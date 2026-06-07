@@ -160,10 +160,14 @@ static inline float& ShopMenuFloat(CShopMenu* shopMenu, int offset)
 
 static inline unsigned short GetPadButtons()
 {
-    if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
-        return 0;
+    bool hasInput = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
+    unsigned short buttons;
+    if (hasInput) {
+        buttons = 0;
+    } else {
+        buttons = Pad.GetPadInputs()[0].buttonDown[0];
     }
-    return static_cast<unsigned short>(Pad.GetPadInputs()[0].buttonDown[0]);
+    return buttons;
 }
 
 static unsigned short GetShopMenuListButtons()
@@ -564,7 +568,21 @@ int CShopMenu::calcGilRatio(int baseGil)
  */
 int CShopMenu::getItemNo(int index)
 {
-    return ResolveShopMenuItemNo(this, index);
+    int listType = m_listType;
+    if (listType == 0) {
+        return m_caravanWork->m_shopList[index];
+    }
+    if (listType == 1) {
+        return m_caravanWork->m_inventoryItems[index];
+    }
+    if (listType == 2) {
+        int mapped = m_itemTable[index];
+        if (mapped == -1) {
+            return -1;
+        }
+        return m_caravanWork->m_inventoryItems[mapped];
+    }
+    return -1;
 }
 
 /*
@@ -2053,15 +2071,24 @@ void CShopMenu::DrawShop0()
  */
 void CShopMenu::SelectMake()
 {
-    unsigned int canSelect = MenuPcs.ChkEquipPossible(m_resultItem) != 0;
+    unsigned int canSelect = static_cast<unsigned int>(MenuPcs.ChkEquipPossible(m_resultItem));
+    canSelect = static_cast<unsigned int>(-(-static_cast<int>(canSelect & 0xFF) >> 0x1F));
     if (canSelect != 0) {
-        int selected = this->getItemNo(m_selectedIndex);
-        unsigned int money = static_cast<unsigned int>(ShopMenuCaravanWork(this)->m_gil);
-        unsigned int craftGil = static_cast<unsigned int>(this->getMakeGil(selected));
-        canSelect = (craftGil <= money) ? 1U : 0U;
+        int selected = getItemNo(m_selectedIndex);
+        unsigned int money = static_cast<unsigned int>(m_caravanWork->m_gil);
+        unsigned int craftGil;
+        if (selected < 1) {
+            craftGil = 0;
+        } else {
+            int gil = m_caravanWork->m_shopParam *
+                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + selected * 0x48 + 0x24);
+            gil = gil / 100 + (gil >> 0x1F);
+            craftGil = gil - (gil >> 0x1F);
+        }
+        canSelect = ((int)money >> 0x1F) + ((craftGil <= money) - ((int)craftGil >> 0x1F));
     }
 
-    int selected = this->getItemNo(m_selectedIndex);
+    int selected = getItemNo(m_selectedIndex);
     short recipeMaterial[8];
     MenuPcs.GetRecipeMaterial(selected, reinterpret_cast<CMenuPcs::MaterialInfo*>(recipeMaterial));
 
@@ -2074,8 +2101,36 @@ void CShopMenu::SelectMake()
 
         canSelect = static_cast<unsigned int>(-static_cast<int>(-canSelect) >> 0x1F);
         if (canSelect != 0) {
-            unsigned int total = static_cast<unsigned int>(CountShopMenuOwnedItems(ShopMenuCaravanWork(this), itemNo));
-            canSelect = (total >= static_cast<unsigned int>(material[3])) ? 1U : 0U;
+            short* inventory = m_caravanWork->m_inventoryItems;
+            unsigned int total = 0;
+            for (int j = 0; j < 8; j++, inventory += 8) {
+                if (inventory[0] == itemNo) {
+                    ++total;
+                }
+                if (inventory[1] == itemNo) {
+                    ++total;
+                }
+                if (inventory[2] == itemNo) {
+                    ++total;
+                }
+                if (inventory[3] == itemNo) {
+                    ++total;
+                }
+                if (inventory[4] == itemNo) {
+                    ++total;
+                }
+                if (inventory[5] == itemNo) {
+                    ++total;
+                }
+                if (inventory[6] == itemNo) {
+                    ++total;
+                }
+                if (inventory[7] == itemNo) {
+                    ++total;
+                }
+            }
+            canSelect = ((int)total >> 0x1F) +
+                        ((static_cast<unsigned int>(material[3]) <= total) - ((int)material[3] >> 0x1F));
         }
     }
 
@@ -2096,9 +2151,17 @@ void CShopMenu::SelectMake()
                     return;
                 }
 
-                int itemId = ResolveShopMenuSelectedItemId(this);
-                int makeGil = CalcShopMenuMakeGil(this, itemId);
-                if (ShopMenuCaravanWork(this)->CanAddGil(-makeGil) != 0) {
+                int itemId = getItemNo(m_selectedIndex);
+                int makeGil;
+                if (itemId < 1) {
+                    makeGil = 0;
+                } else {
+                    int gil = m_caravanWork->m_shopParam *
+                              *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x24);
+                    gil = gil / 100 + (gil >> 0x1F);
+                    makeGil = gil - (gil >> 0x1F);
+                }
+                if (m_caravanWork->CanAddGil(-makeGil) != 0) {
                     Sound.PlaySe(0x52, 0x40, 0x7F, 0);
                     m_nextMode = 0xF;
                     SetMode(0xE);
@@ -2131,21 +2194,25 @@ void CShopMenu::SelectMake()
  */
 void CShopMenu::SelectYesNo()
 {
-    unsigned short buttons = GetPadButtons();
-    if ((buttons & 0xC) != 0) {
+    if ((GetPadButtons() & 0xC) != 0) {
         m_yesNo ^= 1;
         Sound.PlaySe(1, 0x40, 0x7F, 0);
         return;
     }
 
-    if ((buttons & 0x100) == 0) {
+    if ((GetPadButtons() & 0x100) == 0) {
         return;
     }
 
     int yesNo = m_yesNo;
     if (yesNo == 1) {
-        Sound.PlaySe(3, 0x40, 0x7F, 0);
-        m_subMode = (m_listType == 0) ? 1 : 0;
+        if (m_listType == 0) {
+            Sound.PlaySe(3, 0x40, 0x7F, 0);
+            m_subMode = 1;
+        } else {
+            Sound.PlaySe(3, 0x40, 0x7F, 0);
+            m_subMode = 0;
+        }
         return;
     }
 
@@ -2154,37 +2221,149 @@ void CShopMenu::SelectYesNo()
     }
 
     m_subMode = 0;
-    int listType = m_listType;
-    if (listType == 0) {
+    int itemId = getItemNo(m_selectedIndex);
+    if (m_listType == 0) {
         Sound.PlaySe(0x50, 0x40, 0x7F, 0);
-        ExecuteShopMenuBuyConfirm(this);
+        int costBase = itemId * 0x48;
+        int quantity = 0;
+        CCaravanWork* caravanWork;
+        while ((quantity < m_quantity) &&
+               (caravanWork = m_caravanWork,
+                static_cast<unsigned short>(caravanWork->m_inventoryItemCount + 1) < 0x41)) {
+            int gilValue;
+            if (m_listType == 0) {
+                if (itemId < 1) {
+                    gilValue = 0;
+                } else {
+                    int gil = caravanWork->m_shopParam *
+                              *reinterpret_cast<unsigned short*>(costBase + Game.unkCFlatData0[2] + 0x20);
+                    gil = gil / 100 + (gil >> 0x1F);
+                    gilValue = gil - (gil >> 0x1F);
+                }
+            } else if (m_listType == 1) {
+                if (itemId < 1) {
+                    gilValue = 0;
+                } else {
+                    int gil = caravanWork->m_shopParam *
+                              *reinterpret_cast<unsigned short*>(costBase + Game.unkCFlatData0[2] + 0x20);
+                    gil = gil / 100 + (gil >> 0x1F);
+                    gilValue = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil - (gil >> 0x1F)));
+                }
+            } else {
+                gilValue = -1;
+            }
+
+            if (caravanWork->CanAddGil(-gilValue) == 0) {
+                return;
+            }
+
+            m_caravanWork->AddItem(static_cast<short>(itemId), 0);
+            int gilValue2;
+            if (m_listType == 0) {
+                if (itemId < 1) {
+                    gilValue2 = 0;
+                } else {
+                    int gil = m_caravanWork->m_shopParam *
+                              *reinterpret_cast<unsigned short*>(costBase + Game.unkCFlatData0[2] + 0x20);
+                    gil = gil / 100 + (gil >> 0x1F);
+                    gilValue2 = gil - (gil >> 0x1F);
+                }
+            } else if (m_listType == 1) {
+                if (itemId < 1) {
+                    gilValue2 = 0;
+                } else {
+                    int gil = m_caravanWork->m_shopParam *
+                              *reinterpret_cast<unsigned short*>(costBase + Game.unkCFlatData0[2] + 0x20);
+                    gil = gil / 100 + (gil >> 0x1F);
+                    gilValue2 = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil - (gil >> 0x1F)));
+                }
+            } else {
+                gilValue2 = -1;
+            }
+            m_caravanWork->AddGil(-gilValue2);
+            ++quantity;
+        }
         return;
     }
 
     int itemIndex = m_selectedIndex;
-    int itemId = -1;
     bool canTrade = false;
     if (itemIndex != -1) {
-        itemId = ResolveShopMenuSelectedItemId(this);
-        if (itemId >= 1) {
-            if (listType == 0) {
-                canTrade = true;
-            } else if (listType == 2) {
-                unsigned int bit = static_cast<unsigned int>(itemId - 0x191);
-                canTrade = (ShopMenuCaravanWork(this)->m_shopArgs[(itemId - 0x191) >> 5] & (1U << (bit & 0x1F))) != 0;
-            } else if (MenuPcs.EquipChk(itemIndex) == 0) {
-                canTrade = itemId >= 0x9F;
+        int tradeItem = getItemNo(itemIndex);
+        if (tradeItem < 1) {
+            canTrade = false;
+        } else if (m_listType == 0) {
+            canTrade = true;
+        } else if (m_listType == 2) {
+            canTrade = true;
+            if ((m_caravanWork->m_shopArgs[((int)(tradeItem - 0x191U) >> 5)] &
+                 (1 << ((tradeItem - 0x191U) & 0x1F))) == 0) {
+                canTrade = false;
+            }
+        } else {
+            if (MenuPcs.EquipChk(itemIndex) == 0) {
+                canTrade = tradeItem >= 0x9F;
+            } else {
+                canTrade = false;
             }
         }
     }
 
-    if (!canTrade) {
-        Sound.PlaySe(4, 0x40, 0x7F, 0);
-        return;
-    }
+    if (canTrade) {
+        Sound.PlaySe(0x50, 0x40, 0x7F, 0);
+        int sellId = getItemNo(m_selectedIndex);
+        int gilValue;
+        if (m_listType == 0) {
+            if (sellId < 1) {
+                gilValue = 0;
+            } else {
+                int gil = m_caravanWork->m_shopParam *
+                          *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + sellId * 0x48 + 0x20);
+                gil = gil / 100 + (gil >> 0x1F);
+                gilValue = gil - (gil >> 0x1F);
+            }
+        } else if (m_listType == 1) {
+            if (sellId < 1) {
+                gilValue = 0;
+            } else {
+                int gil = m_caravanWork->m_shopParam *
+                          *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + sellId * 0x48 + 0x20);
+                gil = gil / 100 + (gil >> 0x1F);
+                gilValue = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil - (gil >> 0x1F)));
+            }
+        } else {
+            gilValue = -1;
+        }
 
-    Sound.PlaySe(0x50, 0x40, 0x7F, 0);
-    ExecuteShopMenuSellConfirm(this);
+        if (m_caravanWork->CanAddGil(gilValue) != 0) {
+            m_caravanWork->DeleteItemIdx(m_selectedIndex, 0);
+            int gilValue2;
+            if (m_listType == 0) {
+                if (sellId < 1) {
+                    gilValue2 = 0;
+                } else {
+                    int gil = m_caravanWork->m_shopParam *
+                              *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + sellId * 0x48 + 0x20);
+                    gil = gil / 100 + (gil >> 0x1F);
+                    gilValue2 = gil - (gil >> 0x1F);
+                }
+            } else if (m_listType == 1) {
+                if (sellId < 1) {
+                    gilValue2 = 0;
+                } else {
+                    int gil = m_caravanWork->m_shopParam *
+                              *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + sellId * 0x48 + 0x20);
+                    gil = gil / 100 + (gil >> 0x1F);
+                    gilValue2 = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil - (gil >> 0x1F)));
+                }
+            } else {
+                gilValue2 = -1;
+            }
+            m_caravanWork->AddGil(gilValue2);
+        }
+    } else {
+        Sound.PlaySe(4, 0x40, 0x7F, 0);
+    }
 }
 /*
  * --INFO--
@@ -2405,7 +2584,6 @@ void CShopMenu::SelectItemIdx()
  */
 void CShopMenu::Calc()
 {
-    unsigned short buttons = GetPadButtons();
     int mode = m_mode;
     int& timer = m_timer;
     int& subMode = m_subMode;
@@ -2423,24 +2601,24 @@ void CShopMenu::Calc()
         }
         break;
     case 1:
-        if ((buttons & 4) != 0) {
+        if ((GetPadButtons() & 4) != 0) {
             ++choice;
             if (choice > 2) {
                 choice = 0;
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
-        } else if ((buttons & 8) != 0) {
+        } else if ((GetPadButtons() & 8) != 0) {
             --choice;
             if (choice > 2) {
                 choice = 2;
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
-        } else if ((buttons & 0x100) != 0) {
+        } else if ((GetPadButtons() & 0x100) != 0) {
             Sound.PlaySe(2, 0x40, 0x7F, 0);
             this->SetMode(2);
         }
 
-        if ((buttons & 0x200) != 0) {
+        if ((GetPadButtons() & 0x200) != 0) {
             Sound.PlaySe(3, 0x40, 0x7F, 0);
             this->SetMode(2);
             choice = 2;
@@ -2473,21 +2651,23 @@ void CShopMenu::Calc()
         }
         break;
     case 4:
-        if (subMode == 0) {
-            this->SelectItemIdx();
-            if ((buttons & 0x200) != 0) {
-                Sound.PlaySe(3, 0x40, 0x7F, 0);
-                this->SetMode(5);
-            }
-        } else if (subMode == 1) {
+        if (subMode == 1) {
             this->SelectFigure();
-            if ((buttons & 0x200) != 0) {
+            if ((GetPadButtons() & 0x200) != 0) {
                 Sound.PlaySe(3, 0x40, 0x7F, 0);
                 subMode = 0;
             }
-        } else if (subMode == 2) {
+        } else if (subMode < 1) {
+            if (subMode >= 0) {
+                this->SelectItemIdx();
+                if ((GetPadButtons() & 0x200) != 0) {
+                    Sound.PlaySe(3, 0x40, 0x7F, 0);
+                    this->SetMode(5);
+                }
+            }
+        } else if (subMode < 3) {
             this->SelectYesNo();
-            if ((buttons & 0x200) != 0) {
+            if ((GetPadButtons() & 0x200) != 0) {
                 Sound.PlaySe(3, 0x40, 0x7F, 0);
                 subMode = 1;
             }
@@ -2510,17 +2690,21 @@ void CShopMenu::Calc()
         }
         break;
     case 7:
-        if (subMode == 0) {
-            this->SelectItemIdx();
-            if ((buttons & 0x200) != 0) {
-                Sound.PlaySe(3, 0x40, 0x7F, 0);
-                this->SetMode(8);
-            }
-        } else if (subMode == 2) {
-            this->SelectYesNo();
-            if ((buttons & 0x200) != 0) {
-                Sound.PlaySe(3, 0x40, 0x7F, 0);
-                subMode = 1;
+        if (subMode != 1) {
+            if (subMode < 1) {
+                if (subMode >= 0) {
+                    this->SelectItemIdx();
+                    if ((GetPadButtons() & 0x200) != 0) {
+                        Sound.PlaySe(3, 0x40, 0x7F, 0);
+                        this->SetMode(8);
+                    }
+                }
+            } else if (subMode < 3) {
+                this->SelectYesNo();
+                if ((GetPadButtons() & 0x200) != 0) {
+                    Sound.PlaySe(3, 0x40, 0x7F, 0);
+                    subMode = 0;
+                }
             }
         }
         break;
@@ -2535,7 +2719,7 @@ void CShopMenu::Calc()
         break;
     case 10:
         this->SelectItemIdx();
-        if ((buttons & 0x200) != 0) {
+        if ((GetPadButtons() & 0x200) != 0) {
             m_nextMode = -1;
             Sound.PlaySe(3, 0x40, 0x7F, 0);
             this->SetMode(0xB);
@@ -2566,7 +2750,7 @@ void CShopMenu::Calc()
         break;
     case 13:
         this->SelectMake();
-        if ((buttons & 0x200) != 0) {
+        if ((GetPadButtons() & 0x200) != 0) {
             m_nextMode = 9;
             Sound.PlaySe(3, 0x40, 0x7F, 0);
             this->SetMode(0xE);

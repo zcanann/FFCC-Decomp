@@ -3190,11 +3190,10 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 	}
 
 	unsigned int validCount;
-	unsigned char* const cmakeWork = GetWmCmakeWork(this);
-	if (cmakeWork != 0) {
+	if (m_cmakeWorkActive == 1) {
 		validCount = 0;
 		for (int i = 0; i < 8; i++) {
-			if (*reinterpret_cast<int*>(cmakeWork + i * 0x9C0 + 0x1A84) != 0) {
+			if (*reinterpret_cast<int*>(m_cmakeWork + i * 0x9C0 + 0x1A84) != 0) {
 				validCount++;
 			}
 		}
@@ -3281,8 +3280,8 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 		Sound.PlaySe(0x34, 0x40, 0x7F, 0);
 	} else if ((down & 0x100) != 0) {
 		int shopState;
-		if (cmakeWork != 0) {
-			shopState = *reinterpret_cast<int*>(cmakeWork + entry.m_currentSlot * 0x9C0 + 0x1A84);
+		if (m_cmakeWorkActive == 1 && m_cmakeWork != 0) {
+			shopState = *reinterpret_cast<int*>(m_cmakeWork + entry.m_currentSlot * 0x9C0 + 0x1A84);
 		} else {
 			shopState = Game.m_caravanWorkArr[entry.m_currentSlot].m_shopState;
 		}

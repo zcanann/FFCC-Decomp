@@ -13,10 +13,10 @@ extern f32 gPppDefaultValueBuffer[];
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-extern const f32 FLOAT_803306e8;
-extern const f32 FLOAT_803306ec;
-extern u32 kYmTracerTopColorBase;
-extern u32 kYmTracerBottomColorBase;
+extern const u32 kYmTracerTopColorBase = 0xFFFFFF00;
+extern const u32 kYmTracerBottomColorBase = 0xFFFFFF00;
+extern const f32 kYmTracerZero = 0.0f;
+extern const f32 kYmTracerOne = 1.0f;
 
 static const char s_pppYmTracer_cpp[] = "pppYmTracer.cpp";
 
@@ -101,7 +101,7 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYm
         pppSetBlendMode(param_2->m_tracer.m_blendMode);
         pppSetDrawEnv(
             &colorData->color, reinterpret_cast<pppFMATRIX*>(&ppvCameraMatrix),
-            FLOAT_803306e8,
+            kYmTracerZero,
             param_2->m_tracer.m_drawEnvColor1, param_2->m_tracer.m_drawEnvColor0,
             param_2->m_tracer.m_blendMode, 0, 1, 1, 0);
         gUtil.SetVtxFmt_POS_CLR_TEX();
@@ -124,18 +124,18 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYm
                 SetUpPaletteEnv(texture);
             }
 
-            uvStep = FLOAT_803306ec / (f32)(u32)work->count;
+            uvStep = kYmTracerOne / (f32)(u32)work->count;
             GXSetCullMode(GX_CULL_NONE);
 
             for (i = 0; i < (s32)(work->count - 1); i++) {
                 YmTracerPolygon* next = poly + 1;
 
-                if ((next->life > 0) && (FLOAT_803306e8 != poly->to.x) && (FLOAT_803306e8 != poly->to.y) &&
-                    (FLOAT_803306e8 != poly->to.z) && (FLOAT_803306e8 != poly->from.x) &&
-                    (FLOAT_803306e8 != poly->from.y) && (FLOAT_803306e8 != poly->from.z) &&
-                    (FLOAT_803306e8 != next->to.x) && (FLOAT_803306e8 != next->to.y) &&
-                    (FLOAT_803306e8 != next->to.z) && (FLOAT_803306e8 != next->from.x) &&
-                    (FLOAT_803306e8 != next->from.y) && (FLOAT_803306e8 != next->from.z)) {
+                if ((next->life > 0) && (kYmTracerZero != poly->to.x) && (kYmTracerZero != poly->to.y) &&
+                    (kYmTracerZero != poly->to.z) && (kYmTracerZero != poly->from.x) &&
+                    (kYmTracerZero != poly->from.y) && (kYmTracerZero != poly->from.z) &&
+                    (kYmTracerZero != next->to.x) && (kYmTracerZero != next->to.y) &&
+                    (kYmTracerZero != next->to.z) && (kYmTracerZero != next->from.x) &&
+                    (kYmTracerZero != next->from.y) && (kYmTracerZero != next->from.z)) {
                     uTop = (f32)i * uvStep;
                     uBottom = (f32)(i + 1) * uvStep;
                     colorTop.value = kYmTracerTopColorBase;
@@ -146,19 +146,19 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYm
                     GXBegin((GXPrimitive)0x98, GX_VTXFMT7, 4);
                     GXPosition3f32(poly->to.x, poly->to.y, poly->to.z);
                     GXColor1u32(*(u32*)&colorTop);
-                    GXTexCoord2f32(uTop, FLOAT_803306ec);
+                    GXTexCoord2f32(uTop, kYmTracerOne);
 
                     GXPosition3f32(poly->from.x, poly->from.y, poly->from.z);
                     GXColor1u32(*(u32*)&colorTop);
-                    GXTexCoord2f32(uTop, FLOAT_803306e8);
+                    GXTexCoord2f32(uTop, kYmTracerZero);
 
                     GXPosition3f32(next->to.x, next->to.y, next->to.z);
                     GXColor1u32(*(u32*)&colorBottom);
-                    GXTexCoord2f32(uBottom, FLOAT_803306ec);
+                    GXTexCoord2f32(uBottom, kYmTracerOne);
 
                     GXPosition3f32(next->from.x, next->from.y, next->from.z);
                     GXColor1u32(*(u32*)&colorBottom);
-                    GXTexCoord2f32(uBottom, FLOAT_803306e8);
+                    GXTexCoord2f32(uBottom, kYmTracerZero);
                 }
                 poly++;
             }
@@ -196,7 +196,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYmT
         work->entries = (YmTracerPolygon*)pppMemAlloc(
             (u32)param_2->m_tracer.m_entryCount * sizeof(YmTracerPolygon), ppvEnv->m_stagePtr,
             const_cast<char*>(s_pppYmTracer_cpp), 0xEB);
-        fVar3 = FLOAT_803306e8;
+        fVar3 = kYmTracerZero;
         entries = work->entries;
         entry = entries;
         for (i = 0; i < (s32)(u32)param_2->m_tracer.m_entryCount; i++) {
@@ -234,7 +234,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYmT
         entries[0].life = -1;
         entries[0].alpha = param_2->m_tracer.m_entryAlpha;
         entries[0].decay = (u8)((u16)param_2->m_tracer.m_entryAlpha / param_2->m_tracer.m_entryLife);
-        fVar3 = FLOAT_803306e8;
+        fVar3 = kYmTracerZero;
         entries[0].from.z = fVar3;
         entries[0].from.y = fVar3;
         entries[0].from.x = fVar3;
@@ -279,15 +279,15 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYmT
             Vec splineTo[4];
             s16 splineCount = 0;
             f32 t;
-            f32 stepScale = FLOAT_803306ec / (f32)(param_2->m_tracer.m_splineCount + 1);
+            f32 stepScale = kYmTracerOne / (f32)(param_2->m_tracer.m_splineCount + 1);
 
             for (i = 0; i < (s32)(u32)param_2->m_tracer.m_splineCount; i++) {
                 t = stepScale * (f32)(i + 1);
 
                 gUtil.GetSplinePos(splineFrom[(param_2->m_tracer.m_splineCount - 1) - i], entries[3].from, entries[2].from,
-                                          entries[1].from, entries[0].from, t, FLOAT_803306ec);
+                                          entries[1].from, entries[0].from, t, kYmTracerOne);
                 gUtil.GetSplinePos(splineTo[(param_2->m_tracer.m_splineCount - 1) - i], entries[3].to, entries[2].to,
-                                          entries[1].to, entries[0].to, t, FLOAT_803306ec);
+                                          entries[1].to, entries[0].to, t, kYmTracerOne);
 
                 splineCount++;
                 work->count++;
@@ -381,7 +381,7 @@ void pppConstructYmTracer(pppYmTracer* pppYmTracer, pppYmTracerCtrl* param_2)
     f32 fVar1;
     YmTracerWork* work;
 
-    fVar1 = FLOAT_803306e8;
+    fVar1 = kYmTracerZero;
     work = GetYmTracerWork(pppYmTracer, param_2);
 
     work->entries = 0;

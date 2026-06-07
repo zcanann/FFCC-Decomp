@@ -19,11 +19,11 @@ CPad Pad;
 void* operator new[](unsigned long, CMemory::CStage*, char*, int);
 
 static const char s_CPad[] = "CPad";
-extern const float FLOAT_8032f820 = 0.0f;
-extern const float FLOAT_8032f824 = 0.0078125f;
-extern const float FLOAT_8032f828 = 255.0f;
-extern const double DOUBLE_8032f830 = 4503601774854144.0;
-extern const double DOUBLE_8032f838 = 4503599627370496.0;
+extern const float kPadAnalogZero = 0.0f;
+extern const float kPadAnalogScale = 0.0078125f;
+extern const float kPadTriggerMax = 255.0f;
+extern const double kPadS32ToDoubleBias = 4503601774854144.0;
+extern const double kPadU32ToDoubleBias = 4503599627370496.0;
 static const char s_pad_cpp[] = { 'p', 'a', 'd', '.', 'c', 'p', 'p', 0 };
 static const char s_rb[] = { 'r', 'b', 0 };
 static const char s_replay_dat[] = "/replay.dat";
@@ -264,7 +264,7 @@ void CPad::Frame()
 		PADReset(uVar16 & 0xF0000000);
 	}
 
-	fVar2 = FLOAT_8032f820;
+	fVar2 = kPadAnalogZero;
 	PadInput* merged = reinterpret_cast<PadInput*>(puVar10);
 	merged->buttonPrev[0] = merged->button[0];
 	uVar17 = 0;
@@ -383,8 +383,8 @@ void CPad::Frame()
 						{
 							*reinterpret_cast<u16*>(iVar6 + 0x0E) = *reinterpret_cast<u16*>(iVar6 + 0x0E) | 8;
 						}
-						fVar2 = FLOAT_8032f824;
-						fVar3 = FLOAT_8032f828;
+						fVar2 = kPadAnalogScale;
+						fVar3 = kPadTriggerMax;
 						*reinterpret_cast<u8*>(iVar6 + 0x1A) = *reinterpret_cast<u8*>(puVar13 + 2);
 						*reinterpret_cast<u8*>(iVar6 + 0x1B) = *reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar13) + 5);
 						*reinterpret_cast<u8*>(iVar6 + 0x16) = *reinterpret_cast<u8*>(puVar13 + 3);
@@ -405,7 +405,7 @@ void CPad::Frame()
 					else
 					{
 						*puVar12 = 0;
-						fVar2 = FLOAT_8032f820;
+						fVar2 = kPadAnalogZero;
 						*reinterpret_cast<u8*>(iVar6 + 0x18) = 0;
 						*reinterpret_cast<u8*>(iVar6 + 0x19) = 0;
 						*reinterpret_cast<u8*>(iVar6 + 0x1A) = 0;

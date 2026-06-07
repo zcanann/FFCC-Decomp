@@ -18,10 +18,6 @@ extern const float kFontOne = 1.0f;
 extern const double DOUBLE_803306D0 = 4503599627370496.0;
 extern const float kFontOrthoHeight = 448.0f;
 extern const float kFontOrthoWidth = 640.0f;
-extern const unsigned int kYmTracerTopColorBase = 0xFFFFFF00;
-extern const unsigned int kYmTracerBottomColorBase = 0xFFFFFF00;
-extern const float FLOAT_803306e8 = 0.0f;
-extern const float FLOAT_803306ec = 1.0f;
 
 static const char s_fontman_cpp[] = "fontman.cpp";
 static const char s_CFontMan_801D9CC4[] = "CFontMan";

@@ -15,16 +15,16 @@
 extern "C" {
 extern const float kPppYmMeltZero;
 extern const float FLOAT_80330af4;
-extern const float FLOAT_80330b08 = 0.5f;
-extern const float FLOAT_80330b0c = 0.017453292f;
-extern const float FLOAT_80330b10 = -2000.0f;
-extern const float FLOAT_80330b14 = 10000000000.0f;
-extern const float FLOAT_80330b18[2] = {-10000000000.0f, 0.0f};
-extern const u32 DAT_80330b20 = 0x00000001;
-extern const u32 DAT_80330b24 = 0x00000010;
-extern const u32 DAT_80330B28 = 0x0000003f;
-extern const float FLOAT_80330B2C = 0.0f;
-extern const float FLOAT_80330B30 = 0.0f;
+extern const float kPppYmMeltHalf = 0.5f;
+extern const float kPppYmMeltDegToRad = 0.017453292f;
+extern const float kPppYmMeltRayLength = -2000.0f;
+extern const float kPppYmMeltCylinderRadius = 10000000000.0f;
+extern const float kPppYmMeltCylinderBoundAndZero[2] = {-10000000000.0f, 0.0f};
+extern const u32 kPppYmMeltMaskBit0 = 0x00000001;
+extern const u32 kPppYmMeltMaskBit4 = 0x00000010;
+extern const u32 kPppYmMeltMask6Bits = 0x0000003f;
+extern const float kPppYmMeltLocalZero = 0.0f;
+extern const float kCFlatPadStickZero = 0.0f;
 u32 g_ymMelt;
 }
 
@@ -282,9 +282,9 @@ inline void InitPolygonData(VERTEX_DATA* ctrl, YmMeltVertex* vertexData, s16 pha
     float z;
     Mtx rotMtx;
 
-    halfWidth = ctrl->m_stepValue * LoadFloat(FLOAT_80330b08);
+    halfWidth = ctrl->m_stepValue * LoadFloat(kPppYmMeltHalf);
     step = ctrl->m_stepValue / (f32)ctrl->m_gridSize;
-    rot = FLOAT_80330b0c * (f32)phaseOffset;
+    rot = kPppYmMeltDegToRad * (f32)phaseOffset;
     vertex = vertexData;
 
     for (z = -halfWidth; z <= halfWidth; z += step) {
@@ -440,11 +440,11 @@ extern "C" void CalcPolygonHeight(
         worldBase.z = ppvMng->m_matrix.value[2][3];
         worldBase.y += vertexData->m_collisionYOffset;
         rayDirection.x = zero;
-        rayDirection.y = LoadFloat(FLOAT_80330b10);
+        rayDirection.y = LoadFloat(kPppYmMeltRayLength);
         rayDirection.z = zero;
         pppAddVector(vertex->m_position, vertex->m_position, worldBase);
 
-        CMapCylinder cylinder(LoadFloat(FLOAT_80330b14), FLOAT_80330b18[0]);
+        CMapCylinder cylinder(LoadFloat(kPppYmMeltCylinderRadius), kPppYmMeltCylinderBoundAndZero[0]);
         cylinder.m_bottom = vertex->m_position;
         cylinder.m_axis.x = rayDirection.x;
         cylinder.m_axis.y = rayDirection.y;

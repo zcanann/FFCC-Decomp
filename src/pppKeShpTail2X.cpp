@@ -6,7 +6,7 @@
 extern "C" {
 extern const float kPppKeShpTail2XZero;
 extern const float kPppKeShpTail2XAlphaScale;
-const float FLOAT_80330508 = 0.5f;
+const float kPppKeShpTail2XHalf = 0.5f;
 }
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
@@ -178,10 +178,10 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
         colorStep.z = (colorStart.z - colorEnd.z) / invCountMinusOne;
         colorStep.w = (colorStart.w - colorEnd.w) / invCountMinusOne;
     } else {
-        colorStep.x = FLOAT_80330508;
-        colorStep.y = FLOAT_80330508;
-        colorStep.z = FLOAT_80330508;
-        colorStep.w = FLOAT_80330508;
+        colorStep.x = kPppKeShpTail2XHalf;
+        colorStep.y = kPppKeShpTail2XHalf;
+        colorStep.z = kPppKeShpTail2XHalf;
+        colorStep.w = kPppKeShpTail2XHalf;
     }
     colorStepR = colorStep.x;
     colorStepG = colorStep.y;

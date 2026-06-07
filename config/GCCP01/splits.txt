@@ -1258,7 +1258,7 @@ pppYmLaser.cpp:
 	extabindex  start:0x8000F4C0 end:0x8000F4F0
 	.text       start:0x800D2614 end:0x800D3818
 	.rodata     start:0x801DB4B0 end:0x801DB4C0
-	.sdata2     start:0x80330DD8 end:0x80330E10
+	.sdata2     start:0x80330DD8 end:0x80330DF8
 
 pppSpMatrix.cpp:
 	extab       start:0x80008AC4 end:0x80008ACC
@@ -1270,31 +1270,32 @@ pppYmChangeTex.cpp:
 	extabindex  start:0x8000F4FC end:0x8000F538
 	.text       start:0x800D3854 end:0x800D4278
 	.rodata     start:0x801DB4C0 end:0x801DB4D8
-	.sdata2     start:0x80330E10 end:0x80330E2C
+	.sdata2     start:0x80330DF8 end:0x80330E14
 
 pppYmMoveParabola.cpp:
 	extab       start:0x80008AF4 end:0x80008B04
 	extabindex  start:0x8000F538 end:0x8000F550
 	.text       start:0x800D4278 end:0x800D467C
-	.sdata2     start:0x80330E30 end:0x80330E50
+	.sdata2     start:0x80330E18 end:0x80330E38
 
 pppParMoveMatrix.cpp:
 	extab       start:0x80008B04 end:0x80008B0C
 	extabindex  start:0x8000F550 end:0x8000F55C
 	.text       start:0x800D467C end:0x800D4828
+	.sdata2     start:0x80330E38 end:0x80330E40
 
 pppYmTraceMove.cpp:
 	extab       start:0x80008B0C end:0x80008B1C
 	extabindex  start:0x8000F55C end:0x8000F574
 	.text       start:0x800D4828 end:0x800D4C7C
-	.sdata2     start:0x80330E58 end:0x80330E60
+	.sdata2     start:0x80330E40 end:0x80330E48
 
 pppYmMana.cpp:
 	extab       start:0x80008B1C end:0x80008B94
 	extabindex  start:0x8000F574 end:0x8000F628
 	.text       start:0x800D4C7C end:0x800D8710
 	.rodata     start:0x801DB4D8 end:0x801DB4E8
-	.sdata2     start:0x80330E60 end:0x80330EC8
+	.sdata2     start:0x80330E48 end:0x80330EC8
 
 p_sound.cpp:
 	extab       start:0x80008B94 end:0x80008BBC

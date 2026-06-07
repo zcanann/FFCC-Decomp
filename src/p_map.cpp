@@ -80,15 +80,15 @@ CProcessTableCallback CMapPcs::m_table_desc21 = {0, 0xFFFFFFFF, reinterpret_cast
 CProcessTableCallback CMapPcs::m_table_desc22 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__7CMapPcsFv)};
 CProcessTableCallback CMapPcs::m_table_desc23 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfterViewer__7CMapPcsFv)};
 
-static const char s_CMapPcs_GAME_801D76E0[] = "CMapPcs(GAME)";
-static const char s_CMapPcs_VIEWER_801D76F0[] = "CMapPcs(VIEWER)";
-static const char s_CMapPcs_PART_801D7700[] = "CMapPcs(PART)";
-static const char s_CManager_801D7710[] = "CManager";
-static const char s_CProcess_801D771C[] = "CProcess";
+static const char sMapPcsGameTableName[] = "CMapPcs(GAME)";
+static const char sMapPcsViewerTableName[] = "CMapPcs(VIEWER)";
+static const char sMapPcsPartTableName[] = "CMapPcs(PART)";
+static const char sMapPcsManagerClassName[] = "CManager";
+static const char sMapPcsProcessClassName[] = "CProcess";
 
 CProcessTable CMapPcs::m_table[3] = {
     {
-        const_cast<char*>(s_CMapPcs_GAME_801D76E0),
+        const_cast<char*>(sMapPcsGameTableName),
         0, 0, 0,
         0, 0, 0,
         0, 0, 0,
@@ -99,7 +99,7 @@ CProcessTable CMapPcs::m_table[3] = {
         1,                           0, 0, 0,  0x3F,                        1,
     },
     {
-        const_cast<char*>(s_CMapPcs_VIEWER_801D76F0),
+        const_cast<char*>(sMapPcsViewerTableName),
         0, 0, 0,
         0, 0, 0,
         0, 0, 0,
@@ -110,7 +110,7 @@ CProcessTable CMapPcs::m_table[3] = {
         1,                           0, 0, 0, 0x3F,                        1,
     },
     {
-        const_cast<char*>(s_CMapPcs_PART_801D7700),
+        const_cast<char*>(sMapPcsPartTableName),
         0, 0, 0,
         0, 0, 0,
         0, 0, 0,
@@ -165,12 +165,9 @@ unsigned char g_map_calc_prof ATTRIBUTE_ALIGN(4);
 unsigned char g_map_draw_prof ATTRIBUTE_ALIGN(4);
 static const float kPMapBoundMinInit = 10000000000.0f;
 static const float kPMapBoundMaxInit = -10000000000.0f;
-extern "C" const float DrawRangeDefault_8032FA08;
-extern "C" const float kMapBoundsCenterScale_8032FA0C;
-extern "C" const float kMapCameraCenterYOffset_8032FA10;
-#define DrawRangeDefault DrawRangeDefault_8032FA08
-#define kMapBoundsCenterScale kMapBoundsCenterScale_8032FA0C
-#define kMapCameraCenterYOffset kMapCameraCenterYOffset_8032FA10
+extern "C" const float DrawRangeDefault;
+extern "C" const float kMapBoundsCenterScale;
+extern "C" const float kMapCameraCenterYOffset;
 
 static inline float LoadFloat(const float& value)
 {

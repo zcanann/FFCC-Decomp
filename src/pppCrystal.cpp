@@ -16,16 +16,16 @@
 #include "PowerPC_EABI_Support/Runtime/runtime.h"
 #include "ffcc/ppp_linkage.h"
 
-extern const float FLOAT_80330FD4;
-extern const float FLOAT_80330FD8;
-extern const double DOUBLE_80330FE0;
-extern const double DOUBLE_80330FE8;
+extern const float kPppCrystalCoordMin;
+extern const float kPppCrystalZero;
+extern const double kPppNewtonSqrtHalf;
+extern const double kPppNewtonSqrtThree;
 extern const double kPppLensFlareZeroD;
 extern const float kPppLensFlareOne;
 extern const double kPppLensFlareOcclusionStep;
-extern const float FLOAT_80331008;
-extern const float FLOAT_8033100C;
-extern const float FLOAT_80331010[2];
+extern const float kPppCrystalModulationScale;
+extern const float kPppCrystalCoordOffset;
+extern const float kPppCrystalCoordScaleAndZero[2];
 
 #define CRYSTAL_REFRACTION_SIZE 32.0f
 #define CRYSTAL_HALF_NEGATIVE -0.5f
@@ -113,9 +113,9 @@ static inline float CrystalSqrtPositive(float value)
 {
     double guess = __frsqrte((double)value);
 
-    guess = DOUBLE_80330FE0 * guess * (DOUBLE_80330FE8 - guess * guess * value);
-    guess = DOUBLE_80330FE0 * guess * (DOUBLE_80330FE8 - guess * guess * value);
-    guess = DOUBLE_80330FE0 * guess * (DOUBLE_80330FE8 - guess * guess * value);
+    guess = kPppNewtonSqrtHalf * guess * (kPppNewtonSqrtThree - guess * guess * value);
+    guess = kPppNewtonSqrtHalf * guess * (kPppNewtonSqrtThree - guess * guess * value);
+    guess = kPppNewtonSqrtHalf * guess * (kPppNewtonSqrtThree - guess * guess * value);
 
     return (float)(value * guess);
 }
@@ -308,21 +308,21 @@ void pppFrameCrystal(pppCrystal* pppCrystal, pppCrystalStep* param_2, _pppCtrlTa
 
 		stepX = 2.0f / (float)(textureInfo->m_width - 1U);
 		stepY = 2.0f / (float)(textureInfo->m_height - 1U);
-		yCoord = FLOAT_80330FD4;
+		yCoord = kPppCrystalCoordMin;
 		maxMagnitude = kPppLensFlareOne;
-		coordOffset = FLOAT_8033100C;
-		modulationScale = FLOAT_80331008;
-		coordScale = FLOAT_80331010[0];
+		coordOffset = kPppCrystalCoordOffset;
+		modulationScale = kPppCrystalModulationScale;
+		coordScale = kPppCrystalCoordScaleAndZero[0];
 
 		for (y = 0; y < (u32)textureInfo->m_height; y++) {
 			yTile = y >> 2;
 			u32 yFine = (y & 3) * 4;
 			ySq = yCoord * yCoord;
-			xCoord = FLOAT_80330FD4;
+			xCoord = kPppCrystalCoordMin;
 
 			for (x = 0; x < (u32)textureInfo->m_width; x++) {
 				magnitude = xCoord * xCoord + ySq;
-				if (magnitude > FLOAT_80330FD8) {
+				if (magnitude > kPppCrystalZero) {
 					magnitude = CrystalSqrtPositive(magnitude);
 				} else if ((double)magnitude < kPppLensFlareZeroD) {
 					magnitude = NAN;
@@ -436,19 +436,19 @@ inline void MakeRefractionMap(HSD_ImageBuffer* imageBuffer)
 
     stepX = 2.0f / (float)(imageBuffer->m_width - 1U);
     stepY = 2.0f / (float)(imageBuffer->m_height - 1U);
-    yCoord = FLOAT_80330FD4;
+    yCoord = kPppCrystalCoordMin;
     maxMagnitude = kPppLensFlareOne;
-    coordOffset = FLOAT_8033100C;
-    modulationScale = FLOAT_80331008;
-    coordScale = FLOAT_80331010[0];
+    coordOffset = kPppCrystalCoordOffset;
+    modulationScale = kPppCrystalModulationScale;
+    coordScale = kPppCrystalCoordScaleAndZero[0];
 
     for (y = 0; y < imageBuffer->m_height; y++) {
         ySq = yCoord * yCoord;
-        xCoord = FLOAT_80330FD4;
+        xCoord = kPppCrystalCoordMin;
 
         for (x = 0; x < imageBuffer->m_width; x++) {
             magnitude = xCoord * xCoord + ySq;
-            if (magnitude > FLOAT_80330FD8) {
+            if (magnitude > kPppCrystalZero) {
                 magnitude = CrystalSqrtPositive(magnitude);
             } else if ((double)magnitude < kPppLensFlareZeroD) {
                 magnitude = NAN;

@@ -11,8 +11,8 @@ class CTextureSet;
 class CTexture;
 class CMapTexAnim;
 
-extern "C" const float FLOAT_8032fd48;
-extern "C" const float FLOAT_8032fd4c;
+extern "C" const float kMapTexAnimDefaultFrameStep;
+extern "C" const float kMapTexAnimZero;
 
 class CMapTexAnimSet : public CRef
 {
@@ -37,9 +37,9 @@ class CMapTexAnim : public CRef
 public:
     CMapTexAnim()
     {
-        float frameStep = FLOAT_8032fd48;
+        float frameStep = kMapTexAnimDefaultFrameStep;
         m_keyFrame.m_junTable = 0;
-        float currentFrame = FLOAT_8032fd4c;
+        float currentFrame = kMapTexAnimZero;
         m_keyFrame.m_keyFrame = 0;
         m_keyFrame.m_keyValue = 0;
         m_keyFrame.m_splineTable = 0;

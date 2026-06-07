@@ -7,15 +7,11 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-extern const float FLOAT_80331048 = 640.0f;
-extern const float FLOAT_8033104c = 448.0f;
-extern const float FLOAT_80331050 = 320.0f;
-extern const float FLOAT_80331054 = 224.0f;
-extern const unsigned int DOUBLE_80331058[2] = {0x43300000, 0x80000000};
-extern const float FLOAT_803310C0;
-extern const float FLOAT_803310C4;
-extern const float FLOAT_803310C8;
-extern const float FLOAT_803310CC;
+extern const float kPppScreenWidth = 640.0f;
+extern const float kPppScreenHeight = 448.0f;
+extern const float kPppHalfScreenWidth = 320.0f;
+extern const float kPppHalfScreenHeight = 224.0f;
+extern const unsigned int kPppS32ToDoubleBiasWords[2] = {0x43300000, 0x80000000};
 extern const float kYmEnvViewportWidth;
 extern const float kYmEnvViewportHeight;
 extern const float kYmEnvZero;

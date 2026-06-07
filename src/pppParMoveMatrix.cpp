@@ -4,6 +4,14 @@
 
 #include <dolphin/mtx.h>
 
+extern const float gPppParMoveMatrixZero = 0.0f;
+extern const float gPppParMoveMatrixOne = 1.0f;
+
+static inline float LoadFloat(const float& value)
+{
+	return value;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800e092c
@@ -30,20 +38,21 @@ void pppParMoveMatrix(_pppPObject* obj, pppNoStep* stepData, _pppCtrlTable* ctrl
 	Vec* position = &pppMngSt->m_position;
 	PSVECSubtract(previousPosition, position, &local_44);
 	
-	if (((gPppParMoveMatrixZero != local_44.x) || (gPppParMoveMatrixZero != local_44.y)) || (gPppParMoveMatrixZero != local_44.z)) {
+	f32 initialZero = LoadFloat(gPppParMoveMatrixZero);
+	if (((initialZero != local_44.x) || (initialZero != local_44.y)) || (initialZero != local_44.z)) {
 		PSVECNormalize(&local_44, &local_68);
 		local_50.x = local_68.z;
-		local_50.y = gPppParMoveMatrixZero;
+		local_50.y = LoadFloat(gPppParMoveMatrixZero);
 		local_50.z = -local_68.x;
-		f32 zero = gPppParMoveMatrixZero;
+		f32 zero = LoadFloat(gPppParMoveMatrixZero);
 		f32 axisZ = local_68.z;
 		if ((zero == axisZ) && (zero == local_50.z)) {
-			local_50.y = gPppParMoveMatrixZero;
-			local_50.x = gPppParMoveMatrixOne;
-			local_50.z = gPppParMoveMatrixZero;
-			local_5c.x = gPppParMoveMatrixZero;
-			local_5c.y = gPppParMoveMatrixZero;
-			local_5c.z = gPppParMoveMatrixOne;
+			local_50.y = LoadFloat(gPppParMoveMatrixZero);
+			local_50.x = LoadFloat(gPppParMoveMatrixOne);
+			local_50.z = LoadFloat(gPppParMoveMatrixZero);
+			local_5c.x = LoadFloat(gPppParMoveMatrixZero);
+			local_5c.y = LoadFloat(gPppParMoveMatrixZero);
+			local_5c.z = LoadFloat(gPppParMoveMatrixOne);
 		}
 		else {
 			PSVECNormalize(&local_50, &local_50);

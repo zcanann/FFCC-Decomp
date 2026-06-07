@@ -145,7 +145,7 @@ static const char s_unknown_mapobj_type_error[] = "Error:Unknown mapobj type(%d)
 static const char s_npc_max_over[] = "%s(%d): Error: NPC max over!!\n";
 static const char s_subject_max_over[] = "%s(%d): Error: Subject max over!!\n";
 static const char s_letter_data_error[] = "%s(%d): Error: Letter data error(chan:%d  idx:%d)\n";
-extern const float FLOAT_80330D50 = 0.25f;
+extern const float kGbaQueueQuarter = 0.25f;
 extern const float kGbaQueueMapCoordScale = 3.0f;
 
 namespace GbaQueConst {

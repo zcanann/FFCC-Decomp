@@ -15,9 +15,10 @@
 #include "ffcc/ppp_linkage.h"
 
 static const char s_pppYmChangeTex_cpp[] = "pppYmChangeTex.cpp";
-extern const float FLOAT_80330df8;
-extern const float FLOAT_80330dfc;
-extern const float FLOAT_80330e00;
+extern const float kPppYmChangeTexRampStart = 2.0f;
+extern const float kPppYmChangeTexRampScale = 0.5f;
+extern const float kPppYmChangeTexRampStep = 0.25f;
+extern const double kPppYmChangeTexIntToDoubleBias = 4503601774854144.0;
 extern const float kPppYmChangeTexInitZero = 0.0f;
 
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_vertexCount) == 0x14);
@@ -215,9 +216,9 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 			int delta = static_cast<int>(frameShort) - static_cast<int>(curMesh->m_workPositions[v].y);
 			if (delta >= 0) {
 				int level = 0;
-				float threshold = ChangeTexConst(FLOAT_80330df8);
+				float threshold = ChangeTexConst(kPppYmChangeTexRampStart);
 				for (int tries = 7; tries != 0; tries--) {
-					if ((float)delta > ChangeTexConst(FLOAT_80330dfc) * threshold) {
+					if ((float)delta > ChangeTexConst(kPppYmChangeTexRampScale) * threshold) {
 						if (negativeRamp == 0xFF) {
 							vertColors->a = negativeRamp - (level << 4);
 						} else {
@@ -225,7 +226,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 						}
 						break;
 					}
-					threshold = threshold - ChangeTexConst(FLOAT_80330e00);
+					threshold = threshold - ChangeTexConst(kPppYmChangeTexRampStep);
 					level = level + 1;
 				}
 			} else {
@@ -437,9 +438,3 @@ void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* pa
 		GXCallDisplayList(displayList->m_data, displayList->m_size);
 	}
 }
-
-extern const float gPppYmMoveParabolaYOffsetStep = 1.0f;
-extern const float gPppYmMoveParabolaZero = 0.0f;
-extern const float gPppYmMoveParabolaAngleScale = 32768.0f;
-extern const float gPppYmMoveParabolaAngleDivisor = 180.0f;
-extern const float gPppYmMoveParabolaGravityScale = 0.5f;

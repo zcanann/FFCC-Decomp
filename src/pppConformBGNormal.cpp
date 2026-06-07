@@ -301,5 +301,5 @@ void pppConstructConformBGNormal(pppConformBGNormal* conformBG, struct _pppCtrlT
     state->m_initialized = 0;
 }
 
-extern const f32 FLOAT_80331920 = 1.0f;
-extern const f32 FLOAT_80331924 = 0.0f;
+extern const f32 kPppAlignmentScaleOne = 1.0f;
+extern const f32 kPppAlignmentScaleZero = 0.0f;

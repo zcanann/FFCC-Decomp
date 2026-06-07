@@ -13,22 +13,22 @@ inline void* operator new(unsigned long, void* p)
     return p;
 }
 
-static const char s_CTextureSet_801D7968[] = "CTextureSet";
+static const char s_CTextureSet[] = "CTextureSet";
 static const char s_textureman_cpp[] = "textureman.cpp";
-static const char s_Error_width_pctd_height_pctd_801D7984[] = "Error width=%d height=%d\n";
-static const char s_CTexture_texture_801D79A0[] = "CTexture.texture";
-static const char s_CTexture_801D79B4[] = "CTexture";
-static const char s_CTextureMan_801D79C0[] = "CTextureMan";
-static const char s_CManager_801D79CC[] = "CManager";
-static const char s_ptrarray_grow_error_801D79D8[] = {
+static const char s_errorTextureDimensions[] = "Error width=%d height=%d\n";
+static const char s_CTextureStageName[] = "CTexture.texture";
+static const char s_CTexture[] = "CTexture";
+static const char s_CTextureMan[] = "CTextureMan";
+static const char s_CManager[] = "CManager";
+static const char s_ptrarray_grow_error[] = {
     0x83, 0x6f, 0x83, 0x62, 0x83, 0x74, 0x83, 0x40, 0x90, 0xac, 0x92, 0xb7, 0x82, 0xaa,
     0x95, 0x73, 0x8b, 0x96, 0x89, 0xc2, 0x82, 0xc5, 0x82, 0xb7, 0x81, 0x42, 0x0a, 0x00,
 };
-static const char s_collection_ptrarray_h_801D79F4[] = "collection_ptrarray.h";
-static const char s_CPtrArray_CTexture_801D7A0C[] = "CPtrArray<CTexture *>";
-extern const char s_CRef_8032FAE8[];
-extern const float FLOAT_8032faf0;
-extern const float FLOAT_8032faf4;
+static const char s_collection_ptrarray_h[] = "collection_ptrarray.h";
+static const char s_CPtrArray_CTexture[] = "CPtrArray<CTexture *>";
+extern const char kTextureCRefName[];
+extern const float kTextureOne;
+extern const float kTextureZero;
 
 enum {
     kTextureC8TlutEntries = 0x100,
@@ -593,7 +593,7 @@ void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheS
             m_width = chunkFile.Get4();
             m_height = chunkFile.Get4();
             if ((static_cast<unsigned int>(m_width) == 0) || (static_cast<unsigned int>(m_height) == 0)) {
-                System.Printf(const_cast<char*>(s_Error_width_pctd_height_pctd_801D7984), m_width, m_height);
+                System.Printf(const_cast<char*>(s_errorTextureDimensions), m_width, m_height);
                 chunkFile.PopChunk();
                 return;
             }
@@ -758,9 +758,9 @@ void CTexture::InitTexObj()
     }
 }
 
-extern const char s_CRef_8032FAE8[] = "CRef";
-extern const float FLOAT_8032faf0 = 1.0f;
-extern const float FLOAT_8032faf4 = 0.0f;
+extern const char kTextureCRefName[] = "CRef";
+extern const float kTextureOne = 1.0f;
+extern const float kTextureZero = 0.0f;
 
 /*
  * --INFO--
@@ -957,7 +957,7 @@ void CTextureMan::Quit()
  */
 void CTextureMan::Init()
 {
-	m_memoryStage = Memory.CreateStage(0x40000, const_cast<char*>(s_CTexture_texture_801D79A0), 0);
+	m_memoryStage = Memory.CreateStage(0x40000, const_cast<char*>(s_CTextureStageName), 0);
 }
 
 /*
@@ -1164,14 +1164,14 @@ int CPtrArray<CTexture*>::setSize(unsigned long newSize)
             m_size = m_defaultSize;
         } else {
             if (m_growCapacity == 0) {
-                System.Printf(const_cast<char*>(s_ptrarray_grow_error_801D79D8));
+                System.Printf(const_cast<char*>(s_ptrarray_grow_error));
             }
             m_size = m_size << 1;
         }
 
         newItems = static_cast<CTexture**>(
             Memory._Alloc(static_cast<unsigned long>(m_size << 2), m_stage,
-                          const_cast<char*>(s_collection_ptrarray_h_801D79F4), 0xFA, 0));
+                          const_cast<char*>(s_collection_ptrarray_h), 0xFA, 0));
         if (newItems == 0) {
             return 0;
         }

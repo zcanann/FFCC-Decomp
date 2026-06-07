@@ -27,26 +27,26 @@ inline void* operator new(unsigned long, void* p)
     return p;
 }
 
-extern float FLOAT_8032faf0;
-extern float FLOAT_8032faf4;
-extern float FLOAT_8032faf8;
-extern float FLOAT_8032fafc;
-extern float FLOAT_8032fb00;
-extern float FLOAT_8032fb04;
-extern float FLOAT_8032fb08;
-extern float FLOAT_8032fb0c;
-extern float FLOAT_8032fb10;
-extern float FLOAT_8032fb14;
-extern float FLOAT_8032fb20;
+extern const float kTextureOne;
+extern const float kTextureZero;
+extern const float kMaterialShadowScale;
+extern const float kMaterialShadowBoundsRadius;
+extern const float kMaterialNearestDistanceInit;
+extern const float kMaterialMaxDistance;
+extern const float kMaterialProjectionWidthScale;
+extern const float kMaterialProjectionHeightScale;
+extern const float kMaterialProjectionCenter;
+extern const float kMaterialProjectionDepthScale;
+extern const float kMaterialWarpCoeff;
 
-static const char s_CMaterialSet_801D7A28[] = "CMaterialSet";
+static const char s_CMaterialSet[] = "CMaterialSet";
 namespace {
 static const char s_materialman_cpp[] = "materialman.cpp";
 }
 static const char s_materialStageName[] = "CMaterial.material";
-static const char s_CMaterial_801D7A5C[] = "CMaterial";
-static const char s_CMaterialMan_801D7A68[] = "CMaterialMan";
-static const char s_CManager_801D7A78[] = "CManager";
+static const char s_CMaterial[] = "CMaterial";
+static const char s_CMaterialMan[] = "CMaterialMan";
+static const char s_CManager[] = "CManager";
 namespace {
 static const char s_ptrarray_grow_error[] = {
     0x83, 0x6f, 0x83, 0x62, 0x83, 0x74, 0x83, 0x40, 0x90, 0xac, 0x92, 0xb7, 0x82, 0xaa,
@@ -54,7 +54,7 @@ static const char s_ptrarray_grow_error[] = {
 };
 static const char s_collection_ptrarray_h[] = "collection_ptrarray.h";
 }
-static const char s_CPtrArray_CMaterial_801D7AB8[] = "CPtrArray<CMaterial *>";
+static const char s_CPtrArray_CMaterial[] = "CPtrArray<CMaterial *>";
 
 static inline void _GXSetTevOrder(int stage, int coord, int map, int channel)
 {
@@ -597,12 +597,12 @@ void GXSetTexCoordGen(void)
  */
 void CMaterialMan::addtev_bump_water(_GXTevScale tevScale)
 {
-    float warpMtx0 = FLOAT_8032fb20;
-    float warpMtx1 = FLOAT_8032faf4;
-    float warpMtx2 = FLOAT_8032faf4;
-    float warpMtx3 = FLOAT_8032faf4;
-    float warpMtx4 = FLOAT_8032fb20;
-    float warpMtx5 = FLOAT_8032faf4;
+    float warpMtx0 = kMaterialWarpCoeff;
+    float warpMtx1 = kTextureZero;
+    float warpMtx2 = kTextureZero;
+    float warpMtx3 = kTextureZero;
+    float warpMtx4 = kMaterialWarpCoeff;
+    float warpMtx5 = kTextureZero;
 
     GXSetIndTexMtx((GXIndTexMtxID)1, LightPcs.GetBumpIndTexMtx(), 0);
     GXSetIndTexMtx((GXIndTexMtxID)2, reinterpret_cast<const float(*)[3]>(&warpMtx0), 1);
@@ -679,12 +679,12 @@ void CMaterialMan::addtev_bump_water(_GXTevScale tevScale)
  */
 void CMaterialMan::addtev_bump_spec_col_water(_GXTevScale tevScale)
 {
-    float warpMtx0 = FLOAT_8032fb20;
-    float warpMtx1 = FLOAT_8032faf4;
-    float warpMtx2 = FLOAT_8032faf4;
-    float warpMtx3 = FLOAT_8032faf4;
-    float warpMtx4 = FLOAT_8032fb20;
-    float warpMtx5 = FLOAT_8032faf4;
+    float warpMtx0 = kMaterialWarpCoeff;
+    float warpMtx1 = kTextureZero;
+    float warpMtx2 = kTextureZero;
+    float warpMtx3 = kTextureZero;
+    float warpMtx4 = kMaterialWarpCoeff;
+    float warpMtx5 = kTextureZero;
 
     GXSetIndTexMtx((GXIndTexMtxID)1, LightPcs.GetBumpIndTexMtx(), 0);
     GXSetIndTexMtx((GXIndTexMtxID)2, reinterpret_cast<const float(*)[3]>(&warpMtx0), 1);
@@ -1052,15 +1052,15 @@ void CMaterialMan::SetUnderWaterTex()
     PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
     PSMTXCopy(CameraPcs.m_cameraMatrix, matrixB);
 
-    matrixA[0][0] = screenMtx[0][0] * (FLOAT_8032fb08 / static_cast<float>(width));
-    matrixA[1][1] = screenMtx[1][1] * -(FLOAT_8032fb0c / static_cast<float>(height));
+    matrixA[0][0] = screenMtx[0][0] * (kMaterialProjectionWidthScale / static_cast<float>(width));
+    matrixA[1][1] = screenMtx[1][1] * -(kMaterialProjectionHeightScale / static_cast<float>(height));
     matrixA[1][0] = screenMtx[1][0];
     matrixA[2][0] = screenMtx[2][0];
     matrixA[0][1] = screenMtx[0][1];
     matrixA[2][1] = screenMtx[2][1];
-    matrixA[0][2] = FLOAT_8032fb10;
-    matrixA[1][2] = FLOAT_8032fb10;
-    matrixA[2][2] = FLOAT_8032fb14;
+    matrixA[0][2] = kMaterialProjectionCenter;
+    matrixA[1][2] = kMaterialProjectionCenter;
+    matrixA[2][2] = kMaterialProjectionDepthScale;
 
     PSMTXConcat(matrixA, matrixB, m_underWaterTexMtx);
 }
@@ -1585,9 +1585,9 @@ void CMaterialMan::SetObjMatrix(float (*mtxA) [4], float (*mtxB) [4])
     PSMTXConcat(mtxA, mtxB, tmp0);
     GXLoadPosMtxImm(tmp0, GX_PNMTX0);
     PSMTXCopy(tmp0, tmp1);
-    tmp1[0][3] = FLOAT_8032faf4;
-    tmp1[1][3] = FLOAT_8032faf4;
-    tmp1[2][3] = FLOAT_8032faf4;
+    tmp1[0][3] = kTextureZero;
+    tmp1[1][3] = kTextureZero;
+    tmp1[2][3] = kTextureZero;
     GXLoadNrmMtxImm(tmp1, GX_PNMTX0);
     PSMTXCopy(tmp1, m_objTextureMtx);
 }
@@ -1624,7 +1624,7 @@ void CMaterialMan::SetTexScroll(float u0, float v0, float u1, float v1)
         GXSetTexCoordGen2(static_cast<GXTexCoordID>(texCoordCur), GX_TG_MTX2x4, GX_TG_TEX0, texMtxCur, GX_FALSE,
                           0x7D);
 
-        if ((FLOAT_8032faf4 != u1) || (FLOAT_8032faf4 != v1)) {
+        if ((kTextureZero != u1) || (kTextureZero != v1)) {
             m_curEnvTevBit |= 0x40;
 
             PSMTXIdentity(texMtx);
@@ -1811,9 +1811,9 @@ void CMaterialMan::SetPosition(
             PSMTXScaleApply(
                 shadow->m_shadowMtx,
                 scaledShadowMtx,
-                FLOAT_8032faf8,
-                FLOAT_8032faf8,
-                FLOAT_8032faf0);
+                kMaterialShadowScale,
+                kMaterialShadowScale,
+                kTextureOne);
 
             if (shadow->m_materialMode == 1) {
                 SetShadow(*shadow, viewMtx, i, 0);
@@ -1825,7 +1825,7 @@ void CMaterialMan::SetPosition(
                 ((shadow->m_yFilterMode != 2) || (position->y <= shadowPos.y));
             if ((ignoreFrustumCheck != 0) ||
                 (yFilterPass &&
-                 (searchBound.CheckFrustum(shadowPos, scaledShadowMtx, FLOAT_8032fafc) != 0))) {
+                 (searchBound.CheckFrustum(shadowPos, scaledShadowMtx, kMaterialShadowBoundsRadius) != 0))) {
                 Vec delta;
                 PSVECSubtract(&shadowPos, position, &delta);
                 candidateWrite->shadow = shadow;
@@ -1837,7 +1837,7 @@ void CMaterialMan::SetPosition(
         }
 
         ShadowCandidate* nearest = 0;
-        float nearestDist = FLOAT_8032fb00;
+        float nearestDist = kMaterialNearestDistanceInit;
         ShadowCandidate* candidateRead = shadowCandidates;
         for (int i = 0; i < candidateCount; i++) {
             if (static_cast<float>(candidateRead->distance) < nearestDist) {
@@ -1848,7 +1848,7 @@ void CMaterialMan::SetPosition(
         }
 
         if (nearest != 0) {
-            nearest->distance = static_cast<int>(FLOAT_8032fb04);
+            nearest->distance = static_cast<int>(kMaterialMaxDistance);
             SetShadow(*nearest->shadow, viewMtx, nearest->index, 0xFFFFFFFF);
         }
     } else {
@@ -1868,12 +1868,12 @@ void CMaterialMan::SetPosition(
             PSMTXScaleApply(
                 shadow->m_shadowMtx,
                 scaledShadowMtx,
-                FLOAT_8032faf8,
-                FLOAT_8032faf8,
-                FLOAT_8032faf0);
+                kMaterialShadowScale,
+                kMaterialShadowScale,
+                kTextureOne);
 
             if ((shadow->m_materialMode == 1) ||
-                (searchBound.CheckFrustum(shadowPos, scaledShadowMtx, FLOAT_8032fafc) != 0)) {
+                (searchBound.CheckFrustum(shadowPos, scaledShadowMtx, kMaterialShadowBoundsRadius) != 0)) {
                 SetShadow(*shadow, viewMtx, i, 0);
             }
         }
@@ -1930,9 +1930,9 @@ int CMaterialMan::GetCharaShadow(
         PSMTXScaleApply(
             shadow->m_shadowMtx,
             scaledShadowMtx,
-            FLOAT_8032faf8,
-            FLOAT_8032faf8,
-            FLOAT_8032faf0);
+            kMaterialShadowScale,
+            kMaterialShadowScale,
+            kTextureOne);
 
         if (shadow->m_materialMode == 1) {
             if (outputCount < maxShadows) {
@@ -1948,7 +1948,7 @@ int CMaterialMan::GetCharaShadow(
             ((shadow->m_yFilterMode != 2) || (position->y <= shadowPos.y));
         if ((ignoreFrustumCheck != 0) ||
             (yFilterPass &&
-             (searchBound.CheckFrustum(shadowPos, scaledShadowMtx, FLOAT_8032fafc) != 0))) {
+             (searchBound.CheckFrustum(shadowPos, scaledShadowMtx, kMaterialShadowBoundsRadius) != 0))) {
             Vec delta;
             PSVECSubtract(&shadowPos, position, &delta);
             candidateWrite->shadow = shadow;
@@ -1960,7 +1960,7 @@ int CMaterialMan::GetCharaShadow(
     }
 
     ShadowCandidate* nearest = 0;
-    float nearestDist = FLOAT_8032fb00;
+    float nearestDist = kMaterialNearestDistanceInit;
     ShadowCandidate* candidateRead = shadowCandidates;
     for (int i = 0; i < candidateCount; i++) {
         if (static_cast<float>(candidateRead->distance) < nearestDist) {
@@ -1971,7 +1971,7 @@ int CMaterialMan::GetCharaShadow(
     }
 
     if ((nearest != 0) && (outputCount < maxShadows)) {
-        nearest->distance = static_cast<int>(FLOAT_8032fb04);
+        nearest->distance = static_cast<int>(kMaterialMaxDistance);
         CMapShadow* nearestShadow = nearest->shadow;
         materialsOut[outputCount] = (*materials)[nearestShadow->m_materialIndex];
         shadowMtxOut[outputCount] = nearestShadow->m_shadowMtx;
@@ -2007,11 +2007,11 @@ void CMaterialMan::SetShadowBound(CMapShadow::TARGET target, CBound* bound, floa
         position.x = shadow->m_modelA->m_worldMtx[0][3];
         position.y = shadow->m_modelA->m_worldMtx[1][3];
         position.z = shadow->m_modelA->m_worldMtx[2][3];
-        PSMTXScaleApply(shadow->m_shadowMtx, scaledShadowMtx, FLOAT_8032faf8,
-                        FLOAT_8032faf8, FLOAT_8032faf0);
+        PSMTXScaleApply(shadow->m_shadowMtx, scaledShadowMtx, kMaterialShadowScale,
+                        kMaterialShadowScale, kTextureOne);
 
         if ((shadow->m_materialMode == 1) ||
-            (bound->CheckFrustum(position, scaledShadowMtx, FLOAT_8032fafc) != 0)) {
+            (bound->CheckFrustum(position, scaledShadowMtx, kMaterialShadowBoundsRadius) != 0)) {
             SetShadow(*shadow, viewMtx, i, 0xFFFFFFFF);
         }
     }
@@ -2271,7 +2271,7 @@ CTexScroll::~CTexScroll()
  */
 CTexScroll::CTexScroll()
 {
-    float zero = FLOAT_8032faf4;
+    float zero = kTextureZero;
     m_v0 = zero;
     m_u0 = zero;
     m_v1 = zero;
@@ -2396,8 +2396,8 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 material->m_tevBit = static_cast<unsigned long>(tevBit);
                 material->m_bumpLight = 0;
                 material->m_textureCount = 0;
-                material->m_scaleU = FLOAT_8032faf0;
-                material->m_scaleV = FLOAT_8032faf0;
+                material->m_scaleU = kTextureOne;
+                material->m_scaleV = kTextureOne;
                 material->m_singleTextureFlag = 0;
                 material->m_textureCount = static_cast<unsigned short>(chunk.m_arg0);
 
@@ -2492,8 +2492,8 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     AddTextureIndex(material, texture1);
                     AddTextureIndex(material, texture2);
 
-                    material->m_scaleU = FLOAT_8032faf0 / scaleU;
-                    material->m_scaleV = FLOAT_8032faf0 / scaleV;
+                    material->m_scaleU = kTextureOne / scaleU;
+                    material->m_scaleV = kTextureOne / scaleV;
                     material->m_unkA6 = a6;
                     SetMaterialColor(material, rgba);
                     material->m_materialType = 1;
@@ -2529,8 +2529,8 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     if (useJimen != 0) {
                         material->m_tevBit |= 0x20000;
                     }
-                    material->m_scaleU = FLOAT_8032faf0 / scaleU;
-                    material->m_scaleV = FLOAT_8032faf0 / scaleV;
+                    material->m_scaleU = kTextureOne / scaleU;
+                    material->m_scaleV = kTextureOne / scaleV;
                     material->m_materialType = 3;
 
                     CLightPcs::CBumpLight* bumpLight =
@@ -2557,8 +2557,8 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     AddTextureIndex(material, texture0);
                     AddTextureIndex(material, texture1);
                     material->m_fogEnable = a1;
-                    material->m_scaleU = FLOAT_8032faf0 / scaleU;
-                    material->m_scaleV = FLOAT_8032faf0 / scaleV;
+                    material->m_scaleU = kTextureOne / scaleU;
+                    material->m_scaleV = kTextureOne / scaleV;
                     material->m_materialType = 2;
 
                     CLightPcs::CBumpLight* bumpLight =
@@ -2609,7 +2609,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                             if (keyFrameU == 0) {
                                 float valueU = chunkFile.GetF4();
                                 texScroll->m_u1 = valueU;
-                                texScroll->m_type0 = (valueU == FLOAT_8032faf4) ? 0 : 1;
+                                texScroll->m_type0 = (valueU == kTextureZero) ? 0 : 1;
                             } else {
                                 chunkFile.GetF4();
                                 texScroll->m_uKeyFrame = keyFrameU;
@@ -2619,7 +2619,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                             if (keyFrameV == 0) {
                                 float valueV = chunkFile.GetF4();
                                 texScroll->m_v1 = valueV;
-                                texScroll->m_type1 = (valueV == FLOAT_8032faf4) ? 0 : 1;
+                                texScroll->m_type1 = (valueV == kTextureZero) ? 0 : 1;
                             } else {
                                 chunkFile.GetF4();
                                 texScroll->m_vKeyFrame = keyFrameV;
@@ -2638,10 +2638,10 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
 
                     texScroll->m_u1 = valueU;
                     texScroll->m_v1 = valueV;
-                    if (FLOAT_8032faf4 != valueU) {
+                    if (kTextureZero != valueU) {
                         texScroll->m_type0 = 1;
                     }
-                    if (FLOAT_8032faf4 != valueV) {
+                    if (kTextureZero != valueV) {
                         texScroll->m_type1 = 1;
                     }
                 }
@@ -2792,7 +2792,7 @@ next:
 void CMaterial::Create(unsigned long tag, CMaterialMan::TEV_BIT tevBit)
 {
     m_tevBit = static_cast<unsigned long>(tevBit);
-    float scale = FLOAT_8032faf0;
+    float scale = kTextureOne;
     m_bumpLight = 0;
     m_textureCount = 0;
     m_scaleU = scale;
@@ -3172,10 +3172,10 @@ int CMaterial::Set(_GXTexMapID texMapId)
 
     bool hasDualScroll = false;
     if ((textureCount == 2) &&
-        (FLOAT_8032faf4 == scroll[0].m_u0) &&
-        (FLOAT_8032faf4 == scroll[0].m_v0) &&
-        ((FLOAT_8032faf4 != scroll[1].m_u0) ||
-         (FLOAT_8032faf4 != scroll[1].m_v0))) {
+        (kTextureZero == scroll[0].m_u0) &&
+        (kTextureZero == scroll[0].m_v0) &&
+        ((kTextureZero != scroll[1].m_u0) ||
+         (kTextureZero != scroll[1].m_v0))) {
         hasDualScroll = true;
     }
 
@@ -3187,7 +3187,7 @@ int CMaterial::Set(_GXTexMapID texMapId)
 
             float scrollU = scroll->m_u0;
             float scrollV = scroll->m_v0;
-            if ((scrollU != FLOAT_8032faf4) || ((scrollV != FLOAT_8032faf4) || hasDualScroll)) {
+            if ((scrollU != kTextureZero) || ((scrollV != kTextureZero) || hasDualScroll)) {
                 texMtx[0][3] = scrollU;
                 texMtx[1][3] = scrollV;
 

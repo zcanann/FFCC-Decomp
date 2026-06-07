@@ -16,36 +16,36 @@
 
 extern const _GXColor kLightDefaultMaterialColor;
 extern const _GXColor kBumpLightMapColor;
-extern const float FLOAT_8032fc10;
-extern const float FLOAT_8032fc14;
-extern const float FLOAT_8032fc18;
-extern const float FLOAT_8032fc1c;
-extern const float FLOAT_8032fc20;
-extern const float FLOAT_8032fc24;
-extern const float FLOAT_8032fc28;
-extern const float FLOAT_8032fc2c;
-extern const float FLOAT_8032fc30;
-extern const float FLOAT_8032fc34;
-extern const float FLOAT_8032fc38;
-extern const float FLOAT_8032fc3c;
-extern const float FLOAT_8032fc40;
-extern const float FLOAT_8032fc44;
-extern const double DOUBLE_8032fc48;
-extern const double DOUBLE_8032fc50;
-extern const double DOUBLE_8032fc58;
-extern const float FLOAT_8032fc60;
-extern const double DOUBLE_8032fc68;
-extern const float FLOAT_8032fc70;
-extern const float FLOAT_8032fc74;
-extern const float FLOAT_8032fc78;
-extern const float FLOAT_8032fc7c;
-extern const float FLOAT_8032fc80;
-extern const float FLOAT_8032fc84;
-extern const float FLOAT_8032fc88;
-extern const float FLOAT_8032fc8c;
-extern const float FLOAT_8032fc90;
-extern const float FLOAT_8032fc94;
-float FLOAT_8032ed10;
+extern const float kLightDefaultAttenFalloff;
+extern const float kLightZero;
+extern const float kLightHalf;
+extern const float kLightOne;
+extern const float kBumpTexMtxScale;
+extern const float kBumpTexScrollScale;
+extern const float kBumpLightMapTexSize;
+extern const float kLightNegativeOne;
+extern const float kBumpLightMapOrthoFarZ;
+extern const float kBumpLightViewZOffset;
+extern const float kBumpLightTargetScale;
+extern const float kBumpLightMapCoordScale;
+extern const float kBumpLightMapGridStep;
+extern const float kBumpLightNormalDivisor;
+extern const double kLightHalfD;
+extern const double kLightThreeD;
+extern const double kLightZeroD;
+extern const float kBumpLightMapVertexZ;
+extern const double kLightU32ToDoubleBias;
+extern const float kDiffuseLightDistanceScale;
+extern const float kLightFullSpotCutoffDeg;
+extern const float kDiffuseLightAttnK1;
+extern const float kLightAlphaScale;
+extern const float kMapLightAttenMax;
+extern const float kLightAttnScale;
+extern const float kMapLightAttnNegScale;
+extern const float kMapLightAttnNegFineScale;
+extern const float kLightAnimPhaseStep;
+extern const float kLightRadToDeg;
+float sLightAnimPhase;
 
 static inline float CameraPosX() { return CameraPcs.m_positionX; }
 static inline float CameraPosY() { return CameraPcs.m_positionY; }
@@ -71,21 +71,22 @@ void MakeLightMap__9CLightPcsFv(CLightPcs*);
 
 CLightPcs LightPcs;
 
-CProcessTableCallback CLightPcs::m_table_desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__9CLightPcsFv)};
-CProcessTableCallback CLightPcs::m_table_desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__9CLightPcsFv)};
-CProcessTableCallback CLightPcs::m_table_desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__9CLightPcsFv)};
-CProcessTableCallback CLightPcs::m_table_desc3 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__9CLightPcsFv)};
-CProcessTableCallback CLightPcs::m_table_desc4 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(MakeLightMap__9CLightPcsFv)};
+static CProcessTableCallback s_lightTableDescCreate = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__9CLightPcsFv)};
+static CProcessTableCallback s_lightTableDescDestroy = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__9CLightPcsFv)};
+static CProcessTableCallback s_lightTableDescCalc = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__9CLightPcsFv)};
+static CProcessTableCallback s_lightTableDescDraw = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__9CLightPcsFv)};
+static CProcessTableCallback s_lightTableDescMakeLightMap = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(MakeLightMap__9CLightPcsFv)};
 CProcessTable CLightPcs::m_table = {
     const_cast<char*>(sLightPcsClassName),
     {
-        m_table_desc0.m_thisOffset, m_table_desc0.m_virtualOffset, m_table_desc0.m_function,
-        m_table_desc1.m_thisOffset, m_table_desc1.m_virtualOffset, m_table_desc1.m_function,
-        m_table_desc2.m_thisOffset, m_table_desc2.m_virtualOffset, m_table_desc2.m_function,
+        s_lightTableDescCreate.m_thisOffset, s_lightTableDescCreate.m_virtualOffset, s_lightTableDescCreate.m_function,
+        s_lightTableDescDestroy.m_thisOffset, s_lightTableDescDestroy.m_virtualOffset, s_lightTableDescDestroy.m_function,
+        s_lightTableDescCalc.m_thisOffset, s_lightTableDescCalc.m_virtualOffset, s_lightTableDescCalc.m_function,
         0x1C, 0,
-        m_table_desc3.m_thisOffset, m_table_desc3.m_virtualOffset, m_table_desc3.m_function,
+        s_lightTableDescDraw.m_thisOffset, s_lightTableDescDraw.m_virtualOffset, s_lightTableDescDraw.m_function,
         0x2A, 0,
-        m_table_desc4.m_thisOffset, m_table_desc4.m_virtualOffset, m_table_desc4.m_function,
+        s_lightTableDescMakeLightMap.m_thisOffset, s_lightTableDescMakeLightMap.m_virtualOffset,
+        s_lightTableDescMakeLightMap.m_function,
         0x2D, 1,
     },
 };
@@ -101,7 +102,7 @@ static inline double U32ToDouble(unsigned int value)
     } conv;
 
     conv.u = 0x4330000000000000ULL | (unsigned long long)value;
-    return conv.d - DOUBLE_8032fc68;
+    return conv.d - kLightU32ToDoubleBias;
 }
 
 /*
@@ -117,16 +118,16 @@ inline void CLightPcs::CLight::Set(CLightPcs::CLight* light)
 {
     *this = *light;
 
-    if (m_attenFalloff >= FLOAT_8032fc10) {
+    if (m_attenFalloff >= kLightDefaultAttenFalloff) {
         m_attenFalloff = m_attenRadius;
     }
 
     m_unkAC = m_attenRadius * m_attenRadius;
     m_range = m_attenRadius;
-    if (m_range < FLOAT_8032fc14) {
+    if (m_range < kLightZero) {
         m_range = -m_range;
     }
-    m_range = m_range * FLOAT_8032fc18 * m_radius;
+    m_range = m_range * kLightHalf * m_radius;
 
     m_targetEnable[3] = 1;
     m_targetEnable[2] = 1;
@@ -159,8 +160,8 @@ void CLightPcs::Init()
     m_mapLightColor[0].b = 0x3F;
     m_mapLightColor[0].a = 0xFF;
 
-    float lightRange = FLOAT_8032fc2c;
-    float lightParam = FLOAT_8032fc14;
+    float lightRange = kLightNegativeOne;
+    float lightParam = kLightZero;
 
     for (int i = 0; i < 3; i++) {
         unsigned char color = (i == 0) ? 0x3F : 0;
@@ -291,7 +292,7 @@ void CLightPcs::DestroyBumpLightAll(CLightPcs::TARGET target)
 void CLightPcs::calc()
 {
     m_sceneLightCount = 0;
-    FLOAT_8032ed10 += FLOAT_8032fc90;
+    sLightAnimPhase += kLightAnimPhaseStep;
 }
 
 /*
@@ -325,20 +326,20 @@ void CLightPcs::draw()
 
             float cutoff;
             if (static_cast<int>(light->m_type) == 1) {
-                cutoff = FLOAT_8032fc94 * light->m_spotScale;
+                cutoff = kLightRadToDeg * light->m_spotScale;
             } else {
-                cutoff = FLOAT_8032fc74;
+                cutoff = kLightFullSpotCutoffDeg;
             }
 
             GXInitLightSpot(&light->m_gxLightObj, cutoff, (GXSpotFn)light->m_unk4D);
-            GXInitLightAttnK(&light->m_gxLightObj, FLOAT_8032fc84 / light->m_attenFalloff,
-                             FLOAT_8032fc84 / light->m_attenRadius, FLOAT_8032fc84 / light->m_attenRadius);
+            GXInitLightAttnK(&light->m_gxLightObj, kLightAttnScale / light->m_attenFalloff,
+                             kLightAttnScale / light->m_attenRadius, kLightAttnScale / light->m_attenRadius);
         } else {
             PSMTXMultVecSR(mtx, reinterpret_cast<Vec*>(&light->m_direction), &vec);
             GXInitSpecularDir(&light->m_gxLightObj, vec.x, vec.y, vec.z);
-            GXInitLightAttn(&light->m_gxLightObj, FLOAT_8032fc14, FLOAT_8032fc14, FLOAT_8032fc1c,
-                            light->m_specularScale * FLOAT_8032fc18, FLOAT_8032fc14,
-                            FLOAT_8032fc1c - (light->m_specularScale * FLOAT_8032fc18));
+            GXInitLightAttn(&light->m_gxLightObj, kLightZero, kLightZero, kLightOne,
+                            light->m_specularScale * kLightHalf, kLightZero,
+                            kLightOne - (light->m_specularScale * kLightHalf));
         }
     }
 }
@@ -460,7 +461,7 @@ void CLightPcs::SetMapColorAlpha(float (*) [4], _GXColor mapColor, _GXColor ambC
     GXSetChanMatColor((GXChannelID)4, mapColor);
     GXSetChanAmbColor((GXChannelID)4, ambColor);
 
-    if ((enable != 0) && (alpha != 0) && (atten < FLOAT_8032fc80)) {
+    if ((enable != 0) && (alpha != 0) && (atten < kMapLightAttenMax)) {
         Mtx cam;
         Vec eyePos;
         Vec eyeDir;
@@ -482,7 +483,7 @@ void CLightPcs::SetMapColorAlpha(float (*) [4], _GXColor mapColor, _GXColor ambC
         PSMTXMultVecSR(cam, &eyeDir, &transformedDir);
         GXInitLightDir(&m_mapLightObj, transformedDir.x, transformedDir.y, transformedDir.z);
         GXInitLightSpot(&m_mapLightObj, spot, (GXSpotFn)4);
-        GXInitLightAttnK(&m_mapLightObj, FLOAT_8032fc84 / dist, FLOAT_8032fc88 / atten, FLOAT_8032fc8c / atten);
+        GXInitLightAttnK(&m_mapLightObj, kLightAttnScale / dist, kMapLightAttnNegScale / atten, kMapLightAttnNegFineScale / atten);
 
         mcol.a = alpha;
         GXInitLightColor(&m_mapLightObj, mcol);
@@ -535,7 +536,7 @@ void CLightPcs::SetAmbient(_GXColor color)
  */
 void CLightPcs::SetAmbientAlpha(float alpha)
 {
-    const float& alphaScale = FLOAT_8032fc7c;
+    const float& alphaScale = kLightAlphaScale;
     float scaled = alphaScale * alpha;
     s_ambientAlphaColor.a = (u8)(int)scaled;
     GXSetChanAmbColor((GXChannelID)2, s_ambientAlphaColor);
@@ -627,9 +628,9 @@ void CLightPcs::SetDiffuse(unsigned long idx, _GXColor color, Vec* dir, int mode
     GXInitLightColor(&light->m_gxLightObj, color);
     PSMTXCopy(CameraMatrix(), cam);
 
-    lightDir.x = FLOAT_8032fc70 * -dirX;
-    lightDir.y = FLOAT_8032fc70 * -dirY;
-    lightDir.z = FLOAT_8032fc70 * -dirZ;
+    lightDir.x = kDiffuseLightDistanceScale * -dirX;
+    lightDir.y = kDiffuseLightDistanceScale * -dirY;
+    lightDir.z = kDiffuseLightDistanceScale * -dirZ;
     PSMTXMultVec(cam, &lightDir, &lightDir);
     GXInitLightPos(&light->m_gxLightObj, lightDir.x, lightDir.y, lightDir.z);
 
@@ -639,8 +640,8 @@ void CLightPcs::SetDiffuse(unsigned long idx, _GXColor color, Vec* dir, int mode
     PSMTXMultVecSR(cam, &lightDir, &lightDir);
     GXInitLightDir(&light->m_gxLightObj, lightDir.x, lightDir.y, lightDir.z);
 
-    GXInitLightSpot(&light->m_gxLightObj, FLOAT_8032fc74, (GXSpotFn)4);
-    GXInitLightAttnK(&light->m_gxLightObj, FLOAT_8032fc14, FLOAT_8032fc78, FLOAT_8032fc14);
+    GXInitLightSpot(&light->m_gxLightObj, kLightFullSpotCutoffDeg, (GXSpotFn)4);
+    GXInitLightAttnK(&light->m_gxLightObj, kLightZero, kDiffuseLightAttnK1, kLightZero);
 }
 
 /*
@@ -895,19 +896,19 @@ void CLightPcs::CBumpLight::MakeLightMap()
     if (m_useViewSpace == 1) {
         Mtx tmp;
         PSMTXIdentity(tmp);
-        PSMTXTrans(tmp, FLOAT_8032fc14, FLOAT_8032fc14, FLOAT_8032fc34);
+        PSMTXTrans(tmp, kLightZero, kLightZero, kBumpLightViewZOffset);
         GXLoadPosMtxImm(tmp, 0);
         PSMTXIdentity(tmp);
         GXLoadNrmMtxImm(tmp, 0);
 
         Vec eye;
         Vec up;
-        eye.x = FLOAT_8032fc14;
-        eye.y = FLOAT_8032fc14;
-        eye.z = FLOAT_8032fc14;
-        up.x = FLOAT_8032fc14;
-        up.y = FLOAT_8032fc1c;
-        up.z = FLOAT_8032fc14;
+        eye.x = kLightZero;
+        eye.y = kLightZero;
+        eye.z = kLightZero;
+        up.x = kLightZero;
+        up.y = kLightOne;
+        up.z = kLightZero;
 
         Mtx lookAt;
         C_MTXLookAt(lookAt, &eye, &up, reinterpret_cast<Vec*>(&m_direction));
@@ -927,9 +928,9 @@ void CLightPcs::CBumpLight::MakeLightMap()
         Vec diff;
         PSVECSubtract(&lightPos, &nrm, &diff);
 
-        float scale = FLOAT_8032fc1c;
+        float scale = kLightOne;
         if (m_target == 1) {
-            scale = FLOAT_8032fc38;
+            scale = kBumpLightTargetScale;
         }
         PSVECScale(&diff, &diff, scale);
         PSVECAdd(&nrm, &diff, &nrm);
@@ -947,14 +948,14 @@ void CLightPcs::CBumpLight::MakeLightMap()
     }
 
     int copySize = GXGetTexBufferSize(0x40, 0x40, 3, 0, 0);
-    float dScale = FLOAT_8032fc40;
-    float dHalf = FLOAT_8032fc1c;
+    float dScale = kBumpLightMapGridStep;
+    float dHalf = kLightOne;
     static float tParam[4] = {48.0f, 128.0f, 256.0f, 512.0f};
     float* lightScale = tParam;
-    float dFactor = FLOAT_8032fc3c;
-    float dInv = FLOAT_8032fc44;
+    float dFactor = kBumpLightMapCoordScale;
+    float dInv = kBumpLightNormalDivisor;
     int offset = 0;
-    float dW = FLOAT_8032fc60;
+    float dW = kBumpLightMapVertexZ;
 
     for (int i = 0; i < (int)(unsigned int)m_textureCount; i++) {
         int texBase = (int)m_textureData;
@@ -964,15 +965,15 @@ void CLightPcs::CBumpLight::MakeLightMap()
         GXInitLightColor(&lightObj, lightColor);
 
         if (m_target == 1) {
-            double d0 = (double)FLOAT_8032fc14;
-            double d1 = (double)(m_specularScale * FLOAT_8032fc18);
-            GXInitLightAttn(&lightObj, (float)d0, (float)d0, FLOAT_8032fc1c, (float)d1, (float)d0,
-                            (float)((double)FLOAT_8032fc1c - d1));
+            double d0 = (double)kLightZero;
+            double d1 = (double)(m_specularScale * kLightHalf);
+            GXInitLightAttn(&lightObj, (float)d0, (float)d0, kLightOne, (float)d1, (float)d0,
+                            (float)((double)kLightOne - d1));
         } else {
-            double d0 = (double)FLOAT_8032fc14;
-            double d1 = (double)(*lightScale * FLOAT_8032fc18);
-            GXInitLightAttn(&lightObj, (float)d0, (float)d0, FLOAT_8032fc1c, (float)d1, (float)d0,
-                            (float)((double)FLOAT_8032fc1c - d1));
+            double d0 = (double)kLightZero;
+            double d1 = (double)(*lightScale * kLightHalf);
+            GXInitLightAttn(&lightObj, (float)d0, (float)d0, kLightOne, (float)d1, (float)d0,
+                            (float)((double)kLightOne - d1));
         }
 
         GXLoadLightObjImm(&lightObj, (GXLightID)1);
@@ -996,7 +997,7 @@ void CLightPcs::CBumpLight::MakeLightMap()
                 if (dist0 < dHalf) {
                     dist0 = sqrtf(dHalf - dist0);
                 } else {
-                    dist0 = FLOAT_8032fc14;
+                    dist0 = kLightZero;
                 }
 
                 GXWGFifo.f32 = x0;
@@ -1010,7 +1011,7 @@ void CLightPcs::CBumpLight::MakeLightMap()
                 if (dist1 < dHalf) {
                     dist1 = sqrtf(dHalf - dist1);
                 } else {
-                    dist1 = FLOAT_8032fc14;
+                    dist1 = kLightZero;
                 }
 
                 GXWGFifo.f32 = x1;
@@ -1053,10 +1054,10 @@ void CLightPcs::MakeLightMap()
     _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0xFF);
     GXSetColorUpdate(GX_TRUE);
     GXSetPixelFmt(GX_PF_RGBA6_Z24, GX_ZC_LINEAR);
-    GXSetViewport(FLOAT_8032fc14, FLOAT_8032fc14, FLOAT_8032fc28, FLOAT_8032fc28, FLOAT_8032fc14, FLOAT_8032fc1c);
+    GXSetViewport(kLightZero, kLightZero, kBumpLightMapTexSize, kBumpLightMapTexSize, kLightZero, kLightOne);
     GXSetScissor(0, 0, 0x40, 0x40);
-    C_MTXOrtho(projection, FLOAT_8032fc2c, FLOAT_8032fc1c, FLOAT_8032fc2c, FLOAT_8032fc1c, FLOAT_8032fc1c,
-               FLOAT_8032fc30);
+    C_MTXOrtho(projection, kLightNegativeOne, kLightOne, kLightNegativeOne, kLightOne, kLightOne,
+               kBumpLightMapOrthoFarZ);
     GXSetProjection(projection, GX_ORTHOGRAPHIC);
     GXSetChanCtrl(GX_COLOR0, GX_TRUE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT0, GX_DF_CLAMP, GX_AF_NONE);
     GXSetChanCtrl(GX_ALPHA0, GX_TRUE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT0, GX_DF_NONE, GX_AF_SPEC);
@@ -1122,15 +1123,15 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
         PSMTXMultVec(cam, &pos, &pos);
 
         if (mode == 1) {
-            cam[0][1] = FLOAT_8032fc14;
-            cam[0][0] = FLOAT_8032fc1c;
-            cam[0][2] = FLOAT_8032fc14;
-            cam[1][0] = FLOAT_8032fc14;
-            cam[1][1] = FLOAT_8032fc1c;
-            cam[1][2] = FLOAT_8032fc14;
-            cam[2][0] = FLOAT_8032fc14;
-            cam[2][1] = FLOAT_8032fc14;
-            cam[2][2] = FLOAT_8032fc1c;
+            cam[0][1] = kLightZero;
+            cam[0][0] = kLightOne;
+            cam[0][2] = kLightZero;
+            cam[1][0] = kLightZero;
+            cam[1][1] = kLightOne;
+            cam[1][2] = kLightZero;
+            cam[2][0] = kLightZero;
+            cam[2][1] = kLightZero;
+            cam[2][2] = kLightOne;
         } else if (mode == 2) {
             Vec yAxis;
             yAxis.x = cam[0][1];
@@ -1143,7 +1144,7 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
             cam[1][1] = yAxis.y;
             cam[2][1] = yAxis.z;
             xAxis.x = yAxis.y;
-            xAxis.z = FLOAT_8032fc14;
+            xAxis.z = kLightZero;
             PSVECNormalize(&xAxis, &xAxis);
             cam[0][0] = xAxis.x;
             cam[1][0] = xAxis.y;
@@ -1162,7 +1163,7 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
         out[2][3] = pos.z;
     } else {
         if (vec == nullptr ||
-            ((FLOAT_8032fc14 == vec->x) && (FLOAT_8032fc14 == vec->y) && (FLOAT_8032fc14 == vec->z))) {
+            ((kLightZero == vec->x) && (kLightZero == vec->y) && (kLightZero == vec->z))) {
             PSMTXConcat(cam, mat, out);
         } else {
             Mtx tmp;
@@ -1199,9 +1200,9 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
     nrm[0][2] = out[0][2];
     nrm[1][2] = out[1][2];
     nrm[2][2] = out[2][2];
-    nrm[0][3] = FLOAT_8032fc14;
-    nrm[1][3] = FLOAT_8032fc14;
-    nrm[2][3] = FLOAT_8032fc14;
+    nrm[0][3] = kLightZero;
+    nrm[1][3] = kLightZero;
+    nrm[2][3] = kLightZero;
     GXLoadNrmMtxImm(nrm, 0);
 
     if ((bump != nullptr) && (bump->m_hasTexture != 0)) {
@@ -1210,21 +1211,21 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
         Mtx texMtx;
 
         if (bump->m_useViewSpace == 1) {
-            PSMTXTrans(texMtx, FLOAT_8032fc18, FLOAT_8032fc18, FLOAT_8032fc14);
+            PSMTXTrans(texMtx, kLightHalf, kLightHalf, kLightZero);
             PSMTXConcat(texMtx, nrm, *bumpMat0);
-            PSMTXScale(texMtx, FLOAT_8032fc20, FLOAT_8032fc20, FLOAT_8032fc20);
+            PSMTXScale(texMtx, kBumpTexMtxScale, kBumpTexMtxScale, kBumpTexMtxScale);
             PSMTXConcat(*bumpMat0, texMtx, *bumpMat0);
             Mtx posOnly;
             PSMTXCopy(out, posOnly);
-            posOnly[0][3] = FLOAT_8032fc14;
-            posOnly[1][3] = FLOAT_8032fc14;
-            posOnly[2][3] = FLOAT_8032fc14;
+            posOnly[0][3] = kLightZero;
+            posOnly[1][3] = kLightZero;
+            posOnly[2][3] = kLightZero;
             PSMTXConcat(posOnly, texMtx, *bumpMat1);
         } else {
             PSMTXIdentity(nrm);
-            PSMTXTrans(texMtx, FLOAT_8032fc18, FLOAT_8032fc18, FLOAT_8032fc14);
+            PSMTXTrans(texMtx, kLightHalf, kLightHalf, kLightZero);
             PSMTXConcat(texMtx, nrm, *bumpMat0);
-            PSMTXScale(texMtx, FLOAT_8032fc20, FLOAT_8032fc20, FLOAT_8032fc20);
+            PSMTXScale(texMtx, kBumpTexMtxScale, kBumpTexMtxScale, kBumpTexMtxScale);
             PSMTXConcat(*bumpMat0, texMtx, *bumpMat0);
 
             double camX = (double)CameraPosX();
@@ -1232,12 +1233,12 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
             PSMTXIdentity(reinterpret_cast<float(*)[4]>(m_bumpTexScratch));
             float* scratch = m_bumpTexScratch;
 
-            float f0 = FLOAT_8032fc24;
-            float f1 = FLOAT_8032fc14;
-            scratch[0] = FLOAT_8032fc24;
-            float f2 = FLOAT_8032fc18;
+            float f0 = kBumpTexScrollScale;
+            float f1 = kLightZero;
+            scratch[0] = kBumpTexScrollScale;
+            float f2 = kLightHalf;
             scratch[6] = f0;
-            float f3 = FLOAT_8032fc20;
+            float f3 = kBumpTexMtxScale;
             scratch[10] = f1;
             scratch[5] = f1;
             scratch[9] = f1;
@@ -1268,7 +1269,7 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
 CLightPcs::CBumpLight::CBumpLight()
     : CLight()
 {
-    m_radius = FLOAT_8032fc1c;
+    m_radius = kLightOne;
     m_hasTexture = 0;
 }
 
@@ -1297,9 +1298,9 @@ void CLightPcs::CBumpLight::SetTexture(_GXTexMapID texMapID, int textureIdx)
  */
 CLightPcs::CLight::CLight()
 {
-    float f1 = FLOAT_8032fc10;
-    float f2 = FLOAT_8032fc14;
-    float radius = FLOAT_8032fc1c;
+    float f1 = kLightDefaultAttenFalloff;
+    float f2 = kLightZero;
+    float radius = kLightOne;
 
     m_radius = radius;
     m_offsetZ = f2;
@@ -1319,32 +1320,32 @@ CLightPcs::CLight::CLight()
 
 extern const _GXColor kLightDefaultMaterialColor = {0xFF, 0xFF, 0xFF, 0xFF};
 extern const _GXColor kBumpLightMapColor = {0x88, 0x88, 0x88, 0xFF};
-extern const float FLOAT_8032fc10 = 100000000.0f;
-extern const float FLOAT_8032fc14 = 0.0f;
-extern const float FLOAT_8032fc18 = 0.5f;
-extern const float FLOAT_8032fc1c = 1.0f;
-extern const float FLOAT_8032fc20 = 0.4f;
-extern const float FLOAT_8032fc24 = 0.005f;
-extern const float FLOAT_8032fc28 = 64.0f;
-extern const float FLOAT_8032fc2c = -1.0f;
-extern const float FLOAT_8032fc30 = 15.0f;
-extern const float FLOAT_8032fc34 = -4.0f;
-extern const float FLOAT_8032fc38 = 8.0f;
-extern const float FLOAT_8032fc3c = 2.0f;
-extern const float FLOAT_8032fc40 = 0.03125f;
-extern const float FLOAT_8032fc44 = 0.8f;
-extern const double DOUBLE_8032fc48 = 0.5;
-extern const double DOUBLE_8032fc50 = 3.0;
-extern const double DOUBLE_8032fc58 = 0.0;
-extern const float FLOAT_8032fc60 = -2.0f;
-extern const double DOUBLE_8032fc68 = 4503599627370496.0;
-extern const float FLOAT_8032fc70 = 100000.0f;
-extern const float FLOAT_8032fc74 = 360.0f;
-extern const float FLOAT_8032fc78 = 4.999999873689376e-06f;
-extern const float FLOAT_8032fc7c = 255.0f;
-extern const float FLOAT_8032fc80 = 999999986991104.0f;
-extern const float FLOAT_8032fc84 = 0.125f;
-extern const float FLOAT_8032fc88 = -0.125f;
-extern const float FLOAT_8032fc8c = -0.015625f;
-extern const float FLOAT_8032fc90 = 0.1f;
-extern const float FLOAT_8032fc94 = 57.29578f;
+extern const float kLightDefaultAttenFalloff = 100000000.0f;
+extern const float kLightZero = 0.0f;
+extern const float kLightHalf = 0.5f;
+extern const float kLightOne = 1.0f;
+extern const float kBumpTexMtxScale = 0.4f;
+extern const float kBumpTexScrollScale = 0.005f;
+extern const float kBumpLightMapTexSize = 64.0f;
+extern const float kLightNegativeOne = -1.0f;
+extern const float kBumpLightMapOrthoFarZ = 15.0f;
+extern const float kBumpLightViewZOffset = -4.0f;
+extern const float kBumpLightTargetScale = 8.0f;
+extern const float kBumpLightMapCoordScale = 2.0f;
+extern const float kBumpLightMapGridStep = 0.03125f;
+extern const float kBumpLightNormalDivisor = 0.8f;
+extern const double kLightHalfD = 0.5;
+extern const double kLightThreeD = 3.0;
+extern const double kLightZeroD = 0.0;
+extern const float kBumpLightMapVertexZ = -2.0f;
+extern const double kLightU32ToDoubleBias = 4503599627370496.0;
+extern const float kDiffuseLightDistanceScale = 100000.0f;
+extern const float kLightFullSpotCutoffDeg = 360.0f;
+extern const float kDiffuseLightAttnK1 = 4.999999873689376e-06f;
+extern const float kLightAlphaScale = 255.0f;
+extern const float kMapLightAttenMax = 999999986991104.0f;
+extern const float kLightAttnScale = 0.125f;
+extern const float kMapLightAttnNegScale = -0.125f;
+extern const float kMapLightAttnNegFineScale = -0.015625f;
+extern const float kLightAnimPhaseStep = 0.1f;
+extern const float kLightRadToDeg = 57.29578f;

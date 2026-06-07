@@ -41,21 +41,21 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
-extern const char s_SN_EXIT_8032F630[] = "SN_EXIT";
-extern const char s_SN_MAP_8032F638[] = "SN_MAP";
-extern const char s_SN_GAME_8032F640[] = "SN_GAME";
+extern const char sGameStatusExit[] = "SN_EXIT";
+extern const char sGameStatusMap[] = "SN_MAP";
+extern const char sGameStatusGame[] = "SN_GAME";
 extern const char s_localLangDirJp[] = "jp/";
 extern const char s_localLangDirUk[] = "uk/";
 extern const char s_localLangDirGr[] = "gr/";
 extern const char s_localLangDirIt[] = "it/";
 extern const char s_localLangDirFr[] = "fr/";
 extern const char s_localLangDirSp[] = "sp/";
-extern const char s_cGame_8032F660[] = "CGame";
+extern const char sGameClassName[] = "CGame";
 static const char s_numNameFmt[] = "%d %s";
 static const char s_nameSep[] = " ";
 static const char s_nameNoSep[4] = "";
 static const char s_nameJoinFmt[] = "%s%s%s";
-extern const double DOUBLE_8032F680 = 4503601774854144.0;
+extern const double kGameIntToDoubleBias = 4503601774854144.0;
 extern const float kGamePartyBoundsMinInit = 1.0E+10;
 extern const float kGamePartyBoundsMaxInit = -1.0E+10;
 extern const float kGameZero = 0.0;
@@ -67,11 +67,11 @@ const char s_townNameTepa[] = "Tepa";
 const char s_townNameTipa[] = "Tipa";
 const char sGameStageName[] = "Game";
 }
-extern const char s_dvd_pctscft_param_cfd_801D6054[];
-extern const char s_dvd_pctscft_c_system_cfd_801D6068[];
-extern const char s_dvd_pctscft_mail_tbl_cfd_801D6080[];
-extern const char s_dvd_pctscft_newbattle_cfd_801D6098[];
-extern const char s_gameAssetNameBlock_801D5FC0[];
+extern const char sGameParamCfdPathFmt[];
+extern const char sGameSystemCfdPathFmt[];
+extern const char sGameMailTableCfdPathFmt[];
+extern const char sGameNewBattleCfdPathFmt[];
+extern const char sGameAssetNameBlock[];
 
 enum GameAssetNameBlockOffset {
 	kParticleCallbackType0Fmt = 0x114,
@@ -99,31 +99,31 @@ extern const char sNewGameInitMsg[];
 extern const char sGameExecSceneFmt[];
 extern const char sGameInvalidSceneFmt[];
 extern const char sGameDebugStageName[];
-extern const char s_SN_EXIT_8032F630[];
-extern const char s_SN_DUMMY_801D600C[];
-extern const char s_SN_CHARA_801D6018[];
-extern const char s_SN_MAP_8032F638[];
-extern const char s_SN_GAME_8032F640[];
-extern const char s_SN_MATERIALEDITOR_801D6024[];
-extern const char s_SN_FUNNYSHAPE_801D6038[];
-extern const char s_SN_PARTVIEW_801D6048[];
+extern const char sGameStatusExit[];
+extern const char sGameStatusDummy[];
+extern const char sGameStatusChara[];
+extern const char sGameStatusMap[];
+extern const char sGameStatusGame[];
+extern const char sGameStatusMaterialEditor[];
+extern const char sGameStatusFunnyShape[];
+extern const char sGameStatusPartView[];
 extern const char* s_localLangDirs[];
 static const char* m_tStatus[] = {
-    s_SN_EXIT_8032F630,
-    s_SN_DUMMY_801D600C,
-    s_SN_CHARA_801D6018,
-    s_SN_MAP_8032F638,
-    s_SN_GAME_8032F640,
-    s_SN_MATERIALEDITOR_801D6024,
-    s_SN_FUNNYSHAPE_801D6038,
-    s_SN_PARTVIEW_801D6048,
+    sGameStatusExit,
+    sGameStatusDummy,
+    sGameStatusChara,
+    sGameStatusMap,
+    sGameStatusGame,
+    sGameStatusMaterialEditor,
+    sGameStatusFunnyShape,
+    sGameStatusPartView,
     0,
 };
-const char* PTR_s_dvd__scft_param_cfd[] = {
-    s_dvd_pctscft_param_cfd_801D6054,
-    s_dvd_pctscft_c_system_cfd_801D6068,
-    s_dvd_pctscft_mail_tbl_cfd_801D6080,
-    s_dvd_pctscft_newbattle_cfd_801D6098,
+const char* sGameCfdPathFmts[] = {
+    sGameParamCfdPathFmt,
+    sGameSystemCfdPathFmt,
+    sGameMailTableCfdPathFmt,
+    sGameNewBattleCfdPathFmt,
 };
 float s_ratio[] = {1.35f, 1.25f, 1.1f, 1.0f};
 
@@ -695,7 +695,7 @@ inline void CGame::clearWorkScript()
  */
 void CGame::CheckScriptChange()
 {
-    const char* assetNameBlock = s_gameAssetNameBlock_801D5FC0;
+    const char* assetNameBlock = sGameAssetNameBlock;
 
     if (m_newGameFlag == 0) {
         return;
@@ -903,7 +903,7 @@ void CGame::loadCfd()
         localLangDirs[4] = s_localLangDirs[4];
         localLangDirs[5] = s_localLangDirs[5];
 
-        sprintf(path, PTR_s_dvd__scft_param_cfd[i], localLangDirs[Game.m_gameWork.m_languageId]);
+        sprintf(path, sGameCfdPathFmts[i], localLangDirs[Game.m_gameWork.m_languageId]);
         CFile::CHandle* handle = File.Open(path, 0, CFile::PRI_LOW);
 
         if (handle != nullptr)
@@ -1116,7 +1116,7 @@ void CGame::SaveScript(char* scriptData)
  */
 void CGame::ParticleFrameCallback(int effectIndex, int scriptLine, int scriptStep, int callbackType, int graphFrame, Vec*)
 {
-	char* callbackFmtBase = const_cast<char*>(s_gameAssetNameBlock_801D5FC0);
+	char* callbackFmtBase = const_cast<char*>(sGameAssetNameBlock);
 	PPPIFPARAM* ifData = PartMng.pppGetIfDt(static_cast<short>(effectIndex));
 	ifData->m_hitFlags |= 1 << callbackType;
 

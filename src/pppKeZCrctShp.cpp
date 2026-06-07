@@ -2,7 +2,7 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 
-extern const float FLOAT_803304F8;
+extern const float kPppRyjMegaBirthModelZero;
 extern const float kPppKeShpTail2XAlphaScale = 16384.0f;
 
 /*
@@ -35,9 +35,9 @@ void pppKeZCrctShpDraw(_pppPObject* object, pppKeZCrctShpStep* stepData, _pppCtr
     pppScaleVector(scaledY, rowY, ppvMng->m_scale.y);
     pppScaleVector(scaledZ, rowZ, ppvMng->m_scale.z);
 
-    zeroVec.z = FLOAT_803304F8;
-    zeroVec.y = FLOAT_803304F8;
-    zeroVec.x = FLOAT_803304F8;
+    zeroVec.z = kPppRyjMegaBirthModelZero;
+    zeroVec.y = kPppRyjMegaBirthModelZero;
+    zeroVec.x = kPppRyjMegaBirthModelZero;
     pppSetRowVector(transformMatrix, scaledX, scaledY, scaledZ, zeroVec);
 
     pppCopyVector(transformedPos, rowPos);

@@ -28,30 +28,30 @@ STATIC_ASSERT(offsetof(pppColumDataOffsets, m_frameWorkOffset) == 0x0C);
 
 static const char s_pppColum_cpp[] = "pppColum.cpp";
 
-extern const float FLOAT_80331008 = 5.0f;
-extern const float FLOAT_8033100C = 128.0f;
-extern const float FLOAT_80331010[] = {127.0f, 0.0f};
+extern const float kPppCrystalModulationScale = 5.0f;
+extern const float kPppCrystalCoordOffset = 128.0f;
+extern const float kPppCrystalCoordScaleAndZero[] = {127.0f, 0.0f};
 extern const float kPppRainTexCoordBase = 0.0f;
-extern const float FLOAT_8033101c = 1.0f;
-extern const float FLOAT_80331020 = 0.00003051851f;
-extern const double DOUBLE_80331028 = 4503601774854144.0;
-extern const float FLOAT_80331030 = 0.0f;
-extern const float FLOAT_80331034 = 0.003125f;
-extern const float FLOAT_80331038 = -0.004464f;
-extern const float FLOAT_8033103c = 1.0f;
-extern const float FLOAT_80331040 = -1.0f;
-extern const float FLOAT_80331044 = 1.3333334f;
+extern const float kPppRainTexCoordOne = 1.0f;
+extern const float kPppRainRandomUnitScale = 0.00003051851f;
+extern const double kPppColumS32ToDoubleBias = 4503601774854144.0;
+extern const float kPppBlurZero = 0.0f;
+extern const float kPppBlurProjScaleX = 0.003125f;
+extern const float kPppBlurProjScaleY = -0.004464f;
+extern const float kPppBlurOne = 1.0f;
+extern const float kPppBlurNegOne = -1.0f;
+extern const float kPppScreenAspect = 1.3333334f;
 
-extern const float FLOAT_80331078;
-extern const float FLOAT_8033107C;
-extern const float FLOAT_80331080;
-extern const float FLOAT_80331084;
-extern const double DOUBLE_80331088;
-extern const double DOUBLE_80331090;
-extern const double DOUBLE_80331098;
-extern const float FLOAT_803310A0;
-extern const float FLOAT_803310A4;
-extern const float FLOAT_803310A8;
+extern const float kPppColumScreenCenterX;
+extern const float kPppColumScreenCenterY;
+extern const float kPppColumCameraZOffset;
+extern const float kPppColumZero;
+extern const double kPppColumSqrtHalf;
+extern const double kPppColumSqrtThree;
+extern const double kPppColumZeroD;
+extern const float kPppColumNormalizeEpsilon;
+extern const float kPppColumOne;
+extern const float kPppColumSegmentScale;
 
 static inline pppColumDataOffsets* GetColumDataOffsets(_pppCtrlTable* ctrl)
 {
@@ -84,9 +84,9 @@ static inline float ColumSqrtPositive(float value)
 {
     double guess = __frsqrte((double)value);
 
-    guess = DOUBLE_80331088 * guess * (DOUBLE_80331090 - guess * guess * value);
-    guess = DOUBLE_80331088 * guess * (DOUBLE_80331090 - guess * guess * value);
-    guess = DOUBLE_80331088 * guess * (DOUBLE_80331090 - guess * guess * value);
+    guess = kPppColumSqrtHalf * guess * (kPppColumSqrtThree - guess * guess * value);
+    guess = kPppColumSqrtHalf * guess * (kPppColumSqrtThree - guess * guess * value);
+    guess = kPppColumSqrtHalf * guess * (kPppColumSqrtThree - guess * guess * value);
 
     return (float)(value * guess);
 }
@@ -140,32 +140,32 @@ void pppRenderColum(pppColum *column, pppColumStep *param_2, _pppCtrlTable *para
             baseX = positionWork->m_position.x;
             baseY = positionWork->m_position.y;
             baseZ = positionWork->m_position.z;
-            deltaX = FLOAT_80331078 - baseX;
-            deltaY = FLOAT_8033107C - baseY;
+            deltaX = kPppColumScreenCenterX - baseX;
+            deltaY = kPppColumScreenCenterY - baseY;
             cameraDelta.x = deltaX;
             cameraDelta.y = deltaY;
-            cameraDelta.z = FLOAT_80331080 + baseZ;
+            cameraDelta.z = kPppColumCameraZOffset + baseZ;
 
             deltaX2 = deltaX * deltaX;
             deltaY2 = deltaY * deltaY;
             lengthXY = deltaX2 + deltaY2;
-            if (lengthXY > FLOAT_80331084) {
+            if (lengthXY > kPppColumZero) {
                 lengthXY = ColumSqrtPositive(lengthXY);
-            } else if ((double)lengthXY < DOUBLE_80331098) {
+            } else if ((double)lengthXY < kPppColumZeroD) {
                 lengthXY = NAN;
             } else if (ColumFpClassify(lengthXY) == 1) {
                 lengthXY = NAN;
             }
-            drawScale = FLOAT_80331084;
-            if (lengthXY > FLOAT_803310A0) {
-                PSVECScale(&cameraDelta, &cameraDelta, FLOAT_803310A4 / lengthXY);
+            drawScale = kPppColumZero;
+            if (lengthXY > kPppColumNormalizeEpsilon) {
+                PSVECScale(&cameraDelta, &cameraDelta, kPppColumOne / lengthXY);
             }
 
-            zero = FLOAT_80331084;
+            zero = kPppColumZero;
             pppInitBlendMode();
             values = frameWork->m_values;
             segmentStep =
-                (FLOAT_803310A8 * lengthXY) / (float)param_2->m_count;
+                (kPppColumSegmentScale * lengthXY) / (float)param_2->m_count;
 
             for (int i = 0; i < param_2->m_count; i++) {
                 float positionScale = segmentStep * values->m_positionScale;
@@ -186,7 +186,7 @@ void pppRenderColum(pppColum *column, pppColumStep *param_2, _pppCtrlTable *para
                     u32 baseAlpha = positionWork->m_alpha;
 
                     alpha = (u8)baseAlpha;
-                    if (dist < param_2->m_colum.m_fadeDistance && fadeAmount > FLOAT_80331084) {
+                    if (dist < param_2->m_colum.m_fadeDistance && fadeAmount > kPppColumZero) {
                         alpha = (u8)((float)baseAlpha * fadeAmount);
                     }
                 }
@@ -196,7 +196,7 @@ void pppRenderColum(pppColum *column, pppColumStep *param_2, _pppCtrlTable *para
                 color.rgba[3] = alpha;
 
                 pppSetDrawEnv(
-                    &color, (pppFMATRIX*)0, FLOAT_80331084, param_2->m_colum.m_drawEnvColor1,
+                    &color, (pppFMATRIX*)0, kPppColumZero, param_2->m_colum.m_drawEnvColor1,
                     param_2->m_colum.m_drawEnvColor0,
                     param_2->m_arg3, 0, 0, 1, 0);
 

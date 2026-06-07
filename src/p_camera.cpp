@@ -29,13 +29,13 @@
 
 CCameraPcs CameraPcs;
 
-static const char s_CCameraPcs_GAME_801D7860[] = "CCameraPcs(GAME)";
-static const char s_CCameraPcs_CHARA_801D7874[] = "CCameraPcs(CHARA)";
-static const char s_CCameraPcs_MAP_801D7888[] = "CCameraPcs(MAP)";
-static const char s_CCameraPcs_MATERIALEDITOR_801D7898[] = "CCameraPcs(MATERIALEDITOR)";
-static const char s_CCameraPcs_FUNNYSHAPE_801D78B4[] = "CCameraPcs(FUNNYSHAPE)";
-static const char s_CCameraPcs_PART_801D78CC[] = "CCameraPcs(PART)";
-static const char s_CCameraPcs_SHADOW_801D78E0[] = "CCameraPcs(SHADOW)";
+static const char sCameraPcsGameTableName[] = "CCameraPcs(GAME)";
+static const char sCameraPcsCharaTableName[] = "CCameraPcs(CHARA)";
+static const char sCameraPcsMapTableName[] = "CCameraPcs(MAP)";
+static const char sCameraPcsMaterialEditorTableName[] = "CCameraPcs(MATERIALEDITOR)";
+static const char sCameraPcsFunnyShapeTableName[] = "CCameraPcs(FUNNYSHAPE)";
+static const char sCameraPcsPartTableName[] = "CCameraPcs(PART)";
+static const char sCameraPcsShadowTableName[] = "CCameraPcs(SHADOW)";
 
 extern float FLOAT_8032fa18;
 extern float FLOAT_8032fa1c;
@@ -154,7 +154,7 @@ CProcessTableCallback CCameraPcs::m_table_desc23 = {0, 0xFFFFFFFF, reinterpret_c
 CProcessTableCallback CCameraPcs::m_table_desc24 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowEndAll__10CCameraPcsFv)};
 CProcessTable CCameraPcs::m_table[7] = {
     {
-        const_cast<char*>(s_CCameraPcs_GAME_801D7860),
+        const_cast<char*>(sCameraPcsGameTableName),
         m_table_desc0.m_thisOffset,
         m_table_desc0.m_virtualOffset,
         m_table_desc0.m_function,
@@ -176,7 +176,7 @@ CProcessTable CCameraPcs::m_table[7] = {
         m_table_desc4.m_function,
     },
     {
-        const_cast<char*>(s_CCameraPcs_CHARA_801D7874),
+        const_cast<char*>(sCameraPcsCharaTableName),
         m_table_desc5.m_thisOffset,
         m_table_desc5.m_virtualOffset,
         m_table_desc5.m_function,
@@ -190,7 +190,7 @@ CProcessTable CCameraPcs::m_table[7] = {
         0x4,
     },
     {
-        const_cast<char*>(s_CCameraPcs_MAP_801D7888),
+        const_cast<char*>(sCameraPcsMapTableName),
         m_table_desc8.m_thisOffset,
         m_table_desc8.m_virtualOffset,
         m_table_desc8.m_function,
@@ -204,7 +204,7 @@ CProcessTable CCameraPcs::m_table[7] = {
         0x4,
     },
     {
-        const_cast<char*>(s_CCameraPcs_MATERIALEDITOR_801D7898),
+        const_cast<char*>(sCameraPcsMaterialEditorTableName),
         m_table_desc11.m_thisOffset,
         m_table_desc11.m_virtualOffset,
         m_table_desc11.m_function,
@@ -218,7 +218,7 @@ CProcessTable CCameraPcs::m_table[7] = {
         0x4,
     },
     {
-        const_cast<char*>(s_CCameraPcs_FUNNYSHAPE_801D78B4),
+        const_cast<char*>(sCameraPcsFunnyShapeTableName),
         m_table_desc14.m_thisOffset,
         m_table_desc14.m_virtualOffset,
         m_table_desc14.m_function,
@@ -232,7 +232,7 @@ CProcessTable CCameraPcs::m_table[7] = {
         0x4,
     },
     {
-        const_cast<char*>(s_CCameraPcs_PART_801D78CC),
+        const_cast<char*>(sCameraPcsPartTableName),
         m_table_desc17.m_thisOffset,
         m_table_desc17.m_virtualOffset,
         m_table_desc17.m_function,
@@ -246,7 +246,7 @@ CProcessTable CCameraPcs::m_table[7] = {
         0x4,
     },
     {
-        const_cast<char*>(s_CCameraPcs_SHADOW_801D78E0),
+        const_cast<char*>(sCameraPcsShadowTableName),
         m_table_desc20.m_thisOffset,
         m_table_desc20.m_virtualOffset,
         m_table_desc20.m_function,

@@ -3740,18 +3740,16 @@ void CMenuPcs::DrawMCardMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	McCtrl& mcCtrl = *GetMcCtrl();
-	WmWorldState* const typedWorldState = m_wmWorldState;
-	int worldState = reinterpret_cast<int>(typedWorldState);
-	short state = typedWorldState->m_mainState;
+	short state = m_wmWorldState->m_mainState;
 
 	if (state > 0 && state < 4) {
 		float alpha;
 		if (state == 1) {
-			alpha = (float)typedWorldState->m_frameCounter;
+			alpha = (float)m_wmWorldState->m_frameCounter;
 		} else if (state == 2) {
 			alpha = FLOAT_803313e8;
 		} else {
-			alpha = FLOAT_803313e8 - (float)typedWorldState->m_frameCounter;
+			alpha = FLOAT_803313e8 - (float)m_wmWorldState->m_frameCounter;
 		}
 		if (alpha > FLOAT_803314f0) {
 			MenuPcs.SetAttrFmt((FMT)0);
@@ -3771,12 +3769,11 @@ void CMenuPcs::DrawMCardMenu()
 
 	DrawMCList();
 
-	worldState = reinterpret_cast<int>(typedWorldState);
-	state = typedWorldState->m_mainState;
-	if (state == 2 && typedWorldState->m_subState > 0x10) {
+	state = m_wmWorldState->m_mainState;
+	if (state == 2 && m_wmWorldState->m_subState > 0x10) {
 		unsigned int saveIdx;
-		if (typedWorldState->m_subState == 0x11) {
-			saveIdx = (unsigned int)typedWorldState->m_cardChannel;
+		if (m_wmWorldState->m_subState == 0x11) {
+			saveIdx = (unsigned int)m_wmWorldState->m_cardChannel;
 		} else {
 			saveIdx = (unsigned int)mcCtrl.m_saveIndex;
 		}
@@ -3842,10 +3839,9 @@ void CMenuPcs::DrawMCardMenu()
 	}
 
 	// State machine for MC operations
-	worldState = reinterpret_cast<int>(typedWorldState);
-	state = typedWorldState->m_mainState;
-	short subState = typedWorldState->m_subState;
-	if (state == 2 && typedWorldState->m_delay == 0) {
+	state = m_wmWorldState->m_mainState;
+	short subState = m_wmWorldState->m_subState;
+	if (state == 2 && m_wmWorldState->m_delay == 0) {
 		short winState;
 		switch ((int)subState) {
 		case 0:
@@ -3856,32 +3852,32 @@ void CMenuPcs::DrawMCardMenu()
 				DrawMcWinMess(0, 0);
 			}
 			if (winState == 2 && m_menuWindowInfo->state == 3) {
-				if (typedWorldState->m_state0E < 0) {
-					typedWorldState->m_nextMenuMode = -1;
-					typedWorldState->m_delay = 1;
+				if (m_wmWorldState->m_state0E < 0) {
+					m_wmWorldState->m_nextMenuMode = -1;
+					m_wmWorldState->m_delay = 1;
 					m_wmTransitionCode = 1;
 				} else if (subState == 2) {
-					typedWorldState->m_subState = 3;
+					m_wmWorldState->m_subState = 3;
 				} else {
-					typedWorldState->m_subState = 1;
+					m_wmWorldState->m_subState = 1;
 				}
 			}
 			break;
 		case 1:
-			if (typedWorldState->m_frameCounter > 0x12) {
-				typedWorldState->m_subState = 3;
+			if (m_wmWorldState->m_frameCounter > 0x12) {
+				m_wmWorldState->m_subState = 3;
 			}
-			typedWorldState->m_frameCounter++;
+			m_wmWorldState->m_frameCounter++;
 			break;
 		case 3:
-			if (typedWorldState->m_mcResult != 1) {
+			if (m_wmWorldState->m_mcResult != 1) {
 				memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
-				short mcResult = typedWorldState->m_mcResult;
-				if (mcResult == -1) typedWorldState->m_subState = 5;
-				else if (mcResult == -2) typedWorldState->m_subState = 8;
-				else if (mcResult == -3) typedWorldState->m_subState = 6;
-				else if (mcResult == -4) typedWorldState->m_subState = 7;
-				else if (mcResult == 0) typedWorldState->m_subState = 4;
+				short mcResult = m_wmWorldState->m_mcResult;
+				if (mcResult == -1) m_wmWorldState->m_subState = 5;
+				else if (mcResult == -2) m_wmWorldState->m_subState = 8;
+				else if (mcResult == -3) m_wmWorldState->m_subState = 6;
+				else if (mcResult == -4) m_wmWorldState->m_subState = 7;
+				else if (mcResult == 0) m_wmWorldState->m_subState = 4;
 			}
 			break;
 		case 4:
@@ -3890,12 +3886,12 @@ void CMenuPcs::DrawMCardMenu()
 			if (winState == 1) {
 				DrawMcWinMess(6, 0);
 			} else if (winState == 2 && m_menuWindowInfo->state == 3) {
-				short mcRes = typedWorldState->m_mcResult;
-				if (mcRes == -3) typedWorldState->m_subState = 8;
-				else if (mcRes == -4) typedWorldState->m_subState = 8;
-				else if (mcRes == -5) typedWorldState->m_subState = 7;
-				else if (mcRes == -6) typedWorldState->m_subState = 0x10;
-				else typedWorldState->m_subState = 10;
+				short mcRes = m_wmWorldState->m_mcResult;
+				if (mcRes == -3) m_wmWorldState->m_subState = 8;
+				else if (mcRes == -4) m_wmWorldState->m_subState = 8;
+				else if (mcRes == -5) m_wmWorldState->m_subState = 7;
+				else if (mcRes == -6) m_wmWorldState->m_subState = 0x10;
+				else m_wmWorldState->m_subState = 10;
 			}
 			break;
 		case 5:
@@ -3913,7 +3909,7 @@ void CMenuPcs::DrawMCardMenu()
 			if (winState == 1) {
 				int msgId = 0;
 				int msgParam = 0;
-				short ss = typedWorldState->m_subState;
+				short ss = m_wmWorldState->m_subState;
 				if (ss == 5) msgId = 1;
 				else if (ss == 6) msgId = 2;
 				else if (ss == 7) msgId = 3;
@@ -3927,10 +3923,10 @@ void CMenuPcs::DrawMCardMenu()
 				DrawMcWinMess(msgId, msgParam);
 			}
 			if (winState == 2 && m_menuWindowInfo->state == 3) {
-				if (typedWorldState->m_state0E < 0) {
-					typedWorldState->m_subState = 3;
+				if (m_wmWorldState->m_state0E < 0) {
+					m_wmWorldState->m_subState = 3;
 				} else {
-					typedWorldState->m_subState = 2;
+					m_wmWorldState->m_subState = 2;
 				}
 			}
 			break;
@@ -3951,18 +3947,18 @@ void CMenuPcs::DrawMCardMenu()
 				         FLOAT_803313e8, FLOAT_803313e8, 0);
 			}
 			if (winState == 2 && m_menuWindowInfo->state == 3) {
-				short ynRes = typedWorldState->m_mcResult;
+				short ynRes = m_wmWorldState->m_mcResult;
 				if (ynRes < 0) {
-					if (ynRes == -1) typedWorldState->m_subState = 5;
-					else if (ynRes == -2) typedWorldState->m_subState = 8;
-					else if (ynRes == -3) typedWorldState->m_subState = 6;
-					else typedWorldState->m_subState = 7;
-				} else if (typedWorldState->m_state0E < 0) {
-					typedWorldState->m_subState = 2;
+					if (ynRes == -1) m_wmWorldState->m_subState = 5;
+					else if (ynRes == -2) m_wmWorldState->m_subState = 8;
+					else if (ynRes == -3) m_wmWorldState->m_subState = 6;
+					else m_wmWorldState->m_subState = 7;
+				} else if (m_wmWorldState->m_state0E < 0) {
+					m_wmWorldState->m_subState = 2;
 				} else if (subState == 8) {
-					typedWorldState->m_subState = 0x0B;
+					m_wmWorldState->m_subState = 0x0B;
 				} else {
-					typedWorldState->m_subState = 0x0D;
+					m_wmWorldState->m_subState = 0x0D;
 				}
 			}
 			break;
@@ -3973,17 +3969,17 @@ void CMenuPcs::DrawMCardMenu()
 				DrawMcWinMess(6, 0);
 			}
 			if (winState == 2 && m_menuWindowInfo->state == 3) {
-				short cRes = typedWorldState->m_mcResult;
-				if (cRes == -1) typedWorldState->m_subState = 10;
-				else if (cRes == -2) typedWorldState->m_subState = 8;
-				else if (cRes == -3) typedWorldState->m_subState = 8;
-				else if (cRes == -4) typedWorldState->m_subState = 7;
+				short cRes = m_wmWorldState->m_mcResult;
+				if (cRes == -1) m_wmWorldState->m_subState = 10;
+				else if (cRes == -2) m_wmWorldState->m_subState = 8;
+				else if (cRes == -3) m_wmWorldState->m_subState = 8;
+				else if (cRes == -4) m_wmWorldState->m_subState = 7;
 				else if (cRes == -999) {
-					typedWorldState->m_nextMenuMode = -1;
-					typedWorldState->m_delay = 1;
+					m_wmWorldState->m_nextMenuMode = -1;
+					m_wmWorldState->m_delay = 1;
 					m_wmTransitionCode = 2;
 				} else {
-					typedWorldState->m_subState = 0x11;
+					m_wmWorldState->m_subState = 0x11;
 				}
 			}
 			break;
@@ -3993,24 +3989,24 @@ void CMenuPcs::DrawMCardMenu()
 			if (winState == 1) {
 				DrawMcWinMess(7, 0);
 			} else if (winState == 2 && m_menuWindowInfo->state == 3) {
-				short dRes = typedWorldState->m_mcResult;
+				short dRes = m_wmWorldState->m_mcResult;
 				if (dRes == 1) {
-					typedWorldState->m_subState = 0x0E;
+					m_wmWorldState->m_subState = 0x0E;
 				} else if (dRes == -2) {
-					typedWorldState->m_subState = 7;
+					m_wmWorldState->m_subState = 7;
 				} else {
-					typedWorldState->m_subState = 0x0F;
+					m_wmWorldState->m_subState = 0x0F;
 				}
 			}
 			break;
 		case 0x11:
-			if (typedWorldState->m_mcResult < 0) {
-				typedWorldState->m_subState = 3;
-			} else if (typedWorldState->m_state0E != 0) {
-				if (typedWorldState->m_state0E < 0) {
-					typedWorldState->m_subState = 2;
+			if (m_wmWorldState->m_mcResult < 0) {
+				m_wmWorldState->m_subState = 3;
+			} else if (m_wmWorldState->m_state0E != 0) {
+				if (m_wmWorldState->m_state0E < 0) {
+					m_wmWorldState->m_subState = 2;
 				} else {
-					typedWorldState->m_subState = 0x12;
+					m_wmWorldState->m_subState = 0x12;
 				}
 			}
 			break;
@@ -4020,48 +4016,45 @@ void CMenuPcs::DrawMCardMenu()
 			if (winState == 1) {
 				DrawMcWinMess(9, 0);
 			} else if (winState == 2 && m_menuWindowInfo->state == 3) {
-				short eRes = typedWorldState->m_mcResult;
+				short eRes = m_wmWorldState->m_mcResult;
 				if (eRes == 1) {
-					typedWorldState->m_subState = 0x13;
+					m_wmWorldState->m_subState = 0x13;
 					Sound.PlaySe(0x42, 0x40, 0x7F, 0);
 				} else if (eRes == -4) {
-					typedWorldState->m_subState = 7;
+					m_wmWorldState->m_subState = 7;
 				} else {
-					typedWorldState->m_subState = 0x14;
+					m_wmWorldState->m_subState = 0x14;
 				}
 			}
 			break;
 		}
-		if ((int)subState != (int)typedWorldState->m_subState) {
-			typedWorldState->m_flag09 = 0;
-			typedWorldState->m_counter1A = 0;
-			typedWorldState->m_state0E = 0;
+		if ((int)subState != (int)m_wmWorldState->m_subState) {
+			m_wmWorldState->m_flag09 = 0;
+			m_wmWorldState->m_counter1A = 0;
+			m_wmWorldState->m_state0E = 0;
 		}
-	} else if (state == 2 && typedWorldState->m_delay != 0) {
-		typedWorldState->m_delay--;
-		worldState = reinterpret_cast<int>(typedWorldState);
-		if (typedWorldState->m_delay < 1) {
-			typedWorldState->m_mainState++;
-			typedWorldState->m_frameCounter = 0;
-			Sound.PlaySe(0x31 - (typedWorldState->m_nextMenuMode >> 31), 0x40, 0x7F, 0);
+	} else if (state == 2 && m_wmWorldState->m_delay != 0) {
+		m_wmWorldState->m_delay--;
+		if (m_wmWorldState->m_delay < 1) {
+			m_wmWorldState->m_mainState++;
+			m_wmWorldState->m_frameCounter = 0;
+			Sound.PlaySe(0x31 - (m_wmWorldState->m_nextMenuMode >> 31), 0x40, 0x7F, 0);
 		}
 	} else {
-		typedWorldState->m_frameCounter++;
-		worldState = reinterpret_cast<int>(typedWorldState);
+		m_wmWorldState->m_frameCounter++;
 		short threshold = 10;
-		if (typedWorldState->m_mainState == 3 && typedWorldState->m_subState != 0) {
+		if (m_wmWorldState->m_mainState == 3 && m_wmWorldState->m_subState != 0) {
 			threshold = 0x13;
 		}
-		if (typedWorldState->m_frameCounter >= threshold) {
-			typedWorldState->m_mainState++;
-			typedWorldState->m_frameCounter = 0;
-			worldState = reinterpret_cast<int>(typedWorldState);
-			if (typedWorldState->m_mainState > 4) {
-				if (typedWorldState->m_menuMode != 8) {
-					typedWorldState->m_changeRequest = typedWorldState->m_nextMenuMode;
+		if (m_wmWorldState->m_frameCounter >= threshold) {
+			m_wmWorldState->m_mainState++;
+			m_wmWorldState->m_frameCounter = 0;
+			if (m_wmWorldState->m_mainState > 4) {
+				if (m_wmWorldState->m_menuMode != 8) {
+					m_wmWorldState->m_changeRequest = m_wmWorldState->m_nextMenuMode;
 				}
 				m_textureLocIndex = 1;
-				typedWorldState->m_nextMenuMode = 0;
+				m_wmWorldState->m_nextMenuMode = 0;
 			}
 		}
 	}

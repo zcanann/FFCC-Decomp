@@ -1754,6 +1754,9 @@ void CChara::makeFurTex()
 				PSVECAdd(root, velTerm, tmp);
 				CVector pos;
 				PSVECAdd(tmp, accelTerm, pos);
+				float px = pos.x;
+				float py = pos.y;
+				float pz = pos.z;
 
 				CColor color(
 				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.r * (kCharaFurDepthScaleBase - t2)) +
@@ -1763,9 +1766,9 @@ void CChara::makeFurTex()
 				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.b * (kCharaFurDepthScaleBase - t2)) +
 				                               static_cast<int>(src.m_colors[1].color.b * t2)),
 				    0);
-				GXWGFifo.f32 = pos.x;
-				GXWGFifo.f32 = pos.y;
-				GXWGFifo.f32 = pos.z;
+				GXWGFifo.f32 = px;
+				GXWGFifo.f32 = py;
+				GXWGFifo.f32 = pz;
 				GXWGFifo.u32 = *reinterpret_cast<unsigned int*>(&color.color);
 				t += kYmEnvQuarter;
 			}
@@ -1782,6 +1785,9 @@ void CChara::makeFurTex()
 				PSVECAdd(root, velTerm, tmp);
 				CVector pos;
 				PSVECAdd(tmp, accelTerm, pos);
+				float px = pos.x;
+				float py = pos.y;
+				float pz = pos.z;
 
 				CColor color(
 				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.r * (kCharaFurDepthScaleBase - t2)) +
@@ -1791,9 +1797,9 @@ void CChara::makeFurTex()
 				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.b * (kCharaFurDepthScaleBase - t2)) +
 				                               static_cast<int>(src.m_colors[1].color.b * t2)),
 				    0);
-				GXWGFifo.f32 = pos.z;
-				GXWGFifo.f32 = pos.y;
-				GXWGFifo.f32 = pos.x;
+				GXWGFifo.f32 = pz;
+				GXWGFifo.f32 = py;
+				GXWGFifo.f32 = px;
 				GXWGFifo.u32 = *reinterpret_cast<unsigned int*>(&color.color);
 				t += kYmEnvQuarter;
 			}

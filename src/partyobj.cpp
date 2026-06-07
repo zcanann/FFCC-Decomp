@@ -872,10 +872,10 @@ void CGPartyObj::onFrameAlways()
 
 	int& traceSlot = PartyTraceParticleSlot(port);
 	if (showTraceParticle && traceSlot == 0) {
-		traceSlot = gCFlatRuntime2.GetFreeParticleSlot();
+		traceSlot = CFlat.GetFreeParticleSlot();
 		putParticleTrace((port + 0x42U) | 0x100, traceSlot, this, FLOAT_80331a54, 0);
 	} else if (!showTraceParticle && traceSlot != 0) {
-		gCFlatRuntime2.EndParticleSlot(traceSlot, 1);
+		CFlat.EndParticleSlot(traceSlot, 1);
 		traceSlot = 0;
 	}
 
@@ -2128,11 +2128,11 @@ void CGPartyObj::statCharge()
 		}
 		if (m_subFrame == 5 && m_comboItemState >= 0) {
 			endPSlotBit(0x20);
-			gCFlatRuntime2.ResetParticleWork(
+			CFlat.ResetParticleWork(
 			    (m_comboItemState + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 5 + 0x1C) | 0x400,
 			    m_particleSlots[5]);
-			gCFlatRuntime2.SetParticleWorkBind(reinterpret_cast<CFlatRuntime::CObject*>(this));
-			gCFlatRuntime2.PutParticleWork();
+			CFlat.SetParticleWorkBind(reinterpret_cast<CFlatRuntime::CObject*>(this));
+			CFlat.PutParticleWork();
 			playSe3D(m_comboItemState + 0x7EB, 0x32, 0x96, 0, 0);
 		}
 
@@ -2303,7 +2303,7 @@ CGPrgObj* CGPartyObj::getBestAngleObject(float range, float)
 	CGPrgObj* best = 0;
 	float bestAbsAngle = 0.0f;
 
-	for (CGObject* obj = gCFlatRuntime2.FindGObjFirst(); obj != 0; obj = gCFlatRuntime2.FindGObjNext(obj)) {
+	for (CGObject* obj = CFlat.FindGObjFirst(); obj != 0; obj = CFlat.FindGObjNext(obj)) {
 		const unsigned int flags = obj->m_attrFlags;
 		if ((flags & 0x18) == 0) {
 			continue;
@@ -2563,13 +2563,13 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 	}
 
 	endPSlotBit(0x10);
-	gCFlatRuntime2.ResetParticleWork(((targetSide != 0) ? 4 : 0) +
+	CFlat.ResetParticleWork(((targetSide != 0) ? 4 : 0) +
 	                                     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) +
 	                                     0x147 | 0x100,
 	                                 m_particleSlots[4]);
-	gCFlatRuntime2.SetParticleWorkPos(m_comboCenter, FLOAT_80331a78);
-	gCFlatRuntime2.SetParticleWorkParam(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4), 0);
-	gCFlatRuntime2.PutParticleWork();
+	CFlat.SetParticleWorkPos(m_comboCenter, FLOAT_80331a78);
+	CFlat.SetParticleWorkParam(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4), 0);
+	CFlat.PutParticleWork();
 }
 
 /*

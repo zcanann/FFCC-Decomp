@@ -2355,11 +2355,10 @@ void CMenuPcs::CalcResultCountAnim()
 			sprite->w = 0x38;
 			sprite->h = 0x28;
 			sprite->mulX = (float)(rank * sprite->w);
-			sprite->alpha = 0.0f;
-			sprite->depth = 1.0f;
+			sprite->mulY = 0.0f;
 			sprite->startFrame = 9999;
 			sprite->duration = 4;
-			sprite->scale = 1.0f;
+			sprite->depth = 1.0f;
 			sprite->motionX = 0.0f;
 			sprite->motionY = 0.0f;
 			sprite->targetX = (float)(sprite->x - 0x60);
@@ -2387,7 +2386,11 @@ void CMenuPcs::CalcResultCountAnim()
 
 	for (int i = 0; i < activePartyCount; i++) {
 		BonusAnimSprite* sprite = &sprites[countTop + i];
-		if (*(short*)(statePtr + 0x10) == 0) {
+		if (*(short*)(statePtr + 0x10) != 0) {
+			sprite->motionX = 0.0f;
+			sprite->motionY = 0.0f;
+			sprite->alpha = 1.0f;
+		} else {
 			int value = s_Rinfo->m_party[i].m_totalValue;
 			if (frame == value) {
 				Sound.PlaySe(0x4b, 0x40, 0x7f, 0);
@@ -2408,10 +2411,6 @@ void CMenuPcs::CalcResultCountAnim()
 					sprite->motionY = 0.0f;
 				}
 			}
-		} else {
-			sprite->motionX = 0.0f;
-			sprite->motionY = 0.0f;
-			sprite->alpha = 1.0f;
 		}
 	}
 

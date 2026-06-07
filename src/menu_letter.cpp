@@ -2399,8 +2399,8 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 	GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
 	GXSetChanMatColor(GX_COLOR0A0, white);
 
-	double x1 = static_cast<double>(static_cast<float>(x0 + w - static_cast<double>(FLOAT_803330f4)));
-	double y1 = static_cast<double>(static_cast<float>(y0 + h - static_cast<double>(FLOAT_803330f4)));
+	double x1 = x0 + w - static_cast<double>(FLOAT_803330f4);
+	double y1 = y0 + h - static_cast<double>(FLOAT_803330f4);
 
 	for (int i = 0; i < 4; ++i) {
 		int tex;

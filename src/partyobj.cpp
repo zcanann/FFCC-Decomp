@@ -1099,29 +1099,25 @@ void CGPartyObj::command()
 		} else {
 			const int itemId = caravan->DelCmdListAndItem(caravan->GetIdxCmdList());
 			const unsigned short itemKind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48);
-			bool isRingItem = false;
 			if (itemKind == 0x125) {
-				isRingItem = true;
+				ringCommand = itemId | 0x8000;
 			} else if (itemKind < 0x125) {
 				if (itemKind == 0xDF) {
-					isRingItem = true;
+					ringCommand = itemId | 0x8000;
 				} else if (itemKind < 0xDF) {
 					if (itemKind == 1) {
-						isRingItem = true;
+						ringCommand = itemId | 0x8000;
 					}
 				} else if (itemKind == 0x100) {
-					isRingItem = true;
+					ringCommand = itemId | 0x8000;
 				}
 			} else if (itemKind == 0x186) {
-				isRingItem = true;
+				ringCommand = itemId | 0x8000;
 			} else if (itemKind < 0x186) {
 				if (itemKind == 0x17D) {
-					isRingItem = true;
+					ringCommand = itemId | 0x8000;
 				}
 			} else if (itemKind == 0x1F5) {
-				isRingItem = true;
-			}
-			if (isRingItem) {
 				ringCommand = itemId | 0x8000;
 			}
 		}

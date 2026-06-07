@@ -714,19 +714,19 @@ int CMenuPcs::LetterCtrl()
 				}
 			}
 			if (panelCount == messOpenDone) {
-				if (SingGetLetterAttachflg() < 0) {
-					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = 1;
-				} else {
-					if (s_AttachMode < 1) {
+				if (SingGetLetterAttachflg() >= 0) {
+					if (s_AttachMode >= 1) {
+						*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x30) = 5;
+					} else {
 						s_Attach = 2;
 						*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x30) = 3;
 						*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28) = static_cast<s16>(s_ReplyPos);
-					} else {
-						*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x30) = 5;
 					}
 					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = 0;
 					*reinterpret_cast<char*>(GetLetterStateBase(this) + 0xC) = 0;
 					SingSetLetterAttachflg(-1);
+				} else {
+					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = 1;
 				}
 			}
 		} else if (mode == 2) {

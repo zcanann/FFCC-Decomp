@@ -3899,8 +3899,7 @@ void CGMonObj::statMove(int* targetIndex)
 		break;
 
 	default: {
-		unsigned char* script9 = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
-		if (*reinterpret_cast<short*>(script9 + 0x10C) == 1) {
+		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) {
 			*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
 			memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
 		}
@@ -3914,26 +3913,26 @@ void CGMonObj::statMove(int* targetIndex)
 		}
 
 		int hitPartyIndex;
-		if (soundLimit <= static_cast<double>(*reinterpret_cast<float*>(mon + 0x5BC))) {
-			hitPartyIndex = -1;
-		} else {
+		if (static_cast<double>(*reinterpret_cast<float*>(mon + 0x5BC)) < soundLimit) {
 			float hitScale;
 			monObj->checkCol(6, object->m_rotBaseY,
-				static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0xC8)),
+				static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xC8)),
 				&hitScale, &hitPartyIndex);
-			if (hitPartyIndex < 0) {
-				hitPartyIndex = -1;
+			if (hitPartyIndex >= 0) {
+				goto haveHit;
 			}
 		}
+		hitPartyIndex = -1;
+	haveHit:;
 
 		if (hitPartyIndex < 0) {
 			unsigned char* aiData;
 			if (monObj->m_aiState == 0) {
-				aiData = script9;
+				aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
 			} else {
 				aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
 					(monObj->m_aiState +
-					 *reinterpret_cast<unsigned short*>(script9 + 0x100)) *
+					 *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x100)) *
 						0x1D0 +
 					0x10;
 			}
@@ -3952,7 +3951,7 @@ void CGMonObj::statMove(int* targetIndex)
 				} else {
 					*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x1D;
 					float repopDist =
-						static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0xCC));
+						static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xCC));
 					float homeDist = PSVECDistance(&monObj->m_homePosition, &object->m_worldPosition);
 					if (static_cast<double>(repopDist) <= static_cast<double>(homeDist)) {
 						monObj->isValidTarget();

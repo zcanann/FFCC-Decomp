@@ -3230,8 +3230,8 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 
 	float targetDist = *reinterpret_cast<float*>(mon + partyIndex * 4 + 0x5D0);
 
-	unsigned short selectorType = *reinterpret_cast<unsigned short*>(aiScript + 0x108);
-	if (selectorType == 0xFFFF) {
+	short selectorType = *reinterpret_cast<short*>(aiScript + 0x108);
+	if (selectorType == -1) {
 		return -1;
 	}
 

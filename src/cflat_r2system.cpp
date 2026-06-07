@@ -2878,14 +2878,15 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     }
     case -0x48: {
-        CMesMenu* mesMenu = MenuPcs.GetMesMenu(*object->m_localBase);
-        if (mesMenu == 0) {
+        int a0 = *object->m_localBase;
+        int a1 = object->m_localBase[1];
+        if (MenuPcs.GetMesMenu(a0) != 0) {
+            this->push(object, GetErrorLevel__7CSystemFv(MenuPcs.GetMesMenu(a0), a1));
+        } else {
             if (GetNumMes__9CFlatDataFv(&System) != 0) {
-                System.Printf(const_cast<char*>("MesMenu no %d is null\n"), *object->m_localBase);
+                System.Printf(const_cast<char*>("MesMenu no %d is null\n"), a0);
             }
             this->push(object, 0);
-        } else {
-            this->push(object, GetErrorLevel__7CSystemFv(mesMenu, object->m_localBase[1]));
         }
         outResult = 0;
         break;

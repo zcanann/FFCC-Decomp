@@ -10099,18 +10099,22 @@ void CMenuPcs::DrawMCList()
 		unsigned int slotIdx = 0;
 		int iVar16 = 0;
 		do {
-			float yPos = FLOAT_803314d8;
-			float alpha = FLOAT_803313e8;
-			short sub = worldState->m_subState;
-			if (sub == 1 || worldState->m_mainState == 3) {
+			float yPos;
+			float alpha;
+			WmWorldState* const ws = m_wmWorldState;
+			short sub = ws->m_subState;
+			if (sub == 1 || ws->m_mainState == 3) {
 				int animFrames;
-				if (worldState->m_mainState == 2) {
-					animFrames = (int)worldState->m_frameCounter - iVar16;
+				if (ws->m_mainState == 2) {
+					animFrames = (int)ws->m_frameCounter - iVar16;
 				} else {
-					animFrames = 10 - ((int)worldState->m_frameCounter + (3 - (int)slotIdx) * -3);
+					animFrames = 10 - ((int)ws->m_frameCounter - (3 - (int)slotIdx) * 3);
 					}
 					if (animFrames >= 0) {
-						if (animFrames < 11) {
+						if (animFrames > 10) {
+							yPos = FLOAT_803314d8;
+							alpha = FLOAT_803313e8;
+						} else {
 							alpha = static_cast<float>(DOUBLE_803314e8 *
 							                           (static_cast<double>(animFrames) - DOUBLE_80331408));
 							yPos = static_cast<float>(static_cast<float>(static_cast<double>(animFrames) -
@@ -10121,6 +10125,8 @@ void CMenuPcs::DrawMCList()
 						goto LAB_draw;
 					}
 			} else {
+				yPos = FLOAT_803314d8;
+				alpha = FLOAT_803313e8;
 LAB_draw:
 				if (alpha > FLOAT_803314f0) {
 					float slotY = static_cast<float>(DOUBLE_80331498 * (static_cast<double>(static_cast<int>(slotIdx)) - DOUBLE_80331408) + DOUBLE_80331490);

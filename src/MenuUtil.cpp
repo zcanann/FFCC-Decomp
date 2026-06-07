@@ -1475,7 +1475,7 @@ void CMenuPcs::DrawOptionMenu()
 		if (static_cast<double>(m_optionRowAnim) >= DOUBLE_803335C0) {
 			rowAnimFrame = 0xD;
 		} else {
-			rowAnimFrame = static_cast<unsigned int>(static_cast<double>(m_optionRowAnim) / FLOAT_8033362C);
+			rowAnimFrame = static_cast<unsigned int>(static_cast<int>(m_optionRowAnim / FLOAT_8033362C));
 		}
 		const float specialRowCos = static_cast<float>(
 			cos(static_cast<double>(FLOAT_80333594 * static_cast<float>(rowAnimFrame) * FLOAT_80333630)));

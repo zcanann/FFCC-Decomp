@@ -1035,26 +1035,32 @@ void CMenuPcs::loadData()
 		CharaPcs.LoadAnim(0, modelNo, s_wmCharaAnimSleep, 1, 0, 0);
 	}
 
-	int* animState = m_wmCharaAnimState;
-	for (int i = 0; i < 8; i++, animState += 5) {
-		CCharaPcs::CHandle* const handle = reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x7F4)[i];
+	int animOff = 0;
+	for (int i = 0; i < 8; i++, animOff += 0x14) {
+		const int handleIdx = i * 4;
+		CCharaPcs::CHandle* handle = reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x7F4 + handleIdx)[0];
 		if (handle->m_charaKind != 3) {
 			const unsigned int charaBase = static_cast<unsigned int>(handle->m_charaNo) / 100;
 			const int modelNo = charaBase * 100;
 			const int baseAnim = (charaBase - 1) * 6;
 			handle->LoadAnim(s_wmCharaAnimStand, baseAnim, 1, 0, modelNo, -1, 0);
-			handle->LoadAnim(s_wmCharaAnimWalk, baseAnim + 1, 1, 0, modelNo, -1, 0);
-			handle->LoadAnim(s_wmCharaAnimRun, baseAnim + 2, 1, 0, modelNo, -1, 0);
-			handle->LoadAnim(s_wmCharaAnimGlad, baseAnim + 3, 3, 0, modelNo, -1, 0);
-			handle->LoadAnim(s_wmCharaAnimSleep, baseAnim + 4, 1, 0, modelNo, -1, 0);
-			handle->LoadAnim(s_wmCharaAnimAngry, baseAnim + 5, 1, 0, modelNo, -1, 0);
-			animState[0] = 0;
-			animState[1] = -1;
-			animState[2] = rand() % 250;
-			handle->SetAnim(baseAnim, -1, -1, 0, 0);
-			animState[3] = reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xB4)[0];
-			animState[4] = reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xC0)[0];
-			unsigned char* const handleBytes = reinterpret_cast<unsigned char*>(handle);
+			reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x7F4 + handleIdx)[0]->LoadAnim(s_wmCharaAnimWalk, baseAnim + 1, 1, 0, modelNo, -1, 0);
+			reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x7F4 + handleIdx)[0]->LoadAnim(s_wmCharaAnimRun, baseAnim + 2, 1, 0, modelNo, -1, 0);
+			reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x7F4 + handleIdx)[0]->LoadAnim(s_wmCharaAnimGlad, baseAnim + 3, 3, 0, modelNo, -1, 0);
+			reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x7F4 + handleIdx)[0]->LoadAnim(s_wmCharaAnimSleep, baseAnim + 4, 1, 0, modelNo, -1, 0);
+			reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x7F4 + handleIdx)[0]->LoadAnim(s_wmCharaAnimAngry, baseAnim + 5, 1, 0, modelNo, -1, 0);
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_wmCharaAnimState) + animOff + 0) = 0;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_wmCharaAnimState) + animOff + 4) = -1;
+			int r = rand();
+			int q = r / 0xFA + (r >> 0x1F);
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_wmCharaAnimState) + animOff + 8) =
+			    r + (q - (q >> 0x1F)) * -0xFA;
+			reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x7F4 + handleIdx)[0]->SetAnim(baseAnim, -1, -1, 0, 0);
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_wmCharaAnimState) + animOff + 0xC) =
+			    reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x7F4 + handleIdx)[0]->m_model) + 0xB4)[0];
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_wmCharaAnimState) + animOff + 0x10) =
+			    reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x7F4 + handleIdx)[0]->m_model) + 0xC0)[0];
+			unsigned char* const handleBytes = reinterpret_cast<unsigned char*>(reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x7F4 + handleIdx)[0]);
 			int animEntry = reinterpret_cast<int*>(handleBytes + (baseAnim + 6) * 4 + 0xC)[0];
 			int animData = reinterpret_cast<int*>(animEntry + 0x28)[0];
 			float endFrame =

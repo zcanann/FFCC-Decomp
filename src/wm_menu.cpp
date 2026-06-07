@@ -4888,9 +4888,9 @@ void CMenuPcs::DrawLoadMenu()
 	float alpha = FLOAT_803313e8;
 	if (state > 0 && state < 4) {
 		if (state == 1) {
-			alpha = (float)m_wmWorldState->m_frameCounter;
+			alpha = static_cast<float>(DOUBLE_803314e8 * static_cast<double>(static_cast<int>(m_wmWorldState->m_frameCounter)));
 		} else if (state == 3) {
-			alpha = FLOAT_803313e8 - (float)m_wmWorldState->m_frameCounter;
+			alpha = static_cast<float>(-(DOUBLE_803314e8 * static_cast<double>(static_cast<int>(m_wmWorldState->m_frameCounter)) - DOUBLE_80331420));
 		}
 		if (alpha > FLOAT_803314f0) {
 			MenuPcs.SetAttrFmt((FMT)0);
@@ -4898,20 +4898,23 @@ void CMenuPcs::DrawLoadMenu()
 			bgColor.r = 0xFF;
 			bgColor.g = 0xFF;
 			bgColor.b = 0xFF;
-			bgColor.a = static_cast<unsigned char>((unsigned int)(FLOAT_80331458 * alpha) & 0xFF);
+			bgColor.a = static_cast<unsigned char>(static_cast<int>(static_cast<double>(FLOAT_80331458) * static_cast<double>(alpha)));
 			GXSetChanMatColor(GX_COLOR0A0, bgColor);
 			MenuPcs.SetTexture((TEX)0x1F);
-			MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_803313dc, (float)(FLOAT_803314d8 - FLOAT_80331440),
+			MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_803313dc, (float)(DOUBLE_803314d0 - (double)FLOAT_80331440),
 			         FLOAT_803313e0, FLOAT_80331440,
 			         FLOAT_803313dc, FLOAT_803313dc,
 			         FLOAT_803313e8, FLOAT_803313e8, 0);
 		}
 	}
 	if (alpha < FLOAT_803313dc) alpha = FLOAT_803313dc;
-	if (alpha > FLOAT_803313e8) alpha = FLOAT_803313e8;
 
-	unsigned int uAlpha = (unsigned int)(FLOAT_80331458 * alpha);
-	if (uAlpha > 0xFF) uAlpha = 0xFF;
+	unsigned int uAlpha;
+	if (alpha <= FLOAT_803313e8) {
+		uAlpha = (unsigned int)(static_cast<double>(FLOAT_80331458) * static_cast<double>(alpha));
+	} else {
+		uAlpha = 0xFF;
+	}
 
 	// Header text
 	if (*reinterpret_cast<char*>(DAT_8032ef08 + 0x18) == 0x0E) {

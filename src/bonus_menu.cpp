@@ -20,9 +20,9 @@
 
 extern char s_menuSubfontPathFmt[];
 extern const double kPppCrystal2RefractionScale;
-extern const float FLOAT_80331EAC;
-extern const float FLOAT_80331FB8;
-extern const float FLOAT_80331FBC;
+extern const float kBonusZClearOrigin;
+extern const float kBonusZClearWidth;
+extern const float kBonusZClearHeight;
 extern const float s_BonusModelYPos[];
 extern const float s_BonusModelScale[];
 
@@ -2948,7 +2948,7 @@ void CMenuPcs::CalcResultOpenAnim()
  */
 void CMenuPcs::drawBonus()
 {
-	gUtil.ClearZBufferRect(FLOAT_80331EAC, FLOAT_80331EAC, FLOAT_80331FB8, FLOAT_80331FBC);
+	gUtil.ClearZBufferRect(kBonusZClearOrigin, kBonusZClearOrigin, kBonusZClearWidth, kBonusZClearHeight);
 
 	if ((unsigned int)System.m_execParam >= 1) {
 		System.Printf(const_cast<char*>(sDrawBonusFmt), (int)*(short*)(this->m_bonusStatePtr + 0x1c));

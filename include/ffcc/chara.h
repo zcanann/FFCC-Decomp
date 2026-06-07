@@ -181,6 +181,23 @@ public:
 		public:
 			CRefData();
 			~CRefData();
+
+			u32 m_nodeCount;            // 0x08
+			u32 m_meshCount;           // 0x0C
+			void* m_nodeRefData;       // 0x10
+			void* m_meshRefData;       // 0x14
+			void* m_bank;              // 0x18
+			u16 m_headNodeIndex;       // 0x1C
+			u16 m_chest3NodeIndex;     // 0x1E
+			u16 m_chest2NodeIndex;     // 0x20
+			u16 m_chest1NodeIndex;     // 0x22
+			CMaterialSet* m_materialSet; // 0x24
+			float m_baseScale;         // 0x28
+			u8 _pad2C[0x8];            // 0x2C
+			u32 m_posQuant;            // 0x34
+			u32 m_normQuant;           // 0x38
+			u32 m_dynCount;            // 0x3C
+			void* m_dynParams;         // 0x40
 		};
 
 		void Init();

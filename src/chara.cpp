@@ -734,16 +734,21 @@ void CChara::gqrInit(unsigned long, unsigned long, unsigned long)
  */
 CChara::CModel::CRefData::CRefData()
 {
-	CCharaModelRefRaw* ref = reinterpret_cast<CCharaModelRefRaw*>(this);
-
-	memset(ref, 0, sizeof(CCharaModelRefRaw));
-	ref->m_headNodeIndex = 0xFFFF;
-	ref->m_chest3NodeIndex = 0xFFFF;
-	ref->m_chest2NodeIndex = 0xFFFF;
-	ref->m_chest1NodeIndex = 0xFFFF;
-	ref->m_baseScale = 1.0f;
-	ref->m_posQuant = 7;
-	ref->m_normQuant = 0xC;
+	m_nodeCount = 0;
+	m_meshCount = 0;
+	m_nodeRefData = 0;
+	m_meshRefData = 0;
+	m_bank = 0;
+	m_chest1NodeIndex = 0xFFFF;
+	m_chest2NodeIndex = 0xFFFF;
+	m_chest3NodeIndex = 0xFFFF;
+	m_headNodeIndex = 0xFFFF;
+	m_materialSet = 0;
+	m_baseScale = 1.0f;
+	m_posQuant = 7;
+	m_normQuant = 0xC;
+	m_dynParams = 0;
+	m_dynCount = 0;
 }
 
 /*
@@ -949,15 +954,8 @@ void CChara::CModel::Init()
  */
 void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 {
-	CCharaModelRefRaw* ref = reinterpret_cast<CCharaModelRefRaw*>(new u8[sizeof(CCharaModelRefRaw)]);
-	memset(ref, 0, sizeof(CCharaModelRefRaw));
-	ref->m_headNodeIndex = 0xFFFF;
-	ref->m_chest3NodeIndex = 0xFFFF;
-	ref->m_chest2NodeIndex = 0xFFFF;
-	ref->m_chest1NodeIndex = 0xFFFF;
-	ref->m_baseScale = 1.0f;
-	ref->m_posQuant = 7;
-	ref->m_normQuant = 0xC;
+	CCharaModelRefRaw* ref = reinterpret_cast<CCharaModelRefRaw*>(
+	    new (stage, const_cast<char*>(s_chara_cpp), 0x111) CChara::CModel::CRefData());
 	m_data = ref;
 	m_nodes = 0;
 	m_meshes = 0;

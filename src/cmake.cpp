@@ -3550,7 +3550,7 @@ void CMenuPcs::DrawCmakeTitle(int page, float x, float alpha)
         0, 278.0f, offs, 248.0f, 40.0f,
         0.0f, 264.0f, 1.0f, alpha, 0.0f);
 
-    if (x >= static_cast<float>(1.0)) {
+    if (x >= 1.0) {
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x65 : 0x3E));
 
         float titleX = static_cast<float>(offsU + static_cast<int>(20.0));

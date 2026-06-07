@@ -1358,22 +1358,22 @@ void CMenuPcs::DrawOptionMenu()
 		                        &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 		color.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80333550 * m_optionColumnAnim));
-		if (m_leftHintTimer == 0) {
-			gUtil.CalcUV(uv0.x, uv0.y, 0, 0x58, meterWidth, meterHeight);
-			gUtil.CalcUV(uv1.x, uv1.y, 0x10, 0x70, meterWidth, meterHeight);
-		} else {
+		if (m_leftHintTimer != 0) {
 			gUtil.CalcUV(uv0.x, uv0.y, 0x18, 0x58, meterWidth, meterHeight);
 			gUtil.CalcUV(uv1.x, uv1.y, 0x28, 0x70, meterWidth, meterHeight);
+		} else {
+			gUtil.CalcUV(uv0.x, uv0.y, 0, 0x58, meterWidth, meterHeight);
+			gUtil.CalcUV(uv1.x, uv1.y, 0x10, 0x70, meterWidth, meterHeight);
 		}
 		gUtil.RenderTextureQuad(FLOAT_80333564, FLOAT_80333608, FLOAT_80333624, FLOAT_8033361C, meterTexture, &uv0,
 		                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
-		if (m_rightHintTimer == 0) {
-			gUtil.CalcUV(uv0.x, uv0.y, 0x48, 0x5C, meterWidth, meterHeight);
-			gUtil.CalcUV(uv1.x, uv1.y, 0x30, 0x7C, meterWidth, meterHeight);
-		} else {
+		if (m_rightHintTimer != 0) {
 			gUtil.CalcUV(uv0.x, uv0.y, 0x60, 0x5C, meterWidth, meterHeight);
 			gUtil.CalcUV(uv1.x, uv1.y, 0x48, 0x7C, meterWidth, meterHeight);
+		} else {
+			gUtil.CalcUV(uv0.x, uv0.y, 0x48, 0x5C, meterWidth, meterHeight);
+			gUtil.CalcUV(uv1.x, uv1.y, 0x30, 0x7C, meterWidth, meterHeight);
 		}
 		gUtil.RenderTextureQuad(FLOAT_8033360C, FLOAT_80333608, FLOAT_8033361C, FLOAT_80333570, meterTexture, &uv0,
 		                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
@@ -1423,22 +1423,22 @@ void CMenuPcs::DrawOptionMenu()
 		                        &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 		color.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80333550 * m_optionColumnAnim));
-		if (m_leftHintTimer == 0) {
-			gUtil.CalcUV(uv0.x, uv0.y, 0, 0x40, meterWidth, meterHeight);
-			gUtil.CalcUV(uv1.x, uv1.y, 0x10, 0x58, meterWidth, meterHeight);
-		} else {
+		if (m_leftHintTimer != 0) {
 			gUtil.CalcUV(uv0.x, uv0.y, 0x18, 0x40, meterWidth, meterHeight);
 			gUtil.CalcUV(uv1.x, uv1.y, 0x28, 0x58, meterWidth, meterHeight);
+		} else {
+			gUtil.CalcUV(uv0.x, uv0.y, 0, 0x40, meterWidth, meterHeight);
+			gUtil.CalcUV(uv1.x, uv1.y, 0x10, 0x58, meterWidth, meterHeight);
 		}
 		gUtil.RenderTextureQuad(FLOAT_80333564, FLOAT_80333608, FLOAT_80333624, FLOAT_8033361C, meterTexture, &uv0,
 		                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
-		if (m_rightHintTimer == 0) {
-			gUtil.CalcUV(uv0.x, uv0.y, 0x48, 0x3C, meterWidth, meterHeight);
-			gUtil.CalcUV(uv1.x, uv1.y, 0x30, 0x5C, meterWidth, meterHeight);
-		} else {
+		if (m_rightHintTimer != 0) {
 			gUtil.CalcUV(uv0.x, uv0.y, 0x60, 0x3C, meterWidth, meterHeight);
 			gUtil.CalcUV(uv1.x, uv1.y, 0x48, 0x5C, meterWidth, meterHeight);
+		} else {
+			gUtil.CalcUV(uv0.x, uv0.y, 0x48, 0x3C, meterWidth, meterHeight);
+			gUtil.CalcUV(uv1.x, uv1.y, 0x30, 0x5C, meterWidth, meterHeight);
 		}
 		gUtil.RenderTextureQuad(FLOAT_8033360C, FLOAT_80333608, FLOAT_8033361C, FLOAT_80333570, meterTexture, &uv0,
 		                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);

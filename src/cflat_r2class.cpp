@@ -796,37 +796,37 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -9:
-			engineObject->m_moveBaseSpeed = static_cast<float>(object->m_localBase[0]);
+			engineObject->m_moveBaseSpeed = reinterpret_cast<float*>(object->m_localBase)[0];
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
 		case -0xA:
-			engineObject->m_rotTargetY = static_cast<float>(object->m_localBase[0]);
+			engineObject->m_rotTargetY = reinterpret_cast<float*>(object->m_localBase)[0];
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
 		case -0xD: {
-			unsigned int mode = object->m_localBase[0];
+			int mode = static_cast<int>(object->m_localBase[0]);
 			float* params = reinterpret_cast<float*>(object->m_localBase);
 			float radius = params[1];
 			float offset = params[4];
-			if (mode != 2) {
-				if (static_cast<int>(mode) < 2) {
-					if (static_cast<int>(mode) >= 0) {
-						if (mode == 0) {
-							engineObject->m_capsuleHalfHeight = radius;
-						} else {
-							engineObject->m_bodyEllipsoidRadius = radius;
-							engineObject->m_bodyEllipsoidOffset = offset;
-						}
-					}
-				} else if (mode == 4) {
-					engineObject->m_nearColRadius = radius;
-				} else if (static_cast<int>(mode) < 4) {
-					engineObject->m_attackColRadius = radius;
-				}
-			} else {
+			switch (mode) {
+			case 2:
 				engineObject->m_bodyColRadius = radius;
+				break;
+			case 0:
+				engineObject->m_capsuleHalfHeight = radius;
+				break;
+			case 1:
+				engineObject->m_bodyEllipsoidRadius = radius;
+				engineObject->m_bodyEllipsoidOffset = offset;
+				break;
+			case 4:
+				engineObject->m_nearColRadius = radius;
+				break;
+			case 3:
+				engineObject->m_attackColRadius = radius;
+				break;
 			}
 			PushValue(this, object, 0);
 			outResult = 0;

@@ -8915,7 +8915,6 @@ void CMenuPcs::DrawCursor(int x, int y, float scale)
 void CMenuPcs::CalcMainMenuSub()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmWorldState* const world = m_wmWorldState;
 
 	bool noInput = false;
 	if (Pad.m_debugPadLock != 0 || Pad.m_debugPadPort != -1) {
@@ -8929,21 +8928,21 @@ void CMenuPcs::CalcMainMenuSub()
 		btn = Pad.GetPadInputs()[0].buttonDown[0];
 	}
 
-	const short state = world->m_mainState;
+	const short state = m_wmWorldState->m_mainState;
 
-	if (((state > 0) && (state < 4)) || world->m_cardChannel == 1) {
-		if (state == 2 && world->m_delay == 0) {
+	if (((state > 0) && (state < 4)) || m_wmWorldState->m_cardChannel == 1) {
+		if (state == 2 && m_wmWorldState->m_delay == 0) {
 			if ((btn & 1) != 0) {
 				*reinterpret_cast<float*>(bytes + 0x78) -= FLOAT_8033151c;
 				if (*reinterpret_cast<float*>(bytes + 0x78) < FLOAT_803313dc) {
 					*reinterpret_cast<float*>(bytes + 0x78) += FLOAT_80331528;
 					*reinterpret_cast<float*>(bytes + 0x7C) += FLOAT_80331528;
 				}
-				world->m_frameCounter = 0xE;
-				if (world->m_cardChannel < 4) {
-					world->m_cardChannel++;
+				m_wmWorldState->m_frameCounter = 0xE;
+				if (m_wmWorldState->m_cardChannel < 4) {
+					m_wmWorldState->m_cardChannel++;
 				} else {
-					world->m_cardChannel = 0;
+					m_wmWorldState->m_cardChannel = 0;
 				}
 				Sound.PlaySe(0x37, 0x40, 0x7F, 0);
 			} else if ((btn & 2) != 0) {
@@ -8952,11 +8951,11 @@ void CMenuPcs::CalcMainMenuSub()
 					*reinterpret_cast<float*>(bytes + 0x78) -= FLOAT_80331528;
 					*reinterpret_cast<float*>(bytes + 0x7C) -= FLOAT_80331528;
 				}
-				world->m_frameCounter = 0xE;
-				if (world->m_cardChannel < 1) {
-					world->m_cardChannel = 4;
+				m_wmWorldState->m_frameCounter = 0xE;
+				if (m_wmWorldState->m_cardChannel < 1) {
+					m_wmWorldState->m_cardChannel = 4;
 				} else {
-					world->m_cardChannel--;
+					m_wmWorldState->m_cardChannel--;
 				}
 				Sound.PlaySe(0x37, 0x40, 0x7F, 0);
 			}
@@ -8972,15 +8971,15 @@ void CMenuPcs::CalcMainMenuSub()
 				*reinterpret_cast<float*>(bytes + 0x7C) += delta;
 			}
 
-			if (world->m_frameCounter > 0) {
-				world->m_frameCounter--;
+			if (m_wmWorldState->m_frameCounter > 0) {
+				m_wmWorldState->m_frameCounter--;
 			}
 
-			if (world->m_frameCounter == 0 && (btn & 3) == 0) {
+			if (m_wmWorldState->m_frameCounter == 0 && (btn & 3) == 0) {
 				if ((btn & 0x100) != 0) {
 					*reinterpret_cast<float*>(bytes + 0x7C) = *reinterpret_cast<float*>(bytes + 0x78);
-					world->m_delay = 0x14;
-					world->m_nextMenuMode = 1;
+					m_wmWorldState->m_delay = 0x14;
+					m_wmWorldState->m_nextMenuMode = 1;
 					Sound.PlaySe(2, 0x40, 0x7F, 0);
 				} else if ((btn & 0x200) != 0) {
 					int valid = 0;
@@ -8989,15 +8988,15 @@ void CMenuPcs::CalcMainMenuSub()
 						if (Game.m_gameWork.m_menuStageMode != 0 && i != 0) {
 							break;
 						}
-						if (world->m_backupParams[i] >= 0) {
+						if (m_wmWorldState->m_backupParams[i] >= 0) {
 							valid++;
 						}
 					}
 					if (valid == 0) {
 						Sound.PlaySe(4, 0x40, 0x7F, 0);
 					} else {
-						world->m_delay = 1;
-						world->m_nextMenuMode = -1;
+						m_wmWorldState->m_delay = 1;
+						m_wmWorldState->m_nextMenuMode = -1;
 						Sound.PlaySe(3, 0x40, 0x7F, 0);
 					}
 				}
@@ -9017,7 +9016,7 @@ void CMenuPcs::CalcMainMenuSub()
 		PSMTXRotRad(rotMtx, 'y', FLOAT_803314bc * -*reinterpret_cast<float*>(bytes + 0x7C));
 		PSMTXConcat(baseMtx, rotMtx, baseMtx);
 
-		float t = static_cast<float>(world->m_titleState) / FLOAT_803314c0;
+		float t = static_cast<float>(m_wmWorldState->m_titleState) / FLOAT_803314c0;
 		float selectedRotY;
 		float selectedRotZ;
 		float selectedYOffset;
@@ -9026,22 +9025,22 @@ void CMenuPcs::CalcMainMenuSub()
 		WM_MENU_EVAL_SPLINE(selectedYOffset, DAT_8032E8E4, DAT_8032E8E0, t);
 
 		float openScale = FLOAT_803313dc;
-		if (world->m_nextMenuMode != -1) {
-			t = static_cast<float>(0x14 - world->m_delay) / FLOAT_803314c0;
+		if (m_wmWorldState->m_nextMenuMode != -1) {
+			t = static_cast<float>(0x14 - m_wmWorldState->m_delay) / FLOAT_803314c0;
 			WM_MENU_EVAL_SPLINE(openScale, DAT_8032E8EC, DAT_8032E8E8, t);
 		}
 
-		if (state == 2 && world->m_delay == 0) {
-			world->m_titleState++;
-			if (world->m_titleState > 99) {
-				world->m_titleState = 0;
+		if (state == 2 && m_wmWorldState->m_delay == 0) {
+			m_wmWorldState->m_titleState++;
+			if (m_wmWorldState->m_titleState > 99) {
+				m_wmWorldState->m_titleState = 0;
 			}
 		} else {
-			world->m_titleState = 0;
+			m_wmWorldState->m_titleState = 0;
 		}
 
 		for (int i = 0; i < 5; i++) {
-			const short curState = world->m_mainState;
+			const short curState = m_wmWorldState->m_mainState;
 			if (!(((curState > 0) && (curState < 4)) || i == 1)) {
 				continue;
 			}
@@ -9077,12 +9076,12 @@ void CMenuPcs::CalcMainMenuSub()
 				PSMTXRotRad(scaleMtx, 'x', FLOAT_803315d0);
 				PSMTXConcat(rotMtx, scaleMtx, modelMtx);
 			} else if (i == 1) {
-				if (world->m_nextMenuMode == -1 || world->m_cardChannel != 1 ||
-				    world->m_mainState == 2) {
+				if (m_wmWorldState->m_nextMenuMode == -1 || m_wmWorldState->m_cardChannel != 1 ||
+				    m_wmWorldState->m_mainState == 2) {
 					PSMTXRotRad(modelMtx, 'x', FLOAT_80331610);
 				} else {
-					unsigned int frame = 0x13 - (world->m_frameCounter +
-					                              world->m_mainState * 10);
+					unsigned int frame = 0x13 - (m_wmWorldState->m_frameCounter +
+					                              m_wmWorldState->m_mainState * 10);
 					if (static_cast<int>(frame) < 0) {
 						frame = 0;
 					}
@@ -9096,7 +9095,7 @@ void CMenuPcs::CalcMainMenuSub()
 				PSMTXRotRad(modelMtx, 'x', FLOAT_80331614);
 			}
 
-			if (world->m_cardChannel == i) {
+			if (m_wmWorldState->m_cardChannel == i) {
 				PSMTXRotRad(rotMtx, 'z', FLOAT_803314bc * selectedRotZ);
 				PSMTXRotRad(scaleMtx, 'y', FLOAT_803314bc * selectedRotY);
 				PSMTXConcat(rotMtx, scaleMtx, rotMtx);
@@ -9114,13 +9113,13 @@ void CMenuPcs::CalcMainMenuSub()
 			} else if (i == 1) {
 				PSMTXTransApply(modelMtx, modelMtx, FLOAT_80331620, FLOAT_803313dc, FLOAT_803313dc);
 			}
-			if (world->m_cardChannel == i) {
+			if (m_wmWorldState->m_cardChannel == i) {
 				modelMtx[1][3] = static_cast<float>(static_cast<double>(modelMtx[1][3]) +
 				                                    static_cast<double>(selectedYOffset));
 			}
 
-			if (world->m_nextMenuMode != -1 && world->m_cardChannel == i &&
-			    world->m_delay != 0) {
+			if (m_wmWorldState->m_nextMenuMode != -1 && m_wmWorldState->m_cardChannel == i &&
+			    m_wmWorldState->m_delay != 0) {
 				PSMTXScale(scaleMtx, openScale, openScale, openScale);
 				PSMTXConcat(scaleMtx, modelMtx, modelMtx);
 			}
@@ -9129,17 +9128,17 @@ void CMenuPcs::CalcMainMenuSub()
 			if (handle != 0 && handle->m_model != 0) {
 				if (curState == 1) {
 					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) =
-					    static_cast<float>(DOUBLE_803314e8 * static_cast<double>(world->m_frameCounter));
+					    static_cast<float>(DOUBLE_803314e8 * static_cast<double>(m_wmWorldState->m_frameCounter));
 				} else if (curState == 2) {
 					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = FLOAT_803313e8;
 				} else if (curState == 3) {
 					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) =
-					    static_cast<float>(-(DOUBLE_803314e8 * static_cast<double>(world->m_frameCounter) -
+					    static_cast<float>(-(DOUBLE_803314e8 * static_cast<double>(m_wmWorldState->m_frameCounter) -
 					                         DOUBLE_80331420));
 				} else {
 					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = FLOAT_803313dc;
 				}
-				if (world->m_nextMenuMode != -1 && world->m_cardChannel == 1 &&
+				if (m_wmWorldState->m_nextMenuMode != -1 && m_wmWorldState->m_cardChannel == 1 &&
 				    i == 1) {
 					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = FLOAT_803313e8;
 				}

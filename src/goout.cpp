@@ -799,7 +799,8 @@ void CGoOutMenu::CalcMemCardProc()
  */
 int CGoOutMenu::SetMemCardError()
 {
-    if (m_memCardResult == -5) {
+    switch (m_memCardResult) {
+    case -5:
         MenuPcs.m_menuWindowInfo->state = 3;
         MenuGoOutState().m_animFrame = 0;
         m_currentMessage = -1;
@@ -813,13 +814,14 @@ int CGoOutMenu::SetMemCardError()
         m_pendingMessage = 3;
         m_messageCloseMode = 0;
         m_pendingMessageTimer = 0;
-    } else if (m_memCardResult < -5) {
-        if (m_memCardResult == -13 || m_memCardResult == -6) {
-            SetGoOutMode(3);
-            return 1;
-        }
-
-        if ((m_memCardResult == -999 || m_memCardResult == -1000) && m_lastMemCardProc == 1) {
+        break;
+    case -13:
+    case -6:
+        SetGoOutMode(3);
+        return 1;
+    case -999:
+    case -1000:
+        if (m_lastMemCardProc == 1) {
             MenuPcs.m_menuWindowInfo->state = 3;
             MenuGoOutState().m_animFrame = 0;
             m_currentMessage = -1;
@@ -861,7 +863,9 @@ int CGoOutMenu::SetMemCardError()
             m_messageCloseMode = 0;
             m_pendingMessageTimer = 0;
         }
-    } else if (m_memCardResult == -1 || m_memCardResult == -3) {
+        break;
+    case -1:
+    case -3:
         MenuPcs.m_menuWindowInfo->state = 3;
         MenuGoOutState().m_animFrame = 0;
         m_currentMessage = -1;
@@ -875,7 +879,8 @@ int CGoOutMenu::SetMemCardError()
         m_pendingMessage = 1;
         m_messageCloseMode = 0;
         m_pendingMessageTimer = 0;
-    } else if (m_memCardResult == -2) {
+        break;
+    case -2:
         MenuPcs.m_menuWindowInfo->state = 3;
         MenuGoOutState().m_animFrame = 0;
         m_currentMessage = -1;
@@ -889,7 +894,8 @@ int CGoOutMenu::SetMemCardError()
         m_pendingMessage = 2;
         m_messageCloseMode = 0;
         m_pendingMessageTimer = 0;
-    } else if (m_memCardResult == -4) {
+        break;
+    case -4:
         if (m_lastMemCardProc != 1) {
             MenuPcs.m_menuWindowInfo->state = 3;
             MenuGoOutState().m_animFrame = 0;
@@ -918,7 +924,8 @@ int CGoOutMenu::SetMemCardError()
                        GetGoOutMessageLine(languageId, 3),
                        GetGoOutMessageLine(languageId, 4));
         }
-    } else if (m_memCardResult == 1) {
+        break;
+    case 1:
         return 0;
     }
 

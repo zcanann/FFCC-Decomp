@@ -2180,8 +2180,8 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 	PartyObjOverlay& party = PartyData(this);
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	if (doInit != 0) {
-		party.partyFlags = (party.partyFlags & 0xBF) | ((targetSide != 0) ? 0x40 : 0x00);
-		party.partyFlags &= 0xEF;
+		party.flags.flag40 = (targetSide != 0);
+		party.flags.flag10 = 0;
 
 		Vec rayDir = {
 		    sinf(m_rotationY) * FLOAT_80331A98,

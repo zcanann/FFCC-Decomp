@@ -3309,10 +3309,7 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
  */
 int CMenuPcs::CalcGoOutSelChar(unsigned char state, unsigned char slot)
 {
-	WmWorldState* const worldState = m_wmWorldState;
-	unsigned char* const frameState = m_wm.m_frameInfo;
-
-	if (worldState->m_mainState >= 5) {
+	if (m_wmWorldState->m_mainState > 4) {
 		return -1;
 	}
 
@@ -3320,21 +3317,22 @@ int CMenuPcs::CalcGoOutSelChar(unsigned char state, unsigned char slot)
 		CalcGoOutCharaSelect(slot);
 	}
 
-	const short menuAnim = worldState->m_mainState;
+	const short menuAnim = m_wmWorldState->m_mainState;
 	int offset = 0;
 	if (menuAnim == 0) {
-		offset = static_cast<int>(worldState->m_frameCounter) - 10;
-	} else if (menuAnim < 1 || menuAnim > 3) {
-		offset = -static_cast<int>(worldState->m_frameCounter);
+		offset = static_cast<int>(m_wmWorldState->m_frameCounter) - 10;
+	} else if (menuAnim <= 0 || menuAnim >= 4) {
+		offset = -static_cast<int>(m_wmWorldState->m_frameCounter);
 	}
 
-	*reinterpret_cast<short*>(frameState + 4) = 0x10;
-	*reinterpret_cast<short*>(frameState + 0x20) =
-	    static_cast<short>(static_cast<int>(FLOAT_803313e0 - static_cast<float>(*reinterpret_cast<short*>(frameState + 8) + *reinterpret_cast<short*>(frameState + 4))));
+	*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) = 0x10;
+	*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20) =
+	    static_cast<short>(static_cast<int>(FLOAT_803313e0 - static_cast<float>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 8) + *reinterpret_cast<short*>(m_wm.m_frameInfo + 4))));
 
 	if (offset < 0) {
+		unsigned char* const frameState = m_wm.m_frameInfo;
 		float shift = static_cast<float>(*reinterpret_cast<short*>(frameState + 8) + *reinterpret_cast<short*>(frameState + 4));
-		if (offset > -11) {
+		if (offset >= -10) {
 			int absOffset = offset < 0 ? -offset : offset;
 			shift = shift * static_cast<float>(DOUBLE_803314e8 * static_cast<double>(absOffset));
 			if (absOffset > 10) {
@@ -3350,7 +3348,7 @@ int CMenuPcs::CalcGoOutSelChar(unsigned char state, unsigned char slot)
 		    static_cast<short>(static_cast<float>(*reinterpret_cast<short*>(frameState + 0x20)) + shift);
 	}
 
-	if (menuAnim > 0 && menuAnim < 4) {
+	if (m_wmWorldState->m_mainState > 0 && m_wmWorldState->m_mainState < 4) {
 		CalcChara();
 	}
 

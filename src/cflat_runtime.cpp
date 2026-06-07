@@ -1918,21 +1918,28 @@ frameLoop:
 			unsigned int* sp = object->m_sp - 1;
 			object->m_sp = sp;
 			const u32 systemValue = sp[-1];
-			int setMode;
-			if ((code[0] == 0x14) || (code[0] == 0x17)) {
-				setMode = 1;
-			} else if ((code[0] == 0x15) || (code[0] == 0x18)) {
-				setMode = -1;
-			} else {
-				setMode = 0;
-			}
 
-			if (((systemValue >> 12) & 1) == 0) {
-				onSetSystemVal(static_cast<int>(systemValue) >> 13, reinterpret_cast<CStack*>(sp), setMode);
+			if ((code[0] == 0x14) || (code[0] == 0x17)) {
+				if (((systemValue >> 12) & 1) == 0) {
+					onSetSystemVal(static_cast<int>(systemValue) >> 13, reinterpret_cast<CStack*>(sp), 1);
+				} else {
+					CObject* target = reinterpret_cast<CObject*>(intToClass(systemValue & 0xFFF));
+					onSetClassSystemVal(static_cast<int>(systemValue) >> 13, target, reinterpret_cast<CStack*>(sp), 1);
+				}
+			} else if ((code[0] == 0x15) || (code[0] == 0x18)) {
+				if (((systemValue >> 12) & 1) == 0) {
+					onSetSystemVal(static_cast<int>(systemValue) >> 13, reinterpret_cast<CStack*>(sp), -1);
+				} else {
+					CObject* target = reinterpret_cast<CObject*>(intToClass(systemValue & 0xFFF));
+					onSetClassSystemVal(static_cast<int>(systemValue) >> 13, target, reinterpret_cast<CStack*>(sp), -1);
+				}
 			} else {
-				CObject* target = reinterpret_cast<CObject*>(intToClass(systemValue & 0xFFF));
-				onSetClassSystemVal(
-				    static_cast<int>(systemValue) >> 13, target, reinterpret_cast<CStack*>(sp), setMode);
+				if (((systemValue >> 12) & 1) == 0) {
+					onSetSystemVal(static_cast<int>(systemValue) >> 13, reinterpret_cast<CStack*>(sp), 0);
+				} else {
+					CObject* target = reinterpret_cast<CObject*>(intToClass(systemValue & 0xFFF));
+					onSetClassSystemVal(static_cast<int>(systemValue) >> 13, target, reinterpret_cast<CStack*>(sp), 0);
+				}
 			}
 			break;
 		}

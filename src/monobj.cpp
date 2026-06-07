@@ -405,7 +405,7 @@ void CGMonObj::onStatAttack(int state)
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	unsigned char* attackBase = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]);
-	unsigned char* attackData = attackBase + *reinterpret_cast<int*>(mon + 0x560) * 0x48;
+#define attackData (attackBase + *reinterpret_cast<int*>(mon + 0x560) * 0x48)
 	short attackType = *reinterpret_cast<short*>(attackData + 0xE);
 	unsigned short attackFlags = *reinterpret_cast<unsigned short*>(attackData + 0x32);
 
@@ -465,6 +465,7 @@ void CGMonObj::onStatAttack(int state)
 	if ((prgObj->m_stateArg == 0) && (prgObj->isLoopAnim() != 0)) {
 		CGMonObj_SetAttackAfter(this, *reinterpret_cast<int*>(mon + 0x560));
 	}
+#undef attackData
 }
 
 /*

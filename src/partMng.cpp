@@ -3873,19 +3873,15 @@ void CPartMng::pppLoadPan(const char* baseName)
  */
 int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriority, void* readBuffer, int readBufferSize)
 {
-    CMemory::CStage* stageLoad = PartPcs.m_usbStreamState.m_stageLoad;
-    PppPdtSlot* pdtSlots = m_pdtSlots;
-    PppPdtSlot* pdtSlot = &pdtSlots[pdtSlotIndex];
-
     ppvAmemCacheSet.CacheClear();
-    stageLoad->setDefaultParam(pdtSlotIndex);
+    PartPcs.m_usbStreamState.m_stageLoad->setDefaultParam(pdtSlotIndex);
 
-    char pdtPath[256];
+    char* pdtPath = g_StrTmp;
     sprintf(pdtPath, lbl_8032FE20, baseName);
+    PppPdtSlot* pdtSlot = &m_pdtSlots[pdtSlotIndex];
     strncpy(pdtSlot->m_name, baseName, sizeof(pdtSlot->m_name));
-    pdtSlot->m_name[sizeof(pdtSlot->m_name) - 1] = '\0';
 
-    if (System.m_execParam > 2) {
+    if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
         System.Printf(const_cast<char*>(s_ReadPdtLogFormat), pdtPath);
     }
 
@@ -3893,15 +3889,17 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
     void* pdtData = pppFileRead(pdtPath, pdtSize, readBuffer, readBufferSize);
     if (pdtData == 0) {
         pdtSlot->m_pppDataHead = 0;
-        if (System.m_execParam != 0) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1U) {
             System.Printf(const_cast<char*>(s_CanNotReadFormat), pdtPath);
         }
-        stageLoad->resDefaultParam();
+        PartPcs.m_usbStreamState.m_stageLoad->resDefaultParam();
         return 0;
     }
 
-    if (m_partLoadMode == 2 || m_partLoadMode == 3) {
-        stageLoad->resDefaultParam();
+    if (m_partLoadMode == 2) {
+        return 1;
+    }
+    if (m_partLoadMode == 3) {
         return 1;
     }
 
@@ -3922,7 +3920,7 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
                     unsigned long copySize = sourceHead->m_partCount * 0x60 + 0x20;
                     _pppDataHead* copiedHead = static_cast<_pppDataHead*>(
                         operator new[](
-                            copySize, stageLoad, const_cast<char*>(s_partMng_cpp), 0xd56));
+                            copySize, PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0xd56));
                     pdtSlot->m_pppDataHead = copiedHead;
 
                     memcpy(copiedHead, sourceHead, copySize);
@@ -4038,7 +4036,7 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
         pdtFile.PopChunk();
     }
 
-    stageLoad->resDefaultParam();
+    PartPcs.m_usbStreamState.m_stageLoad->resDefaultParam();
     return 1;
 }
 

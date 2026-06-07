@@ -2541,7 +2541,7 @@ void CShopMenu::SelectItemIdx()
                         if (itemId < 1) {
                             unitGil = 0;
                         } else {
-                            int gil = caravanWork->m_shopParam *
+                            unsigned int gil = caravanWork->m_shopParam *
                                       *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x20);
                             gil = gil / 100 + (gil >> 0x1F);
                             unitGil = gil - (gil >> 0x1F);
@@ -2550,7 +2550,7 @@ void CShopMenu::SelectItemIdx()
                         if (itemId < 1) {
                             unitGil = 0;
                         } else {
-                            int gil = caravanWork->m_shopParam *
+                            unsigned int gil = caravanWork->m_shopParam *
                                       *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x20);
                             gil = gil / 100 + (gil >> 0x1F);
                             unitGil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil - (gil >> 0x1F)));

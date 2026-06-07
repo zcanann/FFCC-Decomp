@@ -9496,15 +9496,16 @@ void CMenuPcs::WMChgMenu()
 	*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0x18) = fVar5;
 	*reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0x1C) = 0;
 
-	*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0x20) = *reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 4);
-	*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0x22) = *reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 6);
-	*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0x24) = *reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 8);
-	*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0x26) = *reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 10);
-	*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0x28) = *reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0xC);
-	*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0x2C) = *reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0x10);
-	*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0x30) = *reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0x14);
-	*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0x34) = *reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0x18);
-	*reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0x38) = *reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0x1C);
+	int frameInfo = reinterpret_cast<int>(m_wm.m_frameInfo);
+	*reinterpret_cast<short*>(frameInfo + 0x20) = *reinterpret_cast<short*>(frameInfo + 4);
+	*reinterpret_cast<short*>(frameInfo + 0x22) = *reinterpret_cast<short*>(frameInfo + 6);
+	*reinterpret_cast<short*>(frameInfo + 0x24) = *reinterpret_cast<short*>(frameInfo + 8);
+	*reinterpret_cast<short*>(frameInfo + 0x26) = *reinterpret_cast<short*>(frameInfo + 10);
+	*reinterpret_cast<float*>(frameInfo + 0x28) = *reinterpret_cast<float*>(frameInfo + 0xC);
+	*reinterpret_cast<float*>(frameInfo + 0x2C) = *reinterpret_cast<float*>(frameInfo + 0x10);
+	*reinterpret_cast<float*>(frameInfo + 0x30) = *reinterpret_cast<float*>(frameInfo + 0x14);
+	*reinterpret_cast<float*>(frameInfo + 0x34) = *reinterpret_cast<float*>(frameInfo + 0x18);
+	*reinterpret_cast<int*>(frameInfo + 0x38) = *reinterpret_cast<int*>(frameInfo + 0x1C);
 
 	*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0x20) = 0x280 - (*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 8) + *reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 4));
 	*reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0x38) = 8;
@@ -9529,16 +9530,9 @@ void CMenuPcs::WMChgMenu()
 
 	sVar2 = m_wmWorldState->m_menuMode;
 	switch (sVar2) {
-	case 4:
-		m_wmWorldState->m_posX = FLOAT_80331440;
-		break;
-	case 7:
-		GetOptionData();
-		break;
 	case 0: {
 			int iVar11 = reinterpret_cast<int>(m_wm.m_worldObjData) + 0xA00;
-			int count = 4;
-			do {
+			for (int count = 0; count < 4; count++) {
 				const int paramIndex = iVar8 / 2;
 				if (Game.m_caravanWorkArr[m_wmWorldState->m_originalBackupParams[paramIndex]].m_shopState == 0) {
 					m_wmWorldState->m_originalBackupParams[paramIndex] = (short)0xFFFF;
@@ -9557,8 +9551,7 @@ void CMenuPcs::WMChgMenu()
 				dVar16 = DOUBLE_803313f8;
 				iVar8 = iVar8 + 2;
 				iVar11 = iVar11 + 4;
-				count = count - 1;
-			} while (count != 0);
+			}
 
 			*reinterpret_cast<float*>(bytes + 0x78) = -(FLOAT_8033151c * (float)((double)(int)m_wmWorldState->m_cardChannel));
 			*reinterpret_cast<float*>(bytes + 0x7C) = -(fVar4 * (float)((double)(int)m_wmWorldState->m_cardChannel));
@@ -9595,6 +9588,12 @@ void CMenuPcs::WMChgMenu()
 			} while (iVar8 < 4);
 		break;
 	}
+	case 4:
+		m_wmWorldState->m_posX = FLOAT_80331440;
+		break;
+	case 7:
+		GetOptionData();
+		break;
 	}
 
 	switch (iVar14) {
@@ -9612,8 +9611,7 @@ void CMenuPcs::WMChgMenu()
 			char bVar7 = 0;
 			iVar8 = 0;
 			int iVar11 = 0;
-			int iVar12 = 2;
-			do {
+			for (int iVar12 = 0; iVar12 < 2; iVar12++) {
 				*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 0xC) = 0;
 				*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 0xB) = 0;
 				*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 10) = 0;
@@ -9636,8 +9634,7 @@ void CMenuPcs::WMChgMenu()
 				}
 				iVar8 = iVar8 + 0x20;
 				iVar11 = iVar11 + 4;
-				iVar12 = iVar12 - 1;
-			} while (iVar12 != 0);
+			}
 
 			iVar8 = 0;
 			iVar11 = 4;
@@ -9672,33 +9669,26 @@ void CMenuPcs::WMChgMenu()
 	case 3: {
 		if (m_wmWorldState->m_menuMode == 4) {
 			int selectBase = reinterpret_cast<int>(m_wm.m_charaSelectData);
-			if (*reinterpret_cast<char*>(selectBase + 10) == 0) {
-				Game.m_gameWork.m_wmBackupParams[0] = -1;
-			} else {
-				Game.m_gameWork.m_wmBackupParams[0] = (int)*reinterpret_cast<short*>(selectBase + 4);
-			}
-			m_wmWorldState->m_backupParams[0] = (short)Game.m_gameWork.m_wmBackupParams[0];
+			int* bp = Game.m_gameWork.m_wmBackupParams;
+			int v0 = (*reinterpret_cast<unsigned char*>(selectBase + 10) != 0)
+			    ? (int)*reinterpret_cast<short*>(selectBase + 4) : -1;
+			*bp++ = v0;
+			m_wmWorldState->m_backupParams[0] = (short)v0;
 
-			if (*reinterpret_cast<char*>(selectBase + 0x1A) == 0) {
-				Game.m_gameWork.m_wmBackupParams[1] = -1;
-			} else {
-				Game.m_gameWork.m_wmBackupParams[1] = (int)*reinterpret_cast<short*>(selectBase + 0x14);
-			}
-			m_wmWorldState->m_backupParams[1] = (short)Game.m_gameWork.m_wmBackupParams[1];
+			int v1 = (*reinterpret_cast<unsigned char*>(selectBase + 0x1A) != 0)
+			    ? (int)*reinterpret_cast<short*>(selectBase + 0x14) : -1;
+			*bp++ = v1;
+			m_wmWorldState->m_backupParams[1] = (short)v1;
 
-			if (*reinterpret_cast<char*>(selectBase + 0x2A) == 0) {
-				Game.m_gameWork.m_wmBackupParams[2] = -1;
-			} else {
-				Game.m_gameWork.m_wmBackupParams[2] = (int)*reinterpret_cast<short*>(selectBase + 0x24);
-			}
-			m_wmWorldState->m_backupParams[2] = (short)Game.m_gameWork.m_wmBackupParams[2];
+			int v2 = (*reinterpret_cast<unsigned char*>(selectBase + 0x2A) != 0)
+			    ? (int)*reinterpret_cast<short*>(selectBase + 0x24) : -1;
+			*bp++ = v2;
+			m_wmWorldState->m_backupParams[2] = (short)v2;
 
-			if (*reinterpret_cast<char*>(selectBase + 0x3A) == 0) {
-				Game.m_gameWork.m_wmBackupParams[3] = -1;
-			} else {
-				Game.m_gameWork.m_wmBackupParams[3] = (int)*reinterpret_cast<short*>(selectBase + 0x34);
-			}
-			m_wmWorldState->m_backupParams[3] = (short)Game.m_gameWork.m_wmBackupParams[3];
+			int v3 = (*reinterpret_cast<unsigned char*>(selectBase + 0x3A) != 0)
+			    ? (int)*reinterpret_cast<short*>(selectBase + 0x34) : -1;
+			*bp++ = v3;
+			m_wmWorldState->m_backupParams[3] = (short)v3;
 
 			bytes[0x10] = 1;
 			bytes[0x12] = 0;

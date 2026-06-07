@@ -2153,8 +2153,10 @@ void CGMonObj::onFrameAlways()
 		(this->*m_funcs->always)();
 
 		unsigned short stepSeRaw = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1BE);
-		int stepSeId = 0;
-		if (stepSeRaw != 0xFFFF) {
+		int stepSeId;
+		if (stepSeRaw == 0xFFFF) {
+			stepSeId = 0;
+		} else {
 			stepSeId = (stepSeRaw & 0xFF) + ((stepSeRaw >> 8) * 1000);
 		}
 

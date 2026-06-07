@@ -2327,7 +2327,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
     if (recvResult == 2)
     {
         unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(cmdOut);
-        unsigned char op = cmdBytes[0] & 0x3F;
+        int op = cmdBytes[0] & 0x3F;
 
         if (op == 0x14 || op == 0x17 || op == 0x1A ||
             op == 0x1C || op == 0x1D || op == 0x1E ||

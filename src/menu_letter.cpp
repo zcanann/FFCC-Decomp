@@ -1537,18 +1537,14 @@ void CMenuPcs::LetterAttachWinClose()
  */
 bool CMenuPcs::LetterConfirmOpen()
 {
-	CCaravanWork* caravanWork = GetLetterCaravanWork();
-	CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[s_SelLetter];
-	unsigned char languageId = Game.m_gameWork.m_languageId;
-	int state = GetLetterStateBase(this);
+	int languageId = Game.m_gameWork.m_languageId;
+	char** subjectTable = Game.m_cFlatDataArr[1].TableStrings(2);
 
-	if (*reinterpret_cast<char*>(state + 0xC) == '\0') {
+	if (*reinterpret_cast<char*>(GetLetterStateBase(this) + 0xC) == '\0') {
 		char lines[8][0x80];
 		memset(lines, 0, sizeof(lines));
-		unsigned int letterWord = letter->Word0();
-		char** subjectTable = Game.m_cFlatDataArr[1].TableStrings(2);
-		char** itemTable = Game.m_cFlatDataArr[1].TableStrings(0);
-
+		CCaravanWork* caravanWork = GetLetterCaravanWork();
+		unsigned int letterWord = caravanWork->m_letters[s_SelLetter].Word0();
 		const char* title = subjectTable[(letterWord >> 7) & 0x1FF];
 		if (languageId == 3) {
 			sprintf(lines[0], "%s%s", GetMenuStr(0x26), title);
@@ -1598,7 +1594,7 @@ bool CMenuPcs::LetterConfirmOpen()
 			} else {
 				strcpy(lines[2], GetMenuStr(0x28));
 				if (s_Attach == 0) {
-					strcat(lines[2], itemTable[s_AttachItem * 5 + 4]);
+					strcat(lines[2], Game.m_cFlatDataArr[1].TableStrings(0)[s_AttachItem * 5 + 4]);
 				} else if (s_Attach == 1) {
 					int offs = strlen(lines[2]);
 					sprintf(lines[2] + offs, "%d%s", s_AttachItem, GetMenuStr(4));
@@ -1620,12 +1616,16 @@ bool CMenuPcs::LetterConfirmOpen()
 		GetSingWinSize(0, &winW, &winH, 1);
 		SetMcWinInfo(winW, winH);
 		m_menuWindowInfo->state = 0;
-		*reinterpret_cast<s16*>(state + 0x28) = 0;
-		*reinterpret_cast<unsigned char*>(state + 0x9) = 0xFF;
-		*reinterpret_cast<char*>(state + 0xC) = 1;
+		*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28) = 0;
+		*reinterpret_cast<char*>(GetLetterStateBase(this) + 0x9) = -1;
+		*reinterpret_cast<char*>(GetLetterStateBase(this) + 0xC) = 1;
 	}
 
-	return m_menuWindowInfo->state == 1;
+	bool opened = false;
+	if (m_menuWindowInfo->state == 1) {
+		opened = true;
+	}
+	return opened;
 }
 
 /*

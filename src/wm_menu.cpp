@@ -5338,40 +5338,34 @@ double CMenuPcs::GetFcvValue(CMenuPcs::FCV fcv, float value)
 	float t = value / FLOAT_803314c0;
 	float* keys = fcv.keys;
 
-	if (keys[keyCount * 4 - 4] <= t) {
+	if (t >= keys[keyCount * 4 - 4]) {
 		return static_cast<double>(keys[keyCount * 4 - 3]);
 	}
 
 	int idx = 0;
 	float* cur = keys;
-	if (keyCount < 1) {
-		return static_cast<double>(FLOAT_803313dc);
-	}
+	for (int remaining = keyCount; remaining > 0; remaining--) {
+		if (t <= *cur) {
+			if (idx == 0) {
+				return static_cast<double>(keys[1]);
+			}
 
-	while (*cur < t) {
+			float* next = keys + idx * 4;
+			float* prev = keys + (idx - 1) * 4;
+			float span = *next - *prev;
+			float u = (t - *prev) / span;
+			float u2 = u * u;
+			float u3 = u2 * u;
+
+			return static_cast<double>(
+			    span * (prev[3] * (u + -(FLOAT_803314c8 * u2 - u3)) + next[2] * (u3 - u2)) +
+			    prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2)) +
+			    next[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2));
+		}
 		cur = cur + 4;
 		idx = idx + 1;
-		keyCount = keyCount - 1;
-		if (keyCount == 0) {
-			return static_cast<double>(FLOAT_803313dc);
-		}
 	}
-
-	if (idx == 0) {
-		return static_cast<double>(keys[1]);
-	}
-
-	float* next = keys + idx * 4;
-	float* prev = keys + (idx - 1) * 4;
-	float span = *next - *prev;
-	float u = (t - *prev) / span;
-	float u2 = u * u;
-	float u3 = u2 * u;
-
-	return static_cast<double>(
-	    span * (prev[3] * (u + -(FLOAT_803314c8 * u2 - u3)) + next[2] * (u3 - u2)) +
-	    prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2)) +
-	    next[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2));
+	return static_cast<double>(FLOAT_803313dc);
 }
 
 /*

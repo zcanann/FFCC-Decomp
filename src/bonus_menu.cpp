@@ -2228,7 +2228,7 @@ void CMenuPcs::DrawResultCountAnim()
 				GXSetChanMatColor(GX_COLOR0A0, color);
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kind));
 
-				if (i < s_CntTop || i >= s_CntTop + activePartyCount) {
+				if (s_CntTop > i || i >= s_CntTop + activePartyCount) {
 					MenuPcs.DrawRect(0, (float)sprite->x + sprite->motionX, (float)sprite->y + sprite->motionY,
 					    (float)sprite->w, (float)sprite->h,
 					    sprite->mulX, sprite->mulY, sprite->depth, sprite->depth, 0.0f);

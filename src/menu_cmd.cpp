@@ -1960,7 +1960,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 	const CCaravanWork* const caravan = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
 
 	int candidates[10];
-	int itemKinds[11];
+	int itemKinds[10];
 	int matches[10];
 
 	if (comboOut != nullptr) {

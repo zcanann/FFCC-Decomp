@@ -8621,7 +8621,7 @@ void CMenuPcs::ClrCMakeFlg(int channel)
 
 	selectData[channel * 0x10 + 0xB] = 0;
 	const int current = *reinterpret_cast<short*>(selectData + channel * 0x10 + 4);
-	if ((unsigned int)System.m_execParam > 2) {
+	if ((unsigned int)System.m_execParam >= 3) {
 		System.Printf(const_cast<char*>(s_ClrCMakeFlg_chan_pctd_cur_pctd_801DC390), channel, current);
 	}
 	m_wm.m_charaModelData[current * 0x34 + 0xC] = 0;

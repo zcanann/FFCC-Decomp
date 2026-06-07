@@ -19,6 +19,12 @@ class CGMonObj;
 class CGItemObj;
 struct Vec;
 
+struct CFlatPathPoint
+{
+	float m_distance;
+	Vec m_position;
+};
+
 extern int gCFlatRuntime2DebugDrawOverflowFrame;
 extern unsigned char gCFlatRuntime2DebugDrawOverflowInit;
 extern const char sCFlatRuntime2DebugDrawOverflowMsg[];
@@ -221,7 +227,10 @@ public:
 	float m_particleWorkPosPad;     // 0x1754
 	Vec m_particleWorkScale;        // 0x1758
 	Vec m_particleWorkTarget;       // 0x1764
-	u8 m_pad_1770_1BDC[0x46C];      // 0x1770
+	u8 m_pad_1770_17D4[0x64];       // 0x1770
+	int m_pathPointCount;           // 0x17D4
+	float m_pathTotalDistance;      // 0x17D8
+	CFlatPathPoint m_pathPoints[0x40]; // 0x17DC
 	CLine<64> m_debugLines[16];
 	int m_debugDrawCCCount;         // 0xCD1C
 	CDebugDrawCC m_debugDrawCCEntries[16]; // 0xCD20

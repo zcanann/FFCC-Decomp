@@ -41,6 +41,11 @@ static inline Vec* GetYmTraceMoveBasePosition(_pppMngSt* pppMngSt)
 	return &pppMngSt->BasePosition();
 }
 
+static inline float LoadFloat(const float& value)
+{
+	return value;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800d4828
@@ -90,8 +95,8 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveStep* par
 		pppCopyVector(work->m_direction, local_20);
 		pppSubVector(local_2c, pppMngSt->m_position, *GetYmTraceMovePreviousPosition(pppMngSt));
 
-		if ((local_2c.x == kPppYmTraceMoveZero) && (local_2c.y == kPppYmTraceMoveZero) &&
-		    (local_2c.z == kPppYmTraceMoveZero)) {
+		if ((local_2c.x == LoadFloat(kPppYmTraceMoveZero)) && (local_2c.y == LoadFloat(kPppYmTraceMoveZero)) &&
+		    (local_2c.z == LoadFloat(kPppYmTraceMoveZero))) {
 			pppCopyVector(local_2c, work->m_previousDirection);
 		}
 
@@ -101,7 +106,7 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveStep* par
 	local_60.x = local_20.x;
 	local_60.y = local_20.y;
 	local_60.z = local_20.z;
-	local_60.w = kPppYmTraceMoveOne;
+	local_60.w = LoadFloat(kPppYmTraceMoveOne);
 	local_70.x = local_2c.x;
 	local_70.y = local_2c.y;
 	local_70.z = local_2c.z;
@@ -141,7 +146,7 @@ void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, _pppCtrlTable* para
 
 	pppSubVector(work->m_previousDirection, pppMngSt->m_paramVec0, *GetYmTraceMoveBasePosition(pppMngSt));
 	pppCopyVector(work->m_direction, work->m_previousDirection);
-	zero = kPppYmTraceMoveZero;
+	zero = LoadFloat(kPppYmTraceMoveZero);
 	work->m_acceleration = zero;
 	work->m_velocity = zero;
 	work->m_distance = zero;

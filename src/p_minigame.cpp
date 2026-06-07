@@ -739,7 +739,7 @@ void CMiniGamePcs::GbaThreadMain(void* threadParam)
     int retryLine = 0;
     OSTime timeoutTicks = 0;
     OSTime startTime = 0;
-#define channel (static_cast<int>(static_cast<signed char>(param[0xBC])))
+#define channel (static_cast<signed char>(param[0xBC]))
 
 receive_message:
     ret = OSReceiveMessage(reinterpret_cast<OSMessageQueue*>(param), reinterpret_cast<OSMessage*>(&message), 0);
@@ -788,6 +788,10 @@ receive_message:
     }
     startTime = OSGetTime();
     retryLine = 0x22C;
+    goto retry_loop;
+
+retry_sleep:
+    MiniGameThreadSleepTicks(OSMillisecondsToTicks(1));
 
 retry_loop:
     if (param[0xBE] != 0)
@@ -843,8 +847,7 @@ retry_loop:
         }
         ret = 3;
         retryLine = 0x256;
-        MiniGameThreadSleepTicks(OSMillisecondsToTicks(1));
-        goto retry_loop;
+        goto retry_sleep;
     case 4:
         if (param[0xC4] != 0)
         {
@@ -983,8 +986,7 @@ comm_fail:
             goto receive_message;
         }
         retryLine = 0x2CB;
-        MiniGameThreadSleepTicks(OSMillisecondsToTicks(1));
-        goto retry_loop;
+        goto retry_sleep;
     case 7:
         if (param[0xC4] != 0)
         {
@@ -1182,8 +1184,7 @@ comm_fail:
         {
             retryLine = 0x31A;
         }
-        MiniGameThreadSleepTicks(OSMillisecondsToTicks(1));
-        goto retry_loop;
+        goto retry_sleep;
     case 10:
         if (step == 0)
         {

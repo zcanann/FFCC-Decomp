@@ -2009,13 +2009,12 @@ void CMenuPcs::CmakeNameClose()
  */
 void CMenuPcs::CmakeNameDraw()
 {
-    CmakeMenuState* cmakeState = CmakeState(this);
-    int frame = static_cast<int>(cmakeState->m_frame) - 1;
+    int frame = static_cast<int>(CmakeState(this)->m_frame) - 1;
     if (frame < 0) {
         frame = 0;
     }
 
-    short mode = cmakeState->m_mode;
+    short mode = CmakeState(this)->m_mode;
     float alpha;
     if (mode == 0) {
         alpha = static_cast<float>(DOUBLE_80333268 * static_cast<double>(frame));
@@ -2065,10 +2064,10 @@ void CMenuPcs::CmakeNameDraw()
         0, FLOAT_80333278, FLOAT_8033327c, FLOAT_80333280, FLOAT_80333284,
         FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, FLOAT_80333254);
 
-    if ((gCmakePreviousStep == 2) && (cmakeState->m_mode == 0)) {
+    if ((gCmakePreviousStep == 2) && (CmakeState(this)->m_mode == 0)) {
         DrawNamePreviewChara(this, FLOAT_80333258, 0xFF);
         DrawCmakeTitle(1, alpha, FLOAT_80333258);
-    } else if ((cmakeState->m_mode != 2) || (cmakeState->m_resultDir == -1)) {
+    } else if ((CmakeState(this)->m_mode != 2) || (CmakeState(this)->m_resultDir == -1)) {
         DrawNamePreviewChara(this, alpha, a);
         DrawCmakeTitle(1, FLOAT_80333258, alpha);
     } else {
@@ -2097,10 +2096,10 @@ void CMenuPcs::CmakeNameDraw()
         0, static_cast<float>(static_cast<int>(DOUBLE_803332b8)), FLOAT_803332ac, FLOAT_803332b0, FLOAT_803332b0,
         FLOAT_803332b0, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, FLOAT_80333254);
 
-    if ((cmakeState->m_mode == 1) && (cmakeState->m_row < 5)) {
-        short row = cmakeState->m_row;
+    if ((CmakeState(this)->m_mode == 1) && (CmakeState(this)->m_row < 5)) {
+        short row = CmakeState(this)->m_row;
         int cellX = static_cast<int>(
-            FLOAT_803332c0 * static_cast<float>(cmakeState->m_select) +
+            FLOAT_803332c0 * static_cast<float>(CmakeState(this)->m_select) +
             static_cast<float>(FLOAT_803332c8));
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -2116,7 +2115,7 @@ void CMenuPcs::CmakeNameDraw()
             FLOAT_8033324c, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, FLOAT_80333254);
     }
 
-    short table = cmakeState->m_table;
+    short table = CmakeState(this)->m_table;
     CFont* font = GetCmakeKeyboardFont(this);
     font->SetShadow(0);
     font->SetScale(FLOAT_80333258);
@@ -2138,17 +2137,17 @@ void CMenuPcs::CmakeNameDraw()
     GetRenderFlagBits(font->renderFlags).fixedWidth = 0;
     DrawInit();
 
-    if ((cmakeState->m_mode == 1) && (cmakeState->m_row < 5)) {
+    if ((CmakeState(this)->m_mode == 1) && (CmakeState(this)->m_row < 5)) {
         int cursorX = static_cast<int>(
-            FLOAT_803332c0 * static_cast<float>(cmakeState->m_select) +
+            FLOAT_803332c0 * static_cast<float>(CmakeState(this)->m_select) +
             static_cast<float>(FLOAT_803332c8));
         DrawCursor(cursorX + (static_cast<int>(System.m_frameCounter) % 8),
-            cmakeState->m_row * 0x20 + 0x70, FLOAT_80333258);
+            CmakeState(this)->m_row * 0x20 + 0x70, FLOAT_80333258);
     }
 
     char* name = GetCmakeNameBuffer();
-    int nameCursor = __cntlzw(static_cast<unsigned int>(1 - cmakeState->m_mode)) >> 5;
-    if (4 < cmakeState->m_row) {
+    int nameCursor = __cntlzw(static_cast<unsigned int>(1 - CmakeState(this)->m_mode)) >> 5;
+    if (4 < CmakeState(this)->m_row) {
         nameCursor = 0;
     }
     unsigned int nameLen = strlen(name);
@@ -2157,8 +2156,8 @@ void CMenuPcs::CmakeNameDraw()
     }
     DrawCmakeName(0, nameCursor, name, alpha);
     DrawCmakeDecision(
-        (static_cast<int>(cmakeState->m_row) >> 31) +
-            (static_cast<unsigned int>(static_cast<int>(cmakeState->m_row)) > 4),
+        (static_cast<int>(CmakeState(this)->m_row) >> 31) +
+            (static_cast<unsigned int>(static_cast<int>(CmakeState(this)->m_row)) > 4),
         alpha);
 
     if (CmakeMcState(this) != 3) {

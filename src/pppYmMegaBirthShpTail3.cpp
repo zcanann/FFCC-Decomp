@@ -841,10 +841,13 @@ done:
     }
     particleBytes[0x34] = 0;
 
-    if (pYmMegaBirthShpTail3->m_wmatCopyMode == 0) {
+    switch (pYmMegaBirthShpTail3->m_wmatCopyMode) {
+    case 0:
         pppCopyMatrix(*(pppFMATRIX*)particleWMat, vYmMegaBirthShpTail3->m_emitterMatrix);
-    } else if (pYmMegaBirthShpTail3->m_wmatCopyMode == 1) {
+        break;
+    case 1:
         pppCopyMatrix(*(pppFMATRIX*)particleWMat, vYmMegaBirthShpTail3->m_emitterMatrix);
+        break;
     }
 
     *(u16*)(particleBytes + 0x3a) = 0;

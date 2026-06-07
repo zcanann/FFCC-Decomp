@@ -1684,12 +1684,12 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 		Mtx localMtx;
 		CChara::CAnimNode* animNode0 = NodeAnimNode0(cur);
 		CChara::CAnimNode* animNode1 = NodeAnimNode1(cur);
-		SRTView cachedParentScaleSrt = parentScaleSrt;
 		bool nextReuseAnimNode0Srt = false;
 
 		if (animNode0 == 0 && animNode1 == 0) {
 			PSMTXCopy(NodeRefLocalMtx(cur), localMtx);
 		} else {
+			SRTView cachedParentScaleSrt = parentScaleSrt;
 			CChara::CAnimNode* parentAnimNode0 = parentNode != 0 ? NodeAnimNode0(parentNode) : 0;
 			if (parentNode == 0 || parentAnimNode0 == 0 || !AnimNodeUsesScale(parentAnimNode0)) {
 				if (parentNode == 0) {

@@ -3119,10 +3119,10 @@ void CPartMng::pppDrawIdx(int partIndex)
         return;
     }
 
+    ppvMng = reinterpret_cast<_pppMngSt*>(mng);
     partPos.x = mng->m_matrix.value[0][3];
     partPos.y = mng->m_matrix.value[1][3];
     partPos.z = mng->m_matrix.value[2][3];
-    ppvMng = reinterpret_cast<_pppMngSt*>(mng);
 
     if ((double)mng->m_cullRadiusSq != 0.0) {
         PSVECSubtract(&cameraPos, &partPos, &cameraDelta);

@@ -1503,12 +1503,13 @@ void CChara::CModel::calcMatrix()
 	CNode* nodes = ModelNodes(this);
 	u16 nodeCount = ModelNodeCount(this);
 	Vec twistAxisBase = {FLOAT_803301b0, FLOAT_803301bc, FLOAT_803301b0};
-	for (u32 i = 0; i < nodeCount; i++) {
-		CNode* node = (CNode*)((u8*)nodes + (i * 0xC0));
-		s16 parentIndex = NodeParentIndex(node);
-		CNode* parentNode = 0;
-		if (parentIndex >= 0) {
-			parentNode = reinterpret_cast<CNode*>(reinterpret_cast<u8*>(nodes) + parentIndex * 0xC0);
+	CNode* node = nodes;
+	for (u32 i = 0; i < nodeCount; i++, node++) {
+		CNode* parentNode;
+		if (NodeParentIndex(node) < 0) {
+			parentNode = 0;
+		} else {
+			parentNode = nodes + NodeParentIndex(node);
 		}
 
 		MtxPtr localMtx = NodeLocalRuntimeMtx(node);

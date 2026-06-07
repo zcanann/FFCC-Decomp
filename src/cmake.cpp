@@ -2147,7 +2147,7 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
     short& crest = cmakeState->m_row;
     short& selectField = cmakeState->m_fieldSelect;
     short& mcState = CmakeMcState(this);
-    unsigned short down;
+    short down;
     unsigned short repeat;
 
     bool padBusy = false;
@@ -2159,7 +2159,7 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
     } else {
         int padIndex = 0;
         padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-        down = static_cast<unsigned short>(Pad.GetPadInputs()[padIndex].buttonDown[0]);
+        down = static_cast<short>(Pad.GetPadInputs()[padIndex].buttonDown[0]);
     }
 
     padBusy = false;

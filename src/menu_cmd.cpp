@@ -1970,8 +1970,6 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 		}
 	}
 
-	memset(candidates, -1, sizeof(candidates));
-
 	const s16 selectedState = caravan->m_commandListExtra[selected];
 	const u32 selectedNegMask = static_cast<u32>(-selectedState) & ~static_cast<s32>(selectedState);
 
@@ -1983,6 +1981,8 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 			selected--;
 		}
 	}
+
+	memset(candidates, -1, sizeof(candidates));
 
 	int write = 2;
 	for (int slot = 2; slot < 8;) {

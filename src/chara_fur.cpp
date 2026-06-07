@@ -1482,52 +1482,41 @@ int CChara::CModel::PickFur(
 					FurProjectedVertex current;
 					ProjectFurVertex(current, mesh, modelViewMtx, screenMtx, indices[0], indices[3], posGqr);
 
+					const FurProjectedVertex* a = 0;
+					const FurProjectedVertex* b = 0;
 					if (primitive == 0x90) {
-						if ((vertexIndex % 3) == 2) {
-							if (prev2.m_valid && prev1.m_valid && current.m_valid) {
-								const FurProjectedVertex& a = prev2;
-								const FurProjectedVertex& b = prev1;
-								if (FurPointInTriangle(cursorX, cursorY, a, b, current)) {
-									const float depth = FurHitDepth(a, b, current);
-									if (depth < nearestDepth) {
-										float uvU;
-										float uvV;
-										FurInterpolateHit(hitViewPos, uvU, uvV, screenMtx, cursorX, cursorY, a, b, current);
-										hitAny = 1;
-										if (outWorldPos != 0) {
-											*outWorldPos = hitViewPos;
-										}
-										if (furMaterial) {
-											nearestDepth = depth;
-											hitU = uvU;
-											hitV = uvV;
-											hitPaintable = paintableMaterial;
-										}
-									}
-								}
-							}
+						if ((vertexIndex % 3) == 2 && prev2.m_valid && prev1.m_valid && current.m_valid) {
+							a = &prev2;
+							b = &prev1;
 						}
 					} else if (primitive == 0x98) {
 						if (prev2.m_valid && prev1.m_valid && current.m_valid) {
-							const bool odd = (vertexIndex & 1) != 0;
-							const FurProjectedVertex& a = odd ? prev1 : prev2;
-							const FurProjectedVertex& b = odd ? prev2 : prev1;
-							if (FurPointInTriangle(cursorX, cursorY, a, b, current)) {
-								const float depth = FurHitDepth(a, b, current);
-								if (depth < nearestDepth) {
-									float uvU;
-									float uvV;
-									FurInterpolateHit(hitViewPos, uvU, uvV, screenMtx, cursorX, cursorY, a, b, current);
-									hitAny = 1;
-									if (outWorldPos != 0) {
-										*outWorldPos = hitViewPos;
-									}
-									if (furMaterial) {
-										nearestDepth = depth;
-										hitU = uvU;
-										hitV = uvV;
-										hitPaintable = paintableMaterial;
-									}
+							if ((vertexIndex & 1) != 0) {
+								a = &prev1;
+								b = &prev2;
+							} else {
+								a = &prev2;
+								b = &prev1;
+							}
+						}
+					}
+
+					if (a != 0) {
+						if (FurPointInTriangle(cursorX, cursorY, *a, *b, current)) {
+							const float depth = FurHitDepth(*a, *b, current);
+							if (depth < nearestDepth) {
+								float uvU;
+								float uvV;
+								FurInterpolateHit(hitViewPos, uvU, uvV, screenMtx, cursorX, cursorY, *a, *b, current);
+								hitAny = 1;
+								if (outWorldPos != 0) {
+									*outWorldPos = hitViewPos;
+								}
+								if (furMaterial) {
+									nearestDepth = depth;
+									hitU = uvU;
+									hitV = uvV;
+									hitPaintable = paintableMaterial;
 								}
 							}
 						}

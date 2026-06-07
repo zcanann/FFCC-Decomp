@@ -1331,7 +1331,7 @@ void CMiniGamePcs::OpenCallback(MgGbaThreadParam* param, void* context)
     paramBytes[0xC4] = 0;
     paramBytes[0xC6] = 0;
     paramBytes[0xBF] = 3;
-    *reinterpret_cast<int*>(paramBytes + 0x30) = *reinterpret_cast<int*>(self + static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16B4);
+    *reinterpret_cast<int*>(paramBytes + 0x30) = *reinterpret_cast<int*>(self + (static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16B4));
 
     if (paramBytes[0x28] == 0)
     {
@@ -1339,9 +1339,9 @@ void CMiniGamePcs::OpenCallback(MgGbaThreadParam* param, void* context)
         {
             GbaThreadInitGbaContext(param, 1);
             self[static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16AE] = paramBytes[0x2A];
-            *reinterpret_cast<int*>(self + static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16B8) = *reinterpret_cast<int*>(paramBytes + 0x34);
+            *reinterpret_cast<int*>(self + (static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16B8)) = *reinterpret_cast<int*>(paramBytes + 0x34);
             *reinterpret_cast<int*>(paramBytes + 0x88) = OSGetTick();
-            *reinterpret_cast<int*>(self + static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16B4) = *reinterpret_cast<int*>(paramBytes + 0x88);
+            *reinterpret_cast<int*>(self + (static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16B4)) = *reinterpret_cast<int*>(paramBytes + 0x88);
 
             if (paramBytes[0xC4] != 0)
             {
@@ -1352,14 +1352,14 @@ void CMiniGamePcs::OpenCallback(MgGbaThreadParam* param, void* context)
         }
         else
         {
-            int compareResult = memcmp(paramBytes + 0x28, self + static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16AC, 0x60);
+            int compareResult = memcmp(paramBytes + 0x28, self + (static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16AC), 0x60);
             if (compareResult == 0)
             {
-                int savedTick = *reinterpret_cast<int*>(self + static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16B4);
+                int savedTick = *reinterpret_cast<int*>(self + (static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16B4));
                 int currentTick = *reinterpret_cast<int*>(paramBytes + 0x88);
                 if (baseTick == savedTick || baseTick == currentTick)
                 {
-                    *reinterpret_cast<int*>(self + static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16B4) = baseTick;
+                    *reinterpret_cast<int*>(self + (static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16B4)) = baseTick;
                     *reinterpret_cast<int*>(paramBytes + 0x88) = baseTick;
                     doWrite = false;
                 }
@@ -1377,19 +1377,19 @@ void CMiniGamePcs::OpenCallback(MgGbaThreadParam* param, void* context)
         int swapWord = *reinterpret_cast<int*>(paramBytes + 0x34);
 
         paramBytes[0x2A] = self[static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16AE];
-        *reinterpret_cast<int*>(paramBytes + 0x34) = *reinterpret_cast<int*>(self + static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16B8);
+        *reinterpret_cast<int*>(paramBytes + 0x34) = *reinterpret_cast<int*>(self + (static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16B8));
 
-        int compareResult = memcmp(paramBytes + 0x28, self + static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16AC, 0x60);
+        int compareResult = memcmp(paramBytes + 0x28, self + (static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16AC), 0x60);
         if (compareResult == 0)
         {
-            int savedTick = *reinterpret_cast<int*>(self + static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16B4);
+            int savedTick = *reinterpret_cast<int*>(self + (static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16B4));
             int currentTick = *reinterpret_cast<int*>(paramBytes + 0x88);
             if (baseTick == savedTick || baseTick == currentTick)
             {
-                *reinterpret_cast<int*>(self + static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16B4) = baseTick;
+                *reinterpret_cast<int*>(self + (static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16B4)) = baseTick;
                 *reinterpret_cast<int*>(paramBytes + 0x88) = baseTick;
                 self[static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16AE] = swapByte;
-                *reinterpret_cast<int*>(self + static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16B8) = swapWord;
+                *reinterpret_cast<int*>(self + (static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16B8)) = swapWord;
                 doWrite = false;
             }
         }
@@ -1408,7 +1408,7 @@ void CMiniGamePcs::OpenCallback(MgGbaThreadParam* param, void* context)
         if (!wasResync)
         {
             sendTick = OSGetTick();
-            *reinterpret_cast<int*>(self + static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16B4) = sendTick;
+            *reinterpret_cast<int*>(self + (static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16B4)) = sendTick;
         }
 
         if (GBAWrite(static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)), reinterpret_cast<u8*>(&sendTick), paramBytes + 0xC0) == 0 &&

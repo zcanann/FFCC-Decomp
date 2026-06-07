@@ -1860,7 +1860,7 @@ void CMenuPcs::LetterMessDraw()
 		color.b = 0xFF;
 		color.a = alpha;
 		GXSetChanMatColor(GX_COLOR0A0, color);
-		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
+		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(*reinterpret_cast<int*>(panel + 0xE)));
 		MenuPcs.DrawRect(
 		    0, x0, y0, x1,
 		    y1, *reinterpret_cast<float*>(panel + 4), *reinterpret_cast<float*>(panel + 6),

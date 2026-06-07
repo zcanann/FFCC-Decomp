@@ -40,6 +40,13 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
+namespace std {
+float sinf(float x);
+float cosf(float x);
+float atan2(float y, float x);
+float fmodf(float x, float y);
+}
+
 static inline CUSBStreamDataState* UsbStream(CPartPcs* self)
 {
     return &self->m_usbStreamState;
@@ -1441,7 +1448,7 @@ CVector CVector::operator-(const CVector& other) const
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" float fmodf__3stdFff(float x, float y)
+float std::fmodf(float x, float y)
 {
     return (float)fmod((double)x, (double)y);
 }
@@ -1525,9 +1532,9 @@ int CDbgMenuPcs::GetDbgFlag()
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" float atan2__3stdFff(float y, float x)
+float std::atan2(float y, float x)
 {
-    return (float)atan2((double)y, (double)x);
+    return (float)::atan2((double)y, (double)x);
 }
 
 /*
@@ -1539,7 +1546,7 @@ extern "C" float atan2__3stdFff(float y, float x)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" float cosf__3stdFf(float x)
+float std::cosf(float x)
 {
     return (float)cos((double)x);
 }
@@ -1553,7 +1560,7 @@ extern "C" float cosf__3stdFf(float x)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" float sinf__3stdFf(float x)
+float std::sinf(float x)
 {
     return (float)sin((double)x);
 }
@@ -1840,13 +1847,13 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     }
     case -6: {
-        float value = sinf(*reinterpret_cast<float*>(object->m_localBase));
+        float value = std::sinf(*reinterpret_cast<float*>(object->m_localBase));
         this->push(object, *reinterpret_cast<int*>(&value));
         outResult = 0;
         break;
     }
     case -7: {
-        float value = cosf(*reinterpret_cast<float*>(object->m_localBase));
+        float value = std::cosf(*reinterpret_cast<float*>(object->m_localBase));
         this->push(object, *reinterpret_cast<int*>(&value));
         outResult = 0;
         break;
@@ -1953,7 +1960,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     case -10: {
-        float value = atan2__3stdFff(
+        float value = std::atan2(
             *reinterpret_cast<float*>(object->m_localBase),
             *reinterpret_cast<float*>(object->m_localBase + 1));
         this->push(object, *reinterpret_cast<int*>(&value));
@@ -2113,7 +2120,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
                 const int segmentCount = pointCount + 1 - (mode & 1) - ((mode >> 1) & 1);
                 const float scaled = t * static_cast<float>(segmentCount);
                 const int baseIndex = (mode & 1) + static_cast<int>(scaled);
-                const float segmentT = fmodf(scaled, FLOAT_80330B34);
+                const float segmentT = std::fmodf(scaled, FLOAT_80330B34);
 
                 CVector startDelta = CVector(pathPoints[1].m_position) - CVector(pathPoints[0].m_position);
                 CVector startPhantom1 = CVector(pathPoints[0].m_position) - startDelta;
@@ -2167,14 +2174,14 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             } else {
                 switch (mode & 3) {
                 case 3:
-                    t = -((FLOAT_80330B3C * (FLOAT_80330B34 + sinf(FLOAT_80330B54 * t + FLOAT_80330B50))) -
+                    t = -((FLOAT_80330B3C * (FLOAT_80330B34 + std::sinf(FLOAT_80330B54 * t + FLOAT_80330B50))) -
                           FLOAT_80330B34);
                     break;
                 case 1:
-                    t = FLOAT_80330B34 + sinf(FLOAT_80330B50 * t + FLOAT_80330B58);
+                    t = FLOAT_80330B34 + std::sinf(FLOAT_80330B50 * t + FLOAT_80330B58);
                     break;
                 case 2:
-                    t = sinf(FLOAT_80330B50 * t);
+                    t = std::sinf(FLOAT_80330B50 * t);
                     break;
                 default:
                     break;
@@ -2268,10 +2275,10 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         const float yaw = localFloats[5];
         const float pitch = localFloats[6];
-        const float sinYaw = sinf(yaw);
-        const float cosYaw = cosf(yaw);
-        const float sinPitch = sinf(pitch);
-        const float cosPitch = cosf(pitch);
+        const float sinYaw = std::sinf(yaw);
+        const float cosYaw = std::cosf(yaw);
+        const float sinPitch = std::sinf(pitch);
+        const float cosPitch = std::cosf(pitch);
         Vec direction = {-sinYaw * cosPitch, -sinPitch, -cosYaw * cosPitch};
         CColor color(
             static_cast<u8>(object->m_localBase[2]),
@@ -2555,7 +2562,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     }
     case -0x34: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        Vec axis = {cosf(localFloats[1]), 0.0f, sinf(localFloats[1])};
+        Vec axis = {std::cosf(localFloats[1]), 0.0f, std::sinf(localFloats[1])};
         Mtx matrix;
         Mtx rotation;
 
@@ -2716,7 +2723,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     case -0x81: {
         float angle = static_cast<float>(object->m_localBase[2]);
-        Vec normal = {sinf(angle), 0.0f, cosf(angle)};
+        Vec normal = {std::sinf(angle), 0.0f, std::cosf(angle)};
         Vec point = {static_cast<float>(*object->m_localBase), 0.0f, static_cast<float>(object->m_localBase[1])};
         Mtx& reflectMtx = m_centerMatrix;
         PSMTXReflect(reflectMtx, &point, &normal);
@@ -2777,14 +2784,14 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
 
         switch (*localBase & 3) {
         case 3:
-            alpha = -((FLOAT_80330B3C * (FLOAT_80330B34 + sinf(FLOAT_80330B54 * alpha + FLOAT_80330B50))) -
+            alpha = -((FLOAT_80330B3C * (FLOAT_80330B34 + std::sinf(FLOAT_80330B54 * alpha + FLOAT_80330B50))) -
                       FLOAT_80330B34);
             break;
         case 1:
-            alpha = FLOAT_80330B34 + sinf(FLOAT_80330B50 * alpha + FLOAT_80330B58);
+            alpha = FLOAT_80330B34 + std::sinf(FLOAT_80330B50 * alpha + FLOAT_80330B58);
             break;
         case 2:
-            alpha = sinf(FLOAT_80330B50 * alpha);
+            alpha = std::sinf(FLOAT_80330B50 * alpha);
             break;
         default:
             break;

@@ -1582,13 +1582,13 @@ void CGMonObj::onDamaged(CGPrgObj* prgObj)
 
 skip_target_update:
 		int teamNo = reinterpret_cast<int>(object->m_scriptHandle[2]);
-		*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(prgObj) + 0x5BC) = static_cast<float>(teamNo);
+		*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(prgObj) + 0x6C0) = teamNo;
 		GbaQue.SetHitEnemy(attackerIndex, teamNo);
 
 		unsigned short groupTag = m_groupTag;
 		if ((groupTag & 0x7FFF) != 0) {
-			for (CGMonObj* other = gCFlatRuntime2.FindGMonObjFirst(); other != nullptr;
-				other = gCFlatRuntime2.FindGMonObjNext(other)) {
+			for (CGMonObj* other = CFlat.FindGMonObjFirst(); other != nullptr;
+				other = CFlat.FindGMonObjNext(other)) {
 				if (other == this) {
 					continue;
 				}

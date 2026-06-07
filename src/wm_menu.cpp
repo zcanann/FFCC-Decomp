@@ -6728,13 +6728,11 @@ void CMenuPcs::DrawWMFrame()
  */
 void CMenuPcs::CalcWMFrame0(int param)
 {
-	unsigned char* const frame = m_wm.m_frameInfo;
-
-	reinterpret_cast<short*>(frame + 4)[0] = 0x10;
-	int iVar1 = reinterpret_cast<int>(frame);
-	reinterpret_cast<short*>(iVar1 + 0x20)[0] = static_cast<short>(static_cast<int>(FLOAT_803313e0 - static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(iVar1 + 8)) + static_cast<int>(*reinterpret_cast<short*>(iVar1 + 4)))));
+	reinterpret_cast<short*>(m_wm.m_frameInfo + 4)[0] = 0x10;
+	reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20)[0] = static_cast<short>(static_cast<int>(FLOAT_803313e0 - static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 8)) + static_cast<int>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 4)))));
 
 	if (param < 0) {
+		unsigned char* const frame = m_wm.m_frameInfo;
 		float offset = static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(frame + 8)) + static_cast<int>(*reinterpret_cast<short*>(frame + 4)));
 		if (param >= -10) {
 			unsigned int sign = static_cast<unsigned int>(param) >> 31;

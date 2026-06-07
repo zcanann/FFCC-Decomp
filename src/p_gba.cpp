@@ -5,8 +5,8 @@
 #include "ffcc/system.h"
 #include <dolphin/gba/GBA.h>
 
-extern const char s_CGbaPcs_80330870[8];
-static const char s_JoyBus__LoadBin___error_801d9de0[] = "JoyBus::LoadBin() error\n";
+extern const char sCGbaPcsProcessName[] = "CGbaPcs";
+static const char sGbaJoybusLoadBinError[] = "JoyBus::LoadBin() error\n";
 
 extern "C" {
 void create__7CGbaPcsFv(CGbaPcs*);
@@ -40,7 +40,7 @@ inline CGbaPcs::CGbaPcs()
 }
 
 CProcessTable CGbaPcs::m_table = {
-    const_cast<char*>(s_CGbaPcs_80330870),
+    const_cast<char*>(sCGbaPcsProcessName),
     {
         0x00000000,
         0x00000000,
@@ -170,11 +170,11 @@ void CGbaPcs::destroy()
  */
 void CGbaPcs::create()
 {
-	m_stage = Memory.CreateStage(0x56000, const_cast<char*>(s_CGbaPcs_80330870), 0);
+	m_stage = Memory.CreateStage(0x56000, const_cast<char*>(sCGbaPcsProcessName), 0);
 	Joybus.CreateInit();
 	int result = Joybus.LoadBin();
 	if ((result != 0) && (2 <= (unsigned int)System.m_execParam)) {
-		System.Printf(const_cast<char*>(s_JoyBus__LoadBin___error_801d9de0));
+		System.Printf(const_cast<char*>(sGbaJoybusLoadBinError));
 	}
 	Joybus.ThreadInit();
 }

@@ -2356,8 +2356,6 @@ void CGMonObj::initFinishedFuncDefault()
 void CGMonObj::setIceJEffect(int enabled)
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 
 	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x20000);
 
@@ -2365,7 +2363,7 @@ void CGMonObj::setIceJEffect(int enabled)
 		unsigned short count = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AA);
 		for (int i = 0; i < static_cast<int>(count); i++) {
 			int dataNo = object->m_charaModelHandle->GetPdtSlot();
-			prgObj->putParticleBindTrace((i + 0x5A) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x5A8), object, 0.0f, 0);
+			reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace((i + 0x5A) | (dataNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x5A8), object, 0.0f, 0);
 		}
 	}
 }

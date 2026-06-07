@@ -1365,17 +1365,14 @@ void CMenuPcs::DrawSelectOpenAnim()
 		return;
 	}
 
-	int animPtr = this->m_bonusAnimPtr;
-	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
-	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 	BonusAnimSprite* artiSprite = 0;
-	int modelIndex = 0;
-	int lastKind = 0;
 	int activePartyCount = s_Rinfo->m_partyCount;
 
 	DrawInit();
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
+	int modelIndex = 0;
+	int lastKind = 0;
 	int off = 0;
 	for (int i = 0; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++, off += 0x40) {
 		BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + off + 8);
@@ -1445,6 +1442,10 @@ void CMenuPcs::DrawSelectOpenAnim()
 			}
 		}
 	}
+
+	int animPtr = this->m_bonusAnimPtr;
+	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
+	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 
 	DrawBonusActiveMarks(this, statePtr, artiSprite->alpha);
 	DrawBonusPartyNames(this, header, sprites);

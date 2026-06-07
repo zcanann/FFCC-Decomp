@@ -1189,7 +1189,7 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
     unsigned int tevBit = m_curEnvTevBit & material->m_tevBit;
     if (m_activeEnvTevBit != tevBit) {
         m_activeEnvTevBit = tevBit;
-        GXSetArray(GX_VA_TEX0, m_geometryArraySource, 6);
+        GXSetArray(GX_VA_NRM, m_geometryArraySource, 6);
         GXSetNumIndStages(0);
         GXSetTevDirect(GX_TEVSTAGE0);
 
@@ -1467,7 +1467,7 @@ void CMaterialMan::SetMaterialMenu(CMaterialSet* materialSet, int materialIndex,
     unsigned int tevBit = m_curEnvTevBit & material->m_tevBit;
     if (m_activeEnvTevBit != tevBit) {
         m_activeEnvTevBit = tevBit;
-        GXSetArray(GX_VA_TEX0, m_geometryArraySource, 6);
+        GXSetArray(GX_VA_NRM, m_geometryArraySource, 6);
     GXSetNumIndStages(0);
     GXSetTevDirect(GX_TEVSTAGE0);
 
@@ -1482,7 +1482,7 @@ void CMaterialMan::SetMaterialMenu(CMaterialSet* materialSet, int materialIndex,
         tevColor3.g = 0;
         tevColor3.b = 0xFF;
         tevColor3.a = 0xFF;
-        GXSetTevColor(GX_TEVREG2, tevColor2);
+        GXSetTevColor(GX_TEVREG1, tevColor2);
         GXSetTevColor(static_cast<GXTevRegID>(3), tevColor3);
 
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);

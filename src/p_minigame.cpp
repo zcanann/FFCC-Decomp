@@ -1365,7 +1365,7 @@ void CMiniGamePcs::OpenCallback(MgGbaThreadParam* param, void* context)
     {
         if (paramBytes[0x2B] == 0)
         {
-            GbaThreadInitGbaContext(param, 1);
+            GbaThreadInitGbaContext(reinterpret_cast<MgGbaThreadParam*>(paramBytes), 1);
             self[static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16AE] = paramBytes[0x2A];
             *reinterpret_cast<int*>(self + (static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16B8)) = *reinterpret_cast<int*>(paramBytes + 0x34);
             *reinterpret_cast<int*>(paramBytes + 0x88) = OSGetTick();

@@ -790,7 +790,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		case -8:
 			*(reinterpret_cast<u8*>(&engineObject->m_weaponNodeFlags) + 1) =
-			    static_cast<u8>((object->m_localBase[0] << 7) & 0x80) |
+			    static_cast<u8>((static_cast<signed char>(object->m_localBase[0]) << 7) & 0x80) |
 			    (*(reinterpret_cast<u8*>(&engineObject->m_weaponNodeFlags) + 1) & 0x7F);
 			PushValue(this, object, 0);
 			outResult = 0;
@@ -811,9 +811,6 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			float radius = params[1];
 			float offset = params[4];
 			switch (mode) {
-			case 2:
-				engineObject->m_bodyColRadius = radius;
-				break;
 			case 0:
 				engineObject->m_capsuleHalfHeight = radius;
 				break;
@@ -821,11 +818,14 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 				engineObject->m_bodyEllipsoidRadius = radius;
 				engineObject->m_bodyEllipsoidOffset = offset;
 				break;
-			case 4:
-				engineObject->m_nearColRadius = radius;
+			case 2:
+				engineObject->m_bodyColRadius = radius;
 				break;
 			case 3:
 				engineObject->m_attackColRadius = radius;
+				break;
+			case 4:
+				engineObject->m_nearColRadius = radius;
 				break;
 			}
 			PushValue(this, object, 0);

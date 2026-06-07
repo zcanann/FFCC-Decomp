@@ -2179,9 +2179,7 @@ void CMenuPcs::CalcResultCloseAnim()
  */
 void CMenuPcs::DrawResultCountAnim()
 {
-	int statePtr = this->m_bonusStatePtr;
-
-	if (*(signed char*)(statePtr + 0xb) == 0) {
+	if (*(signed char*)(this->m_bonusStatePtr + 0xb) == 0) {
 		return;
 	}
 
@@ -2234,8 +2232,8 @@ void CMenuPcs::DrawResultCountAnim()
 					    sprite->mulX, sprite->mulY, sprite->depth, sprite->depth, 0.0f);
 				} else {
 					int value = s_Rinfo->m_party[i - s_CntTop].m_totalValue;
-					if (*(short*)(statePtr + 0x10) == 0) {
-						int frame = (int)*(short*)(statePtr + 0x22) - 8;
+					if (*(short*)(this->m_bonusStatePtr + 0x10) == 0) {
+						int frame = (int)*(short*)(this->m_bonusStatePtr + 0x22) - 8;
 						if (frame > 0) {
 							if (frame < value) {
 								value = frame;

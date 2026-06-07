@@ -1367,7 +1367,8 @@ void CGMonObj::onStatDie()
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	int subState = *reinterpret_cast<int*>(mon + 0x52C);
 
-	if (subState == 1) {
+	switch (subState) {
+	case 1: {
 		unsigned char* aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
 		int subFrame = *reinterpret_cast<int*>(mon + 0x530);
 
@@ -1413,10 +1414,7 @@ void CGMonObj::onStatDie()
 		return;
 	}
 
-	if (0 < subState) {
-		if (2 < subState) {
-			return;
-		}
+	case 2: {
 		unsigned short repopDelay = m_repop.delay;
 		if ((repopDelay != 0) && (*reinterpret_cast<int*>(mon + 0x530) == static_cast<int>(repopDelay) * 0x1E)) {
 			setRepop(0);
@@ -1424,7 +1422,10 @@ void CGMonObj::onStatDie()
 		return;
 	}
 
-	if (subState < 0) {
+	case 0:
+		break;
+
+	default:
 		return;
 	}
 

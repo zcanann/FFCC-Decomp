@@ -21,6 +21,9 @@
 extern char s_menuSubfontPathFmt[];
 extern const double kPppCrystal2RefractionScale;
 extern const float FLOAT_80331EAC;
+extern const float FLOAT_80331EB0;
+extern const float FLOAT_80331ED0;
+extern const float FLOAT_80331F6C;
 extern const float FLOAT_80331FB8;
 extern const float FLOAT_80331FBC;
 extern const float s_BonusModelYPos[];
@@ -1994,8 +1997,8 @@ void CMenuPcs::CalcResultCloseAnim()
 		short* count = (short*)this->m_bonusAnimPtr;
 		for (int i = 0; i < *count; i++, count = (short*)this->m_bonusAnimPtr) {
 			*(int*)((int)count + off + 0x28) = 0;
-			*(float*)(this->m_bonusAnimPtr + off + 0x38) = 0.0f;
-			*(float*)(this->m_bonusAnimPtr + off + 0x3c) = 0.0f;
+			*(float*)(this->m_bonusAnimPtr + off + 0x38) = FLOAT_80331EAC;
+			*(float*)(this->m_bonusAnimPtr + off + 0x3c) = FLOAT_80331EAC;
 			off += 0x40;
 		}
 
@@ -2017,7 +2020,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			sprite[0x16] = 0;
 			sprite[0x17] = 1;
 			*(float*)(sprite + 0x1c) = (float)(int)*sprite;
-			*(float*)(sprite + 0x18) = 100.0f;
+			*(float*)(sprite + 0x18) = FLOAT_80331ED0;
 			*sprite = (short)(int)((float)(int)*sprite - *(float*)(sprite + 0x18));
 		}
 
@@ -2052,7 +2055,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			sprite[0x16] = 0;
 			sprite[0x17] = 1;
 			*(float*)(sprite + 0x1c) = (float)(int)*sprite;
-			*(float*)(sprite + 0x18) = 100.0f;
+			*(float*)(sprite + 0x18) = FLOAT_80331ED0;
 			*sprite = (short)(int)((float)(int)*sprite - *(float*)(sprite + 0x18));
 		}
 
@@ -2077,7 +2080,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			sprite[0x16] = 0;
 			sprite[0x17] = 1;
 			*(float*)(sprite + 0x1c) = (float)(int)*sprite;
-			*(float*)(sprite + 0x18) = 100.0f;
+			*(float*)(sprite + 0x18) = FLOAT_80331ED0;
 			*sprite = (short)(int)((float)(int)*sprite - *(float*)(sprite + 0x18));
 		}
 
@@ -2095,7 +2098,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			sprite[0x16] = 0;
 			sprite[0x17] = 1;
 			*(float*)(sprite + 0x1c) = (float)(int)*sprite;
-			*(float*)(sprite + 0x18) = 100.0f;
+			*(float*)(sprite + 0x18) = FLOAT_80331ED0;
 			*sprite = (short)(int)((float)(int)*sprite - *(float*)(sprite + 0x18));
 		}
 
@@ -2113,7 +2116,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			sprite[0x16] = 0;
 			sprite[0x17] = 1;
 			*(float*)(sprite + 0x1c) = (float)(int)*sprite;
-			*(float*)(sprite + 0x18) = 100.0f;
+			*(float*)(sprite + 0x18) = FLOAT_80331ED0;
 			*sprite = (short)(int)((float)(int)*sprite - *(float*)(sprite + 0x18));
 		}
 
@@ -3296,9 +3299,35 @@ void CMenuPcs::createBonus()
 	window = new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0xFA) MenuWindowInfo;
 	this->m_menuWindowInfo = window;
 	memset(window, 0, sizeof(MenuWindowInfo));
-	BonusBoardEntryList* boardEntries = reinterpret_cast<BonusBoardEntryList*>(boardPtr);
+	const float depth1000 = FLOAT_80331F6C;
+	const float scale1 = FLOAT_80331EB0;
+	const float zero = FLOAT_80331EAC;
+	int off = 0;
 	for (int i = 0; i < 0x18; i++) {
-		InitBonusBoardEntry(&boardEntries->entries[i]);
+		float* pos = (float*)(this->m_bonus.m_bonusBoardPtr + off + 0x1c);
+		pos[2] = zero;
+		pos[1] = zero;
+		pos[0] = zero;
+		pos[5] = zero;
+		pos[4] = zero;
+		pos[3] = zero;
+		pos[8] = scale1;
+		pos[7] = scale1;
+		pos[6] = scale1;
+		*(int*)(this->m_bonus.m_bonusBoardPtr + off) = 0;
+		*(int*)(this->m_bonus.m_bonusBoardPtr + off + 0x4) = 0;
+		*(short*)(this->m_bonus.m_bonusBoardPtr + off + 0x8) = 0;
+		*(short*)(this->m_bonus.m_bonusBoardPtr + off + 0xa) = 0;
+		*(short*)(this->m_bonus.m_bonusBoardPtr + off + 0xc) = 0x280;
+		*(short*)(this->m_bonus.m_bonusBoardPtr + off + 0xe) = 0x1c0;
+		*(float*)(this->m_bonus.m_bonusBoardPtr + off + 0x10) = zero;
+		*(float*)(this->m_bonus.m_bonusBoardPtr + off + 0x14) = zero;
+		*(float*)(this->m_bonus.m_bonusBoardPtr + off + 0x18) = depth1000;
+		*(int*)(this->m_bonus.m_bonusBoardPtr + off + 0x40) = 0;
+		*(int*)(this->m_bonus.m_bonusBoardPtr + off + 0x44) = 0;
+		*(int*)(this->m_bonus.m_bonusBoardPtr + off + 0x48) = 0x280;
+		*(int*)(this->m_bonus.m_bonusBoardPtr + off + 0x4c) = 0x1c0;
+		off += 0x50;
 	}
 
 	if (s_Rinfo != 0) {

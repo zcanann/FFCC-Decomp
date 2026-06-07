@@ -915,20 +915,26 @@ void CGMonObj::onFrameStat()
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	int state = prgObj->m_lastStateId;
+#define state (prgObj->m_lastStateId)
 
-	if ((state == 3 || state == 0x11 || state == 0x1E) && (*reinterpret_cast<unsigned short*>(object->m_scriptHandle + 7) != 0)) {
-		int targetPartyIndex = m_targetPartyIndex;
-		bool hasValidTarget = false;
-		if ((targetPartyIndex >= 0) && (targetPartyIndex < 4)) {
-			CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
-			hasValidTarget = (target != NULL) &&
-				(*reinterpret_cast<unsigned short*>(reinterpret_cast<CGObject*>(target)->m_scriptHandle + 7) != 0);
+	switch (state) {
+	case 3:
+	case 0x11:
+	case 0x1E:
+		if (*reinterpret_cast<unsigned short*>(object->m_scriptHandle + 7) != 0) {
+			int targetPartyIndex = m_targetPartyIndex;
+			bool hasValidTarget = false;
+			if ((targetPartyIndex >= 0) && (targetPartyIndex < 4)) {
+				CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
+				hasValidTarget = (target != NULL) &&
+					(*reinterpret_cast<unsigned short*>(reinterpret_cast<CGObject*>(target)->m_scriptHandle + 7) != 0);
+			}
+			if (!hasValidTarget) {
+				m_targetPartyIndex = -1;
+				prgObj->changeStat(0, 0, 0);
+			}
 		}
-		if (!hasValidTarget) {
-			m_targetPartyIndex = -1;
-			prgObj->changeStat(0, 0, 0);
-		}
+		break;
 	}
 
 	(this->*m_funcs->frameStat)();
@@ -1098,6 +1104,7 @@ void CGMonObj::onFrameStat()
 	}
 
 	CGCharaObj::onFrameStat();
+#undef state
 }
 
 /*

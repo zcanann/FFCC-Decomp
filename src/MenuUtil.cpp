@@ -1219,26 +1219,40 @@ void CMenuPcs::DrawOptionMenu()
 
 		const double optionScale = ((Game.m_gameWork.m_languageId == 4) || (Game.m_gameWork.m_languageId == 5)) ?
 		                           DOUBLE_803335B8 : DOUBLE_803335C0;
-		float firstScale = static_cast<float>(optionScale);
-		float secondScale = static_cast<float>(optionScale);
-		float firstY = secondValue ? FLOAT_803335A4 : FLOAT_803335A4 - FLOAT_803335A0;
-		float secondY = secondValue ? FLOAT_803335A4 - FLOAT_803335A0 : FLOAT_803335A4;
-		int firstTlut = secondValue ? 6 : 0x17;
-		int secondTlut = secondValue ? 0x17 : 6;
+		float scale = static_cast<float>(optionScale);
 
-		font->SetMargin(kOptionAnimMax);
-		font->SetShadow(1);
-		font->SetScale(firstScale);
-		DrawFont2(static_cast<int>(selectorX + (FLOAT_803335B0 - font->GetWidth(firstText)) * kMenuCenteringHalfWidth),
-		          static_cast<int>(firstY), color, firstTlut, firstText, firstScale, kOptionAnimMax,
-		          kOptionAnimMax);
-		font->SetMargin(kOptionAnimMax);
-		font->SetShadow(1);
-		font->SetScale(secondScale);
-		DrawFont2(static_cast<int>(selectorX + secondOffset + (FLOAT_803335B0 - font->GetWidth(secondText)) *
-		                                                  kMenuCenteringHalfWidth),
-		          static_cast<int>(secondY), color, secondTlut, secondText, secondScale, kOptionAnimMax,
-		          kOptionAnimMax);
+		if (!secondValue) {
+			float firstScale = kOptionAnimMax * scale;
+			font->SetMargin(kOptionAnimMax);
+			font->SetShadow(1);
+			font->SetScale(firstScale);
+			DrawFont2(static_cast<int>(selectorX +
+			                           (FLOAT_803335B0 - font->GetWidth(firstText)) * kMenuCenteringHalfWidth),
+			          static_cast<int>(FLOAT_803335A4 - FLOAT_803335A0), color, 0x17, firstText, firstScale,
+			          kOptionAnimMax, kOptionAnimMax);
+			font->SetMargin(kOptionAnimMax);
+			font->SetShadow(1);
+			font->SetScale(scale);
+			DrawFont2(static_cast<int>(selectorX + secondOffset +
+			                           (FLOAT_803335B0 - font->GetWidth(secondText)) * kMenuCenteringHalfWidth),
+			          static_cast<int>(FLOAT_803335A4), color, 6, secondText, scale, kOptionAnimMax,
+			          kOptionAnimMax);
+		} else {
+			font->SetMargin(kOptionAnimMax);
+			font->SetShadow(1);
+			font->SetScale(scale);
+			DrawFont2(static_cast<int>(selectorX +
+			                           (FLOAT_803335B0 - font->GetWidth(firstText)) * kMenuCenteringHalfWidth),
+			          static_cast<int>(FLOAT_803335A4), color, 6, firstText, scale, kOptionAnimMax,
+			          kOptionAnimMax);
+			font->SetMargin(kOptionAnimMax);
+			font->SetShadow(1);
+			font->SetScale(scale);
+			DrawFont2(static_cast<int>(selectorX + secondOffset +
+			                           (FLOAT_803335B0 - font->GetWidth(secondText)) * kMenuCenteringHalfWidth),
+			          static_cast<int>(FLOAT_803335A4 - FLOAT_803335A0), color, 0x17, secondText, scale,
+			          kOptionAnimMax, kOptionAnimMax);
+		}
 		break;
 	}
 	case 1: {
@@ -1278,26 +1292,40 @@ void CMenuPcs::DrawOptionMenu()
 
 		const double optionScale = ((Game.m_gameWork.m_languageId == 4) || (Game.m_gameWork.m_languageId == 5)) ?
 		                           DOUBLE_803335B8 : DOUBLE_803335C0;
-		float firstScale = static_cast<float>(optionScale);
-		float secondScale = static_cast<float>(optionScale);
-		float firstY = secondValue ? FLOAT_803335A4 : FLOAT_803335A4 - FLOAT_803335A0;
-		float secondY = secondValue ? FLOAT_803335A4 - FLOAT_803335A0 : FLOAT_803335A4;
-		int firstTlut = secondValue ? 6 : 0x17;
-		int secondTlut = secondValue ? 0x17 : 6;
+		float scale = static_cast<float>(optionScale);
 
-		font->SetMargin(kOptionAnimMax);
-		font->SetShadow(1);
-		font->SetScale(firstScale);
-		DrawFont2(static_cast<int>(selectorX + (FLOAT_803335B0 - font->GetWidth(firstText)) * kMenuCenteringHalfWidth),
-		          static_cast<int>(firstY), color, firstTlut, firstText, firstScale, kOptionAnimMax,
-		          kOptionAnimMax);
-		font->SetMargin(kOptionAnimMax);
-		font->SetShadow(1);
-		font->SetScale(secondScale);
-		DrawFont2(static_cast<int>(selectorX + secondOffset + (FLOAT_803335B0 - font->GetWidth(secondText)) *
-		                                                  kMenuCenteringHalfWidth),
-		          static_cast<int>(secondY), color, secondTlut, secondText, secondScale, kOptionAnimMax,
-		          kOptionAnimMax);
+		if (!secondValue) {
+			float firstScale = kOptionAnimMax * scale;
+			font->SetMargin(kOptionAnimMax);
+			font->SetShadow(1);
+			font->SetScale(firstScale);
+			DrawFont2(static_cast<int>(selectorX +
+			                           (FLOAT_803335B0 - font->GetWidth(firstText)) * kMenuCenteringHalfWidth),
+			          static_cast<int>(FLOAT_803335A4 - FLOAT_803335A0), color, 0x17, firstText, firstScale,
+			          kOptionAnimMax, kOptionAnimMax);
+			font->SetMargin(kOptionAnimMax);
+			font->SetShadow(1);
+			font->SetScale(scale);
+			DrawFont2(static_cast<int>(selectorX + secondOffset +
+			                           (FLOAT_803335B0 - font->GetWidth(secondText)) * kMenuCenteringHalfWidth),
+			          static_cast<int>(FLOAT_803335A4), color, 6, secondText, scale, kOptionAnimMax,
+			          kOptionAnimMax);
+		} else {
+			font->SetMargin(kOptionAnimMax);
+			font->SetShadow(1);
+			font->SetScale(scale);
+			DrawFont2(static_cast<int>(selectorX +
+			                           (FLOAT_803335B0 - font->GetWidth(firstText)) * kMenuCenteringHalfWidth),
+			          static_cast<int>(FLOAT_803335A4), color, 6, firstText, scale, kOptionAnimMax,
+			          kOptionAnimMax);
+			font->SetMargin(kOptionAnimMax);
+			font->SetShadow(1);
+			font->SetScale(scale);
+			DrawFont2(static_cast<int>(selectorX + secondOffset +
+			                           (FLOAT_803335B0 - font->GetWidth(secondText)) * kMenuCenteringHalfWidth),
+			          static_cast<int>(FLOAT_803335A4 - FLOAT_803335A0), color, 0x17, secondText, scale,
+			          kOptionAnimMax, kOptionAnimMax);
+		}
 		break;
 	}
 	case 2: {

@@ -1199,6 +1199,11 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		}
+		case -0x45:
+			engineObject->SetTexAnim(RuntimeString(this, object->m_localBase[0]));
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
 		case -0x46:
 			engineObject->LookAt(object->m_localBase[0] != 0 ? FindRuntimeObject(this, object->m_localBase[0]) : 0, 0);
 			PushValue(this, object, 0);

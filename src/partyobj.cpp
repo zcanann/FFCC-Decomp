@@ -999,9 +999,6 @@ void CGPartyObj::onFramePostCalc()
  */
 void CGPartyObj::command()
 {
-	if (m_scriptHandle == nullptr) {
-		return;
-	}
 	if (isMenuPcsCommandBusy()) {
 		return;
 	}
@@ -1009,14 +1006,17 @@ void CGPartyObj::command()
 	PartyObjOverlay& party = PartyData(this);
 	CCaravanWork* caravan = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
 	const int padSlot = static_cast<unsigned char>(m_animStateMisc);
-	const unsigned short trig = getPadTrigForSlot(padSlot);
-	const unsigned short held = getPadHeldForSlot(padSlot);
 	bool primaryAvailable = false;
 	bool secondaryAvailable = false;
 	int primaryCommand = -1;
 	int secondaryCommand = -1;
 	int ringCommand = -1;
 	int ringCommandArg = -1;
+
+	if (static_cast<signed char>(party.partyFlags) >= 0) {
+
+	const unsigned short trig = getPadTrigForSlot(padSlot);
+	const unsigned short held = getPadHeldForSlot(padSlot);
 
 	if ((*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) &&
 	    ((party.commandMode & 1) != 0) &&
@@ -1170,11 +1170,14 @@ void CGPartyObj::command()
 	ring->SetBattleCommand(1, secondaryCommand, -1);
 	ring->SetBattleCommand(2, ringCommand, ringCommandArg);
 
+	}
+
 	if (Game.m_gameWork.m_menuStageMode != 0 &&
 	    Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag != 0) {
 		return;
 	}
 
+	const unsigned short trig = getPadTrigForSlot(padSlot);
 	if ((trig & 0x100) != 0) {
 		if (primaryAvailable) {
 			if (primaryCommand == 0x1B) {

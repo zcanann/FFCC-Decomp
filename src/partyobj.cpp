@@ -2651,7 +2651,7 @@ void CGPartyObj::checkTargetParticle()
 	    (Game.m_gameWork.m_bossArtifactStageIndex >= 0x0F) ||
 	    ((static_cast<unsigned short>(GetCID()) & 0x6D) != 0x6D) ||
 	    (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) == 0)) {
-		if ((MiniGamePcs.m_flags & 0x100) != 0) {
+		if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x100) != 0) {
 			input.x -= getPadLeftStickXForSlot(static_cast<unsigned char>(m_animStateMisc));
 			input.z += getPadLeftStickYForSlot(static_cast<unsigned char>(m_animStateMisc));
 		}

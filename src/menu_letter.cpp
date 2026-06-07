@@ -737,19 +737,7 @@ int CMenuPcs::LetterCtrl()
 				s16 winW;
 				s16 winH;
 				CCaravanWork::CLetterWork* letter = &GetLetterCaravanWork()->m_letters[s_SelLetter];
-				if (!letter->AttachmentIsGil()) {
-					int itemId = letter->AttachmentValue() * 5 + 4;
-					char* value = GetLetterItemName(itemId);
-					if (Game.m_gameWork.m_languageId == 2) {
-						sprintf(info, s_letterItemInfoFmt,
-						        GetMenuStr(0x23),
-						        value,
-						        GetMenuStr(0x24),
-						        GetMenuStr(0x22));
-					} else {
-						sprintf(info, "%s%s", GetMenuStr(0x22), value);
-					}
-				} else {
+				if (letter->AttachmentIsGil()) {
 					s16 gil = static_cast<int>(letter->AttachmentValue()) * 100;
 					if (Game.m_gameWork.m_languageId == 2) {
 						sprintf(info, "%d%s%s",
@@ -761,6 +749,18 @@ int CMenuPcs::LetterCtrl()
 						        GetMenuStr(0x22),
 						        gil,
 						        GetMenuStr(4));
+					}
+				} else {
+					int itemId = letter->AttachmentValue() * 5 + 4;
+					char* value = GetLetterItemName(itemId);
+					if (Game.m_gameWork.m_languageId == 2) {
+						sprintf(info, s_letterItemInfoFmt,
+						        GetMenuStr(0x23),
+						        value,
+						        GetMenuStr(0x24),
+						        GetMenuStr(0x22));
+					} else {
+						sprintf(info, "%s%s", GetMenuStr(0x22), value);
 					}
 				}
 				strcpy(left, "");

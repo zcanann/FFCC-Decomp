@@ -31,15 +31,15 @@ static CProcessTableCallback s_miniGameTableDescDestroy = {0, 0xFFFFFFFF,
                                                            reinterpret_cast<unsigned int>(destroy__12CMiniGamePcsFv)};
 static CProcessTableCallback s_miniGameTableDescCalc = {0, 0xFFFFFFFF,
                                                         reinterpret_cast<unsigned int>(calc__12CMiniGamePcsFv)};
-extern const char s_miniGameDvdGbaDir[] = "dvd/gba/";
-extern const char s_miniGameClientFile[] = "ffcc_cli.bin";
-extern const char s_miniGameObjFile[] = "objdat.spt";
-extern const char s_CMiniGamePcs_GAME_801DD098[] = "CMiniGamePcs(GAME)";
-extern const char s_CMiniGamePcs_801DD0AC[] = "CMiniGamePcs";
-extern const char s_CManager_801DD0BC[] = "CManager";
-extern const char s_CProcess_801DD0C8[] = "CProcess";
+extern const char sMiniGameGbaDvdDir[] = "dvd/gba/";
+extern const char sMiniGameClientBinaryName[] = "ffcc_cli.bin";
+extern const char sMiniGameObjDataScriptName[] = "objdat.spt";
+extern const char sMiniGamePcsGameProcessName[] = "CMiniGamePcs(GAME)";
+extern const char sMiniGamePcsProcessName[] = "CMiniGamePcs";
+extern const char sMiniGameManagerClassName[] = "CManager";
+extern const char sMiniGameProcessClassName[] = "CProcess";
 CProcessTable CMiniGamePcs::m_table = {
-    const_cast<char*>(s_CMiniGamePcs_GAME_801DD098),
+    const_cast<char*>(sMiniGamePcsGameProcessName),
     {
         s_miniGameTableDescCreate.m_thisOffset,
         s_miniGameTableDescCreate.m_virtualOffset,

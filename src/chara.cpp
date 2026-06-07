@@ -2127,7 +2127,7 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 		return;
 	}
 
-	const unsigned int cullFlag = static_cast<unsigned int>(flags) & 1;
+	const int cullFlag = flags & 1;
 	BeforeDrawModelCallback beforeDrawModel = ModelBeforeDrawCallback(this);
 	if (beforeDrawModel != 0 && pass == 0) {
 		beforeDrawModel(this, ModelCbUser0(this), ModelCbUser1(this), view, cullFlag);
@@ -2166,23 +2166,23 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 		InitCharaMaterialState();
 
 		Mtx meshMtx;
-		if (mesh->m_data->m_skinCount == 0) {
-			PSMTXConcat(ModelDrawMtx(this), ModelNodes(this)[mesh->m_data->m_nodeIndex].m_mtx, meshMtx);
-		} else {
+		if (mesh->m_data->m_skinCount != 0) {
 			PSMTXCopy(ModelDrawMtx(this), meshMtx);
+		} else {
+			PSMTXConcat(ModelDrawMtx(this), ModelNodes(this)[mesh->m_data->m_nodeIndex].m_mtx, meshMtx);
 		}
 
-		if (((cullFlag == 0) && (((flags >> 1) & 1) == 0)) || ((cullFlag != 0) && (((flags >> 3) & 1) != 0))) {
+		if (((cullFlag == 0) && (((flags >> 1) & 1) != 1)) || ((cullFlag != 0) && (((flags >> 3) & 1) != 0))) {
 			CameraPcs.SetFullScreenShadow(meshMtx, 0);
 		}
 
-		if (((flags >> 4) & 1) == 0) {
+		if (((flags >> 4) & 1) != 1) {
 			Vec position;
 			position.x = ModelDrawMtx(this)[0][3];
 			position.y = ModelDrawMtx(this)[1][3];
 			position.z = ModelDrawMtx(this)[2][3];
 			MaterialMan.SetPosition(static_cast<CMapShadow::TARGET>(0), &position, FLOAT_803301c8, FLOAT_803301cc, meshMtx,
-			                        (ModelFlagsA0(this) & 0x80) != 0);
+			                        static_cast<int>(static_cast<u32>(ModelFlagsA0(this)) << 24) >> 31);
 		}
 
 		const int lightEnable = (mesh->m_data->m_flags & 0x80) == 0;
@@ -2214,11 +2214,11 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 
 		CCharaDisplayListRaw* displayList = mesh->m_data->m_displayLists;
 		for (int displayListIndex = static_cast<int>(mesh->m_data->m_displayListCount) - 1; displayListIndex >= 0; displayListIndex--, displayList++) {
-			if (ModelAfterMeshDrawCallback(this) == 0) {
+			if (ModelAfterMeshDrawCallback(this) != 0) {
+				ModelAfterMeshDrawCallback(this)(this, ModelCbUser0(this), ModelCbUser1(this), meshIndex, static_cast<unsigned int>(displayListIndex), meshMtx);
+			} else {
 				MaterialMan.SetMaterial(ModelMaterialSet(this), displayList->m_material, (flags >> 2) & 1, (_GXTevScale)0);
 				GXCallDisplayList(displayList->m_data, displayList->m_size);
-			} else {
-				ModelAfterMeshDrawCallback(this)(this, ModelCbUser0(this), ModelCbUser1(this), meshIndex, static_cast<unsigned int>(displayListIndex), meshMtx);
 			}
 		}
 

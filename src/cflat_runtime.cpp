@@ -1882,18 +1882,16 @@ frameLoop:
 			unsigned int* sp = object->m_sp;
 			--object->m_sp;
 			float* value = reinterpret_cast<float*>(sp[-2]);
-			float delta = *reinterpret_cast<float*>(&sp[-1]);
-			sp[-2] = *reinterpret_cast<unsigned int*>(value);
-			*value += delta;
+			*reinterpret_cast<float*>(&sp[-2]) = *value;
+			*value = *value + *reinterpret_cast<float*>(&sp[-1]);
 			break;
 		}
 		case 0x12: {
 			unsigned int* sp = object->m_sp;
 			--object->m_sp;
 			float* value = reinterpret_cast<float*>(sp[-2]);
-			float delta = *reinterpret_cast<float*>(&sp[-1]);
-			sp[-2] = *reinterpret_cast<unsigned int*>(value);
-			*value -= delta;
+			*reinterpret_cast<float*>(&sp[-2]) = *value;
+			*value = *value - *reinterpret_cast<float*>(&sp[-1]);
 			break;
 		}
 		case 0x13:

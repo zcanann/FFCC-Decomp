@@ -8,7 +8,7 @@
 #include "ffcc/ppp_linkage.h"
 
 extern const float kPppKeShpTail2XZero = 0.0f;
-extern const float FLOAT_803304F0[2];
+extern const float kPppRyjMegaBirthModelZeroPair[2];
 
 STATIC_ASSERT(offsetof(PDrawMdlTs, m_graphId) == 0x00);
 STATIC_ASSERT(offsetof(PDrawMdlTs, m_modelIndex) == 0x04);
@@ -48,7 +48,7 @@ static inline pppCVECTOR* PppDrawMdlTsColor(_pppPObject* obj, _pppCtrlTable* ctr
 void pppDrawMdlTsCon(_pppPObject* obj, _pppCtrlTable* ctrl)
 {
     f32* texCoords = PppDrawMdlTsTexCoords(obj, ctrl);
-    f32 zero = FLOAT_803304F0[0];
+    f32 zero = kPppRyjMegaBirthModelZeroPair[0];
 
     texCoords[5] = zero;
     texCoords[4] = zero;
@@ -66,7 +66,7 @@ void pppDrawMdlTsCon(_pppPObject* obj, _pppCtrlTable* ctrl)
 void pppDrawMdlTsCon3(_pppPObject* obj, _pppCtrlTable* ctrl)
 {
     f32* texCoords = PppDrawMdlTsTexCoords(obj, ctrl);
-    f32 zero = FLOAT_803304F0[0];
+    f32 zero = kPppRyjMegaBirthModelZeroPair[0];
 
     texCoords[5] = zero;
     texCoords[2] = zero;
@@ -126,7 +126,8 @@ inline void pppDrawDrawMdlTs0(_pppPObject* obj, PDrawMdlTs* data, _pppCtrlTable*
         data->m_drawG);
 
     f32* texCoords = PppDrawMdlTsTexCoords(obj, ctrl);
-    MaterialMan.SetTexScroll(texCoords[0], texCoords[3], FLOAT_803304F0[0], FLOAT_803304F0[0]);
+    MaterialMan.SetTexScroll(
+        texCoords[0], texCoords[3], kPppRyjMegaBirthModelZeroPair[0], kPppRyjMegaBirthModelZeroPair[0]);
 
     pppSetBlendMode(data->m_blendMode);
 
@@ -157,7 +158,8 @@ void pppDrawDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct _
         data->m_drawG);
 
     f32* texCoords = PppDrawMdlTsTexCoords(obj, ctrl);
-    MaterialMan.SetTexScroll(texCoords[0], texCoords[3], FLOAT_803304F0[0], FLOAT_803304F0[0]);
+    MaterialMan.SetTexScroll(
+        texCoords[0], texCoords[3], kPppRyjMegaBirthModelZeroPair[0], kPppRyjMegaBirthModelZeroPair[0]);
 
     pppSetBlendMode(data->m_blendMode);
 

@@ -3612,7 +3612,7 @@ int CGPartyObj::useItem(int itemId)
 	if (!canUse) {
 		result = 0;
 	} else {
-		unsigned short itemKind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48);
+		int itemKind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48);
 		if (((itemId == 0x17D) || (itemId == 0x186)) &&
 		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0)) {
 			result = 0;

@@ -8684,18 +8684,21 @@ void CMenuPcs::DrawCMLife()
 
 		const int row = slot / 4;
 		const int col = slot - row * 4;
-		float y = FLOAT_80331478 + static_cast<float>(row * 0xB8);
+		const double yRaw = static_cast<double>(FLOAT_80331478 + static_cast<float>(row * 0xB8));
+		const double xBaseD = static_cast<double>(FLOAT_80331410 + static_cast<float>(col * 0x90));
+		double y = yRaw;
 		if (row != 0) {
-			y += FLOAT_80331548;
+			y = static_cast<double>(static_cast<float>(yRaw + static_cast<double>(FLOAT_80331548)));
 		}
-		const float xBase = FLOAT_80331410 + static_cast<float>(col * 0x90);
-		const float yBase = y + FLOAT_8033166C;
-		float x = static_cast<float>(static_cast<double>(0x90 - count * 0x10) * DOUBLE_803313f8 + static_cast<double>(xBase));
-		float step = static_cast<float>(static_cast<double>(8 - count) * DOUBLE_803313f8);
+		const double yBase = static_cast<double>(static_cast<float>(y + static_cast<double>(FLOAT_8033166C)));
+		double x = static_cast<double>(0x90 - count * 0x10) * DOUBLE_803313f8 + xBaseD;
+		double step = static_cast<double>(8 - count) * DOUBLE_803313f8;
 
 		for (int i = 0; i < count; i++) {
+			x = static_cast<double>(static_cast<float>(x));
+			step = static_cast<double>(static_cast<float>(step));
 			float yAdd = FLOAT_803313dc;
-			const float t = step / FLOAT_803314c0;
+			const float t = static_cast<float>(step / static_cast<double>(FLOAT_803314c0));
 			if (t < gWmLifeYOffsetSpline[gWmLifeYOffsetSplineCount * 4 - 4]) {
 				for (int j = 0; j < gWmLifeYOffsetSplineCount; j++) {
 					if (t <= gWmLifeYOffsetSpline[j * 4]) {
@@ -8721,36 +8724,35 @@ void CMenuPcs::DrawCMLife()
 			}
 
 			MenuPcs.DrawRect(
-			    0, x, yBase + yAdd, FLOAT_80331558, FLOAT_80331558,
+			    0, static_cast<float>(x), static_cast<float>(yBase + static_cast<double>(yAdd)), FLOAT_80331558, FLOAT_80331558,
 			                                FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
-			step += static_cast<float>(DOUBLE_80331420);
-			x += FLOAT_80331558;
+			step += DOUBLE_80331420;
+			x += static_cast<double>(FLOAT_80331558);
 		}
 
+		char flagA;
+		char flagB;
 		if (m_cmakeWorkActive == 1 && m_cmakeWork != 0) {
 			const unsigned char* const work = m_cmakeWork + slot * 0x9C0;
-			const char flagA = work[0x1D90];
-			const char flagB = work[0x1D91];
-			if (flagA != 0 || flagB != 0) {
-				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x38));
-				MenuPcs.DrawRect(
-				    0, xBase + static_cast<float>(DOUBLE_80331670),
-				                                y + static_cast<float>(DOUBLE_803315C0), FLOAT_80331524,
-				                                FLOAT_80331440, FLOAT_803313dc,
-				                                flagA != 0 ? FLOAT_803313dc : FLOAT_80331440,
-				                                FLOAT_803313e8, FLOAT_803313e8, 0.0f);
-			}
+			flagA = work[0x1D90];
+			flagB = work[0x1D91];
 		} else {
 			const CCaravanWork& caravanWork = Game.m_caravanWorkArr[slot];
-			if (caravanWork.m_shopBusyFlag != 0 || caravanWork.m_caravanLocalFlags != 0) {
-				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x38));
-				MenuPcs.DrawRect(
-				    0, xBase + static_cast<float>(DOUBLE_80331670),
-				                                y + static_cast<float>(DOUBLE_803315C0), FLOAT_80331524,
-				                                FLOAT_80331440, FLOAT_803313dc,
-				                                caravanWork.m_shopBusyFlag != 0 ? FLOAT_803313dc : FLOAT_80331440,
-				                                FLOAT_803313e8, FLOAT_803313e8, 0.0f);
+			flagA = static_cast<char>(caravanWork.m_shopBusyFlag);
+			flagB = static_cast<char>(caravanWork.m_caravanLocalFlags);
+		}
+		if (flagA != 0 || flagB != 0) {
+			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x38));
+			double flagY = yRaw;
+			if (row != 0) {
+				flagY = static_cast<double>(static_cast<float>(yRaw + static_cast<double>(FLOAT_80331548)));
 			}
+			MenuPcs.DrawRect(
+			    0, static_cast<float>(xBaseD + DOUBLE_80331670),
+			                                static_cast<float>(flagY + DOUBLE_803315C0), FLOAT_80331524,
+			                                FLOAT_80331440, FLOAT_803313dc,
+			                                flagA != 0 ? FLOAT_803313dc : FLOAT_80331440,
+			                                FLOAT_803313e8, FLOAT_803313e8, 0.0f);
 		}
 	}
 }

@@ -2355,10 +2355,7 @@ void CPartMng::pppEditPartCalc()
             mng->m_baseTime = baseTime;
             if (baseTime < 0) {
                 mng->m_particleEnded = 0;
-                mng->m_envColorR = *reinterpret_cast<unsigned char*>(self + 0x158);
-                mng->m_envColorG = *reinterpret_cast<unsigned char*>(self + 0x159);
-                mng->m_envColorB = *reinterpret_cast<unsigned char*>(self + 0x15A);
-                mng->m_envColorA = *reinterpret_cast<unsigned char*>(self + 0x15B);
+                *reinterpret_cast<int*>(&mng->m_envColorR) = *reinterpret_cast<int*>(self + 0x168);
                 _pppStartPart(mng, reinterpret_cast<long*>(pdtSlots[0].m_pppDataHead), 1);
             }
         }

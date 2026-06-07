@@ -2852,7 +2852,8 @@ void CGPartyObj::moveCenterTargetParticle()
  */
 void CGPartyObj::onStatMagic()
 {
-	if (m_subState == 1) {
+	switch (m_subState) {
+	case 1:
 		if (m_comboState == 0 && m_subFrame > m_unk68C) {
 			putTargetParticle(0, 1);
 			m_comboState = 1;
@@ -2860,12 +2861,14 @@ void CGPartyObj::onStatMagic()
 		if (m_comboState != 0) {
 			checkTargetParticle();
 		}
-	} else if (m_subState < 1) {
-		if (m_subState >= 0 && m_subFrame == 0 && m_itemId != 0x103) {
+		break;
+	case 0:
+		if (m_subFrame == 0 && m_itemId != 0x103) {
 			putParticleFromItem(m_itemId, 0, m_particleSlots[3], &m_worldPosition);
 			putParticleFromItem(m_itemId, 1, m_particleSlots[3], static_cast<Vec*>(0));
 		}
-	} else if (m_subState < 3) {
+		break;
+	case 2:
 		if (m_subFrame == 0) {
 			reqAnim(0x19, 0, 0);
 			if (m_itemId == 0x103) {
@@ -2901,6 +2904,7 @@ void CGPartyObj::onStatMagic()
 			changeStat(0, 0, 0);
 			return;
 		}
+		break;
 	}
 
 	if (m_subState >= 2) {

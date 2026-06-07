@@ -1903,7 +1903,7 @@ void CGPartyObj::statCharge()
 		if (m_subFrame == 0) {
 			reqAnim(m_unk554, 1, 0);
 		}
-		if (m_comboState == 0 && m_comboFramePrev < m_subFrame) {
+		if (m_comboState == 0 && m_unk68C < m_subFrame) {
 			putTargetParticle(0, 1);
 			m_comboState = 1;
 		}
@@ -1911,15 +1911,15 @@ void CGPartyObj::statCharge()
 			checkTargetParticle();
 		}
 		if (m_itemId == 0x206) {
-			int frame = m_comboFramePrev;
-			int counter = m_comboState;
-			if (counter == frame * 3) {
+			int window = m_unk68C;
+			int counter = m_comboFramePrev;
+			if (counter == window * 3) {
 				putParticle(0x578, 0, reinterpret_cast<CGObject*>(this), FLOAT_80331a54, 0x80D);
-			} else if (counter == frame << 1) {
+			} else if (counter == window << 1) {
 				putParticle(0x577, 0, reinterpret_cast<CGObject*>(this), FLOAT_80331a54, 0x80D);
 			}
 		}
-		m_comboState++;
+		m_comboFramePrev++;
 	} else if (m_subState < 1) {
 		if (m_subState >= 0) {
 			if (m_subFrame == 0) {
@@ -1933,8 +1933,6 @@ void CGPartyObj::statCharge()
 			}
 		}
 	} else if (m_subState < 3) {
-		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
-
 		if (m_subFrame == 0) {
 			endPSlotBit(8);
 			enableAttackCol(0x18, 0, 0);
@@ -1942,7 +1940,7 @@ void CGPartyObj::statCharge()
 		if (m_subFrame == 5 && m_comboItemState >= 0) {
 			endPSlotBit(0x20);
 			gCFlatRuntime2.ResetParticleWork(
-			    (m_comboItemState + *reinterpret_cast<unsigned short*>(script + 0x3E0) * 5 + 0x1C) | 0x400,
+			    (m_comboItemState + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 5 + 0x1C) | 0x400,
 			    m_particleSlots[5]);
 			gCFlatRuntime2.SetParticleWorkBind(reinterpret_cast<CFlatRuntime::CObject*>(this));
 			gCFlatRuntime2.PutParticleWork();
@@ -1965,16 +1963,16 @@ void CGPartyObj::statCharge()
 			endPSlotBit(0x10);
 			int item = m_itemId;
 			if (item == 0x1FC || item == 0x23D) {
-				int base = 0;
+				int base;
 				if (item == 0x23D) {
 					base = 0x6F;
 				} else if (item < 0x23D && item == 0x1FC) {
 					base = 0x1B;
 				}
-				if (*reinterpret_cast<unsigned short*>(script + 0x1C) > 1) {
+				if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) > 1) {
 					addHp(-1, static_cast<CGPrgObj*>(0));
 				}
-				putParticle((base + *reinterpret_cast<unsigned short*>(script + 0x3E2)) | 0x500, 0,
+				putParticle((base + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2)) | 0x500, 0,
 				    reinterpret_cast<CGObject*>(this), FLOAT_80331a54, 0);
 			}
 		}
@@ -1983,8 +1981,8 @@ void CGPartyObj::statCharge()
 			putParticleFromItem(m_itemId, 3, m_particleSlots[0], static_cast<Vec*>(0));
 		}
 
-		int entry = (*reinterpret_cast<unsigned short*>(script + 0x3E2) +
-		             *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2) * 0x1CA;
+		int entry = (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
+		             *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2) * 0x1CA;
 		int row = (static_cast<int>(*reinterpret_cast<unsigned short*>(
 		               Game.unkCFlatData0[2] + m_itemId * 0x48 + 10)) >> 8) * 0x42;
 		unsigned short* table =
@@ -2000,13 +1998,13 @@ void CGPartyObj::statCharge()
 					float mag = PSVECMag(&delta);
 					CVector dest(m_comboCenter);
 					if ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 0x32) & 0x10) != 0) {
-						float limit = static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x70));
-						if (mag <= limit) {
+						unsigned int maxReach = *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x70);
+						if (mag <= static_cast<float>(maxReach)) {
 							mag = FLOAT_80331a78;
 						} else {
 							CVector dir(delta);
 							CVector scaled;
-							PSVECScale(dir, scaled, mag - limit);
+							PSVECScale(dir, scaled, mag - static_cast<float>(maxReach));
 							CVector unit;
 							PSVECScale(scaled, unit, FLOAT_80331a54 / mag);
 							CVector origin(m_worldPosition);

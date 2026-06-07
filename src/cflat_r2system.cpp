@@ -1782,20 +1782,20 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             refPosition.x = reinterpret_cast<float*>(object->m_localBase)[0];
             refPosition.y = reinterpret_cast<float*>(object->m_localBase)[1];
             refPosition.z = reinterpret_cast<float*>(object->m_localBase)[2];
-            if (m_cameraScriptTargetMode == 0) {
-                CameraPcs.SetRefPosition(&refPosition);
-            } else {
+            if (m_cameraScriptTargetMode != 0) {
                 CharaPcs.m_overlapTargetPos = refPosition;
+            } else {
+                CameraPcs.SetRefPosition(&refPosition);
             }
 
             Vec position;
             position.x = reinterpret_cast<float*>(object->m_localBase)[3];
             position.y = reinterpret_cast<float*>(object->m_localBase)[4];
             position.z = reinterpret_cast<float*>(object->m_localBase)[5];
-            if (m_cameraScriptTargetMode == 0) {
-                CameraPcs.SetPosition(&position);
-            } else {
+            if (m_cameraScriptTargetMode != 0) {
                 CharaPcs.m_overlapEyePos = position;
+            } else {
+                CameraPcs.SetPosition(&position);
             }
             CameraPcs.SetFromScript();
         }

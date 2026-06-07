@@ -1128,16 +1128,7 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
                     IncNumTevStage();
                     addtev_bump_jimen(tevScale);
 
-                    if ((tevBit & 2) == 0) {
-                        if (m_vtxDescMode != 0) {
-                            GXClearVtxDesc();
-                            GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
-                            GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
-                            GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
-                            GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
-                            m_vtxDescMode = 0;
-                        }
-                    } else {
+                    if ((tevBit & 2) != 0) {
                         if (m_vtxDescMode != 2) {
                             GXClearVtxDesc();
                             GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
@@ -1170,6 +1161,15 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
                         _GXSetTevAlphaOp(m_numTevStage, 0, 0, 0, 1, 0);
                         _GXSetTevSwapMode(m_numTevStage, 0, 0);
                         IncNumTevStage();
+                    } else {
+                        if (m_vtxDescMode != 0) {
+                            GXClearVtxDesc();
+                            GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
+                            GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
+                            GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
+                            GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
+                            m_vtxDescMode = 0;
+                        }
                     }
                 } else {
                     if (m_vtxDescMode != 2) {

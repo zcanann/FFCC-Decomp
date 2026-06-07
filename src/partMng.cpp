@@ -3647,7 +3647,7 @@ int CPartMng::pppLoadPtx(const char* baseName, int pdtSlotIndex, int appendMode,
         System.Printf(const_cast<char*>(s_ReadPtxLogFormat), path);
     }
 
-    unsigned long fileSize = 0;
+    unsigned long fileSize;
     void* fileData = pppFileRead(path, fileSize, readBuffer, readBufferSize);
     if (fileData == 0) {
         if (static_cast<unsigned int>(System.m_execParam) >= 1U) {
@@ -3725,7 +3725,7 @@ void CPartMng::pppLoadPmd(CChunkFile&)
 void CPartMng::pppLoadPmd(const char* baseName)
 {
     char* path = g_StrTmp;
-    unsigned long fileSize = 0;
+    unsigned long fileSize;
 
     sprintf(path, lbl_8032FE30, baseName);
     if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
@@ -3839,7 +3839,7 @@ void CPartMng::pppLoadPan(CChunkFile&)
 void CPartMng::pppLoadPan(const char* baseName)
 {
     char* path = g_StrTmp;
-    unsigned long fileSize = 0;
+    unsigned long fileSize;
 
     sprintf(path, lbl_8032FE28, baseName);
     if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
@@ -3942,7 +3942,7 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
         System.Printf(const_cast<char*>(s_ReadPdtLogFormat), pdtPath);
     }
 
-    unsigned long pdtSize = 0;
+    unsigned long pdtSize;
     void* pdtData = pppFileRead(pdtPath, pdtSize, readBuffer, readBufferSize);
     if (pdtData == 0) {
         pdtSlot->m_pppDataHead = 0;

@@ -410,17 +410,17 @@ void CGMonObj::onStatAttack(int state)
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	unsigned char* attackBase = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]);
 	unsigned char* attackData = attackBase + *reinterpret_cast<int*>(mon + 0x560) * 0x48;
+	short attackType = *reinterpret_cast<short*>(attackData + 0xE);
 	unsigned short attackFlags = *reinterpret_cast<unsigned short*>(attackData + 0x32);
-	int targetPartyIndex = m_targetPartyIndex;
 
 	if (state == 0) {
-		if ((prgObj->m_stateFrame == 0) && (-1 < targetPartyIndex)) {
-			CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
+		if ((prgObj->m_stateFrame == 0) && (m_targetPartyIndex >= 0)) {
+			CGPartyObj* target = Game.m_partyObjArr[m_targetPartyIndex];
 			m_comboCenter = reinterpret_cast<CGObject*>(target)->m_worldPosition;
 
 			if ((attackFlags & 2) == 0) {
 				float rotLimit = 0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x19C));
-				if (-1 < targetPartyIndex) {
+				if (m_targetPartyIndex >= 0) {
 					float targetRot = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(target));
 					if (rotLimit <= 3.1415927f) {
 						float delta = Math.DstRot(targetRot, static_cast<float>(object->m_bgFlags));
@@ -436,13 +436,13 @@ void CGMonObj::onStatAttack(int state)
 				}
 			}
 
-			target = Game.m_partyObjArr[targetPartyIndex];
+			target = Game.m_partyObjArr[m_targetPartyIndex];
 			reinterpret_cast<CGPrgObj*>(target)->bonus(0x17, *reinterpret_cast<int*>(mon + 0x560), reinterpret_cast<CGPrgObj*>(target));
 		}
 		return;
 	}
 
-	if (*reinterpret_cast<short*>(attackData + 0xE) == 3) {
+	if (attackType == 3) {
 		if (prgObj->m_subState == 1) {
 			if (prgObj->m_subFrame == 0) {
 				prgObj->reqAnim(*reinterpret_cast<int*>(mon + 0x554), 1, 0);

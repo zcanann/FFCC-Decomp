@@ -2615,19 +2615,22 @@ int CMenuPcs::CmakeNameCtrl()
             } else if ((down & 0x100) != 0) {
                 short curRow = row;
                 if (curRow >= 5) {
+                    unsigned int emptyLen = strlen(s_CmakeInfo.m_name);
+                    if ((emptyLen & (static_cast<int>(-emptyLen | emptyLen) >> 31)) == 0) {
+                        Sound.PlaySe(4, 0x40, 0x7F, 0);
+                        return 0;
+                    }
+
                     int nameLen = strlen(s_CmakeInfo.m_name);
                     int spaceCount = 0;
                     const char* scan = s_CmakeInfo.m_name;
                     int remain = nameLen;
-                    if (0 < nameLen) {
-                        do {
-                            if (*scan != ' ') {
-                                break;
-                            }
-                            scan = scan + 1;
-                            spaceCount = spaceCount + 1;
-                            remain = remain - 1;
-                        } while (remain != 0);
+                    for (; 0 < remain; remain = remain - 1) {
+                        if (*scan != ' ') {
+                            break;
+                        }
+                        scan = scan + 1;
+                        spaceCount = spaceCount + 1;
                     }
                     if (spaceCount == nameLen) {
                         Sound.PlaySe(4, 0x40, 0x7F, 0);

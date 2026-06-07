@@ -2421,11 +2421,11 @@ void CChara::CNode::Create(CChunkFile& chunk, CChara::CModel* model, CChara::CNo
 {
 	(void)stage;
 	CCharaModelRefRaw* modelRef = model->m_data;
-	u16 idx = modelRef->m_nodeCount;
+	u32 idx = modelRef->m_nodeCount;
 	void* nodeRefBase = modelRef->m_nodeRefData;
 	u8* nodeRef = reinterpret_cast<u8*>((u8*)nodeRefBase + (idx * 0x94));
 	m_refData = reinterpret_cast<CChara::CNode::CRefData*>(nodeRef);
-	m_refData->m_index = idx;
+	m_refData->m_index = static_cast<u16>(idx);
 	m_refData->m_type = static_cast<u8>(type);
 	m_refData->m_dynParamIndex = 0xFF;
 	m_refData->m_bindFlags = 0;

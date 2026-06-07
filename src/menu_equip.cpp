@@ -137,7 +137,7 @@ int CMenuPcs::ChkEquipActive(int index)
  * JP Address: TODO
  * JP Size: TODO
  */
-bool CMenuPcs::EquipClose0()
+int CMenuPcs::EquipClose0()
 {
 	float fVar1;
 	double dVar2;
@@ -196,7 +196,7 @@ bool CMenuPcs::EquipClose0()
  * JP Address: TODO
  * JP Size: TODO
  */
-bool CMenuPcs::EquipOpen0()
+int CMenuPcs::EquipOpen0()
 {
 	float fVar1;
 	double dVar2;

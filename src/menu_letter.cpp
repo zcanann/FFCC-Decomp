@@ -675,7 +675,11 @@ int CMenuPcs::LetterCtrl()
 					}
 				}
 			}
+			int listOpenFinished = 0;
 			if (panelCount == done) {
+				listOpenFinished = 1;
+			}
+			if (listOpenFinished) {
 				*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x34) = s_SelLetter - *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x26);
 				*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = 1;
 			}
@@ -714,7 +718,11 @@ int CMenuPcs::LetterCtrl()
 					}
 				}
 			}
+			int messOpenFinished = 0;
 			if (panelCount == messOpenDone) {
+				messOpenFinished = 1;
+			}
+			if (messOpenFinished) {
 				if (SingGetLetterAttachflg() >= 0) {
 					if (s_AttachMode > 0) {
 						*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x30) = 5;
@@ -837,7 +845,11 @@ int CMenuPcs::LetterCtrl()
 					}
 				}
 			}
+			int uniteFinished = 0;
 			if (panelCount == done) {
+				uniteFinished = 1;
+			}
+			if (uniteFinished) {
 				LetterInit1();
 				*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x30) = 1;
 				*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = 0;
@@ -875,7 +887,11 @@ int CMenuPcs::LetterCtrl()
 						}
 					}
 				}
+				int replyFinished = 0;
 				if (panelCount == done) {
+					replyFinished = 1;
+				}
+				if (replyFinished) {
 					if (s_Attach == 2) {
 						memset(GetLetterAnimStorage(this), 0, 0x1008);
 						float resetAlpha = FLOAT_803330f8;

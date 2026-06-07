@@ -13,8 +13,8 @@
 #include "dolphin/os/OSCache.h"
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 extern "C" {
-extern const float kPppYmMeltZero;
-extern const float FLOAT_80330af4;
+extern const float kPppYmMeltZero = 0.0f;
+extern const float kPppYmMeltPhaseOne = 1.0f;
 extern const float kPppYmMeltHalf = 0.5f;
 extern const float kPppYmMeltDegToRad = 0.017453292f;
 extern const float kPppYmMeltRayLength = -2000.0f;
@@ -150,7 +150,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
         SetUpPaletteEnv(texture);
     }
 
-    phaseLerp = FLOAT_80330af4 - work->m_phase;
+    phaseLerp = kPppYmMeltPhaseOne - work->m_phase;
     drawColor = g_ymMelt;
     drawColorBytes = reinterpret_cast<u8*>(&drawColor);
     drawColorBytes[0] = colorWork->m_color.rgba[0];
@@ -197,7 +197,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
             vtx3.y += worldY;
             vtx2.y += worldY;
 
-            if (FLOAT_80330af4 != work->m_phase) {
+            if (kPppYmMeltPhaseOne != work->m_phase) {
                 vtx0.x += (worldX - vtx0.x) * phaseLerp;
                 vtx0.z += (worldZ - vtx0.z) * phaseLerp;
                 vtx1.x += (worldX - vtx1.x) * phaseLerp;

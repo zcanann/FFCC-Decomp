@@ -204,22 +204,35 @@ STATIC_ASSERT(sizeof(BonusBoardEntryList) == 0x780);
 STATIC_ASSERT(sizeof(BonusEffectSlotBlock) == 0x2920);
 STATIC_ASSERT(sizeof(BonusEffectSlotList) == 0xCDB0);
 
-static inline void InitBonusEffectSlotBlock(BonusEffectSlotBlock* slot)
+static inline void InitBonusEffectSlots(CMenuPcs* menu)
 {
-	unsigned char* slotBase = slot->bytes;
-	static const int s_sentinelOffsets[] = {
-	    0x000, 0x004, 0x008,
-	    0x524, 0x528, 0x52C,
-	    0xA48, 0xA4C, 0xA50,
-	    0xF6C, 0xF70, 0xF74,
-	    0x1490, 0x1494, 0x1498,
-	    0x19B4, 0x19B8, 0x19BC,
-	    0x1ED8, 0x1EDC, 0x1EE0,
-	    0x23FC, 0x2400, 0x2404,
-	};
-
-	for (int i = 0; i < static_cast<int>(sizeof(s_sentinelOffsets) / sizeof(s_sentinelOffsets[0])); i++) {
-		*reinterpret_cast<int*>(slotBase + s_sentinelOffsets[i]) = -1;
+	int base = 0;
+	for (int i = 0; i < 5; i++) {
+		*(int*)(menu->m_bonusListPtr + base + 0x000) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0x004) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0x008) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0x524) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0x528) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0x52C) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0xA48) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0xA4C) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0xA50) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0xF6C) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0xF70) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0xF74) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0x1490) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0x1494) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0x1498) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0x19B4) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0x19B8) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0x19BC) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0x1ED8) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0x1EDC) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0x1EE0) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0x23FC) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0x2400) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0x2404) = -1;
+		base += 0x2920;
 	}
 }
 
@@ -3170,10 +3183,7 @@ void CMenuPcs::createBonus()
 	listPtr = reinterpret_cast<int>(new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0xE6) CMenuPcs::EffectInfo[0x28]);
 	this->m_bonusListPtr = listPtr;
 
-	BonusEffectSlotList* effectSlots = reinterpret_cast<BonusEffectSlotList*>(listPtr);
-	for (int i = 0; i < 5; i++) {
-		InitBonusEffectSlotBlock(&effectSlots->slots[i]);
-	}
+	InitBonusEffectSlots(this);
 	memset((void*)statePtr, 0, sizeof(BonusMenuStateRaw));
 	s_Base[0] = reinterpret_cast<float*>(new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0xF1) BonusBaseRaw);
 	memset(s_Base[0], 0, sizeof(float) * 18);

@@ -3250,7 +3250,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 			continue;
 		}
 
-		unsigned short actionType;
+		int actionType;
 		if (*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) {
 			actionType = actionFlags & 3;
 		} else {
@@ -3280,12 +3280,16 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 			float baseRot =
 				FLOAT_80331A20 * static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x118)) +
 				object->m_rotBaseY;
+			float angleDelta = fabsf(Math.DstRot(targetRot, baseRot));
+			System.Printf(
+				const_cast<char*>("ACT_FLAG_ROT_CHECK \x8d\xb7\x95\xaa=%f\x93x\x81\x42\n"),
+				FLOAT_80331A24 * angleDelta);
 			float angleLimit =
 				FLOAT_80331A20 * static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x11A));
-			float angleDelta = fabsf(Math.DstRot(targetRot, baseRot));
 			if (angleLimit <= angleDelta) {
 				continue;
 			}
+			System.Printf(const_cast<char*>(s_monObjPassThroughText));
 		}
 
 		if (selectorType == 0) {

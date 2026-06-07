@@ -211,6 +211,8 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
                 }
 
                 while (segRemaining < spacing) {
+                    Vec innerZero;
+
                     trailNextIndex++;
                     if (trailNextIndex > trailMaxIndex) {
                         trailNextIndex = 0;
@@ -222,13 +224,14 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
 
                     drawPos = nextPos;
                     segProgress -= segLen;
-                    {
-                        nextPos = history[trailNextIndex];
-                    }
+                    nextPos = history[trailNextIndex];
                     segVec.x = nextPos.x - drawPos.x;
                     segVec.y = nextPos.y - drawPos.y;
                     segVec.z = nextPos.z - drawPos.z;
-                    segLen = PSVECDistance(&zeroVec, &segVec);
+                    innerZero.x = 0.0f;
+                    innerZero.y = 0.0f;
+                    innerZero.z = 0.0f;
+                    segLen = PSVECDistance(&innerZero, &segVec);
                     segRemaining += segLen;
                 }
                 if (frameCount == 0) {

@@ -1123,8 +1123,12 @@ void CMenuPcs::DrawOptionMenu()
 	                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 	CTexture* cursor = GetMenuTexture(this, 0x18C);
-	gUtil.CalcUV(uv0.x, uv0.y, 0, 0, cursor->m_width, cursor->m_height);
-	gUtil.CalcUV(uv1.x, uv1.y, 0x20, 0x20, cursor->m_width, cursor->m_height);
+	float cursorWidth = static_cast<float>(cursor->m_width);
+	float cursorHeight = static_cast<float>(cursor->m_height);
+	gUtil.CalcUV(uv0.x, uv0.y, 0, 0, static_cast<unsigned int>(cursorWidth),
+	             static_cast<unsigned int>(cursorHeight));
+	gUtil.CalcUV(uv1.x, uv1.y, 0x20, 0x20, static_cast<unsigned int>(cursorWidth),
+	             static_cast<unsigned int>(cursorHeight));
 	gUtil.RenderTextureQuad(static_cast<float>((System.m_frameCounter & 7) + 0x1C),
 	                        static_cast<float>(m_optionIndex * 0x28 + 0x70), FLOAT_80333570,
 	                        FLOAT_80333570, cursor, &uv0, &uv1, &color, GX_BL_SRCALPHA,
@@ -1330,8 +1334,8 @@ void CMenuPcs::DrawOptionMenu()
 	}
 	case 2: {
 		CTexture* meterTexture = GetTextureSetTexture(GetMenuTextureSet(this, 0xBC), 3);
-		unsigned int meterWidth = meterTexture->m_width;
-		unsigned int meterHeight = meterTexture->m_height;
+		unsigned int meterWidth = static_cast<unsigned int>(static_cast<float>(meterTexture->m_width));
+		unsigned int meterHeight = static_cast<unsigned int>(static_cast<float>(meterTexture->m_height));
 		float iconWave = FLOAT_80333620 * rowSin;
 		float leftIconX =
 		    static_cast<float>(static_cast<int>((FLOAT_803335A8 - FLOAT_803335F8) * rowCos + FLOAT_803335F8));
@@ -1395,8 +1399,8 @@ void CMenuPcs::DrawOptionMenu()
 	}
 	case 3: {
 		CTexture* meterTexture = GetTextureSetTexture(GetMenuTextureSet(this, 0xBC), 3);
-		unsigned int meterWidth = meterTexture->m_width;
-		unsigned int meterHeight = meterTexture->m_height;
+		unsigned int meterWidth = static_cast<unsigned int>(static_cast<float>(meterTexture->m_width));
+		unsigned int meterHeight = static_cast<unsigned int>(static_cast<float>(meterTexture->m_height));
 		float iconWave = FLOAT_80333620 * rowSin;
 		float leftIconX =
 		    static_cast<float>(static_cast<int>((FLOAT_803335A8 - FLOAT_803335F8) * rowCos + FLOAT_803335F8));

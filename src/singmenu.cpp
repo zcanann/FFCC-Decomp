@@ -992,12 +992,7 @@ void CMenuPcs::SingMenuInit()
     memset(&m_singleMenuTextureLoadIndex, 0, 8);
     m_wm.m_handles[0] = 0;
 
-    CMemory::CStage* stage = m_menuStage;
-    if (Game.m_gameWork.m_menuStageMode != 0) {
-        stage = m_stageF4;
-    }
-
-    CCharaPcs::CHandle* handle = new (stage, s_singmenu_cpp, 0x5CD) CCharaPcs::CHandle;
+    CCharaPcs::CHandle* handle = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x5CD) CCharaPcs::CHandle;
     m_wm.m_handles[0] = handle;
 
     CCharaPcs::CHandle** handlePtr = &m_wm.m_handles[0];
@@ -1012,11 +1007,7 @@ void CMenuPcs::SingMenuInit()
     (*handlePtr)->LoadAnim(s_stand_80332a24, 0, 1, 0, ((*handlePtr)->m_charaNo / 100) * 100, -1, 0);
     (*handlePtr)->SetAnim(0, -1, -1, -1, 0);
 
-    stage = m_menuStage;
-    if (Game.m_gameWork.m_menuStageMode != 0) {
-        stage = m_stageF4;
-    }
-    m_bonus.m_bonusBoardPtr = reinterpret_cast<int>(new (stage, s_singmenu_cpp, 0x5DD) u8[sizeof(MenuBoardEntry)]);
+    m_bonus.m_bonusBoardPtr = reinterpret_cast<int>(new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x5DD) u8[sizeof(MenuBoardEntry)]);
 
     MenuBoardEntry* boardEntry = reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr);
     boardEntry->m_rotZ = FLOAT_8033294c;
@@ -1053,25 +1044,13 @@ void CMenuPcs::SingMenuInit()
     boardEntry->m_screenWidth = 0x48;
     boardEntry->m_screenHeight = 0x58;
 
-    stage = m_menuStage;
-    if (Game.m_gameWork.m_menuStageMode != 0) {
-        stage = m_stageF4;
-    }
-    m_singleFadeState = new (stage, s_singmenu_cpp, 0x605) SingleFadeState;
+    m_singleFadeState = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x605) SingleFadeState;
     memset(m_singleFadeState, 0, sizeof(SingleFadeState));
 
-    stage = m_menuStage;
-    if (Game.m_gameWork.m_menuStageMode != 0) {
-        stage = m_stageF4;
-    }
-    m_singMenuState = new (stage, s_singmenu_cpp, 0x609) SingMenuState;
+    m_singMenuState = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x609) SingMenuState;
     memset(m_singMenuState, 0, sizeof(SingMenuState));
 
-    stage = m_menuStage;
-    if (Game.m_gameWork.m_menuStageMode != 0) {
-        stage = m_stageF4;
-    }
-    m_menuWindowInfo = new (stage, s_singmenu_cpp, 0x60D) MenuWindowInfo;
+    m_menuWindowInfo = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x60D) MenuWindowInfo;
     memset(m_menuWindowInfo, 0, sizeof(MenuWindowInfo));
 
     m_singleMenuPhase = 0;
@@ -1358,20 +1337,10 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
                     goto post_texture_load;
                 }
 
-                CMemory::CStage* stage = m_menuStage;
-                if (Game.m_gameWork.m_menuStageMode != 0) {
-                    stage = m_stageF4;
-                }
-
-                CTextureSet* textureSet = new (stage, s_singmenu_cpp, 0x748) CTextureSet;
+                CTextureSet* textureSet = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x748) CTextureSet;
                 m_textureSets[loadIndex + 5] = textureSet;
 
-                stage = m_menuStage;
-                if (Game.m_gameWork.m_menuStageMode != 0) {
-                    stage = m_stageF4;
-                }
-
-                textureSet->Create(File.m_readBuffer, stage, 0, 0, 0, 0);
+                textureSet->Create(File.m_readBuffer, Game.m_gameWork.m_menuStageMode != 0 ? m_stageF4 : m_menuStage, 0, 0, 0, 0);
                 File.Close(gSingMenuAsyncFileHandle);
                 gSingMenuAsyncFileHandle = 0;
                 m_singleMenuTextureLoadState = 0;

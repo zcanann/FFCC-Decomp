@@ -3123,13 +3123,12 @@ void CChara::CMesh::Calc(CChara::CModel* model)
 	cursor += AlignCharaWorkBytes(mesh->m_data->m_normalCount * 6);
 
 	float* skinData = reinterpret_cast<float*>(mesh->m_data->m_skins);
-	for (u32 i = 0; i < mesh->m_data->m_skinCount; i++) {
+	for (u32 i = 0; i < mesh->m_data->m_skinCount; i++, skinData += 0x19) {
 		int nodeIndex = reinterpret_cast<int*>(skinData + 0x18)[0];
 		PSMTXConcat(
 		    ModelNodes(model)[nodeIndex].m_mtx,
 		    reinterpret_cast<float(*)[4]>(skinData + 0x0C),
 		    reinterpret_cast<float(*)[4]>(skinData));
-		skinData += 0x19;
 	}
 
 	if (mesh->m_data->m_infoWord1 != 0) {

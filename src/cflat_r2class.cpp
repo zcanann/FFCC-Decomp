@@ -832,6 +832,15 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		}
+		case -0x13:
+			engineObject->m_bgColMask = object->m_localBase[0];
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x9C:
+			PushValue(this, object, static_cast<int>(engineObject->m_bgColMask));
+			outResult = 0;
+			break;
 		case -0xE:
 			engineObject->LoadAnim(
 			    RuntimeString(this, object->m_localBase[0]),
@@ -852,19 +861,14 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
-		case -0x12:
-			engineObject->CancelAnim(1);
-			PushValue(this, object, 0);
-			outResult = 0;
-			break;
 		case -0x11:
 			if (engineObject->IsAnimFinished(0) != 0) {
 				PushValue(this, object, 0);
 				outResult = 0;
 			}
 			break;
-		case -0x13:
-			engineObject->m_bgColMask = object->m_localBase[0];
+		case -0x12:
+			engineObject->CancelAnim(1);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1664,10 +1668,6 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		case -0x9B:
 			engineObject->m_charaModelHandle->m_model->m_attachMode = static_cast<unsigned char>(object->m_localBase[0]);
 			PushValue(this, object, 0);
-			outResult = 0;
-			break;
-		case -0x9C:
-			PushValue(this, object, static_cast<int>(engineObject->m_bgColMask));
 			outResult = 0;
 			break;
 		case -0x9D:

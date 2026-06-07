@@ -1181,7 +1181,8 @@ void CMenuPcs::DrawOptionMenu()
 	float rowSin = static_cast<float>(sin(static_cast<double>(FLOAT_80333594 * FLOAT_803335A0 * rowAngle)));
 	float rowCos = static_cast<float>(cos(static_cast<double>(FLOAT_80333594 * rowAngle)));
 
-	if (m_optionIndex == 2) {
+	switch (m_optionIndex) {
+	case 2: {
 		CTexture* meterTexture = GetTextureSetTexture(GetMenuTextureSet(this, 0xBC), 3);
 		unsigned int meterWidth = meterTexture->m_width;
 		unsigned int meterHeight = meterTexture->m_height;
@@ -1244,7 +1245,10 @@ void CMenuPcs::DrawOptionMenu()
 		float maxX = FLOAT_80333628 - font->GetWidth(maxText);
 		DrawFont(static_cast<int>(maxX), static_cast<int>(volumeTextY), color, 7, maxText, kOptionAnimMax,
 		         kOptionAnimMax);
-	} else if (m_optionIndex <= 1) {
+		break;
+	}
+	case 0:
+	case 1: {
 		CTextureSet* textureSet = GetMenuTextureSet(this, 0xBC);
 		CTexture* sideTexture = GetTextureSetTexture(textureSet, 1);
 		CTexture* selectorTexture = GetTextureSetTexture(textureSet, 4);
@@ -1301,7 +1305,9 @@ void CMenuPcs::DrawOptionMenu()
 		                                                  kMenuCenteringHalfWidth),
 		          static_cast<int>(secondY), color, secondTlut, secondText, secondScale, kOptionAnimMax,
 		          kOptionAnimMax);
-	} else if (m_optionIndex < 4) {
+		break;
+	}
+	case 3: {
 		CTexture* meterTexture = GetTextureSetTexture(GetMenuTextureSet(this, 0xBC), 3);
 		unsigned int meterWidth = meterTexture->m_width;
 		unsigned int meterHeight = meterTexture->m_height;
@@ -1364,7 +1370,9 @@ void CMenuPcs::DrawOptionMenu()
 		float maxX = FLOAT_80333628 - font->GetWidth(maxText);
 		DrawFont(static_cast<int>(maxX), static_cast<int>(volumeTextY), color, 7, maxText, kOptionAnimMax,
 		         kOptionAnimMax);
-	} else {
+		break;
+	}
+	default: {
 		CTextureSet* textureSet = GetMenuTextureSet(this, 0xBC);
 		color.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80333550 * m_optionColumnAnim));
 		unsigned int rowAnimFrame;
@@ -1446,6 +1454,8 @@ void CMenuPcs::DrawOptionMenu()
 				                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 			}
 		}
+		break;
+	}
 	}
 }
 

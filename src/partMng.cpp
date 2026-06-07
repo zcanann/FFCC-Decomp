@@ -346,8 +346,9 @@ void CPartMng::Destroy()
     }
 
     if (res->m_pppModelStArr != 0) {
+        pppModelSt* modelArr = res->m_pppModelStArr;
         for (unsigned int i = 0; i < 0x100; i++) {
-            pppModelSt* model = &res->m_pppModelStArr[i];
+            pppModelSt* model = &modelArr[i];
             if (model->m_isUsed != 0) {
                 model->m_refCount--;
                 if (model->m_refCount < 1) {

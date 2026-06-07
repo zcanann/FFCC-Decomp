@@ -1454,11 +1454,11 @@ void CMes::addString(char** text, int branchMode)
 			font->renderFlags = font->renderFlags & 0xF7;
 
 			*(short*)(glyph + 3) = (short)mRevealCursor;
-			*(char*)((int)glyph + 0xF) = (char)(mTextAlign << 4) | *(char*)((int)glyph + 0xF) & 0xF;
+			*(char*)((int)glyph + 0xF) = (mTextAlign << 4) | *(char*)((int)glyph + 0xF) & 0xF;
 			*(char*)((int)glyph + 0xF) = *(char*)((int)glyph + 0xF) & 0xF0;
 			*(char*)((int)glyph + 0x13) = (char)mFlagCount;
-			*(char*)((int)glyph + 0xE) = (char)(mFontAlign << 4) | *(char*)((int)glyph + 0xE) & 0xF;
-			*(char*)((int)glyph + 0xE) = (char)mFontIndex & 0xF | *(char*)((int)glyph + 0xE) & 0xF0;
+			*(char*)((int)glyph + 0xE) = (mFontAlign << 4) | *(char*)((int)glyph + 0xE) & 0xF;
+			*(char*)((int)glyph + 0xE) = mFontIndex & 0xF | *(char*)((int)glyph + 0xE) & 0xF0;
 			*(char*)((int)glyph + 0xA) = (char)(int)(FLOAT_803308ac * mScaleX);
 			*(char*)((int)glyph + 0x11) = (char)(int)(FLOAT_803308ac * mScaleY);
 

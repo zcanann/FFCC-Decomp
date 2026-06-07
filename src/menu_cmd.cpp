@@ -2333,8 +2333,6 @@ unsigned int CMenuPcs::CmdOpen1()
 {
 	u8* self = reinterpret_cast<u8*>(this);
 	const CCaravanWork* const caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
-	CmdListStorage* list = GetCmdListStorage(this);
-	CmdListEntry* entries = list->entries;
 
 	GetCmdStateView(this)->transitionTimer = static_cast<s16>(GetCmdStateView(this)->transitionTimer + 1);
 
@@ -2342,15 +2340,15 @@ unsigned int CMenuPcs::CmdOpen1()
 	const f32 t = static_cast<f32>(
 		-((DOUBLE_80332a90 * static_cast<f64>(GetCmdStateView(this)->transitionTimer)) - DOUBLE_80332a58)
 	);
-	entries[selected].alpha = t;
+	GetCmdListStorage(this)->entries[selected].alpha = t;
 
 	s32 chainCount = 1;
 	if (caravanWork->m_commandListExtra[selected + 1] == -1) {
 		chainCount = 2;
-		entries[selected + 1].alpha = t;
+		GetCmdListStorage(this)->entries[selected + 1].alpha = t;
 		if (caravanWork->m_commandListExtra[selected + 2] == -1) {
 			chainCount = 3;
-			entries[selected + 2].alpha = t;
+			GetCmdListStorage(this)->entries[selected + 2].alpha = t;
 		}
 	}
 
@@ -2360,8 +2358,8 @@ unsigned int CMenuPcs::CmdOpen1()
 		slot = 3;
 	}
 
-	CmdListEntry* const animEntry = &entries[list->listEnd + 3];
-	CmdListEntry* const baseEntry = &entries[list->listEnd + slot];
+	CmdListEntry* const animEntry = &GetCmdListStorage(this)->entries[GetCmdListStorage(this)->listEnd + 3];
+	CmdListEntry* const baseEntry = &GetCmdListStorage(this)->entries[GetCmdListStorage(this)->listEnd + slot];
 
 	if (GetCmdStateView(this)->unitePanelInitialized == 0) {
 		const s32 endX = static_cast<s32>(static_cast<f64>(baseEntry->x + baseEntry->width) - DOUBLE_80332a98);

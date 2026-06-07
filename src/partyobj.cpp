@@ -1031,19 +1031,16 @@ void CGPartyObj::command()
 
 	if (static_cast<signed char>(party.partyFlags) >= 0) {
 
-	const unsigned short held = getPadHeldForSlot(padSlot);
-	const unsigned short trig = getPadTrigForSlot(padSlot);
-
 	if ((*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) &&
 	    ((party.commandMode & 1) != 0) &&
 	    Joybus.GetCtrlMode(padSlot) != 1) {
 		int cmdDir = 0;
 
-		if ((held & 0x60) == 0x60) {
+		if ((getPadHeldForSlot(padSlot) & 0x60) == 0x60) {
 			caravan->IsUseCmdList(0);
-		} else if ((trig & 0x20) != 0) {
+		} else if ((getPadTrigForSlot(padSlot) & 0x20) != 0) {
 			cmdDir = 1;
-		} else if ((trig & 0x40) != 0) {
+		} else if ((getPadTrigForSlot(padSlot) & 0x40) != 0) {
 			cmdDir = -1;
 		}
 
@@ -1179,9 +1176,9 @@ void CGPartyObj::command()
 			secondaryCommand = 0x1A;
 			primaryAvailable = false;
 			int cmdDir = 0;
-			if ((trig & 0x20) != 0) {
+			if ((getPadTrigForSlot(padSlot) & 0x20) != 0) {
 				cmdDir = 1;
-			} else if ((trig & 0x40) != 0) {
+			} else if ((getPadTrigForSlot(padSlot) & 0x40) != 0) {
 				cmdDir = -1;
 			}
 			if (cmdDir != 0) {

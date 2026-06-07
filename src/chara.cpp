@@ -1099,7 +1099,7 @@ void CChara::CModel::CreateDynamics(void* dynData, CMemory::CStage* stage)
 		}
 
 		if (ModelDynParams(this) != 0) {
-			operator delete(ModelDynParams(this));
+			operator delete[](ModelDynParams(this));
 			ModelDynParams(this) = 0;
 		}
 		ModelDynCount(this) = 0;

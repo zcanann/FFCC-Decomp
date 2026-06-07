@@ -591,7 +591,7 @@ cancel_done:
  */
 void CGCharaObj::onFramePostCalc()
 {
-	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x42) != 0) {
+	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x42) != 0) {
 		unsigned short tickDiv = *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x3A);
 		if (m_stateTick != 0 && (m_stateTick % static_cast<int>(tickDiv)) == 0) {
 			if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) > 1 &&

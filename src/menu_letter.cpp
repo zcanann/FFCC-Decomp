@@ -1858,7 +1858,7 @@ void CMenuPcs::LetterMessDraw()
 		color.a = alpha;
 		GXSetChanMatColor(GX_COLOR0A0, color);
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
-		DrawRect(
+		MenuPcs.DrawRect(
 		    0, x0, y0, x1,
 		    y1, *reinterpret_cast<float*>(panel + 4), *reinterpret_cast<float*>(panel + 6),
 		    *reinterpret_cast<float*>(panel + 10), *reinterpret_cast<float*>(panel + 10), 0.0f);
@@ -2445,8 +2445,8 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 			y = y1;
 		}
 
-		SetTexture(static_cast<CMenuPcs::TEX>(tex));
-		DrawRect(
+		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
+		MenuPcs.DrawRect(
 		    flip, static_cast<float>(x), static_cast<float>(y), FLOAT_803330f4, FLOAT_803330f4,
 		    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
 	}
@@ -2459,27 +2459,27 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 	for (int i = 0; i < 2; ++i) {
 		int tex = (i == 0) ? 0x49 : 0x4C;
 		double y = (i == 0) ? y0 : y1;
-		SetTexture(static_cast<CMenuPcs::TEX>(tex));
-		DrawRect(
+		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
+		MenuPcs.DrawRect(
 		    0, static_cast<float>(innerX), static_cast<float>(y), static_cast<float>(innerW), FLOAT_803330f4,
 		    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
 	}
 
-	SetTexture(static_cast<CMenuPcs::TEX>(0x4A));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x4A));
 	for (int i = 0; i < 2; ++i) {
 		int flip = (i == 0) ? 0 : 8;
 		double x = (i == 0) ? x0 : x1;
-		DrawRect(
+		MenuPcs.DrawRect(
 		    flip, static_cast<float>(x), static_cast<float>(innerY), FLOAT_803330f4, static_cast<float>(innerH),
 		    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
 	}
 
-	SetTexture(static_cast<CMenuPcs::TEX>(0x4E));
-	DrawRect(
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x4E));
+	MenuPcs.DrawRect(
 	    0, static_cast<float>(innerX), static_cast<float>(innerY), static_cast<float>(innerW), static_cast<float>(innerH),
 	    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
 
-	SetTexture(static_cast<CMenuPcs::TEX>(0x4F));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x4F));
 	double decoX0 = static_cast<double>(static_cast<float>(x0 + w - static_cast<double>(FLOAT_80333108)));
 	double decoY0 = y0 - DOUBLE_80333100;
 	double decoX1 = static_cast<double>(static_cast<float>(decoX0 + DOUBLE_80333100));
@@ -2488,12 +2488,12 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 		double x = ((i & 1) == 0) ? static_cast<double>(static_cast<float>(x0 - static_cast<double>(FLOAT_80333110))) : decoX1;
 		double y = ((i & 2) == 0) ? decoY0 : decoY1;
 		int flip = ((i & 2) == 0) ? 0 : 4;
-		DrawRect(
+		MenuPcs.DrawRect(
 		    flip, static_cast<float>(x), static_cast<float>(y), FLOAT_80333108, FLOAT_8033310c,
 		    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
 	}
 
-	SetTexture(static_cast<CMenuPcs::TEX>(0x50));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x50));
 	double barX0 = static_cast<double>(static_cast<float>(x0 - static_cast<double>(FLOAT_80333110)));
 	double barX1 = static_cast<double>(static_cast<float>(decoX0 + static_cast<double>(FLOAT_80333110)));
 	double barY0 = static_cast<double>(static_cast<float>((DOUBLE_80333118 + y0) - DOUBLE_80333100));
@@ -2506,7 +2506,7 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 			if (DOUBLE_80333118 <= seg) {
 				seg = static_cast<double>(FLOAT_8033310c);
 			}
-			DrawRect(
+			MenuPcs.DrawRect(
 			    0, static_cast<float>(x), static_cast<float>(y), FLOAT_80333108, static_cast<float>(seg),
 			    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
 			y = static_cast<double>(static_cast<float>(y + seg));
@@ -2514,12 +2514,12 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 	}
 
 	if (param >= DOUBLE_803330e8) {
-		SetTexture(static_cast<CMenuPcs::TEX>(0x3D));
-		DrawRect(
+		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3D));
+		MenuPcs.DrawRect(
 		    0, static_cast<float>(x0 - static_cast<double>(FLOAT_803330f4)),
 		    static_cast<float>(y0 - static_cast<double>(FLOAT_80333108)),
 		    FLOAT_80333128, FLOAT_8033312c, FLOAT_80333130, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
-		DrawRect(
+		MenuPcs.DrawRect(
 		    0, static_cast<float>(x0 + w - static_cast<double>(FLOAT_80333134)),
 		    static_cast<float>(y0 + h - static_cast<double>(FLOAT_803330c0)),
 		    FLOAT_80333130, FLOAT_80333138, FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);

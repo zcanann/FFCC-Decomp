@@ -1585,7 +1585,7 @@ void CMes::Next()
 			{
 				do
 				{
-					if (((*(unsigned char*)((char*)start + 0xe) >> 4) != (*(unsigned char*)((char*)curr + 0xe) >> 4)) ||
+					if ((((*(unsigned char*)((char*)start + 0xe) >> 4) & 0xF) != ((*(unsigned char*)((char*)curr + 0xe) >> 4) & 0xF)) ||
 					    (*(short*)(start + 2) != *(short*)(curr + 2)))
 					{
 						break;
@@ -1601,7 +1601,7 @@ void CMes::Next()
 			{
 				do
 				{
-					type = (int)((unsigned int)*(unsigned char*)((char*)start + 0xe) >> 4);
+					type = (int)(((unsigned int)*(unsigned char*)((char*)start + 0xe) >> 4) & 0xF);
 					if (type == 1)
 					{
 						*start = halfVal * (*(float*)((char*)this + 0x3ca4) - groupWidth) + *start;

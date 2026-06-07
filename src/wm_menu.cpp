@@ -8448,40 +8448,42 @@ void CMenuPcs::CalcCharaSelect()
 
 	*reinterpret_cast<short*>(bytes + 0x74) = static_cast<short>(*reinterpret_cast<short*>(bytes + 0x74) + 1);
 	const unsigned int clz = __cntlzw(static_cast<unsigned int>(Game.m_gameWork.m_menuStageMode));
-	if (static_cast<int>(((clz >> 5) + 2) * 0x4B) <= static_cast<int>(*reinterpret_cast<short*>(bytes + 0x74))) {
+	if (static_cast<int>(*reinterpret_cast<short*>(bytes + 0x74)) >= static_cast<int>(((clz >> 5) + 2) * 0x4B)) {
 		*reinterpret_cast<short*>(bytes + 0x74) = 0;
 	}
 
 	for (int i = 0; i < 4; i++) {
 		WmCharaSelectEntry& entry = GetWmCharaSelectEntries(this)[i];
-		padTrig[i] = 0;
-		padRepeat[i] = 0;
 
-		if ((i == 0) || (Game.m_gameWork.m_menuStageMode == 0)) {
-			entry.m_padType = Joybus.GetPadType(i);
-			if ((entry.m_padType == 0x09000000) || (entry.m_padType == -0x74F00000) ||
-			    (entry.m_padType == -0x78000000)) {
-				entry.m_connected = static_cast<unsigned char>(Game.m_gameWork.m_menuStageMode != 0);
+		if ((i != 0) && (Game.m_gameWork.m_menuStageMode != 0)) {
+			padTrig[i] = 0;
+			padRepeat[i] = 0;
+			entry.m_connected = 0;
+			continue;
+		}
+
+		entry.m_padType = Joybus.GetPadType(i);
+		if ((entry.m_padType == 0x09000000) || (entry.m_padType == -0x74F00000) ||
+		    (entry.m_padType == -0x78000000)) {
+			entry.m_connected = static_cast<unsigned char>(Game.m_gameWork.m_menuStageMode != 0);
+		} else {
+			entry.m_connected = static_cast<unsigned char>(Joybus.GetGBAConnect(i));
+		}
+
+		if (entry.m_connected == 1 && entry.m_cmakePending == 0) {
+			if (Pad.m_debugPadLock != 0 || (i == 0 && Pad.m_debugPadPort != -1)) {
+				padRepeat[i] = 0;
 			} else {
-				entry.m_connected = static_cast<unsigned char>(Joybus.GetGBAConnect(i));
+				padRepeat[i] = Pad.GetPadInputs()[(Pad.m_debugPadPort == i) ? 0 : static_cast<unsigned int>(i)].repeatButton;
 			}
-
-			if (entry.m_connected != 0 && entry.m_cmakePending == 0) {
-				bool noInput = false;
-				if (Pad.m_debugPadLock != 0 || (i == 0 && Pad.m_debugPadPort != -1)) {
-					noInput = true;
-				}
-				if (noInput) {
-					padRepeat[i] = 0;
-					padTrig[i] = 0;
-				} else {
-					const unsigned int padIndex = (Pad.m_debugPadPort == i) ? 0 : static_cast<unsigned int>(i);
-					padRepeat[i] = Pad.GetPadInputs()[padIndex].repeatButton;
-					padTrig[i] = Pad.GetPadInputs()[padIndex].buttonDown[0];
-				}
+			if (Pad.m_debugPadLock != 0 || (i == 0 && Pad.m_debugPadPort != -1)) {
+				padTrig[i] = 0;
+			} else {
+				padTrig[i] = Pad.GetPadInputs()[(Pad.m_debugPadPort == i) ? 0 : static_cast<unsigned int>(i)].buttonDown[0];
 			}
 		} else {
-			entry.m_connected = 0;
+			padTrig[i] = 0;
+			padRepeat[i] = 0;
 		}
 	}
 
@@ -8516,14 +8518,15 @@ void CMenuPcs::CalcCharaSelect()
 
 				if (Game.m_caravanWorkArr[entry.m_currentSlot].m_shopState == 0 &&
 				    entry.m_cmakeReady == 0) {
-					CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[entry.m_currentSlot];
+					CCharaPcs::CHandle* const handle = GetWmWorldHandles(this)[entry.m_currentSlot];
 					if (handle->IsModelLoaded(1) && handle->m_charaKind != 3) {
 						if (static_cast<unsigned int>(System.m_execParam) > 2) {
 							System.Printf(const_cast<char*>(s_SetCMakeEnd_chan_pctd_cur_pctd_801DC3B4), i,
 							              static_cast<int>(entry.m_currentSlot));
 						}
-						GetWmCharaModelData(this)[entry.m_currentSlot * 0x34 + 0x0C] = 0;
-						handle->LoadModelASync(3, 0x43, 0);
+						const int loadSlot = static_cast<int>(entry.m_currentSlot);
+						GetWmCharaModelData(this)[loadSlot * 0x34 + 0x0C] = 0;
+						GetWmCharaHandles(this)[loadSlot]->LoadModelASync(3, 0x43, 0);
 					}
 				}
 			} else if (entry.m_cmakePending == 0 && Joybus.GetMType(i) == 1) {
@@ -8542,10 +8545,10 @@ void CMenuPcs::CalcCharaSelect()
 			if (((confirmedSlotMask & (1u << static_cast<unsigned int>(slot))) == 0) &&
 			    ((pendingMask & (1u << static_cast<unsigned int>(slot))) == 0) &&
 			    Game.m_caravanWorkArr[slot].m_shopState == 0) {
-				CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[slot];
+				CCharaPcs::CHandle* const handle = GetWmWorldHandles(this)[slot];
 				if (handle->IsModelLoaded(1) && handle->m_charaKind != 3) {
 					GetWmCharaModelData(this)[slot * 0x34 + 0x0C] = 0;
-					handle->LoadModelASync(3, 0x43, 0);
+					GetWmCharaHandles(this)[slot]->LoadModelASync(3, 0x43, 0);
 				}
 			}
 		}
@@ -8640,27 +8643,15 @@ void CMenuPcs::CalcCharaSelect()
 				caravanWork.m_appearanceVariant = static_cast<unsigned short>(appearance);
 				caravanWork.m_genderFlag = static_cast<unsigned short>((info.m_charaType >> 7) != 0);
 				caravanWork.m_id = static_cast<unsigned short>(modelNo);
-				for (int favorite = 0; favorite < 8; favorite += 4) {
-					const unsigned char v0 = static_cast<unsigned char>(info.m_favoriteBits[favorite >> 1] & 0x0F);
-					unsigned char v1 = info.m_favoriteBits[(favorite + 1) >> 1];
-					if (((favorite + 1) & 1) != 0) {
-						v1 >>= 4;
+				for (int favorite = 0; favorite < 8; favorite++) {
+					unsigned char nibble = info.m_favoriteBits[favorite >> 1];
+					int v;
+					if ((favorite & 1) != 0) {
+						v = (nibble >> 4) & 0x0F;
+					} else {
+						v = nibble & 0x0F;
 					}
-					const unsigned char v2 =
-					    static_cast<unsigned char>(info.m_favoriteBits[(favorite + 2) >> 1] & 0x0F);
-					unsigned char v3 = info.m_favoriteBits[(favorite + 3) >> 1];
-					if (((favorite + 3) & 1) != 0) {
-						v3 >>= 4;
-					}
-
-					caravanWork.m_letterMeta[favorite + 0] =
-					    static_cast<unsigned short>((10 - static_cast<int>(v0)) * 10 - 5);
-					caravanWork.m_letterMeta[favorite + 1] =
-					    static_cast<unsigned short>((10 - static_cast<int>(v1 & 0x0F)) * 10 - 5);
-					caravanWork.m_letterMeta[favorite + 2] =
-					    static_cast<unsigned short>((10 - static_cast<int>(v2)) * 10 - 5);
-					caravanWork.m_letterMeta[favorite + 3] =
-					    static_cast<unsigned short>((10 - static_cast<int>(v3 & 0x0F)) * 10 - 5);
+					caravanWork.m_letterMeta[favorite] = static_cast<unsigned short>((10 - v) * 10 - 5);
 				}
 
 				const int baseDataIndex =

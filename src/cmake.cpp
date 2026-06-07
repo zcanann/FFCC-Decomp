@@ -1894,22 +1894,22 @@ unsigned short CMenuPcs::CmakeJobCtrl()
                          (*reinterpret_cast<int*>(group + 0x1794) != 0) &&
                          (*(group + 0x1F96) != 1) &&
                          (duplicateSlot = slot,
-                          *reinterpret_cast<int*>(group + 0x179C) == static_cast<int>(job))) ||
+                          *reinterpret_cast<int*>(group + 0x179C) == static_cast<int>(CmakeState(this)->m_select))) ||
                         (((slot + 1) != static_cast<int>(CmakeSlot(this))) &&
                          (*reinterpret_cast<int*>(group + 0x23C4) != 0) &&
                          (*(group + 0x2BC6) != 1) &&
                          (duplicateSlot = slot + 1,
-                          *reinterpret_cast<int*>(group + 0x23CC) == static_cast<int>(job))) ||
+                          *reinterpret_cast<int*>(group + 0x23CC) == static_cast<int>(CmakeState(this)->m_select))) ||
                         (((slot + 2) != static_cast<int>(CmakeSlot(this))) &&
                          (*reinterpret_cast<int*>(group + 0x2FF4) != 0) &&
                          (*(group + 0x37F6) != 1) &&
                          (duplicateSlot = slot + 2,
-                          *reinterpret_cast<int*>(group + 0x2FFC) == static_cast<int>(job))) ||
+                          *reinterpret_cast<int*>(group + 0x2FFC) == static_cast<int>(CmakeState(this)->m_select))) ||
                         (((slot + 3) != static_cast<int>(CmakeSlot(this))) &&
                          (*reinterpret_cast<int*>(group + 0x3C24) != 0) &&
                          (*(group + 0x4426) != 1) &&
                          (duplicateSlot = slot + 3,
-                          *reinterpret_cast<int*>(group + 0x3C2C) == static_cast<int>(job)))) {
+                          *reinterpret_cast<int*>(group + 0x3C2C) == static_cast<int>(CmakeState(this)->m_select)))) {
                         break;
                     }
 

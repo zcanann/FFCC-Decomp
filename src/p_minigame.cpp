@@ -1911,7 +1911,7 @@ void CMiniGamePcs::MngThreadMain(void*)
                             {
                                 playerBase[0x1452] = 1;
                                 self[0x6490 + i] = 1;
-                                successMask |= bit & 0xFF;
+                                successMask = (successMask | bit) & 0xFF;
                                 *reinterpret_cast<unsigned int*>(channelBase + 0x1368) = 0;
                             }
                             else
@@ -1923,7 +1923,7 @@ void CMiniGamePcs::MngThreadMain(void*)
                                     if ((packet & 0xFF) == (crc & 0xFF))
                                     {
                                         self[0x6490 + i] = playerBase[0x144E];
-                                        successMask |= bit & 0xFF;
+                                        successMask = (successMask | bit) & 0xFF;
                                         *reinterpret_cast<unsigned int*>(channelBase + 0x1368) =
                                             *reinterpret_cast<unsigned int*>(playerBase + 0x142C) & 0xFFFF00;
                                     }

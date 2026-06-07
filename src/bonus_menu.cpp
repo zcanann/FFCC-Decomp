@@ -45,28 +45,28 @@ static float s_BallTrnsYspl[] = {
 static CMenuPcs::FCV s_BallTrnsX = {4, s_BallTrnsXspl};
 static CMenuPcs::FCV s_BallTrnsY = {6, s_BallTrnsYspl};
 
-extern const char s_bonus_80331DE0[] = "bonus";
-extern const char s_bonus1_80331DE8[] = "bonus1";
-extern const char s_bonus2_80331DF0[] = "bonus2";
-extern const char s_bonus3_80331DF8[] = "bonus3";
-extern const char s_bonus4_80331E00[] = "bonus4";
-extern const char s_bonus5_80331E08[] = "bonus5";
-extern const char s_bonus6_80331E10[] = "bonus6";
-extern const char s_bonus7_80331E18[] = "bonus7";
-extern const char s_bonus8_80331E20[] = "bonus8";
-extern const char s_bonus9_80331E28[] = "bonus9";
-extern const char s_bonus10_80331E30[] = "bonus10";
-extern const char s_bonus11_80331E38[] = "bonus11";
-extern const char s_bonus12_80331E40[] = "bonus12";
-extern const char s_bonus13_80331E48[] = "bonus13";
-extern const char s_bonus14_80331E50[] = "bonus14";
-extern const char s_bonus15_80331E58[] = "bonus15";
-extern const char s_bonus16_80331E60[] = "bonus16";
-extern const char s_bonus17_80331E68[] = "bonus17";
-extern const char s_bonus18_80331E70[] = "bonus18";
+extern const char sBonusTextureSetName[] = "bonus";
+extern const char sBonusTextureName1[] = "bonus1";
+extern const char sBonusTextureName2[] = "bonus2";
+extern const char sBonusTextureName3[] = "bonus3";
+extern const char sBonusTextureName4[] = "bonus4";
+extern const char sBonusTextureName5[] = "bonus5";
+extern const char sBonusTextureName6[] = "bonus6";
+extern const char sBonusTextureName7[] = "bonus7";
+extern const char sBonusTextureName8[] = "bonus8";
+extern const char sBonusTextureName9[] = "bonus9";
+extern const char sBonusTextureName10[] = "bonus10";
+extern const char sBonusTextureName11[] = "bonus11";
+extern const char sBonusTextureName12[] = "bonus12";
+extern const char sBonusTextureName13[] = "bonus13";
+extern const char sBonusTextureName14[] = "bonus14";
+extern const char sBonusTextureName15[] = "bonus15";
+extern const char sBonusTextureName16[] = "bonus16";
+extern const char sBonusTextureName17[] = "bonus17";
+extern const char sBonusTextureName18[] = "bonus18";
 
-char* PTR_s_bonus[] = {
-    const_cast<char*>(s_bonus_80331DE0),
+char* sBonusTextureSetNames[] = {
+    const_cast<char*>(sBonusTextureSetName),
     0,
     0,
     0,
@@ -77,25 +77,25 @@ char* PTR_s_bonus[] = {
     0,
 };
 
-CMenuPcs::CTmp s_bonusTextureTable[] = {
-    {2, const_cast<char*>(s_bonus1_80331DE8)},
-    {2, const_cast<char*>(s_bonus2_80331DF0)},
-    {2, const_cast<char*>(s_bonus3_80331DF8)},
-    {2, const_cast<char*>(s_bonus4_80331E00)},
-    {2, const_cast<char*>(s_bonus5_80331E08)},
-    {2, const_cast<char*>(s_bonus6_80331E10)},
-    {2, const_cast<char*>(s_bonus7_80331E18)},
-    {2, const_cast<char*>(s_bonus8_80331E20)},
-    {2, const_cast<char*>(s_bonus9_80331E28)},
-    {2, const_cast<char*>(s_bonus10_80331E30)},
-    {2, const_cast<char*>(s_bonus11_80331E38)},
-    {2, const_cast<char*>(s_bonus12_80331E40)},
-    {2, const_cast<char*>(s_bonus13_80331E48)},
-    {2, const_cast<char*>(s_bonus14_80331E50)},
-    {2, const_cast<char*>(s_bonus15_80331E58)},
-    {2, const_cast<char*>(s_bonus16_80331E60)},
-    {2, const_cast<char*>(s_bonus17_80331E68)},
-    {2, const_cast<char*>(s_bonus18_80331E70)},
+CMenuPcs::CTmp sBonusTextureTable[] = {
+    {2, const_cast<char*>(sBonusTextureName1)},
+    {2, const_cast<char*>(sBonusTextureName2)},
+    {2, const_cast<char*>(sBonusTextureName3)},
+    {2, const_cast<char*>(sBonusTextureName4)},
+    {2, const_cast<char*>(sBonusTextureName5)},
+    {2, const_cast<char*>(sBonusTextureName6)},
+    {2, const_cast<char*>(sBonusTextureName7)},
+    {2, const_cast<char*>(sBonusTextureName8)},
+    {2, const_cast<char*>(sBonusTextureName9)},
+    {2, const_cast<char*>(sBonusTextureName10)},
+    {2, const_cast<char*>(sBonusTextureName11)},
+    {2, const_cast<char*>(sBonusTextureName12)},
+    {2, const_cast<char*>(sBonusTextureName13)},
+    {2, const_cast<char*>(sBonusTextureName14)},
+    {2, const_cast<char*>(sBonusTextureName15)},
+    {2, const_cast<char*>(sBonusTextureName16)},
+    {2, const_cast<char*>(sBonusTextureName17)},
+    {2, const_cast<char*>(sBonusTextureName18)},
 };
 
 struct BonusPartySummary {
@@ -3130,7 +3130,7 @@ void CMenuPcs::createBonus()
 		GbaQue.SetRadarMode(i, 0);
 	}
 
-	loadTexture(PTR_s_bonus, 2, 1, s_bonusTextureTable, 0x16, 0x12, 0);
+	loadTexture(sBonusTextureSetNames, 2, 1, sBonusTextureTable, 0x16, 0x12, 0);
 	sprintf(fontPath, s_menuSubfontPathFmt, Game.GetLangString());
 	loadFont(0, fontPath, 1, -1);
 

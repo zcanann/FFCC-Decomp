@@ -1174,12 +1174,15 @@ void CMaterialMan::SetMaterialCharaShadow(CMaterial* material)
  */
 void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex, int setVtxDesc)
 {
-    m_texMapIdCur = m_stdTexMapId;
-    m_texMapIdCurShadow = m_stdTexMapId;
-    m_texMtxCur = m_stdTexMtx;
-    m_texMtxCurShadow = m_stdTexMtx;
-    m_texCoordIdCur = m_stdTexCoordId;
-    m_texCoordIdCurShadow = m_stdTexCoordId;
+    int stdTexMapId = m_stdTexMapId;
+    m_texMapIdCur = stdTexMapId;
+    m_texMapIdCurShadow = stdTexMapId;
+    int stdTexMtx = m_stdTexMtx;
+    m_texMtxCur = stdTexMtx;
+    m_texMtxCurShadow = stdTexMtx;
+    int stdTexCoordId = m_stdTexCoordId;
+    m_texCoordIdCur = stdTexCoordId;
+    m_texCoordIdCurShadow = stdTexCoordId;
     m_curEnvTevBit = m_stdEnvTevBit;
 
     CPtrArray<CMaterial*>* materials = &materialSet->m_materials;

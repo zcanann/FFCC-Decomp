@@ -1702,16 +1702,14 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 	int itemKinds[11];
 	int matches[10];
 
-	memset(candidates, -1, sizeof(candidates));
-	memset(itemKinds, -1, sizeof(itemKinds));
-	memset(matches, -1, sizeof(matches));
-
 	if (comboOut != nullptr) {
 		for (int i = 0; i < 5; i++) {
 			comboOut[i][0] = -1;
 			comboOut[i][1] = -1;
 		}
 	}
+
+	memset(candidates, -1, sizeof(candidates));
 
 	const s16 selectedState = caravan->m_commandListExtra[selected];
 	const u32 selectedNegMask = static_cast<u32>(-selectedState) & ~static_cast<u32>(selectedState);
@@ -1753,6 +1751,8 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 		slot = nextSlot;
 	}
 
+	memset(itemKinds, -1, sizeof(itemKinds));
+
 	int index = 2;
 	for (int slot = 2; slot < 8; slot++, index++) {
 		if (caravan->m_numCmdListSlots <= slot) {
@@ -1784,6 +1784,8 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 			itemKinds[index] = itemId;
 		}
 	}
+
+	memset(matches, -1, sizeof(matches));
 
 	int matchCount = 0;
 	if (itemKinds[selected] > 0) {

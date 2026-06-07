@@ -2345,15 +2345,16 @@ void CMenuPcs::CalcResultCountAnim()
 		int countTop = header->count;
 		s_CntTop = (unsigned char)countTop;
 		for (int i = 0; i < activePartyCount; i++) {
-			short stripX = ((0 < i) && (i < 3)) ? 8 : 0x20;
 			short y = (short)(0x28 + i * 0x60);
 			BonusAnimSprite* sprite = &sprites[countTop + i];
+			int rank = s_Rinfo->m_party[i].m_rank;
 			sprite->kind = 0x19;
+			short stripX = ((1 <= i) && (i <= 2)) ? 8 : 0x20;
 			sprite->x = stripX;
 			sprite->y = y;
 			sprite->w = 0x38;
 			sprite->h = 0x28;
-			sprite->mulX = (float)(s_Rinfo->m_party[i].m_rank * sprite->w);
+			sprite->mulX = (float)(rank * sprite->w);
 			sprite->alpha = 0.0f;
 			sprite->depth = 1.0f;
 			sprite->startFrame = 9999;

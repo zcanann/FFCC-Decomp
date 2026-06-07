@@ -1262,7 +1262,7 @@ void CGPartyObj::command()
 			int weaponItem = 0;
 			int weaponRef = 0;
 			caravan->GetCurrentWeaponItem(weaponItem, weaponRef);
-			if (weaponItem == cmdIdx) {
+			if (weaponItem == party.unk6EC) {
 				const int equippedWeapon =
 					caravan->m_equipment[0] < 0 ? 0 : caravan->m_inventoryItems[caravan->m_equipment[0]];
 				if (weaponRef == equippedWeapon) {

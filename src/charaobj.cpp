@@ -27,6 +27,7 @@ extern "C" char lbl_801DC590[];
 extern "C" char lbl_801DC8CC[];
 extern "C" char lbl_801DC8D8[];
 extern "C" char lbl_801DC8EC[];
+extern "C" char lbl_801DC908[];
 extern "C" char lbl_801DC940[];
 
 static Vec* l_pHitCross = 0;
@@ -1891,41 +1892,33 @@ void CGCharaObj::setSta(int staIndex, int value)
  */
 void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& outValue)
 {
-	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
-	if (script == 0) {
-		outValue = 0;
-		return;
-	}
-
 	CGObject* source = reinterpret_cast<CGObject*>(sourceObj);
-	int next = 0;
 
 	switch (staIndex) {
 		case 0:
-			if (*reinterpret_cast<short*>(script + 0x40) == 0) {
-				setSta(0, calcSta(0, amount, source));
+			if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x40) == 0) {
+				setSta(0, calcSta(0, amount, reinterpret_cast<CGObject*>(sourceObj)));
 				setSta(4, 0);
-				Sound.StopSe3DGroup(m_particleId);
 				damageDelete();
 				changeStat(0, 0, 0);
 			} else {
 				setSta(0, 0);
 				setSta(1, 0);
-				next = 0;
+				outValue = 0;
 			}
 			break;
 		case 1:
-			if (*reinterpret_cast<short*>(script + 0x3E) == 0) {
-				setSta(1, calcSta(1, amount, source));
+			if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E) == 0) {
+				setSta(1, calcSta(1, amount, reinterpret_cast<CGObject*>(sourceObj)));
 				setSta(4, 0);
 			} else {
 				setSta(0, 0);
 				setSta(1, 0);
-				next = 0;
+				outValue = 0;
 			}
 			break;
 		case 2:
-			setSta(2, calcSta(2, amount, source));
+			setSta(2, calcSta(2, amount, reinterpret_cast<CGObject*>(sourceObj)));
 			break;
 		case 3:
 			setSta(1, 0);
@@ -1934,59 +1927,57 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			setSta(9, 0);
 			setSta(7, 0);
 			setSta(8, 0);
-			setSta(3, calcSta(3, amount, source));
+			setSta(3, calcSta(3, amount, reinterpret_cast<CGObject*>(sourceObj)));
+			outValue = 0;
 			putHitParticleFromItem(sourceObj, amount);
-			Sound.StopSe3DGroup(m_particleId);
 			damageDelete();
 			changeStat(0, 0, 0);
-			next = 0;
 			break;
 		case 4:
-			setSta(4, calcSta(4, amount, source));
+			setSta(4, calcSta(4, amount, reinterpret_cast<CGObject*>(sourceObj)));
 			setSta(0, 0);
 			setSta(1, 0);
 			changeStat(10, 0, 0);
 			break;
 		case 6:
-			setSta(6, calcSta(6, amount, source));
+			setSta(6, calcSta(6, amount, reinterpret_cast<CGObject*>(sourceObj)));
+			outValue = 0;
 			putHitParticleFromItem(sourceObj, amount);
-			next = 0;
 			break;
 		case 7:
-			if (*reinterpret_cast<short*>(script + 0x4E) == 0) {
-				setSta(7, calcSta(7, amount, source));
+			if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x4E) == 0) {
+				setSta(7, calcSta(7, amount, reinterpret_cast<CGObject*>(sourceObj)));
 				putHitParticleFromItem(sourceObj, amount);
 			} else {
 				setSta(7, 0);
 				setSta(8, 0);
 			}
-			next = 0;
+			outValue = 0;
 			break;
 		case 8:
-			if (*reinterpret_cast<short*>(script + 0x4C) == 0) {
-				setSta(8, calcSta(8, amount, source));
+			if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x4C) == 0) {
+				setSta(8, calcSta(8, amount, reinterpret_cast<CGObject*>(sourceObj)));
 				putHitParticleFromItem(sourceObj, amount);
 			} else {
 				setSta(7, 0);
 				setSta(8, 0);
 			}
-			next = 0;
+			outValue = 0;
 			break;
 		case 9:
 			setSta(7, 0);
 			setSta(8, 0);
-			setSta(9, calcSta(9, amount, source));
+			setSta(9, calcSta(9, amount, reinterpret_cast<CGObject*>(sourceObj)));
+			outValue = 0;
 			putHitParticleFromItem(sourceObj, amount);
-			Sound.StopSe3DGroup(m_particleId);
 			damageDelete();
 			changeStat(0, 0, 0);
-			next = 0;
 			break;
 		case 0x1C:
-			setSta(0x1C, calcSta(0x1C, amount, source));
+			setSta(0x1C, calcSta(0x1C, amount, reinterpret_cast<CGObject*>(sourceObj)));
 			break;
 		case 0x25:
-			if (*reinterpret_cast<short*>(script + 0x3E) != 0) {
+			if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E) != 0) {
 				setSta(0, 0);
 			}
 			if ((GetCID() & 0xAD) != 0xAD ||
@@ -2002,37 +1993,39 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			}
 			break;
 		case 100:
-			if (*reinterpret_cast<short*>(script + 0x3E) != 0) {
+			if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E) != 0) {
 				setSta(0, 0);
 			}
 			break;
 		case 0x65:
 			if (Game.m_gameWork.m_gameOverFlag == 0) {
 				if (amount == 0x225) {
-					addHp(*reinterpret_cast<unsigned short*>(script + 0x1A), 0);
+					addHp(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1A), 0);
 				} else {
 					addHp(8, 0);
 				}
 				changeStat(0x22, 0, 0);
 				putHitParticleFromItem(sourceObj, amount);
+			} else {
+				System.Printf(lbl_801DC908);
 			}
-			next = 0;
+			outValue = 0;
 			break;
 		case 0x66:
-			addHp(*reinterpret_cast<unsigned short*>(script + 0x1A), 0);
+			addHp(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1A), 0);
 			if (sourceObj != 0) {
 				sourceObj->bonus(0x16, amount, this);
 			}
+			outValue = 0;
 			putHitParticleFromItem(sourceObj, amount);
-			next = 0;
 			break;
 		case 0x24:
-			if (*reinterpret_cast<short*>(script + 0x3E) != 0) {
+			if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E) != 0) {
 				setSta(0, 0);
 			}
 			break;
 		case 0x68:
-			if (*reinterpret_cast<short*>(script + 0x3E) != 0) {
+			if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E) != 0) {
 				setSta(0, 0);
 			}
 			changeStat(4, 0, 0);
@@ -2045,29 +2038,24 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			putHitParticleFromItem(sourceObj, amount);
 			break;
 		case 0x6A:
-			setSta(4, calcSta(4, amount, source));
+			setSta(4, calcSta(4, amount, reinterpret_cast<CGObject*>(sourceObj)));
 			setSta(0, 0);
 			setSta(1, 0);
 			changeStat(10, 0, 0);
 			break;
 		case 0x6B:
-			if (*reinterpret_cast<short*>(script + 0x46) != 0) {
+			if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x46) != 0) {
 				setSta(4, 0);
 			}
-			if (*reinterpret_cast<short*>(script + 0x3E) == 0 &&
-				*reinterpret_cast<short*>(script + 0x50) == 0 &&
-				*reinterpret_cast<short*>(script + 0x44) == 0) {
+			if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E) == 0 &&
+				*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x50) == 0 &&
+				*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x44) == 0) {
 				changeStat(0x1A, 0, 0);
 			}
 			break;
 		default:
 			break;
 	}
-
-	if (staIndex >= 0 && staIndex < 0x27) {
-		next = *reinterpret_cast<short*>(script + 0x3E + (staIndex * 2));
-	}
-	outValue = next;
 }
 
 /*

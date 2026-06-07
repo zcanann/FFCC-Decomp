@@ -1432,18 +1432,18 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		changeStat(0x19, 0, 0);
 	}
 
-	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1D) != 0) {
+	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x74) != 0) {
 		allowEffect = 0;
 		effectResult = 0;
 	}
-	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x11) != 0) {
+	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x44) != 0) {
 		allowEffect = 0;
 	}
-	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x14) != 0 && (staType == 7 || staType == 8)) {
+	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x50) != 0 && (staType == 8 || staType == 7)) {
 		allowEffect = 0;
 		effectResult = 0;
 	}
-	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 7) == 0) {
+	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
 		if (staType == 0x65) {
 			allowEffect = 1;
 			effectResult = 0;

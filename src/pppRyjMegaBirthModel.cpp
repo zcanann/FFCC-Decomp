@@ -461,7 +461,7 @@ void birth(
         particleData->m_matrix[2][1] = forward.z;
         orthonormalize_particle_matrix(particleData);
 
-        pppFMATRIX basis;
+        pppFMATRIX& basis = rotMatrix;
         Vec direction;
         Vec right;
         Vec up;

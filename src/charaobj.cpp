@@ -1538,6 +1538,19 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					reinterpret_cast<CGCharaObj*>(sourceObj)->addHp(-1, 0);
 				}
 			} else if (staType == 10) {
+				int recoilDamage;
+				unsigned char* selfReactive = reinterpret_cast<unsigned char*>(this) + 0x6C2;
+				if ((GetCID() & 0xAD) == 0xAD && *selfReactive != 0) {
+					recoilDamage = 1;
+				} else {
+					float recoilRate = (static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x26 + resistType * 2)) * 0.01f) + 1.0f;
+					int raw = static_cast<int>(static_cast<float>(static_cast<int>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 7))) * recoilRate);
+					recoilDamage = (raw < 1) ? 1 : raw;
+					if ((GetCID() & 0xAD) == 0xAD) {
+						*selfReactive = 1;
+					}
+				}
+				System.Printf(dbg + 0x218, recoilDamage);
 				int nextSta = calcSta(10, resolvedItemId, sourceObj);
 				setSta(10, nextSta);
 			}

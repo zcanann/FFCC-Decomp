@@ -7,16 +7,16 @@
 #include "ffcc/pppShape.h"
 extern "C" {
 extern const float kPppYmMegaBirthShpTail2Zero = 0.0f;
-extern const float FLOAT_80330564 = 16384.0f;
-extern const float FLOAT_80330568 = 0.5f;
-extern const float FLOAT_8033056C = 0.00787f;
-extern const float FLOAT_80330570 = 127.0f;
-extern const double DOUBLE_80330578 = 4503601774854144.0;
-extern const double DOUBLE_80330580 = 4503599627370496.0;
-extern const float FLOAT_80330588 = 2.0f;
-extern const float FLOAT_8033058C = 180.0f;
-extern const float FLOAT_80330590 = 0.7f;
-extern const double DOUBLE_80330598 = 1.0;
+extern const float kPppYmMegaBirthShpTail2AlphaDivisor = 16384.0f;
+extern const float kPppYmMegaBirthShpTail2Half = 0.5f;
+extern const float kPppYmMegaBirthShpTail2DepthAlphaScale = 0.00787f;
+extern const float kPppYmMegaBirthShpTail2ColorComponentMax = 127.0f;
+extern const double kPppYmMegaBirthShpTail2U32ToDoubleBias = 4503601774854144.0;
+extern const double kPppYmMegaBirthShpTail2S32ToDoubleBias = 4503599627370496.0;
+extern const float kPppYmMegaBirthShpTail2Double = 2.0f;
+extern const float kPppYmMegaBirthShpTail2HalfTurnDegrees = 180.0f;
+extern const float kPppYmMegaBirthShpTail2RandomSpeedScale = 0.7f;
+extern const double kPppYmMegaBirthShpTail2OneDouble = 1.0;
 }
 #include <dolphin/mtx.h>
 #include <string.h>
@@ -113,7 +113,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
             const u8 trailReadIndex = *(u8*)(particle + 0x38);
             const u8 trailMaxIndex = (u8)(*(u8*)(particle + 0x37) - 1);
             u8 trailNextIndex = (u8)(trailReadIndex + 1);
-            const float alphaScale = (float)*(s16*)((u8*)colorWork + 6) / FLOAT_80330564;
+            const float alphaScale = (float)*(s16*)((u8*)colorWork + 6) / kPppYmMegaBirthShpTail2AlphaDivisor;
             const float stepDivisor = (float)((s32)frameCountRaw - 1);
             float drawScale = *(float*)(payload + 0x5c);
             const float drawScaleStep =
@@ -122,10 +122,10 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
             float fadeG = (float)payload[0x65];
             float fadeB = (float)payload[0x66];
             float fadeA = (float)payload[0x67] * alphaScale;
-            float fadeRStep = LoadFloat(FLOAT_80330568);
-            float fadeGStep = LoadFloat(FLOAT_80330568);
-            float fadeBStep = LoadFloat(FLOAT_80330568);
-            float fadeAStep = LoadFloat(FLOAT_80330568);
+            float fadeRStep = LoadFloat(kPppYmMegaBirthShpTail2Half);
+            float fadeGStep = LoadFloat(kPppYmMegaBirthShpTail2Half);
+            float fadeBStep = LoadFloat(kPppYmMegaBirthShpTail2Half);
+            float fadeAStep = LoadFloat(kPppYmMegaBirthShpTail2Half);
             if (stepDivisor != kPppYmMegaBirthShpTail2Zero) {
                 fadeRStep = (fadeR - (float)payload[0x68]) / stepDivisor;
                 fadeGStep = (fadeG - (float)payload[0x69]) / stepDivisor;
@@ -184,7 +184,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
                     amb.r = (u8)fadeR;
                     amb.g = (u8)fadeG;
                     amb.b = (u8)fadeB;
-                    amb.a = (u8)(fadeA * (FLOAT_8033056C * (FLOAT_80330570 - *(float*)(particle + 0x30))));
+                    amb.a = (u8)(fadeA * (kPppYmMegaBirthShpTail2DepthAlphaScale * (kPppYmMegaBirthShpTail2ColorComponentMax - *(float*)(particle + 0x30))));
                     GXSetChanAmbColor(GX_COLOR0A0, amb);
                     pppDrawShp(shape, ppvEnv->m_materialSetPtr, payload[0x5A]);
                 }
@@ -441,8 +441,8 @@ void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail2* vYmMegaBirthShpTail2,
     if ((frameState[6] != 0) && (*(u16*)(color + 0x22) <= frameState[6])) {
         fadeInFrames = *((u8*)&pYmMegaBirthShpTail2->m_matrix[1] + 7);
         *blend = *blend + ((float)alpha / (float)fadeInFrames);
-        if (*blend > FLOAT_80330570) {
-            *blend = FLOAT_80330570;
+        if (*blend > kPppYmMegaBirthShpTail2ColorComponentMax) {
+            *blend = kPppYmMegaBirthShpTail2ColorComponentMax;
         }
     }
 
@@ -501,7 +501,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
     u8* particleBytes = (u8*)particleData;
     u8 mode = paramBytes[0x18];
     float spread = (float)paramBytes[0x19];
-    float spreadRange = FLOAT_80330588 * spread;
+    float spreadRange = kPppYmMegaBirthShpTail2Double * spread;
 
     memset(particleData, 0, 0x1b8);
     if (particleWMat != 0) {
@@ -517,9 +517,9 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
         pppFMATRIX rot;
         Vec tempVec;
 
-        angles[0] = (s32)((float)((s32)(spreadRange * Math.RandF() - spread) << 15) / FLOAT_8033058C);
-        angles[1] = (s32)((float)((s32)(spreadRange * Math.RandF() - spread) << 15) / FLOAT_8033058C);
-        angles[2] = (s32)((float)((s32)(spreadRange * Math.RandF() - spread) << 15) / FLOAT_8033058C);
+        angles[0] = (s32)((float)((s32)(spreadRange * Math.RandF() - spread) << 15) / kPppYmMegaBirthShpTail2HalfTurnDegrees);
+        angles[1] = (s32)((float)((s32)(spreadRange * Math.RandF() - spread) << 15) / kPppYmMegaBirthShpTail2HalfTurnDegrees);
+        angles[2] = (s32)((float)((s32)(spreadRange * Math.RandF() - spread) << 15) / kPppYmMegaBirthShpTail2HalfTurnDegrees);
         angles[3] = 0;
         if ((mode == 2) || (mode == 3)) {
             angles[0] = 0;
@@ -539,7 +539,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
 
     if ((mode >= 4) && (mode < 6) && (param->m_speedRandRange != 0.0f)) {
         float speedRandRange = param->m_speedRandRange;
-        float speedRandHalf = FLOAT_80330568 * speedRandRange;
+        float speedRandHalf = kPppYmMegaBirthShpTail2Half * speedRandRange;
         u8 randType = param->m_randType;
 
         if (randType <= 1) {
@@ -550,16 +550,16 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
             particleData->m_matrix[0][1] = speedRandRange * Math.RandF() - speedRandHalf;
             particleData->m_matrix[0][2] = speedRandRange * Math.RandF() - speedRandHalf;
         } else if (randType == 3) {
-            particleData->m_matrix[0][0] = -(FLOAT_80330590 * (speedRandRange * Math.RandF() * Math.RandF()) - speedRandRange) - speedRandHalf;
-            particleData->m_matrix[0][1] = -(FLOAT_80330590 * (speedRandRange * Math.RandF() * Math.RandF()) - speedRandRange) - speedRandHalf;
-            particleData->m_matrix[0][2] = -(FLOAT_80330590 * (speedRandRange * Math.RandF() * Math.RandF()) - speedRandRange) - speedRandHalf;
+            particleData->m_matrix[0][0] = -(kPppYmMegaBirthShpTail2RandomSpeedScale * (speedRandRange * Math.RandF() * Math.RandF()) - speedRandRange) - speedRandHalf;
+            particleData->m_matrix[0][1] = -(kPppYmMegaBirthShpTail2RandomSpeedScale * (speedRandRange * Math.RandF() * Math.RandF()) - speedRandRange) - speedRandHalf;
+            particleData->m_matrix[0][2] = -(kPppYmMegaBirthShpTail2RandomSpeedScale * (speedRandRange * Math.RandF() * Math.RandF()) - speedRandRange) - speedRandHalf;
         } else if (randType == 5) {
             particleData->m_matrix[0][0] =
-                -(LoadFloat(FLOAT_80330568) * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF())) - speedRandRange) - speedRandHalf;
+                -(LoadFloat(kPppYmMegaBirthShpTail2Half) * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF())) - speedRandRange) - speedRandHalf;
             particleData->m_matrix[0][1] =
-                -(LoadFloat(FLOAT_80330568) * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF())) - speedRandRange) - speedRandHalf;
+                -(LoadFloat(kPppYmMegaBirthShpTail2Half) * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF())) - speedRandRange) - speedRandHalf;
             particleData->m_matrix[0][2] =
-                -(LoadFloat(FLOAT_80330568) * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF())) - speedRandRange) - speedRandHalf;
+                -(LoadFloat(kPppYmMegaBirthShpTail2Half) * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF())) - speedRandRange) - speedRandHalf;
         } else if (randType == 2) {
             particleData->m_matrix[0][0] = Math.RandF() * (speedRandRange * Math.RandF()) - speedRandHalf;
             particleData->m_matrix[0][1] = Math.RandF() * (speedRandRange * Math.RandF()) - speedRandHalf;
@@ -611,9 +611,9 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
                         Math.RandF();
                         sampleT = Math.RandF();
                     } else if (param->m_randType == 3) {
-                        sampleT = static_cast<float>(DOUBLE_80330598 - (Math.RandF() * Math.RandF() * Math.RandF()));
+                        sampleT = static_cast<float>(kPppYmMegaBirthShpTail2OneDouble - (Math.RandF() * Math.RandF() * Math.RandF()));
                     } else if (param->m_randType == 5) {
-                        sampleT = static_cast<float>(DOUBLE_80330598 - (Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF()));
+                        sampleT = static_cast<float>(kPppYmMegaBirthShpTail2OneDouble - (Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF()));
                     } else if (param->m_randType == 2) {
                         sampleT = Math.RandF() * Math.RandF() * Math.RandF();
                     } else {
@@ -647,7 +647,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
         float scale = speedRandRange;
 
         if (randType == 3) {
-            scale = -(FLOAT_80330590 * (speedRandRange * Math.RandF() * Math.RandF()) - speedRandRange);
+            scale = -(kPppYmMegaBirthShpTail2RandomSpeedScale * (speedRandRange * Math.RandF() * Math.RandF()) - speedRandRange);
         } else if (randType == 1) {
             Math.RandF();
             scale = speedRandRange * Math.RandF();
@@ -656,7 +656,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
         } else if (randType == 4) {
             scale = Math.RandF() * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF()));
         } else if (randType == 5) {
-            scale = -(LoadFloat(FLOAT_80330568) * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF())) - speedRandRange);
+            scale = -(LoadFloat(kPppYmMegaBirthShpTail2Half) * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF())) - speedRandRange);
         }
 
         Vec velocity = *reinterpret_cast<Vec*>(particleData->m_matrix[1]);
@@ -675,7 +675,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
     particleData->m_matrix[2][3] = param->m_sizeStart;
     if (param->m_colorDeltaAdd[3] != 0.0f) {
         particleData->m_matrix[2][2] +=
-            (FLOAT_80330588 * param->m_colorDeltaAdd[3]) * Math.RandF() - param->m_colorDeltaAdd[3];
+            (kPppYmMegaBirthShpTail2Double * param->m_colorDeltaAdd[3]) * Math.RandF() - param->m_colorDeltaAdd[3];
     }
 
     if (*(u16*)(paramBytes + 0x14) == 0) {

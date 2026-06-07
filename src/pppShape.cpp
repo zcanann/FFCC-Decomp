@@ -6,7 +6,7 @@
 
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
 
-extern const float FLOAT_80330108;
+extern const float kPppShapeUvScale;
 
 /*
  * --INFO--
@@ -53,10 +53,10 @@ void pppGetShapeUV(long* animData, short frameIndex, Vec2d& minUv, Vec2d& maxUv,
     float* minUvF = (float*)&minUv;
     float* maxUvF = (float*)&maxUv;
 
-    minUvF[0] = (float)*(short*)(displayList + 0x13) * FLOAT_80330108;
-    minUvF[1] = (float)*(short*)(displayList + 0x15) * FLOAT_80330108;
-    maxUvF[0] = (float)*(short*)(displayList + 0x3b) * FLOAT_80330108;
-    maxUvF[1] = (float)*(short*)(displayList + 0x3d) * FLOAT_80330108;
+    minUvF[0] = (float)*(short*)(displayList + 0x13) * kPppShapeUvScale;
+    minUvF[1] = (float)*(short*)(displayList + 0x15) * kPppShapeUvScale;
+    maxUvF[0] = (float)*(short*)(displayList + 0x3b) * kPppShapeUvScale;
+    maxUvF[1] = (float)*(short*)(displayList + 0x3d) * kPppShapeUvScale;
 }
 
 /*

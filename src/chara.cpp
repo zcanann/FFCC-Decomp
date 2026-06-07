@@ -2675,23 +2675,19 @@ void CChara::CNode::CalcBind(CChara::CModel* model)
 {
 	CalcOneBindNode(this, model);
 
-	u8 childCount = NodeChildCount(this);
-	for (int i = 0; i < childCount; i++) {
+	for (u32 i = 0; i < NodeChildCount(this); i++) {
 		CNode* child = GetBindChildNode(model, this, i);
 		CalcOneBindNode(child, model);
 
-		u8 grandChildCount = NodeChildCount(child);
-		for (int j = 0; j < grandChildCount; j++) {
+		for (u32 j = 0; j < NodeChildCount(child); j++) {
 			CNode* grandChild = GetBindChildNode(model, child, j);
 			CalcOneBindNode(grandChild, model);
 
-			u8 greatGrandChildCount = NodeChildCount(grandChild);
-			for (int k = 0; k < greatGrandChildCount; k++) {
+			for (u32 k = 0; k < NodeChildCount(grandChild); k++) {
 				CNode* greatGrandChild = GetBindChildNode(model, grandChild, k);
 				CalcOneBindNode(greatGrandChild, model);
 
-				u8 recursiveChildCount = NodeChildCount(greatGrandChild);
-				for (int l = 0; l < recursiveChildCount; l++) {
+				for (u32 l = 0; l < NodeChildCount(greatGrandChild); l++) {
 					GetBindChildNode(model, greatGrandChild, l)->CalcBind(model);
 				}
 			}

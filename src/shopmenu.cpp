@@ -2149,7 +2149,7 @@ void CShopMenu::SelectMake()
             if (itemId < 1) {
                 makeGil = 0;
             } else {
-                int gil = m_caravanWork->m_shopParam *
+                unsigned int gil = m_caravanWork->m_shopParam *
                           *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x24);
                 gil = gil / 100 + (gil >> 0x1F);
                 makeGil = gil - (gil >> 0x1F);
@@ -2219,7 +2219,7 @@ void CShopMenu::SelectYesNo()
                 if (itemId < 1) {
                     gilValue = 0;
                 } else {
-                    int gil = caravanWork->m_shopParam *
+                    unsigned int gil = caravanWork->m_shopParam *
                               *reinterpret_cast<unsigned short*>(costBase + Game.unkCFlatData0[2] + 0x20);
                     gil = gil / 100 + (gil >> 0x1F);
                     gilValue = gil - (gil >> 0x1F);
@@ -2310,7 +2310,7 @@ void CShopMenu::SelectYesNo()
             if (sellId < 1) {
                 gilValue = 0;
             } else {
-                int gil = m_caravanWork->m_shopParam *
+                unsigned int gil = m_caravanWork->m_shopParam *
                           *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + sellId * 0x48 + 0x20);
                 gil = gil / 100 + (gil >> 0x1F);
                 gilValue = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil - (gil >> 0x1F)));

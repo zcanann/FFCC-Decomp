@@ -2190,7 +2190,6 @@ void CMenuPcs::InitSaveLoadMenu()
 void CMenuPcs::CalcLoadMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmWorldState* const worldState = m_wmWorldState;
 	McCtrl& mcCtrl = *GetMcCtrl();
 	m_textureLocIndex = 0;
 
@@ -2243,10 +2242,10 @@ void CMenuPcs::CalcLoadMenu()
 		mcCtrl.m_saveIndex = 0;
 		memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
 
-		Game.m_gameWork.m_wmBackupParams[0] = worldState->m_originalBackupParams[0];
-		Game.m_gameWork.m_wmBackupParams[1] = worldState->m_originalBackupParams[1];
-		Game.m_gameWork.m_wmBackupParams[2] = worldState->m_originalBackupParams[2];
-		Game.m_gameWork.m_wmBackupParams[3] = worldState->m_originalBackupParams[3];
+		Game.m_gameWork.m_wmBackupParams[0] = m_wmWorldState->m_originalBackupParams[0];
+		Game.m_gameWork.m_wmBackupParams[1] = m_wmWorldState->m_originalBackupParams[1];
+		Game.m_gameWork.m_wmBackupParams[2] = m_wmWorldState->m_originalBackupParams[2];
+		Game.m_gameWork.m_wmBackupParams[3] = m_wmWorldState->m_originalBackupParams[3];
 		if (m_wmWorldState->m_menuMode == 8 && m_cmakeWorkCardChannel != 0) {
 			mcCtrl.m_cardChannel = (int)m_cmakeWorkCardChannel - 1;
 			m_wmWorldState->m_subState = 3;
@@ -2257,12 +2256,12 @@ void CMenuPcs::CalcLoadMenu()
 	}
 
 	int iVar14;
-	short sVar8 = worldState->m_mainState;
+	short sVar8 = m_wmWorldState->m_mainState;
 	unsigned int uVar15;
 	if (sVar8 == 0) {
-		uVar15 = static_cast<int>(worldState->m_frameCounter) - 10;
+		uVar15 = static_cast<int>(m_wmWorldState->m_frameCounter) - 10;
 	} else if (sVar8 < 1 || sVar8 > 3) {
-		uVar15 = -static_cast<int>(worldState->m_frameCounter);
+		uVar15 = -static_cast<int>(m_wmWorldState->m_frameCounter);
 	} else {
 		uVar15 = 0;
 	}
@@ -2300,17 +2299,17 @@ void CMenuPcs::CalcLoadMenu()
 	}
 
 	float fVar2 = FLOAT_803313e8;
-	if (worldState->m_mainState != 2) {
+	if (m_wmWorldState->m_mainState != 2) {
 		return;
 	}
 
-	iVar14 = reinterpret_cast<int>(worldState);
-	iVar10 = worldState->m_subState;
+	iVar14 = reinterpret_cast<int>(m_wmWorldState);
+	iVar10 = m_wmWorldState->m_subState;
 	switch (iVar10) {
 	case 0:
 	case 2:
-		if (worldState->m_flag09 == 0) {
-			worldState->m_cardChannel = (short)mcCtrl.m_cardChannel;
+		if (m_wmWorldState->m_flag09 == 0) {
+			m_wmWorldState->m_cardChannel = (short)mcCtrl.m_cardChannel;
 			CFont* pFont = m_fonts[0];
 			pFont->SetMargin(fVar2);
 			pFont->SetShadow(0);
@@ -2343,35 +2342,35 @@ void CMenuPcs::CalcLoadMenu()
 			m_menuWindowInfo->state = 3;
 			m_menuWindowInfo->state = 0;
 			memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
-			worldState->m_flag09 = 1;
-			worldState->m_flag0A = 0;
+			m_wmWorldState->m_flag09 = 1;
+			m_wmWorldState->m_flag0A = 0;
 		}
 		if (m_menuWindowInfo->state == 1) {
-			if (worldState->m_counter1A == 0) {
+			if (m_wmWorldState->m_counter1A == 0) {
 				if ((uVar7 & 3) == 0) {
 					if ((uVar4 & 0x100) == 0) {
 						if ((uVar4 & 0x200) != 0) {
-							worldState->m_state0E = -1;
-							worldState->m_counter1A = 1;
+							m_wmWorldState->m_state0E = -1;
+							m_wmWorldState->m_counter1A = 1;
 							Sound.PlaySe(3, 0x40, 0x7F, 0);
 						}
 					} else {
-						worldState->m_state0E = 1;
-						mcCtrl.m_cardChannel = (int)worldState->m_cardChannel;
-						worldState->m_counter1A = 10;
+						m_wmWorldState->m_state0E = 1;
+						mcCtrl.m_cardChannel = (int)m_wmWorldState->m_cardChannel;
+						m_wmWorldState->m_counter1A = 10;
 						Sound.PlaySe(2, 0x40, 0x7F, 0);
 					}
 				} else {
-					worldState->m_cardChannel ^= 1;
+					m_wmWorldState->m_cardChannel ^= 1;
 					Sound.PlaySe(1, 0x40, 0x7F, 0);
 				}
 			}
 		}
 		if (m_menuWindowInfo->state == 1) {
-			sVar8 = worldState->m_counter1A;
+			sVar8 = m_wmWorldState->m_counter1A;
 			if (sVar8 != 0) {
-				worldState->m_counter1A = sVar8 - 1;
-				if (worldState->m_counter1A == 0) {
+				m_wmWorldState->m_counter1A = sVar8 - 1;
+				if (m_wmWorldState->m_counter1A == 0) {
 					m_menuWindowInfo->state = 2;
 				}
 			}
@@ -2379,10 +2378,10 @@ void CMenuPcs::CalcLoadMenu()
 		break;
 	case 3:
 		MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
-		worldState->m_mcResult = (short)MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
+		m_wmWorldState->m_mcResult = (short)MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
 		break;
 	case 4:
-		if (worldState->m_flag09 == 0) {
+		if (m_wmWorldState->m_flag09 == 0) {
 			CFont* pFont = m_fonts[0];
 			pFont->SetMargin(FLOAT_803313e8);
 			pFont->SetShadow(0);
@@ -2420,23 +2419,23 @@ void CMenuPcs::CalcLoadMenu()
 			mcCtrl.m_iteration = 0;
 			mcCtrl.m_userBuffer = 0;
 			mcCtrl.m_createFlag = 0;
-			worldState->m_flag09 = 1;
+			m_wmWorldState->m_flag09 = 1;
 		} else if (m_menuWindowInfo->state == 1
-		           && worldState->m_counter1A == 0) {
+		           && m_wmWorldState->m_counter1A == 0) {
 			short chkResult = (short)mcCtrl.ChkEmpty(1);
-			worldState->m_mcResult = chkResult;
-			if (worldState->m_mcResult < 0) {
+			m_wmWorldState->m_mcResult = chkResult;
+			if (m_wmWorldState->m_mcResult < 0) {
 				MemoryCardMan.m_opDoneFlag = 1;
 				MemoryCardMan.m_currentSlot = 0xFF;
-				worldState->m_state0E = -1;
-				worldState->m_counter1A = 10;
+				m_wmWorldState->m_state0E = -1;
+				m_wmWorldState->m_counter1A = 10;
 			}
 		}
 		if (m_menuWindowInfo->state == 1) {
-			sVar8 = worldState->m_counter1A;
+			sVar8 = m_wmWorldState->m_counter1A;
 			if (sVar8 != 0) {
-				worldState->m_counter1A = sVar8 - 1;
-				if (worldState->m_counter1A == 0) {
+				m_wmWorldState->m_counter1A = sVar8 - 1;
+				if (m_wmWorldState->m_counter1A == 0) {
 					m_menuWindowInfo->state = 2;
 				}
 			}
@@ -2453,7 +2452,7 @@ void CMenuPcs::CalcLoadMenu()
 	case 0x18:
 	case 0x1B:
 	case 0x1C: {
-		if (worldState->m_flag09 == 0) {
+		if (m_wmWorldState->m_flag09 == 0) {
 			bVar1 = true;
 			int uVar22 = 0;
 			int uVar19;
@@ -2502,47 +2501,47 @@ void CMenuPcs::CalcLoadMenu()
 			m_menuWindowInfo->frame = 0;
 			m_menuWindowInfo->state = 3;
 			m_menuWindowInfo->state = 0;
-			worldState->m_flag09 = 1;
-			worldState->m_counter1A = 0;
+			m_wmWorldState->m_flag09 = 1;
+			m_wmWorldState->m_counter1A = 0;
 		}
 		if (m_menuWindowInfo->state == 1
-		    && worldState->m_counter1A == 0) {
-			sVar8 = worldState->m_subState;
+		    && m_wmWorldState->m_counter1A == 0) {
+			sVar8 = m_wmWorldState->m_subState;
 			if (sVar8 == 0xE || sVar8 == 5) {
 				int chkRes = MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
-				worldState->m_mcResult = (short)chkRes;
-				if (worldState->m_mcResult < 0) {
-					sVar8 = worldState->m_subState;
+				m_wmWorldState->m_mcResult = (short)chkRes;
+				if (m_wmWorldState->m_mcResult < 0) {
+					sVar8 = m_wmWorldState->m_subState;
 					short sVar18;
 					if (sVar8 == 5) { sVar18 = -1; }
 					else if (sVar8 == 6) { sVar18 = -3; }
 					else if (sVar8 == 7) { sVar18 = -4; }
 					else { sVar18 = 0; }
 					if (sVar8 == 7) {
-						short chk = worldState->m_mcResult;
+						short chk = m_wmWorldState->m_mcResult;
 						if (chk != 0 && chk != sVar18 && chk != 1) {
-							worldState->m_state0E = -1;
-							worldState->m_counter1A = 1;
+							m_wmWorldState->m_state0E = -1;
+							m_wmWorldState->m_counter1A = 1;
 							break;
 						}
-					} else if (worldState->m_mcResult != sVar18 && worldState->m_mcResult != 1) {
-						worldState->m_state0E = -1;
-						worldState->m_counter1A = 1;
+					} else if (m_wmWorldState->m_mcResult != sVar18 && m_wmWorldState->m_mcResult != 1) {
+						m_wmWorldState->m_state0E = -1;
+						m_wmWorldState->m_counter1A = 1;
 						break;
 					}
 				}
 			}
 			if ((uVar4 & 0x300) != 0) {
-				worldState->m_state0E = 1;
-				worldState->m_counter1A = 10;
+				m_wmWorldState->m_state0E = 1;
+				m_wmWorldState->m_counter1A = 10;
 				Sound.PlaySe(2, 0x40, 0x7F, 0);
 			}
 		}
 		if (m_menuWindowInfo->state == 1) {
-			sVar8 = worldState->m_counter1A;
+			sVar8 = m_wmWorldState->m_counter1A;
 			if (sVar8 != 0) {
-				worldState->m_counter1A = sVar8 - 1;
-				if (worldState->m_counter1A == 0) {
+				m_wmWorldState->m_counter1A = sVar8 - 1;
+				if (m_wmWorldState->m_counter1A == 0) {
 					m_menuWindowInfo->state = 2;
 				}
 			}
@@ -2552,19 +2551,19 @@ void CMenuPcs::CalcLoadMenu()
 	case 8:
 	case 0xB:
 	case 0x19: {
-		if (worldState->m_flag09 == 0) {
+		if (m_wmWorldState->m_flag09 == 0) {
 			int uVar22 = 0;
 			int uVar19;
 			if (iVar10 == 8) {
-				worldState->m_cardChannel = 0;
+				m_wmWorldState->m_cardChannel = 0;
 				uVar19 = 4;
 			} else if (iVar10 == 0x19) {
 				uVar22 = 1;
 				uVar19 = 0x19;
-				worldState->m_cardChannel = 1;
+				m_wmWorldState->m_cardChannel = 1;
 			} else {
 				uVar19 = 5;
-				worldState->m_cardChannel = 1;
+				m_wmWorldState->m_cardChannel = 1;
 			}
 			CFont* pFont = m_fonts[0];
 			pFont->SetMargin(FLOAT_803313e8);
@@ -2597,61 +2596,61 @@ void CMenuPcs::CalcLoadMenu()
 			m_menuWindowInfo->frame = 0;
 			m_menuWindowInfo->state = 3;
 			m_menuWindowInfo->state = 0;
-			worldState->m_flag09 = 1;
+			m_wmWorldState->m_flag09 = 1;
 		}
 		if (m_menuWindowInfo->state == 1) {
-			if (worldState->m_counter1A == 0) {
-				if (worldState->m_subState == 0x19) {
-					worldState->m_state0E = 1;
-					worldState->m_counter1A = 0x5A;
+			if (m_wmWorldState->m_counter1A == 0) {
+				if (m_wmWorldState->m_subState == 0x19) {
+					m_wmWorldState->m_state0E = 1;
+					m_wmWorldState->m_counter1A = 0x5A;
 					break;
 				}
 				int chkRes = MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
-				worldState->m_mcResult = (short)chkRes;
-				if (worldState->m_mcResult == 0) {
+				m_wmWorldState->m_mcResult = (short)chkRes;
+				if (m_wmWorldState->m_mcResult == 0) {
 					if ((uVar7 & 3) == 0) {
 						if ((uVar4 & 0x100) == 0) {
 							if ((uVar4 & 0x200) != 0) {
-								worldState->m_cardChannel = 1;
-								worldState->m_state0E = -1;
-								worldState->m_counter1A = 10;
+								m_wmWorldState->m_cardChannel = 1;
+								m_wmWorldState->m_state0E = -1;
+								m_wmWorldState->m_counter1A = 10;
 								Sound.PlaySe(3, 0x40, 0x7F, 0);
 							}
 						} else {
-							if (worldState->m_cardChannel == 0) {
-								worldState->m_state0E = 1;
+							if (m_wmWorldState->m_cardChannel == 0) {
+								m_wmWorldState->m_state0E = 1;
 							} else {
-								worldState->m_state0E = -1;
+								m_wmWorldState->m_state0E = -1;
 							}
-							worldState->m_counter1A = 10;
+							m_wmWorldState->m_counter1A = 10;
 							Sound.PlaySe(2, 0x40, 0x7F, 0);
 						}
 					} else {
-						worldState->m_cardChannel ^= 1;
+						m_wmWorldState->m_cardChannel ^= 1;
 						Sound.PlaySe(1, 0x40, 0x7F, 0);
 					}
 				} else {
-					worldState->m_state0E = -1;
-					worldState->m_counter1A = 10;
+					m_wmWorldState->m_state0E = -1;
+					m_wmWorldState->m_counter1A = 10;
 				}
 			}
 		}
 		if (m_menuWindowInfo->state == 1
-		    && worldState->m_counter1A != 0) {
-			if (worldState->m_subState == 0x19) {
+		    && m_wmWorldState->m_counter1A != 0) {
+			if (m_wmWorldState->m_subState == 0x19) {
 				int chkRes = MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
-				worldState->m_mcResult = (short)chkRes;
+				m_wmWorldState->m_mcResult = (short)chkRes;
 			}
-			worldState->m_counter1A--;
-			if (worldState->m_counter1A == 0) {
+			m_wmWorldState->m_counter1A--;
+			if (m_wmWorldState->m_counter1A == 0) {
 				m_menuWindowInfo->state = 2;
 			}
 		}
 		break;
 	}
 	case 0xC: {
-		if (worldState->m_flag09 == 0) {
-			worldState->m_flag09 = 1;
+		if (m_wmWorldState->m_flag09 == 0) {
+			m_wmWorldState->m_flag09 = 1;
 			memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
 			mcCtrl.m_previousState = 0;
 			mcCtrl.m_state = 0;
@@ -2661,12 +2660,12 @@ void CMenuPcs::CalcLoadMenu()
 			mcCtrl.m_createFlag = 0;
 		}
 		if (m_menuWindowInfo->state == 1
-		    && worldState->m_counter1A == 0) {
+		    && m_wmWorldState->m_counter1A == 0) {
 			mcCtrl.m_lastResult = mcCtrl.LoadMcList();
 			short listRes = (short)mcCtrl.m_lastResult;
-			worldState->m_mcResult = listRes;
-			if (worldState->m_mcResult != 0) {
-				if (worldState->m_menuMode == 8) {
+			m_wmWorldState->m_mcResult = listRes;
+			if (m_wmWorldState->m_mcResult != 0) {
+				if (m_wmWorldState->m_menuMode == 8) {
 					int unk838 = reinterpret_cast<int>(m_wmCharaState);
 					int iVar23 = 0;
 					int cnt = 4;
@@ -2680,7 +2679,7 @@ void CMenuPcs::CalcLoadMenu()
 						cnt--;
 					} while (cnt != 0);
 					if (iVar23 == 0) {
-						worldState->m_mcResult = (short)0xFC19;
+						m_wmWorldState->m_mcResult = (short)0xFC19;
 					}
 				}
 				int calTimes[40];
@@ -2733,29 +2732,29 @@ void CMenuPcs::CalcLoadMenu()
 				} while (cnt2 != 0);
 				if (bestIdx < 0) bestIdx = 0;
 
-				worldState->m_cardChannel = (short)bestIdx;
+				m_wmWorldState->m_cardChannel = (short)bestIdx;
 				iVar10 = 0;
 				iVar14 = 0;
 				int cnt3 = 4;
 				do {
 					if (*reinterpret_cast<char*>(unk838 + iVar14 + 0x42) != 0) {
 						mcCtrl.m_saveIndex = iVar10;
-						worldState->m_cardChannel = (short)iVar10;
+						m_wmWorldState->m_cardChannel = (short)iVar10;
 						break;
 					}
 					iVar14 += 0x48;
 					iVar10++;
 					cnt3--;
 				} while (cnt3 != 0);
-				worldState->m_state0E = 1;
-				worldState->m_counter1A = 10;
+				m_wmWorldState->m_state0E = 1;
+				m_wmWorldState->m_counter1A = 10;
 			}
 		}
 		if (m_menuWindowInfo->state == 1) {
-			sVar8 = worldState->m_counter1A;
+			sVar8 = m_wmWorldState->m_counter1A;
 			if (sVar8 != 0) {
-				worldState->m_counter1A = sVar8 - 1;
-				if (worldState->m_counter1A == 0) {
+				m_wmWorldState->m_counter1A = sVar8 - 1;
+				if (m_wmWorldState->m_counter1A == 0) {
 					m_menuWindowInfo->state = 2;
 				}
 			}
@@ -2765,7 +2764,7 @@ void CMenuPcs::CalcLoadMenu()
 	case 0xD:
 	case 0x16:
 	case 0x1A: {
-		if (worldState->m_flag09 == 0) {
+		if (m_wmWorldState->m_flag09 == 0) {
 			int uVar22 = 0;
 			int uVar19;
 			if (iVar10 == 0xD) { uVar19 = 7; }
@@ -2808,40 +2807,40 @@ void CMenuPcs::CalcLoadMenu()
 			mcCtrl.m_iteration = 0;
 			mcCtrl.m_userBuffer = 0;
 			mcCtrl.m_createFlag = 0;
-			if (worldState->m_menuMode == 8
+			if (m_wmWorldState->m_menuMode == 8
 			    && m_cmakeWork != 0) {
 				mcCtrl.m_userBuffer = m_cmakeWork;
 			} else {
 				mcCtrl.m_userBuffer = 0;
 			}
-			worldState->m_flag09 = 1;
+			m_wmWorldState->m_flag09 = 1;
 		} else if (m_menuWindowInfo->state == 1
-		           && worldState->m_counter1A == 0) {
-			iVar10 = (int)worldState->m_subState;
+		           && m_wmWorldState->m_counter1A == 0) {
+			iVar10 = (int)m_wmWorldState->m_subState;
 			if (iVar10 == 0xD) {
 				mcCtrl.Format(1);
-				worldState->m_mcResult = (short)mcCtrl.m_lastResult;
-				if (worldState->m_mcResult < 0) {
+				m_wmWorldState->m_mcResult = (short)mcCtrl.m_lastResult;
+				if (m_wmWorldState->m_mcResult < 0) {
 					MemoryCardMan.m_opDoneFlag = 1;
 					MemoryCardMan.m_currentSlot = 0xFF;
 				}
 			} else if (iVar10 == 0x1A) {
 				mcCtrl.m_lastResult = mcCtrl.EraseDat();
 				short erRes = (short)mcCtrl.m_lastResult;
-				worldState->m_mcResult = erRes;
-				if (worldState->m_mcResult < 0) {
+				m_wmWorldState->m_mcResult = erRes;
+				if (m_wmWorldState->m_mcResult < 0) {
 					MemoryCardMan.m_opDoneFlag = 1;
 					MemoryCardMan.m_currentSlot = 0xFF;
 				}
 			} else {
 				mcCtrl.m_lastResult = mcCtrl.LoadDat();
 				short ldRes = (short)mcCtrl.m_lastResult;
-				worldState->m_mcResult = ldRes;
+				m_wmWorldState->m_mcResult = ldRes;
 			}
 
-			if (worldState->m_mcResult != 0) {
-				if (worldState->m_subState == 0x16) {
-					if (worldState->m_menuMode == 8 || worldState->m_mcResult != 1) {
+			if (m_wmWorldState->m_mcResult != 0) {
+				if (m_wmWorldState->m_subState == 0x16) {
+					if (m_wmWorldState->m_menuMode == 8 || m_wmWorldState->m_mcResult != 1) {
 						DAT_8032ee24 = (unsigned char)mcCtrl.m_cardChannel;
 						uRam8032ee25 = (unsigned char)mcCtrl.m_saveIndex;
 					} else {
@@ -2857,7 +2856,7 @@ void CMenuPcs::CalcLoadMenu()
 					int pOff = 0;
 					do {
 						int iVar17 = reinterpret_cast<int>(m_wm.m_charaModelData) + iVar10;
-						if (worldState->m_menuMode == 8
+						if (m_wmWorldState->m_menuMode == 8
 						    && m_cmakeWork != 0) {
 							int iVar6 = reinterpret_cast<int>(m_cmakeWork) + iVar23 + 0x14D0;
 							if (*reinterpret_cast<int*>(iVar6 + 0x5B4) == 0) {
@@ -2898,26 +2897,26 @@ void CMenuPcs::CalcLoadMenu()
 						pOff += 4;
 						iVar10 += 0x34;
 					} while (iVar14 < 8);
-					if (worldState->m_menuMode != 8) {
-						worldState->m_originalBackupParams[0] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[0]);
-						worldState->m_backupParams[0] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[0]);
-						worldState->m_originalBackupParams[1] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[1]);
-						worldState->m_backupParams[1] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[1]);
-						worldState->m_originalBackupParams[2] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[2]);
-						worldState->m_backupParams[2] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[2]);
-						worldState->m_originalBackupParams[3] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[3]);
-						worldState->m_backupParams[3] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[3]);
+					if (m_wmWorldState->m_menuMode != 8) {
+						m_wmWorldState->m_originalBackupParams[0] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[0]);
+						m_wmWorldState->m_backupParams[0] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[0]);
+						m_wmWorldState->m_originalBackupParams[1] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[1]);
+						m_wmWorldState->m_backupParams[1] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[1]);
+						m_wmWorldState->m_originalBackupParams[2] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[2]);
+						m_wmWorldState->m_backupParams[2] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[2]);
+						m_wmWorldState->m_originalBackupParams[3] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[3]);
+						m_wmWorldState->m_backupParams[3] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[3]);
 					}
 				}
-				worldState->m_state0E = 1;
-				worldState->m_counter1A = 10;
+				m_wmWorldState->m_state0E = 1;
+				m_wmWorldState->m_counter1A = 10;
 			}
 		}
 		if (m_menuWindowInfo->state == 1) {
-			sVar8 = worldState->m_counter1A;
+			sVar8 = m_wmWorldState->m_counter1A;
 			if (sVar8 != 0) {
-				worldState->m_counter1A = sVar8 - 1;
-				if (worldState->m_counter1A == 0) {
+				m_wmWorldState->m_counter1A = sVar8 - 1;
+				if (m_wmWorldState->m_counter1A == 0) {
 					m_menuWindowInfo->state = 2;
 				}
 			}
@@ -2926,45 +2925,45 @@ void CMenuPcs::CalcLoadMenu()
 	}
 	case 0x11: {
 		int chkRes = MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
-		worldState->m_mcResult = (short)chkRes;
-		if (worldState->m_mcResult == 0 && uVar7 != 0) {
+		m_wmWorldState->m_mcResult = (short)chkRes;
+		if (m_wmWorldState->m_mcResult == 0 && uVar7 != 0) {
 			if ((uVar7 & 8) == 0) {
 				if ((uVar7 & 4) != 0) {
-					if (worldState->m_cardChannel < 3) {
-						worldState->m_cardChannel++;
+					if (m_wmWorldState->m_cardChannel < 3) {
+						m_wmWorldState->m_cardChannel++;
 					} else {
-						worldState->m_cardChannel = 0;
+						m_wmWorldState->m_cardChannel = 0;
 					}
 					Sound.PlaySe(1, 0x40, 0x7F, 0);
 				}
 			} else {
-				if (worldState->m_cardChannel < 1) {
-					worldState->m_cardChannel = 3;
+				if (m_wmWorldState->m_cardChannel < 1) {
+					m_wmWorldState->m_cardChannel = 3;
 				} else {
-					worldState->m_cardChannel--;
+					m_wmWorldState->m_cardChannel--;
 				}
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			}
 			if ((uVar7 & 0xC) == 0) {
 				if ((uVar4 & 0x100) != 0) {
-					sVar8 = worldState->m_state0E;
+					sVar8 = m_wmWorldState->m_state0E;
 					if (sVar8 != -1 && sVar8 != 1) {
 						int unk838 = reinterpret_cast<int>(m_wmCharaState);
-						iVar14 = (int)worldState->m_cardChannel;
+						iVar14 = (int)m_wmWorldState->m_cardChannel;
 						if (*reinterpret_cast<char*>(unk838 + iVar14 * 0x48 + 0x41) == 0
 						    || *reinterpret_cast<char*>(unk838 + iVar14 * 0x48 + 0x42) != 0) {
 							Sound.PlaySe(4, 0x40, 0x7F, 0);
 						} else {
 							mcCtrl.m_saveIndex = iVar14;
-							worldState->m_state0E = 1;
+							m_wmWorldState->m_state0E = 1;
 							Sound.PlaySe(2, 0x40, 0x7F, 0);
 						}
 					}
 				}
 				if ((uVar4 & 0x200) != 0) {
-					sVar8 = worldState->m_state0E;
+					sVar8 = m_wmWorldState->m_state0E;
 					if (sVar8 != -1 && sVar8 != 1) {
-						worldState->m_state0E = -1;
+						m_wmWorldState->m_state0E = -1;
 						Sound.PlaySe(3, 0x40, 0x7F, 0);
 					}
 				}
@@ -2974,7 +2973,7 @@ void CMenuPcs::CalcLoadMenu()
 	}
 	}
 
-	if (worldState->m_subState != 0) {
+	if (m_wmWorldState->m_subState != 0) {
 		CalcMcObj();
 	}
 }

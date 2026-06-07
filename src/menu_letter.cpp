@@ -2470,15 +2470,14 @@ int CMenuPcs::LetterCtrlCur()
  */
 void CMenuPcs::LetterLstBaseDraw(float param_1)
 {
-	double param = static_cast<double>(param_1);
-	if (param <= static_cast<double>(FLOAT_803330bc)) {
+	if (param_1 <= FLOAT_803330bc) {
 		return;
 	}
 
-	float x0 = static_cast<float>(static_cast<int>(static_cast<double>(FLOAT_803330d4 - static_cast<float>(static_cast<double>(FLOAT_803330d0) * param * DOUBLE_803330a8)) - DOUBLE_803330a8));
-	float y0 = static_cast<float>(static_cast<int>(static_cast<double>(static_cast<float>(DOUBLE_803330d8 + static_cast<double>(FLOAT_803330d0) * param)) - DOUBLE_803330e8));
-	float w = static_cast<float>(static_cast<int>(static_cast<double>(FLOAT_803330e0) - DOUBLE_803330a8));
-	float h = static_cast<float>(static_cast<int>(static_cast<double>(FLOAT_803330f0) - DOUBLE_803330e8));
+	float x0 = static_cast<float>(static_cast<int>(static_cast<double>(FLOAT_803330d4 - static_cast<float>(FLOAT_803330d0 * param_1 * DOUBLE_803330a8)) - DOUBLE_803330a8));
+	float y0 = static_cast<float>(static_cast<int>(static_cast<double>(static_cast<float>(DOUBLE_803330d8 + FLOAT_803330d0 * param_1)) - DOUBLE_803330e8));
+	float w = static_cast<float>(static_cast<int>(FLOAT_803330e0 - DOUBLE_803330a8));
+	float h = static_cast<float>(static_cast<int>(FLOAT_803330f0 - DOUBLE_803330e8));
 
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	GXColor white;
@@ -2584,7 +2583,7 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 		}
 	}
 
-	if (param >= DOUBLE_803330e8) {
+	if (param_1 >= DOUBLE_803330e8) {
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3D));
 		MenuPcs.DrawRect(
 		    0, static_cast<float>(x0 - static_cast<double>(FLOAT_803330f4)),

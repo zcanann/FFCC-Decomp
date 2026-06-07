@@ -2891,17 +2891,19 @@ void CGPartyObj::onStatMagic()
 			if (m_itemId == 0x103) {
 				m_comboCenter = m_worldPosition;
 				m_comboTarget = m_comboCenter;
-				int kind = Math.Rand(4);
-				if (kind == 2) {
+				switch (Math.Rand(4)) {
+				case 2:
 					m_itemId = 0x232;
-				} else if (kind < 2) {
-					if (kind == 0) {
-						m_itemId = 0x230;
-					} else if (kind >= 0) {
-						m_itemId = 0x231;
-					}
-				} else if (kind < 4) {
+					break;
+				case 0:
+					m_itemId = 0x230;
+					break;
+				case 1:
+					m_itemId = 0x231;
+					break;
+				case 3:
 					m_itemId = 0x238;
+					break;
 				}
 			}
 			endPSlotBit(0x10);

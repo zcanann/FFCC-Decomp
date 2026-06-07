@@ -361,12 +361,15 @@ static inline void CGMonObj_SetAttackAfter(CGMonObj* monObj, int attackKind)
 		delay = 0;
 	}
 
-	int stageRank = 0;
+	int stageRank;
 	if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-		stageRank = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
-		if (2 < stageRank) {
-			stageRank = 2;
+		int rawStage = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
+		stageRank = 2;
+		if (rawStage < 2) {
+			stageRank = rawStage;
 		}
+	} else {
+		stageRank = 0;
 	}
 
 	if (0 < stageRank) {
@@ -376,18 +379,17 @@ static inline void CGMonObj_SetAttackAfter(CGMonObj* monObj, int attackKind)
 
 	if (delay == 0) {
 		reinterpret_cast<CGPrgObj*>(monObj)->changeStat(0, 0, 0);
-		return;
-	}
+	} else {
+		int range = (int)delay / 5 + ((int)delay >> 31);
+		range -= range >> 31;
+		int clampedRange = 1;
+		if (0 < range) {
+			clampedRange = range;
+		}
 
-	int range = (int)delay / 5 + ((int)delay >> 31);
-	range -= range >> 31;
-	if (range < 1) {
-		range = 1;
+		monObj->m_attackDelay = delay + Math.Rand(clampedRange);
+		reinterpret_cast<CGPrgObj*>(monObj)->changeStat(0x11, 0, 0);
 	}
-
-	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
-	monObj->m_attackDelay = delay + Math.Rand(range);
-	reinterpret_cast<CGPrgObj*>(monObj)->changeStat(0x11, 0, 0);
 }
 
 /*

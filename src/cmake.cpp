@@ -1454,17 +1454,30 @@ void CMenuPcs::CmakeResultDraw()
         DrawCmakeTitle(6, alpha, 1.0f);
     }
 
-    float crestAlpha = alpha;
     if ((mode == 2) && (resultDir < 0)) {
-        crestAlpha = 1.0f;
-    }
-
-    {
         int tribe = static_cast<int>(s_CmakeInfo.m_tribe);
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-        int crestA = static_cast<int>(255.0f * crestAlpha);
+        GXColor crestCol;
+        crestCol.r = 0xFF;
+        crestCol.g = 0xFF;
+        crestCol.b = 0xFF;
+        crestCol.a = 0xFF;
+        GXSetChanMatColor(GX_COLOR0A0, crestCol);
+        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x31));
+        MenuPcs.DrawRect(
+            0,
+            351.0f, 96.0f, 184.0f, 184.0f,
+            static_cast<float>((tribe & 1) * 0xB8),
+            static_cast<float>((tribe / 2) * 0xB8),
+            1.0f, 1.0f, 0.0f);
+    } else {
+        int tribe = static_cast<int>(s_CmakeInfo.m_tribe);
+        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
+        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+
+        int crestA = static_cast<int>(255.0f * alpha);
         GXColor crestCol;
         crestCol.r = 0xFF;
         crestCol.g = 0xFF;

@@ -17,17 +17,17 @@
 #include "ffcc/sound.h"
 extern "C" {
 extern u8 gSingMenuItemIconByType[];
-extern char* gSingMenuTextTableEn[];
-extern char* gSingMenuTextTableDe[];
-extern char* gSingMenuTextTableIt[];
-extern char* gSingMenuTextTableFr[];
-extern char* gSingMenuTextTableEs[];
-extern char* gSingMenuHairTableFr[];
-extern char* gSingMenuAttrTableEn[];
-extern char* gSingMenuAttrTableDe[];
-extern char* gSingMenuAttrTableIt[];
-extern char* gSingMenuAttrTableFr[];
-extern char* gSingMenuAttrTableEs[];
+extern const char* gSingMenuTextTableEn[];
+extern const char* gSingMenuTextTableDe[];
+extern const char* gSingMenuTextTableIt[];
+extern const char* gSingMenuTextTableFr[];
+extern const char* gSingMenuTextTableEs[];
+extern const char* gSingMenuHairTableFr[];
+extern const char* gSingMenuAttrTableEn[];
+extern const char* gSingMenuAttrTableDe[];
+extern const char* gSingMenuAttrTableIt[];
+extern const char* gSingMenuAttrTableFr[];
+extern const char* gSingMenuAttrTableEs[];
 }
 #include "ffcc/textureman.h"
 #include "ffcc/util.h"
@@ -67,138 +67,372 @@ struct SingMenuSoloNameTable
     char* entries[9];
 };
 
-extern "C" char* s_stand_80332a24;
 char s_singmenu_cpp[] = "singmenu.cpp";
 extern "C" char* s_singMenuTexturePathFmt;
 extern "C" char s_singMenuSubfontPathFmt[];
 extern "C" char* PTR_s_Tutti_802143ec;
 extern "C" char* PTR_s_Alle_Rassen_8021430c;
 extern "C" char* PTR_s_Todos_802145ac;
-extern "C" char* PTR_s_Clavat_80214110[];
-extern "C" char* PTR_s_Clavat_802140f0[];
-extern "C" char* PTR_s_Clavat_80214100[];
-extern "C" char* PTR_s_Clavate[];
-extern "C" char* PTR_s_Clavat_80214120[];
-extern "C" char* PTR_s_Maschio_802143e4[];
-extern "C" char* PTR_s_Hombre_802145a4[];
-extern "C" char* PTR_s_Masculin_802144c4[];
-extern "C" char s_plural_s_80332958[];
-extern "C" char s_space_8033295c[];
-extern "C" char* PTR_s_Blacksmith[];
-extern "C" char* PTR_s_Schmied[];
-extern "C" char* PTR_s_Fabbri[];
-extern "C" char* PTR_s_Forgeron[];
-extern "C" char* PTR_s_Herrero[];
-extern "C" char* PTR_s_Cowlick[];
-extern "C" char* PTR_s_Spitzschopf[];
-extern "C" char* PTR_s_Ciuffo_ribelle[];
-extern "C" char* PTR_s_Remolino[];
+extern "C" const char* PTR_s_Clavat_80214110[];
 extern "C" {
-extern char s_Clavat_803320D8[];
-extern char s_Lilty_803320E0[];
-extern char s_Yuke_803320E8[];
-extern char s_Selkie_803320F0[];
-extern char s_Lility_803320F8[];
-extern char s_Seliky_80332100[];
-extern char s_Clavate_80332108[];
-extern char s_Lilti_80332110[];
-extern char s_Yuko_80332118[];
-extern char s_Selki_80332120[];
-extern char s_Tailor_80332128[];
-extern char s_Farmer_80332130[];
-extern char s_Rancher_80332138[];
-extern char s_Miller_80332140[];
-extern char s_Schmied_80332148[];
-extern char s_Bauer_80332150[];
-extern char s_Moeller_80332158[];
-extern char s_Fischer_80332160[];
-extern char s_Haendler_80332168[];
-extern char s_Fabbri_80332170[];
-extern char s_Sarti_80332178[];
-extern char s_Mugnai_80332180[];
-extern char s_Fermier_80332188[];
-extern char s_Eleveur_80332190[];
-extern char s_Meunier_80332198[];
-extern char s_Pecheur_803321A0[];
-extern char s_Herrero_803321A8[];
-extern char s_Sastre_803321B0[];
-extern char s_Empty_803321B8[];
-extern char s_Cowlick_80332574[];
-extern char s_Natural_8033257C[];
-extern char s_Cap_80332584[];
-extern char s_Elegant_80332588[];
-extern char s_Bumpy_80332590[];
-extern char s_Spiral_80332598[];
-extern char s_Tulip_803325A0[];
-extern char s_Spoon_803325A8[];
-extern char s_Wolfie_803325B0[];
-extern char s_Wuschel_803325B8[];
-extern char s_normal_803325C0[];
-extern char s_fesch_803325C8[];
-extern char s_Einhorn_803325D0[];
-extern char s_Kreisel_803325D8[];
-extern char s_Tulpe_803325E0[];
-extern char s_Loeffel_803325E8[];
-extern char s_Haiauge_803325F0[];
-extern char s_Fascia_803325F8[];
-extern char s_Secchio_80332600[];
-extern char s_Blu_80332608[];
-extern char s_Spirale_8033260C[];
-extern char s_Cuore_80332614[];
-extern char s_Lupo_8033261C[];
-extern char s_Bandana_80332624[];
-extern char s_Lupa_8033262C[];
-extern char s_Epi_80332634[];
-extern char s_Naturel_80332638[];
-extern char s_Bandeau_80332640[];
-extern char s_Chapeau_80332648[];
-extern char s_Plumes_80332650[];
-extern char s_Brune_80332658[];
-extern char s_Chatain_80332660[];
-extern char s_Cornes_80332668[];
-extern char s_Visiere_80332670[];
-extern char s_Heaume_80332678[];
-extern char s_Masquee_80332680[];
-extern char s_Bosses_80332688[];
-extern char s_Tulipe_80332690[];
-extern char s_Coeur_80332698[];
-extern char s_Loup_803326A0[];
-extern char s_Lynx_803326A8[];
-extern char s_Castor_803326B0[];
-extern char s_Louve_803326B8[];
-extern char s_Hibou_803326C0[];
-extern char s_Cinta_803326C8[];
-extern char s_Gorra_803326D0[];
-extern char s_Azul_803326D8[];
-extern char s_Espiral_803326E0[];
-extern char s_Tulipan_803326E8[];
-extern char s_Cuchara_803326F0[];
-extern char s_Lobezna_803326F8[];
-extern char s_Regen_80332700[];
-extern char s_Regena_80332708[];
-extern char s_Recup_80332710[];
-extern const char s_solo2_80332718[] = "world2";
-extern const char s_solo1_80332720[] = "crystal";
-extern char s_solo4_80332728[];
-extern char s_solo5_80332730[];
-extern char s_solo8_80332738[];
-extern char s_solo9_80332740[];
-extern char s_solo30_80332748[];
-extern char s_solo42_80332750[];
-extern char s_solo47_80332758[];
-extern char s_solo48_80332760[];
-extern char s_solo49_80332768[];
-extern char s_solo50_80332770[];
-extern char s_solo51_80332778[];
-extern char s_solo63_80332780[];
-extern const char s_solo3_80332788[] = "world27";
-extern const char s_solo6_80332790[] = "world28";
-extern const char s_solo7_80332798[] = "world29";
-extern const char s_solo10_803327A0[] = "world44";
-extern const char s_solo11_803327A8[] = "world45";
-extern const char s_solo12_803327B0[] = "world48";
-extern const char s_solo13_803327B8[] = "world49";
-extern const char s_solo14_803327C0[] = "world51";
+const char s_Clavat_803320D8[] = "Clavat";
+const char s_Lilty_803320E0[] = "Lilty";
+const char s_Yuke_803320E8[] = "Yuke";
+const char s_Selkie_803320F0[] = "Selkie";
+const char s_Lility_803320F8[] = "Lility";
+const char s_Seliky_80332100[] = "Seliky";
+const char s_Clavate_80332108[] = "Clavate";
+const char s_Lilti_80332110[] = "Lilti";
+const char s_Yuko_80332118[] = "Yuko";
+const char s_Selki_80332120[] = "Selki";
+const char s_Tailor_80332128[] = "Tailor";
+const char s_Farmer_80332130[] = "Farmer";
+const char s_Rancher_80332138[] = "Rancher";
+const char s_Miller_80332140[] = "Miller";
+const char s_Schmied_80332148[] = "Schmied";
+const char s_Bauer_80332150[] = "Bauer";
+const char s_Moeller_80332158[] = "M\374ller";
+const char s_Fischer_80332160[] = "Fischer";
+const char s_Haendler_80332168[] = "H\344ndler";
+const char s_Fabbri_80332170[] = "Fabbri";
+const char s_Sarti_80332178[] = "Sarti";
+const char s_Mugnai_80332180[] = "Mugnai";
+const char s_Fermier_80332188[] = "Fermier";
+const char s_Eleveur_80332190[] = "\311leveur";
+const char s_Meunier_80332198[] = "Meunier";
+const char s_Pecheur_803321A0[] = "P\352cheur";
+const char s_Herrero_803321A8[] = "Herrero";
+const char s_Sastre_803321B0[] = "Sastre";
+const char s_Empty_803321B8[] = "";
+const char s_Yes_803321BC[] = "Yes";
+const char s_No_803321C0[] = "No";
+const char s_Cancel_803321C4[] = "Cancel";
+const char s_gil_803321CC[] = "gil";
+const char s_Defence_803321D0[] = "Defence";
+const char s_Magic_803321D8[] = "Magic";
+const char s_Attack_803321E0[] = "Attack";
+const char s_Defend_803321E8[] = "Defend";
+const char s_Remove_803321F0[] = "Remove";
+const char s_Fuse_803321F8[] = "Fuse";
+const char s_Split_80332200[] = "Split";
+const char s_Use_80332208[] = "Use";
+const char s_Drop_8033220C[] = "Drop";
+const char s_Destroy_80332214[] = "Destroy";
+const char s_Male_8033221C[] = "Male";
+const char s_Female_80332224[] = "Female";
+const char s_All_8033222C[] = "All";
+const char s_QuestionMarks_80332230[] = "???";
+const char s_g_period_80332234[] = "g.";
+const char s_Father_80332238[] = "Father";
+const char s_Mother_80332240[] = "Mother";
+const char s_Brother_80332248[] = "Brother";
+const char s_Sister_80332250[] = "Sister";
+const char s_Letters_80332258[] = "Letters";
+const char s_Quote_80332260[] = "\"";
+const char s_Send_80332264[] = "Send";
+const char s_Confirm_8033226C[] = "Confirm";
+const char s_Name_80332274[] = "Name:";
+const char s_Gender_8033227C[] = "Gender:";
+const char s_Tribe_80332284[] = "Tribe:";
+const char s_Items_8033228C[] = "Items";
+const char s_Equip_80332294[] = "Equip";
+const char s_Money_8033229C[] = "Money";
+const char s_Family_803322A4[] = "Family";
+const char s_Done_803322AC[] = "Done";
+const char s_Ja_803322B4[] = "Ja";
+const char s_Nein_803322B8[] = "Nein";
+const char s_Gil_803322C0[] = "Gil";
+const char s_Staerke_803322C4[] = "St\344rke";
+const char s_Abwehr_803322CC[] = "Abwehr";
+const char s_Magie_803322D4[] = "Magie";
+const char s_Ablegen_803322DC[] = "Ablegen";
+const char s_G_803322E4[] = "G";
+const char s_Vater_803322E8[] = "Vater";
+const char s_Mutter_803322F0[] = "Mutter";
+const char s_Bruder_803322F8[] = "Bruder";
+const char s_Weiter_80332300[] = "Weiter?";
+const char s_specialChar_80332308[] = "\204";
+const char s_Rasse_8033230C[] = "Rasse:";
+const char s_Geld_80332314[] = "Geld";
+const char s_Familie_8033231C[] = "Familie";
+const char s_Briefe_80332324[] = "Briefe";
+const char s_Si_8033232C[] = "S\354";
+const char s_Annulla_80332330[] = "Annulla";
+const char s_guil_80332338[] = "guil";
+const char s_Forza_80332340[] = "Forza";
+const char s_Difesa_80332348[] = "Difesa";
+const char s_Magia_80332350[] = "Magia";
+const char s_Memorie_80332358[] = "Memorie";
+const char s_Attacco_80332360[] = "Attacco";
+const char s_Rimuovi_80332368[] = "Rimuovi";
+const char s_Fusione_80332370[] = "Fusione";
+const char s_Dividi_80332378[] = "Dividi";
+const char s_Usa_80332380[] = "Usa";
+const char s_Posa_80332384[] = "Posa";
+const char s_Maschio_8033238C[] = "Maschio";
+const char s_Femmina_80332394[] = "Femmina";
+const char s_Tutti_8033239C[] = "Tutti";
+const char s_Padre_803323A4[] = "Padre";
+const char s_Madre_803323AC[] = "Madre";
+const char s_Sorella_803323B4[] = "Sorella";
+const char s_Lettere_803323BC[] = "Lettere";
+const char s_con_803323C4[] = "con ";
+const char s_Nome_803323CC[] = "Nome:";
+const char s_Sesso_803323D4[] = "Sesso:";
+const char s_Razza_803323DC[] = "Razza:";
+const char s_Oggetti_803323E4[] = "Oggetti";
+const char s_Tesori_803323EC[] = "Tesori";
+const char s_Denaro_803323F4[] = "Denaro";
+const char s_Fatto_803323FC[] = "Fatto";
+const char s_Oui_80332404[] = "Oui";
+const char s_Non_80332408[] = "Non";
+const char s_Annuler_8033240C[] = "Annuler";
+const char s_gils_80332414[] = "gils";
+const char s_Force_8033241C[] = "Force";
+const char s_Retirer_80332424[] = "Retirer";
+const char s_Separer_8033242C[] = "S\351parer";
+const char s_Jeter_80332434[] = "Jeter";
+const char s_Feminin_8033243C[] = "F\351minin";
+const char s_Tous_80332444[] = "Tous";
+const char s_Pere_8033244C[] = "P\350re";
+const char s_Mere_80332454[] = "M\350re";
+const char s_Frere_8033245C[] = "Fr\350re";
+const char s_Soeur_80332464[] = "S\234ur";
+const char s_Lettres_8033246C[] = "Lettres";
+const char s_Nom_80332474[] = "Nom:";
+const char s_Sexe_8033247C[] = "Sexe:";
+const char s_Tribu_80332484[] = "Tribu:";
+const char s_Metier_8033248C[] = "M\351tier:";
+const char s_Objets_80332494[] = "Objets";
+const char s_Equiper_8033249C[] = "Equiper";
+const char s_Tresors_803324A4[] = "Tr\351sors";
+const char s_Gils_803324AC[] = "Gils";
+const char s_Famille_803324B4[] = "Famille";
+const char s_Laisser_803324BC[] = "Laisser";
+const char s_Si_803324C4[] = "S\355";
+const char s_guiles_803324C8[] = "guiles";
+const char s_Fuerza_803324D0[] = "Fuerza";
+const char s_Defensa_803324D8[] = "Defensa";
+const char s_Atacar_803324E0[] = "Atacar";
+const char s_Quitar_803324E8[] = "Quitar";
+const char s_Separar_803324F0[] = "Separar";
+const char s_Hombre_803324F8[] = "Hombre";
+const char s_Mujer_80332500[] = "Mujer";
+const char s_Todos_80332508[] = "Todos";
+const char s_invQuestions_80332510[] = "\277\277??";
+const char s_Hermano_80332518[] = "Hermano";
+const char s_Hermana_80332520[] = "Hermana";
+const char s_Cartas_80332528[] = "Cartas";
+const char s_period_80332530[] = ".";
+const char s_Nombre_80332534[] = "Nombre:";
+const char s_Sexo_8033253C[] = "Sexo:";
+const char s_Objetos_80332544[] = "Objetos";
+const char s_Equipo_8033254C[] = "Equipo";
+const char s_Tesoros_80332554[] = "Tesoros";
+const char s_Dinero_8033255C[] = "Dinero";
+const char s_Familia_80332564[] = "Familia";
+const char s_Hecho_8033256C[] = "Hecho";
+const char s_Cowlick_80332574[] = "Cowlick";
+const char s_Natural_8033257C[] = "Natural";
+const char s_Cap_80332584[] = "Cap";
+const char s_Elegant_80332588[] = "Elegant";
+const char s_Bumpy_80332590[] = "Bumpy";
+const char s_Spiral_80332598[] = "Spiral";
+const char s_Tulip_803325A0[] = "Tulip";
+const char s_Spoon_803325A8[] = "Spoon";
+const char s_Wolfie_803325B0[] = "Wolfie";
+const char s_Wuschel_803325B8[] = "Wuschel";
+const char s_normal_803325C0[] = "normal";
+const char s_fesch_803325C8[] = "fesch";
+const char s_Einhorn_803325D0[] = "Einhorn";
+const char s_Kreisel_803325D8[] = "Kreisel";
+const char s_Tulpe_803325E0[] = "Tulpe";
+const char s_Loeffel_803325E8[] = "L\366ffel";
+const char s_Haiauge_803325F0[] = "Haiauge";
+const char s_Fascia_803325F8[] = "Fascia";
+const char s_Secchio_80332600[] = "Secchio";
+const char s_Blu_80332608[] = "Blu";
+const char s_Spirale_8033260C[] = "Spirale";
+const char s_Cuore_80332614[] = "Cuore";
+const char s_Lupo_8033261C[] = "Lupo";
+const char s_Bandana_80332624[] = "Bandana";
+const char s_Lupa_8033262C[] = "Lupa";
+const char s_Epi_80332634[] = "Epi";
+const char s_Naturel_80332638[] = "Naturel";
+const char s_Bandeau_80332640[] = "Bandeau";
+const char s_Chapeau_80332648[] = "Chapeau";
+const char s_Plumes_80332650[] = "Plumes";
+const char s_Brune_80332658[] = "Brune";
+const char s_Chatain_80332660[] = "Ch\342tain";
+const char s_Cornes_80332668[] = "Cornes";
+const char s_Visiere_80332670[] = "Visi\350re";
+const char s_Heaume_80332678[] = "Heaume";
+const char s_Masquee_80332680[] = "Masqu\351e";
+const char s_Bosses_80332688[] = "Bosses";
+const char s_Tulipe_80332690[] = "Tulipe";
+const char s_Coeur_80332698[] = "C\234ur";
+const char s_Loup_803326A0[] = "Loup";
+const char s_Lynx_803326A8[] = "Lynx";
+const char s_Castor_803326B0[] = "Castor";
+const char s_Louve_803326B8[] = "Louve";
+const char s_Hibou_803326C0[] = "Hibou";
+const char s_Cinta_803326C8[] = "Cinta";
+const char s_Gorra_803326D0[] = "Gorra";
+const char s_Azul_803326D8[] = "Azul";
+const char s_Espiral_803326E0[] = "Espiral";
+const char s_Tulipan_803326E8[] = "Tulip\341n";
+const char s_Cuchara_803326F0[] = "Cuchara";
+const char s_Lobezna_803326F8[] = "Lobezna";
+const char s_Regen_80332700[] = "Regen";
+const char s_Regena_80332708[] = "Regena";
+const char s_Recup_80332710[] = "R\351cup";
+const char s_solo2_80332718[] = "solo2";
+const char s_solo1_80332720[] = "solo1";
+const char s_solo4_80332728[] = "solo4";
+const char s_solo5_80332730[] = "solo5";
+const char s_solo8_80332738[] = "solo8";
+const char s_solo9_80332740[] = "solo9";
+const char s_solo30_80332748[] = "solo30";
+const char s_solo42_80332750[] = "solo42";
+const char s_solo47_80332758[] = "solo47";
+const char s_solo48_80332760[] = "solo48";
+const char s_solo49_80332768[] = "solo49";
+const char s_solo50_80332770[] = "solo50";
+const char s_solo51_80332778[] = "solo51";
+const char s_solo63_80332780[] = "solo63";
+const char s_solo3_80332788[] = "solo3";
+const char s_solo6_80332790[] = "solo6";
+const char s_solo7_80332798[] = "solo7";
+const char s_solo10_803327A0[] = "solo10";
+const char s_solo11_803327A8[] = "solo11";
+const char s_solo12_803327B0[] = "solo12";
+const char s_solo13_803327B8[] = "solo13";
+const char s_solo14_803327C0[] = "solo14";
+const char s_solo15_803327C8[] = "solo15";
+const char s_solo16_803327D0[] = "solo16";
+const char s_solo17_803327D8[] = "solo17";
+const char s_solo18_803327E0[] = "solo18";
+const char s_solo19_803327E8[] = "solo19";
+const char s_solo20_803327F0[] = "solo20";
+const char s_solo21_803327F8[] = "solo21";
+const char s_solo22_80332800[] = "solo22";
+const char s_solo24_80332808[] = "solo24";
+const char s_solo25_80332810[] = "solo25";
+const char s_solo26_80332818[] = "solo26";
+const char s_solo27_80332820[] = "solo27";
+const char s_solo28_80332828[] = "solo28";
+const char s_solo29_80332830[] = "solo29";
+const char s_solo31_80332838[] = "solo31";
+const char s_solo32_80332840[] = "solo32";
+const char s_solo33_80332848[] = "solo33";
+const char s_solo34_80332850[] = "solo34";
+const char s_solo35_80332858[] = "solo35";
+const char s_solo36_80332860[] = "solo36";
+const char s_solo37_80332868[] = "solo37";
+const char s_solo38_80332870[] = "solo38";
+const char s_solo39_80332878[] = "solo39";
+const char s_solo40_80332880[] = "solo40";
+const char s_solo41_80332888[] = "solo41";
+const char s_solo43_80332890[] = "solo43";
+const char s_solo44_80332898[] = "solo44";
+const char s_solo45_803328A0[] = "solo45";
+const char s_solo46_803328A8[] = "solo46";
+const char s_solo52_803328B0[] = "solo52";
+const char s_solo53_803328B8[] = "solo53";
+const char s_solo54_803328C0[] = "solo54";
+const char s_solo55_803328C8[] = "solo55";
+const char s_solo56_803328D0[] = "solo56";
+const char s_solo57_803328D8[] = "solo57";
+const char s_solo58_803328E0[] = "solo58";
+const char s_solo59_803328E8[] = "solo59";
+const char s_solo60_803328F0[] = "solo60";
+const char s_solo61_803328F8[] = "solo61";
+const char s_solo62_80332900[] = "solo62";
+const char s_solo64_80332908[] = "solo64";
+const char s_solo23_80332910[] = "solo23";
+const float FLOAT_80332918 = 366.0f;
+const float FLOAT_8033291c = -32.0f;
+const float FLOAT_80332920 = 0.01745329238474369f;
+const float FLOAT_80332924 = 9.0f;
+const float FLOAT_80332928 = 64.0f;
+const float FLOAT_8033292c = 32.0f;
+const float FLOAT_80332930 = 8.0f;
+const float FLOAT_80332934 = 1.0f;
+const double DOUBLE_80332938 = 4503601774854144.0;
+const float FLOAT_80332940 = 255.0f;
+const float FLOAT_80332944 = 16.0f;
+const float FLOAT_80332948 = 24.0f;
+const float FLOAT_8033294c = 0.0f;
+const float FLOAT_80332950 = 80.0f;
+const float FLOAT_80332954 = 4.0f;
+const char s_plural_s_80332958[] = "s";
+const char s_space_8033295c[] = " ";
+const float FLOAT_80332960 = 22.0f;
+const double DOUBLE_80332968 = 0.5;
+const float FLOAT_80332970 = 6.0f;
+const double DOUBLE_80332978 = 2.0;
+const double DOUBLE_80332980 = 1.0;
+const double DOUBLE_80332988 = 64.0;
+const float FLOAT_80332990 = 10.0f;
+const float FLOAT_80332994 = 128.0f;
+const float FLOAT_80332998 = 280.0f;
+const float FLOAT_8033299C = -1.0f;
+const float FLOAT_803329A0 = 192.0f;
+const float FLOAT_803329a4 = 640.0f;
+const float FLOAT_803329a8 = 384.0f;
+const float FLOAT_803329ac = 176.0f;
+const float FLOAT_803329b0 = 288.0f;
+const float FLOAT_803329b4 = 224.0f;
+const float FLOAT_803329b8 = 0.8999999761581421f;
+const float FLOAT_803329bc = 208.0f;
+const float FLOAT_803329c0 = 312.0f;
+const float FLOAT_803329c4 = 576.0f;
+const float FLOAT_803329c8 = 512.0f;
+const float FLOAT_803329cc = 344.0f;
+const float FLOAT_803329d0 = 40.0f;
+const float FLOAT_803329d4 = 440.0f;
+const float FLOAT_803329d8 = 152.0f;
+const float FLOAT_803329dc = 408.0f;
+const double DOUBLE_803329E0 = 255.0;
+const float FLOAT_803329e8 = 216.0f;
+const float FLOAT_803329ec = 28.0f;
+const float FLOAT_803329f0 = 88.0f;
+const float FLOAT_803329f4 = 96.0f;
+const float FLOAT_803329f8 = 48.0f;
+const float FLOAT_803329fc = 53.0f;
+const float FLOAT_80332a00 = 52.0f;
+const float FLOAT_80332a04 = 184.0f;
+const float FLOAT_80332a08 = 0.7199999690055847f;
+const float FLOAT_80332a0c = -5.0f;
+const float FLOAT_80332a10 = -3.0f;
+const float FLOAT_80332a18 = 592.0f;
+const float FLOAT_80332a1c = 36.0f;
+const float FLOAT_80332A20 = 448.0f;
+const char s_stand_80332a24[] = "stand";
+const float FLOAT_80332a2c = 100.0f;
+const double DOUBLE_80332a30 = 4.0;
+const double DOUBLE_80332a38 = 320.0;
+const double DOUBLE_80332a40 = 224.0;
+const float FLOAT_80332a48 = 12.0f;
+}
+
+extern "C" const char* PTR_s_Clavat_802140f0[];
+extern "C" const char* PTR_s_Clavat_80214100[];
+extern "C" const char* PTR_s_Clavate[];
+extern "C" const char* PTR_s_Clavat_80214120[];
+extern "C" const char* PTR_s_Maschio_802143e4[];
+extern "C" const char* PTR_s_Hombre_802145a4[];
+extern "C" const char* PTR_s_Masculin_802144c4[];
+extern "C" const char* PTR_s_Blacksmith[];
+extern "C" const char* PTR_s_Schmied[];
+extern "C" const char* PTR_s_Fabbri[];
+extern "C" const char* PTR_s_Forgeron[];
+extern "C" const char* PTR_s_Herrero[];
+extern "C" const char* PTR_s_Cowlick[];
+extern "C" const char* PTR_s_Spitzschopf[];
+extern "C" const char* PTR_s_Ciuffo_ribelle[];
+extern "C" const char* PTR_s_Remolino[];
+extern "C" {
 extern const float FLOAT_80333240 = 255.0f;
 extern const float FLOAT_80333244 = 33.0f;
 extern const float FLOAT_80333248 = 132.0f;
@@ -211,48 +445,6 @@ extern const float FLOAT_80333260 = -6.0f;
 extern const float FLOAT_80333264 = 0.83f;
 extern const double DOUBLE_80333268 = 0.1;
 extern const double DOUBLE_80333270 = 1.0;
-extern char s_solo15_803327C8[];
-extern char s_solo16_803327D0[];
-extern char s_solo17_803327D8[];
-extern char s_solo18_803327E0[];
-extern char s_solo19_803327E8[];
-extern char s_solo20_803327F0[];
-extern char s_solo21_803327F8[];
-extern char s_solo22_80332800[];
-extern char s_solo24_80332808[];
-extern char s_solo25_80332810[];
-extern char s_solo26_80332818[];
-extern char s_solo27_80332820[];
-extern char s_solo28_80332828[];
-extern char s_solo29_80332830[];
-extern char s_solo31_80332838[];
-extern char s_solo32_80332840[];
-extern char s_solo33_80332848[];
-extern char s_solo34_80332850[];
-extern char s_solo35_80332858[];
-extern char s_solo36_80332860[];
-extern char s_solo37_80332868[];
-extern char s_solo38_80332870[];
-extern char s_solo39_80332878[];
-extern char s_solo40_80332880[];
-extern char s_solo41_80332888[];
-extern char s_solo43_80332890[];
-extern char s_solo44_80332898[];
-extern char s_solo45_803328A0[];
-extern char s_solo46_803328A8[];
-extern char s_solo52_803328B0[];
-extern char s_solo53_803328B8[];
-extern char s_solo54_803328C0[];
-extern char s_solo55_803328C8[];
-extern char s_solo56_803328D0[];
-extern char s_solo57_803328D8[];
-extern char s_solo58_803328E0[];
-extern char s_solo59_803328E8[];
-extern char s_solo60_803328F0[];
-extern char s_solo61_803328F8[];
-extern char s_solo62_80332900[];
-extern char s_solo64_80332908[];
-extern char s_solo23_80332910[];
 extern char s_sololetter_801DE8A4[];
 extern char s_Blacksmith_801DD718[];
 extern char s_Fisherman_801DD724[];
@@ -447,38 +639,6 @@ extern char s_Degats_magiq_801DE58C[];
 extern char s_Rend_inebranlable_801DE59C[];
 extern char s_Anti_frio_801DE5BC[];
 extern char s_Danos_magicos_801DE68C[];
-extern char s_Yes_803321BC[], s_No_803321C0[], s_Cancel_803321C4[], s_gil_803321CC[];
-extern char s_Defence_803321D0[], s_Magic_803321D8[], s_Attack_803321E0[], s_Defend_803321E8[];
-extern char s_Remove_803321F0[], s_Fuse_803321F8[], s_Split_80332200[], s_Use_80332208[];
-extern char s_Drop_8033220C[], s_Destroy_80332214[], s_Male_8033221C[], s_Female_80332224[];
-extern char s_All_8033222C[], s_QuestionMarks_80332230[], s_g_period_80332234[], s_Father_80332238[];
-extern char s_Mother_80332240[], s_Brother_80332248[], s_Sister_80332250[], s_Letters_80332258[];
-extern char s_Quote_80332260[], s_Send_80332264[], s_Confirm_8033226C[], s_Name_80332274[];
-extern char s_Gender_8033227C[], s_Tribe_80332284[], s_Items_8033228C[], s_Equip_80332294[];
-extern char s_Money_8033229C[], s_Family_803322A4[], s_Done_803322AC[], s_Ja_803322B4[];
-extern char s_Nein_803322B8[], s_Gil_803322C0[], s_Staerke_803322C4[], s_Abwehr_803322CC[];
-extern char s_Magie_803322D4[], s_Ablegen_803322DC[], s_G_803322E4[], s_Vater_803322E8[];
-extern char s_Mutter_803322F0[], s_Bruder_803322F8[], s_Weiter_80332300[], lbl_80332308[];
-extern char s_Rasse_8033230C[], s_Geld_80332314[], s_Familie_8033231C[], s_Briefe_80332324[];
-extern char s_Si_8033232C[], s_Annulla_80332330[], s_guil_80332338[], s_Forza_80332340[];
-extern char s_Difesa_80332348[], s_Magia_80332350[], s_Memorie_80332358[], s_Attacco_80332360[];
-extern char s_Rimuovi_80332368[], s_Fusione_80332370[], s_Dividi_80332378[], s_Usa_80332380[];
-extern char s_Posa_80332384[], s_Maschio_8033238C[], s_Femmina_80332394[], s_Tutti_8033239C[];
-extern char s_Padre_803323A4[], s_Madre_803323AC[], s_Sorella_803323B4[], s_Lettere_803323BC[];
-extern char s_con_803323C4[], s_Nome_803323CC[], s_Sesso_803323D4[], s_Razza_803323DC[];
-extern char s_Oggetti_803323E4[], s_Tesori_803323EC[], s_Denaro_803323F4[], s_Fatto_803323FC[];
-extern char s_Oui_80332404[], s_Non_80332408[], s_Annuler_8033240C[], s_gils_80332414[];
-extern char s_Force_8033241C[], s_Retirer_80332424[], s_Separer_8033242C[], s_Jeter_80332434[];
-extern char s_Feminin_8033243C[], s_Tous_80332444[], s_Pere_8033244C[], s_Mere_80332454[];
-extern char s_Frere_8033245C[], s_Soeur_80332464[], s_Lettres_8033246C[], s_Nom_80332474[];
-extern char s_Sexe_8033247C[], s_Tribu_80332484[], s_Metier_8033248C[], s_Objets_80332494[];
-extern char s_Equiper_8033249C[], s_Tresors_803324A4[], s_Gils_803324AC[], s_Famille_803324B4[];
-extern char s_Laisser_803324BC[], s_Si_803324C4[], s_guiles_803324C8[], s_Fuerza_803324D0[];
-extern char s_Defensa_803324D8[], s_Atacar_803324E0[], s_Quitar_803324E8[], s_Separar_803324F0[];
-extern char s_Hombre_803324F8[], s_Mujer_80332500[], s_Todos_80332508[], lbl_80332510[];
-extern char s_Hermano_80332518[], s_Hermana_80332520[], s_Cartas_80332528[], s_period_80332530[];
-extern char s_Nombre_80332534[], s_Sexo_8033253C[], s_Objetos_80332544[], s_Equipo_8033254C[];
-extern char s_Tesoros_80332554[], s_Dinero_8033255C[], s_Familia_80332564[], s_Hecho_8033256C[];
 extern char s_Strength_801DD814[], s_Memories_801DD820[], s_Send_item_801DD82C[], s_Send_gil_801DD838[];
 extern char s_Send_nothing_801DD844[], s_Proceed_801DD854[], s_Take_out_801DD860[], s_the_reply_801DD86C[];
 extern char s_Include_801DD878[], s_Family_Trade_801DD884[], s_Command_List_801DD894[], s_Artefacts_801DD8A4[];
@@ -507,42 +667,42 @@ extern char s_Ausruesten_801DDA50[], s_Resistance_801DDB64[], s_Defendre_801DDB8
 extern char s_Detruire_801DDBAC[], s_la_reponse_801DDC14[], s_Envoyer_a_801DDC20[], s_Preferences_801DDC50[];
 extern char s_Continuar_801DDCE0[], s_Extraer_801DDCEC[];
 }
-extern "C" char* PTR_s_Clavat_802140f0[] = {
+extern "C" const char* PTR_s_Clavat_802140f0[] = {
     s_Clavat_803320D8, s_Lilty_803320E0, s_Yuke_803320E8, s_Selkie_803320F0,
 };
-extern "C" char* PTR_s_Clavat_80214100[] = {
+extern "C" const char* PTR_s_Clavat_80214100[] = {
     s_Clavat_803320D8, s_Lilty_803320E0, s_Yuke_803320E8, s_Selkie_803320F0,
 };
-extern "C" char* PTR_s_Clavat_80214110[] = {
+extern "C" const char* PTR_s_Clavat_80214110[] = {
     s_Clavat_803320D8, s_Lility_803320F8, s_Yuke_803320E8, s_Seliky_80332100,
 };
-extern "C" char* PTR_s_Clavat_80214120[] = {
+extern "C" const char* PTR_s_Clavat_80214120[] = {
     s_Clavat_803320D8, s_Lilty_803320E0, s_Yuke_803320E8, s_Selkie_803320F0,
 };
-extern "C" char* PTR_s_Clavate[] = {
+extern "C" const char* PTR_s_Clavate[] = {
     s_Clavate_80332108, s_Lilti_80332110, s_Yuko_80332118, s_Selki_80332120,
 };
-extern "C" char* PTR_s_Blacksmith[] = {
+extern "C" const char* PTR_s_Blacksmith[] = {
     s_Blacksmith_801DD718, s_Tailor_80332128, s_Farmer_80332130, s_Rancher_80332138,
     s_Miller_80332140, s_Fisherman_801DD724, s_Merchant_801DD730, s_Alchemist_801DD73C,
 };
-extern "C" char* PTR_s_Schmied[] = {
+extern "C" const char* PTR_s_Schmied[] = {
     s_Schmied_80332148, s_Schneider_801DD748, s_Bauer_80332150, s_Viehzuechter_801DD754,
     s_Moeller_80332158, s_Fischer_80332160, s_Haendler_80332168, s_Alchemist_801DD73C,
 };
-extern "C" char* PTR_s_Fabbri[] = {
+extern "C" const char* PTR_s_Fabbri[] = {
     s_Fabbri_80332170, s_Sarti_80332178, s_Agricoltori_801DD760, s_Allevatori_801DD76C,
     s_Mugnai_80332180, s_Pescatori_801DD778, s_Mercanti_801DD784, s_Alchimisti_801DD790,
 };
-extern "C" char* PTR_s_Forgeron[] = {
+extern "C" const char* PTR_s_Forgeron[] = {
     s_Forgeron_801DD79C, s_Tailleur_801DD7A8, s_Fermier_80332188, s_Eleveur_80332190,
     s_Meunier_80332198, s_Pecheur_803321A0, s_Marchand_801DD7B4, s_Alchimiste_801DD7C0,
 };
-extern "C" char* PTR_s_Herrero[] = {
+extern "C" const char* PTR_s_Herrero[] = {
     s_Herrero_803321A8, s_Sastre_803321B0, s_Campesino_801DD7CC, s_Granjero_801DD7D8,
     s_Molinero_801DD7E4, s_Pescador_801DD7F0, s_Comerciante_801DD7FC, s_Alquimista_801DD808,
 };
-extern "C" char* gSingMenuTextTableEn[] = {
+extern "C" const char* gSingMenuTextTableEn[] = {
     s_Empty_803321B8, s_Yes_803321BC, s_No_803321C0, s_Cancel_803321C4,
     s_gil_803321CC, s_Strength_801DD814, s_Defence_803321D0, s_Magic_803321D8,
     s_Memories_801DD820, s_Attack_803321E0, s_Defend_803321E8, s_Remove_803321F0,
@@ -558,7 +718,7 @@ extern "C" char* gSingMenuTextTableEn[] = {
     s_Equip_80332294, s_Artefacts_801DD8A4, s_Treasures_801DD8B0, s_Money_8033229C,
     s_Favourites_801DD8BC, s_Family_803322A4, s_Letters_80332258, s_Done_803322AC,
 };
-extern "C" char* gSingMenuTextTableDe[] = {
+extern "C" const char* gSingMenuTextTableDe[] = {
     s_Empty_803321B8, s_Ja_803322B4, s_Nein_803322B8, s_Abbrechen_801DD8C8,
     s_Gil_803322C0, s_Staerke_803322C4, s_Abwehr_803322CC, s_Magie_803322D4,
     s_Erinnerungen_801DD8D4, s_Angreifen_801DD8E4, s_Verteidigen_801DD8F0, s_Ablegen_803322DC,
@@ -567,14 +727,14 @@ extern "C" char* gSingMenuTextTableDe[] = {
     s_QuestionMarks_80332230, s_G_803322E4, s_Vater_803322E8, s_Mutter_803322F0,
     s_Bruder_803322F8, s_Schwester_801DD95C, s_kl_Bruder_801DD968, s_kl_Schwester_801DD974,
     s_Empty_803321B8, s_Liste_erhaltener_Briefe_801DD984, s_Gegenstand_beifuegen_801DD99C, s_Gil_beifuegen_801DD9B0,
-    s_Nichts_beifuegen_801DD9C0, s_Weiter_80332300, s_herausholen_801DD9D0, lbl_80332308,
+    s_Nichts_beifuegen_801DD9C0, s_Weiter_80332300, s_herausholen_801DD9D0, s_specialChar_80332308,
     s_Quote_80332260, s_Empty_803321B8, s_die_Antwort_801DD9E0, s_schicken_801DD9F0,
     s_beifuegen_801DD9FC, s_Bestaetigen_801DDA08, s_Name_80332274, s_Geschlecht_801DDA14,
     s_Rasse_8033230C, s_Elterlicher_Beruf_801DDA20, s_Kommandoliste_801DDA34, s_Gegenstaende_801DDA44,
     s_Ausruesten_801DDA50, s_Artefakte_801DDA5C, s_Geborgtes_801DDA68, s_Geld_80332314,
     s_Geschmack_801DDA74, s_Familie_8033231C, s_Briefe_80332324, s_Abbrechen_801DD8C8,
 };
-extern "C" char* gSingMenuTextTableIt[] = {
+extern "C" const char* gSingMenuTextTableIt[] = {
     s_Empty_803321B8, s_Si_8033232C, s_No_803321C0, s_Annulla_80332330,
     s_guil_80332338, s_Forza_80332340, s_Difesa_80332348, s_Magia_80332350,
     s_Memorie_80332358, s_Attacco_80332360, s_Difesa_80332348, s_Rimuovi_80332368,
@@ -590,7 +750,7 @@ extern "C" char* gSingMenuTextTableIt[] = {
     s_Equipaggiamento_801DDB30, s_Manufatti_801DDB40, s_Tesori_803323EC, s_Denaro_803323F4,
     s_Preferiti_801DDB4C, s_Famiglia_801DDB58, s_Lettere_803323BC, s_Fatto_803323FC,
 };
-extern "C" char* gSingMenuTextTableFr[] = {
+extern "C" const char* gSingMenuTextTableFr[] = {
     s_Empty_803321B8, s_Oui_80332404, s_Non_80332408, s_Annuler_8033240C,
     s_gils_80332414, s_Force_8033241C, s_Resistance_801DDB64, s_Magie_803322D4,
     s_Souvenirs_801DDB70, s_Attaquer_801DDB7C, s_Defendre_801DDB88, s_Retirer_80332424,
@@ -606,13 +766,13 @@ extern "C" char* gSingMenuTextTableFr[] = {
     s_Equiper_8033249C, s_Artefacts_801DD8A4, s_Tresors_803324A4, s_Gils_803324AC,
     s_Preferences_801DDC50, s_Famille_803324B4, s_Lettres_8033246C, s_Laisser_803324BC,
 };
-extern "C" char* gSingMenuTextTableEs[] = {
+extern "C" const char* gSingMenuTextTableEs[] = {
     s_Empty_803321B8, s_Si_803324C4, s_No_803321C0, s_Cancelar_801DDC5C,
     s_guiles_803324C8, s_Fuerza_803324D0, s_Defensa_803324D8, s_Magia_80332350,
     s_Memorias_801DDC68, s_Atacar_803324E0, s_Defender_801DDC74, s_Quitar_803324E8,
     s_Fusionar_801DDC80, s_Separar_803324F0, s_Utilizar_801DDC8C, s_Descartar_801DDC98,
     s_Destruir_801DDCA4, s_Hombre_803324F8, s_Mujer_80332500, s_Todos_80332508,
-    lbl_80332510, s_g_period_80332234, s_Padre_803323A4, s_Madre_803323AC,
+    s_invQuestions_80332510, s_g_period_80332234, s_Padre_803323A4, s_Madre_803323AC,
     s_Hermano_80332518, s_Hermana_80332520, s_Hermano_80332518, s_Hermana_80332520,
     s_Empty_803321B8, s_Cartas_80332528, s_Enviar_objeto_801DDCB0, s_Enviar_guiles_801DDCC0,
     s_No_enviar_nada_801DDCD0, s_Continuar_801DDCE0, s_Extraer_801DDCEC, s_Quote_80332260,
@@ -622,7 +782,7 @@ extern "C" char* gSingMenuTextTableEs[] = {
     s_Equipo_8033254C, s_Artefactos_801DDD48, s_Tesoros_80332554, s_Dinero_8033255C,
     s_Favoritos_801DDD54, s_Familia_80332564, s_Cartas_80332528, s_Hecho_8033256C,
 };
-extern "C" char* PTR_s_Cowlick[] = {
+extern "C" const char* PTR_s_Cowlick[] = {
     s_Cowlick_80332574, s_Natural_8033257C, s_Headband_801DDD60, s_Cap_80332584,
     s_Long_Hair_801DDD6C, s_Short_Hair_801DDD78, s_Dark_Coat_801DDD84, s_White_Cap_801DDD90,
     s_Bare_Head_801DDD9C, s_Horned_Helm_801DDDA8, s_Steel_Visor_801DDDB4, s_Bucket_Head_801DDDC0,
@@ -632,7 +792,7 @@ extern "C" char* PTR_s_Cowlick[] = {
     s_Wolfie_803325B0, s_Shark_Eyes_801DDE14, s_Bandanna_801DDE20, s_Raccoon_Tail_801DDE2C,
     s_Wolfie_803325B0, s_Raccoon_Tail_801DDE2C, s_Shark_Eyes_801DDE14, s_Owl_Head_801DDE3C,
 };
-extern "C" char* PTR_s_Spitzschopf[] = {
+extern "C" const char* PTR_s_Spitzschopf[] = {
     s_Spitzschopf_801DDE48, s_Wuschel_803325B8, s_Stirnband_801DDE54, s_Kopftuch_801DDE60,
     s_lange_Haare_801DDE6C, s_kurze_Haare_801DDE78, s_mittellang_801DDE84, s_Weisskaeppchen_801DDE90,
     s_normal_803325C0, s_Spitzhelm_801DDEA0, s_Eisenmaske_801DDEAC, s_Topfhelm_801DDEB8,
@@ -642,7 +802,7 @@ extern "C" char* PTR_s_Spitzschopf[] = {
     s_Wolfkopf_801DDF0C, s_Haiauge_803325F0, s_Baerentatze_801DDF18, s_Otterschwanz_801DDF24,
     s_Katzenbein_801DDF34, s_Otterschwanz_801DDF24, s_Haiauge_803325F0, s_Eulenkopf_801DDF40,
 };
-extern "C" char* PTR_s_Ciuffo_ribelle[] = {
+extern "C" const char* PTR_s_Ciuffo_ribelle[] = {
     s_Ciuffo_ribelle_801DDF4C, s_Naturale_801DDF5C, s_Fascia_803325F8, s_Cappello_801DDF68,
     s_Capelli_lunghi_801DDF74, s_Capelli_corti_801DDF84, s_Giacca_scura_801DDF94, s_Cappello_801DDF68,
     s_Pettinato_801DDFA4, s_Elmo_di_corno_801DDFB0, s_Elmo_d_acciaio_801DDFC0, s_Secchio_80332600,
@@ -652,7 +812,7 @@ extern "C" char* PTR_s_Ciuffo_ribelle[] = {
     s_Lupo_8033261C, s_Occhi_rapaci_801DE03C, s_Bandana_80332624, s_Procione_801DE04C,
     s_Lupa_8033262C, s_Procione_801DE04C, s_Occhi_rapaci_801DE03C, s_Testa_di_gufo_801DE058,
 };
-extern "C" char* gSingMenuHairTableFr[] = {
+extern "C" const char* gSingMenuHairTableFr[] = {
     s_Epi_80332634, s_Naturel_80332638, s_Bandeau_80332640, s_Chapeau_80332648,
     s_Plumes_80332650, s_Brune_80332658, s_Chatain_80332660, s_Chapeau_80332648,
     s_Tete_nue_801DE068, s_Cornes_80332668, s_Visiere_80332670, s_Heaume_80332678,
@@ -662,7 +822,7 @@ extern "C" char* gSingMenuHairTableFr[] = {
     s_Loup_803326A0, s_Lynx_803326A8, s_Bandana_80332624, s_Castor_803326B0,
     s_Louve_803326B8, s_Castor_803326B0, s_Lynx_803326A8, s_Hibou_803326C0,
 };
-extern "C" char* PTR_s_Remolino[] = {
+extern "C" const char* PTR_s_Remolino[] = {
     s_Remolino_801DE0B0, s_Natural_8033257C, s_Cinta_803326C8, s_Gorra_803326D0,
     s_Cabello_Largo_801DE0BC, s_Cabello_Corto_801DE0CC, s_Chaqueta_Osc_801DE0DC, s_Gorro_Blanco_801DE0EC,
     s_Cabeza_Aire_801DE0FC, s_Yelmo_Cuerno_801DE108, s_Visor_Metalico_801DE118, s_Cabeza_Balde_801DE128,
@@ -672,35 +832,35 @@ extern "C" char* PTR_s_Remolino[] = {
     s_Lobezna_803326F8, s_Ojos_Tiburon_801DE188, s_Bandana_80332624, s_Cola_Mapache_801DE198,
     s_Lobezna_803326F8, s_Cola_Mapache_801DE198, s_Ojos_Tiburon_801DE188, s_Cabeza_Buho_801DE1A8,
 };
-extern "C" char* gSingMenuAttrTableEn[] = {
+extern "C" const char* gSingMenuAttrTableEn[] = {
     s_Empty_803321B8, s_Resist_fire_801DE1B4, s_Resist_cold_801DE1C0, s_Resist_lightning_801DE1CC,
     s_Resist_slow_801DE1E0, s_Resist_prlysis_801DE1EC, s_Resist_poison_801DE1FC, s_Resist_curses_801DE20C,
     s_Resist_petrif_801DE21C, s_Casting_time_801DE22C, s_Charge_time_801DE23C, s_Spell_duration_801DE248,
     s_Spell_duration_801DE248, s_Resist_miasma_801DE258, s_Long_spell_range_801DE268, s_Long_focus_attks_801DE27C,
     s_Regen_80332700, s_Focus_attacks_801DE290, s_Spell_damage_801DE2A0, s_Cannot_be_stunned_801DE2B0,
 };
-extern "C" char* gSingMenuAttrTableDe[] = {
+extern "C" const char* gSingMenuAttrTableDe[] = {
     s_Empty_803321B8, s_Feuer_Res_801DE2C4, s_Eis_Resist_801DE2D0, s_Blitz_Res_801DE2E0,
     s_Gemach_R_801DE2EC, s_Stopp_Res_801DE2F8, s_Gift_Res_801DE304, s_Fluch_Res_801DE310,
     s_Stein_Res_801DE31C, s_Z_laden_801DE328, s_Sammeln_801DE334, s_Z_Wirkungszeit_801DE340,
     s_Z_Wirkungszeit_801DE340, s_Miasma_R_plus_801DE354, s_Z_Reichw_plus_801DE360, s_SA_Reichw_plus_801DE370,
     s_Regena_80332708, s_Spezialattacke_801DE380, s_Zauber_Schaden_801DE390, s_Standfest_801DE3A0,
 };
-extern "C" char* gSingMenuAttrTableIt[] = {
+extern "C" const char* gSingMenuAttrTableIt[] = {
     s_Empty_803321B8, s_Antifuoco_801DE3AC, s_Antigelo_801DE3B8, s_Antituono_801DE3C4,
     s_Antislow_801DE3D0, s_Antistop_801DE3DC, s_Antiveleno_801DE3E8, s_Antimalediz_801DE3F4,
     s_Antipietrif_801DE404, s_Carica_magia_801DE414, s_Carica_attacchi_801DE424, s_Durata_magie_801DE434,
     s_Durata_magie_801DE434, s_Antimiasma_801DE444, s_Portata_magie_801DE450, s_Portata_Super_Att_801DE460,
     s_Rigenerazione_801DE474, s_Super_Attacchi_801DE484, s_Danno_Magico_801DE494, s_Antistordimento_801DE4A4,
 };
-extern "C" char* gSingMenuAttrTableFr[] = {
+extern "C" const char* gSingMenuAttrTableFr[] = {
     s_Empty_803321B8, s_Anti_Feu_801DE4B4, s_Anti_Glace_801DE4C0, s_Anti_Foudre_801DE4CC,
     s_Anti_Somni_801DE4D8, s_Anti_Stop_801DE4E4, s_Anti_Poison_801DE4F0, s_Anti_Malefice_801DE4FC,
     s_Anti_Petrif_801DE50C, s_Tps_de_lancem_801DE51C, s_Tps_de_charge_801DE52C, s_Duree_sorts_801DE53C,
     s_Duree_sorts_801DE53C, s_Anti_Miasme_801DE548, s_Portee_des_sorts_801DE554, s_Portee_super_atq_801DE568,
     s_Recup_80332710, s_Super_attaques_801DE57C, s_Degats_magiq_801DE58C, s_Rend_inebranlable_801DE59C,
 };
-extern "C" char* gSingMenuAttrTableEs[] = {
+extern "C" const char* gSingMenuAttrTableEs[] = {
     s_Empty_803321B8, s_Anti_fuego_801DE5B0, s_Anti_frio_801DE5BC, s_Anti_rayos_801DE5C8,
     s_Anti_Freno_801DE5D4, s_Anti_Paro_801DE5E0, s_Anti_veneno_801DE5EC, s_Anti_maldic_801DE5F8,
     s_Anti_petrif_801DE608, s_Tiempo_lanzam_801DE618, s_Tiempo_carga_801DE628, s_Durac_hechiz_801DE638,
@@ -724,18 +884,18 @@ extern "C" SingMenuSoloNameTable PTR_s_solo2 = {
 
 CMenuPcs::CTmp s_singleMenuTextureTable[] = {
     {4, (char*)s_solo1_80332720},
-    {4, s_solo4_80332728},
-    {4, s_solo5_80332730},
-    {4, s_solo8_80332738},
-    {4, s_solo9_80332740},
-    {4, s_solo30_80332748},
-    {4, s_solo42_80332750},
-    {4, s_solo47_80332758},
-    {4, s_solo48_80332760},
-    {4, s_solo49_80332768},
-    {4, s_solo50_80332770},
-    {4, s_solo51_80332778},
-    {4, s_solo63_80332780},
+    {4, (char*)s_solo4_80332728},
+    {4, (char*)s_solo5_80332730},
+    {4, (char*)s_solo8_80332738},
+    {4, (char*)s_solo9_80332740},
+    {4, (char*)s_solo30_80332748},
+    {4, (char*)s_solo42_80332750},
+    {4, (char*)s_solo47_80332758},
+    {4, (char*)s_solo48_80332760},
+    {4, (char*)s_solo49_80332768},
+    {4, (char*)s_solo50_80332770},
+    {4, (char*)s_solo51_80332778},
+    {4, (char*)s_solo63_80332780},
 };
 
 extern "C" SingMenuSoloNameTable PTR_s_solo1 = {
@@ -744,45 +904,18 @@ extern "C" SingMenuSoloNameTable PTR_s_solo1 = {
 
 extern "C" SingMenuTextureRef s_singleMenuModelTextureTable[] = {
     {5, (char*)s_solo2_80332718}, {5, (char*)s_solo3_80332788}, {5, (char*)s_solo6_80332790}, {5, (char*)s_solo7_80332798}, {5, (char*)s_solo10_803327A0},
-    {5, (char*)s_solo11_803327A8}, {5, (char*)s_solo12_803327B0}, {5, (char*)s_solo13_803327B8}, {5, (char*)s_solo14_803327C0}, {5, s_solo15_803327C8},
-    {5, s_solo16_803327D0}, {5, s_solo17_803327D8}, {5, s_solo18_803327E0}, {5, s_solo19_803327E8}, {5, s_solo20_803327F0},
-    {5, s_solo21_803327F8}, {5, s_solo22_80332800}, {5, s_solo24_80332808}, {5, s_solo25_80332810}, {5, s_solo26_80332818},
-    {5, s_solo27_80332820}, {5, s_solo28_80332828}, {5, s_solo29_80332830}, {5, s_solo31_80332838}, {5, s_solo32_80332840},
-    {5, s_solo33_80332848}, {5, s_solo34_80332850}, {5, s_solo35_80332858}, {5, s_solo36_80332860}, {5, s_solo37_80332868},
-    {5, s_solo38_80332870}, {5, s_solo39_80332878}, {5, s_solo40_80332880}, {5, s_solo41_80332888}, {5, s_solo43_80332890},
-    {5, s_solo44_80332898}, {5, s_solo45_803328A0}, {5, s_solo46_803328A8}, {5, s_solo52_803328B0}, {5, s_solo53_803328B8},
-    {5, s_solo54_803328C0}, {5, s_solo55_803328C8}, {5, s_solo56_803328D0}, {5, s_solo57_803328D8}, {5, s_solo58_803328E0},
-    {5, s_solo59_803328E8}, {5, s_solo60_803328F0}, {5, s_solo61_803328F8}, {5, s_solo62_80332900}, {5, s_solo64_80332908},
-    {6, s_solo23_80332910},
+    {5, (char*)s_solo11_803327A8}, {5, (char*)s_solo12_803327B0}, {5, (char*)s_solo13_803327B8}, {5, (char*)s_solo14_803327C0}, {5, (char*)s_solo15_803327C8},
+    {5, (char*)s_solo16_803327D0}, {5, (char*)s_solo17_803327D8}, {5, (char*)s_solo18_803327E0}, {5, (char*)s_solo19_803327E8}, {5, (char*)s_solo20_803327F0},
+    {5, (char*)s_solo21_803327F8}, {5, (char*)s_solo22_80332800}, {5, (char*)s_solo24_80332808}, {5, (char*)s_solo25_80332810}, {5, (char*)s_solo26_80332818},
+    {5, (char*)s_solo27_80332820}, {5, (char*)s_solo28_80332828}, {5, (char*)s_solo29_80332830}, {5, (char*)s_solo31_80332838}, {5, (char*)s_solo32_80332840},
+    {5, (char*)s_solo33_80332848}, {5, (char*)s_solo34_80332850}, {5, (char*)s_solo35_80332858}, {5, (char*)s_solo36_80332860}, {5, (char*)s_solo37_80332868},
+    {5, (char*)s_solo38_80332870}, {5, (char*)s_solo39_80332878}, {5, (char*)s_solo40_80332880}, {5, (char*)s_solo41_80332888}, {5, (char*)s_solo43_80332890},
+    {5, (char*)s_solo44_80332898}, {5, (char*)s_solo45_803328A0}, {5, (char*)s_solo46_803328A8}, {5, (char*)s_solo52_803328B0}, {5, (char*)s_solo53_803328B8},
+    {5, (char*)s_solo54_803328C0}, {5, (char*)s_solo55_803328C8}, {5, (char*)s_solo56_803328D0}, {5, (char*)s_solo57_803328D8}, {5, (char*)s_solo58_803328E0},
+    {5, (char*)s_solo59_803328E8}, {5, (char*)s_solo60_803328F0}, {5, (char*)s_solo61_803328F8}, {5, (char*)s_solo62_80332900}, {5, (char*)s_solo64_80332908},
+    {6, (char*)s_solo23_80332910},
 };
 
-extern float FLOAT_8033292c;
-extern float FLOAT_80332930;
-extern float FLOAT_80332928;
-extern float FLOAT_80332924;
-extern float FLOAT_80332920;
-extern float FLOAT_8033291c;
-extern float FLOAT_80332918;
-extern float FLOAT_80332934;
-extern float FLOAT_80332940;
-extern float FLOAT_80332944;
-extern float FLOAT_80332948;
-extern float FLOAT_8033294c;
-extern float FLOAT_80332950;
-extern float FLOAT_80332954;
-extern float FLOAT_80332960;
-extern float FLOAT_80332970;
-extern float FLOAT_803329a4;
-extern float FLOAT_803329a8;
-extern float FLOAT_803329ac;
-extern float FLOAT_803329b0;
-extern float FLOAT_803329b4;
-extern float FLOAT_803329bc;
-extern float FLOAT_803329b8;
-extern float FLOAT_803329c0;
-extern float FLOAT_803329c4;
-extern float FLOAT_803329c8;
-extern float FLOAT_803329cc;
 CFile::CHandle* gSingMenuAsyncFileHandle;
 int gSingMenuAsyncLoadCompleted;
 int gSingMenuHasScriptFoodBase;
@@ -791,40 +924,8 @@ extern "C" SingMenuTextureRef s_singleMenuModelTextureTable[];
 extern float gSingMenuRaceModelScales[];
 extern float gSingMenuRaceModelYOffset[];
 float FLOAT_8032ea78 = FLOAT_80332934;
-extern float FLOAT_803329d0;
-extern float FLOAT_803329d4;
-extern float FLOAT_803329d8;
-extern float FLOAT_803329dc;
-extern float FLOAT_803329e8;
-extern float FLOAT_803329ec;
-extern float FLOAT_803329f0;
-extern float FLOAT_803329f4;
-extern float FLOAT_803329f8;
-extern float FLOAT_80332994;
-extern float FLOAT_80332990;
-extern float FLOAT_80332998;
 extern float FLOAT_8033299c;
 extern float FLOAT_803329a0;
-extern float FLOAT_803329fc;
-extern float FLOAT_80332960;
-extern float FLOAT_80332a00;
-extern float FLOAT_80332a04;
-extern float FLOAT_80332a08;
-extern float FLOAT_80332a0c;
-extern float FLOAT_80332a10;
-extern float FLOAT_80332a18;
-extern float FLOAT_80332a1c;
-extern float FLOAT_80332A20;
-extern float FLOAT_80332a2c;
-extern float FLOAT_80332a48;
-extern double DOUBLE_80332938;
-extern double DOUBLE_80332968;
-extern double DOUBLE_80332978;
-extern double DOUBLE_80332980;
-extern double DOUBLE_80332988;
-extern double DOUBLE_80332a30;
-extern double DOUBLE_80332a38;
-extern double DOUBLE_80332a40;
 
 static inline const char* GetSingWinMessage(int staticText, const char* dynamicText, int useDynamic)
 {
@@ -834,20 +935,20 @@ static inline const char* GetSingWinMessage(int staticText, const char* dynamicT
 
     int languageId = Game.m_gameWork.m_languageId;
     if (languageId == 3) {
-        return gSingMenuTextTableIt[staticText];
+        return (char*)gSingMenuTextTableIt[staticText];
     } else if (languageId < 3) {
         if ((languageId == 1) || (languageId == 0)) {
-            return gSingMenuTextTableEn[staticText];
+            return (char*)gSingMenuTextTableEn[staticText];
         } else {
-            return gSingMenuTextTableDe[staticText];
+            return (char*)gSingMenuTextTableDe[staticText];
         }
     } else if (languageId == 5) {
-        return gSingMenuTextTableEs[staticText];
+        return (char*)gSingMenuTextTableEs[staticText];
     } else {
         if (4 < languageId) {
-            return gSingMenuTextTableEn[staticText];
+            return (char*)gSingMenuTextTableEn[staticText];
         }
-        return gSingMenuTextTableFr[staticText];
+        return (char*)gSingMenuTextTableFr[staticText];
     }
 }
 
@@ -1005,7 +1106,7 @@ void CMenuPcs::SingMenuInit()
         static_cast<int>(caravanWork->m_genderFlag));
     (*handlePtr)->LoadModel(0, static_cast<unsigned long>(modelNo), 0, 0, -1, 0, 0);
     (*handlePtr)->m_flags |= 0x300141;
-    (*handlePtr)->LoadAnim(s_stand_80332a24, 0, 1, 0, ((*handlePtr)->m_charaNo / 100) * 100, -1, 0);
+    (*handlePtr)->LoadAnim((char*)s_stand_80332a24, 0, 1, 0, ((*handlePtr)->m_charaNo / 100) * 100, -1, 0);
     (*handlePtr)->SetAnim(0, -1, -1, -1, 0);
 
     m_bonus.m_bonusBoardPtr = reinterpret_cast<int>(new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x5DD) u8[sizeof(MenuBoardEntry)]);
@@ -1584,19 +1685,19 @@ void CMenuPcs::DrawSingleStat(float alpha)
 
         char* label;
         if (languageId == 3) {
-            label = gSingMenuTextTableIt[i + 5];
+            label = (char*)gSingMenuTextTableIt[i + 5];
         } else if (languageId < 3) {
             if ((languageId == 0) || (languageId == 1)) {
-                label = gSingMenuTextTableEn[i + 5];
+                label = (char*)gSingMenuTextTableEn[i + 5];
             } else {
-                label = gSingMenuTextTableDe[i + 5];
+                label = (char*)gSingMenuTextTableDe[i + 5];
             }
         } else if (languageId == 5) {
-            label = gSingMenuTextTableEs[i + 5];
+            label = (char*)gSingMenuTextTableEs[i + 5];
         } else if (languageId > 4) {
-            label = gSingMenuTextTableEn[i + 5];
+            label = (char*)gSingMenuTextTableEn[i + 5];
         } else {
-            label = gSingMenuTextTableFr[i + 5];
+            label = (char*)gSingMenuTextTableFr[i + 5];
         }
 
         if ((languageId == 2) && (i == 3)) {
@@ -2971,19 +3072,19 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
 
     if ((raceBits & 0xF) == 0xF) {
         if (Game.m_gameWork.m_languageId == 3) {
-            text = gSingMenuTextTableIt[19];
+            text = (char*)gSingMenuTextTableIt[19];
         } else if (Game.m_gameWork.m_languageId < 3) {
             if (Game.m_gameWork.m_languageId == 1 || Game.m_gameWork.m_languageId == 0) {
-                text = gSingMenuTextTableEn[19];
+                text = (char*)gSingMenuTextTableEn[19];
             } else {
-                text = gSingMenuTextTableDe[19];
+                text = (char*)gSingMenuTextTableDe[19];
             }
         } else if (Game.m_gameWork.m_languageId == 5) {
-            text = gSingMenuTextTableEs[19];
+            text = (char*)gSingMenuTextTableEs[19];
         } else if (Game.m_gameWork.m_languageId < 5) {
-            text = gSingMenuTextTableFr[19];
+            text = (char*)gSingMenuTextTableFr[19];
         } else {
-            text = gSingMenuTextTableEn[19];
+            text = (char*)gSingMenuTextTableEn[19];
         }
         strcpy(outText, text);
         return;
@@ -3005,29 +3106,29 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
 
     if (raceType < 4) {
         if (Game.m_gameWork.m_languageId == 3) {
-            text = PTR_s_Clavat_80214110[raceType];
+            text = (char*)PTR_s_Clavat_80214110[raceType];
         } else if (Game.m_gameWork.m_languageId < 3) {
             if (Game.m_gameWork.m_languageId == 1 || Game.m_gameWork.m_languageId == 0) {
-                text = PTR_s_Clavat_802140f0[raceType];
+                text = (char*)PTR_s_Clavat_802140f0[raceType];
             } else {
-                text = PTR_s_Clavat_80214100[raceType];
+                text = (char*)PTR_s_Clavat_80214100[raceType];
             }
         } else if (Game.m_gameWork.m_languageId == 5) {
-            text = PTR_s_Clavate[raceType];
+            text = (char*)PTR_s_Clavate[raceType];
         } else if (Game.m_gameWork.m_languageId < 5) {
-            text = PTR_s_Clavat_80214120[raceType];
+            text = (char*)PTR_s_Clavat_80214120[raceType];
         } else {
-            text = PTR_s_Clavat_802140f0[raceType];
+            text = (char*)PTR_s_Clavat_802140f0[raceType];
         }
 
         strcpy(outText, text);
         if (Game.m_gameWork.m_languageId == 2) {
-            strcat(outText, s_plural_s_80332958);
+            strcat(outText, (char*)s_plural_s_80332958);
         }
     }
 
     if ((raceBits & 0xF) != 0 && (raceBits & 0x30) != 0) {
-        strcpy(outText, s_space_8033295c);
+        strcpy(outText, (char*)s_space_8033295c);
     }
     if ((raceBits & 0x30) == 0) {
         return;
@@ -3035,19 +3136,19 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
 
     raceType = (raceBits & 0x30) >> 5;
     if (Game.m_gameWork.m_languageId == 3) {
-        suffix = gSingMenuTextTableIt[raceType + 17];
+        suffix = (char*)gSingMenuTextTableIt[raceType + 17];
     } else if (Game.m_gameWork.m_languageId < 3) {
         if (Game.m_gameWork.m_languageId == 1 || Game.m_gameWork.m_languageId == 0) {
-            suffix = gSingMenuTextTableEn[raceType + 17];
+            suffix = (char*)gSingMenuTextTableEn[raceType + 17];
         } else {
-            suffix = gSingMenuTextTableDe[raceType + 17];
+            suffix = (char*)gSingMenuTextTableDe[raceType + 17];
         }
     } else if (Game.m_gameWork.m_languageId == 5) {
-        suffix = gSingMenuTextTableEs[raceType + 17];
+        suffix = (char*)gSingMenuTextTableEs[raceType + 17];
     } else if (Game.m_gameWork.m_languageId < 5) {
-        suffix = gSingMenuTextTableFr[raceType + 17];
+        suffix = (char*)gSingMenuTextTableFr[raceType + 17];
     } else {
-        suffix = gSingMenuTextTableEn[raceType + 17];
+        suffix = (char*)gSingMenuTextTableEn[raceType + 17];
     }
     strcat(outText, suffix);
 }
@@ -3238,15 +3339,15 @@ char* CMenuPcs::GetTribeStr(int index)
 {
     switch (Game.m_gameWork.m_languageId) {
         case 2:
-            return PTR_s_Clavat_80214100[index];
+            return (char*)PTR_s_Clavat_80214100[index];
         case 3:
-            return PTR_s_Clavat_80214110[index];
+            return (char*)PTR_s_Clavat_80214110[index];
         case 4:
-            return PTR_s_Clavat_80214120[index];
+            return (char*)PTR_s_Clavat_80214120[index];
         case 5:
-            return PTR_s_Clavate[index];
+            return (char*)PTR_s_Clavate[index];
         default:
-            return PTR_s_Clavat_802140f0[index];
+            return (char*)PTR_s_Clavat_802140f0[index];
     }
 }
 
@@ -3263,15 +3364,15 @@ char* CMenuPcs::GetJobStr(int index)
 {
     switch (Game.m_gameWork.m_languageId) {
         case 2:
-            return PTR_s_Schmied[index];
+            return (char*)PTR_s_Schmied[index];
         case 3:
-            return PTR_s_Fabbri[index];
+            return (char*)PTR_s_Fabbri[index];
         case 4:
-            return PTR_s_Forgeron[index];
+            return (char*)PTR_s_Forgeron[index];
         case 5:
-            return PTR_s_Herrero[index];
+            return (char*)PTR_s_Herrero[index];
         default:
-            return PTR_s_Blacksmith[index];
+            return (char*)PTR_s_Blacksmith[index];
     }
 }
 
@@ -3288,15 +3389,15 @@ char* CMenuPcs::GetHairStr(int index)
 {
     switch (Game.m_gameWork.m_languageId) {
         case 2:
-            return PTR_s_Spitzschopf[index];
+            return (char*)PTR_s_Spitzschopf[index];
         case 3:
-            return PTR_s_Ciuffo_ribelle[index];
+            return (char*)PTR_s_Ciuffo_ribelle[index];
         case 4:
-            return gSingMenuHairTableFr[index];
+            return (char*)gSingMenuHairTableFr[index];
         case 5:
-            return PTR_s_Remolino[index];
+            return (char*)PTR_s_Remolino[index];
         default:
-            return PTR_s_Cowlick[index];
+            return (char*)PTR_s_Cowlick[index];
     }
 }
 
@@ -3313,15 +3414,15 @@ char* CMenuPcs::GetMenuStr(int index)
 {
     switch (Game.m_gameWork.m_languageId) {
         case 2:
-            return gSingMenuTextTableDe[index];
+            return (char*)gSingMenuTextTableDe[index];
         case 3:
-            return gSingMenuTextTableIt[index];
+            return (char*)gSingMenuTextTableIt[index];
         case 4:
-            return gSingMenuTextTableFr[index];
+            return (char*)gSingMenuTextTableFr[index];
         case 5:
-            return gSingMenuTextTableEs[index];
+            return (char*)gSingMenuTextTableEs[index];
         default:
-            return gSingMenuTextTableEn[index];
+            return (char*)gSingMenuTextTableEn[index];
     }
 }
 
@@ -3338,15 +3439,15 @@ char* CMenuPcs::GetAttrStr(int index)
 {
     switch (Game.m_gameWork.m_languageId) {
         case 2:
-            return gSingMenuAttrTableDe[index];
+            return (char*)gSingMenuAttrTableDe[index];
         case 3:
-            return gSingMenuAttrTableIt[index];
+            return (char*)gSingMenuAttrTableIt[index];
         case 4:
-            return gSingMenuAttrTableFr[index];
+            return (char*)gSingMenuAttrTableFr[index];
         case 5:
-            return gSingMenuAttrTableEs[index];
+            return (char*)gSingMenuAttrTableEs[index];
         default:
-            return gSingMenuAttrTableEn[index];
+            return (char*)gSingMenuAttrTableEn[index];
     }
 }
 

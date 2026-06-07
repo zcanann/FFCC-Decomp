@@ -1464,10 +1464,10 @@ void CChara::CModel::calcMatrix()
 				}
 				frame = m_animStart + clamped;
 			}
-		} else if (m_time >= FLOAT_803301b0) {
-			frame = m_animStart + static_cast<float>(fmod(m_time, total));
-		} else {
+		} else if (m_time < FLOAT_803301b0) {
 			frame = ((m_animStart + total) - FLOAT_803301BC) - static_cast<float>(fmod(-m_time, total));
+		} else {
+			frame = m_animStart + static_cast<float>(fmod(m_time, total));
 		}
 	} else {
 		frame = FLOAT_803301b0;

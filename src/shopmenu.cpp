@@ -2533,7 +2533,7 @@ void CShopMenu::SelectItemIdx()
         unsigned int listType = m_listType;
         if (listType == 0) {
             if (m_selectedIndex != -1) {
-                canSelect = m_caravanWork->m_shopList[m_selectedIndex] >= 1;
+                canSelect = getItemNo(m_selectedIndex) >= 1;
             }
             if (canSelect) {
                 CCaravanWork* caravanWork = m_caravanWork;

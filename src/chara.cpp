@@ -21,6 +21,10 @@ extern "C" float FLOAT_803301bc;
 extern "C" float FLOAT_803301c8;
 extern "C" float FLOAT_803301cc;
 extern "C" float FLOAT_803301d0;
+extern "C" float FLOAT_803301d4;
+extern "C" float FLOAT_803301d8;
+extern "C" float FLOAT_803301dc;
+extern "C" float FLOAT_803301e0;
 extern "C" float FLOAT_803301e4;
 extern "C" float FLOAT_803301e8;
 extern "C" float FLOAT_803301f8;
@@ -1704,75 +1708,165 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 		return;
 	}
 
-	float* dynParam = reinterpret_cast<float*>(reinterpret_cast<u8*>(ModelDynParams(this)) + dynIndex * 0x24);
+	float* dynParam = reinterpret_cast<float*>(reinterpret_cast<u8*>(ModelDynParams(this)) + static_cast<char>(NodeDynParamIndex(node)) * 0x24);
 	MtxPtr nodeMtx = NodeWorldMtx(node);
-	Vec forward = {nodeMtx[0][0], nodeMtx[1][0], nodeMtx[2][0]};
-	Vec right = {nodeMtx[0][1], nodeMtx[1][1], nodeMtx[2][1]};
-	Vec up = {nodeMtx[0][2], nodeMtx[1][2], nodeMtx[2][2]};
-	Vec origin = {nodeMtx[0][3], nodeMtx[1][3], nodeMtx[2][3]};
+
+	CVector forward;
+	{
+		CVector tmp = CVector(nodeMtx[0][0], nodeMtx[1][0], nodeMtx[2][0]);
+		forward.x = tmp.x;
+		forward.y = tmp.y;
+		forward.z = tmp.z;
+	}
+	Vec right;
+	{
+		CVector tmp = CVector(nodeMtx[0][1], nodeMtx[1][1], nodeMtx[2][1]);
+		right.x = tmp.x;
+		right.y = tmp.y;
+		right.z = tmp.z;
+	}
+	Vec up;
+	{
+		CVector tmp = CVector(nodeMtx[0][2], nodeMtx[1][2], nodeMtx[2][2]);
+		up.x = tmp.x;
+		up.y = tmp.y;
+		up.z = tmp.z;
+	}
+	forward.Normalize();
+	Vec origin;
+	{
+		CVector tmp = CVector(nodeMtx[0][3], nodeMtx[1][3], nodeMtx[2][3]);
+		origin.x = tmp.x;
+		origin.y = tmp.y;
+		origin.z = tmp.z;
+	}
 	float boneLen = NodeBoneLen(node);
 
-	PSVECNormalize(&forward, &forward);
 	Vec target;
-	PSVECScale(&forward, &target, boneLen);
-	PSVECAdd(&origin, &target, &target);
+	{
+		CVector tmp;
+		PSVECScale(reinterpret_cast<Vec*>(&forward), reinterpret_cast<Vec*>(&tmp), boneLen);
+		target.x = tmp.x;
+		target.y = tmp.y;
+		target.z = tmp.z;
+	}
+	{
+		CVector tmp;
+		PSVECAdd(&origin, &target, reinterpret_cast<Vec*>(&tmp));
+		target.x = tmp.x;
+		target.y = tmp.y;
+		target.z = tmp.z;
+	}
 
 	if ((ModelFlags10C(this) & 0x80) != 0) {
-		NodeDynPosition(node) = target;
-		NodeDynVelocity(node).x = 0.0f;
-		NodeDynVelocity(node).y = 0.0f;
-		NodeDynVelocity(node).z = 0.0f;
+		NodeDynPosition(node).x = target.x;
+		NodeDynPosition(node).y = target.y;
+		NodeDynPosition(node).z = target.z;
+		reinterpret_cast<CVector&>(NodeDynVelocity(node)).Identity();
 		return;
 	}
 
 	float randomScale = FLOAT_803301d0 * Math.RandF() + FLOAT_803301d0;
-	Vec windForce;
-	PSVECScale(&ModelDynJitter(this), &windForce, randomScale);
 	Vec windImpulse;
-	PSVECScale(&windForce, &windImpulse, dynParam[2]);
+	{
+		CVector tmp;
+		PSVECScale(&ModelDynJitter(this), reinterpret_cast<Vec*>(&tmp), randomScale);
+		Vec windForce;
+		windForce.x = tmp.x;
+		windForce.y = tmp.y;
+		windForce.z = tmp.z;
+		CVector tmp2;
+		PSVECScale(&windForce, reinterpret_cast<Vec*>(&tmp2), dynParam[2]);
+		windImpulse.x = tmp2.x;
+		windImpulse.y = tmp2.y;
+		windImpulse.z = tmp2.z;
+	}
 
-	Vec targetDelta;
-	PSVECSubtract(&target, &NodeDynPosition(node), &targetDelta);
 	Vec accel;
-	PSVECAdd(&targetDelta, &windImpulse, &accel);
+	{
+		CVector tmp;
+		PSVECSubtract(&target, &NodeDynPosition(node), reinterpret_cast<Vec*>(&tmp));
+		Vec targetDelta;
+		targetDelta.x = tmp.x;
+		targetDelta.y = tmp.y;
+		targetDelta.z = tmp.z;
+		CVector tmp2;
+		PSVECAdd(&targetDelta, &windImpulse, reinterpret_cast<Vec*>(&tmp2));
+		accel.x = tmp2.x;
+		accel.y = tmp2.y;
+		accel.z = tmp2.z;
+	}
 	PSVECAdd(&NodeDynVelocity(node), &accel, &NodeDynVelocity(node));
 
-	Vec step;
-	PSVECScale(&NodeDynVelocity(node), &step, dynParam[0]);
 	Vec predicted;
-	PSVECAdd(&NodeDynPosition(node), &step, &predicted);
+	{
+		CVector tmp;
+		PSVECScale(&NodeDynVelocity(node), reinterpret_cast<Vec*>(&tmp), dynParam[0]);
+		Vec step;
+		step.x = tmp.x;
+		step.y = tmp.y;
+		step.z = tmp.z;
+		CVector tmp2;
+		PSVECAdd(&NodeDynPosition(node), &step, reinterpret_cast<Vec*>(&tmp2));
+		predicted.x = tmp2.x;
+		predicted.y = tmp2.y;
+		predicted.z = tmp2.z;
+	}
 	PSVECScale(&NodeDynVelocity(node), &NodeDynVelocity(node), dynParam[1]);
 
 	Vec direction;
-	PSVECSubtract(&predicted, &origin, &direction);
+	{
+		CVector tmp;
+		PSVECSubtract(&predicted, &origin, reinterpret_cast<Vec*>(&tmp));
+		direction.x = tmp.x;
+		direction.y = tmp.y;
+		direction.z = tmp.z;
+	}
 	for (int axis = 0; axis < 2; axis++, dynParam++) {
 		if (dynParam[3] != 0.0f) {
-			float dotForward = PSVECDotProduct(&forward, &direction);
-			float dotSide = PSVECDotProduct(axis == 0 ? &up : &right, &direction);
-			float angle = axis == 0 ? -atan2f(dotSide, dotForward) : atan2f(dotSide, dotForward);
-			float limit = 0.01745329252f * dynParam[5];
-			if (angle <= limit || 0.01745329252f * dynParam[7] <= angle) {
+			float angle;
+			if (axis == 0) {
+				float dotForward = PSVECDotProduct(reinterpret_cast<Vec*>(&forward), &direction);
+				float dotSide = PSVECDotProduct(&up, &direction);
+				angle = -atan2f(dotSide, dotForward);
+			} else {
+				float dotForward = PSVECDotProduct(reinterpret_cast<Vec*>(&forward), &direction);
+				float dotSide = PSVECDotProduct(&right, &direction);
+				angle = atan2f(dotSide, dotForward);
+			}
+			float limit = FLOAT_803301d4 * dynParam[5];
+			if (angle <= limit || FLOAT_803301d4 * dynParam[7] <= angle) {
 				if (limit < angle) {
-					limit = 0.01745329252f * dynParam[7];
+					limit = FLOAT_803301d4 * dynParam[7];
 				}
 
 				Mtx rotate;
-				PSMTXRotAxisRad(rotate, axis == 0 ? &right : &up, limit - angle);
+				if (axis == 0) {
+					PSMTXRotAxisRad(rotate, &right, limit - angle);
+				} else {
+					PSMTXRotAxisRad(rotate, &up, limit - angle);
+				}
 				PSMTXMultVecSR(rotate, &direction, &direction);
 			}
 		}
 	}
 
-	PSVECNormalize(&direction, &direction);
-	float align = PSVECDotProduct(&forward, &direction);
-	if (align <= 0.9999f) {
-		float rotateAngle = 3.14159274f;
-		if (-1.0f <= align) {
+	reinterpret_cast<CVector&>(direction).Normalize();
+	float align = PSVECDotProduct(reinterpret_cast<Vec*>(&forward), &direction);
+	if (align <= FLOAT_803301d8) {
+		float rotateAngle = FLOAT_803301e0;
+		if (FLOAT_803301dc <= align) {
 			rotateAngle = acosf(align);
 		}
 
 		Vec axis;
-		PSVECCrossProduct(&forward, &direction, &axis);
+		{
+			CVector tmp;
+			PSVECCrossProduct(reinterpret_cast<Vec*>(&forward), &direction, reinterpret_cast<Vec*>(&tmp));
+			axis.x = tmp.x;
+			axis.y = tmp.y;
+			axis.z = tmp.z;
+		}
 		Mtx rotate;
 		Mtx base;
 		Mtx axisBase;
@@ -1780,12 +1874,12 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 		PSMTXRotAxisRad(rotate, &axis, rotateAngle);
 		PSMTXCopy(nodeMtx, base);
 		PSMTXCopy(rotate, axisBase);
-		base[0][3] = FLOAT_803301b0;
-		base[1][3] = FLOAT_803301b0;
-		base[2][3] = FLOAT_803301b0;
-		axisBase[0][3] = FLOAT_803301b0;
-		axisBase[1][3] = FLOAT_803301b0;
-		axisBase[2][3] = FLOAT_803301b0;
+		base[0][3] = CVector(FLOAT_803301b0, FLOAT_803301b0, FLOAT_803301b0).x;
+		base[1][3] = CVector(FLOAT_803301b0, FLOAT_803301b0, FLOAT_803301b0).y;
+		base[2][3] = CVector(FLOAT_803301b0, FLOAT_803301b0, FLOAT_803301b0).z;
+		axisBase[0][3] = CVector(FLOAT_803301b0, FLOAT_803301b0, FLOAT_803301b0).x;
+		axisBase[1][3] = CVector(FLOAT_803301b0, FLOAT_803301b0, FLOAT_803301b0).y;
+		axisBase[2][3] = CVector(FLOAT_803301b0, FLOAT_803301b0, FLOAT_803301b0).z;
 		PSMTXConcat(axisBase, base, combined);
 		nodeMtx[0][0] = combined[0][0];
 		nodeMtx[1][0] = combined[1][0];
@@ -1798,9 +1892,15 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 		nodeMtx[2][2] = combined[2][2];
 	}
 
-	Vec dynOffset;
-	PSVECScale(&direction, &dynOffset, boneLen);
-	PSVECAdd(&origin, &dynOffset, &NodeDynPosition(node));
+	{
+		CVector tmp;
+		PSVECScale(&direction, reinterpret_cast<Vec*>(&tmp), boneLen);
+		Vec dynOffset;
+		dynOffset.x = tmp.x;
+		dynOffset.y = tmp.y;
+		dynOffset.z = tmp.z;
+		PSVECAdd(&origin, &dynOffset, &NodeDynPosition(node));
+	}
 }
 
 /*

@@ -11626,8 +11626,7 @@ int CMenuPcs::GetSameCharaData(Mc::SaveDat* source, Mc::SaveDat* target, int mem
 
 	if (strictMode == 0) {
 		unsigned char* const targetHeader = dst + memberIndex * 0x9C0;
-		if (*reinterpret_cast<unsigned int*>(src + 0x13D4) != *reinterpret_cast<unsigned int*>(targetHeader + 0x1D9C) ||
-		    *reinterpret_cast<unsigned int*>(src + 0x13D0) != *reinterpret_cast<unsigned int*>(targetHeader + 0x1D98) ||
+		if (*reinterpret_cast<unsigned long long*>(src + 0x13D0) != *reinterpret_cast<unsigned long long*>(targetHeader + 0x1D98) ||
 		    *reinterpret_cast<unsigned int*>(src + 0x13D8) != *reinterpret_cast<unsigned int*>(targetHeader + 0x1DA0)) {
 			return -2;
 		}
@@ -11647,8 +11646,7 @@ int CMenuPcs::GetSameCharaData(Mc::SaveDat* source, Mc::SaveDat* target, int mem
 				}
 			} else if (src[0x1D91] != 0 &&
 			           *reinterpret_cast<unsigned int*>(src + 0x1D94) == *reinterpret_cast<unsigned int*>(dst + cmpOffset) &&
-			           *reinterpret_cast<unsigned int*>(src + 0x1D9C) == *reinterpret_cast<unsigned int*>(dst + 0x13D4) &&
-			           *reinterpret_cast<unsigned int*>(src + 0x1D98) == *reinterpret_cast<unsigned int*>(dst + 0x13D0) &&
+			           *reinterpret_cast<unsigned long long*>(src + 0x1D98) == *reinterpret_cast<unsigned long long*>(dst + 0x13D0) &&
 			           *reinterpret_cast<unsigned int*>(src + 0x1DA0) == *reinterpret_cast<unsigned int*>(dst + 0x13D8)) {
 				break;
 			}
@@ -11663,8 +11661,7 @@ int CMenuPcs::GetSameCharaData(Mc::SaveDat* source, Mc::SaveDat* target, int mem
 				}
 			} else if (src[0x2751] != 0 &&
 			           *reinterpret_cast<unsigned int*>(src + 0x2754) == *reinterpret_cast<unsigned int*>(dst + cmpOffset) &&
-			           *reinterpret_cast<unsigned int*>(src + 0x275C) == *reinterpret_cast<unsigned int*>(dst + 0x13D4) &&
-			           *reinterpret_cast<unsigned int*>(src + 0x2758) == *reinterpret_cast<unsigned int*>(dst + 0x13D0) &&
+			           *reinterpret_cast<unsigned long long*>(src + 0x2758) == *reinterpret_cast<unsigned long long*>(dst + 0x13D0) &&
 			           *reinterpret_cast<unsigned int*>(src + 0x2760) == *reinterpret_cast<unsigned int*>(dst + 0x13D8)) {
 				break;
 			}

@@ -107,6 +107,18 @@ struct BossGhostPartyCounters {
 
 #define sBossGhostPartyCounters (*reinterpret_cast<BossGhostPartyCounters*>(CGPartyObj::m_ghostWork))
 
+struct GhostMogMenuWork {
+	struct {
+		signed char carryActive : 1;
+		signed char _bits : 7;
+	} flags;
+	unsigned char _pad1[0x3F];
+	int mood;
+	int holdTimer;
+};
+
+#define sGhostMogMenuWork (*reinterpret_cast<GhostMogMenuWork*>(CGPartyObj::m_ghostWork))
+
 static inline PartyObjOverlay& PartyData(CGPartyObj* self)
 {
 	return self->m_partyData;
@@ -1503,20 +1515,16 @@ void CGPartyObj::onFrameStat()
 			unsigned short up = getPadButtonUpForSlot(static_cast<unsigned char>(m_animStateMisc));
 			if ((up & 0x400) == 0) {
 				if ((held & 0x400) == 0) {
-					sGhostPartyWork.thresholdA = 0;
+					sGhostMogMenuWork.holdTimer = 0;
 				} else {
-					sGhostPartyWork.thresholdA++;
-					if (sGhostPartyWork.thresholdA > 9 && sGhostPartyWork.mood == 0) {
-						sGhostPartyWork.mood = 2;
+					sGhostMogMenuWork.holdTimer++;
+					if (sGhostMogMenuWork.holdTimer > 9 && sGhostMogMenuWork.mood == 0) {
+						sGhostMogMenuWork.mood = 2;
 					}
 				}
-			} else if (sGhostPartyWork.thresholdA < 10 &&
-			           PartyData(Game.m_partyObjArr[1]).carryObject != reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)) {
-				CGPartyObj* leader = Game.m_partyObjArr[1];
-				int dir = -PartyData(leader).commandMode;
-				leader->m_weaponNodeFlagBytes.m_flags1 =
-				    static_cast<unsigned char>((static_cast<signed char>(static_cast<unsigned char>((dir | PartyData(leader).commandMode) >> 24)) >> 7) << 7) |
-				    (leader->m_weaponNodeFlagBytes.m_flags1 & 0x7F);
+			} else if (sGhostMogMenuWork.holdTimer < 10 &&
+			           party.carryObject != reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)) {
+				sGhostMogMenuWork.flags.carryActive = (party.carryObject != nullptr);
 			}
 		}
 		break;

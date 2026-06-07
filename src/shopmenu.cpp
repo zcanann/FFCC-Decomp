@@ -257,11 +257,6 @@ static int ResolveShopMenuItemNo(CShopMenu* shopMenu, int index)
     return -1;
 }
 
-static int ResolveShopMenuSelectedItemId(CShopMenu* shopMenu)
-{
-    return ResolveShopMenuItemNo(shopMenu, shopMenu->m_selectedIndex);
-}
-
 static int CalcShopMenuMakeGil(CShopMenu* shopMenu, int itemId)
 {
     if (itemId < 1) {
@@ -346,52 +341,6 @@ static bool CanTradeShopMenuItem(CShopMenu* shopMenu, int index, int itemNo)
     return itemNo >= 0x9F;
 }
 
-static void UpdateShopMenuListWindow(CShopMenu* shopMenu)
-{
-    if (shopMenu->m_selectedIndex < shopMenu->m_listTop) {
-        shopMenu->m_listTop = shopMenu->m_selectedIndex;
-    }
-    if ((shopMenu->m_listTop + shopMenu->m_visibleRows) <= shopMenu->m_selectedIndex) {
-        shopMenu->m_listTop = (shopMenu->m_selectedIndex - shopMenu->m_visibleRows) + 1;
-    }
-
-    shopMenu->m_canScrollUp = (shopMenu->m_listTop < 1) ? 0 : 1;
-
-    int itemCount = ResolveShopMenuItemCount(shopMenu);
-    shopMenu->m_canScrollDown = ((shopMenu->m_listTop + shopMenu->m_visibleRows) < itemCount) ? 1 : 0;
-}
-
-static void ExecuteShopMenuBuyConfirm(CShopMenu* shopMenu)
-{
-    CCaravanWork* const caravanWork = ShopMenuCaravanWork(shopMenu);
-    int itemId = ResolveShopMenuSelectedItemId(shopMenu);
-    int quantity = 0;
-
-    while ((quantity < shopMenu->m_quantity) && ((unsigned short)(caravanWork->m_inventoryItemCount + 1) < 0x41)) {
-        int gilValue = CalcShopMenuTradeGil(shopMenu, itemId);
-        if (caravanWork->CanAddGil(-gilValue) == 0) {
-            return;
-        }
-
-        caravanWork->AddItem(static_cast<short>(itemId), 0);
-        caravanWork->AddGil(-CalcShopMenuTradeGil(shopMenu, itemId));
-        ++quantity;
-    }
-}
-
-static void ExecuteShopMenuSellConfirm(CShopMenu* shopMenu)
-{
-    CCaravanWork* const caravanWork = ShopMenuCaravanWork(shopMenu);
-    int itemId = ResolveShopMenuSelectedItemId(shopMenu);
-    int gilValue = CalcShopMenuTradeGil(shopMenu, itemId);
-
-    if (caravanWork->CanAddGil(gilValue) == 0) {
-        return;
-    }
-
-    caravanWork->DeleteItemIdx(shopMenu->m_selectedIndex, 0);
-    caravanWork->AddGil(CalcShopMenuTradeGil(shopMenu, itemId));
-}
 
 static void SetupShopMenuInfoFont(CFont* font, _GXColor* color)
 {
@@ -1107,7 +1056,7 @@ void CShopMenu::DrawItemInfo0()
 
     int listType = m_listType;
     const CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
-    int itemNo = ResolveShopMenuItemNo(this, itemIndex);
+    int itemNo = getItemNo(itemIndex);
 
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
     MenuPcs.DrawInit();
@@ -1268,7 +1217,7 @@ void CShopMenu::DrawBuySellInfo()
     bool canTrade = false;
     if (selected != -1) {
         const CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
-        itemNo = ResolveShopMenuItemNo(this, selected);
+        itemNo = getItemNo(selected);
 
         if (itemNo > 0) {
             if (listType == 0) {
@@ -1359,11 +1308,11 @@ void CShopMenu::DrawItemList()
             break;
         }
 
-        int itemNo = ResolveShopMenuItemNo(this, itemIndex);
+        int itemNo = getItemNo(itemIndex);
 
         bool canTrade = false;
         if (itemIndex != -1) {
-            int tradeItemNo = ResolveShopMenuItemNo(this, itemIndex);
+            int tradeItemNo = getItemNo(itemIndex);
 
             if (tradeItemNo > 0) {
                 if (listType == 0) {
@@ -1810,7 +1759,7 @@ void CShopMenu::DrawMake()
     int listType = m_listType;
     int selectedIndex = m_selectedIndex;
     CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
-    int selectedItem = ResolveShopMenuItemNo(this, selectedIndex);
+    int selectedItem = getItemNo(selectedIndex);
 
     int makeGil = 0;
     if (selectedItem > 0) {
@@ -2861,7 +2810,7 @@ void CShopMenu::Calc()
         m_fade = static_cast<float>(timer) * 0.125f;
         if (timer == 8) {
             short recipeMaterial[8];
-            int itemId = ResolveShopMenuSelectedItemId(this);
+            int itemId = getItemNo(m_selectedIndex);
             CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
 
             MenuPcs.GetRecipeMaterial(itemId, reinterpret_cast<CMenuPcs::MaterialInfo*>(recipeMaterial));

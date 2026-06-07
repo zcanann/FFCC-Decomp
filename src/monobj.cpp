@@ -172,10 +172,13 @@ void CGMonObj::onFramePreCalc()
 		(static_cast<signed char>(mon[0x63C]) < 0) &&
 		(m_unk6B9 == 0) &&
 		(m_unk6C1 == 0)) {
-		m_chaseState =
-			(*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) ? -1 : 0;
-		m_chaseTimer = m_targetPartyIndex;
-		m_actionBranch = -1;
+		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) {
+			*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = -1;
+		} else {
+			*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
+		}
+		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 8) = m_targetPartyIndex;
+		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 0) = -1;
 
 		if ((reinterpret_cast<unsigned int>(object->m_scriptHandle[4]) < 0x9A) &&
 			(0x8D < reinterpret_cast<unsigned int>(object->m_scriptHandle[4]))) {
@@ -185,7 +188,7 @@ void CGMonObj::onFramePreCalc()
 			(this->*m_funcs->logic)();
 		}
 
-		int nextState = m_chaseState;
+		int nextState = *reinterpret_cast<int*>(CGMonObj::m_aiWork + 4);
 		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) {
 			if ((nextState != -1) && (nextState != prgObj->m_lastStateId)) {
 				prgObj->changeStat(nextState, 0, 0);

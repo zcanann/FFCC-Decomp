@@ -2809,7 +2809,7 @@ void CPartMng::pppDumpCacheIdx()
         unsigned char m_ownerFacing;    // 0xEA
         unsigned char m_drawVariant;    // 0xEB
         unsigned char m_rotationOrder;  // 0xEC
-        unsigned char m_drawPass;       // 0xED
+        signed char m_drawPass;         // 0xED
         signed char m_drawSubType;      // 0xEE
         unsigned char m_useOwnerScaleSign; // 0xEF
         unsigned char m_ownerFlagsInitialized; // 0xF0
@@ -2821,10 +2821,10 @@ void CPartMng::pppDumpCacheIdx()
 
     pppSetRendMatrix();
 
-    PppMngStDumpRaw* mng = reinterpret_cast<PppMngStDumpRaw*>(reinterpret_cast<unsigned char*>(this) + 0x1D4);
+    PppMngStDumpRaw* mng = reinterpret_cast<PppMngStDumpRaw*>(reinterpret_cast<unsigned char*>(this) + 0x2A18);
     for (int i = 0; i < 0x180; i++) {
-        if ((Game.m_gameWork.m_gamePaused == 0 || (mng->m_drawVariant > 5 && mng->m_drawVariant < 8)) &&
-            mng->m_baseTime != -0x1000 && mng->m_endRequested == 0) {
+        if ((Game.m_gameWork.m_gamePaused == 0 || (mng->m_drawPass >= 6 && mng->m_drawPass <= 7)) &&
+            mng->m_baseTime != -0x1000 && mng->m_hitBgFlag == 0) {
             ppvMng = reinterpret_cast<_pppMngSt*>(mng);
             ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
 

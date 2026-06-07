@@ -10499,16 +10499,15 @@ void CMenuPcs::SetMcWinInfo(int x, int y)
  */
 void CMenuPcs::DrawMcWin(short state, short kind)
 {
-	MenuWindowInfo* const win = m_menuWindowInfo;
-
-	if (state >= 0 && win->state != state) {
-		win->state = state;
+	if (state >= 0 && m_menuWindowInfo->state != state) {
+		m_menuWindowInfo->state = state;
 	}
 
-	if (win->state == 3) {
+	if (m_menuWindowInfo->state == 3) {
 		return;
 	}
 
+	MenuWindowInfo* const win = m_menuWindowInfo;
 	const float centerX = static_cast<float>(win->x) + static_cast<float>(static_cast<double>(win->width) * DOUBLE_803313f8);
 	const float centerY = static_cast<float>(win->y) + static_cast<float>(static_cast<double>(win->height) * DOUBLE_803313f8);
 
@@ -10535,8 +10534,12 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	sw = static_cast<float>(static_cast<int>(static_cast<double>(sw) - DOUBLE_80331420));
 	sh = static_cast<float>(static_cast<int>(static_cast<double>(sh) - DOUBLE_80331420));
 
-	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-	GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	GXColor color;
+	color.r = 0xFF;
+	color.g = 0xFF;
+	color.b = 0xFF;
+	color.a = 0xFF;
 	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
 
 	const int cornerTex = (kind == 0) ? 0x2C : 0x24;

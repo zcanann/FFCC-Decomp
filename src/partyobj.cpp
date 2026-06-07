@@ -1061,8 +1061,8 @@ void CGPartyObj::command()
 	}
 
 	PartyObjOverlay& party = PartyData(this);
-	CCaravanWork* caravan = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
-	const int padSlot = static_cast<unsigned char>(m_animStateMisc);
+#define caravan reinterpret_cast<CCaravanWork*>(m_scriptHandle)
+#define padSlot static_cast<char>(m_animStateMisc)
 	bool primaryAvailable = false;
 	bool secondaryAvailable = false;
 	int primaryCommand = -1;
@@ -1072,7 +1072,7 @@ void CGPartyObj::command()
 
 	if (static_cast<signed char>(party.partyFlags) >= 0) {
 
-	if ((*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) &&
+	if ((*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) &&
 	    ((party.commandMode & 1) != 0) &&
 	    Joybus.GetCtrlMode(padSlot) != 1) {
 		int cmdDir = 0;
@@ -1483,6 +1483,8 @@ void CGPartyObj::command()
 	} else if (secondaryCommand == 7 || secondaryCommand == 8) {
 		carry(2, static_cast<CGObject*>(0), 0);
 	}
+#undef padSlot
+#undef caravan
 }
 
 /*

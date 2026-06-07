@@ -2830,10 +2830,8 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 		}
 		case 0x534B494E: {
 			m_data->m_skinCount = chunkInfo.m_arg0;
-			if (m_data->m_skinCount != 0) {
-				m_data->m_skins =
-				    new (stage, const_cast<char*>(s_chara_cpp), 0x7F8) CChara::CSkin[m_data->m_skinCount];
-			}
+			m_data->m_skins =
+			    new (stage, const_cast<char*>(s_chara_cpp), 0x7F8) CChara::CSkin[m_data->m_skinCount];
 
 			unsigned int skinIndex = 0;
 			chunk.PushChunk();
@@ -2876,10 +2874,8 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 		}
 		case 0x444C4844: {
 			m_data->m_displayListCount = chunkInfo.m_arg0 & 0xFFFF;
-			if (m_data->m_displayListCount != 0) {
-				m_data->m_displayLists = reinterpret_cast<CCharaDisplayListRaw*>(
-				    new (stage, const_cast<char*>(s_chara_cpp), 0x820) CChara::CMesh::CDisplayList[m_data->m_displayListCount]);
-			}
+			m_data->m_displayLists = reinterpret_cast<CCharaDisplayListRaw*>(
+			    new (stage, const_cast<char*>(s_chara_cpp), 0x820) CChara::CMesh::CDisplayList[m_data->m_displayListCount]);
 
 			u32 displayIndex = 0;
 			chunk.PushChunk();

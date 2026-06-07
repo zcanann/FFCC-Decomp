@@ -1563,10 +1563,8 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 
 	while (true) {
 frameLoop:
-		*reinterpret_cast<u16*>(self + 0x968) = *reinterpret_cast<u16*>(self + 0x964);
-		*reinterpret_cast<u16*>(self + 0x96A) = *reinterpret_cast<u16*>(self + 0x966);
-		*reinterpret_cast<u16*>(self + 0x964) = static_cast<u16>(object->m_codePos);
-		*reinterpret_cast<u16*>(self + 0x966) = static_cast<u16>(object->m_codePos >> 16);
+		*reinterpret_cast<u32*>(self + 0x968) = *reinterpret_cast<u32*>(self + 0x964);
+		*reinterpret_cast<u32*>(self + 0x964) = object->m_codePos;
 
 		switch (code[0]) {
 		case 0: {
@@ -1576,7 +1574,7 @@ frameLoop:
 			if ((arg & 1) != 0) {
 				if (index < 0) {
 					value = reinterpret_cast<unsigned int*>(
-					    (arg & 0x10) == 0 ? onSystemVal(object, index) : onClassSystemVal(object, index));
+					    (arg & 0x10) == 0 ? onClassSystemVal(object, index) : onSystemVal(object, index));
 				} else if ((arg & 8) == 0) {
 					value = object->m_localBase + index;
 				} else if ((arg & 0x10) == 0) {
@@ -1590,8 +1588,8 @@ frameLoop:
 				const int stackIndex = static_cast<int>(*object->m_sp);
 				if (index < 0) {
 					value = reinterpret_cast<unsigned int*>((arg & 0x10) == 0
-					                                            ? onSystemVal(object, index + stackIndex)
-					                                            : onClassSystemVal(object, index + stackIndex));
+					                                            ? onClassSystemVal(object, index + stackIndex)
+					                                            : onSystemVal(object, index + stackIndex));
 				} else if ((arg & 8) == 0) {
 					value = object->m_localBase + index + stackIndex;
 				} else if ((arg & 0x10) == 0) {
@@ -1603,7 +1601,7 @@ frameLoop:
 			} else if ((arg & 4) != 0) {
 				if (index < 0) {
 					value = reinterpret_cast<unsigned int*>(
-					    (arg & 0x10) == 0 ? onSystemVal(object, index) : onClassSystemVal(object, index));
+					    (arg & 0x10) == 0 ? onClassSystemVal(object, index) : onSystemVal(object, index));
 				} else if ((arg & 8) == 0) {
 					value = object->m_localBase + index;
 				} else if ((arg & 0x10) == 0) {
@@ -1624,7 +1622,7 @@ frameLoop:
 			if ((arg & 1) != 0) {
 				if (index < 0) {
 					value = reinterpret_cast<unsigned int*>(
-					    (arg & 0x10) == 0 ? onSystemVal(object, index) : onClassSystemVal(object, index));
+					    (arg & 0x10) == 0 ? onClassSystemVal(object, index) : onSystemVal(object, index));
 				} else if ((arg & 8) == 0) {
 					value = object->m_localBase + index;
 				} else if ((arg & 0x10) == 0) {
@@ -1638,8 +1636,8 @@ frameLoop:
 				const int stackIndex = static_cast<int>(*object->m_sp);
 				if (index < 0) {
 					value = reinterpret_cast<unsigned int*>((arg & 0x10) == 0
-					                                            ? onSystemVal(object, index + stackIndex)
-					                                            : onClassSystemVal(object, index + stackIndex));
+					                                            ? onClassSystemVal(object, index + stackIndex)
+					                                            : onSystemVal(object, index + stackIndex));
 				} else if ((arg & 8) == 0) {
 					value = object->m_localBase + index + stackIndex;
 				} else if ((arg & 0x10) == 0) {
@@ -1651,7 +1649,7 @@ frameLoop:
 			} else if ((arg & 4) != 0) {
 				if (index < 0) {
 					value = reinterpret_cast<unsigned int*>(
-					    (arg & 0x10) == 0 ? onSystemVal(object, index) : onClassSystemVal(object, index));
+					    (arg & 0x10) == 0 ? onClassSystemVal(object, index) : onSystemVal(object, index));
 				} else if ((arg & 8) == 0) {
 					value = object->m_localBase + index;
 				} else if ((arg & 0x10) == 0) {

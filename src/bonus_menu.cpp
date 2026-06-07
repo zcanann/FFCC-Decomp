@@ -2741,20 +2741,23 @@ void CMenuPcs::CalcResultOpenAnim()
 		Sound.PlaySe(0x46, 0x40, 0x7f, 0);
 		memset((void*)animPtr, 0, sizeof(BonusAnimList));
 
-		sprites[0].kind = 0x16;
-		sprites[0].y = 0;
-		sprites[0].x = 0;
-		sprites[0].w = 0x280;
-		sprites[0].h = 0x1c0;
-		sprites[0].mulX = 0.0f;
-		sprites[0].mulY = 0.0f;
-		sprites[0].startFrame = 0;
-		sprites[0].duration = 8;
-		sprites[0].depth = 1.0f;
-		sprites[0].alpha = 0.0f;
+		{
+			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + 8);
+			sprite->kind = 0x16;
+			sprite->y = 0;
+			sprite->x = 0;
+			sprite->w = 0x280;
+			sprite->h = 0x1c0;
+			sprite->mulX = 0.0f;
+			sprite->mulY = 0.0f;
+			sprite->startFrame = 0;
+			sprite->duration = 8;
+			sprite->depth = 1.0f;
+			sprite->alpha = 0.0f;
+		}
 
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* sprite = &sprites[frameBase + i];
+			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + (frameBase + i) * 0x40 + 8);
 			sprite->kind = 0x17;
 			sprite->x = 0x80;
 			sprite->y = (short)(0x38 + i * 0x60);
@@ -2788,8 +2791,8 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* sprite = &sprites[modelBase + i];
-			BonusAnimSprite* icon = &sprites[iconBase + i];
+			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + (modelBase + i) * 0x40 + 8);
+			BonusAnimSprite* icon = (BonusAnimSprite*)((int)sprite - activePartyCount * 0x40);
 			sprite->kind = -2;
 			sprite->x = 0;
 			sprite->y = 0;
@@ -2803,7 +2806,7 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* sprite = &sprites[itemModelBase + i];
+			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + (itemModelBase + i) * 0x40 + 8);
 			sprite->kind = -2;
 			sprite->x = 0;
 			sprite->y = 0;

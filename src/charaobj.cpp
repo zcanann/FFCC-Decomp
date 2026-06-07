@@ -1511,20 +1511,21 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 
 				unsigned int sourcePower = *reinterpret_cast<unsigned short*>(
 					reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0x1E);
+				float multiplier = CharaObjGetStatusMultiplier(0x2C);
 				unsigned int defense = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x22);
+				int rawDamage = static_cast<int>(multiplier * static_cast<float>(basePower + sourcePower)) - defense;
+				if (rawDamage < 1) {
+					rawDamage = 1;
+				}
 				unsigned int bonus = ((sourceObj->GetCID() & 0x6D) == 0x6D && itemEffect == 0x1F8) ?
 					static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(
 						reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0xBDD)) :
 					0;
-				damageAmount =
-					static_cast<int>(((basePower + sourcePower) * CharaObjGetStatusMultiplier(0x2C)) - defense);
-				if (damageAmount < 1) {
-					damageAmount = 1;
-				}
-				damageAmount += bonus;
+				damageAmount = rawDamage + bonus;
 				if (scriptDefense != 0) {
-					damageAmount = static_cast<int>(damageAmount * CharaObjGetStatusMultiplier(0x42));
+					damageAmount = static_cast<int>(static_cast<float>(damageAmount) * CharaObjGetStatusMultiplier(0x42));
 				}
+				System.Printf(dbg + 0x1A0, basePower, sourcePower, defense, bonus, damageAmount);
 
 				if (staType != 0x6A && (sourceObj->GetCID() & 0x6D) == 0x6D && (GetCID() & 0xAD) == 0xAD &&
 				    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 0x100) != 0 &&

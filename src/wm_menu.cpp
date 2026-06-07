@@ -10538,6 +10538,9 @@ void CMenuPcs::ChkMcDataCnt()
  */
 void CMenuPcs::DrawMCList()
 {
+	const int* const DAT_801dc118 = reinterpret_cast<int*>(lbl_801DB7F8 + 0x920);
+	const int DAT_801dc140 = *reinterpret_cast<int*>(lbl_801DB7F8 + 0x948);
+	unsigned char* const lbl_801DC294 = reinterpret_cast<unsigned char*>(lbl_801DB7F8 + 0xA9C);
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	CFont* fontF8 = m_fonts[0];
 	WmWorldState* const worldState = m_wmWorldState;

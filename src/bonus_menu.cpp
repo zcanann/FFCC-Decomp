@@ -1900,12 +1900,12 @@ void CMenuPcs::DrawResultCloseAnim()
 						}
 					}
 				} else {
-					if (i < s_CntTop || i >= s_CntTop + activePartyCount) {
+					if ((signed char)s_CntTop > i || i >= (signed char)s_CntTop + activePartyCount) {
 						MenuPcs.DrawRect(0, (float)sprite->x + sprite->motionX, (float)sprite->y + sprite->motionY,
 						    (float)sprite->w, (float)sprite->h,
 						    sprite->mulX, sprite->mulY, sprite->depth, sprite->depth, 0.0f);
 					} else {
-						int value = s_Rinfo->m_party[i - s_CntTop].m_totalValue;
+						int value = s_Rinfo->m_party[i - (signed char)s_CntTop].m_totalValue;
 						int digits[3];
 						int digitCount;
 

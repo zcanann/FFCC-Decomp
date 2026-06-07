@@ -2792,42 +2792,50 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 			chunk.Get4();
 			chunk.Get4();
 			break;
-		case 0x56455254:
+		case 0x56455254: {
 			m_data->m_vertexCount = chunkInfo.m_size / 6;
-			m_data->m_vertices = static_cast<S16Vec*>(
+			S16Vec* verts = static_cast<S16Vec*>(
 			    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp), 0x7D6, 0));
-			if (m_data->m_vertices != 0) {
+			m_data->m_vertices = verts;
+			if (verts != 0) {
 				memcpy(m_data->m_vertices, chunk.GetAddress(), chunkInfo.m_size);
 				DCFlushRange(m_data->m_vertices, m_data->m_vertexCount * 6);
 			}
 			break;
-		case 0x4E4F524D:
+		}
+		case 0x4E4F524D: {
 			m_data->m_normalCount = chunkInfo.m_size / 6;
-			m_data->m_normals = static_cast<S16Vec*>(
+			S16Vec* normals = static_cast<S16Vec*>(
 			    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp), 0x7DE, 0));
-			if (m_data->m_normals != 0) {
+			m_data->m_normals = normals;
+			if (normals != 0) {
 				memcpy(m_data->m_normals, chunk.GetAddress(), chunkInfo.m_size);
 				DCFlushRange(m_data->m_normals, m_data->m_normalCount * 6);
 			}
 			break;
-		case 0x434F4C52:
+		}
+		case 0x434F4C52: {
 			m_data->m_colorCount = chunkInfo.m_size >> 2;
-			m_data->m_colors = static_cast<u8*>(
+			u8* colors = static_cast<u8*>(
 			    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp), 0x7E6, 0));
-			if (m_data->m_colors != 0) {
+			m_data->m_colors = colors;
+			if (colors != 0) {
 				memcpy(m_data->m_colors, chunk.GetAddress(), chunkInfo.m_size);
 				DCFlushRange(m_data->m_colors, m_data->m_colorCount << 2);
 			}
 			break;
-		case 0x55562020:
+		}
+		case 0x55562020: {
 			m_data->m_uvCount = chunkInfo.m_size >> 2;
-			m_data->m_uvs = static_cast<u8*>(
+			u8* uvs = static_cast<u8*>(
 			    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp), 0x7EE, 0));
-			if (m_data->m_uvs != 0) {
+			m_data->m_uvs = uvs;
+			if (uvs != 0) {
 				memcpy(m_data->m_uvs, chunk.GetAddress(), chunkInfo.m_size);
 				DCFlushRange(m_data->m_uvs, m_data->m_uvCount << 2);
 			}
 			break;
+		}
 		case 0x534B494E: {
 			m_data->m_skinCount = chunkInfo.m_arg0;
 			if (m_data->m_skinCount != 0) {

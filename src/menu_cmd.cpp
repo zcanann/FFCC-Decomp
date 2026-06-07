@@ -683,8 +683,8 @@ int CMenuPcs::CmdCtrl()
 
 	cmd->prevMode = cmd->mode;
 
-	int mode = cmd->mode;
-	int state = cmd->phase;
+	s16 mode = cmd->mode;
+	s16 state = cmd->phase;
 
 	if ((mode == 0) || (state == 1)) {
 		actionHandled = CmdCtrlCur();

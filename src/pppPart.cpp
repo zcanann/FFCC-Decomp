@@ -43,14 +43,14 @@ static const double kScaleConstA = 4503601774854144.0; // DOUBLE_803304b0
 static const float kScaleConstB = 0.017453292f; // FLOAT_803304a8
 static const float kPppLocalZero = 0.0f;
 extern "C" const unsigned int gPppFixedWhite = 0xffffffff;
-extern "C" const float FLOAT_8032fddc = 0.0f;
-extern "C" const float FLOAT_8032fde0 = 10000000000.0f;
-extern "C" const float FLOAT_8032fde4 = -10000000000.0f;
-extern "C" const float FLOAT_8032FDE8 = -1000000000000.0f;
-extern "C" const double DOUBLE_8032fdf0 = 0.0;
-extern "C" const float FLOAT_8032fdf8 = 5000.0f;
-extern "C" const float FLOAT_8032fdfc = 1.0f;
-extern "C" const double DOUBLE_8032fe00 = 1.0;
+extern "C" const float kPppPartZero = 0.0f;
+extern "C" const float kPppPartHugePositive = 10000000000.0f;
+extern "C" const float kPppPartHugeNegative = -10000000000.0f;
+extern "C" const float kPppPartZOffsetMin = -1000000000000.0f;
+extern "C" const double kPppPartZeroDouble = 0.0;
+extern "C" const float kPppPartDepthScale = 5000.0f;
+extern "C" const float kPppPartOne = 1.0f;
+extern "C" const double kPppPartOneDouble = 1.0;
 
 _pppMngSt* ppvMng;
 _pppEnvSt* ppvEnv;
@@ -243,7 +243,7 @@ void pppSetRowVector(pppFMATRIX& pppFMtx, Vec& vecA, Vec& vecB, Vec& vecC, Vec& 
  */
 void pppNormalize(Vec& dest, Vec source)
 { 
-	float zero = FLOAT_8032fddc;
+	float zero = kPppPartZero;
 	if ((source.x == zero) && (source.y == zero) && (source.z == zero)) {
 		return;
 	}
@@ -323,9 +323,9 @@ float pppVectorLength(Vec vec)
 {
 	Vec zeroVec;
 
-	zeroVec.x = FLOAT_8032fddc;
-	zeroVec.y = FLOAT_8032fddc;
-	zeroVec.z = FLOAT_8032fddc;
+	zeroVec.x = kPppPartZero;
+	zeroVec.y = kPppPartZero;
+	zeroVec.z = kPppPartZero;
 
 	return PSVECDistance(&vec, &zeroVec);
 }
@@ -1099,7 +1099,7 @@ ApplyRotatedMatrix:
 	PSMTXConcat(nodeMtx, ppvMng->m_matrix.value, ppvMng->m_matrix.value);
 
 ScaleOnly:
-	if (FLOAT_8032fdfc != pppMngSt->m_scale.x) {
+	if (kPppPartOne != pppMngSt->m_scale.x) {
 		scaleAxis0.x = ppvMng->m_matrix.value[0][0];
 		scaleAxis0.y = ppvMng->m_matrix.value[1][0];
 		scaleAxis0.z = ppvMng->m_matrix.value[2][0];
@@ -1109,7 +1109,7 @@ ScaleOnly:
 		ppvMng->m_matrix.value[2][0] = scaleAxis0.z;
 	}
 
-	if (FLOAT_8032fdfc != pppMngSt->m_scale.y) {
+	if (kPppPartOne != pppMngSt->m_scale.y) {
 		scaleAxis1.x = ppvMng->m_matrix.value[0][1];
 		scaleAxis1.y = ppvMng->m_matrix.value[1][1];
 		scaleAxis1.z = ppvMng->m_matrix.value[2][1];
@@ -1119,7 +1119,7 @@ ScaleOnly:
 		ppvMng->m_matrix.value[2][1] = scaleAxis1.z;
 	}
 
-	if (FLOAT_8032fdfc == pppMngSt->m_scale.z) {
+	if (kPppPartOne == pppMngSt->m_scale.z) {
 		return;
 	}
 
@@ -1165,9 +1165,9 @@ MatrixMode3:
 			ownerScale = pppMngSt->m_owner->m_lookAtTimer;
 		}
 		pppMngSt->m_ownerScale = ownerScale;
-		if (DOUBLE_8032fdf0 == static_cast<double>(pppMngSt->m_ownerScale)) {
+		if (kPppPartZeroDouble == static_cast<double>(pppMngSt->m_ownerScale)) {
 			pppMngSt->m_useOwnerScaleSign = 1;
-		} else if (DOUBLE_8032fe00 == static_cast<double>(pppMngSt->m_ownerScale)) {
+		} else if (kPppPartOneDouble == static_cast<double>(pppMngSt->m_ownerScale)) {
 			pppMngSt->m_useOwnerScaleSign = 0;
 		} else {
 			pppMngSt->m_useOwnerScaleSign = 1;
@@ -1221,9 +1221,9 @@ MatrixMode5:
 			ownerScale = pppMngSt->m_owner->m_lookAtTimer;
 		}
 		pppMngSt->m_ownerScale = ownerScale;
-		if (DOUBLE_8032fdf0 == static_cast<double>(pppMngSt->m_ownerScale)) {
+		if (kPppPartZeroDouble == static_cast<double>(pppMngSt->m_ownerScale)) {
 			pppMngSt->m_useOwnerScaleSign = 1;
-		} else if (DOUBLE_8032fe00 == static_cast<double>(pppMngSt->m_ownerScale)) {
+		} else if (kPppPartOneDouble == static_cast<double>(pppMngSt->m_ownerScale)) {
 			pppMngSt->m_useOwnerScaleSign = 0;
 		} else {
 			pppMngSt->m_useOwnerScaleSign = 1;
@@ -1267,9 +1267,9 @@ MatrixMode6:
 			ownerScale = pppMngSt->m_owner->m_lookAtTimer;
 		}
 		pppMngSt->m_ownerScale = ownerScale;
-		if (DOUBLE_8032fdf0 == static_cast<double>(pppMngSt->m_ownerScale)) {
+		if (kPppPartZeroDouble == static_cast<double>(pppMngSt->m_ownerScale)) {
 			pppMngSt->m_useOwnerScaleSign = 1;
-		} else if (DOUBLE_8032fe00 == static_cast<double>(pppMngSt->m_ownerScale)) {
+		} else if (kPppPartOneDouble == static_cast<double>(pppMngSt->m_ownerScale)) {
 			pppMngSt->m_useOwnerScaleSign = 0;
 		} else {
 			pppMngSt->m_useOwnerScaleSign = 1;
@@ -1316,9 +1316,9 @@ MatrixMode7:
 			ownerScale = pppMngSt->m_owner->m_lookAtTimer;
 		}
 		pppMngSt->m_ownerScale = ownerScale;
-		if (DOUBLE_8032fdf0 == static_cast<double>(pppMngSt->m_ownerScale)) {
+		if (kPppPartZeroDouble == static_cast<double>(pppMngSt->m_ownerScale)) {
 			pppMngSt->m_useOwnerScaleSign = 1;
-		} else if (DOUBLE_8032fe00 == static_cast<double>(pppMngSt->m_ownerScale)) {
+		} else if (kPppPartOneDouble == static_cast<double>(pppMngSt->m_ownerScale)) {
 			pppMngSt->m_useOwnerScaleSign = 0;
 		} else {
 			pppMngSt->m_useOwnerScaleSign = 1;
@@ -1409,19 +1409,19 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
 	local_70.y = ppvWorldMatrix[1][1];
 	local_70.z = ppvWorldMatrix[2][1];
 	local_90 = local_70;
-	if ((local_90.x != FLOAT_8032fddc) || (local_90.y != FLOAT_8032fddc) || (local_90.z != FLOAT_8032fddc)) {
+	if ((local_90.x != kPppPartZero) || (local_90.y != kPppPartZero) || (local_90.z != kPppPartZero)) {
 		PSVECNormalize(&local_90, &local_70);
 	}
 
 	local_9c.x = local_70.y;
 	local_9c.y = -local_70.x;
-	local_9c.z = FLOAT_8032fddc;
+	local_9c.z = kPppPartZero;
 	local_60 = local_9c;
 	ppvWorldMatrixWood[0][1] = local_70.x;
 	ppvWorldMatrixWood[1][1] = local_70.y;
 	ppvWorldMatrixWood[2][1] = local_70.z;
 
-	if ((local_60.x != FLOAT_8032fddc) || (local_60.y != FLOAT_8032fddc) || (local_60.z != FLOAT_8032fddc)) {
+	if ((local_60.x != kPppPartZero) || (local_60.y != kPppPartZero) || (local_60.z != kPppPartZero)) {
 		PSVECNormalize(&local_9c, &local_60);
 	}
 
@@ -1431,7 +1431,7 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
 	PSVECCrossProduct(&local_60, &local_70, &local_80);
 	local_a8 = local_80;
 
-	if ((local_a8.x != FLOAT_8032fddc) || (local_a8.y != FLOAT_8032fddc) || (local_a8.z != FLOAT_8032fddc)) {
+	if ((local_a8.x != kPppPartZero) || (local_a8.y != kPppPartZero) || (local_a8.z != kPppPartZero)) {
 		PSVECNormalize(&local_a8, &local_80);
 	}
 
@@ -2389,8 +2389,8 @@ void pppSetBlendMode(unsigned char blendMode)
  */
 void pppClearDrawEnv()
 {
-	if (FLOAT_8032fddc != s_zoff) {
-		s_zoff = FLOAT_8032fddc;
+	if (kPppPartZero != s_zoff) {
+		s_zoff = kPppPartZero;
 		ppvScreenMatrix[2][3] = ppvScreenMatrixZbuff;
 		GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
 	}
@@ -2407,9 +2407,9 @@ void pppClearDrawEnv()
  */
 void pppSetDrawEnv(pppCVECTOR* pppColor, pppFMATRIX* pppMtx, float depth, unsigned char lightTarget, unsigned char fogIndex, unsigned char fogParam, unsigned char cullMode, unsigned char zEnable, unsigned char colorUpdate, unsigned char zWrite)
 {
-	if (DOUBLE_8032fdf0 != (double)depth) {
+	if (kPppPartZeroDouble != (double)depth) {
 		float sortDepth = ppvMng->m_sortDepth;
-		depth = (depth * FLOAT_8032fdf8) / -sortDepth;
+		depth = (depth * kPppPartDepthScale) / -sortDepth;
 	}
 
 	if ((double)s_zoff != (double)depth) {
@@ -2513,11 +2513,11 @@ void pppInitDrawEnv(unsigned char useZeroDepth)
 
 	if (useZeroDepth != 0)
 	{
-		s_zoff = FLOAT_8032fddc;
+		s_zoff = kPppPartZero;
 	}
 	else
 	{
-		s_zoff = FLOAT_8032FDE8;
+		s_zoff = kPppPartZOffsetMin;
 	}
 
 	LightPcs.SetNumDiffuse(0);
@@ -2553,21 +2553,21 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 	PppMngStHitRaw* hitRaw = (PppMngStHitRaw*)pppMngSt;
 	bool hadHit = false;
 
-	if (FLOAT_8032fddc != cylScale)
+	if (kPppPartZero != cylScale)
 	{
 		CMapCylinder cylinder;
 		cylinder.m_bottom = *origin;
-		cylinder.Probe().m_direction.x = FLOAT_8032fde0;
-		cylinder.Probe().m_direction.y = FLOAT_8032fde0;
-		cylinder.Probe().m_direction.z = FLOAT_8032fde0;
+		cylinder.Probe().m_direction.x = kPppPartHugePositive;
+		cylinder.Probe().m_direction.y = kPppPartHugePositive;
+		cylinder.Probe().m_direction.z = kPppPartHugePositive;
 		cylinder.Probe().m_radius = radius;
-		cylinder.Probe().m_height = FLOAT_8032fde0;
+		cylinder.Probe().m_height = kPppPartHugePositive;
 		cylinder.Probe().m_top = *vector;
-		cylinder.Probe().m_direction2.x = FLOAT_8032fde4;
-		cylinder.Probe().m_direction2.y = FLOAT_8032fde4;
-		cylinder.Probe().m_direction2.z = FLOAT_8032fde4;
+		cylinder.Probe().m_direction2.x = kPppPartHugeNegative;
+		cylinder.Probe().m_direction2.y = kPppPartHugeNegative;
+		cylinder.Probe().m_direction2.z = kPppPartHugeNegative;
 		cylinder.Probe().m_radius2 = cylScale;
-		cylinder.Probe().m_height2 = FLOAT_8032fde0;
+		cylinder.Probe().m_height2 = kPppPartHugePositive;
 
 		if (MapMng.CheckHitCylinder(&cylinder, vector, hitRaw->m_cylinderAttribute) != 0)
 		{
@@ -2620,8 +2620,8 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 						continue;
 					}
 
-					if ((FLOAT_8032fddc == damageCol->m_innerRadius) &&
-						(FLOAT_8032fddc == damageCol->m_outerRadius))
+					if ((kPppPartZero == damageCol->m_innerRadius) &&
+						(kPppPartZero == damageCol->m_outerRadius))
 					{
 						continue;
 					}

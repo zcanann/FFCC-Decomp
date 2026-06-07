@@ -3803,11 +3803,15 @@ int CMaterial::Set(_GXTexMapID texMapId)
                     texMtx[0][3] = GetTexScroll(i)->m_u0;
                     texMtx[1][3] = GetTexScroll(i)->m_v0;
                     GXLoadTexMtxImm(texMtx, MaterialMan.m_texMtxCur, GX_MTX2x4);
+                    int texMtx0 = MaterialMan.m_texMtxCur;
+                    int texCoord0 = MaterialMan.m_texCoordIdCur;
+                    MaterialMan.m_texMtxCur += 3;
+                    MaterialMan.m_texCoordIdCur += 1;
                     GXSetTexCoordGen2(
-                        static_cast<GXTexCoordID>(MaterialMan.m_texCoordIdCur),
+                        static_cast<GXTexCoordID>(texCoord0),
                         GX_TG_MTX2x4,
                         GX_TG_TEX0,
-                        MaterialMan.m_texMtxCur,
+                        texMtx0,
                         GX_FALSE,
                         0x7D);
                 } else {
@@ -3817,17 +3821,18 @@ int CMaterial::Set(_GXTexMapID texMapId)
                     texMtx[0][3] = GetTexScroll(i)->m_u0;
                     texMtx[1][3] = GetTexScroll(i)->m_v0;
                     GXLoadTexMtxImm(texMtx, MaterialMan.m_texMtxCur, GX_MTX2x4);
+                    int texMtx1 = MaterialMan.m_texMtxCur;
+                    int texCoord1 = MaterialMan.m_texCoordIdCur;
+                    MaterialMan.m_texMtxCur += 3;
+                    MaterialMan.m_texCoordIdCur += 1;
                     GXSetTexCoordGen2(
-                        static_cast<GXTexCoordID>(MaterialMan.m_texCoordIdCur),
+                        static_cast<GXTexCoordID>(texCoord1),
                         GX_TG_MTX2x4,
                         GX_TG_TEX1,
-                        MaterialMan.m_texMtxCur,
+                        texMtx1,
                         GX_FALSE,
                         0x7D);
                 }
-
-                MaterialMan.m_texMtxCur += 3;
-                MaterialMan.m_texCoordIdCur += 1;
             }
         }
     }

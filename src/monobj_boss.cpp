@@ -13,8 +13,8 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 extern "C" void CGMonObj_ResetActionState(CGMonObj*);
-static const float FLOAT_80331cf8 = 0.0f;
-extern const double DOUBLE_80331d00 = 0.5;
+static const float kMonObjBossZero = 0.0f;
+extern const double kMonObjBossHalfF64 = 0.5;
 extern const double DOUBLE_80331d08 = 3.0;
 extern const double DOUBLE_80331d10 = 0.0;
 extern const float FLOAT_80331d18 = 1.0f;
@@ -28,11 +28,11 @@ extern const double DOUBLE_80331d38 = 4503601774854144.0;
 extern const float FLOAT_80331D40 = 90.0f;
 extern const float FLOAT_80331D44 = 25.0f;
 extern const double DOUBLE_80331D48 = 0.7853981852531433;
-static const char s_c_item_80331D50[] = "c_item";
+static const char sCrystalItemNodeName[] = "c_item";
 extern const float FLOAT_80331d58 = 2.0f;
 extern const float FLOAT_80331d5c = 12.0f;
 extern const float FLOAT_80331d60 = 0.009999999776482582f;
-static const char s_meteo_3_80331D64[] = "meteo_3";
+static const char sMeteoParasiteScriptName[] = "meteo_3";
 extern const float FLOAT_80331d6c = -172.0f;
 extern const float FLOAT_80331d70 = 3.4100000858306885f;
 extern const float FLOAT_80331d74 = -73.0f;
@@ -76,9 +76,9 @@ extern "C" Vec gLichTeleportPoints[] = {
     {132.0f, 0.0f, -38.0f},
 };
 
-static const char s_to_a_obj_801dd4e8[] = "to_a_obj";
-static const char s_to_b_obj_801dd4f4[] = "to_b_obj";
-static const char s_to_02d_obj_801dd500[] = "to_%02d_obj";
+static const char sLichTeleportNodeA[] = "to_a_obj";
+static const char sLichTeleportNodeB[] = "to_b_obj";
+static const char sLichTeleportNodeFormat[] = "to_%02d_obj";
 
 struct MeteoParasiteCBossWork {
     int m_lichTeleportIndex;
@@ -266,21 +266,21 @@ void CGMonObj::frameStatFuncGiantCrab()
 			int soundStep = *(int*)(SoundBuffer + 0x4f0);
 			if (soundStep == 2) {
 				*(float*)(SoundBuffer + 0x4f4) = FLOAT_80331dd0;
-				*(float*)(SoundBuffer + 0x4f8) = FLOAT_80331cf8;
+				*(float*)(SoundBuffer + 0x4f8) = kMonObjBossZero;
 				*(float*)(SoundBuffer + 0x4fc) = FLOAT_80331dcc;
 			} else if (soundStep < 2) {
 				if (soundStep == 0) {
 					*(float*)(SoundBuffer + 0x4f4) = FLOAT_80331dc8;
-					*(float*)(SoundBuffer + 0x4f8) = FLOAT_80331cf8;
+					*(float*)(SoundBuffer + 0x4f8) = kMonObjBossZero;
 					*(float*)(SoundBuffer + 0x4fc) = FLOAT_80331dcc;
 				} else if (soundStep > -1) {
 					*(float*)(SoundBuffer + 0x4f4) = FLOAT_80331dc8;
-					*(float*)(SoundBuffer + 0x4f8) = FLOAT_80331cf8;
+					*(float*)(SoundBuffer + 0x4f8) = kMonObjBossZero;
 					*(float*)(SoundBuffer + 0x4fc) = FLOAT_80331dc8;
 				}
 			} else if (soundStep < 4) {
 				*(float*)(SoundBuffer + 0x4f4) = FLOAT_80331dd0;
-				*(float*)(SoundBuffer + 0x4f8) = FLOAT_80331cf8;
+				*(float*)(SoundBuffer + 0x4f8) = kMonObjBossZero;
 				*(float*)(SoundBuffer + 0x4fc) = FLOAT_80331dc8;
 			}
 
@@ -344,7 +344,7 @@ void CGMonObj::frameStatFuncGiantCrab()
 			    *(float*)(self + 0x690) *
 			    (FLOAT_80331d60 * (float)((double)scriptScale - DOUBLE_80331dc0) + FLOAT_80331db8);
 			reinterpret_cast<CGObject*>(self)->moveVectorHRot(
-				*(float*)(self + 0x1b4) + turnOffset, FLOAT_80331cf8, moveMagnitude, 0x1e);
+				*(float*)(self + 0x1b4) + turnOffset, kMonObjBossZero, moveMagnitude, 0x1e);
 
 			int targetIdx = *(int*)(self + 0x6c4);
 			if (targetIdx > -1) {
@@ -498,7 +498,7 @@ void CGMonObj::frameStatFuncGolem()
 		setAttackAfter(*reinterpret_cast<int*>(self + 0x560));
 	} else {
 		if (reinterpret_cast<CGPrgObj*>(this)->m_stateFrame == 0) {
-			float turnOffset = FLOAT_80331cf8;
+			float turnOffset = kMonObjBossZero;
 			if (state == 0x68) {
 				turnOffset = FLOAT_80331d2c;
 			}
@@ -513,7 +513,7 @@ void CGMonObj::frameStatFuncGolem()
 		float moveSpeed =
 		    *reinterpret_cast<float*>(self + 0x690) *
 		    (FLOAT_80331d60 * (static_cast<float>(static_cast<double>(scriptScale) - DOUBLE_80331dc0)) + FLOAT_80331db8);
-		reinterpret_cast<CGObject*>(this)->moveVectorHRot(*reinterpret_cast<float*>(SoundBuffer + 0x4FC), FLOAT_80331cf8,
+		reinterpret_cast<CGObject*>(this)->moveVectorHRot(*reinterpret_cast<float*>(SoundBuffer + 0x4FC), kMonObjBossZero,
 		                                                  moveSpeed, 1);
 	}
 }
@@ -986,12 +986,12 @@ state100:
 		m_moveWork.m_flags = 0x322;
 
 		if (m_actionBranch == 1) {
-			CVector targetPos(FLOAT_80331d9c, FLOAT_80331cf8, FLOAT_80331d9c);
+			CVector targetPos(FLOAT_80331d9c, kMonObjBossZero, FLOAT_80331d9c);
 			m_moveWork.m_targetPos.x = targetPos.x;
 			m_moveWork.m_targetPos.y = targetPos.y;
 			m_moveWork.m_targetPos.z = targetPos.z;
 		} else {
-			CVector targetPos(FLOAT_80331d90, FLOAT_80331cf8, FLOAT_80331d94);
+			CVector targetPos(FLOAT_80331d90, kMonObjBossZero, FLOAT_80331d94);
 			m_moveWork.m_targetPos.x = targetPos.x;
 			m_moveWork.m_targetPos.y = targetPos.y;
 			m_moveWork.m_targetPos.z = targetPos.z;
@@ -1049,7 +1049,7 @@ int CGMonObj::attackCheckFuncLKShooter(int)
 
 	if (work->m_stunTimer == 0) {
 		if (work->bits.m_bit40 == 0 && (CFlatBossState() & 2) == 0) {
-			CVector left(FLOAT_80331d90, FLOAT_80331cf8, FLOAT_80331d94);
+			CVector left(FLOAT_80331d90, kMonObjBossZero, FLOAT_80331d94);
 			if (PSVECDistance(reinterpret_cast<Vec*>(&left), &object->m_worldPosition) < FLOAT_80331d98 &&
 			    work->m_leftCooldown == 0) {
 				work->bits.m_bit40 = 1;
@@ -1059,7 +1059,7 @@ int CGMonObj::attackCheckFuncLKShooter(int)
 			}
 		}
 		if (work->bits.m_bit20 == 0 && (CFlatBossState() & 1) == 0) {
-			CVector right(FLOAT_80331d9c, FLOAT_80331cf8, FLOAT_80331d9c);
+			CVector right(FLOAT_80331d9c, kMonObjBossZero, FLOAT_80331d9c);
 			if (PSVECDistance(reinterpret_cast<Vec*>(&right), &object->m_worldPosition) < FLOAT_80331d98 &&
 			    work->m_rightCooldown == 0) {
 				work->bits.m_bit20 = 1;
@@ -1432,11 +1432,11 @@ void CGMonObj::frameStatFuncTetsukyojin()
 			CVector attackDir(-partyPos.x, -partyPos.y, -partyPos.z);
 			Vec attackVec;
 			attackVec.x = attackDir.x;
-			attackVec.y = FLOAT_80331cf8;
+			attackVec.y = kMonObjBossZero;
 			attackVec.z = attackDir.z;
 
 			if (PSVECMag(&attackVec) < FLOAT_80331d7c) {
-				CVector fallback(FLOAT_80331cf8, FLOAT_80331cf8, FLOAT_80331d80);
+				CVector fallback(kMonObjBossZero, kMonObjBossZero, FLOAT_80331d80);
 				attackVec.x = fallback.x;
 				attackVec.y = fallback.y;
 				attackVec.z = fallback.z;
@@ -1710,7 +1710,7 @@ void CGMonObj::frameStatFuncMolbol()
 			if (state < 100) {
 				return;
 			}
-			suikomi(0x53, FLOAT_80331cf8);
+			suikomi(0x53, kMonObjBossZero);
 		}
 		return;
 	}
@@ -1738,7 +1738,7 @@ void CGMonObj::initFinishedFuncMeteoParasiteC()
 	initFinishedFuncDefault();
 	*reinterpret_cast<CGMonObj**>(CGMonObj::m_boss + 0x74) = this;
 
-	if (strcmp(Game.m_currentScriptName, s_meteo_3_80331D64) == 0) {
+	if (strcmp(Game.m_currentScriptName, sMeteoParasiteScriptName) == 0) {
 		MeteoParasiteCBossWork* work = reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss);
 		CGObject* object = reinterpret_cast<CGObject*>(this);
 		work->bits.m_meteo3 = 1;
@@ -1957,17 +1957,17 @@ void CGMonObj::initFinishedFuncMeteoParasite()
 		CGObject* object = reinterpret_cast<CGObject*>(this);
 		CChara::CModel* model = object->m_charaModelHandle->m_model;
 		CChara::CNode** nodes = reinterpret_cast<CChara::CNode**>(CGMonObj::m_boss);
-		int nodeIndex = model->SearchNode(const_cast<char*>(s_to_a_obj_801dd4e8));
+		int nodeIndex = model->SearchNode(const_cast<char*>(sLichTeleportNodeA));
 		nodes[0] = model->m_nodes + nodeIndex;
 		nodes[0]->m_flags &= 0x7F;
 
-		nodeIndex = model->SearchNode(const_cast<char*>(s_to_b_obj_801dd4f4));
+		nodeIndex = model->SearchNode(const_cast<char*>(sLichTeleportNodeB));
 		nodes[1] = model->m_nodes + nodeIndex;
 		nodes[1]->m_flags &= 0x7F;
 
 		char nodeName[256];
 		for (int i = 0; i < 12; i++) {
-			sprintf(nodeName, s_to_02d_obj_801dd500, i + 1);
+			sprintf(nodeName, sLichTeleportNodeFormat, i + 1);
 			nodeIndex = model->SearchNode(nodeName);
 			nodes[i + 2] = model->m_nodes + nodeIndex;
 			if ((CGMonObj::m_boss[0x5C] & 0x40) != 0) {
@@ -2036,7 +2036,7 @@ void CGMonObj::alwaysFuncMeteoParasite()
 	if (scriptKind == 0x85 && ((CGMonObj::m_boss[0x7C] & 0x40) == 0)) {
 		if (g_errCt == 0) {
 			g_errCt = 1;
-			MG_GBA_THREAD_MSG_SETPORT_ct = FLOAT_80331cf8;
+			MG_GBA_THREAD_MSG_SETPORT_ct = kMonObjBossZero;
 		}
 
 		PSMTXRotRad(reinterpret_cast<CChara::CNode**>(CGMonObj::m_boss)[0]->m_localRuntimeMtx, 'x',
@@ -2375,7 +2375,7 @@ void CGMonObj::initFinishedFuncLastBoss()
 	initFinishedFuncDefault();
 	*reinterpret_cast<CGMonObj**>(CGMonObj::m_boss) = this;
 
-	int nodeIndex = object->m_charaModelHandle->m_model->SearchNode(const_cast<char*>(s_c_item_80331D50));
+	int nodeIndex = object->m_charaModelHandle->m_model->SearchNode(const_cast<char*>(sCrystalItemNodeName));
 	CChara::CModel* model = object->m_charaModelHandle->m_model;
 	*reinterpret_cast<CChara::CNode**>(CGMonObj::m_boss + 4) = model->m_nodes + nodeIndex;
 }
@@ -2631,9 +2631,9 @@ void CGMonObj::teleport(
 		int pdtNo;
 		object->m_bgColMask &= 0xFFF3FFFC;
 		*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags) &= 0xEF;
-		object->m_groundHitOffset.z = FLOAT_80331cf8;
-		object->m_groundHitOffset.y = FLOAT_80331cf8;
-		object->m_groundHitOffset.x = FLOAT_80331cf8;
+		object->m_groundHitOffset.z = kMonObjBossZero;
+		object->m_groundHitOffset.y = kMonObjBossZero;
+		object->m_groundHitOffset.x = kMonObjBossZero;
 
 		prgObj->reqAnim(animId, 0, 0);
 		prgObj->playSe3D(seStart, 0x32, 0x1C2, 0, 0);
@@ -2710,9 +2710,9 @@ void CGMonObj::teleport(
 				object->m_bgColMask |= 3;
 				*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags) =
 					(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags) & 0xEF) | 0x10;
-				object->m_groundHitOffset.z = FLOAT_80331cf8;
-				object->m_groundHitOffset.y = FLOAT_80331cf8;
-				object->m_groundHitOffset.x = FLOAT_80331cf8;
+				object->m_groundHitOffset.z = kMonObjBossZero;
+				object->m_groundHitOffset.y = kMonObjBossZero;
+				object->m_groundHitOffset.x = kMonObjBossZero;
 
 				if (mode == 1) {
 					object->m_displayFlags |= 1;
@@ -2755,7 +2755,7 @@ inline void CGMonObj::suikomiSub(CGObject*, float)
 	float distSq = dx * dx + dz * dz;
 	double dist = (double)distSq;
 
-	if (dist <= (double)FLOAT_80331cf8) {
+	if (dist <= (double)kMonObjBossZero) {
 		if (DOUBLE_80331d10 <= dist) {
 			unsigned int exp = (unsigned int)distSq & 0x7f800000;
 			int fpClass;
@@ -2774,12 +2774,12 @@ inline void CGMonObj::suikomiSub(CGObject*, float)
 		}
 	} else {
 		double inv = (double)FLOAT_80331d18 / sqrt(dist);
-		inv = DOUBLE_80331d00 * inv * -(dist * inv * inv - DOUBLE_80331d08);
-		inv = DOUBLE_80331d00 * inv * -(dist * inv * inv - DOUBLE_80331d08);
-		dist = (double)(float)(dist * DOUBLE_80331d00 * inv * -(dist * inv * inv - DOUBLE_80331d08));
+		inv = kMonObjBossHalfF64 * inv * -(dist * inv * inv - DOUBLE_80331d08);
+		inv = kMonObjBossHalfF64 * inv * -(dist * inv * inv - DOUBLE_80331d08);
+		dist = (double)(float)(dist * kMonObjBossHalfF64 * inv * -(dist * inv * inv - DOUBLE_80331d08));
 	}
 
-	if ((double)FLOAT_80331cf8 < dist) {
+	if ((double)kMonObjBossZero < dist) {
 		float accel = (float)((double)FLOAT_80331d18 / dist) * FLOAT_80331d1c *
 		              (float)(dist / (double)FLOAT_80331d20);
 		*(float*)(target + 0x104) += dx * accel;
@@ -2825,7 +2825,7 @@ void CGMonObj::suikomi(int endFrame, float zOffset)
 				float distSq = dx * dx + dz * dz;
 				double dist = (double)distSq;
 
-				if (distSq <= FLOAT_80331cf8) {
+				if (distSq <= kMonObjBossZero) {
 					if (DOUBLE_80331d10 <= dist) {
 						unsigned int exp = (unsigned int)distSq & 0x7f800000;
 						int fpClass;
@@ -2846,7 +2846,7 @@ void CGMonObj::suikomi(int endFrame, float zOffset)
 					dist = sqrtf(distSq);
 				}
 
-				if ((double)FLOAT_80331cf8 < dist) {
+				if ((double)kMonObjBossZero < dist) {
 					float accel = (float)((double)FLOAT_80331d18 / dist) * FLOAT_80331d1c *
 					              (float)(dist / (double)FLOAT_80331d20);
 					*(float*)((unsigned char*)party + 0x104) += dx * accel;
@@ -2862,7 +2862,7 @@ void CGMonObj::suikomi(int endFrame, float zOffset)
 			float distSq = dx * dx + dz * dz;
 			double dist = (double)distSq;
 
-			if (distSq <= FLOAT_80331cf8) {
+			if (distSq <= kMonObjBossZero) {
 				if (DOUBLE_80331d10 <= dist) {
 					unsigned int exp = (unsigned int)distSq & 0x7f800000;
 					int fpClass;
@@ -2883,7 +2883,7 @@ void CGMonObj::suikomi(int endFrame, float zOffset)
 				dist = sqrtf(distSq);
 			}
 
-			if ((double)FLOAT_80331cf8 < dist) {
+			if ((double)kMonObjBossZero < dist) {
 				float accel = (float)((double)FLOAT_80331d18 / dist) * FLOAT_80331d1c *
 				              (float)(dist / (double)FLOAT_80331d20);
 				*(float*)(target + 0x104) += dx * accel;

@@ -2432,18 +2432,15 @@ void CGMonObj::setRepop(int mode)
 
 	bool allowRepop = (mode == 0);
 	if (!allowRepop) {
-		int option = static_cast<short>(Game.m_gameWork.m_optionValue);
-		if (8 < option) {
-			allowRepop = true;
-		} else {
-			int shift = reinterpret_cast<int>(scriptHandle[2]);
-			unsigned long long bit = (shift < 64) ? (1ULL << shift) : 0ULL;
-			unsigned int cflatHi = CFlatSpawnBitHi(option);
-			unsigned int cflatLo = CFlatSpawnBitLo(option);
-			if ((cflatHi & static_cast<unsigned int>(bit)) == 0 &&
-				(cflatLo & static_cast<unsigned int>(bit >> 32)) == 0) {
+		int option = *reinterpret_cast<short*>(&Game.m_gameWork.m_optionValue);
+		if (option < 9) {
+			unsigned long long bit = 1ULL << reinterpret_cast<int>(scriptHandle[2]);
+			if ((CFlatSpawnBitHi(option) & static_cast<unsigned int>(bit)) == 0 &&
+				(CFlatSpawnBitLo(option) & static_cast<unsigned int>(bit >> 32)) == 0) {
 				allowRepop = true;
 			}
+		} else {
+			allowRepop = true;
 		}
 	}
 

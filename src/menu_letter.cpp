@@ -1726,30 +1726,28 @@ void CMenuPcs::LetterListDraw()
 	const int topRow = static_cast<int>(m_singMenuState->topIndex);
 
 	int y = 0x60;
-	for (int row = 0; row < 9; ++row) {
-		const int letterIndex = topRow + row;
-		if (letterIndex >= caravanWork->m_letterCount) {
-			break;
-		}
-
+	int letterIndex;
+	for (int row = 0; row < 9 && (letterIndex = topRow + row) < caravanWork->m_letterCount; ++row) {
 		CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[letterIndex];
 		const unsigned int letterWord = letter->Word0();
 
-		int tlut = 9;
+		int tlut;
 		if (letter->IsOpened()) {
 			tlut = letter->IsReplySent() ? 8 : 0;
+		} else {
+			tlut = 9;
 		}
 
 		font->SetTlut(tlut);
 
 		const char* from = Game.m_cFlatDataArr[1].TableStrings(5)[(letterWord & 0x7FC) >> 2];
 		font->SetPosX(FLOAT_80333160);
-		font->SetPosY(static_cast<float>(static_cast<double>(y) - static_cast<double>(FLOAT_80333148)));
+		font->SetPosY(static_cast<float>(static_cast<double>(static_cast<float>(y)) - static_cast<double>(FLOAT_80333148)));
 		font->Draw(from);
 
 		const char* subject = Game.m_cFlatDataArr[1].TableStrings(2)[(letterWord >> 7) & 0x1FF];
 		font->SetPosX(FLOAT_80333164);
-		font->SetPosY(static_cast<float>(static_cast<double>(y) - static_cast<double>(FLOAT_80333148)));
+		font->SetPosY(static_cast<float>(static_cast<double>(static_cast<float>(y)) - static_cast<double>(FLOAT_80333148)));
 		font->Draw(subject);
 
 		y += 0x20;
@@ -1893,7 +1891,7 @@ void CMenuPcs::LetterMessDraw()
 
 		if (strlen(curLine) != 0) {
 			font->SetPosX(FLOAT_80333144);
-			font->SetPosY(static_cast<float>(static_cast<double>(y) - static_cast<double>(FLOAT_80333148)));
+			font->SetPosY(static_cast<float>(static_cast<double>(static_cast<float>(y)) - static_cast<double>(FLOAT_80333148)));
 			font->Draw(curLine);
 		}
 

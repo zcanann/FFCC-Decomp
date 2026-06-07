@@ -255,7 +255,7 @@ void CPartMng::Create()
     C_MTXPerspective(ppvScreenMatrix, FLOAT_8032fe8c, FLOAT_8032fe90, FLOAT_8032fe94, FLOAT_8032fe58);
     PSMTX44Copy(ppvScreenMatrix, ppvScreenMatrix0);
 
-    memset(self + 0x10, 0, 0x108);
+    memset(self + 0x235a8, 0, 0x108);
 
     ppvSysStopPartF = 1;
     ppvSysGoPartF = 0;
@@ -283,7 +283,12 @@ void CPartMng::Create()
     PSMTXIdentity(ppvCameraMatrix0);
     PSMTXCopy(ppvCameraMatrix0, ppvCameraMatrix0);
 
-    memset(self + 0x1d4, 0, 0x600);
+    {
+        int* zero = reinterpret_cast<int*>(self + 0x1d4);
+        for (int i = 0; i < 0x180; i++) {
+            zero[i] = 0;
+        }
+    }
 
     for (int i = 0; i < kPppMngCount; i++) {
         unsigned char* mng = self + (i * kPppMngStride);

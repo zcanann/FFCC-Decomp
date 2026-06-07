@@ -811,8 +811,7 @@ void CMenuPcs::loadData()
 	    static_cast<unsigned char*>(operator new(0x10, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x24E));
 	memset(m_wmWorldParams, 0, 0x10);
 
-	unsigned char* const effectRaw = new unsigned char[0xCDB0 + 0x10];
-	m_effectWork = reinterpret_cast<EffectInfo*>(effectRaw + 0x10);
+	m_effectWork = new (m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x252) EffectInfo[0x28];
 	{
 		unsigned char* base = reinterpret_cast<unsigned char*>(m_effectWork);
 		for (int i = 0; i < 0x28; i += 8) {

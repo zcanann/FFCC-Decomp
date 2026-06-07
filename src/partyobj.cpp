@@ -964,7 +964,7 @@ void CGPartyObj::onFramePreCalc()
 	if ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x63C]) << 24) & 0xC0000000) >> 31) != 0) &&
 	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(party.partyFlags) << 24) & 0xC0000000) >> 31) == 0) &&
 	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x9B]) << 25) & 0xC0000000) >> 31) == 0)) {
-		unsigned short held = getPadHeldForSlot(static_cast<unsigned char>(m_animStateMisc));
+		unsigned short held = getPadHeldForSlot(static_cast<signed char>(m_animStateMisc));
 		if (held != 0) {
 			changeStat(0, 0, 0);
 		}
@@ -1692,8 +1692,8 @@ void CGPartyObj::onFrameStat()
 		    m_scriptHandle[0xED] == nullptr &&
 		    Game.m_partyObjArr[1] != nullptr &&
 		    Game.m_partyObjArr[1]->m_lastStateId == 0) {
-			unsigned short held = getPadHeldForSlot(static_cast<unsigned char>(m_animStateMisc));
-			unsigned short up = getPadButtonUpForSlot(static_cast<unsigned char>(m_animStateMisc));
+			unsigned short held = getPadHeldForSlot(static_cast<signed char>(m_animStateMisc));
+			unsigned short up = getPadButtonUpForSlot(static_cast<signed char>(m_animStateMisc));
 			if ((up & 0x400) == 0) {
 				if ((held & 0x400) == 0) {
 					sGhostMogMenuWork.holdTimer = 0;
@@ -1716,12 +1716,12 @@ void CGPartyObj::onFrameStat()
 		if (m_stateFrame == 0) {
 			party.unk6D0 = 0;
 		}
-		if ((getPadHeldForSlot(static_cast<unsigned char>(m_animStateMisc)) & 0x100) == 0) {
+		if ((getPadHeldForSlot(static_cast<signed char>(m_animStateMisc)) & 0x100) == 0) {
 			changeStat(1, 0, 0);
 		} else {
 			party.unk6D0++;
 			if (party.unk6D0 < 6) {
-				if ((getPadTrigForSlot(static_cast<unsigned char>(m_animStateMisc)) & 0x200) != 0) {
+				if ((getPadTrigForSlot(static_cast<signed char>(m_animStateMisc)) & 0x200) != 0) {
 					changeStat(0, 0, 0);
 				}
 			} else {
@@ -1839,7 +1839,7 @@ void CGPartyObj::onFrameStat()
 				reqAnim(0x16, 1, 0);
 				enableDamageCol(0);
 			}
-			if ((getPadHeldForSlot(static_cast<unsigned char>(m_animStateMisc)) & 0x100) == 0) {
+			if ((getPadHeldForSlot(static_cast<signed char>(m_animStateMisc)) & 0x100) == 0) {
 				if (m_subFrame > 0x18) {
 					playSe3D(0x30, 0x32, 0x96, 0, 0);
 				}
@@ -2269,7 +2269,7 @@ void CGPartyObj::statAttackSel()
 		putTargetParticle(0, 1);
 	}
 
-	unsigned short trig = getPadTrigForSlot(static_cast<unsigned char>(m_animStateMisc));
+	unsigned short trig = getPadTrigForSlot(static_cast<signed char>(m_animStateMisc));
 	if ((trig & 0x200) != 0) {
 		changeStat(0, 0, 0);
 		return;
@@ -2392,11 +2392,11 @@ void CGPartyObj::onStatAttack(int chargeType)
 	const unsigned short comboStart = *reinterpret_cast<unsigned short*>(attackEntry + 0x0C);
 	const unsigned short comboEnd = *reinterpret_cast<unsigned short*>(attackEntry + 0x0E);
 	if (m_stateFrame < comboStart || comboEnd < m_stateFrame) {
-		if ((getPadTrigForSlot(static_cast<unsigned char>(m_animStateMisc)) & 0x100) != 0) {
+		if ((getPadTrigForSlot(static_cast<signed char>(m_animStateMisc)) & 0x100) != 0) {
 			party.commandFlags = (party.commandFlags & 0xBF) | 0x40;
 		}
 	} else {
-		if ((getPadTrigForSlot(static_cast<unsigned char>(m_animStateMisc)) & 0x100) != 0) {
+		if ((getPadTrigForSlot(static_cast<signed char>(m_animStateMisc)) & 0x100) != 0) {
 			party.commandFlags = (party.commandFlags & 0x7F) | 0x80;
 		}
 	}
@@ -3007,7 +3007,7 @@ void CGPartyObj::onStatMagic()
 	}
 
 	if (!ghostTargetActive) {
-		unsigned short held = getPadHeldForSlot(static_cast<unsigned char>(m_animStateMisc));
+		unsigned short held = getPadHeldForSlot(static_cast<signed char>(m_animStateMisc));
 		if ((held & 0x100) == 0) {
 			if (m_subState == 0 || (m_subState == 1 && m_comboState == 0)) {
 				if ((magicReady >> 5) == 0) {
@@ -3022,7 +3022,7 @@ void CGPartyObj::onStatMagic()
 				m_comboFrame++;
 			}
 		} else {
-			unsigned short trig = getPadTrigForSlot(static_cast<unsigned char>(m_animStateMisc));
+			unsigned short trig = getPadTrigForSlot(static_cast<signed char>(m_animStateMisc));
 			if ((trig & 0x200) != 0 && (magicReady >> 5) == 0) {
 				changeStat(0, 0, 0);
 			}
@@ -3099,7 +3099,7 @@ void CGPartyObj::statAlive()
 	}
 
 	if (m_lastStateId == 0) {
-		unsigned short held = getPadHeldForSlot(static_cast<unsigned char>(m_animStateMisc));
+		unsigned short held = getPadHeldForSlot(static_cast<signed char>(m_animStateMisc));
 		if ((held & 0x100) == 0 && m_subState == 1) {
 			changeSubStat(0);
 		}
@@ -3263,7 +3263,7 @@ void CGPartyObj::statCarry()
 		reqAnim(0x1D, 0, 0);
 	}
 
-	unsigned short trig = getPadTrigForSlot(static_cast<unsigned char>(m_animStateMisc));
+	unsigned short trig = getPadTrigForSlot(static_cast<signed char>(m_animStateMisc));
 	if ((trig & 0x200) != 0) {
 		carry(2, (CGObject*)0, 1);
 		changeStat(0, 0, 0);
@@ -3370,7 +3370,7 @@ void CGPartyObj::statPickup()
 		reqAnim(0x21, 0, 0);
 	}
 
-	unsigned short trig = getPadTrigForSlot(static_cast<unsigned char>(m_animStateMisc));
+	unsigned short trig = getPadTrigForSlot(static_cast<signed char>(m_animStateMisc));
 	if ((trig & 0x200) != 0) {
 		changeStat(0, 0, 0);
 		return;
@@ -3631,7 +3631,7 @@ canUse:
 void CGPartyObj::canPlayerGoMenu()
 {
 	PartyObjOverlay& party = PartyData(this);
-	unsigned short trig = getPadTrigForSlot(static_cast<unsigned char>(m_animStateMisc));
+	unsigned short trig = getPadTrigForSlot(static_cast<signed char>(m_animStateMisc));
 	if (m_lastStateId == 0 && (trig & 0x200) != 0) {
 		party.partyFlags |= 0x10;
 	} else if ((m_lastStateId != 0) || ((trig & 0x200) == 0)) {

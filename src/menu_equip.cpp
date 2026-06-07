@@ -971,6 +971,7 @@ int CMenuPcs::EquipOpen()
 	}
 
 	fVar5 = kEquipOne;
+	int result = 0;
 	if (GetEquipListStorage(this)->count == iVar6) {
 		entry = GetEquipListStorage(this)->entries;
 		if (0 < (int)uVar8) {
@@ -1018,9 +1019,9 @@ int CMenuPcs::EquipOpen()
 				uVar8--;
 			} while (uVar8 != 0);
 		}
-		return 1;
+		result = 1;
 	}
-	return 0;
+	return result;
 }
 
 /*

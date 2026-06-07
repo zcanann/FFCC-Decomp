@@ -2338,20 +2338,22 @@ void CChara::CModel::SetFrame(float frame)
 void CChara::CModel::CalcFurColor()
 {
 	float delta = m_furTarget - m_furCur;
-	float step = -0.01f;
-	if (!(delta < -0.01f)) {
+	float step;
+	if (delta < -0.01f) {
+		step = -0.01f;
+	} else if (0.01f < delta) {
+		step = 0.01f;
+	} else {
 		step = delta;
-		if (0.01f < delta) {
-			step = 0.01f;
-		}
 	}
 	m_furCur += step;
-	float furColor = 0.0f;
-	if (!(m_furCur < 0.0f)) {
+	float furColor;
+	if (m_furCur < 0.0f) {
+		furColor = 0.0f;
+	} else if (1.0f < m_furCur) {
+		furColor = 1.0f;
+	} else {
 		furColor = m_furCur;
-		if (1.0f < m_furCur) {
-			furColor = 1.0f;
-		}
 	}
 	m_furCur = furColor;
 }

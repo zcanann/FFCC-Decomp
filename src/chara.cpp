@@ -656,8 +656,8 @@ void CChara::Init()
 {
 	m_amemStage = Memory.CreateStage(0xc0000, const_cast<char*>(s_CChara_80330220), 0);
 	m_amemLoadStage = 0;
-	m_drawBuffers[0].m_base = new (m_amemStage, const_cast<char*>(s_chara_cpp), 0x3f) u8[0x58000];
-	m_drawBuffers[1].m_base = new (m_amemStage, const_cast<char*>(s_chara_cpp), 0x40) u8[0x58000];
+	m_drawBuffers[0].m_base = new (Chara.GetMemoryStage(), const_cast<char*>(s_chara_cpp), 0x3f) u8[0x58000];
+	m_drawBuffers[1].m_base = new (Chara.GetMemoryStage(), const_cast<char*>(s_chara_cpp), 0x40) u8[0x58000];
 	m_drawBufferIndex = 1;
 	m_drawBufferIndex = 1 - m_drawBufferIndex;
 	m_drawBuffers[m_drawBufferIndex].m_cursor = 0;

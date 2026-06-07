@@ -1776,18 +1776,13 @@ void CMiniGamePcs::MngThreadMain(void*)
     int i = 0;
     do
     {
-        unsigned int imageSize;
-        void* imageBase;
-        if (*spMode == 0)
-        {
-            imageSize = *reinterpret_cast<unsigned int*>(self + 0x1358);
-            imageBase = *reinterpret_cast<void**>(self + 0x1354);
-        }
-        else
-        {
-            imageSize = *reinterpret_cast<unsigned int*>(self + 0x1360);
-            imageBase = *reinterpret_cast<void**>(self + 0x135C);
-        }
+        int mode = *spMode;
+        unsigned int imageSize = (mode == 0)
+                                     ? *reinterpret_cast<unsigned int*>(self + 0x1358)
+                                     : *reinterpret_cast<unsigned int*>(self + 0x1360);
+        void* imageBase = (mode == 0)
+                              ? *reinterpret_cast<void**>(self + 0x1354)
+                              : *reinterpret_cast<void**>(self + 0x135C);
 
         memset(threadParam + 0x138C, 0, 200);
         threadParam[0x1448] = static_cast<unsigned char>(i);

@@ -7161,21 +7161,19 @@ void CMenuPcs::CalcChara()
  */
 void CMenuPcs::PCAnimCtrl()
 {
-	WmWorldState* const worldState = m_wmWorldState;
-	unsigned char* const charaSelect = m_wm.m_charaSelectData;
 	unsigned int selectedMask = 0;
 
-	if (charaSelect[0x0D] != 0 && charaSelect[0x0A] != 0) {
-		selectedMask |= 1 << reinterpret_cast<short*>(charaSelect + 4)[0];
+	if (m_wm.m_charaSelectData[0x0D] != 0 && m_wm.m_charaSelectData[0x0A] != 0) {
+		selectedMask |= 1 << reinterpret_cast<short*>(m_wm.m_charaSelectData + 4)[0];
 	}
-	if (charaSelect[0x1D] != 0 && charaSelect[0x1A] != 0) {
-		selectedMask |= 1 << reinterpret_cast<short*>(charaSelect + 0x14)[0];
+	if (m_wm.m_charaSelectData[0x1D] != 0 && m_wm.m_charaSelectData[0x1A] != 0) {
+		selectedMask |= 1 << reinterpret_cast<short*>(m_wm.m_charaSelectData + 0x14)[0];
 	}
-	if (charaSelect[0x2D] != 0 && charaSelect[0x2A] != 0) {
-		selectedMask |= 1 << reinterpret_cast<short*>(charaSelect + 0x24)[0];
+	if (m_wm.m_charaSelectData[0x2D] != 0 && m_wm.m_charaSelectData[0x2A] != 0) {
+		selectedMask |= 1 << reinterpret_cast<short*>(m_wm.m_charaSelectData + 0x24)[0];
 	}
-	if (charaSelect[0x3D] != 0 && charaSelect[0x3A] != 0) {
-		selectedMask |= 1 << reinterpret_cast<short*>(charaSelect + 0x34)[0];
+	if (m_wm.m_charaSelectData[0x3D] != 0 && m_wm.m_charaSelectData[0x3A] != 0) {
+		selectedMask |= 1 << reinterpret_cast<short*>(m_wm.m_charaSelectData + 0x34)[0];
 	}
 
 	int* animState = m_wmCharaAnimState;
@@ -7206,7 +7204,7 @@ void CMenuPcs::PCAnimCtrl()
 		const float frame = reinterpret_cast<float*>(model + 0xB4)[0];
 		const float frameEnd = reinterpret_cast<float*>(model + 0xC0)[0];
 		if (isSelected == 0 &&
-		    worldState->m_menuMode != 8 &&
+		    m_wmWorldState->m_menuMode != 8 &&
 		    animState[0] == 0 && animState[2] > 2999) {
 			animState[0] = 4;
 			handle->SetAnim(baseAnim + animState[0], -1, -1, blendMode, 0);
@@ -7214,7 +7212,7 @@ void CMenuPcs::PCAnimCtrl()
 			animState[4] = reinterpret_cast<int*>(model + 0xC0)[0];
 			animState[2] = 0;
 		} else if (isSelected != 0 &&
-		           worldState->m_menuMode != 8) {
+		           m_wmWorldState->m_menuMode != 8) {
 			if (animState[0] == 1 && animState[2] > 11999) {
 				animState[0] = 0;
 				animState[2] = 0;

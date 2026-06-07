@@ -2519,11 +2519,11 @@ void CPartMng::pppEditDraw()
     static const int kLifeEndOffset = 0x24;
     static const int kCurrentFrameOffset = 0x34;
     static const int kMatrixOffset = 0x78;
-    static const int kEndRequestedOffset = 0xe4;
+    static const int kEndRequestedOffset = 0xe8;
     static const int kDrawPassOffset = 0xed;
     static const int kStopAtLifeEndOffset = 0xef;
     static const int kSlotVisibleOffset = 0xe9;
-    static const int kOwnerVisibleOffset = 0xf0;
+    static const int kOwnerVisibleOffset = 0xea;
     static const int kCullRadiusSqOffset = 0x108;
     static const int kCullRadiusOffset = 0x10c;
     static const int kCullYOffsetOffset = 0x110;
@@ -2550,25 +2550,26 @@ void CPartMng::pppEditDraw()
                 cameraPos.y = invCamera[1][3];                                                             \
                 cameraPos.z = invCamera[2][3];                                                             \
                                                                                                            \
-                char* mng = reinterpret_cast<char*>(m_pppMng);                                             \
+                char* base = reinterpret_cast<char*>(this);                                               \
                 for (int i = 0; i < kPppMngCount; i++) {                                                   \
+                    char* mng = base + 0x2A18;                                                             \
                     int baseTime = *reinterpret_cast<int*>(mng + kBaseTimeOffset);                         \
-                    unsigned char endRequested = *reinterpret_cast<unsigned char*>(mng + kEndRequestedOffset);   \
-                    unsigned char partDrawPass = *reinterpret_cast<unsigned char*>(mng + kDrawPassOffset); \
-                    unsigned char slotVisible = *reinterpret_cast<unsigned char*>(mng + kSlotVisibleOffset);     \
-                    unsigned char ownerVisible = *reinterpret_cast<unsigned char*>(mng + kOwnerVisibleOffset);   \
                                                                                                            \
-                    if (endRequested == 0 && baseTime != -0x1000 && partDrawPass == (drawPass) && baseTime < 0  \
-                        && slotVisible != 0 && ownerVisible != 0) {                                        \
+                    if (*reinterpret_cast<unsigned char*>(mng + kEndRequestedOffset) == 0                  \
+                        && baseTime != -0x1000                                                             \
+                        && *reinterpret_cast<unsigned char*>(mng + kDrawPassOffset) == (drawPass)          \
+                        && baseTime < 0                                                                    \
+                        && *reinterpret_cast<unsigned char*>(mng + kSlotVisibleOffset) != 0                \
+                        && *reinterpret_cast<unsigned char*>(mng + kOwnerVisibleOffset) != 0) {            \
                         partPos.x = *reinterpret_cast<float*>(mng + kMatrixOffset + 0xc);                  \
                         partPos.y = *reinterpret_cast<float*>(mng + kMatrixOffset + 0x1c);                 \
                         partPos.z = *reinterpret_cast<float*>(mng + kMatrixOffset + 0x2c);                 \
                                                                                                            \
                         float cullRadiusSq = *reinterpret_cast<float*>(mng + kCullRadiusSqOffset);         \
-                        if (cullRadiusSq != 0.0f) {                                                        \
+                        if (cullRadiusSq != 0.0) {                                                         \
                             PSVECSubtract(&cameraPos, &partPos, &cameraDelta);                             \
                             if (PSVECSquareMag(&cameraDelta) >= cullRadiusSq) {                            \
-                                mng += kPppMngStride;                                                      \
+                                base += kPppMngStride;                                                     \
                                 continue;                                                                  \
                             }                                                                              \
                             CBound bound;                                                                  \
@@ -2579,7 +2580,7 @@ void CPartMng::pppEditDraw()
                             min.y = partPos.y;                                                             \
                             min.z = partPos.z - cullRadius;                                                \
                             if (bound.CheckFrustum(min, ppvCameraMatrix, partPos.y + cullYOffset) == 0) {  \
-                                mng += kPppMngStride;                                                      \
+                                base += kPppMngStride;                                                     \
                                 continue;                                                                  \
                             }                                                                              \
                         }                                                                                  \
@@ -2593,7 +2594,7 @@ void CPartMng::pppEditDraw()
                         _pppDrawPart(ppvMng);                                                              \
                     }                                                                                      \
                                                                                                            \
-                    mng += kPppMngStride;                                                                  \
+                    base += kPppMngStride;                                                                 \
                 }                                                                                          \
             }
 

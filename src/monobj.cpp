@@ -715,10 +715,8 @@ void CGMonObj::onCancelStat(int state)
 void CGMonObj::isValidTarget()
 {
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	int* scriptHandle = *reinterpret_cast<int**>(mon + 0x58);
-	unsigned char* script9 = reinterpret_cast<unsigned char*>(scriptHandle[9]);
-	float maxDist = static_cast<float>(static_cast<double>(*reinterpret_cast<unsigned short*>(script9 + 0xCC)) -
-	                                   DOUBLE_803319E0);
+	unsigned char* script9 = reinterpret_cast<unsigned char*>(reinterpret_cast<CGObject*>(this)->m_scriptHandle[9]);
+	float maxDist = static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0xCC));
 	float homeDist = PSVECDistance(&m_homePosition, reinterpret_cast<Vec*>(mon + 0x15C));
 	unsigned char* aiData;
 
@@ -776,8 +774,7 @@ void CGMonObj::isValidTarget()
 		if (soundLimit > static_cast<double>(*reinterpret_cast<float*>(mon + 0x5BC))) {
 			float hitScale;
 			checkCol(6, *reinterpret_cast<float*>(mon + 0x1A8),
-			         static_cast<float>(static_cast<double>(*reinterpret_cast<unsigned short*>(script9 + 0xC8)) -
-			                            DOUBLE_803319E0),
+			         static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0xC8)),
 			         &hitScale, &partyIndex);
 			if (partyIndex < 0) {
 				partyIndex = -1;
@@ -843,8 +840,7 @@ void CGMonObj::seKiduki()
 			float hitScale;
 
 			checkCol(6, *reinterpret_cast<float*>(mon + 0x1A8),
-			         static_cast<float>(static_cast<double>(*reinterpret_cast<unsigned short*>(script + 0xC8)) -
-			                            DOUBLE_803319E0),
+			         static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xC8)),
 			         &hitScale, &partyIndex);
 		}
 	} else {
@@ -1771,8 +1767,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 
 	if ((flags & 2) != 0) {
 		float halfAngle = FLOAT_80331A34 * FLOAT_80331A20 *
-			static_cast<float>(static_cast<double>(*reinterpret_cast<unsigned short*>(baseScript + 0xCA)) -
-			                   DOUBLE_803319E0);
+			static_cast<float>(*reinterpret_cast<unsigned short*>(baseScript + 0xCA));
 		float sideDist = FLOAT_803319D8;
 		if (FLOAT_803319D8 != halfAngle) {
 			sideDist = FLOAT_80331A40 / static_cast<float>(tan(static_cast<double>(halfAngle)));
@@ -3243,8 +3238,7 @@ extern "C" void CGMonObj_TickActionState(CGMonObj* monObj)
 
 	if (prgObj->m_lastStateId == 0) {
 		monObj->m_unk6BD = 0;
-		float homeRange = static_cast<float>(static_cast<double>(*reinterpret_cast<unsigned short*>(script + 0xCC)) -
-		                                     DOUBLE_803319E0);
+		float homeRange = static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xCC));
 		float homeDist = PSVECDistance(&monObj->m_homePosition, &object->m_worldPosition);
 		if (homeDist >= homeRange) {
 			actionState = 0;
@@ -3338,8 +3332,7 @@ extern "C" void CGMonObj_TickActionState(CGMonObj* monObj)
 		}
 
 		if ((*reinterpret_cast<short*>(aiScript + 0x10A) == 1) && (monObj->m_unk6BC == 0)) {
-			float noticeRange = static_cast<float>(
-				static_cast<double>(*reinterpret_cast<unsigned short*>(script + 0xCE)) - DOUBLE_803319E0);
+			float noticeRange = static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xCE));
 			if (*reinterpret_cast<float*>(mon + targetPartyIndex * 4 + 0x5D0) < noticeRange) {
 				if (*reinterpret_cast<short*>(script + 0x10C) == 1) {
 					chaseState = 5;
@@ -3444,8 +3437,7 @@ extern "C" void MonObjRelated(CGMonObj* monObj, int* targetIndex)
 					}
 					monObj->m_moveWork.m_mode = 4;
 					monObj->m_moveWork.m_range =
-						static_cast<float>(static_cast<double>(*reinterpret_cast<unsigned short*>(script + 0xCE)) -
-										  DOUBLE_803319E0);
+						static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xCE));
 					monObj->m_moveWork.m_limitFrame = *reinterpret_cast<unsigned short*>(script + 0x1B6);
 				}
 				monObj->m_moveWork.m_target = partyObj;

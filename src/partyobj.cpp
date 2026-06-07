@@ -1319,21 +1319,20 @@ void CGPartyObj::command()
 	} else if (secondaryCommand == 4) {
 		carry(0, party.target, 0);
 	} else if (static_cast<unsigned int>(secondaryCommand - 2) <= 1 || secondaryCommand == 0x17) {
-		unsigned char* targetBytes = reinterpret_cast<unsigned char*>(party.target);
 		rotTarget(reinterpret_cast<CGPrgObj*>(party.target));
 		changeStat(0x0E, 0, 0);
-		*reinterpret_cast<CGPartyObj**>(targetBytes + 0x550) = this;
+		*reinterpret_cast<CGPartyObj**>(reinterpret_cast<unsigned char*>(party.target) + 0x550) = this;
 		reinterpret_cast<CGPrgObj*>(party.target)->changeStat(0x0E, 0, 0);
 
-		int itemIdx = *reinterpret_cast<int*>(targetBytes + 0x504);
-		unsigned short kind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemIdx * 0x48);
+		int itemIdx = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504);
+		int kind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemIdx * 0x48);
 		int kindClass;
 		if (kind == 0x125) {
 			kindClass = 0;
-		} else if (kind < 0x125) {
-			kindClass = (kind == 0x100 || kind == 1) ? 0 : 2;
-		} else if (kind == 0x190) {
-			kindClass = 1;
+		} else if (kind > 0x125) {
+			kindClass = (kind == 0x190) ? 1 : 2;
+		} else if (kind == 0x100 || kind == 1) {
+			kindClass = 0;
 		} else {
 			kindClass = 2;
 		}
@@ -1342,25 +1341,25 @@ void CGPartyObj::command()
 			int addedItem;
 			if (itemIdx < 0x9F || itemIdx > 0xFF) {
 				caravan->AddItem(static_cast<short>(itemIdx), &addedItem);
-				System.Printf(const_cast<char*>(lbl_801DCA48 + 0x2E0), *reinterpret_cast<int*>(targetBytes + 0x504));
+				System.Printf(const_cast<char*>(lbl_801DCA48 + 0x2E0), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504));
 			} else {
 				caravan->AddTmpArtifact(itemIdx, &addedItem);
-				System.Printf(const_cast<char*>(lbl_801DCA48 + 0x2C0), *reinterpret_cast<int*>(targetBytes + 0x504));
+				System.Printf(const_cast<char*>(lbl_801DCA48 + 0x2C0), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504));
 			}
 			if (kindClass == 0 && caravan->CanAddComList(1) != 0) {
 				int addedSlot;
 				caravan->AddComList(static_cast<short>(addedItem), &addedSlot);
 				System.Printf(const_cast<char*>(lbl_801DCA48 + 0x2F8), addedItem, addedSlot);
 			}
-			if (*reinterpret_cast<short*>(targetBytes + 0x560) != 1) {
-				enableAttackCol(4, *reinterpret_cast<int*>(targetBytes + 0x504), 0);
+			if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(party.target) + 0x560) != 1) {
+				enableAttackCol(4, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504), 0);
 			}
 		} else if (itemIdx == 0x190) {
 			enableAttackCol(5, 0x190, 0);
-			System.Printf(const_cast<char*>(lbl_801DCA48 + 0x324), *reinterpret_cast<int*>(targetBytes + 0x558));
-			caravan->AddGil(*reinterpret_cast<int*>(targetBytes + 0x558));
-			if (*reinterpret_cast<short*>(targetBytes + 0x560) != 1) {
-				enableAttackCol(4, *reinterpret_cast<int*>(targetBytes + 0x504), 0);
+			System.Printf(const_cast<char*>(lbl_801DCA48 + 0x324), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x558));
+			caravan->AddGil(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x558));
+			if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(party.target) + 0x560) != 1) {
+				enableAttackCol(4, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504), 0);
 			}
 		}
 	}

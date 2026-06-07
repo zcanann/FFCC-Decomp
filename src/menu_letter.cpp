@@ -1848,8 +1848,8 @@ void CMenuPcs::LetterMessDraw()
 		float x1 = static_cast<float>(panel[2]);
 		float y1 = static_cast<float>(panel[3]);
 		u8 alpha = static_cast<u8>(FLOAT_803330a0 * *reinterpret_cast<float*>(panel + 8));
-		CColor color(0xFF, 0xFF, 0xFF, alpha);
-		GXSetChanMatColor(GX_COLOR0A0, color.color);
+		GXColor color = {0xFF, 0xFF, 0xFF, alpha};
+		GXSetChanMatColor(GX_COLOR0A0, color);
 		SetTexture(static_cast<CMenuPcs::TEX>(tex));
 		DrawRect(
 		    0, x0, y0, x1,

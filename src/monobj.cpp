@@ -1723,12 +1723,14 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 		*hitPartyIndex = -1;
 	}
 
-	Vec startPos = object->m_worldPosition;
-	Vec forward = {
-		static_cast<float>(sin(static_cast<double>(rotY))),
-		FLOAT_803319D8,
-		static_cast<float>(cos(static_cast<double>(rotY))),
-	};
+	Vec startPos;
+	startPos.x = object->m_worldPosition.x;
+	startPos.y = object->m_worldPosition.y;
+	startPos.z = object->m_worldPosition.z;
+	Vec forward;
+	forward.x = static_cast<float>(sin(static_cast<double>(rotY)));
+	forward.y = FLOAT_803319D8;
+	forward.z = static_cast<float>(cos(static_cast<double>(rotY)));
 	Vec move;
 	PSVECScale(&forward, &move, distance);
 

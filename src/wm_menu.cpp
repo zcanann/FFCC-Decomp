@@ -1542,8 +1542,8 @@ void CMenuPcs::CalcMCardMenu()
 					} else {
 						worldState->m_state0E = 1;
 						mcCtrl.m_cardChannel = worldState->m_cardChannel;
-						if (worldState->m_cardChannel == static_cast<signed char>(DAT_8032ee20)) {
-							mcCtrl.m_saveIndex = (int)uRam8032ee21;
+						if (worldState->m_cardChannel == gWmMenuCursorX[0]) {
+							mcCtrl.m_saveIndex = (int)gWmMenuCursorX[1];
 						}
 						worldState->m_counter1A = 10;
 						Sound.PlaySe(2, 0x40, 0x7F, 0);
@@ -1876,7 +1876,7 @@ void CMenuPcs::CalcMCardMenu()
 					worldState->m_mcResult = (short)0xFC19;
 				}
 			}
-			if ((char)uRam8032ee21 < 0 || (int)DAT_8032ee20 != mcCtrl.m_cardChannel) {
+			if (gWmMenuCursorX[1] < 0 || (int)gWmMenuCursorX[0] != mcCtrl.m_cardChannel) {
 			LAB_saveIdx:
 				int unk838 = reinterpret_cast<int>(m_wmCharaState);
 				uVar15 = 0;
@@ -1909,7 +1909,7 @@ void CMenuPcs::CalcMCardMenu()
 				uVar15 = DAT_8032ee2c ^ mcCtrl.m_serialHi;
 				if (uVar15 != 0 || DAT_8032ee28 != (int)uVar11) goto LAB_saveIdx;
 				if (uVar15 == 0 && DAT_8032ee28 == (int)uVar11) {
-					mcCtrl.m_saveIndex = (int)uRam8032ee21;
+					mcCtrl.m_saveIndex = (int)gWmMenuCursorX[1];
 					worldState->m_cardChannel = (short)mcCtrl.m_saveIndex;
 				}
 			}
@@ -2851,8 +2851,8 @@ void CMenuPcs::CalcLoadMenu()
 					} else {
 						DAT_8032ee28 = mcCtrl.m_serialLo;
 						DAT_8032ee2c = mcCtrl.m_serialHi;
-						DAT_8032ee20 = (unsigned char)mcCtrl.m_cardChannel;
-						uRam8032ee21 = (unsigned char)mcCtrl.m_saveIndex;
+						gWmMenuCursorX[0] = (char)mcCtrl.m_cardChannel;
+						gWmMenuCursorX[1] = (char)mcCtrl.m_saveIndex;
 					}
 					iVar10 = 0;
 					int iVar25 = reinterpret_cast<int>(m_wm.m_worldObjData) + 0x7930;

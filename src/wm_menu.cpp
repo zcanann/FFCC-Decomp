@@ -6973,7 +6973,6 @@ void CMenuPcs::DrawCharaBase()
  */
 void CMenuPcs::CalcChara()
 {
-	WmWorldState* const worldState = m_wmWorldState;
 	unsigned char* modelData = m_wm.m_charaModelData;
 	int* charaWork = reinterpret_cast<int*>(m_wm.m_worldObjData + 0xA00);
 	unsigned int selectedMask = 0;
@@ -7114,13 +7113,13 @@ void CMenuPcs::CalcChara()
 		}
 
 		double alpha = (double)DOUBLE_803314e8 *
-		               ((double)worldState->m_frameCounter - DOUBLE_80331408);
+		               ((double)m_wmWorldState->m_frameCounter - DOUBLE_80331408);
 		if (DOUBLE_80331420 < alpha) {
 			alpha = (double)FLOAT_803313e8;
 		}
 
 		CChara::CModel* const model = charaHandle->m_model;
-		const short state = worldState->m_mainState;
+		const short state = m_wmWorldState->m_mainState;
 		if (state == 1) {
 			model->m_lightAlpha = static_cast<float>(alpha);
 		} else if (state == 2) {

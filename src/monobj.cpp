@@ -1401,9 +1401,7 @@ void CGMonObj::onStatMagic()
 				CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
 				m_comboCenter = reinterpret_cast<CGObject*>(target)->m_worldPosition;
 
-				unsigned char* attackData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) +
-					*reinterpret_cast<int*>(mon + 0x560) * 0x48;
-				if ((*reinterpret_cast<unsigned short*>(attackData + 0x32) & 2) == 0) {
+				if ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (*reinterpret_cast<int*>(mon + 0x560) * 0x48 + 0x32)) & 2) == 0) {
 					float rotLimit = FLOAT_80331A20 *
 						static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x19C));
 					if (m_targetPartyIndex >= 0) {

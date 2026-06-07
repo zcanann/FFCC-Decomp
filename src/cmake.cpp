@@ -250,7 +250,13 @@ static inline void DrawCmakePreviewCharaAlpha(CMenuPcs* menu, float alpha)
     menu->DrawInit();
 
     CCharaPcs::CHandle* handle = GetCmakeCharaHandle(menu, slot);
-    if (handle->m_charaKind == 3) {
+    if (handle->m_charaKind != 3) {
+        menu->SetProjection(0x16);
+        menu->SetLight(2);
+        *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = alpha;
+        handle->Draw(5);
+        menu->RestoreProjection();
+    } else {
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x32));
         MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
         GXColor col;
@@ -263,12 +269,6 @@ static inline void DrawCmakePreviewCharaAlpha(CMenuPcs* menu, float alpha)
             0,
             FLOAT_80333244, FLOAT_80333248, FLOAT_8033324c, FLOAT_80333250,
             FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, FLOAT_80333254);
-    } else {
-        menu->SetProjection(0x16);
-        menu->SetLight(2);
-        *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = alpha;
-        handle->Draw(5);
-        menu->RestoreProjection();
     }
 
     menu->DrawInit();
@@ -292,7 +292,13 @@ static inline void DrawNamePreviewChara(CMenuPcs* menu, float modelAlpha, int gx
     menu->DrawInit();
 
     CCharaPcs::CHandle* handle = GetCmakeCharaHandle(menu, slot);
-    if (handle->m_charaKind == 3) {
+    if (handle->m_charaKind != 3) {
+        menu->SetProjection(0x16);
+        menu->SetLight(2);
+        *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = modelAlpha;
+        handle->Draw(5);
+        menu->RestoreProjection();
+    } else {
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x32));
         MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
         GXColor col = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(gxAlpha)};
@@ -301,12 +307,6 @@ static inline void DrawNamePreviewChara(CMenuPcs* menu, float modelAlpha, int gx
             0,
             FLOAT_80333244, FLOAT_80333248, FLOAT_8033324c, FLOAT_80333250,
             FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, FLOAT_80333254);
-    } else {
-        menu->SetProjection(0x16);
-        menu->SetLight(2);
-        *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = modelAlpha;
-        handle->Draw(5);
-        menu->RestoreProjection();
     }
 
     menu->DrawInit();

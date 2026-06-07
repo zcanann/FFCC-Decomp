@@ -886,7 +886,8 @@ void CShopMenu::DrawItemHelp(int index, int centerX, int y)
         return;
     }
 
-    char* helpText = new char[0x200];
+    char* helpText = new((Game.m_gameWork.m_menuStageMode != 0) ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage,
+                         s_shopmenu_cpp, 0xBFF) char[0x200];
     if (helpText == 0) {
         return;
     }

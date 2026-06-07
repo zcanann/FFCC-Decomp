@@ -787,7 +787,10 @@ int CMenuPcs::CmdCtrl()
 			}
 		}
 
-		actionHandled = (static_cast<double>(static_cast<s32>(GetCmdStateView(this)->transitionTimer)) >= DOUBLE_80332a78);
+		actionHandled = 0;
+		if (static_cast<double>(static_cast<s32>(GetCmdStateView(this)->transitionTimer)) >= DOUBLE_80332a78) {
+			actionHandled = 1;
+		}
 		if (actionHandled != 0) {
 			GetCmdStateSelections(GetCmdStateView(this))[mode] = static_cast<s16>(prev);
 			actionHandled = 0;

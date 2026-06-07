@@ -2267,10 +2267,10 @@ void CChara::CModel::DrawShadow(float (*view)[4], int zMode)
 		InitCharaMaterialState();
 
 		Mtx meshMtx;
-		if (mesh->m_data->m_skinCount == 0) {
-			PSMTXConcat(ModelDrawMtx(this), ModelNodes(this)[mesh->m_data->m_nodeIndex].m_mtx, meshMtx);
-		} else {
+		if (mesh->m_data->m_skinCount != 0) {
 			PSMTXCopy(ModelDrawMtx(this), meshMtx);
+		} else {
+			PSMTXConcat(ModelDrawMtx(this), ModelNodes(this)[mesh->m_data->m_nodeIndex].m_mtx, meshMtx);
 		}
 
 		if (ModelCustomMeshDrawCallback(this) != 0) {
@@ -2287,11 +2287,11 @@ void CChara::CModel::DrawShadow(float (*view)[4], int zMode)
 
 		CCharaDisplayListRaw* displayList = mesh->m_data->m_displayLists;
 		for (int displayListIndex = static_cast<int>(mesh->m_data->m_displayListCount) - 1; displayListIndex >= 0; displayListIndex--, displayList++) {
-			if (ModelShadowDisplayListCallback(this) == 0) {
+			if (ModelShadowDisplayListCallback(this) != 0) {
+				ModelShadowDisplayListCallback(this)(this, ModelCalcCbUser0(this), ModelCalcCbUser1(this), meshIndex, static_cast<unsigned int>(displayListIndex), meshMtx);
+			} else {
 				MaterialMan.SetMaterial(ModelMaterialSet(this), displayList->m_material, 1, (_GXTevScale)0);
 				GXCallDisplayList(displayList->m_data, displayList->m_size);
-			} else {
-				ModelShadowDisplayListCallback(this)(this, ModelCbUser0(this), ModelCbUser1(this), meshIndex, static_cast<unsigned int>(displayListIndex), meshMtx);
 			}
 		}
 	}

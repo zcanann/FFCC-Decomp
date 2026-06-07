@@ -561,7 +561,7 @@ void CMenuPcs::EquipDraw()
 						}
 						if (equipped != 0) {
 							int markX = (int)(x - kEquipMarkXOffset);
-							int markY = (int)((h - kEquipMarkHeight) * kEquipHalf + y);
+							int markY = (int)(((double)h - (double)kEquipMarkHeight) * kEquipHalfDouble + (double)y);
 							DrawEquipMark(markX, markY, listItem->alpha);
 						}
 					}

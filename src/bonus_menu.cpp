@@ -265,7 +265,7 @@ static inline void InitBonusBoardEntry(MenuBoardEntry* entry)
 static inline void ReleaseBonusRefObject(void* object)
 {
 	CRef* ref = reinterpret_cast<CRef*>(object);
-	if (ref->DecRef() == 0 && object != 0) {
+	if (ref->DecRef() == 0) {
 		delete ref;
 	}
 }

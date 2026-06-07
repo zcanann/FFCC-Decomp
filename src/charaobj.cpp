@@ -1317,6 +1317,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 	unsigned int staType;
 	int resistType = 0;
 	int allowEffect = 0;
+	int damageClamp = 0;
 	int severity = 0;
 	int effectResult = 0;
 	char* dbg = s_CGCharaObj_801DC548;
@@ -1366,15 +1367,21 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 	    ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + resolvedItemId * 0x48 + 0x2C) & 8) == 0) &&
 	    CharaObjCanFrontGuard(this, sourceObj)) {
 		playSe3D(0x1D, 0x32, 0x96, 0, 0);
-		putParticle(0x200, 0, hitPos, m_attackColRadius, 0);
+		putParticle(0x200, 0, hitPos, FLOAT_803319AC * m_attackColRadius, 0);
 		if (CharaObjIsPlayerCid(sourceObj->GetCID())) {
 			sourceObj->changeStat(0x13, 0, 0);
 		}
 		if ((GetCID() & 0x6D) == 0x6D) {
 			changeSubStat(2);
+			if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xF8) == 0) {
+				effectResult = 0;
+			} else {
+				damageClamp = 1;
+			}
+		} else {
+			effectResult = 0;
 		}
 		allowEffect = 0;
-		effectResult = 0;
 	}
 
 	if (m_lastStateId == 6 &&
@@ -1575,6 +1582,10 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		}
 		if (scriptDefense != 0 && staType != 2 && staType != 0) {
 			setSta(0, 0);
+		}
+
+		if (damageClamp != 0) {
+			damageAmount = (damageAmount < 2) ? 0 : 1;
 		}
 
 		if (selfIsMonster &&

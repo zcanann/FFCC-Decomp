@@ -2817,9 +2817,11 @@ void CPartMng::pppDumpCacheIdx()
 
     pppSetRendMatrix();
 
-    PppMngStDumpRaw* mng = reinterpret_cast<PppMngStDumpRaw*>(reinterpret_cast<unsigned char*>(this) + 0x2A18);
+    unsigned char gamePaused = Game.m_gameWork.m_gamePaused;
     for (int i = 0; i < 0x180; i++) {
-        if ((Game.m_gameWork.m_gamePaused == 0 || (mng->m_drawPass >= 6 && mng->m_drawPass <= 7)) &&
+        PppMngStDumpRaw* mng = reinterpret_cast<PppMngStDumpRaw*>(
+            reinterpret_cast<unsigned char*>(this) + 0x2A18 + i * 0x158);
+        if ((gamePaused == 0 || (mng->m_drawPass >= 6 && mng->m_drawPass <= 7)) &&
             mng->m_baseTime != -0x1000 && mng->m_hitBgFlag == 0) {
             ppvMng = reinterpret_cast<_pppMngSt*>(mng);
             ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
@@ -2865,8 +2867,6 @@ void CPartMng::pppDumpCacheIdx()
 
             gPppInSubFrameCalc = 0;
         }
-
-        mng = reinterpret_cast<PppMngStDumpRaw*>(reinterpret_cast<unsigned char*>(mng) + 0x158);
     }
 }
 

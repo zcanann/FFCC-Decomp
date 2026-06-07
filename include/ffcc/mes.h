@@ -46,6 +46,9 @@ public:
     static int m_tempVar[0x14];
 
 private:
+    void advanceLine(CFont* font);
+    void addFlagEntry(unsigned char type, unsigned char index, short value);
+
     int m_playerIndex;
     char* mText;
     int mCounter;
@@ -78,7 +81,7 @@ private:
     int mRubyLine;              // 0x3D14
     int mRubyHeight;            // 0x3D18
     int mRubyOffset;            // 0x3D1C
-    int mRubyY;                 // 0x3D20
+    float mRubyY;               // 0x3D20
     int mRubySpacing;           // 0x3D24
     int mColor;                 // 0x3D28
     int mFontAlign;             // 0x3D2C

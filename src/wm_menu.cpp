@@ -2844,8 +2844,8 @@ void CMenuPcs::CalcLoadMenu()
 			if (iVar14 % 0x16 != 0) iVar10 = iVar10 + 1;
 			sVar8 = (iVar10 + 2) * 0x16 + 0x40;
 			short sVar18 = *piVar5 * 0x1E + 0x40;
-			iVar14 = (int)((float)(0x280 - sVar8) * (float)DOUBLE_803313f8);
-			iVar10 = (int)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313f8);
+			iVar14 = (int)(float)((double)(0x280 - sVar8) * DOUBLE_803313f8);
+			iVar10 = (int)(float)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313f8);
 			m_menuWindowInfo->x = (short)iVar14;
 			m_menuWindowInfo->y = (short)iVar10;
 			m_menuWindowInfo->width = sVar8;
@@ -2891,66 +2891,6 @@ void CMenuPcs::CalcLoadMenu()
 	case 3:
 		MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
 		m_wmWorldState->m_mcResult = (short)MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
-		break;
-	case 4:
-		if ((signed char)m_wmWorldState->m_flag09 == 0) {
-			CFont* pFont = m_fonts[0];
-			pFont->SetMargin(FLOAT_803313e8);
-			pFont->SetShadow(0);
-			pFont->SetScale(FLOAT_803313e8);
-			const char* const* msgBuf = GetMcWinMessBuff(0);
-			iVar14 = 0;
-			int* piVar5 = reinterpret_cast<int*>(GetWinMess(6));
-			int* piVar20 = piVar5;
-			for (int iVar23 = 0; iVar23 < *piVar5; iVar23++) {
-				const char* pcVar12 = msgBuf[*reinterpret_cast<short*>(reinterpret_cast<int>(piVar20) + 4)];
-				if (pcVar12 != 0) {
-					if (*pcVar12 == '$') pcVar12 = pcVar12 + 1;
-					int iVar25 = (int)(double)pFont->GetWidth(pcVar12);
-					if (iVar25 > iVar14) iVar14 = iVar25;
-				}
-				piVar20 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar20) + 2);
-			}
-			iVar10 = iVar14 / 0x16;
-			if (iVar14 % 0x16 != 0) iVar10 = iVar10 + 1;
-			sVar8 = (iVar10 + 2) * 0x16 + 0x40;
-			short sVar18 = *piVar5 * 0x1E + 0x40;
-			iVar14 = (int)((float)(0x280 - sVar8) * (float)DOUBLE_803313f8);
-			iVar10 = (int)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313f8);
-			m_menuWindowInfo->x = (short)iVar14;
-			m_menuWindowInfo->y = (short)iVar10;
-			m_menuWindowInfo->width = sVar8;
-			m_menuWindowInfo->height = sVar18;
-			m_menuWindowInfo->frame = 0;
-			m_menuWindowInfo->state = 3;
-			m_menuWindowInfo->state = 0;
-			m_mcCtrl.m_previousState = 0;
-			m_mcCtrl.m_state = 0;
-			m_mcCtrl.m_lastResult = 0;
-			m_mcCtrl.m_iteration = 0;
-			m_mcCtrl.m_userBuffer = 0;
-			m_mcCtrl.m_createFlag = 0;
-			m_wmWorldState->m_flag09 = 1;
-		} else if (m_menuWindowInfo->state == 1
-		           && m_wmWorldState->m_counter1A == 0) {
-			short chkResult = (short)GetMcCtrl()->ChkEmpty(1);
-			m_wmWorldState->m_mcResult = chkResult;
-			if (m_wmWorldState->m_mcResult < 0) {
-				MemoryCardMan.m_opDoneFlag = 1;
-				MemoryCardMan.m_currentSlot = 0xFF;
-				m_wmWorldState->m_state0E = -1;
-				m_wmWorldState->m_counter1A = 10;
-			}
-		}
-		if (m_menuWindowInfo->state == 1) {
-			sVar8 = m_wmWorldState->m_counter1A;
-			if (sVar8 != 0) {
-				m_wmWorldState->m_counter1A = sVar8 - 1;
-				if (m_wmWorldState->m_counter1A == 0) {
-					m_menuWindowInfo->state = 2;
-				}
-			}
-		}
 		break;
 	case 5:
 	case 6:
@@ -3002,8 +2942,8 @@ void CMenuPcs::CalcLoadMenu()
 			if (iVar14 % 0x16 != 0) iVar10 = iVar10 + 1;
 			sVar8 = (iVar10 + 2) * 0x16 + 0x40;
 			short sVar18 = *piVar5 * 0x1E + 0x40;
-			iVar14 = (int)((float)(0x280 - sVar8) * (float)DOUBLE_803313f8);
-			iVar10 = (int)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313f8);
+			iVar14 = (int)(float)((double)(0x280 - sVar8) * DOUBLE_803313f8);
+			iVar10 = (int)(float)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313f8);
 			m_menuWindowInfo->x = (short)iVar14;
 			m_menuWindowInfo->y = (short)iVar10;
 			m_menuWindowInfo->width = sVar8;
@@ -3058,6 +2998,66 @@ void CMenuPcs::CalcLoadMenu()
 		}
 		break;
 	}
+	case 4:
+		if ((signed char)m_wmWorldState->m_flag09 == 0) {
+			CFont* pFont = m_fonts[0];
+			pFont->SetMargin(FLOAT_803313e8);
+			pFont->SetShadow(0);
+			pFont->SetScale(FLOAT_803313e8);
+			const char* const* msgBuf = GetMcWinMessBuff(0);
+			iVar14 = 0;
+			int* piVar5 = reinterpret_cast<int*>(GetWinMess(6));
+			int* piVar20 = piVar5;
+			for (int iVar23 = 0; iVar23 < *piVar5; iVar23++) {
+				const char* pcVar12 = msgBuf[*reinterpret_cast<short*>(reinterpret_cast<int>(piVar20) + 4)];
+				if (pcVar12 != 0) {
+					if (*pcVar12 == '$') pcVar12 = pcVar12 + 1;
+					int iVar25 = (int)(double)pFont->GetWidth(pcVar12);
+					if (iVar25 > iVar14) iVar14 = iVar25;
+				}
+				piVar20 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar20) + 2);
+			}
+			iVar10 = iVar14 / 0x16;
+			if (iVar14 % 0x16 != 0) iVar10 = iVar10 + 1;
+			sVar8 = (iVar10 + 2) * 0x16 + 0x40;
+			short sVar18 = *piVar5 * 0x1E + 0x40;
+			iVar14 = (int)(float)((double)(0x280 - sVar8) * DOUBLE_803313f8);
+			iVar10 = (int)(float)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313f8);
+			m_menuWindowInfo->x = (short)iVar14;
+			m_menuWindowInfo->y = (short)iVar10;
+			m_menuWindowInfo->width = sVar8;
+			m_menuWindowInfo->height = sVar18;
+			m_menuWindowInfo->frame = 0;
+			m_menuWindowInfo->state = 3;
+			m_menuWindowInfo->state = 0;
+			m_mcCtrl.m_previousState = 0;
+			m_mcCtrl.m_state = 0;
+			m_mcCtrl.m_lastResult = 0;
+			m_mcCtrl.m_iteration = 0;
+			m_mcCtrl.m_userBuffer = 0;
+			m_mcCtrl.m_createFlag = 0;
+			m_wmWorldState->m_flag09 = 1;
+		} else if (m_menuWindowInfo->state == 1
+		           && m_wmWorldState->m_counter1A == 0) {
+			short chkResult = (short)GetMcCtrl()->ChkEmpty(1);
+			m_wmWorldState->m_mcResult = chkResult;
+			if (m_wmWorldState->m_mcResult < 0) {
+				MemoryCardMan.m_opDoneFlag = 1;
+				MemoryCardMan.m_currentSlot = 0xFF;
+				m_wmWorldState->m_state0E = -1;
+				m_wmWorldState->m_counter1A = 10;
+			}
+		}
+		if (m_menuWindowInfo->state == 1) {
+			sVar8 = m_wmWorldState->m_counter1A;
+			if (sVar8 != 0) {
+				m_wmWorldState->m_counter1A = sVar8 - 1;
+				if (m_wmWorldState->m_counter1A == 0) {
+					m_menuWindowInfo->state = 2;
+				}
+			}
+		}
+		break;
 	case 8:
 	case 0xB:
 	case 0x19: {
@@ -3096,8 +3096,8 @@ void CMenuPcs::CalcLoadMenu()
 			if (iVar14 % 0x16 != 0) iVar10 = iVar10 + 1;
 			sVar8 = (iVar10 + 2) * 0x16 + 0x40;
 			short sVar18 = *piVar5 * 0x1E + 0x40;
-			iVar14 = (int)((float)(0x280 - sVar8) * (float)DOUBLE_803313f8);
-			iVar10 = (int)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313f8);
+			iVar14 = (int)(float)((double)(0x280 - sVar8) * DOUBLE_803313f8);
+			iVar10 = (int)(float)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313f8);
 			m_menuWindowInfo->x = (short)iVar14;
 			m_menuWindowInfo->y = (short)iVar10;
 			m_menuWindowInfo->width = sVar8;
@@ -3187,8 +3187,8 @@ void CMenuPcs::CalcLoadMenu()
 			if (iVar14 % 0x16 != 0) iVar10 = iVar10 + 1;
 			sVar8 = (iVar10 + 2) * 0x16 + 0x40;
 			short sVar18 = *piVar5 * 0x1E + 0x40;
-			iVar14 = (int)((float)(0x280 - sVar8) * (float)DOUBLE_803313f8);
-			iVar10 = (int)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313f8);
+			iVar14 = (int)(float)((double)(0x280 - sVar8) * DOUBLE_803313f8);
+			iVar10 = (int)(float)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313f8);
 			m_menuWindowInfo->x = (short)iVar14;
 			m_menuWindowInfo->y = (short)iVar10;
 			m_menuWindowInfo->width = sVar8;
@@ -3233,14 +3233,14 @@ void CMenuPcs::CalcLoadMenu()
 
 			if (m_wmWorldState->m_mcResult != 0) {
 				if (m_wmWorldState->m_subState == 0x16) {
-					if (m_wmWorldState->m_menuMode == 8 || m_wmWorldState->m_mcResult != 1) {
-						DAT_8032ee24 = (unsigned char)m_mcCtrl.m_cardChannel;
-						uRam8032ee25 = (unsigned char)m_mcCtrl.m_saveIndex;
+					if (m_wmWorldState->m_menuMode != 8 && m_wmWorldState->m_mcResult == 1) {
+						gWmMenuWorkB = m_mcCtrl.m_serialHi;
+						gWmMenuWorkA = m_mcCtrl.m_serialLo;
+						gWmMenuCursorX[0] = (unsigned char)m_mcCtrl.m_cardChannel;
+						gWmMenuCursorX[1] = (unsigned char)m_mcCtrl.m_saveIndex;
 					} else {
-						DAT_8032ee28 = m_mcCtrl.m_serialLo;
-						DAT_8032ee2c = m_mcCtrl.m_serialHi;
-						DAT_8032ee20 = (unsigned char)m_mcCtrl.m_cardChannel;
-						uRam8032ee21 = (unsigned char)m_mcCtrl.m_saveIndex;
+						gWmMenuCursorY[0] = (unsigned char)m_mcCtrl.m_cardChannel;
+						gWmMenuCursorY[1] = (unsigned char)m_mcCtrl.m_saveIndex;
 					}
 					iVar10 = 0;
 					int iVar25 = reinterpret_cast<int>(m_wm.m_worldObjData) + 0x7930;

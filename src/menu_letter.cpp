@@ -1546,10 +1546,10 @@ bool CMenuPcs::LetterConfirmOpen()
 		if (languageId == 3) {
 			sprintf(lines[0], "%s%s", GetMenuStr(0x26), title);
 		} else if (languageId < 3) {
-			if ((languageId == 1) || (languageId == 0)) {
-				sprintf(lines[0], "%s%s%s", GetMenuStr(0x25), title, GetMenuStr(0x26));
-			} else {
+			if (languageId == 2) {
 				sprintf(lines[0], "%s%s", title, GetMenuStr(0x26));
+			} else {
+				sprintf(lines[0], "%s%s%s", GetMenuStr(0x25), title, GetMenuStr(0x26));
 			}
 		} else if (languageId == 5) {
 			sprintf(lines[0], "%s%s", GetMenuStr(0x26), title);
@@ -1567,7 +1567,7 @@ bool CMenuPcs::LetterConfirmOpen()
 			        GetMenuStr(0x23),
 			        s_ReplyStr,
 			        GetMenuStr(0x24));
-		} else if (((languageId < 3) && (languageId != 1)) && (languageId != 0)) {
+		} else if (languageId == 2) {
 			sprintf(lines[1], "%s%s%s%s",
 			        GetMenuStr(0x23),
 			        s_ReplyStr,

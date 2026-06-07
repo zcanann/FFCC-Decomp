@@ -966,10 +966,6 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 	CCharaModelRefRaw* ref = reinterpret_cast<CCharaModelRefRaw*>(
 	    new (stage, const_cast<char*>(s_chara_cpp), 0x111) CChara::CModel::CRefData());
 	m_data = ref;
-	m_nodes = 0;
-	m_meshes = 0;
-	m_texSet = 0;
-	m_curFrame = 0.0f;
 
 	CChunkFile chunkFile(fileData);
 	CChunkFile::CChunk chunk;

@@ -1508,11 +1508,11 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					*reinterpret_cast<unsigned short*>(itemData + 6) :
 					0;
 				if ((sourceObj->GetCID() & 0x6D) == 0x6D && resolvedItemId == 0x206) {
-					int castCurrent = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0x644);
-					int castEnd = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0x648);
-					if (castEnd >= castCurrent * 3) {
+					int castCurrent = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0x68C);
+					int castEnd = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0x664);
+					if (castCurrent * 3 <= castEnd) {
 						basePower <<= 2;
-					} else if (castEnd >= castCurrent * 2) {
+					} else if (castCurrent * 2 <= castEnd) {
 						basePower <<= 1;
 					}
 				}

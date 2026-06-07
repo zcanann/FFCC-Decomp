@@ -2652,153 +2652,66 @@ void CPartMng::pppEditPartDrawAfter()
         m_pppEnvSt.m_debugCounter = 0;
         if (*reinterpret_cast<long**>(reinterpret_cast<unsigned char*>(this) + 0x5dc) != 0
             && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x174) <= 3) {
-            {
-                Mtx invCamera;
-                Vec cameraPos;
-                Vec partPos;
-                Vec cameraDelta;
-                Vec viewPos;
-                PSMTXInverse(ppvCameraMatrix, invCamera);
-                cameraPos.x = invCamera[0][3];
-                cameraPos.y = invCamera[1][3];
-                cameraPos.z = invCamera[2][3];
-
-                _pppMngSt* mng = m_pppMng;
-                for (int i = 0; i < kPppMngCount; i++) {
-                    int baseTime = mng->m_baseTime;
-                    if (mng->m_mode == 0 && baseTime != -0x1000 && mng->m_drawPass == 5 && baseTime < 0
-                        && mng->m_slotVisible != 0 && mng->m_ownerFlagsInitialized != 0) {
-                        partPos.x = mng->m_matrix.value[0][3];
-                        partPos.y = mng->m_matrix.value[1][3];
-                        partPos.z = mng->m_matrix.value[2][3];
-
-                        ppvMng = mng;
-                        if ((double)mng->m_cullRadiusSq != 0.0) {
-                            PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
-                            if ((double)PSVECSquareMag(&cameraDelta) >= (double)mng->m_cullRadiusSq) {
-                                mng++;
-                                continue;
-                            }
-                            CBound bound;
-                            Vec min;
-                            min.x = partPos.x - mng->m_cullRadius;
-                            min.y = partPos.y;
-                            min.z = partPos.z - mng->m_cullRadius;
-                            if (bound.CheckFrustum(min, ppvCameraMatrix,
-                                                   partPos.y + mng->m_cullYOffset) == 0) {
-                                mng++;
-                                continue;
-                            }
-                        }
-
-                        PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
-                        mng->m_sortDepth = viewPos.z;
-                        ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4);
-                        ppvMng = mng;
-                        pppSetFpMatrix(ppvMng);
-                        _pppDrawPart(ppvMng);
-                    }
-                    mng++;
-                }
+#define PPP_DRAW_AFTER_PASS(drawPass)                                                              \
+            {                                                                                              \
+                struct PppCullBound { Vec m_min; Vec m_max; };                                             \
+                Mtx invCamera;                                                                             \
+                Vec cameraPos;                                                                             \
+                Vec partPos;                                                                               \
+                Vec cameraDelta;                                                                           \
+                Vec viewPos;                                                                               \
+                PSMTXInverse(ppvCameraMatrix, invCamera);                                                  \
+                cameraPos.x = invCamera[0][3];                                                             \
+                cameraPos.y = invCamera[1][3];                                                             \
+                cameraPos.z = invCamera[2][3];                                                             \
+                                                                                                           \
+                for (int i = 0; i < kPppMngCount; i++) {                                                   \
+                    _pppMngSt* mng = &m_pppMng[i];                                                         \
+                    if (mng->m_hitBgFlag == 0 && mng->m_baseTime != -0x1000                                \
+                        && (signed char)mng->m_drawPass == (drawPass) && mng->m_baseTime < 0               \
+                        && mng->m_slotVisible != 0 && mng->m_ownerFacing != 0) {                           \
+                        ppvMng = mng;                                                                      \
+                        partPos.x = mng->m_matrix.value[0][3];                                             \
+                        partPos.y = mng->m_matrix.value[1][3];                                             \
+                        partPos.z = mng->m_matrix.value[2][3];                                             \
+                                                                                                           \
+                        if ((double)mng->m_cullRadiusSq != 0.0) {                                          \
+                            goto checkCull##drawPass;                                                      \
+                        }                                                                                  \
+                                                                                                           \
+                    drawPart##drawPass:                                                                    \
+                        PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);                                 \
+                        mng->m_sortDepth = viewPos.z;                                                      \
+                        ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4); \
+                        ppvMng = mng;                                                                      \
+                        pppSetFpMatrix(ppvMng);                                                            \
+                        _pppDrawPart(ppvMng);                                                              \
+                        continue;                                                                          \
+                                                                                                           \
+                    checkCull##drawPass:                                                                   \
+                        PSVECSubtract(&cameraPos, &partPos, &cameraDelta);                                 \
+                        if (PSVECSquareMag(&cameraDelta) < mng->m_cullRadiusSq) {                          \
+                            PppCullBound bound;                                                            \
+                            float radius = mng->m_cullRadius;                                              \
+                            bound.m_min.x = partPos.x - radius;                                            \
+                            bound.m_min.y = partPos.y;                                                     \
+                            bound.m_min.z = partPos.z - radius;                                            \
+                            bound.m_max.x = partPos.x + radius;                                            \
+                            bound.m_max.y = partPos.y + mng->m_cullYOffset;                                \
+                            bound.m_max.z = partPos.z + radius;                                            \
+                            if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(                           \
+                                    cameraPos, ppvCameraMatrix, FLOAT_8032FE48) != 0) {                    \
+                                goto drawPart##drawPass;                                                   \
+                            }                                                                              \
+                        }                                                                                  \
+                    }                                                                                      \
+                }                                                                                          \
             }
-            {
-                Mtx invCamera;
-                Vec cameraPos;
-                Vec partPos;
-                Vec cameraDelta;
-                Vec viewPos;
-                PSMTXInverse(ppvCameraMatrix, invCamera);
-                cameraPos.x = invCamera[0][3];
-                cameraPos.y = invCamera[1][3];
-                cameraPos.z = invCamera[2][3];
 
-                _pppMngSt* mng = m_pppMng;
-                for (int i = 0; i < kPppMngCount; i++) {
-                    int baseTime = mng->m_baseTime;
-                    if (mng->m_mode == 0 && baseTime != -0x1000 && mng->m_drawPass == 6 && baseTime < 0
-                        && mng->m_slotVisible != 0 && mng->m_ownerFlagsInitialized != 0) {
-                        partPos.x = mng->m_matrix.value[0][3];
-                        partPos.y = mng->m_matrix.value[1][3];
-                        partPos.z = mng->m_matrix.value[2][3];
-
-                        ppvMng = mng;
-                        if ((double)mng->m_cullRadiusSq != 0.0) {
-                            PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
-                            if ((double)PSVECSquareMag(&cameraDelta) >= (double)mng->m_cullRadiusSq) {
-                                mng++;
-                                continue;
-                            }
-                            CBound bound;
-                            Vec min;
-                            min.x = partPos.x - mng->m_cullRadius;
-                            min.y = partPos.y;
-                            min.z = partPos.z - mng->m_cullRadius;
-                            if (bound.CheckFrustum(min, ppvCameraMatrix,
-                                                   partPos.y + mng->m_cullYOffset) == 0) {
-                                mng++;
-                                continue;
-                            }
-                        }
-
-                        PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
-                        mng->m_sortDepth = viewPos.z;
-                        ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4);
-                        ppvMng = mng;
-                        pppSetFpMatrix(ppvMng);
-                        _pppDrawPart(ppvMng);
-                    }
-                    mng++;
-                }
-            }
-            {
-                Mtx invCamera;
-                Vec cameraPos;
-                Vec partPos;
-                Vec cameraDelta;
-                Vec viewPos;
-                PSMTXInverse(ppvCameraMatrix, invCamera);
-                cameraPos.x = invCamera[0][3];
-                cameraPos.y = invCamera[1][3];
-                cameraPos.z = invCamera[2][3];
-
-                _pppMngSt* mng = m_pppMng;
-                for (int i = 0; i < kPppMngCount; i++) {
-                    int baseTime = mng->m_baseTime;
-                    if (mng->m_mode == 0 && baseTime != -0x1000 && mng->m_drawPass == 7 && baseTime < 0
-                        && mng->m_slotVisible != 0 && mng->m_ownerFlagsInitialized != 0) {
-                        partPos.x = mng->m_matrix.value[0][3];
-                        partPos.y = mng->m_matrix.value[1][3];
-                        partPos.z = mng->m_matrix.value[2][3];
-
-                        ppvMng = mng;
-                        if ((double)mng->m_cullRadiusSq != 0.0) {
-                            PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
-                            if ((double)PSVECSquareMag(&cameraDelta) >= (double)mng->m_cullRadiusSq) {
-                                mng++;
-                                continue;
-                            }
-                            CBound bound;
-                            Vec min;
-                            min.x = partPos.x - mng->m_cullRadius;
-                            min.y = partPos.y;
-                            min.z = partPos.z - mng->m_cullRadius;
-                            if (bound.CheckFrustum(min, ppvCameraMatrix,
-                                                   partPos.y + mng->m_cullYOffset) == 0) {
-                                mng++;
-                                continue;
-                            }
-                        }
-
-                        PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
-                        mng->m_sortDepth = viewPos.z;
-                        ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4);
-                        ppvMng = mng;
-                        pppSetFpMatrix(ppvMng);
-                        _pppDrawPart(ppvMng);
-                    }
-                    mng++;
-                }
-            }
+            PPP_DRAW_AFTER_PASS(5)
+            PPP_DRAW_AFTER_PASS(6)
+            PPP_DRAW_AFTER_PASS(7)
+#undef PPP_DRAW_AFTER_PASS
         }
     }
 

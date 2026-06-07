@@ -6783,7 +6783,7 @@ void CMenuPcs::DrawWMFrame0(int mask, float alpha)
 	color.r = 0xFF;
 	color.g = 0xFF;
 	color.b = 0xFF;
-	color.a = static_cast<unsigned char>(static_cast<int>(255.0 * static_cast<double>(alpha)));
+	color.a = static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(alpha)));
 	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
@@ -6796,7 +6796,7 @@ void CMenuPcs::DrawWMFrame0(int mask, float alpha)
 			MenuPcs.DrawRect(0xFFFFFFFF, static_cast<float>(static_cast<int>(psVar1[0])), static_cast<float>(static_cast<int>(psVar1[1])),
 			         static_cast<float>(static_cast<int>(psVar1[2])), static_cast<float>(static_cast<int>(psVar1[3])),
 			         *reinterpret_cast<float*>(psVar1 + 4), *reinterpret_cast<float*>(psVar1 + 6),
-			         1.0f, 1.0f, *reinterpret_cast<float*>(psVar1 + 0xC));
+			         FLOAT_803313e8, FLOAT_803313e8, *reinterpret_cast<float*>(psVar1 + 0xC));
 		}
 		i = i + 1;
 		offset = offset + 0x1C;

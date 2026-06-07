@@ -9903,9 +9903,9 @@ void CMenuPcs::DrawMCList()
 			} else {
 LAB_draw:
 				if (alpha > FLOAT_803314f0) {
-					float slotY = (float)(slotIdx) * FLOAT_80331498 + FLOAT_80331490;
+					float slotY = static_cast<float>(DOUBLE_80331498 * (static_cast<double>(static_cast<int>(slotIdx)) - DOUBLE_80331408) + DOUBLE_80331490);
 					MenuPcs.SetAttrFmt((FMT)0);
-					unsigned int slotAlpha = (unsigned int)(FLOAT_80331458 * alpha) & 0xFF;
+					unsigned int slotAlpha = (unsigned int)(static_cast<float>(static_cast<double>(FLOAT_80331458) * static_cast<double>(alpha))) & 0xFF;
 					GXColor slotColor;
 					slotColor.r = 0xFF;
 					slotColor.g = 0xFF;

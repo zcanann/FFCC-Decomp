@@ -5591,7 +5591,7 @@ void CMenuPcs::CalcFukidashi()
 	}
 
 	fVar1 = FLOAT_80331708;
-	unsigned short uVar3 = static_cast<unsigned short>(*reinterpret_cast<short*>(bytes + 0x1A));
+	int uVar3 = *reinterpret_cast<short*>(bytes + 0x1A);
 	if ((uVar3 & 0x3F0) != 0) {
 		bubbleData = reinterpret_cast<int>(m_wm.m_bubbleData);
 		*reinterpret_cast<short*>(bubbleData + 0x20) = 0x50;
@@ -5616,7 +5616,7 @@ void CMenuPcs::CalcFukidashi()
 	}
 
 	fVar1 = FLOAT_803313dc;
-	uVar3 = static_cast<unsigned short>(*reinterpret_cast<short*>(bytes + 0x1A));
+	uVar3 = *reinterpret_cast<short*>(bytes + 0x1A);
 	if ((uVar3 & 0x1FF) != 0) {
 		bubbleData = reinterpret_cast<int>(m_wm.m_bubbleData);
 		*reinterpret_cast<short*>(bubbleData + 0x3C) = 0x20;

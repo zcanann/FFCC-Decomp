@@ -12454,16 +12454,13 @@ int McCtrl::ChkNowData()
  * JP Address: TODO
  * JP Size: TODO
  */
-void McCtrl::SaveDataBuffer(char* buffer)
+int McCtrl::SaveDataBuffer(char* buffer)
 {
-	unsigned int serialLo = 0;
-	unsigned int serialHi = 0;
-
-	m_userBuffer = buffer;
+	unsigned int serialLo;
+	unsigned int serialHi;
 
 	if (m_state < 0) {
-		m_lastResult = -1000;
-		return;
+		return -1000;
 	}
 
 	m_previousState = m_state;
@@ -12486,12 +12483,10 @@ void McCtrl::SaveDataBuffer(char* buffer)
 					m_state = 2;
 				} else if (m_lastResult == -0xD) {
 					m_state = -1;
-					m_lastResult = -13;
-					return;
+					return -13;
 				} else if (m_lastResult == -5) {
 					m_state = -1;
-					m_lastResult = -5;
-					return;
+					return -5;
 				} else {
 					m_state = -1;
 				}
@@ -12524,13 +12519,11 @@ void McCtrl::SaveDataBuffer(char* buffer)
 		if (m_lastResult == -4) {
 			m_state = -1;
 			MemoryCardMan.McUnmount(m_cardChannel);
-			m_lastResult = -4;
-			return;
+			return -4;
 		} else if (m_lastResult == -5) {
 			m_state = -1;
 			MemoryCardMan.McUnmount(m_cardChannel);
-			m_lastResult = -5;
-			return;
+			return -5;
 		} else {
 			MemoryCardMan.CreateMcBuff();
 			m_state = 0x10;
@@ -12543,36 +12536,33 @@ void McCtrl::SaveDataBuffer(char* buffer)
 			MemoryCardMan.McUnmount(m_cardChannel);
 			MemoryCardMan.DestroyMcBuff();
 			m_state = -1;
-			m_lastResult = -999;
 			break;
 		}
 
-		m_serialLo = serialLo;
 		m_serialHi = serialHi;
+		m_serialLo = serialLo;
 
 		unsigned char* const save = reinterpret_cast<unsigned char*>(MemoryCardMan.m_saveBuffer);
-		if (save == 0 || m_userBuffer == 0) {
-			m_state = -1;
-			m_lastResult = -999;
-			break;
-		}
-
-		memcpy(save, m_userBuffer, 0x8BD0);
+		memcpy(save, buffer, 0x8BD0);
 
 		int member = *reinterpret_cast<int*>(save + 0x30);
-		if (member < 0 || member >= 8 || *reinterpret_cast<int*>(save + member * 0x9C0 + 0x1A84) == 0 || save[member * 0x9C0 + 0x1D90] != 0) {
+		unsigned char* slot = save + member * 0x9C0;
+		if (*reinterpret_cast<int*>(slot + 0x1A84) == 0 || slot[0x1D90] != 0) {
 			*reinterpret_cast<int*>(save + 0x30) = -1;
 		}
 		member = *reinterpret_cast<int*>(save + 0x34);
-		if (member < 0 || member >= 8 || *reinterpret_cast<int*>(save + member * 0x9C0 + 0x1A84) == 0 || save[member * 0x9C0 + 0x1D90] != 0) {
+		slot = save + member * 0x9C0;
+		if (*reinterpret_cast<int*>(slot + 0x1A84) == 0 || slot[0x1D90] != 0) {
 			*reinterpret_cast<int*>(save + 0x34) = -1;
 		}
 		member = *reinterpret_cast<int*>(save + 0x38);
-		if (member < 0 || member >= 8 || *reinterpret_cast<int*>(save + member * 0x9C0 + 0x1A84) == 0 || save[member * 0x9C0 + 0x1D90] != 0) {
+		slot = save + member * 0x9C0;
+		if (*reinterpret_cast<int*>(slot + 0x1A84) == 0 || slot[0x1D90] != 0) {
 			*reinterpret_cast<int*>(save + 0x38) = -1;
 		}
 		member = *reinterpret_cast<int*>(save + 0x3C);
-		if (member < 0 || member >= 8 || *reinterpret_cast<int*>(save + member * 0x9C0 + 0x1A84) == 0 || save[member * 0x9C0 + 0x1D90] != 0) {
+		slot = save + member * 0x9C0;
+		if (*reinterpret_cast<int*>(slot + 0x1A84) == 0 || slot[0x1D90] != 0) {
 			*reinterpret_cast<int*>(save + 0x3C) = -1;
 		}
 
@@ -12592,8 +12582,7 @@ void McCtrl::SaveDataBuffer(char* buffer)
 					MemoryCardMan.McClose();
 					MemoryCardMan.McUnmount(m_cardChannel);
 					MemoryCardMan.DestroyMcBuff();
-					m_lastResult = -5;
-					return;
+					return -5;
 				}
 			} else {
 				m_state = 0x12;
@@ -12609,15 +12598,20 @@ void McCtrl::SaveDataBuffer(char* buffer)
 			}
 		}
 		break;
+
+	case 0x12:
+		break;
 	}
 
+	int result;
 	if (m_state == -1) {
-		m_lastResult = -999;
+		result = -999;
 	} else if (m_state == 0x12) {
-		m_lastResult = 1;
+		result = 1;
 	} else {
-		m_lastResult = 0;
+		result = 0;
 	}
+	return result;
 }
 
 /*

@@ -1986,8 +1986,7 @@ void CGoOutMenu::CalcGoOut()
     }
 
     if (m_memCardProc == 2) {
-        mcCtrl.SaveDataBuffer(static_cast<char*>(m_memCardBuffer));
-        m_memCardResult = mcCtrl.m_lastResult;
+        m_memCardResult = mcCtrl.SaveDataBuffer(static_cast<char*>(m_memCardBuffer));
         if (m_memCardResult != 0) {
             m_lastMemCardProc = m_memCardProc;
             m_memCardProc = 0;

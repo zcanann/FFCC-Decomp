@@ -552,8 +552,31 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
                      *reinterpret_cast<Vec*>(particleData->m_matrix[1]));
     }
 
-    if (paramBytes[0x18] < 6) {
-        if (paramBytes[0x18] > 3) {
+    if ((s8)paramBytes[0x18] < 4 || (s8)paramBytes[0x18] >= 10) {
+        float speedRandRange = param->m_speedRandRange;
+        if (speedRandRange != kPppYmMegaBirthShpTail2Zero) {
+            u8 randType = param->m_randType;
+            float scale = speedRandRange;
+
+            if (randType == 3) {
+                scale = -(FLOAT_80330590 * (speedRandRange * Math.RandF() * Math.RandF()) - speedRandRange);
+            } else if (randType < 3) {
+                if (randType == 1) {
+                    Math.RandF();
+                    scale = speedRandRange * Math.RandF();
+                } else if (randType != 0) {
+                    scale = Math.RandF() * (speedRandRange * Math.RandF());
+                }
+            } else if (randType == 5) {
+                scale = -(FLOAT_80330568 * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF())) - speedRandRange);
+            } else if (randType < 5) {
+                scale = Math.RandF() * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF()));
+            }
+
+            Vec velocity = *reinterpret_cast<Vec*>(particleData->m_matrix[1]);
+            pppScaleVectorXYZ(*reinterpret_cast<Vec*>(particleData->m_matrix[1]), velocity, scale);
+        }
+    } else if ((s8)paramBytes[0x18] < 6) {
         if (param->m_speedRandRange == kPppYmMegaBirthShpTail2Zero) {
             goto done;
         }
@@ -620,8 +643,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
         particleData->m_matrix[0][1] *= param->m_speedScale.x;
         particleData->m_matrix[0][2] *= param->m_speedScale.y;
         goto done;
-        }
-    } else if (paramBytes[0x18] < 10) {
+    } else if ((s8)paramBytes[0x18] < 10) {
         float* pathBase = reinterpret_cast<float*>(pppPObject->m_drawMatrixPtr);
 
         if (param->m_tail2PathIndex >= 0) {
@@ -686,32 +708,6 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
             }
         }
         goto done;
-    }
-
-    {
-        float speedRandRange = param->m_speedRandRange;
-        if (speedRandRange != kPppYmMegaBirthShpTail2Zero) {
-            u8 randType = param->m_randType;
-            float scale = speedRandRange;
-
-            if (randType == 3) {
-                scale = -(FLOAT_80330590 * (speedRandRange * Math.RandF() * Math.RandF()) - speedRandRange);
-            } else if (randType < 3) {
-                if (randType == 1) {
-                    Math.RandF();
-                    scale = speedRandRange * Math.RandF();
-                } else if (randType != 0) {
-                    scale = Math.RandF() * (speedRandRange * Math.RandF());
-                }
-            } else if (randType == 5) {
-                scale = -(FLOAT_80330568 * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF())) - speedRandRange);
-            } else if (randType < 5) {
-                scale = Math.RandF() * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF()));
-            }
-
-            Vec velocity = *reinterpret_cast<Vec*>(particleData->m_matrix[1]);
-            pppScaleVectorXYZ(*reinterpret_cast<Vec*>(particleData->m_matrix[1]), velocity, scale);
-        }
     }
 
 done:

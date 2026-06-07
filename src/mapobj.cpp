@@ -34,7 +34,44 @@ static const float kMapObjInitNegOne = 1000000000000000.0f;
 static const float kMapObjColorBlendScale = 255.0f;
 static const float kMapObjDegToRad = 0.017453292f;
 static const float kMapObjInitValue50 = -1.0f;
-extern const char s_mapobj_cpp_801D70C0[];
+extern const char s_mapobj_cpp[] = "mapobj.cpp";
+extern const char sMapObjScaleWithoutNameWarn[0x78] = {
+    (char)0x83, (char)0x47, (char)0x83, (char)0x89, (char)0x81, (char)0x5b, (char)0x81, (char)0x49,
+    (char)0x81, (char)0x49, (char)0x81, (char)0x49, (char)0x20, (char)0x67, (char)0x72, (char)0x6f,
+    (char)0x75, (char)0x6e, (char)0x64, (char)0x5f, (char)0x61, (char)0x20, (char)0x6f, (char)0x72,
+    (char)0x20, (char)0x6f, (char)0x62, (char)0x6a, (char)0x5f, (char)0x61, (char)0x20, (char)0x83,
+    (char)0x6d, (char)0x81, (char)0x5b, (char)0x83, (char)0x68, (char)0x20, (char)0x82, (char)0xcc,
+    (char)0x83, (char)0x58, (char)0x83, (char)0x50, (char)0x81, (char)0x5b, (char)0x83, (char)0x8b,
+    (char)0x82, (char)0xaa, (char)0x20, (char)0x82, (char)0x50, (char)0x20, (char)0x82, (char)0xc5,
+    (char)0x82, (char)0xcd, (char)0x82, (char)0xc8, (char)0x82, (char)0xa2, (char)0x81, (char)0x42,
+    (char)0x0a, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x8c, (char)0xc3,
+    (char)0x82, (char)0xa2, (char)0x83, (char)0x6f, (char)0x81, (char)0x5b, (char)0x83, (char)0x57,
+    (char)0x83, (char)0x87, (char)0x83, (char)0x93, (char)0x82, (char)0xcc, (char)0x20, (char)0x82,
+    (char)0x6e, (char)0x82, (char)0x73, (char)0x82, (char)0x6c, (char)0x82, (char)0xc8, (char)0x82,
+    (char)0xcc, (char)0x82, (char)0xc5, (char)0x83, (char)0x6d, (char)0x81, (char)0x5b, (char)0x83,
+    (char)0x68, (char)0x96, (char)0xbc, (char)0x82, (char)0xcd, (char)0x95, (char)0x73, (char)0x96,
+    (char)0xbe, (char)0x82, (char)0xc5, (char)0x82, (char)0xb7, (char)0x81, (char)0x42, (char)0x00,
+};
+extern const char sMapObjScaleWithNameWarn[0x48] = {
+    (char)0x83, (char)0x47, (char)0x83, (char)0x89, (char)0x81, (char)0x5b, (char)0x81, (char)0x49,
+    (char)0x81, (char)0x49, (char)0x81, (char)0x49, (char)0x20, (char)0x67, (char)0x72, (char)0x6f,
+    (char)0x75, (char)0x6e, (char)0x64, (char)0x5f, (char)0x61, (char)0x20, (char)0x6f, (char)0x72,
+    (char)0x20, (char)0x6f, (char)0x62, (char)0x6a, (char)0x5f, (char)0x61, (char)0x20, (char)0x83,
+    (char)0x6d, (char)0x81, (char)0x5b, (char)0x83, (char)0x68, (char)0x20, (char)0x25, (char)0x73,
+    (char)0x20, (char)0x82, (char)0xcc, (char)0x83, (char)0x58, (char)0x83, (char)0x50, (char)0x81,
+    (char)0x5b, (char)0x83, (char)0x8b, (char)0x82, (char)0xaa, (char)0x20, (char)0x82, (char)0x50,
+    (char)0x20, (char)0x82, (char)0xc5, (char)0x82, (char)0xcd, (char)0x82, (char)0xc8, (char)0x82,
+    (char)0xa2, (char)0x81, (char)0x42, (char)0x0a, (char)0x00, (char)0x00, (char)0x00, (char)0x00,
+};
+extern const char sMapObjTooManyAttributesWarn[0x34] = {
+    (char)0x6e, (char)0x6f, (char)0x64, (char)0x65, (char)0x20, (char)0x25, (char)0x64, (char)0x20,
+    (char)0x82, (char)0xcd, (char)0x82, (char)0xb1, (char)0x82, (char)0xea, (char)0x88, (char)0xc8,
+    (char)0x8f, (char)0xe3, (char)0x83, (char)0x41, (char)0x83, (char)0x67, (char)0x83, (char)0x8a,
+    (char)0x83, (char)0x72, (char)0x83, (char)0x85, (char)0x81, (char)0x5b, (char)0x83, (char)0x67,
+    (char)0x82, (char)0xf0, (char)0x92, (char)0xc7, (char)0x89, (char)0xc1, (char)0x82, (char)0xc5,
+    (char)0x82, (char)0xab, (char)0x82, (char)0xdc, (char)0x82, (char)0xb9, (char)0x82, (char)0xf1,
+    (char)0x81, (char)0x42, (char)0x0a, (char)0x00,
+};
 _GXColor s_mapObjLightColor = {0xFF, 0xFF, 0xFF, 0xFF};
 
 inline void* operator new(unsigned long, void* ptr)
@@ -460,7 +497,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                     m_mapData = MapMng.GetMapHitArray() + meshOrHitIdx;
                 } else {
                     CMapObjAtrMeshName* meshName =
-                        new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp_801D70C0), 0x84) CMapObjAtrMeshName();
+                        new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x84) CMapObjAtrMeshName();
                     m_attribute = meshName;
                     char* name = chunkFile.GetString();
                     strncpy(meshName->m_name, name, 0x20);
@@ -515,9 +552,9 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             if (((m_mapDataType == 2) || (m_mapDataType == 3)) &&
                 ((kMapObjZero != m_localScaleX) || (kMapObjZero != m_localScaleY) || (kMapObjZero != m_localScaleZ))) {
                 if (m_attribute == 0) {
-                    System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0x0C));
+                    System.Printf(const_cast<char*>(sMapObjScaleWithoutNameWarn));
                 } else {
-                    System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0x84),
+                    System.Printf(const_cast<char*>(sMapObjScaleWithNameWarn),
                                   reinterpret_cast<CMapObjAtrMeshName*>(m_attribute)->m_name);
                 }
                 m_localScaleX = kMapObjZero;
@@ -535,10 +572,10 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         }
         case CHUNK_MIME: {
             if (m_attribute != 0) {
-                System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
+                System.Printf(const_cast<char*>(sMapObjTooManyAttributesWarn), objIndex);
             }
             CMapObjAtrMime* mimeAttr =
-                new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp_801D70C0), 0x33B) CMapObjAtrMime();
+                new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x33B) CMapObjAtrMime();
             CMapObjAtrMime* mime = mimeAttr;
 
             chunkFile.PushChunk();
@@ -554,7 +591,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                     mime->m_vertexListCount = static_cast<unsigned char>(mimeChunk.m_arg0);
                     mime->m_vertexLists = reinterpret_cast<float**>(
                         operator new[](static_cast<unsigned long>(mime->m_vertexListCount) << 2,
-                                       MapMng.m_stage, const_cast<char*>(s_mapobj_cpp_801D70C0), 0x348));
+                                       MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x348));
 
                     chunkFile.PushChunk();
                     CChunkFile::CChunk vtxChunk;
@@ -563,7 +600,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                         if (vtxChunk.m_id == CHUNK_VTX) {
                             float* vtx = reinterpret_cast<float*>(operator new[](
                                 static_cast<unsigned long>(vtxChunk.m_arg0) * 0xC,
-                                MapMng.m_stage, const_cast<char*>(s_mapobj_cpp_801D70C0), 0x353));
+                                MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x353));
                             mime->m_vertexLists[vtxTableIndex] = vtx;
                             vtxTableIndex++;
                             mime->m_vertexCount = static_cast<int>(vtxChunk.m_arg0);
@@ -585,10 +622,10 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         }
         case CHUNK_SLIT: {
             if (m_attribute != 0) {
-                System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
+                System.Printf(const_cast<char*>(sMapObjTooManyAttributesWarn), objIndex);
             }
             CMapObjAtrSpotLight* spotLightAttr =
-                new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp_801D70C0), 0x139) CMapObjAtrSpotLight();
+                new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x139) CMapObjAtrSpotLight();
             CMapObjAtrSpotLight* spotLight = spotLightAttr;
 
             if (chunk.m_version == 6) {
@@ -704,7 +741,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         }
         case CHUNK_ANIM: {
             CMapAnimRun* animRun = static_cast<CMapAnimRun*>(
-                operator new(sizeof(CMapAnimRun), MapMng.m_stage, const_cast<char*>(s_mapobj_cpp_801D70C0), 0x21E));
+                operator new(sizeof(CMapAnimRun), MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x21E));
             if (animRun != 0) {
                 animRun->m_currentFrame = -1;
             }
@@ -731,10 +768,10 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         }
         case CHUNK_PLIT: {
             if (m_attribute != 0) {
-                System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
+                System.Printf(const_cast<char*>(sMapObjTooManyAttributesWarn), objIndex);
             }
             CMapObjAtrPointLight* pointLightAttr =
-                new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp_801D70C0), 0xD4) CMapObjAtrPointLight();
+                new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0xD4) CMapObjAtrPointLight();
             CMapObjAtrPointLight* pointLight = pointLightAttr;
 
             if (chunk.m_version == 2) {
@@ -808,10 +845,10 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         }
         case CHUNK_PSTA: {
             if (m_attribute != 0) {
-                System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
+                System.Printf(const_cast<char*>(sMapObjTooManyAttributesWarn), objIndex);
             }
             CMapObjAtrPlaySta* playSta =
-                new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp_801D70C0), 0x39B) CMapObjAtrPlaySta();
+                new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x39B) CMapObjAtrPlaySta();
             playSta->m_playStaNo = chunkFile.Get1();
             m_attribute = playSta;
             break;

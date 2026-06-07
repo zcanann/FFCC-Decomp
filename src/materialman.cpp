@@ -2368,7 +2368,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
 
     CMaterial* material = 0;
     CChunkFile::CChunk chunk;
-    CPtrArray<CMaterial*>* materials = &m_materials;
+    unsigned long materialIndex = 0;
 
     chunkFile.PushChunk();
     while (chunkFile.GetNextChunk(chunk) != 0) {
@@ -2380,19 +2380,15 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
         while (chunkFile.GetNextChunk(chunk) != 0) {
             switch (chunk.m_id) {
             case CHUNK_TIDX: {
-                unsigned long materialIndex = 0;
-                while (materialIndex < static_cast<unsigned long>(materials->GetSize())) {
-                    if ((*materials)[materialIndex] == 0) {
+                for (materialIndex = 0;
+                     materialIndex < static_cast<unsigned long>(m_materials.GetSize());
+                     materialIndex++) {
+                    if (m_materials[materialIndex] == 0) {
                         break;
                     }
-                    materialIndex++;
                 }
 
                 material = AllocMaterial();
-                if (material == 0) {
-                    continue;
-                }
-
                 material->m_tevBit = static_cast<unsigned long>(tevBit);
                 material->m_bumpLight = 0;
                 material->m_textureCount = 0;
@@ -2412,32 +2408,19 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     }
                 }
 
-                if (materialIndex < static_cast<unsigned long>(materials->GetSize())) {
-                    materials->SetAt(materialIndex, material);
+                if (materialIndex < static_cast<unsigned long>(m_materials.GetSize())) {
+                    m_materials.SetAt(materialIndex, material);
                 } else {
-                    materials->Add(material);
+                    m_materials.Add(material);
                 }
             } break;
             case CHUNK_NAME: {
-                if (material != 0) {
-                    strncpy(material->m_name, chunkFile.GetString(), 0x10);
-                } else {
-                    chunkFile.GetString();
-                }
+                material = m_materials[materialIndex];
+                strncpy(material->m_name, chunkFile.GetString(), 0x10);
             } break;
             case CHUNK_ATTR: {
+                material = m_materials[materialIndex];
                 unsigned int flags = chunkFile.Get4();
-                if (material == 0) {
-                    chunkFile.Get1();
-                    chunkFile.Get1();
-                    chunkFile.Get1();
-                    chunkFile.Get1();
-                    chunkFile.Get2();
-                    chunkFile.Get2();
-                    chunkFile.GetF4();
-                    continue;
-                }
-
                 if ((flags & 1) != 0) {
                     material->m_tevBit |= 0x80;
                 }
@@ -2460,126 +2443,87 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 chunkFile.GetF4();
             } break;
             case CHUNK_FUR: {
-                unsigned short textureIndex = chunkFile.Get2();
-                if (material != 0) {
-                    AddTextureIndex(material, textureIndex);
-                    material->m_singleTextureFlag = 1;
-                }
+                material = m_materials[materialIndex];
+                AddTextureIndex(material, chunkFile.Get2());
+                material->m_singleTextureFlag = 1;
             } break;
             case CHUNK_BUMP: {
                 unsigned char bumpLightDirect = 0;
                 if (chunk.m_version == 1) {
                     bumpLightDirect = chunkFile.Get1();
-                    if (material != 0) {
-                        material->m_fogEnable = chunkFile.Get1();
-                    } else {
-                        chunkFile.Get1();
-                    }
+                    material->m_fogEnable = chunkFile.Get1();
                     chunkFile.Get2();
                 }
 
-                unsigned short texture0 = chunkFile.Get2();
-                unsigned short texture1 = chunkFile.Get2();
+                material = m_materials[materialIndex];
+                AddTextureIndex(material, chunkFile.Get2());
+                AddTextureIndex(material, chunkFile.Get2());
                 unsigned short bumpIndex = chunkFile.Get2();
-                unsigned short texture2 = chunkFile.Get2();
-                float scaleU = chunkFile.GetF4();
-                float scaleV = chunkFile.GetF4();
-                unsigned char a6 = static_cast<unsigned char>(chunkFile.Get4());
-                unsigned int rgba = chunkFile.Get4();
+                AddTextureIndex(material, chunkFile.Get2());
+                material->m_scaleU = kTextureOne / chunkFile.GetF4();
+                material->m_scaleV = kTextureOne / chunkFile.GetF4();
+                material->m_unkA6 = static_cast<unsigned char>(chunkFile.Get4());
+                SetMaterialColor(material, chunkFile.Get4());
+                material->m_materialType = 1;
 
-                if (material != 0) {
-                    AddTextureIndex(material, texture0);
-                    AddTextureIndex(material, texture1);
-                    AddTextureIndex(material, texture2);
-
-                    material->m_scaleU = kTextureOne / scaleU;
-                    material->m_scaleV = kTextureOne / scaleV;
-                    material->m_unkA6 = a6;
-                    SetMaterialColor(material, rgba);
-                    material->m_materialType = 1;
-
-                    CLightPcs::CBumpLight* bumpLight = bumpLights;
-                    if (bumpLight == 0) {
-                        bumpLight = GetMapBumpLight(bumpIndex);
-                        material->m_bumpLightDirect = (bumpLightDirect == 0) ? 0 : 1;
-                    } else {
-                        material->m_bumpLightDirect = 1;
-                    }
-
-                    material->m_bumpLight = bumpLight;
-                    bumpLight->m_useViewSpace = material->m_materialType;
-                    material->m_tevBit |= 4;
-                }
-            } break;
-            case CHUNK_JIME: {
-                unsigned short texture0 = chunkFile.Get2();
-                unsigned short texture1 = chunkFile.Get2();
-                unsigned short bumpIndex = chunkFile.Get2();
-                unsigned char a1 = chunkFile.Get1();
-                unsigned char useJimen = chunkFile.Get1();
-                float scaleU = chunkFile.GetF4();
-                float scaleV = chunkFile.GetF4();
-                chunkFile.Get4();
-                unsigned int rgba = chunkFile.Get4();
-
-                if (material != 0) {
-                    AddTextureIndex(material, texture0);
-                    AddTextureIndex(material, texture1);
-                    material->m_fogEnable = a1;
-                    if (useJimen != 0) {
-                        material->m_tevBit |= 0x20000;
-                    }
-                    material->m_scaleU = kTextureOne / scaleU;
-                    material->m_scaleV = kTextureOne / scaleV;
-                    material->m_materialType = 3;
-
-                    CLightPcs::CBumpLight* bumpLight =
-                        GetMapBumpLight(bumpIndex);
-                    material->m_bumpLight = bumpLight;
-                    bumpLight->m_useViewSpace = material->m_materialType;
-                    material->m_tevBit |= 0x4000;
-                    SetMaterialColor(material, rgba);
+                CLightPcs::CBumpLight* bumpLight = bumpLights;
+                if (bumpLight == 0) {
+                    bumpLight = GetMapBumpLight(bumpIndex);
+                    material->m_bumpLightDirect = (bumpLightDirect == 0) ? 0 : 1;
+                } else {
                     material->m_bumpLightDirect = 1;
                 }
+
+                material->m_bumpLight = bumpLight;
+                bumpLight->m_useViewSpace = material->m_materialType;
+                material->m_tevBit |= 4;
+            } break;
+            case CHUNK_JIME: {
+                material = m_materials[materialIndex];
+                AddTextureIndex(material, chunkFile.Get2());
+                AddTextureIndex(material, chunkFile.Get2());
+                unsigned short bumpIndex = chunkFile.Get2();
+                material->m_fogEnable = chunkFile.Get1();
+                if (chunkFile.Get1() != 0) {
+                    material->m_tevBit |= 0x20000;
+                }
+                material->m_scaleU = kTextureOne / chunkFile.GetF4();
+                material->m_scaleV = kTextureOne / chunkFile.GetF4();
+                material->m_materialType = 3;
+
+                CLightPcs::CBumpLight* bumpLight = GetMapBumpLight(bumpIndex);
+                material->m_bumpLight = bumpLight;
+                bumpLight->m_useViewSpace = material->m_materialType;
+                material->m_tevBit |= 0x4000;
+                chunkFile.Get4();
+                SetMaterialColor(material, chunkFile.Get4());
+                material->m_bumpLightDirect = 1;
             } break;
             case CHUNK_WATR: {
-                unsigned short texture0 = chunkFile.Get2();
-                unsigned short texture1 = chunkFile.Get2();
+                material = m_materials[materialIndex];
+                AddTextureIndex(material, chunkFile.Get2());
+                AddTextureIndex(material, chunkFile.Get2());
                 unsigned short bumpIndex = chunkFile.Get2();
                 unsigned char waterMode = chunkFile.Get1();
-                unsigned char a1 = chunkFile.Get1();
-                float scaleU = chunkFile.GetF4();
-                float scaleV = chunkFile.GetF4();
+                material->m_fogEnable = chunkFile.Get1();
+                material->m_scaleU = kTextureOne / chunkFile.GetF4();
+                material->m_scaleV = kTextureOne / chunkFile.GetF4();
+                material->m_materialType = 2;
+
+                CLightPcs::CBumpLight* bumpLight = GetMapBumpLight(bumpIndex);
+                material->m_bumpLight = bumpLight;
+                bumpLight->m_useViewSpace = material->m_materialType;
+                material->m_blendMode = 4;
                 chunkFile.Get4();
-                unsigned int rgba = chunkFile.Get4();
+                SetMaterialColor(material, chunkFile.Get4());
 
-                if (material != 0) {
-                    AddTextureIndex(material, texture0);
-                    AddTextureIndex(material, texture1);
-                    material->m_fogEnable = a1;
-                    material->m_scaleU = kTextureOne / scaleU;
-                    material->m_scaleV = kTextureOne / scaleV;
-                    material->m_materialType = 2;
-
-                    CLightPcs::CBumpLight* bumpLight =
-                        GetMapBumpLight(bumpIndex);
-                    material->m_bumpLight = bumpLight;
-                    bumpLight->m_useViewSpace = material->m_materialType;
-                    material->m_blendMode = 4;
-                    SetMaterialColor(material, rgba);
-
-                    if ((waterMode == 0) && (material->m_fogEnable == 0)) {
-                        material->m_tevBit |= 8;
-                    } else {
-                        material->m_tevBit |= 0x80000;
-                    }
+                if ((waterMode == 0) && (material->m_fogEnable == 0)) {
+                    material->m_tevBit |= 8;
+                } else {
+                    material->m_tevBit |= 0x80000;
                 }
             } break;
             case CHUNK_TSCL: {
-                if (material == 0) {
-                    continue;
-                }
-
                 if (chunk.m_version == 1) {
                     CMapKeyFrame* keyFrameU = 0;
                     CMapKeyFrame* keyFrameV = 0;

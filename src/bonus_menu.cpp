@@ -3474,25 +3474,26 @@ void CMenuPcs::createBonus()
 			}
 		}
 
-		CCharaPcs::CHandle** displaySlots = GetBonusDisplayHandleSlots(this);
 		for (int i = 0; i < 0x18; i++) {
-			displaySlots[i] = 0;
+			this->m_wm.m_handles[i] = 0;
 		}
 
+		CCharaPcs::CHandle** slot = this->m_wm.m_handles;
 		for (int i = 0; i < s_Rinfo->m_partyCount * 2; i++) {
-			BonusPartySummary& entry = s_Rinfo->m_party[i % s_Rinfo->m_partyCount];
-			unsigned long modelCode = entry.m_partySlot + 0x83;
-			if (i < s_Rinfo->m_partyCount) {
-				modelCode = entry.m_partySlot + 0x87;
-			}
 			CCharaPcs::CHandle* handle =
 			    new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0x183) CCharaPcs::CHandle;
-			displaySlots[i] = handle;
-			handle->Add();
-			handle->LoadModel(3, modelCode & 0xFFF, (modelCode >> 12) & 0xF, 0, -1, 0, 0);
-			handle->m_flags = 0x300543;
+			slot[0] = handle;
+			slot[0]->Add();
+			unsigned long modelCode = s_Rinfo->m_party[i % s_Rinfo->m_partyCount].m_partySlot + 0x83;
+			if (i < s_Rinfo->m_partyCount) {
+				modelCode = s_Rinfo->m_party[i % s_Rinfo->m_partyCount].m_partySlot + 0x87;
+			}
+			slot[0]->LoadModel(3, modelCode & 0xFFF, (modelCode >> 12) & 0xF, 0, -1, 0, 0);
+			slot = (CCharaPcs::CHandle**)((char*)slot + 4);
+			slot[-1]->m_flags = 0x300543;
 		}
 
+		CCharaPcs::CHandle** displaySlots = GetBonusDisplayHandleSlots(this);
 		int handleIndex = s_Rinfo->m_partyCount * 2;
 		short* rewardItems = &s_Rinfo->m_tempArtifacts[0];
 		for (int artifactIndex = 0; artifactIndex < 8; artifactIndex++) {

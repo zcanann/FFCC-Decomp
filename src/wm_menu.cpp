@@ -2297,7 +2297,7 @@ void CMenuPcs::CalcLoadMenu()
 	switch (iVar10) {
 	case 0:
 	case 2:
-		if (m_wmWorldState->m_flag09 == 0) {
+		if (static_cast<signed char>(m_wmWorldState->m_flag09) == 0) {
 			m_wmWorldState->m_cardChannel = (short)mcCtrl.m_cardChannel;
 			CFont* pFont = m_fonts[0];
 			pFont->SetMargin(fVar2);
@@ -2370,7 +2370,7 @@ void CMenuPcs::CalcLoadMenu()
 		m_wmWorldState->m_mcResult = (short)MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
 		break;
 	case 4:
-		if (m_wmWorldState->m_flag09 == 0) {
+		if (static_cast<signed char>(m_wmWorldState->m_flag09) == 0) {
 			CFont* pFont = m_fonts[0];
 			pFont->SetMargin(FLOAT_803313e8);
 			pFont->SetShadow(0);
@@ -2441,7 +2441,7 @@ void CMenuPcs::CalcLoadMenu()
 	case 0x18:
 	case 0x1B:
 	case 0x1C: {
-		if (m_wmWorldState->m_flag09 == 0) {
+		if (static_cast<signed char>(m_wmWorldState->m_flag09) == 0) {
 			bVar1 = true;
 			int uVar22 = 0;
 			int uVar19;
@@ -2540,7 +2540,7 @@ void CMenuPcs::CalcLoadMenu()
 	case 8:
 	case 0xB:
 	case 0x19: {
-		if (m_wmWorldState->m_flag09 == 0) {
+		if (static_cast<signed char>(m_wmWorldState->m_flag09) == 0) {
 			int uVar22 = 0;
 			int uVar19;
 			if (iVar10 == 8) {
@@ -2638,7 +2638,7 @@ void CMenuPcs::CalcLoadMenu()
 		break;
 	}
 	case 0xC: {
-		if (m_wmWorldState->m_flag09 == 0) {
+		if (static_cast<signed char>(m_wmWorldState->m_flag09) == 0) {
 			m_wmWorldState->m_flag09 = 1;
 			memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
 			mcCtrl.m_previousState = 0;
@@ -2753,7 +2753,7 @@ void CMenuPcs::CalcLoadMenu()
 	case 0xD:
 	case 0x16:
 	case 0x1A: {
-		if (m_wmWorldState->m_flag09 == 0) {
+		if (static_cast<signed char>(m_wmWorldState->m_flag09) == 0) {
 			int uVar22 = 0;
 			int uVar19;
 			if (iVar10 == 0xD) { uVar19 = 7; }

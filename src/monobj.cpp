@@ -700,7 +700,8 @@ void CGMonObj::onCancelStat(int state)
 		m_actionBranch = 1;
 		object->SetAnimSlot(0, 0);
 		object->SetAnimSlot(4, 4);
-		object->m_bgColMask = (object->m_bgColMask | 0x50000) & 0xFFFFFFF7;
+		object->m_bgColMask |= 0x50000;
+		object->m_bgColMask &= 0xFFFFFFF7;
 		object->m_objectFlags &= 0xFFFFFFEF;
 		break;
 	}

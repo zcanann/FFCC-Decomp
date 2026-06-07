@@ -2819,8 +2819,8 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* sprite = &sprites[nameBase + i];
-			BonusAnimSprite* icon = &sprites[iconBase + i];
+			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + (nameBase + i) * 0x40 + 8);
+			BonusAnimSprite* icon = (BonusAnimSprite*)((int)sprite - 3 * activePartyCount * 0x40);
 			sprite->kind = -1;
 			sprite->x = (short)(icon->x + 0x50);
 			sprite->y = (short)(icon->y + 0x48);
@@ -2834,8 +2834,8 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* sprite = &sprites[labelBase + i];
-			BonusAnimSprite* name = &sprites[nameBase + i];
+			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + (labelBase + i) * 0x40 + 8);
+			BonusAnimSprite* name = (BonusAnimSprite*)((int)sprite - activePartyCount * 0x40);
 			sprite->kind = -1;
 			sprite->x = 0xb8;
 			sprite->y = (short)(name->y + 0x15);
@@ -2848,24 +2848,26 @@ void CMenuPcs::CalcResultOpenAnim()
 			sprite->depth = 1.0f;
 		}
 		int countBase = labelBase + activePartyCount;
-		BonusAnimSprite* count = &sprites[countBase];
-		count->kind = 0x19;
-		count->x = (short)((0x280 - 0x140) >> 1);
-		count->y = 0x10;
-		count->w = 0x140;
-		count->h = 0x28;
-		count->mulX = 0.0f;
-		count->mulY = 0.0f;
-		count->startFrame = sprites[1].startFrame;
-		count->duration = 8;
-		count->duration = 10;
-		count->depth = 1.0f;
+		{
+			BonusAnimSprite* count = (BonusAnimSprite*)(this->m_bonusAnimPtr + countBase * 0x40 + 8);
+			count->kind = 0x19;
+			count->x = (short)((0x280 - 0x140) >> 1);
+			count->y = 0x10;
+			count->w = 0x140;
+			count->h = 0x28;
+			count->mulX = 0.0f;
+			count->mulY = 0.0f;
+			count->startFrame = ((BonusAnimSprite*)(this->m_bonusAnimPtr + 8))[1].startFrame;
+			count->duration = 8;
+			count->duration = 10;
+			count->depth = 1.0f;
+		}
 		int countTop = labelBase + activePartyCount + 1;
 		s_CntTop = (unsigned char)countTop;
 
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* sprite = &sprites[countTop + i];
-			BonusAnimSprite* count = &sprites[countBase];
+			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + (countTop + i) * 0x40 + 8);
+			BonusAnimSprite* count = (BonusAnimSprite*)(this->m_bonusAnimPtr + countBase * 0x40 + 8);
 			sprite->kind = 0x19;
 			sprite->x = 0x200;
 			sprite->y = (short)(count->y + 0xC);
@@ -2881,7 +2883,7 @@ void CMenuPcs::CalcResultOpenAnim()
 		MenuBoardEntry* boardEntries = GetBonusBoardEntries(this);
 		for (int i = 0; i < activePartyCount; i++) {
 			MenuBoardEntry& entry = boardEntries[i];
-			BonusAnimSprite* sprite = &sprites[iconBase + i];
+			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + (iconBase + i) * 0x40 + 8);
 			int centerX = (int)((double)(float)((double)sprite->w * 0.5 + (double)((float)sprite->x + 24.0f)) - 320.0);
 			int centerY = (int)((double)(float)((double)sprite->h * 0.5 + (double)sprite->y) - 240.0);
 			entry.m_centerX = (short)centerX;
@@ -2894,7 +2896,7 @@ void CMenuPcs::CalcResultOpenAnim()
 
 		for (int i = 0; i < activePartyCount; i++) {
 			MenuBoardEntry& entry = boardEntries[activePartyCount + i];
-			BonusAnimSprite* sprite = &sprites[countTop + i];
+			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + (countTop + i) * 0x40 + 8);
 			int extent = sprite->w * 3 + 0x20;
 			int centerX = (int)((double)(float)((double)(sprite->w * 3) * 0.5 + (double)sprite->x) - 320.0);
 			int centerY = (int)((double)(float)((double)sprite->h * 0.5 + (double)sprite->y) - 240.0);
@@ -2908,7 +2910,7 @@ void CMenuPcs::CalcResultOpenAnim()
 
 		for (int i = 0; i < activePartyCount; i++) {
 			MenuBoardEntry& entry = boardEntries[activePartyCount * 2 + i];
-			BonusAnimSprite* sprite = &sprites[frameBase + i];
+			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + (frameBase + i) * 0x40 + 8);
 			int centerY = (int)((double)(float)((double)sprite->h * 0.5 + (double)sprite->y) - 240.0);
 			entry.m_centerX = 0;
 			entry.m_centerY = (short)centerY;

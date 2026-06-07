@@ -4724,16 +4724,16 @@ void CMenuPcs::DrawLoadMenu()
 void CMenuPcs::DrawTitleMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	Mtx m_cameraMatrix;
 	WmWorldState* const typedWorldState = m_wmWorldState;
 	short state = typedWorldState->m_mainState;
 
 		if (state == 0 && typedWorldState->m_worldReady != 0) {
 			if (m_wmThpActive != 0) {
 				THPSimpleDrawCurrentFrame((_GXRenderModeObj*)DAT_80238028, 0, 0, 0x280, 0x1C0);
+				Graphic._WaitDrawDone(const_cast<char*>(s_wm_menu_cpp), 0x12A2);
 			}
 		short sVarE = typedWorldState->m_state0E;
-		if (sVarE != 0 || typedWorldState->m_frameCounter > 0xB42) {
+		if (sVarE != 0 || typedWorldState->m_frameCounter >= 0xB43) {
 			if (sVarE != -1) {
 				THPSimpleAudioStop();
 				THPSimpleLoadStop();
@@ -4763,24 +4763,24 @@ void CMenuPcs::DrawTitleMenu()
 		GXSetProjection(projMtx, GX_PERSPECTIVE);
 
 		Vec eye = { FLOAT_803313dc, FLOAT_803313dc, FLOAT_80331768 };
-		Vec target = { FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc };
-		Vec up = { FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc };
+		CVector target(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
+		CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
 		Mtx lookAtMtx;
-		C_MTXLookAt(lookAtMtx, &eye, &up, &target);
-		PSMTXCopy(CameraPcs.m_cameraMatrix, m_cameraMatrix);
+		C_MTXLookAt(lookAtMtx, &eye, reinterpret_cast<Vec*>(&up), reinterpret_cast<Point3d*>(&target));
+		PSMTXCopy(CameraPcs.m_cameraMatrix, m_wm.m_cameraMatrix);
 		PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 		CharaPcs.InitEnv(5);
 		GXSetColorUpdate(0);
 		GXSetAlphaUpdate(0);
-		unsigned int clearColor = 0;
-		GXSetCopyClear(*(_GXColor*)&clearColor, 0xFFFFFF);
+		_GXColor clearColor = CColor(0, 0, 0, 0).color;
+		GXSetCopyClear(clearColor, 0xFFFFFF);
 		GXSetColorUpdate(1);
 		GXSetAlphaUpdate(1);
 		GXSetViewport(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e0, FLOAT_803313e4,
 		              FLOAT_803313dc, FLOAT_803313e8);
 
 		PartPcs.DrawMenuIdx(m_effectWork[23].m_partNo);
-		PSMTXCopy(m_cameraMatrix, CameraPcs.m_cameraMatrix);
+		PSMTXCopy(m_wm.m_cameraMatrix, CameraPcs.m_cameraMatrix);
 		GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0xFFFFFF);
 
 		Mtx44 projMtx2;

@@ -10159,14 +10159,29 @@ void CMenuPcs::DrawMcObj()
  */
 void CMenuPcs::SetMcList(int index, McListInfo* info)
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const list = m_wmWorkBuffer;
+	unsigned char* const list = m_wmCharaState;
 	if (list == 0 || info == 0 || index < 0 || index >= kMcListCount) {
 		return;
 	}
 	unsigned char* const dst = list + index * kMcListEntrySize;
-	memcpy(dst, info, kMcListEntrySize);
-	dst[0x43] = 0;
+	unsigned char* const src = reinterpret_cast<unsigned char*>(info);
+	unsigned int* const dstWords = reinterpret_cast<unsigned int*>(dst);
+	unsigned int* const srcWords = reinterpret_cast<unsigned int*>(src);
+	dstWords[0] = srcWords[0];
+	dstWords[1] = srcWords[1];
+	dstWords[2] = srcWords[2];
+	dstWords[3] = srcWords[3];
+	dstWords[4] = srcWords[4];
+	dstWords[5] = srcWords[5];
+	dstWords[6] = srcWords[6];
+	dstWords[7] = srcWords[7];
+	dstWords[8] = srcWords[8];
+	dstWords[9] = srcWords[9];
+	dstWords[10] = srcWords[10];
+	memcpy(dst + 0x2C, src + 0x2C, 0x15);
+	dst[0x41] = src[0x41];
+	dst[0x42] = src[0x42];
+	dst[0x43] = src[0x43];
 }
 
 /*

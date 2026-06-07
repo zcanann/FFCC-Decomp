@@ -2674,7 +2674,21 @@ int CMenuPcs::CmakeNameCtrl()
                     return 0;
                 }
 
-                if (IsCmakeNameBlank(s_CmakeInfo.m_name)) {
+                int nameLen = strlen(s_CmakeInfo.m_name);
+                int spaceCount = 0;
+                const char* scan = s_CmakeInfo.m_name;
+                int remain = nameLen;
+                if (0 < nameLen) {
+                    do {
+                        if (*scan != ' ') {
+                            break;
+                        }
+                        scan = scan + 1;
+                        spaceCount = spaceCount + 1;
+                        remain = remain - 1;
+                    } while (remain != 0);
+                }
+                if (spaceCount == nameLen) {
                     Sound.PlaySe(4, 0x40, 0x7F, 0);
                     return 0;
                 }

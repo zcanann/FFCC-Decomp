@@ -1731,7 +1731,6 @@ void CMenuPcs::LetterListDraw()
 	int letterIndex;
 	for (int row = 0; row < 9 && (letterIndex = topRow + row) < caravanWork->m_letterCount; ++row) {
 		CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[letterIndex];
-		const unsigned int letterWord = letter->Word0();
 
 		int tlut;
 		if (!letter->IsOpened()) {
@@ -1744,12 +1743,12 @@ void CMenuPcs::LetterListDraw()
 
 		font->SetTlut(tlut);
 
-		const char* from = Game.m_cFlatDataArr[1].TableStrings(5)[(letterWord & 0x7FC) >> 2];
+		const char* from = Game.m_cFlatDataArr[1].TableStrings(5)[(letter->Word0() & 0x7FC) >> 2];
 		font->SetPosX(FLOAT_80333160);
 		font->SetPosY(static_cast<float>(y) - FLOAT_80333148);
 		font->Draw(from);
 
-		const char* subject = Game.m_cFlatDataArr[1].TableStrings(2)[(letterWord >> 7) & 0x1FF];
+		const char* subject = Game.m_cFlatDataArr[1].TableStrings(2)[(letter->Word0() >> 7) & 0x1FF];
 		font->SetPosX(FLOAT_80333164);
 		font->SetPosY(static_cast<float>(y) - FLOAT_80333148);
 		font->Draw(subject);

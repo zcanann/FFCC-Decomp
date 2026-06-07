@@ -3122,13 +3122,13 @@ int CMaterial::Set(_GXTexMapID texMapId)
     Mtx texMtx;
     PSMTXIdentity(texMtx);
 
-    bool hasDualScroll = false;
+    int hasDualScroll = 0;
     if ((m_textureCount == 2) &&
         (kTextureZero == GetTexScroll(0)->m_u0) &&
         (kTextureZero == GetTexScroll(0)->m_v0) &&
         ((kTextureZero != GetTexScroll(1)->m_u0) ||
          (kTextureZero != GetTexScroll(1)->m_v0))) {
-        hasDualScroll = true;
+        hasDualScroll = 1;
     }
 
     for (int i = 0; i < static_cast<int>(m_textureCount); i++) {
@@ -3139,13 +3139,12 @@ int CMaterial::Set(_GXTexMapID texMapId)
 
             if ((GetTexScroll(i)->m_u0 != kTextureZero) ||
                 ((GetTexScroll(i)->m_v0 != kTextureZero) || hasDualScroll)) {
-                texMtx[0][3] = GetTexScroll(i)->m_u0;
-                texMtx[1][3] = GetTexScroll(i)->m_v0;
-
                 if (i == 0) {
                     MaterialMan.m_curEnvTevBit |= 0x20;
                     MaterialMan.m_texScroll0TexMtx = MaterialMan.m_texMtxCur;
                     MaterialMan.m_texScroll0TexCoord = MaterialMan.m_texCoordIdCur;
+                    texMtx[0][3] = GetTexScroll(i)->m_u0;
+                    texMtx[1][3] = GetTexScroll(i)->m_v0;
                     GXLoadTexMtxImm(texMtx, MaterialMan.m_texMtxCur, GX_MTX2x4);
                     GXSetTexCoordGen2(
                         static_cast<GXTexCoordID>(MaterialMan.m_texCoordIdCur),
@@ -3158,6 +3157,8 @@ int CMaterial::Set(_GXTexMapID texMapId)
                     MaterialMan.m_curEnvTevBit |= 0x40;
                     MaterialMan.m_texScroll1TexMtx = MaterialMan.m_texMtxCur;
                     MaterialMan.m_texScroll1TexCoord = MaterialMan.m_texCoordIdCur;
+                    texMtx[0][3] = GetTexScroll(i)->m_u0;
+                    texMtx[1][3] = GetTexScroll(i)->m_v0;
                     GXLoadTexMtxImm(texMtx, MaterialMan.m_texMtxCur, GX_MTX2x4);
                     GXSetTexCoordGen2(
                         static_cast<GXTexCoordID>(MaterialMan.m_texCoordIdCur),

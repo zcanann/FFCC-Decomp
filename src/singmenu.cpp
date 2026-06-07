@@ -1447,10 +1447,10 @@ void CMenuPcs::SingCalcChara(float frameStep)
 {
     CChara::CModel* model = m_wm.m_handles[0]->m_model;
 
-    if (model->m_curFrame >= model->m_animEnd) {
-        model->SetFrame(0.0f);
-    } else {
+    if (model->m_animEnd < model->m_curFrame) {
         model->AddFrame(frameStep);
+    } else {
+        model->SetFrame(0.0f);
     }
 
     unsigned short modelScaleIndex = SingleCaravanWork()->m_tribeId;
@@ -1761,10 +1761,10 @@ void CMenuPcs::SingleCalcFadeIn()
     }
 
     CChara::CModel* model = m_wm.m_handles[0]->m_model;
-    if (model->m_curFrame >= model->m_animEnd) {
-        model->SetFrame(0.0f);
-    } else {
+    if (model->m_animEnd < model->m_curFrame) {
         model->AddFrame(1.0f);
+    } else {
+        model->SetFrame(0.0f);
     }
 
     unsigned short modelScaleIndex = SingleCaravanWork()->m_tribeId;
@@ -1864,10 +1864,10 @@ void CMenuPcs::SingleCalcFadeOut()
     }
 
     CChara::CModel* model = m_wm.m_handles[0]->m_model;
-    if (model->m_curFrame >= model->m_animEnd) {
-        model->SetFrame(0.0f);
-    } else {
+    if (model->m_animEnd < model->m_curFrame) {
         model->AddFrame(1.0f);
+    } else {
+        model->SetFrame(0.0f);
     }
 
     unsigned short modelScaleIndex = SingleCaravanWork()->m_tribeId;
@@ -1934,10 +1934,10 @@ void CMenuPcs::SingleCalcCtrl()
 
     unsigned short result = 0;
     CChara::CModel* model = m_wm.m_handles[0]->m_model;
-    if (model->m_curFrame >= model->m_animEnd) {
-        model->SetFrame(0.0f);
-    } else {
+    if (model->m_animEnd < model->m_curFrame) {
         model->AddFrame(1.0f);
+    } else {
+        model->SetFrame(0.0f);
     }
 
     unsigned short modelScaleIndex = SingleCaravanWork()->m_tribeId;

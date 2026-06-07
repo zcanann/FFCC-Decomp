@@ -67,7 +67,7 @@ struct SingMenuSoloNameTable
     char* entries[9];
 };
 
-char s_singmenu_cpp[] = "singmenu.cpp";
+extern char s_singmenu_cpp[];
 extern "C" char* s_singMenuTexturePathFmt;
 extern "C" char s_singMenuSubfontPathFmt[];
 extern "C" char* PTR_s_Tutti_802143ec;

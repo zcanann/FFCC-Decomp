@@ -39,7 +39,10 @@ struct PartyObjOverlay {
     unsigned char _pad6B9[3];
     int unk6BC;
     int unk6C0;
-    unsigned char commandFlags;
+    union {
+        unsigned char commandFlags;
+        PartyObjFlags commandFlagBits;
+    };
     unsigned char _pad6C5[3];
     int attackSel;
     int unk6CC;

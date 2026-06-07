@@ -828,8 +828,8 @@ void CGPartyObj::onFrameAlways()
 			}
 			party.weaponItem = weaponRef;
 			party.pendingWeaponItem = weaponItem;
-			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->SetCurrentWeaponIdx(weaponRef);
-			party.commandFlags &= 0xDF;
+			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->SetCurrentWeaponIdx(party.weaponItem);
+			party.commandFlagBits.flag20 = 0;
 		}
 
 		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
@@ -993,11 +993,11 @@ void CGPartyObj::onFramePreCalc()
 			party.weaponItem = weaponItem;
 			party.pendingWeaponItem = weaponRef;
 			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->SetCurrentWeaponIdx(party.weaponItem);
-			party.commandFlags &= 0xDF;
+			party.commandFlagBits.flag20 = 0;
 		} else {
 			*reinterpret_cast<int*>(self + 0x6D4) = weaponItem;
 			party.weaponRef = weaponRef;
-			party.commandFlags = (party.commandFlags & 0xDF) | 0x20;
+			party.commandFlagBits.flag20 = 1;
 			changeStat(0x0F, 0, 0);
 		}
 	}
@@ -1816,7 +1816,7 @@ void CGPartyObj::onFrameStat()
 			party.pendingWeaponItem = weaponRef;
 			party.weaponItem = weaponItem;
 			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->SetCurrentWeaponIdx(weaponRef);
-			party.commandFlags &= 0xDF;
+			party.commandFlagBits.flag20 = 0;
 		}
 		if (isLoopAnim() != 0) {
 			changeStat(0, 0, 0);

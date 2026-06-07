@@ -1074,8 +1074,14 @@ void CGMonObj::onFrameStat()
 						} else {
 							float speedScale = *reinterpret_cast<float*>(mon + 0x690) *
 								(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(script9b + 0xD4)) + 0.8f);
-							Vec delta = reinterpret_cast<CGObject*>(Game.m_partyObjArr[m_targetPartyIndex])->m_worldPosition;
-							PSVECSubtract(&delta, &object->m_worldPosition, &delta);
+							CVector targetVec(reinterpret_cast<CGObject*>(Game.m_partyObjArr[m_targetPartyIndex])->m_worldPosition);
+							CVector myVec(object->m_worldPosition);
+							CVector diff;
+							PSVECSubtract(static_cast<Vec*>(myVec), static_cast<Vec*>(targetVec), static_cast<Vec*>(diff));
+							Vec delta;
+							delta.x = diff.x;
+							delta.y = diff.y;
+							delta.z = diff.z;
 							object->moveVector(&delta, speedScale, 1);
 						}
 					}
@@ -1133,8 +1139,14 @@ void CGMonObj::onFrameStat()
 	case 0x1E: {
 		float speedScale = *reinterpret_cast<float*>(mon + 0x690) *
 			(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4)) + 0.8f);
-		Vec delta = reinterpret_cast<CGObject*>(Game.m_partyObjArr[m_targetPartyIndex])->m_worldPosition;
-		PSVECSubtract(&delta, &object->m_worldPosition, &delta);
+		CVector targetVec(reinterpret_cast<CGObject*>(Game.m_partyObjArr[m_targetPartyIndex])->m_worldPosition);
+		CVector myVec(object->m_worldPosition);
+		CVector diff;
+		PSVECSubtract(static_cast<Vec*>(myVec), static_cast<Vec*>(targetVec), static_cast<Vec*>(diff));
+		Vec delta;
+		delta.x = diff.x;
+		delta.y = diff.y;
+		delta.z = diff.z;
 		object->moveVector(&delta, speedScale, 1);
 
 		unsigned char* script9 = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);

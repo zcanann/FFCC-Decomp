@@ -2235,8 +2235,8 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 				*object->m_sp++ = 0;
 				result = 0;
 			}
-		} else if ((systemIndex < -1) && (-3 < systemIndex)) {
-			if (*reinterpret_cast<u8*>(self + 0x1298) != 0) {
+		} else if (systemIndex == -2) {
+			if (*reinterpret_cast<int*>(self + 0x1298) != 0) {
 				const u16* const strOffs = *reinterpret_cast<u16**>(self + 0x34);
 				char* const strBlob = *reinterpret_cast<char**>(self + 0x38);
 				char* format = strBlob + strOffs[*object->m_localBase];

@@ -710,7 +710,7 @@ path:
                 float vy;
                 float vz;
 
-                if (param->m_randType == 0 || param->m_randType > 5) {
+                if (param->m_randType == 0 || (s32)param->m_randType > 5) {
                     if ((int)work->m_pathIndex >= pathInfo[1]) {
                         work->m_pathIndex = 0;
                     }

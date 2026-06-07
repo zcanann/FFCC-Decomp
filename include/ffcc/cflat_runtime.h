@@ -56,16 +56,18 @@ public:
 		unsigned char m_reqFlag1;  // 0x2D
 		unsigned char m_reqFlag2;  // 0x2E
 		unsigned char m_reqFlag3;  // 0x2F
-		short m_particleId;        // 0x30
-		short m_0x32;              // 0x32
+		short m_0x30;              // 0x30
+		short m_particleId;        // 0x32
 		short m_0x34;              // 0x34-0x36
 		short m_argCount;          // 0x36-0x38
 		union {
 			unsigned char m_flags;     // 0x38-0x3B
 			struct {
-				unsigned char m_flagBits0 : 3;
-				unsigned char m_constructFlag : 1;
-				unsigned char m_flagBits1 : 4;
+				unsigned char m_deleteFlag : 1;    // 0x80
+				unsigned char m_activeFlag : 1;    // 0x40
+				unsigned char m_callFlag : 1;      // 0x20
+				unsigned char m_constructFlag : 1; // 0x10
+				unsigned char m_flagBits1 : 4;     // 0x0F
 			} m_flagBits;
 		};
 		int m_0x3C;                // 0x3C

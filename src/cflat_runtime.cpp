@@ -199,7 +199,7 @@ void CFlatRuntime::clear()
 
 	m_objectSentinel.m_previous = &m_objectSentinel;
 	m_objectSentinel.m_next = &m_objectSentinel;
-	m_objectSentinel.m_0x32 = 0x10;
+	m_objectSentinel.m_particleId = 0x10;
 
 	m_freeListPrev = reinterpret_cast<void**>(self + 0x978);
 	m_freeListNext = reinterpret_cast<void**>(self + 0x978);
@@ -767,10 +767,13 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 	m_objectSentinel.m_previous->m_next = object;
 	m_objectSentinel.m_previous = object;
 
-	object->m_flags &= 0x7F;
-	object->m_flags &= 0xDF;
-	object->m_flags = static_cast<u8>((object->m_flags & 0xEF) | 0x10);
-	object->m_0x32 = 0;
+	const u32 clearBit = 0;
+	const u32 setBit = 1;
+
+	object->m_flagBits.m_deleteFlag = clearBit;
+	object->m_flagBits.m_callFlag = clearBit;
+	object->m_flagBits.m_constructFlag = setBit;
+	object->m_0x34 = 0;
 	object->m_particleId = 0xF;
 	object->m_waitCounter = 0;
 	object->m_reqFlag0 = 0;
@@ -779,7 +782,7 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 	object->m_reqFlag3 = 0;
 	object->m_classIndex = static_cast<s16>(classIndex);
 	object->m_activeClassIndex = object->m_classIndex;
-	object->m_flags = static_cast<u8>((object->m_flags & 0xBF) | 0x40);
+	object->m_flagBits.m_activeFlag = setBit;
 
 	int classLocalCount = 0;
 	if (classIndex != -1) {
@@ -2350,7 +2353,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 		CObject* begin = root->m_next;
 		CObject* it = begin;
 		do {
-			if (static_cast<int>(scriptGroup) < it->m_0x32) {
+			if (static_cast<int>(scriptGroup) < it->m_particleId) {
 				break;
 			}
 			it = it->m_next;
@@ -2361,7 +2364,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 		engineObject->m_previous = it->m_previous;
 		it->m_previous->m_next = engineObject;
 		it->m_previous = engineObject;
-		engineObject->m_0x32 = static_cast<s16>(scriptGroup);
+		engineObject->m_particleId = static_cast<s16>(scriptGroup);
 
 		*object->m_sp++ = 0;
 		result = 0;

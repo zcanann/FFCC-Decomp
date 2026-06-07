@@ -884,7 +884,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 	int activePartyCount = s_Rinfo->m_partyCount;
 
-	if (*(unsigned char*)(statePtr + 0xb) == 0) {
+	if (*(signed char*)(statePtr + 0xb) == 0) {
 		int iconBase = 4;
 		int nameBase = iconBase + activePartyCount;
 		int slotBase = nameBase + activePartyCount;
@@ -1466,7 +1466,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 {
 	int activePartyCount = s_Rinfo->m_partyCount;
 
-	if (*(unsigned char*)(this->m_bonusStatePtr + 0xb) == 0) {
+	if (*(signed char*)(this->m_bonusStatePtr + 0xb) == 0) {
 		int animPtr = this->m_bonusAnimPtr;
 		BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
 		BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);

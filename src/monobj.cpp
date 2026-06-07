@@ -1554,7 +1554,7 @@ void CGMonObj::onDamaged(CGPrgObj* prgObj)
 		}
 
 		int attackerIndex = reinterpret_cast<int>(prgScript[0xED]);
-		if ((*reinterpret_cast<short*>(aiData + 0x106) == 1) || (m_targetPartyIndex < 0)) {
+		if ((*reinterpret_cast<unsigned short*>(aiData + 0x106) == 1) || (m_targetPartyIndex < 0)) {
 			if ((Game.m_gameWork.m_menuStageMode != '\0') && (Game.m_gameWork.m_bossArtifactStageIndex < 0xF)) {
 				prgFlags = prgObj->GetCID();
 				if ((prgFlags & 0x6D) == 0x6D) {
@@ -1587,16 +1587,16 @@ skip_target_update:
 				}
 
 				void** otherScript = reinterpret_cast<CGObject*>(other)->m_scriptHandle;
-				if (*reinterpret_cast<short*>(otherScript + 7) == 0) {
+				if (*reinterpret_cast<unsigned short*>(otherScript + 7) == 0) {
 					continue;
 				}
-				if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(otherScript) + 0x3E) != 0) {
+				if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(otherScript) + 0x3E) != 0) {
 					continue;
 				}
-				if (*reinterpret_cast<short*>(otherScript + 0x14) != 0) {
+				if (*reinterpret_cast<unsigned short*>(otherScript + 0x14) != 0) {
 					continue;
 				}
-				if (*reinterpret_cast<short*>(otherScript + 0x11) != 0) {
+				if (*reinterpret_cast<unsigned short*>(otherScript + 0x11) != 0) {
 					continue;
 				}
 

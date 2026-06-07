@@ -1805,7 +1805,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 				((partyFlags & 0x6D) == 0x6D) &&
 				(partyObj->m_scriptHandle[0xED] != NULL);
 			if (targetHidden ||
-				(*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(partyObj->m_scriptHandle) + 7) == 0) ||
+				(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(partyObj->m_scriptHandle) + 7) == 0) ||
 				(partyObj->m_lastStateId == 9) ||
 				(partyObj->m_lastStateId == 0x22) ||
 				(static_cast<double>(*reinterpret_cast<float*>(mon + partyIndex * 4 + 0x5D0)) >=
@@ -3247,7 +3247,7 @@ void CGMonObj::statWatch()
 						(partyObj->m_scriptHandle[0xED] != NULL)) {
 						menuBlocked = true;
 					}
-					if ((*reinterpret_cast<short*>(partyObj->m_scriptHandle + 7) != 0) &&
+					if ((*reinterpret_cast<unsigned short*>(partyObj->m_scriptHandle + 7) != 0) &&
 						(partyPrg->m_lastStateId != 9) &&
 						(partyPrg->m_lastStateId != 0x22) &&
 						!menuBlocked) {

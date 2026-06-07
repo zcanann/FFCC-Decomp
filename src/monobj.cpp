@@ -915,13 +915,13 @@ void CGMonObj::onFrameStat()
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	int state = prgObj->m_lastStateId;
 
-	if ((state == 3 || state == 0x11 || state == 0x1E) && (*reinterpret_cast<short*>(object->m_scriptHandle + 7) != 0)) {
+	if ((state == 3 || state == 0x11 || state == 0x1E) && (*reinterpret_cast<unsigned short*>(object->m_scriptHandle + 7) != 0)) {
 		int targetPartyIndex = m_targetPartyIndex;
 		bool hasValidTarget = false;
 		if ((targetPartyIndex >= 0) && (targetPartyIndex < 4)) {
 			CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
 			hasValidTarget = (target != NULL) &&
-				(*reinterpret_cast<short*>(reinterpret_cast<CGObject*>(target)->m_scriptHandle + 7) != 0);
+				(*reinterpret_cast<unsigned short*>(reinterpret_cast<CGObject*>(target)->m_scriptHandle + 7) != 0);
 		}
 		if (!hasValidTarget) {
 			m_targetPartyIndex = -1;

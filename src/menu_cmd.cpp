@@ -1943,7 +1943,7 @@ void CMenuPcs::DrawUniteList()
 			active = false;
 		}
 
-		if (i >= foodCount) {
+		if (i >= caravan->m_numCmdListSlots) {
 			break;
 		}
 

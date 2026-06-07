@@ -399,6 +399,9 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			next = in + 4;
 			break;
 		}
+		case 0x44:
+			branchMode = (playerIndex == 0) ? 1 : 2;
+			break;
 		case 0x42:
 		{
 			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 2);
@@ -406,9 +409,6 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			next = in + 4;
 			break;
 		}
-		case 0x44:
-			branchMode = (playerIndex == 0) ? 1 : 2;
-			break;
 		case 0x45:
 		{
 			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 2);

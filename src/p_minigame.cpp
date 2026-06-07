@@ -1885,13 +1885,9 @@ void CMiniGamePcs::MngThreadMain(void*)
                 {
                     if (*reinterpret_cast<unsigned int*>(playerBase + 0x1420) == 0x40000)
                     {
-                        unsigned char state = playerBase[0x144B];
-                        if (state == 3)
+                        switch ((s32)playerBase[0x144B])
                         {
-                            *reinterpret_cast<unsigned int*>(playerBase + 0x1420) = 0;
-                        }
-                        else if (state < 3 && state == 0)
-                        {
+                        case 0:
                             if (playerBase[0x1450] == 0)
                             {
                                 if (playerBase[0x1452] != 0)
@@ -1908,7 +1904,14 @@ void CMiniGamePcs::MngThreadMain(void*)
                                     OSSendMessage(reinterpret_cast<OSMessageQueue*>(playerBase + 0x138C), reinterpret_cast<OSMessage>(7), 1);
                                 }
                             }
-                            else if (playerBase[0x1451] == 0)
+                            else if (playerBase[0x1451] != 0)
+                            {
+                                playerBase[0x1452] = 1;
+                                self[0x6490 + i] = 1;
+                                successMask |= bit & 0xFF;
+                                *reinterpret_cast<unsigned int*>(channelBase + 0x1368) = 0;
+                            }
+                            else
                             {
                                 if (playerBase[0x144E] != 0)
                                 {
@@ -1971,17 +1974,11 @@ void CMiniGamePcs::MngThreadMain(void*)
                                     }
                                 }
                             }
-                            else
-                            {
-                                playerBase[0x1452] = 1;
-                                self[0x6490 + i] = 1;
-                                successMask |= bit & 0xFF;
-                                *reinterpret_cast<unsigned int*>(channelBase + 0x1368) = 0;
-                            }
-                        }
-                        else
-                        {
+                            break;
+                        case 3:
+                        default:
                             *reinterpret_cast<unsigned int*>(playerBase + 0x1420) = 0;
+                            break;
                         }
                     }
                     else if (*reinterpret_cast<unsigned int*>(playerBase + 0x1420) == 0 || (loopCounter & 0x1F) == 0)

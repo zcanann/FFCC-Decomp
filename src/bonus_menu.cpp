@@ -3344,32 +3344,42 @@ void CMenuPcs::createBonus()
 				break;
 			}
 
-			BonusPartySummary& entry = s_Rinfo->m_party[activeCount];
-			entry.m_partySlot = i;
-			entry.m_partyHandle =
+			s_Rinfo->m_party[activeCount].m_partySlot = i;
+			s_Rinfo->m_party[activeCount].m_partyHandle =
 			    *reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(Game.m_partyObjArr[i]) + 0xF8);
-			entry.m_partyHandle->m_model->m_lightAlpha = 0.0f;
-			entry.m_bonusCondition = (int)caravanWork->m_bonusCondition;
-			entry.m_foodValue = (int)caravanWork->m_artifactRelated[2] + (int)caravanWork->m_artifactRelated[3];
-			entry.m_foodValue = (entry.m_foodValue > 100) ? 100 : entry.m_foodValue;
-			entry.m_artifactValue =
-			    (int)caravanWork->m_artifactRelated[0] + (int)caravanWork->m_artifactRelated[1] - (int)caravanWork->m_artifactRelated[4];
-			entry.m_totalValue = entry.m_foodValue + entry.m_artifactValue;
-			entry.m_selectedItemId = -1;
-			entry.m_selectedSlot = -1;
+			s_Rinfo->m_party[activeCount].m_partyHandle->m_model->m_lightAlpha = 0.0f;
+			s_Rinfo->m_party[activeCount].m_bonusCondition = (int)caravanWork->m_bonusCondition;
+			int foodValue = (int)caravanWork->m_artifactRelated[3] + (int)caravanWork->m_artifactRelated[4];
+			int foodClamped;
+			if (foodValue < 0) {
+				foodClamped = 0;
+			} else {
+				foodClamped = 100;
+				if (foodValue <= 100) {
+					foodClamped = foodValue;
+				}
+			}
+			s_Rinfo->m_party[activeCount].m_foodValue = foodClamped;
+			s_Rinfo->m_party[activeCount].m_artifactValue =
+			    (int)caravanWork->m_artifactRelated[0] + (int)caravanWork->m_artifactRelated[1] - (int)caravanWork->m_artifactRelated[2];
+			s_Rinfo->m_party[activeCount].m_totalValue =
+			    s_Rinfo->m_party[activeCount].m_foodValue + s_Rinfo->m_party[activeCount].m_artifactValue;
+			s_Rinfo->m_party[activeCount].m_selectedItemId = -1;
+			s_Rinfo->m_party[activeCount].m_selectedSlot = -1;
+			int rawTotal = s_Rinfo->m_party[activeCount].m_totalValue;
 			int totalValueClamped;
-			if (entry.m_totalValue < 0) {
+			if (rawTotal < 0) {
 				totalValueClamped = 0;
 			} else {
 				totalValueClamped = 999;
-				if (entry.m_totalValue <= 999) {
-					totalValueClamped = entry.m_totalValue;
+				if (rawTotal < 1000) {
+					totalValueClamped = rawTotal;
 				}
 			}
-			entry.m_totalValue = totalValueClamped;
-			totalValue += entry.m_totalValue;
+			s_Rinfo->m_party[activeCount].m_totalValue = totalValueClamped;
+			totalValue += s_Rinfo->m_party[activeCount].m_totalValue;
+			s_Rinfo->m_party[activeCount].m_tribeId = (unsigned int)caravanWork->m_tribeId;
 			activeCount++;
-			entry.m_tribeId = (unsigned int)caravanWork->m_tribeId;
 
 			if (caravanWork->m_treasures[0] > 0) {
 				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = caravanWork->m_treasures[0];

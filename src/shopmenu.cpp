@@ -1295,13 +1295,13 @@ void CShopMenu::DrawItemList()
 {
     int y = 0x4C;
     int itemIndex = m_listTop;
-    int selectableFrame = 10;
+    unsigned int selectableFrame = 10;
     if (m_listType == 2) {
         selectableFrame = 0xF;
     }
 
     for (int row = 0; row < m_visibleRows; ++row) {
-        int listType = m_listType;
+        unsigned int listType = m_listType;
         int itemCount = ResolveShopMenuItemCount(this);
 
         if (itemCount <= itemIndex) {
@@ -1657,7 +1657,7 @@ void CShopMenu::Draw()
     float fade = m_fade;
     if (fade != FLOAT_80332d28) {
         int fadeStep = static_cast<int>(FLOAT_80332de0 * fade);
-        unsigned char alpha = static_cast<unsigned char>(0xFF - (fadeStep & 0xFF));
+        signed char alpha = static_cast<unsigned char>(0xFF - (fadeStep & 0xFF));
 
         Graphic.SetDrawDoneDebugData(0x32);
 

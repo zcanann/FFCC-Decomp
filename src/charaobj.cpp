@@ -947,41 +947,24 @@ void CGCharaObj::onFrameStat()
 			}
 			break;
 
-		case 8:
-			if (m_subState == 2) {
-				if (m_subFrame == 0) {
-					reqAnim(m_unk558, 0, 0);
+		case 0x19:
+			if (m_stateFrame == 0) {
+				if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D) {
+					static_cast<CGPartyObj*>(this)->carry(1, 0, 1);
 				}
 
-				if (isLoopAnim() != 0) {
-					changeSubStat(1);
-					return;
+				Sound.StopSe3DGroup(m_particleId);
+				for (int i = 0; i < 0x16; i++) {
+					if ((0x3BU & (1U << i)) != 0) {
+						CFlatRuntime2Storage().DeleteParticleSlot(m_particleSlots[i], 1);
+					}
 				}
-			} else if (m_subState == 0) {
-				if (m_subFrame == 0) {
-					reqAnim(m_attackAnimId, 0, 0);
-				}
-
-				if (isLoopAnim() != 0) {
-					changeSubStat(1);
-					return;
-				}
-			} else if (m_subState == 1) {
-				if (m_subFrame == 0) {
-					reqAnim(m_unk554, 1, 0);
-				}
-			} else if (m_subState < 4) {
-				if (m_subFrame == 0) {
-					reqAnim(((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) ? m_unk558 : m_unk55C, 0, 0);
-				}
-
-				if (isLoopAnim() != 0) {
-					changeStat(0, 0, 0);
-					return;
-				}
+				reqAnim(0x1D, 0, 0);
 			}
 
-			onStatShield();
+			if (isLoopAnim() != 0) {
+				changeStat(0, 0, 0);
+			}
 			break;
 
 		case 9:
@@ -1038,24 +1021,41 @@ void CGCharaObj::onFrameStat()
 			}
 			break;
 
-		case 0x19:
-			if (m_stateFrame == 0) {
-				if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D) {
-					static_cast<CGPartyObj*>(this)->carry(1, 0, 1);
+		case 8:
+			if (m_subState == 2) {
+				if (m_subFrame == 0) {
+					reqAnim(m_unk558, 0, 0);
 				}
 
-				Sound.StopSe3DGroup(m_particleId);
-				for (int i = 0; i < 0x16; i++) {
-					if ((0x3BU & (1U << i)) != 0) {
-						CFlatRuntime2Storage().DeleteParticleSlot(m_particleSlots[i], 1);
-					}
+				if (isLoopAnim() != 0) {
+					changeSubStat(1);
+					return;
 				}
-				reqAnim(0x1D, 0, 0);
+			} else if (m_subState == 0) {
+				if (m_subFrame == 0) {
+					reqAnim(m_attackAnimId, 0, 0);
+				}
+
+				if (isLoopAnim() != 0) {
+					changeSubStat(1);
+					return;
+				}
+			} else if (m_subState == 1) {
+				if (m_subFrame == 0) {
+					reqAnim(m_unk554, 1, 0);
+				}
+			} else if (m_subState < 4) {
+				if (m_subFrame == 0) {
+					reqAnim(((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) ? m_unk558 : m_unk55C, 0, 0);
+				}
+
+				if (isLoopAnim() != 0) {
+					changeStat(0, 0, 0);
+					return;
+				}
 			}
 
-			if (isLoopAnim() != 0) {
-				changeStat(0, 0, 0);
-			}
+			onStatShield();
 			break;
 	}
 }

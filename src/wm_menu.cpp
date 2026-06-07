@@ -3648,18 +3648,17 @@ void CMenuPcs::DrawDiaryMenu()
 		C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 		GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 		PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
-		Vec target = {FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc};
-		Vec up = {FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc};
+		CVector target(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
+		CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
 		Mtx lookAtMtx;
-		Mtx savedCamera;
-		C_MTXLookAt(lookAtMtx, reinterpret_cast<Vec*>(worldObj + 0x60), &up, &target);
-		PSMTXCopy(CameraPcs.m_cameraMatrix, savedCamera);
+		C_MTXLookAt(lookAtMtx, reinterpret_cast<Vec*>(worldObj + 0x60), reinterpret_cast<Vec*>(&up), reinterpret_cast<Point3d*>(&target));
+		PSMTXCopy(CameraPcs.m_cameraMatrix, m_wm.m_cameraMatrix);
 		PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 		CharaPcs.InitEnv(5);
 		GXSetColorUpdate(0);
 		GXSetAlphaUpdate(0);
-		unsigned int clearColor = 0;
-		GXSetCopyClear(*reinterpret_cast<GXColor*>(&clearColor), 0xFFFFFF);
+		_GXColor clearColor = CColor(0, 0, 0, 0).color;
+		GXSetCopyClear(clearColor, 0xFFFFFF);
 		GXSetColorUpdate(1);
 		GXSetAlphaUpdate(1);
 		GXSetViewport(static_cast<float>(*reinterpret_cast<short*>(worldObj + 0x58)),
@@ -3669,8 +3668,8 @@ void CMenuPcs::DrawDiaryMenu()
 		GXSetScissor(*reinterpret_cast<unsigned int*>(worldObj + 0x90), *reinterpret_cast<unsigned int*>(worldObj + 0x94),
 		             *reinterpret_cast<unsigned int*>(worldObj + 0x98), *reinterpret_cast<unsigned int*>(worldObj + 0x9C));
 		handle->Draw(5);
-		PSMTXCopy(savedCamera, CameraPcs.m_cameraMatrix);
-		GXSetCopyClear(*reinterpret_cast<GXColor*>(&clearColor), 0xFFFFFF);
+		PSMTXCopy(m_wm.m_cameraMatrix, CameraPcs.m_cameraMatrix);
+		GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0xFFFFFF);
 		PSMTX44Copy(CameraPcs.m_screenMatrix, projectionMtx);
 		GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 		Graphic.SetViewport();

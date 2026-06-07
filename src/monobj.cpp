@@ -1565,7 +1565,7 @@ void CGMonObj::onDamaged(CGPrgObj* prgObj)
 
 		int attackerIndex = reinterpret_cast<int>(prgScript[0xED]);
 		if ((static_cast<int>(*reinterpret_cast<unsigned short*>(aiData + 0x106)) == 1) || (m_targetPartyIndex < 0)) {
-			if ((Game.m_gameWork.m_menuStageMode != '\0') && (Game.m_gameWork.m_bossArtifactStageIndex < 0xF)) {
+			if ((static_cast<unsigned int>(Game.m_gameWork.m_menuStageMode) != 0) && (Game.m_gameWork.m_bossArtifactStageIndex < 0xF)) {
 				prgFlags = static_cast<unsigned short>(prgObj->GetCID());
 				if ((prgFlags & 0x6D) == 0x6D) {
 					if (reinterpret_cast<int>(prgScript[0xED]) != 0) {
@@ -1613,12 +1613,12 @@ skip_target_update:
 				other->m_targetPartyIndex = reinterpret_cast<int>(prgScript[0xED]);
 				other->m_unk6BD = 1;
 
+				int otherClassId = reinterpret_cast<int>(reinterpret_cast<CGObject*>(other)->m_scriptHandle[4]);
 				if (other->m_chaseState != 4) {
 					other->m_chaseState = 2;
 					other->m_chaseTimer = 0;
 					other->m_chaseDirty = 1;
-				} else if ((other->m_actionBranch == 0) &&
-					(reinterpret_cast<int>(reinterpret_cast<CGObject*>(other)->m_scriptHandle[4]) == 0x55)) {
+				} else if ((other->m_actionBranch == 0) && (otherClassId == 0x55)) {
 					reinterpret_cast<CGPrgObj*>(other)->changeStat(0x18, 0, 0);
 					other->m_chaseState = 2;
 					other->m_chaseTimer = 0;
@@ -1629,12 +1629,12 @@ skip_target_update:
 	}
 
 	if (*reinterpret_cast<int*>(mon + 0x520) == 0x11) {
-		prgObj->changeStat(0, 0, 0);
+		reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
 	}
 
-	if ((m_actionBranch == 0) &&
-		(reinterpret_cast<int>(object->m_scriptHandle[4]) == 0x55)) {
-		prgObj->changeStat(0x18, 0, 0);
+	int classId = reinterpret_cast<int>(object->m_scriptHandle[4]);
+	if ((m_actionBranch == 0) && (classId == 0x55)) {
+		reinterpret_cast<CGPrgObj*>(this)->changeStat(0x18, 0, 0);
 	}
 
 	m_chaseState = 2;

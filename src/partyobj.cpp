@@ -1017,8 +1017,8 @@ void CGPartyObj::command()
 
 	if (static_cast<signed char>(party.partyFlags) >= 0) {
 
-	const unsigned short trig = getPadTrigForSlot(padSlot);
 	const unsigned short held = getPadHeldForSlot(padSlot);
+	const unsigned short trig = getPadTrigForSlot(padSlot);
 
 	if ((*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) &&
 	    ((party.commandMode & 1) != 0) &&

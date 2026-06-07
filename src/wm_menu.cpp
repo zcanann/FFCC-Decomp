@@ -10668,8 +10668,7 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 	font->SetScale(FLOAT_803313e8);
 	font->DrawInit();
 
-	GXColor textColor = {0xFF, 0xFF, 0xFF, 0xFF};
-	font->SetColor(textColor);
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 	font->SetTlut(0x23);
 
 	const char* const* msgTable = GetMcWinMessBuff(messType);

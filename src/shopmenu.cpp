@@ -165,38 +165,50 @@ static inline unsigned short GetPadButtons()
     if (hasInput) {
         buttons = 0;
     } else {
-        buttons = Pad.GetPadInputs()[0].buttonDown[0];
+        int padIndex = 0;
+        padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+        buttons = Pad.GetPadInputs()[padIndex].buttonDown[0];
     }
     return buttons;
 }
 
 static unsigned short GetShopMenuListButtons()
 {
+    unsigned short buttons;
     if (gShopMenuInputLatch == 0) {
-        if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
-            return 0;
+        bool hasInput = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
+        if (hasInput) {
+            buttons = 0;
+        } else {
+            int padIndex = 0;
+            padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+            buttons = Pad.GetPadInputs()[padIndex].repeatButton;
         }
-        __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
-        return Pad.GetPadInputs()[0].repeatButton;
+        return buttons;
     }
 
-    unsigned short buttons;
-    if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
+    bool hasInput = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
+    if (hasInput) {
         buttons = 0;
     } else {
-        __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
-        buttons = Pad.GetPadInputs()[0].button[0];
+        int padIndex = 0;
+        padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+        buttons = Pad.GetPadInputs()[padIndex].button[0];
     }
 
     if ((buttons & gShopMenuInputLatch) == 0) {
         gShopMenuInputLatch = 0;
     }
 
-    if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
-        return 0;
+    hasInput = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
+    if (hasInput) {
+        buttons = 0;
+    } else {
+        int padIndex = 0;
+        padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+        buttons = Pad.GetPadInputs()[padIndex].buttonDown[0];
     }
-    __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
-    return static_cast<unsigned short>(Pad.GetPadInputs()[0].buttonDown[0]);
+    return buttons;
 }
 
 static inline CCaravanWork* ShopMenuCaravanWork(CShopMenu* shopMenu)

@@ -1370,9 +1370,8 @@ void CMenuPcs::LetterItemWinClose()
 bool CMenuPcs::LetterReplyWinOpen()
 {
 	CCaravanWork* caravanWork = GetLetterCaravanWork();
-	unsigned char languageId = Game.m_gameWork.m_languageId;
-	int state = GetLetterStateBase(this);
-	if (*reinterpret_cast<char*>(state + 0xC) == '\0') {
+	int languageId = Game.m_gameWork.m_languageId;
+	if (*reinterpret_cast<char*>(GetLetterStateBase(this) + 0xC) == '\0') {
 		char lines[8][0x80];
 		memset(lines, 0, sizeof(lines));
 
@@ -1435,10 +1434,14 @@ bool CMenuPcs::LetterReplyWinOpen()
 		GetSingWinSize(0, &winW, &winH, 1);
 		SetMcWinInfo(winW, winH);
 		m_menuWindowInfo->state = 0;
-		*reinterpret_cast<unsigned char*>(state + 0x9) = 0xFF;
-		*reinterpret_cast<char*>(state + 0xC) = 1;
+		*reinterpret_cast<char*>(GetLetterStateBase(this) + 0x9) = -1;
+		*reinterpret_cast<char*>(GetLetterStateBase(this) + 0xC) = 1;
 	}
-	return m_menuWindowInfo->state == 1;
+	bool opened = false;
+	if (m_menuWindowInfo->state == 1) {
+		opened = true;
+	}
+	return opened;
 }
 
 /*

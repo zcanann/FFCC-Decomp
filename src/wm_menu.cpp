@@ -6579,16 +6579,16 @@ void CMenuPcs::DrawFukidashi()
 	MenuPcs.SetTexture((TEX)0x18);
 
 	short* bubData = reinterpret_cast<short*>(bubbleData);
-	MenuPcs.DrawRect(0xFFFFFFFF,
+	MenuPcs.DrawRect(texMode,
 		(float)(int)bubData[0], (float)(int)bubData[1],
 		(float)(int)bubData[2], (float)(int)bubData[3],
 		*reinterpret_cast<float*>(bubData + 4), *reinterpret_cast<float*>(bubData + 6),
-		FLOAT_803313e8, FLOAT_803313e8, (float)texMode);
+		FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 
 	unsigned int uVar3 = (unsigned int)*reinterpret_cast<unsigned short*>(bytes + 0x1A);
 	if ((uVar3 & 0x3F0) != 0) {
 		int bd = reinterpret_cast<int>(bubbleData);
-		MenuPcs.DrawRect(0xFFFFFFFF, 
+		MenuPcs.DrawRect(0, 
 			(float)*reinterpret_cast<short*>(bd + 0x1C), (float)*reinterpret_cast<short*>(bd + 0x1E),
 			(float)*reinterpret_cast<short*>(bd + 0x20), (float)*reinterpret_cast<short*>(bd + 0x22),
 			*reinterpret_cast<float*>(bd + 0x24), *reinterpret_cast<float*>(bd + 0x28),
@@ -6604,7 +6604,7 @@ void CMenuPcs::DrawFukidashi()
 				if ((uVar3 & (0x10 << idx)) != 0) {
 					MenuPcs.SetTexture((TEX)(idx + 0x19));
 					int bd = reinterpret_cast<int>(bubbleData);
-					MenuPcs.DrawRect(0xFFFFFFFF, 
+					MenuPcs.DrawRect(0, 
 						(float)*reinterpret_cast<short*>(bd + 0x38), (float)*reinterpret_cast<short*>(bd + 0x3A),
 						(float)*reinterpret_cast<short*>(bd + 0x3C), (float)*reinterpret_cast<short*>(bd + 0x3E),
 						*reinterpret_cast<float*>(bd + 0x40), *reinterpret_cast<float*>(bd + 0x44),
@@ -6626,7 +6626,7 @@ void CMenuPcs::DrawFukidashi()
 					} else {
 						psVar4 = reinterpret_cast<short*>(bubbleData + 0x54);
 					}
-					MenuPcs.DrawRect(0xFFFFFFFF, 
+					MenuPcs.DrawRect(0, 
 						(float)(int)psVar4[0], (float)(int)psVar4[1],
 						(float)(int)psVar4[2], (float)(int)psVar4[3],
 						*reinterpret_cast<float*>(psVar4 + 4), *reinterpret_cast<float*>(psVar4 + 6),

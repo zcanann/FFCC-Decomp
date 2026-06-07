@@ -798,13 +798,13 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 	const s32 scanDelta = static_cast<s32>((self + 0x978) - scanNode);
 	u32 noScan = static_cast<u32>(__cntlzw(static_cast<u32>(scanDelta))) >> 5 & 0xFF;
 	while (noScan == 0) {
-		u8* const prev = scanNode;
-		scanNode = *reinterpret_cast<u8**>(prev + 4);
-		if (*reinterpret_cast<int*>(*reinterpret_cast<u8**>(prev + 4) + 8)
-		    >= (requiredWords + *reinterpret_cast<int*>(prev + 8) + *reinterpret_cast<int*>(prev + 0xC))) {
-			scanNode = prev;
-			break;
+		u8* const next = *reinterpret_cast<u8**>(scanNode + 4);
+		if ((*reinterpret_cast<int*>(scanNode + 0xC) + requiredWords + *reinterpret_cast<int*>(scanNode + 8))
+		    > *reinterpret_cast<int*>(next + 8)) {
+			scanNode = next;
+			continue;
 		}
+		break;
 	}
 
 	void** const freeNode = m_objectFreeListHead;
@@ -814,19 +814,20 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 	*reinterpret_cast<void***>(freeNode[1]) = freeNode;
 	*reinterpret_cast<void**>(scanNode + 4) = freeNode;
 
+	const int scanOffset = *reinterpret_cast<int*>(scanNode + 0xC);
 	int baseWords = 0;
 	if (noScan == 0) {
 		baseWords = *reinterpret_cast<int*>(scanNode + 8);
 	}
-	freeNode[2] = reinterpret_cast<void*>(static_cast<int>(*reinterpret_cast<int*>(scanNode + 0xC) + baseWords));
+	freeNode[2] = reinterpret_cast<void*>(static_cast<int>(scanOffset + baseWords));
 	freeNode[3] = reinterpret_cast<void*>(requiredWords);
 
 	object->m_freeListNode = freeNode;
-	object->m_id = reinterpret_cast<u32>(*reinterpret_cast<u8**>(self + 0x0C) + (reinterpret_cast<s32>(freeNode[2]) * 4));
+	object->m_id = reinterpret_cast<u32>(*reinterpret_cast<u8**>(self + 0x10) + (reinterpret_cast<s32>(freeNode[2]) * 4));
 
 	unsigned int* varBase = 0;
 	if (classIndex == -1) {
-		varBase = *reinterpret_cast<unsigned int**>(self + 0x2C);
+		varBase = *reinterpret_cast<unsigned int**>(self + 0x0C);
 	} else {
 		varBase = reinterpret_cast<unsigned int*>(object->m_id);
 	}
@@ -840,7 +841,7 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 	object->m_sp = varBase;
 	object->m_localBase = 0;
 	object->m_engineObject = object;
-	object->m_codePos = (object->m_codePos & 0x000F) | 0xFFF0;
+	object->m_codeIndex.m_codeFunc = -1;
 	object->m_argCount = 0;
 
 	u32 allowKeep = 1;

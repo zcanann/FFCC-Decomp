@@ -10675,7 +10675,7 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 			}
 			entry += 2;
 		}
-		posX = static_cast<float>(m_menuWindowInfo->x) + static_cast<float>(m_menuWindowInfo->width - maxWidth) * static_cast<float>(DOUBLE_803313f8);
+		posX = static_cast<float>(static_cast<double>(m_menuWindowInfo->x) + static_cast<double>(m_menuWindowInfo->width - maxWidth) * DOUBLE_803313f8);
 	}
 
 	float y = static_cast<float>(m_menuWindowInfo->y + 0x20);
@@ -10695,7 +10695,7 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 
 			if (winType == 0 || !noMarker) {
 				const int textWidth = font->GetWidth(textBuf);
-				posX = static_cast<float>(m_menuWindowInfo->x) + static_cast<float>(m_menuWindowInfo->width - textWidth) * static_cast<float>(DOUBLE_803313f8);
+				posX = static_cast<float>(static_cast<double>(m_menuWindowInfo->x) + static_cast<double>(m_menuWindowInfo->width - textWidth) * DOUBLE_803313f8);
 			}
 			font->SetPosX(posX);
 			font->SetPosY(y);

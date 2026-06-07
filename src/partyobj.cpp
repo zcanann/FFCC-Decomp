@@ -1696,18 +1696,18 @@ void CGPartyObj::onFrameStat()
 		    Game.m_partyObjArr[1]->m_lastStateId == 0) {
 			unsigned short held = getPadHeldForSlot(static_cast<signed char>(m_animStateMisc));
 			unsigned short up = getPadButtonUpForSlot(static_cast<signed char>(m_animStateMisc));
-			if ((up & 0x400) == 0) {
-				if ((held & 0x400) == 0) {
-					sGhostMogMenuWork.holdTimer = 0;
-				} else {
-					sGhostMogMenuWork.holdTimer++;
-					if (sGhostMogMenuWork.holdTimer > 9 && sGhostMogMenuWork.mood == 0) {
-						sGhostMogMenuWork.mood = 2;
-					}
+			if ((up & 0x400) != 0) {
+				if (sGhostMogMenuWork.holdTimer < 10 &&
+				    party.carryObject != reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)) {
+					sGhostMogMenuWork.flags.carryActive = (party.carryObject != nullptr);
 				}
-			} else if (sGhostMogMenuWork.holdTimer < 10 &&
-			           party.carryObject != reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)) {
-				sGhostMogMenuWork.flags.carryActive = (party.carryObject != nullptr);
+			} else if ((held & 0x400) == 0) {
+				sGhostMogMenuWork.holdTimer = 0;
+			} else {
+				sGhostMogMenuWork.holdTimer++;
+				if (sGhostMogMenuWork.holdTimer > 9 && sGhostMogMenuWork.mood == 0) {
+					sGhostMogMenuWork.mood = 2;
+				}
 			}
 		}
 		break;

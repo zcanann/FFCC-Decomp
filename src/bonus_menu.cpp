@@ -3075,9 +3075,9 @@ void CMenuPcs::destroyBonus()
 		}
 	}
 
-	int ptr = this->m_bonusListPtr;
-	if (ptr != 0) {
-		delete[] (CMenuPcs::EffectInfo*)ptr;
+	CMenuPcs::EffectInfo* list = (CMenuPcs::EffectInfo*)this->m_bonusListPtr;
+	if (list != 0) {
+		delete[] list;
 		this->m_bonusListPtr = 0;
 	}
 
@@ -3086,15 +3086,15 @@ void CMenuPcs::destroyBonus()
 		s_Rinfo = 0;
 	}
 
-	ptr = this->m_bonusStatePtr;
-	if (ptr != 0) {
-		delete (BonusMenuStateRaw*)ptr;
+	BonusMenuStateRaw* state = (BonusMenuStateRaw*)this->m_bonusStatePtr;
+	if (state != 0) {
+		delete state;
 		this->m_bonusStatePtr = 0;
 	}
 
-	ptr = this->m_bonusAnimPtr;
-	if (ptr != 0) {
-		delete (BonusAnimList*)ptr;
+	BonusAnimList* anim = (BonusAnimList*)this->m_bonusAnimPtr;
+	if (anim != 0) {
+		delete anim;
 		this->m_bonusAnimPtr = 0;
 	}
 
@@ -3103,9 +3103,9 @@ void CMenuPcs::destroyBonus()
 		s_Base[0] = 0;
 	}
 
-	ptr = this->m_bonus.m_bonusBoardPtr;
-	if (ptr != 0) {
-		delete[] (unsigned char*)ptr;
+	unsigned char* board = (unsigned char*)this->m_bonus.m_bonusBoardPtr;
+	if (board != 0) {
+		delete[] board;
 		this->m_bonus.m_bonusBoardPtr = 0;
 	}
 

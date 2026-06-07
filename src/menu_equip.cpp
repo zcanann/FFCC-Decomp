@@ -145,18 +145,16 @@ bool CMenuPcs::EquipClose0()
 	int timer;
 	int itemCount;
 
-	EquipMenuState* menuState = GetEquipMenuState(this);
-	menuState->frame = menuState->frame + 1;
-	timer = static_cast<int>(menuState->frame);
-	EquipOpenAnimList* list = GetEquipListStorage(this);
-	EquipOpenAnim* selected = &list->entries[menuState->selectedIndex];
+	GetEquipMenuState(this)->frame = GetEquipMenuState(this)->frame + 1;
+	timer = static_cast<int>(GetEquipMenuState(this)->frame);
+	EquipOpenAnim* selected = &GetEquipListStorage(this)->entries[GetEquipMenuState(this)->selectedIndex];
 	if (7 < timer) {
 		selected->x = selected->x + 0x13;
 	}
 
 	doneCount = 0;
-	itemCount = (int)list->listEnd - (int)list->count;
-	EquipOpenAnim* item = &list->entries[list->count];
+	itemCount = (int)GetEquipListStorage(this)->listEnd - (int)GetEquipListStorage(this)->count;
+	EquipOpenAnim* item = &GetEquipListStorage(this)->entries[GetEquipListStorage(this)->count];
 	for (int i = 0; i < itemCount; i++) {
 		fVar1 = kEquipZero;
 		if (timer >= item->startFrame) {

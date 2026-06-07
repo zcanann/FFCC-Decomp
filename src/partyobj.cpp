@@ -5149,20 +5149,9 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 	}
 
 	char text[256];
-	if ((Game.m_gameWork.m_menuStageMode == 0) ||
-	    (Game.m_gameWork.m_bossArtifactStageIndex >= 0x0F) ||
-	    (((static_cast<unsigned short>(GetCID()) & 0x6D) != 0x6D) || (m_scriptHandle[0xED] == nullptr))) {
-		unsigned char* work = reinterpret_cast<unsigned char*>(m_scriptHandle);
-		sprintf(text, s_partyObjDebugScriptFmt, work[0xBA4], *reinterpret_cast<short*>(work + 0xBC4),
-		        *reinterpret_cast<short*>(work + 0xBC6), *reinterpret_cast<short*>(work + 0xBC8),
-		        *reinterpret_cast<short*>(work + 0xBCA), *reinterpret_cast<short*>(work + 0xBCC));
-
-		float width = static_cast<float>(font->GetWidth(text));
-		font->SetPosX(x - width * 0.5f);
-		font->SetPosY(y);
-		font->SetPosZ(z);
-		font->Draw(text);
-	} else {
+	if ((Game.m_gameWork.m_menuStageMode != 0) &&
+	    (Game.m_gameWork.m_bossArtifactStageIndex < 0x0F) &&
+	    ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D) && (m_scriptHandle[0xED] != nullptr)) {
 		unsigned int bossKind;
 		switch (Game.m_gameWork.m_bossArtifactStageIndex) {
 		case 4:
@@ -5186,7 +5175,9 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 		double angleScale;
 		if (bossKind == 2) {
 			angleScale = FLOAT_80331A58 * rate + FLOAT_80331A58;
-		} else if ((bossKind < 2) && (bossKind != 0)) {
+		} else if (bossKind > 2) {
+			angleScale = FLOAT_80331a54;
+		} else if (bossKind == 1) {
 			angleScale = FLOAT_80331A58 * (FLOAT_80331a54 - rate) + FLOAT_80331A58;
 		} else {
 			angleScale = FLOAT_80331a54;
@@ -5207,6 +5198,17 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 		        static_cast<int>(FLOAT_80331A5C * angleScale), CharaGhostValue(0x2054));
 
 		width = static_cast<float>(font->GetWidth(text));
+		font->SetPosX(x - width * 0.5f);
+		font->SetPosY(y);
+		font->SetPosZ(z);
+		font->Draw(text);
+	} else {
+		unsigned char* work = reinterpret_cast<unsigned char*>(m_scriptHandle);
+		sprintf(text, s_partyObjDebugScriptFmt, work[0xBA4], *reinterpret_cast<short*>(work + 0xBC4),
+		        *reinterpret_cast<short*>(work + 0xBC6), *reinterpret_cast<short*>(work + 0xBC8),
+		        *reinterpret_cast<short*>(work + 0xBCA), *reinterpret_cast<short*>(work + 0xBCC));
+
+		float width = static_cast<float>(font->GetWidth(text));
 		font->SetPosX(x - width * 0.5f);
 		font->SetPosY(y);
 		font->SetPosZ(z);

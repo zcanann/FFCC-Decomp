@@ -1778,22 +1778,11 @@ void CShopMenu::DrawMake()
 {
     DrawMakeBase();
 
-    int resultItem = m_resultItem;
-    int listType = m_listType;
-    int selectedIndex = m_selectedIndex;
-    CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
-    int selectedItem = getItemNo(selectedIndex);
-
-    int makeGil = 0;
-    if (selectedItem > 0) {
-        makeGil = CalcShopMenuMakeGil(this, selectedItem);
-    }
-    int currentMoney = caravanWork->m_gil;
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
 
     drawShapeSeq(0xF, 0, 0xA8, 0x4A, 0xFF, 0, 0, 0.0f, 0);
     MenuPcs.DrawInit();
-    MenuPcs.DrawSingleIcon(resultItem, 0x40, 0x32, FLOAT_80332d28, 0, FLOAT_80332d28);
+    MenuPcs.DrawSingleIcon(m_resultItem, 0x40, 0x32, FLOAT_80332d28, 0, FLOAT_80332d28);
 
     CFont* font = MenuPcs.m_fonts[0];
     font->SetMargin(FLOAT_80332d28);
@@ -1802,14 +1791,14 @@ void CShopMenu::DrawMake()
     CColor white(0xFF, 0xFF, 0xFF, 0xFF);
     font->SetColor(white.color);
 
-    const char* itemName = GetItemName(resultItem);
+    const char* itemName = GetItemName(m_resultItem);
     font->DrawInit();
     MenuPcs.DrawShadowFont(font, const_cast<char*>(itemName), FLOAT_80332d54, FLOAT_80332e0c, 0x18, 0x12);
     MenuPcs.DrawInit();
 
     char raceBuffer[64];
-    MenuPcs.GetRaceStr(resultItem, raceBuffer);
-    const int raceColor = (MenuPcs.ChkEquipPossible(resultItem) != 0) ? 0x18 : 2;
+    MenuPcs.GetRaceStr(m_resultItem, raceBuffer);
+    const int raceColor = (MenuPcs.ChkEquipPossible(m_resultItem) != 0) ? 0x18 : 2;
     const char* raceText = ShopMenuMes(languageId, SHOP_MENU_TEXT_RACE);
 
     font->DrawInit();
@@ -1843,9 +1832,12 @@ void CShopMenu::DrawMake()
     MenuPcs.DrawInit();
 
     SetupShopMenuAmountFont(font, &white.color);
+    int makeGil = getItemNo(m_selectedIndex) > 0 ? CalcShopMenuMakeGil(this, getItemNo(m_selectedIndex)) : 0;
     DrawShopMenuAmount(font, makeGil, FLOAT_80332e14 - gilUnitWidth - FLOAT_80332d5c - FLOAT_80332d5c, FLOAT_80332e18, 0x13);
-    DrawShopMenuAmount(
-        font, currentMoney, FLOAT_80332e1c - gilUnitWidth - FLOAT_80332d5c, FLOAT_80332e18, (makeGil <= currentMoney) ? 0x14 : 2);
+    int makeGil2 = getItemNo(m_selectedIndex) > 0 ? CalcShopMenuMakeGil(this, getItemNo(m_selectedIndex)) : 0;
+    DrawShopMenuAmount(font, ShopMenuCaravanWork(this)->m_gil,
+        FLOAT_80332e1c - gilUnitWidth - FLOAT_80332d5c, FLOAT_80332e18,
+        (makeGil2 <= ShopMenuCaravanWork(this)->m_gil) ? 0x14 : 2);
 
     CFont* labelFont = MenuPcs.m_fonts[4];
     SetupShopMenuLabelFont(labelFont, &white.color);
@@ -1870,7 +1862,7 @@ void CShopMenu::DrawMake()
     MenuPcs.DrawInit();
 
     short recipeMaterial[8];
-    MenuPcs.GetRecipeMaterial(selectedItem, reinterpret_cast<CMenuPcs::MaterialInfo*>(recipeMaterial));
+    MenuPcs.GetRecipeMaterial(getItemNo(m_selectedIndex), reinterpret_cast<CMenuPcs::MaterialInfo*>(recipeMaterial));
     int rowY = 300;
     for (int i = 0; i < 3; i++, rowY += 0x1E) {
         int materialItem = recipeMaterial[i];
@@ -1914,7 +1906,7 @@ void CShopMenu::DrawMake()
 
         int ownedCount = 0;
         for (int slot = 0; slot < 0x40; slot++) {
-            if (caravanWork->m_inventoryItems[slot] == materialItem) {
+            if (ShopMenuCaravanWork(this)->m_inventoryItems[slot] == materialItem) {
                 ++ownedCount;
             }
         }
@@ -1938,7 +1930,7 @@ void CShopMenu::DrawMake()
     DrawShopMenuCenteredText(labelFont, ShopMenuMes(languageId, SHOP_MENU_TEXT_CANCEL), 148.0f, FLOAT_80332e44);
     MenuPcs.DrawInit();
 
-    DrawItemInfo(resultItem, 0x98, 0x7E, 0, 0x9C, 0, 0, 0);
+    DrawItemInfo(m_resultItem, 0x98, 0x7E, 0, 0x9C, 0, 0, 0);
     DrawItemHelp(m_selectedIndex, 0x140, 0x172);
     MenuPcs.DrawCursor(0xD8, m_yesNo * 0x18 + 0x14C, 1.0f);
 }

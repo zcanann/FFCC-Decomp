@@ -113,11 +113,9 @@ void CFlatRuntime::Destroy()
 		delete[] reinterpret_cast<u8*>(ptr);
 	}
 
-	u8* funcs = m_funcs;
-	const int funcCount = m_funcCount;
-	for (int i = 0, off = 0; i < funcCount; i++, off += 0x50) {
-		delete[] *reinterpret_cast<u8**>(funcs + off + 0x34);
-		delete[] *reinterpret_cast<u8**>(funcs + off + 0x3C);
+	for (int i = 0, off = 0; i < m_funcCount; i++, off += 0x50) {
+		delete[] *reinterpret_cast<u8**>(m_funcs + off + 0x34);
+		delete[] *reinterpret_cast<u8**>(m_funcs + off + 0x3C);
 	}
 
 	ptr = m_funcs;

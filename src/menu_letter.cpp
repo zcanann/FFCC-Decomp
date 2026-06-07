@@ -991,7 +991,7 @@ bool CMenuPcs::LetterClose()
 	for (int i = 0; i < panelCount; ++i, entry += 0x20) {
 		float f = FLOAT_803330bc;
 		if (frame >= *reinterpret_cast<int*>(entry + 0x12)) {
-			if (frame < *reinterpret_cast<int*>(entry + 0x12) + *reinterpret_cast<int*>(entry + 0x14)) {
+			if (*reinterpret_cast<int*>(entry + 0x12) + *reinterpret_cast<int*>(entry + 0x14) > frame) {
 				*reinterpret_cast<int*>(entry + 0x10) = *reinterpret_cast<int*>(entry + 0x10) + 1;
 				*reinterpret_cast<float*>(entry + 8) =
 				    static_cast<float>(DOUBLE_803330e8 -

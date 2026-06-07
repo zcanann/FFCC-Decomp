@@ -2575,51 +2575,107 @@ void CGPartyObj::moveCenterTargetParticle()
  */
 void CGPartyObj::onStatMagic()
 {
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	if (m_subState == 0) {
-		if (m_subFrame == 0) {
+	if (m_subState == 1) {
+		if (m_comboState == 0 && m_subFrame > m_unk68C) {
 			putTargetParticle(0, 1);
-			*reinterpret_cast<int*>(self + 0x664) = 0;
+			m_comboState = 1;
 		}
-	} else if (m_subState == 2 && m_subFrame == 0) {
-		reqAnim(0x19, 0, 0);
-		endPSlotBit(0x10);
-		endPSlotBit(0x100);
-		*reinterpret_cast<int*>(self + 0x664) = 0;
-	}
-
-	if (m_subState != 0) {
-		moveCenterTargetParticle();
-		if (*reinterpret_cast<int*>(self + 0x664) != 0) {
+		if (m_comboState != 0) {
 			checkTargetParticle();
 		}
-	}
-
-	int magicId = *reinterpret_cast<int*>(self + 0x560);
-	if (m_subState == 0 && m_subFrame == 0) {
-		if (magicId != 0x103) {
-			putParticleFromItem(magicId, 0, 0, &m_worldPosition);
-			putParticleFromItem(magicId, 1, 0, (Vec*)0);
+	} else if (m_subState < 1) {
+		if (m_subState >= 0 && m_subFrame == 0 && m_itemId != 0x103) {
+			putParticleFromItem(m_itemId, 0, m_particleSlots[3], &m_worldPosition);
+			putParticleFromItem(m_itemId, 1, m_particleSlots[3], static_cast<Vec*>(0));
+		}
+	} else if (m_subState < 3) {
+		if (m_subFrame == 0) {
+			reqAnim(0x19, 0, 0);
+			if (m_itemId == 0x103) {
+				m_comboCenter = m_worldPosition;
+				m_comboTarget = m_comboCenter;
+				int kind = Math.Rand(4);
+				if (kind == 2) {
+					m_itemId = 0x232;
+				} else if (kind < 2) {
+					if (kind == 0) {
+						m_itemId = 0x230;
+					} else if (kind >= 0) {
+						m_itemId = 0x231;
+					}
+				} else if (kind < 4) {
+					m_itemId = 0x238;
+				}
+			}
+			endPSlotBit(0x10);
+			endPSlotBit(0x100);
+			if ((*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x524) & 2) != 0) {
+				reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetNumCombi(PartyData(this).unk6BC, 1);
+			}
+		}
+		if (m_subFrame == 8 && m_comboLinkCount != 0) {
+			sendCombiToScript(reinterpret_cast<CGCharaObj*>(m_comboScriptArg), m_comboScriptMode, m_subFrame);
+		}
+		moveCenterTargetParticle();
+		if (m_subFrame >= 0x12) {
+			m_unk63CBits.m_bit80 = 1;
+		}
+		if (isLoopAnim() != 0) {
+			changeStat(0, 0, 0);
+			return;
 		}
 	}
 
-	if (m_subState == 1 && m_subFrame > 0x11) {
-		PartyData(this).commandFlags |= 0x80;
+	if (m_subState >= 2) {
+		return;
+	}
+
+	bool canTargetMagic = false;
+	bool ghostTargetActive = false;
+	bool menuStageGhost = false;
+	const bool itemIsCombi = (m_itemId == 0x103);
+	if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0x0F) {
+		menuStageGhost = true;
+	}
+	if (menuStageGhost && (GetCID() & 0x6D) == 0x6D) {
+		canTargetMagic = true;
+	}
+	if (canTargetMagic && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) != 0) {
+		ghostTargetActive = true;
+	}
+
+	if (ghostTargetActive) {
+		if (m_subState == 1 && m_comboState != 0 &&
+		    sGhostMogMenuWork.flags.carryActive < 0) {
+			if (m_comboFrame == 1) {
+				putParticleTrace(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) + 0x4FU | 0x100,
+				    m_particleSlots[8], this, FLOAT_80331a54, 0);
+				playSe3D(0x3E, 0x32, 0x96, 0, 0);
+			}
+			m_comboFrame++;
+		}
+		return;
 	}
 
 	unsigned short held = getPadHeldForSlot(static_cast<unsigned char>(m_animStateMisc));
-	if ((held & 0x100) == 0 && m_subState < 2 && magicId != 0x103) {
-		changeStat(0, 0, 0);
-		return;
-	}
-	unsigned short trig = getPadTrigForSlot(static_cast<unsigned char>(m_animStateMisc));
-	if ((trig & 0x200) != 0 && m_subState < 2 && magicId != 0x103) {
-		changeStat(0, 0, 0);
-		return;
-	}
-
-	if (isLoopAnim() != 0) {
-		changeStat(0, 0, 0);
+	if ((held & 0x100) == 0) {
+		if (m_subState == 0 || (m_subState == 1 && m_comboState == 0)) {
+			if (!itemIsCombi) {
+				changeStat(0, 0, 0);
+			}
+		} else {
+			if (m_comboFrame == 1) {
+				putParticleTrace(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) + 0x4FU | 0x100,
+				    m_particleSlots[8], this, FLOAT_80331a54, 0);
+				playSe3D(0x3E, 0x32, 0x96, 0, 0);
+			}
+			m_comboFrame++;
+		}
+	} else {
+		unsigned short trig = getPadTrigForSlot(static_cast<unsigned char>(m_animStateMisc));
+		if ((trig & 0x200) != 0 && !itemIsCombi) {
+			changeStat(0, 0, 0);
+		}
 	}
 }
 

@@ -1531,13 +1531,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 				Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
 				return 1;
 			}
-			if ((press & 0x100) == 0) {
-				if ((press & 0x200) != 0) {
-					GetCmdStateView(this)->submenuFlag = 1;
-					Sound.PlaySe(3, 0x40, 0x7F, 0);
-					return 1;
-				}
-			} else {
+			if ((press & 0x100) != 0) {
 				if (caravanWork->m_commandListExtra[GetCmdStateView(this)->selected] == 0) {
 					GetCmdStateView(this)->mode = 1;
 				} else {
@@ -1547,6 +1541,12 @@ unsigned int CMenuPcs::CmdCtrlCur()
 				GetCmdStateView(this)->phase = 0;
 				GetCmdStateView(this)->transitionTimer = 0;
 				Sound.PlaySe(2, 0x40, 0x7F, 0);
+			} else {
+				if ((press & 0x200) != 0) {
+					GetCmdStateView(this)->submenuFlag = 1;
+					Sound.PlaySe(3, 0x40, 0x7F, 0);
+					return 1;
+				}
 			}
 		}
 	} else if (mode == 1) {

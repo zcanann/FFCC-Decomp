@@ -21,22 +21,15 @@ struct MenuOptionEstandarData {
 	f32 m_layout[68];
 };
 
-static const MenuOptionEstandarData s_MenuOptionEstandar_801E36C4 = {
-	"Est\341ndar",
-	{ 0x160, 0x14E, 0x142, 0x13E, 0x160, 0x154, 0x146 },
-	{
-		0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-		328.0f, 172.0f, 544.0f, 186.0f, 368.0f, 176.0f, 400.0f, 0.0f, 496.0f, 0.0f,
-		328.0f, 172.0f, 552.0f, 186.0f, 360.0f, 176.0f, 376.0f, 0.0f, 488.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 508.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 508.0f, 0.0f, 326.0f, 128.0f,
-		300.0f, 160.0f, 330.0f, 138.0f, 372.0f, 132.0f, 492.0f, 132.0f,
-	},
-};
-
-static const char s_MenuUtil_cpp_801e37fc[] = "MenuUtil.cpp";
-static const char s_MenuUtilAllocErrorFmt[] = "%s(%d): Error: memory allocation error\n";
+// Disc-path constants for CGame::SetGbaSP().  The method is dead-stripped from
+// this build's .text, but its string constants are still emitted into
+// MenuUtil.o's .rodata.  Being the first constants in the translation unit they
+// anchor the rodata pool base register used by the option-menu draw routines.
+static const char s_dvd_gba_801E3058[] = "dvd/gba/";
+static const char s_ffcc_cli_bin_801E3060[] = "ffcc_cli.bin";
+static const char s_objdat_spt_801E3070[] = "objdat.spt";
+static const char s_icon_dat_801E307C[] = "icon.dat";
+static const char s_FF_Crystal_Chronicles_801E3088[] = "FF Crystal Chronicles";
 
 extern "C" const char s_MenuOptionMusic[] = "Music";
 extern "C" const char s_MenuOptionOn[] = "On";
@@ -187,6 +180,24 @@ static const char s_Ajusta_el_balance_del_color_de_la_Game_Boy_Advance_801E366C[
 static const char s_Encendido_801E36A0[] = "Encendido";
 static const char s_Monoaural_801E36AC[] = "Monoaural";
 static const char s_Mejorado_801E36B8[] = "Mejorado";
+
+static const MenuOptionEstandarData s_MenuOptionEstandar_801E36C4 = {
+	"Est\341ndar",
+	{ 0x160, 0x14E, 0x142, 0x13E, 0x160, 0x154, 0x146 },
+	{
+		0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+		328.0f, 172.0f, 544.0f, 186.0f, 368.0f, 176.0f, 400.0f, 0.0f, 496.0f, 0.0f,
+		328.0f, 172.0f, 552.0f, 186.0f, 360.0f, 176.0f, 376.0f, 0.0f, 488.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 508.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 508.0f, 0.0f, 326.0f, 128.0f,
+		300.0f, 160.0f, 330.0f, 138.0f, 372.0f, 132.0f, 492.0f, 132.0f,
+	},
+};
+
+static const char s_MenuUtil_cpp_801e37fc[] = "MenuUtil.cpp";
+static const char s_MenuUtilAllocErrorFmt[] = "%s(%d): Error: memory allocation error\n";
+
 extern const char s_MenuOptionMusic[];
 extern const char s_MenuOptionOn[];
 extern const char s_MenuOptionOff[];

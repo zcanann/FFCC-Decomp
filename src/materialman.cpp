@@ -1224,9 +1224,15 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
         if ((tevBit & 0x200) != 0) {
             GXColor tevColor2;
             GXColor tevColor3;
-            *reinterpret_cast<unsigned int*>(&tevColor2) = 0xFFFF0000;
+            tevColor2.r = 0xFF;
+            tevColor2.g = 0xFF;
+            tevColor2.b = 0;
+            tevColor2.a = 0;
+            tevColor3.r = 0;
+            tevColor3.g = 0;
+            tevColor3.b = 0xFF;
+            tevColor3.a = 0xFF;
             m_texMapIdCur = m_texMapIdCur + 1;
-            *reinterpret_cast<unsigned int*>(&tevColor3) = 0x0000FFFF;
             GXSetTevColor(static_cast<_GXTevRegID>(2), tevColor2);
             GXSetTevColor(static_cast<_GXTevRegID>(3), tevColor3);
 
@@ -1338,16 +1344,7 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
                 _GXSetTevSwapMode(0, 0, 0);
                 m_numTevStage = 1;
 
-                if ((tevBit == 0) || ((tevBit & 2) == 0)) {
-                    if ((m_vtxDescMode != 0) && (setVtxDesc != 0)) {
-                        GXClearVtxDesc();
-                        GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
-                        GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
-                        GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
-                        GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
-                        m_vtxDescMode = 0;
-                    }
-                } else {
+                if ((tevBit != 0) && ((tevBit & 2) != 0)) {
                     if ((m_vtxDescMode != 2) && (setVtxDesc != 0)) {
                         GXClearVtxDesc();
                         GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
@@ -1359,13 +1356,13 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
                     }
 
                     int texCoordId;
-                    if ((tevBit & 0x40) == 0) {
+                    if ((tevBit & 0x40) != 0) {
+                        texCoordId = m_texScroll1TexCoord;
+                    } else {
                         m_texCoordIdCur = m_texCoordIdCur + 1;
                         texCoordId = m_texCoordIdCur;
                         GXSetTexCoordGen2(static_cast<_GXTexCoordID>(texCoordId), static_cast<_GXTexGenType>(1),
                                           static_cast<_GXTexGenSrc>(5), 0x3C, 0, 0x7D);
-                    } else {
-                        texCoordId = m_texScroll1TexCoord;
                     }
 
                     m_numTevStage = 1;
@@ -1402,6 +1399,15 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
                         m_numTevStage, 0, 0);
                     m_numTevStage =
                         ((m_numTevStage & 0xFF) + 1) & 0xFF;
+                } else {
+                    if ((m_vtxDescMode != 0) && (setVtxDesc != 0)) {
+                        GXClearVtxDesc();
+                        GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
+                        GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
+                        GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
+                        GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
+                        m_vtxDescMode = 0;
+                    }
                 }
             }
         }
@@ -1445,8 +1451,14 @@ void CMaterialMan::SetMaterialMenu(CMaterialSet* materialSet, int materialIndex,
     if ((tevBit & 0x200) != 0) {
         GXColor tevColor2;
         GXColor tevColor3;
-        *reinterpret_cast<unsigned int*>(&tevColor2) = 0xFFFF0000;
-        *reinterpret_cast<unsigned int*>(&tevColor3) = 0x0000FFFF;
+        tevColor2.r = 0xFF;
+        tevColor2.g = 0xFF;
+        tevColor2.b = 0;
+        tevColor2.a = 0;
+        tevColor3.r = 0;
+        tevColor3.g = 0;
+        tevColor3.b = 0xFF;
+        tevColor3.a = 0xFF;
         GXSetTevColor(GX_TEVREG2, tevColor2);
         GXSetTevColor(static_cast<GXTevRegID>(3), tevColor3);
 

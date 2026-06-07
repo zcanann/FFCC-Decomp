@@ -773,25 +773,26 @@ void CMenuPcs::loadData()
 	{
 		float z = FLOAT_803313dc;
 		float one = FLOAT_803313e8;
-		unsigned char* entry = m_wm.m_charaModelData;
+		int off = 0;
 		for (int i = 0; i < 4; i++) {
-			*reinterpret_cast<unsigned int*>(entry + 0x00) = 0;
-			*reinterpret_cast<unsigned int*>(entry + 0x04) = 0;
-			*reinterpret_cast<unsigned int*>(entry + 0x08) = 0;
-			entry[0x0C] = 0;
-			float* a = reinterpret_cast<float*>(entry + 0x10);
+			*reinterpret_cast<unsigned int*>(m_wm.m_charaModelData + off + 0x00) = 0;
+			*reinterpret_cast<unsigned int*>(m_wm.m_charaModelData + off + 0x04) = 0;
+			*reinterpret_cast<unsigned int*>(m_wm.m_charaModelData + off + 0x08) = 0;
+			m_wm.m_charaModelData[off + 0x0C] = 0;
+			float* a = reinterpret_cast<float*>(m_wm.m_charaModelData + off + 0x10);
 			a[2] = z; a[1] = z; a[0] = z;
 			a[5] = z; a[4] = z; a[3] = z;
 			a[8] = one; a[7] = one; a[6] = one;
-			*reinterpret_cast<unsigned int*>(entry + 0x34) = 0;
-			*reinterpret_cast<unsigned int*>(entry + 0x38) = 0;
-			*reinterpret_cast<unsigned int*>(entry + 0x3C) = 0;
-			entry[0x40] = 0;
-			float* b = reinterpret_cast<float*>(entry + 0x44);
+			*reinterpret_cast<unsigned int*>(m_wm.m_charaModelData + off + 0x34) = 0;
+			const int base = off;
+			off += 0x68;
+			*reinterpret_cast<unsigned int*>(m_wm.m_charaModelData + base + 0x38) = 0;
+			*reinterpret_cast<unsigned int*>(m_wm.m_charaModelData + base + 0x3C) = 0;
+			m_wm.m_charaModelData[base + 0x40] = 0;
+			float* b = reinterpret_cast<float*>(m_wm.m_charaModelData + base + 0x44);
 			b[2] = z; b[1] = z; b[0] = z;
 			b[5] = z; b[4] = z; b[3] = z;
 			b[8] = one; b[7] = one; b[6] = one;
-			entry += 0x68;
 		}
 	}
 

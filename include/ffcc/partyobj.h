@@ -85,11 +85,11 @@ STATIC_ASSERT(sizeof(PartyObjOverlay) == 0x40);
 struct GhostPartyWorkFlags {
 	unsigned char flag80 : 1;
 	unsigned char flag40 : 1;
-	unsigned char flag20 : 1;
-	unsigned char flag10 : 1;
-	unsigned char flag08 : 1;
-	unsigned char flag04 : 1;
-	unsigned char flag02 : 1;
+	signed char flag20 : 1;
+	signed char flag10 : 1;
+	signed char flag08 : 1;
+	signed char flag04 : 1;
+	signed char flag02 : 1;
 	unsigned char flag01 : 1;
 };
 

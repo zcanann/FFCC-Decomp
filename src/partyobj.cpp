@@ -4705,7 +4705,7 @@ void CGPartyObj::ghostPartyMog()
 	gpmCol();
 	gpmMove();
 
-	unsigned int stageMode;
+	int stageMode;
 	switch (Game.m_gameWork.m_bossArtifactStageIndex) {
 	default:
 	case 0:
@@ -4745,24 +4745,23 @@ void CGPartyObj::ghostPartyMog()
 	int& bossState = *reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x1C);
 
 	if (static_cast<double>(m_partyDistance[0]) <= DOUBLE_80331A90) {
-		bool exceeded;
+		int exceeded;
 		if (static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x24)) < CharaGhostValue(0x2048) &&
 		    static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x28)) < CharaGhostValue(0x204C) &&
 		    static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x2C)) < CharaGhostValue(0x2050)) {
-			exceeded = false;
+			exceeded = 0;
 		} else {
-			exceeded = true;
+			exceeded = 1;
 		}
 
-		if (exceeded && static_cast<signed char>(flags[0] << 3) >= 0) {
-			flags[0] = (flags[0] & 0xEF) | 0x10;
+		if (exceeded && sGhostPartyWork.flagBits.flag10 >= 0) {
+			sGhostPartyWork.flagBits.flag10 = 1;
 			bossState = 2;
 			putParticle(299, 0, this, FLOAT_80331a54, 0);
-		} else if (static_cast<signed char>(flags[0] << 2) < 0 ||
+		} else if (sGhostPartyWork.flagBits.flag08 < 0 ||
 		           static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x38)) < 10) {
-			bool settled = static_cast<signed char>(flags[0] << 3) >= 0;
-			if (settled) {
-				unsigned int innerMode;
+			if (sGhostPartyWork.flagBits.flag10 >= 0) {
+				int innerMode;
 				switch (Game.m_gameWork.m_bossArtifactStageIndex) {
 				default:
 				case 0:
@@ -4799,14 +4798,14 @@ void CGPartyObj::ghostPartyMog()
 					goto messageMenu;
 				}
 			}
-			if (!settled || *reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x3C) < 0x97) {
+			if (sGhostPartyWork.flagBits.flag10 < 0 || *reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x3C) < 0x97) {
 				bossState = 0;
 				*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x20) = 0;
 			} else {
 				bossState = 8;
 			}
 		} else {
-			unsigned int moodMode;
+			int moodMode;
 			switch (Game.m_gameWork.m_bossArtifactStageIndex) {
 			default:
 			case 0:

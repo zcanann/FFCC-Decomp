@@ -1083,7 +1083,7 @@ void CMenuPcs::calcWorld()
 
 	reinterpret_cast<unsigned int*>(worldParams + 4)[0] = reinterpret_cast<unsigned int*>(worldParams + 8)[0];
 
-	if (worldState->m_worldReady == 0) {
+	if (static_cast<signed char>(worldState->m_worldReady) == 0) {
 		Sound.PlaySe(0x138B, 0x40, 0x7F, 0);
 		GetWmWorldHandles(this)[1]->SetAnim(0, -1, -1, -1, 0);
 		reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 0;

@@ -23,7 +23,6 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern unsigned char ARRAY_8030918c[];
 u8 CGMonObj::m_aiWork[0xC];
 u8 CGMonObj::m_boss[0x8C];
 
@@ -2596,7 +2595,7 @@ void CGMonObj::moveAStar(int startGroup, int forbiddenGroup, Vec& targetPos)
 	short& routeFrom = m_moveWork.m_routeFrom;
 	short& routePrev = m_moveWork.m_routePrev;
 
-	if (((moveFlags & 0x30000) == 0) || (*reinterpret_cast<unsigned int*>(ARRAY_8030918c) == 0)) {
+	if (((moveFlags & 0x30000) == 0) || (AStar.m_portalCount == 0)) {
 		return;
 	}
 
@@ -2691,7 +2690,7 @@ void CGMonObj::moveFrame()
 		local_68 = target->m_worldPosition;
 		in_f29 = PSVECDistance(&local_68, &object->m_worldPosition);
 
-		if (((moveFlags & 0x30000) != 0) && (*reinterpret_cast<unsigned int*>(ARRAY_8030918c) != 0)) {
+		if (((moveFlags & 0x30000) != 0) && (AStar.m_portalCount != 0)) {
 			short targetAStarGroupId = target->m_aStarGroupId;
 			moveAStar(aStarGroupId, targetAStarGroupId, local_68);
 		}
@@ -2699,7 +2698,7 @@ void CGMonObj::moveFrame()
 		local_68 = moveTarget;
 		in_f29 = PSVECDistance(&local_68, &object->m_worldPosition);
 
-		if (((moveFlags & 0x30000) != 0) && (*reinterpret_cast<unsigned int*>(ARRAY_8030918c) != 0)) {
+		if (((moveFlags & 0x30000) != 0) && (AStar.m_portalCount != 0)) {
 			int polygonGroup = AStar.calcPolygonGroup(&local_68, static_cast<int>(object->m_bgHitMask));
 			moveAStar(aStarGroupId, polygonGroup, local_68);
 		}

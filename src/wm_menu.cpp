@@ -9483,7 +9483,7 @@ void CMenuPcs::DrawMCList()
 LAB_draw:
 				if (alpha > FLOAT_803314f0) {
 					float slotY = (float)(slotIdx) * FLOAT_80331498 + FLOAT_80331490;
-					SetAttrFmt((FMT)0);
+					MenuPcs.SetAttrFmt((FMT)0);
 					unsigned int slotAlpha = (unsigned int)(FLOAT_80331458 * alpha) & 0xFF;
 					GXColor slotColor;
 					slotColor.r = 0xFF;
@@ -9493,17 +9493,17 @@ LAB_draw:
 					GXSetChanMatColor(GX_COLOR0A0, slotColor);
 
 					// Draw slot background
-					SetTexture((TEX)0x24);
-					DrawRect(0xFFFFFFFF, yPos, slotY, FLOAT_80331468, FLOAT_803314f8,
+					MenuPcs.SetTexture((TEX)0x24);
+					MenuPcs.DrawRect(0xFFFFFFFF, yPos, slotY, FLOAT_80331468, FLOAT_803314f8,
 					         FLOAT_803313dc, FLOAT_803313dc,
 					         FLOAT_803313e8, FLOAT_803313e8, 0);
-					SetTexture((TEX)0x25);
-					DrawRect(0xFFFFFFFF, yPos + FLOAT_80331468, slotY, FLOAT_803314fc, FLOAT_803314f8,
+					MenuPcs.SetTexture((TEX)0x25);
+					MenuPcs.DrawRect(0xFFFFFFFF, yPos + FLOAT_80331468, slotY, FLOAT_803314fc, FLOAT_803314f8,
 					         FLOAT_803313dc, FLOAT_803313dc,
 					         FLOAT_803313e8, FLOAT_803313e8, 0);
 
 					// Draw slot content area
-					SetAttrFmt((FMT)1);
+					MenuPcs.SetAttrFmt((FMT)1);
 					float contentX = yPos + FLOAT_80331468 + FLOAT_803314fc;
 					GXColor contentColors[4] = {
 					    {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(slotAlpha)},
@@ -9511,7 +9511,7 @@ LAB_draw:
 					    {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(slotAlpha)},
 					    {0xFF, 0xFF, 0xFF, 0},
 					};
-					DrawRect(0xFFFFFFFF, contentX, slotY, FLOAT_80331500, FLOAT_803314f8,
+					MenuPcs.DrawRect(0xFFFFFFFF, contentX, slotY, FLOAT_80331500, FLOAT_803314f8,
 					         FLOAT_803313dc, FLOAT_803313dc, contentColors,
 					         FLOAT_803313e8, FLOAT_803313e8, 0);
 				}
@@ -9535,16 +9535,16 @@ LAB_draw:
 		                                   DOUBLE_80331408) -
 		                                  DOUBLE_80331420));
 	}
-	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	GXColor frameColor = {0xFF, 0xFF, 0xFF,
 	                      static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(frameAlpha)))};
 	GXSetChanMatColor(static_cast<GXChannelID>(4), frameColor);
-	SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 	unsigned char* const frame = m_wm.m_frameInfo;
 	for (int i = 0, offset = 0; i < 2; i++, offset += 0x1C) {
 		if (((1 << i) & 2) != 0) {
 			unsigned char* const frameEntry = frame + offset + 4;
-			DrawRect(0xFFFFFFFF, static_cast<float>(*reinterpret_cast<short*>(frameEntry)),
+			MenuPcs.DrawRect(0xFFFFFFFF, static_cast<float>(*reinterpret_cast<short*>(frameEntry)),
 			         static_cast<float>(*reinterpret_cast<short*>(frameEntry + 2)),
 			         static_cast<float>(*reinterpret_cast<short*>(frameEntry + 4)),
 			         static_cast<float>(*reinterpret_cast<short*>(frameEntry + 6)),
@@ -9554,15 +9554,15 @@ LAB_draw:
 		}
 	}
 
-	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
 	GXSetChanMatColor(static_cast<GXChannelID>(4), white);
 	short separatorSub = worldState->m_subState;
 	if (separatorSub != 0 && separatorSub > 1 &&
 	    worldState->m_mainState == 2) {
 		for (int slot = 0; slot < kMcListCount; slot++) {
-			SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
-			DrawRect(0xFFFFFFFF, FLOAT_803314d8,
+			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
+			MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_803314d8,
 			         static_cast<float>(static_cast<double>(FLOAT_80331498 * static_cast<float>(slot) + FLOAT_80331490) -
 			                            DOUBLE_80331510),
 			         FLOAT_803314d8, FLOAT_803314d8,
@@ -9579,8 +9579,8 @@ LAB_draw:
 			const float slotY = FLOAT_80331498 * static_cast<float>(slot) + FLOAT_80331490;
 			if (slotData[0x42] == 0 && slotData[0x41] != 0) {
 				const float rowY = slotY + FLOAT_80331440;
-				SetTexture(static_cast<CMenuPcs::TEX>(0x26));
-				DrawRect(0xFFFFFFFF, FLOAT_80331468, rowY, FLOAT_803314d8, FLOAT_80331440,
+				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x26));
+				MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_80331468, rowY, FLOAT_803314d8, FLOAT_80331440,
 				         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
 
 				unsigned int memberCount = static_cast<unsigned int>(*reinterpret_cast<int*>(slotData + 0x18) >= 0);
@@ -9594,12 +9594,12 @@ LAB_draw:
 					memberCount++;
 				}
 				const unsigned int panelWidth = memberCount * 0x30 + 0x40;
-				DrawRect(0xFFFFFFFF,
+				MenuPcs.DrawRect(0xFFFFFFFF,
 				         FLOAT_80331468 + FLOAT_803314d8 + static_cast<float>(static_cast<int>(panelWidth)),
 				         rowY, FLOAT_803314d8, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc,
 				         FLOAT_803313e8, FLOAT_803313e8, 8.0f);
-					SetTexture(static_cast<CMenuPcs::TEX>(0x2A));
-					DrawRect(0xFFFFFFFF, FLOAT_8033151c, rowY, static_cast<float>(panelWidth), FLOAT_80331440,
+					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2A));
+					MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_8033151c, rowY, static_cast<float>(panelWidth), FLOAT_80331440,
 					         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
 
 					const unsigned int language = Game.m_gameWork.m_languageId;
@@ -9607,7 +9607,7 @@ LAB_draw:
 					if (language != 5) {
 						dateY = slotY + FLOAT_803314d8;
 					}
-					SetTexture(static_cast<CMenuPcs::TEX>(0x17));
+					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x17));
 					const unsigned int saveYear = *reinterpret_cast<unsigned int*>(slotData + 8);
 					int digitCount = 1;
 					if (saveYear > 99) {
@@ -9616,7 +9616,7 @@ LAB_draw:
 						digitCount = 2;
 					}
 					if (digitCount == 3) {
-						DrawRect(0xFFFFFFFF, FLOAT_80331520, dateY, static_cast<float>(DAT_801dc140), FLOAT_80331410,
+						MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_80331520, dateY, static_cast<float>(DAT_801dc140), FLOAT_80331410,
 						         FLOAT_80331524, FLOAT_80331528, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
 					} else {
 						int digits[2];
@@ -9651,7 +9651,7 @@ LAB_draw:
 							const int row = digit / 5 + (digit >> 0x1F);
 							const int rowIndex = row - (row >> 0x1F);
 							const int col = digit + rowIndex * -5;
-							DrawRect(0xFFFFFFFF, digitX, dateY, static_cast<float>(digitWidth), FLOAT_80331410,
+							MenuPcs.DrawRect(0xFFFFFFFF, digitX, dateY, static_cast<float>(digitWidth), FLOAT_80331410,
 							         static_cast<float>(DOUBLE_80331490 * static_cast<double>(col)),
 							         static_cast<float>(DOUBLE_80331540 * static_cast<double>(rowIndex) + DOUBLE_80331538),
 							         digitScale, FLOAT_803313e8, 0.0f);
@@ -9688,8 +9688,8 @@ LAB_draw:
 							} else if (language == 2) {
 								dateY += FLOAT_80331550;
 							}
-							SetTexture(static_cast<CMenuPcs::TEX>(0x34));
-							DrawRect(0xFFFFFFFF, digitX, dateY, suffixWidth, FLOAT_803314d8,
+							MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x34));
+							MenuPcs.DrawRect(0xFFFFFFFF, digitX, dateY, suffixWidth, FLOAT_803314d8,
 							         suffixU, FLOAT_803313dc, suffixScale, FLOAT_803313e8, 0.0f);
 						}
 					}
@@ -9700,12 +9700,12 @@ LAB_draw:
 					} else {
 						dateLabelY = slotY + FLOAT_80331554;
 					}
-					SetTexture(static_cast<CMenuPcs::TEX>(0x21));
-					DrawRect(0xFFFFFFFF, FLOAT_80331520 - FLOAT_80331550, dateLabelY,
+					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x21));
+					MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_80331520 - FLOAT_80331550, dateLabelY,
 					         FLOAT_80331440, FLOAT_80331558, FLOAT_803313dc, FLOAT_803313dc,
 					         FLOAT_803313e8, FLOAT_803313e8, 0.0f);
 
-					SetTexture(static_cast<CMenuPcs::TEX>(0x37));
+					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x37));
 					float iconX = FLOAT_8033155C;
 				for (int member = 0; member < 4; member++) {
 					const int modelNo = *reinterpret_cast<int*>(slotData + 0x18 + member * 4);
@@ -9718,15 +9718,15 @@ LAB_draw:
 							texU = FLOAT_80331560;
 						}
 						const int variant = faceNo + (tribe - (tribe >> 31)) * -100;
-						DrawRect(0xFFFFFFFF, iconX, slotY + FLOAT_803314d8, FLOAT_80331468, FLOAT_80331468,
+						MenuPcs.DrawRect(0xFFFFFFFF, iconX, slotY + FLOAT_803314d8, FLOAT_80331468, FLOAT_80331468,
 						         texU + FLOAT_80331468 * static_cast<float>(variant),
 						         FLOAT_80331468 * static_cast<float>(static_cast<int>(tribeIndex / 2)),
 						         FLOAT_803313e8, FLOAT_803313e8, 0.0f);
 						iconX += FLOAT_80331468;
 					}
 				}
-					SetTexture(static_cast<CMenuPcs::TEX>(0x20));
-					DrawRect(0xFFFFFFFF, FLOAT_80331564, slotY + FLOAT_80331468,
+					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x20));
+					MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_80331564, slotY + FLOAT_80331468,
 					         FLOAT_80331554, FLOAT_803314d8, FLOAT_803313dc, FLOAT_803313dc,
 					         FLOAT_803313e8, FLOAT_803313e8, 0.0f);
 
@@ -9764,13 +9764,13 @@ LAB_draw:
 					for (int digitIdx = 0; digitIdx < 5; digitIdx++) {
 						if (playDigits[digitIdx] >= 0) {
 							if (digitIdx == 3) {
-								DrawRect(0xFFFFFFFF, playX, playY, static_cast<float>(playColonWidth), FLOAT_803314d8,
+								MenuPcs.DrawRect(0xFFFFFFFF, playX, playY, static_cast<float>(playColonWidth), FLOAT_803314d8,
 								         FLOAT_80331568, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
 								playX += static_cast<float>(playColonWidth);
 							}
 							const int digit = playDigits[digitIdx];
 							const int digitWidth = playDigitWidths[digit];
-							DrawRect(0xFFFFFFFF, playX, playY, static_cast<float>(digitWidth), FLOAT_803314d8,
+							MenuPcs.DrawRect(0xFFFFFFFF, playX, playY, static_cast<float>(digitWidth), FLOAT_803314d8,
 							         static_cast<float>(DOUBLE_80331490 * static_cast<double>(digit) + DOUBLE_80331570),
 							         FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
 							playX += static_cast<float>(digitWidth);
@@ -9790,7 +9790,7 @@ LAB_draw:
 					GXSetTexCoordGen2(static_cast<GXTexCoordID>(0), static_cast<GXTexGenType>(1),
 					                  static_cast<GXTexGenSrc>(4), 0x1E, GX_FALSE, 0x7D);
 					TextureMan.SetTextureTev(texture);
-					DrawRect(0xFFFFFFFF,
+					MenuPcs.DrawRect(0xFFFFFFFF,
 					         static_cast<float>(static_cast<double>(FLOAT_80331518) + DOUBLE_80331510),
 					         static_cast<float>(static_cast<double>(slotY) + DOUBLE_80331510),
 					         FLOAT_80331578, FLOAT_80331578,

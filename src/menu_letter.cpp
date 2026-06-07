@@ -1775,7 +1775,11 @@ void CMenuPcs::LetterListDraw()
 
 		const int alpha = static_cast<int>(
 		    FLOAT_803330a0 * static_cast<float>(DOUBLE_803330b0 * static_cast<double>(absPhase) + DOUBLE_803330a8));
-		GXColor markColor = {0xFF, 0xFF, 0xFF, static_cast<u8>(alpha)};
+		GXColor markColor;
+		markColor.r = 0xFF;
+		markColor.g = 0xFF;
+		markColor.b = 0xFF;
+		markColor.a = static_cast<u8>(alpha);
 		GXSetChanMatColor(GX_COLOR0A0, markColor);
 		SetTexture(static_cast<CMenuPcs::TEX>(0x43));
 

@@ -3675,9 +3675,9 @@ int CGPartyObj::canPlayerPutItem()
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	unsigned char* weaponFlags = reinterpret_cast<unsigned char*>(&m_weaponNodeFlags);
 
-	if ((int)((unsigned int)weaponFlags[0] << 0x18) < 0 &&
-	    (int)((unsigned int)weaponFlags[1] << 0x18) < 0 &&
-	    (int)((unsigned int)self[0x63C] << 0x18) < 0 &&
+	if ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(weaponFlags[0]) << 24) & 0xC0000000) >> 31) != 0) &&
+	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(weaponFlags[1]) << 24) & 0xC0000000) >> 31) != 0) &&
+	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x63C]) << 24) & 0xC0000000) >> 31) != 0) &&
 	    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) &&
 	    (PartyData(this).carryObject == nullptr)) {
 		if (Game.m_gameWork.m_menuStageMode != 0 && CGItemObj::CanCreateFromScript() == 0) {

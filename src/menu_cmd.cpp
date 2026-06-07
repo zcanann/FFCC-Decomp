@@ -1822,8 +1822,8 @@ unsigned int CMenuPcs::CmdClose0()
 			} else {
 				entry->timer++;
 				const f32 t = static_cast<f32>(
-				    1.0 - (static_cast<f64>(entry->timer) /
-				           static_cast<f64>(entry->duration)));
+				    1.0 - ((DOUBLE_80332a58 / static_cast<f64>(entry->duration)) *
+				           static_cast<f64>(entry->timer)));
 
 				entry->alpha = t;
 				if ((entry->flags & 2) == 0) {
@@ -1837,8 +1837,9 @@ unsigned int CMenuPcs::CmdClose0()
 		entry++;
 	}
 
-	unsigned int done = static_cast<unsigned int>(entryCount == doneCount);
-	if (done) {
+	unsigned int done = 0;
+	if (entryCount == doneCount) {
+		done = 1;
 		entries[sel].x = entries[0].x;
 	}
 

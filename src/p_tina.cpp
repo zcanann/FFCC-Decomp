@@ -114,67 +114,86 @@ inline CPartPcs::CPartPcs()
 }
 
 CPartPcs PartPcs;
-CProcessTableCallback CPartPcs::m_table_desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc3 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc4 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcDead__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc5 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(ClearOt__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc6 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadow__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc7 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawCharaBefore__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc8 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc9 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfter__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc10 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc11 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc12 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc13 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc14 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcDead__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc15 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(ClearOt__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc16 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowViewer__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc17 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc18 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfterViewer__8CPartPcsFv)};
+static CProcessTableCallback s_partTableDescCreate = {0, 0xFFFFFFFF,
+                                                       reinterpret_cast<unsigned int>(create__8CPartPcsFv)};
+static CProcessTableCallback s_partTableDescDestroy = {0, 0xFFFFFFFF,
+                                                        reinterpret_cast<unsigned int>(destroy__8CPartPcsFv)};
+static CProcessTableCallback s_partTableDescCalcInit = {0, 0xFFFFFFFF,
+                                                         reinterpret_cast<unsigned int>(calcInit__8CPartPcsFv)};
+static CProcessTableCallback s_partTableDescCalc = {0, 0xFFFFFFFF,
+                                                     reinterpret_cast<unsigned int>(calc__8CPartPcsFv)};
+static CProcessTableCallback s_partTableDescCalcDead = {0, 0xFFFFFFFF,
+                                                         reinterpret_cast<unsigned int>(calcDead__8CPartPcsFv)};
+static CProcessTableCallback s_partTableDescClearOt = {0, 0xFFFFFFFF,
+                                                        reinterpret_cast<unsigned int>(ClearOt__8CPartPcsFv)};
+static CProcessTableCallback s_partTableDescDrawShadow = {0, 0xFFFFFFFF,
+                                                           reinterpret_cast<unsigned int>(drawShadow__8CPartPcsFv)};
+static CProcessTableCallback s_partTableDescDrawCharaBefore = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawCharaBefore__8CPartPcsFv)};
+static CProcessTableCallback s_partTableDescDraw = {0, 0xFFFFFFFF,
+                                                     reinterpret_cast<unsigned int>(draw__8CPartPcsFv)};
+static CProcessTableCallback s_partTableDescDrawAfter = {0, 0xFFFFFFFF,
+                                                          reinterpret_cast<unsigned int>(drawAfter__8CPartPcsFv)};
+static CProcessTableCallback s_partViewerTableDescCreate = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__8CPartPcsFv)};
+static CProcessTableCallback s_partViewerTableDescDestroy = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CPartPcsFv)};
+static CProcessTableCallback s_partViewerTableDescCalcInit = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__8CPartPcsFv)};
+static CProcessTableCallback s_partViewerTableDescCalc = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__8CPartPcsFv)};
+static CProcessTableCallback s_partViewerTableDescCalcDead = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcDead__8CPartPcsFv)};
+static CProcessTableCallback s_partViewerTableDescClearOt = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(ClearOt__8CPartPcsFv)};
+static CProcessTableCallback s_partViewerTableDescDrawShadow = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowViewer__8CPartPcsFv)};
+static CProcessTableCallback s_partViewerTableDescDraw = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__8CPartPcsFv)};
+static CProcessTableCallback s_partViewerTableDescDrawAfter = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfterViewer__8CPartPcsFv)};
 CProcessTable CPartPcs::m_table[2] = {
     {
         const_cast<char*>(s_CPartPcs_GAME_801D7F2C),
         {
-            m_table_desc0.m_thisOffset, m_table_desc0.m_virtualOffset, m_table_desc0.m_function,
-            m_table_desc1.m_thisOffset, m_table_desc1.m_virtualOffset, m_table_desc1.m_function,
-            m_table_desc2.m_thisOffset, m_table_desc2.m_virtualOffset, m_table_desc2.m_function,
+            s_partTableDescCreate.m_thisOffset, s_partTableDescCreate.m_virtualOffset, s_partTableDescCreate.m_function,
+            s_partTableDescDestroy.m_thisOffset, s_partTableDescDestroy.m_virtualOffset, s_partTableDescDestroy.m_function,
+            s_partTableDescCalcInit.m_thisOffset, s_partTableDescCalcInit.m_virtualOffset, s_partTableDescCalcInit.m_function,
             0x15, 0,
-            m_table_desc3.m_thisOffset, m_table_desc3.m_virtualOffset, m_table_desc3.m_function,
+            s_partTableDescCalc.m_thisOffset, s_partTableDescCalc.m_virtualOffset, s_partTableDescCalc.m_function,
             0x1D, 0,
-            m_table_desc4.m_thisOffset, m_table_desc4.m_virtualOffset, m_table_desc4.m_function,
+            s_partTableDescCalcDead.m_thisOffset, s_partTableDescCalcDead.m_virtualOffset, s_partTableDescCalcDead.m_function,
             0x28, 0,
-            m_table_desc5.m_thisOffset, m_table_desc5.m_virtualOffset, m_table_desc5.m_function,
+            s_partTableDescClearOt.m_thisOffset, s_partTableDescClearOt.m_virtualOffset, s_partTableDescClearOt.m_function,
             0x2C, 1,
-            m_table_desc6.m_thisOffset, m_table_desc6.m_virtualOffset, m_table_desc6.m_function,
+            s_partTableDescDrawShadow.m_thisOffset, s_partTableDescDrawShadow.m_virtualOffset, s_partTableDescDrawShadow.m_function,
             0x31, 1,
-            m_table_desc7.m_thisOffset, m_table_desc7.m_virtualOffset, m_table_desc7.m_function,
+            s_partTableDescDrawCharaBefore.m_thisOffset, s_partTableDescDrawCharaBefore.m_virtualOffset, s_partTableDescDrawCharaBefore.m_function,
             0x38, 1,
-            m_table_desc8.m_thisOffset, m_table_desc8.m_virtualOffset, m_table_desc8.m_function,
+            s_partTableDescDraw.m_thisOffset, s_partTableDescDraw.m_virtualOffset, s_partTableDescDraw.m_function,
             0x3E, 1,
-            m_table_desc9.m_thisOffset, m_table_desc9.m_virtualOffset, m_table_desc9.m_function,
+            s_partTableDescDrawAfter.m_thisOffset, s_partTableDescDrawAfter.m_virtualOffset, s_partTableDescDrawAfter.m_function,
             0x40, 1,
         },
     },
     {
         const_cast<char*>(s_CPartPcs_PART_VIEWER_801D7F3C),
         {
-            m_table_desc10.m_thisOffset, m_table_desc10.m_virtualOffset, m_table_desc10.m_function,
-            m_table_desc11.m_thisOffset, m_table_desc11.m_virtualOffset, m_table_desc11.m_function,
-            m_table_desc12.m_thisOffset, m_table_desc12.m_virtualOffset, m_table_desc12.m_function,
+            s_partViewerTableDescCreate.m_thisOffset, s_partViewerTableDescCreate.m_virtualOffset, s_partViewerTableDescCreate.m_function,
+            s_partViewerTableDescDestroy.m_thisOffset, s_partViewerTableDescDestroy.m_virtualOffset, s_partViewerTableDescDestroy.m_function,
+            s_partViewerTableDescCalcInit.m_thisOffset, s_partViewerTableDescCalcInit.m_virtualOffset, s_partViewerTableDescCalcInit.m_function,
             0x15, 0,
-            m_table_desc13.m_thisOffset, m_table_desc13.m_virtualOffset, m_table_desc13.m_function,
+            s_partViewerTableDescCalc.m_thisOffset, s_partViewerTableDescCalc.m_virtualOffset, s_partViewerTableDescCalc.m_function,
             0x1D, 0,
-            m_table_desc14.m_thisOffset, m_table_desc14.m_virtualOffset, m_table_desc14.m_function,
+            s_partViewerTableDescCalcDead.m_thisOffset, s_partViewerTableDescCalcDead.m_virtualOffset, s_partViewerTableDescCalcDead.m_function,
             0x28, 0,
-            m_table_desc15.m_thisOffset, m_table_desc15.m_virtualOffset, m_table_desc15.m_function,
+            s_partViewerTableDescClearOt.m_thisOffset, s_partViewerTableDescClearOt.m_virtualOffset, s_partViewerTableDescClearOt.m_function,
             0x2C, 1,
-            m_table_desc16.m_thisOffset, m_table_desc16.m_virtualOffset, m_table_desc16.m_function,
+            s_partViewerTableDescDrawShadow.m_thisOffset, s_partViewerTableDescDrawShadow.m_virtualOffset, s_partViewerTableDescDrawShadow.m_function,
             0x31, 1,
-            m_table_desc17.m_thisOffset, m_table_desc17.m_virtualOffset, m_table_desc17.m_function,
+            s_partViewerTableDescDraw.m_thisOffset, s_partViewerTableDescDraw.m_virtualOffset, s_partViewerTableDescDraw.m_function,
             0x3E, 1,
-            m_table_desc18.m_thisOffset, m_table_desc18.m_virtualOffset, m_table_desc18.m_function,
+            s_partViewerTableDescDrawAfter.m_thisOffset, s_partViewerTableDescDrawAfter.m_virtualOffset, s_partViewerTableDescDrawAfter.m_function,
             0x40, 1,
         },
     },

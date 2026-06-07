@@ -1755,7 +1755,7 @@ unsigned int CMenuPcs::CmdOpen0()
 		entries[sel].x = static_cast<s16>(entries[sel].x - 0x13);
 	}
 
-	s32 doneCount = 0;
+	u32 doneCount = 0;
 	s32 entryCount = static_cast<s32>(GetCmdListStorage(this)->listEnd) - static_cast<s32>(GetCmdListStorage(this)->count);
 	CmdListEntry* entry = &entries[GetCmdListStorage(this)->count];
 	const float fVar1 = FLOAT_80332ab0;
@@ -1812,7 +1812,7 @@ unsigned int CMenuPcs::CmdClose0()
 		entries[sel].x = static_cast<s16>(entries[sel].x + 0x13);
 	}
 
-	s32 doneCount = 0;
+	u32 doneCount = 0;
 	s32 entryCount = static_cast<s32>(GetCmdListStorage(this)->listEnd) - static_cast<s32>(GetCmdListStorage(this)->count);
 	CmdListEntry* entry = &entries[GetCmdListStorage(this)->count];
 

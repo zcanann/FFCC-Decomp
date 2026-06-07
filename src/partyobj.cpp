@@ -1462,9 +1462,9 @@ void CGPartyObj::onFrameStat()
 			}
 		}
 		if ((static_cast<signed char>(party.partyFlags) < 0) ||
-		    (*reinterpret_cast<short*>(script + 0x3E) != 0) ||
-		    (*reinterpret_cast<short*>(script + 0x50) != 0) ||
-		    (*reinterpret_cast<short*>(script + 0x44) != 0)) {
+		    (*reinterpret_cast<unsigned short*>(script + 0x3E) != 0) ||
+		    (*reinterpret_cast<unsigned short*>(script + 0x50) != 0) ||
+		    (*reinterpret_cast<unsigned short*>(script + 0x44) != 0)) {
 			m_weaponNodeFlagAll.m_bits1.m_menuReady = 0;
 			m_unk63CBits.m_bit80 = 0;
 		} else {
@@ -1474,14 +1474,14 @@ void CGPartyObj::onFrameStat()
 		if (((DbgMenuPcs.GetDbgFlagsRaw() & 8) != 0) ||
 		    ((Game.unk_flat3_0xc7d0 != 0) &&
 		     (Joybus.GetCtrlMode(static_cast<char>(m_animStateMisc)) == 1) &&
-		     (static_cast<signed char>(self[0x63C]) < 0) &&
-		     (static_cast<signed char>(m_weaponNodeFlagBytes.m_flags1) < 0) &&
-		     (static_cast<signed char>(m_weaponNodeFlags >> 8) < 0) &&
+		     (m_unk63CBits.m_bit80 < 0) &&
+		     (m_weaponNodeFlagAll.m_bits1.m_shield < 0) &&
+		     (m_weaponNodeFlagAll.m_bits1.m_menuReady < 0) &&
 		     (static_cast<signed char>(party.partyFlags) >= 0))) {
 			if ((m_targetDist > FLOAT_80331a74 * Game.unkFloat_0xca10) &&
-			    (*reinterpret_cast<short*>(script + 0x3E) == 0) &&
-			    (*reinterpret_cast<short*>(script + 0x50) == 0) &&
-			    (*reinterpret_cast<short*>(script + 0x44) == 0) &&
+			    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E) == 0) &&
+			    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x50) == 0) &&
+			    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x44) == 0) &&
 			    (Game.m_gameWork.m_bossArtifactStageIndex != 0x17)) {
 				Vec moveVec;
 				PSVECSubtract(reinterpret_cast<Vec*>(Game.unk_flat3_0xc7d0 + 0x15C), &m_worldPosition, &moveVec);

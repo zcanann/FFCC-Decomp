@@ -1777,7 +1777,6 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 			Vec positionScaleA;
 			Vec positionScaleB;
 			Vec blendedPos;
-			Mtx quatMtx;
 			Mtx scaleMtx;
 
 			Math.MTXGetScale(localMtx, &targetScale);
@@ -1795,8 +1794,8 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 			C_QUATMtx(&targetQuat, localMtx);
 			C_QUATSlerp(&NodePreviousQuat(cur), &targetQuat, &targetQuat, alpha);
 			PSMTXScale(scaleMtx, targetScale.x, targetScale.y, targetScale.z);
-			PSMTXQuat(quatMtx, &targetQuat);
-			PSMTXConcat(quatMtx, scaleMtx, localMtx);
+			PSMTXQuat(localMtx, &targetQuat);
+			PSMTXConcat(localMtx, scaleMtx, localMtx);
 			localMtx[0][3] = blendedPos.x;
 			localMtx[1][3] = blendedPos.y;
 			localMtx[2][3] = blendedPos.z;

@@ -3280,13 +3280,13 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 			float baseRot =
 				FLOAT_80331A20 * static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x118)) +
 				object->m_rotBaseY;
-			float angleDelta = fabsf(Math.DstRot(targetRot, baseRot));
+			float angleDelta = (float)__fabs(Math.DstRot(targetRot, baseRot));
 			System.Printf(
 				const_cast<char*>("ACT_FLAG_ROT_CHECK \x8d\xb7\x95\xaa=%f\x93x\x81\x42\n"),
 				FLOAT_80331A24 * angleDelta);
 			float angleLimit =
 				FLOAT_80331A20 * static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x11A));
-			if (angleLimit <= angleDelta) {
+			if (angleDelta >= angleLimit) {
 				continue;
 			}
 			System.Printf(const_cast<char*>(s_monObjPassThroughText));
@@ -3305,7 +3305,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 			CGPartyObj* party = Game.m_partyObjArr[partyIndex];
 			int partyState = reinterpret_cast<CGPrgObj*>(party)->m_lastStateId;
 			if (((partyState == 1) || (partyState == 7)) &&
-				(FLOAT_80331A30 < fabsf(Math.DstRot(object->m_rotBaseY, reinterpret_cast<CGObject*>(party)->m_rotBaseY)))) {
+				(FLOAT_80331A30 < (float)__fabs(Math.DstRot(object->m_rotBaseY, reinterpret_cast<CGObject*>(party)->m_rotBaseY)))) {
 				if (*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) {
 					forceAction = monObj->m_forcedAction ==
 						*reinterpret_cast<short*>(aiScript + actionOffset + 0x11E);

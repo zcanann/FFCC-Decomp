@@ -2993,7 +2993,6 @@ void CMenuPcs::CalcLoadMenu()
  */
 void CMenuPcs::CalcTitleMenu()
 {
-	WmWorldState* const worldState = m_wmWorldState;
 
 	if (lbl_8032EE38[0] == 0) {
 		lbl_8032EE38[0] = 1;
@@ -3013,15 +3012,15 @@ void CMenuPcs::CalcTitleMenu()
 	}
 	const unsigned short repeat = GetButtonRepeat(0);
 
-	if (worldState != 0) {
-		if (static_cast<signed char>(worldState->m_worldReady) == 0) {
-			worldState->m_delay = 0;
-			worldState->m_titleState = 0;
-			worldState->m_state0E = -1;
-			worldState->m_state12 = 0;
-			worldState->m_cardChannel = 0;
-			worldState->m_worldReady = 1;
-			worldState->m_flag09 = 1;
+	if (m_wmWorldState != 0) {
+		if (static_cast<signed char>(m_wmWorldState->m_worldReady) == 0) {
+			m_wmWorldState->m_delay = 0;
+			m_wmWorldState->m_titleState = 0;
+			m_wmWorldState->m_state0E = -1;
+			m_wmWorldState->m_state12 = 0;
+			m_wmWorldState->m_cardChannel = 0;
+			m_wmWorldState->m_worldReady = 1;
+			m_wmWorldState->m_flag09 = 1;
 			m_wmThpActive = 0;
 			if (DAT_8032ee1c == 1) {
 				int createParam[0x1B];
@@ -3063,7 +3062,7 @@ void CMenuPcs::CalcTitleMenu()
 				flatArgs[1].m_word = 0;
 				flatArgs[2].m_word = 0;
 				gCFlatRuntime().SystemCall(0, 1, 4, 3, flatArgs, 0);
-				worldState->m_cardChannel = 0;
+				m_wmWorldState->m_cardChannel = 0;
 				DAT_8032ee1c = 0;
 				return;
 			}
@@ -3113,7 +3112,7 @@ void CMenuPcs::CalcTitleMenu()
 			m_wmThpActive = 1;
 		}
 
-		if (worldState->m_mainState == 0) {
+		if (m_wmWorldState->m_mainState == 0) {
 			if ((down & 0x1000) != 0) {
 				THPSimpleAudioStop();
 				THPSimpleLoadStop();
@@ -3124,47 +3123,47 @@ void CMenuPcs::CalcTitleMenu()
 					m_wmWorkBuffer = 0;
 				}
 				m_wmThpActive = 0;
-				worldState->m_titleState = 0;
-				worldState->m_state0E = -1;
+				m_wmWorldState->m_titleState = 0;
+				m_wmWorldState->m_state0E = -1;
 			} else if (THPSimpleDecode(0) == 0) {
-				worldState->m_frameCounter = static_cast<short>(worldState->m_frameCounter + 1);
+				m_wmWorldState->m_frameCounter = static_cast<short>(m_wmWorldState->m_frameCounter + 1);
 			}
 		}
 
-		if (worldState->m_mainState == 2 && worldState->m_delay == 0) {
+		if (m_wmWorldState->m_mainState == 2 && m_wmWorldState->m_delay == 0) {
 			if ((repeat & 0xC) != 0) {
-				worldState->m_cardChannel ^= 1;
-				worldState->m_titleState = 0;
-				worldState->m_state12 = 0;
-				worldState->m_flag09 = 0;
+				m_wmWorldState->m_cardChannel ^= 1;
+				m_wmWorldState->m_titleState = 0;
+				m_wmWorldState->m_state12 = 0;
+				m_wmWorldState->m_flag09 = 0;
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			} else if ((down & 0x100) != 0) {
-				if (worldState->m_cardChannel == 0) {
+				if (m_wmWorldState->m_cardChannel == 0) {
 					DAT_8032ee2c = 0xFFFFFFFF;
 					DAT_8032ee28 = 0xFFFFFFFF;
 					DAT_8032ee20 = 0xFF;
 					uRam8032ee21 = 0xFF;
 					Game.InitNewGame();
 				}
-				worldState->m_delay = 0x14;
-				worldState->m_state0E = 1;
+				m_wmWorldState->m_delay = 0x14;
+				m_wmWorldState->m_state0E = 1;
 				Sound.PlaySe(0x0B, 0x40, 0x7F, 0);
 			} else if ((down & 0x200) != 0) {
 				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			}
 
 			if (repeat == 0) {
-				worldState->m_frameCounter = static_cast<short>(worldState->m_frameCounter + 1);
+				m_wmWorldState->m_frameCounter = static_cast<short>(m_wmWorldState->m_frameCounter + 1);
 			} else {
-				worldState->m_frameCounter = 0;
+				m_wmWorldState->m_frameCounter = 0;
 			}
-		} else if (worldState->m_mainState < 2) {
+		} else if (m_wmWorldState->m_mainState < 2) {
 			if (MemoryCardMan.McChkConnect(0) == 0) {
-				worldState->m_cardChannel = 1;
+				m_wmWorldState->m_cardChannel = 1;
 			} else if (MemoryCardMan.McChkConnect(1) == 0) {
-				worldState->m_cardChannel = 1;
+				m_wmWorldState->m_cardChannel = 1;
 			} else {
-				worldState->m_cardChannel = 0;
+				m_wmWorldState->m_cardChannel = 0;
 			}
 		}
 	}

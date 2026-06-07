@@ -566,11 +566,11 @@ static inline void CopyDuplicatedNodeState(CChara::CNode* dst, CChara::CNode* sr
 static void CalcOneBindNode(CChara::CNode* node, CChara::CModel* model)
 {
 	s16 parent = NodeParentIndex(node);
-	if (parent < 0) {
-		PSMTXCopy(NodeRefLocalMtx(node), NodeRefBindMtx(node));
-	} else {
+	if (parent >= 0) {
 		CChara::CNode* parentNode = ModelNodes(model) + parent;
 		PSMTXConcat(NodeRefBindMtx(parentNode), NodeRefLocalMtx(node), NodeRefBindMtx(node));
+	} else {
+		PSMTXCopy(NodeRefLocalMtx(node), NodeRefBindMtx(node));
 	}
 	PSMTXCopy(NodeRefBindMtx(node), NodeWorldMtx(node));
 }

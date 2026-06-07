@@ -8654,7 +8654,7 @@ void CMenuPcs::ChgAllModel2()
 		    m_cmakeWork + pdtOffset + 0x14D0;
 		unsigned char* modelData = m_wm.m_charaModelData + modelOffset;
 		unsigned int race;
-		unsigned int variant;
+		int variant;
 		unsigned int index;
 		int modelId;
 		int loadMode;

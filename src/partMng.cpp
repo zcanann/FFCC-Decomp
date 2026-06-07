@@ -1437,10 +1437,6 @@ void CPartMng::pppEditAllReleaseResource()
  */
 void CheckSum(char* packet, unsigned long code, unsigned long packetSize)
 {
-    if (packet == 0 || packetSize <= 0x20) {
-        return;
-    }
-
     int checkSum = 0x12345678;
     char* cursor = packet + 0x20;
     unsigned long remaining = packetSize - 0x20;
@@ -1496,10 +1492,6 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
     static const int kLoadAnimNameOffset = 0x19C;
     static const int kMapPcsFlagOffset = 0x1BC;
     static const int kCharaVisToggleOffset = 0x1C0;
-
-    if (packet == 0 || packetSize <= 0x20) {
-        return;
-    }
 
     CheckSum(packet, code, packetSize);
 

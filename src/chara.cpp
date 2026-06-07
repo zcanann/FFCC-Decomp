@@ -1479,7 +1479,6 @@ void CChara::CModel::calcMatrix()
 
 	CNode* nodes = ModelNodes(this);
 	u16 nodeCount = ModelNodeCount(this);
-	Vec twistAxisBase = {FLOAT_803301b0, FLOAT_803301BC, FLOAT_803301b0};
 	CNode* node = nodes;
 	for (u32 i = 0; i < nodeCount; i++, node++) {
 		CNode* parentNode;
@@ -1620,7 +1619,10 @@ void CChara::CModel::calcMatrix()
 		}
 
 		if (NodeRefIndex(node) == ModelChest1Index(this) && ModelTwistAngle(this) != FLOAT_803301b0) {
-			Vec twistAxis = twistAxisBase;
+			Vec twistAxis;
+			twistAxis.x = FLOAT_803301b0;
+			twistAxis.y = FLOAT_803301BC;
+			twistAxis.z = FLOAT_803301b0;
 			Mtx twistRotate;
 			Mtx nodeBase;
 			Mtx axisBase;

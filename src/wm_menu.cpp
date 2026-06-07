@@ -6019,19 +6019,23 @@ void CMenuPcs::DrawFukidashi()
 	}
 
 	int texMode;
-	if (bytes[0x08] == 0 || bytes[0x08] == 2) {
+	if (static_cast<signed char>(bytes[0x08]) == 0 || static_cast<signed char>(bytes[0x08]) == 2) {
 		texMode = 0;
 	} else {
 		texMode = 8;
 	}
 
-	SetAttrFmt((FMT)0);
-	unsigned int color = 0xFFFFFFFF;
-	GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&color);
-	SetTexture((TEX)0x18);
+	MenuPcs.SetAttrFmt((FMT)0);
+	GXColor color;
+	color.r = 0xFF;
+	color.g = 0xFF;
+	color.b = 0xFF;
+	color.a = 0xFF;
+	GXSetChanMatColor(GX_COLOR0A0, color);
+	MenuPcs.SetTexture((TEX)0x18);
 
 	short* bubData = reinterpret_cast<short*>(bubbleData);
-	DrawRect(0xFFFFFFFF, 
+	MenuPcs.DrawRect(0xFFFFFFFF,
 		(float)(int)bubData[0], (float)(int)bubData[1],
 		(float)(int)bubData[2], (float)(int)bubData[3],
 		*reinterpret_cast<float*>(bubData + 4), *reinterpret_cast<float*>(bubData + 6),

@@ -33,6 +33,8 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 #include "ffcc/fontman.h"
+#include "ffcc/mesmenu.h"
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 extern "C" char* strstr(const char*, const char*);
 extern "C" int DAT_801dc118[];
@@ -294,6 +296,18 @@ extern char s_wmCharaAnimRun[];
 extern char s_wmCharaAnimGlad[];
 extern char s_wmCharaAnimSleep[];
 extern char s_wmCharaAnimAngry[];
+extern float FLOAT_803317fc;
+extern double DOUBLE_803313f0;
+extern char lbl_80331800[];
+extern char lbl_80331808[];
+extern char lbl_80331810[];
+extern char lbl_80331818[];
+extern char lbl_80331820[];
+extern char lbl_80331828[];
+extern char lbl_80331830[];
+extern char lbl_80331838[];
+static const char s_dvd__smenu_subfont__s_fnt_801dc46c[] = "dvd/smenu/subfont_%s.fnt";
+static const char s_dvd__smenu_option__s_tex_801dc484[] = "dvd/smenu/option_%s.tex";
 const char* s_wmEmptyCreatingTextEn_8032E8F0[] = {s_Empty_803313A4, s_Creating_801DC250};
 const char* s_wmEmptyCreatingTextDe_8032E8F8[] = {s_Frei_803313AC, s_Wird_kreiert_801DC25C};
 const char* s_wmEmptyCreatingTextIt_8032E900[] = {s_Vuoto_803313B4, s_Creazione_801DC26C};
@@ -325,6 +339,12 @@ static const unsigned short s_wmLoadCharaModels[] = {
     0x0014, 0x0015, 0x0016, 0x0017, 0x0018, 0x0019, 0x001A, 0x0064,
 };
 static const float s_MainMenuSubFrameWidths[5] = {264.0f, 264.0f, 264.0f, 264.0f, 264.0f};
+static const unsigned int s_wmFrameInitTable[24] = {
+    0x03200000, 0x00000000, 0x00000000, 0x00000080, 0x000000A0, 0x00000080,
+    0x00000000, 0x00000078, 0x00000040, 0x00000260, 0x000000F8, 0x00000020,
+    0x00000040, 0x00000238, 0x00000138, 0x00000040, 0x00000038, 0x000001A0,
+    0x00000170, 0x000000C8, 0x00000050, 0x00000000, 0x00000000, 0x43000000,
+};
 static Vec s_RingOrgPos;
 static Vec s_MMenuPos[5];
 
@@ -673,17 +693,65 @@ void CMenuPcs::loadData()
 	    static_cast<unsigned char*>(operator new(0xEC, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x22B));
 	memset(m_wm.m_frameData, 0, 0xEC);
 
+	{
+		unsigned int frameTemplate[20];
+		for (int i = 0; i < 20; i++) {
+			frameTemplate[i] = s_wmFrameInitTable[i + 1];
+		}
+		const unsigned int* src = frameTemplate;
+		unsigned char* dst = m_wm.m_frameData + 0xC;
+		const float one = FLOAT_803313e8;
+		for (int i = 0; i < 5; i++) {
+			*reinterpret_cast<short*>(dst + 0x00) = static_cast<short>(src[0]);
+			*reinterpret_cast<short*>(dst + 0x02) = static_cast<short>(src[1]);
+			*reinterpret_cast<short*>(dst + 0x04) = static_cast<short>(src[2]);
+			*reinterpret_cast<short*>(dst + 0x06) = static_cast<short>(src[3]);
+			*reinterpret_cast<unsigned int*>(dst + 0x08) = src[0];
+			*reinterpret_cast<unsigned int*>(dst + 0x0C) = src[1];
+			*reinterpret_cast<float*>(dst + 0x10) = one;
+			*reinterpret_cast<float*>(dst + 0x14) = one;
+			*reinterpret_cast<unsigned int*>(dst + 0x18) = 0;
+			dst += 0x1C;
+			src += 4;
+		}
+	}
+
 	m_wm.m_frameInfo =
 	    static_cast<unsigned char*>(operator new(kWmFrameInfoBytes, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x231));
 	memset(m_wm.m_frameInfo, 0, kWmFrameInfoBytes);
+	InitFrame0Info();
 
 	m_wm.m_charaModelData =
 	    static_cast<unsigned char*>(operator new[](0x1A0, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x237));
-	memset(m_wm.m_charaModelData, 0, 0x1A0);
+	{
+		float z = FLOAT_803313dc;
+		float one = FLOAT_803313e8;
+		unsigned char* entry = m_wm.m_charaModelData;
+		for (int i = 0; i < 4; i++) {
+			*reinterpret_cast<unsigned int*>(entry + 0x00) = 0;
+			*reinterpret_cast<unsigned int*>(entry + 0x04) = 0;
+			*reinterpret_cast<unsigned int*>(entry + 0x08) = 0;
+			entry[0x0C] = 0;
+			float* a = reinterpret_cast<float*>(entry + 0x10);
+			a[2] = z; a[1] = z; a[0] = z;
+			a[5] = z; a[4] = z; a[3] = z;
+			a[8] = one; a[7] = one; a[6] = one;
+			*reinterpret_cast<unsigned int*>(entry + 0x34) = 0;
+			*reinterpret_cast<unsigned int*>(entry + 0x38) = 0;
+			*reinterpret_cast<unsigned int*>(entry + 0x3C) = 0;
+			entry[0x40] = 0;
+			float* b = reinterpret_cast<float*>(entry + 0x44);
+			b[2] = z; b[1] = z; b[0] = z;
+			b[5] = z; b[4] = z; b[3] = z;
+			b[8] = one; b[7] = one; b[6] = one;
+			entry += 0x68;
+		}
+	}
+
+	InitCharaInfo();
 
 	m_wm.m_charaSelectData =
 	    static_cast<unsigned char*>(operator new[](kWmCharaSelectBytes, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x243));
-	memset(m_wm.m_charaSelectData, 0, kWmCharaSelectBytes);
 
 	m_wmWorldState =
 	    static_cast<WmWorldState*>(operator new(sizeof(WmWorldState), m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x246));
@@ -698,13 +766,14 @@ void CMenuPcs::loadData()
 	memset(m_wmWorldParams, 0, 0x10);
 
 	unsigned char* const effectRaw = new unsigned char[0xCDB0 + 0x10];
-	memset(effectRaw, 0, 0xCDB0 + 0x10);
 	m_effectWork = reinterpret_cast<EffectInfo*>(effectRaw + 0x10);
-	for (int i = 0; i < 0x28; i++) {
-		EffectInfo* const effect = &m_effectWork[i];
-		effect->m_effectNo = -1;
-		effect->m_partNo = -1;
-		effect->m_slotNo = -1;
+	{
+		unsigned char* base = reinterpret_cast<unsigned char*>(m_effectWork);
+		for (int i = 0; i < 0x28; i += 8) {
+			for (int j = 0; j < 8; j++) {
+				*reinterpret_cast<unsigned int*>(base + (i + j) * 0x524) = 0xFFFFFFFF;
+			}
+		}
 	}
 
 	m_wmCharaAnimState =
@@ -714,12 +783,271 @@ void CMenuPcs::loadData()
 	m_menuWindowInfo = new (m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x25E) MenuWindowInfo;
 	memset(m_menuWindowInfo, 0, sizeof(MenuWindowInfo));
 
-	InitFrameInfo();
-	InitCharaInfo();
-	InitCharaSelectInfo();
-	InitCSelCurPos();
-	WMSubMenuInit();
-	SetParty();
+	{
+		unsigned char* base = reinterpret_cast<unsigned char*>(m_effectWork);
+		for (int i = 0; i < 0x28; i += 8) {
+			for (int j = 1; j < 9; j++) {
+				*reinterpret_cast<unsigned int*>(base + (i + (j & 7)) * 0x524 + (j == 8 ? 0x524 : 0)) = 0xFFFFFFFF;
+			}
+			for (int j = 0; j < 8; j++) {
+				*reinterpret_cast<unsigned int*>(base + (i + j) * 0x524) = 0xFFFFFFFF;
+			}
+		}
+	}
+
+	bytes[0x86E] = 0;
+	bytes[0x858] = 0;
+	*reinterpret_cast<unsigned int*>(bytes + 0x854) = 0;
+	memset(m_wm.m_charaSelectData, 0, kWmCharaSelectBytes);
+
+	{
+		unsigned char used = 0;
+		unsigned char* selectEntry = m_wm.m_charaSelectData;
+		unsigned char* modelEntry = reinterpret_cast<unsigned char*>(m_wmWorldState);
+		for (int i = 0; i < 2; i++) {
+			selectEntry[0x0C] = 0;
+			selectEntry[0x0B] = 0;
+			selectEntry[0x0A] = 0;
+			short v0 = *reinterpret_cast<short*>(modelEntry + 0x3E);
+			if (v0 < 0) {
+				*reinterpret_cast<unsigned short*>(selectEntry + 4) = 0xFFFF;
+			} else {
+				*reinterpret_cast<short*>(selectEntry + 4) = v0;
+				used = static_cast<unsigned char>(used | (1 << v0));
+			}
+			selectEntry[0x1C] = 0;
+			selectEntry[0x1B] = 0;
+			selectEntry[0x1A] = 0;
+			short v1 = *reinterpret_cast<short*>(modelEntry + 0x40);
+			if (v1 < 0) {
+				*reinterpret_cast<unsigned short*>(selectEntry + 0x14) = 0xFFFF;
+			} else {
+				*reinterpret_cast<short*>(selectEntry + 0x14) = v1;
+				used = static_cast<unsigned char>(used | (1 << v1));
+			}
+			selectEntry += 0x20;
+			modelEntry += 4;
+		}
+
+		unsigned char* slot = m_wm.m_charaSelectData;
+		for (int i = 0; i < 4; i++) {
+			if (*reinterpret_cast<short*>(slot + 4) < 0) {
+				int assigned = 0;
+				unsigned int mask = static_cast<unsigned int>(static_cast<char>(used));
+				if ((mask & 1) != 0) {
+					assigned = 1;
+					if ((mask & 2) != 0) {
+						assigned = 2;
+						if ((mask & 4) != 0) {
+							assigned = 3;
+							if ((mask & 8) != 0) {
+								assigned = 4;
+								if ((mask & 0x10) != 0) {
+									assigned = 5;
+									if ((mask & 0x20) != 0) {
+										assigned = 6;
+										if ((mask & 0x40) != 0) {
+											assigned = 7;
+											if ((mask & 0x80) != 0) {
+												assigned = 8;
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				*reinterpret_cast<short*>(slot + 4) = static_cast<short>(assigned);
+				used = static_cast<unsigned char>(used | (1 << assigned));
+			}
+			*reinterpret_cast<short*>(slot + 6) = *reinterpret_cast<short*>(slot + 4);
+			slot += 0x10;
+		}
+	}
+
+	SetManaWaterEffect();
+	m_crystalPart = -1;
+	m_crystalAttr = -1;
+	SetCrystalCageAttr();
+
+	float defaultScale = FLOAT_803313e8;
+
+	{
+		PPPCREATEPARAM createParam;
+		unsigned char* effectBase = reinterpret_cast<unsigned char*>(m_effectWork);
+		EffectInfo* eff = reinterpret_cast<EffectInfo*>(effectBase + 9 * 0x524);
+		eff->m_effectNo = 9;
+		eff->m_slotNo = 7;
+		eff->m_object.Create();
+		eff->m_object.m_charaModelHandle =
+		    reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x790)[0];
+		createParam.m_paramB = reinterpret_cast<unsigned int>(&eff->m_object);
+		createParam.m_lookTargetPtr = &eff->m_object;
+		eff->m_partNo = PartMng.pppCreate(0, 9, &createParam, 1);
+	}
+
+	for (int i = 0; i < 4; i++) {
+		PPPCREATEPARAM createParam;
+		createParam.m_paramC = defaultScale;
+		createParam.m_paramD = defaultScale;
+		EffectInfo* eff = &m_effectWork[i + 8];
+		eff->m_effectNo = i + 5;
+		eff->m_slotNo = i + 8;
+		eff->m_object.Create();
+		eff->m_object.m_charaModelHandle =
+		    reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x4A8 + 0x20)[i];
+		createParam.m_paramB = reinterpret_cast<unsigned int>(&eff->m_object);
+		createParam.m_lookTargetPtr = &eff->m_object;
+		const int group = ((((i + 5) ^ 100) >> 1) - (((i + 5) ^ 100) & (i + 5))) >> 31;
+		eff->m_partNo = PartMng.pppCreate(group, i + 5, &createParam, 1);
+	}
+
+	for (int i = 0; i < 5; i++) {
+		PPPCREATEPARAM createParam;
+		createParam.m_paramC = defaultScale;
+		createParam.m_paramD = defaultScale;
+		EffectInfo* eff = &m_effectWork[i + 0xC];
+		eff->m_effectNo = i;
+		eff->m_slotNo = i + 0xC;
+		eff->m_object.Create();
+		eff->m_object.m_charaModelHandle =
+		    reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x4A8 + 0x28)[i];
+		createParam.m_paramB = reinterpret_cast<unsigned int>(&eff->m_object);
+		createParam.m_lookTargetPtr = &eff->m_object;
+		const int group = (((i ^ 100) >> 1) - ((i ^ 100) & i)) >> 31;
+		eff->m_partNo = PartMng.pppCreate(group, i, &createParam, 1);
+	}
+
+	for (int i = 0; i < 4; i++) {
+		PPPCREATEPARAM createParam;
+		createParam.m_paramC = defaultScale;
+		createParam.m_paramD = defaultScale;
+		EffectInfo* eff = &m_effectWork[i + 0x20];
+		eff->m_effectNo = i + 10;
+		eff->m_slotNo = i + 0x20;
+		eff->m_object.Create();
+		eff->m_object.m_charaModelHandle =
+		    reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x7F4)[i];
+		createParam.m_paramB = reinterpret_cast<unsigned int>(&eff->m_object);
+		createParam.m_lookTargetPtr = &eff->m_object;
+		const int group = ((((i + 10) ^ 100) >> 1) - (((i + 10) ^ 100) & (i + 10))) >> 31;
+		eff->m_partNo = PartMng.pppCreate(group, i + 10, &createParam, 1);
+		if (i == 0) {
+			PartPcs.GetParLocIdx(eff->m_partNo, s_RingOrgPos);
+		}
+	}
+
+	FLOAT_8032ee18 = FLOAT_803317fc;
+	for (int i = 0; i < 8; i++) {
+		int modelNo = (i + 1) * 100;
+		CharaPcs.LoadAnim(0, modelNo, s_wmCharaAnimStand, 1, 0, 0);
+		CharaPcs.LoadAnim(0, modelNo, s_wmCharaAnimWalk, 1, 0, 0);
+		CharaPcs.LoadAnim(0, modelNo, s_wmCharaAnimRun, 1, 0, 0);
+		CharaPcs.LoadAnim(0, modelNo, s_wmCharaAnimGlad, 3, 0, 0);
+		CharaPcs.LoadAnim(0, modelNo, s_wmCharaAnimSleep, 1, 0, 0);
+	}
+
+	int* animState = m_wmCharaAnimState;
+	for (int i = 0; i < 8; i++, animState += 5) {
+		CCharaPcs::CHandle* const handle = reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x7F4)[i];
+		if (handle->m_charaKind != 3) {
+			const unsigned int charaBase = static_cast<unsigned int>(handle->m_charaNo) / 100;
+			const int modelNo = charaBase * 100;
+			const int baseAnim = (charaBase - 1) * 6;
+			handle->LoadAnim(s_wmCharaAnimStand, baseAnim, 1, 0, modelNo, -1, 0);
+			handle->LoadAnim(s_wmCharaAnimWalk, baseAnim + 1, 1, 0, modelNo, -1, 0);
+			handle->LoadAnim(s_wmCharaAnimRun, baseAnim + 2, 1, 0, modelNo, -1, 0);
+			handle->LoadAnim(s_wmCharaAnimGlad, baseAnim + 3, 3, 0, modelNo, -1, 0);
+			handle->LoadAnim(s_wmCharaAnimSleep, baseAnim + 4, 1, 0, modelNo, -1, 0);
+			handle->LoadAnim(s_wmCharaAnimAngry, baseAnim + 5, 1, 0, modelNo, -1, 0);
+			animState[0] = 0;
+			animState[1] = -1;
+			animState[2] = rand() % 250;
+			handle->SetAnim(baseAnim, -1, -1, 0, 0);
+			animState[3] = reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xB4)[0];
+			animState[4] = reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xC0)[0];
+			unsigned char* const handleBytes = reinterpret_cast<unsigned char*>(handle);
+			int animEntry = reinterpret_cast<int*>(handleBytes + (baseAnim + 6) * 4 + 0xC)[0];
+			int animData = reinterpret_cast<int*>(animEntry + 0x28)[0];
+			float endFrame =
+			    static_cast<float>(static_cast<double>(reinterpret_cast<unsigned short*>(animData + 0x10)[0]));
+			if (FLOAT_8032ee18 < endFrame) {
+				FLOAT_8032ee18 = endFrame;
+			}
+		}
+	}
+
+	{
+		CCharaPcs::CHandle* const world = reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x778)[0];
+		world->LoadAnim(lbl_80331800, 0, 2, -1, -1, -1, 0);
+		world->LoadAnim(lbl_80331808, 1, 0, -1, -1, -1, 0);
+		world->LoadAnim(lbl_80331810, 2, 2, -1, -1, -1, 0);
+		world->LoadAnim(lbl_80331818, 3, 2, -1, -1, -1, 0);
+		world->LoadAnim(lbl_80331820, 4, 2, -1, -1, -1, 0);
+		world->LoadAnim(lbl_80331828, 5, 2, -1, -1, -1, 0);
+		world->LoadAnim(lbl_80331830, 6, 2, -1, -1, -1, 0);
+		world->LoadAnim(lbl_80331838, 7, 0, -1, -1, -1, 0);
+		world->SetAnim(0, -1, -1, -1, 0);
+	}
+
+	unsigned char* const worldState = reinterpret_cast<unsigned char*>(m_wmWorldState);
+	*reinterpret_cast<unsigned short*>(worldState + 0x1C) = 0;
+	*reinterpret_cast<short*>(worldState + 0x36) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[0]);
+	*reinterpret_cast<short*>(worldState + 0x3E) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[0]);
+	*reinterpret_cast<short*>(worldState + 0x38) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[1]);
+	*reinterpret_cast<short*>(worldState + 0x40) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[1]);
+	*reinterpret_cast<short*>(worldState + 0x3A) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[2]);
+	*reinterpret_cast<short*>(worldState + 0x42) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[2]);
+	*reinterpret_cast<short*>(worldState + 0x3C) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[3]);
+	*reinterpret_cast<short*>(worldState + 0x44) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[3]);
+
+	char fontPath[128];
+	sprintf(fontPath, const_cast<char*>(s_dvd__smenu_subfont__s_fnt_801dc46c), Game.GetLangString());
+	loadFont(0, fontPath, 1, -1);
+
+	bytes[0x0D] = 0;
+	bytes[0x10] = 0;
+	bytes[0x12] = 0;
+	bytes[0x13] = 0;
+	*reinterpret_cast<unsigned short*>(worldState + 0x20) = 0;
+	*reinterpret_cast<unsigned short*>(worldState + 0x1E) = 0;
+	*reinterpret_cast<unsigned short*>(worldState + 0x18) = 0;
+	DAT_8032ee1c = 1;
+	DAT_8032e8ac = 1;
+
+	for (int i = 4; i < 6; i++) {
+		CMesMenu* menu = new (m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x2EA) CMesMenu;
+		m_battleMesMenus[i] = menu;
+		m_battleMesMenus[i]->SetBattleIndex(i);
+		m_battleMesMenus[i]->Create();
+	}
+
+	char texPath[256];
+	sprintf(texPath, const_cast<char*>(s_dvd__smenu_option__s_tex_801dc484), Game.GetLangString());
+	CFile::CHandle* fileHandle = File.Open(texPath, 0, CFile::PRI_LOW);
+	if (fileHandle != 0) {
+		File.Read(fileHandle);
+		File.SyncCompleted(fileHandle);
+		CTextureSet* textureSet = new (m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x300) CTextureSet;
+		reinterpret_cast<CTextureSet**>(bytes + 0xBC)[0] = textureSet;
+		reinterpret_cast<CTextureSet**>(bytes + 0xBC)[0]->Create(File.m_readBuffer, m_menuStage, 0, 0, 0, 0);
+		File.Close(fileHandle);
+	}
+
+	CTexture** textureSlot = reinterpret_cast<CTexture**>(bytes + 0xC0);
+	for (unsigned int i = 0;
+	     i < static_cast<unsigned int>(reinterpret_cast<CTextureSet**>(bytes + 0xBC)[0]->m_textureArray.GetSize());
+	     i++) {
+		textureSlot[i] = reinterpret_cast<CTextureSet**>(bytes + 0xBC)[0]->m_textureArray[i];
+	}
+
+	GetOptionData();
+	bytes[0x80] = 0;
+	*reinterpret_cast<float*>(bytes + 0x7C) = FLOAT_803313dc;
+	*reinterpret_cast<float*>(bytes + 0x78) = FLOAT_803313dc;
+	*reinterpret_cast<unsigned short*>(bytes + 0x74) = 0;
+	DAT_8032ef08 = reinterpret_cast<int>(&g_GoOutMenu);
 }
 
 /*

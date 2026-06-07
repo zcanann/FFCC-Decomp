@@ -2903,7 +2903,7 @@ int CMenuPcs::GetSmithItem(int itemNo)
     int itemBase = Game.unkCFlatData0[2] + itemNo * 0x48;
 
     int smithItem = *reinterpret_cast<u16*>(itemBase + raceType * 2 + 0x38);
-    if (smithItem != 0) {
+    if (smithItem > 0) {
         u16 flags = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + smithItem * 0x48 + 4);
         unsigned int raceMask = 1 << (caravanWork->m_tribeId & 3);
         unsigned int genderMask = 0x10;
@@ -2929,25 +2929,25 @@ int CMenuPcs::GetSmithItem(int itemNo)
 
     if (raceType != 0) {
         smithItem = *reinterpret_cast<u16*>(itemBase + 0x38);
-        if (smithItem != 0) {
+        if (smithItem > 0) {
             return smithItem;
         }
     }
     if (raceType != 1) {
         smithItem = *reinterpret_cast<u16*>(itemBase + 0x3A);
-        if (smithItem != 0) {
+        if (smithItem > 0) {
             return smithItem;
         }
     }
     if (raceType != 2) {
         smithItem = *reinterpret_cast<u16*>(itemBase + 0x3C);
-        if (smithItem != 0) {
+        if (smithItem > 0) {
             return smithItem;
         }
     }
     if (raceType != 3) {
         smithItem = *reinterpret_cast<u16*>(itemBase + 0x3E);
-        if (smithItem != 0) {
+        if (smithItem > 0) {
             return smithItem;
         }
     }

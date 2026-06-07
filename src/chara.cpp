@@ -299,17 +299,17 @@ static inline float& ModelTwistAngle(CChara::CModel* model)
 
 static inline int CharaDrawBufferIndex()
 {
-	return gChara.GetDrawBufferIndex();
+	return Chara.GetDrawBufferIndex();
 }
 
 static inline u32& CharaDrawBufferCursor(int bufferIndex)
 {
-	return gChara.GetDrawBufferCursor(bufferIndex);
+	return Chara.GetDrawBufferCursor(bufferIndex);
 }
 
 static inline u8* CharaDrawBufferBase(int bufferIndex)
 {
-	return gChara.GetDrawBufferBase(bufferIndex);
+	return Chara.GetDrawBufferBase(bufferIndex);
 }
 
 static inline u32 AlignCharaWorkBytes(u32 size)
@@ -590,7 +590,7 @@ static void CopyDuplicatedMeshState(CChara::CMesh* dst, CChara::CMesh* src)
 
 static const char s_charaMeshWorkOverflow[] = "chara mesh work buffer overflow\n";
 static int s_charaMeshWorkWarnArmed = 1;
-static bool s_charaMeshWorkOverflowSeen = false;
+static char s_charaMeshWorkOverflowSeen = 0;
 
 } // namespace
 
@@ -2947,7 +2947,7 @@ void CChara::CMesh::Calc(CChara::CModel* model)
 
 		if (!s_charaMeshWorkOverflowSeen) {
 			s_charaMeshWorkWarnArmed = 1;
-			s_charaMeshWorkOverflowSeen = true;
+			s_charaMeshWorkOverflowSeen = 1;
 		}
 
 		if ((s_charaMeshWorkWarnArmed != 0) && (System.m_execParam > 1)) {

@@ -2202,19 +2202,15 @@ int CMapMng::ReadOtm(char* mapName)
         chunkFile.PopChunk();
     }
 
-    const short octTreeCount = m_octTreeCount;
-    for (int i = 0; i < octTreeCount; i++) {
-        COctTree* octTree = GetOctTreeArray() + i;
-        CMapObj* mapObj = octTree->GetMapObject();
+    for (int i = 0; i < m_octTreeCount; i++) {
+        CMapObj* mapObj = m_octTreeArray[i].GetMapObject();
         if (mapObj != 0) {
             mapObj->m_octTreeIndex = static_cast<signed char>(i);
         }
     }
 
-    CPtrArray<CMapShadow*>* mapShadowArray = &GetMapShadowArray();
-    for (unsigned int i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
-        CMapShadow* mapShadow = (*mapShadowArray)[i];
-        mapShadow->Init();
+    for (unsigned int i = 0; i < static_cast<unsigned int>(GetMapShadowArray().GetSize()); i++) {
+        GetMapShadowArray()[i]->Init();
     }
 
     CMapObj* mapObj = GetMapObjArray();
@@ -2321,7 +2317,7 @@ int CMapMng::ReadMid(char* mapName)
 {
 
     sprintf(g_StrTmp, const_cast<char*>(s_mapMidPathFmt), mapName);
-    bool ok = true;
+    int ok = 1;
 
     if (static_cast<unsigned int>(System.m_execParam) >= 3) {
         System.Printf(const_cast<char*>(s_read_mid_fmt), g_StrTmp);
@@ -2441,7 +2437,7 @@ int CMapMng::ReadMid(char* mapName)
                     if (System.m_execParam != 0) {
                         System.Printf(const_cast<char*>(s_read_mid_octtree_error));
                     }
-                    ok = false;
+                    ok = 0;
                     nextMapObj = mapObj + 1;
                     octTreeCount += 1;
                     break;
@@ -2456,7 +2452,7 @@ int CMapMng::ReadMid(char* mapName)
                     System.Printf(const_cast<char*>(s_error_root_mapobj_not_found));
                     System.Printf(const_cast<char*>(s_read_mid_octtree_error));
                 }
-                ok = false;
+                ok = 0;
             }
         }
         chunkFile.PopChunk();
@@ -2487,10 +2483,8 @@ int CMapMng::ReadMid(char* mapName)
         System.Printf(const_cast<char*>(s_read_mid_error));
     }
 
-    const short octTreeCount = m_octTreeCount;
-    for (int i = 0; i < octTreeCount; i++) {
-        COctTree* octTree = GetOctTreeArray() + i;
-        CMapObj* mapObj = octTree->GetMapObject();
+    for (int i = 0; i < m_octTreeCount; i++) {
+        CMapObj* mapObj = m_octTreeArray[i].GetMapObject();
         if (mapObj != 0) {
             mapObj->m_octTreeIndex = static_cast<signed char>(i);
         }

@@ -562,8 +562,8 @@ void CMes::Draw()
 
 		float* glyph = (float*)((char*)this + 0x0C);
 		CFont* font = 0;
-		unsigned int activeTlut = 0xFFFFFFFF;
-		unsigned int activeFontId = 0xFFFFFFFF;
+		int activeTlut = 0xFFFFFFFF;
+		int activeFontId = 0xFFFFFFFF;
 
 		for (int i = 0; i < *(int*)((char*)this + 8); i++)
 		{
@@ -681,7 +681,7 @@ void CMes::Draw()
 				}
 				else
 				{
-					unsigned int fontId = (unsigned int)*(unsigned char*)((char*)glyph + 0x0E) & 0x0F;
+					int fontId = (int)((unsigned int)*(unsigned char*)((char*)glyph + 0x0E) & 0x0F);
 					if (activeFontId != fontId)
 					{
 						nextFont = MenuPcs.m_fonts[2];
@@ -731,10 +731,10 @@ void CMes::Draw()
 					_GXColor color = {0xFF, 0xFF, 0xFF, alpha};
 					font->SetColor(color);
 
-					unsigned int tlut = (unsigned int)*(unsigned char*)((char*)glyph + 0x12);
+					int tlut = (int)*(unsigned char*)((char*)glyph + 0x12);
 					if ((activeTlut != tlut) && (((unsigned int)*(unsigned char*)((char*)glyph + 0x0E) & 0x0F) < 2))
 					{
-						font->SetTlut((int)tlut + *(int*)((char*)this + 0x3D34));
+						font->SetTlut(tlut + *(int*)((char*)this + 0x3D34));
 						activeTlut = tlut;
 					}
 

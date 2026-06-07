@@ -151,7 +151,8 @@ static inline void UpdateGhostPartyDamageCounters(CGPrgObj* attacker)
 
 static unsigned short getPadHeldForSlot(int slot)
 {
-	if (Pad.m_debugPadLock != 0 || (slot == 0 && Pad.m_debugPadPort != -1)) {
+	bool blocked = Pad.m_debugPadLock != 0 || (slot == 0 && Pad.m_debugPadPort != -1);
+	if (blocked) {
 		return 0;
 	}
 
@@ -161,7 +162,8 @@ static unsigned short getPadHeldForSlot(int slot)
 
 static unsigned short getPadTrigForSlot(int slot)
 {
-	if (Pad.m_debugPadLock != 0 || (slot == 0 && Pad.m_debugPadPort != -1)) {
+	bool blocked = Pad.m_debugPadLock != 0 || (slot == 0 && Pad.m_debugPadPort != -1);
+	if (blocked) {
 		return 0;
 	}
 
@@ -171,7 +173,8 @@ static unsigned short getPadTrigForSlot(int slot)
 
 static int getPadConnectedForSlot(int slot)
 {
-	if (Pad.m_debugPadLock != 0 || (slot == 0 && Pad.m_debugPadPort != -1)) {
+	bool blocked = Pad.m_debugPadLock != 0 || (slot == 0 && Pad.m_debugPadPort != -1);
+	if (blocked) {
 		return 0;
 	}
 
@@ -181,7 +184,8 @@ static int getPadConnectedForSlot(int slot)
 
 static unsigned short getPadButtonUpForSlot(int slot)
 {
-	if (Pad.m_debugPadLock != 0 || (slot == 0 && Pad.m_debugPadPort != -1)) {
+	bool blocked = Pad.m_debugPadLock != 0 || (slot == 0 && Pad.m_debugPadPort != -1);
+	if (blocked) {
 		return 0;
 	}
 
@@ -215,7 +219,8 @@ static unsigned short getItemKindFromCfd(int itemId)
 
 static float getPadLeftStickXForSlot(int slot)
 {
-	if (Pad.m_debugPadLock != 0 || (slot == 0 && Pad.m_debugPadPort != -1)) {
+	bool blocked = Pad.m_debugPadLock != 0 || (slot == 0 && Pad.m_debugPadPort != -1);
+	if (blocked) {
 		return 0.0f;
 	}
 
@@ -225,7 +230,8 @@ static float getPadLeftStickXForSlot(int slot)
 
 static float getPadLeftStickYForSlot(int slot)
 {
-	if (Pad.m_debugPadLock != 0 || (slot == 0 && Pad.m_debugPadPort != -1)) {
+	bool blocked = Pad.m_debugPadLock != 0 || (slot == 0 && Pad.m_debugPadPort != -1);
+	if (blocked) {
 		return 0.0f;
 	}
 

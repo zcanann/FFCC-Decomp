@@ -2027,7 +2027,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 		const int itemId = caravan->m_inventoryItems[itemRef];
 		const int icon = GetItemIcon(itemId);
 
-		if ((itemId > 0xde) && (itemId < 0xe4)) {
+		if (IsMagicArti(itemId)) {
 			if (itemId == 0xdf) {
 				itemKinds[index] = 0x100;
 			} else if (itemId == 0xe0) {

@@ -1238,8 +1238,9 @@ void CPartMng::pppReadShp(CChunkFile& chunkFile, pppShapeSt* shapeSt)
 	while (chunkFile.GetNextChunk(chunk))
 	{
 		chunkFile.PushChunk();
-		if ((int)chunk.m_id == 0x46534850) // 'FSHP'
+		switch (chunk.m_id)
 		{
+		case 0x46534850: // 'FSHP'
 			while (chunkFile.GetNextChunk(chunk))
 			{
 				switch (chunk.m_id)
@@ -1266,6 +1267,7 @@ void CPartMng::pppReadShp(CChunkFile& chunkFile, pppShapeSt* shapeSt)
 					break;
 				}
 			}
+			break;
 		}
 		chunkFile.PopChunk();
 	}

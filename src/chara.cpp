@@ -2025,7 +2025,11 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 	GXSetZCompLoc((u8)0);
 	_GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
 	GXSetZMode((u8)1, (GXCompare)3, (u8)1);
-	GXSetCullMode(static_cast<GXCullMode>(cullFlag != 0 ? 2 : 1));
+	int cullMode = 1;
+	if (cullFlag != 0) {
+		cullMode = 2;
+	}
+	GXSetCullMode(static_cast<GXCullMode>(cullMode));
 	LightPcs.SetAmbientAlpha(ModelLightAlpha(this));
 
 	CCharaMeshRaw* mesh = ModelMeshes(this);

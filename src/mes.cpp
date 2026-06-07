@@ -716,7 +716,7 @@ void CMes::Draw()
 					}
 
 					unsigned int fadeCur = (unsigned int)*(unsigned char*)((char*)glyph + 0x0F) & 0x0F;
-					unsigned int fadeMax = (unsigned int)*(unsigned char*)((char*)glyph + 0x0F) >> 4;
+					unsigned int fadeMax = (unsigned int)*(unsigned char*)((char*)glyph + 0x0F) >> 4 & 0xF;
 					float ratio = (float)fadeCur / (float)fadeMax;
 					unsigned char alpha;
 					if (ratio >= FLOAT_80330898)

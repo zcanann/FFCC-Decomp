@@ -24,7 +24,7 @@ extern "C" float FLOAT_803301d0;
 extern "C" float FLOAT_803301e4;
 extern "C" float FLOAT_803301e8;
 extern "C" float FLOAT_803301f8;
-extern const char s_CChara_80330220[];
+extern const char sCharaStageName[] = "CChara";
 
 inline void* operator new(unsigned long, void* ptr)
 {
@@ -627,7 +627,7 @@ inline void D3DXMatrixMultiplyRotate(float (*out)[4], float (*a)[4], float (*b)[
  */
 void CChara::Init()
 {
-	m_amemStage = Memory.CreateStage(0xc0000, const_cast<char*>(s_CChara_80330220), 0);
+	m_amemStage = Memory.CreateStage(0xc0000, const_cast<char*>(sCharaStageName), 0);
 	m_amemLoadStage = 0;
 	m_drawBuffers[0].m_base = new (m_amemStage, const_cast<char*>(s_chara_cpp), 0x3f) u8[0x58000];
 	m_drawBuffers[1].m_base = new (m_amemStage, const_cast<char*>(s_chara_cpp), 0x40) u8[0x58000];

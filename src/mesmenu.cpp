@@ -17,7 +17,7 @@
 #include <math.h>
 #include <string.h>
 
-static const char s_CMesMenu_801D9E90[] = "CMesMenu";
+static const char sMesMenuClassName[] = "CMesMenu";
 extern "C" {
 const char s_mesMenuOnOffChangedFmt[] =
     "mesMenu\x95\x8e\xa6on/off\x82\xaa\x95\xcf\x8d\x58\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42%d-%d\n\0\0\0";

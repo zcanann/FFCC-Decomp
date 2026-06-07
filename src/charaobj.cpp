@@ -1342,7 +1342,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		System.Printf(dbg + 0x138);
 		return;
 	}
-	if (static_cast<int>(static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) << 0x18) >= 0) {
+	if (static_cast<signed char>(static_cast<int>(static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) << 24 >> 30) << 30 >> 31) == 0) {
 		System.Printf(dbg + 0x160);
 		return;
 	}

@@ -2141,12 +2141,7 @@ void CMenuPcs::DrawUniteList()
 	for (s32 i = 0; i < s_unitePanelCount; i++) {
 		CmdListEntry* const panel = &unitePanels[i];
 		const float alpha = (cmd->mode == 3) ? FLOAT_80332a70 : panel->alpha;
-		GXColor color;
-		color.r = 0xFF;
-		color.g = 0xFF;
-		color.b = 0xFF;
-		color.a = static_cast<u8>(FLOAT_80332acc * alpha);
-		font->SetColor(color);
+		font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_80332acc * alpha)).color);
 
 		const int itemId = caravan->m_commandListExtra[s_UniteTop[i]];
 		const char* text = GetUniteListName(itemId);

@@ -83,22 +83,33 @@ STATIC_ASSERT(offsetof(PartyObjOverlay, commandMode) == 0x3C);
 STATIC_ASSERT(sizeof(PartyObjOverlay) == 0x40);
 
 struct GhostPartyWork {
-	unsigned char _pad0[0x20];
-	int mood;
-	int thresholdA;
-	int thresholdB;
-	int thresholdC;
-	int slotSel;
-	float carrySpeed;
-	int pressure;
-	int settleTimer;
-	int activeTrailCount;
-	int trailIndex;
-	Vec trail[5];
-	Vec leaderTrail[5];
-	Vec carryDir;
-	int auraParticle;
+	unsigned char flags;       // 0x00
+	unsigned char _pad0[3];
+	int field04;               // 0x04
+	int field08;               // 0x08
+	Vec carryDir;              // 0x0C
+	int gauge;                 // 0x18
+	int state;                 // 0x1C
+	int field20;               // 0x20
+	int thresholdA;            // 0x24
+	int thresholdB;            // 0x28
+	int thresholdC;            // 0x2C
+	int slotSel;               // 0x30
+	float carrySpeed;          // 0x34
+	int pressure;              // 0x38
+	int settleTimer;           // 0x3C
+	int activeTrailCount;      // 0x40
+	unsigned char _pad44[0x90 - 0x44];
 };
+STATIC_ASSERT(offsetof(GhostPartyWork, carryDir) == 0x0C);
+STATIC_ASSERT(offsetof(GhostPartyWork, gauge) == 0x18);
+STATIC_ASSERT(offsetof(GhostPartyWork, thresholdA) == 0x24);
+STATIC_ASSERT(offsetof(GhostPartyWork, slotSel) == 0x30);
+STATIC_ASSERT(offsetof(GhostPartyWork, carrySpeed) == 0x34);
+STATIC_ASSERT(offsetof(GhostPartyWork, pressure) == 0x38);
+STATIC_ASSERT(offsetof(GhostPartyWork, settleTimer) == 0x3C);
+STATIC_ASSERT(offsetof(GhostPartyWork, activeTrailCount) == 0x40);
+STATIC_ASSERT(sizeof(GhostPartyWork) == 0x90);
 
 class CGPartyObj : public CGCharaObj
 {

@@ -4622,11 +4622,12 @@ void CGPartyObj::gpmCol()
 	int& trailIndex = *reinterpret_cast<int*>(ghostWork + 0x4C);
 	CGPartyObj* leader = Game.m_partyObjArr[0];
 
+	unsigned char* trailBase = ghostWork + 0x50;
 	int newIndex = 0;
-	unsigned int i = 0;
+	int i = 0;
 	do {
 		Vec* pos = (i == 0) ? &m_worldPosition
-		                    : reinterpret_cast<Vec*>(ghostWork + 0x50 + (i - 1) * 0xC);
+		                    : reinterpret_cast<Vec*>(trailBase + (i - 1) * 0xC);
 
 		CVector posV(*pos);
 		CVector leaderV(leader->m_worldPosition);
@@ -4664,8 +4665,8 @@ void CGPartyObj::gpmCol()
 			newIndex = trailIndex;
 		} else {
 			activeTrailCount = i + 1;
-			*reinterpret_cast<Vec*>(ghostWork + 0x50 + i * 0xC) = leader->m_worldPosition;
-			newIndex = (static_cast<int>(i) > trailIndex) ? trailIndex : static_cast<int>(i);
+			*reinterpret_cast<Vec*>(trailBase + i * 0xC) = leader->m_worldPosition;
+			newIndex = (i > trailIndex) ? trailIndex : i;
 			break;
 		}
 	} while (i < 5);
@@ -4728,26 +4729,26 @@ void CGPartyObj::ghostPartyMog()
 	}
 	unsigned int distFar = static_cast<unsigned int>(FLOAT_80331A5C * scale);
 
-	unsigned char* mboss = CGMonObj::m_boss;
-	int& bossState = *reinterpret_cast<int*>(mboss + 0x88);
+	unsigned char* flags = &CGPartyObj::m_ghostWork[0];
+	int& bossState = *reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x1C);
 
 	if (static_cast<double>(m_partyDistance[0]) <= DOUBLE_80331A90) {
 		bool exceeded;
-		if (static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x04)) < CharaGhostValue(0x2048) &&
-		    static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x08)) < CharaGhostValue(0x204C) &&
-		    static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x0C)) < CharaGhostValue(0x2050)) {
+		if (static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x24)) < CharaGhostValue(0x2048) &&
+		    static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x28)) < CharaGhostValue(0x204C) &&
+		    static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x2C)) < CharaGhostValue(0x2050)) {
 			exceeded = false;
 		} else {
 			exceeded = true;
 		}
 
-		if (exceeded && static_cast<signed char>(mboss[0x6C] << 4) >= 0) {
-			mboss[0x6C] = (mboss[0x6C] & 0xEF) | 0x10;
+		if (exceeded && static_cast<signed char>(flags[0] << 3) >= 0) {
+			flags[0] = (flags[0] & 0xEF) | 0x10;
 			bossState = 2;
 			putParticle(299, 0, this, FLOAT_80331a54, 0);
-		} else if (static_cast<signed char>(mboss[0x6C] << 3) < 0 ||
-		           static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x18)) < 10) {
-			bool settled = static_cast<signed char>(mboss[0x6C] << 4) >= 0;
+		} else if (static_cast<signed char>(flags[0] << 2) < 0 ||
+		           static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x38)) < 10) {
+			bool settled = static_cast<signed char>(flags[0] << 3) >= 0;
 			if (settled) {
 				unsigned int innerMode;
 				switch (Game.m_gameWork.m_bossArtifactStageIndex) {
@@ -4776,15 +4777,15 @@ void CGPartyObj::ghostPartyMog()
 						innerScale = FLOAT_80331A58 * (FLOAT_80331a54 - ramp) + FLOAT_80331A58;
 					}
 				}
-				if (static_cast<int>(FLOAT_80331A5C * innerScale) <= static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x18))) {
-					mboss[0x6C] = (mboss[0x6C] & 0xFB) | 4;
+				if (static_cast<int>(FLOAT_80331A5C * innerScale) <= static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x38))) {
+					flags[0] = (flags[0] & 0xFB) | 4;
 					bossState = 3;
 					goto messageMenu;
 				}
 			}
-			if (!settled || *reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x1C) < 0x97) {
+			if (!settled || *reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x3C) < 0x97) {
 				bossState = 0;
-				*reinterpret_cast<int*>(CGPartyObj::m_ghostWork) = 0;
+				*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x20) = 0;
 			} else {
 				bossState = 8;
 			}
@@ -4816,7 +4817,7 @@ void CGPartyObj::ghostPartyMog()
 			} else if (moodMode != 0 && moodMode < 3 && CharaGhostValue(0x2054) < 0x32) {
 				bossState = 6;
 			}
-			mboss[0x6C] = (mboss[0x6C] & 0xF7) | 8;
+			flags[0] = (flags[0] & 0xF7) | 8;
 		}
 	} else {
 		bossState = 1;
@@ -4825,20 +4826,20 @@ void CGPartyObj::ghostPartyMog()
 messageMenu:
 	if (static_cast<signed char>(leader->m_weaponNodeFlags >> 8) < 0 &&
 	    bossState != 0 &&
-	    bossState != *reinterpret_cast<int*>(CGPartyObj::m_ghostWork)) {
+	    bossState != *reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x20)) {
 		CMesMenu* mesMenu = MenuPcs.GetMesMenu(5);
 		bool busy = false;
 		if (mesMenu->IsActiveMessage()) {
 			busy = true;
 		}
 		if (!busy) {
-			*reinterpret_cast<int*>(CGPartyObj::m_ghostWork) = bossState;
+			*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x20) = bossState;
 			mesMenu->Open(Game.m_cFlatDataArr[1].Message(bossState - 1), 0x260, 0x20, 0x8E20, 0, 0x65, 0x8B);
 		}
 	}
 
 	unsigned int auraSlot = 0;
-	int gauge = *reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x18);
+	int gauge = *reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x38);
 	if (static_cast<int>(distFar * 3) / 3 < gauge) {
 		auraSlot = 0xF;
 	} else if (static_cast<int>(distFar << 1) / 3 < gauge) {
@@ -4847,7 +4848,7 @@ messageMenu:
 		auraSlot = 0xD;
 	}
 
-	unsigned int prevSlot = *reinterpret_cast<unsigned int*>(CGPartyObj::m_ghostWork + 0x6C);
+	unsigned int prevSlot = *reinterpret_cast<unsigned int*>(CGPartyObj::m_ghostWork + 0x8C);
 	if (prevSlot != auraSlot) {
 		endPSlotBit(0x400);
 		prevSlot = auraSlot;
@@ -4855,7 +4856,7 @@ messageMenu:
 			putParticle(auraSlot | 0x200, m_particleSlots[10], this, FLOAT_80331a54, 0);
 		}
 	}
-	*reinterpret_cast<unsigned int*>(CGPartyObj::m_ghostWork + 0x6C) = prevSlot;
+	*reinterpret_cast<unsigned int*>(CGPartyObj::m_ghostWork + 0x8C) = prevSlot;
 }
 
 /*
@@ -4881,7 +4882,7 @@ void CGPartyObj::gpmMove()
 		sGhostPartyWork.settleTimer = 0;
 	}
 
-	if (sGhostPartyWork.carrySpeed > FLOAT_80331A70) {
+	if (FLOAT_80331A70 < sGhostPartyWork.carrySpeed) {
 		moveVector(&sGhostPartyWork.carryDir, sGhostPartyWork.carrySpeed, 1);
 	}
 	sGhostPartyWork.carrySpeed *= FLOAT_80331a74;
@@ -4971,15 +4972,15 @@ void CGPartyObj::gpmMove()
 				return;
 			}
 			if ((PartyData(leader).partyFlags & 0x40) != 0) {
-				sGhostPartyWork.trailIndex = 0;
+				sGhostPartyWork.gauge = 0;
 			}
 			if ((PartyData(this).partyFlags & 0x80) == 0) {
 				return;
 			}
 
 			PartyData(this).partyFlags |= 0x20;
-			sGhostPartyWork.trailIndex++;
-			if (sGhostPartyWork.trailIndex < 0x10) {
+			sGhostPartyWork.gauge++;
+			if (sGhostPartyWork.gauge < 0x10) {
 				return;
 			}
 			if ((PartyData(this).partyFlags & 0x40) != 0) {
@@ -5088,7 +5089,7 @@ void CGPartyObj::gpmMove()
 				*reinterpret_cast<int*>(self + 0x550) = 0x20B;
 			}
 			changeStat(2, 0, 0);
-			sGhostPartyWork.trailIndex = 0;
+			sGhostPartyWork.gauge = 0;
 			PartyData(this).partyFlags &= 0x9F;
 			return;
 		}

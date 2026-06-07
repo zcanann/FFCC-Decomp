@@ -2373,8 +2373,8 @@ void CMenuPcs::CalcResultCountAnim()
 		*(short*)(this->m_bonusStatePtr + 0x22) = *(short*)(this->m_bonusStatePtr + 0x22) + 1;
 	}
 
-	int frame = (int)*(short*)(this->m_bonusStatePtr + 0x22) - 8;
 	int countTop = (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count - activePartyCount;
+	int frame = (int)*(short*)(this->m_bonusStatePtr + 0x22) - 8;
 
 	for (int i = 0; i < activePartyCount; i++) {
 		BonusAnimSprite* sprite = &((BonusAnimList*)this->m_bonusAnimPtr)->sprites[countTop + i];
@@ -2386,13 +2386,13 @@ void CMenuPcs::CalcResultCountAnim()
 			int value = s_Rinfo->m_party[i].m_totalValue;
 			if (frame == value) {
 				Sound.PlaySe(0x4b, 0x40, 0x7f, 0);
-				sprite->timer = frame;
+				sprite->startFrame = frame;
 			}
 
-			if (frame < sprite->timer) {
+			if (frame < sprite->startFrame) {
 				sprite->alpha = 0.0f;
 			} else {
-				int elapsed = frame - sprite->timer;
+				int elapsed = frame - sprite->startFrame;
 				sprite->alpha = 1.0f;
 				if (elapsed < sprite->duration) {
 					float progress = 1.0f - ((float)elapsed / (float)sprite->duration);

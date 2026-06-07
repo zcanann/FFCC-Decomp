@@ -538,7 +538,7 @@ void CMenuPcs::EquipDraw()
 						x = x + fillWidth;
 						u = u + fillWidth;
 					}
-					if ((kEquipZero < fillWidth) && (fillWidth < w)) {
+					if ((kEquipZero < fillWidth) && (fillWidth < (float)listItem->w)) {
 						colors[1].a = 0;
 						colors[3].a = 0;
 						float fadeWidth =

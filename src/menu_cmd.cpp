@@ -2004,8 +2004,8 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 				}
 			}
 		} else {
-			const u32 v = static_cast<u32>(caravan->m_commandListExtra[slot]);
-			candidates[write] = static_cast<s32>((-v | v) >> 31);
+			const s32 v = caravan->m_commandListExtra[slot];
+			candidates[write] = (-v | v) >> 31;
 		}
 
 		write = nextWrite + 1;

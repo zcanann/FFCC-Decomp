@@ -2210,7 +2210,7 @@ void CMenuPcs::CalcLoadMenu()
 	}
 	unsigned short uVar7 = GetButtonRepeat(0);
 
-	if (worldState->m_worldReady == 0) {
+	if (static_cast<signed char>(m_wmWorldState->m_worldReady) == 0) {
 		int frame = reinterpret_cast<int>(m_wm.m_frameInfo);
 		*reinterpret_cast<short*>(frame + 4) = 0x10;
 		float fVar5 = FLOAT_803313e8;

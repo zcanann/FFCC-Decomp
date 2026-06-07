@@ -2808,11 +2808,11 @@ void la(CGObject*)
  */
 void CGCharaObj::statAttack()
 {
-	unsigned int cid = GetCID();
+	unsigned short cid = GetCID();
 
 	if ((cid & 0xAD) == 0xAD && m_subState == 0) {
-		void* animPoint = m_scriptHandle[4];
-		if (animPoint == reinterpret_cast<void*>(0x88) || animPoint == reinterpret_cast<void*>(0x87)) {
+		int animPoint = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x10);
+		if (animPoint == 0x88 || animPoint == 0x87) {
 			if (!CharaObjIsAttackAnimBoundary(this)) {
 				return;
 			}

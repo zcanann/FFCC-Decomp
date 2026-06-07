@@ -2585,8 +2585,8 @@ void CGPartyObj::checkTargetParticle()
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	unsigned char flags = party.partyFlags;
 
-	if ((flags & 0x10) != 0) {
-		putTargetParticle((flags & 0x80) ? 1 : 0, 0);
+	if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(flags) << 27) & 0xC0000000) >> 31) != 0) {
+		putTargetParticle(static_cast<int>((static_cast<unsigned int>(flags) << 25) & 0xC0000000) >> 31, 0);
 		party.partyFlags &= 0xEF;
 	}
 

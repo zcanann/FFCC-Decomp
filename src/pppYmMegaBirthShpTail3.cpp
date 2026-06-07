@@ -65,7 +65,6 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
 {
     u8* step = (u8*)stepData;
     u8* payload = step + 0x14;
-    const u32 dataValIndex = *(u32*)(step + 4);
     YmMegaBirthShpTail3DataOffsets* serializedOffsets = offsets->m_serializedDataOffsets;
     const s32 colorOffset = serializedOffsets->m_colorOffset;
     const s32 particleDataOffset = serializedOffsets->m_workOffset;
@@ -74,15 +73,20 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
     _PARTICLE_DATA* particles = *(_PARTICLE_DATA**)(workBytes + 0x3c);
     _PARTICLE_WMAT* wmats = *(_PARTICLE_WMAT**)(workBytes + 0x40);
     _PARTICLE_COLOR* colors = *(_PARTICLE_COLOR**)(workBytes + 0x44);
-    const u32 maxParticles = *(u32*)(workBytes + 0x48);
-    bool hasRequiredMemory = false;
+    s8 hasRequiredMemory;
 
-    if (particles != 0 && wmats != 0) {
+    if (particles == 0) {
+        hasRequiredMemory = false;
+    } else if (wmats == 0) {
+        hasRequiredMemory = false;
+    } else {
         hasRequiredMemory = true;
     }
-    if (!hasRequiredMemory || dataValIndex == 0xFFFF) {
+    if (!hasRequiredMemory || *(u32*)(step + 4) == 0xFFFF) {
         return;
     }
+    const u32 dataValIndex = *(u32*)(step + 4);
+    const u32 maxParticles = *(u32*)(workBytes + 0x48);
 
     pppShapeAnimData* shapeAnim =
         static_cast<pppShapeAnimData*>(ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex]->m_animData);

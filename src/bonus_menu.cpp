@@ -23,6 +23,15 @@ extern const double kPppCrystal2RefractionScale;
 extern const float FLOAT_80331EAC;
 extern const float FLOAT_80331EB0;
 extern const float FLOAT_80331ED0;
+extern const float FLOAT_80331F00;
+extern const float FLOAT_80331F04;
+extern const double DOUBLE_80331F08;
+extern const float FLOAT_80331F10;
+extern const float FLOAT_80331F14;
+extern const float FLOAT_80331F18;
+extern const double DOUBLE_80331F20;
+extern const float FLOAT_80331F28;
+extern const float FLOAT_80331F2C;
 extern const float FLOAT_80331F6C;
 extern const float FLOAT_80331FB8;
 extern const float FLOAT_80331FBC;
@@ -1106,7 +1115,7 @@ void CMenuPcs::CalcSelectWait()
 			if ((int)count <= i) {
 				break;
 			}
-			*(float*)(animBase + walkOff + 0x18) = 1.0f;
+			*(float*)(animBase + walkOff + 0x18) = FLOAT_80331EB0;
 			*(int*)(animBase + walkOff + 0x34) = 3;
 			walkOff += 0x40;
 		}
@@ -1117,11 +1126,11 @@ void CMenuPcs::CalcSelectWait()
 		cursor->y = (short)(partySprite->y - 8);
 		cursor->w = 0x40;
 		cursor->h = 0x30;
-		cursor->mulX = 0.0f;
-		cursor->mulY = 0.0f;
+		cursor->mulX = FLOAT_80331EAC;
+		cursor->mulY = FLOAT_80331EAC;
 		cursor->startFrame = 0;
 		cursor->duration = 8;
-		cursor->depth = 1.0f;
+		cursor->depth = FLOAT_80331EB0;
 		((BonusAnimHeader*)this->m_bonusAnimPtr)->count = (short)(count + 1);
 		BonusSpriteFlags(&((BonusAnimSprite*)(this->m_bonusAnimPtr + 8))[2]) = 0;
 		*(short*)(this->m_bonusStatePtr + 0xe) = 0;
@@ -1252,7 +1261,7 @@ void CMenuPcs::CalcSelectWait()
 		sprites[2].alpha = (float)sprites[2].timer / (float)sprites[2].duration;
 		sprites[2].timer++;
 	} else {
-		sprites[2].alpha = 1.0f;
+		sprites[2].alpha = FLOAT_80331EB0;
 	}
 	{
 		BonusAnimSprite* cursor = &sprites[header->count - 1];
@@ -1266,7 +1275,7 @@ void CMenuPcs::CalcSelectWait()
 			cursor->y = (short)(partySprite->y - 8);
 			cursor->alpha = (float)pulseFrame / 10.0f;
 		} else {
-			cursor->alpha = 0.0f;
+			cursor->alpha = FLOAT_80331EAC;
 		}
 	}
 
@@ -1285,7 +1294,7 @@ void CMenuPcs::CalcSelectWait()
 			PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
 
 			scaleMtx[1][3] = s_BonusModelYPos[tribeId];
-			scaleMtx[0][3] = 0.0f;
+			scaleMtx[0][3] = FLOAT_80331EAC;
 		} else {
 			int artifactIndex = i - activePartyCount;
 			handle = GetBonusDisplayHandleSlots(this)[activePartyCount * 2 + artifactIndex];
@@ -1293,31 +1302,31 @@ void CMenuPcs::CalcSelectWait()
 				continue;
 			}
 
-			PSMTXScale(scaleMtx, 0.5799999833106995f, 0.5799999833106995f, 0.5799999833106995f);
+			PSMTXScale(scaleMtx, FLOAT_80331F00, FLOAT_80331F00, FLOAT_80331F00);
 			srcVec.x = s_BonusModelScale[4];
-			srcVec.y = 0.0f;
-			srcVec.z = 0.0f;
-			PSMTXRotRad(rotMtx, 'z', 0.01745329238474369f * (float)(-45.0 * (double)artifactIndex));
+			srcVec.y = FLOAT_80331EAC;
+			srcVec.z = FLOAT_80331EAC;
+			PSMTXRotRad(rotMtx, 'z', FLOAT_80331F04 * (float)(DOUBLE_80331F08 * (double)artifactIndex));
 			PSMTXMultVecSR(rotMtx, &srcVec, &dstVec);
 
 			int charaNo = handle->m_charaNo;
 			if (charaNo == 0x44) {
-				PSMTXRotRad(tempMtx, 'y', 3.1415927410125732f);
+				PSMTXRotRad(tempMtx, 'y', FLOAT_80331F10);
 				PSMTXConcat(scaleMtx, tempMtx, scaleMtx);
-				PSMTXRotRad(tempMtx, 'x', -1.1693705320358276f);
+				PSMTXRotRad(tempMtx, 'x', FLOAT_80331F14);
 				PSMTXConcat(scaleMtx, tempMtx, scaleMtx);
 			}
 
 			scaleMtx[0][3] = dstVec.x;
-			float modelY = (float)((double)(0.9670329689979553f * dstVec.y) - 5.0);
+			float modelY = (float)((double)(FLOAT_80331F18 * dstVec.y) - DOUBLE_80331F20);
 			if (charaNo == 0x41 || charaNo == 0x37) {
-				modelY += 3.4000000953674316f;
+				modelY += FLOAT_80331F28;
 			} else if (charaNo == 0x44) {
-				modelY += 5.0f;
+				modelY += FLOAT_80331F2C;
 			}
 			scaleMtx[1][3] = modelY;
 		}
-		scaleMtx[2][3] = 0.0f;
+		scaleMtx[2][3] = FLOAT_80331EAC;
 
 		handle->m_model->m_flags10C = (handle->m_model->m_flags10C & 0x7F) | 0x80;
 		handle->m_model->SetMatrix(scaleMtx);

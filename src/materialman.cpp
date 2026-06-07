@@ -1803,7 +1803,8 @@ void CMaterialMan::SetPosition(
                 ((shadow->m_yFilterMode != 2) || (position->y <= shadowPos.y));
             if ((ignoreFrustumCheck != 0) ||
                 (yFilterPass &&
-                 (searchBound.CheckFrustum(shadowPos, scaledShadowMtx, kMaterialShadowBoundsRadius) != 0))) {
+                 (reinterpret_cast<CBound*>(searchBoundStorage)
+                      ->CheckFrustum(shadowPos, scaledShadowMtx, kMaterialShadowBoundsRadius) != 0))) {
                 Vec delta;
                 PSVECSubtract(&shadowPos, position, &delta);
                 candidateWrite->shadow = shadow;
@@ -1852,7 +1853,8 @@ void CMaterialMan::SetPosition(
                 kTextureOne);
 
             if ((shadow->m_materialMode == 1) ||
-                (searchBound.CheckFrustum(shadowPos, scaledShadowMtx, kMaterialShadowBoundsRadius) != 0)) {
+                (reinterpret_cast<CBound*>(searchBoundStorage)
+                     ->CheckFrustum(shadowPos, scaledShadowMtx, kMaterialShadowBoundsRadius) != 0)) {
                 SetShadow(*shadow, viewMtx, i, 0);
             }
         }

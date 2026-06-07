@@ -954,10 +954,12 @@ void CGPartyObj::onFramePreCalc()
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	if (Game.unk_flat3_0xc7d0 != 0) {
 		const Vec* chalicePos = reinterpret_cast<Vec*>(Game.unk_flat3_0xc7d0 + 0x15C);
-		m_projection.z = PSVECDistance(&m_worldPosition, chalicePos);
+		*reinterpret_cast<float*>(self + 0x5BC) = PSVECDistance(&m_worldPosition, chalicePos);
 	}
 
-	if (((self[0x63C] & 0x80) != 0) && ((party.partyFlags & 0x80) == 0)) {
+	if ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x63C]) << 24) & 0xC0000000) >> 31) != 0) &&
+	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(party.partyFlags) << 24) & 0xC0000000) >> 31) == 0) &&
+	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x9B]) << 25) & 0xC0000000) >> 31) == 0)) {
 		unsigned short held = getPadHeldForSlot(static_cast<unsigned char>(m_animStateMisc));
 		if (held != 0) {
 			changeStat(0, 0, 0);

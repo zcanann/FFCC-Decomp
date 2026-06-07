@@ -930,8 +930,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		}
 		case -0x1D: {
 			float* params = reinterpret_cast<float*>(object->m_localBase);
-			CVector moveVector(params[0], params[1], params[2]);
-			engineObject->moveVector(moveVector, params[3], static_cast<int>(object->m_localBase[4]));
+			engineObject->moveVector(CVector(params[0], params[1], params[2]), params[3], static_cast<int>(object->m_localBase[4]));
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1004,8 +1003,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		}
 		case -0x25: {
 			float* params = reinterpret_cast<float*>(object->m_localBase);
-			CVector position(params[0], params[1], params[2]);
-			engineObject->SetPosBG(position, 0);
+			engineObject->SetPosBG(CVector(params[0], params[1], params[2]), 0);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1075,12 +1073,11 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		}
 		case -0x2D: {
 			float* params = reinterpret_cast<float*>(object->m_localBase);
-			CVector position(params[3], params[4], params[5]);
 			engineObject->SetAttackCol(
 			    static_cast<int>(object->m_localBase[0]),
 			    RuntimeString(this, object->m_localBase[1]),
 			    params[2],
-			    position);
+			    CVector(params[3], params[4], params[5]));
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1106,13 +1103,12 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		}
 		case -0x2F: {
 			float* params = reinterpret_cast<float*>(object->m_localBase);
-			CVector position(params[4], params[5], params[6]);
 			engineObject->SetDamageCol(
 			    static_cast<int>(object->m_localBase[0]),
 			    RuntimeString(this, object->m_localBase[1]),
 			    params[2],
 			    params[3],
-			    position);
+			    CVector(params[4], params[5], params[6]));
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1154,8 +1150,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		}
 		case -0x36: {
 			float* params = reinterpret_cast<float*>(object->m_localBase);
-			CVector moveVector(params[0], params[1], params[2]);
-			engineObject->moveVectorH(moveVector, params[3], static_cast<int>(object->m_localBase[4]));
+			engineObject->moveVectorH(CVector(params[0], params[1], params[2]), params[3], static_cast<int>(object->m_localBase[4]));
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

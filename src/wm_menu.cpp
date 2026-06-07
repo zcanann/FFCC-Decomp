@@ -2979,7 +2979,7 @@ void CMenuPcs::CalcLoadMenu()
 void CMenuPcs::CalcTitleMenu()
 {
 
-	if (lbl_8032EE38[0] == 0) {
+	if (static_cast<signed char>(lbl_8032EE38[0]) == 0) {
 		lbl_8032EE38[0] = 1;
 		DAT_8032EE34 = const_cast<char*>(s_dvd_movie_ffcc_op_thp_801dc448);
 	}

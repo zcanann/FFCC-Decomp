@@ -3627,7 +3627,7 @@ void CGMonObj::statWatch()
 				(static_cast<int>(monObj->m_aiState) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
 		}
 
-		unsigned short targetMode = *reinterpret_cast<unsigned short*>(aiScript + 0x106);
+		int targetMode = *reinterpret_cast<unsigned short*>(aiScript + 0x106);
 		int selectedTarget = -1;
 		if (targetMode == 0xFFFF) {
 			chaseState = 0;
@@ -3642,12 +3642,12 @@ void CGMonObj::statWatch()
 			for (int slot = 0; slot < 4; slot++) {
 				CGPartyObj* party = Game.m_partyObjArr[*reinterpret_cast<int*>(mon + slot * 4 + 0x620)];
 				if ((party != NULL) &&
-					(*reinterpret_cast<short*>(reinterpret_cast<CGObject*>(party)->m_scriptHandle + 7) != 0) &&
+					(*reinterpret_cast<unsigned short*>(reinterpret_cast<CGObject*>(party)->m_scriptHandle + 7) != 0) &&
 					(reinterpret_cast<CGPrgObj*>(party)->m_lastStateId != 9) &&
 					(reinterpret_cast<CGPrgObj*>(party)->m_lastStateId != 0x22) &&
 					((Game.m_gameWork.m_menuStageMode == 0) ||
-					 (0xE < Game.m_gameWork.m_bossArtifactStageIndex) ||
-					 ((reinterpret_cast<CGPrgObj*>(party)->GetCID() & 0x6D) != 0x6D) ||
+					 (0xF <= Game.m_gameWork.m_bossArtifactStageIndex) ||
+					 ((static_cast<unsigned short>(reinterpret_cast<CGPrgObj*>(party)->GetCID()) & 0x6D) != 0x6D) ||
 					 (reinterpret_cast<CGObject*>(party)->m_scriptHandle[0xED] == NULL))) {
 					validCount++;
 				}
@@ -3668,12 +3668,12 @@ void CGMonObj::statWatch()
 				CGPartyObj* party = Game.m_partyObjArr[partyIndex];
 				int candidate = accum;
 				if ((party != NULL) &&
-					(*reinterpret_cast<short*>(reinterpret_cast<CGObject*>(party)->m_scriptHandle + 7) != 0) &&
+					(*reinterpret_cast<unsigned short*>(reinterpret_cast<CGObject*>(party)->m_scriptHandle + 7) != 0) &&
 					(reinterpret_cast<CGPrgObj*>(party)->m_lastStateId != 9) &&
 					(reinterpret_cast<CGPrgObj*>(party)->m_lastStateId != 0x22) &&
 					((Game.m_gameWork.m_menuStageMode == 0) ||
-					 (0xE < Game.m_gameWork.m_bossArtifactStageIndex) ||
-					 ((reinterpret_cast<CGPrgObj*>(party)->GetCID() & 0x6D) != 0x6D) ||
+					 (0xF <= Game.m_gameWork.m_bossArtifactStageIndex) ||
+					 ((static_cast<unsigned short>(reinterpret_cast<CGPrgObj*>(party)->GetCID()) & 0x6D) != 0x6D) ||
 					 (reinterpret_cast<CGObject*>(party)->m_scriptHandle[0xED] == NULL))) {
 					if ((static_cast<double>(*reinterpret_cast<float*>(mon + partyIndex * 4 + 0x5D0)) < homeRange2) &&
 						(mode0Target = partyIndex, targetMode == 0)) {

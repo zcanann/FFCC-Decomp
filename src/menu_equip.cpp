@@ -441,11 +441,12 @@ void CMenuPcs::EquipDraw()
 			float v = item->v;
 			float alpha = item->alpha;
 
+			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
+
 			if ((listState == 1) && (i == static_cast<int>(menuState->selectedIndex))) {
 				v = v + h;
 			}
 
-			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
 			GXColor color;
 			color.r = 0xff;
 			color.g = 0xff;

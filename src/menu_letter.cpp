@@ -1771,7 +1771,7 @@ void CMenuPcs::LetterListDraw()
 		const float markScale =
 		    static_cast<float>(DOUBLE_80333098 * static_cast<double>(absPhase) + DOUBLE_80333090);
 
-		SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+		MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 		const int alpha = static_cast<int>(
 		    FLOAT_803330a0 * static_cast<float>(DOUBLE_803330b0 * static_cast<double>(absPhase) + DOUBLE_803330a8));
@@ -1781,7 +1781,7 @@ void CMenuPcs::LetterListDraw()
 		markColor.b = 0xFF;
 		markColor.a = static_cast<u8>(alpha);
 		GXSetChanMatColor(GX_COLOR0A0, markColor);
-		SetTexture(static_cast<CMenuPcs::TEX>(0x43));
+		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x43));
 
 		const float iconSize = FLOAT_803330b8;
 		const double iconOffset = (iconSize - iconSize * markScale) * DOUBLE_803330a8;
@@ -1789,14 +1789,14 @@ void CMenuPcs::LetterListDraw()
 		const double markY = static_cast<double>(static_cast<float>(static_cast<double>(FLOAT_8033308c) + iconOffset));
 
 		if ((pageMark & 1) != 0) {
-			DrawRect(
+			MenuPcs.DrawRect(
 			    4, static_cast<float>(markX), static_cast<float>(markY), FLOAT_803330b8,
 			    FLOAT_803330b8, FLOAT_803330bc, FLOAT_803330bc, static_cast<float>(markScale),
 			    static_cast<float>(markScale), 0.0f);
 		}
 
 		if ((pageMark & 2) != 0) {
-			DrawRect(
+			MenuPcs.DrawRect(
 			    0, static_cast<float>(markX), static_cast<float>(static_cast<float>(markY + static_cast<double>(FLOAT_803330c0))),
 			    FLOAT_803330b8, FLOAT_803330b8, FLOAT_803330bc, FLOAT_803330bc,
 			    static_cast<float>(markScale), static_cast<float>(markScale), 0.0f);

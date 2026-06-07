@@ -635,9 +635,9 @@ void CGCharaObj::onFramePostCalc()
 	}
 
 	script = reinterpret_cast<unsigned char*>(m_scriptHandle);
-	if (*reinterpret_cast<short*>(script + 0x3E) == 0 &&
-	    *reinterpret_cast<short*>(script + 0x14) == 0 &&
-	    *reinterpret_cast<short*>(script + 0x11) == 0) {
+	if (*reinterpret_cast<unsigned short*>(script + 0x3E) == 0 &&
+	    *reinterpret_cast<unsigned short*>(script + 0x50) == 0 &&
+	    *reinterpret_cast<unsigned short*>(script + 0x44) == 0) {
 		m_displayFlags |= 2;
 	} else {
 		m_displayFlags &= ~2;

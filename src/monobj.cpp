@@ -3214,6 +3214,10 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
 	CGObject* object = reinterpret_cast<CGObject*>(monObj);
 #define baseScript (reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]))
+#define aiScript (monObj->m_aiState == 0 \
+		? baseScript \
+		: reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) + \
+			(monObj->m_aiState + *reinterpret_cast<unsigned short*>(baseScript + 0x100)) * 0x1D0 + 0x10)
 	if (monObj->m_funcs->attackCheck != 0) {
 		int result = (monObj->*monObj->m_funcs->attackCheck)(partyIndex);
 		if (result == -2) {
@@ -3225,20 +3229,15 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 	}
 
 	float targetDist = *reinterpret_cast<float*>(mon + partyIndex * 4 + 0x5D0);
-	short aiState = monObj->m_aiState;
-	unsigned char* aiScript = baseScript;
-	if (aiState != 0) {
-		aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-			(aiState + *reinterpret_cast<unsigned short*>(baseScript + 0x100)) * 0x1D0 + 0x10;
-	}
 
 	unsigned short selectorType = *reinterpret_cast<unsigned short*>(aiScript + 0x108);
 	if (selectorType == 0xFFFF) {
 		return -1;
 	}
 
-	unsigned int groupTable[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };
-	int groupCount[8] = { 0 };
+	unsigned int groupTable[8] = { 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+		0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF };
+	int groupCount[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 	int selectedAction = -1;
 
 	for (int actionIndex = 0; actionIndex < 8; actionIndex++) {
@@ -3355,6 +3354,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 	}
 
 	return selectedAction;
+#undef aiScript
 #undef baseScript
 }
 

@@ -2214,7 +2214,7 @@ void CMenuPcs::DrawUniteList()
 		color.r = 0xFF;
 		color.g = 0xFF;
 		color.b = 0xFF;
-		color.a = static_cast<s8>(FLOAT_80332acc * entry->alpha);
+		color.a = static_cast<u8>(FLOAT_80332acc * entry->alpha);
 		GXSetChanMatColor((_GXChannelID)4, color);
 
 		s32 groupSize = 1;
@@ -2349,7 +2349,7 @@ void CMenuPcs::DrawUniteList()
 		GXSetChanMatColor((_GXChannelID)4, color);
 
 		CmdListEntry* const panel = &unitePanels[s_unitePanelCount];
-		panel->x = static_cast<s16>(panelX);
+		panel->x = static_cast<u16>(panelX);
 		panel->y = static_cast<s16>(panelY);
 		panel->width = static_cast<s16>(FLOAT_80332AEC);
 		panel->height = static_cast<s16>(FLOAT_80332ac8);

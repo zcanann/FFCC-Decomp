@@ -113,7 +113,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                 u8 trailNextIndex = (u8)(trailReadIndex + 1);
                 const float alphaScale = (float)*(s16*)((u8*)colorWork + 6) / FLOAT_803305A0;
                 const float stepDivisor = (float)((s32)frameCountRaw - 1);
-                double fadeA = (double)((float)(*(s16*)(workBytes + 0x56) >> 7) * alphaScale);
+                float fadeA = (float)(*(s16*)(workBytes + 0x56) >> 7) * alphaScale;
                 float fadeR = (float)(*(s16*)(workBytes + 0x50) >> 7);
                 float fadeG = (float)(*(s16*)(workBytes + 0x52) >> 7);
                 float fadeB = (float)(*(s16*)(workBytes + 0x54) >> 7);
@@ -129,7 +129,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                     fadeBStep =
                         (fadeB - (float)(*(s16*)(workBytes + 0x5c) >> 7)) / stepDivisor;
                     fadeAStep =
-                        ((float)fadeA - (float)(*(s16*)(workBytes + 0x5e) >> 7) * alphaScale) /
+                        (fadeA - (float)(*(s16*)(workBytes + 0x5e) >> 7) * alphaScale) /
                         stepDivisor;
                 }
                 double drawScale = (double)*(float*)(payload + 0x5C);
@@ -230,7 +230,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                         amb.r = (u8)fadeR;
                         amb.g = (u8)fadeG;
                         amb.b = (u8)fadeB;
-                        amb.a = (u8)(fadeA * (double)(FLOAT_803305AC * (FLOAT_803305B0 - *(float*)(particle + 0x30))));
+                        amb.a = (u8)(fadeA * (FLOAT_803305AC * (FLOAT_803305B0 - *(float*)(particle + 0x30))));
                         if (amb.a > 0x7F) {
                             amb.a = 0x7F;
                         }
@@ -242,7 +242,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                     fadeR -= fadeRStep;
                     fadeG -= fadeGStep;
                     fadeB -= fadeBStep;
-                    fadeA = (double)(float)(fadeA - (double)fadeAStep);
+                    fadeA -= fadeAStep;
                     drawScale = (double)(float)(drawScale - (double)drawScaleStep);
                     if (*(float*)(payload + 0x98) <= kPppYmMegaBirthShpTail3Zero) {
                         break;

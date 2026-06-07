@@ -287,12 +287,11 @@ void CGMonObj::undeadOff()
  */
 void CGMonObj::undeadOn()
 {
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-
-	*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x694) = 1.0f;
+#define object (reinterpret_cast<CGObject*>(this))
+	*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x694) = FLOAT_803319E8;
 	void* classId = object->m_scriptHandle[4];
 	unsigned char weaponFlags = *reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags);
-	int weaponMode = static_cast<int>(static_cast<unsigned int>(weaponFlags) << 24) >> 31;
+	int weaponMode = static_cast<int>((static_cast<unsigned int>(weaponFlags) << 24) & 0xC0000000) >> 31;
 	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC) != 0xB) {
 		weaponMode = 1;
 	}
@@ -305,8 +304,8 @@ void CGMonObj::undeadOn()
 	int particleBase = (weaponMode != 0) ? 0x46 : 0x3C;
 
 	for (int i = 0; i < static_cast<int>(count); i++) {
-		int dataNo = object->m_charaModelHandle != nullptr ? object->m_charaModelHandle->GetPdtSlot() : -1;
-		reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace((particleBase + i) | (dataNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x594), object, 0.0f, 0);
+		int dataNo = object->m_charaModelHandle->GetPdtSlot();
+		reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace((particleBase + i) | (dataNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x594), object, FLOAT_803319C0, 0);
 	}
 
 	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC) == 0xB) {
@@ -322,6 +321,7 @@ void CGMonObj::undeadOn()
 	}
 
 	m_unk6BA = 0;
+#undef object
 }
 
 /*

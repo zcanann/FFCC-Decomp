@@ -3786,35 +3786,35 @@ void CMenuPcs::CalcSingCMake()
     case 0:
         if (CmakeState(this)->m_mode == 0) {
             CalcWMFrame0(CmakeState(this)->m_frame - 10);
-            if (CmakeState(this)->m_frame < 10) {
-                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
-                result = 0;
-            } else {
+            if (CmakeState(this)->m_frame >= 10) {
                 CmakeState(this)->m_select = 0;
                 CmakeState(this)->m_row = 0;
                 CmakeState(this)->m_table = 0;
                 CmakeState(this)->m_subSelect = 0;
                 result = 1;
+            } else {
+                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+                result = 0;
             }
         } else if (CmakeState(this)->m_mode == 1) {
             result = 0;
         } else {
             CalcWMFrame0(-CmakeState(this)->m_frame);
-            if (CmakeState(this)->m_frame < 10) {
+            if (CmakeState(this)->m_frame >= 10) {
+                result = 1;
+            } else {
                 CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
                 result = 0;
-            } else {
-                result = 1;
             }
         }
         break;
     case 1:
         if (CmakeState(this)->m_mode == 0) {
-            if (CmakeState(this)->m_frame < 10) {
+            if (CmakeState(this)->m_frame >= 10) {
+                result = 1;
+            } else {
                 CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
                 result = 0;
-            } else {
-                result = 1;
             }
         } else if (CmakeState(this)->m_mode == 1) {
             result = static_cast<unsigned short>(CmakeNameCtrl());
@@ -3833,11 +3833,11 @@ void CMenuPcs::CalcSingCMake()
                 CmakeState(this)->m_select = 0;
                 CmakeState(this)->m_selectionInitialized = 1;
             }
-            if (CmakeState(this)->m_frame < 10) {
+            if (CmakeState(this)->m_frame >= 10) {
+                result = 1;
+            } else {
                 CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
                 result = 0;
-            } else {
-                result = 1;
             }
         } else if (CmakeState(this)->m_mode == 1) {
             unsigned short down;
@@ -3898,11 +3898,11 @@ void CMenuPcs::CalcSingCMake()
                 CmakeState(this)->m_fieldSelect = 0;
                 CmakeState(this)->m_selectionInitialized = 1;
             }
-            if (CmakeState(this)->m_frame < 10) {
+            if (CmakeState(this)->m_frame >= 10) {
+                result = 1;
+            } else {
                 CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
                 result = 0;
-            } else {
-                result = 1;
             }
         } else if (CmakeState(this)->m_mode == 1) {
             result = CmakeTribeCtrl();
@@ -3918,11 +3918,11 @@ void CMenuPcs::CalcSingCMake()
                 CmakeState(this)->m_select = 0;
                 CmakeState(this)->m_selectionInitialized = 1;
             }
-            if (CmakeState(this)->m_frame < 10) {
+            if (CmakeState(this)->m_frame >= 10) {
+                result = 1;
+            } else {
                 CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
                 result = 0;
-            } else {
-                result = 1;
             }
         } else if (CmakeState(this)->m_mode == 1) {
             result = CmakeJobCtrl();
@@ -3938,11 +3938,11 @@ void CMenuPcs::CalcSingCMake()
                 CmakeState(this)->m_select = 0;
                 CmakeState(this)->m_selectionInitialized = 1;
             }
-            if (CmakeState(this)->m_frame < 10) {
+            if (CmakeState(this)->m_frame >= 10) {
+                result = 1;
+            } else {
                 CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
                 result = 0;
-            } else {
-                result = 1;
             }
         } else if (CmakeState(this)->m_mode == 1) {
             unsigned short down;
@@ -4041,11 +4041,11 @@ void CMenuPcs::CalcSingCMake()
                 CmakeState(this)->m_select = 0;
                 CmakeState(this)->m_selectionInitialized = 1;
             }
-            if (CmakeState(this)->m_frame < 10) {
+            if (CmakeState(this)->m_frame >= 10) {
+                result = 1;
+            } else {
                 CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
                 result = 0;
-            } else {
-                result = 1;
             }
         } else if (CmakeState(this)->m_mode == 1) {
             unsigned short down;

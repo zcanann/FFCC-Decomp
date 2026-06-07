@@ -897,7 +897,7 @@ void CMes::addString(char** text, int branchMode)
 
 	bool running = true;
 	unsigned char caseMode = 0;
-	int flowMode = 0;
+	unsigned char flowMode = 0;
 
 	do
 	{

@@ -1582,7 +1582,7 @@ void CMes::Next()
 			curr = start + 5;
 			for (entryCount = remaining - i; entryCount != 0; entryCount = entryCount - 1)
 			{
-				if ((((*(unsigned char*)((char*)start + 0xe) >> 4) & 0xF) != ((*(unsigned char*)((char*)curr + 0xe) >> 4) & 0xF)) ||
+				if ((((unsigned int)*(unsigned char*)((char*)start + 0xe) >> 4 & 0xF) != ((unsigned int)*(unsigned char*)((char*)curr + 0xe) >> 4 & 0xF)) ||
 				    (*(short*)(start + 2) != *(short*)(curr + 2)))
 				{
 					break;

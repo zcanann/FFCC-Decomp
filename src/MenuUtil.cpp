@@ -111,9 +111,9 @@ extern "C" const char s_MenuOptionFuerzaEs[] = "Fuerza";
 extern "C" const char s_MenuOptionDefensaEs[] = "Defensa";
 extern "C" const char s_MenuOptionMusicaEs[8] = "M\372sica";
 extern "C" const char s_MenuOptionApagadoEs[] = "Apagado";
-extern "C" const char s_MenuOptionEstereo_80333530[8] = "Est\351reo";
-extern "C" const char s_MenuOptionMinEs_80333538[8] = "M\355n.";
-extern "C" const char s_MenuOptionMaxEs_80333540[8] = "M\341x.";
+extern "C" const char s_MenuOptionEstereoEs[8] = "Est\351reo";
+extern "C" const char s_MenuOptionMinEs[8] = "M\355n.";
+extern "C" const char s_MenuOptionMaxEs[8] = "M\341x.";
 extern char s_Strength_801E30A4[];
 extern char s_Defence_801E30B0[];
 extern char s_Position_Markers_801E30BC[];
@@ -200,9 +200,9 @@ extern const char s_MenuOptionFuerzaEs[];
 extern const char s_MenuOptionDefensaEs[];
 extern const char s_MenuOptionMusicaEs[];
 extern const char s_MenuOptionApagadoEs[];
-extern const char s_MenuOptionEstereo_80333530[];
-extern const char s_MenuOptionMinEs_80333538[];
-extern const char s_MenuOptionMaxEs_80333540[];
+extern const char s_MenuOptionEstereoEs[];
+extern const char s_MenuOptionMinEs[];
+extern const char s_MenuOptionMaxEs[];
 char* g_strMenuUtilMes[] = {
 	s_Strength_801E30A4, s_Defence_801E30B0, s_Position_Markers_801E30BC, s_Sound_Mode_801E30D0,
 	const_cast<char*>(s_MenuOptionMusic), s_Sound_Effects_801E30DC, s_GBA_Colour_Balance_801E30EC,
@@ -234,7 +234,7 @@ char* g_strMenuUtilMes[] = {
 	const_cast<char*>(s_MenuOptionMusicaEs), s_Efectos_de_sonido_801E3594, s_Color_de_la_GBA_801E35A8,
 	s_Senala_la_posicion_bajo_los_pies_de_cada_personaje_801E35B8, s_Selecciona_sonido_estereo_o_monoaural_801E35EC, s_Ajusta_el_volumen_de_la_musica_de_fondo_801E3614, s_Ajusta_el_volumen_de_los_efectos_de_sonido_801E3640,
 	s_Ajusta_el_balance_del_color_de_la_Game_Boy_Advance_801E366C, s_Encendido_801E36A0,
-	const_cast<char*>(s_MenuOptionApagadoEs), const_cast<char*>(s_MenuOptionEstereo_80333530), s_Monoaural_801E36AC, const_cast<char*>(s_MenuOptionMinEs_80333538), const_cast<char*>(s_MenuOptionMaxEs_80333540),
+	const_cast<char*>(s_MenuOptionApagadoEs), const_cast<char*>(s_MenuOptionEstereoEs), s_Monoaural_801E36AC, const_cast<char*>(s_MenuOptionMinEs), const_cast<char*>(s_MenuOptionMaxEs),
 	s_Mejorado_801E36B8, s_MenuOptionEstandar_801E36C4.m_text,
 };
 

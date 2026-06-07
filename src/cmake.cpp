@@ -978,31 +978,32 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
                 table = 0;
             }
             Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
-        }
-
-        if ((down & 0x1000) != 0) {
+        } else if ((down & 0x1000) != 0) {
             select = 0xB;
             row = 5;
             Sound.PlaySe(2, 0x40, 0x7f, 0);
             return 0;
-        }
-
-        if ((down & 0x200) != 0) {
-            if (len == 0) {
+        } else if ((down & 0x100) != 0) {
+            short curRow = row;
+            if (curRow >= 5) {
+            unsigned int emptyLen = strlen(s_CmakeInfo.m_name);
+            if ((emptyLen & (static_cast<int>(-emptyLen | emptyLen) >> 31)) == 0) {
                 Sound.PlaySe(4, 0x40, 0x7f, 0);
-            } else {
-                s_CmakeInfo.m_name[len - 1] = '\0';
-                Sound.PlaySe(3, 0x40, 0x7f, 0);
+                return 0;
             }
-            return 0;
-        }
 
-        if ((down & 0x100) == 0) {
-            return 0;
-        }
-
-        if (row > 4) {
-            if (IsCmakeNameBlank(s_CmakeInfo.m_name)) {
+            int nameLen = strlen(s_CmakeInfo.m_name);
+            int spaceCount = 0;
+            const char* scan = s_CmakeInfo.m_name;
+            int remain = nameLen;
+            for (; 0 < remain; remain = remain - 1) {
+                if (*scan != ' ') {
+                    break;
+                }
+                scan = scan + 1;
+                spaceCount = spaceCount + 1;
+            }
+            if (spaceCount == nameLen) {
                 Sound.PlaySe(4, 0x40, 0x7f, 0);
                 return 0;
             }
@@ -1011,36 +1012,94 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
             Sound.PlaySe(2, 0x40, 0x7f, 0);
             villageWork->m_resultDir = 1;
             return 1;
-        }
-
-        if (len >= 7) {
-            Sound.PlaySe(4, 0x40, 0x7f, 0);
+        } else {
+            short curTable = table;
+            short curSelect = select;
+            memset(picked, 0, 3);
+            picked[0] = '\0';
+            const char* rowText = s_NameEntryStr[curRow + curTable * 5];
+            int rowLen = strlen(rowText);
+            if (rowLen != 0) {
+                int i = 0;
+                int j = 0;
+                for (; 0 < rowLen; rowLen = rowLen - 1) {
+                    if (i == curSelect) {
+                        picked[0] = rowText[j];
+                        picked[1] = '\0';
+                        break;
+                    }
+                    i = i + 1;
+                    j = j + 1;
+                }
+            }
+            unsigned int rawLen = strlen(s_CmakeInfo.m_name);
+            int nameLen = rawLen & (static_cast<int>(-rawLen | rawLen) >> 31);
+            int ret;
+            if (nameLen < 7) {
+                picked[0] = '\0';
+                rowLen = strlen(rowText);
+                if (rowLen != 0) {
+                    int i = 0;
+                    int j = 0;
+                    for (; 0 < rowLen; rowLen = rowLen - 1) {
+                        if (i == curSelect) {
+                            picked[0] = rowText[j];
+                            picked[1] = '\0';
+                            break;
+                        }
+                        i = i + 1;
+                        j = j + 1;
+                    }
+                }
+                if (nameLen == 0) {
+                    strcat(s_CmakeInfo.m_name, picked);
+                    ret = 0;
+                } else if (strlen(rowText) != 0 && nameLen > 6) {
+                    ret = -1;
+                } else {
+                    strcat(s_CmakeInfo.m_name, picked);
+                    ret = 0;
+                }
+            } else {
+                ret = -1;
+            }
+            if (ret == 0) {
+                unsigned int finalLen = strlen(s_CmakeInfo.m_name);
+                if (static_cast<int>(finalLen & (static_cast<int>(-finalLen | finalLen) >> 31)) > 6) {
+                    select = 0xB;
+                    row = 5;
+                }
+                Sound.PlaySe(2, 0x40, 0x7f, 0);
+            } else {
+                Sound.PlaySe(4, 0x40, 0x7f, 0);
+            }
+            }
+        } else if ((down & 0x200) != 0) {
+            unsigned int bsLen0 = strlen(s_CmakeInfo.m_name);
+            if ((bsLen0 & (static_cast<int>(-bsLen0 | bsLen0) >> 31)) == 0) {
+                Sound.PlaySe(4, 0x40, 0x7f, 0);
+                return 0;
+            }
+            int bsRet;
+            unsigned int bsLen1 = strlen(s_CmakeInfo.m_name);
+            if ((bsLen1 & (static_cast<int>(-bsLen1 | bsLen1) >> 31)) == 0) {
+                bsRet = -1;
+            } else {
+                int bsPos = strlen(s_CmakeInfo.m_name);
+                if ((__cntlzw(static_cast<unsigned int>(strlen(s_CmakeInfo.m_name))) >> 5 & 1) == 0) {
+                    s_CmakeInfo.m_name[bsPos - 1] = '\0';
+                } else {
+                    s_CmakeInfo.m_name[bsPos - 2] = '\0';
+                }
+                bsRet = 0;
+            }
+            if (bsRet == 0) {
+                Sound.PlaySe(3, 0x40, 0x7f, 0);
+            } else {
+                Sound.PlaySe(4, 0x40, 0x7f, 0);
+            }
             return 0;
         }
-
-        const char* rowText = s_NameEntryStr[table * 5 + row];
-        int rowLen = strlen(rowText);
-        if (select < 0 || select >= rowLen) {
-            Sound.PlaySe(4, 0x40, 0x7f, 0);
-            return 0;
-        }
-
-        memset(picked, 0, 3);
-        picked[0] = '\0';
-        picked[0] = rowText[select];
-        picked[1] = '\0';
-        if (picked[0] == '\0') {
-            Sound.PlaySe(4, 0x40, 0x7f, 0);
-            return 0;
-        }
-
-        strcat(s_CmakeInfo.m_name, picked, 0x11);
-        if (strlen(s_CmakeInfo.m_name) > 6) {
-            select = 0xB;
-            row = 5;
-        }
-
-        Sound.PlaySe(2, 0x40, 0x7f, 0);
     }
     return 0;
 }

@@ -634,8 +634,8 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 
 		if ((allocatedWaveBank < RedEntryWaveBankGetEnd(this)) &&
 		    ((aramAddress = RedNewA(waveHead->m_loadSize, aramRangeStart, aramRangeEnd)) != 0)) {
-			int waveCopySize = RedWaveHeadGetTableSize(waveHead);
-			waveCopySize += RedWaveHeadGetToneSize(waveHead) + REDSOUND_WAVE_HEADER_COPY_BASE_SIZE;
+			int waveCopySize = RedWaveHeadGetTableSize(waveHead) + RedWaveHeadGetToneSize(waveHead);
+			waveCopySize += REDSOUND_WAVE_HEADER_COPY_BASE_SIZE;
 			RedWaveHeadWD* copiedWaveHead = (RedWaveHeadWD*)RedNew(waveCopySize);
 			if (copiedWaveHead != 0) {
 				allocatedWaveBank->m_waveHead = copiedWaveHead;
@@ -1859,10 +1859,11 @@ void CRedEntry::DisplayMMemoryInfo()
 			int blockEnd = RedMemoryBlockGetEndAddress(bankEntry);
 
 			if (RedMemoryBlockGetNext(bankEntry)->m_size > 0) {
-				freeSize = RedMemoryBlockGetNext(bankEntry)->m_address - blockEnd;
+				blockEnd = RedMemoryBlockGetNext(bankEntry)->m_address - blockEnd;
 			} else {
-				freeSize = bufferTop - blockEnd;
+				blockEnd = bufferTop - blockEnd;
 			}
+			freeSize = blockEnd;
 
 			history = m_musicBankBase;
 			do {

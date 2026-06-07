@@ -12,8 +12,8 @@ public:
 	CVector(const Vec&);
 	CVector operator+(const CVector&) const;
 	CVector operator-(const CVector&) const;
-	operator Vec&();
-	operator Vec*();
+	operator Vec&() { return *reinterpret_cast<Vec*>(this); }
+	operator Vec*() { return reinterpret_cast<Vec*>(this); }
 	void operator=(const CVector&);
 
 	void Identity();

@@ -255,12 +255,12 @@ void CPartMng::Create()
     C_MTXPerspective(ppvScreenMatrix, FLOAT_8032fe8c, FLOAT_8032fe90, FLOAT_8032fe94, FLOAT_8032fe58);
     PSMTX44Copy(ppvScreenMatrix, ppvScreenMatrix0);
 
-    memset(self + 0x10, 0, 0x108);
+    memset(self + 0x235a8, 0, 0x108);
 
     ppvSysStopPartF = 1;
     ppvSysGoPartF = 0;
-    gPppCalcDisabled = 0;
     ppvUserStopPartF = 0;
+    ppvEmptyLoop = 0;
 
     if (Game.m_currentSceneId == 7) {
         pppCreateHeap(env, 0x100000);
@@ -269,7 +269,6 @@ void CPartMng::Create()
     }
 
     ppvEnv = env;
-    ppvEmptyLoop = 0;
 
     PSMTXIdentity(ppvUnitMatrix);
     ppvZeroVector.x = FLOAT_8032fe5c;
@@ -284,7 +283,29 @@ void CPartMng::Create()
     PSMTXIdentity(ppvCameraMatrix0);
     PSMTXCopy(ppvCameraMatrix0, ppvCameraMatrix0);
 
-    memset(self + 0x1d4, 0, 0x600);
+    m_materialSet = 0;
+    m_textureSet = 0;
+    m_pppModelStArr = 0;
+    m_pppShapeStArr = 0;
+
+    {
+        int* zero = reinterpret_cast<int*>(self + 0x1d4);
+        for (int i = 0; i < 0x80; i++) {
+            zero[i] = 0;
+        }
+    }
+    {
+        int* zero = reinterpret_cast<int*>(self + 0x3d8);
+        for (int i = 0; i < 0x80; i++) {
+            zero[i] = 0;
+        }
+    }
+    {
+        int* zero = reinterpret_cast<int*>(self + 0x5dc);
+        for (int i = 0; i < 0x80; i++) {
+            zero[i] = 0;
+        }
+    }
 
     for (int i = 0; i < kPppMngCount; i++) {
         unsigned char* mng = self + (i * kPppMngStride);
@@ -346,8 +367,9 @@ void CPartMng::Destroy()
     }
 
     if (res->m_pppModelStArr != 0) {
+        pppModelSt* modelArr = res->m_pppModelStArr;
         for (unsigned int i = 0; i < 0x100; i++) {
-            pppModelSt* model = &res->m_pppModelStArr[i];
+            pppModelSt* model = &modelArr[i];
             if (model->m_isUsed != 0) {
                 model->m_refCount--;
                 if (model->m_refCount < 1) {
@@ -430,7 +452,9 @@ void CPartMng::pppDumpMngSt()
 {
     struct PppMngStDumpRaw {
         void* m_pppResSet;                 // 0x00
-        unsigned char m_pad04[0x74 - 0x4];
+        unsigned char m_pad04[0x14 - 0x4];
+        int m_baseTime;                    // 0x14
+        unsigned char m_pad18[0x74 - 0x18];
         short m_kind;                      // 0x74
         short m_nodeIndex;                 // 0x76
         unsigned char m_pad78[0xAC - 0x78];
@@ -451,9 +475,9 @@ void CPartMng::pppDumpMngSt()
         System.Printf(const_cast<char*>(s__________________________________801d8358));
     }
 
-    PppMngStDumpRaw* mng = reinterpret_cast<PppMngStDumpRaw*>(self + 0x1D4);
+    PppMngStDumpRaw* mng = reinterpret_cast<PppMngStDumpRaw*>(self + 0x2A18);
     for (int i = 0; i < 0x180; i++) {
-        if (mng->m_prioTime != -0x1000 && System.m_execParam != 0) {
+        if (mng->m_baseTime != -0x1000 && System.m_execParam != 0) {
             int kind = static_cast<int>(mng->m_kind);
             int heapGroup = (mng->m_heapGroupRef + 0x2D) / 0x158;
             int heapSize = ppvEnv->m_stagePtr->heapWalker(0, 0, static_cast<unsigned long>(heapGroup));
@@ -548,11 +572,12 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
     Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x13a);
 
     ppvEnv = reinterpret_cast<_pppEnvSt*>(pdtSlot->m_envFields);
-    PppMngStRaw* pppMngSt = reinterpret_cast<PppMngStRaw*>(self + 0x1d4);
+    PppMngStRaw* pppMngSt = reinterpret_cast<PppMngStRaw*>(self + 0x2A18);
     for (int i = 0; i < 0x180; i++) {
-        if (pppMngSt[i].m_pppResSet == pdtSlot) {
-            _pppAllFreePObject(reinterpret_cast<_pppMngSt*>(&pppMngSt[i]));
+        if (pppMngSt->m_pppResSet == pdtSlot) {
+            _pppAllFreePObject(reinterpret_cast<_pppMngSt*>(pppMngSt));
         }
+        pppMngSt++;
     }
 
     Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x149);
@@ -920,9 +945,9 @@ void CPartMng::pppGet2Dpos()
     PartMngMouseRaw* raw = reinterpret_cast<PartMngMouseRaw*>(this);
 
     if (raw->requestFlag != 0) {
-        unsigned int x = raw->cursorX + 0x140;
-        unsigned int y = raw->cursorY + 0xE0;
-        if ((-1 < (int)x) && ((int)x < 0x27E) && (-1 < (int)y) && ((int)y < 0x1BE)) {
+        int x = raw->cursorX + 0x140;
+        int y = raw->cursorY + 0xE0;
+        if ((x >= 0) && (x < 0x27E) && (y >= 0) && (y < 0x1BE)) {
             Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x2A2);
             GXPeekZ(static_cast<u16>(x & 0xFFFF), static_cast<u16>(y & 0xFFFF), reinterpret_cast<u32*>(&zAtPixel));
 
@@ -1060,20 +1085,19 @@ void CPartMng::SetFp()
 
     static const int kUsbEditOffset = 0x7F0;
     static const int kResSetOffset = 0x23518;
-    static const int kRecvBuffOffset = 0x23554;
-    static const int kEditCountOffset = 0x2355C;
+    static const int kRecvBuffOffset = 0x1C8;
+    static const int kEditCountOffset = 0x4;
     static const int kPppMngOffset = 0x2A18;
     static const int kPacketStride = 0x60;
 
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    int editCount = *reinterpret_cast<int*>(self + kEditCountOffset);
-    float* recvBuff = *reinterpret_cast<float**>(self + kRecvBuffOffset);
     PppMngSetFpRaw* mng = reinterpret_cast<PppMngSetFpRaw*>(self + kPppMngOffset);
-    for (int i = 0; i < editCount; i++) {
-        unsigned char* fpBytes = reinterpret_cast<unsigned char*>(recvBuff);
+    for (int i = 0; i < *reinterpret_cast<int*>(self + kEditCountOffset); i++) {
+        unsigned char* fpBytes = *reinterpret_cast<unsigned char**>(self + kRecvBuffOffset) + i * kPacketStride;
+        float* recvBuff = reinterpret_cast<float*>(fpBytes);
         mng->m_pppResSet = self + kResSetOffset;
 
-        int fpTime = static_cast<int>(recvBuff[0x0B]);
+        int fpTime = reinterpret_cast<int*>(recvBuff)[0x0B];
         if (mng->m_baseTime < 0) {
             mng->m_baseTime = fpTime;
         } else {
@@ -1082,7 +1106,7 @@ void CPartMng::SetFp()
         }
 
         mng->m_cullRadiusSq = recvBuff[0x0D];
-        if (mng->m_cullRadiusSq > 0.0f) {
+        if (mng->m_cullRadiusSq > 0.0) {
             mng->m_cullRadiusSq *= mng->m_cullRadiusSq;
         }
         mng->m_nodeIndex = static_cast<short>(i);
@@ -1136,7 +1160,6 @@ void CPartMng::SetFp()
             }
         }
 
-        recvBuff = reinterpret_cast<float*>(fpBytes + kPacketStride);
         mng = reinterpret_cast<PppMngSetFpRaw*>(reinterpret_cast<unsigned char*>(mng) + sizeof(_pppMngSt));
     }
 }
@@ -1231,42 +1254,40 @@ void CPartMng::pppReadShp(CChunkFile& chunkFile, pppShapeSt* shapeSt)
 	char* textureNames[0x101];
 	char** textureNameIt = textureNames;
 	CChunkFile::CChunk chunk;
-	CMemory::CStage* stageLoad = PartPcs.m_usbStreamState.m_stageLoad;
 
 	while (chunkFile.GetNextChunk(chunk))
 	{
 		chunkFile.PushChunk();
-		if (chunk.m_id == 0x46534850) // 'FSHP'
+		switch (chunk.m_id)
 		{
+		case 0x46534850: // 'FSHP'
 			while (chunkFile.GetNextChunk(chunk))
 			{
-				if (chunk.m_id == 0x444C5354) // 'DLST'
+				switch (chunk.m_id)
 				{
-					shapeSt->m_displayListData =
-						operator new[](
-						    chunk.m_arg0, stageLoad, const_cast<char*>(s_partMng_cpp), 0x4B3);
-					chunkFile.Get(shapeSt->m_displayListData, chunk.m_arg0);
-					DCFlushRange(shapeSt->m_displayListData, (chunk.m_arg0 + 0x1F) & 0xFFFFFFE0);
-				}
-				else if ((int)chunk.m_id < 0x444C5354)
-				{
-					if (chunk.m_id == 0x414E494D) // 'ANIM'
-					{
-						shapeSt->m_animData =
-							operator new[](
-							    chunk.m_arg0, stageLoad, const_cast<char*>(s_partMng_cpp), 0x4B9);
-						chunkFile.Get(shapeSt->m_animData, chunk.m_arg0);
-						pppSetShapeMaterial(shapeSt, m_materialSet, textureNames);
-					}
-				}
-				else if (chunk.m_id == 0x54584E4D) // 'TXNM'
-				{
+				case 0x54584E4D: // 'TXNM'
 					chunkFile.PushChunk();
 					*textureNameIt = chunkFile.GetString();
 					chunkFile.PopChunk();
 					textureNameIt++;
+					break;
+				case 0x444C5354: // 'DLST'
+					shapeSt->m_displayListData =
+						operator new[](
+						    chunk.m_size, PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x4B3);
+					chunkFile.Get(shapeSt->m_displayListData, chunk.m_size);
+					DCFlushRange(shapeSt->m_displayListData, (chunk.m_size + 0x1F) & 0xFFFFFFE0);
+					break;
+				case 0x414E494D: // 'ANIM'
+					shapeSt->m_animData =
+						operator new[](
+						    chunk.m_size, PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x4B9);
+					chunkFile.Get(shapeSt->m_animData, chunk.m_size);
+					pppSetShapeMaterial(shapeSt, m_materialSet, textureNames);
+					break;
 				}
 			}
+			break;
 		}
 		chunkFile.PopChunk();
 	}
@@ -1437,10 +1458,6 @@ void CPartMng::pppEditAllReleaseResource()
  */
 void CheckSum(char* packet, unsigned long code, unsigned long packetSize)
 {
-    if (packet == 0 || packetSize <= 0x20) {
-        return;
-    }
-
     int checkSum = 0x12345678;
     char* cursor = packet + 0x20;
     unsigned long remaining = packetSize - 0x20;
@@ -1450,7 +1467,7 @@ void CheckSum(char* packet, unsigned long code, unsigned long packetSize)
         remaining--;
     }
 
-    if (checkSum != *reinterpret_cast<int*>(packet)) {
+    if (static_cast<unsigned int>(checkSum) != *reinterpret_cast<unsigned int*>(packet)) {
         Graphic.Printf(const_cast<char*>(s_CheckSum_ERROR_code_0x_x____801d82f0), code);
         Graphic.DrawDebugString();
     }
@@ -1476,18 +1493,20 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
     static const int kUsbMapMeshTableOffset = 0x7F4;
     static const int kUsbShapeSlotTableOffset = 0x7F8;
     static const int kUsbTextTableOffset = 0x7FC;
-    static const int kStreamTextRawOffset = 0x1D8;
-    static const int kRecvWriteOffset = 0x23550;
-    static const int kRecvBuffOffset = 0x23554;
-    static const int kPdtCountOffset = 0x23558;
-    static const int kEditCountOffset = 0x2355C;
+    static const int kStreamTextRawOffset = 0x3D8;
+    static const int kRecvWriteOffset = 0x1CC;
+    static const int kRecvBuffOffset = 0x1C8;
+    static const int kPdtCountOffset = 0x0;
+    static const int kEditCountOffset = 0x4;
+    static const int kPppDataHeadTableOffset = 0x5DC;
     static const int kLastEnvCmdOffset = 0x23560;
-    static const int kEditFrameOffset = 0x23564;
+    static const int kEditFrameOffset = 0xC;
     static const int kEditDrawModeOffset = 0x23570;
     static const int kCursorRequestOffset = 0x10;
-    static const int kCursorXOffset = 0x28;
-    static const int kCursorYOffset = 0x2C;
-    static const int kCursorPacketOffset = 0x30;
+    static const int kCursorXOffset = 0x178;
+    static const int kCursorYOffset = 0x17A;
+    static const int kCursorPacketOffset = 0x17C;
+    static const int kCursorPacket42Offset = 0x18;
     static const int kEditCameraMatrixOffset = 0x40;
     static const int kEditCameraExtraOffset = 0x70;
     static const int kCmd16PayloadOffset = 0x180;
@@ -1497,104 +1516,31 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
     static const int kMapPcsFlagOffset = 0x1BC;
     static const int kCharaVisToggleOffset = 0x1C0;
 
-    if (packet == 0 || packetSize <= 0x20) {
-        return;
-    }
-
     CheckSum(packet, code, packetSize);
 
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     PartMngResRaw* res = reinterpret_cast<PartMngResRaw*>(self);
-    _pppEnvSt* env = &m_pppEnvSt;
-    PppPdtSlot* pdtSlots = m_pdtSlots;
-    _pppMngSt* firstMng = m_pppMng;
     char* payload = packet + 0x20;
     float* payloadFloats = reinterpret_cast<float*>(payload);
-    int* packetWords = reinterpret_cast<int*>(packet);
     int* payloadWords = reinterpret_cast<int*>(payload);
-    CMemory::CStage* stageLoad = PartPcs.m_usbStreamState.m_stageLoad;
-
-    switch (code) {
-    case 1:
-    case 2: {
-        if (env->m_isEditMode != 0) {
-            return;
-        }
-
-        *reinterpret_cast<int*>(self + kLastEnvCmdOffset) = static_cast<int>(code);
-        memcpy(self + kEditCameraMatrixOffset, payload, 0x30);
-        *reinterpret_cast<int*>(self + kEditCameraExtraOffset) = packetWords[0x14];
-        memcpy(self + kEditCameraExtraOffset + 4, packetWords + 0x15, 0xE0);
-        *reinterpret_cast<unsigned int*>(self + 0x158) = static_cast<unsigned int>(packetWords[0x4E]);
-        *reinterpret_cast<unsigned int*>(self + 0x15C) = static_cast<unsigned int>(packetWords[0x4F]);
-        *reinterpret_cast<int*>(self + 0x160) = packetWords[0x50];
-        *reinterpret_cast<int*>(self + 0x164) = packetWords[0x51];
-        *reinterpret_cast<int*>(self + 0x168) = packetWords[0x52];
-        *reinterpret_cast<int*>(self + 0x16C) = packetWords[0x53];
-        *reinterpret_cast<int*>(self + 0x170) = packetWords[0x54];
-        *reinterpret_cast<int*>(self + kEditDrawModeOffset) = packetWords[0x55];
-        env->m_mapMeshPtr = *reinterpret_cast<CMapMesh***>(self + kUsbMapMeshTableOffset);
-        *reinterpret_cast<unsigned int*>(&env->m_particleColors[0]) =
-            *reinterpret_cast<unsigned int*>(self + kUsbShapeSlotTableOffset);
-        *reinterpret_cast<unsigned int*>(&env->m_particleColors[1]) =
-            *reinterpret_cast<unsigned int*>(self + kUsbTextTableOffset);
-
-        if (code == 1) {
-            firstMng->m_ownerScale = FLOAT_8032fe18;
-            firstMng->m_scaleFactor = FLOAT_8032fe18;
-            firstMng->m_userFloat1 = FLOAT_8032fe18;
-            firstMng->m_userFloat0 = FLOAT_8032fe18;
-            firstMng->m_useOwnerScaleSign = 0;
-            firstMng->m_matrixMode = 0;
-        }
-
-        _pppMngSt* mng = m_pppMng;
-        int editCount = *reinterpret_cast<int*>(self + kEditCountOffset);
-        for (int i = 0; i < editCount; i++) {
-            mng->m_envColorR = self[0x168];
-            mng->m_envColorG = self[0x169];
-            mng->m_envColorB = self[0x16A];
-            mng->m_envColorA = self[0x16B];
-            mng++;
-        }
+    if (payload == 0) {
         return;
     }
-    case 3:
-        if (env->m_isEditMode != 0) {
-            return;
-        }
 
-        firstMng->m_position.x = payloadFloats[0];
-        firstMng->m_position.y = payloadFloats[1];
-        firstMng->m_position.z = payloadFloats[2];
-        firstMng->m_rotation.x = static_cast<short>(packetWords[0xC] >> 16);
-        firstMng->m_rotation.y = static_cast<short>(packetWords[0xC]);
-        firstMng->m_rotation.z = static_cast<short>(packetWords[0xD] >> 16);
-        firstMng->m_rotation.w = static_cast<short>(packetWords[0xD]);
-        firstMng->m_rotationSpeed = packetWords[0xE];
-        firstMng->m_scale.x = payloadFloats[8];
-        firstMng->m_scale.y = payloadFloats[9];
-        firstMng->m_scale.z = payloadFloats[0xA];
-        firstMng->m_savedPosition.x = payloadFloats[0x10];
-        firstMng->m_savedPosition.y = payloadFloats[0x11];
-        firstMng->m_savedPosition.z = payloadFloats[0x12];
-        firstMng->m_paramVec0.x = payloadFloats[0x14];
-        firstMng->m_paramVec0.y = payloadFloats[0x15];
-        firstMng->m_paramVec0.z = payloadFloats[0x16];
-        ppvChrScl[0] = payloadFloats[0xC];
-        ppvChrScl[1] = payloadFloats[0xD];
-        ppvChrScl[2] = payloadFloats[0xE];
-        firstMng->m_previousPosition.x = payloadFloats[0x17];
-        firstMng->m_previousPosition.y = payloadFloats[0x18];
-        firstMng->m_mode = 0;
-        return;
+    struct EditCameraMatrix {
+        int m_words[12];
+    };
+    struct EditEnvBlock {
+        int m_words[0x38];
+    };
+
+    switch (code) {
     case 4:
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x554);
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3A9);
         {
             _pppMngSt* mng = m_pppMng;
-            int editCount = *reinterpret_cast<int*>(self + kEditCountOffset);
-            for (int i = 0; i < editCount; i++) {
+            for (int i = 0; i < *reinterpret_cast<int*>(self + kEditCountOffset); i++) {
                 if (mng->m_baseTime != -0x1000) {
                     _pppAllFreePObject(mng);
                 }
@@ -1605,366 +1551,42 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3B3);
         pppEditAllReleaseResource();
         ppvSysStopPartF = 1;
-        self[0x800] = 0;
-        self[0x801] = 0;
-        self[0x802] = 0;
-        self[0x803] = 0;
-        self[0x804] = 0xFF;
-        self[0x805] = 0xFF;
-        self[0x806] = 0xFF;
-        self[0x807] = 0xFF;
+        *reinterpret_cast<int*>(self + 0x800) = 0;
+        *reinterpret_cast<int*>(self + 0x804) = -1;
         *reinterpret_cast<int*>(self + kEditCountOffset) = 0;
         *reinterpret_cast<int*>(self + kPdtCountOffset) = 0;
-        env->m_isEditMode = 0;
+        m_pppEnvSt.m_isEditMode = 0;
 
         if (res->m_textureSet == 0) {
-            res->m_textureSet = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x447) CTextureSet;
+            res->m_textureSet = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x447) CTextureSet;
+            res->m_textureSet->m_textureArray.SetDefaultSize(0x180);
+            res->m_textureSet->m_textureArray.SetGrow(0);
         }
 
         if (res->m_materialSet == 0) {
-            CMaterialSet* materialSet = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x44B) CMaterialSet;
-            res->m_materialSet = materialSet;
-            env->m_materialSetPtr = materialSet;
+            res->m_materialSet = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x44B) CMaterialSet;
+            res->m_materialSet->m_materials.SetDefaultSize(0x180);
+            res->m_materialSet->m_materials.SetGrow(0);
+            m_pppEnvSt.m_materialSetPtr = res->m_materialSet;
 
-            CMaterial* defaultMaterial = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x44E) CMaterial;
-            if (defaultMaterial != 0) {
-                defaultMaterial->Create(0, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0));
-                res->m_materialSet->AddMaterial(defaultMaterial, 0);
-            }
-        }
-        return;
-    case 5:
-        if (env->m_isEditMode != 0) {
-            return;
-        }
-        {
-            pppModelSt*** modelTablePtr = reinterpret_cast<pppModelSt***>(self + kUsbMapMeshTableOffset);
-            if (*modelTablePtr == 0) {
-                *modelTablePtr = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x5F8) pppModelSt*[0x88];
-                if (*modelTablePtr != 0) {
-                    memset(*modelTablePtr, 0, sizeof(pppModelSt*) * 0x88);
-                }
-            }
-
-            int slotIndex = static_cast<int>(*reinterpret_cast<short*>(payload));
-            if (*modelTablePtr != 0 && 0 <= slotIndex && slotIndex < 0x88) {
-                pppModelSt*& modelSlot = (*modelTablePtr)[slotIndex];
-                if (modelSlot != 0) {
-                    modelSlot->m_refCount--;
-                    if (modelSlot->m_refCount < 1) {
-                        if (modelSlot->m_cacheId != -1) {
-                            ppvAmemCacheSet.DestroyCache(modelSlot->m_cacheId);
-                            modelSlot->m_meshData = 0;
-                            modelSlot->m_displayListData = 0;
-                        }
-                        modelSlot->Destroy();
-                        modelSlot->m_refCount = 0;
-                        modelSlot->m_isUsed = 0;
-                    }
-                    modelSlot = 0;
-                }
-
-                modelSlot = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x5FC) pppModelSt;
-                if (modelSlot != 0) {
-                    modelSlot->m_refCount = 0;
-                    modelSlot->m_cacheId = -1;
-                    modelSlot->m_isUsed = 0;
-                    CChunkFile chunkFile;
-                    chunkFile.SetBuf(packetWords + 0x10);
-                    pppReadRsd(chunkFile, modelSlot);
-                }
-                self[0x804] = 0xFF;
-                self[0x805] = 0xFF;
-                self[0x806] = 0xFF;
-                self[0x807] = 0xFF;
-            }
-        }
-        return;
-    case 6:
-    case 10:
-        if (env->m_isEditMode != 0) {
-            return;
-        }
-        {
-            pppShapeSt*** shapeSlotTablePtr = reinterpret_cast<pppShapeSt***>(self + kUsbShapeSlotTableOffset);
-            if (*shapeSlotTablePtr == 0) {
-                *shapeSlotTablePtr = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x60A) pppShapeSt*[0x80];
-                if (*shapeSlotTablePtr != 0) {
-                    memset(*shapeSlotTablePtr, 0, sizeof(pppShapeSt*) * 0x80);
-                }
-            }
-
-            int slotIndex = static_cast<int>(payloadFloats[0]);
-            if (*shapeSlotTablePtr != 0 && 0 <= slotIndex && slotIndex < 0x80) {
-                pppShapeSt*& shapeSlot = (*shapeSlotTablePtr)[slotIndex];
-                if (shapeSlot != 0) {
-                    shapeSlot->m_refCount--;
-                    if (shapeSlot->m_refCount < 1) {
-                        if (shapeSlot->m_animData != 0) {
-                            delete[] reinterpret_cast<u8*>(shapeSlot->m_animData);
-                            shapeSlot->m_animData = 0;
-                        }
-                        if (shapeSlot->m_displayListData != 0) {
-                            delete[] reinterpret_cast<u8*>(shapeSlot->m_displayListData);
-                            shapeSlot->m_displayListData = 0;
-                        }
-                        shapeSlot->m_refCount = 0;
-                        shapeSlot->m_inUse = 0;
-                    }
-                    shapeSlot = 0;
-                }
-
-                shapeSlot = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x610) pppShapeSt;
-                if (shapeSlot != 0) {
-                    CChunkFile chunkFile;
-                    chunkFile.SetBuf(packetWords + 0xC);
-                    pppReadShp(chunkFile, shapeSlot);
-                }
-            }
-        }
-        return;
-    case 8:
-        if (env->m_isEditMode != 0) {
-            return;
-        }
-        {
-            void**& textTable = *reinterpret_cast<void***>(self + kUsbTextTableOffset);
-            if (textTable == 0) {
-                textTable = reinterpret_cast<void**>(
-                    operator new[](0x400, stageLoad, const_cast<char*>(s_partMng_cpp), 0x61F));
-            }
-
-            int slotIndex = static_cast<int>(payloadFloats[0]);
-            void*& textRaw = *reinterpret_cast<void**>(self + kStreamTextRawOffset + slotIndex * 0xC);
-            if (textRaw == 0) {
-                textRaw = operator new[](packetSize - 0x20, stageLoad, const_cast<char*>(s_partMng_cpp), 0x625);
-            }
-
-            memcpy(textRaw, payload, packetSize - 0x20);
-
-            unsigned char* textBytes = reinterpret_cast<unsigned char*>(textRaw);
-            unsigned short* textEntry = reinterpret_cast<unsigned short*>(
-                reinterpret_cast<unsigned char*>(textTable) + slotIndex * 8);
-            textEntry[0] = static_cast<unsigned short>(*reinterpret_cast<int*>(textBytes + 4));
-            textEntry[1] = static_cast<unsigned short>(*reinterpret_cast<int*>(textBytes + 8));
-            *reinterpret_cast<void**>(textEntry + 2) = textBytes + 0xC;
-        }
-        return;
-    case 0x0B:
-        if (env->m_isEditMode != 0) {
-            return;
-        }
-        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x646);
-        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3A9);
-        {
-            _pppMngSt* mng = m_pppMng;
-            int editCount = *reinterpret_cast<int*>(self + kEditCountOffset);
-            for (int i = 0; i < editCount; i++) {
-                if (mng->m_baseTime != -0x1000) {
-                    _pppAllFreePObject(mng);
-                }
-                mng++;
-            }
-        }
-        *reinterpret_cast<int*>(self + kEditCountOffset) = 0;
-        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3B3);
-        if (pdtSlots[0].m_pppDataHead != 0) {
-            delete[] reinterpret_cast<u8*>(pdtSlots[0].m_pppDataHead);
-            pdtSlots[0].m_pppDataHead = 0;
-        }
-        if (*reinterpret_cast<void**>(self + kRecvBuffOffset) != 0) {
-            delete[] *reinterpret_cast<u8**>(self + kRecvBuffOffset);
-            *reinterpret_cast<void**>(self + kRecvBuffOffset) = 0;
-        }
-        pdtSlots[0].m_pppDataHead = reinterpret_cast<_pppDataHead*>(
-            operator new[](
-                packetSize - 0x20, stageLoad, const_cast<char*>(s_partMng_cpp), 0x64D));
-        *reinterpret_cast<u8**>(self + kRecvBuffOffset) =
-            new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x64E) u8[0x3000];
-        if (pdtSlots[0].m_pppDataHead != 0) {
-            memcpy(pdtSlots[0].m_pppDataHead, payload, packetSize - 0x20);
-            pppInitPdt(reinterpret_cast<long*>(pdtSlots[0].m_pppDataHead), pppGetSysProgTable());
-        }
-
-        if (*reinterpret_cast<void**>(self + kRecvBuffOffset) != 0) {
-            unsigned char* recvBytes = reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(self + kRecvBuffOffset));
-            *reinterpret_cast<int*>(recvBytes + 0x2C) = 0;
-            *reinterpret_cast<int*>(recvBytes + 0x30) = 0;
-            *reinterpret_cast<float*>(recvBytes + 0x34) = FLOAT_8032FE6C;
-            *reinterpret_cast<float*>(recvBytes + 0x38) = FLOAT_8032FE70;
-            *reinterpret_cast<float*>(recvBytes + 0x3C) = FLOAT_8032FE70;
-        }
-
-        firstMng->m_baseTime = 0;
-        firstMng->m_cullRadiusSq = FLOAT_8032FE6C;
-        firstMng->m_cullRadius = FLOAT_8032FE70;
-        firstMng->m_cullYOffset = FLOAT_8032FE70;
-        *reinterpret_cast<int*>(self + kEditCountOffset) = 1;
-        *reinterpret_cast<int*>(self + kPdtCountOffset) = 1;
-        firstMng->m_objHitMask = 0xFFFFFFFF;
-        firstMng->m_cylinderAttribute = 0xFFFFFFFF;
-        firstMng->m_paramA = 0;
-        firstMng->m_slotVisible = 1;
-        firstMng->m_ownerFlagsInitialized = 1;
-        firstMng->m_pppResSet = self + 0x23518;
-        firstMng->m_nodeIndex = 0;
-        firstMng->m_fieldF2 = 1;
-        env->m_mapMeshPtr = *reinterpret_cast<CMapMesh***>(self + kUsbMapMeshTableOffset);
-        *reinterpret_cast<unsigned int*>(&env->m_particleColors[0]) =
-            *reinterpret_cast<unsigned int*>(self + kUsbShapeSlotTableOffset);
-        *reinterpret_cast<unsigned int*>(&env->m_particleColors[1]) =
-            *reinterpret_cast<unsigned int*>(self + kUsbTextTableOffset);
-        return;
-    case 0x0C:
-        if (env->m_isEditMode != 0) {
-            return;
-        }
-        if (*reinterpret_cast<int*>(self + kEditCountOffset) == 0) {
-            *reinterpret_cast<void**>(self + kRecvWriteOffset) = *reinterpret_cast<void**>(self + kRecvBuffOffset);
-        }
-        memcpy(*reinterpret_cast<void**>(self + kRecvWriteOffset), payload, packetSize - 0x20);
-        *reinterpret_cast<unsigned char**>(self + kRecvWriteOffset) += 0x60;
-        *reinterpret_cast<int*>(self + kEditCountOffset) += 1;
-        return;
-    case 0x0D: {
-        if (env->m_isEditMode != 0) {
-            return;
-        }
-        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x673);
-        int pdtCount = *reinterpret_cast<int*>(self + kPdtCountOffset);
-        if (pdtSlots[pdtCount].m_pppDataHead != 0) {
-            delete[] reinterpret_cast<u8*>(pdtSlots[pdtCount].m_pppDataHead);
-            pdtSlots[pdtCount].m_pppDataHead = 0;
-        }
-        if (*reinterpret_cast<void**>(self + kRecvBuffOffset) != 0) {
-            delete[] *reinterpret_cast<u8**>(self + kRecvBuffOffset);
-            *reinterpret_cast<void**>(self + kRecvBuffOffset) = 0;
-        }
-
-        pdtSlots[pdtCount].m_pppDataHead = reinterpret_cast<_pppDataHead*>(
-            operator new[](
-                packetSize - 0x20, stageLoad, const_cast<char*>(s_partMng_cpp), 0x678));
-        *reinterpret_cast<u8**>(self + kRecvBuffOffset) =
-            new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x679) u8[0x3000];
-        memcpy(pdtSlots[pdtCount].m_pppDataHead, payload, packetSize - 0x20);
-        pppInitPdt(reinterpret_cast<long*>(pdtSlots[pdtCount].m_pppDataHead), pppGetSysProgTable());
-        *reinterpret_cast<int*>(self + kPdtCountOffset) = pdtCount + 1;
-        return;
-    }
-    case 0x0E:
-        if (env->m_isEditMode != 0) {
-            return;
-        }
-        {
-            CChunkFile chunkFile;
-            chunkFile.SetBuf(payload);
-
-            CChunkFile::CChunk chunk;
-            while (chunkFile.GetNextChunk(chunk)) {
-                if (chunk.m_id != 'DIXT') {
-                    continue;
-                }
-
-                if (res->m_textureSet == 0) {
-                    res->m_textureSet = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x447) CTextureSet;
-                }
-
-                if (res->m_materialSet == 0) {
-                    CMaterialSet* materialSet = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x44B) CMaterialSet;
-                    res->m_materialSet = materialSet;
-                    env->m_materialSetPtr = materialSet;
-
-                    CMaterial* defaultMaterial = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x44E) CMaterial;
-                    if (defaultMaterial != 0) {
-                        defaultMaterial->Create(0, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0));
-                        res->m_materialSet->AddMaterial(defaultMaterial, 0);
-                    }
-                }
-
-                if (res->m_textureSet != 0 && res->m_materialSet != 0) {
-                    res->m_textureSet->Create(chunkFile, stageLoad, 1, 0, 0, 0);
-                    res->m_materialSet->SetPartFromTextureSet(res->m_textureSet, 0);
-                    res->m_materialSet->SetTextureSet(res->m_textureSet);
-                }
-            }
-        }
-        return;
-    case 0x0F:
-        if (env->m_isEditMode != 0) {
-            return;
-        }
-        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3A9);
-        {
-            _pppMngSt* mng = m_pppMng;
-            int editCount = *reinterpret_cast<int*>(self + kEditCountOffset);
-            for (int i = 0; i < editCount; i++) {
-                if (mng->m_baseTime != -0x1000) {
-                    _pppAllFreePObject(mng);
-                }
-                mng++;
-            }
-        }
-        *reinterpret_cast<int*>(self + kEditCountOffset) = 0;
-        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3B3);
-        ppvSysStopPartF = 1;
-        return;
-    case 0x10:
-        if (env->m_isEditMode != 0) {
-            return;
-        }
-        env->m_envParam = FLOAT_8032fe5c;
-        env->m_mapMeshPtr = *reinterpret_cast<CMapMesh***>(self + kUsbMapMeshTableOffset);
-        *reinterpret_cast<unsigned int*>(&env->m_particleColors[0]) =
-            *reinterpret_cast<unsigned int*>(self + kUsbShapeSlotTableOffset);
-        *reinterpret_cast<unsigned int*>(&env->m_particleColors[1]) =
-            *reinterpret_cast<unsigned int*>(self + kUsbTextTableOffset);
-        SetFp();
-        return;
-    case 0x11:
-        if (env->m_isEditMode != 0) {
-            return;
-        }
-        firstMng->m_particleEnded = 1;
-        return;
-    case 0x12:
-    case 0x13:
-        if (env->m_isEditMode != 0) {
-            return;
-        }
-        if (*reinterpret_cast<void**>(self + kRecvBuffOffset) != 0) {
-            unsigned int selectedId = *reinterpret_cast<unsigned int*>(self + 0x34) & 0xFFFF;
-            unsigned char* recvBytes = reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(self + kRecvBuffOffset));
-            _pppMngSt* mng = m_pppMng;
-            int editCount = *reinterpret_cast<int*>(self + kEditCountOffset);
-            for (int i = 0; i < editCount; i++) {
-                if (static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(recvBytes + 0x40)) == selectedId) {
-                    if (code == 0x12) {
-                        mng->m_baseTime = 0;
-                    } else {
-                        mng->m_particleEnded = 1;
-                    }
-                }
-                recvBytes += 0x60;
-                mng++;
+            CMaterial* defaultMaterial = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x44E) CMaterial;
+            defaultMaterial->Create(0, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0));
+            *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(defaultMaterial) + 0x24) |= 1;
+            if (res->m_materialSet->m_materials.GetSize() < 1) {
+                res->m_materialSet->m_materials.Add(defaultMaterial);
+            } else {
+                res->m_materialSet->m_materials.SetAt(0, defaultMaterial);
             }
         }
         return;
     case 0x14:
-        gPppCalcDisabled = 0;
+        ppvUserStopPartF = 0;
         return;
     case 0x15:
-        gPppCalcDisabled = 1;
+        ppvUserStopPartF = 1;
         return;
     case 0x16:
         memcpy(self + kCmd16PayloadOffset, payload, 8);
-        return;
-    case 0x17:
-        if (env->m_isEditMode != 0) {
-            return;
-        }
-        *reinterpret_cast<int*>(self + kCursorPacketOffset) = *reinterpret_cast<int*>(self + kCursorXOffset);
-        *reinterpret_cast<int*>(self + kCursorPacketOffset + 4) = *reinterpret_cast<int*>(self + kCursorYOffset);
-        self[0x808] = 1;
         return;
     case 0x18:
         *reinterpret_cast<int*>(self + kLastEnvCmdOffset) = 0x18;
@@ -1978,6 +1600,33 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         *reinterpret_cast<int*>(self + kLastEnvCmdOffset) = 0x1A;
         memcpy(self + kLoadAnimNameOffset, payload, 0x20);
         return;
+    case 3:
+        if (m_pppEnvSt.m_isEditMode != 0) {
+            return;
+        }
+
+        m_pppMng[0].m_position.x = payloadFloats[0];
+        m_pppMng[0].m_position.y = payloadFloats[1];
+        m_pppMng[0].m_position.z = payloadFloats[2];
+        *reinterpret_cast<int*>(&m_pppMng[0].m_rotation.x) = payloadWords[4];
+        *reinterpret_cast<int*>(&m_pppMng[0].m_rotation.z) = payloadWords[5];
+        m_pppMng[0].m_rotationSpeed = payloadWords[6];
+        m_pppMng[0].m_scale.x = payloadFloats[8];
+        m_pppMng[0].m_scale.y = payloadFloats[9];
+        m_pppMng[0].m_scale.z = payloadFloats[0xA];
+        m_pppMng[0].m_savedPosition.x = payloadFloats[0x10];
+        m_pppMng[0].m_savedPosition.y = payloadFloats[0x11];
+        m_pppMng[0].m_savedPosition.z = payloadFloats[0x12];
+        m_pppMng[0].m_paramVec0.x = payloadFloats[0x14];
+        m_pppMng[0].m_paramVec0.y = payloadFloats[0x15];
+        m_pppMng[0].m_paramVec0.z = payloadFloats[0x16];
+        ppvChrScl[0] = payloadFloats[0xC];
+        ppvChrScl[1] = payloadFloats[0xD];
+        ppvChrScl[2] = payloadFloats[0xE];
+        m_pppMng[0].m_previousPosition.x = payloadFloats[0x17];
+        m_pppMng[0].m_previousPosition.y = payloadFloats[0x18];
+        m_pppMng[0].m_mode = 0;
+        return;
     case 0x1B:
         *reinterpret_cast<int*>(self + kLastEnvCmdOffset) = 0x1B;
         memcpy(self + kMapPcsFlagOffset, payload, 4);
@@ -1986,21 +1635,440 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         *reinterpret_cast<int*>(self + kLastEnvCmdOffset) = 0x1C;
         memcpy(self + kCharaVisToggleOffset, payload, 4);
         return;
-    case 0x1D:
+    case 1: {
+        if (m_pppEnvSt.m_isEditMode != 0) {
+            return;
+        }
+
+        *reinterpret_cast<int*>(self + kLastEnvCmdOffset) = 1;
+        m_pppEnvSt.m_mapMeshPtr = *reinterpret_cast<CMapMesh***>(self + kUsbMapMeshTableOffset);
+        *reinterpret_cast<unsigned int*>(&m_pppEnvSt.m_particleColors[0]) =
+            *reinterpret_cast<unsigned int*>(self + kUsbShapeSlotTableOffset);
+        *reinterpret_cast<unsigned int*>(&m_pppEnvSt.m_particleColors[1]) =
+            *reinterpret_cast<unsigned int*>(self + kUsbTextTableOffset);
+        *reinterpret_cast<EditCameraMatrix*>(self + kEditCameraMatrixOffset) =
+            *reinterpret_cast<EditCameraMatrix*>(payload);
+        *reinterpret_cast<float*>(self + kEditCameraExtraOffset) = payloadFloats[0xC];
+        *reinterpret_cast<float*>(self + kEditCameraExtraOffset + 4) = payloadFloats[0xD];
+        *reinterpret_cast<EditEnvBlock*>(self + kEditCameraExtraOffset + 8) =
+            *reinterpret_cast<EditEnvBlock*>(payload + 0x38);
+        *reinterpret_cast<unsigned char*>(self + 0x158) = payload[0x118];
+        *reinterpret_cast<unsigned char*>(self + 0x159) = payload[0x119];
+        *reinterpret_cast<unsigned char*>(self + 0x15A) = payload[0x11A];
+        *reinterpret_cast<unsigned char*>(self + 0x15B) = payload[0x11B];
+        *reinterpret_cast<unsigned char*>(self + 0x15C) = payload[0x11C];
+        *reinterpret_cast<unsigned char*>(self + 0x15D) = payload[0x11D];
+        *reinterpret_cast<unsigned char*>(self + 0x15E) = payload[0x11E];
+        *reinterpret_cast<unsigned char*>(self + 0x15F) = payload[0x11F];
+        *reinterpret_cast<float*>(self + 0x160) = *reinterpret_cast<float*>(payload + 0x120);
+        *reinterpret_cast<float*>(self + 0x164) = *reinterpret_cast<float*>(payload + 0x124);
+        *reinterpret_cast<int*>(self + 0x168) = *reinterpret_cast<int*>(payload + 0x128);
+        *reinterpret_cast<int*>(self + 0x16C) = *reinterpret_cast<int*>(payload + 0x12C);
+        *reinterpret_cast<int*>(self + 0x170) = *reinterpret_cast<int*>(payload + 0x130);
+        *reinterpret_cast<int*>(self + kEditDrawModeOffset) = *reinterpret_cast<int*>(payload + 0x134);
+
+        m_pppMng[0].m_ownerScale = FLOAT_8032fe18;
+        m_pppMng[0].m_scaleFactor = FLOAT_8032fe18;
+        m_pppMng[0].m_userFloat1 = FLOAT_8032fe18;
+        m_pppMng[0].m_userFloat0 = FLOAT_8032fe18;
+        m_pppMng[0].m_useOwnerScaleSign = 0;
+        m_pppMng[0].m_matrixMode = 0;
+
+        _pppMngSt* mng = m_pppMng;
+        for (int i = 0; i < *reinterpret_cast<int*>(self + 0x4); i++) {
+            *reinterpret_cast<unsigned int*>(&mng->m_envColorR) = *reinterpret_cast<unsigned int*>(self + 0x168);
+            mng++;
+        }
+        return;
+    }
+    case 2: {
+        if (m_pppEnvSt.m_isEditMode != 0) {
+            return;
+        }
+
+        *reinterpret_cast<int*>(self + kLastEnvCmdOffset) = 2;
+        m_pppEnvSt.m_mapMeshPtr = *reinterpret_cast<CMapMesh***>(self + kUsbMapMeshTableOffset);
+        *reinterpret_cast<unsigned int*>(&m_pppEnvSt.m_particleColors[0]) =
+            *reinterpret_cast<unsigned int*>(self + kUsbShapeSlotTableOffset);
+        *reinterpret_cast<unsigned int*>(&m_pppEnvSt.m_particleColors[1]) =
+            *reinterpret_cast<unsigned int*>(self + kUsbTextTableOffset);
+        *reinterpret_cast<EditCameraMatrix*>(self + kEditCameraMatrixOffset) =
+            *reinterpret_cast<EditCameraMatrix*>(payload);
+        *reinterpret_cast<float*>(self + kEditCameraExtraOffset) = payloadFloats[0xC];
+        *reinterpret_cast<float*>(self + kEditCameraExtraOffset + 4) = payloadFloats[0xD];
+        *reinterpret_cast<EditEnvBlock*>(self + kEditCameraExtraOffset + 8) =
+            *reinterpret_cast<EditEnvBlock*>(payload + 0x38);
+        *reinterpret_cast<unsigned char*>(self + 0x158) = payload[0x118];
+        *reinterpret_cast<unsigned char*>(self + 0x159) = payload[0x119];
+        *reinterpret_cast<unsigned char*>(self + 0x15A) = payload[0x11A];
+        *reinterpret_cast<unsigned char*>(self + 0x15B) = payload[0x11B];
+        *reinterpret_cast<unsigned char*>(self + 0x15C) = payload[0x11C];
+        *reinterpret_cast<unsigned char*>(self + 0x15D) = payload[0x11D];
+        *reinterpret_cast<unsigned char*>(self + 0x15E) = payload[0x11E];
+        *reinterpret_cast<unsigned char*>(self + 0x15F) = payload[0x11F];
+        *reinterpret_cast<float*>(self + 0x160) = *reinterpret_cast<float*>(payload + 0x120);
+        *reinterpret_cast<float*>(self + 0x164) = *reinterpret_cast<float*>(payload + 0x124);
+        *reinterpret_cast<int*>(self + 0x168) = *reinterpret_cast<int*>(payload + 0x128);
+        *reinterpret_cast<int*>(self + 0x16C) = *reinterpret_cast<int*>(payload + 0x12C);
+        *reinterpret_cast<int*>(self + 0x170) = *reinterpret_cast<int*>(payload + 0x130);
+        *reinterpret_cast<int*>(self + kEditDrawModeOffset) = *reinterpret_cast<int*>(payload + 0x134);
+
+        ppvChrScl[2] = FLOAT_8032fe18;
+        ppvChrScl[1] = FLOAT_8032fe18;
+        ppvChrScl[0] = FLOAT_8032fe18;
+
+        _pppMngSt* mng = m_pppMng;
+        for (int i = 0; i < *reinterpret_cast<int*>(self + 0x4); i++) {
+            *reinterpret_cast<unsigned int*>(&mng->m_envColorR) = *reinterpret_cast<unsigned int*>(self + 0x168);
+            mng++;
+        }
+        return;
+    }
+    case 5:
+    case 9:
+        if (m_pppEnvSt.m_isEditMode != 0) {
+            return;
+        }
+        {
+            pppModelSt*** modelTablePtr = reinterpret_cast<pppModelSt***>(self + kUsbMapMeshTableOffset);
+            if (*modelTablePtr == 0) {
+                *modelTablePtr = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x5F8) pppModelSt*[0x88];
+                for (int slot = 0; slot < 0x88; slot++) {
+                    (*modelTablePtr)[slot] = 0;
+                }
+            }
+
+            int slotIndex = static_cast<int>(*reinterpret_cast<short*>(payload));
+            pppModelSt*& modelSlot = (*modelTablePtr)[slotIndex];
+            if (modelSlot != 0) {
+                modelSlot->m_refCount--;
+                if (modelSlot->m_refCount < 1) {
+                    if (modelSlot->m_cacheId != -1) {
+                        ppvAmemCacheSet.DestroyCache(modelSlot->m_cacheId);
+                        modelSlot->m_meshData = 0;
+                        modelSlot->m_displayListData = 0;
+                    }
+                    modelSlot->Destroy();
+                    modelSlot->m_refCount = 0;
+                    modelSlot->m_isUsed = 0;
+                }
+                modelSlot = 0;
+            }
+
+            modelSlot = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x5FC) pppModelSt;
+            if (modelSlot != 0) {
+                modelSlot->m_refCount = 0;
+                modelSlot->m_cacheId = -1;
+                modelSlot->m_isUsed = 0;
+                CChunkFile chunkFile;
+                chunkFile.SetBuf(payloadWords + 8);
+                pppReadRsd(chunkFile, modelSlot);
+            }
+            *reinterpret_cast<int*>(self + 0x804) = -1;
+        }
+        return;
+    case 6:
+    case 10:
+        if (m_pppEnvSt.m_isEditMode != 0) {
+            return;
+        }
+        {
+            pppShapeSt*** shapeSlotTablePtr = reinterpret_cast<pppShapeSt***>(self + kUsbShapeSlotTableOffset);
+            if (*shapeSlotTablePtr == 0) {
+                *shapeSlotTablePtr = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x60A) pppShapeSt*[0x80];
+                for (int slot = 0; slot < 0x80; slot++) {
+                    (*shapeSlotTablePtr)[slot] = 0;
+                }
+            }
+
+            int slotIndex = payloadWords[0];
+            pppShapeSt*& shapeSlot = (*shapeSlotTablePtr)[slotIndex];
+            if (shapeSlot != 0) {
+                shapeSlot->m_refCount--;
+                if (shapeSlot->m_refCount < 1) {
+                    if (shapeSlot->m_animData != 0) {
+                        delete[] reinterpret_cast<u8*>(shapeSlot->m_animData);
+                        shapeSlot->m_animData = 0;
+                    }
+                    if (shapeSlot->m_displayListData != 0) {
+                        delete[] reinterpret_cast<u8*>(shapeSlot->m_displayListData);
+                        shapeSlot->m_displayListData = 0;
+                    }
+                    shapeSlot->m_refCount = 0;
+                    shapeSlot->m_inUse = 0;
+                }
+                shapeSlot = 0;
+            }
+
+            shapeSlot = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x610) pppShapeSt;
+            if (shapeSlot != 0) {
+                CChunkFile chunkFile;
+                chunkFile.SetBuf(payloadWords + 4);
+                pppReadShp(chunkFile, shapeSlot);
+            }
+        }
+        return;
+    case 8:
+        if (m_pppEnvSt.m_isEditMode != 0) {
+            return;
+        }
+        {
+            void**& textTable = *reinterpret_cast<void***>(self + kUsbTextTableOffset);
+            if (textTable == 0) {
+                textTable = reinterpret_cast<void**>(
+                    operator new[](0x400, PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x61F));
+            }
+
+            int slotIndex = payloadWords[0];
+            void*& textRaw = *reinterpret_cast<void**>(self + kStreamTextRawOffset + slotIndex * 4);
+            if (textRaw == 0) {
+                textRaw = operator new[](packetSize - 0x20, PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x625);
+            }
+
+            memcpy(textRaw, payload, packetSize - 0x20);
+
+            unsigned char* textBytes = reinterpret_cast<unsigned char*>(textRaw);
+            unsigned short* textEntry = reinterpret_cast<unsigned short*>(
+                reinterpret_cast<unsigned char*>(textTable) + slotIndex * 8);
+            textEntry[0] = static_cast<unsigned short>(*reinterpret_cast<int*>(textBytes + 4));
+            textEntry[1] = static_cast<unsigned short>(*reinterpret_cast<int*>(textBytes + 8));
+            *reinterpret_cast<void**>(textEntry + 2) = textBytes + 0xC;
+        }
+        return;
+    case 0x0B:
+        if (m_pppEnvSt.m_isEditMode != 0) {
+            return;
+        }
+        {
+            CChunkFile chunkFile;
+            chunkFile.SetBuf(payload);
+
+            CChunkFile::CChunk chunk;
+            while (chunkFile.GetNextChunk(chunk)) {
+                if (chunk.m_id != 'DIXT') {
+                    continue;
+                }
+
+                if (res->m_textureSet == 0) {
+                    res->m_textureSet = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x447) CTextureSet;
+                    res->m_textureSet->m_textureArray.SetDefaultSize(0x180);
+                    res->m_textureSet->m_textureArray.SetGrow(0);
+                }
+
+                if (res->m_materialSet == 0) {
+                    res->m_materialSet = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x44B) CMaterialSet;
+                    res->m_materialSet->m_materials.SetDefaultSize(0x180);
+                    res->m_materialSet->m_materials.SetGrow(0);
+                    m_pppEnvSt.m_materialSetPtr = res->m_materialSet;
+
+                    CMaterial* defaultMaterial = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x44E) CMaterial;
+                    defaultMaterial->Create(0, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0));
+                    *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(defaultMaterial) + 0x24) |= 1;
+                    if (res->m_materialSet->m_materials.GetSize() < 1) {
+                        res->m_materialSet->m_materials.Add(defaultMaterial);
+                    } else {
+                        res->m_materialSet->m_materials.SetAt(0, defaultMaterial);
+                    }
+                }
+
+                if (res->m_textureSet != 0 && res->m_materialSet != 0) {
+                    res->m_textureSet->Create(chunkFile, PartPcs.m_usbStreamState.m_stageLoad, 1, 0, 0, 0);
+                    res->m_materialSet->SetPartFromTextureSet(res->m_textureSet, 0);
+                    res->m_materialSet->SetTextureSet(res->m_textureSet);
+                }
+            }
+        }
+        return;
+    case 0x0C:
+        if (m_pppEnvSt.m_isEditMode != 0) {
+            return;
+        }
+        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x646);
+        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3A9);
+        {
+            _pppMngSt* mng = m_pppMng;
+            for (int i = 0; i < *reinterpret_cast<int*>(self + kEditCountOffset); i++) {
+                if (mng->m_baseTime != -0x1000) {
+                    _pppAllFreePObject(mng);
+                }
+                mng++;
+            }
+        }
+        *reinterpret_cast<int*>(self + kEditCountOffset) = 0;
+        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3B3);
+        {
+            void*& pppDataHead0 = *reinterpret_cast<void**>(self + kPppDataHeadTableOffset);
+            if (pppDataHead0 != 0) {
+                delete[] reinterpret_cast<u8*>(pppDataHead0);
+                pppDataHead0 = 0;
+            }
+            if (*reinterpret_cast<void**>(self + kRecvBuffOffset) != 0) {
+                delete[] *reinterpret_cast<u8**>(self + kRecvBuffOffset);
+                *reinterpret_cast<void**>(self + kRecvBuffOffset) = 0;
+            }
+            pppDataHead0 = operator new[](
+                packetSize - 0x20, PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x64D);
+            *reinterpret_cast<u8**>(self + kRecvBuffOffset) =
+                new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x64E) u8[0x3000];
+            memcpy(pppDataHead0, payload, packetSize - 0x20);
+            pppInitPdt(reinterpret_cast<long*>(pppDataHead0), pppGetSysProgTable());
+        }
+
+        *reinterpret_cast<int*>(*reinterpret_cast<unsigned char**>(self + kRecvBuffOffset) + 0x2C) = 0;
+        m_pppMng[0].m_baseTime = 0;
+        *reinterpret_cast<float*>(*reinterpret_cast<unsigned char**>(self + kRecvBuffOffset) + 0x34) = FLOAT_8032FE6C;
+        m_pppMng[0].m_cullRadiusSq = FLOAT_8032FE6C;
+        *reinterpret_cast<float*>(*reinterpret_cast<unsigned char**>(self + kRecvBuffOffset) + 0x3C) = FLOAT_8032FE70;
+        *reinterpret_cast<float*>(*reinterpret_cast<unsigned char**>(self + kRecvBuffOffset) + 0x38) = FLOAT_8032FE70;
+        m_pppMng[0].m_cullYOffset = FLOAT_8032FE70;
+        m_pppMng[0].m_cullRadius = FLOAT_8032FE70;
+        *reinterpret_cast<int*>(*reinterpret_cast<unsigned char**>(self + kRecvBuffOffset) + 0x30) = 0;
+        *reinterpret_cast<int*>(self + kEditCountOffset) = 1;
+        *reinterpret_cast<int*>(self + kPdtCountOffset) = 1;
+        m_pppMng[0].m_objHitMask = 0xFFFFFFFF;
+        m_pppMng[0].m_cylinderAttribute = 0xFFFFFFFF;
+        m_pppMng[0].m_paramA = 0;
+        m_pppMng[0].m_slotVisible = 1;
+        m_pppMng[0].m_ownerFlagsInitialized = 1;
+        m_pppMng[0].m_pppResSet = self + 0x23518;
+        m_pppMng[0].m_nodeIndex = 0;
+        m_pppMng[0].m_fieldF2 = 1;
+        m_pppEnvSt.m_mapMeshPtr = *reinterpret_cast<CMapMesh***>(self + kUsbMapMeshTableOffset);
+        *reinterpret_cast<unsigned int*>(&m_pppEnvSt.m_particleColors[0]) =
+            *reinterpret_cast<unsigned int*>(self + kUsbShapeSlotTableOffset);
+        *reinterpret_cast<unsigned int*>(&m_pppEnvSt.m_particleColors[1]) =
+            *reinterpret_cast<unsigned int*>(self + kUsbTextTableOffset);
+        return;
+    case 0x0D: {
+        if (m_pppEnvSt.m_isEditMode != 0) {
+            return;
+        }
+        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x673);
+        int pdtCount = *reinterpret_cast<int*>(self + kPdtCountOffset);
+        void*& pppDataHead = *reinterpret_cast<void**>(self + kPppDataHeadTableOffset + pdtCount * 4);
+        if (pppDataHead != 0) {
+            delete[] reinterpret_cast<u8*>(pppDataHead);
+            pppDataHead = 0;
+        }
+        if (*reinterpret_cast<void**>(self + kRecvBuffOffset) != 0) {
+            delete[] *reinterpret_cast<u8**>(self + kRecvBuffOffset);
+            *reinterpret_cast<void**>(self + kRecvBuffOffset) = 0;
+        }
+
+        pppDataHead = operator new[](
+            packetSize - 0x20, PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x678);
+        *reinterpret_cast<u8**>(self + kRecvBuffOffset) =
+            new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x679) u8[0x3000];
+        memcpy(pppDataHead, payload, packetSize - 0x20);
+        pppInitPdt(reinterpret_cast<long*>(pppDataHead), pppGetSysProgTable());
+        *reinterpret_cast<int*>(self + kPdtCountOffset) = pdtCount + 1;
+        return;
+    }
+    case 0x0F:
+        if (m_pppEnvSt.m_isEditMode != 0) {
+            return;
+        }
+        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3A9);
+        {
+            _pppMngSt* mng = m_pppMng;
+            for (int i = 0; i < *reinterpret_cast<int*>(self + kEditCountOffset); i++) {
+                if (mng->m_baseTime != -0x1000) {
+                    _pppAllFreePObject(mng);
+                }
+                mng++;
+            }
+        }
+        *reinterpret_cast<int*>(self + kEditCountOffset) = 0;
+        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3B3);
+        ppvSysStopPartF = 1;
+        return;
+    case 0x0E:
+        if (m_pppEnvSt.m_isEditMode != 0) {
+            return;
+        }
+        if (*reinterpret_cast<int*>(self + kEditCountOffset) == 0) {
+            *reinterpret_cast<void**>(self + kRecvWriteOffset) = *reinterpret_cast<void**>(self + kRecvBuffOffset);
+        }
+        memcpy(*reinterpret_cast<void**>(self + kRecvWriteOffset), payload, packetSize - 0x20);
+        *reinterpret_cast<unsigned char**>(self + kRecvWriteOffset) += 0x60;
+        *reinterpret_cast<int*>(self + kEditCountOffset) += 1;
+        return;
+    case 0x10:
+        if (m_pppEnvSt.m_isEditMode != 0) {
+            return;
+        }
+        m_pppEnvSt.m_envParam = FLOAT_8032fe5c;
+        m_pppEnvSt.m_mapMeshPtr = *reinterpret_cast<CMapMesh***>(self + kUsbMapMeshTableOffset);
+        *reinterpret_cast<unsigned int*>(&m_pppEnvSt.m_particleColors[0]) =
+            *reinterpret_cast<unsigned int*>(self + kUsbShapeSlotTableOffset);
+        *reinterpret_cast<unsigned int*>(&m_pppEnvSt.m_particleColors[1]) =
+            *reinterpret_cast<unsigned int*>(self + kUsbTextTableOffset);
+        SetFp();
+        return;
+    case 0x11:
+        if (m_pppEnvSt.m_isEditMode != 0) {
+            return;
+        }
+        m_pppMng[0].m_particleEnded = 1;
+        return;
+    case 0x12: {
+        if (m_pppEnvSt.m_isEditMode != 0) {
+            return;
+        }
+        unsigned int selectedId = *reinterpret_cast<unsigned int*>(self + 0x1C4) & 0xFFFF;
+        _pppMngSt* mng = m_pppMng;
+        unsigned char* recvBytes = *reinterpret_cast<unsigned char**>(self + 0x1C8);
+        for (int i = *reinterpret_cast<int*>(self + 0x4); i != 0; i--) {
+            if (static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(recvBytes + 0x40)) == selectedId) {
+                mng->m_baseTime = 0;
+            }
+            recvBytes += 0x60;
+            mng++;
+        }
+        return;
+    }
+    case 0x13: {
+        if (m_pppEnvSt.m_isEditMode != 0) {
+            return;
+        }
+        unsigned int selectedId = *reinterpret_cast<unsigned int*>(self + 0x1C4) & 0xFFFF;
+        _pppMngSt* mng = m_pppMng;
+        unsigned char* recvBytes = *reinterpret_cast<unsigned char**>(self + 0x1C8);
+        for (int i = *reinterpret_cast<int*>(self + 0x4); i != 0; i--) {
+            if (static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(recvBytes + 0x40)) == selectedId) {
+                mng->m_particleEnded = 1;
+            }
+            recvBytes += 0x60;
+            mng++;
+        }
+        return;
+    }
+    case 0x17:
+        if (m_pppEnvSt.m_isEditMode != 0) {
+            return;
+        }
+        *reinterpret_cast<short*>(self + kCursorPacketOffset) = *reinterpret_cast<short*>(self + kCursorXOffset);
+        *reinterpret_cast<short*>(self + kCursorPacketOffset + 2) = *reinterpret_cast<short*>(self + kCursorYOffset);
+        self[0x808] = 1;
+        return;
+    case 0x1E:
         *reinterpret_cast<int*>(self + kCursorRequestOffset) = 1;
-        return;
-    case 0x20:
-        MapMng.ShowMapObjID(packetWords[9], static_cast<int>(payloadFloats[0]));
-        return;
-    case 0x21:
-        MapMng.ShowMapMeshID(packetWords[9], static_cast<int>(payloadFloats[0]));
         return;
     case 0x41:
         *reinterpret_cast<int*>(self + kEditFrameOffset) = 0;
         return;
-    case 0x42:
-        memcpy(self + kCursorPacketOffset, payload, 0x28);
+    case 0x40:
         *reinterpret_cast<int*>(self + kEditFrameOffset) = 1;
+        return;
+    case 0x42:
+        memcpy(self + kCursorPacket42Offset, payload, 0x28);
+        *reinterpret_cast<int*>(self + kEditFrameOffset) = 1;
+        return;
+    case 0x20:
+        MapMng.ShowMapObjID(payloadWords[1], payloadWords[0]);
+        return;
+    case 0x21:
+        MapMng.ShowMapMeshID(payloadWords[1], payloadWords[0]);
         return;
     case 0x1f:
     case 0xfe:
@@ -2046,8 +2114,7 @@ void CPartMng::pppEditBeforeCalc()
     CGObject** editorObj = reinterpret_cast<CGObject**>(self + 0x80c);
 
     switch (*lastEnvCmd) {
-    case 1:
-    case 2: {
+    case 1: {
         // Camera matrix handed over from editor uses opposite handedness on these axes.
         *reinterpret_cast<float*>(self + 0x60) = -*reinterpret_cast<float*>(self + 0x60);
         *reinterpret_cast<float*>(self + 0x68) = -*reinterpret_cast<float*>(self + 0x68);
@@ -2071,21 +2138,64 @@ void CPartMng::pppEditBeforeCalc()
         clearColor.a = 0xFF;
         GXSetCopyClear(clearColor, 0x00FFFFFF);
 
-        unsigned char useFog = *reinterpret_cast<unsigned char*>(self + 0x15c);
-        _GXColor fogColor;
-        fogColor.r = *reinterpret_cast<unsigned char*>(self + 0x15d);
-        fogColor.g = *reinterpret_cast<unsigned char*>(self + 0x15e);
-        fogColor.b = *reinterpret_cast<unsigned char*>(self + 0x15f);
-        fogColor.a = 0;
-
-        if (useFog != 0) {
+        float fogFar = *reinterpret_cast<float*>(self + 0x164);
+        float fogNear = *reinterpret_cast<float*>(self + 0x160);
+        if (*reinterpret_cast<unsigned char*>(self + 0x15c) != 0) {
+            _GXColor fogColor;
+            fogColor.r = *reinterpret_cast<unsigned char*>(self + 0x15d);
+            fogColor.g = *reinterpret_cast<unsigned char*>(self + 0x15e);
+            fogColor.b = *reinterpret_cast<unsigned char*>(self + 0x15f);
+            fogColor.a = 0;
             Graphic.SetFogColor(fogColor);
-            if (*lastEnvCmd == 1) {
-                Graphic.SetFogParam(*reinterpret_cast<float*>(self + 0x160), *reinterpret_cast<float*>(self + 0x164));
-            } else {
-                Graphic.SetFogParam(*reinterpret_cast<float*>(self + 0x164), *reinterpret_cast<float*>(self + 0x160));
-            }
+            Graphic.SetFogParam(fogNear, fogFar);
         } else {
+            _GXColor fogColor;
+            fogColor.r = 0;
+            fogColor.g = 0;
+            fogColor.b = 0;
+            fogColor.a = 0;
+            Graphic.SetFogColor(fogColor);
+            Graphic.SetFogParam(FLOAT_8032fe5c, FLOAT_8032fe5c);
+        }
+
+        ppvSysGoPartF = 1;
+        break;
+    }
+    case 2: {
+        *reinterpret_cast<float*>(self + 0x60) = -*reinterpret_cast<float*>(self + 0x60);
+        *reinterpret_cast<float*>(self + 0x68) = -*reinterpret_cast<float*>(self + 0x68);
+        *reinterpret_cast<float*>(self + 0x44) = -*reinterpret_cast<float*>(self + 0x44);
+        *reinterpret_cast<float*>(self + 0x54) = -*reinterpret_cast<float*>(self + 0x54);
+        *reinterpret_cast<float*>(self + 0x6c) = -*reinterpret_cast<float*>(self + 0x6c);
+        *reinterpret_cast<float*>(self + 0x6c) *= *reinterpret_cast<float*>(self + 0x70);
+
+        PSMTXCopy(reinterpret_cast<float(*)[4]>(self + 0x40), ppvCameraMatrix);
+        C_MTXPerspective(ppvScreenMatrix, FLOAT_8032fe4c, FLOAT_8032fe50, FLOAT_8032fe54, FLOAT_8032fe58);
+        ppvScreenMatrixXbuff = ppvScreenMatrix[2][0];
+        ppvScreenMatrixYbuff = ppvScreenMatrix[2][1];
+        ppvScreenMatrixZbuff = ppvScreenMatrix[2][3];
+        PSMTXCopy(ppvCameraMatrix, ppvCameraMatrix0);
+        PSMTX44Copy(ppvScreenMatrix, ppvScreenMatrix0);
+
+        _GXColor clearColor;
+        clearColor.r = *reinterpret_cast<unsigned char*>(self + 0x158);
+        clearColor.g = *reinterpret_cast<unsigned char*>(self + 0x159);
+        clearColor.b = *reinterpret_cast<unsigned char*>(self + 0x15a);
+        clearColor.a = 0xFF;
+        GXSetCopyClear(clearColor, 0x00FFFFFF);
+
+        float fogFar = *reinterpret_cast<float*>(self + 0x164);
+        float fogNear = *reinterpret_cast<float*>(self + 0x160);
+        if (*reinterpret_cast<unsigned char*>(self + 0x15c) != 0) {
+            _GXColor fogColor;
+            fogColor.r = *reinterpret_cast<unsigned char*>(self + 0x15d);
+            fogColor.g = *reinterpret_cast<unsigned char*>(self + 0x15e);
+            fogColor.b = *reinterpret_cast<unsigned char*>(self + 0x15f);
+            fogColor.a = 0;
+            Graphic.SetFogColor(fogColor);
+            Graphic.SetFogParam(fogNear, fogFar);
+        } else {
+            _GXColor fogColor;
             fogColor.r = 0;
             fogColor.g = 0;
             fogColor.b = 0;
@@ -2114,14 +2224,13 @@ void CPartMng::pppEditBeforeCalc()
             *editorObj = 0;
         }
 
-        CMemory::CStage* stageLoad = PartPcs.m_usbStreamState.m_stageLoad;
         *editorObj = static_cast<CGObject*>(
-            operator new(0x518, stageLoad, const_cast<char*>(s_partMng_cpp), 0x7b5));
+            operator new(0x518, PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x7b5));
         if (*editorObj != 0) {
             (*editorObj)->Create();
 
             CCharaPcs::CHandle* handle =
-                new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x7b7) CCharaPcs::CHandle;
+                new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x7b7) CCharaPcs::CHandle;
             (*editorObj)->m_charaModelHandle = handle;
             if (handle != 0) {
                 handle->Add();
@@ -2196,21 +2305,24 @@ void CPartMng::pppEditPartCalc()
 
     char* self = reinterpret_cast<char*>(this);
     unsigned char* usbEdit = reinterpret_cast<unsigned char*>(self + kUsbEditOffset);
-    CGObject* editorObj = *reinterpret_cast<CGObject**>(usbEdit + 0x1C);
-    _pppMngSt* mng = m_pppMng;
     PppPdtSlot* pdtSlots = m_pdtSlots;
 
-    OSStopStopwatch(&g_par_calc_prof);
-    if (editorObj != 0 && editorObj->m_charaModelHandle != 0 && editorObj->m_charaModelHandle->m_model != 0) {
-        CChara::CModel* model = editorObj->m_charaModelHandle->m_model;
-        model->CalcMatrix();
-        model->CalcSkin();
-        model->SetFrame(*reinterpret_cast<float*>(self + 0x23564));
-        if (gPppCalcDisabled == 0) {
+    if (ppvSysGoPartF != 0) {
+        ppvSysGoPartF = 0;
+        ppvSysStopPartF = 0;
+    }
+
+    reinterpret_cast<CStopWatch&>(g_par_calc_prof).Stop();
+    if (*reinterpret_cast<CGObject**>(self + 0x80c) != 0) {
+        (*reinterpret_cast<CGObject**>(self + 0x80c))->m_charaModelHandle->m_model->CalcMatrix();
+        (*reinterpret_cast<CGObject**>(self + 0x80c))->m_charaModelHandle->m_model->CalcSkin();
+        (*reinterpret_cast<CGObject**>(self + 0x80c))->m_charaModelHandle->m_model->SetFrame(
+            *reinterpret_cast<float*>(self + 0x23564));
+        if (ppvUserStopPartF == 0) {
             *reinterpret_cast<float*>(self + 0x23564) += FLOAT_8032fe18;
         }
     }
-    OSStartStopwatch(&g_par_calc_prof);
+    reinterpret_cast<CStopWatch&>(g_par_calc_prof).Start();
 
     if (usbEdit[0x18] != 0) {
         usbEdit[0x18] = 0;
@@ -2218,83 +2330,96 @@ void CPartMng::pppEditPartCalc()
         usbEdit[0x1A] = 0;
 
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3a9);
-        for (int i = 0; i < kPppMngCount; i++) {
+        _pppMngSt* mng = m_pppMng;
+        int activeCount = *reinterpret_cast<int*>(self + 0x4);
+        for (int i = 0; i < activeCount; i++) {
             if (mng->m_baseTime != -0x1000) {
                 _pppAllFreePObject(mng);
             }
             mng++;
         }
 
-        *reinterpret_cast<int*>(self + 0x2355C) = 0;
+        *reinterpret_cast<int*>(self + 0x4) = 0;
 
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3b3);
-        if (pdtSlots[0].m_pppDataHead != 0) {
-            _pppMngSt* firstMng = m_pppMng;
-            firstMng->m_particleEnded = 0;
-            firstMng->m_envColorR = *reinterpret_cast<unsigned char*>(self + 0x158);
-            firstMng->m_envColorG = *reinterpret_cast<unsigned char*>(self + 0x159);
-            firstMng->m_envColorB = *reinterpret_cast<unsigned char*>(self + 0x15A);
-            firstMng->m_envColorA = *reinterpret_cast<unsigned char*>(self + 0x15B);
-            _pppStartPart(firstMng, reinterpret_cast<long*>(pdtSlots[0].m_pppDataHead), 1);
-        }
+        _pppMngSt* firstMng = m_pppMng;
+        firstMng->m_particleEnded = 0;
+        *reinterpret_cast<int*>(&firstMng->m_envColorR) = *reinterpret_cast<int*>(self + 0x168);
+        _pppStartPart(firstMng, *reinterpret_cast<long**>(self + 0x5dc), 1);
     }
 
-    if (ppvSysStopPartF != 0 || pdtSlots[0].m_pppDataHead == 0) {
+    if (ppvSysStopPartF != 0 || *reinterpret_cast<long**>(self + 0x5dc) == 0) {
         return;
     }
 
-    int editDrawMode = *reinterpret_cast<int*>(self + 0x23570);
-    int loopCount = *reinterpret_cast<int*>(self + 0x2355C);
-    if (loopCount > kPppMngCount) {
-        loopCount = kPppMngCount;
-    }
+    int* recvBuff = *reinterpret_cast<int**>(self + 0x1C8);
 
-    mng = m_pppMng;
-    for (int i = 0; i < loopCount; i++) {
-        int baseTime = mng->m_baseTime;
-        ppvMng = mng;
-        if (baseTime == -0x1000) {
-            mng++;
-            continue;
-        }
-
-        if (editDrawMode >= 4 && baseTime == -0x1000) {
-            mng->m_baseTime = 0;
-            baseTime = 0;
-        }
-
-        if (baseTime >= 0) {
-            baseTime -= 1;
-            mng->m_baseTime = baseTime;
-            if (baseTime < 0) {
+    if (*reinterpret_cast<int*>(self + 0x174) <= 3) {
+        for (int i = 0; i < *reinterpret_cast<int*>(self + 0x4); i++) {
+            _pppMngSt* mng = &m_pppMng[i];
+            int baseTime = mng->m_baseTime;
+            ppvMng = mng;
+            if (baseTime == -0x1000) {
+                continue;
+            }
+            if (baseTime >= 0) {
+                baseTime -= 1;
+                mng->m_baseTime = baseTime;
+                if (baseTime >= 0) {
+                    continue;
+                }
                 mng->m_particleEnded = 0;
-                mng->m_envColorR = *reinterpret_cast<unsigned char*>(self + 0x158);
-                mng->m_envColorG = *reinterpret_cast<unsigned char*>(self + 0x159);
-                mng->m_envColorB = *reinterpret_cast<unsigned char*>(self + 0x15A);
-                mng->m_envColorA = *reinterpret_cast<unsigned char*>(self + 0x15B);
-                _pppStartPart(mng, reinterpret_cast<long*>(pdtSlots[0].m_pppDataHead), 1);
+                *reinterpret_cast<int*>(&mng->m_envColorR) = *reinterpret_cast<int*>(self + 0x168);
+                _pppStartPart(mng, reinterpret_cast<long*>(self + 0x5dc) + recvBuff[i * 0x18 + 0xC], 1);
+            }
+
+            pppSetMatrix(mng);
+            pppSetFpMatrix(mng);
+            _pppCalcPart(mng);
+            _pppDeadPart(mng);
+
+            if (mng->m_isFinished != 0 || mng->m_hitBgFlag != 0) {
+                Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x827);
+                _pppAllFreePObject(mng);
+                Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x82b);
+                if (*reinterpret_cast<int*>(self + 0x174) > 3) {
+                    pppHeapCheckLeak(ppvEnv->m_stagePtr);
+                }
+                if (i == 0) {
+                    usbEdit[0x1A] = 1;
+                }
+                gPppHeapUseRateWords[1] = 0;
             }
         }
-
-        ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4);
-        pppSetMatrix(mng);
-        pppSetFpMatrix(mng);
-        _pppCalcPart(mng);
-        _pppDeadPart(mng);
-
-        if (mng->m_isFinished != 0 || mng->m_mode != 0) {
-            Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), (editDrawMode < 4) ? 0x827 : 0x861);
-            _pppAllFreePObject(mng);
-            Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), (editDrawMode < 4) ? 0x82b : 0x865);
-            if (editDrawMode > 3) {
-                pppHeapCheckLeak(ppvEnv->m_stagePtr);
+    } else {
+        for (int i = 0; i < *reinterpret_cast<int*>(self + 0x4); i++) {
+            _pppMngSt* mng = &m_pppMng[i];
+            ppvMng = mng;
+            if (mng->m_baseTime == -0x1000) {
+                mng->m_baseTime = 0;
             }
-            if (i == 0) {
-                usbEdit[0x1A] = 1;
+            if (mng->m_baseTime < 0) {
+                pppSetMatrix(mng);
+                pppSetFpMatrix(mng);
+                _pppCalcPart(mng);
+                if (mng->m_mode != 0 && mng->m_currentFrame == mng->m_lifeEnd) {
+                    gPppHeapUseRateWords[1] = 0;
+                }
+                _pppDeadPart(mng);
+                if (mng->m_isFinished != 0 || mng->m_hitBgFlag != 0) {
+                    Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x861);
+                    _pppAllFreePObject(mng);
+                    Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x865);
+                    if (*reinterpret_cast<int*>(self + 0x174) > 3) {
+                        pppHeapCheckLeak(ppvEnv->m_stagePtr);
+                    }
+                    if (i == 0) {
+                        usbEdit[0x1A] = 1;
+                    }
+                    gPppHeapUseRateWords[1] = 0;
+                }
             }
         }
-
-        mng++;
     }
 }
 
@@ -2309,34 +2434,9 @@ void CPartMng::pppEditPartCalc()
  */
 void CPartMng::pppEditDrawShadow()
 {
-    struct PppMngStDrawRaw {
-        void* m_pppResSet;                   // 0x00
-        int m_partIndex;                     // 0x04
-        Vec m_position;                      // 0x08
-        int m_baseTime;                      // 0x14
-        unsigned char m_pad18[0x78 - 0x18]; // 0x18
-        pppFMATRIX m_matrix;                 // 0x78
-        unsigned char m_padA8[0xE4 - 0xA8]; // 0xA8
-        unsigned char m_endRequested;        // 0xE4
-        unsigned char m_stopRequested;       // 0xE5
-        unsigned char m_isFinished;          // 0xE6
-        unsigned char m_matrixMode;          // 0xE7
-        unsigned char m_hitBgFlag;           // 0xE8
-        unsigned char m_slotVisible;         // 0xE9
-        unsigned char m_ownerFacing;         // 0xEA
-        unsigned char m_drawVariant;         // 0xEB
-        unsigned char m_rotationOrder;       // 0xEC
-        unsigned char m_drawMode;            // 0xED
-        signed char m_drawSubType;           // 0xEE
-        unsigned char m_useOwnerScaleSign;   // 0xEF
-        unsigned char m_ownerVisible;        // 0xF0
-        unsigned char m_nodeScaleInitialized; // 0xF1
-        unsigned char m_fieldF2;             // 0xF2
-        unsigned char m_padF3[0x108 - 0xF3]; // 0xF3
-        float m_cullRadiusSq;                // 0x108
-        float m_cullRadius;                  // 0x10C
-        float m_cullYOffset;                 // 0x110
-        float m_sortDepth;                   // 0x114
+    struct PppCullBound {
+        Vec m_min;
+        Vec m_max;
     };
 
     if (ppvSysStopPartF != 0) {
@@ -2345,49 +2445,57 @@ void CPartMng::pppEditDrawShadow()
 
     char* self = reinterpret_cast<char*>(this);
     PppPdtSlot* pdtSlots = m_pdtSlots;
-    if (pdtSlots[0].m_pppDataHead != 0 && *reinterpret_cast<int*>(self + 0x23570) < 4) {
+    if (pdtSlots[0].m_pppDataHead != 0 && *reinterpret_cast<int*>(self + 0x174) <= 3) {
         Mtx invCamera;
         Vec cameraPos;
         Vec partPos;
         Vec cameraDelta;
         Vec viewPos;
 
-        PSMTXInverse(ppvCameraMatrix0, invCamera);
+        PSMTXInverse(ppvCameraMatrix, invCamera);
         cameraPos.x = invCamera[0][3];
         cameraPos.y = invCamera[1][3];
         cameraPos.z = invCamera[2][3];
 
-        PppMngStDrawRaw* mng = reinterpret_cast<PppMngStDrawRaw*>(self + 0x2A18);
         for (int i = 0; i < 0x180; i++) {
-            if (mng->m_endRequested == 0 && mng->m_baseTime != -0x1000 && mng->m_drawMode == 3 && mng->m_baseTime < 0
-                && mng->m_slotVisible != 0 && mng->m_ownerVisible != 0) {
+            _pppMngSt* mng = &m_pppMng[i];
+            if (mng->m_hitBgFlag == 0 && mng->m_baseTime != -0x1000 && (signed char)mng->m_drawPass == 3
+                && mng->m_baseTime < 0 && mng->m_slotVisible != 0 && mng->m_ownerFacing != 0) {
+                ppvMng = mng;
                 partPos.x = mng->m_matrix.value[0][3];
                 partPos.y = mng->m_matrix.value[1][3];
                 partPos.z = mng->m_matrix.value[2][3];
 
-                bool shouldDraw = (mng->m_cullRadiusSq == 0.0f);
-                if (!shouldDraw) {
-                    PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
-                    if (PSVECSquareMag(&cameraDelta) < mng->m_cullRadiusSq) {
-                        CBound bound;
-                        Vec min;
-                        min.x = partPos.x - mng->m_cullRadius;
-                        min.y = partPos.y;
-                        min.z = partPos.z - mng->m_cullRadius;
-                        shouldDraw = (bound.CheckFrustum(min, ppvCameraMatrix0, partPos.y + mng->m_cullYOffset) != 0);
-                    }
+                if ((double)mng->m_cullRadiusSq != 0.0) {
+                    goto checkCull;
                 }
 
-                if (shouldDraw) {
-                    PSMTXMultVec(ppvCameraMatrix0, &partPos, &viewPos);
-                    mng->m_sortDepth = viewPos.z;
-                    ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
-                    ppvMng = reinterpret_cast<_pppMngSt*>(mng);
-                    pppSetFpMatrix(ppvMng);
-                    _pppDrawPart(ppvMng);
+            drawPart:
+                PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
+                mng->m_sortDepth = viewPos.z;
+                ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4);
+                ppvMng = mng;
+                pppSetFpMatrix(ppvMng);
+                _pppDrawPart(ppvMng);
+                continue;
+
+            checkCull:
+                PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
+                if (PSVECSquareMag(&cameraDelta) < mng->m_cullRadiusSq) {
+                    PppCullBound bound;
+                    float radius = mng->m_cullRadius;
+                    bound.m_min.x = partPos.x - radius;
+                    bound.m_min.y = partPos.y;
+                    bound.m_min.z = partPos.z - radius;
+                    bound.m_max.x = partPos.x + radius;
+                    bound.m_max.y = partPos.y + mng->m_cullYOffset;
+                    bound.m_max.z = partPos.z + radius;
+                    if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(
+                            cameraPos, ppvCameraMatrix, FLOAT_8032FE48) != 0) {
+                        goto drawPart;
+                    }
                 }
             }
-            mng++;
         }
     }
 
@@ -2415,11 +2523,11 @@ void CPartMng::pppEditDraw()
     static const int kLifeEndOffset = 0x24;
     static const int kCurrentFrameOffset = 0x34;
     static const int kMatrixOffset = 0x78;
-    static const int kEndRequestedOffset = 0xe4;
+    static const int kEndRequestedOffset = 0xe8;
     static const int kDrawPassOffset = 0xed;
     static const int kStopAtLifeEndOffset = 0xef;
     static const int kSlotVisibleOffset = 0xe9;
-    static const int kOwnerVisibleOffset = 0xf0;
+    static const int kOwnerVisibleOffset = 0xea;
     static const int kCullRadiusSqOffset = 0x108;
     static const int kCullRadiusOffset = 0x10c;
     static const int kCullYOffsetOffset = 0x110;
@@ -2431,76 +2539,71 @@ void CPartMng::pppEditDraw()
 
     m_pppEnvSt.m_debugCounter = 0;
 
-    Mtx invCamera;
-    Vec cameraPos;
     Vec partPos;
-    Vec cameraDelta;
     Vec viewPos;
 
-    if (m_pdtSlots[0].m_pppDataHead != 0) {
-        if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + kEditDrawModeOffset) < 4) {
-            for (int passIndex = 0; passIndex < 4; passIndex++) {
-                unsigned char drawPass = 0;
-                if (passIndex == 0) {
-                    drawPass = 8;
-                } else if (passIndex == 1) {
-                    drawPass = 4;
-                } else if (passIndex == 2) {
-                    pppDraw();
-                    drawPass = 6;
-                } else {
-                    drawPass = 7;
-                }
-
-                PSMTXInverse(ppvCameraMatrix0, invCamera);
-                cameraPos.x = invCamera[0][3];
-                cameraPos.y = invCamera[1][3];
-                cameraPos.z = invCamera[2][3];
-
-                char* mng = reinterpret_cast<char*>(m_pppMng);
-                for (int i = 0; i < kPppMngCount; i++) {
-                    int baseTime = *reinterpret_cast<int*>(mng + kBaseTimeOffset);
-                    unsigned char endRequested = *reinterpret_cast<unsigned char*>(mng + kEndRequestedOffset);
-                    unsigned char partDrawPass = *reinterpret_cast<unsigned char*>(mng + kDrawPassOffset);
-                    unsigned char slotVisible = *reinterpret_cast<unsigned char*>(mng + kSlotVisibleOffset);
-                    unsigned char ownerVisible = *reinterpret_cast<unsigned char*>(mng + kOwnerVisibleOffset);
-
-                    if (endRequested == 0 && baseTime != -0x1000 && partDrawPass == drawPass && baseTime < 0
-                        && slotVisible != 0 && ownerVisible != 0) {
-                        partPos.x = *reinterpret_cast<float*>(mng + kMatrixOffset + 0xc);
-                        partPos.y = *reinterpret_cast<float*>(mng + kMatrixOffset + 0x1c);
-                        partPos.z = *reinterpret_cast<float*>(mng + kMatrixOffset + 0x2c);
-
-                        float cullRadiusSq = *reinterpret_cast<float*>(mng + kCullRadiusSqOffset);
-                        bool shouldDraw = (cullRadiusSq == 0.0f);
-                        if (!shouldDraw) {
-                            PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
-                            if (PSVECSquareMag(&cameraDelta) < cullRadiusSq) {
-                                CBound bound;
-                                float cullRadius = *reinterpret_cast<float*>(mng + kCullRadiusOffset);
-                                float cullYOffset = *reinterpret_cast<float*>(mng + kCullYOffsetOffset);
-                                Vec min;
-                                min.x = partPos.x - cullRadius;
-                                min.y = partPos.y;
-                                min.z = partPos.z - cullRadius;
-                                shouldDraw = (bound.CheckFrustum(min, ppvCameraMatrix0, partPos.y + cullYOffset) != 0);
-                            }
-                        }
-
-                        if (shouldDraw) {
-                            PSMTXMultVec(ppvCameraMatrix0, &partPos, &viewPos);
-                            *reinterpret_cast<float*>(mng + kSortDepthOffset) = viewPos.z;
-
-                            ppvMng = reinterpret_cast<_pppMngSt*>(mng);
-                            ppvEnv = reinterpret_cast<_pppEnvSt*>(*reinterpret_cast<char**>(mng) + 4);
-                            pppSetFpMatrix(ppvMng);
-                            _pppDrawPart(ppvMng);
-                        }
-                    }
-
-                    mng += kPppMngStride;
-                }
+    if (*reinterpret_cast<long**>(reinterpret_cast<unsigned char*>(this) + 0x5dc) != 0) {
+        if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x174) <= 3) {
+#define PPP_EDIT_DRAW_PASS(drawPass)                                                                       \
+            {                                                                                              \
+                struct PppCullBound { Vec m_min; Vec m_max; };                                             \
+                Mtx invCamera;                                                                             \
+                Vec cameraPos;                                                                             \
+                Vec cameraDelta;                                                                           \
+                PSMTXInverse(ppvCameraMatrix, invCamera);                                                  \
+                cameraPos.x = invCamera[0][3];                                                             \
+                cameraPos.y = invCamera[1][3];                                                             \
+                cameraPos.z = invCamera[2][3];                                                             \
+                                                                                                           \
+                for (int i = 0; i < kPppMngCount; i++) {                                                   \
+                    _pppMngSt* mng = &m_pppMng[i];                                                         \
+                    if (mng->m_hitBgFlag == 0 && mng->m_baseTime != -0x1000                                \
+                        && (signed char)mng->m_drawPass == (drawPass) && mng->m_baseTime < 0               \
+                        && mng->m_slotVisible != 0 && mng->m_ownerFacing != 0) {                           \
+                        ppvMng = mng;                                                                      \
+                        partPos.x = mng->m_matrix.value[0][3];                                             \
+                        partPos.y = mng->m_matrix.value[1][3];                                             \
+                        partPos.z = mng->m_matrix.value[2][3];                                             \
+                                                                                                           \
+                        if ((double)mng->m_cullRadiusSq != 0.0) {                                          \
+                            goto checkCull##drawPass;                                                      \
+                        }                                                                                  \
+                                                                                                           \
+                    drawPart##drawPass:                                                                    \
+                        PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);                                 \
+                        mng->m_sortDepth = viewPos.z;                                                      \
+                        ppvMng = mng;                                                                      \
+                        ppvEnv = reinterpret_cast<_pppEnvSt*>(*reinterpret_cast<char**>(mng) + 4);         \
+                        pppSetFpMatrix(ppvMng);                                                            \
+                        _pppDrawPart(ppvMng);                                                              \
+                        continue;                                                                          \
+                                                                                                           \
+                    checkCull##drawPass:                                                                   \
+                        PSVECSubtract(&cameraPos, &partPos, &cameraDelta);                                 \
+                        if (PSVECSquareMag(&cameraDelta) < mng->m_cullRadiusSq) {                          \
+                            PppCullBound bound;                                                            \
+                            float radius = mng->m_cullRadius;                                              \
+                            bound.m_min.x = partPos.x - radius;                                            \
+                            bound.m_min.y = partPos.y;                                                     \
+                            bound.m_min.z = partPos.z - radius;                                            \
+                            bound.m_max.x = partPos.x + radius;                                            \
+                            bound.m_max.y = partPos.y + mng->m_cullYOffset;                                \
+                            bound.m_max.z = partPos.z + radius;                                            \
+                            if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(                           \
+                                    cameraPos, ppvCameraMatrix, FLOAT_8032FE48) != 0) {                    \
+                                goto drawPart##drawPass;                                                   \
+                            }                                                                              \
+                        }                                                                                  \
+                    }                                                                                      \
+                }                                                                                          \
             }
+
+            PPP_EDIT_DRAW_PASS(8)
+            PPP_EDIT_DRAW_PASS(4)
+            pppDraw();
+            PPP_EDIT_DRAW_PASS(6)
+            PPP_EDIT_DRAW_PASS(7)
+#undef PPP_EDIT_DRAW_PASS
         } else {
             char* mng = reinterpret_cast<char*>(m_pppMng);
             int editCount = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + kEditCountOffset);
@@ -2511,7 +2614,7 @@ void CPartMng::pppEditDraw()
                     partPos.x = *reinterpret_cast<float*>(mng + kMatrixOffset + 0xc);
                     partPos.y = *reinterpret_cast<float*>(mng + kMatrixOffset + 0x1c);
                     partPos.z = *reinterpret_cast<float*>(mng + kMatrixOffset + 0x2c);
-                    PSMTXMultVec(ppvCameraMatrix0, &partPos, &viewPos);
+                    PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
                     *reinterpret_cast<float*>(mng + kSortDepthOffset) = viewPos.z;
                     ppvDrawMng.AddPrimOt(0x3ff, reinterpret_cast<_pppMngSt*>(mng));
                     if (*reinterpret_cast<unsigned char*>(mng + kStopAtLifeEndOffset) != 0
@@ -2551,149 +2654,68 @@ void CPartMng::pppEditPartDrawAfter()
 
     if (ppvSysStopPartF == 0) {
         m_pppEnvSt.m_debugCounter = 0;
-        if (m_pdtSlots[0].m_pppDataHead != 0
-            && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + kEditDrawModeOffset) < 4) {
-            {
-                Mtx invCamera;
-                Vec cameraPos;
-                Vec partPos;
-                Vec cameraDelta;
-                Vec viewPos;
-                PSMTXInverse(ppvCameraMatrix0, invCamera);
-                cameraPos.x = invCamera[0][3];
-                cameraPos.y = invCamera[1][3];
-                cameraPos.z = invCamera[2][3];
-
-                _pppMngSt* mng = m_pppMng;
-                for (int i = 0; i < kPppMngCount; i++) {
-                    int baseTime = mng->m_baseTime;
-                    if (mng->m_mode == 0 && baseTime != -0x1000 && mng->m_drawPass == 5 && baseTime < 0
-                        && mng->m_slotVisible != 0 && mng->m_ownerFlagsInitialized != 0) {
-                        partPos.x = mng->m_matrix.value[0][3];
-                        partPos.y = mng->m_matrix.value[1][3];
-                        partPos.z = mng->m_matrix.value[2][3];
-
-                        ppvMng = mng;
-                        bool shouldDraw = ((double)mng->m_cullRadiusSq == 0.0);
-                        if (!shouldDraw) {
-                            PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
-                            if ((double)PSVECSquareMag(&cameraDelta) < (double)mng->m_cullRadiusSq) {
-                                CBound bound;
-                                Vec min;
-                                min.x = partPos.x - mng->m_cullRadius;
-                                min.y = partPos.y;
-                                min.z = partPos.z - mng->m_cullRadius;
-                                shouldDraw = (bound.CheckFrustum(min, ppvCameraMatrix0,
-                                                                 partPos.y + mng->m_cullYOffset) != 0);
-                            }
-                        }
-
-                        if (shouldDraw) {
-                            PSMTXMultVec(ppvCameraMatrix0, &partPos, &viewPos);
-                            mng->m_sortDepth = viewPos.z;
-                            ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4);
-                            ppvMng = mng;
-                            pppSetFpMatrix(ppvMng);
-                            _pppDrawPart(ppvMng);
-                        }
-                    }
-                    mng++;
-                }
+        if (*reinterpret_cast<long**>(reinterpret_cast<unsigned char*>(this) + 0x5dc) != 0
+            && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x174) <= 3) {
+#define PPP_DRAW_AFTER_PASS(drawPass)                                                              \
+            {                                                                                              \
+                struct PppCullBound { Vec m_min; Vec m_max; };                                             \
+                Mtx invCamera;                                                                             \
+                Vec cameraPos;                                                                             \
+                Vec partPos;                                                                               \
+                Vec cameraDelta;                                                                           \
+                Vec viewPos;                                                                               \
+                PSMTXInverse(ppvCameraMatrix, invCamera);                                                  \
+                cameraPos.x = invCamera[0][3];                                                             \
+                cameraPos.y = invCamera[1][3];                                                             \
+                cameraPos.z = invCamera[2][3];                                                             \
+                                                                                                           \
+                for (int i = 0; i < kPppMngCount; i++) {                                                   \
+                    _pppMngSt* mng = &m_pppMng[i];                                                         \
+                    if (mng->m_hitBgFlag == 0 && mng->m_baseTime != -0x1000                                \
+                        && (signed char)mng->m_drawPass == (drawPass) && mng->m_baseTime < 0               \
+                        && mng->m_slotVisible != 0 && mng->m_ownerFacing != 0) {                           \
+                        ppvMng = mng;                                                                      \
+                        partPos.x = mng->m_matrix.value[0][3];                                             \
+                        partPos.y = mng->m_matrix.value[1][3];                                             \
+                        partPos.z = mng->m_matrix.value[2][3];                                             \
+                                                                                                           \
+                        if ((double)mng->m_cullRadiusSq != 0.0) {                                          \
+                            goto checkCull##drawPass;                                                      \
+                        }                                                                                  \
+                                                                                                           \
+                    drawPart##drawPass:                                                                    \
+                        PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);                                 \
+                        mng->m_sortDepth = viewPos.z;                                                      \
+                        ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4); \
+                        ppvMng = mng;                                                                      \
+                        pppSetFpMatrix(ppvMng);                                                            \
+                        _pppDrawPart(ppvMng);                                                              \
+                        continue;                                                                          \
+                                                                                                           \
+                    checkCull##drawPass:                                                                   \
+                        PSVECSubtract(&cameraPos, &partPos, &cameraDelta);                                 \
+                        if (PSVECSquareMag(&cameraDelta) < mng->m_cullRadiusSq) {                          \
+                            PppCullBound bound;                                                            \
+                            float radius = mng->m_cullRadius;                                              \
+                            bound.m_min.x = partPos.x - radius;                                            \
+                            bound.m_min.y = partPos.y;                                                     \
+                            bound.m_min.z = partPos.z - radius;                                            \
+                            bound.m_max.x = partPos.x + radius;                                            \
+                            bound.m_max.y = partPos.y + mng->m_cullYOffset;                                \
+                            bound.m_max.z = partPos.z + radius;                                            \
+                            if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(                           \
+                                    cameraPos, ppvCameraMatrix, FLOAT_8032FE48) != 0) {                    \
+                                goto drawPart##drawPass;                                                   \
+                            }                                                                              \
+                        }                                                                                  \
+                    }                                                                                      \
+                }                                                                                          \
             }
-            {
-                Mtx invCamera;
-                Vec cameraPos;
-                Vec partPos;
-                Vec cameraDelta;
-                Vec viewPos;
-                PSMTXInverse(ppvCameraMatrix0, invCamera);
-                cameraPos.x = invCamera[0][3];
-                cameraPos.y = invCamera[1][3];
-                cameraPos.z = invCamera[2][3];
 
-                _pppMngSt* mng = m_pppMng;
-                for (int i = 0; i < kPppMngCount; i++) {
-                    int baseTime = mng->m_baseTime;
-                    if (mng->m_mode == 0 && baseTime != -0x1000 && mng->m_drawPass == 6 && baseTime < 0
-                        && mng->m_slotVisible != 0 && mng->m_ownerFlagsInitialized != 0) {
-                        partPos.x = mng->m_matrix.value[0][3];
-                        partPos.y = mng->m_matrix.value[1][3];
-                        partPos.z = mng->m_matrix.value[2][3];
-
-                        ppvMng = mng;
-                        bool shouldDraw = ((double)mng->m_cullRadiusSq == 0.0);
-                        if (!shouldDraw) {
-                            PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
-                            if ((double)PSVECSquareMag(&cameraDelta) < (double)mng->m_cullRadiusSq) {
-                                CBound bound;
-                                Vec min;
-                                min.x = partPos.x - mng->m_cullRadius;
-                                min.y = partPos.y;
-                                min.z = partPos.z - mng->m_cullRadius;
-                                shouldDraw = (bound.CheckFrustum(min, ppvCameraMatrix0,
-                                                                 partPos.y + mng->m_cullYOffset) != 0);
-                            }
-                        }
-
-                        if (shouldDraw) {
-                            PSMTXMultVec(ppvCameraMatrix0, &partPos, &viewPos);
-                            mng->m_sortDepth = viewPos.z;
-                            ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4);
-                            ppvMng = mng;
-                            pppSetFpMatrix(ppvMng);
-                            _pppDrawPart(ppvMng);
-                        }
-                    }
-                    mng++;
-                }
-            }
-            {
-                Mtx invCamera;
-                Vec cameraPos;
-                Vec partPos;
-                Vec cameraDelta;
-                Vec viewPos;
-                PSMTXInverse(ppvCameraMatrix0, invCamera);
-                cameraPos.x = invCamera[0][3];
-                cameraPos.y = invCamera[1][3];
-                cameraPos.z = invCamera[2][3];
-
-                _pppMngSt* mng = m_pppMng;
-                for (int i = 0; i < kPppMngCount; i++) {
-                    int baseTime = mng->m_baseTime;
-                    if (mng->m_mode == 0 && baseTime != -0x1000 && mng->m_drawPass == 7 && baseTime < 0
-                        && mng->m_slotVisible != 0 && mng->m_ownerFlagsInitialized != 0) {
-                        partPos.x = mng->m_matrix.value[0][3];
-                        partPos.y = mng->m_matrix.value[1][3];
-                        partPos.z = mng->m_matrix.value[2][3];
-
-                        ppvMng = mng;
-                        bool shouldDraw = ((double)mng->m_cullRadiusSq == 0.0);
-                        if (!shouldDraw) {
-                            PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
-                            if ((double)PSVECSquareMag(&cameraDelta) < (double)mng->m_cullRadiusSq) {
-                                CBound bound;
-                                Vec min;
-                                min.x = partPos.x - mng->m_cullRadius;
-                                min.y = partPos.y;
-                                min.z = partPos.z - mng->m_cullRadius;
-                                shouldDraw = (bound.CheckFrustum(min, ppvCameraMatrix0,
-                                                                 partPos.y + mng->m_cullYOffset) != 0);
-                            }
-                        }
-
-                        if (shouldDraw) {
-                            PSMTXMultVec(ppvCameraMatrix0, &partPos, &viewPos);
-                            mng->m_sortDepth = viewPos.z;
-                            ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4);
-                            ppvMng = mng;
-                            pppSetFpMatrix(ppvMng);
-                            _pppDrawPart(ppvMng);
-                        }
-                    }
-                    mng++;
-                }
-            }
+            PPP_DRAW_AFTER_PASS(5)
+            PPP_DRAW_AFTER_PASS(6)
+            PPP_DRAW_AFTER_PASS(7)
+#undef PPP_DRAW_AFTER_PASS
         }
     }
 
@@ -2815,7 +2837,7 @@ void CPartMng::pppDumpCacheIdx()
         unsigned char m_ownerFacing;    // 0xEA
         unsigned char m_drawVariant;    // 0xEB
         unsigned char m_rotationOrder;  // 0xEC
-        unsigned char m_drawPass;       // 0xED
+        signed char m_drawPass;         // 0xED
         signed char m_drawSubType;      // 0xEE
         unsigned char m_useOwnerScaleSign; // 0xEF
         unsigned char m_ownerFlagsInitialized; // 0xF0
@@ -2827,11 +2849,16 @@ void CPartMng::pppDumpCacheIdx()
 
     pppSetRendMatrix();
 
-    PppMngStDumpRaw* mng = reinterpret_cast<PppMngStDumpRaw*>(reinterpret_cast<unsigned char*>(this) + 0x1D4);
+    unsigned char gamePaused = Game.m_gameWork.m_gamePaused;
     for (int i = 0; i < 0x180; i++) {
-        if ((Game.m_gameWork.m_gamePaused == 0 || (mng->m_drawVariant > 5 && mng->m_drawVariant < 8)) &&
-            mng->m_baseTime != -0x1000 && mng->m_endRequested == 0) {
+        PppMngStDumpRaw* mng = reinterpret_cast<PppMngStDumpRaw*>(
+            reinterpret_cast<unsigned char*>(this) + 0x2A18 + i * 0x158);
+        if ((gamePaused == 0 || (mng->m_drawPass >= 6 && mng->m_drawPass <= 7)) &&
+            mng->m_baseTime != -0x1000) {
             ppvMng = reinterpret_cast<_pppMngSt*>(mng);
+            if (mng->m_hitBgFlag != 0) {
+                continue;
+            }
             ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
 
             if (mng->m_baseTime >= 0) {
@@ -2875,8 +2902,6 @@ void CPartMng::pppDumpCacheIdx()
 
             gPppInSubFrameCalc = 0;
         }
-
-        mng = reinterpret_cast<PppMngStDumpRaw*>(reinterpret_cast<unsigned char*>(mng) + 0x158);
     }
 }
 
@@ -2901,34 +2926,9 @@ void CPartMng::pppDrawPppMngSt(Vec&, _pppMngSt*)
  */
 void CPartMng::pppDrawPrio(unsigned char drawMode)
 {
-    struct PppMngStDrawRaw {
-        void* m_pppResSet;                   // 0x00
-        int m_partIndex;                     // 0x04
-        Vec m_position;                      // 0x08
-        int m_baseTime;                      // 0x14
-        unsigned char m_pad18[0x78 - 0x18]; // 0x18
-        pppFMATRIX m_matrix;                 // 0x78
-        unsigned char m_padA8[0xE4 - 0xA8]; // 0xA8
-        unsigned char m_endRequested;        // 0xE4
-        unsigned char m_stopRequested;       // 0xE5
-        unsigned char m_isFinished;          // 0xE6
-        unsigned char m_matrixMode;          // 0xE7
-        unsigned char m_hitBgFlag;           // 0xE8
-        unsigned char m_slotVisible;         // 0xE9
-        unsigned char m_ownerFacing;         // 0xEA
-        unsigned char m_drawVariant;         // 0xEB
-        unsigned char m_rotationOrder;       // 0xEC
-        unsigned char m_drawMode;            // 0xED
-        signed char m_drawSubType;           // 0xEE
-        unsigned char m_useOwnerScaleSign;   // 0xEF
-        unsigned char m_ownerVisible;        // 0xF0
-        unsigned char m_nodeScaleInitialized; // 0xF1
-        unsigned char m_fieldF2;             // 0xF2
-        unsigned char m_padF3[0x108 - 0xF3]; // 0xF3
-        float m_cullRadiusSq;                // 0x108
-        float m_cullRadius;                  // 0x10C
-        float m_cullYOffset;                 // 0x110
-        float m_sortDepth;                   // 0x114
+    struct PppCullBound {
+        Vec m_min;
+        Vec m_max;
     };
 
     Mtx invCamera;
@@ -2942,38 +2942,46 @@ void CPartMng::pppDrawPrio(unsigned char drawMode)
     cameraPos.y = invCamera[1][3];
     cameraPos.z = invCamera[2][3];
 
-    PppMngStDrawRaw* mng = reinterpret_cast<PppMngStDrawRaw*>(reinterpret_cast<unsigned char*>(this) + 0x2A18);
     for (int i = 0; i < 0x180; i++) {
-        if (mng->m_endRequested == 0 && mng->m_baseTime != -0x1000
-            && mng->m_drawMode == drawMode && mng->m_baseTime < 0
-            && mng->m_slotVisible != 0 && mng->m_ownerVisible != 0) {
+        _pppMngSt* mng = &m_pppMng[i];
+        if (mng->m_hitBgFlag == 0 && mng->m_baseTime != -0x1000
+            && (signed char)mng->m_drawPass == drawMode && mng->m_baseTime < 0
+            && mng->m_slotVisible != 0 && mng->m_ownerFacing != 0) {
+            ppvMng = mng;
             partPos.x = mng->m_matrix.value[0][3];
             partPos.y = mng->m_matrix.value[1][3];
             partPos.z = mng->m_matrix.value[2][3];
 
-            bool shouldDraw = (mng->m_cullRadiusSq == 0.0f);
-            if (!shouldDraw) {
-                PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
-                if (PSVECSquareMag(&cameraDelta) < mng->m_cullRadiusSq) {
-                    CBound bound;
-                    Vec min;
-                    min.x = partPos.x - mng->m_cullRadius;
-                    min.y = partPos.y;
-                    min.z = partPos.z - mng->m_cullRadius;
-                    shouldDraw = (bound.CheckFrustum(min, ppvCameraMatrix, partPos.y + mng->m_cullYOffset) != 0);
-                }
+            if ((double)mng->m_cullRadiusSq != 0.0) {
+                goto checkCull;
             }
 
-            if (shouldDraw) {
-                PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
-                mng->m_sortDepth = viewPos.z;
-                ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
-                ppvMng = reinterpret_cast<_pppMngSt*>(mng);
-                pppSetFpMatrix(ppvMng);
-                _pppDrawPart(ppvMng);
+        drawPart:
+            PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
+            mng->m_sortDepth = viewPos.z;
+            ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4);
+            ppvMng = mng;
+            pppSetFpMatrix(ppvMng);
+            _pppDrawPart(ppvMng);
+            continue;
+
+        checkCull:
+            PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
+            if (PSVECSquareMag(&cameraDelta) < mng->m_cullRadiusSq) {
+                PppCullBound bound;
+                float radius = mng->m_cullRadius;
+                bound.m_min.x = partPos.x - radius;
+                bound.m_min.y = partPos.y;
+                bound.m_min.z = partPos.z - radius;
+                bound.m_max.x = partPos.x + radius;
+                bound.m_max.y = partPos.y + mng->m_cullYOffset;
+                bound.m_max.z = partPos.z + radius;
+                if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(
+                        cameraPos, ppvCameraMatrix, FLOAT_8032FE48) != 0) {
+                    goto drawPart;
+                }
             }
         }
-        mng++;
     }
 }
 
@@ -3053,29 +3061,41 @@ void CPartMng::pppDrawPrioPdtFpno(unsigned char drawMode, short kind, short node
     partPos.z = mng->m_matrix.value[2][3];
     ppvMng = reinterpret_cast<_pppMngSt*>(mng);
 
-    if ((double)mng->m_cullRadiusSq != 0.0) {
-        CBound bound;
-        Vec min;
+    {
+        struct PppCullBound { Vec m_min; Vec m_max; };
 
+        if ((double)mng->m_cullRadiusSq != 0.0) {
+            goto checkCull;
+        }
+
+    drawPart:
+        PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
+        mng->m_sortDepth = viewPos.z;
+        ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4);
+        ppvMng = reinterpret_cast<_pppMngSt*>(mng);
+        pppSetFpMatrix(ppvMng);
+        _pppDrawPart(ppvMng);
+        return;
+
+    checkCull:
         PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
         if (PSVECSquareMag(&cameraDelta) >= mng->m_cullRadiusSq) {
             return;
         }
 
-        min.x = partPos.x - mng->m_cullRadius;
-        min.y = partPos.y;
-        min.z = partPos.z - mng->m_cullRadius;
-        if (bound.CheckFrustum(min, ppvCameraMatrix, partPos.y + mng->m_cullYOffset) == 0) {
-            return;
+        PppCullBound bound;
+        float radius = mng->m_cullRadius;
+        bound.m_min.x = partPos.x - radius;
+        bound.m_min.y = partPos.y;
+        bound.m_min.z = partPos.z - radius;
+        bound.m_max.x = partPos.x + radius;
+        bound.m_max.y = partPos.y + mng->m_cullYOffset;
+        bound.m_max.z = partPos.z + radius;
+        if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(
+                cameraPos, ppvCameraMatrix, FLOAT_8032FE48) != 0) {
+            goto drawPart;
         }
     }
-
-    PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
-    mng->m_sortDepth = viewPos.z;
-    ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
-    ppvMng = reinterpret_cast<_pppMngSt*>(mng);
-    pppSetFpMatrix(ppvMng);
-    _pppDrawPart(ppvMng);
 }
 
 /*
@@ -3089,6 +3109,11 @@ void CPartMng::pppDrawPrioPdtFpno(unsigned char drawMode, short kind, short node
  */
 void CPartMng::pppDrawIdx(int partIndex)
 {
+    struct PppCullBound {
+        Vec m_min;
+        Vec m_max;
+    };
+
     struct PppMngStDrawIdxRaw {
         void* m_pppResSet;                   // 0x00
         unsigned char m_pad04[0x14 - 0x4];
@@ -3127,33 +3152,43 @@ void CPartMng::pppDrawIdx(int partIndex)
         return;
     }
 
+    ppvMng = reinterpret_cast<_pppMngSt*>(mng);
     partPos.x = mng->m_matrix.value[0][3];
     partPos.y = mng->m_matrix.value[1][3];
     partPos.z = mng->m_matrix.value[2][3];
-    ppvMng = reinterpret_cast<_pppMngSt*>(mng);
 
     if ((double)mng->m_cullRadiusSq != 0.0) {
-        PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
-        if (PSVECSquareMag(&cameraDelta) >= mng->m_cullRadiusSq) {
-            return;
-        }
-
-        CBound bound;
-        Vec min;
-        min.x = partPos.x - mng->m_cullRadius;
-        min.y = partPos.y;
-        min.z = partPos.z - mng->m_cullRadius;
-        if (bound.CheckFrustum(min, ppvCameraMatrix, partPos.y + mng->m_cullYOffset) == 0) {
-            return;
-        }
+        goto checkCull;
     }
 
+drawPart:
     PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
     mng->m_sortDepth = viewPos.z;
     ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
     ppvMng = reinterpret_cast<_pppMngSt*>(mng);
     pppSetFpMatrix(reinterpret_cast<_pppMngSt*>(mng));
     _pppDrawPart(reinterpret_cast<_pppMngSt*>(mng));
+    return;
+
+checkCull:
+    PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
+    if (PSVECSquareMag(&cameraDelta) >= mng->m_cullRadiusSq) {
+        return;
+    }
+
+    {
+        PppCullBound bound;
+        float radius = mng->m_cullRadius;
+        bound.m_min.x = partPos.x - radius;
+        bound.m_min.y = partPos.y;
+        bound.m_min.z = partPos.z - radius;
+        bound.m_max.x = partPos.x + radius;
+        bound.m_max.y = partPos.y + mng->m_cullYOffset;
+        bound.m_max.z = partPos.z + radius;
+        if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(cameraPos, ppvCameraMatrix, FLOAT_8032FE48) != 0) {
+            goto drawPart;
+        }
+    }
 }
 
 /*
@@ -3201,14 +3236,16 @@ void CPartMng::pppDraw()
             PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
             mng->m_sortDepth = viewPos.z;
 
-            if ((signed char)mng->m_drawPass == 1) {
-                ppvDrawMng.AddPrimOt(0x3FF, reinterpret_cast<_pppMngSt*>(mng));
-            } else if ((signed char)mng->m_drawPass < 1) {
-                if ((signed char)mng->m_drawPass >= 0) {
-                    ppvDrawMng.AddPrim(viewPos.z, reinterpret_cast<_pppMngSt*>(mng), mng->m_drawSubType);
+            if ((signed char)mng->m_drawPass != 1) {
+                if ((signed char)mng->m_drawPass < 1) {
+                    if ((signed char)mng->m_drawPass >= 0) {
+                        ppvDrawMng.AddPrim(viewPos.z, reinterpret_cast<_pppMngSt*>(mng), mng->m_drawSubType);
+                    }
+                } else if ((signed char)mng->m_drawPass < 3) {
+                    ppvDrawMng.AddPrimOt(0, reinterpret_cast<_pppMngSt*>(mng));
                 }
-            } else if ((signed char)mng->m_drawPass < 3) {
-                ppvDrawMng.AddPrimOt(0, reinterpret_cast<_pppMngSt*>(mng));
+            } else {
+                ppvDrawMng.AddPrimOt(0x3FF, reinterpret_cast<_pppMngSt*>(mng));
             }
             goto nextPart;
 
@@ -3250,34 +3287,9 @@ void CPartMng::pppDraw()
  */
 void CPartMng::pppPartDrawAfter()
 {
-    struct PppMngStDrawRaw {
-        void* m_pppResSet;                   // 0x00
-        int m_partIndex;                     // 0x04
-        Vec m_position;                      // 0x08
-        int m_baseTime;                      // 0x14
-        unsigned char m_pad18[0x78 - 0x18]; // 0x18
-        pppFMATRIX m_matrix;                 // 0x78
-        unsigned char m_padA8[0xE4 - 0xA8]; // 0xA8
-        unsigned char m_endRequested;        // 0xE4
-        unsigned char m_stopRequested;       // 0xE5
-        unsigned char m_isFinished;          // 0xE6
-        unsigned char m_matrixMode;          // 0xE7
-        unsigned char m_hitBgFlag;           // 0xE8
-        unsigned char m_slotVisible;         // 0xE9
-        unsigned char m_ownerFacing;         // 0xEA
-        unsigned char m_drawVariant;         // 0xEB
-        unsigned char m_rotationOrder;       // 0xEC
-        unsigned char m_drawMode;            // 0xED
-        signed char m_drawSubType;           // 0xEE
-        unsigned char m_useOwnerScaleSign;   // 0xEF
-        unsigned char m_ownerVisible;        // 0xF0
-        unsigned char m_nodeScaleInitialized; // 0xF1
-        unsigned char m_fieldF2;             // 0xF2
-        unsigned char m_padF3[0x108 - 0xF3]; // 0xF3
-        float m_cullRadiusSq;                // 0x108
-        float m_cullRadius;                  // 0x10C
-        float m_cullYOffset;                 // 0x110
-        float m_sortDepth;                   // 0x114
+    struct PppCullBound {
+        Vec m_min;
+        Vec m_max;
     };
 
     Mtx invCamera;
@@ -3286,42 +3298,50 @@ void CPartMng::pppPartDrawAfter()
     Vec cameraDelta;
     Vec viewPos;
 
-    PSMTXInverse(ppvCameraMatrix0, invCamera);
+    PSMTXInverse(ppvCameraMatrix, invCamera);
     cameraPos.x = invCamera[0][3];
     cameraPos.y = invCamera[1][3];
     cameraPos.z = invCamera[2][3];
 
-    PppMngStDrawRaw* mng = reinterpret_cast<PppMngStDrawRaw*>(reinterpret_cast<unsigned char*>(this) + 0x1D4);
     for (int i = 0; i < 0x180; i++) {
-        if (mng->m_endRequested == 0 && mng->m_baseTime != -0x1000 && mng->m_drawMode == 5 && mng->m_baseTime < 0
-            && mng->m_slotVisible != 0 && mng->m_ownerVisible != 0) {
+        _pppMngSt* mng = &m_pppMng[i];
+        if (mng->m_hitBgFlag == 0 && mng->m_baseTime != -0x1000 && (signed char)mng->m_drawPass == 5
+            && mng->m_baseTime < 0 && mng->m_slotVisible != 0 && mng->m_ownerFacing != 0) {
+            ppvMng = mng;
             partPos.x = mng->m_matrix.value[0][3];
             partPos.y = mng->m_matrix.value[1][3];
             partPos.z = mng->m_matrix.value[2][3];
 
-            bool shouldDraw = (mng->m_cullRadiusSq == 0.0f);
-            if (!shouldDraw) {
-                PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
-                if (PSVECSquareMag(&cameraDelta) < mng->m_cullRadiusSq) {
-                    CBound bound;
-                    Vec min;
-                    min.x = partPos.x - mng->m_cullRadius;
-                    min.y = partPos.y;
-                    min.z = partPos.z - mng->m_cullRadius;
-                    shouldDraw = (bound.CheckFrustum(min, ppvCameraMatrix0, partPos.y + mng->m_cullYOffset) != 0);
-                }
+            if ((double)mng->m_cullRadiusSq != 0.0) {
+                goto checkCull;
             }
 
-            if (shouldDraw) {
-                PSMTXMultVec(ppvCameraMatrix0, &partPos, &viewPos);
-                mng->m_sortDepth = viewPos.z;
-                ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
-                ppvMng = reinterpret_cast<_pppMngSt*>(mng);
-                pppSetFpMatrix(ppvMng);
-                _pppDrawPart(ppvMng);
+        drawPart:
+            PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
+            mng->m_sortDepth = viewPos.z;
+            ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4);
+            ppvMng = mng;
+            pppSetFpMatrix(ppvMng);
+            _pppDrawPart(ppvMng);
+            continue;
+
+        checkCull:
+            PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
+            if (PSVECSquareMag(&cameraDelta) < mng->m_cullRadiusSq) {
+                PppCullBound bound;
+                float radius = mng->m_cullRadius;
+                bound.m_min.x = partPos.x - radius;
+                bound.m_min.y = partPos.y;
+                bound.m_min.z = partPos.z - radius;
+                bound.m_max.x = partPos.x + radius;
+                bound.m_max.y = partPos.y + mng->m_cullYOffset;
+                bound.m_max.z = partPos.z + radius;
+                if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(
+                        cameraPos, ppvCameraMatrix, FLOAT_8032FE48) != 0) {
+                    goto drawPart;
+                }
             }
         }
-        mng++;
     }
 
     gPppHeapUseRateWords[0] = pppHeapCheckLeak__FPQ27CMemory6CStage2(ppvEnv->m_stagePtr);
@@ -3498,45 +3518,52 @@ void CPartMng::LoadPartNoSyncCalc()
  */
 int CPartMng::pppLoadPtx(const char* baseName, int pdtSlotIndex, int appendMode, void* readBuffer, int readBufferSize)
 {
-    CMemory::CStage* stageLoad = PartPcs.m_usbStreamState.m_stageLoad;
-
     ppvAmemCacheSet.CacheClear();
-    stageLoad->setDefaultParam(pdtSlotIndex);
+    PartPcs.m_usbStreamState.m_stageLoad->setDefaultParam(pdtSlotIndex);
 
     char* path = g_StrTmp;
     sprintf(path, lbl_8032FE38, baseName);
-    if (System.m_execParam > 2) {
+    if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
         System.Printf(const_cast<char*>(s_ReadPtxLogFormat), path);
     }
 
-    unsigned long fileSize = 0;
+    unsigned long fileSize;
     void* fileData = pppFileRead(path, fileSize, readBuffer, readBufferSize);
     if (fileData == 0) {
-        if (System.m_execParam != 0) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1U) {
             System.Printf(const_cast<char*>(s_CanNotReadFormat), path);
         }
-        stageLoad->resDefaultParam();
+        PartPcs.m_usbStreamState.m_stageLoad->resDefaultParam();
         return 0;
     }
 
-    if (fileData == reinterpret_cast<void*>(1)) {
-        stageLoad->resDefaultParam();
+    if (m_partLoadMode == 2) {
+        return 1;
+    }
+    if (m_partLoadMode == 3) {
         return 1;
     }
 
     if (m_textureSet == 0) {
-        m_textureSet = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0xC10) CTextureSet;
+        m_textureSet = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0xC10) CTextureSet;
+        CTextureSet* textureSet = m_textureSet;
+        textureSet->m_textureArray.SetDefaultSize(0x180);
+        textureSet->m_textureArray.SetGrow(0);
     }
 
     if (m_materialSet == 0) {
-        CMaterialSet* materialSet = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0xC14) CMaterialSet;
-        m_materialSet = materialSet;
+        m_materialSet = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0xC14) CMaterialSet;
+        CMaterialSet* materialSet = m_materialSet;
+        materialSet->m_materials.SetDefaultSize(0x180);
+        materialSet->m_materials.SetGrow(0);
         m_pppEnvSt.m_materialSetPtr = m_materialSet;
 
-        CMaterial* defaultMaterial = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0xC17) CMaterial;
-        if (defaultMaterial != 0) {
-            defaultMaterial->Create(0, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0));
-            m_materialSet->AddMaterial(defaultMaterial, 0);
+        CMaterial* defaultMaterial = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0xC17) CMaterial;
+        defaultMaterial->Create(0, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0));
+        if (materialSet->m_materials.GetSize() == 0) {
+            materialSet->m_materials.Add(defaultMaterial);
+        } else {
+            materialSet->m_materials.SetAt(0, defaultMaterial);
         }
     }
 
@@ -3546,13 +3573,13 @@ int CPartMng::pppLoadPtx(const char* baseName, int pdtSlotIndex, int appendMode,
     CChunkFile::CChunk chunk;
     while (chunkFile.GetNextChunk(chunk)) {
         if (chunk.m_id == kChunkTSET) {
-            m_textureSet->Create(chunkFile, stageLoad, 1, &ppvAmemCacheSet, appendMode, 0);
+            m_textureSet->Create(chunkFile, PartPcs.m_usbStreamState.m_stageLoad, 1, &ppvAmemCacheSet, appendMode, 0);
         }
     }
 
     m_materialSet->SetPartFromTextureSet(m_textureSet, pdtSlotIndex);
     m_materialSet->SetTextureSet(m_textureSet);
-    stageLoad->resDefaultParam();
+    PartPcs.m_usbStreamState.m_stageLoad->resDefaultParam();
     return 1;
 }
 
@@ -3578,16 +3605,16 @@ void CPartMng::pppLoadPmd(CChunkFile&)
 void CPartMng::pppLoadPmd(const char* baseName)
 {
     char* path = g_StrTmp;
-    unsigned long fileSize = 0;
+    unsigned long fileSize;
 
     sprintf(path, lbl_8032FE30, baseName);
-    if (System.m_execParam > 2) {
+    if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
         System.Printf(const_cast<char*>(s_ReadPmdLogFormat), path);
     }
 
     void* fileData = pppFileRead(path, fileSize, 0, 0);
     if (fileData == 0) {
-        if (System.m_execParam != 0) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1U) {
             System.Printf(const_cast<char*>(s_CanNotReadFormat), path);
         }
         return;
@@ -3616,7 +3643,8 @@ void CPartMng::pppLoadPmd(const char* baseName)
 
             CChunkFile::CChunk innerChunk;
             while (chunkFile.GetNextChunk(innerChunk)) {
-                if (innerChunk.m_id == kChunkRSDM) {
+                switch (innerChunk.m_id) {
+                case kChunkRSDM:
                     if (targetModel != 0) {
                         CChunkFile rsdFile;
                         rsdFile.SetBuf(chunkFile.GetAddress());
@@ -3636,7 +3664,8 @@ void CPartMng::pppLoadPmd(const char* baseName)
                         targetModel->m_refCount++;
                         targetModel = 0;
                     }
-                } else if (innerChunk.m_id == kChunkNAME) {
+                    break;
+                case kChunkNAME: {
                     char* name = chunkFile.GetString();
 
                     targetModel = 0;
@@ -3663,6 +3692,8 @@ void CPartMng::pppLoadPmd(const char* baseName)
                     } else {
                         targetModel = 0;
                     }
+                    break;
+                }
                 }
             }
         }
@@ -3692,16 +3723,16 @@ void CPartMng::pppLoadPan(CChunkFile&)
 void CPartMng::pppLoadPan(const char* baseName)
 {
     char* path = g_StrTmp;
-    unsigned long fileSize = 0;
+    unsigned long fileSize;
 
     sprintf(path, lbl_8032FE28, baseName);
-    if (System.m_execParam > 2) {
+    if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
         System.Printf(const_cast<char*>(s_ReadPanLogFormat), path);
     }
 
     void* fileData = pppFileRead(path, fileSize, 0, 0);
     if (fileData == 0) {
-        if (System.m_execParam != 0) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1U) {
             System.Printf(const_cast<char*>(s_CanNotReadFormat), path);
         }
         return;
@@ -3730,7 +3761,8 @@ void CPartMng::pppLoadPan(const char* baseName)
 
             CChunkFile::CChunk innerChunk;
             while (chunkFile.GetNextChunk(innerChunk)) {
-                if (innerChunk.m_id == kChunkSHPM) {
+                switch (innerChunk.m_id) {
+                case kChunkSHPM:
                     if (targetShape != 0) {
                         CChunkFile shpFile;
                         shpFile.SetBuf(chunkFile.GetAddress());
@@ -3738,7 +3770,8 @@ void CPartMng::pppLoadPan(const char* baseName)
                         targetShape->m_refCount++;
                         targetShape = 0;
                     }
-                } else if (innerChunk.m_id == kChunkNAME) {
+                    break;
+                case kChunkNAME: {
                     char* name = chunkFile.GetString();
 
                     targetShape = 0;
@@ -3765,6 +3798,8 @@ void CPartMng::pppLoadPan(const char* baseName)
                     } else {
                         targetShape = 0;
                     }
+                    break;
+                }
                 }
             }
         }
@@ -3783,35 +3818,33 @@ void CPartMng::pppLoadPan(const char* baseName)
  */
 int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriority, void* readBuffer, int readBufferSize)
 {
-    CMemory::CStage* stageLoad = PartPcs.m_usbStreamState.m_stageLoad;
-    PppPdtSlot* pdtSlots = m_pdtSlots;
-    PppPdtSlot* pdtSlot = &pdtSlots[pdtSlotIndex];
-
     ppvAmemCacheSet.CacheClear();
-    stageLoad->setDefaultParam(pdtSlotIndex);
+    PartPcs.m_usbStreamState.m_stageLoad->setDefaultParam(pdtSlotIndex);
 
-    char pdtPath[256];
+    char* pdtPath = g_StrTmp;
     sprintf(pdtPath, lbl_8032FE20, baseName);
+    PppPdtSlot* pdtSlot = &m_pdtSlots[pdtSlotIndex];
     strncpy(pdtSlot->m_name, baseName, sizeof(pdtSlot->m_name));
-    pdtSlot->m_name[sizeof(pdtSlot->m_name) - 1] = '\0';
 
-    if (System.m_execParam > 2) {
+    if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
         System.Printf(const_cast<char*>(s_ReadPdtLogFormat), pdtPath);
     }
 
-    unsigned long pdtSize = 0;
+    unsigned long pdtSize;
     void* pdtData = pppFileRead(pdtPath, pdtSize, readBuffer, readBufferSize);
     if (pdtData == 0) {
         pdtSlot->m_pppDataHead = 0;
-        if (System.m_execParam != 0) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1U) {
             System.Printf(const_cast<char*>(s_CanNotReadFormat), pdtPath);
         }
-        stageLoad->resDefaultParam();
+        PartPcs.m_usbStreamState.m_stageLoad->resDefaultParam();
         return 0;
     }
 
-    if (m_partLoadMode == 2 || m_partLoadMode == 3) {
-        stageLoad->resDefaultParam();
+    if (m_partLoadMode == 2) {
+        return 1;
+    }
+    if (m_partLoadMode == 3) {
         return 1;
     }
 
@@ -3832,7 +3865,7 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
                     unsigned long copySize = sourceHead->m_partCount * 0x60 + 0x20;
                     _pppDataHead* copiedHead = static_cast<_pppDataHead*>(
                         operator new[](
-                            copySize, stageLoad, const_cast<char*>(s_partMng_cpp), 0xd56));
+                            copySize, PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0xd56));
                     pdtSlot->m_pppDataHead = copiedHead;
 
                     memcpy(copiedHead, sourceHead, copySize);
@@ -3948,7 +3981,7 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
         pdtFile.PopChunk();
     }
 
-    stageLoad->resDefaultParam();
+    PartPcs.m_usbStreamState.m_stageLoad->resDefaultParam();
     return 1;
 }
 
@@ -4110,7 +4143,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
 
     int freeIdx = -1;
     for (int i = 0; i < 0x180; i++) {
-        unsigned char* mngBytes = self + 0x1D4 + i * 0x158;
+        unsigned char* mngBytes = self + 0x2A18 + i * 0x158;
         if (*reinterpret_cast<int*>(mngBytes + 0x14) == -0x1000) {
             freeIdx = i;
             break;
@@ -4120,7 +4153,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
         return -1;
     }
 
-    PppMngStCreateRaw* mng = reinterpret_cast<PppMngStCreateRaw*>(self + 0x1D4 + freeIdx * 0x158);
+    PppMngStCreateRaw* mng = reinterpret_cast<PppMngStCreateRaw*>(self + 0x2A18 + freeIdx * 0x158);
     if (System.m_execParam != 0) {
         System.Printf(const_cast<char*>(s_pppCreate0_pdtID_d_fpno_d_mngNo_d_name_s), pdtSlotIndex, fpNo, freeIdx,
                       slot->m_name);

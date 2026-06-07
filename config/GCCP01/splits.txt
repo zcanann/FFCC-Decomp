@@ -1847,6 +1847,7 @@ MenuUtil.cpp:
 	extab       start:0x8000A16C end:0x8000A1CC
 	extabindex  start:0x800116EC end:0x8001177C
 	.text       start:0x8017683C end:0x8017AF14
+	.rodata     start:0x801E3058 end:0x801E3838
 	.data       start:0x80215A48 end:0x80215BD8
 	.sdata2     start:0x80333460 end:0x803336D8
 

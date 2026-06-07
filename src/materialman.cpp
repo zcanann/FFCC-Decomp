@@ -475,7 +475,6 @@ void CMaterialMan::SetBlendMode(CMaterialSet* materialSet, int materialIndex)
  */
 void CMaterialMan::addtev_bump_st(int mode, _GXTevScale tevScale)
 {
-    unsigned int tevStage = m_numTevStage;
 
     GXSetIndTexMtx((GXIndTexMtxID)1, LightPcs.GetBumpIndTexMtx(), 0);
     GXSetNumIndStages(1);
@@ -486,17 +485,17 @@ void CMaterialMan::addtev_bump_st(int mode, _GXTevScale tevScale)
                           static_cast<GXIndTexScale>(g_drawMaterial->m_texShiftU),
                           static_cast<GXIndTexScale>(g_drawMaterial->m_texShiftV));
 
-    GXSetTevDirect(static_cast<GXTevStageID>(tevStage));
+    GXSetTevDirect(static_cast<GXTevStageID>(m_numTevStage));
     _GXSetTevOrder(
-        tevStage, m_texCoordIdCurShadow, m_texMapIdCurShadow, 4);
+        m_numTevStage, m_texCoordIdCurShadow, m_texMapIdCurShadow, 4);
     _GXSetTevColorIn(
-        tevStage, 0xF, 8, 10, 0xF);
-    _GXSetTevColorOp(tevStage, 0, 0, tevScale, 1,
+        m_numTevStage, 0xF, 8, 10, 0xF);
+    _GXSetTevColorOp(m_numTevStage, 0, 0, tevScale, 1,
                                                                                           0);
-    _GXSetTevAlphaIn(tevStage, 7,
+    _GXSetTevAlphaIn(m_numTevStage, 7,
                                                                                                            4, 5, 7);
-    _GXSetTevAlphaOp(tevStage, 0, 0, 0, 1, 0);
-    _GXSetTevSwapMode(tevStage, 0, 0);
+    _GXSetTevAlphaOp(m_numTevStage, 0, 0, 0, 1, 0);
+    _GXSetTevSwapMode(m_numTevStage, 0, 0);
     IncNumTevStage();
 
     if (mode != 0) {
@@ -510,31 +509,28 @@ void CMaterialMan::addtev_bump_st(int mode, _GXTevScale tevScale)
     GXSetTevIndirect((GXTevStageID)3, (GXIndTexStageID)0, (GXIndTexFormat)0, (GXIndTexBiasSel)0, (GXIndTexMtxID)0,
                      (GXIndTexWrap)0, (GXIndTexWrap)0, GX_TRUE, GX_FALSE, (GXIndTexAlphaSel)0);
 
-    tevStage = m_numTevStage;
     _GXSetTevOrder(
-        tevStage, m_bumpTexCoordIds[1], m_bumpTexMapIds[1] | 0x100, 0xFF);
-    _GXSetTevOp(tevStage, 4);
+        m_numTevStage, m_bumpTexCoordIds[1], m_bumpTexMapIds[1] | 0x100, 0xFF);
+    _GXSetTevOp(m_numTevStage, 4);
     IncNumTevStage();
 
-    tevStage = m_numTevStage;
     _GXSetTevOrder(
-        tevStage, m_bumpTexCoordIds[2], m_bumpTexMapIds[1] | 0x100, 0xFF);
-    _GXSetTevOp(tevStage, 4);
+        m_numTevStage, m_bumpTexCoordIds[2], m_bumpTexMapIds[1] | 0x100, 0xFF);
+    _GXSetTevOp(m_numTevStage, 4);
     IncNumTevStage();
 
-    tevStage = m_numTevStage;
     if (g_drawMaterial->m_bumpLightDirect == 0) {
         _GXSetTevOrder(
-            tevStage, m_bumpTexCoordIds[3], m_bumpTexMapIds[1], 0xFF);
-        _GXSetTevColorIn(tevStage,
+            m_numTevStage, m_bumpTexCoordIds[3], m_bumpTexMapIds[1], 0xFF);
+        _GXSetTevColorIn(m_numTevStage,
                                                                                                               0xF, 0,
                                                                                                               8, 9);
-        _GXSetTevAlphaIn(tevStage,
+        _GXSetTevAlphaIn(m_numTevStage,
                                                                                                               7, 7, 7,
                                                                                                               0);
-        _GXSetTevColorOp(tevStage, 0, 0, 1, 1,
+        _GXSetTevColorOp(m_numTevStage, 0, 0, 1, 1,
                                                                                               0);
-        _GXSetTevAlphaOp(tevStage, 0, 0, 0, 1,
+        _GXSetTevAlphaOp(m_numTevStage, 0, 0, 0, 1,
                                                                                               0);
         IncNumTevStage();
         return;
@@ -548,31 +544,30 @@ void CMaterialMan::addtev_bump_st(int mode, _GXTevScale tevScale)
     }
 
     _GXSetTevOrder(
-        tevStage, m_bumpTexCoordIds[3], m_bumpTexMapIds[1], 0xFF);
+        m_numTevStage, m_bumpTexCoordIds[3], m_bumpTexMapIds[1], 0xFF);
     _GXSetTevColorIn(
-        tevStage, 0xF, 4, 9, (hasProjTex != 0) ? 0xF : 0);
-    _GXSetTevAlphaIn(tevStage, 7,
+        m_numTevStage, 0xF, 4, 9, (hasProjTex != 0) ? 0xF : 0);
+    _GXSetTevAlphaIn(m_numTevStage, 7,
                                                                                                            7, 7, 0);
     _GXSetTevColorOp(
-        tevStage, 0, 0, 0, 1, static_cast<int>((-hasProjTex) >> 0x1F));
-    _GXSetTevAlphaOp(tevStage, 0, 0, 0, 1, 0);
+        m_numTevStage, 0, 0, 0, 1, static_cast<int>((-hasProjTex) >> 0x1F));
+    _GXSetTevAlphaOp(m_numTevStage, 0, 0, 0, 1, 0);
     IncNumTevStage();
 
     if (hasProjTex == 0) {
         return;
     }
 
-    tevStage = m_numTevStage;
-    GXSetTevDirect(static_cast<GXTevStageID>(tevStage));
+    GXSetTevDirect(static_cast<GXTevStageID>(m_numTevStage));
     _GXSetTevOrder(
-        tevStage, m_bumpTexCoordIds[6], m_bumpTexMapIds[3], 0xFF);
-    _GXSetTevColorIn(tevStage,
+        m_numTevStage, m_bumpTexCoordIds[6], m_bumpTexMapIds[3], 0xFF);
+    _GXSetTevColorIn(m_numTevStage,
                                                                                                           0xF, 2, 8,
                                                                                                           0);
-    _GXSetTevAlphaIn(tevStage, 7,
+    _GXSetTevAlphaIn(m_numTevStage, 7,
                                                                                                           7, 7, 0);
-    _GXSetTevColorOp(tevStage, 0, 0, 0, 1, 0);
-    _GXSetTevAlphaOp(tevStage, 0, 0, 0, 1, 0);
+    _GXSetTevColorOp(m_numTevStage, 0, 0, 0, 1, 0);
+    _GXSetTevAlphaOp(m_numTevStage, 0, 0, 0, 1, 0);
     IncNumTevStage();
 }
 
@@ -608,18 +603,17 @@ void CMaterialMan::addtev_bump_water(_GXTevScale tevScale)
     GXSetIndTexMtx((GXIndTexMtxID)2, reinterpret_cast<const float(*)[3]>(&warpMtx0), 1);
     GXSetNumIndStages(2);
 
-    int tevStage = m_numTevStage;
-    GXSetTevDirect((GXTevStageID)tevStage);
+    GXSetTevDirect((GXTevStageID)m_numTevStage);
     _GXSetTevOrder(
-        tevStage, m_texCoordIdCurShadow, m_texMapIdCurShadow, 4);
+        m_numTevStage, m_texCoordIdCurShadow, m_texMapIdCurShadow, 4);
     _GXSetTevColorIn(
-        tevStage, 0xF, 8, 10, 0xF);
-    _GXSetTevColorOp(tevStage, 0, 0, tevScale, 1,
+        m_numTevStage, 0xF, 8, 10, 0xF);
+    _GXSetTevColorOp(m_numTevStage, 0, 0, tevScale, 1,
                                                                                           0);
-    _GXSetTevAlphaIn(tevStage, 7,
+    _GXSetTevAlphaIn(m_numTevStage, 7,
                                                                                                            4, 5, 7);
-    _GXSetTevAlphaOp(tevStage, 0, 0, 0, 1, 0);
-    _GXSetTevSwapMode(tevStage, 0, 0);
+    _GXSetTevAlphaOp(m_numTevStage, 0, 0, 0, 1, 0);
+    _GXSetTevSwapMode(m_numTevStage, 0, 0);
     IncNumTevStage();
 
     GXSetIndTexOrder(static_cast<GXIndTexStageID>(0),
@@ -631,40 +625,37 @@ void CMaterialMan::addtev_bump_water(_GXTevScale tevScale)
                      static_cast<GXTexMapID>(m_bumpTexMapIds[0]));
     GXSetIndTexCoordScale((GXIndTexStageID)1, (GXIndTexScale)0, (GXIndTexScale)0);
 
-    tevStage = m_numTevStage;
-    GXSetTevIndBumpXYZ((GXTevStageID)tevStage, (GXIndTexStageID)0, (GXIndTexMtxID)1);
+    GXSetTevIndBumpXYZ((GXTevStageID)m_numTevStage, (GXIndTexStageID)0, (GXIndTexMtxID)1);
     _GXSetTevOrder(
-        tevStage, m_bumpTexCoordIds[3], m_bumpTexMapIds[1], 0xFF);
+        m_numTevStage, m_bumpTexCoordIds[3], m_bumpTexMapIds[1], 0xFF);
     _GXSetTevColorIn(
-        tevStage, 0xF, 0, 8, 0xF);
+        m_numTevStage, 0xF, 0, 8, 0xF);
     _GXSetTevAlphaIn(
-        tevStage, 7, 7, 7, 0);
-    _GXSetTevColorOp(tevStage, 0, 0, 0, 1, 0);
-    _GXSetTevAlphaOp(tevStage, 0, 0, 0, 1, 0);
+        m_numTevStage, 7, 7, 7, 0);
+    _GXSetTevColorOp(m_numTevStage, 0, 0, 0, 1, 0);
+    _GXSetTevAlphaOp(m_numTevStage, 0, 0, 0, 1, 0);
     IncNumTevStage();
 
-    tevStage = m_numTevStage;
-    GXSetTevIndBumpXYZ((GXTevStageID)tevStage, (GXIndTexStageID)0, (GXIndTexMtxID)1);
+    GXSetTevIndBumpXYZ((GXTevStageID)m_numTevStage, (GXIndTexStageID)0, (GXIndTexMtxID)1);
     _GXSetTevOrder(
-        tevStage, m_bumpTexCoordIds[4], m_bumpTexMapIds[1], 0xFF);
+        m_numTevStage, m_bumpTexCoordIds[4], m_bumpTexMapIds[1], 0xFF);
     _GXSetTevColorIn(
-        tevStage, 0xF, 0, 0xC, 9);
+        m_numTevStage, 0xF, 0, 0xC, 9);
     _GXSetTevAlphaIn(
-        tevStage, 7, 7, 7, 0);
-    _GXSetTevColorOp(tevStage, 0, 0, 0, 1, 0);
-    _GXSetTevAlphaOp(tevStage, 0, 0, 0, 1, 0);
+        m_numTevStage, 7, 7, 7, 0);
+    _GXSetTevColorOp(m_numTevStage, 0, 0, 0, 1, 0);
+    _GXSetTevAlphaOp(m_numTevStage, 0, 0, 0, 1, 0);
     IncNumTevStage();
 
-    tevStage = m_numTevStage;
-    GXSetTevIndWarp((GXTevStageID)tevStage, (GXIndTexStageID)1, GX_TRUE, GX_FALSE, (GXIndTexMtxID)2);
+    GXSetTevIndWarp((GXTevStageID)m_numTevStage, (GXIndTexStageID)1, GX_TRUE, GX_FALSE, (GXIndTexMtxID)2);
     _GXSetTevOrder(
-        tevStage, m_bumpTexCoordIds[5], m_bumpTexMapIds[2], 0xFF);
+        m_numTevStage, m_bumpTexCoordIds[5], m_bumpTexMapIds[2], 0xFF);
     _GXSetTevColorIn(
-        tevStage, 8, 0, 1, 0xF);
+        m_numTevStage, 8, 0, 1, 0xF);
     _GXSetTevAlphaIn(
-        tevStage, 7, 7, 7, 0);
-    _GXSetTevColorOp(tevStage, 0, 0, 0, 1, 0);
-    _GXSetTevAlphaOp(tevStage, 0, 0, 0, 1, 0);
+        m_numTevStage, 7, 7, 7, 0);
+    _GXSetTevColorOp(m_numTevStage, 0, 0, 0, 1, 0);
+    _GXSetTevAlphaOp(m_numTevStage, 0, 0, 0, 1, 0);
     IncNumTevStage();
 }
 
@@ -690,18 +681,17 @@ void CMaterialMan::addtev_bump_spec_col_water(_GXTevScale tevScale)
     GXSetIndTexMtx((GXIndTexMtxID)2, reinterpret_cast<const float(*)[3]>(&warpMtx0), 1);
     GXSetNumIndStages(2);
 
-    int tevStage = m_numTevStage;
-    GXSetTevDirect((GXTevStageID)tevStage);
+    GXSetTevDirect((GXTevStageID)m_numTevStage);
     _GXSetTevOrder(
-        tevStage, m_texCoordIdCurShadow, m_texMapIdCurShadow, 4);
+        m_numTevStage, m_texCoordIdCurShadow, m_texMapIdCurShadow, 4);
     _GXSetTevColorIn(
-        tevStage, 0xF, 8, 10, 0xF);
-    _GXSetTevColorOp(tevStage, 0, 0, tevScale, 1,
+        m_numTevStage, 0xF, 8, 10, 0xF);
+    _GXSetTevColorOp(m_numTevStage, 0, 0, tevScale, 1,
                                                                                           0);
-    _GXSetTevAlphaIn(tevStage, 7,
+    _GXSetTevAlphaIn(m_numTevStage, 7,
                                                                                                            4, 5, 7);
-    _GXSetTevAlphaOp(tevStage, 0, 0, 0, 1, 0);
-    _GXSetTevSwapMode(tevStage, 0, 0);
+    _GXSetTevAlphaOp(m_numTevStage, 0, 0, 0, 1, 0);
+    _GXSetTevSwapMode(m_numTevStage, 0, 0);
     IncNumTevStage();
 
     GXSetIndTexOrder(static_cast<GXIndTexStageID>(0),
@@ -713,28 +703,26 @@ void CMaterialMan::addtev_bump_spec_col_water(_GXTevScale tevScale)
                      static_cast<GXTexMapID>(m_bumpTexMapIds[0]));
     GXSetIndTexCoordScale((GXIndTexStageID)1, (GXIndTexScale)0, (GXIndTexScale)0);
 
-    tevStage = m_numTevStage;
-    GXSetTevIndBumpXYZ((GXTevStageID)tevStage, (GXIndTexStageID)0, (GXIndTexMtxID)1);
+    GXSetTevIndBumpXYZ((GXTevStageID)m_numTevStage, (GXIndTexStageID)0, (GXIndTexMtxID)1);
     _GXSetTevOrder(
-        tevStage, m_bumpTexCoordIds[4], m_bumpTexMapIds[1], 0xFF);
+        m_numTevStage, m_bumpTexCoordIds[4], m_bumpTexMapIds[1], 0xFF);
     _GXSetTevColorIn(
-        tevStage, 0xF, 4, 9, 0);
+        m_numTevStage, 0xF, 4, 9, 0);
     _GXSetTevAlphaIn(
-        tevStage, 7, 7, 7, 0);
-    _GXSetTevColorOp(tevStage, 0, 0, 0, 1, 0);
-    _GXSetTevAlphaOp(tevStage, 0, 0, 0, 1, 0);
+        m_numTevStage, 7, 7, 7, 0);
+    _GXSetTevColorOp(m_numTevStage, 0, 0, 0, 1, 0);
+    _GXSetTevAlphaOp(m_numTevStage, 0, 0, 0, 1, 0);
     IncNumTevStage();
 
-    tevStage = m_numTevStage;
-    GXSetTevIndWarp((GXTevStageID)tevStage, (GXIndTexStageID)1, GX_TRUE, GX_FALSE, (GXIndTexMtxID)2);
+    GXSetTevIndWarp((GXTevStageID)m_numTevStage, (GXIndTexStageID)1, GX_TRUE, GX_FALSE, (GXIndTexMtxID)2);
     _GXSetTevOrder(
-        tevStage, m_bumpTexCoordIds[5], m_bumpTexMapIds[2], 0xFF);
+        m_numTevStage, m_bumpTexCoordIds[5], m_bumpTexMapIds[2], 0xFF);
     _GXSetTevColorIn(
-        tevStage, 8, 0, 1, 0xF);
+        m_numTevStage, 8, 0, 1, 0xF);
     _GXSetTevAlphaIn(
-        tevStage, 7, 7, 7, 0);
-    _GXSetTevColorOp(tevStage, 0, 0, 0, 1, 0);
-    _GXSetTevAlphaOp(tevStage, 0, 0, 0, 1, 0);
+        m_numTevStage, 7, 7, 7, 0);
+    _GXSetTevColorOp(m_numTevStage, 0, 0, 0, 1, 0);
+    _GXSetTevAlphaOp(m_numTevStage, 0, 0, 0, 1, 0);
     IncNumTevStage();
 }
 
@@ -756,16 +744,15 @@ void CMaterialMan::addtev_bump_jimen(_GXTevScale)
                      static_cast<GXTexMapID>(m_bumpTexMapIds[0]));
     GXSetIndTexCoordScale((GXIndTexStageID)0, (GXIndTexScale)0, (GXIndTexScale)0);
 
-    int tevStage = m_numTevStage;
-    GXSetTevIndBumpXYZ((GXTevStageID)tevStage, (GXIndTexStageID)0, (GXIndTexMtxID)1);
+    GXSetTevIndBumpXYZ((GXTevStageID)m_numTevStage, (GXIndTexStageID)0, (GXIndTexMtxID)1);
     _GXSetTevOrder(
-        tevStage, m_bumpTexCoordIds[4], m_bumpTexMapIds[1], 0xFF);
+        m_numTevStage, m_bumpTexCoordIds[4], m_bumpTexMapIds[1], 0xFF);
     _GXSetTevColorIn(
-        tevStage, 0xF, 4, 9, 0);
+        m_numTevStage, 0xF, 4, 9, 0);
     _GXSetTevAlphaIn(
-        tevStage, 7, 7, 7, 0);
-    _GXSetTevColorOp(tevStage, 0, 0, 0, 1, 0);
-    _GXSetTevAlphaOp(tevStage, 0, 0, 0, 1, 0);
+        m_numTevStage, 7, 7, 7, 0);
+    _GXSetTevColorOp(m_numTevStage, 0, 0, 0, 1, 0);
+    _GXSetTevAlphaOp(m_numTevStage, 0, 0, 0, 1, 0);
     m_numTevStage =
         (((m_numTevStage) & 0xFF) + 1) & 0xFF;
 }

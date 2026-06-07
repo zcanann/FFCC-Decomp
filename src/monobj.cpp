@@ -3011,8 +3011,8 @@ void CGMonObj::statAround()
 	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
 	CGObject* object = reinterpret_cast<CGObject*>(monObj);
 	int& targetPartyIndex = monObj->m_targetPartyIndex;
-	int& actionState = *reinterpret_cast<int*>(CGMonObj::m_aiWork + 4);
-	unsigned char* script = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
+#define actionState (*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4))
+#define script (reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]))
 
 	if (targetPartyIndex >= 0) {
 		float homeRange = static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xCC));
@@ -3184,6 +3184,8 @@ void CGMonObj::statAround()
 	monObj->m_chaseState = 3;
 	monObj->m_chaseTimer = 0;
 	monObj->m_chaseDirty = 1;
+#undef script
+#undef actionState
 }
 
 /*

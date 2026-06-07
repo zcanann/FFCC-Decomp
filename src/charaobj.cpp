@@ -300,6 +300,14 @@ static unsigned int CharaObjResolveHitParticleBank(CGPrgObj* sourceObj, unsigned
 	return particleBank;
 }
 
+// Tests CFlatGameFlag_Bit5 (0x20) the way the original source did: the flag
+// byte is sign-extracted through a signed char, which the compiler lowers to
+// extlwi/srawi/extsb rather than a single rlwinm mask. Returns nonzero if set.
+static int CharaObjGameFlagBit5Set()
+{
+	return static_cast<signed char>(static_cast<int>(static_cast<unsigned int>(CFlatGameFlags()) << 26 >> 30) << 30 >> 31) != 0;
+}
+
 static int CharaObjDecodeHitParticleSe(unsigned short seData)
 {
 	return (seData == 0xFFFF) ? 0 : (seData & 0xFF) + static_cast<int>(seData >> 8) * 1000;
@@ -595,7 +603,7 @@ void CGCharaObj::onFramePostCalc()
 		unsigned short tickDiv = *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x3A);
 		if (m_stateTick != 0 && (m_stateTick % static_cast<int>(tickDiv)) == 0) {
 			if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) > 1 &&
-			    (CFlatGameFlags() & CFlatGameFlag_Bit5) == 0) {
+			    !CharaObjGameFlagBit5Set()) {
 				playSe3D(0x19, 0x32, 0x96, 0, 0);
 				addHp(-1, 0);
 			}

@@ -1577,15 +1577,16 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 8) :
 					*reinterpret_cast<unsigned short*>(itemData + 0x30);
 				unsigned int defense = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x22);
-				float defenseRate = 1.0f;
+				float defenseRate = kOneF32;
 				if ((sourceObj->GetCID() & 0xAD) == 0xAD) {
 					defenseRate = CharaObjGetStatusMultiplier(0x32);
 				}
-				damageAmount = static_cast<int>(defense * defenseRate);
-				damageAmount = static_cast<int>(basePower + sourcePower) - damageAmount;
+				int guardValue = static_cast<int>(static_cast<float>(static_cast<int>(defense)) * defenseRate);
+				damageAmount = static_cast<int>(basePower + sourcePower) - guardValue;
 				if (damageAmount < 1) {
 					damageAmount = 1;
 				}
+				System.Printf(dbg + 0x2BC, basePower, sourcePower, defense, damageAmount);
 			} else if (staType == 0x25) {
 				damageAmount = (resolvedItemId == 0x4AA) ? 1 : 10;
 			}

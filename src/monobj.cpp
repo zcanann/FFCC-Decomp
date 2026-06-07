@@ -2786,27 +2786,18 @@ void CGMonObj::setRepop(int mode)
 	void** scriptHandle = object->m_scriptHandle;
 	void* classId = scriptHandle[4];
 
-	bool allowRepop = (mode == 0);
-	if (!allowRepop) {
-		int option = *reinterpret_cast<short*>(&Game.m_gameWork.m_optionValue);
-		if (option < 9) {
-			unsigned long long bit = 1ULL << reinterpret_cast<int>(scriptHandle[2]);
-			if ((CFlatSpawnBitHi(option) & static_cast<unsigned int>(bit)) == 0 &&
-				(CFlatSpawnBitLo(option) & static_cast<unsigned int>(bit >> 32)) == 0) {
-				allowRepop = true;
-			}
-		} else {
-			allowRepop = true;
+	int option;
+	if ((mode != 0) && (option = static_cast<int>(*reinterpret_cast<short*>(&Game.m_gameWork.m_optionValue)), option < 9)) {
+		unsigned long long bit = 1ULL << reinterpret_cast<int>(scriptHandle[2]);
+		if (((CFlatSpawnBitHi(option) & static_cast<unsigned int>(bit)) |
+			 (CFlatSpawnBitLo(option) & static_cast<unsigned int>(bit >> 32))) != 0) {
+			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle) + 0x1C) = 0;
+			object->m_bgColMask = 0;
+			object->m_displayFlags = 0;
+			object->m_weaponNodeFlags &= 0xFFEF;
+			prgObj->changeStat(0x28, 0, 0);
+			return;
 		}
-	}
-
-	if (!allowRepop) {
-		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle) + 0x1C) = 0;
-		object->m_bgColMask = 0;
-		object->m_displayFlags = 0;
-		object->m_weaponNodeFlags &= 0xFFEF;
-		prgObj->changeStat(0x28, 0, 0);
-		return;
 	}
 
 	if (mode == 0) {

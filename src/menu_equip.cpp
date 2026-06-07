@@ -837,9 +837,11 @@ int CMenuPcs::EquipOpen0()
 				double recip = kEquipOneDouble / (double)item->duration;
 				item->alpha = (float)(recip * (double)item->step);
 				if ((item->flags & 2) == 0) {
+					float dx = item->targetX - (float)item->x;
+					float dy = item->targetY - (float)item->y;
 					fVar1 = (float)((dVar2 / (double)item->duration) * (double)item->step);
-					item->dx = (item->targetX - (float)item->x) * fVar1;
-					item->dy = (item->targetY - (float)item->y) * fVar1;
+					item->dx = dx * fVar1;
+					item->dy = dy * fVar1;
 				}
 			}
 		}

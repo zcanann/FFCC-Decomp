@@ -1489,11 +1489,9 @@ void CChara::CModel::calcMatrix()
 		}
 
 		MtxPtr localMtx = NodeLocalRuntimeMtx(node);
-		CChara::CAnimNode* animNode0 = NodeAnimNode0(node);
-		CChara::CAnimNode* animNode1 = NodeAnimNode1(node);
 		SRTView srt;
 
-		if (animNode0 == 0 && animNode1 == 0) {
+		if (NodeAnimNode0(node) == 0 && NodeAnimNode1(node) == 0) {
 			if ((s8)NodeRuntimeFlags(node) < 0) {
 				PSMTXCopy(NodeRefLocalMtx(node), localMtx);
 			}
@@ -1519,10 +1517,10 @@ void CChara::CModel::calcMatrix()
 				localMtx[0][3] = NodeBoneLen(parentNode);
 			}
 
-			if (animNode1 != 0) {
+			if (NodeAnimNode1(node) != 0) {
 				Mtx animMtx;
-				animNode1->Interp(m_anim, reinterpret_cast<SRT*>(&srt), frame);
-				if (AnimNodeUsesScale(animNode1)) {
+				NodeAnimNode1(node)->Interp(m_anim, reinterpret_cast<SRT*>(&srt), frame);
+				if (AnimNodeUsesScale(NodeAnimNode1(node))) {
 					Math.SRTToMatrix(animMtx, reinterpret_cast<SRT*>(&srt));
 				} else {
 					Math.SRTToMatrixRT(animMtx, reinterpret_cast<SRT*>(&srt));
@@ -1535,14 +1533,14 @@ void CChara::CModel::calcMatrix()
 				PSMTXConcat(localMtx, animMtx, localMtx);
 			}
 
-			if (animNode0 == 0) {
+			if (NodeAnimNode0(node) == 0) {
 				float* runtimeScale = NodeRuntimeScale(node);
 				runtimeScale[2] = FLOAT_803301b0;
 				runtimeScale[1] = FLOAT_803301b0;
 				runtimeScale[0] = FLOAT_803301b0;
 			} else {
 				Mtx animMtx;
-				animNode0->Interp(m_anim, reinterpret_cast<SRT*>(&srt), frame);
+				NodeAnimNode0(node)->Interp(m_anim, reinterpret_cast<SRT*>(&srt), frame);
 				u16 nodeIndex = NodeRefIndex(node);
 				if (nodeIndex == ModelChest1Index(this) || nodeIndex == ModelChest2Index(this) ||
 				    nodeIndex == ModelChest3Index(this)) {
@@ -1558,7 +1556,7 @@ void CChara::CModel::calcMatrix()
 				} else if (nodeIndex == ModelHeadIndex(this) && ModelTexAnimSet(this) != 0) {
 					srt.m_rotation.z += TexAnimSetChin(ModelTexAnimSet(this));
 				}
-				if (AnimNodeUsesScale(animNode0)) {
+				if (AnimNodeUsesScale(NodeAnimNode0(node))) {
 					Math.SRTToMatrix(animMtx, reinterpret_cast<SRT*>(&srt));
 				} else {
 					Math.SRTToMatrixRT(animMtx, reinterpret_cast<SRT*>(&srt));

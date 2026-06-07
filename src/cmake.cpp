@@ -621,75 +621,69 @@ void GetCharaCnt(char* dst)
  */
 void CMenuPcs::CalcSingCMake()
 {
-    CmakeMenuState* cmakeState = CmakeState(this);
 
-    if (cmakeState->m_initialized == 0) {
+    if (CmakeState(this)->m_initialized == 0) {
         InitFrame0Info();
         memset(&s_CmakeInfo, 0, sizeof(s_CmakeInfo));
-        cmakeState->m_initialized = 1;
-        cmakeState->m_selectionInitialized = 0;
+        CmakeState(this)->m_initialized = 1;
+        CmakeState(this)->m_selectionInitialized = 0;
         gCmakePreviousStep = -1;
         CmakeMcState(this) = 3;
     }
 
-    short& frame = cmakeState->m_frame;
-    short& openMode = cmakeState->m_mode;
-    short& step = cmakeState->m_step;
-    short& resultDir = cmakeState->m_resultDir;
-    short& resultFlag = cmakeState->m_resultFlag;
     unsigned short result = 0;
 
-    switch (step) {
+    switch (CmakeState(this)->m_step) {
     case 0:
-        if (openMode == 0) {
-            CalcWMFrame0(frame - 10);
-            if (frame < 10) {
-                frame = frame + 1;
+        if (CmakeState(this)->m_mode == 0) {
+            CalcWMFrame0(CmakeState(this)->m_frame - 10);
+            if (CmakeState(this)->m_frame < 10) {
+                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
             } else {
-                cmakeState->m_select = 0;
-                cmakeState->m_row = 0;
-                cmakeState->m_table = 0;
-                cmakeState->m_subSelect = 0;
+                CmakeState(this)->m_select = 0;
+                CmakeState(this)->m_row = 0;
+                CmakeState(this)->m_table = 0;
+                CmakeState(this)->m_subSelect = 0;
             }
-            result = static_cast<unsigned short>(frame >= 10);
-        } else if (openMode == 1) {
+            result = static_cast<unsigned short>(CmakeState(this)->m_frame >= 10);
+        } else if (CmakeState(this)->m_mode == 1) {
             result = 0;
         } else {
-            CalcWMFrame0(-frame);
-            if (frame < 10) {
-                frame = frame + 1;
+            CalcWMFrame0(-CmakeState(this)->m_frame);
+            if (CmakeState(this)->m_frame < 10) {
+                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
             }
-            result = static_cast<unsigned short>(frame >= 10);
+            result = static_cast<unsigned short>(CmakeState(this)->m_frame >= 10);
         }
         break;
     case 1:
-        if (openMode == 0) {
-            if (frame < 10) {
-                frame = frame + 1;
+        if (CmakeState(this)->m_mode == 0) {
+            if (CmakeState(this)->m_frame < 10) {
+                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
             }
-            result = static_cast<unsigned short>(frame >= 10);
-        } else if (openMode == 1) {
+            result = static_cast<unsigned short>(CmakeState(this)->m_frame >= 10);
+        } else if (CmakeState(this)->m_mode == 1) {
             result = static_cast<unsigned short>(CmakeNameCtrl());
-        } else if (frame < 10) {
-            frame = frame + 1;
+        } else if (CmakeState(this)->m_frame < 10) {
+            CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
         } else {
-            if (resultDir < 0) {
+            if (CmakeState(this)->m_resultDir < 0) {
                 ChgModel(static_cast<int>(CmakeSlot(this)), -1, -1, -1);
             }
             result = 1;
         }
         break;
     case 2: {
-        if (openMode == 0) {
-            if (cmakeState->m_selectionInitialized == 0) {
-                cmakeState->m_select = 0;
-                cmakeState->m_selectionInitialized = 1;
+        if (CmakeState(this)->m_mode == 0) {
+            if (CmakeState(this)->m_selectionInitialized == 0) {
+                CmakeState(this)->m_select = 0;
+                CmakeState(this)->m_selectionInitialized = 1;
             }
-            if (frame < 10) {
-                frame = frame + 1;
+            if (CmakeState(this)->m_frame < 10) {
+                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
             }
-            result = static_cast<unsigned short>(frame >= 10);
-        } else if (openMode == 1) {
+            result = static_cast<unsigned short>(CmakeState(this)->m_frame >= 10);
+        } else if (CmakeState(this)->m_mode == 1) {
             unsigned short down;
             unsigned short repeat;
 
@@ -713,19 +707,19 @@ void CMenuPcs::CalcSingCMake()
                 result = 0;
             } else {
                 if ((repeat & 0xC) != 0) {
-                    cmakeState->m_select ^= 1;
+                    CmakeState(this)->m_select ^= 1;
                     Sound.PlaySe(1, 0x40, 0x7F, 0);
                 }
                 if ((repeat & 0xC) == 0) {
                     if ((down & 0x100) != 0) {
-                        s_CmakeInfo.m_gender = static_cast<signed char>(cmakeState->m_select);
-                        resultDir = 1;
+                        s_CmakeInfo.m_gender = static_cast<signed char>(CmakeState(this)->m_select);
+                        CmakeState(this)->m_resultDir = 1;
                         Sound.PlaySe(2, 0x40, 0x7F, 0);
                         result = 1;
                         break;
                     }
                     if ((down & 0x200) != 0) {
-                        resultDir = -1;
+                        CmakeState(this)->m_resultDir = -1;
                         Sound.PlaySe(3, 0x40, 0x7F, 0);
                         result = 1;
                         break;
@@ -733,62 +727,62 @@ void CMenuPcs::CalcSingCMake()
                 }
                 result = 0;
             }
-        } else if (frame < 10) {
-            frame = frame + 1;
+        } else if (CmakeState(this)->m_frame < 10) {
+            CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
         } else {
             result = 1;
         }
         break;
     }
     case 3:
-        if (openMode == 0) {
-            if (cmakeState->m_selectionInitialized == 0) {
-                cmakeState->m_select = 0;
-                cmakeState->m_row = 0;
-                cmakeState->m_fieldSelect = 0;
-                cmakeState->m_selectionInitialized = 1;
+        if (CmakeState(this)->m_mode == 0) {
+            if (CmakeState(this)->m_selectionInitialized == 0) {
+                CmakeState(this)->m_select = 0;
+                CmakeState(this)->m_row = 0;
+                CmakeState(this)->m_fieldSelect = 0;
+                CmakeState(this)->m_selectionInitialized = 1;
             }
-            if (frame < 10) {
-                frame = frame + 1;
+            if (CmakeState(this)->m_frame < 10) {
+                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
             }
-            result = static_cast<unsigned short>(frame >= 10);
-        } else if (openMode == 1) {
+            result = static_cast<unsigned short>(CmakeState(this)->m_frame >= 10);
+        } else if (CmakeState(this)->m_mode == 1) {
             result = CmakeTribeCtrl();
-        } else if (frame < 10) {
-            frame = frame + 1;
+        } else if (CmakeState(this)->m_frame < 10) {
+            CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
         } else {
             result = 1;
         }
         break;
     case 4:
-        if (openMode == 0) {
-            if (cmakeState->m_selectionInitialized == 0) {
-                cmakeState->m_select = 0;
-                cmakeState->m_selectionInitialized = 1;
+        if (CmakeState(this)->m_mode == 0) {
+            if (CmakeState(this)->m_selectionInitialized == 0) {
+                CmakeState(this)->m_select = 0;
+                CmakeState(this)->m_selectionInitialized = 1;
             }
-            if (frame < 10) {
-                frame = frame + 1;
+            if (CmakeState(this)->m_frame < 10) {
+                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
             }
-            result = static_cast<unsigned short>(frame >= 10);
-        } else if (openMode == 1) {
+            result = static_cast<unsigned short>(CmakeState(this)->m_frame >= 10);
+        } else if (CmakeState(this)->m_mode == 1) {
             result = CmakeJobCtrl();
-        } else if (frame < 10) {
-            frame = frame + 1;
+        } else if (CmakeState(this)->m_frame < 10) {
+            CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
         } else {
             result = 1;
         }
         break;
     case 5: {
-        if (openMode == 0) {
-            if (cmakeState->m_selectionInitialized == 0) {
-                cmakeState->m_select = 0;
-                cmakeState->m_selectionInitialized = 1;
+        if (CmakeState(this)->m_mode == 0) {
+            if (CmakeState(this)->m_selectionInitialized == 0) {
+                CmakeState(this)->m_select = 0;
+                CmakeState(this)->m_selectionInitialized = 1;
             }
-            if (frame < 10) {
-                frame = frame + 1;
+            if (CmakeState(this)->m_frame < 10) {
+                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
             }
-            result = static_cast<unsigned short>(frame >= 10);
-        } else if (openMode == 1) {
+            result = static_cast<unsigned short>(CmakeState(this)->m_frame >= 10);
+        } else if (CmakeState(this)->m_mode == 1) {
             unsigned short down;
             unsigned short repeat;
 
@@ -812,13 +806,13 @@ void CMenuPcs::CalcSingCMake()
                 result = 0;
             } else {
                 if ((repeat & 3) != 0) {
-                    cmakeState->m_select ^= 1;
+                    CmakeState(this)->m_select ^= 1;
                     Sound.PlaySe(1, 0x40, 0x7F, 0);
                 }
                 if ((repeat & 3) == 0) {
                     if ((down & 0x100) != 0) {
-                        if (cmakeState->m_select == 0) {
-                            resultDir = 1;
+                        if (CmakeState(this)->m_select == 0) {
+                            CmakeState(this)->m_resultDir = 1;
                             *reinterpret_cast<int*>(MenuS32(this, 0x844) + CmakeSlot(this) * 0x14 + 4) = 3;
 
                             int slot = static_cast<int>(CmakeSlot(this));
@@ -847,17 +841,17 @@ void CMenuPcs::CalcSingCMake()
                                 static_cast<int>(caravanWork->m_appearanceVariant));
                             caravanWork->LoadFinished();
                             CallWorldParam(0, slot, 0);
-                            cmakeState->m_stepTimer =
+                            CmakeState(this)->m_stepTimer =
                                 static_cast<short>(static_cast<int>(GetMaxAnimWait()));
                         } else {
-                            resultDir = -1;
+                            CmakeState(this)->m_resultDir = -1;
                         }
                         Sound.PlaySe(0x33, 0x40, 0x7F, 0);
                         result = 1;
                         break;
                     }
                     if ((down & 0x200) != 0) {
-                        resultDir = -1;
+                        CmakeState(this)->m_resultDir = -1;
                         Sound.PlaySe(3, 0x40, 0x7F, 0);
                         result = 1;
                         break;
@@ -866,30 +860,30 @@ void CMenuPcs::CalcSingCMake()
                 result = 0;
             }
         } else {
-            if (cmakeState->m_stepTimer == 0) {
-                if (frame < 10) {
-                    frame = frame + 1;
+            if (CmakeState(this)->m_stepTimer == 0) {
+                if (CmakeState(this)->m_frame < 10) {
+                    CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
                 } else {
                     result = 1;
                 }
             } else {
-                cmakeState->m_stepTimer =
-                    static_cast<short>(cmakeState->m_stepTimer - 1);
+                CmakeState(this)->m_stepTimer =
+                    static_cast<short>(CmakeState(this)->m_stepTimer - 1);
             }
         }
         break;
     }
     case 6: {
-        if (openMode == 0) {
-            if (cmakeState->m_selectionInitialized == 0) {
-                cmakeState->m_select = 0;
-                cmakeState->m_selectionInitialized = 1;
+        if (CmakeState(this)->m_mode == 0) {
+            if (CmakeState(this)->m_selectionInitialized == 0) {
+                CmakeState(this)->m_select = 0;
+                CmakeState(this)->m_selectionInitialized = 1;
             }
-            if (frame < 10) {
-                frame = frame + 1;
+            if (CmakeState(this)->m_frame < 10) {
+                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
             }
-            result = static_cast<unsigned short>(frame >= 10);
-        } else if (openMode == 1) {
+            result = static_cast<unsigned short>(CmakeState(this)->m_frame >= 10);
+        } else if (CmakeState(this)->m_mode == 1) {
             unsigned short down;
             unsigned short repeat;
 
@@ -913,29 +907,29 @@ void CMenuPcs::CalcSingCMake()
                 result = 0;
             } else {
                 if ((repeat & 0x8) != 0) {
-                    if (cmakeState->m_select == 0) {
-                        cmakeState->m_select = 3;
+                    if (CmakeState(this)->m_select == 0) {
+                        CmakeState(this)->m_select = 3;
                     } else {
-                        cmakeState->m_select =
-                            static_cast<short>(cmakeState->m_select - 1);
+                        CmakeState(this)->m_select =
+                            static_cast<short>(CmakeState(this)->m_select - 1);
                     }
                     Sound.PlaySe(1, 0x40, 0x7F, 0);
                 } else if ((repeat & 0x4) != 0) {
-                    if (cmakeState->m_select < 3) {
-                        cmakeState->m_select =
-                            static_cast<short>(cmakeState->m_select + 1);
+                    if (CmakeState(this)->m_select < 3) {
+                        CmakeState(this)->m_select =
+                            static_cast<short>(CmakeState(this)->m_select + 1);
                     } else {
-                        cmakeState->m_select = 0;
+                        CmakeState(this)->m_select = 0;
                     }
                     Sound.PlaySe(1, 0x40, 0x7F, 0);
                 }
 
                 if ((repeat & 0xC) == 0) {
                     if ((down & 0x100) != 0) {
-                        if (cmakeState->m_select < 3) {
+                        if (CmakeState(this)->m_select < 3) {
                             ChgModel(static_cast<int>(CmakeSlot(this)), -1, -1, -1);
                         }
-                        resultDir = 1;
+                        CmakeState(this)->m_resultDir = 1;
                         Sound.PlaySe(2, 0x40, 0x7F, 0);
                         result = 1;
                         break;
@@ -946,8 +940,8 @@ void CMenuPcs::CalcSingCMake()
                 }
                 result = 0;
             }
-        } else if (frame < 10) {
-            frame = frame + 1;
+        } else if (CmakeState(this)->m_frame < 10) {
+            CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
         } else {
             result = 1;
         }
@@ -958,7 +952,7 @@ void CMenuPcs::CalcSingCMake()
     }
 
     CalcSingleCMakeChara();
-    resultFlag = static_cast<short>(result);
+    CmakeState(this)->m_resultFlag = static_cast<short>(result);
 }
 
 /*

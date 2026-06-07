@@ -802,26 +802,31 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 
 	GXSetChanMatColor(GX_COLOR0A0, color);
 
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1B));
 	const float right = (x + w) - corner;
 	const float bottom = (y + h) - corner;
-
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1B));
 	for (int i = 0; i < 4; i++) {
 		float drawX = x;
 		float drawY = y;
-		float texU = 0.0f;
-		float texV = 0.0f;
-		if (i == 1) {
-			drawX = right;
+		float texU;
+		float texV;
+		if (i == 0) {
+			texU = 0.0f;
+			texV = 0.0f;
+		} else if (i == 1) {
 			texU = corner;
-		} else if (i == 2) {
-			drawY = bottom;
-			texV = corner;
-		} else if (i == 3) {
 			drawX = right;
+			texV = 0.0f;
+		} else {
 			drawY = bottom;
-			texU = corner;
-			texV = corner;
+			if (i == 2) {
+				texU = 0.0f;
+				texV = corner;
+			} else {
+				texU = corner;
+				drawX = right;
+				texV = corner;
+			}
 		}
 		MenuPcs.DrawRect(0, drawX, drawY, corner, corner, texU, texV, texScale, texScale, 0.0f);
 	}

@@ -1123,7 +1123,7 @@ void CShopMenu::DrawItemInfo0()
             if (itemNo < 1) {
                 totalGil = 0;
             } else {
-                int gil = static_cast<int>(caravanWork->m_shopParam) *
+                unsigned int gil = static_cast<int>(caravanWork->m_shopParam) *
                           static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 0x20));
                 gil = gil / 100 + (gil >> 31);
                 totalGil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil - (gil >> 31)));

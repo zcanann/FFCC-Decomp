@@ -11417,18 +11417,15 @@ void McCtrl::LoadMcList()
 void McCtrl::SetListDat(int slot, int clearPlayTime)
 {
 	unsigned char entry[kMcListEntrySize];
+	unsigned char* const save = reinterpret_cast<unsigned char*>(MemoryCardMan.m_saveBuffer);
 	memset(entry, 0, sizeof(entry));
 
-	unsigned char* const save = reinterpret_cast<unsigned char*>(MemoryCardMan.m_saveBuffer);
-	unsigned char hasData = 0;
-	unsigned char hasError = 0;
-
-	if (save[0x10C0] == 0) {
-		hasData = 0;
-		hasError = 0;
+	if (*reinterpret_cast<char*>(save + 0x10C0) == 0) {
+		entry[0x42] = 0;
+		entry[0x41] = 0;
 	} else {
 		const int formatMatch = memcmp(save + 0x0C, DAT_8032E8A8, 4);
-		const unsigned int crcOk = MemoryCardMan.ChkCrc(0);
+		const unsigned char crcOk = static_cast<unsigned char>(MemoryCardMan.ChkCrc(0));
 		if (crcOk == 1 && formatMatch == 0) {
 			unsigned int playTime = clearPlayTime == 0 ? *reinterpret_cast<unsigned int*>(save + 0x20) : 0;
 			memcpy(entry + 0x00, save + 0x8AD0, 8);
@@ -11436,51 +11433,40 @@ void McCtrl::SetListDat(int slot, int clearPlayTime)
 			*reinterpret_cast<unsigned int*>(entry + 0x10) = *reinterpret_cast<unsigned int*>(save + 0x28);
 			*reinterpret_cast<unsigned int*>(entry + 0x14) = *reinterpret_cast<unsigned int*>(save + 0x2C);
 
-			int party0 = *reinterpret_cast<int*>(save + 0x30);
-			int party1 = *reinterpret_cast<int*>(save + 0x34);
-			int party2 = *reinterpret_cast<int*>(save + 0x38);
-			int party3 = *reinterpret_cast<int*>(save + 0x3C);
-
-			if (*reinterpret_cast<int*>(save + party0 * 0x9C0 + 0x1A84) == 0 || save[party0 * 0x9C0 + 0x1D90] != 0) {
+			unsigned char* slot = save + *reinterpret_cast<int*>(save + 0x30) * 0x9C0;
+			if (*reinterpret_cast<int*>(slot + 0x1A84) == 0 || slot[0x1D90] != 0) {
 				*reinterpret_cast<int*>(save + 0x30) = -1;
-				party0 = -1;
 			}
-			if (*reinterpret_cast<int*>(save + party1 * 0x9C0 + 0x1A84) == 0 || save[party1 * 0x9C0 + 0x1D90] != 0) {
+			slot = save + *reinterpret_cast<int*>(save + 0x34) * 0x9C0;
+			if (*reinterpret_cast<int*>(slot + 0x1A84) == 0 || slot[0x1D90] != 0) {
 				*reinterpret_cast<int*>(save + 0x34) = -1;
-				party1 = -1;
 			}
-			if (*reinterpret_cast<int*>(save + party2 * 0x9C0 + 0x1A84) == 0 || save[party2 * 0x9C0 + 0x1D90] != 0) {
+			slot = save + *reinterpret_cast<int*>(save + 0x38) * 0x9C0;
+			if (*reinterpret_cast<int*>(slot + 0x1A84) == 0 || slot[0x1D90] != 0) {
 				*reinterpret_cast<int*>(save + 0x38) = -1;
-				party2 = -1;
 			}
-			if (*reinterpret_cast<int*>(save + party3 * 0x9C0 + 0x1A84) == 0 || save[party3 * 0x9C0 + 0x1D90] != 0) {
+			slot = save + *reinterpret_cast<int*>(save + 0x3C) * 0x9C0;
+			if (*reinterpret_cast<int*>(slot + 0x1A84) == 0 || slot[0x1D90] != 0) {
 				*reinterpret_cast<int*>(save + 0x3C) = -1;
-				party3 = -1;
 			}
 
 			*reinterpret_cast<unsigned int*>(save + 0x1C) = MemoryCardMan.CalcCrc(reinterpret_cast<Mc::SaveDat*>(save));
 
 			*reinterpret_cast<unsigned int*>(entry + 0x08) = playTime;
-			const int saveParty0 = *reinterpret_cast<int*>(save + 0x30);
-			const int saveParty1 = *reinterpret_cast<int*>(save + 0x34);
-			const int saveParty2 = *reinterpret_cast<int*>(save + 0x38);
-			const int saveParty3 = *reinterpret_cast<int*>(save + 0x3C);
-			*reinterpret_cast<unsigned int*>(entry + 0x18) = (saveParty0 < 0) ? 0xFFFFFFFFu : *reinterpret_cast<unsigned short*>(save + saveParty0 * 0x9C0 + 0x14D0);
-			*reinterpret_cast<unsigned int*>(entry + 0x1C) = (saveParty1 < 0) ? 0xFFFFFFFFu : *reinterpret_cast<unsigned short*>(save + saveParty1 * 0x9C0 + 0x14D0);
-			*reinterpret_cast<unsigned int*>(entry + 0x20) = (saveParty2 < 0) ? 0xFFFFFFFFu : *reinterpret_cast<unsigned short*>(save + saveParty2 * 0x9C0 + 0x14D0);
-			*reinterpret_cast<unsigned int*>(entry + 0x24) = (saveParty3 < 0) ? 0xFFFFFFFFu : *reinterpret_cast<unsigned short*>(save + saveParty3 * 0x9C0 + 0x14D0);
+			*reinterpret_cast<unsigned int*>(entry + 0x18) = (*reinterpret_cast<int*>(save + 0x30) < 0) ? 0xFFFFFFFFu : *reinterpret_cast<unsigned short*>(save + *reinterpret_cast<int*>(save + 0x30) * 0x9C0 + 0x14D0);
+			*reinterpret_cast<unsigned int*>(entry + 0x1C) = (*reinterpret_cast<int*>(save + 0x34) < 0) ? 0xFFFFFFFFu : *reinterpret_cast<unsigned short*>(save + *reinterpret_cast<int*>(save + 0x34) * 0x9C0 + 0x14D0);
+			*reinterpret_cast<unsigned int*>(entry + 0x20) = (*reinterpret_cast<int*>(save + 0x38) < 0) ? 0xFFFFFFFFu : *reinterpret_cast<unsigned short*>(save + *reinterpret_cast<int*>(save + 0x38) * 0x9C0 + 0x14D0);
+			*reinterpret_cast<unsigned int*>(entry + 0x24) = (*reinterpret_cast<int*>(save + 0x3C) < 0) ? 0xFFFFFFFFu : *reinterpret_cast<unsigned short*>(save + *reinterpret_cast<int*>(save + 0x3C) * 0x9C0 + 0x14D0);
 			*reinterpret_cast<unsigned int*>(entry + 0x28) = *reinterpret_cast<unsigned int*>(save + 0xB8);
 			memcpy(entry + 0x2C, save + 0x10C0, 0x10);
-			hasData = 1;
+			entry[0x41] = 1;
 		} else {
-			hasError = 1;
+			entry[0x42] = 1;
 		}
 	}
 
-	entry[0x41] = hasData;
-	entry[0x42] = hasError;
 	entry[0x43] = 0;
-	unsigned char* const dst = MenuPcs.m_wmWorkBuffer + slot * kMcListEntrySize;
+	unsigned char* const dst = MenuPcs.m_wmCharaState + slot * kMcListEntrySize;
 	unsigned int* const dstWords = reinterpret_cast<unsigned int*>(dst);
 	unsigned int* const entryWords = reinterpret_cast<unsigned int*>(entry);
 	dstWords[0] = entryWords[0];

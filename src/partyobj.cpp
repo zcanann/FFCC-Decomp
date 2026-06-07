@@ -2633,10 +2633,11 @@ void CGPartyObj::onStatMagic()
 	bool canTargetMagic = false;
 	bool ghostTargetActive = false;
 	bool menuStageGhost = false;
+	const int magicReady = ((0x103 - m_itemId) == 0);
 	if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0x0F) {
 		menuStageGhost = true;
 	}
-	if (menuStageGhost && (GetCID() & 0x6D) == 0x6D) {
+	if (menuStageGhost && ((GetCID() & 0x6D) == 0x6D)) {
 		canTargetMagic = true;
 	}
 	if (canTargetMagic && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) != 0) {
@@ -2659,7 +2660,7 @@ void CGPartyObj::onStatMagic()
 	unsigned short held = getPadHeldForSlot(static_cast<unsigned char>(m_animStateMisc));
 	if ((held & 0x100) == 0) {
 		if (m_subState == 0 || (m_subState == 1 && m_comboState == 0)) {
-			if (m_itemId != 0x103) {
+			if (magicReady == 0) {
 				changeStat(0, 0, 0);
 			}
 		} else {
@@ -2672,7 +2673,7 @@ void CGPartyObj::onStatMagic()
 		}
 	} else {
 		unsigned short trig = getPadTrigForSlot(static_cast<unsigned char>(m_animStateMisc));
-		if ((trig & 0x200) != 0 && m_itemId != 0x103) {
+		if ((trig & 0x200) != 0 && magicReady == 0) {
 			changeStat(0, 0, 0);
 		}
 	}

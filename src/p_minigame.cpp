@@ -730,8 +730,11 @@ void CMiniGamePcs::GbaThreadMain(void* threadParam)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     unsigned char* param = reinterpret_cast<unsigned char*>(threadParam);
+    unsigned int identity8;
+    unsigned int identity7;
+    unsigned int command8;
+    unsigned int command7;
     unsigned int command;
-    unsigned int identity;
     unsigned int message;
     int ret;
     int step;
@@ -1056,10 +1059,10 @@ comm_fail:
                 {
                     if (param[0xC0] == 0x28)
                     {
-                        status = GBARead(channel, reinterpret_cast<u8*>(&identity), param + 0xC0);
+                        status = GBARead(channel, reinterpret_cast<u8*>(&identity7), param + 0xC0);
                         if (status == 0)
                         {
-                            *reinterpret_cast<unsigned int*>(param + 0xA4) = identity;
+                            *reinterpret_cast<unsigned int*>(param + 0xA4) = identity7;
                             param[0xC3] = 1;
                         }
                     }
@@ -1099,8 +1102,8 @@ comm_fail:
 
                     if (status == 0)
                     {
-                        command = 0x60000000;
-                        status = GBAWrite(channel, reinterpret_cast<u8*>(&command), param + 0xC0);
+                        command7 = 0x60000000;
+                        status = GBAWrite(channel, reinterpret_cast<u8*>(&command7), param + 0xC0);
                         if (status == 0 && (param[0xC0] & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_FLAGS_MASK)
                         {
                             bool failed = false;
@@ -1148,10 +1151,10 @@ comm_fail:
             {
                 if (param[0xC0] == 0x28)
                 {
-                    status = GBARead(channel, reinterpret_cast<u8*>(&identity), param + 0xC0);
+                    status = GBARead(channel, reinterpret_cast<u8*>(&identity8), param + 0xC0);
                     if (status == 0)
                     {
-                        *reinterpret_cast<unsigned int*>(param + 0xA4) = identity;
+                        *reinterpret_cast<unsigned int*>(param + 0xA4) = identity8;
                         param[0xC3] = 1;
                     }
                 }
@@ -1190,8 +1193,8 @@ comm_fail:
 
                 if (status == 0)
                 {
-                    command = 0x60000000;
-                    status = GBAWrite(channel, reinterpret_cast<u8*>(&command), param + 0xC0);
+                    command8 = 0x60000000;
+                    status = GBAWrite(channel, reinterpret_cast<u8*>(&command8), param + 0xC0);
                     if (status == 0 && (param[0xC0] & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_FLAGS_MASK)
                     {
                         bool failed = false;

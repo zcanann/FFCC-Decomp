@@ -2376,8 +2376,7 @@ void CShopMenu::SelectYesNo()
  */
 void CShopMenu::SelectFigure()
 {
-    unsigned short buttons = GetPadButtons();
-    if ((buttons & 1) != 0) {
+    if ((GetPadButtons() & 1) != 0) {
         ++m_figureMode;
         if (m_figureMode < 2) {
             Sound.PlaySe(1, 0x40, 0x7F, 0);
@@ -2385,7 +2384,7 @@ void CShopMenu::SelectFigure()
             m_figureMode = 1;
             Sound.PlaySe(4, 0x40, 0x7F, 0);
         }
-    } else if ((buttons & 2) != 0) {
+    } else if ((GetPadButtons() & 2) != 0) {
         --m_figureMode;
         if (m_figureMode < 0) {
             m_figureMode = 0;
@@ -2393,58 +2392,87 @@ void CShopMenu::SelectFigure()
         } else {
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
-    } else if ((buttons & 0x100) != 0) {
+    } else if ((GetPadButtons() & 0x100) != 0) {
         Sound.PlaySe(2, 0x40, 0x7F, 0);
         m_subMode = 2;
     }
 
-    buttons = GetShopMenuListButtons();
-    if ((buttons & 8) != 0) {
+    if ((GetShopMenuListButtons() & 8) != 0) {
         int figureMode = m_figureMode;
         if (figureMode == 1) {
             m_quantity += 10;
-            int quantity = m_quantity;
-            CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
-            bool canIncrease = quantity <= (0x40 - caravanWork->m_inventoryItemCount);
-            if (canIncrease) {
+            CCaravanWork* caravanWork = m_caravanWork;
+            if (m_quantity <= (0x40 - static_cast<unsigned short>(caravanWork->m_inventoryItemCount))) {
                 int totalGil = 0;
                 if (m_selectedIndex != -1) {
-                    int listType = m_listType;
-                    if ((listType == 0) || (listType == 1)) {
-                        totalGil = quantity * CalcShopMenuTradeGil(this, ResolveShopMenuSelectedItemId(this));
+                    int itemId = getItemNo(m_selectedIndex);
+                    int unitGil;
+                    if (m_listType == 0) {
+                        if (itemId < 1) {
+                            unitGil = 0;
+                        } else {
+                            int gil = caravanWork->m_shopParam *
+                                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x20);
+                            gil = gil / 100 + (gil >> 0x1F);
+                            unitGil = gil - (gil >> 0x1F);
+                        }
+                    } else if (m_listType == 1) {
+                        if (itemId < 1) {
+                            unitGil = 0;
+                        } else {
+                            int gil = caravanWork->m_shopParam *
+                                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x20);
+                            gil = gil / 100 + (gil >> 0x1F);
+                            unitGil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil - (gil >> 0x1F)));
+                        }
                     } else {
-                        totalGil = quantity * -1;
+                        unitGil = -1;
                     }
+                    totalGil = m_quantity * unitGil;
                 }
-                canIncrease = caravanWork->CanAddGil(-totalGil) != 0;
-            }
-            if (canIncrease) {
-                Sound.PlaySe(1, 0x40, 0x7F, 0);
-                return;
+                if (caravanWork->CanAddGil(-totalGil) != 0) {
+                    Sound.PlaySe(1, 0x40, 0x7F, 0);
+                    return;
+                }
             }
 
             m_quantity -= 10;
             Sound.PlaySe(4, 0x40, 0x7F, 0);
         } else if ((figureMode < 1) && (figureMode >= 0)) {
             ++m_quantity;
-            int quantity = m_quantity;
-            CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
-            bool canIncrease = quantity <= (0x40 - caravanWork->m_inventoryItemCount);
-            if (canIncrease) {
+            CCaravanWork* caravanWork = m_caravanWork;
+            if (m_quantity <= (0x40 - static_cast<unsigned short>(caravanWork->m_inventoryItemCount))) {
                 int totalGil = 0;
                 if (m_selectedIndex != -1) {
-                    int listType = m_listType;
-                    if ((listType == 0) || (listType == 1)) {
-                        totalGil = quantity * CalcShopMenuTradeGil(this, ResolveShopMenuSelectedItemId(this));
+                    int itemId = getItemNo(m_selectedIndex);
+                    int unitGil;
+                    if (m_listType == 0) {
+                        if (itemId < 1) {
+                            unitGil = 0;
+                        } else {
+                            int gil = caravanWork->m_shopParam *
+                                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x20);
+                            gil = gil / 100 + (gil >> 0x1F);
+                            unitGil = gil - (gil >> 0x1F);
+                        }
+                    } else if (m_listType == 1) {
+                        if (itemId < 1) {
+                            unitGil = 0;
+                        } else {
+                            int gil = caravanWork->m_shopParam *
+                                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x20);
+                            gil = gil / 100 + (gil >> 0x1F);
+                            unitGil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil - (gil >> 0x1F)));
+                        }
                     } else {
-                        totalGil = quantity * -1;
+                        unitGil = -1;
                     }
+                    totalGil = m_quantity * unitGil;
                 }
-                canIncrease = caravanWork->CanAddGil(-totalGil) != 0;
-            }
-            if (canIncrease) {
-                Sound.PlaySe(1, 0x40, 0x7F, 0);
-                return;
+                if (caravanWork->CanAddGil(-totalGil) != 0) {
+                    Sound.PlaySe(1, 0x40, 0x7F, 0);
+                    return;
+                }
             }
 
             gShopMenuInputLatch = 8;
@@ -2454,7 +2482,7 @@ void CShopMenu::SelectFigure()
         return;
     }
 
-    if ((buttons & 4) == 0) {
+    if ((GetShopMenuListButtons() & 4) == 0) {
         return;
     }
 

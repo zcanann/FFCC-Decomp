@@ -2790,12 +2790,13 @@ void CMenuPcs::CalcLoadMenu()
 		float baseWidth = (float)((int)*reinterpret_cast<short*>(frame + 8) + (int)*reinterpret_cast<short*>(frame + 4));
 		if ((int)uVar15 > -11) {
 			int s15 = (int)uVar15 >> 31;
-			unsigned int absOff = (unsigned int)(((int)uVar15 ^ s15) - s15);
+			int absRaw = ((int)uVar15 ^ s15) - s15;
+			float dVar27 = (float)(baseWidth * (DOUBLE_803314E8 * (double)absRaw));
+			unsigned int absOff = (unsigned int)absRaw;
 			if ((int)absOff < 0) absOff = 0;
 			if ((int)absOff > 10) absOff = 10;
-			double dVar27 = (double)(baseWidth * FLOAT_8033151c * (float)(int)absOff);
-			dVar26 = (double)(float)((double)(float)sin((double)(FLOAT_803314bc * (float)(int)absOff * FLOAT_803316d4)));
-			dVar26 = (double)(float)(dVar27 * (double)(float)dVar26);
+			float dVar28 = (float)sin((double)(FLOAT_803314bc * (float)(int)absOff * FLOAT_803316d4));
+			dVar26 = (double)(dVar27 * dVar28);
 		} else {
 			dVar26 = (double)baseWidth;
 		}
@@ -2854,22 +2855,22 @@ void CMenuPcs::CalcLoadMenu()
 		}
 		if (m_menuWindowInfo->state == 1) {
 			if (m_wmWorldState->m_counter1A == 0) {
-				if ((uVar7 & 3) == 0) {
-					if ((uVar4 & 0x100) == 0) {
+				if ((uVar7 & 3) != 0) {
+					m_wmWorldState->m_cardChannel ^= 1;
+					Sound.PlaySe(1, 0x40, 0x7F, 0);
+				} else {
+					if ((uVar4 & 0x100) != 0) {
+						m_wmWorldState->m_state0E = 1;
+						m_mcCtrl.m_cardChannel = (int)m_wmWorldState->m_cardChannel;
+						m_wmWorldState->m_counter1A = 10;
+						Sound.PlaySe(2, 0x40, 0x7F, 0);
+					} else {
 						if ((uVar4 & 0x200) != 0) {
 							m_wmWorldState->m_state0E = -1;
 							m_wmWorldState->m_counter1A = 1;
 							Sound.PlaySe(3, 0x40, 0x7F, 0);
 						}
-					} else {
-						m_wmWorldState->m_state0E = 1;
-						m_mcCtrl.m_cardChannel = (int)m_wmWorldState->m_cardChannel;
-						m_wmWorldState->m_counter1A = 10;
-						Sound.PlaySe(2, 0x40, 0x7F, 0);
 					}
-				} else {
-					m_wmWorldState->m_cardChannel ^= 1;
-					Sound.PlaySe(1, 0x40, 0x7F, 0);
 				}
 			}
 		}
@@ -3111,16 +3112,15 @@ void CMenuPcs::CalcLoadMenu()
 				}
 				int chkRes = MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
 				m_wmWorldState->m_mcResult = (short)chkRes;
-				if (m_wmWorldState->m_mcResult == 0) {
-					if ((uVar7 & 3) == 0) {
-						if ((uVar4 & 0x100) == 0) {
-							if ((uVar4 & 0x200) != 0) {
-								m_wmWorldState->m_cardChannel = 1;
-								m_wmWorldState->m_state0E = -1;
-								m_wmWorldState->m_counter1A = 10;
-								Sound.PlaySe(3, 0x40, 0x7F, 0);
-							}
-						} else {
+				if (m_wmWorldState->m_mcResult != 0) {
+					m_wmWorldState->m_state0E = -1;
+					m_wmWorldState->m_counter1A = 10;
+				} else {
+					if ((uVar7 & 3) != 0) {
+						m_wmWorldState->m_cardChannel ^= 1;
+						Sound.PlaySe(1, 0x40, 0x7F, 0);
+					} else {
+						if ((uVar4 & 0x100) != 0) {
 							if (m_wmWorldState->m_cardChannel == 0) {
 								m_wmWorldState->m_state0E = 1;
 							} else {
@@ -3128,14 +3128,15 @@ void CMenuPcs::CalcLoadMenu()
 							}
 							m_wmWorldState->m_counter1A = 10;
 							Sound.PlaySe(2, 0x40, 0x7F, 0);
+						} else {
+							if ((uVar4 & 0x200) != 0) {
+								m_wmWorldState->m_cardChannel = 1;
+								m_wmWorldState->m_state0E = -1;
+								m_wmWorldState->m_counter1A = 10;
+								Sound.PlaySe(3, 0x40, 0x7F, 0);
+							}
 						}
-					} else {
-						m_wmWorldState->m_cardChannel ^= 1;
-						Sound.PlaySe(1, 0x40, 0x7F, 0);
 					}
-				} else {
-					m_wmWorldState->m_state0E = -1;
-					m_wmWorldState->m_counter1A = 10;
 				}
 			}
 		}
@@ -3427,22 +3428,22 @@ void CMenuPcs::CalcLoadMenu()
 		int chkRes = MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
 		m_wmWorldState->m_mcResult = (short)chkRes;
 		if (m_wmWorldState->m_mcResult == 0 && uVar7 != 0) {
-			if ((uVar7 & 8) == 0) {
-				if ((uVar7 & 4) != 0) {
-					if (m_wmWorldState->m_cardChannel < 3) {
-						m_wmWorldState->m_cardChannel++;
-					} else {
-						m_wmWorldState->m_cardChannel = 0;
-					}
-					Sound.PlaySe(1, 0x40, 0x7F, 0);
-				}
-			} else {
-				if (m_wmWorldState->m_cardChannel < 1) {
+			if ((uVar7 & 8) != 0) {
+				if (m_wmWorldState->m_cardChannel <= 0) {
 					m_wmWorldState->m_cardChannel = 3;
 				} else {
 					m_wmWorldState->m_cardChannel--;
 				}
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
+			} else {
+				if ((uVar7 & 4) != 0) {
+					if (m_wmWorldState->m_cardChannel >= 3) {
+						m_wmWorldState->m_cardChannel = 0;
+					} else {
+						m_wmWorldState->m_cardChannel++;
+					}
+					Sound.PlaySe(1, 0x40, 0x7F, 0);
+				}
 			}
 			if ((uVar7 & 0xC) == 0) {
 				if ((uVar4 & 0x100) != 0) {

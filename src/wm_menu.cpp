@@ -674,6 +674,8 @@ void CMenuPcs::ChkNumItemAll()
 void CMenuPcs::loadData()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	char* const rodataBase = lbl_801DB7F8;
+#define srcFile (rodataBase + 0xC20)
 	m_menuResultCode = 0;
 	GbaQue.SetControllerMode(1);
 	loadTexture(lbl_80210B74, 2, 3, lbl_80210B98, 0x16, 0x2F, 0);
@@ -720,7 +722,7 @@ void CMenuPcs::loadData()
 	m_wm.m_handles[0x27] = 0;
 
 	for (int i = 0; i < 0x28; i++) {
-		CCharaPcs::CHandle* handle = new (MenuPcs.m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x1F4) CCharaPcs::CHandle;
+		CCharaPcs::CHandle* handle = new (MenuPcs.m_menuStage, srcFile, 0x1F4) CCharaPcs::CHandle;
 		m_wm.m_handles[i] = handle;
 		handle->Add();
 
@@ -729,7 +731,7 @@ void CMenuPcs::loadData()
 		if (i < 0x20) {
 			CharaPcs.m_charaAllocStage = 1;
 			charaKind = 3;
-			charaNo = s_wmLoadCharaModels[i];
+			charaNo = reinterpret_cast<const unsigned short*>(rodataBase + 0x970)[i];
 		} else {
 			CCaravanWork& caravan = Game.m_caravanWorkArr[i - 0x20];
 			CharaPcs.m_charaAllocStage = 0;
@@ -742,7 +744,7 @@ void CMenuPcs::loadData()
 				charaNo += caravan.m_appearanceVariant;
 			} else {
 				charaKind = 3;
-				charaNo = s_wmLoadCharaModels[21];
+				charaNo = reinterpret_cast<const unsigned short*>(rodataBase + 0x970)[21];
 			}
 		}
 
@@ -753,7 +755,7 @@ void CMenuPcs::loadData()
 	*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(m_wm.m_handles[6]->m_model) + 0x9C) =
 	    FLOAT_803314B0;
 
-	m_wm.m_worldObjData = static_cast<unsigned char*>(operator new[](0xC80, MenuPcs.m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x214));
+	m_wm.m_worldObjData = static_cast<unsigned char*>(operator new[](0xC80, MenuPcs.m_menuStage, srcFile, 0x214));
 	{
 		const float bigF = FLOAT_80331598;
 		const float oneF = FLOAT_803313e8;
@@ -786,17 +788,17 @@ void CMenuPcs::loadData()
 	}
 
 	m_wm.m_bubbleData =
-	    static_cast<unsigned char*>(operator new(0x8C, MenuPcs.m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x227));
+	    static_cast<unsigned char*>(operator new(0x8C, MenuPcs.m_menuStage, srcFile, 0x227));
 	memset(m_wm.m_bubbleData, 0, 0x8C);
 
 	m_wm.m_frameData =
-	    static_cast<unsigned char*>(operator new(0xEC, MenuPcs.m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x22B));
+	    static_cast<unsigned char*>(operator new(0xEC, MenuPcs.m_menuStage, srcFile, 0x22B));
 	memset(m_wm.m_frameData, 0, 0xEC);
 	{
 		const float oneF = FLOAT_803313e8;
 		int frameSrc[20];
 		unsigned int* dst = reinterpret_cast<unsigned int*>(frameSrc) - 1;
-		unsigned int* src = reinterpret_cast<unsigned int*>(&lbl_801DB7F8[0x9BC]);
+		unsigned int* src = reinterpret_cast<unsigned int*>(rodataBase + 0x9BC);
 		int n = 10;
 		do {
 			unsigned int* const lo = src + 1;
@@ -809,16 +811,16 @@ void CMenuPcs::loadData()
 		} while (n != 0);
 
 		int wordSrc[10];
-		wordSrc[0] = *reinterpret_cast<int*>(&lbl_801DB7F8[0xA10]);
-		wordSrc[1] = *reinterpret_cast<int*>(&lbl_801DB7F8[0xA14]);
-		wordSrc[2] = *reinterpret_cast<int*>(&lbl_801DB7F8[0xA18]);
-		wordSrc[3] = *reinterpret_cast<int*>(&lbl_801DB7F8[0xA1C]);
-		wordSrc[4] = *reinterpret_cast<int*>(&lbl_801DB7F8[0xA20]);
-		wordSrc[5] = *reinterpret_cast<int*>(&lbl_801DB7F8[0xA24]);
-		wordSrc[6] = *reinterpret_cast<int*>(&lbl_801DB7F8[0xA28]);
-		wordSrc[7] = *reinterpret_cast<int*>(&lbl_801DB7F8[0xA2C]);
-		wordSrc[8] = *reinterpret_cast<int*>(&lbl_801DB7F8[0xA30]);
-		wordSrc[9] = *reinterpret_cast<int*>(&lbl_801DB7F8[0xA34]);
+		wordSrc[0] = *reinterpret_cast<int*>(rodataBase + 0xA10);
+		wordSrc[1] = *reinterpret_cast<int*>(rodataBase + 0xA14);
+		wordSrc[2] = *reinterpret_cast<int*>(rodataBase + 0xA18);
+		wordSrc[3] = *reinterpret_cast<int*>(rodataBase + 0xA1C);
+		wordSrc[4] = *reinterpret_cast<int*>(rodataBase + 0xA20);
+		wordSrc[5] = *reinterpret_cast<int*>(rodataBase + 0xA24);
+		wordSrc[6] = *reinterpret_cast<int*>(rodataBase + 0xA28);
+		wordSrc[7] = *reinterpret_cast<int*>(rodataBase + 0xA2C);
+		wordSrc[8] = *reinterpret_cast<int*>(rodataBase + 0xA30);
+		wordSrc[9] = *reinterpret_cast<int*>(rodataBase + 0xA34);
 
 		int* tbl = frameSrc;
 		float* wsrc = reinterpret_cast<float*>(wordSrc);
@@ -838,7 +840,7 @@ void CMenuPcs::loadData()
 	}
 
 	m_wm.m_frameInfo =
-	    static_cast<unsigned char*>(operator new(kWmFrameInfoBytes, MenuPcs.m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x231));
+	    static_cast<unsigned char*>(operator new(kWmFrameInfoBytes, MenuPcs.m_menuStage, srcFile, 0x231));
 	memset(m_wm.m_frameInfo, 0, kWmFrameInfoBytes);
 	*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x4) = 0x10;
 	{
@@ -873,7 +875,7 @@ void CMenuPcs::loadData()
 	*reinterpret_cast<int*>(m_wm.m_frameInfo + 0x38) = 8;
 
 	m_wm.m_charaModelData =
-	    static_cast<unsigned char*>(operator new[](0x1A0, MenuPcs.m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x237));
+	    static_cast<unsigned char*>(operator new[](0x1A0, MenuPcs.m_menuStage, srcFile, 0x237));
 	{
 		const float oneF = FLOAT_803313e8;
 		const float zeroF = FLOAT_803313dc;
@@ -912,21 +914,21 @@ void CMenuPcs::loadData()
 	InitCharaInfo();
 
 	m_wm.m_charaSelectData =
-	    static_cast<unsigned char*>(operator new[](kWmCharaSelectBytes, MenuPcs.m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x243));
+	    static_cast<unsigned char*>(operator new[](kWmCharaSelectBytes, MenuPcs.m_menuStage, srcFile, 0x243));
 
 	m_wmWorldState =
-	    static_cast<WmWorldState*>(operator new(sizeof(WmWorldState), MenuPcs.m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x246));
+	    static_cast<WmWorldState*>(operator new(sizeof(WmWorldState), MenuPcs.m_menuStage, srcFile, 0x246));
 	memset(m_wmWorldState, 0, sizeof(WmWorldState));
 
 	m_wmCharaState =
-	    static_cast<unsigned char*>(operator new[](kWmMenuCharaStateBytes, MenuPcs.m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x24A));
+	    static_cast<unsigned char*>(operator new[](kWmMenuCharaStateBytes, MenuPcs.m_menuStage, srcFile, 0x24A));
 	memset(m_wmCharaState, 0, kWmMenuCharaStateBytes);
 
 	m_wmWorldParams =
-	    static_cast<unsigned char*>(operator new(0x10, MenuPcs.m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x24E));
+	    static_cast<unsigned char*>(operator new(0x10, MenuPcs.m_menuStage, srcFile, 0x24E));
 	memset(m_wmWorldParams, 0, 0x10);
 
-	m_effectWork = new (MenuPcs.m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x252) EffectInfo[0x28];
+	m_effectWork = new (MenuPcs.m_menuStage, srcFile, 0x252) EffectInfo[0x28];
 	for (int i = 0; i < 0x28; i++) {
 		EffectInfo* const effect = &m_effectWork[i];
 		effect->m_effectNo = -1;
@@ -935,10 +937,10 @@ void CMenuPcs::loadData()
 	}
 
 	m_wmCharaAnimState =
-	    static_cast<int*>(operator new[](0xA0, MenuPcs.m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x25A));
+	    static_cast<int*>(operator new[](0xA0, MenuPcs.m_menuStage, srcFile, 0x25A));
 	memset(m_wmCharaAnimState, 0, 0xA0);
 
-	m_menuWindowInfo = new (MenuPcs.m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x25E) MenuWindowInfo;
+	m_menuWindowInfo = new (MenuPcs.m_menuStage, srcFile, 0x25E) MenuWindowInfo;
 	memset(m_menuWindowInfo, 0, sizeof(MenuWindowInfo));
 
 	// Re-initialize the effect work entries.
@@ -1183,7 +1185,7 @@ void CMenuPcs::loadData()
 	}
 
 	char fontPath[128];
-	sprintf(fontPath, &lbl_801DB7F8[0xC74], Game.GetLangString());
+	sprintf(fontPath, rodataBase + 0xC74, Game.GetLangString());
 	loadFont(0, fontPath, 1, -1);
 
 	bytes[0xD] = 0;
@@ -1201,7 +1203,7 @@ void CMenuPcs::loadData()
 
 	for (int i = 4; i < 6; i++) {
 		CMesMenu* mesMenu =
-		    new (MenuPcs.m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x2EA) CMesMenu;
+		    new (MenuPcs.m_menuStage, srcFile, 0x2EA) CMesMenu;
 		*reinterpret_cast<CMesMenu**>(bytes + (i - 4) * 4 + 0x11C) = mesMenu;
 		CMesMenu* const cur = *reinterpret_cast<CMesMenu**>(bytes + (i - 4) * 4 + 0x11C);
 		*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(cur) + 0x18) = i;
@@ -1210,13 +1212,13 @@ void CMenuPcs::loadData()
 	}
 
 	char optionPath[256];
-	sprintf(optionPath, &lbl_801DB7F8[0xC8C], Game.GetLangString());
+	sprintf(optionPath, rodataBase + 0xC8C, Game.GetLangString());
 	CFile::CHandle* const fileHandle = File.Open(optionPath, 0, CFile::PRI_LOW);
 	if (fileHandle != 0) {
 		File.Read(fileHandle);
 		File.SyncCompleted(fileHandle);
 		CTextureSet* texSet =
-		    new (MenuPcs.m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x300) CTextureSet;
+		    new (MenuPcs.m_menuStage, srcFile, 0x300) CTextureSet;
 		*reinterpret_cast<CTextureSet**>(bytes + 0xBC) = texSet;
 		(*reinterpret_cast<CTextureSet**>(bytes + 0xBC))
 		    ->Create(File.m_readBuffer, m_menuStage, 0, 0, 0, 0);
@@ -1243,6 +1245,7 @@ void CMenuPcs::loadData()
 	*reinterpret_cast<float*>(bytes + 0x78) = zeroF;
 	*reinterpret_cast<short*>(bytes + 0x74) = 0;
 	g_pGoOutMenu = &g_GoOutMenu;
+#undef srcFile
 }
 
 /*

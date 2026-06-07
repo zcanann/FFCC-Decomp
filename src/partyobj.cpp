@@ -5087,11 +5087,17 @@ void CGPartyObj::gpmMove()
 			PartyData(this).unk6BC = moveKind;
 		}
 
-		Vec moveDir;
+		CVector moveDir;
 		if (moveKind == 0) {
-			moveDir = pathVec;
+			CVector pathVecV(pathVec);
+			moveDir.x = pathVecV.x;
+			moveDir.y = pathVecV.y;
+			moveDir.z = pathVecV.z;
 		} else {
-			moveDir = toLeader;
+			CVector toLeaderV(toLeader);
+			moveDir.x = toLeaderV.x;
+			moveDir.y = toLeaderV.y;
+			moveDir.z = toLeaderV.z;
 		}
 
 		float nextSpeed = sGhostPartyWork.carrySpeed + FLOAT_80331A70;
@@ -5099,7 +5105,7 @@ void CGPartyObj::gpmMove()
 		float speedLimit = speedScale * m_moveBaseSpeed * *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(leader) + 0x690);
 		sGhostPartyWork.carrySpeed = (nextSpeed >= 0.0f && speedLimit < nextSpeed) ? speedLimit : nextSpeed;
 
-		sGhostPartyWork.carryDir = moveDir;
+		sGhostPartyWork.carryDir = *reinterpret_cast<Vec*>(&moveDir);
 		if (PartyData(this).unk6C0 + 1 != 4) {
 			PartyData(this).unk6C0++;
 		} else {

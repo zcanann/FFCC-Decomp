@@ -1954,7 +1954,7 @@ void CMenuPcs::DrawUniteList()
 		CmdListEntry* const entry = &GetCmdListStorage(this)->entries[i];
 		const float rectX = static_cast<float>(entry->x + 4);
 		const float rectY = static_cast<float>(entry->y) - FLOAT_80332ad0;
-		const float rectW = static_cast<float>(entry->width) - 8.0f;
+		const float rectW = static_cast<float>(entry->width - 8);
 		const float rectU = static_cast<float>(entry->u);
 		GXColor color;
 		color.r = 0xFF;

@@ -166,6 +166,16 @@ static int getPadConnectedForSlot(int slot)
 	return Pad.GetPadInputs()[idx].gbaMode;
 }
 
+static unsigned short getPadButtonUpForSlot(int slot)
+{
+	if (Pad.m_debugPadLock != 0 || (slot == 0 && Pad.m_debugPadPort != -1)) {
+		return 0;
+	}
+
+	int idx = slot & ~((~(Pad.m_debugPadPort - slot | slot - Pad.m_debugPadPort) >> 31));
+	return Pad.GetPadInputs()[idx].buttonUp;
+}
+
 static bool isMenuPcsCommandBusy()
 {
 	return MenuPcs.m_mode != 0;
@@ -1438,60 +1448,84 @@ void CGPartyObj::onFrameStat()
 		return;
 	}
 
+	PartyObjOverlay& party = PartyData(this);
+	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
+
 	switch (m_lastStateId) {
 	case 0:
 		if (m_stateFrame == 0) {
-			if ((PartyData(this).partyFlags & 0x02) != 0) {
+			if (party.flags.flag02) {
 				reqAnim(0x27, 0, 0);
-				PartyData(this).partyFlags &= 0xFD;
+				party.partyFlags &= 0xFD;
 			} else {
 				reqAnim(-1, 0, 0);
 			}
 		}
-		if ((static_cast<signed char>(PartyData(this).partyFlags) < 0) ||
-		    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E) != 0) ||
-		    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x50) != 0) ||
-		    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x44) != 0)) {
-			*(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1) &= 0xBF;
+		if ((static_cast<signed char>(party.partyFlags) < 0) ||
+		    (*reinterpret_cast<short*>(script + 0x3E) != 0) ||
+		    (reinterpret_cast<short*>(m_scriptHandle)[0x14] != 0) ||
+		    (reinterpret_cast<short*>(m_scriptHandle)[0x11] != 0)) {
+			m_weaponNodeFlagBytes.m_flags1 &= 0xBF;
 			m_unk63C &= 0x7F;
 		} else {
-			*(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1) =
-			    (*(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1) & 0xBF) | 0x40;
+			m_weaponNodeFlagBytes.m_flags1 = (m_weaponNodeFlagBytes.m_flags1 & 0xBF) | 0x40;
 			m_unk63C = (m_unk63C & 0x7F) | 0x80;
 		}
 		if (((MiniGamePcs.m_flags & 8) != 0) ||
 		    ((Game.unk_flat3_0xc7d0 != 0) &&
 		     (Joybus.GetCtrlMode(static_cast<char>(m_animStateMisc)) == 1) &&
 		     (static_cast<signed char>(m_unk63C) < 0) &&
+		     (static_cast<signed char>(m_weaponNodeFlagBytes.m_flags1) < 0) &&
 		     (static_cast<signed char>(m_weaponNodeFlags >> 8) < 0) &&
-		     ((*(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1) & 0x40) != 0) &&
-		     (static_cast<signed char>(PartyData(this).partyFlags) >= 0))) {
+		     (static_cast<signed char>(party.partyFlags) >= 0))) {
 			if ((m_targetDist > FLOAT_80331a74 * Game.unkFloat_0xca10) &&
-			    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E) == 0) &&
-			    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x50) == 0) &&
-			    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x44) == 0) &&
+			    (*reinterpret_cast<short*>(script + 0x3E) == 0) &&
+			    (reinterpret_cast<short*>(m_scriptHandle)[0x14] == 0) &&
+			    (reinterpret_cast<short*>(m_scriptHandle)[0x11] == 0) &&
 			    (Game.m_gameWork.m_bossArtifactStageIndex != 0x17)) {
 				Vec moveVec;
 				PSVECSubtract(reinterpret_cast<Vec*>(Game.unk_flat3_0xc7d0 + 0x15C), &m_worldPosition, &moveVec);
 				moveVector(&moveVec, m_moveBaseSpeed, 0x0F);
 			}
 		}
-		break;
-	case 2:
-		onStatMagic();
+		if ((static_cast<signed char>(m_weaponNodeFlagBytes.m_flags1) < 0) &&
+		    Game.m_gameWork.m_menuStageMode != 0 &&
+		    m_scriptHandle[0xED] == nullptr &&
+		    Game.m_partyObjArr[1] != nullptr &&
+		    Game.m_partyObjArr[1]->m_lastStateId == 0) {
+			unsigned short held = getPadHeldForSlot(static_cast<unsigned char>(m_animStateMisc));
+			unsigned short up = getPadButtonUpForSlot(static_cast<unsigned char>(m_animStateMisc));
+			if ((up & 0x400) == 0) {
+				if ((held & 0x400) == 0) {
+					sGhostPartyWork.thresholdA = 0;
+				} else {
+					sGhostPartyWork.thresholdA++;
+					if (sGhostPartyWork.thresholdA > 9 && sGhostPartyWork.mood == 0) {
+						sGhostPartyWork.mood = 2;
+					}
+				}
+			} else if (sGhostPartyWork.thresholdA < 10 &&
+			           PartyData(Game.m_partyObjArr[1]).carryObject != reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)) {
+				CGPartyObj* leader = Game.m_partyObjArr[1];
+				int dir = -PartyData(leader).commandMode;
+				leader->m_weaponNodeFlagBytes.m_flags1 =
+				    static_cast<unsigned char>((static_cast<signed char>(static_cast<unsigned char>((dir | PartyData(leader).commandMode) >> 24)) >> 7) << 7) |
+				    (leader->m_weaponNodeFlagBytes.m_flags1 & 0x7F);
+			}
+		}
 		break;
 	case 6:
 		statCharge();
 		break;
 	case 7:
 		if (m_stateFrame == 0) {
-			PartyData(this).unk6D0 = 0;
+			party.unk6D0 = 0;
 		}
 		if ((getPadHeldForSlot(static_cast<unsigned char>(m_animStateMisc)) & 0x100) == 0) {
 			changeStat(1, 0, 0);
 		} else {
-			PartyData(this).unk6D0++;
-			if (PartyData(this).unk6D0 < 6) {
+			party.unk6D0++;
+			if (party.unk6D0 < 6) {
 				if ((getPadTrigForSlot(static_cast<unsigned char>(m_animStateMisc)) & 0x200) != 0) {
 					changeStat(0, 0, 0);
 				}
@@ -1523,7 +1557,35 @@ void CGPartyObj::onFrameStat()
 			playSe3D(0x22, 0x32, 0x96, 0, 0);
 		}
 		if (isLoopAnim() != 0) {
-			setIdleMotion();
+			short mapId = *reinterpret_cast<short*>(&m_lastMapIdHit);
+			if (party.carryObject == nullptr) {
+				if (*reinterpret_cast<short*>(script + 0x1C) == 0) {
+					if (mapId == 1) {
+						SetAnimSlot(0x25, 0);
+						SetAnimSlot(0x24, 1);
+					} else {
+						SetAnimSlot(0x25, 0);
+						SetAnimSlot(0x24, 1);
+					}
+				} else if (mapId == 1) {
+					SetAnimSlot(0, 0);
+					SetAnimSlot(1, 1);
+				} else {
+					SetAnimSlot(0x25, 0);
+					SetAnimSlot(0x30, 1);
+				}
+			} else if (CFlatItemCarryMode() == 0) {
+				if (mapId == 1) {
+					SetAnimSlot(0x0B, 0);
+					SetAnimSlot(0x0C, 1);
+				} else {
+					SetAnimSlot(0x0B, 0);
+					SetAnimSlot(2, 1);
+				}
+			} else {
+				SetAnimSlot(0x0B, 0);
+				SetAnimSlot(0x0C, 1);
+			}
 			changeStat(0, 0, 0);
 			m_extraMoveVec.x = FLOAT_80331a78;
 			m_extraMoveVec.z = FLOAT_80331a78;
@@ -1543,6 +1605,28 @@ void CGPartyObj::onFrameStat()
 			changeStat(0, 0, 0);
 		}
 		break;
+	case 0x0F:
+		if (m_stateFrame == 0) {
+			reqAnim(0x29, 0, 0);
+		}
+		if (m_stateFrame == 4) {
+			int weaponItem = party.weaponItem;
+			int weaponRef = party.pendingWeaponItem;
+			if (weaponItem <= 0) {
+				LoadWeapon(-1, 0);
+			} else {
+				unsigned short itemKind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + weaponItem * 0x48 + 2);
+				LoadWeapon(itemKind & 0xFFF, itemKind >> 12);
+			}
+			party.pendingWeaponItem = weaponRef;
+			party.weaponItem = weaponItem;
+			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->SetCurrentWeaponIdx(weaponRef);
+			party.commandFlags &= 0xDF;
+		}
+		if (isLoopAnim() != 0) {
+			changeStat(0, 0, 0);
+		}
+		break;
 	case 0x13:
 		if (m_stateFrame == 0) {
 			damageDelete();
@@ -1553,15 +1637,7 @@ void CGPartyObj::onFrameStat()
 		}
 		break;
 	case 0x14:
-		if (m_subState == 0) {
-			if (m_subFrame == 0) {
-				playSe3D(0x2F, 0x32, 0x96, 0, 0);
-				reqAnim(0x15, 0, 0);
-			}
-			if (isLoopAnim() != 0) {
-				changeSubStat(1);
-			}
-		} else if (m_subState == 1) {
+		if (m_subState == 1) {
 			if (m_subFrame == 0) {
 				m_alpha = FLOAT_80331ABC;
 				reqAnim(0x16, 1, 0);
@@ -1575,7 +1651,17 @@ void CGPartyObj::onFrameStat()
 				changeSubStat(2);
 				enableDamageCol(1);
 			}
-		} else if (m_subState == 2) {
+		} else if (m_subState < 1) {
+			if (m_subState >= 0) {
+				if (m_subFrame == 0) {
+					playSe3D(0x2F, 0x32, 0x96, 0, 0);
+					reqAnim(0x15, 0, 0);
+				}
+				if (isLoopAnim() != 0) {
+					changeSubStat(1);
+				}
+			}
+		} else if (m_subState < 3) {
 			if (m_subFrame == 0) {
 				reqAnim(0x17, 0, 0);
 			}
@@ -1601,29 +1687,6 @@ void CGPartyObj::onFrameStat()
 	case 0x1A:
 		statKorobi();
 		break;
-	case 0x0F:
-		if (m_stateFrame == 0) {
-			reqAnim(0x29, 0, 0);
-		}
-		if (m_stateFrame == 4) {
-			PartyObjOverlay& party = PartyData(this);
-			int weaponItem = party.weaponItem;
-			int weaponRef = party.pendingWeaponItem;
-			if (weaponItem <= 0) {
-				LoadWeapon(-1, 0);
-			} else {
-				unsigned short itemKind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + weaponItem * 0x48 + 2);
-				LoadWeapon(itemKind & 0xFFF, itemKind >> 12);
-			}
-			party.pendingWeaponItem = weaponRef;
-			party.weaponItem = weaponItem;
-			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->SetCurrentWeaponIdx(weaponRef);
-			party.commandFlags &= 0xDF;
-		}
-		if (isLoopAnim() != 0) {
-			changeStat(0, 0, 0);
-		}
-		break;
 	case 0x20:
 		if (m_stateFrame == 0) {
 			reqAnim(0x31, 0, 0);
@@ -1633,21 +1696,69 @@ void CGPartyObj::onFrameStat()
 		break;
 	case 0x22:
 		if (m_stateFrame == 0) {
-			setAlive(0, 0);
+			if (party.flags.flag04) {
+				if (*reinterpret_cast<short*>(script + 0x1C) == 0) {
+					addHp(*reinterpret_cast<unsigned short*>(script + 0x1A), static_cast<CGPrgObj*>(0));
+				}
+				party.partyFlags &= 0xFB;
+			}
+			enableDamageCol(1);
+			short mapId = *reinterpret_cast<short*>(&m_lastMapIdHit);
+			if (party.carryObject == nullptr) {
+				if (*reinterpret_cast<short*>(script + 0x1C) == 0) {
+					if (mapId == 1) {
+						SetAnimSlot(0x25, 0);
+						SetAnimSlot(0x24, 1);
+					} else {
+						SetAnimSlot(0x25, 0);
+						SetAnimSlot(0x24, 1);
+					}
+				} else if (mapId == 1) {
+					SetAnimSlot(0, 0);
+					SetAnimSlot(1, 1);
+				} else {
+					SetAnimSlot(0x25, 0);
+					SetAnimSlot(0x30, 1);
+				}
+			} else if (CFlatItemCarryMode() == 0) {
+				if (mapId == 1) {
+					SetAnimSlot(0x0B, 0);
+					SetAnimSlot(0x0C, 1);
+				} else {
+					SetAnimSlot(0x0B, 0);
+					SetAnimSlot(2, 1);
+				}
+			} else {
+				SetAnimSlot(0x0B, 0);
+				SetAnimSlot(0x0C, 1);
+			}
+			if (m_currentAnimSlot == 6) {
+				reqAnim(0x26, 0, 0);
+			} else {
+				reqAnim(0x27, 0, 0);
+			}
+			if (*reinterpret_cast<short*>(script + 0x1C) == 0) {
+				m_alpha = FLOAT_80331A7C;
+				m_bgColMask &= 0xFFFEFFF1;
+				void* port = m_scriptHandle[0xED];
+				endPSlotBit(0x10000);
+				putParticle(reinterpret_cast<int>(port) + 3U | 0x100, m_particleSlots[16], this, FLOAT_80331a54, 0);
+				playSe3D(0x2D, 0x32, 0x96, 0, 0);
+			} else {
+				endPSlotBit(0x10000);
+				m_alpha = FLOAT_80331a54;
+				m_bgColMask |= 0x1000E;
+				*reinterpret_cast<unsigned short*>(script + 0x12) = 0x5A;
+			}
 		} else if (isLoopAnim() != 0) {
-			if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
-				PartyData(this).flags.flag40 = 1;
+			if (*reinterpret_cast<short*>(script + 0x1C) != 0) {
+				party.partyFlags = (party.partyFlags & 0xFD) | 2;
 			}
 			changeStat(0, 0, 0);
 		}
 		break;
 	default:
 		break;
-	}
-
-	if (m_lastStateId == 2 || m_lastStateId == 6) {
-		moveCenterTargetParticle();
-		checkTargetParticle();
 	}
 
 	CGCharaObj::onFrameStat();

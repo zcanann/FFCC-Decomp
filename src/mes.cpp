@@ -1580,20 +1580,15 @@ void CMes::Next()
 		{
 			i = i + 1;
 			curr = start + 5;
-			entryCount = remaining - i;
-			if (i < remaining)
+			for (entryCount = remaining - i; entryCount != 0; entryCount = entryCount - 1)
 			{
-				do
+				if ((((*(unsigned char*)((char*)start + 0xe) >> 4) & 0xF) != ((*(unsigned char*)((char*)curr + 0xe) >> 4) & 0xF)) ||
+				    (*(short*)(start + 2) != *(short*)(curr + 2)))
 				{
-					if ((((*(unsigned char*)((char*)start + 0xe) >> 4) & 0xF) != ((*(unsigned char*)((char*)curr + 0xe) >> 4) & 0xF)) ||
-					    (*(short*)(start + 2) != *(short*)(curr + 2)))
-					{
-						break;
-					}
-					i = i + 1;
-					curr = curr + 5;
-					entryCount = entryCount + -1;
-				} while (entryCount != 0);
+					break;
+				}
+				i = i + 1;
+				curr = curr + 5;
 			}
 			runLength = (unsigned int)((int)curr - (int)start) / 0x14;
 			groupWidth = (curr[-5] - *start) + start[1] + *(float*)((char*)this + 0x3d3c);

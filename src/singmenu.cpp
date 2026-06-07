@@ -1181,7 +1181,7 @@ void CMenuPcs::SingMenuInit()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::SingMenuEnd()
+inline void CMenuPcs::SingMenuEnd()
 {
     Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 0;
     gSingMenuHasScriptFoodBase = 0;
@@ -1194,7 +1194,7 @@ void CMenuPcs::SingMenuEnd()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::calcSingleMenu()
+inline void CMenuPcs::calcSingleMenu()
 {
     loadTextureAsync(0, 0, 0, 0, 0, 0, 0);
 }
@@ -1530,7 +1530,7 @@ post_texture_load:
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::SingCalcChara(float frameStep)
+inline void CMenuPcs::SingCalcChara(float frameStep)
 {
     CChara::CModel* model = m_wm.m_handles[0]->m_model;
 
@@ -1877,7 +1877,7 @@ void CMenuPcs::SingleCalcFadeIn()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::SingleDrawFadeIn()
+inline void CMenuPcs::SingleDrawFadeIn()
 {
     SingleFadeState* fadeState = m_singleFadeState;
     if (fadeState == 0) {
@@ -1980,7 +1980,7 @@ void CMenuPcs::SingleCalcFadeOut()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::SingleDrawFadeOut()
+inline void CMenuPcs::SingleDrawFadeOut()
 {
     SingleFadeState* fadeState = m_singleFadeState;
     if (fadeState == 0) {
@@ -2880,7 +2880,7 @@ void CMenuPcs::SetSingWinScl(float scale)
  * JP Address: TODO
  * JP Size: TODO
  */
-float CMenuPcs::GetSingWinScl()
+inline float CMenuPcs::GetSingWinScl()
 {
     return FLOAT_8032ea78;
 }
@@ -3265,7 +3265,7 @@ int CMenuPcs::SingGetLetterAttachflg()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::CalcSingLife()
+inline void CMenuPcs::CalcSingLife()
 {
     int* lifeTimer = &m_singleLifeTimer;
     if (*lifeTimer >= 0) {
@@ -3341,7 +3341,7 @@ void CMenuPcs::SingLifeInit(int timer)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::SingLifeResetWait()
+inline void CMenuPcs::SingLifeResetWait()
 {
     SingLifeInit(0);
 }

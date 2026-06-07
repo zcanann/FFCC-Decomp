@@ -73,7 +73,7 @@ static inline int ReadTagS16(char** text)
 	return (int)acc;
 }
 
-static inline void ApplyCaseMode(char* text, int& caseMode)
+static inline void ApplyCaseMode(char* text, unsigned char& caseMode)
 {
 	if (caseMode != 0)
 	{
@@ -180,7 +180,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		sTag54Init = 1;
 	}
 
-	int caseMode = 0;
+	unsigned char caseMode = 0;
 	int branchMode = 0;
 
 	while (true)
@@ -896,7 +896,7 @@ void CMes::addString(char** text, int branchMode)
 	font->SetScaleY(setupScaleY);
 
 	bool running = true;
-	int caseMode = 0;
+	unsigned char caseMode = 0;
 	int flowMode = 0;
 
 	do

@@ -2032,12 +2032,13 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 		move.z = scaled.z;
 	}
 
-	unsigned char* baseScript = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
-	unsigned char* aiScript = baseScript;
-	short aiState = m_aiState;
-	if (aiState != 0) {
+	unsigned char* aiScript;
+	if (m_aiState == 0) {
+		aiScript = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
+	} else {
 		aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-			(aiState + *reinterpret_cast<unsigned short*>(baseScript + 0x100)) * 0x1D0 + 0x10;
+			(static_cast<int>(m_aiState) +
+			 *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x100)) * 0x1D0 + 0x10;
 	}
 
 	if ((m_bind != 0) &&
@@ -2087,7 +2088,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 		hitCylinder.m_top.y = move.y;
 		hitCylinder.m_top.z = move.z;
 
-		int hit = MapMng.CheckHitCylinderNear(&hitCylinder, reinterpret_cast<Vec*>(&move), *reinterpret_cast<unsigned short*>(baseScript + 0x1B2));
+		int hit = MapMng.CheckHitCylinderNear(&hitCylinder, reinterpret_cast<Vec*>(&move), *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1B2));
 		if (hit != 0) {
 			if (hitScale != NULL) {
 				*hitScale = g_hit_t;
@@ -2100,7 +2101,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 
 	if ((flags & 2) != 0) {
 		float halfAngle = FLOAT_80331A34 * FLOAT_80331A20 *
-			static_cast<float>(*reinterpret_cast<unsigned short*>(baseScript + 0xCA));
+			static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xCA));
 		float sideDist = FLOAT_803319D8;
 		if (FLOAT_803319D8 != halfAngle) {
 			sideDist = FLOAT_80331A40 / static_cast<float>(tan(static_cast<double>(halfAngle)));
@@ -2200,7 +2201,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 
 			didHit = 1;
 			float cylRadius = FLOAT_80331A34 * object->m_bodyEllipsoidRadius;
-			unsigned short hitMask = *reinterpret_cast<unsigned short*>(baseScript + 0x1B2);
+			unsigned short hitMask = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1B2);
 			Vec cylTop;
 			{
 				CVector delta;

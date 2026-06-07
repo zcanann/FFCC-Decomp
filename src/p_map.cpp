@@ -165,12 +165,9 @@ unsigned char g_map_calc_prof ATTRIBUTE_ALIGN(4);
 unsigned char g_map_draw_prof ATTRIBUTE_ALIGN(4);
 static const float kPMapBoundMinInit = 10000000000.0f;
 static const float kPMapBoundMaxInit = -10000000000.0f;
-extern "C" const float DrawRangeDefault_8032FA08;
-extern "C" const float kMapBoundsCenterScale_8032FA0C;
-extern "C" const float kMapCameraCenterYOffset_8032FA10;
-#define DrawRangeDefault DrawRangeDefault_8032FA08
-#define kMapBoundsCenterScale kMapBoundsCenterScale_8032FA0C
-#define kMapCameraCenterYOffset kMapCameraCenterYOffset_8032FA10
+extern "C" const float DrawRangeDefault;
+extern "C" const float kMapBoundsCenterScale;
+extern "C" const float kMapCameraCenterYOffset;
 
 static inline float LoadFloat(const float& value)
 {

@@ -680,50 +680,11 @@ int CMenuPcs::EquipClose()
 	float fVar1 = kEquipZero;
 	if (**(short**)&this->m_equipList == doneCount) {
 		item = GetEquipListStorage(this)->entries;
-		unsigned int uVar6 = (unsigned int)itemCount;
-		if (0 < (int)uVar6) {
-			unsigned int blk = uVar6 >> 3;
-			if (blk != 0) {
-				do {
-					item[0].startFrame = 0;
-					item[0].duration = 1;
-					item[0].alpha = fVar1;
-					item[1].startFrame = 0;
-					item[1].duration = 1;
-					item[1].alpha = fVar1;
-					item[2].startFrame = 0;
-					item[2].duration = 1;
-					item[2].alpha = fVar1;
-					item[3].startFrame = 0;
-					item[3].duration = 1;
-					item[3].alpha = fVar1;
-					item[4].startFrame = 0;
-					item[4].duration = 1;
-					item[4].alpha = fVar1;
-					item[5].startFrame = 0;
-					item[5].duration = 1;
-					item[5].alpha = fVar1;
-					item[6].startFrame = 0;
-					item[6].duration = 1;
-					item[6].alpha = fVar1;
-					item[7].startFrame = 0;
-					item[7].duration = 1;
-					item[7].alpha = fVar1;
-					item += 8;
-					blk = blk - 1;
-				} while (blk != 0);
-				uVar6 = uVar6 & 7;
-				if (uVar6 == 0) {
-					return 1;
-				}
-			}
-			do {
-				item->startFrame = 0;
-				item->duration = 1;
-				item->alpha = fVar1;
-				item++;
-				uVar6 = uVar6 - 1;
-			} while (uVar6 != 0);
+		for (int j = 0; j < itemCount; j++) {
+			item->startFrame = 0;
+			item->duration = 1;
+			item->alpha = fVar1;
+			item++;
 		}
 		return 1;
 	}

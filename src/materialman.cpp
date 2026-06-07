@@ -1684,14 +1684,14 @@ void CMaterialMan::SetShadow(CMapShadow& shadow, float (*viewMtx) [4], int shado
 
         Mtx texMtx;
         PSMTXConcat(shadow.m_shadowMtx, viewMtx, texMtx);
-        GXLoadTexMtxImm(texMtx, m_texMtxCur, GX_MTX2x4);
+        GXLoadTexMtxImm(texMtx, m_texMtxCur, GX_MTX3x4);
 
         int texMtxCur = m_texMtxCur;
         m_texMtxCur = texMtxCur + 3;
 
         int texCoordCur = m_texCoordIdCur;
         m_texCoordIdCur = texCoordCur + 1;
-        GXSetTexCoordGen2(static_cast<GXTexCoordID>(texCoordCur), GX_TG_MTX2x4, GX_TG_TEX0, texMtxCur, GX_FALSE,
+        GXSetTexCoordGen2(static_cast<GXTexCoordID>(texCoordCur), GX_TG_MTX3x4, GX_TG_POS, texMtxCur, GX_FALSE,
                           GX_PTIDENTITY);
 
         int texMapCur = m_texMapIdCur;
@@ -1703,7 +1703,7 @@ void CMaterialMan::SetShadow(CMapShadow& shadow, float (*viewMtx) [4], int shado
             m_texMapIdCur = texMapCur + 1;
             TextureMan.SetTexture(static_cast<_GXTexMapID>(texMapCur), material->m_textureData.m_textures[1]);
             m_shadowKColorIds[m_shadowMaterialCount] = material->m_shadowKColorId;
-            m_shadowKColorMask |= static_cast<unsigned char>(1 << m_shadowMaterialCount);
+            m_shadowKColorMask |= (1 << m_shadowMaterialCount);
             m_shadowTextureCount = m_shadowTextureCount + 1;
         }
 

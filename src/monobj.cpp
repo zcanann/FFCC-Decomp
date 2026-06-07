@@ -830,9 +830,12 @@ void CGMonObj::seKiduki()
 	}
 
 	bool notice = false;
-	int partyIndex = -1;
+	int partyIndex;
 
-	if (m_unk6BD == 0) {
+	if (m_unk6BD != 0) {
+		partyIndex = m_targetPartyIndex;
+	} else {
+		partyIndex = -1;
 		double soundLimit = DOUBLE_80331A18;
 		if (Game.m_gameWork.m_soundOptionFlag != 0) {
 			soundLimit = DOUBLE_80331A10;
@@ -847,8 +850,6 @@ void CGMonObj::seKiduki()
 			         static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xC8)),
 			         &hitScale, &partyIndex);
 		}
-	} else {
-		partyIndex = m_targetPartyIndex;
 	}
 
 	if (partyIndex >= 0) {

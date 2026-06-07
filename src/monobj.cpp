@@ -685,11 +685,11 @@ void CGMonObj::onCancelStat(int state)
 		break;
 
 	case 0x18:
-		m_unk6BE = 1;
+		m_actionBranch = 1;
 		object->SetAnimSlot(0, 0);
 		object->SetAnimSlot(4, 4);
 		object->m_bgColMask = (object->m_bgColMask | 0x50000) & 0xFFFFFFF7;
-		object->m_displayFlags &= 0xFFFFFFEF;
+		object->m_objectFlags &= 0xFFFFFFEF;
 		break;
 
 	case 0x1D:

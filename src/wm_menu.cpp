@@ -6736,7 +6736,7 @@ void CMenuPcs::CalcWMFrame0(int param)
 
 	if (param < 0) {
 		float offset = static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(frame + 8)) + static_cast<int>(*reinterpret_cast<short*>(frame + 4)));
-		if (param > -11) {
+		if (param >= -10) {
 			unsigned int sign = static_cast<unsigned int>(param) >> 31;
 			unsigned int absParam = (sign ^ static_cast<unsigned int>(param)) - sign;
 			float t_unclamped = static_cast<float>(static_cast<int>(absParam));

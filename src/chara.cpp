@@ -2594,7 +2594,7 @@ CChara::CMesh::~CMesh()
 void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CStage* stage)
 {
 	CCharaModelRefRaw* modelRef = model->m_data;
-	u16 idx = modelRef->m_meshCount;
+	u32 idx = modelRef->m_meshCount;
 	void* meshRefBase = modelRef->m_meshRefData;
 	CCharaMeshRefRaw* meshRef = reinterpret_cast<CCharaMeshRefRaw*>((u8*)meshRefBase + (idx * 0x64));
 	m_data = meshRef;

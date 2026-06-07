@@ -1103,8 +1103,7 @@ comm_fail:
             }
         }
         retryLine = 0x30F;
-        MiniGameThreadSleepTicks(OSMillisecondsToTicks(1));
-        goto retry_loop;
+        goto retry_sleep;
     case 8:
         if (param[0xC4] != 0)
         {

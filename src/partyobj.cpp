@@ -3529,9 +3529,10 @@ int CGPartyObj::useItem(int itemId)
 	bool canUse = false;
 	int result;
 
-	if ((static_cast<signed char>(m_weaponNodeFlagBytes.m_flags0) < 0) &&
-	    (static_cast<signed char>(m_weaponNodeFlagBytes.m_flags1) < 0) &&
-	    (m_unk63CBits.m_bit80 < 0) &&
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	if ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x9A]) << 24) & 0xC0000000) >> 31) != 0) &&
+	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x9B]) << 24) & 0xC0000000) >> 31) != 0) &&
+	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x63C]) << 24) & 0xC0000000) >> 31) != 0) &&
 	    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0)) {
 		canUse = true;
 	}

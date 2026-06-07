@@ -920,66 +920,86 @@ void CMenuPcs::loadData()
 
 	{
 		PPPCREATEPARAM createParam;
-		unsigned char* effectBase = reinterpret_cast<unsigned char*>(m_effectWork);
-		EffectInfo* eff = reinterpret_cast<EffectInfo*>(effectBase + 9 * 0x524);
-		eff->m_effectNo = 9;
-		eff->m_slotNo = 7;
-		eff->m_object.Create();
-		eff->m_object.m_charaModelHandle =
-		    reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x790)[0];
-		createParam.m_paramB = reinterpret_cast<unsigned int>(&eff->m_object);
-		createParam.m_lookTargetPtr = &eff->m_object;
-		eff->m_partNo = PartMng.pppCreate(0, 9, &createParam, 1);
+		unsigned int* eff = reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(m_effectWork) + 9 * 0x524);
+		eff[0] = 9;
+		CGObject* object = reinterpret_cast<CGObject*>(eff + 3);
+		eff[2] = 7;
+		object->Create();
+		eff[0x41] = reinterpret_cast<unsigned int>(reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x790)[0]);
+		createParam.m_paramB = reinterpret_cast<unsigned int>(object);
+		createParam.m_lookTargetPtr = object;
+		eff[1] = PartMng.pppCreate(0, 9, &createParam, 1);
 	}
 
 	for (int i = 0; i < 4; i++) {
 		PPPCREATEPARAM createParam;
 		createParam.m_paramC = defaultScale;
 		createParam.m_paramD = defaultScale;
-		EffectInfo* eff = &m_effectWork[i + 8];
-		eff->m_effectNo = i + 5;
-		eff->m_slotNo = i + 8;
-		eff->m_object.Create();
-		eff->m_object.m_charaModelHandle =
-		    reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x4A8 + 0x20)[i];
-		createParam.m_paramB = reinterpret_cast<unsigned int>(&eff->m_object);
-		createParam.m_lookTargetPtr = &eff->m_object;
-		const int group = ((((i + 5) ^ 100) >> 1) - (((i + 5) ^ 100) & (i + 5))) >> 31;
-		eff->m_partNo = PartMng.pppCreate(group, i + 5, &createParam, 1);
+		const int slot = i + 8;
+		const int effectNo = i + 5;
+		unsigned int* eff = reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(m_effectWork) + slot * 0x524);
+		if (slot == 5 && effectNo < 0x13) {
+			eff += 0x149;
+		} else if (slot > 0x10 && slot < 0x15 && effectNo > 0x19) {
+			eff += 0x524;
+		}
+		eff[0] = effectNo;
+		CGObject* object = reinterpret_cast<CGObject*>(eff + 3);
+		eff[2] = slot;
+		object->Create();
+		eff[0x41] = reinterpret_cast<unsigned int>(reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x4A8 + 0x20)[i]);
+		createParam.m_paramB = reinterpret_cast<unsigned int>(object);
+		createParam.m_lookTargetPtr = object;
+		const int group = (((effectNo ^ 100) >> 1) - ((effectNo ^ 100) & effectNo)) >> 31;
+		eff[1] = PartMng.pppCreate(group, effectNo, &createParam, 1);
 	}
 
 	for (int i = 0; i < 5; i++) {
 		PPPCREATEPARAM createParam;
 		createParam.m_paramC = defaultScale;
 		createParam.m_paramD = defaultScale;
-		EffectInfo* eff = &m_effectWork[i + 0xC];
-		eff->m_effectNo = i;
-		eff->m_slotNo = i + 0xC;
-		eff->m_object.Create();
-		eff->m_object.m_charaModelHandle =
-		    reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x4A8 + 0x28)[i];
-		createParam.m_paramB = reinterpret_cast<unsigned int>(&eff->m_object);
-		createParam.m_lookTargetPtr = &eff->m_object;
-		const int group = (((i ^ 100) >> 1) - ((i ^ 100) & i)) >> 31;
-		eff->m_partNo = PartMng.pppCreate(group, i, &createParam, 1);
+		const int slot = i + 0xC;
+		const int effectNo = i;
+		unsigned int* eff = reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(m_effectWork) + slot * 0x524);
+		if (slot == 5 && effectNo < 0x13) {
+			eff += 0x149;
+		} else if (slot > 0x10 && slot < 0x15 && effectNo > 0x19) {
+			eff += 0x524;
+		}
+		CGObject* object = reinterpret_cast<CGObject*>(eff + 3);
+		eff[0] = effectNo;
+		eff[2] = slot;
+		object->Create();
+		eff[0x41] = reinterpret_cast<unsigned int>(reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x4A8 + 0x28)[i]);
+		createParam.m_paramB = reinterpret_cast<unsigned int>(object);
+		createParam.m_lookTargetPtr = object;
+		const int group = (((effectNo ^ 100) >> 1) - ((effectNo ^ 100) & effectNo)) >> 31;
+		eff[1] = PartMng.pppCreate(group, effectNo, &createParam, 1);
 	}
 
 	for (int i = 0; i < 4; i++) {
 		PPPCREATEPARAM createParam;
 		createParam.m_paramC = defaultScale;
 		createParam.m_paramD = defaultScale;
-		EffectInfo* eff = &m_effectWork[i + 0x20];
-		eff->m_effectNo = i + 10;
-		eff->m_slotNo = i + 0x20;
-		eff->m_object.Create();
-		eff->m_object.m_charaModelHandle =
-		    reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x7F4)[i];
-		createParam.m_paramB = reinterpret_cast<unsigned int>(&eff->m_object);
-		createParam.m_lookTargetPtr = &eff->m_object;
-		const int group = ((((i + 10) ^ 100) >> 1) - (((i + 10) ^ 100) & (i + 10))) >> 31;
-		eff->m_partNo = PartMng.pppCreate(group, i + 10, &createParam, 1);
+		const int slot = i + 0x20;
+		const int effectNo = i + 10;
+		unsigned int* eff = reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(m_effectWork) + slot * 0x524);
+		if (slot == 5 && effectNo < 0x13) {
+			eff += 0x149;
+		} else if (slot > 0x10 && slot < 0x15 && effectNo > 0x19) {
+			eff += 0x524;
+		}
+		eff[0] = effectNo;
+		CGObject* object = reinterpret_cast<CGObject*>(eff + 3);
+		eff[2] = slot;
+		object->Create();
+		eff[0x41] = reinterpret_cast<unsigned int>(reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x7F4)[i]);
+		createParam.m_paramB = reinterpret_cast<unsigned int>(object);
+		createParam.m_lookTargetPtr = object;
+		const int group = (((effectNo ^ 100) >> 1) - ((effectNo ^ 100) & effectNo)) >> 31;
+		eff[1] = PartMng.pppCreate(group, effectNo, &createParam, 1);
 		if (i == 0) {
-			PartPcs.GetParLocIdx(eff->m_partNo, s_RingOrgPos);
+			PartPcs.GetParLocIdx(eff[1], s_RingOrgPos);
 		}
 	}
 

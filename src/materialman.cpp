@@ -2591,7 +2591,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
  */
 void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
 {
-    unsigned long materialIndex = 0;
+    register long materialIndex = 0;
 
     while (materialIndex < static_cast<unsigned long>(m_materials.GetSize())) {
         CMaterial* material = m_materials[materialIndex];

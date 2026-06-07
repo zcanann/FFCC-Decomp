@@ -17,30 +17,30 @@
 #include "ffcc/ref.h"
 #include "ffcc/ringmenu.h"
 extern "C" {
-extern const f32 FLOAT_80330804;
+extern const f32 kMenuFadeStep;
 extern const f32 kMenuInitOne;
 extern const f32 kMenuOrthoBottom;
 extern const f32 kMenuOrthoRight;
 extern const f32 kMenuOrthoFar;
-extern const f32 FLOAT_80330808;
-extern const f32 FLOAT_80330810;
-extern const f32 FLOAT_80330814;
-extern const f32 FLOAT_80330818;
-extern const f32 FLOAT_8033081C;
-extern const f32 FLOAT_80330820;
-extern const f32 FLOAT_80330824;
-extern const f32 FLOAT_80330828;
-extern const f32 FLOAT_8033082C;
-extern const f32 FLOAT_80330830;
+extern const f32 kMenuOne;
+extern const f32 kMenuScreenCenterX;
+extern const f32 kMenuScreenCenterY;
+extern const f32 kMenuMarkerMinY;
+extern const f32 kMenuMarkerMaxY;
+extern const f32 kMenuMarkerCapSize;
+extern const f32 kMenuAlphaMax;
+extern const f32 kMenuMarkerFillYOffset;
+extern const f32 kMenuMarkerFillTopHeight;
+extern const f32 kMenuMarkerFillBottomHeight;
 extern const double kMenuUnsignedIntToDoubleBias;
 extern const double kMenuSignedIntToDoubleBias;
-extern const f32 FLOAT_80330848;
-extern const f32 FLOAT_8033084C;
-extern const f32 FLOAT_80330850;
-extern const f32 FLOAT_80330854;
-extern const f32 FLOAT_80330858;
-extern const f32 FLOAT_8033085C;
-extern const f32 FLOAT_8033086C;
+extern const f32 kMenuPulseStep;
+extern const f32 kMenuHalf;
+extern const f32 kMenuInitRectWidth;
+extern const f32 kMenuInitRectHeight;
+extern const f32 kMenuColorBlendSpan;
+extern const f32 kMenuColorBlendTarget;
+extern const f32 kMenuPaletteBlendStep;
 }
 #include "ffcc/textureman.h"
 #include "ffcc/fontman.h"
@@ -105,30 +105,30 @@ static const char sMenuTexSuna[] = "suna";
 static const char sMenuTexGba[] = "gba";
 static const char sMenuTexBattle2[] = "battle2";
 
-extern "C" const f32 FLOAT_80330804 = 0.015625f;
-extern "C" const f32 FLOAT_80330808 = 1.0f;
+extern "C" const f32 kMenuFadeStep = 0.015625f;
+extern "C" const f32 kMenuOne = 1.0f;
 extern "C" const f32 kMenuInitOne = 0.0f;
-extern "C" const f32 FLOAT_80330810 = 320.0f;
-extern "C" const f32 FLOAT_80330814 = 224.0f;
-extern "C" const f32 FLOAT_80330818 = 16.0f;
-extern "C" const f32 FLOAT_8033081C = 432.0f;
-extern "C" const f32 FLOAT_80330820 = 8.0f;
-extern "C" const f32 FLOAT_80330824 = 255.0f;
-extern "C" const f32 FLOAT_80330828 = 3.0f;
-extern "C" const f32 FLOAT_8033082C = 4.0f;
-extern "C" const f32 FLOAT_80330830 = 2.0f;
+extern "C" const f32 kMenuScreenCenterX = 320.0f;
+extern "C" const f32 kMenuScreenCenterY = 224.0f;
+extern "C" const f32 kMenuMarkerMinY = 16.0f;
+extern "C" const f32 kMenuMarkerMaxY = 432.0f;
+extern "C" const f32 kMenuMarkerCapSize = 8.0f;
+extern "C" const f32 kMenuAlphaMax = 255.0f;
+extern "C" const f32 kMenuMarkerFillYOffset = 3.0f;
+extern "C" const f32 kMenuMarkerFillTopHeight = 4.0f;
+extern "C" const f32 kMenuMarkerFillBottomHeight = 2.0f;
 extern "C" const double kMenuUnsignedIntToDoubleBias = 4503601774854144.0;
 extern "C" const double kMenuSignedIntToDoubleBias = 4503599627370496.0;
-extern "C" const f32 FLOAT_80330848 = 0.1f;
-extern "C" const f32 FLOAT_8033084C = 0.5f;
-extern "C" const f32 FLOAT_80330850 = 120.0f;
-extern "C" const f32 FLOAT_80330854 = 56.0f;
-extern "C" const f32 FLOAT_80330858 = 7.0f;
-extern "C" const f32 FLOAT_8033085C = 245.0f;
+extern "C" const f32 kMenuPulseStep = 0.1f;
+extern "C" const f32 kMenuHalf = 0.5f;
+extern "C" const f32 kMenuInitRectWidth = 120.0f;
+extern "C" const f32 kMenuInitRectHeight = 56.0f;
+extern "C" const f32 kMenuColorBlendSpan = 7.0f;
+extern "C" const f32 kMenuColorBlendTarget = 245.0f;
 extern "C" const f32 kMenuOrthoBottom = 448.0f;
 extern "C" const f32 kMenuOrthoRight = 640.0f;
 extern "C" const f32 kMenuOrthoFar = -100.0f;
-extern "C" const f32 FLOAT_8033086C = 0.125f;
+extern "C" const f32 kMenuPaletteBlendStep = 0.125f;
 
 extern "C" {
 void create__8CMenuPcsFv(CMenuPcs*);
@@ -564,8 +564,8 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
                     tlutColor.g = palette[tlutIndex].highlight.g;
                     tlutColor.b = palette[tlutIndex].highlight.b;
                 } else {
-                    blend = LoadFloat(FLOAT_80330808) - static_cast<float>(colorIndex - 8) * LoadFloat(FLOAT_8033086C);
-                    blendInv = LoadFloat(FLOAT_80330808) - blend;
+                    blend = LoadFloat(kMenuOne) - static_cast<float>(colorIndex - 8) * LoadFloat(kMenuPaletteBlendStep);
+                    blendInv = LoadFloat(kMenuOne) - blend;
                     tlutColor.r = static_cast<u8>(static_cast<float>(palette[tlutIndex].highlight.r) * blend +
                                                   static_cast<float>(palette[tlutIndex].shadow.r) * blendInv);
                     tlutColor.g = static_cast<u8>(static_cast<float>(palette[tlutIndex].highlight.g) * blend +
@@ -900,8 +900,8 @@ void CMenuPcs::draw()
 
         float width = static_cast<float>(texture->m_width);
         float height = static_cast<float>(texture->m_height);
-        PSMTXScale(texMtx, LoadFloat(FLOAT_80330808) / width, LoadFloat(FLOAT_80330808) / height,
-                   LoadFloat(FLOAT_80330808));
+        PSMTXScale(texMtx, LoadFloat(kMenuOne) / width, LoadFloat(kMenuOne) / height,
+                   LoadFloat(kMenuOne));
         GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
         GXSetNumTexGens(1);
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
@@ -909,12 +909,12 @@ void CMenuPcs::draw()
         TextureMan.SetTextureTev(texture);
 
         {
-            int alpha = static_cast<int>(127.5f * (1.0f + sinf(System.m_frameCounter * FLOAT_80330848)));
+            int alpha = static_cast<int>(127.5f * (1.0f + sinf(System.m_frameCounter * kMenuPulseStep)));
             CColor color(0xFF, 0xFF, 0xFF, static_cast<u8>(alpha));
             GXSetChanMatColor(GX_COLOR0A0, color.color);
-            DrawRect(3, LoadFloat(FLOAT_80330810), LoadFloat(FLOAT_80330814), LoadFloat(FLOAT_80330850),
-                     LoadFloat(FLOAT_80330854), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne),
-                     LoadFloat(FLOAT_80330808), LoadFloat(FLOAT_80330808), LoadFloat(kMenuInitOne));
+            DrawRect(3, LoadFloat(kMenuScreenCenterX), LoadFloat(kMenuScreenCenterY), LoadFloat(kMenuInitRectWidth),
+                     LoadFloat(kMenuInitRectHeight), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne),
+                     LoadFloat(kMenuOne), LoadFloat(kMenuOne), LoadFloat(kMenuInitOne));
         }
     }
 
@@ -1177,8 +1177,8 @@ void CMenuPcs::SetTexture(CMenuPcs::TEX tex)
 
         width = *(u32*)((u8*)texture + 0x64);
         height = *(u32*)((u8*)texture + 0x68);
-        PSMTXScale(texMtx, LoadFloat(FLOAT_80330808) / (f32)width, LoadFloat(FLOAT_80330808) / (f32)height,
-                   LoadFloat(FLOAT_80330808));
+        PSMTXScale(texMtx, LoadFloat(kMenuOne) / (f32)width, LoadFloat(kMenuOne) / (f32)height,
+                   LoadFloat(kMenuOne));
         GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
         GXSetNumTexGens(1);
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
@@ -1217,19 +1217,19 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
         float scaledH;
 
         if ((attr & 8) != 0) {
-            u1 = u + LoadFloat(FLOAT_8033084C);
-            u0 = (u + w) - LoadFloat(FLOAT_8033084C);
+            u1 = u + LoadFloat(kMenuHalf);
+            u0 = (u + w) - LoadFloat(kMenuHalf);
         } else {
-            u0 = u + LoadFloat(FLOAT_8033084C);
-            u1 = (u + w) - LoadFloat(FLOAT_8033084C);
+            u0 = u + LoadFloat(kMenuHalf);
+            u1 = (u + w) - LoadFloat(kMenuHalf);
         }
 
         if ((attr & 4) != 0) {
-            v1 = v + LoadFloat(FLOAT_8033084C);
-            v0 = (v1 + h) - LoadFloat(FLOAT_8033084C);
+            v1 = v + LoadFloat(kMenuHalf);
+            v0 = (v1 + h) - LoadFloat(kMenuHalf);
         } else {
-            v0 = v + LoadFloat(FLOAT_8033084C);
-            v1 = (v + h) - LoadFloat(FLOAT_8033084C);
+            v0 = v + LoadFloat(kMenuHalf);
+            v1 = (v + h) - LoadFloat(kMenuHalf);
         }
 
         scaledW = w * us;
@@ -1237,12 +1237,12 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
 
         x0 = x;
         if ((attr & 1) != 0) {
-            x0 = -(scaledW * LoadFloat(FLOAT_8033084C) - x);
+            x0 = -(scaledW * LoadFloat(kMenuHalf) - x);
         }
 
         y0 = y;
         if ((attr & 2) != 0) {
-            y0 = -(scaledH * LoadFloat(FLOAT_8033084C) - y);
+            y0 = -(scaledH * LoadFloat(kMenuHalf) - y);
         }
 
         x1 = x0 + scaledW;
@@ -1318,19 +1318,19 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
         float scaledH;
 
         if ((attr & 8) != 0) {
-            u1 = u + LoadFloat(FLOAT_8033084C);
-            u0 = (u + w) - LoadFloat(FLOAT_8033084C);
+            u1 = u + LoadFloat(kMenuHalf);
+            u0 = (u + w) - LoadFloat(kMenuHalf);
         } else {
-            u0 = u + LoadFloat(FLOAT_8033084C);
-            u1 = (u + w) - LoadFloat(FLOAT_8033084C);
+            u0 = u + LoadFloat(kMenuHalf);
+            u1 = (u + w) - LoadFloat(kMenuHalf);
         }
 
         if ((attr & 4) != 0) {
-            v1 = v + LoadFloat(FLOAT_8033084C);
-            v0 = (v1 + h) - LoadFloat(FLOAT_8033084C);
+            v1 = v + LoadFloat(kMenuHalf);
+            v0 = (v1 + h) - LoadFloat(kMenuHalf);
         } else {
-            v0 = v + LoadFloat(FLOAT_8033084C);
-            v1 = (v + h) - LoadFloat(FLOAT_8033084C);
+            v0 = v + LoadFloat(kMenuHalf);
+            v1 = (v + h) - LoadFloat(kMenuHalf);
         }
 
         scaledW = w * us;
@@ -1338,12 +1338,12 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
 
         x0 = x;
         if ((attr & 1) != 0) {
-            x0 = -(scaledW * LoadFloat(FLOAT_8033084C) - x);
+            x0 = -(scaledW * LoadFloat(kMenuHalf) - x);
         }
 
         y0 = y;
         if ((attr & 2) != 0) {
-            y0 = -(scaledH * LoadFloat(FLOAT_8033084C) - y);
+            y0 = -(scaledH * LoadFloat(kMenuHalf) - y);
         }
 
         x1 = x0 + scaledW;
@@ -1568,10 +1568,10 @@ void CMenuPcs::SetExtraFontTlut(int fontNo, _GXColor color)
             out.g = color.g;
             out.b = color.b;
         } else {
-            float blend = FLOAT_80330808 - static_cast<float>(i - 9) / FLOAT_80330858;
-            out.r = static_cast<u8>(-(static_cast<float>(0xF5 - color.r) * blend - FLOAT_8033085C));
-            out.g = static_cast<u8>(-(static_cast<float>(0xF5 - color.g) * blend - FLOAT_8033085C));
-            out.b = static_cast<u8>(-(static_cast<float>(0xF5 - color.b) * blend - FLOAT_8033085C));
+            float blend = kMenuOne - static_cast<float>(i - 9) / kMenuColorBlendSpan;
+            out.r = static_cast<u8>(-(static_cast<float>(0xF5 - color.r) * blend - kMenuColorBlendTarget));
+            out.g = static_cast<u8>(-(static_cast<float>(0xF5 - color.g) * blend - kMenuColorBlendTarget));
+            out.b = static_cast<u8>(-(static_cast<float>(0xF5 - color.b) * blend - kMenuColorBlendTarget));
         }
 
         CTexture* texture = m_fonts[fontNo + 2]->texturePtr;
@@ -1607,7 +1607,7 @@ void CMenuPcs::drawPause()
 
     TextureMan.SetTextureTev(texture);
 
-    int alpha = static_cast<int>(127.5f * (1.0f + sinf(System.m_frameCounter * FLOAT_80330848)));
+    int alpha = static_cast<int>(127.5f * (1.0f + sinf(System.m_frameCounter * kMenuPulseStep)));
     CColor color(0xFF, 0xFF, 0xFF, static_cast<u8>(alpha));
     GXSetChanMatColor(GX_COLOR0A0, color.color);
     DrawRect(3, 0.0f, 0.0f, 640.0f, 480.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
@@ -1775,9 +1775,9 @@ void CMenuPcs::drawBattle()
 {
     if (m_battleHud.m_visible != 0) {
         const float frame = static_cast<float>(m_battleHud.m_fadeCounter);
-        float fade = frame * LoadFloat(FLOAT_80330804);
+        float fade = frame * LoadFloat(kMenuFadeStep);
         if (m_battleHud.m_visible != 0) {
-            fade = LoadFloat(FLOAT_80330808) - fade;
+            fade = LoadFloat(kMenuOne) - fade;
         }
 
         Mtx cameraMtx;
@@ -1789,7 +1789,7 @@ void CMenuPcs::drawBattle()
         viewMtx[3][0] = LoadFloat(kMenuInitOne);
         viewMtx[3][1] = LoadFloat(kMenuInitOne);
         viewMtx[3][2] = LoadFloat(kMenuInitOne);
-        viewMtx[3][3] = LoadFloat(FLOAT_80330808);
+        viewMtx[3][3] = LoadFloat(kMenuOne);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
         PSMTX44Concat(screenMtx, viewMtx, screenMtx);
         Math.MTX44MultVec4(screenMtx, reinterpret_cast<Vec*>(m_battleHud.m_worldPos), &projected);
@@ -1797,8 +1797,8 @@ void CMenuPcs::drawBattle()
         if (LoadFloat(kMenuInitOne) < projected.w) {
             const int totalWidth = static_cast<int>(static_cast<float>(m_battleHud.m_width) * fade);
             const int halfWidth = totalWidth / 2;
-            float screenX = LoadFloat(FLOAT_80330810) + (LoadFloat(FLOAT_80330810) * projected.x) / projected.w;
-            float screenY = LoadFloat(FLOAT_80330814) - (LoadFloat(FLOAT_80330814) * projected.y) / projected.w;
+            float screenX = LoadFloat(kMenuScreenCenterX) + (LoadFloat(kMenuScreenCenterX) * projected.x) / projected.w;
+            float screenY = LoadFloat(kMenuScreenCenterY) - (LoadFloat(kMenuScreenCenterY) * projected.y) / projected.w;
 
             if (screenX < static_cast<float>(halfWidth)) {
                 screenX = static_cast<float>(halfWidth);
@@ -1809,22 +1809,22 @@ void CMenuPcs::drawBattle()
                 }
             }
 
-            if (screenY < LoadFloat(FLOAT_80330818)) {
-                screenY = LoadFloat(FLOAT_80330818);
-            } else if (screenY > LoadFloat(FLOAT_8033081C)) {
-                screenY = LoadFloat(FLOAT_8033081C);
+            if (screenY < LoadFloat(kMenuMarkerMinY)) {
+                screenY = LoadFloat(kMenuMarkerMinY);
+            } else if (screenY > LoadFloat(kMenuMarkerMaxY)) {
+                screenY = LoadFloat(kMenuMarkerMaxY);
             }
 
             int fillWidth = ((totalWidth - 16) * m_battleHud.m_gaugeValue) / m_battleHud.m_gaugeMax;
 
             const float left = screenX - static_cast<float>(halfWidth);
-            const float bodyLeft = left + LoadFloat(FLOAT_80330820);
-            const float alphaF = LoadFloat(FLOAT_80330824) * fade;
+            const float bodyLeft = left + LoadFloat(kMenuMarkerCapSize);
+            const float alphaF = LoadFloat(kMenuAlphaMax) * fade;
             const CColor frameColor(0xFF, 0xFF, 0xFF, static_cast<u8>(alphaF));
             GXSetChanMatColor(GX_COLOR0A0, frameColor.color);
 
             if (LoadFloat(kMenuInitOne) < static_cast<float>(totalWidth)) {
-                float bodyWidth = static_cast<float>(totalWidth) - LoadFloat(FLOAT_80330818);
+                float bodyWidth = static_cast<float>(totalWidth) - LoadFloat(kMenuMarkerMinY);
                 if (bodyWidth < LoadFloat(kMenuInitOne)) {
                     bodyWidth = LoadFloat(kMenuInitOne);
                 }
@@ -1834,48 +1834,48 @@ void CMenuPcs::drawBattle()
                 u32 width = tex->m_width;
                 u32 height = tex->m_height;
                 Mtx texMtx0;
-                PSMTXScale(texMtx0, LoadFloat(FLOAT_80330808) / static_cast<float>(width), LoadFloat(FLOAT_80330808) / static_cast<float>(height), LoadFloat(FLOAT_80330808));
+                PSMTXScale(texMtx0, LoadFloat(kMenuOne) / static_cast<float>(width), LoadFloat(kMenuOne) / static_cast<float>(height), LoadFloat(kMenuOne));
                 GXLoadTexMtxImm(texMtx0, GX_TEXMTX0, GX_MTX2x4);
                 GXSetNumTexGens(1);
                 GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
                 TextureMan.SetTextureTev(tex);
-                MenuPcs.DrawRect(0, left, screenY, LoadFloat(FLOAT_80330820), LoadFloat(FLOAT_80330820), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(FLOAT_80330808), LoadFloat(FLOAT_80330808), LoadFloat(kMenuInitOne));
+                MenuPcs.DrawRect(0, left, screenY, LoadFloat(kMenuMarkerCapSize), LoadFloat(kMenuMarkerCapSize), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(kMenuOne), LoadFloat(kMenuOne), LoadFloat(kMenuInitOne));
 
                 tex = MenuPcs.m_textures[0xDE];
                 TextureMan.SetTexture(GX_TEXMAP0, tex);
                 width = tex->m_width;
                 height = tex->m_height;
                 Mtx texMtx1;
-                PSMTXScale(texMtx1, LoadFloat(FLOAT_80330808) / static_cast<float>(width), LoadFloat(FLOAT_80330808) / static_cast<float>(height), LoadFloat(FLOAT_80330808));
+                PSMTXScale(texMtx1, LoadFloat(kMenuOne) / static_cast<float>(width), LoadFloat(kMenuOne) / static_cast<float>(height), LoadFloat(kMenuOne));
                 GXLoadTexMtxImm(texMtx1, GX_TEXMTX0, GX_MTX2x4);
                 GXSetNumTexGens(1);
                 GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
                 TextureMan.SetTextureTev(tex);
-                MenuPcs.DrawRect(0, bodyLeft, screenY, bodyWidth, LoadFloat(FLOAT_80330820), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(FLOAT_80330808), LoadFloat(FLOAT_80330808), LoadFloat(kMenuInitOne));
+                MenuPcs.DrawRect(0, bodyLeft, screenY, bodyWidth, LoadFloat(kMenuMarkerCapSize), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(kMenuOne), LoadFloat(kMenuOne), LoadFloat(kMenuInitOne));
 
                 tex = MenuPcs.m_textures[0xDF];
                 TextureMan.SetTexture(GX_TEXMAP0, tex);
                 width = tex->m_width;
                 height = tex->m_height;
                 Mtx texMtx2;
-                PSMTXScale(texMtx2, LoadFloat(FLOAT_80330808) / static_cast<float>(width), LoadFloat(FLOAT_80330808) / static_cast<float>(height), LoadFloat(FLOAT_80330808));
+                PSMTXScale(texMtx2, LoadFloat(kMenuOne) / static_cast<float>(width), LoadFloat(kMenuOne) / static_cast<float>(height), LoadFloat(kMenuOne));
                 GXLoadTexMtxImm(texMtx2, GX_TEXMTX0, GX_MTX2x4);
                 GXSetNumTexGens(1);
                 GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
                 TextureMan.SetTextureTev(tex);
-                MenuPcs.DrawRect(0, (left + static_cast<float>(totalWidth)) - LoadFloat(FLOAT_80330820), screenY, LoadFloat(FLOAT_80330820), LoadFloat(FLOAT_80330820), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(FLOAT_80330808), LoadFloat(FLOAT_80330808), LoadFloat(kMenuInitOne));
+                MenuPcs.DrawRect(0, (left + static_cast<float>(totalWidth)) - LoadFloat(kMenuMarkerCapSize), screenY, LoadFloat(kMenuMarkerCapSize), LoadFloat(kMenuMarkerCapSize), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(kMenuOne), LoadFloat(kMenuOne), LoadFloat(kMenuInitOne));
             }
 
             const int gauge = (m_battleHud.m_gaugeCounter * 0xFF) / 16;
             const CColor fillTop(0xFF, gauge, gauge, static_cast<u8>(alphaF));
             GXSetChanMatColor(GX_COLOR0A0, fillTop.color);
             TextureMan.SetTextureTev(0);
-            DrawRect(0, bodyLeft, (screenY + LoadFloat(FLOAT_80330828)) - LoadFloat(FLOAT_80330808), static_cast<float>(fillWidth), LoadFloat(FLOAT_8033082C), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(FLOAT_80330808), LoadFloat(FLOAT_80330808), LoadFloat(kMenuInitOne));
+            DrawRect(0, bodyLeft, (screenY + LoadFloat(kMenuMarkerFillYOffset)) - LoadFloat(kMenuOne), static_cast<float>(fillWidth), LoadFloat(kMenuMarkerFillTopHeight), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(kMenuOne), LoadFloat(kMenuOne), LoadFloat(kMenuInitOne));
 
             const int gaugeTop = ((m_battleHud.m_gaugeCounter * 0x7F) / 16) + 0x80;
             const CColor fillBottom(0xFF, gaugeTop, gauge, static_cast<u8>(alphaF));
             GXSetChanMatColor(GX_COLOR0A0, fillBottom.color);
-            DrawRect(0, bodyLeft, screenY + LoadFloat(FLOAT_80330828), static_cast<float>(fillWidth), LoadFloat(FLOAT_80330830), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(FLOAT_80330808), LoadFloat(FLOAT_80330808), LoadFloat(kMenuInitOne));
+            DrawRect(0, bodyLeft, screenY + LoadFloat(kMenuMarkerFillYOffset), static_cast<float>(fillWidth), LoadFloat(kMenuMarkerFillBottomHeight), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(kMenuOne), LoadFloat(kMenuOne), LoadFloat(kMenuInitOne));
         }
     }
 

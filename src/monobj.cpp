@@ -3313,7 +3313,7 @@ void CGMonObj::statWatch()
 				(static_cast<int>(aiState) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
 		}
 
-		if ((*reinterpret_cast<short*>(aiScript + 0x10A) == 1) && (monObj->m_unk6BC == 0)) {
+		if ((*reinterpret_cast<unsigned short*>(aiScript + 0x10A) == 1) && (monObj->m_unk6BC == 0)) {
 			float noticeRange = static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xCE));
 			if (*reinterpret_cast<float*>(mon + targetPartyIndex * 4 + 0x5D0) < noticeRange) {
 				if (*reinterpret_cast<unsigned short*>(script + 0x10C) == 1) {

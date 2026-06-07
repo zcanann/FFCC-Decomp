@@ -19,7 +19,7 @@ extern const float kCharaAnimNegativeOne;
 extern const float kCharaAnimFullTurnDegrees;
 extern const float kYmBreathHalfCircleDegrees = 180.0f;
 extern const float kYmBreathNegativeHalfCircleDegrees = -180.0f;
-extern const double DOUBLE_80330CA0 = 4503599627370496.0;
+extern const double kYmBreathIntToDoubleBias = 4503599627370496.0;
 extern const float kYmBreathSpreadScale = 2.0f;
 extern const double kYmBreathHalfChance = 0.5;
 extern const char s_CardGameCode_80330CB8[] = "FFCC";

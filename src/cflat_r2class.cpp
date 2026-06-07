@@ -939,6 +939,11 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		}
+		case -0x1F:
+			engineObject->m_attrFlags = object->m_localBase[0];
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
 		case -0x21: {
 			Vec hitStart;
 			Vec hitTarget;
@@ -961,7 +966,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		}
 		case -0x22:
-			engineObject->m_attrFlags = object->m_localBase[0];
+			engineObject->unk_0x184 = reinterpret_cast<float*>(object->m_localBase)[0];
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

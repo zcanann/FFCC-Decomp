@@ -1836,7 +1836,7 @@ void CMenuPcs::LetterListDraw()
 		CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[iconLetterIndex];
 		if (letter->AttachmentValue() != 0) {
 			const int icon = 0x26 + (letter->IsAttachmentClaimed() ? 1 : 0);
-			DrawSingleIcon(icon, iconX, static_cast<int>(static_cast<double>(iconY)), FLOAT_803330f8, 0, FLOAT_803330f8);
+			DrawSingleIcon(icon, iconX, static_cast<int>(static_cast<float>(iconY)), FLOAT_803330f8, 1, FLOAT_803330f8);
 		}
 		iconY += 0x20;
 	}

@@ -750,8 +750,10 @@ void CFlatRuntime::deleteObject(CFlatRuntime::CObject* object)
 CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 {
 	u8* const self = reinterpret_cast<u8*>(this);
-	CClass* classBase = 0;
-	if (classIndex != -1) {
+	CClass* classBase;
+	if (classIndex == -1) {
+		classBase = 0;
+	} else {
 		classBase = &m_classes[classIndex];
 	}
 

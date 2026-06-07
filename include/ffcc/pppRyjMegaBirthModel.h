@@ -17,7 +17,7 @@ struct PRyjMegaBirthModel
     u16 m_maxParticles;           // 0x20
     u16 m_emitCount;              // 0x22
     u16 m_emitInterval;           // 0x24
-    s16 m_life;                   // 0x26
+    u16 m_life;                   // 0x26
     u8 m_fadeOutFrames;           // 0x28
     u8 m_fadeInFrames;            // 0x29
     u8 m_spawnMode;               // 0x2A

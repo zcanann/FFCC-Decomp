@@ -1182,71 +1182,6 @@ void CMenuPcs::DrawOptionMenu()
 	float rowCos = static_cast<float>(cos(static_cast<double>(FLOAT_80333594 * rowAngle)));
 
 	switch (m_optionIndex) {
-	case 2: {
-		CTexture* meterTexture = GetTextureSetTexture(GetMenuTextureSet(this, 0xBC), 3);
-		unsigned int meterWidth = meterTexture->m_width;
-		unsigned int meterHeight = meterTexture->m_height;
-		float iconWave = FLOAT_80333620 * rowSin;
-		float leftIconX =
-		    static_cast<float>(static_cast<int>((FLOAT_803335A8 - FLOAT_803335F8) * rowCos + FLOAT_803335F8));
-		float rightIconX = static_cast<float>(static_cast<int>(
-		    -(((FLOAT_8033361C + FLOAT_80333600) - FLOAT_803335A8) * rowCos - FLOAT_80333600)));
-		float leftIconY = FLOAT_803335FC - iconWave;
-		float rightIconY = FLOAT_80333604 + iconWave;
-
-		gUtil.CalcUV(uv0.x, uv0.y, 0, 0x28, meterWidth, meterHeight);
-		gUtil.CalcUV(uv1.x, uv1.y, 0x18, 0x40, meterWidth, meterHeight);
-		gUtil.RenderTextureQuad(leftIconX, leftIconY, FLOAT_8033361C, FLOAT_8033361C, meterTexture, &uv0, &uv1,
-		                        &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
-
-		gUtil.CalcUV(uv0.x, uv0.y, 0, 0, meterWidth, meterHeight);
-		gUtil.CalcUV(uv1.x, uv1.y, 0x28, 0x28, meterWidth, meterHeight);
-		gUtil.RenderTextureQuad(rightIconX, rightIconY, FLOAT_80333588, FLOAT_80333588, meterTexture, &uv0, &uv1,
-		                        &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
-
-		color.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80333550 * m_optionColumnAnim));
-		if (m_leftHintTimer == 0) {
-			gUtil.CalcUV(uv0.x, uv0.y, 0, 0x58, meterWidth, meterHeight);
-			gUtil.CalcUV(uv1.x, uv1.y, 0x10, 0x70, meterWidth, meterHeight);
-		} else {
-			gUtil.CalcUV(uv0.x, uv0.y, 0x18, 0x58, meterWidth, meterHeight);
-			gUtil.CalcUV(uv1.x, uv1.y, 0x28, 0x70, meterWidth, meterHeight);
-		}
-		gUtil.RenderTextureQuad(FLOAT_80333564, FLOAT_80333608, FLOAT_80333624, FLOAT_8033361C, meterTexture, &uv0,
-		                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
-
-		if (m_rightHintTimer == 0) {
-			gUtil.CalcUV(uv0.x, uv0.y, 0x48, 0x5C, meterWidth, meterHeight);
-			gUtil.CalcUV(uv1.x, uv1.y, 0x30, 0x7C, meterWidth, meterHeight);
-		} else {
-			gUtil.CalcUV(uv0.x, uv0.y, 0x60, 0x5C, meterWidth, meterHeight);
-			gUtil.CalcUV(uv1.x, uv1.y, 0x48, 0x7C, meterWidth, meterHeight);
-		}
-		gUtil.RenderTextureQuad(FLOAT_8033360C, FLOAT_80333608, FLOAT_8033361C, FLOAT_80333570, meterTexture, &uv0,
-		                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
-
-		gUtil.CalcUV(uv0.x, uv0.y, 0x40, 0x28, meterWidth, meterHeight);
-		gUtil.CalcUV(uv1.x, uv1.y, 0x50, 0x38, meterWidth, meterHeight);
-		for (int i = 0, x = 0; i < 12; i++, x += 0x10) {
-			float barX = FLOAT_80333610 + static_cast<float>(x);
-			gUtil.RenderTextureQuad(barX, FLOAT_80333614, FLOAT_80333624, FLOAT_80333624, meterTexture, &uv0,
-			                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
-			if ((m_optionMenuState != 2) && (i + 1 <= m_bgmVolume)) {
-				gUtil.RenderTextureQuad(barX, FLOAT_80333614, FLOAT_80333624, FLOAT_80333624, meterTexture, &uv0,
-				                        &uv1, &color, GX_BL_ONE, GX_BL_ONE);
-			}
-		}
-
-		float minTextX = FLOAT_80333614;
-		float volumeTextY = FLOAT_80333618;
-		char* maxText = g_strMenuUtilMes[languageBase + 17];
-		DrawFont(static_cast<int>(minTextX), static_cast<int>(volumeTextY), color, 7,
-		         g_strMenuUtilMes[languageBase + 16], kOptionAnimMax, kOptionAnimMax);
-		float maxX = FLOAT_80333628 - font->GetWidth(maxText);
-		DrawFont(static_cast<int>(maxX), static_cast<int>(volumeTextY), color, 7, maxText, kOptionAnimMax,
-		         kOptionAnimMax);
-		break;
-	}
 	case 0: {
 		CTextureSet* textureSet = GetMenuTextureSet(this, 0xBC);
 		CTexture* sideTexture = GetTextureSetTexture(textureSet, 1);
@@ -1365,6 +1300,71 @@ void CMenuPcs::DrawOptionMenu()
 		          kOptionAnimMax);
 		break;
 	}
+	case 2: {
+		CTexture* meterTexture = GetTextureSetTexture(GetMenuTextureSet(this, 0xBC), 3);
+		unsigned int meterWidth = meterTexture->m_width;
+		unsigned int meterHeight = meterTexture->m_height;
+		float iconWave = FLOAT_80333620 * rowSin;
+		float leftIconX =
+		    static_cast<float>(static_cast<int>((FLOAT_803335A8 - FLOAT_803335F8) * rowCos + FLOAT_803335F8));
+		float rightIconX = static_cast<float>(static_cast<int>(
+		    -(((FLOAT_8033361C + FLOAT_80333600) - FLOAT_803335A8) * rowCos - FLOAT_80333600)));
+		float leftIconY = FLOAT_803335FC - iconWave;
+		float rightIconY = FLOAT_80333604 + iconWave;
+
+		gUtil.CalcUV(uv0.x, uv0.y, 0, 0x28, meterWidth, meterHeight);
+		gUtil.CalcUV(uv1.x, uv1.y, 0x18, 0x40, meterWidth, meterHeight);
+		gUtil.RenderTextureQuad(leftIconX, leftIconY, FLOAT_8033361C, FLOAT_8033361C, meterTexture, &uv0, &uv1,
+		                        &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+
+		gUtil.CalcUV(uv0.x, uv0.y, 0, 0, meterWidth, meterHeight);
+		gUtil.CalcUV(uv1.x, uv1.y, 0x28, 0x28, meterWidth, meterHeight);
+		gUtil.RenderTextureQuad(rightIconX, rightIconY, FLOAT_80333588, FLOAT_80333588, meterTexture, &uv0, &uv1,
+		                        &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+
+		color.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80333550 * m_optionColumnAnim));
+		if (m_leftHintTimer == 0) {
+			gUtil.CalcUV(uv0.x, uv0.y, 0, 0x58, meterWidth, meterHeight);
+			gUtil.CalcUV(uv1.x, uv1.y, 0x10, 0x70, meterWidth, meterHeight);
+		} else {
+			gUtil.CalcUV(uv0.x, uv0.y, 0x18, 0x58, meterWidth, meterHeight);
+			gUtil.CalcUV(uv1.x, uv1.y, 0x28, 0x70, meterWidth, meterHeight);
+		}
+		gUtil.RenderTextureQuad(FLOAT_80333564, FLOAT_80333608, FLOAT_80333624, FLOAT_8033361C, meterTexture, &uv0,
+		                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+
+		if (m_rightHintTimer == 0) {
+			gUtil.CalcUV(uv0.x, uv0.y, 0x48, 0x5C, meterWidth, meterHeight);
+			gUtil.CalcUV(uv1.x, uv1.y, 0x30, 0x7C, meterWidth, meterHeight);
+		} else {
+			gUtil.CalcUV(uv0.x, uv0.y, 0x60, 0x5C, meterWidth, meterHeight);
+			gUtil.CalcUV(uv1.x, uv1.y, 0x48, 0x7C, meterWidth, meterHeight);
+		}
+		gUtil.RenderTextureQuad(FLOAT_8033360C, FLOAT_80333608, FLOAT_8033361C, FLOAT_80333570, meterTexture, &uv0,
+		                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+
+		gUtil.CalcUV(uv0.x, uv0.y, 0x40, 0x28, meterWidth, meterHeight);
+		gUtil.CalcUV(uv1.x, uv1.y, 0x50, 0x38, meterWidth, meterHeight);
+		for (int i = 0, x = 0; i < 12; i++, x += 0x10) {
+			float barX = FLOAT_80333610 + static_cast<float>(x);
+			gUtil.RenderTextureQuad(barX, FLOAT_80333614, FLOAT_80333624, FLOAT_80333624, meterTexture, &uv0,
+			                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+			if ((m_optionMenuState != 2) && (i + 1 <= m_bgmVolume)) {
+				gUtil.RenderTextureQuad(barX, FLOAT_80333614, FLOAT_80333624, FLOAT_80333624, meterTexture, &uv0,
+				                        &uv1, &color, GX_BL_ONE, GX_BL_ONE);
+			}
+		}
+
+		float minTextX = FLOAT_80333614;
+		float volumeTextY = FLOAT_80333618;
+		char* maxText = g_strMenuUtilMes[languageBase + 17];
+		DrawFont(static_cast<int>(minTextX), static_cast<int>(volumeTextY), color, 7,
+		         g_strMenuUtilMes[languageBase + 16], kOptionAnimMax, kOptionAnimMax);
+		float maxX = FLOAT_80333628 - font->GetWidth(maxText);
+		DrawFont(static_cast<int>(maxX), static_cast<int>(volumeTextY), color, 7, maxText, kOptionAnimMax,
+		         kOptionAnimMax);
+		break;
+	}
 	case 3: {
 		CTexture* meterTexture = GetTextureSetTexture(GetMenuTextureSet(this, 0xBC), 3);
 		unsigned int meterWidth = meterTexture->m_width;
@@ -1430,7 +1430,7 @@ void CMenuPcs::DrawOptionMenu()
 		         kOptionAnimMax);
 		break;
 	}
-	default: {
+	case 4: {
 		CTextureSet* textureSet = GetMenuTextureSet(this, 0xBC);
 		color.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80333550 * m_optionColumnAnim));
 		unsigned int rowAnimFrame;

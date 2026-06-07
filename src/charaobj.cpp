@@ -1355,14 +1355,14 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 
 	if (resistType == 3) {
 		if (CharaObjIsElementalStatus(staType)) {
-			putParticle(0x201, 0, hitPos, FLOAT_803319A8 * FLOAT_803319AC * m_attackColRadius, 0x65);
+			putParticle(0x201, 0, hitPos, FLOAT_803319A8 * (FLOAT_803319AC * m_attackColRadius), 0x65);
 		} else if (CharaObjIsBreakStatus(staType)) {
-			putParticle(0x200, 0, hitPos, FLOAT_803319A8 * FLOAT_803319AC * m_attackColRadius, 0x1D);
+			putParticle(0x200, 0, hitPos, FLOAT_803319A8 * (FLOAT_803319AC * m_attackColRadius), 0x1D);
 		}
 	} else if ((resistType > 1 || (resistType == 1 &&
 	           ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + resolvedItemId * 0x48 + 0x32) & 1) == 0))) &&
 	           (static_cast<unsigned int>(staType - 8) <= 1 || staType == 6 || staType == 3)) {
-		putParticle(0x201, 0, hitPos, FLOAT_803319A8 * FLOAT_803319AC * m_attackColRadius, 0x65);
+		putParticle(0x201, 0, hitPos, FLOAT_803319A8 * (FLOAT_803319AC * m_attackColRadius), 0x65);
 	}
 
 	damageClamp = 0;

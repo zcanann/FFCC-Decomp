@@ -4077,24 +4077,24 @@ void CMenuPcs::drawWorld()
 void CMenuPcs::DrawMainMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	GXColor matColor;
 
 	const short state = m_wmWorldState->m_mainState;
 	float frameAlpha;
 	if (state == 0) {
 		frameAlpha = static_cast<float>(DOUBLE_803314e8 * static_cast<double>(m_wmWorldState->m_frameCounter));
-	} else if (state <= 0 || state >= 4) {
-		frameAlpha = static_cast<float>(-(DOUBLE_803314e8 * static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331420));
-	} else {
+	} else if (state > 0 && state < 4) {
 		frameAlpha = FLOAT_803313e8;
+	} else {
+		frameAlpha = static_cast<float>(-(DOUBLE_803314e8 * static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331420));
 	}
 
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-	GXColor frameColor;
-	frameColor.r = 0xFF;
-	frameColor.g = 0xFF;
-	frameColor.b = 0xFF;
-	frameColor.a = static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(frameAlpha)));
-	GXSetChanMatColor(static_cast<GXChannelID>(4), frameColor);
+	matColor.r = 0xFF;
+	matColor.g = 0xFF;
+	matColor.b = 0xFF;
+	matColor.a = static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(frameAlpha)));
+	GXSetChanMatColor(static_cast<GXChannelID>(4), matColor);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 	int bit = 0;
 	int offset = 0;
@@ -4122,12 +4122,11 @@ void CMenuPcs::DrawMainMenu()
 		}
 		tileAlpha = static_cast<float>(static_cast<double>(tileAlpha) * DOUBLE_803313f8);
 		MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-		GXColor tileColor;
-		tileColor.r = 0xFF;
-		tileColor.g = 0xFF;
-		tileColor.b = 0xFF;
-		tileColor.a = static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(tileAlpha)));
-		GXSetChanMatColor(static_cast<GXChannelID>(4), tileColor);
+		matColor.r = 0xFF;
+		matColor.g = 0xFF;
+		matColor.b = 0xFF;
+		matColor.a = static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(tileAlpha)));
+		GXSetChanMatColor(static_cast<GXChannelID>(4), matColor);
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x33));
 		const float x = FLOAT_80331410;
 		float y = FLOAT_80331440 - x;
@@ -4166,12 +4165,11 @@ void CMenuPcs::DrawMainMenu()
 		if (static_cast<double>(helpAlpha) > DOUBLE_803314f0) {
 			MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 			const double helpColorAlpha = static_cast<double>(FLOAT_80331458 * helpAlpha);
-			GXColor helpColor;
-			helpColor.r = 0xFF;
-			helpColor.g = 0xFF;
-			helpColor.b = 0xFF;
-			helpColor.a = static_cast<unsigned char>(static_cast<int>(helpColorAlpha));
-			GXSetChanMatColor(static_cast<GXChannelID>(4), helpColor);
+			matColor.r = 0xFF;
+			matColor.g = 0xFF;
+			matColor.b = 0xFF;
+			matColor.a = static_cast<unsigned char>(static_cast<int>(helpColorAlpha));
+			GXSetChanMatColor(static_cast<GXChannelID>(4), matColor);
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1F));
 			MenuPcs.DrawRect(0, FLOAT_803313dc, static_cast<float>(DOUBLE_803314d0 - static_cast<double>(FLOAT_80331440)),
 			                 FLOAT_803313e0, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
@@ -4184,10 +4182,10 @@ void CMenuPcs::DrawMainMenu()
 			textList[3] = lbl_80210750[languageIndex + 3];
 			textList[4] = lbl_80210750[languageIndex + 4];
 			unsigned int textAlpha;
-			if (helpAlpha <= FLOAT_803313e8) {
-				textAlpha = static_cast<unsigned int>(static_cast<int>(helpColorAlpha));
-			} else {
+			if (helpAlpha > FLOAT_803313e8) {
 				textAlpha = 0xFF;
+			} else {
+				textAlpha = static_cast<unsigned int>(static_cast<int>(helpColorAlpha));
 			}
 			CColor textColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF));
 			char* const text = textList[m_wmWorldState->m_cardChannel];

@@ -37,7 +37,7 @@ enum CmakeFontSlot {
 
 struct CmakeMenuState {
     unsigned char m_pad00[0x0B];
-    unsigned char m_initialized;
+    char m_initialized;
     char m_selectionInitialized;
     unsigned char m_pad0D[0x10 - 0x0D];
     short m_mode;

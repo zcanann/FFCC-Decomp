@@ -1311,12 +1311,12 @@ void CGPartyObj::command()
 		}
 
 		const int cmdIdx = caravan->GetIdxCmdList();
-		party.unk6EC = cmdIdx;
+		party.unk6BC = cmdIdx;
 		if (cmdIdx == 0) {
-			int weaponItem = 0;
-			int weaponRef = 0;
+			int weaponItem;
+			int weaponRef;
 			caravan->GetCurrentWeaponItem(weaponItem, weaponRef);
-			if (weaponItem == party.unk6EC) {
+			if (weaponItem == party.unk6BC) {
 				const int equippedWeapon =
 					caravan->m_equipment[0] < 0 ? 0 : caravan->m_inventoryItems[caravan->m_equipment[0]];
 				if (weaponRef == equippedWeapon) {
@@ -1374,7 +1374,7 @@ void CGPartyObj::command()
 				}
 			}
 			if (useItem(itemId) != 0) {
-				caravan->GetNumCombi(party.unk6EC, 1);
+				caravan->GetNumCombi(party.unk6BC, 1);
 			}
 			return;
 		}
@@ -1387,8 +1387,8 @@ void CGPartyObj::command()
 			if (itemKind != 1) {
 				return;
 			}
-			int weaponItem = 0;
-			int weaponRef = 0;
+			int weaponItem;
+			int weaponRef;
 			caravan->GetCurrentWeaponItem(weaponItem, weaponRef);
 			if (weaponItem == caravan->GetIdxCmdList() && weaponRef == itemId) {
 				m_itemId = itemId;
@@ -1408,7 +1408,7 @@ void CGPartyObj::command()
 			if (Math.Rand(3) == 0) {
 				ClearAllSta();
 				setSta(0x1B, 900);
-				caravan->GetNumCombi(party.unk6EC, 1);
+				caravan->GetNumCombi(party.unk6BC, 1);
 				return;
 			}
 			m_itemId = 0x103;

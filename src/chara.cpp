@@ -2779,8 +2779,8 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 		case 0x494E464F:
 			m_data->m_nodeIndex = chunk.Get4();
 			m_data->m_infoWord1 = chunk.Get4();
-			m_data->m_flags = static_cast<u8>(((static_cast<s8>(chunk.Get4()) << 7) & 0x80) | (m_data->m_flags & 0x7F));
-			m_data->m_flags = static_cast<u8>(((static_cast<s8>(chunk.Get4()) << 6) & 0x40) | (m_data->m_flags & 0xBF));
+			m_data->m_flagsBits.m_flag_80 = static_cast<s8>(chunk.Get4());
+			m_data->m_flagsBits.m_flag_40 = static_cast<s8>(chunk.Get4());
 			chunk.Get4();
 			chunk.Get4();
 			chunk.Get4();

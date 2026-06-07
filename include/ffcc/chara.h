@@ -344,7 +344,16 @@ public:
 			~CRefData();
 
 			char m_name[0x10];
-			u8 m_flags;
+			union
+			{
+				u8 m_flags;
+				struct
+				{
+					s8 m_flag_80 : 1;
+					s8 m_flag_40 : 1;
+					s8 m_flag_lo : 6;
+				} m_flagsBits;
+			};
 			u8 _pad11[3];
 			u32 m_vertexCount;
 			S16Vec* m_vertices;

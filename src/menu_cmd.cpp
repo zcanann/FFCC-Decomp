@@ -2021,12 +2021,7 @@ void CMenuPcs::DrawUniteList()
 		CmdListEntry* const entry = &GetCmdListStorage(this)->entries[i];
 		const float alpha = (cmd->mode == 3) ? FLOAT_80332a70 : entry->alpha;
 
-		GXColor color;
-		color.r = 0xFF;
-		color.g = 0xFF;
-		color.b = 0xFF;
-		color.a = static_cast<u8>(FLOAT_80332acc * alpha);
-		font->SetColor(color);
+		font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_80332acc * alpha)).color);
 
 		const char* text = 0;
 		if (i < 2) {

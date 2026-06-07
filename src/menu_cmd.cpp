@@ -916,7 +916,7 @@ void CMenuPcs::CmdDraw()
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	for (i = 0; i < cmdList->count; i++) {
+	for (i = 0; i < GetCmdListStorage(this)->count; i++) {
 		const s32 tex = entry->tex;
 		if (tex >= 0) {
 			const float x = static_cast<float>(entry->x);
@@ -1016,7 +1016,7 @@ void CMenuPcs::CmdDraw()
 	}
 
 	if (cmdMode == 2) {
-		CmdListEntry* panel = &entries[cmdList->listEnd + 3];
+		CmdListEntry* panel = &GetCmdListStorage(this)->entries[GetCmdListStorage(this)->listEnd + 3];
 		SetTexture(static_cast<CMenuPcs::TEX>(panel->tex));
 
 		GXColor panelColor;
@@ -1065,7 +1065,7 @@ void CMenuPcs::CmdDraw()
 	if ((cmdMode == 1) && (GetCmdStateView(this)->phase == 1)) {
 		const s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 		const float mark = CalcListPos(GetCmdStateView(this)->scrollTop, letter[0], 1);
-		CmdListEntry* listPos = &entries[cmdList->count];
+		CmdListEntry* listPos = &GetCmdListStorage(this)->entries[GetCmdListStorage(this)->count];
 		if (mark > FLOAT_80332ab0) {
 			DrawListPosMark(static_cast<float>(listPos->x), static_cast<float>(listPos->y), mark);
 		}
@@ -1081,13 +1081,13 @@ void CMenuPcs::CmdDraw()
 		if ((cmdMode == 0) || (cmdMode == 3)) {
 			s32 index = GetCmdStateSelections(GetCmdStateView(this))[cmdMode];
 			if (caravan->m_commandListExtra[index] == 0) {
-				cursorEntry = &entries[index];
+				cursorEntry = &GetCmdListStorage(this)->entries[index];
 			} else {
 				s32 uniteIdx = 0;
 				while ((uniteIdx < s_unitePanelCount) && (s_UniteTop[uniteIdx] != index)) {
 					uniteIdx++;
 				}
-				cursorEntry = &entries[cmdList->listEnd + uniteIdx];
+				cursorEntry = &GetCmdListStorage(this)->entries[GetCmdListStorage(this)->listEnd + uniteIdx];
 				cursorOnUnite = true;
 			}
 			cursorX = static_cast<float>(cursorEntry->x - 0x14);
@@ -1103,7 +1103,7 @@ void CMenuPcs::CmdDraw()
 		} else if (cmdMode == 1) {
 			const s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 			s32 idx = 0;
-			CmdListEntry* scan = &entries[cmdList->count];
+			CmdListEntry* scan = &GetCmdListStorage(this)->entries[GetCmdListStorage(this)->count];
 			while (idx < 8) {
 				if (scan->tex == 0x37) {
 					break;
@@ -1120,7 +1120,7 @@ void CMenuPcs::CmdDraw()
 			cursorX = static_cast<float>(scan->x - 0x14);
 			cursorY = static_cast<float>(scan->y);
 		} else {
-			CmdListEntry* panel = &entries[cmdList->listEnd + 3];
+			CmdListEntry* panel = &GetCmdListStorage(this)->entries[GetCmdListStorage(this)->listEnd + 3];
 			const s32 choices = (DOUBLE_80332a58 == static_cast<double>(panel->scale)) ? 2 : 3;
 			const float pitch = static_cast<float>(
 			    ((static_cast<float>(panel->height) * panel->scale) - DOUBLE_80332b20) /
@@ -1159,9 +1159,9 @@ void CMenuPcs::CmdDraw()
 		}
 	}
 
-	float helpAlpha = entries[cmdList->count].alpha;
+	float helpAlpha = GetCmdListStorage(this)->entries[GetCmdListStorage(this)->count].alpha;
 	if ((cmdMode == 0) || (cmdMode == 2)) {
-		helpAlpha = entries[0].alpha;
+		helpAlpha = GetCmdListStorage(this)->entries[0].alpha;
 	}
 
 	GXColor helpColor;

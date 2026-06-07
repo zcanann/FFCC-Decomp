@@ -21,10 +21,10 @@ extern const char s_pppEmissionShapeObj2;
 extern const float FLOAT_803311e0;
 extern const float FLOAT_803311e4;
 extern const float FLOAT_803311f8;
-extern const float FLOAT_8033111C = 15.0f;
-extern const float FLOAT_80331120 = 7.0f;
+extern const float kCharaFurColorComponentScale = 15.0f;
+extern const float kCharaFurAlphaComponentScale = 7.0f;
 extern const double DOUBLE_80331128 = 4503599627370496.0;
-extern const float FLOAT_80331130 = 10000000.0f;
+extern const float kCharaFurNoHitDepth = 10000000.0f;
 static const char s_pppEmission_cpp[] = "pppEmission.cpp";
 
 static inline MtxPtr CameraMatrix() { return CameraPcs.m_cameraMatrix; }

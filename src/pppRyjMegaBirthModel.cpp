@@ -240,19 +240,6 @@ static inline void orthonormalize_particle_matrix(_PARTICLE_DATA* particleData)
     pppSetRowVector(*(pppFMATRIX*)&particleData->m_matrix, rowX, rowY, rowZ, rowPos);
 }
 
-static inline void wrap_particle_rotation_triplet(u8* particleBytes, s32 offset)
-{
-    for (int i = 0; i < 3; i++) {
-        float* value = f32_at(particleBytes, offset + i * 4);
-        while ((s32)*value > 0x7FFF) {
-            *value = (float)((s32)*value - 0x10000);
-        }
-        while ((s32)*value < -0x8000) {
-            *value = (float)((s32)*value + 0x10000);
-        }
-    }
-}
-
 static inline void wrap_particle_rotation_triplet_s32(u8* particleBytes, s32 offset)
 {
     s32 count = 3;
@@ -269,47 +256,10 @@ static inline void wrap_particle_rotation_triplet_s32(u8* particleBytes, s32 off
     } while (count != 0);
 }
 
-static inline void apply_signed_randomization(u8* particleBytes, s32 offset, u8 flags)
-{
-    if (((flags & 1) != 0) && ((flags & 2) != 0)) {
-        for (int i = 0; i < 3; i++) {
-            float* value = f32_at(particleBytes, offset + i * 4);
-            if (MegaBirthHalfDouble() < (double)Math.RandF()) {
-                *value = *value * FLOAT_803304E8[0];
-            }
-        }
-    } else if ((flags & 2) != 0) {
-        for (int i = 0; i < 3; i++) {
-            float* value = f32_at(particleBytes, offset + i * 4);
-            *value = *value * FLOAT_803304E8[0];
-        }
-    }
-}
-
 static inline signed char random_signed_byte_span(u8 span)
 {
     (void)Math.RandF();
     return (signed char)((s32)((float)(span << 1) * Math.RandF() - (float)(span >> 1)));
-}
-
-static inline void randomize_particle_triplet(u8* particleBytes, s32 offset, u8 flags, float rangeX, float rangeY, float rangeZ)
-{
-    if (flags == 0) {
-        return;
-    }
-
-    if ((flags & 0x20) == 0) {
-        *f32_at(particleBytes, offset + 0) = rangeX * Math.RandF();
-        *f32_at(particleBytes, offset + 4) = rangeY * Math.RandF();
-        *f32_at(particleBytes, offset + 8) = rangeZ * Math.RandF();
-    } else {
-        float shared = rangeX * Math.RandF();
-        *f32_at(particleBytes, offset + 0) = shared;
-        *f32_at(particleBytes, offset + 4) = shared;
-        *f32_at(particleBytes, offset + 8) = shared;
-    }
-
-    apply_signed_randomization(particleBytes, offset, flags);
 }
 
 /*

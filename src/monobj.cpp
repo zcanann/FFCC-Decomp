@@ -3603,12 +3603,12 @@ void CGMonObj::onChangePrg(int value)
 	unsigned int weaponModeBits = (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags)) << 24) & 0xC0000000;
 	if ((static_cast<int>(weaponModeBits) >> 31) != value &&
 		(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC) == 0xB)) {
-		unsigned int isUndead =
+		int isUndead =
 			(static_cast<unsigned int>(
 				 __cntlzw(0xB - *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC))) >>
 			 5) &
 			0xFF;
-		unsigned int isNormal = (static_cast<unsigned int>(__cntlzw(m_unk6BA)) >> 5) & 0xFF;
+		int isNormal = (static_cast<unsigned int>(__cntlzw(m_unk6BA)) >> 5) & 0xFF;
 		int mode = value;
 		if (isUndead == 0) {
 			mode = 1;

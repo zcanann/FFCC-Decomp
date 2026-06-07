@@ -1408,13 +1408,18 @@ void CShopMenu::DrawSoubiBase()
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
     GXSetColorUpdate(GX_TRUE);
 
-    _GXColor fadeA = {0xFF, 0xFF, 0xFF, 0x00};
-    _GXColor fadeB = {0xFF, 0xFF, 0xFF, 0xFF};
-    _GXColor fadeC = {0xFF, 0xFF, 0xFF, 0x00};
-    _GXColor fadeD = {0xFF, 0xFF, 0xFF, 0xFF};
+    _GXColor fadeA;
+    fadeA.r = 0xFF; fadeA.g = 0xFF; fadeA.b = 0xFF; fadeA.a = 0x00;
+    _GXColor fadeB;
+    fadeB.r = 0xFF; fadeB.g = 0xFF; fadeB.b = 0xFF; fadeB.a = 0xFF;
+    _GXColor fadeC;
+    fadeC.r = 0xFF; fadeC.g = 0xFF; fadeC.b = 0xFF; fadeC.a = 0x00;
+    _GXColor fadeD;
+    fadeD.r = 0xFF; fadeD.g = 0xFF; fadeD.b = 0xFF; fadeD.a = 0xFF;
     drawShapeSeqGrouad(9, 0, 0x1C, 0x10C, FLOAT_80332d78, FLOAT_80332dc8, fadeA, fadeB, fadeC, fadeD);
 
-    _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
+    _GXColor white;
+    white.r = 0xFF; white.g = 0xFF; white.b = 0xFF; white.a = 0xFF;
     int x = 0x3C;
     while (x < 0x25C) {
         drawShapeSeqGrouad(9, 0, x, 0x10C, FLOAT_80332d78, FLOAT_80332dc8, white, white, white, white);

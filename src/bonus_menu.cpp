@@ -1623,10 +1623,10 @@ void CMenuPcs::CalcSelectOpenAnim()
 			if (frame < sprite->startFrame) {
 				sprite->alpha = 0.0f;
 			}
-			if (frame < sprite->startFrame + sprite->duration) {
-				sprite->alpha = (1.0f / (float)sprite->duration) * (float)sprite->timer;
-			} else {
+			if (sprite->startFrame + sprite->duration <= frame) {
 				sprite->alpha = 1.0f;
+			} else {
+				sprite->alpha = (1.0f / (float)sprite->duration) * (float)sprite->timer;
 			}
 		}
 

@@ -3098,13 +3098,11 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     case -0x65: {
-        _GXColor color = {
+        CColor shadeColor(
             static_cast<u8>(object->m_localBase[1]),
             static_cast<u8>(object->m_localBase[2]),
             static_cast<u8>(object->m_localBase[3]),
-            0xFF,
-        };
-        CColor shadeColor(color);
+            0xFF);
         CharaPcs.SetMapShadeColor(*object->m_localBase, shadeColor);
         this->push(object, 0);
         outResult = 0;

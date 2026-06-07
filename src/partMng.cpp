@@ -1590,10 +1590,8 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         m_pppMng[0].m_position.x = payloadFloats[0];
         m_pppMng[0].m_position.y = payloadFloats[1];
         m_pppMng[0].m_position.z = payloadFloats[2];
-        m_pppMng[0].m_rotation.x = static_cast<short>(payloadWords[4] >> 16);
-        m_pppMng[0].m_rotation.y = static_cast<short>(payloadWords[4]);
-        m_pppMng[0].m_rotation.z = static_cast<short>(payloadWords[5] >> 16);
-        m_pppMng[0].m_rotation.w = static_cast<short>(payloadWords[5]);
+        *reinterpret_cast<int*>(&m_pppMng[0].m_rotation.x) = payloadWords[4];
+        *reinterpret_cast<int*>(&m_pppMng[0].m_rotation.z) = payloadWords[5];
         m_pppMng[0].m_rotationSpeed = payloadWords[6];
         m_pppMng[0].m_scale.x = payloadFloats[8];
         m_pppMng[0].m_scale.y = payloadFloats[9];

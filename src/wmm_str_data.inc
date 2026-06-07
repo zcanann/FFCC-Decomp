@@ -365,21 +365,21 @@ extern const char lbl_801E658C[];
 extern const char s_Datos_eliminados_801E65AC[];
 extern const char s_No_es_posible_eliminar_los_datos_801E65C0[];
 
-const char* PTR_s_The_data_is_corrupt_[] = {
+const char* s_McStr_en[] = {
     (char*)s_The_data_is_corrupt_801E3838,
     (char*)sWmmEmptyEn,
     (char*)s_Select_game_data_to_load_801E3850,
     (char*)s_Select_save_location_801E386C,
 };
 
-const char* PTR_s_Der_Spielstand_ist_fehlerhaft_[] = {
+const char* s_McStr_de[] = {
     (char*)s_Der_Spielstand_ist_fehlerhaft_801E3884,
     (char*)s_Kein_Spielstand_vorhanden_801E38A4,
     (char*)lbl_801E38C0,
     (char*)lbl_801E38E0,
 };
 
-const char* PTR_s_I_dati_sono_danneggiati_[] = {
+const char* s_McStr_it[] = {
     (char*)s_I_dati_sono_danneggiati_801E3904,
     (char*)sWmmEmptyIt,
     (char*)s_Seleziona_i_dati_da_caricare_801E3920,

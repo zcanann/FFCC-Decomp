@@ -846,7 +846,11 @@ int CMenuPcs::EquipOpen0()
 		item++;
 	}
 
-	return itemCount == doneCount;
+	int result = 0;
+	if (itemCount == doneCount) {
+		result = 1;
+	}
+	return result;
 }
 
 /*

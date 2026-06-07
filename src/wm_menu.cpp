@@ -6931,22 +6931,21 @@ void CMenuPcs::DrawCharaBase()
 void CMenuPcs::CalcChara()
 {
 	WmWorldState* const worldState = m_wmWorldState;
-	unsigned char* const charaSelect = m_wm.m_charaSelectData;
 	unsigned char* modelData = m_wm.m_charaModelData;
 	int* charaWork = reinterpret_cast<int*>(m_wm.m_worldObjData + 0xA00);
 	unsigned int selectedMask = 0;
 
-	if (charaSelect[0x0D] == 1) {
-		selectedMask = 1u << static_cast<unsigned int>(*reinterpret_cast<short*>(charaSelect + 0x04));
+	if (m_wm.m_charaSelectData[0x0D] == 1) {
+		selectedMask = 1u << static_cast<unsigned int>(*reinterpret_cast<short*>(m_wm.m_charaSelectData + 0x04));
 	}
-	if (charaSelect[0x1D] == 1) {
-		selectedMask |= 1u << static_cast<unsigned int>(*reinterpret_cast<short*>(charaSelect + 0x14));
+	if (m_wm.m_charaSelectData[0x1D] == 1) {
+		selectedMask |= 1u << static_cast<unsigned int>(*reinterpret_cast<short*>(m_wm.m_charaSelectData + 0x14));
 	}
-	if (charaSelect[0x2D] == 1) {
-		selectedMask |= 1u << static_cast<unsigned int>(*reinterpret_cast<short*>(charaSelect + 0x24));
+	if (m_wm.m_charaSelectData[0x2D] == 1) {
+		selectedMask |= 1u << static_cast<unsigned int>(*reinterpret_cast<short*>(m_wm.m_charaSelectData + 0x24));
 	}
-	if (charaSelect[0x3D] == 1) {
-		selectedMask |= 1u << static_cast<unsigned int>(*reinterpret_cast<short*>(charaSelect + 0x34));
+	if (m_wm.m_charaSelectData[0x3D] == 1) {
+		selectedMask |= 1u << static_cast<unsigned int>(*reinterpret_cast<short*>(m_wm.m_charaSelectData + 0x34));
 	}
 
 	for (int slot = 0; slot < 8; slot++) {
@@ -6954,7 +6953,7 @@ void CMenuPcs::CalcChara()
 		int effectCount = 0;
 
 		for (int player = 0; player < 4; player++) {
-			unsigned char* const entry = charaSelect + player * 0x10;
+			unsigned char* const entry = m_wm.m_charaSelectData + player * 0x10;
 			const int currentSlot = *reinterpret_cast<short*>(entry + 0x04);
 			if ((entry[0x0D] == 1) && (currentSlot >= 0) && (slot == currentSlot)) {
 				effectCount++;

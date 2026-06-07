@@ -1014,36 +1014,7 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
     unsigned int attr = *reinterpret_cast<unsigned short*>(itemData + 8);
     char textBuffer[256];
 
-    if (label == 0) {
-        font->SetScaleX(FLOAT_80332d2c);
-        font->SetScaleY(FLOAT_80332d28);
-        char* attrStr = MenuPcs.GetAttrStr(attr);
-        font->DrawInit();
-        MenuPcs.DrawNoShadowFont(font, attrStr, static_cast<float>(x + 0x40), static_cast<float>(y), 0x18, 0x12);
-        MenuPcs.DrawInit();
-
-        int fontColor = 9;
-        if ((attr == 0) || (attr >= 9)) {
-            if ((attr == 0xB) || (attr == 0x11) || (attr == 0x12)) {
-                sprintf(textBuffer, s_StringDecimalFormat_80332d44, s_Plus_80332d4c, statValue);
-            } else {
-                if ((attr != 9) && (attr != 10) && (attr != 0xC)) {
-                    return;
-                }
-                sprintf(textBuffer, s_StringDecimalFormat_80332d44, s_Minus_80332d50, statValue);
-                fontColor = 3;
-            }
-        } else {
-            sprintf(textBuffer, s_StringFormat_80332d40, s_PlusOne_80332d38);
-        }
-
-        font->SetScaleX(FLOAT_80332d28);
-        float valueWidth = font->GetWidth(textBuffer);
-        font->DrawInit();
-        MenuPcs.DrawNoShadowFont(font, textBuffer, static_cast<float>(x) + (FLOAT_80332d3c - valueWidth), static_cast<float>(y), fontColor, 0x12);
-        MenuPcs.DrawInit();
-        return;
-    }
+    if (label != 0) {
 
     strcpy(textBuffer, label);
     strcat(textBuffer, s_Colon_80332d30);
@@ -1087,6 +1058,35 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
             MenuPcs.DrawNoShadowFont(font, textBuffer, static_cast<float>(x) + (FLOAT_80332d3c - valueWidth), static_cast<float>(attrY), 9, 0x12);
             MenuPcs.DrawInit();
         }
+    }
+    } else {
+        font->SetScaleX(FLOAT_80332d2c);
+        font->SetScaleY(FLOAT_80332d28);
+        char* attrStr = MenuPcs.GetAttrStr(attr);
+        font->DrawInit();
+        MenuPcs.DrawNoShadowFont(font, attrStr, static_cast<float>(x + 0x40), static_cast<float>(y), 0x18, 0x12);
+        MenuPcs.DrawInit();
+
+        int fontColor = 9;
+        if ((attr == 0) || (attr >= 9)) {
+            if ((attr == 0xB) || (attr == 0x11) || (attr == 0x12)) {
+                sprintf(textBuffer, s_StringDecimalFormat_80332d44, s_Plus_80332d4c, statValue);
+            } else {
+                if ((attr != 9) && (attr != 10) && (attr != 0xC)) {
+                    return;
+                }
+                sprintf(textBuffer, s_StringDecimalFormat_80332d44, s_Minus_80332d50, statValue);
+                fontColor = 3;
+            }
+        } else {
+            sprintf(textBuffer, s_StringFormat_80332d40, s_PlusOne_80332d38);
+        }
+
+        font->SetScaleX(FLOAT_80332d28);
+        float valueWidth = font->GetWidth(textBuffer);
+        font->DrawInit();
+        MenuPcs.DrawNoShadowFont(font, textBuffer, static_cast<float>(x) + (FLOAT_80332d3c - valueWidth), static_cast<float>(y), fontColor, 0x12);
+        MenuPcs.DrawInit();
     }
 }
 /*

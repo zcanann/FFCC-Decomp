@@ -1315,10 +1315,10 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 
 	int resolvedItemId = itemId;
 	int staType;
-	int resistType = 0;
-	int allowEffect = 0;
-	int damageClamp = 0;
-	int effectResult = 0;
+	int resistType;
+	int allowEffect;
+	int damageClamp;
+	int effectResult;
 	char* dbg = s_CGCharaObj_801DC548;
 
 	if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D && *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x48) != 0) {
@@ -1362,6 +1362,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		putParticle(0x201, 0, hitPos, FLOAT_803319A8 * FLOAT_803319AC * m_attackColRadius, 0x65);
 	}
 
+	damageClamp = 0;
 	if (m_lastStateId == 8 && m_subState == 1 &&
 	    ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + resolvedItemId * 0x48 + 0x2C) & 8) == 0)) {
 		CVector selfPos(m_worldPosition);

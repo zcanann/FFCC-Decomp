@@ -8044,8 +8044,8 @@ void CMenuPcs::DrawCMLife()
 		}
 		const float xBase = FLOAT_80331410 + static_cast<float>(col * 0x90);
 		const float yBase = y + FLOAT_8033166C;
-		float x = xBase + static_cast<float>(0x90 - count * 0x10) * static_cast<float>(DOUBLE_803313f8);
-		float step = static_cast<float>(8 - count) * static_cast<float>(DOUBLE_803313f8);
+		float x = static_cast<float>(static_cast<double>(0x90 - count * 0x10) * DOUBLE_803313f8 + static_cast<double>(xBase));
+		float step = static_cast<float>(static_cast<double>(8 - count) * DOUBLE_803313f8);
 
 		for (int i = 0; i < count; i++) {
 			float yAdd = FLOAT_803313dc;

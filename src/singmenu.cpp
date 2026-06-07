@@ -2775,13 +2775,13 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     CColor color(0xFF, 0xFF, 0xFF, 0xFF);
     font->SetColor(color.color);
 
-    const SingMenuStaticMessageInfo& staticMessage = s_singleMenuStaticMessages[messageNo];
     int lineCount;
     if (useDynamic != 0) {
         lineCount = s_DynamicMess[0];
     } else {
-        lineCount = staticMessage.lineCount;
+        lineCount = s_singleMenuStaticMessages[messageNo].lineCount;
     }
+    const SingMenuStaticMessageInfo& staticMessage = s_singleMenuStaticMessages[messageNo];
 
     int maxWidth = 0;
     char* dynamicText = s_DynamicMessStr;

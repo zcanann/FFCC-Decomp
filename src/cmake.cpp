@@ -1174,8 +1174,34 @@ void CMenuPcs::CmakeResultDraw1()
 
     DrawCmakePreviewChara(this);
 
-    DrawCmakePopupPanel(this, popupAlpha, 192.0f, 56.0f, 416.0f, 264.0f,
-        1.0f, 1.0f);
+    if (mode == 0) {
+        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
+        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+        GXColor panelCol;
+        panelCol.r = 0xFF;
+        panelCol.g = 0xFF;
+        panelCol.b = 0xFF;
+        panelCol.a = 0xFF;
+        GXSetChanMatColor(GX_COLOR0A0, panelCol);
+        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
+        MenuPcs.DrawRect(
+            0, 192.0f, 56.0f, 416.0f, 264.0f,
+            0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+    } else {
+        int panelA = static_cast<int>(255.0f * alpha);
+        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
+        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+        GXColor panelCol;
+        panelCol.r = 0xFF;
+        panelCol.g = 0xFF;
+        panelCol.b = 0xFF;
+        panelCol.a = static_cast<unsigned char>(panelA);
+        GXSetChanMatColor(GX_COLOR0A0, panelCol);
+        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
+        MenuPcs.DrawRect(
+            0, 192.0f, 56.0f, 416.0f, 264.0f,
+            0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+    }
     DrawCmakeTitle(7, 1.0f, alpha);
 
     float textAlpha = alpha;

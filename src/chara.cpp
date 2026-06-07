@@ -208,7 +208,7 @@ static inline u8& ModelFlags10C(CChara::CModel* model)
 
 static inline Vec& ModelDynJitter(CChara::CModel* model)
 {
-	return model->m_dynJitter;
+	return reinterpret_cast<Vec&>(model->m_dynJitter);
 }
 
 static inline CTexAnimSet* ModelTexAnimSet(CChara::CModel* model)

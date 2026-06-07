@@ -1803,7 +1803,7 @@ void CMenuPcs::DrawResultCloseAnim()
 	int modelIndex = 0;
 	int lastKind = 0;
 
-	if (*(unsigned char*)(statePtr + 0xb) == 0) {
+	if (*(signed char*)(statePtr + 0xb) == 0) {
 		return;
 	}
 

@@ -1349,7 +1349,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 
 	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + resolvedItemId * 0x48;
 	staType = *reinterpret_cast<unsigned short*>(itemData + 8);
-	if (static_cast<int>(staType) != 0x67 && static_cast<int>(staType) != 0x65 && static_cast<int>(staType) != 0x66 && (CFlatGameFlags() & CFlatGameFlag_Bit5) != 0) {
+	if (static_cast<int>(staType) != 0x67 && static_cast<int>(staType) != 0x65 && static_cast<int>(staType) != 0x66 && CharaObjGameFlagBit5Set()) {
 		System.Printf(dbg + 0x17C);
 		return;
 	}

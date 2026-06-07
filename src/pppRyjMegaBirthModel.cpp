@@ -566,8 +566,8 @@ void birth(
             particleData->m_matrix[1][3] = spawnPoint.y;
             particleData->m_matrix[2][3] = spawnPoint.z;
 
-            mode = params->m_spawnMode;
-            if ((mode == 8) || (mode == 9)) {
+            u8 finalizeMode = params->m_spawnMode;
+            if ((finalizeMode == 8) || (finalizeMode == 9)) {
                 Vec rowX;
                 Vec rowY;
                 Vec rowZ;

@@ -1745,7 +1745,7 @@ void CMiniGamePcs::MngThreadMain(void*)
     int managerStackOffset = 0x1000;
     unsigned char* threadParam = self;
     unsigned char* threadState = self;
-    char* spMode = reinterpret_cast<char*>(Game.m_gameWork.m_spModeFlags);
+    unsigned char* spMode = Game.m_gameWork.m_spModeFlags;
 
     int i = 0;
     do

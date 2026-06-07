@@ -677,6 +677,109 @@ char* CMenuPcs::GetTribeStr(int index)
             return (char*)PTR_s_Clavat_802140f0[index];
     }
 }
+/*
+ * --INFO--
+ * PAL Address: 0x80145c84
+ * PAL Size: 748b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::GetRaceStr(int itemNo, char* outText)
+{
+    unsigned short raceBits;
+    unsigned int raceType;
+    char* text;
+    char* suffix;
+
+    GetItemType(itemNo, 1);
+    raceBits = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 4);
+    outText[0] = '\0';
+
+    if ((raceBits & 0xF) == 0xF) {
+        if (Game.m_gameWork.m_languageId == 3) {
+            text = (char*)gSingMenuTextTableIt[19];
+        } else if (Game.m_gameWork.m_languageId < 3) {
+            if (Game.m_gameWork.m_languageId == 1 || Game.m_gameWork.m_languageId == 0) {
+                text = (char*)gSingMenuTextTableEn[19];
+            } else {
+                text = (char*)gSingMenuTextTableDe[19];
+            }
+        } else if (Game.m_gameWork.m_languageId == 5) {
+            text = (char*)gSingMenuTextTableEs[19];
+        } else if (Game.m_gameWork.m_languageId < 5) {
+            text = (char*)gSingMenuTextTableFr[19];
+        } else {
+            text = (char*)gSingMenuTextTableEn[19];
+        }
+        strcpy(outText, text);
+        return;
+    }
+
+    raceType = 0;
+    if ((raceBits & 1) == 0) {
+        raceType = 1;
+        if ((raceBits & 2) == 0) {
+            raceType = 2;
+            if ((raceBits & 4) == 0) {
+                raceType = 3;
+                if ((raceBits & 8) == 0) {
+                    raceType = 4;
+                }
+            }
+        }
+    }
+
+    if (raceType < 4) {
+        if (Game.m_gameWork.m_languageId == 3) {
+            text = (char*)PTR_s_Clavat_80214110[raceType];
+        } else if (Game.m_gameWork.m_languageId < 3) {
+            if (Game.m_gameWork.m_languageId == 1 || Game.m_gameWork.m_languageId == 0) {
+                text = (char*)PTR_s_Clavat_802140f0[raceType];
+            } else {
+                text = (char*)PTR_s_Clavat_80214100[raceType];
+            }
+        } else if (Game.m_gameWork.m_languageId == 5) {
+            text = (char*)PTR_s_Clavate[raceType];
+        } else if (Game.m_gameWork.m_languageId < 5) {
+            text = (char*)PTR_s_Clavat_80214120[raceType];
+        } else {
+            text = (char*)PTR_s_Clavat_802140f0[raceType];
+        }
+
+        strcpy(outText, text);
+        if (Game.m_gameWork.m_languageId == 2) {
+            strcat(outText, (char*)s_plural_s_80332958);
+        }
+    }
+
+    if ((raceBits & 0xF) != 0 && (raceBits & 0x30) != 0) {
+        strcpy(outText, (char*)s_space_8033295c);
+    }
+    if ((raceBits & 0x30) == 0) {
+        return;
+    }
+
+    raceType = (raceBits & 0x30) >> 5;
+    if (Game.m_gameWork.m_languageId == 3) {
+        suffix = (char*)gSingMenuTextTableIt[raceType + 17];
+    } else if (Game.m_gameWork.m_languageId < 3) {
+        if (Game.m_gameWork.m_languageId == 1 || Game.m_gameWork.m_languageId == 0) {
+            suffix = (char*)gSingMenuTextTableEn[raceType + 17];
+        } else {
+            suffix = (char*)gSingMenuTextTableDe[raceType + 17];
+        }
+    } else if (Game.m_gameWork.m_languageId == 5) {
+        suffix = (char*)gSingMenuTextTableEs[raceType + 17];
+    } else if (Game.m_gameWork.m_languageId < 5) {
+        suffix = (char*)gSingMenuTextTableFr[raceType + 17];
+    } else {
+        suffix = (char*)gSingMenuTextTableEn[raceType + 17];
+    }
+    strcat(outText, suffix);
+}
+
 extern "C" const char* PTR_s_Clavat_802140f0[] = {
     s_Clavat_803320D8, s_Lilty_803320E0, s_Yuke_803320E8, s_Selkie_803320F0,
 };
@@ -3066,108 +3169,6 @@ void CMenuPcs::GetRecipeMaterial(int itemNo, CMenuPcs::MaterialInfo* materialInf
     materialInfo->m_count[2] = *reinterpret_cast<u16*>(itemBase + 0x30);
 }
 
-/*
- * --INFO--
- * PAL Address: 0x80145c84
- * PAL Size: 748b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::GetRaceStr(int itemNo, char* outText)
-{
-    unsigned short raceBits;
-    unsigned int raceType;
-    char* text;
-    char* suffix;
-
-    GetItemType(itemNo, 1);
-    raceBits = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 4);
-    outText[0] = '\0';
-
-    if ((raceBits & 0xF) == 0xF) {
-        if (Game.m_gameWork.m_languageId == 3) {
-            text = (char*)gSingMenuTextTableIt[19];
-        } else if (Game.m_gameWork.m_languageId < 3) {
-            if (Game.m_gameWork.m_languageId == 1 || Game.m_gameWork.m_languageId == 0) {
-                text = (char*)gSingMenuTextTableEn[19];
-            } else {
-                text = (char*)gSingMenuTextTableDe[19];
-            }
-        } else if (Game.m_gameWork.m_languageId == 5) {
-            text = (char*)gSingMenuTextTableEs[19];
-        } else if (Game.m_gameWork.m_languageId < 5) {
-            text = (char*)gSingMenuTextTableFr[19];
-        } else {
-            text = (char*)gSingMenuTextTableEn[19];
-        }
-        strcpy(outText, text);
-        return;
-    }
-
-    raceType = 0;
-    if ((raceBits & 1) == 0) {
-        raceType = 1;
-        if ((raceBits & 2) == 0) {
-            raceType = 2;
-            if ((raceBits & 4) == 0) {
-                raceType = 3;
-                if ((raceBits & 8) == 0) {
-                    raceType = 4;
-                }
-            }
-        }
-    }
-
-    if (raceType < 4) {
-        if (Game.m_gameWork.m_languageId == 3) {
-            text = (char*)PTR_s_Clavat_80214110[raceType];
-        } else if (Game.m_gameWork.m_languageId < 3) {
-            if (Game.m_gameWork.m_languageId == 1 || Game.m_gameWork.m_languageId == 0) {
-                text = (char*)PTR_s_Clavat_802140f0[raceType];
-            } else {
-                text = (char*)PTR_s_Clavat_80214100[raceType];
-            }
-        } else if (Game.m_gameWork.m_languageId == 5) {
-            text = (char*)PTR_s_Clavate[raceType];
-        } else if (Game.m_gameWork.m_languageId < 5) {
-            text = (char*)PTR_s_Clavat_80214120[raceType];
-        } else {
-            text = (char*)PTR_s_Clavat_802140f0[raceType];
-        }
-
-        strcpy(outText, text);
-        if (Game.m_gameWork.m_languageId == 2) {
-            strcat(outText, (char*)s_plural_s_80332958);
-        }
-    }
-
-    if ((raceBits & 0xF) != 0 && (raceBits & 0x30) != 0) {
-        strcpy(outText, (char*)s_space_8033295c);
-    }
-    if ((raceBits & 0x30) == 0) {
-        return;
-    }
-
-    raceType = (raceBits & 0x30) >> 5;
-    if (Game.m_gameWork.m_languageId == 3) {
-        suffix = (char*)gSingMenuTextTableIt[raceType + 17];
-    } else if (Game.m_gameWork.m_languageId < 3) {
-        if (Game.m_gameWork.m_languageId == 1 || Game.m_gameWork.m_languageId == 0) {
-            suffix = (char*)gSingMenuTextTableEn[raceType + 17];
-        } else {
-            suffix = (char*)gSingMenuTextTableDe[raceType + 17];
-        }
-    } else if (Game.m_gameWork.m_languageId == 5) {
-        suffix = (char*)gSingMenuTextTableEs[raceType + 17];
-    } else if (Game.m_gameWork.m_languageId < 5) {
-        suffix = (char*)gSingMenuTextTableFr[raceType + 17];
-    } else {
-        suffix = (char*)gSingMenuTextTableEn[raceType + 17];
-    }
-    strcat(outText, suffix);
-}
 
 /*
  * --INFO--

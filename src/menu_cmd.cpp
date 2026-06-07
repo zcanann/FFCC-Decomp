@@ -1159,13 +1159,9 @@ void CMenuPcs::CmdDraw()
 		helpAlpha = GetCmdListStorage(this)->entries[0].alpha;
 	}
 
-	GXColor helpColor;
-	helpColor.r = 0xFF;
-	helpColor.g = 0xFF;
-	helpColor.b = 0xFF;
-	helpColor.a = static_cast<u8>(FLOAT_80332acc * helpAlpha);
 	DrawHelpMessage(
-	    helpId, m_fonts[0], 0, static_cast<s32>(-FLOAT_80332b28), helpColor, 0,
+	    helpId, m_fonts[0], 0, static_cast<s32>(-FLOAT_80332b28),
+	    CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_80332acc * helpAlpha)).color, 0,
 	    FLOAT_80332a88, FLOAT_80332b08);
 }
 

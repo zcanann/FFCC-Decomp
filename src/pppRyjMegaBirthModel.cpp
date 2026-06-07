@@ -436,8 +436,6 @@ void birth(
     float spread = (float)params->m_spread;
     float halfSpread = spread;
     float randomRange = FLOAT_803304c0 * spread;
-    float speedMag = params->m_speed;
-    u8 speedMode = params->m_speedMode;
     Vec pos;
 
     memset(particleData, 0, 0xA0);
@@ -537,7 +535,9 @@ void birth(
     particleData->m_matrix[1][3] = pos.y;
     particleData->m_matrix[2][3] = pos.z;
 
-    if (speedMag != kPppRyjMegaBirthSharedZero) {
+    if (params->m_speed != kPppRyjMegaBirthSharedZero) {
+        float speedMag = params->m_speed;
+        u8 speedMode = params->m_speedMode;
         float speedX = calc_spawn_speed(speedMag, speedMode);
         float speedY = calc_spawn_speed(speedMag, speedMode);
         float speedZ = calc_spawn_speed(speedMag, speedMode);
@@ -1037,16 +1037,18 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* stepData, _p
 void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMegaBirthModel* params,
                 _PARTICLE_DATA* particleData, _PARTICLE_WMAT* particleWMat, pppFMATRIX& out, unsigned char copyOut)
 {
-    pppFMATRIX tmp;
     Mtx scale;
 
     if (params->m_matrixMode != 0) {
         pppCopyMatrix(mtxB, *(pppFMATRIX*)&particleData->m_matrix);
     } else {
         pppUnitMatrix(mtxB);
-        mtxB.value[0][3] = particleData->m_matrix[0][3];
-        mtxB.value[1][3] = particleData->m_matrix[1][3];
-        mtxB.value[2][3] = particleData->m_matrix[2][3];
+        float posX = particleData->m_matrix[0][3];
+        float posY = particleData->m_matrix[1][3];
+        float posZ = particleData->m_matrix[2][3];
+        mtxB.value[0][3] = posX;
+        mtxB.value[1][3] = posY;
+        mtxB.value[2][3] = posZ;
     }
 
     if (*s32_at(particleData, 0x38) != 0 ||
@@ -1059,13 +1061,11 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
         pppFMATRIX r;
         pppUnitMatrix(r);
         pppRotMatrix(r, r, rot);
-        pppCopyMatrix(tmp, mtxB);
-        pppMulMatrix(mtxB, tmp, r);
+        pppMulMatrix(mtxB, mtxB, r);
     }
 
     PSMTXScale(scale, *f32_at(particleData, 0x5C), *f32_at(particleData, 0x60), *f32_at(particleData, 0x64));
-    pppCopyMatrix(tmp, mtxB);
-    pppMulMatrix(mtxB, tmp, *(pppFMATRIX*)&scale);
+    pppMulMatrix(mtxB, mtxB, *(pppFMATRIX*)&scale);
     pppCopyMatrix(*(pppFMATRIX*)&g_matKeep, mtxB);
 
     switch (params->m_spawnMode) {
@@ -1082,8 +1082,7 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
         localPos.z = mtxB.value[2][3];
         pppApplyMatrix(transformedPos, mtxA, localPos);
 
-        pppCopyMatrix(tmp, mtxB);
-        pppMulMatrix(mtxB, *(pppFMATRIX*)&ppvWorldMatrixWood, tmp);
+        pppMulMatrix(mtxB, *(pppFMATRIX*)&ppvWorldMatrixWood, mtxB);
         mtxB.value[0][3] = transformedPos.x;
         mtxB.value[1][3] = transformedPos.y;
         mtxB.value[2][3] = transformedPos.z;
@@ -1093,19 +1092,15 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
         break;
     }
     default:
-        pppCopyMatrix(tmp, mtxB);
-        pppMulMatrix(mtxB, *(pppFMATRIX*)&pObject->m_localMatrix, tmp);
+        pppMulMatrix(mtxB, *(pppFMATRIX*)&pObject->m_localMatrix, mtxB);
 
         if (particleWMat != NULL) {
-            pppCopyMatrix(tmp, mtxB);
-            pppMulMatrix(mtxB, *(pppFMATRIX*)particleWMat, tmp);
+            pppMulMatrix(mtxB, *(pppFMATRIX*)particleWMat, mtxB);
         } else {
-            pppCopyMatrix(tmp, mtxB);
-            pppMulMatrix(mtxB, ppvMng->m_matrix, tmp);
+            pppMulMatrix(mtxB, ppvMng->m_matrix, mtxB);
         }
 
-        pppCopyMatrix(tmp, mtxB);
-        pppMulMatrix(mtxB, *(pppFMATRIX*)&ppvCameraMatrix0, tmp);
+        pppMulMatrix(mtxB, *(pppFMATRIX*)&ppvCameraMatrix0, mtxB);
         pppCopyMatrix(pObject->m_drawMatrix, mtxB);
         if (copyOut != 0) {
             pppCopyMatrix(out, mtxB);
@@ -1127,16 +1122,16 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
         pppAddVector(endPos, endPos, objectPos);
 
         pppUnitMatrix(mtxB);
-        PSMTXScaleApply(mtxB.value, pObject->m_drawMatrix.value, *f32_at(particleData, 0x5C) * ppvMng->m_scale.x,
-                        *f32_at(particleData, 0x60) * ppvMng->m_scale.y,
-                        *f32_at(particleData, 0x64) * ppvMng->m_scale.z);
+        PSMTXScaleApply(mtxB.value, pObject->m_drawMatrix.value,
+                        mtxB.value[0][0] * *f32_at(particleData, 0x5C) * ppvMng->m_scale.x,
+                        mtxB.value[1][1] * *f32_at(particleData, 0x60) * ppvMng->m_scale.y,
+                        mtxB.value[2][2] * *f32_at(particleData, 0x64) * ppvMng->m_scale.z);
         PSMTXMultVec(ppvWorldMatrix, &endPos, &endPos);
 
         pppFMATRIX rot;
 
-        PSMTXRotRad(rot.value, 'z', FLOAT_803304a8 * (float)*s32_at(particleData, 0x40));
-        pppCopyMatrix(tmp, pObject->m_drawMatrix);
-        pppMulMatrix(pObject->m_drawMatrix, rot, tmp);
+        PSMTXRotRad(rot.value, 'z', FLOAT_803304a8 * (float)-*s32_at(particleData, 0x40));
+        pppMulMatrix(pObject->m_drawMatrix, rot, pObject->m_drawMatrix);
 
         pObject->m_drawMatrix.value[0][3] = endPos.x;
         pObject->m_drawMatrix.value[1][3] = endPos.y;

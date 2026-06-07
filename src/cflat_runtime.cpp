@@ -569,7 +569,7 @@ void CFlatRuntime::createVal(CChunkFile&, int, CFlatRuntime::CVal*)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CFlatRuntime::Frame(int unused, int mode)
+int CFlatRuntime::Frame(int mode, int unused)
 {
 	CObject* const root = &m_objectSentinel;
 	CObject* object = root->m_next;
@@ -578,7 +578,7 @@ int CFlatRuntime::Frame(int unused, int mode)
 	while (object != root) {
 		CObject* const next = object->m_next;
 
-		if (((static_cast<int>(object->m_flags) << 24) >= 0) && (mode != 0)) {
+		if ((object->m_flagBits.m_deleteFlag == 0) && (mode != 0)) {
 			object->m_flagBits.m_activeFlag = 0;
 			if (objectFrame(object) != 0) {
 				int scriptIndex;

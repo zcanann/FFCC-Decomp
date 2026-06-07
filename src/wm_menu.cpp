@@ -8004,14 +8004,12 @@ void CMenuPcs::CalcCharaSelect()
 
 	*reinterpret_cast<short*>(bytes + 0x74) = static_cast<short>(*reinterpret_cast<short*>(bytes + 0x74) + 1);
 	const unsigned int clz = __cntlzw(static_cast<unsigned int>(Game.m_gameWork.m_menuStageMode));
-	if (static_cast<int>(((clz >> 5) + 2) * 0x4B) <= static_cast<int>(*reinterpret_cast<short*>(bytes + 0x74))) {
+	if (static_cast<int>(*reinterpret_cast<short*>(bytes + 0x74)) >= static_cast<int>(((clz >> 5) + 2) * 0x4B)) {
 		*reinterpret_cast<short*>(bytes + 0x74) = 0;
 	}
 
 	for (int i = 0; i < 4; i++) {
 		WmCharaSelectEntry& entry = GetWmCharaSelectEntries(this)[i];
-		padTrig[i] = 0;
-		padRepeat[i] = 0;
 
 		if ((i == 0) || (Game.m_gameWork.m_menuStageMode == 0)) {
 			entry.m_padType = Joybus.GetPadType(i);
@@ -8026,21 +8024,32 @@ void CMenuPcs::CalcCharaSelect()
 				entry.m_connected = static_cast<unsigned char>(Joybus.GetGBAConnect(i));
 			}
 
-			if (entry.m_connected != 0 && entry.m_cmakePending == 0) {
+			if (entry.m_connected == 1 && entry.m_cmakePending == 0) {
 				bool noInput = false;
 				if (Pad.m_debugPadLock != 0 || (i == 0 && Pad.m_debugPadPort != -1)) {
 					noInput = true;
 				}
 				if (noInput) {
 					padRepeat[i] = 0;
+				} else {
+					padRepeat[i] = Pad.GetPadInputs()[(Pad.m_debugPadPort == i) ? 0 : static_cast<unsigned int>(i)].repeatButton;
+				}
+				noInput = false;
+				if (Pad.m_debugPadLock != 0 || (i == 0 && Pad.m_debugPadPort != -1)) {
+					noInput = true;
+				}
+				if (noInput) {
 					padTrig[i] = 0;
 				} else {
-					const unsigned int padIndex = (Pad.m_debugPadPort == i) ? 0 : static_cast<unsigned int>(i);
-					padRepeat[i] = Pad.GetPadInputs()[padIndex].repeatButton;
-					padTrig[i] = Pad.GetPadInputs()[padIndex].buttonDown[0];
+					padTrig[i] = Pad.GetPadInputs()[(Pad.m_debugPadPort == i) ? 0 : static_cast<unsigned int>(i)].buttonDown[0];
 				}
+			} else {
+				padRepeat[i] = 0;
+				padTrig[i] = 0;
 			}
 		} else {
+			padRepeat[i] = 0;
+			padTrig[i] = 0;
 			entry.m_connected = 0;
 		}
 	}
@@ -8054,8 +8063,8 @@ void CMenuPcs::CalcCharaSelect()
 		unsigned int pendingMask = 0;
 		if (Game.m_gameWork.m_menuStageMode == 0) {
 			for (int i = 0; i < 4; i++) {
-				if (GetWmCharaSelectEntries(this)[i].m_cmakePending != 0 && GetWmCharaSelectEntries(this)[i].m_currentSlot >= 0) {
-					pendingMask |= 1u << static_cast<unsigned int>(GetWmCharaSelectEntries(this)[i].m_currentSlot);
+				if (GetWmCharaSelectEntries(this)[i].m_cmakePending != 0) {
+					pendingMask |= 1 << static_cast<int>(GetWmCharaSelectEntries(this)[i].m_currentSlot);
 				}
 			}
 		}
@@ -8068,18 +8077,15 @@ void CMenuPcs::CalcCharaSelect()
 
 			if (entry.m_connected == 0) {
 				GbaQue.ClrCmakeInfo(i);
-				if (entry.m_cmakeReady != 0) {
+				if (entry.m_cmakeReady == 1) {
 					entry.m_cmakeReady = 0;
-				} else if ((entry.m_currentSlot >= 0) &&
-				           ((pendingMask & (1u << static_cast<unsigned int>(entry.m_currentSlot))) != 0)) {
+				} else if ((pendingMask & (1u << static_cast<unsigned int>(entry.m_currentSlot))) != 0) {
 					continue;
 				}
 
-				if (entry.m_currentSlot >= 0 &&
-				    Game.m_caravanWorkArr[entry.m_currentSlot].m_shopState == 0 &&
-				    entry.m_cmakeReady == 0) {
+				if (Game.m_caravanWorkArr[entry.m_currentSlot].m_shopState == 0) {
 					CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[entry.m_currentSlot];
-					if (handle->IsModelLoaded(1) && handle->m_charaKind != 3) {
+					if (handle->IsModelLoaded(1) && handle->m_charaKind != 3 && entry.m_cmakeReady != 1) {
 						if (static_cast<unsigned int>(System.m_execParam) > 2) {
 							System.Printf(const_cast<char*>(s_SetCMakeEnd_chan_pctd_cur_pctd_801DC3B4), i,
 							              static_cast<int>(entry.m_currentSlot));
@@ -8095,8 +8101,8 @@ void CMenuPcs::CalcCharaSelect()
 
 		unsigned int confirmedSlotMask = 0;
 		for (int i = 0; i < 4; i++) {
-			if (GetWmCharaSelectEntries(this)[i].m_confirmed != 0 && GetWmCharaSelectEntries(this)[i].m_currentSlot >= 0) {
-				confirmedSlotMask |= 1u << static_cast<unsigned int>(GetWmCharaSelectEntries(this)[i].m_currentSlot);
+			if (GetWmCharaSelectEntries(this)[i].m_confirmed != 0) {
+				confirmedSlotMask |= 1 << static_cast<int>(GetWmCharaSelectEntries(this)[i].m_currentSlot);
 			}
 		}
 

@@ -1875,7 +1875,7 @@ void CShopMenu::DrawMake()
     MenuPcs.DrawNoShadowFont(font, const_cast<char*>(stockText), stockX, FLOAT_80332e34, 9, 0x12);
     MenuPcs.DrawInit();
 
-    short recipeMaterial[8];
+    unsigned short recipeMaterial[8];
     MenuPcs.GetRecipeMaterial(getItemNo(m_selectedIndex), reinterpret_cast<CMenuPcs::MaterialInfo*>(recipeMaterial));
     int rowY = 300;
     for (int i = 0; i < 3; i++, rowY += 0x1E) {
@@ -2857,7 +2857,7 @@ void CShopMenu::Calc()
         }
         m_fade = static_cast<float>(timer) * 0.125f;
         if (timer == 8) {
-            short recipeMaterial[8];
+            unsigned short recipeMaterial[8];
             int itemId = getItemNo(m_selectedIndex);
             CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
 

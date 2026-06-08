@@ -2085,14 +2085,14 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 					u32 stageSlotOffset = progSet->m_workBaseOffset + stageIdx * 4;
 					u32* stageSlot = *(u32**)(((u8*)obj) + stageSlotOffset);
 					u32* nextSlot = (u32*)(((u8*)stageSlot) + stage->m_workOffset);
-					if (*nextSlot == (u32)((_pppPObject*)obj)->m_graphId)
+					if ((s32)*nextSlot == ((_pppPObject*)obj)->m_graphId)
 					{
 						*(u32**)(((u8*)obj) + stageSlotOffset) = nextSlot;
 					}
 				}
 
 				if (mng->m_loopMode != 0 &&
-					(u32)((_pppPObject*)obj)->m_graphId >= (u32)progSet->m_loopFrame &&
+					((_pppPObject*)obj)->m_graphId >= progSet->m_loopFrame &&
 					(progSet->m_loopFrame & 0xF0000000) != 0x70000000)
 				{
 					((_pppPObject*)obj)->m_graphId = progSet->m_endFrame;

@@ -2346,9 +2346,7 @@ int CMapMng::ReadMid(char* mapName)
         m_asyncLoadState.m_asyncReadIndex += 1;
     } else {
         CFile::CHandle* fileHandle = File.Open(strTmp, 0, CFile::PRI_LOW);
-        if (fileHandle == 0) {
-            filePtr = 0;
-        } else {
+        if (fileHandle != 0) {
             const int size = File.GetLength(fileHandle);
             if (m_asyncLoadState.m_mapReadMode == 3) {
                 File.ReadASync(fileHandle);
@@ -2370,6 +2368,8 @@ int CMapMng::ReadMid(char* mapName)
                         reinterpret_cast<unsigned char*>(m_asyncLoadState.m_mapLoadCursor) + size;
                 }
             }
+        } else {
+            filePtr = 0;
         }
     }
 
@@ -2380,7 +2380,10 @@ int CMapMng::ReadMid(char* mapName)
         return 0;
     }
 
-    if (m_asyncLoadState.m_mapReadMode == 2 || m_asyncLoadState.m_mapReadMode == 3) {
+    if (m_asyncLoadState.m_mapReadMode == 2) {
+        return 1;
+    }
+    if (m_asyncLoadState.m_mapReadMode == 3) {
         return 1;
     }
 

@@ -1365,11 +1365,8 @@ int CCharaPcs::releaseUnuseLoadModel(int releaseMask)
 
     for (int i = LoadModelArray(this)->GetSize() - 1; i >= 0; i--) {
         CLoadModel* loadModel = (*LoadModelArray(this))[static_cast<unsigned long>(i)];
-        const bool shouldRelease =
-            (((loadModel->m_mergeFileId < 0) || (loadModel->m_streamMode != 0)) && loadModel->GetRef() == 1) ||
-            (loadModel->m_mergeFileId >= 0 && (releaseMask & loadModel->m_mergeFlags) != 0);
-
-        if (!shouldRelease) {
+        if (!((((loadModel->m_mergeFileId < 0) || (loadModel->m_streamMode != 0)) && loadModel->GetRef() == 1) ||
+              (loadModel->m_mergeFileId >= 0 && (releaseMask & loadModel->m_mergeFlags) != 0))) {
             activeCount++;
             continue;
         }
@@ -1386,11 +1383,8 @@ int CCharaPcs::releaseUnuseLoadModel(int releaseMask)
 
     for (int i = LoadTextureArray(this)->GetSize() - 1; i >= 0; i--) {
         CLoadTexture* loadTexture = (*LoadTextureArray(this))[static_cast<unsigned long>(i)];
-        const bool shouldRelease =
-            (((loadTexture->m_mergeFileId < 0) || (loadTexture->m_streamMode != 0)) && loadTexture->GetRef() == 1) ||
-            (loadTexture->m_mergeFileId >= 0 && (releaseMask & loadTexture->m_mergeFlags) != 0);
-
-        if (!shouldRelease) {
+        if (!((((loadTexture->m_mergeFileId < 0) || (loadTexture->m_streamMode != 0)) && loadTexture->GetRef() == 1) ||
+              (loadTexture->m_mergeFileId >= 0 && (releaseMask & loadTexture->m_mergeFlags) != 0))) {
             activeCount++;
             continue;
         }
@@ -1407,11 +1401,8 @@ int CCharaPcs::releaseUnuseLoadModel(int releaseMask)
 
     for (int i = LoadPdtArray(this)->GetSize() - 1; i >= 0; i--) {
         CLoadPdt* loadPdt = (*LoadPdtArray(this))[static_cast<unsigned long>(i)];
-        const bool shouldRelease =
-            (loadPdt->m_mergeFileId < 0 && loadPdt->GetRef() == 1) ||
-            (loadPdt->m_mergeFileId >= 0 && (releaseMask & loadPdt->m_mergeFlags) != 0);
-
-        if (!shouldRelease) {
+        if (!((loadPdt->m_mergeFileId < 0 && loadPdt->GetRef() == 1) ||
+              (loadPdt->m_mergeFileId >= 0 && (releaseMask & loadPdt->m_mergeFlags) != 0))) {
             activeCount++;
             continue;
         }

@@ -24,8 +24,6 @@ static const float kFunnyShapeUnusedZero = 0.0f;
 static const float kFunnyShapeDefaultOffsetX = 480.0f;
 static const float kFunnyShapeDefaultOffsetY = 336.0f;
 static const float kFunnyShapeTextureViewportOrigin = 20.0f;
-static const float kFunnyShapeAnimOffsetX = 320.0f;
-static const float kFunnyShapeAnimOffsetY = 224.0f;
 static const float kFunnyShapePi = 3.14f;
 static const float kFunnyShapeHalfTurnDegrees = 180.0f;
 extern const char sDebugSpinnerText[5] ATTRIBUTE_ALIGN(8);
@@ -280,7 +278,7 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             p3y = invPadH * (ry2 - viewMaxY);
             p3z = kFunnyShapeZero;
             memcpy(&color, entry + 0x18, sizeof(color));
-            color = *reinterpret_cast<const u32*>(entry + 0x18);
+            *reinterpret_cast<GXColor*>(&color) = *reinterpret_cast<const GXColor*>(entry + 0x18);
         } else {
             const u8* entry = shapeData + packedStride;
             const u32 texIndex = entry[0x30];
@@ -328,15 +326,38 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             p3y = kFunnyShapeNegativeOne;
             p3z = kFunnyShapeZero;
             memcpy(&color, entry + 0x18, sizeof(color));
-            color = *reinterpret_cast<const u32*>(entry + 0x18);
+            *reinterpret_cast<GXColor*>(&color) = *reinterpret_cast<const GXColor*>(entry + 0x18);
         }
+
+        float tex[4][2];
+        float pos[4][3];
+        tex[0][0] = u0;
+        tex[0][1] = v0;
+        tex[1][0] = u1;
+        tex[1][1] = v0;
+        tex[2][0] = u1;
+        tex[2][1] = v1;
+        tex[3][0] = u0;
+        tex[3][1] = v1;
+        pos[0][0] = p0x;
+        pos[0][1] = p0y;
+        pos[0][2] = p0z;
+        pos[1][0] = p1x;
+        pos[1][1] = p1y;
+        pos[1][2] = p1z;
+        pos[2][0] = p2x;
+        pos[2][1] = p2y;
+        pos[2][2] = p2z;
+        pos[3][0] = p3x;
+        pos[3][1] = p3y;
+        pos[3][2] = p3z;
 
         DCStoreRange(&color, 4);
         GXBegin((GXPrimitive)0x80, GX_VTXFMT0, 4);
-        WriteVertex(p0x, p0y, p0z, color, u0, v0);
-        WriteVertex(p1x, p1y, p1z, color, u1, v0);
-        WriteVertex(p2x, p2y, p2z, color, u1, v1);
-        WriteVertex(p3x, p3y, p3z, color, u0, v1);
+        WriteVertex(pos[0][0], pos[0][1], pos[0][2], color, tex[0][0], tex[0][1]);
+        WriteVertex(pos[1][0], pos[1][1], pos[1][2], color, tex[1][0], tex[1][1]);
+        WriteVertex(pos[2][0], pos[2][1], pos[2][2], color, tex[2][0], tex[2][1]);
+        WriteVertex(pos[3][0], pos[3][1], pos[3][2], color, tex[3][0], tex[3][1]);
 
         packedStride += 0x24;
         rotatedStride += 0x2C;
@@ -604,8 +625,8 @@ void CFunnyShape::Render()
     }
 
     work = m_anmWork;
-    const float& baseX = kFunnyShapeAnimOffsetX;
-    const float& baseY = kFunnyShapeAnimOffsetY;
+    const float baseX = 320.0f;
+    const float baseY = 224.0f;
 
     for (s32 i = 0; i < count; i++) {
         Vec2d posCopy;

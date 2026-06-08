@@ -1290,8 +1290,8 @@ void GbaQueue::LoadPlayerStat()
 		outOfShoukiMask = 0;
 		for (i = 0; i < 4; i++) {
 			char menuStageMode = m_singleMode;
-			CGPartyObj* partyObj;
 			CCaravanWork* caravanWork;
+			CGPartyObj* partyObj;
 
 			if ((menuStageMode != 0) && (i == 1)) {
 				caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);

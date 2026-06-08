@@ -863,8 +863,8 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 		reinterpret_cast<CFlatRuntime*>(this)->CFlatRuntime::Frame(arg0, mode);
 
 		CFlatRuntime::CObject* const root = FlatObjectRoot(&CFlat);
-		for (CGBaseObj* obj = FindNextGBaseObjByCidMask(this, root->m_next->m_next, 5); obj != 0;
-			 obj = FindNextGBaseObjByCidMask(this, reinterpret_cast<CFlatRuntime::CObject*>(obj)->m_next, 5)) {
+		for (CGBaseObj* obj = FindNextGBaseObjByCidMask(&CFlat, root->m_next->m_next, 5); obj != 0;
+			 obj = FindNextGBaseObjByCidMask(&CFlat, reinterpret_cast<CFlatRuntime::CObject*>(obj)->m_next, 5)) {
 			obj->Frame();
 		}
 		return 1;
@@ -934,9 +934,9 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
 	AStar.drawAStar();
 
-	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
-	for (CGBaseObj* obj = FindNextGBaseObjByCidMask(this, root->m_next->m_next, 1); obj != 0;
-		 obj = FindNextGBaseObjByCidMask(this, reinterpret_cast<CFlatRuntime::CObject*>(obj)->m_next, 1)) {
+	CFlatRuntime::CObject* const root = FlatObjectRoot(&CFlat);
+	for (CGBaseObj* obj = FindNextGBaseObjByCidMask(&CFlat, root->m_next->m_next, 1); obj != 0;
+		 obj = FindNextGBaseObjByCidMask(&CFlat, reinterpret_cast<CFlatRuntime::CObject*>(obj)->m_next, 1)) {
 		obj->Draw();
 	}
 

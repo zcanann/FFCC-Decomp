@@ -739,7 +739,7 @@ void CGraphicPcs::drawBar()
     const int orderCount = System.m_orderCount;
     const int lastOrder = orderCount - 1;
     float x = kDebugBarLeft;
-    unsigned int hue = 0;
+    int hue = 0;
     u32 y = 0x10;
     for (int i = 0; i < orderCount; i++) {
         const u32 rgb = Math.Hsb2Rgb(hue / orderCount, 100, 100);

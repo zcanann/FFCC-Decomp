@@ -222,28 +222,24 @@ static inline void stageReleaseMode2Buffer(CMemory::CStage* stage)
     }
 }
 
-static inline void stageMoveToPoolList(CMemory* memory, CMemory::CStage* stage)
+static inline void stageDestroyAndPool(CMemory* memory, CMemory::CStage* stage)
 {
     int mode = stageGetAllocationMode(stage);
     CMemory::CMode& modeData = memory->Mode(mode);
+
+    if (mode != 2) {
+        if (stageHasUnfreedBlocks(stage)) {
+            System.Printf(const_cast<char*>(sStageQuitBlockUnfreedAllocFmt), stageGetSourceName(stage));
+            stage->heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
+        }
+    } else {
+        stageReleaseMode2Buffer(stage);
+    }
 
     stage->m_prev->m_next = stage->m_next;
     stage->m_next->m_prev = stage->m_prev;
     stage->m_next = modeData.m_freeList.m_next;
     modeData.m_freeList.m_next = stage;
-}
-
-static inline void stageDestroyInternal(CMemory::CStage* stage)
-{
-    if (stageGetAllocationMode(stage) == 2) {
-        stageReleaseMode2Buffer(stage);
-        return;
-    }
-
-    if (stageHasUnfreedBlocks(stage)) {
-        System.Printf(const_cast<char*>(sStageQuitBlockUnfreedAllocFmt), stageGetSourceName(stage));
-        stage->heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
-    }
 }
 
 /*
@@ -425,9 +421,9 @@ void CMemory::Init()
  */
 void CMemory::Quit()
 {
-    CStage* activeStage = m_mainMemoryStage;
-    stageDestroyInternal(activeStage);
-    stageMoveToPoolList(this, activeStage);
+    const char* strBase = reinterpret_cast<const char*>(sHeapBarColors);
+
+    stageDestroyAndPool(this, m_mainMemoryStage);
 
     CMode* modeData = m_modes;
     for (int pass = 0; pass < 3; pass++, modeData++) {
@@ -439,23 +435,19 @@ void CMemory::Quit()
                 CStage* next = stage->m_next;
                 if (pass == 0) {
                     if (stage != m_currentMemoryStage) {
-                        System.Printf(const_cast<char*>(sHeapWalkerTotalFmt + kStageDestroyingMsgOffset), stage->m_allocationSourceStr);
-                        stageDestroyInternal(stage);
-                        stageMoveToPoolList(this, stage);
+                        System.Printf(const_cast<char*>(strBase + 0x7b0), stage->m_allocationSourceStr);
+                        stageDestroyAndPool(this, stage);
                     }
                 } else {
-                    System.Printf(const_cast<char*>(sHeapWalkerTotalFmt + kStageDestroyingMsgOffset), stage->m_allocationSourceStr);
-                    stageDestroyInternal(stage);
-                    stageMoveToPoolList(this, stage);
+                    System.Printf(const_cast<char*>(strBase + 0x7b0), stage->m_allocationSourceStr);
+                    stageDestroyAndPool(this, stage);
                 }
                 stage = next;
             }
         }
     }
 
-    CStage* rootStage = m_currentMemoryStage;
-    stageDestroyInternal(rootStage);
-    stageMoveToPoolList(this, rootStage);
+    stageDestroyAndPool(this, m_currentMemoryStage);
 }
 
 /*

@@ -1308,55 +1308,71 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 		}
 	PassedLinkValueConditions:
 
-		unsigned int cmpValue = 0;
+		int cmpValue = 0;
+		int sysVal0 = *reinterpret_cast<int*>(&Game.m_gameWork.m_scriptSysVal0);
+		int sysVal1 = Game.m_gameWork.m_timerA;
+		int sysVal2 = Game.m_gameWork.m_scriptGlobalTime;
+		int sysVal3 = Game.m_gameWork.m_frameCounter;
 		for (int i = 0; i < 4; i++) {
-			const unsigned short cmpType = curLetter->m_compareRules[i].m_rule;
+			const short cmpType = curLetter->m_compareRules[i].m_rule;
 			const int sourceType = (cmpType >> 11) & 3;
 			const int sourceIdx = cmpType & 0x7FF;
 
 			if (sourceType != 3) {
 				if (sourceType == 1) {
-					cmpValue = static_cast<unsigned int>(Game.m_gameWork.m_eventWork[sourceIdx]);
+					cmpValue = Game.m_gameWork.m_eventWork[sourceIdx];
 				} else if (sourceType == 0) {
-					if (sourceIdx == 0) {
-							cmpValue = *reinterpret_cast<unsigned int*>(&Game.m_gameWork.m_scriptSysVal0);
-					} else if (sourceIdx == 1) {
-						cmpValue = static_cast<unsigned int>(Game.m_gameWork.m_timerA);
-					} else if (sourceIdx == 2) {
-						cmpValue = static_cast<unsigned int>(Game.m_gameWork.m_scriptGlobalTime);
-					} else if (sourceIdx == 3) {
-						cmpValue = static_cast<unsigned int>(Game.m_gameWork.m_frameCounter);
+					switch (sourceIdx) {
+					case 0:
+						cmpValue = sysVal0;
+						break;
+					case 1:
+						cmpValue = sysVal1;
+						break;
+					case 2:
+						cmpValue = sysVal2;
+						break;
+					case 3:
+						cmpValue = sysVal3;
+						break;
 					}
 				} else if (sourceType < 3) {
-					cmpValue = static_cast<unsigned int>(m_evtWordArr[sourceIdx]);
+					cmpValue = m_evtWordArr[sourceIdx];
 				}
 
 				const int op = cmpType >> 13;
-				const unsigned int compareValue = static_cast<unsigned int>(curLetter->m_compareRules[i].m_value);
-				if (op == 0) {
+				const int compareValue = curLetter->m_compareRules[i].m_value;
+				switch (op) {
+				case 0:
 					if (cmpValue != compareValue) {
 						goto NextLetter;
 					}
-				} else if (op == 1) {
+					break;
+				case 1:
 					if (cmpValue == compareValue) {
 						goto NextLetter;
 					}
-				} else if (op == 2) {
+					break;
+				case 2:
 					if (cmpValue < compareValue) {
 						goto NextLetter;
 					}
-				} else if (op == 3) {
+					break;
+				case 3:
 					if (compareValue < cmpValue) {
 						goto NextLetter;
 					}
-				} else if (op == 4) {
+					break;
+				case 4:
 					if (cmpValue <= compareValue) {
 						goto NextLetter;
 					}
-				} else if (op == 5) {
+					break;
+				case 5:
 					if (compareValue <= cmpValue) {
 						goto NextLetter;
 					}
+					break;
 				}
 			}
 		}

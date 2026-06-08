@@ -2223,7 +2223,7 @@ void CCharaPcs::CHandle::ChangeTexture(
     CLoadTexture* loadTexture = 0;
     for (unsigned int i = 0; i < static_cast<unsigned int>(LoadTextureArray(&CharaPcs)->GetSize()); i++) {
         CLoadTexture* it = (*LoadTextureArray(&CharaPcs))[i];
-        if (it->m_keyTag == reinterpret_cast<void*>(charaKind) && it->m_keyId == static_cast<unsigned int>(charaNo) &&
+        if (reinterpret_cast<int>(it->m_keyTag) == charaKind && it->m_keyId == static_cast<unsigned int>(charaNo) &&
             it->m_variantTag == reinterpret_cast<void*>(textureVariant)) {
             loadTexture = it;
             break;

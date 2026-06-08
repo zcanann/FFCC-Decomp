@@ -791,7 +791,7 @@ void GbaQueue::ExecutQueue()
 						const unsigned short baseGil =
 							*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + static_cast<int>(itemId) * 0x48 + 0x20);
 						int gil = static_cast<int>(
-							static_cast<float>(caravanWork->m_shopParam) / 100.0f * 0.25f * static_cast<float>(baseGil));
+							static_cast<float>(static_cast<double>(caravanWork->m_shopParam) / 100.0) * 0.25f * static_cast<float>(baseGil));
 						if (gil < 1) {
 							gil = 1;
 						}
@@ -812,7 +812,7 @@ void GbaQueue::ExecutQueue()
 						const unsigned short baseGil =
 							*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + static_cast<short>(shopItem) * 0x48 + 0x20);
 						const int gil =
-							static_cast<int>(static_cast<float>(caravanWork->m_shopParam) / 100.0f * static_cast<float>(baseGil));
+							static_cast<int>(static_cast<float>(static_cast<double>(caravanWork->m_shopParam) / 100.0) * static_cast<float>(baseGil));
 						caravanWork->AddGil(-static_cast<int>(gil * quantity));
 						Joybus.SendResult(channel, 0, static_cast<unsigned char>(cmdWord >> 24), static_cast<unsigned char>(cmdWord >> 16));
 					}

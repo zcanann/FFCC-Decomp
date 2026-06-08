@@ -3045,7 +3045,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
         CHUNK_VKEY = 0x564B4559,
     };
 
-    CMaterial* material = 0;
+    CMaterial* material;
     CChunkFile::CChunk chunk;
     unsigned long materialIndex = 0;
 

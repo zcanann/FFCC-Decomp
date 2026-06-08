@@ -1147,8 +1147,8 @@ void CMes::addString(char** text, int branchMode)
 		}
 		case 0x2F:
 		{
-			char* fallback = (char*)s_mesFallback;
-			addString(&fallback, branchMode);
+			char* townName = Game.m_gameWork.m_townName;
+			addString(&townName, branchMode);
 			break;
 		}
 		case 0x30:
@@ -1219,20 +1219,20 @@ void CMes::addString(char** text, int branchMode)
 		case 0x25:
 		{
 			unsigned int value = ReadTagS8(text);
-			if (mFontCount == 0)
+			if (mFontCount != 0)
 			{
-				if (value == 0x7F)
+				if (System.m_execParam != 0)
 				{
-					mAdvanceEnabled = 0;
-				}
-				else
-				{
-					mAdvanceStep = value;
+					System.Printf(const_cast<char*>(s_mesTagUnknown), uch + 0xA0);
 				}
 			}
-			else if (System.m_execParam != 0)
+			else if (value == 0x7F)
 			{
-				System.Printf(const_cast<char*>(s_mesTagUnknown), uch + 0xA0);
+				mAdvanceEnabled = 0;
+			}
+			else
+			{
+				mAdvanceStep = value;
 			}
 			break;
 		}

@@ -1429,21 +1429,21 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
 
 	PSMTXCopy(ppvMng->m_matrix.value, local_44);
 	if (pppMngSt->m_fpBillboard != 0) {
-		PSMTXConcat(ppvCameraMatrix0, ppvMng->m_matrix.value, ppvWorldMatrix);
+		PSMTXConcat(ppvCameraMatrix, ppvMng->m_matrix.value, ppvWorldMatrix);
 		local_50.x = local_44[0][3];
 		local_50.y = local_44[1][3];
 		local_50.z = local_44[2][3];
-		PSMTXMultVecSR(ppvCameraMatrix0, &local_50, &local_50);
+		PSMTXMultVecSR(ppvCameraMatrix, &local_50, &local_50);
 		local_50.y += CameraPcs.m_positionY;
 		ppvWorldMatrix[0][3] = local_50.x;
 		ppvWorldMatrix[1][3] = local_50.y;
 		ppvWorldMatrix[2][3] = local_50.z;
 	} else {
-		PSMTXConcat(ppvCameraMatrix0, ppvMng->m_matrix.value, ppvWorldMatrix);
+		PSMTXConcat(ppvCameraMatrix, ppvMng->m_matrix.value, ppvWorldMatrix);
 		local_50.x = local_44[0][3];
 		local_50.y = local_44[1][3];
 		local_50.z = local_44[2][3];
-		PSMTXMultVec(ppvCameraMatrix0, &local_50, &local_50);
+		PSMTXMultVec(ppvCameraMatrix, &local_50, &local_50);
 		ppvWorldMatrix[0][3] = local_50.x;
 		ppvWorldMatrix[1][3] = local_50.y;
 		ppvWorldMatrix[2][3] = local_50.z;

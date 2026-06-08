@@ -1524,9 +1524,12 @@ void CMemoryCardMan::MakeSaveData()
         {
             System.Printf(const_cast<char*>(sMemoryAllocationError), const_cast<char*>(sMemoryCardSourceFile), 0x2AD);
         }
+        memset(m_saveBuffer, 0, kMemoryCardSaveBufferSize);
     }
-
-    memset(m_saveBuffer, 0, kMemoryCardSaveBufferSize);
+    else
+    {
+        memset(m_saveBuffer, 0, kMemoryCardSaveBufferSize);
+    }
 
     u8* save = reinterpret_cast<u8*>(m_saveBuffer);
     Mc::SaveDat* saveDat = GetSaveDat(m_saveBuffer);

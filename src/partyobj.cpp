@@ -5054,7 +5054,7 @@ void CGPartyObj::gpmMove()
 	int clampedPressure = sGhostPartyWork.pressure;
 	if (clampedPressure < 0) {
 		clampedPressure = 0;
-	} else if (clampedPressure > pressureLimit + 100) {
+	} else if (pressureLimit + 100 < clampedPressure) {
 		clampedPressure = pressureLimit + 100;
 	}
 	sGhostPartyWork.pressure = clampedPressure;
@@ -5062,8 +5062,9 @@ void CGPartyObj::gpmMove()
 	if (sGhostPartyWork.pressure < pressureLimit / 3) {
 		sGhostPartyWork.flagBits.flag04 = 0;
 	}
-	if (sGhostPartyWork.activeTrailCount > 0) {
-		sGhostPartyWork.activeTrailCount--;
+	{
+		int trailDec = sGhostPartyWork.activeTrailCount - 1;
+		sGhostPartyWork.activeTrailCount = trailDec & ~(trailDec >> 31);
 	}
 
 	Vec pathVec;

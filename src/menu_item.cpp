@@ -858,8 +858,7 @@ void CMenuPcs::ItemInit()
 
     itemList = this->m_itemList;
     yOffset = 0;
-    int loopCount = 4;
-    do {
+    for (int loopCount = 0; loopCount < 4; loopCount++) {
         entry = &this->m_itemList->anims[index++];
         entry->flags = 2;
         entry->tex = 0x37;
@@ -886,8 +885,7 @@ void CMenuPcs::ItemInit()
         entry->v = zero;
         entry->startFrame = 7;
         entry->duration = 5;
-        loopCount--;
-    } while (loopCount != 0);
+    }
 
     this->m_itemList->count = count;
     this->m_itemMenuState->selectedIndex = 0;

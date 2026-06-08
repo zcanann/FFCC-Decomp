@@ -1846,8 +1846,8 @@ void CFlatRuntime2::drawLayer(
 
 	const float scaledWidth = static_cast<float>(width) * scaleX;
 	const float scaledHeight = static_cast<float>(height) * scaleY;
-	short u1 = static_cast<short>(texU + static_cast<short>(width));
-	short v1 = static_cast<short>(texV + static_cast<short>(height));
+	short u1 = static_cast<short>(texU + width);
+	short v1 = static_cast<short>(texV + height);
 	float xAnchor = FLOAT_80330144;
 	if ((flags & 1) != 0) {
 		xAnchor = FLOAT_80330154 * scaledWidth;

@@ -2649,12 +2649,12 @@ void CMenuPcs::DrawResultOpenAnim()
 					}
 					if (lastKind != 0x17 && sprite->kind == 0x17) {
 						MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
-					} else if (lastKind == 0x17 && kind != 0x17) {
+					} else if (lastKind == 0x17 && sprite->kind != 0x17) {
 						MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 					}
 
 					_GXColor colors[4];
-					if (kind == 0x17) {
+					if (sprite->kind == 0x17) {
 						colors[0].r = 0xFF;
 						colors[0].g = 0xFF;
 						colors[0].b = 0xFF;
@@ -2681,9 +2681,9 @@ void CMenuPcs::DrawResultOpenAnim()
 						color.a = (unsigned char)(sprite->alpha * 255.0f);
 						GXSetChanMatColor(GX_COLOR0A0, color);
 					}
-					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kind));
+					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(sprite->kind));
 
-					if (kind == 0x17) {
+					if (sprite->kind == 0x17) {
 						float fillWidth = 1.0f;
 						if (sprite->timer < sprite->duration) {
 							fillWidth = 1.0f - ((float)(sprite->timer - 1) / (float)sprite->duration);

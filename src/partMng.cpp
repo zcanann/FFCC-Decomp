@@ -78,6 +78,7 @@ extern "C" const float kPartMngEnvBoxMaxZ = 800.0f;
 extern "C" {
 extern int ppvSysStopPartF;
 extern int ppvSysGoPartF;
+extern void* ppvHookFuncTbl;
 unsigned char gPppDefaultValueBuffer[0x40] = {0};
 int gPppHeapUseRateWords[3] = {0, 0, 0};
 unsigned char gPppInConstructor = 0;
@@ -257,9 +258,9 @@ void CPartMng::Create()
 
     memset(self + 0x235a8, 0, 0x108);
 
-    self[0x808] = 0;
-    self[0x809] = 0;
     self[0x80a] = 0;
+    self[0x809] = 0;
+    self[0x808] = 0;
 
     ppvSysStopPartF = 1;
     ppvSysGoPartF = 0;
@@ -273,6 +274,7 @@ void CPartMng::Create()
     }
 
     ppvEnv = &m_pppEnvSt;
+    ppvHookFuncTbl = 0;
 
     PSMTXIdentity(ppvUnitMatrix);
     ppvZeroVector.z = kPartMngZero;

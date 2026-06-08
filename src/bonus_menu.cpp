@@ -2885,8 +2885,9 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		base += activePartyCount;
-		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
+		for (int i = activePartyCount; i != 0; i--) {
+			int idx = base + activePartyCount - i;
+			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + idx * 0x40 + 8);
 			BonusAnimSprite* icon = (BonusAnimSprite*)((int)sprite - activePartyCount * 0x40);
 			sprite->kind = -2;
 			sprite->x = 0;

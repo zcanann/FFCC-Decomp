@@ -827,8 +827,8 @@ void CGObject::objectCollision()
 
                 if (capsuleDistance < bodyDistanceLimit) {
                     if (usePushTimers
-                        && ((m_groundHitOffset.x != sZeroFloat) || (m_groundHitOffset.z != sZeroFloat)
-                            || (other->m_groundHitOffset.x != sZeroFloat) || (other->m_groundHitOffset.z != sZeroFloat))) {
+                        && ((sZeroFloat != m_groundHitOffset.x) || (sZeroFloat != m_groundHitOffset.z)
+                            || (sZeroFloat != other->m_groundHitOffset.x) || (sZeroFloat != other->m_groundHitOffset.z))) {
                         keepPushTimer = true;
                     }
 

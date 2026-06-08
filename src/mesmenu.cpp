@@ -535,9 +535,9 @@ void CMesMenu::onDraw()
         if (FLOAT_803308d8 < stateBlend) {
             float width = m_windowWidth * stateBlend;
             float height = m_windowHeight * stateBlend;
-            float drawX = baseX + (((m_menuIndex & 1) == 0)
-                ? (m_windowWidth - width)
-                : -m_windowWidth);
+            float drawX = baseX + (((m_menuIndex & 1) != 0)
+                ? -m_windowWidth
+                : (m_windowWidth - width));
 
             float edgeY = FLOAT_803308f8;
             if ((m_menuIndex & 2) != 0) {

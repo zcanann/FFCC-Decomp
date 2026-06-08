@@ -10231,7 +10231,7 @@ input_check_done:
 					*reinterpret_cast<float*>(bytes + 0x7C) -= FLOAT_80331528;
 				}
 				m_wmWorldState->m_frameCounter = 0xE;
-				if (m_wmWorldState->m_cardChannel < 1) {
+				if (m_wmWorldState->m_cardChannel <= 0) {
 					m_wmWorldState->m_cardChannel = 4;
 				} else {
 					m_wmWorldState->m_cardChannel--;
@@ -10314,7 +10314,7 @@ input_check_done:
 
 		if (state == 2 && m_wmWorldState->m_delay == 0) {
 			m_wmWorldState->m_titleState++;
-			if (m_wmWorldState->m_titleState > 99) {
+			if (m_wmWorldState->m_titleState >= 100) {
 				m_wmWorldState->m_titleState = 0;
 			}
 		} else {

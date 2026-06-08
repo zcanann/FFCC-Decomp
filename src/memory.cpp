@@ -609,6 +609,8 @@ void CMemory::SetGroup(void* ptr, int group)
  */
 CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int mode)
 {
+    const char* strBase = reinterpret_cast<const char*>(sHeapBarColors);
+
     if ((mode != 1) || (OSGetConsoleSimulatedMemSize() == 0x3000000)) {
         unsigned int alignedSize = (size + 0x3F) & ~0x3FU;
         CMode& modeData = m_modes[mode];
@@ -616,7 +618,7 @@ CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int mode
         CStage* list = &modeData.m_activeList;
 
         if (stage == &modeData.m_freeList) {
-            System.Printf(const_cast<char*>(sCopyFromAMemorySyncTimeoutMsg + kStagePoolFullMsgOffset));
+            System.Printf(const_cast<char*>(strBase + 0x6d4));
         } else {
             do {
                 CStage* next = list->m_next;
@@ -674,7 +676,7 @@ CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int mode
                     if (mode == 2) {
                         CStage* backingStage = m_mainMemoryStage;
                         void* blockPool =
-                            backingStage->alloc(sizeof(CStage::CBlock) * 0x20 + 0x10, const_cast<char*>(s_memory_cpp), 0x228, 0);
+                            backingStage->alloc(sizeof(CStage::CBlock) * 0x20 + 0x10, const_cast<char*>(strBase + 0x1e8), 0x228, 0);
                         stage->m_heapHead = reinterpret_cast<unsigned long>(
                             static_cast<CStage::CBlock*>(__construct_new_array(blockPool, 0, 0, sizeof(CStage::CBlock), 0x20)));
                         stage->m_blockCount = 0;
@@ -686,7 +688,7 @@ CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int mode
                 list = next;
             } while (list != &modeData.m_activeList);
 
-            System.Printf(const_cast<char*>(sCopyFromAMemorySyncTimeoutMsg + kStageAllocFailedMsgOffset));
+            System.Printf(const_cast<char*>(strBase + 0x708));
             HeapWalker();
         }
     }

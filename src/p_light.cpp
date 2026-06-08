@@ -964,15 +964,13 @@ void CLightPcs::CBumpLight::MakeLightMap()
         GXInitLightColor(&lightObj, lightColor);
 
         if (m_target == 1) {
-            double d0 = (double)kLightZero;
-            double d1 = (double)(m_specularScale * kLightHalf);
-            GXInitLightAttn(&lightObj, (float)d0, (float)d0, kLightOne, (float)d1, (float)d0,
-                            (float)((double)kLightOne - d1));
+            float d1 = m_specularScale * kLightHalf;
+            GXInitLightAttn(&lightObj, kLightZero, kLightZero, kLightOne, d1, kLightZero,
+                            kLightOne - d1);
         } else {
-            double d0 = (double)kLightZero;
-            double d1 = (double)(*lightScale * kLightHalf);
-            GXInitLightAttn(&lightObj, (float)d0, (float)d0, kLightOne, (float)d1, (float)d0,
-                            (float)((double)kLightOne - d1));
+            float d1 = *lightScale * kLightHalf;
+            GXInitLightAttn(&lightObj, kLightZero, kLightZero, kLightOne, d1, kLightZero,
+                            kLightOne - d1);
         }
 
         GXLoadLightObjImm(&lightObj, (GXLightID)1);

@@ -1493,9 +1493,9 @@ void CFlatRuntime2::Draw()
 		for (int i = 0; i < debugCount; i++) {
 			const u8 flags = entry->m_flags;
 			GXColor* drawColor = &greenColor;
-			if ((flags & 0x80) != 0) {
+			if (entry->m_flagBits.m_bit7 != 0) {
 				drawColor = &redColor;
-			} else if ((flags & 0x40) != 0) {
+			} else if (entry->m_flagBits.m_bit6 != 0) {
 				drawColor = &blueColor;
 			}
 			GXSetChanMatColor(GX_COLOR0A0, *drawColor);

@@ -130,7 +130,6 @@ int checkThread(void*)
 void CGraphic::Init()
 {
     char* graphicInitData = const_cast<char*>(sGraphicInitData);
-    char* graphicFileName = graphicInitData + kGraphicInitSource;
 
     m_graphicStage = Memory.CreateStage(0x19C000, graphicInitData + kGraphicInitCGraphic, 0);
     m_scratchStage = Memory.CreateStage(0xD6000, graphicInitData + kGraphicInitCGraphic2, 0);
@@ -164,18 +163,18 @@ void CGraphic::Init()
     u32 efbBufferSize = alignedWidth * efbHeight * 2;
     u32 xfbBufferSize = alignedWidth * xfbHeight * 2;
 
-    m_frameBuffer = new (m_graphicStage, graphicFileName, 0x86) u8[xfbBufferSize];
+    m_frameBuffer = new (m_graphicStage, graphicInitData + kGraphicInitSource, 0x86) u8[xfbBufferSize];
     memset(m_frameBuffer, 0, 4);
 
-    m_savedFrameBuffer = new (m_graphicStage, graphicFileName, 0x88) u8[efbBufferSize];
+    m_savedFrameBuffer = new (m_graphicStage, graphicInitData + kGraphicInitSource, 0x88) u8[efbBufferSize];
     memset(m_savedFrameBuffer, 0, 4);
 
     renderMode = m_renderMode;
     u32 scratchBufferSize = (((renderMode->fbWidth + 0xF) & 0xFFF0) * renderMode->efbHeight * 2) + 0x46000;
-    m_scratchTextureBuffer = Memory._Alloc(scratchBufferSize, m_scratchStage, graphicFileName, 0xB53, 0);
+    m_scratchTextureBuffer = Memory._Alloc(scratchBufferSize, m_scratchStage, graphicInitData + kGraphicInitSource, 0xB53, 0);
     memset(m_scratchTextureBuffer, 0, 0x46004);
 
-    m_fifoBuffer = new (m_graphicStage, graphicFileName, 0x8B) u8[0x60000];
+    m_fifoBuffer = new (m_graphicStage, graphicInitData + kGraphicInitSource, 0x8B) u8[0x60000];
 
     VIConfigure(m_renderMode);
     GXInit(m_fifoBuffer, 0x60000);
@@ -216,7 +215,7 @@ void CGraphic::Init()
     m_blurBufferIndex = 0;
     m_blurTextureCount = 0;
     GXCopyDisp(m_frameBuffer, GX_TRUE);
-    m_drawDoneFile = graphicFileName;
+    m_drawDoneFile = graphicInitData + kGraphicInitSource;
     m_drawDoneLine = 0xBE;
     m_drawDoneWaiting = 1;
     GXSetDrawDone();

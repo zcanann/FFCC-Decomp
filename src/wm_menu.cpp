@@ -86,7 +86,7 @@ float* DAT_8032E8EC = lbl_80210B04;
 extern int DAT_8032ef08;
 extern int DAT_80238028;
 extern char cRam8032ee21;
-extern "C" char lbl_80331380[];
+extern "C" char lbl_80331380[4];
 extern "C" char lbl_80331400[];
 extern "C" unsigned char lbl_801DC294[];
 extern "C" const char* lbl_80210D10[];

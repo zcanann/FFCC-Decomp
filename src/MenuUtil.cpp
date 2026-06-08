@@ -1161,7 +1161,7 @@ void CMenuPcs::DrawOptionMenu()
 	font->SetScaleX(kOptionListTextScaleX);
 	char** option = optionText;
 	int rowY = 0x70;
-	unsigned int selectedY = 0x73;
+	int selectedY = 0x73;
 	unsigned int normalY = 0x75;
 	for (int i = 0; i < 5; i++, rowY += 0x28, selectedY += 0x28, normalY += 0x28, option++) {
 		CTexture* row = GetMenuTexture(this, 0xC0);
@@ -1284,7 +1284,7 @@ void CMenuPcs::DrawOptionMenu()
 		unsigned int sideWidth = sideTexture->m_width;
 		unsigned int sideHeight = sideTexture->m_height;
 		const f32* row = &layoutBase[20];
-		signed char secondValue = m_stereoMode;
+		unsigned char secondValue = m_stereoMode;
 		char* firstText = langStrings[14];
 		char* secondText = langStrings[15];
 		float leftX = row[0];

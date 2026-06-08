@@ -313,9 +313,9 @@ void CMenuPcs::ItemDraw()
     s16 listState = this->m_itemMenuState->listState;
     s16 mode = this->m_itemMenuState->mode;
     ItemMenuAnimList* itemList = this->m_itemList;
-    bool hasLetterAttach = SingGetLetterAttachflg() >= 0;
-    int drawIndex = 0;
     MenuItemOpenAnim* entry = itemList->anims;
+    int drawIndex = 0;
+    bool hasLetterAttach = SingGetLetterAttachflg() >= 0;
 
     for (int i = 0; i < this->m_itemList->count; i++, entry++) {
         int tex = entry->tex;

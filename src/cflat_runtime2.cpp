@@ -2284,19 +2284,19 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 
 	switch (controlNo) {
 	case 0:
-		m_gameFlags = static_cast<u8>((m_gameFlags & 0x7F) | ((value8 & 1) << 7));
+		CFlat.m_gameFlags = static_cast<u8>((CFlat.m_gameFlags & 0x7F) | ((value8 & 1) << 7));
 		break;
 
 	case 2:
-		m_gameFlags = static_cast<u8>((m_gameFlags & 0xF7) | ((value8 & 1) << 3));
+		CFlat.m_gameFlags = static_cast<u8>((CFlat.m_gameFlags & 0xF7) | ((value8 & 1) << 3));
 		break;
 
 	case 3:
-		m_bossState = controlValue;
+		CFlat.m_bossState = controlValue;
 		break;
 
 	case 5:
-		m_bossSubState = controlValue;
+		CFlat.m_bossSubState = controlValue;
 		break;
 
 	case 4:
@@ -2333,20 +2333,20 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 		break;
 
 	case 0xA:
-		m_gameFlags = static_cast<u8>((m_gameFlags & 0xEF) | ((value8 & 1) << 4));
+		CFlat.m_gameFlags = static_cast<u8>((CFlat.m_gameFlags & 0xEF) | ((value8 & 1) << 4));
 		break;
 
 	case 0xB:
-		m_gameFlags = static_cast<u8>((m_gameFlags & 0xDF) | ((value8 & 1) << 5));
+		CFlat.m_gameFlags = static_cast<u8>((CFlat.m_gameFlags & 0xDF) | ((value8 & 1) << 5));
 		break;
 
 	case 0xE:
-		m_gameFlags = static_cast<u8>((m_gameFlags & 0xFD) | ((value8 & 1) << 1));
+		CFlat.m_gameFlags = static_cast<u8>((CFlat.m_gameFlags & 0xFD) | ((value8 & 1) << 1));
 		Chara.ChangeMogMode(controlValue);
 		break;
 
 	case 0x12:
-		m_gameFlags = static_cast<u8>((m_gameFlags & 0xFE) | (value8 & 1));
+		CFlat.m_gameFlags = static_cast<u8>((CFlat.m_gameFlags & 0xFE) | (value8 & 1));
 		break;
 
 	case 0x13: {

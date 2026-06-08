@@ -2827,7 +2827,7 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
             text = GetSingWinMessage(staticMessage.textIds[i], dynamicText, 0);
         }
         int textWidth = font->GetWidth(text);
-        if (maxWidth < textWidth) {
+        if (textWidth > maxWidth) {
             maxWidth = textWidth;
         }
         dynamicText += 0x80;
@@ -2898,7 +2898,7 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
             text = GetSingWinMessage(staticMessage.textIds[i], dynamicText, 0);
         }
         int textWidth = font->GetWidth(text);
-        if (maxWidth < textWidth) {
+        if (textWidth > maxWidth) {
             maxWidth = textWidth;
         }
         dynamicText += 0x80;

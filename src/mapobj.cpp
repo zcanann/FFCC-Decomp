@@ -537,9 +537,8 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                         pointLight->m_unknown20 = chunkFile.Get1();
                         chunkFile.Get1();
 
-                        unsigned char colorCount = chunkFile.Get1();
-                        pointLight->m_colorCount = colorCount;
-                        for (int i = 0; i < static_cast<int>(colorCount); i++) {
+                        pointLight->m_colorCount = chunkFile.Get1();
+                        for (int i = 0; i < static_cast<int>(pointLight->m_colorCount); i++) {
                             pointLight->m_colors[i].r = chunkFile.Get1();
                             pointLight->m_colors[i].g = chunkFile.Get1();
                             pointLight->m_colors[i].b = chunkFile.Get1();

@@ -323,7 +323,7 @@ void CGObject::onCreate()
     m_gravityY = 0.0f;
     m_jumpLandingDampening = 0.0f;
 
-    m_stateFlags0 &= 0xEF;
+    m_stateFlags0Bits.unk3 = 0;
 
     m_bgCollisionQtrn.x = 0.0f;
     m_bgCollisionQtrn.y = 0.0f;
@@ -350,9 +350,9 @@ void CGObject::onCreate()
     m_moveAnimSubState = 0;
     m_randSeedLo = 0;
     m_randSeedHi = 0;
-    m_stateFlags0 &= 0xF7;
+    m_stateFlags0Bits.unk4 = 0;
     m_ownerSlot = 0;
-    m_stateFlags0 &= 0x7F;
+    m_stateFlags0Bits.unk0 = 0;
     m_moveMode = 0;
     m_moveModePrevious = 4;
 

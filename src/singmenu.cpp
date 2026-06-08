@@ -2746,10 +2746,10 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     } else {
         lineCount = s_singleMenuStaticMessages[messageNo].lineCount;
     }
+    char* dynamicText = s_DynamicMessStr;
     const SingMenuStaticMessageInfo& staticMessage = s_singleMenuStaticMessages[messageNo];
 
     int maxWidth = 0;
-    char* dynamicText = s_DynamicMessStr;
     for (int i = 0; i < lineCount; i++) {
         const char* text = dynamicText;
         if (useDynamic == 0) {

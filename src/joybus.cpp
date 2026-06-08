@@ -4823,7 +4823,6 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
             memcpy(&payload[0x81], classFlags, sizeof(classFlags));
 
             unsigned char* playerData = playerInfo.m_data;
-            int playerOffset = threadParam->m_portIndex * 0xDC;
 
             payload[0x85] = playerData[0x16];
             payload[0x86] = playerData[0x17];
@@ -4833,11 +4832,11 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
             payload[0x8A] = playerData[0x1CF];
             payload[0x8B] = playerData[0x2AA];
             payload[0x8C] = playerData[0x2AB];
-            payload[0x8D] = playerData[playerOffset + 2];
+            payload[0x8D] = playerData[threadParam->m_portIndex * 0xDC + 2];
 
-            memcpy(&payload[0x8E], &playerData[playerOffset + 0x20], 3);
+            memcpy(&payload[0x8E], &playerData[threadParam->m_portIndex * 0xDC + 0x20], 3);
 
-            unsigned short statHalf = __lhbrx(&playerData[playerOffset + 0x14], 0);
+            unsigned short statHalf = __lhbrx(&playerData[threadParam->m_portIndex * 0xDC + 0x14], 0);
             memcpy(&payload[0x91], &statHalf, 2);
 
             unsigned char compatBuf[64];
@@ -4849,9 +4848,9 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
 
             memcpy(body, compatBuf, compatLen);
 
-            memcpy(body + compatLen, &playerData[playerOffset + 0x18], 8);
+            memcpy(body + compatLen, &playerData[threadParam->m_portIndex * 0xDC + 0x18], 8);
 
-            unsigned int statWord = __lwbrx(&playerData[playerOffset + 0x24], 0);
+            unsigned int statWord = __lwbrx(&playerData[threadParam->m_portIndex * 0xDC + 0x24], 0);
             memcpy(body + compatLen + 8, &statWord, sizeof(statWord));
 
             const int byteLen = compatLen + 0xA3;

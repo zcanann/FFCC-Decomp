@@ -306,11 +306,15 @@ static inline u32& CharaAmemSize()
     return Chara.AmemSize();
 }
 
-static inline void SetupBaseCharaLights(CCharaPcs* self)
+static inline void SetupCharaTevSwap()
 {
     _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+}
+
+static inline void SetupBaseCharaLights(CCharaPcs* self)
+{
     Graphic.SetFog(1, 0);
     LightPcs.SetAmbient(self->m_viewerAmbientColor[0]);
     LightPcs.SetNumDiffuse(3);
@@ -1124,9 +1128,7 @@ void CCharaPcs::SetSpecularAlpha(int alpha)
  */
 void CCharaPcs::InitEnv(int envMode)
 {
-    _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-    _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-    _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+    SetupCharaTevSwap();
 
     if (envMode == 1 || envMode == 2) {
         CColor black(0x00, 0x00, 0x00, 0xFF);
@@ -1138,7 +1140,7 @@ void CCharaPcs::InitEnv(int envMode)
     }
 
     if (envMode == 4) {
-        GXSetProjection(CameraPcs.m_screenMatrix, GX_ORTHOGRAPHIC);
+        GXSetProjection(CameraPcs.m_screenMatrix, GX_PERSPECTIVE);
     }
 }
 
@@ -1185,7 +1187,7 @@ void CCharaPcs::GetTexShadow(int startIndex, int maxCount, _GXTexObj* texObjs, V
 
                 const unsigned short texSize = static_cast<unsigned short>(m_texShadowSize);
                 GXInitTexObj(
-                    &texObjs[outIndex], handle->m_shadowTexturePtr, texSize, texSize, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP,
+                    &texObjs[outIndex], handle->m_shadowTexturePtr, texSize, texSize, GX_TF_I4, GX_CLAMP, GX_CLAMP,
                     GX_FALSE);
 
                 Mtx modelMtx;
@@ -1212,6 +1214,7 @@ void CCharaPcs::GetTexShadow(int startIndex, int maxCount, _GXTexObj* texObjs, V
  */
 void CCharaPcs::draw()
 {
+    SetupCharaTevSwap();
     SetupBaseCharaLights(this);
 
     CHandle* handle = m_handleList->m_next;
@@ -1231,6 +1234,7 @@ void CCharaPcs::draw()
 void CCharaPcs::drawBefore()
 {
     CameraPcs.SetStdProjectionMatrix();
+    SetupCharaTevSwap();
     SetupBaseCharaLights(this);
 
     CHandle* handle = m_handleList->m_next;
@@ -1274,7 +1278,7 @@ void CCharaPcs::drawMakeTexShadow()
 
     GXSetPixelFmt((GXPixelFmt)1, GX_ZC_LINEAR);
     GXSetAlphaUpdate(GX_TRUE);
-    GXSetViewport(0.0f, 0.0f, static_cast<float>(m_texShadowSize), static_cast<float>(m_texShadowSize), 0.0f, 1.0f);
+    GXSetViewport(kCharaZero, kCharaZero, static_cast<float>(m_texShadowSize), static_cast<float>(m_texShadowSize), kCharaZero, kCharaOne);
     GXSetScissor(0, 0, static_cast<unsigned int>(m_texShadowSize), static_cast<unsigned int>(m_texShadowSize));
     CColor clearColor(0x00, 0x00, 0x00, 0x00);
     Graphic.SetCopyClear(clearColor.color, 0xFFFFFF);
@@ -1307,7 +1311,7 @@ void CCharaPcs::drawMakeTexShadow()
  */
 void CCharaPcs::drawShadow()
 {
-    if (CameraPcs.m_fullScreenShadowEnabled == 0) {
+    if (static_cast<int>(CameraPcs.m_fullScreenShadowEnabled) == 0) {
         return;
     }
 
@@ -2001,6 +2005,7 @@ void CCharaPcs::drawOverlap()
     C_MTXLookAt(lookAtMtx, &m_overlapEyePos, &up, &m_overlapTargetPos);
     PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 
+    SetupCharaTevSwap();
     SetupBaseCharaLights(this);
 
     CHandle* handle = m_handleList->m_next;

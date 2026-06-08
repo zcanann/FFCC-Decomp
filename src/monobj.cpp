@@ -170,7 +170,7 @@ void CGMonObj::onFramePreCalc()
 		(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x50) == 0) &&
 		(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x44) == 0) &&
 		(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x46) == 0) &&
-		(static_cast<signed char>(mon[0x63C]) < 0) &&
+		((static_cast<int>((static_cast<unsigned int>(mon[0x63C]) << 24) & 0xC0000000) >> 31) != 0) &&
 		(m_unk6B9 == 0) &&
 		(m_unk6C1 == 0)) {
 		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) {
@@ -251,7 +251,7 @@ void CGMonObj::undeadOff()
 	*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x694) = 0.0f;
 
 	unsigned char weaponFlags = *reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags);
-	int weaponMode = static_cast<int>(static_cast<unsigned int>(weaponFlags) << 24) >> 31;
+	int weaponMode = static_cast<int>((static_cast<unsigned int>(weaponFlags) << 24) & 0xC0000000) >> 31;
 	int isUndead =
 		(static_cast<unsigned int>(
 			 __cntlzw(0xB - *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC))) >>
@@ -1606,19 +1606,21 @@ int CGMonObj::getReplaceStat(int state)
 	if ((state < -4) && (-0xE <= state)) {
 		unsigned short action = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + ((state + 0xE) * 2 + 0xD0));
 		unsigned short actionType = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (action * 0x48 + 0xE));
-		if (actionType == 3) {
-			return 0x12;
+		switch (actionType) {
+		case 0:
+		case 1:
+			state = 1;
+			break;
+		case 2:
+			state = 2;
+			break;
+		case 3:
+			state = 0x12;
+			break;
+		case 4:
+			state = 8;
+			break;
 		}
-		if (actionType < 3) {
-			if (actionType < 2) {
-				return 1;
-			}
-			return 2;
-		}
-		if (4 < actionType) {
-			return state;
-		}
-		return 8;
 	} else {
 		state = CGCharaObj::getReplaceStat(state);
 	}
@@ -3936,7 +3938,7 @@ void CGMonObj::statMove(int* targetIndex)
 		break;
 
 	default: {
-		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) {
+		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) {
 			*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
 			memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
 		}

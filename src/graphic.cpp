@@ -636,13 +636,13 @@ void CGraphic::Flip()
 
         if (System.m_scenegraphStepMode != 1) {
             int retraceCount = VIGetRetraceCount();
-            if ((u32)(retraceCount - m_lastRetraceCount) < 2) {
+            if ((u32)(retraceCount - m_lastRetraceCount) > 1) {
+                m_frameRateOver = 1;
+            } else {
                 m_frameRateOver = 0;
                 while ((u32)((retraceCount = VIGetRetraceCount()) - m_lastRetraceCount) < 2) {
                     VIWaitForRetrace();
                 }
-            } else {
-                m_frameRateOver = 1;
             }
         }
 
@@ -667,11 +667,13 @@ void CGraphic::Flip()
 
     m_lastRetraceCount = VIGetRetraceCount();
 
+    u8 frameReady;
     if (System.m_scenegraphStepMode == 1) {
-        m_frameReady = ((u32)__cntlzw(System.m_frameCounter & 3) >> 5) & 0xFF;
+        frameReady = ((u32)__cntlzw(System.m_frameCounter & 3) >> 5) & 0xFF;
     } else {
-        m_frameReady = 1;
+        frameReady = 1;
     }
+    m_frameReady = frameReady;
 }
 
 /*

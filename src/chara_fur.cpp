@@ -1076,9 +1076,25 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 			Sound.StopSe(MogWork().m_loopSeHandle);
 			MogWork().m_loopSeHandle = 0;
 		}
-		const _GXColor brushColor = MogBrushColor(radarType);
-		const int eraseMode = (radarType == 4) ? 1 : 0;
-		const int doPaint = (radarType == 3 || radarType == 4) ? (((System.m_frameCounter & 3U) == 0) ? 1 : 0) : 1;
+		int eraseMode = 0;
+		int doPaint = 1;
+		_GXColor brushColor;
+		if (radarType == 2) {
+			brushColor = CColor(4, 0xF, 4, 2).color;
+		} else if (radarType < 2) {
+			if (radarType == 0) {
+				brushColor = CColor(0xF, 4, 4, 2).color;
+			} else if (radarType >= 0) {
+				brushColor = CColor(4, 8, 0xF, 2).color;
+			}
+		} else if (radarType == 4) {
+			brushColor = CColor(0, 0, 0, 2).color;
+			eraseMode = 1;
+			doPaint = ((System.m_frameCounter & 3U) == 0) ? 1 : 0;
+		} else if (radarType < 4) {
+			brushColor = CColor(0xF, 0xF, 0xF, 4).color;
+			doPaint = ((System.m_frameCounter & 3U) == 0) ? 1 : 0;
+		}
 		_GXColor centerBefore = CColor(0xF, 0xF, 0xF, 0).color;
 		_GXColor centerAfter = centerBefore;
 		Vec worldPos;

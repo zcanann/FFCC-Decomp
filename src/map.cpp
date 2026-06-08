@@ -1543,14 +1543,16 @@ search:
             stride;
 
         if (mapObj < mapObjEnd) {
-            do {
+            for (unsigned int i = 0; i < remaining; i++) {
+                if (mapObj >= mapObjEnd) {
+                    break;
+                }
                 CMapObjAtr* mapObjAtr = mapObj->m_attribute;
                 if (mapObjAtr != 0 && mapObjAtr->m_type == CMapObjAtr::MESH_NAME) {
                     goto found;
                 }
                 mapObj++;
-                remaining--;
-            } while (remaining != 0);
+            }
         }
 
         mapObj = 0;

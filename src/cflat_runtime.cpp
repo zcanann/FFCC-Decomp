@@ -502,7 +502,7 @@ int CFlatRuntime::CreateDebug(void* filePtr, int debugChunkIndex)
 
 							while ((hasChunk = chunkFile.GetNextChunk(chunk), hasChunk != 0)) {
 								if (((chunk.m_id != 'NAME')
-								     && (static_cast<int>(chunk.m_id) < static_cast<int>('NAME')))
+								     && (chunk.m_id < static_cast<unsigned int>('NAME')))
 								    && (chunk.m_id == 'CODE')) {
 									if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(funcs) + blockOffset + 0x30)
 									    == 0) {

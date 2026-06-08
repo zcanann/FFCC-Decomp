@@ -5150,8 +5150,7 @@ int JoyBus::SendMapObj(ThreadParam* threadParam)
             m_txWordCount[threadParam->m_portIndex] = wordCount;
 
             port = threadParam->m_portIndex;
-            unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
-            unsigned int word = *wordPtr;
+            unsigned int word = *(unsigned int*)&m_joyDataPacketBuffer[port][2 + m_txWordIndex[port] * 4];
 
             if (static_cast<signed char>(m_threadRunningMask) == 0)
             {
@@ -5184,8 +5183,7 @@ int JoyBus::SendMapObj(ThreadParam* threadParam)
     case 1:
     {
         port = threadParam->m_portIndex;
-        unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
-        unsigned int word = *wordPtr;
+        unsigned int word = *(unsigned int*)&m_joyDataPacketBuffer[port][2 + m_txWordIndex[port] * 4];
 
         if (static_cast<signed char>(m_threadRunningMask) == 0)
         {
@@ -5210,7 +5208,7 @@ int JoyBus::SendMapObj(ThreadParam* threadParam)
                 result = 0;
             }
         }
-    
+
         break;
     }
     }

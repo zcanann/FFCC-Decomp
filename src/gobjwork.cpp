@@ -1739,7 +1739,7 @@ void CCaravanWork::SafeDeleteTempItem()
 	}
 
 	short invalidSlot = -1;
-	short slot = m_commandListInventorySlotRef[2];
+	int slot = m_commandListInventorySlotRef[2];
 	if (slot >= 0 && m_inventoryItems[slot] < 0) {
 		m_commandListInventorySlotRef[2] = invalidSlot;
 	}

@@ -1274,30 +1274,29 @@ void CFlatRuntime2::Calc()
 	u8* runtime = reinterpret_cast<u8*>(this);
 
 	for (int i = 0; i < 8; i++) {
-		CFlatLayerResource* layer = &LayerResources(this)[i];
-		CFile::CHandle* fileHandle = layer->m_fileHandle;
+		CFile::CHandle* fileHandle = LayerResources(this)[i].m_fileHandle;
 		if (fileHandle == 0) {
 			continue;
 		}
 
 		if (File.IsCompleted(fileHandle)) {
-			CTextureSet* textureSet = layer->m_textureSet;
+			CTextureSet* textureSet = LayerResources(this)[i].m_textureSet;
 			if (textureSet != 0) {
 				delete textureSet;
-				layer->m_textureSet = 0;
+				LayerResources(this)[i].m_textureSet = 0;
 			}
 
 			textureSet = new (getStage(), const_cast<char*>(sCFlatRuntime2FileTag), 0x335) CTextureSet;
-			layer->m_textureSet = textureSet;
+			LayerResources(this)[i].m_textureSet = textureSet;
 			if (textureSet != 0) {
 				textureSet->Create(
 					File.m_readBuffer,
-					GET_CHARA_ALLOC_STAGE_S(layer->m_allocStage, Game.m_mainStage),
+					GET_CHARA_ALLOC_STAGE_S(LayerResources(this)[i].m_allocStage, Game.m_mainStage),
 					0, 0, 0, 0);
 			}
 
-			File.Close(fileHandle);
-			layer->m_fileHandle = 0;
+			File.Close(LayerResources(this)[i].m_fileHandle);
+			LayerResources(this)[i].m_fileHandle = 0;
 		}
 	}
 

@@ -796,7 +796,7 @@ void CMes::Calc()
 
 	unsigned char* flagEntry =
 	    (unsigned char*)((char*)this + *(int*)((char*)this + 0x3C10) * 6 + 0x3C14);
-	while ((int)maxAdvance > *(int*)((char*)this + 0x3C10))
+	while (*(int*)((char*)this + 0x3C10) < (int)maxAdvance)
 	{
 		int type = *flagEntry;
 		switch (type)

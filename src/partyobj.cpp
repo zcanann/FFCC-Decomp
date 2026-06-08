@@ -402,6 +402,8 @@ void CGPartyObj::onChangeStat(int state)
 	m_weaponNodeFlagAll.m_bits1.m_menuReady = 0;
 
 	switch (state) {
+	case -20:
+		break;
 	case 0:
 		m_weaponNodeFlagAll.m_bits1.m_menuReady = 1;
 		break;

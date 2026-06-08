@@ -2488,11 +2488,11 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
                 while (len-- > 0)
                 {
                     unsigned char b = *data++;
-                    unsigned char idxC = static_cast<unsigned char>(((crc >> 8) ^ b));
+                    unsigned char idxC = static_cast<signed char>(((crc >> 8) ^ b));
                     crc = static_cast<unsigned short>((crc << 8) ^ JoyBusCrcTable[idxC]);
                 }
 
-                if (static_cast<unsigned short>(~crc) == buf.m_crc)
+                if (static_cast<short>(~crc) == buf.m_crc)
                 {
                     GbaQue.SetQueue(threadParam->m_portIndex, prevCmd);
                 }
@@ -2542,7 +2542,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
             for (int i = 0; i < (int)m_cmdCount[threadParam->m_portIndex]; ++i)
             {
                 unsigned int cmd = m_cmdQueueData[threadParam->m_portIndex][i];
-                unsigned char op = static_cast<unsigned char>(cmd >> 24) & 0x3F;
+                signed char op = static_cast<unsigned char>(cmd >> 24) & 0x3F;
 
                 if (op == 0x0A || op == 0x10 || op == 0x14 ||
                     op == 0x1B || op == 0x13 || op == 0x09)
@@ -2837,7 +2837,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
                     {
                         status = 0;
 
-                        threadParam->m_gbaBootFlag    = (unsigned char)((int)(unsigned char)flags >> 6);
+                        threadParam->m_gbaBootFlag    = (unsigned char)((int)(signed char)flags >> 6);
                         threadParam->m_unk2           = (unsigned char)((flags >> 4) & 0x03);
                         threadParam->m_bootRetryCount = (unsigned char)(flags & 0x0F);
                     }
@@ -2892,7 +2892,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
                 if (status == 0)
                 {
                     // Bit-twiddly inequality check preserved from decomp
-                    unsigned char a = (unsigned char)((timeValue - threadParam->m_timestamp) >> 24);
+                    unsigned char a = (signed char)((timeValue - threadParam->m_timestamp) >> 24);
                     unsigned char b = (unsigned char)((threadParam->m_timestamp - timeValue) >> 24);
 
                     threadParam->m_timeChangedFlag = (unsigned char)((a | b) >> 7);
@@ -2994,7 +2994,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
 
                 unsigned char portVal = singleMode2 ? 0 : (unsigned char)threadParam->m_portIndex;
                 unsigned char header = 1;
-                unsigned char flags = (unsigned char)(portVal | (threadParam->m_gbaBootFlag << 6) | (threadParam->m_unk2 << 4));
+                signed char flags = (unsigned char)(portVal | (threadParam->m_gbaBootFlag << 6) | (threadParam->m_unk2 << 4));
                 unsigned int word = (1u << 24) | ((unsigned int)flags << 16);
 
                 threadParam->m_gbaStatus = GBAWrite(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(&word), &threadParam->m_unk3);
@@ -4072,7 +4072,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
     case 3:
     {
         int sent = wordIndex;
-        int totalWord = (int)(signed char)mobCount;
+        int totalWord = (int)(unsigned char)mobCount;
 
         while (sent < totalWord)
         {
@@ -4346,7 +4346,7 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
 
             m_txWordIndex[threadParam->m_portIndex] = 0;
 
-            unsigned char classFlags[4];
+            signed char classFlags[4];
             memset(classFlags, 0xFF, sizeof(classFlags));
 
             unsigned char payload[0x300];
@@ -4368,7 +4368,7 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
                 if (p[0x16] != 0)
                 {
                     int idx = (int)p[0] >> 1;
-                    unsigned char v = (classFlags[idx] & 0x0F) | lowBits;
+                    signed char v = (classFlags[idx] & 0x0F) | lowBits;
 
                     if ((p[0] & 1) != 0)
                     {
@@ -4386,7 +4386,7 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
 
                     if ((p[0xDC] & 1) != 0)
                     {
-                        v = (classFlags[idx] & 0xF0) | (unsigned char)(highBits + 1);
+                        v = (classFlags[idx] & 0xF0) | (signed char)(highBits + 1);
                     }
 
                     classFlags[idx] = v;

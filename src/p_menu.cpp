@@ -1786,9 +1786,9 @@ void CMenuPcs::drawBattle()
         Vec4d projected;
         PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
         PSMTXCopy(cameraMtx, reinterpret_cast<MtxPtr>(viewMtx));
-        viewMtx[3][0] = LoadFloat(kMenuInitOne);
-        viewMtx[3][1] = LoadFloat(kMenuInitOne);
         viewMtx[3][2] = LoadFloat(kMenuInitOne);
+        viewMtx[3][1] = LoadFloat(kMenuInitOne);
+        viewMtx[3][0] = LoadFloat(kMenuInitOne);
         viewMtx[3][3] = LoadFloat(kMenuOne);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
         PSMTX44Concat(screenMtx, viewMtx, screenMtx);

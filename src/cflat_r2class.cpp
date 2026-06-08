@@ -1675,10 +1675,10 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		case -0x91: {
 			float furTarget = reinterpret_cast<float*>(object->m_localBase)[0];
-			float furSetCur = reinterpret_cast<float*>(object->m_localBase)[1];
+			int furSetCur = static_cast<int>(object->m_localBase[1]);
 			CChara::CModel* model = engineObject->m_charaModelHandle->m_model;
 			model->m_furTarget = furTarget;
-			if (furSetCur != 0.0f) {
+			if (furSetCur != 0) {
 				model->m_furCur = furTarget;
 			}
 			PushValue(this, object, 0);

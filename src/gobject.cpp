@@ -3380,8 +3380,8 @@ void CGObject::PutDropItem()
     s32 dropCount = 0;
 
     for (int i = 0; i < 4; i++) {
-        s32 dropCode = static_cast<u16>(m_dropItemCodes[i]);
-        if ((short)m_dropItemCodes[i] > 0) {
+        s32 dropCode = *reinterpret_cast<s16*>(&m_dropItemCodes[i]);
+        if (dropCode > 0) {
             int createMode;
             if ((dropCode & 0xC000) == 0x4000) {
                 dropCode &= 0x3FFF;

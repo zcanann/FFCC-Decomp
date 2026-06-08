@@ -11021,7 +11021,7 @@ LAB_draw:
 						dateY = slotY + FLOAT_803314d8;
 					}
 					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x17));
-					const int saveYear = *reinterpret_cast<int*>(slotData + 8);
+					const unsigned int saveYear = *reinterpret_cast<int*>(slotData + 8);
 					int digitCount = 1;
 					if (saveYear > 99) {
 						digitCount = 3;
@@ -11078,7 +11078,7 @@ LAB_draw:
 							}
 							const int digitWidth = DAT_801dc118[digit];
 							const int row = digit / 5 + (digit >> 0x1F);
-							const int rowIndex = row - (row >> 0x1F);
+							const unsigned int rowIndex = row - (row >> 0x1F);
 							const int col = digit + rowIndex * -5;
 							const float digitWidthF = static_cast<float>(digitWidth);
 							MenuPcs.DrawRect(0xFFFFFFFF, digitX, dateY, digitWidthF, FLOAT_80331410,
@@ -11100,7 +11100,7 @@ LAB_draw:
 								suffixScale = static_cast<float>(DOUBLE_80331530);
 							}
 							if (language == 1) {
-								const int tens = static_cast<int>(saveYear) / 10 + (static_cast<int>(saveYear) >> 0x1F);
+								const int tens = static_cast<int>(saveYear) / 10 + (static_cast<unsigned int>(saveYear) >> 0x1F);
 								if (tens - (tens >> 0x1F) == 1) {
 									suffixU = FLOAT_8033151c;
 								} else {
@@ -11164,7 +11164,7 @@ LAB_draw:
 					int playMinutes;
 					MemoryCardMan.CnvPlayTime(*reinterpret_cast<unsigned int*>(slotData + 0x14), &playHours, &playMinutes);
 					const int* const playDigitWidths = reinterpret_cast<int*>(lbl_801DC294 + 0x14);
-					const int playColonWidth = *reinterpret_cast<int*>(lbl_801DC294 + 0x3C);
+					const unsigned int playColonWidth = *reinterpret_cast<int*>(lbl_801DC294 + 0x3C);
 					int playDigits[5];
 					float playWidth = FLOAT_803313dc;
 					int hundreds = playHours / 100 + (playHours >> 0x1F);

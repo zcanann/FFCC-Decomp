@@ -3615,7 +3615,7 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 		}
 		break;
 	case 0x17:
-		if (kind == 1 && source != nullptr && source->m_scriptHandle != nullptr && source->m_scriptHandle[9] != nullptr &&
+		if (kind == 1 &&
 		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(source->m_scriptHandle[9]) + 0xFE) & 4) != 0) {
 			addValue = stageAdd;
 		}

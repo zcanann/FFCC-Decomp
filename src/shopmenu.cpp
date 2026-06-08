@@ -2939,8 +2939,16 @@ updateWindow:
     if ((m_listTop + m_visibleRows) <= m_selectedIndex) {
         m_listTop = (m_selectedIndex - m_visibleRows) + 1;
     }
-    m_canScrollUp = (m_listTop < 1) ? 0 : 1;
-    m_canScrollDown = ((m_listTop + m_visibleRows) < getItemCnt()) ? 1 : 0;
+    if (m_listTop > 0) {
+        m_canScrollUp = 1;
+    } else {
+        m_canScrollUp = 0;
+    }
+    if ((m_listTop + m_visibleRows) < getItemCnt()) {
+        m_canScrollDown = 1;
+    } else {
+        m_canScrollDown = 0;
+    }
 }
 /*
  * --INFO--

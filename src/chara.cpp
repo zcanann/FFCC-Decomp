@@ -2843,37 +2843,31 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 			unsigned int skinOffset = 0;
 			chunk.PushChunk();
 			while (chunk.GetNextChunk(chunkInfo)) {
-				switch (chunkInfo.m_id) {
-				case 0x4E4F4445: {
+				if (chunkInfo.m_id == 0x4E4F4445) {
 					u8* skinEntry = reinterpret_cast<u8*>(m_data->m_skins) + skinOffset;
 					skinOffset += 0x64;
 					*reinterpret_cast<u32*>(skinEntry + 0x60) = chunk.Get4();
-					break;
-				}
-				case 0x4F4E4520:
+				} else if (chunkInfo.m_id == 0x4F4E4520) {
 					m_data->m_oneWeightCountOrSize = chunkInfo.m_size;
 					m_data->m_oneWeightData =
 					    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp), 0x808, 0);
 					if (m_data->m_oneWeightData != 0) {
 						memcpy(m_data->m_oneWeightData, chunk.GetAddress(), chunkInfo.m_size);
 					}
-					break;
-				case 0x54574F20:
+				} else if (chunkInfo.m_id == 0x54574F20) {
 					m_data->m_twoWeightCountOrSize = chunkInfo.m_size;
 					m_data->m_twoWeightData =
 					    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp), 0x80E, 0);
 					if (m_data->m_twoWeightData != 0) {
 						memcpy(m_data->m_twoWeightData, chunk.GetAddress(), chunkInfo.m_size);
 					}
-					break;
-				case 0x524D494E:
+				} else if (chunkInfo.m_id == 0x524D494E) {
 					m_data->m_threeWeightCountOrSize = chunkInfo.m_size;
 					m_data->m_threeWeightData =
 					    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp), 0x814, 0);
 					if (m_data->m_threeWeightData != 0) {
 						memcpy(m_data->m_threeWeightData, chunk.GetAddress(), chunkInfo.m_size);
 					}
-					break;
 				}
 			}
 			chunk.PopChunk();

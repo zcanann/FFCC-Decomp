@@ -544,7 +544,7 @@ int CGMonObj::getNearParty(int targetOrdinal, int flags, float minDist, float ma
 				Vec toParty;
 				Vec facing;
 				PSVECSubtract(&partyObj->m_worldPosition, &monObject->m_worldPosition, &toParty);
-				PSVECScale(&toParty, &toParty, 1.0f / *reinterpret_cast<float*>(mon + 0x5D0 + partyIndex * 4));
+				PSVECScale(&toParty, &toParty, kMonObjDefaultScale / *reinterpret_cast<float*>(mon + 0x5D0 + partyIndex * 4));
 				facing.x = sin(monObject->m_rotTargetY);
 				facing.y = 0.0f;
 				facing.z = cos(monObject->m_rotTargetY);

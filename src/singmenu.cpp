@@ -2718,14 +2718,14 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     }
 
     MenuWindowInfo* win = m_menuWindowInfo;
-    int lineHeight = static_cast<int>(22.0f * FLOAT_8032ea78);
+    unsigned int lineHeight = static_cast<int>(22.0f * FLOAT_8032ea78);
     if (0.0f < 22.0f * FLOAT_8032ea78 - static_cast<float>(lineHeight)) {
         lineHeight++;
     }
 
     float x = static_cast<float>(win->x) + static_cast<float>(win->width - maxWidth) * static_cast<float>(0.5);
     float y = static_cast<float>(win->y + 0x20);
-    int lineStep = lineHeight + 3;
+    unsigned int lineStep = lineHeight + 3;
 
     dynamicText = s_DynamicMessStr;
     for (int i = 0; i < lineCount; i++) {

@@ -5508,11 +5508,11 @@ int JoyBus::SendFavorite(ThreadParam* threadParam)
 
             unsigned char* favBuf = &payload[1];
 
-            int dataLen = GbaQue.GetFavorite(threadParam->m_portIndex, (char*)favBuf);
+            int byteLen = GbaQue.GetFavorite(threadParam->m_portIndex, (char*)favBuf) + 1;
 
             int wordCount = MakeJoyData(
                 (char*)payload,
-                dataLen + 1,
+                byteLen,
                 (unsigned int*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2)
             );
 

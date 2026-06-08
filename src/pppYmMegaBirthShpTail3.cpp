@@ -789,11 +789,11 @@ path:
                 float vz;
 
                 if ((pYmMegaBirthShpTail3->m_randType == 0) || (pYmMegaBirthShpTail3->m_randType > 5)) {
-                    if ((u16)vYmMegaBirthShpTail3->m_pathIndex >= (u16)pathInfo[1]) {
+                    if ((u16)vYmMegaBirthShpTail3->m_pathIndex >= (s16)pathInfo[1]) {
                         vYmMegaBirthShpTail3->m_pathIndex = 0;
                     }
 
-                    u16 sampleIndex = (u16)vYmMegaBirthShpTail3->m_pathIndex;
+                    s16 sampleIndex = (u16)vYmMegaBirthShpTail3->m_pathIndex;
                     vYmMegaBirthShpTail3->m_pathIndex = sampleIndex + 1;
 
                     float* pathVec = (float*)((u8*)pathBase + *(u16*)(*(int*)(pathInfo + 2) + sampleIndex * 2) * sizeof(Vec));
@@ -817,7 +817,7 @@ path:
                         sampleT = Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF();
                     }
 
-                    if ((u16)vYmMegaBirthShpTail3->m_pathIndex >= (u16)pathInfo[1]) {
+                    if ((u16)vYmMegaBirthShpTail3->m_pathIndex >= (s16)pathInfo[1]) {
                         vYmMegaBirthShpTail3->m_pathIndex = 0;
                     }
 
@@ -859,10 +859,10 @@ done:
             pYmMegaBirthShpTail3->m_colorDeltaAdd[3];
     }
 
-    if (*(s16*)(paramBytes + 0x14) == 0) {
+    if (*(u16*)(paramBytes + 0x14) == 0) {
         *(u16*)((u8*)particleData + 0x22) = 0xFFFF;
     } else {
-        *(s16*)((u8*)particleData + 0x22) = *(s16*)(paramBytes + 0x14);
+        *(s16*)((u8*)particleData + 0x22) = *(u16*)(paramBytes + 0x14);
     }
     particleBytes[0x34] = 0;
 

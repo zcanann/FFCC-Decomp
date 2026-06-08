@@ -10986,7 +10986,7 @@ LAB_draw:
 		}
 	}
 
-	if (worldState->m_subState > 0x10 &&
+	if (worldState->m_subState >= 0x11 &&
 	    worldState->m_mainState < 3) {
 		unsigned char* const mcData = m_wmCharaState;
 		for (int slot = 0; slot < kMcListCount; slot++) {
@@ -11217,7 +11217,7 @@ LAB_draw:
 	}
 
 	// Draw text info for each save slot
-	if (worldState->m_subState > 0x10 &&
+	if (worldState->m_subState >= 0x11 &&
 	    worldState->m_mainState < 3) {
 		unsigned int* mcData = reinterpret_cast<unsigned int*>(m_wmCharaState);
 		for (int slot = 0; slot < 4; slot++) {

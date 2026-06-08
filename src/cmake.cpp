@@ -1266,7 +1266,8 @@ void CMenuPcs::CmakeResultDraw1()
     valueFont->SetShadow(1);
     valueFont->SetScale(1.0f);
     valueFont->DrawInit();
-    valueFont->SetColor(color.color);
+    CColor valueColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textColor));
+    valueFont->SetColor(valueColor.color);
     valueFont->SetTlut(6);
 
     for (int i = 0; i < 4; i++) {
@@ -1564,7 +1565,8 @@ void CMenuPcs::CmakeResultDraw()
     valueFont->SetShadow(1);
     valueFont->SetScale(1.0f);
     valueFont->DrawInit();
-    valueFont->SetColor(color.color);
+    CColor valueColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textColor));
+    valueFont->SetColor(valueColor.color);
     valueFont->SetTlut(6);
 
     char tribeWithSlash[0x40];

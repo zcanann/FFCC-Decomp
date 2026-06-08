@@ -6759,6 +6759,8 @@ int JoyBus::SendOpenMenu(ThreadParam* threadParam, char menuId)
  */
 int JoyBus::SendItemUse(ThreadParam* threadParam)
 {
+    unsigned int cmd = 0;
+
     bool isSingle = GbaQue.IsSingleMode(threadParam->m_portIndex);
 
     if (isSingle)
@@ -6768,7 +6770,6 @@ int JoyBus::SendItemUse(ThreadParam* threadParam)
 
     unsigned char itemId = GbaQue.GetItemUse(threadParam->m_portIndex);
 
-    unsigned int cmd = 0;
     unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
     cmdBytes[0] = 0x14;
     cmdBytes[1] = 0x10;

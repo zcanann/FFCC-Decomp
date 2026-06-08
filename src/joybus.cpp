@@ -3453,23 +3453,27 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
         unsigned int cmdStage = MakeJoyCmd32(0x0E, 1, ((unsigned char*)&stageMajor)[3], ((unsigned char*)&stageMinor)[3]);
         int stageResult = 0;
 
-        if (static_cast<signed char>(m_threadRunningMask) != 0)
+        if (static_cast<signed char>(m_threadRunningMask) == 0)
+        {
+            stageResult = 0;
+        }
+        else
         {
             OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
             unsigned int qPort = threadParam->m_portIndex;
             if ((int)m_cmdCount[qPort] >= 0x40)
             {
+                OSSignalSemaphore(&m_accessSemaphores[qPort]);
+                stageResult = 0xFFFFFFFF;
+            }
+            else
+            {
                 m_cmdQueueData[qPort][m_cmdCount[qPort]] = cmdStage;
                 m_cmdCount[threadParam->m_portIndex]++;
 
                 OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
                 stageResult = 0;
-            }
-            else
-            {
-                OSSignalSemaphore(&m_accessSemaphores[qPort]);
-                stageResult = 0xFFFFFFFF;
             }
         }
 

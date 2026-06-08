@@ -1381,9 +1381,7 @@ void CMenuPcs::CalcSelectWait()
 	}
 
 	if (currentPartyIndex >= activePartyCount && delay == 0) {
-		if (*(short*)(statePtr + 0x18) < 10) {
-			*(short*)(statePtr + 0x18) = (short)(*(short*)(statePtr + 0x18) + 1);
-		} else {
+		if (*(short*)(statePtr + 0x18) >= 10) {
 			*(short*)(statePtr + 0x18) = 0;
 			for (int i = 0; i < activePartyCount; i++) {
 				BonusPartySummary& summary = s_Rinfo->m_party[i];
@@ -1398,6 +1396,8 @@ void CMenuPcs::CalcSelectWait()
 				}
 			}
 			header->finished = 1;
+		} else {
+			*(short*)(statePtr + 0x18) = (short)(*(short*)(statePtr + 0x18) + 1);
 		}
 	}
 }

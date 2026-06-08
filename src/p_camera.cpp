@@ -1242,7 +1242,7 @@ void CCameraPcs::destroyMap()
 void CCameraPcs::calcMap()
 {
     bool useDebugPad = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
-    u16 buttons;
+    s16 buttons;
     float stickH;
     float stickV;
     float triggerL;
@@ -1514,7 +1514,7 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
             unsigned int displayFlags = gObject->m_displayFlags;
             if ((displayFlags & 1) != 0 && (displayFlags & 0x40) == 0) {
                 if (static_cast<signed char>(
-                        static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(
+                        static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<signed char*>(
                                              &gObject->m_weaponNodeFlags)) << 26) &
                                          0xC0000000) >>
                         31) != 0) {

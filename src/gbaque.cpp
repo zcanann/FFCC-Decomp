@@ -1573,12 +1573,13 @@ void GbaQueue::LoadMapItemStat()
 
 		while (object != 0) {
 			if ((object->m_objectFlags & 0x100) != 0) {
-				if ((object->m_dropItemCodes[0] & 0xC000) == 0x4000) {
+				const int dropItemCode = static_cast<short>(object->m_dropItemCodes[0]);
+				if ((dropItemCode & 0xC000) == 0x4000) {
 					mapItemEntry[1] = 4;
 				} else {
 					const int itemDataBase = Game.unkCFlatData0[2];
 					const int bossStageLimit = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex] + 2;
-					const int itemStage = *reinterpret_cast<unsigned short*>(itemDataBase + object->m_dropItemCodes[0] * 0x48 + 0xC);
+					const int itemStage = *reinterpret_cast<unsigned short*>(itemDataBase + dropItemCode * 0x48 + 0xC);
 					if (itemStage >= bossStageLimit) {
 						mapItemEntry[1] = 5;
 					} else {
@@ -1588,9 +1589,13 @@ void GbaQueue::LoadMapItemStat()
 
 				int isDispRader = object->IsDispRader();
 				numMapItems++;
-				mapItemEntry[2] = static_cast<unsigned char>((-isDispRader | isDispRader) >> 31);
-				*reinterpret_cast<short*>(mapItemEntry + 8) = static_cast<short>(object->m_worldPosition.x / kGbaQueueMapCoordScale);
-				*reinterpret_cast<short*>(mapItemEntry + 0xA) = static_cast<short>(object->m_worldPosition.z / kGbaQueueMapCoordScale);
+				mapItemEntry[2] = static_cast<unsigned char>(static_cast<unsigned int>(-isDispRader | isDispRader) >> 31);
+				{
+					short posX = static_cast<short>(object->m_worldPosition.x / kGbaQueueMapCoordScale);
+					short posZ = static_cast<short>(object->m_worldPosition.z / kGbaQueueMapCoordScale);
+					*reinterpret_cast<short*>(mapItemEntry + 8) = posX;
+					*reinterpret_cast<short*>(mapItemEntry + 0xA) = posZ;
+				}
 				mapItemEntry += 0x14;
 			}
 

@@ -1086,7 +1086,7 @@ timeout_expiry:
                 {
                     int hitInfo = GbaQue.GetHitEInfo(threadParam->m_portIndex);
                     if (SendHitEnemy(threadParam->m_portIndex, (char)(short)(hitInfo >> 16),
-                                     (short)hitInfo) < 0)
+                                     (unsigned short)hitInfo) < 0)
                     {
                         goto sleep_retry;
                     }
@@ -1316,7 +1316,7 @@ timeout_expiry:
             threadParam->m_state = 0x15;
 
             localCrc[0] = 0xFFFF;
-            short crcA = Crc16(m_fileBaseA_dup, reinterpret_cast<unsigned char*>(m_fileBaseA), localCrc);
+            unsigned short crcA = Crc16(m_fileBaseA_dup, reinterpret_cast<unsigned char*>(m_fileBaseA), localCrc);
             int chkA = SendChkCrc(threadParam, 0, crcA, &localWord);
             if (chkA != 0)
             {

@@ -5060,12 +5060,11 @@ void CMenuPcs::DrawMoveMenu()
 
 	DrawFukidashi();
 	const short state = worldState->m_mainState;
-	const short step = worldState->m_frameCounter;
 	float moveAlpha;
 	if (state == 1) {
-		moveAlpha = static_cast<float>((static_cast<double>(step) - DOUBLE_80331408) / DOUBLE_803316e8);
+		moveAlpha = static_cast<float>((static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408) / DOUBLE_803316e8);
 	} else if (state == 2 && bytes[0x13] != 0) {
-		moveAlpha = static_cast<float>(DOUBLE_80331420 - (static_cast<double>(step) - DOUBLE_80331408) / DOUBLE_803316e8);
+		moveAlpha = static_cast<float>(DOUBLE_80331420 - (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408) / DOUBLE_803316e8);
 	} else {
 		moveAlpha = FLOAT_803313e8;
 	}

@@ -1822,31 +1822,29 @@ void CMenuPcs::DrawSingleCrescent(float scaleX, float alpha)
  */
 void CMenuPcs::SingleCalcFadeIn()
 {
-    SingleFadeState* fadeState = m_singleFadeState;
-    if (fadeState->active == 0) {
+    if (m_singleFadeState->active == 0) {
         Sound.PlaySe(0xE, 0x40, 0x7F, 0);
-        memset(fadeState, 0, sizeof(SingleFadeState));
+        memset(m_singleFadeState, 0, sizeof(SingleFadeState));
 
-        int phase = (m_singleMenuMode == 8) ? 10 : 0;
-        fadeState->entries[0].startFrame = 0;
-        fadeState->entries[0].duration = 10;
-        fadeState->entries[1].startFrame = phase;
-        fadeState->entries[1].duration = 10;
-        fadeState->entries[2].startFrame = phase;
-        fadeState->entries[2].duration = 10;
-        fadeState->entries[3].startFrame = phase;
-        fadeState->entries[3].duration = 10;
+        m_singleFadeState->entries[0].startFrame = 0;
+        m_singleFadeState->entries[0].duration = 10;
+        m_singleFadeState->entries[1].startFrame = (m_singleMenuMode == 8) ? 10 : 0;
+        m_singleFadeState->entries[1].duration = 10;
+        m_singleFadeState->entries[2].startFrame = (m_singleMenuMode == 8) ? 10 : 0;
+        m_singleFadeState->entries[2].duration = 10;
+        m_singleFadeState->entries[3].startFrame = (m_singleMenuMode == 8) ? 10 : 0;
+        m_singleFadeState->entries[3].duration = 10;
 
-        fadeState->count = 4;
-        fadeState->done = 0;
-        fadeState->active = 1;
+        m_singleFadeState->count = 4;
+        m_singleFadeState->done = 0;
+        m_singleFadeState->active = 1;
     }
 
     int completed = 0;
     m_singMenuState->frame = m_singMenuState->frame + 1;
 
-    int count = static_cast<int>(fadeState->count);
-    SingleFadeEntry* entry = fadeState->entries;
+    int count = static_cast<int>(m_singleFadeState->count);
+    SingleFadeEntry* entry = m_singleFadeState->entries;
     int frame = static_cast<int>(m_singMenuState->frame);
     if (0 < count) {
         do {
@@ -1884,8 +1882,8 @@ void CMenuPcs::SingleCalcFadeIn()
     m_wm.m_handles[0]->m_model->CalcMatrix();
     m_wm.m_handles[0]->m_model->CalcSkin();
 
-    if (fadeState->count == completed) {
-        fadeState->done = 1;
+    if (m_singleFadeState->count == completed) {
+        m_singleFadeState->done = 1;
     }
 }
 

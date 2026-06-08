@@ -3133,10 +3133,9 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
             bodyCylinder.Probe().m_radius2 = 0.6f;
             bodyCylinder.Probe().m_height2 = sZeroFloat;
 
-            u32 hitMask = m_bgHitMask;
             if (MapMng.CheckHitCylinderNear(
                     reinterpret_cast<CMapCylinder*>(&bodyCylinder), &bodyCylinder.Probe().m_direction,
-                    hitMask) != 0) {
+                    m_bgHitMask) != 0) {
                 MapMng.m_hitMapObj->CalcHitPosition(&m_worldPosition);
             }
         }

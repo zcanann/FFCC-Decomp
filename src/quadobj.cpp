@@ -64,7 +64,7 @@ void CGQuadObj::Reset(float base, float height)
  * JP Address: TODO
  * JP Size: TODO
  */
-bool CGQuadObj::isInner(Vec* vec)
+int CGQuadObj::isInner(Vec* vec)
 {
 	CGQuadObj* current;
 	u32 count = m_vertexCount;

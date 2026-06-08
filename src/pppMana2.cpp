@@ -883,7 +883,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     PSMTXIdentity(identityMtx);
     PSMTXCopy(CameraMatrix(), savedCameraMtx);
     PSMTX44Copy(CameraScreenMatrix(), savedScreenMtx);
-    Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &sceneTexObj, 0, 0, 0x80, 0x80, 0, GX_NEAR, GX_TF_RGBA8, 0);
+    Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &sceneTexObj, 0, 0, 0x80, 0x80, 0, GX_LINEAR, GX_TF_RGBA8, 0);
 
     gObject = work->m_object;
     if (gObject == NULL) {

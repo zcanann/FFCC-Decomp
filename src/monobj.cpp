@@ -2702,34 +2702,39 @@ void CGMonObj::initFinishedFuncDefault()
 	}
 
 	m_forcedAction = -1;
-	for (int attackBase = 0, slotBase = 0; slotBase < 0x10; attackBase += 4, slotBase += 8) {
-		unsigned int attackId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + slotBase + 0xD0);
+	int forcedAction = 0;
+	for (int slotBase = 0; slotBase < 0x10; slotBase += 8) {
+		unsigned int attackId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + (slotBase + 0xD0));
 		if ((attackId != 0xFFFF) &&
-			(*reinterpret_cast<short*>(Game.unkCFlatData0[2] + attackId * 0x48 + 0xE) == 4)) {
-			m_forcedAction = attackBase;
+			(static_cast<int>(*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + attackId * 0x48 + 0xE)) == 4)) {
+			m_forcedAction = forcedAction;
 			break;
 		}
+		forcedAction++;
 
-		attackId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + slotBase + 0xD2);
+		attackId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + (slotBase + 0xD2));
 		if ((attackId != 0xFFFF) &&
-			(*reinterpret_cast<short*>(Game.unkCFlatData0[2] + attackId * 0x48 + 0xE) == 4)) {
-			m_forcedAction = attackBase + 1;
+			(static_cast<int>(*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + attackId * 0x48 + 0xE)) == 4)) {
+			m_forcedAction = forcedAction;
 			break;
 		}
+		forcedAction++;
 
-		attackId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + slotBase + 0xD4);
+		attackId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + (slotBase + 0xD4));
 		if ((attackId != 0xFFFF) &&
-			(*reinterpret_cast<short*>(Game.unkCFlatData0[2] + attackId * 0x48 + 0xE) == 4)) {
-			m_forcedAction = attackBase + 2;
+			(static_cast<int>(*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + attackId * 0x48 + 0xE)) == 4)) {
+			m_forcedAction = forcedAction;
 			break;
 		}
+		forcedAction++;
 
-		attackId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + slotBase + 0xD6);
+		attackId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + (slotBase + 0xD6));
 		if ((attackId != 0xFFFF) &&
-			(*reinterpret_cast<short*>(Game.unkCFlatData0[2] + attackId * 0x48 + 0xE) == 4)) {
-			m_forcedAction = attackBase + 3;
+			(static_cast<int>(*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + attackId * 0x48 + 0xE)) == 4)) {
+			m_forcedAction = forcedAction;
 			break;
 		}
+		forcedAction++;
 	}
 
 	setRepop(1);

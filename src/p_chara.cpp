@@ -801,6 +801,14 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
     }
 
     switch (resetMode) {
+    case 1:
+    releaseAllArrays:
+        LoadModelArray(this)->ReleaseAndRemoveAll();
+        LoadAnimArray(this)->ReleaseAndRemoveAll();
+        LoadTextureArray(this)->ReleaseAndRemoveAll();
+        LoadPdtArray(this)->ReleaseAndRemoveAll();
+        CharaAmemSize() = 0;
+        break;
     case 0: {
         const unsigned int releaseMask = ~(FreeMergeMask(this) | 0x10000000U);
         releaseUnuseLoadModel(static_cast<int>(releaseMask));
@@ -830,15 +838,8 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
         if (static_cast<unsigned int>(System.m_execParam) >= 2) {
             System.Printf(const_cast<char*>(s_charaAmemCompactFailed));
         }
+        goto releaseAllArrays;
     }
-        // fallthrough
-    case 1:
-        LoadModelArray(this)->ReleaseAndRemoveAll();
-        LoadAnimArray(this)->ReleaseAndRemoveAll();
-        LoadTextureArray(this)->ReleaseAndRemoveAll();
-        LoadPdtArray(this)->ReleaseAndRemoveAll();
-        CharaAmemSize() = 0;
-        break;
     }
 
 complete:

@@ -2886,7 +2886,7 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 				displayList->m_material = chunk.Get2();
 				displayList->m_size = static_cast<s32>(chunkInfo.m_arg0);
 				chunk.Align(0x20);
-				if (displayList->m_size != 0) {
+				if (static_cast<u32>(displayList->m_size) != 0) {
 					const unsigned int allocSize = (displayList->m_size + 0x1F) & ~0x1FU;
 					displayList->m_data =
 					    Memory._Alloc(allocSize, stage, const_cast<char*>(s_chara_cpp), 0x830, 0);

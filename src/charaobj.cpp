@@ -645,17 +645,21 @@ void CGCharaObj::onFramePostCalc()
 		    (i == 0 || i == 4 || i == 9 || i == 3) &&
 		    statusValue > 0) {
 			int slot = static_cast<signed char>(m_animStateMisc);
-			unsigned short padMask = 0;
+			unsigned short padMask;
 			bool useDebugPad = (Pad.m_debugPadLock != 0) || ((slot == 0) && (Pad.m_debugPadPort != -1));
-			if (!useDebugPad) {
+			if (useDebugPad) {
+				padMask = 0;
+			} else {
 				int activePad = Pad.m_debugPadPort;
 				int idx = slot & ~(static_cast<int>(~((activePad - slot) | (slot - activePad))) >> 31);
 				padMask = Pad.GetPadInputs()[idx].buttonDown[0];
 			}
 			if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x100) != 0) {
 				useDebugPad = (Pad.m_debugPadLock != 0) || ((slot == 0) && (Pad.m_debugPadPort != -1));
-				unsigned short heldMask = 0;
-				if (!useDebugPad) {
+				unsigned short heldMask;
+				if (useDebugPad) {
+					heldMask = 0;
+				} else {
 					int activePad = Pad.m_debugPadPort;
 					int idx = slot & ~(static_cast<int>(~((activePad - slot) | (slot - activePad))) >> 31);
 					heldMask = Pad.GetPadInputs()[idx].repeatButton;
@@ -799,9 +803,11 @@ void CGCharaObj::onFramePreCalc()
 			push += 10;
 		}
 		int slot = m_animStateMisc;
-		int padHeld = 0;
+		int padHeld;
 		bool useDebugPad = (Pad.m_debugPadLock != 0) || ((slot == 0) && (Pad.m_debugPadPort != -1));
-		if (!useDebugPad) {
+		if (useDebugPad) {
+			padHeld = 0;
+		} else {
 			int activePad = Pad.m_debugPadPort;
 			int idx = slot & ~(static_cast<int>(~((activePad - slot) | (slot - activePad))) >> 31);
 			padHeld = Pad.GetPadInputs()[idx].gbaMode;
@@ -2602,7 +2608,6 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
 	switch (staIndex) {
 		case 0x24:
 		case 0x25:
-		case 0x26:
 		case 0x69:
 		case 0x6A:
 		case 0x6B:
@@ -3373,8 +3378,7 @@ void CGCharaObj::combi2()
 			continue;
 		}
 
-		unsigned int hasNearbyPartner = 0;
-		Vec* partyCenter = &CharaObjComboCenter(party);
+		int hasNearbyPartner = 0;
 		for (int j = 0; j < candidateCount; j++) {
 			if (i == j) {
 				continue;
@@ -3385,7 +3389,7 @@ void CGCharaObj::combi2()
 				continue;
 			}
 
-			if (PSVECDistance(partyCenter, &CharaObjComboCenter(other)) < kQuadObjDebugHeight) {
+			if (PSVECDistance(&CharaObjComboCenter(party), &CharaObjComboCenter(other)) < kQuadObjDebugHeight) {
 				hasNearbyPartner = 1;
 				break;
 			}
@@ -3406,7 +3410,7 @@ void CGCharaObj::combi2()
 	}
 
 	for (int i = 0; i < candidateCount - 1; i++) {
-		for (unsigned int j = i + 1; j < candidateCount; j++) {
+		for (int j = i + 1; j < candidateCount; j++) {
 			if (candidates[i]->m_comboFrame < candidates[j]->m_comboFrame) {
 				CGPartyObj* swap = candidates[i];
 				candidates[i] = candidates[j];
@@ -3417,8 +3421,10 @@ void CGCharaObj::combi2()
 
 	for (int i = 1; i < candidateCount; ) {
 		if (kQuadObjDebugHeight < PSVECDistance(&CharaObjComboCenter(candidates[0]), &CharaObjComboCenter(candidates[i]))) {
-			for (int j = i; j < candidateCount - 1; j++) {
-				candidates[j] = candidates[j + 1];
+			CGPartyObj** shiftCursor = &candidates[i];
+			for (int remaining = (candidateCount - 1) - i; remaining != 0; remaining--) {
+				shiftCursor[0] = shiftCursor[1];
+				shiftCursor++;
 			}
 			candidateCount--;
 			continue;
@@ -3638,10 +3644,10 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 				unsigned short* fallbackCursor = slotCursor;
 				if (slot < reqCount) {
 					do {
-						unsigned int objParticle = static_cast<unsigned int>(partyObj->m_itemId);
+						int objParticle = partyObj->m_itemId;
 						int itemMatch;
 						if ((slot == lastSlot &&
-							*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (objParticle * 0x48)) == 0x1F8 &&
+							*reinterpret_cast<short*>(Game.unkCFlatData0[2] + (objParticle * 0x48)) == 0x1F8 &&
 							fallbackCursor[0] == 0x1F8) ||
 							objParticle == fallbackCursor[0]) {
 							itemMatch = 1;

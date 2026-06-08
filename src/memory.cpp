@@ -1988,8 +1988,7 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
         }
 
         if (bestPriority != 0xFFFFFFFF) {
-            bestPriority = 0xFFFFFFFF;
-            continue;
+            goto dropPriority;
         }
 
         if (m_releaseAction == 0 || m_releaseAction(m_releaseActionArg) == 0) {
@@ -2015,6 +2014,10 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
             }
             m_rStage->heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
         }
+        continue;
+
+    dropPriority:
+        bestPriority = 0xFFFFFFFF;
         continue;
 
     shrink:

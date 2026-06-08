@@ -22,7 +22,7 @@ struct RSDITEM {
 };
 
 struct MaterialEditorPolygon {
-    u16 flags;
+    s16 flags;
     u16 blendMode;
     u32 _04;
     u16 index0;

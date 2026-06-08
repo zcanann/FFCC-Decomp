@@ -189,9 +189,8 @@ void CMaterialEditorPcs::drawViewer()
         _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
 
         for (int pass = 0; pass < 2; pass++) {
-            MaterialEditorPolygon* polygon = static_cast<MaterialEditorPolygon*>(model->ptr18);
-
-            for (u32 polyIndex = 0; polyIndex < model->countC; polyIndex++, polygon++) {
+            for (u32 polyIndex = 0; polyIndex < model->countC; polyIndex++) {
+#define polygon (&static_cast<MaterialEditorPolygon*>(model->ptr18)[polyIndex])
                 if ((polygon->flags & 0x200) == 0) {
                     GXSetCullMode(GX_CULL_BACK);
                 } else {
@@ -383,6 +382,7 @@ void CMaterialEditorPcs::drawViewer()
                     GXWGFifo.u8 = static_cast<u8>(vertexIndex[i]);
                     GXWGFifo.u16 = static_cast<u16>(vertexIndex[i]);
                 }
+#undef polygon
             }
         }
     }

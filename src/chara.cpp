@@ -1289,7 +1289,8 @@ CChara::CModel* CChara::CModel::Duplicate(CMemory::CStage* stage)
 	}
 
 	if (m_texSet != 0) {
-		clone->AttachTextureSet(m_texSet);
+		clone->m_texSet = m_texSet;
+		clone->m_texSet->AddRef();
 	}
 	clone->m_texAnimSet = (ModelTexAnimSet(this) != 0) ? ModelTexAnimSet(this)->Duplicate(stage) : 0;
 

@@ -1057,7 +1057,7 @@ void CGMonObj::onFrameStat()
 					if (((m_moveWork.m_stateFlags & 1) != 0) ||
 						(static_cast<int>((static_cast<unsigned int>(object->m_stateFlags0) << 25) | (static_cast<unsigned int>(object->m_stateFlags0) >> 7)) < 0)) {
 						prgObj->reqAnim(-1, 0, 0);
-						if (-1 < m_targetPartyIndex) {
+						if (m_targetPartyIndex >= 0) {
 							object->m_rotTargetY = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]));
 						}
 						prgObj->m_subState = 1;
@@ -1160,7 +1160,7 @@ void CGMonObj::onFrameStat()
 			(static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0xCE)) <= *reinterpret_cast<float*>(mon + 0x5D0 + m_targetPartyIndex * 4)) ||
 			(static_cast<int>((static_cast<unsigned int>(object->m_stateFlags0) << 25) | (static_cast<unsigned int>(object->m_stateFlags0) >> 7)) < 0)) {
 			prgObj->changeStat(0, 0, 0);
-			if (-1 < m_targetPartyIndex) {
+			if (m_targetPartyIndex >= 0) {
 				object->m_rotTargetY = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]));
 			}
 		}
@@ -1190,10 +1190,10 @@ void CGMonObj::onFrameStat()
 
 	case 0x32: {
 		if (prgObj->m_stateFrame == 0) {
-			void* classId = object->m_scriptHandle[4];
+			int classId = reinterpret_cast<int>(object->m_scriptHandle[4]);
 			int anim;
 			unsigned int soundId;
-			if ((reinterpret_cast<unsigned int>(classId) - 0x10 < 3) || (classId == reinterpret_cast<void*>(0x5E))) {
+			if ((static_cast<unsigned int>(classId) - 0x10 <= 2) || (classId == 0x5E)) {
 				anim = 0xF;
 				soundId = 0x2EF1;
 			} else {
@@ -1216,7 +1216,7 @@ void CGMonObj::onFrameStat()
 			prgObj->reqAnim(anim, 0, 0);
 			prgObj->playSe3D(soundId, 0x32, 0x96, 0, (Vec*)0);
 			if (anim == 0xF) {
-				if (classId == reinterpret_cast<void*>(0x5E)) {
+				if (classId == 0x5E) {
 					int dataNo = object->m_charaModelHandle->GetPdtSlot();
 					prgObj->putParticle((dataNo << 8) | 8, 0, object, kMonObjDefaultScale, 0);
 				} else {
@@ -1268,7 +1268,7 @@ void CGMonObj::onFrameStat()
 		if (prgObj->m_stateFrame == 0) {
 			unsigned int particleBase;
 			unsigned int soundId;
-			if (object->m_scriptHandle[4] == reinterpret_cast<void*>(0x39)) {
+			if (reinterpret_cast<int>(object->m_scriptHandle[4]) == 0x39) {
 				particleBase = 4;
 				soundId = 0xC36E;
 			} else {
@@ -1293,7 +1293,7 @@ void CGMonObj::onFrameStat()
 			object->m_displayFlags |= 1;
 			*reinterpret_cast<int*>(mon + 0x6B0) = 1;
 			object->SetAnimSlot(0, 0);
-			if (object->m_scriptHandle[4] == reinterpret_cast<void*>(0x39)) {
+			if (reinterpret_cast<int>(object->m_scriptHandle[4]) == 0x39) {
 				object->SetAnimSlot(1, 1);
 				object->SetAnimSlot(4, 4);
 				object->SetAnimSlot(6, 6);
@@ -1334,16 +1334,16 @@ void CGMonObj::onFrameStat()
 			prgObj->putParticle((dataNo << 8) | 4, 0, object, kMonObjDefaultScale, 0);
 			prgObj->reqAnim(0xF, 1, 0);
 			unsigned int soundId = 0;
-			void* classId = object->m_scriptHandle[4];
-			if (classId == reinterpret_cast<void*>(0xA7)) {
+			int classId = reinterpret_cast<int>(object->m_scriptHandle[4]);
+			if (classId == 0xA7) {
 				soundId = 0x12130;
-			} else if (reinterpret_cast<int>(classId) < 0xA7) {
-				if (classId == reinterpret_cast<void*>(0x9C)) {
+			} else if (classId < 0xA7) {
+				if (classId == 0x9C) {
 					soundId = 0x12130;
 				}
-			} else if (classId == reinterpret_cast<void*>(0xA9)) {
+			} else if (classId == 0xA9) {
 				soundId = 0x1213A;
-			} else if (reinterpret_cast<int>(classId) < 0xA9) {
+			} else if (classId < 0xA9) {
 				soundId = 0x12126;
 			}
 			prgObj->playSe3D(soundId, 0x32, 0x96, 0, (Vec*)0);

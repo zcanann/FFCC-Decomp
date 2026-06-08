@@ -1154,10 +1154,7 @@ void CGObject::bgWorldCollision()
  */
 void CGObject::bgAttribCollision()
 {
-    const bool hasModel =
-        (m_charaModelHandle != (CCharaPcs::CHandle*)0) &&
-        (m_charaModelHandle->m_model != (CChara::CModel*)0);
-    if (!hasModel) {
+    if (!HasLoadedModel(m_charaModelHandle)) {
         return;
     }
 

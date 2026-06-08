@@ -635,9 +635,9 @@ void CMaterialEditorPcs::Init()
     m_viewerLightColors[0].b = 0x7f;
     m_viewerLightColors[0].a = 0xff;
 
-    float zero = LoadFloat(kMaterialEditorZeroF);
-    float minusOne = LoadFloat(kMaterialEditorNegativeOneF);
     float one = LoadFloat(kMaterialEditorOneF);
+    float minusOne = LoadFloat(kMaterialEditorNegativeOneF);
+    float zero = LoadFloat(kMaterialEditorZeroF);
 
     for (int i = 0; i < 3; i++) {
         u8 shade = (i == 0) ? 0x3f : 0;

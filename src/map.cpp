@@ -2406,7 +2406,10 @@ int CMapMng::ReadMid(char* mapName)
             case 0x5343454E: {
                 chunkFile.PushChunk();
                 while (chunkFile.GetNextChunk(chunk)) {
-                    if (chunk.m_id != 0x48495420) {
+                    switch (chunk.m_id) {
+                    case 0x48495420:
+                        break;
+                    default:
                         continue;
                     }
 

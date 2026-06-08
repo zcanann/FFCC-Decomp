@@ -1753,7 +1753,14 @@ card_connected:;
         }
         if (m_selectedTransferChara != -1) {
             Mc::SaveDat* transferWork = static_cast<Mc::SaveDat*>(MenuPcs.m_goOutTransferWork);
-            if (GoOutSaveDat(transferWork).m_caravan[m_selectedTransferChara].m_odekakeOutFlag == 0) {
+            if (GoOutSaveDat(transferWork).m_caravan[m_selectedTransferChara].m_odekakeOutFlag != 0) {
+                int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+                SetMenuStr(0, 2,
+                           GetGoOutMessageLine(languageId, 57),
+                           GetGoOutMessageLine(languageId, 58));
+                m_returnGoOutMode = 0xF;
+                SetGoOutMode(0);
+            } else {
                 m_returnTransfer = 0;
                 if (GoOutSaveDat(transferWork).m_caravan[m_selectedTransferChara].m_odekakeReturnFlag == 0) {
                     int sameChara = MenuPcs.GetSameCharaData(MenuPcs.m_goOutTransferSaveData, transferWork, m_selectedTransferChara, 1);
@@ -1798,13 +1805,6 @@ card_connected:;
                     m_returnTransfer = 1;
                 }
                 SetGoOutMode(0x10);
-            } else {
-                int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
-                SetMenuStr(0, 2,
-                           GetGoOutMessageLine(languageId, 57),
-                           GetGoOutMessageLine(languageId, 58));
-                m_returnGoOutMode = 0xF;
-                SetGoOutMode(0);
             }
         }
         break;

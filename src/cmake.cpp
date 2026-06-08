@@ -789,7 +789,8 @@ void CMenuPcs::CmakeVillageDraw()
     col.a = static_cast<unsigned char>(static_cast<int>(a255));
     GXSetChanMatColor(GX_COLOR0A0, col);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
-    float panelX = -(328.0f * static_cast<float>(0.5) - static_cast<float>(400.0));
+    float panelX = static_cast<float>(static_cast<int>(
+        -(static_cast<double>(328.0f) * 0.5 - 400.0)));
     MenuPcs.DrawRect(
         0, panelX, 288.0f, 328.0f, 56.0f,
         0.0f, 368.0f, 1.0f, 1.0f, 0.0f);
@@ -855,11 +856,11 @@ void CMenuPcs::CmakeVillageDraw()
     }
 
     int showNameCursor = __cntlzw(static_cast<unsigned int>(1 - villageWork->m_mode)) >> 5;
-    if (villageWork->m_row > 4) {
+    if (villageWork->m_row >= 5) {
         showNameCursor = 0;
     }
     unsigned int nameLen = strlen(s_CmakeInfo.m_name);
-    if (6 < static_cast<int>(nameLen & (static_cast<int>(-nameLen | nameLen) >> 31))) {
+    if (7 <= static_cast<int>(nameLen & (static_cast<int>(-nameLen | nameLen) >> 31))) {
         showNameCursor = 0;
     }
     DrawCmakeName(1, showNameCursor, s_CmakeInfo.m_name, alpha);

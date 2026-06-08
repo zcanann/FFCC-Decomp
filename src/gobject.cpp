@@ -764,6 +764,7 @@ void CGObject::objectCollision()
         }
 
         ColInfo info;
+        Vec scratch;
         info.obj = other;
         PSVECAdd(&other->m_worldPosition, &other->m_groundHitOffset, &info.basePos);
         info.capsuleOffset.x = other->m_bodyEllipsoidOffset * -sinf(other->m_rotBaseY);
@@ -794,7 +795,7 @@ void CGObject::objectCollision()
                     frontObj = &info;
                     hitObj = &self;
                 }
-                Vec dir;
+                Vec& dir = scratch;
                 PSVECSubtract(&hitObj->capsulePos, &frontObj->capsulePos, &dir);
                 const float hitRot = atan2f(dir.x, dir.z);
                 const float rotDelta = Math.DstRot(frontObj->obj->m_rotBaseY, hitRot);
@@ -840,7 +841,7 @@ void CGObject::objectCollision()
                             split = rawSplit;
                         }
 
-                        Vec delta;
+                        Vec& delta = scratch;
                         Vec scaledDelta;
                         PSVECSubtract(&self.capsulePos, &info.capsulePos, &delta);
                         PSVECScale(&delta, &delta, (bodyDistanceLimit - capsuleDistance) / bodyDistanceLimit);

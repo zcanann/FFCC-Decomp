@@ -2506,7 +2506,7 @@ void CMenuPcs::CmakeNameDraw()
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-    int a = static_cast<int>(static_cast<double>(255.0f) * static_cast<double>(alpha));
+    int a = static_cast<int>(255.0f * alpha);
     GXColor col;
     col.r = 0xFF;
     col.g = 0xFF;

@@ -1657,7 +1657,7 @@ void CCharaPcs::LoadCam(int index, char* fileName)
  */
 void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
 {
-    int hasLoaded;
+    unsigned int hasLoaded;
     unsigned int i;
 
     for (i = 0; i < LoadModelArray(this)->GetSize(); i++) {
@@ -1701,7 +1701,7 @@ checkLoaded:
     }
 
     CCharaPcs* pcs = &CharaPcs;
-    int mergePartCount = 1;
+    unsigned int mergePartCount = 1;
     for (int mergePartIndex = 0; mergePartIndex < mergePartCount; mergePartIndex++) {
         char path[0x100];
         sprintf(path, s_charaMergePathFmt, mergeFileId, mergePartIndex);
@@ -2491,7 +2491,7 @@ int CCharaPcs::CHandle::LoadAnim(
     char* animName, int animIndex, int animFlags, int charaKind, int charaNo, int mergeFileId, int mergeFlags)
 {
     if (animIndex == -1) {
-        for (int i = 0; i < 64; i++) {
+        for (unsigned int i = 0; i < 64; i++) {
             ReleaseHandleAnimSlot(this, i);
         }
         PruneUnsharedAnimRefs(&CharaPcs, 0);

@@ -526,14 +526,14 @@ int CGMonObj::getNearParty(int targetOrdinal, int flags, float minDist, float ma
 			(((Game.m_gameWork.m_menuStageMode == 0) ||
 				(0xF <= Game.m_gameWork.m_bossArtifactStageIndex) ||
 				((static_cast<unsigned short>(partyPrg->GetCID()) & 0x6D) != 0x6D) ||
-				(partyObj->m_scriptHandle[0xED] == NULL))) &&
+				(reinterpret_cast<int>(partyObj->m_scriptHandle[0xED]) == 0))) &&
 			(((flags & 1) == 0) ||
 				((*reinterpret_cast<short*>(partyObj->m_scriptHandle + 7) != 0) &&
 					(partyPrg->m_lastStateId != 9) && (partyPrg->m_lastStateId != 0x22) &&
 					((Game.m_gameWork.m_menuStageMode == 0) ||
 						(0xF <= Game.m_gameWork.m_bossArtifactStageIndex) ||
 						((static_cast<unsigned short>(partyPrg->GetCID()) & 0x6D) != 0x6D) ||
-						(partyObj->m_scriptHandle[0xED] == NULL)))) &&
+						(reinterpret_cast<int>(partyObj->m_scriptHandle[0xED]) == 0)))) &&
 			(((flags & 0x10) == 0) ||
 				(*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(partyObj->m_scriptHandle) + 0x4E) != 0)) &&
 			(((flags & 0x20) == 0) ||
@@ -3677,7 +3677,7 @@ void CGMonObj::statWatch()
 					((Game.m_gameWork.m_menuStageMode == 0) ||
 					 (0xF <= Game.m_gameWork.m_bossArtifactStageIndex) ||
 					 ((static_cast<unsigned short>(reinterpret_cast<CGPrgObj*>(party)->GetCID()) & 0x6D) != 0x6D) ||
-					 (reinterpret_cast<CGObject*>(party)->m_scriptHandle[0xED] == NULL))) {
+					 (reinterpret_cast<int>(reinterpret_cast<CGObject*>(party)->m_scriptHandle[0xED]) == 0))) {
 					validCount++;
 				}
 			}
@@ -3685,10 +3685,9 @@ void CGMonObj::statWatch()
 			int pick = Math.Rand(validCount);
 			unsigned int minHp = 10000000;
 			int validIndex = 0;
-			double homeRange2 = static_cast<double>(static_cast<float>(
-				*reinterpret_cast<unsigned short*>(script + 0xCC)));
+			float homeRange2 = static_cast<float>(
+				*reinterpret_cast<unsigned short*>(script + 0xCC));
 			int accum = -1;
-			int mode0Target = -1;
 
 			// Pass 2: select target.
 			int result = -1;
@@ -3703,11 +3702,12 @@ void CGMonObj::statWatch()
 					((Game.m_gameWork.m_menuStageMode == 0) ||
 					 (0xF <= Game.m_gameWork.m_bossArtifactStageIndex) ||
 					 ((static_cast<unsigned short>(reinterpret_cast<CGPrgObj*>(party)->GetCID()) & 0x6D) != 0x6D) ||
-					 (reinterpret_cast<CGObject*>(party)->m_scriptHandle[0xED] == NULL))) {
-					if ((static_cast<double>(*reinterpret_cast<float*>(mon + partyIndex * 4 + 0x5D0)) < homeRange2) &&
-						(mode0Target = partyIndex, targetMode == 0)) {
+					 (reinterpret_cast<int>(reinterpret_cast<CGObject*>(party)->m_scriptHandle[0xED]) == 0))) {
+					if (*reinterpret_cast<float*>(mon + partyIndex * 4 + 0x5D0) < homeRange2) {
 						result = partyIndex;
-						break;
+						if (targetMode == 0) {
+							break;
+						}
 					}
 					candidate = partyIndex;
 					if ((targetMode != 3) ||
@@ -3730,7 +3730,6 @@ void CGMonObj::statWatch()
 					}
 					validIndex++;
 				}
-				result = mode0Target;
 				accum = candidate;
 			}
 

@@ -1265,12 +1265,11 @@ void CGObject::hit()
     if (!hasModel) {
         return;
     }
-    u8* const modelBytes = reinterpret_cast<u8*>(m_charaModelHandle->m_model);
-    u8* const modelNodes = *reinterpret_cast<u8**>(modelBytes + 0xA8);
-
     for (int i = 0; i < 8; i++) {
         AttackCol* attack = &m_attackColliders[i];
         const int node = attack->m_nodeIndex;
+        u8* const modelNodes =
+            *reinterpret_cast<u8**>(reinterpret_cast<u8*>(m_charaModelHandle->m_model) + 0xA8);
         PSMTXMultVec(reinterpret_cast<const float (*)[4]>(modelNodes + node * 0xC0 + 0xC),
                      &attack->m_localStart, &attack->m_worldPosition);
         PSVECAdd(&attack->m_worldPosition, &m_worldPosition, &attack->m_worldPosition);
@@ -1279,6 +1278,8 @@ void CGObject::hit()
     for (int i = 0; i < 8; i++) {
         DamageCol* damage = &m_damageColliders[i];
         const int node = damage->m_nodeIndex;
+        u8* const modelNodes =
+            *reinterpret_cast<u8**>(reinterpret_cast<u8*>(m_charaModelHandle->m_model) + 0xA8);
         PSMTXMultVec(reinterpret_cast<const float (*)[4]>(modelNodes + node * 0xC0 + 0xC),
                      &damage->m_localPosition, &damage->m_worldPosition);
         PSVECAdd(&damage->m_worldPosition, &m_worldPosition, &damage->m_worldPosition);

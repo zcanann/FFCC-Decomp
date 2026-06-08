@@ -1302,8 +1302,9 @@ void CShopMenu::DrawBuySellInfo()
     DrawShopMenuAmountTrunc(font, currentMoney, amountRightMoney, FLOAT_80332d90, 0x14);
 
     SetupShopMenuUnitFont(font);
+    int rightPriceX = static_cast<int>(rightPrice);
     font->DrawInit();
-    MenuPcs.DrawNoShadowFont(font, unitText, rightPrice, FLOAT_80332d98, 0x19, 0x12);
+    MenuPcs.DrawNoShadowFont(font, unitText, static_cast<float>(rightPriceX), FLOAT_80332d98, 0x19, 0x12);
     MenuPcs.DrawInit();
 
     font->DrawInit();
@@ -1311,7 +1312,7 @@ void CShopMenu::DrawBuySellInfo()
     MenuPcs.DrawInit();
 
     font->DrawInit();
-    MenuPcs.DrawNoShadowFont(font, unitText, rightMoney, FLOAT_80332d98, 0x19, 0x12);
+    MenuPcs.DrawNoShadowFont(font, unitText, static_cast<float>(static_cast<int>(rightMoney)), FLOAT_80332d98, 0x19, 0x12);
     MenuPcs.DrawInit();
 }
 /*

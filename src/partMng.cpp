@@ -558,8 +558,7 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
     };
 
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    PppPdtSlot* pdtSlots = m_pdtSlots;
-    PppPdtSlot* pdtSlot = &pdtSlots[pdtSlotIndex];
+    PppPdtSlot* pdtSlot = m_pdtSlots + pdtSlotIndex;
     _pppDataHead* pdt = pdtSlot->m_pppDataHead;
 
     if (pdt == 0) {

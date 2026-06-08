@@ -483,14 +483,13 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         return 0;
     }
 
-    Vec* normal = &g_hit_lpface->m_normal;
     Vec* hitDirection = &g_hit_cyl.m_axis;
-    float dot = PSVECDotProduct(hitDirection, normal);
+    float dot = PSVECDotProduct(hitDirection, &g_hit_lpface->m_normal);
     if (dot >= kMapHitZero) {
         return 0;
     }
 
-    float hitDot = PSVECDotProduct(&g_hit_cyl.m_bottom, normal);
+    float hitDot = PSVECDotProduct(&g_hit_cyl.m_bottom, &g_hit_lpface->m_normal);
     float hitT = -((hitDot - (g_hit_lpface->m_planeD + g_hit_cyl.m_radius)) / dot);
     int edgeIndex = -1;
 
@@ -503,7 +502,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         PSVECAdd(&g_hit_cyl.m_bottom, &g_hit_hpv, &g_hit_hpv);
 
         Vec pushedHit;
-        PSVECScale(normal, &pushedHit, g_hit_cyl.m_radius);
+        PSVECScale(&g_hit_lpface->m_normal, &pushedHit, g_hit_cyl.m_radius);
         PSVECSubtract(&g_hit_hpv, &pushedHit, &pushedHit);
 
         unsigned int sideMask = 3;

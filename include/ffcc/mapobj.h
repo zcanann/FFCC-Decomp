@@ -84,8 +84,6 @@ public:
         m_colorMode = 0;
         m_useAltColor = 0;
         m_keyFrameCount = 0;
-        InitMapObjAtrColorKeyFrame(m_colorKeyFrame);
-        InitMapObjAtrColorKeyFrame(m_altColorKeyFrame);
     }
 
     ~CMapObjAtrSpotLight();
@@ -121,8 +119,6 @@ class CMapObjAtrPointLight : public CMapObjAtr
 public:
     CMapObjAtrPointLight()
     {
-        InitMapObjAtrColorKeyFrame(m_colorKeyFrame);
-        InitMapObjAtrColorKeyFrame(m_altColorKeyFrame);
         m_type = POINT_LIGHT;
         m_colorMode = 0;
         m_useAltColor = 0;

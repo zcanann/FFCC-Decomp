@@ -528,7 +528,8 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             if (chunk.m_version == 2) {
                 chunkFile.PushChunk();
                 while (chunkFile.GetNextChunk(chunk) != 0) {
-                    if (chunk.m_id == CHUNK_LDAT) {
+                    switch (chunk.m_id) {
+                    case CHUNK_LDAT: {
                         pointLight->m_radius = chunkFile.GetF4();
                         pointLight->m_intensity = chunkFile.GetF4();
                         pointLight->m_colorMode = chunkFile.Get1();
@@ -536,9 +537,8 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                         pointLight->m_unknown20 = chunkFile.Get1();
                         chunkFile.Get1();
 
-                        unsigned char colorCount = chunkFile.Get1();
-                        pointLight->m_colorCount = colorCount;
-                        for (int i = 0; i < static_cast<int>(colorCount); i++) {
+                        pointLight->m_colorCount = chunkFile.Get1();
+                        for (int i = 0; i < static_cast<int>(pointLight->m_colorCount); i++) {
                             pointLight->m_colors[i].r = chunkFile.Get1();
                             pointLight->m_colors[i].g = chunkFile.Get1();
                             pointLight->m_colors[i].b = chunkFile.Get1();
@@ -555,18 +555,26 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
 
                         pointLight->m_color = pointLight->m_colors[0];
                         pointLight->m_altColor = pointLight->m_altColors[0];
-                    } else if (chunk.m_id == CHUNK_CJUN) {
+                        break;
+                    }
+                    case CHUNK_CJUN:
                         pointLight->m_altColorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
-                    } else if (chunk.m_id == CHUNK_CFRM) {
+                        break;
+                    case CHUNK_CFRM:
                         pointLight->m_altColorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
-                    } else if (chunk.m_id == CHUNK_CKEY) {
+                        break;
+                    case CHUNK_CKEY:
                         pointLight->m_altColorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
-                    } else if (chunk.m_id == CHUNK_MJUN) {
+                        break;
+                    case CHUNK_MJUN:
                         pointLight->m_colorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
-                    } else if (chunk.m_id == CHUNK_MFRM) {
+                        break;
+                    case CHUNK_MFRM:
                         pointLight->m_colorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
-                    } else if (chunk.m_id == CHUNK_MKEY) {
+                        break;
+                    case CHUNK_MKEY:
                         pointLight->m_colorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
+                        break;
                     }
                 }
                 chunkFile.PopChunk();
@@ -597,7 +605,8 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             if (chunk.m_version == 6) {
                 chunkFile.PushChunk();
                 while (chunkFile.GetNextChunk(chunk) != 0) {
-                    if (chunk.m_id == CHUNK_LDAT) {
+                    switch (chunk.m_id) {
+                    case CHUNK_LDAT: {
                         spotLight->m_baseColor.r = chunkFile.Get1();
                         spotLight->m_baseColor.g = chunkFile.Get1();
                         spotLight->m_baseColor.b = chunkFile.Get1();
@@ -640,18 +649,26 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
 
                         spotLight->m_color = spotLight->m_colors[0];
                         spotLight->m_altColor = spotLight->m_altColors[0];
-                    } else if (chunk.m_id == CHUNK_CJUN) {
+                        break;
+                    }
+                    case CHUNK_CJUN:
                         spotLight->m_altColorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
-                    } else if (chunk.m_id == CHUNK_CFRM) {
+                        break;
+                    case CHUNK_CFRM:
                         spotLight->m_altColorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
-                    } else if (chunk.m_id == CHUNK_CKEY) {
+                        break;
+                    case CHUNK_CKEY:
                         spotLight->m_altColorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
-                    } else if (chunk.m_id == CHUNK_MJUN) {
+                        break;
+                    case CHUNK_MJUN:
                         spotLight->m_colorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
-                    } else if (chunk.m_id == CHUNK_MFRM) {
+                        break;
+                    case CHUNK_MFRM:
                         spotLight->m_colorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
-                    } else if (chunk.m_id == CHUNK_MKEY) {
+                        break;
+                    case CHUNK_MKEY:
                         spotLight->m_colorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
+                        break;
                     }
                 }
                 chunkFile.PopChunk();
@@ -847,13 +864,17 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             chunkFile.PushChunk();
             CChunkFile::CChunk mimeChunk;
             while (chunkFile.GetNextChunk(mimeChunk) != 0) {
-                if (mimeChunk.m_id == CHUNK_JUN) {
+                switch (mimeChunk.m_id) {
+                case CHUNK_JUN:
                     mime->m_keyFrame.ReadJun(chunkFile, static_cast<char>(mimeChunk.m_arg0));
-                } else if (mimeChunk.m_id == CHUNK_FRAM) {
+                    break;
+                case CHUNK_FRAM:
                     mime->m_keyFrame.ReadFrame(chunkFile, mimeChunk.m_arg0);
-                } else if (mimeChunk.m_id == CHUNK_KEY) {
+                    break;
+                case CHUNK_KEY:
                     mime->m_keyFrame.ReadKey(chunkFile, mimeChunk.m_arg0);
-                } else if (mimeChunk.m_id == CHUNK_VTXL) {
+                    break;
+                case CHUNK_VTXL: {
                     mime->m_vertexListCount = static_cast<unsigned char>(mimeChunk.m_arg0);
                     mime->m_vertexLists = reinterpret_cast<float**>(
                         operator new[](static_cast<unsigned long>(mime->m_vertexListCount) << 2,
@@ -880,6 +901,8 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                         }
                     }
                     chunkFile.PopChunk();
+                    break;
+                }
                 }
             }
             chunkFile.PopChunk();

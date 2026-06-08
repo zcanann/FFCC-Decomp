@@ -1384,17 +1384,19 @@ void GbaQueue::LoadPlayerStat()
 				}
 
 				if (caravanWork->CanPlayerUseItem() != 0) {
-					entry[0xD6] |= 1;
+					entry[0xD6] |= GbaQueConst::CAN_REPLY;
 				}
 				if (caravanWork->CanPlayerPutItem() != 0) {
-					entry[0xD6] |= 2;
+					entry[0xD6] |= GbaQueConst::ITEM_ATTACH;
 				}
 			}
 
 			if (partyObj != 0) {
+				short posX = static_cast<short>(partyObj->m_worldPosition.x / kGbaQueueMapCoordScale);
+				short posZ = static_cast<short>(partyObj->m_worldPosition.z / kGbaQueueMapCoordScale);
 				entry[1] = 1;
-				*reinterpret_cast<short*>(entry + 0x36) = static_cast<short>(partyObj->m_worldPosition.x / kGbaQueueMapCoordScale);
-				*reinterpret_cast<short*>(entry + 0x38) = static_cast<short>(partyObj->m_worldPosition.z / kGbaQueueMapCoordScale);
+				*reinterpret_cast<short*>(entry + 0x36) = posX;
+				*reinterpret_cast<short*>(entry + 0x38) = posZ;
 			}
 
 			entry += 0xDC;
@@ -1423,7 +1425,7 @@ void GbaQueue::LoadPlayerStat()
 		if (memcmp(obj + oldBase + 0x18, obj + newBase + 0x18, 8) != 0) {
 			m_compatibilityFlg[0] = static_cast<unsigned char>(m_compatibilityFlg[0] | (1 << i));
 		}
-		if (*reinterpret_cast<int*>(obj + oldBase + 0x24) != *reinterpret_cast<int*>(obj + newBase + 0x24)) {
+		if (*reinterpret_cast<unsigned int*>(obj + oldBase + 0x24) != *reinterpret_cast<unsigned int*>(obj + newBase + 0x24)) {
 			m_compatibilityFlg[1] = static_cast<unsigned char>(m_compatibilityFlg[1] | (1 << i));
 		}
 

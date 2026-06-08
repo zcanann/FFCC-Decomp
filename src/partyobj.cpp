@@ -530,7 +530,7 @@ void CGPartyObj::onCancelStat(int state)
 					SetAnimSlot(0x0B, 0);
 					SetAnimSlot(0x0C, 1);
 				}
-			} else if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+			} else if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
 				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
 					SetAnimSlot(0, 0);
 					SetAnimSlot(1, 1);
@@ -565,7 +565,7 @@ void CGPartyObj::onCancelStat(int state)
 					SetAnimSlot(0x0B, 0);
 					SetAnimSlot(0x0C, 1);
 				}
-			} else if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+			} else if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
 				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
 					SetAnimSlot(0, 0);
 					SetAnimSlot(1, 1);
@@ -589,7 +589,7 @@ void CGPartyObj::onCancelStat(int state)
 			break;
 		}
 		if (party.flags.flag04) {
-			if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+			if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
 				addHp(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1A), static_cast<CGPrgObj*>(0));
 			}
 			party.flags.flag04 = 0;
@@ -609,7 +609,7 @@ void CGPartyObj::onCancelStat(int state)
 					SetAnimSlot(0x0B, 0);
 					SetAnimSlot(0x0C, 1);
 				}
-			} else if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+			} else if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
 				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
 					SetAnimSlot(0, 0);
 					SetAnimSlot(1, 1);
@@ -627,7 +627,7 @@ void CGPartyObj::onCancelStat(int state)
 				}
 			}
 		}
-		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
 			m_alpha = FLOAT_80331A7C;
 			m_bgColMask &= 0xFFFEFFF1;
 		} else {
@@ -638,7 +638,7 @@ void CGPartyObj::onCancelStat(int state)
 		break;
 	case 0x22:
 		if (party.flags.flag04) {
-			if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+			if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
 				addHp(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1A), static_cast<CGPrgObj*>(0));
 			}
 			party.flags.flag04 = 0;
@@ -658,7 +658,7 @@ void CGPartyObj::onCancelStat(int state)
 					SetAnimSlot(0x0B, 0);
 					SetAnimSlot(0x0C, 1);
 				}
-			} else if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+			} else if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
 				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
 					SetAnimSlot(0, 0);
 					SetAnimSlot(1, 1);
@@ -676,7 +676,7 @@ void CGPartyObj::onCancelStat(int state)
 				}
 			}
 		}
-		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
 			m_alpha = FLOAT_80331A7C;
 			m_bgColMask &= 0xFFFEFFF1;
 		} else {

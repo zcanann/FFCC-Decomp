@@ -2473,6 +2473,19 @@ void CGMonObj::frameStatFuncLastBoss()
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 
+	Mtx nodeMtx;
+	CChara::CModel* model = object->m_charaModelHandle->m_model;
+	CChara::CNode** nodes = reinterpret_cast<CChara::CNode**>(CGMonObj::m_boss);
+	PSMTXCopy(nodes[1]->m_mtx, nodeMtx);
+
+	Vec* bossPos = reinterpret_cast<Vec*>(CGMonObj::m_boss + 0x18);
+	nodeMtx[0][3] += model->m_drawMtx[0][3];
+	nodeMtx[1][3] += model->m_drawMtx[1][3];
+	nodeMtx[2][3] += model->m_drawMtx[2][3];
+	bossPos->x = nodeMtx[0][3];
+	bossPos->y = nodeMtx[1][3];
+	bossPos->z = nodeMtx[2][3];
+
 	const int state = prgObj->m_lastStateId;
 	const int stateFrame = prgObj->m_stateFrame;
 

@@ -518,11 +518,11 @@ void CGObject::move()
         } else if (m_weaponNodeFlagAll.m_bits1.m_bit10) {
             PSVECNormalize(&moveVec, &moveVec);
             PSVECScale(&moveVec, &moveVec, static_cast<float>(m_moveTimer));
-        } else if (!(moveMag < static_cast<double>(m_moveTimer))) {
+        } else if (moveMag < static_cast<double>(m_moveTimer)) {
+            scriptMoveEnd = 1;
+        } else {
             PSVECNormalize(&moveVec, &moveVec);
             PSVECScale(&moveVec, &moveVec, static_cast<float>(m_moveTimer));
-        } else {
-            scriptMoveEnd = 1;
         }
 
         m_turnFrames -= 1;
@@ -541,13 +541,11 @@ void CGObject::move()
         movingWithScript = true;
     } else {
         const s8 player = m_animStateMisc;
-        const bool canReadPad = (static_cast<char>(player) >= 0)
+        if ((static_cast<char>(player) >= 0)
             && (static_cast<char>(player) < 4)
             && m_weaponNodeFlagAll.m_bits1.m_shield
             && m_weaponNodeFlagAll.m_bits1.m_menuReady
-            && ((Game.m_gameWork.m_menuStageMode == 0) || (player == 0));
-
-        if (canReadPad) {
+            && ((Game.m_gameWork.m_menuStageMode == 0) || (player == 0))) {
             u16 buttons = (Pad.m_debugPadLock != 0 || (player == 0 && Pad.m_debugPadPort != -1))
                 ? 0
                 : Pad.GetPadInputs()[RemapPadSlot(&Pad, player)].button[0];

@@ -1186,8 +1186,13 @@ void CGObject::bgAttribCollision()
         }
     }
 
-    if ((m_weaponNodeFlags & 1) == 0) {
-        if ((m_groundHitOffset.x != sZeroFloat) || (m_groundHitOffset.z != sZeroFloat)) {
+    if ((m_weaponNodeFlags & 1) != 0) {
+        m_bgAttrValue = m_attachOwner->m_bgAttrValue;
+        return;
+    }
+
+    {
+        if ((sZeroFloat != m_groundHitOffset.x) || (sZeroFloat != m_groundHitOffset.z)) {
             const bool hasModel =
                 (m_charaModelHandle != (CCharaPcs::CHandle*)0) &&
                 (m_charaModelHandle->m_model != (CChara::CModel*)0);
@@ -1233,8 +1238,6 @@ void CGObject::bgAttribCollision()
                 }
             }
         }
-    } else {
-        m_bgAttrValue = m_attachOwner->m_bgAttrValue;
     }
 }
 

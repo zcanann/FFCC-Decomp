@@ -3261,7 +3261,7 @@ void GbaQueue::CMakeFavorite(int channel, unsigned int value)
 
 	unsigned short crc = 0xFFFF;
 	if (Joybus.Crc16(4, localInfo.m_favorite, &crc) != localInfo.m_crc) {
-		if (System.m_execParam >= 1) {
+		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
 System.Printf(const_cast<char*>(s_cmake_favorite_crc_error), const_cast<char*>(s_gbaque_cpp), 0xBDC);
 		}
 		Joybus.SendResult(channel, 1, localInfo.m_resultCode, 0);
@@ -3662,7 +3662,7 @@ int GbaQueue::MakeBuyData(int channel, char* outData)
 {
 char* itemNameScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0xD79) char[kGbaQueueScratchTextSize];
 	if (itemNameScratch == 0) {
-		if (System.m_execParam >= 1) {
+		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
 System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0xD7B);
 		}
 		return -1;
@@ -3671,7 +3671,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 
 char* agbStringScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0xD82) char[kGbaQueueScratchTextSize];
 	if (agbStringScratch == 0) {
-		if (System.m_execParam >= 1) {
+		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
 System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0xD84);
 		}
 		return -1;

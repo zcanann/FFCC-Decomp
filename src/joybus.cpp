@@ -7095,7 +7095,7 @@ int JoyBus::SetCtrlMode(int portIndex, int controlMode)
 	}
 
     unsigned char modeFlag =
-        (unsigned char)(((unsigned int)(controlMode | -controlMode)) >> 31);
+        (unsigned char)(((unsigned int)(-controlMode | controlMode)) >> 31);
 
     unsigned int cmd = 0;
     unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);

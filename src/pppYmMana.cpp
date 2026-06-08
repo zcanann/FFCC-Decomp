@@ -810,11 +810,10 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
     if (mana->m_positions == 0 && mana->m_normals == 0 && mana->m_waterHeightA == 0) {
         for (meshIndex = 0; meshIndex < model->m_data->m_meshCount; meshIndex++, mesh++) {
             CChara::CMesh::CRefData* meshShape = mesh->m_data;
-            u8 type = param_2->m_type;
 
-            if (((type == 1) && strcmp(meshShape->m_name, s_ymManaShapeObj5) == 0) ||
-                ((type == 2) && strcmp(meshShape->m_name, s_ymManaShapeObj3) == 0) ||
-                ((type == 3) && strcmp(meshShape->m_name, s_ymManaShapeObj1) == 0)) {
+            if (((param_2->m_type == 1) && strcmp(meshShape->m_name, s_ymManaShapeObj5) == 0) ||
+                ((param_2->m_type == 2) && strcmp(meshShape->m_name, s_ymManaShapeObj3) == 0) ||
+                ((param_2->m_type == 3) && strcmp(meshShape->m_name, s_ymManaShapeObj1) == 0)) {
                 if (mana->m_meshReflectionVec == 0) {
                     mana->m_meshReflectionVec = static_cast<Vec*>(
                         pppMemAlloc(meshShape->m_vertexCount * sizeof(Vec), ppvEnv->m_stagePtr,
@@ -876,8 +875,8 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
                 }
             }
 
-            if (((type == 1) && strcmp(meshShape->m_name, s_ymManaShapeObj4) == 0) ||
-                ((type == 2) && strcmp(meshShape->m_name, s_ymManaShapeObj2) == 0)) {
+            if (((param_2->m_type == 1) && strcmp(meshShape->m_name, s_ymManaShapeObj4) == 0) ||
+                ((param_2->m_type == 2) && strcmp(meshShape->m_name, s_ymManaShapeObj2) == 0)) {
                 mana->m_positions =
                     static_cast<Vec*>(pppMemAlloc(0xD8C, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x427));
                 mana->m_normals =
@@ -921,11 +920,10 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
         mesh = model->m_meshes;
         for (meshIndex = 0; meshIndex < model->m_data->m_meshCount; meshIndex++, mesh++) {
             CChara::CMesh::CRefData* meshShape = mesh->m_data;
-            u8 type = param_2->m_type;
 
-            if (((type == 1) && strcmp(meshShape->m_name, s_ymManaShapeObj5) == 0) ||
-                ((type == 2) && strcmp(meshShape->m_name, s_ymManaShapeObj3) == 0) ||
-                ((type == 3) && strcmp(meshShape->m_name, s_ymManaShapeObj1) == 0)) {
+            if (((param_2->m_type == 1) && strcmp(meshShape->m_name, s_ymManaShapeObj5) == 0) ||
+                ((param_2->m_type == 2) && strcmp(meshShape->m_name, s_ymManaShapeObj3) == 0) ||
+                ((param_2->m_type == 3) && strcmp(meshShape->m_name, s_ymManaShapeObj1) == 0)) {
                 for (s32 dlIndex = meshShape->m_displayListCount - 1; dlIndex >= 0; dlIndex--) {
                     CalcReflectionVector2(
                         mana->m_meshReflectionVec, meshShape->m_vertices, meshShape->m_normals, meshShape->m_vertexCount,

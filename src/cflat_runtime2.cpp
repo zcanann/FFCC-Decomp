@@ -1718,7 +1718,7 @@ void CFlatRuntime2::loadLayer(int layerNo, char* fileName)
 		textureSet = new (getStage(), const_cast<char*>(sCFlatRuntime2FileTag), 0x4F4) CTextureSet;
 		LayerResources(this)[layerNo].m_textureSet = textureSet;
 		void* readBuffer = File.m_readBuffer;
-		textureSet->Create(
+		LayerResources(this)[layerNo].m_textureSet->Create(
 			readBuffer,
 			GET_CHARA_ALLOC_STAGE_S(CharaPcs.m_charaAllocStage, Game.m_mainStage),
 			0, 0, 0, 0);

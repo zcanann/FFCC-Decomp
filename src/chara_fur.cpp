@@ -988,12 +988,12 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 
 	if (work.m_state == 0) {
 		if ((rotateButtons & 1) != 0) {
-			gObject->m_rotTargetY -= 0.03125f;
+			gObject->m_rotTargetY -= kYmEnvQuarter;
 			if (gObject->m_currentAnimSlot < 0) {
 				gObject->PlayAnim(1, 0, 0, -1, -1, 0);
 			}
 		} else if ((rotateButtons & 2) != 0) {
-			gObject->m_rotTargetY += 0.03125f;
+			gObject->m_rotTargetY += kYmEnvQuarter;
 			if (gObject->m_currentAnimSlot < 0) {
 				gObject->PlayAnim(1, 0, 0, -1, -1, 0);
 			}

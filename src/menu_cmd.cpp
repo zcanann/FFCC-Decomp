@@ -731,14 +731,14 @@ int CMenuPcs::CmdCtrl()
 	} else if ((mode == 1) && (GetCmdStateView(this)->phase == 2)) {
 		actionHandled = CmdClose0();
 		if (actionHandled != 0) {
-			if (GetCmdStateView(this)->commandResult == 0) {
-				GetCmdStateView(this)->phase = static_cast<s16>(GetCmdStateView(this)->phase + 1);
-			} else {
+			if (GetCmdStateView(this)->commandResult != 0) {
 				GetCmdStateView(this)->phase = 0;
 				GetCmdStateView(this)->mode = 3;
 				GetCmdStateView(this)->transitionTimer = 0;
 				GetCmdStateView(this)->commandResult = 0;
 				CmdInit1();
+			} else {
+				GetCmdStateView(this)->phase = static_cast<s16>(GetCmdStateView(this)->phase + 1);
 			}
 			actionHandled = 0;
 		}
@@ -760,11 +760,11 @@ int CMenuPcs::CmdCtrl()
 	} else if ((mode == 2) && (GetCmdStateView(this)->phase == 2)) {
 		actionHandled = CmdClose1();
 		if (actionHandled != 0) {
-			if (GetCmdStateView(this)->commandResult == 0) {
-				GetCmdStateView(this)->mode = 0;
-			} else {
+			if (GetCmdStateView(this)->commandResult != 0) {
 				GetCmdStateView(this)->uniteState = 0;
 				GetCmdStateView(this)->mode = 3;
+			} else {
+				GetCmdStateView(this)->mode = 0;
 			}
 			actionHandled = 0;
 			GetCmdStateView(this)->phase = 0;
@@ -774,17 +774,19 @@ int CMenuPcs::CmdCtrl()
 		GetCmdStateView(this)->transitionTimer = static_cast<s16>(GetCmdStateView(this)->transitionTimer + 1);
 
 		s32 selected = static_cast<s32>(GetCmdStateView(this)->selected);
-		u32 prev = selected - 1;
-		for (; prev > 2; --prev) {
-			if (caravanWork->m_commandListExtra[prev] >= 0) {
+		s32 prev = selected - 1;
+		const s16* prevPtr = &caravanWork->m_commandListExtra[prev];
+		for (; prev > 2; --prev, --prevPtr) {
+			if (*prevPtr >= 0) {
 				break;
 			}
 		}
 
 		s32 next = selected + 1;
 		s32 limit = static_cast<s32>(caravanWork->m_numCmdListSlots);
-		for (; next < limit; ++next) {
-			if (caravanWork->m_commandListExtra[next] >= 0) {
+		const s16* nextPtr = &caravanWork->m_commandListExtra[next];
+		for (; next < limit; ++next, ++nextPtr) {
+			if (*nextPtr >= 0) {
 				break;
 			}
 		}
@@ -968,6 +970,7 @@ void CMenuPcs::CmdDraw()
 	CmdListEntry* entry = entries;
 	const s32 animState = GetCmdStateView(this)->animState;
 	const s32 cmdMode = GetCmdStateView(this)->mode;
+	const float smallOffset = kCmdMenuSmallOffset;
 
 	for (i = 0; i < GetCmdListStorage(this)->count; i++) {
 		const s32 tex = entry->tex;
@@ -977,7 +980,7 @@ void CMenuPcs::CmdDraw()
 			const float w = static_cast<float>(entry->width);
 			double h = static_cast<double>(entry->height);
 			const float u = entry->u;
-			float t = kCmdMenuSmallOffset;
+			float t = smallOffset;
 
 			if ((i >= 8) || (caravan->m_commandListExtra[i] == 0)) {
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
@@ -988,8 +991,8 @@ void CMenuPcs::CmdDraw()
 				if ((animState == 1) && (i < caravan->m_numCmdListSlots) &&
 				    (i == GetCmdStateView(this)->selected)) {
 					t = kCmdMenuSelectedUvY;
-					y -= kCmdMenuSmallOffset;
-					h += kCmdMenuSmallOffset;
+					y -= smallOffset;
+					h += smallOffset;
 				}
 
 				GXColor boxColor;
@@ -2701,14 +2704,14 @@ unsigned int CMenuPcs::CmdClose1()
 
 	if (state == 0) {
 		const s32 selected = GetCmdStateView(this)->selected;
-		GetCmdListStorage(this)->entries[selected].alpha =
+		*reinterpret_cast<f32*>(reinterpret_cast<u8*>(GetCmdList(this)) + selected * 0x40 + 0x18) =
 			static_cast<float>(kCmdMenuTransitionStepD * static_cast<f64>(GetCmdStateView(this)->transitionTimer));
 
 		if (caravanWork->m_commandListExtra[selected + 1] == -1) {
-			GetCmdListStorage(this)->entries[selected + 1].alpha =
+			*reinterpret_cast<f32*>(reinterpret_cast<u8*>(GetCmdList(this)) + (selected + 1) * 0x40 + 0x18) =
 				static_cast<float>(kCmdMenuTransitionStepD * static_cast<f64>(GetCmdStateView(this)->transitionTimer));
 			if (caravanWork->m_commandListExtra[selected + 2] == -1) {
-				GetCmdListStorage(this)->entries[selected + 2].alpha =
+				*reinterpret_cast<f32*>(reinterpret_cast<u8*>(GetCmdList(this)) + (selected + 2) * 0x40 + 0x18) =
 					static_cast<float>(kCmdMenuTransitionStepD * static_cast<f64>(GetCmdStateView(this)->transitionTimer));
 			}
 		}

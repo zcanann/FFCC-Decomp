@@ -159,7 +159,7 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
         float u1;
         float v1;
 
-        if ((*reinterpret_cast<const s16*>(shapeData) & 8) != 0) {
+        if ((*reinterpret_cast<const u16*>(shapeData) & 8) != 0) {
             const u8* entry = (shapeData + 0x10) + rotatedStride;
             const u8 texIndex = entry[0x28];
             const s8 numTex = m_textureCount;
@@ -249,7 +249,7 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             GXSetViewport(viewportScale * minX + offsetXY[0], viewportScale * minY + offsetXY[1], viewportW,
                           viewportH, kFunnyShapeZero, kFunnyShapeOne);
 
-            const s16 texX = S16At(entry, 0x20);
+            const u16 texX = S16At(entry, 0x20);
             const s16 texY = S16At(entry, 0x22);
             const s16 texW = S16At(entry, 0x24);
             const s16 texH = S16At(entry, 0x26);

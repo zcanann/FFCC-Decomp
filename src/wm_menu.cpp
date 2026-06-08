@@ -7683,7 +7683,11 @@ void CMenuPcs::DrawWMFrame()
 	rotMtx[2][3] = FLOAT_803313dc;
 
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-	GXColor frameColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(alpha))};
+	GXColor frameColor;
+	frameColor.r = 0xFF;
+	frameColor.g = 0xFF;
+	frameColor.b = 0xFF;
+	frameColor.a = static_cast<unsigned char>(static_cast<int>(alpha));
 	GXSetChanMatColor(static_cast<GXChannelID>(4), frameColor);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x16));
 

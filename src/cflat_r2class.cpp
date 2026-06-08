@@ -973,7 +973,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			hitTarget.y = params[3];
 			hitTarget.z = params[4];
 			PSVECSubtract(&hitTarget, &hitStart, &hitMove);
-			unsigned int hit = MapPcs.CheckHitCylinderNear(&hitStart, &hitMove, params[5], object->m_localBase[0]);
+			int hit = MapPcs.CheckHitCylinderNear(&hitStart, &hitMove, params[5], object->m_localBase[0]);
 			AddDebugDrawCC(&hitStart, &hitMove, params[5], 1, 0);
 			if (hit != 0) {
 				*reinterpret_cast<int*>(object->m_localBase[6]) = 0;
@@ -1080,7 +1080,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			hitMove.x = kCFlatRuntime2Zero;
 			hitMove.y = -height;
 			hitMove.z = kCFlatRuntime2Zero;
-			unsigned int hit = MapPcs.CheckHitCylinderNear(&hitStart, &hitMove, radius, object->m_localBase[0]);
+			int hit = MapPcs.CheckHitCylinderNear(&hitStart, &hitMove, radius, object->m_localBase[0]);
 			AddDebugDrawCC(&hitStart, &hitMove, radius, 1, 0);
 			if (hit != 0) {
 				*reinterpret_cast<int*>(object->m_localBase[6]) = 0;

@@ -1920,10 +1920,12 @@ void CMenuPcs::CalcDiaryMenu()
 	case 0:
 		if (m_wmWorldState->m_mainState <= 4) {
 			const short state = m_wmWorldState->m_mainState;
-			int frameStep = 0;
+			int frameStep;
 			if (state == 0) {
 				frameStep = m_wmWorldState->m_frameCounter - 10;
-			} else if (state <= 0 || state >= 4) {
+			} else if (state > 0 && state < 4) {
+				frameStep = 0;
+			} else {
 				frameStep = -m_wmWorldState->m_frameCounter;
 			}
 			CalcWmFrame0Inline(this, frameStep);
@@ -1953,10 +1955,12 @@ void CMenuPcs::CalcDiaryMenu()
 			if (m_wmWorldState->m_mainState <= 4) {
 				CalcCharaSelect();
 				const short state = m_wmWorldState->m_mainState;
-				int frameStep = 0;
+				int frameStep;
 				if (state == 0) {
 					frameStep = m_wmWorldState->m_frameCounter - 10;
-				} else if (state <= 0 || state >= 4) {
+				} else if (state > 0 && state < 4) {
+					frameStep = 0;
+				} else {
 					frameStep = -m_wmWorldState->m_frameCounter;
 				}
 				CalcWmFrame0Inline(this, frameStep);
@@ -2071,10 +2075,10 @@ void CMenuPcs::CalcMCardMenu()
 	unsigned int uVar15;
 	if (sVar7 == 0) {
 		uVar15 = static_cast<int>(m_wmWorldState->m_frameCounter) - 10;
-	} else if (sVar7 <= 0 || sVar7 >= 4) {
-		uVar15 = -static_cast<int>(m_wmWorldState->m_frameCounter);
-	} else {
+	} else if (sVar7 > 0 && sVar7 < 4) {
 		uVar15 = 0;
+	} else {
+		uVar15 = -static_cast<int>(m_wmWorldState->m_frameCounter);
 	}
 
 	*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) = 0x10;
@@ -2896,7 +2900,7 @@ void CMenuPcs::CalcLoadMenu()
 		unsigned char* const frame = m_wm.m_frameInfo;
 		double dVar26;
 		float baseWidth = (float)((int)*reinterpret_cast<short*>(frame + 8) + (int)*reinterpret_cast<short*>(frame + 4));
-		if ((int)uVar15 > -11) {
+		if ((int)uVar15 >= -10) {
 			int s15 = (int)uVar15 >> 31;
 			int absRaw = ((int)uVar15 ^ s15) - s15;
 			float dVar27 = (float)(baseWidth * (DOUBLE_803314E8 * (double)absRaw));

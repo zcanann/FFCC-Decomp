@@ -1791,10 +1791,10 @@ void CCameraPcs::drawShadowEnd()
 
     {
         float span = m_fullScreenShadow.m_span;
-        float depthSpan = m_shadowCamera.m_farZ - m_shadowCamera.m_nearZ;
         C_MTXLightOrtho(m_fullScreenShadow.m_shadowTexMtx, -span, span, -span, span,
                         kCameraHalfF, kCameraHalfF, kCameraHalfF, kCameraHalfF);
         PSMTXScale(m_fullScreenShadow.m_depthScaleMtx, kCameraZeroF, kCameraZeroF, kCameraZeroF);
+        float depthSpan = m_shadowCamera.m_farZ - m_shadowCamera.m_nearZ;
         m_fullScreenShadow.m_depthScaleMtx[0][2] = kCameraNegativeOneF / depthSpan;
         m_fullScreenShadow.m_depthScaleMtx[0][3] = -(m_shadowCamera.m_nearZ / depthSpan);
         m_fullScreenShadow.m_depthScaleMtx[1][2] = m_fullScreenShadow.m_depthScaleMtx[0][2] * kCameraShadowDepthScaleY;

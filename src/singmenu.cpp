@@ -2480,7 +2480,11 @@ void CMenuPcs::DrawListPosMark(float x, float y, float z)
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-    _GXColor color = { 0xFF, 0xFF, 0xFF, 0xFF };
+    _GXColor color;
+    color.r = 0xFF;
+    color.g = 0xFF;
+    color.b = 0xFF;
+    color.a = 0xFF;
     GXSetChanMatColor(GX_COLOR0A0, color);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2E));
@@ -2644,7 +2648,11 @@ void CMenuPcs::DrawSingWin(short mode)
     float y1 = y0 + h - 32.0f;
 
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-    _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
+    _GXColor white;
+    white.r = 0xFF;
+    white.g = 0xFF;
+    white.b = 0xFF;
+    white.a = 0xFF;
     GXSetChanMatColor(GX_COLOR0A0, white);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3F));
     for (unsigned long i = 0; i < 4; i++) {

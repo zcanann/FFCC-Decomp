@@ -259,6 +259,7 @@ void CGMonObj::frameStatFuncGiantCrab()
 	u8* self = (u8*)this;
 	int state = *(int*)(self + 0x520);
 
+	if (state >= 100 && state < 0x69) {
 	if (state == 100) {
 		if (*(int*)(self + 0x528) == 0) {
 			int soundStep = *(int*)(CGMonObj::m_boss + 0x4);
@@ -285,7 +286,7 @@ void CGMonObj::frameStatFuncGiantCrab()
 				break;
 			}
 
-			*(int*)(CGMonObj::m_boss + 0x4) = (soundStep + 1) % 4;
+			*(int*)(CGMonObj::m_boss + 0x4) = (*(int*)(CGMonObj::m_boss + 0x4) + 1) % 4;
 			reinterpret_cast<CGPrgObj*>(self)->reqAnim(0xc, 0, 0);
 
 			reinterpret_cast<CGPrgObj*>(self)->putParticle(
@@ -305,9 +306,9 @@ void CGMonObj::frameStatFuncGiantCrab()
 			}
 
 			*(u32*)(self + 0x1c0) &= 0xfff7fffd;
-			float moveScale = PSVECDistance((Vec*)(CGMonObj::m_boss + 0x8), (Vec*)(self + 0x15c)) * kMonObjBossOneSixteenth;
-			Vec moveDir = { 0.0f, 0.0f, 0.0f };
-			reinterpret_cast<CGObject*>(self)->Move(&moveDir, moveScale, 0x10, 1, 0, 0, 0);
+			Vec* moveDir = (Vec*)(CGMonObj::m_boss + 0x8);
+			float moveScale = PSVECDistance(moveDir, (Vec*)(self + 0x15c)) * kMonObjBossOneSixteenth;
+			reinterpret_cast<CGObject*>(self)->Move(moveDir, moveScale, 0x10, 1, 0, 0, 0);
 
 			int targetIdx = *(int*)(self + 0x6c4);
 			if (targetIdx >= 0) {
@@ -324,20 +325,25 @@ void CGMonObj::frameStatFuncGiantCrab()
 			reinterpret_cast<CGPrgObj*>(self)->changeStat(0, 0, 0);
 			*(u32*)(self + 0x1c0) |= 0x80002;
 		}
-	} else if (state >= 100 && state < 0x69) {
+	} else {
 		if (*(int*)(self + 0x528) == 0) {
 			float turnOffset = kMonObjBossPi;
 			int animId = 1;
 			if (state == 0x67) {
 				turnOffset = kMonObjBossHalfPi;
 				animId = 0x12;
-			} else if (state >= 0x68) {
+			} else if (state < 0x67) {
+				if (state == 0x65) {
+					turnOffset = kMonObjBossZero;
+				}
+			} else if (state < 0x69) {
 				turnOffset = kMonObjBossThreeHalfPi;
 				animId = 0x13;
 			}
 
 			reinterpret_cast<CGPrgObj*>(self)->reqAnim(animId, 0, 0);
-			u16 scriptScale = *(u16*)(*(u8**)(self + 0x7c) + 0xd4);
+			u16 scriptScale =
+			    *(u16*)((u8*)reinterpret_cast<CGObject*>(self)->m_scriptHandle[9] + 0xd4);
 			float moveMagnitude =
 			    *(float*)(self + 0x690) *
 			    (kMonObjBossScaleStep * (float)((double)scriptScale - kMonObjBossUnsignedIntBias) + kMonObjBossEpsilon);
@@ -354,7 +360,7 @@ void CGMonObj::frameStatFuncGiantCrab()
 				}
 			}
 
-			u32 action = (u32) * (void**)(self + 0x68);
+			int action = reinterpret_cast<int>(reinterpret_cast<CGObject*>(self)->m_scriptHandle[4]);
 			if (action == 0x63) {
 				reinterpret_cast<CGPrgObj*>(self)->playSe3D(0x8cab, 0x32, 0x1c2, 0, 0);
 			} else if (action < 99) {
@@ -369,6 +375,7 @@ void CGMonObj::frameStatFuncGiantCrab()
 		if (*(int*)(self + 0x528) == 0x19) {
 			reinterpret_cast<CGPrgObj*>(self)->changeStat(0, 0, 0);
 		}
+	}
 	}
 }
 
@@ -1048,9 +1055,9 @@ int CGMonObj::attackCheckFuncLKShooter(int)
 		if (work->bits.m_bit40 == 0 && (CFlatBossState() & 2) == 0) {
 			CVector left(kMonObjBossLeftTargetX, kMonObjBossZero, kMonObjBossLeftTargetZ);
 			if (PSVECDistance(reinterpret_cast<Vec*>(&left), &object->m_worldPosition) < kMonObjBossSideTargetRange &&
-			    work->m_leftCooldown == 0) {
+			    reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->m_leftCooldown == 0) {
 				work->bits.m_bit40 = 1;
-				work->m_leftCooldown = 300;
+				reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->m_leftCooldown = 300;
 				m_actionBranch = 2;
 				return 100;
 			}
@@ -1058,7 +1065,7 @@ int CGMonObj::attackCheckFuncLKShooter(int)
 		if (work->bits.m_bit20 == 0 && (CFlatBossState() & 1) == 0) {
 			CVector right(kMonObjBossRightTargetXZ, kMonObjBossZero, kMonObjBossRightTargetXZ);
 			if (PSVECDistance(reinterpret_cast<Vec*>(&right), &object->m_worldPosition) < kMonObjBossSideTargetRange &&
-			    work->m_rightCooldown == 0) {
+			    reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->m_rightCooldown == 0) {
 				work->bits.m_bit20 = 1;
 				m_actionBranch = 1;
 				return 100;
@@ -2057,7 +2064,7 @@ void CGMonObj::alwaysFuncMeteoParasite()
 		MG_GBA_THREAD_MSG_SETPORT_ct += kMonObjBossScaleStep;
 	}
 
-	if (scriptKind < 0x88 && scriptKind > 0x84 &&
+	if (scriptKind < 0x88 && scriptKind >= 0x85 &&
 	    *reinterpret_cast<int*>(CGMonObj::m_boss + 0x78) == scriptKind - 0x85 &&
 	    reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_bit80 != 0) {
 		int effect;

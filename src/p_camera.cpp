@@ -1726,8 +1726,11 @@ void CCameraPcs::drawShadowEnd()
         return;
     }
 
-    C_MTXOrtho(proj, kCameraHalfScreenHeight, -kCameraHalfScreenHeight, kCameraHalfScreenHeight, -kCameraHalfScreenHeight,
-               m_shadowCamera.m_nearZ, m_shadowCamera.m_farZ);
+    float nearZ = m_shadowCamera.m_nearZ;
+    float negHalf = -kCameraHalfScreenHeight;
+    float farZ = m_shadowCamera.m_farZ;
+    C_MTXOrtho(proj, kCameraHalfScreenHeight, negHalf, kCameraHalfScreenHeight, negHalf,
+               nearZ, farZ);
     GXSetProjection(proj, GX_ORTHOGRAPHIC);
     GXSetZMode(GX_TRUE, GX_ALWAYS, GX_TRUE);
     PSMTXIdentity(ident);
@@ -1754,8 +1757,8 @@ void CCameraPcs::drawShadowEnd()
         GXSetChanMatColor(GX_COLOR0A0, black);
     }
 
-    z = m_shadowCamera.m_nearZ - m_shadowCamera.m_farZ;
-    x0 = static_cast<int>(-kCameraHalfScreenHeight - kCameraTwoF);
+    z = nearZ - farZ;
+    x0 = static_cast<int>(negHalf - kCameraTwoF);
     y0 = static_cast<int>(kCameraShadowRectRight);
     x1 = static_cast<int>(kCameraShadowRectLeft);
     y1 = static_cast<int>(kCameraShadowRectBottom);

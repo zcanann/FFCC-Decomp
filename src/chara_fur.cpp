@@ -1072,21 +1072,25 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		int eraseMode = 0;
 		int doPaint = 1;
 		_GXColor brushColor;
-		if (radarType == 2) {
+		switch (radarType) {
+		case 0:
+			brushColor = CColor(0xF, 4, 4, 2).color;
+			break;
+		case 1:
+			brushColor = CColor(4, 8, 0xF, 2).color;
+			break;
+		case 2:
 			brushColor = CColor(4, 0xF, 4, 2).color;
-		} else if (radarType < 2) {
-			if (radarType == 0) {
-				brushColor = CColor(0xF, 4, 4, 2).color;
-			} else if (radarType >= 0) {
-				brushColor = CColor(4, 8, 0xF, 2).color;
-			}
-		} else if (radarType == 4) {
+			break;
+		case 3:
+			brushColor = CColor(0xF, 0xF, 0xF, 4).color;
+			doPaint = ((System.m_frameCounter & 3U) == 0) ? 1 : 0;
+			break;
+		case 4:
 			brushColor = CColor(0, 0, 0, 2).color;
 			eraseMode = 1;
 			doPaint = ((System.m_frameCounter & 3U) == 0) ? 1 : 0;
-		} else if (radarType < 4) {
-			brushColor = CColor(0xF, 0xF, 0xF, 4).color;
-			doPaint = ((System.m_frameCounter & 3U) == 0) ? 1 : 0;
+			break;
 		}
 		_GXColor centerBefore = CColor(0xF, 0xF, 0xF, 0).color;
 		_GXColor centerAfter = centerBefore;

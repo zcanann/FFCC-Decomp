@@ -2776,18 +2776,21 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 		}
 
 		if (effectId > 500) {
-			unsigned short itemType = *reinterpret_cast<unsigned short*>(itemData + 2);
+			int itemType = *reinterpret_cast<unsigned short*>(itemData + 2);
 			int colType;
-			if (itemType == 4) {
-				colType = 4;
-			} else if (itemType < 4) {
-				if (itemType == 1) {
-					colType = 1;
-				}
-			} else if (itemType == 9) {
-				colType = 9;
-			} else if (itemType < 9 && itemType > 7) {
+			switch (itemType) {
+			case 1:
+				colType = 1;
+				break;
+			case 8:
 				colType = 8;
+				break;
+			case 4:
+				colType = 4;
+				break;
+			case 9:
+				colType = 9;
+				break;
 			}
 			CFlatRuntime2Storage().SetParticleWorkCol(colType, -1, *reinterpret_cast<unsigned short*>(itemData + 4) * 0.01f);
 		}
@@ -3356,6 +3359,7 @@ void CGCharaObj::combi2()
 		}
 
 		int hasNearbyPartner = 0;
+		Vec* partyCenter = &CharaObjComboCenter(party);
 		for (int j = 0; j < candidateCount; j++) {
 			if (i == j) {
 				continue;
@@ -3366,18 +3370,17 @@ void CGCharaObj::combi2()
 				continue;
 			}
 
-			if (PSVECDistance(&CharaObjComboCenter(party), &CharaObjComboCenter(other)) < 20.0f) {
+			if (PSVECDistance(partyCenter, &CharaObjComboCenter(other)) < 20.0f) {
 				hasNearbyPartner = 1;
 				break;
 			}
 		}
 
 		CharaObjComboFlagBits* comboFlags = reinterpret_cast<CharaObjComboFlagBits*>(&CharaObjComboFlags(party));
-		if (hasNearbyPartner) {
-			if (comboFlags->m_nearby == 0) {
-				goto changed;
-			}
-		} else if (comboFlags->m_nearby != 0) {
+		if (hasNearbyPartner && comboFlags->m_nearby == 0) {
+			goto changed;
+		}
+		if (!hasNearbyPartner && comboFlags->m_nearby != 0) {
 			goto changed;
 		}
 		continue;

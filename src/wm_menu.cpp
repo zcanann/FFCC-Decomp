@@ -6232,7 +6232,7 @@ unsigned int CMenuPcs::GetWorldParam(int code)
 		break;
 	}
 	default:
-		if (System.m_execParam != 0) {
+		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
 			System.Printf(const_cast<char*>(s__s__d___Error_function_code_not_f_801dc3ec), s_wm_menu_cpp, 0x1521, code);
 		}
 		break;

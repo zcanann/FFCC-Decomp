@@ -1581,8 +1581,8 @@ void CMenuPcs::DrawOptionMenu()
  */
 void CMenuPcs::BindMcObj(int slotNo)
 {
-	EffectInfo* obj;
 	int slot;
+	EffectInfo* obj;
 
 	for (slot = 0; slot < 4; slot++) {
 		if (slotNo == slot) {

@@ -2207,8 +2207,8 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	const CCaravanWork* caravanWork = reinterpret_cast<const CCaravanWork*>(scriptFood);
 	const unsigned int letterCount = static_cast<unsigned int>(caravanWork->m_letterCount);
 
-	unsigned int subjectCount = 0;
-	unsigned int npcCount = 0;
+	int subjectCount = 0;
+	int npcCount = 0;
 
 	char* npcWrite = npcNameBuf;
 	char* subjectWrite = subjectNameBuf;
@@ -2245,7 +2245,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 			(reinterpret_cast<unsigned char*>(entryWrite))[5] =
 				(reinterpret_cast<unsigned char*>(letterEntryBuf + matchedNpc * 2))[5];
 		} else {
-			if (npcCount > 0x7F && (unsigned int)System.m_execParam >= 1) {
+			if (npcCount >= 0x80 && (unsigned int)System.m_execParam >= 1) {
 System.Printf(const_cast<char*>(s_npc_max_over), const_cast<char*>(s_gbaque_cpp), 0x7DC);
 			}
 
@@ -2260,7 +2260,7 @@ System.Printf(const_cast<char*>(s_npc_max_over), const_cast<char*>(s_gbaque_cpp)
 			(reinterpret_cast<unsigned char*>(entryWrite))[4] =
 				(reinterpret_cast<unsigned char*>(letterEntryBuf + matchedSubject * 2))[4];
 		} else {
-			if (subjectCount > 0xFF && (unsigned int)System.m_execParam >= 1) {
+			if (subjectCount >= 0x100 && (unsigned int)System.m_execParam >= 1) {
 System.Printf(const_cast<char*>(s_subject_max_over), const_cast<char*>(s_gbaque_cpp), 0x7F0);
 			}
 

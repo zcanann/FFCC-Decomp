@@ -1031,14 +1031,15 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
 
     if (stepData->m_map21Flag != 0) {
         char* compareName = Game.m_currentScriptName;
-        C_MTXPerspective(projectionMtx, kYmManaCaptureFovY, kYmManaOne, kYmManaOne, kYmManaCaptureFarClip);
+        C_MTXPerspective(projectionMtx, LoadFloat(kYmManaCaptureFovY), LoadFloat(kYmManaOne), LoadFloat(kYmManaOne),
+                         LoadFloat(kYmManaCaptureFarClip));
         GXSetProjection(projectionMtx, (_GXProjectionType)0);
 
         for (i = 0; i < 6; i++) {
             cameraPos = centerPos;
-            cameraUp.x = kPppYmMoveParabolaZero;
-            cameraUp.y = kYmManaOne;
-            cameraUp.z = kPppYmMoveParabolaZero;
+            cameraUp.x = LoadFloat(kPppYmMoveParabolaZero);
+            cameraUp.y = LoadFloat(kYmManaOne);
+            cameraUp.z = LoadFloat(kPppYmMoveParabolaZero);
 
             s32 nameCompare = strcmp(s_ymManaRuin2Name, compareName);
             if (nameCompare == 0) {

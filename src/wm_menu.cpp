@@ -4971,9 +4971,6 @@ void CMenuPcs::DrawMoveMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 #define worldState m_wmWorldState
-	if (worldState == 0) {
-		return;
-	}
 
 	{
 		const short state = worldState->m_mainState;

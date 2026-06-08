@@ -879,21 +879,17 @@ void CMenuPcs::draw()
     GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
     GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
 
-    {
-        int mode = m_mode;
-
-        if (mode != 1) {
-            if (mode < 1) {
-                if (mode >= 0) {
-                    drawBattle();
-                    drawVillageMenu();
-                }
-            } else if (mode < 3) {
-                drawBonus();
-            }
-        } else {
-            drawWorld();
-        }
+    switch (m_mode) {
+    case 0:
+        drawBattle();
+        drawVillageMenu();
+        break;
+    case 1:
+        drawWorld();
+        break;
+    case 2:
+        drawBonus();
+        break;
     }
 
     if (((CFlatEventFlags() & 0x10) != 0) && (System.m_scenegraphStepMode == 2)) {
@@ -1200,10 +1196,7 @@ void CMenuPcs::SetTexture(CMenuPcs::TEX tex)
  */
 void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, float u, float v, float us, float vs, float angle)
 {
-    if (w <= LoadFloat(kMenuInitOne)) {
-        return;
-    }
-    if (h <= LoadFloat(kMenuInitOne)) {
+    if (w <= LoadFloat(kMenuInitOne) || h <= LoadFloat(kMenuInitOne)) {
         return;
     }
     {
@@ -1301,10 +1294,7 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
  */
 void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, float u, float v, _GXColor* colors, float us, float vs, float angle)
 {
-    if (w <= LoadFloat(kMenuInitOne)) {
-        return;
-    }
-    if (h <= LoadFloat(kMenuInitOne)) {
+    if (w <= LoadFloat(kMenuInitOne) || h <= LoadFloat(kMenuInitOne)) {
         return;
     }
     {
@@ -1804,13 +1794,13 @@ void CMenuPcs::drawBattle()
 
             if (screenX < static_cast<float>(halfWidth)) {
                 screenX = static_cast<float>(halfWidth);
-            } else if (screenX > static_cast<float>(0x280 - halfWidth)) {
+            } else if (static_cast<float>(0x280 - halfWidth) < screenX) {
                 screenX = static_cast<float>(0x280 - halfWidth);
             }
 
             if (screenY < LoadFloat(kMenuMarkerMinY)) {
                 screenY = LoadFloat(kMenuMarkerMinY);
-            } else if (screenY > LoadFloat(kMenuMarkerMaxY)) {
+            } else if (LoadFloat(kMenuMarkerMaxY) < screenY) {
                 screenY = LoadFloat(kMenuMarkerMaxY);
             }
 

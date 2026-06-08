@@ -3073,19 +3073,19 @@ void CShopMenu::Calc()
         }
         break;
     case 4:
-        if (subMode == 1) {
-            this->SelectFigure();
-            if ((GetPadButtons() & 0x200) != 0) {
-                Sound.PlaySe(3, 0x40, 0x7F, 0);
-                subMode = 0;
-            }
-        } else if (subMode < 1) {
+        if (subMode < 1) {
             if (subMode >= 0) {
                 this->SelectItemIdx();
                 if ((GetPadButtons() & 0x200) != 0) {
                     Sound.PlaySe(3, 0x40, 0x7F, 0);
                     this->SetMode(5);
                 }
+            }
+        } else if (subMode == 1) {
+            this->SelectFigure();
+            if ((GetPadButtons() & 0x200) != 0) {
+                Sound.PlaySe(3, 0x40, 0x7F, 0);
+                subMode = 0;
             }
         } else if (subMode < 3) {
             this->SelectYesNo();

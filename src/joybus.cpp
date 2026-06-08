@@ -8066,7 +8066,7 @@ int JoyBus::SetOpenMenu(int playerIndex, char menuId)
             else
             {
                 const unsigned short opcode = static_cast<unsigned short>(0x140F);
-				const unsigned int cmd = MakeJoyCmd16(opcode, static_cast<unsigned char>(menuId), 0);
+				const unsigned int cmd = MakeJoyCmd16(opcode, static_cast<signed char>(menuId), 0);
 
                 m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
                 m_cmdCount[m_threadParams[playerIndex].m_portIndex]++;

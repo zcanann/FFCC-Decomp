@@ -475,7 +475,8 @@ void CMenuPcs::EquipDraw()
 					color.b = 0xff;
 					color.a = 0xff;
 					GXSetChanMatColor(GX_COLOR0A0, color);
-					float fillWidth = listItem->alpha * w;
+					w = listItem->alpha * w;
+					float fillWidth = w;
 					if (fillWidth > kEquipZero) {
 						MenuPcs.DrawRect(0, x, y, fillWidth, h, u, v, colors, kEquipOne, kEquipOne, kEquipZero);
 						x = x + fillWidth;

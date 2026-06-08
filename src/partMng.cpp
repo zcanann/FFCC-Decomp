@@ -3660,18 +3660,14 @@ int CPartMng::pppLoadPmd(const char* baseName)
                     }
 
                     if (searchModel == 0) {
-                        int freeIndex = 0;
-                        int remaining = 0x100;
                         pppModelSt* freeModel = modelArray;
-                        do {
+                        for (int freeIndex = 0; freeIndex < 0x100; freeIndex++) {
                             if (freeModel->m_isUsed == 0) {
                                 targetModel = modelArray + freeIndex;
                                 goto foundFreeModel;
                             }
                             freeModel++;
-                            freeIndex++;
-                            remaining--;
-                        } while (remaining != 0);
+                        }
                         targetModel = 0;
                     foundFreeModel:
 
@@ -3795,10 +3791,8 @@ int CPartMng::pppLoadPan(const char* baseName)
                     }
 
                     if (searchShape == 0) {
-                        int freeIndex = 0;
-                        int remaining = 0x100;
                         pppShapeSt* freeShape = shapeArray;
-                        do {
+                        for (int freeIndex = 0; freeIndex < 0x100; freeIndex++) {
                             if (freeShape->m_inUse == 0) {
                                 targetShape = reinterpret_cast<pppShapeSt*>(
                                     reinterpret_cast<unsigned char*>(shapeArray) + freeIndex * 0x2c);
@@ -3806,9 +3800,7 @@ int CPartMng::pppLoadPan(const char* baseName)
                             }
                             freeShape = reinterpret_cast<pppShapeSt*>(
                                 reinterpret_cast<unsigned char*>(freeShape) + 0x2c);
-                            freeIndex++;
-                            remaining--;
-                        } while (remaining != 0);
+                        }
                         targetShape = 0;
                     foundFree:
 
@@ -3916,18 +3908,14 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
                             }
 
                             if (searchModel == 0) {
-                                int freeIndex = 0;
-                                int remaining = 0x100;
                                 pppModelSt* freeModel = modelArray;
-                                do {
+                                for (int freeIndex = 0; freeIndex < 0x100; freeIndex++) {
                                     if (freeModel->m_isUsed == 0) {
                                         targetModel = modelArray + freeIndex;
                                         goto foundFreeModel;
                                     }
                                     freeModel++;
-                                    freeIndex++;
-                                    remaining--;
-                                } while (remaining != 0);
+                                }
                                 targetModel = 0;
                             foundFreeModel:
 
@@ -3986,18 +3974,14 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
                             }
 
                             if (searchShape == 0) {
-                                int freeIndex = 0;
-                                int remaining = 0x100;
                                 pppShapeSt* freeShape = shapeArray;
-                                do {
+                                for (int freeIndex = 0; freeIndex < 0x100; freeIndex++) {
                                     if (freeShape->m_inUse == 0) {
                                         targetShape = shapeArray + freeIndex;
                                         goto foundFreeShape;
                                     }
                                     freeShape++;
-                                    freeIndex++;
-                                    remaining--;
-                                } while (remaining != 0);
+                                }
                                 targetShape = 0;
                             foundFreeShape:
 

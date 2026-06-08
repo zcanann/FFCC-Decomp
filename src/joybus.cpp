@@ -5193,7 +5193,7 @@ int JoyBus::SendFavorite(ThreadParam* threadParam)
  */
 unsigned int JoyBus::RequestData(ThreadParam* threadParam, int a, int b)
 {
-    unsigned int cmd = MakeJoyCmd32(0x0C, static_cast<unsigned char>(a), static_cast<unsigned char>(b), 0);
+    unsigned int cmd = MakeJoyCmd32(0x0C, static_cast<signed char>(a), static_cast<unsigned char>(b), 0);
     int result = 0;
 
     if (m_threadRunningMask != 0)
@@ -6868,7 +6868,7 @@ void JoyBus::SetLetterSize(int portIndex, int letterSize)
  */
 int JoyBus::SendResult(int portIndex, int param3, int param4, int param5)
 {
-    unsigned char a = static_cast<unsigned char>(param4);
+    unsigned char a = static_cast<signed char>(param4);
     unsigned char b = static_cast<unsigned char>(param5);
     unsigned char firstByte = (param3 == 0) ? 6 : 7;
     unsigned short opcode = static_cast<unsigned short>((static_cast<unsigned short>(firstByte) << 8) | a);

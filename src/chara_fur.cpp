@@ -1888,10 +1888,8 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 
 			if (mode != 0) {
 				int reduce = (targetColor.a * (4 - distance)) / 4;
-				a -= reduce;
-				if (a < 0) {
-					a = 0;
-				}
+				a = a - reduce;
+				a = a < 0 ? 0 : a;
 			} else {
 				float k = (float)(7 - targetColor.a) / kCharaFurAlphaComponentScale + (float)(distance / 4);
 				if (k > 1.0f) {

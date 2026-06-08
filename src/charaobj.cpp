@@ -352,7 +352,7 @@ static int CharaObjDecodeHitParticleSe(unsigned short seData)
 
 static int CharaObjDecodeSe(unsigned short encodedSe)
 {
-	if (encodedSe == 0 || encodedSe == 0xFFFF) {
+	if (encodedSe == 0xFFFF) {
 		return 0;
 	}
 	return (encodedSe & 0xFF) + ((encodedSe >> 8) * 1000);

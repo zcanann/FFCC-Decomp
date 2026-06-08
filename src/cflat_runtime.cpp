@@ -2233,7 +2233,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 						char* scan = spec + 1;
 						if (spec[0] == '%') {
 							int fmtIndex = 1;
-							unsigned int width = 0;
+							int width = 0;
 							s32 started = static_cast<u32>(__cntlzw(static_cast<u32>(0x30 - spec[1]))) >> 5 & 0xFF;
 							for (; (*scan >= '0') && (*scan <= '9'); scan++) {
 								fmtIndex++;
@@ -2242,11 +2242,11 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 
 							if (spec[fmtIndex] == 'b') {
 								char* out = rendered;
-								u32 value = *arg;
+								int value = *arg;
 								int outLen = 0;
 
 								for (int bit = 0; bit < width; bit++) {
-									const u32 cur = (value >> ((width - bit) - 1U)) & 1U;
+									const int cur = (value >> ((width - bit) - 1)) & 1;
 									if ((started == 0) && (cur != 0)) {
 										started = 1;
 									}

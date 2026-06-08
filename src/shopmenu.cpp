@@ -1861,18 +1861,18 @@ void CShopMenu::DrawMake()
     MenuPcs.DrawShadowFont(font, const_cast<char*>(itemName), FLOAT_80332d54, FLOAT_80332e0c, 0x18, 0x12);
     MenuPcs.DrawInit();
 
-    char raceBuffer[64];
-    MenuPcs.GetRaceStr(m_resultItem, raceBuffer);
-    const int raceColor = (MenuPcs.ChkEquipPossible(m_resultItem) != 0) ? 0x18 : 2;
     const char* raceText = ShopMenuMes(languageId, SHOP_MENU_TEXT_RACE);
 
     font->DrawInit();
     MenuPcs.DrawNoShadowFont(font, const_cast<char*>(raceText), 180, FLOAT_80332d58, 0x18, 0x12);
     MenuPcs.DrawInit();
 
-    float raceX = 180 + FLOAT_80332d5c + font->GetWidth(raceText);
+    int raceX = static_cast<int>(180 + FLOAT_80332d5c + font->GetWidth(raceText));
+    char raceBuffer[64];
+    MenuPcs.GetRaceStr(m_resultItem, raceBuffer);
+    const int raceColor = (MenuPcs.ChkEquipPossible(m_resultItem) != 0) ? 0x18 : 2;
     font->DrawInit();
-    MenuPcs.DrawNoShadowFont(font, raceBuffer, raceX, FLOAT_80332d58, raceColor, 0x12);
+    MenuPcs.DrawNoShadowFont(font, raceBuffer, static_cast<float>(raceX), FLOAT_80332d58, raceColor, 0x12);
     MenuPcs.DrawInit();
 
     const char* gilUnitText = ShopMenuMes(languageId, SHOP_MENU_TEXT_GIL);

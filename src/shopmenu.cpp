@@ -1282,21 +1282,22 @@ void CShopMenu::DrawBuySellInfo()
 
     int totalGil = 0;
     if (canTrade) {
+        int gilItemNo = getItemNo(m_selectedIndex);
         if (m_listType == 0) {
             int gil = 0;
-            if (itemNo >= 1) {
+            if (gilItemNo >= 1) {
                 const CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
                 gil = static_cast<int>(caravanWork->m_shopParam) *
-                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 0x20);
+                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + gilItemNo * 0x48 + 0x20);
                 gil = gil / 100;
             }
             totalGil = m_quantity * gil;
         } else if (m_listType == 1) {
             int sellGil = 0;
-            if (itemNo >= 1) {
+            if (gilItemNo >= 1) {
                 const CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
                 sellGil = static_cast<int>(caravanWork->m_shopParam) *
-                          *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 0x20);
+                          *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + gilItemNo * 0x48 + 0x20);
                 sellGil = sellGil / 100;
             }
             sellGil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(sellGil));

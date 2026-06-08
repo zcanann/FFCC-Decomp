@@ -1090,13 +1090,12 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
  */
 void CShopMenu::DrawItemInfo0()
 {
-    int itemIndex = m_selectedIndex;
-    if (itemIndex == -1) {
+    if (m_selectedIndex == -1) {
         return;
     }
 
     const CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
-    int itemNo = getItemNo(itemIndex);
+    int itemNo = getItemNo(m_selectedIndex);
 
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
     MenuPcs.DrawInit();
@@ -1125,7 +1124,7 @@ void CShopMenu::DrawItemInfo0()
     }
 
     bool canTrade = false;
-    int tradeItemNo = getItemNo(itemIndex);
+    int tradeItemNo = getItemNo(m_selectedIndex);
     if (tradeItemNo > 0) {
         if (m_listType == 0) {
             canTrade = true;
@@ -1136,7 +1135,7 @@ void CShopMenu::DrawItemInfo0()
                 canTrade = false;
             }
         } else if (m_listType == 1) {
-            if (MenuPcs.EquipChk(itemIndex) == 0) {
+            if (MenuPcs.EquipChk(m_selectedIndex) == 0) {
                 if (tradeItemNo >= 0x9F) {
                     canTrade = true;
                 }

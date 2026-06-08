@@ -1978,10 +1978,10 @@ void CMenuPcs::DrawResultCloseAnim()
 			}
 
 			float y = (float)sprite->y + sprite->motionY;
+			font->SetPosX((float)sprite->x + sprite->motionX);
 			if (textIndex < activePartyCount) {
 				y -= 6.0f;
 			}
-			font->SetPosX((float)sprite->x + sprite->motionX);
 			font->SetPosY(y - 6.0f);
 			font->Draw(text);
 
@@ -2757,10 +2757,10 @@ void CMenuPcs::DrawResultOpenAnim()
 				}
 
 				float y = (float)sprite->y + sprite->motionY;
+				font->SetPosX((float)sprite->x + sprite->motionX);
 				if (textIndex < activePartyCount) {
 					y -= 6.0f;
 				}
-				font->SetPosX((float)sprite->x + sprite->motionX);
 				font->SetPosY(y - 6.0f);
 				font->Draw(text);
 

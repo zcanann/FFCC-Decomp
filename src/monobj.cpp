@@ -1078,7 +1078,7 @@ void CGMonObj::onFrameStat()
 				}
 			} else {
 				if ((prgObj->m_stateFrame == 0) &&
-					(*reinterpret_cast<float*>(mon + (m_targetPartyIndex * 4 + 0x5D0)) < range)) {
+					(reinterpret_cast<float*>(mon + 0x5D0)[m_targetPartyIndex] < range)) {
 					prgObj->m_subState = 1;
 				}
 				if (prgObj->m_subState == 1) {
@@ -1087,7 +1087,7 @@ void CGMonObj::onFrameStat()
 					if (static_cast<int>(prgObj->m_stateFrame) <= static_cast<int>(limit)) {
 						if ((object->m_stateFlags0Bits.unk1 != 0) ||
 							(prgObj->m_stateFrame == static_cast<int>(limit)) ||
-							(*reinterpret_cast<float*>(mon + (m_targetPartyIndex * 4 + 0x5D0)) >= range)) {
+							(reinterpret_cast<float*>(mon + 0x5D0)[m_targetPartyIndex] >= range)) {
 							prgObj->m_subState = 0;
 							object->m_rotTargetY = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]));
 						} else {
@@ -1170,7 +1170,7 @@ void CGMonObj::onFrameStat()
 
 		unsigned char* script9 = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
 		if ((static_cast<unsigned int>(prgObj->m_stateFrame) == *reinterpret_cast<unsigned short*>(script9 + 0x1B6)) ||
-			(static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0xCE)) <= *reinterpret_cast<float*>(mon + 0x5D0 + m_targetPartyIndex * 4)) ||
+			(static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0xCE)) <= reinterpret_cast<float*>(mon + 0x5D0)[m_targetPartyIndex]) ||
 			(object->m_stateFlags0Bits.unk1 != 0)) {
 			prgObj->changeStat(0, 0, 0);
 			if (m_targetPartyIndex >= 0) {

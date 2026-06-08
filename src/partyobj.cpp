@@ -4601,8 +4601,7 @@ void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 		outVec->y = FLOAT_80331a78;
 
 		outDist = PSVECMag(outVec);
-		float maxDist0 = m_partyDistance[0];
-		outDist = (outDist < maxDist0) ? outDist : maxDist0;
+		outDist = (outDist < m_partyDistance[0]) ? outDist : m_partyDistance[0];
 		return;
 	}
 

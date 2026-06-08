@@ -2324,7 +2324,7 @@ int CMapMng::ReadMid(char* mapName)
     sprintf(strTmp, const_cast<char*>(s_mapMidPathFmt), mapName);
     int ok = 1;
 
-    if (static_cast<int>(System.m_execParam) >= 3) {
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
         System.Printf(const_cast<char*>(s_read_mid_fmt), strTmp);
     }
 

@@ -3453,7 +3453,7 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 		return;
 	}
 
-	unsigned int bonusSlot = reinterpret_cast<unsigned char*>(m_scriptHandle)[0xBA4];
+	int bonusSlot = reinterpret_cast<unsigned char*>(m_scriptHandle)[0xBA4];
 	unsigned int addValue = 0;
 	unsigned int subValue = 0;
 	unsigned short currentAdd = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBCA);
@@ -3496,7 +3496,7 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 	case 4:
 	case 6:
 		if (kind == 4) {
-			unsigned short item = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + value * 0x48);
+			int item = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + value * 0x48);
 			if ((bonusSlot == 4 && item == 0x100) || (bonusSlot == 6 && item == 400)) {
 				addValue = stageAdd;
 			} else if (bonusSlot == 2) {
@@ -3526,7 +3526,7 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 	case 3:
 	case 0xE:
 		if (kind == 5) {
-			short item = *reinterpret_cast<short*>(Game.unkCFlatData0[2] + value * 0x48);
+			int item = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + value * 0x48);
 			if ((bonusSlot == 0xE && (item == 0x17D || item == 0x186)) ||
 			    (bonusSlot == 3 && item != 0x17D && item != 0x186)) {
 				addValue = stageAdd;

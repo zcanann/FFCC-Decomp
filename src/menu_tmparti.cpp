@@ -361,7 +361,7 @@ int CMenuPcs::TmpArtiCtrl()
 		const CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 
 		TmpArtiEntry* entry = this->m_tmpArtiList->entries;
-		for (iVar7 = 0; iVar7 < this->m_tmpArtiList->count; iVar7 = iVar7 + 1) {
+		for (int i = 0; i < this->m_tmpArtiList->count; i = i + 1) {
 			entry->alpha = fVar2;
 			entry->z = fVar2;
 			entry++;

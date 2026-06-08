@@ -1252,28 +1252,15 @@ void CCameraPcs::calcMap()
     };
     HitCylinder hitCylinder;
 
-    if (useDebugPad) {
-        buttons = 0;
-    } else {
-        buttons = CameraRawPadInput().button[0];
-    }
+    buttons = useDebugPad ? 0 : CameraRawPadInput().button[0];
 
-    stickH = kCameraZeroF;
-    if (!useDebugPad) {
-        stickH = CameraRawPadInput().substickYF;
-    }
+    stickH = useDebugPad ? kCameraZeroF : CameraRawPadInput().substickYF;
     stickH = kCameraDegToRad * (stickH / kCameraOneEighthF);
 
-    stickV = kCameraZeroF;
-    if (!useDebugPad) {
-        stickV = *reinterpret_cast<float*>(&CameraRawPadInput().lockedButton[0]);
-    }
+    stickV = useDebugPad ? kCameraZeroF : *reinterpret_cast<float*>(&CameraRawPadInput().lockedButton[0]);
     stickV = kCameraDegToRad * (stickV / kCameraOneEighthF);
 
-    triggerL = kCameraZeroF;
-    if (!useDebugPad) {
-        triggerL = CameraRawPadInput().stickYF;
-    }
+    triggerL = useDebugPad ? kCameraZeroF : CameraRawPadInput().stickYF;
 
     m_fov += triggerL;
     m_mapRotX -= stickV;

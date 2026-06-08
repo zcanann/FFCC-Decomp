@@ -1078,7 +1078,7 @@ void CGMonObj::onFrameStat()
 				}
 			} else {
 				if ((prgObj->m_stateFrame == 0) &&
-					(*reinterpret_cast<float*>(mon + (m_targetPartyIndex * 4 + 0x5D0)) < range)) {
+					(reinterpret_cast<float*>(mon + 0x5D0)[m_targetPartyIndex] < range)) {
 					prgObj->m_subState = 1;
 				}
 				if (prgObj->m_subState == 1) {
@@ -1087,7 +1087,7 @@ void CGMonObj::onFrameStat()
 					if (static_cast<int>(prgObj->m_stateFrame) <= static_cast<int>(limit)) {
 						if ((object->m_stateFlags0Bits.unk1 != 0) ||
 							(prgObj->m_stateFrame == static_cast<int>(limit)) ||
-							(*reinterpret_cast<float*>(mon + (m_targetPartyIndex * 4 + 0x5D0)) >= range)) {
+							(reinterpret_cast<float*>(mon + 0x5D0)[m_targetPartyIndex] >= range)) {
 							prgObj->m_subState = 0;
 							object->m_rotTargetY = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]));
 						} else {
@@ -1119,8 +1119,8 @@ void CGMonObj::onFrameStat()
 		if (prgObj->m_stateFrame == 0) {
 			prgObj->reqAnim(-1, 0, 0);
 		}
-		if (Math.Rand(0x32) == 0) {
-			if (Math.Rand(2) == 0) {
+		if (static_cast<unsigned int>(Math.Rand(0x32)) == 0) {
+			if (static_cast<unsigned int>(Math.Rand(2)) == 0) {
 				object->m_rotTargetY += 0.2f;
 			} else {
 				object->m_rotTargetY -= 0.2f;
@@ -1170,7 +1170,7 @@ void CGMonObj::onFrameStat()
 
 		unsigned char* script9 = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
 		if ((static_cast<unsigned int>(prgObj->m_stateFrame) == *reinterpret_cast<unsigned short*>(script9 + 0x1B6)) ||
-			(static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0xCE)) <= *reinterpret_cast<float*>(mon + 0x5D0 + m_targetPartyIndex * 4)) ||
+			(static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0xCE)) <= reinterpret_cast<float*>(mon + 0x5D0)[m_targetPartyIndex]) ||
 			(object->m_stateFlags0Bits.unk1 != 0)) {
 			prgObj->changeStat(0, 0, 0);
 			if (m_targetPartyIndex >= 0) {
@@ -3949,26 +3949,26 @@ void CGMonObj::statMove(int* targetIndex)
 			monObj->checkCol(6, object->m_rotBaseY,
 				static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xC8)),
 				&hitScale, &hitPartyIndex);
-			if (hitPartyIndex >= 0) {
-				*targetPartyIdx = hitPartyIndex;
-				*chaseState = 2;
-				*chaseTimer = 0;
-				monObj->m_chaseDirty = 1;
-				if (monObj->m_unk6B8 == 0) {
-					void** scriptHandle = object->m_scriptHandle;
-					int randVal = Math.Rand(3);
-					unsigned char* script = reinterpret_cast<unsigned char*>(scriptHandle[9]);
-					prgObj->playSe3D(
-						*reinterpret_cast<unsigned short*>(script + 0x192) +
-							*reinterpret_cast<unsigned short*>(script + 0x190) * 1000 + randVal,
-						0x32, 0x96, 0, reinterpret_cast<Vec*>(NULL));
-					monObj->m_unk6B8 = 1;
-				}
-				break;
-			}
+		} else {
+			hitPartyIndex = -1;
 		}
 
-		{
+		if (hitPartyIndex >= 0) {
+			*targetPartyIdx = hitPartyIndex;
+			*chaseState = 2;
+			*chaseTimer = 0;
+			monObj->m_chaseDirty = 1;
+			if (monObj->m_unk6B8 == 0) {
+				void** scriptHandle = object->m_scriptHandle;
+				int randVal = Math.Rand(3);
+				unsigned char* script = reinterpret_cast<unsigned char*>(scriptHandle[9]);
+				prgObj->playSe3D(
+					*reinterpret_cast<unsigned short*>(script + 0x192) +
+						*reinterpret_cast<unsigned short*>(script + 0x190) * 1000 + randVal,
+					0x32, 0x96, 0, reinterpret_cast<Vec*>(NULL));
+				monObj->m_unk6B8 = 1;
+			}
+		} else {
 			unsigned char* aiData;
 			if (monObj->m_aiState == 0) {
 				aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
@@ -4050,7 +4050,7 @@ void CGMonObj::statMove(int* targetIndex)
 				}
 				monObj->m_moveWork.m_target = partyObj;
 				if (((monObj->m_moveWork.m_stateFlags & 1) != 0) ||
-					((static_cast<int>(((unsigned int)object->m_stateFlags0 << 0x19) | ((unsigned int)object->m_stateFlags0 >> 7))) < 0)) {
+					(object->m_stateFlags0Bits.unk1 != 0)) {
 					*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
 					memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
 					if (*targetPartyIdx >= 0) {

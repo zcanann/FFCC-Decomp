@@ -1547,7 +1547,7 @@ void CMenuPcs::CmakeResultDraw()
     labelFont->SetScale(1.0f);
     labelFont->DrawInit();
 
-    int textColor = static_cast<int>(static_cast<double>(255.0f) * textAlpha);
+    int textColor = static_cast<int>(255.0f * textAlpha);
     CColor color(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textColor));
     labelFont->SetColor(color.color);
 

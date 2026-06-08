@@ -2851,7 +2851,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
 
                 if (buf.m_cmdFlags != (cmdId & 0x3F))
                 {
-                    if (static_cast<unsigned int>(System.m_execParam) > 1u)
+                    if (static_cast<unsigned int>(System.m_execParam) >= 2u)
                     {
                         System.Printf(const_cast<char*>(s_recv_type_mismatch_warn_fmt), threadParam->m_portIndex, const_cast<char*>(s_joybus_cpp), 0x1079);
                     }

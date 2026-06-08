@@ -1956,7 +1956,7 @@ frameLoop:
 			unsigned int* sp = object->m_sp;
 			--object->m_sp;
 			const u32 value = sp[-1] ^ sp[-2];
-			sp[-2] = (static_cast<int>((value >> 1) - (value & sp[-1])) >> 31);
+			sp[-2] = static_cast<u32>((static_cast<int>(value) >> 1) - static_cast<int>(value & sp[-1])) >> 31;
 			break;
 		}
 		case 0x2F: {
@@ -1970,7 +1970,7 @@ frameLoop:
 			unsigned int* sp = object->m_sp;
 			--object->m_sp;
 			const u32 value = sp[-2] ^ sp[-1];
-			sp[-2] = (static_cast<int>((value >> 1) - (value & sp[-2])) >> 31);
+			sp[-2] = static_cast<u32>((static_cast<int>(value) >> 1) - static_cast<int>(value & sp[-2])) >> 31;
 			break;
 		}
 		case 0x31: {

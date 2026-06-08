@@ -1106,8 +1106,7 @@ void CPartMng::SetFp()
         if (mng->m_baseTime < 0) {
             mng->m_baseTime = fpTime;
         } else {
-            int scaled = (fpTime * 0x19) / 0x1E + ((fpTime * 0x19) >> 0x1F);
-            mng->m_baseTime = scaled - (scaled >> 0x1F);
+            mng->m_baseTime = fpTime * 0x19 / 0x1E;
         }
 
         mng->m_cullRadiusSq = recvBuff[0x0D];
@@ -1117,9 +1116,9 @@ void CPartMng::SetFp()
         mng->m_nodeIndex = static_cast<short>(i);
         mng->m_cullRadius = recvBuff[0x0E];
         mng->m_cullYOffset = recvBuff[0x0F];
-        mng->m_rotationX = recvBuff[4];
-        mng->m_rotationZ = recvBuff[5];
-        mng->m_rotationSpeed = static_cast<int>(recvBuff[6]);
+        *reinterpret_cast<int*>(&mng->m_rotationX) = reinterpret_cast<int*>(recvBuff)[4];
+        *reinterpret_cast<int*>(&mng->m_rotationZ) = reinterpret_cast<int*>(recvBuff)[5];
+        mng->m_rotationSpeed = reinterpret_cast<int*>(recvBuff)[6];
         mng->m_scale.x = recvBuff[8];
         mng->m_scale.y = recvBuff[9];
         mng->m_scale.z = recvBuff[0x0A];
@@ -1146,7 +1145,7 @@ void CPartMng::SetFp()
         mng->m_ownerFlagsInitialized = 1;
         mng->m_ownerFlagA = 1;
 
-        unsigned char mode = mng->m_matrixMode;
+        signed char mode = mng->m_matrixMode;
         if (mode == 2 || mode == 4) {
             mng->m_mapObjIndex = static_cast<short>(MapMng.GetMapObjEffectIdx(*reinterpret_cast<unsigned short*>(fpBytes + 0x48)));
         } else if (mode >= 3 && mode <= 8) {

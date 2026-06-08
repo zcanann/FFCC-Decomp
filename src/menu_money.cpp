@@ -46,15 +46,15 @@ inline void CMenuPcs::MoneySetPlace(int row)
 		if ((!started) && (digitPlace <= gil)) {
 			started = 1;
 		}
-		if (((started) || (digitPlace <= gil)) || (digitIndex == 7)) {
+		if (((!started) && (gil < digitPlace)) && (digitIndex != 7)) {
+			*place = -1;
+		} else {
 			int digit = gil / digitPlace;
 			if (9 < digit) {
 				digit = 9;
 			}
 			*place = static_cast<signed char>(digit);
 			gil = gil - (gil / digitPlace) * digitPlace;
-		} else {
-			*place = -1;
 		}
 		place++;
 		digitIndex++;
@@ -109,8 +109,9 @@ int CMenuPcs::MoneyCtrlCur()
 	unsigned int press;
 	unsigned int hold;
 
+	int padLock = Pad.m_debugPadLock;
 	blocked = false;
-	if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
+	if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
 		blocked = true;
 	}
 	if (blocked) {
@@ -122,7 +123,7 @@ int CMenuPcs::MoneyCtrlCur()
 	}
 
 	blocked = false;
-	if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
+	if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
 		blocked = true;
 	}
 	if (blocked) {
@@ -138,8 +139,7 @@ int CMenuPcs::MoneyCtrlCur()
 	}
 
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
-	MoneyMenuState* state = this->m_moneyState;
-	int mode = state->mode;
+	int mode = this->m_moneyState->mode;
 	int maxDigits = 1;
 	int maxGil = caravanWork->m_gil;
 	int digitPlace = 10;
@@ -155,7 +155,7 @@ int CMenuPcs::MoneyCtrlCur()
 	int attachFlag = SingGetLetterAttachflg();
 
 	if (mode == 0) {
-		unsigned int cursor = state->selections[mode];
+		unsigned int cursor = this->m_moneyState->selections[mode];
 		unsigned int placeValue = 1;
 		while (cursor != 0) {
 			placeValue *= 10;
@@ -167,9 +167,7 @@ int CMenuPcs::MoneyCtrlCur()
 				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			} else {
 				unsigned int gil = s_Money + placeValue;
-				if ((unsigned int)caravanWork->m_gil < gil) {
-					gil = 0;
-				}
+				gil = ((unsigned int)caravanWork->m_gil < gil) ? 0u : gil;
 				s_Money = gil;
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
 				gil = s_Money;
@@ -178,7 +176,7 @@ int CMenuPcs::MoneyCtrlCur()
 			}
 		} else {
 			if ((hold & 4) != 0) {
-				unsigned int gil = caravanWork->m_gil;
+				int gil = caravanWork->m_gil;
 				if (gil == 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else {
@@ -193,18 +191,18 @@ int CMenuPcs::MoneyCtrlCur()
 		}
 
 		if ((hold & 1) != 0) {
-			if (state->selections[mode] < maxDigits - 1) {
-				state->selections[mode] = state->selections[mode] + 1;
+			if (this->m_moneyState->selections[mode] < maxDigits - 1) {
+				this->m_moneyState->selections[mode] = this->m_moneyState->selections[mode] + 1;
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			} else {
 				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			}
 		} else {
 			if ((hold & 2) != 0) {
-				if (state->selections[mode] == 0) {
+				if (this->m_moneyState->selections[mode] == 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else {
-					state->selections[mode] = state->selections[mode] - 1;
+					this->m_moneyState->selections[mode] = this->m_moneyState->selections[mode] - 1;
 					Sound.PlaySe(1, 0x40, 0x7F, 0);
 				}
 			}
@@ -213,14 +211,14 @@ int CMenuPcs::MoneyCtrlCur()
 		if ((hold & 0xF) == 0) {
 			if ((press & 0x20) != 0) {
 				if (attachFlag < 0) {
-					state->moveDirection = 1;
+					this->m_moneyState->moveDirection = 1;
 					Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
 					return 1;
 				}
 				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			} else if ((press & 0x40) != 0) {
 				if (attachFlag < 0) {
-					state->moveDirection = -1;
+					this->m_moneyState->moveDirection = -1;
 					Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
 					return 1;
 				}
@@ -243,58 +241,58 @@ int CMenuPcs::MoneyCtrlCur()
 					GetSingWinSize(1, &winW, &winH, 0);
 					SetSingWinInfo(0xF0, 0xD0, winW, winH);
 					this->m_menuWindowInfo->state = 0;
-					state->optionState = 0;
-					state->mode = 1;
+					this->m_moneyState->optionState = 0;
+					this->m_moneyState->mode = 1;
 					Sound.PlaySe(2, 0x40, 0x7F, 0);
 				}
 			} else if ((press & 0x200) != 0) {
-				if (attachFlag < 0) {
-					state->closeRequested = 1;
+				if (-1 < attachFlag) {
+					LetterSetAttachItem(0, 0xFFFFFFFF);
 					Sound.PlaySe(3, 0x40, 0x7F, 0);
 					return 1;
 				}
-				LetterSetAttachItem(0, 0xFFFFFFFF);
+				this->m_moneyState->closeRequested = 1;
 				Sound.PlaySe(3, 0x40, 0x7F, 0);
 				return 1;
 			}
 		}
 	} else {
-		if ((hold & 8) == 0) {
+		if ((hold & 8) != 0) {
+			if (this->m_moneyState->selections[mode] != 0) {
+				this->m_moneyState->selections[mode] = this->m_moneyState->selections[mode] - 1;
+			} else {
+				this->m_moneyState->selections[mode] = 1;
+			}
+			Sound.PlaySe(1, 0x40, 0x7F, 0);
+		} else {
 			if ((hold & 4) != 0) {
-				if (state->selections[mode] < 1) {
-					state->selections[mode] = state->selections[mode] + 1;
+				if (this->m_moneyState->selections[mode] < 1) {
+					this->m_moneyState->selections[mode] = this->m_moneyState->selections[mode] + 1;
 				} else {
-					state->selections[mode] = 0;
+					this->m_moneyState->selections[mode] = 0;
 				}
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			}
-		} else {
-			if (state->selections[mode] == 0) {
-				state->selections[mode] = 1;
-			} else {
-				state->selections[mode] = state->selections[mode] - 1;
-			}
-			Sound.PlaySe(1, 0x40, 0x7F, 0);
 		}
 
 		if ((hold & 0xC) == 0) {
 			if ((press & 0x100) != 0) {
-				if (((int)this->m_moneyState->messageMask & (1 << state->selections[mode])) == 0) {
+				if (((int)this->m_moneyState->messageMask & (1 << this->m_moneyState->selections[mode])) == 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else {
-					if (state->selections[mode] == 0) {
+					if (this->m_moneyState->selections[mode] == 0) {
 						caravanWork->FGPutGil(static_cast<int>(s_Money));
 						s_Money = 0;
 						MoneySetPlace(0);
 						MoneySetPlace(1);
 					}
 					this->m_menuWindowInfo->state = 2;
-					state->optionState = state->optionState + 1;
+					this->m_moneyState->optionState = this->m_moneyState->optionState + 1;
 					Sound.PlaySe(2, 0x40, 0x7F, 0);
 				}
 			} else if ((press & 0x200) != 0) {
 				this->m_menuWindowInfo->state = 2;
-				state->optionState = state->optionState + 1;
+				this->m_moneyState->optionState = this->m_moneyState->optionState + 1;
 				Sound.PlaySe(3, 0x40, 0x7F, 0);
 			}
 		}
@@ -316,8 +314,8 @@ void CMenuPcs::MoneyDraw()
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	s16 selectionState = this->m_moneyState->listState;
-	s16 mode = this->m_moneyState->mode;
+	int selectionState = this->m_moneyState->listState;
+	int mode = this->m_moneyState->mode;
 	MoneyMenuAnim* entry = this->m_moneyPanel->anims;
 
 	for (int i = 0; i < this->m_moneyPanel->count; i++, entry++) {
@@ -418,7 +416,7 @@ void CMenuPcs::MoneyDraw()
 		cursorY += (float)(this->m_moneyState->selections[1] * SingWinMessHeight());
 
 		int anim = (int)System.m_frameCounter % 8;
-		DrawCursor((int)((float)window->x + (float)anim), (int)cursorY, 1.0f);
+		DrawCursor((unsigned int)((float)window->x + (float)anim), (int)cursorY, 1.0f);
 	}
 }
 

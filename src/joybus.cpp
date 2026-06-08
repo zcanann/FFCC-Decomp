@@ -118,6 +118,7 @@ static const char s_thread_init_end[] = "JoyBus::ThreadInit end";
 extern char s_pctd_Error_send_type_error_pct02x_801DA350[];
 
 extern const u32 kPppYmMeltMaskBit0;
+extern const u32 kPppYmMeltMaskBit4;
 
 namespace JoyBusConst {
 static char* DVD_DIR = const_cast<char*>(s_dvd_gba_dir);
@@ -3182,10 +3183,10 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
 
                     if (status == 0)
                     {
-                        if ((threadParam->m_unk3 & 0x30) == 0x20)
-                            status = 0;
-                        else
+                        if ((threadParam->m_unk3 & 0x30) != 0x20)
                             status = 1;
+                        else
+                            status = 0;
                     }
                 }
             }
@@ -3479,27 +3480,29 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
         }
 
         unsigned char gameFlags =
-            (unsigned char)((Game.m_gameWork.m_languageId - 1) | (unsigned char)JoyBusConst::CTRL_GBA);
+            (unsigned char)((Game.m_gameWork.m_languageId - 1) | kPppYmMeltMaskBit4);
         unsigned int cmdGame = MakeJoyCmd32(0x14, 0x16, gameFlags, 0);
 
-        err = 0;
-
-        if (m_threadRunningMask != 0)
+        if (static_cast<signed char>(m_threadRunningMask) == 0)
+        {
+            err = 0;
+        }
+        else
         {
             OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
             if ((int)m_cmdCount[threadParam->m_portIndex] >= 0x40)
+            {
+                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+                err = -1;
+            }
+            else
             {
                 m_cmdQueueData[threadParam->m_portIndex][m_cmdCount[threadParam->m_portIndex]] = cmdGame;
                 m_cmdCount[threadParam->m_portIndex]++;
 
                 OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
                 err = 0;
-            }
-            else
-            {
-                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-                err = -1;
             }
         }
 

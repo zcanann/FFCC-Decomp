@@ -790,8 +790,8 @@ void CGMonObj::isValidTarget()
 
 		int partyIndex = -1;
 		if (soundLimit > static_cast<double>(*reinterpret_cast<float*>(mon + 0x5BC))) {
-			float hitScale;
 			int colIndex;
+			float hitScale;
 			checkCol(6, *reinterpret_cast<float*>(mon + 0x1A8),
 			         static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0xC8)),
 			         &hitScale, &colIndex);
@@ -2712,38 +2712,17 @@ void CGMonObj::initFinishedFuncDefault()
 	m_forcedAction = -1;
 	int forcedAction = 0;
 	for (int slotBase = 0; slotBase < 0x10; slotBase += 8) {
-		unsigned int attackId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + (slotBase + 0xD0));
-		if ((attackId != 0xFFFF) &&
-			(static_cast<int>(*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + attackId * 0x48 + 0xE)) == 4)) {
-			m_forcedAction = forcedAction;
-			break;
+		for (int slotOff = 0; slotOff < 8; slotOff += 2) {
+			unsigned int attackId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + (slotBase + slotOff + 0xD0));
+			if ((attackId != 0xFFFF) &&
+				(static_cast<int>(*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + attackId * 0x48 + 0xE)) == 4)) {
+				m_forcedAction = forcedAction;
+				goto forcedDone;
+			}
+			forcedAction++;
 		}
-		forcedAction++;
-
-		attackId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + (slotBase + 0xD2));
-		if ((attackId != 0xFFFF) &&
-			(static_cast<int>(*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + attackId * 0x48 + 0xE)) == 4)) {
-			m_forcedAction = forcedAction;
-			break;
-		}
-		forcedAction++;
-
-		attackId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + (slotBase + 0xD4));
-		if ((attackId != 0xFFFF) &&
-			(static_cast<int>(*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + attackId * 0x48 + 0xE)) == 4)) {
-			m_forcedAction = forcedAction;
-			break;
-		}
-		forcedAction++;
-
-		attackId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + (slotBase + 0xD6));
-		if ((attackId != 0xFFFF) &&
-			(static_cast<int>(*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + attackId * 0x48 + 0xE)) == 4)) {
-			m_forcedAction = forcedAction;
-			break;
-		}
-		forcedAction++;
 	}
+forcedDone:;
 
 	setRepop(1);
 }
@@ -3958,8 +3937,8 @@ void CGMonObj::statMove(int* targetIndex)
 
 		int hitPartyIndex;
 		if (static_cast<double>(*reinterpret_cast<float*>(mon + 0x5BC)) < soundLimit) {
-			float hitScale;
 			int colIndex;
+			float hitScale;
 			monObj->checkCol(6, object->m_rotBaseY,
 				static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xC8)),
 				&hitScale, &colIndex);

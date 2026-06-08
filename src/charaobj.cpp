@@ -516,8 +516,7 @@ void CGCharaObj::onChangeStat(int state)
 			break;
 	}
 
-	reinterpret_cast<unsigned char*>(this)[0x63C] =
-		static_cast<unsigned char>(reinterpret_cast<unsigned char*>(this)[0x63C] << 1) >> 1;
+	reinterpret_cast<CharaObjIgnoreFlagBits*>(reinterpret_cast<unsigned char*>(this) + 0x63C)->m_active = 0;
 }
 
 /*

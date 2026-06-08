@@ -504,7 +504,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	if (rangeKind != 0) {
 		int baseIndex = drawPrefix + 2;
 		u32 baseY = lineBaseY[baseIndex];
-		int y = baseY;
+		unsigned int y = baseY;
 		if (drawPrefix != 0) {
 			font->SetPosX(kOptionRowLeft);
 			font->SetPosY(static_cast<float>(static_cast<int>(y)));
@@ -596,7 +596,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 						currentItem = 3;
 					}
 
-					int equipmentSlot = caravanWork->m_equipment[currentItem];
+					unsigned int equipmentSlot = caravanWork->m_equipment[currentItem];
 					currentItem = (equipmentSlot >= 0) ? caravanWork->m_inventoryItems[equipmentSlot] : -1;
 
 					if (static_cast<unsigned char>(ChkEquipActive(static_cast<int>(m_artiState->selections[1]) +
@@ -674,7 +674,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			font->SetPosY(static_cast<float>(static_cast<int>(y)));
 			font->Draw(itemName);
 			font->Draw(suffix);
-			y = static_cast<int>(static_cast<float>(static_cast<int>(y)) + lineStep);
+			y = static_cast<int>(static_cast<float>(static_cast<unsigned int>(y)) + lineStep);
 		}
 
 		for (int i = 0; i < lineCount; i++) {
@@ -1107,9 +1107,9 @@ void CMenuPcs::DrawOptionMenu()
 	CTexture* banner = GetMenuTexture(this, 0xD4);
 	float bannerWidth = static_cast<float>(banner->m_width);
 	float bannerHeight = static_cast<float>(banner->m_height);
-	gUtil.CalcUV(uv0.x, uv0.y, 0, 0, static_cast<unsigned int>(bannerWidth), static_cast<unsigned int>(bannerHeight));
+	gUtil.CalcUV(uv0.x, uv0.y, 0, 0, static_cast<int>(bannerWidth), static_cast<unsigned int>(bannerHeight));
 	gUtil.CalcUV(uv1.x, uv1.y, 0x280, static_cast<unsigned int>(bannerHeight),
-	             static_cast<unsigned int>(bannerWidth), static_cast<unsigned int>(bannerHeight));
+	             static_cast<int>(bannerWidth), static_cast<unsigned int>(bannerHeight));
 	gUtil.RenderTextureQuad(kOptionAnimMin,
 	                        -(bannerHeight * kMenuCenteringHalfWidth - kOptionBannerCenterY) - kOptionBannerYOffset,
 	                        kOptionScreenWidth, bannerHeight, banner, &uv0, &uv1, &color, GX_BL_SRCALPHA,
@@ -1161,7 +1161,7 @@ void CMenuPcs::DrawOptionMenu()
 	font->SetScaleX(kOptionListTextScaleX);
 	char** option = optionText;
 	int rowY = 0x70;
-	unsigned int selectedY = 0x73;
+	int selectedY = 0x73;
 	unsigned int normalY = 0x75;
 	for (int i = 0; i < 5; i++, rowY += 0x28, selectedY += 0x28, normalY += 0x28, option++) {
 		CTexture* row = GetMenuTexture(this, 0xC0);
@@ -1211,7 +1211,7 @@ void CMenuPcs::DrawOptionMenu()
 		unsigned int sideWidth = sideTexture->m_width;
 		unsigned int sideHeight = sideTexture->m_height;
 		const f32* row = &layoutBase[10];
-		signed char secondValue = m_gameInitMode;
+		unsigned char secondValue = m_gameInitMode;
 		char* firstText = langStrings[12];
 		char* secondText = langStrings[13];
 		float leftX = row[0];
@@ -1284,7 +1284,7 @@ void CMenuPcs::DrawOptionMenu()
 		unsigned int sideWidth = sideTexture->m_width;
 		unsigned int sideHeight = sideTexture->m_height;
 		const f32* row = &layoutBase[20];
-		signed char secondValue = m_stereoMode;
+		unsigned char secondValue = m_stereoMode;
 		char* firstText = langStrings[14];
 		char* secondText = langStrings[15];
 		float leftX = row[0];
@@ -1418,7 +1418,7 @@ void CMenuPcs::DrawOptionMenu()
 	}
 	case 3: {
 		CTexture* meterTexture = GetTextureSetTexture(GetMenuTextureSet(this, 0xBC), 3);
-		unsigned int meterWidth = static_cast<unsigned int>(static_cast<float>(meterTexture->m_width));
+		unsigned int meterWidth = static_cast<int>(static_cast<float>(meterTexture->m_width));
 		unsigned int meterHeight = static_cast<unsigned int>(static_cast<float>(meterTexture->m_height));
 		float iconWave = kOptionUiTwenty * rowSin;
 		float leftIconX =
@@ -1483,8 +1483,8 @@ void CMenuPcs::DrawOptionMenu()
 	}
 	case 4: {
 		CTextureSet* textureSet = GetMenuTextureSet(this, 0xBC);
-		color.a = static_cast<unsigned char>(static_cast<int>(kOptionMenuAlphaMax * m_optionColumnAnim));
-		unsigned int rowAnimFrame;
+		color.a = static_cast<unsigned char>(static_cast<unsigned int>(kOptionMenuAlphaMax * m_optionColumnAnim));
+		int rowAnimFrame;
 		if (static_cast<double>(m_optionRowAnim) < kOptionDefaultTextScale) {
 			rowAnimFrame = static_cast<unsigned int>(static_cast<int>(m_optionRowAnim / kOptionSpecialRowFrameStep));
 		} else {
@@ -1495,11 +1495,11 @@ void CMenuPcs::DrawOptionMenu()
 
 		int y = 0;
 		unsigned int uvY = 0;
-		unsigned int modeU = 0x280;
+		int modeU = 0x280;
 		for (int i = 0; i < 4; i++, y += 0x28, uvY += 0x20, modeU += 0x40) {
 			if ((m_specialModeEdit != 0) && (m_specialModeCursor == i)) {
 				CTexture* cursorPanel = GetTextureSetTexture(textureSet, 4);
-				unsigned int cursorWidth = static_cast<unsigned int>(static_cast<float>(cursorPanel->m_width));
+				int cursorWidth = static_cast<int>(static_cast<float>(cursorPanel->m_width));
 				unsigned int cursorHeight = static_cast<unsigned int>(static_cast<float>(cursorPanel->m_height));
 				gUtil.CalcUV(uv0.x, uv0.y, cursorWidth - 0x30, 0, cursorWidth, cursorHeight);
 				gUtil.CalcUV(uv1.x, uv1.y, cursorWidth, 0x28, cursorWidth, cursorHeight);
@@ -1520,8 +1520,8 @@ void CMenuPcs::DrawOptionMenu()
 			}
 
 			CTexture* modePanel = GetTextureSetTexture(textureSet, 7);
-			unsigned int modeWidth = static_cast<unsigned int>(static_cast<float>(modePanel->m_width));
-			unsigned int modeHeight = static_cast<unsigned int>(static_cast<float>(modePanel->m_height));
+			unsigned int modeWidth = static_cast<int>(static_cast<float>(modePanel->m_width));
+			unsigned int modeHeight = static_cast<int>(static_cast<float>(modePanel->m_height));
 			gUtil.CalcUV(uv0.x, uv0.y, static_cast<unsigned int>(static_cast<float>(modeWidth) - kOptionSelectorHeight),
 			             uvY, modeWidth, modeHeight);
 			gUtil.CalcUV(uv1.x, uv1.y, modeWidth, uvY + 0x18, modeWidth, modeHeight);

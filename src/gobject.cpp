@@ -167,10 +167,10 @@ extern "C" const float sZeroFloat;
 
 static inline float WrapAnimFrame(float value, float span)
 {
-    if (sZeroFloat <= value) {
-        return fmodf(value, span);
+    if (value < sZeroFloat) {
+        return (span - sAnimFrameOffset) - fmodf(-value, span);
     }
-    return (span - sAnimFrameOffset) - fmodf(-value, span);
+    return fmodf(value, span);
 }
 
 static const float sBgDefaultGravityY = 0.0;

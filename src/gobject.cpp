@@ -1472,11 +1472,11 @@ void CGObject::update()
             if (m_groundHitOffset.x == sZeroFloat && m_groundHitOffset.z == sZeroFloat) {
                 PSMTXQuat(tiltMtx, &m_bgCollisionQtrn);
             } else {
-                CVector worldUp(sZeroFloat, sAnimFrameOffset, sZeroFloat);
                 Vec axis;
                 const float slideMagSq =
                     m_groundHitOffset.x * m_groundHitOffset.x + m_groundHitOffset.z * m_groundHitOffset.z;
                 const float slideMag = slideMagSq > sZeroFloat ? sqrtf(slideMagSq) : sZeroFloat;
+                CVector worldUp(sZeroFloat, sAnimFrameOffset, sZeroFloat);
                 PSVECCrossProduct(&m_groundHitOffset, worldUp, &axis);
                 PSMTXRotAxisRad(tiltMtx, &axis, slideMag * -0.125f);
                 Mtx quatMtx;

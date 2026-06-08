@@ -863,8 +863,8 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 		reinterpret_cast<CFlatRuntime*>(this)->CFlatRuntime::Frame(arg0, mode);
 
 		CFlatRuntime::CObject* const root = FlatObjectRoot(&CFlat);
-		for (CGBaseObj* obj = FindNextGBaseObjByCidMask(this, root->m_next->m_next, 5); obj != 0;
-			 obj = FindNextGBaseObjByCidMask(this, reinterpret_cast<CFlatRuntime::CObject*>(obj)->m_next, 5)) {
+		for (CGBaseObj* obj = FindNextGBaseObjByCidMask(&CFlat, root->m_next->m_next, 5); obj != 0;
+			 obj = FindNextGBaseObjByCidMask(&CFlat, reinterpret_cast<CFlatRuntime::CObject*>(obj)->m_next, 5)) {
 			obj->Frame();
 		}
 		return 1;
@@ -873,7 +873,7 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 	if (mode == 1) {
 		watch.Reset();
 		watch.Start();
-		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
+		for (CGObject* object = CFlat.FindGObjFirst(); object != 0; object = CFlat.FindGObjNext(object)) {
 			object->move();
 		}
 		watch.Stop();
@@ -881,7 +881,7 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 
 		watch.Reset();
 		watch.Start();
-		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
+		for (CGObject* object = CFlat.FindGObjFirst(); object != 0; object = CFlat.FindGObjNext(object)) {
 			object->objectCollision();
 		}
 		watch.Stop();
@@ -889,7 +889,7 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 
 		watch.Reset();
 		watch.Start();
-		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
+		for (CGObject* object = CFlat.FindGObjFirst(); object != 0; object = CFlat.FindGObjNext(object)) {
 			object->bgCollision();
 		}
 		watch.Stop();
@@ -897,7 +897,7 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 
 		watch.Reset();
 		watch.Start();
-		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
+		for (CGObject* object = CFlat.FindGObjFirst(); object != 0; object = CFlat.FindGObjNext(object)) {
 			object->update();
 		}
 		watch.Stop();
@@ -905,13 +905,13 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 
 		watch.Reset();
 		watch.Start();
-		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
+		for (CGObject* object = CFlat.FindGObjFirst(); object != 0; object = CFlat.FindGObjNext(object)) {
 			object->hit();
 		}
 		watch.Stop();
 		CFlatHitTime() += watch.Get();
 
-		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
+		for (CGObject* object = CFlat.FindGObjFirst(); object != 0; object = CFlat.FindGObjNext(object)) {
 			object->copy();
 		}
 		return 1;
@@ -934,9 +934,9 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
 	AStar.drawAStar();
 
-	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
-	for (CGBaseObj* obj = FindNextGBaseObjByCidMask(this, root->m_next->m_next, 1); obj != 0;
-		 obj = FindNextGBaseObjByCidMask(this, reinterpret_cast<CFlatRuntime::CObject*>(obj)->m_next, 1)) {
+	CFlatRuntime::CObject* const root = FlatObjectRoot(&CFlat);
+	for (CGBaseObj* obj = FindNextGBaseObjByCidMask(&CFlat, root->m_next->m_next, 1); obj != 0;
+		 obj = FindNextGBaseObjByCidMask(&CFlat, reinterpret_cast<CFlatRuntime::CObject*>(obj)->m_next, 1)) {
 		obj->Draw();
 	}
 
@@ -1384,7 +1384,7 @@ void CFlatRuntime2::Calc()
 
 		CFlatSaveObject record;
 
-		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
+		for (CGObject* object = CFlat.FindGObjFirst(); object != 0; object = CFlat.FindGObjNext(object)) {
 			if (object->m_charaModelHandle == 0) {
 				continue;
 			}
@@ -1525,10 +1525,22 @@ void CFlatRuntime2::Draw()
 		((DbgMenuPcs.GetDbgFlagsRaw() & 0x80) != 0);
 	const int debugCount = DebugDrawCCCount(runtime);
 	if (showDebugCC && debugCount != 0) {
-		GXColor greenColor = {0x80, 0xFF, 0x80, 0xFF};
-		GXColor blueColor = {0x80, 0x80, 0xFF, 0xFF};
-		GXColor redColor = {0xFF, 0x00, 0x00, 0xFF};
-		Vec worldUp = {0.0f, 1.0f, 0.0f};
+		GXColor greenColor;
+		greenColor.r = 0x80;
+		greenColor.g = 0xFF;
+		greenColor.b = 0x80;
+		greenColor.a = 0xFF;
+		GXColor blueColor;
+		blueColor.r = 0x80;
+		blueColor.g = 0x80;
+		blueColor.b = 0xFF;
+		blueColor.a = 0xFF;
+		GXColor redColor;
+		redColor.r = 0xFF;
+		redColor.g = 0x00;
+		redColor.b = 0x00;
+		redColor.a = 0xFF;
+		static const Vec worldUp = {0.0f, 1.0f, 0.0f};
 		float ringVerts[8][3];
 
 		CFlatRuntime2::CDebugDrawCC* entry = DebugDrawCCEntries(runtime);
@@ -1812,10 +1824,9 @@ void CFlatRuntime2::loadLayerASync(int layerNo, char* fileName)
 	char path[0x104];
 	sprintf(path, sCFlatRuntime2TexturePathFmt, Game.GetLangString(), fileName);
 
-	fileHandle = File.Open(path, 0, CFile::PRI_LOW);
-	LayerResources(this)[layerNo].m_fileHandle = fileHandle;
-	if (fileHandle != 0) {
-		File.ReadASync(fileHandle);
+	LayerResources(this)[layerNo].m_fileHandle = File.Open(path, 0, CFile::PRI_LOW);
+	if (LayerResources(this)[layerNo].m_fileHandle != 0) {
+		File.ReadASync(LayerResources(this)[layerNo].m_fileHandle);
 	}
 
 	LayerResources(this)[layerNo].m_allocStage = CharaPcs.m_charaAllocStage;

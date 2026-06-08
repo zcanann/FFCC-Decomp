@@ -358,7 +358,7 @@ void CGMonObj::frameStatFuncGiantCrab()
 			    *(u16*)((u8*)reinterpret_cast<CGObject*>(self)->m_scriptHandle[9] + 0xd4);
 			float moveMagnitude =
 			    *(float*)(self + 0x690) *
-			    (kMonObjBossScaleStep * (float)((double)scriptScale - kMonObjBossUnsignedIntBias) + kMonObjBossEpsilon);
+			    (kMonObjBossScaleStep * (float)scriptScale + kMonObjBossEpsilon);
 			reinterpret_cast<CGObject*>(self)->moveVectorHRot(
 				*(float*)(self + 0x1b4) + turnOffset, kMonObjBossZero, moveMagnitude, 0x1e);
 
@@ -531,7 +531,7 @@ void CGMonObj::frameStatFuncGolem()
 		    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(reinterpret_cast<CGObject*>(this)->m_scriptHandle[9]) + 0xD4);
 		float moveSpeed =
 		    *reinterpret_cast<float*>(self + 0x690) *
-		    (kMonObjBossScaleStep * (static_cast<float>(static_cast<double>(scriptScale) - kMonObjBossUnsignedIntBias)) + kMonObjBossEpsilon);
+		    (kMonObjBossScaleStep * static_cast<float>(scriptScale) + kMonObjBossEpsilon);
 		reinterpret_cast<CGObject*>(this)->moveVectorHRot(*reinterpret_cast<float*>(CGMonObj::m_boss + 0x10), kMonObjBossZero,
 		                                                  moveSpeed, 1);
 	}

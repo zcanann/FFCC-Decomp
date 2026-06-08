@@ -2298,10 +2298,13 @@ void CGoOutMenu::CalcDel()
             }
         }
 
-        if (next == 2) {
+        switch (next) {
+        case 2:
             SetDelMode(2);
-        } else if (next == 1) {
+            break;
+        case 1:
             SetDelMode(4);
+            break;
         }
         break;
     case 4:
@@ -2347,10 +2350,13 @@ void CGoOutMenu::CalcDel()
             }
         }
 
-        if (next == 2) {
+        switch (next) {
+        case 2:
             SetDelMode(2);
-        } else if (next == 1) {
+            break;
+        case 1:
             SetDelMode(5);
+            break;
         }
         break;
     case 5:
@@ -2409,10 +2415,13 @@ void CGoOutMenu::CalcDel()
             }
         }
 
-        if (next == 2) {
+        switch (next) {
+        case 2:
             SetDelMode(2);
-        } else if (next == 1) {
+            break;
+        case 1:
             SetDelMode(7);
+            break;
         }
         break;
     case 7:
@@ -2458,11 +2467,14 @@ void CGoOutMenu::CalcDel()
             }
         }
 
-        if (next == 2) {
+        switch (next) {
+        case 2:
             SetDelMode(2);
-        } else if (next == 1) {
+            break;
+        case 1:
             Game.m_caravanWorkArr[m_selectedChara].m_shopBusyFlag = 0;
             SetDelMode(8);
+            break;
         }
         break;
     case 8:

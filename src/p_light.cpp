@@ -980,15 +980,15 @@ void CLightPcs::CBumpLight::MakeLightMap()
             unsigned int yBase = y;
             GXBegin((GXPrimitive)0x98, (GXVtxFmt)0, 0x42);
 
-            float x0 = dFactor * (float)U32ToDouble(yBase) * dScale - dHalf;
+            float x0 = dFactor * (float)yBase * dScale - dHalf;
             float dx0 = x0;
-            float x1 = dFactor * (float)U32ToDouble(yBase + 1) * dScale - dHalf;
+            float x1 = dFactor * (float)(yBase + 1) * dScale - dHalf;
             float dx1 = x1;
 
             int inner = 0x21;
             unsigned int x = 0;
             do {
-                float z0 = dFactor * (float)U32ToDouble(x) * dScale - dHalf;
+                float z0 = dFactor * (float)x * dScale - dHalf;
                 float dz0 = z0;
                 float dist0 = dx0 * dx0 + dz0 * dz0;
                 if (dist0 < dHalf) {

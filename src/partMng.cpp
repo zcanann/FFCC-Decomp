@@ -643,13 +643,15 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
         ppvAmemCacheSet.DestroyCache(cacheChunks[i * 4]);
     }
 
-    if (cacheChunks != 0) {
-        delete[] cacheChunks;
+    if (pdt->m_cacheChunks != 0) {
+        operator delete(reinterpret_cast<void*>(pdt->m_cacheChunks));
         pdt->m_cacheChunks = 0;
     }
 
-    delete[] reinterpret_cast<u8*>(pdtSlot->m_pppDataHead);
-    pdtSlot->m_pppDataHead = 0;
+    if (pdtSlot->m_pppDataHead != 0) {
+        operator delete(pdtSlot->m_pppDataHead);
+        pdtSlot->m_pppDataHead = 0;
+    }
 
     Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x182);
 }

@@ -2620,13 +2620,12 @@ int CMaterialMan::GetCharaShadow(
             continue;
         }
 
-        bool yFilterPass =
-            !((shadow->m_yFilterMode == 1) && (position->y < shadowPos.y)) &&
-            !((shadow->m_yFilterMode == 2) && (position->y > shadowPos.y));
-        if ((ignoreFrustumCheck != 0) ||
-            (yFilterPass &&
-             (reinterpret_cast<CBound*>(searchBoundStorage)
-                  ->CheckFrustum(shadowPos, scaledShadowMtx, kMaterialShadowBoundsRadius) != 0))) {
+        if (ignoreFrustumCheck == 0) {
+            goto frustumCheck;
+        }
+
+    writeCandidate:
+        {
             Vec delta;
             PSVECSubtract(&shadowPos, position, &delta);
             candidateWrite->distance = PSVECSquareMag(&delta);
@@ -2634,6 +2633,19 @@ int CMaterialMan::GetCharaShadow(
             candidateWrite->index = i;
             candidateWrite++;
             candidateCount++;
+        }
+        continue;
+
+    frustumCheck:
+        if ((shadow->m_yFilterMode == 1) && (position->y < shadowPos.y)) {
+            continue;
+        }
+        if ((shadow->m_yFilterMode == 2) && (position->y > shadowPos.y)) {
+            continue;
+        }
+        if (reinterpret_cast<CBound*>(searchBoundStorage)
+                ->CheckFrustum(shadowPos, scaledShadowMtx, kMaterialShadowBoundsRadius) != 0) {
+            goto writeCandidate;
         }
     }
 

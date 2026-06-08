@@ -724,7 +724,7 @@ loop_body:
             statusIndex = (unsigned int)threadParam->m_portIndex;
         }
 
-        int gamePadState = (int)Game.m_scriptFoodBase[statusIndex];
+        unsigned int gamePadState = (int)Game.m_scriptFoodBase[statusIndex];
 
         if (gamePadState == 0 && padType != 0x00040000)
         {
@@ -1086,7 +1086,7 @@ timeout_expiry:
 
                 if (GbaQue.GetChgHitFlg(threadParam->m_portIndex) != 0)
                 {
-                    int hitInfo = GbaQue.GetHitEInfo(threadParam->m_portIndex);
+                    unsigned int hitInfo = GbaQue.GetHitEInfo(threadParam->m_portIndex);
                     if (SendHitEnemy(threadParam->m_portIndex, (char)(unsigned short)(hitInfo >> 16),
                                      (short)hitInfo) < 0)
                     {
@@ -1550,7 +1550,7 @@ timeout_expiry:
                     {
                         threadParam->m_state = 0x1E;
                         localCrc[0] = 0xFFFF;
-                        short crcB = Crc16(m_fileBaseB_dup, reinterpret_cast<unsigned char*>(m_fileBaseB), localCrc);
+                        unsigned short crcB = Crc16(m_fileBaseB_dup, reinterpret_cast<unsigned char*>(m_fileBaseB), localCrc);
                         int chkB = SendChkCrc(threadParam, 1, crcB, &localWord);
                         if (chkB != 0)
                         {

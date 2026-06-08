@@ -12133,7 +12133,7 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 					text++;
 				}
 				const int width = font->GetWidth(const_cast<char*>(text));
-				if (maxWidth < width) {
+				if (width > maxWidth) {
 					maxWidth = width;
 				}
 			}

@@ -1030,7 +1030,7 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
     char valueBuffer[64];
     sprintf(valueBuffer, s_DecimalFormat_80332d14, statValue);
     float valueWidth = font->GetWidth(valueBuffer);
-    MenuPcs.DrawNoShadowFont(font, valueBuffer, static_cast<float>(valueRightX) - valueWidth, static_cast<float>(y), 0x1A, 0x12);
+    MenuPcs.DrawNoShadowFont(font, valueBuffer, static_cast<float>(static_cast<int>(static_cast<float>(valueRightX) - valueWidth)), static_cast<float>(y), 0x1A, 0x12);
     MenuPcs.DrawInit();
 
     font->DrawInit();

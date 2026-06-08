@@ -2155,7 +2155,7 @@ void CGMonObj::frameStatFuncMeteoParasite()
 
 	if (scriptKind == 0x87 && prgObj->m_lastStateId == 0x67) {
 		int frame = prgObj->m_stateFrame;
-		if (frame > 0x18 && frame < 0x32) {
+		if (frame >= 0x19 && frame < 0x32) {
 			if (frame == 0x19) {
 				prgObj->playSe3D(0x11D5B, 0x32, 0x96, 0, 0);
 			}

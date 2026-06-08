@@ -13,6 +13,7 @@ extern const char s_CPtrArrayFile[];
 #include "ffcc/chunkfile.h"
 #include "ffcc/maphit.h"
 #include "ffcc/mapmesh.h"
+#include "ffcc/mapshadow.h"
 #include "ffcc/linkage.h"
 #include "ffcc/materialman.h"
 #include "ffcc/math.h"
@@ -726,6 +727,68 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             break;
         }
         case CHUNK_LSDW: {
+            CMapShadow* shadow =
+                new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x241) CMapShadow();
+            shadow->m_yFilterMode = 0;
+
+            if (chunk.m_version == 4) {
+                shadow->m_materialIndex = static_cast<unsigned short>(chunkFile.Get4());
+                shadow->m_modelA = MapMng.m_mapObjArray + chunkFile.Get2();
+                shadow->m_modelB = MapMng.m_mapObjArray + chunkFile.Get2();
+                shadow->m_modelC = MapMng.m_mapObjArray + chunkFile.Get2();
+                shadow->m_useFrustum = chunkFile.Get1();
+                shadow->m_shadowMaterialType = chunkFile.Get1();
+                shadow->m_targetEnabled[1] = (chunkFile.Get1() == 0);
+                shadow->m_targetEnabled[0] = (chunkFile.Get1() == 0);
+                shadow->m_yFilterMode = chunkFile.Get1();
+                chunkFile.Get1();
+                shadow->m_targetBoundsScale = chunkFile.GetF4();
+                shadow->m_shadowScale = chunkFile.GetF4();
+                shadow->m_frustumNear = chunkFile.GetF4();
+                shadow->m_frustumFar = chunkFile.GetF4();
+                shadow->m_scrollStepX = chunkFile.GetF4();
+                shadow->m_scrollStepY = chunkFile.GetF4();
+                shadow->m_targetBounds[0].m_min.x = chunkFile.GetF4();
+                shadow->m_targetBounds[0].m_min.y = chunkFile.GetF4();
+                shadow->m_targetBounds[0].m_min.z = chunkFile.GetF4();
+                shadow->m_targetBounds[0].m_max.x = chunkFile.GetF4();
+                shadow->m_targetBounds[0].m_max.y = chunkFile.GetF4();
+                shadow->m_targetBounds[0].m_max.z = chunkFile.GetF4();
+            } else if (chunk.m_version == 3) {
+                shadow->m_materialIndex = static_cast<unsigned short>(chunkFile.Get4());
+                shadow->m_modelA = MapMng.m_mapObjArray + chunkFile.Get2();
+                shadow->m_modelB = MapMng.m_mapObjArray + chunkFile.Get2();
+                shadow->m_modelC = MapMng.m_mapObjArray + chunkFile.Get2();
+                shadow->m_useFrustum = chunkFile.Get1();
+                shadow->m_shadowMaterialType = chunkFile.Get1();
+                chunkFile.Get1();
+                chunkFile.Get1();
+                chunkFile.Get1();
+                chunkFile.Get1();
+                shadow->m_shadowScale = chunkFile.GetF4();
+                shadow->m_frustumNear = chunkFile.GetF4();
+                shadow->m_frustumFar = chunkFile.GetF4();
+                shadow->m_scrollStepX = chunkFile.GetF4();
+                shadow->m_scrollStepY = chunkFile.GetF4();
+                shadow->m_targetBounds[0].m_min.x = chunkFile.GetF4();
+                shadow->m_targetBounds[0].m_min.y = chunkFile.GetF4();
+                shadow->m_targetBounds[0].m_min.z = chunkFile.GetF4();
+                shadow->m_targetBounds[0].m_max.x = chunkFile.GetF4();
+                shadow->m_targetBounds[0].m_max.y = chunkFile.GetF4();
+                shadow->m_targetBounds[0].m_max.z = chunkFile.GetF4();
+                shadow->m_targetEnabled[1] = 1;
+                shadow->m_targetEnabled[0] = 1;
+                shadow->m_targetBoundsScale = kMapObjZero;
+            }
+
+            shadow->m_targetBounds[1].m_min.x = shadow->m_targetBounds[0].m_min.x * shadow->m_targetBoundsScale;
+            shadow->m_targetBounds[1].m_min.y = shadow->m_targetBounds[0].m_min.y * shadow->m_targetBoundsScale;
+            shadow->m_targetBounds[1].m_min.z = shadow->m_targetBounds[0].m_min.z * shadow->m_targetBoundsScale;
+            shadow->m_targetBounds[1].m_max.x = shadow->m_targetBounds[0].m_max.x * shadow->m_targetBoundsScale;
+            shadow->m_targetBounds[1].m_max.y = shadow->m_targetBounds[0].m_max.y * shadow->m_targetBoundsScale;
+            shadow->m_targetBounds[1].m_max.z = shadow->m_targetBounds[0].m_max.z * shadow->m_targetBoundsScale;
+
+            MapMng.GetMapShadowArray().Add(shadow);
             break;
         }
         case CHUNK_PRIO: {

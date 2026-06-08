@@ -1391,7 +1391,7 @@ void CMiniGamePcs::OpenCallback(MgGbaThreadParam* param, void* context)
     }
     else
     {
-        signed char swapByte = paramBytes[0x2A];
+        unsigned char swapByte = paramBytes[0x2A];
         int swapWord = *reinterpret_cast<int*>(paramBytes + 0x34);
 
         paramBytes[0x2A] = self[static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16AE];
@@ -1417,13 +1417,17 @@ void CMiniGamePcs::OpenCallback(MgGbaThreadParam* param, void* context)
         }
     }
 
-    if ((!doWrite || wasResync) && GBAGetStatus(static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)), paramBytes + 0xC0) == 0 && paramBytes[0xC0] == '0')
+    if ((!doWrite || wasResync) && GBAGetStatus(static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)), paramBytes + 0xC0) == 0 && paramBytes[0xC0] == 0x30u)
     {
-        unsigned int sendTick = baseTick;
+        unsigned int sendTick;
         int readTick;
         int readStatus;
 
-        if (!wasResync)
+        if (wasResync)
+        {
+            sendTick = baseTick;
+        }
+        else
         {
             sendTick = OSGetTick();
             *reinterpret_cast<int*>(self + (static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16B4)) = sendTick;
@@ -1431,7 +1435,7 @@ void CMiniGamePcs::OpenCallback(MgGbaThreadParam* param, void* context)
 
         if (GBAWrite(static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)), reinterpret_cast<u8*>(&sendTick), paramBytes + 0xC0) == 0 &&
             (paramBytes[0xC0] & 0x30) == 0x30 &&
-            GBAGetStatus(static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)), paramBytes + 0xC0) == 0 && paramBytes[0xC0] == '8' &&
+            GBAGetStatus(static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)), paramBytes + 0xC0) == 0 && paramBytes[0xC0] == 0x38u &&
             (readStatus = GBARead(static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)), reinterpret_cast<u8*>(&readTick), paramBytes + 0xC0), !wasResync) &&
             readStatus == 0 &&
             sendTick == readTick && (paramBytes[0xC0] & 0x30) == 0x30)

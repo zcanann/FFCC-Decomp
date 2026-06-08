@@ -5027,14 +5027,16 @@ void CGPartyObj::gpmMove()
 
 	float frameScale = static_cast<float>(CharaGhostValue(0x2054)) / kMonObjPercentMax;
 	float pressureScale;
-	if (stageMode == 2) {
-		pressureScale = FLOAT_80331A58 * frameScale + FLOAT_80331A58;
-	} else if (stageMode > 2) {
+	switch (stageMode) {
+	default:
 		pressureScale = kMonObjOne;
-	} else if (stageMode == 1) {
+		break;
+	case 1:
 		pressureScale = FLOAT_80331A58 * (kMonObjOne - frameScale) + FLOAT_80331A58;
-	} else {
-		pressureScale = kMonObjOne;
+		break;
+	case 2:
+		pressureScale = FLOAT_80331A58 * frameScale + FLOAT_80331A58;
+		break;
 	}
 
 	int pressureLimit = static_cast<int>(FLOAT_80331A5C * pressureScale);
@@ -5050,11 +5052,13 @@ void CGPartyObj::gpmMove()
 		sGhostPartyWork.pressure -= 4;
 	}
 
-	if (sGhostPartyWork.pressure < 0) {
-		sGhostPartyWork.pressure = 0;
-	} else if (sGhostPartyWork.pressure > pressureLimit + 100) {
-		sGhostPartyWork.pressure = pressureLimit + 100;
+	int clampedPressure = sGhostPartyWork.pressure;
+	if (clampedPressure < 0) {
+		clampedPressure = 0;
+	} else if (clampedPressure > pressureLimit + 100) {
+		clampedPressure = pressureLimit + 100;
 	}
+	sGhostPartyWork.pressure = clampedPressure;
 
 	if (sGhostPartyWork.pressure < pressureLimit / 3) {
 		sGhostPartyWork.flagBits.flag04 = 0;

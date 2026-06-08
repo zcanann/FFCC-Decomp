@@ -151,9 +151,21 @@ void SetEnvMap(PYmMana*, VYmMana* vYmMana)
     GXTexObj* texObjC = &vYmMana->m_envTexture1->m_texObj;
     unsigned char alpha = vYmMana->m_manaAlpha;
 
-    _GXColor white = {0xff, 0xff, 0xff, 0xff};
-    _GXColor alphaOnly = {0x00, 0x00, 0x00, alpha};
-    _GXColor whiteAlpha = {0xff, 0xff, 0xff, alpha};
+    _GXColor white;
+    _GXColor alphaOnly;
+    _GXColor whiteAlpha;
+    white.r = 0xff;
+    white.g = 0xff;
+    alphaOnly.r = 0x00;
+    alphaOnly.g = 0x00;
+    alphaOnly.b = 0x00;
+    alphaOnly.a = alpha;
+    white.b = 0xff;
+    white.a = 0xff;
+    whiteAlpha.r = 0xff;
+    whiteAlpha.g = 0xff;
+    whiteAlpha.b = 0xff;
+    whiteAlpha.a = alpha;
     GXSetChanAmbColor((GXChannelID)4, white);
     GXSetChanMatColor((GXChannelID)4, white);
     GXSetTevKColor((GXTevKColorID)0, alphaOnly);
@@ -318,22 +330,27 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
     CGObject* object = mana->m_object;
     int draw = 0;
 
-    if (type != 2) {
-        if (type < 2) {
-            if (type == 0) {
-                if (strcmp(mesh->m_name, s_ymManaShapeObj) == 0) {
-                    draw = 1;
-                }
-            } else if (strcmp(mesh->m_name, s_ymManaShapeObj) == 0 || strcmp(mesh->m_name, s_ymManaShapeObj5) == 0) {
-                draw = 1;
-            }
-        } else if (type < 4 && (strcmp(mesh->m_name, s_ymManaShapeObj) == 0 || strcmp(mesh->m_name, s_ymManaShapeObj1) == 0)) {
+    switch (type) {
+    case 0:
+        if (strcmp(mesh->m_name, s_ymManaShapeObj) == 0) {
             draw = 1;
         }
-    } else {
+        break;
+    case 1:
+        if (strcmp(mesh->m_name, s_ymManaShapeObj) == 0 || strcmp(mesh->m_name, s_ymManaShapeObj5) == 0) {
+            draw = 1;
+        }
+        break;
+    case 2:
         if (strcmp(mesh->m_name, s_ymManaShapeObj) == 0 || strcmp(mesh->m_name, s_ymManaShapeObj3) == 0) {
             draw = 1;
         }
+        break;
+    case 3:
+        if (strcmp(mesh->m_name, s_ymManaShapeObj) == 0 || strcmp(mesh->m_name, s_ymManaShapeObj1) == 0) {
+            draw = 1;
+        }
+        break;
     }
 
     int waterCmp = strcmp(mesh->m_name, s_ymManaShapeObj4);
@@ -705,7 +722,7 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
         param_2->m_map21Flag = 0;
     }
 
-    if ((*(u8*)&gObject->m_weaponNodeFlags & 1) != 0) {
+    if (gObject->m_weaponNodeFlagBits.m_attached != 0) {
         mana->m_attachedObject = gObject->m_attachOwner;
     }
 
@@ -989,8 +1006,8 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     PSMTXIdentity(identityMtx);
     PSMTXCopy(CameraMatrix(), savedCameraMtx);
     PSMTX44Copy(CameraScreenMatrix(), savedScreenMtx);
-    Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &sceneTexObj, 0, 0, 0x80, 0x80, 0, GX_NEAR, GX_TF_RGBA8,
-                               0);
+    Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &sceneTexObj, (int)LoadFloat(kPppYmMoveParabolaZero),
+                               (int)LoadFloat(kPppYmMoveParabolaZero), 0x80, 0x80, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
     gObject = mana->m_object;
     if (gObject == NULL) {
@@ -1043,12 +1060,10 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
                 } else if (i < 3) {
                     if (i == 1) {
                         cameraPos.z += kYmManaOne;
-                    } else if (i < 1) {
-                        if (-1 < i) {
-                            cameraPos.x += kYmManaOne;
-                        }
-                    } else {
+                    } else if (i >= 2) {
                         cameraPos.x -= kYmManaOne;
+                    } else if (i >= 0) {
+                        cameraPos.x += kYmManaOne;
                     }
                 } else if (i == 5) {
                     cameraPos.y -= kYmManaOne;
@@ -1063,12 +1078,12 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
 
             C_MTXLookAt(lookAtMtx, (Point3d*)&centerPos, &cameraUp, (Point3d*)&cameraPos);
             Graphic.SetViewport();
-            GXSetScissor(0, 0, 0x80, 0x80);
+            GXSetScissor((u32)LoadFloat(kPppYmMoveParabolaZero), (u32)LoadFloat(kPppYmMoveParabolaZero), 0x80, 0x80);
             gUtil.RenderTextureQuad(kPppYmMoveParabolaZero, kPppYmMoveParabolaZero, kYmManaCaptureTextureSize, kYmManaCaptureTextureSize,
                                     sourceTexObjs, 0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
 
             GXSetViewport(kPppYmMoveParabolaZero, kPppYmMoveParabolaZero, kYmManaCaptureTextureSize, kYmManaCaptureTextureSize, kPppYmMoveParabolaZero, kYmManaOne);
-            GXSetScissor(0, 0, 0x80, 0x80);
+            GXSetScissor((u32)LoadFloat(kPppYmMoveParabolaZero), (u32)LoadFloat(kPppYmMoveParabolaZero), 0x80, 0x80);
             PSMTXCopy(lookAtMtx, CameraMatrix());
             GXSetProjection(projectionMtx, (_GXProjectionType)0);
 
@@ -1720,8 +1735,6 @@ void CalcReflectionVector2(
             u16 posIndex = dl[0];
             u16 normalIndex = dl[1];
             float denom;
-            float uVal;
-            float vVal;
             u8* colorBytes = (u8*)&color[posIndex];
 
             dl += 4;
@@ -1754,17 +1767,25 @@ void CalcReflectionVector2(
             }
 
             denom = denomBias + reflectionVec[posIndex].z;
-            uVal = (-reflectionVec[posIndex].x / denom) * half + half;
-            vVal = (-reflectionVec[posIndex].y / denom) * half + half;
-            uv.x = -(scale * (warp * (uVal - half)) - uVal);
-            uv.y = -(scale * (warp * (vVal - half)) - vVal);
+            uv.x = -reflectionVec[posIndex].x / denom;
+            uv.y = -reflectionVec[posIndex].y / denom;
+            uv.x *= half;
+            uv.y *= half;
+            uv.x += half;
+            uv.y += half;
+            uv.x = -(scale * (warp * (uv.x - half)) - uv.x);
+            uv.y = -(scale * (warp * (uv.y - half)) - uv.y);
             gUtil.ConvF2IVector2d(texCoordA[posIndex], uv, 12);
 
             denom = denomBias - reflectionVec[posIndex].z;
-            uVal = (-reflectionVec[posIndex].x / denom) * half + half;
-            vVal = (-reflectionVec[posIndex].y / denom) * half + half;
-            uv.x = -(scale * (warp * (uVal - half)) - uVal);
-            uv.y = -(scale * (warp * (vVal - half)) - vVal);
+            uv.x = -reflectionVec[posIndex].x / denom;
+            uv.y = -reflectionVec[posIndex].y / denom;
+            uv.x *= half;
+            uv.y *= half;
+            uv.x += half;
+            uv.y += half;
+            uv.x = -(scale * (warp * (uv.x - half)) - uv.x);
+            uv.y = -(scale * (warp * (uv.y - half)) - uv.y);
             gUtil.ConvF2IVector2d(texCoordB[posIndex], uv, 12);
         }
     }

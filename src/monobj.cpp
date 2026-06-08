@@ -805,11 +805,13 @@ void CGMonObj::isValidTarget()
 			m_targetPartyIndex = partyIndex;
 			if (*reinterpret_cast<unsigned short*>(script9 + 0x10C) == 1) {
 				m_chaseState = 2;
+				m_chaseTimer = 0;
+				m_chaseDirty = 1;
 			} else {
 				m_chaseState = 1;
+				m_chaseTimer = 0;
+				m_chaseDirty = 1;
 			}
-			m_chaseTimer = 0;
-			m_chaseDirty = 1;
 			return;
 		}
 	}
@@ -1823,21 +1825,24 @@ void CGMonObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 		font->SetPosY(curPosY);
 		font->SetPosZ(posZ);
 		font->Draw(text);
-		posY -= static_cast<float>(font->m_glyphHeight) * font->scaleY;
+		float lineH = static_cast<float>(font->m_glyphHeight) * font->scaleY;
+		posY = posY - lineH;
 
 		int targetDist = 0;
-		if (targetIndex >= 0) {
-			targetDist = static_cast<int>(*reinterpret_cast<float*>(mon + targetIndex * 4 + 0x5D0));
+		if (m_targetPartyIndex >= 0) {
+			targetDist = static_cast<int>(*reinterpret_cast<float*>(mon + m_targetPartyIndex * 4 + 0x5D0));
 		}
 
 		int chaseRange = static_cast<int>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xCC));
 		int spawnDist = static_cast<int>(PSVECDistance(&m_homePosition, &object->m_worldPosition));
 		sprintf(text, s_monObjDistanceFmt, targetDist, spawnDist, chaseRange);
+		float curPosY2 = posY;
 		font->SetPosX(posX - static_cast<float>(font->GetWidth(text)) * 0.5f);
-		font->SetPosY(posY);
+		font->SetPosY(curPosY2);
 		font->SetPosZ(posZ);
 		font->Draw(text);
-		posY -= static_cast<float>(font->m_glyphHeight) * font->scaleY;
+		float lineH2 = static_cast<float>(font->m_glyphHeight) * font->scaleY;
+		posY = posY - lineH2;
 	}
 }
 
@@ -3133,8 +3138,8 @@ void CGMonObj::moveFrame()
 	float rotY = local_74.GetRotateY();
 	float distance = PSVECMag(reinterpret_cast<Vec*>(&local_74));
 
-	if ((((moveFlags & 0x20) != 0) && (moveRange <= in_f29)) ||
-		(((moveFlags & 0x40) != 0) && (in_f29 < moveRange))) {
+	if ((((moveFlags & 0x20) != 0) && !(in_f29 < moveRange)) ||
+		(((moveFlags & 0x40) != 0) && !(moveRange <= in_f29))) {
 		moveStateFlags |= 1;
 		(this->*m_funcs->moveCancel)();
 		moveStateFlags |= 2;
@@ -4179,13 +4184,11 @@ void CGMonObj::sysControl(int controlType)
 		break;
 
 	case 0x16:
-		*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags) =
-			static_cast<unsigned char>(__rlwimi(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags), 0, 3, 28, 28));
+		object->m_weaponNodeFlagBits.m_control3 = 0;
 		break;
 
 	case 0x15:
-		*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags) =
-			static_cast<unsigned char>(__rlwimi(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags), 1, 3, 28, 28));
+		object->m_weaponNodeFlagBits.m_control3 = 1;
 		break;
 	}
 }

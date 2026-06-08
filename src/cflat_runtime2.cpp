@@ -1308,7 +1308,7 @@ void CFlatRuntime2::Calc()
 			textureSet = new (getStage(), const_cast<char*>(sCFlatRuntime2FileTag), 0x335) CTextureSet;
 			layer->m_textureSet = textureSet;
 			void* readBuffer = File.m_readBuffer;
-			textureSet->Create(
+			layer->m_textureSet->Create(
 				readBuffer,
 				GET_CHARA_ALLOC_STAGE_S(layer->m_allocStage, Game.m_mainStage),
 				0, 0, 0, 0);

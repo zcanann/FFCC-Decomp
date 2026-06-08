@@ -4184,7 +4184,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     }
 
     int freeIdx = mng - reinterpret_cast<PppMngStCreateRaw*>(self + 0x2A18);
-    if (System.m_execParam != 0) {
+    if (static_cast<unsigned int>(System.m_execParam) >= 1U) {
         System.Printf(const_cast<char*>(sPppCreateLogFmt), pdtSlotIndex, fpNo, freeIdx,
                       slot->m_name);
     }

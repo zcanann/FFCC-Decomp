@@ -2309,7 +2309,7 @@ void CCharaPcs::CHandle::LoadModel(
 
     m_charaKind = charaKind;
     m_charaNo = static_cast<int>(charaNo);
-    m_textureVariant = static_cast<int>(textureVariant);
+    m_textureVariant = static_cast<unsigned int>(textureVariant);
 
     char basePath[0x100];
     char path[0x100];
@@ -2417,7 +2417,7 @@ void CCharaPcs::CHandle::LoadModel(
             loadPdt = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x868) CLoadPdt;
             m_pdtLoadRef = loadPdt;
             reinterpret_cast<CLoadPdt*>(m_pdtLoadRef)->m_keyTag = reinterpret_cast<void*>(1);
-            reinterpret_cast<CLoadPdt*>(m_pdtLoadRef)->m_keyId = static_cast<int>(charaNo);
+            reinterpret_cast<CLoadPdt*>(m_pdtLoadRef)->m_keyId = static_cast<unsigned int>(charaNo);
             reinterpret_cast<CLoadPdt*>(m_pdtLoadRef)->m_variantTag = reinterpret_cast<void*>(textureVariant);
             reinterpret_cast<CLoadPdt*>(m_pdtLoadRef)->m_mergeFileId = mergeFileId;
             reinterpret_cast<CLoadPdt*>(m_pdtLoadRef)->m_mergeFlags = mergeFlags;

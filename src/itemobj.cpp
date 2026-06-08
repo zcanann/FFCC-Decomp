@@ -1119,16 +1119,16 @@ void CGItemObj::onFrameStat()
 		float distance = PSVECMag(reinterpret_cast<Vec*>(&monTarget));
 		if (distance < kItemObjMemoryRadius) {
 			changeStat(0x27, 0, 0);
-		} else if (distance <= zero) {
-			prgObj->m_groundHitOffset.z = zero;
-			prgObj->m_groundHitOffset.y = zero;
-			prgObj->m_groundHitOffset.x = zero;
-		} else {
+		} else if (zero < distance) {
 			float moveScale = kItemObjMemoryChaseAccel * prgObj->m_moveTimer;
 
 			prgObj->m_groundHitOffset.x += kItemObjMemoryChaseScale * monTarget.x * moveScale;
 			prgObj->m_groundHitOffset.y += kItemObjMemoryChaseScale * monTarget.y * moveScale;
 			prgObj->m_groundHitOffset.z += kItemObjMemoryChaseScale * monTarget.z * moveScale;
+		} else {
+			prgObj->m_groundHitOffset.z = zero;
+			prgObj->m_groundHitOffset.y = zero;
+			prgObj->m_groundHitOffset.x = zero;
 		}
 		break;
 	}

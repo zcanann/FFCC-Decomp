@@ -1557,6 +1557,7 @@ static void CalcWaterReflectionVector(
     Vec reflected;
     Mtx matrixNoTranslate;
     Mtx inverseMtx;
+    Vec* positionIt;
     Vec* reflectionIt;
     Vec* normalIt;
     unsigned char* colorBytes;
@@ -1594,15 +1595,16 @@ static void CalcWaterReflectionVector(
     PSVECScale(&cameraPos, &cameraPos, LoadFloat(kYmManaNegOne));
     PSMTXMultVec(inverseMtx, &cameraPos, &transformedCameraPos);
 
-    colorBytes = (unsigned char*)color;
-    texCoordFloat = (float*)texCoord;
+    positionIt = positions;
     reflectionIt = reflectionVec;
     normalIt = normals;
+    colorBytes = (unsigned char*)color;
+    texCoordFloat = (float*)texCoord;
     zero = LoadFloat(kPppYmMoveParabolaZero);
     half = LoadFloat(kYmManaHalf);
 
     for (i = 0; i < count; i++) {
-        PSVECSubtract(positions, &transformedCameraPos, &reflected);
+        PSVECSubtract(positionIt, &transformedCameraPos, &reflected);
         C_VECReflect(&reflected, normalIt, reflectionIt);
         PSMTXMultVec(matrixNoTranslate, reflectionIt, reflectionIt);
         PSVECNormalize(reflectionIt, reflectionIt);
@@ -1628,7 +1630,7 @@ static void CalcWaterReflectionVector(
             texCoordFloat[1] = -reflectionIt->y / (denomBase - reflectionIt->z);
         }
 
-        positions++;
+        positionIt++;
         reflectionIt++;
         normalIt++;
         colorBytes += 4;

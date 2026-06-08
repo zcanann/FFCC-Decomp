@@ -1115,6 +1115,7 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
     Mtx texMtx;
     Mtx out;
     Mtx nrm;
+    Mtx posOnly;
 
     if (mode != 0) {
         Vec pos;
@@ -1211,7 +1212,6 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
             PSMTXConcat(texMtx, nrm, m_bumpTexMtx0);
             PSMTXScale(texMtx, kBumpTexMtxScale, kBumpTexMtxScale, kBumpTexMtxScale);
             PSMTXConcat(m_bumpTexMtx0, texMtx, m_bumpTexMtx0);
-            Mtx posOnly;
             PSMTXCopy(out, posOnly);
             posOnly[0][3] = kLightZero;
             posOnly[1][3] = kLightZero;
@@ -1229,26 +1229,26 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
             PSMTXIdentity(reinterpret_cast<float(*)[4]>(m_bumpTexScratch));
             float* scratch = m_bumpTexScratch;
 
-            float f0 = kBumpTexScrollScale;
-            float f1 = kLightZero;
+            float scrollScale = kBumpTexScrollScale;
+            float zero = kLightZero;
             scratch[0] = kBumpTexScrollScale;
-            float f2 = kLightHalf;
-            scratch[6] = f0;
-            float f3 = kBumpTexMtxScale;
-            scratch[10] = f1;
-            scratch[5] = f1;
-            scratch[9] = f1;
+            float half = kLightHalf;
+            scratch[6] = scrollScale;
+            float mtxScale = kBumpTexMtxScale;
+            scratch[10] = zero;
+            scratch[5] = zero;
+            scratch[9] = zero;
             scratch[3] =
-                -(f0 * (camX + bump->m_offsetX) - f2);
+                -(scrollScale * (camX + bump->m_offsetX) - half);
             scratch[7] =
-                -(f0 * (camZ + bump->m_offsetZ) - f2);
-            scratch[11] = f1;
-            scratch[16] = f3;
-            scratch[12] = f3;
-            scratch[17] = f1;
-            scratch[15] = f1;
-            scratch[14] = f1;
-            scratch[13] = f1;
+                -(scrollScale * (camZ + bump->m_offsetZ) - half);
+            scratch[11] = zero;
+            scratch[16] = mtxScale;
+            scratch[12] = mtxScale;
+            scratch[17] = zero;
+            scratch[15] = zero;
+            scratch[14] = zero;
+            scratch[13] = zero;
         }
     }
 }

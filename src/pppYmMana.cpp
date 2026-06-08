@@ -736,7 +736,7 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
     }
     mana->m_manaAlpha = MaterialMan.GetManaAlpha();
 
-    if (*(s32*)pppYmMana != 0) {
+    if (reinterpret_cast<_pppPObject*>(pppYmMana)->m_graphId != 0) {
         return;
     }
 

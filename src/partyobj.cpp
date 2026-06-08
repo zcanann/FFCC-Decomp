@@ -539,21 +539,23 @@ void CGPartyObj::onCancelStat(int state)
 					SetAnimSlot(0x0B, 0);
 					SetAnimSlot(0x0C, 1);
 				}
-			} else if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
-				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
-					SetAnimSlot(0x25, 0);
-					SetAnimSlot(0x24, 1);
-				} else {
-					SetAnimSlot(0x25, 0);
-					SetAnimSlot(0x24, 1);
-				}
 			} else {
-				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
-					SetAnimSlot(0, 0);
-					SetAnimSlot(1, 1);
+				if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
+					if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+						SetAnimSlot(0, 0);
+						SetAnimSlot(1, 1);
+					} else {
+						SetAnimSlot(0x25, 0);
+						SetAnimSlot(0x30, 1);
+					}
 				} else {
-					SetAnimSlot(0x25, 0);
-					SetAnimSlot(0x30, 1);
+					if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+						SetAnimSlot(0x25, 0);
+						SetAnimSlot(0x24, 1);
+					} else {
+						SetAnimSlot(0x25, 0);
+						SetAnimSlot(0x24, 1);
+					}
 				}
 			}
 		}
@@ -574,21 +576,23 @@ void CGPartyObj::onCancelStat(int state)
 					SetAnimSlot(0x0B, 0);
 					SetAnimSlot(0x0C, 1);
 				}
-			} else if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
-				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
-					SetAnimSlot(0x25, 0);
-					SetAnimSlot(0x24, 1);
-				} else {
-					SetAnimSlot(0x25, 0);
-					SetAnimSlot(0x24, 1);
-				}
 			} else {
-				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
-					SetAnimSlot(0, 0);
-					SetAnimSlot(1, 1);
+				if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
+					if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+						SetAnimSlot(0, 0);
+						SetAnimSlot(1, 1);
+					} else {
+						SetAnimSlot(0x25, 0);
+						SetAnimSlot(0x30, 1);
+					}
 				} else {
-					SetAnimSlot(0x25, 0);
-					SetAnimSlot(0x30, 1);
+					if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+						SetAnimSlot(0x25, 0);
+						SetAnimSlot(0x24, 1);
+					} else {
+						SetAnimSlot(0x25, 0);
+						SetAnimSlot(0x24, 1);
+					}
 				}
 			}
 		}
@@ -618,21 +622,23 @@ void CGPartyObj::onCancelStat(int state)
 					SetAnimSlot(0x0B, 0);
 					SetAnimSlot(0x0C, 1);
 				}
-			} else if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
-				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
-					SetAnimSlot(0x25, 0);
-					SetAnimSlot(0x24, 1);
-				} else {
-					SetAnimSlot(0x25, 0);
-					SetAnimSlot(0x24, 1);
-				}
 			} else {
-				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
-					SetAnimSlot(0, 0);
-					SetAnimSlot(1, 1);
+				if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
+					if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+						SetAnimSlot(0, 0);
+						SetAnimSlot(1, 1);
+					} else {
+						SetAnimSlot(0x25, 0);
+						SetAnimSlot(0x30, 1);
+					}
 				} else {
-					SetAnimSlot(0x25, 0);
-					SetAnimSlot(0x30, 1);
+					if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+						SetAnimSlot(0x25, 0);
+						SetAnimSlot(0x24, 1);
+					} else {
+						SetAnimSlot(0x25, 0);
+						SetAnimSlot(0x24, 1);
+					}
 				}
 			}
 		}
@@ -667,21 +673,23 @@ void CGPartyObj::onCancelStat(int state)
 					SetAnimSlot(0x0B, 0);
 					SetAnimSlot(0x0C, 1);
 				}
-			} else if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
-				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
-					SetAnimSlot(0x25, 0);
-					SetAnimSlot(0x24, 1);
-				} else {
-					SetAnimSlot(0x25, 0);
-					SetAnimSlot(0x24, 1);
-				}
 			} else {
-				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
-					SetAnimSlot(0, 0);
-					SetAnimSlot(1, 1);
+				if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
+					if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+						SetAnimSlot(0, 0);
+						SetAnimSlot(1, 1);
+					} else {
+						SetAnimSlot(0x25, 0);
+						SetAnimSlot(0x30, 1);
+					}
 				} else {
-					SetAnimSlot(0x25, 0);
-					SetAnimSlot(0x30, 1);
+					if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+						SetAnimSlot(0x25, 0);
+						SetAnimSlot(0x24, 1);
+					} else {
+						SetAnimSlot(0x25, 0);
+						SetAnimSlot(0x24, 1);
+					}
 				}
 			}
 		}
@@ -2711,8 +2719,7 @@ void CGPartyObj::checkTargetParticle()
 		}
 	} else {
 		CGPartyObj* leader = Game.m_partyObjArr[0];
-		if (leader != nullptr &&
-		    (leader->m_lastStateId == 2 || leader->m_lastStateId == 6) &&
+		if ((leader->m_lastStateId == 2 || leader->m_lastStateId == 6) &&
 		    leader->m_comboState != 0) {
 			CVector leaderCenter(leader->m_comboCenter);
 			CVector selfCenter(m_comboCenter);

@@ -60,10 +60,8 @@ void CMenuPcs::CompaDraw()
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	const CCaravanWork* caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
-	CompaOpenAnimList* compaList = this->m_compaList;
-	CompaOpenAnim* entry = compaList->entries;
-	int count = compaList->count;
-	for (int i = 0; i < count; i++) {
+	CompaOpenAnim* entry = this->m_compaList->entries;
+	for (int i = 0; i < this->m_compaList->count; i++) {
 		int tex = entry->tex;
 		if (tex >= 0) {
 			float x = static_cast<float>(entry->x);
@@ -137,7 +135,7 @@ void CMenuPcs::CompaDraw()
 						float end = y + h;
 						while (static_cast<float>(yStep) < end) {
 							float diff = end - static_cast<float>(yStep);
-							int tileH = (diff >= kCompaTileHeight) ? 0x18 : static_cast<int>(diff);
+							int tileH = (diff >= kCompaTileHeight) ? 0x18 : static_cast<unsigned int>(diff);
 							MenuPcs.DrawRect(
 								static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
 								remainW, static_cast<float>(tileH), u, v,
@@ -168,13 +166,14 @@ void CMenuPcs::CompaDraw()
 		entry++;
 	}
 
+	CompaOpenAnimList* compaList = this->m_compaList;
 	float globalAlpha = compaList->entries[0].alpha;
 
 	GXColor color;
 	color.r = 0xFF;
 	color.g = 0xFF;
 	color.b = 0xFF;
-	color.a = static_cast<unsigned char>(globalAlpha * kCompaColorMax);
+	color.a = static_cast<signed char>(globalAlpha * kCompaColorMax);
 	GXSetChanMatColor(GX_COLOR0A0, color);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3A));
 
@@ -192,7 +191,7 @@ void CMenuPcs::CompaDraw()
 		familyCount = 4;
 	}
 
-	for (int i = 0; i < familyCount; i++) {
+	for (unsigned int i = 0; i < familyCount; i++) {
 		MenuPcs.DrawRect(
 			0,
 			static_cast<float>(compaList->entries[0].x + 0x10),
@@ -202,12 +201,14 @@ void CMenuPcs::CompaDraw()
 	}
 
 	int memberIndex = 0;
-	int shown = 0;
+	unsigned int shown = 0;
 	for (int i = 0; i < 8 && shown < familyCount; i++) {
 		int drawIndex = memberIndex;
 		if (memberIndex > 1) {
-			while (drawIndex < 8 && caravanWork->m_evtWordArr[19 + drawIndex] == 0) {
-				drawIndex++;
+			for (; drawIndex < 8; drawIndex++) {
+				if (caravanWork->m_evtWordArr[19 + drawIndex] != 0) {
+					break;
+				}
 			}
 			if (drawIndex > 7) {
 				break;
@@ -248,7 +249,7 @@ void CMenuPcs::CompaDraw()
 	font->SetScaleY(kCompaOne);
 	font->DrawInit();
 
-	GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(kCompaColorMax * globalAlpha)).color;
+	GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<signed char>(kCompaColorMax * globalAlpha)).color;
 	font->SetColor(textColor);
 
 	memberIndex = 0;
@@ -256,8 +257,10 @@ void CMenuPcs::CompaDraw()
 	for (int i = 0; i < 8 && shown < familyCount; i++) {
 		int drawIndex = memberIndex;
 		if (memberIndex > 1) {
-			while (drawIndex < 8 && caravanWork->m_evtWordArr[19 + drawIndex] <= 0) {
-				drawIndex++;
+			for (; drawIndex < 8; drawIndex++) {
+				if (caravanWork->m_evtWordArr[19 + drawIndex] > 0) {
+					break;
+				}
 			}
 			if (drawIndex > 7) {
 				break;

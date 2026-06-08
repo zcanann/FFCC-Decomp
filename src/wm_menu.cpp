@@ -1380,14 +1380,14 @@ void CMenuPcs::InitCharaInfo()
 	float zero = FLOAT_803313dc;
 	int row = 0;
 	int baseSlot = 0x20;
-	short baseY = 0x66;
+	int baseY = 0x66;
 	while (row < 2) {
 		int slotOffset = baseSlot * 0x50;
-		short baseX = 0x68;
+		int baseX = 0x68;
 		for (int col = 0; col < 2; col++) {
-			short y = baseY;
+			int y = baseY;
 			if (row != 0) {
-				y = static_cast<short>(baseY + 8);
+				y = baseY + 8;
 			}
 
 			*reinterpret_cast<short*>(m_wm.m_worldObjData + slotOffset + 8) = static_cast<short>(baseX - 0xA0);
@@ -1398,9 +1398,9 @@ void CMenuPcs::InitCharaInfo()
 			*reinterpret_cast<float*>(m_wm.m_worldObjData + slotOffset + 0x14) = zero;
 			*reinterpret_cast<float*>(m_wm.m_worldObjData + slotOffset + 0x18) = z;
 
-			short y2 = baseY;
+			int y2 = baseY;
 			if (row != 0) {
-				y2 = static_cast<short>(baseY + 8);
+				y2 = baseY + 8;
 			}
 
 			*reinterpret_cast<short*>(m_wm.m_worldObjData + slotOffset + 0x58) = static_cast<short>(baseX - 0x10);
@@ -1412,10 +1412,10 @@ void CMenuPcs::InitCharaInfo()
 			*reinterpret_cast<float*>(m_wm.m_worldObjData + slotOffset + 0x68) = z;
 
 			slotOffset += 0xA0;
-			baseX = static_cast<short>(baseX + 0x120);
+			baseX = baseX + 0x120;
 		}
 		row++;
-		baseY = static_cast<short>(baseY + 0xB8);
+		baseY = baseY + 0xB8;
 		baseSlot += 4;
 	}
 

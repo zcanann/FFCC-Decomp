@@ -2186,13 +2186,13 @@ CGObject* CGObject::CCClass(int useBodyRadius, int classMask, float yOffset, Vec
 
     PSVECSubtract(targetPos, &origin, &toTarget);
     const double maxDist = static_cast<double>(PSVECMag(&toTarget));
-    if (maxDist == static_cast<double>(sZeroFloat)) {
+    if (static_cast<double>(sZeroFloat) == maxDist) {
         return 0;
     }
 
     PSVECNormalize(&toTarget, &targetDir);
     const double maxAngle = static_cast<double>(static_cast<float>(atan2(static_cast<double>(radius), maxDist)));
-    double bestDist = static_cast<double>(sLargeDistance);
+    float bestDist = sLargeDistance;
     best = 0;
 
     for (CGObject* other = CFlat.FindGObjFirst(); other != 0;

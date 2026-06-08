@@ -2040,9 +2040,10 @@ int CMapMng::ReadOtm(char* mapName)
     void* filePtr = File.m_readBuffer;
 
     m_mapReadReady = 1;
-    sprintf(g_StrTmp, const_cast<char*>(s_mapOtmPathFmt), mapName);
+    char* strTmp = g_StrTmp;
+    sprintf(strTmp, const_cast<char*>(s_mapOtmPathFmt), mapName);
     if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-        System.Printf(const_cast<char*>(s_read_otm_fmt), g_StrTmp);
+        System.Printf(const_cast<char*>(s_read_otm_fmt), strTmp);
     }
     m_mapAnimFrame = 0;
 
@@ -2056,7 +2057,7 @@ int CMapMng::ReadOtm(char* mapName)
         CheckSum(filePtr, size);
         readIndex += 1;
     } else {
-        CFile::CHandle* fileHandle = File.Open(g_StrTmp, 0, CFile::PRI_LOW);
+        CFile::CHandle* fileHandle = File.Open(strTmp, 0, CFile::PRI_LOW);
         if (fileHandle != 0) {
             const int size = File.GetLength(fileHandle);
             if (m_asyncLoadState.m_mapReadMode == 3) {
@@ -2089,7 +2090,7 @@ int CMapMng::ReadOtm(char* mapName)
 
     if (filePtr == 0) {
         if (System.m_execParam != 0) {
-            System.Printf(const_cast<char*>(s_mapReadErrorFmt), g_StrTmp);
+            System.Printf(const_cast<char*>(s_mapReadErrorFmt), strTmp);
         }
         return 0;
     }
@@ -2317,7 +2318,6 @@ int CMapMng::ReadOtm(char* mapName)
  */
 int CMapMng::ReadMid(char* mapName)
 {
-
     sprintf(g_StrTmp, const_cast<char*>(s_mapMidPathFmt), mapName);
     int ok = 1;
 

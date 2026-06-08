@@ -120,6 +120,8 @@ static inline const char* GetStrikeListName(int itemId)
 			return s_SkillStr_fr[0];
 		case 5:
 			return s_SkillStr_sp[0];
+		case 1:
+			return s_SkillStr_us[0];
 		default:
 			return s_SkillStr_us[0];
 		}
@@ -133,6 +135,8 @@ static inline const char* GetStrikeListName(int itemId)
 			return s_SkillStr_fr[1];
 		case 5:
 			return s_SkillStr_sp[1];
+		case 1:
+			return s_SkillStr_us[1];
 		default:
 			return s_SkillStr_us[1];
 		}
@@ -146,6 +150,8 @@ static inline const char* GetStrikeListName(int itemId)
 			return s_SkillStr_fr[2];
 		case 5:
 			return s_SkillStr_sp[2];
+		case 1:
+			return s_SkillStr_us[2];
 		default:
 			return s_SkillStr_us[2];
 		}
@@ -159,6 +165,8 @@ static inline const char* GetStrikeListName(int itemId)
 			return s_SkillStr_fr[3];
 		case 5:
 			return s_SkillStr_sp[3];
+		case 1:
+			return s_SkillStr_us[3];
 		default:
 			return s_SkillStr_us[3];
 		}
@@ -172,6 +180,8 @@ static inline const char* GetStrikeListName(int itemId)
 			return s_SkillStr_fr[4];
 		case 5:
 			return s_SkillStr_sp[4];
+		case 1:
+			return s_SkillStr_us[4];
 		default:
 			return s_SkillStr_us[4];
 		}

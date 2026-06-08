@@ -1497,26 +1497,26 @@ void CGPartyObj::command()
 
 		if (kindClass == 0 || kindClass == 2) {
 			int addedItem;
-			if (itemIdx < 0x9F || itemIdx > 0xFF) {
-				caravan->AddItem(static_cast<short>(itemIdx), &addedItem);
-				System.Printf(const_cast<char*>(msgBase + 0x2E0), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504));
-			} else {
+			if (itemIdx >= 0x9F && itemIdx <= 0xFF) {
 				caravan->AddTmpArtifact(itemIdx, &addedItem);
 				System.Printf(const_cast<char*>(msgBase + 0x2C0), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504));
+			} else {
+				caravan->AddItem(static_cast<short>(itemIdx), &addedItem);
+				System.Printf(const_cast<char*>(msgBase + 0x2E0), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504));
 			}
 			if (kindClass == 0 && caravan->CanAddComList(1) != 0) {
 				int addedSlot;
 				caravan->AddComList(static_cast<short>(addedItem), &addedSlot);
 				System.Printf(const_cast<char*>(msgBase + 0x2F8), addedItem, addedSlot);
 			}
-			if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(party.target) + 0x560) != 1) {
+			if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(party.target) + 0x560) != 1) {
 				bonus(4, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504), 0);
 			}
 		} else if (itemIdx == 0x190) {
 			bonus(5, 0x190, 0);
 			System.Printf(const_cast<char*>(msgBase + 0x324), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x558));
 			caravan->AddGil(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x558));
-			if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(party.target) + 0x560) != 1) {
+			if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(party.target) + 0x560) != 1) {
 				bonus(4, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504), 0);
 			}
 		}

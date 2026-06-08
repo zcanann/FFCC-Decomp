@@ -1263,9 +1263,9 @@ void CMenuPcs::drawSingleMenu()
                 m_wm.m_handles[0] = 0;
             }
 
-            if (m_bonus.m_bonusBoardPtr != 0) {
-                delete[] static_cast<u8*>(reinterpret_cast<void*>(m_bonus.m_bonusBoardPtr));
-                m_bonus.m_bonusBoardPtr = 0;
+            if (m_wm.m_worldObjData != 0) {
+                delete[] m_wm.m_worldObjData;
+                m_wm.m_worldObjData = 0;
             }
 
             if (m_singMenuState != 0) {
@@ -1453,9 +1453,9 @@ void CMenuPcs::drawSingleMenu()
                     m_wm.m_handles[0] = 0;
                 }
 
-                if (m_bonus.m_bonusBoardPtr != 0) {
-                    delete[] static_cast<u8*>(reinterpret_cast<void*>(m_bonus.m_bonusBoardPtr));
-                    m_bonus.m_bonusBoardPtr = 0;
+                if (m_wm.m_worldObjData != 0) {
+                    delete[] m_wm.m_worldObjData;
+                    m_wm.m_worldObjData = 0;
                 }
 
                 if (m_singMenuState != 0) {

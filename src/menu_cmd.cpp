@@ -1146,7 +1146,7 @@ void CMenuPcs::CmdDraw()
 								canUse = static_cast<u32>(
 								    ChkUnite(GetCmdStateView(this)->selected, combo) > 0);
 							} else {
-								canUse = static_cast<u32>(EquipChk(static_cast<int>(canBuf[sel - 1])) != 0);
+								canUse = static_cast<u32>(static_cast<u8>(EquipChk(static_cast<int>(canBuf[sel - 1]))) != 0);
 							}
 
 							if (canUse == 0) {
@@ -1159,12 +1159,12 @@ void CMenuPcs::CmdDraw()
 								itemIdx -= itemCount;
 							}
 
-							bool equippable = true;
+							int equippable = 1;
 							if (itemIdx + 2 < itemCount) {
-								equippable = EquipChk(static_cast<int>(letterBuf[itemIdx + 1])) != 0;
+								equippable = EquipChk(static_cast<int>(letterBuf[itemIdx + 1]));
 							}
 
-							if (equippable) {
+							if (static_cast<u8>(equippable) != 0) {
 								if (itemIdx + 2 < itemCount) {
 									const float markX = rowX - kCmdMenuTwelve;
 									const float markY = (rowH - kCmdMenuTwentyFour) *
@@ -2673,12 +2673,12 @@ unsigned int CMenuPcs::CmdOpen1()
 	}
 
 	animEntry->alpha = static_cast<f32>(kCmdMenuTransitionStepD * static_cast<f64>(GetCmdStateView(this)->transitionTimer));
-	u32 done = static_cast<u32>(static_cast<f64>(GetCmdStateView(this)->transitionTimer) >= kCmdMenuTransitionFramesD);
-	if (done != 0) {
+	if (static_cast<f64>(GetCmdStateView(this)->transitionTimer) >= kCmdMenuTransitionFramesD) {
 		GetCmdStateView(this)->choice = 0;
+		return 1;
 	}
 
-	return done;
+	return 0;
 }
 
 /*

@@ -3105,8 +3105,8 @@ void CGPartyObj::onStatDie()
 		}
 		break;
 	case 2:
-		if (m_subFrame > 0xBA) {
-			if ((unsigned int)System.m_execParam > 1) {
+		if (m_subFrame >= 0xBB) {
+			if ((unsigned int)System.m_execParam >= 2) {
 				System.Printf(const_cast<char*>(lbl_801DCCB0));
 			}
 			changeStat(0x22, 0, 0);

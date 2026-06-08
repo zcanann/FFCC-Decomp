@@ -2054,13 +2054,13 @@ void CCharaPcs::drawOverlap()
     _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
 
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-    GXPosition3f32(0.0f, 0.0f, 0.0f);
+    GXPosition3f32(kCharaZero, kCharaZero, kCharaZero);
     GXTexCoord2u16(0, 0);
-    GXPosition3f32(640.0f, 0.0f, 0.0f);
+    GXPosition3f32(FLOAT_803302CC, kCharaZero, kCharaZero);
     GXTexCoord2u16(0x280, 0);
-    GXPosition3f32(0.0f, 448.0f, 0.0f);
+    GXPosition3f32(kCharaZero, FLOAT_803302C8, kCharaZero);
     GXTexCoord2u16(0, 0x1C0);
-    GXPosition3f32(640.0f, 448.0f, 0.0f);
+    GXPosition3f32(FLOAT_803302CC, FLOAT_803302C8, kCharaZero);
     GXTexCoord2u16(0x280, 0x1C0);
 
     PSMTX44Copy(CameraPcs.m_screenMatrix, projectionMtx);
@@ -2561,11 +2561,11 @@ int CCharaPcs::CHandle::SetAnim(int animIndex, int startFrame, int endFrame, int
     }
 
     CChara::CAnim* anim;
-    if (animIndex != -1) {
+    if (animIndex == -1) {
+        anim = 0;
+    } else {
         CLoadAnim* loadAnim = reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex]);
         anim = loadAnim != 0 ? loadAnim->m_anim : 0;
-    } else {
-        anim = 0;
     }
 
     if (anim == 0) {
@@ -2983,7 +2983,10 @@ void CCharaPcs::CHandle::loadModelASyncFrame()
         return;
     }
 
-    if ((asyncState != 2 && asyncState != 4 && asyncState != 6) || !File.IsCompleted(m_asyncFileHandle)) {
+    if (asyncState != 2 && asyncState != 4 && asyncState != 6) {
+        return;
+    }
+    if (!File.IsCompleted(m_asyncFileHandle)) {
         return;
     }
 

@@ -2165,16 +2165,14 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 
 	if (comboOut != nullptr) {
 		for (int rank = 0; rank < 2; rank++) {
-			int (*dst)[2] = comboOut;
 			for (int i = 0; i < matchCount; i++) {
 				const int* m = &matches[i * 2];
 				if (rank + 2 == s_uniteRecipePatterns[2 + m[0] * 6]) {
-					dst[0][0] = m[0];
-					dst[0][1] = m[1];
-					dst++;
+					comboOut[0][0] = m[0];
+					comboOut[0][1] = m[1];
+					comboOut++;
 				}
 			}
-			comboOut = dst;
 		}
 	}
 

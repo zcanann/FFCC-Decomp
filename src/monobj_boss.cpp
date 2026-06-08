@@ -2057,7 +2057,7 @@ void CGMonObj::alwaysFuncMeteoParasite()
 		MG_GBA_THREAD_MSG_SETPORT_ct += kMonObjBossScaleStep;
 	}
 
-	if (scriptKind < 0x88 && scriptKind > 0x84 &&
+	if (scriptKind < 0x88 && scriptKind >= 0x85 &&
 	    *reinterpret_cast<int*>(CGMonObj::m_boss + 0x78) == scriptKind - 0x85 &&
 	    reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_bit80 != 0) {
 		int effect;

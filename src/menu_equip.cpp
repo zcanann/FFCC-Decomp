@@ -381,7 +381,6 @@ void CMenuPcs::EquipDraw()
 			float h = (float)item->h;
 			float u = item->u;
 			float v = item->v;
-			float alpha = item->alpha;
 
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
 
@@ -393,7 +392,7 @@ void CMenuPcs::EquipDraw()
 			color.r = 0xff;
 			color.g = 0xff;
 			color.b = 0xff;
-			color.a = (u8)(int)(kEquipColorMax * alpha);
+			color.a = (u8)(int)(kEquipColorMax * item->alpha);
 			GXSetChanMatColor(GX_COLOR0A0, color);
 
 			float scale = item->scale;

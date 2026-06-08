@@ -2215,10 +2215,12 @@ void CGoOutMenu::CalcDel()
     case 0:
         if (m_messageWindowOpen != 0) {
             input = GetGoOutInputMask();
-            bool pressed = false;
+            bool pressed;
             if ((input & 0x100) != 0) {
                 Sound.PlaySe(2, 0x40, 0x7f, 0);
                 pressed = true;
+            } else {
+                pressed = false;
             }
             if (pressed) {
                 if (m_prevDeleteMode == -1) {
@@ -2248,10 +2250,12 @@ void CGoOutMenu::CalcDel()
 
         input = GetGoOutInputMask();
         {
-            bool pressed = false;
+            bool pressed;
             if ((input & 0x200) != 0) {
                 Sound.PlaySe(3, 0x40, 0x7f, 0);
                 pressed = true;
+            } else {
+                pressed = false;
             }
             if (pressed) {
                 SetDelMode(2);
@@ -2295,10 +2299,12 @@ void CGoOutMenu::CalcDel()
 
         input = GetGoOutInputMask();
         {
-            bool pressed = false;
+            bool pressed;
             if ((input & 0x200) != 0) {
                 Sound.PlaySe(3, 0x40, 0x7f, 0);
                 pressed = true;
+            } else {
+                pressed = false;
             }
             if (pressed) {
                 SetDelMode(2);
@@ -2355,10 +2361,12 @@ void CGoOutMenu::CalcDel()
 
         input = GetGoOutInputMask();
         {
-            bool pressed = false;
+            bool pressed;
             if ((input & 0x200) != 0) {
                 Sound.PlaySe(3, 0x40, 0x7f, 0);
                 pressed = true;
+            } else {
+                pressed = false;
             }
             if (pressed) {
                 SetDelMode(2);
@@ -2402,10 +2410,12 @@ void CGoOutMenu::CalcDel()
 
         input = GetGoOutInputMask();
         {
-            bool pressed = false;
+            bool pressed;
             if ((input & 0x200) != 0) {
                 Sound.PlaySe(3, 0x40, 0x7f, 0);
                 pressed = true;
+            } else {
+                pressed = false;
             }
             if (pressed) {
                 SetDelMode(2);

@@ -531,32 +531,32 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
         if (artifact >= 0 && artifact < 0x40)
         {
             artifact = artifact * 2 + 0x3C;
-            *reinterpret_cast<u16*>(dstCharData + artifact) = *reinterpret_cast<u16*>(srcCharData + artifact);
-            *reinterpret_cast<s16*>(dstCharData + 0x28) = *reinterpret_cast<s16*>(dstCharData + 0x28) + 1;
+            *reinterpret_cast<u16*>(dstCharData + artifact) = *reinterpret_cast<s16*>(srcCharData + artifact);
+            *reinterpret_cast<u16*>(dstCharData + 0x28) = *reinterpret_cast<u16*>(dstCharData + 0x28) + 1;
         }
 
         artifact = static_cast<int>(*reinterpret_cast<s16*>(dstCharData + 0x36));
         if (artifact >= 0 && artifact < 0x40)
         {
             artifact = artifact * 2 + 0x3C;
-            *reinterpret_cast<u16*>(dstCharData + artifact) = *reinterpret_cast<u16*>(srcCharData + artifact);
-            *reinterpret_cast<s16*>(dstCharData + 0x28) = *reinterpret_cast<s16*>(dstCharData + 0x28) + 1;
+            *reinterpret_cast<u16*>(dstCharData + artifact) = *reinterpret_cast<s16*>(srcCharData + artifact);
+            *reinterpret_cast<u16*>(dstCharData + 0x28) = *reinterpret_cast<u16*>(dstCharData + 0x28) + 1;
         }
 
         artifact = static_cast<int>(*reinterpret_cast<s16*>(dstCharData + 0x38));
         if (artifact >= 0 && artifact < 0x40)
         {
             artifact = artifact * 2 + 0x3C;
-            *reinterpret_cast<u16*>(dstCharData + artifact) = *reinterpret_cast<u16*>(srcCharData + artifact);
-            *reinterpret_cast<s16*>(dstCharData + 0x28) = *reinterpret_cast<s16*>(dstCharData + 0x28) + 1;
+            *reinterpret_cast<u16*>(dstCharData + artifact) = *reinterpret_cast<s16*>(srcCharData + artifact);
+            *reinterpret_cast<u16*>(dstCharData + 0x28) = *reinterpret_cast<u16*>(dstCharData + 0x28) + 1;
         }
 
         artifact = static_cast<int>(*reinterpret_cast<s16*>(dstCharData + 0x3A));
         if (artifact >= 0 && artifact < 0x40)
         {
             artifact = artifact * 2 + 0x3C;
-            *reinterpret_cast<u16*>(dstCharData + artifact) = *reinterpret_cast<u16*>(srcCharData + artifact);
-            *reinterpret_cast<s16*>(dstCharData + 0x28) = *reinterpret_cast<s16*>(dstCharData + 0x28) + 1;
+            *reinterpret_cast<u16*>(dstCharData + artifact) = *reinterpret_cast<s16*>(srcCharData + artifact);
+            *reinterpret_cast<u16*>(dstCharData + 0x28) = *reinterpret_cast<u16*>(dstCharData + 0x28) + 1;
         }
 
         srcCharData[0x8C0] = 1;

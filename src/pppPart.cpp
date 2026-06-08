@@ -1011,7 +1011,7 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 		pppMngSt->m_pppPDataVals = 0;
 	}
 
-	ppvEmptyLoop = 0;
+	ppvHookFuncTbl = 0;
 	pppMngSt->m_baseTime = -0x1000;
 
 	if (Game.m_currentSceneId != 7)
@@ -1037,7 +1037,8 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 				mapMeshIndices++;
 				for (s16 i = 0; i < mapMeshCount; i++)
 				{
-					CMapMesh* mapMesh = *(CMapMesh**)(*(u32*)(pppResSet + 0x14) + mapMeshIndices[i] * 4);
+					CMapMesh* mapMesh = *(CMapMesh**)(*(u32*)(pppResSet + 0x14) + *mapMeshIndices * 4);
+					mapMeshIndices++;
 					mapMesh->pppCacheDumpModelTexture(ppvEnv->m_materialSetPtr, &ppvAmemCacheSet);
 				}
 
@@ -1045,7 +1046,8 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 				shapeIndices++;
 				for (s16 i = 0; i < shapeCount; i++)
 				{
-					pppShapeSt* shape = *(pppShapeSt**)(*(u32*)(pppResSet + 0x18) + shapeIndices[i] * 4);
+					pppShapeSt* shape = *(pppShapeSt**)(*(u32*)(pppResSet + 0x18) + *shapeIndices * 4);
+					shapeIndices++;
 					pppCacheDumpShapeTexture(shape, ppvEnv->m_materialSetPtr);
 				}
 			}

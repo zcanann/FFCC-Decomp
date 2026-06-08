@@ -2260,7 +2260,7 @@ int CMapMng::ReadOtm(char* mapName)
         }
 
         CMapObjAtrSpotLight* spotAttr = static_cast<CMapObjAtrSpotLight*>(attr);
-        if (*reinterpret_cast<int*>(&spotAttr->m_baseColor) == 0) {
+        if (*reinterpret_cast<unsigned int*>(&spotAttr->m_baseColor) == 0) {
             continue;
         }
 

@@ -1626,7 +1626,7 @@ void CMenuPcs::DrawSingleBase(float alpha)
 void CMenuPcs::DrawSingleStat(float alpha)
 {
     u8* self = reinterpret_cast<u8*>(this);
-    int languageId = Game.m_gameWork.m_languageId;
+    unsigned int languageId = Game.m_gameWork.m_languageId;
 
     DrawInit();
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -2045,7 +2045,7 @@ void CMenuPcs::SingleCalcCtrl()
         model->SetFrame(0.0f);
     }
 
-    unsigned short modelScaleIndex = SingleCaravanWork()->m_tribeId;
+    short modelScaleIndex = SingleCaravanWork()->m_tribeId;
     float modelScale = gSingMenuRaceModelScales[modelScaleIndex];
     Mtx scaleMtx;
     PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
@@ -2766,7 +2766,7 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
     font->SetShadow(1);
     font->SetScale(FLOAT_8032ea78);
 
-    int lineCount;
+    unsigned int lineCount;
     if (useDynamic != 0) {
         lineCount = s_DynamicMess[0];
     } else {

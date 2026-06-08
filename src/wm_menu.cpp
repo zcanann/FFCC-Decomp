@@ -4074,9 +4074,11 @@ void CMenuPcs::drawWorld()
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
 	if (static_cast<signed char>(bytes[0xD]) == 0) {
+		unsigned char* menuSlot = bytes + 0x10;
 		for (int i = 4; i < 6; i++) {
-			CMenu* const menu = *reinterpret_cast<CMenu**>(bytes + 0x10 + (i - 4) * 4 + 0x10C);
+			CMenu* const menu = *reinterpret_cast<CMenu**>(menuSlot + 0x10C);
 			menu->Draw();
+			menuSlot += 4;
 		}
 	} else {
 		const short menuMode = m_wmWorldState->m_menuMode;
@@ -4120,9 +4122,11 @@ void CMenuPcs::drawWorld()
 			break;
 		}
 
+		unsigned char* menuSlot = bytes + 0x10;
 		for (int i = 4; i < 6; i++) {
-			CMenu* const menu = *reinterpret_cast<CMenu**>(bytes + 0x10 + (i - 4) * 4 + 0x10C);
+			CMenu* const menu = *reinterpret_cast<CMenu**>(menuSlot + 0x10C);
 			menu->Draw();
+			menuSlot += 4;
 		}
 		DrawInit();
 	}

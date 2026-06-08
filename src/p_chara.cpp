@@ -2671,8 +2671,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
     if ((flags & 1) == 0 || (flags & 0x400000) != 0) {
         return;
     }
-    const float lightAlpha = m_model->m_lightAlpha;
-    if (kCharaZero == lightAlpha && (flags & 0x80) == 0) {
+    if (kCharaZero == m_model->m_lightAlpha && (flags & 0x80) == 0) {
         return;
     }
     if ((flags & 0x100) != 0 && drawPass != 5) {
@@ -2688,7 +2687,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         return;
     }
 
-    if (immediatePass != 0 && drawPass == 0 && (lightAlpha < kCharaOne || (flags & 0x40000) != 0)) {
+    if (immediatePass != 0 && drawPass == 0 && (m_model->m_lightAlpha < kCharaOne || (flags & 0x40000) != 0)) {
         ppvDrawMng.AddPrim(-m_sortZ, this);
         return;
     }

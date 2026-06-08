@@ -4776,7 +4776,7 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
 
             GbaQue.GetCaravanName((char*)&payload[1]);
 
-            unsigned char* p = (unsigned char*)&playerInfo;
+            signed char* p = (signed char*)&playerInfo;
             unsigned char lowBits = 0;
             unsigned char highBits = 0;
 
@@ -4867,7 +4867,7 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
             unsigned int sendPort = threadParam->m_portIndex;
             unsigned int word = *(unsigned int*)&m_joyDataPacketBuffer[sendPort][2 + m_txWordIndex[sendPort] * 4];
 
-            if (m_threadRunningMask == 0)
+            if (static_cast<signed char>(m_threadRunningMask) == 0)
             {
                 result = 0;
             }
@@ -4897,7 +4897,7 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
         unsigned int statPort = threadParam->m_portIndex;
         unsigned int word = *(unsigned int*)&m_joyDataPacketBuffer[statPort][2 + m_txWordIndex[statPort] * 4];
 
-        if (m_threadRunningMask == 0)
+        if (static_cast<signed char>(m_threadRunningMask) == 0)
         {
             result = 0;
         }

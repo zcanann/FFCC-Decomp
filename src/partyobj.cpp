@@ -3732,9 +3732,9 @@ int CGPartyObj::canPlayerPutItem()
 	if ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(weaponFlags[0]) << 24) & 0xC0000000) >> 31) != 0) &&
 	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(weaponFlags[1]) << 24) & 0xC0000000) >> 31) != 0) &&
 	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x63C]) << 24) & 0xC0000000) >> 31) != 0) &&
-	    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) &&
+	    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) &&
 	    (PartyData(this).carryObject == nullptr)) {
-		if (Game.m_gameWork.m_menuStageMode != 0 && CGItemObj::CanCreateFromScript() == 0) {
+		if (Game.m_gameWork.m_menuStageMode != 0 && static_cast<int>(CGItemObj::CanCreateFromScript()) == 0) {
 			return 0;
 		}
 		return 1;

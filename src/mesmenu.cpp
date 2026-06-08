@@ -408,7 +408,7 @@ void CMesMenu::CalcHeart()
     }
 
     for (int i = 0; i < 8; i += 4) {
-        unsigned int value = m_heartGrowTimers[i] - 1;
+        int value = m_heartGrowTimers[i] - 1;
         m_heartGrowTimers[i] = value & ~((int)value >> 0x1F);
 
         value = m_heartDropTimers[i] - 1;

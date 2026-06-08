@@ -2586,7 +2586,7 @@ void CGObject::Turn(float targetRot, int turnFrames)
     m_rotTargetY = targetRot;
     m_turnBaseSpeed =
         Math.DstRot(m_rotBaseY, m_rotTargetY) / static_cast<float>(turnFrames);
-    m_attackColliders[0].m_localStart.x = static_cast<float>(turnFrames);
+    *reinterpret_cast<int*>(&m_attackColliders[0].m_localStart.x) = turnFrames;
 
     int animSlot = 2;
     if (m_turnBaseSpeed >= sZeroFloat) {

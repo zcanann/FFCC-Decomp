@@ -1582,7 +1582,7 @@ inline void CMenuPcs::SingCalcChara(float frameStep)
     scaleMtx[0][3] = 0.0f;
     scaleMtx[2][3] = 0.0f;
 
-    model->m_flags10C = (model->m_flags10C & 0x7F) | 0x80;
+    model->m_flags10CBits.m_flag10C_80 = 1;
     model->SetMatrix(scaleMtx);
     model->CalcMatrix();
     model->CalcSkin();
@@ -1893,10 +1893,10 @@ void CMenuPcs::SingleCalcFadeIn()
         } while (count != 0);
     }
 
-    if (m_wm.m_handles[0]->m_model->m_animEnd < m_wm.m_handles[0]->m_model->m_time) {
-        m_wm.m_handles[0]->m_model->SetFrame(0.0f);
-    } else {
+    if (m_wm.m_handles[0]->m_model->m_time < m_wm.m_handles[0]->m_model->m_animEnd) {
         m_wm.m_handles[0]->m_model->AddFrame(1.0f);
+    } else {
+        m_wm.m_handles[0]->m_model->SetFrame(0.0f);
     }
 
     unsigned short modelScaleIndex = SingleCaravanWork()->m_tribeId;
@@ -1907,7 +1907,7 @@ void CMenuPcs::SingleCalcFadeIn()
     scaleMtx[0][3] = 0.0f;
     scaleMtx[2][3] = 0.0f;
 
-    m_wm.m_handles[0]->m_model->m_flags10C = (m_wm.m_handles[0]->m_model->m_flags10C & 0x7F) | 0x80;
+    m_wm.m_handles[0]->m_model->m_flags10CBits.m_flag10C_80 = 1;
     m_wm.m_handles[0]->m_model->SetMatrix(scaleMtx);
     m_wm.m_handles[0]->m_model->CalcMatrix();
     m_wm.m_handles[0]->m_model->CalcSkin();
@@ -1992,10 +1992,10 @@ void CMenuPcs::SingleCalcFadeOut()
         } while (count != 0);
     }
 
-    if (m_wm.m_handles[0]->m_model->m_animEnd < m_wm.m_handles[0]->m_model->m_time) {
-        m_wm.m_handles[0]->m_model->SetFrame(0.0f);
-    } else {
+    if (m_wm.m_handles[0]->m_model->m_time < m_wm.m_handles[0]->m_model->m_animEnd) {
         m_wm.m_handles[0]->m_model->AddFrame(1.0f);
+    } else {
+        m_wm.m_handles[0]->m_model->SetFrame(0.0f);
     }
 
     unsigned short modelScaleIndex = SingleCaravanWork()->m_tribeId;
@@ -2006,7 +2006,7 @@ void CMenuPcs::SingleCalcFadeOut()
     scaleMtx[0][3] = 0.0f;
     scaleMtx[2][3] = 0.0f;
 
-    m_wm.m_handles[0]->m_model->m_flags10C = (m_wm.m_handles[0]->m_model->m_flags10C & 0x7F) | 0x80;
+    m_wm.m_handles[0]->m_model->m_flags10CBits.m_flag10C_80 = 1;
     m_wm.m_handles[0]->m_model->SetMatrix(scaleMtx);
     m_wm.m_handles[0]->m_model->CalcMatrix();
     m_wm.m_handles[0]->m_model->CalcSkin();
@@ -2061,10 +2061,10 @@ void CMenuPcs::SingleCalcCtrl()
     }
 
     int result = 0;
-    if (m_wm.m_handles[0]->m_model->m_animEnd < m_wm.m_handles[0]->m_model->m_time) {
-        m_wm.m_handles[0]->m_model->SetFrame(0.0f);
-    } else {
+    if (m_wm.m_handles[0]->m_model->m_time < m_wm.m_handles[0]->m_model->m_animEnd) {
         m_wm.m_handles[0]->m_model->AddFrame(1.0f);
+    } else {
+        m_wm.m_handles[0]->m_model->SetFrame(0.0f);
     }
 
     unsigned short modelScaleIndex = SingleCaravanWork()->m_tribeId;
@@ -2075,7 +2075,7 @@ void CMenuPcs::SingleCalcCtrl()
     scaleMtx[0][3] = 0.0f;
     scaleMtx[2][3] = 0.0f;
 
-    m_wm.m_handles[0]->m_model->m_flags10C = (m_wm.m_handles[0]->m_model->m_flags10C & 0x7F) | 0x80;
+    m_wm.m_handles[0]->m_model->m_flags10CBits.m_flag10C_80 = 1;
     m_wm.m_handles[0]->m_model->SetMatrix(scaleMtx);
     m_wm.m_handles[0]->m_model->CalcMatrix();
     m_wm.m_handles[0]->m_model->CalcSkin();

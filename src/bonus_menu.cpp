@@ -2633,13 +2633,13 @@ void CMenuPcs::DrawResultOpenAnim()
 						handle->Draw(5);
 						RestoreProjection();
 					}
-					lastKind = kind;
+					lastKind = sprite->kind;
 					modelIndex++;
 				} else {
 					if (lastKind < 0) {
 						DrawInit();
 					}
-					if (lastKind != 0x17 && kind == 0x17) {
+					if (lastKind != 0x17 && sprite->kind == 0x17) {
 						MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
 					} else if (lastKind == 0x17 && kind != 0x17) {
 						MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));

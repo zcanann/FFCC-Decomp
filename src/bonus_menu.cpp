@@ -2783,13 +2783,9 @@ void CMenuPcs::CalcResultOpenAnim()
 	const int frameBase = 1;
 
 	if (*(signed char*)(this->m_bonusStatePtr + 0xb) == 0) {
-		int animPtr = this->m_bonusAnimPtr;
-		BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
-		BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
-
 		this->m_bonusAlpha = 0;
 		Sound.PlaySe(0x46, 0x40, 0x7f, 0);
-		memset((void*)animPtr, 0, sizeof(BonusAnimList));
+		memset((void*)this->m_bonusAnimPtr, 0, sizeof(BonusAnimList));
 
 		{
 			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + 8);
@@ -2821,7 +2817,7 @@ void CMenuPcs::CalcResultOpenAnim()
 
 		int base = frameBase + activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* sprite = &sprites[base + i];
+			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
 			unsigned int partySlot = s_Rinfo->m_party[i].m_partySlot;
 			sprite->kind = 0x18;
 			sprite->x = ((1 <= i) && (i <= 2)) ? 0x30 : 0x48;
@@ -2833,9 +2829,11 @@ void CMenuPcs::CalcResultOpenAnim()
 			int texY = ((int)partySlot >> 1) ? (int)sprite->h : 0;
 			sprite->mulY = (float)texY;
 			if (i == 0) {
-				sprite->startFrame = sprites[frameBase].startFrame + sprites[frameBase].duration + 0x18;
+				BonusAnimSprite* frame = (BonusAnimSprite*)(this->m_bonusAnimPtr + frameBase * 0x40 + 8);
+				sprite->startFrame = frame->startFrame + frame->duration + 0x18;
 			} else {
-				sprite->startFrame = sprites[base + i - 1].startFrame + 3;
+				BonusAnimSprite* prev = (BonusAnimSprite*)(this->m_bonusAnimPtr + (base + i - 1) * 0x40 + 8);
+				sprite->startFrame = prev->startFrame + 3;
 			}
 			sprite->duration = 8;
 			sprite->depth = 1.0f;
@@ -2978,9 +2976,9 @@ void CMenuPcs::CalcResultOpenAnim()
 			}
 		}
 
-		header->count = (short)(countTop + activePartyCount);
+		((BonusAnimHeader*)this->m_bonusAnimPtr)->count = (short)(countTop + activePartyCount);
 		*(unsigned char*)(this->m_bonusStatePtr + 0xb) = 1;
-		header->finished = 0;
+		((BonusAnimHeader*)this->m_bonusAnimPtr)->finished = 0;
 		return;
 	}
 

@@ -61,7 +61,7 @@ void CMenuPcs::CompaDraw()
 
 	const CCaravanWork* caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	CompaOpenAnim* entry = this->m_compaList->entries;
-	for (unsigned int i = 0; i < this->m_compaList->count; i++) {
+	for (int i = 0; i < this->m_compaList->count; i++) {
 		int tex = entry->tex;
 		if (tex >= 0) {
 			float x = static_cast<float>(entry->x);
@@ -73,7 +73,7 @@ void CMenuPcs::CompaDraw()
 
 			if (i < 3) {
 				MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
-				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
+				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(entry->tex));
 
 				GXColor colors[4];
 				colors[0].r = 0xFF;
@@ -185,7 +185,7 @@ void CMenuPcs::CompaDraw()
 		}
 		i++;
 	} while (i < 7);
-	if (familyCount > 4 && System.m_execParam >= 1) {
+	if (familyCount > 4 && static_cast<unsigned int>(System.m_execParam) >= 1) {
 		System.Printf(const_cast<char*>(sCompaFamilyCountErrorFmt), s_menu_compa_cpp, 0x1BF,
 		              familyCount);
 	}
@@ -193,18 +193,21 @@ void CMenuPcs::CompaDraw()
 		familyCount = 4;
 	}
 
-	for (unsigned int i = 0; i < familyCount; i++) {
+	for (int i = 0; i < familyCount; i++) {
 		MenuPcs.DrawRect(
 			0,
 			static_cast<float>(compaList->entries[0].x + 0x10),
-			static_cast<float>(compaList->entries[0].y + 0x40 + i * 0x28),
+			static_cast<float>(compaList->entries[0].y + 0x40) + static_cast<float>(i * 0x28),
 			kCompaFoodIconWidth, kCompaFoodIconHeight, kCompaZero, kCompaZero, kCompaOne,
 			kCompaOne, kCompaZero);
 	}
 
 	int memberIndex = 0;
-	unsigned int shown = 0;
+	int shown = 0;
 	for (int i = 0; i < 8 && shown < familyCount; i++) {
+		float iconX = static_cast<float>(compaList->entries[0].x + 0x128);
+		float iconY = static_cast<float>(compaList->entries[0].y + 0x40);
+
 		int drawIndex = shown;
 		if (shown > 1) {
 			drawIndex = memberIndex;
@@ -219,12 +222,12 @@ void CMenuPcs::CompaDraw()
 		}
 
 		const u8* foodPtr = &Game.m_gameWork.m_linkTable[caravanWork->m_saveSlot][0][caravanWork->m_saveSlot][drawIndex + 1];
-		if (*foodPtr == 0 && System.m_execParam >= 1) {
+		if (*foodPtr == 0 && static_cast<unsigned int>(System.m_execParam) >= 1) {
 			System.Printf(const_cast<char*>(sCompaFamilyCountErrorFmt), s_menu_compa_cpp, 0x1E0,
 			              shown);
 		}
-		u8 food = *foodPtr;
-		int icon = 0x1D;
+		unsigned int food = *foodPtr;
+		int icon;
 		if (food <= 0x14) {
 			icon = 0x21;
 		} else if (food <= 0x28) {
@@ -233,12 +236,14 @@ void CMenuPcs::CompaDraw()
 			icon = 0x1F;
 		} else if (food <= 0x50) {
 			icon = 0x1E;
+		} else {
+			icon = 0x1D;
 		}
 
 		DrawSingleIcon(
 			icon,
-			static_cast<int>(compaList->entries[0].x + 0x128),
-			static_cast<int>(compaList->entries[0].y + 0x40 + shown * 0x28),
+			static_cast<int>(iconX),
+			static_cast<int>(iconY + static_cast<float>(shown * 0x28)),
 			compaList->entries[0].alpha, 1, kCompaOne);
 
 		shown++;
@@ -258,7 +263,7 @@ void CMenuPcs::CompaDraw()
 	const CCaravanWork* nameWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	memberIndex = 0;
 	shown = 0;
-	for (unsigned int i = 0; i < 8 && shown < familyCount; i++) {
+	for (int i = 0; i < 8 && shown < familyCount; i++) {
 		int drawIndex = shown;
 		if (shown > 1) {
 			drawIndex = memberIndex;
@@ -273,15 +278,15 @@ void CMenuPcs::CompaDraw()
 		}
 
 		const char* name = GetMenuStr(drawIndex + 0x16);
-		float y = static_cast<float>(compaList->entries[0].y + 0x45 + shown * 0x28) - kCompaTextYOffset;
+		float y = static_cast<float>(compaList->entries[0].y + 0x45) + static_cast<float>(shown * 0x28);
 		font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x18));
-		font->SetPosY(y);
+		font->SetPosY(y - kCompaTextYOffset);
 		font->Draw(name);
 
 		short food = nameWork->m_evtWordArr[19 + drawIndex];
 		const char* value = Game.m_cFlatDataArr[1].TableStrings(2)[food];
 		font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x90));
-		font->SetPosY(y);
+		font->SetPosY(y - kCompaTextYOffset);
 		font->Draw(value);
 
 		shown++;
@@ -293,13 +298,14 @@ void CMenuPcs::CompaDraw()
 	font->SetShadow(0);
 	font->SetScale(kCompaJobFontScale);
 	font->DrawInit();
-	GXColor jobColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(kCompaColorMax * compaList->entries[0].alpha)).color;
+	GXColor jobColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(kCompaColorMax * this->m_compaList->entries[0].alpha)).color;
 	font->SetColor(jobColor);
 
 	const char* job = GetJobStr(nameWork->unk_0x3ac);
 	font->GetWidth(job);
+	float jobY = static_cast<float>(compaList->entries[0].y + 0x20);
 	font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x18));
-	font->SetPosY(static_cast<float>(compaList->entries[0].y + 0x20) - kCompaTextYOffset - kCompaJobYOffset);
+	font->SetPosY(jobY - kCompaTextYOffset - kCompaJobYOffset);
 	font->Draw(job);
 
 	DrawInit();

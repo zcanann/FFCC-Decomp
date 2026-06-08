@@ -2878,7 +2878,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 			if (effectId < 0x46F) {
 				if (effectId > 0x46C) {
 					if (effectArg0 == 2) {
-						if (m_stateFrame > 0xF) {
+						if (m_stateFrame >= 0x10) {
 							CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | 0x1D);
 							float rand0 = Math.RandFPM(kCharaObjForwardParticleOffset);
 							float rand1 = Math.RandFPM(kCharaObjForwardParticleOffset);

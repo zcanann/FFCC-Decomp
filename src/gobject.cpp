@@ -33,15 +33,6 @@ extern double DOUBLE_80330400;
 extern const Vec DAT_801D9B88;
 extern const Vec DAT_801D9B94;
 
-struct GObjectMapCylinder {
-    Vec m_bottom;
-    CMapCylinderProbeView m_probe;
-
-    CMapCylinderProbeView& Probe() { return m_probe; }
-    const CMapCylinderProbeView& Probe() const { return m_probe; }
-};
-typedef char GObjectMapCylinder_size_check[(sizeof(GObjectMapCylinder) == sizeof(CMapCylinder)) ? 1 : -1];
-
 struct CModelAnimState {
     u8 _padB4[0xB4];
     float m_time;

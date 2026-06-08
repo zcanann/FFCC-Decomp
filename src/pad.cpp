@@ -320,14 +320,15 @@ void CPad::Frame()
 				puVar12[0x26] = static_cast<u16>(*reinterpret_cast<u16*>(iVar6 + 0x34) | *puVar12);
 				if (iVar14 == 0)
 				{
+					u8* p12 = reinterpret_cast<u8*>(puVar12);
 					uVar8 = *puVar18;
-					*reinterpret_cast<u16*>(iVar6 + 0x0C) = *reinterpret_cast<u16*>(iVar6 + 0x0E);
+					*reinterpret_cast<u16*>(p12 + 0x08) = *reinterpret_cast<u16*>(p12 + 0x0A);
 					uVar16 = (__cntlzw(1 - (uVar8 & 0x3FFF)) >> 5) & 0xFF;
-					*reinterpret_cast<s8*>(iVar6 + 0x44) = *reinterpret_cast<s8*>(puVar13 + 5);
-					*reinterpret_cast<u32*>(iVar6 + 0x54) = uVar16;
-					*reinterpret_cast<u32*>(iVar6 + 0x48) = 0;
-					*reinterpret_cast<u32*>(iVar6 + 0x3C) = 0;
-					*reinterpret_cast<u32*>(iVar6 + 0x40) = 0;
+					*reinterpret_cast<s8*>(p12 + 0x40) = *reinterpret_cast<s8*>(puVar13 + 5);
+					*reinterpret_cast<u32*>(p12 + 0x50) = uVar16;
+					*reinterpret_cast<u32*>(p12 + 0x44) = 0;
+					*reinterpret_cast<u32*>(p12 + 0x38) = 0;
+					*reinterpret_cast<u32*>(p12 + 0x3C) = 0;
 					if ((*reinterpret_cast<s8*>(iVar6 + 0x44) == 0) || reinterpret_cast<CPad::Gba*>(puVar18)->noController)
 					{
 						if (reinterpret_cast<CPad::Gba*>(puVar18)->noController)

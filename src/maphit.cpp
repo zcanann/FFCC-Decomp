@@ -533,14 +533,16 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
                 PSVECSubtract(&edgeEnd, &edgeStart, &edge);
                 PSVECSubtract(&point, &edgeEnd, &toPoint);
                 PSVECCrossProduct(&edge, &toPoint, &cross);
-                if (cross.z <= kMapHitZero) {
-                    sideMask &= 2;
-                } else {
+                if (cross.z >= kMapHitZero) {
                     sideMask &= 1;
-                }
-
-                if (sideMask == 0) {
-                    break;
+                    if (sideMask == 0) {
+                        break;
+                    }
+                } else if (cross.z <= kMapHitZero) {
+                    sideMask &= 2;
+                    if (sideMask == 0) {
+                        break;
+                    }
                 }
 
                 previous = current;
@@ -563,14 +565,16 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
                 PSVECSubtract(&edgeEnd, &edgeStart, &edge);
                 PSVECSubtract(&point, &edgeEnd, &toPoint);
                 PSVECCrossProduct(&edge, &toPoint, &cross);
-                if (cross.z <= kMapHitZero) {
-                    sideMask &= 2;
-                } else {
+                if (cross.z >= kMapHitZero) {
                     sideMask &= 1;
-                }
-
-                if (sideMask == 0) {
-                    break;
+                    if (sideMask == 0) {
+                        break;
+                    }
+                } else if (cross.z <= kMapHitZero) {
+                    sideMask &= 2;
+                    if (sideMask == 0) {
+                        break;
+                    }
                 }
 
                 previous = current;
@@ -593,14 +597,16 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
                 PSVECSubtract(&edgeEnd, &edgeStart, &edge);
                 PSVECSubtract(&point, &edgeEnd, &toPoint);
                 PSVECCrossProduct(&edge, &toPoint, &cross);
-                if (cross.z <= kMapHitZero) {
-                    sideMask &= 2;
-                } else {
+                if (cross.z >= kMapHitZero) {
                     sideMask &= 1;
-                }
-
-                if (sideMask == 0) {
-                    break;
+                    if (sideMask == 0) {
+                        break;
+                    }
+                } else if (cross.z <= kMapHitZero) {
+                    sideMask &= 2;
+                    if (sideMask == 0) {
+                        break;
+                    }
                 }
 
                 previous = current;

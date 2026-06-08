@@ -506,21 +506,43 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
         *reinterpret_cast<u32*>(dstCharData + 0x8D0) = *reinterpret_cast<u32*>(srcSaveData + 0x13D8);
 
         u8* dstWork = dstSaveData + dstChar * 0x200;
-        for (int i = 0; i < 8; i++)
+        int i = 0;
+        do
         {
             u8* item = dstWork + dstChar * 8;
             int row = 0;
             for (int j = 0; j < 2; j++)
             {
-                item[0xC0] = ((i == 0) && (row == 0)) ? 0x32 : 0;
-                item[0xC1] = ((i == 0) && (row == -1)) ? 0x32 : 0;
-                item[0xC2] = ((i == 0) && (row == -2)) ? 0x32 : 0;
-                item[0xC3] = ((i == 0) && (row == -3)) ? 0x32 : 0;
+                u8 a = 0;
+                if ((i == 0) && (row == 0))
+                {
+                    a = 1;
+                }
+                u8 b = 0;
+                item[0xC0] = (-a | a) >> 0x1F & 0x32;
+                if ((i == 0) && (row == -1))
+                {
+                    b = 1;
+                }
+                a = 0;
+                item[0xC1] = (-b | b) >> 0x1F & 0x32;
+                if ((i == 0) && (row == -2))
+                {
+                    a = 1;
+                }
+                b = 0;
+                item[0xC2] = (-a | a) >> 0x1F & 0x32;
+                if ((i == 0) && (row == -3))
+                {
+                    b = 1;
+                }
                 row += 4;
+                item[0xC3] = (-b | b) >> 0x1F & 0x32;
                 item += 4;
             }
+            i++;
             dstWork += 0x40;
-        }
+        } while (i < 8);
 
         memset(dstCharData + 0xC8, 0xFF, 0x10);
         memset(dstCharData + 0xD8, 0, 0x10);
@@ -1481,12 +1503,12 @@ void CMemoryCardMan::SetLoadData()
 
     for (unsigned int i = 0; i < 4; i++)
     {
-        CCaravanWork* wmWork = &Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[i]];
-        if (wmWork->m_shopState == 0)
+        int idx = Game.m_gameWork.m_wmBackupParams[i];
+        if (Game.m_caravanWorkArr[idx].m_shopState == 0)
         {
             Game.m_gameWork.m_wmBackupParams[i] = -1;
         }
-        if (wmWork->m_shopBusyFlag != 0)
+        if (Game.m_caravanWorkArr[idx].m_shopBusyFlag != 0)
         {
             Game.m_gameWork.m_wmBackupParams[i] = -1;
         }
@@ -1542,12 +1564,12 @@ void CMemoryCardMan::MakeSaveData()
     CGame* g = &Game;
     for (int i = 0; i < 4; i++)
     {
-        CCaravanWork* cw = &g->m_caravanWorkArr[g->m_gameWork.m_wmBackupParams[i]];
-        if (cw->m_shopState == 0)
+        int idx = g->m_gameWork.m_wmBackupParams[i];
+        if (g->m_caravanWorkArr[idx].m_shopState == 0)
         {
             g->m_gameWork.m_wmBackupParams[i] = -1;
         }
-        if (cw->m_shopBusyFlag != 0)
+        if (g->m_caravanWorkArr[idx].m_shopBusyFlag != 0)
         {
             g->m_gameWork.m_wmBackupParams[i] = -1;
         }

@@ -1122,10 +1122,9 @@ int CFlatRuntime::request(CFlatRuntime::CObject* object, int systemKind, int sys
 	const int reqFlagIndex = *reinterpret_cast<int*>(func + 0x48);
 	if (reqFlagIndex >= 0) {
 		unsigned int reqFlags = static_cast<unsigned int>(*reinterpret_cast<u16*>(targetObject + 0x34));
-		int scanCount = 4;
 		int highestBit = 0x1F;
 
-		do {
+		for (int scanCount = 0; scanCount < 4; scanCount++) {
 			for (int bit = 0; bit < 8; bit++) {
 				if ((reqFlags & 0x80000000) != 0) {
 					goto foundBit;
@@ -1133,8 +1132,7 @@ int CFlatRuntime::request(CFlatRuntime::CObject* object, int systemKind, int sys
 				reqFlags <<= 1;
 				highestBit--;
 			}
-			scanCount--;
-		} while (scanCount != 0);
+		}
 
 		highestBit = -1;
 	foundBit:

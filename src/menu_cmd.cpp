@@ -830,7 +830,7 @@ int CMenuPcs::CmdCtrl()
 	}
 
 	CmdListStorage* list = GetCmdListStorage(this);
-	for (s32 i = 0; i < static_cast<s32>(list->count); i++) {
+	for (u32 i = 0; i < static_cast<s32>(list->count); i++) {
 		list->entries[i].alpha = kCmdMenuOne;
 		list->entries[i].scale = kCmdMenuOne;
 	}
@@ -1506,7 +1506,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 	s32 mode = GetCmdStateView(this)->mode;
 
 	if (mode == 0) {
-		s16 cmdCount = caravanWork->m_numCmdListSlots;
+		u16 cmdCount = caravanWork->m_numCmdListSlots;
 
 		if ((hold & 8) == 0) {
 			if ((hold & 4) != 0) {
@@ -2262,7 +2262,7 @@ void CMenuPcs::DrawUniteList()
 		color.r = 0xFF;
 		color.g = 0xFF;
 		color.b = 0xFF;
-		color.a = static_cast<u8>(kCmdMenuAlphaMax * entry->alpha);
+		color.a = static_cast<s8>(kCmdMenuAlphaMax * entry->alpha);
 		GXSetChanMatColor((_GXChannelID)4, color);
 
 		s32 groupSize = 1;
@@ -2360,7 +2360,7 @@ void CMenuPcs::DrawUniteList()
 			continue;
 		}
 
-		s32 groupSize = 2;
+		u32 groupSize = 2;
 		if ((i + 2 < 8) && (caravan->m_commandListExtra[i + 2] == -1)) {
 			groupSize = 3;
 		}

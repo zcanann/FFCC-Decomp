@@ -810,7 +810,7 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 	object->m_codeIndex.m_codeFunc = -1;
 	object->m_argCount = 0;
 
-	u32 allowKeep = 1;
+	int allowKeep = 1;
 	if (classIndex == -1) {
 		allowKeep = static_cast<u32>(__cntlzw(*reinterpret_cast<u32*>(self + 0x970))) >> 5 & 0xFF;
 	}

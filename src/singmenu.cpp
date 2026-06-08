@@ -2577,27 +2577,16 @@ void CMenuPcs::DrawEquipMark(int x, int y, float alpha)
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-    union {
-        u32 word;
-        _GXColor color;
-    } color;
-    color.word = 0xFFFFFF00;
-    color.color.a = static_cast<u8>(static_cast<int>(255.0f * alpha));
-    GXSetChanMatColor(GX_COLOR0A0, color.color);
+    _GXColor color;
+    color.r = 0xFF;
+    color.g = 0xFF;
+    color.b = 0xFF;
+    color.a = static_cast<u8>(static_cast<int>(255.0f * alpha));
+    GXSetChanMatColor(GX_COLOR0A0, color);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2C));
 
-    union {
-        double value;
-        u32 words[2];
-    } xPos, yPos;
-
-    xPos.words[0] = 0x43300000;
-    xPos.words[1] = static_cast<u32>(x) ^ 0x80000000U;
-    yPos.words[0] = 0x43300000;
-    yPos.words[1] = static_cast<u32>(y) ^ 0x80000000U;
-
-    MenuPcs.DrawRect(0, static_cast<float>(xPos.value - 4503601774854144.0),
-        static_cast<float>(yPos.value - 4503601774854144.0), 24.0f, 24.0f, 0.0f, 0.0f,
+    MenuPcs.DrawRect(0, static_cast<float>(x),
+        static_cast<float>(y), 24.0f, 24.0f, 0.0f, 0.0f,
         1.0f, 1.0f, 0.0f);
 }
 

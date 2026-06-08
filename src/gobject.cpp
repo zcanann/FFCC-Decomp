@@ -2251,17 +2251,16 @@ void CGObject::moveVectorRot(float rotX, float rotY, float moveTimer, int turnFr
     const float cosY1 = static_cast<float>(cos(rotY));
     const float cosX = static_cast<float>(cos(rotX));
 
-    u8* const weaponFlagsHi = reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1;
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 5, 26, 26));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 4, 27, 27));
+    m_weaponNodeFlagAll.m_bits1.m_bit20 = 1;
+    m_weaponNodeFlagAll.m_bits1.m_bit10 = 1;
     m_turnFrames = static_cast<u32>(turnFrames);
     m_moveTarget.x = sinX * cosY0;
     m_moveTarget.y = sinY;
     m_moveTarget.z = cosX * cosY1;
     m_moveTimer = moveTimer;
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 3, 28, 28));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 1, 30, 30));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 2, 29, 29));
+    m_weaponNodeFlagAll.m_bits1.m_bit08 = 1;
+    m_weaponNodeFlagAll.m_bits1.m_bit02 = 0;
+    m_weaponNodeFlagAll.m_bits1.m_bit04 = 1;
 }
 
 /*
@@ -2317,15 +2316,14 @@ void CGObject::moveVector(Vec* moveVec, float moveTimer, int turnFrames)
         PSVECScale(moveVec, &unitVec, sAnimFrameOffset / mag);
     }
 
-    u8* const weaponFlagsHi = reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1;
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 5, 26, 26));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 4, 27, 27));
+    m_weaponNodeFlagAll.m_bits1.m_bit20 = 1;
+    m_weaponNodeFlagAll.m_bits1.m_bit10 = 1;
     m_turnFrames = static_cast<u32>(turnFrames);
     m_moveTarget = unitVec;
     m_moveTimer = moveTimer;
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 3, 28, 28));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 1, 30, 30));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 2, 29, 29));
+    m_weaponNodeFlagAll.m_bits1.m_bit08 = 1;
+    m_weaponNodeFlagAll.m_bits1.m_bit02 = 0;
+    m_weaponNodeFlagAll.m_bits1.m_bit04 = 1;
 }
 
 /*

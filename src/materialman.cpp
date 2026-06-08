@@ -2484,47 +2484,48 @@ void CMaterialMan::SetPosition(
             }
 
             Vec delta;
-            if (ignoreFrustumCheck != 0) {
-                PSVECSubtract(&shadowPos, position, &delta);
-                candidateWrite->distance = PSVECSquareMag(&delta);
-                candidateWrite->shadow = shadow;
-                candidateWrite->index = i;
-                candidateWrite++;
-                candidateCount++;
-            } else {
-                if ((shadow->m_yFilterMode == 1) && (position->y < shadowPos.y)) {
-                    continue;
-                }
-                if ((shadow->m_yFilterMode == 2) && (position->y > shadowPos.y)) {
-                    continue;
-                }
-                if (reinterpret_cast<CBound*>(searchBoundStorage)
-                        ->CheckFrustum(shadowPos, scaledShadowMtx, kMaterialShadowBoundsRadius) == 0) {
-                    continue;
-                }
-                PSVECSubtract(&shadowPos, position, &delta);
-                candidateWrite->distance = PSVECSquareMag(&delta);
-                candidateWrite->shadow = shadow;
-                candidateWrite->index = i;
-                candidateWrite++;
-                candidateCount++;
+            if (ignoreFrustumCheck == 0) {
+                goto frustumCheck;
+            }
+
+        writeCandidate:
+            PSVECSubtract(&shadowPos, position, &delta);
+            candidateWrite->distance = PSVECSquareMag(&delta);
+            candidateWrite->shadow = shadow;
+            candidateWrite->index = i;
+            candidateWrite++;
+            candidateCount++;
+            continue;
+
+        frustumCheck:
+            if ((shadow->m_yFilterMode == 1) && (position->y < shadowPos.y)) {
+                continue;
+            }
+            if ((shadow->m_yFilterMode == 2) && (position->y > shadowPos.y)) {
+                continue;
+            }
+            if (reinterpret_cast<CBound*>(searchBoundStorage)
+                    ->CheckFrustum(shadowPos, scaledShadowMtx, kMaterialShadowBoundsRadius) != 0) {
+                goto writeCandidate;
             }
         }
 
+        float maxDist = kMaterialMaxDistance;
+        float candidateDist;
         ShadowCandidate* nearest = 0;
         float nearestDist = kMaterialNearestDistanceInit;
         ShadowCandidate* candidateRead = shadowCandidates;
         for (int i = 0; i < candidateCount; i++) {
-            float candidateDist = candidateRead->distance;
+            candidateDist = candidateRead->distance;
             if (nearestDist > candidateDist) {
-                nearest = candidateRead;
                 nearestDist = candidateDist;
+                nearest = candidateRead;
             }
             candidateRead++;
         }
 
         if (nearest != 0) {
-            nearest->distance = kMaterialMaxDistance;
+            nearest->distance = maxDist;
             SetShadow(*nearest->shadow, viewMtx, nearest->index, 0xFFFFFFFF);
         }
     } else {
@@ -2620,13 +2621,12 @@ int CMaterialMan::GetCharaShadow(
             continue;
         }
 
-        bool yFilterPass =
-            !((shadow->m_yFilterMode == 1) && (position->y < shadowPos.y)) &&
-            !((shadow->m_yFilterMode == 2) && (position->y > shadowPos.y));
-        if ((ignoreFrustumCheck != 0) ||
-            (yFilterPass &&
-             (reinterpret_cast<CBound*>(searchBoundStorage)
-                  ->CheckFrustum(shadowPos, scaledShadowMtx, kMaterialShadowBoundsRadius) != 0))) {
+        if (ignoreFrustumCheck == 0) {
+            goto frustumCheck;
+        }
+
+    writeCandidate:
+        {
             Vec delta;
             PSVECSubtract(&shadowPos, position, &delta);
             candidateWrite->distance = PSVECSquareMag(&delta);
@@ -2634,6 +2634,19 @@ int CMaterialMan::GetCharaShadow(
             candidateWrite->index = i;
             candidateWrite++;
             candidateCount++;
+        }
+        continue;
+
+    frustumCheck:
+        if ((shadow->m_yFilterMode == 1) && (position->y < shadowPos.y)) {
+            continue;
+        }
+        if ((shadow->m_yFilterMode == 2) && (position->y > shadowPos.y)) {
+            continue;
+        }
+        if (reinterpret_cast<CBound*>(searchBoundStorage)
+                ->CheckFrustum(shadowPos, scaledShadowMtx, kMaterialShadowBoundsRadius) != 0) {
+            goto writeCandidate;
         }
     }
 

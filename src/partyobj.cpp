@@ -1333,7 +1333,7 @@ void CGPartyObj::command()
 
 			CGObject* scriptTarget = party.secondaryTarget != nullptr ?
 				reinterpret_cast<CGObject*>(party.secondaryTarget) : party.target;
-			party.commandFlags |= 0x80;
+			party.partyFlags |= 0x80;
 
 			CFlatRuntime::CStack stack[2];
 			stack[0].m_word = primaryCommand;

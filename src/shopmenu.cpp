@@ -3258,9 +3258,8 @@ mode_3_6_common:
         m_resultParam = -1;
         m_itemCount = 0;
 
-        CMenuPcs* menuPcs = &MenuPcs;
         for (int i = 0; i < 0x40; i++) {
-            if (menuPcs->GetItemType(i, 0) == 9) {
+            if (MenuPcs.GetItemType(i, 0) == 9) {
                 int count = m_itemCount;
                 m_itemCount = count + 1;
                 m_itemTable[count] = i;

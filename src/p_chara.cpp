@@ -465,7 +465,8 @@ static inline CMemory::CStage* HandleModelStage(int charaKind, int specialModelS
 
 static inline CMemory::CStage* HandleTextureStage(int charaKind)
 {
-    CMemory::CStage* stage = charaKind == 4 ? CharaPcs.m_weaponTextureStage : CharaPcs.m_viewerTextureStage;
+    int index = charaKind == 4 ? 3 : 1;
+    CMemory::CStage* stage = (&CharaPcs.m_viewerModelStage)[index];
     return SelectLoadStage(&CharaPcs, stage);
 }
 

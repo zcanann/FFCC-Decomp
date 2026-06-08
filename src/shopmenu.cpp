@@ -1238,7 +1238,6 @@ void CShopMenu::DrawBuySellInfo()
     int itemNo = -1;
     bool canTrade = false;
     if (m_selectedIndex != -1) {
-        const CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
         itemNo = getItemNo(m_selectedIndex);
 
         if (itemNo > 0) {
@@ -1246,7 +1245,7 @@ void CShopMenu::DrawBuySellInfo()
                 canTrade = true;
             } else if (m_listType == 2) {
                 unsigned int bit = static_cast<unsigned int>(itemNo - 0x191);
-                canTrade = (caravanWork->m_shopArgs[(itemNo - 0x191) >> 5] &
+                canTrade = (ShopMenuCaravanWork(this)->m_shopArgs[(itemNo - 0x191) >> 5] &
                             (1U << (bit & 0x1F))) != 0;
             } else if ((m_listType == 1) && MenuPcs.EquipChk(m_selectedIndex) == 0 && itemNo >= 0x9F) {
                 canTrade = true;

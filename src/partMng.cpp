@@ -4356,7 +4356,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
 
     const signed char mode = *reinterpret_cast<signed char*>(fpData2 + 0x05);
     if (mode == 2 || mode == 4) {
-        mng->m_mapObjIndex = static_cast<short>(MapMng.GetMapObjEffectIdx(*reinterpret_cast<unsigned short*>(fpData2 + 0x08)));
+        mng->m_mapObjIndex = static_cast<short>(MapMng.GetMapObjEffectIdx(*reinterpret_cast<short*>(fpData2 + 0x08)));
     } else if (mode >= 3 && mode <= 8) {
         mng->m_ownerFacing = 0;
         CGObject* owner = reinterpret_cast<CGObject*>(createParam->m_paramB);

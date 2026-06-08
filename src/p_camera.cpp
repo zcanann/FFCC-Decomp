@@ -1528,13 +1528,13 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
         if (worldBound->CheckFrustum0(*clipBound) == 0) {
             continue;
         }
-        if (!(clipBoundData[0] > kCameraClipMinZ)) {
+        if (!(clipBoundData[2] > kCameraClipMinZ)) {
             continue;
         }
-        float negMinX = -clipBoundData[0];
-        float ratioZ = (clipBoundData[5] - clipBoundData[2]) / negMinX;
-        float ratioY = (clipBoundData[4] - clipBoundData[1]) / negMinX;
-        if (ratioZ > kCameraDebugRotateStep) {
+        float negMinZ = -clipBoundData[2];
+        float ratioX = (clipBoundData[3] - clipBoundData[0]) / negMinZ;
+        float ratioY = (clipBoundData[4] - clipBoundData[1]) / negMinZ;
+        if (ratioX > kCameraDebugRotateStep) {
             // proceed
         } else if (!(ratioY > kCameraDebugRotateStep)) {
             continue;

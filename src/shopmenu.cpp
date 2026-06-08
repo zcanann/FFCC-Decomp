@@ -1671,25 +1671,38 @@ void CShopMenu::Draw()
 
     MenuPcs.DrawInit();
 
-    int mode = m_mode;
-    if ((mode >= 0) && (mode < 3)) {
+    switch (m_mode) {
+    case 0:
+    case 1:
+    case 2:
         DrawShop0();
-    } else if (mode < 6) {
+        break;
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+    case 8:
         DrawShopBase();
         DrawItemList();
         DrawItemInfo0();
         DrawBuySellInfo();
-    } else if (mode < 9) {
-        DrawShopBase();
-        DrawItemList();
-        DrawItemInfo0();
-        DrawBuySellInfo();
-    } else if (mode < 0xC) {
+        break;
+    case 9:
+    case 0xA:
+    case 0xB:
         DrawSmith0();
-    } else if (mode < 0xF) {
+        break;
+    case 0xC:
+    case 0xD:
+    case 0xE:
         DrawMake();
-    } else if (mode < 0x12) {
+        break;
+    case 0xF:
+    case 0x10:
+    case 0x11:
         DrawSoubi();
+        break;
     }
 
     float fade = m_fade;

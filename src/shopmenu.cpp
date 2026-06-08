@@ -1538,7 +1538,7 @@ void CShopMenu::DrawBuySellInfo()
 
     SetupShopMenuUnitFont(font);
     font->DrawInit();
-    MenuPcs.DrawNoShadowFont(font, unitText, static_cast<float>(static_cast<int>(rightPrice)), FLOAT_80332d98, 0x19, 0x12);
+    MenuPcs.DrawNoShadowFont(font, unitText, static_cast<float>(static_cast<unsigned int>(rightPrice)), FLOAT_80332d98, 0x19, 0x12);
     MenuPcs.DrawInit();
 
     font->DrawInit();
@@ -1570,7 +1570,7 @@ void CShopMenu::DrawItemList()
     }
 
     for (int row = 0; row < m_visibleRows; ++row) {
-        unsigned int listType = m_listType;
+        int listType = m_listType;
         int itemCount = ResolveShopMenuItemCount(this);
 
         if (itemCount <= itemIndex) {
@@ -2865,7 +2865,7 @@ void CShopMenu::SelectItemIdx()
             if (canSelect) {
                 CCaravanWork* caravanWork = m_caravanWork;
                 if (m_quantity <= (0x40 - static_cast<unsigned short>(caravanWork->m_inventoryItemCount))) {
-                    int itemId = getItemNo(m_selectedIndex);
+                    unsigned int itemId = getItemNo(m_selectedIndex);
                     int unitGil;
                     if (m_listType == 0) {
                         if (itemId <= 0) {
@@ -3389,7 +3389,7 @@ void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, flo
 
     MaterialMan.SetMaterialMenu(
         ppvEnv->m_materialSetPtr,
-        static_cast<int>(*reinterpret_cast<signed char*>(reinterpret_cast<unsigned char*>(shape) + 10)), 0);
+        static_cast<int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(shape) + 10)), 0);
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
     GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);

@@ -3260,16 +3260,16 @@ void CMapMng::SetMeshCameraSemiTransRange(unsigned short id, float nearRange, fl
     }
 
     if (!found) {
-        if (System.m_execParam >= 1) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1) {
             System.Printf(g_MsgFlashy);
         }
-        if (System.m_execParam >= 1) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1) {
             System.Printf(const_cast<char*>(s_set_bg_transparent_missing_fmt), id);
         }
-        if (System.m_execParam >= 1) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1) {
             System.Printf(g_MsgFlashy);
         }
-        if (System.m_execParam >= 1) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1) {
             System.Printf(const_cast<char*>(s_mapNewLine));
         }
     }

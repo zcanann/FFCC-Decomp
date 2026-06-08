@@ -1560,8 +1560,12 @@ void CMenuPcs::destroyWorld()
 	int iVar4 = 4;
 	do {
 		void** piVar2 = reinterpret_cast<void**>(puVar5 + 0x10C);
-		if (*piVar2 != 0) {
-			releaseRefCounted(piVar2);
+		CRef* const obj = reinterpret_cast<CRef*>(*piVar2);
+		if (obj != 0) {
+			if (obj->DecRef() == 0) {
+				delete obj;
+			}
+			*piVar2 = 0;
 		}
 		iVar4 = iVar4 + 1;
 		puVar5 = puVar5 + 4;
@@ -1569,8 +1573,12 @@ void CMenuPcs::destroyWorld()
 
 	{
 		void** piVar2 = reinterpret_cast<void**>(&m_fonts[1]);
-		if (*piVar2 != 0) {
-			releaseRefCounted(piVar2);
+		CRef* const obj = reinterpret_cast<CRef*>(*piVar2);
+		if (obj != 0) {
+			if (obj->DecRef() == 0) {
+				delete obj;
+			}
+			*piVar2 = 0;
 		}
 	}
 

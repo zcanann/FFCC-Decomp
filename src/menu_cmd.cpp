@@ -2461,6 +2461,8 @@ void CMenuPcs::DrawUniteList()
 	}
 }
 
+#pragma push
+#pragma peephole off
 /*
  * --INFO--
  * PAL Address: 0x8014b7ec
@@ -2525,6 +2527,7 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 
 	return 0;
 }
+#pragma pop
 
 /*
  * --INFO--

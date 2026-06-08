@@ -1476,7 +1476,9 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
 
     if (SingleCaravanWork()->m_shopRequestState == 0) {
         int loadIndex = m_singleMenuTextureLoadIndex;
-        if (loadIndex < 2) {
+        if (loadIndex >= 2) {
+            gSingMenuAsyncLoadCompleted = 1;
+        } else {
             if (m_singleMenuTextureLoadState == 0) {
                 char path[260];
                 const char* language = Game.GetLangString();
@@ -1514,8 +1516,6 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
                 }
                 gSingMenuAsyncLoadCompleted = 1;
             }
-        } else {
-            gSingMenuAsyncLoadCompleted = 1;
         }
     }
 

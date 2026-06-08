@@ -115,19 +115,20 @@ int CMenuPcs::ChkEquipActive(int index)
 		return 0;
 	}
 
+	unsigned int active;
 	if (index == 0) {
 		if (equipIndex < 3) {
-			return 0;
+			active = 0;
+		} else {
+			active = (unsigned int)(int)caravanWork->m_equipment[equipIndex] >> 0x1f ^ 1;
 		}
+	} else {
+		unsigned int item = caravanWork->m_inventoryItems[itemEntries[index - 1]];
+		active = ChkEquipPossible(item);
 
-		return (unsigned int)(int)caravanWork->m_equipment[equipIndex] >> 0x1f ^ 1;
-	}
-
-	int item = caravanWork->m_inventoryItems[itemEntries[index - 1]];
-	unsigned int active = ChkEquipPossible(item);
-
-	if (((active & 0xff) != 0) && (GetEquipType(item) != equipIndex)) {
-		active = 0;
+		if (((active & 0xff) != 0) && (GetEquipType(item) != equipIndex)) {
+			active = 0;
+		}
 	}
 
 	return active;

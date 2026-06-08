@@ -2603,8 +2603,8 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 		for (CGObject* gObject = gCFlatRuntime2.FindGObjFirst(); gObject != 0;
 			 gObject = gCFlatRuntime2.FindGObjNext(gObject))
 		{
-			u8 previousCount = hitRaw->m_hitParams.m_hitObjectCount;
-			u8 objectSlot = 0;
+			int previousCount = hitRaw->m_hitParams.m_hitObjectCount;
+			int objectSlot = 0;
 			while ((objectSlot < previousCount) &&
 				   (hitRaw->m_hitObjectIds[objectSlot] != gObject->m_particleId))
 			{
@@ -2649,10 +2649,10 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 					{
 						gObject->HitParticle(partIndex, hitRaw->m_kind, hitRaw->m_nodeIndex, colliderIndex, &hitPos,
 											 &hitRaw->m_hitParams);
-						u8 newCount = hitRaw->m_hitParams.m_hitObjectCount;
+						int newCount = hitRaw->m_hitParams.m_hitObjectCount;
 						if (previousCount != newCount)
 						{
-							u8 updatedSlot = 0;
+							int updatedSlot = 0;
 							while ((updatedSlot < newCount) &&
 								   (hitRaw->m_hitObjectIds[updatedSlot] != gObject->m_particleId))
 							{

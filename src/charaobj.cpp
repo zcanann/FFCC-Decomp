@@ -201,6 +201,11 @@ static int& CharaObjComboScriptArg(CGCharaObj* charaObj)
 	return charaObj->m_comboScriptArg;
 }
 
+static int& CharaObjComboItemId(CGCharaObj* charaObj)
+{
+	return charaObj->m_itemId;
+}
+
 static unsigned int& CharaObjComboScriptMode(CGCharaObj* charaObj)
 {
 	return charaObj->m_comboScriptMode;
@@ -2785,7 +2790,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 			break;
 		}
 
-		if (effectId > 500) {
+		if (effectId >= 501) {
 			int itemType = *reinterpret_cast<unsigned short*>(itemData + 2);
 			int colType;
 			switch (itemType) {
@@ -3428,7 +3433,7 @@ void CGCharaObj::combi2()
 	int fallback = 0;
 	int comboIndex = searchCombi(candidateCount, candidates, fallback);
 	if (comboIndex < 0) {
-		if (fallback == 0 || candidates[0]->m_comboFrame > 0x41) {
+		if (fallback == 0 || candidates[0]->m_comboFrame >= 0x42) {
 			candidates[0]->m_comboState = 0;
 			candidates[0]->m_comboFrame = 0;
 			candidates[0]->addSubStat();
@@ -3456,8 +3461,8 @@ void CGCharaObj::combi2()
 		}
 	}
 
-	const short comboCmd = comboData[0xC];
-	const int isSharedResult = comboData[participantCount * 3 - 3] != 0x1F8;
+#define comboCmd (comboData[0xC])
+	const int isSharedResult = (0x1F8 - comboData[participantCount * 3 - 3]) != 0;
 	if (isSharedResult) {
 		comboCenter.Identity();
 		for (int i = 0; i < participantCount; i++) {
@@ -3474,16 +3479,7 @@ void CGCharaObj::combi2()
 		CGPartyObj* party = candidates[i];
 		unsigned int comboMode = 0xFFFFFFFF;
 
-		if (isSharedResult) {
-			CharaObjComboCenter(party) = comboCenter;
-			if (playedComboSe || CharaObjSkipComboScript(party)) {
-				CharaObjComboScriptArg(party) = 0;
-			} else {
-				CharaObjComboScriptArg(party) = comboCmd;
-				party->playSe3D(0x3F, 0x32, 0x96, 0, 0);
-				playedComboSe = true;
-			}
-		} else {
+		if (!isSharedResult) {
 			if (comboCmd == 0x207) {
 				comboMode = 0;
 			} else if (comboCmd == 0x20B) {
@@ -3497,7 +3493,16 @@ void CGCharaObj::combi2()
 				party->playSe3D(0x3F, 0x32, 0x96, 0, 0);
 			} else {
 				CharaObjComboCenter(party) = leadParty->m_worldPosition;
-				CharaObjComboScriptArg(party) = 0;
+				CharaObjComboItemId(party) = 0;
+			}
+		} else {
+			CharaObjComboCenter(party) = comboCenter;
+			if (playedComboSe || CharaObjSkipComboScript(party)) {
+				CharaObjComboItemId(party) = 0;
+			} else {
+				CharaObjComboItemId(party) = comboCmd;
+				party->playSe3D(0x3F, 0x32, 0x96, 0, 0);
+				playedComboSe = true;
 			}
 		}
 
@@ -3521,6 +3526,7 @@ void CGCharaObj::combi2()
 		}
 		CharaObjComboLinkCount(party) = linkCount;
 	}
+#undef comboCmd
 
 	combi2();
 }
@@ -3667,15 +3673,17 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 			}
 
 			int diff = reinterpret_cast<CGCharaObj*>(partyList[0])->m_comboFrame - partyObj->m_comboFrame;
-			int minWindow = static_cast<int>(combiCursor[slot * 3 + 1]);
-			int maxWindow = static_cast<int>(combiCursor[slot * 3 + 2]);
 			int windowOk;
-			if (minWindow <= diff && diff <= maxWindow) {
+			if (partyList[0] == obj) {
 				windowOk = 1;
-			} else {
+			} else if (static_cast<int>(combiCursor[slot * 3 + 1]) > diff) {
 				windowOk = 0;
+			} else if (static_cast<int>(combiCursor[slot * 3 + 2]) < diff) {
+				windowOk = 0;
+			} else {
+				windowOk = 1;
 			}
-			if (!(partyList[0] == obj || windowOk)) {
+			if (!windowOk) {
 				break;
 			}
 

@@ -1589,7 +1589,6 @@ void CCharaPcs::searchPdt(int, int, int)
  */
 void CCharaPcs::LoadCam(int index, char* fileName)
 {
-    static char s_p_chara_cpp[] = "p_chara.cpp";
     char path[0x104];
     CChunkFile::CChunk chunk;
 
@@ -1614,7 +1613,7 @@ void CCharaPcs::LoadCam(int index, char* fileName)
         if (chunk.m_id == 'CAM ') {
             m_cameraFrameCount[index] = static_cast<int>(chunk.m_arg0);
 
-            cameraBuffer = new (m_viewerAnimStage, s_p_chara_cpp, 0x4D4)
+            cameraBuffer = new (m_viewerAnimStage, const_cast<char*>(s_p_chara_cpp), 0x4D4)
                 CCameraFrame[static_cast<unsigned long>(m_cameraFrameCount[index])];
 
             int byteOffset = 0;
@@ -2516,9 +2515,9 @@ int CCharaPcs::LoadAnim(int charaKind, int charaNo, char* animName, int unusedAr
 {
     (void)unusedArg;
 
-    CLoadAnim* loadAnim = FindLoadedAnim(this, charaKind, charaNo, animName);
+    CLoadAnim* loadAnim = FindLoadedAnim(&CharaPcs, charaKind, charaNo, animName);
     if (loadAnim == 0) {
-        loadAnim = LoadAnimFromDisk(this, charaKind, charaNo, animName, mergeFileId, mergeFlags);
+        loadAnim = LoadAnimFromDisk(&CharaPcs, charaKind, charaNo, animName, mergeFileId, mergeFlags);
     }
 
     return loadAnim != 0;

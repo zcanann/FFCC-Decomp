@@ -2215,8 +2215,12 @@ void CGoOutMenu::CalcDel()
     case 0:
         if (m_messageWindowOpen != 0) {
             input = GetGoOutInputMask();
+            bool pressed = false;
             if ((input & 0x100) != 0) {
                 Sound.PlaySe(2, 0x40, 0x7f, 0);
+                pressed = true;
+            }
+            if (pressed) {
                 if (m_prevDeleteMode == -1) {
                     SetMainMode(1);
                 } else {

@@ -1144,9 +1144,9 @@ void CGItemObj::onFrameStat()
 			prgObj->m_stepSlopeLimit = zero;
 			ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
 
-			int soundEntry = *(int*)(*(int*)(*reinterpret_cast<int*>(CGMonObj::m_boss) + 0xF8) + 0x178);
-			if (soundEntry != 0) {
-				pdtNo = *(int*)(soundEntry + 0x14);
+			int* soundData = *(int**)(*(int*)(*reinterpret_cast<int*>(CGMonObj::m_boss) + 0xF8) + 0x178);
+			if (soundData != 0) {
+				pdtNo = soundData[5];
 			}
 
 			float particleScale =
@@ -1197,9 +1197,9 @@ void CGItemObj::onFrameStat()
 			prgObj->m_stepSlopeLimit = zero;
 			ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
 
-			int soundEntry = *(int*)(*(int*)(*reinterpret_cast<int*>(CGMonObj::m_boss) + 0xF8) + 0x178);
-			if (soundEntry != 0) {
-				pdtNo = *(int*)(soundEntry + 0x14);
+			int* soundData = *(int**)(*(int*)(*reinterpret_cast<int*>(CGMonObj::m_boss) + 0xF8) + 0x178);
+			if (soundData != 0) {
+				pdtNo = soundData[5];
 			}
 
 			float particleScale =

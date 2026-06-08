@@ -254,6 +254,12 @@ struct CharaObjIgnoreFlagBits
 	unsigned char m_pad : 7;
 };
 
+struct CharaObjSignedTopBit
+{
+	signed char m_top : 1;
+	signed char m_pad : 7;
+};
+
 static bool CharaObjCanFrontGuard(CGCharaObj* self, CGPrgObj* sourceObj)
 {
 	CVector selfPos(self->m_worldPosition);
@@ -2485,7 +2491,7 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 
 		if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D) {
 			CGPartyObj* party = static_cast<CGPartyObj*>(this);
-			if (static_cast<signed char>(party->m_partyData.partyFlags) < 0) {
+			if (reinterpret_cast<CharaObjSignedTopBit*>(&party->m_partyData.partyFlags)->m_top) {
 				int stackArgs[2];
 				stackArgs[0] = -1;
 				stackArgs[1] = 0;

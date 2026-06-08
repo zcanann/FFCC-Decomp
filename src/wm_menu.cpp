@@ -6387,6 +6387,7 @@ void CMenuPcs::CalcPitcher()
 
 	unsigned char* worldObj = m_wm.m_worldObjData;
 
+	const float one = FLOAT_803313e8;
 	const float pa8 = FLOAT_803314a4;
 	const float pac = FLOAT_80331748;
 	const float pb0 = FLOAT_8033174c;
@@ -6409,7 +6410,7 @@ void CMenuPcs::CalcPitcher()
 	Mtx scaleMtx;
 	Mtx rotXMtx;
 	Mtx rotYMtx;
-	PSMTXScale(scaleMtx, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313e8);
+	PSMTXScale(scaleMtx, one, one, one);
 	PSMTXRotRad(rotXMtx, 'x', reinterpret_cast<float*>(worldObj + 0x1B8)[0]);
 	PSMTXRotRad(rotYMtx, 'y', reinterpret_cast<float*>(worldObj + 0x1BC)[0]);
 	PSMTXConcat(rotXMtx, rotYMtx, rotXMtx);

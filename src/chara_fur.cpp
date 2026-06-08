@@ -849,18 +849,13 @@ static void OpenMogHintMessage(int messageId)
 		return;
 	}
 
-	CMesMenu* mesMenu = *reinterpret_cast<CMesMenu**>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0x288);
-	if (mesMenu == 0) {
-		return;
-	}
-
-	if (mesMenu->IsActiveMessage()) {
+	if ((*reinterpret_cast<CMesMenu**>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0x120))->IsActiveMessage()) {
 		return;
 	}
 
 	CFlatData* flatData = reinterpret_cast<CFlatData*>(reinterpret_cast<unsigned char*>(&Game) + 0xCC38 + sizeof(CFlatData));
 	char** mesPtr = reinterpret_cast<char**>(reinterpret_cast<unsigned char*>(flatData) + 0xD4);
-	mesMenu->Open(mesPtr[messageId + 8], 0x160, 0x20, 0x220, 0, -1, -1);
+	(*reinterpret_cast<CMesMenu**>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0x120))->Open(mesPtr[messageId + 8], 0x160, 0x20, 0x220, 0, -1, -1);
 }
 
 } // namespace

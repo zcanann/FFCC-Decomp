@@ -784,11 +784,11 @@ void CGPartyObj::menu()
 		}
 
 		bool bVar3;
-		if ((static_cast<int>(static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) << 0x18) < 0) &&
-		    ((static_cast<int>(static_cast<unsigned int>(static_cast<unsigned char>(m_shieldAttachNodeIndex)) << 0x18) < 0) ||
+		if ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) << 24) & 0xC0000000) >> 31) != 0) &&
+		    ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)[1]) << 24) & 0xC0000000) >> 31) != 0) ||
 		     ((party.commandMode & 2) != 0) ||
 		     ((party.commandMode & 4) != 0)) &&
-		    (static_cast<int>(static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x63C)) << 0x18) < 0) &&
+		    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x63C)) << 24) & 0xC0000000) >> 31) != 0) &&
 		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0)) {
 			bVar3 = true;
 		} else {
@@ -1611,10 +1611,9 @@ void CGPartyObj::shouki()
 		m_unk688 = 2;
 	} else {
 		deletePSlotBit(0x200);
-		if (FLOAT_80331a74 * Game.unkFloat_0xca10 > chaliceDist) {
-			m_unk688 = 0;
-		} else {
-			if ((static_cast<unsigned char>(m_flags) & 3) == 0) {
+		if (FLOAT_80331a74 * Game.unkFloat_0xca10 <= chaliceDist) {
+			int flagFrame = *reinterpret_cast<int*>(&m_flagBits);
+			if (flagFrame % 4 == 0) {
 				playSe3D(0x1E, 0x32, 0x96, 0, 0);
 				CFlat.ResetParticleWork(2, 0);
 				CFlat.SetParticleWorkPos(m_worldPosition, m_rotBaseY);
@@ -1623,10 +1622,12 @@ void CGPartyObj::shouki()
 				CFlat.PutParticleWork();
 			}
 			m_unk688 = 1;
+		} else {
+			m_unk688 = 0;
 		}
 	}
 
-	const unsigned int frame = static_cast<unsigned char>(m_flags);
+	const int frame = *reinterpret_cast<int*>(&m_flagBits);
 	if (m_unk688 == 0 &&
 	    static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 27) & 0xC0000000) >> 31) == 0) {
 		int healCount = 0;
@@ -3351,8 +3352,8 @@ void CGPartyObj::statPut()
 
 		if (m_stateFrame <= 0x0B) {
 			const float phase = sinf((FLOAT_80331AB8 * static_cast<float>(m_stateFrame)) / FLOAT_80331AC0);
-			m_extraMoveVec.x = FLOAT_8032EE80 * phase * sinf(m_rotBaseY);
-			m_extraMoveVec.z = FLOAT_8032EE80 * phase * cosf(m_rotBaseY);
+			m_extraMoveVec.x = FLOAT_8032EE80 * (phase * sinf(m_rotBaseY));
+			m_extraMoveVec.z = FLOAT_8032EE80 * (phase * cosf(m_rotBaseY));
 			m_extraMoveVec.y = FLOAT_8032EE84 * phase + FLOAT_80331A98;
 		}
 	}
@@ -3725,7 +3726,8 @@ int CGPartyObj::useItem(int itemId)
 			System.Printf(const_cast<char*>(msgBase + 0x170), itemId, itemKind);
 			bonus(5, itemId, 0);
 
-			if (itemKind == 0x17D) {
+			switch (itemKind) {
+			case 0x17D: {
 				int heal;
 				int foodIndex = itemId - 0x17D;
 				if ((foodIndex < 0) || (foodIndex >= 8)) {
@@ -3743,7 +3745,9 @@ int CGPartyObj::useItem(int itemId)
 				}
 				addHp(heal, 0);
 				System.Printf(const_cast<char*>(msgBase + 0x194), heal);
-			} else if (itemKind == 0x186) {
+				break;
+			}
+			case 0x186: {
 				int heal = 2;
 				if ((itemId == 0x188) &&
 				    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) == 2)) {
@@ -3751,6 +3755,8 @@ int CGPartyObj::useItem(int itemId)
 				}
 				addHp(heal, 0);
 				System.Printf(const_cast<char*>(msgBase + 0x1AC), heal);
+				break;
+			}
 			}
 
 			CFlatRuntime::CStack stack[2];

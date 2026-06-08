@@ -245,7 +245,7 @@ static bool isBossArtifactStage()
 	return Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0x0F;
 }
 
-static bool isFrameInterval(unsigned int frame, unsigned int interval)
+static bool isFrameInterval(int frame, int interval)
 {
 	return interval != 0 && frame == (frame / interval) * interval;
 }

@@ -27,6 +27,8 @@ static const char s_p_chara_collection_ptrarray_h[] = "collection_ptrarray.h";
 
 extern const float kCharaZero;
 extern const float kCharaOne;
+extern const float FLOAT_80330290;
+extern const double DOUBLE_80330298;
 extern const float FLOAT_803302A4;
 extern const float FLOAT_803302A8;
 extern const float FLOAT_803302C8;
@@ -2245,7 +2247,7 @@ void CCharaPcs::CHandle::ChangeTexture(
     CLoadTexture* loadTexture;
     for (unsigned int i = 0; i < static_cast<unsigned int>(LoadTextureArray(&CharaPcs)->GetSize()); i++) {
         CLoadTexture* it = (*LoadTextureArray(&CharaPcs))[i];
-        if (reinterpret_cast<int>(it->m_keyTag) == charaKind && it->m_keyId == static_cast<int>(charaNo) &&
+        if (reinterpret_cast<int>(it->m_keyTag) == charaKind && static_cast<unsigned long>(it->m_keyId) == charaNo &&
             it->m_variantTag == reinterpret_cast<void*>(textureVariant)) {
             loadTexture = it;
             goto foundTexture;
@@ -2706,7 +2708,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
 
     if (drawPass != 1 && drawPass != 2 && (flags & 0x200000) == 0) {
         const unsigned int lightBank = (flags >> 19) & 1;
-        const float phase = m_colorPhase * 4.0f;
+        const float phase = m_colorPhase * FLOAT_80330290;
         int phaseIndex = static_cast<int>(phase);
         if (phaseIndex < 0) {
             phaseIndex = 0;
@@ -2714,7 +2716,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         if (phaseIndex > 3) {
             phaseIndex = 3;
         }
-        const float blendT = static_cast<float>(fmod(static_cast<double>(phase), 1.0));
+        const float blendT = static_cast<float>(fmod(static_cast<double>(phase), DOUBLE_80330298));
         CColor shade;
         if ((m_flags & 0x20000) != 0 && drawPass != 3) {
             CColor white(0xFF, 0xFF, 0xFF, 0xFF);

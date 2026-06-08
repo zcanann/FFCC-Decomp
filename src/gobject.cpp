@@ -1617,13 +1617,9 @@ void CGObject::update()
         }
 
         if (m_lookAtTimer == sZeroFloat) {
-            weaponFlagsLo &= ~0x20;
+            m_weaponNodeFlagBits.m_unk20 = 0;
         }
-        if ((weaponFlagsLo & 0x60) != 0) {
-            weaponFlagsLo |= 0x40;
-        } else {
-            weaponFlagsLo &= ~0x40;
-        }
+        m_weaponNodeFlagBits.m_unk40 = (weaponFlagsLo & 0x60) != 0 ? 1 : 0;
 
         if ((m_displayFlags & 1) != 0) {
             model->CalcMatrix();

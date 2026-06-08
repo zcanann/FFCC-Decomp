@@ -1458,6 +1458,7 @@ void CGObject::update()
 
         Math.SRTToMatrix(modelMtx, reinterpret_cast<SRT*>(&srt));
 
+        Mtx rotScratch;
         if (m_stateFlags0Bits.unk3) {
             Mtx tiltMtx;
             if (m_groundHitOffset.x != sZeroFloat || m_groundHitOffset.z != sZeroFloat) {
@@ -1467,10 +1468,9 @@ void CGObject::update()
                 const float slideMag = sqrtf(slideMagSq);
                 CVector worldUp(sZeroFloat, sAnimFrameOffset, sZeroFloat);
                 PSVECCrossProduct(&m_groundHitOffset, worldUp, &axis);
-                Mtx rotAxisMtx;
-                PSMTXRotAxisRad(rotAxisMtx, &axis, slideMag * -0.125f);
+                PSMTXRotAxisRad(rotScratch, &axis, slideMag * -0.125f);
                 PSMTXQuat(tiltMtx, &m_bgCollisionQtrn);
-                PSMTXConcat(rotAxisMtx, tiltMtx, tiltMtx);
+                PSMTXConcat(rotScratch, tiltMtx, tiltMtx);
                 C_QUATMtx(&m_bgCollisionQtrn, tiltMtx);
             } else {
                 PSMTXQuat(tiltMtx, &m_bgCollisionQtrn);
@@ -1509,8 +1509,7 @@ void CGObject::update()
                 CVector swayAxisUp(sZeroFloat, sAnimFrameOffset, sZeroFloat);
                 Vec swayAxis;
                 PSVECCrossProduct(&swayDir, swayAxisUp, &swayAxis);
-                Mtx swayMtx;
-                PSMTXRotAxisRad(swayMtx, &swayAxis, -swayAngle);
+                PSMTXRotAxisRad(rotScratch, &swayAxis, -swayAngle);
 
                 const float mtx0 = modelMtx[0][3];
                 const float mtx1 = modelMtx[1][3];
@@ -1521,7 +1520,7 @@ void CGObject::update()
                 modelMtx[1][3] = swayZero1.y;
                 CVector swayZero2(sZeroFloat, sZeroFloat, sZeroFloat);
                 modelMtx[2][3] = swayZero2.z;
-                PSMTXConcat(swayMtx, modelMtx, modelMtx);
+                PSMTXConcat(rotScratch, modelMtx, modelMtx);
                 const float swayTan = tan(-swayAngle);
                 modelMtx[0][3] = mtx0;
                 modelMtx[2][3] = mtx2;
@@ -1584,6 +1583,7 @@ void CGObject::update()
     }
 
     if (HasLoadedModel(m_charaModelHandle)) {
+        Mtx attachScratch;
         m_animBlend += ClampFloat(m_bgAttrValue - m_animBlend, -0.25f, 0.25f);
 
         float lookYaw = m_lookAtAccumYaw;
@@ -1781,10 +1781,9 @@ void CGObject::update()
         }
 
         if (HasLoadedModel(m_weaponModelHandle) && (m_displayFlags & 1) != 0 && m_weaponAttachNode >= 0) {
-            Mtx attachMtx;
-            PSMTXCopy(ModelNodeMtx(m_charaModelHandle->m_model, m_weaponAttachNode), attachMtx);
-            PSMTXTransApply(attachMtx, attachMtx, m_worldPosition.x, m_worldPosition.y, m_worldPosition.z);
-            m_weaponModelHandle->m_model->SetMatrix(attachMtx);
+            PSMTXCopy(ModelNodeMtx(m_charaModelHandle->m_model, m_weaponAttachNode), attachScratch);
+            PSMTXTransApply(attachScratch, attachScratch, m_worldPosition.x, m_worldPosition.y, m_worldPosition.z);
+            m_weaponModelHandle->m_model->SetMatrix(attachScratch);
             m_weaponModelHandle->m_model->CalcMatrix();
             if ((weaponFlagsLo & 0x40) != 0) {
                 m_weaponModelHandle->m_model->CalcSkin();
@@ -1796,10 +1795,9 @@ void CGObject::update()
         }
 
         if (HasLoadedModel(m_shieldModelHandle) && (m_displayFlags & 1) != 0 && m_shieldAttachNodeIndex >= 0) {
-            Mtx attachMtx;
-            PSMTXCopy(ModelNodeMtx(m_charaModelHandle->m_model, m_shieldAttachNodeIndex), attachMtx);
-            PSMTXTransApply(attachMtx, attachMtx, m_worldPosition.x, m_worldPosition.y, m_worldPosition.z);
-            m_shieldModelHandle->m_model->SetMatrix(attachMtx);
+            PSMTXCopy(ModelNodeMtx(m_charaModelHandle->m_model, m_shieldAttachNodeIndex), attachScratch);
+            PSMTXTransApply(attachScratch, attachScratch, m_worldPosition.x, m_worldPosition.y, m_worldPosition.z);
+            m_shieldModelHandle->m_model->SetMatrix(attachScratch);
             m_shieldModelHandle->m_model->CalcMatrix();
             if ((weaponFlagsLo & 0x40) != 0) {
                 m_shieldModelHandle->m_model->CalcSkin();

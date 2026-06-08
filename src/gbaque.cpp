@@ -1554,10 +1554,10 @@ void GbaQueue::LoadMapItemStat()
 					const int itemDataBase = Game.unkCFlatData0[2];
 					const int bossStageLimit = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex] + 2;
 					const int itemStage = *reinterpret_cast<unsigned short*>(itemDataBase + object->m_dropItemCodes[0] * 0x48 + 0xC);
-					if (itemStage < bossStageLimit) {
-						mapItemEntry[1] = 4;
-					} else {
+					if (itemStage >= bossStageLimit) {
 						mapItemEntry[1] = 5;
+					} else {
+						mapItemEntry[1] = 4;
 					}
 				}
 

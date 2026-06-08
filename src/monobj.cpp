@@ -3206,17 +3206,17 @@ void CGMonObj::moveFrame()
 		moveDelta.z = local_74.z;
 	}
 
-	if ((moveFlags & 0x4000) == 0) {
+	if ((moveFlags & 0x4000) != 0) {
+		PSVECAdd(&object->m_groundHitOffset, static_cast<Vec*>(moveDelta), &object->m_groundHitOffset);
+	} else {
 		object->m_groundHitOffset.x += moveDelta.x;
 		object->m_groundHitOffset.z += moveDelta.z;
-	} else {
-		PSVECAdd(&object->m_groundHitOffset, static_cast<Vec*>(moveDelta), &object->m_groundHitOffset);
 	}
 
-	if ((moveFlags & 0x8000) == 0) {
-		object->m_rotTargetY = rotY;
-	} else {
+	if ((moveFlags & 0x8000) != 0) {
 		object->m_rotTargetY = 3.1415927f + rotY;
+	} else {
+		object->m_rotTargetY = rotY;
 	}
 
 	if (((moveFlags & 0x20) == 0 || moveRange <= (in_f29 - stepDist)) &&

@@ -2700,7 +2700,7 @@ unsigned int CMenuPcs::CmdClose1()
 
 	GetCmdStateView(this)->transitionTimer = static_cast<s16>(GetCmdStateView(this)->transitionTimer + 1);
 	s32 state = GetCmdStateView(this)->uniteState;
-	u32 done = 0;
+	s32 done = 0;
 
 	if (state == 0) {
 		const s32 selected = GetCmdStateView(this)->selected;

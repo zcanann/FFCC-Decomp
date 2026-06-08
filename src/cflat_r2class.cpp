@@ -1346,10 +1346,10 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			    static_cast<int>(object->m_localBase[2]),
 			    static_cast<int>(object->m_localBase[3]),
 			    static_cast<int>(object->m_localBase[4]),
-			    static_cast<short>(object->m_localBase[5]),
-			    static_cast<short>(object->m_localBase[6]),
-			    static_cast<short>(object->m_localBase[7]),
-			    static_cast<short>(object->m_localBase[8]));
+			    static_cast<int>(object->m_localBase[5]),
+			    static_cast<int>(object->m_localBase[6]),
+			    static_cast<int>(object->m_localBase[7]),
+			    static_cast<int>(object->m_localBase[8]));
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1491,7 +1491,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		}
 		case -0x78:
 			engineObject->PlayAnim(
-			    static_cast<int>(object->m_localBase[0]), 0, 0, static_cast<short>(object->m_localBase[1]), static_cast<short>(object->m_localBase[2]), 0);
+			    static_cast<int>(object->m_localBase[0]), 0, 0, static_cast<int>(object->m_localBase[1]), static_cast<int>(object->m_localBase[2]), 0);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1523,7 +1523,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		}
 		case -0x7A:
 			engineObject->PlayAnim(
-			    static_cast<int>(object->m_localBase[0]), 1, 0, static_cast<short>(object->m_localBase[1]), static_cast<short>(object->m_localBase[2]), 0);
+			    static_cast<int>(object->m_localBase[0]), 1, 0, static_cast<int>(object->m_localBase[1]), static_cast<int>(object->m_localBase[2]), 0);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1731,13 +1731,13 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		case -0x9A:
 			engineObject->PlayAnim(
-			    static_cast<int>(object->m_localBase[0]), 1, 1, static_cast<short>(object->m_localBase[1]), static_cast<short>(object->m_localBase[2]), 0);
+			    static_cast<int>(object->m_localBase[0]), 1, 1, static_cast<int>(object->m_localBase[1]), static_cast<int>(object->m_localBase[2]), 0);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
 		case -0x99:
 			engineObject->PlayAnim(
-			    static_cast<int>(object->m_localBase[0]), 0, 1, static_cast<short>(object->m_localBase[1]), static_cast<short>(object->m_localBase[2]), 0);
+			    static_cast<int>(object->m_localBase[0]), 0, 1, static_cast<int>(object->m_localBase[1]), static_cast<int>(object->m_localBase[2]), 0);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

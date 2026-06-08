@@ -5985,10 +5985,10 @@ void CMenuPcs::SetWorldParam(int code, int value)
 		m_wmWorldState->m_changeRequest = 2;
 		break;
 	case 10:
-		bytes[0x10] = static_cast<unsigned char>(((static_cast<unsigned int>(-value) >> 24) | static_cast<unsigned int>(value)) >> 31);
+		bytes[0x10] = static_cast<unsigned char>((static_cast<unsigned int>(-value) | static_cast<unsigned int>(value)) >> 31);
 		break;
 	case 11:
-		bytes[0x11] = static_cast<unsigned char>(((static_cast<unsigned int>(-value) >> 24) | static_cast<unsigned int>(value)) >> 31);
+		bytes[0x11] = static_cast<unsigned char>((static_cast<unsigned int>(-value) | static_cast<unsigned int>(value)) >> 31);
 		break;
 	case 12:
 		bytes[0xE] = static_cast<unsigned char>(value);
@@ -5997,10 +5997,10 @@ void CMenuPcs::SetWorldParam(int code, int value)
 		bytes[0xF] = static_cast<unsigned char>(value) & 3;
 		break;
 	case 14:
-		bytes[0x12] = static_cast<unsigned char>(((static_cast<unsigned int>(-value) >> 24) | static_cast<unsigned int>(value)) >> 31);
+		bytes[0x12] = static_cast<unsigned char>((static_cast<unsigned int>(-value) | static_cast<unsigned int>(value)) >> 31);
 		break;
 	case 15:
-		bytes[0x13] = static_cast<unsigned char>(((static_cast<unsigned int>(-value) >> 24) | static_cast<unsigned int>(value)) >> 31);
+		bytes[0x13] = static_cast<unsigned char>((static_cast<unsigned int>(-value) | static_cast<unsigned int>(value)) >> 31);
 		break;
 	case 16:
 		bytes[0x17] = static_cast<unsigned char>(value);

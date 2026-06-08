@@ -1691,9 +1691,9 @@ void CGObject::update()
         if ((m_displayFlags & 2) != 0) {
             float frameStep;
             if (m_animSlotSel != -1 && (shieldFlagsLo & 0x80) != 0) {
-                if (ModelAnim(model) != 0) {
-                    const unsigned short frameCount =
-                        *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(ModelAnim(model)) + 0x10);
+                if (ModelAnim(m_charaModelHandle->m_model) != 0) {
+                    const unsigned short frameCount = *reinterpret_cast<unsigned short*>(
+                        reinterpret_cast<unsigned char*>(ModelAnim(m_charaModelHandle->m_model)) + 0x10);
                     frameStep = m_turnSpeed + static_cast<float>(frameCount) /
                                  static_cast<float>(*reinterpret_cast<unsigned int*>(&m_attackColliders[0].m_localStart.x));
                 } else {

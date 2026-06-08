@@ -1133,16 +1133,16 @@ void CMenuPcs::CalcSelectWait()
 		int animBase;
 		short count;
 		int walkOff = 0;
-		for (int i = 0; ; i++) {
+		int i = 0;
+		while (i < (int)*(short*)this->m_bonusAnimPtr) {
 			animBase = this->m_bonusAnimPtr;
-			count = *(short*)animBase;
-			if ((int)count <= i) {
-				break;
-			}
 			*(float*)(animBase + walkOff + 0x18) = 1.0f;
 			*(int*)(animBase + walkOff + 0x34) = 3;
 			walkOff += 0x40;
+			i++;
 		}
+		animBase = this->m_bonusAnimPtr;
+		count = *(short*)animBase;
 		BonusAnimSprite* cursor = (BonusAnimSprite*)(animBase + count * 0x40 + 8);
 		BonusAnimSprite* partySprite = cursor - activePartyCount * 2;
 		cursor->kind = 0x20;
@@ -1166,7 +1166,11 @@ void CMenuPcs::CalcSelectWait()
 		*(unsigned char*)(this->m_bonusStatePtr + 8) = 0;
 	}
 
-	int statePtr = this->m_bonusStatePtr;
+#define statePtr (this->m_bonusStatePtr)
+#define currentPartyIndex (*(short*)(this->m_bonusStatePtr + 0xe))
+#define selection (*(short*)(this->m_bonusStatePtr + 0x26))
+#define confirmSel (*(short*)(this->m_bonusStatePtr + 0x28))
+#define delay (*(short*)(this->m_bonusStatePtr + 0x1a))
 	int animPtr = this->m_bonusAnimPtr;
 	MenuWindowInfo* window = this->m_menuWindowInfo;
 	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
@@ -1175,10 +1179,6 @@ void CMenuPcs::CalcSelectWait()
 	*(short*)(statePtr + 0x22) = *(short*)(statePtr + 0x22) + 1;
 	int frame = (int)*(short*)(statePtr + 0x22);
 	short& promptMode = window->state;
-	short& currentPartyIndex = *(short*)(statePtr + 0xe);
-	short& selection = *(short*)(statePtr + 0x26);
-	short& confirmSel = *(short*)(statePtr + 0x28);
-	short& delay = *(short*)(statePtr + 0x1a);
 	int currentPartySlot = 0;
 	for (; currentPartySlot < activePartyCount; currentPartySlot++) {
 		if (s_Rinfo->m_party[currentPartySlot].m_rank == currentPartyIndex) {
@@ -1203,8 +1203,6 @@ void CMenuPcs::CalcSelectWait()
 		int resolvedPadSlot = (Pad.m_debugPadPort == padSlot) ? 0 : padSlot;
 		down = Pad.m_padInputs[resolvedPadSlot].buttonDown[0];
 	}
-	int unavailableMask = GetBonusUnavailableMask(statePtr, currentParty);
-
 	if (promptMode != 3) {
 		if (promptMode == 1) {
 			if ((repeat & 3) != 0) {
@@ -1231,16 +1229,32 @@ void CMenuPcs::CalcSelectWait()
 			promptMode = 3;
 		}
 	} else {
+		unsigned short repeat;
+		unsigned short down;
+		unsigned char padLocked = (Pad.m_debugPadLock != 0 || (padSlot == 0 && Pad.m_debugPadPort != -1));
+		if (padLocked) {
+			repeat = 0;
+		} else {
+			int resolvedPadSlot = (Pad.m_debugPadPort == padSlot) ? 0 : padSlot;
+			repeat = Pad.m_padInputs[resolvedPadSlot].repeatButton;
+		}
+		padLocked = (Pad.m_debugPadLock != 0 || (padSlot == 0 && Pad.m_debugPadPort != -1));
+		if (padLocked) {
+			down = 0;
+		} else {
+			int resolvedPadSlot = (Pad.m_debugPadPort == padSlot) ? 0 : padSlot;
+			down = Pad.m_padInputs[resolvedPadSlot].buttonDown[0];
+		}
 		if (delay == 0 && currentPartyIndex < activePartyCount) {
 			if ((repeat & 9) != 0) {
 				selection = (short)(selection + 1);
-				if (selection > 7) {
+				if (*(short*)(this->m_bonusStatePtr + 0x26) > 7) {
 					selection = 0;
 				}
 				Sound.PlaySe(0x4e, 0x40, 0x7f, 0);
 			} else if ((repeat & 6) != 0) {
 				selection = (short)(selection - 1);
-				if (selection < 0) {
+				if (*(short*)(this->m_bonusStatePtr + 0x26) < 0) {
 					selection = 7;
 				}
 				Sound.PlaySe(0x4e, 0x40, 0x7f, 0);
@@ -1249,6 +1263,7 @@ void CMenuPcs::CalcSelectWait()
 			if ((repeat & 0xf) == 0) {
 				if ((down & 0x100) != 0) {
 					int bit = 1 << selection;
+					int unavailableMask = GetBonusUnavailableMask(statePtr, currentParty);
 					if ((unavailableMask & bit) == 0) {
 						*(unsigned char*)(statePtr + 8) = 1;
 						delay = 10;
@@ -1273,8 +1288,8 @@ void CMenuPcs::CalcSelectWait()
 				int itemId = (&s_Rinfo->m_tempArtifacts[0])[selection];
 				s_Rinfo->pad_0008 = (unsigned char)(s_Rinfo->pad_0008 | bit);
 				*(unsigned char*)(statePtr + 8) = 0;
-				currentParty->m_selectedItemId = itemId;
-				currentParty->m_selectedSlot = selection;
+				s_Rinfo->m_party[currentPartySlot].m_selectedItemId = itemId;
+				s_Rinfo->m_party[currentPartySlot].m_selectedSlot = selection;
 				currentPartyIndex = (short)(currentPartyIndex + 1);
 			}
 		} else {
@@ -1301,7 +1316,7 @@ void CMenuPcs::CalcSelectWait()
 			}
 			cursor->x = (short)(partySprite->x - 3);
 			cursor->y = (short)(partySprite->y - 8);
-			cursor->alpha = (float)pulseFrame / 10.0f;
+			cursor->alpha = (float)((double)pulseFrame / 10.0);
 		} else {
 			cursor->alpha = 0.0f;
 		}
@@ -1384,6 +1399,11 @@ void CMenuPcs::CalcSelectWait()
 		}
 	}
 }
+#undef statePtr
+#undef currentPartyIndex
+#undef selection
+#undef confirmSel
+#undef delay
 #pragma pop
 
 #pragma push

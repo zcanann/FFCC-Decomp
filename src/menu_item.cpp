@@ -363,18 +363,6 @@ void CMenuPcs::ItemDraw()
             }
 
             if (w > LoadFloat(kItemZero) && w < entry->w) {
-                colors[0].r = 0xFF;
-                colors[0].g = 0xFF;
-                colors[0].b = 0xFF;
-                colors[0].a = 0;
-                colors[1].r = 0xFF;
-                colors[1].g = 0xFF;
-                colors[1].b = 0xFF;
-                colors[1].a = 0;
-                colors[2].r = 0xFF;
-                colors[2].g = 0xFF;
-                colors[2].b = 0xFF;
-                colors[2].a = 0;
                 colors[3].r = 0xFF;
                 colors[3].g = 0xFF;
                 colors[3].b = 0xFF;

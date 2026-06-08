@@ -1694,16 +1694,16 @@ void CChara::makeFurTex()
 
 	Mtx posMtx;
 	posMtx[0][0] = kCharaFurDepthScaleBase;
-	posMtx[0][1] = kCharaFurDepthZero;
-	posMtx[0][2] = kCharaFurDepthZero;
-	posMtx[0][3] = kCharaFurDepthZero;
 	posMtx[1][0] = kCharaFurDepthZero;
-	posMtx[1][1] = kCharaFurDepthZero;
-	posMtx[1][2] = FLOAT_8033116C * (kCharaFurViewDepthThreshold / s_mogFurMaxY);
-	posMtx[1][3] = kCharaFurDepthZero;
 	posMtx[2][0] = kCharaFurDepthZero;
+	posMtx[0][1] = kCharaFurDepthZero;
+	posMtx[1][1] = kCharaFurDepthZero;
 	posMtx[2][1] = kCharaFurDepthScaleBase;
+	posMtx[0][2] = kCharaFurDepthZero;
+	posMtx[1][2] = FLOAT_8033116C * (kCharaFurViewDepthThreshold / s_mogFurMaxY);
 	posMtx[2][2] = kCharaFurDepthZero;
+	posMtx[0][3] = kCharaFurDepthZero;
+	posMtx[1][3] = kCharaFurDepthZero;
 	posMtx[2][3] = kCharaFurDepthZero;
 
 	Mtx44 projection;

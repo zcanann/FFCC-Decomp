@@ -695,9 +695,11 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
 
     GetItemType(itemNo, 1);
     raceBits = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 4);
+    int raceLow = raceBits & 0xF;
+    int genderMask = raceBits & 0x30;
     outText[0] = '\0';
 
-    if ((raceBits & 0xF) == 0xF) {
+    if (raceLow == 0xF) {
         switch (Game.m_gameWork.m_languageId) {
         case 2:
             text = (char*)gSingMenuTextTableDe[19];
@@ -752,14 +754,14 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
         }
     }
 
-    if ((raceBits & 0xF) != 0 && (raceBits & 0x30) != 0) {
+    if (raceLow != 0 && genderMask != 0) {
         strcpy(outText, (char*)s_space_8033295c);
     }
-    if ((raceBits & 0x30) == 0) {
+    if (genderMask == 0) {
         return;
     }
 
-    raceType = (raceBits & 0x30) >> 5;
+    raceType = genderMask >> 5;
     switch (Game.m_gameWork.m_languageId) {
     case 2:
         suffix = (char*)gSingMenuTextTableDe[raceType + 17];

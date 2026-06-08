@@ -3829,8 +3829,42 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 	unsigned short repeat = 0;
 	unsigned short down = 0;
 	if (entry.m_connected != 0 && entry.m_cmakePending == 0) {
-		repeat = GetButtonRepeat(0);
-		down = GetButtonDown(0);
+		const int port = 0;
+		bool noRepeatInput = false;
+		if (Pad.m_debugPadLock == 0) {
+			if (port != 0) {
+				goto repeat_check_done;
+			}
+			if (Pad.m_debugPadPort == -1) {
+				goto repeat_check_done;
+			}
+		}
+		noRepeatInput = true;
+	repeat_check_done:
+		if (noRepeatInput) {
+			repeat = 0;
+		} else {
+			u32 clamped = (Pad.m_debugPadPort == port) ? 0 : port;
+			repeat = static_cast<unsigned short>(Pad.GetPadInputs()[clamped].repeatButton);
+		}
+
+		bool noDownInput = false;
+		if (Pad.m_debugPadLock == 0) {
+			if (port != 0) {
+				goto down_check_done;
+			}
+			if (Pad.m_debugPadPort == -1) {
+				goto down_check_done;
+			}
+		}
+		noDownInput = true;
+	down_check_done:
+		if (noDownInput) {
+			down = 0;
+		} else {
+			u32 clamped = (Pad.m_debugPadPort == port) ? 0 : port;
+			down = static_cast<unsigned short>(Pad.GetPadInputs()[clamped].buttonDown[0]);
+		}
 	}
 
 	if (m_wmWorldState->m_mainState != 2 || m_wmWorldState->m_nextMenuMode != 0) {

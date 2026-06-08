@@ -25,8 +25,8 @@ public:
 	union {
 		unsigned char m_isActive;
 		struct ActiveBits {
-			unsigned char active : 1;
-			unsigned char : 7;
+			signed char active : 1;
+			signed char : 7;
 		} m_isActiveBits;
 	};
 };

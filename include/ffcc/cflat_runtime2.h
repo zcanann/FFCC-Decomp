@@ -26,7 +26,7 @@ struct CFlatPathPoint
 };
 
 extern int gCFlatRuntime2DebugDrawOverflowFrame;
-extern unsigned char gCFlatRuntime2DebugDrawOverflowInit;
+extern char gCFlatRuntime2DebugDrawOverflowInit;
 extern const char sCFlatRuntime2DebugDrawOverflowMsg[];
 extern u32 CFlatFlags;
 
@@ -41,7 +41,14 @@ public:
 
 	struct CDebugDrawCC
 	{
-		u8 m_flags;
+		union {
+			u8 m_flags;
+			struct {
+				s8 m_bit7 : 1;
+				s8 m_bit6 : 1;
+				s8 m_bitsLow : 6;
+			} m_flagBits;
+		};
 		u8 m_pad[3];
 		Vec m_from;
 		Vec m_to;
@@ -64,6 +71,15 @@ public:
 	public:
 		CParticleWork()
 		{
+			m_seFrame = -1;
+			m_seNo = -1;
+			m_seUnk0 = 0;
+			m_seKind = 1;
+			m_seParam = 0;
+			m_seUnk2 = 0;
+			m_seDelay = 0x1E;
+			m_paramNo = 0;
+			m_paramId = 0;
 			m_pos = 0;
 			m_posVec = 0;
 			m_scale = 0;
@@ -76,15 +92,6 @@ public:
 			m_speed = 1.0f;
 			m_colorLerp = 1.0f;
 			m_enable = 0;
-			m_seNo = -1;
-			m_seUnk0 = 0;
-			m_seKind = 1;
-			m_seUnk2 = 0;
-			m_seParam = 0;
-			m_seDelay = 0x1E;
-			m_seFrame = -1;
-			m_paramNo = 0;
-			m_paramId = 0;
 		}
 
 		float* m_pos;
@@ -206,7 +213,19 @@ public:
 	u32 m_centerState;              // 0x12AC
 	float m_centerDistanceScale;    // 0x12B0
 	Mtx m_centerMatrix;             // 0x12B4
-	u8 m_gameFlags;                 // 0x12E4
+	union {
+		u8 m_gameFlags;             // 0x12E4
+		struct {
+			s8 m_flagBit7 : 1;
+			s8 m_flagBit6 : 1;
+			s8 m_flagBit5 : 1;
+			s8 m_flagBit4 : 1;
+			s8 m_flagBit3 : 1;
+			s8 m_flagBit2 : 1;
+			s8 m_flagBit1 : 1;
+			s8 m_flagBit0 : 1;
+		} m_gameFlagBits;
+	};
 	u8 m_pad_12E5_12E8[0x3];        // 0x12E5
 	int m_bossState;                // 0x12E8
 	int m_bossSubState;             // 0x12EC
@@ -238,8 +257,7 @@ public:
 	u8 m_pad_E3F4_E400[0xC];        // 0xE3F4
 	int m_debugDataBuffer[0x800];   // 0xE400
 	int m_debugDataIndex;           // 0x10400
-	u8 m_initAllFinishedFlag;       // 0x10404
-	u8 m_pad_10405_10408[0x3];      // 0x10405
+	int m_initAllFinishedFlag;      // 0x10404
 	int m_letterEventEnabled;       // 0x10408
 	unsigned int m_workAssignIndex; // 0x1040C
 	unsigned int m_partyAssignIndex; // 0x10410

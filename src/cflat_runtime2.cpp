@@ -3,6 +3,7 @@
 #include "ffcc/astar.h"
 #include "ffcc/baseobj.h"
 #include "ffcc/cflat_data.h"
+#include "ffcc/color.h"
 #include "ffcc/game.h"
 #include "ffcc/goout.h"
 #include "ffcc/graphic.h"
@@ -38,6 +39,17 @@ inline void* operator new(unsigned long, void* ptr)
 extern "C" void StaticFrame__10CGCharaObjFv();
 extern const float kCFlatAngleHalfTurnDeg;
 extern const float kCFlatAnglePi;
+extern "C" const float FLOAT_80330140;
+extern "C" const float FLOAT_80330144;
+extern "C" const float FLOAT_80330148;
+extern "C" const float FLOAT_8033014C;
+extern "C" const float FLOAT_80330150;
+extern "C" const float FLOAT_80330154;
+extern "C" const float FLOAT_80330180;
+extern "C" const float FLOAT_80330184;
+extern "C" const float FLOAT_80330188;
+extern "C" const float FLOAT_8033018C;
+extern "C" const float FLOAT_80330190;
 
 CFlatRuntime2 CFlat ATTRIBUTE_ALIGN(32);
 CFlatRuntime2& gCFlatRuntime2 = CFlat;
@@ -67,7 +79,7 @@ STATIC_ASSERT(sizeof(m_objItem) == sizeof(CGItemObj) * kFlatItemObjCount);
 STATIC_ASSERT(sizeof(m_objMon) == sizeof(CGMonObj) * kFlatMonObjCount);
 
 int gCFlatRuntime2DebugDrawOverflowFrame = 0;
-unsigned char gCFlatRuntime2DebugDrawOverflowInit = 0;
+char gCFlatRuntime2DebugDrawOverflowInit = 0;
 const char sCFlatRuntime2DebugDrawOverflowMsg[] =
 	"CFlatRuntime2.AddDebugDrawCC: "
 	"\x8e\x8b\x90\xfc\x83\x60\x83\x46\x83\x62\x83\x4e\x83\x66\x83\x6f\x83\x62\x83\x4f"
@@ -78,6 +90,8 @@ static const char sCFlatRuntime2FileNameFmt[] = "dvd/cft/%s.cft";
 static const char sCFlatRuntime2DebugFileNameFmt[] = "dvd/cft/%s.cft.dbg";
 static const char sCFlatRuntime2LoadMsg[] = "CFlatRuntime2::Load\n";
 static const char sCFlatRuntime2FileTag[] = "cflat_runtime2.cpp";
+static const char sCFlatRuntime2LayerMissingMsg[] =
+	"layer\x82\xaa\x82\xa0\x82\xe8\x82\xdc\x82\xb9\x82\xf1\x81\x42%s\n";
 static const char sCFlatRuntime2TexturePathFmt[] = "dvd/%s%s.tex";
 
 struct CFlatLayerResource {
@@ -99,7 +113,7 @@ static inline CFlatRuntime::CObject* FlatObjectRoot(CFlatRuntime2* runtime)
 	return &runtime->m_objectSentinel;
 }
 
-static inline CGBaseObj* FindNextGBaseObjByCidMask(CFlatRuntime2* runtime, CFlatRuntime::CObject* object, unsigned int cidMask)
+static inline CGBaseObj* FindNextGBaseObjByCidMask(CFlatRuntime2* runtime, CFlatRuntime::CObject* object, int cidMask)
 {
 	CFlatRuntime::CObject* const root = FlatObjectRoot(runtime);
 
@@ -135,31 +149,40 @@ void CLine<64>::Draw()
 	GXBegin((GXPrimitive)0xB0, GX_VTXFMT0, (u16)(pointCount & 0xFFFF));
 	u32 i = 0;
 	while (i < pointCount) {
-		GXWGFifo.f32 = points[i].x;
-		GXWGFifo.f32 = points[i].y;
-		GXWGFifo.f32 = points[i].z;
+		const float x = points[i].x;
+		const float y = points[i].y;
+		const float z = points[i].z;
+		GXWGFifo.f32 = x;
+		GXWGFifo.f32 = y;
+		GXWGFifo.f32 = z;
 		i++;
 	}
 
-	const float yOffset = 1.0f;
+	const float yOffset = 5.0f;
 	GXBegin((GXPrimitive)0xB0, GX_VTXFMT0, (u16)(pointCount & 0xFFFF));
 	i = 0;
 	while (i < pointCount) {
-		GXWGFifo.f32 = points[i].x;
-		GXWGFifo.f32 = yOffset + points[i].y;
-		GXWGFifo.f32 = points[i].z;
+		const float x = points[i].x;
+		const float y = yOffset + points[i].y;
+		const float z = points[i].z;
+		GXWGFifo.f32 = x;
+		GXWGFifo.f32 = y;
+		GXWGFifo.f32 = z;
 		i++;
 	}
 
 	GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, (u16)((pointCount & 0x7FFF) << 1));
 	i = 0;
 	while (i < pointCount) {
-		GXWGFifo.f32 = points[i].x;
-		GXWGFifo.f32 = points[i].y;
-		GXWGFifo.f32 = points[i].z;
-		GXWGFifo.f32 = points[i].x;
-		GXWGFifo.f32 = yOffset + points[i].y;
-		GXWGFifo.f32 = points[i].z;
+		const float x = points[i].x;
+		const float y = points[i].y;
+		const float z = points[i].z;
+		GXWGFifo.f32 = x;
+		GXWGFifo.f32 = y;
+		GXWGFifo.f32 = z;
+		GXWGFifo.f32 = x;
+		GXWGFifo.f32 = yOffset + y;
+		GXWGFifo.f32 = z;
 		i++;
 	}
 }
@@ -420,7 +443,7 @@ CFlatRuntime2::CFlatRuntime2()
 	RuntimeDebugFlags(runtime) = 0;
 	m_eventFlags = 0;
 	m_eventMask = -1;
-	m_gameFlags = (m_gameFlags & 0xFB) | 4;
+	m_gameFlagBits.m_flagBit2 = 1;
 	m_debugDataIndex = 0;
 	m_letterEventEnabled = 0;
 	memset(m_savedNextScript, 0, sizeof(m_savedNextScript));
@@ -623,9 +646,9 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 
 	switch (classType) {
 	case 0: {
-		signed char* obj = reinterpret_cast<signed char*>(m_objBase);
+		unsigned char* obj = reinterpret_cast<unsigned char*>(m_objBase);
 		for (int i = 0; i < 40; i++) {
-			if (obj[0x4C] >= 0) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
 				count++;
 			}
 			obj += 0x50;
@@ -633,9 +656,9 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 		return count;
 	}
 	case 1: {
-		signed char* obj = reinterpret_cast<signed char*>(m_objQuad);
+		unsigned char* obj = reinterpret_cast<unsigned char*>(m_objQuad);
 		for (int i = 0; i < 24; i++) {
-			if (obj[0x4C] >= 0) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
 				count++;
 			}
 			obj += 0xAC;
@@ -643,9 +666,9 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 		return count;
 	}
 	case 2: {
-		signed char* obj = reinterpret_cast<signed char*>(m_obj);
+		unsigned char* obj = reinterpret_cast<unsigned char*>(m_obj);
 		for (int i = 0; i < 56; i++) {
-			if (obj[0x4C] >= 0) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
 				count++;
 			}
 			obj += 0x518;
@@ -655,7 +678,7 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 	case 3: {
 		CGPartyObj* obj = reinterpret_cast<CGPartyObj*>(m_objParty);
 		for (int i = 0; i < kFlatPartyObjCount; i++, obj++) {
-			if (reinterpret_cast<signed char*>(obj)[0x4C] >= 0) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
 				count++;
 			}
 		}
@@ -664,16 +687,16 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 	case 4: {
 		CGMonObj* obj = reinterpret_cast<CGMonObj*>(m_objMon);
 		for (int i = 0; i < kFlatMonObjCount; i++, obj++) {
-			if (reinterpret_cast<signed char*>(obj)[0x4C] >= 0) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
 				count++;
 			}
 		}
 		return count;
 	}
 	case 5: {
-		signed char* obj = reinterpret_cast<signed char*>(m_objItem);
+		unsigned char* obj = reinterpret_cast<unsigned char*>(m_objItem);
 		for (int i = 0; i < 32; i++) {
-			if (obj[0x4C] >= 0) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
 				count++;
 			}
 			obj += 0x57C;
@@ -696,60 +719,67 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
  */
 CGObject* CFlatRuntime2::getFreeObject(int classType)
 {
-	if (classType == 3) {
+	switch (classType) {
+	case 0: {
+		unsigned char* obj = reinterpret_cast<unsigned char*>(m_objBase);
+		for (int i = 0; i < 0x28; i++) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
+				return reinterpret_cast<CGObject*>(&m_objBase[i]);
+			}
+			obj += 0x50;
+		}
+		break;
+	}
+	case 1: {
+		unsigned char* obj = reinterpret_cast<unsigned char*>(m_objQuad);
+		for (int i = 0; i < 0x18; i++) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
+				return reinterpret_cast<CGObject*>(&m_objQuad[i]);
+			}
+			obj += 0xAC;
+		}
+		break;
+	}
+	case 2: {
+		unsigned char* obj = reinterpret_cast<unsigned char*>(m_obj);
+		for (int i = 0; i < 0x38; i++) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
+				return &m_obj[i];
+			}
+			obj += 0x518;
+		}
+		break;
+	}
+	case 3: {
 		unsigned char* obj = reinterpret_cast<unsigned char*>(m_objParty);
 		for (int i = 0; i < 4; i++) {
-			if (static_cast<signed char>(obj[0x4C]) >= 0) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
 				return reinterpret_cast<CGObject*>(&m_objParty[i]);
 			}
 			obj += 0x6F8;
 		}
-	} else if (classType < 3) {
-		if (classType == 1) {
-			unsigned char* obj = reinterpret_cast<unsigned char*>(m_objQuad);
-			for (int i = 0; i < 0x18; i++) {
-				if (static_cast<signed char>(obj[0x4C]) >= 0) {
-					return reinterpret_cast<CGObject*>(&m_objQuad[i]);
-				}
-				obj += 0xAC;
-			}
-		} else if (classType < 1) {
-			if (classType < 0) {
-				return 0;
-			}
-
-			unsigned char* obj = reinterpret_cast<unsigned char*>(m_objBase);
-			for (int i = 0; i < 0x28; i++) {
-				if (static_cast<signed char>(obj[0x4C]) >= 0) {
-					return reinterpret_cast<CGObject*>(&m_objBase[i]);
-				}
-				obj += 0x50;
-			}
-		} else {
-			unsigned char* obj = reinterpret_cast<unsigned char*>(m_obj);
-			for (int i = 0; i < 0x38; i++) {
-				if (static_cast<signed char>(obj[0x4C]) >= 0) {
-					return &m_obj[i];
-				}
-				obj += 0x518;
-			}
-		}
-	} else if (classType == 5) {
-		unsigned char* obj = reinterpret_cast<unsigned char*>(m_objItem);
-		for (int i = 0; i < 0x20; i++) {
-			if (static_cast<signed char>(obj[0x4C]) >= 0) {
-				return reinterpret_cast<CGObject*>(&m_objItem[i]);
-			}
-			obj += 0x57C;
-		}
-	} else if (classType < 5) {
+		break;
+	}
+	case 4: {
 		unsigned char* obj = reinterpret_cast<unsigned char*>(m_objMon);
 		for (int i = 0; i < 0x40; i++) {
-			if (static_cast<signed char>(obj[0x4C]) >= 0) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
 				return reinterpret_cast<CGObject*>(&m_objMon[i]);
 			}
 			obj += 0x740;
 		}
+		break;
+	}
+	case 5: {
+		unsigned char* obj = reinterpret_cast<unsigned char*>(m_objItem);
+		for (int i = 0; i < 0x20; i++) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
+				return reinterpret_cast<CGObject*>(&m_objItem[i]);
+			}
+			obj += 0x57C;
+		}
+		break;
+	}
 	}
 
 	return 0;
@@ -864,14 +894,14 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 	GXSetZCompLoc(GX_FALSE);
 	_GXSetAlphaCompare((_GXCompare)6, 1, (_GXAlphaOp)0, (_GXCompare)7, 0);
 	GXSetZMode(GX_TRUE, (_GXCompare)3, GX_TRUE);
-	GXSetCullMode(GX_CULL_BACK);
+	GXSetCullMode(GX_CULL_FRONT);
 	GXSetNumTevStages(1);
 	_GXSetTevOp((_GXTevStageID)0, (_GXTevMode)4);
 	_GXSetTevOrder((_GXTevStageID)0, (_GXTexCoordID)0xFF, (_GXTexMapID)0xFF, (_GXChannelID)4);
 	GXSetNumChans(1);
-	GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+	GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
 	GXSetChanCtrl(
-		GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPEC);
+		GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
 	GXClearVtxDesc();
 	GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
@@ -1228,22 +1258,21 @@ CGItemObj* CFlatRuntime2::FindGItemObjNext(CGItemObj* gItemObj)
  */
 void CFlatRuntime2::Destroy()
 {
-	reinterpret_cast<CFlatRuntime*>(this)->Destroy();
+	CFlatRuntime::Destroy();
 	m_flatData.Destroy();
 
-	CFlatLayerResource* layer = LayerResources(this);
 	int zero = 0;
-	for (int i = 0; i < 8; i++, layer++) {
-		CFile::CHandle* fileHandle = layer->m_fileHandle;
+	for (int i = 0; i < 8; i++) {
+		CFile::CHandle* fileHandle = LayerResources(this)[i].m_fileHandle;
 		if (fileHandle != 0) {
 			File.Close(fileHandle);
-			layer->m_fileHandle = reinterpret_cast<CFile::CHandle*>(zero);
+			LayerResources(this)[i].m_fileHandle = reinterpret_cast<CFile::CHandle*>(zero);
 		}
 
-		CTextureSet* textureSet = layer->m_textureSet;
+		CTextureSet* textureSet = LayerResources(this)[i].m_textureSet;
 		if (textureSet != 0) {
 			delete textureSet;
-			layer->m_textureSet = reinterpret_cast<CTextureSet*>(zero);
+			LayerResources(this)[i].m_textureSet = reinterpret_cast<CTextureSet*>(zero);
 		}
 	}
 }
@@ -1261,8 +1290,9 @@ void CFlatRuntime2::Calc()
 {
 	u8* runtime = reinterpret_cast<u8*>(this);
 
-	for (int i = 0; i < 8; i++) {
-		CFlatLayerResource* layer = &LayerResources(this)[i];
+	char* base = reinterpret_cast<char*>(this);
+	for (int i = 0; i < 8; i++, base += sizeof(CFlatLayerResource)) {
+		CFlatLayerResource* layer = reinterpret_cast<CFlatLayerResource*>(base + 0x1770);
 		CFile::CHandle* fileHandle = layer->m_fileHandle;
 		if (fileHandle == 0) {
 			continue;
@@ -1277,14 +1307,13 @@ void CFlatRuntime2::Calc()
 
 			textureSet = new (getStage(), const_cast<char*>(sCFlatRuntime2FileTag), 0x335) CTextureSet;
 			layer->m_textureSet = textureSet;
-			if (textureSet != 0) {
-				textureSet->Create(
-					File.m_readBuffer,
-					GET_CHARA_ALLOC_STAGE_S(layer->m_allocStage, Game.m_mainStage),
-					0, 0, 0, 0);
-			}
+			void* readBuffer = File.m_readBuffer;
+			layer->m_textureSet->Create(
+				readBuffer,
+				GET_CHARA_ALLOC_STAGE_S(layer->m_allocStage, Game.m_mainStage),
+				0, 0, 0, 0);
 
-			File.Close(fileHandle);
+			File.Close(layer->m_fileHandle);
 			layer->m_fileHandle = 0;
 		}
 	}
@@ -1295,11 +1324,11 @@ void CFlatRuntime2::Calc()
 		button = Pad.GetPadInputs()[padIndex].lockedButton[1];
 	}
 
-	if (((button & 0x400) != 0) && (CFlatSaveSceneEnabled() != 0)) {
-		CFlatSaveSceneEnabled() = 0;
+	if (((button & 0x400) != 0) && (m_saveSceneEnabled != 0)) {
+		m_saveSceneEnabled = 0;
 	}
 
-	if (CFlatSaveSceneEnabled() != 0) {
+	if (m_saveSceneEnabled != 0) {
 		Graphic.Printf(2, 3, const_cast<char*>(sCFlatRuntime2SaveSceneMsg));
 
 		u32* saveData = new (getStage(), const_cast<char*>(sCFlatRuntime2FileTag), 0x36F) u32[0x3FF];
@@ -1373,15 +1402,14 @@ void CFlatRuntime2::Calc()
  */
 void CFlatRuntime2::Draw()
 {
-	CFont* font = *reinterpret_cast<CFont**>(MenuPcsRaw() + 0x248);
-	font->SetScale(1.0f);
+	CFont* font = MenuPcs.m_fonts[0];
+	font->SetScale(0.65f);
 	font->SetShadow(1);
 	font->SetMargin(0.0f);
 	font->SetZMode(0, 0);
 	font->DrawInit();
 	font->SetTlut(7);
-	GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
-	font->SetColor(color);
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 
 	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
 	for (CGObject* object = reinterpret_cast<CGObject*>(
@@ -1395,10 +1423,11 @@ void CFlatRuntime2::Draw()
 	font->SetZMode(0, 0);
 	font->SetPosZ(1.0f);
 	Mtx44 projection;
-	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcsRaw() + 0x40), projection);
+	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcsRaw() + 0x94), projection);
 	GXSetProjection(projection, GX_PERSPECTIVE);
 
-	font->SetScale(0.875f);
+	font = MenuPcs.m_fonts[0];
+	font->SetScale(0.85f);
 	font->SetShadow(1);
 	font->SetMargin(0.0f);
 	font->SetZMode(1, 1);
@@ -1414,8 +1443,9 @@ void CFlatRuntime2::Draw()
 
 	font->SetZMode(0, 0);
 	font->SetPosZ(1.0f);
-	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcsRaw() + 0x40), projection);
-	GXSetProjection(projection, GX_PERSPECTIVE);
+	Mtx44 projection2;
+	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcsRaw() + 0x94), projection2);
+	GXSetProjection(projection2, GX_PERSPECTIVE);
 
 	Mtx cameraMtx;
 	PSMTXCopy(*reinterpret_cast<Mtx*>(CameraPcsRaw() + 0x10), cameraMtx);
@@ -1424,22 +1454,21 @@ void CFlatRuntime2::Draw()
 	GXSetZCompLoc(GX_FALSE);
 	_GXSetAlphaCompare((_GXCompare)6, 1, (_GXAlphaOp)0, (_GXCompare)7, 0);
 	GXSetZMode(GX_TRUE, (_GXCompare)3, GX_TRUE);
-	GXSetCullMode(GX_CULL_BACK);
+	GXSetCullMode(GX_CULL_FRONT);
 	GXSetNumTevStages(1);
 	_GXSetTevOp((_GXTevStageID)0, (_GXTevMode)4);
 	_GXSetTevOrder((_GXTevStageID)0, (_GXTexCoordID)0xFF, (_GXTexMapID)0xFF, (_GXChannelID)4);
 	GXSetNumChans(1);
-	GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+	GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
 	GXSetChanCtrl(
-		GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPEC);
+		GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
 	GXClearVtxDesc();
 	GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
 
 	u8* runtime = reinterpret_cast<u8*>(this);
 	if ((RuntimeDebugFlags(runtime) & CFlatRuntimeDebugFlag_ParticleLines) != 0) {
-		GXColor lineColor = {0xFF, 0x80, 0x80, 0xFF};
-		GXSetChanMatColor(GX_COLOR0A0, lineColor);
+		GXSetChanMatColor(GX_COLOR0A0, CColor(0xFF, 0x80, 0x80, 0xFF).color);
 		GXLoadPosMtxImm(cameraMtx, GX_PNMTX0);
 
 		CLine<64>* line = m_debugLines;
@@ -1464,9 +1493,9 @@ void CFlatRuntime2::Draw()
 		for (int i = 0; i < debugCount; i++) {
 			const u8 flags = entry->m_flags;
 			GXColor* drawColor = &greenColor;
-			if ((flags & 0x80) != 0) {
+			if (entry->m_flagBits.m_bit7 != 0) {
 				drawColor = &redColor;
-			} else if ((flags & 0x40) != 0) {
+			} else if (entry->m_flagBits.m_bit6 != 0) {
 				drawColor = &blueColor;
 			}
 			GXSetChanMatColor(GX_COLOR0A0, *drawColor);
@@ -1548,16 +1577,15 @@ void CFlatRuntime2::AddDebugDrawCC(Vec* from, Vec* to, float radius, int bit7, i
 	int& count = DebugDrawCCCount(runtime);
 
 	if (static_cast<unsigned int>(count) < 0x10U) {
-		CFlatRuntime2::CDebugDrawCC* slot = &DebugDrawCCEntries(runtime)[count];
-		slot->m_from = *from;
-		slot->m_to = *to;
+		DebugDrawCCEntries(runtime)[count].m_from = *from;
+		DebugDrawCCEntries(runtime)[count].m_to = *to;
 
-		slot->m_flags = static_cast<u8>((bit7 << 7) | (slot->m_flags & 0x7F));
-		slot->m_flags = static_cast<u8>(((bit6 << 6) & 0x40) | (slot->m_flags & 0xBF));
+		DebugDrawCCEntries(runtime)[count].m_flagBits.m_bit7 = bit7;
+		DebugDrawCCEntries(runtime)[count].m_flagBits.m_bit6 = bit6;
 
 		const int index = count;
 		count = index + 1;
-		slot->m_radius = radius;
+		DebugDrawCCEntries(runtime)[index].m_radius = radius;
 		return;
 	}
 
@@ -1583,13 +1611,14 @@ void CFlatRuntime2::AddDebugDrawCC(Vec* from, Vec* to, float radius, int bit7, i
  */
 int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float radius, float angle, int maxCount, CGObject** objects)
 {
+	const float radiusSq = radius * radius;
+	CFlatRuntime::CObject* root = FlatObjectRoot(&CFlat);
+
 	if (maxCount <= 0 || objects == 0) {
 		return 0;
 	}
 
-	const float radiusSq = radius * radius;
-	CFlatRuntime::CObject* root = FlatObjectRoot(this);
-	CGBaseObj* baseObj = FindNextGBaseObjByCidMask(this, root->m_next->m_next, 5);
+	CGBaseObj* baseObj = FindNextGBaseObjByCidMask(&CFlat, root->m_next->m_next, 5);
 	int count = 0;
 
 	while (baseObj != 0) {
@@ -1621,7 +1650,7 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float radius
 								facing.z = cos(angle);
 								if (PSVECDotProduct(&offset, &facing) <= 0.0f) {
 									baseObj = FindNextGBaseObjByCidMask(
-										this, reinterpret_cast<CFlatRuntime::CObject*>(object)->m_next, 5);
+										&CFlat, reinterpret_cast<CFlatRuntime::CObject*>(object)->m_next, 5);
 									continue;
 								}
 							}
@@ -1657,7 +1686,7 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float radius
 			}
 		}
 
-		baseObj = FindNextGBaseObjByCidMask(this, reinterpret_cast<CFlatRuntime::CObject*>(object)->m_next, 5);
+		baseObj = FindNextGBaseObjByCidMask(&CFlat, reinterpret_cast<CFlatRuntime::CObject*>(object)->m_next, 5);
 	}
 
 	return count;
@@ -1674,12 +1703,10 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float radius
  */
 void CFlatRuntime2::loadLayer(int layerNo, char* fileName)
 {
-	CFlatLayerResource* layer = &LayerResources(this)[layerNo];
-
-	CTextureSet* textureSet = layer->m_textureSet;
+	CTextureSet* textureSet = LayerResources(this)[layerNo].m_textureSet;
 	if (textureSet != 0) {
 		delete textureSet;
-		layer->m_textureSet = 0;
+		LayerResources(this)[layerNo].m_textureSet = 0;
 	}
 
 	char path[0x104];
@@ -1690,11 +1717,13 @@ void CFlatRuntime2::loadLayer(int layerNo, char* fileName)
 		File.Read(fileHandle);
 		File.SyncCompleted(fileHandle);
 
-		textureSet = new (Game.m_mainStage, const_cast<char*>(sCFlatRuntime2FileTag), 0x4F4) CTextureSet;
-		layer->m_textureSet = textureSet;
-		if (textureSet != 0) {
-			textureSet->Create(File.m_readBuffer, Game.m_mainStage, 0, 0, 0, 0);
-		}
+		textureSet = new (getStage(), const_cast<char*>(sCFlatRuntime2FileTag), 0x4F4) CTextureSet;
+		LayerResources(this)[layerNo].m_textureSet = textureSet;
+		void* readBuffer = File.m_readBuffer;
+		LayerResources(this)[layerNo].m_textureSet->Create(
+			readBuffer,
+			GET_CHARA_ALLOC_STAGE_S(CharaPcs.m_charaAllocStage, Game.m_mainStage),
+			0, 0, 0, 0);
 
 		File.Close(fileHandle);
 	}
@@ -1721,30 +1750,28 @@ unsigned int CFlatRuntime2::isLoadLayerASyncCompleted(int layerNo)
  */
 void CFlatRuntime2::loadLayerASync(int layerNo, char* fileName)
 {
-	CFlatLayerResource* layer = &LayerResources(this)[layerNo];
-
-	CFile::CHandle* fileHandle = layer->m_fileHandle;
+	CFile::CHandle* fileHandle = LayerResources(this)[layerNo].m_fileHandle;
 	if (fileHandle != 0) {
 		File.Close(fileHandle);
-		layer->m_fileHandle = 0;
+		LayerResources(this)[layerNo].m_fileHandle = 0;
 	}
 
-	CTextureSet* textureSet = layer->m_textureSet;
+	CTextureSet* textureSet = LayerResources(this)[layerNo].m_textureSet;
 	if (textureSet != 0) {
 		delete textureSet;
-		layer->m_textureSet = 0;
+		LayerResources(this)[layerNo].m_textureSet = 0;
 	}
 
 	char path[0x104];
 	sprintf(path, sCFlatRuntime2TexturePathFmt, Game.GetLangString(), fileName);
 
 	fileHandle = File.Open(path, 0, CFile::PRI_LOW);
-	layer->m_fileHandle = fileHandle;
+	LayerResources(this)[layerNo].m_fileHandle = fileHandle;
 	if (fileHandle != 0) {
 		File.ReadASync(fileHandle);
 	}
 
-	layer->m_allocStage = CharaPcs.m_charaAllocStage;
+	LayerResources(this)[layerNo].m_allocStage = CharaPcs.m_charaAllocStage;
 }
 
 /*
@@ -1760,26 +1787,26 @@ void CFlatRuntime2::drawLayer(
 	int layerNo, char* textureName, int x, int y, int width, int height, int texU, int texV, float scaleX,
 	float scaleY, _GXColor* color, int flags)
 {
-	CTextureSet* textureSet = LayerResources(this)[layerNo].m_textureSet;
-	if (textureSet == 0) {
+	CFlatLayerResource* layer = &LayerResources(this)[layerNo];
+	if (layer->m_textureSet == 0) {
 		return;
 	}
 
-	int textureIndex = textureSet->Find(textureName);
+	int textureIndex = layer->m_textureSet->Find(textureName);
 	if (textureIndex < 0) {
 		return;
 	}
 
-	CTexture* texture = textureSet->GetTexture(static_cast<unsigned long>(textureIndex));
+	CTexture* texture = layer->m_textureSet->GetTexture(static_cast<unsigned long>(textureIndex));
 
 	GXSetNumChans(1);
 	GXSetChanCtrl(
-		GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
-	GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPEC);
+		GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
+	GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
 	GXSetChanMatColor(GX_COLOR0A0, *color);
 
 	Mtx44 ortho;
-	C_MTXOrtho(ortho, 0.0f, 448.0f, 0.0f, 640.0f, 0.0f, 1.0f);
+	C_MTXOrtho(ortho, FLOAT_80330144, FLOAT_80330148, FLOAT_80330144, FLOAT_8033014C, FLOAT_80330144, FLOAT_80330150);
 	GXSetProjection(ortho, GX_ORTHOGRAPHIC);
 
 	Mtx identity;
@@ -1787,7 +1814,7 @@ void CFlatRuntime2::drawLayer(
 	GXLoadPosMtxImm(identity, GX_PNMTX0);
 	GXSetCurrentMtx(GX_PNMTX0);
 
-	const unsigned int blendMode = static_cast<unsigned int>(flags >> 1) & 2;
+	const int blendMode = (flags >> 1) & 2;
 	if (blendMode == 1) {
 		_GXSetBlendMode((_GXBlendMode)1, (_GXBlendFactor)4, (_GXBlendFactor)1, (_GXLogicOp)5);
 	} else if (blendMode == 2) {
@@ -1807,7 +1834,7 @@ void CFlatRuntime2::drawLayer(
 	const float texW = static_cast<float>(texture->m_width);
 	const float texH = static_cast<float>(texture->m_height);
 	PSMTXScale(texMtx, 1.0f / texW, 1.0f / texH, 1.0f);
-	GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX3x4);
+	GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
 	GXSetNumTexGens(1);
 	GXSetTexCoordGen2(
 		GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
@@ -1925,7 +1952,7 @@ void CFlatRuntime2::drawLayer(
 	}
 
 	Mtx44 projection;
-	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcsRaw() + 0x40), projection);
+	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcsRaw() + 0x94), projection);
 	GXSetProjection(projection, GX_PERSPECTIVE);
 }
 
@@ -2231,8 +2258,9 @@ void CFlatRuntime2::IgnoreParticle(int slotNo, CFlatRuntime::CObject* object)
 	u8* ifDt = reinterpret_cast<u8*>(PartMng.pppGetIfDt(static_cast<short>(slotNo)));
 	u8 count = ifDt[6];
 	if (count < 0x10) {
+		short particleId = object->m_particleId;
 		ifDt[6] = static_cast<u8>(count + 1);
-		*reinterpret_cast<short*>(ifDt + 8 + count * 2) = object->m_particleId;
+		*reinterpret_cast<short*>(ifDt + 8 + count * 2) = particleId;
 	}
 }
 
@@ -2273,23 +2301,23 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 
 	switch (controlNo) {
 	case 0:
-		m_gameFlags = static_cast<u8>((m_gameFlags & 0x7F) | ((value8 & 1) << 7));
+		CFlat.m_gameFlagBits.m_flagBit7 = controlValue;
 		break;
 
 	case 2:
-		m_gameFlags = static_cast<u8>((m_gameFlags & 0xF7) | ((value8 & 1) << 3));
+		CFlat.m_gameFlagBits.m_flagBit3 = controlValue;
 		break;
 
 	case 3:
-		m_bossState = controlValue;
-		break;
-
-	case 4:
-		Game.m_gameWork.m_radarType = value8;
+		CFlat.m_bossState = controlValue;
 		break;
 
 	case 5:
-		m_bossSubState = controlValue;
+		CFlat.m_bossSubState = controlValue;
+		break;
+
+	case 4:
+		Game.m_gameWork.m_radarType = static_cast<unsigned char>(controlValue);
 		break;
 
 	case 6:
@@ -2302,9 +2330,9 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 	case 0x11:
 	case 0x15:
 	case 0x16: {
-		CGMonObj* mon = reinterpret_cast<CGMonObj*>(m_objMon);
-		for (int i = 0; i < 0x40; i++, mon++) {
-			if ((*reinterpret_cast<unsigned int*>(mon) != 0) &&
+		for (int i = 0; i < 0x40; i++) {
+			CGMonObj* mon = reinterpret_cast<CGMonObj*>(Game.m_scriptWork[0][0][i]);
+			if ((mon != 0) &&
 			    ((controlValue == 0) || ((mon->m_controlMask & static_cast<unsigned int>(controlValue)) != 0))) {
 				mon->sysControl(controlNo);
 			}
@@ -2316,36 +2344,36 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 		MenuPcs.ClrBattleItem();
 		break;
 
+	case 0x14:
+		Chara.TimeMogFur();
+		break;
+
 	case 0xA:
-		m_gameFlags = static_cast<u8>((m_gameFlags & 0xEF) | ((value8 & 1) << 4));
+		CFlat.m_gameFlagBits.m_flagBit4 = controlValue;
 		break;
 
 	case 0xB:
-		m_gameFlags = static_cast<u8>((m_gameFlags & 0xDF) | ((value8 & 1) << 5));
+		CFlat.m_gameFlagBits.m_flagBit5 = controlValue;
 		break;
 
 	case 0xE:
-		m_gameFlags = static_cast<u8>((m_gameFlags & 0xFD) | ((value8 & 1) << 1));
-		gChara.ChangeMogMode(controlValue);
+		CFlat.m_gameFlagBits.m_flagBit1 = controlValue;
+		Chara.ChangeMogMode(controlValue);
 		break;
 
 	case 0x12:
-		m_gameFlags = static_cast<u8>((m_gameFlags & 0xFE) | (value8 & 1));
+		CFlat.m_gameFlagBits.m_flagBit0 = controlValue;
 		break;
 
 	case 0x13: {
-		CGPartyObj* party = reinterpret_cast<CGPartyObj*>(m_objParty);
-		for (int i = 0; i < kFlatPartyObjCount; i++, party++) {
-			if (*reinterpret_cast<unsigned int*>(party) != 0) {
+		for (int i = 0; i < kFlatPartyObjCount; i++) {
+			CGPartyObj* party = Game.m_partyObjArr[i];
+			if (party != 0) {
 				party->sysControl(controlNo, controlValue);
 			}
 		}
 		break;
 	}
-
-	case 0x14:
-		gChara.TimeMogFur();
-		break;
 
 	case 0x17:
 	Pad.m_stickDigitalThreshold = static_cast<int>(controlValue);
@@ -2356,16 +2384,16 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 		break;
 
 	case 0x19: {
-		CGPartyObj* party = reinterpret_cast<CGPartyObj*>(m_objParty);
-		for (int i = 0; i < kFlatPartyObjCount; i++, party++) {
-			if (*reinterpret_cast<unsigned int*>(party) != 0) {
+		for (int i = 0; i < kFlatPartyObjCount; i++) {
+			CGPartyObj* party = Game.m_partyObjArr[i];
+			if (party != 0) {
 				party->damageDelete();
 			}
 		}
 
-		CGMonObj* mon = reinterpret_cast<CGMonObj*>(m_objMon);
-		for (int i = 0; i < kFlatMonObjCount; i++, mon++) {
-			if (*reinterpret_cast<unsigned int*>(mon) != 0) {
+		for (int i = 0; i < kFlatMonObjCount; i++) {
+			CGMonObj* mon = reinterpret_cast<CGMonObj*>(Game.m_scriptWork[0][0][i]);
+			if (mon != 0) {
 				mon->damageDelete();
 			}
 		}
@@ -2449,23 +2477,23 @@ void CFlatRuntime2::resetChangeScript()
 	}
 
 	for (int i = 0; i < 32; i++) {
-		m_mapObjectInfo[i].m_type = -1;
 		m_mapObjectInfo[i].m_drawFlag = 0;
+		m_mapObjectInfo[i].m_type = -1;
 	}
 
 	m_workAssignIndex = 0;
 	m_partyAssignIndex = 0;
 	m_cameraScriptTargetMode = 0;
 	m_gameFlags = (m_gameFlags & 0x7F) | 0x80;
-	m_gameFlags &= 0xDF;
-	m_gameFlags &= 0xEF;
+	m_gameFlagBits.m_flagBit5 = 0;
+	m_gameFlagBits.m_flagBit4 = 0;
 	m_bossState = 0;
 	m_bossSubState = 0;
 	memset(m_partyTraceParticleSlot, 0, sizeof(m_partyTraceParticleSlot) + sizeof(m_itemTraceParticleSlot));
 	memset(CGMonObj::m_boss, 0, sizeof(CGMonObj::m_boss));
-	m_gameFlags &= 0xFD;
-	m_gameFlags &= 0xF7;
-	m_gameFlags &= 0xFE;
+	m_gameFlagBits.m_flagBit1 = 0;
+	m_gameFlagBits.m_flagBit3 = 0;
+	m_gameFlagBits.m_flagBit0 = 0;
 	Pad.m_stickDigitalThreshold = 1;
 	GraphicPcs.m_screenFade[1].m_mode = 0;
 	CameraPcs.m_shadowAuto = 1;

@@ -1109,7 +1109,8 @@ int CFlatRuntime::request(CFlatRuntime::CObject* object, int systemKind, int sys
 		if (reqFlagIndex <= highestBit) {
 			return 0;
 		}
-		*reinterpret_cast<u16*>(targetObject + 0x34) |= static_cast<u16>(1 << reqFlagIndex);
+		*reinterpret_cast<u16*>(targetObject + 0x34) =
+		    static_cast<u16>(*reinterpret_cast<u16*>(targetObject + 0x34) | (1 << reqFlagIndex));
 	}
 
 	int copiedArgs = 0;

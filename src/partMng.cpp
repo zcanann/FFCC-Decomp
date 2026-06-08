@@ -1100,11 +1100,10 @@ void CPartMng::SetFp()
         float* recvBuff = reinterpret_cast<float*>(fpBytes);
         mng->m_pppResSet = self + kResSetOffset;
 
-        int fpTime = reinterpret_cast<int*>(recvBuff)[0x0B];
         if (mng->m_baseTime < 0) {
-            mng->m_baseTime = fpTime;
+            mng->m_baseTime = reinterpret_cast<int*>(recvBuff)[0x0B];
         } else {
-            mng->m_baseTime = fpTime * 0x19 / 0x1E;
+            mng->m_baseTime = reinterpret_cast<int*>(recvBuff)[0x0B] * 0x19 / 0x1E;
         }
 
         mng->m_cullRadiusSq = recvBuff[0x0D];
@@ -1145,7 +1144,7 @@ void CPartMng::SetFp()
 
         signed char mode = mng->m_matrixMode;
         if (mode == 2 || mode == 4) {
-            mng->m_mapObjIndex = static_cast<short>(MapMng.GetMapObjEffectIdx(*reinterpret_cast<unsigned short*>(fpBytes + 0x48)));
+            mng->m_mapObjIndex = static_cast<short>(MapMng.GetMapObjEffectIdx(*reinterpret_cast<short*>(fpBytes + 0x48)));
         } else if (mode >= 3 && mode <= 8) {
             CGObject* owner = *reinterpret_cast<CGObject**>(self + kUsbEditOffset + 0x1C);
             mng->m_ownerFlagA = 0;
@@ -2986,11 +2985,11 @@ void CPartMng::pppDrawPrioPdtFpno(unsigned char drawMode, short kind, short node
         short m_nodeIndex;                   // 0x76
         pppFMATRIX m_matrix;                 // 0x78
         unsigned char m_padA8[0xE4 - 0xA8]; // 0xA8
-        unsigned char m_endRequested;        // 0xE4
+        unsigned char m_mode;                // 0xE4
         unsigned char m_stopRequested;       // 0xE5
         unsigned char m_isFinished;          // 0xE6
         unsigned char m_matrixMode;          // 0xE7
-        unsigned char m_hitBgFlag;           // 0xE8
+        unsigned char m_endRequested;        // 0xE8
         unsigned char m_slotVisible;         // 0xE9
         unsigned char m_ownerFacing;         // 0xEA
         unsigned char m_drawVariant;         // 0xEB
@@ -4321,10 +4320,8 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     }
 
     if (createParam->m_rotationPtr == 0) {
-        mng->m_rotation.x = *reinterpret_cast<short*>(fpData + 0x10);
-        mng->m_rotation.y = *reinterpret_cast<short*>(fpData + 0x12);
-        mng->m_rotation.z = *reinterpret_cast<short*>(fpData + 0x14);
-        mng->m_rotation.w = *reinterpret_cast<short*>(fpData + 0x16);
+        *reinterpret_cast<int*>(&mng->m_rotation.x) = *reinterpret_cast<int*>(fpData + 0x10);
+        *reinterpret_cast<int*>(&mng->m_rotation.z) = *reinterpret_cast<int*>(fpData + 0x14);
         mng->m_rotationSpeed = *reinterpret_cast<int*>(fpData + 0x18);
     } else {
         int rotX = static_cast<int>(createParam->m_rotationPtr->x * 65536.0f / 360.0f);
@@ -4357,7 +4354,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
 
     const signed char mode = *reinterpret_cast<signed char*>(fpData2 + 0x05);
     if (mode == 2 || mode == 4) {
-        mng->m_mapObjIndex = static_cast<short>(MapMng.GetMapObjEffectIdx(*reinterpret_cast<unsigned short*>(fpData2 + 0x08)));
+        mng->m_mapObjIndex = static_cast<short>(MapMng.GetMapObjEffectIdx(*reinterpret_cast<short*>(fpData2 + 0x08)));
     } else if (mode >= 3 && mode <= 8) {
         mng->m_ownerFacing = 0;
         CGObject* owner = reinterpret_cast<CGObject*>(createParam->m_paramB);

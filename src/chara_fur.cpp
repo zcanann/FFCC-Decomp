@@ -1022,24 +1022,24 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 	}
 
 	const float cursorStep = 0.1f;
-	const unsigned int cursorX = static_cast<int>(static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorX)) +
+	Chara.MogFur().m_cursorX = static_cast<int>(static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorX)) +
 	                                     static_cast<float>(MogPadInt(36)) * cursorStep);
-	const int cursorY = static_cast<int>(static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorY)) -
+	Chara.MogFur().m_cursorY = static_cast<int>(static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorY)) -
 	                                     static_cast<float>(MogPadInt(40)) * cursorStep);
 
-	if (cursorX < 0) {
+	if (static_cast<int>(Chara.MogFur().m_cursorX) < 0) {
 		Chara.MogFur().m_cursorX = 0;
-	} else if (cursorX > 0x280) {
+	} else if (static_cast<int>(Chara.MogFur().m_cursorX) > 0x280) {
 		Chara.MogFur().m_cursorX = 0x280;
 	} else {
-		Chara.MogFur().m_cursorX = static_cast<unsigned int>(cursorX);
+		Chara.MogFur().m_cursorX = Chara.MogFur().m_cursorX;
 	}
-	if (cursorY < 0) {
+	if (static_cast<int>(Chara.MogFur().m_cursorY) < 0) {
 		Chara.MogFur().m_cursorY = 0;
-	} else if (cursorY > 0x1C0) {
+	} else if (static_cast<int>(Chara.MogFur().m_cursorY) > 0x1C0) {
 		Chara.MogFur().m_cursorY = 0x1C0;
 	} else {
-		Chara.MogFur().m_cursorY = static_cast<unsigned int>(cursorY);
+		Chara.MogFur().m_cursorY = Chara.MogFur().m_cursorY;
 	}
 
 	Mtx cameraMtx;

@@ -952,7 +952,9 @@ cylinder_body:
         const f32 vy = localDirection.y;
         const f32 radialC = (px * px + py * py) - radiusSq;
         const f32 radialB = px * vx + py * vy;
-        const f32 radialA = vx * vx + vy * vy;
+        const f32 vxSq = vx * vx;
+        const f32 vySq = vy * vy;
+        const f32 radialA = vxSq + vySq;
         f32 disc = radialB * radialB - radialA * radialC;
         if (disc < 0.0) {
             return 0;

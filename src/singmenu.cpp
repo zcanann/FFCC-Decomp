@@ -1578,8 +1578,8 @@ inline void CMenuPcs::SingCalcChara(float frameStep)
     float modelScale = gSingMenuRaceModelScales[modelScaleIndex];
     Mtx scaleMtx;
     PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
-    scaleMtx[1][3] = gSingMenuRaceModelYOffset[modelScaleIndex];
     scaleMtx[0][3] = 0.0f;
+    scaleMtx[1][3] = gSingMenuRaceModelYOffset[modelScaleIndex];
     scaleMtx[2][3] = 0.0f;
 
     model->m_flags10CBits.m_flag10C_80 = 1;
@@ -1878,13 +1878,13 @@ void CMenuPcs::SingleCalcFadeIn()
     int frame = static_cast<int>(m_singMenuState->frame);
     for (int i = 0; i < count; i++) {
         if (entry->startFrame <= frame) {
-            if (entry->startFrame + entry->duration > frame) {
+            if (entry->startFrame + entry->duration <= frame) {
+                completed = completed + 1;
+                entry->alpha = 1.0f;
+            } else {
                 entry->elapsed = entry->elapsed + 1;
                 entry->alpha = static_cast<float>((1.0 / (double)entry->duration) *
                                                   (double)entry->elapsed);
-            } else {
-                completed = completed + 1;
-                entry->alpha = 1.0f;
             }
         }
         entry = entry + 1;
@@ -1900,8 +1900,8 @@ void CMenuPcs::SingleCalcFadeIn()
     float modelScale = gSingMenuRaceModelScales[modelScaleIndex];
     Mtx scaleMtx;
     PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
-    scaleMtx[1][3] = gSingMenuRaceModelYOffset[modelScaleIndex];
     scaleMtx[0][3] = 0.0f;
+    scaleMtx[1][3] = gSingMenuRaceModelYOffset[modelScaleIndex];
     scaleMtx[2][3] = 0.0f;
 
     m_wm.m_handles[0]->m_model->m_flags10CBits.m_flag10C_80 = 1;
@@ -1974,14 +1974,14 @@ void CMenuPcs::SingleCalcFadeOut()
     for (int i = 0; i < count; i++) {
         if (entry->startFrame > frame) {
             entry->alpha = 1.0f;
-        } else if (entry->startFrame + entry->duration > frame) {
+        } else if (entry->startFrame + entry->duration <= frame) {
+            completed = completed + 1;
+            entry->alpha = 0.0f;
+        } else {
             entry->elapsed = entry->elapsed + 1;
             entry->alpha =
                 static_cast<float>(-((1.0 / static_cast<double>(entry->duration)) *
                                       static_cast<double>(entry->elapsed) - 1.0));
-        } else {
-            completed = completed + 1;
-            entry->alpha = 0.0f;
         }
         entry = entry + 1;
     }
@@ -1996,8 +1996,8 @@ void CMenuPcs::SingleCalcFadeOut()
     float modelScale = gSingMenuRaceModelScales[modelScaleIndex];
     Mtx scaleMtx;
     PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
-    scaleMtx[1][3] = gSingMenuRaceModelYOffset[modelScaleIndex];
     scaleMtx[0][3] = 0.0f;
+    scaleMtx[1][3] = gSingMenuRaceModelYOffset[modelScaleIndex];
     scaleMtx[2][3] = 0.0f;
 
     m_wm.m_handles[0]->m_model->m_flags10CBits.m_flag10C_80 = 1;
@@ -2065,8 +2065,8 @@ void CMenuPcs::SingleCalcCtrl()
     float modelScale = gSingMenuRaceModelScales[modelScaleIndex];
     Mtx scaleMtx;
     PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
-    scaleMtx[1][3] = gSingMenuRaceModelYOffset[modelScaleIndex];
     scaleMtx[0][3] = 0.0f;
+    scaleMtx[1][3] = gSingMenuRaceModelYOffset[modelScaleIndex];
     scaleMtx[2][3] = 0.0f;
 
     m_wm.m_handles[0]->m_model->m_flags10CBits.m_flag10C_80 = 1;

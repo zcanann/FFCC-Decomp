@@ -1828,7 +1828,7 @@ void CMenuPcs::drawBattle()
                     bodyWidth = LoadFloat(kMenuInitOne);
                 }
 
-                CTexture* tex = MenuPcs.m_textures[0xDD];
+                CTexture* tex = MenuPcs.m_textures[0x1A];
                 TextureMan.SetTexture(GX_TEXMAP0, tex);
                 u32 width = tex->m_width;
                 u32 height = tex->m_height;
@@ -1840,7 +1840,7 @@ void CMenuPcs::drawBattle()
                 TextureMan.SetTextureTev(tex);
                 MenuPcs.DrawRect(0, left, screenY, LoadFloat(kMenuMarkerCapSize), LoadFloat(kMenuMarkerCapSize), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(kMenuOne), LoadFloat(kMenuOne), LoadFloat(kMenuInitOne));
 
-                tex = MenuPcs.m_textures[0xDE];
+                tex = MenuPcs.m_textures[0x1B];
                 TextureMan.SetTexture(GX_TEXMAP0, tex);
                 width = tex->m_width;
                 height = tex->m_height;
@@ -1852,7 +1852,7 @@ void CMenuPcs::drawBattle()
                 TextureMan.SetTextureTev(tex);
                 MenuPcs.DrawRect(0, bodyLeft, screenY, bodyWidth, LoadFloat(kMenuMarkerCapSize), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(kMenuOne), LoadFloat(kMenuOne), LoadFloat(kMenuInitOne));
 
-                tex = MenuPcs.m_textures[0xDF];
+                tex = MenuPcs.m_textures[0x1C];
                 TextureMan.SetTexture(GX_TEXMAP0, tex);
                 width = tex->m_width;
                 height = tex->m_height;

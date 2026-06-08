@@ -3138,9 +3138,10 @@ void GbaQueue::CMakeFavorite(int channel, unsigned int value)
 		int writeOffset = static_cast<int>(*reinterpret_cast<short*>(obj + 0x2CB4 + channel * 0x20)) * 3;
 		*reinterpret_cast<short*>(obj + 0x2CB4 + channel * 0x20) =
 			static_cast<short>(*reinterpret_cast<short*>(obj + 0x2CB4 + channel * 0x20) + 1);
-		obj[0x2CCB + channel * 0x20 + writeOffset] = static_cast<char>(valueBytes[1]);
-		obj[0x2CCC + channel * 0x20 + writeOffset] = static_cast<char>(valueBytes[2]);
-		obj[0x2CCD + channel * 0x20 + writeOffset] = static_cast<char>(valueBytes[3]);
+		char* favBase = obj + 0x2CCD + channel * 0x20;
+		favBase[writeOffset - 2] = static_cast<char>(valueBytes[1]);
+		favBase[writeOffset - 1] = static_cast<char>(valueBytes[2]);
+		favBase[writeOffset] = static_cast<char>(valueBytes[3]);
 
 		if (*reinterpret_cast<short*>(obj + 0x2CB4 + channel * 0x20) >= 2) {
 			memcpy(&localInfo, &cmakeInfo[channel], sizeof(localInfo));

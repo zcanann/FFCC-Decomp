@@ -1019,11 +1019,8 @@ void CGItemObj::onFrameStat()
 	case 0x1F:
 		PartMng.pppSetLocSlot(m_particleSlot, &prgObj->m_worldPosition);
 
-		if (m_subState == 1) {
-			if (m_subFrame == 0x7D) {
-				ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
-			}
-		} else if (m_subState < 1 && -1 < m_subState && m_subFrame == 0) {
+		if (m_subState != 1) {
+			if (m_subState < 1 && -1 < m_subState && m_subFrame == 0) {
 			int particleNoA;
 			int particleNoB;
 
@@ -1048,6 +1045,9 @@ void CGItemObj::onFrameStat()
 			SetDamageCol(0, itemObjStrings + kItemObjStrF051Root, kItemObjDamageRadius, kItemObjDamageRadius,
 			             reinterpret_cast<Vec*>(&damageOffset));
 			*reinterpret_cast<int*>(&prgObj->m_damageColliders[1].m_localPosition.x) = 9;
+			}
+		} else if (m_subFrame == 0x7D) {
+			ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
 		}
 		break;
 	case 0x23:

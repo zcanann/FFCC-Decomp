@@ -3932,7 +3932,7 @@ void CGMonObj::statMove(int* targetIndex)
 		monObj->seKiduki();
 		break;
 
-	default: {
+	case 0: {
 		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) {
 			*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
 			memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));

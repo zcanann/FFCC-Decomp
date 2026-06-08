@@ -595,15 +595,15 @@ void CChara::CalcMogScore()
 		*scorePtr = (line + circle * 2 - bit * 2) / 3;
 		if (*scorePtr < 0) {
 			*scorePtr = 0;
-		} else if (*scorePtr > 100) {
-			*scorePtr = 100;
+		} else {
+			*scorePtr = (*scorePtr > 100) ? 100 : *scorePtr;
 		}
 
 		level = (100 - *scorePtr) / 5;
 		if (level < 5) {
 			level = 5;
-		} else if (level > 0xF) {
-			level = 0xF;
+		} else {
+			level = (level > 0xF) ? 0xF : level;
 		}
 		fur.m_radarLevel[i] = level;
 	}

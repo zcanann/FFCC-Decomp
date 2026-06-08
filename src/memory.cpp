@@ -1688,7 +1688,7 @@ int CAmemCacheSet::GetData(short index, char* source, int line)
         if (data != 0) {
             return data;
         }
-        AmemFreeLowPrio(entry.m_size);
+        AmemFreeLowPrio(cacheEntryAt(this, index).m_size);
     }
 }
 

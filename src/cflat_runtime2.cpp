@@ -1505,7 +1505,12 @@ void CFlatRuntime2::Draw()
 
 	u8* runtime = reinterpret_cast<u8*>(this);
 	if ((RuntimeDebugFlags(runtime) & CFlatRuntimeDebugFlag_ParticleLines) != 0) {
-		GXSetChanMatColor(GX_COLOR0A0, CColor(0xFF, 0x80, 0x80, 0xFF).color);
+		GXColor lineColor;
+		lineColor.r = 0xFF;
+		lineColor.g = 0x80;
+		lineColor.b = 0x80;
+		lineColor.a = 0xFF;
+		GXSetChanMatColor(GX_COLOR0A0, lineColor);
 		GXLoadPosMtxImm(cameraMtx, GX_PNMTX0);
 
 		CLine<64>* line = m_debugLines;

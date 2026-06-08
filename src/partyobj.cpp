@@ -3195,14 +3195,21 @@ void CGPartyObj::carry(int carryType, CGObject* object, int forceMode)
 					SetAnimSlot(0x0C, 1);
 				}
 			} else if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
-				SetAnimSlot(0x25, 0);
-				SetAnimSlot(0x24, 1);
-			} else if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
-				SetAnimSlot(0, 0);
-				SetAnimSlot(1, 1);
+				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+					SetAnimSlot(0, 0);
+					SetAnimSlot(1, 1);
+				} else {
+					SetAnimSlot(0x25, 0);
+					SetAnimSlot(0x30, 1);
+				}
 			} else {
-				SetAnimSlot(0x25, 0);
-				SetAnimSlot(0x30, 1);
+				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+					SetAnimSlot(0x25, 0);
+					SetAnimSlot(0x24, 1);
+				} else {
+					SetAnimSlot(0x25, 0);
+					SetAnimSlot(0x24, 1);
+				}
 			}
 			reinterpret_cast<CGItemObj*>(PartyData(this).carryObject)->carry(this, 0, 0);
 		} else {

@@ -4380,14 +4380,11 @@ void JoyBus::InitPpos()
  */
 int JoyBus::SendPpos(ThreadParam* threadParam)
 {
-    unsigned int result = 0;
+    int result = 0;
 
     unsigned char& state = threadParam->m_pposCounter;
-    unsigned char& playerCount = m_cmdBuffer[threadParam->m_portIndex];
-    unsigned char& mobCount = m_cmdBuffer[4 + threadParam->m_portIndex];
     unsigned char* posBytes = m_playerPosPacketBuffer[threadParam->m_portIndex] + 2;
     unsigned int* posWords = (unsigned int*)posBytes;
-    int& wordIndex = m_pposWordIndex[threadParam->m_portIndex];
 
     switch (state)
     {
@@ -4402,8 +4399,8 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 
         GbaQue.GetPlayerPos(threadParam->m_portIndex, posWords);
 
-        playerCount = 3;
-        wordIndex = 0;
+        m_cmdBuffer[threadParam->m_portIndex] = 3;
+        m_pposWordIndex[threadParam->m_portIndex] = 0;
         state += 1;
 
         break;
@@ -4411,8 +4408,8 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 
     case 1:
     {
-        int sent = wordIndex;
-        int totalWord = (int)(signed char)playerCount;
+        int sent = m_pposWordIndex[threadParam->m_portIndex];
+        int totalWord = (int)(signed char)m_cmdBuffer[threadParam->m_portIndex];
 
         while (sent < totalWord)
         {
@@ -4446,13 +4443,13 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
             sent++;
         }
 
-        wordIndex += sent;
+        m_pposWordIndex[threadParam->m_portIndex] += sent;
 
         // Done with all player-pos words?
-        if (wordIndex >= (int)(signed char)playerCount)
+        if (m_pposWordIndex[threadParam->m_portIndex] >= (int)(signed char)m_cmdBuffer[threadParam->m_portIndex])
         {
-            playerCount = 0;
-            wordIndex = 0;
+            m_cmdBuffer[threadParam->m_portIndex] = 0;
+            m_pposWordIndex[threadParam->m_portIndex] = 0;
             state += 1;
         }
         break;
@@ -4461,17 +4458,17 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
     case 2:
     {
         memset(posBytes, 0, sizeof(m_playerPosPacketBuffer[threadParam->m_portIndex]));
-        wordIndex = 0;
-        mobCount = 0;
+        m_pposWordIndex[threadParam->m_portIndex] = 0;
+        m_cmdBuffer[4 + threadParam->m_portIndex] = 0;
 
         int enemyCount = 0;
 
         GbaQue.GetEnemyPos(threadParam->m_portIndex, posWords, &enemyCount);
 
-        mobCount = (unsigned char)enemyCount;
+        m_cmdBuffer[4 + threadParam->m_portIndex] = (unsigned char)enemyCount;
 
         // If there are no enemies, skip straight to treasure (state 4)
-        if (mobCount == 0)
+        if (m_cmdBuffer[4 + threadParam->m_portIndex] == 0)
         {
             state += 2; // 2 -> 4
         }
@@ -4484,8 +4481,8 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 
     case 3:
     {
-        int sent = wordIndex;
-        int totalWord = (int)(unsigned char)mobCount;
+        int sent = m_pposWordIndex[threadParam->m_portIndex];
+        int totalWord = (int)(unsigned char)m_cmdBuffer[4 + threadParam->m_portIndex];
 
         while (sent < totalWord)
         {
@@ -4519,12 +4516,12 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
             sent++;
         }
 
-        wordIndex += sent;
+        m_pposWordIndex[threadParam->m_portIndex] += sent;
 
-        if (wordIndex >= (int)(signed char)mobCount)
+        if (m_pposWordIndex[threadParam->m_portIndex] >= (int)(signed char)m_cmdBuffer[4 + threadParam->m_portIndex])
         {
-            mobCount = 0;
-            wordIndex = 0;
+            m_cmdBuffer[4 + threadParam->m_portIndex] = 0;
+            m_pposWordIndex[threadParam->m_portIndex] = 0;
             state += 1;
         }
 
@@ -4534,16 +4531,16 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
     case 4:
     {
         memset(posBytes, 0, sizeof(m_playerPosPacketBuffer[threadParam->m_portIndex]));
-        wordIndex = 0;
-        mobCount = 0;
+        m_pposWordIndex[threadParam->m_portIndex] = 0;
+        m_cmdBuffer[4 + threadParam->m_portIndex] = 0;
 
         int treasureCount = 0;
 
         GbaQue.GetTreasurePos(threadParam->m_portIndex, posWords, &treasureCount);
 
-        mobCount = (unsigned char)treasureCount;
+        m_cmdBuffer[4 + threadParam->m_portIndex] = (unsigned char)treasureCount;
 
-        if (mobCount == 0)
+        if (m_cmdBuffer[4 + threadParam->m_portIndex] == 0)
         {
             state = 0;
         }
@@ -4557,8 +4554,8 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 
     case 5:
     {
-        int sent = wordIndex;
-        int totalWord = (int)(signed char)mobCount;
+        int sent = m_pposWordIndex[threadParam->m_portIndex];
+        int totalWord = (int)(signed char)m_cmdBuffer[4 + threadParam->m_portIndex];
 
         while (sent < totalWord)
         {
@@ -4592,13 +4589,13 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
             sent++;
         }
 
-        wordIndex += sent;
+        m_pposWordIndex[threadParam->m_portIndex] += sent;
 
-        if (wordIndex >= (int)(signed char)mobCount)
+        if (m_pposWordIndex[threadParam->m_portIndex] >= (int)(signed char)m_cmdBuffer[4 + threadParam->m_portIndex])
         {
             state = 0;
-            mobCount = 0;
-            wordIndex = 0;
+            m_cmdBuffer[4 + threadParam->m_portIndex] = 0;
+            m_pposWordIndex[threadParam->m_portIndex] = 0;
         }
 
         break;

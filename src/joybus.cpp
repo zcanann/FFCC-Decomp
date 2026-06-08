@@ -622,7 +622,7 @@ void JoyBus::ThreadMain(void* arg)
 
     for (;;)
     {
-        int diskError = File.IsDiskError();
+        unsigned int diskError = File.IsDiskError();
 
         if (diskError != 0)
         {
@@ -666,7 +666,7 @@ void JoyBus::ThreadMain(void* arg)
         }
 
         {
-            unsigned int s = (unsigned int)threadParam->m_state;
+            int s = (unsigned int)threadParam->m_state;
 
             if (s == 5 || s == 900)
             {
@@ -904,7 +904,7 @@ void JoyBus::ThreadMain(void* arg)
             threadParam->m_state = 0x15;
 
             localCrc[0] = 0xFFFF;
-            unsigned short crcA = Crc16(m_fileBaseA_dup, reinterpret_cast<unsigned char*>(m_fileBaseA), localCrc);
+            short crcA = Crc16(m_fileBaseA_dup, reinterpret_cast<unsigned char*>(m_fileBaseA), localCrc);
             int chkA = SendChkCrc(threadParam, 0, crcA, &localWord);
             if (chkA != 0)
             {
@@ -1136,7 +1136,7 @@ void JoyBus::ThreadMain(void* arg)
                     {
                         threadParam->m_state = 0x1E;
                         localCrc[0] = 0xFFFF;
-                        unsigned short crcB = Crc16(m_fileBaseB_dup, reinterpret_cast<unsigned char*>(m_fileBaseB), localCrc);
+                        short crcB = Crc16(m_fileBaseB_dup, reinterpret_cast<unsigned char*>(m_fileBaseB), localCrc);
                         int chkB = SendChkCrc(threadParam, 1, crcB, &localWord);
                         if (chkB != 0)
                         {

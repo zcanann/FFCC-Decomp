@@ -4,9 +4,19 @@
 #include "types.h"
 #include <dolphin/mtx.h>
 
+struct WindObjectFlags
+{
+    u8 active : 1;
+    u8 secondary : 1;
+    u8 _unused : 6;
+};
+
 struct WindObject
 {
-    u8 flags;
+    union {
+        u8 flags;
+        WindObjectFlags flagBits;
+    };
     u8 _pad01[3];
     f32 centerX;
     f32 centerZ;
@@ -34,7 +44,10 @@ struct WindObject
 
 struct WindGrassObject
 {
-    u8 flags;
+    union {
+        u8 flags;
+        WindObjectFlags flagBits;
+    };
     u8 _pad01[3];
     Vec pos;
     s32 id;

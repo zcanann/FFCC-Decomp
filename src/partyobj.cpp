@@ -1656,7 +1656,7 @@ void CGPartyObj::shouki()
 		}
 		if (isFrameInterval(*reinterpret_cast<int*>(&m_flagBits), damageInterval)) {
 			playSe3D(0x19, 0x32, 0x96, 0, 0);
-			if ((CFlatGameFlags() & 0x20) == 0) {
+			if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 26) & 0xC0000000) >> 31) == 0) {
 				addHp(-1, static_cast<CGPrgObj*>(0));
 			}
 		}

@@ -4385,7 +4385,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     reinterpret_cast<_pppMngSt*>(mng)->m_lookTarget = createParam->m_lookTargetPtr;
     reinterpret_cast<_pppMngSt*>(mng)->m_bindNode = 0;
 
-    const unsigned char mode = *reinterpret_cast<unsigned char*>(fpData2 + 0x05);
+    const signed char mode = *reinterpret_cast<signed char*>(fpData2 + 0x05);
     if (mode == 2 || mode == 4) {
         mng->m_mapObjIndex = static_cast<short>(MapMng.GetMapObjEffectIdx(*reinterpret_cast<unsigned short*>(fpData2 + 0x08)));
     } else if (mode >= 3 && mode <= 8) {

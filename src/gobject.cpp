@@ -738,7 +738,7 @@ void CGObject::objectCollision()
         Vec capsuleOffset;
     };
 
-    bool keepPushTimer = false;
+    int keepPushTimer = false;
     ColInfo self;
 
     self.obj = this;
@@ -771,9 +771,9 @@ void CGObject::objectCollision()
         info.capsuleOffset.z = other->m_bodyEllipsoidOffset * -cosf(other->m_rotBaseY);
         PSVECAdd(&info.basePos, &info.capsuleOffset, &info.capsulePos);
 
-        const double capsuleDistance = PSVECDistance(&self.capsulePos, &info.capsulePos);
-        if ((static_cast<double>(sZeroFloat) == capsuleDistance)
-            || (static_cast<double>(m_nearColRadius + other->m_nearColRadius) < capsuleDistance)) {
+        const float capsuleDistance = PSVECDistance(&self.capsulePos, &info.capsulePos);
+        if ((sZeroFloat == capsuleDistance)
+            || ((m_nearColRadius + other->m_nearColRadius) < capsuleDistance)) {
             continue;
         }
 
@@ -784,7 +784,7 @@ void CGObject::objectCollision()
                  || ((m_objectFlags & 0xC) != 0 && (other->m_objectFlags & 2) != 0))
                 && ((m_weaponNodeFlagBits.m_attached == 0) || (m_attachOwner != other))
                 && ((other->m_weaponNodeFlagBits.m_attached == 0) || (other->m_attachOwner != this))
-                && (capsuleDistance < static_cast<double>(m_attackColRadius + other->m_attackColRadius))) {
+                && (capsuleDistance < (m_attackColRadius + other->m_attackColRadius))) {
                 ColInfo* frontObj = thisAttack ? &self : &info;
                 ColInfo* hitObj = thisAttack ? &info : &self;
                 Vec dir;
@@ -800,7 +800,7 @@ void CGObject::objectCollision()
         }
 
         if (((m_bgColMask & 4) != 0) && ((other->m_bgColMask & 4) != 0)
-            && (capsuleDistance < static_cast<double>(m_bodyColRadius + other->m_bodyColRadius))) {
+            && (capsuleDistance < (m_bodyColRadius + other->m_bodyColRadius))) {
             CallOnPush(this, other, 1);
             CallOnPush(other, this, 0);
         }
@@ -810,8 +810,8 @@ void CGObject::objectCollision()
             && (sZeroFloat < other->m_bodyEllipsoidRadius)) {
             if (((m_weaponNodeFlagBits.m_attached == 0) || (m_attachOwner != other))
                 && ((other->m_weaponNodeFlagBits.m_attached == 0) || (other->m_attachOwner != this))) {
-                const bool usePushTimers = ((m_objectFlags & 0x40) != 0) && ((other->m_objectFlags & 0x40) != 0);
-                const double bodyDistanceLimit = static_cast<double>(m_bodyEllipsoidRadius + other->m_bodyEllipsoidRadius);
+                const int usePushTimers = ((m_objectFlags & 0x40) != 0) && ((other->m_objectFlags & 0x40) != 0);
+                const float bodyDistanceLimit = m_bodyEllipsoidRadius + other->m_bodyEllipsoidRadius;
 
                 if (capsuleDistance < bodyDistanceLimit) {
                     if (usePushTimers
@@ -823,18 +823,20 @@ void CGObject::objectCollision()
                     if (!usePushTimers || (m_collisionPushTimerMax != 0) || (other->m_collisionPushTimerMax == 0)) {
                         const float thisPush = static_cast<float>(m_pushParamA + m_pushParamB);
                         const float otherPush = static_cast<float>(other->m_pushParamA + other->m_pushParamB);
-                        float split = 0.5f + (thisPush - otherPush) / 510.0f;
-                        if (split < sZeroFloat) {
+                        const float rawSplit = 0.5f + (thisPush - otherPush) / 510.0f;
+                        float split;
+                        if (rawSplit < sZeroFloat) {
                             split = sZeroFloat;
-                        }
-                        if (split > sAnimFrameOffset) {
+                        } else if (rawSplit > sAnimFrameOffset) {
                             split = sAnimFrameOffset;
+                        } else {
+                            split = rawSplit;
                         }
 
                         Vec delta;
                         Vec scaledDelta;
                         PSVECSubtract(&self.capsulePos, &info.capsulePos, &delta);
-                        PSVECScale(&delta, &delta, static_cast<float>((bodyDistanceLimit - capsuleDistance) / bodyDistanceLimit));
+                        PSVECScale(&delta, &delta, (bodyDistanceLimit - capsuleDistance) / bodyDistanceLimit);
                         PSVECScale(&delta, &scaledDelta, sAnimFrameOffset - split);
                         PSVECAdd(&self.capsulePos, &scaledDelta, &self.capsulePos);
                         PSVECScale(&delta, &scaledDelta, -split);
@@ -849,9 +851,11 @@ void CGObject::objectCollision()
     }
 
     if (keepPushTimer) {
-        if (m_collisionPushTimerMax > 0) {
-            --m_collisionPushTimerMax;
+        short dec = m_collisionPushTimerMax - 1;
+        if (dec < 0) {
+            dec = 0;
         }
+        m_collisionPushTimerMax = dec;
     } else {
         m_collisionPushTimerMax = 0x32;
     }

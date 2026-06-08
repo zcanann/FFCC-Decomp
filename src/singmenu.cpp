@@ -1711,7 +1711,7 @@ void CMenuPcs::DrawSingleStat(float alpha)
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x29));
     for (float y = 40.0f; y < 408.0f; ) {
-        float sliceHeight = 32.0f;
+        float sliceHeight = 8.0f;
         if ((408.0f - y) < sliceHeight) {
             sliceHeight = 408.0f - y;
         }

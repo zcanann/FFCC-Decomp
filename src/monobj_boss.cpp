@@ -1603,7 +1603,8 @@ void CGMonObj::frameStatFuncWifeLamia()
 {
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
 
-	if (prgObj->m_lastStateId == 100) {
+	switch (prgObj->m_lastStateId) {
+	case 100:
 		if (prgObj->m_subState == 0) {
 			if (prgObj->m_subFrame == 0) {
 				memset(&m_moveWork, 0, sizeof(m_moveWork));
@@ -1629,6 +1630,7 @@ void CGMonObj::frameStatFuncWifeLamia()
 		} else if (prgObj->m_subState == 2 && prgObj->m_subFrame == 0) {
 			prgObj->reqAnim(0x1B, 1, 0);
 		}
+		break;
 	}
 }
 

@@ -2940,10 +2940,10 @@ int CGObject::IsAnimFinished(int mode)
                         if (sAnimFrameOffset == animSpan) {
                             result = 1;
                         } else {
-                            if (mode == 0) {
-                                frame = model.m_time;
-                            } else {
+                            if (mode != 0) {
                                 frame = m_turnSpeed;
+                            } else {
+                                frame = model.m_time;
                             }
 
                             threshold = static_cast<double>(frame);
@@ -2951,8 +2951,8 @@ int CGObject::IsAnimFinished(int mode)
                                 threshold = static_cast<double>(static_cast<float>(threshold + sLoopBias));
                             }
 
-                            if (static_cast<double>(sZeroFloat)
-                                <= static_cast<double>(m_lastBgAttr)) {
+                            if (static_cast<double>(m_lastBgAttr)
+                                >= static_cast<double>(sZeroFloat)) {
                                 result =
                                     (static_cast<u32>(static_cast<u8>(
                                          (static_cast<double>(animSpan - sAnimFrameOffset) < threshold) << 3))

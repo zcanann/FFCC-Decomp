@@ -3169,28 +3169,12 @@ int CMenuPcs::GetSmithItem(int itemNo)
         }
     }
 
-    if (raceType != 0) {
-        smithItem = *reinterpret_cast<u16*>(itemBase + 0x38);
-        if (smithItem > 0) {
-            return smithItem;
-        }
-    }
-    if (raceType != 1) {
-        smithItem = *reinterpret_cast<u16*>(itemBase + 0x3A);
-        if (smithItem > 0) {
-            return smithItem;
-        }
-    }
-    if (raceType != 2) {
-        smithItem = *reinterpret_cast<u16*>(itemBase + 0x3C);
-        if (smithItem > 0) {
-            return smithItem;
-        }
-    }
-    if (raceType != 3) {
-        smithItem = *reinterpret_cast<u16*>(itemBase + 0x3E);
-        if (smithItem > 0) {
-            return smithItem;
+    for (int i = 0; i < 4; i++) {
+        if (raceType != i) {
+            smithItem = *reinterpret_cast<u16*>(itemBase + 0x38 + i * 2);
+            if (smithItem > 0) {
+                return smithItem;
+            }
         }
     }
     return 0xFFFFFFFF;

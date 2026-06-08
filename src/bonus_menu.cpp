@@ -2602,6 +2602,8 @@ void CMenuPcs::CalcResultCountAnim()
 	}
 }
 
+#pragma push
+#pragma opt_strength_reduction off
 /*
  * --INFO--
  * PAL Address: 0x8013a8f4
@@ -2774,6 +2776,7 @@ void CMenuPcs::DrawResultOpenAnim()
 		DrawInit();
 	}
 }
+#pragma pop
 
 /*
  * --INFO--

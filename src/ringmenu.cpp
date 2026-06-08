@@ -607,7 +607,10 @@ void CRingMenu::onDraw()
 				font->SetTlut(4);
 
 				float scroll = m_spinAccumulator;
-				while (scroll >= kRingMenuOne) {
+				for (;;) {
+					if (!(scroll >= kRingMenuOne)) {
+						break;
+					}
 					if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
 						cmdIndex = (cmdIndex + 1) % 5;
 					} else {
@@ -615,7 +618,10 @@ void CRingMenu::onDraw()
 					}
 					scroll -= kRingMenuOne;
 				}
-				while (scroll < kRingMenuNegativeOne) {
+				for (;;) {
+					if (!(scroll < kRingMenuNegativeOne)) {
+						break;
+					}
 					if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
 						cmdIndex = (cmdIndex + 4) % 5;
 					} else {

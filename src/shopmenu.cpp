@@ -1222,7 +1222,6 @@ void CShopMenu::DrawBuySellInfo()
 {
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
     CFont* font = MenuPcs.m_fonts[0];
-    int listType = m_listType;
 
     SetupShopMenuInfoFont(font);
 
@@ -1254,13 +1253,13 @@ void CShopMenu::DrawBuySellInfo()
         itemNo = getItemNo(m_selectedIndex);
 
         if (itemNo > 0) {
-            if (listType == 0) {
+            if (m_listType == 0) {
                 canTrade = true;
-            } else if (listType == 2) {
+            } else if (m_listType == 2) {
                 unsigned int bit = static_cast<unsigned int>(itemNo - 0x191);
                 canTrade = (caravanWork->m_shopArgs[(itemNo - 0x191) >> 5] &
                             (1U << (bit & 0x1F))) != 0;
-            } else if ((listType == 1) && MenuPcs.EquipChk(m_selectedIndex) == 0 && itemNo >= 0x9F) {
+            } else if ((m_listType == 1) && MenuPcs.EquipChk(m_selectedIndex) == 0 && itemNo >= 0x9F) {
                 canTrade = true;
             }
         }
@@ -1268,7 +1267,7 @@ void CShopMenu::DrawBuySellInfo()
 
     int totalGil = 0;
     if (canTrade) {
-        if (listType == 0) {
+        if (m_listType == 0) {
             int gil = 0;
             if (itemNo >= 1) {
                 const CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
@@ -1277,7 +1276,7 @@ void CShopMenu::DrawBuySellInfo()
                 gil = gil / 100;
             }
             totalGil = m_quantity * gil;
-        } else if (listType == 1) {
+        } else if (m_listType == 1) {
             int sellGil = 0;
             if (itemNo >= 1) {
                 const CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);

@@ -2472,7 +2472,7 @@ void CMenuPcs::CmakeNameDraw()
         frame = 0;
     }
 
-    short mode = CmakeState(this)->m_mode;
+    unsigned short mode = CmakeState(this)->m_mode;
     float alpha;
     if (mode == 0) {
         alpha = static_cast<float>(0.1 * static_cast<double>(frame));
@@ -2559,7 +2559,7 @@ void CMenuPcs::CmakeNameDraw()
         48.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     if ((CmakeState(this)->m_mode == 1) && (CmakeState(this)->m_row < 5)) {
-        short row = CmakeState(this)->m_row;
+        unsigned short row = CmakeState(this)->m_row;
         int cellX = static_cast<int>(
             26.9f * static_cast<float>(CmakeState(this)->m_select) +
             static_cast<float>(240.0f));
@@ -2619,7 +2619,7 @@ void CMenuPcs::CmakeNameDraw()
     DrawCmakeName(0, nameCursor, name, alpha);
     DrawCmakeDecision(
         (static_cast<int>(CmakeState(this)->m_row) >> 31) +
-            (static_cast<unsigned int>(static_cast<int>(CmakeState(this)->m_row)) > 4),
+            (static_cast<int>(static_cast<int>(CmakeState(this)->m_row)) > 4),
         alpha);
 
     if (CmakeMcState(this) != 3) {
@@ -2706,7 +2706,7 @@ int CMenuPcs::CmakeNameCtrl()
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else if ((repeat & 0x4) != 0) {
-            if (CmakeState(this)->m_row < (4 + static_cast<int>((static_cast<long long>(CmakeState(this)->m_select) - 10) >> 32))) {
+            if (CmakeState(this)->m_row < (4 + static_cast<unsigned int>((static_cast<unsigned long long>(CmakeState(this)->m_select) - 10) >> 32))) {
                 CmakeState(this)->m_row = static_cast<short>(CmakeState(this)->m_row + 1);
             } else {
                 CmakeState(this)->m_row = 0;

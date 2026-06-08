@@ -2009,10 +2009,11 @@ void CMenuPcs::CalcResultCloseAnim()
 			off += 0x40;
 		}
 
-		count[0x16] = 0;
-		count[0x17] = 9999;
-		count[0x1a] = 0;
-		count[0x1b] = 3;
+		{
+			BonusAnimSprite* headerSprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + 8);
+			headerSprite->startFrame = 9999;
+			*(int*)((int)headerSprite + 0x2c) = 3;
+		}
 
 		for (int i = 0; i < activePartyCount; i++) {
 			*(int*)(this->m_bonusAnimPtr + (i + 1) * 0x40 + 0x2c) = 0x10;

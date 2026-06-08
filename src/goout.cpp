@@ -2545,15 +2545,15 @@ void CGoOutMenu::Calc()
                 unsigned char nextMode = 0;
                 if (MenuPcs.m_menuWindowInfo->state == 1) {
                     input = GetGoOutInputMask();
-                    if ((input & 0xC) == 0) {
+                    if ((input & 0xC) != 0) {
+                        m_cursorChoice ^= 1;
+                        Sound.PlaySe(1, 0x40, 0x7f, 0);
+                    } else {
                         input = GetGoOutInputMask();
                         if ((input & 0x100) != 0) {
                             Sound.PlaySe(2, 0x40, 0x7f, 0);
                             nextMode = static_cast<unsigned char>(m_cursorChoice + 1);
                         }
-                    } else {
-                        m_cursorChoice ^= 1;
-                        Sound.PlaySe(1, 0x40, 0x7f, 0);
                     }
                 }
 

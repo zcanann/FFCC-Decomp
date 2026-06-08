@@ -267,10 +267,10 @@ int CMenuPcs::MoneyCtrlCur()
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			}
 		} else {
-			if (this->m_moneyState->selections[mode] == 0) {
-				this->m_moneyState->selections[mode] = 1;
-			} else {
+			if (this->m_moneyState->selections[mode] != 0) {
 				this->m_moneyState->selections[mode] = this->m_moneyState->selections[mode] - 1;
+			} else {
+				this->m_moneyState->selections[mode] = 1;
 			}
 			Sound.PlaySe(1, 0x40, 0x7F, 0);
 		}

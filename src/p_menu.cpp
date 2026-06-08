@@ -1804,13 +1804,13 @@ void CMenuPcs::drawBattle()
 
             if (screenX < static_cast<float>(halfWidth)) {
                 screenX = static_cast<float>(halfWidth);
-            } else if (screenX > static_cast<float>(0x280 - halfWidth)) {
+            } else if (static_cast<float>(0x280 - halfWidth) < screenX) {
                 screenX = static_cast<float>(0x280 - halfWidth);
             }
 
             if (screenY < LoadFloat(kMenuMarkerMinY)) {
                 screenY = LoadFloat(kMenuMarkerMinY);
-            } else if (screenY > LoadFloat(kMenuMarkerMaxY)) {
+            } else if (LoadFloat(kMenuMarkerMaxY) < screenY) {
                 screenY = LoadFloat(kMenuMarkerMaxY);
             }
 

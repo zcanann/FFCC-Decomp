@@ -27,6 +27,17 @@ static const char s_p_chara_collection_ptrarray_h[] = "collection_ptrarray.h";
 
 extern const float kCharaZero;
 extern const float kCharaOne;
+extern const float FLOAT_80330290;
+extern const double DOUBLE_80330298;
+extern const float FLOAT_803302A0;
+extern const float FLOAT_803302A4;
+extern const float FLOAT_803302A8;
+extern const float FLOAT_803302AC;
+extern const float FLOAT_803302C8;
+extern const float FLOAT_803302CC;
+extern const float FLOAT_803302D0;
+extern const float FLOAT_803302D4;
+extern const float FLOAT_803302D8;
 extern const float kCharaBumpLightPosX;
 extern const float kCharaBumpLightPosY;
 extern const float kCharaBumpLightPosZ;
@@ -1996,10 +2007,10 @@ void CCharaPcs::drawOverlap()
     GXSetCullMode(GX_CULL_NONE);
 
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-    GXPosition3f32(0.0f, 0.0f, 1.0f);
-    GXPosition3f32(640.0f, 0.0f, 1.0f);
-    GXPosition3f32(0.0f, 448.0f, 1.0f);
-    GXPosition3f32(640.0f, 448.0f, 1.0f);
+    GXPosition3f32(kCharaZero, kCharaZero, kCharaOne);
+    GXPosition3f32(FLOAT_803302CC, kCharaZero, kCharaOne);
+    GXPosition3f32(kCharaZero, FLOAT_803302C8, kCharaOne);
+    GXPosition3f32(FLOAT_803302CC, FLOAT_803302C8, kCharaOne);
 
     PSMTX44Copy(CameraPcs.m_screenMatrix, projectionMtx);
     GXSetProjection(projectionMtx, GX_PERSPECTIVE);
@@ -2045,10 +2056,10 @@ void CCharaPcs::drawOverlap()
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-    GXPosition3f32(0.0f, 0.0f, 0.0f);
-    GXPosition3f32(640.0f, 0.0f, 0.0f);
-    GXPosition3f32(0.0f, 448.0f, 0.0f);
-    GXPosition3f32(640.0f, 448.0f, 0.0f);
+    GXPosition3f32(kCharaZero, kCharaZero, kCharaZero);
+    GXPosition3f32(FLOAT_803302CC, kCharaZero, kCharaZero);
+    GXPosition3f32(kCharaZero, FLOAT_803302C8, kCharaZero);
+    GXPosition3f32(FLOAT_803302CC, FLOAT_803302C8, kCharaZero);
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_NOOP);
     _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};

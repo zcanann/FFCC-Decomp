@@ -2645,36 +2645,8 @@ void CGoOutMenu::Calc()
                     }
                 }
 
-                if (nextMode == 2) {
-                    unsigned int activeCount = 0;
-                    for (int i = 0; i < 8; i++) {
-                        if (Game.m_caravanWorkArr[i].m_shopState != 0) {
-                            activeCount++;
-                            if (Game.m_caravanWorkArr[i].m_shopBusyFlag != 0) {
-                                activeCount++;
-                            }
-                        }
-                    }
-
-                    if (activeCount < 2) {
-                        int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
-                        SetMenuStr(0, 2,
-                                   GetGoOutMessageLine(languageId, 108),
-                                   GetGoOutMessageLine(languageId, 109));
-                        m_nextMainMode = 1;
-                        SetMainMode(0);
-                    } else {
-                        SetMainMode(3);
-                        if (m_currentMessage >= 0) {
-                            MenuPcs.m_menuWindowInfo->state = 2;
-                            MenuGoOutState().m_animFrame = 0;
-                        }
-                        m_messageWindowOpen = 0;
-                        m_pendingMessage = -1;
-                        m_messageCloseMode = 0;
-                        m_pendingMessageTimer = 0;
-                    }
-                } else if (nextMode == 1) {
+                switch (nextMode) {
+                case 1: {
                     int characterCount = 0;
                     for (unsigned int i = 0; i < 8; i++) {
                         if (Game.m_caravanWorkArr[i].m_shopState != 0) {
@@ -2717,6 +2689,39 @@ void CGoOutMenu::Calc()
                             SetMainMode(0);
                         }
                     }
+                    break;
+                }
+                case 2: {
+                    unsigned int activeCount = 0;
+                    for (int i = 0; i < 8; i++) {
+                        if (Game.m_caravanWorkArr[i].m_shopState != 0) {
+                            activeCount++;
+                            if (Game.m_caravanWorkArr[i].m_shopBusyFlag != 0) {
+                                activeCount++;
+                            }
+                        }
+                    }
+
+                    if (activeCount < 2) {
+                        int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+                        SetMenuStr(0, 2,
+                                   GetGoOutMessageLine(languageId, 108),
+                                   GetGoOutMessageLine(languageId, 109));
+                        m_nextMainMode = 1;
+                        SetMainMode(0);
+                    } else {
+                        SetMainMode(3);
+                        if (m_currentMessage >= 0) {
+                            MenuPcs.m_menuWindowInfo->state = 2;
+                            MenuGoOutState().m_animFrame = 0;
+                        }
+                        m_messageWindowOpen = 0;
+                        m_pendingMessage = -1;
+                        m_messageCloseMode = 0;
+                        m_pendingMessageTimer = 0;
+                    }
+                    break;
+                }
                 }
             }
             break;

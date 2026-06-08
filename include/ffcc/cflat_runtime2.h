@@ -41,7 +41,14 @@ public:
 
 	struct CDebugDrawCC
 	{
-		u8 m_flags;
+		union {
+			u8 m_flags;
+			struct {
+				s8 m_bit7 : 1;
+				s8 m_bit6 : 1;
+				s8 m_bitsLow : 6;
+			} m_flagBits;
+		};
 		u8 m_pad[3];
 		Vec m_from;
 		Vec m_to;

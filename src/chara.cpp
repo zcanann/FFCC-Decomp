@@ -1026,9 +1026,11 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 			} else if (chunk.m_id == 0x4E534554) {
 				const u32 nodeCapacity = chunk.m_arg0;
 				m_data->m_nodeCount = 0;
-				CChara::CNode::CRefData* nodeRefs = new CChara::CNode::CRefData[nodeCapacity];
+				CChara::CNode::CRefData* nodeRefs =
+				    new (stage, const_cast<char*>(s_chara_cpp), 0x143) CChara::CNode::CRefData[nodeCapacity];
 				m_data->m_nodeRefData = nodeRefs;
-				CChara::CNode* nodes = new CChara::CNode[nodeCapacity];
+				CChara::CNode* nodes =
+				    new (stage, const_cast<char*>(s_chara_cpp), 0x145) CChara::CNode[nodeCapacity];
 				m_nodes = nodes;
 
 				chunkFile.PushChunk();
@@ -1052,9 +1054,11 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 			} else if (chunk.m_id == 0x4D535354) {
 				const u32 meshCapacity = chunk.m_arg0;
 				m_data->m_meshCount = 0;
-				CChara::CMesh::CRefData* meshRefs = new CChara::CMesh::CRefData[meshCapacity];
+				CChara::CMesh::CRefData* meshRefs =
+				    new (stage, const_cast<char*>(s_chara_cpp), 0x171) CChara::CMesh::CRefData[meshCapacity];
 				m_data->m_meshRefData = meshRefs;
-				CChara::CMesh* meshes = new CChara::CMesh[meshCapacity];
+				CChara::CMesh* meshes =
+				    new (stage, const_cast<char*>(s_chara_cpp), 0x173) CChara::CMesh[meshCapacity];
 				m_meshes = meshes;
 
 				chunkFile.PushChunk();

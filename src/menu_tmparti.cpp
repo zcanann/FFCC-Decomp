@@ -207,23 +207,24 @@ void CMenuPcs::TmpArtiDraw()
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	const CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	TmpArtiEntry* entry = GetTmpArtiEntries(this);
+	const CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 
 	for (int i = 0; i < GetTmpArtiList(this)->count; i++) {
 		int tex = entry->tex;
 		if (tex >= 0) {
-			float alpha = entry->alpha;
 			float left = (float)entry->x;
 			float top = (float)entry->y;
 			float width = (float)entry->width;
 			float height = (float)entry->height;
 			float s = entry->s;
 			float t = entry->t;
+			float rawAlpha = entry->alpha;
+			float alpha = rawAlpha;
 
 			if (caravanWork->m_treasures[i] < 0) {
 				tex = 0x34;
-				alpha = (float)(kTmpArtiHalfDouble * (double)alpha);
+				alpha = (float)(kTmpArtiHalfDouble * (double)rawAlpha);
 			}
 
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
@@ -242,7 +243,7 @@ void CMenuPcs::TmpArtiDraw()
 	}
 
 	entry = GetTmpArtiEntries(this);
-	for (int i = 0; i < 4; i++) {
+	for (unsigned int i = 0; i < 4; i++) {
 		short icon = caravanWork->m_treasures[i];
 		if (icon >= 0) {
 			int posX = (int)TmpArtiIntToFloat(entry->x + entry->width - 0x10);
@@ -361,7 +362,7 @@ int CMenuPcs::TmpArtiCtrl()
 		const CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 
 		TmpArtiEntry* entry = this->m_tmpArtiList->entries;
-		for (iVar7 = 0; iVar7 < this->m_tmpArtiList->count; iVar7 = iVar7 + 1) {
+		for (int i = 0; i < this->m_tmpArtiList->count; i = i + 1) {
 			entry->alpha = fVar2;
 			entry->z = fVar2;
 			entry++;
@@ -369,44 +370,11 @@ int CMenuPcs::TmpArtiCtrl()
 
 		itemCount = caravanWork->m_numCmdListSlots;
 		iVar7 = 0;
-		TmpArtiEntry* entries = GetTmpArtiEntries(this);
-		int setupIndex = itemCount - 1;
-		if (setupIndex > -1) {
-			blockCount = (unsigned int)itemCount >> 3;
-			if (blockCount != 0) {
-				do {
-					TmpArtiEntry* setupEntry = entries + setupIndex;
-					setupEntry[0].startFrame = iVar7++;
-					setupEntry[0].duration = 3;
-					setupEntry[-1].startFrame = iVar7++;
-					setupEntry[-1].duration = 3;
-					setupEntry[-2].startFrame = iVar7++;
-					setupEntry[-2].duration = 3;
-					setupEntry[-3].startFrame = iVar7++;
-					setupEntry[-3].duration = 3;
-					setupEntry[-4].startFrame = iVar7++;
-					setupEntry[-4].duration = 3;
-					setupEntry[-5].startFrame = iVar7++;
-					setupEntry[-5].duration = 3;
-					setupEntry[-6].startFrame = iVar7++;
-					setupEntry[-6].duration = 3;
-					setupEntry[-7].startFrame = iVar7++;
-					setupEntry[-7].duration = 3;
-					setupIndex -= 8;
-					blockCount = blockCount - 1;
-				} while (blockCount != 0);
-				itemCount = itemCount & 7;
-				if (itemCount == 0) {
-					return hasInput;
-				}
-			}
-			do {
-				entries[setupIndex].startFrame = iVar7;
-				iVar7 = iVar7 + 1;
-				entries[setupIndex].duration = 3;
-				setupIndex--;
-				itemCount = itemCount - 1;
-			} while (itemCount != 0);
+		for (int setupIndex = itemCount - 1; setupIndex >= 0; setupIndex--) {
+			TmpArtiEntry* setupEntry = &this->m_tmpArtiList->entries[setupIndex];
+			setupEntry->startFrame = iVar7;
+			iVar7 = iVar7 + 1;
+			setupEntry->duration = 3;
 		}
 	}
 

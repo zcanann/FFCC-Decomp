@@ -158,11 +158,12 @@ static bool CharaObjIsAttackAnimBoundary(CGCharaObj* charaObj)
 	}
 
 	int frame = static_cast<int>(charaObj->m_turnSpeed);
+	int remainder = frame % span;
 	if (charaObj->m_lastBgAttr >= kCharaObjZero) {
 		return span <= frame;
 	}
 
-	return (frame % span) == 0;
+	return remainder == 0;
 }
 
 static float CharaObjGetMonsterScale(unsigned char* script9, bool isMon)
@@ -258,6 +259,19 @@ struct CharaObjSignedTopBit
 {
 	signed char m_top : 1;
 	signed char m_pad : 7;
+};
+
+struct CharaObjSignedLowBit
+{
+	signed char m_pad : 7;
+	signed char m_low : 1;
+};
+
+struct CharaObjPartyFlag04
+{
+	unsigned char m_pad_hi : 5;
+	unsigned char m_bit04 : 1;
+	unsigned char m_pad_lo : 2;
 };
 
 struct CharaObjComboFlagBits
@@ -1860,7 +1874,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 	}
 
 	unsigned char* staSlot = reinterpret_cast<unsigned char*>(m_scriptHandle) + (staIndex * 2);
-	unsigned short current = *reinterpret_cast<unsigned short*>(staSlot + 0x3E);
+	int current = *reinterpret_cast<unsigned short*>(staSlot + 0x3E);
 	value &= ~(value >> 31);
 
 	if (current == 0 && value != 0) {
@@ -2462,15 +2476,9 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 	int hpValue = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C);
 	int next = hpValue;
 
-	if (delta > 0) {
-		unsigned short maxHp = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1A);
-		next = hpValue + delta;
-		if (static_cast<int>(next) > static_cast<int>(maxHp)) {
-			next = maxHp;
-		}
-		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) = static_cast<unsigned short>(next);
-	} else if (delta < 0 && hpValue != 0) {
-		if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D && (CFlatGameFlags() & CFlatGameFlag_Bit0) != 0 &&
+	if (hpValue != 0 && delta < 0) {
+		if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
+		    reinterpret_cast<CharaObjSignedLowBit*>(&CFlatGameFlags())->m_low != 0 &&
 		    static_cast<int>(hpValue + delta) <= 0) {
 			delta = -(static_cast<int>(hpValue) - 1);
 		}
@@ -2511,29 +2519,37 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 		if (sourceObj != 0) {
 			onDamaged(sourceObj);
 		}
-	}
 
-	if (next != 0) {
+		if (next != 0) {
+			return;
+		}
+
+		for (int i = 0; i < 0x27; i++) {
+			setSta(i, 0);
+		}
+		m_displayFlags |= 2;
+		changeStat(9, 0, 0);
+
+		if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D) {
+			CGPartyObj* party = static_cast<CGPartyObj*>(this);
+			for (int i = 2; i < *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBAA); i++) {
+				if (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->DelCmdListAndItem(i) == 0x125) {
+					reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetNumCombi(i, 1);
+					reinterpret_cast<CharaObjPartyFlag04*>(&party->m_partyData.partyFlags)->m_bit04 = 1;
+					return;
+				}
+			}
+		}
 		return;
 	}
 
-	for (int i = 0; i < 0x27; i++) {
-		setSta(i, 0);
-	}
-	m_displayFlags |= 2;
-	changeStat(9, 0, 0);
-
-	if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D) {
-		CGPartyObj* party = static_cast<CGPartyObj*>(this);
-		CCaravanWork* caravan = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
-		for (int i = 2; i < *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBAA); i++) {
-			if (caravan->DelCmdListAndItem(i) == 0x125) {
-				caravan->GetNumCombi(i, 1);
-				unsigned char& flags = party->m_partyData.partyFlags;
-				flags = (flags & 0xFB) | 4;
-				return;
-			}
+	if (delta > 0) {
+		unsigned short maxHp = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1A);
+		next = hpValue + delta;
+		if (static_cast<int>(next) > static_cast<int>(maxHp)) {
+			next = maxHp;
 		}
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) = static_cast<unsigned short>(next);
 	}
 }
 
@@ -2683,7 +2699,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 	int particleBank = CharaObjResolveParticleBank(this, particleClass);
 	unsigned short particleEntry = 0xFFFF;
 	unsigned short particleFlags = 0;
-	unsigned int particleNo = effectId;
+	int particleNo = effectId;
 	int seNo = 0;
 	int emittedCustom = 0;
 	int hasParticle = 0;
@@ -3324,7 +3340,7 @@ void CGCharaObj::combi2()
 			continue;
 		}
 
-		bool hasNearbyPartner = false;
+		int hasNearbyPartner = 0;
 		for (int j = 0; j < candidateCount; j++) {
 			if (i == j) {
 				continue;
@@ -3336,18 +3352,24 @@ void CGCharaObj::combi2()
 			}
 
 			if (PSVECDistance(&CharaObjComboCenter(party), &CharaObjComboCenter(other)) < 20.0f) {
-				hasNearbyPartner = true;
+				hasNearbyPartner = 1;
 				break;
 			}
 		}
 
 		CharaObjComboFlagBits* comboFlags = reinterpret_cast<CharaObjComboFlagBits*>(&CharaObjComboFlags(party));
-		const bool hadNearbyPartner = comboFlags->m_nearby;
-		if (hasNearbyPartner != hadNearbyPartner) {
-			comboFlags->m_nearby = hasNearbyPartner ? -1 : 0;
-			comboFlags->m_active = -1;
-			party->playSe3D(hasNearbyPartner ? 0x3E : 0x3D, 0x32, 0x96, 0, 0);
+		if (hasNearbyPartner) {
+			if (comboFlags->m_nearby == 0) {
+				goto changed;
+			}
+		} else if (comboFlags->m_nearby != 0) {
+			goto changed;
 		}
+		continue;
+	changed:
+		comboFlags->m_nearby = hasNearbyPartner ? -1 : 0;
+		comboFlags->m_active = -1;
+		party->playSe3D(hasNearbyPartner ? 0x3E : 0x3D, 0x32, 0x96, 0, 0);
 	}
 
 	for (int i = 0; i < candidateCount - 1; i++) {
@@ -3487,14 +3509,13 @@ void CGCharaObj::combi2()
 void CGCharaObj::sendCombiToScript(CGCharaObj* target, int scriptArg, int)
 {
 	int entry = 0;
-	CGPrgObj** comboLinks = CharaObjComboLinks(this);
 	while (entry < CharaObjComboLinkCount(this)) {
-		if (comboLinks[entry] != 0) {
+		if (CharaObjComboLinks(this)[entry] != 0) {
 			if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
-			    (static_cast<unsigned short>(comboLinks[entry]->GetCID()) & 0x6D) == 0x6D &&
-			    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(comboLinks[entry]->m_scriptHandle) + 0x3B4) != 0) {
+			    (static_cast<unsigned short>(CharaObjComboLinks(this)[entry]->GetCID()) & 0x6D) == 0x6D &&
+			    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(CharaObjComboLinks(this)[entry]->m_scriptHandle) + 0x3B4) != 0) {
 				goto next_link;
-			} else if (comboLinks[entry]->m_lastStateId != 6 && comboLinks[entry]->m_lastStateId != 2) {
+			} else if (CharaObjComboLinks(this)[entry]->m_lastStateId != 6 && CharaObjComboLinks(this)[entry]->m_lastStateId != 2) {
 				break;
 			}
 		}

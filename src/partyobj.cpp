@@ -3728,28 +3728,30 @@ int CGPartyObj::useItem(int itemId)
 			case 0x17D: {
 				int heal;
 				int foodIndex = itemId - 0x17D;
-				if ((foodIndex < 0) || (foodIndex >= 8)) {
-					heal = 4;
-				} else {
+				if ((foodIndex >= 0) && (foodIndex < 8)) {
 					unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
-					unsigned int value = *reinterpret_cast<unsigned short*>(script + foodIndex * 2 + 0x3B8) / 10;
+					int value = *reinterpret_cast<unsigned short*>(script + foodIndex * 2 + 0x3B8) / 10;
 					heal = 1;
-					if (value != 0) {
+					if (value > 0) {
 						heal = value;
 					}
 					m_scriptHandle[0x2F4] =
 					    reinterpret_cast<void*>(static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x68)));
 					m_scriptHandle[0x2F5] = reinterpret_cast<void*>(itemId);
+				} else {
+					heal = 4;
 				}
 				addHp(heal, 0);
 				System.Printf(const_cast<char*>(msgBase + 0x194), heal);
 				break;
 			}
 			case 0x186: {
-				int heal = 2;
+				int heal;
 				if ((itemId == 0x188) &&
 				    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) == 2)) {
 					heal = 4;
+				} else {
+					heal = 2;
 				}
 				addHp(heal, 0);
 				System.Printf(const_cast<char*>(msgBase + 0x1AC), heal);

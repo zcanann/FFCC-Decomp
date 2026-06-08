@@ -1030,7 +1030,7 @@ int CMemoryCardMan::DummySave()
         }
         m_result = result;
 
-        while ((((u32)(-((int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
+        while ((((u32)(-((unsigned int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
         {
         }
 
@@ -1105,7 +1105,7 @@ int CMemoryCardMan::DummySave()
         }
         m_result = result;
 
-        while ((((u32)(-((int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
+        while ((((u32)(-((unsigned int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
         {
         }
 

@@ -1840,8 +1840,7 @@ void CMenuPcs::LetterListDraw()
 
 	if (pageMark != 0) {
 		const int frame = static_cast<int>(System.m_frameCounter);
-		const int cycle = ((frame / 0x14) + (frame >> 31));
-		const int phase = (frame + (cycle - (cycle >> 31)) * -0x14) - 10;
+		const int phase = (frame % 0x14) - 10;
 		const int absPhase = static_cast<unsigned int>(phase < 0 ? -phase : phase);
 		const float markScale =
 		    static_cast<float>(DOUBLE_80333098 * static_cast<double>(absPhase) + DOUBLE_80333090);

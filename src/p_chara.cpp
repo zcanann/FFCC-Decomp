@@ -1432,76 +1432,104 @@ void CCharaPcs::releaseUnuseLoadAnim(CCharaPcs::CLoadAnim*, int)
  */
 void CCharaPcs::DumpLoad()
 {
-    if (System.m_execParam <= 2) {
-        return;
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        System.Printf(const_cast<char*>(s_charaDumpModelHdr1));
     }
-
-    System.Printf(const_cast<char*>(s_charaDumpModelHdr1));
-    System.Printf(const_cast<char*>(s_charaDumpModelHdr2));
-    System.Printf(const_cast<char*>(s_charaDumpLineSep));
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        System.Printf(const_cast<char*>(s_charaDumpModelHdr2));
+    }
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        System.Printf(const_cast<char*>(s_charaDumpLineSep));
+    }
     for (int i = 0; i < LoadModelArray(this)->GetSize(); i++) {
         CLoadModel* loadModel = (*LoadModelArray(this))[static_cast<unsigned long>(i)];
-        unsigned int streamAddr = 0;
-        unsigned int streamSize = 0;
-        if (loadModel->m_streamMode != 0) {
-            streamAddr = reinterpret_cast<unsigned int>(loadModel->m_streamOffset);
-            streamSize = static_cast<unsigned int>(loadModel->m_streamSize);
-        }
+        if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+            unsigned int streamAddr = 0;
+            unsigned int streamSize = 0;
+            if (loadModel->m_streamMode != 0) {
+                streamAddr = reinterpret_cast<unsigned int>(loadModel->m_streamOffset);
+                streamSize = static_cast<unsigned int>(loadModel->m_streamSize);
+            }
 
-        System.Printf(
-            const_cast<char*>(s_charaDumpModelFmt), i, reinterpret_cast<int>(loadModel->m_keyTag), loadModel->m_keyId,
-            loadModel->m_mergeFileId, loadModel->m_mergeFlags, reinterpret_cast<unsigned int>(loadModel->m_model),
-            loadModel->m_streamMode, streamAddr, streamSize);
+            System.Printf(
+                const_cast<char*>(s_charaDumpModelFmt), i, reinterpret_cast<int>(loadModel->m_keyTag), loadModel->m_keyId,
+                loadModel->m_mergeFileId, loadModel->m_mergeFlags, reinterpret_cast<unsigned int>(loadModel->m_model),
+                loadModel->m_streamMode, streamAddr, streamSize);
+        }
     }
 
-    System.Printf(const_cast<char*>(s_charaDumpTextureHdr1));
-    System.Printf(const_cast<char*>(s_charaDumpTextureHdr2));
-    System.Printf(const_cast<char*>(s_charaDumpLineSep));
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        System.Printf(const_cast<char*>(s_charaDumpTextureHdr1));
+    }
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        System.Printf(const_cast<char*>(s_charaDumpTextureHdr2));
+    }
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        System.Printf(const_cast<char*>(s_charaDumpLineSep));
+    }
     for (int i = 0; i < LoadTextureArray(this)->GetSize(); i++) {
         CLoadTexture* loadTexture = (*LoadTextureArray(this))[static_cast<unsigned long>(i)];
-        unsigned int streamAddr = 0;
-        unsigned int streamSize = 0;
-        if (loadTexture->m_streamMode != 0) {
-            streamAddr = reinterpret_cast<unsigned int>(loadTexture->m_streamOffset);
-            streamSize = static_cast<unsigned int>(loadTexture->m_streamSize);
-        }
+        if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+            unsigned int streamAddr = 0;
+            unsigned int streamSize = 0;
+            if (loadTexture->m_streamMode != 0) {
+                streamAddr = reinterpret_cast<unsigned int>(loadTexture->m_streamOffset);
+                streamSize = static_cast<unsigned int>(loadTexture->m_streamSize);
+            }
 
-        System.Printf(
-            const_cast<char*>(s_charaDumpTextureFmt), i, reinterpret_cast<int>(loadTexture->m_keyTag), loadTexture->m_keyId,
-            reinterpret_cast<int>(loadTexture->m_variantTag), loadTexture->m_mergeFileId, loadTexture->m_mergeFlags,
-            reinterpret_cast<unsigned int>(loadTexture->m_textureSet), loadTexture->m_streamMode, streamAddr, streamSize);
+            System.Printf(
+                const_cast<char*>(s_charaDumpTextureFmt), i, reinterpret_cast<int>(loadTexture->m_keyTag), loadTexture->m_keyId,
+                reinterpret_cast<int>(loadTexture->m_variantTag), loadTexture->m_mergeFileId, loadTexture->m_mergeFlags,
+                reinterpret_cast<unsigned int>(loadTexture->m_textureSet), loadTexture->m_streamMode, streamAddr, streamSize);
+        }
     }
 
-    System.Printf(const_cast<char*>(s_charaDumpPdtHdr1));
-    System.Printf(const_cast<char*>(s_charaDumpPdtHdr2));
-    System.Printf(const_cast<char*>(s_charaDumpLineSep));
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        System.Printf(const_cast<char*>(s_charaDumpPdtHdr1));
+    }
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        System.Printf(const_cast<char*>(s_charaDumpPdtHdr2));
+    }
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        System.Printf(const_cast<char*>(s_charaDumpLineSep));
+    }
     for (int i = 0; i < LoadPdtArray(this)->GetSize(); i++) {
         CLoadPdt* loadPdt = (*LoadPdtArray(this))[static_cast<unsigned long>(i)];
-        System.Printf(
-            const_cast<char*>(s_charaDumpPdtFmt), i, reinterpret_cast<int>(loadPdt->m_keyTag), loadPdt->m_keyId,
-            reinterpret_cast<int>(loadPdt->m_variantTag), loadPdt->m_pdtSlot, loadPdt->m_mergeFileId,
-            loadPdt->m_mergeFlags);
+        if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+            System.Printf(
+                const_cast<char*>(s_charaDumpPdtFmt), i, reinterpret_cast<int>(loadPdt->m_keyTag), loadPdt->m_keyId,
+                reinterpret_cast<int>(loadPdt->m_variantTag), loadPdt->m_pdtSlot, loadPdt->m_mergeFileId,
+                loadPdt->m_mergeFlags);
+        }
     }
 
-    System.Printf(const_cast<char*>(s_charaDumpAnimHdr1));
-    System.Printf(const_cast<char*>(s_charaDumpAnimHdr2));
-    System.Printf(const_cast<char*>(s_charaDumpLineSep));
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        System.Printf(const_cast<char*>(s_charaDumpAnimHdr1));
+    }
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        System.Printf(const_cast<char*>(s_charaDumpAnimHdr2));
+    }
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        System.Printf(const_cast<char*>(s_charaDumpLineSep));
+    }
     int totalBankSize = 0;
     for (int i = 0; i < LoadAnimArray(this)->GetSize(); i++) {
         CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
-        unsigned int animAddr = 0;
-        int bankSize = 0;
-        unsigned int bankAddr = 0;
-        if (loadAnim->m_anim != 0) {
-            animAddr = reinterpret_cast<unsigned int>(loadAnim->m_anim);
-            bankSize = loadAnim->m_anim->m_bankSize;
-            bankAddr = loadAnim->m_anim->m_bankAddress;
-        }
+        if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+            unsigned int animAddr = 0;
+            int bankSize = 0;
+            unsigned int bankAddr = 0;
+            if (loadAnim->m_anim != 0) {
+                animAddr = reinterpret_cast<unsigned int>(loadAnim->m_anim);
+                bankSize = loadAnim->m_anim->m_bankSize;
+                bankAddr = loadAnim->m_anim->m_bankAddress;
+            }
 
-        System.Printf(
-            const_cast<char*>(s_charaDumpAnimFmt), i, reinterpret_cast<int>(loadAnim->m_keyTag), loadAnim->m_keyId,
-            loadAnim->m_name, loadAnim->m_mergeFileId, loadAnim->m_mergeFlags, animAddr, bankSize, totalBankSize, bankAddr);
-        totalBankSize += bankSize;
+            System.Printf(
+                const_cast<char*>(s_charaDumpAnimFmt), i, reinterpret_cast<int>(loadAnim->m_keyTag), loadAnim->m_keyId,
+                loadAnim->m_name, loadAnim->m_mergeFileId, loadAnim->m_mergeFlags, animAddr, bankSize, totalBankSize, bankAddr);
+            totalBankSize += bankSize;
+        }
     }
 }
 

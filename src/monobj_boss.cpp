@@ -1068,8 +1068,8 @@ int CGMonObj::attackCheckFuncLKShooter(int)
 			CVector left(kMonObjBossLeftTargetX, kMonObjBossZero, kMonObjBossLeftTargetZ);
 			if (PSVECDistance(reinterpret_cast<Vec*>(&left), &object->m_worldPosition) < kMonObjBossSideTargetRange &&
 			    reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->m_leftCooldown == 0) {
-				work->bits.m_bit40 = 1;
 				reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->m_leftCooldown = 300;
+				work->bits.m_bit40 = 1;
 				m_actionBranch = 2;
 				return 100;
 			}

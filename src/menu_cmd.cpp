@@ -2589,10 +2589,11 @@ unsigned int CMenuPcs::CmdOpen1()
 
 	GetCmdStateView(this)->transitionTimer = static_cast<s16>(GetCmdStateView(this)->transitionTimer + 1);
 
-	const s32 selected = static_cast<s32>(GetCmdStateView(this)->selected);
-	GetCmdListStorage(this)->entries[selected].alpha = static_cast<f32>(
+	GetCmdListStorage(this)->entries[GetCmdStateView(this)->selected].alpha = static_cast<f32>(
 		-((kCmdMenuTransitionStepD * static_cast<f64>(GetCmdStateView(this)->transitionTimer)) - kCmdMenuOneD)
 	);
+
+	const s32 selected = static_cast<s32>(GetCmdStateView(this)->selected);
 
 	s32 chainCount = 1;
 	if (caravanWork->m_commandListExtra[selected + 1] == -1) {

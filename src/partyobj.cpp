@@ -2105,11 +2105,22 @@ int CGPartyObj::getReplaceStat(int state)
 void CGPartyObj::statCharge()
 {
 	switch (m_subState) {
+	case 0:
+		if (m_subFrame == 0) {
+			m_comboFramePrev = 0;
+			reqAnim(m_attackAnimId, 0, 0);
+			putParticle(0x210, m_particleSlots[3], reinterpret_cast<CGObject*>(this), kMonObjOne, 0x7EE);
+		}
+		if (isLoopAnim() != 0) {
+			changeSubStat(1);
+			return;
+		}
+		break;
 	case 1:
 		if (m_subFrame == 0) {
 			reqAnim(m_unk554, 1, 0);
 		}
-		if (m_comboState == 0 && m_unk68C < m_subFrame) {
+		if (m_comboState == 0 && m_subFrame > m_unk68C) {
 			putTargetParticle(0, 1);
 			m_comboState = 1;
 		}
@@ -2126,17 +2137,6 @@ void CGPartyObj::statCharge()
 			}
 		}
 		m_comboFramePrev++;
-		break;
-	case 0:
-		if (m_subFrame == 0) {
-			m_comboFramePrev = 0;
-			reqAnim(m_attackAnimId, 0, 0);
-			putParticle(0x210, m_particleSlots[3], reinterpret_cast<CGObject*>(this), kMonObjOne, 0x7EE);
-		}
-		if (isLoopAnim() != 0) {
-			changeSubStat(1);
-			return;
-		}
 		break;
 	case 2: {
 		if (m_subFrame == 0) {

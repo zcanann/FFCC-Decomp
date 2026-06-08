@@ -3225,12 +3225,12 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     case -0x81: {
-        float angle = static_cast<float>(object->m_localBase[2]);
+        float angle = reinterpret_cast<float*>(object->m_localBase)[2];
         Mtx& reflectMtx = m_centerMatrix;
         PSMTXReflect(
             reflectMtx,
-            CVector(static_cast<float>(*object->m_localBase), kCFlatPadStickZero,
-                static_cast<float>(object->m_localBase[1])),
+            CVector(reinterpret_cast<float*>(object->m_localBase)[0], kCFlatPadStickZero,
+                reinterpret_cast<float*>(object->m_localBase)[1]),
             CVector(std::sinf(angle), kCFlatPadStickZero, std::cosf(angle)));
         this->push(object, 0);
         outResult = 0;
@@ -3252,7 +3252,8 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     case -0x85:
         this->push(
-            object, Wind.AddAmbient(static_cast<float>(*object->m_localBase), static_cast<float>(object->m_localBase[1])));
+            object, Wind.AddAmbient(reinterpret_cast<float*>(object->m_localBase)[0],
+                                    reinterpret_cast<float*>(object->m_localBase)[1]));
         outResult = 0;
         break;
     case -0x86: {
@@ -3272,7 +3273,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     }
     case -0x88:
-        Wind.ChangePower(*object->m_localBase, static_cast<float>(object->m_localBase[1]));
+        Wind.ChangePower(*object->m_localBase, reinterpret_cast<float*>(object->m_localBase)[1]);
         this->push(object, 0);
         outResult = 0;
         break;

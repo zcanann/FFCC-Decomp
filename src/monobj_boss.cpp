@@ -1653,7 +1653,8 @@ void CGMonObj::frameStatFuncWifeLamia()
 				memset(&m_moveWork, 0, sizeof(m_moveWork));
 				m_moveWork.m_flags = 0x10022;
 
-				CVector attackOffset(kMeteoParasiteAttackOffsetX, kMeteoParasiteAttackOffsetY, kMeteoParasiteAttackOffsetZ);
+				const CVector& attackOffset =
+				    CVector(kMeteoParasiteAttackOffsetX, kMeteoParasiteAttackOffsetY, kMeteoParasiteAttackOffsetZ);
 				m_moveWork.m_targetPos.x = attackOffset.x;
 				m_moveWork.m_targetPos.y = attackOffset.y;
 				m_moveWork.m_targetPos.z = attackOffset.z;

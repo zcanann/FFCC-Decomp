@@ -1255,25 +1255,30 @@ void CMes::addString(char** text, int branchMode)
 		{
 			mFontIndex = ReadTagS8(text);
 			int sel = mFontIndex;
-			font = MenuPcs.m_fonts[2];
-			if (sel == 0)
+			CFont* newFont;
+			switch (sel)
 			{
-				font = MenuPcs.m_fonts[0];
+			case 0:
+				newFont = MenuPcs.m_fonts[0];
+				break;
+			case 1:
+				newFont = MenuPcs.m_fonts[2];
+				break;
+			case 2:
+				newFont = MenuPcs.m_fonts[2];
+				break;
+			case 3:
+				newFont = MenuPcs.m_fonts[2];
+				break;
+			default:
+				newFont = MenuPcs.m_fonts[2];
+				break;
 			}
-			else if (sel == 1)
-			{
-			}
-			else if (sel >= 4)
-			{
-			}
-			else
-			{
-				font = MenuPcs.m_fonts[2];
-			}
-			font->SetShadow(mShadow);
-			font->SetMargin(kMesZero);
-			font->SetScaleX(mScaleX);
-			font->SetScaleY(mScaleY);
+			newFont->SetShadow(mShadow);
+			newFont->SetMargin(kMesZero);
+			newFont->SetScaleX(mScaleX);
+			newFont->SetScaleY(mScaleY);
+			font = newFont;
 			break;
 		}
 		case 0x35:

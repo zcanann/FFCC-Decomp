@@ -1106,22 +1106,24 @@ void CGMonObj::cancelStatFuncDragonZombie()
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	const int state = prgObj->m_lastStateId;
-	if (state == 100) {
+	switch (state) {
+	case 100:
 		object->SetAnimSlot(0x0E, 0);
 		object->SetAnimSlot(0x13, 4);
 		object->SetAnimSlot(0x16, 0x1A);
 		object->SetAnimSlot(0x17, 0x1B);
 		object->SetAnimSlot(0x18, 0x1C);
-		*reinterpret_cast<int*>(mon + 0x6B4) = 1;
+		m_actionBranch = 1;
 		return;
-	}
-	if (state == 4 || (state > 99 && state < 0x66)) {
+	case 4:
+	case 0x65:
 		object->SetAnimSlot(0, 0);
 		object->SetAnimSlot(4, 4);
 		object->SetAnimSlot(0x1A, 0x1A);
 		object->SetAnimSlot(0x1B, 0x1B);
 		object->SetAnimSlot(0x1C, 0x1C);
-		*reinterpret_cast<int*>(mon + 0x6B4) = 0;
+		m_actionBranch = 0;
+		break;
 	}
 }
 

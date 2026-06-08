@@ -1704,8 +1704,8 @@ void CMenuPcs::calcWorld()
 #define handle GetWmWorldHandles(this)[1]
 #define model handle->m_model
 	const int animState = m_wmWorldState->m_mainState;
-	const float animEnd = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0xC0)[0];
 	const float animTime = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0xB4)[0];
+	const float animEnd = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0xC0)[0];
 
 	if (animState == 1) {
 		if (animTime < animEnd) {
@@ -10618,9 +10618,7 @@ void CMenuPcs::DrawMainMenuSub()
 	CharaPcs.InitEnv(5);
 	GXSetColorUpdate(0);
 	GXSetAlphaUpdate(0);
-	CColor clearColor0(0, 0, 0, 0);
-	GXColor clearColor = clearColor0.color;
-	GXSetCopyClear(clearColor, 0x00FFFFFF);
+	GXSetCopyClear(CColor(0, 0, 0, 0).color, 0x00FFFFFF);
 	GXSetColorUpdate(1);
 	GXSetAlphaUpdate(1);
 	GXSetViewport(static_cast<float>(*reinterpret_cast<short*>(worldObj + 0x738)),
@@ -10735,9 +10733,7 @@ void CMenuPcs::DrawMainMenuSub()
 		CharaPcs.InitEnv(5);
 		GXSetColorUpdate(0);
 		GXSetAlphaUpdate(0);
-		CColor clearColor0(0, 0, 0, 0);
-		GXColor clearColor = clearColor0.color;
-		GXSetCopyClear(clearColor, 0x00FFFFFF);
+		GXSetCopyClear(CColor(0, 0, 0, 0).color, 0x00FFFFFF);
 		GXSetColorUpdate(1);
 		GXSetAlphaUpdate(1);
 		GXSetViewport(static_cast<float>(*reinterpret_cast<short*>(view + 8)), static_cast<float>(*reinterpret_cast<short*>(view + 0xA)),
@@ -10775,9 +10771,7 @@ void CMenuPcs::DrawMainMenuSub()
 		CharaPcs.InitEnv(5);
 		GXSetColorUpdate(0);
 		GXSetAlphaUpdate(0);
-		CColor clearColor1(0, 0, 0, 0);
-		GXColor clearColorB = clearColor1.color;
-		GXSetCopyClear(clearColorB, 0x00FFFFFF);
+		GXSetCopyClear(CColor(0, 0, 0, 0).color, 0x00FFFFFF);
 		GXSetColorUpdate(1);
 		GXSetAlphaUpdate(1);
 		GXSetViewport(static_cast<float>(*reinterpret_cast<short*>(view + 8)), static_cast<float>(*reinterpret_cast<short*>(view + 0xA)),

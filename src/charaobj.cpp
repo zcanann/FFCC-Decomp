@@ -1055,16 +1055,8 @@ void CGCharaObj::onFrameStat()
 			break;
 
 		case 8:
-			if (m_subState == 2) {
-				if (m_subFrame == 0) {
-					reqAnim(m_unk558, 0, 0);
-				}
-
-				if (isLoopAnim() != 0) {
-					changeSubStat(1);
-					return;
-				}
-			} else if (m_subState == 0) {
+			switch (m_subState) {
+			case 0:
 				if (m_subFrame == 0) {
 					reqAnim(m_attackAnimId, 0, 0);
 				}
@@ -1073,11 +1065,23 @@ void CGCharaObj::onFrameStat()
 					changeSubStat(1);
 					return;
 				}
-			} else if (m_subState == 1) {
+				break;
+			case 1:
 				if (m_subFrame == 0) {
 					reqAnim(m_unk554, 1, 0);
 				}
-			} else if (m_subState < 4) {
+				break;
+			case 2:
+				if (m_subFrame == 0) {
+					reqAnim(m_unk558, 0, 0);
+				}
+
+				if (isLoopAnim() != 0) {
+					changeSubStat(1);
+					return;
+				}
+				break;
+			case 3:
 				if (m_subFrame == 0) {
 					reqAnim(((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) ? m_unk558 : m_unk55C, 0, 0);
 				}
@@ -1086,6 +1090,7 @@ void CGCharaObj::onFrameStat()
 					changeStat(0, 0, 0);
 					return;
 				}
+				break;
 			}
 
 			onStatShield();

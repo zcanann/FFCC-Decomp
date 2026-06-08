@@ -2064,11 +2064,9 @@ void CAmemCacheSet::CacheClear()
 void CAmemCacheSet::CalcPrio()
 {
     for (int i = 0; i < m_cacheCount; i++) {
-        CAmemCache& entry = cacheEntryAt(this, i);
-
-        if ((entry.m_inUse != 0) && (entry.m_refCount == 0) &&
-            (entry.m_cacheData != 0) && (static_cast<unsigned int>(entry.m_priority) != 0)) {
-            entry.m_priority--;
+        if ((m_cacheTable[i].m_inUse != 0) && (m_cacheTable[i].m_refCount == 0) &&
+            (m_cacheTable[i].m_cacheData != 0) && (static_cast<unsigned int>(m_cacheTable[i].m_priority) != 0)) {
+            m_cacheTable[i].m_priority--;
         }
     }
 }

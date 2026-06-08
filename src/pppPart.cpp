@@ -1794,7 +1794,7 @@ void pppInitPdt(long* progOffsetReconstructionTable, pppProg* pppProg)
 		}
 
 		entry = (int*)*head;
-	} while (*(int*)*head != 0);
+	} while (*(unsigned int*)*head != 0);
 
 	*head = 0;
 	for (int i = 0; i < pppProgRelocCount; i++) {

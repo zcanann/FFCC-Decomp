@@ -1594,12 +1594,17 @@ bool CMenuPcs::LetterConfirmOpen()
 		char lines[8][0x80];
 		memset(lines, 0, sizeof(lines));
 		switch (languageId) {
-		case 3: {
+		case 2: {
 			const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
-			sprintf(lines[0], s_fmt_pcts_pcts, GetMenuStr(0x26), title);
+			sprintf(lines[0], s_fmt_pcts_pcts, title, GetMenuStr(0x26));
 			break;
 		}
-		case 2: {
+		case 4: {
+			const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
+			sprintf(lines[0], s_fmt_pcts_pcts_pcts, GetMenuStr(0x26), title, GetMenuStr(0x25));
+			break;
+		}
+		case 3: {
 			const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
 			sprintf(lines[0], s_fmt_pcts_pcts, title, GetMenuStr(0x26));
 			break;
@@ -1607,11 +1612,6 @@ bool CMenuPcs::LetterConfirmOpen()
 		case 5: {
 			const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
 			sprintf(lines[0], s_fmt_pcts_sp_pcts_dot, GetMenuStr(0x26), title);
-			break;
-		}
-		case 4: {
-			const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
-			sprintf(lines[0], s_fmt_pcts_pcts_pcts, GetMenuStr(0x26), title, GetMenuStr(0x25));
 			break;
 		}
 		case 0:
@@ -1624,19 +1624,19 @@ bool CMenuPcs::LetterConfirmOpen()
 		}
 
 		switch (languageId) {
-		case 3:
-			sprintf(lines[1], s_pctspctspctspcts,
-			        GetMenuStr(0x25),
-			        GetMenuStr(0x23),
-			        s_ReplyStr,
-			        GetMenuStr(0x24));
-			break;
 		case 2:
 			sprintf(lines[1], s_letterItemInfoFmt,
 			        GetMenuStr(0x23),
 			        s_ReplyStr,
 			        GetMenuStr(0x24),
 			        GetMenuStr(0x27));
+			break;
+		case 3:
+			sprintf(lines[1], s_pctspctspctspcts,
+			        GetMenuStr(0x25),
+			        GetMenuStr(0x23),
+			        s_ReplyStr,
+			        GetMenuStr(0x24));
 			break;
 		case 0:
 		case 1:

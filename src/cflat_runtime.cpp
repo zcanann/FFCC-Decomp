@@ -1566,7 +1566,7 @@ frameLoop:
 			if ((arg & 1) != 0) {
 				if (index < 0) {
 					value = reinterpret_cast<unsigned int*>(
-					    (arg & 0x10) == 0 ? onClassSystemVal(object, index) : onSystemVal(object, index));
+					    (arg & 0x10) != 0 ? onSystemVal(object, index) : onClassSystemVal(object, index));
 				} else if ((arg & 8) != 0) {
 					if ((arg & 0x10) != 0) {
 						value = object->m_thisBase + index;
@@ -1599,7 +1599,7 @@ frameLoop:
 			} else if ((arg & 4) != 0) {
 				if (index < 0) {
 					value = reinterpret_cast<unsigned int*>(
-					    (arg & 0x10) == 0 ? onClassSystemVal(object, index) : onSystemVal(object, index));
+					    (arg & 0x10) != 0 ? onSystemVal(object, index) : onClassSystemVal(object, index));
 				} else if ((arg & 8) != 0) {
 					if ((arg & 0x10) != 0) {
 						value = object->m_thisBase + index;
@@ -1622,7 +1622,7 @@ frameLoop:
 			if ((arg & 1) != 0) {
 				if (index < 0) {
 					value = reinterpret_cast<unsigned int*>(
-					    (arg & 0x10) == 0 ? onClassSystemVal(object, index) : onSystemVal(object, index));
+					    (arg & 0x10) != 0 ? onSystemVal(object, index) : onClassSystemVal(object, index));
 				} else if ((arg & 8) != 0) {
 					if ((arg & 0x10) != 0) {
 						value = object->m_thisBase + index;
@@ -1655,7 +1655,7 @@ frameLoop:
 			} else if ((arg & 4) != 0) {
 				if (index < 0) {
 					value = reinterpret_cast<unsigned int*>(
-					    (arg & 0x10) == 0 ? onClassSystemVal(object, index) : onSystemVal(object, index));
+					    (arg & 0x10) != 0 ? onSystemVal(object, index) : onClassSystemVal(object, index));
 				} else if ((arg & 8) != 0) {
 					if ((arg & 0x10) != 0) {
 						value = object->m_thisBase + index;

@@ -959,11 +959,11 @@ cylinder_body:
         }
 
         f32 t;
-        if (disc == 0.0) {
-            t = -radialB / radialA;
-        } else {
+        if (disc > 0.0) {
             disc = sqrtf(disc);
             t = (-radialB - disc) / radialA;
+        } else {
+            t = -radialB / radialA;
         }
         {
             const f32 z = (t * vz) + pz;

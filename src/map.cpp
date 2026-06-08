@@ -2338,7 +2338,7 @@ int CMapMng::ReadMid(char* mapName)
     sprintf(strTmp, const_cast<char*>(s_mapMidPathFmt), mapName);
     int ok = 1;
 
-    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+    if (static_cast<int>(System.m_execParam) >= 3) {
         System.Printf(const_cast<char*>(s_read_mid_fmt), strTmp);
     }
 
@@ -2486,7 +2486,7 @@ int CMapMng::ReadMid(char* mapName)
 
     for (int i = 0; i < m_mapObjCount; i++) {
         CMapObj* obj = &MapMng.m_mapObjArray[i];
-        signed char type = obj->m_mapDataType;
+        unsigned char type = obj->m_mapDataType;
         CMapHit* hit = static_cast<CMapHit*>(obj->m_mapData);
         if ((type == 2 || type == 3) && hit != 0) {
             int hitIndex = hit - GetMapHitArray();

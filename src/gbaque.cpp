@@ -633,12 +633,13 @@ void GbaQueue::ExecutQueue()
 
 		for (i = 0; i < queueCount; i++) {
 			unsigned int cmdWord = queueWords[i];
-			int cmd = static_cast<int>(cmdWord & 0x3F);
+			const unsigned char* cmdBytes = reinterpret_cast<const unsigned char*>(&cmdWord);
+			int cmd = static_cast<int>(cmdBytes[0] & 0x3F);
 
 			if (cmd == 0x17) {
 				if (caravanWork != 0) {
-					const int action = static_cast<unsigned char>(cmdWord >> 16);
-					const int itemIdx = static_cast<unsigned char>(cmdWord >> 8);
+					const int action = cmdBytes[1];
+					const int itemIdx = cmdBytes[2];
 					if (action == 1) {
 						caravanWork->FGUseItem(itemIdx, 1);
 					} else if (action == 2) {

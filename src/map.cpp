@@ -1542,17 +1542,15 @@ search:
             (reinterpret_cast<unsigned int>(mapObjEnd) + (stride - 1) - reinterpret_cast<unsigned int>(mapObj)) /
             stride;
 
-        if (mapObj < mapObjEnd) {
-            for (unsigned int i = 0; i < remaining; i++) {
-                if (mapObj >= mapObjEnd) {
-                    break;
-                }
-                CMapObjAtr* mapObjAtr = mapObj->m_attribute;
-                if (mapObjAtr != 0 && mapObjAtr->m_type == CMapObjAtr::MESH_NAME) {
-                    goto found;
-                }
-                mapObj++;
+        for (unsigned int i = 0; i < remaining; i++) {
+            if (mapObj >= mapObjEnd) {
+                break;
             }
+            CMapObjAtr* mapObjAtr = mapObj->m_attribute;
+            if (mapObjAtr != 0 && mapObjAtr->m_type == CMapObjAtr::MESH_NAME) {
+                goto found;
+            }
+            mapObj++;
         }
 
         mapObj = 0;
@@ -1596,14 +1594,13 @@ search:
             stride;
 
         if (mapObj < mapObjEnd) {
-            do {
+            for (unsigned int i = 0; i < remaining; i++) {
                 CMapObjAtr* mapObjAtr = mapObj->m_attribute;
                 if (mapObjAtr != 0 && mapObjAtr->m_type == CMapObjAtr::PLAY_STA) {
                     goto found;
                 }
                 mapObj++;
-                remaining--;
-            } while (remaining != 0);
+            }
         }
 
         mapObj = 0;
@@ -1646,13 +1643,13 @@ void CMapMng::SetLightSource()
                 light.m_position.x = MapObjWorldX(mapObj);
                 light.m_position.y = MapObjWorldY(mapObj);
                 light.m_position.z = MapObjWorldZ(mapObj);
-                light.m_direction.x = 0.0f;
-                light.m_direction.y = 0.0f;
-                light.m_direction.z = 1.0f;
+                light.m_direction.x = kMapZero;
+                light.m_direction.y = kMapZero;
+                light.m_direction.z = kMapViewScaleZ;
                 light.m_partMask = 1 << mapLightIndex;
                 light.m_attenRadius = pointAttr->m_radius;
                 light.m_range = pointAttr->m_intensity;
-                light.m_attenFalloff = 1.0f;
+                light.m_attenFalloff = kMapViewScaleZ;
                 light.m_targetColor[0] = pointAttr->m_altColor;
                 light.m_targetColor[1] = pointAttr->m_color;
                 *(u32*)light.m_targetEnable = 0;
@@ -1672,9 +1669,9 @@ void CMapMng::SetLightSource()
                     light->m_position.x = MapObjWorldX(mapObj);
                     light->m_position.y = MapObjWorldY(mapObj);
                     light->m_position.z = MapObjWorldZ(mapObj);
-                    light->m_direction.x = 0.0f;
-                    light->m_direction.y = 0.0f;
-                    light->m_direction.z = 1.0f;
+                    light->m_direction.x = kMapZero;
+                    light->m_direction.y = kMapZero;
+                    light->m_direction.z = kMapViewScaleZ;
 
                     CMapObj* targetObj = spotAttr->m_target;
                     light->m_targetPosition.x = MapObjWorldX(targetObj);
@@ -1691,9 +1688,9 @@ void CMapMng::SetLightSource()
                     light.m_position.y = MapObjWorldY(mapObj);
                     light.m_position.z = MapObjWorldZ(mapObj);
 
-                    light.m_direction.x = 0.0f;
-                    light.m_direction.y = 0.0f;
-                    light.m_direction.z = 1.0f;
+                    light.m_direction.x = kMapZero;
+                    light.m_direction.y = kMapZero;
+                    light.m_direction.z = kMapViewScaleZ;
 
                     CMapObj* targetObj = spotAttr->m_target;
                     light.m_targetPosition.x = MapObjWorldX(targetObj);
@@ -1817,9 +1814,7 @@ int CMapMng::ReadMtx(char* mapName)
             m_asyncLoadState.m_asyncReadIndex += 1;
         } else {
             CFile::CHandle* handle = File.Open(strTmp, 0, CFile::PRI_LOW);
-            if (handle == 0) {
-                filePtr = 0;
-            } else {
+            if (handle != 0) {
                 int size = File.GetLength(handle);
                 if (m_asyncLoadState.m_mapReadMode == 3) {
                     File.ReadASync(handle);
@@ -1840,6 +1835,8 @@ int CMapMng::ReadMtx(char* mapName)
                             reinterpret_cast<unsigned char*>(m_asyncLoadState.m_mapLoadCursor) + size;
                     }
                 }
+            } else {
+                filePtr = 0;
             }
         }
 
@@ -1855,10 +1852,12 @@ int CMapMng::ReadMtx(char* mapName)
             chunkFile.SetBuf(filePtr);
             CChunkFile::CChunk chunk;
 
-            if (m_asyncLoadState.m_mapReadMode == 2) {
+            if (m_asyncLoadState.m_mapReadMode != 2) {
                 while (chunkFile.GetNextChunk(chunk)) {
                     switch (chunk.m_id) {
                     case 0x54534554:
+                        m_textureSet->Create(chunkFile, MapMng.m_stage, append, 0, 0, 0);
+                        append = 1;
                         if (chunk.m_arg0 == 1) {
                             return 1;
                         }
@@ -1869,8 +1868,6 @@ int CMapMng::ReadMtx(char* mapName)
                 while (chunkFile.GetNextChunk(chunk)) {
                     switch (chunk.m_id) {
                     case 0x54534554:
-                        m_textureSet->Create(chunkFile, MapMng.m_stage, append, 0, 0, 0);
-                        append = 1;
                         if (chunk.m_arg0 == 1) {
                             return 1;
                         }
@@ -1946,9 +1943,7 @@ int CMapMng::ReadMpl(char* mapName)
             m_asyncLoadState.m_asyncReadIndex += 1;
         } else {
             CFile::CHandle* fileHandle = File.Open(strTmp, 0, CFile::PRI_LOW);
-            if (fileHandle == 0) {
-                filePtr = 0;
-            } else {
+            if (fileHandle != 0) {
                 const int size = File.GetLength(fileHandle);
                 if (m_asyncLoadState.m_mapReadMode == 3) {
                     File.ReadASync(fileHandle);
@@ -1969,6 +1964,8 @@ int CMapMng::ReadMpl(char* mapName)
                             reinterpret_cast<unsigned char*>(m_asyncLoadState.m_mapLoadCursor) + size;
                     }
                 }
+            } else {
+                filePtr = 0;
             }
         }
 
@@ -1984,13 +1981,7 @@ int CMapMng::ReadMpl(char* mapName)
             chunkFile.SetBuf(filePtr);
             CChunkFile::CChunk chunk;
 
-            if (m_asyncLoadState.m_mapReadMode == 2) {
-                while (chunkFile.GetNextChunk(chunk)) {
-                    if (chunk.m_id == 0x4D455348 && chunk.m_arg0 == 1) {
-                        return 1;
-                    }
-                }
-            } else {
+            if (m_asyncLoadState.m_mapReadMode != 2) {
                 while (chunkFile.GetNextChunk(chunk)) {
                     switch (chunk.m_id) {
                     case 0x4D455348:
@@ -2024,6 +2015,12 @@ int CMapMng::ReadMpl(char* mapName)
                     chunkFile.PopChunk();
 
                     if (chunk.m_arg0 == 1) {
+                        return 1;
+                    }
+                }
+            } else {
+                while (chunkFile.GetNextChunk(chunk)) {
+                    if (chunk.m_id == 0x4D455348 && chunk.m_arg0 == 1) {
                         return 1;
                     }
                 }
@@ -2099,7 +2096,10 @@ int CMapMng::ReadOtm(char* mapName)
         return 0;
     }
 
-    if (m_asyncLoadState.m_mapReadMode == 2 || m_asyncLoadState.m_mapReadMode == 3) {
+    if (m_asyncLoadState.m_mapReadMode == 2) {
+        return 1;
+    }
+    if (m_asyncLoadState.m_mapReadMode == 3) {
         return 1;
     }
 
@@ -2118,6 +2118,9 @@ int CMapMng::ReadOtm(char* mapName)
         chunkFile.PushChunk();
         while (chunkFile.GetNextChunk(chunk)) {
             switch (chunk.m_id) {
+            case 0x5343454E:
+                break;
+
             case 0x4F43544D: {
                 short& octTreeCount = m_octTreeCount;
                 if (octTreeCount >= 0x10) {
@@ -2146,8 +2149,6 @@ int CMapMng::ReadOtm(char* mapName)
                 continue;
             }
 
-            case 0x5343454E:
-                break;
             default:
                 goto otmDone;
             }
@@ -2345,9 +2346,7 @@ int CMapMng::ReadMid(char* mapName)
         m_asyncLoadState.m_asyncReadIndex += 1;
     } else {
         CFile::CHandle* fileHandle = File.Open(strTmp, 0, CFile::PRI_LOW);
-        if (fileHandle == 0) {
-            filePtr = 0;
-        } else {
+        if (fileHandle != 0) {
             const int size = File.GetLength(fileHandle);
             if (m_asyncLoadState.m_mapReadMode == 3) {
                 File.ReadASync(fileHandle);
@@ -2369,6 +2368,8 @@ int CMapMng::ReadMid(char* mapName)
                         reinterpret_cast<unsigned char*>(m_asyncLoadState.m_mapLoadCursor) + size;
                 }
             }
+        } else {
+            filePtr = 0;
         }
     }
 
@@ -2379,7 +2380,10 @@ int CMapMng::ReadMid(char* mapName)
         return 0;
     }
 
-    if (m_asyncLoadState.m_mapReadMode == 2 || m_asyncLoadState.m_mapReadMode == 3) {
+    if (m_asyncLoadState.m_mapReadMode == 2) {
+        return 1;
+    }
+    if (m_asyncLoadState.m_mapReadMode == 3) {
         return 1;
     }
 
@@ -2402,7 +2406,10 @@ int CMapMng::ReadMid(char* mapName)
             case 0x5343454E: {
                 chunkFile.PushChunk();
                 while (chunkFile.GetNextChunk(chunk)) {
-                    if (chunk.m_id != 0x48495420) {
+                    switch (chunk.m_id) {
+                    case 0x48495420:
+                        break;
+                    default:
                         continue;
                     }
 

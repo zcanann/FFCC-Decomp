@@ -1209,7 +1209,7 @@ int CFlatRuntime::request(CFlatRuntime::CObject* object, int systemKind, int sys
 	*reinterpret_cast<u32*>(targetObject + 0x08) += 4;
 
 	int clearCount = *reinterpret_cast<int*>(func + 0x28) - *reinterpret_cast<int*>(func + 0x24);
-	if (clearCount > 0) {
+	if (clearCount != 0) {
 		u32* clearPtr =
 		    reinterpret_cast<u32*>(*reinterpret_cast<u32*>(targetObject + 0x0C) + (*reinterpret_cast<int*>(func + 0x24) * 4));
 		while (clearCount > 0) {

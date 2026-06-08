@@ -1154,30 +1154,30 @@ void CMenuPcs::SingMenuInit()
     boardEntry->m_unk3c = 1.0f;
     boardEntry->m_unk38 = 1.0f;
     boardEntry->m_unk34 = 1.0f;
-    boardEntry->m_modelHandle = 0;
-    boardEntry->m_effectHandle = 0;
-    boardEntry->m_centerX = 0;
-    boardEntry->m_centerY = 0;
-    boardEntry->m_width = 0x280;
-    boardEntry->m_height = 0x1C0;
-    boardEntry->m_posX = 0.0f;
-    boardEntry->m_posY = 0.0f;
-    boardEntry->m_depth = 100.0f;
-    boardEntry->m_screenX = 0;
-    boardEntry->m_screenY = 0;
-    boardEntry->m_screenWidth = 0x280;
-    boardEntry->m_screenHeight = 0x1C0;
-    boardEntry->m_centerX = static_cast<s16>(static_cast<int>(
-        static_cast<double>(static_cast<float>(4.0 + static_cast<double>(96.0f) * 0.5
-                + static_cast<double>(440.0f + 28.0f)) - 320.0) - 4.0));
-    boardEntry->m_centerY = static_cast<s16>(static_cast<int>(
+    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_modelHandle = 0;
+    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_effectHandle = 0;
+    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_centerX = 0;
+    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_centerY = 0;
+    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_width = 0x280;
+    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_height = 0x1C0;
+    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_posX = 0.0f;
+    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_posY = 0.0f;
+    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_depth = 100.0f;
+    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_screenX = 0;
+    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_screenY = 0;
+    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_screenWidth = 0x280;
+    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_screenHeight = 0x1C0;
+    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_centerX = static_cast<s16>(static_cast<int>(
+        static_cast<double>(static_cast<float>(static_cast<double>(static_cast<float>(4.0 + static_cast<double>(96.0f) * 0.5
+                + static_cast<double>(440.0f + 28.0f))) - 320.0)) - 4.0));
+    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_centerY = static_cast<s16>(static_cast<int>(
         static_cast<double>(static_cast<float>(static_cast<double>(88.0f) * 0.5
                 + static_cast<double>(88.0f))) - 224.0));
-    boardEntry->m_screenX = static_cast<int>(static_cast<double>(12.0f)
+    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_screenX = static_cast<int>(static_cast<double>(12.0f)
                                              + static_cast<double>(440.0f + 28.0f));
-    boardEntry->m_screenY = static_cast<int>(80.0f);
-    boardEntry->m_screenWidth = 0x48;
-    boardEntry->m_screenHeight = 0x58;
+    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_screenY = static_cast<int>(80.0f);
+    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_screenWidth = 0x48;
+    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_screenHeight = 0x58;
 
     m_singleFadeState = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x605) SingleFadeState;
     memset(m_singleFadeState, 0, sizeof(SingleFadeState));

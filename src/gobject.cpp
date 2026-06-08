@@ -1163,26 +1163,22 @@ void CGObject::bgAttribCollision()
     m_shieldNodeFlagBits.m_bit20 = 0;
 
     if ((m_displayFlags & 4) != 0) {
-        Vec probePos;
         CVector probeMove(sZeroFloat, sDownProbeDistance, sZeroFloat);
         CVector probeBase(m_worldPosition.x, m_worldPosition.y + sHitProbeHeight, m_worldPosition.z);
 
         GObjectMapCylinder charmCylinder;
-        probePos.x = probeBase.x;
-        probePos.y = probeBase.y;
-        probePos.z = probeBase.z;
-        charmCylinder.m_bottom = probePos;
-        charmCylinder.Probe().m_direction.x = probeMove.x;
-        charmCylinder.Probe().m_direction.y = probeMove.y;
-        charmCylinder.Probe().m_direction.z = probeMove.z;
         charmCylinder.Probe().m_radius = sHugeCylinderExtent;
         charmCylinder.Probe().m_height = sHugeCylinderExtent;
-        charmCylinder.Probe().m_top = charmCylinder.Probe().m_direction;
+        charmCylinder.Probe().m_radius2 = sZeroFloat;
+        charmCylinder.Probe().m_height2 = sZeroFloat;
         charmCylinder.Probe().m_direction2.x = sNegHugeCylinderExtent;
         charmCylinder.Probe().m_direction2.y = sNegHugeCylinderExtent;
         charmCylinder.Probe().m_direction2.z = sNegHugeCylinderExtent;
-        charmCylinder.Probe().m_radius2 = sZeroFloat;
-        charmCylinder.Probe().m_height2 = sZeroFloat;
+        charmCylinder.m_bottom = probeBase;
+        charmCylinder.Probe().m_direction.x = probeMove.x;
+        charmCylinder.Probe().m_direction.y = probeMove.y;
+        charmCylinder.Probe().m_direction.z = probeMove.z;
+        charmCylinder.Probe().m_top = charmCylinder.Probe().m_direction;
 
         if (MapMng.CheckHitCylinderNear(
                 reinterpret_cast<CMapCylinder*>(&charmCylinder), reinterpret_cast<Vec*>(&probeMove),

@@ -2205,17 +2205,13 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 		int matchedNpc = -1;
 
 		const CCaravanWork::CLetterWork* cur = &caravanWork->m_letters[i];
-		const unsigned int curWord = cur->Word0();
-		const unsigned short curHalf = cur->HeaderWord();
-		const unsigned int npcId = (curWord >> 9) & 0x1FF;
-		const unsigned int subjectId = (curHalf >> 2) & 0x1FF;
 
 		for (int j = 0; j < i; j++) {
 			const CCaravanWork::CLetterWork* prev = &caravanWork->m_letters[j];
-			if (npcId == ((prev->Word0() >> 9) & 0x1FF)) {
+			if (((cur->Word0() >> 9) & 0x1FF) == ((prev->Word0() >> 9) & 0x1FF)) {
 				matchedNpc = j;
 			}
-			if (subjectId == ((prev->HeaderWord() >> 2) & 0x1FF)) {
+			if (((cur->HeaderWord() >> 2) & 0x1FF) == ((prev->HeaderWord() >> 2) & 0x1FF)) {
 				matchedSubject = j;
 			}
 			if (matchedSubject != -1 && matchedNpc != -1) {
@@ -2232,7 +2228,7 @@ System.Printf(const_cast<char*>(s_npc_max_over), const_cast<char*>(s_gbaque_cpp)
 			}
 
 			memset(tempName, 0, sizeof(tempName));
-			strcpy(tempName, npcTable[npcId]);
+			strcpy(tempName, npcTable[(cur->Word0() >> 9) & 0x1FF]);
 			memcpy(npcWrite, tempName, kGbaQueueLetterNpcNameEntryBytes);
 			npcWrite += kGbaQueueLetterNpcNameEntryBytes;
 			(reinterpret_cast<unsigned char*>(entryWrite))[5] = static_cast<unsigned char>(npcCount++);
@@ -2247,7 +2243,7 @@ System.Printf(const_cast<char*>(s_subject_max_over), const_cast<char*>(s_gbaque_
 			}
 
 			memset(tempName, 0, sizeof(tempName));
-			strcpy(tempName, subjectTable[subjectId]);
+			strcpy(tempName, subjectTable[(cur->HeaderWord() >> 2) & 0x1FF]);
 			memcpy(subjectWrite, tempName, kGbaQueueLetterSubjectNameEntryBytes);
 			subjectWrite += kGbaQueueLetterSubjectNameEntryBytes;
 			(reinterpret_cast<unsigned char*>(entryWrite))[4] = static_cast<unsigned char>(subjectCount++);

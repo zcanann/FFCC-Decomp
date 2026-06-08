@@ -8802,7 +8802,7 @@ void CMenuPcs::CalcCharaSelect()
 						text++;
 					}
 					const int width = static_cast<int>(static_cast<double>(font->GetWidth(text)));
-					if (maxWidth < width) {
+					if (width > maxWidth) {
 						maxWidth = width;
 					}
 				}

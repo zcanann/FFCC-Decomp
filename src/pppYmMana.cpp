@@ -1729,7 +1729,7 @@ void CalcReflectionVector2(
             float denom;
 
             dl += 4;
-            if ((drawFmt & 7) == 2) {
+            if ((drawFmt & 7u) == 2) {
                 dl++;
             }
 

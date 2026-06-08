@@ -1491,7 +1491,7 @@ void CGMonObj::frameStatFuncTetsukyojin()
 			m_moveWork.m_limitFrame =
 			    static_cast<int>((kMonObjBossTwo * (kMonObjBossAttackRange - object->m_capsuleHalfHeight)) / kMonObjBossFastMoveSpeed);
 		}
-		if (prgObj->m_stateFrame > 0xF) {
+		if (prgObj->m_stateFrame >= 0x10) {
 			moveFrame();
 		}
 		reinterpret_cast<CGCharaObj*>(this)->statAttack();
@@ -1501,8 +1501,8 @@ void CGMonObj::frameStatFuncTetsukyojin()
 			int flatCount = CFlatBossState();
 			if (flatCount < 1) {
 				CFlatBossState() = 0;
-			} else if (((flatCount == 1) && (*reinterpret_cast<int*>(CGMonObj::m_boss) > 0x13)) ||
-			           ((flatCount > 1) && (*reinterpret_cast<int*>(CGMonObj::m_boss) > 4))) {
+			} else if (((flatCount == 1) && (*reinterpret_cast<int*>(CGMonObj::m_boss) >= 0x14)) ||
+			           ((flatCount > 1) && (*reinterpret_cast<int*>(CGMonObj::m_boss) >= 5))) {
 				*reinterpret_cast<int*>(CGMonObj::m_boss) = 0;
 				object->DispCharaParts(1);
 

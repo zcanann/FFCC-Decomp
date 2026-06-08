@@ -12791,24 +12791,32 @@ void McCtrl::SetListDat(int slot, int clearPlayTime)
 			*reinterpret_cast<unsigned int*>(entry + 0x10) = *reinterpret_cast<unsigned int*>(save + 0x28);
 			*reinterpret_cast<unsigned int*>(entry + 0x14) = *reinterpret_cast<unsigned int*>(save + 0x2C);
 
-			const int party0 = *reinterpret_cast<int*>(save + 0x30);
-			unsigned char* const party0Base = save + party0 * 0x9C0;
-			if (*reinterpret_cast<int*>(party0Base + 0x1A84) == 0 || party0Base[0x1D90] != 0) {
+			unsigned char* party = save + *reinterpret_cast<int*>(save + 0x30) * 0x9C0;
+			if (*reinterpret_cast<int*>(party + 0x1A84) == 0) {
 				*reinterpret_cast<int*>(save + 0x30) = -1;
 			}
-			const int party1 = *reinterpret_cast<int*>(save + 0x34);
-			unsigned char* const party1Base = save + party1 * 0x9C0;
-			if (*reinterpret_cast<int*>(party1Base + 0x1A84) == 0 || party1Base[0x1D90] != 0) {
+			if (party[0x1D90] != 0) {
+				*reinterpret_cast<int*>(save + 0x30) = -1;
+			}
+			party = save + *reinterpret_cast<int*>(save + 0x34) * 0x9C0;
+			if (*reinterpret_cast<int*>(party + 0x1A84) == 0) {
 				*reinterpret_cast<int*>(save + 0x34) = -1;
 			}
-			const int party2 = *reinterpret_cast<int*>(save + 0x38);
-			unsigned char* const party2Base = save + party2 * 0x9C0;
-			if (*reinterpret_cast<int*>(party2Base + 0x1A84) == 0 || party2Base[0x1D90] != 0) {
+			if (party[0x1D90] != 0) {
+				*reinterpret_cast<int*>(save + 0x34) = -1;
+			}
+			party = save + *reinterpret_cast<int*>(save + 0x38) * 0x9C0;
+			if (*reinterpret_cast<int*>(party + 0x1A84) == 0) {
 				*reinterpret_cast<int*>(save + 0x38) = -1;
 			}
-			const int party3 = *reinterpret_cast<int*>(save + 0x3C);
-			unsigned char* const party3Base = save + party3 * 0x9C0;
-			if (*reinterpret_cast<int*>(party3Base + 0x1A84) == 0 || party3Base[0x1D90] != 0) {
+			if (party[0x1D90] != 0) {
+				*reinterpret_cast<int*>(save + 0x38) = -1;
+			}
+			party = save + *reinterpret_cast<int*>(save + 0x3C) * 0x9C0;
+			if (*reinterpret_cast<int*>(party + 0x1A84) == 0) {
+				*reinterpret_cast<int*>(save + 0x3C) = -1;
+			}
+			if (party[0x1D90] != 0) {
 				*reinterpret_cast<int*>(save + 0x3C) = -1;
 			}
 

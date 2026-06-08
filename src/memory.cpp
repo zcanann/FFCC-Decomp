@@ -1650,13 +1650,10 @@ int CAmemCacheSet::GetData(short index, char* source, int line)
 
         if (entry.m_cacheData == 0) {
             if (entry.m_dmaCopy != 0) {
-                char* allocSource = source;
-                if (allocSource == 0) {
-                    allocSource = const_cast<char*>(sEmptyAllocSourceName);
-                }
-
                 entry.m_cacheData =
-                    m_rStage->alloc(static_cast<unsigned long>(entry.m_size), allocSource, static_cast<unsigned long>(line), 1);
+                    m_rStage->alloc(static_cast<unsigned long>(entry.m_size),
+                                    source != 0 ? source : const_cast<char*>(sEmptyAllocSourceName),
+                                    static_cast<unsigned long>(line), 1);
                 if (entry.m_cacheData == 0) {
                     data = 0;
                 } else {

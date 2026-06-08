@@ -2019,31 +2019,25 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 	memset(candidates, 0xff, sizeof(candidates));
 
 	int write = 2;
-	for (int slot = 2; slot < 8;) {
-		int nextWrite = write;
-		int nextSlot = slot + 1;
-
+	for (int slot = 2; slot < 8; slot++, write++) {
 		if (slot == selected) {
 			if (caravan->m_commandListExtra[slot] == 0) {
 				candidates[write] = 0;
 			} else {
 				candidates[write] = 0;
 				candidates[write + 1] = 0;
-				nextWrite = write + 1;
-				nextSlot = slot + 2;
-				if (caravan->m_commandListExtra[slot + 1] < 0) {
-					candidates[write + 2] = 0;
-					nextWrite = write + 2;
-					nextSlot = slot + 3;
+				write++;
+				slot++;
+				if (caravan->m_commandListExtra[slot] < 0) {
+					candidates[write + 1] = 0;
+					write++;
+					slot++;
 				}
 			}
 		} else {
 			const s32 v = caravan->m_commandListExtra[slot];
 			candidates[write] = (-v | v) >> 31;
 		}
-
-		write = nextWrite + 1;
-		slot = nextSlot;
 	}
 
 	memset(itemKinds, 0xff, sizeof(itemKinds));

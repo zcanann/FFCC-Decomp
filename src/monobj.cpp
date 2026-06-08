@@ -4184,13 +4184,11 @@ void CGMonObj::sysControl(int controlType)
 		break;
 
 	case 0x16:
-		*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags) =
-			static_cast<unsigned char>(__rlwimi(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags), 0, 3, 28, 28));
+		object->m_weaponNodeFlagBits.m_control3 = 0;
 		break;
 
 	case 0x15:
-		*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags) =
-			static_cast<unsigned char>(__rlwimi(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags), 1, 3, 28, 28));
+		object->m_weaponNodeFlagBits.m_control3 = 1;
 		break;
 	}
 }

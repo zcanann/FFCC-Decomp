@@ -1110,6 +1110,7 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
 {
     Mtx cam;
     PSMTXCopy(CameraMatrix(), cam);
+    Mtx nrm;
     Mtx out;
 
     if (mode != 0) {
@@ -1187,7 +1188,6 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
 
     GXLoadPosMtxImm(out, 0);
 
-    Mtx nrm;
     nrm[0][0] = out[0][0];
     nrm[1][0] = out[1][0];
     nrm[2][0] = out[2][0];

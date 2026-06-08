@@ -1364,7 +1364,7 @@ void CGObject::update()
         double clampedTurn;
         if (turnDelta < -turnLimit) {
             clampedTurn = -turnLimit;
-        } else if (turnDelta > turnLimit) {
+        } else if (turnLimit < turnDelta) {
             clampedTurn = turnLimit;
         } else {
             clampedTurn = turnDelta;

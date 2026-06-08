@@ -633,12 +633,12 @@ void GbaQueue::ExecutQueue()
 		int i;
 
 		for (i = 0; i < queueCount; i++) {
-			unsigned int cmdWord = queueWords[i];
-			const unsigned char* cmdBytes = reinterpret_cast<const unsigned char*>(&cmdWord);
-			int cmd = static_cast<int>(cmdBytes[0] & 0x3F);
+			int cmd = static_cast<int>(reinterpret_cast<const unsigned char*>(&queueWords[i])[0] & 0x3F);
 
 			if (cmd == 0x17) {
 				if (caravanWork != 0) {
+					unsigned int cmdWord = queueWords[i];
+					const unsigned char* cmdBytes = reinterpret_cast<const unsigned char*>(&cmdWord);
 					const int action = cmdBytes[1];
 					const int itemIdx = cmdBytes[2];
 					if (action == 1) {
@@ -651,6 +651,7 @@ void GbaQueue::ExecutQueue()
 				}
 			} else if (cmd == 0x1A) {
 				if (caravanWork != 0) {
+					unsigned int cmdWord = queueWords[i];
 					const unsigned char p0 = static_cast<unsigned char>(cmdWord >> 24);
 					const unsigned char p1 = static_cast<unsigned char>(cmdWord >> 16);
 					const unsigned char p2 = static_cast<unsigned char>(cmdWord >> 8);
@@ -673,16 +674,19 @@ void GbaQueue::ExecutQueue()
 				}
 			} else if (cmd == 0x1E) {
 				if (caravanWork != 0) {
+					unsigned int cmdWord = queueWords[i];
 					const int equipType = static_cast<signed char>(cmdWord >> 16);
 					const int equipItem = static_cast<signed char>(cmdWord >> 8);
 					caravanWork->ChgEquipPos(equipType, equipItem);
 				}
 			} else if (cmd == 0x1F) {
 				if (caravanWork != 0) {
+					unsigned int cmdWord = queueWords[i];
 					unsigned short cmdListData = static_cast<unsigned short>((cmdWord << 8) | ((cmdWord >> 8) & 0xFF));
 					caravanWork->ChgCmdLst(static_cast<unsigned char>(cmdWord >> 16), static_cast<short>(cmdListData));
 				}
 			} else if (cmd == 0x0C) {
+				unsigned int cmdWord = queueWords[i];
 				const unsigned char request = static_cast<unsigned char>(cmdWord >> 8);
 				if (caravanWork != 0) {
 					if (request == 3) {
@@ -731,6 +735,7 @@ void GbaQueue::ExecutQueue()
 					}
 				}
 			} else if (cmd == 0x14) {
+				unsigned int cmdWord = queueWords[i];
 				const unsigned char request = static_cast<unsigned char>(cmdWord >> 8);
 				if (request == 0 || request == 1) {
 					if (caravanWork != 0) {
@@ -839,15 +844,15 @@ void GbaQueue::ExecutQueue()
 				if (caravanWork != 0) {
 					ReplyLetter(channel);
 				}
-			} else if ((cmd == 6) && (static_cast<unsigned char>(cmdWord >> 8) == 0x18)) {
+			} else if ((cmd == 6) && (static_cast<unsigned char>(queueWords[i] >> 8) == 0x18)) {
 				if (caravanWork != 0) {
 					caravanWork->m_evtState1 = 1;
 				}
 				m_maskSendState[channel] = static_cast<signed char>(0xFF);
 			} else if (cmd == 0x1C) {
-				ChkCMakeName(channel, cmdWord);
+				ChkCMakeName(channel, queueWords[i]);
 			} else if (cmd == 0x1D) {
-				CMakeFavorite(channel, cmdWord);
+				CMakeFavorite(channel, queueWords[i]);
 			}
 		}
 

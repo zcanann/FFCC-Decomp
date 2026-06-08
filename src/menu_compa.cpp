@@ -61,7 +61,7 @@ void CMenuPcs::CompaDraw()
 
 	const CCaravanWork* caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	CompaOpenAnim* entry = this->m_compaList->entries;
-	for (unsigned int i = 0; i < this->m_compaList->count; i++) {
+	for (int i = 0; i < this->m_compaList->count; i++) {
 		int tex = entry->tex;
 		if (tex >= 0) {
 			float x = static_cast<float>(entry->x);

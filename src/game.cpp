@@ -738,7 +738,7 @@ void CGame::CheckScriptChange()
     int scriptResult = CFlatRuntime2Storage().Load(m_nextScript.m_name);
     strcpy(m_currentScriptName, m_nextScript.m_name);
 
-    if (m_nextScript.m_flags != 0) {
+    if ((int)m_nextScript.m_flags != 0) {
         System.Printf(const_cast<char*>(s_gameDebugMarker));
         System.Printf(const_cast<char*>(assetNameBlock + kNewGameInitMsg));
         System.Printf(const_cast<char*>(s_gameDebugMarker));

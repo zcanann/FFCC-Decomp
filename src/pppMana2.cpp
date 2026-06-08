@@ -756,9 +756,10 @@ void CalcReflectionVector2(
             float absX = fabsf(outVec->x);
             float absZ = fabsf(outVec->z);
 
-            axis = absX < absY;
+            axis = 0;
             maxAxis = absX;
-            if (axis) {
+            if (absX < absY) {
+                axis = 1;
                 maxAxis = absY;
             }
             if (maxAxis < absZ) {

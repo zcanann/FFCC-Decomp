@@ -666,7 +666,7 @@ void DrawGoOutMenu()
             MenuPcs.DrawInit();
             MenuPcs.DrawCMakeMenu();
         }
-        if (goOutMenu.m_goOutMode > 0xD && goOutMenu.m_goOutMode < 0xF) {
+        if (goOutMenu.m_goOutMode != 0xF && goOutMenu.m_goOutMode < 0xF && goOutMenu.m_goOutMode >= 0xE) {
             MenuPcs.DrawLoadMenu();
         }
         if (goOutMenu.m_goOutMode == 1 &&
@@ -699,15 +699,14 @@ void DrawGoOutMenu()
     if (MenuPcs.m_menuWindowInfo->state == 1 && goOutMenu.m_drawCursor != 0) {
         const float cursorY = (float)(MenuPcs.m_menuWindowInfo->y +
             MenuPcs.m_menuWindowInfo->height - 0x3E);
-        const float cursorX = (float)(MenuPcs.m_menuWindowInfo->x + 0x20);
-        const unsigned char cursorMode = goOutMenu.m_cursorMode;
+        float cursorX = (float)(MenuPcs.m_menuWindowInfo->x + 0x20);
 
-        if (cursorMode != 0) {
+        if (goOutMenu.m_cursorMode != 0) {
             const int localY = goOutMenu.m_cursorListY1 + goOutMenu.m_cursorChoice * 0x1E;
             MenuPcs.DrawCursor((int)cursorX, localY, 1.0f);
         } else {
-            const int cursorX = MenuPcs.GetYesNoXPos(goOutMenu.m_cursorChoice);
-            MenuPcs.DrawCursor(cursorX, (int)cursorY, 1.0f);
+            cursorX = (float)MenuPcs.GetYesNoXPos(goOutMenu.m_cursorChoice);
+            MenuPcs.DrawCursor((int)cursorX, (int)cursorY, 1.0f);
         }
     }
 }

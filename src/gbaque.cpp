@@ -955,7 +955,7 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
 	caravanWork->DeleteItemIdx(itemSlot, 1);
 
 	const unsigned int itemTableBase = Game.unkCFlatData0[2] + static_cast<int>(baseItem) * 0x48;
-	const unsigned short smithItem = *reinterpret_cast<unsigned short*>(itemTableBase + recipeIndex * 2 + 0x38);
+	const short smithItem = *reinterpret_cast<unsigned short*>(itemTableBase + recipeIndex * 2 + 0x38);
 
 	unsigned int materialTable = itemTableBase;
 	for (int i = 0; i < 3; i++, materialTable += 2) {

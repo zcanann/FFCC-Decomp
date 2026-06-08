@@ -130,7 +130,7 @@ void CMapHit::Draw()
 
             GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
             int i = 0;
-            while (i < static_cast<int>(face->m_vertexCount)) {
+            while (i < static_cast<unsigned int>(face->m_vertexCount)) {
                 Vec* vertex = m_vertices + face->m_vertexIndices[i];
                 GXPosition3f32(vertex->x, vertex->y, vertex->z);
                 GXNormal3f32(face->m_normal.x, face->m_normal.y, face->m_normal.z);

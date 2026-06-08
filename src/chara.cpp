@@ -32,10 +32,10 @@ extern "C" float FLOAT_803301E8;
 extern "C" float FLOAT_803301F8;
 extern const char sCharaStageName[7];
 
-extern const char lbl_80330200[];
-extern const char lbl_80330208[];
-extern const char lbl_80330210[];
-extern const char lbl_80330218[];
+extern const char lbl_80330200[7];
+extern const char lbl_80330208[7];
+extern const char lbl_80330210[5];
+extern const char lbl_80330218[5];
 extern "C" const char lbl_801D90D4[];
 
 inline void* operator new(unsigned long, void* ptr)

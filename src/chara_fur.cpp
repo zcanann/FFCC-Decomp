@@ -1868,7 +1868,7 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 			}
 
 			distance = (dx < 0 ? -dx : dx) + (dy < 0 ? -dy : dy);
-			int ux = px;
+			unsigned int ux = px;
 			unsigned int uy = py;
 			tileIndex = ((ux & 3) + ((uy & 3) * 4) + (ux >> 2) * 0x10 + (uy >> 2) * width * 4) * 2;
 			packed = *(unsigned short*)(((char*)pixels) + tileIndex);
@@ -1889,30 +1889,16 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 				a = a < 0 ? 0 : a;
 			} else {
 				float k = (float)(7 - targetColor.a) / kCharaFurAlphaComponentScale + (float)(distance / 4);
-				if (k > 1.0f) {
-					k = 1.0f;
-				}
+				k = (k > 1.0f) ? 1.0f : k;
 				{
 					float inv = 1.0f - k;
 					r = (int)((float)r * k + (float)targetColor.r * inv);
 					g = (int)((float)g * k + (float)targetColor.g * inv);
 					b = (int)((float)b * k + (float)targetColor.b * inv);
 				}
-				if (r < 0) {
-					r = 0;
-				} else if (r > 0x0f) {
-					r = 0x0f;
-				}
-				if (g < 0) {
-					g = 0;
-				} else if (g > 0x0f) {
-					g = 0x0f;
-				}
-				if (b < 0) {
-					b = 0;
-				} else if (b > 0x0f) {
-					b = 0x0f;
-				}
+				r = (r < 0) ? 0 : (r > 0x0f ? 0x0f : r);
+				g = (g < 0) ? 0 : (g > 0x0f ? 0x0f : g);
+				b = (b < 0) ? 0 : (b > 0x0f ? 0x0f : b);
 			}
 
 			*(unsigned short*)(((char*)pixels) + tileIndex) = (unsigned short)((a << 12) | (r << 8) | (g << 4) | b);

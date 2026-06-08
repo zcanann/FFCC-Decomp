@@ -720,7 +720,7 @@ void CGraphicPcs::drawBar()
         padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
         padState = Pad.GetPadInputs()[padIndex].holdOverride;
     }
-    const bool drawText = (padState != 0) && (Joybus.GetPadType(0) != 0x40000);
+    const int drawText = (padState != 0) && (Joybus.GetPadType(0) != 0x40000);
 
     GXColor backColor = s_debug_bar_color;
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
@@ -744,15 +744,16 @@ void CGraphicPcs::drawBar()
     int hue = 0;
     u32 y = 0x10;
     for (int i = 0; i < orderCount; i++) {
-        const float width = (kGraphicScreenCenterX * order->m_lastTime) / kDebugBarFrameBudget;
+        const int priority = order->m_priority;
+        const float lastTime = order->m_lastTime;
         GXColor rgb;
         *reinterpret_cast<u32*>(&rgb) = Math.Hsb2Rgb(hue / orderCount, 100, 100);
+        const float width = (kGraphicScreenCenterX * lastTime) / kDebugBarFrameBudget;
 
-        if (order->m_priority == 0x26) {
+        if (priority == 0x26) {
+            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
             const float y0 = drawText ? static_cast<float>(y) : kDebugBarMoveBottom;
             const float y1 = drawText ? static_cast<float>(y + kDebugBarLineStep) : kDebugBarTop;
-
-            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
             GXPosition3f32(x, y0, kGraphicZero);
             GXColor1u32(*reinterpret_cast<u32*>(&rgb));
             GXTexCoord2u16(0, 0);
@@ -766,11 +767,10 @@ void CGraphicPcs::drawBar()
             GXColor1u32(*reinterpret_cast<u32*>(&rgb));
             GXTexCoord2u16(0, 2);
             x += width;
-        } else if (order->m_priority != 0x27) {
+        } else if (priority != 0x27) {
+            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
             const float y0 = drawText ? static_cast<float>(y) : kDebugBarObjectTop;
             const float y1 = drawText ? static_cast<float>(y + kDebugBarLineStep) : kDebugBarMoveBottom;
-
-            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
             GXPosition3f32(x, y0, kGraphicZero);
             GXColor1u32(*reinterpret_cast<u32*>(&rgb));
             GXTexCoord2u16(0, 0);
@@ -811,33 +811,35 @@ void CGraphicPcs::drawBar()
     }
 
     CColor frameColor = (Graphic.IsFrameRateOver() == 0) ? CColor(0, 0xFF, 0, 0xFF) : CColor(0xFF, 0, 0, 0xFF);
+    const u32 frameColorWord = *reinterpret_cast<u32*>(&frameColor.color);
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
     GXPosition3f32(kDebugBarLeft, kDebugIndicatorTop, kGraphicZero);
-    GXColor1u32(*reinterpret_cast<u32*>(&frameColor.color));
+    GXColor1u32(frameColorWord);
     GXTexCoord2u16(0, 0);
     GXPosition3f32(kDebugIndicatorFrameRight, kDebugIndicatorTop, kGraphicZero);
-    GXColor1u32(*reinterpret_cast<u32*>(&frameColor.color));
+    GXColor1u32(frameColorWord);
     GXTexCoord2u16(2, 0);
     GXPosition3f32(kDebugIndicatorFrameRight, kDebugIndicatorBottom, kGraphicZero);
-    GXColor1u32(*reinterpret_cast<u32*>(&frameColor.color));
+    GXColor1u32(frameColorWord);
     GXTexCoord2u16(2, 2);
     GXPosition3f32(kDebugBarLeft, kDebugIndicatorBottom, kGraphicZero);
-    GXColor1u32(*reinterpret_cast<u32*>(&frameColor.color));
+    GXColor1u32(frameColorWord);
     GXTexCoord2u16(0, 2);
 
     CColor fifoColor = (Graphic.IsFifoOver() == 0) ? CColor(0, 0xFF, 0, 0xFF) : CColor(0xFF, 0, 0, 0xFF);
+    const u32 fifoColorWord = *reinterpret_cast<u32*>(&fifoColor.color);
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
     GXPosition3f32(kDebugIndicatorFifoLeft, kDebugIndicatorTop, kGraphicZero);
-    GXColor1u32(*reinterpret_cast<u32*>(&fifoColor.color));
+    GXColor1u32(fifoColorWord);
     GXTexCoord2u16(0, 0);
     GXPosition3f32(kDebugIndicatorFifoRight, kDebugIndicatorTop, kGraphicZero);
-    GXColor1u32(*reinterpret_cast<u32*>(&fifoColor.color));
+    GXColor1u32(fifoColorWord);
     GXTexCoord2u16(2, 0);
     GXPosition3f32(kDebugIndicatorFifoRight, kDebugIndicatorBottom, kGraphicZero);
-    GXColor1u32(*reinterpret_cast<u32*>(&fifoColor.color));
+    GXColor1u32(fifoColorWord);
     GXTexCoord2u16(2, 2);
     GXPosition3f32(kDebugIndicatorFifoLeft, kDebugIndicatorBottom, kGraphicZero);
-    GXColor1u32(*reinterpret_cast<u32*>(&fifoColor.color));
+    GXColor1u32(fifoColorWord);
     GXTexCoord2u16(0, 2);
 
     if (drawText) {

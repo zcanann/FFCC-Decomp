@@ -1220,8 +1220,8 @@ void CShopMenu::DrawItemInfo0()
  */
 void CShopMenu::DrawBuySellInfo()
 {
-    CFont* font = MenuPcs.m_fonts[0];
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+    CFont* font = MenuPcs.m_fonts[0];
     int listType = m_listType;
 
     SetupShopMenuInfoFont(font);

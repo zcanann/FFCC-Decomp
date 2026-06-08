@@ -1221,7 +1221,6 @@ void CCameraPcs::destroyMap()
  */
 void CCameraPcs::calcMap()
 {
-    bool useDebugPad = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
     u16 buttons;
     float stickH;
     float stickV;
@@ -1246,15 +1245,15 @@ void CCameraPcs::calcMap()
     };
     HitCylinder hitCylinder;
 
-    buttons = useDebugPad ? 0 : CameraRawPadInput().button[0];
+    buttons = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? 0 : CameraRawPadInput().button[0];
 
-    stickH = useDebugPad ? kCameraZeroF : CameraRawPadInput().substickYF;
+    stickH = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? kCameraZeroF : CameraRawPadInput().substickYF;
     stickH = kCameraDegToRad * (stickH / kCameraOneEighthF);
 
-    stickV = useDebugPad ? kCameraZeroF : *reinterpret_cast<float*>(&CameraRawPadInput().lockedButton[0]);
+    stickV = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? kCameraZeroF : *reinterpret_cast<float*>(&CameraRawPadInput().lockedButton[0]);
     stickV = kCameraDegToRad * (stickV / kCameraOneEighthF);
 
-    triggerL = useDebugPad ? kCameraZeroF : CameraRawPadInput().stickYF;
+    triggerL = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? kCameraZeroF : CameraRawPadInput().stickYF;
 
     m_fov += triggerL;
     m_mapRotX -= stickV;

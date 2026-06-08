@@ -1256,19 +1256,6 @@ int CChara::CModel::PickFur(
 	FurProjectedVertex verts[3];
 	unsigned long curValid = 0;
 	Mtx44 invScreenMtx;
-	CVector ray;
-	CVector planeDelta;
-	CVector hitToA;
-	CVector hitToBStorage;
-	CVector hitToCStorage;
-	CVector areaAB;
-	CVector areaBCStorage;
-	CVector areaCAStorage;
-	CVector weights;
-	CVector* hitToB = &hitToBStorage;
-	CVector* hitToC = &hitToCStorage;
-	CVector* areaBC = &areaBCStorage;
-	CVector* areaCA = &areaCAStorage;
 
 	for (unsigned int meshIndex = 0; meshIndex < meshCount; meshIndex++, mesh++) {
 		if (mesh->m_workPositions == 0) {
@@ -1430,6 +1417,7 @@ int CChara::CModel::PickFur(
 						PSMTX44MultVec(invScreenMtx, rayStart, rayStart);
 						PSMTX44MultVec(invScreenMtx, rayEnd, rayEnd);
 
+						Vec ray;
 						CVector raySub;
 						PSVECSubtract(rayEnd, rayStart, raySub);
 						ray.x = raySub.x;
@@ -1451,19 +1439,25 @@ int CChara::CModel::PickFur(
 						}
 						normal.Normalize();
 
+						Vec planeDelta;
 						CVector vertA0(verts[0].m_viewPos);
 						CVector planeSub;
 						PSVECSubtract(vertA0, rayStart, planeSub);
 						planeDelta.x = planeSub.x;
 						planeDelta.y = planeSub.y;
 						planeDelta.z = planeSub.z;
-						const float rayDot = PSVECDotProduct(normal, ray);
-						const float planeDot = PSVECDotProduct(normal, planeDelta);
+						const float rayDot = PSVECDotProduct(normal, &ray);
+						const float planeDot = PSVECDotProduct(normal, &planeDelta);
 						CVector scaledRay;
-						PSVECScale(ray, scaledRay, planeDot / rayDot);
+						PSVECScale(&ray, scaledRay, planeDot / rayDot);
 						PSVECAdd(rayStart, scaledRay, hitViewPos);
 
 						CVector hitToA;
+						CVector hitToC;
+						CVector hitToB;
+						CVector areaAB;
+						CVector areaBC;
+						CVector areaCA;
 						CVector vertA1(verts[0].m_viewPos);
 						CVector hitToASub;
 						PSVECSubtract(vertA1, hitViewPos, hitToASub);
@@ -1473,24 +1467,25 @@ int CChara::CModel::PickFur(
 						CVector vertB(verts[1].m_viewPos);
 						CVector hitToBSub;
 						PSVECSubtract(vertB, hitViewPos, hitToBSub);
-						hitToB->y = hitToBSub.y;
-						hitToB->x = hitToBSub.x;
-						hitToB->z = hitToBSub.z;
+						hitToB.y = hitToBSub.y;
+						hitToB.x = hitToBSub.x;
+						hitToB.z = hitToBSub.z;
 						CVector vertC(verts[2].m_viewPos);
 						CVector hitToCSub;
 						PSVECSubtract(vertC, hitViewPos, hitToCSub);
-						hitToC->x = hitToCSub.x;
-						hitToC->y = hitToCSub.y;
-						hitToC->z = hitToCSub.z;
+						hitToC.x = hitToCSub.x;
+						hitToC.y = hitToCSub.y;
+						hitToC.z = hitToCSub.z;
 
-						PSVECCrossProduct(hitToA, *hitToB, areaAB);
-						PSVECCrossProduct(*hitToB, *hitToC, *areaBC);
-						PSVECCrossProduct(*hitToC, hitToA, *areaCA);
+						PSVECCrossProduct(hitToA, hitToB, areaAB);
+						PSVECCrossProduct(hitToB, hitToC, areaBC);
+						PSVECCrossProduct(hitToC, hitToA, areaCA);
 						const float magAB = PSVECMag(areaAB);
-						const float magCA = PSVECMag(*areaCA);
-						const float magBC = PSVECMag(*areaBC);
+						const float magCA = PSVECMag(areaCA);
+						const float magBC = PSVECMag(areaBC);
 						CVector weightsInit(magBC, magCA, magAB);
 						CVector weightsScale;
+						CVector weights;
 						PSVECScale(weightsInit, weightsScale, kCharaFurWeightScale);
 						weights.x = weightsScale.x;
 						weights.y = weightsScale.y;

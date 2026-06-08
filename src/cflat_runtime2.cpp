@@ -1779,7 +1779,7 @@ void CFlatRuntime2::drawLayer(
 	GXSetChanMatColor(GX_COLOR0A0, *color);
 
 	Mtx44 ortho;
-	C_MTXOrtho(ortho, 0.0f, 448.0f, 0.0f, 640.0f, 0.0f, 1.0f);
+	C_MTXOrtho(ortho, 0.0f, 448.0f, 0.0f, 640.0f, 0.0f, -100.0f);
 	GXSetProjection(ortho, GX_ORTHOGRAPHIC);
 
 	Mtx identity;
@@ -1787,7 +1787,7 @@ void CFlatRuntime2::drawLayer(
 	GXLoadPosMtxImm(identity, GX_PNMTX0);
 	GXSetCurrentMtx(GX_PNMTX0);
 
-	const unsigned int blendMode = static_cast<unsigned int>(flags >> 1) & 2;
+	const int blendMode = (flags >> 1) & 2;
 	if (blendMode == 1) {
 		_GXSetBlendMode((_GXBlendMode)1, (_GXBlendFactor)4, (_GXBlendFactor)1, (_GXLogicOp)5);
 	} else if (blendMode == 2) {

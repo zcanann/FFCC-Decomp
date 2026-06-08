@@ -1022,7 +1022,7 @@ void CMenuPcs::CmdDraw()
 			}
 
 			const float textW = static_cast<float>(nameFont->GetWidth(text));
-			const float px = static_cast<float>(entry->x) + ((static_cast<float>(entry->width) - textW) * 0.5f);
+			const float px = static_cast<double>(entry->x) + ((static_cast<float>(entry->width) - textW) * 0.5);
 			const float py = static_cast<float>(entry->y + 3) - kCmdMenuTextYOffset;
 			nameFont->SetPosX(px);
 			nameFont->SetPosY(py);

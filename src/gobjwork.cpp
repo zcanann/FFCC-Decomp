@@ -967,10 +967,8 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 {
 	int foundCount = 0;
 
-	if (maxResults > 0) {
-		for (int i = 0; i < maxResults; i++) {
-			romLetterWork[i] = 0;
-		}
+	for (int i = 0; i < maxResults; i++) {
+		romLetterWork[i] = 0;
 	}
 
 	CRomLetterWork* curLetter = reinterpret_cast<CRomLetterWork*>(Game.m_romLetterWorkBase);
@@ -1803,14 +1801,27 @@ void CCaravanWork::CalcStatus()
 	if (m_tempStatBuffTimer != 0) {
 		int tempStatBuffId = m_tempStatBuffId;
 		if (tempStatBuffId >= 0x183) {
-			if (tempStatBuffId < 0x185) {
-				m_strength += *(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + 0x6A);
-			}
-		} else if (tempStatBuffId >= 0x180) {
-			m_defense += *(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + 0x6C);
-		} else if (tempStatBuffId > 0x17C) {
-			m_magic += *(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + 0x6E);
+			goto TempStatStr;
 		}
+		if (tempStatBuffId >= 0x180) {
+			goto TempStatDef;
+		}
+		if (tempStatBuffId >= 0x17D) {
+			goto TempStatMag;
+		}
+		goto TempStatDone;
+	TempStatStr:
+		if (tempStatBuffId >= 0x185) {
+			goto TempStatDone;
+		}
+		m_strength += *(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + 0x6A);
+		goto TempStatDone;
+	TempStatDef:
+		m_defense += *(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + 0x6C);
+		goto TempStatDone;
+	TempStatMag:
+		m_magic += *(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + 0x6E);
+	TempStatDone:;
 		m_tempStatBuffTimer--;
 	}
 
@@ -2142,9 +2153,9 @@ unsigned int CCaravanWork::GetMagicCharge(int cmdListIdx, int&, int&)
 
 			groupedCountLocal = 1;
 			int nextIdx = topIdx + 1;
-			scanCount = static_cast<short>(m_numCmdListSlots) - nextIdx;
+			int remaining = static_cast<short>(m_numCmdListSlots) - nextIdx;
 			if (nextIdx < static_cast<short>(m_numCmdListSlots)) {
-				for (; scanCount != 0; scanCount--) {
+				for (; remaining != 0; remaining--) {
 					if (m_commandListExtra[nextIdx] != -1) {
 						break;
 					}

@@ -3755,7 +3755,7 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 		return;
 	}
 
-	unsigned int validCount = 0;
+	int validCount = 0;
 	if (m_cmakeWorkActive == 1) {
 		if (*reinterpret_cast<int*>(m_cmakeWork + 0x1A84) != 0) {
 			validCount = 1;
@@ -3794,7 +3794,7 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 		}
 	}
 
-	unsigned int loadedCount = 0;
+	int loadedCount = 0;
 	for (int i = 0; i < 8; i++) {
 		const int handleIdx = i + 0x20;
 		CCharaPcs::CHandle* const handle = m_wm.m_handles[handleIdx];
@@ -4074,9 +4074,11 @@ void CMenuPcs::drawWorld()
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
 	if (static_cast<signed char>(bytes[0xD]) == 0) {
+		unsigned char* menuSlot = bytes + 0x10;
 		for (int i = 4; i < 6; i++) {
-			CMenu* const menu = *reinterpret_cast<CMenu**>(bytes + 0x10 + (i - 4) * 4 + 0x10C);
+			CMenu* const menu = *reinterpret_cast<CMenu**>(menuSlot + 0x10C);
 			menu->Draw();
+			menuSlot += 4;
 		}
 	} else {
 		const short menuMode = m_wmWorldState->m_menuMode;
@@ -4120,9 +4122,11 @@ void CMenuPcs::drawWorld()
 			break;
 		}
 
+		unsigned char* menuSlot = bytes + 0x10;
 		for (int i = 4; i < 6; i++) {
-			CMenu* const menu = *reinterpret_cast<CMenu**>(bytes + 0x10 + (i - 4) * 4 + 0x10C);
+			CMenu* const menu = *reinterpret_cast<CMenu**>(menuSlot + 0x10C);
 			menu->Draw();
+			menuSlot += 4;
 		}
 		DrawInit();
 	}
@@ -11710,15 +11714,14 @@ unsigned int CMenuPcs::BindEffect(int slot, int effectNo, int cameraSlot)
 void CMenuPcs::SetLight(int mode)
 {
 	Graphic.SetFog(1, 0);
-	WmMenuLightTable& lightTable = gWmMenuLightTables[mode];
 
-	LightPcs.SetAmbient(lightTable.m_ambient);
-	LightPcs.SetNumDiffuse(static_cast<unsigned long>(lightTable.m_diffuseCount));
+	LightPcs.SetAmbient(gWmMenuLightTables[mode].m_ambient);
+	LightPcs.SetNumDiffuse(static_cast<unsigned long>(gWmMenuLightTables[mode].m_diffuseCount));
 
-	for (int i = 0; i < lightTable.m_diffuseCount; i++) {
+	for (int i = 0; i < gWmMenuLightTables[mode].m_diffuseCount; i++) {
 		LightPcs.SetDiffuse(
-			static_cast<unsigned long>(i), lightTable.m_diffuseColors[i],
-			&lightTable.m_diffuseDirs[i], 0);
+			static_cast<unsigned long>(i), gWmMenuLightTables[mode].m_diffuseColors[i],
+			&gWmMenuLightTables[mode].m_diffuseDirs[i], 0);
 	}
 
 	LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
@@ -12516,13 +12519,10 @@ int CMenuPcs::GetSameCharaData(Mc::SaveDat* source, Mc::SaveDat* target, int mem
 		}
 	}
 
-	unsigned int result;
-	unsigned int index = 0;
+	unsigned int result = 0;
 	const int cmpOffset = memberIndex * 0x9C0 + 0x1D94;
-	int count = 4;
-	do {
+	for (int count = 4; count != 0; count--) {
 		if (*reinterpret_cast<int*>(src + 0x1A84) != 0) {
-			result = index;
 			if (strictMode == 0) {
 				if (src[0x1D90] != 0 &&
 				    *reinterpret_cast<unsigned int*>(src + 0x1D94) == *reinterpret_cast<unsigned int*>(dst + cmpOffset)) {
@@ -12538,9 +12538,9 @@ int CMenuPcs::GetSameCharaData(Mc::SaveDat* source, Mc::SaveDat* target, int mem
 				}
 			}
 		}
+		result++;
 
 		if (*reinterpret_cast<int*>(src + 0x2444) != 0) {
-			result = index + 1;
 			if (strictMode == 0) {
 				if (src[0x2750] != 0 &&
 				    *reinterpret_cast<unsigned int*>(src + 0x2754) == *reinterpret_cast<unsigned int*>(dst + cmpOffset)) {
@@ -12556,12 +12556,10 @@ int CMenuPcs::GetSameCharaData(Mc::SaveDat* source, Mc::SaveDat* target, int mem
 				}
 			}
 		}
+		result++;
 
 		src += 0x1380;
-		index += 2;
-		count--;
-		result = index;
-	} while (count != 0);
+	}
 
 	if (strictMode == 0) {
 		if (static_cast<int>(result) < 8) {
@@ -13903,6 +13901,9 @@ int McCtrl::ChkNowData()
 				m_state = -1;
 			}
 		}
+		break;
+
+	case 7:
 		break;
 	}
 

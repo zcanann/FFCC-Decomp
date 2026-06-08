@@ -177,7 +177,7 @@ void CMenuPcs::CompaDraw()
 	GXSetChanMatColor(GX_COLOR0A0, color);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3A));
 
-	int familyCount = 2;
+	unsigned int familyCount = 2;
 	for (int i = 2; i < 7; i++) {
 		if (caravanWork->m_evtWordArr[19 + i] > 0) {
 			familyCount++;

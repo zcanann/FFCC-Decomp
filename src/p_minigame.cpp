@@ -733,12 +733,12 @@ void CMiniGamePcs::GbaThreadMain(void* threadParam)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     unsigned char* param = reinterpret_cast<unsigned char*>(threadParam);
-    unsigned int identity8;
-    unsigned int identity7;
-    unsigned int command8;
-    unsigned int command7;
-    unsigned int command;
     int message;
+    unsigned int command;
+    unsigned int command7;
+    unsigned int command8;
+    unsigned int identity7;
+    unsigned int identity8;
     int ret;
     int step;
     int contextRecvOffset;

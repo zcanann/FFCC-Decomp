@@ -494,11 +494,11 @@ void CGObject::move()
 
     bool movingWithScript = false;
     bool hasStickInput = false;
+    m_groundHitOffset.y += m_gravityY;
     Vec moveVec;
     moveVec.x = sZeroFloat;
     moveVec.y = sZeroFloat;
     moveVec.z = sZeroFloat;
-    m_groundHitOffset.y += m_gravityY;
 
     if (m_weaponNodeFlagAll.m_bits1.m_bit20) {
         int scriptMoveEnd = 0;

@@ -2510,8 +2510,7 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 			}
 		}
 
-		next = hpValue + delta;
-		next &= ~(static_cast<int>(next) >> 31);
+		next = (hpValue + delta) & ~(static_cast<int>(hpValue + delta) >> 31);
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) = static_cast<unsigned short>(next);
 		m_worldParam = kOneF32;
 
@@ -2556,12 +2555,12 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 	}
 
 	if (delta > 0) {
-		unsigned short maxHp = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1A);
-		next = hpValue + delta;
-		if (static_cast<int>(next) > static_cast<int>(maxHp)) {
-			next = maxHp;
+		int maxHp = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1A);
+		int result = maxHp;
+		if (hpValue + delta < maxHp) {
+			result = hpValue + delta;
 		}
-		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) = static_cast<unsigned short>(next);
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) = static_cast<unsigned short>(result);
 	}
 }
 

@@ -195,7 +195,7 @@ void CRingMenu::DrawIcon()
 	unsigned char blinkAlpha = sRingMenuBlinkAlphaTable[frameNibble(System.m_frameCounter)];
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x19));
-	int iconRow;
+	unsigned int iconRow;
 	unsigned int iconCol;
 	if ((Game.m_gameWork.m_menuStageMode != 0) && (m_menuIndex >= 1)) {
 		iconRow = 1;
@@ -237,10 +237,10 @@ void CRingMenu::DrawIcon()
 	CColor iconColor(0xFF, 0xFF, 0xFF, blinkAlpha);
 	MenuPcs.SetColor(iconColor);
 
-	int signedIconCol = static_cast<int>(iconCol);
-	int colSign = signedIconCol >> 31;
-	float u = static_cast<float>((((colSign * 8) | (signedIconCol * 0x20000000 + colSign) >> 29) - colSign) * 0x30);
-	float v = static_cast<float>(((signedIconCol >> 3) + ((signedIconCol < 0) && ((iconCol & 7) != 0))) * 0x30);
+	unsigned int colValue = iconCol;
+	int colSign = colValue >> 31;
+	float u = static_cast<float>((((colSign * 8) | (colValue * 0x20000000 + colSign) >> 29) - colSign) * 0x30);
+	float v = static_cast<float>(((colValue >> 3) + ((colValue < 0) && ((iconCol & 7) != 0))) * 0x30);
 	MenuPcs.DrawRect(3, static_cast<float>(posX), static_cast<float>(posY), kRingMenuMarkerSize,
 	                                 kRingMenuMarkerSize, u, v, kRingMenuMarkerUvScale, kRingMenuMarkerUvScale, angle);
 }
@@ -439,9 +439,9 @@ void CRingMenu::drawGBA()
 			MenuPcs.DrawRect(3, drawX, drawY, kRingMenuGbaIconSize, kRingMenuGbaIconSize, kRingMenuZero, kRingMenuCommandIconV,
 			                                 kRingMenuOne, kRingMenuOne, 0.0f);
 		} else {
-			int frameHalf = static_cast<int>(System.m_frameCounter) >> 1;
+			unsigned int frameHalf = static_cast<int>(System.m_frameCounter) >> 1;
 			int frameSign = frameHalf >> 31;
-			unsigned int frameTex = static_cast<unsigned int>(
+			int frameTex = static_cast<unsigned int>(
 			    (frameSign * 0x10 | (frameHalf * 0x10000000 + frameSign) >> 28) - frameSign);
 			if (frameTex > 3) {
 				frameTex &= 1;

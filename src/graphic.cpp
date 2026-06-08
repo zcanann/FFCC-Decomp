@@ -1956,9 +1956,9 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
     GXSetNumTexGens(1);
 
     int blurOffsetInt = offset;
-    unsigned int negativeBlurOffset = -blurOffsetInt;
     int textureOffset = 0;
     for (int i = 0; i < static_cast<int>(m_blurTextureCount); i++) {
+        unsigned int negativeBlurOffset = -blurOffsetInt;
         u8* textureBase = reinterpret_cast<u8*>(m_savedFrameBuffer) + textureOffset;
         GXInitTexObj(&texObj, textureBase, 0x140, 0xE0, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
         GXInitTexObjLOD(&texObj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);

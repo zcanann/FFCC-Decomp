@@ -1529,20 +1529,27 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
     CChara::CMesh::CDisplayList* displayList = &meshData->m_displayLists[dlIndex];
     bool draw = false;
 
-    if (type == 2) {
+    switch (type) {
+    case 0:
+        if (strcmp(shape, s_manaShapeObj) == 0) {
+            draw = true;
+        }
+        break;
+    case 1:
+        if (strcmp(shape, s_manaShapeObj) == 0 || strcmp(shape, s_manaShapeObj5) == 0) {
+            draw = true;
+        }
+        break;
+    case 2:
         if (strcmp(shape, s_manaShapeObj) == 0 || strcmp(shape, s_manaShapeObj3) == 0) {
             draw = true;
         }
-    } else if (type < 2) {
-        if (type == 0) {
-            if (strcmp(shape, s_manaShapeObj) == 0) {
-                draw = true;
-            }
-        } else if (strcmp(shape, s_manaShapeObj) == 0 || strcmp(shape, s_manaShapeObj5) == 0) {
+        break;
+    case 3:
+        if (strcmp(shape, s_manaShapeObj) == 0 || strcmp(shape, s_manaShapeObj1) == 0) {
             draw = true;
         }
-    } else if (type < 4 && (strcmp(shape, s_manaShapeObj) == 0 || strcmp(shape, s_manaShapeObj1) == 0)) {
-        draw = true;
+        break;
     }
 
     int waterCmp = strcmp(shape, s_manaShapeObj4);

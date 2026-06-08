@@ -1296,7 +1296,7 @@ void CGObject::hit()
 
     for (CGObject* other = CFlat.FindGObjFirst(); other != 0;
          other = CFlat.FindGObjNext(other)) {
-        if ((other == this) || ((other->m_bgColMask & 0x80000) == 0)) {
+        if (((other->m_bgColMask & 0x80000) == 0) || (other == this)) {
             continue;
         }
 

@@ -415,8 +415,7 @@ static inline void ReleaseHandleAnimSlot(CCharaPcs::CHandle* handle, int slot)
 {
     CRef* animRef = handle->m_animSlot[slot];
     if (animRef != 0) {
-        ReleaseSharedNonNull(animRef);
-        handle->m_animSlot[slot] = 0;
+        ReleaseShared(handle->m_animSlot[slot]);
     }
 }
 
@@ -424,16 +423,19 @@ static inline void PruneUnsharedAnimRefs(CCharaPcs* self, CCharaPcs::CLoadAnim* 
 {
     for (int i = LoadAnimArray(self)->GetSize() - 1; i >= 0; i--) {
         CCharaPcs::CLoadAnim* loadAnim = (*LoadAnimArray(self))[static_cast<unsigned long>(i)];
-        if (loadAnim->m_mergeFileId >= 0 || loadAnim->GetRef() != 1) {
+        if (loadAnim->m_mergeFileId >= 0) {
             continue;
         }
-        if (target != 0 && loadAnim != target) {
-            continue;
+        if (loadAnim->GetRef() == 1) {
+            if (target == 0 || target == loadAnim) {
+                CCharaPcs::CLoadAnim* releasedAnim = loadAnim;
+                ReleaseSharedNonNull(releasedAnim);
+                LoadAnimArray(self)->RemoveAt(static_cast<unsigned long>(i));
+                if (target != 0) {
+                    break;
+                }
+            }
         }
-
-        CCharaPcs::CLoadAnim* releasedAnim = loadAnim;
-        ReleaseSharedNonNull(releasedAnim);
-        LoadAnimArray(self)->RemoveAt(static_cast<unsigned long>(i));
     }
 }
 
@@ -1094,10 +1096,11 @@ int CCharaPcs::TryReleaseAnimBank(int requiredSize)
         return 0;
     }
 
-    void* bankPtr = releaseAnim->m_anim->m_bank;
+    CChara::CAnim* releaseAnimData = releaseAnim->m_anim;
+    void* bankPtr = releaseAnimData->m_bank;
     if (bankPtr != 0) {
         operator delete(bankPtr);
-        releaseAnim->m_anim->m_bank = 0;
+        releaseAnimData->m_bank = 0;
     }
 
     if (static_cast<unsigned int>(System.m_execParam) >= 3) {
@@ -1359,51 +1362,46 @@ int CCharaPcs::releaseUnuseLoadModel(int releaseMask)
 
     for (int i = LoadModelArray(this)->GetSize() - 1; i >= 0; i--) {
         CLoadModel* loadModel = (*LoadModelArray(this))[static_cast<unsigned long>(i)];
-        if (!((((loadModel->m_mergeFileId < 0) || (loadModel->m_streamMode != 0)) && loadModel->GetRef() == 1) ||
-              (loadModel->m_mergeFileId >= 0 && (releaseMask & loadModel->m_mergeFlags) != 0))) {
+        if ((((loadModel->m_mergeFileId < 0) || (loadModel->m_streamMode != 0)) && loadModel->GetRef() == 1) ||
+            (loadModel->m_mergeFileId >= 0 && (releaseMask & loadModel->m_mergeFlags) != 0)) {
+            if (loadModel->m_streamMode != 0 && loadModel->GetRef() == 1) {
+                ReleaseShared(loadModel->m_model);
+            } else {
+                CLoadModel* releasedModel = loadModel;
+                ReleaseSharedNonNull(releasedModel);
+                LoadModelArray(this)->RemoveAt(static_cast<unsigned long>(i));
+            }
+        } else {
             activeCount++;
-            continue;
         }
-
-        if (loadModel->m_streamMode != 0 && loadModel->GetRef() == 1) {
-            ReleaseShared(loadModel->m_model);
-            continue;
-        }
-
-        CLoadModel* releasedModel = loadModel;
-        ReleaseShared(releasedModel);
-        LoadModelArray(this)->RemoveAt(static_cast<unsigned long>(i));
     }
 
     for (int i = LoadTextureArray(this)->GetSize() - 1; i >= 0; i--) {
         CLoadTexture* loadTexture = (*LoadTextureArray(this))[static_cast<unsigned long>(i)];
-        if (!((((loadTexture->m_mergeFileId < 0) || (loadTexture->m_streamMode != 0)) && loadTexture->GetRef() == 1) ||
-              (loadTexture->m_mergeFileId >= 0 && (releaseMask & loadTexture->m_mergeFlags) != 0))) {
+        if ((((loadTexture->m_mergeFileId < 0) || (loadTexture->m_streamMode != 0)) && loadTexture->GetRef() == 1) ||
+            (loadTexture->m_mergeFileId >= 0 && (releaseMask & loadTexture->m_mergeFlags) != 0)) {
+            if (loadTexture->m_streamMode != 0 && loadTexture->GetRef() == 1) {
+                ReleaseShared(loadTexture->m_textureSet);
+            } else {
+                CLoadTexture* releasedTexture = loadTexture;
+                ReleaseSharedNonNull(releasedTexture);
+                LoadTextureArray(this)->RemoveAt(static_cast<unsigned long>(i));
+            }
+        } else {
             activeCount++;
-            continue;
         }
-
-        if (loadTexture->m_streamMode != 0 && loadTexture->GetRef() == 1) {
-            ReleaseShared(loadTexture->m_textureSet);
-            continue;
-        }
-
-        CLoadTexture* releasedTexture = loadTexture;
-        ReleaseShared(releasedTexture);
-        LoadTextureArray(this)->RemoveAt(static_cast<unsigned long>(i));
     }
 
     for (int i = LoadPdtArray(this)->GetSize() - 1; i >= 0; i--) {
         CLoadPdt* loadPdt = (*LoadPdtArray(this))[static_cast<unsigned long>(i)];
-        if (!((loadPdt->m_mergeFileId < 0 && loadPdt->GetRef() == 1) ||
-              (loadPdt->m_mergeFileId >= 0 && (releaseMask & loadPdt->m_mergeFlags) != 0))) {
+        if ((loadPdt->m_mergeFileId < 0 && loadPdt->GetRef() == 1) ||
+            (loadPdt->m_mergeFileId >= 0 && (releaseMask & loadPdt->m_mergeFlags) != 0)) {
+            CLoadPdt* releasedPdt = loadPdt;
+            ReleaseSharedNonNull(releasedPdt);
+            LoadPdtArray(this)->RemoveAt(static_cast<unsigned long>(i));
+        } else {
             activeCount++;
-            continue;
         }
-
-        CLoadPdt* releasedPdt = loadPdt;
-        ReleaseShared(releasedPdt);
-        LoadPdtArray(this)->RemoveAt(static_cast<unsigned long>(i));
     }
 
     return activeCount;
@@ -2223,15 +2221,17 @@ void CCharaPcs::CHandle::ChangeTexture(
     char path[0x100];
     BuildCharaBasePath(charaKind, charaNo, basePath);
 
-    CLoadTexture* loadTexture = 0;
+    CLoadTexture* loadTexture;
     for (unsigned int i = 0; i < static_cast<unsigned int>(LoadTextureArray(&CharaPcs)->GetSize()); i++) {
         CLoadTexture* it = (*LoadTextureArray(&CharaPcs))[i];
         if (reinterpret_cast<int>(it->m_keyTag) == charaKind && it->m_keyId == static_cast<unsigned int>(charaNo) &&
             it->m_variantTag == reinterpret_cast<void*>(textureVariant)) {
             loadTexture = it;
-            break;
+            goto foundTexture;
         }
     }
+    loadTexture = 0;
+foundTexture:
 
     if (loadTexture != 0) {
         if (loadTexture->m_streamMode != 0 && loadTexture->GetRef() == 1) {
@@ -2323,14 +2323,16 @@ void CCharaPcs::CHandle::LoadModel(
     char path[0x100];
     BuildCharaBasePath(charaKind, charaNo, basePath);
 
-    CLoadModel* loadModel = 0;
+    CLoadModel* loadModel;
     for (unsigned int i = 0; i < static_cast<unsigned int>(LoadModelArray(&CharaPcs)->GetSize()); i++) {
         CLoadModel* it = (*LoadModelArray(&CharaPcs))[i];
         if (reinterpret_cast<int>(it->m_keyTag) == charaKind && static_cast<unsigned long>(it->m_keyId) == charaNo) {
             loadModel = it;
-            break;
+            goto foundModel;
         }
     }
+    loadModel = 0;
+foundModel:
 
     if (loadModel != 0) {
         m_modelLoadRef = loadModel;
@@ -2411,15 +2413,17 @@ void CCharaPcs::CHandle::LoadModel(
     }
 
     if (CurrentSceneId() != 7 && charaKind == 1) {
-        CLoadPdt* loadPdt = 0;
+        CLoadPdt* loadPdt;
         for (unsigned int i = 0; i < static_cast<unsigned int>(LoadPdtArray(&CharaPcs)->GetSize()); i++) {
             CLoadPdt* it = (*LoadPdtArray(&CharaPcs))[i];
             if (it->m_keyTag == reinterpret_cast<void*>(1) && it->m_keyId == static_cast<int>(charaNo) &&
                 it->m_variantTag == reinterpret_cast<void*>(textureVariant)) {
                 loadPdt = it;
-                break;
+                goto foundPdt;
             }
         }
+        loadPdt = 0;
+    foundPdt:
 
         if (loadPdt == 0) {
             loadPdt = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x868) CLoadPdt;
@@ -2459,8 +2463,8 @@ int CCharaPcs::CHandle::LoadAnim(
     } else {
         CLoadAnim* previousAnim = reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex]);
         if (previousAnim != 0) {
-            ReleaseShared(m_animSlot[animIndex]);
-            PruneUnsharedAnimRefs(&CharaPcs, previousAnim);
+            ReleaseSharedNonNull(m_animSlot[animIndex]);
+            PruneUnsharedAnimRefs(&CharaPcs, reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex]));
             m_animSlot[animIndex] = 0;
         }
     }
@@ -2548,8 +2552,8 @@ void CCharaPcs::CHandle::FreeAnim(int animIndex)
         return;
     }
 
-    ReleaseShared(m_animSlot[animIndex]);
-    PruneUnsharedAnimRefs(&CharaPcs, previousAnim);
+    ReleaseSharedNonNull(m_animSlot[animIndex]);
+    PruneUnsharedAnimRefs(&CharaPcs, reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex]));
     m_animSlot[animIndex] = 0;
 }
 

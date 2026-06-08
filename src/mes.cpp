@@ -200,14 +200,15 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 	unsigned char branchMode = 0;
 
 	char* townName = Game.m_gameWork.m_townName;
-	const unsigned char* next;
+	const unsigned char* op;
 	unsigned char c;
 	while ((c = in[0]) != 0)
 	{
 		if (c == 0xFF)
 		{
 		unsigned int tag = ((unsigned int)in[1] - 0xA0U) & 0xFFU;
-		next = in + 2;
+		op = in + 2;
+		in++;
 
 		switch (tag)
 		{
@@ -233,10 +234,10 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			break;
 		case 8:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)(next + 2));
+			signed char varIndex = (signed char)GetMesNibbleValue((const char*)(op + 2));
 			strcpy(dst, FlatNameDirect(5, CMes::m_tempVar[varIndex]));
 			dst += strlen(dst);
-			next = in + 6;
+			in += 4;
 			break;
 		}
 		case 9:
@@ -247,7 +248,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x3D:
 		case 0x3F:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)(next + 2));
+			signed char varIndex = (signed char)GetMesNibbleValue((const char*)(op + 2));
 			int value = CMes::m_tempVar[varIndex];
 			switch (tag)
 			{
@@ -266,14 +267,14 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 				break;
 			case 0x3D:
 			{
-				signed char countIdx = (signed char)GetMesNibbleValue((const char*)(next + 4));
+				signed char countIdx = (signed char)GetMesNibbleValue((const char*)(op + 4));
 				int count = (unsigned int)CMes::m_tempVar[countIdx] & 0xFFFF;
 				Game.MakeArtItemName(dst, value, count);
 				break;
 			}
 			case 0x3F:
 			{
-				signed char countIdx = (signed char)GetMesNibbleValue((const char*)(next + 4));
+				signed char countIdx = (signed char)GetMesNibbleValue((const char*)(op + 4));
 				int count = (unsigned int)CMes::m_tempVar[countIdx] & 0xFFFF;
 				Game.MakeNumItemName(dst, value, count);
 				break;
@@ -281,7 +282,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			}
 			ApplyCaseMode(dst, caseMode);
 			dst += strlen(dst);
-			next = in + 6;
+			in += 4;
 			break;
 		}
 		case 0x1E:
@@ -292,7 +293,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x3E:
 		case 0x40:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)(next + 2));
+			signed char varIndex = (signed char)GetMesNibbleValue((const char*)(op + 2));
 			int value = CMes::m_tempVar[varIndex];
 			switch (tag)
 			{
@@ -311,14 +312,14 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 				break;
 			case 0x3E:
 			{
-				signed char countIdx = (signed char)GetMesNibbleValue((const char*)(next + 4));
+				signed char countIdx = (signed char)GetMesNibbleValue((const char*)(op + 4));
 				int count = (unsigned int)CMes::m_tempVar[countIdx] & 0xFFFF;
 				Game.MakeArtMonName(dst, value, count);
 				break;
 			}
 			case 0x40:
 			{
-				signed char countIdx = (signed char)GetMesNibbleValue((const char*)(next + 4));
+				signed char countIdx = (signed char)GetMesNibbleValue((const char*)(op + 4));
 				int count = (unsigned int)CMes::m_tempVar[countIdx] & 0xFFFF;
 				Game.MakeNumMonName(dst, value, count);
 				break;
@@ -326,39 +327,39 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			}
 			ApplyCaseMode(dst, caseMode);
 			dst += strlen(dst);
-			next = in + 6;
+			in += 4;
 			break;
 		}
 		case 0x2B:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)(next + 2));
+			signed char varIndex = (signed char)GetMesNibbleValue((const char*)(op + 2));
 			strcpy(dst, FlatNameDirect(2, CMes::m_tempVar[varIndex]));
 			dst += strlen(dst);
-			next = in + 6;
+			in += 4;
 			break;
 		}
 		case 0x2C:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)(next + 2));
+			signed char varIndex = (signed char)GetMesNibbleValue((const char*)(op + 2));
 			strcpy(dst, FlatNameDirect(3, CMes::m_tempVar[varIndex]));
 			dst += strlen(dst);
-			next = in + 6;
+			in += 4;
 			break;
 		}
 		case 0x2D:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)(next + 2));
+			signed char varIndex = (signed char)GetMesNibbleValue((const char*)(op + 2));
 			strcpy(dst, FlatNameDirect(3, CMes::m_tempVar[varIndex] + 0x3C));
 			dst += strlen(dst);
-			next = in + 6;
+			in += 4;
 			break;
 		}
 		case 0x2E:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)next);
+			signed char varIndex = (signed char)GetMesNibbleValue((const char*)op);
 			strcpy(dst, FlatNameDirect(5, CMes::m_tempVar[varIndex]));
 			dst += strlen(dst);
-			next = in + 4;
+			in += 2;
 			break;
 		}
 		case 0x2F:
@@ -367,15 +368,15 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			break;
 		case 0x30:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)next);
+			signed char varIndex = (signed char)GetMesNibbleValue((const char*)op);
 			sprintf(dst, s_mesNumFmt, CMes::m_tempVar[varIndex]);
 			dst += strlen(dst);
-			next = in + 4;
+			in += 2;
 			break;
 		}
 		case 0x41:
 		{
-			unsigned char mode = (unsigned char)GetMesNibbleValue((const char*)next);
+			unsigned char mode = (unsigned char)GetMesNibbleValue((const char*)op);
 			if (mode == 1)
 			{
 				caseMode = 1;
@@ -388,7 +389,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			{
 				caseMode = 2;
 			}
-			next = in + 4;
+			in += 2;
 			break;
 		}
 		case 0x44:
@@ -396,17 +397,17 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			break;
 		case 0x42:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)next);
+			signed char varIndex = (signed char)GetMesNibbleValue((const char*)op);
 			branchMode = (CMes::m_tempVar[varIndex] == 1) ? 1 : 2;
-			next = in + 4;
+			in += 2;
 			break;
 		}
 		case 0x45:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)next);
+			signed char varIndex = (signed char)GetMesNibbleValue((const char*)op);
 			int caravanIdx = CMes::m_tempVar[varIndex];
 			branchMode = (Game.m_caravanWorkArr[caravanIdx].m_genderFlag == 0) ? 1 : 2;
-			next = in + 4;
+			in += 2;
 			break;
 		}
 		case 0x46:
@@ -466,7 +467,6 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			break;
 		}
 
-		in = next;
 		continue;
 		}
 

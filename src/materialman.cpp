@@ -3087,10 +3087,10 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 if (material->m_textureCount == 0) {
                     material->m_tevBit |= 1;
                 } else {
-                    for (int i = 0; i < static_cast<int>(static_cast<unsigned short>(chunk.m_arg0)); i++) {
+                    for (int i = 0; i < static_cast<int>(material->m_textureCount); i++) {
                         material->m_textureIndices[i] = static_cast<short>(chunkFile.Get4());
                     }
-                    if (material->m_textureCount == 2) {
+                    if (static_cast<int>(material->m_textureCount) == 2) {
                         material->m_tevBit |= 2;
                     }
                 }

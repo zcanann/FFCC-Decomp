@@ -1549,18 +1549,17 @@ void CMenuPcs::CalcSelectOpenAnim()
 
 		idx = 0;
 		sprites[idx].kind = 0x16;
-		sprites[idx].x = 0;
 		sprites[idx].y = 0;
+		sprites[idx].x = 0;
 		sprites[idx].w = 0x280;
 		sprites[idx].h = 0x1c0;
-		sprites[idx].mulX = 0.0f;
 		sprites[idx].mulY = 0.0f;
+		sprites[idx].mulX = 0.0f;
 		sprites[idx].startFrame = 0;
 		sprites[idx].duration = 0;
 		sprites[idx].depth = 1.0f;
+		BonusSpriteFlags(&sprites[idx]) = 3;
 		idx++;
-		BonusSpriteFlags(&sprites[0]) = 3;
-		sprites[0].alpha = 0.0f;
 
 		sprites[idx].kind = -3;
 		sprites[idx].x = 0xf0;
@@ -1826,7 +1825,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 			PSMTXRotRad(rotZMtx, 'z', 0.01745329238474369f * angle);
 			PSMTXMultVecSR(rotZMtx, &srcVec, &dstVec);
 
-			int charaNo = handle->m_charaNo;
+			unsigned int charaNo = handle->m_charaNo;
 			if (charaNo == 0x44) {
 				PSMTXRotRad(rotYMtx, 'y', 3.1415927410125732f);
 				PSMTXConcat(scaleMtx, rotYMtx, scaleMtx);
@@ -2875,7 +2874,7 @@ void CMenuPcs::CalcResultOpenAnim()
 	const int activePartyCount = s_Rinfo->m_partyCount;
 	const int frameBase = 1;
 
-	if (*(signed char*)(this->m_bonusStatePtr + 0xb) == 0) {
+	if (*(unsigned char*)(this->m_bonusStatePtr + 0xb) == 0) {
 		this->m_bonusAlpha = 0;
 		Sound.PlaySe(0x46, 0x40, 0x7f, 0);
 		memset((void*)this->m_bonusAnimPtr, 0, sizeof(BonusAnimList));

@@ -356,7 +356,7 @@ void CGMonObj::frameStatFuncGiantCrab()
 				}
 			}
 
-			u32 action = (u32) * (void**)(self + 0x68);
+			int action = reinterpret_cast<int>(reinterpret_cast<CGObject*>(self)->m_scriptHandle[4]);
 			if (action == 0x63) {
 				reinterpret_cast<CGPrgObj*>(self)->playSe3D(0x8cab, 0x32, 0x1c2, 0, 0);
 			} else if (action < 99) {

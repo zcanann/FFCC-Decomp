@@ -3955,9 +3955,11 @@ void CGMonObj::statMove(int* targetIndex)
 		int hitPartyIndex;
 		if (static_cast<double>(*reinterpret_cast<float*>(mon + 0x5BC)) < soundLimit) {
 			float hitScale;
+			int colIndex;
 			monObj->checkCol(6, object->m_rotBaseY,
 				static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xC8)),
-				&hitScale, &hitPartyIndex);
+				&hitScale, &colIndex);
+			hitPartyIndex = colIndex;
 		} else {
 			hitPartyIndex = -1;
 		}

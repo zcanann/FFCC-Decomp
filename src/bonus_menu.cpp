@@ -1851,7 +1851,7 @@ void CMenuPcs::DrawResultCloseAnim()
 				}
 				if (lastKind != 0x17 && sprite->kind == 0x17) {
 					MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
-				} else if (lastKind == 0x17 && kind != 0x17) {
+				} else if (lastKind == 0x17 && sprite->kind != 0x17) {
 					MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 				}
 

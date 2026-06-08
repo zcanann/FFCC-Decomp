@@ -369,44 +369,11 @@ int CMenuPcs::TmpArtiCtrl()
 
 		itemCount = caravanWork->m_numCmdListSlots;
 		iVar7 = 0;
-		TmpArtiEntry* entries = GetTmpArtiEntries(this);
-		int setupIndex = itemCount - 1;
-		if (setupIndex > -1) {
-			blockCount = (unsigned int)itemCount >> 3;
-			if (blockCount != 0) {
-				do {
-					TmpArtiEntry* setupEntry = entries + setupIndex;
-					setupEntry[0].startFrame = iVar7++;
-					setupEntry[0].duration = 3;
-					setupEntry[-1].startFrame = iVar7++;
-					setupEntry[-1].duration = 3;
-					setupEntry[-2].startFrame = iVar7++;
-					setupEntry[-2].duration = 3;
-					setupEntry[-3].startFrame = iVar7++;
-					setupEntry[-3].duration = 3;
-					setupEntry[-4].startFrame = iVar7++;
-					setupEntry[-4].duration = 3;
-					setupEntry[-5].startFrame = iVar7++;
-					setupEntry[-5].duration = 3;
-					setupEntry[-6].startFrame = iVar7++;
-					setupEntry[-6].duration = 3;
-					setupEntry[-7].startFrame = iVar7++;
-					setupEntry[-7].duration = 3;
-					setupIndex -= 8;
-					blockCount = blockCount - 1;
-				} while (blockCount != 0);
-				itemCount = itemCount & 7;
-				if (itemCount == 0) {
-					return hasInput;
-				}
-			}
-			do {
-				entries[setupIndex].startFrame = iVar7;
-				iVar7 = iVar7 + 1;
-				entries[setupIndex].duration = 3;
-				setupIndex--;
-				itemCount = itemCount - 1;
-			} while (itemCount != 0);
+		for (int setupIndex = itemCount - 1; setupIndex >= 0; setupIndex--) {
+			TmpArtiEntry* setupEntry = &this->m_tmpArtiList->entries[setupIndex];
+			setupEntry->startFrame = iVar7;
+			iVar7 = iVar7 + 1;
+			setupEntry->duration = 3;
 		}
 	}
 

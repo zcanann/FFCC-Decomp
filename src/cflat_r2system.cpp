@@ -4318,18 +4318,19 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
             case 1:
                 languageValue = 3;
                 break;
+            case 2:
+                languageValue = 5;
+                break;
             case 3:
                 languageValue = 6;
+                break;
+            case 4:
+                languageValue = 4;
                 break;
             case 5:
                 languageValue = 7;
                 break;
             default:
-                if (gameWork.m_languageId < 3) {
-                    languageValue = 5;
-                } else if (gameWork.m_languageId < 5) {
-                    languageValue = 4;
-                }
                 break;
             }
             FlatLastResult(this) = languageValue;

@@ -2059,9 +2059,6 @@ void CGMonObj::changeStatFuncMeteoParasite(int stat)
 void CGMonObj::alwaysFuncMeteoParasite()
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
-	CGCharaObj* chara = reinterpret_cast<CGCharaObj*>(this);
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	u8* mon = reinterpret_cast<u8*>(this);
 	const int scriptKind = reinterpret_cast<int>(object->m_scriptHandle[4]);
 
 	if (scriptKind == 0x85 && reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_meteo3 == 0) {
@@ -2091,17 +2088,17 @@ void CGMonObj::alwaysFuncMeteoParasite()
 		int effect;
 		int arg0;
 		int arg1;
-		if (chara->getItemPdt(0, 0, effect, arg0, arg1) != 0) {
+		if (reinterpret_cast<CGCharaObj*>(this)->getItemPdt(0, 0, effect, arg0, arg1) != 0) {
 			if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x80) == 0) {
-				prgObj->changeStat(100, 0, 0);
+				reinterpret_cast<CGPrgObj*>(this)->changeStat(100, 0, 0);
 				m_actionBranch = 0;
 			}
 			if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x80) == 2) {
-				prgObj->changeStat(0x65, 0, 0);
+				reinterpret_cast<CGPrgObj*>(this)->changeStat(0x65, 0, 0);
 				m_actionBranch = 2;
 			}
 			if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x80) == 1) {
-				prgObj->changeStat(0x66, 0, 0);
+				reinterpret_cast<CGPrgObj*>(this)->changeStat(0x66, 0, 0);
 				m_actionBranch = 1;
 			}
 			reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_bit80 = 0;

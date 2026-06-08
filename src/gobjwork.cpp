@@ -2410,13 +2410,13 @@ int CCaravanWork::DelCmdListAndItem(int cmdListIdx)
  */
 void CCaravanWork::GetNumCombi(int cmdListIdx, int updateJoybus)
 {
-	short nextCmdIdx = 0;
+	int nextCmdIdx = 0;
 	if (m_currentCmdListIndex == cmdListIdx) {
 		nextCmdIdx = GetNextCmdListIdx(cmdListIdx, 1);
 	}
 
 	short inventorySlot = m_commandListInventorySlotRef[cmdListIdx];
-	if (m_inventoryItems[inventorySlot] != 0xFFFF) {
+	if (m_inventoryItems[inventorySlot] != -1) {
 		m_inventoryItems[inventorySlot] = 0xFFFF;
 		m_inventoryItemCount = static_cast<short>(m_inventoryItemCount - 1);
 		if (updateJoybus != 0) {

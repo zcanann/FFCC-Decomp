@@ -666,10 +666,10 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 					value = LoadU16(classData, 0x22);
 					break;
 				default:
-					if (systemVal <= -0x85 && systemVal > -0x95) {
-						value = LoadU16(classData, (systemVal + 0x94) * 2 + 0x8C);
-					} else if (systemVal < -0x52 && systemVal > -0x7A) {
+					if (systemVal < -0x52 && systemVal > -0x7A) {
 						value = LoadU16(classData, (-0x53 - systemVal) * 2 + 0x3E);
+					} else if (systemVal <= -0x85 && systemVal > -0x95) {
+						value = LoadU16(classData, (systemVal + 0x94) * 2 + 0x8C);
 					}
 					break;
 				}

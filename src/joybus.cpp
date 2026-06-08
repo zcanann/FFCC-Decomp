@@ -3119,7 +3119,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
             threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
         }
 
-        if ((int)threadParam->m_gbaStatus == 0 && threadParam->m_unk3 == '(')
+        if ((int)threadParam->m_gbaStatus == 0 && threadParam->m_unk3 == 0x28)
         {
             unsigned int readBuf[4];
 
@@ -3216,11 +3216,11 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
             threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
         }
 
-        unsigned int status = threadParam->m_gbaStatus;
+        int status = threadParam->m_gbaStatus;
 
         if (status == 0)
         {
-            if (threadParam->m_unk3 == '(')
+            if (threadParam->m_unk3 == 0x28)
             {
                 char header;
                 unsigned char flags = 0; // will land in local_1f
@@ -3286,11 +3286,11 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
             threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
         }
 
-        unsigned int status = threadParam->m_gbaStatus;
+        int status = threadParam->m_gbaStatus;
 
         if (status == 0)
         {
-            if (threadParam->m_unk3 == '(')
+            if (threadParam->m_unk3 == 0x28)
             {
                 unsigned int timeValue;
                 threadParam->m_gbaStatus = GBARead(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(&timeValue), &threadParam->m_unk3);
@@ -3338,7 +3338,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
             threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
         }
 
-        unsigned int status = threadParam->m_gbaStatus;
+        int status = threadParam->m_gbaStatus;
 
         if (status == 0)
         {
@@ -3391,7 +3391,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
             threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
         }
 
-        unsigned int status = threadParam->m_gbaStatus;
+        int status = threadParam->m_gbaStatus;
 
         if (status == 0)
         {

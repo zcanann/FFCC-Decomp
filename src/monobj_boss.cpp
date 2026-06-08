@@ -2716,18 +2716,18 @@ void CGMonObj::teleport(
 
 			const float ratio = static_cast<float>(stateFrame - blendStartFrame) / static_cast<float>(blendFrameCount);
 			const float blend = kMonObjBossHalf * (kMonObjBossOne + static_cast<float>(cos(kMonObjBossPi * ratio)));
-			CVector point(teleportPoints[teleportIndex]);
+			const CVector& point = CVector(teleportPoints[teleportIndex]);
 			CVector scaledPoint;
-			PSVECScale(reinterpret_cast<Vec*>(&point), reinterpret_cast<Vec*>(&scaledPoint), kMonObjBossOne - blend);
+			PSVECScale(reinterpret_cast<Vec*>(const_cast<CVector*>(&point)), reinterpret_cast<Vec*>(&scaledPoint), kMonObjBossOne - blend);
 
 			Vec scaledPointCopy;
 			scaledPointCopy.x = scaledPoint.x;
 			scaledPointCopy.y = scaledPoint.y;
 			scaledPointCopy.z = scaledPoint.z;
 
-			CVector current(object->m_worldPosition);
+			const CVector& current = CVector(object->m_worldPosition);
 			CVector scaledCurrent;
-			PSVECScale(reinterpret_cast<Vec*>(&current), reinterpret_cast<Vec*>(&scaledCurrent), blend);
+			PSVECScale(reinterpret_cast<Vec*>(const_cast<CVector*>(&current)), reinterpret_cast<Vec*>(&scaledCurrent), blend);
 
 			Vec scaledCurrentCopy;
 			scaledCurrentCopy.x = scaledCurrent.x;

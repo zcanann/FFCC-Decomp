@@ -604,7 +604,6 @@ void JoyBus::ReleaseSem(int portIndex)
 void JoyBus::ThreadMain(void* arg)
 {
 	ThreadParam* threadParam = (ThreadParam*)arg;
-    unsigned int port = (unsigned int)threadParam->m_portIndex;
 
     unsigned int padType = 0;
     unsigned int stateTimeoutTicks = 0;
@@ -620,25 +619,19 @@ void JoyBus::ThreadMain(void* arg)
     ThreadSleep(OSMillisecondsToTicks(15));
 
 recompute_timeout:
+    switch ((unsigned int)threadParam->m_state)
     {
-        int s = (unsigned int)threadParam->m_state;
-
-        if (s == 5 || s == 900)
-        {
-            stateTimeoutTicks = OSMillisecondsToTicks(500);
-        }
-        else if (s > 2 && s < 5)
-        {
-            stateTimeoutTicks = OSMillisecondsToTicks(500);
-        }
-        else if (s == 2)
-        {
-            stateTimeoutTicks = OSMillisecondsToTicks(2000);
-        }
-        else
-        {
-            stateTimeoutTicks = OSMillisecondsToTicks(1000);
-        }
+    case 4:
+    case 5:
+    case 900:
+        stateTimeoutTicks = OSMillisecondsToTicks(500);
+        break;
+    case 2:
+        stateTimeoutTicks = OSMillisecondsToTicks(2000);
+        break;
+    default:
+        stateTimeoutTicks = OSMillisecondsToTicks(1000);
+        break;
     }
 
     stateStartTime = OSGetTime();
@@ -677,14 +670,12 @@ loop_body:
                 idx++;
                 left--;
             }
-
-            port = (unsigned int)threadParam->m_portIndex;
         }
 
         if (m_threadInitFlag != 0)
         {
-            m_threadRunningMask = (unsigned char)(m_threadRunningMask & ~(unsigned char)(1 << port));
-            m_stageFlags[port] = 0;
+            m_threadRunningMask = (unsigned char)(m_threadRunningMask & ~(unsigned char)(1 << threadParam->m_portIndex));
+            m_stageFlags[threadParam->m_portIndex] = 0;
             OSExitThread(&gJoyBusThreadExitValue);
         }
 
@@ -714,11 +705,11 @@ loop_body:
 
         ReleaseSem(threadParam->m_portIndex);
 
-        if (m_nextModeTypeArr[port] != m_modeXArr[port])
+        if (m_nextModeTypeArr[threadParam->m_portIndex] != m_modeXArr[threadParam->m_portIndex])
         {
             threadParam->m_state    = (unsigned char)0x14;
             threadParam->m_subState = 0;
-            m_modeXArr[port]        = m_nextModeTypeArr[port];
+            m_modeXArr[threadParam->m_portIndex]        = m_nextModeTypeArr[threadParam->m_portIndex];
         }
 
         int gamePadState = 0;
@@ -762,8 +753,8 @@ loop_body:
         {
             threadParam->m_state = 1;
 
-            GbaQue.SetChgUseItemFlg(port);
-            GbaQue.SetResetFlg(port);
+            GbaQue.SetChgUseItemFlg(threadParam->m_portIndex);
+            GbaQue.SetResetFlg(threadParam->m_portIndex);
 
             threadParam->m_subState      = 0;
             threadParam->m_pposCounter   = 0;
@@ -776,19 +767,19 @@ loop_body:
             threadParam->m_flags[2]      = 0;
             threadParam->m_flags[3]      = 0;
 
-            m_ctrlModeArr[port] = 0;
+            m_ctrlModeArr[threadParam->m_portIndex] = 0;
 
             char controllerMode = GbaQue.GetControllerMode();
 
             if (controllerMode == 0)
-                m_nextModeTypeArr[port] = 0;
+                m_nextModeTypeArr[threadParam->m_portIndex] = 0;
             else
-                m_nextModeTypeArr[port] = 4;
+                m_nextModeTypeArr[threadParam->m_portIndex] = 4;
 
             ResetQueue(threadParam);
 
             threadParam->m_gbaStatus =
-                GBAJoyBoot(port, port << 1, 2, reinterpret_cast<unsigned char*>(m_gbaBootImage), m_gbaBootImageSize,
+                GBAJoyBoot(threadParam->m_portIndex, threadParam->m_portIndex << 1, 2, reinterpret_cast<unsigned char*>(m_gbaBootImage), m_gbaBootImageSize,
                            &threadParam->m_unk3);
 
             if (threadParam->m_gbaStatus == 3 && (threadParam->m_unk3 & 0x10) != 0)
@@ -801,9 +792,9 @@ loop_body:
                 char cm = GbaQue.GetControllerMode();
 
                 if (cm == 0)
-                    m_nextModeTypeArr[port] = 0;
+                    m_nextModeTypeArr[threadParam->m_portIndex] = 0;
                 else
-                    m_nextModeTypeArr[port] = 4;
+                    m_nextModeTypeArr[threadParam->m_portIndex] = 4;
 
                 threadParam->m_state    = 2;
                 threadParam->m_subState = 0;
@@ -856,7 +847,7 @@ loop_body:
 
         case 0x03:
         {
-            GbaQue.SetResetFlg(port);
+            GbaQue.SetResetFlg(threadParam->m_portIndex);
 
             ResetQueue(threadParam);
 
@@ -923,8 +914,8 @@ loop_body:
                 if ((localBuf[0] & 0x3F) == 7)
                 {
                     threadParam->m_state = 0x16;
-                    memset(m_perThreadTemp[port], 0, sizeof(m_perThreadTemp[port]));
-                    m_perThreadTemp[port][0] = 0;
+                    memset(m_perThreadTemp[threadParam->m_portIndex], 0, sizeof(m_perThreadTemp[threadParam->m_portIndex]));
+                    m_perThreadTemp[threadParam->m_portIndex][0] = 0;
                     int cancelRes = SendCancel(threadParam);
                     if (cancelRes != 0)
                     {
@@ -933,7 +924,7 @@ loop_body:
                         threadParam->m_state = 0x84;
                     }
                 }
-                else if (m_nextModeTypeArr[port] == 0)
+                else if (m_nextModeTypeArr[threadParam->m_portIndex] == 0)
                 {
                     threadParam->m_state = ';';
                 }
@@ -964,7 +955,7 @@ loop_body:
             }
             if (threadParam->m_skipProcessingFlag == 0 && dataRes == 1)
             {
-                if (m_nextModeTypeArr[port] == 0)
+                if (m_nextModeTypeArr[threadParam->m_portIndex] == 0)
                 {
                     threadParam->m_state = ';';
                 }
@@ -986,7 +977,7 @@ loop_body:
 
         case 0x17:
         {
-            m_stateFlagArr[port] = 0;
+            m_stateFlagArr[threadParam->m_portIndex] = 0;
             int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
             if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetScrFlg() != 0)
             {
@@ -1128,7 +1119,7 @@ loop_body:
                 {
                     if (m_fileBaseB_dup == 0)
                     {
-                        GbaQue.ClrStageFlg(port);
+                        GbaQue.ClrStageFlg(threadParam->m_portIndex);
                         threadParam->m_state = 'F';
                     }
                     else
@@ -1322,7 +1313,7 @@ loop_body:
 
         case 0x32:
         {
-            m_stateFlagArr[port] = 0;
+            m_stateFlagArr[threadParam->m_portIndex] = 0;
             int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
             if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetScrFlg() != 0)
             {
@@ -1383,8 +1374,8 @@ loop_body:
             if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetSellFlg(threadParam->m_portIndex) != 0)
             {
                 threadParam->m_state = '6';
-                memset(m_perThreadTemp[port], 0, sizeof(m_perThreadTemp[port]));
-                m_perThreadTemp[port][0] = 6;
+                memset(m_perThreadTemp[threadParam->m_portIndex], 0, sizeof(m_perThreadTemp[threadParam->m_portIndex]));
+                m_perThreadTemp[threadParam->m_portIndex][0] = 6;
                 int cancelRes = SendCancel(threadParam);
                 if (cancelRes != 0)
                 {
@@ -1418,8 +1409,8 @@ loop_body:
             if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetBuyFlg(threadParam->m_portIndex) != 0)
             {
                 threadParam->m_state = '8';
-                memset(m_perThreadTemp[port], 0, sizeof(m_perThreadTemp[port]));
-                m_perThreadTemp[port][0] = 7;
+                memset(m_perThreadTemp[threadParam->m_portIndex], 0, sizeof(m_perThreadTemp[threadParam->m_portIndex]));
+                m_perThreadTemp[threadParam->m_portIndex][0] = 7;
                 int cancelRes = SendCancel(threadParam);
                 if (cancelRes != 0)
                 {
@@ -1453,8 +1444,8 @@ loop_body:
             if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetMkSmithFlg(threadParam->m_portIndex) != 0)
             {
                 threadParam->m_state = ':';
-                memset(m_perThreadTemp[port], 0, sizeof(m_perThreadTemp[port]));
-                m_perThreadTemp[port][0] = 8;
+                memset(m_perThreadTemp[threadParam->m_portIndex], 0, sizeof(m_perThreadTemp[threadParam->m_portIndex]));
+                m_perThreadTemp[threadParam->m_portIndex][0] = 8;
                 int cancelRes = SendCancel(threadParam);
                 if (cancelRes != 0)
                 {
@@ -1546,7 +1537,7 @@ loop_body:
 
         case 0x3E:
         {
-            m_stateFlagArr[port] = 0;
+            m_stateFlagArr[threadParam->m_portIndex] = 0;
             int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
             if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetScrFlg() != 0)
             {
@@ -1608,8 +1599,8 @@ loop_body:
             if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetArtiDatFlg(threadParam->m_portIndex) != 0)
             {
                 threadParam->m_state = 'B';
-                memset(m_perThreadTemp[port], 0, sizeof(m_perThreadTemp[port]));
-                m_perThreadTemp[port][0] = 9;
+                memset(m_perThreadTemp[threadParam->m_portIndex], 0, sizeof(m_perThreadTemp[threadParam->m_portIndex]));
+                m_perThreadTemp[threadParam->m_portIndex][0] = 9;
                 int cancelRes = SendCancel(threadParam);
                 if (cancelRes != 0)
                 {
@@ -1640,7 +1631,7 @@ loop_body:
 
         case 0x43:
         {
-            m_stateFlagArr[port] = 0;
+            m_stateFlagArr[threadParam->m_portIndex] = 0;
             int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
             if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetScrFlg() != 0)
             {
@@ -1698,7 +1689,7 @@ loop_body:
 
         case 0x46:
         {
-            m_stateFlagArr[port] = 0;
+            m_stateFlagArr[threadParam->m_portIndex] = 0;
             int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
             if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetScrFlg() != 0)
             {
@@ -1763,7 +1754,7 @@ loop_body:
 
         case 0x49:
         {
-            m_stateFlagArr[port] = 0;
+            m_stateFlagArr[threadParam->m_portIndex] = 0;
             int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
             if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetScrFlg() != 0)
             {
@@ -1822,7 +1813,7 @@ loop_body:
 
         case 0x4C:
         {
-            m_stateFlagArr[port] = 0;
+            m_stateFlagArr[threadParam->m_portIndex] = 0;
             int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
             if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetScrFlg() != 0)
             {

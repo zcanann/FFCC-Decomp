@@ -384,10 +384,9 @@ void CMenuPcs::ItemDraw()
                     menuIndex -= 0x40;
                 }
 
-                s16 itemId = caravanWork->m_inventoryItems[menuIndex];
-                if ((itemId <= 0) || (EquipChk(menuIndex) != 0) ||
-                    (hasLetterAttach && (itemId < 0x125))) {
-                    if (EquipChk(menuIndex) != 0) {
+                if ((caravanWork->m_inventoryItems[menuIndex] <= 0) || ((u8)EquipChk(menuIndex) != 0) ||
+                    (hasLetterAttach && (caravanWork->m_inventoryItems[menuIndex] < 0x125))) {
+                    if ((u8)EquipChk(menuIndex) != 0) {
                         int markX = (int)(x - LoadFloat(kItemMarkXOffset));
                         int markY = (int)((h - LoadFloat(kItemMarkHeight)) * LoadDouble(kItemHalfDouble) + y);
                         DrawEquipMark(markX, markY, entry->alpha);

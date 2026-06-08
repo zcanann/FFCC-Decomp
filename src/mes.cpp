@@ -913,16 +913,15 @@ void CMes::addString(char** text, int branchMode)
 	{
 		unsigned char* p = (unsigned char*)*text;
 		*text = (char*)(p + 1);
-		unsigned char ch = *p;
-		unsigned int uch = (unsigned int)ch;
+		unsigned int uch = (unsigned int)*p;
 
-		if (ch == 0)
+		if (uch == 0)
 		{
 			running = false;
 			goto updateBounds;
 		}
 
-		if (ch != 0xFF)
+		if (uch != 0xFF)
 		{
 			goto renderChar;
 		}

@@ -793,11 +793,9 @@ void CGObject::objectCollision()
 
         if (((m_bgColMask & 8) != 0) && ((other->m_bgColMask & 8) != 0)) {
             const bool thisAttack = (m_objectFlags & 2) != 0;
-            const bool otherDamage = (other->m_objectFlags & 0xC) != 0;
-            const bool thisDamage = (m_objectFlags & 0xC) != 0;
-            const bool otherAttack = (other->m_objectFlags & 2) != 0;
 
-            if (((thisAttack && otherDamage) || (thisDamage && otherAttack))
+            if ((((m_objectFlags & 2) != 0 && (other->m_objectFlags & 0xC) != 0)
+                 || ((m_objectFlags & 0xC) != 0 && (other->m_objectFlags & 2) != 0))
                 && ((m_weaponNodeFlagBits.m_attached == 0) || (m_attachOwner != other))
                 && ((other->m_weaponNodeFlagBits.m_attached == 0) || (other->m_attachOwner != this))
                 && (capsuleDistance < static_cast<double>(m_attackColRadius + other->m_attackColRadius))) {

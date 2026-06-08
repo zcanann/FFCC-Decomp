@@ -151,9 +151,14 @@ static const char s_CCharaPcs_loadWepModel[] = "CCharaPcs LoadWepModel";
 static const char s_CCharaPcs_loadFaModel[] = "CCharaPcs LoadFaModel";
 static const char s_CCharaPcs_loadAnim[] = "CCharaPcs LoadAnim";
 static const char s_charaMergePathFmt[] = "dvd/mrg/m%04d_%02d.mrg";
-static const char s_charaMergeDupFmt[] = "CCharaPcs duplicate merge %d\n";
-static const char s_charaMergeOpenFmt[] = "CCharaPcs missing merge %d\n";
-static const char s_charaMergeDoneFmt[] = "CCharaPcs LoadMergeFile %d 0x%x\n";
+static const char s_charaMergeDupFmt[] =
+    "\x43\x43\x68\x61\x72\x61\x50\x63\x73\x2e\x4c\x6f\x61\x64\x4d\x65\x72\x67\x65\x46\x69\x6c\x65\x3a\x20\x25\x64\x82"
+    "\xcd\x82\xb7\x82\xc5\x82\xc9\x83\x4c\x83\x83\x83\x62\x83\x56\x83\x93\x83\x4f\x82\xb3\x82\xea\x82\xc4\x82\xa2\x82"
+    "\xdc\x82\xb7\x81\x42\x0a";
+static const char s_charaMergeOpenFmt[] =
+    "\x43\x43\x68\x61\x72\x61\x50\x63\x73\x2e\x4c\x6f\x61\x64\x4d\x65\x72\x67\x65\x46\x69\x6c\x65\x3a\x20\x25\x64\x82"
+    "\xcd\x82\xa0\x82\xe8\x82\xdc\x82\xb9\x82\xf1\x81\x42\x0a";
+static const char s_charaMergeDoneFmt[] = "CCharaPcs.LoadMergeFile: %d 0x%08x\n";
 static const char s_charaModelLoadAmemFmt[] =
     "\x4d\x65\x72\x67\x65\x3a\x20\x1b\x5b\x33\x32\x6d\x83\x82\x83\x66\x83\x8b\x82\xf0\x41\x4d\x45\x4d\x82\xa9\x82"
     "\xe7\x93\xc7\x82\xdd\x8d\x9e\x82\xdd\x82\xdc\x82\xb5\x82\xbd\x81\x42\x74\x79\x70\x65\x20\x3d\x20\x25\x64\x20"
@@ -2274,10 +2279,10 @@ foundTexture:
                           static_cast<int>(textureVariant));
         }
 
-        if (textureVariant == 0) {
-            strcpy(path, basePath);
-        } else {
+        if (textureVariant != 0) {
             sprintf(path, s_charaTextureVariantFmt, basePath, static_cast<int>(textureVariant) + 0x61);
+        } else {
+            strcpy(path, basePath);
         }
         strcat(path, s_charaTextureSuffix);
 

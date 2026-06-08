@@ -2021,7 +2021,7 @@ void CGObject::onDraw()
     if (((CFlat.m_debugFlags & 0x40000) != 0) && ((m_bgColMask & 0x40000) != 0)) {
         for (int i = 0; i < 8; i++) {
             AttackCol* collider = &m_attackColliders[i];
-            if (collider->m_localStart.x == sZeroFloat) {
+            if (*reinterpret_cast<int*>(&collider->m_localStart.x) == 0) {
                 continue;
             }
 
@@ -2038,7 +2038,7 @@ void CGObject::onDraw()
     if (((CFlat.m_debugFlags & 0x80000) != 0) && ((m_bgColMask & 0x80000) != 0)) {
         for (int i = 0; i < 8; i++) {
             DamageCol* collider = &m_damageColliders[i];
-            if (collider->m_localPosition.x == sZeroFloat) {
+            if (*reinterpret_cast<int*>(&collider->m_localPosition.x) == 0) {
                 continue;
             }
 

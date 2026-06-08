@@ -1009,6 +1009,11 @@ void CGItemObj::onFrameStat()
 			prgObj->m_rotationZ = prgObj->m_rotationZ * kItemObjRotationDamping;
 		}
 		break;
+	case 9:
+		if (m_stateFrame == 8) {
+			self[0x38] = static_cast<unsigned char>(__rlwimi(self[0x38], 1, 7, 24, 24));
+		}
+		break;
 	case 0x1F:
 		PartMng.pppSetLocSlot(m_particleSlot, &prgObj->m_worldPosition);
 
@@ -1125,6 +1130,43 @@ void CGItemObj::onFrameStat()
 		}
 		break;
 	}
+	case 0x27: {
+		int pdtNo = -1;
+
+		prgObj->m_groundHitOffset.z = zero;
+		prgObj->m_groundHitOffset.y = zero;
+		prgObj->m_groundHitOffset.x = zero;
+
+		if (m_stateFrame == 0) {
+			prgObj->m_stepSlopeLimit = zero;
+			ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
+
+			int* soundData = *(int**)(*(int*)(*reinterpret_cast<int*>(CGMonObj::m_boss) + 0xF8) + 0x178);
+			if (soundData != 0) {
+				pdtNo = soundData[5];
+			}
+
+			float particleScale =
+			    kItemObjFineStep * (float)*(unsigned short*)(Game.unkCFlatData0[2] + prgObj->m_worldParamB * 0x48 + 0x10) +
+			    kItemObjParticleScaleBase;
+			putParticle((pdtNo << 8) | 0x13, m_particleSlot, this, particleScale, 0x12903);
+		} else if (m_stateFrame == 0xD) {
+			int ownerSlot = *(int*)(*(unsigned char**)(*(unsigned char**)(self + 0x550) + 0x58) + 0x3B4);
+
+			if ((unsigned int)System.m_execParam >= 3U) {
+				System.Printf(itemObjStrings + kItemObjStrMemoryCapsuleFailedFmt, ownerSlot);
+			}
+
+			CFlatRuntime::CStack stack;
+			stack.m_word = 0;
+			*(int*)(CGMonObj::m_boss + ownerSlot * 4 + 8) = 0;
+			gCFlatRuntime().SystemCall(
+			    *reinterpret_cast<CFlatRuntime::CObject**>(self + 0x550), 2, 0x16, 1, &stack, 0);
+
+			self[0x38] = static_cast<unsigned char>(__rlwimi(self[0x38], 1, 7, 24, 24));
+		}
+		break;
+	}
 	case 0x26: {
 		int pdtNo = -1;
 
@@ -1178,48 +1220,6 @@ void CGItemObj::onFrameStat()
 		}
 		break;
 	}
-	case 0x27: {
-		int pdtNo = -1;
-
-		prgObj->m_groundHitOffset.z = zero;
-		prgObj->m_groundHitOffset.y = zero;
-		prgObj->m_groundHitOffset.x = zero;
-
-		if (m_stateFrame == 0) {
-			prgObj->m_stepSlopeLimit = zero;
-			ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
-
-			int* soundData = *(int**)(*(int*)(*reinterpret_cast<int*>(CGMonObj::m_boss) + 0xF8) + 0x178);
-			if (soundData != 0) {
-				pdtNo = soundData[5];
-			}
-
-			float particleScale =
-			    kItemObjFineStep * (float)*(unsigned short*)(Game.unkCFlatData0[2] + prgObj->m_worldParamB * 0x48 + 0x10) +
-			    kItemObjParticleScaleBase;
-			putParticle((pdtNo << 8) | 0x13, m_particleSlot, this, particleScale, 0x12903);
-		} else if (m_stateFrame == 0xD) {
-			int ownerSlot = *(int*)(*(unsigned char**)(*(unsigned char**)(self + 0x550) + 0x58) + 0x3B4);
-
-			if ((unsigned int)System.m_execParam >= 3U) {
-				System.Printf(itemObjStrings + kItemObjStrMemoryCapsuleFailedFmt, ownerSlot);
-			}
-
-			CFlatRuntime::CStack stack;
-			stack.m_word = 0;
-			*(int*)(CGMonObj::m_boss + ownerSlot * 4 + 8) = 0;
-			gCFlatRuntime().SystemCall(
-			    *reinterpret_cast<CFlatRuntime::CObject**>(self + 0x550), 2, 0x16, 1, &stack, 0);
-
-			self[0x38] = static_cast<unsigned char>(__rlwimi(self[0x38], 1, 7, 24, 24));
-		}
-		break;
-	}
-	case 9:
-		if (m_stateFrame == 8) {
-			self[0x38] = static_cast<unsigned char>(__rlwimi(self[0x38], 1, 7, 24, 24));
-		}
-		break;
 	default:
 		break;
 	}

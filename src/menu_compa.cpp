@@ -129,7 +129,7 @@ void CMenuPcs::CompaDraw()
 					colors[3].g = 0xFF;
 					colors[3].b = 0xFF;
 					colors[3].a = 0;
-					float remainW = static_cast<float>((LoadDouble(kCompaOneDouble) / (double)entry->duration) * (double)static_cast<float>(entry->w));
+					float remainW = static_cast<float>((1.0 / (double)entry->duration) * (double)static_cast<float>(entry->w));
 					if (entry->tex == 0x51) {
 						int yStep = static_cast<int>(y);
 						float end = y + h;
@@ -340,10 +340,10 @@ bool CMenuPcs::CompaClose()
             } else {
                 entry->frame = entry->frame + 1;
                 entry->alpha =
-                    (float)(LoadDouble(kCompaOneDouble) - (LoadDouble(kCompaOneDouble) / (double)entry->duration) * (double)entry->frame);
+                    (float)(1.0 - (1.0 / (double)entry->duration) * (double)entry->frame);
                 if ((entry->flags & 2) == 0) {
                     float step =
-                        (float)(LoadDouble(kCompaOneDouble) - (LoadDouble(kCompaOneDouble) / (double)entry->duration) * (double)entry->frame);
+                        (float)(1.0 - (1.0 / (double)entry->duration) * (double)entry->frame);
                     float dx = entry->targetX - (float)entry->x;
                     float dy = entry->targetY - (float)entry->y;
                     entry->dx = dx * step;
@@ -562,9 +562,9 @@ bool CMenuPcs::CompaOpen()
                 entry->dy = LoadFloat(kCompaZero);
             } else {
                 entry->frame = entry->frame + 1;
-                entry->alpha = (float)((LoadDouble(kCompaOneDouble) / (double)entry->duration) * (double)entry->frame);
+                entry->alpha = (float)((1.0 / (double)entry->duration) * (double)entry->frame);
                 if ((entry->flags & 2) == 0) {
-                    float step = (float)((LoadDouble(kCompaOneDouble) / (double)entry->duration) * (double)entry->frame);
+                    float step = (float)((1.0 / (double)entry->duration) * (double)entry->frame);
                     float dx = entry->targetX - (float)entry->x;
                     float dy = entry->targetY - (float)entry->y;
                     entry->dx = dx * step;

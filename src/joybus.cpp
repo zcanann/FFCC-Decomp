@@ -429,9 +429,11 @@ void JoyBus::Destroy()
  */
 int JoyBus::LoadBin()
 {
-    int result = 0;
+    if (static_cast<signed char>(m_binLoaded) != 0)
+    {
+        return 0;
+    }
 
-    if (static_cast<signed char>(m_binLoaded) == 0)
     {
         CFile::CHandle* file = File.Open((char*)this, 0, CFile::PRI_LOW);
 
@@ -442,7 +444,7 @@ int JoyBus::LoadBin()
                 System.Printf(const_cast<char*>(s_not_found_error_fmt), (char*)this);
             }
 
-            result = -1;
+            return -1;
         }
         else
         {
@@ -514,7 +516,7 @@ int JoyBus::LoadBin()
         }
     }
 
-    return result;
+    return 0;
 }
 
 
@@ -3125,7 +3127,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
 
             threadParam->m_gbaStatus = GBARead(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(readBuf), &threadParam->m_unk3);
 
-            if (threadParam->m_gbaStatus == 0)
+            if ((int)threadParam->m_gbaStatus == 0)
             {
                 threadParam->m_recvReadIdx = readBuf[0];
 
@@ -3238,15 +3240,14 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
                 if (status == 0)
                 {
                     header = tmpBuf.h;
-                    flags  = tmpBuf.f;
 
                     if (header == 1)
                     {
                         status = 0;
 
-                        threadParam->m_gbaBootFlag    = (unsigned char)((int)(signed char)flags >> 6);
-                        threadParam->m_unk2           = (unsigned char)((flags >> 4) & 0x03);
-                        threadParam->m_bootRetryCount = (unsigned char)(flags & 0x0F);
+                        threadParam->m_gbaBootFlag    = (unsigned char)((int)(signed char)tmpBuf.f >> 6);
+                        threadParam->m_unk2           = (unsigned char)((tmpBuf.f >> 4) & 0x03);
+                        threadParam->m_bootRetryCount = (unsigned char)(tmpBuf.f & 0x0F);
                     }
                     else
                     {
@@ -3299,10 +3300,10 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
                 if (status == 0)
                 {
                     // Bit-twiddly inequality check preserved from decomp
-                    unsigned char a = (signed char)((timeValue - threadParam->m_timestamp) >> 24);
-                    unsigned char b = (unsigned char)((threadParam->m_timestamp - timeValue) >> 24);
+                    unsigned int a = timeValue - threadParam->m_timestamp;
+                    unsigned int b = threadParam->m_timestamp - timeValue;
 
-                    threadParam->m_timeChangedFlag = (unsigned char)((a | b) >> 7);
+                    threadParam->m_timeChangedFlag = (unsigned char)((a | b) >> 31);
                     threadParam->m_timestamp = timeValue;
                     status = 0;
                 }
@@ -4267,9 +4268,8 @@ int JoyBus::SendMBase(ThreadParam* threadParam)
 
     unsigned int cmdX = 0;
     unsigned char* cmdXBytes = reinterpret_cast<unsigned char*>(&cmdX);
-    unsigned short xValue = posX;
     cmdXBytes[0] = 0x0F;
-    *reinterpret_cast<unsigned short*>(cmdXBytes + 2) = __lhbrx(&xValue, 0);
+    *reinterpret_cast<unsigned short*>(cmdXBytes + 2) = __lhbrx(&posX, 0);
     unsigned int wordX = cmdX;
     int result = 0;
 
@@ -4299,9 +4299,8 @@ int JoyBus::SendMBase(ThreadParam* threadParam)
 
     unsigned int cmdY = 0;
     unsigned char* cmdYBytes = reinterpret_cast<unsigned char*>(&cmdY);
-    unsigned short yValue = posY;
     cmdYBytes[0] = 0x4F;
-    *reinterpret_cast<unsigned short*>(cmdYBytes + 2) = __lhbrx(&yValue, 0);
+    *reinterpret_cast<unsigned short*>(cmdYBytes + 2) = __lhbrx(&posY, 0);
     unsigned int wordY = cmdY;
 
     if (static_cast<signed char>(m_threadRunningMask) != 0)
@@ -4777,7 +4776,7 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
 
             GbaQue.GetCaravanName((char*)&payload[1]);
 
-            unsigned char* p = (unsigned char*)&playerInfo;
+            signed char* p = (signed char*)&playerInfo;
             unsigned char lowBits = 0;
             unsigned char highBits = 0;
 
@@ -4868,7 +4867,7 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
             unsigned int sendPort = threadParam->m_portIndex;
             unsigned int word = *(unsigned int*)&m_joyDataPacketBuffer[sendPort][2 + m_txWordIndex[sendPort] * 4];
 
-            if (m_threadRunningMask == 0)
+            if (static_cast<signed char>(m_threadRunningMask) == 0)
             {
                 result = 0;
             }
@@ -4898,7 +4897,7 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
         unsigned int statPort = threadParam->m_portIndex;
         unsigned int word = *(unsigned int*)&m_joyDataPacketBuffer[statPort][2 + m_txWordIndex[statPort] * 4];
 
-        if (m_threadRunningMask == 0)
+        if (static_cast<signed char>(m_threadRunningMask) == 0)
         {
             result = 0;
         }
@@ -4945,7 +4944,7 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
  */
 int JoyBus::SendPlayerHP(ThreadParam* threadParam)
 {
-    unsigned int hpData[3];
+    unsigned int hpData[2];
 
     int sync = GBARecvSend(threadParam, hpData);
 
@@ -5411,17 +5410,17 @@ int JoyBus::SendMapObjDrawFlg(ThreadParam* threadParam)
         crcBytes[1] = data[2];
         crcBytes[0] = data[3];
         unsigned char* crcData = crcBytes;
-        unsigned int crc = 0xFFFF;
+        unsigned short crc = 0xFFFF;
         int crcCount = 4;
 
         while (--crcCount >= 0)
         {
             unsigned char byte = *crcData++;
             unsigned int index = (crc >> 8) ^ byte;
-            crc = ((crc << 8) ^ JoyBusCrcTable[index]) & 0xFFFF;
+            crc = (crc << 8) ^ JoyBusCrcTable[index];
         }
 
-        crc = (~crc) & 0xFFFF;
+        crc = ~crc;
 
         unsigned int cmds[2] = { 0, 0 };
         unsigned char* cmdBytes = (unsigned char*)cmds;
@@ -6868,9 +6867,9 @@ int JoyBus::SendSPMode(ThreadParam* threadParam)
  */
 int JoyBus::SendMemorys(ThreadParam* threadParam)
 {
-    unsigned char value = GbaQue.GetMemorys(threadParam->m_portIndex);
     unsigned int cmd = 0;
     unsigned char* cmdBytes = (unsigned char*)&cmd;
+    unsigned char value = GbaQue.GetMemorys(threadParam->m_portIndex);
     cmdBytes[0] = 0x14;
     cmdBytes[1] = 0x13;
     cmdBytes[2] = value;
@@ -6909,10 +6908,9 @@ int JoyBus::SendMemorys(ThreadParam* threadParam)
  */
 int JoyBus::SendChgCmdNum(ThreadParam* threadParam)
 {
-    unsigned char cmdNum = GbaQue.GetCmdNum(threadParam->m_portIndex);
-
     unsigned int cmd = 0;
     unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
+    unsigned char cmdNum = GbaQue.GetCmdNum(threadParam->m_portIndex);
     cmdBytes[0] = 0x14;
     cmdBytes[1] = 0x12;
     cmdBytes[2] = cmdNum;

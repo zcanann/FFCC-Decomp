@@ -2197,7 +2197,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	char** subjectTable = Game.m_cFlatDataArr[1].TableStrings(5);
 	char tempName[kGbaQueueLetterTempNameBytes];
 
-	for (int i = 0; i < static_cast<int>(letterCount); i++) {
+	for (int i = 0; i < static_cast<unsigned int>(letterCount); i++) {
 		int matchedSubject = -1;
 		int matchedNpc = -1;
 
@@ -3701,7 +3701,7 @@ int GbaQueue::MakeSellData(int channel, char* outData)
 {
 char* itemNameScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0xDD5) char[kGbaQueueScratchTextSize];
 	if (itemNameScratch == 0) {
-		if ((unsigned int)System.m_execParam >= 1) {
+		if ((int)System.m_execParam >= 1) {
 System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0xDD7);
 		}
 		return -1;
@@ -3742,7 +3742,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 		const int itemId = reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_inventoryItems[i];
 		unsigned int packedPrice;
 		if (itemId > 0) {
-			int itemPrice = static_cast<unsigned short>(
+			unsigned int itemPrice = static_cast<unsigned short>(
 				*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x20));
 			itemPrice = static_cast<int>(static_cast<float>(itemPrice) * userRate);
 			if (itemPrice < 1) {

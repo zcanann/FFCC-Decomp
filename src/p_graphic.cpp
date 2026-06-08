@@ -742,8 +742,9 @@ void CGraphicPcs::drawBar()
     int hue = 0;
     u32 y = 0x10;
     for (int i = 0; i < orderCount; i++) {
-        const u32 rgb = Math.Hsb2Rgb(hue / orderCount, 100, 100);
-        const float width = (kDebugBarFrameBudget * order->m_lastTime) / 16.666666f;
+        GXColor rgb;
+        *reinterpret_cast<u32*>(&rgb) = Math.Hsb2Rgb(hue / orderCount, 100, 100);
+        const float width = (kGraphicScreenCenterX * order->m_lastTime) / kDebugBarFrameBudget;
 
         if (order->m_priority == 0x26) {
             const float y0 = drawText ? static_cast<float>(y) : kDebugBarMoveBottom;
@@ -751,16 +752,16 @@ void CGraphicPcs::drawBar()
 
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
             GXPosition3f32(x, y0, kGraphicZero);
-            GXColor1u32(rgb);
+            GXColor1u32(*reinterpret_cast<u32*>(&rgb));
             GXTexCoord2u16(0, 0);
             GXPosition3f32(x + width + kGraphicOne, y0, kGraphicZero);
-            GXColor1u32(rgb);
+            GXColor1u32(*reinterpret_cast<u32*>(&rgb));
             GXTexCoord2u16(2, 0);
             GXPosition3f32(x + width + kGraphicOne, y1, kGraphicZero);
-            GXColor1u32(rgb);
+            GXColor1u32(*reinterpret_cast<u32*>(&rgb));
             GXTexCoord2u16(2, 2);
             GXPosition3f32(x, y1, kGraphicZero);
-            GXColor1u32(rgb);
+            GXColor1u32(*reinterpret_cast<u32*>(&rgb));
             GXTexCoord2u16(0, 2);
             x += width;
         } else if (order->m_priority != 0x27) {
@@ -769,23 +770,23 @@ void CGraphicPcs::drawBar()
 
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
             GXPosition3f32(x, y0, kGraphicZero);
-            GXColor1u32(rgb);
+            GXColor1u32(*reinterpret_cast<u32*>(&rgb));
             GXTexCoord2u16(0, 0);
             GXPosition3f32(x + width + kGraphicOne, y0, kGraphicZero);
-            GXColor1u32(rgb);
+            GXColor1u32(*reinterpret_cast<u32*>(&rgb));
             GXTexCoord2u16(2, 0);
             GXPosition3f32(x + width + kGraphicOne, y1, kGraphicZero);
-            GXColor1u32(rgb);
+            GXColor1u32(*reinterpret_cast<u32*>(&rgb));
             GXTexCoord2u16(2, 2);
             GXPosition3f32(x, y1, kGraphicZero);
-            GXColor1u32(rgb);
+            GXColor1u32(*reinterpret_cast<u32*>(&rgb));
             GXTexCoord2u16(0, 2);
             x += width;
         }
 
         if (i == lastOrder) {
             const u32 soundColor = Math.Hsb2Rgb(0, 100, 100);
-            const float soundWidth = (kDebugBarFrameBudget * Sound.GetPerformance()) / 16.666666f;
+            const float soundWidth = (kGraphicScreenCenterX * Sound.GetPerformance()) / kDebugBarFrameBudget;
 
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
             GXPosition3f32(x, drawText ? static_cast<float>(y) : kDebugBarMoveBottom, kGraphicZero);
@@ -844,7 +845,7 @@ void CGraphicPcs::drawBar()
         x = kGraphicZero;
         y = 0x10;
         for (int i = 0; i < orderCount; i++) {
-            const float width = (kDebugBarFrameBudget * order->m_lastTime) / 16.666666f;
+            const float width = (kGraphicScreenCenterX * order->m_lastTime) / kDebugBarFrameBudget;
 
             if (order->m_priority != 0x27) {
                 char debugString[260];

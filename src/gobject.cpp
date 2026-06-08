@@ -731,21 +731,27 @@ void CGObject::move()
  */
 void CGObject::objectCollision()
 {
-    bool keepPushTimer = false;
-    Vec selfBasePos;
-    Vec selfCapsuleOffset;
-    Vec selfCapsulePos;
+    struct ColInfo {
+        CGObject* obj;
+        Vec basePos;
+        Vec capsulePos;
+        Vec capsuleOffset;
+    };
 
-    PSVECAdd(&m_worldPosition, &m_groundHitOffset, &selfBasePos);
-    selfCapsuleOffset.x = m_bodyEllipsoidOffset * -sinf(m_rotBaseY);
-    selfCapsuleOffset.y = sZeroFloat;
-    selfCapsuleOffset.z = m_bodyEllipsoidOffset * -cosf(m_rotBaseY);
-    PSVECAdd(&selfBasePos, &selfCapsuleOffset, &selfCapsulePos);
+    bool keepPushTimer = false;
+    ColInfo self;
+
+    self.obj = this;
+    PSVECAdd(&m_worldPosition, &m_groundHitOffset, &self.basePos);
+    self.capsuleOffset.x = m_bodyEllipsoidOffset * -sinf(m_rotBaseY);
+    self.capsuleOffset.y = sZeroFloat;
+    self.capsuleOffset.z = m_bodyEllipsoidOffset * -cosf(m_rotBaseY);
+    PSVECAdd(&self.basePos, &self.capsuleOffset, &self.capsulePos);
 
     if ((m_bgColMask & 0x10000) != 0) {
         for (CGQuadObj* quad = CFlat.FindGQuadObjFirst(); quad != 0;
             quad = CFlat.FindGQuadObjNext(quad)) {
-            if (quad->isInner(&selfBasePos)) {
+            if (quad->isInner(&self.basePos)) {
                 CallOnPush(quad, this, 0);
             }
         }
@@ -757,16 +763,15 @@ void CGObject::objectCollision()
             continue;
         }
 
-        Vec otherBasePos;
-        Vec otherCapsuleOffset;
-        Vec otherCapsulePos;
-        PSVECAdd(&other->m_worldPosition, &other->m_groundHitOffset, &otherBasePos);
-        otherCapsuleOffset.x = other->m_bodyEllipsoidOffset * -sinf(other->m_rotBaseY);
-        otherCapsuleOffset.y = sZeroFloat;
-        otherCapsuleOffset.z = other->m_bodyEllipsoidOffset * -cosf(other->m_rotBaseY);
-        PSVECAdd(&otherBasePos, &otherCapsuleOffset, &otherCapsulePos);
+        ColInfo info;
+        info.obj = other;
+        PSVECAdd(&other->m_worldPosition, &other->m_groundHitOffset, &info.basePos);
+        info.capsuleOffset.x = other->m_bodyEllipsoidOffset * -sinf(other->m_rotBaseY);
+        info.capsuleOffset.y = sZeroFloat;
+        info.capsuleOffset.z = other->m_bodyEllipsoidOffset * -cosf(other->m_rotBaseY);
+        PSVECAdd(&info.basePos, &info.capsuleOffset, &info.capsulePos);
 
-        const double capsuleDistance = PSVECDistance(&selfCapsulePos, &otherCapsulePos);
+        const double capsuleDistance = PSVECDistance(&self.capsulePos, &info.capsulePos);
         if ((static_cast<double>(sZeroFloat) == capsuleDistance)
             || (static_cast<double>(m_nearColRadius + other->m_nearColRadius) < capsuleDistance)) {
             continue;
@@ -780,16 +785,16 @@ void CGObject::objectCollision()
                 && ((m_weaponNodeFlagBits.m_attached == 0) || (m_attachOwner != other))
                 && ((other->m_weaponNodeFlagBits.m_attached == 0) || (other->m_attachOwner != this))
                 && (capsuleDistance < static_cast<double>(m_attackColRadius + other->m_attackColRadius))) {
-                CGObject* frontObj = thisAttack ? this : other;
-                CGObject* hitObj = thisAttack ? other : this;
+                ColInfo* frontObj = thisAttack ? &self : &info;
+                ColInfo* hitObj = thisAttack ? &info : &self;
                 Vec dir;
-                PSVECSubtract(&hitObj->m_worldPosition, &frontObj->m_worldPosition, &dir);
+                PSVECSubtract(&hitObj->capsulePos, &frontObj->capsulePos, &dir);
                 const float hitRot = atan2f(dir.x, dir.z);
-                const float rotDelta = Math.DstRot(frontObj->m_rotBaseY, hitRot);
+                const float rotDelta = Math.DstRot(frontObj->obj->m_rotBaseY, hitRot);
 
-                if (fabsf(rotDelta) < frontObj->m_frontHitAngle) {
-                    CallOnTalk(frontObj, hitObj, 1);
-                    CallOnTalk(hitObj, frontObj, 0);
+                if (fabsf(rotDelta) < frontObj->obj->m_frontHitAngle) {
+                    CallOnTalk(frontObj->obj, hitObj->obj, 1);
+                    CallOnTalk(hitObj->obj, frontObj->obj, 0);
                 }
             }
         }
@@ -828,19 +833,19 @@ void CGObject::objectCollision()
 
                         Vec delta;
                         Vec scaledDelta;
-                        PSVECSubtract(&selfCapsulePos, &otherCapsulePos, &delta);
+                        PSVECSubtract(&self.capsulePos, &info.capsulePos, &delta);
                         PSVECScale(&delta, &delta, static_cast<float>((bodyDistanceLimit - capsuleDistance) / bodyDistanceLimit));
                         PSVECScale(&delta, &scaledDelta, sAnimFrameOffset - split);
-                        PSVECAdd(&selfCapsulePos, &scaledDelta, &selfCapsulePos);
+                        PSVECAdd(&self.capsulePos, &scaledDelta, &self.capsulePos);
                         PSVECScale(&delta, &scaledDelta, -split);
-                        PSVECAdd(&otherCapsulePos, &scaledDelta, &otherCapsulePos);
+                        PSVECAdd(&info.capsulePos, &scaledDelta, &info.capsulePos);
                     }
                 }
             }
         }
 
-        PSVECSubtract(&otherCapsulePos, &other->m_worldPosition, &other->m_groundHitOffset);
-        PSVECSubtract(&other->m_groundHitOffset, &otherCapsuleOffset, &other->m_groundHitOffset);
+        PSVECSubtract(&info.capsulePos, &other->m_worldPosition, &other->m_groundHitOffset);
+        PSVECSubtract(&other->m_groundHitOffset, &info.capsuleOffset, &other->m_groundHitOffset);
     }
 
     if (keepPushTimer) {
@@ -851,8 +856,8 @@ void CGObject::objectCollision()
         m_collisionPushTimerMax = 0x32;
     }
 
-    PSVECSubtract(&selfCapsulePos, &m_worldPosition, &m_groundHitOffset);
-    PSVECSubtract(&m_groundHitOffset, &selfCapsuleOffset, &m_groundHitOffset);
+    PSVECSubtract(&self.capsulePos, &m_worldPosition, &m_groundHitOffset);
+    PSVECSubtract(&m_groundHitOffset, &self.capsuleOffset, &m_groundHitOffset);
 }
 
 /*

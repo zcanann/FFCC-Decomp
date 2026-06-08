@@ -1580,9 +1580,9 @@ frameLoop:
 			} else if ((arg & 2) != 0) {
 				if (index < 0) {
 					--object->m_sp;
-					value = reinterpret_cast<unsigned int*>((arg & 0x10) == 0
-					                                            ? onClassSystemVal(object, index + static_cast<int>(*object->m_sp))
-					                                            : onSystemVal(object, index + static_cast<int>(*object->m_sp)));
+					value = reinterpret_cast<unsigned int*>((arg & 0x10) != 0
+					                                            ? onSystemVal(object, index + static_cast<int>(*object->m_sp))
+					                                            : onClassSystemVal(object, index + static_cast<int>(*object->m_sp)));
 				} else if ((arg & 8) != 0) {
 					if ((arg & 0x10) != 0) {
 						--object->m_sp;
@@ -1636,9 +1636,9 @@ frameLoop:
 			} else if ((arg & 2) != 0) {
 				if (index < 0) {
 					--object->m_sp;
-					value = reinterpret_cast<unsigned int*>((arg & 0x10) == 0
-					                                            ? onClassSystemVal(object, index + static_cast<int>(*object->m_sp))
-					                                            : onSystemVal(object, index + static_cast<int>(*object->m_sp)));
+					value = reinterpret_cast<unsigned int*>((arg & 0x10) != 0
+					                                            ? onSystemVal(object, index + static_cast<int>(*object->m_sp))
+					                                            : onClassSystemVal(object, index + static_cast<int>(*object->m_sp)));
 				} else if ((arg & 8) != 0) {
 					if ((arg & 0x10) != 0) {
 						--object->m_sp;

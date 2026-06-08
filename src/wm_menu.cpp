@@ -6387,6 +6387,11 @@ void CMenuPcs::CalcPitcher()
 
 	unsigned char* worldObj = m_wm.m_worldObjData;
 
+	const float pa8 = FLOAT_803314a4;
+	const float pac = FLOAT_80331748;
+	const float pb0 = FLOAT_8033174c;
+	const float pb4 = FLOAT_80331750;
+	const float pb8 = FLOAT_803315d0;
 	reinterpret_cast<unsigned int*>(worldObj + 0x190)[0] = 1;
 	reinterpret_cast<short*>(worldObj + 0x198)[0] = 0x140;
 	reinterpret_cast<short*>(worldObj + 0x19A)[0] = 0xE0;
@@ -6394,11 +6399,11 @@ void CMenuPcs::CalcPitcher()
 	reinterpret_cast<short*>(worldObj + 0x19E)[0] = 0xE0;
 	reinterpret_cast<float*>(worldObj + 0x1A0)[0] = FLOAT_803313dc;
 	reinterpret_cast<float*>(worldObj + 0x1A4)[0] = FLOAT_803313dc;
-	reinterpret_cast<float*>(worldObj + 0x1A8)[0] = FLOAT_803314a4;
-	reinterpret_cast<float*>(worldObj + 0x1AC)[0] = FLOAT_80331748;
-	reinterpret_cast<float*>(worldObj + 0x1B0)[0] = FLOAT_8033174c;
-	reinterpret_cast<float*>(worldObj + 0x1B4)[0] = FLOAT_80331750;
-	reinterpret_cast<float*>(worldObj + 0x1B8)[0] = FLOAT_803315d0;
+	reinterpret_cast<float*>(worldObj + 0x1A8)[0] = pa8;
+	reinterpret_cast<float*>(worldObj + 0x1AC)[0] = pac;
+	reinterpret_cast<float*>(worldObj + 0x1B0)[0] = pb0;
+	reinterpret_cast<float*>(worldObj + 0x1B4)[0] = pb4;
+	reinterpret_cast<float*>(worldObj + 0x1B8)[0] = pb8;
 	reinterpret_cast<float*>(worldObj + 0x1BC)[0] += FLOAT_80331754;
 
 	Mtx scaleMtx;

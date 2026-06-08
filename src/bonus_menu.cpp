@@ -1944,7 +1944,7 @@ void CMenuPcs::DrawResultCloseAnim()
 						    sprite->mulX, sprite->mulY, sprite->depth, sprite->depth, 0.0f);
 					}
 				}
-				lastKind = kind;
+				lastKind = sprite->kind;
 			}
 		}
 	}
@@ -2718,7 +2718,7 @@ void CMenuPcs::DrawResultOpenAnim()
 							    sprite->mulX, sprite->mulY, sprite->depth, sprite->depth, 0.0f);
 						}
 					}
-					lastKind = kind;
+					lastKind = sprite->kind;
 				}
 			}
 		}

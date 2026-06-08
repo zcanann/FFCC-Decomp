@@ -605,37 +605,40 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 					value = static_cast<unsigned int>((byteValue & mask) != 0);
 				} else if (systemVal <= -500 && systemVal >= -0x2F3) {
 					value = LoadS16(classData, (systemVal + 0x2F3) * 2 + 0x9A4);
-				} else if (systemVal != -0x1AA) {
-					if (systemVal < -0x1AA) {
-						if (systemVal != -0x1C8) {
-							if (systemVal > -0x1C8) {
-								if (systemVal == -0x1B6) {
-									value = LoadU16(classData, 0x3DE);
-								}
-							} else if (systemVal >= -0x1C9) {
-								value = LoadU16(classData, 0xBC8);
-							}
-						} else {
-							CGObject* const carryObject = reinterpret_cast<CGPartyObj*>(engineObject)->m_partyData.carryObject;
-							if (carryObject != 0) {
-								value = static_cast<unsigned int>(*reinterpret_cast<short*>(reinterpret_cast<u8*>(carryObject) + 0x30));
-							} else {
-								value = 0;
-							}
-						}
-					} else if (systemVal == -0x19C) {
-						value = LoadU32(classData, 0x200);
-					} else if (systemVal < -0x19C) {
-						if (systemVal < -0x1A5) {
-							value = LoadS16(classData, (systemVal + 0x1A9) * 2 + 0xAC);
-						} else if (systemVal == -0x19D) {
-							value = LoadU16(classData, 0x3C8);
-						}
-					} else if (systemVal < -0x191 && systemVal >= -0x199) {
-						value = LoadU16(classData, (systemVal + 0x199) * 2 + 0x3B8);
-					}
 				} else {
-					value = LoadU16(classData, 0xB4);
+					switch (systemVal) {
+					case -0x1AA:
+						value = LoadU16(classData, 0xB4);
+						break;
+					case -0x1C8: {
+						CGObject* const carryObject = reinterpret_cast<CGPartyObj*>(engineObject)->m_partyData.carryObject;
+						if (carryObject != 0) {
+							value = static_cast<unsigned int>(*reinterpret_cast<short*>(reinterpret_cast<u8*>(carryObject) + 0x30));
+						} else {
+							value = 0;
+						}
+						break;
+					}
+					case -0x1B6:
+						value = LoadU16(classData, 0x3DE);
+						break;
+					case -0x1C9:
+						value = LoadU16(classData, 0xBC8);
+						break;
+					case -0x19C:
+						value = LoadU32(classData, 0x200);
+						break;
+					case -0x19D:
+						value = LoadU16(classData, 0x3C8);
+						break;
+					default:
+						if (systemVal <= -0x1A6 && systemVal >= -0x1A9) {
+							value = LoadS16(classData, (systemVal + 0x1A9) * 2 + 0xAC);
+						} else if (systemVal < -0x191 && systemVal >= -0x199) {
+							value = LoadU16(classData, (systemVal + 0x199) * 2 + 0x3B8);
+						}
+						break;
+					}
 				}
 			} else if (systemVal <= -0x96 && systemVal >= -0x175) {
 				u8* itemTable = *reinterpret_cast<u8**>(classData + 0x24);

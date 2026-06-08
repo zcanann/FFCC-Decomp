@@ -477,11 +477,20 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 }
             }
 
-            if (((Game.m_currentSceneId == 4) || (Game.m_currentSceneId == 7)) &&
-                (m_meshType < 10) && (m_meshType >= 8)) {
+            if (Game.m_currentSceneId == 4) {
+                goto checkScaleMeshType;
+            }
+            goto checkScaleScene7;
+        checkScaleMeshType:
+            if ((m_meshType < 10) && (m_meshType >= 8)) {
                 m_transRateX = kMapObjZero;
                 m_transRateY = kMapObjOne;
                 m_transRateZ = kMapObjZero;
+            }
+            break;
+        checkScaleScene7:
+            if (Game.m_currentSceneId == 7) {
+                goto checkScaleMeshType;
             }
             break;
         }

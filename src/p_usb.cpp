@@ -82,7 +82,7 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
 {
     unsigned int count;
     int result;
-    unsigned int connected;
+    int connected;
     CDataHeader* packet;
     CDataHeader* dstBuffer;
     CMemory::CStage* stage;

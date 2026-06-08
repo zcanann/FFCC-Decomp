@@ -441,9 +441,8 @@ void CChara::TimeMogFur()
 		}
 	}
 
-	MogFurState& fur = MogFur();
-	unsigned short* const texels = fur.m_texels;
-	memset(fur.m_score, 0, 0x40);
+	unsigned short* const texels = MogFur().m_texels;
+	memset(MogFur().m_score, 0, 0x40);
 
 	for (int y = 0; y < 0x40; y++) {
 		for (int x = 0; x < 0x40; x++) {

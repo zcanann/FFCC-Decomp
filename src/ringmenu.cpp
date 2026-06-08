@@ -790,7 +790,7 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 	char** cmdNameTable;
 	const char* commandLabel;
 	double waveX;
-	double waveY;
+	float waveY;
 	double textWidth;
 	double textHeight;
 	float waveSinY;
@@ -845,9 +845,9 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 	if (reverseDir) {
 		waveDirection = -1;
 	}
-	waveY = static_cast<double>(static_cast<float>(waveDirection) * kRingMenuGbaOrbitYScale * waveSinY);
+	waveY = static_cast<float>(waveDirection) * kRingMenuGbaOrbitYScale * waveSinY;
 	if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
-		waveY = static_cast<double>(static_cast<float>(waveY + static_cast<double>(kRingMenuTwo)));
+		waveY = waveY + kRingMenuTwo;
 	}
 
 	font->SetScale(static_cast<float>(-(kRingMenuSpinScaleSlopeD * fabs(static_cast<double>(angle)) - kRingMenuSpinScaleBaseD)));

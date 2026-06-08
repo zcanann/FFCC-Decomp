@@ -2179,13 +2179,13 @@ int CMenuPcs::LetterCtrlCur()
 			if ((letter->AttachmentValue() != 0) && !letter->IsAttachmentClaimed()) {
 				*reinterpret_cast<u8*>(GetLetterStateBase(this) + 8) = 1;
 				*reinterpret_cast<u8*>(GetLetterStateBase(this) + 9) = 5;
-				if (!letter->AttachmentIsGil()) {
-					if (caravanWork->m_inventoryItemCount + 1 < 0x41) {
+				if (letter->AttachmentIsGil()) {
+					int canAdd = caravanWork->CanAddGil(letter->AttachmentValue() * 100);
+					if (canAdd != 0) {
 						*reinterpret_cast<u8*>(GetLetterStateBase(this) + 9) |= 2;
 					}
 				} else {
-					int canAdd = caravanWork->CanAddGil(letter->AttachmentValue() * 100);
-					if (canAdd != 0) {
+					if (caravanWork->m_inventoryItemCount + 1 < 0x41) {
 						*reinterpret_cast<u8*>(GetLetterStateBase(this) + 9) |= 2;
 					}
 				}

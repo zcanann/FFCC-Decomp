@@ -902,9 +902,9 @@ void CLightPcs::CBumpLight::MakeLightMap()
 
         Vec eye;
         Vec up;
-        eye.x = kLightZero;
-        eye.y = kLightZero;
         eye.z = kLightZero;
+        eye.y = kLightZero;
+        eye.x = kLightZero;
         up.x = kLightZero;
         up.y = kLightOne;
         up.z = kLightZero;

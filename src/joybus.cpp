@@ -5694,6 +5694,11 @@ int JoyBus::SendMType(ThreadParam* threadParam, int modeType)
 {
     ResetQueue(threadParam);
 
+    unsigned int cmd0 = 0;
+    unsigned char* cmd0Bytes = reinterpret_cast<unsigned char*>(&cmd0);
+    cmd0Bytes[0] = 0x10;
+    unsigned int word0 = cmd0;
+
     int result = 0;
 
     if (static_cast<signed char>(m_threadRunningMask) != 0)
@@ -5708,7 +5713,7 @@ int JoyBus::SendMType(ThreadParam* threadParam, int modeType)
         }
         else
         {
-            m_cmdQueueData[port][m_cmdCount[port]] = 0x10000000;
+            m_cmdQueueData[port][m_cmdCount[port]] = word0;
             m_cmdCount[threadParam->m_portIndex]++;
             OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
         }
@@ -5720,7 +5725,11 @@ int JoyBus::SendMType(ThreadParam* threadParam, int modeType)
 	}
 
 
-    unsigned int cmd = (0x1Bu << 24) | ((unsigned char)modeType << 16);
+    unsigned int cmd = 0;
+    unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
+    cmdBytes[0] = 0x1B;
+    cmdBytes[1] = static_cast<unsigned char>(modeType);
+    unsigned int word = cmd;
 
     if (static_cast<signed char>(m_threadRunningMask) != 0)
     {
@@ -5734,7 +5743,7 @@ int JoyBus::SendMType(ThreadParam* threadParam, int modeType)
         }
         else
         {
-            m_cmdQueueData[port][m_cmdCount[port]] = cmd;
+            m_cmdQueueData[port][m_cmdCount[port]] = word;
             m_cmdCount[threadParam->m_portIndex]++;
             OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
         }

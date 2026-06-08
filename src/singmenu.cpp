@@ -2904,10 +2904,10 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
         dynamicText += 0x80;
     }
 
-    if (useDynamic == 0) {
-        maxWidth -= 0x18;
-    } else {
+    if (useDynamic != 0) {
         maxWidth += 0x16;
+    } else {
+        maxWidth -= 0x18;
     }
 
     int lineHeight = static_cast<int>(22.0f * FLOAT_8032ea78);

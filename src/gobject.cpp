@@ -100,7 +100,7 @@ static inline unsigned char* ModelNodes(CChara::CModel* model)
 
 static inline MtxPtr ModelNodeMtx(CChara::CModel* model, int nodeIndex)
 {
-    return reinterpret_cast<MtxPtr>(ModelNodes(model) + nodeIndex * 0xC0 + 0xC);
+    return reinterpret_cast<MtxPtr>(ModelNodes(model) + nodeIndex * 0xC0 + 0x6C);
 }
 
 static inline float& ModelLightAlpha(CChara::CModel* model)
@@ -1271,9 +1271,11 @@ void CGObject::hit()
         const int node = attack->m_nodeIndex;
         u8* const modelNodes =
             *reinterpret_cast<u8**>(reinterpret_cast<u8*>(m_charaModelHandle->m_model) + 0xA8);
-        PSMTXMultVec(reinterpret_cast<const float (*)[4]>(modelNodes + node * 0xC0 + 0xC),
-                     &attack->m_localStart, &attack->m_worldPosition);
-        PSVECAdd(&attack->m_worldPosition, &m_worldPosition, &attack->m_worldPosition);
+        PSMTXMultVec(reinterpret_cast<const float (*)[4]>(modelNodes + node * 0xC0 + 0x6C),
+                     reinterpret_cast<Vec*>(&attack->m_localStart.y),
+                     reinterpret_cast<Vec*>(&attack->m_worldPosition.y));
+        PSVECAdd(reinterpret_cast<Vec*>(&attack->m_worldPosition.y), &m_worldPosition,
+                 reinterpret_cast<Vec*>(&attack->m_worldPosition.y));
     }
 
     for (int i = 0; i < 8; i++) {
@@ -1281,9 +1283,11 @@ void CGObject::hit()
         const int node = damage->m_nodeIndex;
         u8* const modelNodes =
             *reinterpret_cast<u8**>(reinterpret_cast<u8*>(m_charaModelHandle->m_model) + 0xA8);
-        PSMTXMultVec(reinterpret_cast<const float (*)[4]>(modelNodes + node * 0xC0 + 0xC),
-                     &damage->m_localPosition, &damage->m_worldPosition);
-        PSVECAdd(&damage->m_worldPosition, &m_worldPosition, &damage->m_worldPosition);
+        PSMTXMultVec(reinterpret_cast<const float (*)[4]>(modelNodes + node * 0xC0 + 0x6C),
+                     reinterpret_cast<Vec*>(&damage->m_localPosition.y),
+                     reinterpret_cast<Vec*>(&damage->m_worldPosition.y));
+        PSVECAdd(reinterpret_cast<Vec*>(&damage->m_worldPosition.y), &m_worldPosition,
+                 reinterpret_cast<Vec*>(&damage->m_worldPosition.y));
     }
 
     if ((m_bgColMask & 0x40000) == 0) {

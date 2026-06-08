@@ -3369,7 +3369,7 @@ void CMenuPcs::DrawSingLife()
         return;
     }
 
-    float y;
+    float y = yBase;
     if (lifeTimer < 10) {
         int phase;
         if (lifeTimer < 0) {
@@ -3380,7 +3380,7 @@ void CMenuPcs::DrawSingLife()
                 phase = lifeTimer;
             }
         }
-        y = 64.0f * static_cast<float>(sin(0.01745329238474369f * (9.0f * static_cast<float>(phase)))) + yBase;
+        y = 64.0f * static_cast<float>(sin(0.01745329238474369f * (9.0f * static_cast<float>(phase)))) + y;
     } else {
         y = 32.0f;
         if (lifeTimer >= 0x28) {

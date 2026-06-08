@@ -1316,7 +1316,7 @@ void CMenuPcs::CalcSelectWait()
 			}
 			cursor->x = (short)(partySprite->x - 3);
 			cursor->y = (short)(partySprite->y - 8);
-			cursor->alpha = (float)pulseFrame / 10.0f;
+			cursor->alpha = (float)((double)pulseFrame / 10.0);
 		} else {
 			cursor->alpha = 0.0f;
 		}

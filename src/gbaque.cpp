@@ -2410,7 +2410,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	delete[] workText;
 	delete[] srcText;
 
-    m_letterDatFlg = static_cast<unsigned char>(m_letterDatFlg | static_cast<unsigned char>(0x10 << channel));
+    m_letterDatFlg = static_cast<unsigned char>(m_letterDatFlg | (0x10 << channel));
     Joybus.SetLetterSize(channel, totalSize);
     return totalSize;
 }

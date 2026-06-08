@@ -1742,7 +1742,7 @@ void CChara::makeFurTex()
 			CVector root(rootX, kCharaFurDepthZero, rootZ);
 
 			s_mogFurRand = s_mogFurRand * 0x41C64E6D + 0x3039;
-			CHairSet& src = hairSet[(s_mogFurRand >> 11) & 0x1F];
+			CHairSet& src = hairSet[(s_mogFurRand >> 16) & 0x1F];
 
 			float t = kCharaFurDepthZero;
 			for (int v = 0; v < 5; v++) {

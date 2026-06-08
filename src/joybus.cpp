@@ -7038,15 +7038,13 @@ int JoyBus::SetCtrlMode(int portIndex, int controlMode)
         return 0;
 	}
 
-    unsigned char modeFlag =
-        (unsigned char)(((unsigned int)(-controlMode | controlMode)) >> 31);
-
     unsigned int cmd = 0;
     unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
 
-    bool isSinglePort = GbaQue.IsSingleMode(m_threadParams[portIndex].m_portIndex);
+    unsigned char modeFlag =
+        (unsigned char)(((unsigned int)(-controlMode | controlMode)) >> 31);
 
-    if (isSinglePort)
+    if (GbaQue.IsSingleMode(m_threadParams[portIndex].m_portIndex))
 	{
         modeFlag = 0;
 	}
@@ -7357,37 +7355,35 @@ bool JoyBus::IsLetterMenu(int portIndex)
  */
 int JoyBus::SendAddLetter(int portIndex)
 {
-    int port;
-    int result;
     unsigned int cmd = 0;
     unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
     cmdBytes[0] = 0x14;
     cmdBytes[1] = 1;
     unsigned int cmdWord = cmd;
+    unsigned int port;
 
     if (static_cast<signed char>(m_threadRunningMask) == 0)
     {
-        result = 0;
+        return 0;
+    }
+
+    OSWaitSemaphore(m_accessSemaphores + m_threadParams[portIndex].m_portIndex);
+
+    unsigned int result = 0;
+
+    port = m_threadParams[portIndex].m_portIndex;
+    if ((int)m_cmdCount[port] >= 0x40)
+    {
+        OSSignalSemaphore(m_accessSemaphores + port);
+        result = 0xFFFFFFFF;
     }
     else
     {
-        OSWaitSemaphore(m_accessSemaphores + m_threadParams[portIndex].m_portIndex);
-
+        m_cmdQueueData[port][m_cmdCount[port]] = cmdWord;
         port = m_threadParams[portIndex].m_portIndex;
-        if ((int)m_cmdCount[port] >= 0x40)
-        {
-            OSSignalSemaphore(m_accessSemaphores + port);
-            result = -1;
-        }
-        else
-        {
-            m_cmdQueueData[port][ m_cmdCount[port] ] = cmdWord;
-            port = m_threadParams[portIndex].m_portIndex;
-            m_cmdCount[port]++;
-
-            OSSignalSemaphore(m_accessSemaphores + m_threadParams[portIndex].m_portIndex);
-            result = 0;
-        }
+        m_cmdCount[port]++;
+        OSSignalSemaphore(m_accessSemaphores + m_threadParams[portIndex].m_portIndex);
+        result = 0;
     }
 
     return result;

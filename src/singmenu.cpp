@@ -2579,42 +2579,35 @@ void CMenuPcs::DrawListPosMark(float x, float y, float z)
  */
 int CMenuPcs::EquipChk(int itemNo)
 {
-    const CCaravanWork* const caravanWork = SingleCaravanWork();
-    int slot;
+    CCaravanWork* caravanWork = SingleCaravanWork();
     int commandItem;
 
-    slot = 2;
-    if (slot < caravanWork->m_numCmdListSlots) {
+    if (2 < caravanWork->m_numCmdListSlots) {
         commandItem = caravanWork->m_commandListInventorySlotRef[2];
         if ((commandItem >= 0) && (commandItem == itemNo)) {
             return 1;
         }
-        slot = 3;
-        if (slot < caravanWork->m_numCmdListSlots) {
+        if (3 < caravanWork->m_numCmdListSlots) {
             commandItem = caravanWork->m_commandListInventorySlotRef[3];
             if ((commandItem >= 0) && (commandItem == itemNo)) {
                 return 1;
             }
-            slot = 4;
-            if (slot < caravanWork->m_numCmdListSlots) {
+            if (4 < caravanWork->m_numCmdListSlots) {
                 commandItem = caravanWork->m_commandListInventorySlotRef[4];
                 if ((commandItem >= 0) && (commandItem == itemNo)) {
                     return 1;
                 }
-                slot = 5;
-                if (slot < caravanWork->m_numCmdListSlots) {
+                if (5 < caravanWork->m_numCmdListSlots) {
                     commandItem = caravanWork->m_commandListInventorySlotRef[5];
                     if ((commandItem >= 0) && (commandItem == itemNo)) {
                         return 1;
                     }
-                    slot = 6;
-                    if (slot < caravanWork->m_numCmdListSlots) {
+                    if (6 < caravanWork->m_numCmdListSlots) {
                         commandItem = caravanWork->m_commandListInventorySlotRef[6];
                         if ((commandItem >= 0) && (commandItem == itemNo)) {
                             return 1;
                         }
-                        slot = 7;
-                        if (slot < caravanWork->m_numCmdListSlots) {
+                        if (7 < caravanWork->m_numCmdListSlots) {
                             commandItem = caravanWork->m_commandListInventorySlotRef[7];
                             if ((commandItem >= 0) && (commandItem == itemNo)) {
                                 return 1;

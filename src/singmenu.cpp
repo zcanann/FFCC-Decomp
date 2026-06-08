@@ -1711,7 +1711,7 @@ void CMenuPcs::DrawSingleStat(float alpha)
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x29));
     for (float y = 40.0f; y < 408.0f; ) {
-        float sliceHeight = 32.0f;
+        float sliceHeight = 8.0f;
         if ((408.0f - y) < sliceHeight) {
             sliceHeight = 408.0f - y;
         }
@@ -1907,11 +1907,11 @@ void CMenuPcs::SingleCalcFadeIn()
 
         m_singleFadeState->entries[0].startFrame = 0;
         m_singleFadeState->entries[0].duration = 10;
-        m_singleFadeState->entries[1].startFrame = (m_singleMenuMode == 8) ? 10 : 0;
+        m_singleFadeState->entries[1].startFrame = (m_singleMenuMode == 8) ? 0 : 10;
         m_singleFadeState->entries[1].duration = 10;
-        m_singleFadeState->entries[2].startFrame = (m_singleMenuMode == 8) ? 10 : 0;
+        m_singleFadeState->entries[2].startFrame = (m_singleMenuMode == 8) ? 0 : 10;
         m_singleFadeState->entries[2].duration = 10;
-        m_singleFadeState->entries[3].startFrame = (m_singleMenuMode == 8) ? 10 : 0;
+        m_singleFadeState->entries[3].startFrame = (m_singleMenuMode == 8) ? 0 : 10;
         m_singleFadeState->entries[3].duration = 10;
 
         m_singleFadeState->count = 4;
@@ -1953,7 +1953,7 @@ void CMenuPcs::SingleCalcFadeIn()
     scaleMtx[0][3] = 0.0f;
     scaleMtx[2][3] = 0.0f;
 
-    m_wm.m_handles[0]->m_model->m_flags10C = (m_wm.m_handles[0]->m_model->m_flags10C & 0x7F) | 0x80;
+    m_wm.m_handles[0]->m_model->m_flags10CBits.m_flag10C_80 = 1;
     m_wm.m_handles[0]->m_model->SetMatrix(scaleMtx);
     m_wm.m_handles[0]->m_model->CalcMatrix();
     m_wm.m_handles[0]->m_model->CalcSkin();
@@ -2000,7 +2000,7 @@ void CMenuPcs::SingleCalcFadeOut()
         Sound.PlaySe(0xF, 0x40, 0x7F, 0);
         memset(m_singleFadeState, 0, sizeof(SingleFadeState));
 
-        m_singleFadeState->entries[0].startFrame = (m_singleMenuMode == 8) ? 10 : 0;
+        m_singleFadeState->entries[0].startFrame = (m_singleMenuMode == 8) ? 0 : 10;
         m_singleFadeState->entries[0].duration = 10;
         m_singleFadeState->entries[1].startFrame = 0;
         m_singleFadeState->entries[1].duration = 10;
@@ -2049,7 +2049,7 @@ void CMenuPcs::SingleCalcFadeOut()
     scaleMtx[0][3] = 0.0f;
     scaleMtx[2][3] = 0.0f;
 
-    m_wm.m_handles[0]->m_model->m_flags10C = (m_wm.m_handles[0]->m_model->m_flags10C & 0x7F) | 0x80;
+    m_wm.m_handles[0]->m_model->m_flags10CBits.m_flag10C_80 = 1;
     m_wm.m_handles[0]->m_model->SetMatrix(scaleMtx);
     m_wm.m_handles[0]->m_model->CalcMatrix();
     m_wm.m_handles[0]->m_model->CalcSkin();
@@ -2118,7 +2118,7 @@ void CMenuPcs::SingleCalcCtrl()
     scaleMtx[0][3] = 0.0f;
     scaleMtx[2][3] = 0.0f;
 
-    m_wm.m_handles[0]->m_model->m_flags10C = (m_wm.m_handles[0]->m_model->m_flags10C & 0x7F) | 0x80;
+    m_wm.m_handles[0]->m_model->m_flags10CBits.m_flag10C_80 = 1;
     m_wm.m_handles[0]->m_model->SetMatrix(scaleMtx);
     m_wm.m_handles[0]->m_model->CalcMatrix();
     m_wm.m_handles[0]->m_model->CalcSkin();

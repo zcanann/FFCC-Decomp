@@ -11612,6 +11612,8 @@ void CMenuPcs::ClrMcList()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_propagation off
 unsigned int CMenuPcs::BindEffect(int slot, int effectNo, int cameraSlot)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
@@ -11642,6 +11644,7 @@ unsigned int CMenuPcs::BindEffect(int slot, int effectNo, int cameraSlot)
 	effect->m_partNo = partId;
 	return effect->m_partNo;
 }
+#pragma pop
 
 /*
  * --INFO--

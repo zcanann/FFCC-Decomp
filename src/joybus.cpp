@@ -5034,7 +5034,7 @@ int JoyBus::SendItemAll(ThreadParam* threadParam)
             port = threadParam->m_portIndex;
             unsigned int word = *(unsigned int*)&m_joyDataPacketBuffer[port][2 + m_txWordIndex[port] * 4];
 
-            if (m_threadRunningMask == 0)
+            if (static_cast<signed char>(m_threadRunningMask) == 0)
             {
                 result = 0;
             }
@@ -5143,7 +5143,7 @@ int JoyBus::SendMapObj(ThreadParam* threadParam)
             port = threadParam->m_portIndex;
             unsigned int word = *(unsigned int*)&m_joyDataPacketBuffer[port][2 + m_txWordIndex[port] * 4];
 
-            if (m_threadRunningMask == 0)
+            if (static_cast<signed char>(m_threadRunningMask) == 0)
             {
                 result = 0;
             }
@@ -5257,7 +5257,7 @@ int JoyBus::SendCompatibility(ThreadParam* threadParam)
             port = threadParam->m_portIndex;
             unsigned int word = *(unsigned int*)&m_joyDataPacketBuffer[port][2 + m_txWordIndex[port] * 4];
 
-            if (m_threadRunningMask == 0)
+            if (static_cast<signed char>(m_threadRunningMask) == 0)
             {
                 result = 0;
             }
@@ -5800,7 +5800,7 @@ int JoyBus::SendEquip(ThreadParam* threadParam)
             port = threadParam->m_portIndex;
             unsigned int word = *(unsigned int*)&m_joyDataPacketBuffer[port][2 + m_txWordIndex[port] * 4];
 
-            if (m_threadRunningMask == 0)
+            if (static_cast<signed char>(m_threadRunningMask) == 0)
             {
                 result = 0;
             }
@@ -5914,7 +5914,7 @@ int JoyBus::SendCmd(ThreadParam* threadParam)
             port = threadParam->m_portIndex;
             unsigned int word = *(unsigned int*)&m_joyDataPacketBuffer[port][2 + m_txWordIndex[port] * 4];
 
-            if (m_threadRunningMask == 0)
+            if (static_cast<signed char>(m_threadRunningMask) == 0)
             {
                 result = 0;
             }
@@ -6057,7 +6057,7 @@ int JoyBus::SendBonusStr(ThreadParam* threadParam)
             port = threadParam->m_portIndex;
             unsigned int word = *(unsigned int*)&m_joyDataPacketBuffer[port][2 + m_txWordIndex[port] * 4];
 
-            if (m_threadRunningMask == 0)
+            if (static_cast<signed char>(m_threadRunningMask) == 0)
             {
                 result = 0;
             }
@@ -6170,7 +6170,7 @@ int JoyBus::SendArtifact(ThreadParam* threadParam)
             port = threadParam->m_portIndex;
             unsigned int word = *(unsigned int*)&m_joyDataPacketBuffer[port][2 + m_txWordIndex[port] * 4];
 
-            if (m_threadRunningMask == 0)
+            if (static_cast<signed char>(m_threadRunningMask) == 0)
             {
                 result = 0;
             }
@@ -6283,7 +6283,7 @@ int JoyBus::SendTmpArtifact(ThreadParam* threadParam)
             port = threadParam->m_portIndex;
             unsigned int word = *(unsigned int*)&m_joyDataPacketBuffer[port][2 + m_txWordIndex[port] * 4];
 
-            if (m_threadRunningMask == 0)
+            if (static_cast<signed char>(m_threadRunningMask) == 0)
             {
                 result = 0;
             }
@@ -6400,7 +6400,7 @@ int JoyBus::SendMapObjInfo(ThreadParam* threadParam)
             port = threadParam->m_portIndex;
             unsigned int word = *(unsigned int*)&m_joyDataPacketBuffer[port][2 + m_txWordIndex[port] * 4];
 
-            if (m_threadRunningMask == 0)
+            if (static_cast<signed char>(m_threadRunningMask) == 0)
             {
                 result = 0;
             }
@@ -6639,7 +6639,7 @@ int JoyBus::SendScouInfo(ThreadParam* threadParam)
             port = threadParam->m_portIndex;
             unsigned int word = *(unsigned int*)&m_joyDataPacketBuffer[port][2 + m_txWordIndex[port] * 4];
 
-            if (m_threadRunningMask == 0)
+            if (static_cast<signed char>(m_threadRunningMask) == 0)
             {
                 result = 0;
             }

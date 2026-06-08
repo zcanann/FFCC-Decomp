@@ -3796,22 +3796,20 @@ int CGPartyObj::canPlayerPutItem()
  */
 int CGPartyObj::putItem(int itemId)
 {
-	if (canPlayerPutItem() == 0) {
-		return 0;
+	int result;
+	CGPrgObj* created;
+	if (canPlayerPutItem() != 0 &&
+	    (created = CGItemObj::CreateFromScript(0, 9, itemId, this, FLOAT_80331a78, (CGItemObj::CCFS*)0)) != nullptr) {
+		*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(created) + 0x562) =
+		    static_cast<short>(reinterpret_cast<int>(m_scriptHandle[0xED]));
+		if (Game.m_gameWork.m_menuStageMode == 0) {
+			changeStat(0x1B, 0, 0);
+		}
+		result = 1;
+	} else {
+		result = 0;
 	}
-
-	CGPrgObj* created = CGItemObj::CreateFromScript(
-	    0, 9, itemId, this, FLOAT_80331a78, (CGItemObj::CCFS*)0);
-	if (created == nullptr) {
-		return 0;
-	}
-
-	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(created) + 0x562) =
-	    static_cast<short>(reinterpret_cast<int>(m_scriptHandle[0xED]));
-	if (Game.m_gameWork.m_menuStageMode == 0) {
-		changeStat(0x1B, 0, 0);
-	}
-	return 1;
+	return result;
 }
 
 /*
@@ -3825,23 +3823,21 @@ int CGPartyObj::putItem(int itemId)
  */
 int CGPartyObj::putGil(int amount)
 {
-	if (canPlayerPutItem() == 0) {
-		return 0;
+	int result;
+	CGPrgObj* created;
+	if (canPlayerPutItem() != 0 &&
+	    (created = CGItemObj::CreateFromScript(2, 1, amount, this, FLOAT_80331a78, (CGItemObj::CCFS*)0)) != nullptr) {
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(created) + 0x560) = 1;
+		*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(created) + 0x562) =
+		    static_cast<short>(reinterpret_cast<int>(m_scriptHandle[0xED]));
+		if (Game.m_gameWork.m_menuStageMode == 0) {
+			changeStat(0x1B, 0, 0);
+		}
+		result = 1;
+	} else {
+		result = 0;
 	}
-
-	CGPrgObj* created = CGItemObj::CreateFromScript(
-	    2, 1, amount, this, FLOAT_80331a78, (CGItemObj::CCFS*)0);
-	if (created == nullptr) {
-		return 0;
-	}
-
-	*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(created) + 0x560) = 1;
-	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(created) + 0x562) =
-	    static_cast<short>(reinterpret_cast<int>(m_scriptHandle[0xED]));
-	if (Game.m_gameWork.m_menuStageMode == 0) {
-		changeStat(0x1B, 0, 0);
-	}
-	return 1;
+	return result;
 }
 
 /*

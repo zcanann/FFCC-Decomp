@@ -697,7 +697,19 @@ void CCameraPcs::CalcQuake()
         return;
     }
 
-    if (m_quake.m_startTimer <= 0) {
+    if (m_quake.m_startTimer > 0) {
+        float ratio = static_cast<float>(m_quake.m_startTimer) /
+                      static_cast<float>(m_quake.m_startDuration);
+        PSVECScale(&offset, &offset, ratio);
+        PSVECAdd(&offset, &jitter, &offset);
+        PSVECAdd(&offset, &PositionVec(), &PositionVec());
+        PSVECAdd(&offset, &TargetVec(), &TargetVec());
+        m_quake.m_startTimer = m_quake.m_startTimer - 1;
+
+        if ((m_quake.m_startTimer == 0) && (m_quake.m_keepMoving == 0)) {
+            m_quake.m_state = 0;
+        }
+    } else {
         if (m_quake.m_state == 0) {
             if (m_quake.m_endTimer <= 0) {
                 m_quake.m_state = 0;
@@ -724,18 +736,6 @@ void CCameraPcs::CalcQuake()
             PSVECAdd(&offset, &jitter, &offset);
             PSVECAdd(&offset, &PositionVec(), &PositionVec());
             PSVECAdd(&offset, &TargetVec(), &TargetVec());
-        }
-    } else {
-        float ratio = static_cast<float>(m_quake.m_startTimer) /
-                      static_cast<float>(m_quake.m_startDuration);
-        PSVECScale(&offset, &offset, ratio);
-        PSVECAdd(&offset, &jitter, &offset);
-        PSVECAdd(&offset, &PositionVec(), &PositionVec());
-        PSVECAdd(&offset, &TargetVec(), &TargetVec());
-        m_quake.m_startTimer = m_quake.m_startTimer - 1;
-
-        if ((m_quake.m_startTimer == 0) && (m_quake.m_keepMoving == 0)) {
-            m_quake.m_state = 0;
         }
     }
 }

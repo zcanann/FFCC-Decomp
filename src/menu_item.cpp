@@ -513,7 +513,7 @@ void CMenuPcs::ItemDraw()
 
             cursorEntry += this->m_itemMenuState->cursorIndex[0];
             cursorX = (float)(cursorEntry->x - 0x14);
-            cursorY = (float)((float)(cursorEntry->h - 0x20) * (float)LoadDouble(kItemHalfDouble) + (float)cursorEntry->y);
+            cursorY = (float)((double)(cursorEntry->h - 0x20) * LoadDouble(kItemHalfDouble) + (double)cursorEntry->y);
         } else {
             MenuWindowInfo* window = this->m_menuWindowInfo;
             cursorX = (float)window->x;

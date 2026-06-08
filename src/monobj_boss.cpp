@@ -1772,13 +1772,13 @@ void CGMonObj::damagedFuncMeteoParasiteC()
 	unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
 	MeteoParasiteCBossWork* work = reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss);
 
-	if ((work->m_coreFlags & 0x40) == 0) {
+	if (work->bits.m_meteo3 == 0) {
 		if (((work->m_coreIndex == 0) && (script[7] < ((script[0x1A / 2] * 2) / 3))) ||
 		    ((work->m_coreIndex == 1) && (script[7] < (script[0x1A / 2] / 3)))) {
 			work->m_coreWait = 0;
 			reinterpret_cast<CGPrgObj*>(this)->changeStat(0x66, 0, 0);
 			object->m_bgColMask &= 0xFFF7FFFF;
-		} else if (work->m_coreWait > 0x31) {
+		} else if (work->m_coreWait >= 0x32) {
 			work->m_coreWait = 0;
 			reinterpret_cast<CGPrgObj*>(this)->changeStat(0x67, 0, 0);
 			object->m_bgColMask &= 0xFFF7FFFF;

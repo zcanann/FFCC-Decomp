@@ -1528,13 +1528,15 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			    this, object, ScriptCaravan(engineObject)->GetFoodRank(static_cast<int>(object->m_localBase[0])));
 			outResult = 0;
 			break;
-		case -0x7D:
-			if (object->m_localBase[0] == 1) {
-				engineObject->m_bodyEllipsoidAspect = reinterpret_cast<float*>(object->m_localBase)[1];
+		case -0x7D: {
+			float aspect = reinterpret_cast<float*>(object->m_localBase)[1];
+			if (static_cast<int>(object->m_localBase[0]) == 1) {
+				engineObject->m_bodyEllipsoidAspect = aspect;
 			}
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
+		}
 		case -0x7E: {
 			unsigned int workIndex = RuntimeWorkAssignIndex(this);
 			RuntimeWorkAssignIndex(this) = workIndex + 1;

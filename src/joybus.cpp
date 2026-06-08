@@ -2574,7 +2574,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
             OSSignalSemaphore(&m_accessSemaphores[port]);
         }
 
-        const unsigned char state = threadParam->m_state;
+        const signed char state = threadParam->m_state;
 
         if (m_stateFlagArr[port] != 0 &&
             m_stateCodeArr[port] != 0x09 &&
@@ -2587,7 +2587,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
 
             for (unsigned int i = 0; i < m_cmdCount[port]; ++i)
             {
-                unsigned int cmd = m_cmdQueueData[port][i];
+                int cmd = m_cmdQueueData[port][i];
                 unsigned char op = static_cast<unsigned char>(cmd >> 24) & 0x3F;
 
                 if (op == 0x0A || op == 0x10 || op == 0x14 ||

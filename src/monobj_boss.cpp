@@ -483,7 +483,7 @@ void CGMonObj::frameStatFuncGolem()
 	}
 
 	if ((reinterpret_cast<CGPrgObj*>(this)->m_stateFrame == 0x14) ||
-	    ((reinterpret_cast<CGObject*>(this)->m_stateFlags0 & 0x40) != 0) ||
+	    (reinterpret_cast<CGObject*>(this)->m_stateFlags0Bits.unk1 != 0) ||
 	    ((state == 0x66) &&
 	     (*reinterpret_cast<float*>(self + 0x5D0 + m_targetPartyIndex * 4) <
 	      kMonObjBossTwo * reinterpret_cast<CGObject*>(this)->m_bodyEllipsoidRadius))) {

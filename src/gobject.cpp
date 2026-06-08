@@ -1376,6 +1376,8 @@ void CGObject::update()
     }
 
     if (HasLoadedModel(m_charaModelHandle) && (m_displayFlags & 2) != 0) {
+        const int blendMode = (shieldFlagsLo & 0x2) == 0 ? -1 : 0;
+        const int forceSet = (shieldFlagsLo & 0x8) != 0 ? 1 : 0;
         int animIndex = m_currentAnimSlot;
         int startFrame = m_animExtraIndex;
         int endFrame = m_collisionPushTimer;
@@ -1385,8 +1387,6 @@ void CGObject::update()
             endFrame = -1;
         }
 
-        const int blendMode = (shieldFlagsLo & 0x2) == 0 ? -1 : 0;
-        const int forceSet = (shieldFlagsLo & 0x8) != 0 ? 1 : 0;
         if (m_charaModelHandle->SetAnim(animIndex, startFrame, endFrame, blendMode, forceSet) != 0 &&
             m_currentAnimSlot != -1) {
             float frame = sZeroFloat;

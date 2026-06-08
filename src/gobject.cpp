@@ -1381,7 +1381,7 @@ void CGObject::update()
         PSMTXRotRad(modelMtx, 'y', atan2f(m_worldPosition.x, m_worldPosition.z));
         Vec mapUp = DAT_801D9B88;
         PSVECNormalize(&m_worldPosition, &worldNorm);
-        PSMTXRotRad(tempMtx, 'x', acosf(PSVECDotProduct(&mapUp, &worldNorm)));
+        PSMTXRotRad(tempMtx, 'x', acosf(PSVECDotProduct(&worldNorm, &mapUp)));
         PSMTXConcat(modelMtx, tempMtx, modelMtx);
 
         PSMTXRotRad(tempMtx, 'y', m_rotBaseY);

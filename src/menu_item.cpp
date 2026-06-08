@@ -520,10 +520,11 @@ void CMenuPcs::ItemDraw()
     DrawSingLife();
 
     CFont* helpFont = this->m_fonts[0];
-    CColor helpColor(0xFF, 0xFF, 0xFF, (u8)(LoadFloat(kItemColorMax) * cursorEntry->alpha));
+    u8 helpAlpha = (u8)(LoadFloat(kItemColorMax) * cursorEntry->alpha);
     if (!foundSelected) {
         selectedItemId = -1;
     }
+    CColor helpColor(0xFF, 0xFF, 0xFF, helpAlpha);
     float helpBaseX = LoadFloat(kItemHelpCenterX);
     float helpOffsetX = LoadFloat(kItemHalf);
     int helpX = (int)(helpBaseX - LoadFloat(kItemHalf) * helpOffsetX);

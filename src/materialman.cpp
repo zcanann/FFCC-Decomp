@@ -2517,8 +2517,8 @@ void CMaterialMan::SetPosition(
         for (int i = 0; i < candidateCount; i++) {
             float candidateDist = candidateRead->distance;
             if (nearestDist > candidateDist) {
-                nearest = candidateRead;
                 nearestDist = candidateDist;
+                nearest = candidateRead;
             }
             candidateRead++;
         }

@@ -190,7 +190,7 @@ int CMenuPcs::EquipClose0()
 	int result = 0;
 	if (itemCount == doneCount) {
 		EquipOpenAnim* selected = &GetEquipListStorage(this)->entries[GetEquipMenuState(this)->selectedIndex];
-		selected->x = (s16)(int)-(((double)selected->w - kEquipIntToDoubleBias) * kEquipHalfDouble - kEquipWindowCenterX);
+		selected->x = (s16)(int)-((double)selected->w * kEquipHalfDouble - kEquipWindowCenterX);
 		result = 1;
 	}
 
@@ -960,7 +960,7 @@ int CMenuPcs::EquipOpen()
 			entry[0].tex = 0x34;
 			entry[0].w = 200;
 			entry[0].h = 0x28;
-			entry[0].x = (s16)(int)-(((double)entry[0].w - dVar4) * dVar3 - dVar2);
+			entry[0].x = (s16)(int)-((double)entry[0].w * dVar3 - dVar2);
 			entry[0].y = iVar6 * (entry[0].h - 8) + 0x60;
 			entry[0].u = fVar1;
 			entry[0].v = fVar1;
@@ -971,7 +971,7 @@ int CMenuPcs::EquipOpen()
 			entry[1].tex = 0x34;
 			entry[1].w = 200;
 			entry[1].h = 0x28;
-			entry[1].x = (s16)(int)-(((double)entry[1].w - dVar4) * dVar3 - dVar2);
+			entry[1].x = (s16)(int)-((double)entry[1].w * dVar3 - dVar2);
 			entry[1].y = iVar6 * (entry[1].h - 8) + 0x60;
 			entry[1].u = fVar1;
 			entry[1].v = fVar1;

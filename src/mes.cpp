@@ -201,7 +201,6 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 	unsigned char caseMode = 0;
 	unsigned char branchMode = 0;
 
-	char* townName = Game.m_gameWork.m_townName;
 	const unsigned char* op;
 	signed char c;
 	while ((c = in[0]) != 0)
@@ -365,9 +364,12 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			break;
 		}
 		case 0x2F:
+		{
+			char* townName = Game.m_gameWork.m_townName;
 			strcpy(dst, townName);
 			dst += strlen(dst);
 			break;
+		}
 		case 0x30:
 		{
 			signed char varIndex = (signed char)GetMesNibbleValue((const char*)op);
@@ -596,7 +598,7 @@ void CMes::Draw()
 						if (specialPad)
 						{
 							int padType = Joybus.GetPadType(0);
-							mode = ((unsigned int)((0x40000 - padType) | (padType - 0x40000))) >> 31;
+							mode = ((unsigned int)((padType - 0x40000) | (0x40000 - padType))) >> 31;
 						}
 						else
 						{
@@ -616,7 +618,7 @@ void CMes::Draw()
 						if (specialPad)
 						{
 							int padType = Joybus.GetPadType(0);
-							mode = ((unsigned int)((0x40000 - padType) | (padType - 0x40000))) >> 31;
+							mode = ((unsigned int)((padType - 0x40000) | (0x40000 - padType))) >> 31;
 						}
 						else
 						{
@@ -636,7 +638,7 @@ void CMes::Draw()
 						if (specialPad)
 						{
 							int padType = Joybus.GetPadType(0);
-							mode = ((unsigned int)((0x40000 - padType) | (padType - 0x40000))) >> 31;
+							mode = ((unsigned int)((padType - 0x40000) | (0x40000 - padType))) >> 31;
 						}
 						else
 						{
@@ -656,7 +658,7 @@ void CMes::Draw()
 						if (specialPad)
 						{
 							int padType = Joybus.GetPadType(0);
-							mode = ((unsigned int)((0x40000 - padType) | (padType - 0x40000))) >> 31;
+							mode = ((unsigned int)((padType - 0x40000) | (0x40000 - padType))) >> 31;
 						}
 						else
 						{
@@ -673,7 +675,7 @@ void CMes::Draw()
 
 					MenuPcs.DrawRect(
 					    0, *(float*)((char*)this + 0x3C9C) + *glyph,
-					    kMesIconDrawYOffset + *(float*)((char*)this + 0x3CA0) + (float)*(short*)(glyph + 2),
+					    kMesIconDrawYOffset + *(float*)((char*)this + 0x3CA0) + (float)*(unsigned short*)(glyph + 2),
 					    kMesIconDefaultWidth, kMesIconDefaultWidth, (float)((iconId % 5) * 0x16),
 					    (float)((iconId / 5) * 0x16), kMesOne, kMesOne, 0.0f);
 
@@ -776,7 +778,7 @@ void CMes::Calc()
 
 	int textEntry = (int)((char*)this + 0xC);
 	unsigned int maxAdvance = 0;
-	for (int i = 0; i < *(int*)((char*)this + 8); i++)
+	for (int i = 0; i < *(int*)((char*)this + 8); i++, textEntry += 0x14)
 	{
 		if ((int)(unsigned int)*(unsigned short*)(textEntry + 0xC) <= *(int*)((char*)this + 0x3C80))
 		{
@@ -790,12 +792,11 @@ void CMes::Calc()
 			    (unsigned char)((fadeMax & 0xF) | (*(unsigned char*)(textEntry + 0xF) & 0xF0));
 			maxAdvance = (unsigned int)*(unsigned char*)(textEntry + 0x13);
 		}
-		textEntry += 0x14;
 	}
 
 	unsigned char* flagEntry =
 	    (unsigned char*)((char*)this + *(int*)((char*)this + 0x3C10) * 6 + 0x3C14);
-	while ((int)maxAdvance > *(int*)((char*)this + 0x3C10))
+	while (*(int*)((char*)this + 0x3C10) < (int)maxAdvance)
 	{
 		int type = *flagEntry;
 		switch (type)
@@ -1296,7 +1297,7 @@ void CMes::addString(char** text, int branchMode)
 			break;
 		case 0x36:
 		{
-			signed char idx = (unsigned char)ReadTagU8(text);
+			unsigned char idx = (unsigned char)ReadTagU8(text);
 			if (branchMode == 0)
 			{
 				int count = mFlagCount;
@@ -1575,22 +1576,20 @@ void CMes::Next()
 		{
 			int j = i + 1;
 			curr = start + 5;
-			for (entryCount = remaining - j; entryCount != 0; entryCount = entryCount - 1)
+			for (; j < remaining; j = j + 1, curr = curr + 5)
 			{
 				if ((((unsigned int)*(unsigned char*)((char*)start + 0xe) >> 4 & 0xF) != ((unsigned int)*(unsigned char*)((char*)curr + 0xe) >> 4 & 0xF)) ||
-				    (*(short*)(start + 2) != *(short*)(curr + 2)))
+				    (*(unsigned short*)(start + 2) != *(short*)(curr + 2)))
 				{
 					break;
 				}
-				j = j + 1;
-				curr = curr + 5;
 			}
-			runLength = (unsigned int)((int)curr - (int)start) / 0x14;
-			groupWidth = (curr[-5] - *start) + start[1] + *(float*)((char*)this + 0x3d3c);
+			runLength = (unsigned int)(j - i);
+			groupWidth = (curr[-5] - *start) + (start[1] + *(float*)((char*)this + 0x3d3c));
 			for (; runLength != 0; runLength = runLength - 1)
 			{
 				type = (int)(((unsigned int)*(unsigned char*)((char*)start + 0xe) >> 4) & 0xF);
-				if ((unsigned int)type == 1)
+				if ((int)type == 1)
 				{
 					*start = halfVal * (*(float*)((char*)this + 0x3ca4) - groupWidth) + *start;
 				}

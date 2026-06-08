@@ -6388,11 +6388,11 @@ void CMenuPcs::CalcPitcher()
 	unsigned char* worldObj = m_wm.m_worldObjData;
 
 	const float one = FLOAT_803313e8;
-	const float pa8 = FLOAT_803314a4;
-	const float pac = FLOAT_80331748;
-	const float pb0 = FLOAT_8033174c;
-	const float pb4 = FLOAT_80331750;
 	const float pb8 = FLOAT_803315d0;
+	const float pb4 = FLOAT_80331750;
+	const float pb0 = FLOAT_8033174c;
+	const float pac = FLOAT_80331748;
+	const float pa8 = FLOAT_803314a4;
 	reinterpret_cast<unsigned int*>(worldObj + 0x190)[0] = 1;
 	reinterpret_cast<short*>(worldObj + 0x198)[0] = 0x140;
 	reinterpret_cast<short*>(worldObj + 0x19A)[0] = 0xE0;

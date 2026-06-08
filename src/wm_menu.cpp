@@ -6270,9 +6270,10 @@ double CMenuPcs::GetFcvValue(CMenuPcs::FCV fcv, float value)
 	float u2 = u * u;
 	float u3 = u2 * u;
 	float c4u2 = FLOAT_803314c4 * u2;
+	float negTerm = -(FLOAT_803314c8 * u2 - u3);
 
 	return static_cast<double>(
-	    span * (prev[3] * (u + -(FLOAT_803314c8 * u2 - u3)) + next[2] * (u3 - u2)) +
+	    span * (prev[3] * (u + negTerm) + next[2] * (u3 - u2)) +
 	    prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - c4u2)) +
 	    next[1] * (FLOAT_803314cc * u3 + c4u2));
 }

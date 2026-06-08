@@ -1401,20 +1401,19 @@ void CSound::StopAndFreeAllSe(int clearMode)
 int CSound::PlaySe(int seNo, int pan, int volume, int fadeFrames)
 {
     int seId;
-    CRedSound* redSound = &m_redSound;
 
     if (seNo < 0) {
         System.Printf(const_cast<char*>(s_soundMinusOneFmt));
         return -1;
     } else if (seNo < 4000) {
-        seId = redSound->SePlay(seNo / 1000, seNo % 1000, pan, volume & ~((-fadeFrames | fadeFrames) >> 0x1F), 0);
+        seId = m_redSound.SePlay(seNo / 1000, seNo % 1000, pan, volume & ~((-fadeFrames | fadeFrames) >> 0x1F), 0);
         if (fadeFrames != 0) {
-            redSound->SeVolume(seId, volume, fadeFrames);
+            m_redSound.SeVolume(seId, volume, fadeFrames);
         }
     } else {
-        seId = redSound->SePlay(-1, seNo, pan, volume & ~((-fadeFrames | fadeFrames) >> 0x1F), 0);
+        seId = m_redSound.SePlay(-1, seNo, pan, volume & ~((-fadeFrames | fadeFrames) >> 0x1F), 0);
         if (fadeFrames != 0) {
-            redSound->SeVolume(seId, volume, fadeFrames);
+            m_redSound.SeVolume(seId, volume, fadeFrames);
         }
     }
 

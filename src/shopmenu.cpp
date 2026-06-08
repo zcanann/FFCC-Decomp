@@ -1570,7 +1570,7 @@ void CShopMenu::DrawItemList()
     }
 
     for (int row = 0; row < m_visibleRows; ++row) {
-        unsigned int listType = m_listType;
+        int listType = m_listType;
         int itemCount = ResolveShopMenuItemCount(this);
 
         if (itemCount <= itemIndex) {

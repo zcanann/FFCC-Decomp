@@ -742,12 +742,13 @@ void CGraphicPcs::drawBar()
     int hue = 0;
     u32 y = 0x10;
     for (int i = 0; i < orderCount; i++) {
+        const int priority = order->m_priority;
         const float lastTime = order->m_lastTime;
         GXColor rgb;
         *reinterpret_cast<u32*>(&rgb) = Math.Hsb2Rgb(hue / orderCount, 100, 100);
         const float width = (kGraphicScreenCenterX * lastTime) / kDebugBarFrameBudget;
 
-        if (order->m_priority == 0x26) {
+        if (priority == 0x26) {
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
             const float y0 = drawText ? static_cast<float>(y) : kDebugBarMoveBottom;
             const float y1 = drawText ? static_cast<float>(y + kDebugBarLineStep) : kDebugBarTop;
@@ -764,7 +765,7 @@ void CGraphicPcs::drawBar()
             GXColor1u32(*reinterpret_cast<u32*>(&rgb));
             GXTexCoord2u16(0, 2);
             x += width;
-        } else if (order->m_priority != 0x27) {
+        } else if (priority != 0x27) {
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
             const float y0 = drawText ? static_cast<float>(y) : kDebugBarObjectTop;
             const float y1 = drawText ? static_cast<float>(y + kDebugBarLineStep) : kDebugBarMoveBottom;

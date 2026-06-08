@@ -8628,7 +8628,7 @@ void CMenuPcs::CalcCharaSelect()
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
 	unsigned short padTrig[4];
-	unsigned short padRepeat[4];
+	short padRepeat[4];
 
 	*reinterpret_cast<short*>(bytes + 0x74) = static_cast<short>(*reinterpret_cast<short*>(bytes + 0x74) + 1);
 	const unsigned int clz = __cntlzw(static_cast<unsigned int>(Game.m_gameWork.m_menuStageMode));
@@ -8683,7 +8683,7 @@ void CMenuPcs::CalcCharaSelect()
 	if (winState != 3) {
 		unsigned short anyTrig = 0;
 		for (int i = 0; i < 4; i++) {
-			anyTrig = static_cast<unsigned short>(anyTrig | padTrig[i]);
+			anyTrig = static_cast<short>(anyTrig | padTrig[i]);
 		}
 		if (winState == 1 && (anyTrig & 0x0300) != 0) {
 			m_menuWindowInfo->state = 2;

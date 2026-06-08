@@ -172,9 +172,9 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             }
 
             const u8 blendMode = *reinterpret_cast<const u8*>(entry + 0xC);
-            if (blendMode == 'H') {
+            if (blendMode == 0x48) {
                 _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_COPY);
-            } else if (blendMode == 'B') {
+            } else if (blendMode == 0x42) {
                 _GXSetBlendMode(GX_BM_SUBTRACT, GX_BL_ONE, GX_BL_ONE, GX_LO_COPY);
             } else if (blendMode == 0x88) {
                 _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_COPY);
@@ -289,9 +289,9 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             }
 
             const u8 blendMode = *reinterpret_cast<const u8*>(entry + 0xC);
-            if (blendMode == 'H') {
+            if (blendMode == 0x48) {
                 _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_COPY);
-            } else if (blendMode == 'B') {
+            } else if (blendMode == 0x42) {
                 _GXSetBlendMode(GX_BM_SUBTRACT, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_COPY);
             } else if (blendMode == 0x88) {
                 _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_COPY);

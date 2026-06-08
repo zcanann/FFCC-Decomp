@@ -1743,7 +1743,7 @@ inline void CShopMenu::DrawObi(int)
  * JP Size: TODO
  */
 #pragma push
-#pragma opt_propagation off
+#pragma optimization_level 4
 void CShopMenu::DrawMakeBase()
 {
     MenuPcs.DrawSingleBase(FLOAT_80332d28);

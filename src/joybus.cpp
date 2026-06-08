@@ -8022,8 +8022,8 @@ int JoyBus::SetOpenMenu(int playerIndex, char menuId)
 
     if (playerIndex == 0 && GbaQue.IsSingleMode(0) && menuId != 0)
     {
-        MenuPcs.m_singleMenuMode = menuId - 1;
         Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 1;
+        MenuPcs.m_singleMenuMode = menuId - 1;
         result = 0;
         m_ctrlModeArr[0] = 1;
     }
@@ -8033,7 +8033,14 @@ int JoyBus::SetOpenMenu(int playerIndex, char menuId)
 
         if (!isSingle)
         {
-            if (m_threadRunningMask == 0)
+            unsigned int cmd = 0;
+            unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
+            cmdBytes[0] = 0x14;
+            cmdBytes[1] = 0x0F;
+            cmdBytes[2] = menuId;
+            unsigned int cmdCache = cmd;
+
+            if (static_cast<signed char>(m_threadRunningMask) == 0)
             {
                 result = 0;
             }
@@ -8048,7 +8055,7 @@ int JoyBus::SetOpenMenu(int playerIndex, char menuId)
                 }
                 else
                 {
-                    m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = 0x140F0000;
+                    m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmdCache;
                     m_cmdCount[m_threadParams[1].m_portIndex]++;
                     OSSignalSemaphore(&m_accessSemaphores[m_threadParams[1].m_portIndex]);
                     result = 0;
@@ -8066,9 +8073,13 @@ int JoyBus::SetOpenMenu(int playerIndex, char menuId)
 
         if (!isSingle)
         {
-            const unsigned int cmd = MakeJoyCmd16(0x140F, static_cast<signed char>(menuId), 0);
+            unsigned int cmd = 0;
+            unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
+            cmdBytes[0] = 0x14;
+            cmdBytes[1] = 0x0F;
+            cmdBytes[2] = menuId;
 
-            if (m_threadRunningMask == 0)
+            if (static_cast<signed char>(m_threadRunningMask) == 0)
             {
                 result = 0;
             }

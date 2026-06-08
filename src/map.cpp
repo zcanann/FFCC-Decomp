@@ -3016,17 +3016,17 @@ int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
         return 0;
     }
 
-    if ((move->x <= kMapHitMoveEpsilon) && (kMapHitMoveNegEpsilon <= move->x) &&
-        (move->y <= kMapHitMoveEpsilon) && (kMapHitMoveNegEpsilon <= move->y) &&
-        (move->z <= kMapHitMoveEpsilon) && (kMapHitMoveNegEpsilon <= move->z)) {
-        if (static_cast<unsigned int>(System.m_execParam) > 1) {
+    if ((move->x <= kMapHitMoveEpsilon) && (move->x >= kMapHitMoveNegEpsilon) &&
+        (move->y <= kMapHitMoveEpsilon) && (move->y >= kMapHitMoveNegEpsilon) &&
+        (move->z <= kMapHitMoveEpsilon) && (move->z >= kMapHitMoveNegEpsilon)) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 2) {
             System.Printf(g_MsgFlashy);
         }
-        if (static_cast<unsigned int>(System.m_execParam) > 1) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 2) {
             System.Printf(const_cast<char*>(s_check_hit_cylinder_small_vec_fmt), static_cast<double>(move->x),
                 static_cast<double>(move->y), static_cast<double>(move->z));
         }
-        if (static_cast<unsigned int>(System.m_execParam) > 1) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 2) {
             System.Printf(g_MsgFlashy);
         }
     }
@@ -3036,17 +3036,15 @@ int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
     PSVECAdd(&cylinder->m_bottom, move, &cylinder->m_top);
 
     for (int i = 0; i < m_octTreeCount; i++) {
-        COctTree* octTree = GetOctTreeArray() + i;
-        if (octTree->CheckHitCylinder(cylinder, move, mask) != 0) {
-            m_hitMapObj = octTree->GetMapObject();
+        if (m_octTreeArray[i].CheckHitCylinder(cylinder, move, mask) != 0) {
+            m_hitMapObj = m_octTreeArray[i].GetMapObject();
             return 1;
         }
     }
 
     for (int i = 0; i < m_mapObjCount; i++) {
-        CMapObj* mapObj = GetMapObjArray() + i;
-        m_hitMapObj = mapObj;
-        if (mapObj->CheckHitCylinder(cylinder, move, mask) != 0) {
+        m_hitMapObj = &m_mapObjArray[i];
+        if (m_hitMapObj->CheckHitCylinder(cylinder, move, mask) != 0) {
             return 1;
         }
     }
@@ -3069,17 +3067,17 @@ int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
         return 0;
     }
 
-    if ((move->x <= kMapHitMoveEpsilon) && (kMapHitMoveNegEpsilon <= move->x) &&
-        (move->y <= kMapHitMoveEpsilon) && (kMapHitMoveNegEpsilon <= move->y) &&
-        (move->z <= kMapHitMoveEpsilon) && (kMapHitMoveNegEpsilon <= move->z)) {
-        if (static_cast<unsigned int>(System.m_execParam) > 1) {
+    if ((move->x <= kMapHitMoveEpsilon) && (move->x >= kMapHitMoveNegEpsilon) &&
+        (move->y <= kMapHitMoveEpsilon) && (move->y >= kMapHitMoveNegEpsilon) &&
+        (move->z <= kMapHitMoveEpsilon) && (move->z >= kMapHitMoveNegEpsilon)) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 2) {
             System.Printf(g_MsgFlashy);
         }
-        if (static_cast<unsigned int>(System.m_execParam) > 1) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 2) {
             System.Printf(const_cast<char*>(s_check_hit_cylinder_near_small_vec_fmt), static_cast<double>(move->x),
                 static_cast<double>(move->y), static_cast<double>(move->z));
         }
-        if (static_cast<unsigned int>(System.m_execParam) > 1) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 2) {
             System.Printf(g_MsgFlashy);
         }
     }
@@ -3090,22 +3088,20 @@ int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
     PSVECAdd(&cylinder->m_bottom, move, &cylinder->m_top);
 
     for (int i = 0; i < m_octTreeCount; i++) {
-        COctTree* octTree = GetOctTreeArray() + i;
         gMapHitFaceFlag = 0;
-        octTree->CheckHitCylinderNear(cylinder, move, mask);
+        m_octTreeArray[i].CheckHitCylinderNear(cylinder, move, mask);
         if (gMapHitFaceFlag != 0) {
             hit = 1;
-            m_hitMapObj = octTree->GetMapObject();
+            m_hitMapObj = m_octTreeArray[i].GetMapObject();
         }
     }
 
     for (int i = 0; i < m_mapObjCount; i++) {
-        CMapObj* mapObj = GetMapObjArray() + i;
         gMapHitFaceFlag = 0;
-        mapObj->CheckHitCylinderNear(cylinder, move, mask);
+        m_mapObjArray[i].CheckHitCylinderNear(cylinder, move, mask);
         if (gMapHitFaceFlag != 0) {
             hit = 1;
-            m_hitMapObj = mapObj;
+            m_hitMapObj = &m_mapObjArray[i];
         }
     }
 

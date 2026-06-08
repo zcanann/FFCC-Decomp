@@ -1144,8 +1144,7 @@ void CCharaPcs::InitEnv(int envMode)
     SetupCharaTevSwap();
 
     if (envMode == 1 || envMode == 2) {
-        CColor black(0x00, 0x00, 0x00, 0xFF);
-        LightPcs.SetAmbient(black.color);
+        LightPcs.SetAmbient(CColor(0x00, 0x00, 0x00, 0xFF).color);
         LightPcs.SetNumDiffuse(0);
         LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
     } else {

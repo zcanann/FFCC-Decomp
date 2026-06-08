@@ -998,14 +998,14 @@ int CFlatRuntime::SystemCall(CFlatRuntime::CObject* objectParam, int systemKind,
 	const int prevReqFlags = *reinterpret_cast<int*>(&object->m_reqFlag0);
 	const s16 prevArgCount = object->m_argCount;
 
-	if (*reinterpret_cast<int*>(func + 0x4C) == 0) {
-		object->m_localBase = object->m_sp - *reinterpret_cast<int*>(func + 0x24);
-		object->m_sp = object->m_localBase + *reinterpret_cast<int*>(func + 0x28);
-	} else {
+	if (*reinterpret_cast<int*>(func + 0x4C) != 0) {
 		object->m_sp--;
 		object->m_argCount = static_cast<s16>(*object->m_sp);
 		object->m_localBase = object->m_sp - object->m_argCount;
 		object->m_sp = object->m_localBase + object->m_argCount;
+	} else {
+		object->m_localBase = object->m_sp - *reinterpret_cast<int*>(func + 0x24);
+		object->m_sp = object->m_localBase + *reinterpret_cast<int*>(func + 0x28);
 	}
 
 	*reinterpret_cast<u16*>(&object->m_codePos) =

@@ -337,20 +337,23 @@ void CGMonObj::frameStatFuncGiantCrab()
 		if (*(int*)(self + 0x528) == 0) {
 			float turnOffset;
 			int animId;
-			if (state == 0x67) {
+			switch (state) {
+			case 0x65:
+				turnOffset = kMonObjBossZero;
+				animId = 1;
+				break;
+			case 0x66:
+				turnOffset = kMonObjBossPi;
+				animId = 1;
+				break;
+			case 0x67:
 				turnOffset = kMonObjBossHalfPi;
 				animId = 0x12;
-			} else if (state < 0x67) {
-				if (state == 0x65) {
-					turnOffset = kMonObjBossZero;
-					animId = 1;
-				} else if (state > 100) {
-					turnOffset = kMonObjBossPi;
-					animId = 1;
-				}
-			} else if (state < 0x69) {
+				break;
+			case 0x68:
 				turnOffset = kMonObjBossThreeHalfPi;
 				animId = 0x13;
+				break;
 			}
 
 			reinterpret_cast<CGPrgObj*>(self)->reqAnim(animId, 0, 0);

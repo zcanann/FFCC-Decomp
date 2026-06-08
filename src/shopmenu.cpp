@@ -1900,14 +1900,14 @@ void CShopMenu::DrawMake()
     font->DrawInit();
     MenuPcs.DrawNoShadowFont(font,
         const_cast<char*>(gilUnitText),
-        FLOAT_80332e14 - gilUnitWidth - FLOAT_80332d5c - FLOAT_80332d5c,
+        static_cast<float>(makeAmountX),
         FLOAT_80332e20,
         0x19,
         0x12);
     MenuPcs.DrawInit();
 
     font->DrawInit();
-    MenuPcs.DrawNoShadowFont(font, const_cast<char*>(gilUnitText), FLOAT_80332e1c - gilUnitWidth, FLOAT_80332e20, 0x19, 0x12);
+    MenuPcs.DrawNoShadowFont(font, const_cast<char*>(gilUnitText), static_cast<float>(gilAmountX), FLOAT_80332e20, 0x19, 0x12);
     MenuPcs.DrawInit();
 
     CFont* labelFont = MenuPcs.m_fonts[4];

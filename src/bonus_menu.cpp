@@ -772,8 +772,8 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 		return;
 	}
 
+	_GXColor color;
 	if (*(short*)(this->m_bonusStatePtr + 0x1c) != 4) {
-		_GXColor color;
 		color.r = 0xFF;
 		color.g = 0xFF;
 		color.b = 0xFF;
@@ -805,7 +805,6 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 			} else {
 				gray = 1.0f * 255.0f;
 			}
-			_GXColor color;
 			color.r = (unsigned char)gray;
 			color.g = (unsigned char)gray;
 			color.b = (unsigned char)gray;
@@ -1100,7 +1099,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 		handle->m_model->SetMatrix(scaleMtx);
 		handle->m_model->CalcMatrix();
 		handle->m_model->CalcSkin();
-		handle->m_model->m_lightAlpha = sprites[(int)(signed char)s_PlayerTop + i].alpha;
+		handle->m_model->m_lightAlpha = sprites[(int)(unsigned char)s_PlayerTop + i].alpha;
 	}
 
 	if (doneCount == (int)header->count) {
@@ -1285,7 +1284,7 @@ void CMenuPcs::CalcSelectWait()
 			}
 		} else if (currentPartyIndex < activePartyCount) {
 			delay = (short)(delay - 1);
-			if (delay == 0 && *(signed char*)(statePtr + 8) > 0) {
+			if (delay == 0 && *(unsigned char*)(statePtr + 8) > 0) {
 				int bit = 1 << selection;
 				int itemId = (&s_Rinfo->m_tempArtifacts[0])[selection];
 				s_Rinfo->pad_0008 = (unsigned char)(s_Rinfo->pad_0008 | bit);
@@ -1341,7 +1340,7 @@ void CMenuPcs::CalcSelectWait()
 			scaleMtx[1][3] = s_BonusModelYPos[tribeId];
 			scaleMtx[0][3] = 0.0f;
 		} else {
-			int artifactIndex = i - activePartyCount;
+			unsigned int artifactIndex = i - activePartyCount;
 			handle = GetBonusDisplayHandleSlots(this)[activePartyCount * 2 + artifactIndex];
 			if (handle == 0) {
 				continue;
@@ -1377,7 +1376,7 @@ void CMenuPcs::CalcSelectWait()
 		handle->m_model->SetMatrix(scaleMtx);
 		handle->m_model->CalcMatrix();
 		handle->m_model->CalcSkin();
-		handle->m_model->m_lightAlpha = sprites[(int)(signed char)s_PlayerTop + i].alpha;
+		handle->m_model->m_lightAlpha = sprites[(int)(unsigned char)s_PlayerTop + i].alpha;
 	}
 
 	if (currentPartyIndex >= activePartyCount && delay == 0) {
@@ -1594,7 +1593,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 
 		iconBase = idx;
 		short y = 0x28;
-		for (int i = 0; i < activePartyCount; i++) {
+		for (unsigned int i = 0; i < activePartyCount; i++) {
 			InitSelectOpenPartyIcon(&sprites[idx], i, y);
 			idx++;
 			y += 0x60;
@@ -1701,7 +1700,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 
-	*(short*)(statePtr + 0x22) = *(short*)(statePtr + 0x22) + 1;
+	*(short*)(statePtr + 0x22) = *(unsigned short*)(statePtr + 0x22) + 1;
 	int frame = (int)*(short*)(statePtr + 0x22);
 	int doneCount = 0;
 
@@ -1772,7 +1771,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 	CCharaPcs::CHandle** displaySlots = GetBonusDisplayHandleSlots(this);
 	int partyByteOff = 0;
 	for (int i = 0; i < activePartyCount + 8; i++, partyByteOff += sizeof(BonusPartySummary)) {
-		BonusAnimSprite* iconSprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + ((int)(signed char)s_PlayerTop + i) * 0x40 + 8);
+		BonusAnimSprite* iconSprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + ((int)(unsigned char)s_PlayerTop + i) * 0x40 + 8);
 		CCharaPcs::CHandle* handle;
 		int tribeId;
 		if (i < activePartyCount) {
@@ -1791,8 +1790,8 @@ void CMenuPcs::CalcSelectOpenAnim()
 			PSMTXScale(scaleMtx, 0.5799999833106995f, 0.5799999833106995f, 0.5799999833106995f);
 
 			int duration = iconSprite->duration;
-			int artifactIndex = i - activePartyCount;
-			int fcvIndex = duration / 5;
+			unsigned int artifactIndex = i - activePartyCount;
+			unsigned int fcvIndex = duration / 5;
 			float rate = (float)(450.0 / (double)(float)duration);
 			int phase = (int)(((double)duration / 10.0) * (double)(10 - artifactIndex));
 
@@ -1980,7 +1979,7 @@ void CMenuPcs::DrawResultCloseAnim()
 				} else {
 					if ((signed char)s_CntTop <= i && i < (signed char)s_CntTop + activePartyCount) {
 						int value = s_Rinfo->m_party[i - (signed char)s_CntTop].m_totalValue;
-						int digits[3];
+						unsigned int digits[3];
 						int digitCount;
 
 						if (value >= 100) {
@@ -2083,7 +2082,7 @@ void CMenuPcs::DrawResultCloseAnim()
 #pragma opt_dead_assignments off
 void CMenuPcs::CalcResultCloseAnim()
 {
-	const int activePartyCount = s_Rinfo->m_partyCount;
+	const unsigned int activePartyCount = s_Rinfo->m_partyCount;
 
 	if (*(signed char*)(this->m_bonusStatePtr + 0xb) == 0) {
 		int off = 0;
@@ -2150,7 +2149,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			*(int*)((int)sprite + 0x2c) = 1;
 			*(float*)(sprite + 0x1c) = (float)(int)*sprite;
 			*(float*)(sprite + 0x18) = FLOAT_80331ED0;
-			*sprite = (short)(int)((float)(int)*sprite - *(float*)(sprite + 0x18));
+			*sprite = (unsigned short)(int)((float)(int)*sprite - *(float*)(sprite + 0x18));
 		}
 
 		// sprites[digitEchoBase + pc].startFrame = sprites[1].startFrame
@@ -2174,7 +2173,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			*(int*)((int)sprite + 0x2c) = 1;
 			*(float*)(sprite + 0x1c) = (float)(int)*sprite;
 			*(float*)(sprite + 0x18) = FLOAT_80331ED0;
-			*sprite = (short)(int)((float)(int)*sprite - *(float*)(sprite + 0x18));
+			*sprite = (unsigned short)(int)((float)(int)*sprite - *(float*)(sprite + 0x18));
 		}
 
 		// extraBase + pc block: flags = 0
@@ -2246,7 +2245,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			}
 			if (frame < (int)(*(int*)(sprite + 0x12) + *(unsigned int*)(sprite + 0x14))) {
 				*(float*)(sprite + 8) =
-				    1.0f - ((float)*(int*)(sprite + 0x10) / (float)*(unsigned int*)(sprite + 0x14));
+				    1.0f - ((float)*(int*)(sprite + 0x10) / (float)*(int*)(sprite + 0x14));
 			} else {
 				*(float*)(sprite + 8) = 0.0f;
 			}
@@ -2262,7 +2261,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			float fy = (float)(int)sprite[1];
 			float ty = *(float*)(sprite + 0x1e);
 			float progress =
-			    1.0f - ((float)*(int*)(sprite + 0x10) / (float)*(unsigned int*)(sprite + 0x14));
+			    1.0f - ((float)*(int*)(sprite + 0x10) / (float)*(int*)(sprite + 0x14));
 			*(float*)(sprite + 0x18) =
 			    (*(float*)(sprite + 0x1c) - (float)(int)*sprite) * progress;
 			*(float*)(sprite + 0x1a) = (ty - fy) * progress;
@@ -2429,7 +2428,7 @@ void CMenuPcs::DrawResultCountAnim()
 							value = (int)frame;
 						}
 					}
-					int digits[3];
+					unsigned int digits[3];
 					int digitCount;
 
 					if (value >= 100) {
@@ -2554,6 +2553,7 @@ void CMenuPcs::CalcResultCountAnim()
 			sprite->timer = 0;
 		}
 
+		int newCount = countTop + activePartyCount;
 		for (int i = 0; i < 0x18; i++) {
 			CCharaPcs::CHandle* handle = GetBonusDisplayHandleSlots(this)[i];
 			if (handle != 0) {
@@ -2561,7 +2561,7 @@ void CMenuPcs::CalcResultCountAnim()
 			}
 		}
 
-		((BonusAnimHeader*)this->m_bonusAnimPtr)->count = (short)(countTop + activePartyCount);
+		((BonusAnimHeader*)this->m_bonusAnimPtr)->count = (short)newCount;
 		*(unsigned char*)(this->m_bonusStatePtr + 0xb) = 1;
 	}
 
@@ -2659,7 +2659,7 @@ void CMenuPcs::CalcResultCountAnim()
 		int padRemap = Pad.m_debugPadPort;
 		int padLock = Pad.m_debugPadLock;
 		for (int i = 0; i < s_Rinfo->m_partyCount; i++) {
-			unsigned int padIndex = s_Rinfo->m_party[i].m_partySlot;
+			int padIndex = s_Rinfo->m_party[i].m_partySlot;
 			unsigned short down;
 			unsigned char padLocked = (padLock != 0 || (padIndex == 0 && padRemap != -1));
 			if (padLocked) {
@@ -2701,7 +2701,7 @@ void CMenuPcs::DrawResultOpenAnim()
 
 		int modelIndex = 0;
 
-		for (int i = 0; i < (int)((BonusAnimList*)this->m_bonusAnimPtr)->header.count; i++) {
+		for (int i = 0; i < (unsigned int)((BonusAnimList*)this->m_bonusAnimPtr)->header.count; i++) {
 			BonusAnimSprite* sprite = &((BonusAnimList*)this->m_bonusAnimPtr)->sprites[i];
 			int kind = sprite->kind;
 
@@ -3010,7 +3010,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			count->depth = 1.0f;
 		}
 		int countTop = countBase + 1;
-		s_CntTop = (unsigned char)countTop;
+		s_CntTop = (signed char)countTop;
 
 		for (int i = 0; i < activePartyCount; i++) {
 			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + (countTop + i) * 0x40 + 8);

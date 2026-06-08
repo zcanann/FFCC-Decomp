@@ -1948,22 +1948,46 @@ int GbaQueue::GetMapObjInfo(int channel, unsigned char* outData)
 
 	OSWaitSemaphore(accessSemaphores + channel);
 
-	unsigned char* mapObj = obj + 0xB35;
-	int count = 4;
-	do {
-		unsigned char* out = outData;
-		int k;
-		for (k = 0; k < 0x10; k++) {
-			out[k] = mapObj[k * 0x14];
-		}
+	unsigned char* mapObj = obj;
+	unsigned char* out;
+	for (int count = 0; count < 4; count++) {
+		out = outData;
+		out[0] = mapObj[0xB35];
+		out[1] = mapObj[0xB49];
+		out[2] = mapObj[0xB5D];
+		out[3] = mapObj[0xB71];
+		out[4] = mapObj[0xB85];
+		out[5] = mapObj[0xB99];
+		out[6] = mapObj[0xBAD];
+		out[7] = mapObj[0xBC1];
+		out[8] = mapObj[0xBD5];
+		out[9] = mapObj[0xBE9];
+		out[0xA] = mapObj[0xBFD];
+		out[0xB] = mapObj[0xC11];
+		out[0xC] = mapObj[0xC25];
+		out[0xD] = mapObj[0xC39];
+		out[0xE] = mapObj[0xC4D];
+		out[0xF] = mapObj[0xC61];
 		mapObj += 0x140;
-		count--;
-		outData += 0x10;
-	} while (count != 0);
-
-	for (int i = 0; i < 0x10; i++) {
-		outData[i] = obj[0x2435 + i * 0x14];
+		outData = out + 0x10;
 	}
+
+	out[0x10] = obj[0x2435];
+	out[0x11] = obj[0x2449];
+	out[0x12] = obj[0x245D];
+	out[0x13] = obj[0x2471];
+	out[0x14] = obj[0x2485];
+	out[0x15] = obj[0x2499];
+	out[0x16] = obj[0x24AD];
+	out[0x17] = obj[0x24C1];
+	out[0x18] = obj[0x24D5];
+	out[0x19] = obj[0x24E9];
+	out[0x1A] = obj[0x24FD];
+	out[0x1B] = obj[0x2511];
+	out[0x1C] = obj[0x2525];
+	out[0x1D] = obj[0x2539];
+	out[0x1E] = obj[0x254D];
+	out[0x1F] = obj[0x2561];
 
 	OSSignalSemaphore(accessSemaphores + channel);
 	return 0x50;

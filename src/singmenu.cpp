@@ -3140,8 +3140,8 @@ int CMenuPcs::GetSmithItem(int itemNo)
     u16 raceType = race & 3;
     int itemBase = Game.unkCFlatData0[2] + itemNo * 0x48;
 
-    unsigned int smithItem = *reinterpret_cast<u16*>(itemBase + (race & 3) * 2 + 0x38);
-    if (smithItem != 0) {
+    int smithItem = *reinterpret_cast<u16*>((itemBase + (race & 3) * 2) + 0x38);
+    if (smithItem > 0) {
         unsigned int genderMask = 0x10;
         u16 flags = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + smithItem * 0x48 + 4);
         unsigned int raceMask = 1 << (*reinterpret_cast<u16*>(reinterpret_cast<unsigned int>(SingleCaravanWork()) + 0x3e0) & 3);
@@ -3151,10 +3151,10 @@ int CMenuPcs::GetSmithItem(int itemNo)
 
         unsigned int valid;
         if (((flags & 0xF) != 0) && ((flags & 0x30) != 0)) {
-            if (((flags & 0xF & raceMask) == 0) || ((flags & 0x30 & genderMask) == 0)) {
-                valid = 0;
-            } else {
+            if (((flags & 0xF & raceMask) != 0) && ((flags & 0x30 & genderMask) != 0)) {
                 valid = 1;
+            } else {
+                valid = 0;
             }
         } else if ((flags & 0xF) == 0) {
             valid = static_cast<unsigned int>(-static_cast<int>(flags & 0x30 & genderMask)) >> 0x1f;
@@ -3167,10 +3167,10 @@ int CMenuPcs::GetSmithItem(int itemNo)
         }
     }
 
-    if ((((((race & 3) == 0) || (smithItem = *reinterpret_cast<u16*>(itemBase + 0x38), smithItem == 0)) &&
-          ((raceType == 1) || (smithItem = *reinterpret_cast<u16*>(itemBase + 0x3A), smithItem == 0))) &&
-         ((raceType == 2) || (smithItem = *reinterpret_cast<u16*>(itemBase + 0x3C), smithItem == 0))) &&
-        ((raceType == 3) || (smithItem = *reinterpret_cast<u16*>(itemBase + 0x3E), smithItem == 0))) {
+    if ((((((race & 3) == 0) || (smithItem = *reinterpret_cast<u16*>(itemBase + 0x38), smithItem <= 0)) &&
+          ((raceType == 1) || (smithItem = *reinterpret_cast<u16*>(itemBase + 0x3A), smithItem <= 0))) &&
+         ((raceType == 2) || (smithItem = *reinterpret_cast<u16*>(itemBase + 0x3C), smithItem <= 0))) &&
+        ((raceType == 3) || (smithItem = *reinterpret_cast<u16*>(itemBase + 0x3E), smithItem <= 0))) {
         smithItem = 0xFFFFFFFF;
     }
     return smithItem;

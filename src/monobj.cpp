@@ -148,11 +148,13 @@ void CGMonObj::onFramePreCalc()
 	m_aliveFrames += 1;
 
 	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) {
-		unsigned char* aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
+		unsigned char* aiData;
 		short& aiState = m_aiState;
 		short& aiStatePrev = m_aiStatePrev;
 
-		if (aiState != 0) {
+		if (aiState == 0) {
+			aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
+		} else {
 			aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
 				(aiState + *reinterpret_cast<unsigned short*>(
 					reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x100)) * 0x1D0 + 0x10;
@@ -181,8 +183,8 @@ void CGMonObj::onFramePreCalc()
 		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 8) = m_targetPartyIndex;
 		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 0) = -1;
 
-		if ((reinterpret_cast<int>(object->m_scriptHandle[4]) < 0x9A) &&
-			(0x8E <= reinterpret_cast<int>(object->m_scriptHandle[4]))) {
+		if ((0x8E <= reinterpret_cast<int>(object->m_scriptHandle[4])) &&
+			(reinterpret_cast<int>(object->m_scriptHandle[4]) < 0x9A)) {
 			int aiLocal = 0;
 			aiAddDuct(aiLocal);
 		} else {

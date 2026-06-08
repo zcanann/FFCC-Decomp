@@ -1993,18 +1993,23 @@ int CMapMng::ReadMpl(char* mapName)
                     chunkFile.PushChunk();
                     CChunkFile::CChunk meshChunk;
                     while (chunkFile.GetNextChunk(meshChunk)) {
-                        if (meshChunk.m_id == 0x56534554) {
+                        switch (meshChunk.m_id) {
+                        case 0x56534554: {
                             short& meshCount = m_mapMeshCount;
                             if (meshCount >= 0xA0) {
                                 return 0;
                             }
                             CMapMesh* mesh = GetMapMeshArray() + meshCount;
                             mesh->ReadOtmMesh(chunkFile, m_stage, 1, 1);
-                        } else if (meshChunk.m_id == 0x44534554) {
+                            break;
+                        }
+                        case 0x44534554: {
                             short& meshCount = m_mapMeshCount;
                             CMapMesh* mesh = GetMapMeshArray() + meshCount;
                             mesh->ReadOtmMesh(chunkFile, m_stage, 1, 1);
                             meshCount += 1;
+                            break;
+                        }
                         }
                     }
                     chunkFile.PopChunk();

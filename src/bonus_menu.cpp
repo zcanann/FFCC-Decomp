@@ -1340,7 +1340,7 @@ void CMenuPcs::CalcSelectWait()
 			scaleMtx[1][3] = s_BonusModelYPos[tribeId];
 			scaleMtx[0][3] = 0.0f;
 		} else {
-			int artifactIndex = i - activePartyCount;
+			unsigned int artifactIndex = i - activePartyCount;
 			handle = GetBonusDisplayHandleSlots(this)[activePartyCount * 2 + artifactIndex];
 			if (handle == 0) {
 				continue;
@@ -1380,7 +1380,7 @@ void CMenuPcs::CalcSelectWait()
 	}
 
 	if (currentPartyIndex >= activePartyCount && delay == 0) {
-		if (*(unsigned short*)(statePtr + 0x18) >= 10) {
+		if (*(short*)(statePtr + 0x18) >= 10) {
 			*(short*)(statePtr + 0x18) = 0;
 			for (int i = 0; i < activePartyCount; i++) {
 				BonusPartySummary& summary = s_Rinfo->m_party[i];

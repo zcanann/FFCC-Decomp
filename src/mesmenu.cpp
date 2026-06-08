@@ -484,14 +484,14 @@ void CMesMenu::onDraw()
             FLOAT_803308d8);
     }
 
-    CFont* font = MenuPcs.m_fonts[0];
     if (!((m_menuIndex < 4) || (m_active != 0))) {
         return;
     }
-    if ((Game.m_gameWork.m_menuStageMode != 0) && (m_menuIndex > 0) && (m_menuIndex < 4)) {
+    if ((Game.m_gameWork.m_menuStageMode != 0) && (m_menuIndex >= 1) && (m_menuIndex < 4)) {
         return;
     }
 
+    CFont* font = MenuPcs.m_fonts[0];
     font->SetMargin(FLOAT_803308d8);
     font->SetShadow(1);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));

@@ -437,9 +437,12 @@ void birth(
         baseDirection.x = params->m_baseDirection.x;
         baseDirection.y = params->m_baseDirection.y;
         baseDirection.z = params->m_baseDirection.z;
-        angles.x = (kPppRyjMegaBirthAngleIndexScale * (float)(randomRange * Math.RandF() - halfSpread)) / kPppRyjMegaBirthModelDegrees180;
-        angles.y = (kPppRyjMegaBirthAngleIndexScale * (float)(randomRange * Math.RandF() - halfSpread)) / kPppRyjMegaBirthModelDegrees180;
-        angles.z = (kPppRyjMegaBirthAngleIndexScale * (float)(randomRange * Math.RandF() - halfSpread)) / kPppRyjMegaBirthModelDegrees180;
+        angles.x = (float)(randomRange * Math.RandF() - halfSpread);
+        angles.x = (kPppRyjMegaBirthAngleIndexScale * angles.x) / kPppRyjMegaBirthModelDegrees180;
+        angles.y = (float)(randomRange * Math.RandF() - halfSpread);
+        angles.y = (kPppRyjMegaBirthAngleIndexScale * angles.y) / kPppRyjMegaBirthModelDegrees180;
+        angles.z = (float)(randomRange * Math.RandF() - halfSpread);
+        angles.z = (kPppRyjMegaBirthAngleIndexScale * angles.z) / kPppRyjMegaBirthModelDegrees180;
 
         if ((params->m_spawnMode == 2) || (params->m_spawnMode == 3)) {
             angles.x = kPppRyjMegaBirthSharedZero;
@@ -504,30 +507,47 @@ void birth(
 
     s32 mode = params->m_spawnMode;
     if (mode < 6) {
-        if (mode >= 4) {
+        if (mode < 4) {
             if (kPppRyjMegaBirthSharedZero != params->m_speed) {
-                u8 speedMode = params->m_speedMode;
-                Vec speed;
-                speed.x = particleData->m_matrix[0][3];
-                speed.y = particleData->m_matrix[1][3];
-                speed.z = particleData->m_matrix[2][3];
-                speed.x = calc_spawn_speed(params, speedMode);
-                speed.y = calc_spawn_speed(params, speedMode);
-                speed.z = calc_spawn_speed(params, speedMode);
-                particleData->m_matrix[0][3] = speed.x;
-                particleData->m_matrix[1][3] = speed.y;
-                particleData->m_matrix[2][3] = speed.z;
+                float speedScalar = calc_direction_speed(params, params->m_speedMode);
+                Vec direction;
+                Vec position;
 
-                float speedY = particleData->m_matrix[1][3];
-                float scaleY = params->m_directionScale.y;
-                float speedZ = particleData->m_matrix[2][3];
-                float scaleZ = params->m_directionScale.z;
-                particleData->m_matrix[0][3] = particleData->m_matrix[0][3] * params->m_directionScale.x;
-                particleData->m_matrix[1][3] = speedY * scaleY;
-                particleData->m_matrix[2][3] = speedZ * scaleZ;
+                direction.x = particleData->m_matrix[0][1];
+                direction.y = particleData->m_matrix[1][1];
+                direction.z = particleData->m_matrix[2][1];
+                position.x = particleData->m_matrix[0][3];
+                position.y = particleData->m_matrix[1][3];
+                position.z = particleData->m_matrix[2][3];
+                pppScaleVectorXYZ(position, direction, speedScalar);
+                particleData->m_matrix[0][3] = position.x;
+                particleData->m_matrix[1][3] = position.y;
+                particleData->m_matrix[2][3] = position.z;
             }
             goto join_position;
         }
+        if (kPppRyjMegaBirthSharedZero != params->m_speed) {
+            u8 speedMode = params->m_speedMode;
+            Vec speed;
+            speed.x = particleData->m_matrix[0][3];
+            speed.y = particleData->m_matrix[1][3];
+            speed.z = particleData->m_matrix[2][3];
+            speed.x = calc_spawn_speed(params, speedMode);
+            speed.y = calc_spawn_speed(params, speedMode);
+            speed.z = calc_spawn_speed(params, speedMode);
+            particleData->m_matrix[0][3] = speed.x;
+            particleData->m_matrix[1][3] = speed.y;
+            particleData->m_matrix[2][3] = speed.z;
+
+            float speedY = particleData->m_matrix[1][3];
+            float scaleY = params->m_directionScale.y;
+            float speedZ = particleData->m_matrix[2][3];
+            float scaleZ = params->m_directionScale.z;
+            particleData->m_matrix[0][3] = particleData->m_matrix[0][3] * params->m_directionScale.x;
+            particleData->m_matrix[1][3] = speedY * scaleY;
+            particleData->m_matrix[2][3] = speedZ * scaleZ;
+        }
+        goto join_position;
     } else if (mode < 10) {
         s8 speedMode = params->m_speedMode;
         s16 pathIndex = *(s16*)(payload + 0x138);
@@ -589,23 +609,6 @@ void birth(
             }
         }
         goto join_position;
-    }
-
-    if (kPppRyjMegaBirthSharedZero != params->m_speed) {
-        float speedScalar = calc_direction_speed(params, params->m_speedMode);
-        Vec direction;
-        Vec position;
-
-        direction.x = particleData->m_matrix[0][1];
-        direction.y = particleData->m_matrix[1][1];
-        direction.z = particleData->m_matrix[2][1];
-        position.x = particleData->m_matrix[0][3];
-        position.y = particleData->m_matrix[1][3];
-        position.z = particleData->m_matrix[2][3];
-        pppScaleVectorXYZ(position, direction, speedScalar);
-        particleData->m_matrix[0][3] = position.x;
-        particleData->m_matrix[1][3] = position.y;
-        particleData->m_matrix[2][3] = position.z;
     }
 
 join_position:
@@ -753,9 +756,10 @@ join_position:
     *f32_at(particleData, 0x80) = params->m_directionVelocityStart;
     *f32_at(particleData, 0x84) = params->m_acceleration;
     if (params->m_directionVelocityRandom != kPppRyjMegaBirthSharedZero) {
-        *f32_at(particleData, 0x80) +=
-            kPppRyjMegaBirthModelTwoF * params->m_directionVelocityRandom * Math.RandF() -
-            params->m_directionVelocityRandom;
+        *f32_at(particleData, 0x80) =
+            *f32_at(particleData, 0x80) +
+            (float)((double)(float)((double)kPppRyjMegaBirthModelTwoF * (double)params->m_directionVelocityRandom) * (double)Math.RandF() -
+                    (double)params->m_directionVelocityRandom);
     }
 
     *f32_at(particleData, 0x88) = *(float*)(payload + 0xD0);

@@ -1203,8 +1203,6 @@ void CMenuPcs::CalcSelectWait()
 		int resolvedPadSlot = (Pad.m_debugPadPort == padSlot) ? 0 : padSlot;
 		down = Pad.m_padInputs[resolvedPadSlot].buttonDown[0];
 	}
-	int unavailableMask = GetBonusUnavailableMask(statePtr, currentParty);
-
 	if (promptMode != 3) {
 		if (promptMode == 1) {
 			if ((repeat & 3) != 0) {
@@ -1249,6 +1247,7 @@ void CMenuPcs::CalcSelectWait()
 			if ((repeat & 0xf) == 0) {
 				if ((down & 0x100) != 0) {
 					int bit = 1 << selection;
+					int unavailableMask = GetBonusUnavailableMask(statePtr, currentParty);
 					if ((unavailableMask & bit) == 0) {
 						*(unsigned char*)(statePtr + 8) = 1;
 						delay = 10;

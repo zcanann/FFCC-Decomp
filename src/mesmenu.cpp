@@ -1024,15 +1024,7 @@ void CMesMenu::onCalc()
                     if (wait5 != 4) {
                         m_closeReason = 0;
                         if (m_state < 2) {
-                            if ((m_flags & 0x40) == 0) {
-                                m_state = 2;
-                                m_stateTimer = 0;
-                                m_stateTimerMax = 4;
-                                if (((m_flags & 1) == 0) &&
-                                    ((m_flags & 0x4000) == 0)) {
-                                    Sound.PlaySe(6, 0x40, 0x7F, 0);
-                                }
-                            } else {
+                            if ((m_flags & 0x40) != 0) {
                                 CFlatRuntime::CStack stack[2];
                                 m_mes.Set(0, 0);
                                 stack[0].m_word = m_menuIndex;
@@ -1042,6 +1034,14 @@ void CMesMenu::onCalc()
                                 m_active = 0;
                                 if (m_menuIndex < 4) {
                                     MenuPcs.m_battleRingMenus[m_menuIndex]->SetFade(1);
+                                }
+                            } else {
+                                m_state = 2;
+                                m_stateTimer = 0;
+                                m_stateTimerMax = 4;
+                                if (((m_flags & 1) == 0) &&
+                                    ((m_flags & 0x4000) == 0)) {
+                                    Sound.PlaySe(6, 0x40, 0x7F, 0);
                                 }
                             }
                         }

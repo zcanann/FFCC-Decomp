@@ -391,7 +391,8 @@ static inline void CGMonObj_SetAttackAfter(CGMonObj* monObj, int attackKind)
 			clampedRange = range;
 		}
 
-		monObj->m_attackDelay = delay + Math.Rand(clampedRange);
+		delay += Math.Rand(clampedRange);
+		monObj->m_attackDelay = delay;
 		reinterpret_cast<CGPrgObj*>(monObj)->changeStat(0x11, 0, 0);
 	} else {
 		reinterpret_cast<CGPrgObj*>(monObj)->changeStat(0, 0, 0);
@@ -1617,27 +1618,27 @@ int CGMonObj::getReplaceStat(int state)
 		}
 		break;
 	default:
-	if ((state < -4) && (-0xE <= state)) {
-		unsigned short action = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + ((state + 0xE) * 2 + 0xD0));
-		unsigned short actionType = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (action * 0x48 + 0xE));
-		switch (actionType) {
-		case 0:
-		case 1:
-			state = 1;
-			break;
-		case 2:
-			state = 2;
-			break;
-		case 3:
-			state = 0x12;
-			break;
-		case 4:
-			state = 8;
-			break;
+		if ((state < -4) && (-0xE <= state)) {
+			unsigned short action = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + ((state + 0xE) * 2 + 0xD0));
+			unsigned short actionType = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (action * 0x48 + 0xE));
+			switch (actionType) {
+			case 0:
+			case 1:
+				state = 1;
+				break;
+			case 2:
+				state = 2;
+				break;
+			case 3:
+				state = 0x12;
+				break;
+			case 4:
+				state = 8;
+				break;
+			}
+		} else {
+			return CGCharaObj::getReplaceStat(state);
 		}
-	} else {
-		state = CGCharaObj::getReplaceStat(state);
-	}
 		break;
 	}
 
@@ -2839,17 +2840,19 @@ void CGMonObj::setRepop(int mode)
 		m_homePosition.y = object->unk_0x16C;
 		m_homePosition.z = object->unk_0x170;
 		object->m_worldPosition = m_homePosition;
-		object->m_rotBaseY = *reinterpret_cast<float*>(&object->m_bgFlags);
-		object->m_rotTargetY = object->m_rotBaseY;
+		float baseRot = *reinterpret_cast<float*>(&object->m_bgFlags);
+		object->m_rotBaseY = baseRot;
+		object->m_rotTargetY = baseRot;
 
-		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle) + 0x1C) =
-			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle) + 0x1A);
+		void** repopHandle = object->m_scriptHandle;
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(repopHandle) + 0x1C) =
+			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(repopHandle) + 0x1A);
 		m_targetPartyIndex = -1;
 		m_aiState = 0;
 		m_aiStatePrev = 0;
 		m_unk6C8 = 0;
 		m_unk6CC = 0;
-		mon[0x6B4] = 0;
+		m_actionBranch = 0;
 		m_unk6B8 = 0;
 		m_unk6B9 = 0;
 		m_unk6BA = 0;

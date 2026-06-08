@@ -4759,8 +4759,9 @@ int JoyBus::MakeJoyData(char* src, int length, unsigned int* outBuffer)
 int JoyBus::SendPlayerStat(ThreadParam* threadParam)
 {
     unsigned int result = 0;
+    unsigned char subState = threadParam->m_subState;
 
-    switch ((signed char)threadParam->m_subState)
+    switch (subState)
     {
     case 0:
         {

@@ -2444,13 +2444,12 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
  */
 void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 {
-	if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
-	    (MiniGamePcs.m_flags & 4) != 0) {
+	if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D && (DbgMenuPcs.GetDbgFlagsRaw() & 4) != 0) {
 		return;
 	}
 
-	unsigned int hpValue = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C);
-	unsigned int next = hpValue;
+	int hpValue = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C);
+	int next = hpValue;
 
 	if (delta > 0) {
 		unsigned short maxHp = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1A);

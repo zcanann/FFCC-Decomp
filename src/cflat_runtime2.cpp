@@ -1608,12 +1608,13 @@ void CFlatRuntime2::AddDebugDrawCC(Vec* from, Vec* to, float radius, int bit7, i
  */
 int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float radius, float angle, int maxCount, CGObject** objects)
 {
+	const float radiusSq = radius * radius;
+	CFlatRuntime::CObject* root = FlatObjectRoot(&CFlat);
+
 	if (maxCount <= 0 || objects == 0) {
 		return 0;
 	}
 
-	const float radiusSq = radius * radius;
-	CFlatRuntime::CObject* root = FlatObjectRoot(&CFlat);
 	CGBaseObj* baseObj = FindNextGBaseObjByCidMask(&CFlat, root->m_next->m_next, 5);
 	int count = 0;
 

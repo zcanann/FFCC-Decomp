@@ -3858,7 +3858,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
             {
                 GbaQue.IsSingleMode(threadParam->m_portIndex);
 
-                if (m_threadRunningMask == 0)
+                if (static_cast<signed char>(m_threadRunningMask) == 0)
                 {
                     result = 0;
                 }
@@ -4342,7 +4342,7 @@ int JoyBus::SendMapNo(ThreadParam* threadParam)
 
     unsigned int result = 0;
 
-    if (m_threadRunningMask != 0)
+    if (static_cast<signed char>(m_threadRunningMask) != 0)
     {
         OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
@@ -4968,7 +4968,7 @@ int JoyBus::SendPlayerHP(ThreadParam* threadParam)
     unsigned int cmd = hpData[0];
     int result = 0;
 
-    if (m_threadRunningMask != 0)
+    if (static_cast<signed char>(m_threadRunningMask) != 0)
     {
         OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
@@ -6657,7 +6657,7 @@ int JoyBus::SendScouInfo(ThreadParam* threadParam)
             unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + m_txWordIndex[port] * 4 + 2);
             unsigned int word = *wordPtr;
 
-            if (m_threadRunningMask == 0)
+            if (static_cast<signed char>(m_threadRunningMask) == 0)
             {
                 result = 0;
             }
@@ -6689,7 +6689,7 @@ int JoyBus::SendScouInfo(ThreadParam* threadParam)
         unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + m_txWordIndex[port] * 4 + 2);
         unsigned int word = *wordPtr;
 
-        if (m_threadRunningMask == 0)
+        if (static_cast<signed char>(m_threadRunningMask) == 0)
         {
             result = 0;
         }
@@ -6748,7 +6748,7 @@ int JoyBus::SendOpenMenu(ThreadParam* threadParam, char menuId)
     unsigned short opcode = 0x140F;
     unsigned int cmd = MakeJoyCmd16(opcode, menuId, 0);
 
-    if (m_threadRunningMask == 0)
+    if (static_cast<signed char>(m_threadRunningMask) == 0)
     {
         return 0;
     }
@@ -6792,7 +6792,7 @@ int JoyBus::SendItemUse(ThreadParam* threadParam)
     unsigned char itemId = GbaQue.GetItemUse(port);
     unsigned int cmd = MakeJoyCmd16(0x1410, itemId);
 
-    if (m_threadRunningMask == 0)
+    if (static_cast<signed char>(m_threadRunningMask) == 0)
     {
         return 0;
     }
@@ -6909,7 +6909,7 @@ int JoyBus::SendChgCmdNum(ThreadParam* threadParam)
     unsigned char cmdNum = GbaQue.GetCmdNum(threadParam->m_portIndex);
     unsigned int cmd = MakeJoyCmd16(0x1412, cmdNum, 0);
 
-    if (m_threadRunningMask == 0)
+    if (static_cast<signed char>(m_threadRunningMask) == 0)
     {
         return 0;
     }
@@ -7088,7 +7088,7 @@ int JoyBus::SetCtrlMode(int portIndex, int controlMode)
 
     int result = 0;
 
-    if (m_threadRunningMask != 0)
+    if (static_cast<signed char>(m_threadRunningMask) != 0)
     {
         unsigned int port = m_threadParams[portIndex].m_portIndex;
 
@@ -7389,7 +7389,7 @@ int JoyBus::SendAddLetter(int portIndex)
     cmdBytes[0] = 0x14;
     cmdBytes[1] = 1;
 
-    if (m_threadRunningMask != 0)
+    if (static_cast<signed char>(m_threadRunningMask) != 0)
     {
         OSWaitSemaphore(m_accessSemaphores + m_threadParams[portIndex].m_portIndex);
 

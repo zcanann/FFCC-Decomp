@@ -2637,7 +2637,7 @@ void CGMonObj::teleport(
 	if (prgObj->m_stateFrame == 0) {
 		int pdtNo;
 		object->m_bgColMask &= 0xFFF3FFFC;
-		*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags) &= 0xEF;
+		object->m_weaponNodeFlagBits.m_unk10 = 0;
 		object->m_groundHitOffset.z = kMonObjBossZero;
 		object->m_groundHitOffset.y = kMonObjBossZero;
 		object->m_groundHitOffset.x = kMonObjBossZero;
@@ -2715,8 +2715,7 @@ void CGMonObj::teleport(
 				}
 
 				object->m_bgColMask |= 3;
-				*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags) =
-					(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags) & 0xEF) | 0x10;
+				object->m_weaponNodeFlagBits.m_unk10 = 1;
 				object->m_groundHitOffset.z = kMonObjBossZero;
 				object->m_groundHitOffset.y = kMonObjBossZero;
 				object->m_groundHitOffset.x = kMonObjBossZero;

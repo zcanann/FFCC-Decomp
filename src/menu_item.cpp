@@ -304,7 +304,7 @@ int CMenuPcs::ItemCtrlCur()
 void CMenuPcs::ItemDraw()
 {
     bool foundSelected = false;
-    int selectedItemId;
+    unsigned int selectedItemId;
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -391,7 +391,7 @@ void CMenuPcs::ItemDraw()
         } else {
             float itemAlpha = alpha;
             if (tex == 0x37) {
-                int menuIndex = drawIndex + itemState->scroll;
+                unsigned int menuIndex = drawIndex + itemState->scroll;
                 if (menuIndex > 0x3F) {
                     menuIndex -= 0x40;
                 }

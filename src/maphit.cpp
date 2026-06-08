@@ -514,7 +514,8 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         Vec edge;
         Vec toPoint;
         Vec cross;
-        if (g_hit_lpface->m_projectionAxis == 1) {
+        switch (g_hit_lpface->m_projectionAxis) {
+        case 1:
             point.x = pushedHit.x;
             point.y = pushedHit.z;
             point.z = kMapHitZero;
@@ -543,7 +544,8 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
 
                 previous = current;
             }
-        } else if (g_hit_lpface->m_projectionAxis == 0) {
+            break;
+        case 0:
             point.x = pushedHit.y;
             point.y = pushedHit.z;
             point.z = kMapHitZero;
@@ -572,7 +574,8 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
 
                 previous = current;
             }
-        } else if (g_hit_lpface->m_projectionAxis < 3) {
+            break;
+        case 2:
             point.x = pushedHit.x;
             point.y = pushedHit.y;
             point.z = kMapHitZero;
@@ -601,6 +604,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
 
                 previous = current;
             }
+            break;
         }
 
         if (sideMask != 0) {

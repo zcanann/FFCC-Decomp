@@ -1956,10 +1956,11 @@ void CGMonObj::logicFuncMeteoParasiteC()
 	} else {
 		work->m_wait = (work->m_wait - 1) & ~((work->m_wait - 1) >> 31);
 		if (m_actionBranch == 0) {
-			if (work->m_wait != 0) {
+			if (work->m_wait == 0) {
+				nextState = 0x65;
+			} else {
 				return;
 			}
-			nextState = 0x65;
 		}
 	}
 	if (nextState != -1) {

@@ -3621,6 +3621,7 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 			return found;
 		}
 
+		int reqLast = reqCount - 1;
 		for (int slot = 0; slot < reqCount; slot++) {
 			CGPartyObj* obj = partyList[slot];
 			CGCharaObj* partyObj = reinterpret_cast<CGCharaObj*>(obj);
@@ -3678,7 +3679,7 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 				break;
 			}
 
-			if (slot == reqCount - 1) {
+			if (slot == reqLast) {
 				found = combiIndex;
 			}
 		}

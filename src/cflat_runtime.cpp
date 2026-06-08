@@ -504,12 +504,7 @@ int CFlatRuntime::CreateDebug(void* filePtr, int debugChunkIndex)
 								if ((static_cast<int>(chunk.m_id) < static_cast<int>('NAME'))
 								    && (chunk.m_id == 'CODE')) {
 									if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(funcs) + blockOffset + 0x30)
-									    == 0) {
-										*reinterpret_cast<void**>(reinterpret_cast<u8*>(funcs) + blockOffset + 0x3C)
-										    = 0;
-										*reinterpret_cast<void**>(reinterpret_cast<u8*>(funcs) + blockOffset + 0x38)
-										    = 0;
-									} else {
+									    != 0) {
 										*reinterpret_cast<unsigned int*>(
 											reinterpret_cast<u8*>(funcs) + blockOffset + 0x38) = chunk.m_size >> 3;
 										*reinterpret_cast<u8**>(reinterpret_cast<u8*>(funcs) + blockOffset + 0x3C)
@@ -519,6 +514,11 @@ int CFlatRuntime::CreateDebug(void* filePtr, int debugChunkIndex)
 										memcpy(
 											*reinterpret_cast<void**>(reinterpret_cast<u8*>(funcs) + blockOffset + 0x3C),
 											chunkFile.GetAddress(), chunk.m_size);
+									} else {
+										*reinterpret_cast<void**>(reinterpret_cast<u8*>(funcs) + blockOffset + 0x3C)
+										    = 0;
+										*reinterpret_cast<void**>(reinterpret_cast<u8*>(funcs) + blockOffset + 0x38)
+										    = 0;
 									}
 								}
 							}

@@ -1794,12 +1794,12 @@ void CMiniGamePcs::MngThreadMain(void*)
     int managerStackOffset = 0x1000;
     unsigned char* threadParam = self;
     unsigned char* threadState = self;
-    unsigned char* spMode = Game.m_gameWork.m_spModeFlags;
+    unsigned char* spMode = reinterpret_cast<unsigned char*>(&Game);
 
     int i = 0;
     do
     {
-        int mode = *spMode;
+        int mode = spMode[0xA];
         unsigned int imageSize = (mode == 0)
                                      ? *reinterpret_cast<unsigned int*>(self + 0x1358)
                                      : *reinterpret_cast<unsigned int*>(self + 0x1360);

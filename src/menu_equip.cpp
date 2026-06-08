@@ -956,31 +956,30 @@ int CMenuPcs::EquipOpen()
 
 		iVar6 = 0;
 		entry = GetEquipListStorage(this)->entries;
-		iVar11 = 2;
-		do {
+		for (iVar11 = 0; iVar11 < 2; iVar11++) {
 			entry[0].tex = 0x34;
 			entry[0].w = 200;
 			entry[0].h = 0x28;
 			entry[0].x = (s16)(int)-(((double)entry[0].w - dVar4) * dVar3 - dVar2);
-			entry[0].y = (s16)iVar6 * (entry[0].h - 8) + 0x60;
+			entry[0].y = iVar6 * (entry[0].h - 8) + 0x60;
 			entry[0].u = fVar1;
 			entry[0].v = fVar1;
 			entry[0].startFrame = iVar6;
+			iVar6++;
 			entry[0].duration = 3;
 
 			entry[1].tex = 0x34;
 			entry[1].w = 200;
 			entry[1].h = 0x28;
 			entry[1].x = (s16)(int)-(((double)entry[1].w - dVar4) * dVar3 - dVar2);
-			entry[1].y = (s16)(iVar6 + 1) * (entry[1].h - 8) + 0x60;
+			entry[1].y = iVar6 * (entry[1].h - 8) + 0x60;
 			entry[1].u = fVar1;
 			entry[1].v = fVar1;
-			entry[1].startFrame = iVar6 + 1;
-			iVar6 += 2;
+			entry[1].startFrame = iVar6;
+			iVar6++;
 			entry[1].duration = 3;
 			entry += 2;
-			iVar11--;
-		} while (iVar11 != 0);
+		}
 
 		GetEquipListStorage(this)->count = 4;
 		EquipInit1();

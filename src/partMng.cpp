@@ -1149,7 +1149,7 @@ void CPartMng::SetFp()
         if (mode == 2 || mode == 4) {
             mng->m_mapObjIndex = static_cast<short>(MapMng.GetMapObjEffectIdx(*reinterpret_cast<short*>(fpBytes + 0x48)));
         } else if (mode >= 3 && mode <= 8) {
-            CGObject* owner = *reinterpret_cast<CGObject**>(self + kUsbEditOffset + 0x1C);
+#define owner (*reinterpret_cast<CGObject**>(self + kUsbEditOffset + 0x1C))
             mng->m_ownerFlagA = 0;
             mng->m_owner = owner;
             mng->m_lookTarget = owner;
@@ -1162,6 +1162,7 @@ void CPartMng::SetFp()
                                                 node * 0xC0));
                 }
             }
+#undef owner
         }
 
         mng = reinterpret_cast<PppMngSetFpRaw*>(reinterpret_cast<unsigned char*>(mng) + sizeof(_pppMngSt));

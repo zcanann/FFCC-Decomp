@@ -4106,7 +4106,7 @@ void CGPartyObj::SetBonusCondition(int useRandom, int bonus0, int bonus1, int bo
 			case 2:
 				bonus = bonus2;
 				break;
-			default:
+			case 3:
 				bonus = bonus3;
 				break;
 			}

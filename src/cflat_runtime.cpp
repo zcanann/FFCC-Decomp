@@ -2303,67 +2303,9 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 			break;
 		}
 		}
-	} else if (systemIndex == -2) {
-		CObject* const engineObject = reinterpret_cast<CObject*>(object->m_engineObject);
-		const u32 scriptGroup = *object->m_localBase;
-
-		engineObject->m_next->m_previous = engineObject->m_previous;
-		engineObject->m_previous->m_next = engineObject->m_next;
-
-		CObject* const root = &m_objectSentinel;
-		CObject* begin = root->m_next;
-		CObject* it = begin;
-		do {
-			if (static_cast<int>(scriptGroup) < it->m_0x32) {
-				break;
-			}
-			it = it->m_next;
-		} while (it != begin);
-
-		it = it->m_previous;
-		engineObject->m_next = it;
-		engineObject->m_previous = it->m_previous;
-		it->m_previous->m_next = engineObject;
-		it->m_previous = engineObject;
-		engineObject->m_0x32 = static_cast<s16>(scriptGroup);
-
-		*object->m_sp++ = 0;
-		result = 0;
 	} else {
-		if (systemIndex < -2) {
-			if (systemIndex == -4) {
-				SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-				    this, object, 2, *object->m_localBase, object->m_argCount - 1,
-				    reinterpret_cast<CStack*>(object->m_localBase + 1), 0);
-				*object->m_sp++ = 0;
-				result = 0;
-				return 1;
-			}
-
-			if (-5 < systemIndex) {
-				CObject* const engineObject = reinterpret_cast<CObject*>(object->m_engineObject);
-				if ((static_cast<u32>(__cntlzw(static_cast<u32>(reinterpret_cast<u8*>(engineObject) - reinterpret_cast<u8*>(object)))) >> 5) == 0) {
-					engineObject->m_previous->m_next = engineObject->m_next;
-					engineObject->m_next->m_previous = engineObject->m_previous;
-
-					*reinterpret_cast<void**>(reinterpret_cast<u8*>(*engineObject->m_freeListNode) + 0x04) =
-					    engineObject->m_freeListNode[1];
-					*reinterpret_cast<void**>(engineObject->m_freeListNode[1]) = *engineObject->m_freeListNode;
-
-					engineObject->m_freeListNode[1] = m_objectFreeListHead;
-					m_objectFreeListHead = engineObject->m_freeListNode;
-					engineObject->m_flags = static_cast<u8>(__rlwimi(engineObject->m_flags, 0, 4, 27, 27));
-
-					onDeleteObject(engineObject);
-				} else {
-					object->m_flagBits.m_deleteFlag = 1;
-				}
-
-				*object->m_sp++ = 0;
-				result = 0;
-				return 1;
-			}
-		} else if (systemIndex < 0) {
+		switch (systemIndex) {
+		case -1: {
 			const u32 reqFlags = *reinterpret_cast<u32*>(&object->m_reqFlag0);
 			if (reqFlags != 0) {
 				*object->m_sp++ = 0;
@@ -2394,6 +2336,65 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 				return 1;
 			}
 
+			*object->m_sp++ = 0;
+			result = 0;
+			return 1;
+		}
+		case -2: {
+			CObject* const engineObject = reinterpret_cast<CObject*>(object->m_engineObject);
+			const u32 scriptGroup = *object->m_localBase;
+
+			engineObject->m_next->m_previous = engineObject->m_previous;
+			engineObject->m_previous->m_next = engineObject->m_next;
+
+			CObject* const root = &m_objectSentinel;
+			CObject* begin = root->m_next;
+			CObject* it = begin;
+			do {
+				if (static_cast<int>(scriptGroup) < it->m_0x32) {
+					break;
+				}
+				it = it->m_next;
+			} while (it != begin);
+
+			it = it->m_previous;
+			engineObject->m_next = it;
+			engineObject->m_previous = it->m_previous;
+			it->m_previous->m_next = engineObject;
+			it->m_previous = engineObject;
+			engineObject->m_0x32 = static_cast<s16>(scriptGroup);
+
+			*object->m_sp++ = 0;
+			result = 0;
+			return ret;
+		}
+		case -3: {
+			CObject* const engineObject = reinterpret_cast<CObject*>(object->m_engineObject);
+			if ((static_cast<u32>(__cntlzw(static_cast<u32>(reinterpret_cast<u8*>(engineObject) - reinterpret_cast<u8*>(object)))) >> 5) == 0) {
+				engineObject->m_previous->m_next = engineObject->m_next;
+				engineObject->m_next->m_previous = engineObject->m_previous;
+
+				*reinterpret_cast<void**>(reinterpret_cast<u8*>(*engineObject->m_freeListNode) + 0x04) =
+				    engineObject->m_freeListNode[1];
+				*reinterpret_cast<void**>(engineObject->m_freeListNode[1]) = *engineObject->m_freeListNode;
+
+				engineObject->m_freeListNode[1] = m_objectFreeListHead;
+				m_objectFreeListHead = engineObject->m_freeListNode;
+				engineObject->m_flags = static_cast<u8>(__rlwimi(engineObject->m_flags, 0, 4, 27, 27));
+
+				onDeleteObject(engineObject);
+			} else {
+				object->m_flagBits.m_deleteFlag = 1;
+			}
+
+			*object->m_sp++ = 0;
+			result = 0;
+			return 1;
+		}
+		case -4:
+			SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+			    this, object, 2, *object->m_localBase, object->m_argCount - 1,
+			    reinterpret_cast<CStack*>(object->m_localBase + 1), 0);
 			*object->m_sp++ = 0;
 			result = 0;
 			return 1;

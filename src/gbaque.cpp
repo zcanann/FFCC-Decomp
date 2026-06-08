@@ -1166,17 +1166,18 @@ void GbaQueue::SetRadarType()
 		return;
 	}
 
+	const int* wmParams = Game.m_gameWork.m_wmBackupParams;
 	validMemberCount = 0;
-	if (Game.m_gameWork.m_wmBackupParams[0] >= 0) {
+	if (wmParams[0] >= 0) {
 		validMemberCount++;
 	}
-	if (Game.m_gameWork.m_wmBackupParams[1] >= 0) {
+	if (wmParams[1] >= 0) {
 		validMemberCount++;
 	}
-	if (Game.m_gameWork.m_wmBackupParams[2] >= 0) {
+	if (wmParams[2] >= 0) {
 		validMemberCount++;
 	}
-	if (Game.m_gameWork.m_wmBackupParams[3] >= 0) {
+	if (wmParams[3] >= 0) {
 		validMemberCount++;
 	}
 

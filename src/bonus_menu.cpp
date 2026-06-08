@@ -3446,7 +3446,7 @@ void CMenuPcs::createBonus()
 			s_Rinfo->m_party[activeCount].m_partySlot = i;
 			s_Rinfo->m_party[activeCount].m_partyHandle =
 			    *reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(Game.m_partyObjArr[i]) + 0xF8);
-			s_Rinfo->m_party[activeCount].m_partyHandle->m_model->m_lightAlpha = 0.0f;
+			s_Rinfo->m_party[activeCount].m_partyHandle->m_model->m_lightAlpha = kBonusZClearOrigin;
 			s_Rinfo->m_party[activeCount].m_bonusCondition = (int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_bonusCondition;
 			int foodValue = (int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_artifactRelated[3] + (int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_artifactRelated[4];
 			int foodClamped;

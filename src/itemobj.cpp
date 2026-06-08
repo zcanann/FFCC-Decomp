@@ -612,7 +612,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 
 	if ((*(unsigned int*)(self + 0x5C) & 0x10) != 0 && canSystemCall != 0) {
 		stack[0].m_word = 3;
-		stack[1].m_word = static_cast<unsigned int>((-carryState | carryState) >> 0x1F);
+		stack[1].m_word = static_cast<unsigned int>(-carryState | carryState) >> 0x1F;
 		stack[2].m_word = 0;
 		gCFlatRuntime().SystemCall(0, 1, 9, 3, stack, 0);
 	}

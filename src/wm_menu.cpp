@@ -7563,7 +7563,9 @@ LAB_calc:
 		    static_cast<float>(DOUBLE_803314a8 * static_cast<double>(s_YearTrns.data[s_YearTrns.count * 4 - 4]))) {
 			float t = (float)(uVar) / FLOAT_803314c0;
 			float fVar5 = fDc;
-			if (t < s_YearTrns.data[s_YearTrns.count * 4 - 4]) {
+			if (t >= s_YearTrns.data[s_YearTrns.count * 4 - 4]) {
+				fVar5 = s_YearTrns.data[s_YearTrns.count * 4 - 3];
+			} else {
 				float* pf = s_YearTrns.data;
 				int cnt = s_YearTrns.count;
 				for (int idx = 0; idx < cnt; idx++, pf += 4) {
@@ -7584,14 +7586,14 @@ LAB_calc:
 						break;
 					}
 				}
-			} else {
-				fVar5 = s_YearTrns.data[s_YearTrns.count * 4 - 3];
 			}
 			*reinterpret_cast<short*>(base + 0xD2) =
 			    static_cast<short>(static_cast<int>(static_cast<float>(*reinterpret_cast<short*>(base + 0xD2)) + fVar5));
 
 			float fVar1 = fDc;
-			if (t < DAT_8032e8cc[DAT_8032e8c8 * 4 - 4]) {
+			if (t >= DAT_8032e8cc[DAT_8032e8c8 * 4 - 4]) {
+				fVar1 = DAT_8032e8cc[DAT_8032e8c8 * 4 - 3];
+			} else {
 				float* pf = DAT_8032e8cc;
 				int cnt = DAT_8032e8c8;
 				for (int idx = 0; idx < cnt; idx++, pf += 4) {
@@ -7612,8 +7614,6 @@ LAB_calc:
 						break;
 					}
 				}
-			} else {
-				fVar1 = DAT_8032e8cc[DAT_8032e8c8 * 4 - 3];
 			}
 			*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xE0) = fVar1;
 
@@ -7623,7 +7623,9 @@ LAB_calc:
 			}
 			t = (float)(uVar) / FLOAT_803314c0;
 			fVar5 = fDc;
-			if (t < s_YearTrns.data[s_YearTrns.count * 4 - 4]) {
+			if (t >= s_YearTrns.data[s_YearTrns.count * 4 - 4]) {
+				fVar5 = s_YearTrns.data[s_YearTrns.count * 4 - 3];
+			} else {
 				float* pf = s_YearTrns.data;
 				int cnt = s_YearTrns.count;
 				for (int idx = 0; idx < cnt; idx++, pf += 4) {
@@ -7644,14 +7646,14 @@ LAB_calc:
 						break;
 					}
 				}
-			} else {
-				fVar5 = s_YearTrns.data[s_YearTrns.count * 4 - 3];
 			}
 			*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xB6) =
 			    static_cast<short>(static_cast<int>(
 			        static_cast<float>(*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xB6)) + fVar5));
 
-			if (t < DAT_8032e8cc[DAT_8032e8c8 * 4 - 4]) {
+			if (t >= DAT_8032e8cc[DAT_8032e8c8 * 4 - 4]) {
+				fVar1 = DAT_8032e8cc[DAT_8032e8c8 * 4 - 3];
+			} else {
 				float* pf = DAT_8032e8cc;
 				int cnt = DAT_8032e8c8;
 				for (int idx = 0; idx < cnt; idx++, pf += 4) {
@@ -7672,8 +7674,6 @@ LAB_calc:
 						break;
 					}
 				}
-			} else {
-				fVar1 = DAT_8032e8cc[DAT_8032e8c8 * 4 - 3];
 			}
 			*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xC4) = fVar1;
 			*reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_frameData) + 8) =

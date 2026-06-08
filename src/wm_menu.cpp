@@ -6250,14 +6250,12 @@ double CMenuPcs::GetFcvValue(CMenuPcs::FCV fcv, float value)
 	if (keyCount < 1) {
 		return static_cast<double>(FLOAT_803313dc);
 	}
-
-	while (t > *cur) {
+	for (int rem = keyCount; rem > 0; rem--) {
+		if (t <= *cur) {
+			break;
+		}
 		cur = cur + 4;
 		idx = idx + 1;
-		keyCount = keyCount - 1;
-		if (keyCount == 0) {
-			return static_cast<double>(FLOAT_803313dc);
-		}
 	}
 
 	if (idx == 0) {

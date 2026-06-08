@@ -1211,7 +1211,7 @@ void CMenuPcs::DrawOptionMenu()
 		unsigned int sideWidth = sideTexture->m_width;
 		unsigned int sideHeight = sideTexture->m_height;
 		const f32* row = &layoutBase[10];
-		signed char secondValue = m_gameInitMode;
+		unsigned char secondValue = m_gameInitMode;
 		char* firstText = langStrings[12];
 		char* secondText = langStrings[13];
 		float leftX = row[0];
@@ -1484,7 +1484,7 @@ void CMenuPcs::DrawOptionMenu()
 	case 4: {
 		CTextureSet* textureSet = GetMenuTextureSet(this, 0xBC);
 		color.a = static_cast<unsigned char>(static_cast<int>(kOptionMenuAlphaMax * m_optionColumnAnim));
-		unsigned int rowAnimFrame;
+		int rowAnimFrame;
 		if (static_cast<double>(m_optionRowAnim) < kOptionDefaultTextScale) {
 			rowAnimFrame = static_cast<unsigned int>(static_cast<int>(m_optionRowAnim / kOptionSpecialRowFrameStep));
 		} else {
@@ -1495,7 +1495,7 @@ void CMenuPcs::DrawOptionMenu()
 
 		int y = 0;
 		unsigned int uvY = 0;
-		unsigned int modeU = 0x280;
+		int modeU = 0x280;
 		for (int i = 0; i < 4; i++, y += 0x28, uvY += 0x20, modeU += 0x40) {
 			if ((m_specialModeEdit != 0) && (m_specialModeCursor == i)) {
 				CTexture* cursorPanel = GetTextureSetTexture(textureSet, 4);

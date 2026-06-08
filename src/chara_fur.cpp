@@ -1812,7 +1812,145 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 				GXLoadTexObj(&texObj, GX_TEXMAP1);
 
 				const float shellOffset = furLength * (static_cast<float>(layer) * 0.125f);
-				DrawFurDisplayListShell(mesh, displayList, shellOffset, posQuant, normQuant);
+				{
+					register const FurMeshRaw* meshReg = mesh;
+					register float shellReg = shellOffset;
+					register const unsigned char* cursorReg =
+					    reinterpret_cast<const unsigned char*>(displayList->m_data);
+					register int remainingReg = displayList->m_size;
+					register int cmdReg;
+					register int countReg;
+					Vec posScratch;
+					register float* psPtr = reinterpret_cast<float*>(&posScratch);
+					asm {
+						b _furChk
+					_furCmd:
+						lbz r3, 0x0(cursorReg)
+						lhz r0, 0x1(cursorReg)
+						addi cursorReg, cursorReg, 0x3
+						rlwinm r3, r3, 0, 24, 28
+						clrlslwi r4, r0, 16, 3
+						mr countReg, r0
+						addi r0, r4, 0x3
+						cmpwi r3, 0x90
+						mr cmdReg, cursorReg
+						subf remainingReg, r0, remainingReg
+						beq _furBegin
+						cmpwi r3, 0x98
+						bne _furSkip
+					_furBegin:
+						clrlwi r5, countReg, 16
+						li r4, 0x0
+						bl GXBegin
+						cmpwi countReg, 0x0
+						mr r3, countReg
+						lis r4, 0xcc01
+						beq _furEnd
+						srwi. r0, countReg, 1
+						mtctr r0
+						beq _furOddInit
+					_furPair:
+						lhz r5, 0x0(cmdReg)
+						lhz r0, 0x2(cmdReg)
+						mulli r6, r5, 0x6
+						lwz r7, 0xc(meshReg)
+						lwz r5, 0x10(meshReg)
+						mulli r0, r0, 0x6
+						add r6, r7, r6
+						add r5, r5, r0
+						psq_l f0, 0x0(r5), 0, 6
+						psq_l f1, 0x0(r6), 0, 5
+						psq_l f2, 0x4(r5), 1, 6
+						psq_l f3, 0x4(r6), 1, 5
+						ps_madd f0, f0, shellReg, f1
+						ps_madd f2, f2, shellReg, f3
+						psq_st f0, 0(psPtr), 0, 0
+						lfs f0, 0(psPtr)
+						psq_st f2, 8(psPtr), 1, 0
+						lfs f1, 4(psPtr)
+						stfs f0, -0x8000(r4)
+						lfs f0, 8(psPtr)
+						stfs f1, -0x8000(r4)
+						stfs f0, -0x8000(r4)
+						lhz r0, 0x2(cmdReg)
+						sth r0, -0x8000(r4)
+						lhz r0, 0x6(cmdReg)
+						sth r0, -0x8000(r4)
+						lhz r5, 0x8(cmdReg)
+						lhz r0, 0xa(cmdReg)
+						mulli r6, r5, 0x6
+						lwz r7, 0xc(meshReg)
+						lwz r5, 0x10(meshReg)
+						mulli r0, r0, 0x6
+						add r6, r7, r6
+						add r5, r5, r0
+						psq_l f0, 0x0(r5), 0, 6
+						psq_l f1, 0x0(r6), 0, 5
+						psq_l f2, 0x4(r5), 1, 6
+						psq_l f3, 0x4(r6), 1, 5
+						ps_madd f0, f0, shellReg, f1
+						ps_madd f2, f2, shellReg, f3
+						psq_st f0, 0(psPtr), 0, 0
+						lfs f0, 0(psPtr)
+						psq_st f2, 8(psPtr), 1, 0
+						lfs f1, 4(psPtr)
+						stfs f0, -0x8000(r4)
+						lfs f0, 8(psPtr)
+						stfs f1, -0x8000(r4)
+						stfs f0, -0x8000(r4)
+						lhz r0, 0xa(cmdReg)
+						sth r0, -0x8000(r4)
+						lhz r0, 0xe(cmdReg)
+						addi cmdReg, cmdReg, 0x10
+						sth r0, -0x8000(r4)
+						bdnz _furPair
+						andi. r3, r3, 0x1
+						beq _furEnd
+					_furOddInit:
+						mtctr r3
+					_furOdd:
+						lhz r5, 0x0(cmdReg)
+						lhz r0, 0x2(cmdReg)
+						mulli r6, r5, 0x6
+						lwz r7, 0xc(meshReg)
+						lwz r5, 0x10(meshReg)
+						mulli r0, r0, 0x6
+						add r6, r7, r6
+						add r5, r5, r0
+						psq_l f0, 0x0(r5), 0, 6
+						psq_l f1, 0x0(r6), 0, 5
+						psq_l f2, 0x4(r5), 1, 6
+						psq_l f3, 0x4(r6), 1, 5
+						ps_madd f0, f0, shellReg, f1
+						ps_madd f2, f2, shellReg, f3
+						psq_st f0, 0(psPtr), 0, 0
+						lfs f0, 0(psPtr)
+						psq_st f2, 8(psPtr), 1, 0
+						lfs f1, 4(psPtr)
+						stfs f0, -0x8000(r4)
+						lfs f0, 8(psPtr)
+						stfs f1, -0x8000(r4)
+						stfs f0, -0x8000(r4)
+						lhz r0, 0x2(cmdReg)
+						sth r0, -0x8000(r4)
+						lhz r0, 0x6(cmdReg)
+						addi cmdReg, cmdReg, 0x8
+						sth r0, -0x8000(r4)
+						bdnz _furOdd
+						b _furEnd
+					_furSkip:
+						cmpwi r3, 0x0
+						beq _furDone
+						b _furChk2
+					_furEnd:
+						mr cursorReg, cmdReg
+					_furChk:
+						cmpwi remainingReg, 0x0
+						bne _furCmd
+					_furChk2:
+					_furDone:
+					}
+				}
 			}
 		}
 	}

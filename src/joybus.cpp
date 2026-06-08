@@ -7037,6 +7037,7 @@ int JoyBus::ChgCtrlMode(int portIndex)
         unsigned char* wordBytes = reinterpret_cast<unsigned char*>(&word);
         wordBytes[0] = 0x09;
         wordBytes[1] = mode;
+        unsigned int wordCache = word;
         int ret = 0;
 
         if (m_threadRunningMask != 0)
@@ -7051,7 +7052,7 @@ int JoyBus::ChgCtrlMode(int portIndex)
             }
             else
             {
-                m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = word;
+                m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = wordCache;
                 queuePort = m_threadParams[portIndex].m_portIndex;
                 m_cmdCount[queuePort] = m_cmdCount[queuePort] + 1;
 

@@ -1608,7 +1608,7 @@ bool CMenuPcs::LetterConfirmOpen()
 		}
 		case 3: {
 			const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
-			sprintf(lines[0], s_fmt_pcts_pcts, title, GetMenuStr(0x26));
+			sprintf(lines[0], s_fmt_pcts_pcts, GetMenuStr(0x26), title);
 			break;
 		}
 		case 5: {

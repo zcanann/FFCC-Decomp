@@ -1485,10 +1485,10 @@ void CMenuPcs::DrawOptionMenu()
 		CTextureSet* textureSet = GetMenuTextureSet(this, 0xBC);
 		color.a = static_cast<unsigned char>(static_cast<int>(kOptionMenuAlphaMax * m_optionColumnAnim));
 		unsigned int rowAnimFrame;
-		if (static_cast<double>(m_optionRowAnim) >= kOptionDefaultTextScale) {
-			rowAnimFrame = 0xD;
-		} else {
+		if (static_cast<double>(m_optionRowAnim) < kOptionDefaultTextScale) {
 			rowAnimFrame = static_cast<unsigned int>(static_cast<int>(m_optionRowAnim / kOptionSpecialRowFrameStep));
+		} else {
+			rowAnimFrame = 0xD;
 		}
 		const float specialRowCos = static_cast<float>(
 			cos(static_cast<double>(kOptionDegToRad * static_cast<float>(rowAnimFrame) * kOptionSpecialRowAngleStep)));

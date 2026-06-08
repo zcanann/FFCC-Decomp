@@ -276,8 +276,8 @@ void CPartMng::Create()
     ppvZeroVector.y = kPartMngZero;
     ppvZeroVector.z = kPartMngZero;
 
-    gPppInConstructor = 0;
-    gPppInSubFrameCalc = 0;
+    ppvIsLoopCalc = 0;
+    ppvIs2ndCalc = 0;
 
     PSMTXIdentity(ppvWorldMatrix);
     PSMTXIdentity(ppvWorldMatrix);

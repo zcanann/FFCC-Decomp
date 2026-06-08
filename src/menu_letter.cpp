@@ -2218,7 +2218,7 @@ int CMenuPcs::LetterCtrlCur()
 		*reinterpret_cast<int*>(openAnim + 0x70) = 10;
 
 		float f = FLOAT_803330f8;
-		int panelCount = static_cast<int>(GetLetterAnimStorage(this)->count);
+		unsigned int panelCount = static_cast<int>(GetLetterAnimStorage(this)->count);
 		s16* panel = GetLetterPanelBase(this);
 		for (int i = 0; i < panelCount; ++i, panel += 0x20) {
 			*reinterpret_cast<int*>(panel + 0x10) = 0;
@@ -2559,7 +2559,7 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 	double decoY0 = y0 - DOUBLE_80333100;
 	double decoX1 = DOUBLE_80333100 + decoX0;
 	double decoY1 = DOUBLE_80333100 + static_cast<double>(static_cast<float>(yh - static_cast<double>(FLOAT_8033310c)));
-	for (int i = 0; i < 4; ++i) {
+	for (unsigned int i = 0; i < 4; ++i) {
 		double x;
 		if ((i & 1) == 0) {
 			x = x0 - static_cast<double>(FLOAT_80333110);

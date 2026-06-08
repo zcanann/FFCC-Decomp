@@ -72,8 +72,6 @@ void CMenuPcs::CompaDraw()
 			float h = static_cast<float>(entry->h);
 			float u = entry->u;
 			float v = entry->v;
-			float alpha = entry->alpha;
-			float uvScale = entry->uvScale;
 
 			if (i < 3) {
 				MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
@@ -98,33 +96,33 @@ void CMenuPcs::CompaDraw()
 				colors[3].a = 0xFF;
 				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 
-				float fillW = alpha * w;
+				float fillW = entry->alpha * w;
 				if (fillW > kCompaZero) {
 					if (tex == 0x51) {
 						int yStep = static_cast<int>(y);
 						float end = y + h;
 						while (static_cast<float>(yStep) < end) {
-							int tileH = static_cast<int>(end - static_cast<float>(yStep));
+							int tileH = static_cast<unsigned int>(end - static_cast<float>(yStep));
 							if (static_cast<float>(tileH) > kCompaTileHeight) {
 								tileH = 0x18;
 							}
 							MenuPcs.DrawRect(
 								static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
 								fillW, static_cast<float>(tileH), u, v,
-								colors, uvScale, kCompaOne, kCompaZero);
+								colors, kCompaOne, kCompaOne, kCompaZero);
 							yStep += 0x18;
 						}
 					} else {
 						MenuPcs.DrawRect(
 							static_cast<unsigned long>(entry->drawFlags), x, y, fillW, h, u, v,
-							colors, uvScale, kCompaOne, kCompaZero);
+							colors, kCompaOne, kCompaOne, kCompaZero);
 					}
 
 					u += fillW;
-					x += fillW * uvScale;
+					x += fillW * entry->uvScale;
 				}
 
-				if (fillW > kCompaZero && fillW < w) {
+				if (fillW > kCompaZero && fillW < static_cast<float>(entry->w)) {
 					colors[1].r = 0xFF;
 					colors[1].g = 0xFF;
 					colors[1].b = 0xFF;
@@ -133,30 +131,29 @@ void CMenuPcs::CompaDraw()
 					colors[3].g = 0xFF;
 					colors[3].b = 0xFF;
 					colors[3].a = 0;
-					float remainW = static_cast<float>((LoadDouble(kCompaOneDouble) / (double)entry->duration) * (double)w);
+					float remainW = static_cast<float>((LoadDouble(kCompaOneDouble) / (double)entry->duration) * (double)static_cast<float>(entry->w));
 					if (tex == 0x51) {
 						int yStep = static_cast<int>(y);
 						float end = y + h;
 						while (static_cast<float>(yStep) < end) {
-							int tileH = static_cast<int>(end - static_cast<float>(yStep));
-							if (static_cast<float>(tileH) > kCompaTileHeight) {
-								tileH = 0x18;
-							}
+							float diff = end - static_cast<float>(yStep);
+							int tileH = (diff >= kCompaTileHeight) ? 0x18 : static_cast<int>(diff);
 							MenuPcs.DrawRect(
 								static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
 								remainW, static_cast<float>(tileH), u, v,
-								colors, uvScale, kCompaOne, kCompaZero);
+								colors, kCompaOne, kCompaOne, kCompaZero);
 							yStep += 0x18;
 						}
 					} else {
 						MenuPcs.DrawRect(
 							static_cast<unsigned long>(entry->drawFlags), x, y, remainW, h, u, v,
-							colors, uvScale, kCompaOne, kCompaZero);
+							colors, kCompaOne, kCompaOne, kCompaZero);
 					}
 				}
 
 				MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 			} else {
+				float alpha = entry->alpha;
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
 				GXColor color;
 				color.r = 0xFF;
@@ -164,7 +161,7 @@ void CMenuPcs::CompaDraw()
 				color.b = 0xFF;
 				color.a = static_cast<unsigned char>(alpha * kCompaColorMax);
 				GXSetChanMatColor(GX_COLOR0A0, color);
-				MenuPcs.DrawRect(0, x, y, w, h, u, v, uvScale, uvScale, kCompaZero);
+				MenuPcs.DrawRect(0, x, y, w, h, u, v, entry->uvScale, entry->uvScale, kCompaZero);
 			}
 		}
 
@@ -217,19 +214,20 @@ void CMenuPcs::CompaDraw()
 			}
 		}
 
-		u8 food = Game.m_gameWork.m_linkTable[caravanWork->m_saveSlot][0][caravanWork->m_saveSlot][drawIndex + 1];
-		if (food == 0 && System.m_execParam >= 1) {
+		const u8* foodPtr = &Game.m_gameWork.m_linkTable[caravanWork->m_saveSlot][0][caravanWork->m_saveSlot][drawIndex + 1];
+		if (*foodPtr == 0 && System.m_execParam >= 1) {
 			System.Printf(const_cast<char*>(sCompaFamilyCountErrorFmt), s_menu_compa_cpp, 0x1E0,
 			              shown);
 		}
+		u8 food = *foodPtr;
 		int icon = 0x1D;
-		if (food < 0x15) {
+		if (food <= 0x14) {
 			icon = 0x21;
-		} else if (food < 0x29) {
+		} else if (food <= 0x28) {
 			icon = 0x20;
-		} else if (food < 0x3D) {
+		} else if (food <= 0x3C) {
 			icon = 0x1F;
-		} else if (food < 0x51) {
+		} else if (food <= 0x50) {
 			icon = 0x1E;
 		}
 
@@ -459,13 +457,11 @@ noReset:
 		setupEntry->startFrame = 7;
 		setupEntry->duration = 5;
 
-		unsigned int entryCount = compaList->count;
-		CompaOpenAnim* entry = compaList->entries;
-		while (entryCount != 0) {
+		CompaOpenAnim* entry = this->m_compaList->entries;
+		for (int entryCount = this->m_compaList->count; entryCount > 0; entryCount--) {
 			entry->frame = 0;
 			entry->alpha = LoadFloat(kCompaOne);
 			entry++;
-			entryCount--;
 		}
 	}
 }

@@ -814,7 +814,7 @@ void CGMonObj::isValidTarget()
 
 check_home:
 	if ((homeDist < kMonObjHomeSnapDistance) ||
-	    (static_cast<unsigned int>(m_chaseTimer) == *reinterpret_cast<unsigned short*>(script9 + 0x1B8))) {
+	    (m_chaseTimer == static_cast<int>(*reinterpret_cast<unsigned short*>(script9 + 0x1B8)))) {
 		m_homePosition = *reinterpret_cast<Vec*>(mon + 0x15C);
 		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
 		memset(&m_moveWork, 0, sizeof(m_moveWork));

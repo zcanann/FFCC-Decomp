@@ -1600,7 +1600,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 			for (unsigned int layer = 0; layer < 8; layer++) {
 				GXTexObj texObj;
 				void* texData = reinterpret_cast<unsigned char*>(gMogFurTexBuffer) + (layer * 0x4000);
-				GXInitTexObj(&texObj, texData, 0x80, 0x80, GX_TF_RGB5A3, GX_CLAMP, GX_CLAMP, GX_FALSE);
+				GXInitTexObj(&texObj, texData, 0x80, 0x80, GX_TF_IA4, GX_REPEAT, GX_REPEAT, GX_FALSE);
 				GXLoadTexObj(&texObj, GX_TEXMAP1);
 
 				const float shellOffset = furLength * (static_cast<float>(layer) * 0.125f);

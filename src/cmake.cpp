@@ -2211,27 +2211,34 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
                     return 0;
                 }
 
-                int duplicateSlot = 8;
+                int slot = 0;
+                int duplicateSlot;
                 unsigned char* entry = reinterpret_cast<unsigned char*>(&Game);
-                for (int slot = 0; slot < 8; slot += 2, entry += 0x1860) {
-                    if (((*reinterpret_cast<int*>(entry + 0x1794) != 0) &&
-                         (*(entry + 0x1F96) != 1) &&
-                         (*reinterpret_cast<unsigned short*>(entry + 0x17D0) == CmakeState(this)->m_select) &&
-                         (*reinterpret_cast<unsigned short*>(entry + 0x17D4) == CmakeState(this)->m_row) &&
-                         (duplicateSlot = slot,
-                          *reinterpret_cast<unsigned short*>(entry + 0x17D2) == s_CmakeInfo.m_gender)) ||
-                        ((*reinterpret_cast<int*>(entry + 0x23C4) != 0) &&
-                         (*(entry + 0x2BC6) != 1) &&
-                         (*reinterpret_cast<unsigned short*>(entry + 0x2400) == CmakeState(this)->m_select) &&
-                         (*reinterpret_cast<unsigned short*>(entry + 0x2404) == CmakeState(this)->m_row) &&
-                         (duplicateSlot = slot + 1,
-                          *reinterpret_cast<unsigned short*>(entry + 0x2402) == s_CmakeInfo.m_gender))) {
+                for (int iter = 0; iter < 4; ++iter) {
+                    if ((*reinterpret_cast<int*>(entry + 0x1794) != 0) &&
+                        (*(entry + 0x1F96) != 1) &&
+                        (*reinterpret_cast<unsigned short*>(entry + 0x17D0) == CmakeState(this)->m_select) &&
+                        (*reinterpret_cast<unsigned short*>(entry + 0x17D4) == CmakeState(this)->m_row) &&
+                        (duplicateSlot = slot,
+                         *reinterpret_cast<unsigned short*>(entry + 0x17D2) == s_CmakeInfo.m_gender)) {
                         break;
                     }
-                    duplicateSlot = slot + 2;
+                    ++slot;
+                    entry += 0xC30;
+                    if ((*reinterpret_cast<int*>(entry + 0x1794) != 0) &&
+                        (*(entry + 0x1F96) != 1) &&
+                        (*reinterpret_cast<unsigned short*>(entry + 0x17D0) == CmakeState(this)->m_select) &&
+                        (*reinterpret_cast<unsigned short*>(entry + 0x17D4) == CmakeState(this)->m_row) &&
+                        (duplicateSlot = slot,
+                         *reinterpret_cast<unsigned short*>(entry + 0x17D2) == s_CmakeInfo.m_gender)) {
+                        break;
+                    }
+                    ++slot;
+                    entry += 0xC30;
+                    duplicateSlot = slot;
                 }
 
-                if (duplicateSlot > 7) {
+                if (slot > 7) {
                     s_CmakeInfo.m_tribe = static_cast<signed char>(CmakeState(this)->m_select);
                     s_CmakeInfo.m_hair = static_cast<signed char>(CmakeState(this)->m_row);
                     ChgModel(static_cast<int>(CmakeSlot(this)),

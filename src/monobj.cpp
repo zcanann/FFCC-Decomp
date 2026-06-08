@@ -1119,8 +1119,8 @@ void CGMonObj::onFrameStat()
 		if (prgObj->m_stateFrame == 0) {
 			prgObj->reqAnim(-1, 0, 0);
 		}
-		if (Math.Rand(0x32) == 0) {
-			if (Math.Rand(2) == 0) {
+		if (static_cast<unsigned int>(Math.Rand(0x32)) == 0) {
+			if (static_cast<unsigned int>(Math.Rand(2)) == 0) {
 				object->m_rotTargetY += 0.2f;
 			} else {
 				object->m_rotTargetY -= 0.2f;

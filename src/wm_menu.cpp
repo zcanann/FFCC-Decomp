@@ -12208,7 +12208,7 @@ void CMenuPcs::BindMcObj()
 			effectA->m_effectNo = -1;
 		}
 
-		EffectInfo* const effectB = effectA + 1;
+		EffectInfo* const effectB = effectA + 4;
 		if (effectB->m_partNo >= 0) {
 			PartMng.pppDeletePart(effectB->m_partNo);
 			effectB->m_partNo = -1;

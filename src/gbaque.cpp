@@ -1550,16 +1550,16 @@ void GbaQueue::LoadEnemyStat()
 				int isDispRadarMask = -isDispRadar | isDispRadar;
 				enemyEntry[2] = static_cast<unsigned char>(isDispRadarMask >> 31);
 				*reinterpret_cast<unsigned short*>(enemyEntry + 0xC) =
-				    *reinterpret_cast<unsigned short*>(reinterpret_cast<char*>(enemyObj) + 0x510);
+				    *reinterpret_cast<short*>(reinterpret_cast<char*>(enemyObj) + 0x510);
 				*reinterpret_cast<unsigned short*>(enemyEntry + 0xE) =
-				    *reinterpret_cast<unsigned short*>(reinterpret_cast<char*>(enemyObj) + 0x512);
+				    *reinterpret_cast<short*>(reinterpret_cast<char*>(enemyObj) + 0x512);
 				*reinterpret_cast<unsigned short*>(enemyEntry + 0x10) =
-				    *reinterpret_cast<unsigned short*>(reinterpret_cast<char*>(enemyObj) + 0x514);
+				    *reinterpret_cast<short*>(reinterpret_cast<char*>(enemyObj) + 0x514);
 				*reinterpret_cast<unsigned short*>(enemyEntry + 0x12) =
-				    *reinterpret_cast<unsigned short*>(reinterpret_cast<char*>(enemyObj) + 0x516);
+				    *reinterpret_cast<short*>(reinterpret_cast<char*>(enemyObj) + 0x516);
 				long long posX = static_cast<int>(enemyObj->m_worldPosition.x / kGbaQueueMapCoordScale);
-				*reinterpret_cast<short*>(enemyEntry + 8) = static_cast<short>(posX);
 				long long posZ = static_cast<int>(enemyObj->m_worldPosition.z / kGbaQueueMapCoordScale);
+				*reinterpret_cast<short*>(enemyEntry + 8) = static_cast<short>(posX);
 				*reinterpret_cast<short*>(enemyEntry + 0xA) = static_cast<short>(posZ);
 			}
 

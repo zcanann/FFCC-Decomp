@@ -887,7 +887,7 @@ void CGPartyObj::onFrameAlways()
 			LoadShield(-1);
 		} else {
 			int shieldModel = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + shieldItem * 0x48 + 2) & 0xFFF;
-			if (m_shieldModelHandle == nullptr || m_shieldModelHandle->m_charaNo != shieldModel) {
+			if (m_shieldModelHandle == nullptr || static_cast<unsigned int>(m_shieldModelHandle->m_charaNo) != static_cast<unsigned int>(shieldModel)) {
 				LoadShield(shieldModel);
 			}
 		}

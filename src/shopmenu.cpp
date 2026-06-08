@@ -2998,6 +2998,8 @@ inline void CShopMenu::SelectSOUBI()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_dead_assignments off
 void CShopMenu::Calc()
 {
     int mode = m_mode;
@@ -3224,6 +3226,7 @@ void CShopMenu::Calc()
         gShopMenuInputLatch = 0;
     }
 }
+#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x801588ac

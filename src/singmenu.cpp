@@ -601,14 +601,15 @@ extern char s_Continuar_801DDCE0[], s_Extraer_801DDCEC[];
 char* CMenuPcs::GetAttrStr(int index)
 {
     switch (Game.m_gameWork.m_languageId) {
-        case 1:
-            return (char*)gSingMenuAttrTableDe[index];
         case 2:
-            return (char*)gSingMenuAttrTableIt[index];
+            return (char*)gSingMenuAttrTableDe[index];
         case 3:
-            return (char*)gSingMenuAttrTableFr[index];
+            return (char*)gSingMenuAttrTableIt[index];
         case 4:
+            return (char*)gSingMenuAttrTableFr[index];
+        case 5:
             return (char*)gSingMenuAttrTableEs[index];
+        case 1:
         default:
             return (char*)gSingMenuAttrTableEn[index];
     }
@@ -617,14 +618,15 @@ char* CMenuPcs::GetAttrStr(int index)
 char* CMenuPcs::GetMenuStr(int index)
 {
     switch (Game.m_gameWork.m_languageId) {
-        case 1:
-            return (char*)gSingMenuTextTableDe[index];
         case 2:
-            return (char*)gSingMenuTextTableIt[index];
+            return (char*)gSingMenuTextTableDe[index];
         case 3:
-            return (char*)gSingMenuTextTableFr[index];
+            return (char*)gSingMenuTextTableIt[index];
         case 4:
+            return (char*)gSingMenuTextTableFr[index];
+        case 5:
             return (char*)gSingMenuTextTableEs[index];
+        case 1:
         default:
             return (char*)gSingMenuTextTableEn[index];
     }
@@ -633,14 +635,15 @@ char* CMenuPcs::GetMenuStr(int index)
 char* CMenuPcs::GetHairStr(int index)
 {
     switch (Game.m_gameWork.m_languageId) {
-        case 1:
-            return (char*)PTR_s_Spitzschopf[index];
         case 2:
-            return (char*)PTR_s_Ciuffo_ribelle[index];
+            return (char*)PTR_s_Spitzschopf[index];
         case 3:
-            return (char*)gSingMenuHairTableFr[index];
+            return (char*)PTR_s_Ciuffo_ribelle[index];
         case 4:
+            return (char*)gSingMenuHairTableFr[index];
+        case 5:
             return (char*)PTR_s_Remolino[index];
+        case 1:
         default:
             return (char*)PTR_s_Cowlick[index];
     }
@@ -649,14 +652,15 @@ char* CMenuPcs::GetHairStr(int index)
 char* CMenuPcs::GetJobStr(int index)
 {
     switch (Game.m_gameWork.m_languageId) {
-        case 1:
-            return (char*)PTR_s_Schmied[index];
         case 2:
-            return (char*)PTR_s_Fabbri[index];
+            return (char*)PTR_s_Schmied[index];
         case 3:
-            return (char*)PTR_s_Forgeron[index];
+            return (char*)PTR_s_Fabbri[index];
         case 4:
+            return (char*)PTR_s_Forgeron[index];
+        case 5:
             return (char*)PTR_s_Herrero[index];
+        case 1:
         default:
             return (char*)PTR_s_Blacksmith[index];
     }
@@ -665,14 +669,15 @@ char* CMenuPcs::GetJobStr(int index)
 char* CMenuPcs::GetTribeStr(int index)
 {
     switch (Game.m_gameWork.m_languageId) {
-        case 1:
-            return (char*)PTR_s_Clavat_80214100[index];
         case 2:
-            return (char*)PTR_s_Clavat_80214110[index];
+            return (char*)PTR_s_Clavat_80214100[index];
         case 3:
-            return (char*)PTR_s_Clavat_80214120[index];
+            return (char*)PTR_s_Clavat_80214110[index];
         case 4:
+            return (char*)PTR_s_Clavat_80214120[index];
+        case 5:
             return (char*)PTR_s_Clavate[index];
+        case 1:
         default:
             return (char*)PTR_s_Clavat_802140f0[index];
     }
@@ -1935,9 +1940,9 @@ void CMenuPcs::SingleCalcFadeIn()
     }
 
     if (m_wm.m_handles[0]->m_model->m_animEnd < m_wm.m_handles[0]->m_model->m_time) {
-        m_wm.m_handles[0]->m_model->SetFrame(0.0f);
-    } else {
         m_wm.m_handles[0]->m_model->AddFrame(1.0f);
+    } else {
+        m_wm.m_handles[0]->m_model->SetFrame(0.0f);
     }
 
     unsigned short modelScaleIndex = SingleCaravanWork()->m_tribeId;
@@ -2031,9 +2036,9 @@ void CMenuPcs::SingleCalcFadeOut()
     }
 
     if (m_wm.m_handles[0]->m_model->m_animEnd < m_wm.m_handles[0]->m_model->m_time) {
-        m_wm.m_handles[0]->m_model->SetFrame(0.0f);
-    } else {
         m_wm.m_handles[0]->m_model->AddFrame(1.0f);
+    } else {
+        m_wm.m_handles[0]->m_model->SetFrame(0.0f);
     }
 
     unsigned short modelScaleIndex = SingleCaravanWork()->m_tribeId;
@@ -2524,7 +2529,7 @@ void CMenuPcs::DrawNoShadowFont(CFont* font, char* text, float x, float y, int t
  * JP Address: TODO
  * JP Size: TODO
  */
-double CMenuPcs::CalcListPos(int listPos, int listSize, int mode)
+float CMenuPcs::CalcListPos(int listPos, int listSize, int mode)
 {
     float span;
 
@@ -2687,23 +2692,23 @@ void CMenuPcs::DrawSingWin(short mode)
         return;
     }
 
-    float left = static_cast<float>(m_menuWindowInfo->x) + static_cast<float>(m_menuWindowInfo->width) * 0.5f;
-    float top = static_cast<float>(m_menuWindowInfo->y) + static_cast<float>(m_menuWindowInfo->height) * 0.5f;
+    float left = static_cast<float>(m_menuWindowInfo->x) + static_cast<float>(static_cast<double>(m_menuWindowInfo->width) * 0.5);
+    float top = static_cast<float>(m_menuWindowInfo->y) + static_cast<float>(static_cast<double>(m_menuWindowInfo->height) * 0.5);
     float width;
     float height;
 
-    if (m_menuWindowInfo->state == 1) {
-        left = static_cast<float>(m_menuWindowInfo->x);
-        top = static_cast<float>(m_menuWindowInfo->y);
-        width = static_cast<float>(m_menuWindowInfo->width);
-        height = static_cast<float>(m_menuWindowInfo->height);
-    } else {
+    if (m_menuWindowInfo->state != 1) {
         float leftScale = (((left - static_cast<float>(m_menuWindowInfo->x)) - 32.0f) / 6.0f) * static_cast<float>(m_menuWindowInfo->frame);
         float topScale = (((top - static_cast<float>(m_menuWindowInfo->y)) - 32.0f) / 6.0f) * static_cast<float>(m_menuWindowInfo->frame);
         left = (left - 32.0f) - leftScale;
         width = static_cast<float>(2.0 * static_cast<double>(32.0f + leftScale));
         height = static_cast<float>(2.0 * static_cast<double>(32.0f + topScale));
         top = (top - 32.0f) - topScale;
+    } else {
+        left = static_cast<float>(m_menuWindowInfo->x);
+        top = static_cast<float>(m_menuWindowInfo->y);
+        width = static_cast<float>(m_menuWindowInfo->width);
+        height = static_cast<float>(m_menuWindowInfo->height);
     }
 
     int leftPx = static_cast<int>(static_cast<double>(left) - 0.5);
@@ -3124,7 +3129,7 @@ int CMenuPcs::SingWinMessHeight()
     float scaled = 22.0f * FLOAT_8032ea78;
     int lineHeight = static_cast<int>(scaled);
 
-    if (0.0f < scaled - static_cast<float>(lineHeight)) {
+    if (scaled - static_cast<float>(lineHeight) > 0.0f) {
         lineHeight += 1;
     }
     return lineHeight + 3;

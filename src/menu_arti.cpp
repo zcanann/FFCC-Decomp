@@ -323,7 +323,7 @@ void CMenuPcs::ArtiDraw()
 
 	ArtiOpenAnim* textEntry = listStart;
 	for (int i = 0; i < 8; i++) {
-		u8 alpha = (u8)(kArtiColorMax * textEntry->alpha);
+		s8 alpha = (u8)(kArtiColorMax * textEntry->alpha);
 		CColor color(0xFF, 0xFF, 0xFF, alpha);
 		listFont->SetColor(color.color);
 
@@ -387,7 +387,7 @@ void CMenuPcs::ArtiDraw()
 	}
 
 	CFont* helpFont = GetArtiHelpFont(this);
-	u8 helpAlpha = (u8)(kArtiColorMax * GetArtiOpenAnimList(this)->entries[0].alpha);
+	s8 helpAlpha = (s8)(kArtiColorMax * GetArtiOpenAnimList(this)->entries[0].alpha);
 	if (!hasSelectedArtifact) {
 		selectedArtifactId = -1;
 	}
@@ -744,38 +744,39 @@ void CMenuPcs::ArtiInit()
 	entry->startFrame = 0;
 	entry->duration = 5;
 
-	list = GetArtiOpenAnimList(this);
+	ArtiOpenAnim* entry0 = GetArtiOpenAnimList(this)->entries;
 	yOffset = 0;
-	int listIndex = 4;
+	int byteOffset = 0x100;
 	int loopCount = 4;
 	do {
-		entry = &list->entries[listIndex];
+		entry = (ArtiOpenAnim*)((char*)GetArtiOpenAnimList(this)->entries + byteOffset);
 		entry->flags = 2;
 		entry->tex = 0x37;
 		count = count + 2;
-		entry->x = list->entries[0].x + 0x24;
-		short nextY = yOffset + 0x20;
-		entry->y = list->entries[0].y + yOffset;
+		entry->x = entry0->x + 0x24;
+		entry->y = entry0->y + yOffset;
 		entry->w = 200;
 		entry->h = 0x28;
 		entry->u = zero;
 		entry->v = zero;
 		entry->startFrame = 7;
 		entry->duration = 5;
+		yOffset = yOffset + 0x20;
 
-		entry = &list->entries[listIndex + 1];
-		listIndex = listIndex + 2;
+		byteOffset = byteOffset + 0x40;
+		entry = (ArtiOpenAnim*)((char*)GetArtiOpenAnimList(this)->entries + byteOffset);
 		entry->flags = 2;
 		entry->tex = 0x37;
-		entry->x = list->entries[0].x + 0x24;
-		yOffset = yOffset + 0x40;
-		entry->y = list->entries[0].y + nextY;
+		entry->x = entry0->x + 0x24;
+		entry->y = entry0->y + yOffset;
 		entry->w = 200;
 		entry->h = 0x28;
 		entry->u = zero;
 		entry->v = zero;
 		entry->startFrame = 7;
 		entry->duration = 5;
+		yOffset = yOffset + 0x20;
+		byteOffset = byteOffset + 0x40;
 		loopCount--;
 	} while (loopCount != 0);
 

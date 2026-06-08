@@ -7428,13 +7428,12 @@ LAB_calc:
 		bytes[0x0A] = bytes[0x0A] & ~2;
 	}
 
-	char cVar2;
+	unsigned int uVar13;
 	if ((bytes[0x0A] & 2) != 0) {
-		cVar2 = (char)bytes[0x0B];
+		uVar13 = *reinterpret_cast<int*>(reinterpret_cast<char*>(&Game.m_gameWork) + 8) + (int)(char)bytes[0x0B];
 	} else {
-		cVar2 = (char)bytes[0x0C];
+		uVar13 = *reinterpret_cast<int*>(reinterpret_cast<char*>(&Game.m_gameWork) + 8) + (int)(char)bytes[0x0C];
 	}
-	unsigned int uVar13 = *reinterpret_cast<int*>(reinterpret_cast<char*>(&Game.m_gameWork) + 8) + (int)cVar2;
 	gWmMenuScriptValueCache = (unsigned char)uVar13;
 	if ((int)uVar13 > 99) {
 		gWmMenuScriptValueCache = 100;

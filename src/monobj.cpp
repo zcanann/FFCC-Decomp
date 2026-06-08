@@ -3730,10 +3730,17 @@ void CGMonObj::statWatch()
 				accum = candidate;
 			}
 
-			if (targetMode == 1) {
+			switch (targetMode) {
+			case 1:
 				result = targetPartyIndex;
-			} else if ((targetMode != 0) && (targetMode < 5) && (-1 < accum)) {
-				result = accum;
+				break;
+			case 2:
+			case 3:
+			case 4:
+				if (accum >= 0) {
+					result = accum;
+				}
+				break;
 			}
 			selectedTarget = result;
 		}

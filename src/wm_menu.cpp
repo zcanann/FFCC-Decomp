@@ -12516,13 +12516,10 @@ int CMenuPcs::GetSameCharaData(Mc::SaveDat* source, Mc::SaveDat* target, int mem
 		}
 	}
 
-	unsigned int result;
-	unsigned int index = 0;
+	unsigned int result = 0;
 	const int cmpOffset = memberIndex * 0x9C0 + 0x1D94;
-	int count = 4;
-	do {
+	for (int count = 4; count != 0; count--) {
 		if (*reinterpret_cast<int*>(src + 0x1A84) != 0) {
-			result = index;
 			if (strictMode == 0) {
 				if (src[0x1D90] != 0 &&
 				    *reinterpret_cast<unsigned int*>(src + 0x1D94) == *reinterpret_cast<unsigned int*>(dst + cmpOffset)) {
@@ -12538,9 +12535,9 @@ int CMenuPcs::GetSameCharaData(Mc::SaveDat* source, Mc::SaveDat* target, int mem
 				}
 			}
 		}
+		result++;
 
 		if (*reinterpret_cast<int*>(src + 0x2444) != 0) {
-			result = index + 1;
 			if (strictMode == 0) {
 				if (src[0x2750] != 0 &&
 				    *reinterpret_cast<unsigned int*>(src + 0x2754) == *reinterpret_cast<unsigned int*>(dst + cmpOffset)) {
@@ -12556,12 +12553,10 @@ int CMenuPcs::GetSameCharaData(Mc::SaveDat* source, Mc::SaveDat* target, int mem
 				}
 			}
 		}
+		result++;
 
 		src += 0x1380;
-		index += 2;
-		count--;
-		result = index;
-	} while (count != 0);
+	}
 
 	if (strictMode == 0) {
 		if (static_cast<int>(result) < 8) {

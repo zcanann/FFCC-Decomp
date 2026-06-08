@@ -621,18 +621,20 @@ void CGCharaObj::onFramePostCalc()
 		if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
 		    (i == 0 || i == 4 || i == 9 || i == 3) &&
 		    statusValue > 0) {
-			char slot = m_animStateMisc;
+			int slot = m_animStateMisc;
 			unsigned short padMask = 0;
 			bool useDebugPad = (Pad.m_debugPadLock != 0) || ((slot == 0) && (Pad.m_debugPadPort != -1));
 			if (!useDebugPad) {
-				int idx = slot & ~((~(Pad.m_debugPadPort - static_cast<int>(slot) | static_cast<int>(slot) - Pad.m_debugPadPort)) >> 31);
+				int activePad = Pad.m_debugPadPort;
+				int idx = slot & ~(static_cast<int>(~((activePad - slot) | (slot - activePad))) >> 31);
 				padMask = Pad.GetPadInputs()[idx].buttonDown[0];
 			}
 			if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x100) != 0) {
 				useDebugPad = (Pad.m_debugPadLock != 0) || ((slot == 0) && (Pad.m_debugPadPort != -1));
 				unsigned short heldMask = 0;
 				if (!useDebugPad) {
-					int idx = slot & ~((~(Pad.m_debugPadPort - static_cast<int>(slot) | static_cast<int>(slot) - Pad.m_debugPadPort)) >> 31);
+					int activePad = Pad.m_debugPadPort;
+					int idx = slot & ~(static_cast<int>(~((activePad - slot) | (slot - activePad))) >> 31);
 					heldMask = Pad.GetPadInputs()[idx].repeatButton;
 				}
 				padMask |= heldMask;
@@ -773,11 +775,12 @@ void CGCharaObj::onFramePreCalc()
 		if (static_cast<CGPartyObj*>(this)->m_partyData.carryObject != nullptr) {
 			push += 10;
 		}
-		unsigned char slot = m_animStateMisc;
+		int slot = m_animStateMisc;
 		int padHeld = 0;
 		bool useDebugPad = (Pad.m_debugPadLock != 0) || ((slot == 0) && (Pad.m_debugPadPort != -1));
 		if (!useDebugPad) {
-			int idx = slot & ~((~(Pad.m_debugPadPort - static_cast<int>(slot) | static_cast<int>(slot) - Pad.m_debugPadPort)) >> 31);
+			int activePad = Pad.m_debugPadPort;
+			int idx = slot & ~(static_cast<int>(~((activePad - slot) | (slot - activePad))) >> 31);
 			padHeld = Pad.GetPadInputs()[idx].gbaMode;
 		}
 		if (padHeld != 0) {

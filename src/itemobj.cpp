@@ -982,7 +982,8 @@ void CGItemObj::onFrameStat()
 	case 0xE:
 		if (m_stateFrame == 0) {
 			prgObj->m_bgColMask = 0;
-			*reinterpret_cast<unsigned char*>(&prgObj->m_weaponNodeFlags) &= 0xEF;
+			*reinterpret_cast<unsigned char*>(&prgObj->m_weaponNodeFlags) =
+			    static_cast<unsigned char>(__rlwimi(*reinterpret_cast<unsigned char*>(&prgObj->m_weaponNodeFlags), 0, 4, 27, 27));
 			prgObj->m_groundHitOffset.z = zero;
 			prgObj->m_groundHitOffset.y = zero;
 			prgObj->m_groundHitOffset.x = zero;

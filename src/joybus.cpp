@@ -2661,16 +2661,16 @@ int JoyBus::SendGBA(ThreadParam* threadParam)
 
     bool isSingle = GbaQue.IsSingleMode(threadParam->m_portIndex);
 
-    if (isSingle == 0 || threadParam->m_portIndex == 1)
-    {
-        threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
-    }
-    else
+    if (isSingle != 0 && (int)threadParam->m_portIndex != 1)
     {
         threadParam->m_gbaStatus = 0;
     }
+    else
+    {
+        threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
+    }
 
-    if (threadParam->m_gbaStatus != 0)
+    if ((int)threadParam->m_gbaStatus != 0)
 	{
         return -1;
 	}
@@ -2689,7 +2689,7 @@ int JoyBus::SendGBA(ThreadParam* threadParam)
 
     threadParam->m_gbaStatus = gbaResult;
 
-    if (threadParam->m_gbaStatus != 0)
+    if ((int)threadParam->m_gbaStatus != 0)
 	{
         return -1;
 	}

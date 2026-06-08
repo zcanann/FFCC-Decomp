@@ -361,12 +361,13 @@ int CMenuPcs::EquipCtrlCur()
  */
 void CMenuPcs::EquipDraw()
 {
-	int helpItem = -1;
+	unsigned int helpItem = -1;
+	bool helpFound = false;
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	int mode = static_cast<int>(GetEquipMenuState(this)->mode);
+	unsigned int mode = static_cast<int>(GetEquipMenuState(this)->mode);
 	int listState = static_cast<int>(GetEquipMenuState(this)->listState);
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	EquipOpenAnim* item = GetEquipListStorage(this)->entries;
@@ -380,7 +381,6 @@ void CMenuPcs::EquipDraw()
 			float h = (float)item->h;
 			float u = item->u;
 			float v = item->v;
-			float alpha = item->alpha;
 
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
 
@@ -392,7 +392,7 @@ void CMenuPcs::EquipDraw()
 			color.r = 0xff;
 			color.g = 0xff;
 			color.b = 0xff;
-			color.a = (u8)(int)(kEquipColorMax * alpha);
+			color.a = (u8)(int)(kEquipColorMax * item->alpha);
 			GXSetChanMatColor(GX_COLOR0A0, color);
 
 			float scale = item->scale;
@@ -421,12 +421,12 @@ void CMenuPcs::EquipDraw()
 	item = GetEquipListStorage(this)->entries;
 	for (int i = 0; i < 4; i++) {
 		if (caravanWork->m_equipment[i] >= 0) {
-			float alpha = item->alpha;
-			CColor color(0xff, 0xff, 0xff, (u8)(int)(kEquipColorMax * alpha));
+			CColor color(0xff, 0xff, 0xff, (u8)(int)(kEquipColorMax * item->alpha));
 			font->SetColor(color.color);
 			int itemIdx = caravanWork->m_inventoryItems[caravanWork->m_equipment[i]];
 			const char* str = GetAttrStr(itemIdx);
 			if ((mode == 0) && (i == static_cast<int>(GetEquipMenuState(this)->selectedIndex))) {
+				helpFound = true;
 				helpItem = itemIdx;
 			}
 			float width = font->GetWidth(str);
@@ -626,23 +626,28 @@ void CMenuPcs::EquipDraw()
 	}
 
 	int listIndex = static_cast<int>(GetEquipModeSelected(GetEquipMenuState(this), mode)) + static_cast<int>(GetEquipMenuState(this)->scroll);
-	if ((mode == 1) && (listIndex < 1)) {
+	int helpEntryIndex = (mode == 1) ? GetEquipListStorage(this)->count : 0;
+	float helpAlpha = GetEquipListStorage(this)->entries[helpEntryIndex].alpha;
+	if (!helpFound) {
 		helpItem = -1;
 	}
-	if (((mode == 0) && (GetEquipMenuState(this)->emptySlotHelpState == 0)) && (helpItem < 0)) {
+	if ((listIndex < 1) && (mode == 1)) {
+		helpItem = -1;
+	}
+	if (((mode == 0) && (GetEquipMenuState(this)->emptySlotHelpState == 0)) && (helpItem == -1)) {
 		helpItem = 0x267;
 	}
 
-	int helpEntryIndex = (mode == 1) ? GetEquipListStorage(this)->count : 0;
-	CColor helpColor(0xff, 0xff, 0xff,
-	                 static_cast<u8>(kEquipColorMax * GetEquipListStorage(this)->entries[helpEntryIndex].alpha));
-	DrawHelpMessage(helpItem, m_fonts[0], 0, static_cast<int>(kEquipHelpY), helpColor.color, 10,
-	                kEquipOne, kEquipSmallScale);
+	CColor helpColor(0xff, 0xff, 0xff, static_cast<u8>(kEquipColorMax * helpAlpha));
+	int helpX = (int)kEquipHelpCenterX;
+	int helpY = (int)kEquipHelpY;
+	DrawHelpMessage(helpItem, m_fonts[0], helpX, helpY, helpColor.color, 10,
+	                kEquipOne, kEquipHelpScale);
 	if ((mode == 1) && (listIndex < 1)) {
-		CColor listHelpColor(
-		    0xff, 0xff, 0xff, static_cast<u8>(kEquipColorMax * GetEquipListStorage(this)->entries[GetEquipListStorage(this)->count].alpha));
-		DrawHelpMessage(0x265, m_fonts[0], 0, static_cast<int>(kEquipHelpY), listHelpColor.color, 10,
-		                kEquipOne, kEquipSmallScale);
+		float listHelpAlpha = GetEquipListStorage(this)->entries[GetEquipListStorage(this)->count].alpha;
+		CColor listHelpColor(0xff, 0xff, 0xff, static_cast<s8>(kEquipColorMax * listHelpAlpha));
+		DrawHelpMessage(0x265, m_fonts[0], helpX, helpY, listHelpColor.color, 10,
+		                kEquipOne, kEquipHelpScale);
 	}
 }
 
@@ -787,7 +792,7 @@ void CMenuPcs::EquipCtrl()
 			do {
 				int p2 = byteOff + 8;
 				byteOff = byteOff + -0x40;
-				p2 = *(int*)&this->m_equipList + p2;
+				p2 = *(unsigned int*)&this->m_equipList + p2;
 				*(int*)(p2 + 0x24) = index;
 				index = index + 1;
 				*(int*)(p2 + 0x28) = 3;

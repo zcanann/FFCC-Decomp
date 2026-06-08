@@ -2041,7 +2041,7 @@ void CGMonObj::alwaysFuncMeteoParasite()
 	u8* mon = reinterpret_cast<u8*>(this);
 	const int scriptKind = reinterpret_cast<int>(object->m_scriptHandle[4]);
 
-	if (scriptKind == 0x85 && ((CGMonObj::m_boss[0x7C] & 0x40) == 0)) {
+	if (scriptKind == 0x85 && reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_meteo3 == 0) {
 		if (g_errCt == 0) {
 			g_errCt = 1;
 			MG_GBA_THREAD_MSG_SETPORT_ct = kMonObjBossZero;
@@ -2058,14 +2058,15 @@ void CGMonObj::alwaysFuncMeteoParasite()
 		CGObject** rotObjects = reinterpret_cast<CGObject**>(CGMonObj::m_boss + 0x38);
 		for (int i = 0; i < 12; i++) {
 			rotObjects[i]->m_rotTargetY =
-			    (rotBase * rotStep * static_cast<float>(i + 3)) / rotDivisor + MG_GBA_THREAD_MSG_SETPORT_ct;
+			    rotBase * (rotStep * static_cast<float>(i + 3)) / rotDivisor + MG_GBA_THREAD_MSG_SETPORT_ct;
 		}
 
 		MG_GBA_THREAD_MSG_SETPORT_ct += kMonObjBossScaleStep;
 	}
 
 	if (scriptKind < 0x88 && scriptKind > 0x84 &&
-	    *reinterpret_cast<int*>(CGMonObj::m_boss + 0x78) == scriptKind - 0x85 && (CGMonObj::m_boss[0x7C] & 0x80) != 0) {
+	    *reinterpret_cast<int*>(CGMonObj::m_boss + 0x78) == scriptKind - 0x85 &&
+	    reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_bit80 != 0) {
 		int effect;
 		int arg0;
 		int arg1;
@@ -2082,7 +2083,7 @@ void CGMonObj::alwaysFuncMeteoParasite()
 				prgObj->changeStat(0x66, 0, 0);
 				m_actionBranch = 1;
 			}
-			CGMonObj::m_boss[0x7C] &= 0x7F;
+			reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_bit80 = 0;
 		}
 	}
 }

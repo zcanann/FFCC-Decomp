@@ -91,7 +91,7 @@ inline void* operator new(unsigned long, void* ptr)
 
 static inline CPad::PadInput& CameraDebugPadInput()
 {
-    return Pad.GetPadInputs()[(Pad.m_debugPadPort == 4) ? 4 : 0];
+    return Pad.GetPadInputs()[(Pad.m_debugPadPort == 4) ? 0 : 4];
 }
 
 static inline CPad::PadInput& CameraShadowPadInput()

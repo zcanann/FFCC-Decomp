@@ -3070,8 +3070,8 @@ void GbaQueue::ChkCMakeCharaType(int channel, unsigned int value)
 
 	if (charaType == 0xFF) {
 		OSWaitSemaphore(accessSemaphores + channel);
-		obj[0x2CCA + channel * 0x20] = static_cast<char>(0xFF);
-		obj[0x2CD1 + channel * 0x20] = static_cast<char>(0xFF);
+		reinterpret_cast<unsigned char*>(obj)[0x2CCA + channel * 0x20] = 0xFF;
+		reinterpret_cast<unsigned char*>(obj)[0x2CD1 + channel * 0x20] = 0xFF;
 		OSSignalSemaphore(accessSemaphores + channel);
 		return;
 	}
@@ -3104,7 +3104,7 @@ void GbaQueue::ChkCMakeCharaType(int channel, unsigned int value)
 		CCaravanWork* caravanWork = &Game.m_caravanWorkArr[i];
 		char* caravanObj = reinterpret_cast<char*>(caravanWork);
 		if ((i != playerSlot) && (*reinterpret_cast<int*>(caravanObj + 0x3A4) != 0) &&
-		    (caravanObj[0xBA6] == '\0')) {
+		    (static_cast<unsigned char>(caravanObj[0xBA6]) == 0)) {
 			short existingCharaType = *reinterpret_cast<unsigned short*>(caravanObj + 0x3E0) & 0xFF;
 			existingCharaType |= static_cast<unsigned short>(
 			    static_cast<unsigned char>(static_cast<char>(*reinterpret_cast<unsigned short*>(caravanObj + 0x3E4)) << 2));

@@ -19,8 +19,9 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
 
-char s_shopmenu_cpp[] = "shopmenu.cpp";
-static const char s_shopMenuAllocErrorFmt[] = "%s(%d): Error: memory allocation error\n";
+#pragma readonly_strings on
+extern char s_shopmenu_cpp[];
+extern char s_pcts_pctd_Error_memory_allocation_error_801DED9C[];
 extern char s_shop_80332e54[];
 unsigned short gShopMenuInputLatch;
 extern CShopMenu* g_shopMenu;
@@ -97,7 +98,213 @@ extern char s_StringFormat_80332d40[3];
 extern char s_StringDecimalFormat_80332d44[5];
 extern char s_Plus_80332d4c[2];
 extern char s_Minus_80332d50[2];
-extern "C" char* g_strShopMenuMes[];
+extern char s_Blacksmith_801DEB38[];
+extern char s_Materials_801DEB44[];
+extern char s_Cannot_buy_801DEB50[];
+extern char s_Cannot_sell_801DEB5C[];
+extern char s_Quantity_801DEB6C[];
+extern char s_Strength_801DEB78[];
+extern char s_Cannot_be_crafted_here_801DEB84[];
+extern char s_Verkaufen_801DEB9C[];
+extern char s_Abbrechen_801DEBA8[];
+extern char s_Schmiede_801DEBB4[];
+extern char s_Guthaben_801DEBC0[];
+extern char lbl_801DEBCC[];
+extern char s_Inventar_801DEBD8[];
+extern char s_Herstellen_801DEBE4[];
+extern char lbl_801DEBF0[];
+extern char lbl_801DEBFC[];
+extern char lbl_801DEC0C[];
+extern char s_Anzahl_x_801DEC18[];
+extern char s_Falsche_Schmiede_801DEC24[];
+extern char s_Inventario_801DEC38[];
+extern char s_Utilizza_801DEC44[];
+extern char s_Non_puoi_acquistare_801DEC50[];
+extern char s_Non_puoi_vendere_801DEC68[];
+extern char lbl_801DEC7C[];
+extern char s_Irrealizzabile_qui_801DEC88[];
+extern char s_Forgeron_801DEC9C[];
+extern char lbl_801DECA8[];
+extern char s_En_stock_801DECB4[];
+extern char s_Non_achetable_801DECC0[];
+extern char s_Non_vendable_801DECD0[];
+extern char lbl_801DECE0[];
+extern char lbl_801DECEC[];
+extern char s_Infaisable_ici_801DECF8[];
+extern char s_Cancelar_801DED08[];
+extern char s_Honorario_801DED14[];
+extern char s_Materiales_801DED20[];
+extern char s_Reservas_801DED2C[];
+extern char lbl_801DED38[];
+extern char s_No_puedes_comprar_801DED44[];
+extern char s_No_vendible_801DED58[];
+extern char s_Cantidad_801DED68[];
+extern char lbl_801DED74[];
+const char lbl_80332B40[] = "Buy";
+const char lbl_80332B44[] = "Sell";
+const char lbl_80332B4C[] = "Cancel";
+const char lbl_80332B54[] = "Shop";
+const char lbl_80332B5C[] = "For:";
+const char lbl_80332B64[] = "gil";
+const char lbl_80332B68[] = "Fee";
+const char lbl_80332B6C[] = "Money";
+const char lbl_80332B74[] = "Stock";
+const char lbl_80332B7C[] = "Craft";
+const char lbl_80332B84[] = "Equip";
+const char lbl_80332B8C[] = "Price";
+const char lbl_80332B94[] = "Defence";
+const char lbl_80332B9C[] = "";
+const char lbl_80332BA0[] = "Kaufen";
+const char lbl_80332BA8[] = "Laden";
+const char lbl_80332BB0[] = "F\374r:";
+const char lbl_80332BB8[] = "Gil";
+const char lbl_80332BBC[] = "Kosten";
+const char lbl_80332BC4[] = "Preis";
+const char lbl_80332BCC[] = "St\344rke";
+const char lbl_80332BD4[] = "Abwehr";
+const char lbl_80332BDC[] = "Compra";
+const char lbl_80332BE4[] = "Vendi";
+const char lbl_80332BEC[] = "Annulla";
+const char lbl_80332BF4[] = "Emporio";
+const char lbl_80332BFC[] = "Fabbro";
+const char lbl_80332C04[] = "Per:";
+const char lbl_80332C0C[] = "guil";
+const char lbl_80332C14[] = "Tariffa";
+const char lbl_80332C1C[] = "Denaro";
+const char lbl_80332C24[] = "Materie";
+const char lbl_80332C2C[] = "Forgia";
+const char lbl_80332C34[] = "Prezzo";
+const char lbl_80332C3C[] = "Forza";
+const char lbl_80332C44[] = "Difesa";
+const char lbl_80332C4C[] = "Acheter";
+const char lbl_80332C54[] = "Vendre";
+const char lbl_80332C5C[] = "Annuler";
+const char lbl_80332C64[] = "Magasin";
+const char lbl_80332C6C[] = "Pour:";
+const char lbl_80332C74[] = "gils";
+const char lbl_80332C7C[] = "Tarif";
+const char lbl_80332C84[] = "Argent";
+const char lbl_80332C8C[] = "Forger";
+const char lbl_80332C94[] = "Equiper";
+const char lbl_80332C9C[] = "Prix";
+const char lbl_80332CA4[] = "Force";
+const char lbl_80332CAC[] = "Comprar";
+const char lbl_80332CB4[] = "Vender";
+const char lbl_80332CBC[] = "Herrero";
+const char lbl_80332CC4[] = "Para:";
+const char lbl_80332CCC[] = "guiles";
+const char lbl_80332CD4[] = "Dinero";
+const char lbl_80332CDC[] = "Equipar";
+const char lbl_80332CE4[] = "Precio";
+const char lbl_80332CEC[] = "Fuerza";
+const char lbl_80332CF4[] = "Defensa";
+extern "C" char* g_strShopMenuMes[105] = {
+    (char*)lbl_80332B40,
+    (char*)lbl_80332B44,
+    (char*)lbl_80332B4C,
+    (char*)lbl_80332B54,
+    s_Blacksmith_801DEB38,
+    (char*)lbl_80332B5C,
+    (char*)lbl_80332B64,
+    (char*)lbl_80332B68,
+    (char*)lbl_80332B6C,
+    s_Materials_801DEB44,
+    (char*)lbl_80332B74,
+    (char*)lbl_80332B7C,
+    (char*)lbl_80332B84,
+    (char*)lbl_80332B8C,
+    s_Cannot_buy_801DEB50,
+    s_Cannot_sell_801DEB5C,
+    s_Quantity_801DEB6C,
+    s_Strength_801DEB78,
+    (char*)lbl_80332B94,
+    (char*)lbl_80332B9C,
+    s_Cannot_be_crafted_here_801DEB84,
+    (char*)lbl_80332BA0,
+    s_Verkaufen_801DEB9C,
+    s_Abbrechen_801DEBA8,
+    (char*)lbl_80332BA8,
+    s_Schmiede_801DEBB4,
+    (char*)lbl_80332BB0,
+    (char*)lbl_80332BB8,
+    (char*)lbl_80332BBC,
+    s_Guthaben_801DEBC0,
+    lbl_801DEBCC,
+    s_Inventar_801DEBD8,
+    s_Herstellen_801DEBE4,
+    lbl_801DEBF0,
+    (char*)lbl_80332BC4,
+    lbl_801DEBFC,
+    lbl_801DEC0C,
+    s_Anzahl_x_801DEC18,
+    (char*)lbl_80332BCC,
+    (char*)lbl_80332BD4,
+    (char*)lbl_80332B9C,
+    s_Falsche_Schmiede_801DEC24,
+    (char*)lbl_80332BDC,
+    (char*)lbl_80332BE4,
+    (char*)lbl_80332BEC,
+    (char*)lbl_80332BF4,
+    (char*)lbl_80332BFC,
+    (char*)lbl_80332C04,
+    (char*)lbl_80332C0C,
+    (char*)lbl_80332C14,
+    (char*)lbl_80332C1C,
+    (char*)lbl_80332C24,
+    s_Inventario_801DEC38,
+    (char*)lbl_80332C2C,
+    s_Utilizza_801DEC44,
+    (char*)lbl_80332C34,
+    s_Non_puoi_acquistare_801DEC50,
+    s_Non_puoi_vendere_801DEC68,
+    lbl_801DEC7C,
+    (char*)lbl_80332C3C,
+    (char*)lbl_80332C44,
+    (char*)lbl_80332B9C,
+    s_Irrealizzabile_qui_801DEC88,
+    (char*)lbl_80332C4C,
+    (char*)lbl_80332C54,
+    (char*)lbl_80332C5C,
+    (char*)lbl_80332C64,
+    s_Forgeron_801DEC9C,
+    (char*)lbl_80332C6C,
+    (char*)lbl_80332C74,
+    (char*)lbl_80332C7C,
+    (char*)lbl_80332C84,
+    lbl_801DECA8,
+    s_En_stock_801DECB4,
+    (char*)lbl_80332C8C,
+    (char*)lbl_80332C94,
+    (char*)lbl_80332C9C,
+    s_Non_achetable_801DECC0,
+    s_Non_vendable_801DECD0,
+    lbl_801DECE0,
+    (char*)lbl_80332CA4,
+    lbl_801DECEC,
+    (char*)lbl_80332B9C,
+    s_Infaisable_ici_801DECF8,
+    (char*)lbl_80332CAC,
+    (char*)lbl_80332CB4,
+    s_Cancelar_801DED08,
+    (char*)lbl_80332CAC,
+    (char*)lbl_80332CBC,
+    (char*)lbl_80332CC4,
+    (char*)lbl_80332CCC,
+    s_Honorario_801DED14,
+    (char*)lbl_80332CD4,
+    s_Materiales_801DED20,
+    s_Reservas_801DED2C,
+    lbl_801DED38,
+    (char*)lbl_80332CDC,
+    (char*)lbl_80332CE4,
+    s_No_puedes_comprar_801DED44,
+    s_No_vendible_801DED58,
+    s_Cantidad_801DED68,
+    (char*)lbl_80332CEC,
+    (char*)lbl_80332CF4,
+    (char*)lbl_80332B9C,
+    lbl_801DED74,
+};
 
 STATIC_ASSERT(offsetof(CShopMenu, m_mode) == 0x4);
 STATIC_ASSERT(offsetof(CShopMenu, m_subMode) == 0x10);
@@ -959,7 +1166,7 @@ void CShopMenu::DrawItemHelp(int index, int centerX, int y)
     char* helpText = new((Game.m_gameWork.m_menuStageMode != 0) ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage,
                          s_shopmenu_cpp, 0xBFF) char[0x200];
     if ((helpText == 0) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
-        System.Printf(const_cast<char*>(s_shopMenuAllocErrorFmt), s_shopmenu_cpp, 0xC01);
+        System.Printf(s_pcts_pctd_Error_memory_allocation_error_801DED9C, s_shopmenu_cpp, 0xC01);
     }
     memset(helpText, 0, 0x200);
     CMes::MakeAgbString(helpText, const_cast<char*>(sourceText), 0, 1);

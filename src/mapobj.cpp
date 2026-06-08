@@ -865,13 +865,17 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             chunkFile.PushChunk();
             CChunkFile::CChunk mimeChunk;
             while (chunkFile.GetNextChunk(mimeChunk) != 0) {
-                if (mimeChunk.m_id == CHUNK_JUN) {
+                switch (mimeChunk.m_id) {
+                case CHUNK_JUN:
                     mime->m_keyFrame.ReadJun(chunkFile, static_cast<char>(mimeChunk.m_arg0));
-                } else if (mimeChunk.m_id == CHUNK_FRAM) {
+                    break;
+                case CHUNK_FRAM:
                     mime->m_keyFrame.ReadFrame(chunkFile, mimeChunk.m_arg0);
-                } else if (mimeChunk.m_id == CHUNK_KEY) {
+                    break;
+                case CHUNK_KEY:
                     mime->m_keyFrame.ReadKey(chunkFile, mimeChunk.m_arg0);
-                } else if (mimeChunk.m_id == CHUNK_VTXL) {
+                    break;
+                case CHUNK_VTXL: {
                     mime->m_vertexListCount = static_cast<unsigned char>(mimeChunk.m_arg0);
                     mime->m_vertexLists = reinterpret_cast<float**>(
                         operator new[](static_cast<unsigned long>(mime->m_vertexListCount) << 2,
@@ -898,6 +902,8 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                         }
                     }
                     chunkFile.PopChunk();
+                    break;
+                }
                 }
             }
             chunkFile.PopChunk();

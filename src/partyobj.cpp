@@ -1190,7 +1190,7 @@ void CGPartyObj::command()
 			case 0x0F:
 			case 0x10:
 			case 0x11:
-				if (*reinterpret_cast<int*>(targetBytes + 0x550) == 0) {
+				if (*reinterpret_cast<unsigned int*>(targetBytes + 0x550) == 0) {
 					secondaryAvailable = true;
 					secondaryCommand = 4;
 				}

@@ -716,11 +716,20 @@ static inline float FurRandScale()
 
 static inline CColor FurNoiseColor(const CColor& base, const CColor& noise, float scale)
 {
-	return CColor(
-	    static_cast<unsigned char>(base.color.r + static_cast<int>(noise.color.r * scale)),
-	    static_cast<unsigned char>(base.color.g + static_cast<int>(noise.color.g * scale)),
-	    static_cast<unsigned char>(base.color.b + static_cast<int>(noise.color.b * scale)),
-	    static_cast<unsigned char>(base.color.a + static_cast<int>(noise.color.a * scale)));
+	CColor scaledNoiseTmp;
+	scaledNoiseTmp.color.r = static_cast<unsigned char>(static_cast<int>(noise.color.r * scale));
+	scaledNoiseTmp.color.g = static_cast<unsigned char>(static_cast<int>(noise.color.g * scale));
+	scaledNoiseTmp.color.b = static_cast<unsigned char>(static_cast<int>(noise.color.b * scale));
+	scaledNoiseTmp.color.a = static_cast<unsigned char>(static_cast<int>(noise.color.a * scale));
+	CColor scaledNoise = scaledNoiseTmp;
+
+	CColor resultTmp;
+	resultTmp.color.r = static_cast<unsigned char>(base.color.r + scaledNoise.color.r);
+	resultTmp.color.g = static_cast<unsigned char>(base.color.g + scaledNoise.color.g);
+	resultTmp.color.b = static_cast<unsigned char>(base.color.b + scaledNoise.color.b);
+	resultTmp.color.a = static_cast<unsigned char>(base.color.a + scaledNoise.color.a);
+	CColor result = resultTmp;
+	return result;
 }
 
 void brush(unsigned short*, int, int, float, float, int, _GXColor, _GXColor*, _GXColor*);

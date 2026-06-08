@@ -1637,7 +1637,7 @@ void CShopMenu::DrawItemList()
         y += 0x1C;
     }
 
-    int pulseFrame = System.m_frameCounter % 0x14;
+    int pulseFrame = static_cast<int>(System.m_frameCounter) % 0x14;
     int pulse = pulseFrame - 10;
     if (pulse < 0) {
         pulse = -pulse;
@@ -1992,7 +1992,7 @@ void CShopMenu::Draw()
     float fade = m_fade;
     if (FLOAT_80332d28 != fade) {
         int fadeStep = static_cast<int>(FLOAT_80332de0 * fade);
-        unsigned char alpha = static_cast<unsigned char>(0xFF - (fadeStep & 0xFF));
+        unsigned char alpha = static_cast<unsigned char>(0xFF - fadeStep);
 
         Graphic.SetDrawDoneDebugData(0x32);
 

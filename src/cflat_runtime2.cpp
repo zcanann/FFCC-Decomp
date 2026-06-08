@@ -1771,17 +1771,17 @@ void CFlatRuntime2::drawLayer(
 	int layerNo, char* textureName, int x, int y, int width, int height, int texU, int texV, float scaleX,
 	float scaleY, _GXColor* color, int flags)
 {
-	CTextureSet* textureSet = LayerResources(this)[layerNo].m_textureSet;
-	if (textureSet == 0) {
+	CFlatLayerResource* layer = &LayerResources(this)[layerNo];
+	if (layer->m_textureSet == 0) {
 		return;
 	}
 
-	int textureIndex = textureSet->Find(textureName);
+	int textureIndex = layer->m_textureSet->Find(textureName);
 	if (textureIndex < 0) {
 		return;
 	}
 
-	CTexture* texture = textureSet->GetTexture(static_cast<unsigned long>(textureIndex));
+	CTexture* texture = layer->m_textureSet->GetTexture(static_cast<unsigned long>(textureIndex));
 
 	GXSetNumChans(1);
 	GXSetChanCtrl(

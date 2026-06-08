@@ -602,8 +602,8 @@ cancel_done:
 void CGCharaObj::onFramePostCalc()
 {
 	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x42) != 0) {
-		unsigned short tickDiv = *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x3A);
-		if (m_stateTick != 0 && (m_stateTick % static_cast<int>(tickDiv)) == 0) {
+		if (m_stateTick != 0 &&
+		    (m_stateTick % static_cast<int>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x3A))) == 0) {
 			if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) > 1 &&
 			    !CharaObjGameFlagBit5Set()) {
 				playSe3D(0x19, 0x32, 0x96, 0, 0);
@@ -612,7 +612,7 @@ void CGCharaObj::onFramePostCalc()
 		}
 	}
 
-	for (int i = 0, statusOffset = 0; i < 0x27; i++, statusOffset += 2) {
+	for (int statusOffset = 0, i = 0; i < 0x27; i++, statusOffset += 2) {
 		int statusValue = static_cast<int>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E + statusOffset)) - 1;
 		if (statusValue != 0 && i == 2) {
 			m_stateTick += 1;
@@ -628,7 +628,7 @@ void CGCharaObj::onFramePostCalc()
 				int idx = slot & ~((~(Pad.m_debugPadPort - static_cast<int>(slot) | static_cast<int>(slot) - Pad.m_debugPadPort)) >> 31);
 				padMask = Pad.GetPadInputs()[idx].buttonDown[0];
 			}
-			if ((MiniGamePcs.m_flags & 0x100) != 0) {
+			if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x100) != 0) {
 				useDebugPad = (Pad.m_debugPadLock != 0) || ((slot == 0) && (Pad.m_debugPadPort != -1));
 				unsigned short heldMask = 0;
 				if (!useDebugPad) {

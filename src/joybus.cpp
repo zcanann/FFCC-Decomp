@@ -4339,7 +4339,7 @@ int JoyBus::MakeJoyData(char* src, int length, unsigned int* outBuffer)
  */
 int JoyBus::SendPlayerStat(ThreadParam* threadParam)
 {
-    const int port = threadParam->m_portIndex;
+
     unsigned int result = 0;
 
     if (threadParam->m_subState != 1)
@@ -4466,7 +4466,7 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
             }
             else
             {
-                OSWaitSemaphore(&m_accessSemaphores[port]);
+                OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
                 unsigned int queuePort = threadParam->m_portIndex;
                 if ((int)m_cmdCount[queuePort] >= 0x40)
@@ -4487,8 +4487,8 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
     }
     else
     {
-        unsigned char* base = m_joyDataPacketBuffer[port];
-        unsigned int* wordPtr = (unsigned int*)(void*)(base + m_txWordIndex[port] * 4 + 2);
+        unsigned char* base = m_joyDataPacketBuffer[threadParam->m_portIndex];
+        unsigned int* wordPtr = (unsigned int*)(void*)(base + m_txWordIndex[threadParam->m_portIndex] * 4 + 2);
         unsigned int word = *wordPtr;
 
         if (m_threadRunningMask == 0)
@@ -4497,19 +4497,19 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
         }
         else
         {
-            OSWaitSemaphore(&m_accessSemaphores[port]);
+            OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
-            if ((int)m_cmdCount[port] >= 0x40)
+            if ((int)m_cmdCount[threadParam->m_portIndex] >= 0x40)
             {
-                OSSignalSemaphore(&m_accessSemaphores[port]);
+                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
                 result = -1;
             }
             else
             {
-                m_cmdQueueData[port][m_cmdCount[port]] = word;
-                m_cmdCount[port]++;
+                m_cmdQueueData[threadParam->m_portIndex][m_cmdCount[threadParam->m_portIndex]] = word;
+                m_cmdCount[threadParam->m_portIndex]++;
 
-                OSSignalSemaphore(&m_accessSemaphores[port]);
+                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
                 result = 0;
             }
         }
@@ -4518,11 +4518,11 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
     // Common tail: advance word index and clear GBA flag when finished.
     if (result == 0)
     {
-        m_txWordIndex[port]++;
+        m_txWordIndex[threadParam->m_portIndex]++;
 
-        if (m_txWordCount[port] <= m_txWordIndex[port])
+        if (m_txWordCount[threadParam->m_portIndex] <= m_txWordIndex[threadParam->m_portIndex])
         {
-            GbaQue.ClrCompatibilityFlg(port);
+            GbaQue.ClrCompatibilityFlg(threadParam->m_portIndex);
 
             return 1;
         }

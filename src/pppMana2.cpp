@@ -1257,7 +1257,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
     }
 
     if ((param_2->m_type == 1 || param_2->m_type == 2) && mana2Work->m_waterHeightA != 0) {
-        *reinterpret_cast<u32*>(reinterpret_cast<u8*>(mana2Work->m_waterHeightA) + 0x240) = param_2->m_rippleLevel;
+        mana2Work->m_waterHeightA[0x90] = param_2->m_rippleHeight;
     }
     }
 

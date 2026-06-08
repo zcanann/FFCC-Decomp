@@ -561,7 +561,7 @@ static bool CanTradeShopMenuItem(CShopMenu* shopMenu, int index, int itemNo)
         return false;
     }
 
-    if (itemNo >= 0x9F) {
+    if (itemNo > 0x9E) {
         return true;
     }
     return false;
@@ -1281,7 +1281,7 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
         font->SetScaleX(FLOAT_80332d28);
         attrStr = MenuPcs.GetAttrStr(attr);
         font->GetWidth(attrStr);
-        if ((attr != 0) && (attr < 9)) {
+        if ((attr >= 1) && (attr <= 8)) {
             strcpy(textBuffer, s_PlusOne_80332d38);
             valueWidth = font->GetWidth(textBuffer);
             float plusOneX = static_cast<float>(x) + (FLOAT_80332d3c - valueWidth);
@@ -1373,7 +1373,7 @@ void CShopMenu::DrawItemInfo0()
         int totalGil;
 
         if (m_listType == 0) {
-            if (itemNo < 1) {
+            if (itemNo <= 0) {
                 totalGil = 0;
             } else {
                 totalGil = static_cast<int>(ShopMenuCaravanWork(this)->m_shopParam) *
@@ -1381,7 +1381,7 @@ void CShopMenu::DrawItemInfo0()
                 totalGil = totalGil / 100;
             }
         } else if (m_listType == 1) {
-            if (itemNo < 1) {
+            if (itemNo <= 0) {
                 totalGil = 0;
             } else {
                 int gil = static_cast<int>(ShopMenuCaravanWork(this)->m_shopParam) *
@@ -1494,7 +1494,7 @@ void CShopMenu::DrawBuySellInfo()
                 unsigned int bit = static_cast<unsigned int>(itemNo - 0x191);
                 canTrade = (ShopMenuCaravanWork(this)->m_shopArgs[(itemNo - 0x191) >> 5] &
                             (1U << (bit & 0x1F))) != 0;
-            } else if ((m_listType == 1) && MenuPcs.EquipChk(m_selectedIndex) == 0 && itemNo >= 0x9F) {
+            } else if ((m_listType == 1) && MenuPcs.EquipChk(m_selectedIndex) == 0 && itemNo > 0x9E) {
                 canTrade = true;
             }
         }
@@ -1505,7 +1505,7 @@ void CShopMenu::DrawBuySellInfo()
         int gilItemNo = getItemNo(m_selectedIndex);
         if (m_listType == 0) {
             int gil = 0;
-            if (gilItemNo >= 1) {
+            if (gilItemNo > 0) {
                 const CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
                 gil = static_cast<int>(caravanWork->m_shopParam) *
                       *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + gilItemNo * 0x48 + 0x20);
@@ -1514,7 +1514,7 @@ void CShopMenu::DrawBuySellInfo()
             totalGil = m_quantity * gil;
         } else if (m_listType == 1) {
             int sellGil = 0;
-            if (gilItemNo >= 1) {
+            if (gilItemNo > 0) {
                 const CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
                 sellGil = static_cast<int>(caravanWork->m_shopParam) *
                           *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + gilItemNo * 0x48 + 0x20);
@@ -1592,7 +1592,7 @@ void CShopMenu::DrawItemList()
                          (1U << (bit & 0x1F))) != 0) {
                         canTrade = true;
                     }
-                } else if (MenuPcs.EquipChk(itemIndex) == 0 && tradeItemNo >= 0x9F) {
+                } else if (MenuPcs.EquipChk(itemIndex) == 0 && tradeItemNo > 0x9E) {
                     canTrade = true;
                 }
             }
@@ -1875,7 +1875,7 @@ void CShopMenu::DrawShopBase()
     Graphic.SetDrawDoneDebugData(4);
 
     if (m_mode >= 3) {
-        int listX = (m_mode < 9) ? 0x64 : 0x118;
+        int listX = (m_mode <= 8) ? 0x64 : 0x118;
         for (int barX = listX + 0x48; barX < 0x244; barX += 8) {
             Graphic.SetDrawDoneDebugData(5);
             drawShapeSeq(0x10, 0, barX, 0x11E, 0xFF, 0, 0, FLOAT_80332d9c, 0);
@@ -1889,7 +1889,7 @@ void CShopMenu::DrawShopBase()
         Graphic.SetDrawDoneDebugData(10);
     }
 
-    if (m_mode < 9) {
+    if (m_mode <= 8) {
         for (int sideX = 0x4E; sideX > 0x32; sideX -= 0x10) {
             Graphic.SetDrawDoneDebugData(0xB);
             drawShapeSeq(0xC, 0, sideX, 0x174, 0xFF, 0, 0, FLOAT_80332d9c, 0);
@@ -2615,7 +2615,7 @@ void CShopMenu::SelectYesNo()
             }
         } else {
             if (MenuPcs.EquipChk(itemIndex) == 0) {
-                if (tradeItem >= 0x9F) {
+                if (tradeItem > 0x9E) {
                     canTrade = true;
                 } else {
                     canTrade = false;

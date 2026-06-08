@@ -1369,7 +1369,6 @@ void CGObject::update()
     unsigned char& weaponFlagsHi = m_weaponNodeFlagBytes.m_flags1;
     unsigned char& shieldFlagsLo = *reinterpret_cast<unsigned char*>(&m_shieldNodeFlags);
     unsigned char& shieldFlagsHi = *(reinterpret_cast<unsigned char*>(&m_shieldNodeFlags) + 1);
-    const float lastBgAttr = m_lastBgAttr;
 
     int dispItemTimer = static_cast<signed char>(m_dispItemTimer) - 1;
     m_dispItemTimer = dispItemTimer & ~(dispItemTimer >> 31);
@@ -1398,7 +1397,7 @@ void CGObject::update()
         if (m_charaModelHandle->SetAnim(animIndex, startFrame, endFrame, blendMode, forceSet) != 0 &&
             m_currentAnimSlot != -1) {
             float frame = sZeroFloat;
-            if (lastBgAttr < sZeroFloat) {
+            if (m_lastBgAttr < sZeroFloat) {
                 frame = ModelAnimEnd(m_charaModelHandle->m_model) - ModelAnimStart(m_charaModelHandle->m_model);
             }
             m_turnSpeed = frame;
@@ -1637,7 +1636,7 @@ void CGObject::update()
         if ((m_displayFlags & 2) != 0) {
             float frameStep = m_turnSpeed;
             if (m_animSlotSel == -1 || (shieldFlagsLo & 0x80) == 0) {
-                float frameDelta = lastBgAttr;
+                float frameDelta = m_lastBgAttr;
                 const int activeAnimIndex = m_charaModelHandle->m_currentAnimIndex;
                 if (activeAnimIndex >= 0 && m_charaModelHandle->m_animSlot[activeAnimIndex] != 0) {
                     CRef* animRef = m_charaModelHandle->m_animSlot[activeAnimIndex];
@@ -1697,7 +1696,7 @@ void CGObject::update()
             if (ModelAnim(model) != 0) {
                 const float animSpan = sAnimFrameOffset + (ModelAnimEnd(model) - ModelAnimStart(model));
                 if (animSpan != sAnimFrameOffset) {
-                    animFinished = lastBgAttr >= sZeroFloat ? (ModelTime(model) >= animSpan - sAnimFrameOffset)
+                    animFinished = m_lastBgAttr >= sZeroFloat ? (ModelTime(model) >= animSpan - sAnimFrameOffset)
                                                             : (ModelTime(model) <= sZeroFloat);
                 }
             }

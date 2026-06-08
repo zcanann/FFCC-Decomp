@@ -56,6 +56,7 @@ void CMenuPcs::MLstDraw()
 
 	short menuMode = this->m_menuLstState->mode;
 	MenuLstEntry* item = this->m_menuLstList->entries;
+	float rowHeight = kMLstRowHeight;
 
 	for (int i = 0; i < this->m_menuLstList->count; i++) {
 		int tex = item->tex;
@@ -94,8 +95,8 @@ void CMenuPcs::MLstDraw()
 				0,
 				iconX,
 				iconY,
-				kMLstRowHeight,
-				kMLstRowHeight,
+				rowHeight,
+				rowHeight,
 				zero,
 				v,
 				item->z,
@@ -143,8 +144,8 @@ void CMenuPcs::MLstDraw()
 	DrawInit();
 	int helpMessageId = this->m_menuLstState->cursor + 0x25c;
 	CFont* helpFont = this->m_fonts[0];
-	float helpX = kMLstHelpCenterX;
-	float helpY = 352.0f;
+	float helpX = (float)-(rowHeight * kMLstHalf - kMLstHelpCenterX);
+	float helpY = kMLstHelpY;
 	DrawHelpMessage(
 		helpMessageId,
 		helpFont,

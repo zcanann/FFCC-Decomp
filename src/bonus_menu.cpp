@@ -1915,7 +1915,8 @@ void CMenuPcs::DrawResultCloseAnim()
 					colors[3].b = 0xFF;
 					colors[3].a = 0xFF;
 					GXSetChanMatColor(GX_COLOR0A0, colors[0]);
-				} else {
+				}
+				if (sprite->kind != 0x17) {
 					colors[0].r = 0xFF;
 					colors[0].g = 0xFF;
 					colors[0].b = 0xFF;
@@ -2727,7 +2728,8 @@ void CMenuPcs::DrawResultOpenAnim()
 						colors[3].b = 0xFF;
 						colors[3].a = 0xFF;
 						GXSetChanMatColor(GX_COLOR0A0, colors[0]);
-					} else {
+					}
+					if (sprite->kind != 0x17) {
 						colors[0].r = 0xFF;
 						colors[0].g = 0xFF;
 						colors[0].b = 0xFF;

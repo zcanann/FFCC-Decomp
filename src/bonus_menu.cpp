@@ -2340,10 +2340,10 @@ void CMenuPcs::DrawResultCountAnim()
 				if ((signed char)s_CntTop <= i && i < (signed char)s_CntTop + activePartyCount) {
 					int value = s_Rinfo->m_party[i - (signed char)s_CntTop].m_totalValue;
 					if (*(short*)(this->m_bonusStatePtr + 0x10) == 0) {
-						int frame = (int)*(short*)(this->m_bonusStatePtr + 0x22) - 8;
-						if (frame > 0) {
-							if (frame < value) {
-								value = frame;
+						double frame = (double)*(short*)(this->m_bonusStatePtr + 0x22) - 8.0;
+						if (frame > 0.0) {
+							if (frame < (double)value) {
+								value = (int)frame;
 							}
 						} else {
 							value = 0;

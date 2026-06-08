@@ -714,10 +714,10 @@ void CGCharaObj::onFramePreCalc()
 				m_partyRank[i] += 1;
 			} else if (m_partyDistance[j] == 0.0f) {
 				m_partyRank[j] += 1;
-			} else if (m_partyDistance[i] >= m_partyDistance[j]) {
-				m_partyRank[i] += 1;
-			} else {
+			} else if (m_partyDistance[i] < m_partyDistance[j]) {
 				m_partyRank[j] += 1;
+			} else {
+				m_partyRank[i] += 1;
 			}
 		}
 	}

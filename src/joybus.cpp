@@ -359,7 +359,7 @@ void JoyBus::Destroy()
 
     m_threadInitFlag = 1;
 
-    while (static_cast<signed char>(m_threadRunningMask) != 0)
+    while (static_cast<signed char>(Joybus.m_threadRunningMask) != 0)
     {
     }
 

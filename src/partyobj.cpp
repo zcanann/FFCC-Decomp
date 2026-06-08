@@ -1735,7 +1735,7 @@ void CGPartyObj::onFrameStat()
 		if (Game.m_gameWork.m_menuStageMode != 0 &&
 		    Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
 		    (static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
-		    m_scriptHandle[0xED] != nullptr) {
+		    reinterpret_cast<int*>(m_scriptHandle)[0xED] != 0) {
 			if (m_stateFrame == 0) {
 				CancelMove(1);
 				FLOAT_8032EE78 = m_targetDist - FLOAT_80331ac4;
@@ -5233,7 +5233,7 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 	char text[256];
 	if ((Game.m_gameWork.m_menuStageMode != 0) &&
 	    (Game.m_gameWork.m_bossArtifactStageIndex < 0x0F) &&
-	    ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D) && (m_scriptHandle[0xED] != nullptr)) {
+	    ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D) && (reinterpret_cast<int*>(m_scriptHandle)[0xED] != 0)) {
 		unsigned int bossKind;
 		switch (Game.m_gameWork.m_bossArtifactStageIndex) {
 		case 4:

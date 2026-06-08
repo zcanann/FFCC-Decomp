@@ -1650,20 +1650,20 @@ bool CMenuPcs::LetterConfirmOpen()
 		if (s_Attach != 2) {
 			if (languageId == 2) {
 				if (s_Attach == 0) {
-					sprintf(lines[2], s_fmt_pcts_pcts_pcts, GetMenuStr(0x23),
-					        GetLetterItemName(s_AttachItem * 5 + 4),
+					sprintf(lines[lineCount], s_fmt_pcts_pcts_pcts, GetMenuStr(0x23),
+					        Game.m_cFlatDataArr[1].TableStrings(0)[s_AttachItem * 5 + 4],
 					        GetMenuStr(0x24));
 				} else if (s_Attach == 1) {
-					sprintf(lines[2], s_fmt_pctd_sp_pcts, s_AttachItem, GetMenuStr(4));
+					sprintf(lines[lineCount], s_fmt_pctd_sp_pcts, s_AttachItem, GetMenuStr(4));
 				}
-				strcat(lines[2], GetMenuStr(0x28));
+				strcat(lines[lineCount], GetMenuStr(0x28));
 			} else {
-				strcpy(lines[2], GetMenuStr(0x28));
+				strcpy(lines[lineCount], GetMenuStr(0x28));
 				if (s_Attach == 0) {
-					strcat(lines[2], Game.m_cFlatDataArr[1].TableStrings(0)[s_AttachItem * 5 + 4]);
+					strcat(lines[lineCount], Game.m_cFlatDataArr[1].TableStrings(0)[s_AttachItem * 5 + 4]);
 				} else if (s_Attach == 1) {
-					int offs = strlen(lines[2]);
-					sprintf(lines[2] + offs, s_fmt_pctd_sp_pcts, s_AttachItem, GetMenuStr(4));
+					int offs = strlen(lines[lineCount]);
+					sprintf(lines[lineCount] + offs, s_fmt_pctd_sp_pcts, s_AttachItem, GetMenuStr(4));
 				}
 			}
 			lineCount = 3;

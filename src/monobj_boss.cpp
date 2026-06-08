@@ -446,44 +446,41 @@ void CGMonObj::frameStatFuncGolem()
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	int state = reinterpret_cast<CGPrgObj*>(this)->m_lastStateId;
 
-	if (state != 0x66) {
-		if (state < 0x66) {
-			if (state == 100) {
-				if (reinterpret_cast<CGPrgObj*>(this)->m_stateFrame == 0) {
-					reinterpret_cast<CGPrgObj*>(this)->playSe3D(0xFA17, 0x32, 0x96, 0, 0);
-				} else if (reinterpret_cast<CGPrgObj*>(this)->m_stateFrame == 0x14) {
-					reinterpret_cast<CGObject*>(this)->DispCharaParts(1);
-					reinterpret_cast<CGPrgObj*>(this)->playSe3D(0xFA18, 0x32, 0x96, 0, 0);
-					m_actionBranch = 1;
-				}
-				reinterpret_cast<CGCharaObj*>(this)->statAttack();
-				return;
-			}
-			if (state < 100) {
-				return;
-			}
-			int frame = reinterpret_cast<CGPrgObj*>(this)->m_stateFrame;
-			if (frame == 0) {
-				reinterpret_cast<CGPrgObj*>(this)->playSe3D(0xFA1A, 0x32, 0x96, 0, 0);
-			} else if (frame == 4) {
-				reinterpret_cast<CGObject*>(this)->DispCharaParts(3);
-				m_actionBranch = 0;
-			} else if (frame == 5) {
-				reinterpret_cast<CGObject*>(this)->DispCharaParts(7);
-			}
-			reinterpret_cast<CGCharaObj*>(this)->statAttack();
+	switch (state) {
+	case 100:
+		if (reinterpret_cast<CGPrgObj*>(this)->m_stateFrame == 0) {
+			reinterpret_cast<CGPrgObj*>(this)->playSe3D(0xFA17, 0x32, 0x96, 0, 0);
+		} else if (reinterpret_cast<CGPrgObj*>(this)->m_stateFrame == 0x14) {
+			reinterpret_cast<CGObject*>(this)->DispCharaParts(1);
+			reinterpret_cast<CGPrgObj*>(this)->playSe3D(0xFA18, 0x32, 0x96, 0, 0);
+			m_actionBranch = 1;
+		}
+		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+		return;
+	case 0x65: {
+		int frame = reinterpret_cast<CGPrgObj*>(this)->m_stateFrame;
+		if (frame == 0) {
+			reinterpret_cast<CGPrgObj*>(this)->playSe3D(0xFA1A, 0x32, 0x96, 0, 0);
+		} else if (frame == 4) {
+			reinterpret_cast<CGObject*>(this)->DispCharaParts(3);
+			m_actionBranch = 0;
+		} else if (frame == 5) {
+			reinterpret_cast<CGObject*>(this)->DispCharaParts(7);
+		}
+		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+		return;
+	}
+	case 0x67:
+		if (reinterpret_cast<CGPrgObj*>(this)->m_stateFrame != 0x32) {
 			return;
 		}
-		if (state != 0x68) {
-			if (0x67 < state) {
-				return;
-			}
-			if (reinterpret_cast<CGPrgObj*>(this)->m_stateFrame != 0x32) {
-				return;
-			}
-			reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
-			return;
-		}
+		reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
+		return;
+	case 0x66:
+	case 0x68:
+		break;
+	default:
+		return;
 	}
 
 	if ((reinterpret_cast<CGPrgObj*>(this)->m_stateFrame == 0x14) ||

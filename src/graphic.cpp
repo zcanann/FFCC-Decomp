@@ -1601,7 +1601,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 	bool hasNearAlpha;
 	bool hasFarAlpha;
 
-	if (mode >= 4) {
+	if (mode > 3) {
 		return;
 	}
 
@@ -1614,7 +1614,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 	if (farDist < nearDist) {
 		farDist = nearDist;
 	}
-	if (blurWidth < 1) {
+	if (blurWidth <= 0) {
 		blurWidth = 1;
 	}
 

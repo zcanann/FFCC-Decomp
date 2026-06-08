@@ -1513,51 +1513,45 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
         float clipBoundData[6];
         CBound* clipBound = reinterpret_cast<CBound*>(clipBoundData);
         worldBoundData[0] = gObject->m_worldPosition.x - radius;
-        clipBoundData[0] = kCameraBoundsMinInitial;
         worldBoundData[3] = gObject->m_worldPosition.x + radius;
-        clipBoundData[3] = kCameraBoundsMaxInitial;
-        worldBoundData[1] = gObject->m_worldPosition.y;
-        clipBoundData[1] = kCameraBoundsMinInitial;
-        worldBoundData[4] = gObject->m_worldPosition.y + radius;
-        clipBoundData[4] = kCameraBoundsMaxInitial;
         worldBoundData[2] = gObject->m_worldPosition.z - radius;
-        clipBoundData[2] = kCameraBoundsMinInitial;
         worldBoundData[5] = gObject->m_worldPosition.z + radius;
+        worldBoundData[1] = gObject->m_worldPosition.y;
+        clipBoundData[2] = kCameraBoundsMinInitial;
+        worldBoundData[4] = gObject->m_worldPosition.y + radius;
+        clipBoundData[1] = kCameraBoundsMinInitial;
+        clipBoundData[0] = kCameraBoundsMinInitial;
         clipBoundData[5] = kCameraBoundsMaxInitial;
+        clipBoundData[4] = kCameraBoundsMaxInitial;
+        clipBoundData[3] = kCameraBoundsMaxInitial;
 
         if (worldBound->CheckFrustum0(*clipBound) == 0) {
             continue;
         }
-        if (clipBoundData[0] <= kCameraClipMinZ) {
+        if (!(clipBoundData[2] > kCameraClipMinZ)) {
             continue;
         }
-        float negMinX = -clipBoundData[0];
-        float ratioZ = (clipBoundData[5] - clipBoundData[2]) / negMinX;
-        float ratioY = (clipBoundData[4] - clipBoundData[1]) / negMinX;
-        if (ratioZ > kCameraDebugRotateStep) {
+        float negMinZ = -clipBoundData[2];
+        float ratioX = (clipBoundData[3] - clipBoundData[0]) / negMinZ;
+        float ratioY = (clipBoundData[4] - clipBoundData[1]) / negMinZ;
+        if (ratioX > kCameraDebugRotateStep) {
             // proceed
-        } else if (ratioY <= kCameraDebugRotateStep) {
+        } else if (!(ratioY > kCameraDebugRotateStep)) {
             continue;
         }
 
-        if (worldBoundData[0] < shadowRectBound.m_min.x) {
-            shadowRectBound.m_min.x = worldBoundData[0];
-        }
-        if (worldBoundData[1] < shadowRectBound.m_min.y) {
-            shadowRectBound.m_min.y = worldBoundData[1];
-        }
-        if (worldBoundData[2] < shadowRectBound.m_min.z) {
-            shadowRectBound.m_min.z = worldBoundData[2];
-        }
-        if (shadowRectBound.m_max.x < worldBoundData[3]) {
-            shadowRectBound.m_max.x = worldBoundData[3];
-        }
-        if (shadowRectBound.m_max.y < worldBoundData[4]) {
-            shadowRectBound.m_max.y = worldBoundData[4];
-        }
-        if (shadowRectBound.m_max.z < worldBoundData[5]) {
-            shadowRectBound.m_max.z = worldBoundData[5];
-        }
+        shadowRectBound.m_min.x =
+            (shadowRectBound.m_min.x < worldBoundData[0]) ? shadowRectBound.m_min.x : worldBoundData[0];
+        shadowRectBound.m_min.y =
+            (shadowRectBound.m_min.y < worldBoundData[1]) ? shadowRectBound.m_min.y : worldBoundData[1];
+        shadowRectBound.m_min.z =
+            (shadowRectBound.m_min.z < worldBoundData[2]) ? shadowRectBound.m_min.z : worldBoundData[2];
+        shadowRectBound.m_max.x =
+            (shadowRectBound.m_max.x > worldBoundData[3]) ? shadowRectBound.m_max.x : worldBoundData[3];
+        shadowRectBound.m_max.y =
+            (shadowRectBound.m_max.y > worldBoundData[4]) ? shadowRectBound.m_max.y : worldBoundData[4];
+        shadowRectBound.m_max.z =
+            (shadowRectBound.m_max.z > worldBoundData[5]) ? shadowRectBound.m_max.z : worldBoundData[5];
         count += 1;
     }
 
@@ -1582,7 +1576,7 @@ void CCameraPcs::drawShadowBegin()
     Mtx tempMtx;
     Vec up;
     Vec delta;
-    double depth;
+    float depth;
 
     if (m_fullScreenShadowEnabled == 0) {
         return;
@@ -1594,16 +1588,11 @@ void CCameraPcs::drawShadowBegin()
     CopyCameraState(m_shadowCamera, CurrentCameraState());
 
     if (Game.m_currentSceneId == 3) {
-        float stickX = kCameraZeroF;
-        float stickY = kCameraZeroF;
+        float stickX = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraShadowPadInput().stickXF;
+        m_fullScreenShadow.m_rotY += kCameraDegToRad * (kCameraDebugMoveStep * stickX);
 
-        if (Pad.m_debugPadLock == 0) {
-            stickX = CameraShadowPadInput().stickXF;
-            stickY = CameraShadowPadInput().stickYF;
-        }
-
-        m_fullScreenShadow.m_rotY += kCameraDegToRad * kCameraDebugMoveStep * stickX;
-        m_fullScreenShadow.m_rotX += kCameraDegToRad * kCameraTwoF * stickY;
+        float stickY = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraShadowPadInput().stickYF;
+        m_fullScreenShadow.m_rotX += kCameraDegToRad * (kCameraTwoF * stickY);
     }
 
     PSMTXRotRad(rotX, 'x', -m_fullScreenShadow.m_rotX);
@@ -1611,47 +1600,46 @@ void CCameraPcs::drawShadowBegin()
     PSMTXConcat(rotY, rotX, rotXY);
 
     if (Game.m_currentSceneId == 4) {
-        m_shadowRectBound.m_min.x = kCameraBoundsMinInitial;
-        m_shadowRectBound.m_min.y = kCameraBoundsMinInitial;
         m_shadowRectBound.m_min.z = kCameraBoundsMinInitial;
-        m_shadowRectBound.m_max.x = kCameraBoundsMaxInitial;
-        m_shadowRectBound.m_max.y = kCameraBoundsMaxInitial;
+        m_shadowRectBound.m_min.y = kCameraBoundsMinInitial;
+        m_shadowRectBound.m_min.x = kCameraBoundsMinInitial;
         m_shadowRectBound.m_max.z = kCameraBoundsMaxInitial;
+        m_shadowRectBound.m_max.y = kCameraBoundsMaxInitial;
+        m_shadowRectBound.m_max.x = kCameraBoundsMaxInitial;
 
         if (m_shadowAuto == 1 && GetShadowRect(m_shadowRectBound) != 0) {
             m_targetX = (m_shadowRectBound.m_min.x + m_shadowRectBound.m_max.x) * kCameraHalfF;
-            m_targetY = m_fullScreenShadowPosition.y;
             m_targetZ = (m_shadowRectBound.m_min.z + m_shadowRectBound.m_max.z) * kCameraHalfF;
+            m_targetY = m_fullScreenShadowPosition.y;
 
-            double w = static_cast<double>(m_shadowRectBound.m_max.x - m_shadowRectBound.m_min.x);
-            double h = static_cast<double>(m_shadowRectBound.m_max.z - m_shadowRectBound.m_min.z);
+            float w = m_shadowRectBound.m_max.x - m_shadowRectBound.m_min.x;
+            float h = m_shadowRectBound.m_max.z - m_shadowRectBound.m_min.z;
             if (w < h) {
                 w = h;
             }
-            m_fullScreenShadow.m_span = static_cast<float>(static_cast<double>(kCameraHalfF) * w);
+            m_fullScreenShadow.m_span = kCameraHalfF * w;
             depth = w;
         } else if (m_shadowAuto == 2) {
             m_targetX = m_fullScreenShadowPosition.x;
             m_targetY = m_fullScreenShadowPosition.y;
             m_targetZ = m_fullScreenShadowPosition.z;
             PSVECSubtract(reinterpret_cast<Vec*>(&m_targetX), reinterpret_cast<Vec*>(&m_positionX), &delta);
-            depth = static_cast<double>(m_fullScreenShadowCamLen);
+            depth = m_fullScreenShadowCamLen;
             m_fullScreenShadow.m_span = kCameraShadowSpanScale * m_fullScreenShadow.m_scale;
         } else {
             m_targetX = m_fullScreenShadowPosition.x;
             m_targetY = m_fullScreenShadowPosition.y;
             m_targetZ = m_fullScreenShadowPosition.z;
             PSVECSubtract(reinterpret_cast<Vec*>(&m_targetX), reinterpret_cast<Vec*>(&m_positionX), &delta);
-            depth = static_cast<double>(PSVECMag(&delta));
-            m_fullScreenShadow.m_span = static_cast<float>(depth) * m_fullScreenShadow.m_scale;
+            depth = PSVECMag(&delta);
+            m_fullScreenShadow.m_span = depth * m_fullScreenShadow.m_scale;
         }
 
-        double currentDepth = static_cast<double>(m_fullScreenShadowDepth);
-        if (currentDepth >= static_cast<double>(kCameraZeroF)) {
-            m_fullScreenShadowDepth = static_cast<float>(currentDepth +
-                                                         static_cast<double>((static_cast<float>(depth - currentDepth)) * kCameraShadowDepthBlend));
+        float currentDepth = m_fullScreenShadowDepth;
+        if (currentDepth >= kCameraZeroF) {
+            m_fullScreenShadowDepth = currentDepth + (depth - currentDepth) * kCameraShadowDepthBlend;
         } else {
-            m_fullScreenShadowDepth = static_cast<float>(depth);
+            m_fullScreenShadowDepth = depth;
         }
     } else {
         m_fullScreenShadow.m_span = kCameraHundredF;
@@ -1797,16 +1785,16 @@ void CCameraPcs::drawShadowEnd()
     GXPosition3f32(static_cast<float>(x0), static_cast<float>(x0), z);
 
     GXSetTexCopySrc(0, 0, 0x1E0, 0x1E0);
-    GXSetTexCopyDst(0x1E0, 0x1E0, GX_TF_I8, GX_FALSE);
+    GXSetTexCopyDst(0x1E0, 0x1E0, GX_TF_Z8, GX_FALSE);
     GXCopyTex(m_fullScreenShadow.m_shadowTexture, GX_TRUE);
     GXSetCullMode(GX_CULL_FRONT);
 
     {
         float span = m_fullScreenShadow.m_span;
-        float depthSpan = m_shadowCamera.m_farZ - m_shadowCamera.m_nearZ;
         C_MTXLightOrtho(m_fullScreenShadow.m_shadowTexMtx, -span, span, -span, span,
                         kCameraHalfF, kCameraHalfF, kCameraHalfF, kCameraHalfF);
         PSMTXScale(m_fullScreenShadow.m_depthScaleMtx, kCameraZeroF, kCameraZeroF, kCameraZeroF);
+        float depthSpan = m_shadowCamera.m_farZ - m_shadowCamera.m_nearZ;
         m_fullScreenShadow.m_depthScaleMtx[0][2] = kCameraNegativeOneF / depthSpan;
         m_fullScreenShadow.m_depthScaleMtx[0][3] = -(m_shadowCamera.m_nearZ / depthSpan);
         m_fullScreenShadow.m_depthScaleMtx[1][2] = m_fullScreenShadow.m_depthScaleMtx[0][2] * kCameraShadowDepthScaleY;

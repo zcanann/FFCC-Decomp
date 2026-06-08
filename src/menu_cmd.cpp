@@ -2641,8 +2641,8 @@ unsigned int CMenuPcs::CmdOpen1()
 		animEntry->scale = static_cast<f32>(panelScale);
 		animEntry->width = 0xC0;
 		animEntry->height = 0x40;
-		animEntry->y = static_cast<s16>(((-((static_cast<f64>(animEntry->height) * animEntry->scale) -
-		                                    static_cast<f64>(baseEntry->height)) *
+		animEntry->y = static_cast<s16>(((-((static_cast<f32>(animEntry->height) * animEntry->scale) -
+		                                    static_cast<f32>(baseEntry->height)) *
 		                                   kCmdMenuHalfD) +
 		                                  static_cast<f64>(baseEntry->y)) -
 		                                 kCmdMenuUnitePanelYOffsetD);

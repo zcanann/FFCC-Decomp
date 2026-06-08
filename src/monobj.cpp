@@ -855,11 +855,13 @@ void CGMonObj::seKiduki()
 		if (static_cast<double>(*reinterpret_cast<float*>(mon + 0x5BC)) < soundLimit) {
 			int* scriptHandle = *reinterpret_cast<int**>(mon + 0x58);
 			unsigned char* script = reinterpret_cast<unsigned char*>(scriptHandle[9]);
+			int colIndex;
 			float hitScale;
 
 			checkCol(6, *reinterpret_cast<float*>(mon + 0x1A8),
 			         static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xC8)),
-			         &hitScale, &partyIndex);
+			         &hitScale, &colIndex);
+			partyIndex = colIndex;
 			if (partyIndex >= 0) {
 				goto haveNotice;
 			}

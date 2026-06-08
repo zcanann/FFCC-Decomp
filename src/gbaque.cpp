@@ -3146,16 +3146,15 @@ void GbaQueue::ChkCMakeCharaType(int channel, unsigned int value)
  */
 void GbaQueue::ChkCMakeJob(int channel, unsigned int value)
 {
+	unsigned int stackValue = value;
+	unsigned char* valueBytes = reinterpret_cast<unsigned char*>(&stackValue);
 	char* obj = reinterpret_cast<char*>(this);
-	unsigned char jobType = static_cast<unsigned char>(value >> 8);
-	unsigned char resultCode = static_cast<unsigned char>(value >> 16);
-	int cmakeOffset = channel * 0x20;
 	OSSemaphore* semaphore = accessSemaphores + channel;
 
-	if (jobType == 0xFF) {
-		OSWaitSemaphore(semaphore);
-		obj[0x2CD1 + cmakeOffset] = static_cast<char>(0xFF);
-		OSSignalSemaphore(semaphore);
+	if (valueBytes[2] == 0xFF) {
+		OSWaitSemaphore(accessSemaphores + channel);
+		obj[0x2CD1 + channel * 0x20] = static_cast<char>(valueBytes[2]);
+		OSSignalSemaphore(accessSemaphores + channel);
 		return;
 	}
 
@@ -3164,12 +3163,12 @@ void GbaQueue::ChkCMakeJob(int channel, unsigned int value)
 		OSWaitSemaphore(accessSemaphores + i);
 	}
 
-	unsigned char playerSlot = static_cast<unsigned char>(obj[0x2CB8 + cmakeOffset]);
+	unsigned char playerSlot = static_cast<unsigned char>(obj[0x2CB8 + channel * 0x20]);
 	for (int i = 0; i < 4; i++) {
 		int otherOffset = i * 0x20;
 		if ((channel != i) && (cmakeInfo[i].m_active != 0) &&
-		    (static_cast<unsigned char>(obj[0x2CD1 + otherOffset]) == jobType)) {
-			Joybus.SendResult(channel, 1, resultCode, 0);
+		    (static_cast<unsigned char>(obj[0x2CD1 + otherOffset]) == valueBytes[2])) {
+			Joybus.SendResult(channel, 1, valueBytes[1], 0);
 			foundDuplicate = true;
 			break;
 		}
@@ -3186,16 +3185,16 @@ void GbaQueue::ChkCMakeJob(int channel, unsigned int value)
 	for (int i = 0; i < 8; i++) {
 		CCaravanWork* caravanWork = &Game.m_caravanWorkArr[i];
 		if ((i != playerSlot) && (caravanWork->m_shopState != 0) && (caravanWork->m_caravanLocalFlags == 0) &&
-		    (static_cast<unsigned char>(caravanWork->unk_0x3ac) == jobType)) {
-			Joybus.SendResult(channel, 1, resultCode, 0);
+		    (static_cast<unsigned char>(caravanWork->unk_0x3ac) == valueBytes[2])) {
+			Joybus.SendResult(channel, 1, valueBytes[1], 0);
 			return;
 		}
 	}
 
-	Joybus.SendResult(channel, 0, resultCode, 0);
-	OSWaitSemaphore(semaphore);
-	obj[0x2CD1 + cmakeOffset] = static_cast<char>(jobType);
-	OSSignalSemaphore(semaphore);
+	Joybus.SendResult(channel, 0, valueBytes[1], 0);
+	OSWaitSemaphore(accessSemaphores + channel);
+	obj[0x2CD1 + channel * 0x20] = static_cast<char>(valueBytes[2]);
+	OSSignalSemaphore(accessSemaphores + channel);
 }
 
 /*

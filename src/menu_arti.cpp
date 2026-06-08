@@ -744,18 +744,18 @@ void CMenuPcs::ArtiInit()
 	entry->startFrame = 0;
 	entry->duration = 5;
 
-	list = GetArtiOpenAnimList(this);
+	ArtiOpenAnim* entry0 = GetArtiOpenAnimList(this)->entries;
 	yOffset = 0;
-	int listIndex = 4;
+	int byteOffset = 0x100;
 	int loopCount = 4;
 	do {
-		entry = &list->entries[listIndex];
+		entry = (ArtiOpenAnim*)((char*)GetArtiOpenAnimList(this)->entries + byteOffset);
 		entry->flags = 2;
 		entry->tex = 0x37;
 		count = count + 2;
-		entry->x = list->entries[0].x + 0x24;
+		entry->x = entry0->x + 0x24;
 		short nextY = yOffset + 0x20;
-		entry->y = list->entries[0].y + yOffset;
+		entry->y = entry0->y + yOffset;
 		entry->w = 200;
 		entry->h = 0x28;
 		entry->u = zero;
@@ -763,13 +763,14 @@ void CMenuPcs::ArtiInit()
 		entry->startFrame = 7;
 		entry->duration = 5;
 
-		entry = &list->entries[listIndex + 1];
-		listIndex = listIndex + 2;
+		int byteOffset2 = byteOffset + 0x40;
+		byteOffset = byteOffset + 0x80;
+		entry = (ArtiOpenAnim*)((char*)GetArtiOpenAnimList(this)->entries + byteOffset2);
 		entry->flags = 2;
 		entry->tex = 0x37;
-		entry->x = list->entries[0].x + 0x24;
+		entry->x = entry0->x + 0x24;
 		yOffset = yOffset + 0x40;
-		entry->y = list->entries[0].y + nextY;
+		entry->y = entry0->y + nextY;
 		entry->w = 200;
 		entry->h = 0x28;
 		entry->u = zero;

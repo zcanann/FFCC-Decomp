@@ -281,7 +281,7 @@ void GbaQueue::LoadAll()
 	char prevMenuStageMode;
 	char spModeBits;
 	char spModeChangeBits;
-	unsigned int cflatFlag;
+	int cflatFlag;
 	int* scriptFoodBase;
 
 	for (i = 0; i < 4; i++) {
@@ -318,7 +318,7 @@ void GbaQueue::LoadAll()
 	LoadEnemyStat();
 	LoadMapItemStat();
 
-	cflatFlag = reinterpret_cast<unsigned int*>(&CFlat)[0x1041];
+	cflatFlag = reinterpret_cast<int*>(&CFlat)[0x1041];
 	if ((obj[0x2CE8] == 0) && (cflatFlag != 0)) {
 		SetRadarType();
 	}

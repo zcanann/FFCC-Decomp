@@ -1545,7 +1545,7 @@ void GbaQueue::LoadEnemyStat()
 				    *reinterpret_cast<short*>(reinterpret_cast<char*>(enemyObj) + 0x516);
 				long long posX = static_cast<int>(enemyObj->m_worldPosition.x / kGbaQueueMapCoordScale);
 				long long posZ = static_cast<int>(enemyObj->m_worldPosition.z / kGbaQueueMapCoordScale);
-				*reinterpret_cast<short*>(enemyEntry + 8) = static_cast<short>(posX);
+				*reinterpret_cast<unsigned short*>(enemyEntry + 8) = static_cast<short>(posX);
 				*reinterpret_cast<short*>(enemyEntry + 0xA) = static_cast<short>(posZ);
 			}
 
@@ -1894,7 +1894,7 @@ void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 		if ((localEntry[0] != 0 || prevEntry[0] != 0) && memcmp(localEntry, prevEntry, 0x14) != 0) {
 			count++;
 			outPtr[0] = 0x21;
-			outPtr[1] = static_cast<unsigned char>(i + 0x40) | (static_cast<unsigned char>(localEntry[0]) << 7);
+			outPtr[1] = static_cast<unsigned char>(i + 0x40) | (static_cast<signed char>(localEntry[0]) << 7);
 			outPtr[2] = static_cast<unsigned char>(*reinterpret_cast<short*>(localEntry + 8));
 			outPtr[3] = static_cast<unsigned char>(*reinterpret_cast<short*>(localEntry + 10));
 			outPtr += 4;
@@ -3290,7 +3290,7 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 		count++;
 	}
 
-	if ((count > 4) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
+	if ((count > 4) && (static_cast<int>(System.m_execParam) >= 1)) {
 		System.Printf(const_cast<char*>(s_compatibility_data_error));
 	}
 
@@ -3626,7 +3626,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
-	const unsigned int itemCount = static_cast<unsigned short>(caravanWork->m_shopListCount);
+	const unsigned int itemCount = static_cast<short>(caravanWork->m_shopListCount);
 
 	int totalSize = 4;
 	outData[0] = static_cast<char>(itemCount);
@@ -3649,7 +3649,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 
 	for (unsigned int i = 0; i < itemCount; i++) {
 		const int itemId = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_shopList[i];
-		int itemPrice = static_cast<unsigned short>(
+		unsigned int itemPrice = static_cast<unsigned short>(
 			*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x20));
 		itemPrice = static_cast<int>(static_cast<float>(itemPrice) * userRate);
 		if (itemPrice < 1) {
@@ -4445,7 +4445,7 @@ int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
 			scouterEntry[0] = enemyEntry[0xB37];
 			if (scouterEntry[0] != 0) {
 				CMonWork* enemyWork = reinterpret_cast<CMonWork*>(enemyWorkPtrs[i]);
-				const int enemyDataBase = Game.unkCFlatData0[1] + static_cast<unsigned char>(enemyEntry[0xB37]) * 0x1D0;
+				const int enemyDataBase = Game.unkCFlatData0[1] + static_cast<signed char>(enemyEntry[0xB37]) * 0x1D0;
 
 				*reinterpret_cast<unsigned short*>(scouterEntry + 4) = SwapU16(enemyWork->m_maxHp);
 
@@ -4469,7 +4469,7 @@ int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
 					scouterEntry[1] = 0;
 				} else if ((enemyFlags & 4) == 0) {
 					if ((enemyFlags & 1) == 0) {
-						const unsigned short form0 = *reinterpret_cast<unsigned short*>(enemyDataBase + 0xF0);
+						const unsigned short form0 = *reinterpret_cast<short*>(enemyDataBase + 0xF0);
 						if ((form0 == 0) && (*reinterpret_cast<unsigned short*>(enemyDataBase + 0xF2) == 0) &&
 						    (*reinterpret_cast<unsigned short*>(enemyDataBase + 0xF4) == 0)) {
 							scouterEntry[1] = 3;

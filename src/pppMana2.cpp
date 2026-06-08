@@ -756,9 +756,10 @@ void CalcReflectionVector2(
             float absX = fabsf(outVec->x);
             float absZ = fabsf(outVec->z);
 
-            axis = absX < absY;
+            axis = 0;
             maxAxis = absX;
-            if (axis) {
+            if (absX < absY) {
+                axis = 1;
                 maxAxis = absY;
             }
             if (maxAxis < absZ) {
@@ -770,10 +771,10 @@ void CalcReflectionVector2(
             clr[0] = 0x80;
             clr[1] = 0x80;
             clr[2] = 0x80;
-            clr[3] = 0xFF;
 
-            uv.x = (float)half;
             uv.y = (float)half;
+            uv.x = (float)half;
+            clr[3] = 0xFF;
 
             switch (axis) {
             case 0:
@@ -1224,12 +1225,13 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
                 for (s32 dlIndex = meshData->m_displayListCount - 1; dlIndex >= 0; dlIndex--) {
                     void* copiedDisplayList =
                         pppMemAlloc(displayList->m_size, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x255);
-                    copiedDisplayList = reinterpret_cast<void*>((reinterpret_cast<u32>(copiedDisplayList) + 0x1F) & 0xFFFFFFE0);
                     mana2Work->m_displayListCopies[dlIndex] = copiedDisplayList;
+                    mana2Work->m_displayListCopies[dlIndex] = reinterpret_cast<void*>(
+                        (reinterpret_cast<u32>(mana2Work->m_displayListCopies[dlIndex]) + 0x1F) & 0xFFFFFFE0);
                     mana2Work->m_displayListSize = displayList->m_size;
-                    memcpy(copiedDisplayList, displayList->m_data, displayList->m_size);
-                    DCFlushRange(copiedDisplayList, displayList->m_size);
-                    gUtil.ReWriteDisplayList(copiedDisplayList, displayList->m_size, 1);
+                    memcpy(mana2Work->m_displayListCopies[dlIndex], displayList->m_data, displayList->m_size);
+                    DCFlushRange(mana2Work->m_displayListCopies[dlIndex], displayList->m_size);
+                    gUtil.ReWriteDisplayList(mana2Work->m_displayListCopies[dlIndex], displayList->m_size, 1);
                     displayList++;
                 }
             }
@@ -1262,8 +1264,12 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
         }
     }
 
-    if ((param_2->m_type == 1 || param_2->m_type == 2) && mana2Work->m_waterHeightA != 0) {
-        mana2Work->m_waterHeightA[0x90] = param_2->m_rippleHeight;
+    if (param_2->m_type == 1 || param_2->m_type == 2) {
+        float* waterHeightA = mana2Work->m_waterHeightA;
+        float rippleHeight = param_2->m_rippleHeight;
+        if (waterHeightA != 0) {
+            waterHeightA[0x90] = rippleHeight;
+        }
     }
     }
 

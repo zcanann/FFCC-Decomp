@@ -12224,7 +12224,7 @@ void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
 #define count (*reinterpret_cast<const int*>(winMess))
 	int maxWidth = 0;
 
-	const unsigned char* entry = winMess + 4;
+	const unsigned char* entry = winMess;
 	for (int i = 0; i < count; i++) {
 		const short msgId = *reinterpret_cast<const short*>(entry + 4);
 		const char* text = msgTable[msgId];
@@ -12237,7 +12237,7 @@ void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
 				maxWidth = textWidth;
 			}
 		}
-		entry += 8;
+		entry += 2;
 	}
 
 	int cols = maxWidth / 0x16;

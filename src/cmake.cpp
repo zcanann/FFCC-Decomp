@@ -1045,7 +1045,9 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
             unsigned int rawLen = strlen(s_CmakeInfo.m_name);
             int nameLen = rawLen & (static_cast<int>(-rawLen | rawLen) >> 31);
             int ret;
-            if (nameLen < 7) {
+            if (nameLen >= 7) {
+                ret = -1;
+            } else {
                 picked[0] = '\0';
                 rowLen = strlen(rowText);
                 if (rowLen != 0) {
@@ -1070,18 +1072,16 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
                     strcat(s_CmakeInfo.m_name, picked);
                     ret = 0;
                 }
-            } else {
-                ret = -1;
             }
-            if (ret == 0) {
+            if (ret != 0) {
+                Sound.PlaySe(4, 0x40, 0x7f, 0);
+            } else {
                 unsigned int finalLen = strlen(s_CmakeInfo.m_name);
                 if (static_cast<int>(finalLen & (static_cast<int>(-finalLen | finalLen) >> 31)) > 6) {
                     select = 0xB;
                     row = 5;
                 }
                 Sound.PlaySe(2, 0x40, 0x7f, 0);
-            } else {
-                Sound.PlaySe(4, 0x40, 0x7f, 0);
             }
             }
         } else if ((down & 0x200) != 0) {
@@ -1103,10 +1103,10 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
                 }
                 bsRet = 0;
             }
-            if (bsRet == 0) {
-                Sound.PlaySe(3, 0x40, 0x7f, 0);
-            } else {
+            if (bsRet != 0) {
                 Sound.PlaySe(4, 0x40, 0x7f, 0);
+            } else {
+                Sound.PlaySe(3, 0x40, 0x7f, 0);
             }
             return 0;
         }

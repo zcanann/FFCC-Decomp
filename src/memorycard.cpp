@@ -567,7 +567,7 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
     {
         memcpy(dstCharData + 0xBC, srcCharData + 0xBC, 0x0C);
 
-        u8* srcWork = srcSaveData + srcChar * 0x208;
+        u8* srcWork = srcSaveData + (srcChar << 9) + (srcChar << 3);
         for (int i = 0; i < 2; i++)
         {
             srcWork[0xC0] = 0;

@@ -3149,17 +3149,19 @@ int CMenuPcs::GetSmithItem(int itemNo)
             genderMask = 0x20;
         }
 
+        int raceFlags = flags & 0xF;
+        int genderFlags = flags & 0x30;
         unsigned int valid;
-        if (((flags & 0xF) != 0) && ((flags & 0x30) != 0)) {
-            if (((flags & 0xF & raceMask) != 0) && ((flags & 0x30 & genderMask) != 0)) {
+        if ((raceFlags != 0) && (genderFlags != 0)) {
+            if (((raceFlags & raceMask) != 0) && ((genderFlags & genderMask) != 0)) {
                 valid = 1;
             } else {
                 valid = 0;
             }
-        } else if ((flags & 0xF) == 0) {
-            valid = static_cast<unsigned int>(-static_cast<int>(flags & 0x30 & genderMask)) >> 0x1f;
+        } else if (raceFlags == 0) {
+            valid = static_cast<unsigned int>(-static_cast<int>(genderFlags & genderMask)) >> 0x1f;
         } else {
-            valid = static_cast<unsigned int>(-static_cast<int>(flags & 0xF & raceMask)) >> 0x1f;
+            valid = static_cast<unsigned int>(-static_cast<int>(raceFlags & raceMask)) >> 0x1f;
         }
 
         if (valid != 0) {

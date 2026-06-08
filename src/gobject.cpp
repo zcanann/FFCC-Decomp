@@ -941,7 +941,6 @@ void CGObject::bgNormalCollision()
     move.y = sZeroFloat;
     Vec pos = m_worldPosition;
     pos.y += sStepProbeHeight + m_capsuleHalfHeight;
-    const u32 hitMask = m_bgHitMask;
 
     unsigned int retry = 4;
     while (retry != 0) {
@@ -957,7 +956,7 @@ void CGObject::bgNormalCollision()
         bodyCylinder.Probe().m_radius2 = m_capsuleHalfHeight;
         bodyCylinder.Probe().m_height2 = sZeroFloat;
 
-        if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&bodyCylinder), &move, hitMask) == 0) {
+        if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&bodyCylinder), &move, m_bgHitMask) == 0) {
             break;
         }
 
@@ -1003,7 +1002,7 @@ void CGObject::bgNormalCollision()
     stepCylinder.Probe().m_radius2 = m_capsuleHalfHeight;
     stepCylinder.Probe().m_height2 = sZeroFloat;
 
-    if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&stepCylinder), &move, hitMask) == 0) {
+    if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&stepCylinder), &move, m_bgHitMask) == 0) {
         pos.y -= m_capsuleHalfHeight;
         PSVECAdd(&pos, &move, &pos);
         PSVECSubtract(&pos, &m_worldPosition, &m_groundHitOffset);
@@ -1033,7 +1032,7 @@ void CGObject::bgNormalCollision()
         hitCylinder.Probe().m_radius2 = m_capsuleHalfHeight;
         hitCylinder.Probe().m_height2 = 0.0f;
 
-        if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&hitCylinder), &move, hitMask) != 0) {
+        if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&hitCylinder), &move, m_bgHitMask) != 0) {
             Vec hitPos;
             MapMng.m_hitMapObj->CalcHitPosition(&hitPos);
             PSVECSubtract(&hitPos, &pos, &move);

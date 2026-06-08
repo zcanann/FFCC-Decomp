@@ -5875,7 +5875,7 @@ void CMenuPcs::DrawTitleMenu()
 				fadeAlpha2 = static_cast<float>(-(DOUBLE_80331770 * static_cast<double>(m_wmWorldState->m_frameCounter) -
 				                                 DOUBLE_80331420));
 			}
-			if (FLOAT_803313e8 <= fadeAlpha2) fadeAlpha2 = FLOAT_803313e8;
+			if (fadeAlpha2 >= FLOAT_803313e8) fadeAlpha2 = FLOAT_803313e8;
 			SetAttrFmt((FMT)2);
 			matColor.r = 0;
 			matColor.g = 0;
@@ -7704,7 +7704,7 @@ void CMenuPcs::DrawWMFrame()
 		alpha = static_cast<float>(DOUBLE_803316d8 * static_cast<double>(m_wmWorldState->m_frameCounter));
 	} else if (sVar == 3) {
 		m_wmWorldState->m_posX += FLOAT_80331550;
-		if (DOUBLE_803316e0 <= static_cast<double>(m_wmWorldState->m_posX)) {
+		if (static_cast<double>(m_wmWorldState->m_posX) >= DOUBLE_803316e0) {
 			m_wmWorldState->m_posX = FLOAT_80331440;
 		}
 		alpha = static_cast<float>(-(DOUBLE_803316d8 * static_cast<double>(m_wmWorldState->m_frameCounter) -

@@ -2317,16 +2317,9 @@ void CShopMenu::SelectYesNo()
         return;
     }
 
-    unsigned int yesNo = m_yesNo;
+    int yesNo = m_yesNo;
     if (yesNo == 1) {
-        if (m_listType == 0) {
-            Sound.PlaySe(3, 0x40, 0x7F, 0);
-            m_subMode = 1;
-        } else {
-            Sound.PlaySe(3, 0x40, 0x7F, 0);
-            m_subMode = 0;
-        }
-        return;
+        goto yesBlock;
     }
 
     if ((yesNo >= 1) || (yesNo < 0)) {
@@ -2476,6 +2469,16 @@ void CShopMenu::SelectYesNo()
         }
     } else {
         Sound.PlaySe(4, 0x40, 0x7F, 0);
+    }
+    return;
+
+yesBlock:
+    if (m_listType == 0) {
+        Sound.PlaySe(3, 0x40, 0x7F, 0);
+        m_subMode = 1;
+    } else {
+        Sound.PlaySe(3, 0x40, 0x7F, 0);
+        m_subMode = 0;
     }
 }
 /*

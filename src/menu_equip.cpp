@@ -14,25 +14,25 @@ typedef signed short s16;
 typedef unsigned char u8;
 typedef unsigned short u16;
 
-static const float kEquipZero = 0.0f;
-static const double kEquipOneDouble = 1.0;
-static const double kEquipWindowCenterX = 216.0;
-static const double kEquipHalfDouble = 0.5;
-static const double kEquipIntToDoubleBias = 4503601774854144.0;
-static const float kEquipOne = 1.0f;
-static const float kEquipColorMax = 255.0f;
-static const float kEquipListFontScale = 0.9f;
-static const float kEquipTextYOffset = 4.0f;
-static const float kEquipMarkXOffset = 12.0f;
-static const float kEquipMarkHeight = 24.0f;
-static const float kEquipHelpCenterX = 320.0f;
-static const float kEquipHalf = 0.5f;
-static const float kEquipHelpY = 352.0f;
-static const float kEquipHelpScale = 3.0f;
-static const double kEquipZeroDouble = 0.0;
-static const float kEquipInitU = 128.0f;
-static const float kEquipInitV = 8.0f;
-static const float kEquipSmallScale = 0.75f;
+#define kEquipZero 0.0f
+#define kEquipOneDouble 1.0
+#define kEquipWindowCenterX 216.0
+#define kEquipHalfDouble 0.5
+#define kEquipIntToDoubleBias 4503601774854144.0
+#define kEquipOne 1.0f
+#define kEquipColorMax 255.0f
+#define kEquipListFontScale 0.9f
+#define kEquipTextYOffset 4.0f
+#define kEquipMarkXOffset 12.0f
+#define kEquipMarkHeight 24.0f
+#define kEquipHelpCenterX 320.0f
+#define kEquipHalf 0.5f
+#define kEquipHelpY 352.0f
+#define kEquipHelpScale 3.0f
+#define kEquipZeroDouble 0.0
+#define kEquipInitU 128.0f
+#define kEquipInitV 8.0f
+#define kEquipSmallScale 0.75f
 
 namespace {
 STATIC_ASSERT(offsetof(CMenuPcs, m_fonts[4]) == 0x108);
@@ -475,7 +475,8 @@ void CMenuPcs::EquipDraw()
 					color.b = 0xff;
 					color.a = 0xff;
 					GXSetChanMatColor(GX_COLOR0A0, color);
-					float fillWidth = listItem->alpha * w;
+					w = listItem->alpha * w;
+					float fillWidth = w;
 					if (fillWidth > kEquipZero) {
 						MenuPcs.DrawRect(0, x, y, fillWidth, h, u, v, colors, kEquipOne, kEquipOne, kEquipZero);
 						x = x + fillWidth;
@@ -1105,8 +1106,7 @@ void CMenuPcs::EquipInit1()
 	puVar12->duration = 5;
 
 	psVar10 = &GetEquipListStorage(this)->entries[GetEquipListStorage(this)->count];
-	iVar8 = 4;
-	do {
+	for (iVar8 = 0; iVar8 < 4; iVar8++) {
 		psVar13 = &GetEquipListStorage(this)->entries[iVar9];
 		psVar13[0].flags = 2;
 		psVar13[0].tex = 0x37;
@@ -1133,8 +1133,7 @@ void CMenuPcs::EquipInit1()
 		psVar13[1].startFrame = 7;
 		fVar3 = kEquipZero;
 		psVar13[1].duration = 5;
-		iVar8 = iVar8 - 1;
-	} while (iVar8 != 0);
+	}
 
 	GetEquipListStorage(this)->listEnd = (short)iVar9;
 	uVar6 = (unsigned int)((int)GetEquipListStorage(this)->listEnd - (int)GetEquipListStorage(this)->count);

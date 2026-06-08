@@ -2105,7 +2105,8 @@ int CMapMng::ReadOtm(char* mapName)
 
         chunkFile.PushChunk();
         while (chunkFile.GetNextChunk(chunk)) {
-            if (chunk.m_id == 0x4F43544D) {
+            switch (chunk.m_id) {
+            case 0x4F43544D: {
                 short& octTreeCount = m_octTreeCount;
                 if (octTreeCount >= 0x10) {
                     return 0;
@@ -2117,7 +2118,7 @@ int CMapMng::ReadOtm(char* mapName)
                 continue;
             }
 
-            if (chunk.m_id == 0x4C495448) {
+            case 0x4C495448: {
                 CMapLightHolder* light = static_cast<CMapLightHolder*>(
                     operator new(0x10, MapMng.m_stage, const_cast<char*>(s_map_cpp), 0x4D3));
                 unsigned char* lightRaw = reinterpret_cast<unsigned char*>(light);
@@ -2133,28 +2134,28 @@ int CMapMng::ReadOtm(char* mapName)
                 continue;
             }
 
-            if (chunk.m_id != 0x5343454E) {
+            case 0x5343454E:
                 break;
+            default:
+                goto otmDone;
             }
 
             chunkFile.PushChunk();
             while (chunkFile.GetNextChunk(chunk)) {
                 switch (chunk.m_id) {
                 case 0x4D534554: {
-                    CMaterialSet* materialSet =
+                    m_materialSet =
                         new (MapMng.m_stage, const_cast<char*>(s_map_cpp), 0x482) CMaterialSet();
-                    m_materialSet = materialSet;
-                    materialSet->m_materials.SetDefaultSize(0x180);
-                    materialSet->m_materials.SetGrow(0);
-                    materialSet->Create(chunkFile, m_textureSet, static_cast<CMaterialMan::TEV_BIT>(0xFFF53060), 0);
+                    m_materialSet->m_materials.SetDefaultSize(0x180);
+                    m_materialSet->m_materials.SetGrow(0);
+                    m_materialSet->Create(chunkFile, m_textureSet, static_cast<CMaterialMan::TEV_BIT>(0xFFF53060), 0);
                     break;
                 }
 
                 case 0x41534554: {
-                    CMapTexAnimSet* texAnimSet =
+                    m_mapTexAnimSet =
                         new (MapMng.m_stage, const_cast<char*>(s_map_cpp), 0x49A) CMapTexAnimSet();
-                    m_mapTexAnimSet = texAnimSet;
-                    texAnimSet->Create(chunkFile, m_materialSet, m_textureSet);
+                    m_mapTexAnimSet->Create(chunkFile, m_materialSet, m_textureSet);
                     break;
                 }
 
@@ -2201,6 +2202,7 @@ int CMapMng::ReadOtm(char* mapName)
             }
             chunkFile.PopChunk();
         }
+    otmDone:
         chunkFile.PopChunk();
     }
 

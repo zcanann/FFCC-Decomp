@@ -1295,7 +1295,13 @@ void CGObject::hit()
                     stackIn[6].m_word = reinterpret_cast<u32>(m_scriptHandle);
                     CFlatRuntime::CStack stackOut;
                     gCFlatRuntime().SystemCall(this, 2, 0x13, 7, stackIn, &stackOut);
-                    onHit(attackIndex, other, damageIndex, &hitPos);
+                    const int hitResult = onHit(attackIndex, other, damageIndex, &hitPos);
+                    if (hitResult == 1) {
+                        continue;
+                    }
+                    if (hitResult == 2) {
+                        break;
+                    }
                 }
             }
         }

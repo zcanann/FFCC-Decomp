@@ -251,7 +251,6 @@ void CPartMng::Create()
     static const int kPppMngStride = 0x158;
 
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    _pppEnvSt* env = &m_pppEnvSt;
 
     C_MTXPerspective(ppvScreenMatrix, kPartMngScreenFovY, kPartMngScreenAspect, kPartMngScreenNear, kPartMngPppFar);
     PSMTX44Copy(ppvScreenMatrix, ppvScreenMatrix0);
@@ -264,17 +263,17 @@ void CPartMng::Create()
     ppvEmptyLoop = 0;
 
     if (Game.m_currentSceneId == 7) {
-        pppCreateHeap(env, 0x100000);
+        pppCreateHeap(&m_pppEnvSt, 0x100000);
     } else {
-        pppCreateHeap(env, 0xC0000);
+        pppCreateHeap(&m_pppEnvSt, 0xC0000);
     }
 
-    ppvEnv = env;
+    ppvEnv = &m_pppEnvSt;
 
     PSMTXIdentity(ppvUnitMatrix);
-    ppvZeroVector.x = kPartMngZero;
-    ppvZeroVector.y = kPartMngZero;
     ppvZeroVector.z = kPartMngZero;
+    ppvZeroVector.y = kPartMngZero;
+    ppvZeroVector.x = kPartMngZero;
 
     ppvIsLoopCalc = 0;
     ppvIs2ndCalc = 0;
@@ -320,18 +319,18 @@ void CPartMng::Create()
         *reinterpret_cast<int*>(mng + 0x128) = 0x1e;
     }
 
-    env->m_envParam = kPartMngZero;
-    env->m_mngStCount = 0x10;
-    env->m_isEditMode = 1;
+    m_pppEnvSt.m_envParam = kPartMngZero;
+    m_pppEnvSt.m_mngStCount = 0x10;
+    m_pppEnvSt.m_isEditMode = 1;
 
     memset(self + 0x10, 0, 0x108);
 
-    env->m_boxMinX = kPartMngEnvBoxMinX;
-    env->m_boxMaxX = kPartMngEnvBoxMaxXz;
-    env->m_boxMinY = kPartMngEnvBoxMinY;
-    env->m_boxMaxY = kPartMngEnvBoxMaxY;
-    env->m_boxMinZ = kPartMngEnvBoxMaxXz;
-    env->m_boxMaxZ = kPartMngEnvBoxMaxZ;
+    m_pppEnvSt.m_boxMinX = kPartMngEnvBoxMinX;
+    m_pppEnvSt.m_boxMaxX = kPartMngEnvBoxMaxXz;
+    m_pppEnvSt.m_boxMinY = kPartMngEnvBoxMinY;
+    m_pppEnvSt.m_boxMaxY = kPartMngEnvBoxMaxY;
+    m_pppEnvSt.m_boxMinZ = kPartMngEnvBoxMaxXz;
+    m_pppEnvSt.m_boxMaxZ = kPartMngEnvBoxMaxZ;
 }
 
 /*

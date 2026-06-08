@@ -1430,8 +1430,9 @@ void CGMonObj::frameStatFuncTetsukyojin()
 			CVector attackDir(-partyPos.x, -partyPos.y, -partyPos.z);
 			Vec attackVec;
 			attackVec.x = attackDir.x;
-			attackVec.y = kMonObjBossZero;
+			attackVec.y = attackDir.y;
 			attackVec.z = attackDir.z;
+			attackVec.y = kMonObjBossZero;
 
 			if (PSVECMag(&attackVec) < kMonObjBossMinAttackDistance) {
 				CVector fallback(kMonObjBossZero, kMonObjBossZero, kMonObjBossNegativeOne);
@@ -1484,7 +1485,7 @@ void CGMonObj::frameStatFuncTetsukyojin()
 		}
 		reinterpret_cast<CGCharaObj*>(this)->statAttack();
 		return;
-	default:
+	case 0x65:
 		if ((CFlatBossState() != 0) && (prgObj->m_stateFrame == 0x25)) {
 			int flatCount = CFlatBossState();
 			if (flatCount < 1) {

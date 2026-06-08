@@ -365,7 +365,7 @@ void CMaterialEditorPcs::drawViewer()
                 GXSetArray(GX_VA_TEX0, polygon->texCoord, 8);
 
                 u32 vertexIndex[8];
-                u8 vertexCount = 3;
+                int vertexCount = 3;
                 MaterialEditorPolygon* poly = polygon;
                 vertexIndex[4] = poly->index0;
                 vertexIndex[5] = poly->index1;

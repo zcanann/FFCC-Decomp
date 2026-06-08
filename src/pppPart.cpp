@@ -361,7 +361,7 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 {
 	int firstAllocFailure = 1;
 	int canRetry = 1;
-	u8 denied[0x180];
+	s8 denied[0x180];
 
 	ppvMemAllocErrorF = 0;
 	do
@@ -763,7 +763,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 	_pppPObjLink* newObj = 0;
 	int firstFailure = 1;
 	int canRetry = 1;
-	u8 denied[0x180];
+	s8 denied[0x180];
 
 	ppvMemAllocErrorF = 0;
 	do
@@ -1583,7 +1583,7 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 		int firstAllocFailure = 1;
 		int canRetry = 1;
 		_pppPDataVal* pDataVals = 0;
-		u8 denied[0x180];
+		s8 denied[0x180];
 
 		ppvMemAllocErrorF = 0;
 		do

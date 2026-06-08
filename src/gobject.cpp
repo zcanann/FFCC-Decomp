@@ -618,22 +618,20 @@ void CGObject::move()
         const double inputYaw = atan2(static_cast<double>(moveVec.x), static_cast<double>(moveVec.z));
         const float inputYawF = static_cast<float>(inputYaw);
 
-        const double sinYaw = sin(static_cast<double>(cameraYaw));
-        const double cosYaw = cos(static_cast<double>(cameraYaw));
+        const float sinYaw = static_cast<float>(sin(static_cast<double>(cameraYaw)));
+        const float cosYaw = static_cast<float>(cos(static_cast<double>(cameraYaw)));
         if (Game.m_currentMapId != 0x21) {
-            const double mz = static_cast<double>(moveVec.z);
+            const float oldZ = moveVec.z;
             const float oldX = moveVec.x;
-            moveVec.z = static_cast<float>(static_cast<double>(oldX) * static_cast<float>(sinYaw)
-                                           + static_cast<float>(mz * static_cast<float>(cosYaw)));
-            moveVec.x = static_cast<float>(static_cast<double>(oldX) * static_cast<float>(cosYaw)
-                                           - static_cast<float>(mz * static_cast<float>(sinYaw)));
+            moveVec.z = oldX * sinYaw + oldZ * cosYaw;
+            moveVec.x = oldX * cosYaw - oldZ * sinYaw;
         }
 
         if (!movingWithScript) {
-            double speed = static_cast<double>(m_moveBaseSpeed);
-            if (hasStickInput && ((MiniGamePcs.m_flags & 0x200) != 0)) {
-                const double mag = static_cast<double>(PSVECMag(&moveVec));
-                speed *= static_cast<double>(sAnalogSpeedScale) * mag;
+            float speed = m_moveBaseSpeed;
+            if (hasStickInput && ((DbgMenuPcs.GetDbgFlagsRaw() & 0x200) != 0)) {
+                const float mag = PSVECMag(&moveVec);
+                speed *= sAnalogSpeedScale * mag;
             }
 
             PSVECNormalize(&moveVec, &moveVec);

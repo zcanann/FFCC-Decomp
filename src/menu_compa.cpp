@@ -102,7 +102,7 @@ void CMenuPcs::CompaDraw()
 						int yStep = static_cast<int>(y);
 						float end = y + h;
 						while (static_cast<float>(yStep) < end) {
-							int tileH = static_cast<int>(end - static_cast<float>(yStep));
+							int tileH = static_cast<unsigned int>(end - static_cast<float>(yStep));
 							if (static_cast<float>(tileH) > kCompaTileHeight) {
 								tileH = 0x18;
 							}

@@ -89,7 +89,7 @@ public:
     unsigned short m_strength;              // 0x001E
     unsigned short m_magic;                 // 0x0020
     unsigned short m_defense;               // 0x0022
-    CRomWork* m_romWork;                    // 0x0024
+    unsigned short* m_romWork;              // 0x0024
     unsigned short* RomStatusBlock() { return m_elementResistances; }
     unsigned short m_elementResistances[8]; // 0x0028 physical, fire, freeze, stun, slow, stop, gravity, holy
     unsigned short m_statusTimers[42];      // 0x0038

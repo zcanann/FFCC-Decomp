@@ -89,9 +89,9 @@ void CGObjWork::Init(int baseDataIndex, CRomWork* romWork, int idOffset)
 	m_strength = romWork->m_strength;
 	m_magic = romWork->m_magic;
 	m_defense = romWork->m_defense;
-	m_romWork = romWork;
+	m_romWork = romWork->Data();
 
-	memcpy(RomStatusBlock(), m_romWork->ElementResistances(), RomStatusBlockHalfwordCount * sizeof(unsigned short));
+	memcpy(RomStatusBlock(), (m_romWork + CRomWork::ElementResistanceOffset), RomStatusBlockHalfwordCount * sizeof(unsigned short));
 	memset(m_statusTimers + 3, 0, sizeof(m_statusTimers) - 3 * sizeof(m_statusTimers[0]));
 	m_statusValues[0] = 0xFFFF;
 	m_statusValues[1] = 0xFFFF;
@@ -271,7 +271,7 @@ void CCaravanWork::LoadFinished()
 
 	CGame* game = &Game;
 	m_baseDataIndex = (m_id / 100) - 1;
-	m_romWork = reinterpret_cast<CRomWork*>(game->unkCFlatData0[0] + (m_baseDataIndex * 0x1D0));
+	m_romWork = reinterpret_cast<unsigned short*>(game->unkCFlatData0[0] + (m_baseDataIndex * 0x1D0) + 0x10);
 }
 
 /*
@@ -295,8 +295,8 @@ void CCaravanWork::Init(int baseDataIndex, CRomWork* romWork, int idOffset)
 	m_strength = romWork->m_strength;
 	m_magic = romWork->m_magic;
 	m_defense = romWork->m_defense;
-	m_romWork = romWork;
-	memcpy(RomStatusBlock(), m_romWork->ElementResistances(), RomStatusBlockHalfwordCount * sizeof(unsigned short));
+	m_romWork = romWork->Data();
+	memcpy(RomStatusBlock(), (m_romWork + CRomWork::ElementResistanceOffset), RomStatusBlockHalfwordCount * sizeof(unsigned short));
 	memset(m_statusTimers + 3, 0, sizeof(m_statusTimers) - 3 * sizeof(m_statusTimers[0]));
 	m_statusValues[0] = 0xFFFF;
 	m_statusValues[1] = 0xFFFF;
@@ -1783,7 +1783,7 @@ void CCaravanWork::CalcStatus()
 {
 	CRomWork* baseData = reinterpret_cast<CRomWork*>(Game.unkCFlatData0[0] + (m_baseDataIndex * 0x1D0));
 
-	memcpy(RomStatusBlock(), m_romWork->ElementResistances(), RomStatusBlockHalfwordCount * sizeof(unsigned short));
+	memcpy(RomStatusBlock(), (m_romWork + CRomWork::ElementResistanceOffset), RomStatusBlockHalfwordCount * sizeof(unsigned short));
 
 	unsigned short stat = baseData->m_strength;
 	m_strength = stat;
@@ -2834,9 +2834,9 @@ void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
 	m_strength = romWork->m_strength;
 	m_magic = romWork->m_magic;
 	m_defense = romWork->m_defense;
-	m_romWork = romWork;
+	m_romWork = romWork->Data();
 
-	memcpy(RomStatusBlock(), m_romWork->ElementResistances(), RomStatusBlockHalfwordCount * sizeof(unsigned short));
+	memcpy(RomStatusBlock(), (m_romWork + CRomWork::ElementResistanceOffset), RomStatusBlockHalfwordCount * sizeof(unsigned short));
 	memset(m_statusTimers + 3, 0, sizeof(m_statusTimers) - 3 * sizeof(m_statusTimers[0]));
 	m_statusValues[0] = 0xFFFF;
 	m_statusValues[1] = 0xFFFF;
@@ -2927,7 +2927,7 @@ void CMonWork::CalcStatus()
 {
 	CRomWork* baseData = reinterpret_cast<CRomWork*>(Game.unkCFlatData0[1] + (m_baseDataIndex * 0x1D0));
 
-	memcpy(RomStatusBlock(), m_romWork->ElementResistances(), RomStatusBlockHalfwordCount * sizeof(unsigned short));
+	memcpy(RomStatusBlock(), (m_romWork + CRomWork::ElementResistanceOffset), RomStatusBlockHalfwordCount * sizeof(unsigned short));
 
 	m_strength = baseData->m_strength;
 	m_magic = baseData->m_magic;

@@ -3859,7 +3859,8 @@ void CMenuPcs::CalcSingCMake()
             unsigned short down;
             unsigned short repeat;
 
-            if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
+            int padLock = Pad.m_debugPadLock;
+            if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
                 down = 0;
             } else {
                 int padIndex = 0;
@@ -3867,7 +3868,7 @@ void CMenuPcs::CalcSingCMake()
                 down = Pad.GetPadInputs()[padIndex].buttonDown[0];
             }
 
-            if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
+            if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
                 repeat = 0;
             } else {
                 int padIndex = 0;
@@ -3970,7 +3971,8 @@ void CMenuPcs::CalcSingCMake()
             unsigned short down;
             unsigned short repeat;
 
-            if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
+            int padLock = Pad.m_debugPadLock;
+            if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
                 down = 0;
             } else {
                 int padIndex = 0;
@@ -3978,7 +3980,7 @@ void CMenuPcs::CalcSingCMake()
                 down = Pad.GetPadInputs()[padIndex].buttonDown[0];
             }
 
-            if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
+            if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
                 repeat = 0;
             } else {
                 int padIndex = 0;
@@ -4073,7 +4075,8 @@ void CMenuPcs::CalcSingCMake()
             unsigned short down;
             unsigned short repeat;
 
-            if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
+            int padLock = Pad.m_debugPadLock;
+            if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
                 down = 0;
             } else {
                 int padIndex = 0;
@@ -4081,7 +4084,7 @@ void CMenuPcs::CalcSingCMake()
                 down = Pad.GetPadInputs()[padIndex].buttonDown[0];
             }
 
-            if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
+            if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
                 repeat = 0;
             } else {
                 int padIndex = 0;

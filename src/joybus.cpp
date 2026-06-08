@@ -117,6 +117,8 @@ static const char s_load_bin_error[] = "JoyBus::LoadBin() error";
 static const char s_thread_init_end[] = "JoyBus::ThreadInit end";
 extern char s_pctd_Error_send_type_error_pct02x_801DA350[];
 
+extern const u32 kPppYmMeltMaskBit0;
+
 namespace JoyBusConst {
 static char* DVD_DIR = const_cast<char*>(s_dvd_gba_dir);
 static char* CLIENT_FILE = const_cast<char*>(s_ffcc_cli_bin);
@@ -7026,50 +7028,49 @@ int JoyBus::GetGBAStat(ThreadParam* threadParam)
  */
 int JoyBus::ChgCtrlMode(int portIndex)
 {
+    unsigned int word = 0;
+    unsigned char* wordBytes = reinterpret_cast<unsigned char*>(&word);
     unsigned char mode = m_ctrlModeArr[portIndex];
-    bool single = GbaQue.IsSingleMode(portIndex);
 
-    if (!single)
+    if (GbaQue.IsSingleMode(portIndex))
     {
-        mode ^= (unsigned char)JoyBusConst::JOY_CODE_MASK;
-
-        unsigned int word = 0;
-        unsigned char* wordBytes = reinterpret_cast<unsigned char*>(&word);
-        wordBytes[0] = 0x09;
-        wordBytes[1] = mode;
-        unsigned int wordCache = word;
-        int ret = 0;
-
-        if (m_threadRunningMask != 0)
-        {
-            OSWaitSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
-
-            unsigned int queuePort = m_threadParams[portIndex].m_portIndex;
-            if ((int)m_cmdCount[queuePort] >= 0x40)
-            {
-                OSSignalSemaphore(&m_accessSemaphores[queuePort]);
-                ret = -1;
-            }
-            else
-            {
-                m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = wordCache;
-                queuePort = m_threadParams[portIndex].m_portIndex;
-                m_cmdCount[queuePort] = m_cmdCount[queuePort] + 1;
-
-                OSSignalSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
-                ret = 0;
-            }
-        }
-
-        if (ret == 0)
-        {
-            m_ctrlModeArr[portIndex] = mode;
-        }
-
-        return ret;
+        return 0;
     }
 
-    return 0;
+    unsigned int x = mode ^ kPppYmMeltMaskBit0;
+    wordBytes[0] = 0x09;
+    wordBytes[1] = (unsigned char)x;
+    mode = (unsigned char)x;
+    unsigned int wordCache = word;
+    int ret = 0;
+
+    if (static_cast<signed char>(m_threadRunningMask) != 0)
+    {
+        OSWaitSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
+
+        unsigned int queuePort = m_threadParams[portIndex].m_portIndex;
+        if ((int)m_cmdCount[queuePort] >= 0x40)
+        {
+            OSSignalSemaphore(&m_accessSemaphores[queuePort]);
+            ret = -1;
+        }
+        else
+        {
+            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = wordCache;
+            queuePort = m_threadParams[portIndex].m_portIndex;
+            m_cmdCount[queuePort] = m_cmdCount[queuePort] + 1;
+
+            OSSignalSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
+            ret = 0;
+        }
+    }
+
+    if (ret == 0)
+    {
+        m_ctrlModeArr[portIndex] = mode;
+    }
+
+    return ret;
 }
 
 /*

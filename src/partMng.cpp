@@ -3626,27 +3626,6 @@ int CPartMng::pppLoadPmd(const char* baseName)
             CChunkFile::CChunk innerChunk;
             while (chunkFile.GetNextChunk(innerChunk)) {
                 switch (innerChunk.m_id) {
-                case kChunkRSDM:
-                    if (targetModel != 0) {
-                        CChunkFile rsdFile;
-                        rsdFile.SetBuf(chunkFile.GetAddress());
-                        unsigned int meshSize = pppReadRsd(rsdFile, targetModel);
-                        targetModel->Ptr2Off();
-
-                        void** meshDataPtr =
-                            reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(targetModel) + 0x24);
-                        targetModel->m_cacheId = static_cast<short>(ppvAmemCacheSet.SetData(
-                            *meshDataPtr, meshSize, static_cast<CAmemCache::TYPE>(1), 1));
-
-                        if (*meshDataPtr != 0) {
-                            operator delete(*meshDataPtr);
-                            *meshDataPtr = 0;
-                        }
-
-                        targetModel->m_refCount++;
-                        targetModel = 0;
-                    }
-                    break;
                 case kChunkNAME: {
                     char* name = chunkFile.GetString();
 
@@ -3687,6 +3666,27 @@ int CPartMng::pppLoadPmd(const char* baseName)
                     }
                     break;
                 }
+                case kChunkRSDM:
+                    if (targetModel != 0) {
+                        CChunkFile rsdFile;
+                        rsdFile.SetBuf(chunkFile.GetAddress());
+                        unsigned int meshSize = pppReadRsd(rsdFile, targetModel);
+                        targetModel->Ptr2Off();
+
+                        void** meshDataPtr =
+                            reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(targetModel) + 0x24);
+                        targetModel->m_cacheId = static_cast<short>(ppvAmemCacheSet.SetData(
+                            *meshDataPtr, meshSize, static_cast<CAmemCache::TYPE>(1), 1));
+
+                        if (*meshDataPtr != 0) {
+                            operator delete(*meshDataPtr);
+                            *meshDataPtr = 0;
+                        }
+
+                        targetModel->m_refCount++;
+                        targetModel = 0;
+                    }
+                    break;
                 }
             }
             break;
@@ -3760,15 +3760,6 @@ int CPartMng::pppLoadPan(const char* baseName)
             CChunkFile::CChunk innerChunk;
             while (chunkFile.GetNextChunk(innerChunk)) {
                 switch (innerChunk.m_id) {
-                case kChunkSHPM:
-                    if (targetShape != 0) {
-                        CChunkFile shpFile;
-                        shpFile.SetBuf(chunkFile.GetAddress());
-                        pppReadShp(shpFile, targetShape);
-                        targetShape->m_refCount++;
-                        targetShape = 0;
-                    }
-                    break;
                 case kChunkNAME: {
                     char* name = chunkFile.GetString();
 
@@ -3812,6 +3803,15 @@ int CPartMng::pppLoadPan(const char* baseName)
                     }
                     break;
                 }
+                case kChunkSHPM:
+                    if (targetShape != 0) {
+                        CChunkFile shpFile;
+                        shpFile.SetBuf(chunkFile.GetAddress());
+                        pppReadShp(shpFile, targetShape);
+                        targetShape->m_refCount++;
+                        targetShape = 0;
+                    }
+                    break;
                 }
             }
             break;
@@ -3882,25 +3882,6 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
                     CChunkFile::CChunk resourceChunk;
                     while (pdtFile.GetNextChunk(resourceChunk)) {
                         switch (resourceChunk.m_id) {
-                        case kChunkRSDM:
-                            if (targetModel != 0) {
-                                CChunkFile rsdFile;
-                                rsdFile.SetBuf(pdtFile.GetAddress());
-                                unsigned int meshSize = pppReadRsd(rsdFile, targetModel);
-                                targetModel->Ptr2Off();
-
-                                void** meshDataPtr =
-                                    reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(targetModel) + 0x24);
-                                targetModel->m_cacheId = static_cast<short>(ppvAmemCacheSet.SetData(
-                                    *meshDataPtr, meshSize, static_cast<CAmemCache::TYPE>(1), cachePriority));
-
-                                if (*meshDataPtr != 0) {
-                                    operator delete(*meshDataPtr);
-                                    *meshDataPtr = 0;
-                                }
-                                targetModel = 0;
-                            }
-                            break;
                         case kChunkNAME: {
                             char* name = pdtFile.GetString();
 
@@ -3941,6 +3922,25 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
                             }
                             break;
                         }
+                        case kChunkRSDM:
+                            if (targetModel != 0) {
+                                CChunkFile rsdFile;
+                                rsdFile.SetBuf(pdtFile.GetAddress());
+                                unsigned int meshSize = pppReadRsd(rsdFile, targetModel);
+                                targetModel->Ptr2Off();
+
+                                void** meshDataPtr =
+                                    reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(targetModel) + 0x24);
+                                targetModel->m_cacheId = static_cast<short>(ppvAmemCacheSet.SetData(
+                                    *meshDataPtr, meshSize, static_cast<CAmemCache::TYPE>(1), cachePriority));
+
+                                if (*meshDataPtr != 0) {
+                                    operator delete(*meshDataPtr);
+                                    *meshDataPtr = 0;
+                                }
+                                targetModel = 0;
+                            }
+                            break;
                         }
                     }
                     break;
@@ -3952,14 +3952,6 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
                     CChunkFile::CChunk shapeChunk;
                     while (pdtFile.GetNextChunk(shapeChunk)) {
                         switch (shapeChunk.m_id) {
-                        case kChunkSHPM:
-                            if (targetShape != 0) {
-                                CChunkFile shpFile;
-                                shpFile.SetBuf(pdtFile.GetAddress());
-                                pppReadShp(shpFile, targetShape);
-                                targetShape = 0;
-                            }
-                            break;
                         case kChunkNAME: {
                             char* name = pdtFile.GetString();
 
@@ -4000,6 +3992,14 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
                             }
                             break;
                         }
+                        case kChunkSHPM:
+                            if (targetShape != 0) {
+                                CChunkFile shpFile;
+                                shpFile.SetBuf(pdtFile.GetAddress());
+                                pppReadShp(shpFile, targetShape);
+                                targetShape = 0;
+                            }
+                            break;
                         }
                     }
                     break;

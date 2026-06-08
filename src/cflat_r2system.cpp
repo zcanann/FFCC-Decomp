@@ -4346,7 +4346,7 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
     if (systemValue > -0x1000) {
         if (systemValue <= -500) {
             int bitIndex = systemValue + 0x9F3;
-            unsigned char* flagByte = reinterpret_cast<unsigned char*>(gameWork.m_eventFlags) + bitIndex / 8;
+            unsigned char* flagByte = reinterpret_cast<unsigned char*>(Game.m_gameWork.m_eventFlags) + bitIndex / 8;
             unsigned int mask = 1U << (bitIndex % 8);
             unsigned int flag = *flagByte & mask;
             unsigned int value = (flag | -flag) >> 31;
@@ -4368,7 +4368,7 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
                 *flagByte &= ~mask;
             }
         } else if (systemValue <= -200) {
-            short* artifact = gameWork.m_eventWork + systemValue + 0x1C7;
+            short* artifact = Game.m_gameWork.m_eventWork + systemValue + 0x1C7;
             stack[-1].m_word = *artifact;
             if (setMode == 0) {
                 *artifact = static_cast<short>(stack->m_word);

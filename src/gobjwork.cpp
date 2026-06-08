@@ -1484,16 +1484,16 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 				}
 
 				if (sourceType == 2) {
-					bit0 = ((evtWorkBytes[sourceIdx >> 3] & (1 << (sourceIdx & 7))) != 0);
-					bit1 = ((evtWorkBytes[(sourceIdx + 1) >> 3] & (1 << ((sourceIdx + 1) & 7))) != 0);
-					bit2 = ((evtWorkBytes[(sourceIdx + 2) >> 3] & (1 << ((sourceIdx + 2) & 7))) != 0);
+					bit0 = ((evtWorkBytes[sourceIdx / 8] & (1 << (sourceIdx % 8))) != 0);
+					bit1 = ((evtWorkBytes[(sourceIdx + 1) / 8] & (1 << ((sourceIdx + 1) % 8))) != 0);
+					bit2 = ((evtWorkBytes[(sourceIdx + 2) / 8] & (1 << ((sourceIdx + 2) % 8))) != 0);
 				} else if ((sourceType < 2) && (sourceType != 0)) {
-					bit0 = ((static_cast<signed char>(Game.m_gameWork.m_eventFlags[sourceIdx >> 3]) &
-							 (1 << (sourceIdx & 7))) != 0);
-					bit1 = ((static_cast<unsigned char>(Game.m_gameWork.m_eventFlags[(sourceIdx + 1) >> 3]) &
-							 (1 << ((sourceIdx + 1) & 7))) != 0);
-					bit2 = ((static_cast<unsigned char>(Game.m_gameWork.m_eventFlags[(sourceIdx + 2) >> 3]) &
-							 (1 << ((sourceIdx + 2) & 7))) != 0);
+					bit0 = ((static_cast<signed char>(Game.m_gameWork.m_eventFlags[sourceIdx / 8]) &
+							 (1 << (sourceIdx % 8))) != 0);
+					bit1 = ((static_cast<unsigned char>(Game.m_gameWork.m_eventFlags[(sourceIdx + 1) / 8]) &
+							 (1 << ((sourceIdx + 1) % 8))) != 0);
+					bit2 = ((static_cast<unsigned char>(Game.m_gameWork.m_eventFlags[(sourceIdx + 2) / 8]) &
+							 (1 << ((sourceIdx + 2) % 8))) != 0);
 				}
 
 				checkValue = bit0;

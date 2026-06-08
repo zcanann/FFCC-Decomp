@@ -2215,19 +2215,19 @@ CGObject* CGObject::CCClass(int useBodyRadius, int classMask, float yOffset, Vec
             continue;
         }
         if (!(other->m_worldPosition.x - maxDist <= origin.x) || !(other->m_worldPosition.y - maxDist <= origin.y)
-            || !(other->m_worldPosition.z - maxDist <= origin.z) || !(origin.x <= other->m_worldPosition.x + maxDist)
-            || !(origin.y <= other->m_worldPosition.y + maxDist) || !(origin.z <= other->m_worldPosition.z + maxDist)) {
+            || !(other->m_worldPosition.z - maxDist <= origin.z) || !(other->m_worldPosition.x + maxDist >= origin.x)
+            || !(other->m_worldPosition.y + maxDist >= origin.y) || !(other->m_worldPosition.z + maxDist >= origin.z)) {
             continue;
         }
 
         PSVECSubtract(&other->m_worldPosition, &origin, &toOther);
-        const double dist = static_cast<double>(PSVECMag(&toOther));
-        if ((static_cast<double>(sZeroFloat) < dist) && (dist < maxDist)) {
+        const float dist = PSVECMag(&toOther);
+        if ((sZeroFloat < dist) && (dist < maxDist)) {
             double extraAngle = static_cast<double>(sZeroFloat);
             if (useBodyRadius != 0) {
-                extraAngle = static_cast<double>(static_cast<float>(atan(static_cast<double>(other->m_bodyEllipsoidRadius) / maxDist)));
+                extraAngle = static_cast<double>(static_cast<float>(atan(static_cast<double>(other->m_bodyEllipsoidRadius / maxDist))));
             }
-            PSVECScale(&toOther, &toOther, static_cast<float>(sAnimFrameOffset / dist));
+            PSVECScale(&toOther, &toOther, sAnimFrameOffset / dist);
             const double angle = static_cast<double>(static_cast<float>(acos(static_cast<double>(PSVECDotProduct(&toOther, &targetDir)))));
             if ((angle < maxAngle + extraAngle) && (dist < bestDist)) {
                 best = other;

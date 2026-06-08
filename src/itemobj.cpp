@@ -656,14 +656,14 @@ CGPrgObj* CGItemObj::CreateFromScript(
 			gCFlatRuntime().deleteObject(reinterpret_cast<CFlatRuntime::CObject*>(bestItemObj));
 			deletedCount = 1;
 		} else {
-			if (2U < (unsigned int)System.m_execParam) {
+			if ((unsigned int)System.m_execParam >= 3U) {
 				System.Printf(itemObjStrings + kItemObjStrNoDeletableObjectMsg);
 			}
 		}
 
 		System.Printf(itemObjStrings + kItemObjStrNumDeleteItemFmt, deletedCount);
 		if (deletedCount == 0) {
-			if (2U < (unsigned int)System.m_execParam) {
+			if ((unsigned int)System.m_execParam >= 3U) {
 				System.Printf(itemObjStrings + kItemObjStrCreateFailedMsg);
 			}
 			return 0;
@@ -924,7 +924,7 @@ void CGItemObj::onFrameStat()
 			if (Game.m_gameWork.m_menuStageMode != 0) {
 				if (Game.m_gameWork.m_menuStageMode != 0 &&
 				    Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-					unsigned int carryCid = static_cast<unsigned short>(m_owner->GetCID());
+					int carryCid = static_cast<unsigned short>(m_owner->GetCID());
 					if ((carryCid & 0x6D) == 0x6D &&
 					    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_owner->m_scriptHandle) + 0x3B4) != 0) {
 						useMenuLaunchSpeed = true;
@@ -935,7 +935,7 @@ void CGItemObj::onFrameStat()
 			if (useMenuLaunchSpeed) {
 				launchSpeed = kItemObjUnitScale;
 			} else if (static_cast<int>(CFlatCenterState()) == 1) {
-				unsigned int carryCid = static_cast<unsigned short>(m_owner->GetCID());
+				int carryCid = static_cast<unsigned short>(m_owner->GetCID());
 				if ((carryCid & 0x6D) == 0x6D &&
 				    1 < *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_owner->m_scriptHandle) + 0x3E0)) {
 					launchSpeed = kItemObjUnitScale;
@@ -1144,9 +1144,9 @@ void CGItemObj::onFrameStat()
 			prgObj->m_stepSlopeLimit = zero;
 			ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
 
-			int soundEntry = *(int*)(*(int*)(*reinterpret_cast<int*>(CGMonObj::m_boss) + 0xF8) + 0x178);
-			if (soundEntry != 0) {
-				pdtNo = *(int*)(soundEntry + 0x14);
+			int* soundData = *(int**)(*(int*)(*reinterpret_cast<int*>(CGMonObj::m_boss) + 0xF8) + 0x178);
+			if (soundData != 0) {
+				pdtNo = soundData[5];
 			}
 
 			float particleScale =
@@ -1197,9 +1197,9 @@ void CGItemObj::onFrameStat()
 			prgObj->m_stepSlopeLimit = zero;
 			ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
 
-			int soundEntry = *(int*)(*(int*)(*reinterpret_cast<int*>(CGMonObj::m_boss) + 0xF8) + 0x178);
-			if (soundEntry != 0) {
-				pdtNo = *(int*)(soundEntry + 0x14);
+			int* soundData = *(int**)(*(int*)(*reinterpret_cast<int*>(CGMonObj::m_boss) + 0xF8) + 0x178);
+			if (soundData != 0) {
+				pdtNo = soundData[5];
 			}
 
 			float particleScale =
@@ -1262,9 +1262,10 @@ void CGItemObj::onFrame()
 
 			CGObject* owner = m_owner;
 			int ownerScriptSlot = *(int*)(*(int*)((unsigned char*)owner + 0x58) + 0x3B4);
-			int soundEntry = *(int*)(*(int*)(*reinterpret_cast<int*>(CGMonObj::m_boss) + 0xF8) + 0x178);
-			if (soundEntry != 0) {
-				soundEntry = *(int*)(soundEntry + 0x14);
+			int* soundData = *(int**)(*(int*)(*reinterpret_cast<int*>(CGMonObj::m_boss) + 0xF8) + 0x178);
+			int soundEntry;
+			if (soundData != 0) {
+				soundEntry = soundData[5];
 			} else {
 				soundEntry = -1;
 			}

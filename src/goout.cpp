@@ -589,8 +589,8 @@ struct CGoOutSaveCaravan
 {
     int m_dataPresent;
     unsigned char unk4[0x308];
-    char m_odekakeOutFlag;
-    char m_odekakeReturnFlag;
+    unsigned char m_odekakeOutFlag;
+    unsigned char m_odekakeReturnFlag;
     unsigned char unk30E[0x6B2];
 };
 
@@ -666,7 +666,7 @@ void DrawGoOutMenu()
             MenuPcs.DrawInit();
             MenuPcs.DrawCMakeMenu();
         }
-        if (goOutMenu.m_goOutMode > 0xD && goOutMenu.m_goOutMode < 0xF) {
+        if (goOutMenu.m_goOutMode != 0xF && goOutMenu.m_goOutMode < 0xF && goOutMenu.m_goOutMode >= 0xE) {
             MenuPcs.DrawLoadMenu();
         }
         if (goOutMenu.m_goOutMode == 1 &&
@@ -699,15 +699,14 @@ void DrawGoOutMenu()
     if (MenuPcs.m_menuWindowInfo->state == 1 && goOutMenu.m_drawCursor != 0) {
         const float cursorY = (float)(MenuPcs.m_menuWindowInfo->y +
             MenuPcs.m_menuWindowInfo->height - 0x3E);
-        const float cursorX = (float)(MenuPcs.m_menuWindowInfo->x + 0x20);
-        const unsigned char cursorMode = goOutMenu.m_cursorMode;
+        float cursorX = (float)(MenuPcs.m_menuWindowInfo->x + 0x20);
 
-        if (cursorMode != 0) {
+        if (goOutMenu.m_cursorMode != 0) {
             const int localY = goOutMenu.m_cursorListY1 + goOutMenu.m_cursorChoice * 0x1E;
             MenuPcs.DrawCursor((int)cursorX, localY, 1.0f);
         } else {
-            const int cursorX = MenuPcs.GetYesNoXPos(goOutMenu.m_cursorChoice);
-            MenuPcs.DrawCursor(cursorX, (int)cursorY, 1.0f);
+            cursorX = (float)MenuPcs.GetYesNoXPos(goOutMenu.m_cursorChoice);
+            MenuPcs.DrawCursor((int)cursorX, (int)cursorY, 1.0f);
         }
     }
 }
@@ -1294,19 +1293,19 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         m_pendingMessageTimer = 0;
         MenuPcs.GetMcAccessPos(&m_accessCardChannel, &m_accessSaveIndex);
         m_accessCardChannel = 0;
-        MenuPcs.GetMcCtrl()->m_cardChannel = m_accessCardChannel;
-        m_cardChannel = static_cast<char>(MenuPcs.GetMcCtrl()->m_cardChannel);
+        MenuPcs.m_mcCtrl.m_cardChannel = m_accessCardChannel;
+        m_cardChannel = static_cast<char>(MenuPcs.m_mcCtrl.m_cardChannel);
         m_saveIndex = static_cast<char>(m_accessSaveIndex);
-        m_memCardResult = MenuPcs.GetMcCtrl()->ChkConnect(static_cast<unsigned char>(m_cardChannel));
+        m_memCardResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(static_cast<unsigned char>(m_cardChannel));
         if (m_memCardResult == 1) {
-            MenuPcs.GetMcCtrl()->m_saveIndex = static_cast<unsigned char>(m_saveIndex);
-            MenuPcs.GetMcCtrl()->m_cardChannel = static_cast<unsigned char>(m_cardChannel);
-            MenuPcs.GetMcCtrl()->m_previousState = 0;
-            MenuPcs.GetMcCtrl()->m_state = 0;
-            MenuPcs.GetMcCtrl()->m_lastResult = 0;
-            MenuPcs.GetMcCtrl()->m_iteration = 0;
-            MenuPcs.GetMcCtrl()->m_userBuffer = 0;
-            MenuPcs.GetMcCtrl()->m_createFlag = 0;
+            MenuPcs.m_mcCtrl.m_saveIndex = static_cast<unsigned char>(m_saveIndex);
+            MenuPcs.m_mcCtrl.m_cardChannel = static_cast<unsigned char>(m_cardChannel);
+            MenuPcs.m_mcCtrl.m_previousState = 0;
+            MenuPcs.m_mcCtrl.m_state = 0;
+            MenuPcs.m_mcCtrl.m_lastResult = 0;
+            MenuPcs.m_mcCtrl.m_iteration = 0;
+            MenuPcs.m_mcCtrl.m_userBuffer = 0;
+            MenuPcs.m_mcCtrl.m_createFlag = 0;
             m_memCardProc = 1;
         }
         break;
@@ -1378,32 +1377,31 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         break;
     case 0x12: {
         m_watchCardDisconnect = 0;
-        Mc::SaveDat* const transferWork = static_cast<Mc::SaveDat*>(MenuPcs.m_goOutTransferWork);
-        Mc::SaveDat* const transferSaveData = MenuPcs.m_goOutTransferSaveData;
+        const int selectedChara = m_selectedTransferChara;
         int freeCaravanIdx;
 
-        if (GoOutSaveDat(transferWork).m_caravan[m_selectedTransferChara].m_odekakeReturnFlag == 0) {
-            freeCaravanIdx = FindFreeCaravanIdx(transferSaveData);
-            MemoryCardMan.Odekake(1, *transferWork, m_selectedTransferChara, *transferSaveData, freeCaravanIdx);
+        if (GoOutSaveDat(static_cast<Mc::SaveDat*>(MenuPcs.m_goOutTransferWork)).m_caravan[selectedChara].m_odekakeReturnFlag == 0) {
+            freeCaravanIdx = FindFreeCaravanIdx(MenuPcs.m_goOutTransferSaveData);
+            MemoryCardMan.Odekake(1, *static_cast<Mc::SaveDat*>(MenuPcs.m_goOutTransferWork), selectedChara, *MenuPcs.m_goOutTransferSaveData, freeCaravanIdx);
         } else {
-            freeCaravanIdx = MenuPcs.GetSameCharaData(transferSaveData, transferWork, m_selectedTransferChara, 0);
-            MemoryCardMan.Odekake(0, *transferWork, m_selectedTransferChara, *transferSaveData, freeCaravanIdx);
+            freeCaravanIdx = MenuPcs.GetSameCharaData(MenuPcs.m_goOutTransferSaveData, static_cast<Mc::SaveDat*>(MenuPcs.m_goOutTransferWork), selectedChara, 0);
+            MemoryCardMan.Odekake(0, *static_cast<Mc::SaveDat*>(MenuPcs.m_goOutTransferWork), m_selectedTransferChara, *MenuPcs.m_goOutTransferSaveData, freeCaravanIdx);
         }
 
-        MenuPcs.GetMcCtrl()->m_cardChannel = m_accessCardChannel;
-        m_cardChannel = static_cast<char>(MenuPcs.GetMcCtrl()->m_cardChannel);
+        MenuPcs.m_mcCtrl.m_cardChannel = m_accessCardChannel;
+        m_cardChannel = static_cast<char>(MenuPcs.m_mcCtrl.m_cardChannel);
         m_saveIndex = static_cast<char>(m_accessSaveIndex);
-        m_memCardBuffer = transferSaveData;
-        m_memCardResult = MenuPcs.GetMcCtrl()->ChkConnect(static_cast<unsigned char>(m_cardChannel));
+        m_memCardBuffer = MenuPcs.m_goOutTransferSaveData;
+        m_memCardResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(static_cast<unsigned char>(m_cardChannel));
         if (m_memCardResult == 1) {
-            MenuPcs.GetMcCtrl()->m_saveIndex = static_cast<unsigned char>(m_saveIndex);
-            MenuPcs.GetMcCtrl()->m_cardChannel = static_cast<unsigned char>(m_cardChannel);
-            MenuPcs.GetMcCtrl()->m_previousState = 0;
-            MenuPcs.GetMcCtrl()->m_state = 0;
-            MenuPcs.GetMcCtrl()->m_lastResult = 0;
-            MenuPcs.GetMcCtrl()->m_iteration = 0;
-            MenuPcs.GetMcCtrl()->m_userBuffer = 0;
-            MenuPcs.GetMcCtrl()->m_createFlag = 0;
+            MenuPcs.m_mcCtrl.m_saveIndex = static_cast<unsigned char>(m_saveIndex);
+            MenuPcs.m_mcCtrl.m_cardChannel = static_cast<unsigned char>(m_cardChannel);
+            MenuPcs.m_mcCtrl.m_previousState = 0;
+            MenuPcs.m_mcCtrl.m_state = 0;
+            MenuPcs.m_mcCtrl.m_lastResult = 0;
+            MenuPcs.m_mcCtrl.m_iteration = 0;
+            MenuPcs.m_mcCtrl.m_userBuffer = 0;
+            MenuPcs.m_mcCtrl.m_createFlag = 0;
             m_memCardProc = 2;
         }
         {
@@ -1417,20 +1415,20 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         break;
     }
     case 0x13:
-        MenuPcs.GetMcCtrl()->m_cardChannel = static_cast<unsigned char>(m_odekakeCardChannel);
+        MenuPcs.m_mcCtrl.m_cardChannel = static_cast<unsigned char>(m_odekakeCardChannel);
         m_cardChannel = m_odekakeCardChannel;
         m_saveIndex = m_odekakeSaveIndex;
         m_memCardBuffer = MenuPcs.m_goOutTransferWork;
-        m_memCardResult = MenuPcs.GetMcCtrl()->ChkConnect(static_cast<unsigned char>(m_cardChannel));
+        m_memCardResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(static_cast<unsigned char>(m_cardChannel));
         if (m_memCardResult == 1) {
-            MenuPcs.GetMcCtrl()->m_saveIndex = static_cast<unsigned char>(m_saveIndex);
-            MenuPcs.GetMcCtrl()->m_cardChannel = static_cast<unsigned char>(m_cardChannel);
-            MenuPcs.GetMcCtrl()->m_previousState = 0;
-            MenuPcs.GetMcCtrl()->m_state = 0;
-            MenuPcs.GetMcCtrl()->m_lastResult = 0;
-            MenuPcs.GetMcCtrl()->m_iteration = 0;
-            MenuPcs.GetMcCtrl()->m_userBuffer = 0;
-            MenuPcs.GetMcCtrl()->m_createFlag = 0;
+            MenuPcs.m_mcCtrl.m_saveIndex = static_cast<unsigned char>(m_saveIndex);
+            MenuPcs.m_mcCtrl.m_cardChannel = static_cast<unsigned char>(m_cardChannel);
+            MenuPcs.m_mcCtrl.m_previousState = 0;
+            MenuPcs.m_mcCtrl.m_state = 0;
+            MenuPcs.m_mcCtrl.m_lastResult = 0;
+            MenuPcs.m_mcCtrl.m_iteration = 0;
+            MenuPcs.m_mcCtrl.m_userBuffer = 0;
+            MenuPcs.m_mcCtrl.m_createFlag = 0;
             m_memCardProc = 2;
         }
         {
@@ -1475,16 +1473,16 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
 		m_cursorChoice = 1;
 		break;
     case 5:
-        m_memCardResult = MenuPcs.GetMcCtrl()->ChkConnect(static_cast<unsigned char>(m_cardChannel));
+        m_memCardResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(static_cast<unsigned char>(m_cardChannel));
         if (m_memCardResult == 1) {
-            MenuPcs.GetMcCtrl()->m_saveIndex = static_cast<unsigned char>(m_saveIndex);
-            MenuPcs.GetMcCtrl()->m_cardChannel = static_cast<unsigned char>(m_cardChannel);
-            MenuPcs.GetMcCtrl()->m_previousState = 0;
-            MenuPcs.GetMcCtrl()->m_state = 0;
-            MenuPcs.GetMcCtrl()->m_lastResult = 0;
-            MenuPcs.GetMcCtrl()->m_iteration = 0;
-            MenuPcs.GetMcCtrl()->m_userBuffer = 0;
-            MenuPcs.GetMcCtrl()->m_createFlag = 0;
+            MenuPcs.m_mcCtrl.m_saveIndex = static_cast<unsigned char>(m_saveIndex);
+            MenuPcs.m_mcCtrl.m_cardChannel = static_cast<unsigned char>(m_cardChannel);
+            MenuPcs.m_mcCtrl.m_previousState = 0;
+            MenuPcs.m_mcCtrl.m_state = 0;
+            MenuPcs.m_mcCtrl.m_lastResult = 0;
+            MenuPcs.m_mcCtrl.m_iteration = 0;
+            MenuPcs.m_mcCtrl.m_userBuffer = 0;
+            MenuPcs.m_mcCtrl.m_createFlag = 0;
             m_memCardProc = 3;
         }
         if (m_currentMessage >= 0) {
@@ -1533,7 +1531,7 @@ void CGoOutMenu::CalcGoOut()
     int selResult = -1;
 
     if (m_watchCardDisconnect != 0 && m_modeFrame >= 0x14 && (m_modeFrame & 0xF) == 0) {
-        const int cardStatus = MenuPcs.GetMcCtrl()->ChkConnect(((m_modeFrame & 0x10) == 0) ? 1 : 0);
+        const int cardStatus = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(((m_modeFrame & 0x10) == 0) ? 1 : 0);
         if (cardStatus != 1) {
             m_watchCardDisconnect = 0;
             m_returnGoOutMode = -1;
@@ -1606,7 +1604,7 @@ void CGoOutMenu::CalcGoOut()
         }
         break;
     case 8:
-        if (MenuPcs.GetMcCtrl()->ChkConnect(0) == -1) {
+        if (static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(0) == -1) {
             return;
         }
         m_modeFrame = 0;
@@ -1616,7 +1614,7 @@ void CGoOutMenu::CalcGoOut()
         if (m_modeFrame < 0x14) {
             return;
         }
-        if (MenuPcs.GetMcCtrl()->ChkConnect(0) == -3) {
+        if (static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(0) == -3) {
             int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
             SetMenuStr(0, 2,
                        GetGoOutMessageLine(languageId, 44),
@@ -1646,15 +1644,15 @@ void CGoOutMenu::CalcGoOut()
                 SetGoOutMode(0);
             } else {
                 m_accessCardChannel = 0;
-                MenuPcs.GetMcCtrl()->m_cardChannel = m_accessCardChannel;
-                m_cardChannel = static_cast<char>(MenuPcs.GetMcCtrl()->m_cardChannel);
+                MenuPcs.m_mcCtrl.m_cardChannel = m_accessCardChannel;
+                m_cardChannel = static_cast<char>(MenuPcs.m_mcCtrl.m_cardChannel);
                 m_saveIndex = static_cast<char>(m_accessSaveIndex);
                 SetGoOutMode(10);
             }
         }
         break;
     case 10:
-        if (MenuPcs.GetMcCtrl()->ChkConnect(1) == -1) {
+        if (static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(1) == -1) {
             return;
         }
         m_modeFrame = 0;
@@ -1664,7 +1662,7 @@ void CGoOutMenu::CalcGoOut()
         if (m_modeFrame < 0x14) {
             return;
         }
-        if (MenuPcs.GetMcCtrl()->ChkConnect(1) == -3) {
+        if (static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(1) == -3) {
             int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
             SetMenuStr(0, 2,
                        GetGoOutMessageLine(languageId, 46),
@@ -1730,10 +1728,9 @@ void CGoOutMenu::CalcGoOut()
         }
         if (m_selectedTransferChara != -1) {
             Mc::SaveDat* transferWork = static_cast<Mc::SaveDat*>(MenuPcs.m_goOutTransferWork);
-            CGoOutSaveCaravan& caravan = GoOutSaveDat(transferWork).m_caravan[m_selectedTransferChara];
-            if (caravan.m_odekakeOutFlag == 0) {
+            if (GoOutSaveDat(transferWork).m_caravan[m_selectedTransferChara].m_odekakeOutFlag == 0) {
                 m_returnTransfer = 0;
-                if (caravan.m_odekakeReturnFlag == 0) {
+                if (GoOutSaveDat(transferWork).m_caravan[m_selectedTransferChara].m_odekakeReturnFlag == 0) {
                     int sameChara = MenuPcs.GetSameCharaData(MenuPcs.m_goOutTransferSaveData, transferWork, m_selectedTransferChara, 1);
                     if (sameChara == -3) {
                         m_returnGoOutMode = 0xF;
@@ -2011,23 +2008,23 @@ void CGoOutMenu::CalcGoOut()
     }
 
     if (m_memCardProc == 2) {
-        MenuPcs.GetMcCtrl()->SaveDataBuffer(static_cast<char*>(m_memCardBuffer));
-        m_memCardResult = MenuPcs.GetMcCtrl()->m_lastResult;
+        static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->SaveDataBuffer(static_cast<char*>(m_memCardBuffer));
+        m_memCardResult = MenuPcs.m_mcCtrl.m_lastResult;
         if (m_memCardResult != 0) {
             m_lastMemCardProc = m_memCardProc;
             m_memCardProc = 0;
         }
     } else if (m_memCardProc < 2) {
         if (m_memCardProc != 0) {
-            m_memCardResult = MenuPcs.GetMcCtrl()->ChkNowData();
+            m_memCardResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkNowData();
             if (m_memCardResult != 0) {
                 m_lastMemCardProc = m_memCardProc;
                 m_memCardProc = 0;
             }
         }
     } else if (m_memCardProc < 4) {
-        MenuPcs.GetMcCtrl()->Format(1);
-        int formatResult = MenuPcs.GetMcCtrl()->m_lastResult;
+        static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->Format(1);
+        int formatResult = MenuPcs.m_mcCtrl.m_lastResult;
         if (formatResult < 0) {
             MemoryCardMan.m_opDoneFlag = 1;
             MemoryCardMan.m_currentSlot = static_cast<char>(0xff);

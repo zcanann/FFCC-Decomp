@@ -3633,7 +3633,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	char* writePtr = outData + 4;
 
 	for (unsigned int i = 0; i < itemCount; i++) {
-		const unsigned short itemId = static_cast<unsigned short>(caravanWork->m_shopList[i]);
+		const unsigned short itemId = static_cast<unsigned short>(reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_shopList[i]);
 		const unsigned short swapped = SwapU16(itemId);
 		memcpy(writePtr, &swapped, 2);
 		writePtr += 2;
@@ -3648,7 +3648,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	const float userRate = static_cast<float>(static_cast<double>(caravanWork->m_shopParam) / 100.0);
 
 	for (unsigned int i = 0; i < itemCount; i++) {
-		const int itemId = caravanWork->m_shopList[i];
+		const int itemId = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_shopList[i];
 		int itemPrice = static_cast<unsigned short>(
 			*reinterpret_cast<unsigned short*>(flatBase + itemId * 0x48 + 0x20));
 		itemPrice = static_cast<int>(static_cast<float>(itemPrice) * userRate);
@@ -3667,7 +3667,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 		memset(itemNameScratch, 0, kGbaQueueScratchTextSize);
 		memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
-		const int itemId = caravanWork->m_shopList[i];
+		const int itemId = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_shopList[i];
 		strcpy(itemNameScratch, itemNameTable[itemId]);
 		CMes::MakeAgbString(agbStringScratch, itemNameScratch, 0, 0);
 

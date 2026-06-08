@@ -1936,18 +1936,15 @@ void CGObject::copy()
  */
 void CGObject::onDraw()
 {
-    if ((m_weaponNodeFlags & 0x20) == 0) {
+    if (!m_weaponNodeFlagBits.m_unk20) {
         return;
     }
 
-    const bool hasModel =
-        (m_charaModelHandle != (CCharaPcs::CHandle*)0) &&
-        (m_charaModelHandle->m_model != (CChara::CModel*)0);
-    if (!hasModel) {
+    if (!HasLoadedModel(m_charaModelHandle)) {
         return;
     }
 
-    if (((CFlatFlags & 0x1) != 0) && ((m_bgColMask & 0x1) != 0)) {
+    if (((CFlat.m_debugFlags & 0x1) != 0) && ((m_bgColMask & 0x1) != 0)) {
         CColor color(0xFF, 0x00, 0x00, 0xFF);
         Vec pos;
         pos.x = m_worldPosition.x;
@@ -1956,7 +1953,7 @@ void CGObject::onDraw()
         Graphic.DrawSphere(FlatPosMtx(), &pos, m_capsuleHalfHeight, &color.color);
     }
 
-    if (((CFlatFlags & 0x2) != 0) && ((m_bgColMask & 0x2) != 0)) {
+    if (((CFlat.m_debugFlags & 0x2) != 0) && ((m_bgColMask & 0x2) != 0)) {
         Vec capsuleOffset;
         capsuleOffset.x = sZeroFloat;
         capsuleOffset.y = sZeroFloat;
@@ -1992,7 +1989,7 @@ void CGObject::onDraw()
         Graphic.DrawSphere();
     }
 
-    if (((CFlatFlags & 0x4) != 0) && ((m_bgColMask & 0x4) != 0)) {
+    if (((CFlat.m_debugFlags & 0x4) != 0) && ((m_bgColMask & 0x4) != 0)) {
         CColor color(0x00, 0x00, 0xFF, 0xFF);
         Vec pos;
         pos.x = m_worldPosition.x;
@@ -2001,7 +1998,7 @@ void CGObject::onDraw()
         Graphic.DrawSphere(FlatPosMtx(), &pos, m_bodyColRadius, &color.color);
     }
 
-    if (((CFlatFlags & 0x8) != 0) && ((m_bgColMask & 0x8) != 0)) {
+    if (((CFlat.m_debugFlags & 0x8) != 0) && ((m_bgColMask & 0x8) != 0)) {
         CColor color(0xFF, 0xFF, 0x00, 0xFF);
         Vec pos;
         pos.x = m_worldPosition.x;
@@ -2010,12 +2007,12 @@ void CGObject::onDraw()
         Graphic.DrawSphere(FlatPosMtx(), &pos, m_attackColRadius, &color.color);
     }
 
-    if (((CFlatFlags & 0x10) != 0) && ((m_bgColMask & 0x10) != 0)) {
+    if (((CFlat.m_debugFlags & 0x10) != 0) && ((m_bgColMask & 0x10) != 0)) {
         CColor color(0x40, 0xFF, 0x40, 0xFF);
         Graphic.DrawSphere(FlatPosMtx(), &m_worldPosition, m_nearColRadius, &color.color);
     }
 
-    if (((CFlatFlags & 0x40000) != 0) && ((m_bgColMask & 0x40000) != 0)) {
+    if (((CFlat.m_debugFlags & 0x40000) != 0) && ((m_bgColMask & 0x40000) != 0)) {
         for (int i = 0; i < 8; i++) {
             AttackCol* collider = &m_attackColliders[i];
             if (collider->m_localStart.x == sZeroFloat) {
@@ -2032,7 +2029,7 @@ void CGObject::onDraw()
         }
     }
 
-    if (((CFlatFlags & 0x80000) != 0) && ((m_bgColMask & 0x80000) != 0)) {
+    if (((CFlat.m_debugFlags & 0x80000) != 0) && ((m_bgColMask & 0x80000) != 0)) {
         for (int i = 0; i < 8; i++) {
             DamageCol* collider = &m_damageColliders[i];
             if (collider->m_localPosition.x == sZeroFloat) {

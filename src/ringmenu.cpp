@@ -751,7 +751,7 @@ void CRingMenu::onDraw()
 						for (int i = 0; i < caravanWork->m_numCmdListSlots; i++) {
 							int maxCharge;
 							int curCharge;
-							int charge = caravanWork->GetMagicCharge(i, maxCharge, curCharge);
+							unsigned int charge = caravanWork->GetMagicCharge(i, maxCharge, curCharge);
 
 							float blink = kRingMenuZero;
 							if (charge == 0) {

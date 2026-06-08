@@ -6558,7 +6558,6 @@ void CMenuPcs::CalcFukidashi()
 	} else if (fieldVal == 0x16) {
 		char* const townName = Game.m_gameWork.m_townName;
 		int languageId = Game.m_gameWork.m_languageId;
-		strcpy(nameBuffer, townName);
 		if (languageId == 2) {
 			strcpy(nameBuffer, townName);
 			strcat(nameBuffer, lbl_80210D10[languageId - 1]);

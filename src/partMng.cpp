@@ -371,7 +371,7 @@ void CPartMng::Destroy()
         for (unsigned int i = 0; i < 0x100; i++) {
             pppModelSt* model = &modelArr[i];
             if (model->m_isUsed != 0) {
-                if (--model->m_refCount < 1) {
+                if (--model->m_refCount <= 0) {
                     if (model->m_cacheId != -1) {
                         ppvAmemCacheSet.DestroyCache(model->m_cacheId);
                         *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(model) + 0x24) = 0;
@@ -391,7 +391,7 @@ void CPartMng::Destroy()
         for (unsigned int i = 0; i < 0x100; i++) {
             pppShapeSt* shape = &res->m_pppShapeStArr[i];
             if (shape->m_inUse != 0) {
-                if (--shape->m_refCount < 1) {
+                if (--shape->m_refCount <= 0) {
                     if (shape->m_animData != 0) {
                         delete[] reinterpret_cast<u8*>(shape->m_animData);
                         shape->m_animData = 0;

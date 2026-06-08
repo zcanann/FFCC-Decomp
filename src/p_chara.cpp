@@ -2326,7 +2326,7 @@ void CCharaPcs::CHandle::LoadModel(
     CLoadModel* loadModel = 0;
     for (int i = 0; i < LoadModelArray(&CharaPcs)->GetSize(); i++) {
         CLoadModel* it = (*LoadModelArray(&CharaPcs))[static_cast<unsigned long>(i)];
-        if (it != 0 && it->m_keyTag == reinterpret_cast<void*>(charaKind) && it->m_keyId == static_cast<int>(charaNo)) {
+        if (reinterpret_cast<int>(it->m_keyTag) == charaKind && static_cast<unsigned long>(it->m_keyId) == charaNo) {
             loadModel = it;
             break;
         }

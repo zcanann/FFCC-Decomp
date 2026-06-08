@@ -1024,13 +1024,12 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 					m_texAnimSet->Create(chunkFile, stage);
 				}
 			} else if (chunk.m_id == 0x4E534554) {
-				const u32 nodeCapacity = chunk.m_arg0;
 				m_data->m_nodeCount = 0;
 				CChara::CNode::CRefData* nodeRefs =
-				    new (stage, const_cast<char*>(s_chara_cpp), 0x143) CChara::CNode::CRefData[nodeCapacity];
+				    new (stage, const_cast<char*>(s_chara_cpp), 0x143) CChara::CNode::CRefData[chunk.m_arg0];
 				m_data->m_nodeRefData = nodeRefs;
 				CChara::CNode* nodes =
-				    new (stage, const_cast<char*>(s_chara_cpp), 0x145) CChara::CNode[nodeCapacity];
+				    new (stage, const_cast<char*>(s_chara_cpp), 0x145) CChara::CNode[chunk.m_arg0];
 				m_nodes = nodes;
 
 				chunkFile.PushChunk();
@@ -1052,13 +1051,12 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 				}
 				chunkFile.PopChunk();
 			} else if (chunk.m_id == 0x4D535354) {
-				const u32 meshCapacity = chunk.m_arg0;
 				m_data->m_meshCount = 0;
 				CChara::CMesh::CRefData* meshRefs =
-				    new (stage, const_cast<char*>(s_chara_cpp), 0x171) CChara::CMesh::CRefData[meshCapacity];
+				    new (stage, const_cast<char*>(s_chara_cpp), 0x171) CChara::CMesh::CRefData[chunk.m_arg0];
 				m_data->m_meshRefData = meshRefs;
 				CChara::CMesh* meshes =
-				    new (stage, const_cast<char*>(s_chara_cpp), 0x173) CChara::CMesh[meshCapacity];
+				    new (stage, const_cast<char*>(s_chara_cpp), 0x173) CChara::CMesh[chunk.m_arg0];
 				m_meshes = meshes;
 
 				chunkFile.PushChunk();
@@ -1289,7 +1287,8 @@ CChara::CModel* CChara::CModel::Duplicate(CMemory::CStage* stage)
 	}
 
 	if (m_texSet != 0) {
-		clone->AttachTextureSet(m_texSet);
+		clone->m_texSet = m_texSet;
+		clone->m_texSet->AddRef();
 	}
 	clone->m_texAnimSet = (ModelTexAnimSet(this) != 0) ? ModelTexAnimSet(this)->Duplicate(stage) : 0;
 
@@ -2142,6 +2141,10 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 	}
 
 	const int cullFlag = flags & 1;
+	const int shadowDisabled = ((flags >> 1) & 1) ^ 1;
+	const int shadowCullEnabled = (flags >> 3) & 1;
+	const int skipShadowPosition = ((flags >> 4) & 1) ^ 1;
+	const int materialAlpha = (flags >> 2) & 1;
 	BeforeDrawModelCallback beforeDrawModel = ModelBeforeDrawCallback(this);
 	if (beforeDrawModel != 0 && pass == 0) {
 		beforeDrawModel(this, ModelCbUser0(this), ModelCbUser1(this), view, cullFlag);
@@ -2166,14 +2169,14 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 	LightPcs.SetAmbientAlpha(ModelLightAlpha(this));
 
 	CCharaMeshRaw* mesh = ModelMeshes(this);
-	int lastLightEnable = -1;
-	int lastZWrite = -1;
+	int lastLightEnable = 0;
+	int lastZWrite = 0;
 
 	for (u32 meshIndex = 0; meshIndex < ModelMeshCount(this); meshIndex++, mesh++) {
 		if (mesh->m_workPositions == 0) {
 			continue;
 		}
-		if (static_cast<int>(meshIndex) <= 0x1F && ((ModelMeshVisibleMask(this) >> meshIndex) & 1) == 0) {
+		if (static_cast<int>(meshIndex) < 0x20 && ((ModelMeshVisibleMask(this) >> meshIndex) & 1) == 0) {
 			continue;
 		}
 
@@ -2186,11 +2189,11 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 			PSMTXConcat(ModelDrawMtx(this), ModelNodes(this)[mesh->m_data->m_nodeIndex].m_mtx, meshMtx);
 		}
 
-		if (((cullFlag == 0) && (((flags >> 1) & 1) != 1)) || ((cullFlag != 0) && (((flags >> 3) & 1) != 0))) {
+		if (((cullFlag == 0) && shadowDisabled) || ((cullFlag != 0) && (shadowCullEnabled != 0))) {
 			CameraPcs.SetFullScreenShadow(meshMtx, 0);
 		}
 
-		if (((flags >> 4) & 1) != 1) {
+		if (skipShadowPosition) {
 			Vec position;
 			position.x = ModelDrawMtx(this)[0][3];
 			position.y = ModelDrawMtx(this)[1][3];
@@ -2365,7 +2368,7 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 {
 	if (blendMode == -1) {
 		CAnim* currentAnim = m_anim;
-		u8 interpCount;
+		int interpCount;
 		if (currentAnim != 0 && (interpCount = AnimInterpCount(currentAnim)) != 0 && AnimBank(currentAnim) != 0) {
 			blendMode = 4;
 
@@ -2401,12 +2404,11 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 		NodeAnimNode0(node) = 0;
 		NodeAnimNode1(node) = 0;
 
-		MtxPtr localMtx = NodeLocalRuntimeMtx(node);
-		C_QUATMtx(&NodePreviousQuat(node), localMtx);
-		NodePreviousPosition(node).x = localMtx[0][3];
-		NodePreviousPosition(node).y = localMtx[1][3];
-		NodePreviousPosition(node).z = localMtx[2][3];
-		Math.MTXGetScale(localMtx, &NodePreviousScale(node));
+		C_QUATMtx(&NodePreviousQuat(node), NodeLocalRuntimeMtx(node));
+		NodePreviousPosition(node).x = NodeLocalRuntimeMtx(node)[0][3];
+		NodePreviousPosition(node).y = NodeLocalRuntimeMtx(node)[1][3];
+		NodePreviousPosition(node).z = NodeLocalRuntimeMtx(node)[2][3];
+		Math.MTXGetScale(NodeLocalRuntimeMtx(node), &NodePreviousScale(node));
 
 		if (m_anim == 0) {
 			continue;
@@ -2426,37 +2428,36 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 		}
 	}
 
-	if (m_anim == 0) {
+	if (m_anim != 0) {
+		int blendFrames = 0;
+		if (ModelAttachMode(this) == 0) {
+			blendFrames = (AnimFlags(m_anim) & 0x80) != 0 ? blendMode : 0;
+		} else if (ModelAttachMode(this) == 1) {
+			blendFrames = blendMode;
+		}
+
+		m_blendCur = static_cast<u16>(blendFrames);
+		m_blendMax = m_blendCur;
+
+		if (startFrame < 0) {
+			startFrame = 0;
+		}
+
+		m_curFrame = static_cast<float>(startFrame);
+		m_time = m_curFrame;
+		m_animStart = m_curFrame;
+
+		if (endFrame == -1) {
+			endFrame = static_cast<int>(AnimFrameCount(m_anim)) - 1;
+		}
+
+		m_animEnd = static_cast<float>(endFrame);
+	} else {
 		m_curFrame = 0.0f;
 		m_time = 0.0f;
 		m_animEnd = 0.0f;
 		m_animStart = 0.0f;
-		return;
 	}
-
-	int blendFrames = 0;
-	if (ModelAttachMode(this) == 0) {
-		blendFrames = (AnimFlags(m_anim) & 0x80) != 0 ? blendMode : 0;
-	} else if (ModelAttachMode(this) == 1) {
-		blendFrames = blendMode;
-	}
-
-	m_blendCur = static_cast<u16>(blendFrames);
-	m_blendMax = m_blendCur;
-
-	if (startFrame < 0) {
-		startFrame = 0;
-	}
-
-	m_curFrame = static_cast<float>(startFrame);
-	m_time = m_curFrame;
-	m_animStart = m_curFrame;
-
-	if (endFrame == -1) {
-		endFrame = static_cast<int>(AnimFrameCount(m_anim)) - 1;
-	}
-
-	m_animEnd = static_cast<float>(endFrame);
 }
 
 /*
@@ -2846,37 +2847,31 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 			unsigned int skinOffset = 0;
 			chunk.PushChunk();
 			while (chunk.GetNextChunk(chunkInfo)) {
-				switch (chunkInfo.m_id) {
-				case 0x4E4F4445: {
+				if (chunkInfo.m_id == 0x4E4F4445) {
 					u8* skinEntry = reinterpret_cast<u8*>(m_data->m_skins) + skinOffset;
 					skinOffset += 0x64;
 					*reinterpret_cast<u32*>(skinEntry + 0x60) = chunk.Get4();
-					break;
-				}
-				case 0x4F4E4520:
+				} else if (chunkInfo.m_id == 0x4F4E4520) {
 					m_data->m_oneWeightCountOrSize = chunkInfo.m_size;
 					m_data->m_oneWeightData =
 					    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp), 0x808, 0);
 					if (m_data->m_oneWeightData != 0) {
 						memcpy(m_data->m_oneWeightData, chunk.GetAddress(), chunkInfo.m_size);
 					}
-					break;
-				case 0x54574F20:
+				} else if (chunkInfo.m_id == 0x54574F20) {
 					m_data->m_twoWeightCountOrSize = chunkInfo.m_size;
 					m_data->m_twoWeightData =
 					    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp), 0x80E, 0);
 					if (m_data->m_twoWeightData != 0) {
 						memcpy(m_data->m_twoWeightData, chunk.GetAddress(), chunkInfo.m_size);
 					}
-					break;
-				case 0x524D494E:
+				} else if (chunkInfo.m_id == 0x524D494E) {
 					m_data->m_threeWeightCountOrSize = chunkInfo.m_size;
 					m_data->m_threeWeightData =
 					    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp), 0x814, 0);
 					if (m_data->m_threeWeightData != 0) {
 						memcpy(m_data->m_threeWeightData, chunk.GetAddress(), chunkInfo.m_size);
 					}
-					break;
 				}
 			}
 			chunk.PopChunk();

@@ -257,6 +257,10 @@ void CPartMng::Create()
 
     memset(self + 0x235a8, 0, 0x108);
 
+    self[0x808] = 0;
+    self[0x809] = 0;
+    self[0x80a] = 0;
+
     ppvSysStopPartF = 1;
     ppvSysGoPartF = 0;
     ppvUserStopPartF = 0;

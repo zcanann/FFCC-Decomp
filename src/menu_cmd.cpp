@@ -1631,7 +1631,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 					canUse = static_cast<u32>(caravanWork->m_commandListInventorySlotRef[GetCmdStateView(this)->selected] >= 0);
 				} else if (selected == 1) {
 					int combo[5][2];
-					canUse = static_cast<u32>(ChkUnite(GetCmdStateView(this)->selected, combo) > 0);
+					canUse = static_cast<u32>(ChkUnite(GetCmdStateView(this)->selected, combo) != 0);
 				} else {
 					canUse = static_cast<u32>(EquipChk(static_cast<int>(list[selected - 1])) != 0);
 				}

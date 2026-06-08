@@ -608,8 +608,14 @@ void CCameraPcs::CalcQuake()
     Vec offset;
     Vec jitter;
 
-    if ((System.m_scenegraphStepMode == 2) || ((m_quake.m_mode == 2) && (m_quake.m_state == 0)) ||
-        ((m_quake.m_mode == 1) && (m_quake.m_state == 0) && (m_quake.m_endTimer <= 0))) {
+    if (System.m_scenegraphStepMode == 2) {
+        return;
+    }
+    unsigned char mode = m_quake.m_mode;
+    if (mode == 2 && m_quake.m_state == 0) {
+        return;
+    }
+    if (mode == 1 && m_quake.m_state == 0 && m_quake.m_endTimer <= 0) {
         return;
     }
 
@@ -691,35 +697,7 @@ void CCameraPcs::CalcQuake()
         return;
     }
 
-    if (m_quake.m_startTimer <= 0) {
-        if (m_quake.m_state == 0) {
-            if (m_quake.m_endTimer <= 0) {
-                m_quake.m_state = 0;
-                m_quake.m_startTimer = 0;
-                m_quake.m_startDuration = 0;
-                m_quake.m_endTimer = 0;
-                m_quake.m_endDuration = 0;
-                m_quake.m_positionAmplitude.z = kCameraZeroF;
-                m_quake.m_positionAmplitude.y = kCameraZeroF;
-                m_quake.m_positionAmplitude.x = kCameraZeroF;
-                m_quake.m_jitterAmplitude.z = kCameraZeroF;
-                m_quake.m_jitterAmplitude.y = kCameraZeroF;
-                m_quake.m_jitterAmplitude.x = kCameraZeroF;
-            } else {
-                float ratio = static_cast<float>(m_quake.m_endTimer) /
-                              static_cast<float>(m_quake.m_endDuration);
-                PSVECScale(&offset, &offset, ratio);
-                PSVECSubtract(&offset, &jitter, &offset);
-                PSVECAdd(&offset, &PositionVec(), &PositionVec());
-                PSVECAdd(&offset, &TargetVec(), &TargetVec());
-                m_quake.m_endTimer = m_quake.m_endTimer - 1;
-            }
-        } else {
-            PSVECAdd(&offset, &jitter, &offset);
-            PSVECAdd(&offset, &PositionVec(), &PositionVec());
-            PSVECAdd(&offset, &TargetVec(), &TargetVec());
-        }
-    } else {
+    if (m_quake.m_startTimer > 0) {
         float ratio = static_cast<float>(m_quake.m_startTimer) /
                       static_cast<float>(m_quake.m_startDuration);
         PSVECScale(&offset, &offset, ratio);
@@ -730,6 +708,32 @@ void CCameraPcs::CalcQuake()
 
         if ((m_quake.m_startTimer == 0) && (m_quake.m_keepMoving == 0)) {
             m_quake.m_state = 0;
+        }
+    } else {
+        if (m_quake.m_state != 0) {
+            PSVECAdd(&offset, &jitter, &offset);
+            PSVECAdd(&offset, &PositionVec(), &PositionVec());
+            PSVECAdd(&offset, &TargetVec(), &TargetVec());
+        } else if (m_quake.m_endTimer > 0) {
+            float ratio = static_cast<float>(m_quake.m_endTimer) /
+                          static_cast<float>(m_quake.m_endDuration);
+            PSVECScale(&offset, &offset, ratio);
+            PSVECSubtract(&offset, &jitter, &offset);
+            PSVECAdd(&offset, &PositionVec(), &PositionVec());
+            PSVECAdd(&offset, &TargetVec(), &TargetVec());
+            m_quake.m_endTimer = m_quake.m_endTimer - 1;
+        } else {
+            m_quake.m_state = 0;
+            m_quake.m_startTimer = 0;
+            m_quake.m_startDuration = 0;
+            m_quake.m_endTimer = 0;
+            m_quake.m_endDuration = 0;
+            m_quake.m_positionAmplitude.z = kCameraZeroF;
+            m_quake.m_positionAmplitude.y = kCameraZeroF;
+            m_quake.m_positionAmplitude.x = kCameraZeroF;
+            m_quake.m_jitterAmplitude.z = kCameraZeroF;
+            m_quake.m_jitterAmplitude.y = kCameraZeroF;
+            m_quake.m_jitterAmplitude.x = kCameraZeroF;
         }
     }
 }
@@ -1525,11 +1529,15 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
         if (worldBound->CheckFrustum0(*clipBound) == 0) {
             continue;
         }
-        if (kCameraClipMinZ >= clipBoundData[0]) {
+        if (clipBoundData[0] <= kCameraClipMinZ) {
             continue;
         }
-        if ((kCameraDebugRotateStep >= (clipBoundData[5] - clipBoundData[2]) / -clipBoundData[0]) &&
-            (kCameraDebugRotateStep >= (clipBoundData[4] - clipBoundData[1]) / -clipBoundData[0])) {
+        float negMinX = -clipBoundData[0];
+        float ratioZ = (clipBoundData[5] - clipBoundData[2]) / negMinX;
+        float ratioY = (clipBoundData[4] - clipBoundData[1]) / negMinX;
+        if (ratioZ > kCameraDebugRotateStep) {
+            // proceed
+        } else if (ratioY <= kCameraDebugRotateStep) {
             continue;
         }
 
@@ -1636,11 +1644,11 @@ void CCameraPcs::drawShadowBegin()
             m_targetZ = m_fullScreenShadowPosition.z;
             PSVECSubtract(reinterpret_cast<Vec*>(&m_targetX), reinterpret_cast<Vec*>(&m_positionX), &delta);
             depth = static_cast<double>(PSVECMag(&delta));
-            m_fullScreenShadow.m_span = static_cast<float>(depth * static_cast<double>(m_fullScreenShadow.m_scale));
+            m_fullScreenShadow.m_span = static_cast<float>(depth) * m_fullScreenShadow.m_scale;
         }
 
         double currentDepth = static_cast<double>(m_fullScreenShadowDepth);
-        if (static_cast<double>(kCameraZeroF) <= currentDepth) {
+        if (currentDepth >= static_cast<double>(kCameraZeroF)) {
             m_fullScreenShadowDepth = static_cast<float>(currentDepth +
                                                          static_cast<double>((static_cast<float>(depth - currentDepth)) * kCameraShadowDepthBlend));
         } else {

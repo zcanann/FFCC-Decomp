@@ -7095,10 +7095,11 @@ int JoyBus::SetCtrlMode(int portIndex, int controlMode)
         modeFlag = 0;
 	}
 
-    unsigned int cmd;
+    unsigned int cmd = 0;
     unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
     cmdBytes[0] = 0x09;
     cmdBytes[1] = modeFlag;
+    unsigned int cmdWord = cmd;
 
     int result = 0;
 
@@ -7114,7 +7115,7 @@ int JoyBus::SetCtrlMode(int portIndex, int controlMode)
         }
         else
         {
-            m_cmdQueueData[m_threadParams[portIndex].m_portIndex][m_cmdCount[m_threadParams[portIndex].m_portIndex]] = cmd;
+            m_cmdQueueData[m_threadParams[portIndex].m_portIndex][m_cmdCount[m_threadParams[portIndex].m_portIndex]] = cmdWord;
             m_cmdCount[m_threadParams[portIndex].m_portIndex]++;
             OSSignalSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
             result = 0;

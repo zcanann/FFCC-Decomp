@@ -952,7 +952,8 @@ void* CMemory::CStage::alloc(unsigned long size, char* source, unsigned long lin
         size = 0x40;
     }
 
-    unsigned int allocSize = static_cast<unsigned int>(size + 0x3F) & ~0x3F;
+    size = (size + 0x3F) & ~0x3F;
+    unsigned int allocSize = static_cast<unsigned int>(size);
     int allocated = 0;
 
     for (int pass = 0; pass < 2; pass++) {

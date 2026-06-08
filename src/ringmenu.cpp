@@ -105,12 +105,6 @@ static inline int clampDecToZero(int value)
 	return static_cast<int>(next & ~static_cast<unsigned int>(static_cast<int>(next) >> 31));
 }
 
-static inline unsigned int frameNibble(int value)
-{
-	int sign = value >> 31;
-	return static_cast<unsigned int>(((sign << 4) | (((value << 28) + sign) >> 28)) - sign);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x800a2dd4
@@ -199,20 +193,18 @@ void CRingMenu::DrawIcon()
 
 	float posX = kRingMenuScreenHalfWidth * clampedX + kRingMenuScreenHalfWidth;
 	float posY = -(kRingMenuScreenHalfHeight * clampedY - kRingMenuScreenHalfHeight);
-	unsigned char blinkAlpha = sRingMenuBlinkAlphaTable[frameNibble(System.m_frameCounter)];
+	unsigned char blinkAlpha = sRingMenuBlinkAlphaTable[static_cast<int>(System.m_frameCounter) % 16];
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x19));
-	unsigned int iconRow;
-	unsigned int iconCol;
+	int iconRow;
+	int iconCol;
 	if ((Game.m_gameWork.m_menuStageMode != 0) && (m_menuIndex >= 1)) {
 		iconRow = 1;
 		iconCol = 0x65;
 	} else {
 		iconRow = caravanWork->m_joybusCaravanId;
-		int foodProgress = static_cast<int>(caravanWork->m_id);
-		int progress = foodProgress - 100;
-		int q = progress / 100 + (progress >> 31);
-		iconCol = foodProgress % 100 + static_cast<unsigned int>((q - (q >> 31)) * 4);
+		int foodProgress = caravanWork->m_id;
+		iconCol = foodProgress % 100 + (foodProgress - 100) / 100 * 4;
 	}
 
 	CColor bgColor(0, 0, 0, 0x80);
@@ -228,10 +220,8 @@ void CRingMenu::DrawIcon()
 	    angle);
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x18));
-	unsigned int colValue = iconCol;
-	int colSign = colValue >> 31;
-	int uInt = (((colSign * 8) | (colValue * 0x20000000 + colSign) >> 29) - colSign) * 0x30;
-	int vInt = ((colValue >> 3) + ((colValue < 0) && ((iconCol & 7) != 0))) * 0x30;
+	int uInt = iconCol % 8 * 0x30;
+	int vInt = iconCol / 8 * 0x30;
 	void* tlut = MenuPcs.m_externalFontTlut;
 	if (caravanWork->m_hp != 0) {
 		tlut = 0;

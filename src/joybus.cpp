@@ -7047,10 +7047,9 @@ int JoyBus::ChgCtrlMode(int portIndex)
         return 0;
     }
 
-    unsigned int x = mode ^ kPppYmMeltMaskBit0;
+    mode = (unsigned char)(mode ^ kPppYmMeltMaskBit0);
     wordBytes[0] = 0x09;
-    wordBytes[1] = (unsigned char)x;
-    mode = (unsigned char)x;
+    wordBytes[1] = mode;
     unsigned int wordCache = word;
     int ret = 0;
 

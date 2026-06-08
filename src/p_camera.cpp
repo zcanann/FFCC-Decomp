@@ -1753,7 +1753,11 @@ void CCameraPcs::drawShadowEnd()
     GXSetNumTexGens(0);
 
     {
-        GXColor black = {0, 0, 0, 0};
+        GXColor black;
+        black.r = 0;
+        black.g = 0;
+        black.b = 0;
+        black.a = 0;
         GXSetChanMatColor(GX_COLOR0A0, black);
     }
 

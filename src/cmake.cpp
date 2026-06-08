@@ -1963,7 +1963,6 @@ void CMenuPcs::CmakeJobOpen()
 void CMenuPcs::CmakeTribeDraw()
 {
     float alpha = CalcCmakeFadeAlpha(this);
-    CmakeMenuState* cmakeState = CmakeState(this);
 
     DrawWMFrame0(1, 1.0f);
 
@@ -2020,7 +2019,7 @@ void CMenuPcs::CmakeTribeDraw()
 
     DrawCmakeTitle(3, 1.0f, alpha);
     {
-        int tribe = cmakeState->m_select;
+        int tribe = CmakeState(this)->m_select;
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
@@ -2077,19 +2076,19 @@ void CMenuPcs::CmakeTribeDraw()
 
     DrawInit();
 
-    if (cmakeState->m_mode == 1) {
-        int select = cmakeState->m_select;
+    if (CmakeState(this)->m_mode == 1) {
+        int select = CmakeState(this)->m_select;
         unsigned int frame = System.m_frameCounter & 7;
         int tribeCursorY = 0x88 + select * 0x1C;
 
-        if (cmakeState->m_fieldSelect == 0) {
+        if (CmakeState(this)->m_fieldSelect == 0) {
             DrawCursor(static_cast<int>(228.0f + static_cast<float>(frame)), tribeCursorY, alpha);
         } else {
             if ((System.m_frameCounter & 1) != 0) {
                 DrawCursor(static_cast<int>(228.0f), tribeCursorY, alpha);
             }
 
-            int hairCursorY = 0x88 + cmakeState->m_row * 0x1C;
+            int hairCursorY = 0x88 + CmakeState(this)->m_row * 0x1C;
             DrawCursor(static_cast<int>(348.0f + static_cast<float>(frame)), hairCursorY, alpha);
         }
     }

@@ -965,7 +965,7 @@ int CFlatRuntime2::Load(char* fileName)
 	}
 
 	resetChangeScript();
-	if (System.m_execParam > 2) {
+	if (static_cast<unsigned int>(System.m_execParam) >= 3) {
 		System.Printf(const_cast<char*>(sCFlatRuntime2LoadMsg));
 	}
 	return 1;
@@ -1959,9 +1959,8 @@ void CFlatRuntime2::drawLayer(
 		}
 	}
 
-	Mtx44 projection;
-	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcsRaw() + 0x94), projection);
-	GXSetProjection(projection, GX_PERSPECTIVE);
+	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcsRaw() + 0x94), ortho);
+	GXSetProjection(ortho, GX_PERSPECTIVE);
 
 	} else {
 		if (static_cast<unsigned int>(System.m_execParam) >= 2) {

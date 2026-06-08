@@ -1688,7 +1688,7 @@ frameLoop:
 		}
 		case 9: {
 			--object->m_sp;
-			if (*object->m_sp != 0) {
+			if (static_cast<int>(*object->m_sp) != 0) {
 				const u32 jumpArg = *reinterpret_cast<u32*>(code + 1);
 				if ((static_cast<int>(jumpArg) >> 24) != 0) {
 					*object->m_sp++ = 1;
@@ -1704,7 +1704,7 @@ frameLoop:
 		}
 		case 8: {
 			--object->m_sp;
-			if (*object->m_sp == 0) {
+			if (static_cast<int>(*object->m_sp) == 0) {
 				const u32 jumpArg = *reinterpret_cast<u32*>(code + 1);
 				if ((static_cast<int>(jumpArg) >> 24) != 0) {
 					*object->m_sp++ = 0;

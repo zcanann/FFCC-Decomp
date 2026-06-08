@@ -28,8 +28,10 @@ static const char s_p_chara_collection_ptrarray_h[] = "collection_ptrarray.h";
 extern const float kCharaZero;
 extern const float kCharaOne;
 extern const float FLOAT_803302A4;
+extern const float FLOAT_803302A8;
 extern const float FLOAT_803302C8;
 extern const float FLOAT_803302CC;
+extern const float FLOAT_803302D0;
 extern const float FLOAT_803302DC;
 extern const float FLOAT_803302E0;
 extern const float kCharaBumpLightPosX;
@@ -1952,19 +1954,18 @@ void CCharaPcs::drawOverlap()
     Mtx identityMtx;
     Mtx texMtx;
     Mtx44 projectionMtx;
-    Vec up = {0.0f, 1.0f, 0.0f};
 
     PSMTXCopy(CameraPcs.m_cameraMatrix, savedCameraMtx);
 
-    C_MTXOrtho(projectionMtx, kCharaZero, FLOAT_803302C8, kCharaZero, FLOAT_803302CC, 0.5f, -0.5f);
+    C_MTXOrtho(projectionMtx, kCharaZero, FLOAT_803302C8, kCharaZero, FLOAT_803302CC, FLOAT_803302A8, FLOAT_803302D0);
     GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
     GXSetChanCtrl(GX_ALPHA0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 
-    _GXColor black = {0x00, 0x00, 0x00, 0xFF};
-    GXSetChanMatColor(GX_COLOR0A0, black);
+    CColor black(0x00, 0x00, 0x00, 0xFF);
+    GXSetChanMatColor(GX_COLOR0A0, black.color);
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
@@ -1989,6 +1990,10 @@ void CCharaPcs::drawOverlap()
     PSMTX44Copy(CameraPcs.m_screenMatrix, projectionMtx);
     GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 
+    Vec up;
+    up.x = kCharaZero;
+    up.y = kCharaOne;
+    up.z = kCharaZero;
     C_MTXLookAt(lookAtMtx, &m_overlapEyePos, &up, &m_overlapTargetPos);
     PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 
@@ -2007,8 +2012,8 @@ void CCharaPcs::drawOverlap()
     GXSetChanCtrl(GX_COLOR0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
     GXSetChanCtrl(GX_ALPHA0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
 
-    black.a = static_cast<unsigned char>(m_overlapAlpha & 0xFF);
-    GXSetChanMatColor(GX_COLOR0A0, black);
+    CColor blendBlack(0x00, 0x00, 0x00, static_cast<unsigned char>(m_overlapAlpha & 0xFF));
+    GXSetChanMatColor(GX_COLOR0A0, blendBlack.color);
     PSMTXIdentity(identityMtx);
     GXLoadPosMtxImm(identityMtx, GX_PNMTX0);
     GXSetCullMode(GX_CULL_NONE);
@@ -2036,8 +2041,8 @@ void CCharaPcs::drawOverlap()
     GXPosition3f32(FLOAT_803302CC, FLOAT_803302C8, kCharaZero);
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_NOOP);
-    _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-    GXSetChanMatColor(GX_COLOR0A0, white);
+    CColor white(0xFF, 0xFF, 0xFF, 0xFF);
+    GXSetChanMatColor(GX_COLOR0A0, white.color);
     GXLoadTexObj(backBufferTex, GX_TEXMAP0);
     PSMTXScale(texMtx, FLOAT_803302DC, FLOAT_803302E0, kCharaOne);
     GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);

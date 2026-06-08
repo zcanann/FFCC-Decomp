@@ -207,7 +207,7 @@ void CMaterialEditorPcs::drawViewer()
                     int srcFactor = 1;
                     int dstFactor = 1;
                     int src = blendMode & 3;
-                    int dst = (blendMode >> 2) & 3;
+                    unsigned int dst = (blendMode >> 2) & 3;
 
                     if ((src == 0) && (dst == 0)) {
                         srcFactor = 4;
@@ -365,7 +365,7 @@ void CMaterialEditorPcs::drawViewer()
                 GXSetArray(GX_VA_TEX0, polygon->texCoord, 8);
 
                 u32 vertexIndex[8];
-                int vertexCount = 3;
+                unsigned int vertexCount = 3;
                 MaterialEditorPolygon* poly = polygon;
                 vertexIndex[4] = poly->index0;
                 vertexIndex[5] = poly->index1;

@@ -2600,8 +2600,8 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 	{
 		s32 partIndex = ((s32)((u8*)pppMngSt - ((u8*)&PartMng + 0x2A18))) / 0x158;
 
-		for (CGObject* gObject = gCFlatRuntime2.FindGObjFirst(); gObject != 0;
-			 gObject = gCFlatRuntime2.FindGObjNext(gObject))
+		for (CGObject* gObject = CFlat.FindGObjFirst(); gObject != 0;
+			 gObject = CFlat.FindGObjNext(gObject))
 		{
 			int previousCount = hitRaw->m_hitParams.m_hitObjectCount;
 			int objectSlot;

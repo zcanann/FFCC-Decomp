@@ -2087,17 +2087,15 @@ void CGMonObj::alwaysFuncMeteoParasite()
 void CGMonObj::frameStatFuncMeteoParasite()
 {
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	CGCharaObj* chara = reinterpret_cast<CGCharaObj*>(this);
 	int state = prgObj->m_lastStateId;
-	int scriptKind = reinterpret_cast<int>(object->m_scriptHandle[4]);
+	int scriptKind = reinterpret_cast<int>(reinterpret_cast<CGObject*>(this)->m_scriptHandle[4]);
 
 	switch (state) {
 	case 100:
 		if (prgObj->m_stateFrame == 0) {
 			prgObj->reqAnim(10, 0, 0);
 		} else if (prgObj->isLoopAnim() != 0) {
-			object->SetAnimSlot(0xB, 0);
+			reinterpret_cast<CGObject*>(this)->SetAnimSlot(0xB, 0);
 			prgObj->changeStat(0, 0, 0);
 		}
 		break;
@@ -2105,7 +2103,7 @@ void CGMonObj::frameStatFuncMeteoParasite()
 		if (prgObj->m_stateFrame == 0) {
 			prgObj->reqAnim(0xD, 0, 0);
 		} else if (prgObj->isLoopAnim() != 0) {
-			object->SetAnimSlot(0xE, 0);
+			reinterpret_cast<CGObject*>(this)->SetAnimSlot(0xE, 0);
 			prgObj->changeStat(0, 0, 0);
 		}
 		break;
@@ -2113,7 +2111,7 @@ void CGMonObj::frameStatFuncMeteoParasite()
 		if (prgObj->m_stateFrame == 0) {
 			prgObj->reqAnim(0xC, 0, 0);
 		} else if (prgObj->isLoopAnim() != 0) {
-			object->SetAnimSlot(0, 0);
+			reinterpret_cast<CGObject*>(this)->SetAnimSlot(0, 0);
 			prgObj->changeStat(0, 0, 0);
 		}
 		break;
@@ -2126,10 +2124,11 @@ void CGMonObj::frameStatFuncMeteoParasite()
 				prgObj->playSe3D(0x11D5B, 0x32, 0x96, 0, 0);
 			}
 			if (prgObj->m_stateFrame % 3 == 0) {
+				CGCharaObj* chara = reinterpret_cast<CGCharaObj*>(this);
 				chara->putParticleFromItem(chara->m_itemId, 2, chara->m_particleSlots[0], 0);
 			}
 		}
-		chara->statAttack();
+		reinterpret_cast<CGCharaObj*>(this)->statAttack();
 	}
 }
 

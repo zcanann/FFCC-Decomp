@@ -4257,8 +4257,7 @@ void CMenuPcs::DrawDiaryMenu()
 		CharaPcs.InitEnv(5);
 		GXSetColorUpdate(0);
 		GXSetAlphaUpdate(0);
-		CColor clearColor(0, 0, 0, 0);
-		GXSetCopyClear(clearColor.color, 0xFFFFFF);
+		GXSetCopyClear(CColor(0, 0, 0, 0).color, 0xFFFFFF);
 		GXSetColorUpdate(1);
 		GXSetAlphaUpdate(1);
 		GXSetViewport(static_cast<float>(*reinterpret_cast<short*>(worldObj + 0x58)),
@@ -5237,8 +5236,7 @@ void CMenuPcs::DrawLoadMenu()
 				CharaPcs.InitEnv(5);
 				GXSetColorUpdate(0);
 				GXSetAlphaUpdate(0);
-				CColor clearColor(0, 0, 0, 0);
-				GXSetCopyClear(clearColor.color, 0xFFFFFF);
+				GXSetCopyClear(CColor(0, 0, 0, 0).color, 0xFFFFFF);
 				GXSetColorUpdate(1);
 				GXSetAlphaUpdate(1);
 				GXSetViewport(
@@ -7184,8 +7182,7 @@ void CMenuPcs::DrawFukidashi()
 					CharaPcs.InitEnv(5);
 					GXSetColorUpdate(0);
 					GXSetAlphaUpdate(0);
-					CColor clearColor(0, 0, 0, 0);
-					GXSetCopyClear(clearColor.color, 0xFFFFFF);
+					GXSetCopyClear(CColor(0, 0, 0, 0).color, 0xFFFFFF);
 					GXSetColorUpdate(1);
 					GXSetAlphaUpdate(1);
 
@@ -8460,8 +8457,7 @@ void CMenuPcs::DrawChara()
 			CharaPcs.InitEnv(5);
 			GXSetColorUpdate(0);
 			GXSetAlphaUpdate(0);
-			CColor clearColor(0, 0, 0, 0);
-			GXSetCopyClear(clearColor.color, 0x00FFFFFF);
+			GXSetCopyClear(CColor(0, 0, 0, 0).color, 0x00FFFFFF);
 			GXSetColorUpdate(1);
 			GXSetAlphaUpdate(1);
 			GXSetViewport(static_cast<float>(*reinterpret_cast<short*>(view + 8)),
@@ -8502,8 +8498,7 @@ void CMenuPcs::DrawChara()
 				CharaPcs.InitEnv(5);
 				GXSetColorUpdate(0);
 				GXSetAlphaUpdate(0);
-				CColor clearColor(0, 0, 0, 0);
-				GXSetCopyClear(clearColor.color, 0x00FFFFFF);
+				GXSetCopyClear(CColor(0, 0, 0, 0).color, 0x00FFFFFF);
 				GXSetColorUpdate(1);
 				GXSetAlphaUpdate(1);
 				GXSetViewport(static_cast<float>(*reinterpret_cast<short*>(view + 8)),

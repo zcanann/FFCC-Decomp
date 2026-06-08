@@ -1981,13 +1981,7 @@ int CMapMng::ReadMpl(char* mapName)
             chunkFile.SetBuf(filePtr);
             CChunkFile::CChunk chunk;
 
-            if (m_asyncLoadState.m_mapReadMode == 2) {
-                while (chunkFile.GetNextChunk(chunk)) {
-                    if (chunk.m_id == 0x4D455348 && chunk.m_arg0 == 1) {
-                        return 1;
-                    }
-                }
-            } else {
+            if (m_asyncLoadState.m_mapReadMode != 2) {
                 while (chunkFile.GetNextChunk(chunk)) {
                     switch (chunk.m_id) {
                     case 0x4D455348:
@@ -2021,6 +2015,12 @@ int CMapMng::ReadMpl(char* mapName)
                     chunkFile.PopChunk();
 
                     if (chunk.m_arg0 == 1) {
+                        return 1;
+                    }
+                }
+            } else {
+                while (chunkFile.GetNextChunk(chunk)) {
+                    if (chunk.m_id == 0x4D455348 && chunk.m_arg0 == 1) {
                         return 1;
                     }
                 }

@@ -3221,26 +3221,25 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                         case CHUNK_TSDT: {
                             unsigned int slot = chunkFile.Get2() & 0xFFFF;
                             chunkFile.Get2();
-                            CTexScroll* texScroll = material->GetTexScroll(slot);
 
                             if (keyFrameU == 0) {
                                 float valueU = chunkFile.GetF4();
-                                texScroll->m_u1 = valueU;
-                                texScroll->m_type0 = (valueU == kTextureZero) ? 0 : 1;
+                                material->GetTexScroll(slot)->m_u1 = valueU;
+                                material->GetTexScroll(slot)->m_type0 = (valueU == kTextureZero) ? 0 : 1;
                             } else {
                                 chunkFile.GetF4();
-                                texScroll->m_uKeyFrame = keyFrameU;
-                                texScroll->m_type0 = 2;
+                                material->GetTexScroll(slot)->m_uKeyFrame = keyFrameU;
+                                material->GetTexScroll(slot)->m_type0 = 2;
                             }
 
                             if (keyFrameV == 0) {
                                 float valueV = chunkFile.GetF4();
-                                texScroll->m_v1 = valueV;
-                                texScroll->m_type1 = (valueV == kTextureZero) ? 0 : 1;
+                                material->GetTexScroll(slot)->m_v1 = valueV;
+                                material->GetTexScroll(slot)->m_type1 = (valueV == kTextureZero) ? 0 : 1;
                             } else {
                                 chunkFile.GetF4();
-                                texScroll->m_vKeyFrame = keyFrameV;
-                                texScroll->m_type1 = 2;
+                                material->GetTexScroll(slot)->m_vKeyFrame = keyFrameV;
+                                material->GetTexScroll(slot)->m_type1 = 2;
                             }
                         } break;
                         case CHUNK_UFRM:
@@ -3263,16 +3262,13 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 } else {
                     unsigned int slot = chunkFile.Get2() & 0xFFFF;
                     chunkFile.Get2();
-                    float valueU = chunkFile.GetF4();
-                    CTexScroll* texScroll = material->GetTexScroll(slot);
-
-                    texScroll->m_u1 = valueU;
-                    texScroll->m_v1 = chunkFile.GetF4();
-                    if (kTextureZero != texScroll->m_u1) {
-                        texScroll->m_type0 = 1;
+                    material->GetTexScroll(slot)->m_u1 = chunkFile.GetF4();
+                    material->GetTexScroll(slot)->m_v1 = chunkFile.GetF4();
+                    if (kTextureZero != material->GetTexScroll(slot)->m_u1) {
+                        material->GetTexScroll(slot)->m_type0 = 1;
                     }
-                    if (kTextureZero != texScroll->m_v1) {
-                        texScroll->m_type1 = 1;
+                    if (kTextureZero != material->GetTexScroll(slot)->m_v1) {
+                        material->GetTexScroll(slot)->m_type1 = 1;
                     }
                 }
             } break;

@@ -717,7 +717,7 @@ void CMes::Draw()
 					}
 
 					unsigned int fadeCur = (unsigned int)*(unsigned char*)((char*)glyph + 0x0F) & 0x0F;
-					unsigned int fadeMax = (unsigned int)*(unsigned char*)((char*)glyph + 0x0F) >> 4 & 0xF;
+					unsigned int fadeMax = (unsigned int)*(signed char*)((char*)glyph + 0x0F) >> 4 & 0xF;
 					float ratio = (float)fadeCur / (float)fadeMax;
 					unsigned char alpha;
 					if (ratio >= kMesOne)
@@ -726,7 +726,7 @@ void CMes::Draw()
 					}
 					else
 					{
-						alpha = (unsigned char)((float)globalAlpha * ratio);
+						alpha = (signed char)((float)globalAlpha * ratio);
 					}
 
 					_GXColor color = {0xFF, 0xFF, 0xFF, alpha};

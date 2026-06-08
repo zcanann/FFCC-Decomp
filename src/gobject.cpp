@@ -1367,7 +1367,7 @@ void CGObject::hit()
 void CGObject::update()
 {
     const unsigned int dbgFlags = DbgMenuPcs.GetDbgFlagsRaw();
-    const unsigned int miniGameModelPass = (static_cast<unsigned int>(__cntlzw(dbgFlags & 0x8000)) >> 5) & 0xFF;
+    const int miniGameModelPass = (static_cast<unsigned int>(__cntlzw(dbgFlags & 0x8000)) >> 5) & 0xFF;
     unsigned char& weaponFlagsLo = m_weaponNodeFlagBytes.m_flags0;
     unsigned char& weaponFlagsHi = m_weaponNodeFlagBytes.m_flags1;
     unsigned char& shieldFlagsLo = *reinterpret_cast<unsigned char*>(&m_shieldNodeFlags);
@@ -1731,7 +1731,7 @@ void CGObject::update()
 
                     for (int i = 0; i < pointCount; i++) {
                         const unsigned short pointFrame = *reinterpret_cast<unsigned short*>(animRefBytes + 0x30 + i * 4);
-                        const short pointValue = *reinterpret_cast<unsigned short*>(animRefBytes + 0x32 + i * 4);
+                        const short pointValue = *reinterpret_cast<short*>(animRefBytes + 0x32 + i * 4);
                         const float eventFrame = WrapAnimFrame(static_cast<float>(pointFrame) + ModelAnimStart(model), animSpan);
                         if ((!wrapped && prevWrapped < eventFrame && eventFrame <= nextWrapped) ||
                             (wrapped && (eventFrame > prevWrapped || eventFrame <= nextWrapped))) {

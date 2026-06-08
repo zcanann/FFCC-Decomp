@@ -2288,10 +2288,10 @@ void CGMonObj::logicFuncRamoe()
 		nextState = 100;
 	}
 
-	if (nextState == -1) {
-		logicFuncDefault();
-	} else {
+	if (nextState != -1) {
 		reinterpret_cast<CGPrgObj*>(this)->changeStat(nextState, 0, 0);
+	} else {
+		logicFuncDefault();
 	}
 }
 

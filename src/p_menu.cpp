@@ -846,10 +846,10 @@ void CMenuPcs::calc()
  */
 void CMenuPcs::draw()
 {
-    Mtx modelMtx;
-    Mtx texMtx;
     Mtx44 orthoMtx;
+    Mtx modelMtx;
     Mtx44 screenMtx;
+    Mtx texMtx;
 
     PSMTXIdentity(modelMtx);
     GXLoadPosMtxImm(modelMtx, 0);
@@ -882,15 +882,17 @@ void CMenuPcs::draw()
     {
         int mode = m_mode;
 
-        if (mode == 1) {
-            drawWorld();
-        } else if (mode < 1) {
-            if (mode >= 0) {
-                drawBattle();
-                drawVillageMenu();
+        if (mode != 1) {
+            if (mode < 1) {
+                if (mode >= 0) {
+                    drawBattle();
+                    drawVillageMenu();
+                }
+            } else if (mode < 3) {
+                drawBonus();
             }
-        } else if (mode < 3) {
-            drawBonus();
+        } else {
+            drawWorld();
         }
     }
 
@@ -909,7 +911,7 @@ void CMenuPcs::draw()
         TextureMan.SetTextureTev(texture);
 
         {
-            int alpha = static_cast<int>(127.5f * (1.0f + sinf(System.m_frameCounter * kMenuPulseStep)));
+            int alpha = static_cast<int>(LoadFloat(kMenuAlphaMax) * (LoadFloat(kMenuHalf) * (LoadFloat(kMenuOne) + sinf(System.m_frameCounter * LoadFloat(kMenuPulseStep)))));
             CColor color(0xFF, 0xFF, 0xFF, static_cast<u8>(alpha));
             GXSetChanMatColor(GX_COLOR0A0, color.color);
             DrawRect(3, LoadFloat(kMenuScreenCenterX), LoadFloat(kMenuScreenCenterY), LoadFloat(kMenuInitRectWidth),
@@ -1786,9 +1788,9 @@ void CMenuPcs::drawBattle()
         Vec4d projected;
         PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
         PSMTXCopy(cameraMtx, reinterpret_cast<MtxPtr>(viewMtx));
-        viewMtx[3][0] = LoadFloat(kMenuInitOne);
-        viewMtx[3][1] = LoadFloat(kMenuInitOne);
         viewMtx[3][2] = LoadFloat(kMenuInitOne);
+        viewMtx[3][1] = LoadFloat(kMenuInitOne);
+        viewMtx[3][0] = LoadFloat(kMenuInitOne);
         viewMtx[3][3] = LoadFloat(kMenuOne);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
         PSMTX44Concat(screenMtx, viewMtx, screenMtx);
@@ -1802,11 +1804,8 @@ void CMenuPcs::drawBattle()
 
             if (screenX < static_cast<float>(halfWidth)) {
                 screenX = static_cast<float>(halfWidth);
-            } else {
-                const float right = static_cast<float>(0x280 - halfWidth);
-                if (screenX > right) {
-                    screenX = right;
-                }
+            } else if (screenX > static_cast<float>(0x280 - halfWidth)) {
+                screenX = static_cast<float>(0x280 - halfWidth);
             }
 
             if (screenY < LoadFloat(kMenuMarkerMinY)) {
@@ -1823,13 +1822,13 @@ void CMenuPcs::drawBattle()
             const CColor frameColor(0xFF, 0xFF, 0xFF, static_cast<u8>(alphaF));
             GXSetChanMatColor(GX_COLOR0A0, frameColor.color);
 
-            if (LoadFloat(kMenuInitOne) < static_cast<float>(totalWidth)) {
+            if (static_cast<float>(totalWidth) > LoadFloat(kMenuInitOne)) {
                 float bodyWidth = static_cast<float>(totalWidth) - LoadFloat(kMenuMarkerMinY);
                 if (bodyWidth < LoadFloat(kMenuInitOne)) {
                     bodyWidth = LoadFloat(kMenuInitOne);
                 }
 
-                CTexture* tex = MenuPcs.m_textures[0xDD];
+                CTexture* tex = MenuPcs.m_textures[0x1A];
                 TextureMan.SetTexture(GX_TEXMAP0, tex);
                 u32 width = tex->m_width;
                 u32 height = tex->m_height;
@@ -1841,7 +1840,7 @@ void CMenuPcs::drawBattle()
                 TextureMan.SetTextureTev(tex);
                 MenuPcs.DrawRect(0, left, screenY, LoadFloat(kMenuMarkerCapSize), LoadFloat(kMenuMarkerCapSize), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(kMenuOne), LoadFloat(kMenuOne), LoadFloat(kMenuInitOne));
 
-                tex = MenuPcs.m_textures[0xDE];
+                tex = MenuPcs.m_textures[0x1B];
                 TextureMan.SetTexture(GX_TEXMAP0, tex);
                 width = tex->m_width;
                 height = tex->m_height;
@@ -1853,7 +1852,7 @@ void CMenuPcs::drawBattle()
                 TextureMan.SetTextureTev(tex);
                 MenuPcs.DrawRect(0, bodyLeft, screenY, bodyWidth, LoadFloat(kMenuMarkerCapSize), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(kMenuOne), LoadFloat(kMenuOne), LoadFloat(kMenuInitOne));
 
-                tex = MenuPcs.m_textures[0xDF];
+                tex = MenuPcs.m_textures[0x1C];
                 TextureMan.SetTexture(GX_TEXMAP0, tex);
                 width = tex->m_width;
                 height = tex->m_height;

@@ -1651,7 +1651,7 @@ int CAmemCacheSet::GetData(short index, char* source, int line)
 {
     while (true) {
         CAmemCache& entry = cacheEntryAt(this, index);
-        int data;
+        unsigned int data;
 
         if (entry.m_cacheData == 0) {
             if (entry.m_dmaCopy != 0) {

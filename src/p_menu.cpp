@@ -1196,10 +1196,7 @@ void CMenuPcs::SetTexture(CMenuPcs::TEX tex)
  */
 void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, float u, float v, float us, float vs, float angle)
 {
-    if (w <= LoadFloat(kMenuInitOne)) {
-        return;
-    }
-    if (h <= LoadFloat(kMenuInitOne)) {
+    if (w <= LoadFloat(kMenuInitOne) || h <= LoadFloat(kMenuInitOne)) {
         return;
     }
     {
@@ -1297,10 +1294,7 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
  */
 void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, float u, float v, _GXColor* colors, float us, float vs, float angle)
 {
-    if (w <= LoadFloat(kMenuInitOne)) {
-        return;
-    }
-    if (h <= LoadFloat(kMenuInitOne)) {
+    if (w <= LoadFloat(kMenuInitOne) || h <= LoadFloat(kMenuInitOne)) {
         return;
     }
     {

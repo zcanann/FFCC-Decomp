@@ -2593,7 +2593,7 @@ void CMenuPcs::CmakeNameDraw()
     font->SetColor(textCol.color);
 
     int y = 0x6C;
-    for (int i = 0; i < 5; i++) {
+    for (unsigned int i = 0; i < 5; i++) {
         const char* rowText = s_NameEntryStr[table * 5 + i];
         font->SetPosX(240.0f);
         font->SetPosY(static_cast<float>(y));

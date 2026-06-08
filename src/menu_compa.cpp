@@ -127,7 +127,7 @@ void CMenuPcs::CompaDraw()
 					colors[3].g = 0xFF;
 					colors[3].b = 0xFF;
 					colors[3].a = 0;
-					float remainW = static_cast<float>((1.0 / (double)entry->duration) * (double)static_cast<float>(entry->w));
+					float remainW = static_cast<float>(1.0 / (double)entry->duration) * static_cast<float>(entry->w);
 					if (entry->tex == 0x51) {
 						int yStep = static_cast<int>(y);
 						float end = y + h;

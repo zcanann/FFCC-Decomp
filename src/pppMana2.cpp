@@ -578,7 +578,7 @@ static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned 
     rowCount = 0;
     uvStep = LoadFloat(kMana2MeshUvStep);
     radius = param_5 * LoadFloat(kMana2Half);
-    for (z = radius; -radius <= z; z -= param_5 * uvStep) {
+    for (z = radius; z >= -radius; z -= param_5 * uvStep) {
         colCount = 0;
         positions = reinterpret_cast<float*>(param_1);
         normals = reinterpret_cast<float*>(param_2);
@@ -756,12 +756,12 @@ void CalcReflectionVector2(
             float absX = fabsf(outVec->x);
             float absZ = fabsf(outVec->z);
 
+            axis = absX < absY;
             maxAxis = absX;
-            if (absY > maxAxis) {
-                axis = 1;
+            if (axis) {
                 maxAxis = absY;
             }
-            if (absZ > maxAxis) {
+            if (maxAxis < absZ) {
                 axis = 2;
             }
             CVector reflected(outVec->x, outVec->y, outVec->z);
@@ -1578,8 +1578,9 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
         offset.y = stepData->m_waterScale;
         PSMTXMultVec(mtx, &offset, &offset);
 
+        float newY = y - offset.y;
         mtx[0][3] = x;
-        mtx[1][3] = y - offset.y;
+        mtx[1][3] = newY;
         mtx[2][3] = z;
 
         PSMTXConcat(cameraMtx, mtx, posMtx);
@@ -1608,9 +1609,11 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
                 GXCallDisplayList(mana2->m_displayListCopies[dlIndex], displayList->m_size);
             }
         } else {
-            GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_ENABLE);
-            MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
-            GXCallDisplayList(displayList->m_data, displayList->m_size);
+            if (strcmp(meshData->m_name, s_manaShapeObj) == 0) {
+                GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_ENABLE);
+                MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
+                GXCallDisplayList(displayList->m_data, displayList->m_size);
+            }
         }
     }
 }

@@ -1143,7 +1143,7 @@ void CShopMenu::DrawItemInfo0()
         char* unitText = ShopMenuMes(languageId, SHOP_MENU_TEXT_GIL);
         float unitWidth = font->GetWidth(unitText);
         float rightX = FLOAT_80332d3c - unitWidth;
-        float amountRightX = rightX - FLOAT_80332d5c;
+        int amountRightX = static_cast<int>(rightX - FLOAT_80332d5c);
         int totalGil;
 
         if (m_listType == 0) {
@@ -1168,11 +1168,11 @@ void CShopMenu::DrawItemInfo0()
         }
 
         SetupShopMenuAmountFont(font);
-        DrawShopMenuAmount(font, totalGil, amountRightX, FLOAT_80332d68, 0x1B);
+        DrawShopMenuAmountTrunc(font, totalGil, amountRightX, FLOAT_80332d68, 0x1B);
 
         SetupShopMenuUnitFont(font);
         font->DrawInit();
-        MenuPcs.DrawNoShadowFont(font, unitText, rightX, FLOAT_80332d68, 0x19, 0x12);
+        MenuPcs.DrawNoShadowFont(font, unitText, static_cast<float>(static_cast<int>(rightX)), FLOAT_80332d68, 0x19, 0x12);
         MenuPcs.DrawInit();
     } else {
         SetupShopMenuUnitFont(font);

@@ -1733,7 +1733,6 @@ void CalcReflectionVector2(
             u16 posIndex = dl[0];
             u16 normalIndex = dl[1];
             float denom;
-            u8* colorBytes = (u8*)&color[posIndex];
 
             dl += 4;
             if ((drawFmt & 7) == 2) {
@@ -1753,15 +1752,15 @@ void CalcReflectionVector2(
             }
 
             if (reflectionVec[posIndex].z >= zero) {
-                colorBytes[0] = 0xFF;
-                colorBytes[1] = 0xFF;
-                colorBytes[2] = 0xFF;
-                colorBytes[3] = 0xFF;
+                ((u8*)&color[posIndex])[0] = 0xFF;
+                ((u8*)&color[posIndex])[1] = 0xFF;
+                ((u8*)&color[posIndex])[2] = 0xFF;
+                ((u8*)&color[posIndex])[3] = 0xFF;
             } else {
-                colorBytes[0] = 0;
-                colorBytes[1] = 0;
-                colorBytes[2] = 0;
-                colorBytes[3] = 0;
+                ((u8*)&color[posIndex])[0] = 0;
+                ((u8*)&color[posIndex])[1] = 0;
+                ((u8*)&color[posIndex])[2] = 0;
+                ((u8*)&color[posIndex])[3] = 0;
             }
 
             denom = denomBias + reflectionVec[posIndex].z;

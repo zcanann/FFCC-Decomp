@@ -2568,10 +2568,9 @@ void CGoOutMenu::Calc()
                 if (nextMode == 2) {
                     unsigned int activeCount = 0;
                     for (int i = 0; i < 8; i++) {
-                        CCaravanWork& caravanWork = Game.m_caravanWorkArr[i];
-                        if (caravanWork.m_shopState != 0) {
+                        if (Game.m_caravanWorkArr[i].m_shopState != 0) {
                             activeCount++;
-                            if (caravanWork.m_shopBusyFlag != 0) {
+                            if (Game.m_caravanWorkArr[i].m_shopBusyFlag != 0) {
                                 activeCount++;
                             }
                         }
@@ -2618,8 +2617,7 @@ void CGoOutMenu::Calc()
                     } else {
                         int transferableCount = 0;
                         for (int i = 0; i < 8; i++) {
-                            CCaravanWork& caravanWork = Game.m_caravanWorkArr[i];
-                            if (caravanWork.m_shopState != 0 && caravanWork.m_shopBusyFlag == 0) {
+                            if (Game.m_caravanWorkArr[i].m_shopState != 0 && Game.m_caravanWorkArr[i].m_shopBusyFlag == 0) {
                                 transferableCount++;
                             }
                         }

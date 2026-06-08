@@ -564,8 +564,8 @@ void CGCharaObj::onCancelStat(int)
 	switch (state) {
 		case 0x12:
 			{
-				unsigned char* self = reinterpret_cast<unsigned char*>(this);
 				int i = 0;
+				unsigned char* self = reinterpret_cast<unsigned char*>(this);
 				for (; i < 0x16; i++, self += 4) {
 					if (((1U << i) & 1U) != 0) {
 						CFlatRuntime2Storage().EndParticleSlot(*reinterpret_cast<int*>(self + 0x564), 1);
@@ -2229,10 +2229,13 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 				setSta(0, calcSta(0, amount, reinterpret_cast<CGObject*>(sourceObj)));
 				setSta(4, 0);
 				Sound.StopSe3DGroup(m_particleId);
-				for (int i = 0; i < 0x16; i++) {
-					if (((1U << i) & 0x3bU) != 0) {
-						CFlatRuntime2Storage().DeleteParticleSlot(
-							*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x564 + i * 4), 1);
+				{
+					int i = 0;
+					unsigned char* slot = reinterpret_cast<unsigned char*>(this);
+					for (; i < 0x16; i++, slot += 4) {
+						if (((1U << i) & 0x3bU) != 0) {
+							CFlatRuntime2Storage().DeleteParticleSlot(*reinterpret_cast<int*>(slot + 0x564), 1);
+						}
 					}
 				}
 				changeStat(0, 0, 0);
@@ -2301,10 +2304,13 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			outValue = 0;
 			putHitParticleFromItem(sourceObj, amount);
 			Sound.StopSe3DGroup(m_particleId);
-			for (int i = 0; i < 0x16; i++) {
-				if (((1U << i) & 0x3bU) != 0) {
-					CFlatRuntime2Storage().DeleteParticleSlot(
-						*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x564 + i * 4), 1);
+			{
+				int i = 0;
+				unsigned char* slot = reinterpret_cast<unsigned char*>(this);
+				for (; i < 0x16; i++, slot += 4) {
+					if (((1U << i) & 0x3bU) != 0) {
+						CFlatRuntime2Storage().DeleteParticleSlot(*reinterpret_cast<int*>(slot + 0x564), 1);
+					}
 				}
 			}
 			changeStat(0, 0, 0);
@@ -2328,10 +2334,13 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			outValue = 0;
 			putHitParticleFromItem(sourceObj, amount);
 			Sound.StopSe3DGroup(m_particleId);
-			for (int i = 0; i < 0x16; i++) {
-				if (((1U << i) & 0x3bU) != 0) {
-					CFlatRuntime2Storage().DeleteParticleSlot(
-						*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x564 + i * 4), 1);
+			{
+				int i = 0;
+				unsigned char* slot = reinterpret_cast<unsigned char*>(this);
+				for (; i < 0x16; i++, slot += 4) {
+					if (((1U << i) & 0x3bU) != 0) {
+						CFlatRuntime2Storage().DeleteParticleSlot(*reinterpret_cast<int*>(slot + 0x564), 1);
+					}
 				}
 			}
 			changeStat(0, 0, 0);
@@ -2510,8 +2519,7 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 			}
 		}
 
-		next = hpValue + delta;
-		next &= ~(static_cast<int>(next) >> 31);
+		next = (hpValue + delta) & ~(static_cast<int>(hpValue + delta) >> 31);
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) = static_cast<unsigned short>(next);
 		m_worldParam = kOneF32;
 
@@ -2556,12 +2564,12 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 	}
 
 	if (delta > 0) {
-		unsigned short maxHp = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1A);
-		next = hpValue + delta;
-		if (static_cast<int>(next) > static_cast<int>(maxHp)) {
-			next = maxHp;
+		int maxHp = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1A);
+		int result = maxHp;
+		if (hpValue + delta < maxHp) {
+			result = hpValue + delta;
 		}
-		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) = static_cast<unsigned short>(next);
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) = static_cast<unsigned short>(result);
 	}
 }
 
@@ -3231,7 +3239,7 @@ int CGCharaObj::calcCastTime(int itemId)
  */
 void CGCharaObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 {
-	if ((m_weaponNodeFlagBits.m_prg && (CFlatCenterState() == 0)) &&
+	if ((m_weaponNodeFlagBits.m_prg && (static_cast<int>(CFlatCenterState()) == 0)) &&
 	    ((DbgMenuPcs.GetDbgFlagsRaw() & 0x80) != 0)) {
 		char text[0x100];
 		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);

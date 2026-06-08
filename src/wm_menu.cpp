@@ -10879,9 +10879,12 @@ LAB_draw:
 				if (alpha > FLOAT_803314f0) {
 					float slotY = (float)(DOUBLE_80331498 * (double)(int)slotIdx + DOUBLE_80331490);
 					MenuPcs.SetAttrFmt((FMT)0);
-					unsigned int slotAlpha = (unsigned int)(int)(FLOAT_80331458 * alpha) & 0xFF;
-					slotAlpha = slotAlpha | 0xFFFFFF00;
-					GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&slotAlpha);
+					GXColor slotColor;
+					slotColor.r = 0xFF;
+					slotColor.g = 0xFF;
+					slotColor.b = 0xFF;
+					slotColor.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * alpha));
+					GXSetChanMatColor(GX_COLOR0A0, slotColor);
 
 					// Draw slot background
 					MenuPcs.SetTexture((TEX)0x24);
@@ -10900,7 +10903,7 @@ LAB_draw:
 					contentColors[0].r = 0xFF;
 					contentColors[0].g = 0xFF;
 					contentColors[0].b = 0xFF;
-					contentColors[0].a = static_cast<unsigned char>(slotAlpha);
+					contentColors[0].a = slotColor.a;
 					contentColors[1].r = 0xFF;
 					contentColors[1].g = 0xFF;
 					contentColors[1].b = 0xFF;
@@ -10908,7 +10911,7 @@ LAB_draw:
 					contentColors[2].r = 0xFF;
 					contentColors[2].g = 0xFF;
 					contentColors[2].b = 0xFF;
-					contentColors[2].a = static_cast<unsigned char>(slotAlpha);
+					contentColors[2].a = slotColor.a;
 					contentColors[3].r = 0xFF;
 					contentColors[3].g = 0xFF;
 					contentColors[3].b = 0xFF;

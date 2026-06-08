@@ -6382,12 +6382,13 @@ void CMenuPcs::DrawObj(int kind)
 void CMenuPcs::CalcPitcher()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* worldObj = m_wm.m_worldObjData;
 
 	short state = m_wmWorldState->m_mainState;
 	if (state == 0 || state > 2) {
 		return;
 	}
+
+	unsigned char* worldObj = m_wm.m_worldObjData;
 
 	reinterpret_cast<unsigned int*>(worldObj + 0x190)[0] = 1;
 	reinterpret_cast<short*>(worldObj + 0x198)[0] = 0x140;
@@ -6417,10 +6418,10 @@ void CMenuPcs::CalcPitcher()
 
 	short step = m_wmWorldState->m_frameCounter;
 	float blendStep = static_cast<float>(DOUBLE_803314e8 * static_cast<double>(step));
-	if (state == 1 && step < 10) {
+	if (m_wmWorldState->m_mainState == 1 && step < 10) {
 		reinterpret_cast<float*>(
 			reinterpret_cast<unsigned char*>(reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x788)[0]->m_model) + 0x9C)[0] = blendStep;
-	} else if (state == 2 && bytes[0x13] != 0) {
+	} else if (m_wmWorldState->m_mainState == 2 && bytes[0x13] != 0) {
 		reinterpret_cast<float*>(
 			reinterpret_cast<unsigned char*>(reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x788)[0]->m_model) + 0x9C)[0] =
 			static_cast<float>(DOUBLE_80331420 - static_cast<double>(blendStep));

@@ -965,8 +965,8 @@ void CGCharaObj::onFrameStat()
 				case 2:
 					if (m_subFrame == 0) {
 						{
-							unsigned char* slot = reinterpret_cast<unsigned char*>(this);
 							int i = 0;
+							unsigned char* slot = reinterpret_cast<unsigned char*>(this);
 							for (; i < 0x16; i++, slot += 4) {
 								if ((8U & (1U << i)) != 0) {
 									CFlatRuntime2Storage().EndParticleSlot(*reinterpret_cast<int*>(slot + 0x564), 1);

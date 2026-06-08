@@ -520,14 +520,14 @@ int CGMonObj::getNearParty(int targetOrdinal, int flags, float minDist, float ma
 
 		if ((party != NULL) &&
 			(((Game.m_gameWork.m_menuStageMode == 0) ||
-				(0xE < Game.m_gameWork.m_bossArtifactStageIndex) ||
+				(0xF <= Game.m_gameWork.m_bossArtifactStageIndex) ||
 				((static_cast<unsigned short>(partyPrg->GetCID()) & 0x6D) != 0x6D) ||
 				(partyObj->m_scriptHandle[0xED] == NULL))) &&
 			(((flags & 1) == 0) ||
 				((*reinterpret_cast<short*>(partyObj->m_scriptHandle + 7) != 0) &&
 					(partyPrg->m_lastStateId != 9) && (partyPrg->m_lastStateId != 0x22) &&
 					((Game.m_gameWork.m_menuStageMode == 0) ||
-						(0xE < Game.m_gameWork.m_bossArtifactStageIndex) ||
+						(0xF <= Game.m_gameWork.m_bossArtifactStageIndex) ||
 						((static_cast<unsigned short>(partyPrg->GetCID()) & 0x6D) != 0x6D) ||
 						(partyObj->m_scriptHandle[0xED] == NULL)))) &&
 			(((flags & 0x10) == 0) ||
@@ -537,7 +537,7 @@ int CGMonObj::getNearParty(int targetOrdinal, int flags, float minDist, float ma
 					(partyPrg->m_subState == 1))) &&
 			(((flags & 0x40) == 0) ||
 				((static_cast<signed char>(party->m_partyData.unk6C0) >= 0) &&
-					(partyObj->m_scriptHandle[4] == reinterpret_cast<void*>(classId)))) &&
+					(reinterpret_cast<int>(partyObj->m_scriptHandle[4]) == classId))) &&
 			(((flags & 2) != 0) || (minDist <= *reinterpret_cast<float*>(mon + 0x5D0 + partyIndex * 4))) &&
 			(((flags & 4) != 0) || (*reinterpret_cast<float*>(mon + 0x5D0 + partyIndex * 4) <= maxDist))) {
 			if (((flags & 8) != 0) && (0.0f < *reinterpret_cast<float*>(mon + 0x5D0 + partyIndex * 4))) {

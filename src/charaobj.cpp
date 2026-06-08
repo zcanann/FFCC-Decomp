@@ -635,16 +635,16 @@ void CGCharaObj::onFramePostCalc()
 		setSta(i, statusValue);
 	}
 
-	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E) == 0 &&
-	    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x50) == 0 &&
-	    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x44) == 0) {
-		m_displayFlags |= 2;
-	} else {
+	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E) != 0 ||
+	    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x50) != 0 ||
+	    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x44) != 0) {
 		m_displayFlags &= ~2;
-		reinterpret_cast<unsigned char*>(this)[0x63C] &= 0x7F;
+		reinterpret_cast<CharaObjIgnoreFlagBits*>(reinterpret_cast<unsigned char*>(this) + 0x63C)->m_active = 0;
+	} else {
+		m_displayFlags |= 2;
 	}
 
-	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x38) += 1;
+	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x54C) += 1;
 
 	if (m_ignoreHit[0].m_flagBits.m_flag_80 && m_ignoreHit[0].m_timer != 0) {
 		short t = static_cast<short>(m_ignoreHit[0].m_timer - 1);

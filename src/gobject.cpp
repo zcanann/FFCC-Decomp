@@ -2961,19 +2961,20 @@ int CGObject::IsAnimFinished(int mode)
                                 threshold = static_cast<double>(static_cast<float>(threshold + sLoopBias));
                             }
 
-                            if (static_cast<double>(m_lastBgAttr)
-                                >= static_cast<double>(sZeroFloat)) {
-                                result =
-                                    (static_cast<u32>(static_cast<u8>(
-                                         (static_cast<double>(animSpan - sAnimFrameOffset) < threshold) << 3))
-                                     << 0x1C)
-                                    >> 0x1F;
-                            } else {
+                            const float lastAttr = m_lastBgAttr;
+                            if (static_cast<double>(lastAttr)
+                                < static_cast<double>(sZeroFloat)) {
                                 result =
                                     (static_cast<u32>(static_cast<u8>(
                                          (threshold <= static_cast<double>(sZeroFloat)) << 1))
                                      << 0x1C)
                                     >> 0x1D;
+                            } else {
+                                result =
+                                    (static_cast<u32>(static_cast<u8>(
+                                         (static_cast<double>(animSpan - sAnimFrameOffset) < threshold) << 3))
+                                     << 0x1C)
+                                    >> 0x1F;
                             }
                         }
                     }

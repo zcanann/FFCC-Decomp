@@ -73,7 +73,7 @@ void CMenuPcs::CompaDraw()
 
 			if (i < 3) {
 				MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
-				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
+				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(entry->tex));
 
 				GXColor colors[4];
 				colors[0].r = 0xFF;

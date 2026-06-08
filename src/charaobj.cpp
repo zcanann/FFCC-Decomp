@@ -2500,9 +2500,10 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 	if ((static_cast<unsigned short>(source->GetCID()) & 0xAD) == 0xAD) {
 		int stageLevel;
 		if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-			stageLevel = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
-			if (stageLevel > 2) {
-				stageLevel = 2;
+			int rawStage = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
+			stageLevel = 2;
+			if (rawStage < 2) {
+				stageLevel = rawStage;
 			}
 		} else {
 			stageLevel = 0;

@@ -2345,9 +2345,9 @@ void CMenuPcs::DrawUniteList()
 			x = (target - x) * t + x;
 		}
 
-		const float uniteListPy = static_cast<float>(entry->y + 3) - kCmdMenuTextYOffset;
+		const float uniteListPyBase = static_cast<float>(entry->y + 3);
 		font->SetPosX(x);
-		font->SetPosY(uniteListPy);
+		font->SetPosY(uniteListPyBase - kCmdMenuTextYOffset);
 		font->Draw(text);
 	}
 

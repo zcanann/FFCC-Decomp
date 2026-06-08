@@ -1100,11 +1100,10 @@ void CPartMng::SetFp()
         float* recvBuff = reinterpret_cast<float*>(fpBytes);
         mng->m_pppResSet = self + kResSetOffset;
 
-        int fpTime = reinterpret_cast<int*>(recvBuff)[0x0B];
         if (mng->m_baseTime < 0) {
-            mng->m_baseTime = fpTime;
+            mng->m_baseTime = reinterpret_cast<int*>(recvBuff)[0x0B];
         } else {
-            mng->m_baseTime = fpTime * 0x19 / 0x1E;
+            mng->m_baseTime = reinterpret_cast<int*>(recvBuff)[0x0B] * 0x19 / 0x1E;
         }
 
         mng->m_cullRadiusSq = recvBuff[0x0D];
@@ -1145,7 +1144,7 @@ void CPartMng::SetFp()
 
         signed char mode = mng->m_matrixMode;
         if (mode == 2 || mode == 4) {
-            mng->m_mapObjIndex = static_cast<short>(MapMng.GetMapObjEffectIdx(*reinterpret_cast<unsigned short*>(fpBytes + 0x48)));
+            mng->m_mapObjIndex = static_cast<short>(MapMng.GetMapObjEffectIdx(*reinterpret_cast<short*>(fpBytes + 0x48)));
         } else if (mode >= 3 && mode <= 8) {
             CGObject* owner = *reinterpret_cast<CGObject**>(self + kUsbEditOffset + 0x1C);
             mng->m_ownerFlagA = 0;

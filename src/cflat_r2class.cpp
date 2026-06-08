@@ -1242,11 +1242,11 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		case -0x4F: {
 			CCaravanWork* caravanWork = ScriptCaravan(engineObject);
 			int mode = static_cast<int>(object->m_localBase[0]);
+			int itemId = static_cast<int>(object->m_localBase[1]);
 			int slot = -1;
 			if (mode != 2) {
-				int itemId = static_cast<unsigned short>(object->m_localBase[1]);
 				if (mode < 2) {
-					if (mode > 0) {
+					if (mode >= 1) {
 						caravanWork->AddItem(itemId, &slot);
 					}
 				} else if (mode < 4) {

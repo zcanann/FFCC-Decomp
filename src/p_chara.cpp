@@ -385,24 +385,20 @@ static CCharaPcs::CLoadAnim* LoadAnimFromDisk(
     File.SyncCompleted(fileHandle);
 
     CChara::CAnim* anim = new (self->m_stage, const_cast<char*>(s_p_chara_cpp), 0x62A) CChara::CAnim;
-    if (anim != 0) {
-        anim->Create(File.m_readBuffer, self->m_viewerAnimStage);
-    }
+    anim->Create(File.m_readBuffer, self->m_viewerAnimStage);
 
     CCharaPcs::CLoadAnim* loadAnim = new (self->m_stage, const_cast<char*>(s_p_chara_cpp), 0x62D) CCharaPcs::CLoadAnim;
-    if (loadAnim != 0) {
-        loadAnim->m_keyTag = reinterpret_cast<void*>(charaKind);
-        loadAnim->m_keyId = charaNo;
-        loadAnim->m_mergeFileId = mergeFileId;
-        loadAnim->m_mergeFlags = mergeFlags;
-        strcpy(loadAnim->m_name, animName);
-        loadAnim->m_anim = anim;
-        LoadAnimArray(self)->Add(loadAnim);
-    }
+    loadAnim->m_keyId = charaNo;
+    loadAnim->m_keyTag = reinterpret_cast<void*>(charaKind);
+    strcpy(loadAnim->m_name, animName);
+    loadAnim->m_anim = anim;
+    loadAnim->m_mergeFileId = mergeFileId;
+    loadAnim->m_mergeFlags = mergeFlags;
+    LoadAnimArray(self)->Add(loadAnim);
 
     File.Close(fileHandle);
 
-    if (loadAnim != 0 && System.m_execParam != 0) {
+    if (System.m_execParam != 0) {
         System.Printf(const_cast<char*>(s_charaLoadAnimLogFmt), animName, charaKind, charaNo);
     }
 

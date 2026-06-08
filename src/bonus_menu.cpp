@@ -1094,7 +1094,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 		}
 		scaleMtx[2][3] = 0.0f;
 
-		handle->m_model->m_flags10C = (handle->m_model->m_flags10C & 0x7F) | 0x80;
+		handle->m_model->m_flags10CBits.m_flag10C_80 = 1;
 		handle->m_model->SetMatrix(scaleMtx);
 		handle->m_model->CalcMatrix();
 		handle->m_model->CalcSkin();
@@ -2311,7 +2311,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			scaleMtx[2][3] = 0.0f;
 		}
 
-		handle->m_model->m_flags10C = (handle->m_model->m_flags10C & 0x7F) | 0x80;
+		handle->m_model->m_flags10CBits.m_flag10C_80 = 1;
 		handle->m_model->SetMatrix(scaleMtx);
 		handle->m_model->CalcMatrix();
 		handle->m_model->CalcSkin();
@@ -3135,7 +3135,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			}
 		}
 
-		handle->m_model->m_flags10C = (handle->m_model->m_flags10C & 0x7F) | 0x80;
+		handle->m_model->m_flags10CBits.m_flag10C_80 = 1;
 		handle->m_model->SetMatrix(scaleMtx);
 		handle->m_model->CalcMatrix();
 		handle->m_model->CalcSkin();

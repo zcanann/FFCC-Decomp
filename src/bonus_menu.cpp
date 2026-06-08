@@ -1910,11 +1910,7 @@ void CMenuPcs::DrawResultCloseAnim()
 						}
 					}
 				} else {
-					if ((signed char)s_CntTop > i || i >= (signed char)s_CntTop + activePartyCount) {
-						MenuPcs.DrawRect(0, (float)sprite->x + sprite->motionX, (float)sprite->y + sprite->motionY,
-						    (float)sprite->w, (float)sprite->h,
-						    sprite->mulX, sprite->mulY, sprite->depth, sprite->depth, 0.0f);
-					} else {
+					if ((signed char)s_CntTop <= i && i < (signed char)s_CntTop + activePartyCount) {
 						int value = s_Rinfo->m_party[i - (signed char)s_CntTop].m_totalValue;
 						int digits[3];
 						int digitCount;
@@ -1942,6 +1938,10 @@ void CMenuPcs::DrawResultCloseAnim()
 							    sprite->depth, sprite->depth, 0.0f);
 							digitX += digitW;
 						}
+					} else {
+						MenuPcs.DrawRect(0, (float)sprite->x + sprite->motionX, (float)sprite->y + sprite->motionY,
+						    (float)sprite->w, (float)sprite->h,
+						    sprite->mulX, sprite->mulY, sprite->depth, sprite->depth, 0.0f);
 					}
 				}
 				lastKind = kind;

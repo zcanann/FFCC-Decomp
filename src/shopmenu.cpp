@@ -403,12 +403,12 @@ static void DrawShopMenuAmount(CFont* font, int value, float rightEdge, float y,
     MenuPcs.DrawInit();
 }
 
-static void DrawShopMenuAmountTrunc(CFont* font, int value, float rightEdge, float y, int tlut)
+static void DrawShopMenuAmountTrunc(CFont* font, int value, int rightEdge, float y, int tlut)
 {
     char amountBuffer[64];
     sprintf(amountBuffer, s_DecimalFormat_80332d14, value);
     float amountWidth = font->GetWidth(amountBuffer);
-    MenuPcs.DrawNoShadowFont(font, amountBuffer, static_cast<float>(static_cast<int>(rightEdge - amountWidth)), y, tlut, 0x12);
+    MenuPcs.DrawNoShadowFont(font, amountBuffer, static_cast<float>(static_cast<int>(static_cast<float>(rightEdge) - amountWidth)), y, tlut, 0x12);
     MenuPcs.DrawInit();
 }
 
@@ -1291,20 +1291,19 @@ void CShopMenu::DrawBuySellInfo()
     }
 
     float rightPrice = FLOAT_80332d88 - unitWidth;
-    float amountRightPrice = rightPrice - FLOAT_80332d5c;
+    int amountRightPrice = static_cast<int>(rightPrice - FLOAT_80332d5c);
     SetupShopMenuAmountFont(font);
     DrawShopMenuAmountTrunc(font, totalGil, amountRightPrice, FLOAT_80332d90, 0x13);
 
     float rightMoney = FLOAT_80332d94 - unitWidth;
-    float amountRightMoney = rightMoney - FLOAT_80332d5c;
+    int amountRightMoney = static_cast<int>(rightMoney - FLOAT_80332d5c);
     int currentMoney = ShopMenuCaravanWork(this)->m_gil;
     SetupShopMenuAmountFont(font);
     DrawShopMenuAmountTrunc(font, currentMoney, amountRightMoney, FLOAT_80332d90, 0x14);
 
     SetupShopMenuUnitFont(font);
-    int rightPriceX = static_cast<int>(rightPrice);
     font->DrawInit();
-    MenuPcs.DrawNoShadowFont(font, unitText, static_cast<float>(rightPriceX), FLOAT_80332d98, 0x19, 0x12);
+    MenuPcs.DrawNoShadowFont(font, unitText, static_cast<float>(static_cast<int>(rightPrice)), FLOAT_80332d98, 0x19, 0x12);
     MenuPcs.DrawInit();
 
     font->DrawInit();

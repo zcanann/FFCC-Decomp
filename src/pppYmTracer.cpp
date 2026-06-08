@@ -13,10 +13,10 @@ extern f32 gPppDefaultValueBuffer[];
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-static const u32 kYmTracerTopColorBase = 0xFFFFFF00;
-static const u32 kYmTracerBottomColorBase = 0xFFFFFF00;
-static const f32 kYmTracerZero = 0.0f;
-static const f32 kYmTracerOne = 1.0f;
+extern const u32 kYmTracerTopColorBase;
+extern const u32 kYmTracerBottomColorBase;
+extern const f32 kYmTracerZero;
+extern const f32 kYmTracerOne;
 
 static const char s_pppYmTracer_cpp[] = "pppYmTracer.cpp";
 
@@ -398,6 +398,11 @@ void pppConstructYmTracer(pppYmTracer* pppYmTracer, pppYmTracerCtrl* param_2)
     work->to.x = fVar1;
     work->_pad2e = 0;
 }
+
+extern const u32 kYmTracerTopColorBase = 0xFFFFFF00;
+extern const u32 kYmTracerBottomColorBase = 0xFFFFFF00;
+extern const f32 kYmTracerZero = 0.0f;
+extern const f32 kYmTracerOne = 1.0f;
 
 extern const f64 kPppParHitSphZero = 0.0;
 extern const char sYmTracerCommonName[8] = "common";

@@ -1166,7 +1166,11 @@ void CMenuPcs::CalcSelectWait()
 		*(unsigned char*)(this->m_bonusStatePtr + 8) = 0;
 	}
 
-	int statePtr = this->m_bonusStatePtr;
+#define statePtr (this->m_bonusStatePtr)
+#define currentPartyIndex (*(short*)(this->m_bonusStatePtr + 0xe))
+#define selection (*(short*)(this->m_bonusStatePtr + 0x26))
+#define confirmSel (*(short*)(this->m_bonusStatePtr + 0x28))
+#define delay (*(short*)(this->m_bonusStatePtr + 0x1a))
 	int animPtr = this->m_bonusAnimPtr;
 	MenuWindowInfo* window = this->m_menuWindowInfo;
 	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
@@ -1175,10 +1179,6 @@ void CMenuPcs::CalcSelectWait()
 	*(short*)(statePtr + 0x22) = *(short*)(statePtr + 0x22) + 1;
 	int frame = (int)*(short*)(statePtr + 0x22);
 	short& promptMode = window->state;
-	short& currentPartyIndex = *(short*)(statePtr + 0xe);
-	short& selection = *(short*)(statePtr + 0x26);
-	short& confirmSel = *(short*)(statePtr + 0x28);
-	short& delay = *(short*)(statePtr + 0x1a);
 	int currentPartySlot = 0;
 	for (; currentPartySlot < activePartyCount; currentPartySlot++) {
 		if (s_Rinfo->m_party[currentPartySlot].m_rank == currentPartyIndex) {
@@ -1383,6 +1383,11 @@ void CMenuPcs::CalcSelectWait()
 		}
 	}
 }
+#undef statePtr
+#undef currentPartyIndex
+#undef selection
+#undef confirmSel
+#undef delay
 #pragma pop
 
 #pragma push

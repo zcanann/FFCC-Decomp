@@ -315,10 +315,9 @@ void CMenuPcs::ItemDraw()
     ItemMenuAnimList* itemList = this->m_itemList;
     bool hasLetterAttach = SingGetLetterAttachflg() >= 0;
     int drawIndex = 0;
-    int count = itemList->count;
     MenuItemOpenAnim* entry = itemList->anims;
 
-    for (int i = 0; i < count; i++, entry++) {
+    for (int i = 0; i < this->m_itemList->count; i++, entry++) {
         int tex = entry->tex;
         if (tex < 0) {
             continue;

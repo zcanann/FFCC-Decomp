@@ -240,7 +240,7 @@ void CGraphicPcs::drawScreenFade()
 
         if (slot == 3) {
             const int barHeight = (int)(kScreenFadeBarEdge * fadeWave);
-            const int barEdge = (int)(kScreenFadeRingWidth * fadeWave);
+            const unsigned int barEdge = (int)(kScreenFadeRingWidth * fadeWave);
 
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
             GXPosition3f32(kGraphicZero, kGraphicZero, kGraphicZero);
@@ -323,7 +323,7 @@ void CGraphicPcs::drawScreenFade()
                     }
 
                     const int radius = (unsigned int)(kGraphicScreenWidth * (kGraphicOne - fadeWave));
-                    drawSFCircle(static_cast<unsigned int>(kScreenFadeCircleRadius), radius, (int)sx, (int)sy, baseColor, baseColor);
+                    drawSFCircle(static_cast<unsigned int>(kScreenFadeCircleRadius), radius, (unsigned int)sx, (unsigned int)sy, baseColor, baseColor);
                     drawSFCircle(radius, radius - static_cast<unsigned int>(kScreenFadeRingWidth), (int)sx, (int)sy, baseColor, baseColor2);
                     continue;
                 }

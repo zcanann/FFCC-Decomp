@@ -1278,7 +1278,7 @@ void CCharaPcs::drawMakeTexShadow()
 
     GXSetPixelFmt((GXPixelFmt)1, GX_ZC_LINEAR);
     GXSetAlphaUpdate(GX_TRUE);
-    GXSetViewport(0.0f, 0.0f, static_cast<float>(m_texShadowSize), static_cast<float>(m_texShadowSize), 0.0f, 1.0f);
+    GXSetViewport(kCharaZero, kCharaZero, static_cast<float>(m_texShadowSize), static_cast<float>(m_texShadowSize), kCharaZero, kCharaOne);
     GXSetScissor(0, 0, static_cast<unsigned int>(m_texShadowSize), static_cast<unsigned int>(m_texShadowSize));
     CColor clearColor(0x00, 0x00, 0x00, 0x00);
     Graphic.SetCopyClear(clearColor.color, 0xFFFFFF);

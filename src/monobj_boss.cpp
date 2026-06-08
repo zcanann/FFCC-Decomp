@@ -572,7 +572,7 @@ void CGMonObj::frameStatFuncArmstrong()
 			charaObj->enableDamageCol(1);
 		}
 		charaObj->statAttack();
-	} else if (state > 99 && state < 0x69) {
+	} else if (state >= 100 && state < 0x69) {
 		frameStatFuncGiantCrab();
 	}
 }

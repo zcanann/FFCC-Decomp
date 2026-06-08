@@ -796,12 +796,10 @@ void CGObject::objectCollision()
             const bool otherDamage = (other->m_objectFlags & 0xC) != 0;
             const bool thisDamage = (m_objectFlags & 0xC) != 0;
             const bool otherAttack = (other->m_objectFlags & 2) != 0;
-            const bool allowAttachA = (m_weaponNodeFlagBits.m_attached == 0) || (m_attachOwner != other);
-            const bool allowAttachB = (other->m_weaponNodeFlagBits.m_attached == 0) || (other->m_attachOwner != this);
 
             if (((thisAttack && otherDamage) || (thisDamage && otherAttack))
-                && allowAttachA
-                && allowAttachB
+                && ((m_weaponNodeFlagBits.m_attached == 0) || (m_attachOwner != other))
+                && ((other->m_weaponNodeFlagBits.m_attached == 0) || (other->m_attachOwner != this))
                 && (capsuleDistance < static_cast<double>(m_attackColRadius + other->m_attackColRadius))) {
                 CGObject* frontObj = thisAttack ? this : other;
                 CGObject* hitObj = thisAttack ? other : this;
@@ -826,10 +824,8 @@ void CGObject::objectCollision()
         if (((m_bgColMask & 2) != 0) && ((other->m_bgColMask & 2) != 0)
             && (sZeroFloat < m_bodyEllipsoidRadius)
             && (sZeroFloat < other->m_bodyEllipsoidRadius)) {
-            const bool allowAttachA = (m_weaponNodeFlagBits.m_attached == 0) || (m_attachOwner != other);
-            const bool allowAttachB = (other->m_weaponNodeFlagBits.m_attached == 0) || (other->m_attachOwner != this);
-
-            if (allowAttachA && allowAttachB) {
+            if (((m_weaponNodeFlagBits.m_attached == 0) || (m_attachOwner != other))
+                && ((other->m_weaponNodeFlagBits.m_attached == 0) || (other->m_attachOwner != this))) {
                 const bool usePushTimers = ((m_objectFlags & 0x40) != 0) && ((other->m_objectFlags & 0x40) != 0);
                 const double bodyDistanceLimit = static_cast<double>(m_bodyEllipsoidRadius + other->m_bodyEllipsoidRadius);
 

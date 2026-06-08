@@ -828,7 +828,7 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
                 goto complete;
             }
 
-            if (System.m_execParam > 1) {
+            if (static_cast<unsigned int>(System.m_execParam) >= 2) {
                 System.Printf(const_cast<char*>(s_charaAmemCompactFailed));
             }
         }
@@ -2848,14 +2848,14 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
  */
 void CCharaPcs::CHandle::LoadModelASync(int charaKind, unsigned long charaNo, unsigned long textureVariant)
 {
-    if (System.m_execParam > 2)
+    if (static_cast<unsigned int>(System.m_execParam) >= 3)
     {
         System.Printf(const_cast<char*>(s_charaAsyncEntryFmt));
     }
 
     if (m_asyncFileHandle != 0)
 	{
-        if (System.m_execParam > 1)
+        if (static_cast<unsigned int>(System.m_execParam) >= 2)
         {
             System.Printf(const_cast<char*>(s_charaAsyncCancelFmt));
         }
@@ -2970,7 +2970,7 @@ void CCharaPcs::CHandle::loadModelASyncFrame()
     m_asyncFileHandle = 0;
     if (m_asyncState == 6) {
         m_asyncState = 7;
-        if (System.m_execParam > 2) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 3) {
             System.Printf(const_cast<char*>(s_charaAsyncCompleteFmt));
         }
     } else {

@@ -3135,16 +3135,8 @@ void CGMonObj::moveFrame()
 	float rotY = local_74.GetRotateY();
 	float distance = PSVECMag(reinterpret_cast<Vec*>(&local_74));
 
-	if (((moveFlags & 0x20) != 0) && (moveRange <= in_f29)) {
-		moveStateFlags |= 1;
-		(this->*m_funcs->moveCancel)();
-		moveStateFlags |= 2;
-		if ((moveFlags & 0x100) != 0) {
-			reinterpret_cast<CGPrgObj*>(this)->changeStat(moveChangeStat, 0, 0);
-		}
-		return;
-	}
-	if (((moveFlags & 0x40) != 0) && (in_f29 < moveRange)) {
+	if ((((moveFlags & 0x20) != 0) && (moveRange <= in_f29)) ||
+		(((moveFlags & 0x40) != 0) && (in_f29 < moveRange))) {
 		moveStateFlags |= 1;
 		(this->*m_funcs->moveCancel)();
 		moveStateFlags |= 2;

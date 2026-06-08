@@ -32,6 +32,7 @@ extern const float FLOAT_803302A8;
 extern const float FLOAT_803302C8;
 extern const float FLOAT_803302CC;
 extern const float FLOAT_803302D0;
+extern const float FLOAT_803302D8;
 extern const float FLOAT_803302DC;
 extern const float FLOAT_803302E0;
 extern const float kCharaBumpLightPosX;
@@ -2017,7 +2018,7 @@ void CCharaPcs::drawOverlap()
     PSMTXIdentity(identityMtx);
     GXLoadPosMtxImm(identityMtx, GX_PNMTX0);
     GXSetCullMode(GX_CULL_NONE);
-    C_MTXOrtho(projectionMtx, kCharaZero, FLOAT_803302C8, kCharaZero, FLOAT_803302CC, kCharaZero, FLOAT_803302A4);
+    C_MTXOrtho(projectionMtx, kCharaZero, FLOAT_803302C8, kCharaZero, FLOAT_803302CC, kCharaZero, FLOAT_803302D8);
     GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
     PSMTXIdentity(identityMtx);
     GXLoadPosMtxImm(identityMtx, GX_PNMTX0);

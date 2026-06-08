@@ -2491,7 +2491,15 @@ void CMaterialMan::SetPosition(
                 continue;
             }
 
-            if (ignoreFrustumCheck == 0) {
+            if (ignoreFrustumCheck != 0) {
+                Vec delta;
+                PSVECSubtract(&shadowPos, position, &delta);
+                candidateWrite->shadow = shadow;
+                candidateWrite->distance = PSVECSquareMag(&delta);
+                candidateWrite->index = i;
+                candidateWrite++;
+                candidateCount++;
+            } else {
                 if ((shadow->m_yFilterMode == 1) && (position->y < shadowPos.y)) {
                     continue;
                 }
@@ -2502,15 +2510,14 @@ void CMaterialMan::SetPosition(
                         ->CheckFrustum(shadowPos, scaledShadowMtx, kMaterialShadowBoundsRadius) == 0) {
                     continue;
                 }
+                Vec delta;
+                PSVECSubtract(&shadowPos, position, &delta);
+                candidateWrite->shadow = shadow;
+                candidateWrite->distance = PSVECSquareMag(&delta);
+                candidateWrite->index = i;
+                candidateWrite++;
+                candidateCount++;
             }
-
-            Vec delta;
-            PSVECSubtract(&shadowPos, position, &delta);
-            candidateWrite->shadow = shadow;
-            candidateWrite->distance = PSVECSquareMag(&delta);
-            candidateWrite->index = i;
-            candidateWrite++;
-            candidateCount++;
         }
 
         ShadowCandidate* nearest = 0;

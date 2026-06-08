@@ -1294,13 +1294,13 @@ void CGMonObj::frameStatFuncLich()
 	}
 
 	const int stat = prgObj->m_lastStateId;
-	if (stat < 0x65) {
-		if (stat >= 100) {
-			teleport(1, 0x0E, 0x29, 100, 0x11578, 0x11579, 0x2D, 0x2B, 0x2C, gLichTeleportPoints,
-			         reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_lichTeleportIndex,
-			         reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_lichTeleportVec);
-		}
-	} else if (stat == 0x65) {
+	switch (stat) {
+	case 100:
+		teleport(1, 0x0E, 0x29, 100, 0x11578, 0x11579, 0x2D, 0x2B, 0x2C, gLichTeleportPoints,
+		         reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_lichTeleportIndex,
+		         reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_lichTeleportVec);
+		break;
+	case 0x65:
 		if (prgObj->m_stateFrame == 0 && CFlatBossState() == 3) {
 			prgObj->changeStat(0, 0, 0);
 		} else {
@@ -1313,6 +1313,7 @@ void CGMonObj::frameStatFuncLich()
 				gCFlatRuntime().SystemCall(0, 1, 9, 3, stack, 0);
 			}
 		}
+		break;
 	}
 }
 

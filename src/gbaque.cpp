@@ -4127,9 +4127,9 @@ int GbaQueue::GetArtifactData(int channel, unsigned char* outData)
 	localPlayerData = m_playerData[channel];
 	OSSignalSemaphore(accessSemaphores + channel);
 
-	artifactData[0] = SwapU32Value(localPlayerData.m_artifacts[0]);
-	artifactData[1] = SwapU32Value(localPlayerData.m_artifacts[1]);
-	artifactData[2] = SwapU32Value(localPlayerData.m_artifacts[2]);
+	artifactData[0] = __lwbrx(&localPlayerData.m_artifacts[0], 0);
+	artifactData[1] = __lwbrx(&localPlayerData.m_artifacts[1], 0);
+	artifactData[2] = __lwbrx(&localPlayerData.m_artifacts[2], 0);
 	memcpy(outData, artifactData, sizeof(artifactData));
 	return 0xC;
 }

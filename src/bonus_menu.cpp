@@ -1137,9 +1137,9 @@ void CMenuPcs::CalcSelectWait()
 		int walkOff = 0;
 		int i = 0;
 		while (i < (int)*(short*)this->m_bonusAnimPtr) {
-			animBase = this->m_bonusAnimPtr;
-			*(float*)(animBase + walkOff + 0x18) = 1.0f;
-			*(int*)(animBase + walkOff + 0x34) = 3;
+			animBase = this->m_bonusAnimPtr + walkOff + 8;
+			*(float*)(animBase + 0x10) = 1.0f;
+			*(int*)(animBase + 0x2c) = 3;
 			walkOff += 0x40;
 			i++;
 		}

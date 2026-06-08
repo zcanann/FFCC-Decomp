@@ -960,14 +960,14 @@ void CMesMenu::onCalc()
                         Sound.PlaySe(1, 0x40, 0x7F, 0);
                     }
                 } else if ((downMask & 0x200) != 0) {
-                    if (altCursor < 0) {
-                        if ((m_flags & 0x4000) == 0) {
-                            Sound.PlaySe(1, 0x40, 0x7F, 0);
-                        }
-                    } else {
+                    if (altCursor >= 0) {
                         cursor = altCursor;
                         if ((m_flags & 0x4000) == 0) {
                             Sound.PlaySe(3, 0x40, 0x7F, 0);
+                        }
+                    } else {
+                        if ((m_flags & 0x4000) == 0) {
+                            Sound.PlaySe(1, 0x40, 0x7F, 0);
                         }
                     }
                 }

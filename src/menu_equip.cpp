@@ -1143,26 +1143,27 @@ void CMenuPcs::EquipInit1()
 	GetEquipListStorage(this)->listEnd = (short)iVar9;
 	uVar6 = (unsigned int)((int)GetEquipListStorage(this)->listEnd - (int)GetEquipListStorage(this)->count);
 	psVar10 = &GetEquipListStorage(this)->entries[GetEquipListStorage(this)->count];
+	fVar2 = kEquipZero;
 	if (0 < (int)uVar6) {
 		uVar15 = uVar6 >> 3;
 		if (uVar15 != 0) {
 			do {
 				psVar10[0].step = 0;
-				psVar10[0].alpha = fVar3;
+				psVar10[0].alpha = fVar2;
 				psVar10[1].step = 0;
-				psVar10[1].alpha = fVar3;
+				psVar10[1].alpha = fVar2;
 				psVar10[2].step = 0;
-				psVar10[2].alpha = fVar3;
+				psVar10[2].alpha = fVar2;
 				psVar10[3].step = 0;
-				psVar10[3].alpha = fVar3;
+				psVar10[3].alpha = fVar2;
 				psVar10[4].step = 0;
-				psVar10[4].alpha = fVar3;
+				psVar10[4].alpha = fVar2;
 				psVar10[5].step = 0;
-				psVar10[5].alpha = fVar3;
+				psVar10[5].alpha = fVar2;
 				psVar10[6].step = 0;
-				psVar10[6].alpha = fVar3;
+				psVar10[6].alpha = fVar2;
 				psVar10[7].step = 0;
-				psVar10[7].alpha = fVar3;
+				psVar10[7].alpha = fVar2;
 				psVar10 += 8;
 				uVar15 = uVar15 - 1;
 			} while (uVar15 != 0);
@@ -1173,7 +1174,7 @@ void CMenuPcs::EquipInit1()
 		}
 		do {
 			psVar10->step = 0;
-			psVar10->alpha = fVar3;
+			psVar10->alpha = fVar2;
 			psVar10++;
 			uVar6 = uVar6 - 1;
 		} while (uVar6 != 0);

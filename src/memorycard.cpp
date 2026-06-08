@@ -1611,15 +1611,18 @@ void CMemoryCardMan::MakeSaveData()
         u8* dst = save + 0x14D0 + c * 0x9C0;
         CCaravanWork* caravanWork = &Game.m_caravanWorkArr[c];
 
-        if (caravanWork->m_shopState == 0)
+        if (caravanWork->m_shopState != 0)
+        {
+            if (static_cast<s8>(caravanWork->unk_0xc1e) == 0)
+            {
+                caravanWork->m_shopRandSeed = Math.Rand(0x7FFFFFFF);
+                caravanWork->unk_0xc1e = 1;
+            }
+        }
+        else
         {
             caravanWork->m_shopRandSeed = 0;
             caravanWork->unk_0xc1e = 0;
-        }
-        else if (caravanWork->unk_0xc1e == 0)
-        {
-            caravanWork->m_shopRandSeed = Math.Rand(0x7FFFFFFF);
-            caravanWork->unk_0xc1e = 1;
         }
 
         *reinterpret_cast<u16*>(dst + 0x00) = caravanWork->m_id;

@@ -520,7 +520,7 @@ void CGraphic::Thread()
             if (debugCountdown == 0) {
                 u32 drawSyncRaw = GXReadDrawSync();
                 drawSyncRaw &= 0xFFFF;
-                unsigned int drawSyncPart = drawSyncRaw;
+                int drawSyncPart = drawSyncRaw;
                 if ((drawSyncRaw & 0x8000) != 0) {
                     drawSyncPart &= 0x7FFF;
                     if (drawSyncPart == 0x7FFF) {

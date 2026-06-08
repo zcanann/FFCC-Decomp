@@ -358,11 +358,12 @@ static inline CCharaPcs::CLoadAnim* FindLoadedAnim(CCharaPcs* self, int charaKin
 {
     for (int i = 0; i < LoadAnimArray(self)->GetSize(); i++) {
         CCharaPcs::CLoadAnim* loadAnim = (*LoadAnimArray(self))[static_cast<unsigned long>(i)];
-        if (loadAnim == 0 || loadAnim->m_keyTag != reinterpret_cast<void*>(charaKind) || loadAnim->m_keyId != charaNo) {
+        if (reinterpret_cast<int>(loadAnim->m_keyTag) != charaKind ||
+            static_cast<unsigned long>(loadAnim->m_keyId) != static_cast<unsigned long>(charaNo)) {
             continue;
         }
 
-        if (strcmp(loadAnim->m_name, animName) == 0) {
+        if (strcmp(animName, loadAnim->m_name) == 0) {
             return loadAnim;
         }
     }

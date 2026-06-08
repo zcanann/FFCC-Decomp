@@ -2003,6 +2003,8 @@ void CMenuPcs::DrawResultCloseAnim()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_loop_invariants off
 void CMenuPcs::CalcResultCloseAnim()
 {
 	const int activePartyCount = s_Rinfo->m_partyCount;
@@ -2273,6 +2275,7 @@ void CMenuPcs::CalcResultCloseAnim()
 		((short*)this->m_bonusAnimPtr)[3] = 1;
 	}
 }
+#pragma pop
 
 /*
  * --INFO--

@@ -2140,7 +2140,6 @@ unsigned short JoyBus::GetPadData(int portIndex)
  */
 int JoyBus::RecvGBA(ThreadParam* threadParam, unsigned int* recvBuffer)
 {
-    const int port = threadParam->m_portIndex;
     unsigned int secCount;
 
     *recvBuffer = 0;
@@ -2689,7 +2688,6 @@ void JoyBus::CleanQueue(ThreadParam* threadParam)
  */
 int JoyBus::InitialCode(ThreadParam* threadParam)
 {
-
     int result = 0;
 
     switch (threadParam->m_subState)

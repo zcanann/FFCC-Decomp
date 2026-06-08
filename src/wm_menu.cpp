@@ -12846,7 +12846,11 @@ void McCtrl::SetListDat(int slot, int clearPlayTime)
 		const int formatMatch = memcmp(save + 0x0C, DAT_8032E8A8, 4);
 		const unsigned char crcOk = MemoryCardMan.ChkCrc(0);
 		if (crcOk == 1 && formatMatch == 0) {
-			*reinterpret_cast<unsigned int*>(entry + 0x08) = clearPlayTime == 0 ? *reinterpret_cast<unsigned int*>(save + 0x20) : 0;
+			if (clearPlayTime == 0) {
+				*reinterpret_cast<unsigned int*>(entry + 0x08) = *reinterpret_cast<unsigned int*>(save + 0x20);
+			} else {
+				*reinterpret_cast<unsigned int*>(entry + 0x08) = 0;
+			}
 			memcpy(entry + 0x00, save + 0x8AD0, 8);
 			*reinterpret_cast<unsigned int*>(entry + 0x0C) = *reinterpret_cast<unsigned int*>(save + 0x24);
 			*reinterpret_cast<unsigned int*>(entry + 0x10) = *reinterpret_cast<unsigned int*>(save + 0x28);
@@ -12883,10 +12887,26 @@ void McCtrl::SetListDat(int slot, int clearPlayTime)
 
 			*reinterpret_cast<unsigned int*>(save + 0x1C) = MemoryCardMan.CalcCrc(reinterpret_cast<Mc::SaveDat*>(save));
 
-			*reinterpret_cast<unsigned int*>(entry + 0x18) = (*reinterpret_cast<int*>(save + 0x30) < 0) ? 0xFFFFFFFFu : *reinterpret_cast<unsigned short*>(save + *reinterpret_cast<int*>(save + 0x30) * 0x9C0 + 0x14D0);
-			*reinterpret_cast<unsigned int*>(entry + 0x1C) = (*reinterpret_cast<int*>(save + 0x34) < 0) ? 0xFFFFFFFFu : *reinterpret_cast<unsigned short*>(save + *reinterpret_cast<int*>(save + 0x34) * 0x9C0 + 0x14D0);
-			*reinterpret_cast<unsigned int*>(entry + 0x20) = (*reinterpret_cast<int*>(save + 0x38) < 0) ? 0xFFFFFFFFu : *reinterpret_cast<unsigned short*>(save + *reinterpret_cast<int*>(save + 0x38) * 0x9C0 + 0x14D0);
-			*reinterpret_cast<unsigned int*>(entry + 0x24) = (*reinterpret_cast<int*>(save + 0x3C) < 0) ? 0xFFFFFFFFu : *reinterpret_cast<unsigned short*>(save + *reinterpret_cast<int*>(save + 0x3C) * 0x9C0 + 0x14D0);
+			if (*reinterpret_cast<int*>(save + 0x30) >= 0) {
+				*reinterpret_cast<unsigned int*>(entry + 0x18) = *reinterpret_cast<unsigned short*>(save + *reinterpret_cast<int*>(save + 0x30) * 0x9C0 + 0x14D0);
+			} else {
+				*reinterpret_cast<unsigned int*>(entry + 0x18) = 0xFFFFFFFFu;
+			}
+			if (*reinterpret_cast<int*>(save + 0x34) >= 0) {
+				*reinterpret_cast<unsigned int*>(entry + 0x1C) = *reinterpret_cast<unsigned short*>(save + *reinterpret_cast<int*>(save + 0x34) * 0x9C0 + 0x14D0);
+			} else {
+				*reinterpret_cast<unsigned int*>(entry + 0x1C) = 0xFFFFFFFFu;
+			}
+			if (*reinterpret_cast<int*>(save + 0x38) >= 0) {
+				*reinterpret_cast<unsigned int*>(entry + 0x20) = *reinterpret_cast<unsigned short*>(save + *reinterpret_cast<int*>(save + 0x38) * 0x9C0 + 0x14D0);
+			} else {
+				*reinterpret_cast<unsigned int*>(entry + 0x20) = 0xFFFFFFFFu;
+			}
+			if (*reinterpret_cast<int*>(save + 0x3C) >= 0) {
+				*reinterpret_cast<unsigned int*>(entry + 0x24) = *reinterpret_cast<unsigned short*>(save + *reinterpret_cast<int*>(save + 0x3C) * 0x9C0 + 0x14D0);
+			} else {
+				*reinterpret_cast<unsigned int*>(entry + 0x24) = 0xFFFFFFFFu;
+			}
 			*reinterpret_cast<unsigned int*>(entry + 0x28) = *reinterpret_cast<unsigned int*>(save + 0xB8);
 			memcpy(entry + 0x2C, save + 0x10C0, 0x10);
 			entry[0x41] = 1;

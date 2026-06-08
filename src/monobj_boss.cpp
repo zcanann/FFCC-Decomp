@@ -2309,10 +2309,10 @@ void CGMonObj::damagedFuncDuct()
  */
 void CGMonObj::logicFuncRamoe()
 {
+	unsigned int* scriptWork = reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&Game) + 4);
 	int activeCount = 0;
 	int nextState = -1;
 
-	unsigned int* scriptWork = reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&Game) + 4);
 	for (int i = 0; i < 0x3F; scriptWork++, i++) {
 		CGPrgObj* monObj = reinterpret_cast<CGPrgObj*>(scriptWork[0xC5D0 / 4]);
 		if (monObj != 0 && (monObj->m_lastStateId != 9 || monObj->m_subState != 2)) {
@@ -2320,7 +2320,7 @@ void CGMonObj::logicFuncRamoe()
 		}
 	}
 
-	if (activeCount == 0 && Math.Rand(3) == 0) {
+	if (activeCount == 0 && static_cast<unsigned int>(Math.Rand(3)) == 0) {
 		nextState = 100;
 	}
 

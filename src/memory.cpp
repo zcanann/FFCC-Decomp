@@ -972,8 +972,9 @@ void* CMemory::CStage::alloc(unsigned long size, char* source, unsigned long lin
                         split[1].m_magicEnd = kMemoryBlockEndMagic;
                         split[1].m_prev = node;
                         split[1].m_next = node->m_next;
-                        node->m_next = split + 1;
-                        split[1].m_next->m_prev = split + 1;
+                        CBlock* split1 = split + 1;
+                        node->m_next = split1;
+                        split1->m_next->m_prev = split1;
                     }
 
                     node->m_line = static_cast<unsigned short>(line);

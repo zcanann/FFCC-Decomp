@@ -715,7 +715,7 @@ void CalcReflectionVector2(
     while (dl < dlEnd) {
         u8 drawFmt = *(u8*)dl;
         u16 itemCount = *(u16*)((u8*)dl + 1);
-        int i;
+        unsigned int i;
 
         if (gUtil.IsHasDrawFmtDL(drawFmt) == 0) {
             break;
@@ -755,7 +755,7 @@ void CalcReflectionVector2(
                 axis = 1;
                 maxAxis = absY;
             }
-            if (maxAxis < absZ) {
+            if (absZ > maxAxis) {
                 axis = 2;
             }
             CVector reflected(outVec->x, outVec->y, outVec->z);
@@ -922,30 +922,37 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
             cameraPos.x = centerPos.x;
             cameraPos.y = centerPos.y;
             cameraPos.z = centerPos.z;
+            cameraUp.x = LoadFloat(kMana2Zero);
             cameraUp.y = LoadFloat(kMana2One);
             cameraUp.z = LoadFloat(kMana2Zero);
 
-            if (i == 3) {
+            switch (i) {
+            case 0:
+                cameraPos.x = centerPos.x + LoadFloat(kMana2One);
+                break;
+            case 1:
+                cameraPos.x = centerPos.x - LoadFloat(kMana2One);
+                break;
+            case 2:
+                cameraPos.y = centerPos.y + LoadFloat(kMana2One);
+                cameraUp.x = LoadFloat(kMana2Zero);
+                cameraUp.y = LoadFloat(kMana2Zero);
+                cameraUp.z = LoadFloat(kMana2NegativeOne);
+                break;
+            case 3:
                 cameraPos.y = centerPos.y - LoadFloat(kMana2One);
+                cameraUp.x = LoadFloat(kMana2Zero);
                 cameraUp.y = LoadFloat(kMana2Zero);
                 cameraUp.z = LoadFloat(kMana2One);
-            } else if (i < 3) {
-                if (i == 1) {
-                    cameraPos.x = centerPos.x - LoadFloat(kMana2One);
-                } else if (i < 1) {
-                    cameraPos.x = centerPos.x + LoadFloat(kMana2One);
-                } else {
-                    cameraPos.y = centerPos.y + LoadFloat(kMana2One);
-                    cameraUp.y = LoadFloat(kMana2Zero);
-                    cameraUp.z = LoadFloat(kMana2NegativeOne);
-                }
-            } else if (i == 5) {
-                cameraPos.z = centerPos.z - LoadFloat(kMana2One);
-            } else if (i < 5) {
+                break;
+            case 4:
                 cameraPos.z = centerPos.z + LoadFloat(kMana2One);
+                break;
+            case 5:
+                cameraPos.z = centerPos.z - LoadFloat(kMana2One);
+                break;
             }
 
-            cameraUp.x = LoadFloat(kMana2Zero);
             C_MTXLookAt(lookAtMtx, (Point3d*)&centerPos, &cameraUp, (Point3d*)&cameraPos);
             Graphic.SetViewport();
             GXSetScissor(0, 0, 0x280, 0x1C0);
@@ -1095,10 +1102,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
     MaterialMan.SetManaAlpha(setupBlock->m_color.rgba[3]);
     mana2Work->m_waterAlpha = MaterialMan.GetManaAlpha();
 
-    if (*(s32*)pppMana2 != 0) {
-        return;
-    }
-
+    if (reinterpret_cast<_pppPObject*>(pppMana2)->m_graphId == 0) {
     mana2Work->m_object = gObject;
     SetMana2ModelCallbacks(model, mana2Work, param_2);
     mana2Work->m_sourceTextures[0] = GetTextureFromRSD(param_2->m_sourceTextureIds[0], ppvEnv);
@@ -1253,6 +1257,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
 
     if ((param_2->m_type == 1 || param_2->m_type == 2) && mana2Work->m_waterHeightA != 0) {
         *reinterpret_cast<u32*>(reinterpret_cast<u8*>(mana2Work->m_waterHeightA) + 0x240) = param_2->m_rippleLevel;
+    }
     }
 
     if (param_2->m_type != 0) {
@@ -1522,20 +1527,27 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
     CChara::CMesh::CDisplayList* displayList = &meshData->m_displayLists[dlIndex];
     bool draw = false;
 
-    if (type == 2) {
+    switch (type) {
+    case 0:
+        if (strcmp(shape, s_manaShapeObj) == 0) {
+            draw = true;
+        }
+        break;
+    case 1:
+        if (strcmp(shape, s_manaShapeObj) == 0 || strcmp(shape, s_manaShapeObj5) == 0) {
+            draw = true;
+        }
+        break;
+    case 2:
         if (strcmp(shape, s_manaShapeObj) == 0 || strcmp(shape, s_manaShapeObj3) == 0) {
             draw = true;
         }
-    } else if (type < 2) {
-        if (type == 0) {
-            if (strcmp(shape, s_manaShapeObj) == 0) {
-                draw = true;
-            }
-        } else if (strcmp(shape, s_manaShapeObj) == 0 || strcmp(shape, s_manaShapeObj5) == 0) {
+        break;
+    case 3:
+        if (strcmp(shape, s_manaShapeObj) == 0 || strcmp(shape, s_manaShapeObj1) == 0) {
             draw = true;
         }
-    } else if (type < 4 && (strcmp(shape, s_manaShapeObj) == 0 || strcmp(shape, s_manaShapeObj1) == 0)) {
-        draw = true;
+        break;
     }
 
     int waterCmp = strcmp(shape, s_manaShapeObj4);

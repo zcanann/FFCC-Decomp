@@ -2001,13 +2001,13 @@ void CMenuPcs::DrawResultCloseAnim()
 						for (int digitIndex = 0; digitIndex < digitCount; digitIndex++) {
 							MenuPcs.DrawRect(0, digitX, (float)sprite->y, digitW, (float)sprite->h,
 							    digitW * (float)digits[digitIndex], sprite->mulY,
-							    sprite->depth, sprite->depth, 0.0f);
+							    sprite->depth, sprite->depth, kBonusZClearOrigin);
 							digitX += digitW;
 						}
 					} else {
 						MenuPcs.DrawRect(0, (float)sprite->x + sprite->motionX, (float)sprite->y + sprite->motionY,
 						    (float)sprite->w, (float)sprite->h,
-						    sprite->mulX, sprite->mulY, sprite->depth, sprite->depth, 0.0f);
+						    sprite->mulX, sprite->mulY, sprite->depth, sprite->depth, kBonusZClearOrigin);
 					}
 				}
 				lastKind = sprite->kind;

@@ -2819,7 +2819,9 @@ int CMenuPcs::CmakeNameCtrl()
                     unsigned int rawLen = strlen(s_CmakeInfo.m_name);
                     int nameLen = rawLen & (static_cast<int>(-rawLen | rawLen) >> 31);
                     int ret;
-                    if (nameLen < 7) {
+                    if (nameLen >= 7) {
+                        ret = -1;
+                    } else {
                         picked[0] = '\0';
                         rowLen = strlen(rowText);
                         if (rowLen != 0) {
@@ -2844,8 +2846,6 @@ int CMenuPcs::CmakeNameCtrl()
                             strcat(s_CmakeInfo.m_name, picked);
                             ret = 0;
                         }
-                    } else {
-                        ret = -1;
                     }
                     if (ret == 0) {
                         unsigned int finalLen = strlen(s_CmakeInfo.m_name);

@@ -3426,7 +3426,6 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 	outData[2] = 0;
 	outData[3] = 0;
 	itemPtr = localPlayerData;
-	cmdData[3] = 0;
 
 	for (i = 0; i < 0x40; i++, itemPtr += 2) {
 		int itemId = *reinterpret_cast<short*>(itemPtr + 0x3A);

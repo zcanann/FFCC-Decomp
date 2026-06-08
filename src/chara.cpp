@@ -2366,7 +2366,7 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 {
 	if (blendMode == -1) {
 		CAnim* currentAnim = m_anim;
-		u8 interpCount;
+		int interpCount;
 		if (currentAnim != 0 && (interpCount = AnimInterpCount(currentAnim)) != 0 && AnimBank(currentAnim) != 0) {
 			blendMode = 4;
 
@@ -2402,12 +2402,11 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 		NodeAnimNode0(node) = 0;
 		NodeAnimNode1(node) = 0;
 
-		MtxPtr localMtx = NodeLocalRuntimeMtx(node);
-		C_QUATMtx(&NodePreviousQuat(node), localMtx);
-		NodePreviousPosition(node).x = localMtx[0][3];
-		NodePreviousPosition(node).y = localMtx[1][3];
-		NodePreviousPosition(node).z = localMtx[2][3];
-		Math.MTXGetScale(localMtx, &NodePreviousScale(node));
+		C_QUATMtx(&NodePreviousQuat(node), NodeLocalRuntimeMtx(node));
+		NodePreviousPosition(node).x = NodeLocalRuntimeMtx(node)[0][3];
+		NodePreviousPosition(node).y = NodeLocalRuntimeMtx(node)[1][3];
+		NodePreviousPosition(node).z = NodeLocalRuntimeMtx(node)[2][3];
+		Math.MTXGetScale(NodeLocalRuntimeMtx(node), &NodePreviousScale(node));
 
 		if (m_anim == 0) {
 			continue;

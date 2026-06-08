@@ -1596,14 +1596,13 @@ search:
             stride;
 
         if (mapObj < mapObjEnd) {
-            do {
+            for (unsigned int i = 0; i < remaining; i++) {
                 CMapObjAtr* mapObjAtr = mapObj->m_attribute;
                 if (mapObjAtr != 0 && mapObjAtr->m_type == CMapObjAtr::PLAY_STA) {
                     goto found;
                 }
                 mapObj++;
-                remaining--;
-            } while (remaining != 0);
+            }
         }
 
         mapObj = 0;

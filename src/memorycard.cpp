@@ -1563,41 +1563,42 @@ void CMemoryCardMan::MakeSaveData()
     saveDat->m_flags = 0;
 
     CGame::CGameWork* gameWork = &Game.m_gameWork;
-    CCaravanWork* cw0 = &Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[0]];
+    CGame* g = &Game;
+    CCaravanWork* cw0 = &g->m_caravanWorkArr[g->m_gameWork.m_wmBackupParams[0]];
     if (cw0->m_shopState == 0)
     {
-        Game.m_gameWork.m_wmBackupParams[0] = -1;
+        g->m_gameWork.m_wmBackupParams[0] = -1;
     }
     if (cw0->m_shopBusyFlag != 0)
     {
-        Game.m_gameWork.m_wmBackupParams[0] = -1;
+        g->m_gameWork.m_wmBackupParams[0] = -1;
     }
-    CCaravanWork* cw1 = &Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[1]];
+    CCaravanWork* cw1 = &g->m_caravanWorkArr[g->m_gameWork.m_wmBackupParams[1]];
     if (cw1->m_shopState == 0)
     {
-        Game.m_gameWork.m_wmBackupParams[1] = -1;
+        g->m_gameWork.m_wmBackupParams[1] = -1;
     }
     if (cw1->m_shopBusyFlag != 0)
     {
-        Game.m_gameWork.m_wmBackupParams[1] = -1;
+        g->m_gameWork.m_wmBackupParams[1] = -1;
     }
-    CCaravanWork* cw2 = &Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[2]];
+    CCaravanWork* cw2 = &g->m_caravanWorkArr[g->m_gameWork.m_wmBackupParams[2]];
     if (cw2->m_shopState == 0)
     {
-        Game.m_gameWork.m_wmBackupParams[2] = -1;
+        g->m_gameWork.m_wmBackupParams[2] = -1;
     }
     if (cw2->m_shopBusyFlag != 0)
     {
-        Game.m_gameWork.m_wmBackupParams[2] = -1;
+        g->m_gameWork.m_wmBackupParams[2] = -1;
     }
-    CCaravanWork* cw3 = &Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[3]];
+    CCaravanWork* cw3 = &g->m_caravanWorkArr[g->m_gameWork.m_wmBackupParams[3]];
     if (cw3->m_shopState == 0)
     {
-        Game.m_gameWork.m_wmBackupParams[3] = -1;
+        g->m_gameWork.m_wmBackupParams[3] = -1;
     }
     if (cw3->m_shopBusyFlag != 0)
     {
-        Game.m_gameWork.m_wmBackupParams[3] = -1;
+        g->m_gameWork.m_wmBackupParams[3] = -1;
     }
 
     *reinterpret_cast<u32*>(save + 0x20) = *reinterpret_cast<u32*>(&gameWork->m_scriptSysVal0);

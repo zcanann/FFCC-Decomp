@@ -1261,20 +1261,20 @@ void GbaQueue::LoadPlayerStat()
 		memcpy(localNames + (i * 0x10), Game.m_caravanWorkArr[i].m_name, 0x10);
 	}
 
-	outOfShoukiMask = 0;
 	if (reinterpret_cast<int*>(&CFlat)[0x4101] != 0) {
 		unsigned char* entry = localPlayerStat;
+		outOfShoukiMask = 0;
 		for (i = 0; i < 4; i++) {
 			char menuStageMode = m_singleMode;
 			CGPartyObj* partyObj;
 			CCaravanWork* caravanWork;
 
-			if ((menuStageMode == 0) || (i != 1)) {
-				partyObj = Game.m_partyObjArr[i];
-				caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i]);
-			} else {
-				partyObj = Game.m_partyObjArr[0];
+			if ((menuStageMode != 0) && (i == 1)) {
 				caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+				partyObj = Game.m_partyObjArr[0];
+			} else {
+				caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i]);
+				partyObj = Game.m_partyObjArr[i];
 			}
 
 			if (caravanWork != 0) {
@@ -1286,17 +1286,22 @@ void GbaQueue::LoadPlayerStat()
 
 				entry[0x16] = static_cast<unsigned char>(caravanWork->m_maxHp);
 				entry[0x17] = static_cast<unsigned char>(caravanWork->m_hp);
-				entry[2] = static_cast<unsigned char>((caravanWork->m_tribeId & 3) |
-				                                      ((caravanWork->m_appearanceVariant & 3) << 2));
-				if (caravanWork->m_genderFlag != 0) {
-					entry[2] |= 0x80;
+				{
+					unsigned char tribeAppearance = static_cast<unsigned char>((caravanWork->m_tribeId & 3) |
+					                                      ((caravanWork->m_appearanceVariant & 3) << 2));
+					if (caravanWork->m_genderFlag != 0) {
+						tribeAppearance |= 0x80;
+					}
+					entry[2] = tribeAppearance;
 				}
 
 				*reinterpret_cast<int*>(entry + 0x24) = caravanWork->m_gil;
-				if (caravanWork->m_progressValue > 0xFF) {
-					*reinterpret_cast<unsigned short*>(entry + 0x14) = 0xFF;
-				} else {
-					*reinterpret_cast<unsigned short*>(entry + 0x14) = caravanWork->m_progressValue;
+				{
+					unsigned short progress = 0xFF;
+					if (caravanWork->m_progressValue <= 0xFF) {
+						progress = caravanWork->m_progressValue;
+					}
+					*reinterpret_cast<unsigned short*>(entry + 0x14) = progress;
 				}
 
 				entry[0x18] = static_cast<unsigned char>(caravanWork->m_letterMeta[0]);

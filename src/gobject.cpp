@@ -799,7 +799,7 @@ void CGObject::objectCollision()
                 const float hitRot = atan2f(dir.x, dir.z);
                 const float rotDelta = Math.DstRot(frontObj->obj->m_rotBaseY, hitRot);
 
-                if (fabsf(rotDelta) < frontObj->obj->m_frontHitAngle) {
+                if (fabs(rotDelta) < frontObj->obj->m_frontHitAngle) {
                     CallOnTalk(frontObj->obj, hitObj->obj, 1);
                     CallOnTalk(hitObj->obj, frontObj->obj, 0);
                 }

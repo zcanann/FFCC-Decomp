@@ -422,7 +422,7 @@ static inline void PruneUnsharedAnimRefs(CCharaPcs* self, CCharaPcs::CLoadAnim* 
 {
     for (int i = LoadAnimArray(self)->GetSize() - 1; i >= 0; i--) {
         CCharaPcs::CLoadAnim* loadAnim = (*LoadAnimArray(self))[static_cast<unsigned long>(i)];
-        if (loadAnim == 0 || loadAnim->m_mergeFileId >= 0 || loadAnim->GetRef() != 1) {
+        if (loadAnim->m_mergeFileId >= 0 || loadAnim->GetRef() != 1) {
             continue;
         }
         if (target != 0 && loadAnim != target) {

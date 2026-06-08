@@ -1593,7 +1593,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 
 		iconBase = idx;
 		short y = 0x28;
-		for (int i = 0; i < activePartyCount; i++) {
+		for (unsigned int i = 0; i < activePartyCount; i++) {
 			InitSelectOpenPartyIcon(&sprites[idx], i, y);
 			idx++;
 			y += 0x60;
@@ -1702,7 +1702,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 
 	*(short*)(statePtr + 0x22) = *(unsigned short*)(statePtr + 0x22) + 1;
 	int frame = (int)*(short*)(statePtr + 0x22);
-	unsigned int doneCount = 0;
+	int doneCount = 0;
 
 	int off = 0;
 	for (int i = 0; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++, off += 0x40) {
@@ -1790,8 +1790,8 @@ void CMenuPcs::CalcSelectOpenAnim()
 			PSMTXScale(scaleMtx, 0.5799999833106995f, 0.5799999833106995f, 0.5799999833106995f);
 
 			int duration = iconSprite->duration;
-			int artifactIndex = i - activePartyCount;
-			int fcvIndex = duration / 5;
+			unsigned int artifactIndex = i - activePartyCount;
+			unsigned int fcvIndex = duration / 5;
 			float rate = (float)(450.0 / (double)(float)duration);
 			int phase = (int)(((double)duration / 10.0) * (double)(10 - artifactIndex));
 

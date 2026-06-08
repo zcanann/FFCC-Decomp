@@ -1569,7 +1569,7 @@ void GbaQueue::LoadMapItemStat()
 
 	if (reinterpret_cast<int*>(&CFlat)[0x4101] != 0) {
 		unsigned char* mapItemEntry = localMapItems;
-		object = gCFlatRuntime2.FindGObjFirst();
+		object = CFlat.FindGObjFirst();
 
 		while (object != 0) {
 			if ((object->m_objectFlags & 0x100) != 0) {
@@ -1599,7 +1599,7 @@ void GbaQueue::LoadMapItemStat()
 				mapItemEntry += 0x14;
 			}
 
-			object = gCFlatRuntime2.FindGObjNext(object);
+			object = CFlat.FindGObjNext(object);
 		}
 	}
 

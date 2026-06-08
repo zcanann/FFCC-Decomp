@@ -3457,7 +3457,7 @@ void CGCharaObj::combi2()
 	}
 
 #define comboCmd (comboData[0xC])
-	const int isSharedResult = comboData[participantCount * 3 - 3] != 0x1F8;
+	const int isSharedResult = (0x1F8 - comboData[participantCount * 3 - 3]) != 0;
 	if (isSharedResult) {
 		comboCenter.Identity();
 		for (int i = 0; i < participantCount; i++) {

@@ -2683,7 +2683,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 	int particleBank = CharaObjResolveParticleBank(this, particleClass);
 	unsigned short particleEntry = 0xFFFF;
 	unsigned short particleFlags = 0;
-	unsigned int particleNo = effectId;
+	int particleNo = effectId;
 	int seNo = 0;
 	int emittedCustom = 0;
 	int hasParticle = 0;

@@ -155,6 +155,17 @@ struct SawBossWork {
 STATIC_ASSERT(offsetof(SawBossWork, m_cooldown) == 0x08);
 STATIC_ASSERT(offsetof(SawBossWork, m_flags) == 0x14);
 
+struct MeteoParasiteCGameFlags {
+    union {
+        u8 m_flags;
+        struct {
+            s8 m_pad : 2;
+            s8 m_bit5 : 1;
+            u8 m_rest : 5;
+        } bits;
+    };
+};
+
 /*
  * --INFO--
  * PAL Address: 0x80132f68
@@ -435,7 +446,9 @@ int CGMonObj::calcBranchFuncGolem(int)
 	}
 
 	unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
-	return static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(script[0x1C / 2] >= (script[0x1A / 2] >> 1)))) >> 5;
+	return static_cast<unsigned int>(
+	           __cntlzw(script[0x1C / 2] >= static_cast<int>(static_cast<unsigned int>(script[0x1A / 2]) >> 1))) >>
+	       5;
 }
 
 /*
@@ -676,17 +689,16 @@ void CGMonObj::frameStatFuncOrcKing()
  */
 void CGMonObj::alwaysFuncOrcKing()
 {
-	CGObject* object = reinterpret_cast<CGObject*>(this);
 	if (*reinterpret_cast<int*>(CGMonObj::m_boss) == 0) {
 		return;
 	}
 
 	if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x4) == 0x3C) {
-		object->m_charaModelHandle->ChangeTexture(1, 0x39, 1, 0xFFFFFFFF, 0);
-		int pdtNo = object->m_charaModelHandle->GetPdtSlot();
+		reinterpret_cast<CGObject*>(this)->m_charaModelHandle->ChangeTexture(1, 0x39, 1, 0xFFFFFFFF, 0);
+		int pdtNo = reinterpret_cast<CGObject*>(this)->m_charaModelHandle->GetPdtSlot();
 		reinterpret_cast<CGPrgObj*>(this)->putParticle(
-			(pdtNo << 8) | 0x1D, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x590), object,
-			kMonObjBossOne, 0);
+			(pdtNo << 8) | 0x1D, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x590),
+			reinterpret_cast<CGObject*>(this), kMonObjBossOne, 0);
 	} else if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x4) == 300 && Game.m_gameWork.m_gameOverFlag == 0) {
 		CGMonObj* monObj = CFlat.FindGMonObjFirst();
 		while (monObj != 0) {
@@ -849,9 +861,9 @@ void CGMonObj::frameStatFuncSaw()
 			if (prgObj->m_subFrame == 0) {
 				prgObj->reqAnim(10, 0, 0);
 
-				int pdtNo = object->m_charaModelHandle->GetPdtSlot();
+				int pdtNo = reinterpret_cast<CGObject*>(this)->m_charaModelHandle->GetPdtSlot();
 
-				prgObj->putParticle(pdtNo << 8, *reinterpret_cast<int*>(mon + 0x564), object, kMonObjBossOne, 0x1C52C);
+				prgObj->putParticle(pdtNo << 8, *reinterpret_cast<int*>(mon + 0x564), reinterpret_cast<CGObject*>(this), kMonObjBossOne, 0x1C52C);
 				prgObj->playSe3D(0x1C52B, 0x32, 0x96, 0, 0);
 				memset(&m_moveWork, 0, sizeof(m_moveWork));
 				m_moveWork.m_flags = 0x1402;
@@ -1056,8 +1068,8 @@ int CGMonObj::attackCheckFuncLKShooter(int)
 			CVector left(kMonObjBossLeftTargetX, kMonObjBossZero, kMonObjBossLeftTargetZ);
 			if (PSVECDistance(reinterpret_cast<Vec*>(&left), &object->m_worldPosition) < kMonObjBossSideTargetRange &&
 			    reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->m_leftCooldown == 0) {
-				work->bits.m_bit40 = 1;
 				reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->m_leftCooldown = 300;
+				work->bits.m_bit40 = 1;
 				m_actionBranch = 2;
 				return 100;
 			}
@@ -1866,7 +1878,7 @@ void CGMonObj::frameStatFuncMeteoParasiteC()
 			    ->m_objs[reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex]
 			    ->changeStat(0x65, 0, 0);
 			prgObj->reqAnim(reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex + 0x25, 0, 0);
-			CFlatGameFlags() = static_cast<u8>((CFlatGameFlags() & ~CFlatGameFlag_Bit5) | CFlatGameFlag_Bit5);
+			reinterpret_cast<MeteoParasiteCGameFlags*>(&CFlatGameFlags())->bits.m_bit5 = 1;
 			CFlatBossState() = CFlatBossState() + 1;
 		} else if (prgObj->isLoopAnim() != 0) {
 			reinterpret_cast<CGObject*>(this)->SetAnimSlot(0, 0);

@@ -423,8 +423,9 @@ void CGPartyObj::onChangeStat(int state)
 		*reinterpret_cast<int*>(self + 0x554) = 0x10;
 		*reinterpret_cast<int*>(self + 0x558) = 0x11;
 		int castTime;
-		castTime = 0;
-		if (*reinterpret_cast<int*>(self + 0x560) != 0x103) {
+		if (*reinterpret_cast<int*>(self + 0x560) == 0x103) {
+			castTime = 0;
+		} else {
 			castTime = calcCastTime(*reinterpret_cast<int*>(self + 0x560));
 		}
 		*reinterpret_cast<int*>(self + 0x68C) = castTime;

@@ -1541,7 +1541,7 @@ void CGObject::update()
         }
     }
 
-    if (m_weaponNodeFlagBits.m_prg && m_attachOwner != 0 && HasLoadedModel(m_attachOwner->m_charaModelHandle)) {
+    if (m_weaponNodeFlagBits.m_attached && m_attachOwner != 0 && HasLoadedModel(m_attachOwner->m_charaModelHandle)) {
         CChara::CModel* ownerModel = m_attachOwner->m_charaModelHandle->m_model;
         PSMTXCopy(ModelNodeMtx(ownerModel, m_attachNode), modelMtx);
 
@@ -1738,7 +1738,7 @@ void CGObject::update()
             m_turnSpeed = frameStep;
         }
 
-        if (m_currentAnimSlot != -1 && (weaponFlagsHi & 0x1) == 0) {
+        if (m_currentAnimSlot != -1 && !m_weaponNodeFlagAll.m_bits1.m_bit01) {
             bool animFinished = HasLoadedModel(m_charaModelHandle);
             if (animFinished && m_currentAnimSlot != -1) {
                 if (ModelAnim(m_charaModelHandle->m_model) == 0) {

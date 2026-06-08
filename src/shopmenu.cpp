@@ -2415,8 +2415,8 @@ void CShopMenu::DrawShop0()
 #pragma opt_strength_reduction off
 void CShopMenu::SelectMake()
 {
-    bool canSelect = MenuPcs.ChkEquipPossible(m_resultItem) &&
-                     (CalcShopMenuMakeGil(this, getItemNo(m_selectedIndex)) <= m_caravanWork->m_gil);
+    bool canSelect = static_cast<unsigned char>(MenuPcs.ChkEquipPossible(m_resultItem)) &&
+                     (m_caravanWork->m_gil >= CalcShopMenuMakeGil(this, getItemNo(m_selectedIndex)));
 
     int selected = getItemNo(m_selectedIndex);
     short recipeMaterial[8];

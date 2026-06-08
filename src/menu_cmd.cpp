@@ -2640,8 +2640,8 @@ unsigned int CMenuPcs::CmdOpen1()
 	}
 
 	s32 slot = 0;
-	if ((selected != s_UniteTop[0]) && ((slot = 1), selected != s_UniteTop[1]) &&
-	    ((slot = 2), selected != s_UniteTop[2])) {
+	if ((s_UniteTop[0] != selected) && ((slot = 1), s_UniteTop[1] != selected) &&
+	    ((slot = 2), s_UniteTop[2] != selected)) {
 		slot = 3;
 	}
 

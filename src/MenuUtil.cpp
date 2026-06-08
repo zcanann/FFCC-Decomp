@@ -1582,8 +1582,9 @@ void CMenuPcs::DrawOptionMenu()
 void CMenuPcs::BindMcObj(int slotNo)
 {
 	EffectInfo* obj;
+	int slot;
 
-	for (int slot = 0; slot < 4; slot++) {
+	for (slot = 0; slot < 4; slot++) {
 		if (slotNo == slot) {
 			obj = &m_effectWork[slot + 0x11];
 
@@ -1604,7 +1605,7 @@ void CMenuPcs::BindMcObj(int slotNo)
 		}
 	}
 
-	for (int slot = 0; slot < 4; slot++) {
+	for (slot = 0; slot < 4; slot++) {
 		if (slotNo == slot) {
 			EffectEntry* entry = &m_effectEntries[slot];
 			int iconType = entry->m_iconType;

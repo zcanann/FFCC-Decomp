@@ -144,7 +144,7 @@ int CMenuPcs::ItemCtrlCur()
         return 0;
     }
 
-    int mode = this->m_itemMenuState->mode;
+    unsigned int mode = this->m_itemMenuState->mode;
     s16 letterAttachFlg = SingGetLetterAttachflg();
 
     if (mode == 0) {

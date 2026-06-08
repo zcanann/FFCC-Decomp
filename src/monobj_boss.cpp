@@ -1710,23 +1710,20 @@ void CGMonObj::frameStatFuncMolbol()
 	u8* self = reinterpret_cast<u8*>(this);
 	int state = prgObj->m_lastStateId;
 
-	if (state != 0x65) {
-		if (state < 0x65) {
-			if (state < 100) {
-				return;
-			}
-			suikomi(0x53, kMonObjBossZero);
+	switch (state) {
+	case 100:
+		suikomi(0x53, kMonObjBossZero);
+		break;
+	case 0x65:
+		if (prgObj->m_stateFrame == 0 || prgObj->m_stateFrame == 5 || prgObj->m_stateFrame == 10) {
+			CVector pos(Game.m_partyObjArr[m_targetPartyIndex]->m_worldPosition);
+			pos.x += Math.RandFPM(static_cast<float>((prgObj->m_stateFrame == 0) ? 0 : 40));
+			pos.z += Math.RandFPM(static_cast<float>((prgObj->m_stateFrame == 0) ? 0 : 40));
+			charaObj->putParticleFromItem(charaObj->m_itemId, 3, charaObj->m_particleSlots[0], reinterpret_cast<Vec*>(&pos));
 		}
-		return;
+		charaObj->statAttack();
+		break;
 	}
-
-	if (prgObj->m_stateFrame == 0 || prgObj->m_stateFrame == 5 || prgObj->m_stateFrame == 10) {
-		CVector pos(Game.m_partyObjArr[m_targetPartyIndex]->m_worldPosition);
-		pos.x += Math.RandFPM(static_cast<float>((prgObj->m_stateFrame == 0) ? 0 : 40));
-		pos.z += Math.RandFPM(static_cast<float>((prgObj->m_stateFrame == 0) ? 0 : 40));
-		charaObj->putParticleFromItem(charaObj->m_itemId, 3, charaObj->m_particleSlots[0], reinterpret_cast<Vec*>(&pos));
-	}
-	charaObj->statAttack();
 }
 
 /*

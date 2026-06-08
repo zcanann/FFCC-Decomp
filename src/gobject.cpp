@@ -927,11 +927,12 @@ void CGObject::bgNormalCollision()
     pos.y += sStepProbeHeight + m_capsuleHalfHeight;
 
     unsigned int retry = 4;
+    const float capsuleRadius = m_capsuleHalfHeight;
     while (retry != 0) {
         CMapCylinder bodyCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
         bodyCylinder.m_bottom = pos;
         bodyCylinder.m_axis = move;
-        bodyCylinder.m_radius = m_capsuleHalfHeight;
+        bodyCylinder.m_radius = capsuleRadius;
 
         if (MapMng.CheckHitCylinderNear(&bodyCylinder, &move, m_bgHitMask) == 0) {
             break;

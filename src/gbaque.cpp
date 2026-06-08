@@ -689,7 +689,8 @@ void GbaQueue::ExecutQueue()
 				}
 			} else if (cmd == 0x0C) {
 				unsigned int cmdWord = queueWords[i];
-				const unsigned char request = static_cast<unsigned char>(cmdWord >> 8);
+				const unsigned char* cmdBytes = reinterpret_cast<const unsigned char*>(&cmdWord);
+				const unsigned char request = cmdBytes[2];
 				if (caravanWork != 0) {
 					if (request == 3) {
 						OSWaitSemaphore(accessSemaphores + channel);
@@ -703,9 +704,9 @@ void GbaQueue::ExecutQueue()
 						obj[0x2CCA] = static_cast<char>(obj[0x2CCA] & ~static_cast<unsigned char>(playerBit));
 						OSSignalSemaphore(accessSemaphores + channel);
 						Joybus.SetLetterSize(channel, 0);
-						caravanWork->FGLetterOpen(static_cast<unsigned char>(cmdWord));
+						caravanWork->FGLetterOpen(cmdBytes[3]);
 						char* letterBuf = Joybus.GetLetterBuffer(channel);
-						MakeLetterData(channel, letterBuf, static_cast<unsigned char>(cmdWord));
+						MakeLetterData(channel, letterBuf, cmdBytes[3]);
 					} else if (request == 6) {
 						OSWaitSemaphore(accessSemaphores + channel);
 						obj[0x2CCA] = static_cast<char>(obj[0x2CCA] & ~static_cast<unsigned char>(playerBit));

@@ -1009,9 +1009,9 @@ void CGPartyObj::onFramePreCalc()
 
 	int weaponItem;
 	int weaponRef;
-	if ((static_cast<int>(CFlatCenterState()) == 0) &&
-	    (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCurrentWeaponItem(weaponItem, weaponRef),
-	     (party.weaponItem != weaponItem) || (party.pendingWeaponItem != weaponRef))) {
+	if (static_cast<int>(CFlatCenterState()) == 0) {
+		reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCurrentWeaponItem(weaponItem, weaponRef);
+		if (party.weaponItem != weaponItem || party.pendingWeaponItem != weaponRef) {
 		bool canImmediateSwap =
 		    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x9A]) << 24) & 0xC0000000) >> 31) != 0) &&
 		    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x9B]) << 24) & 0xC0000000) >> 31) != 0) &&
@@ -1036,6 +1036,7 @@ void CGPartyObj::onFramePreCalc()
 			party.weaponRef = weaponRef;
 			party.commandFlagBits.flag20 = 1;
 			changeStat(0x0F, 0, 0);
+		}
 		}
 	}
 

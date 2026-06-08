@@ -3356,6 +3356,7 @@ void CGCharaObj::combi2()
 		}
 
 		int hasNearbyPartner = 0;
+		Vec* partyCenter = &CharaObjComboCenter(party);
 		for (int j = 0; j < candidateCount; j++) {
 			if (i == j) {
 				continue;
@@ -3366,7 +3367,7 @@ void CGCharaObj::combi2()
 				continue;
 			}
 
-			if (PSVECDistance(&CharaObjComboCenter(party), &CharaObjComboCenter(other)) < 20.0f) {
+			if (PSVECDistance(partyCenter, &CharaObjComboCenter(other)) < 20.0f) {
 				hasNearbyPartner = 1;
 				break;
 			}

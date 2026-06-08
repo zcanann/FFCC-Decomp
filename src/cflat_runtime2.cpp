@@ -873,7 +873,7 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 	if (mode == 1) {
 		watch.Reset();
 		watch.Start();
-		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
+		for (CGObject* object = CFlat.FindGObjFirst(); object != 0; object = CFlat.FindGObjNext(object)) {
 			object->move();
 		}
 		watch.Stop();
@@ -881,7 +881,7 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 
 		watch.Reset();
 		watch.Start();
-		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
+		for (CGObject* object = CFlat.FindGObjFirst(); object != 0; object = CFlat.FindGObjNext(object)) {
 			object->objectCollision();
 		}
 		watch.Stop();
@@ -889,7 +889,7 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 
 		watch.Reset();
 		watch.Start();
-		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
+		for (CGObject* object = CFlat.FindGObjFirst(); object != 0; object = CFlat.FindGObjNext(object)) {
 			object->bgCollision();
 		}
 		watch.Stop();
@@ -897,7 +897,7 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 
 		watch.Reset();
 		watch.Start();
-		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
+		for (CGObject* object = CFlat.FindGObjFirst(); object != 0; object = CFlat.FindGObjNext(object)) {
 			object->update();
 		}
 		watch.Stop();
@@ -905,13 +905,13 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 
 		watch.Reset();
 		watch.Start();
-		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
+		for (CGObject* object = CFlat.FindGObjFirst(); object != 0; object = CFlat.FindGObjNext(object)) {
 			object->hit();
 		}
 		watch.Stop();
 		CFlatHitTime() += watch.Get();
 
-		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
+		for (CGObject* object = CFlat.FindGObjFirst(); object != 0; object = CFlat.FindGObjNext(object)) {
 			object->copy();
 		}
 		return 1;

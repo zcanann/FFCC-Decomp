@@ -1516,7 +1516,7 @@ void GbaQueue::LoadEnemyStat()
 
 	memset(localEnemyData, 0, sizeof(localEnemyData));
 
-	if (reinterpret_cast<unsigned int*>(&CFlat)[0x1041] != 0) {
+	if (reinterpret_cast<int*>(&CFlat)[0x1041] != 0) {
 		unsigned char* enemyEntry = localEnemyData;
 		enemyObjPtrs = &Game.m_scriptWork[0][0][0];
 		enemyWorkPtrs = &Game.m_scriptWork[4][0][0];
@@ -1528,7 +1528,7 @@ void GbaQueue::LoadEnemyStat()
 				CGObject* enemyObj = reinterpret_cast<CGObject*>(enemyObjPtrs[i]);
 				CMonWork* enemyWork = reinterpret_cast<CMonWork*>(enemyWorkPtrs[i]);
 				const int enemyDataBase = Game.unkCFlatData0[1] + enemyWork->m_baseDataIndex * 0x1D0;
-				const int enemyKind = *reinterpret_cast<short*>(enemyDataBase + 0x10C);
+				const unsigned int enemyKind = *reinterpret_cast<unsigned short*>(enemyDataBase + 0x10C);
 
 				if (enemyKind == 10) {
 					enemyEntry[1] = 1;

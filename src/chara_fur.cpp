@@ -62,6 +62,7 @@ STATIC_ASSERT(offsetof(CChara::MogFurState, m_alphaScore) == 0x2050);
 
 class CMaterial;
 
+extern char sYmEnvSeparator[4];
 extern "C" char* sMogRadarTypeLabels[];
 extern "C" char sMogRadarDebugFormatBlock[];
 extern "C" char sMogFurTextureName[8];
@@ -90,6 +91,7 @@ extern float FLOAT_80331164;
 extern float FLOAT_80331168;
 extern float FLOAT_8033116C;
 extern float kYmEnvQuarter;
+extern float kYmEnvTen;
 extern double kYmEnvSignedDoubleMagic;
 extern double kPppEmissionDoubleBias;
 
@@ -429,13 +431,13 @@ void CChara::TimeMogFur()
 	if (MogFur().m_timestamp + 0x1A5E0 < frameCounter) {
 		MogFur().m_timestamp = frameCounter;
 		if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
-			System.Printf("");
+			System.Printf(sYmEnvSeparator);
 		}
 		if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
 			System.Printf(sMogRadarDebugFormatBlock);
 		}
 		if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
-			System.Printf("");
+			System.Printf(sYmEnvSeparator);
 		}
 	}
 
@@ -966,9 +968,9 @@ void CChara::CModel::InitMogFurTex()
 void CChara::CModel::MogFurFrame(CGObject* gObject)
 {
 	MogWorkRaw& work = MogWork();
-	const short heldButtons = MogHeldButtons();
+	const unsigned short heldButtons = MogHeldButtons();
 	const unsigned short triggerButtons = MogTriggerButtons();
-	const unsigned short rotateButtons = (MogPadInt(64) == 0) ? heldButtons : 0;
+	const unsigned short rotateButtons = (MogPadInt(64) == 0) ? MogHeldButtons() : 0;
 	int messageId = -1;
 
 	if (work.m_started == 0) {
@@ -987,12 +989,12 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 
 	if (work.m_state == 0) {
 		if ((rotateButtons & 1) != 0) {
-			gObject->m_rotTargetY -= 0.03125f;
+			gObject->m_rotTargetY -= kYmEnvQuarter;
 			if (gObject->m_currentAnimSlot < 0) {
 				gObject->PlayAnim(1, 0, 0, -1, -1, 0);
 			}
 		} else if ((rotateButtons & 2) != 0) {
-			gObject->m_rotTargetY += 0.03125f;
+			gObject->m_rotTargetY += kYmEnvQuarter;
 			if (gObject->m_currentAnimSlot < 0) {
 				gObject->PlayAnim(1, 0, 0, -1, -1, 0);
 			}
@@ -1021,11 +1023,10 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		}
 	}
 
-	const float cursorStep = 0.1f;
-	Chara.MogFur().m_cursorX = static_cast<int>(static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorX)) +
-	                                     static_cast<float>(MogPadInt(36)) * cursorStep);
-	Chara.MogFur().m_cursorY = static_cast<int>(static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorY)) -
-	                                     static_cast<float>(MogPadInt(40)) * cursorStep);
+	Chara.MogFur().m_cursorX = static_cast<int>(kYmEnvTen * static_cast<float>(MogPadInt(36)) +
+	                                     static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorX)));
+	Chara.MogFur().m_cursorY = static_cast<int>(-(kYmEnvTen * static_cast<float>(MogPadInt(40)) -
+	                                     static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorY))));
 
 	if (static_cast<int>(Chara.MogFur().m_cursorX) < 0) {
 		Chara.MogFur().m_cursorX = 0;
@@ -1374,7 +1375,7 @@ int CChara::CModel::PickFur(
  */
 void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 {
-	if (static_cast<signed char>(m_flags10C << 1) >= 0) {
+	if (m_flags10CBits.m_flag10C_40 == 0) {
 		return;
 	}
 
@@ -1423,7 +1424,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_NRM, GX_NRM_XYZ, GX_S16, ModelNormQuant(this) & 0xFF);
-	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_U16, 0x0C);
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 0x0C);
 	LightPcs.EnableLight(1, 1);
 	GXSetZMode((u8)1, (GXCompare)3, (u8)0);
 	const int furShade = static_cast<int>(kCharaFurShadeScale * ModelFurCur(this));
@@ -1436,8 +1437,8 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	GXSetNumTevStages(2);
 	GXSetTevDirect(GX_TEVSTAGE0);
 	_GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
-	_GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_RASC, GX_CC_TEXC, GX_CC_ZERO);
-	_GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_RASA, GX_CA_TEXA, GX_CA_ZERO);
+	_GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASC, GX_CC_ZERO);
+	_GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_KONST, GX_CA_TEXA, GX_CA_ZERO);
 	_GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
 	_GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
 	_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
@@ -1529,8 +1530,8 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 			if (prevExtraTexture != hasExtraTexture || prevExtraTextureFormat != extraTextureFormat) {
 				GXSetTevDirect(GX_TEVSTAGE0);
 				_GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
-				_GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_RASC, GX_CC_TEXC, GX_CC_ZERO);
-				_GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_RASA, GX_CA_TEXA, GX_CA_ZERO);
+				_GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASC, GX_CC_ZERO);
+				_GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_KONST, GX_CA_TEXA, GX_CA_ZERO);
 				_GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
 				_GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
 				_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
@@ -1539,7 +1540,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 				for (int shadowStage = 0; shadowStage < shadowCount; shadowStage++, tevStage++) {
 					GXSetTevDirect(static_cast<GXTevStageID>(tevStage));
 					_GXSetTevSwapMode(static_cast<GXTevStageID>(tevStage), GX_TEV_SWAP0, GX_TEV_SWAP0);
-					_GXSetTevColorIn(static_cast<GXTevStageID>(tevStage), GX_CC_CPREV, GX_CC_TEXC, GX_CC_C1, GX_CC_ZERO);
+					_GXSetTevColorIn(static_cast<GXTevStageID>(tevStage), GX_CC_CPREV, GX_CC_TEXC, GX_CC_TEXA, GX_CC_ZERO);
 					_GXSetTevAlphaIn(static_cast<GXTevStageID>(tevStage), GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
 					_GXSetTevColorOp(static_cast<GXTevStageID>(tevStage), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE,
 					                 GX_TEVPREV);

@@ -545,7 +545,7 @@ void CMenuPcs::FavoInit()
 	int sVar9;
 	int sVar10;
 	unsigned short sVar11;
-	int iVar16;
+	unsigned int iVar16;
 	int iVar17;
 
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
@@ -696,7 +696,7 @@ void CMenuPcs::FavoInit()
 		for (iVar16 = iVar17; iVar16 < 8; iVar16++) {
 			if (rank->score < compareRank->score) {
 				signed char place = rank->place;
-				unsigned char foodId = rank->foodId;
+				signed char foodId = rank->foodId;
 				short score = rank->score;
 
 				rank->place = compareRank->place;

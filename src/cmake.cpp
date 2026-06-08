@@ -3426,9 +3426,7 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
     const char* txt = GetMenuStr(0x29);
     float w = static_cast<float>(font->GetWidth(txt));
     int tx = static_cast<int>(
-        static_cast<double>(static_cast<float>(static_cast<double>(120.0f) - static_cast<double>(w))) *
-            0.5 +
-        480.0);
+        static_cast<double>(120.0f - w) * 0.5 + 480.0);
     int cursorY = static_cast<int>(373.0);
     font->SetPosX(static_cast<float>(tx));
     font->SetPosY(static_cast<float>(cursorY - 4));

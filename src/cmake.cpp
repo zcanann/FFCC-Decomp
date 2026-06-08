@@ -1470,7 +1470,7 @@ void CMenuPcs::CmakeResultDraw()
     if ((mode == 2) && (resultDir < 0)) {
         panelAlphaValue = 1.0f;
     }
-    int panelAlpha = static_cast<int>(static_cast<double>(255.0f) * panelAlphaValue);
+    int panelAlpha = static_cast<int>(255.0f * panelAlphaValue);
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 

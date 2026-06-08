@@ -2281,6 +2281,8 @@ void CMenuPcs::CalcResultCloseAnim()
 }
 #pragma pop
 
+#pragma push
+#pragma opt_dead_assignments off
 /*
  * --INFO--
  * PAL Address: 0x80139b14
@@ -2436,6 +2438,7 @@ void CMenuPcs::DrawResultCountAnim()
 	}
 	DrawInit();
 }
+#pragma pop
 
 /*
  * --INFO--

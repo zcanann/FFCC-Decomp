@@ -280,8 +280,8 @@ void CPartMng::Create()
 
     PSMTXIdentity(ppvWorldMatrix);
     PSMTXIdentity(ppvWorldMatrix);
-    PSMTXIdentity(ppvCameraMatrix0);
-    PSMTXCopy(ppvCameraMatrix0, ppvCameraMatrix0);
+    PSMTXIdentity(ppvCameraMatrix);
+    PSMTXCopy(ppvCameraMatrix, ppvCameraMatrix0);
 
     m_materialSet = 0;
     m_textureSet = 0;
@@ -289,21 +289,21 @@ void CPartMng::Create()
     m_pppShapeStArr = 0;
 
     {
-        int* zero = reinterpret_cast<int*>(self + 0x1d4);
+        int* zero = reinterpret_cast<int*>(self);
         for (int i = 0; i < 0x80; i++) {
-            zero[i] = 0;
+            zero[0x75 + i] = 0;
         }
     }
     {
-        int* zero = reinterpret_cast<int*>(self + 0x3d8);
+        int* zero = reinterpret_cast<int*>(self);
         for (int i = 0; i < 0x80; i++) {
-            zero[i] = 0;
+            zero[0xf6 + i] = 0;
         }
     }
     {
-        int* zero = reinterpret_cast<int*>(self + 0x5dc);
+        int* zero = reinterpret_cast<int*>(self);
         for (int i = 0; i < 0x80; i++) {
-            zero[i] = 0;
+            zero[0x177 + i] = 0;
         }
     }
 

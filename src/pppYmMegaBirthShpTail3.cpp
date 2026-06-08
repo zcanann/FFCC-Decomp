@@ -789,7 +789,7 @@ path:
                 float vz;
 
                 if ((pYmMegaBirthShpTail3->m_randType == 0) || (pYmMegaBirthShpTail3->m_randType > 5)) {
-                    if ((u16)vYmMegaBirthShpTail3->m_pathIndex >= (u16)pathInfo[1]) {
+                    if ((u16)vYmMegaBirthShpTail3->m_pathIndex >= (s16)pathInfo[1]) {
                         vYmMegaBirthShpTail3->m_pathIndex = 0;
                     }
 
@@ -817,7 +817,7 @@ path:
                         sampleT = Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF();
                     }
 
-                    if ((u16)vYmMegaBirthShpTail3->m_pathIndex >= (u16)pathInfo[1]) {
+                    if ((u16)vYmMegaBirthShpTail3->m_pathIndex >= (s16)pathInfo[1]) {
                         vYmMegaBirthShpTail3->m_pathIndex = 0;
                     }
 

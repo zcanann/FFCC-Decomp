@@ -1337,7 +1337,30 @@ void CGMonObj::onFrameStat()
 
 
 	case 0x36:
-		if (prgObj->m_subState != 0) {
+		if (prgObj->m_subState == 0) {
+			if (prgObj->m_subFrame == 0) {
+				int dataNo = object->m_charaModelHandle->GetPdtSlot();
+				prgObj->putParticle((dataNo << 8) | 4, 0, object, kMonObjDefaultScale, 0);
+				prgObj->reqAnim(0xF, 1, 0);
+				unsigned int soundId = 0;
+				int classId = reinterpret_cast<int>(object->m_scriptHandle[4]);
+				if (classId == 0xA7) {
+					soundId = 0x12130;
+				} else if (classId < 0xA7) {
+					if (classId == 0x9C) {
+						soundId = 0x12130;
+					}
+				} else if (classId == 0xA9) {
+					soundId = 0x1213A;
+				} else if (classId < 0xA9) {
+					soundId = 0x12126;
+				}
+				prgObj->playSe3D(soundId, 0x32, 0x96, 0, (Vec*)0);
+			}
+			if (prgObj->m_subFrame == 0x32) {
+				prgObj->changeSubStat(1);
+			}
+		} else {
 			if (prgObj->m_subState == 1) {
 				if (prgObj->m_subFrame == 0) {
 					prgObj->reqAnim(0x10, 0, 0);
@@ -1345,29 +1368,6 @@ void CGMonObj::onFrameStat()
 					prgObj->changeStat(0, 0, 0);
 				}
 			}
-			break;
-		}
-		if (prgObj->m_subFrame == 0) {
-			int dataNo = object->m_charaModelHandle->GetPdtSlot();
-			prgObj->putParticle((dataNo << 8) | 4, 0, object, kMonObjDefaultScale, 0);
-			prgObj->reqAnim(0xF, 1, 0);
-			unsigned int soundId = 0;
-			int classId = reinterpret_cast<int>(object->m_scriptHandle[4]);
-			if (classId == 0xA7) {
-				soundId = 0x12130;
-			} else if (classId < 0xA7) {
-				if (classId == 0x9C) {
-					soundId = 0x12130;
-				}
-			} else if (classId == 0xA9) {
-				soundId = 0x1213A;
-			} else if (classId < 0xA9) {
-				soundId = 0x12126;
-			}
-			prgObj->playSe3D(soundId, 0x32, 0x96, 0, (Vec*)0);
-		}
-		if (prgObj->m_subFrame == 0x32) {
-			prgObj->changeSubStat(1);
 		}
 		break;
 

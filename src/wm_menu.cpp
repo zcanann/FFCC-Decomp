@@ -6868,8 +6868,8 @@ void CMenuPcs::CalcFukidashi()
 		modelPtr->CalcSkin();
 
 		puVar20[1] = puVar20[1] + 1;
-		if (DOUBLE_803314a8 * static_cast<double>(gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4]) <=
-		    static_cast<double>(static_cast<float>(static_cast<double>(puVar20[1])))) {
+		if (static_cast<double>(static_cast<float>(static_cast<double>(puVar20[1]))) >=
+		    DOUBLE_803314a8 * static_cast<double>(gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4])) {
 			puVar20[1] = 0;
 		}
 	}
@@ -7008,8 +7008,8 @@ void CMenuPcs::CalcFukidashi()
 				mdl->CalcSkin();
 
 				puVar20[1] = puVar20[1] + 1;
-				if (DOUBLE_803314a8 * static_cast<double>(gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4]) <=
-				    static_cast<double>(static_cast<float>(static_cast<double>(puVar20[1])))) {
+				if (static_cast<double>(static_cast<float>(static_cast<double>(puVar20[1]))) >=
+				    DOUBLE_803314a8 * static_cast<double>(gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4])) {
 					puVar20[1] = 0;
 				}
 				slotIdx++;

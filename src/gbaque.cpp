@@ -1162,11 +1162,14 @@ void GbaQueue::SetRadarType()
 	int prevAssignedType;
 	int i;
 
-	if ((obj[0x2D30] != 0) || (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)) {
+	if ((static_cast<signed char>(m_radarTypeFlags) != 0) || (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)) {
 		return;
 	}
 
-	validMemberCount = static_cast<unsigned int>(Game.m_gameWork.m_wmBackupParams[0] >= 0);
+	validMemberCount = 0;
+	if (Game.m_gameWork.m_wmBackupParams[0] >= 0) {
+		validMemberCount++;
+	}
 	if (Game.m_gameWork.m_wmBackupParams[1] >= 0) {
 		validMemberCount++;
 	}

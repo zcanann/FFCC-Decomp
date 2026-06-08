@@ -1425,7 +1425,7 @@ void CMenuPcs::CmakeResultDraw()
     int slot = static_cast<int>(CmakeSlot(this));
     int modelBlock = MenuS32(this, 0x814);
     if (*reinterpret_cast<int*>(modelBlock + (slot + 0x20) * 0x50) != 0) {
-        *reinterpret_cast<unsigned short*>(modelBlock + 0x6E8) = 0xFF24;
+        *reinterpret_cast<short*>(modelBlock + 0x6E8) = 0xFF24;
         *reinterpret_cast<unsigned short*>(modelBlock + 0x6EA) = 4;
         DrawInit();
 

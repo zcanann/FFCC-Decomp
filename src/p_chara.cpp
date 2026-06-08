@@ -2321,14 +2321,16 @@ void CCharaPcs::CHandle::LoadModel(
     char path[0x100];
     BuildCharaBasePath(charaKind, charaNo, basePath);
 
-    CLoadModel* loadModel = 0;
+    CLoadModel* loadModel;
     for (unsigned int i = 0; i < static_cast<unsigned int>(LoadModelArray(&CharaPcs)->GetSize()); i++) {
         CLoadModel* it = (*LoadModelArray(&CharaPcs))[i];
         if (reinterpret_cast<int>(it->m_keyTag) == charaKind && static_cast<unsigned long>(it->m_keyId) == charaNo) {
             loadModel = it;
-            break;
+            goto foundModel;
         }
     }
+    loadModel = 0;
+foundModel:
 
     if (loadModel != 0) {
         m_modelLoadRef = loadModel;
@@ -2409,15 +2411,17 @@ void CCharaPcs::CHandle::LoadModel(
     }
 
     if (CurrentSceneId() != 7 && charaKind == 1) {
-        CLoadPdt* loadPdt = 0;
+        CLoadPdt* loadPdt;
         for (unsigned int i = 0; i < static_cast<unsigned int>(LoadPdtArray(&CharaPcs)->GetSize()); i++) {
             CLoadPdt* it = (*LoadPdtArray(&CharaPcs))[i];
             if (it->m_keyTag == reinterpret_cast<void*>(1) && it->m_keyId == static_cast<int>(charaNo) &&
                 it->m_variantTag == reinterpret_cast<void*>(textureVariant)) {
                 loadPdt = it;
-                break;
+                goto foundPdt;
             }
         }
+        loadPdt = 0;
+    foundPdt:
 
         if (loadPdt == 0) {
             loadPdt = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x868) CLoadPdt;

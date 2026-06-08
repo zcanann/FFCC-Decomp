@@ -77,9 +77,12 @@ public:
 			m_seKind = 1;
 			m_seParam = 0;
 			m_seUnk2 = 0;
+			m_seUnk3 = 0;
 			m_seDelay = 0x1E;
 			m_paramNo = 0;
 			m_paramId = 0;
+			m_pad4A[0] = 0;
+			m_pad4A[1] = 0;
 			m_pos = 0;
 			m_posVec = 0;
 			m_scale = 0;

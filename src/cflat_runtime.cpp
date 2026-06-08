@@ -260,6 +260,23 @@ void CFlatRuntime::Create(void* filePtr)
 				strcpy(reinterpret_cast<char*>(self + 0x84C), chunkFile.GetString());
 				break;
 
+			case 'VAL ': {
+				const int variableCount = chunk.m_arg0;
+				*reinterpret_cast<int*>(self + 0x24) = variableCount;
+				*reinterpret_cast<u8**>(self + 0x28) =
+				    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x96)
+				        u8[variableCount << 2];
+
+				u8* variableDef = *reinterpret_cast<u8**>(self + 0x28);
+				for (int i = 0; i < variableCount; i++) {
+					variableDef[0] = chunkFile.Get1();
+					variableDef[1] = chunkFile.Get1();
+					*reinterpret_cast<u16*>(variableDef + 2) = chunkFile.Get2();
+					variableDef += 4;
+				}
+				break;
+			}
+
 			case 'CLAS': {
 				const int classCount = chunk.m_arg0;
 				*reinterpret_cast<int*>(self + 0x14) = classCount;
@@ -369,23 +386,6 @@ void CFlatRuntime::Create(void* filePtr)
 					funcIndex++;
 				}
 				chunkFile.PopChunk();
-				break;
-			}
-
-			case 'VAL ': {
-				const int variableCount = chunk.m_arg0;
-				*reinterpret_cast<int*>(self + 0x24) = variableCount;
-				*reinterpret_cast<u8**>(self + 0x28) =
-				    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x96)
-				        u8[variableCount << 2];
-
-				u8* variableDef = *reinterpret_cast<u8**>(self + 0x28);
-				for (int i = 0; i < variableCount; i++) {
-					variableDef[0] = chunkFile.Get1();
-					variableDef[1] = chunkFile.Get1();
-					*reinterpret_cast<u16*>(variableDef + 2) = chunkFile.Get2();
-					variableDef += 4;
-				}
 				break;
 			}
 

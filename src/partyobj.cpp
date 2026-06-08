@@ -3725,7 +3725,8 @@ int CGPartyObj::useItem(int itemId)
 			System.Printf(const_cast<char*>(msgBase + 0x170), itemId, itemKind);
 			bonus(5, itemId, 0);
 
-			if (itemKind == 0x17D) {
+			switch (itemKind) {
+			case 0x17D: {
 				int heal;
 				int foodIndex = itemId - 0x17D;
 				if ((foodIndex < 0) || (foodIndex >= 8)) {
@@ -3743,7 +3744,9 @@ int CGPartyObj::useItem(int itemId)
 				}
 				addHp(heal, 0);
 				System.Printf(const_cast<char*>(msgBase + 0x194), heal);
-			} else if (itemKind == 0x186) {
+				break;
+			}
+			case 0x186: {
 				int heal = 2;
 				if ((itemId == 0x188) &&
 				    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) == 2)) {
@@ -3751,6 +3754,8 @@ int CGPartyObj::useItem(int itemId)
 				}
 				addHp(heal, 0);
 				System.Printf(const_cast<char*>(msgBase + 0x1AC), heal);
+				break;
+			}
 			}
 
 			CFlatRuntime::CStack stack[2];

@@ -650,21 +650,21 @@ void CGMonObj::setActionParam(int state)
 	*reinterpret_cast<int*>(mon + 0x55C) = *reinterpret_cast<int*>(mon + 0x558) + 1;
 
 	int actionType = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<unsigned int*>(mon + 0x560) * 0x48 + 0xE);
-	if (actionType != 3) {
-		if (2 < actionType) {
-			return;
-		}
-		if (1 < actionType) {
-			*reinterpret_cast<int*>(mon + 0x68C) = CGCharaObj::calcCastTime(*reinterpret_cast<int*>(mon + 0x560));
-			return;
-		}
+	switch (actionType) {
+	case 0:
+	case 1:
+	case 3:
+		*reinterpret_cast<unsigned int*>(mon + 0x630) =
+			*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<unsigned int*>(mon + 0x560) * 0x48 + 0x20);
+		*reinterpret_cast<unsigned int*>(mon + 0x634) =
+			*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (*reinterpret_cast<unsigned int*>(mon + 0x560) * 0x48 + 0x22));
+		*reinterpret_cast<unsigned int*>(mon + 0x638) =
+			*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (*reinterpret_cast<unsigned int*>(mon + 0x560) * 0x48 + 0x22));
+		break;
+	case 2:
+		*reinterpret_cast<int*>(mon + 0x68C) = CGCharaObj::calcCastTime(*reinterpret_cast<int*>(mon + 0x560));
+		break;
 	}
-	*reinterpret_cast<unsigned int*>(mon + 0x630) =
-		*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<unsigned int*>(mon + 0x560) * 0x48 + 0x20);
-	*reinterpret_cast<unsigned int*>(mon + 0x634) =
-		*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (*reinterpret_cast<unsigned int*>(mon + 0x560) * 0x48 + 0x22));
-	*reinterpret_cast<unsigned int*>(mon + 0x638) =
-		*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (*reinterpret_cast<unsigned int*>(mon + 0x560) * 0x48 + 0x22));
 }
 
 /*

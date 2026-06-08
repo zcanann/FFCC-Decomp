@@ -206,7 +206,19 @@ public:
 	u32 m_centerState;              // 0x12AC
 	float m_centerDistanceScale;    // 0x12B0
 	Mtx m_centerMatrix;             // 0x12B4
-	u8 m_gameFlags;                 // 0x12E4
+	union {
+		u8 m_gameFlags;             // 0x12E4
+		struct {
+			s8 m_flagBit7 : 1;
+			s8 m_flagBit6 : 1;
+			s8 m_flagBit5 : 1;
+			s8 m_flagBit4 : 1;
+			s8 m_flagBit3 : 1;
+			s8 m_flagBit2 : 1;
+			s8 m_flagBit1 : 1;
+			s8 m_flagBit0 : 1;
+		} m_gameFlagBits;
+	};
 	u8 m_pad_12E5_12E8[0x3];        // 0x12E5
 	int m_bossState;                // 0x12E8
 	int m_bossSubState;             // 0x12EC

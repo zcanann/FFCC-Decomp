@@ -2284,11 +2284,11 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 
 	switch (controlNo) {
 	case 0:
-		CFlat.m_gameFlags = static_cast<u8>((CFlat.m_gameFlags & 0x7F) | ((value8 & 1) << 7));
+		CFlat.m_gameFlagBits.m_flagBit7 = controlValue;
 		break;
 
 	case 2:
-		CFlat.m_gameFlags = static_cast<u8>((CFlat.m_gameFlags & 0xF7) | ((value8 & 1) << 3));
+		CFlat.m_gameFlagBits.m_flagBit3 = controlValue;
 		break;
 
 	case 3:
@@ -2300,7 +2300,7 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 		break;
 
 	case 4:
-		Game.m_gameWork.m_radarType = value8;
+		Game.m_gameWork.m_radarType = static_cast<unsigned char>(controlValue);
 		break;
 
 	case 6:
@@ -2333,20 +2333,20 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 		break;
 
 	case 0xA:
-		CFlat.m_gameFlags = static_cast<u8>((CFlat.m_gameFlags & 0xEF) | ((value8 & 1) << 4));
+		CFlat.m_gameFlagBits.m_flagBit4 = controlValue;
 		break;
 
 	case 0xB:
-		CFlat.m_gameFlags = static_cast<u8>((CFlat.m_gameFlags & 0xDF) | ((value8 & 1) << 5));
+		CFlat.m_gameFlagBits.m_flagBit5 = controlValue;
 		break;
 
 	case 0xE:
-		CFlat.m_gameFlags = static_cast<u8>((CFlat.m_gameFlags & 0xFD) | ((value8 & 1) << 1));
+		CFlat.m_gameFlagBits.m_flagBit1 = controlValue;
 		Chara.ChangeMogMode(controlValue);
 		break;
 
 	case 0x12:
-		CFlat.m_gameFlags = static_cast<u8>((CFlat.m_gameFlags & 0xFE) | (value8 & 1));
+		CFlat.m_gameFlagBits.m_flagBit0 = controlValue;
 		break;
 
 	case 0x13: {

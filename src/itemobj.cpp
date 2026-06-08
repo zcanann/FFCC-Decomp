@@ -948,7 +948,7 @@ void CGItemObj::onFrameStat()
 
 			float safeDist = CalcSafePos(0x41, m_owner, &safePos);
 
-			if (kItemObjZero < safeDist) {
+			if (safeDist > kItemObjZero) {
 				m_owner->moveVectorHRot(kItemObjPi + m_owner->m_rotBaseY, kItemObjZero,
 				                        safeDist / kItemObjSafeMoveDivisor, 3);
 			}

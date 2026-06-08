@@ -78,6 +78,7 @@ extern "C" const float kPartMngEnvBoxMaxZ = 800.0f;
 extern "C" {
 extern int ppvSysStopPartF;
 extern int ppvSysGoPartF;
+extern void* ppvHookFuncTbl;
 unsigned char gPppDefaultValueBuffer[0x40] = {0};
 int gPppHeapUseRateWords[3] = {0, 0, 0};
 unsigned char gPppInConstructor = 0;
@@ -257,9 +258,9 @@ void CPartMng::Create()
 
     memset(self + 0x235a8, 0, 0x108);
 
-    self[0x808] = 0;
-    self[0x809] = 0;
     self[0x80a] = 0;
+    self[0x809] = 0;
+    self[0x808] = 0;
 
     ppvSysStopPartF = 1;
     ppvSysGoPartF = 0;
@@ -273,6 +274,7 @@ void CPartMng::Create()
     }
 
     ppvEnv = &m_pppEnvSt;
+    ppvHookFuncTbl = 0;
 
     PSMTXIdentity(ppvUnitMatrix);
     ppvZeroVector.z = kPartMngZero;
@@ -588,9 +590,8 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
 
     pdt = pdtSlot->m_pppDataHead;
     if (pdt != 0) {
-        pppModelSt** modelNames = reinterpret_cast<pppModelSt**>(pdt->m_modelNames);
         for (int i = 0; i < pdt->m_modelCount; i++) {
-            pppModelSt* model = modelNames[i];
+            pppModelSt* model = reinterpret_cast<pppModelSt**>(pdt->m_modelNames)[i];
             if (--model->m_refCount <= 0) {
                 if (model->m_cacheId != -1) {
                     ppvAmemCacheSet.DestroyCache(model->m_cacheId);
@@ -603,14 +604,13 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
             }
         }
 
-        if (modelNames != 0) {
-            delete[] modelNames;
+        if (reinterpret_cast<pppModelSt**>(pdt->m_modelNames) != 0) {
+            delete[] reinterpret_cast<pppModelSt**>(pdt->m_modelNames);
             pdt->m_modelNames = 0;
         }
 
-        pppShapeSt** shapeNames = reinterpret_cast<pppShapeSt**>(pdt->m_shapeNames);
         for (int i = 0; i < pdt->m_shapeCount; i++) {
-            pppShapeSt* shape = shapeNames[i];
+            pppShapeSt* shape = reinterpret_cast<pppShapeSt**>(pdt->m_shapeNames)[i];
             if (--shape->m_refCount <= 0) {
                 if (shape->m_animData != 0) {
                     delete[] reinterpret_cast<u8*>(shape->m_animData);
@@ -625,27 +625,26 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
             }
         }
 
-        if (shapeNames != 0) {
-            delete[] shapeNames;
+        if (reinterpret_cast<pppShapeSt**>(pdt->m_shapeNames) != 0) {
+            delete[] reinterpret_cast<pppShapeSt**>(pdt->m_shapeNames);
             pdt->m_shapeNames = 0;
         }
 
-        pppShapeGroupRaw* shapeGroups = reinterpret_cast<pppShapeGroupRaw*>(pdt->m_shapeGroups);
         for (int i = 0; i < pdt->m_shapeGroupCount; i++) {
+            pppShapeGroupRaw* shapeGroups = reinterpret_cast<pppShapeGroupRaw*>(pdt->m_shapeGroups);
             if (shapeGroups[i].m_shapeList != 0) {
                 delete[] shapeGroups[i].m_shapeList;
                 shapeGroups[i].m_shapeList = 0;
             }
         }
 
-        if (shapeGroups != 0) {
-            delete[] shapeGroups;
+        if (reinterpret_cast<pppShapeGroupRaw*>(pdt->m_shapeGroups) != 0) {
+            delete[] reinterpret_cast<pppShapeGroupRaw*>(pdt->m_shapeGroups);
             pdt->m_shapeGroups = 0;
         }
 
-        s16* cacheChunks = reinterpret_cast<s16*>(pdt->m_cacheChunks);
         for (int i = 0; i < pdt->m_cacheChunkCount; i++) {
-            ppvAmemCacheSet.DestroyCache(cacheChunks[i * 4]);
+            ppvAmemCacheSet.DestroyCache(reinterpret_cast<s16*>(pdt->m_cacheChunks)[i * 4]);
         }
 
         if (pdt->m_cacheChunks != 0) {
@@ -2356,8 +2355,6 @@ void CPartMng::pppEditPartCalc()
         return;
     }
 
-    int* recvBuff = *reinterpret_cast<int**>(self + 0x1C8);
-
     if (*reinterpret_cast<int*>(self + 0x174) <= 3) {
         for (int i = 0; i < *reinterpret_cast<int*>(self + 0x4); i++) {
             _pppMngSt* mng = &m_pppMng[i];
@@ -2367,16 +2364,10 @@ void CPartMng::pppEditPartCalc()
                 continue;
             }
             if (baseTime >= 0) {
-                baseTime -= 1;
-                mng->m_baseTime = baseTime;
-                if (baseTime >= 0) {
-                    continue;
-                }
-                mng->m_particleEnded = 0;
-                *reinterpret_cast<int*>(&mng->m_envColorR) = *reinterpret_cast<int*>(self + 0x168);
-                _pppStartPart(mng, reinterpret_cast<long*>(self + 0x5dc) + recvBuff[i * 0x18 + 0xC], 1);
+                goto decrementTimerA;
             }
 
+        runFrameA:
             pppSetMatrix(mng);
             pppSetFpMatrix(mng);
             _pppCalcPart(mng);
@@ -2394,6 +2385,21 @@ void CPartMng::pppEditPartCalc()
                 }
                 gPppHeapUseRateWords[1] = 0;
             }
+            continue;
+
+        decrementTimerA:
+            {
+                int newBaseTime = baseTime - 1;
+                mng->m_baseTime = newBaseTime;
+                if (newBaseTime >= 0) {
+                    continue;
+                }
+            }
+            mng->m_particleEnded = 0;
+            *reinterpret_cast<int*>(&mng->m_envColorR) = *reinterpret_cast<int*>(self + 0x168);
+            _pppStartPart(mng, reinterpret_cast<long*>(reinterpret_cast<long*>(self + 0x5dc)[
+                                   (*reinterpret_cast<int**>(self + 0x1C8))[i * 0x18 + 0xC]]), 1);
+            goto runFrameA;
         }
     } else {
         for (int i = 0; i < *reinterpret_cast<int*>(self + 0x4); i++) {
@@ -2478,8 +2484,8 @@ void CPartMng::pppEditDrawShadow()
                 mng->m_sortDepth = viewPos.z;
                 ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4);
                 ppvMng = mng;
-                pppSetFpMatrix(ppvMng);
-                _pppDrawPart(ppvMng);
+                pppSetFpMatrix(mng);
+                _pppDrawPart(mng);
                 continue;
 
             checkCull:
@@ -2577,8 +2583,8 @@ void CPartMng::pppEditDraw()
                         mng->m_sortDepth = viewPos.z;                                                      \
                         ppvMng = mng;                                                                      \
                         ppvEnv = reinterpret_cast<_pppEnvSt*>(*reinterpret_cast<char**>(mng) + 4);         \
-                        pppSetFpMatrix(ppvMng);                                                            \
-                        _pppDrawPart(ppvMng);                                                              \
+                        pppSetFpMatrix(reinterpret_cast<_pppMngSt*>(mng));                                  \
+                        _pppDrawPart(reinterpret_cast<_pppMngSt*>(mng));                                    \
                         continue;                                                                          \
                                                                                                            \
                     checkCull##drawPass:                                                                   \
@@ -2691,8 +2697,8 @@ void CPartMng::pppEditPartDrawAfter()
                         mng->m_sortDepth = viewPos.z;                                                      \
                         ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4); \
                         ppvMng = mng;                                                                      \
-                        pppSetFpMatrix(ppvMng);                                                            \
-                        _pppDrawPart(ppvMng);                                                              \
+                        pppSetFpMatrix(reinterpret_cast<_pppMngSt*>(mng));                                  \
+                        _pppDrawPart(reinterpret_cast<_pppMngSt*>(mng));                                    \
                         continue;                                                                          \
                                                                                                            \
                     checkCull##drawPass:                                                                   \
@@ -2840,34 +2846,15 @@ void CPartMng::pppDumpCacheIdx()
             ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
 
             if (mng->m_baseTime >= 0) {
-                mng->m_baseTime--;
-                if (mng->m_baseTime >= 0) {
-                    continue;
-                }
-
-                _pppDataHead* pdtHead = *reinterpret_cast<_pppDataHead**>(mng->m_pppResSet);
-                PppPartResourceRaw* partResource =
-                    reinterpret_cast<PppPartResourceRaw*>(reinterpret_cast<unsigned char*>(pdtHead->m_cacheChunks) +
-                                                          mng->m_partIndex * sizeof(PppPartResourceRaw));
-
-                CAmemCacheSet* cacheSet = &ppvAmemCacheSet;
-                if (cacheSet->IsEnable(partResource->m_cacheIndex) == 0) {
-                    partResource->m_pdt = reinterpret_cast<long*>(
-                        cacheSet->GetData(
-                            partResource->m_cacheIndex, const_cast<char*>(s_partMng_cpp), 0x9A9));
-                    pppInitPdt(partResource->m_pdt, pppGetSysProgTable());
-                }
-
-                cacheSet->AddRef(partResource->m_cacheIndex);
-                mng->m_hasMapRef = 1;
-                _pppStartPart(reinterpret_cast<_pppMngSt*>(mng), partResource->m_pdt, 1);
+                goto decrementTimer;
             }
 
+        runFrame:
             pppSetMatrix(reinterpret_cast<_pppMngSt*>(mng));
             pppSetFpMatrix(reinterpret_cast<_pppMngSt*>(mng));
 
             mng->m_spawnedCount += *reinterpret_cast<int*>(&mng->m_envColorR);
-            gPppInSubFrameCalc = 0;
+            ppvIs2ndCalc = 0;
 
             while (mng->m_spawnedCount >= 0x1000) {
                 _pppCalcPart(reinterpret_cast<_pppMngSt*>(mng));
@@ -2876,11 +2863,40 @@ void CPartMng::pppDumpCacheIdx()
                     break;
                 }
 
-                gPppInSubFrameCalc = 1;
+                ppvIs2ndCalc = 1;
                 mng->m_spawnedCount -= 0x1000;
             }
 
-            gPppInSubFrameCalc = 0;
+            ppvIs2ndCalc = 0;
+            continue;
+
+        decrementTimer:
+            {
+                int newBaseTime = mng->m_baseTime - 1;
+                mng->m_baseTime = newBaseTime;
+                if (newBaseTime >= 0) {
+                    continue;
+                }
+            }
+
+            {
+                _pppDataHead* pdtHead = *reinterpret_cast<_pppDataHead**>(mng->m_pppResSet);
+                PppPartResourceRaw* partResource =
+                    reinterpret_cast<PppPartResourceRaw*>(reinterpret_cast<unsigned char*>(pdtHead->m_cacheChunks) +
+                                                          mng->m_partIndex * sizeof(PppPartResourceRaw));
+
+                if (ppvAmemCacheSet.IsEnable(partResource->m_cacheIndex) == 0) {
+                    partResource->m_pdt = reinterpret_cast<long*>(
+                        ppvAmemCacheSet.GetData(
+                            partResource->m_cacheIndex, const_cast<char*>(s_partMng_cpp), 0x9A9));
+                    pppInitPdt(partResource->m_pdt, pppGetSysProgTable());
+                }
+
+                ppvAmemCacheSet.AddRef(partResource->m_cacheIndex);
+                mng->m_hasMapRef = 1;
+                _pppStartPart(reinterpret_cast<_pppMngSt*>(mng), partResource->m_pdt, 1);
+            }
+            goto runFrame;
         }
     }
 }
@@ -2941,8 +2957,8 @@ void CPartMng::pppDrawPrio(unsigned char drawMode)
             mng->m_sortDepth = viewPos.z;
             ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4);
             ppvMng = mng;
-            pppSetFpMatrix(ppvMng);
-            _pppDrawPart(ppvMng);
+            pppSetFpMatrix(mng);
+            _pppDrawPart(mng);
             continue;
 
         checkCull:
@@ -3053,8 +3069,8 @@ void CPartMng::pppDrawPrioPdtFpno(unsigned char drawMode, short kind, short node
         mng->m_sortDepth = viewPos.z;
         ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4);
         ppvMng = reinterpret_cast<_pppMngSt*>(mng);
-        pppSetFpMatrix(ppvMng);
-        _pppDrawPart(ppvMng);
+        pppSetFpMatrix(reinterpret_cast<_pppMngSt*>(mng));
+        _pppDrawPart(reinterpret_cast<_pppMngSt*>(mng));
         return;
 
     checkCull:
@@ -3301,8 +3317,8 @@ void CPartMng::pppPartDrawAfter()
             mng->m_sortDepth = viewPos.z;
             ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4);
             ppvMng = mng;
-            pppSetFpMatrix(ppvMng);
-            _pppDrawPart(ppvMng);
+            pppSetFpMatrix(mng);
+            _pppDrawPart(mng);
             continue;
 
         checkCull:

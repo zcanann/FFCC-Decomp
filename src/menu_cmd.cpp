@@ -1132,7 +1132,7 @@ void CMenuPcs::CmdDraw()
 
 							if (canUse == 0) {
 								rowTex = 0x34;
-								rowAlpha = static_cast<float>(kCmdMenuHalfD) * row->alpha;
+								rowAlpha = kCmdMenuHalfD * row->alpha;
 							}
 						} else {
 							s32 itemIdx = sel - 2;
@@ -1155,7 +1155,7 @@ void CMenuPcs::CmdDraw()
 									    row->alpha);
 								}
 								rowTex = 0x34;
-								rowAlpha = static_cast<float>(kCmdMenuHalfD) * row->alpha;
+								rowAlpha = kCmdMenuHalfD * row->alpha;
 							}
 						}
 

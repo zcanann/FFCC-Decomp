@@ -2508,7 +2508,7 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 		if ((i & 1) != 0) {
 			x = x1;
 			if (i == 1) {
-				flip = 8;
+				flip |= 8;
 			}
 		}
 		if ((i & 2) != 0) {
@@ -2559,9 +2559,20 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 	double decoX1 = DOUBLE_80333100 + decoX0;
 	double decoY1 = DOUBLE_80333100 + static_cast<double>(static_cast<float>(y0 + h - static_cast<double>(FLOAT_8033310c)));
 	for (int i = 0; i < 4; ++i) {
-		double x = ((i & 1) == 0) ? (x0 - static_cast<double>(FLOAT_80333110)) : decoX1;
-		double y = ((i & 2) == 0) ? decoY0 : decoY1;
-		int flip = ((i & 2) == 0) ? 0 : 4;
+		double x;
+		if ((i & 1) == 0) {
+			x = x0 - static_cast<double>(FLOAT_80333110);
+		} else {
+			x = decoX1;
+		}
+		double y;
+		int flip = 0;
+		if ((i & 2) == 0) {
+			y = decoY0;
+		} else {
+			y = decoY1;
+			flip |= 4;
+		}
 		MenuPcs.DrawRect(
 		    flip, static_cast<float>(x), static_cast<float>(y), FLOAT_80333108, FLOAT_8033310c,
 		    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);

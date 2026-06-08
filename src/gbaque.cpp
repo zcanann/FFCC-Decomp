@@ -2271,19 +2271,19 @@ System.Printf(const_cast<char*>(s_subject_max_over), const_cast<char*>(s_gbaque_
 			(reinterpret_cast<unsigned char*>(entryWrite))[4] = static_cast<unsigned char>(subjectCount++);
 		}
 
-		unsigned char flags = 0;
+		unsigned int flags = 0;
 		const unsigned char curFlags = cur->Flags();
-		if (static_cast<char>(curFlags) < 0) {
-			flags |= 1;
+		if (((curFlags >> 7) & 1) != 0) {
+			flags = GbaQueConst::ITEM_USE;
 		}
 		if (((curFlags >> 6) & 1) != 0) {
-			flags |= 2;
+			flags |= GbaQueConst::ITEM_PUT;
 		}
 		if (((curFlags >> 5) & 1) != 0) {
-			flags |= 4;
+			flags |= GbaQueConst::MONEY_ATTACH;
 		}
 		if (((curFlags >> 4) & 1) != 0) {
-			flags |= 8;
+			flags |= GbaQueConst::OPEN_LETTER;
 		}
 
 		const unsigned int value = cur->AttachmentValue();
@@ -2291,7 +2291,7 @@ System.Printf(const_cast<char*>(s_subject_max_over), const_cast<char*>(s_gbaque_
 		if (valueIsMoney == 0) {
 			if (value != 0) {
 				if (value < 0x100 || value > 0x124) {
-					flags |= 0x10;
+					flags |= GbaQueConst::MOVE_ATTACH;
 					entryWrite[0] = SwapU32(value);
 				} else if ((unsigned int)System.m_execParam >= 1) {
 System.Printf(const_cast<char*>(s_letter_data_error), const_cast<char*>(s_gbaque_cpp), 0x810, channel, i);
@@ -2299,12 +2299,12 @@ System.Printf(const_cast<char*>(s_letter_data_error), const_cast<char*>(s_gbaque
 			}
 		} else {
 			if (value != 0) {
-				flags |= 0x20;
+				flags |= GbaQueConst::REPLY_LETTER;
 				entryWrite[0] = SwapU32(value * 100);
 			}
 		}
 
-		(reinterpret_cast<unsigned char*>(entryWrite))[6] = flags;
+		(reinterpret_cast<unsigned char*>(entryWrite))[6] = static_cast<unsigned char>(flags);
 		entryWrite += 2;
 	}
 

@@ -199,6 +199,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 	unsigned char caseMode = 0;
 	int branchMode = 0;
 
+	char* townName = Game.m_gameWork.m_townName;
 	const unsigned char* next;
 	unsigned char c;
 	while ((c = in[0]) != 0)
@@ -361,7 +362,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			break;
 		}
 		case 0x2F:
-			strcpy(dst, s_mesFallback);
+			strcpy(dst, townName);
 			dst += strlen(dst);
 			break;
 		case 0x30:

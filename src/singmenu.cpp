@@ -2234,7 +2234,7 @@ void CMenuPcs::SingleCalcCtrl()
     }
     }
 
-    reinterpret_cast<CMesMenu*>(*reinterpret_cast<void**>(reinterpret_cast<u8*>(&MenuPcs) + 0x268))->CalcHeart();
+    MenuPcs.m_battleMesMenus[0]->CalcHeart();
     m_singMenuState->result = result;
 
     bool hasInput = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
@@ -2827,7 +2827,7 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
             text = GetSingWinMessage(staticMessage.textIds[i], dynamicText, 0);
         }
         int textWidth = font->GetWidth(text);
-        if (maxWidth < textWidth) {
+        if (textWidth > maxWidth) {
             maxWidth = textWidth;
         }
         dynamicText += 0x80;
@@ -2851,7 +2851,7 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
         if (useDynamic == 0) {
             text = GetSingWinMessage(staticMessage.textIds[i], dynamicText, 0);
         }
-        if (strlen(text) != 0) {
+        if (static_cast<int>(strlen(text)) != 0) {
             char lineBuffer[128];
             strcpy(lineBuffer, text);
             font->SetPosX(x);
@@ -2898,16 +2898,16 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
             text = GetSingWinMessage(staticMessage.textIds[i], dynamicText, 0);
         }
         int textWidth = font->GetWidth(text);
-        if (maxWidth < textWidth) {
+        if (textWidth > maxWidth) {
             maxWidth = textWidth;
         }
         dynamicText += 0x80;
     }
 
-    if (useDynamic == 0) {
-        maxWidth -= 0x18;
-    } else {
+    if (useDynamic != 0) {
         maxWidth += 0x16;
+    } else {
+        maxWidth -= 0x18;
     }
 
     int lineHeight = static_cast<int>(22.0f * FLOAT_8032ea78);
@@ -3401,8 +3401,8 @@ void CMenuPcs::DrawSingLife()
 {
     const CCaravanWork* const caravanWork = SingleCaravanWork();
     int lifeTimer = m_singleLifeTimer;
-    float y = -32.0f;
     float xBase = 366.0f;
+    float y = -32.0f;
     if (lifeTimer < 0) {
         return;
     }
@@ -3435,8 +3435,8 @@ void CMenuPcs::DrawSingLife()
     }
 
     int halfHearts = static_cast<unsigned int>(caravanWork->m_maxHp) >> 1;
-    reinterpret_cast<CMesMenu*>(*reinterpret_cast<void**>(reinterpret_cast<u8*>(&MenuPcs) + 0x268))
-        ->DrawHeart(xBase + static_cast<float>(((8 - halfHearts) * 0x18) / 2), y - 8.0f, 1.0f, 1.0f);
+    xBase += static_cast<float>(((8 - halfHearts) * 0x18) / 2);
+    MenuPcs.m_battleMesMenus[0]->DrawHeart(xBase, y - 8.0f, 1.0f, 1.0f);
 }
 
 /*

@@ -184,7 +184,7 @@ extern "C" float sAnimFrameOffset;                    // FLOAT_80330338
 static const float sHugeCylinderExtent = 10000000000.0f; // FLOAT_8033033c
 static const float sNegHugeCylinderExtent = -10000000000.0f; // FLOAT_80330340
 static const float sQuarterTurn = 1.5707964f;         // FLOAT_80330344
-static const double sLoopBias = 1.2;                  // DOUBLE_80330378
+extern "C" const double sLoopBias;                    // DOUBLE_80330378
 extern "C" const float sZeroFloat;                    // FLOAT_80330350
 static const float sPushDistance = 1000.0f;           // FLOAT_80330354
 extern const float sDownUnitY = -1.0f;                // FLOAT_80330358

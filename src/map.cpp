@@ -1800,7 +1800,7 @@ int CMapMng::ReadMtx(char* mapName)
             return 1;
         }
 
-        if (static_cast<int>(System.m_execParam) >= 3) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 3) {
             System.Printf(const_cast<char*>(s_mapReadMtxFmt), strTmp);
         }
 

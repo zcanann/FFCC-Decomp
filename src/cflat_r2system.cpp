@@ -4369,7 +4369,7 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
                 *flagByte &= ~mask;
             }
         } else if (systemValue <= -200) {
-            short* artifact = Game.m_gameWork.m_eventWork + systemValue + 0x1C7;
+            short* artifact = &Game.m_gameWork.m_eventWork[systemValue + 0x1C7];
             stack[-1].m_word = *artifact;
             if (setMode < 0) {
                 if (setMode >= -1) {

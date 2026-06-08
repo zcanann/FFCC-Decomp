@@ -2421,13 +2421,13 @@ void CGPartyObj::onStatAttack(int chargeType)
 
 	const unsigned short comboStart = *reinterpret_cast<unsigned short*>(attackEntry + 0x0C);
 	const unsigned short comboEnd = *reinterpret_cast<unsigned short*>(attackEntry + 0x0E);
-	if (m_stateFrame < comboStart || comboEnd < m_stateFrame) {
+	if (comboStart <= m_stateFrame && m_stateFrame <= comboEnd) {
 		if ((getPadTrigForSlot(static_cast<signed char>(m_animStateMisc)) & 0x100) != 0) {
-			party.commandFlags = (party.commandFlags & 0xBF) | 0x40;
+			party.commandFlagBits.commandActive = 1;
 		}
 	} else {
 		if ((getPadTrigForSlot(static_cast<signed char>(m_animStateMisc)) & 0x100) != 0) {
-			party.commandFlags = (party.commandFlags & 0x7F) | 0x80;
+			party.commandFlagBits.flag40 = 1;
 		}
 	}
 
@@ -2441,7 +2441,7 @@ void CGPartyObj::onStatAttack(int chargeType)
 
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	if (m_stateFrame == *reinterpret_cast<int*>(self + 0x638)) {
-		self[0x63C] = (self[0x63C] & 0x7F) | 0x80;
+		m_unk63CBits.m_bit80 = 1;
 	}
 
 	if (isLoopAnim() != 0) {

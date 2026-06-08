@@ -1911,8 +1911,9 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
  */
 void pppCalcPartStd(_pppMngSt* pppMngSt)
 {
+	s32 i = 0;
 	s32 pDataValOffset = 0;
-	for (s32 i = 0; i < pppMngSt->m_numPrograms; i++)
+	for (; i < pppMngSt->m_numPrograms; i++)
 	{
 		_pppPDataVal* pDataVal = (_pppPDataVal*)((u8*)pppMngSt->m_pppPDataVals + pDataValOffset);
 		if (pDataVal != 0 && pDataVal->m_programSetDef != 0)

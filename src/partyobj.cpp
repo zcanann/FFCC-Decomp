@@ -774,10 +774,10 @@ void CGPartyObj::menu()
 			}
 			int connected = bVar3 ? 0 : Pad.GetPadInputs()[slot & ~((~(Pad.m_debugPadPort - slot | slot - Pad.m_debugPadPort) >> 0x1F))].gbaMode;
 			if (connected == 0) {
-				if ((CFlatEventFlagsByte() & CFlatEventFlagByte_GbaSound) != 0) {
+				if ((CFlatEventFlags() & CFlatEventFlagByte_GbaSound) != 0) {
 					Sound.PlaySe(7, 0x40, 0x7F, 0);
 				}
-			} else if ((CFlatEventFlagsByte() & CFlatEventFlagByte_GbaSound) != 0) {
+			} else if ((CFlatEventFlags() & CFlatEventFlagByte_GbaSound) != 0) {
 				Sound.PlaySe(8, 0x40, 0x7F, 0);
 			}
 
@@ -827,7 +827,7 @@ void CGPartyObj::menu()
 	}
 
 	Joybus.ChgCtrlMode(reinterpret_cast<int>(portIndex));
-	if ((CFlatEventFlagsByte() & CFlatEventFlagByte_GbaSound) != 0) {
+	if ((CFlatEventFlags() & CFlatEventFlagByte_GbaSound) != 0) {
 		Sound.PlaySe(8, 0x40, 0x7F, 0);
 	}
 }
@@ -1102,12 +1102,12 @@ void CGPartyObj::onFramePostCalc()
  */
 void CGPartyObj::command()
 {
+	const char* msgBase = lbl_801DCA48;
 	if (isMenuPcsCommandBusy()) {
 		return;
 	}
 
 	PartyObjOverlay& party = PartyData(this);
-	const char* msgBase = lbl_801DCA48;
 #define caravan reinterpret_cast<CCaravanWork*>(m_scriptHandle)
 #define padSlot static_cast<char>(m_animStateMisc)
 	bool primaryAvailable = false;
@@ -1497,32 +1497,32 @@ void CGPartyObj::command()
 
 		if (kindClass == 0 || kindClass == 2) {
 			int addedItem;
-			if (itemIdx < 0x9F || itemIdx > 0xFF) {
-				caravan->AddItem(static_cast<short>(itemIdx), &addedItem);
-				System.Printf(const_cast<char*>(msgBase + 0x2E0), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504));
-			} else {
+			if (itemIdx >= 0x9F && itemIdx <= 0xFF) {
 				caravan->AddTmpArtifact(itemIdx, &addedItem);
 				System.Printf(const_cast<char*>(msgBase + 0x2C0), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504));
+			} else {
+				caravan->AddItem(static_cast<short>(itemIdx), &addedItem);
+				System.Printf(const_cast<char*>(msgBase + 0x2E0), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504));
 			}
 			if (kindClass == 0 && caravan->CanAddComList(1) != 0) {
 				int addedSlot;
 				caravan->AddComList(static_cast<short>(addedItem), &addedSlot);
 				System.Printf(const_cast<char*>(msgBase + 0x2F8), addedItem, addedSlot);
 			}
-			if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(party.target) + 0x560) != 1) {
+			if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(party.target) + 0x560) != 1) {
 				bonus(4, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504), 0);
 			}
 		} else if (itemIdx == 0x190) {
 			bonus(5, 0x190, 0);
 			System.Printf(const_cast<char*>(msgBase + 0x324), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x558));
 			caravan->AddGil(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x558));
-			if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(party.target) + 0x560) != 1) {
+			if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(party.target) + 0x560) != 1) {
 				bonus(4, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504), 0);
 			}
 		}
 	}
 
-	party.partyFlags |= 0x80;
+	party.flags.commandActive = 1;
 	CGObject* tgt = party.target;
 	CFlatRuntime::CStack stack[2];
 	stack[0].m_word = secondaryCommand;
@@ -1642,7 +1642,7 @@ void CGPartyObj::shouki()
 				healCount = 1;
 			}
 		}
-		const unsigned char periodicHeal = script[0xBDC];
+		const unsigned int periodicHeal = script[0xBDC];
 		if (periodicHeal != 0 && isFrameInterval(*reinterpret_cast<int*>(&m_flagBits), periodicHeal)) {
 			healCount += 1;
 		}
@@ -2337,6 +2337,8 @@ void CGPartyObj::statAttackSel()
  * JP Address: TODO
  * JP Size: TODO
  */
+extern "C" float dstTargetRot__8CGPrgObjFP8CGPrgObj(CGPrgObj*, CGPrgObj*);
+
 CGPrgObj* CGPartyObj::getBestAngleObject(float range, float)
 {
 	CGPrgObj* best = 0;
@@ -2377,7 +2379,7 @@ CGPrgObj* CGPartyObj::getBestAngleObject(float range, float)
 				diff.y = 0.0f;
 				float distSq = PSVECSquareMag(&diff);
 				if (0.0f < distSq && distSq < radius * radius) {
-					float absAngle = fabsf(getTargetRot(reinterpret_cast<CGPrgObj*>(obj)));
+					float absAngle = fabsf(dstTargetRot__8CGPrgObjFP8CGPrgObj(this, reinterpret_cast<CGPrgObj*>(obj)));
 					if (absAngle > bestAbsAngle) {
 						bestAbsAngle = absAngle;
 						best = reinterpret_cast<CGPrgObj*>(obj);
@@ -4077,11 +4079,13 @@ void CGPartyObj::SetBonusCondition(int useRandom, int bonus0, int bonus1, int bo
 			for (;;) {
 				bonusIndex = Math.Rand(bonusCount);
 
+				int* scan = chosenBonus;
 				int duplicateIndex = 0;
 				while (duplicateIndex < chosenCount) {
-					if (chosenBonus[duplicateIndex] == bonusIndex) {
+					if (bonusIndex == *scan) {
 						break;
 					}
+					scan++;
 					duplicateIndex++;
 				}
 
@@ -5302,9 +5306,9 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 {
 	CGCharaObj::onDrawDebug(font, x, y, z);
 
-	if ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(static_cast<unsigned char>(m_weaponNodeFlags)) << 24) & 0xC0000000) >> 31) == 0) ||
+	if ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(reinterpret_cast<unsigned char*>(this)[0x9A]) << 24) & 0xC0000000) >> 31) == 0) ||
 	    (static_cast<int>(CFlatCenterState()) != 0) ||
-	    ((MiniGamePcs.m_flags & 0x80) == 0)) {
+	    ((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&DbgMenuPcs) + 4) & 0x80) == 0)) {
 		return;
 	}
 

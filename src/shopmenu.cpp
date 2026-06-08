@@ -354,6 +354,17 @@ static bool CanTradeShopMenuItem(CShopMenu* shopMenu, int index, int itemNo)
     return false;
 }
 
+struct ShopMenuFontRenderFlags {
+    unsigned char m_top3 : 3;
+    unsigned char m_bit4 : 1;
+    unsigned char m_low4 : 4;
+};
+
+static inline void SetShopMenuFontRenderBit(CFont* font)
+{
+    reinterpret_cast<ShopMenuFontRenderFlags*>(reinterpret_cast<unsigned char*>(font) + 0x24)->m_bit4 = 1;
+}
+
 
 static void SetupShopMenuInfoFont(CFont* font)
 {
@@ -379,7 +390,7 @@ static void SetupShopMenuAmountFont(CFont* font)
     font->SetScaleY(FLOAT_80332d8c);
     font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
     font->DrawInit();
-    reinterpret_cast<unsigned char*>(font)[0x24] = (reinterpret_cast<unsigned char*>(font)[0x24] & 0xEF) | 0x10;
+    SetShopMenuFontRenderBit(font);
     font->SetMargin(FLOAT_80332d64);
 }
 
@@ -389,7 +400,7 @@ static void SetupShopMenuMakeAmountFont(CFont* font)
     font->SetScale(FLOAT_80332d28);
     font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
     font->DrawInit();
-    reinterpret_cast<unsigned char*>(font)[0x24] = (reinterpret_cast<unsigned char*>(font)[0x24] & 0xEF) | 0x10;
+    SetShopMenuFontRenderBit(font);
     font->SetMargin(FLOAT_80332e10 * FLOAT_80332d28 + FLOAT_80332d10);
 }
 
@@ -399,7 +410,7 @@ static void SetupShopMenuMakeOwnedFont(CFont* font)
     font->SetScale(FLOAT_80332d28);
     font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
     font->DrawInit();
-    reinterpret_cast<unsigned char*>(font)[0x24] = (reinterpret_cast<unsigned char*>(font)[0x24] & 0xEF) | 0x10;
+    SetShopMenuFontRenderBit(font);
     font->SetMargin(FLOAT_80332d64);
 }
 
@@ -1033,7 +1044,7 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
         font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
     }
     font->DrawInit();
-    reinterpret_cast<unsigned char*>(font)[0x24] = (reinterpret_cast<unsigned char*>(font)[0x24] & 0xEF) | 0x10;
+    SetShopMenuFontRenderBit(font);
     font->SetMargin(FLOAT_80332d34);
 
     char valueBuffer[64];
@@ -1194,7 +1205,7 @@ void CShopMenu::DrawItemInfo0()
         font->SetScale(FLOAT_80332d28);
         font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
         font->DrawInit();
-        reinterpret_cast<unsigned char*>(font)[0x24] = (reinterpret_cast<unsigned char*>(font)[0x24] & 0xEF) | 0x10;
+        SetShopMenuFontRenderBit(font);
         font->SetMargin(FLOAT_80332d34);
         char countBuffer[64];
         sprintf(countBuffer, s_TwoDigitFormat_80332d18, amount);

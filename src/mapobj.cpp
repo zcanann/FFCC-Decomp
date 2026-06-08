@@ -847,12 +847,12 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             chunkFile.PushChunk();
             CChunkFile::CChunk mimeChunk;
             while (chunkFile.GetNextChunk(mimeChunk) != 0) {
-                if (mimeChunk.m_id == CHUNK_KEY) {
-                    mime->m_keyFrame.ReadKey(chunkFile, mimeChunk.m_arg0);
-                } else if (mimeChunk.m_id == CHUNK_JUN) {
+                if (mimeChunk.m_id == CHUNK_JUN) {
                     mime->m_keyFrame.ReadJun(chunkFile, static_cast<char>(mimeChunk.m_arg0));
                 } else if (mimeChunk.m_id == CHUNK_FRAM) {
                     mime->m_keyFrame.ReadFrame(chunkFile, mimeChunk.m_arg0);
+                } else if (mimeChunk.m_id == CHUNK_KEY) {
+                    mime->m_keyFrame.ReadKey(chunkFile, mimeChunk.m_arg0);
                 } else if (mimeChunk.m_id == CHUNK_VTXL) {
                     mime->m_vertexListCount = static_cast<unsigned char>(mimeChunk.m_arg0);
                     mime->m_vertexLists = reinterpret_cast<float**>(
@@ -871,7 +871,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                             vtxTableIndex++;
                             mime->m_vertexCount = static_cast<int>(vtxChunk.m_arg0);
 
-                            for (unsigned int i = 0; i < vtxChunk.m_arg0; i++) {
+                            for (int i = 0; i < mime->m_vertexCount; i++) {
                                 vtx[0] = chunkFile.GetF4();
                                 vtx[1] = chunkFile.GetF4();
                                 vtx[2] = chunkFile.GetF4();

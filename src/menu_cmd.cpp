@@ -701,7 +701,7 @@ int CMenuPcs::CmdCtrl()
 
 	GetCmdStateView(this)->prevMode = GetCmdStateView(this)->mode;
 
-	s16 mode = GetCmdStateView(this)->mode;
+	s32 mode = GetCmdStateView(this)->mode;
 
 	if ((mode == 0) || (GetCmdStateView(this)->phase == 1)) {
 		actionHandled = CmdCtrlCur();

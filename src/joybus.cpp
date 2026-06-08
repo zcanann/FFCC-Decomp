@@ -7423,13 +7423,18 @@ bool JoyBus::IsLetterMenu(int portIndex)
 int JoyBus::SendAddLetter(int portIndex)
 {
     int port;
-    int result = 0;
+    int result;
     unsigned int cmd = 0;
     unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
     cmdBytes[0] = 0x14;
     cmdBytes[1] = 1;
+    unsigned int cmdWord = cmd;
 
-    if (static_cast<signed char>(m_threadRunningMask) != 0)
+    if (static_cast<signed char>(m_threadRunningMask) == 0)
+    {
+        result = 0;
+    }
+    else
     {
         OSWaitSemaphore(m_accessSemaphores + m_threadParams[portIndex].m_portIndex);
 
@@ -7441,7 +7446,7 @@ int JoyBus::SendAddLetter(int portIndex)
         }
         else
         {
-            m_cmdQueueData[port][ m_cmdCount[port] ] = cmd;
+            m_cmdQueueData[port][ m_cmdCount[port] ] = cmdWord;
             port = m_threadParams[portIndex].m_portIndex;
             m_cmdCount[port]++;
 

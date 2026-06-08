@@ -2667,7 +2667,7 @@ unsigned int CMenuPcs::CmdClose1()
 	u32 done = 0;
 
 	if (state == 0) {
-		const s16 selected = GetCmdStateView(this)->selected;
+		const s32 selected = GetCmdStateView(this)->selected;
 		GetCmdListStorage(this)->entries[selected].alpha =
 			static_cast<float>(kCmdMenuTransitionStepD * static_cast<f64>(GetCmdStateView(this)->transitionTimer));
 

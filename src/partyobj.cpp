@@ -423,8 +423,9 @@ void CGPartyObj::onChangeStat(int state)
 		*reinterpret_cast<int*>(self + 0x554) = 0x10;
 		*reinterpret_cast<int*>(self + 0x558) = 0x11;
 		int castTime;
-		castTime = 0;
-		if (*reinterpret_cast<int*>(self + 0x560) != 0x103) {
+		if (*reinterpret_cast<int*>(self + 0x560) == 0x103) {
+			castTime = 0;
+		} else {
 			castTime = calcCastTime(*reinterpret_cast<int*>(self + 0x560));
 		}
 		*reinterpret_cast<int*>(self + 0x68C) = castTime;
@@ -4696,22 +4697,20 @@ void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 		flatLen = outDist;
 	}
 	outDist = flatLen;
-	if (outDist <= DOUBLE_80331AA8) {
-		return;
-	}
+	if (outDist > DOUBLE_80331AA8) {
+		activeTrailCount = 0;
+		outVec->x = m_partyDelta[0].x;
+		outVec->y = m_partyDelta[0].y;
+		outVec->z = m_partyDelta[0].z;
+		outVec->y = FLOAT_80331a78;
 
-	activeTrailCount = 0;
-	outVec->x = m_partyDelta[0].x;
-	outVec->y = m_partyDelta[0].y;
-	outVec->z = m_partyDelta[0].z;
-	outVec->y = FLOAT_80331a78;
-
-	outDist = PSVECMag(outVec);
-	float maxDist = m_partyDistance[0];
-	if (outDist < maxDist) {
-		maxDist = outDist;
+		outDist = PSVECMag(outVec);
+		float maxDist = m_partyDistance[0];
+		if (outDist < maxDist) {
+			maxDist = outDist;
+		}
+		outDist = maxDist;
 	}
-	outDist = maxDist;
 }
 
 /*
@@ -5080,38 +5079,10 @@ void CGPartyObj::gpmMove()
 	float nearDist = m_nearColRadius + leader->m_nearColRadius;
 	float clampedDist = (*reinterpret_cast<float*>(self + 0x5BC) < dist) ? *reinterpret_cast<float*>(self + 0x5BC) : dist;
 
-	if (m_lastStateId == 0 && (static_cast<signed char>(m_shieldAttachNodeIndex) < 0)) {
+	if (m_lastStateId == 0 &&
+	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x63C]) << 24) & 0xC0000000) >> 31) != 0)) {
 		int moveKind;
-		if (static_cast<signed char>(PartyData(this).partyFlags) >= 0) {
-			moveKind = 0;
-			if (chalice != nullptr &&
-			    PartyData(this).carryObject == nullptr &&
-			    (static_cast<signed char>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(chalice) + 0x9A)) < 0) &&
-			    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(chalice) + 0x550) == 0) {
-				float pickupRadius = (leader->m_bodyEllipsoidRadius + *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(chalice) + 0x144)) * 1.25f;
-				if (dist < pickupRadius) {
-					CancelMove(1);
-					rotTarget(reinterpret_cast<CGPrgObj*>(chalice));
-					sGhostPartyWork.carrySpeed = 0.0f;
-					carry(0, chalice, 0);
-					return;
-				}
-				moveKind = 1;
-			}
-
-			if (moveKind == 0) {
-				float limit = (sGhostPartyWork.activeTrailCount != 0) ? 0.75f : FLOAT_80331A58;
-				if (pathDist < Game.unkFloat_0xca10 * limit) {
-					return;
-				}
-			}
-			if (moveKind == 1 && chalice != nullptr) {
-				float keepDist = (leader->m_bodyEllipsoidRadius + *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(chalice) + 0x144)) * 0.5f;
-				if (clampedDist < keepDist) {
-					return;
-				}
-			}
-		} else {
+		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(sGhostPartyWork.flags) << 24) & 0xC0000000) >> 31) != 0) {
 			moveKind = 0;
 			if (PartyData(this).carryObject != nullptr) {
 				sGhostPartyWork.carrySpeed = 0.0f;
@@ -5119,7 +5090,7 @@ void CGPartyObj::gpmMove()
 				return;
 			}
 
-			float limit = (sGhostPartyWork.activeTrailCount != 0) ? FLOAT_80331A7C : 0.8f;
+			float limit = (sGhostPartyWork.activeTrailCount != 0) ? FLOAT_80331A7C : FLOAT_80331A80;
 			if (Game.unkFloat_0xca10 * limit > pathDist) {
 				if ((leader->m_lastStateId != 2 && leader->m_lastStateId != 6) ||
 				    leader->m_subState != 1 ||
@@ -5150,39 +5121,78 @@ void CGPartyObj::gpmMove()
 
 				int pick = Math.Rand(choices);
 				int cursor = 0;
-				if (sGhostPartyWork.thresholdA >= threshold0) {
-					if (cursor == pick) {
-						sGhostPartyWork.slotSel = 0;
+				int newSlotSel;
+				if (sGhostPartyWork.thresholdA >= threshold0 && cursor == pick) {
+					newSlotSel = 0;
+				} else {
+					if (sGhostPartyWork.thresholdA >= threshold0) {
+						cursor++;
 					}
-					cursor++;
-				}
-				if (cursor <= pick && sGhostPartyWork.thresholdB >= threshold1) {
-					if (cursor == pick) {
-						sGhostPartyWork.slotSel = 1;
+					if (sGhostPartyWork.thresholdB >= threshold1 && cursor == pick) {
+						newSlotSel = 1;
+					} else {
+						if (sGhostPartyWork.thresholdB >= threshold1) {
+							cursor++;
+						}
+						if (sGhostPartyWork.thresholdC >= threshold2 && cursor == pick) {
+							newSlotSel = 2;
+						} else {
+							newSlotSel = 0;
+						}
 					}
-					cursor++;
 				}
-				if (cursor <= pick && sGhostPartyWork.thresholdC >= threshold2) {
-					sGhostPartyWork.slotSel = 2;
-				}
+				sGhostPartyWork.slotSel = newSlotSel;
 
-				if (sGhostPartyWork.slotSel == 1) {
-					*reinterpret_cast<int*>(self + 0x550) = 0x20F;
-				} else if (sGhostPartyWork.slotSel == 0) {
-					*reinterpret_cast<int*>(self + 0x550) = 0x207;
-				} else if ((unsigned int)sGhostPartyWork.slotSel < 3) {
-					*reinterpret_cast<int*>(self + 0x550) = 0x20B;
+				switch (sGhostPartyWork.slotSel) {
+				case 1:
+					*reinterpret_cast<int*>(self + 0x560) = 0x20F;
+					break;
+				case 0:
+					*reinterpret_cast<int*>(self + 0x560) = 0x207;
+					break;
+				case 2:
+					*reinterpret_cast<int*>(self + 0x560) = 0x20B;
+					break;
 				}
 				changeStat(2, 0, 0);
 				sGhostPartyWork.gauge = 0;
 				PartyData(this).partyFlags &= 0x9F;
 				return;
 			}
+		} else {
+			moveKind = 0;
+			if (chalice != nullptr &&
+			    PartyData(this).carryObject == nullptr &&
+			    (static_cast<signed char>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(chalice) + 0x9A)) < 0) &&
+			    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(chalice) + 0x550) == 0) {
+				float pickupRadius = (leader->m_bodyEllipsoidRadius + *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(chalice) + 0x144)) * FLOAT_80331A84;
+				if (dist < pickupRadius) {
+					CancelMove(1);
+					rotTarget(reinterpret_cast<CGPrgObj*>(chalice));
+					sGhostPartyWork.carrySpeed = 0.0f;
+					carry(0, chalice, 0);
+					return;
+				}
+				moveKind = 1;
+			}
+
+			if (moveKind == 0) {
+				float limit = (sGhostPartyWork.activeTrailCount != 0) ? FLOAT_80331A7C : FLOAT_80331A58;
+				if (pathDist < Game.unkFloat_0xca10 * limit) {
+					return;
+				}
+			}
+			if (moveKind == 1 && chalice != nullptr) {
+				float keepDist = (leader->m_bodyEllipsoidRadius + *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(chalice) + 0x144)) * FLOAT_80331A58;
+				if (clampedDist < keepDist) {
+					return;
+				}
+			}
 		}
 
-		if (PartyData(this).unk6BC != moveKind) {
-			PartyData(this).unk6C0 = 0;
-			PartyData(this).unk6BC = moveKind;
+		if (sGhostPartyWork.field04 != moveKind) {
+			sGhostPartyWork.field04 = moveKind;
+			sGhostPartyWork.field08 = 0;
 		}
 
 		CVector moveDir;
@@ -5199,15 +5209,19 @@ void CGPartyObj::gpmMove()
 		}
 
 		float nextSpeed = sGhostPartyWork.carrySpeed + FLOAT_80331A70;
-		float speedScale = (pressureLimit <= sGhostPartyWork.pressure) ? 1.0f : 0.9f;
-		float speedLimit = speedScale * m_moveBaseSpeed * *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(Game.m_partyObjArr[0]) + 0x690);
-		sGhostPartyWork.carrySpeed = (nextSpeed >= 0.0f && speedLimit < nextSpeed) ? speedLimit : nextSpeed;
+		float speedScale = (pressureLimit <= sGhostPartyWork.pressure) ? kMonObjOne : FLOAT_80331A88;
+		if (nextSpeed < 0.0f) {
+			sGhostPartyWork.carrySpeed = nextSpeed;
+		} else {
+			float speedLimit = speedScale * m_moveBaseSpeed * *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(Game.m_partyObjArr[0]) + 0x690);
+			sGhostPartyWork.carrySpeed = (speedLimit < nextSpeed) ? speedLimit : nextSpeed;
+		}
 
 		sGhostPartyWork.carryDir = *reinterpret_cast<Vec*>(&moveDir);
-		if (PartyData(this).unk6C0 + 1 != 4) {
-			PartyData(this).unk6C0++;
+		if (sGhostPartyWork.field08 + 1 != 4) {
+			sGhostPartyWork.field08++;
 		} else {
-			PartyData(this).unk6C0 = 0;
+			sGhostPartyWork.field08 = 0;
 		}
 		return;
 	}
@@ -5215,7 +5229,7 @@ void CGPartyObj::gpmMove()
 	if (m_lastStateId != 2) {
 		return;
 	}
-	if (static_cast<signed char>(PartyData(this).partyFlags) >= 0) {
+	if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(sGhostPartyWork.flags) << 24) & 0xC0000000) >> 31) == 0) {
 		changeStat(0, 0, 0);
 		return;
 	}
@@ -5227,10 +5241,10 @@ void CGPartyObj::gpmMove()
 		if (*reinterpret_cast<int*>(self + 0x668) == 0) {
 			return;
 		}
-		if ((PartyData(leader).partyFlags & 0x40) != 0) {
+		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(PartyData(leader).partyFlags) << 26) & 0xC0000000) >> 31) != 0) {
 			sGhostPartyWork.gauge = 0;
 		}
-		if ((PartyData(this).partyFlags & 0x80) == 0) {
+		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(PartyData(this).partyFlags) << 25) & 0xC0000000) >> 31) == 0) {
 			return;
 		}
 
@@ -5239,10 +5253,10 @@ void CGPartyObj::gpmMove()
 		if (sGhostPartyWork.gauge < 0x10) {
 			return;
 		}
-		if ((PartyData(this).partyFlags & 0x40) != 0) {
+		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(PartyData(this).partyFlags) << 25) & 0xC0000000) >> 31) != 0) {
 			return;
 		}
-	} else if ((PartyData(this).partyFlags & 0x40) == 0) {
+	} else if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(sGhostPartyWork.flags) << 26) & 0xC0000000) >> 31) == 0) {
 		changeStat(0, 0, 0);
 		return;
 	}

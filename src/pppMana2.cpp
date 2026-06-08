@@ -1520,12 +1520,12 @@ void pppConstructMana2(pppMana2* pppMana2, _pppCtrlTable* param_2)
  */
 void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int partIndex, int dlIndex, float (*mtx)[4])
 {
+    CChara::CMesh::CRefData* meshData = model->m_meshes[partIndex].m_data;
+    CChara::CMesh::CDisplayList* displayList = &meshData->m_displayLists[dlIndex];
     VMana2* mana2 = (VMana2*)work;
     pppMana2Step* stepData = static_cast<pppMana2Step*>(step);
     int type = stepData->m_type;
-    CChara::CMesh::CRefData* meshData = model->m_meshes[partIndex].m_data;
     const char* shape = meshData->m_name;
-    CChara::CMesh::CDisplayList* displayList = &meshData->m_displayLists[dlIndex];
     bool draw = false;
 
     switch (type) {

@@ -1812,8 +1812,8 @@ unsigned int CMenuPcs::CmdOpen0()
 						static_cast<double>(entry->timer));
 					const float dx = entry->targetX - static_cast<float>(entry->x);
 					const float dy = entry->targetY - static_cast<float>(entry->y);
-					entry->dx = t * dx;
-					entry->dy = t * dy;
+					entry->dx = dx * t;
+					entry->dy = dy * t;
 				}
 			}
 		}
@@ -1871,8 +1871,8 @@ unsigned int CMenuPcs::CmdClose0()
 					           static_cast<f64>(entry->timer)));
 					const f32 dx = entry->targetX - static_cast<f32>(entry->x);
 					const f32 dy = entry->targetY - static_cast<f32>(entry->y);
-					entry->dx = t * dx;
-					entry->dy = t * dy;
+					entry->dx = dx * t;
+					entry->dy = dy * t;
 				}
 			}
 		}

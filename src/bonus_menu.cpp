@@ -3263,6 +3263,8 @@ void CMenuPcs::destroyBonus()
 	freeTexture(2, 1, 0x16, 0x12);
 }
 
+#pragma push
+#pragma optimization_level 3
 /*
  * --INFO--
  * PAL Address: 0x8013d59c
@@ -3559,6 +3561,7 @@ void CMenuPcs::createBonus()
 	this->m_bonusAlpha = 0;
 	this->m_bonusCursorFlag = 0;
 }
+#pragma pop
 
 /*
  * --INFO--

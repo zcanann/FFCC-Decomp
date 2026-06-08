@@ -8020,16 +8020,16 @@ int JoyBus::SetOpenMenu(int playerIndex, char menuId)
 {
     int result;
 
-    if (playerIndex == 0 && GbaQue.IsSingleMode(0) && menuId != 0)
+    if (playerIndex == 0 && GbaQue.IsSingleMode(playerIndex) && menuId != 0)
     {
         Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 1;
-        MenuPcs.m_singleMenuMode = menuId - 1;
         result = 0;
-        m_ctrlModeArr[0] = 1;
+        MenuPcs.m_singleMenuMode = menuId - 1;
+        m_ctrlModeArr[playerIndex] = 1;
     }
-    else if (playerIndex == 1 && GbaQue.IsSingleMode(1) && menuId == 0)
+    else if (playerIndex == 1 && GbaQue.IsSingleMode(playerIndex) && menuId == 0)
     {
-        bool isSingle = GbaQue.IsSingleMode(m_threadParams[1].m_portIndex);
+        bool isSingle = GbaQue.IsSingleMode(m_threadParams[playerIndex].m_portIndex);
 
         if (!isSingle)
         {
@@ -8046,8 +8046,8 @@ int JoyBus::SetOpenMenu(int playerIndex, char menuId)
             }
             else
             {
-                OSWaitSemaphore(&m_accessSemaphores[m_threadParams[1].m_portIndex]);
-                unsigned int queuePort = m_threadParams[1].m_portIndex;
+                OSWaitSemaphore(&m_accessSemaphores[m_threadParams[playerIndex].m_portIndex]);
+                unsigned int queuePort = m_threadParams[playerIndex].m_portIndex;
                 if (static_cast<int>(m_cmdCount[queuePort]) >= 0x40)
                 {
                     OSSignalSemaphore(&m_accessSemaphores[queuePort]);
@@ -8056,8 +8056,8 @@ int JoyBus::SetOpenMenu(int playerIndex, char menuId)
                 else
                 {
                     m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmdCache;
-                    m_cmdCount[m_threadParams[1].m_portIndex]++;
-                    OSSignalSemaphore(&m_accessSemaphores[m_threadParams[1].m_portIndex]);
+                    m_cmdCount[m_threadParams[playerIndex].m_portIndex]++;
+                    OSSignalSemaphore(&m_accessSemaphores[m_threadParams[playerIndex].m_portIndex]);
                     result = 0;
                 }
             }

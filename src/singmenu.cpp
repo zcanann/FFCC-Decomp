@@ -2050,10 +2050,9 @@ void CMenuPcs::SingleCalcCtrl()
     m_wm.m_handles[0]->m_model->CalcMatrix();
     m_wm.m_handles[0]->m_model->CalcSkin();
 
-    s16 mode = m_singleMenuMode;
-    s16 proc = state->stepState;
-    switch (mode) {
-    case 0:
+    switch (m_singleMenuMode) {
+    case 0: {
+        s16 proc = m_singMenuState->stepState;
         if (proc == 0) {
             CmdOpen();
         } else if (proc == 1) {
@@ -2062,8 +2061,16 @@ void CMenuPcs::SingleCalcCtrl()
             result = CmdClose();
         }
         break;
-    case 1:
-        result = (proc == 0) ? ItemOpen() : ((proc == 1) ? ItemCtrl() : ItemClose());
+    }
+    case 1: {
+        s16 proc = m_singMenuState->stepState;
+        if (proc == 0) {
+            result = ItemOpen();
+        } else if (proc == 1) {
+            result = ItemCtrl();
+        } else {
+            result = ItemClose();
+        }
         if (m_singleLifeTimer >= 0) {
             ++m_singleLifeTimer;
             if (m_singleLifeTimer > 0x31) {
@@ -2071,7 +2078,9 @@ void CMenuPcs::SingleCalcCtrl()
             }
         }
         break;
-    case 2:
+    }
+    case 2: {
+        s16 proc = m_singMenuState->stepState;
         if (proc == 0) {
             result = EquipOpen();
         } else if (proc == 1) {
@@ -2080,10 +2089,20 @@ void CMenuPcs::SingleCalcCtrl()
             result = EquipClose();
         }
         break;
-    case 3:
-        result = (proc == 0) ? ArtiOpen() : ((proc == 1) ? ArtiCtrl() : ArtiClose());
+    }
+    case 3: {
+        s16 proc = m_singMenuState->stepState;
+        if (proc == 0) {
+            result = ArtiOpen();
+        } else if (proc == 1) {
+            result = ArtiCtrl();
+        } else {
+            result = ArtiClose();
+        }
         break;
-    case 4:
+    }
+    case 4: {
+        s16 proc = m_singMenuState->stepState;
         if (proc == 0) {
             result = TmpArtiOpen();
         } else if (proc == 1) {
@@ -2092,13 +2111,31 @@ void CMenuPcs::SingleCalcCtrl()
             result = TmpArtiClose();
         }
         break;
-    case 5:
-        result = (proc == 0) ? MoneyOpen() : ((proc == 1) ? MoneyCtrl() : MoneyClose());
+    }
+    case 5: {
+        s16 proc = m_singMenuState->stepState;
+        if (proc == 0) {
+            result = MoneyOpen();
+        } else if (proc == 1) {
+            result = MoneyCtrl();
+        } else {
+            result = MoneyClose();
+        }
         break;
-    case 6:
-        result = (proc == 0) ? FavoOpen() : ((proc == 1) ? FavoCtrl() : FavoClose());
+    }
+    case 6: {
+        s16 proc = m_singMenuState->stepState;
+        if (proc == 0) {
+            result = FavoOpen();
+        } else if (proc == 1) {
+            result = FavoCtrl();
+        } else {
+            result = FavoClose();
+        }
         break;
-    case 7:
+    }
+    case 7: {
+        s16 proc = m_singMenuState->stepState;
         if (proc == 0) {
             result = CompaOpen();
         } else if (proc == 1) {
@@ -2107,16 +2144,33 @@ void CMenuPcs::SingleCalcCtrl()
             result = CompaClose();
         }
         break;
-    case 8:
-        result = (proc == 0) ? LetterOpen() : ((proc == 1) ? LetterCtrl() : LetterClose());
-        break;
-    case 9:
-        result = (proc == 0) ? MLstOpen() : ((proc == 1) ? MLstCtrl() : MLstClose());
+    }
+    case 8: {
+        s16 proc = m_singMenuState->stepState;
+        if (proc == 0) {
+            result = LetterOpen();
+        } else if (proc == 1) {
+            result = LetterCtrl();
+        } else {
+            result = LetterClose();
+        }
         break;
     }
+    case 9: {
+        s16 proc = m_singMenuState->stepState;
+        if (proc == 0) {
+            result = MLstOpen();
+        } else if (proc == 1) {
+            result = MLstCtrl();
+        } else {
+            result = MLstClose();
+        }
+        break;
+    }
+    }
 
-    reinterpret_cast<CMesMenu*>(*reinterpret_cast<void**>(self + 0x268))->CalcHeart();
-    state->result = result;
+    reinterpret_cast<CMesMenu*>(*reinterpret_cast<void**>(reinterpret_cast<u8*>(&MenuPcs) + 0x268))->CalcHeart();
+    m_singMenuState->result = result;
 
     bool hasInput = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
     unsigned short press;

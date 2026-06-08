@@ -9916,7 +9916,7 @@ void CMenuPcs::SetCMakeEnd(int channel)
 	m_wm.m_charaSelectData[channel * 0x10 + 0xC] = 1;
 	if ((unsigned int)system->m_execParam >= 3) {
 		system->Printf(const_cast<char*>(s_SetCMakeEnd_chan_pctd_cur_pctd_801DC3B4), channel,
-		               (int)*reinterpret_cast<short*>(m_wm.m_charaSelectData + channel * 0x10 + 4));
+		               (int)*reinterpret_cast<short*>(&m_wm.m_charaSelectData[channel * 0x10 + 4]));
 	}
 }
 

@@ -2497,7 +2497,7 @@ void CFlatRuntime2::resetChangeScript()
 	m_workAssignIndex = 0;
 	m_partyAssignIndex = 0;
 	m_cameraScriptTargetMode = 0;
-	m_gameFlags = (m_gameFlags & 0x7F) | 0x80;
+	m_gameFlagBits.m_flagBit7 = 1;
 	m_gameFlagBits.m_flagBit5 = 0;
 	m_gameFlagBits.m_flagBit4 = 0;
 	m_bossState = 0;

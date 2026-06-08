@@ -4859,7 +4859,6 @@ unsigned int GbaQueue::GetControllerMode()
  */
 void GbaQueue::OpenMenu(int channel, int menuId, int controlMode)
 {
-	GbaQueue* queue = &GbaQue;
 	int i;
 	int retries;
 	unsigned int isSingleMode;
@@ -4904,9 +4903,9 @@ void GbaQueue::OpenMenu(int channel, int menuId, int controlMode)
 		retries++;
 	} while (retries < 10);
 
-	OSSemaphore* semaphore = queue->accessSemaphores + channel;
+	OSSemaphore* semaphore = accessSemaphores + channel;
 	OSWaitSemaphore(semaphore);
-	char menuStageMode = queue->m_singleMode;
+	char menuStageMode = m_singleMode;
 	isSingleMode =
 		(static_cast<unsigned int>(__cntlzw(1 - static_cast<int>(menuStageMode))) >>
 		 5) &
@@ -4925,7 +4924,7 @@ void GbaQueue::OpenMenu(int channel, int menuId, int controlMode)
 	}
 
 	OSWaitSemaphore(semaphore);
-	menuStageMode = queue->m_singleMode;
+	menuStageMode = m_singleMode;
 	isSingleMode =
 		(static_cast<unsigned int>(__cntlzw(1 - static_cast<int>(menuStageMode))) >>
 		 5) &

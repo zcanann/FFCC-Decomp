@@ -1020,7 +1020,7 @@ void CGItemObj::onFrameStat()
 		PartMng.pppSetLocSlot(m_particleSlot, &prgObj->m_worldPosition);
 
 		if (m_subState != 1) {
-			if (m_subState < 1 && -1 < m_subState && m_subFrame == 0) {
+			if (m_subState < 1 && 0 <= m_subState && m_subFrame == 0) {
 			int particleNoA;
 			int particleNoB;
 

@@ -10923,7 +10923,7 @@ LAB_draw:
 			}
 			slotIdx++;
 			iVar16 += 3;
-		} while ((int)slotIdx < 4);
+		} while ((unsigned int)slotIdx < 4);
 	}
 
 	float frameAlpha;
@@ -10949,7 +10949,7 @@ LAB_draw:
 	GXSetChanMatColor(static_cast<GXChannelID>(4), frameColor);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 	unsigned char* const frame = m_wm.m_frameInfo;
-	for (int i = 0, offset = 0; i < 2; i++, offset += 0x1C) {
+	for (unsigned int i = 0, offset = 0; i < 2; i++, offset += 0x1C) {
 		if (((1 << i) & 2) != 0) {
 			unsigned char* const frameEntry = frame + offset + 4;
 			MenuPcs.DrawRect(0xFFFFFFFF, static_cast<float>(*reinterpret_cast<short*>(frameEntry)),
@@ -11263,7 +11263,7 @@ LAB_draw:
 				fontF8->DrawInit();
 				fontF8->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 				fontF8->SetTlut(0x19);
-				const unsigned int msgId = static_cast<unsigned int>(
+				const unsigned int msgId = static_cast<int>(
 					__cntlzw(static_cast<unsigned int>(static_cast<int>(*reinterpret_cast<char*>(slotData + 0x42))))) >> 5;
 				char* text = const_cast<char*>(GetMcStr(msgId));
 				const int width = static_cast<int>(fontF8->GetWidth(text));

@@ -441,9 +441,8 @@ void CChara::TimeMogFur()
 		}
 	}
 
-	MogFurState& fur = MogFur();
-	unsigned short* const texels = fur.m_texels;
-	memset(fur.m_score, 0, 0x40);
+	unsigned short* const texels = MogFur().m_texels;
+	memset(MogFur().m_score, 0, 0x40);
 
 	for (int y = 0; y < 0x40; y++) {
 		for (int x = 0; x < 0x40; x++) {
@@ -1430,10 +1429,8 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 0x0C);
 	LightPcs.EnableLight(1, 1);
 	GXSetZMode((u8)1, (GXCompare)3, (u8)0);
-	const int furShade = static_cast<int>(kCharaFurShadeScale * ModelFurCur(this));
-	const GXColor furColor = CColor(static_cast<unsigned char>(furShade), static_cast<unsigned char>(furShade),
-	                                static_cast<unsigned char>(furShade), 0xFF)
-	                             .color;
+	const unsigned char furShade = static_cast<unsigned char>(kCharaFurShadeScale * ModelFurCur(this));
+	const GXColor furColor = CColor(furShade, furShade, furShade, 0xFF).color;
 	GXSetChanMatColor(GX_COLOR0A0, furColor);
 	LightPcs.SetAmbientAlpha(ModelLightAlpha(this));
 	GXSetNumIndStages(0);
@@ -1888,10 +1885,8 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 
 			if (mode != 0) {
 				int reduce = (targetColor.a * (4 - distance)) / 4;
-				a -= reduce;
-				if (a < 0) {
-					a = 0;
-				}
+				a = a - reduce;
+				a = a < 0 ? 0 : a;
 			} else {
 				float k = (float)(7 - targetColor.a) / kCharaFurAlphaComponentScale + (float)(distance / 4);
 				if (k > 1.0f) {

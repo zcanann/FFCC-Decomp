@@ -1760,8 +1760,8 @@ void CalcReflectionVector2(
             uv.y *= half;
             uv.x += half;
             uv.y += half;
-            uv.x = -(scale * (warp * (uv.x - half)) - uv.x);
-            uv.y = -(scale * (warp * (uv.y - half)) - uv.y);
+            uv.x = uv.x - scale * (warp * (uv.x - half));
+            uv.y = uv.y - scale * (warp * (uv.y - half));
             gUtil.ConvF2IVector2d(texCoordA[posIndex], uv, 12);
 
             denom = denomBias - reflectionVec[posIndex].z;

@@ -111,7 +111,7 @@ static inline CFlatRuntime::CObject* FlatObjectRoot(CFlatRuntime2* runtime)
 	return &runtime->m_objectSentinel;
 }
 
-static inline CGBaseObj* FindNextGBaseObjByCidMask(CFlatRuntime2* runtime, CFlatRuntime::CObject* object, unsigned int cidMask)
+static inline CGBaseObj* FindNextGBaseObjByCidMask(CFlatRuntime2* runtime, CFlatRuntime::CObject* object, int cidMask)
 {
 	CFlatRuntime::CObject* const root = FlatObjectRoot(runtime);
 
@@ -1464,8 +1464,7 @@ void CFlatRuntime2::Draw()
 
 	u8* runtime = reinterpret_cast<u8*>(this);
 	if ((RuntimeDebugFlags(runtime) & CFlatRuntimeDebugFlag_ParticleLines) != 0) {
-		GXColor lineColor = {0xFF, 0x80, 0x80, 0xFF};
-		GXSetChanMatColor(GX_COLOR0A0, lineColor);
+		GXSetChanMatColor(GX_COLOR0A0, CColor(0xFF, 0x80, 0x80, 0xFF).color);
 		GXLoadPosMtxImm(cameraMtx, GX_PNMTX0);
 
 		CLine<64>* line = m_debugLines;

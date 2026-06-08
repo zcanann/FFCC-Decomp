@@ -2123,10 +2123,9 @@ void pppSetFog(unsigned char, unsigned char, unsigned char, unsigned char, float
 void CPartMng::pppEditBeforeCalc()
 {
     char* self = reinterpret_cast<char*>(this);
-    int* lastEnvCmd = reinterpret_cast<int*>(self + 0x23560);
     CGObject** editorObj = reinterpret_cast<CGObject**>(self + 0x80c);
 
-    switch (*lastEnvCmd) {
+    switch (*reinterpret_cast<int*>(self + 0x23560)) {
     case 1: {
         // Camera matrix handed over from editor uses opposite handedness on these axes.
         *reinterpret_cast<float*>(self + 0x60) = -*reinterpret_cast<float*>(self + 0x60);
@@ -2153,8 +2152,8 @@ void CPartMng::pppEditBeforeCalc()
 
         float fogFar = *reinterpret_cast<float*>(self + 0x164);
         float fogNear = *reinterpret_cast<float*>(self + 0x160);
+        _GXColor fogColor;
         if (*reinterpret_cast<unsigned char*>(self + 0x15c) != 0) {
-            _GXColor fogColor;
             fogColor.r = *reinterpret_cast<unsigned char*>(self + 0x15d);
             fogColor.g = *reinterpret_cast<unsigned char*>(self + 0x15e);
             fogColor.b = *reinterpret_cast<unsigned char*>(self + 0x15f);
@@ -2162,7 +2161,6 @@ void CPartMng::pppEditBeforeCalc()
             Graphic.SetFogColor(fogColor);
             Graphic.SetFogParam(fogNear, fogFar);
         } else {
-            _GXColor fogColor;
             fogColor.r = 0;
             fogColor.g = 0;
             fogColor.b = 0;
@@ -2199,8 +2197,8 @@ void CPartMng::pppEditBeforeCalc()
 
         float fogFar = *reinterpret_cast<float*>(self + 0x164);
         float fogNear = *reinterpret_cast<float*>(self + 0x160);
+        _GXColor fogColor;
         if (*reinterpret_cast<unsigned char*>(self + 0x15c) != 0) {
-            _GXColor fogColor;
             fogColor.r = *reinterpret_cast<unsigned char*>(self + 0x15d);
             fogColor.g = *reinterpret_cast<unsigned char*>(self + 0x15e);
             fogColor.b = *reinterpret_cast<unsigned char*>(self + 0x15f);
@@ -2208,7 +2206,6 @@ void CPartMng::pppEditBeforeCalc()
             Graphic.SetFogColor(fogColor);
             Graphic.SetFogParam(fogNear, fogFar);
         } else {
-            _GXColor fogColor;
             fogColor.r = 0;
             fogColor.g = 0;
             fogColor.b = 0;
@@ -2299,7 +2296,7 @@ void CPartMng::pppEditBeforeCalc()
         break;
     }
 
-    *lastEnvCmd = 0;
+    *reinterpret_cast<int*>(self + 0x23560) = 0;
 }
 
 /*
@@ -2457,8 +2454,7 @@ void CPartMng::pppEditDrawShadow()
     }
 
     char* self = reinterpret_cast<char*>(this);
-    PppPdtSlot* pdtSlots = m_pdtSlots;
-    if (pdtSlots[0].m_pppDataHead != 0 && *reinterpret_cast<int*>(self + 0x174) <= 3) {
+    if (*reinterpret_cast<long**>(self + 0x5dc) != 0 && *reinterpret_cast<int*>(self + 0x174) <= 3) {
         Mtx invCamera;
         Vec cameraPos;
         Vec partPos;
@@ -3028,7 +3024,7 @@ void CPartMng::pppDrawPrioPdtFpno(unsigned char drawMode, short kind, short node
         unsigned char m_ownerFacing;         // 0xEA
         unsigned char m_drawVariant;         // 0xEB
         unsigned char m_rotationOrder;       // 0xEC
-        unsigned char m_drawMode;            // 0xED
+        signed char m_drawMode;            // 0xED
         signed char m_drawSubType;           // 0xEE
         unsigned char m_useOwnerScaleSign;   // 0xEF
         unsigned char m_ownerVisible;        // 0xF0

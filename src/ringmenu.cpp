@@ -603,22 +603,22 @@ void CRingMenu::onDraw()
 				font->SetShadow(1);
 				font->SetTlut(4);
 
-				double scroll = static_cast<double>(m_spinAccumulator);
-				while (scroll >= static_cast<double>(kRingMenuOne)) {
+				float scroll = m_spinAccumulator;
+				while (scroll >= kRingMenuOne) {
 					if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
 						cmdIndex = (cmdIndex + 1) % 5;
 					} else {
 						cmdIndex = caravanWork->GetNextCmdListIdx(cmdIndex, -1);
 					}
-					scroll -= static_cast<double>(kRingMenuOne);
+					scroll -= kRingMenuOne;
 				}
-				while (scroll < static_cast<double>(kRingMenuNegativeOne)) {
+				while (scroll < kRingMenuNegativeOne) {
 					if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
 						cmdIndex = (cmdIndex + 4) % 5;
 					} else {
 						cmdIndex = caravanWork->GetNextCmdListIdx(cmdIndex, 1);
 					}
-					scroll += static_cast<double>(kRingMenuOne);
+					scroll += kRingMenuOne;
 				}
 
 				double labelAlphaScale = kRingMenuOneD;

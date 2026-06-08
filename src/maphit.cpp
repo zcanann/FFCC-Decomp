@@ -958,14 +958,19 @@ cylinder_body:
             return 0;
         }
 
-        f32 t;
         if (disc > 0.0) {
             disc = sqrtf(disc);
-            t = (-radialB - disc) / radialA;
+            const f32 t = (-radialB - disc) / radialA;
+            const f32 z = (t * vz) + pz;
+            if (kMapHitZero <= z && z <= axisLen) {
+                outT = t * tScale;
+                if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {
+                    return 1;
+                }
+                return 0;
+            }
         } else {
-            t = -radialB / radialA;
-        }
-        {
+            const f32 t = -radialB / radialA;
             const f32 z = (t * vz) + pz;
             if (kMapHitZero <= z && z <= axisLen) {
                 outT = t * tScale;

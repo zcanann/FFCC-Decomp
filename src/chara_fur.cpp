@@ -1383,15 +1383,11 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 		return;
 	}
 
-	CMaterialSet* materialSet = ModelMaterialSet(this);
-	FurMeshRaw* mesh = ModelMeshes(this);
-	CChara::CNode* nodes = ModelNodes(this);
-
-	const int materialCount = materialSet->m_materials.GetSize();
+	const int materialCount = ModelMaterialSet(this)->m_materials.GetSize();
 
 	int hasFurMaterial = 0;
 	for (int i = 0; i < materialCount; i++) {
-		CMaterial* material = materialSet->m_materials[i];
+		CMaterial* material = ModelMaterialSet(this)->m_materials[i];
 		if (material->IsFurEnabled()) {
 			hasFurMaterial = 1;
 			break;
@@ -1466,6 +1462,9 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	unsigned int prevExtraTexture = 0xFFFFFFFF;
 	int prevExtraTextureFormat = -1;
 
+	CChara::CNode* nodes = ModelNodes(this);
+	FurMeshRaw* mesh = ModelMeshes(this);
+
 	for (unsigned int meshIndex = 0; meshIndex < meshCount; meshIndex++, mesh++) {
 		if (mesh->m_workPositions == 0) {
 			continue;
@@ -1516,7 +1515,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 		Chara.gqrInit(posGqr << 0x18 | 0x70000 | posGqr << 8 | 7, normGqr << 0x18 | 0x70000 | normGqr << 8 | 7,
 		              0xC070C07);
 		for (unsigned int displayIndex = 0; displayIndex < mesh->m_data->m_displayListCount; displayIndex++, displayList++) {
-			CMaterial* material = materialSet->m_materials[displayList->m_material];
+			CMaterial* material = ModelMaterialSet(this)->m_materials[displayList->m_material];
 			if (!material->IsFurEnabled()) {
 				continue;
 			}

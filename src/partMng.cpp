@@ -474,11 +474,13 @@ void CPartMng::pppDumpMngSt()
         System.Printf(const_cast<char*>(sPartMngDumpSeparator));
     }
 
-    PppMngStDumpRaw* mng = reinterpret_cast<PppMngStDumpRaw*>(self + 0x2A18);
+    unsigned char* base = self;
+    PppMngStDumpRaw* mngBase = reinterpret_cast<PppMngStDumpRaw*>(self + 0x2A18);
     for (int i = 0; i < 0x180; i++) {
+        PppMngStDumpRaw* mng = reinterpret_cast<PppMngStDumpRaw*>(base + 0x2A18);
         if (mng->m_baseTime != -0x1000 && static_cast<unsigned int>(System.m_execParam) >= 1U) {
             int kind = static_cast<int>(mng->m_kind);
-            int heapGroup = (mng->m_heapGroupRef + 0x2D) / 0x158;
+            int heapGroup = static_cast<int>(reinterpret_cast<char*>(mng) - reinterpret_cast<char*>(mngBase)) / 0x158;
             int heapSize = ppvEnv->m_stagePtr->heapWalker(0, 0, static_cast<unsigned long>(heapGroup));
 
             System.Printf(
@@ -487,7 +489,7 @@ void CPartMng::pppDumpMngSt()
                 pdtSlots[kind].m_name);
         }
 
-        mng = reinterpret_cast<PppMngStDumpRaw*>(reinterpret_cast<unsigned char*>(mng) + 0x158);
+        base += 0x158;
     }
 
     ppvEnv->m_stagePtr->heapInfo(heapTotal, heapUse, heapFree);
@@ -558,8 +560,7 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
     };
 
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    PppPdtSlot* pdtSlots = m_pdtSlots;
-    PppPdtSlot* pdtSlot = &pdtSlots[pdtSlotIndex];
+    PppPdtSlot* pdtSlot = m_pdtSlots + pdtSlotIndex;
     _pppDataHead* pdt = pdtSlot->m_pppDataHead;
 
     if (pdt == 0) {
@@ -571,85 +572,91 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
     Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x13a);
 
     ppvEnv = reinterpret_cast<_pppEnvSt*>(pdtSlot->m_envFields);
-    PppMngStRaw* pppMngSt = reinterpret_cast<PppMngStRaw*>(self + 0x2A18);
+    unsigned char* mngWalk = self;
     for (int i = 0; i < 0x180; i++) {
+        PppMngStRaw* pppMngSt = reinterpret_cast<PppMngStRaw*>(mngWalk + 0x2A18);
         if (pppMngSt->m_pppResSet == pdtSlot) {
             _pppAllFreePObject(reinterpret_cast<_pppMngSt*>(pppMngSt));
         }
-        pppMngSt++;
+        mngWalk += 0x158;
     }
 
     Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x149);
 
-    pppModelSt** modelNames = reinterpret_cast<pppModelSt**>(pdt->m_modelNames);
-    for (int i = 0; i < pdt->m_modelCount; i++) {
-        pppModelSt* model = modelNames[i];
-        model->m_refCount--;
-        if (model->m_refCount < 1) {
-            if (model->m_cacheId != -1) {
-                ppvAmemCacheSet.DestroyCache(model->m_cacheId);
-                *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(model) + 0x24) = 0;
-                *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(model) + 0x28) = 0;
+    pdt = pdtSlot->m_pppDataHead;
+    if (pdt != 0) {
+        pppModelSt** modelNames = reinterpret_cast<pppModelSt**>(pdt->m_modelNames);
+        for (int i = 0; i < pdt->m_modelCount; i++) {
+            pppModelSt* model = modelNames[i];
+            model->m_refCount--;
+            if (model->m_refCount < 1) {
+                if (model->m_cacheId != -1) {
+                    ppvAmemCacheSet.DestroyCache(model->m_cacheId);
+                    *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(model) + 0x24) = 0;
+                    *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(model) + 0x28) = 0;
+                }
+                model->Destroy();
+                model->m_refCount = 0;
+                model->m_isUsed = 0;
             }
-            model->Destroy();
-            model->m_refCount = 0;
-            model->m_isUsed = 0;
+        }
+
+        if (modelNames != 0) {
+            delete[] modelNames;
+            pdt->m_modelNames = 0;
+        }
+
+        pppShapeSt** shapeNames = reinterpret_cast<pppShapeSt**>(pdt->m_shapeNames);
+        for (int i = 0; i < pdt->m_shapeCount; i++) {
+            pppShapeSt* shape = shapeNames[i];
+            shape->m_refCount--;
+            if (shape->m_refCount < 1) {
+                if (shape->m_animData != 0) {
+                    delete[] reinterpret_cast<u8*>(shape->m_animData);
+                    shape->m_animData = 0;
+                }
+                if (shape->m_displayListData != 0) {
+                    delete[] reinterpret_cast<u8*>(shape->m_displayListData);
+                    shape->m_displayListData = 0;
+                }
+                shape->m_refCount = 0;
+                shape->m_inUse = 0;
+            }
+        }
+
+        if (shapeNames != 0) {
+            delete[] shapeNames;
+            pdt->m_shapeNames = 0;
+        }
+
+        pppShapeGroupRaw* shapeGroups = reinterpret_cast<pppShapeGroupRaw*>(pdt->m_shapeGroups);
+        for (int i = 0; i < pdt->m_shapeGroupCount; i++) {
+            if (shapeGroups[i].m_shapeList != 0) {
+                delete[] shapeGroups[i].m_shapeList;
+                shapeGroups[i].m_shapeList = 0;
+            }
+        }
+
+        if (shapeGroups != 0) {
+            delete[] shapeGroups;
+            pdt->m_shapeGroups = 0;
+        }
+
+        s16* cacheChunks = reinterpret_cast<s16*>(pdt->m_cacheChunks);
+        for (int i = 0; i < pdt->m_cacheChunkCount; i++) {
+            ppvAmemCacheSet.DestroyCache(cacheChunks[i * 4]);
+        }
+
+        if (pdt->m_cacheChunks != 0) {
+            operator delete(reinterpret_cast<void*>(pdt->m_cacheChunks));
+            pdt->m_cacheChunks = 0;
+        }
+
+        if (pdtSlot->m_pppDataHead != 0) {
+            operator delete(pdtSlot->m_pppDataHead);
+            pdtSlot->m_pppDataHead = 0;
         }
     }
-
-    if (modelNames != 0) {
-        delete[] modelNames;
-        pdt->m_modelNames = 0;
-    }
-
-    pppShapeSt** shapeNames = reinterpret_cast<pppShapeSt**>(pdt->m_shapeNames);
-    for (int i = 0; i < pdt->m_shapeCount; i++) {
-        pppShapeSt* shape = shapeNames[i];
-        shape->m_refCount--;
-        if (shape->m_refCount < 1) {
-            if (shape->m_animData != 0) {
-                delete[] reinterpret_cast<u8*>(shape->m_animData);
-                shape->m_animData = 0;
-            }
-            if (shape->m_displayListData != 0) {
-                delete[] reinterpret_cast<u8*>(shape->m_displayListData);
-                shape->m_displayListData = 0;
-            }
-            shape->m_refCount = 0;
-            shape->m_inUse = 0;
-        }
-    }
-
-    if (shapeNames != 0) {
-        delete[] shapeNames;
-        pdt->m_shapeNames = 0;
-    }
-
-    pppShapeGroupRaw* shapeGroups = reinterpret_cast<pppShapeGroupRaw*>(pdt->m_shapeGroups);
-    for (int i = 0; i < pdt->m_shapeGroupCount; i++) {
-        if (shapeGroups[i].m_shapeList != 0) {
-            delete[] shapeGroups[i].m_shapeList;
-            shapeGroups[i].m_shapeList = 0;
-        }
-    }
-
-    if (shapeGroups != 0) {
-        delete[] shapeGroups;
-        pdt->m_shapeGroups = 0;
-    }
-
-    s16* cacheChunks = reinterpret_cast<s16*>(pdt->m_cacheChunks);
-    for (int i = 0; i < pdt->m_cacheChunkCount; i++) {
-        ppvAmemCacheSet.DestroyCache(cacheChunks[i * 4]);
-    }
-
-    if (cacheChunks != 0) {
-        delete[] cacheChunks;
-        pdt->m_cacheChunks = 0;
-    }
-
-    delete[] reinterpret_cast<u8*>(pdtSlot->m_pppDataHead);
-    pdtSlot->m_pppDataHead = 0;
 
     Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x182);
 }
@@ -3610,7 +3617,7 @@ void CPartMng::pppLoadPmd(CChunkFile&)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CPartMng::pppLoadPmd(const char* baseName)
+int CPartMng::pppLoadPmd(const char* baseName)
 {
     char* path = g_StrTmp;
     unsigned long fileSize;
@@ -3625,7 +3632,7 @@ void CPartMng::pppLoadPmd(const char* baseName)
         if (static_cast<unsigned int>(System.m_execParam) >= 1U) {
             System.Printf(const_cast<char*>(s_CanNotReadFormat), path);
         }
-        return;
+        return 0;
     }
 
     if (m_pppModelStArr == 0) {
@@ -3677,27 +3684,38 @@ void CPartMng::pppLoadPmd(const char* baseName)
                 case kChunkNAME: {
                     char* name = chunkFile.GetString();
 
-                    targetModel = 0;
-                    for (unsigned int i = 0; i < 0x100; i++) {
-                        if (modelArray[i].m_isUsed != 0 && strcmp(modelArray[i].m_name, name) == 0) {
-                            targetModel = &modelArray[i];
+                    pppModelSt* searchModel = modelArray;
+                    unsigned int i = 0;
+                    do {
+                        if (searchModel->m_isUsed != 0 && strcmp(searchModel->m_name, name) == 0) {
                             break;
                         }
+                        i++;
+                        searchModel++;
+                    } while (i < 0x100);
+                    if (i >= 0x100) {
+                        searchModel = 0;
                     }
 
-                    if (targetModel == 0) {
-                        for (int i = 0; i < 0x100; i++) {
-                            if (modelArray[i].m_isUsed == 0) {
-                                targetModel = &modelArray[i];
-                                break;
+                    if (searchModel == 0) {
+                        int freeIndex = 0;
+                        int remaining = 0x100;
+                        pppModelSt* freeModel = modelArray;
+                        do {
+                            if (freeModel->m_isUsed == 0) {
+                                targetModel = modelArray + freeIndex;
+                                goto foundFreeModel;
                             }
-                        }
+                            freeModel++;
+                            freeIndex++;
+                            remaining--;
+                        } while (remaining != 0);
+                        targetModel = 0;
+                    foundFreeModel:
 
-                        if (targetModel != 0) {
-                            targetModel->m_refCount = 0;
-                            targetModel->m_isUsed = 1;
-                            strcpy(targetModel->m_name, name);
-                        }
+                        targetModel->m_refCount = 0;
+                        targetModel->m_isUsed = 1;
+                        strcpy(targetModel->m_name, name);
                     } else {
                         targetModel = 0;
                     }
@@ -3710,6 +3728,8 @@ void CPartMng::pppLoadPmd(const char* baseName)
         }
         chunkFile.PopChunk();
     }
+
+    return 1;
 }
 
 /*
@@ -3731,7 +3751,7 @@ void CPartMng::pppLoadPan(CChunkFile&)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CPartMng::pppLoadPan(const char* baseName)
+int CPartMng::pppLoadPan(const char* baseName)
 {
     char* path = g_StrTmp;
     unsigned long fileSize;
@@ -3746,7 +3766,7 @@ void CPartMng::pppLoadPan(const char* baseName)
         if (static_cast<unsigned int>(System.m_execParam) >= 1U) {
             System.Printf(const_cast<char*>(s_CanNotReadFormat), path);
         }
-        return;
+        return 0;
     }
 
     if (m_pppShapeStArr == 0) {
@@ -3786,27 +3806,41 @@ void CPartMng::pppLoadPan(const char* baseName)
                 case kChunkNAME: {
                     char* name = chunkFile.GetString();
 
-                    targetShape = 0;
-                    for (unsigned int i = 0; i < 0x100; i++) {
-                        if (shapeArray[i].m_inUse != 0 && strcmp(shapeArray[i].m_name, name) == 0) {
-                            targetShape = &shapeArray[i];
+                    pppShapeSt* searchShape = shapeArray;
+                    unsigned int i = 0;
+                    do {
+                        if (searchShape->m_inUse != 0 && strcmp(searchShape->m_name, name) == 0) {
                             break;
                         }
+                        i++;
+                        searchShape = reinterpret_cast<pppShapeSt*>(
+                            reinterpret_cast<unsigned char*>(searchShape) + 0x2c);
+                    } while (i < 0x100);
+                    if (i >= 0x100) {
+                        searchShape = 0;
                     }
 
-                    if (targetShape == 0) {
-                        for (int i = 0; i < 0x100; i++) {
-                            if (shapeArray[i].m_inUse == 0) {
-                                targetShape = &shapeArray[i];
-                                break;
+                    if (searchShape == 0) {
+                        int freeIndex = 0;
+                        int remaining = 0x100;
+                        pppShapeSt* freeShape = shapeArray;
+                        do {
+                            if (freeShape->m_inUse == 0) {
+                                targetShape = reinterpret_cast<pppShapeSt*>(
+                                    reinterpret_cast<unsigned char*>(shapeArray) + freeIndex * 0x2c);
+                                goto foundFree;
                             }
-                        }
+                            freeShape = reinterpret_cast<pppShapeSt*>(
+                                reinterpret_cast<unsigned char*>(freeShape) + 0x2c);
+                            freeIndex++;
+                            remaining--;
+                        } while (remaining != 0);
+                        targetShape = 0;
+                    foundFree:
 
-                        if (targetShape != 0) {
-                            targetShape->m_refCount = 0;
-                            targetShape->m_inUse = 1;
-                            strcpy(targetShape->m_name, name);
-                        }
+                        targetShape->m_refCount = 0;
+                        targetShape->m_inUse = 1;
+                        strcpy(targetShape->m_name, name);
                     } else {
                         targetShape = 0;
                     }
@@ -3819,6 +3853,8 @@ void CPartMng::pppLoadPan(const char* baseName)
         }
         chunkFile.PopChunk();
     }
+
+    return 1;
 }
 
 /*

@@ -854,7 +854,7 @@ void CMenuPcs::CmakeVillageDraw()
         showNameCursor = 0;
     }
     DrawCmakeName(1, showNameCursor, s_CmakeInfo.m_name, alpha);
-    DrawCmakeDecision((static_cast<int>(villageWork->m_row) >> 31) +
+    DrawCmakeDecision((static_cast<unsigned int>(villageWork->m_row) >> 31) +
         (static_cast<int>(villageWork->m_row) > 4), alpha);
 }
 
@@ -2083,7 +2083,7 @@ void CMenuPcs::CmakeTribeDraw()
 
     if (cmakeState->m_mode == 1) {
         int select = cmakeState->m_select;
-        int frame = System.m_frameCounter & 7;
+        unsigned int frame = System.m_frameCounter & 7;
         int tribeCursorY = 0x88 + select * 0x1C;
 
         if (cmakeState->m_fieldSelect == 0) {
@@ -2364,7 +2364,7 @@ void CMenuPcs::CmakeSexDraw()
 
     if (CmakeState(this)->m_mode == 1) {
         int sel = CmakeState(this)->m_select;
-        int frame = System.m_frameCounter & 7;
+        unsigned int frame = System.m_frameCounter & 7;
         int cursorX = static_cast<int>(
             static_cast<double>(static_cast<float>(400.0 - static_cast<double>(maxWidth) * 0.5) +
                                 static_cast<float>(frame)) -

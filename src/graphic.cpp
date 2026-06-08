@@ -534,6 +534,7 @@ void CGraphic::Thread()
                 }
 
                 CSystem::COrder* order = System.GetOrder(drawSyncPart >> 8);
+                int drawSyncByte = static_cast<int>(static_cast<char>(drawSyncPart));
                 int orderIndex;
                 if (order != nullptr) {
                     orderIndex = order->m_insertIndex;
@@ -547,7 +548,7 @@ void CGraphic::Thread()
                     orderName = sGraphicUnknownOrderName;
                 }
                 System.Printf(debugFmtBase + kGraphicCppDrawDoneFmt, m_drawDoneFile, m_drawDoneLine, orderName, orderIndex,
-                              static_cast<int>(static_cast<char>(drawSyncPart)));
+                              drawSyncByte);
             }
         } else {
             debugCountdown = 5;
@@ -1588,7 +1589,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 	unsigned int texBufferSize;
 	unsigned int depthAlphaNear;
 	unsigned int depthAlphaFar;
-	unsigned char nearAlpha;
+	signed char nearAlpha;
 	unsigned char farAlpha;
 	float xOffset;
 	float yOffset;
@@ -1614,13 +1615,13 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 
 	nearAlpha = 0;
 	farAlpha = 0;
-	hasNearAlpha = 0;
-	hasFarAlpha = 0;
 	texBufferSize = GXGetTexBufferSize(0x140, 0xE0, GX_TF_RGBA8, GX_FALSE, GX_FALSE);
 
 	cameraPos.x = CameraWorldX();
 	cameraPos.z = CameraWorldZ();
+	hasNearAlpha = 0;
 	cameraPos.y = kGraphicZeroF;
+	hasFarAlpha = 0;
 
 	targetPos.y = kGraphicZeroF;
 	PSVECSubtract(&targetPos, &cameraPos, &cameraToTarget);
@@ -1635,7 +1636,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		          gxViewport, &projX, &projY, &projZ);
 
 		depthAlphaNear = static_cast<unsigned int>(projZ * 16777215.0f) >> 16;
-		if (depthAlphaNear > 0xFF) {
+		if (depthAlphaNear >= 0xFF) {
 			depthAlphaNear = 0xFF;
 		}
 		nearAlpha = (signed char)depthAlphaNear;
@@ -1659,10 +1660,10 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		if (depthAlphaFar == 0) {
 			depthAlphaFar = 0xFF;
 		}
-		if (depthAlphaFar > 0xFF) {
+		if (depthAlphaFar >= 0xFF) {
 			depthAlphaFar = 0xFF;
 		}
-		farAlpha = (unsigned char)depthAlphaFar;
+		farAlpha = (signed char)depthAlphaFar;
 		hasFarAlpha = 1;
 	}
 
@@ -1674,8 +1675,8 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 	}
 
 	gUtil.SetVtxFmt_POS_CLR_TEX();
-	Graphic.CreateSmallBackTexture(Graphic.m_scratchTextureBuffer, &smallBackTex, 0x140, 0xE0, GX_NEAR, GX_TF_RGBA8, 0);
-	Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backBufferTex, 0, 0, 0x280, 0x1C0, texBufferSize, GX_NEAR,
+	Graphic.CreateSmallBackTexture(Graphic.m_scratchTextureBuffer, &smallBackTex, 0x140, 0xE0, GX_LINEAR, GX_TF_RGBA8, 0);
+	Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backBufferTex, 0, 0, 0x280, 0x1C0, texBufferSize, GX_LINEAR,
 	                   (_GXTexFmt)0x11, 0);
 	gUtil.SetVtxFmt_POS_CLR_TEX0_TEX1();
 	gUtil.SetOrthoEnv();
@@ -1686,7 +1687,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 	for (int pass = 0; pass < 2; pass++) {
 		int kColorSel = 0x0C;
 		int kAlphaSel = 0x1C;
-		unsigned char passAlpha = nearAlpha;
+		signed char passAlpha = nearAlpha;
 
 		if ((pass == 0) && !((mode != 2) && hasNearAlpha && (mode != 1) && hasFarAlpha)) {
 			continue;
@@ -1957,7 +1958,7 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
     int blurOffsetInt = offset;
     int textureOffset = 0;
     for (int i = 0; i < static_cast<int>(m_blurTextureCount); i++) {
-        unsigned int negativeBlurOffset = -blurOffsetInt;
+        int negativeBlurOffset = -blurOffsetInt;
         u8* textureBase = reinterpret_cast<u8*>(m_savedFrameBuffer) + textureOffset;
         GXInitTexObj(&texObj, textureBase, 0x140, 0xE0, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
         GXInitTexObjLOD(&texObj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);

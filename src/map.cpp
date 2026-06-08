@@ -1932,13 +1932,14 @@ int CMapMng::ReadMpl(char* mapName)
             System.Printf(const_cast<char*>(s_mapReadMplFmt), strTmp);
         }
 
-        void* filePtr = File.m_readBuffer;
+        void* filePtr;
         if (m_asyncLoadState.m_mapReadMode == 1) {
             int& readIndex = m_asyncLoadState.m_asyncReadIndex;
             const int size = m_asyncLoadState.m_fileSizes[readIndex];
             void* amemCursor = m_asyncLoadState.m_mapLoadCursor;
+            filePtr = File.m_readBuffer;
 
-            Memory.CopyFromAMemorySync(File.m_readBuffer, amemCursor, (size + 0x1F) & ~0x1F);
+            Memory.CopyFromAMemorySync(filePtr, amemCursor, (size + 0x1F) & ~0x1F);
             m_asyncLoadState.m_mapLoadCursor = reinterpret_cast<unsigned char*>(m_asyncLoadState.m_mapLoadCursor) + size;
             CheckSum(filePtr, size);
             readIndex += 1;

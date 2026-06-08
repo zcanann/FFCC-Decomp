@@ -1183,18 +1183,18 @@ int CFlatRuntime::request(CFlatRuntime::CObject* object, int systemKind, int sys
 	const int prevReqFlag0 = *reinterpret_cast<int*>(targetObject + 0x2C);
 	const s16 prevArgCount = *reinterpret_cast<s16*>(targetObject + 0x36);
 
-	if (*reinterpret_cast<int*>(func + 0x4C) == 0) {
-		*reinterpret_cast<u32*>(targetObject + 0x0C) =
-		    *reinterpret_cast<u32*>(targetObject + 0x08) - (static_cast<u32>(*reinterpret_cast<int*>(func + 0x24)) * 4);
-		*reinterpret_cast<u32*>(targetObject + 0x08) =
-		    *reinterpret_cast<u32*>(targetObject + 0x0C) + (static_cast<u32>(*reinterpret_cast<int*>(func + 0x28)) * 4);
-	} else {
+	if (*reinterpret_cast<int*>(func + 0x4C) != 0) {
 		*reinterpret_cast<u32*>(targetObject + 0x08) -= 4;
 		*reinterpret_cast<s16*>(targetObject + 0x36) = static_cast<s16>(**reinterpret_cast<u32**>(targetObject + 0x08));
 		*reinterpret_cast<u32*>(targetObject + 0x0C) =
 		    *reinterpret_cast<u32*>(targetObject + 0x08) - (static_cast<u32>(*reinterpret_cast<s16*>(targetObject + 0x36)) * 4);
 		*reinterpret_cast<u32*>(targetObject + 0x08) =
 		    *reinterpret_cast<u32*>(targetObject + 0x0C) + (static_cast<u32>(*reinterpret_cast<s16*>(targetObject + 0x36)) * 4);
+	} else {
+		*reinterpret_cast<u32*>(targetObject + 0x0C) =
+		    *reinterpret_cast<u32*>(targetObject + 0x08) - (static_cast<u32>(*reinterpret_cast<int*>(func + 0x24)) * 4);
+		*reinterpret_cast<u32*>(targetObject + 0x08) =
+		    *reinterpret_cast<u32*>(targetObject + 0x0C) + (static_cast<u32>(*reinterpret_cast<int*>(func + 0x28)) * 4);
 	}
 
 	*reinterpret_cast<u16*>(targetObject + 0x1C) =

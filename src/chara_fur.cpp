@@ -1803,14 +1803,31 @@ void CChara::makeFurTex()
 				float py = pos.y;
 				float pz = pos.z;
 
-				CColor color(
-				    static_cast<signed char>(static_cast<int>(src.m_colors[0].color.r * (kCharaFurDepthScaleBase - t2)) +
-				                               static_cast<int>(src.m_colors[1].color.r * t2)),
-				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.g * (kCharaFurDepthScaleBase - t2)) +
-				                               static_cast<int>(src.m_colors[1].color.g * t2)),
-				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.b * (kCharaFurDepthScaleBase - t2)) +
-				                               static_cast<int>(src.m_colors[1].color.b * t2)),
-				    0);
+				CColor tipPartTmp;
+				tipPartTmp.color.r = static_cast<unsigned char>(static_cast<int>(src.m_colors[1].color.r * t2));
+				tipPartTmp.color.g = static_cast<unsigned char>(static_cast<int>(src.m_colors[1].color.g * t2));
+				tipPartTmp.color.b = static_cast<unsigned char>(static_cast<int>(src.m_colors[1].color.b * t2));
+				tipPartTmp.color.a = static_cast<unsigned char>(static_cast<int>(src.m_colors[1].color.a * t2));
+				CColor tipPart = tipPartTmp;
+
+				CColor basePartTmp;
+				basePartTmp.color.r =
+				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.r * (kCharaFurDepthScaleBase - t2)));
+				basePartTmp.color.g =
+				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.g * (kCharaFurDepthScaleBase - t2)));
+				basePartTmp.color.b =
+				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.b * (kCharaFurDepthScaleBase - t2)));
+				basePartTmp.color.a =
+				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.a * (kCharaFurDepthScaleBase - t2)));
+				CColor basePart = basePartTmp;
+
+				CColor colorTmp;
+				colorTmp.color.r = static_cast<unsigned char>(basePart.color.r + tipPart.color.r);
+				colorTmp.color.g = static_cast<unsigned char>(basePart.color.g + tipPart.color.g);
+				colorTmp.color.b = static_cast<unsigned char>(basePart.color.b + tipPart.color.b);
+				colorTmp.color.a = static_cast<unsigned char>(basePart.color.a + tipPart.color.a);
+				CColor colorCopy = colorTmp;
+				CColor color = colorCopy;
 				GXWGFifo.f32 = px;
 				GXWGFifo.f32 = py;
 				GXWGFifo.f32 = pz;
@@ -1834,14 +1851,31 @@ void CChara::makeFurTex()
 				float py = pos.y;
 				float pz = pos.z;
 
-				CColor color(
-				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.r * (kCharaFurDepthScaleBase - t2)) +
-				                               static_cast<int>(src.m_colors[1].color.r * t2)),
-				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.g * (kCharaFurDepthScaleBase - t2)) +
-				                               static_cast<int>(src.m_colors[1].color.g * t2)),
-				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.b * (kCharaFurDepthScaleBase - t2)) +
-				                               static_cast<int>(src.m_colors[1].color.b * t2)),
-				    0);
+				CColor tipPartTmp;
+				tipPartTmp.color.r = static_cast<unsigned char>(static_cast<int>(src.m_colors[1].color.r * t2));
+				tipPartTmp.color.g = static_cast<unsigned char>(static_cast<int>(src.m_colors[1].color.g * t2));
+				tipPartTmp.color.b = static_cast<unsigned char>(static_cast<int>(src.m_colors[1].color.b * t2));
+				tipPartTmp.color.a = static_cast<unsigned char>(static_cast<int>(src.m_colors[1].color.a * t2));
+				CColor tipPart = tipPartTmp;
+
+				CColor basePartTmp;
+				basePartTmp.color.r =
+				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.r * (kCharaFurDepthScaleBase - t2)));
+				basePartTmp.color.g =
+				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.g * (kCharaFurDepthScaleBase - t2)));
+				basePartTmp.color.b =
+				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.b * (kCharaFurDepthScaleBase - t2)));
+				basePartTmp.color.a =
+				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.a * (kCharaFurDepthScaleBase - t2)));
+				CColor basePart = basePartTmp;
+
+				CColor colorTmp;
+				colorTmp.color.r = static_cast<unsigned char>(basePart.color.r + tipPart.color.r);
+				colorTmp.color.g = static_cast<unsigned char>(basePart.color.g + tipPart.color.g);
+				colorTmp.color.b = static_cast<unsigned char>(basePart.color.b + tipPart.color.b);
+				colorTmp.color.a = static_cast<unsigned char>(basePart.color.a + tipPart.color.a);
+				CColor colorCopy = colorTmp;
+				CColor color = colorCopy;
 				GXWGFifo.f32 = pz;
 				GXWGFifo.f32 = py;
 				GXWGFifo.f32 = px;

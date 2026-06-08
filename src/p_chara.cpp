@@ -2322,7 +2322,33 @@ void CCharaPcs::CHandle::LoadModel(
         }
     }
 
-    if (loadModel == 0) {
+    if (loadModel != 0) {
+        m_modelLoadRef = loadModel;
+
+        if (loadModel->GetRef() == 1) {
+            if (loadModel->m_streamMode != 0) {
+                File.LockBuffer();
+                Memory.CopyFromAMemorySync(
+                    File.m_readBuffer,
+                    reinterpret_cast<unsigned char*>(StageBase(CharaPcs.m_amemWorkStage)) +
+                        reinterpret_cast<unsigned int>(loadModel->m_streamOffset),
+                    static_cast<unsigned long>(loadModel->m_streamSize));
+                CChara::CModel* model =
+                    new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x7C7) CChara::CModel;
+                model->Create(File.m_readBuffer, HandleModelStage(m_charaKind, specialModelStage));
+                loadModel->m_model = model;
+                File.UnlockBuffer();
+            }
+
+            m_modelLoadRef->AddRef();
+            m_model = loadModel->m_model;
+            m_model->AddRef();
+            m_model->Init();
+        } else {
+            m_modelLoadRef->AddRef();
+            m_model = loadModel->m_model->Duplicate(HandleModelStage(m_charaKind, specialModelStage));
+        }
+    } else {
         strcpy(path, basePath);
         strcat(path, s_charaModelSuffix);
 
@@ -2361,32 +2387,6 @@ void CCharaPcs::CHandle::LoadModel(
             File.SyncCompleted(fileHandle);
             m_model->CreateDynamics(File.m_readBuffer, HandleModelStage(charaKind, 0));
             File.Close(fileHandle);
-        }
-    } else {
-        m_modelLoadRef = loadModel;
-
-        if (loadModel->GetRef() == 1) {
-            if (loadModel->m_streamMode != 0) {
-                File.LockBuffer();
-                Memory.CopyFromAMemorySync(
-                    File.m_readBuffer,
-                    reinterpret_cast<unsigned char*>(StageBase(CharaPcs.m_amemWorkStage)) +
-                        reinterpret_cast<unsigned int>(loadModel->m_streamOffset),
-                    static_cast<unsigned long>(loadModel->m_streamSize));
-                CChara::CModel* model =
-                    new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x7C7) CChara::CModel;
-                model->Create(File.m_readBuffer, HandleModelStage(m_charaKind, specialModelStage));
-                loadModel->m_model = model;
-                File.UnlockBuffer();
-            }
-
-            m_modelLoadRef->AddRef();
-            m_model = loadModel->m_model;
-            m_model->AddRef();
-            m_model->Init();
-        } else {
-            m_modelLoadRef->AddRef();
-            m_model = loadModel->m_model->Duplicate(HandleModelStage(m_charaKind, specialModelStage));
         }
     }
 

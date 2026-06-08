@@ -406,9 +406,7 @@ void CCaravanWork::AddLetter(int letterType, int senderId, int moneyValue, int h
 	}
 
 	memset(&m_letters[0], 0, sizeof(m_letters[0]));
-	unsigned short header = m_letters[0].m_half.m_header & 0xF803;
-	unsigned short letterTypeBits = static_cast<unsigned short>((letterType & 0x1FF) << 2);
-	m_letters[0].m_half.m_header = header | letterTypeBits;
+	m_letters[0].m_half.m_header = (m_letters[0].m_half.m_header & 0xF803) | ((letterType & 0x1FF) << 2);
 	m_letters[0].m_words.m_word0 = (m_letters[0].m_words.m_word0 & 0xFFFC01FF) | ((senderId & 0x1FF) << 9);
 	m_letters[0].SetFlags((m_letters[0].Flags() & ~8) | ((hasMoneyFlag << 3) & 8));
 	if (m_letters[0].AttachmentIsGil()) {
@@ -424,7 +422,7 @@ void CCaravanWork::AddLetter(int letterType, int senderId, int moneyValue, int h
 	m_letters[0].m_half.m_tempVars[2] = static_cast<unsigned short>(itemC);
 	m_letters[0].m_half.m_tempVars[3] = static_cast<unsigned short>(itemD);
 
-	int nextCount = m_letterCount + 1;
+	unsigned int nextCount = m_letterCount + 1;
 	int letterCount = 100;
 	if (nextCount < 100) {
 		letterCount = nextCount;
@@ -562,7 +560,8 @@ void CCaravanWork::FGPutGil(int gilToRemove)
 {
 	int put = static_cast<CGPartyObj*>(m_ownerObj)->putGil(gilToRemove);
 	if (put != 0) {
-		m_gil += -gilToRemove;
+		gilToRemove = -gilToRemove;
+		m_gil += gilToRemove;
 		if (m_gil > 99999999) {
 			m_gil -= m_gil - 99999999;
 		} else if (m_gil < 0) {
@@ -757,7 +756,7 @@ int CCaravanWork::FindItem(int itemId)
 	int itemIdx = 0;
 
 	for (int row = 0; row < 8; row++) {
-		short item = cur->m_inventoryItems[0];
+		unsigned short item = cur->m_inventoryItems[0];
 		if (item != -1 && item == itemId) {
 			return itemIdx;
 		}
@@ -979,106 +978,135 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 		unsigned short condBits = curLetter->m_personalConditions;
 
 		if ((condBits & 0x7FFF) != 0) {
-			if ((condBits & 0x0001) != 0 && m_tribeId == 0) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedPersonalConditions;
+			int excludeFlag = condBits & 0x8000;
+			if ((condBits & 0x0001) != 0) {
+				if (m_tribeId == 0) {
+					if (excludeFlag == 0) {
+						goto PassedPersonalConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0001) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0002) != 0 && m_tribeId == 1) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedPersonalConditions;
+			if ((condBits & 0x0002) != 0) {
+				if (m_tribeId == 1) {
+					if (excludeFlag == 0) {
+						goto PassedPersonalConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0002) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0004) != 0 && m_tribeId == 2) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedPersonalConditions;
+			if ((condBits & 0x0004) != 0) {
+				if (m_tribeId == 2) {
+					if (excludeFlag == 0) {
+						goto PassedPersonalConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0004) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0008) != 0 && m_tribeId == 3) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedPersonalConditions;
+			if ((condBits & 0x0008) != 0) {
+				if (m_tribeId == 3) {
+					if (excludeFlag == 0) {
+						goto PassedPersonalConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0008) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0010) != 0 && m_genderFlag == 0) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedPersonalConditions;
+			if ((condBits & 0x0010) != 0) {
+				if (m_genderFlag == 0) {
+					if (excludeFlag == 0) {
+						goto PassedPersonalConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0010) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0020) != 0 && m_genderFlag == 1) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedPersonalConditions;
+			if ((condBits & 0x0020) != 0) {
+				if (m_genderFlag == 1) {
+					if (excludeFlag == 0) {
+						goto PassedPersonalConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0020) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0040) != 0 && GetFoodRank(0) == 0) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedPersonalConditions;
+			if ((condBits & 0x0040) != 0) {
+				if (GetFoodRank(0) == 0) {
+					if (excludeFlag == 0) {
+						goto PassedPersonalConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0040) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0080) != 0 && GetFoodRank(1) == 0) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedPersonalConditions;
+			if ((condBits & 0x0080) != 0) {
+				if (GetFoodRank(1) == 0) {
+					if (excludeFlag == 0) {
+						goto PassedPersonalConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0080) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0100) != 0 && GetFoodRank(2) == 0) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedPersonalConditions;
+			if ((condBits & 0x0100) != 0) {
+				if (GetFoodRank(2) == 0) {
+					if (excludeFlag == 0) {
+						goto PassedPersonalConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0100) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0200) != 0 && GetFoodRank(3) == 0) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedPersonalConditions;
+			if ((condBits & 0x0200) != 0) {
+				if (GetFoodRank(3) == 0) {
+					if (excludeFlag == 0) {
+						goto PassedPersonalConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0200) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0400) != 0 && GetFoodRank(4) == 0) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedPersonalConditions;
+			if ((condBits & 0x0400) != 0) {
+				if (GetFoodRank(4) == 0) {
+					if (excludeFlag == 0) {
+						goto PassedPersonalConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0400) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0800) != 0 && GetFoodRank(5) == 0) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedPersonalConditions;
+			if ((condBits & 0x0800) != 0) {
+				if (GetFoodRank(5) == 0) {
+					if (excludeFlag == 0) {
+						goto PassedPersonalConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0800) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x1000) != 0 && GetFoodRank(6) == 0) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedPersonalConditions;
+			if ((condBits & 0x1000) != 0) {
+				if (GetFoodRank(6) == 0) {
+					if (excludeFlag == 0) {
+						goto PassedPersonalConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x1000) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x2000) != 0 && GetFoodRank(7) == 0) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedPersonalConditions;
+			if ((condBits & 0x2000) != 0) {
+				if (GetFoodRank(7) == 0) {
+					if (excludeFlag == 0) {
+						goto PassedPersonalConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x2000) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
 
-			if ((condBits & 0x8000) == 0) {
+			if (excludeFlag == 0) {
 				goto NextLetter;
 			}
 		}
@@ -1086,113 +1114,144 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 
 		condBits = curLetter->m_linkConditions;
 		if ((condBits & 0x7FFF) != 0) {
-			if ((condBits & 0x0001) != 0 && unk_0x3ac == 0) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedLinkConditions;
+			int excludeFlag = condBits & 0x8000;
+			if ((condBits & 0x0001) != 0) {
+				if (unk_0x3ac == 0) {
+					if (excludeFlag == 0) {
+						goto PassedLinkConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0001) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0002) != 0 && unk_0x3ac == 1) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedLinkConditions;
+			if ((condBits & 0x0002) != 0) {
+				if (unk_0x3ac == 1) {
+					if (excludeFlag == 0) {
+						goto PassedLinkConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0002) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0004) != 0 && unk_0x3ac == 2) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedLinkConditions;
+			if ((condBits & 0x0004) != 0) {
+				if (unk_0x3ac == 2) {
+					if (excludeFlag == 0) {
+						goto PassedLinkConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0004) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0008) != 0 && unk_0x3ac == 3) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedLinkConditions;
+			if ((condBits & 0x0008) != 0) {
+				if (unk_0x3ac == 3) {
+					if (excludeFlag == 0) {
+						goto PassedLinkConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0008) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0010) != 0 && unk_0x3ac == 4) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedLinkConditions;
+			if ((condBits & 0x0010) != 0) {
+				if (unk_0x3ac == 4) {
+					if (excludeFlag == 0) {
+						goto PassedLinkConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0010) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0020) != 0 && unk_0x3ac == 5) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedLinkConditions;
+			if ((condBits & 0x0020) != 0) {
+				if (unk_0x3ac == 5) {
+					if (excludeFlag == 0) {
+						goto PassedLinkConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0020) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0040) != 0 && unk_0x3ac == 6) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedLinkConditions;
+			if ((condBits & 0x0040) != 0) {
+				if (unk_0x3ac == 6) {
+					if (excludeFlag == 0) {
+						goto PassedLinkConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0040) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0080) != 0 && unk_0x3ac == 7) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedLinkConditions;
+			if ((condBits & 0x0080) != 0) {
+				if (unk_0x3ac == 7) {
+					if (excludeFlag == 0) {
+						goto PassedLinkConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0080) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0100) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][1] != 0) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedLinkConditions;
+			if ((condBits & 0x0100) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][1] != 0) {
+					if (excludeFlag == 0) {
+						goto PassedLinkConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0100) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0200) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][2] != 0) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedLinkConditions;
+			if ((condBits & 0x0200) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][2] != 0) {
+					if (excludeFlag == 0) {
+						goto PassedLinkConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0200) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0400) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][3] != 0) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedLinkConditions;
+			if ((condBits & 0x0400) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][3] != 0) {
+					if (excludeFlag == 0) {
+						goto PassedLinkConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0400) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0800) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][4] != 0) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedLinkConditions;
+			if ((condBits & 0x0800) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][4] != 0) {
+					if (excludeFlag == 0) {
+						goto PassedLinkConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0800) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x1000) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][5] != 0) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedLinkConditions;
+			if ((condBits & 0x1000) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][5] != 0) {
+					if (excludeFlag == 0) {
+						goto PassedLinkConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x1000) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x2000) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][6] != 0) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedLinkConditions;
+			if ((condBits & 0x2000) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][6] != 0) {
+					if (excludeFlag == 0) {
+						goto PassedLinkConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x2000) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x4000) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][7] != 0) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedLinkConditions;
+			if ((condBits & 0x4000) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][7] != 0) {
+					if (excludeFlag == 0) {
+						goto PassedLinkConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x4000) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
 
-			if ((condBits & 0x8000) == 0) {
+			if (excludeFlag == 0) {
 				goto NextLetter;
 			}
 		}
@@ -1200,160 +1259,209 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 
 		condBits = curLetter->m_linkValueConditions;
 		if ((condBits & 0x7FFF) != 0) {
-			if ((condBits & 0x0001) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][1] >= 0x3D) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedLinkValueConditions;
+			int excludeFlag = condBits & 0x8000;
+			if ((condBits & 0x0001) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][1] >= 0x3D) {
+					if (excludeFlag == 0) {
+						goto PassedLinkValueConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0001) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0002) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][2] >= 0x3D) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedLinkValueConditions;
+			if ((condBits & 0x0002) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][2] >= 0x3D) {
+					if (excludeFlag == 0) {
+						goto PassedLinkValueConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0002) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0004) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][3] >= 0x3D) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedLinkValueConditions;
+			if ((condBits & 0x0004) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][3] >= 0x3D) {
+					if (excludeFlag == 0) {
+						goto PassedLinkValueConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0004) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0008) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][4] >= 0x3D) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedLinkValueConditions;
+			if ((condBits & 0x0008) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][4] >= 0x3D) {
+					if (excludeFlag == 0) {
+						goto PassedLinkValueConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0008) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0010) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][5] >= 0x3D) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedLinkValueConditions;
+			if ((condBits & 0x0010) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][5] >= 0x3D) {
+					if (excludeFlag == 0) {
+						goto PassedLinkValueConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0010) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0020) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][6] >= 0x3D) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedLinkValueConditions;
+			if ((condBits & 0x0020) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][6] >= 0x3D) {
+					if (excludeFlag == 0) {
+						goto PassedLinkValueConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0020) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0040) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][7] >= 0x3D) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedLinkValueConditions;
+			if ((condBits & 0x0040) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][7] >= 0x3D) {
+					if (excludeFlag == 0) {
+						goto PassedLinkValueConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0040) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0100) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][1] > 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][1] <= 0x28) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedLinkValueConditions;
+			if ((condBits & 0x0100) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][1] > 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][1] <= 0x28) {
+					if (excludeFlag == 0) {
+						goto PassedLinkValueConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0100) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0200) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][2] > 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][2] <= 0x28) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedLinkValueConditions;
+			if ((condBits & 0x0200) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][2] > 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][2] <= 0x28) {
+					if (excludeFlag == 0) {
+						goto PassedLinkValueConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0200) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0400) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][3] > 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][3] <= 0x28) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedLinkValueConditions;
+			if ((condBits & 0x0400) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][3] > 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][3] <= 0x28) {
+					if (excludeFlag == 0) {
+						goto PassedLinkValueConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0400) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0800) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][4] > 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][4] <= 0x28) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedLinkValueConditions;
+			if ((condBits & 0x0800) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][4] > 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][4] <= 0x28) {
+					if (excludeFlag == 0) {
+						goto PassedLinkValueConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0800) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x1000) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][5] > 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][5] <= 0x28) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedLinkValueConditions;
+			if ((condBits & 0x1000) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][5] > 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][5] <= 0x28) {
+					if (excludeFlag == 0) {
+						goto PassedLinkValueConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x1000) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x2000) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][6] > 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][6] <= 0x28) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedLinkValueConditions;
+			if ((condBits & 0x2000) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][6] > 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][6] <= 0x28) {
+					if (excludeFlag == 0) {
+						goto PassedLinkValueConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x2000) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x4000) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][7] > 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][7] <= 0x28) {
-				if ((condBits & 0x8000) == 0) {
-					goto PassedLinkValueConditions;
+			if ((condBits & 0x4000) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][7] > 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][7] <= 0x28) {
+					if (excludeFlag == 0) {
+						goto PassedLinkValueConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x4000) != 0 && (condBits & 0x8000) != 0) {
-				goto NextLetter;
 			}
 
-			if ((condBits & 0x8000) == 0) {
+			if (excludeFlag == 0) {
 				goto NextLetter;
 			}
 		}
 	PassedLinkValueConditions:
 
-		unsigned int cmpValue = 0;
+		int cmpValue = 0;
+		int sysVal0 = *reinterpret_cast<int*>(&Game.m_gameWork.m_scriptSysVal0);
+		int sysVal1 = Game.m_gameWork.m_timerA;
+		int sysVal2 = Game.m_gameWork.m_scriptGlobalTime;
+		int sysVal3 = Game.m_gameWork.m_frameCounter;
 		for (int i = 0; i < 4; i++) {
 			const unsigned short cmpType = curLetter->m_compareRules[i].m_rule;
 			const int sourceType = (cmpType >> 11) & 3;
 			const int sourceIdx = cmpType & 0x7FF;
 
 			if (sourceType != 3) {
-				if (sourceType == 1) {
-					cmpValue = static_cast<unsigned int>(Game.m_gameWork.m_eventWork[sourceIdx]);
-				} else if (sourceType == 0) {
-					if (sourceIdx == 0) {
-							cmpValue = *reinterpret_cast<unsigned int*>(&Game.m_gameWork.m_scriptSysVal0);
-					} else if (sourceIdx == 1) {
-						cmpValue = static_cast<unsigned int>(Game.m_gameWork.m_timerA);
-					} else if (sourceIdx == 2) {
-						cmpValue = static_cast<unsigned int>(Game.m_gameWork.m_scriptGlobalTime);
-					} else if (sourceIdx == 3) {
-						cmpValue = static_cast<unsigned int>(Game.m_gameWork.m_frameCounter);
+				switch (sourceType) {
+				case 0:
+					switch (sourceIdx) {
+					case 0:
+						cmpValue = sysVal0;
+						break;
+					case 1:
+						cmpValue = sysVal1;
+						break;
+					case 2:
+						cmpValue = sysVal2;
+						break;
+					case 3:
+						cmpValue = sysVal3;
+						break;
 					}
-				} else if (sourceType < 3) {
-					cmpValue = static_cast<unsigned int>(m_evtWordArr[sourceIdx]);
+					break;
+				case 1:
+					cmpValue = Game.m_gameWork.m_eventWork[sourceIdx];
+					break;
+				case 2:
+					cmpValue = m_evtWordArr[sourceIdx];
+					break;
 				}
 
 				const int op = cmpType >> 13;
-				const unsigned int compareValue = static_cast<unsigned int>(curLetter->m_compareRules[i].m_value);
-				if (op == 0) {
+				const int compareValue = curLetter->m_compareRules[i].m_value;
+				switch (op) {
+				case 0:
 					if (cmpValue != compareValue) {
 						goto NextLetter;
 					}
-				} else if (op == 1) {
+					break;
+				case 1:
 					if (cmpValue == compareValue) {
 						goto NextLetter;
 					}
-				} else if (op == 2) {
+					break;
+				case 2:
 					if (cmpValue < compareValue) {
 						goto NextLetter;
 					}
-				} else if (op == 3) {
-					if (compareValue < cmpValue) {
+					break;
+				case 3:
+					if (cmpValue > compareValue) {
 						goto NextLetter;
 					}
-				} else if (op == 4) {
+					break;
+				case 4:
 					if (cmpValue <= compareValue) {
 						goto NextLetter;
 					}
-				} else if (op == 5) {
-					if (compareValue <= cmpValue) {
+					break;
+				case 5:
+					if (cmpValue >= compareValue) {
 						goto NextLetter;
 					}
+					break;
 				}
 			}
 		}
@@ -1374,22 +1482,25 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 					continue;
 				}
 
-				if (sourceType == 2) {
-					bit0 = ((evtWorkBytes[sourceIdx >> 3] & (1 << (sourceIdx & 7))) != 0);
-					bit1 = ((evtWorkBytes[(sourceIdx + 1) >> 3] & (1 << ((sourceIdx + 1) & 7))) != 0);
-					bit2 = ((evtWorkBytes[(sourceIdx + 2) >> 3] & (1 << ((sourceIdx + 2) & 7))) != 0);
-				} else if ((sourceType < 2) && (sourceType != 0)) {
-					bit0 = ((static_cast<unsigned char>(Game.m_gameWork.m_eventFlags[sourceIdx >> 3]) &
-							 (1 << (sourceIdx & 7))) != 0);
-					bit1 = ((static_cast<unsigned char>(Game.m_gameWork.m_eventFlags[(sourceIdx + 1) >> 3]) &
-							 (1 << ((sourceIdx + 1) & 7))) != 0);
-					bit2 = ((static_cast<unsigned char>(Game.m_gameWork.m_eventFlags[(sourceIdx + 2) >> 3]) &
-							 (1 << ((sourceIdx + 2) & 7))) != 0);
+				switch (sourceType) {
+				case 2:
+					bit0 = ((evtWorkBytes[sourceIdx / 8] & (1 << (sourceIdx % 8))) != 0);
+					bit1 = ((evtWorkBytes[(sourceIdx + 1) / 8] & (1 << ((sourceIdx + 1) % 8))) != 0);
+					bit2 = ((evtWorkBytes[(sourceIdx + 2) / 8] & (1 << ((sourceIdx + 2) % 8))) != 0);
+					break;
+				case 1:
+					bit0 = ((static_cast<signed char>(Game.m_gameWork.m_eventFlags[sourceIdx / 8]) &
+							 (1 << (sourceIdx % 8))) != 0);
+					bit1 = ((static_cast<unsigned char>(Game.m_gameWork.m_eventFlags[(sourceIdx + 1) / 8]) &
+							 (1 << ((sourceIdx + 1) % 8))) != 0);
+					bit2 = ((static_cast<unsigned char>(Game.m_gameWork.m_eventFlags[(sourceIdx + 2) / 8]) &
+							 (1 << ((sourceIdx + 2) % 8))) != 0);
+					break;
 				}
 
 				checkValue = bit0;
 
-				switch (evtRule >> 13) {
+				switch ((evtRule >> 13) & 7) {
 				case 0:
 				case 1:
 					break;
@@ -1436,14 +1547,14 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 			unsigned short minPriority = 0xFFFF;
 			int replaceIndex = 0;
 			for (int i = 0; i < maxResults; i++) {
-				unsigned short priority = romLetterWork[i]->m_priorityFlags & 0xF00;
+				short priority = romLetterWork[i]->m_priorityFlags & 0xF00;
 				if (priority < minPriority) {
 					minPriority = priority;
 					replaceIndex = i;
 				}
 			}
 
-			const unsigned short curPriority = curLetter->m_priorityFlags & 0xF00;
+			const short curPriority = curLetter->m_priorityFlags & 0xF00;
 			if (minPriority < curPriority) {
 				romLetterWork[replaceIndex] = curLetter;
 			}
@@ -1566,14 +1677,14 @@ void CCaravanWork::SafeDeleteTempItem()
 		System.Printf(const_cast<char*>(sNoWorldReturnItemWarning));
 	}
 
-	short* artifact = reinterpret_cast<short*>(m_artifacts);
-	for (int i = 0; i < 50; i++, artifactIndex += 2, artifact += 2) {
-		if (artifactIndex < 96 && (short)artifact[0] > 0) {
+	for (int i = 0; i < 50; i++, artifactIndex += 2) {
+		if (artifactIndex < 96 && m_artifacts[artifactIndex] > 0) {
 			unsigned short* artifactData =
-				(unsigned short*)(Game.unkCFlatData0[2] + (short)artifact[0] * 0x48);
+				(unsigned short*)(Game.unkCFlatData0[2] + m_artifacts[artifactIndex] * 0x48);
+			unsigned short slots = artifactData[3];
 			switch (artifactData[0]) {
 			case 0xDB:
-				totalSlots += artifactData[3];
+				totalSlots += slots;
 				break;
 			case 0x9F:
 			case 0xB6:
@@ -1585,12 +1696,13 @@ void CCaravanWork::SafeDeleteTempItem()
 			}
 		}
 
-		if ((artifactIndex + 1) < 96 && (short)artifact[1] > 0) {
+		if ((artifactIndex + 1) < 96 && m_artifacts[artifactIndex + 1] > 0) {
 			unsigned short* artifactData = (unsigned short*)(Game.unkCFlatData0[2] +
-															 (short)artifact[1] * 0x48);
+															 m_artifacts[artifactIndex + 1] * 0x48);
+			unsigned short slots = artifactData[3];
 			switch (artifactData[0]) {
 			case 0xDB:
-				totalSlots += artifactData[3];
+				totalSlots += slots;
 				break;
 			case 0x9F:
 			case 0xB6:
@@ -1604,10 +1716,9 @@ void CCaravanWork::SafeDeleteTempItem()
 	}
 
 	totalSlots += (short)m_baseCmdListSlots;
-	short* commandSlot = m_commandListInventorySlotRef + totalSlots;
-	for (int slotIndex = totalSlots; slotIndex < 8; slotIndex++, commandSlot++) {
-		if (*commandSlot >= 0) {
-			*commandSlot = -1;
+	for (int slotIndex = totalSlots; slotIndex < 8; slotIndex++) {
+		if (m_commandListInventorySlotRef[slotIndex] >= 0) {
+			m_commandListInventorySlotRef[slotIndex] = -1;
 			if ((unsigned int)System.m_execParam >= 3U) {
 				System.Printf(const_cast<char*>(sTempArtifactIndexWarning), slotIndex);
 			}
@@ -1622,14 +1733,14 @@ void CCaravanWork::SafeDeleteTempItem()
 
 	for (int i = 0; i < 64; i++) {
 		short item = m_inventoryItems[i];
-		if ((item > 0xFF) && (item < 0x125) && (item != -1)) {
+		if ((item >= 0x100) && (item <= 0x124) && (item != -1)) {
 			m_inventoryItems[i] = invalidItem;
 			m_inventoryItemCount--;
 		}
 	}
 
 	short invalidSlot = -1;
-	short slot = m_commandListInventorySlotRef[2];
+	int slot = m_commandListInventorySlotRef[2];
 	if (slot >= 0 && m_inventoryItems[slot] < 0) {
 		m_commandListInventorySlotRef[2] = invalidSlot;
 	}
@@ -1691,42 +1802,42 @@ void CCaravanWork::CalcStatus()
 
 	if (m_tempStatBuffTimer != 0) {
 		int tempStatBuffId = m_tempStatBuffId;
-		if (tempStatBuffId < 0x183) {
-			if (tempStatBuffId >= 0x180) {
-				m_defense += *(short*)(Game.unk_flat3_field_8_0xc7dc + 0x6C);
-			} else if (tempStatBuffId > 0x17C) {
-				m_magic += *(short*)(Game.unk_flat3_field_8_0xc7dc + 0x6E);
+		if (tempStatBuffId >= 0x183) {
+			if (tempStatBuffId < 0x185) {
+				m_strength += *(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + 0x6A);
 			}
-		} else if (tempStatBuffId < 0x185) {
-			m_strength += *(short*)(Game.unk_flat3_field_8_0xc7dc + 0x6A);
+		} else if (tempStatBuffId >= 0x180) {
+			m_defense += *(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + 0x6C);
+		} else if (tempStatBuffId > 0x17C) {
+			m_magic += *(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + 0x6E);
 		}
 		m_tempStatBuffTimer--;
 	}
 
 	int chaliceElement = Game.m_gameWork.m_chaliceElement;
-	if (chaliceElement != 4) {
-		if (chaliceElement < 4) {
-			if (chaliceElement == 2) {
-				m_elementResistances[2]++;
-			} else if ((chaliceElement < 2) && (chaliceElement > 0)) {
-				m_elementResistances[1]++;
-			}
-		} else if (chaliceElement == 8) {
-			m_statusTimers[0]++;
-			m_statusTimers[2]++;
-		}
-	} else {
+	switch (chaliceElement) {
+	case 1:
+		m_elementResistances[1]++;
+		break;
+	case 2:
+		m_elementResistances[2]++;
+		break;
+	case 4:
 		m_elementResistances[3]++;
+		break;
+	case 8:
+		m_statusTimers[0]++;
+		m_statusTimers[2]++;
+		break;
 	}
 
-	short hpBonus = 0;
+	unsigned short hpBonus = 0;
 	short cmdBonus = 0;
 	short strBonus = 0;
 	short magBonus = 0;
 	short defBonus = 0;
-	short* artifact = reinterpret_cast<short*>(m_artifacts);
-	for (int i = 0; i < 100; i++, artifact++) {
-		short artifactId = *artifact;
+	for (int i = 0; i < 100; i++) {
+		int artifactId = m_artifacts[i];
 		if (artifactId > 0) {
 			unsigned short* artifactData = GetItemDataPtr(artifactId);
 			int artifactEffect = artifactData[0];
@@ -1790,7 +1901,7 @@ void CCaravanWork::CalcStatus()
 				}
 			}
 
-			short itemValue = (short)itemData[3];
+			unsigned short itemValue = (short)itemData[3];
 			if (itemType != 0x45) {
 				if (itemType >= 0x45) {
 					if (itemType == 0x7F) {
@@ -1809,6 +1920,7 @@ void CCaravanWork::CalcStatus()
 			m_baseDefense += itemValue;
 		apply_effect:
 			int itemEffect = itemData[4];
+			char effectValue = (char)itemValue;
 			switch (itemEffect) {
 			case 1:
 				m_elementResistances[1]++;
@@ -1834,29 +1946,29 @@ void CCaravanWork::CalcStatus()
 			case 8:
 				m_statusTimers[2]++;
 				break;
-			case 9:
-				m_equipEffectParams[0] += (char)itemValue;
-				break;
-			case 10:
-				m_equipEffectParams[1] += (char)itemValue;
-				break;
-			case 0xB:
-				m_equipEffectParams[2] += (char)itemValue;
-				break;
-			case 0xC:
-				m_equipEffectParams[3] += (char)itemValue;
-				break;
-			case 0x10:
-				m_equipEffectParams[4] += (char)itemValue;
-				break;
-			case 0x11:
-				m_equipEffectParams[5] += (char)itemValue;
-				break;
-			case 0x12:
-				m_equipEffectParams[6] += (char)itemValue;
-				break;
 			case 0x13:
 				m_elementResistances[0]++;
+				break;
+			case 9:
+				m_equipEffectParams[0] += effectValue;
+				break;
+			case 10:
+				m_equipEffectParams[1] += effectValue;
+				break;
+			case 0xB:
+				m_equipEffectParams[2] += effectValue;
+				break;
+			case 0xC:
+				m_equipEffectParams[3] += effectValue;
+				break;
+			case 0x10:
+				m_equipEffectParams[4] += effectValue;
+				break;
+			case 0x11:
+				m_equipEffectParams[5] += effectValue;
+				break;
+			case 0x12:
+				m_equipEffectParams[6] += effectValue;
 				break;
 			}
 			m_equipEffectFlags |= 1 << itemEffect;
@@ -2014,33 +2126,30 @@ unsigned int CCaravanWork::GetMagicCharge(int cmdListIdx, int&, int&)
 	if (Game.m_gameWork.m_menuStageMode == 0) {
 		groupedCountLocal = 1;
 	} else {
-		short* slotRef = m_commandListExtra + cmdListIdx;
-		if (slotRef[0] == 0) {
+		if (m_commandListExtra[cmdListIdx] == 0) {
 			groupedCountLocal = 1;
 		} else {
 			int topIdx = cmdListIdx;
 			int scanCount = cmdListIdx + 1;
 			if (cmdListIdx >= 0) {
 				for (; scanCount != 0; scanCount--) {
-					if (slotRef[0] != -1) {
+					if (m_commandListExtra[topIdx] != -1) {
 						break;
 					}
-					slotRef--;
 					topIdx--;
 				}
 			}
 
 			groupedCountLocal = 1;
 			int nextIdx = topIdx + 1;
-			slotRef = m_commandListExtra + nextIdx;
 			scanCount = static_cast<short>(m_numCmdListSlots) - nextIdx;
 			if (nextIdx < static_cast<short>(m_numCmdListSlots)) {
 				for (; scanCount != 0; scanCount--) {
-					if (slotRef[0] != -1) {
+					if (m_commandListExtra[nextIdx] != -1) {
 						break;
 					}
 					groupedCountLocal++;
-					slotRef++;
+					nextIdx++;
 				}
 			}
 		}
@@ -2049,14 +2158,12 @@ unsigned int CCaravanWork::GetMagicCharge(int cmdListIdx, int&, int&)
 	if (groupedCountLocal == 1) {
 		return (((unsigned int)__cntlzw(cmdListIdx - static_cast<short>(m_currentCmdListIndex))) >> 5) & 0xFF;
 	} else {
-		short* slotRef = m_commandListExtra + cmdListIdx;
 		int scanCount = cmdListIdx + 1;
 		if (cmdListIdx >= 0) {
 			for (; scanCount != 0; scanCount--) {
-				if (slotRef[0] != -1) {
+				if (m_commandListExtra[cmdListIdx] != -1) {
 					break;
 				}
-				slotRef--;
 				cmdListIdx--;
 			}
 		}
@@ -2229,20 +2336,18 @@ int CCaravanWork::DelCmdListAndItem(int cmdListIdx)
 		}
 	} else {
 		int numGrouped;
-		short* cmdListSlot = m_commandListExtra + cmdListIdx;
 		if (Game.m_gameWork.m_menuStageMode == 0) {
 			numGrouped = 1;
-		} else if (cmdListSlot[0] == 0) {
+		} else if (m_commandListExtra[cmdListIdx] == 0) {
 			numGrouped = 1;
 		} else {
 			int scanCount = cmdListIdx + 1;
 			int topIdx = cmdListIdx;
 			if (cmdListIdx >= 0) {
 				while (scanCount != 0) {
-					if (cmdListSlot[0] != -1) {
+					if (m_commandListExtra[topIdx] != -1) {
 						break;
 					}
-					cmdListSlot--;
 					topIdx--;
 					scanCount--;
 				}
@@ -2250,14 +2355,14 @@ int CCaravanWork::DelCmdListAndItem(int cmdListIdx)
 
 			numGrouped = 1;
 			scanCount = (short)m_numCmdListSlots - (topIdx + 1);
-			cmdListSlot = m_commandListExtra + topIdx + 1;
+			int nextIdx = topIdx + 1;
 			if ((topIdx + 1) < (short)m_numCmdListSlots) {
 				while (scanCount != 0) {
-					if (cmdListSlot[0] != -1) {
+					if (m_commandListExtra[nextIdx] != -1) {
 						break;
 					}
 					numGrouped++;
-					cmdListSlot++;
+					nextIdx++;
 					scanCount--;
 				}
 			}
@@ -2265,13 +2370,11 @@ int CCaravanWork::DelCmdListAndItem(int cmdListIdx)
 
 		if (numGrouped > 1) {
 			int scanCount = cmdListIdx + 1;
-			cmdListSlot = m_commandListExtra + cmdListIdx;
 			if (cmdListIdx >= 0) {
 				while (scanCount != 0) {
-					if (cmdListSlot[0] != -1) {
+					if (m_commandListExtra[cmdListIdx] != -1) {
 						break;
 					}
-					cmdListSlot--;
 					cmdListIdx--;
 					scanCount--;
 				}
@@ -2307,13 +2410,14 @@ int CCaravanWork::DelCmdListAndItem(int cmdListIdx)
  */
 void CCaravanWork::GetNumCombi(int cmdListIdx, int updateJoybus)
 {
-	short nextCmdIdx = 0;
+	int nextCmdIdx = 0;
+	short* slotRefPtr = &m_commandListInventorySlotRef[cmdListIdx];
 	if (m_currentCmdListIndex == cmdListIdx) {
 		nextCmdIdx = GetNextCmdListIdx(cmdListIdx, 1);
 	}
 
-	short inventorySlot = m_commandListInventorySlotRef[cmdListIdx];
-	if (m_inventoryItems[inventorySlot] != 0xFFFF) {
+	short inventorySlot = *slotRefPtr;
+	if (m_inventoryItems[inventorySlot] != -1) {
 		m_inventoryItems[inventorySlot] = 0xFFFF;
 		m_inventoryItemCount = static_cast<short>(m_inventoryItemCount - 1);
 		if (updateJoybus != 0) {
@@ -2321,7 +2425,7 @@ void CCaravanWork::GetNumCombi(int cmdListIdx, int updateJoybus)
 		}
 	}
 
-	m_commandListInventorySlotRef[cmdListIdx] = 0xFFFF;
+	*slotRefPtr = 0xFFFF;
 	if (updateJoybus != 0) {
 		Joybus.SetCmdLst(m_joybusCaravanId, cmdListIdx, -1);
 	}
@@ -2485,7 +2589,7 @@ void CCaravanWork::SortBeforeReturnWorldMap()
 
 					for (int slot = 2; slot < 8; slot++) {
 						if (static_cast<short>(m_commandListInventorySlotRef[slot]) == j) {
-							m_commandListInventorySlotRef[slot] = static_cast<unsigned short>(i);
+							m_commandListInventorySlotRef[slot] = static_cast<short>(i);
 						}
 					}
 
@@ -2502,7 +2606,7 @@ void CCaravanWork::SortBeforeReturnWorldMap()
 				for (int slot = 2; slot < 8; slot++) {
 					short cur = static_cast<short>(m_commandListInventorySlotRef[slot]);
 					if (cur == i) {
-						m_commandListInventorySlotRef[slot] = static_cast<unsigned short>(j);
+						m_commandListInventorySlotRef[slot] = static_cast<short>(j);
 					} else if (cur == j) {
 						m_commandListInventorySlotRef[slot] = static_cast<unsigned short>(i);
 					}
@@ -2802,7 +2906,7 @@ void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
 		(Game.m_gameWork.m_bossArtifactStageIndex < 0xF)) {
 		CGame::CBossArtifactStage* bossArtifacts =
 			&Game.m_bossArtifactBase[Game.m_gameWork.m_bossArtifactStageIndex];
-		unsigned short artifactScale = bossArtifacts->m_entries[8].m_values[0];
+		short artifactScale = bossArtifacts->m_entries[8].m_values[0];
 		m_maxHp = (unsigned short)((float)m_maxHp *
 								   ((((float)artifactScale) * kGObjWorkStatusScaleStep) + kGObjWorkStatusScaleBase));
 	}

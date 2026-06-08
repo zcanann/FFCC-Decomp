@@ -59,9 +59,6 @@ CTexture::CTexture()
 static inline CTexture* NewTexture(CMemory::CStage* textureStage, char* file, int line)
 {
     void* memory = Memory._Alloc(sizeof(CTexture), textureStage, file, line, 0);
-    if (memory == 0) {
-        return 0;
-    }
     return ::new (memory) CTexture;
 }
 

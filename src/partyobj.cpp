@@ -1037,7 +1037,7 @@ void CGPartyObj::onFramePreCalc()
 		}
 	}
 
-	onChangePrg(2);
+	bonus(2, 0, 0);
 
 	if (Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
 		if (party.carryObject == nullptr &&
@@ -1505,14 +1505,14 @@ void CGPartyObj::command()
 				System.Printf(const_cast<char*>(msgBase + 0x2F8), addedItem, addedSlot);
 			}
 			if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(party.target) + 0x560) != 1) {
-				enableAttackCol(4, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504), 0);
+				bonus(4, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504), 0);
 			}
 		} else if (itemIdx == 0x190) {
-			enableAttackCol(5, 0x190, 0);
+			bonus(5, 0x190, 0);
 			System.Printf(const_cast<char*>(msgBase + 0x324), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x558));
 			caravan->AddGil(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x558));
 			if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(party.target) + 0x560) != 1) {
-				enableAttackCol(4, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504), 0);
+				bonus(4, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504), 0);
 			}
 		}
 	}
@@ -2153,7 +2153,7 @@ void CGPartyObj::statCharge()
 	case 2: {
 		if (m_subFrame == 0) {
 			endPSlotBit(8);
-			enableAttackCol(0x18, 0, 0);
+			bonus(0x18, 0, 0);
 		}
 		if (m_subFrame == 5 && m_comboItemState >= 0) {
 			endPSlotBit(0x20);
@@ -2243,10 +2243,10 @@ void CGPartyObj::statCharge()
 				}
 			}
 			if (phase == p[1]) {
-				ClassControl(1, 1);
+				enableAttackCol(1, 1, p[0]);
 			}
 			if (phase == p[2]) {
-				ClassControl(0, 0);
+				enableAttackCol(0, 0, 0);
 			}
 		}
 
@@ -2985,7 +2985,7 @@ void CGPartyObj::onStatMagic()
 		break;
 	case 2:
 		if (m_subFrame == 0) {
-			reqAnim(0x19, 0, 0);
+			bonus(0x19, 0, 0);
 			if (m_itemId == 0x103) {
 				m_comboCenter = m_worldPosition;
 				m_comboTarget = m_comboCenter;
@@ -3342,10 +3342,11 @@ void CGPartyObj::statPut()
 	    Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
 	    (static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
 	    reinterpret_cast<int*>(m_scriptHandle)[0xED] != 0) {
+		unsigned int chalice = Game.unk_flat3_0xc7d0;
 		if (m_stateFrame == 0) {
 			CancelMove(1);
 			FLOAT_8032EE80 = FLOAT_80331AB0;
-			FLOAT_8032EE84 = *reinterpret_cast<float*>(Game.unk_flat3_0xc7d0 + 0x160) - m_worldPosition.y;
+			FLOAT_8032EE84 = *reinterpret_cast<float*>(chalice + 0x160) - m_worldPosition.y;
 		}
 
 		if (m_stateFrame <= 0x0B) {

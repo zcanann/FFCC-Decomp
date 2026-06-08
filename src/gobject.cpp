@@ -2874,7 +2874,7 @@ int CGObject::IsLoopAnim(int mode)
 
     const float span = sAnimFrameOffset + (model.m_animEnd - model.m_animStart);
 
-    if (span == sAnimFrameOffset) {
+    if (sAnimFrameOffset == span) {
         return 1;
     }
 

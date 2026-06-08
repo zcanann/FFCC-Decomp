@@ -204,9 +204,8 @@ void CGraphicPcs::drawScreenFade()
 
     for (int slot = 0; slot < 4; slot++) {
         ScreenFadeSlot* slotData = &m_screenFade[slot];
-        const int invert = slotData->m_invert;
 
-        if ((invert == 0) && (slotData->m_timer == 0)) {
+        if ((slotData->m_invert == 0) && (slotData->m_timer == 0)) {
             continue;
         }
         _GXSetBlendMode((GXBlendMode)1, (GXBlendFactor)4, (GXBlendFactor)5, (GXLogicOp)1);
@@ -231,7 +230,7 @@ void CGraphicPcs::drawScreenFade()
         _GXColor baseColor2 = slotData->m_colorB;
 
         float t = (float)slotData->m_timer / (float)slotData->m_duration;
-        if (invert != 0) {
+        if (slotData->m_invert != 0) {
             t = kGraphicOne - t;
         }
         const float fadeWave = (float)sin((double)(kScreenFadeHalfPi * t));

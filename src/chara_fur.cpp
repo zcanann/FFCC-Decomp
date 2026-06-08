@@ -484,7 +484,7 @@ void CChara::TimeMogFur()
 			newA = clampedA;
 
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(texels) + tileIndex) =
-			    static_cast<unsigned short>((b & 0xF) | ((g & 0xF) << 4) | ((r & 0xF) << 8) | ((newA & 7) << 12));
+			    static_cast<unsigned short>((newA << 12) | (r << 8) | (g << 4) | b);
 		}
 	}
 

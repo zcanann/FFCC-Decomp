@@ -1854,10 +1854,10 @@ unsigned short CMenuPcs::CmakeJobCtrl()
         }
     } else {
         if ((repeat & 0x8) != 0) {
-            if ((CmakeState(this)->m_select % 4) == 0) {
-                CmakeState(this)->m_select = static_cast<short>(CmakeState(this)->m_select + 3);
-            } else {
+            if ((CmakeState(this)->m_select % 4) != 0) {
                 CmakeState(this)->m_select = static_cast<short>(CmakeState(this)->m_select - 1);
+            } else {
+                CmakeState(this)->m_select = static_cast<short>(CmakeState(this)->m_select + 3);
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else if ((repeat & 0x4) != 0) {

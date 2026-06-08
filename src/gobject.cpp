@@ -1479,12 +1479,12 @@ void CGObject::update()
             if (m_groundHitOffset.x == sZeroFloat && m_groundHitOffset.z == sZeroFloat) {
                 PSMTXQuat(tiltMtx, &m_bgCollisionQtrn);
             } else {
-                Vec worldUp = {0.0f, 1.0f, 0.0f};
+                CVector worldUp(sZeroFloat, sAnimFrameOffset, sZeroFloat);
                 Vec axis;
                 const float slideMagSq =
                     m_groundHitOffset.x * m_groundHitOffset.x + m_groundHitOffset.z * m_groundHitOffset.z;
                 const float slideMag = slideMagSq > sZeroFloat ? sqrtf(slideMagSq) : sZeroFloat;
-                PSVECCrossProduct(&m_groundHitOffset, &worldUp, &axis);
+                PSVECCrossProduct(&m_groundHitOffset, worldUp, &axis);
                 PSMTXRotAxisRad(tiltMtx, &axis, slideMag * -0.125f);
                 Mtx quatMtx;
                 PSMTXQuat(quatMtx, &m_bgCollisionQtrn);
@@ -1495,9 +1495,12 @@ void CGObject::update()
             const float tx = modelMtx[0][3];
             const float ty = modelMtx[1][3];
             const float tz = modelMtx[2][3];
-            modelMtx[0][3] = sZeroFloat;
-            modelMtx[1][3] = sZeroFloat;
-            modelMtx[2][3] = sZeroFloat;
+            CVector tiltZero0(sZeroFloat, sZeroFloat, sZeroFloat);
+            modelMtx[0][3] = tiltZero0.x;
+            CVector tiltZero1(sZeroFloat, sZeroFloat, sZeroFloat);
+            modelMtx[1][3] = tiltZero1.y;
+            CVector tiltZero2(sZeroFloat, sZeroFloat, sZeroFloat);
+            modelMtx[2][3] = tiltZero2.z;
             PSMTXConcat(tiltMtx, modelMtx, modelMtx);
             modelMtx[0][3] = tx;
             modelMtx[1][3] = ty;

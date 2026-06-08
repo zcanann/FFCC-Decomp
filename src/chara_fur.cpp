@@ -636,7 +636,11 @@ void CChara::CalcMogScore()
 	}
 
 	{
-		char** radarLabel = reinterpret_cast<char**>(sMogRadarTypeLabels);
+		char* radarLabel[4];
+		radarLabel[0] = sMogRadarTypeLabels[4];
+		radarLabel[1] = sMogRadarTypeLabels[5];
+		radarLabel[2] = sMogRadarTypeLabels[6];
+		radarLabel[3] = sMogRadarTypeLabels[7];
 		Graphic.Printf(
 		    5,
 		    0xB,

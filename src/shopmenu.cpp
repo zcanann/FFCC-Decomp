@@ -995,24 +995,25 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
     font->DrawInit();
 
     int languageId = static_cast<unsigned int>(Game.m_gameWork.m_languageId);
+    int langIndex = languageId - 1;
     int equipType = MenuPcs.GetEquipType(itemNo);
     int statType;
     char* label = 0;
     if (equipType == 0) {
         statType = 0;
-        label = ShopMenuMes(languageId - 1, SHOP_MENU_TEXT_STRENGTH);
+        label = ShopMenuMes(langIndex, SHOP_MENU_TEXT_STRENGTH);
     } else {
         equipType = MenuPcs.GetEquipType(itemNo);
         if (equipType == 3) {
             statType = 2;
         } else {
             statType = 1;
-            label = ShopMenuMes(languageId - 1, SHOP_MENU_TEXT_DEFENCE);
+            label = ShopMenuMes(langIndex, SHOP_MENU_TEXT_DEFENCE);
         }
     }
 
     int itemData = Game.unkCFlatData0[2] + itemNo * 0x48;
-    short statValue = *reinterpret_cast<short*>(itemData + 6);
+    unsigned short statValue = *reinterpret_cast<unsigned short*>(itemData + 6);
     int attr = *reinterpret_cast<unsigned short*>(itemData + 8);
     char textBuffer[256];
 

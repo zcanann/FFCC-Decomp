@@ -983,8 +983,8 @@ comm_fail:
         *reinterpret_cast<int*>(param + 0x9C) = 1;
         param[0xC3] = 0;
         {
-            int probe = SIProbe(channel);
-            *reinterpret_cast<int*>(param + 0x98) = probe;
+            unsigned int probe = SIProbe(channel);
+            *reinterpret_cast<unsigned int*>(param + 0x98) = probe;
             if (probe == 0x80)
             {
                 retryLine = 0x2CB;
@@ -992,14 +992,14 @@ comm_fail:
             }
             if (probe == 0x40000)
             {
-                *reinterpret_cast<int*>(param + 0x94) = 0x40000;
+                *reinterpret_cast<unsigned int*>(param + 0x94) = probe;
                 param[0xBF] = 0;
             }
             else
             {
                 if (probe != 8 && probe != 0x40)
                 {
-                    *reinterpret_cast<int*>(param + 0x94) = probe;
+                    *reinterpret_cast<unsigned int*>(param + 0x94) = probe;
                 }
                 param[0xBF] = 1;
             }

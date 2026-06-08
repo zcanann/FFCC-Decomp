@@ -893,17 +893,15 @@ haveNotice:
 	}
 
 	int classId = (*reinterpret_cast<int**>(mon + 0x58))[4];
-	if (classId != 0x70) {
-		if (classId < 0x70) {
-			if (classId == 0x6A) {
-				notice = true;
-				*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x35;
-			}
-		} else if (classId == 0x7B) {
-			notice = true;
-		}
-	} else {
+	switch (classId) {
+	case 0x6A:
 		notice = true;
+		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x35;
+		break;
+	case 0x70:
+	case 0x7B:
+		notice = true;
+		break;
 	}
 
 	if (notice) {

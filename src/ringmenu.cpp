@@ -466,30 +466,28 @@ void CRingMenu::drawGBA()
  */
 void CRingMenu::onDraw()
 {
-	const int menuIndex = m_menuIndex;
-	if (!((Game.m_gameWork.m_menuStageMode == 0) || (menuIndex < 1))) {
+	if (!((Game.m_gameWork.m_menuStageMode == 0) || (m_menuIndex < 1))) {
 		return;
 	}
 
-	unsigned int scriptFood = Game.m_scriptFoodBase[menuIndex];
+	unsigned int scriptFood = Game.m_scriptFoodBase[m_menuIndex];
 	if (scriptFood == 0) {
 		return;
 	}
 
-	double showScale = static_cast<double>(static_cast<float>(m_displayCounter) * kRingMenuAnimStep);
+	float showScale = static_cast<float>(m_displayCounter) * kRingMenuAnimStep;
 	if (m_displayDirection != 0) {
-		showScale = static_cast<double>(kRingMenuOne) - showScale;
+		showScale = kRingMenuOne - showScale;
 	}
-	if (showScale == static_cast<double>(kRingMenuZero)) {
+	if (showScale == kRingMenuZero) {
 		return;
 	}
 
-	double transitionScale;
+	float transitionScale;
 	if (m_animDirection != 0) {
-		transitionScale = -static_cast<double>(static_cast<float>(
-			static_cast<double>(static_cast<float>(m_transitionCounter) * kRingMenuAnimStep) - kRingMenuOne));
+		transitionScale = -(static_cast<float>(m_transitionCounter) * kRingMenuAnimStep - kRingMenuOne);
 	} else {
-		transitionScale = static_cast<double>(static_cast<float>(m_transitionCounter) * kRingMenuAnimStep);
+		transitionScale = static_cast<float>(m_transitionCounter) * kRingMenuAnimStep;
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x16));
@@ -505,7 +503,7 @@ void CRingMenu::onDraw()
 	sin(static_cast<double>(cycleAngle));
 	sin(static_cast<double>(kRingMenuNegHalfPi + cycleAngle));
 
-	const double pulse = sin(static_cast<double>(kRingMenuHalfPi) * showScale);
+	const double pulse = sin(static_cast<double>(kRingMenuHalfPi * showScale));
 
 	const float alphaScaleBase = kRingMenuAlphaMax * static_cast<float>(showScale * transitionScale);
 	const float glowOffset = kRingMenuButtonHeight * (kRingMenuOne - static_cast<float>(pulse));
@@ -523,25 +521,25 @@ void CRingMenu::onDraw()
 
 		if (group == 2) {
 			float sideX = posLeft;
-			if ((menuIndex & 1) != 0) {
+			if ((m_menuIndex & 1) != 0) {
 				sideX = posAltX;
 			}
 			posX = kRingMenuButtonInsetX + sideX;
 
 			float sideY = posLeft;
-			if ((menuIndex & 2) != 0) {
+			if ((m_menuIndex & 2) != 0) {
 				sideY = posAltY;
 			}
 			posY = kRingMenuPanelWidth80 + sideY;
 		} else {
 			float sideX = posLeft;
-			if ((menuIndex & 1) != 0) {
+			if ((m_menuIndex & 1) != 0) {
 				sideX = posMainX;
 			}
 			posX = kRingMenuButtonWidth + sideX;
 
 			float sideY = posLeft;
-			if ((menuIndex & 2) != 0) {
+			if ((m_menuIndex & 2) != 0) {
 				sideY = posMainY;
 			}
 			posY = kRingMenuMainButtonY + sideY;
@@ -553,7 +551,7 @@ void CRingMenu::onDraw()
 		}
 
 			if (group == 2) {
-				CGPartyObj* partyObj = Game.m_partyObjArr[menuIndex];
+				CGPartyObj* partyObj = Game.m_partyObjArr[m_menuIndex];
 				buttonAlpha = static_cast<double>(-static_cast<int>(
 					static_cast<unsigned short>(partyObj->m_partyData.commandMode) & 9) >>
 				                                  31);
@@ -592,7 +590,7 @@ void CRingMenu::onDraw()
 		}
 
 		if (group == 2) {
-			CGPartyObj* partyObj = Game.m_partyObjArr[menuIndex];
+			CGPartyObj* partyObj = Game.m_partyObjArr[m_menuIndex];
 			if (partyObj != 0) {
 				CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle);
 				int cmdIndex = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
@@ -636,9 +634,9 @@ void CRingMenu::onDraw()
 				                ? (prev1 + 4) % 5
 				                : caravanWork->GetNextCmdListIdx(prev1, -1);
 
-				drawCommand(menuIndex, font, posX, posY, caravanWork, prev2, static_cast<float>(scroll - kRingMenuTwo),
+				drawCommand(m_menuIndex, font, posX, posY, caravanWork, prev2, static_cast<float>(scroll - kRingMenuTwo),
 				            static_cast<float>(labelAlphaScale));
-				drawCommand(menuIndex, font, posX, posY, caravanWork, prev1, static_cast<float>(scroll - kRingMenuOne),
+				drawCommand(m_menuIndex, font, posX, posY, caravanWork, prev1, static_cast<float>(scroll - kRingMenuOne),
 				            static_cast<float>(labelAlphaScale));
 				int next1 = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
 				                ? (cmdIndex + 1) % 5
@@ -646,11 +644,11 @@ void CRingMenu::onDraw()
 				int next2 = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
 				                ? (next1 + 1) % 5
 				                : caravanWork->GetNextCmdListIdx(next1, 1);
-				drawCommand(menuIndex, font, posX, posY, caravanWork, next2, static_cast<float>(scroll + kRingMenuTwo),
+				drawCommand(m_menuIndex, font, posX, posY, caravanWork, next2, static_cast<float>(scroll + kRingMenuTwo),
 				            static_cast<float>(labelAlphaScale));
-				drawCommand(menuIndex, font, posX, posY, caravanWork, next1, static_cast<float>(scroll + kRingMenuOne),
+				drawCommand(m_menuIndex, font, posX, posY, caravanWork, next1, static_cast<float>(scroll + kRingMenuOne),
 				            static_cast<float>(labelAlphaScale));
-				drawCommand(menuIndex, font, posX, posY, caravanWork, cmdIndex, static_cast<float>(scroll), iconAlphaScale);
+				drawCommand(m_menuIndex, font, posX, posY, caravanWork, cmdIndex, static_cast<float>(scroll), iconAlphaScale);
 				MenuPcs.DrawInit();
 			}
 		}
@@ -726,7 +724,7 @@ void CRingMenu::onDraw()
 
 			if (group == 2) {
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1F));
-				CGPartyObj* partyObj = Game.m_partyObjArr[menuIndex];
+				CGPartyObj* partyObj = Game.m_partyObjArr[m_menuIndex];
 				if (partyObj != 0) {
 					CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle);
 					if ((caravanWork != 0) && ((CFlatGameFlags() & CFlatGameFlag_Bit1) == 0)) {

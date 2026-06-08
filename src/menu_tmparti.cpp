@@ -207,8 +207,8 @@ void CMenuPcs::TmpArtiDraw()
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	const CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	TmpArtiEntry* entry = GetTmpArtiEntries(this);
+	const CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 
 	for (int i = 0; i < GetTmpArtiList(this)->count; i++) {
 		int tex = entry->tex;

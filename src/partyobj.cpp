@@ -1211,7 +1211,7 @@ void CGPartyObj::command()
 				canAddBlock = true;
 				break;
 			case 0xCA:
-				if (CFlatCenterState() == 0) {
+				if (static_cast<int>(CFlatCenterState()) == 0) {
 					secondaryAvailable = true;
 					secondaryCommand = 0x1C;
 				} else {
@@ -1224,7 +1224,7 @@ void CGPartyObj::command()
 				secondaryCommand = 6;
 				break;
 			case 0xC8:
-				if (CFlatCenterState() == 0) {
+				if (static_cast<int>(CFlatCenterState()) == 0) {
 					secondaryAvailable = true;
 					secondaryCommand = 0x0B;
 				} else {
@@ -1233,7 +1233,7 @@ void CGPartyObj::command()
 				}
 				break;
 			case 0xC9:
-				if (CFlatCenterState() == 0) {
+				if (static_cast<int>(CFlatCenterState()) == 0) {
 					secondaryAvailable = true;
 					secondaryCommand = 0x0A;
 				} else {

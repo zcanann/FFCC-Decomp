@@ -352,7 +352,7 @@ static int CharaObjDecodeHitParticleSe(unsigned short seData)
 
 static int CharaObjDecodeSe(unsigned short encodedSe)
 {
-	if (encodedSe == 0 || encodedSe == 0xFFFF) {
+	if (encodedSe == 0xFFFF) {
 		return 0;
 	}
 	return (encodedSe & 0xFF) + ((encodedSe >> 8) * 1000);
@@ -662,7 +662,7 @@ void CGCharaObj::onFramePostCalc()
 				} else {
 					int activePad = Pad.m_debugPadPort;
 					int idx = slot & ~(static_cast<int>(~((activePad - slot) | (slot - activePad))) >> 31);
-					heldMask = Pad.GetPadInputs()[idx].repeatButton;
+					heldMask = Pad.GetPadInputs()[idx].stickBitsDown;
 				}
 				padMask |= heldMask;
 			}
@@ -1096,7 +1096,7 @@ void CGCharaObj::onFrameStat()
 				break;
 			case 3:
 				if (m_subFrame == 0) {
-					reqAnim(((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) ? m_unk558 : m_unk55C, 0, 0);
+					reqAnim((((static_cast<unsigned int>(__cntlzw(0xAD - (static_cast<unsigned short>(GetCID()) & 0xAD))) >> 5) & 0xFFU) != 0) ? m_unk558 : m_unk55C, 0, 0);
 				}
 
 				if (isLoopAnim() != 0) {
@@ -2196,7 +2196,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 				delta.x = deltaVec.x;
 				delta.y = deltaVec.y;
 				delta.z = deltaVec.z;
-				moveVectorH(&delta, 8.0f, 8);
+				moveVectorH(&delta, FLOAT_803319A8, 8);
 				m_rotTargetY = static_cast<float>(atan2(-static_cast<double>(delta.x), -static_cast<double>(delta.z)));
 				changeStat(0x19, 0, 0);
 			}
@@ -2878,7 +2878,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 			if (effectId < 0x46F) {
 				if (effectId > 0x46C) {
 					if (effectArg0 == 2) {
-						if (m_stateFrame > 0xF) {
+						if (m_stateFrame >= 0x10) {
 							CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | 0x1D);
 							float rand0 = Math.RandFPM(kCharaObjForwardParticleOffset);
 							float rand1 = Math.RandFPM(kCharaObjForwardParticleOffset);
@@ -3389,7 +3389,7 @@ void CGCharaObj::combi2()
 				continue;
 			}
 
-			if (PSVECDistance(&CharaObjComboCenter(party), &CharaObjComboCenter(other)) < kQuadObjDebugHeight) {
+			if (PSVECDistance(&CharaObjComboCenter(candidates[i]), &CharaObjComboCenter(other)) < kQuadObjDebugHeight) {
 				hasNearbyPartner = 1;
 				break;
 			}

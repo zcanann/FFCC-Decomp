@@ -156,7 +156,7 @@ void CLine<64>::Draw()
 		i++;
 	}
 
-	const float yOffset = 1.0f;
+	const float yOffset = 5.0f;
 	GXBegin((GXPrimitive)0xB0, GX_VTXFMT0, (u16)(pointCount & 0xFFFF));
 	i = 0;
 	while (i < pointCount) {

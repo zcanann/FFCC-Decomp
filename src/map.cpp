@@ -1986,7 +1986,10 @@ int CMapMng::ReadMpl(char* mapName)
                 }
             } else {
                 while (chunkFile.GetNextChunk(chunk)) {
-                    if (chunk.m_id != 0x4D455348) {
+                    switch (chunk.m_id) {
+                    case 0x4D455348:
+                        break;
+                    default:
                         continue;
                     }
 
@@ -2380,7 +2383,10 @@ int CMapMng::ReadMid(char* mapName)
     CMapObj* nextMapObj = GetMapObjArray();
     CChunkFile::CChunk chunk;
     while (chunkFile.GetNextChunk(chunk)) {
-        if (chunk.m_id != 0x4D494420) {
+        switch (chunk.m_id) {
+        case 0x4D494420:
+            break;
+        default:
             continue;
         }
 

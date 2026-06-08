@@ -2804,10 +2804,10 @@ void CGMonObj::suikomi(int endFrame, float zOffset)
 		for (int i = 0; i < 4; i++) {
 			CGPartyObj* party = Game.m_partyObjArr[i];
 			if (party != 0) {
-				gCFlatRuntime2.ResetParticleWork(0x26, *(int*)(self + 0x58c));
-				gCFlatRuntime2.SetParticleWorkTrace(this);
-				gCFlatRuntime2.SetParticleWorkBind(party);
-				gCFlatRuntime2.PutParticleWork();
+				CFlat.ResetParticleWork(0x26, *(int*)(self + 0x58c));
+				CFlat.SetParticleWorkTrace(this);
+				CFlat.SetParticleWorkBind(party);
+				CFlat.PutParticleWork();
 			}
 		}
 	}
@@ -2820,30 +2820,9 @@ void CGMonObj::suikomi(int endFrame, float zOffset)
 				float dz =
 				    zOffset + (*(float*)(self + 0x164) - *(float*)((unsigned char*)party + 0x164));
 				float distSq = dx * dx + dz * dz;
-				double dist = (double)distSq;
+				float dist = sqrtf(distSq);
 
-				if (distSq <= kMonObjBossZero) {
-					if (kMonObjBossZeroF64 <= dist) {
-						unsigned int exp = (unsigned int)distSq & 0x7f800000;
-						int fpClass;
-						if (exp == 0x7f800000) {
-							fpClass = (((unsigned int)distSq & 0x7fffff) == 0) ? 2 : 1;
-						} else if ((exp < 0x7f800000) && (exp == 0)) {
-							fpClass = (((unsigned int)distSq & 0x7fffff) == 0) ? 3 : 5;
-						} else {
-							fpClass = 4;
-						}
-						if (fpClass == 1) {
-							dist = NAN;
-						}
-					} else {
-						dist = NAN;
-					}
-				} else {
-					dist = sqrtf(distSq);
-				}
-
-				if ((double)kMonObjBossZero < dist) {
+				if (kMonObjBossZero < dist) {
 					float accel = (float)((double)kMonObjBossOne / dist) * kMonObjBossQuarter *
 					              (float)(dist / (double)kMonObjBossLargeBodyRadius);
 					*(float*)((unsigned char*)party + 0x104) += dx * accel;
@@ -2857,30 +2836,9 @@ void CGMonObj::suikomi(int endFrame, float zOffset)
 			float dx = *(float*)(self + 0x15c) - *(float*)(target + 0x15c);
 			float dz = zOffset + (*(float*)(self + 0x164) - *(float*)(target + 0x164));
 			float distSq = dx * dx + dz * dz;
-			double dist = (double)distSq;
+			float dist = sqrtf(distSq);
 
-			if (distSq <= kMonObjBossZero) {
-				if (kMonObjBossZeroF64 <= dist) {
-					unsigned int exp = (unsigned int)distSq & 0x7f800000;
-					int fpClass;
-					if (exp == 0x7f800000) {
-						fpClass = (((unsigned int)distSq & 0x7fffff) == 0) ? 2 : 1;
-					} else if ((exp < 0x7f800000) && (exp == 0)) {
-						fpClass = (((unsigned int)distSq & 0x7fffff) == 0) ? 3 : 5;
-					} else {
-						fpClass = 4;
-					}
-					if (fpClass == 1) {
-						dist = NAN;
-					}
-				} else {
-					dist = NAN;
-				}
-			} else {
-				dist = sqrtf(distSq);
-			}
-
-			if ((double)kMonObjBossZero < dist) {
+			if (kMonObjBossZero < dist) {
 				float accel = (float)((double)kMonObjBossOne / dist) * kMonObjBossQuarter *
 				              (float)(dist / (double)kMonObjBossLargeBodyRadius);
 				*(float*)(target + 0x104) += dx * accel;

@@ -2881,7 +2881,7 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 		writeBase[0x2CB9] = static_cast<char>(valueBytes[3]);
 
 		if (*reinterpret_cast<short*>(cmakeBase + 0x2CB4) >= 6) {
-			memcpy(&localInfo, &cmakeInfo[channel], sizeof(localInfo));
+			localInfo = cmakeInfo[channel];
 		}
 	}
 	OSSignalSemaphore(accessSemaphores + channel);

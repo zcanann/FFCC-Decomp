@@ -498,7 +498,11 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         return 0;
     }
 
-    if (!(hitT < kMapHitEdgeMinT) && hitT < g_hit_t_min) {
+    if (hitT < kMapHitEdgeMinT || g_hit_t_min <= hitT) {
+        goto edge_loop;
+    }
+
+    {
         PSVECScale(hitDirection, &g_hit_hpv, hitT);
         PSVECAdd(&g_hit_cyl.m_bottom, &g_hit_hpv, &g_hit_hpv);
 
@@ -537,12 +541,12 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
                 if (cross.z >= kMapHitZero) {
                     sideMask &= 1;
                     if (sideMask == 0) {
-                        break;
+                        goto edge_loop;
                     }
                 } else if (cross.z <= kMapHitZero) {
                     sideMask &= 2;
                     if (sideMask == 0) {
-                        break;
+                        goto edge_loop;
                     }
                 }
 
@@ -569,12 +573,12 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
                 if (cross.z >= kMapHitZero) {
                     sideMask &= 1;
                     if (sideMask == 0) {
-                        break;
+                        goto edge_loop;
                     }
                 } else if (cross.z <= kMapHitZero) {
                     sideMask &= 2;
                     if (sideMask == 0) {
-                        break;
+                        goto edge_loop;
                     }
                 }
 
@@ -601,12 +605,12 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
                 if (cross.z >= kMapHitZero) {
                     sideMask &= 1;
                     if (sideMask == 0) {
-                        break;
+                        goto edge_loop;
                     }
                 } else if (cross.z <= kMapHitZero) {
                     sideMask &= 2;
                     if (sideMask == 0) {
-                        break;
+                        goto edge_loop;
                     }
                 }
 
@@ -614,21 +618,32 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
             }
             break;
         }
-
-        if (sideMask != 0) {
-            edgeIndex = -1;
-        }
     }
 
-    if (edgeIndex != -1 || g_hit_t < kMapHitEdgeMinT || g_hit_t_min <= g_hit_t) {
-        if (s_bitMask.m_fields.m_mode != 0) {
-            g_hit_lpface->m_drawFlags = s_bitMask.m_fields.m_drawFlags;
-        }
+commit:
+    if (s_bitMask.m_fields.m_mode != 0) {
+        g_hit_lpface->m_drawFlags = s_bitMask.m_fields.m_drawFlags;
+    }
+    g_hit_t_slide_min = g_hit_t;
+    g_hit_t_min = g_hit_t;
+    g_hit_f = g_hit_lpface;
+    g_hit_cyl_min = g_hit_cyl;
+    g_hit_mvec_min = g_hit_mvec;
+    g_hit_hpv_min = g_hit_hpv;
+    gMapHitFaceFlag = 1;
+    g_hit_edge_idx_min = edgeIndex;
+    return 1;
 
-        if (g_hit_lpface->m_edgeFlags == 0) {
-            return 0;
-        }
+edge_loop:
+    if (s_bitMask.m_fields.m_mode != 0) {
+        g_hit_lpface->m_drawFlags = s_bitMask.m_fields.m_drawFlags;
+    }
 
+    if (g_hit_lpface->m_edgeFlags == 0) {
+        return 0;
+    }
+
+    {
         Vec previous = m_vertices[g_hit_lpface->m_vertexIndices[g_hit_lpface->m_vertexCount - 1]];
         for (int i = 0; i < static_cast<int>(g_hit_lpface->m_vertexCount); i++) {
             Vec current = m_vertices[g_hit_lpface->m_vertexIndices[i]];
@@ -648,29 +663,14 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
                     edgeIndex = i;
                     PSVECScale(hitDirection, &g_hit_hpv, g_hit_t);
                     PSVECAdd(&g_hit_cyl.m_bottom, &g_hit_hpv, &g_hit_hpv);
-                    break;
+                    goto commit;
                 }
             }
             previous = current;
         }
-
-        if (edgeIndex == -1 || g_hit_t_min <= g_hit_t) {
-            return 0;
-        }
     }
 
-    g_hit_t_slide_min = g_hit_t;
-    g_hit_t_min = g_hit_t;
-    g_hit_f = g_hit_lpface;
-    g_hit_cyl_min = g_hit_cyl;
-    if (s_bitMask.m_fields.m_mode != 0) {
-        g_hit_lpface->m_drawFlags = s_bitMask.m_fields.m_drawFlags;
-    }
-    g_hit_mvec_min = g_hit_mvec;
-    g_hit_hpv_min = g_hit_hpv;
-    gMapHitFaceFlag = 1;
-    g_hit_edge_idx_min = edgeIndex;
-    return 1;
+    return 0;
 }
 
 /*

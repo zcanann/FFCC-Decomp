@@ -1293,15 +1293,16 @@ int CChara::CModel::PickFur(
 			const unsigned char* cursor = reinterpret_cast<const unsigned char*>(displayList->m_data);
 			if ((cursor[0] & 7) == 0) {
 				int remaining = displayList->m_size;
-				while (remaining > 0) {
-				const unsigned char command = cursor[0];
-				if ((command & 0xF8) == 0) {
-					break;
+				unsigned char command;
+				do {
+				while (true) {
+				if (remaining == 0) {
+					goto displayDone;
 				}
-
-				const unsigned char primitive = command & 0xF8;
+				command = cursor[0];
 				const unsigned short count = *reinterpret_cast<const unsigned short*>(cursor + 1);
 				cursor += 3;
+				const unsigned char primitive = command & 0xF8;
 				remaining -= static_cast<int>(count) * 8 + 3;
 				if (primitive != 0x90 && primitive != 0x98) {
 					break;
@@ -1513,6 +1514,8 @@ nextVertex:
 					cursor += 8;
 				}
 				}
+				} while ((command & 0xF8) != 0);
+displayDone:;
 			}
 			displayList++;
 		}

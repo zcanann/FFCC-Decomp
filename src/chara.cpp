@@ -993,6 +993,9 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 			continue;
 		}
 		if (chunk.m_version < 5) {
+			if (2 <= static_cast<u32>(System.m_execParam)) {
+				System.Printf(const_cast<char*>(lbl_801D90D4));
+			}
 			break;
 		}
 
@@ -1023,9 +1026,11 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 			} else if (chunk.m_id == 0x4E534554) {
 				const u32 nodeCapacity = chunk.m_arg0;
 				m_data->m_nodeCount = 0;
-				CChara::CNode::CRefData* nodeRefs = new CChara::CNode::CRefData[nodeCapacity];
+				CChara::CNode::CRefData* nodeRefs =
+				    new (stage, const_cast<char*>(s_chara_cpp), 0x143) CChara::CNode::CRefData[nodeCapacity];
 				m_data->m_nodeRefData = nodeRefs;
-				CChara::CNode* nodes = new CChara::CNode[nodeCapacity];
+				CChara::CNode* nodes =
+				    new (stage, const_cast<char*>(s_chara_cpp), 0x145) CChara::CNode[nodeCapacity];
 				m_nodes = nodes;
 
 				chunkFile.PushChunk();
@@ -1049,9 +1054,11 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 			} else if (chunk.m_id == 0x4D535354) {
 				const u32 meshCapacity = chunk.m_arg0;
 				m_data->m_meshCount = 0;
-				CChara::CMesh::CRefData* meshRefs = new CChara::CMesh::CRefData[meshCapacity];
+				CChara::CMesh::CRefData* meshRefs =
+				    new (stage, const_cast<char*>(s_chara_cpp), 0x171) CChara::CMesh::CRefData[meshCapacity];
 				m_data->m_meshRefData = meshRefs;
-				CChara::CMesh* meshes = new CChara::CMesh[meshCapacity];
+				CChara::CMesh* meshes =
+				    new (stage, const_cast<char*>(s_chara_cpp), 0x173) CChara::CMesh[meshCapacity];
 				m_meshes = meshes;
 
 				chunkFile.PushChunk();
@@ -2367,10 +2374,10 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 {
 	if (blendMode == -1) {
 		CAnim* currentAnim = m_anim;
-		if (currentAnim != 0 && AnimInterpCount(currentAnim) != 0 && AnimBank(currentAnim) != 0) {
+		u8 interpCount;
+		if (currentAnim != 0 && (interpCount = AnimInterpCount(currentAnim)) != 0 && AnimBank(currentAnim) != 0) {
 			blendMode = 4;
 
-			u8 interpCount = AnimInterpCount(currentAnim);
 			u16* interpTable = reinterpret_cast<u16*>(reinterpret_cast<u8*>(AnimBank(currentAnim)) + AnimInterpOffset(currentAnim));
 			int frame = static_cast<int>(m_curFrame);
 
@@ -2382,8 +2389,10 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 					break;
 				}
 			}
+		} else if (currentAnim != 0) {
+			blendMode = 4;
 		} else {
-			blendMode = (currentAnim == 0) ? 0 : 4;
+			blendMode = 0;
 		}
 	}
 
@@ -2411,23 +2420,16 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 			continue;
 		}
 
-		CAnimNode* animNodes = AnimNodes(m_anim);
-		u16 animNodeCount = AnimNodeCount(m_anim);
-		char* primaryName = NodeRefName(node);
-		char* secondaryName = NodeRefAltName(node);
-
-		for (u32 animIndex = 0; animIndex < animNodeCount; animIndex++) {
-			CAnimNode* animNode = &animNodes[animIndex];
+		for (u32 animIndex = 0; animIndex < AnimNodeCount(m_anim); animIndex++) {
+			CAnimNode* animNode = &AnimNodes(m_anim)[animIndex];
 			char* animName = AnimNodeName(animNode);
 
-			if (NodeAnimNode0(node) == 0 && primaryName[0] != '\0' && strcmp(primaryName, animName) == 0) {
-				NodeAnimNode0(node) = animNode;
-			} else if (NodeAnimNode1(node) == 0 && secondaryName[0] != '\0' && strcmp(secondaryName, animName) == 0) {
-				NodeAnimNode1(node) = animNode;
-			}
-
-			if (NodeAnimNode0(node) != 0 && NodeAnimNode1(node) != 0) {
-				break;
+			for (int slot = 0; slot < 2; slot++) {
+				char* name = node->m_refData->m_name + slot * 0x10;
+				if (name[0] != '\0' && strcmp(animName, name) == 0) {
+					(&NodeAnimNode0(node))[slot] = animNode;
+					break;
+				}
 			}
 		}
 	}
@@ -2440,26 +2442,28 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 		return;
 	}
 
-	u16 blendFrames = 0;
+	int blendFrames = 0;
 	if (ModelAttachMode(this) == 0) {
-		blendFrames = (AnimFlags(m_anim) & 0x80) != 0 ? static_cast<u16>(blendMode) : 0;
+		blendFrames = (AnimFlags(m_anim) & 0x80) != 0 ? blendMode : 0;
 	} else if (ModelAttachMode(this) == 1) {
-		blendFrames = static_cast<u16>(blendMode);
+		blendFrames = blendMode;
 	}
 
-	*reinterpret_cast<u16*>(reinterpret_cast<u8*>(this) + 0xD8) = blendFrames;
-	*reinterpret_cast<u16*>(reinterpret_cast<u8*>(this) + 0xDA) = blendFrames;
+	m_blendCur = static_cast<u16>(blendFrames);
+	m_blendMax = m_blendCur;
 
 	if (startFrame < 0) {
 		startFrame = 0;
 	}
-	if (endFrame < 0) {
+
+	m_curFrame = static_cast<float>(startFrame);
+	m_time = m_curFrame;
+	m_animStart = m_curFrame;
+
+	if (endFrame == -1) {
 		endFrame = static_cast<int>(AnimFrameCount(m_anim)) - 1;
 	}
 
-	m_animStart = static_cast<float>(startFrame);
-	m_curFrame = m_animStart;
-	m_time = m_animStart;
 	m_animEnd = static_cast<float>(endFrame);
 }
 

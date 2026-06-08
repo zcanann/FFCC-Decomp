@@ -132,7 +132,7 @@ public:
 			Mtx m_bindMtx;                  // 0x30
 			float m_boneLen;                // 0x60
 			s16 m_childBankOffset;          // 0x64
-			u16 m_index;                    // 0x66
+			s16 m_index;                    // 0x66
 			s16 m_parentIndex;              // 0x68
 			char m_name[0x10];              // 0x6A
 			char m_altName[0x10];           // 0x7A

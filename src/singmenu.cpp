@@ -969,6 +969,7 @@ static inline const char* GetSingWinMessage(int staticText, const char* dynamicT
         return (char*)gSingMenuTextTableFr[staticText];
     case 5:
         return (char*)gSingMenuTextTableEs[staticText];
+    case 1:
     default:
         return (char*)gSingMenuTextTableEn[staticText];
     }

@@ -2082,7 +2082,7 @@ void CMenuPcs::DrawResultCloseAnim()
 #pragma opt_dead_assignments off
 void CMenuPcs::CalcResultCloseAnim()
 {
-	const int activePartyCount = s_Rinfo->m_partyCount;
+	const unsigned int activePartyCount = s_Rinfo->m_partyCount;
 
 	if (*(signed char*)(this->m_bonusStatePtr + 0xb) == 0) {
 		int off = 0;
@@ -2173,7 +2173,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			*(int*)((int)sprite + 0x2c) = 1;
 			*(float*)(sprite + 0x1c) = (float)(int)*sprite;
 			*(float*)(sprite + 0x18) = FLOAT_80331ED0;
-			*sprite = (short)(int)((float)(int)*sprite - *(float*)(sprite + 0x18));
+			*sprite = (unsigned short)(int)((float)(int)*sprite - *(float*)(sprite + 0x18));
 		}
 
 		// extraBase + pc block: flags = 0
@@ -2261,7 +2261,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			float fy = (float)(int)sprite[1];
 			float ty = *(float*)(sprite + 0x1e);
 			float progress =
-			    1.0f - ((float)*(int*)(sprite + 0x10) / (float)*(unsigned int*)(sprite + 0x14));
+			    1.0f - ((float)*(int*)(sprite + 0x10) / (float)*(int*)(sprite + 0x14));
 			*(float*)(sprite + 0x18) =
 			    (*(float*)(sprite + 0x1c) - (float)(int)*sprite) * progress;
 			*(float*)(sprite + 0x1a) = (ty - fy) * progress;

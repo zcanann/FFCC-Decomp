@@ -2196,7 +2196,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 				delta.x = deltaVec.x;
 				delta.y = deltaVec.y;
 				delta.z = deltaVec.z;
-				moveVectorH(&delta, 8.0f, 8);
+				moveVectorH(&delta, FLOAT_803319A8, 8);
 				m_rotTargetY = static_cast<float>(atan2(-static_cast<double>(delta.x), -static_cast<double>(delta.z)));
 				changeStat(0x19, 0, 0);
 			}

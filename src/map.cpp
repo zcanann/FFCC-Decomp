@@ -2376,7 +2376,8 @@ int CMapMng::ReadMid(char* mapName)
 
         chunkFile.PushChunk();
         while (chunkFile.GetNextChunk(chunk)) {
-            if (chunk.m_id == 0x5343454E) {
+            switch (chunk.m_id) {
+            case 0x5343454E: {
                 chunkFile.PushChunk();
                 while (chunkFile.GetNextChunk(chunk)) {
                     if (chunk.m_id != 0x48495420) {
@@ -2394,8 +2395,9 @@ int CMapMng::ReadMid(char* mapName)
                 chunkFile.PopChunk();
                 continue;
             }
-
-            if (chunk.m_id != 0x4F43544D) {
+            case 0x4F43544D:
+                break;
+            default:
                 continue;
             }
 

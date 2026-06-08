@@ -193,7 +193,20 @@ public:
         WeaponNodeFlagBytes m_weaponNodeFlagBytes;
         WeaponNodeFlagAll m_weaponNodeFlagAll;
     };
-    unsigned short m_shieldNodeFlags; // 0x9C
+    struct ShieldNodeFlagBits {
+        signed char m_bit80 : 1;
+        signed char m_bit40 : 1;
+        signed char m_bit20 : 1;
+        signed char m_bit10 : 1;
+        signed char m_bit08 : 1;
+        signed char m_bit04 : 1;
+        signed char m_bit02 : 1;
+        signed char m_bit01 : 1;
+    };
+    union {
+        unsigned short m_shieldNodeFlags; // 0x9C
+        ShieldNodeFlagBits m_shieldNodeFlagBits;
+    };
     unsigned short m_animStartFrame;  // 0x9E
     unsigned short m_animEndFrame;    // 0xA0
     unsigned short m_pushTimer;       // 0xA2

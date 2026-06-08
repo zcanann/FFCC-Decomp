@@ -381,16 +381,16 @@ extern "C" WmMenuLightTable gWmMenuLightTables[];
 						float wmSplineU3 = wmSplineU2 * wmSplineU;                             \
 						result = wmSplineDt *                                                   \
 						             (wmSplinePrev[3] *                                       \
-						                  (wmSplineU - (FLOAT_803314c8 * wmSplineU2 -          \
-						                                wmSplineU3)) +                         \
+						                  (wmSplineU + (wmSplineU3 -                           \
+						                                FLOAT_803314c8 * wmSplineU2)) +        \
 						              wmSplineCur[2] * (wmSplineU3 - wmSplineU2)) +            \
-						         wmSplinePrev[1] *                                             \
-						             (FLOAT_803313e8 +                                        \
-						              (FLOAT_803314c8 * wmSplineU3 - FLOAT_803314c4 *          \
-						                                                wmSplineU2)) +          \
-						         wmSplineCur[1] *                                              \
-						             (FLOAT_803314cc * wmSplineU3 + FLOAT_803314c4 *           \
-						                                                wmSplineU2);            \
+						         (wmSplinePrev[1] *                                            \
+						              (FLOAT_803313e8 +                                       \
+						               (FLOAT_803314c8 * wmSplineU3 - FLOAT_803314c4 *         \
+						                                                 wmSplineU2)) +         \
+						          wmSplineCur[1] *                                             \
+						              (FLOAT_803314cc * wmSplineU3 + FLOAT_803314c4 *          \
+						                                                 wmSplineU2));          \
 					}                                                                          \
 					break;                                                                     \
 				}                                                                              \

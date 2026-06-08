@@ -767,7 +767,7 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 	const int requiredWords = classLocalCount + 0x60;
 	u8* scanNode = reinterpret_cast<u8*>(m_freeListNext);
 	const s32 scanDelta = static_cast<s32>((self + 0x978) - scanNode);
-	u32 noScan = static_cast<u32>(__cntlzw(static_cast<u32>(scanDelta))) >> 5 & 0xFF;
+	int noScan = static_cast<u32>(__cntlzw(static_cast<u32>(scanDelta))) >> 5 & 0xFF;
 	if (noScan == 0) {
 		u8* next;
 		while (((*reinterpret_cast<int*>(scanNode + 0xC) + requiredWords) + *reinterpret_cast<int*>(scanNode + 8))
@@ -810,13 +810,13 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 	object->m_codeIndex.m_codeFunc = -1;
 	object->m_argCount = 0;
 
-	u32 allowKeep = 1;
+	int allowKeep = 1;
 	if (classIndex == -1) {
 		allowKeep = static_cast<u32>(__cntlzw(*reinterpret_cast<u32*>(self + 0x970))) >> 5 & 0xFF;
 	}
 
 	u8* defs = (classIndex == -1) ? *reinterpret_cast<u8**>(self + 0x28) : 0;
-	unsigned int clearCount = (classIndex == -1) ? *reinterpret_cast<int*>(self + 0x24) : classBase->m_localCount;
+	int clearCount = (classIndex == -1) ? *reinterpret_cast<int*>(self + 0x24) : classBase->m_localCount;
 
 	unsigned int* write = object->m_thisBase;
 	while (clearCount > 0) {
@@ -899,7 +899,7 @@ int CFlatRuntime::SystemCall(CFlatRuntime::CObject* objectParam, int systemKind,
 	}
 
 	u8* func = 0;
-	const s16 classIndex = object->m_activeClassIndex;
+	const int classIndex = object->m_activeClassIndex;
 	if ((classIndex >= 0)
 	    && (((systemKind == 2) || (systemKind == 3)) && (systemIndex >= 0))) {
 		u8* const classes = reinterpret_cast<u8*>(m_classes) + (classIndex * 0x22C) + 0x24;
@@ -1688,7 +1688,7 @@ frameLoop:
 		}
 		case 9: {
 			--object->m_sp;
-			if (*object->m_sp != 0) {
+			if (static_cast<int>(*object->m_sp) != 0) {
 				const u32 jumpArg = *reinterpret_cast<u32*>(code + 1);
 				if ((static_cast<int>(jumpArg) >> 24) != 0) {
 					*object->m_sp++ = 1;
@@ -1704,7 +1704,7 @@ frameLoop:
 		}
 		case 8: {
 			--object->m_sp;
-			if (*object->m_sp == 0) {
+			if (static_cast<int>(*object->m_sp) == 0) {
 				const u32 jumpArg = *reinterpret_cast<u32*>(code + 1);
 				if ((static_cast<int>(jumpArg) >> 24) != 0) {
 					*object->m_sp++ = 0;
@@ -1751,7 +1751,7 @@ frameLoop:
 			    static_cast<u16>((static_cast<s16>(func->m_index) << 4)
 			                     | (*reinterpret_cast<u16*>(&object->m_codePos) & 0x000F));
 			object->m_codePos &= 0xFFF00000;
-			object->m_flags = static_cast<u8>(object->m_flags & 0xDF);
+			object->m_flagBits.m_callFlag = 0;
 			object->m_waitCounter = 0;
 			*reinterpret_cast<int*>(&object->m_reqFlag0) = 0;
 
@@ -1956,7 +1956,7 @@ frameLoop:
 			unsigned int* sp = object->m_sp;
 			--object->m_sp;
 			const u32 value = sp[-1] ^ sp[-2];
-			sp[-2] = (static_cast<int>((value >> 1) - (value & sp[-1])) >> 31);
+			sp[-2] = static_cast<u32>((static_cast<int>(value) >> 1) - static_cast<int>(value & sp[-1])) >> 31;
 			break;
 		}
 		case 0x2F: {
@@ -1970,7 +1970,7 @@ frameLoop:
 			unsigned int* sp = object->m_sp;
 			--object->m_sp;
 			const u32 value = sp[-2] ^ sp[-1];
-			sp[-2] = (static_cast<int>((value >> 1) - (value & sp[-2])) >> 31);
+			sp[-2] = static_cast<u32>((static_cast<int>(value) >> 1) - static_cast<int>(value & sp[-2])) >> 31;
 			break;
 		}
 		case 0x31: {
@@ -2052,12 +2052,12 @@ frameLoop:
 			*object->m_sp++ = returnValue;
 			object->m_localBase = previousLocalBase;
 			object->m_codePos = previousCodePos;
-			object->m_flags = static_cast<u8>((object->m_flags & 0xDF) | ((static_cast<s8>(previousActive) << 5) & 0x20));
+			object->m_flagBits.m_callFlag = static_cast<s8>(previousActive);
 			object->m_waitCounter = static_cast<int>(packedFlags) >> 16;
 			*reinterpret_cast<int*>(&object->m_reqFlag0) = (packedFlags >> 15) & 1;
 			object->m_argCount = static_cast<s16>(packedFlags);
 
-			if ((static_cast<int>(object->m_flags) << 24) < 0) {
+			if (object->m_flagBits.m_deleteFlag != 0) {
 				return 0;
 			}
 			if ((static_cast<int>(oldFlags) << 26) < 0) {
@@ -2137,7 +2137,7 @@ callSystemFunction:
 		*object->m_sp++ = returnValue;
 		object->m_localBase = previousLocalBase;
 		object->m_codePos = previousCodePos;
-		object->m_flags = static_cast<u8>((object->m_flags & 0xDF) | ((static_cast<s8>(previousActive) << 5) & 0x20));
+		object->m_flagBits.m_callFlag = static_cast<s8>(previousActive);
 		object->m_waitCounter = static_cast<int>(packedFlags) >> 16;
 		*reinterpret_cast<int*>(&object->m_reqFlag0) = (packedFlags >> 15) & 1;
 		object->m_argCount = static_cast<s16>(packedFlags);
@@ -2218,12 +2218,13 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 					for (int i = 0; i < object->m_argCount - 1; i++) {
 						while (true) {
 							int specLen = 0;
-							while ((format[specLen] != '\0') && ((specLen == 0) || (format[specLen] != '%'))) {
-								spec[specLen] = format[specLen];
+							char specChar;
+							while (((specChar = *format) != '\0') && ((specLen == 0) || (specChar != '%'))) {
+								spec[specLen] = specChar;
 								specLen++;
+								format++;
 							}
 							spec[specLen] = '\0';
-							format += specLen;
 
 							if (spec[0] == '%') {
 								break;

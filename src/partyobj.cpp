@@ -3552,7 +3552,7 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 		}
 		break;
 	case 10:
-		if ((unsigned int)(kind - 0x12) < 3 || kind == 0x15) {
+		if ((unsigned int)(kind - 0x12) <= 2 || kind == 0x15) {
 			subValue = stageSub;
 		}
 		if (kind == 0x17) {
@@ -3560,12 +3560,12 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 		}
 		break;
 	case 0x0B:
-		if ((unsigned int)(kind - 0x0E) < 3 || kind == 0x11) {
+		if ((unsigned int)(kind - 0x0E) <= 2 || kind == 0x11) {
 			addValue = stageAdd;
 		}
 		break;
 	case 0x0C:
-		if ((unsigned int)(kind - 0x12) < 3 || kind == 0x15) {
+		if ((unsigned int)(kind - 0x12) <= 2 || kind == 0x15) {
 			subValue = stageSub;
 		}
 		break;

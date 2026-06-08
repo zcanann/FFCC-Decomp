@@ -2141,6 +2141,10 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 	}
 
 	const int cullFlag = flags & 1;
+	const int shadowDisabled = ((flags >> 1) & 1) ^ 1;
+	const int shadowCullEnabled = (flags >> 3) & 1;
+	const int skipShadowPosition = ((flags >> 4) & 1) ^ 1;
+	const int materialAlpha = (flags >> 2) & 1;
 	BeforeDrawModelCallback beforeDrawModel = ModelBeforeDrawCallback(this);
 	if (beforeDrawModel != 0 && pass == 0) {
 		beforeDrawModel(this, ModelCbUser0(this), ModelCbUser1(this), view, cullFlag);
@@ -2165,14 +2169,14 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 	LightPcs.SetAmbientAlpha(ModelLightAlpha(this));
 
 	CCharaMeshRaw* mesh = ModelMeshes(this);
-	int lastLightEnable = -1;
-	int lastZWrite = -1;
+	int lastLightEnable = 0;
+	int lastZWrite = 0;
 
 	for (u32 meshIndex = 0; meshIndex < ModelMeshCount(this); meshIndex++, mesh++) {
 		if (mesh->m_workPositions == 0) {
 			continue;
 		}
-		if (static_cast<int>(meshIndex) <= 0x1F && ((ModelMeshVisibleMask(this) >> meshIndex) & 1) == 0) {
+		if (static_cast<int>(meshIndex) < 0x20 && ((ModelMeshVisibleMask(this) >> meshIndex) & 1) == 0) {
 			continue;
 		}
 
@@ -2185,11 +2189,11 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 			PSMTXConcat(ModelDrawMtx(this), ModelNodes(this)[mesh->m_data->m_nodeIndex].m_mtx, meshMtx);
 		}
 
-		if (((cullFlag == 0) && (((flags >> 1) & 1) != 1)) || ((cullFlag != 0) && (((flags >> 3) & 1) != 0))) {
+		if (((cullFlag == 0) && shadowDisabled) || ((cullFlag != 0) && (shadowCullEnabled != 0))) {
 			CameraPcs.SetFullScreenShadow(meshMtx, 0);
 		}
 
-		if (((flags >> 4) & 1) != 1) {
+		if (skipShadowPosition) {
 			Vec position;
 			position.x = ModelDrawMtx(this)[0][3];
 			position.y = ModelDrawMtx(this)[1][3];

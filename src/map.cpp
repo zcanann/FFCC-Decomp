@@ -1800,7 +1800,7 @@ int CMapMng::ReadMtx(char* mapName)
             return 1;
         }
 
-        if (static_cast<int>(System.m_execParam) >= 3) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 3) {
             System.Printf(const_cast<char*>(s_mapReadMtxFmt), strTmp);
         }
 
@@ -1970,7 +1970,7 @@ int CMapMng::ReadMpl(char* mapName)
         }
 
         if (filePtr == 0) {
-            if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+            if (static_cast<int>(System.m_execParam) >= 1) {
                 System.Printf(const_cast<char*>(s_mapReadErrorFmt), strTmp);
             }
             return 0;
@@ -2121,33 +2121,11 @@ int CMapMng::ReadOtm(char* mapName)
             case 0x5343454E:
                 break;
 
-            case 0x4F43544D: {
-                short& octTreeCount = m_octTreeCount;
-                if (octTreeCount >= 0x10) {
-                    return 0;
-                }
+            case 0x4F43544D:
+                goto octmCase;
 
-                COctTree* octTree = GetOctTreeArray() + octTreeCount;
-                octTree->ReadOtmOctTree(chunkFile);
-                octTreeCount += 1;
-                continue;
-            }
-
-            case 0x4C495448: {
-                CMapLightHolder* light = static_cast<CMapLightHolder*>(
-                    operator new(0x10, MapMng.m_stage, const_cast<char*>(s_map_cpp), 0x4D3));
-                unsigned char* lightRaw = reinterpret_cast<unsigned char*>(light);
-                lightRaw[0] = chunkFile.Get1();
-                lightRaw[1] = chunkFile.Get1();
-                lightRaw[2] = chunkFile.Get1();
-                lightRaw[3] = chunkFile.Get1();
-                *reinterpret_cast<float*>(lightRaw + 4) = chunkFile.GetF4();
-                *reinterpret_cast<float*>(lightRaw + 8) = chunkFile.GetF4();
-                *reinterpret_cast<float*>(lightRaw + 0xC) = chunkFile.GetF4();
-
-                GetMapLightHolderArray(chunk.m_arg0).Add(light);
-                continue;
-            }
+            case 0x4C495448:
+                goto lithCase;
 
             default:
                 goto otmDone;
@@ -2214,6 +2192,35 @@ int CMapMng::ReadOtm(char* mapName)
                 }
             }
             chunkFile.PopChunk();
+            continue;
+
+        octmCase: {
+            short& octTreeCount = m_octTreeCount;
+            if (octTreeCount >= 0x10) {
+                return 0;
+            }
+
+            COctTree* octTree = GetOctTreeArray() + octTreeCount;
+            octTree->ReadOtmOctTree(chunkFile);
+            octTreeCount += 1;
+            continue;
+        }
+
+        lithCase: {
+            CMapLightHolder* light = static_cast<CMapLightHolder*>(
+                operator new(0x10, MapMng.m_stage, const_cast<char*>(s_map_cpp), 0x4D3));
+            unsigned char* lightRaw = reinterpret_cast<unsigned char*>(light);
+            lightRaw[0] = chunkFile.Get1();
+            lightRaw[1] = chunkFile.Get1();
+            lightRaw[2] = chunkFile.Get1();
+            lightRaw[3] = chunkFile.Get1();
+            *reinterpret_cast<float*>(lightRaw + 4) = chunkFile.GetF4();
+            *reinterpret_cast<float*>(lightRaw + 8) = chunkFile.GetF4();
+            *reinterpret_cast<float*>(lightRaw + 0xC) = chunkFile.GetF4();
+
+            GetMapLightHolderArray(chunk.m_arg0).Add(light);
+            continue;
+        }
         }
     otmDone:
         chunkFile.PopChunk();
@@ -2331,7 +2338,7 @@ int CMapMng::ReadMid(char* mapName)
     sprintf(strTmp, const_cast<char*>(s_mapMidPathFmt), mapName);
     int ok = 1;
 
-    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+    if (static_cast<int>(System.m_execParam) >= 3) {
         System.Printf(const_cast<char*>(s_read_mid_fmt), strTmp);
     }
 
@@ -2479,7 +2486,7 @@ int CMapMng::ReadMid(char* mapName)
 
     for (int i = 0; i < m_mapObjCount; i++) {
         CMapObj* obj = &MapMng.m_mapObjArray[i];
-        signed char type = obj->m_mapDataType;
+        unsigned char type = obj->m_mapDataType;
         CMapHit* hit = static_cast<CMapHit*>(obj->m_mapData);
         if ((type == 2 || type == 3) && hit != 0) {
             int hitIndex = hit - GetMapHitArray();
@@ -2718,7 +2725,7 @@ void CMapMng::Draw()
             GXSetZMode(1, GX_LEQUAL, 1);
             LightPcs.SetNumDiffuse(0);
 
-            unsigned int shadowCount = CharaPcs.GetNumTexShadow();
+            int shadowCount = CharaPcs.GetNumTexShadow();
             if (shadowCount != 0) {
                 _GXTexObj texObjs[8];
                 Vec shadowPositions[8];
@@ -2742,7 +2749,7 @@ void CMapMng::Draw()
 
                 int startIndex = 0;
                 do {
-                    unsigned int batchCount = 8;
+                    int batchCount = 8;
                     if (shadowCount < batchCount) {
                         batchCount = shadowCount;
                     }
@@ -2751,7 +2758,7 @@ void CMapMng::Draw()
 
                     int texMtx = 0x1E;
                     int stage = 0;
-                    for (unsigned int i = 0; i < batchCount; i++) {
+                    for (int i = 0; i < batchCount; i++) {
                         GXLoadTexMtxImm(shadowMatrices[i], texMtx, GX_MTX2x4);
                         GXLoadTexObj(&texObjs[i], static_cast<GXTexMapID>(i));
                         GXSetTexCoordGen2(
@@ -2846,10 +2853,8 @@ void CMapMng::Draw()
         _GXColor lightColor;
         *reinterpret_cast<u32*>(&lightColor) = 0xFFFFFFFF;
 
-        Vec lightDir0;
-        lightDir0.x = 1.0f;
-        lightDir0.y = 1.0f;
-        lightDir0.z = 1.0f;
+        static const Vec kMapHitLightDir0 = { 1.0f, 1.0f, 1.0f };
+        Vec lightDir0 = kMapHitLightDir0;
 
         Mtx cameraMtx0;
         PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx0);
@@ -2869,10 +2874,8 @@ void CMapMng::Draw()
         GXInitLightAttnK(&lightObj0, kMapZero, kMapTinyEpsilon, kMapZero);
         GXLoadLightObjImm(&lightObj0, GX_LIGHT0);
 
-        Vec lightDir1;
-        lightDir1.x = -1.0f;
-        lightDir1.y = 1.0f;
-        lightDir1.z = -1.0f;
+        static const Vec kMapHitLightDir1 = { -1.0f, 1.0f, -1.0f };
+        Vec lightDir1 = kMapHitLightDir1;
 
         Mtx cameraMtx1;
         PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx1);
@@ -3429,12 +3432,12 @@ void CMapMng::GetMapObjWMtx(int mapObjIndex, float (*destination)[4])
 #pragma dont_inline on
 void CMapMng::SetMapObjAnim(int mapObjIndex, int startFrame, int endFrame, int loop)
 {
-    CMapAnimRun* foundMapAnimRun;
+    CMapAnimRun* mapAnimRun;
     CMapObj* mapObj = m_mapObjArray + mapObjIndex;
     int mapAnimRunCount = m_mapAnimRunArray.GetSize();
 
     for (int mapAnimRunIndex = 0; mapAnimRunIndex < mapAnimRunCount; mapAnimRunIndex++) {
-        CMapAnimRun* mapAnimRun = m_mapAnimRunArray[mapAnimRunIndex];
+        mapAnimRun = m_mapAnimRunArray[mapAnimRunIndex];
         CPtrArray<CMapAnimNode*>* mapAnimNodeArray =
             reinterpret_cast<CPtrArray<CMapAnimNode*>*>(m_mapAnimArray[mapAnimRun->m_mapAnimIndex]);
         int mapAnimNodeCount = mapAnimNodeArray->GetSize();
@@ -3442,16 +3445,15 @@ void CMapMng::SetMapObjAnim(int mapObjIndex, int startFrame, int endFrame, int l
         for (int mapAnimNodeIndex = 0; mapAnimNodeIndex < mapAnimNodeCount; mapAnimNodeIndex++) {
             CMapAnimNode* mapAnimNode = (*mapAnimNodeArray)[mapAnimNodeIndex];
             if (mapAnimNode->m_node == reinterpret_cast<CMapAnimTargetNode*>(mapObj)) {
-                foundMapAnimRun = mapAnimRun;
                 goto startMapObjAnim;
             }
         }
     }
 
-    foundMapAnimRun = 0;
+    mapAnimRun = 0;
 
 startMapObjAnim:
-    foundMapAnimRun->Start(startFrame, endFrame, loop);
+    mapAnimRun->Start(startFrame, endFrame, loop);
 }
 #pragma dont_inline reset
 

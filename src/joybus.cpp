@@ -4801,23 +4801,25 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
                     classFlags[idx] = v;
                 }
 
+                lowBits  += 0x10;
+                highBits += 1;
+
                 if (p[0xF2] != 0)
                 {
                     int idx = (int)p[0xDC] >> 1;
-                    unsigned char v =
-                        (classFlags[idx] & 0x0F) | (signed char)(lowBits + 0x10);
+                    signed char v = (classFlags[idx] & 0x0F) | lowBits;
 
                     if ((p[0xDC] & 1) != 0)
                     {
-                        v = (classFlags[idx] & 0xF0) | (signed char)(highBits + 1);
+                        v = (classFlags[idx] & 0xF0) | highBits;
                     }
 
                     classFlags[idx] = v;
                 }
 
-                p       += 0x1B8;
-                lowBits += 0x20;
-                highBits += 2;
+                p        += 0x1B8;
+                lowBits  += 0x10;
+                highBits += 1;
             }
 
             memcpy(&payload[0x81], classFlags, sizeof(classFlags));

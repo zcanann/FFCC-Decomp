@@ -2977,9 +2977,9 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 		char* writeBase = cmakeBase + 0x2CB9;
 		*reinterpret_cast<short*>(cmakeBase + 0x2CB4) = static_cast<short>(packetCount + 1);
 		int writeIndex = static_cast<int>(packetCount) * 3 - 2;
-		writeBase[writeIndex] = static_cast<char>(valueBytes[1]);
-		writeBase[writeIndex + 1] = static_cast<char>(valueBytes[2]);
-		writeBase[writeIndex + 2] = static_cast<char>(valueBytes[3]);
+		writeBase[writeIndex++] = static_cast<char>(valueBytes[1]);
+		writeBase[writeIndex++] = static_cast<char>(valueBytes[2]);
+		writeBase[writeIndex] = static_cast<char>(valueBytes[3]);
 
 		if (*reinterpret_cast<short*>(cmakeBase + 0x2CB4) >= 6) {
 			localInfo = cmakeInfo[channel];
@@ -2992,8 +2992,8 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 	}
 
 	if (strlen(reinterpret_cast<char*>(obj + 0x2CB9 + channel * 0x20)) == 0) {
-		obj[0x2CCA + channel * 0x20] = static_cast<char>(0xFF);
-		obj[0x2CD1 + channel * 0x20] = static_cast<char>(0xFF);
+		reinterpret_cast<unsigned char*>(obj)[0x2CCA + channel * 0x20] = 0xFF;
+		reinterpret_cast<unsigned char*>(obj)[0x2CD1 + channel * 0x20] = 0xFF;
 		return;
 	}
 

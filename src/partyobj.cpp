@@ -2427,11 +2427,10 @@ void CGPartyObj::onStatAttack(int chargeType)
 	         0x1CA) +
 	    chain * 0x12);
 
-	const unsigned short stepStart = *reinterpret_cast<unsigned short*>(attackEntry + 4);
-	const unsigned short stepEnd = *reinterpret_cast<unsigned short*>(attackEntry + 6);
-	if (chain > 0 && m_stateFrame == stepStart && Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
+	if (chain > 0 && m_stateFrame == *reinterpret_cast<unsigned short*>(attackEntry + 4) && Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
 		const float stepSpeed = FLOAT_80331ADC * static_cast<float>(*reinterpret_cast<unsigned short*>(attackEntry + 8));
-		moveVectorRot(m_rotTargetY, FLOAT_80331a78, stepSpeed, (stepEnd - stepStart) + 1);
+		moveVectorRot(m_rotTargetY, FLOAT_80331a78, stepSpeed,
+		    (*reinterpret_cast<unsigned short*>(attackEntry + 6) - *reinterpret_cast<unsigned short*>(attackEntry + 4)) + 1);
 	}
 
 	const unsigned short comboStart = *reinterpret_cast<unsigned short*>(attackEntry + 0x0C);

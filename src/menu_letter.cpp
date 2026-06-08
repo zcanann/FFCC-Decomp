@@ -695,7 +695,7 @@ int CMenuPcs::LetterCtrl()
 		s16 mode = *reinterpret_cast<s16*>(state + 0x30);
 		if (mode == 0) {
 			*reinterpret_cast<s16*>(state + 0x22) = *reinterpret_cast<s16*>(state + 0x22) + 1;
-			int panelCount = static_cast<int>(GetLetterAnimStorage(this)->count);
+			unsigned int panelCount = GetLetterAnimStorage(this)->count;
 			s16* panel = GetLetterPanelBase(this);
 			int frame = static_cast<int>(*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x22));
 			done = 0;
@@ -846,7 +846,7 @@ int CMenuPcs::LetterCtrl()
 				SetMcWinInfo(static_cast<int>(winW), static_cast<int>(winH));
 				m_menuWindowInfo->state = 0;
 				*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28) = 0;
-				*reinterpret_cast<unsigned char*>(GetLetterStateBase(this) + 9) = 0xFF;
+				*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 9) = 0xFF;
 				*reinterpret_cast<char*>(GetLetterStateBase(this) + 0xC) = 1;
 			}
 			if (m_menuWindowInfo->state == 1) {
@@ -884,7 +884,7 @@ int CMenuPcs::LetterCtrl()
 						if ((*reinterpret_cast<unsigned int*>(panel + 0x16) & 2) == 0) {
 							f = static_cast<float>(DOUBLE_803330e8 -
 							                       (DOUBLE_803330e8 / static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(panel + 0x14)))) *
-							                           static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(panel + 0x10))));
+							                           static_cast<double>(static_cast<float>(*reinterpret_cast<unsigned int*>(panel + 0x10))));
 							*reinterpret_cast<float*>(panel + 0x18) =
 							    (*reinterpret_cast<float*>(panel + 0x1C) - static_cast<float>(panel[0])) * f;
 							*reinterpret_cast<float*>(panel + 0x1A) =
@@ -926,7 +926,7 @@ int CMenuPcs::LetterCtrl()
 							if ((*reinterpret_cast<unsigned int*>(panel + 0x16) & 2) == 0) {
 								f = static_cast<float>(DOUBLE_803330e8 -
 								                       (DOUBLE_803330e8 / static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(panel + 0x14)))) *
-								                           static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(panel + 0x10))));
+								                           static_cast<double>(static_cast<float>(*reinterpret_cast<unsigned int*>(panel + 0x10))));
 								*reinterpret_cast<float*>(panel + 0x18) =
 								    (*reinterpret_cast<float*>(panel + 0x1C) - static_cast<float>(panel[0])) * f;
 								*reinterpret_cast<float*>(panel + 0x1A) =

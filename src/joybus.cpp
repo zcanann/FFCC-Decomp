@@ -6027,7 +6027,7 @@ int JoyBus::SendBonusStr(ThreadParam* threadParam)
             if (Game.m_gameWork.m_bossArtifactStageIndex < 0xE)
             {
                 unsigned int bonusPort;
-                if (GbaQue.IsSingleMode(threadParam->m_portIndex) && threadParam->m_portIndex == 1)
+                if (GbaQue.IsSingleMode(threadParam->m_portIndex) && (int)threadParam->m_portIndex == 1)
                 {
                     bonusPort = 0;
                 }

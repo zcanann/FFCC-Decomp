@@ -540,7 +540,7 @@ static int CountShopMenuOwnedItems(CCaravanWork* caravanWork, int itemNo)
 
 static bool CanTradeShopMenuItem(CShopMenu* shopMenu, int index, int itemNo)
 {
-    if ((index < 0) || (itemNo < 1)) {
+    if ((index < 0) || (itemNo <= 0)) {
         return false;
     }
 
@@ -2884,7 +2884,7 @@ void CShopMenu::SelectItemIdx()
                     int itemId = getItemNo(m_selectedIndex);
                     int unitGil;
                     if (m_listType == 0) {
-                        if (itemId < 1) {
+                        if (itemId <= 0) {
                             unitGil = 0;
                         } else {
                             int gil = caravanWork->m_shopParam *
@@ -2892,7 +2892,7 @@ void CShopMenu::SelectItemIdx()
                             unitGil = gil / 100;
                         }
                     } else if (m_listType == 1) {
-                        if (itemId < 1) {
+                        if (itemId <= 0) {
                             unitGil = 0;
                         } else {
                             int gil = caravanWork->m_shopParam *
@@ -2937,7 +2937,7 @@ void CShopMenu::SelectItemIdx()
     }
 
 updateWindow:
-    if (m_selectedIndex < m_listTop) {
+    if (m_listTop > m_selectedIndex) {
         m_listTop = m_selectedIndex;
     }
     if ((m_listTop + m_visibleRows) <= m_selectedIndex) {

@@ -656,14 +656,14 @@ CGPrgObj* CGItemObj::CreateFromScript(
 			gCFlatRuntime().deleteObject(reinterpret_cast<CFlatRuntime::CObject*>(bestItemObj));
 			deletedCount = 1;
 		} else {
-			if (2U < (unsigned int)System.m_execParam) {
+			if ((unsigned int)System.m_execParam >= 3U) {
 				System.Printf(itemObjStrings + kItemObjStrNoDeletableObjectMsg);
 			}
 		}
 
 		System.Printf(itemObjStrings + kItemObjStrNumDeleteItemFmt, deletedCount);
 		if (deletedCount == 0) {
-			if (2U < (unsigned int)System.m_execParam) {
+			if ((unsigned int)System.m_execParam >= 3U) {
 				System.Printf(itemObjStrings + kItemObjStrCreateFailedMsg);
 			}
 			return 0;

@@ -737,7 +737,9 @@ static inline unsigned short MogHeldButtons()
 	if (HasDebugPadOverride()) {
 		return 0;
 	}
-	return static_cast<unsigned short>(Pad.GetPadInputs()[0].button[0]);
+	int padIndex = 0;
+	padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+	return static_cast<unsigned short>(Pad.GetPadInputs()[padIndex].button[0]);
 }
 
 static inline unsigned short MogTriggerButtons()
@@ -745,7 +747,9 @@ static inline unsigned short MogTriggerButtons()
 	if (HasDebugPadOverride()) {
 		return 0;
 	}
-	return static_cast<unsigned short>(Pad.GetPadInputs()[0].buttonDown[0]);
+	int padIndex = 0;
+	padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+	return static_cast<unsigned short>(Pad.GetPadInputs()[padIndex].buttonDown[0]);
 }
 
 static inline int MogPadInt(int offset)
@@ -753,7 +757,19 @@ static inline int MogPadInt(int offset)
 	if (HasDebugPadOverride()) {
 		return 0;
 	}
-	return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Pad) + offset);
+	int padIndex = 0;
+	padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+	return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Pad) + padIndex * sizeof(CPad::PadInput) + offset);
+}
+
+static inline float MogPadFloat(int offset)
+{
+	if (HasDebugPadOverride()) {
+		return 0.0f;
+	}
+	int padIndex = 0;
+	padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+	return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + padIndex * sizeof(CPad::PadInput) + offset);
 }
 
 static inline unsigned char MogRadarType()
@@ -1026,9 +1042,9 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		}
 	}
 
-	Chara.MogFur().m_cursorX = static_cast<int>(kYmEnvTen * static_cast<float>(MogPadInt(36)) +
+	Chara.MogFur().m_cursorX = static_cast<int>(kYmEnvTen * MogPadFloat(36) +
 	                                     static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorX)));
-	Chara.MogFur().m_cursorY = static_cast<int>(-(kYmEnvTen * static_cast<float>(MogPadInt(40)) -
+	Chara.MogFur().m_cursorY = static_cast<int>(-(kYmEnvTen * MogPadFloat(40) -
 	                                     static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorY))));
 
 	if (static_cast<int>(Chara.MogFur().m_cursorX) < 0) {
@@ -1429,8 +1445,10 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 0x0C);
 	LightPcs.EnableLight(1, 1);
 	GXSetZMode((u8)1, (GXCompare)3, (u8)0);
-	const unsigned char furShade = static_cast<unsigned char>(kCharaFurShadeScale * ModelFurCur(this));
-	const GXColor furColor = CColor(furShade, furShade, furShade, 0xFF).color;
+	const GXColor furColor = CColor(static_cast<unsigned char>(kCharaFurShadeScale * ModelFurCur(this)),
+	                                static_cast<unsigned char>(kCharaFurShadeScale * ModelFurCur(this)),
+	                                static_cast<unsigned char>(kCharaFurShadeScale * ModelFurCur(this)), 0xFF)
+	                             .color;
 	GXSetChanMatColor(GX_COLOR0A0, furColor);
 	LightPcs.SetAmbientAlpha(ModelLightAlpha(this));
 	GXSetNumIndStages(0);
@@ -1868,7 +1886,7 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 			}
 
 			distance = (dx < 0 ? -dx : dx) + (dy < 0 ? -dy : dy);
-			int ux = px;
+			unsigned int ux = px;
 			unsigned int uy = py;
 			tileIndex = ((ux & 3) + ((uy & 3) * 4) + (ux >> 2) * 0x10 + (uy >> 2) * width * 4) * 2;
 			packed = *(unsigned short*)(((char*)pixels) + tileIndex);
@@ -1889,30 +1907,16 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 				a = a < 0 ? 0 : a;
 			} else {
 				float k = (float)(7 - targetColor.a) / kCharaFurAlphaComponentScale + (float)(distance / 4);
-				if (k > 1.0f) {
-					k = 1.0f;
-				}
+				k = (k > 1.0f) ? 1.0f : k;
 				{
 					float inv = 1.0f - k;
 					r = (int)((float)r * k + (float)targetColor.r * inv);
 					g = (int)((float)g * k + (float)targetColor.g * inv);
 					b = (int)((float)b * k + (float)targetColor.b * inv);
 				}
-				if (r < 0) {
-					r = 0;
-				} else if (r > 0x0f) {
-					r = 0x0f;
-				}
-				if (g < 0) {
-					g = 0;
-				} else if (g > 0x0f) {
-					g = 0x0f;
-				}
-				if (b < 0) {
-					b = 0;
-				} else if (b > 0x0f) {
-					b = 0x0f;
-				}
+				r = (r < 0) ? 0 : (r > 0x0f ? 0x0f : r);
+				g = (g < 0) ? 0 : (g > 0x0f ? 0x0f : g);
+				b = (b < 0) ? 0 : (b > 0x0f ? 0x0f : b);
 			}
 
 			*(unsigned short*)(((char*)pixels) + tileIndex) = (unsigned short)((a << 12) | (r << 8) | (g << 4) | b);

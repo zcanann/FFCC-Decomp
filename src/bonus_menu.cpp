@@ -1232,13 +1232,13 @@ void CMenuPcs::CalcSelectWait()
 		if (delay == 0 && currentPartyIndex < activePartyCount) {
 			if ((repeat & 9) != 0) {
 				selection = (short)(selection + 1);
-				if (selection > 7) {
+				if (*(short*)(this->m_bonusStatePtr + 0x26) > 7) {
 					selection = 0;
 				}
 				Sound.PlaySe(0x4e, 0x40, 0x7f, 0);
 			} else if ((repeat & 6) != 0) {
 				selection = (short)(selection - 1);
-				if (selection < 0) {
+				if (*(short*)(this->m_bonusStatePtr + 0x26) < 0) {
 					selection = 7;
 				}
 				Sound.PlaySe(0x4e, 0x40, 0x7f, 0);

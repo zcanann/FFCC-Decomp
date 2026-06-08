@@ -202,12 +202,12 @@ void CMenuPcs::FavoDraw()
 		rankFont->SetColor(
 		    CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * drawEntry->alpha)).color);
 		float posX = static_cast<float>(drawEntry->x - 0xC);
-		float posY = static_cast<float>(drawEntry->y + 0xA) - 4.0f;
+		float posY = static_cast<float>(drawEntry->y + 0xA);
 		rankFont->renderFlags = (rankFont->renderFlags & 0xEF) | 0x10;
 		rankFont->SetMargin(1.0f);
 		sprintf(textBuf, sFavoRankFormat, static_cast<int>(rank->place));
 		rankFont->SetPosX(posX);
-		rankFont->SetPosY(posY);
+		rankFont->SetPosY(posY - 4.0f);
 		rankFont->Draw(textBuf);
 		rankFont->SetShadow(0);
 		rank++;
@@ -226,11 +226,11 @@ void CMenuPcs::FavoDraw()
 	for (int i = 0; i < 8; i++) {
 		nameFont->SetColor(
 		    CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * drawEntry->alpha)).color);
+		float posY = static_cast<float>(drawEntry->y + 0xB);
 		float posX = static_cast<float>(drawEntry->x + 0x1C);
 		const char* name = Game.m_cFlatDataArr[1].TableStrings(0)[(static_cast<char>(rank->foodId) + 0x17D) * 5 + 4];
-		float posY = static_cast<float>(drawEntry->y + 0xB) - 4.0f;
 		nameFont->SetPosX(posX);
-		nameFont->SetPosY(posY);
+		nameFont->SetPosY(posY - 4.0f);
 		nameFont->Draw(const_cast<char*>(name));
 		rank++;
 		drawEntry++;

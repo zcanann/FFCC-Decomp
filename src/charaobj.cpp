@@ -1513,9 +1513,11 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 
 	int damageAmount = 0;
 	if (effectResult != 0) {
-		int itemKind = 1;
+		int itemKind;
 		if (resolvedItemId >= 0x1F5) {
-			itemKind = *reinterpret_cast<short*>(itemData + 2);
+			itemKind = *reinterpret_cast<unsigned short*>(itemData + 2);
+		} else {
+			itemKind = 1;
 		}
 
 		if (itemKind == 1 || (itemKind == 9 && (static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && (static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D)) {

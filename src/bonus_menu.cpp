@@ -2316,10 +2316,9 @@ void CMenuPcs::DrawResultCountAnim()
 	int off = 0;
 	for (int i = 0; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++, off += 0x40) {
 		BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + off + 8);
-		int kind = sprite->kind;
 
-		if (kind >= 0 || kind == -2) {
-			if (kind == -2) {
+		if (sprite->kind >= 0 || sprite->kind == -2) {
+			if (sprite->kind == -2) {
 				CCharaPcs::CHandle* handle = 0;
 				if (modelIndex < activePartyCount) {
 					handle = s_Rinfo->m_party[modelIndex].m_partyHandle;
@@ -2349,7 +2348,7 @@ void CMenuPcs::DrawResultCountAnim()
 				color.b = 0xFF;
 				color.a = (unsigned char)(sprite->alpha * 255.0f);
 				GXSetChanMatColor(GX_COLOR0A0, color);
-				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kind));
+				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(sprite->kind));
 
 				if ((signed char)s_CntTop <= i && i < (signed char)s_CntTop + activePartyCount) {
 					int value = s_Rinfo->m_party[i - (signed char)s_CntTop].m_totalValue;

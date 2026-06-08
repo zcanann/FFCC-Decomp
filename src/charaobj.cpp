@@ -803,9 +803,11 @@ void CGCharaObj::onFramePreCalc()
 			push += 10;
 		}
 		int slot = m_animStateMisc;
-		int padHeld = 0;
+		int padHeld;
 		bool useDebugPad = (Pad.m_debugPadLock != 0) || ((slot == 0) && (Pad.m_debugPadPort != -1));
-		if (!useDebugPad) {
+		if (useDebugPad) {
+			padHeld = 0;
+		} else {
 			int activePad = Pad.m_debugPadPort;
 			int idx = slot & ~(static_cast<int>(~((activePad - slot) | (slot - activePad))) >> 31);
 			padHeld = Pad.GetPadInputs()[idx].gbaMode;

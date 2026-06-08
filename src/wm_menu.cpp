@@ -1701,7 +1701,10 @@ void CMenuPcs::calcWorld()
 	const float animTime = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0xB4)[0];
 
 	if (animState == 1) {
-		if (animEnd <= animTime) {
+		if (animTime < animEnd) {
+			model->AddFrame(FLOAT_80331698);
+			m_wmWorldState->m_frameCounter = 0;
+		} else {
 			if (m_wmWorldState->m_frameCounter >= 10) {
 				CFlatRuntime::CStack stackData[3];
 
@@ -1714,19 +1717,16 @@ void CMenuPcs::calcWorld()
 				m_wmWorldState->m_mainState = 2;
 				m_wmWorldState->m_frameCounter = 0;
 			}
-		} else {
-			model->AddFrame(FLOAT_80331698);
-			m_wmWorldState->m_frameCounter = 0;
 		}
 	} else if (animState == 2) {
 		int nextAnim = static_cast<signed char>(bytes[0xE]);
 
 		if (nextAnim == 0) {
-			if (animEnd <= animTime) {
+			if (animTime < animEnd) {
+				model->AddFrame(FLOAT_80331698);
+			} else {
 				handle->SetAnim(1, -1, -1, -1, 0);
 				reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 1;
-			} else {
-				model->AddFrame(FLOAT_80331698);
 			}
 		} else {
 			if (nextAnim == 1) {
@@ -1759,15 +1759,15 @@ void CMenuPcs::calcWorld()
 			bytes[0xE] = 0;
 		}
 	} else if (animState == 3 && m_wmWorldState->m_frameCounter >= 10) {
-		if (animEnd <= animTime) {
+		if (animTime < animEnd) {
+			model->AddFrame(FLOAT_80331698);
+		} else {
 			handle->SetAnim(0, -1, -1, -1, 0);
 			reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 0;
 			m_wmWorldState->m_delay = 10;
 			m_wmWorldState->m_nextMenuMode = -1;
 			m_wmWorldState->m_mainState = 4;
 			Sound.PlaySe(0x32, 0x40, 0x7F, 0);
-		} else {
-			model->AddFrame(FLOAT_80331698);
 		}
 	} else if (animState == 4) {
 		if (m_wmWorldState->m_delay != 0) {

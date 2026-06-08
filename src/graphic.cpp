@@ -777,16 +777,15 @@ void CGraphic::DrawDebugString()
     GXSetNumTexGens(1);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x1E, GX_FALSE, 0x7D);
 
-    s16 y = 0x10;
+    int y = 0x10;
     for (u32 i = 0; i < static_cast<u32>(m_debugStringCount); ++i) {
         s16 xCell = m_debugStringPositions[i].x;
-        s16 yCell = m_debugStringPositions[i].y;
-        char* text = m_debugStrings[i];
 
         if (xCell == -1) {
-            DrawDebugStringDirect(0x10, static_cast<u32>(y), text, 0xC);
+            DrawDebugStringDirect(0x10, static_cast<u32>(y), m_debugStrings[i], 0xC);
         } else {
-            DrawDebugStringDirect(static_cast<u32>(xCell * 0xC + 0x10), static_cast<u32>(yCell * 0xC + 0x10), text, 0xC);
+            s16 yCell = m_debugStringPositions[i].y;
+            DrawDebugStringDirect(static_cast<u32>(xCell * 0xC + 0x10), static_cast<u32>(yCell * 0xC + 0x10), m_debugStrings[i], 0xC);
         }
 
         y += 0xC;
@@ -1600,11 +1599,11 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		return;
 	}
 
-	if (nearDist < 0.0f) {
-		nearDist = 0.0f;
+	if (nearDist < kGraphicZeroF) {
+		nearDist = kGraphicZeroF;
 	}
-	if (nearDist > 1.0f) {
-		nearDist = 1.0f;
+	if (nearDist > kGraphicOneF) {
+		nearDist = kGraphicOneF;
 	}
 	if (farDist < nearDist) {
 		farDist = nearDist;
@@ -1621,9 +1620,9 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 
 	cameraPos.x = CameraWorldX();
 	cameraPos.z = CameraWorldZ();
-	cameraPos.y = 0.0f;
+	cameraPos.y = kGraphicZeroF;
 
-	targetPos.y = 0.0f;
+	targetPos.y = kGraphicZeroF;
 	PSVECSubtract(&targetPos, &cameraPos, &cameraToTarget);
 
 	GXGetProjectionv(gxProjection);
@@ -1675,8 +1674,8 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 	}
 
 	gUtil.SetVtxFmt_POS_CLR_TEX();
-	CreateSmallBackTexture(m_scratchTextureBuffer, &smallBackTex, 0x140, 0xE0, GX_NEAR, GX_TF_RGBA8, 0);
-	GetBackBufferRect2(m_scratchTextureBuffer, &backBufferTex, 0, 0, 0x280, 0x1C0, texBufferSize, GX_NEAR,
+	Graphic.CreateSmallBackTexture(Graphic.m_scratchTextureBuffer, &smallBackTex, 0x140, 0xE0, GX_NEAR, GX_TF_RGBA8, 0);
+	Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backBufferTex, 0, 0, 0x280, 0x1C0, texBufferSize, GX_NEAR,
 	                   (_GXTexFmt)0x11, 0);
 	gUtil.SetVtxFmt_POS_CLR_TEX0_TEX1();
 	gUtil.SetOrthoEnv();

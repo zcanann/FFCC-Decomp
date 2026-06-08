@@ -1006,24 +1006,15 @@ void CCharaPcs::calcAfter()
 
     for (int i = LoadAnimArray(this)->GetSize() - 1; i >= 0; i--) {
         CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
-        if (loadAnim == 0 || loadAnim->m_anim == 0) {
-            continue;
-        }
-
-        void*& bankPtr = loadAnim->m_anim->m_bank;
-        const int bankRefCount = loadAnim->m_anim->GetRef();
-        if (bankRefCount == 1 && bankPtr != 0) {
-            operator delete(bankPtr);
-            bankPtr = 0;
+        CChara::CAnim* anim = loadAnim->m_anim;
+        if (anim->GetRef() == 1 && anim->m_bank != 0) {
+            operator delete(anim->m_bank);
+            anim->m_bank = 0;
         }
     }
 
     for (int i = LoadAnimArray(this)->GetSize() - 1; i >= 0; i--) {
         CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
-        if (loadAnim == 0 || loadAnim->m_anim == 0) {
-            continue;
-        }
-
         const int bankRefCount = loadAnim->m_anim->GetRef();
         if (bankRefCount == 1) {
             loadAnim->m_anim->m_lastFrame++;

@@ -534,6 +534,7 @@ void CGraphic::Thread()
                 }
 
                 CSystem::COrder* order = System.GetOrder(drawSyncPart >> 8);
+                int drawSyncByte = static_cast<int>(static_cast<char>(drawSyncPart));
                 int orderIndex;
                 if (order != nullptr) {
                     orderIndex = order->m_insertIndex;
@@ -547,7 +548,7 @@ void CGraphic::Thread()
                     orderName = sGraphicUnknownOrderName;
                 }
                 System.Printf(debugFmtBase + kGraphicCppDrawDoneFmt, m_drawDoneFile, m_drawDoneLine, orderName, orderIndex,
-                              static_cast<int>(static_cast<char>(drawSyncPart)));
+                              drawSyncByte);
             }
         } else {
             debugCountdown = 5;

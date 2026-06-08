@@ -1423,7 +1423,7 @@ void CFlatRuntime2::Draw()
 	font->SetZMode(0, 0);
 	font->SetPosZ(1.0f);
 	Mtx44 projection;
-	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcsRaw() + 0x40), projection);
+	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcsRaw() + 0x94), projection);
 	GXSetProjection(projection, GX_PERSPECTIVE);
 
 	font = MenuPcs.m_fonts[0];
@@ -1444,7 +1444,7 @@ void CFlatRuntime2::Draw()
 	font->SetZMode(0, 0);
 	font->SetPosZ(1.0f);
 	Mtx44 projection2;
-	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcsRaw() + 0x40), projection2);
+	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcsRaw() + 0x94), projection2);
 	GXSetProjection(projection2, GX_PERSPECTIVE);
 
 	Mtx cameraMtx;
@@ -1952,7 +1952,7 @@ void CFlatRuntime2::drawLayer(
 	}
 
 	Mtx44 projection;
-	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcsRaw() + 0x40), projection);
+	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcsRaw() + 0x94), projection);
 	GXSetProjection(projection, GX_PERSPECTIVE);
 }
 

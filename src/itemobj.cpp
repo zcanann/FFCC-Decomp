@@ -589,7 +589,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 		if (carryMode == 0) {
 			Vec safePos;
 			float safeDist = CalcSafePos(0x41, *(CGPartyObj**)(self + 0x550), &safePos);
-			if (kItemObjZero < safeDist) {
+			if (safeDist > kItemObjZero) {
 				CGPartyObj* carryObj = *(CGPartyObj**)(self + 0x550);
 				carryObj->moveVectorHRot(
 					kItemObjPi + *(float*)((unsigned char*)carryObj + 0x1A8),
@@ -670,7 +670,6 @@ CGPrgObj* CGItemObj::CreateFromScript(
 		}
 	}
 
-	gItemObjCreateFlags = createFlags;
 	CFlatRuntime::CStack inStack[5];
 	CFlatRuntime::CStack outStack;
 	inStack[0].m_word = createMode;
@@ -678,6 +677,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 	inStack[2].m_word = scriptArg;
 	inStack[3].m_word = owner != 0 ? owner->m_particleId : 0;
 	*reinterpret_cast<float*>(&inStack[4].m_word) = launchAngle;
+	gItemObjCreateFlags = createFlags;
 	gCFlatRuntime().SystemCall(0, 1, 7, 5, inStack, &outStack);
 
 	CGPrgObj* newItem = 0;
@@ -702,7 +702,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 			newItem->m_worldPosition.z = kItemObjHeightOffset * (float)cos((double)yRot) + owner->m_worldPosition.z;
 
 			safePosDist = newItem->CalcSafePos(0x41, owner, &safePos);
-			if (kItemObjZero < safePosDist) {
+			if (safePosDist > kItemObjZero) {
 				owner->moveVectorHRot(kItemObjPi + owner->m_rotBaseY, kItemObjZero,
 				                       safePosDist / kItemObjSafeMoveDivisor, 3);
 			}

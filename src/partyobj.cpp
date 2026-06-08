@@ -272,16 +272,20 @@ static int getCarryAnimNo(CGPartyObj* self, int carryType)
 	}
 
 	unsigned char* script = reinterpret_cast<unsigned char*>(self->m_scriptHandle);
-	int offset;
-	if (carryType == 0) {
-		offset = (CFlatItemCarryMode() == 1) ? 0x1C6 : 0x1C2;
-	} else {
-		offset = (CFlatItemCarryMode() == 1) ? 0x1C8 : 0x1C4;
-	}
-
 	int entry = (*reinterpret_cast<unsigned short*>(script + 0x3E2) +
 	             *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2) * 0x1CA;
-	return *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_30_0xc7e0 + entry + offset);
+	unsigned int table = Game.unk_flat3_field_30_0xc7e0 + entry;
+	if (carryType == 0) {
+		if (CFlatItemCarryMode() == 1) {
+			return *reinterpret_cast<unsigned short*>(table + 0x1C6);
+		}
+		return *reinterpret_cast<unsigned short*>(table + 0x1C2);
+	} else {
+		if (CFlatItemCarryMode() == 1) {
+			return *reinterpret_cast<unsigned short*>(table + 0x1C8);
+		}
+		return *reinterpret_cast<unsigned short*>(table + 0x1C4);
+	}
 }
 
 static CMapObj* getMapHitObject()

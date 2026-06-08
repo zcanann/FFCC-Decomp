@@ -68,6 +68,11 @@ static inline s16& GetEquipModeSelected(EquipMenuState* state, int mode)
 	return (&state->selectedIndex)[mode];
 }
 
+static inline s16& GetEquipCurSelected(EquipMenuState* state)
+{
+	return (&state->selectedIndex)[state->mode];
+}
+
 static inline EquipOpenAnimList* GetEquipListStorage(CMenuPcs* menu)
 {
 	return menu->m_equipList;
@@ -240,19 +245,19 @@ int CMenuPcs::EquipCtrlCur()
 
 	if (mode == 0) {
 		if ((hold & 8) != 0) {
-			if (GetEquipModeSelected(GetEquipMenuState(this), mode) != 0) {
-				GetEquipModeSelected(GetEquipMenuState(this), mode) =
-				    GetEquipModeSelected(GetEquipMenuState(this), mode) - 1;
+			if (GetEquipCurSelected(GetEquipMenuState(this)) != 0) {
+				GetEquipCurSelected(GetEquipMenuState(this)) =
+				    GetEquipCurSelected(GetEquipMenuState(this)) - 1;
 			} else {
-				GetEquipModeSelected(GetEquipMenuState(this), mode) = 3;
+				GetEquipCurSelected(GetEquipMenuState(this)) = 3;
 			}
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		} else if ((hold & 4) != 0) {
-			if (GetEquipModeSelected(GetEquipMenuState(this), mode) < 3) {
-				GetEquipModeSelected(GetEquipMenuState(this), mode) =
-				    GetEquipModeSelected(GetEquipMenuState(this), mode) + 1;
+			if (GetEquipCurSelected(GetEquipMenuState(this)) < 3) {
+				GetEquipCurSelected(GetEquipMenuState(this)) =
+				    GetEquipCurSelected(GetEquipMenuState(this)) + 1;
 			} else {
-				GetEquipModeSelected(GetEquipMenuState(this), mode) = 0;
+				GetEquipCurSelected(GetEquipMenuState(this)) = 0;
 			}
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		}
@@ -289,9 +294,9 @@ int CMenuPcs::EquipCtrlCur()
 		s16* letterBuffer = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 
 		if ((hold & 8) != 0) {
-			if (GetEquipModeSelected(GetEquipMenuState(this), mode) != 0) {
-				GetEquipModeSelected(GetEquipMenuState(this), mode) =
-				    GetEquipModeSelected(GetEquipMenuState(this), mode) - 1;
+			if (GetEquipCurSelected(GetEquipMenuState(this)) != 0) {
+				GetEquipCurSelected(GetEquipMenuState(this)) =
+				    GetEquipCurSelected(GetEquipMenuState(this)) - 1;
 				Sound.PlaySe(1, 0x40, 0x7f, 0);
 			} else if (GetEquipMenuState(this)->scroll == 0) {
 				Sound.PlaySe(4, 0x40, 0x7f, 0);
@@ -300,10 +305,10 @@ int CMenuPcs::EquipCtrlCur()
 				Sound.PlaySe(1, 0x40, 0x7f, 0);
 			}
 		} else if ((hold & 4) != 0) {
-			s16 selected = GetEquipModeSelected(GetEquipMenuState(this), mode);
+			s16 selected = GetEquipCurSelected(GetEquipMenuState(this));
 
 			if (selected < 7) {
-				GetEquipModeSelected(GetEquipMenuState(this), mode) = selected + 1;
+				GetEquipCurSelected(GetEquipMenuState(this)) = selected + 1;
 			} else if (static_cast<int>(GetEquipMenuState(this)->scroll) + static_cast<int>(selected) < letterBuffer[0] - 1) {
 				GetEquipMenuState(this)->scroll = GetEquipMenuState(this)->scroll + 1;
 				Sound.PlaySe(1, 0x40, 0x7f, 0);
@@ -317,7 +322,7 @@ int CMenuPcs::EquipCtrlCur()
 		if ((hold & 0xc) == 0) {
 			if ((press & 0x100) != 0) {
 				int index = static_cast<int>(GetEquipMenuState(this)->scroll) +
-				            static_cast<int>(GetEquipModeSelected(GetEquipMenuState(this), mode));
+				            static_cast<int>(GetEquipCurSelected(GetEquipMenuState(this)));
 				s16* entries = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 				int equipIndex = static_cast<int>(GetEquipMenuState(this)->selectedIndex);
 				unsigned int valid = ChkEquipActive(index);
@@ -690,11 +695,50 @@ int CMenuPcs::EquipClose()
 	int result = 0;
 	if (**(short**)&this->m_equipList == doneCount) {
 		item = GetEquipListStorage(this)->entries;
-		for (int j = 0; j < itemCount; j++) {
-			item->startFrame = 0;
-			item->duration = 1;
-			item->alpha = fVar1;
-			item++;
+		unsigned int n = (unsigned int)itemCount;
+		if (0 < (int)n) {
+			unsigned int blocks = n >> 3;
+			if (blocks != 0) {
+				do {
+					item[0].startFrame = 0;
+					item[0].duration = 1;
+					item[0].alpha = fVar1;
+					item[1].startFrame = 0;
+					item[1].duration = 1;
+					item[1].alpha = fVar1;
+					item[2].startFrame = 0;
+					item[2].duration = 1;
+					item[2].alpha = fVar1;
+					item[3].startFrame = 0;
+					item[3].duration = 1;
+					item[3].alpha = fVar1;
+					item[4].startFrame = 0;
+					item[4].duration = 1;
+					item[4].alpha = fVar1;
+					item[5].startFrame = 0;
+					item[5].duration = 1;
+					item[5].alpha = fVar1;
+					item[6].startFrame = 0;
+					item[6].duration = 1;
+					item[6].alpha = fVar1;
+					item[7].startFrame = 0;
+					item[7].duration = 1;
+					item[7].alpha = fVar1;
+					item += 8;
+					blocks = blocks - 1;
+				} while (blocks != 0);
+				n = n & 7;
+				if (n == 0) {
+					return 1;
+				}
+			}
+			do {
+				item->startFrame = 0;
+				item->duration = 1;
+				item->alpha = fVar1;
+				item++;
+				n = n - 1;
+			} while (n != 0);
 		}
 		result = 1;
 	}
@@ -1143,26 +1187,27 @@ void CMenuPcs::EquipInit1()
 	GetEquipListStorage(this)->listEnd = (short)iVar9;
 	uVar6 = (unsigned int)((int)GetEquipListStorage(this)->listEnd - (int)GetEquipListStorage(this)->count);
 	psVar10 = &GetEquipListStorage(this)->entries[GetEquipListStorage(this)->count];
+	fVar2 = kEquipZero;
 	if (0 < (int)uVar6) {
 		uVar15 = uVar6 >> 3;
 		if (uVar15 != 0) {
 			do {
 				psVar10[0].step = 0;
-				psVar10[0].alpha = fVar3;
+				psVar10[0].alpha = fVar2;
 				psVar10[1].step = 0;
-				psVar10[1].alpha = fVar3;
+				psVar10[1].alpha = fVar2;
 				psVar10[2].step = 0;
-				psVar10[2].alpha = fVar3;
+				psVar10[2].alpha = fVar2;
 				psVar10[3].step = 0;
-				psVar10[3].alpha = fVar3;
+				psVar10[3].alpha = fVar2;
 				psVar10[4].step = 0;
-				psVar10[4].alpha = fVar3;
+				psVar10[4].alpha = fVar2;
 				psVar10[5].step = 0;
-				psVar10[5].alpha = fVar3;
+				psVar10[5].alpha = fVar2;
 				psVar10[6].step = 0;
-				psVar10[6].alpha = fVar3;
+				psVar10[6].alpha = fVar2;
 				psVar10[7].step = 0;
-				psVar10[7].alpha = fVar3;
+				psVar10[7].alpha = fVar2;
 				psVar10 += 8;
 				uVar15 = uVar15 - 1;
 			} while (uVar15 != 0);
@@ -1173,7 +1218,7 @@ void CMenuPcs::EquipInit1()
 		}
 		do {
 			psVar10->step = 0;
-			psVar10->alpha = fVar3;
+			psVar10->alpha = fVar2;
 			psVar10++;
 			uVar6 = uVar6 - 1;
 		} while (uVar6 != 0);

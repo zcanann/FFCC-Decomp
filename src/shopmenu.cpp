@@ -1687,28 +1687,20 @@ void CShopMenu::DrawSoubiBase()
     fadeD.r = 0xFF; fadeD.g = 0xFF; fadeD.b = 0xFF; fadeD.a = 0xFF;
     drawShapeSeqGrouad(9, 0, 0x1C, 0x10C, FLOAT_80332d78, FLOAT_80332dc8, fadeA, fadeB, fadeC, fadeD);
 
-    _GXColor whiteA;
-    whiteA.r = 0xFF; whiteA.g = 0xFF; whiteA.b = 0xFF; whiteA.a = 0xFF;
-    _GXColor whiteB;
-    whiteB.r = 0xFF; whiteB.g = 0xFF; whiteB.b = 0xFF; whiteB.a = 0xFF;
-    _GXColor whiteC;
-    whiteC.r = 0xFF; whiteC.g = 0xFF; whiteC.b = 0xFF; whiteC.a = 0xFF;
-    _GXColor whiteD;
-    whiteD.r = 0xFF; whiteD.g = 0xFF; whiteD.b = 0xFF; whiteD.a = 0xFF;
+    fadeA.r = 0xFF; fadeA.g = 0xFF; fadeA.b = 0xFF; fadeA.a = 0xFF;
+    fadeB.r = 0xFF; fadeB.g = 0xFF; fadeB.b = 0xFF; fadeB.a = 0xFF;
+    fadeC.r = 0xFF; fadeC.g = 0xFF; fadeC.b = 0xFF; fadeC.a = 0xFF;
+    fadeD.r = 0xFF; fadeD.g = 0xFF; fadeD.b = 0xFF; fadeD.a = 0xFF;
     int x = 0x3C;
     while (x < 0x25C) {
-        drawShapeSeqGrouad(9, 0, x, 0x10C, FLOAT_80332d78, FLOAT_80332dc8, whiteA, whiteB, whiteC, whiteD);
+        drawShapeSeqGrouad(9, 0, x, 0x10C, FLOAT_80332d78, FLOAT_80332dc8, fadeA, fadeB, fadeC, fadeD);
         x += 0x20;
     }
-    _GXColor endA;
-    endA.r = 0xFF; endA.g = 0xFF; endA.b = 0xFF; endA.a = 0xFF;
-    _GXColor endB;
-    endB.r = 0xFF; endB.g = 0xFF; endB.b = 0xFF; endB.a = 0x00;
-    _GXColor endC;
-    endC.r = 0xFF; endC.g = 0xFF; endC.b = 0xFF; endC.a = 0xFF;
-    _GXColor endD;
-    endD.r = 0xFF; endD.g = 0xFF; endD.b = 0xFF; endD.a = 0x00;
-    drawShapeSeqGrouad(9, 0, x, 0x10C, FLOAT_80332d78, FLOAT_80332dc8, endA, endB, endC, endD);
+    fadeA.r = 0xFF; fadeA.g = 0xFF; fadeA.b = 0xFF; fadeA.a = 0xFF;
+    fadeB.r = 0xFF; fadeB.g = 0xFF; fadeB.b = 0xFF; fadeB.a = 0x00;
+    fadeC.r = 0xFF; fadeC.g = 0xFF; fadeC.b = 0xFF; fadeC.a = 0xFF;
+    fadeD.r = 0xFF; fadeD.g = 0xFF; fadeD.b = 0xFF; fadeD.a = 0x00;
+    drawShapeSeqGrouad(9, 0, x, 0x10C, FLOAT_80332d78, FLOAT_80332dc8, fadeA, fadeB, fadeC, fadeD);
 
     drawShapeSeqScale(3, 0, 0x106, 0xA4, FLOAT_80332d78, FLOAT_80332dcc, 0xFF);
     x = 0x106;
@@ -1769,29 +1761,21 @@ void CShopMenu::DrawMakeBase()
     colorD.r = 0xFF; colorD.g = 0xFF; colorD.b = 0xFF; colorD.a = 0xFF;
     drawShapeSeqGrouad(9, 0, 0x1C, 0xB8, FLOAT_80332d78, FLOAT_80332dc8, colorA, colorB, colorC, colorD);
 
-    _GXColor whiteA;
-    whiteA.r = 0xFF; whiteA.g = 0xFF; whiteA.b = 0xFF; whiteA.a = 0xFF;
-    _GXColor whiteB;
-    whiteB.r = 0xFF; whiteB.g = 0xFF; whiteB.b = 0xFF; whiteB.a = 0xFF;
-    _GXColor whiteC;
-    whiteC.r = 0xFF; whiteC.g = 0xFF; whiteC.b = 0xFF; whiteC.a = 0xFF;
-    _GXColor whiteD;
-    whiteD.r = 0xFF; whiteD.g = 0xFF; whiteD.b = 0xFF; whiteD.a = 0xFF;
+    colorA.r = 0xFF; colorA.g = 0xFF; colorA.b = 0xFF; colorA.a = 0xFF;
+    colorB.r = 0xFF; colorB.g = 0xFF; colorB.b = 0xFF; colorB.a = 0xFF;
+    colorC.r = 0xFF; colorC.g = 0xFF; colorC.b = 0xFF; colorC.a = 0xFF;
+    colorD.r = 0xFF; colorD.g = 0xFF; colorD.b = 0xFF; colorD.a = 0xFF;
     int x = 0x3C;
     while (x < 0x25C) {
-        drawShapeSeqGrouad(9, 0, x, 0xB8, FLOAT_80332d78, FLOAT_80332dc8, whiteA, whiteB, whiteC, whiteD);
+        drawShapeSeqGrouad(9, 0, x, 0xB8, FLOAT_80332d78, FLOAT_80332dc8, colorA, colorB, colorC, colorD);
         x += 0x20;
     }
 
-    _GXColor endA;
-    endA.r = 0xFF; endA.g = 0xFF; endA.b = 0xFF; endA.a = 0xFF;
-    _GXColor endB;
-    endB.r = 0xFF; endB.g = 0xFF; endB.b = 0xFF; endB.a = 0x00;
-    _GXColor endC;
-    endC.r = 0xFF; endC.g = 0xFF; endC.b = 0xFF; endC.a = 0xFF;
-    _GXColor endD;
-    endD.r = 0xFF; endD.g = 0xFF; endD.b = 0xFF; endD.a = 0x00;
-    drawShapeSeqGrouad(9, 0, x, 0xB8, FLOAT_80332d78, FLOAT_80332dc8, endA, endB, endC, endD);
+    colorA.r = 0xFF; colorA.g = 0xFF; colorA.b = 0xFF; colorA.a = 0xFF;
+    colorB.r = 0xFF; colorB.g = 0xFF; colorB.b = 0xFF; colorB.a = 0x00;
+    colorC.r = 0xFF; colorC.g = 0xFF; colorC.b = 0xFF; colorC.a = 0xFF;
+    colorD.r = 0xFF; colorD.g = 0xFF; colorD.b = 0xFF; colorD.a = 0x00;
+    drawShapeSeqGrouad(9, 0, x, 0xB8, FLOAT_80332d78, FLOAT_80332dc8, colorA, colorB, colorC, colorD);
 
     drawShapeSeq(3, 0, 0xB4, 0x8C, 0xFF, 0, 0, FLOAT_80332d9c, 0);
     x = 0xB4;

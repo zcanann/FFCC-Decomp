@@ -2983,7 +2983,10 @@ void CCharaPcs::CHandle::loadModelASyncFrame()
         return;
     }
 
-    if ((asyncState != 2 && asyncState != 4 && asyncState != 6) || !File.IsCompleted(m_asyncFileHandle)) {
+    if (asyncState != 2 && asyncState != 4 && asyncState != 6) {
+        return;
+    }
+    if (!File.IsCompleted(m_asyncFileHandle)) {
         return;
     }
 

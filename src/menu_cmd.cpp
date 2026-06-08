@@ -942,6 +942,8 @@ int CMenuPcs::CmdClose()
 	return 0;
 }
 
+#pragma push
+#pragma opt_lifetimes off
 /*
  * --INFO--
  * PAL Address: 0x8014dd88
@@ -1447,6 +1449,7 @@ void CMenuPcs::CmdDraw()
 	    CColor(0xFF, 0xFF, 0xFF, static_cast<s8>(kCmdMenuAlphaMax * helpAlpha)).color, 0,
 	    kCmdMenuHalf, kCmdMenuScreenHalfWidth);
 }
+#pragma pop
 
 #pragma push
 #pragma optimization_level 3
@@ -1769,8 +1772,6 @@ unsigned int CMenuPcs::CmdCtrlCur()
 }
 #pragma pop
 
-#pragma push
-#pragma opt_dead_assignments off
 /*
  * --INFO--
  * PAL Address: 0x8014d0c4
@@ -1828,7 +1829,6 @@ unsigned int CMenuPcs::CmdOpen0()
 	}
 	return done;
 }
-#pragma pop
 
 /*
  * --INFO--

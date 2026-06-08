@@ -279,8 +279,8 @@ void GbaQueue::LoadAll()
 	int i;
 	char* obj;
 	unsigned char prevMenuStageMode;
-	unsigned char spModeBits;
-	unsigned char spModeChangeBits;
+	char spModeBits;
+	char spModeChangeBits;
 	unsigned int cflatFlag;
 	int* scriptFoodBase;
 
@@ -295,29 +295,18 @@ void GbaQueue::LoadAll()
 		m_makeMapObjFlg = 0xF;
 	}
 
-	spModeBits = static_cast<unsigned char>(Game.m_gameWork.m_spModeFlags[0] != 0);
-	if (Game.m_gameWork.m_spModeFlags[1] != 0) {
-		spModeBits |= 2;
-	}
-	if (Game.m_gameWork.m_spModeFlags[2] != 0) {
-		spModeBits |= 4;
-	}
-	if (Game.m_gameWork.m_spModeFlags[3] != 0) {
-		spModeBits |= 8;
+	spModeBits = 0;
+	for (i = 0; i < 4; i++) {
+		if (Game.m_gameWork.m_spModeFlags[i] != 0) {
+			spModeBits = static_cast<char>(spModeBits | (1 << i));
+		}
 	}
 
-	spModeChangeBits = static_cast<unsigned char>(spModeBits ^ m_spModeBits);
-	if ((spModeChangeBits & 1) != 0) {
-		m_spModeFlags = static_cast<unsigned char>(m_spModeFlags | 1);
-	}
-	if ((spModeChangeBits & 2) != 0) {
-		m_spModeFlags = static_cast<unsigned char>(m_spModeFlags | 2);
-	}
-	if ((spModeChangeBits & 4) != 0) {
-		m_spModeFlags = static_cast<unsigned char>(m_spModeFlags | 4);
-	}
-	if ((spModeChangeBits & 8) != 0) {
-		m_spModeFlags = static_cast<unsigned char>(m_spModeFlags | 8);
+	spModeChangeBits = static_cast<char>(spModeBits ^ m_spModeBits);
+	for (i = 0; i < 4; i++) {
+		if ((spModeChangeBits & (1 << i)) != 0) {
+			m_spModeFlags = static_cast<unsigned char>(m_spModeFlags | (1 << i));
+		}
 	}
 	m_spModeBits = spModeBits;
 

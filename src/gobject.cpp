@@ -538,7 +538,7 @@ void CGObject::move()
     } else {
         const s8 player = m_animStateMisc;
         const bool canReadPad = (static_cast<char>(player) >= 0)
-            && (static_cast<char>(player) <= 3)
+            && (static_cast<char>(player) < 4)
             && m_weaponNodeFlagAll.m_bits1.m_shield
             && m_weaponNodeFlagAll.m_bits1.m_menuReady
             && ((Game.m_gameWork.m_menuStageMode == 0) || (player == 0));

@@ -21,16 +21,6 @@ class CMaterialMan;
 class CCameraPcs;
 struct Vec;
 
-static inline void InitMapObjAtrColorKeyFrame(CMapKeyFrame& keyFrame)
-{
-    keyFrame.m_junTable = 0;
-    keyFrame.m_keyFrame = 0;
-    keyFrame.m_keyValue = 0;
-    keyFrame.m_splineTable = 0;
-    keyFrame.m_loop = 1;
-    keyFrame.m_isRun = 0;
-}
-
 class CMapObjAtr
 {
 public:
@@ -79,8 +69,8 @@ public:
     {
         m_type = SPOT_LIGHT;
         m_light = 0;
-        m_intensity = 1.0f;
         m_falloff = 1.0f;
+        m_intensity = 1.0f;
         m_colorMode = 0;
         m_useAltColor = 0;
         m_keyFrameCount = 0;
@@ -121,7 +111,6 @@ public:
     {
         m_type = POINT_LIGHT;
         m_colorMode = 0;
-        m_useAltColor = 0;
         m_unknown20 = 0;
     }
 

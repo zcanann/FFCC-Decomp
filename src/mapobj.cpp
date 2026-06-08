@@ -35,6 +35,7 @@ static const float kMapObjInitNegOne = 1000000000000000.0f;
 static const float kMapObjColorBlendScale = 255.0f;
 static const float kMapObjDegToRad = 0.017453292f;
 static const float kMapObjInitValue50 = -1.0f;
+static const float kMapObjDefaultAngle = 48.0f;
 extern const char s_mapobj_cpp[] = "mapobj.cpp";
 extern const char sMapObjScaleWithoutNameWarn[0x78] = {
     (char)0x83, (char)0x47, (char)0x83, (char)0x89, (char)0x81, (char)0x5b, (char)0x81, (char)0x49,
@@ -117,6 +118,7 @@ static inline float LoadFloatVolatile(const volatile float& value)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 template <>
 int CPtrArray<CMapAnimRun*>::Add(CMapAnimRun* item)
 {
@@ -128,6 +130,7 @@ int CPtrArray<CMapAnimRun*>::Add(CMapAnimRun* item)
     m_numItems = m_numItems + 1;
     return 1;
 }
+#pragma dont_inline off
 
 /*
  * --INFO--
@@ -183,6 +186,7 @@ int CPtrArray<CMapAnimRun*>::setSize(unsigned long newSize)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 template <>
 int CPtrArray<CMapShadow*>::Add(CMapShadow* item)
 {
@@ -194,6 +198,7 @@ int CPtrArray<CMapShadow*>::Add(CMapShadow* item)
     m_numItems = m_numItems + 1;
     return 1;
 }
+#pragma dont_inline off
 
 /*
  * --INFO--
@@ -377,7 +382,6 @@ inline CMapObjAtrPlaySta::CMapObjAtrPlaySta()
  */
 inline CMapObjAtrMime::CMapObjAtrMime()
 {
-    InitMapObjAtrColorKeyFrame(m_keyFrame);
     m_type = CMapObjAtr::MIME;
     m_vertexLists = 0;
 }
@@ -477,11 +481,20 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 }
             }
 
-            if (((Game.m_currentSceneId == 4) || (Game.m_currentSceneId == 7)) &&
-                (m_meshType < 10) && (m_meshType >= 8)) {
+            if (Game.m_currentSceneId == 4) {
+                goto checkScaleMeshType;
+            }
+            goto checkScaleScene7;
+        checkScaleMeshType:
+            if ((m_meshType < 10) && (m_meshType >= 8)) {
                 m_transRateX = kMapObjZero;
                 m_transRateY = kMapObjOne;
                 m_transRateZ = kMapObjZero;
+            }
+            break;
+        checkScaleScene7:
+            if (Game.m_currentSceneId == 7) {
+                goto checkScaleMeshType;
             }
             break;
         }
@@ -558,22 +571,22 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                         break;
                     }
                     case CHUNK_CJUN:
-                        pointLight->m_altColorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
-                        break;
-                    case CHUNK_CFRM:
-                        pointLight->m_altColorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
-                        break;
-                    case CHUNK_CKEY:
-                        pointLight->m_altColorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
-                        break;
-                    case CHUNK_MJUN:
                         pointLight->m_colorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
                         break;
-                    case CHUNK_MFRM:
+                    case CHUNK_CFRM:
                         pointLight->m_colorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
                         break;
-                    case CHUNK_MKEY:
+                    case CHUNK_CKEY:
                         pointLight->m_colorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
+                        break;
+                    case CHUNK_MJUN:
+                        pointLight->m_altColorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
+                        break;
+                    case CHUNK_MFRM:
+                        pointLight->m_altColorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
+                        break;
+                    case CHUNK_MKEY:
+                        pointLight->m_altColorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
                         break;
                     }
                 }
@@ -652,22 +665,22 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                         break;
                     }
                     case CHUNK_CJUN:
-                        spotLight->m_altColorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
-                        break;
-                    case CHUNK_CFRM:
-                        spotLight->m_altColorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
-                        break;
-                    case CHUNK_CKEY:
-                        spotLight->m_altColorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
-                        break;
-                    case CHUNK_MJUN:
                         spotLight->m_colorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
                         break;
-                    case CHUNK_MFRM:
+                    case CHUNK_CFRM:
                         spotLight->m_colorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
                         break;
-                    case CHUNK_MKEY:
+                    case CHUNK_CKEY:
                         spotLight->m_colorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
+                        break;
+                    case CHUNK_MJUN:
+                        spotLight->m_altColorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
+                        break;
+                    case CHUNK_MFRM:
+                        spotLight->m_altColorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
+                        break;
+                    case CHUNK_MKEY:
+                        spotLight->m_altColorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
                         break;
                     }
                 }
@@ -697,6 +710,31 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 spotLight->m_useAltColor = chunkFile.Get1();
                 spotLight->m_angle = chunkFile.GetF4();
                 spotLight->m_unknown2E = chunkFile.Get1();
+            } else if (chunk.m_version == 4) {
+                spotLight->m_color.r = chunkFile.Get1();
+                spotLight->m_color.g = chunkFile.Get1();
+                spotLight->m_color.b = chunkFile.Get1();
+                spotLight->m_color.a = chunkFile.Get1();
+                spotLight->m_altColor.r = chunkFile.Get1();
+                spotLight->m_altColor.g = chunkFile.Get1();
+                spotLight->m_altColor.b = chunkFile.Get1();
+                spotLight->m_altColor.a = chunkFile.Get1();
+                spotLight->m_baseColor.r = chunkFile.Get1();
+                spotLight->m_baseColor.g = chunkFile.Get1();
+                spotLight->m_baseColor.b = chunkFile.Get1();
+                spotLight->m_baseColor.a = chunkFile.Get1();
+                spotLight->m_radius = chunkFile.GetF4();
+                spotLight->m_nearRange = chunkFile.GetF4();
+                spotLight->m_farRange = chunkFile.GetF4();
+                spotLight->m_intensity = chunkFile.GetF4();
+                chunkFile.GetF4();
+                spotLight->m_falloff = chunkFile.GetF4();
+                unsigned short targetIndex = chunkFile.Get2();
+                spotLight->m_target = MapMng.m_mapObjArray + targetIndex;
+                spotLight->m_colorMode = chunkFile.Get1();
+                spotLight->m_useAltColor = chunkFile.Get1();
+                spotLight->m_angle = kMapObjDefaultAngle;
+                spotLight->m_unknown2E = 0;
             }
             m_attribute = spotLightAttr;
             break;
@@ -812,10 +850,10 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 m_shadowTarget = static_cast<int>(chunkFile.Get4());
             } else if (chunk.m_version == 1) {
                 m_enableFullScreenShadow = chunkFile.Get1();
-                if (chunkFile.Get1() == 0) {
-                    m_shadowTarget = 0;
-                } else {
+                if (chunkFile.Get1() != 0) {
                     m_shadowTarget = -1;
+                } else {
+                    m_shadowTarget = 0;
                 }
             } else {
                 m_enableFullScreenShadow = chunkFile.Get1();
@@ -865,15 +903,6 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             CChunkFile::CChunk mimeChunk;
             while (chunkFile.GetNextChunk(mimeChunk) != 0) {
                 switch (mimeChunk.m_id) {
-                case CHUNK_JUN:
-                    mime->m_keyFrame.ReadJun(chunkFile, static_cast<char>(mimeChunk.m_arg0));
-                    break;
-                case CHUNK_FRAM:
-                    mime->m_keyFrame.ReadFrame(chunkFile, mimeChunk.m_arg0);
-                    break;
-                case CHUNK_KEY:
-                    mime->m_keyFrame.ReadKey(chunkFile, mimeChunk.m_arg0);
-                    break;
                 case CHUNK_VTXL: {
                     mime->m_vertexListCount = static_cast<unsigned char>(mimeChunk.m_arg0);
                     mime->m_vertexLists = reinterpret_cast<float**>(
@@ -903,6 +932,15 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                     chunkFile.PopChunk();
                     break;
                 }
+                case CHUNK_JUN:
+                    mime->m_keyFrame.ReadJun(chunkFile, static_cast<char>(mimeChunk.m_arg0));
+                    break;
+                case CHUNK_FRAM:
+                    mime->m_keyFrame.ReadFrame(chunkFile, mimeChunk.m_arg0);
+                    break;
+                case CHUNK_KEY:
+                    mime->m_keyFrame.ReadKey(chunkFile, mimeChunk.m_arg0);
+                    break;
                 }
             }
             chunkFile.PopChunk();

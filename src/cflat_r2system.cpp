@@ -2016,10 +2016,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     }
     case -0x15: {
-        float value = *reinterpret_cast<float*>(object->m_localBase);
-        if (value < 0.0f) {
-            value = -value;
-        }
+        float value = (float)__fabs((double)*reinterpret_cast<float*>(object->m_localBase));
         this->push(object, *reinterpret_cast<int*>(&value));
         outResult = 0;
         break;

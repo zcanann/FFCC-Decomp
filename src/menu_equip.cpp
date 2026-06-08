@@ -421,8 +421,7 @@ void CMenuPcs::EquipDraw()
 	item = GetEquipListStorage(this)->entries;
 	for (int i = 0; i < 4; i++) {
 		if (caravanWork->m_equipment[i] >= 0) {
-			float alpha = item->alpha;
-			CColor color(0xff, 0xff, 0xff, (u8)(int)(kEquipColorMax * alpha));
+			CColor color(0xff, 0xff, 0xff, (u8)(int)(kEquipColorMax * item->alpha));
 			font->SetColor(color.color);
 			int itemIdx = caravanWork->m_inventoryItems[caravanWork->m_equipment[i]];
 			const char* str = GetAttrStr(itemIdx);

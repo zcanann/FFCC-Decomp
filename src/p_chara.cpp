@@ -162,6 +162,10 @@ static const char s_charaModelLoadDvdFmt[] =
     "\x1b\x5b\x33\x31\x6d\x4d\x65\x72\x67\x65\x3a\x20\x83\x82\x83\x66\x83\x8b\x82\xf0\x44\x56\x44\x82\xa9\x82\xe7"
     "\x93\xc7\x82\xdd\x8d\x9e\x82\xdd\x82\xdc\x82\xb5\x82\xbd\x81\x42\x74\x79\x70\x65\x20\x3d\x20\x25\x64\x20\x6e"
     "\x75\x6d\x62\x65\x72\x20\x3d\x20\x25\x64\x0a\x1b\x5b\x30\x6d";
+static const char s_charaDynamicsLoadDvdFmt[] =
+    "\x1b\x5b\x33\x31\x6d\x4d\x65\x72\x67\x65\x3a\x20\x83\x5f\x83\x43\x83\x69\x83\x7e\x83\x4e\x83\x58\x82\xf0\x44"
+    "\x56\x44\x82\xa9\x82\xe7\x93\xc7\x82\xdd\x8d\x9e\x82\xdd\x82\xdc\x82\xb5\x82\xbd\x81\x42\x74\x79\x70\x65\x20"
+    "\x3d\x20\x25\x64\x20\x6e\x75\x6d\x62\x65\x72\x20\x3d\x20\x25\x64\x0a";
 static const char s_charaTexLoadAmemFmt[] =
     "\x4d\x65\x72\x67\x65\x3a\x20\x1b\x5b\x33\x32\x6d\x83\x65\x83\x4e\x83\x58\x83\x60\x83\x83\x82\xf0\x41\x4d\x45"
     "\x4d\x82\xa9\x82\xe7\x93\xc7\x82\xdd\x8d\x9e\x82\xdd\x82\xdc\x82\xb5\x82\xbd\x81\x42\x74\x79\x70\x65\x20\x3d"
@@ -2432,6 +2436,9 @@ foundModel:
             File.SyncCompleted(fileHandle);
             m_model->CreateDynamics(File.m_readBuffer, HandleModelStage(charaKind, 0));
             File.Close(fileHandle);
+            if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+                System.Printf(const_cast<char*>(s_charaDynamicsLoadDvdFmt), charaKind, static_cast<int>(charaNo));
+            }
         }
     }
 
@@ -2464,7 +2471,7 @@ foundModel:
             reinterpret_cast<CLoadPdt*>(m_pdtLoadRef)->m_pdtSlot =
                 PartPcs.LoadMonsterPdt(static_cast<int>(charaNo), static_cast<int>(textureVariant), 0, 0, 0, 0);
             if (System.m_execParam != 0) {
-                System.Printf(const_cast<char*>(s_charaLoadPdtLogFmt), 1, static_cast<int>(charaNo), static_cast<int>(textureVariant));
+                System.Printf(const_cast<char*>(s_charaLoadPdtLogFmt), charaKind, static_cast<int>(charaNo), static_cast<int>(textureVariant));
             }
             LoadPdtArray(&CharaPcs)->Add(reinterpret_cast<CLoadPdt*>(m_pdtLoadRef));
             m_pdtLoadRef->AddRef();

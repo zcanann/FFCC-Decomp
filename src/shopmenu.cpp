@@ -1923,9 +1923,9 @@ void CShopMenu::DrawMake()
     font->SetShadow(1);
     font->SetScale(FLOAT_80332d28);
     font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
+    font->DrawInit();
 
     const char* itemName = GetItemName(m_resultItem);
-    font->DrawInit();
     MenuPcs.DrawShadowFont(font, const_cast<char*>(itemName), FLOAT_80332d54, FLOAT_80332e0c, 0x18, 0x12);
     MenuPcs.DrawInit();
 

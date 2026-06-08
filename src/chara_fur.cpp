@@ -452,7 +452,7 @@ void CChara::TimeMogFur()
 			int a;
 			int newA;
 			unsigned int tileIndex = ((x % 4) + ((y % 4) * 4) + (x / 4) * 0x10 + (y / 4) * 0x100) * 2;
-			short packed = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(texels) + tileIndex);
+			unsigned short packed = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(texels) + tileIndex);
 
 			a = (packed >> 12) & 7;
 			light = 7 - a;

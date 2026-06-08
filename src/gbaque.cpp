@@ -373,7 +373,7 @@ void GbaQueue::LoadAll()
 			unsigned int bit = static_cast<unsigned int>(1U << i);
 			if ((resetMask & bit) != 0) {
 				CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(scriptFoodBase[i]);
-				if (caravanWork->m_shopBusyFlag == 1) {
+				if (caravanWork->m_shopRequestState == 1) {
 					OSWaitSemaphore(accessSemaphores + i);
 					m_shopFlags = static_cast<unsigned char>(m_shopFlags & ~static_cast<unsigned char>(bit));
 					m_shopStatusFlags = static_cast<unsigned char>(m_shopStatusFlags & ~static_cast<unsigned char>(bit));
@@ -385,7 +385,7 @@ void GbaQueue::LoadAll()
 					}
 					caravanWork->CallShop(0, 0, 0, 0, 0);
 				}
-				if (caravanWork->m_shopBusyFlag == 2) {
+				if (caravanWork->m_shopRequestState == 2) {
 					unsigned char shopMask = static_cast<unsigned char>(0x10 << i);
 					OSWaitSemaphore(accessSemaphores + i);
 					m_shopFlags = static_cast<unsigned char>(m_shopFlags & ~shopMask);

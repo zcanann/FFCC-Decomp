@@ -2165,31 +2165,31 @@ void CShopMenu::SelectMake()
         }
 
         if (canSelect) {
-            short* inventory = m_caravanWork->m_inventoryItems;
             int total = 0;
-            for (int j = 0; j < 8; j++, inventory += 8) {
-                if (inventory[0] == itemNo) {
+            int base = 0;
+            for (int j = 0; j < 8; j++, base += 8) {
+                if (m_caravanWork->m_inventoryItems[base + 0] == itemNo) {
                     ++total;
                 }
-                if (inventory[1] == itemNo) {
+                if (m_caravanWork->m_inventoryItems[base + 1] == itemNo) {
                     ++total;
                 }
-                if (inventory[2] == itemNo) {
+                if (m_caravanWork->m_inventoryItems[base + 2] == itemNo) {
                     ++total;
                 }
-                if (inventory[3] == itemNo) {
+                if (m_caravanWork->m_inventoryItems[base + 3] == itemNo) {
                     ++total;
                 }
-                if (inventory[4] == itemNo) {
+                if (m_caravanWork->m_inventoryItems[base + 4] == itemNo) {
                     ++total;
                 }
-                if (inventory[5] == itemNo) {
+                if (m_caravanWork->m_inventoryItems[base + 5] == itemNo) {
                     ++total;
                 }
-                if (inventory[6] == itemNo) {
+                if (m_caravanWork->m_inventoryItems[base + 6] == itemNo) {
                     ++total;
                 }
-                if (inventory[7] == itemNo) {
+                if (m_caravanWork->m_inventoryItems[base + 7] == itemNo) {
                     ++total;
                 }
             }

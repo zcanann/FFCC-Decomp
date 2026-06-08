@@ -3095,10 +3095,10 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     }
                 }
 
-                if (materialIndex < static_cast<unsigned long>(m_materials.GetSize())) {
-                    m_materials.SetAt(materialIndex, material);
-                } else {
+                if (materialIndex >= static_cast<unsigned long>(m_materials.GetSize())) {
                     m_materials.Add(material);
+                } else {
+                    m_materials.SetAt(materialIndex, material);
                 }
             } break;
             case CHUNK_NAME: {
@@ -3133,7 +3133,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 unsigned char bumpLightDirect = 0;
                 if (chunk.m_version == 1) {
                     bumpLightDirect = chunkFile.Get1();
-                    material->m_fogEnable = chunkFile.Get1();
+                    material->m_unkA5 = chunkFile.Get1();
                     chunkFile.Get2();
                 }
 

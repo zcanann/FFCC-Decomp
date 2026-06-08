@@ -586,31 +586,20 @@ int CFlatRuntime::Frame(int mode, int unused)
 					object->m_sp--;
 					scriptMask = static_cast<unsigned int>(static_cast<unsigned short>(object->m_0x34));
 					scriptIndex = bitBase;
-					scanCount = 4;
+					(void)scanCount;
 
-					do {
-						if (static_cast<int>(scriptMask) < 0) { break; }
-						scriptMask <<= 1; scriptIndex--;
-						if (static_cast<int>(scriptMask) < 0) { break; }
-						scriptMask <<= 1; scriptIndex--;
-						if (static_cast<int>(scriptMask) < 0) { break; }
-						scriptMask <<= 1; scriptIndex--;
-						if (static_cast<int>(scriptMask) < 0) { break; }
-						scriptMask <<= 1; scriptIndex--;
-						if (static_cast<int>(scriptMask) < 0) { break; }
-						scriptMask <<= 1; scriptIndex--;
-						if (static_cast<int>(scriptMask) < 0) { break; }
-						scriptMask <<= 1; scriptIndex--;
-						if (static_cast<int>(scriptMask) < 0) { break; }
-						scriptMask <<= 1; scriptIndex--;
-						if (static_cast<int>(scriptMask) < 0) { break; }
-						scriptMask <<= 1; scriptIndex--;
-						scanCount--;
-					} while (scanCount != 0);
-
-					if (scanCount == 0) {
-						scriptIndex = -1;
+					for (int frameScan = 0; frameScan < 4; frameScan++) {
+						for (int bit = 0; bit < 8; bit++) {
+							if ((scriptMask & 0x80000000) != 0) {
+								goto frameFoundBit;
+							}
+							scriptMask <<= 1;
+							scriptIndex--;
+						}
 					}
+
+					scriptIndex = -1;
+				frameFoundBit:
 
 					do {
 						reqFinished(scriptIndex, object);

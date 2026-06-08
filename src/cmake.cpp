@@ -2174,10 +2174,9 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
         }
         return 0;
     } else {
-        CmakeMenuState* cmakeState = CmakeState(this);
-        int fieldSelect = cmakeState->m_fieldSelect;
+        int fieldSelect = CmakeState(this)->m_fieldSelect;
         short& currentValue = *reinterpret_cast<short*>(
-            reinterpret_cast<char*>(cmakeState) + fieldSelect * 2 + offsetof(CmakeMenuState, m_select));
+            reinterpret_cast<char*>(CmakeState(this)) + fieldSelect * 2 + offsetof(CmakeMenuState, m_select));
 
         if ((repeat & 0x8) != 0) {
             if (currentValue == 0) {
@@ -2199,7 +2198,7 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
             if ((down & 0x100) != 0) {
                 Sound.PlaySe(2, 0x40, 0x7F, 0);
                 if (fieldSelect == 0) {
-                    cmakeState->m_fieldSelect = static_cast<short>(fieldSelect + 1);
+                    CmakeState(this)->m_fieldSelect = static_cast<short>(fieldSelect + 1);
                     return 0;
                 }
 
@@ -2250,11 +2249,11 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
             } else if ((down & 0x200) != 0) {
                 Sound.PlaySe(3, 0x40, 0x7F, 0);
                 if (fieldSelect == 0) {
-                    cmakeState->m_resultDir = -1;
+                    CmakeState(this)->m_resultDir = -1;
                     return 1;
                 }
 
-                cmakeState->m_fieldSelect = static_cast<short>(fieldSelect - 1);
+                CmakeState(this)->m_fieldSelect = static_cast<short>(fieldSelect - 1);
                 return 0;
             }
         }

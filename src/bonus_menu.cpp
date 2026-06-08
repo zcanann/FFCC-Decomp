@@ -1094,7 +1094,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 		}
 		scaleMtx[2][3] = 0.0f;
 
-		handle->m_model->m_flags10C = (handle->m_model->m_flags10C & 0x7F) | 0x80;
+		handle->m_model->m_flags10CBits.m_flag10C_80 = 1;
 		handle->m_model->SetMatrix(scaleMtx);
 		handle->m_model->CalcMatrix();
 		handle->m_model->CalcSkin();
@@ -1914,15 +1914,13 @@ void CMenuPcs::DrawResultCloseAnim()
 					colors[3].g = 0xFF;
 					colors[3].b = 0xFF;
 					colors[3].a = 0xFF;
-					_GXColor color = colors[0];
-					GXSetChanMatColor(GX_COLOR0A0, color);
+					GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 				} else {
-					_GXColor color;
-					color.r = 0xFF;
-					color.g = 0xFF;
-					color.b = 0xFF;
-					color.a = (unsigned char)(sprite->alpha * 255.0f);
-					GXSetChanMatColor(GX_COLOR0A0, color);
+					colors[0].r = 0xFF;
+					colors[0].g = 0xFF;
+					colors[0].b = 0xFF;
+					colors[0].a = (unsigned char)(sprite->alpha * 255.0f);
+					GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 				}
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(sprite->kind));
 
@@ -2313,7 +2311,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			scaleMtx[2][3] = 0.0f;
 		}
 
-		handle->m_model->m_flags10C = (handle->m_model->m_flags10C & 0x7F) | 0x80;
+		handle->m_model->m_flags10CBits.m_flag10C_80 = 1;
 		handle->m_model->SetMatrix(scaleMtx);
 		handle->m_model->CalcMatrix();
 		handle->m_model->CalcSkin();
@@ -2398,12 +2396,10 @@ void CMenuPcs::DrawResultCountAnim()
 					int value = s_Rinfo->m_party[i - (signed char)s_CntTop].m_totalValue;
 					if (*(short*)(this->m_bonusStatePtr + 0x10) == 0) {
 						double frame = (double)*(short*)(this->m_bonusStatePtr + 0x22) - 8.0;
-						if (frame > 0.0) {
-							if (frame < (double)value) {
-								value = (int)frame;
-							}
-						} else {
+						if (frame <= 0.0) {
 							value = 0;
+						} else if (frame < (double)value) {
+							value = (int)frame;
 						}
 					}
 					int digits[3];
@@ -2614,15 +2610,14 @@ void CMenuPcs::CalcResultCountAnim()
 			scaleMtx[2][3] = 0.0f;
 		}
 
-		CChara::CModel* model = handle->m_model;
-		model->m_flags10C = (model->m_flags10C & 0x7F) | 0x80;
-		model->SetMatrix(scaleMtx);
-		model->CalcMatrix();
-		model->CalcSkin();
-		model->m_lightAlpha = 1.0f;
+		handle->m_model->m_flags10CBits.m_flag10C_80 = 1;
+		handle->m_model->SetMatrix(scaleMtx);
+		handle->m_model->CalcMatrix();
+		handle->m_model->CalcSkin();
+		handle->m_model->m_lightAlpha = 1.0f;
 	}
 
-	if (*(short*)(this->m_bonusStatePtr + 0x10) == 0 && frame >= 0 && frame <= s_Rinfo->m_winnerTotalValue) {
+	if (*(short*)(this->m_bonusStatePtr + 0x10) == 0 && frame >= 0 && !(s_Rinfo->m_winnerTotalValue < frame)) {
 		Sound.PlaySe(0x4a, 0x40, 0x7f, 0);
 	}
 
@@ -2731,15 +2726,13 @@ void CMenuPcs::DrawResultOpenAnim()
 						colors[3].g = 0xFF;
 						colors[3].b = 0xFF;
 						colors[3].a = 0xFF;
-						_GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
-						GXSetChanMatColor(GX_COLOR0A0, color);
+						GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 					} else {
-						_GXColor color;
-						color.r = 0xFF;
-						color.g = 0xFF;
-						color.b = 0xFF;
-						color.a = (unsigned char)(sprite->alpha * 255.0f);
-						GXSetChanMatColor(GX_COLOR0A0, color);
+						colors[0].r = 0xFF;
+						colors[0].g = 0xFF;
+						colors[0].b = 0xFF;
+						colors[0].a = (unsigned char)(sprite->alpha * 255.0f);
+						GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 					}
 					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(sprite->kind));
 
@@ -3141,7 +3134,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			}
 		}
 
-		handle->m_model->m_flags10C = (handle->m_model->m_flags10C & 0x7F) | 0x80;
+		handle->m_model->m_flags10CBits.m_flag10C_80 = 1;
 		handle->m_model->SetMatrix(scaleMtx);
 		handle->m_model->CalcMatrix();
 		handle->m_model->CalcSkin();
@@ -3476,7 +3469,7 @@ void CMenuPcs::createBonus()
 
 		s_Rinfo->m_partyCount = activeCount;
 
-		short* bossArtifact = reinterpret_cast<short*>(Game.GetBossArtifact(s_Rinfo->m_partyCount, totalValue));
+		unsigned short* bossArtifact = reinterpret_cast<unsigned short*>(Game.GetBossArtifact(s_Rinfo->m_partyCount, totalValue));
 		for (int i = 0; i < 4; i++) {
 			s_Rinfo->m_bossArtifacts[i] = bossArtifact[i];
 		}

@@ -1642,7 +1642,7 @@ void CGPartyObj::shouki()
 				healCount = 1;
 			}
 		}
-		const unsigned char periodicHeal = script[0xBDC];
+		const int periodicHeal = script[0xBDC];
 		if (periodicHeal != 0 && isFrameInterval(*reinterpret_cast<int*>(&m_flagBits), periodicHeal)) {
 			healCount += 1;
 		}

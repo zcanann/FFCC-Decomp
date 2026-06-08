@@ -450,13 +450,13 @@ static bool IsDuplicateCmakeName(CMenuPcs* menu, const char* name)
         return false;
     }
 
+    bool found = false;
     int activeSlot = static_cast<int>(CmakeSlot(menu));
-    for (int slot = 0; slot < 8; ++slot) {
+    unsigned char* entry = reinterpret_cast<unsigned char*>(&Game);
+    for (int slot = 0; slot < 8; ++slot, entry += 0xC30) {
         if (slot == activeSlot) {
             continue;
         }
-
-        unsigned char* entry = GetCmakeRosterEntry(menu, slot);
         if (*reinterpret_cast<int*>(entry + 0x1794) == 0) {
             continue;
         }
@@ -464,18 +464,22 @@ static bool IsDuplicateCmakeName(CMenuPcs* menu, const char* name)
             continue;
         }
         if (strcmp(name, reinterpret_cast<char*>(entry + 0x17BA)) == 0) {
-            return true;
+            found = true;
+            break;
         }
     }
 
-    char** nameTable = Game.m_cFlatDataArr[1].TableStrings(2);
-    for (int i = 0; i < 0x100; ++i) {
-        if (strcmp(nameTable[i], name) == 0) {
-            return true;
+    if (!found) {
+        char** nameTable = Game.m_cFlatDataArr[1].TableStrings(2);
+        for (int i = 0; i < 0x100; ++i) {
+            if (strcmp(nameTable[i], name) == 0) {
+                found = true;
+                break;
+            }
         }
     }
 
-    return false;
+    return found;
 }
 
 

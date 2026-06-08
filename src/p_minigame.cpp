@@ -766,7 +766,7 @@ receive_message:
             MiniGameThreadSleepTicks(OSMillisecondsToTicks(10));
         }
         MiniGameThreadSleepTicks(OSMillisecondsToTicks(10));
-        self[0x649D] |= static_cast<unsigned char>(1 << channel);
+        self[0x649D] |= (1 << channel);
         OSExitThread(0);
         return;
     }

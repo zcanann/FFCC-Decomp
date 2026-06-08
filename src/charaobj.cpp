@@ -158,11 +158,12 @@ static bool CharaObjIsAttackAnimBoundary(CGCharaObj* charaObj)
 	}
 
 	int frame = static_cast<int>(charaObj->m_turnSpeed);
+	int remainder = frame % span;
 	if (charaObj->m_lastBgAttr >= kCharaObjZero) {
 		return span <= frame;
 	}
 
-	return (frame % span) == 0;
+	return remainder == 0;
 }
 
 static float CharaObjGetMonsterScale(unsigned char* script9, bool isMon)

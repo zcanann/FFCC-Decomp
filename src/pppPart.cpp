@@ -2004,8 +2004,8 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
 					pppProgRenderCallback fn = (pppProgRenderCallback)prog->m_pppFunctionRender;
 					if (fn != 0)
 					{
-						u32 count = pDataVal->m_activeCount;
 						_pppPObjLink* obj = pDataVal->m_pppPObjLink;
+						u32 count = pDataVal->m_activeCount;
 
 						do
 						{

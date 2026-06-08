@@ -1087,7 +1087,10 @@ void CGObject::bgWorldCollision()
     PSVECAdd(reinterpret_cast<Vec*>(&worldPosition), reinterpret_cast<Vec*>(&groundOffset),
              reinterpret_cast<Vec*>(&radialSum));
 
-    Vec radial = *reinterpret_cast<Vec*>(&radialSum);
+    Vec radial;
+    radial.x = radialSum.x;
+    radial.y = radialSum.y;
+    radial.z = radialSum.z;
 
     if (PSVECMag(&radial) > sZeroFloat) {
         reinterpret_cast<CVector*>(&radial)->Normalize();
@@ -1097,7 +1100,10 @@ void CGObject::bgWorldCollision()
     CVector reverseRadial(-radial.x, -radial.y, -radial.z);
     CVector scaledHitMove;
     PSVECScale(reinterpret_cast<Vec*>(&reverseRadial), reinterpret_cast<Vec*>(&scaledHitMove), sHitMoveScale);
-    Vec hitMove = *reinterpret_cast<Vec*>(&scaledHitMove);
+    Vec hitMove;
+    hitMove.x = scaledHitMove.x;
+    hitMove.y = scaledHitMove.y;
+    hitMove.z = scaledHitMove.z;
 
     bodyCylinder.m_bottom = radial;
     bodyCylinder.Probe().m_direction = hitMove;

@@ -1144,7 +1144,9 @@ void CShopMenu::DrawItemInfo0()
             }
         } else if (m_listType == 1) {
             if (MenuPcs.EquipChk(itemIndex) == 0) {
-                canTrade = itemNo >= 0x9F;
+                if (itemNo >= 0x9F) {
+                    canTrade = true;
+                }
             }
         }
     }

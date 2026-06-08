@@ -314,11 +314,12 @@ void GbaQueue::LoadAll()
 		OSSignalSemaphore(&accessSemaphores[i]);
 	}
 
+	cflatFlag = reinterpret_cast<int*>(&CFlat)[0x1041];
+
 	LoadPlayerStat();
 	LoadEnemyStat();
 	LoadMapItemStat();
 
-	cflatFlag = reinterpret_cast<int*>(&CFlat)[0x1041];
 	if ((obj[0x2CE8] == 0) && (cflatFlag != 0)) {
 		SetRadarType();
 	}

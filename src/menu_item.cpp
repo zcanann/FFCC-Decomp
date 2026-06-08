@@ -304,7 +304,7 @@ int CMenuPcs::ItemCtrlCur()
 void CMenuPcs::ItemDraw()
 {
     bool foundSelected = false;
-    unsigned int selectedItemId;
+    int selectedItemId;
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -399,7 +399,7 @@ void CMenuPcs::ItemDraw()
                     (hasLetterAttach && (itemId < 0x125))) {
                     if (EquipChk(menuIndex) != 0) {
                         int markX = (unsigned int)(x - LoadFloat(kItemMarkXOffset));
-                        int markY = (int)((float)((h - LoadFloat(kItemMarkHeight)) * (float)LoadDouble(kItemHalfDouble)) + y);
+                        int markY = (unsigned int)((float)((h - LoadFloat(kItemMarkHeight)) * (float)LoadDouble(kItemHalfDouble)) + y);
                         DrawEquipMark(markX, markY, alpha);
                     }
                     tex = 0x34;

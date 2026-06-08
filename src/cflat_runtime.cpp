@@ -784,10 +784,7 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 	*reinterpret_cast<void**>(scanNode + 4) = freeNode;
 
 	const int scanOffset = *reinterpret_cast<int*>(scanNode + 0xC);
-	int baseWords = 0;
-	if (noScan == 0) {
-		baseWords = *reinterpret_cast<int*>(scanNode + 8);
-	}
+	const int baseWords = (noScan != 0) ? 0 : *reinterpret_cast<int*>(scanNode + 8);
 	freeNode[2] = reinterpret_cast<void*>(static_cast<int>(scanOffset + baseWords));
 	freeNode[3] = reinterpret_cast<void*>(requiredWords);
 

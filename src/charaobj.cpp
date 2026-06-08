@@ -3184,7 +3184,7 @@ int CGCharaObj::calcCastTime(int itemId)
  */
 void CGCharaObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 {
-	if (((reinterpret_cast<unsigned char*>(this)[0x9A] & 0x80) != 0 && (CFlatCenterState() == 0)) &&
+	if ((m_weaponNodeFlagBits.m_prg && (CFlatCenterState() == 0)) &&
 	    ((DbgMenuPcs.GetDbgFlagsRaw() & 0x80) != 0)) {
 		char text[0x100];
 		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);

@@ -1291,12 +1291,9 @@ int CChara::CModel::PickFur(
 			const unsigned int furMaterial = material->IsFurEnabled();
 
 			const unsigned char* cursor = reinterpret_cast<const unsigned char*>(displayList->m_data);
-			int remaining = displayList->m_size;
-			if ((cursor[0] & 7) != 0) {
-				displayList++;
-				continue;
-			}
-			while (remaining > 0) {
+			if ((cursor[0] & 7) == 0) {
+				int remaining = displayList->m_size;
+				while (remaining > 0) {
 				const unsigned char command = cursor[0];
 				if ((command & 0xF8) == 0) {
 					break;
@@ -1514,6 +1511,7 @@ int CChara::CModel::PickFur(
 					}
 nextVertex:
 					cursor += 8;
+				}
 				}
 			}
 			displayList++;

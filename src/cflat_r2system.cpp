@@ -3386,7 +3386,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     }
     case -0x96:
         m_centerState = *object->m_localBase;
-        *reinterpret_cast<int*>(&m_centerDistanceScale) = object->m_localBase[1];
+        m_centerDistanceScale = *reinterpret_cast<float*>(&object->m_localBase[1]);
         this->push(object, 0);
         outResult = 0;
         break;
@@ -3443,16 +3443,16 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             break;
         }
 
-        CCharaPcs::CCameraFrame* cameraData = &CharaPcs.m_cameraData[cameraSlot][cameraFrame];
-        *reinterpret_cast<int*>(object->m_localBase[2]) = cameraData->m_values[0].m_int;
-        *reinterpret_cast<float*>(object->m_localBase[3]) = -cameraData->m_values[1].m_float;
-        *reinterpret_cast<float*>(object->m_localBase[4]) = -cameraData->m_values[2].m_float;
-        *reinterpret_cast<int*>(object->m_localBase[5]) = cameraData->m_values[3].m_int;
-        *reinterpret_cast<float*>(object->m_localBase[6]) = -cameraData->m_values[4].m_float;
-        *reinterpret_cast<float*>(object->m_localBase[7]) = -cameraData->m_values[5].m_float;
-        *reinterpret_cast<int*>(object->m_localBase[8]) = cameraData->m_values[6].m_int;
+        CCharaPcs::CCameraFrame*& cameraSlotRef = CharaPcs.m_cameraData[cameraSlot];
+        *reinterpret_cast<int*>(object->m_localBase[2]) = cameraSlotRef[cameraFrame].m_values[0].m_int;
+        *reinterpret_cast<float*>(object->m_localBase[3]) = -cameraSlotRef[cameraFrame].m_values[1].m_float;
+        *reinterpret_cast<float*>(object->m_localBase[4]) = -cameraSlotRef[cameraFrame].m_values[2].m_float;
+        *reinterpret_cast<int*>(object->m_localBase[5]) = cameraSlotRef[cameraFrame].m_values[3].m_int;
+        *reinterpret_cast<float*>(object->m_localBase[6]) = -cameraSlotRef[cameraFrame].m_values[4].m_float;
+        *reinterpret_cast<float*>(object->m_localBase[7]) = -cameraSlotRef[cameraFrame].m_values[5].m_float;
+        *reinterpret_cast<int*>(object->m_localBase[8]) = cameraSlotRef[cameraFrame].m_values[6].m_int;
         *reinterpret_cast<float*>(object->m_localBase[9]) =
-            -(kCFlatPi * cameraData->m_values[7].m_float) / kCFlatDegrees180;
+            -((kCFlatPi * cameraSlotRef[cameraFrame].m_values[7].m_float) / kCFlatDegrees180);
         this->push(object, 1);
         outResult = 0;
         break;
@@ -3777,9 +3777,9 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         int foundCount = this->CcClass2D(
             *object->m_localBase, object->m_localBase[1], center, localFloats[5],
             localFloats[6], maxCount, foundObjects);
-        int* outIds = reinterpret_cast<int*>(object->m_localBase[8]);
         for (int i = 0; i < foundCount; i++) {
-            outIds[i] = reinterpret_cast<CFlatRuntime::CObject*>(foundObjects[i])->m_particleId;
+            reinterpret_cast<int*>(object->m_localBase[8])[i] =
+                reinterpret_cast<CFlatRuntime::CObject*>(foundObjects[i])->m_particleId;
         }
 
         this->push(object, foundCount);

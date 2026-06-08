@@ -795,8 +795,9 @@ void CMenuPcs::EquipCtrl()
 
 		unsigned int slotCount = (unsigned int)caravanWork->m_numCmdListSlots;
 		index = 0;
-		int byteOff = (slotCount - 1) * 0x40;
-		if (-1 < (int)(slotCount - 1)) {
+		int count1 = slotCount - 1;
+		int byteOff = count1 * 0x40;
+		if (count1 >= 0) {
 			blockCount = slotCount >> 3;
 			if (blockCount != 0) {
 				do {

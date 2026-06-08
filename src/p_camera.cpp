@@ -1513,22 +1513,22 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
         float clipBoundData[6];
         CBound* clipBound = reinterpret_cast<CBound*>(clipBoundData);
         worldBoundData[0] = gObject->m_worldPosition.x - radius;
-        clipBoundData[0] = kCameraBoundsMinInitial;
         worldBoundData[3] = gObject->m_worldPosition.x + radius;
-        clipBoundData[3] = kCameraBoundsMaxInitial;
-        worldBoundData[1] = gObject->m_worldPosition.y;
-        clipBoundData[1] = kCameraBoundsMinInitial;
-        worldBoundData[4] = gObject->m_worldPosition.y + radius;
-        clipBoundData[4] = kCameraBoundsMaxInitial;
         worldBoundData[2] = gObject->m_worldPosition.z - radius;
-        clipBoundData[2] = kCameraBoundsMinInitial;
         worldBoundData[5] = gObject->m_worldPosition.z + radius;
+        worldBoundData[1] = gObject->m_worldPosition.y;
+        clipBoundData[2] = kCameraBoundsMinInitial;
+        worldBoundData[4] = gObject->m_worldPosition.y + radius;
+        clipBoundData[1] = kCameraBoundsMinInitial;
+        clipBoundData[0] = kCameraBoundsMinInitial;
         clipBoundData[5] = kCameraBoundsMaxInitial;
+        clipBoundData[4] = kCameraBoundsMaxInitial;
+        clipBoundData[3] = kCameraBoundsMaxInitial;
 
         if (worldBound->CheckFrustum0(*clipBound) == 0) {
             continue;
         }
-        if (clipBoundData[0] <= kCameraClipMinZ) {
+        if (!(clipBoundData[0] > kCameraClipMinZ)) {
             continue;
         }
         float negMinX = -clipBoundData[0];
@@ -1536,7 +1536,7 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
         float ratioY = (clipBoundData[4] - clipBoundData[1]) / negMinX;
         if (ratioZ > kCameraDebugRotateStep) {
             // proceed
-        } else if (ratioY <= kCameraDebugRotateStep) {
+        } else if (!(ratioY > kCameraDebugRotateStep)) {
             continue;
         }
 

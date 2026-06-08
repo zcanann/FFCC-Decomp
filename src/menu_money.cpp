@@ -257,7 +257,14 @@ int CMenuPcs::MoneyCtrlCur()
 			}
 		}
 	} else {
-		if ((hold & 8) == 0) {
+		if ((hold & 8) != 0) {
+			if (this->m_moneyState->selections[mode] != 0) {
+				this->m_moneyState->selections[mode] = this->m_moneyState->selections[mode] - 1;
+			} else {
+				this->m_moneyState->selections[mode] = 1;
+			}
+			Sound.PlaySe(1, 0x40, 0x7F, 0);
+		} else {
 			if ((hold & 4) != 0) {
 				if (this->m_moneyState->selections[mode] < 1) {
 					this->m_moneyState->selections[mode] = this->m_moneyState->selections[mode] + 1;
@@ -266,13 +273,6 @@ int CMenuPcs::MoneyCtrlCur()
 				}
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			}
-		} else {
-			if (this->m_moneyState->selections[mode] != 0) {
-				this->m_moneyState->selections[mode] = this->m_moneyState->selections[mode] - 1;
-			} else {
-				this->m_moneyState->selections[mode] = 1;
-			}
-			Sound.PlaySe(1, 0x40, 0x7F, 0);
 		}
 
 		if ((hold & 0xC) == 0) {

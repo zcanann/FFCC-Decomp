@@ -1021,7 +1021,7 @@ cylinder_body:
         }
 
         capB = -((localDirection.z * axisLen) - capB);
-        disc = capB * capB - (axisLen * -((2.0 * pz) - axisLen) + capC);
+        disc = capB * capB - (f32)(axisLen * -((2.0 * pz) - axisLen) + capC);
         if (disc > 0.0) {
             disc = sqrtf(disc);
             f32 t = -capB - disc;

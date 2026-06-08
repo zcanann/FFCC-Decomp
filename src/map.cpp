@@ -2084,7 +2084,7 @@ int CMapMng::ReadOtm(char* mapName)
     }
 
     if (filePtr == 0) {
-        if (System.m_execParam != 0) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1) {
             System.Printf(const_cast<char*>(s_mapReadErrorFmt), strTmp);
         }
         return 0;
@@ -2099,7 +2099,10 @@ int CMapMng::ReadOtm(char* mapName)
 
     CChunkFile::CChunk chunk;
     while (chunkFile.GetNextChunk(chunk)) {
-        if (chunk.m_id != 0x4F544D20) {
+        switch (chunk.m_id) {
+        case 0x4F544D20:
+            break;
+        default:
             continue;
         }
 

@@ -191,10 +191,10 @@ void CMaterialEditorPcs::drawViewer()
         for (int pass = 0; pass < 2; pass++) {
             for (u32 polyIndex = 0; polyIndex < model->countC; polyIndex++) {
 #define polygon (&static_cast<MaterialEditorPolygon*>(model->ptr18)[polyIndex])
-                if ((polygon->flags & 0x200) == 0) {
-                    GXSetCullMode(GX_CULL_BACK);
-                } else {
+                if ((polygon->flags & 0x200) != 0) {
                     GXSetCullMode(GX_CULL_NONE);
+                } else {
+                    GXSetCullMode(GX_CULL_BACK);
                 }
 
                 if (pass == 1) {

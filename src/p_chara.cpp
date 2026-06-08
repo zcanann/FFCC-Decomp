@@ -423,16 +423,19 @@ static inline void PruneUnsharedAnimRefs(CCharaPcs* self, CCharaPcs::CLoadAnim* 
 {
     for (int i = LoadAnimArray(self)->GetSize() - 1; i >= 0; i--) {
         CCharaPcs::CLoadAnim* loadAnim = (*LoadAnimArray(self))[static_cast<unsigned long>(i)];
-        if (loadAnim->m_mergeFileId >= 0 || loadAnim->GetRef() != 1) {
+        if (loadAnim->m_mergeFileId >= 0) {
             continue;
         }
-        if (target != 0 && loadAnim != target) {
-            continue;
+        if (loadAnim->GetRef() == 1) {
+            if (target == 0 || target == loadAnim) {
+                CCharaPcs::CLoadAnim* releasedAnim = loadAnim;
+                ReleaseSharedNonNull(releasedAnim);
+                LoadAnimArray(self)->RemoveAt(static_cast<unsigned long>(i));
+                if (target != 0) {
+                    break;
+                }
+            }
         }
-
-        CCharaPcs::CLoadAnim* releasedAnim = loadAnim;
-        ReleaseSharedNonNull(releasedAnim);
-        LoadAnimArray(self)->RemoveAt(static_cast<unsigned long>(i));
     }
 }
 
@@ -2547,8 +2550,8 @@ void CCharaPcs::CHandle::FreeAnim(int animIndex)
         return;
     }
 
-    ReleaseShared(m_animSlot[animIndex]);
-    PruneUnsharedAnimRefs(&CharaPcs, previousAnim);
+    ReleaseSharedNonNull(m_animSlot[animIndex]);
+    PruneUnsharedAnimRefs(&CharaPcs, reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex]));
     m_animSlot[animIndex] = 0;
 }
 

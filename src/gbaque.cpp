@@ -292,7 +292,7 @@ void GbaQueue::LoadAll()
 	prevMenuStageMode = m_singleMode;
 	m_singleMode = static_cast<char>(Game.m_gameWork.m_menuStageMode != 0);
 	if (prevMenuStageMode != m_singleMode) {
-		m_makeMapObjFlg = 0xF;
+		m_playModeFlags = 0xF;
 	}
 
 	spModeBits = 0;

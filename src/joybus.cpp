@@ -4999,12 +4999,12 @@ int JoyBus::SendItemAll(ThreadParam* threadParam)
 {
     unsigned int port;
     int result = 0;
-    char subState = threadParam->m_subState;
+    unsigned char subState = threadParam->m_subState;
 
-    if (subState != 1)
+    switch (subState)
     {
-        if (subState == 0)
-        {
+    case 0:
+    {
             m_txWordIndex[threadParam->m_portIndex] = 0;
 
             unsigned char payload[780];
@@ -5039,7 +5039,7 @@ int JoyBus::SendItemAll(ThreadParam* threadParam)
             unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
             unsigned int word = *wordPtr;
 
-            if (m_threadRunningMask == 0)
+            if (static_cast<signed char>(m_threadRunningMask) == 0)
             {
                 result = 0;
             }
@@ -5062,15 +5062,15 @@ int JoyBus::SendItemAll(ThreadParam* threadParam)
                     result = 0;
                 }
             }
-        }
+        break;
     }
-    else
+    case 1:
     {
         port = threadParam->m_portIndex;
         unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
         unsigned int word = *wordPtr;
 
-        if (m_threadRunningMask == 0)
+        if (static_cast<signed char>(m_threadRunningMask) == 0)
         {
             result = 0;
         }
@@ -5093,6 +5093,8 @@ int JoyBus::SendItemAll(ThreadParam* threadParam)
                 result = 0;
             }
         }
+        break;
+    }
     }
 
     if (result == 0)

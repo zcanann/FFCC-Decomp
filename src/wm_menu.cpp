@@ -12126,12 +12126,11 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 	const int languageIndex = Game.m_gameWork.m_languageId - 1;
 	const unsigned char* const winMess = reinterpret_cast<unsigned char*>(GetWinMess(winType));
 
-	const int count = *reinterpret_cast<const int*>(winMess);
 	float posX;
 	if (winType != 0) {
 		int maxWidth = 0;
 		const unsigned char* entry = winMess;
-		for (int i = 0; i < count; i++) {
+		for (int i = 0; i < *reinterpret_cast<const int*>(winMess); i++) {
 			const short msgId = *reinterpret_cast<const short*>(entry + 4);
 			const char* text = msgTable[msgId];
 			if (text != 0) {
@@ -12153,7 +12152,7 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 
 	char textBuf[128];
 	const unsigned char* entry = winMess + 4;
-	for (int i = 0; i < count; i++) {
+	for (int i = 0; i < *reinterpret_cast<const int*>(winMess); i++) {
 		const short msgId = *reinterpret_cast<const short*>(entry);
 		const char* text = msgTable[msgId];
 		if (strlen(text) != 0) {

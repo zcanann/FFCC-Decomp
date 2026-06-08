@@ -751,10 +751,9 @@ void CGraphicPcs::drawBar()
         const float width = (kGraphicScreenCenterX * lastTime) / kDebugBarFrameBudget;
 
         if (priority == 0x26) {
+            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
             const float y0 = drawText ? static_cast<float>(y) : kDebugBarMoveBottom;
             const float y1 = drawText ? static_cast<float>(y + kDebugBarLineStep) : kDebugBarTop;
-
-            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
             GXPosition3f32(x, y0, kGraphicZero);
             GXColor1u32(*reinterpret_cast<u32*>(&rgb));
             GXTexCoord2u16(0, 0);
@@ -769,10 +768,9 @@ void CGraphicPcs::drawBar()
             GXTexCoord2u16(0, 2);
             x += width;
         } else if (priority != 0x27) {
+            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
             const float y0 = drawText ? static_cast<float>(y) : kDebugBarObjectTop;
             const float y1 = drawText ? static_cast<float>(y + kDebugBarLineStep) : kDebugBarMoveBottom;
-
-            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
             GXPosition3f32(x, y0, kGraphicZero);
             GXColor1u32(*reinterpret_cast<u32*>(&rgb));
             GXTexCoord2u16(0, 0);

@@ -322,14 +322,15 @@ static int CharaObjDecodeSe(unsigned short encodedSe)
 	return (encodedSe & 0xFF) + ((encodedSe >> 8) * 1000);
 }
 
-static unsigned int CharaObjResolveParticleBank(CGCharaObj* charaObj, unsigned int particleClass)
+static int CharaObjResolveParticleBank(CGCharaObj* charaObj, int particleClass)
 {
-	if (particleClass == 0xFE) {
-		int pdtNo = CharaObjGetModelPdtNo(charaObj);
-		return (pdtNo >= 0) ? static_cast<unsigned int>(pdtNo) : 0xFFFFFFFF;
-	} else if (particleClass >= 0xFD && particleClass <= 0xFF) {
-		return 0xFFFFFFFF;
-	} else {
+	switch (particleClass) {
+	case 0xFE:
+		return CharaObjGetModelPdtNo(charaObj);
+	case 0xFD:
+	case 0xFF:
+		return -1;
+	default:
 		return particleClass;
 	}
 }
@@ -2668,8 +2669,8 @@ int CGCharaObj::getItemPdt(int itemId, int level, int& outEffect, int& outArg0, 
 void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg1, Vec* pos)
 {
 	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + effectId * 0x48;
-	unsigned short particleClass = *reinterpret_cast<unsigned short*>(itemData + 0x12);
-	unsigned int particleBank = CharaObjResolveParticleBank(this, particleClass);
+	int particleClass = *reinterpret_cast<unsigned short*>(itemData + 0x12);
+	int particleBank = CharaObjResolveParticleBank(this, particleClass);
 	unsigned short particleEntry = 0xFFFF;
 	unsigned short particleFlags = 0;
 	unsigned int particleNo = effectId;
@@ -2677,7 +2678,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 	int emittedCustom = 0;
 	int hasParticle = 0;
 
-	if (particleBank != 0xFFFFFFFF) {
+	if (particleBank != -1) {
 		particleEntry = *reinterpret_cast<unsigned short*>(itemData + 0x14 + effectArg0 * 2);
 		if (particleEntry != 0xFFFF) {
 			particleFlags = particleEntry;

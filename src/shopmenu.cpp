@@ -1671,6 +1671,8 @@ void CShopMenu::DrawShopBase()
  * Address:	TODO
  * Size:	TODO
  */
+#pragma push
+#pragma peephole off
 void CShopMenu::Draw()
 {
     if (reinterpret_cast<int>(m_unk00) == 0) {
@@ -1766,6 +1768,7 @@ void CShopMenu::Draw()
     }
     Graphic.SetDrawDoneDebugData(0x3C);
 }
+#pragma pop
 /*
  * --INFO--
  * Address:	TODO

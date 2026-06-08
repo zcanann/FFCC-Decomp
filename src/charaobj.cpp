@@ -1159,7 +1159,6 @@ int CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos)
 		}
 	}
 
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	int slot = 4;
 	for (int i = 0; i < 4; i++) {
 		if (m_ignoreHit[i].m_flagBits.m_flag_80 != 0) {

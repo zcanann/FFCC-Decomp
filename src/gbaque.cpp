@@ -1568,12 +1568,13 @@ void GbaQueue::LoadMapItemStat()
 	numMapItems = 0;
 
 	if (reinterpret_cast<int*>(&CFlat)[0x4101] != 0) {
-		unsigned char* mapItemEntry = localMapItems;
+		unsigned char* mapItemEntry;
 		object = CFlat.FindGObjFirst();
+		mapItemEntry = localMapItems;
 
 		while (object != 0) {
 			if ((object->m_objectFlags & 0x100) != 0) {
-				const int dropItemCode = static_cast<short>(object->m_dropItemCodes[0]);
+				const int dropItemCode = *reinterpret_cast<short*>(&object->m_dropItemCodes[0]);
 				if ((dropItemCode & 0xC000) == 0x4000) {
 					mapItemEntry[1] = 4;
 				} else {

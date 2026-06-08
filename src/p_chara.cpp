@@ -2944,43 +2944,45 @@ void CCharaPcs::CHandle::loadModelASyncFrame()
     }
 
     if (m_asyncState == 2) {
+        void* readBuffer = File.m_readBuffer;
+        int keyId = m_asyncCharaNo;
+        void* keyTag = reinterpret_cast<void*>(m_asyncCharaKind);
         CLoadModel* loadModel = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x5E8) CLoadModel;
-        loadModel->m_keyTag = reinterpret_cast<void*>(m_asyncCharaKind);
-        loadModel->m_keyId = m_asyncCharaNo;
+        loadModel->m_keyTag = keyTag;
+        loadModel->m_keyId = keyId;
         loadModel->m_mergeFileId = -1;
         loadModel->m_mergeFlags = 0;
         LoadModelArray(&CharaPcs)->Add(loadModel);
-        loadModel->m_model =
+        CChara::CModel* model =
             new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x5F1) CChara::CModel;
-        loadModel->m_streamMode = 0;
-        loadModel->m_streamOffset = 0;
-        loadModel->m_streamSize = 0;
-        loadModel->m_model->Create(File.m_readBuffer, HandleModelStage(m_asyncCharaKind, 0));
+        model->Create(readBuffer, HandleModelStage(m_asyncCharaKind, 0));
+        loadModel->m_model = model;
         m_modelLoadRef = loadModel;
-        AddSharedRef(m_modelLoadRef);
-        m_model = loadModel->m_model;
-        AddSharedRef(m_model);
+        m_modelLoadRef->AddRef();
+        m_model = reinterpret_cast<CLoadModel*>(m_modelLoadRef)->m_model;
+        m_model->AddRef();
         m_charaKind = m_asyncCharaKind;
         m_charaNo = m_asyncCharaNo;
     } else if (m_asyncState == 4) {
         m_model->CreateDynamics(File.m_readBuffer, HandleModelStage(m_asyncCharaKind, 0));
     } else {
+        void* readBuffer = File.m_readBuffer;
+        int keyId = m_asyncCharaNo;
+        void* keyTag = reinterpret_cast<void*>(m_asyncCharaKind);
         CLoadTexture* loadTexture = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x609) CLoadTexture;
-        loadTexture->m_keyTag = reinterpret_cast<void*>(m_asyncCharaKind);
-        loadTexture->m_keyId = m_asyncCharaNo;
+        loadTexture->m_keyTag = keyTag;
+        loadTexture->m_keyId = keyId;
+        loadTexture->m_variantTag = reinterpret_cast<void*>(m_asyncTextureVariant);
         loadTexture->m_mergeFileId = -1;
         loadTexture->m_mergeFlags = 0;
-        loadTexture->m_variantTag = reinterpret_cast<void*>(m_asyncTextureVariant);
         LoadTextureArray(&CharaPcs)->Add(loadTexture);
-        loadTexture->m_textureSet = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
-        loadTexture->m_streamMode = 0;
-        loadTexture->m_streamOffset = 0;
-        loadTexture->m_streamSize = 0;
-        loadTexture->m_textureSet->Create(File.m_readBuffer, HandleTextureStage(m_asyncCharaKind), 0, 0, 0, 0);
+        CTextureSet* textureSet = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
+        textureSet->Create(readBuffer, HandleTextureStage(m_asyncCharaKind), 0, 0, 0, 0);
+        loadTexture->m_textureSet = textureSet;
         m_texLoadRef = loadTexture;
-        AddSharedRef(m_texLoadRef);
-        m_textureSet = loadTexture->m_textureSet;
-        AddSharedRef(m_textureSet);
+        m_texLoadRef->AddRef();
+        m_textureSet = reinterpret_cast<CLoadTexture*>(m_texLoadRef)->m_textureSet;
+        m_textureSet->AddRef();
         m_model->AttachTextureSet(m_textureSet);
         m_textureVariant = m_asyncTextureVariant;
     }

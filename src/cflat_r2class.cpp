@@ -454,7 +454,7 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 					StoreU32(stack, engineObject, 0x94, setMode);
 					break;
 				case -0xA: {
-					const int oldBit = static_cast<int>((static_cast<unsigned int>(*(engineObject + 0x50)) << 0x1C) >> 0x1F);
+					const int oldBit = static_cast<int>((static_cast<int>(*(engineObject + 0x50)) << 0x1C) >> 0x1F);
 					stack[-1].m_word = static_cast<unsigned int>(oldBit);
 					int bitValue = oldBit;
 					if (setMode == 0) {

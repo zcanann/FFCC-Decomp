@@ -1173,11 +1173,10 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
     if (mana2Work->m_positions == 0 && mana2Work->m_normals == 0 && mana2Work->m_waterHeightA == 0) {
         for (meshIndex = 0; meshIndex < model->m_data->m_meshCount; meshIndex++) {
             meshData = mesh->m_data;
-            u8 type = param_2->m_type;
 
-            if (((type == 1) && strcmp(meshData->m_name, s_manaShapeObj5) == 0) ||
-                ((type == 2) && strcmp(meshData->m_name, s_manaShapeObj3) == 0) ||
-                ((type == 3) && strcmp(meshData->m_name, s_manaShapeObj1) == 0)) {
+            if (((param_2->m_type == 1) && strcmp(meshData->m_name, s_manaShapeObj5) == 0) ||
+                ((param_2->m_type == 2) && strcmp(meshData->m_name, s_manaShapeObj3) == 0) ||
+                ((param_2->m_type == 3) && strcmp(meshData->m_name, s_manaShapeObj1) == 0)) {
                 if (mana2Work->m_meshReflectionVec == 0) {
                     mana2Work->m_meshReflectionVec =
                         static_cast<Vec*>(pppMemAlloc(meshData->m_vertexCount * sizeof(Vec), ppvEnv->m_stagePtr,
@@ -1235,8 +1234,8 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
                 }
             }
 
-            if (((type == 1) && strcmp(meshData->m_name, s_manaShapeObj4) == 0) ||
-                ((type == 2) && strcmp(meshData->m_name, s_manaShapeObj2) == 0)) {
+            if (((param_2->m_type == 1) && strcmp(meshData->m_name, s_manaShapeObj4) == 0) ||
+                ((param_2->m_type == 2) && strcmp(meshData->m_name, s_manaShapeObj2) == 0)) {
                 mana2Work->m_positions = static_cast<Vec*>(pppMemAlloc(0xD8C, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26A));
                 mana2Work->m_normals = static_cast<Vec*>(pppMemAlloc(0xD8C, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26B));
                 mana2Work->m_colors = static_cast<GXColor*>(pppMemAlloc(0x484, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26C));
@@ -1276,11 +1275,10 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
         mesh = model->m_meshes;
         for (meshIndex = 0; meshIndex < model->m_data->m_meshCount; meshIndex++) {
             meshData = mesh->m_data;
-            u8 type = param_2->m_type;
 
-            if (((type == 1) && strcmp(meshData->m_name, s_manaShapeObj5) == 0) ||
-                ((type == 2) && strcmp(meshData->m_name, s_manaShapeObj3) == 0) ||
-                ((type == 3) && strcmp(meshData->m_name, s_manaShapeObj1) == 0)) {
+            if (((param_2->m_type == 1) && strcmp(meshData->m_name, s_manaShapeObj5) == 0) ||
+                ((param_2->m_type == 2) && strcmp(meshData->m_name, s_manaShapeObj3) == 0) ||
+                ((param_2->m_type == 3) && strcmp(meshData->m_name, s_manaShapeObj1) == 0)) {
                 for (s32 dlIndex = meshData->m_displayListCount - 1; dlIndex >= 0; dlIndex--) {
                     CalcReflectionVector2(
                         mana2Work->m_meshReflectionVec, meshData->m_vertices, meshData->m_normals,

@@ -156,7 +156,7 @@ static inline CChara::CNode* ModelNodes(CChara::CModel* model)
     return model->m_nodes;
 }
 
-static inline unsigned short ModelMeshCount(CChara::CModel* model)
+static inline unsigned int ModelMeshCount(CChara::CModel* model)
 {
     return model->m_data->m_meshCount;
 }
@@ -1456,7 +1456,6 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	texMtx[1][1] = furStep;
 	GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
 
-	const unsigned short meshCount = ModelMeshCount(this);
 	const int posQuant = ModelPosQuant(this) & 0xFF;
 	const int normQuant = ModelNormQuant(this) & 0xFF;
 	unsigned int prevExtraTexture = 0xFFFFFFFF;
@@ -1465,7 +1464,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	CChara::CNode* nodes = ModelNodes(this);
 	FurMeshRaw* mesh = ModelMeshes(this);
 
-	for (unsigned int meshIndex = 0; meshIndex < meshCount; meshIndex++, mesh++) {
+	for (unsigned int meshIndex = 0; meshIndex < ModelMeshCount(this); meshIndex++, mesh++) {
 		if (mesh->m_workPositions == 0) {
 			continue;
 		}

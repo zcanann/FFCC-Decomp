@@ -3383,7 +3383,6 @@ void CGPartyObj::statPut()
 	}
 
 	if (isLoopAnim() != 0) {
-		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
 		PartyObjOverlay& party = PartyData(this);
 		if (party.carryObject != 0) {
 			if (static_cast<int>(CFlatCenterState()) == 0) {
@@ -3398,7 +3397,7 @@ void CGPartyObj::statPut()
 				SetAnimSlot(0x0B, 0);
 				SetAnimSlot(0x0C, 1);
 			}
-		} else if (*reinterpret_cast<unsigned short*>(script + 0x1C) != 0) {
+		} else if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
 			if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
 				SetAnimSlot(0, 0);
 				SetAnimSlot(1, 1);

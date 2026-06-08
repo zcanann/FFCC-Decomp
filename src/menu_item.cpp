@@ -447,9 +447,11 @@ void CMenuPcs::ItemDraw()
                 selectedItemId = itemId;
             }
 
+            float textX = (float)(textEntry->x + 0x1C);
+            float textY = (float)(textEntry->y + 0xB);
             listFont->GetWidth(text);
-            listFont->SetPosX((float)(textEntry->x + 0x1C));
-            listFont->SetPosY((float)(textEntry->y + 0xB) - LoadFloat(kItemTextYOffset));
+            listFont->SetPosX(textX);
+            listFont->SetPosY(textY - LoadFloat(kItemTextYOffset));
             listFont->Draw(text);
         }
     }

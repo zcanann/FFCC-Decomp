@@ -1312,7 +1312,11 @@ void CMenuPcs::drawSingleMenu()
                         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
                         MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-                        _GXColor color = {0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * alpha)};
+                        _GXColor color;
+                        color.r = 0xFF;
+                        color.g = 0xFF;
+                        color.b = 0xFF;
+                        color.a = static_cast<u8>(255.0f * alpha);
                         GXSetChanMatColor(GX_COLOR0A0, color);
 
                         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x20));
@@ -1340,7 +1344,11 @@ void CMenuPcs::drawSingleMenu()
                         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
                         MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-                        _GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
+                        _GXColor color;
+                        color.r = 0xFF;
+                        color.g = 0xFF;
+                        color.b = 0xFF;
+                        color.a = 0xFF;
                         GXSetChanMatColor(GX_COLOR0A0, color);
                         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x21));
                         MenuPcs.DrawRect(0, -(176.0f * alpha - 208.0f),
@@ -1373,7 +1381,11 @@ void CMenuPcs::drawSingleMenu()
                         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
                         MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-                        _GXColor color = {0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * alpha)};
+                        _GXColor color;
+                        color.r = 0xFF;
+                        color.g = 0xFF;
+                        color.b = 0xFF;
+                        color.a = static_cast<u8>(255.0f * alpha);
                         GXSetChanMatColor(GX_COLOR0A0, color);
 
                         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x20));
@@ -1401,7 +1413,11 @@ void CMenuPcs::drawSingleMenu()
                         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
                         MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-                        _GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
+                        _GXColor color;
+                        color.r = 0xFF;
+                        color.g = 0xFF;
+                        color.b = 0xFF;
+                        color.a = 0xFF;
                         GXSetChanMatColor(GX_COLOR0A0, color);
                         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x21));
                         MenuPcs.DrawRect(0, -(176.0f * alpha - 208.0f),

@@ -1256,22 +1256,21 @@ CGItemObj* CFlatRuntime2::FindGItemObjNext(CGItemObj* gItemObj)
  */
 void CFlatRuntime2::Destroy()
 {
-	reinterpret_cast<CFlatRuntime*>(this)->Destroy();
+	CFlatRuntime::Destroy();
 	m_flatData.Destroy();
 
-	CFlatLayerResource* layer = LayerResources(this);
 	int zero = 0;
-	for (int i = 0; i < 8; i++, layer++) {
-		CFile::CHandle* fileHandle = layer->m_fileHandle;
+	for (int i = 0; i < 8; i++) {
+		CFile::CHandle* fileHandle = LayerResources(this)[i].m_fileHandle;
 		if (fileHandle != 0) {
 			File.Close(fileHandle);
-			layer->m_fileHandle = reinterpret_cast<CFile::CHandle*>(zero);
+			LayerResources(this)[i].m_fileHandle = reinterpret_cast<CFile::CHandle*>(zero);
 		}
 
-		CTextureSet* textureSet = layer->m_textureSet;
+		CTextureSet* textureSet = LayerResources(this)[i].m_textureSet;
 		if (textureSet != 0) {
 			delete textureSet;
-			layer->m_textureSet = reinterpret_cast<CTextureSet*>(zero);
+			LayerResources(this)[i].m_textureSet = reinterpret_cast<CTextureSet*>(zero);
 		}
 	}
 }

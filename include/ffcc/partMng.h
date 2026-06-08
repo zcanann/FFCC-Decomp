@@ -280,7 +280,7 @@ struct _pppEnvSt
     };
     unsigned int m_mngStCount;      // 0x34
     unsigned int m_debugCounter;    // 0x38
-    unsigned int m_isEditMode;      // 0x3c
+    int m_isEditMode;               // 0x3c
     int m_unknown;                  // 0x40
     int m_lastEnvCmd;               // 0x44
     float m_envParam;               // 0x48

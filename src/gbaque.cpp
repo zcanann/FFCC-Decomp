@@ -3218,12 +3218,10 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 	int selectedCount = 0;
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	memcpy(compatibilityData, reinterpret_cast<unsigned char*>(this) + channel * 0xDC + 0x524, sizeof(compatibilityData));
+	memcpy(compatibilityData, reinterpret_cast<unsigned char*>(this) + channel * 0xDC + 0x458, sizeof(compatibilityData));
 	OSSignalSemaphore(accessSemaphores + channel);
 
-	char** nameTable = Game.m_cFlatDataArr[1].TableStrings(2);
-
-	outCompatibility[0] = compatibilityData[5];
+	outCompatibility[0] = reinterpret_cast<unsigned char*>(this)[channel * 0xDC + 0x529];
 	if (compatibilityData[3] != 0) {
 		count++;
 	}
@@ -3261,7 +3259,7 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 	for (int slot = 1; (selectedCount < count) && (slot < 8); slot++) {
 		unsigned char slotValue = compatibilityData[slot];
 		if ((selectedCount < 2) || (slotValue != 0)) {
-			char* src = nameTable[slotValue];
+			char* src = Game.m_cFlatDataArr[1].TableStrings(2)[slotValue];
 			int len = strlen(src);
 			memcpy(writePtr, src, len + 1);
 			writePtr += len + 1;

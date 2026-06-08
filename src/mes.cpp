@@ -1575,14 +1575,13 @@ void CMes::Next()
 		{
 			int j = i + 1;
 			curr = start + 5;
-			for (; j < remaining; j = j + 1)
+			for (; j < remaining; j = j + 1, curr = curr + 5)
 			{
 				if ((((unsigned int)*(unsigned char*)((char*)start + 0xe) >> 4 & 0xF) != ((unsigned int)*(unsigned char*)((char*)curr + 0xe) >> 4 & 0xF)) ||
 				    (*(short*)(start + 2) != *(short*)(curr + 2)))
 				{
 					break;
 				}
-				curr = curr + 5;
 			}
 			runLength = (unsigned int)(j - i);
 			groupWidth = (curr[-5] - *start) + (start[1] + *(float*)((char*)this + 0x3d3c));

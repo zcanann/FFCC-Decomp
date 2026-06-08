@@ -409,10 +409,13 @@ int CMiniGamePcs::GetMiniGameParam(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
+__declspec(section ".rodata") static const char sMiniGameParamDebugFmt[] =
+    "SetMiniGameParam no 0x%04x data[%d]\n";
+
 void CMiniGamePcs::SetMiniGameParam(int id, int value)
 {
     if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
-        System.Printf(const_cast<char*>("SetMiniGameParam no 0x%04x data[%d]\n"), id, value);
+        System.Printf(const_cast<char*>(sMiniGameParamDebugFmt), id, value);
     }
 
     switch (id) {

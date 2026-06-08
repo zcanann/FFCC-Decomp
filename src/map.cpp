@@ -1814,9 +1814,7 @@ int CMapMng::ReadMtx(char* mapName)
             m_asyncLoadState.m_asyncReadIndex += 1;
         } else {
             CFile::CHandle* handle = File.Open(strTmp, 0, CFile::PRI_LOW);
-            if (handle == 0) {
-                filePtr = 0;
-            } else {
+            if (handle != 0) {
                 int size = File.GetLength(handle);
                 if (m_asyncLoadState.m_mapReadMode == 3) {
                     File.ReadASync(handle);
@@ -1837,6 +1835,8 @@ int CMapMng::ReadMtx(char* mapName)
                             reinterpret_cast<unsigned char*>(m_asyncLoadState.m_mapLoadCursor) + size;
                     }
                 }
+            } else {
+                filePtr = 0;
             }
         }
 

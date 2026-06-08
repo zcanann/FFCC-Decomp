@@ -224,18 +224,17 @@ void CMenuPcs::ArtiDraw()
 	short artiState = m_artiState->state;
 	ArtiOpenAnim* entry = GetArtiOpenAnimList(this)->entries;
 	unsigned int drawIndex = 0;
-	float helpWidth;
+	float w;
 
 	for (int i = 0; i < GetArtiOpenAnimList(this)->count; i++) {
 		int tex = entry->tex;
 		if (tex >= 0) {
 			float x = (float)entry->x;
 			float y = (float)entry->y;
-			float w = (float)entry->w;
+			w = (float)entry->w;
 			float h = (float)entry->h;
 			float u = entry->u;
 			float v = entry->v;
-			helpWidth = w;
 
 			if (i == 0) {
 				MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
@@ -402,7 +401,7 @@ void CMenuPcs::ArtiDraw()
 		         kArtiHelpScale);
 	} else {
 		CColor helpColor(0xFF, 0xFF, 0xFF, helpAlpha);
-		int x = (int)-(helpWidth * kArtiHalf - kArtiHelpCenterX);
+		int x = (int)-(w * kArtiHalf - kArtiHelpCenterX);
 		float helpY = kArtiHelpY;
 		DrawHelpMessage(selectedArtifactId, helpFont, x, (int)helpY, helpColor.color, 10,
 		                kArtiOne, kArtiHelpScale);

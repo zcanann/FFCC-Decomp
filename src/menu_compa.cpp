@@ -209,14 +209,14 @@ void CMenuPcs::CompaDraw()
 		float iconY = static_cast<float>(compaList->entries[0].y + 0x40);
 
 		int drawIndex = shown;
-		if (shown > 1) {
+		if (shown >= 2) {
 			drawIndex = memberIndex;
 			for (; drawIndex < 7; drawIndex++) {
 				if (caravanWork->m_evtWordArr[19 + drawIndex] != 0) {
 					break;
 				}
 			}
-			if (drawIndex > 7) {
+			if (drawIndex >= 8) {
 				break;
 			}
 		}
@@ -265,14 +265,14 @@ void CMenuPcs::CompaDraw()
 	shown = 0;
 	for (int i = 0; i < 8 && shown < familyCount; i++) {
 		int drawIndex = shown;
-		if (shown > 1) {
+		if (shown >= 2) {
 			drawIndex = memberIndex;
 			for (; drawIndex < 7; drawIndex++) {
 				if (nameWork->m_evtWordArr[19 + drawIndex] > 0) {
 					break;
 				}
 			}
-			if (drawIndex > 7) {
+			if (drawIndex >= 8) {
 				break;
 			}
 		}

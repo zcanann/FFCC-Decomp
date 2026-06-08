@@ -4321,10 +4321,9 @@ void CGPartyObj::changeMotionMode(int mode)
  */
 void CGPartyObj::setIdleMotion()
 {
-	short mapId = *reinterpret_cast<short*>(&m_lastMapIdHit);
 	if (PartyData(this).carryObject != 0) {
 		if (CFlatItemCarryMode() == 0) {
-			if (mapId == 1) {
+			if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
 				SetAnimSlot(0x0B, 0);
 				SetAnimSlot(0x0C, 1);
 			} else {
@@ -4336,10 +4335,10 @@ void CGPartyObj::setIdleMotion()
 			SetAnimSlot(0x0C, 1);
 		}
 	} else {
-		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
 			SetAnimSlot(0x25, 0);
 			SetAnimSlot(0x24, 1);
-		} else if (mapId == 1) {
+		} else if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
 			SetAnimSlot(0, 0);
 			SetAnimSlot(1, 1);
 		} else {

@@ -3702,7 +3702,6 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
-	const unsigned int flatBase = Game.unkCFlatData0[2];
 	int totalSize = 0;
 
 	for (int i = 0; i < 0x40; i++) {
@@ -3711,7 +3710,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 		if ((itemId < 1) || (itemId > 0x9E)) {
 			memset(sellInfo, 0, sizeof(sellInfo));
 		} else {
-			const int itemBase = flatBase + itemId * 0x48;
+			const int itemBase = Game.unkCFlatData0[2] + itemId * 0x48;
 			sellInfo[0] = SwapU16(*reinterpret_cast<unsigned short*>(itemBase + 4));
 			sellInfo[1] = SwapU16(*reinterpret_cast<unsigned short*>(itemBase + 6));
 			sellInfo[2] = SwapU16(*reinterpret_cast<unsigned short*>(itemBase + 8));
@@ -3728,7 +3727,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 		unsigned int packedPrice;
 		if (itemId > 0) {
 			int itemPrice = static_cast<unsigned short>(
-				*reinterpret_cast<unsigned short*>(flatBase + itemId * 0x48 + 0x20));
+				*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x20));
 			itemPrice = static_cast<int>(static_cast<float>(itemPrice) * userRate);
 			if (itemPrice < 1) {
 				itemPrice = 1;

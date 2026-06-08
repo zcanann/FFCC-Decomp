@@ -4944,7 +4944,7 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
  */
 int JoyBus::SendPlayerHP(ThreadParam* threadParam)
 {
-    unsigned int hpData[3];
+    unsigned int hpData[2];
 
     int sync = GBARecvSend(threadParam, hpData);
 

@@ -2651,8 +2651,8 @@ void CMenuPcs::DrawResultOpenAnim()
 						handle->m_flags = 0x300543;
 						handle->Draw(5);
 						RestoreProjection();
+						lastKind = sprite->kind;
 					}
-					lastKind = sprite->kind;
 					modelIndex++;
 				} else {
 					if (lastKind < 0) {

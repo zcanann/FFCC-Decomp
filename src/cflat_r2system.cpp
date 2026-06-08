@@ -1606,7 +1606,7 @@ int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long*
     float bestT = kLineSegmentMinT;
     Vec bestPosition;
 
-    for (unsigned int i = 0; i + 1 < pointCount; i++) {
+    for (int i = 0; i + 1 < pointCount; i++) {
         float distanceSq = PSVECSquareDistance(&points[i], targetPosition);
         if (distanceSq < maxDistanceSq || infiniteRange) {
             Vec candidatePosition = points[i];

@@ -7713,7 +7713,7 @@ void JoyBus::RestartThread()
 
         if (file == 0)
         {
-            if ((unsigned int)System.m_execParam > 1)
+            if ((unsigned int)System.m_execParam >= 2)
                 System.Printf(const_cast<char*>(s_not_found_error_fmt), (char*)&Joybus);
 
             err = -1;

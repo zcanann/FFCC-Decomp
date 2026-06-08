@@ -209,10 +209,8 @@ void CRingMenu::DrawIcon()
 		iconCol = 0x65;
 	} else {
 		iconRow = caravanWork->m_joybusCaravanId;
-		int foodProgress = static_cast<int>(caravanWork->m_id);
-		int progress = foodProgress - 100;
-		int q = progress / 100 + (progress >> 31);
-		iconCol = foodProgress % 100 + static_cast<unsigned int>((q - (q >> 31)) * 4);
+		int foodProgress = caravanWork->m_id;
+		iconCol = foodProgress % 100 + (foodProgress - 100) / 100 * 4;
 	}
 
 	CColor bgColor(0, 0, 0, 0x80);

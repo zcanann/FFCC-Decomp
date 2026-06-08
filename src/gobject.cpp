@@ -1627,7 +1627,7 @@ void CGObject::update()
             m_weaponNodeFlagBits.m_unk20 = 0;
         }
         m_weaponNodeFlagBits.m_unk40 =
-            (static_cast<s32>(static_cast<u32>(weaponFlagsLo) << 25 | static_cast<u32>(weaponFlagsLo) >> 7) |
+            (static_cast<s32>(static_cast<s32>(weaponFlagsLo) << 25 | static_cast<u32>(weaponFlagsLo) >> 7) |
              static_cast<s32>(static_cast<u32>(weaponFlagsLo) << 26 | static_cast<u32>(weaponFlagsLo) >> 6)) < 0;
 
         if ((m_displayFlags & 1) != 0) {
@@ -1643,7 +1643,7 @@ void CGObject::update()
 
             ModelLightAlpha(m_charaModelHandle->m_model) = m_lookAtTimer;
             m_charaModelHandle->m_model->m_flagsA0Bits.m_flagA0_20 =
-                static_cast<s32>(static_cast<u32>(weaponFlagsLo) << 26 | static_cast<u32>(weaponFlagsLo) >> 6) < 0;
+                static_cast<s32>(static_cast<s32>(weaponFlagsLo) << 26 | static_cast<u32>(weaponFlagsLo) >> 6) < 0;
             m_charaModelHandle->m_model->m_flagsA0Bits.m_flagA0_80 = (m_displayFlags & 0x20) != 0;
         }
 
@@ -1682,7 +1682,7 @@ void CGObject::update()
             if (activeAnimIndex >= 0 && m_charaModelHandle->m_animSlot[activeAnimIndex] != 0) {
                 unsigned char* animRefBytes =
                     reinterpret_cast<unsigned char*>(m_charaModelHandle->m_animSlot[activeAnimIndex]);
-                const short pointCount = *reinterpret_cast<short*>(animRefBytes + 0x2C);
+                const unsigned short pointCount = *reinterpret_cast<short*>(animRefBytes + 0x2C);
                 if (pointCount > 0) {
                     const float animSpan =
                         sAnimFrameOffset + (ModelAnimEnd(m_charaModelHandle->m_model) - ModelAnimStart(m_charaModelHandle->m_model));
@@ -1775,7 +1775,7 @@ void CGObject::update()
 
             ModelLightAlpha(m_weaponModelHandle->m_model) = m_lookAtTimer;
             m_weaponModelHandle->m_model->m_flagsA0Bits.m_flagA0_20 =
-                static_cast<s32>(static_cast<u32>(weaponFlagsLo) << 26 | static_cast<u32>(weaponFlagsLo) >> 6) < 0;
+                static_cast<s32>(static_cast<s32>(weaponFlagsLo) << 26 | static_cast<u32>(weaponFlagsLo) >> 6) < 0;
             m_weaponModelHandle->m_model->m_flagsA0Bits.m_flagA0_80 = (m_displayFlags & 0x20) != 0;
         }
 
@@ -2501,7 +2501,7 @@ void CGObject::boundCheck()
         const float clipLimit = 2.0f;
 
         clipMask = 0x1F;
-        for (u32 i = 0; (clipMask != 0) && (i < 8); i++) {
+        for (s32 i = 0; (clipMask != 0) && (i < 8); i++) {
             clipCorner.x = m_worldPosition.x + (((i & 1) != 0) ? -m_nearColRadius : m_nearColRadius);
             clipCorner.y = m_worldPosition.y + (((i & 4) != 0) ? -m_nearColRadius : m_nearColRadius);
             clipCorner.z = m_worldPosition.z + (((i & 2) != 0) ? -m_nearColRadius : m_nearColRadius);

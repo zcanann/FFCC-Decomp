@@ -2614,21 +2614,21 @@ unsigned int CMenuPcs::CmdOpen1()
 
 	GetCmdStateView(this)->transitionTimer = static_cast<s16>(GetCmdStateView(this)->transitionTimer + 1);
 
-	GetCmdListStorage(this)->entries[GetCmdStateView(this)->selected].alpha = static_cast<f32>(
+	const s32 selected = static_cast<s32>(GetCmdStateView(this)->selected);
+
+	*reinterpret_cast<f32*>(reinterpret_cast<u8*>(GetCmdList(this)) + selected * 0x40 + 0x18) = static_cast<f32>(
 		-((kCmdMenuTransitionStepD * static_cast<f64>(GetCmdStateView(this)->transitionTimer)) - kCmdMenuOneD)
 	);
-
-	const s32 selected = static_cast<s32>(GetCmdStateView(this)->selected);
 
 	s32 chainCount = 1;
 	if (caravanWork->m_commandListExtra[selected + 1] == -1) {
 		chainCount = 2;
-		GetCmdListStorage(this)->entries[selected + 1].alpha = static_cast<f32>(
+		*reinterpret_cast<f32*>(reinterpret_cast<u8*>(GetCmdList(this)) + (selected + 1) * 0x40 + 0x18) = static_cast<f32>(
 			-((kCmdMenuTransitionStepD * static_cast<f64>(GetCmdStateView(this)->transitionTimer)) - kCmdMenuOneD)
 		);
 		if (caravanWork->m_commandListExtra[selected + 2] == -1) {
 			chainCount = 3;
-			GetCmdListStorage(this)->entries[selected + 2].alpha = static_cast<f32>(
+			*reinterpret_cast<f32*>(reinterpret_cast<u8*>(GetCmdList(this)) + (selected + 2) * 0x40 + 0x18) = static_cast<f32>(
 				-((kCmdMenuTransitionStepD * static_cast<f64>(GetCmdStateView(this)->transitionTimer)) - kCmdMenuOneD)
 			);
 		}

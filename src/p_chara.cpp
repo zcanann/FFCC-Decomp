@@ -1187,7 +1187,7 @@ void CCharaPcs::GetTexShadow(int startIndex, int maxCount, _GXTexObj* texObjs, V
 
                 const unsigned short texSize = static_cast<unsigned short>(m_texShadowSize);
                 GXInitTexObj(
-                    &texObjs[outIndex], handle->m_shadowTexturePtr, texSize, texSize, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP,
+                    &texObjs[outIndex], handle->m_shadowTexturePtr, texSize, texSize, GX_TF_I4, GX_CLAMP, GX_CLAMP,
                     GX_FALSE);
 
                 Mtx modelMtx;

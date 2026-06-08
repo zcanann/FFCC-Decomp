@@ -1174,7 +1174,8 @@ void CChara::CModel::CreateDynamics(void* dynData, CMemory::CStage* stage)
 						chunkFile.PushChunk();
 						while (chunkFile.GetNextChunk(chunk)) {
 							if (chunk.m_id == CharaFourCC('P', 'A', 'R', 'M')) {
-								NodeDynParamIndex(&ModelNodes(this)[currentNode]) = static_cast<s8>(chunkFile.Get4());
+								s8 paramIndex = static_cast<s8>(chunkFile.Get4());
+								NodeDynParamIndex(&ModelNodes(this)[currentNode]) = paramIndex;
 							}
 						}
 						chunkFile.PopChunk();

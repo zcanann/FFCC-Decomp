@@ -406,9 +406,7 @@ void CCaravanWork::AddLetter(int letterType, int senderId, int moneyValue, int h
 	}
 
 	memset(&m_letters[0], 0, sizeof(m_letters[0]));
-	unsigned short header = m_letters[0].m_half.m_header & 0xF803;
-	unsigned short letterTypeBits = static_cast<unsigned short>((letterType & 0x1FF) << 2);
-	m_letters[0].m_half.m_header = header | letterTypeBits;
+	m_letters[0].m_half.m_header = (m_letters[0].m_half.m_header & 0xF803) | ((letterType & 0x1FF) << 2);
 	m_letters[0].m_words.m_word0 = (m_letters[0].m_words.m_word0 & 0xFFFC01FF) | ((senderId & 0x1FF) << 9);
 	m_letters[0].SetFlags((m_letters[0].Flags() & ~8) | ((hasMoneyFlag << 3) & 8));
 	if (m_letters[0].AttachmentIsGil()) {

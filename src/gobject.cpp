@@ -539,7 +539,7 @@ void CGObject::move()
         if (canReadPad) {
             const bool useDebugPad = (Pad.m_debugPadLock != 0) || ((player == 0) && (Pad.m_debugPadPort != -1));
             const u32 playerIndex = static_cast<u32>(player)
-                & ~((static_cast<int>(~(Pad.m_debugPadPort - static_cast<int>(player)
+                & ~((static_cast<unsigned int>(~(Pad.m_debugPadPort - static_cast<int>(player)
                                         | static_cast<int>(player) - Pad.m_debugPadPort))
                      >> 31));
             const u8* padBytes = reinterpret_cast<u8*>(&Pad);
@@ -942,7 +942,7 @@ void CGObject::bgNormalCollision()
     pos.y += sStepProbeHeight + m_capsuleHalfHeight;
     const u32 hitMask = m_bgHitMask;
 
-    int retry = 4;
+    unsigned int retry = 4;
     while (retry != 0) {
         GObjectMapCylinder bodyCylinder;
         bodyCylinder.m_bottom = pos;

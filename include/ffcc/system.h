@@ -80,7 +80,7 @@ class CSystem : public CManager
 public:
     struct COrder
 	{
-        unsigned int m_priority; // 0x00
+        int m_priority;          // 0x00
         float m_lastTime;        // 0x04
         const char* m_debugName; // 0x08
         int m_insertIndex;       // 0x0C

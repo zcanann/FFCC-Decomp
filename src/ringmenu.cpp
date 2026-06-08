@@ -167,7 +167,7 @@ void CRingMenu::DrawIcon()
 
 	clipPos.x = clipPos.x * (kRingMenuOne / clipPos.w);
 	clipPos.y = clipPos.y * (kRingMenuOne / clipPos.w);
-	if ((kRingMenuNegativeOne < clipPos.x) && (clipPos.x < kRingMenuOne) && (kRingMenuNegativeOne < clipPos.y) &&
+	if ((clipPos.x > kRingMenuNegativeOne) && (clipPos.x < kRingMenuOne) && (clipPos.y > kRingMenuNegativeOne) &&
 	    (clipPos.y < kRingMenuOne)) {
 		return;
 	}

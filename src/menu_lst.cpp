@@ -78,7 +78,7 @@ void CMenuPcs::MLstDraw()
 
 			if ((menuMode == 1) && (i == this->m_menuLstState->cursor)) {
 				x = (float)(x + 20.0);
-				v += (float)((double)item->height);
+				v += (float)item->height;
 			}
 
 			MenuPcs.DrawRect(0, x, y, w, h, zero, v, item->z, item->z, zero);

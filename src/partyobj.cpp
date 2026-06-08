@@ -1102,12 +1102,12 @@ void CGPartyObj::onFramePostCalc()
  */
 void CGPartyObj::command()
 {
+	const char* msgBase = lbl_801DCA48;
 	if (isMenuPcsCommandBusy()) {
 		return;
 	}
 
 	PartyObjOverlay& party = PartyData(this);
-	const char* msgBase = lbl_801DCA48;
 #define caravan reinterpret_cast<CCaravanWork*>(m_scriptHandle)
 #define padSlot static_cast<char>(m_animStateMisc)
 	bool primaryAvailable = false;

@@ -62,6 +62,7 @@ STATIC_ASSERT(offsetof(CChara::MogFurState, m_alphaScore) == 0x2050);
 
 class CMaterial;
 
+extern char sYmEnvSeparator[4];
 extern "C" char* sMogRadarTypeLabels[];
 extern "C" char sMogRadarDebugFormatBlock[];
 extern "C" char sMogFurTextureName[8];
@@ -429,13 +430,13 @@ void CChara::TimeMogFur()
 	if (MogFur().m_timestamp + 0x1A5E0 < frameCounter) {
 		MogFur().m_timestamp = frameCounter;
 		if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
-			System.Printf("");
+			System.Printf(sYmEnvSeparator);
 		}
 		if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
 			System.Printf(sMogRadarDebugFormatBlock);
 		}
 		if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
-			System.Printf("");
+			System.Printf(sYmEnvSeparator);
 		}
 	}
 

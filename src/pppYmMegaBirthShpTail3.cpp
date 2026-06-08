@@ -197,7 +197,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                         drawMtx.value[1][1] = drawScale * ppvMng->m_scale.y;
                         drawMtx.value[2][2] = drawScale * ppvMng->m_scale.z;
 
-                        if (*(s16*)(payload + 0x94) != 0) {
+                        if (*(u16*)(payload + 0x94) != 0) {
                             pppFMATRIX rotMtx;
                             pppFMATRIX tmpMtx;
                             PSMTXRotRad(rotMtx.value, 'z',

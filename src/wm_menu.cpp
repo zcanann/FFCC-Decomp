@@ -6302,7 +6302,7 @@ void CMenuPcs::SetProjection(int mode)
 	CharaPcs.InitEnv(5);
 	GXSetColorUpdate(0);
 	GXSetAlphaUpdate(0);
-	_GXColor clearColor = {0, 0, 0, 0};
+	CColor clearColor(0, 0, 0, 0);
 	GXSetCopyClear(clearColor, 0x00FFFFFF);
 	GXSetColorUpdate(1);
 	GXSetAlphaUpdate(1);

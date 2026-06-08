@@ -252,8 +252,8 @@ typedef int _pppFieldParticleData_size_mismatch[(sizeof(_pppFieldParticleData) =
 
 struct pppShapeGroupRaw
 {
-    u16 m_groupId;     // 0x0
-    u16 m_shapeCount;  // 0x2
+    s16 m_groupId;     // 0x0
+    s16 m_shapeCount;  // 0x2
     s16* m_shapeList;  // 0x4
 }; // Size 0x8
 

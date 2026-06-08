@@ -441,7 +441,7 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 			{
 				_pppPObjLink* next = obj->m_next;
 				_pppPDataVal* owner = obj->m_owner;
-				if ((int)((u32)owner->m_programSetDef->m_drawFlags << 30) >= 0)
+				if ((s8)((s32)((u32)owner->m_programSetDef->m_drawFlags << 30) >> 31) == 0)
 				{
 					prev->m_next = next;
 
@@ -578,7 +578,7 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 			{
 				_pppPObjLink* next = obj->m_next;
 				_pppPDataVal* owner = obj->m_owner;
-				if ((int)((u32)owner->m_programSetDef->m_drawFlags << 30) >= 0)
+				if ((s8)((s32)((u32)owner->m_programSetDef->m_drawFlags << 30) >> 31) == 0)
 				{
 					prev->m_next = next;
 
@@ -845,7 +845,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 			{
 				_pppPObjLink* next = obj->m_next;
 				_pppPDataVal* owner = obj->m_owner;
-				if ((int)((u32)owner->m_programSetDef->m_drawFlags << 30) >= 0)
+				if ((s8)((s32)((u32)owner->m_programSetDef->m_drawFlags << 30) >> 31) == 0)
 				{
 					prev->m_next = next;
 
@@ -1011,7 +1011,7 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 		pppMngSt->m_pppPDataVals = 0;
 	}
 
-	ppvEmptyLoop = 0;
+	ppvHookFuncTbl = 0;
 	pppMngSt->m_baseTime = -0x1000;
 
 	if (Game.m_currentSceneId != 7)
@@ -1037,7 +1037,8 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 				mapMeshIndices++;
 				for (s16 i = 0; i < mapMeshCount; i++)
 				{
-					CMapMesh* mapMesh = *(CMapMesh**)(*(u32*)(pppResSet + 0x14) + mapMeshIndices[i] * 4);
+					CMapMesh* mapMesh = *(CMapMesh**)(*(u32*)(pppResSet + 0x14) + *mapMeshIndices * 4);
+					mapMeshIndices++;
 					mapMesh->pppCacheDumpModelTexture(ppvEnv->m_materialSetPtr, &ppvAmemCacheSet);
 				}
 
@@ -1045,7 +1046,8 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 				shapeIndices++;
 				for (s16 i = 0; i < shapeCount; i++)
 				{
-					pppShapeSt* shape = *(pppShapeSt**)(*(u32*)(pppResSet + 0x18) + shapeIndices[i] * 4);
+					pppShapeSt* shape = *(pppShapeSt**)(*(u32*)(pppResSet + 0x18) + *shapeIndices * 4);
+					shapeIndices++;
 					pppCacheDumpShapeTexture(shape, ppvEnv->m_materialSetPtr);
 				}
 			}
@@ -1665,7 +1667,7 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 				{
 					_pppPObjLink* next = obj->m_next;
 					_pppPDataVal* owner = obj->m_owner;
-					if ((int)((u32)owner->m_programSetDef->m_drawFlags << 30) >= 0)
+					if ((s8)((s32)((u32)owner->m_programSetDef->m_drawFlags << 30) >> 31) == 0)
 					{
 						prev->m_next = next;
 
@@ -1844,18 +1846,19 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 	pppDataHead->m_modelNames = reinterpret_cast<u32>(modelRefs);
 
 	for (int i = 0; i < pppDataHead->m_modelCount; i++) {
-		pppModelSt* modelArray = PartMng.m_pppModelStArr;
-		pppModelSt* model = 0;
+		pppModelSt* model = PartMng.m_pppModelStArr;
 		for (u32 j = 0; j < 0x100; j++) {
-			if (modelArray[j].m_isUsed != 0 && strcmp(modelArray[j].m_name, modelName) == 0) {
-				model = &modelArray[j];
-				break;
+			if (model->m_isUsed != 0 && strcmp(model->m_name, modelName) == 0) {
+				goto modelFound;
 			}
+			model++;
 		}
+		model = 0;
+	modelFound:
 
 		modelName += 0x20;
-		modelRefs[i] = model;
-		modelRefs[i]->m_refCount++;
+		reinterpret_cast<pppModelSt**>(pppDataHead->m_modelNames)[i] = model;
+		reinterpret_cast<pppModelSt**>(pppDataHead->m_modelNames)[i]->m_refCount++;
 	}
 
 	char* shapeName = reinterpret_cast<char*>(pppDataHead->m_shapeNames);
@@ -1864,18 +1867,19 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 	pppDataHead->m_shapeNames = reinterpret_cast<u32>(shapeRefs);
 
 	for (int i = 0; i < pppDataHead->m_shapeCount; i++) {
-		pppShapeSt* shapeArray = PartMng.m_pppShapeStArr;
-		pppShapeSt* shape = 0;
+		pppShapeSt* shape = PartMng.m_pppShapeStArr;
 		for (u32 j = 0; j < 0x100; j++) {
-			if (shapeArray[j].m_inUse != 0 && strcmp(shapeArray[j].m_name, shapeName) == 0) {
-				shape = &shapeArray[j];
-				break;
+			if (shape->m_inUse != 0 && strcmp(shape->m_name, shapeName) == 0) {
+				goto shapeFound;
 			}
+			shape++;
 		}
+		shape = 0;
+	shapeFound:
 
 		shapeName += 0x20;
-		shapeRefs[i] = shape;
-		shapeRefs[i]->m_refCount++;
+		reinterpret_cast<pppShapeSt**>(pppDataHead->m_shapeNames)[i] = shape;
+		reinterpret_cast<pppShapeSt**>(pppDataHead->m_shapeNames)[i]->m_refCount++;
 	}
 
 	pppShapeGroupRaw* shapeGroups = reinterpret_cast<pppShapeGroupRaw*>(pppDataHead->m_shapeGroups);
@@ -1884,13 +1888,14 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 	pppDataHead->m_shapeGroups = reinterpret_cast<u32>(shapeGroupRefs);
 
 	for (int i = 0; i < pppDataHead->m_shapeGroupCount; i++) {
-		shapeGroupRefs[i].m_groupId = shapeGroups[i].m_groupId;
-		shapeGroupRefs[i].m_shapeCount = shapeGroups[i].m_shapeCount;
-		shapeGroupRefs[i].m_shapeList =
-		    new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_pppPart_cpp), 0x656) s16[shapeGroups[i].m_shapeCount];
+		reinterpret_cast<pppShapeGroupRaw*>(pppDataHead->m_shapeGroups)[i].m_groupId = shapeGroups->m_groupId;
+		reinterpret_cast<pppShapeGroupRaw*>(pppDataHead->m_shapeGroups)[i].m_shapeCount = shapeGroups->m_shapeCount;
+		reinterpret_cast<pppShapeGroupRaw*>(pppDataHead->m_shapeGroups)[i].m_shapeList =
+		    new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_pppPart_cpp), 0x656) s16[shapeGroups->m_shapeCount];
 
-		shapeGroups[i].m_shapeList = reinterpret_cast<s16*>(reinterpret_cast<u8*>(shapeGroups[i].m_shapeList) + reinterpret_cast<u32>(dataBase));
-		memcpy(shapeGroupRefs[i].m_shapeList, shapeGroups[i].m_shapeList, static_cast<int>(shapeGroups[i].m_shapeCount) << 1);
+		shapeGroups->m_shapeList = reinterpret_cast<s16*>(reinterpret_cast<u8*>(shapeGroups->m_shapeList) + reinterpret_cast<u32>(dataBase));
+		memcpy(reinterpret_cast<pppShapeGroupRaw*>(pppDataHead->m_shapeGroups)[i].m_shapeList, shapeGroups->m_shapeList, static_cast<int>(shapeGroups->m_shapeCount) << 1);
+		shapeGroups++;
 	}
 }
 
@@ -1984,7 +1989,7 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
 	{
 		_pppPDataVal* pDataVal = (_pppPDataVal*)((u8*)pppMngSt->m_pppPDataVals + pDataValOffset);
 		if (pDataVal != 0 && pDataVal->m_programSetDef != 0 &&
-		    (int)((u32)pDataVal->m_programSetDef->m_drawFlags << 24) >= 0 && pDataVal->m_activeCount > 0)
+		    (s8)((s32)((u32)pDataVal->m_programSetDef->m_drawFlags << 24) >> 31) == 0 && pDataVal->m_activeCount > 0)
 		{
 			s32 workOffsetStep = 0;
 			_pppProgSetDef* progSet = pDataVal->m_programSetDef;
@@ -2080,14 +2085,14 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 					u32 stageSlotOffset = progSet->m_workBaseOffset + stageIdx * 4;
 					u32* stageSlot = *(u32**)(((u8*)obj) + stageSlotOffset);
 					u32* nextSlot = (u32*)(((u8*)stageSlot) + stage->m_workOffset);
-					if (*nextSlot == (u32)((_pppPObject*)obj)->m_graphId)
+					if ((s32)*nextSlot == ((_pppPObject*)obj)->m_graphId)
 					{
 						*(u32**)(((u8*)obj) + stageSlotOffset) = nextSlot;
 					}
 				}
 
 				if (mng->m_loopMode != 0 &&
-					(u32)((_pppPObject*)obj)->m_graphId >= (u32)progSet->m_loopFrame &&
+					((_pppPObject*)obj)->m_graphId >= progSet->m_loopFrame &&
 					(progSet->m_loopFrame & 0xF0000000) != 0x70000000)
 				{
 					((_pppPObject*)obj)->m_graphId = progSet->m_endFrame;
@@ -2555,19 +2560,10 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 
 	if (kPppPartZero != cylScale)
 	{
-		CMapCylinder cylinder;
+		CMapCylinder cylinder(kMapHitBoundsMinInit, kMapHitBoundsMaxInit);
 		cylinder.m_bottom = *origin;
-		cylinder.Probe().m_direction.x = kPppPartHugePositive;
-		cylinder.Probe().m_direction.y = kPppPartHugePositive;
-		cylinder.Probe().m_direction.z = kPppPartHugePositive;
-		cylinder.Probe().m_radius = radius;
-		cylinder.Probe().m_height = kPppPartHugePositive;
-		cylinder.Probe().m_top = *vector;
-		cylinder.Probe().m_direction2.x = kPppPartHugeNegative;
-		cylinder.Probe().m_direction2.y = kPppPartHugeNegative;
-		cylinder.Probe().m_direction2.z = kPppPartHugeNegative;
-		cylinder.Probe().m_radius2 = cylScale;
-		cylinder.Probe().m_height2 = kPppPartHugePositive;
+		cylinder.m_axis = *vector;
+		cylinder.m_radius = radius;
 
 		if (MapMng.CheckHitCylinder(&cylinder, vector, hitRaw->m_cylinderAttribute) != 0)
 		{
@@ -2597,15 +2593,17 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 	{
 		s32 partIndex = ((s32)((u8*)pppMngSt - ((u8*)&PartMng + 0x2A18))) / 0x158;
 
-		for (CGObject* gObject = gCFlatRuntime2.FindGObjFirst(); gObject != 0;
-			 gObject = gCFlatRuntime2.FindGObjNext(gObject))
+		for (CGObject* gObject = CFlat.FindGObjFirst(); gObject != 0;
+			 gObject = CFlat.FindGObjNext(gObject))
 		{
-			u8 previousCount = hitRaw->m_hitParams.m_hitObjectCount;
-			u8 objectSlot = 0;
-			while ((objectSlot < previousCount) &&
-				   (hitRaw->m_hitObjectIds[objectSlot] != gObject->m_particleId))
+			int previousCount = hitRaw->m_hitParams.m_hitObjectCount;
+			int objectSlot;
+			for (objectSlot = 0; objectSlot < previousCount; objectSlot++)
 			{
-				objectSlot++;
+				if (hitRaw->m_hitObjectIds[objectSlot] == gObject->m_particleId)
+				{
+					break;
+				}
 			}
 
 			if (objectSlot == previousCount)
@@ -2646,14 +2644,16 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 					{
 						gObject->HitParticle(partIndex, hitRaw->m_kind, hitRaw->m_nodeIndex, colliderIndex, &hitPos,
 											 &hitRaw->m_hitParams);
-						u8 newCount = hitRaw->m_hitParams.m_hitObjectCount;
+						int newCount = hitRaw->m_hitParams.m_hitObjectCount;
 						if (previousCount != newCount)
 						{
-							u8 updatedSlot = 0;
-							while ((updatedSlot < newCount) &&
-								   (hitRaw->m_hitObjectIds[updatedSlot] != gObject->m_particleId))
+							int updatedSlot;
+							for (updatedSlot = 0; updatedSlot < newCount; updatedSlot++)
 							{
-								updatedSlot++;
+								if (hitRaw->m_hitObjectIds[updatedSlot] == gObject->m_particleId)
+								{
+									break;
+								}
 							}
 							previousCount = newCount;
 							if (updatedSlot < newCount)

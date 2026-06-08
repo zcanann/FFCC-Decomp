@@ -4783,6 +4783,7 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
             GbaQue.GetCaravanName((char*)&payload[1]);
 
             signed char* p = (signed char*)&playerInfo;
+            unsigned char* cf = classFlags;
             unsigned char lowBits = 0;
             unsigned char highBits = 0;
 
@@ -4791,14 +4792,14 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
                 if (p[0x16] != 0)
                 {
                     int idx = (int)p[0] >> 1;
-                    signed char v = (classFlags[idx] & 0x0F) | lowBits;
+                    signed char v = (cf[idx] & 0x0F) | lowBits;
 
                     if ((p[0] & 1) != 0)
                     {
-                        v = (classFlags[idx] & 0xF0) | highBits;
+                        v = (cf[idx] & 0xF0) | highBits;
                     }
 
-                    classFlags[idx] = v;
+                    cf[idx] = v;
                 }
 
                 lowBits  += 0x10;
@@ -4807,14 +4808,14 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
                 if (p[0xF2] != 0)
                 {
                     int idx = (int)p[0xDC] >> 1;
-                    signed char v = (classFlags[idx] & 0x0F) | lowBits;
+                    signed char v = (cf[idx] & 0x0F) | lowBits;
 
                     if ((p[0xDC] & 1) != 0)
                     {
-                        v = (classFlags[idx] & 0xF0) | highBits;
+                        v = (cf[idx] & 0xF0) | highBits;
                     }
 
-                    classFlags[idx] = v;
+                    cf[idx] = v;
                 }
 
                 p        += 0x1B8;

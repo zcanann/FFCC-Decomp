@@ -1413,9 +1413,9 @@ void CGObject::update()
 
         if (m_worldParamA == 0x20 || m_worldParamA == 0x13 || m_worldParamA == 0x15 ||
             m_worldParamA == 0x16 || m_worldParamA == 0x17 || m_worldParamA == 0x14) {
-            const float wobbleBias = m_worldParamA == 0x20 ? -0.125f : -0.0625f;
-            m_radiusCtrl.z += (-0.5f * m_radiusCtrl.y) + wobbleBias;
-            m_radiusCtrl.y *= 0.8f;
+            const float wobbleBias = m_worldParamA == 0x20 ? 0.3f : 0.05f;
+            m_radiusCtrl.z += 0.8f * m_radiusCtrl.y + wobbleBias;
+            m_radiusCtrl.y *= 0.95f;
             srt.m_rot.y += m_radiusCtrl.z;
         } else if (m_worldParamA == 0x24 || m_worldParamB == 0x125) {
             const float cameraYaw = CameraPcs.m_yaw;

@@ -734,10 +734,10 @@ void CGCharaObj::onFramePreCalc()
 	if (*reinterpret_cast<unsigned short*>(script + 0x4E) != 0) {
 		m_pushScale *= (static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x34)) * 0.01f) + kOneF32;
 	}
-	if (*reinterpret_cast<short*>(script + 0x4C) != 0) {
+	if (*reinterpret_cast<unsigned short*>(script + 0x4C) != 0) {
 		m_pushScale *= (static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x36)) * 0.01f) + kOneF32;
 	}
-	if (*reinterpret_cast<short*>(script + 0x40) != 0) {
+	if (*reinterpret_cast<unsigned short*>(script + 0x40) != 0) {
 		m_pushScale *= (static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x40)) * 0.01f) + kOneF32;
 	}
 	float pushScale = 1.5f;

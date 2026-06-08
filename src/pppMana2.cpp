@@ -911,7 +911,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     sourceTexObjs = work->m_sourceTexObjs;
 
     if (step->m_rippleLevel != 0) {
-        Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &depthTexObj, 0, 0, 0x80, 0x80, depthTexSize, GX_LINEAR,
+        Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &depthTexObj, 0, 0, 0x80, 0x80, depthTexSize, GX_NEAR,
                                    (_GXTexFmt)0x16, 1);
         GXSetViewport(LoadFloat(kMana2Zero), LoadFloat(kMana2Zero), LoadFloat(kMana2ParaboloidTexSize),
                       LoadFloat(kMana2ParaboloidTexSize), LoadFloat(kMana2Zero), LoadFloat(kMana2One));

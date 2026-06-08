@@ -1857,18 +1857,24 @@ int CMapMng::ReadMtx(char* mapName)
 
             if (m_asyncLoadState.m_mapReadMode == 2) {
                 while (chunkFile.GetNextChunk(chunk)) {
-                    if (chunk.m_id == 0x54534554 && chunk.m_arg0 == 1) {
-                        return 1;
+                    switch (chunk.m_id) {
+                    case 0x54534554:
+                        if (chunk.m_arg0 == 1) {
+                            return 1;
+                        }
+                        break;
                     }
                 }
             } else {
                 while (chunkFile.GetNextChunk(chunk)) {
-                    if (chunk.m_id == 0x54534554) {
+                    switch (chunk.m_id) {
+                    case 0x54534554:
                         m_textureSet->Create(chunkFile, MapMng.m_stage, append, 0, 0, 0);
                         append = 1;
                         if (chunk.m_arg0 == 1) {
                             return 1;
                         }
+                        break;
                     }
                 }
             }

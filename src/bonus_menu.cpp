@@ -1826,7 +1826,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 			PSMTXRotRad(rotZMtx, 'z', 0.01745329238474369f * angle);
 			PSMTXMultVecSR(rotZMtx, &srcVec, &dstVec);
 
-			int charaNo = handle->m_charaNo;
+			unsigned int charaNo = handle->m_charaNo;
 			if (charaNo == 0x44) {
 				PSMTXRotRad(rotYMtx, 'y', 3.1415927410125732f);
 				PSMTXConcat(scaleMtx, rotYMtx, scaleMtx);

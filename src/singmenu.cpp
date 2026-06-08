@@ -3287,33 +3287,44 @@ void CMenuPcs::DrawSingLife()
 {
     const CCaravanWork* const caravanWork = SingleCaravanWork();
     int lifeTimer = m_singleLifeTimer;
+    float xBase = 366.0f;
+    float yBase = -32.0f;
     if (lifeTimer < 0) {
         return;
     }
 
-    float y = -32.0f;
+    float y;
     if (lifeTimer < 10) {
-        int phase = lifeTimer;
-        if (phase < 0) {
+        int phase;
+        if (lifeTimer < 0) {
             phase = 0;
-        } else if (phase > 10) {
+        } else {
             phase = 10;
+            if (lifeTimer <= 10) {
+                phase = lifeTimer;
+            }
         }
-        y = 64.0f * static_cast<float>(sin(0.01745329238474369f * 9.0f * static_cast<float>(phase))) + -32.0f;
-    } else if (lifeTimer > 0x27) {
-        int phase = 10 - (lifeTimer - 0x28);
-        if (phase < 0) {
-            phase = 0;
-        } else if (phase > 10) {
-            phase = 10;
+        y = 64.0f * static_cast<float>(sin(0.01745329238474369f * (9.0f * static_cast<float>(phase)))) + yBase;
+    } else {
+        y = 32.0f;
+        if (lifeTimer > 0x27) {
+            int t = 10 - (lifeTimer - 0x28);
+            int phase;
+            if (t < 0) {
+                phase = 0;
+            } else {
+                phase = 10;
+                if (t <= 10) {
+                    phase = t;
+                }
+            }
+            y = 64.0f * static_cast<float>(sin(0.01745329238474369f * (9.0f * static_cast<float>(phase)))) + yBase;
         }
-        y = 64.0f * static_cast<float>(sin(0.01745329238474369f * 9.0f * static_cast<float>(phase))) + -32.0f;
     }
 
     int halfHearts = static_cast<unsigned int>(caravanWork->m_maxHp >> 1);
-    float x = 366.0f + static_cast<float>(((8 - halfHearts) * 0x18) / 2);
-    reinterpret_cast<CMesMenu*>(*reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0x268))
-        ->DrawHeart(x, y - 8.0f, 1.0f, 1.0f);
+    reinterpret_cast<CMesMenu*>(*reinterpret_cast<void**>(reinterpret_cast<u8*>(&MenuPcs) + 0x268))
+        ->DrawHeart(xBase + static_cast<float>(((8 - halfHearts) * 0x18) / 2), y - 8.0f, 1.0f, 1.0f);
 }
 
 /*

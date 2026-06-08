@@ -933,7 +933,7 @@ void CGObject::bgNormalCollision()
         m_groundHitOffset.z = sZeroFloat;
     }
 
-    if ((m_groundHitOffset.x == sZeroFloat) && (m_groundHitOffset.y == sZeroFloat) && (m_groundHitOffset.z == sZeroFloat)) {
+    if ((sZeroFloat == m_groundHitOffset.x) && (sZeroFloat == m_groundHitOffset.y) && (sZeroFloat == m_groundHitOffset.z)) {
         return;
     }
 
@@ -955,7 +955,7 @@ void CGObject::bgNormalCollision()
         bodyCylinder.Probe().m_direction2.y = sNegHugeCylinderExtent;
         bodyCylinder.Probe().m_direction2.z = sNegHugeCylinderExtent;
         bodyCylinder.Probe().m_radius2 = m_capsuleHalfHeight;
-        bodyCylinder.Probe().m_height2 = 0.0f;
+        bodyCylinder.Probe().m_height2 = sZeroFloat;
 
         if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&bodyCylinder), &move, hitMask) == 0) {
             break;
@@ -1001,7 +1001,7 @@ void CGObject::bgNormalCollision()
     stepCylinder.Probe().m_direction2.y = sNegHugeCylinderExtent;
     stepCylinder.Probe().m_direction2.z = sNegHugeCylinderExtent;
     stepCylinder.Probe().m_radius2 = m_capsuleHalfHeight;
-    stepCylinder.Probe().m_height2 = 0.0f;
+    stepCylinder.Probe().m_height2 = sZeroFloat;
 
     if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&stepCylinder), &move, hitMask) == 0) {
         pos.y -= m_capsuleHalfHeight;

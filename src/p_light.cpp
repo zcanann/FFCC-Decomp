@@ -1160,10 +1160,8 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
         out[1][3] = pos.y;
         out[2][3] = pos.z;
     } else {
-        if (vec == nullptr ||
-            ((kLightZero == vec->x) && (kLightZero == vec->y) && (kLightZero == vec->z))) {
-            PSMTXConcat(cam, mat, out);
-        } else {
+        if (vec != nullptr &&
+            ((kLightZero != vec->x) || (kLightZero != vec->y) || (kLightZero != vec->z))) {
             Mtx tmp;
             PSMTXCopy(mat, tmp);
             Vec camPos;
@@ -1183,6 +1181,8 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
             out[0][3] += camPos.x;
             out[1][3] += camPos.y;
             out[2][3] += camPos.z;
+        } else {
+            PSMTXConcat(cam, mat, out);
         }
     }
 

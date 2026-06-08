@@ -770,10 +770,10 @@ void CalcReflectionVector2(
             clr[0] = 0x80;
             clr[1] = 0x80;
             clr[2] = 0x80;
-            clr[3] = 0xFF;
 
-            uv.x = (float)half;
             uv.y = (float)half;
+            uv.x = (float)half;
+            clr[3] = 0xFF;
 
             switch (axis) {
             case 0:

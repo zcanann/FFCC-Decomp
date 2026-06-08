@@ -144,16 +144,14 @@ void SetEnvMap(PYmMana*, VYmMana* vYmMana)
 {
     GXSetNumChans(1);
     GXSetChanCtrl((GXChannelID)4, (GXBool)0, (GXColorSrc)0, (GXColorSrc)1, 0, (GXDiffuseFn)0, (GXAttnFn)2);
-    GXSetBlendMode((GXBlendMode)1, (GXBlendFactor)4, (GXBlendFactor)5, (GXLogicOp)0xf);
+    _GXSetBlendMode((GXBlendMode)1, (GXBlendFactor)4, (GXBlendFactor)5, (GXLogicOp)0xf);
 
-    GXTexObj* texObjA = vYmMana->m_generatedTexObj1;
-    GXTexObj* texObjB = vYmMana->m_generatedTexObj0;
-    GXTexObj* texObjC = &vYmMana->m_envTexture1->m_texObj;
+    CTexture* envTex1 = vYmMana->m_envTexture1;
     unsigned char alpha = vYmMana->m_manaAlpha;
 
-    _GXColor white;
     _GXColor alphaOnly;
     _GXColor whiteAlpha;
+    _GXColor white;
     white.r = 0xff;
     white.g = 0xff;
     alphaOnly.r = 0x00;
@@ -170,90 +168,90 @@ void SetEnvMap(PYmMana*, VYmMana* vYmMana)
     GXSetChanMatColor((GXChannelID)4, white);
     GXSetTevKColor((GXTevKColorID)0, alphaOnly);
     GXSetTevKColor((GXTevKColorID)1, whiteAlpha);
-    GXSetTevSwapModeTable((GXTevSwapSel)1, (GXTevColorChan)3, (GXTevColorChan)3, (GXTevColorChan)3, (GXTevColorChan)3);
+    _GXSetTevSwapModeTable((GXTevSwapSel)1, (GXTevColorChan)3, (GXTevColorChan)3, (GXTevColorChan)3, (GXTevColorChan)3);
 
     GXSetTevDirect((GXTevStageID)0);
-    GXLoadTexObj(texObjC, (GXTexMapID)0);
+    GXLoadTexObj(&envTex1->m_texObj, (GXTexMapID)0);
     GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3c, (GXBool)0, 0x7d);
-    GXSetTevOrder((GXTevStageID)0, (GXTexCoordID)0, (GXTexMapID)0, (GXChannelID)4);
-    GXSetTevSwapMode((GXTevStageID)0, (GXTevSwapSel)0, (GXTevSwapSel)0);
-    GXSetTevColorIn((GXTevStageID)0, (GXTevColorArg)0xf, (GXTevColorArg)0xf, (GXTevColorArg)0xf, (GXTevColorArg)0xc);
-    GXSetTevColorOp((GXTevStageID)0, (GXTevOp)0, (GXTevBias)0, (GXTevScale)0, (GXBool)1, (GXTevRegID)0);
-    GXSetTevAlphaIn((GXTevStageID)0, (GXTevAlphaArg)7, (GXTevAlphaArg)7, (GXTevAlphaArg)7, (GXTevAlphaArg)4);
-    GXSetTevAlphaOp((GXTevStageID)0, (GXTevOp)0, (GXTevBias)0, (GXTevScale)2, (GXBool)1, (GXTevRegID)1);
+    _GXSetTevOrder((GXTevStageID)0, (GXTexCoordID)0, (GXTexMapID)0, (GXChannelID)4);
+    _GXSetTevSwapMode((GXTevStageID)0, (GXTevSwapSel)0, (GXTevSwapSel)0);
+    _GXSetTevColorIn((GXTevStageID)0, (GXTevColorArg)0xf, (GXTevColorArg)0xf, (GXTevColorArg)0xf, (GXTevColorArg)0xc);
+    _GXSetTevColorOp((GXTevStageID)0, (GXTevOp)0, (GXTevBias)0, (GXTevScale)0, (GXBool)1, (GXTevRegID)0);
+    _GXSetTevAlphaIn((GXTevStageID)0, (GXTevAlphaArg)7, (GXTevAlphaArg)7, (GXTevAlphaArg)7, (GXTevAlphaArg)4);
+    _GXSetTevAlphaOp((GXTevStageID)0, (GXTevOp)0, (GXTevBias)0, (GXTevScale)2, (GXBool)1, (GXTevRegID)1);
 
     GXSetTevDirect((GXTevStageID)1);
-    GXLoadTexObj(texObjC, (GXTexMapID)0);
+    GXLoadTexObj(&envTex1->m_texObj, (GXTexMapID)0);
     GXSetTexCoordGen2((GXTexCoordID)1, (GXTexGenType)1, (GXTexGenSrc)5, 0x3c, (GXBool)0, 0x7d);
-    GXSetTevOrder((GXTevStageID)1, (GXTexCoordID)1, (GXTexMapID)0, (GXChannelID)4);
-    GXSetTevSwapMode((GXTevStageID)1, (GXTevSwapSel)0, (GXTevSwapSel)0);
-    GXSetTevColorIn((GXTevStageID)1, (GXTevColorArg)0xf, (GXTevColorArg)0xf, (GXTevColorArg)0xf, (GXTevColorArg)0xc);
-    GXSetTevColorOp((GXTevStageID)1, (GXTevOp)0, (GXTevBias)0, (GXTevScale)0, (GXBool)1, (GXTevRegID)0);
-    GXSetTevAlphaIn((GXTevStageID)1, (GXTevAlphaArg)7, (GXTevAlphaArg)7, (GXTevAlphaArg)7, (GXTevAlphaArg)4);
-    GXSetTevAlphaOp((GXTevStageID)1, (GXTevOp)0, (GXTevBias)0, (GXTevScale)2, (GXBool)1, (GXTevRegID)2);
+    _GXSetTevOrder((GXTevStageID)1, (GXTexCoordID)1, (GXTexMapID)0, (GXChannelID)4);
+    _GXSetTevSwapMode((GXTevStageID)1, (GXTevSwapSel)0, (GXTevSwapSel)0);
+    _GXSetTevColorIn((GXTevStageID)1, (GXTevColorArg)0xf, (GXTevColorArg)0xf, (GXTevColorArg)0xf, (GXTevColorArg)0xc);
+    _GXSetTevColorOp((GXTevStageID)1, (GXTevOp)0, (GXTevBias)0, (GXTevScale)0, (GXBool)1, (GXTevRegID)0);
+    _GXSetTevAlphaIn((GXTevStageID)1, (GXTevAlphaArg)7, (GXTevAlphaArg)7, (GXTevAlphaArg)7, (GXTevAlphaArg)4);
+    _GXSetTevAlphaOp((GXTevStageID)1, (GXTevOp)0, (GXTevBias)0, (GXTevScale)2, (GXBool)1, (GXTevRegID)2);
 
     GXSetTevDirect((GXTevStageID)2);
-    GXLoadTexObj(texObjA, (GXTexMapID)1);
+    GXLoadTexObj(vYmMana->m_generatedTexObj1, (GXTexMapID)1);
     GXSetTexCoordGen2((GXTexCoordID)2, (GXTexGenType)1, (GXTexGenSrc)4, 0x3c, (GXBool)0, 0x7d);
-    GXSetTevOrder((GXTevStageID)2, (GXTexCoordID)2, (GXTexMapID)1, (GXChannelID)4);
-    GXSetTevSwapMode((GXTevStageID)2, (GXTevSwapSel)0, (GXTevSwapSel)0);
+    _GXSetTevOrder((GXTevStageID)2, (GXTexCoordID)2, (GXTexMapID)1, (GXChannelID)4);
+    _GXSetTevSwapMode((GXTevStageID)2, (GXTevSwapSel)0, (GXTevSwapSel)0);
     GXSetTevKColor((GXTevKColorID)0, alphaOnly);
     GXSetTevKColorSel((GXTevStageID)2, (GXTevKColorSel)0xc);
     GXSetTevKAlphaSel((GXTevStageID)2, (GXTevKAlphaSel)0x1c);
-    GXSetTevColorIn((GXTevStageID)2, (GXTevColorArg)10, (GXTevColorArg)0xe, (GXTevColorArg)8, (GXTevColorArg)0xf);
-    GXSetTevColorOp((GXTevStageID)2, (GXTevOp)8, (GXTevBias)0, (GXTevScale)0, (GXBool)1, (GXTevRegID)3);
-    GXSetTevAlphaIn((GXTevStageID)2, (GXTevAlphaArg)7, (GXTevAlphaArg)7, (GXTevAlphaArg)7, (GXTevAlphaArg)1);
-    GXSetTevAlphaOp((GXTevStageID)2, (GXTevOp)0, (GXTevBias)0, (GXTevScale)0, (GXBool)1, (GXTevRegID)0);
+    _GXSetTevColorIn((GXTevStageID)2, (GXTevColorArg)10, (GXTevColorArg)0xe, (GXTevColorArg)8, (GXTevColorArg)0xf);
+    _GXSetTevColorOp((GXTevStageID)2, (GXTevOp)8, (GXTevBias)0, (GXTevScale)0, (GXBool)1, (GXTevRegID)3);
+    _GXSetTevAlphaIn((GXTevStageID)2, (GXTevAlphaArg)7, (GXTevAlphaArg)7, (GXTevAlphaArg)7, (GXTevAlphaArg)1);
+    _GXSetTevAlphaOp((GXTevStageID)2, (GXTevOp)0, (GXTevBias)0, (GXTevScale)0, (GXBool)1, (GXTevRegID)0);
 
     GXSetTevDirect((GXTevStageID)3);
-    GXLoadTexObj(texObjA, (GXTexMapID)1);
+    GXLoadTexObj(vYmMana->m_generatedTexObj1, (GXTexMapID)1);
     GXSetTexCoordGen2((GXTexCoordID)3, (GXTexGenType)1, (GXTexGenSrc)4, 0x3c, (GXBool)0, 0x7d);
-    GXSetTevOrder((GXTevStageID)3, (GXTexCoordID)3, (GXTexMapID)0, (GXChannelID)4);
-    GXSetTevSwapMode((GXTevStageID)3, (GXTevSwapSel)0, (GXTevSwapSel)0);
-    GXSetTevColorIn((GXTevStageID)3, (GXTevColorArg)0xf, (GXTevColorArg)6, (GXTevColorArg)9, (GXTevColorArg)0xf);
-    GXSetTevColorOp((GXTevStageID)3, (GXTevOp)0, (GXTevBias)0, (GXTevScale)0, (GXBool)1, (GXTevRegID)3);
-    GXSetTevAlphaIn((GXTevStageID)3, (GXTevAlphaArg)7, (GXTevAlphaArg)7, (GXTevAlphaArg)7, (GXTevAlphaArg)1);
-    GXSetTevAlphaOp((GXTevStageID)3, (GXTevOp)0, (GXTevBias)0, (GXTevScale)0, (GXBool)1, (GXTevRegID)0);
+    _GXSetTevOrder((GXTevStageID)3, (GXTexCoordID)3, (GXTexMapID)0, (GXChannelID)4);
+    _GXSetTevSwapMode((GXTevStageID)3, (GXTevSwapSel)0, (GXTevSwapSel)0);
+    _GXSetTevColorIn((GXTevStageID)3, (GXTevColorArg)0xf, (GXTevColorArg)6, (GXTevColorArg)9, (GXTevColorArg)0xf);
+    _GXSetTevColorOp((GXTevStageID)3, (GXTevOp)0, (GXTevBias)0, (GXTevScale)0, (GXBool)1, (GXTevRegID)3);
+    _GXSetTevAlphaIn((GXTevStageID)3, (GXTevAlphaArg)7, (GXTevAlphaArg)7, (GXTevAlphaArg)7, (GXTevAlphaArg)1);
+    _GXSetTevAlphaOp((GXTevStageID)3, (GXTevOp)0, (GXTevBias)0, (GXTevScale)0, (GXBool)1, (GXTevRegID)0);
 
     GXSetTevDirect((GXTevStageID)4);
-    GXLoadTexObj(texObjB, (GXTexMapID)2);
+    GXLoadTexObj(vYmMana->m_generatedTexObj0, (GXTexMapID)2);
     GXSetTexCoordGen2((GXTexCoordID)4, (GXTexGenType)1, (GXTexGenSrc)5, 0x3c, (GXBool)0, 0x7d);
-    GXSetTevOrder((GXTevStageID)4, (GXTexCoordID)4, (GXTexMapID)2, (GXChannelID)4);
-    GXSetTevSwapMode((GXTevStageID)4, (GXTevSwapSel)0, (GXTevSwapSel)0);
+    _GXSetTevOrder((GXTevStageID)4, (GXTexCoordID)4, (GXTexMapID)2, (GXChannelID)4);
+    _GXSetTevSwapMode((GXTevStageID)4, (GXTevSwapSel)0, (GXTevSwapSel)0);
     GXSetTevKColor((GXTevKColorID)1, whiteAlpha);
     GXSetTevKColorSel((GXTevStageID)4, (GXTevKColorSel)0xd);
     GXSetTevKAlphaSel((GXTevStageID)4, (GXTevKAlphaSel)0x1d);
-    GXSetTevColorIn((GXTevStageID)4, (GXTevColorArg)0xe, (GXTevColorArg)0xb, (GXTevColorArg)8, (GXTevColorArg)0xf);
-    GXSetTevColorOp((GXTevStageID)4, (GXTevOp)8, (GXTevBias)0, (GXTevScale)0, (GXBool)1, (GXTevRegID)0);
-    GXSetTevAlphaIn((GXTevStageID)4, (GXTevAlphaArg)7, (GXTevAlphaArg)7, (GXTevAlphaArg)7, (GXTevAlphaArg)2);
-    GXSetTevAlphaOp((GXTevStageID)4, (GXTevOp)0, (GXTevBias)0, (GXTevScale)0, (GXBool)1, (GXTevRegID)0);
+    _GXSetTevColorIn((GXTevStageID)4, (GXTevColorArg)0xe, (GXTevColorArg)0xb, (GXTevColorArg)8, (GXTevColorArg)0xf);
+    _GXSetTevColorOp((GXTevStageID)4, (GXTevOp)8, (GXTevBias)0, (GXTevScale)0, (GXBool)1, (GXTevRegID)0);
+    _GXSetTevAlphaIn((GXTevStageID)4, (GXTevAlphaArg)7, (GXTevAlphaArg)7, (GXTevAlphaArg)7, (GXTevAlphaArg)2);
+    _GXSetTevAlphaOp((GXTevStageID)4, (GXTevOp)0, (GXTevBias)0, (GXTevScale)0, (GXBool)1, (GXTevRegID)0);
 
     GXSetTevDirect((GXTevStageID)5);
-    GXLoadTexObj(texObjB, (GXTexMapID)2);
+    GXLoadTexObj(vYmMana->m_generatedTexObj0, (GXTexMapID)2);
     GXSetTexCoordGen2((GXTexCoordID)5, (GXTexGenType)1, (GXTexGenSrc)5, 0x3c, (GXBool)0, 0x7d);
-    GXSetTevOrder((GXTevStageID)5, (GXTexCoordID)5, (GXTexMapID)0, (GXChannelID)4);
-    GXSetTevSwapMode((GXTevStageID)5, (GXTevSwapSel)0, (GXTevSwapSel)0);
-    GXSetTevColorIn((GXTevStageID)5, (GXTevColorArg)0xf, (GXTevColorArg)0, (GXTevColorArg)9, (GXTevColorArg)0xf);
-    GXSetTevColorOp((GXTevStageID)5, (GXTevOp)0, (GXTevBias)0, (GXTevScale)0, (GXBool)1, (GXTevRegID)0);
-    GXSetTevAlphaIn((GXTevStageID)5, (GXTevAlphaArg)7, (GXTevAlphaArg)7, (GXTevAlphaArg)7, (GXTevAlphaArg)2);
-    GXSetTevAlphaOp((GXTevStageID)5, (GXTevOp)0, (GXTevBias)0, (GXTevScale)0, (GXBool)1, (GXTevRegID)0);
+    _GXSetTevOrder((GXTevStageID)5, (GXTexCoordID)5, (GXTexMapID)0, (GXChannelID)4);
+    _GXSetTevSwapMode((GXTevStageID)5, (GXTevSwapSel)0, (GXTevSwapSel)0);
+    _GXSetTevColorIn((GXTevStageID)5, (GXTevColorArg)0xf, (GXTevColorArg)0, (GXTevColorArg)9, (GXTevColorArg)0xf);
+    _GXSetTevColorOp((GXTevStageID)5, (GXTevOp)0, (GXTevBias)0, (GXTevScale)0, (GXBool)1, (GXTevRegID)0);
+    _GXSetTevAlphaIn((GXTevStageID)5, (GXTevAlphaArg)7, (GXTevAlphaArg)7, (GXTevAlphaArg)7, (GXTevAlphaArg)2);
+    _GXSetTevAlphaOp((GXTevStageID)5, (GXTevOp)0, (GXTevBias)0, (GXTevScale)0, (GXBool)1, (GXTevRegID)0);
 
     GXSetTevDirect((GXTevStageID)6);
-    GXSetTevOrder((GXTevStageID)6, (GXTexCoordID)0xff, (GXTexMapID)0xff, (GXChannelID)4);
-    GXSetTevSwapMode((GXTevStageID)6, (GXTevSwapSel)0, (GXTevSwapSel)0);
-    GXSetTevColorIn((GXTevStageID)6, (GXTevColorArg)0xf, (GXTevColorArg)6, (GXTevColorArg)0xc, (GXTevColorArg)0);
-    GXSetTevColorOp((GXTevStageID)6, (GXTevOp)0, (GXTevBias)0, (GXTevScale)0, (GXBool)1, (GXTevRegID)0);
-    GXSetTevAlphaIn((GXTevStageID)6, (GXTevAlphaArg)7, (GXTevAlphaArg)1, (GXTevAlphaArg)6, (GXTevAlphaArg)2);
-    GXSetTevAlphaOp((GXTevStageID)6, (GXTevOp)0, (GXTevBias)0, (GXTevScale)0, (GXBool)1, (GXTevRegID)0);
+    _GXSetTevOrder((GXTevStageID)6, (GXTexCoordID)0xff, (GXTexMapID)0xff, (GXChannelID)4);
+    _GXSetTevSwapMode((GXTevStageID)6, (GXTevSwapSel)0, (GXTevSwapSel)0);
+    _GXSetTevColorIn((GXTevStageID)6, (GXTevColorArg)0xf, (GXTevColorArg)6, (GXTevColorArg)0xc, (GXTevColorArg)0);
+    _GXSetTevColorOp((GXTevStageID)6, (GXTevOp)0, (GXTevBias)0, (GXTevScale)0, (GXBool)1, (GXTevRegID)0);
+    _GXSetTevAlphaIn((GXTevStageID)6, (GXTevAlphaArg)7, (GXTevAlphaArg)1, (GXTevAlphaArg)6, (GXTevAlphaArg)2);
+    _GXSetTevAlphaOp((GXTevStageID)6, (GXTevOp)0, (GXTevBias)0, (GXTevScale)0, (GXBool)1, (GXTevRegID)0);
 
     GXSetTevDirect((GXTevStageID)7);
-    GXSetTevOrder((GXTevStageID)7, (GXTexCoordID)0xff, (GXTexMapID)0xff, (GXChannelID)4);
-    GXSetTevSwapMode((GXTevStageID)7, (GXTevSwapSel)0, (GXTevSwapSel)0);
+    _GXSetTevOrder((GXTevStageID)7, (GXTexCoordID)0xff, (GXTexMapID)0xff, (GXChannelID)4);
+    _GXSetTevSwapMode((GXTevStageID)7, (GXTevSwapSel)0, (GXTevSwapSel)0);
     GXSetTevKAlphaSel((GXTevStageID)7, (GXTevKAlphaSel)0x1c);
-    GXSetTevColorIn((GXTevStageID)7, (GXTevColorArg)0xf, (GXTevColorArg)0xf, (GXTevColorArg)0xf, (GXTevColorArg)0);
-    GXSetTevColorOp((GXTevStageID)7, (GXTevOp)0, (GXTevBias)0, (GXTevScale)0, (GXBool)1, (GXTevRegID)0);
-    GXSetTevAlphaIn((GXTevStageID)7, (GXTevAlphaArg)7, (GXTevAlphaArg)0, (GXTevAlphaArg)6, (GXTevAlphaArg)7);
-    GXSetTevAlphaOp((GXTevStageID)7, (GXTevOp)0, (GXTevBias)0, (GXTevScale)0, (GXBool)1, (GXTevRegID)0);
+    _GXSetTevColorIn((GXTevStageID)7, (GXTevColorArg)0xf, (GXTevColorArg)0xf, (GXTevColorArg)0xf, (GXTevColorArg)0);
+    _GXSetTevColorOp((GXTevStageID)7, (GXTevOp)0, (GXTevBias)0, (GXTevScale)0, (GXBool)1, (GXTevRegID)0);
+    _GXSetTevAlphaIn((GXTevStageID)7, (GXTevAlphaArg)7, (GXTevAlphaArg)0, (GXTevAlphaArg)6, (GXTevAlphaArg)7);
+    _GXSetTevAlphaOp((GXTevStageID)7, (GXTevOp)0, (GXTevBias)0, (GXTevScale)0, (GXBool)1, (GXTevRegID)0);
 
     GXSetNumTevStages(8);
     GXSetNumTexGens(6);
@@ -355,18 +353,18 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
 
     int waterCmp = strcmp(mesh->m_name, s_ymManaShapeObj4);
     if ((waterCmp == 0 && stepData->m_type == 1) || (strcmp(mesh->m_name, s_ymManaShapeObj2) == 0 && stepData->m_type == 2)) {
-        Mtx cameraMtx;
-        Mtx rotXMtx;
-        Mtx rotZMtx;
         Mtx offsetMtx;
+        Mtx cameraMtx;
         Mtx worldMtx;
+        Mtx rotZMtx;
+        Mtx rotXMtx;
 
         PSMTXCopy(CameraMatrix(), cameraMtx);
         PSMTXCopy(mtx, mana->m_waterMtx);
         GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
         GXSetCullMode(GX_CULL_NONE);
-        PSMTXRotRad(rotXMtx, 'x', kPppYmMoveParabolaNegHalfPi);
-        PSMTXRotRad(rotZMtx, 'z', kPppYmMoveParabolaNegHalfPi);
+        PSMTXRotRad(rotXMtx, 'x', LoadFloat(kPppYmMoveParabolaNegHalfPi));
+        PSMTXRotRad(rotZMtx, 'z', LoadFloat(kPppYmMoveParabolaNegHalfPi));
         PSMTXIdentity(offsetMtx);
         offsetMtx[1][3] = -stepData->m_waterOffset;
         PSMTXConcat(rotZMtx, offsetMtx, offsetMtx);
@@ -1559,6 +1557,7 @@ static void CalcWaterReflectionVector(
     Vec reflected;
     Mtx matrixNoTranslate;
     Mtx inverseMtx;
+    Vec* positionIt;
     Vec* reflectionIt;
     Vec* normalIt;
     unsigned char* colorBytes;
@@ -1596,15 +1595,16 @@ static void CalcWaterReflectionVector(
     PSVECScale(&cameraPos, &cameraPos, LoadFloat(kYmManaNegOne));
     PSMTXMultVec(inverseMtx, &cameraPos, &transformedCameraPos);
 
-    colorBytes = (unsigned char*)color;
-    texCoordFloat = (float*)texCoord;
+    positionIt = positions;
     reflectionIt = reflectionVec;
     normalIt = normals;
+    colorBytes = (unsigned char*)color;
+    texCoordFloat = (float*)texCoord;
     zero = LoadFloat(kPppYmMoveParabolaZero);
     half = LoadFloat(kYmManaHalf);
 
     for (i = 0; i < count; i++) {
-        PSVECSubtract(positions, &transformedCameraPos, &reflected);
+        PSVECSubtract(positionIt, &transformedCameraPos, &reflected);
         C_VECReflect(&reflected, normalIt, reflectionIt);
         PSMTXMultVec(matrixNoTranslate, reflectionIt, reflectionIt);
         PSVECNormalize(reflectionIt, reflectionIt);
@@ -1630,7 +1630,7 @@ static void CalcWaterReflectionVector(
             texCoordFloat[1] = -reflectionIt->y / (denomBase - reflectionIt->z);
         }
 
-        positions++;
+        positionIt++;
         reflectionIt++;
         normalIt++;
         colorBytes += 4;
@@ -1675,16 +1675,16 @@ void CalcReflectionVector2(
     Vec nodePos;
     Vec matrixPos;
     Vec worldPos;
+    Vec eyeToPos;
     Vec position;
     Vec normal;
-    Vec eyeToPos;
     Vec2d uv;
-    Mtx matrixCopy;
-    Mtx nodeOffsetMtx;
-    Mtx nodeRotMtx;
-    Mtx workMtx;
     Mtx normalMtx;
+    Mtx nodeRotMtx;
+    Mtx matrixCopy;
     Mtx rotateMtx;
+    Mtx nodeOffsetMtx;
+    Mtx workMtx;
     u16* dl = (u16*)displayList;
     const float zero = kPppYmMoveParabolaZero;
     const float denomBias = kYmManaReflectionDenomBias;
@@ -1710,7 +1710,7 @@ void CalcReflectionVector2(
     PSVECAdd(&nodePos, &matrixPos, &worldPos);
 
     PSMTXCopy(workMtx, nodeRotMtx);
-    PSMTXRotRad(rotateMtx, 'y', kPppYmMoveParabolaNegHalfPi);
+    PSMTXRotRad(rotateMtx, 'y', LoadFloat(kPppYmMoveParabolaNegHalfPi));
     nodeRotMtx[0][3] = worldPos.x;
     nodeRotMtx[1][3] = worldPos.y;
     nodeRotMtx[2][3] = worldPos.z;
@@ -1735,7 +1735,6 @@ void CalcReflectionVector2(
             u16 posIndex = dl[0];
             u16 normalIndex = dl[1];
             float denom;
-            u8* colorBytes = (u8*)&color[posIndex];
 
             dl += 4;
             if ((drawFmt & 7) == 2) {
@@ -1754,16 +1753,16 @@ void CalcReflectionVector2(
                 PSMTXMultVec(rotateMtx, &reflectionVec[posIndex], &reflectionVec[posIndex]);
             }
 
-            if (reflectionVec[posIndex].z < zero) {
-                colorBytes[0] = 0;
-                colorBytes[1] = 0;
-                colorBytes[2] = 0;
-                colorBytes[3] = 0;
+            if (reflectionVec[posIndex].z >= zero) {
+                ((u8*)&color[posIndex])[0] = 0xFF;
+                ((u8*)&color[posIndex])[1] = 0xFF;
+                ((u8*)&color[posIndex])[2] = 0xFF;
+                ((u8*)&color[posIndex])[3] = 0xFF;
             } else {
-                colorBytes[0] = 0xFF;
-                colorBytes[1] = 0xFF;
-                colorBytes[2] = 0xFF;
-                colorBytes[3] = 0xFF;
+                ((u8*)&color[posIndex])[0] = 0;
+                ((u8*)&color[posIndex])[1] = 0;
+                ((u8*)&color[posIndex])[2] = 0;
+                ((u8*)&color[posIndex])[3] = 0;
             }
 
             denom = denomBias + reflectionVec[posIndex].z;

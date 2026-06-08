@@ -5252,7 +5252,7 @@ void CGPartyObj::gpmMove()
 
 		PartyData(this).partyFlags |= 0x20;
 		sGhostPartyWork.gauge++;
-		if (sGhostPartyWork.gauge < 0x10) {
+		if (sGhostPartyWork.gauge <= 0xF) {
 			return;
 		}
 		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(PartyData(this).partyFlags) << 25) & 0xC0000000) >> 31) != 0) {

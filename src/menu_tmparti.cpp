@@ -326,7 +326,7 @@ unsigned int CMenuPcs::TmpArtiClose()
 	if (this->m_tmpArtiList->count == completedItems) {
 		zero = kTmpArtiZero;
 		entry = this->m_tmpArtiList->entries;
-		for (count = itemCount; count > 0; count--) {
+		for (count = itemCount; (int)count > 0; count--) {
 			entry->startFrame = 0;
 			entry->duration = 1;
 			entry->alpha = zero;

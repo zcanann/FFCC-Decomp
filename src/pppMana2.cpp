@@ -716,6 +716,7 @@ void CalcReflectionVector2(
         u8 drawFmt = *(u8*)dl;
         u16 itemCount = *(u16*)((u8*)dl + 1);
         unsigned int i;
+        u32 fmt = drawFmt & 7;
 
         if (gUtil.IsHasDrawFmtDL(drawFmt) == 0) {
             break;
@@ -732,7 +733,7 @@ void CalcReflectionVector2(
             u8* clr;
 
             dl += 4;
-            if ((drawFmt & 7) == 2) {
+            if (fmt == 2) {
                 dl++;
             }
 

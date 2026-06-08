@@ -871,7 +871,7 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 	if (reverseDir) {
 		waveDirection = -1;
 	}
-	waveY = static_cast<float>(waveDirection) * kRingMenuGbaOrbitYScale * waveSinY;
+	waveY = static_cast<float>(waveDirection) * (kRingMenuGbaOrbitYScale * waveSinY);
 	if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
 		waveY = waveY + kRingMenuTwo;
 	}

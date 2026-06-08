@@ -2469,6 +2469,7 @@ void CMenuPcs::DrawUniteList()
 
 #pragma push
 #pragma peephole off
+#pragma opt_loop_invariants off
 /*
  * --INFO--
  * PAL Address: 0x8014b7ec

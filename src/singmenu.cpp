@@ -698,54 +698,52 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
     outText[0] = '\0';
 
     if ((raceBits & 0xF) == 0xF) {
-        if (Game.m_gameWork.m_languageId == 3) {
+        switch (Game.m_gameWork.m_languageId) {
+        case 2:
+            text = (char*)gSingMenuTextTableDe[19];
+            break;
+        case 3:
             text = (char*)gSingMenuTextTableIt[19];
-        } else if (Game.m_gameWork.m_languageId < 3) {
-            if (Game.m_gameWork.m_languageId == 1 || Game.m_gameWork.m_languageId == 0) {
-                text = (char*)gSingMenuTextTableEn[19];
-            } else {
-                text = (char*)gSingMenuTextTableDe[19];
-            }
-        } else if (Game.m_gameWork.m_languageId == 5) {
-            text = (char*)gSingMenuTextTableEs[19];
-        } else if (Game.m_gameWork.m_languageId < 5) {
+            break;
+        case 4:
             text = (char*)gSingMenuTextTableFr[19];
-        } else {
+            break;
+        case 5:
+            text = (char*)gSingMenuTextTableEs[19];
+            break;
+        case 1:
+        default:
             text = (char*)gSingMenuTextTableEn[19];
+            break;
         }
         strcpy(outText, text);
         return;
     }
 
-    raceType = 0;
-    if ((raceBits & 1) == 0) {
-        raceType = 1;
-        if ((raceBits & 2) == 0) {
-            raceType = 2;
-            if ((raceBits & 4) == 0) {
-                raceType = 3;
-                if ((raceBits & 8) == 0) {
-                    raceType = 4;
-                }
-            }
+    for (raceType = 0; raceType < 4; raceType++) {
+        if ((raceBits & (1 << raceType)) != 0) {
+            break;
         }
     }
 
     if (raceType < 4) {
-        if (Game.m_gameWork.m_languageId == 3) {
+        switch (Game.m_gameWork.m_languageId) {
+        case 2:
+            text = (char*)PTR_s_Clavat_80214100[raceType];
+            break;
+        case 3:
             text = (char*)PTR_s_Clavat_80214110[raceType];
-        } else if (Game.m_gameWork.m_languageId < 3) {
-            if (Game.m_gameWork.m_languageId == 1 || Game.m_gameWork.m_languageId == 0) {
-                text = (char*)PTR_s_Clavat_802140f0[raceType];
-            } else {
-                text = (char*)PTR_s_Clavat_80214100[raceType];
-            }
-        } else if (Game.m_gameWork.m_languageId == 5) {
-            text = (char*)PTR_s_Clavate[raceType];
-        } else if (Game.m_gameWork.m_languageId < 5) {
+            break;
+        case 4:
             text = (char*)PTR_s_Clavat_80214120[raceType];
-        } else {
+            break;
+        case 5:
+            text = (char*)PTR_s_Clavate[raceType];
+            break;
+        case 1:
+        default:
             text = (char*)PTR_s_Clavat_802140f0[raceType];
+            break;
         }
 
         strcpy(outText, text);
@@ -762,20 +760,23 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
     }
 
     raceType = (raceBits & 0x30) >> 5;
-    if (Game.m_gameWork.m_languageId == 3) {
+    switch (Game.m_gameWork.m_languageId) {
+    case 2:
+        suffix = (char*)gSingMenuTextTableDe[raceType + 17];
+        break;
+    case 3:
         suffix = (char*)gSingMenuTextTableIt[raceType + 17];
-    } else if (Game.m_gameWork.m_languageId < 3) {
-        if (Game.m_gameWork.m_languageId == 1 || Game.m_gameWork.m_languageId == 0) {
-            suffix = (char*)gSingMenuTextTableEn[raceType + 17];
-        } else {
-            suffix = (char*)gSingMenuTextTableDe[raceType + 17];
-        }
-    } else if (Game.m_gameWork.m_languageId == 5) {
-        suffix = (char*)gSingMenuTextTableEs[raceType + 17];
-    } else if (Game.m_gameWork.m_languageId < 5) {
+        break;
+    case 4:
         suffix = (char*)gSingMenuTextTableFr[raceType + 17];
-    } else {
+        break;
+    case 5:
+        suffix = (char*)gSingMenuTextTableEs[raceType + 17];
+        break;
+    case 1:
+    default:
         suffix = (char*)gSingMenuTextTableEn[raceType + 17];
+        break;
     }
     strcat(outText, suffix);
 }

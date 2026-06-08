@@ -652,9 +652,9 @@ void GbaQueue::ExecutQueue()
 			} else if (cmd == 0x1A) {
 				if (caravanWork != 0) {
 					unsigned int cmdWord = queueWords[i];
-					const unsigned char p0 = static_cast<unsigned char>(cmdWord >> 24);
-					const unsigned char p1 = static_cast<unsigned char>(cmdWord >> 16);
-					const unsigned char p2 = static_cast<unsigned char>(cmdWord >> 8);
+					const unsigned char p0 = static_cast<signed char>(cmdWord >> 24);
+					const signed char p1 = static_cast<unsigned char>(cmdWord >> 16);
+					const signed char p2 = static_cast<unsigned char>(cmdWord >> 8);
 					const unsigned char p3 = static_cast<unsigned char>(cmdWord);
 
 					if ((static_cast<int>(p0) >> 6) == 0) {

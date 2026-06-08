@@ -1377,22 +1377,21 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         break;
     case 0x12: {
         m_watchCardDisconnect = 0;
-        Mc::SaveDat* const transferWork = static_cast<Mc::SaveDat*>(MenuPcs.m_goOutTransferWork);
-        Mc::SaveDat* const transferSaveData = MenuPcs.m_goOutTransferSaveData;
+        const int selectedChara = m_selectedTransferChara;
         int freeCaravanIdx;
 
-        if (GoOutSaveDat(transferWork).m_caravan[m_selectedTransferChara].m_odekakeReturnFlag == 0) {
-            freeCaravanIdx = FindFreeCaravanIdx(transferSaveData);
-            MemoryCardMan.Odekake(1, *transferWork, m_selectedTransferChara, *transferSaveData, freeCaravanIdx);
+        if (GoOutSaveDat(static_cast<Mc::SaveDat*>(MenuPcs.m_goOutTransferWork)).m_caravan[selectedChara].m_odekakeReturnFlag == 0) {
+            freeCaravanIdx = FindFreeCaravanIdx(MenuPcs.m_goOutTransferSaveData);
+            MemoryCardMan.Odekake(1, *static_cast<Mc::SaveDat*>(MenuPcs.m_goOutTransferWork), selectedChara, *MenuPcs.m_goOutTransferSaveData, freeCaravanIdx);
         } else {
-            freeCaravanIdx = MenuPcs.GetSameCharaData(transferSaveData, transferWork, m_selectedTransferChara, 0);
-            MemoryCardMan.Odekake(0, *transferWork, m_selectedTransferChara, *transferSaveData, freeCaravanIdx);
+            freeCaravanIdx = MenuPcs.GetSameCharaData(MenuPcs.m_goOutTransferSaveData, static_cast<Mc::SaveDat*>(MenuPcs.m_goOutTransferWork), selectedChara, 0);
+            MemoryCardMan.Odekake(0, *static_cast<Mc::SaveDat*>(MenuPcs.m_goOutTransferWork), m_selectedTransferChara, *MenuPcs.m_goOutTransferSaveData, freeCaravanIdx);
         }
 
         MenuPcs.GetMcCtrl()->m_cardChannel = m_accessCardChannel;
         m_cardChannel = static_cast<char>(MenuPcs.GetMcCtrl()->m_cardChannel);
         m_saveIndex = static_cast<char>(m_accessSaveIndex);
-        m_memCardBuffer = transferSaveData;
+        m_memCardBuffer = MenuPcs.m_goOutTransferSaveData;
         m_memCardResult = MenuPcs.GetMcCtrl()->ChkConnect(static_cast<unsigned char>(m_cardChannel));
         if (m_memCardResult == 1) {
             MenuPcs.GetMcCtrl()->m_saveIndex = static_cast<unsigned char>(m_saveIndex);

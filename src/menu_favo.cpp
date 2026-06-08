@@ -671,9 +671,8 @@ void CMenuPcs::FavoInit()
 		setupEntry->startFrame = 7;
 		setupEntry->duration = 5;
 
-		int byteOff2 = byteOff + 0x40;
+		setupEntry = reinterpret_cast<FavoEntry*>(reinterpret_cast<char*>(this->m_favoList->entries) + (byteOff + 0x40));
 		byteOff = byteOff + 0x80;
-		setupEntry = reinterpret_cast<FavoEntry*>(reinterpret_cast<char*>(this->m_favoList->entries) + byteOff2);
 		setupEntry->flags = 2;
 		setupEntry->tex = 0x37;
 		setupEntry->x = firstEntry->x + 0x28;

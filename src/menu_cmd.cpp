@@ -2845,7 +2845,7 @@ unsigned int CMenuPcs::CmdClose2()
 	CmdListStorage* const list = GetCmdListStorage(this);
 	CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 
-	const u32 selected = static_cast<s32>(GetCmdStateView(this)->selected);
+	const s32 selected = static_cast<s32>(GetCmdStateView(this)->selected);
 	const u32 modeSel = static_cast<s32>(GetCmdStateSelections(GetCmdStateView(this))[GetCmdStateView(this)->mode]);
 
 	GetCmdStateView(this)->transitionTimer = static_cast<s16>(GetCmdStateView(this)->transitionTimer + 1);

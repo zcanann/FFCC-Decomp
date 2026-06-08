@@ -183,6 +183,8 @@ static const char s_charaTextureVariantFmt[] = "%s_%c";
 static const char s_mogFurTextureName[] = "mog_hair";
 static const char s_charaSetAnimMissingFmt[] = "CCharaPcs missing anim %d %d %d\n";
 static const char s_charaLoadAnimLogFmt[] = "CCharaPcs LoadAnim %s %d %d\n";
+static const char s_charaLoadPdtLogFmt[] =
+    "\x1b[31mMerge: \x83\x82\x83\x93\x83X\x83^\x81[PDT\x82\xf0" "DVD\x82\xa9\x82\xe7\x93\xc7\x82\xdd\x8d\x9e\x82\xdd\x82\xdc\x82\xb5\x82\xbd\x81" "Btype = %d number = %d idxTexture = %d\n\x1b[0m";
 static const char s_charaReleaseAnimBankFmt[] = "bank release %d %s\n";
 static const char s_charaAsyncCancelFmt[] =
     "\x83\x82\x83\x66\x83\x8b\x94\xf1\x93\xaf\x8a\xfa\x93\xc7\x82\xdd"
@@ -2325,8 +2327,8 @@ void CCharaPcs::CHandle::LoadModel(
     BuildCharaBasePath(charaKind, charaNo, basePath);
 
     CLoadModel* loadModel = 0;
-    for (int i = 0; i < LoadModelArray(&CharaPcs)->GetSize(); i++) {
-        CLoadModel* it = (*LoadModelArray(&CharaPcs))[static_cast<unsigned long>(i)];
+    for (unsigned int i = 0; i < static_cast<unsigned int>(LoadModelArray(&CharaPcs)->GetSize()); i++) {
+        CLoadModel* it = (*LoadModelArray(&CharaPcs))[i];
         if (reinterpret_cast<int>(it->m_keyTag) == charaKind && static_cast<unsigned long>(it->m_keyId) == charaNo) {
             loadModel = it;
             break;
@@ -2335,7 +2337,7 @@ void CCharaPcs::CHandle::LoadModel(
 
     if (loadModel == 0) {
         strcpy(path, basePath);
-        strcpy(path + strlen(path), s_charaModelSuffix);
+        strcat(path, s_charaModelSuffix);
 
         CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
         if (fileHandle == 0) {
@@ -2345,81 +2347,72 @@ void CCharaPcs::CHandle::LoadModel(
         File.Read(fileHandle);
         File.SyncCompleted(fileHandle);
 
+        void* readBuffer = File.m_readBuffer;
         loadModel = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x5E8) CLoadModel;
-        if (loadModel != 0) {
-            loadModel->m_keyTag = reinterpret_cast<void*>(charaKind);
-            loadModel->m_keyId = static_cast<int>(charaNo);
-            loadModel->m_mergeFileId = mergeFileId;
-            loadModel->m_mergeFlags = mergeFlags;
-            loadModel->m_model =
-                new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x5F1) CChara::CModel;
-            loadModel->m_streamMode = 0;
-            loadModel->m_streamOffset = 0;
-            loadModel->m_streamSize = 0;
+        loadModel->m_keyTag = reinterpret_cast<void*>(charaKind);
+        loadModel->m_keyId = static_cast<int>(charaNo);
+        loadModel->m_mergeFileId = mergeFileId;
+        loadModel->m_mergeFlags = mergeFlags;
+        LoadModelArray(&CharaPcs)->Add(loadModel);
 
-            if (loadModel->m_model != 0) {
-                loadModel->m_model->Create(File.m_readBuffer, HandleModelStage(charaKind, 0));
-            }
-            LoadModelArray(&CharaPcs)->Add(loadModel);
-        }
+        CChara::CModel* model =
+            new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x5F1) CChara::CModel;
+        model->Create(readBuffer, HandleModelStage(charaKind, 0));
+        loadModel->m_model = model;
 
         m_modelLoadRef = loadModel;
-        AddSharedRef(m_modelLoadRef);
-        m_model = loadModel != 0 ? loadModel->m_model : 0;
-        AddSharedRef(m_model);
+        File.Close(fileHandle);
+        m_modelLoadRef->AddRef();
+        m_model = reinterpret_cast<CLoadModel*>(m_modelLoadRef)->m_model;
+        m_model->AddRef();
 
         strcpy(path, basePath);
-        strcpy(path + strlen(path), s_charaDynamicsSuffix);
+        strcat(path, s_charaDynamicsSuffix);
         fileHandle = File.Open(path, 0, CFile::PRI_LOW);
         if (fileHandle != 0) {
             File.Read(fileHandle);
             File.SyncCompleted(fileHandle);
-            if (m_model != 0) {
-                m_model->CreateDynamics(File.m_readBuffer, HandleModelStage(charaKind, 0));
-            }
+            m_model->CreateDynamics(File.m_readBuffer, HandleModelStage(charaKind, 0));
             File.Close(fileHandle);
         }
     } else {
         m_modelLoadRef = loadModel;
 
         if (loadModel->GetRef() == 1) {
-            if (loadModel->m_streamOffset != 0) {
+            if (loadModel->m_streamMode != 0) {
                 File.LockBuffer();
                 Memory.CopyFromAMemorySync(
                     File.m_readBuffer,
                     reinterpret_cast<unsigned char*>(StageBase(CharaPcs.m_amemWorkStage)) +
                         reinterpret_cast<unsigned int>(loadModel->m_streamOffset),
                     static_cast<unsigned long>(loadModel->m_streamSize));
-                loadModel->m_model =
+                CChara::CModel* model =
                     new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x7C7) CChara::CModel;
-                if (loadModel->m_model != 0) {
-                    loadModel->m_model->Create(File.m_readBuffer, HandleModelStage(charaKind, specialModelStage));
-                }
+                model->Create(File.m_readBuffer, HandleModelStage(m_charaKind, specialModelStage));
+                loadModel->m_model = model;
                 File.UnlockBuffer();
             }
 
-            AddSharedRef(m_modelLoadRef);
+            m_modelLoadRef->AddRef();
             m_model = loadModel->m_model;
-            AddSharedRef(m_model);
-            if (m_model != 0) {
-                m_model->Init();
-            }
+            m_model->AddRef();
+            m_model->Init();
         } else {
-            AddSharedRef(m_modelLoadRef);
-            m_model = loadModel->m_model != 0 ? loadModel->m_model->Duplicate(HandleModelStage(charaKind, specialModelStage)) : 0;
+            m_modelLoadRef->AddRef();
+            m_model = loadModel->m_model->Duplicate(HandleModelStage(m_charaKind, specialModelStage));
         }
     }
 
     ChangeTexture(charaKind, charaNo, textureVariant, mergeFileId, mergeFlags);
-    if (m_textureSet != 0 && m_textureSet->Find(const_cast<char*>(s_mogFurTextureName)) >= 0 && m_model != 0) {
+    if (m_textureSet != 0 && m_textureSet->Find(const_cast<char*>(s_mogFurTextureName)) >= 0) {
         m_model->InitMogFurTex();
     }
 
     if (CurrentSceneId() != 7 && charaKind == 1) {
         CLoadPdt* loadPdt = 0;
-        for (int i = 0; i < LoadPdtArray(&CharaPcs)->GetSize(); i++) {
-            CLoadPdt* it = (*LoadPdtArray(&CharaPcs))[static_cast<unsigned long>(i)];
-            if (it != 0 && it->m_keyTag == reinterpret_cast<void*>(1) && it->m_keyId == static_cast<int>(charaNo) &&
+        for (unsigned int i = 0; i < static_cast<unsigned int>(LoadPdtArray(&CharaPcs)->GetSize()); i++) {
+            CLoadPdt* it = (*LoadPdtArray(&CharaPcs))[i];
+            if (it->m_keyTag == reinterpret_cast<void*>(1) && it->m_keyId == static_cast<int>(charaNo) &&
                 it->m_variantTag == reinterpret_cast<void*>(textureVariant)) {
                 loadPdt = it;
                 break;
@@ -2428,19 +2421,23 @@ void CCharaPcs::CHandle::LoadModel(
 
         if (loadPdt == 0) {
             loadPdt = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x868) CLoadPdt;
-            if (loadPdt != 0) {
-                loadPdt->m_keyTag = reinterpret_cast<void*>(1);
-                loadPdt->m_keyId = static_cast<int>(charaNo);
-                loadPdt->m_variantTag = reinterpret_cast<void*>(textureVariant);
-                loadPdt->m_mergeFileId = mergeFileId;
-                loadPdt->m_mergeFlags = mergeFlags;
-                loadPdt->m_pdtSlot = PartPcs.LoadMonsterPdt(static_cast<int>(charaNo), static_cast<int>(textureVariant), 0, 0, 0, 0);
-                LoadPdtArray(&CharaPcs)->Add(loadPdt);
+            m_pdtLoadRef = loadPdt;
+            reinterpret_cast<CLoadPdt*>(m_pdtLoadRef)->m_keyTag = reinterpret_cast<void*>(1);
+            reinterpret_cast<CLoadPdt*>(m_pdtLoadRef)->m_keyId = static_cast<int>(charaNo);
+            reinterpret_cast<CLoadPdt*>(m_pdtLoadRef)->m_variantTag = reinterpret_cast<void*>(textureVariant);
+            reinterpret_cast<CLoadPdt*>(m_pdtLoadRef)->m_mergeFileId = mergeFileId;
+            reinterpret_cast<CLoadPdt*>(m_pdtLoadRef)->m_mergeFlags = mergeFlags;
+            reinterpret_cast<CLoadPdt*>(m_pdtLoadRef)->m_pdtSlot =
+                PartPcs.LoadMonsterPdt(static_cast<int>(charaNo), static_cast<int>(textureVariant), 0, 0, 0, 0);
+            if (System.m_execParam != 0) {
+                System.Printf(const_cast<char*>(s_charaLoadPdtLogFmt), 1, static_cast<int>(charaNo), static_cast<int>(textureVariant));
             }
+            LoadPdtArray(&CharaPcs)->Add(reinterpret_cast<CLoadPdt*>(m_pdtLoadRef));
+            m_pdtLoadRef->AddRef();
+        } else {
+            m_pdtLoadRef = loadPdt;
+            m_pdtLoadRef->AddRef();
         }
-
-        m_pdtLoadRef = loadPdt;
-        AddSharedRef(m_pdtLoadRef);
     }
 }
 

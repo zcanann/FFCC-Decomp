@@ -800,8 +800,8 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 	const char* commandLabel;
 	double waveX;
 	float waveY;
-	double textWidth;
-	double textHeight;
+	float textWidth;
+	float textHeight;
 	float waveSinY;
 
 	if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
@@ -860,9 +860,9 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 	}
 
 	font->SetScale(static_cast<float>(-(kRingMenuSpinScaleSlopeD * fabs(static_cast<double>(angle)) - kRingMenuSpinScaleBaseD)));
-	textWidth = static_cast<double>(font->GetWidth(commandLabel));
+	textWidth = static_cast<float>(font->GetWidth(commandLabel));
 	fVar1 = static_cast<float>(-(kRingMenuSpinAlphaSlopeD * fabs(static_cast<double>(angle)) - kRingMenuOneD));
-	textHeight = static_cast<double>(static_cast<float>(font->m_glyphHeight) * font->scaleY);
+	textHeight = static_cast<float>(font->m_glyphHeight) * font->scaleY;
 
 	clampedAlpha = kRingMenuZero;
 	if ((kRingMenuZero <= fVar1) && ((clampedAlpha = fVar1), (kRingMenuOne < fVar1))) {
@@ -873,10 +873,9 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 	CColor color(0xFF, 0xFF, 0xFF, alpha);
 	font->SetColor(color.color);
 	font->SetPosX(static_cast<float>(waveX) +
-		((kRingMenuTextBaseX + posX) - static_cast<float>(textWidth) * kRingMenuHalf));
+		((kRingMenuTextBaseX + posX) - textWidth * kRingMenuHalf));
 	font->SetPosY(kRingMenuGbaOrbitYScale +
-		(static_cast<float>(waveY) +
-			((kRingMenuShadowOffset + posY) - static_cast<float>(textHeight) * kRingMenuHalf)));
+		(waveY + ((kRingMenuShadowOffset + posY) - textHeight * kRingMenuHalf)));
 	font->SetPosZ(kRingMenuZero);
 	font->Draw(commandLabel);
 }

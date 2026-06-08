@@ -310,10 +310,8 @@ void CPad::Frame()
 	do
 	{
 		puVar12 = reinterpret_cast<u16*>(iVar6 + 4);
-		iVar14 = 0;
-		iVar19 = 2;
 		puVar7 = puVar10;
-		do
+		for (iVar14 = 0; iVar14 < 2; iVar14++)
 		{
 			u8* p12 = reinterpret_cast<u8*>(puVar12);
 			if ((iVar14 != 0) || (*reinterpret_cast<s8*>(puVar13 + 5) != -3))
@@ -556,9 +554,7 @@ void CPad::Frame()
 			}
 			puVar12 = puVar12 + 1;
 			puVar7 = puVar7 + 1;
-			iVar14 = iVar14 + 1;
-			iVar19 = iVar19 + -1;
-		} while (iVar19 != 0);
+		}
 		uVar17 = uVar17 + 1;
 		puVar13 = puVar13 + 6;
 		puVar18 = puVar18 + 2;

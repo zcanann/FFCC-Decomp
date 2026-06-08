@@ -1731,7 +1731,7 @@ void CMenuPcs::DrawSingleStat(float alpha)
     unsigned short charaNo = SingleCaravanWork()->m_tribeId;
     float iconStep = 216.0f;
     float texU = static_cast<float>(charaNo & 1) * iconStep;
-    float texV = static_cast<float>(static_cast<short>(charaNo) / 2) * iconStep;
+    float texV = static_cast<float>(static_cast<int>(charaNo) / 2) * iconStep;
     MenuPcs.DrawRect(0, 440.0f - 32.0f, 176.0f, iconStep, iconStep,
                                      texU, texV, 1.0f, 1.0f, 0.0f);
 

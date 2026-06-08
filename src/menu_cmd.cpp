@@ -636,14 +636,14 @@ void CMenuPcs::CmdOpen()
 		entry++;
 	}
 
-	bool done = false;
+	int done = 0;
 	if (list->count == finishedCount) {
 		float anim = kCmdMenuOne;
 		entry = entries;
 		if (static_cast<s32>(count) > 0) {
 			u32 batch = count >> 3;
 			if (batch != 0) {
-				do {
+				for (; batch != 0; batch--) {
 					entry[0].startFrame = 0;
 					entry[0].duration = 1;
 					entry[0].alpha = anim;
@@ -669,15 +669,14 @@ void CMenuPcs::CmdOpen()
 					entry[7].duration = 1;
 					entry[7].alpha = anim;
 					entry += 8;
-					batch -= 1;
-				} while (batch != 0);
+				}
 				count &= 7;
 				if (count == 0) {
-					done = true;
+					done = 1;
 				}
 			}
 
-			if (done == false) {
+			if (count != 0) {
 				do {
 					entry->startFrame = 0;
 					entry->duration = 1;
@@ -687,7 +686,7 @@ void CMenuPcs::CmdOpen()
 				} while (count != 0);
 			}
 		}
-		done = true;
+		done = 1;
 	}
 
 	if (done) {

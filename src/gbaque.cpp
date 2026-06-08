@@ -3319,7 +3319,6 @@ void GbaQueue::ClrCompatibilityFlg(int channel)
 int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 {
 	unsigned char compatibilityData[0x10];
-	char** nameTable = Game.m_cFlatDataArr[1].TableStrings(2);
 	unsigned char count = 2;
 	unsigned char* writePtr;
 	int outSize = 2;
@@ -3328,6 +3327,8 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 	OSWaitSemaphore(accessSemaphores + channel);
 	memcpy(compatibilityData, reinterpret_cast<unsigned char*>(this) + channel * 0xDC + 0x524, sizeof(compatibilityData));
 	OSSignalSemaphore(accessSemaphores + channel);
+
+	char** nameTable = Game.m_cFlatDataArr[1].TableStrings(2);
 
 	outCompatibility[0] = compatibilityData[5];
 	if (compatibilityData[3] != 0) {

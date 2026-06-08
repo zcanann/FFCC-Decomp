@@ -729,10 +729,10 @@ void callCon2Prog(_pppPObject* pObject)
 			if (*nextSlot == pObject->m_graphId)
 			{
 				*slotPtr = nextSlot;
-				if (prog != 0 && prog->m_pppFunctionOperation != 0 && prog->m_pppFunctionConstructor2 != 0)
-				{
-					((pppProgOperation2Callback)prog->m_pppFunctionOperation)(pObject, *slotPtr);
-				}
+			}
+			if (prog != 0 && prog->m_pppFunctionOperation != 0 && prog->m_pppFunctionConstructor2 != 0)
+			{
+				((pppProgOperation2Callback)prog->m_pppFunctionOperation)(pObject, *slotPtr);
 			}
 
 			stageSet = (_pppProgSetDef*)(((u8*)stageSet) + sizeof(_pppCtrlTable));
@@ -1911,8 +1911,9 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
  */
 void pppCalcPartStd(_pppMngSt* pppMngSt)
 {
+	s32 i = 0;
 	s32 pDataValOffset = 0;
-	for (s32 i = 0; i < pppMngSt->m_numPrograms; i++)
+	for (; i < pppMngSt->m_numPrograms; i++)
 	{
 		_pppPDataVal* pDataVal = (_pppPDataVal*)((u8*)pppMngSt->m_pppPDataVals + pDataValOffset);
 		if (pDataVal != 0 && pDataVal->m_programSetDef != 0)
@@ -2264,8 +2265,9 @@ void _pppCalcPart(_pppMngSt* pppMngSt)
 		}
 	}
 
+	s32 i = 0;
 	s32 pDataValOffset = 0;
-	for (s32 i = 0; i < pppMngSt->m_numPrograms; i++)
+	for (; i < pppMngSt->m_numPrograms; i++)
 	{
 		_pppPDataVal* pDataVals = pppMngSt->m_pppPDataVals;
 		_pppPDataVal* pDataVal = (_pppPDataVal*)((u8*)pDataVals + pDataValOffset);

@@ -132,6 +132,12 @@ static inline unsigned char& ModelFlagsA0(CChara::CModel* model)
     return model->m_flagsA0;
 }
 
+static inline int RemapPadSlot(CPad* pad, int padIndex)
+{
+    int activePad = pad->m_debugPadPort;
+    return static_cast<int>(padIndex & ~(static_cast<int>(~((activePad - padIndex) | (padIndex - activePad))) >> 31));
+}
+
 static inline float& ModelChestAmp(CChara::CModel* model)
 {
     return *reinterpret_cast<float*>(ModelBytes(model) + 0xB4);
@@ -540,21 +546,15 @@ void CGObject::move()
             && ((Game.m_gameWork.m_menuStageMode == 0) || (player == 0));
 
         if (canReadPad) {
-            const bool useDebugPad = (Pad.m_debugPadLock != 0) || ((player == 0) && (Pad.m_debugPadPort != -1));
-            const u32 playerIndex = static_cast<u32>(player)
-                & ~((static_cast<unsigned int>(~(Pad.m_debugPadPort - static_cast<int>(player)
-                                        | static_cast<int>(player) - Pad.m_debugPadPort))
-                     >> 31));
-            const u8* padBytes = reinterpret_cast<u8*>(&Pad);
-
-            u16 buttons = 0;
-            u16 buttonsDown = 0;
-            u16 buttonsRepeat = 0;
-            if (!useDebugPad) {
-                buttons = *reinterpret_cast<const u16*>(padBytes + 0x4 + (playerIndex * 0x54));
-                buttonsDown = *reinterpret_cast<const u16*>(padBytes + 0x8 + (playerIndex * 0x54));
-                buttonsRepeat = *reinterpret_cast<const u16*>(padBytes + 0x12 + (playerIndex * 0x54));
-            }
+            u16 buttons = (Pad.m_debugPadLock != 0 || (player == 0 && Pad.m_debugPadPort != -1))
+                ? 0
+                : Pad.GetPadInputs()[RemapPadSlot(&Pad, player)].button[0];
+            const u16 buttonsDown = (Pad.m_debugPadLock != 0 || (player == 0 && Pad.m_debugPadPort != -1))
+                ? 0
+                : Pad.GetPadInputs()[RemapPadSlot(&Pad, player)].buttonDown[0];
+            const u16 buttonsRepeat = (Pad.m_debugPadLock != 0 || (player == 0 && Pad.m_debugPadPort != -1))
+                ? 0
+                : Pad.GetPadInputs()[RemapPadSlot(&Pad, player)].repeatButton;
 
             if ((buttons != 0) && (buttonsRepeat != 0)) {
                 buttons |= buttonsRepeat;
@@ -562,12 +562,12 @@ void CGObject::move()
 
             u32 miniGameFlags = MiniGamePcs.m_flags;
             if ((miniGameFlags & 0x100) != 0) {
-                float stickX = sZeroFloat;
-                float stickY = sZeroFloat;
-                if (!useDebugPad) {
-                    stickX = *reinterpret_cast<const float*>(padBytes + 0x24 + (playerIndex * 0x54));
-                    stickY = *reinterpret_cast<const float*>(padBytes + 0x28 + (playerIndex * 0x54));
-                }
+                const float stickX = (Pad.m_debugPadLock != 0 || (player == 0 && Pad.m_debugPadPort != -1))
+                    ? sZeroFloat
+                    : Pad.GetPadInputs()[RemapPadSlot(&Pad, player)].stickXF;
+                const float stickY = (Pad.m_debugPadLock != 0 || (player == 0 && Pad.m_debugPadPort != -1))
+                    ? sZeroFloat
+                    : Pad.GetPadInputs()[RemapPadSlot(&Pad, player)].stickYF;
                 moveVec.x = sZeroFloat - stickX;
                 moveVec.z = sZeroFloat + stickY;
                 if ((moveVec.x != sZeroFloat) || (moveVec.z != sZeroFloat)) {

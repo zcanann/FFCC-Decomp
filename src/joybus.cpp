@@ -7918,6 +7918,7 @@ int JoyBus::SendUseItem(int portIndex, char itemId)
     cmdBytes[0] = 0x14;
     cmdBytes[1] = 0x0C;
     cmdBytes[2] = itemId;
+    unsigned int word = cmd;
     unsigned int port;
 
     if (static_cast<signed char>(m_threadRunningMask) == 0)
@@ -7937,7 +7938,7 @@ int JoyBus::SendUseItem(int portIndex, char itemId)
     }
     else
     {
-        m_cmdQueueData[port][m_cmdCount[port]] = cmd;
+        m_cmdQueueData[port][m_cmdCount[port]] = word;
         port = m_threadParams[portIndex].m_portIndex;
         m_cmdCount[port]++;
         OSSignalSemaphore(m_accessSemaphores + m_threadParams[portIndex].m_portIndex);

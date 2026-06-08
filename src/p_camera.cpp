@@ -900,8 +900,6 @@ void CCameraPcs::draw()
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     Mtx shadowMtx;
     Mtx cameraMtx;
-    unsigned int redColor;
-    unsigned int magentaColor;
 
     if ((m_isAbsolute == 0) ||
         ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_Camera) != 0)) {
@@ -948,8 +946,12 @@ void CCameraPcs::draw()
         shadowMtx[2][3] = posZ;
         PSMTXConcat(cameraMtx, shadowMtx, shadowMtx);
         GXLoadPosMtxImm(shadowMtx, 0);
-        redColor = 0xFF0000FF;
-        GXSetChanMatColor(GX_COLOR0A0, *reinterpret_cast<_GXColor*>(&redColor));
+        _GXColor redColor;
+        redColor.r = 0xFF;
+        redColor.g = 0;
+        redColor.b = 0;
+        redColor.a = 0xFF;
+        GXSetChanMatColor(GX_COLOR0A0, redColor);
         Graphic.DrawSphere();
 
         PSMTXCopy(m_cameraMatrix, cameraMtx);
@@ -976,8 +978,12 @@ void CCameraPcs::draw()
         shadowMtx[2][3] = refPosZ;
         PSMTXConcat(cameraMtx, shadowMtx, shadowMtx);
         GXLoadPosMtxImm(shadowMtx, 0);
-        magentaColor = 0x00FF00FF;
-        GXSetChanMatColor(GX_COLOR0A0, *reinterpret_cast<_GXColor*>(&magentaColor));
+        _GXColor magentaColor;
+        magentaColor.r = 0;
+        magentaColor.g = 0xFF;
+        magentaColor.b = 0;
+        magentaColor.a = 0xFF;
+        GXSetChanMatColor(GX_COLOR0A0, magentaColor);
         Graphic.DrawSphere();
     }
 }

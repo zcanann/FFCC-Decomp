@@ -1454,7 +1454,7 @@ void CGObject::update()
         } else if (m_worldParamA == 0x24 || m_worldParamB == 0x125) {
             const float cameraYaw = CameraPcs.m_yaw;
             srt.m_rot.y = sQuarterTurn - cameraYaw;
-            srt.m_rot.y += cosf(sBgAttrNormal * m_radiusCtrl.y);
+            srt.m_rot.y += sBgAttrNormal * cosf(sBgAttrNormal * m_radiusCtrl.y);
             srt.m_trans.y += sAnimFrameOffset + sinf(m_radiusCtrl.y);
             m_radiusCtrl.y += 0.125f;
         }

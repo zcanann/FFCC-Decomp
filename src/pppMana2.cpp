@@ -1573,6 +1573,7 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
         PSMTXConcat(mtx, rotMtx, mtx);
 
         offset.z = LoadFloat(kMana2Zero);
+        offset.y = LoadFloat(kMana2Zero);
         offset.x = LoadFloat(kMana2Zero);
         offset.y = stepData->m_waterScale;
         PSMTXMultVec(mtx, &offset, &offset);

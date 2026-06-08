@@ -648,7 +648,7 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 	case 0: {
 		unsigned char* obj = reinterpret_cast<unsigned char*>(m_objBase);
 		for (int i = 0; i < 40; i++) {
-			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active == 0) {
 				count++;
 			}
 			obj += 0x50;
@@ -658,7 +658,7 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 	case 1: {
 		unsigned char* obj = reinterpret_cast<unsigned char*>(m_objQuad);
 		for (int i = 0; i < 24; i++) {
-			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active == 0) {
 				count++;
 			}
 			obj += 0xAC;
@@ -668,7 +668,7 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 	case 2: {
 		unsigned char* obj = reinterpret_cast<unsigned char*>(m_obj);
 		for (int i = 0; i < 56; i++) {
-			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active == 0) {
 				count++;
 			}
 			obj += 0x518;
@@ -678,7 +678,7 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 	case 3: {
 		CGPartyObj* obj = reinterpret_cast<CGPartyObj*>(m_objParty);
 		for (int i = 0; i < kFlatPartyObjCount; i++, obj++) {
-			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active == 0) {
 				count++;
 			}
 		}
@@ -687,7 +687,7 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 	case 4: {
 		CGMonObj* obj = reinterpret_cast<CGMonObj*>(m_objMon);
 		for (int i = 0; i < kFlatMonObjCount; i++, obj++) {
-			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active == 0) {
 				count++;
 			}
 		}
@@ -696,7 +696,7 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 	case 5: {
 		unsigned char* obj = reinterpret_cast<unsigned char*>(m_objItem);
 		for (int i = 0; i < 32; i++) {
-			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active == 0) {
 				count++;
 			}
 			obj += 0x57C;
@@ -723,7 +723,7 @@ CGObject* CFlatRuntime2::getFreeObject(int classType)
 	case 0: {
 		unsigned char* obj = reinterpret_cast<unsigned char*>(m_objBase);
 		for (int i = 0; i < 0x28; i++) {
-			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active == 0) {
 				return reinterpret_cast<CGObject*>(&m_objBase[i]);
 			}
 			obj += 0x50;
@@ -733,7 +733,7 @@ CGObject* CFlatRuntime2::getFreeObject(int classType)
 	case 1: {
 		unsigned char* obj = reinterpret_cast<unsigned char*>(m_objQuad);
 		for (int i = 0; i < 0x18; i++) {
-			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active == 0) {
 				return reinterpret_cast<CGObject*>(&m_objQuad[i]);
 			}
 			obj += 0xAC;
@@ -743,7 +743,7 @@ CGObject* CFlatRuntime2::getFreeObject(int classType)
 	case 2: {
 		unsigned char* obj = reinterpret_cast<unsigned char*>(m_obj);
 		for (int i = 0; i < 0x38; i++) {
-			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active == 0) {
 				return &m_obj[i];
 			}
 			obj += 0x518;
@@ -753,7 +753,7 @@ CGObject* CFlatRuntime2::getFreeObject(int classType)
 	case 3: {
 		unsigned char* obj = reinterpret_cast<unsigned char*>(m_objParty);
 		for (int i = 0; i < 4; i++) {
-			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active == 0) {
 				return reinterpret_cast<CGObject*>(&m_objParty[i]);
 			}
 			obj += 0x6F8;
@@ -763,7 +763,7 @@ CGObject* CFlatRuntime2::getFreeObject(int classType)
 	case 4: {
 		unsigned char* obj = reinterpret_cast<unsigned char*>(m_objMon);
 		for (int i = 0; i < 0x40; i++) {
-			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active == 0) {
 				return reinterpret_cast<CGObject*>(&m_objMon[i]);
 			}
 			obj += 0x740;
@@ -773,7 +773,7 @@ CGObject* CFlatRuntime2::getFreeObject(int classType)
 	case 5: {
 		unsigned char* obj = reinterpret_cast<unsigned char*>(m_objItem);
 		for (int i = 0; i < 0x20; i++) {
-			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active == 0) {
 				return reinterpret_cast<CGObject*>(&m_objItem[i]);
 			}
 			obj += 0x57C;
@@ -828,14 +828,14 @@ void* CFlatRuntime2::intToClass(int classId)
  */
 int CFlatRuntime2::Frame(int arg0, int mode)
 {
-	CStopWatch watch((char*)-1);
+	CStopWatch watch("no name");
 
 	if (mode == 0) {
 		StaticFrame__10CGCharaObjFv();
 		CGPartyObj::CheckGameOver();
-		reinterpret_cast<CFlatRuntime*>(this)->Frame(arg0, mode);
+		reinterpret_cast<CFlatRuntime*>(this)->CFlatRuntime::Frame(arg0, mode);
 
-		CFlatRuntime::CObject* const root = FlatObjectRoot(this);
+		CFlatRuntime::CObject* const root = FlatObjectRoot(&CFlat);
 		for (CGBaseObj* obj = FindNextGBaseObjByCidMask(this, root->m_next->m_next, 5); obj != 0;
 			 obj = FindNextGBaseObjByCidMask(this, reinterpret_cast<CFlatRuntime::CObject*>(obj)->m_next, 5)) {
 			obj->Frame();
@@ -1521,8 +1521,8 @@ void CFlatRuntime2::Draw()
 			PSVECNormalize(&dir, &dir);
 
 			const float dot = PSVECDotProduct(&worldUp, &dir);
-			if (dot < 0.9999f) {
-				if (dot >= -0.9999f) {
+			if (dot < FLOAT_80330188) {
+				if (dot >= FLOAT_8033018C) {
 					Vec axis;
 					PSVECCrossProduct(&dir, &worldUp, &axis);
 					PSMTXRotAxisRad(orientMtx, &axis, -acosf(dot));
@@ -1540,7 +1540,7 @@ void CFlatRuntime2::Draw()
 			const float radius = entry->m_radius;
 			GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, 0x20);
 			for (int j = 0; j < 8; j++) {
-				const float angle = static_cast<float>(j) * 0.7853982f;
+				const float angle = static_cast<float>(j) * FLOAT_80330190;
 				ringVerts[j][0] = radius * sinf(angle);
 				ringVerts[j][1] = radius * cosf(angle);
 				ringVerts[j][2] = length;
@@ -2497,7 +2497,7 @@ void CFlatRuntime2::resetChangeScript()
 	m_workAssignIndex = 0;
 	m_partyAssignIndex = 0;
 	m_cameraScriptTargetMode = 0;
-	m_gameFlags = (m_gameFlags & 0x7F) | 0x80;
+	m_gameFlagBits.m_flagBit7 = 1;
 	m_gameFlagBits.m_flagBit5 = 0;
 	m_gameFlagBits.m_flagBit4 = 0;
 	m_bossState = 0;

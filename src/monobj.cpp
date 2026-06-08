@@ -391,7 +391,8 @@ static inline void CGMonObj_SetAttackAfter(CGMonObj* monObj, int attackKind)
 			clampedRange = range;
 		}
 
-		monObj->m_attackDelay = delay + Math.Rand(clampedRange);
+		delay += Math.Rand(clampedRange);
+		monObj->m_attackDelay = delay;
 		reinterpret_cast<CGPrgObj*>(monObj)->changeStat(0x11, 0, 0);
 	} else {
 		reinterpret_cast<CGPrgObj*>(monObj)->changeStat(0, 0, 0);

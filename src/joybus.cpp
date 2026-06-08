@@ -617,22 +617,45 @@ void JoyBus::ThreadMain(void* arg)
 
     threadParam->m_gbaStatus = GBAReset(threadParam->m_portIndex, &threadParam->m_unk3);
 
-    ThreadSleep((OS_BUS_CLOCK / 4000) * 0xF);
-    stateStartTime = OSGetTime();
+    ThreadSleep(OSMillisecondsToTicks(15));
 
+recompute_timeout:
+    {
+        int s = (unsigned int)threadParam->m_state;
+
+        if (s == 5 || s == 900)
+        {
+            stateTimeoutTicks = OSMillisecondsToTicks(500);
+        }
+        else if (s > 2 && s < 5)
+        {
+            stateTimeoutTicks = OSMillisecondsToTicks(500);
+        }
+        else if (s == 2)
+        {
+            stateTimeoutTicks = OSMillisecondsToTicks(2000);
+        }
+        else
+        {
+            stateTimeoutTicks = OSMillisecondsToTicks(1000);
+        }
+    }
+
+    stateStartTime = OSGetTime();
+    goto loop_body;
+
+sleep_retry:
+    ThreadSleep(OSMillisecondsToTicks(15));
+
+loop_body:
     for (;;)
     {
-        unsigned int diskError = File.IsDiskError();
-
-        if (diskError != 0)
+        if (File.IsDiskError() != 0)
         {
             threadParam->m_state = (unsigned char)0x86;
             ResetQueue(threadParam);
             ClrRecvBuffer(threadParam->m_portIndex);
-
-            ThreadSleep((OS_BUS_CLOCK / 4000) * 0xF);
-            stateStartTime = OSGetTime();
-            continue;
+            goto sleep_retry;
         }
 
         if (threadParam != &m_threadParams[threadParam->m_portIndex])
@@ -665,62 +688,11 @@ void JoyBus::ThreadMain(void* arg)
             OSExitThread(&gJoyBusThreadExitValue);
         }
 
-        {
-            int s = (unsigned int)threadParam->m_state;
-
-            if (s == 5 || s == 900)
-            {
-                stateTimeoutTicks = (OS_BUS_CLOCK / 4000) * 500;
-            }
-            else if (s > 2 && s < 5)
-            {
-                stateTimeoutTicks = (OS_BUS_CLOCK / 4000) * 500;
-            }
-            else if (s == 2)
-            {
-                stateTimeoutTicks = (OS_BUS_CLOCK / 4000) * 2000;
-            }
-            else
-            {
-                stateTimeoutTicks = (OS_BUS_CLOCK / 4000) * 1000;
-            }
-        }
-
-        {
-            unsigned long long now = OSGetTime();
-            unsigned int elapsed = (unsigned int)(now - stateStartTime);
-
-            if (elapsed > stateTimeoutTicks)
-            {
-                threadParam->m_prevState = threadParam->m_state;
-
-                if (threadParam->m_gbaStatus == 3)
-                {
-                    threadParam->m_state = (unsigned char)0x86;
-                }
-                else
-                {
-                    threadParam->m_gbaStatus = 1;
-                    threadParam->m_state = (unsigned char)0x85;
-                }
-
-                stateStartTime = OSGetTime();
-                ThreadSleep((OS_BUS_CLOCK / 4000) * 0xF);
-                continue;
-            }
-        }
-
-        if (threadParam->m_skipProcessingFlag != 0)
-        {
-            threadParam->m_skipProcessingFlag = 0;
-        }
-
         if (GbaQue.IsSingleMode(threadParam->m_portIndex) && threadParam->m_portIndex != 1)
         {
             threadParam->m_state = 0;
-            ThreadSleep((OS_BUS_CLOCK / 4000) * 0xF);
             stateStartTime = OSGetTime();
-            continue;
+            goto sleep_retry;
         }
 
         padType = SIProbe(threadParam->m_portIndex);
@@ -754,6 +726,33 @@ void JoyBus::ThreadMain(void* arg)
         // TODO: unsigned int statusIndex = (single != 0 && threadParam->m_portIndex != 1) ? 0 : (unsigned int)threadParam->m_portIndex;
         // TODO: int* padPtr = (int*)(&Game.field_0xc5c0 + statusIndex * 4);
         // TODO: gamePadState = *padPtr;
+
+        {
+            unsigned long long now = OSGetTime();
+            unsigned int elapsed = (unsigned int)(now - stateStartTime);
+
+            if (elapsed > stateTimeoutTicks)
+            {
+                threadParam->m_prevState = threadParam->m_state;
+
+                if (threadParam->m_gbaStatus == 3)
+                {
+                    threadParam->m_state = (unsigned char)0x86;
+                }
+                else
+                {
+                    threadParam->m_gbaStatus = 1;
+                    threadParam->m_state = (unsigned char)0x85;
+                }
+
+                goto recompute_timeout;
+            }
+        }
+
+        if (threadParam->m_skipProcessingFlag != 0)
+        {
+            threadParam->m_skipProcessingFlag = 0;
+        }
 
         unsigned int state = (unsigned int)threadParam->m_state;
 
@@ -811,7 +810,7 @@ void JoyBus::ThreadMain(void* arg)
 
                 threadParam->m_timestamp = OSGetTick();
 
-                ThreadSleep((OS_BUS_CLOCK / 4000) * 0xF);
+                ThreadSleep(OSMillisecondsToTicks(15));
                 stateStartTime = OSGetTime();
             }
             else if (threadParam->m_gbaStatus == 3)
@@ -821,7 +820,7 @@ void JoyBus::ThreadMain(void* arg)
                 {
                     threadParam->m_state    = 2;
                     threadParam->m_subState = 0;
-                    ThreadSleep((OS_BUS_CLOCK / 4000) * 0xF);
+                    ThreadSleep(OSMillisecondsToTicks(15));
                     stateStartTime = OSGetTime();
                 }
                 else
@@ -849,7 +848,7 @@ void JoyBus::ThreadMain(void* arg)
             }
             else if (result == 2)
             {
-                ThreadSleep((OS_BUS_CLOCK / 4000) * 0xF);
+                ThreadSleep(OSMillisecondsToTicks(15));
             }
 
             break;
@@ -868,7 +867,7 @@ void JoyBus::ThreadMain(void* arg)
                 threadParam->m_state    = 2;
                 threadParam->m_subState = 0;
 
-                ThreadSleep((OS_BUS_CLOCK / 4000) * 0xF);
+                ThreadSleep(OSMillisecondsToTicks(15));
                 stateStartTime = OSGetTime();
             }
 
@@ -1478,7 +1477,7 @@ void JoyBus::ThreadMain(void* arg)
             if (threadParam->m_skipProcessingFlag == 0 && dataRes == 1)
             {
                 threadParam->m_state = 6;
-                ThreadSleep(OS_BUS_CLOCK / 4000);
+                ThreadSleep(OSMillisecondsToTicks(1));
                 stateStartTime = OSGetTime();
             }
 
@@ -1899,8 +1898,7 @@ void JoyBus::ThreadMain(void* arg)
         }
         }
 
-        ThreadSleep((OS_BUS_CLOCK / 4000) * 0xF);
-        stateStartTime = OSGetTime();
+        goto recompute_timeout;
     }
 }
 

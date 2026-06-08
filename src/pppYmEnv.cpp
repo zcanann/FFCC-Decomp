@@ -596,7 +596,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
     }
 
     node = &model->m_nodes[skNodeIndex];
-    modelTime = model->m_curFrame;
+    modelTime = model->m_time;
     if (model->m_anim != 0) {
         animFrameCount = model->m_anim->m_frameCount;
     } else {

@@ -518,11 +518,11 @@ void CGObject::move()
         } else if (m_weaponNodeFlagAll.m_bits1.m_bit10) {
             PSVECNormalize(&moveVec, &moveVec);
             PSVECScale(&moveVec, &moveVec, static_cast<float>(m_moveTimer));
-        } else if (!(moveMag < static_cast<double>(m_moveTimer))) {
+        } else if (moveMag < static_cast<double>(m_moveTimer)) {
+            scriptMoveEnd = 1;
+        } else {
             PSVECNormalize(&moveVec, &moveVec);
             PSVECScale(&moveVec, &moveVec, static_cast<float>(m_moveTimer));
-        } else {
-            scriptMoveEnd = 1;
         }
 
         m_turnFrames -= 1;
@@ -541,13 +541,11 @@ void CGObject::move()
         movingWithScript = true;
     } else {
         const s8 player = m_animStateMisc;
-        const bool canReadPad = (static_cast<char>(player) >= 0)
+        if ((static_cast<char>(player) >= 0)
             && (static_cast<char>(player) < 4)
             && m_weaponNodeFlagAll.m_bits1.m_shield
             && m_weaponNodeFlagAll.m_bits1.m_menuReady
-            && ((Game.m_gameWork.m_menuStageMode == 0) || (player == 0));
-
-        if (canReadPad) {
+            && ((Game.m_gameWork.m_menuStageMode == 0) || (player == 0))) {
             u16 buttons = (Pad.m_debugPadLock != 0 || (player == 0 && Pad.m_debugPadPort != -1))
                 ? 0
                 : Pad.GetPadInputs()[RemapPadSlot(&Pad, player)].button[0];
@@ -887,7 +885,7 @@ void CGObject::bgCollision()
     m_stateFlags0Bits.unk1 = 0;
 
     *reinterpret_cast<int*>(&m_radiusCtrl.x) = 0;
-    m_gravityY = sBgDefaultGravityY;
+    m_gravityY = sZeroFloat;
 
     bgAttribCollision();
 
@@ -2215,19 +2213,19 @@ CGObject* CGObject::CCClass(int useBodyRadius, int classMask, float yOffset, Vec
             continue;
         }
         if (!(other->m_worldPosition.x - maxDist <= origin.x) || !(other->m_worldPosition.y - maxDist <= origin.y)
-            || !(other->m_worldPosition.z - maxDist <= origin.z) || !(origin.x <= other->m_worldPosition.x + maxDist)
-            || !(origin.y <= other->m_worldPosition.y + maxDist) || !(origin.z <= other->m_worldPosition.z + maxDist)) {
+            || !(other->m_worldPosition.z - maxDist <= origin.z) || !(other->m_worldPosition.x + maxDist >= origin.x)
+            || !(other->m_worldPosition.y + maxDist >= origin.y) || !(other->m_worldPosition.z + maxDist >= origin.z)) {
             continue;
         }
 
         PSVECSubtract(&other->m_worldPosition, &origin, &toOther);
-        const double dist = static_cast<double>(PSVECMag(&toOther));
-        if ((static_cast<double>(sZeroFloat) < dist) && (dist < maxDist)) {
+        const float dist = PSVECMag(&toOther);
+        if ((sZeroFloat < dist) && (dist < maxDist)) {
             double extraAngle = static_cast<double>(sZeroFloat);
             if (useBodyRadius != 0) {
-                extraAngle = static_cast<double>(static_cast<float>(atan(static_cast<double>(other->m_bodyEllipsoidRadius) / maxDist)));
+                extraAngle = static_cast<double>(static_cast<float>(atan(static_cast<double>(other->m_bodyEllipsoidRadius / maxDist))));
             }
-            PSVECScale(&toOther, &toOther, static_cast<float>(sAnimFrameOffset / dist));
+            PSVECScale(&toOther, &toOther, sAnimFrameOffset / dist);
             const double angle = static_cast<double>(static_cast<float>(acos(static_cast<double>(PSVECDotProduct(&toOther, &targetDir)))));
             if ((angle < maxAngle + extraAngle) && (dist < bestDist)) {
                 best = other;
@@ -2599,10 +2597,7 @@ void CGObject::Turn(float targetRot, int turnFrames)
         Math.DstRot(m_rotBaseY, m_rotTargetY) / static_cast<float>(turnFrames);
     *reinterpret_cast<int*>(&m_attackColliders[0].m_localStart.x) = turnFrames;
 
-    int animSlot = 2;
-    if (m_turnBaseSpeed >= sZeroFloat) {
-        animSlot = 3;
-    }
+    const int animSlot = (m_turnBaseSpeed < sZeroFloat) ? 2 : 3;
 
     m_currentAnimSlot = m_animQueue[animSlot - 0x41];
     *(reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1) =
@@ -2782,10 +2777,9 @@ void CGObject::LoadWeapon(int itemId, int itemVariant)
         m_weaponModelHandle = new (Game.m_mainStage, const_cast<char*>(s_gobject_cpp), 0xA11) CCharaPcs::CHandle;
         m_weaponModelHandle->Add();
 
-        unsigned long textureVariant = 0;
-        if (m_ownerType == 0) {
-            textureVariant = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2);
-        }
+        const unsigned long textureVariant = (m_ownerType == 0)
+            ? *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2)
+            : 0;
 
         m_weaponModelHandle->LoadModel(
             4, static_cast<unsigned long>(itemId), static_cast<unsigned long>(itemVariant), textureVariant, -1, 0, 1);
@@ -2814,10 +2808,9 @@ void CGObject::LoadShield(int itemId)
         m_shieldModelHandle = new (Game.m_mainStage, const_cast<char*>(s_gobject_cpp), 0xA23) CCharaPcs::CHandle;
         m_shieldModelHandle->Add();
 
-        unsigned long textureVariant = 0;
-        if (m_ownerType == 0) {
-            textureVariant = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2);
-        }
+        const unsigned long textureVariant = (m_ownerType == 0)
+            ? *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2)
+            : 0;
 
         m_shieldModelHandle->LoadModel(4, static_cast<unsigned long>(itemId), 0, textureVariant, -1, 0, 1);
         m_shieldAttachNodeIndex =
@@ -2894,11 +2887,14 @@ int CGObject::IsLoopAnim(int mode)
     const float lastAttr = m_lastBgAttr;
 
     if (static_cast<double>(lastAttr) < static_cast<double>(sZeroFloat)) {
-        return (threshold <= static_cast<double>(sZeroFloat)) ? 1 : 0;
+        return (static_cast<u32>(static_cast<u8>(
+                    (threshold <= static_cast<double>(sZeroFloat)) << 1))
+                << 0x1C)
+               >> 0x1D;
     }
 
     const double diff = static_cast<double>(span - sAnimFrameOffset);
-    return (diff < threshold) ? 1 : 0;
+    return (static_cast<u32>(static_cast<u8>((diff < threshold) << 3)) << 0x1C) >> 0x1F;
 }
 
 /*
@@ -2961,19 +2957,20 @@ int CGObject::IsAnimFinished(int mode)
                                 threshold = static_cast<double>(static_cast<float>(threshold + sLoopBias));
                             }
 
-                            if (static_cast<double>(m_lastBgAttr)
-                                >= static_cast<double>(sZeroFloat)) {
-                                result =
-                                    (static_cast<u32>(static_cast<u8>(
-                                         (static_cast<double>(animSpan - sAnimFrameOffset) < threshold) << 3))
-                                     << 0x1C)
-                                    >> 0x1F;
-                            } else {
+                            const float lastAttr = m_lastBgAttr;
+                            if (static_cast<double>(lastAttr)
+                                < static_cast<double>(sZeroFloat)) {
                                 result =
                                     (static_cast<u32>(static_cast<u8>(
                                          (threshold <= static_cast<double>(sZeroFloat)) << 1))
                                      << 0x1C)
                                     >> 0x1D;
+                            } else {
+                                result =
+                                    (static_cast<u32>(static_cast<u8>(
+                                         (static_cast<double>(animSpan - sAnimFrameOffset) < threshold) << 3))
+                                     << 0x1C)
+                                    >> 0x1F;
                             }
                         }
                     }
@@ -3260,7 +3257,9 @@ void CGObject::CalcSphereNearPos(float scale, float angleOffset, Vec& outPos)
     Vec offset;
     Mtx rotationMtx;
 
-    up = DAT_801D9B94;
+    *reinterpret_cast<int*>(&up.x) = *reinterpret_cast<const int*>(&DAT_801D9B94.x);
+    *reinterpret_cast<int*>(&up.y) = *reinterpret_cast<const int*>(&DAT_801D9B94.y);
+    *reinterpret_cast<int*>(&up.z) = *reinterpret_cast<const int*>(&DAT_801D9B94.z);
 
     PSVECNormalize(&m_worldPosition, &normal);
     PSVECCrossProduct(&normal, &up, &bitangent);

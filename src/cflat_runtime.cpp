@@ -899,7 +899,7 @@ int CFlatRuntime::SystemCall(CFlatRuntime::CObject* objectParam, int systemKind,
 	}
 
 	u8* func = 0;
-	const s16 classIndex = object->m_activeClassIndex;
+	const int classIndex = object->m_activeClassIndex;
 	if ((classIndex >= 0)
 	    && (((systemKind == 2) || (systemKind == 3)) && (systemIndex >= 0))) {
 		u8* const classes = reinterpret_cast<u8*>(m_classes) + (classIndex * 0x22C) + 0x24;

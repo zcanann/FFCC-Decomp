@@ -935,11 +935,7 @@ int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder&
     const f32 radius = cyl.m_radius;
     const f32 radiusSq = radius * radius;
 
-    if (fabs(vz) < 1.0f) {
-        goto cylinder_body;
-    }
-
-    {
+    if (fabs(vz) >= 1.0f) {
         f32 disc = radiusSq - px * px - py * py;
         if (disc < 0.0f) {
             return 0;

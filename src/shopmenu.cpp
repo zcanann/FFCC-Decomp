@@ -1637,7 +1637,7 @@ void CShopMenu::DrawItemList()
         y += 0x1C;
     }
 
-    int pulseFrame = System.m_frameCounter % 0x14;
+    int pulseFrame = static_cast<int>(System.m_frameCounter) % 0x14;
     int pulse = pulseFrame - 10;
     if (pulse < 0) {
         pulse = -pulse;
@@ -1992,7 +1992,7 @@ void CShopMenu::Draw()
     float fade = m_fade;
     if (FLOAT_80332d28 != fade) {
         int fadeStep = static_cast<int>(FLOAT_80332de0 * fade);
-        unsigned char alpha = static_cast<unsigned char>(0xFF - (fadeStep & 0xFF));
+        unsigned char alpha = static_cast<unsigned char>(0xFF - fadeStep);
 
         Graphic.SetDrawDoneDebugData(0x32);
 
@@ -2384,7 +2384,7 @@ void CShopMenu::DrawShop0()
     font->SetScale(FLOAT_80332d28);
 
     entry = s_shopMenuTopMenuEntries;
-    for (unsigned int i = 0; i < 3; i++, entry++) {
+    for (int i = 0; i < 3; i++, entry++) {
         s_currentShopMenuTopMenuEntry = entry;
         Graphic.SetDrawDoneDebugData(0x23);
         float entryY = static_cast<float>(s_currentShopMenuTopMenuEntry->y - 0x0B);
@@ -2415,7 +2415,7 @@ void CShopMenu::DrawShop0()
 #pragma opt_strength_reduction off
 void CShopMenu::SelectMake()
 {
-    bool canSelect = static_cast<unsigned char>(MenuPcs.ChkEquipPossible(m_resultItem)) &&
+    int canSelect = static_cast<unsigned char>(MenuPcs.ChkEquipPossible(m_resultItem)) &&
                      (m_caravanWork->m_gil >= CalcShopMenuMakeGil(this, getItemNo(m_selectedIndex)));
 
     int selected = getItemNo(m_selectedIndex);

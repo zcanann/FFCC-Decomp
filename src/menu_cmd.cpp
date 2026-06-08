@@ -958,8 +958,8 @@ void CMenuPcs::CmdDraw()
 {
 	u8* self = reinterpret_cast<u8*>(this);
 	s32 i;
-	s32 helpId = -1;
 	bool hasItemHelp = false;
+	s32 helpId = -1;
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -1155,8 +1155,8 @@ void CMenuPcs::CmdDraw()
 							}
 
 							if (canUse == 0) {
-								rowTex = 0x34;
 								rowAlpha = kCmdMenuHalfD * row->alpha;
+								rowTex = 0x34;
 							}
 						} else {
 							s32 itemIdx = sel - 2;
@@ -1170,7 +1170,8 @@ void CMenuPcs::CmdDraw()
 							}
 
 							if (static_cast<u8>(equippable) != 0) {
-								if (itemIdx + 2 < itemCount) {
+								int __p8 = itemIdx;
+								if (__p8 + 2 < itemCount) {
 									const float markX = rowX - kCmdMenuTwelve;
 									const float markY = (rowH - kCmdMenuTwentyFour) *
 									                        static_cast<float>(kCmdMenuHalfD) +
@@ -1375,7 +1376,8 @@ void CMenuPcs::CmdDraw()
 				cursorOnUnite = true;
 			}
 			cursorX = static_cast<float>(cursorEntry->x - 0x14);
-			if (cursorOnUnite) {
+			int __p9 = cursorOnUnite;
+			if (__p9) {
 				cursorY = static_cast<float>(cursorEntry->y) +
 				          (static_cast<float>(cursorEntry->height - 0x20) * static_cast<float>(kCmdMenuHalfD));
 			} else {
@@ -1486,7 +1488,8 @@ unsigned int CMenuPcs::CmdCtrlCur()
 	}
 
 	blocked = false;
-	if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
+	int __p13 = padLock;
+	if ((__p13 != 0) || (Pad.m_debugPadPort != -1)) {
 		blocked = true;
 	}
 	if (blocked) {
@@ -1627,7 +1630,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 				}
 			} else {
 				int selected = static_cast<int>(GetCmdStateView(this)->scrollTop) + static_cast<int>(GetCmdStateView(this)->itemSelected);
-				if (itemCount <= selected) {
+				if (selected >= itemCount) {
 					selected -= itemCount;
 				}
 
@@ -2235,7 +2238,7 @@ void CMenuPcs::DrawUniteList()
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	s_unitePanelCount = 0;
-	bool active = false;
+	bool active =  (0 + false);
 	for (s32 i = 0; i < 8; i++) {
 		if (i == cmd->selected) {
 			active = true;
@@ -2429,7 +2432,7 @@ void CMenuPcs::DrawUniteList()
 	font->DrawInit();
 	font->SetTlut(6);
 
-	for (s32 i = 0; i < s_unitePanelCount; i++) {
+	for (s32 i =  (int)(long)(0); i < s_unitePanelCount; i++) {
 		CmdListEntry* const panel = &unitePanels[i];
 		const float alpha = (cmd->mode == 3) ? kCmdMenuOne : panel->alpha;
 		font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(kCmdMenuAlphaMax * alpha)).color);

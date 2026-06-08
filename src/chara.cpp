@@ -1796,13 +1796,13 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 			Mtx scaleMtx;
 
 			Math.MTXGetScale(localMtx, &targetScale);
-			if (FLOAT_803301E4 <= targetScale.x) {
+			if (targetScale.x < FLOAT_803301E4) {
+				targetScale.y = FLOAT_803301E8;
+				targetScale.z = FLOAT_803301E8;
+			} else {
 				PSVECScale(&NodePreviousScale(node), &positionScaleA, FLOAT_803301BC - alpha);
 				PSVECScale(&targetScale, &positionScaleB, alpha);
 				PSVECAdd(&positionScaleA, &positionScaleB, &targetScale);
-			} else {
-				targetScale.y = FLOAT_803301E8;
-				targetScale.z = FLOAT_803301E8;
 			}
 			PSVECScale(&NodePreviousPosition(node), &positionScaleA, FLOAT_803301BC - alpha);
 			PSVECScale(&targetPos, &positionScaleB, alpha);

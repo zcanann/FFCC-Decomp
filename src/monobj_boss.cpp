@@ -270,7 +270,6 @@ void CGMonObj::frameStatFuncGiantCrab()
 	u8* self = (u8*)this;
 	int state = *(int*)(self + 0x520);
 
-	if (state >= 100 && state < 0x69) {
 	if (state == 100) {
 		if (*(int*)(self + 0x528) == 0) {
 			int soundStep = *(int*)(CGMonObj::m_boss + 0x4);
@@ -324,11 +323,9 @@ void CGMonObj::frameStatFuncGiantCrab()
 			int targetIdx = *(int*)(self + 0x6c4);
 			if (targetIdx >= 0) {
 				u8* target = (u8*)Game.m_partyObjArr[targetIdx];
-				if (target != 0) {
-					*(float*)(self + 0x1b4) = (float)atan2(
-					    (double)(*(float*)(target + 0x15c) - *(float*)(self + 0x15c)),
-					    (double)(*(float*)(target + 0x164) - *(float*)(self + 0x164)));
-				}
+				*(float*)(self + 0x1b4) = (float)atan2(
+				    (double)(*(float*)(target + 0x15c) - *(float*)(self + 0x15c)),
+				    (double)(*(float*)(target + 0x164) - *(float*)(self + 0x164)));
 			}
 		}
 
@@ -336,16 +333,20 @@ void CGMonObj::frameStatFuncGiantCrab()
 			reinterpret_cast<CGPrgObj*>(self)->changeStat(0, 0, 0);
 			*(u32*)(self + 0x1c0) |= 0x80002;
 		}
-	} else {
+	} else if (state >= 100 && state < 0x69) {
 		if (*(int*)(self + 0x528) == 0) {
-			float turnOffset = kMonObjBossPi;
-			int animId = 1;
+			float turnOffset;
+			int animId;
 			if (state == 0x67) {
 				turnOffset = kMonObjBossHalfPi;
 				animId = 0x12;
 			} else if (state < 0x67) {
 				if (state == 0x65) {
 					turnOffset = kMonObjBossZero;
+					animId = 1;
+				} else if (state > 100) {
+					turnOffset = kMonObjBossPi;
+					animId = 1;
 				}
 			} else if (state < 0x69) {
 				turnOffset = kMonObjBossThreeHalfPi;
@@ -364,11 +365,9 @@ void CGMonObj::frameStatFuncGiantCrab()
 			int targetIdx = *(int*)(self + 0x6c4);
 			if (targetIdx >= 0) {
 				u8* target = (u8*)Game.m_partyObjArr[targetIdx];
-				if (target != 0) {
-					*(float*)(self + 0x1b4) = (float)atan2(
-					    (double)(*(float*)(target + 0x15c) - *(float*)(self + 0x15c)),
-					    (double)(*(float*)(target + 0x164) - *(float*)(self + 0x164)));
-				}
+				*(float*)(self + 0x1b4) = (float)atan2(
+				    (double)(*(float*)(target + 0x15c) - *(float*)(self + 0x15c)),
+				    (double)(*(float*)(target + 0x164) - *(float*)(self + 0x164)));
 			}
 
 			int action = reinterpret_cast<int>(reinterpret_cast<CGObject*>(self)->m_scriptHandle[4]);
@@ -386,7 +385,6 @@ void CGMonObj::frameStatFuncGiantCrab()
 		if (*(int*)(self + 0x528) == 0x19) {
 			reinterpret_cast<CGPrgObj*>(self)->changeStat(0, 0, 0);
 		}
-	}
 	}
 }
 

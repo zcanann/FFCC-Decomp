@@ -2173,7 +2173,12 @@ void CGPartyObj::statCharge()
 			playSe3D(m_comboItemState + 0x7EB, 0x32, 0x96, 0, 0);
 		}
 
-		int phase = (m_comboItemState == -1) ? m_subFrame : (m_subFrame - 0x10);
+		int phase;
+		if (m_comboItemState != -1) {
+			phase = m_subFrame - 0x10;
+		} else {
+			phase = m_subFrame;
+		}
 		int itemType =
 		    *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 10) & 0xFF;
 

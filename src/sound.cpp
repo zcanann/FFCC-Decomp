@@ -33,6 +33,7 @@ extern const double kSoundU32ToDoubleBias = 4503599627370496.0;
 extern const float kLineBoundsInitMin = 10000000.0f;
 extern const double kLineBoundsHalf = 0.5;
 extern const float kVectorFive;
+extern const float kVectorOne;
 extern const char sSoundNoFreeWaveWarn[] =
     "\x82\xb1\x82\xea\x88\xc8\x8f\xe3noFreeWaev\x82\xf0\x92\xc7\x89\xc1\x82\xc5"
     "\x82\xab\x82\xdc\x82\xb9\x82\xf1\x81\x42\n";
@@ -126,14 +127,8 @@ CLine<PointCount>::CLine()
 
 int CLine<10>::Calc(Vec* outPos, float* outDistance, u32* outIndex, float* outT, Vec* queryPos, float maxDistance)
 {
-    const float zero = kLineSegmentMinT;
-    const bool infiniteRange = (zero == maxDistance);
-    float bestDistance;
-    if (infiniteRange) {
-        bestDistance = kLineBoundsInitMin;
-    } else {
-        bestDistance = maxDistance;
-    }
+    const int infiniteRange = (kLineSegmentMinT == maxDistance);
+    float bestDistance = infiniteRange ? kLineBoundsInitMin : maxDistance;
     const float maxDistanceSq = maxDistance * maxDistance;
     int found = 0;
     u32 bestIndex = 0;
@@ -163,20 +158,19 @@ int CLine<10>::Calc(Vec* outPos, float* outDistance, u32* outIndex, float* outT,
                     bestDistance = distance;
                     bestPos = candidatePosition;
                     bestIndex = i;
-                    bestT = kLineSegmentMaxT;
+                    bestT = kVectorOne;
                     found = 1;
                 }
             }
         }
 
-        CLineSegment& segment = segments[i];
-        const float dotQuery = PSVECDotProduct(queryPos, &segment.delta);
-        const float dotStart = PSVECDotProduct(&points[i], &segment.delta);
-        const float t = (-dotStart + dotQuery) / (segment.length * segment.length);
-        if (((t >= kLineSegmentMinT) && (t <= kLineSegmentMaxT)) || infiniteRange) {
-            Vec projected;
+        const float dotQuery = PSVECDotProduct(queryPos, &segments[i].delta);
+        const float dotStart = PSVECDotProduct(&points[i], &segments[i].delta);
+        const float t = (-dotStart + dotQuery) / (segments[i].length * segments[i].length);
+        if (((t >= kLineSegmentMinT) && (t <= kVectorOne)) || infiniteRange) {
             Vec scaled;
-            PSVECScale(&segment.delta, &scaled, t);
+            Vec projected;
+            PSVECScale(&segments[i].delta, &scaled, t);
             PSVECAdd(&points[i], &scaled, &projected);
             const float distance = PSVECDistance(queryPos, &projected);
             if (distance < bestDistance) {
@@ -906,11 +900,12 @@ void CSound::loadWaveFrame()
         u32& streamHalf = sound.m_streamHalf;
 
         if (streamState == 0) {
-            int playPoint[2];
-            m_redSound.GetStreamPlayPoint(streamID, &playPoint[0], &playPoint[1]);
-            playPoint[0] = static_cast<int>(static_cast<unsigned int>(playPoint[0]) >> 16);
+            int playPoint0;
+            int playPoint1;
+            m_redSound.GetStreamPlayPoint(streamID, &playPoint0, &playPoint1);
+            playPoint0 = static_cast<int>(static_cast<unsigned int>(playPoint0) >> 16);
 
-            if (streamHalf != static_cast<unsigned int>(playPoint[0])) {
+            if (static_cast<int>(streamHalf) != playPoint0) {
                 int readSize = 0x10000;
                 if (streamRemain < readSize) {
                     readSize = streamRemain;
@@ -923,7 +918,7 @@ void CSound::loadWaveFrame()
 
                     streamOffset += readSize;
                     streamRemain -= readSize;
-                    streamHalf = static_cast<unsigned int>(playPoint[0]);
+                    streamHalf = static_cast<unsigned int>(playPoint0);
                     streamState = 1;
                 }
             }
@@ -1406,20 +1401,19 @@ void CSound::StopAndFreeAllSe(int clearMode)
 int CSound::PlaySe(int seNo, int pan, int volume, int fadeFrames)
 {
     int seId;
-    CRedSound* redSound = &m_redSound;
 
     if (seNo < 0) {
         System.Printf(const_cast<char*>(s_soundMinusOneFmt));
         return -1;
     } else if (seNo < 4000) {
-        seId = redSound->SePlay(seNo / 1000, seNo % 1000, pan, volume & ~((-fadeFrames | fadeFrames) >> 0x1F), 0);
+        seId = m_redSound.SePlay(seNo / 1000, seNo % 1000, pan, volume & ~((-fadeFrames | fadeFrames) >> 0x1F), 0);
         if (fadeFrames != 0) {
-            redSound->SeVolume(seId, volume, fadeFrames);
+            m_redSound.SeVolume(seId, volume, fadeFrames);
         }
     } else {
-        seId = redSound->SePlay(-1, seNo, pan, volume & ~((-fadeFrames | fadeFrames) >> 0x1F), 0);
+        seId = m_redSound.SePlay(-1, seNo, pan, volume & ~((-fadeFrames | fadeFrames) >> 0x1F), 0);
         if (fadeFrames != 0) {
-            redSound->SeVolume(seId, volume, fadeFrames);
+            m_redSound.SeVolume(seId, volume, fadeFrames);
         }
     }
 

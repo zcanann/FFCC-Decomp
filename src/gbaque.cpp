@@ -1328,10 +1328,10 @@ void GbaQueue::LoadPlayerStat()
 	}
 
 	outOfShoukiMask = 0;
-	if (reinterpret_cast<unsigned int*>(&CFlat)[0x1041] != 0) {
+	if (reinterpret_cast<int*>(&CFlat)[0x1041] != 0) {
 		unsigned char* entry = localPlayerStat;
 		for (i = 0; i < 4; i++) {
-			unsigned char menuStageMode = static_cast<unsigned char>(m_singleMode);
+			char menuStageMode = m_singleMode;
 			CGPartyObj* partyObj;
 			CCaravanWork* caravanWork;
 

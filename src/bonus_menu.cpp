@@ -26,6 +26,7 @@ extern const float FLOAT_80331ED0;
 extern const float FLOAT_80331F6C;
 extern const float kBonusZClearWidth;
 extern const float kBonusZClearHeight;
+extern char lbl_801DD510[];
 extern const float s_BonusModelYPos[];
 extern const float s_BonusModelScale[];
 
@@ -1091,6 +1092,11 @@ void CMenuPcs::CalcSelectCloseAnim()
  * JP Address: TODO
  * JP Size: TODO
  */
+// CalcSelectWait / CalcSelectOpenAnim anchor on &lbl_801DD510 and reach the
+// bonus model arrays via fixed offsets (matching the target's pooled-base
+// addressing).
+#define s_BonusModelYPos ((const float*)(lbl_801DD510 + 0x4C))
+#define s_BonusModelScale ((const float*)(lbl_801DD510 + 0x5C))
 void CMenuPcs::CalcSelectWait()
 {
 	int activePartyCount = s_Rinfo->m_partyCount;
@@ -1987,6 +1993,8 @@ void CMenuPcs::DrawResultCloseAnim()
 	}
 	DrawInit();
 }
+#undef s_BonusModelYPos
+#undef s_BonusModelScale
 
 /*
  * --INFO--

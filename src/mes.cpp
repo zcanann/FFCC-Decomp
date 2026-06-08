@@ -510,7 +510,6 @@ int CMes::useFlag(int maxCount, int stopOnClear)
 			*slot = *slot + 1;
 			break;
 		}
-		case 3:
 		case 4:
 			if ((mFlagVars[flagEntry->m_index] == 0) && (stopOnClear == 0))
 			{

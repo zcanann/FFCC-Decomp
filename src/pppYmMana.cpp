@@ -736,7 +736,7 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
     }
     mana->m_manaAlpha = MaterialMan.GetManaAlpha();
 
-    if (*(s32*)pppYmMana != 0) {
+    if (reinterpret_cast<_pppPObject*>(pppYmMana)->m_graphId != 0) {
         return;
     }
 
@@ -1593,7 +1593,7 @@ static void CalcWaterReflectionVector(
     zero = LoadFloat(kPppYmMoveParabolaZero);
     half = LoadFloat(kYmManaHalf);
 
-    for (i = 0; i < count; i++) {
+    for (i = 0; i < count;) {
         PSVECSubtract(positionIt, &transformedCameraPos, &reflected);
         C_VECReflect(&reflected, normalIt, reflectionIt);
         PSMTXMultVec(matrixNoTranslate, reflectionIt, reflectionIt);
@@ -1624,6 +1624,7 @@ static void CalcWaterReflectionVector(
         reflectionIt++;
         normalIt++;
         colorBytes += 4;
+        i++;
         *texCoordFloat = *texCoordFloat * half;
         *texCoordFloat = *texCoordFloat + half;
         texCoordFloat[1] = texCoordFloat[1] * half;
@@ -1677,7 +1678,7 @@ void CalcReflectionVector2(
     Mtx workMtx;
     u16* dl = (u16*)displayList;
     const float zero = kPppYmMoveParabolaZero;
-    const float denomBias = kYmManaReflectionDenomBias;
+    const float denomBias = kYmManaOne;
     const float half = kYmManaHalf;
     const float warp = kYmManaReflectionUvWarp;
     const float scale = kYmManaReflectionUvWarpScale;
@@ -1773,8 +1774,8 @@ void CalcReflectionVector2(
             uv.y *= half;
             uv.x += half;
             uv.y += half;
-            uv.x = -(scale * (warp * (uv.x - half)) - uv.x);
-            uv.y = -(scale * (warp * (uv.y - half)) - uv.y);
+            uv.x = uv.x - scale * (warp * (uv.x - half));
+            uv.y = uv.y - scale * (warp * (uv.y - half));
             gUtil.ConvF2IVector2d(texCoordB[posIndex], uv, 12);
         }
     }

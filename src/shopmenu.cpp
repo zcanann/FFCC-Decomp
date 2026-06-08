@@ -2412,6 +2412,7 @@ void CShopMenu::DrawShop0()
  */
 #pragma push
 #pragma opt_common_subs off
+#pragma opt_strength_reduction off
 void CShopMenu::SelectMake()
 {
     bool canSelect = MenuPcs.ChkEquipPossible(m_resultItem) &&

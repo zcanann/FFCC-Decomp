@@ -2282,9 +2282,9 @@ void CGMonObj::logicFuncRamoe()
 	int activeCount = 0;
 	int nextState = -1;
 
-	unsigned int* scriptWork = &Game.m_scriptWork[0][0][1];
+	unsigned int* scriptWork = reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&Game) + 4);
 	for (int i = 0; i < 0x3F; i++, scriptWork++) {
-		CGPrgObj* monObj = reinterpret_cast<CGPrgObj*>(*scriptWork);
+		CGPrgObj* monObj = reinterpret_cast<CGPrgObj*>(scriptWork[0xC5D0 / 4]);
 		if (monObj != 0 && (monObj->m_lastStateId != 9 || monObj->m_subState != 2)) {
 			activeCount++;
 		}
@@ -2345,11 +2345,12 @@ void CGMonObj::cancelStatFuncRamoe()
 void CGMonObj::frameStatFuncRamoe()
 {
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	if (prgObj->m_lastStateId == 100) {
+	switch (prgObj->m_lastStateId) {
+	case 100:
 		if (prgObj->m_stateFrame == 0x3A) {
-			unsigned int* scriptWork = &Game.m_scriptWork[0][0][1];
+			unsigned int* scriptWork = reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&Game) + 4);
 			for (int i = 1; i < 0x40; i++, scriptWork++) {
-				CGMonObj* monObj = reinterpret_cast<CGMonObj*>(*scriptWork);
+				CGMonObj* monObj = reinterpret_cast<CGMonObj*>(scriptWork[0xC5D0 / 4]);
 				CGPrgObj* monPrg = reinterpret_cast<CGPrgObj*>(monObj);
 				if (monObj != 0 && monPrg->m_lastStateId == 9 && monPrg->m_subState == 2) {
 					monObj->setRepop(0);
@@ -2357,6 +2358,7 @@ void CGMonObj::frameStatFuncRamoe()
 			}
 		}
 		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+		break;
 	}
 }
 

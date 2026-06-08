@@ -699,7 +699,8 @@ int CMenuPcs::EquipClose()
 		if (0 < (int)n) {
 			unsigned int blocks = n >> 3;
 			if (blocks != 0) {
-				do {
+				unsigned int b;
+				for (b = 0; b < blocks; b++) {
 					item[0].startFrame = 0;
 					item[0].duration = 1;
 					item[0].alpha = fVar1;
@@ -725,8 +726,7 @@ int CMenuPcs::EquipClose()
 					item[7].duration = 1;
 					item[7].alpha = fVar1;
 					item += 8;
-					blocks = blocks - 1;
-				} while (blocks != 0);
+				}
 				n = n & 7;
 				if (n == 0) {
 					return 1;

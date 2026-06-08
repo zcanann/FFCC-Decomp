@@ -3755,7 +3755,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
         return 0;
     }
 
-    if ((unsigned int)gbaStatus < 0)
+    if ((int)gbaStatus < 0)
     {
         return -1;
     }
@@ -3785,7 +3785,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
 
     OSSignalSemaphore(&m_accessSemaphores[port]);
 
-    const signed char cmd = static_cast<unsigned char>(localWord & 0x3F);
+    const unsigned char cmd = static_cast<unsigned char>(localWord & 0x3F);
     const unsigned char seq = static_cast<signed char>((localWord >> 8) & 0xFF);
 
     if (cmd == 7)

@@ -857,8 +857,6 @@ static void OpenMogHintMessage(int messageId)
 void CChara::InitFurTexBuffer()
 {
 	MogFurState& fur = MogFur();
-	MogFurState& charaFur = Chara.MogFur();
-	unsigned char* texels = reinterpret_cast<unsigned char*>(charaFur.m_texels);
 	int rowCount = 0;
 	int row = 0;
 	do {
@@ -866,16 +864,17 @@ void CChara::InitFurTexBuffer()
 		int byteOffset = row << 1;
 		int count = 8;
 		do {
+			unsigned short* texels = Chara.MogFur().m_texels;
 			int idxBase = inner + row;
-			*reinterpret_cast<unsigned short*>(texels + byteOffset) = 0x7FFF;
+			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(texels) + byteOffset) = 0x7FFF;
 			byteOffset += 0x10;
-			*reinterpret_cast<unsigned short*>(texels + idxBase * 2 + 2) = 0x7FFF;
-			*reinterpret_cast<unsigned short*>(texels + idxBase * 2 + 4) = 0x7FFF;
-			*reinterpret_cast<unsigned short*>(texels + idxBase * 2 + 6) = 0x7FFF;
-			*reinterpret_cast<unsigned short*>(texels + idxBase * 2 + 8) = 0x7FFF;
-			*reinterpret_cast<unsigned short*>(texels + idxBase * 2 + 10) = 0x7FFF;
-			*reinterpret_cast<unsigned short*>(texels + idxBase * 2 + 12) = 0x7FFF;
-			*reinterpret_cast<unsigned short*>(texels + idxBase * 2 + 14) = 0x7FFF;
+			texels[idxBase + 1] = 0x7FFF;
+			texels[idxBase + 2] = 0x7FFF;
+			texels[idxBase + 3] = 0x7FFF;
+			texels[idxBase + 4] = 0x7FFF;
+			texels[idxBase + 5] = 0x7FFF;
+			texels[idxBase + 6] = 0x7FFF;
+			texels[idxBase + 7] = 0x7FFF;
 			inner += 8;
 			count--;
 		} while (count != 0);
@@ -884,7 +883,7 @@ void CChara::InitFurTexBuffer()
 	} while (rowCount < 0x40);
 
 	fur.m_dirty = 0;
-	charaFur.m_timestamp = System.m_frameCounter;
+	Chara.MogFur().m_timestamp = System.m_frameCounter;
 	memset(fur.m_score, 0, 0x40);
 	CalcMogScore();
 }
@@ -1399,15 +1398,15 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 
 	float furStep = ModelFurStep(this);
 	float furDepth = kCharaFurDepthZero;
-	Vec modelPos;
+	CVector modelPos;
+	CVector viewPos;
 	modelPos.x = ModelDrawMtx(this)[0][3];
 	modelPos.y = ModelDrawMtx(this)[1][3];
 	modelPos.z = ModelDrawMtx(this)[2][3];
-	Vec viewPos;
-	PSMTXMultVec(viewMtx, &modelPos, &viewPos);
+	PSMTXMultVec(viewMtx, reinterpret_cast<Vec*>(&modelPos), reinterpret_cast<Vec*>(&viewPos));
 	if (viewPos.z < kCharaFurViewDepthThreshold) {
 		Vec4d clipPos;
-		Math.MTX44MultVec4(CameraPcs.m_screenMatrix, &viewPos, &clipPos);
+		Math.MTX44MultVec4(CameraPcs.m_screenMatrix, reinterpret_cast<Vec*>(&viewPos), &clipPos);
 		furDepth = -clipPos.z / clipPos.w;
 	}
 
@@ -1481,7 +1480,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 		CMaterial* shadowMaterials[2];
 		MtxPtr shadowMatrices[2];
 		if (shadowPass != 0) {
-			shadowCount = MaterialMan.GetCharaShadow(2, shadowMaterials, shadowMatrices, &modelPos, kCharaFurShadowRange, kCharaFurShadowFade, 0);
+			shadowCount = MaterialMan.GetCharaShadow(2, shadowMaterials, shadowMatrices, reinterpret_cast<Vec*>(&modelPos), kCharaFurShadowRange, kCharaFurShadowFade, 0);
 			for (int shadowIndex = 0; shadowIndex < shadowCount; shadowIndex++) {
 				TextureMan.SetTexture(static_cast<GXTexMapID>(shadowIndex + 3), shadowMaterials[shadowIndex]->GetFurTexture(0));
 
@@ -1838,8 +1837,8 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 {
 	int dy;
 
-	CColor defaultColor(0x0f, 0x0f, 0x0f, 0);
-	*centerAfter = defaultColor.color;
+	_GXColor defaultColor = CColor(0x0f, 0x0f, 0x0f, 0).color;
+	*centerAfter = defaultColor;
 	*centerBefore = *centerAfter;
 
 	int texelCountBytes = width * height * 2;
@@ -1877,7 +1876,8 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 			a = (packed >> 12) & 0x07;
 
 			if (distance == 0) {
-				*centerBefore = CColor((unsigned char)r, (unsigned char)g, (unsigned char)b, (unsigned char)a).color;
+				_GXColor beforeColor = CColor((unsigned char)r, (unsigned char)g, (unsigned char)b, (unsigned char)a).color;
+				*centerBefore = beforeColor;
 			}
 
 			if (mode != 0) {
@@ -1917,7 +1917,8 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 			*(unsigned short*)(((char*)pixels) + tileIndex) = (unsigned short)((b & 0x0f) | ((g & 0x0f) << 4) | ((r & 0x0f) << 8) | ((a & 0x07) << 12));
 
 			if (distance == 0) {
-				*centerAfter = CColor((unsigned char)r, (unsigned char)g, (unsigned char)b, (unsigned char)a).color;
+				_GXColor afterColor = CColor((unsigned char)r, (unsigned char)g, (unsigned char)b, (unsigned char)a).color;
+				*centerAfter = afterColor;
 			}
 		}
 	}

@@ -22,6 +22,8 @@ extern float kMesHalf;
 // PAL map: CMes::m_tempVar in mes.o, .bss size 0x50.
 int CMes::m_tempVar[0x14];
 
+extern char lbl_801D9E58[];
+
 static const char s_mesTagUnknown[] = "Not corresponding TAG is used. %02x\n";
 static const char s_mesTagMissing[] = "This TAG is not created. %02x\n";
 static const char s_mesNumFmt[] = "%d";
@@ -1218,7 +1220,7 @@ void CMes::addString(char** text, int branchMode)
 			{
 				if (System.m_execParam != 0)
 				{
-					System.Printf(const_cast<char*>(s_mesTagUnknown), uch + 0xA0);
+					System.Printf(lbl_801D9E58);
 				}
 			}
 			else if (value == 0x7F)

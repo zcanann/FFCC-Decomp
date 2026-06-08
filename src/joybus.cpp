@@ -2568,7 +2568,7 @@ int JoyBus::RecvGBA(ThreadParam* threadParam, unsigned int* recvBuffer)
 
     bool isSingle = GbaQue.IsSingleMode(threadParam->m_portIndex);
 
-    if (isSingle && threadParam->m_portIndex != 1)
+    if (isSingle && (int)threadParam->m_portIndex != 1)
     {
         threadParam->m_gbaStatus = 0;
     }
@@ -2577,7 +2577,7 @@ int JoyBus::RecvGBA(ThreadParam* threadParam, unsigned int* recvBuffer)
         threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
     }
 
-    if (threadParam->m_gbaStatus != 0)
+    if ((int)threadParam->m_gbaStatus != 0)
     {
         return -1;
     }
@@ -2596,28 +2596,28 @@ int JoyBus::RecvGBA(ThreadParam* threadParam, unsigned int* recvBuffer)
 
     threadParam->m_gbaStatus = GBARead(threadParam->m_portIndex, (unsigned char*)&data, &threadParam->m_unk3);
 
-    if (threadParam->m_gbaStatus != 0)
+    if ((int)threadParam->m_gbaStatus != 0)
     {
         return -1;
     }
 
     *recvBuffer = data;
 
-    unsigned char op = data & 0x3F;
+    unsigned char* dataBytes = reinterpret_cast<unsigned char*>(&data);
+    unsigned char op = dataBytes[0] & 0x3F;
 
-    if (op == 4)
+    if ((int)op == 4)
     {
         SetPadData(threadParam, (unsigned char*)&data);
         return 1;
     }
-    else if (op == 0x0E)
+    else if ((int)op == 0x0E)
     {
-        unsigned char b1 = (data >> 8) & 0xFF;
-        unsigned char b2 = (data >> 16) & 0xFF;
+        unsigned char b1 = dataBytes[1];
 
         if (b1 == 0)
         {
-            m_stateCodeArr[threadParam->m_portIndex] = b2;
+            m_stateCodeArr[threadParam->m_portIndex] = dataBytes[2];
             m_stateFlagArr[threadParam->m_portIndex] = 1;
             return 1;
         }

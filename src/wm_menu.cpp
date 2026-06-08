@@ -7329,7 +7329,7 @@ void CMenuPcs::SplitPlace2(const char* text, char* left, char* right, CFont*, in
 void CMenuPcs::CalcWMFrame()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmWorldState* const worldState = m_wmWorldState;
+#define worldState m_wmWorldState
 	short sVar3 = worldState->m_mainState;
 	if (sVar3 == 0) {
 		return;
@@ -7651,6 +7651,7 @@ LAB_calc:
 			    *reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_frameData) + 8) + 1;
 		}
 	}
+#undef worldState
 }
 
 /*

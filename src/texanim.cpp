@@ -9,7 +9,6 @@
 #include <math.h>
 #include "dolphin/mtx.h"
 
-static const char s_texanim_cpp[] = "texanim.cpp";
 extern const float kTexAnimZero = 0.0f;
 extern const float kTexAnimOne = 1.0f;
 extern const double kTexAnimIntToDoubleBias = 4503599627370496.0;

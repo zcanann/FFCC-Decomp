@@ -470,13 +470,13 @@ void CPartMng::pppDumpMngSt()
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     PppPdtSlot* pdtSlots = m_pdtSlots;
 
-    if (System.m_execParam != 0) {
+    if (static_cast<unsigned int>(System.m_execParam) >= 1U) {
         System.Printf(const_cast<char*>(sPartMngDumpSeparator));
     }
 
     PppMngStDumpRaw* mng = reinterpret_cast<PppMngStDumpRaw*>(self + 0x2A18);
     for (int i = 0; i < 0x180; i++) {
-        if (mng->m_baseTime != -0x1000 && System.m_execParam != 0) {
+        if (mng->m_baseTime != -0x1000 && static_cast<unsigned int>(System.m_execParam) >= 1U) {
             int kind = static_cast<int>(mng->m_kind);
             int heapGroup = (mng->m_heapGroupRef + 0x2D) / 0x158;
             int heapSize = ppvEnv->m_stagePtr->heapWalker(0, 0, static_cast<unsigned long>(heapGroup));
@@ -492,7 +492,7 @@ void CPartMng::pppDumpMngSt()
 
     ppvEnv->m_stagePtr->heapInfo(heapTotal, heapUse, heapFree);
 
-    if (System.m_execParam != 0) {
+    if (static_cast<unsigned int>(System.m_execParam) >= 1U) {
         System.Printf(
             const_cast<char*>(sPartMngHeapSummaryFmt),
             static_cast<int>(heapTotal >> 10), static_cast<int>(heapUse >> 10),
@@ -1563,23 +1563,25 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
 
         if (res->m_textureSet == 0) {
             res->m_textureSet = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x447) CTextureSet;
-            res->m_textureSet->m_textureArray.SetDefaultSize(0x180);
-            res->m_textureSet->m_textureArray.SetGrow(0);
+            CTextureSet* textureSet = res->m_textureSet;
+            textureSet->m_textureArray.SetDefaultSize(0x180);
+            textureSet->m_textureArray.SetGrow(0);
         }
 
         if (res->m_materialSet == 0) {
             res->m_materialSet = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x44B) CMaterialSet;
-            res->m_materialSet->m_materials.SetDefaultSize(0x180);
-            res->m_materialSet->m_materials.SetGrow(0);
+            CMaterialSet* materialSet = res->m_materialSet;
+            materialSet->m_materials.SetDefaultSize(0x180);
+            materialSet->m_materials.SetGrow(0);
             m_pppEnvSt.m_materialSetPtr = res->m_materialSet;
 
             CMaterial* defaultMaterial = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x44E) CMaterial;
             defaultMaterial->Create(0, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0));
             *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(defaultMaterial) + 0x24) |= 1;
-            if (res->m_materialSet->m_materials.GetSize() < 1) {
-                res->m_materialSet->m_materials.Add(defaultMaterial);
+            if (materialSet->m_materials.GetSize() == 0) {
+                materialSet->m_materials.Add(defaultMaterial);
             } else {
-                res->m_materialSet->m_materials.SetAt(0, defaultMaterial);
+                materialSet->m_materials.SetAt(0, defaultMaterial);
             }
         }
         return;
@@ -2893,7 +2895,7 @@ void CPartMng::pppDumpCacheIdx()
             mng->m_spawnedCount += *reinterpret_cast<int*>(&mng->m_envColorR);
             gPppInSubFrameCalc = 0;
 
-            while (mng->m_spawnedCount > 0xFFF) {
+            while (mng->m_spawnedCount >= 0x1000) {
                 _pppCalcPart(reinterpret_cast<_pppMngSt*>(mng));
                 _pppDeadPart(reinterpret_cast<_pppMngSt*>(mng));
                 if (mng->m_isFinished != 0) {
@@ -4182,7 +4184,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     }
 
     int freeIdx = mng - reinterpret_cast<PppMngStCreateRaw*>(self + 0x2A18);
-    if (System.m_execParam != 0) {
+    if (static_cast<unsigned int>(System.m_execParam) >= 1U) {
         System.Printf(const_cast<char*>(sPppCreateLogFmt), pdtSlotIndex, fpNo, freeIdx,
                       slot->m_name);
     }

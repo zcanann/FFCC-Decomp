@@ -261,13 +261,13 @@ void CFlatRuntime::Create(void* filePtr)
 				break;
 
 			case 'VAL ': {
-				const int variableCount = chunk.m_arg0;
-				*reinterpret_cast<int*>(self + 0x24) = variableCount;
+				*reinterpret_cast<int*>(self + 0x24) = chunk.m_arg0;
 				*reinterpret_cast<u8**>(self + 0x28) =
 				    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x96)
-				        u8[variableCount << 2];
+				        u8[*reinterpret_cast<int*>(self + 0x24) << 2];
 
 				u8* variableDef = *reinterpret_cast<u8**>(self + 0x28);
+				const int variableCount = *reinterpret_cast<int*>(self + 0x24);
 				for (int i = 0; i < variableCount; i++) {
 					variableDef[0] = chunkFile.Get1();
 					variableDef[1] = chunkFile.Get1();

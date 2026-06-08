@@ -1600,11 +1600,11 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		return;
 	}
 
-	if (nearDist < 0.0f) {
-		nearDist = 0.0f;
+	if (nearDist < kGraphicZeroF) {
+		nearDist = kGraphicZeroF;
 	}
-	if (nearDist > 1.0f) {
-		nearDist = 1.0f;
+	if (nearDist > kGraphicOneF) {
+		nearDist = kGraphicOneF;
 	}
 	if (farDist < nearDist) {
 		farDist = nearDist;
@@ -1621,9 +1621,9 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 
 	cameraPos.x = CameraWorldX();
 	cameraPos.z = CameraWorldZ();
-	cameraPos.y = 0.0f;
+	cameraPos.y = kGraphicZeroF;
 
-	targetPos.y = 0.0f;
+	targetPos.y = kGraphicZeroF;
 	PSVECSubtract(&targetPos, &cameraPos, &cameraToTarget);
 
 	GXGetProjectionv(gxProjection);
@@ -1675,8 +1675,8 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 	}
 
 	gUtil.SetVtxFmt_POS_CLR_TEX();
-	CreateSmallBackTexture(m_scratchTextureBuffer, &smallBackTex, 0x140, 0xE0, GX_NEAR, GX_TF_RGBA8, 0);
-	GetBackBufferRect2(m_scratchTextureBuffer, &backBufferTex, 0, 0, 0x280, 0x1C0, texBufferSize, GX_NEAR,
+	Graphic.CreateSmallBackTexture(Graphic.m_scratchTextureBuffer, &smallBackTex, 0x140, 0xE0, GX_NEAR, GX_TF_RGBA8, 0);
+	Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backBufferTex, 0, 0, 0x280, 0x1C0, texBufferSize, GX_NEAR,
 	                   (_GXTexFmt)0x11, 0);
 	gUtil.SetVtxFmt_POS_CLR_TEX0_TEX1();
 	gUtil.SetOrthoEnv();

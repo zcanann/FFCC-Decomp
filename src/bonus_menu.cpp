@@ -1701,9 +1701,9 @@ void CMenuPcs::CalcSelectOpenAnim()
 	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 
-	*(short*)(statePtr + 0x22) = *(short*)(statePtr + 0x22) + 1;
+	*(short*)(statePtr + 0x22) = *(unsigned short*)(statePtr + 0x22) + 1;
 	int frame = (int)*(short*)(statePtr + 0x22);
-	int doneCount = 0;
+	unsigned int doneCount = 0;
 
 	int off = 0;
 	for (int i = 0; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++, off += 0x40) {
@@ -1772,7 +1772,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 	CCharaPcs::CHandle** displaySlots = GetBonusDisplayHandleSlots(this);
 	int partyByteOff = 0;
 	for (int i = 0; i < activePartyCount + 8; i++, partyByteOff += sizeof(BonusPartySummary)) {
-		BonusAnimSprite* iconSprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + ((int)(signed char)s_PlayerTop + i) * 0x40 + 8);
+		BonusAnimSprite* iconSprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + ((int)(unsigned char)s_PlayerTop + i) * 0x40 + 8);
 		CCharaPcs::CHandle* handle;
 		int tribeId;
 		if (i < activePartyCount) {

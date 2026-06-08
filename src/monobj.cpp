@@ -3961,8 +3961,8 @@ void CGMonObj::statMove(int* targetIndex)
 				int randVal = Math.Rand(3);
 				unsigned char* script = reinterpret_cast<unsigned char*>(scriptHandle[9]);
 				prgObj->playSe3D(
-					*reinterpret_cast<unsigned short*>(script + 0x192) +
-						*reinterpret_cast<unsigned short*>(script + 0x190) * 1000 + randVal,
+					*reinterpret_cast<unsigned short*>(script + 0x190) * 1000 + randVal +
+						*reinterpret_cast<unsigned short*>(script + 0x192),
 					0x32, 0x96, 0, reinterpret_cast<Vec*>(NULL));
 				monObj->m_unk6B8 = 1;
 			}

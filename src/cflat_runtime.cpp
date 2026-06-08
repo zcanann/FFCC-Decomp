@@ -944,7 +944,7 @@ int CFlatRuntime::SystemCall(CFlatRuntime::CObject* objectParam, int systemKind,
 		}
 	} else {
 		u8* searchFunc = m_funcs;
-		int funcCount = m_funcCount;
+		unsigned int funcCount = m_funcCount;
 
 		for (; funcCount > 0; funcCount--, searchFunc += 0x50) {
 			if ((*reinterpret_cast<int*>(searchFunc + 0x40) == systemKind)
@@ -963,7 +963,7 @@ int CFlatRuntime::SystemCall(CFlatRuntime::CObject* objectParam, int systemKind,
 	if (argCount > 0) {
 		u8* const objectBytes = reinterpret_cast<u8*>(object);
 		if (argCount > 8) {
-			unsigned int batchCount = (static_cast<unsigned int>(argCount) - 1) >> 3;
+			unsigned int batchCount = (static_cast<int>(argCount) - 1) >> 3;
 			int byteOffset = 0;
 			CStack* batchArgs = args;
 

@@ -1255,7 +1255,7 @@ void VECLerp(Vec* a, Vec* b, Vec* out, float t)
 extern "C" void SetDiffuse__9CCharaPcsFiUlP8_GXColorP3Vec(
     CCharaPcs* chara, int lightIndex, unsigned long lightSet, _GXColor* color, Vec* direction)
 {
-    char* colorBase = (char*)chara + lightIndex * 0xC + lightSet * 4;
+    char* colorBase = (char*)chara + lightSet * 4 + lightIndex * 0xC;
     colorBase[0xF0] = color->r;
     colorBase[0xF1] = color->g;
     colorBase[0xF2] = color->b;

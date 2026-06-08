@@ -1975,7 +1975,7 @@ int CMapMng::ReadMpl(char* mapName)
         }
 
         if (filePtr == 0) {
-            if (System.m_execParam != 0) {
+            if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                 System.Printf(const_cast<char*>(s_mapReadErrorFmt), strTmp);
             }
             return 0;

@@ -438,7 +438,7 @@ void CMenuPcs::ItemDraw()
     }
 
     MenuItemOpenAnim* textEntry = listStart;
-    for (unsigned int i = 0; i < 8; i++, textEntry++) {
+    for (int i = 0; i < 8; i++, textEntry++) {
         int menuIndex = i + this->m_itemMenuState->scroll;
         if (menuIndex > 0x3F) {
             menuIndex -= 0x40;
@@ -450,7 +450,7 @@ void CMenuPcs::ItemDraw()
         s16 itemId = caravanWork->m_inventoryItems[menuIndex];
         if (itemId > 0) {
             const char* text = Game.m_cFlatDataArr[1].TableStrings(0)[itemId * 5 + 4];
-            int selectedIndex = this->m_itemMenuState->selectedIndex + this->m_itemMenuState->scroll;
+            unsigned int selectedIndex = this->m_itemMenuState->selectedIndex + this->m_itemMenuState->scroll;
             if (selectedIndex > 0x3F) {
                 selectedIndex -= 0x40;
             }

@@ -2211,7 +2211,7 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
                         (*reinterpret_cast<unsigned short*>(entry + 0x17D0) == CmakeState(this)->m_select) &&
                         (*reinterpret_cast<unsigned short*>(entry + 0x17D4) == CmakeState(this)->m_row) &&
                         (duplicateSlot = slot,
-                         *reinterpret_cast<short*>(entry + 0x17D2) == s_CmakeInfo.m_gender)) {
+                         *reinterpret_cast<unsigned short*>(entry + 0x17D2) == s_CmakeInfo.m_gender)) {
                         break;
                     }
                     ++slot;

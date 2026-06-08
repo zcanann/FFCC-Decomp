@@ -86,7 +86,7 @@ public:
     short m_mapHitCount;               // 0x0000A
     short m_mapObjCount;               // 0x0000C
     short m_mapMeshCount;              // 0x0000E
-    unsigned short m_shadowKeyInfoCount; // 0x00010
+    short m_shadowKeyInfoCount; // 0x00010
     unsigned char m_pad012[0x14 - 0x12];
     COctTree m_octTreeArray[16];       // 0x00014
     CMapHit m_mapHitArray[32];         // 0x004D4

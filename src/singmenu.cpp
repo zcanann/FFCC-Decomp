@@ -2851,7 +2851,7 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
         if (useDynamic == 0) {
             text = GetSingWinMessage(staticMessage.textIds[i], dynamicText, 0);
         }
-        if (strlen(text) != 0) {
+        if (static_cast<int>(strlen(text)) != 0) {
             char lineBuffer[128];
             strcpy(lineBuffer, text);
             font->SetPosX(x);

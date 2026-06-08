@@ -492,10 +492,12 @@ void CGame::Create()
         u32* dst = reinterpret_cast<u32*>(&m_nextScript);
         int count = sizeof(scriptName) / (sizeof(u32) * 2);
         do {
-            dst[1] = src[1];
+            u32 a = src[1];
+            u32 b = src[2];
             src += 2;
+            dst[1] = a;
+            dst[2] = b;
             dst += 2;
-            dst[0] = src[0];
         } while (--count != 0);
         m_newGameFlag = 1;
     }
@@ -736,7 +738,7 @@ void CGame::CheckScriptChange()
     int scriptResult = CFlatRuntime2Storage().Load(m_nextScript.m_name);
     strcpy(m_currentScriptName, m_nextScript.m_name);
 
-    if (m_nextScript.m_flags != 0) {
+    if ((int)m_nextScript.m_flags != 0) {
         System.Printf(const_cast<char*>(s_gameDebugMarker));
         System.Printf(const_cast<char*>(assetNameBlock + kNewGameInitMsg));
         System.Printf(const_cast<char*>(s_gameDebugMarker));
@@ -1067,9 +1069,8 @@ void CGame::LoadScript(char* scriptData)
 
     while (i < CFlatPermanentVarCount()) {
         if ((CFlatPermanentVarFlagByte(entryOffset) & 0x20) != 0) {
-            u32* src = reinterpret_cast<u32*>(scriptData + scriptOffset);
+            CFlatPermanentVarWord(entryOffset) = *reinterpret_cast<u32*>(scriptData + scriptOffset);
             scriptOffset += 4;
-            CFlatPermanentVarWord(entryOffset) = *src;
         }
 
         entryOffset += 4;
@@ -1233,7 +1234,10 @@ int CGame::GetBossArtifact(int ratioIndex, int amount)
     memset(thresholds, 0, 8);
 
     int stageIndex = (int)Game.m_gameWork.m_bossArtifactStageIndex;
-    CBossArtifactStage* stageArtifacts = &Game.m_bossArtifactBase[stageIndex];
+    int stageByteOffset = stageIndex * sizeof(CBossArtifactStage);
+    CBossArtifactStage* artifactBase = Game.m_bossArtifactBase;
+    CBossArtifactStage* stageArtifacts =
+        reinterpret_cast<CBossArtifactStage*>(reinterpret_cast<char*>(artifactBase) + stageByteOffset);
     int artifactRank = 3;
 
     thresholds[1] = stageArtifacts->m_rankThresholds[1];
@@ -1249,7 +1253,9 @@ int CGame::GetBossArtifact(int ratioIndex, int amount)
     int divisor = artifactRank + 1;
     int quotient = scaledAmount / divisor;
     stageBase += scaledAmount - quotient * divisor;
-    return reinterpret_cast<int>(&stageArtifacts->m_entries[stageBase]);
+    int entriesByteOffset = stageByteOffset + offsetof(CBossArtifactStage, m_entries);
+    return reinterpret_cast<int>(reinterpret_cast<char*>(artifactBase) +
+        (entriesByteOffset + stageBase * (int)sizeof(CBossArtifactEntry)));
 }
 
 /*

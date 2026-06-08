@@ -733,7 +733,7 @@ void CMiniGamePcs::GbaThreadMain(void* threadParam)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     unsigned char* param = reinterpret_cast<unsigned char*>(threadParam);
-    int message;
+    unsigned int message;
     unsigned int command;
     unsigned int command7;
     unsigned int command8;
@@ -766,12 +766,12 @@ receive_message:
             MiniGameThreadSleepTicks(OSMillisecondsToTicks(10));
         }
         MiniGameThreadSleepTicks(OSMillisecondsToTicks(10));
-        self[0x649D] |= static_cast<unsigned char>(1 << channel);
+        self[0x649D] |= (1 << channel);
         OSExitThread(0);
         return;
     }
 
-    if (message == 7 && *reinterpret_cast<int*>(param + 0x8C) == 0)
+    if (message == 7 && *reinterpret_cast<unsigned int*>(param + 0x8C) == 0)
     {
         message = 8;
     }

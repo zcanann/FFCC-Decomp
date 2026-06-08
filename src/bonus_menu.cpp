@@ -1876,7 +1876,11 @@ void CMenuPcs::DrawResultCloseAnim()
 					_GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
 					GXSetChanMatColor(GX_COLOR0A0, color);
 				} else {
-					_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(sprite->alpha * 255.0f)};
+					_GXColor color;
+					color.r = 0xFF;
+					color.g = 0xFF;
+					color.b = 0xFF;
+					color.a = (unsigned char)(sprite->alpha * 255.0f);
 					GXSetChanMatColor(GX_COLOR0A0, color);
 				}
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kind));

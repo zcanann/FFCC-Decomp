@@ -2660,7 +2660,7 @@ void CShopMenu::SelectItemIdx()
         int listType = m_listType;
         if (listType == 0) {
             if (m_selectedIndex != -1) {
-                canSelect = getItemNo(m_selectedIndex) >= 1;
+                canSelect = CanTradeShopMenuItem(this, m_selectedIndex, getItemNo(m_selectedIndex));
             }
             if (canSelect) {
                 CCaravanWork* caravanWork = m_caravanWork;

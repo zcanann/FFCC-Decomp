@@ -13493,6 +13493,8 @@ int McCtrl::Format(int unmountAfter)
 			}
 		}
 		break;
+	case 4:
+		break;
 	}
 
 	int result;

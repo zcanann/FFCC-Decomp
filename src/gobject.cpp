@@ -3296,7 +3296,6 @@ float CGObject::CalcSafePos(int hitMask, CGObject* other, Vec* outSafePos)
 {
     Vec centerPos;
     Vec hitMove;
-    CMapCylinder hitCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
     float safeDistance = sZeroFloat;
 
     centerPos.x = other->m_worldPosition.x;
@@ -3310,6 +3309,7 @@ float CGObject::CalcSafePos(int hitMask, CGObject* other, Vec* outSafePos)
     PSVECSubtract(&m_worldPosition, &centerPos, &hitMove);
     hitMove.y = sZeroFloat;
 
+    CMapCylinder hitCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
     hitCylinder.m_bottom = centerPos;
     hitCylinder.m_axis = hitMove;
     hitCylinder.m_radius = m_capsuleHalfHeight;

@@ -227,7 +227,7 @@ int CMenuPcs::MoneyCtrlCur()
 				if (s_Money < 1) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else {
-					if (-1 < attachFlag) {
+					if (attachFlag >= 0) {
 						LetterSetAttachItem(s_Money, 1);
 						Sound.PlaySe(2, 0x40, 0x7F, 0);
 						return 1;
@@ -246,7 +246,7 @@ int CMenuPcs::MoneyCtrlCur()
 					Sound.PlaySe(2, 0x40, 0x7F, 0);
 				}
 			} else if ((press & 0x200) != 0) {
-				if (-1 < attachFlag) {
+				if (attachFlag >= 0) {
 					LetterSetAttachItem(0, 0xFFFFFFFF);
 					Sound.PlaySe(3, 0x40, 0x7F, 0);
 					return 1;

@@ -3144,7 +3144,7 @@ void GbaQueue::CMakeFavorite(int channel, unsigned int value)
 		favBase[writeOffset] = static_cast<char>(valueBytes[3]);
 
 		if (*reinterpret_cast<short*>(obj + 0x2CB4 + channel * 0x20) >= 2) {
-			memcpy(&localInfo, &cmakeInfo[channel], sizeof(localInfo));
+			localInfo = cmakeInfo[channel];
 		}
 	}
 	OSSignalSemaphore(accessSemaphores + channel);

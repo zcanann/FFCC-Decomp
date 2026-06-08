@@ -604,7 +604,11 @@ CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int mode
 {
     const char* strBase = reinterpret_cast<const char*>(sHeapBarColors);
 
-    if ((mode != 1) || (OSGetConsoleSimulatedMemSize() == 0x3000000)) {
+    if ((mode == 1) && (OSGetConsoleSimulatedMemSize() != 0x3000000)) {
+        return (CMemory::CStage*)nullptr;
+    }
+
+    {
         unsigned int alignedSize = (size + 0x3F) & ~0x3FU;
         CMode& modeData = m_modes[mode];
         CStage* stage = modeData.m_freeList.m_next;

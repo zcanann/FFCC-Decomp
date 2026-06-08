@@ -452,7 +452,7 @@ void GbaQueue::ClrShopMode()
 		if (caravanWork->m_shopRequestState == 1) {
 			OSWaitSemaphore(accessSemaphores + i);
 			{
-				const unsigned char playerMask = static_cast<unsigned char>(1 << i);
+				const int playerMask = 1 << i;
 				m_shopFlags = static_cast<unsigned char>(m_shopFlags & ~playerMask);
 				m_shopStatusFlags = static_cast<unsigned char>(m_shopStatusFlags & ~playerMask);
 			}
@@ -463,13 +463,13 @@ void GbaQueue::ClrShopMode()
 					break;
 				}
 			}
-			caravanWork->CallShop(0, 0, 0, 0, 0);
+			reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->CallShop(0, 0, 0, 0, 0);
 		}
 
-		if (caravanWork->m_shopRequestState == 2) {
+		if (reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_shopRequestState == 2) {
 			OSWaitSemaphore(accessSemaphores + i);
 			{
-				const unsigned char shopMask = static_cast<unsigned char>(0x10 << i);
+				const int shopMask = 0x10 << i;
 				m_shopFlags = static_cast<unsigned char>(m_shopFlags & ~shopMask);
 				m_shopStatusFlags = static_cast<unsigned char>(m_shopStatusFlags & ~shopMask);
 			}
@@ -480,30 +480,30 @@ void GbaQueue::ClrShopMode()
 					break;
 				}
 			}
-			caravanWork->CallShop(1, 0, 0, 0, 0);
+			reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->CallShop(1, 0, 0, 0, 0);
 		}
 
-		if ((m_shopStatusFlags & (1 << i)) == 0) {
-			const unsigned char shopMask = static_cast<unsigned char>(0x10 << i);
+		if ((m_shopStatusFlags & (1 << i)) != 0) {
+			const int playerMask = 1 << i;
+			OSWaitSemaphore(accessSemaphores + i);
+			m_shopFlags = static_cast<unsigned char>(m_shopFlags | playerMask);
+			OSSignalSemaphore(accessSemaphores + i);
+			if (Joybus.SetMType(i, 2) != 0) {
+				m_shopStatusFlags = static_cast<unsigned char>(m_shopStatusFlags | playerMask);
+			} else {
+				m_shopStatusFlags = static_cast<unsigned char>(m_shopStatusFlags & ~playerMask);
+			}
+		} else {
+			const int shopMask = 0x10 << i;
 			if ((m_shopStatusFlags & shopMask) != 0) {
 				OSWaitSemaphore(accessSemaphores + i);
 				m_shopFlags = static_cast<unsigned char>(m_shopFlags | shopMask);
 				OSSignalSemaphore(accessSemaphores + i);
-				if (Joybus.SetMType(i, 3) == 0) {
-					m_shopStatusFlags = static_cast<unsigned char>(m_shopStatusFlags & ~shopMask);
-				} else {
+				if (Joybus.SetMType(i, 3) != 0) {
 					m_shopStatusFlags = static_cast<unsigned char>(m_shopStatusFlags | shopMask);
+				} else {
+					m_shopStatusFlags = static_cast<unsigned char>(m_shopStatusFlags & ~shopMask);
 				}
-			}
-		} else {
-			const unsigned char playerMask = static_cast<unsigned char>(1 << i);
-			OSWaitSemaphore(accessSemaphores + i);
-			m_shopFlags = static_cast<unsigned char>(m_shopFlags | playerMask);
-			OSSignalSemaphore(accessSemaphores + i);
-			if (Joybus.SetMType(i, 2) == 0) {
-				m_shopStatusFlags = static_cast<unsigned char>(m_shopStatusFlags & ~playerMask);
-			} else {
-				m_shopStatusFlags = static_cast<unsigned char>(m_shopStatusFlags | playerMask);
 			}
 		}
 	}

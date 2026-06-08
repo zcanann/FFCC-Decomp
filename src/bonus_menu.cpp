@@ -3481,17 +3481,21 @@ void CMenuPcs::createBonus()
 			s_Rinfo->m_party[activeCount].m_tribeId = (unsigned int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_tribeId;
 			activeCount++;
 
-			if (reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[0] > 0) {
-				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[0];
+			int treasure0 = (int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[0];
+			if (treasure0 > 0) {
+				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = (short)treasure0;
 			}
-			if (reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[1] > 0) {
-				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[1];
+			int treasure1 = (int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[1];
+			if (treasure1 > 0) {
+				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = (short)treasure1;
 			}
-			if (reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[2] > 0) {
-				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[2];
+			int treasure2 = (int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[2];
+			if (treasure2 > 0) {
+				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = (short)treasure2;
 			}
-			if (reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[3] > 0) {
-				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[3];
+			int treasure3 = (int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[3];
+			if (treasure3 > 0) {
+				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = (short)treasure3;
 			}
 		}
 

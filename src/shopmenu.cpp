@@ -1138,8 +1138,8 @@ void CShopMenu::DrawItemInfo0()
             canTrade = true;
         } else if (m_listType == 2) {
             canTrade = true;
-            if ((caravanWork->m_shopArgs[(itemNo - 0x191U) >> 5] &
-                 (1U << ((itemNo - 0x191U) & 0x1F))) == 0) {
+            if ((caravanWork->m_shopArgs[(itemNo - 0x191) >> 5] &
+                 (1U << ((itemNo - 0x191) & 0x1F))) == 0) {
                 canTrade = false;
             }
         } else if (m_listType == 1) {

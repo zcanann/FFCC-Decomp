@@ -581,12 +581,10 @@ int CFlatRuntime::Frame(int mode, int unused)
 				if (object->m_0x34 != 0) {
 					int bitBase = 0x1F;
 					unsigned int scriptMask;
-					int scanCount;
 
 					object->m_sp--;
 					scriptMask = static_cast<unsigned int>(static_cast<unsigned short>(object->m_0x34));
 					scriptIndex = bitBase;
-					(void)scanCount;
 
 					for (int frameScan = 0; frameScan < 4; frameScan++) {
 						for (int bit = 0; bit < 8; bit++) {
@@ -608,31 +606,19 @@ int CFlatRuntime::Frame(int mode, int unused)
 
 						scriptIndex = 0x1F;
 						scriptMask = static_cast<unsigned int>(static_cast<short>(object->m_0x34));
-						scanCount = 4;
 
-						do {
-							if (static_cast<int>(scriptMask) < 0) { break; }
-							scriptMask <<= 1; scriptIndex--;
-							if (static_cast<int>(scriptMask) < 0) { break; }
-							scriptMask <<= 1; scriptIndex--;
-							if (static_cast<int>(scriptMask) < 0) { break; }
-							scriptMask <<= 1; scriptIndex--;
-							if (static_cast<int>(scriptMask) < 0) { break; }
-							scriptMask <<= 1; scriptIndex--;
-							if (static_cast<int>(scriptMask) < 0) { break; }
-							scriptMask <<= 1; scriptIndex--;
-							if (static_cast<int>(scriptMask) < 0) { break; }
-							scriptMask <<= 1; scriptIndex--;
-							if (static_cast<int>(scriptMask) < 0) { break; }
-							scriptMask <<= 1; scriptIndex--;
-							if (static_cast<int>(scriptMask) < 0) { break; }
-							scriptMask <<= 1; scriptIndex--;
-							scanCount--;
-						} while (scanCount != 0);
-
-						if (scanCount == 0) {
-							scriptIndex = -1;
+						for (int frameScan2 = 0; frameScan2 < 4; frameScan2++) {
+							for (int bit = 0; bit < 8; bit++) {
+								if ((scriptMask & 0x80000000) != 0) {
+									goto frameFoundBit2;
+								}
+								scriptMask <<= 1;
+								scriptIndex--;
+							}
 						}
+
+						scriptIndex = -1;
+					frameFoundBit2:;
 					} while (scriptIndex >= 0);
 				}
 

@@ -772,8 +772,8 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 		return;
 	}
 
+	_GXColor color;
 	if (*(short*)(this->m_bonusStatePtr + 0x1c) != 4) {
-		_GXColor color;
 		color.r = 0xFF;
 		color.g = 0xFF;
 		color.b = 0xFF;
@@ -805,7 +805,6 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 			} else {
 				gray = 1.0f * 255.0f;
 			}
-			_GXColor color;
 			color.r = (unsigned char)gray;
 			color.g = (unsigned char)gray;
 			color.b = (unsigned char)gray;

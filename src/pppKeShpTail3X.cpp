@@ -141,6 +141,7 @@ void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, _pppCtrlTable* param_2)
 void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* step, _pppCtrlTable* param_3)
 {
     KeShpTail3XWork* work;
+    Vec* history;
     tagOAN3_SHAPE* shapeEntry;
     pppShapeAnimData* shapeAnim;
     int count;
@@ -224,17 +225,18 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
         count = 0;
     }
 
+    history = work->m_posHistory;
     currentIndex = work->m_head;
-    segBaseX = work->m_posHistory[currentIndex].x;
-    segBaseY = work->m_posHistory[currentIndex].y;
-    segBaseZ = work->m_posHistory[currentIndex].z;
+    segBaseX = history[currentIndex].x;
+    segBaseY = history[currentIndex].y;
+    segBaseZ = history[currentIndex].z;
     nextIndex = currentIndex + 1;
     if (currentIndex == 0x1b) {
         nextIndex = 0;
     }
-    nextBaseX = work->m_posHistory[nextIndex].x;
-    nextBaseY = work->m_posHistory[nextIndex].y;
-    nextBaseZ = work->m_posHistory[nextIndex].z;
+    nextBaseX = history[nextIndex].x;
+    nextBaseY = history[nextIndex].y;
+    nextBaseZ = history[nextIndex].z;
     segDx = nextBaseX - segBaseX;
     segDy = nextBaseY - segBaseY;
     segDz = nextBaseZ - segBaseZ;
@@ -361,9 +363,9 @@ advance_segment:
     segBaseX = nextBaseX;
     segBaseY = nextBaseY;
     segBaseZ = nextBaseZ;
-    nextBaseX = work->m_posHistory[nextIndex].x;
-    nextBaseY = work->m_posHistory[nextIndex].y;
-    nextBaseZ = work->m_posHistory[nextIndex].z;
+    nextBaseX = history[nextIndex].x;
+    nextBaseY = history[nextIndex].y;
+    nextBaseZ = history[nextIndex].z;
     segDx = nextBaseX - segBaseX;
     segDy = nextBaseY - segBaseY;
     segDz = nextBaseZ - segBaseZ;

@@ -1094,6 +1094,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 
 #pragma push
 #pragma opt_strength_reduction off
+#pragma opt_dead_assignments off
 /*
  * --INFO--
  * PAL Address: 0x8013473c

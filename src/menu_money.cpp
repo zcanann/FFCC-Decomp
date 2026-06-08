@@ -49,12 +49,13 @@ inline void CMenuPcs::MoneySetPlace(int row)
 		if (((!started) && (gil < digitPlace)) && (digitIndex < 7)) {
 			*place = -1;
 		} else {
-			int digit = gil / digitPlace;
+			int quotient = gil / digitPlace;
+			int digit = quotient;
 			if (9 < digit) {
 				digit = 9;
 			}
 			*place = static_cast<signed char>(digit);
-			gil = gil - (gil / digitPlace) * digitPlace;
+			gil = gil - quotient * digitPlace;
 		}
 		place++;
 		digitIndex++;

@@ -2554,12 +2554,12 @@ int CCharaPcs::CHandle::SetAnim(int animIndex, int startFrame, int endFrame, int
     }
 
     CChara::CAnim* anim = 0;
-    if (animIndex >= 0 && m_animSlot[animIndex] != 0) {
+    if (animIndex != -1 && m_animSlot[animIndex] != 0) {
         anim = reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex])->m_anim;
     }
 
     if (anim == 0) {
-        if (m_charaKind != 3 && System.m_execParam > 1) {
+        if (m_charaKind != 3 && static_cast<unsigned int>(System.m_execParam) > 1) {
             System.Printf(const_cast<char*>(s_charaSetAnimMissingFmt), m_charaKind, m_charaNo, animIndex);
         }
         return 0;

@@ -468,10 +468,10 @@ void CChara::TimeMogFur()
 				g = b;
 			}
 
-			a = a + 2;
-			unsigned int clampedA = 7;
-			if (a < 7) {
-				clampedA = a;
+			int aPlus = static_cast<int>(a) + 2;
+			int clampedA = 7;
+			if (aPlus < 7) {
+				clampedA = aPlus;
 			}
 
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(texels) + tileIndex) =
@@ -595,15 +595,15 @@ void CChara::CalcMogScore()
 		*scorePtr = (line + circle * 2 - bit * 2) / 3;
 		if (*scorePtr < 0) {
 			*scorePtr = 0;
-		} else if (*scorePtr > 100) {
-			*scorePtr = 100;
+		} else {
+			*scorePtr = (*scorePtr > 100) ? 100 : *scorePtr;
 		}
 
 		level = (100 - *scorePtr) / 5;
 		if (level < 5) {
 			level = 5;
-		} else if (level > 0xF) {
-			level = 0xF;
+		} else {
+			level = (level > 0xF) ? 0xF : level;
 		}
 		fur.m_radarLevel[i] = level;
 	}
@@ -613,11 +613,11 @@ void CChara::CalcMogScore()
 		const int b1 = fur.m_score[1];
 		const int b2 = fur.m_score[2];
 
-		if (b0 > 2 && kYmEnvDefaultScale * static_cast<float>(b1 + b2) < static_cast<float>(b0)) {
+		if (b0 >= 3 && kYmEnvDefaultScale * static_cast<float>(b1 + b2) < static_cast<float>(b0)) {
 			Game.m_gameWork.m_mogScoreRadarType = 1;
-		} else if (b1 > 2 && kYmEnvDefaultScale * static_cast<float>(b0 + b2) < static_cast<float>(b1)) {
+		} else if (b1 >= 3 && kYmEnvDefaultScale * static_cast<float>(b0 + b2) < static_cast<float>(b1)) {
 			Game.m_gameWork.m_mogScoreRadarType = 2;
-		} else if (b2 > 2 && kYmEnvDefaultScale * static_cast<float>(b0 + b1) < static_cast<float>(b2)) {
+		} else if (b2 >= 3 && kYmEnvDefaultScale * static_cast<float>(b0 + b1) < static_cast<float>(b2)) {
 			Game.m_gameWork.m_mogScoreRadarType = 3;
 		} else {
 			Game.m_gameWork.m_mogScoreRadarType = 0;
@@ -1044,7 +1044,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		Chara.MogFur().m_cursorX = 0;
 	} else {
 		Chara.MogFur().m_cursorX = 0x280;
-		if (cursorXv < 0x281) {
+		if (cursorXv <= 0x280) {
 			Chara.MogFur().m_cursorX = cursorXv;
 		}
 	}
@@ -1053,7 +1053,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		Chara.MogFur().m_cursorY = 0;
 	} else {
 		Chara.MogFur().m_cursorY = 0x1C0;
-		if (cursorYv < 0x1C1) {
+		if (cursorYv <= 0x1C0) {
 			Chara.MogFur().m_cursorY = cursorYv;
 		}
 	}
@@ -1072,21 +1072,25 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		int eraseMode = 0;
 		int doPaint = 1;
 		_GXColor brushColor;
-		if (radarType == 2) {
+		switch (radarType) {
+		case 0:
+			brushColor = CColor(0xF, 4, 4, 2).color;
+			break;
+		case 1:
+			brushColor = CColor(4, 8, 0xF, 2).color;
+			break;
+		case 2:
 			brushColor = CColor(4, 0xF, 4, 2).color;
-		} else if (radarType < 2) {
-			if (radarType == 0) {
-				brushColor = CColor(0xF, 4, 4, 2).color;
-			} else if (radarType >= 0) {
-				brushColor = CColor(4, 8, 0xF, 2).color;
-			}
-		} else if (radarType == 4) {
+			break;
+		case 3:
+			brushColor = CColor(0xF, 0xF, 0xF, 4).color;
+			doPaint = ((static_cast<int>(System.m_frameCounter) % 4) == 0) ? 1 : 0;
+			break;
+		case 4:
 			brushColor = CColor(0, 0, 0, 2).color;
 			eraseMode = 1;
-			doPaint = ((System.m_frameCounter & 3U) == 0) ? 1 : 0;
-		} else if (radarType < 4) {
-			brushColor = CColor(0xF, 0xF, 0xF, 4).color;
-			doPaint = ((System.m_frameCounter & 3U) == 0) ? 1 : 0;
+			doPaint = ((static_cast<int>(System.m_frameCounter) % 4) == 0) ? 1 : 0;
+			break;
 		}
 		_GXColor centerBefore = CColor(0xF, 0xF, 0xF, 0).color;
 		_GXColor centerAfter = centerBefore;
@@ -1100,33 +1104,33 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		if (pickResult >= 0) {
 			MogWork().m_pickTicks++;
 
-			if (Chara.MogFur().m_score[0] >= MogWork().m_prevScoreA + 5) {
+			if (MogWork().m_prevScoreA + 5 <= Chara.MogFur().m_score[0]) {
 				MogWork().m_prevScoreA = Chara.MogFur().m_score[0];
 				messageId = 1;
-			} else if (Chara.MogFur().m_score[0] < MogWork().m_prevScoreA - 5) {
+			} else if (MogWork().m_prevScoreA - 5 > Chara.MogFur().m_score[0]) {
 				MogWork().m_prevScoreA = Chara.MogFur().m_score[0];
 				messageId = 6;
 			}
-			if (Chara.MogFur().m_score[1] >= MogWork().m_prevScoreB + 5) {
+			if (MogWork().m_prevScoreB + 5 <= Chara.MogFur().m_score[1]) {
 				MogWork().m_prevScoreB = Chara.MogFur().m_score[1];
 				messageId = 1;
-			} else if (Chara.MogFur().m_score[1] < MogWork().m_prevScoreB - 5) {
+			} else if (MogWork().m_prevScoreB - 5 > Chara.MogFur().m_score[1]) {
 				MogWork().m_prevScoreB = Chara.MogFur().m_score[1];
 				messageId = 6;
 			}
-			if (Chara.MogFur().m_score[2] >= MogWork().m_prevScoreC + 5) {
+			if (MogWork().m_prevScoreC + 5 <= Chara.MogFur().m_score[2]) {
 				MogWork().m_prevScoreC = Chara.MogFur().m_score[2];
 				messageId = 1;
-			} else if (Chara.MogFur().m_score[2] < MogWork().m_prevScoreC - 5) {
+			} else if (MogWork().m_prevScoreC - 5 > Chara.MogFur().m_score[2]) {
 				MogWork().m_prevScoreC = Chara.MogFur().m_score[2];
 				messageId = 6;
 			}
 
 			if (pickResult == 0) {
 				MogWork().m_idleTicks++;
-				if (MogWork().m_idleTicks == 0x3C && messageId < 0) {
+				if (MogWork().m_idleTicks == 0x3C && messageId == -1) {
 					messageId = 3;
-				} else if (MogWork().m_idleTicks == 0xF0 && messageId < 0) {
+				} else if (MogWork().m_idleTicks == 0xF0 && messageId == -1) {
 					messageId = 4;
 				}
 			} else {
@@ -1136,27 +1140,39 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 			if (doPaint != 0) {
 				int particleNo = 0;
 				int seId = 0;
-				int emitParticle = ((System.m_frameCounter & 1) == 0);
-				int playGate = ((System.m_frameCounter & 3) == 0);
+				int emitParticle = ((static_cast<int>(System.m_frameCounter) % 2) == 0);
+				int playGate = ((static_cast<int>(System.m_frameCounter) % 4) == 0);
 				_GXColor particleColor = CColor(centerBefore).color;
-				if (radarType == 2) {
+				switch (radarType) {
+				case 0:
+					MogWork().m_offColorTicks = 0;
+					particleNo = 0x73;
+					MogWork().m_eraseTicks = 0;
+					particleColor = CColor(0xF, 4, 4, 2).color;
+					break;
+				case 1:
+					MogWork().m_offColorTicks = 0;
+					particleNo = 0x73;
+					MogWork().m_eraseTicks = 0;
+					particleColor = CColor(4, 8, 0xF, 2).color;
+					break;
+				case 2:
 					MogWork().m_offColorTicks = 0;
 					particleNo = 0x73;
 					MogWork().m_eraseTicks = 0;
 					particleColor = CColor(4, 0xF, 4, 2).color;
-				} else if (radarType < 2) {
-					if (radarType == 0) {
-						MogWork().m_offColorTicks = 0;
-						particleNo = 0x73;
-						MogWork().m_eraseTicks = 0;
-						particleColor = CColor(0xF, 4, 4, 2).color;
-					} else if (radarType >= 0) {
-						MogWork().m_offColorTicks = 0;
-						particleNo = 0x73;
-						MogWork().m_eraseTicks = 0;
-						particleColor = CColor(4, 8, 0xF, 2).color;
+					break;
+				case 3:
+					MogWork().m_eraseTicks = 0;
+					if ((((centerBefore.r < 0x0D) || (centerBefore.g < 0x0D)) || (centerBefore.b < 0x0D)) && (centerBefore.a != 0)) {
+						MogWork().m_offColorTicks++;
 					}
-				} else if (radarType == 4) {
+					seId = 0x249f4;
+					particleNo = 0x74;
+					emitParticle = ((static_cast<int>(System.m_frameCounter) % 8) == 0);
+					playGate = ((static_cast<int>(System.m_frameCounter) % 16) == 0);
+					break;
+				case 4:
 					MogWork().m_offColorTicks = 0;
 					if ((doPaint != 0) && (centerBefore.a != 0) && (centerAfter.a == 0)) {
 						MogWork().m_eraseTicks++;
@@ -1167,16 +1183,8 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 						particleColor.a = 0;
 					}
 					seId = 0x249f3;
-					playGate = ((System.m_frameCounter & 7) == 0);
-				} else if (radarType < 4) {
-					MogWork().m_eraseTicks = 0;
-					if ((((centerBefore.r < 0x0D) || (centerBefore.g < 0x0D)) || (centerBefore.b < 0x0D)) && (centerBefore.a != 0)) {
-						MogWork().m_offColorTicks++;
-					}
-					seId = 0x249f4;
-					particleNo = 0x74;
-					emitParticle = ((System.m_frameCounter & 7) == 0);
-					playGate = ((System.m_frameCounter & 0xF) == 0);
+					playGate = ((static_cast<int>(System.m_frameCounter) % 8) == 0);
+					break;
 				}
 
 				if (emitParticle != 0) {
@@ -1195,19 +1203,19 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 				}
 
 				if (MogWork().m_offColorTicks == 10) {
-					if (messageId < 0) {
+					if (messageId == -1) {
 						messageId = 2;
 					}
 					MogWork().m_offColorTicks = 0x0B;
 				}
 				if (MogWork().m_eraseTicks == 10) {
-					if (messageId < 0) {
+					if (messageId == -1) {
 						messageId = 5;
 					}
 					MogWork().m_eraseTicks = 0x0B;
 				}
 				if (MogWork().m_eraseTicks == 0x32) {
-					if (messageId < 0) {
+					if (messageId == -1) {
 						messageId = 6;
 					}
 					MogWork().m_eraseTicks = 0x33;

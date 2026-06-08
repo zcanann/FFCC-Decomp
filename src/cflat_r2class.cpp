@@ -1328,9 +1328,9 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		case -0x60: {
 			Vec safePos;
 			float safeDist = engineObject->CalcSafePos(static_cast<int>(object->m_localBase[0]), FindRuntimeObject(this, object->m_localBase[1]), &safePos);
-			*reinterpret_cast<unsigned int*>(object->m_localBase[2]) = *reinterpret_cast<unsigned int*>(&safePos.x);
-			*reinterpret_cast<unsigned int*>(object->m_localBase[3]) = *reinterpret_cast<unsigned int*>(&safePos.y);
-			*reinterpret_cast<unsigned int*>(object->m_localBase[4]) = *reinterpret_cast<unsigned int*>(&safePos.z);
+			*reinterpret_cast<float*>(object->m_localBase[2]) = safePos.x;
+			*reinterpret_cast<float*>(object->m_localBase[3]) = safePos.y;
+			*reinterpret_cast<float*>(object->m_localBase[4]) = safePos.z;
 			PushValue(this, object, *reinterpret_cast<int*>(&safeDist));
 			outResult = 0;
 			break;
@@ -1630,9 +1630,9 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		case -0x88: {
 			Vec nearPos;
 			engineObject->CalcSphereNearPos(reinterpret_cast<float*>(object->m_localBase)[0], reinterpret_cast<float*>(object->m_localBase)[1], nearPos);
-			*reinterpret_cast<unsigned int*>(object->m_localBase[2]) = *reinterpret_cast<unsigned int*>(&nearPos.x);
-			*reinterpret_cast<unsigned int*>(object->m_localBase[3]) = *reinterpret_cast<unsigned int*>(&nearPos.y);
-			*reinterpret_cast<unsigned int*>(object->m_localBase[4]) = *reinterpret_cast<unsigned int*>(&nearPos.z);
+			*reinterpret_cast<float*>(object->m_localBase[2]) = nearPos.x;
+			*reinterpret_cast<float*>(object->m_localBase[3]) = nearPos.y;
+			*reinterpret_cast<float*>(object->m_localBase[4]) = nearPos.z;
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

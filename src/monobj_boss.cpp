@@ -2123,6 +2123,8 @@ void CGMonObj::frameStatFuncMeteoParasite()
 			prgObj->changeStat(0, 0, 0);
 		}
 		break;
+	case 0x68:
+		break;
 	}
 
 	if (scriptKind == 0x87 && prgObj->m_lastStateId == 0x67) {

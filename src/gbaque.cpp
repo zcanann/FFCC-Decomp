@@ -3071,17 +3071,16 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
  */
 void GbaQueue::ChkCMakeCharaType(int channel, unsigned int value)
 {
+	unsigned int stackValue = value;
+	unsigned char* valueBytes = reinterpret_cast<unsigned char*>(&stackValue);
 	char* obj = reinterpret_cast<char*>(this);
-	unsigned char charaType = static_cast<unsigned char>(value >> 8);
-	unsigned char resultCode = static_cast<unsigned char>(value >> 16);
-	int cmakeOffset = channel * 0x20;
-	OSSemaphore* semaphore = accessSemaphores + channel;
+	unsigned char charaType = valueBytes[2];
 
 	if (charaType == 0xFF) {
-		OSWaitSemaphore(semaphore);
-		obj[0x2CCA + cmakeOffset] = static_cast<char>(0xFF);
-		obj[0x2CD1 + cmakeOffset] = static_cast<char>(0xFF);
-		OSSignalSemaphore(semaphore);
+		OSWaitSemaphore(accessSemaphores + channel);
+		obj[0x2CCA + channel * 0x20] = static_cast<char>(0xFF);
+		obj[0x2CD1 + channel * 0x20] = static_cast<char>(0xFF);
+		OSSignalSemaphore(accessSemaphores + channel);
 		return;
 	}
 
@@ -3090,12 +3089,12 @@ void GbaQueue::ChkCMakeCharaType(int channel, unsigned int value)
 		OSWaitSemaphore(accessSemaphores + i);
 	}
 
-	unsigned char playerSlot = static_cast<unsigned char>(obj[0x2CB8 + cmakeOffset]);
+	unsigned char playerSlot = static_cast<unsigned char>(obj[0x2CB8 + channel * 0x20]);
 	for (int i = 0; i < 4; i++) {
 		int otherOffset = i * 0x20;
 		if ((channel != i) && (cmakeInfo[i].m_active != 0) &&
 		    (static_cast<unsigned char>(obj[0x2CCA + otherOffset]) == charaType)) {
-			Joybus.SendResult(channel, 1, resultCode, 0);
+			Joybus.SendResult(channel, 1, valueBytes[1], 0);
 			foundDuplicate = true;
 			break;
 		}
@@ -3122,16 +3121,16 @@ void GbaQueue::ChkCMakeCharaType(int channel, unsigned int value)
 			}
 
 			if (existingCharaType == charaType) {
-				Joybus.SendResult(channel, 1, resultCode, 0);
+				Joybus.SendResult(channel, 1, valueBytes[1], 0);
 				return;
 			}
 		}
 	}
 
-	Joybus.SendResult(channel, 0, resultCode, 0);
-	OSWaitSemaphore(semaphore);
-	obj[0x2CCA + cmakeOffset] = static_cast<char>(charaType);
-	OSSignalSemaphore(semaphore);
+	Joybus.SendResult(channel, 0, valueBytes[1], 0);
+	OSWaitSemaphore(accessSemaphores + channel);
+	obj[0x2CCA + channel * 0x20] = static_cast<char>(charaType);
+	OSSignalSemaphore(accessSemaphores + channel);
 	MenuPcs.ChgModel(static_cast<int>(playerSlot), charaType & 3, (charaType >> 2) & 3, static_cast<int>(charaType >> 7));
 }
 

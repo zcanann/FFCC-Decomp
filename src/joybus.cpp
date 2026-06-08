@@ -431,7 +431,7 @@ int JoyBus::LoadBin()
 {
     int result = 0;
 
-    if (!m_binLoaded)
+    if (static_cast<signed char>(m_binLoaded) == 0)
     {
         CFile::CHandle* file = File.Open((char*)this, 0, CFile::PRI_LOW);
 

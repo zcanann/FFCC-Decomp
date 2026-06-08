@@ -1709,8 +1709,8 @@ void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
 
     OSWaitSemaphore(accessSemaphores + channel);
 
-    baseX = *reinterpret_cast<short*>(obj + channel * 0xDC + 0x32);
-    baseZ = *reinterpret_cast<short*>(obj + channel * 0xDC + 0x34);
+    baseX = *reinterpret_cast<short*>(obj + channel * 0xDC + 0x48A);
+    baseZ = *reinterpret_cast<short*>(obj + channel * 0xDC + 0x48C);
     memcpy(localEnemyData, obj + 0xB34, kGbaQueueEnemyDataBytes);
 
     prevEntry = obj + channel * kGbaQueueEnemyDataBytes + 0x1034;

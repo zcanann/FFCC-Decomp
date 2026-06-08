@@ -1484,12 +1484,11 @@ void CGMonObj::onAnimPoint(int param2, int param3)
 	int soundId = 0xFFFF;
 
 	if ((param3 < 0xC) && (param3 >= 0xA)) {
-		unsigned char* scriptData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
-		particleId = *reinterpret_cast<unsigned short*>(scriptData + 0x1A4);
+		particleId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A4);
 		if ((particleId != 0xFFFF) && (param3 == 10)) {
 			particleId += 1;
 		}
-		soundId = *reinterpret_cast<unsigned short*>(scriptData + 0x1A6);
+		soundId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A6);
 	}
 
 	if (particleId != 0xFFFF) {
@@ -1498,10 +1497,10 @@ void CGMonObj::onAnimPoint(int param2, int param3)
 	}
 
 	if (soundId != 0xFFFF) {
-		if (soundId != 0xFFFF) {
-			soundEffect = (soundId & 0xFF) + ((int)soundId >> 8) * 1000;
-		} else {
+		if (soundId == 0xFFFF) {
 			soundEffect = 0;
+		} else {
+			soundEffect = (soundId & 0xFF) + ((int)soundId >> 8) * 1000;
 		}
 		reinterpret_cast<CGPrgObj*>(this)->playSe3D(
 			soundEffect,

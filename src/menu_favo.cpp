@@ -160,8 +160,8 @@ void CMenuPcs::FavoDraw()
 		remaining--;
 	}
 
-	FoodRank* rank = s_rank;
 	FavoEntry* drawEntry = rankEntry;
+	FoodRank* rank = s_rank;
 	for (int i = 0; i < 8; i++) {
 		int barX = drawEntry->x + drawEntry->w + 0x18;
 		int barY = static_cast<int>((static_cast<float>(drawEntry->h) - 24.0f) * 0.5 +

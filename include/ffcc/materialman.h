@@ -431,7 +431,7 @@ public:
     void AddTextureIdx(int, int);
     void SetMaterialColor(unsigned int rgba)
     {
-        GXColor& color = m_textureData.m_textureColorView.m_materialColor;
+        GXColor& color = m_materialColor;
         color.r = static_cast<unsigned char>((rgba >> 24) & 0xFF);
         color.g = static_cast<unsigned char>((rgba >> 16) & 0xFF);
         color.b = static_cast<unsigned char>((rgba >> 8) & 0xFF);
@@ -463,13 +463,13 @@ private:
     char m_texShiftU;                     // 0x034
     char m_texShiftV;                     // 0x035
     unsigned char m_unk36;                // 0x036
-    unsigned char m_pad37[5];             // 0x037
+    unsigned char m_pad37;                // 0x037
+    GXColor m_materialColor;              // 0x038
     struct TextureColorView
     {
         CTexture* m_texture0;             // 0x03C
         CTexture* m_texture1;             // 0x040
         CTexture* m_texture2;             // 0x044
-        GXColor m_materialColor;          // 0x048
     };
     struct {
         union {

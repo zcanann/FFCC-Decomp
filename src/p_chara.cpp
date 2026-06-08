@@ -2516,13 +2516,14 @@ int CCharaPcs::CHandle::LoadAnim(
     }
 
     m_animSlot[animIndex] = loadAnim;
-    AddSharedRef(m_animSlot[animIndex]);
+    reinterpret_cast<CRef*>(loadAnim)->AddRef();
 
-    *reinterpret_cast<unsigned int*>(Ptr(loadAnim, 0x70)) = static_cast<unsigned int>(animFlags);
-    if (loadAnim->m_anim != 0) {
-        unsigned char& flags = loadAnim->m_anim->m_flags;
-        flags = static_cast<unsigned char>((flags & 0x7F) | ((animFlags << 7) & 0x80));
-        flags = static_cast<unsigned char>((flags & 0xBF) | ((animFlags << 5) & 0x40));
+    *reinterpret_cast<unsigned int*>(Ptr(m_animSlot[animIndex], 0x70)) = static_cast<unsigned int>(animFlags);
+    if (reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex])->m_anim != 0) {
+        unsigned char& flags1 = reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex])->m_anim->m_flags;
+        flags1 = static_cast<unsigned char>((flags1 & 0x7F) | ((animFlags << 7) & 0x80));
+        unsigned char& flags2 = reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex])->m_anim->m_flags;
+        flags2 = static_cast<unsigned char>((flags2 & 0xBF) | ((animFlags << 5) & 0x40));
     }
 
     return 1;

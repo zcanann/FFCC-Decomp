@@ -1846,8 +1846,8 @@ void CFlatRuntime2::drawLayer(
 
 	const float scaledWidth = static_cast<float>(width) * scaleX;
 	const float scaledHeight = static_cast<float>(height) * scaleY;
-	short u1 = static_cast<short>(texU + width);
-	short v1 = static_cast<short>(texV + height);
+	unsigned short u1 = static_cast<short>(texU + width);
+	short v1 = static_cast<unsigned short>(texV + height);
 	float xAnchor = FLOAT_80330144;
 	if ((flags & 1) != 0) {
 		xAnchor = FLOAT_80330154 * scaledWidth;
@@ -1860,7 +1860,7 @@ void CFlatRuntime2::drawLayer(
 	const float y0 = static_cast<float>(y) - yAnchor;
 	const float x1 = x0 + scaledWidth;
 	const float y1 = y0 + scaledHeight;
-	short u0 = static_cast<short>(texU);
+	unsigned short u0 = static_cast<unsigned short>(texU);
 	short v0 = static_cast<short>(texV);
 
 	if (blendMode != 3) {
@@ -1913,7 +1913,7 @@ void CFlatRuntime2::drawLayer(
 			}
 			int rectY = static_cast<int>(by);
 
-			short quadU0 = static_cast<short>(texU);
+			unsigned short quadU0 = static_cast<short>(texU);
 			if ((quad & 1) != 0) {
 				quadU0 = static_cast<short>(texU + static_cast<short>(pixelWidth));
 			}

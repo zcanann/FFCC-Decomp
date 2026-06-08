@@ -2377,14 +2377,13 @@ void CMenuPcs::DrawUniteList()
 		color.a = static_cast<u8>(kCmdMenuAlphaMax * panelAlpha);
 		GXSetChanMatColor((_GXChannelID)4, color);
 
-		CmdListEntry* const panel = &unitePanels[s_unitePanelCount];
-		panel->x = static_cast<u16>(panelX);
-		panel->y = static_cast<s16>(panelY);
-		panel->width = static_cast<s16>(kCmdMenuUnitePanelWidth);
-		panel->height = static_cast<s16>(kCmdMenuPanelSize64);
-		panel->u = kCmdMenuZero;
-		panel->v = panelTone;
-		panel->alpha = panelAlpha;
+		unitePanels[s_unitePanelCount].x = static_cast<u16>(panelX);
+		unitePanels[s_unitePanelCount].y = static_cast<s16>(panelY);
+		unitePanels[s_unitePanelCount].width = static_cast<s16>(kCmdMenuUnitePanelWidth);
+		unitePanels[s_unitePanelCount].height = static_cast<s16>(kCmdMenuPanelSize64);
+		unitePanels[s_unitePanelCount].u = kCmdMenuZero;
+		unitePanels[s_unitePanelCount].v = panelTone;
+		unitePanels[s_unitePanelCount].alpha = panelAlpha;
 		s_UniteTop[s_unitePanelCount] = i;
 		s_unitePanelCount++;
 

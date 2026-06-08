@@ -751,9 +751,9 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
     mana->m_envTexture0 = GetTextureFromRSD(param_2->m_envTextureId0, ppvEnv);
     mana->m_envTexture1 = GetTextureFromRSD(param_2->m_envTextureId1, ppvEnv);
 
-    mana->m_envTexture0->m_format = 0;
+    mana->m_envTexture0->m_wrapMode = 0;
     mana->m_envTexture0->InitTexObj();
-    mana->m_envTexture1->m_format = 0;
+    mana->m_envTexture1->m_wrapMode = 0;
     mana->m_envTexture1->InitTexObj();
 
     if (mana->m_captureTexObjs == 0) {
@@ -790,15 +790,15 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
     }
     dstTexObj = mana->m_baseParaboloidTexObjs;
     for (i = 0; i < 6; i++) {
-        mana->m_sourceTextures[i]->m_format = 0;
+        mana->m_sourceTextures[i]->m_wrapMode = 0;
         mana->m_sourceTextures[i]->InitTexObj();
         memcpy(dstTexObj, &mana->m_sourceTextures[i]->m_texObj, sizeof(GXTexObj));
         dstTexObj++;
     }
 
-    mana->m_envTexture0->m_format = 0;
+    mana->m_envTexture0->m_wrapMode = 0;
     mana->m_envTexture0->InitTexObj();
-    mana->m_envTexture1->m_format = 0;
+    mana->m_envTexture1->m_wrapMode = 0;
     mana->m_envTexture1->InitTexObj();
 
     if (mana->m_paraboloidMap == 0) {

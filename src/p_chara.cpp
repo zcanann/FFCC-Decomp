@@ -154,6 +154,14 @@ static const char s_charaMergePathFmt[] = "dvd/mrg/m%04d_%02d.mrg";
 static const char s_charaMergeDupFmt[] = "CCharaPcs duplicate merge %d\n";
 static const char s_charaMergeOpenFmt[] = "CCharaPcs missing merge %d\n";
 static const char s_charaMergeDoneFmt[] = "CCharaPcs LoadMergeFile %d 0x%x\n";
+static const char s_charaModelLoadAmemFmt[] =
+    "\x4d\x65\x72\x67\x65\x3a\x20\x1b\x5b\x33\x32\x6d\x83\x82\x83\x66\x83\x8b\x82\xf0\x41\x4d\x45\x4d\x82\xa9\x82"
+    "\xe7\x93\xc7\x82\xdd\x8d\x9e\x82\xdd\x82\xdc\x82\xb5\x82\xbd\x81\x42\x74\x79\x70\x65\x20\x3d\x20\x25\x64\x20"
+    "\x6e\x75\x6d\x62\x65\x72\x20\x3d\x20\x25\x64\x0a\x1b\x5b\x30\x6d";
+static const char s_charaModelLoadDvdFmt[] =
+    "\x1b\x5b\x33\x31\x6d\x4d\x65\x72\x67\x65\x3a\x20\x83\x82\x83\x66\x83\x8b\x82\xf0\x44\x56\x44\x82\xa9\x82\xe7"
+    "\x93\xc7\x82\xdd\x8d\x9e\x82\xdd\x82\xdc\x82\xb5\x82\xbd\x81\x42\x74\x79\x70\x65\x20\x3d\x20\x25\x64\x20\x6e"
+    "\x75\x6d\x62\x65\x72\x20\x3d\x20\x25\x64\x0a\x1b\x5b\x30\x6d";
 static const char s_charaFreeMergeFmt[] = "CCharaPcs.FreeMergeFile: 0x%08x\n";
 static const char s_charaAmemAnimCompactStart[] =
     "\x61\x6d\x65\x6d\x20\x61\x6e\x69\x6d\x20\x83\x4b\x83\x78\x81\x5b\x83\x57"
@@ -2347,6 +2355,10 @@ foundModel:
                 File.UnlockBuffer();
             }
 
+            if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+                System.Printf(const_cast<char*>(s_charaModelLoadAmemFmt), charaKind, static_cast<int>(charaNo));
+            }
+
             m_modelLoadRef->AddRef();
             m_model = loadModel->m_model;
             m_model->AddRef();
@@ -2356,6 +2368,10 @@ foundModel:
             m_model = loadModel->m_model->Duplicate(SelectLoadStage(&CharaPcs, modelStage));
         }
     } else {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+            System.Printf(const_cast<char*>(s_charaModelLoadDvdFmt), charaKind, static_cast<int>(charaNo));
+        }
+
         strcpy(path, basePath);
         strcat(path, s_charaModelSuffix);
 

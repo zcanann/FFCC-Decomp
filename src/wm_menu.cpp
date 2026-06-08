@@ -5593,7 +5593,7 @@ void CMenuPcs::DrawLoadMenu()
 void CMenuPcs::DrawTitleMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	short state = m_wmWorldState->m_mainState;
+	int state = m_wmWorldState->m_mainState;
 
 		if (state == 0 && static_cast<signed char>(m_wmWorldState->m_worldReady) != 0) {
 			if (static_cast<signed char>(m_wmThpActive) != 0) {

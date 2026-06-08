@@ -887,7 +887,7 @@ void CGObject::bgCollision()
     m_stateFlags0Bits.unk1 = 0;
 
     *reinterpret_cast<int*>(&m_radiusCtrl.x) = 0;
-    m_gravityY = sBgDefaultGravityY;
+    m_gravityY = sZeroFloat;
 
     bgAttribCollision();
 
@@ -2782,10 +2782,9 @@ void CGObject::LoadWeapon(int itemId, int itemVariant)
         m_weaponModelHandle = new (Game.m_mainStage, const_cast<char*>(s_gobject_cpp), 0xA11) CCharaPcs::CHandle;
         m_weaponModelHandle->Add();
 
-        unsigned long textureVariant = 0;
-        if (m_ownerType == 0) {
-            textureVariant = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2);
-        }
+        const unsigned long textureVariant = (m_ownerType == 0)
+            ? *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2)
+            : 0;
 
         m_weaponModelHandle->LoadModel(
             4, static_cast<unsigned long>(itemId), static_cast<unsigned long>(itemVariant), textureVariant, -1, 0, 1);
@@ -2814,10 +2813,9 @@ void CGObject::LoadShield(int itemId)
         m_shieldModelHandle = new (Game.m_mainStage, const_cast<char*>(s_gobject_cpp), 0xA23) CCharaPcs::CHandle;
         m_shieldModelHandle->Add();
 
-        unsigned long textureVariant = 0;
-        if (m_ownerType == 0) {
-            textureVariant = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2);
-        }
+        const unsigned long textureVariant = (m_ownerType == 0)
+            ? *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2)
+            : 0;
 
         m_shieldModelHandle->LoadModel(4, static_cast<unsigned long>(itemId), 0, textureVariant, -1, 0, 1);
         m_shieldAttachNodeIndex =

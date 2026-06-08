@@ -2126,33 +2126,30 @@ unsigned int CCaravanWork::GetMagicCharge(int cmdListIdx, int&, int&)
 	if (Game.m_gameWork.m_menuStageMode == 0) {
 		groupedCountLocal = 1;
 	} else {
-		short* slotRef = m_commandListExtra + cmdListIdx;
-		if (slotRef[0] == 0) {
+		if (m_commandListExtra[cmdListIdx] == 0) {
 			groupedCountLocal = 1;
 		} else {
 			int topIdx = cmdListIdx;
 			int scanCount = cmdListIdx + 1;
 			if (cmdListIdx >= 0) {
 				for (; scanCount != 0; scanCount--) {
-					if (slotRef[0] != -1) {
+					if (m_commandListExtra[topIdx] != -1) {
 						break;
 					}
-					slotRef--;
 					topIdx--;
 				}
 			}
 
 			groupedCountLocal = 1;
 			int nextIdx = topIdx + 1;
-			slotRef = m_commandListExtra + nextIdx;
 			scanCount = static_cast<short>(m_numCmdListSlots) - nextIdx;
 			if (nextIdx < static_cast<short>(m_numCmdListSlots)) {
 				for (; scanCount != 0; scanCount--) {
-					if (slotRef[0] != -1) {
+					if (m_commandListExtra[nextIdx] != -1) {
 						break;
 					}
 					groupedCountLocal++;
-					slotRef++;
+					nextIdx++;
 				}
 			}
 		}
@@ -2161,14 +2158,12 @@ unsigned int CCaravanWork::GetMagicCharge(int cmdListIdx, int&, int&)
 	if (groupedCountLocal == 1) {
 		return (((unsigned int)__cntlzw(cmdListIdx - static_cast<short>(m_currentCmdListIndex))) >> 5) & 0xFF;
 	} else {
-		short* slotRef = m_commandListExtra + cmdListIdx;
 		int scanCount = cmdListIdx + 1;
 		if (cmdListIdx >= 0) {
 			for (; scanCount != 0; scanCount--) {
-				if (slotRef[0] != -1) {
+				if (m_commandListExtra[cmdListIdx] != -1) {
 					break;
 				}
-				slotRef--;
 				cmdListIdx--;
 			}
 		}

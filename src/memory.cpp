@@ -1984,11 +1984,7 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
         }
 
         if (currentSize != 0) {
-            currentSize -= size / 2;
-            if (currentSize < 0) {
-                currentSize = 0;
-            }
-            continue;
+            goto shrink;
         }
 
         if (bestPriority != 0xFFFFFFFF) {
@@ -2018,6 +2014,13 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
                 System.Printf(const_cast<char*>(sAmemCacheSeparator));
             }
             m_rStage->heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
+        }
+        continue;
+
+    shrink:
+        currentSize -= size / 2;
+        if (currentSize < 0) {
+            currentSize = 0;
         }
     }
 }

@@ -22,6 +22,8 @@ extern float kMesHalf;
 // PAL map: CMes::m_tempVar in mes.o, .bss size 0x50.
 int CMes::m_tempVar[0x14];
 
+extern char lbl_801D9E58[];
+
 static const char s_mesTagUnknown[] = "Not corresponding TAG is used. %02x\n";
 static const char s_mesTagMissing[] = "This TAG is not created. %02x\n";
 static const char s_mesNumFmt[] = "%d";
@@ -899,13 +901,8 @@ void CMes::addString(char** text, int branchMode)
 	unsigned char caseMode = 0;
 	signed char flowMode = 0;
 
-	do
+	while (running)
 	{
-		if (!running)
-		{
-			return;
-		}
-
 		unsigned char* p = (unsigned char*)*text;
 		*text = (char*)(p + 1);
 		unsigned char ch = *p;
@@ -1147,8 +1144,8 @@ void CMes::addString(char** text, int branchMode)
 		}
 		case 0x2F:
 		{
-			char* fallback = (char*)s_mesFallback;
-			addString(&fallback, branchMode);
+			char* townName = Game.m_gameWork.m_townName;
+			addString(&townName, branchMode);
 			break;
 		}
 		case 0x30:
@@ -1219,20 +1216,20 @@ void CMes::addString(char** text, int branchMode)
 		case 0x25:
 		{
 			unsigned int value = ReadTagS8(text);
-			if (mFontCount == 0)
+			if (mFontCount != 0)
 			{
-				if (value == 0x7F)
+				if (System.m_execParam != 0)
 				{
-					mAdvanceEnabled = 0;
-				}
-				else
-				{
-					mAdvanceStep = value;
+					System.Printf(lbl_801D9E58);
 				}
 			}
-			else if (System.m_execParam != 0)
+			else if (value == 0x7F)
 			{
-				System.Printf(const_cast<char*>(s_mesTagUnknown), uch + 0xA0);
+				mAdvanceEnabled = 0;
+			}
+			else
+			{
+				mAdvanceStep = value;
 			}
 			break;
 		}
@@ -1506,7 +1503,7 @@ void CMes::addString(char** text, int branchMode)
 			}
 			mLineHeight = h;
 		}
-	} while (true);
+	}
 }
 
 /*
@@ -1573,19 +1570,19 @@ void CMes::Next()
 		memcpy(mFlagVars, tempFlags, sizeof(tempFlags));
 		halfVal = kMesHalf;
 		i = 0;
-		curr = (float*)((char*)this + 0xc);
-		while ((start = curr, remaining = mCounter, i < remaining))
+		start = (float*)((char*)this + 0xc);
+		while ((remaining = mCounter, i < remaining))
 		{
-			i = i + 1;
+			int j = i + 1;
 			curr = start + 5;
-			for (entryCount = remaining - i; entryCount != 0; entryCount = entryCount - 1)
+			for (entryCount = remaining - j; entryCount != 0; entryCount = entryCount - 1)
 			{
 				if ((((unsigned int)*(unsigned char*)((char*)start + 0xe) >> 4 & 0xF) != ((unsigned int)*(unsigned char*)((char*)curr + 0xe) >> 4 & 0xF)) ||
 				    (*(short*)(start + 2) != *(short*)(curr + 2)))
 				{
 					break;
 				}
-				i = i + 1;
+				j = j + 1;
 				curr = curr + 5;
 			}
 			runLength = (unsigned int)((int)curr - (int)start) / 0x14;
@@ -1603,6 +1600,8 @@ void CMes::Next()
 				}
 				start = start + 5;
 			}
+			i = j;
+			start = curr;
 		}
 	}
 }

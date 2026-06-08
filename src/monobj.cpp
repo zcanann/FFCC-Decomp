@@ -1035,7 +1035,7 @@ void CGMonObj::onFrameStat()
 							(aiState + *reinterpret_cast<unsigned short*>(aiData2 + 0x100)) * 0x1D0 + 0x10;
 					}
 					if ((*reinterpret_cast<unsigned short*>(aiData2 + 0x102) & 0x10) != 0) {
-						chaseFlag = 0x8000;
+						chaseFlag |= 0x8000;
 					}
 					CGPartyObj* target = Game.m_partyObjArr[m_targetPartyIndex];
 					if (m_moveWork.m_mode != 4) {

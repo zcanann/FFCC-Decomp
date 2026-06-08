@@ -30,7 +30,7 @@ extern "C" float FLOAT_803301E0;
 extern "C" float FLOAT_803301E4;
 extern "C" float FLOAT_803301E8;
 extern "C" float FLOAT_803301F8;
-extern const char sCharaStageName[];
+extern const char sCharaStageName[7];
 
 extern const char lbl_80330200[];
 extern const char lbl_80330208[];

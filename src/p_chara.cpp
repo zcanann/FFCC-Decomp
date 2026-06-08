@@ -2225,7 +2225,21 @@ void CCharaPcs::CHandle::ChangeTexture(
         }
     }
 
-    if (loadTexture == 0) {
+    if (loadTexture != 0) {
+        if (loadTexture->m_streamMode != 0 && loadTexture->GetRef() == 1) {
+            File.LockBuffer();
+            Memory.CopyFromAMemorySync(
+                File.m_readBuffer,
+                reinterpret_cast<unsigned char*>(StageBase(CharaPcs.m_amemWorkStage)) +
+                    reinterpret_cast<unsigned int>(loadTexture->m_streamOffset),
+                static_cast<unsigned long>(loadTexture->m_streamSize));
+            void* readBuffer = File.m_readBuffer;
+            CTextureSet* textureSet = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
+            textureSet->Create(readBuffer, HandleTextureStage(charaKind), 0, 0, 0, 0);
+            loadTexture->m_textureSet = textureSet;
+            File.UnlockBuffer();
+        }
+    } else {
         if (textureVariant == 0) {
             strcpy(path, basePath);
         } else {
@@ -2262,20 +2276,6 @@ void CCharaPcs::CHandle::ChangeTexture(
         m_textureSet->AddRef();
         m_model->AttachTextureSet(m_textureSet);
         return;
-    }
-
-    if (loadTexture->m_streamOffset != 0 && loadTexture->GetRef() == 1) {
-        File.LockBuffer();
-        Memory.CopyFromAMemorySync(
-            File.m_readBuffer,
-            reinterpret_cast<unsigned char*>(StageBase(CharaPcs.m_amemWorkStage)) +
-                reinterpret_cast<unsigned int>(loadTexture->m_streamOffset),
-            static_cast<unsigned long>(loadTexture->m_streamSize));
-        void* readBuffer = File.m_readBuffer;
-        CTextureSet* textureSet = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
-        textureSet->Create(readBuffer, HandleTextureStage(charaKind), 0, 0, 0, 0);
-        loadTexture->m_textureSet = textureSet;
-        File.UnlockBuffer();
     }
 
     m_texLoadRef = loadTexture;

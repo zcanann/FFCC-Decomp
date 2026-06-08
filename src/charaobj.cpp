@@ -1088,8 +1088,7 @@ void CGCharaObj::onFrameStat()
 					reqAnim(0x1B, 1, 0);
 				}
 
-				if (m_scriptHandle != 0 &&
-				    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x46) == 0) {
+				if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x46) == 0) {
 					changeSubStat(2);
 				}
 				break;

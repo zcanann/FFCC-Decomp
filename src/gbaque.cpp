@@ -2474,16 +2474,17 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 {
 	unsigned int stackValue = value;
 	unsigned char* valueBytes = reinterpret_cast<unsigned char*>(&stackValue);
-	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
-	int letterIndex = valueBytes[2];
-	int hasGil = caravanWork->m_letters[letterIndex].FlagsBits().m_attachmentIsGil;
+	unsigned int* foodBasePtr = &Game.m_scriptFoodBase[channel];
+	int letterOffset = valueBytes[2] * 0xC;
+	char* letter = reinterpret_cast<char*>(*foodBasePtr) + letterOffset;
+	int hasGil = reinterpret_cast<CCaravanWork::CLetterWork*>(letter + 0x3EC)->FlagsBits().m_attachmentIsGil;
 	int result;
 
 	if (hasGil == 0) {
-		int item = caravanWork->m_letters[letterIndex].AttachmentValue();
+		int item = *reinterpret_cast<unsigned short*>(letter + 0x3EE) & 0x1FF;
 		if (item != 0) {
 			if ((item < 1) || (item > 0x9E)) {
-				if (caravanWork->AddItem(item, 0) == 0) {
+				if (reinterpret_cast<CCaravanWork*>(*foodBasePtr)->AddItem(item, 0) == 0) {
 					result = 1;
 				} else {
 					result = 0;
@@ -2491,13 +2492,14 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 			}
 		}
 	} else {
-		int item = caravanWork->m_letters[letterIndex].AttachmentValue();
+		letter = reinterpret_cast<char*>(*foodBasePtr) + letterOffset;
+		int item = *reinterpret_cast<unsigned short*>(letter + 0x3EE) & 0x1FF;
 		if (item != 0) {
 			int gil = item * 100;
-			if (caravanWork->CanAddGil(gil) == 0) {
+			if (reinterpret_cast<CCaravanWork*>(*foodBasePtr)->CanAddGil(gil) == 0) {
 				result = 1;
 			} else {
-				caravanWork->AddGil(gil);
+				reinterpret_cast<CCaravanWork*>(*foodBasePtr)->AddGil(gil);
 				result = 0;
 			}
 		}
@@ -2512,7 +2514,8 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 	} while (i < 10);
 
 	if ((result == 0) && (i < 10)) {
-		caravanWork->m_letters[letterIndex].SetAttachmentClaimed();
+		char* base = reinterpret_cast<char*>(*foodBasePtr);
+		reinterpret_cast<CCaravanWork::CLetterWork*>(base + letterOffset + 0x3EC)->FlagsBits().m_attachmentClaimed = 1;
 	}
 }
 

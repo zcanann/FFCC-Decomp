@@ -388,7 +388,11 @@ static inline void DrawBonusActiveMarks(CMenuPcs* menu, int statePtr, float alph
 	}
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-	GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
+	GXColor color;
+	color.r = 0xFF;
+	color.g = 0xFF;
+	color.b = 0xFF;
+	color.a = (unsigned char)(alpha * 255.0f);
 	GXSetChanMatColor(GX_COLOR0A0, color);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x23));

@@ -2604,11 +2604,13 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 			 gObject = gCFlatRuntime2.FindGObjNext(gObject))
 		{
 			int previousCount = hitRaw->m_hitParams.m_hitObjectCount;
-			int objectSlot = 0;
-			while ((objectSlot < previousCount) &&
-				   (hitRaw->m_hitObjectIds[objectSlot] != gObject->m_particleId))
+			int objectSlot;
+			for (objectSlot = 0; objectSlot < previousCount; objectSlot++)
 			{
-				objectSlot++;
+				if (hitRaw->m_hitObjectIds[objectSlot] == gObject->m_particleId)
+				{
+					break;
+				}
 			}
 
 			if (objectSlot == previousCount)
@@ -2652,11 +2654,13 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 						int newCount = hitRaw->m_hitParams.m_hitObjectCount;
 						if (previousCount != newCount)
 						{
-							int updatedSlot = 0;
-							while ((updatedSlot < newCount) &&
-								   (hitRaw->m_hitObjectIds[updatedSlot] != gObject->m_particleId))
+							int updatedSlot;
+							for (updatedSlot = 0; updatedSlot < newCount; updatedSlot++)
 							{
-								updatedSlot++;
+								if (hitRaw->m_hitObjectIds[updatedSlot] == gObject->m_particleId)
+								{
+									break;
+								}
 							}
 							previousCount = newCount;
 							if (updatedSlot < newCount)

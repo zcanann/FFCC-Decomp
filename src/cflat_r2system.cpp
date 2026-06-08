@@ -1434,8 +1434,8 @@ void CCameraPcs::SetZRotate(float zRotate)
 void CGame::SetNextScript(CGame::CNextScript* nextScript)
 {
     int count = 0x20;
-    unsigned int* dst = (unsigned int*)&m_nextScript;
     unsigned int* src = (unsigned int*)((char*)nextScript - 4);
+    unsigned int* dst = (unsigned int*)&m_nextScript;
 
     do {
         unsigned int a = src[1];

@@ -1418,41 +1418,40 @@ void GbaQueue::LoadPlayerStat()
 	m_outOfShoukiFlags = static_cast<unsigned char>(outOfShoukiMask);
 
 	for (i = 0; i < 4; i++) {
-		const int oldBase = 0x7C4 + (i * 0xDC);
-		const int newBase = 0x454 + (i * 0xDC);
+		char* base = obj + (i * 0xDC);
 		int j;
 
-		if (memcmp(obj + oldBase + 0x18, obj + newBase + 0x18, 8) != 0) {
+		if (memcmp(base + 0x7C4 + 0x18, base + 0x454 + 0x18, 8) != 0) {
 			m_compatibilityFlg[0] = static_cast<unsigned char>(m_compatibilityFlg[0] | (1 << i));
 		}
-		if (*reinterpret_cast<unsigned int*>(obj + oldBase + 0x24) != *reinterpret_cast<unsigned int*>(obj + newBase + 0x24)) {
+		if (*reinterpret_cast<unsigned int*>(base + 0x7C4 + 0x24) != *reinterpret_cast<unsigned int*>(base + 0x454 + 0x24)) {
 			m_compatibilityFlg[1] = static_cast<unsigned char>(m_compatibilityFlg[1] | (1 << i));
 		}
 
 		for (j = 0; j < 8; j++) {
-			if (memcmp(obj + oldBase + 4, obj + newBase + 4, 8) != 0) {
+			if (memcmp(base + 0x7C4 + 4, base + 0x454 + 4, 8) != 0) {
 				m_maskSendState[i] = static_cast<signed char>(m_maskSendState[i] | (1 << j));
 			}
 		}
 
-		if (obj[oldBase + 0x23] != obj[newBase + 0x23]) {
+		if (base[0x7C4 + 0x23] != base[0x454 + 0x23]) {
 			m_moneyState[0] = static_cast<unsigned char>(m_moneyState[0] | (1 << i));
 		}
-		if (memcmp(obj + oldBase + 0x20, obj + newBase + 0x20, 3) != 0) {
+		if (memcmp(base + 0x7C4 + 0x20, base + 0x454 + 0x20, 3) != 0) {
 			m_moneyState[1] = static_cast<unsigned char>(m_moneyState[1] | (1 << i));
 		}
-		if (memcmp(obj + oldBase + 0x28, obj + newBase + 0x28, 0xC) != 0) {
+		if (memcmp(base + 0x7C4 + 0x28, base + 0x454 + 0x28, 0xC) != 0) {
 			m_moneyState[2] = static_cast<unsigned char>(m_moneyState[2] | (1 << i));
 		}
-		if (*reinterpret_cast<unsigned short*>(obj + oldBase + 0x14) !=
-		    *reinterpret_cast<unsigned short*>(obj + newBase + 0x14)) {
+		if (*reinterpret_cast<unsigned short*>(base + 0x7C4 + 0x14) !=
+		    *reinterpret_cast<unsigned short*>(base + 0x454 + 0x14)) {
 			m_compatibilityFlg[2] = static_cast<unsigned char>(m_compatibilityFlg[2] | (1 << i));
 		}
 
-		if (obj[oldBase + 0xD3] != obj[newBase + 0xD3]) {
+		if (base[0x7C4 + 0xD3] != base[0x454 + 0xD3]) {
 			const int shift = i << 1;
 			m_radarMode = static_cast<unsigned char>(m_radarMode | (1 << shift));
-			if ((static_cast<int>(obj[newBase + 0xD3]) - static_cast<int>(obj[oldBase + 0xD3])) != 1) {
+			if ((static_cast<int>(base[0x454 + 0xD3]) - static_cast<int>(base[0x7C4 + 0xD3])) != 1) {
 				m_radarMode = static_cast<unsigned char>(m_radarMode | (2 << shift));
 			}
 		}

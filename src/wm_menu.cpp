@@ -1423,12 +1423,13 @@ void CMenuPcs::InitCharaInfo()
 	int modelOffset = 0;
 	for (int i = 4; i != 0; i--) {
 		unsigned char* entry0 = m_wm.m_charaModelData + modelOffset;
+		unsigned char* src0 = gameData + 0x13F0;
 		if (*reinterpret_cast<int*>(gameData + 0x1794) == 0) {
 			*reinterpret_cast<unsigned int*>(entry0 + 8) = 0xFFFFFFFF;
 		} else {
-			int modelNo = *reinterpret_cast<unsigned short*>(gameData + 0x17D0) * 200 + 100;
-			short flag0 = *reinterpret_cast<short*>(gameData + 0x17D2);
-			unsigned short add0  = *reinterpret_cast<unsigned short*>(gameData + 0x17D4);
+			int modelNo = *reinterpret_cast<unsigned short*>(src0 + 0x3E0) * 200 + 100;
+			int flag0 = *reinterpret_cast<unsigned short*>(src0 + 0x3E2);
+			unsigned short add0  = *reinterpret_cast<unsigned short*>(src0 + 0x3E4);
 			if (flag0 != 0) {
 				modelNo += 100;
 			}
@@ -1436,19 +1437,21 @@ void CMenuPcs::InitCharaInfo()
 		}
 
 		unsigned char* entry1 = entry0 + 0x34;
-		if (*reinterpret_cast<int*>(gameData + 0x23C4) == 0) {
+		gameData += 0xC30;
+		unsigned char* src1 = gameData + 0x13F0;
+		if (*reinterpret_cast<int*>(gameData + 0x1794) == 0) {
 			*reinterpret_cast<unsigned int*>(entry1 + 8) = 0xFFFFFFFF;
 		} else {
-			int modelNo = *reinterpret_cast<unsigned short*>(gameData + 0x2400) * 200 + 100;
-			short flag1 = *reinterpret_cast<short*>(gameData + 0x2402);
-			unsigned short add1  = *reinterpret_cast<unsigned short*>(gameData + 0x2404);
+			int modelNo = *reinterpret_cast<unsigned short*>(src1 + 0x3E0) * 200 + 100;
+			int flag1 = *reinterpret_cast<unsigned short*>(src1 + 0x3E2);
+			unsigned short add1  = *reinterpret_cast<unsigned short*>(src1 + 0x3E4);
 			if (flag1 != 0) {
 				modelNo += 100;
 			}
 			*reinterpret_cast<unsigned int*>(entry1 + 8) = modelNo + add1;
 		}
 
-		gameData += 0x1860;
+		gameData += 0xC30;
 		modelOffset += 0x68;
 	}
 }

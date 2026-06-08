@@ -3735,7 +3735,7 @@ int CGPartyObj::useItem(int itemId)
 					unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
 					int value = *reinterpret_cast<unsigned short*>(script + foodIndex * 2 + 0x3B8) / 10;
 					heal = 1;
-					if (value > 0) {
+					if (value >= 1) {
 						heal = value;
 					}
 					m_scriptHandle[0x2F4] =

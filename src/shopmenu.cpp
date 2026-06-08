@@ -1840,6 +1840,7 @@ void CShopMenu::DrawSoubi()
  */
 #pragma push
 #pragma opt_loop_invariants off
+#pragma opt_lifetimes off
 void CShopMenu::DrawMake()
 {
     DrawMakeBase();

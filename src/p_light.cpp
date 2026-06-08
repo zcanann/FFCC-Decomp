@@ -1110,8 +1110,9 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
 {
     Mtx cam;
     PSMTXCopy(CameraMatrix(), cam);
-    Mtx nrm;
+    Mtx texMtx;
     Mtx out;
+    Mtx nrm;
 
     if (mode != 0) {
         Vec pos;
@@ -1203,8 +1204,6 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
     GXLoadNrmMtxImm(nrm, 0);
 
     if ((bump != nullptr) && (bump->m_hasTexture != 0)) {
-        Mtx texMtx;
-
         if (bump->m_useViewSpace == 1) {
             PSMTXTrans(texMtx, kLightHalf, kLightHalf, kLightZero);
             PSMTXConcat(texMtx, nrm, m_bumpTexMtx0);

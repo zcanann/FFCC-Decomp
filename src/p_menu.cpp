@@ -859,10 +859,7 @@ void CMenuPcs::draw()
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
     GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
-    {
-        CColor white(0xFF, 0xFF, 0xFF, 0xFF);
-        GXSetChanAmbColor(GX_COLOR0A0, white.color);
-    }
+    GXSetChanAmbColor(GX_COLOR0A0, CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
     GXSetZCompLoc(GX_FALSE);
     GXSetCurrentMtx(0);
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);

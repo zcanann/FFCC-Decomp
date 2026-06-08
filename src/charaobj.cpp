@@ -3324,7 +3324,7 @@ void CGCharaObj::combi2()
 			continue;
 		}
 
-		bool hasNearbyPartner = false;
+		int hasNearbyPartner = 0;
 		for (int j = 0; j < candidateCount; j++) {
 			if (i == j) {
 				continue;
@@ -3336,18 +3336,24 @@ void CGCharaObj::combi2()
 			}
 
 			if (PSVECDistance(&CharaObjComboCenter(party), &CharaObjComboCenter(other)) < 20.0f) {
-				hasNearbyPartner = true;
+				hasNearbyPartner = 1;
 				break;
 			}
 		}
 
 		CharaObjComboFlagBits* comboFlags = reinterpret_cast<CharaObjComboFlagBits*>(&CharaObjComboFlags(party));
-		const bool hadNearbyPartner = comboFlags->m_nearby;
-		if (hasNearbyPartner != hadNearbyPartner) {
-			comboFlags->m_nearby = hasNearbyPartner ? -1 : 0;
-			comboFlags->m_active = -1;
-			party->playSe3D(hasNearbyPartner ? 0x3E : 0x3D, 0x32, 0x96, 0, 0);
+		if (hasNearbyPartner) {
+			if (comboFlags->m_nearby == 0) {
+				goto changed;
+			}
+		} else if (comboFlags->m_nearby != 0) {
+			goto changed;
 		}
+		continue;
+	changed:
+		comboFlags->m_nearby = hasNearbyPartner ? -1 : 0;
+		comboFlags->m_active = -1;
+		party->playSe3D(hasNearbyPartner ? 0x3E : 0x3D, 0x32, 0x96, 0, 0);
 	}
 
 	for (int i = 0; i < candidateCount - 1; i++) {

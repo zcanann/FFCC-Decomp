@@ -788,16 +788,18 @@ void CGraphicPcs::drawBar()
             const float soundWidth = (kGraphicScreenCenterX * Sound.GetPerformance()) / kDebugBarFrameBudget;
 
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-            GXPosition3f32(x, drawText ? static_cast<float>(y) : kDebugBarMoveBottom, kGraphicZero);
+            const float y0 = drawText ? static_cast<float>(y) : kDebugBarMoveBottom;
+            const float y1 = drawText ? static_cast<float>(y + kDebugBarLineStep) : kDebugBarTop;
+            GXPosition3f32(x, y0, kGraphicZero);
             GXColor1u32(soundColor);
             GXTexCoord2u16(0, 0);
-            GXPosition3f32(x + soundWidth + kGraphicOne, drawText ? static_cast<float>(y) : kDebugBarMoveBottom, kGraphicZero);
+            GXPosition3f32(x + soundWidth + kGraphicOne, y0, kGraphicZero);
             GXColor1u32(soundColor);
             GXTexCoord2u16(2, 0);
-            GXPosition3f32(x + soundWidth + kGraphicOne, drawText ? static_cast<float>(y + kDebugBarLineStep) : kDebugBarTop, kGraphicZero);
+            GXPosition3f32(x + soundWidth + kGraphicOne, y1, kGraphicZero);
             GXColor1u32(soundColor);
             GXTexCoord2u16(2, 2);
-            GXPosition3f32(x, drawText ? static_cast<float>(y + kDebugBarLineStep) : kDebugBarTop, kGraphicZero);
+            GXPosition3f32(x, y1, kGraphicZero);
             GXColor1u32(soundColor);
             GXTexCoord2u16(0, 2);
         }

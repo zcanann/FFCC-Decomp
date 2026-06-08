@@ -3841,7 +3841,7 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 
 	unsigned short repeat = 0;
 	unsigned short down = 0;
-	if (entry.m_connected != 0 && entry.m_cmakePending == 0) {
+	if (entry.m_connected == 1 && entry.m_cmakePending == 0) {
 		const int port = 0;
 		bool noRepeatInput = false;
 		if (Pad.m_debugPadLock == 0) {
@@ -6072,11 +6072,6 @@ void CMenuPcs::SetWorldParam(int code, int value)
 	case 16:
 		bytes[0x17] = static_cast<unsigned char>(value);
 		break;
-	default:
-		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-			System.Printf(const_cast<char*>(s__s__d___Error_function_code_not_f_801dc3ec), s_wm_menu_cpp, 0x1482, code);
-		}
-		break;
 	case 0x12: {
 		McCtrl* mc = GetMcCtrl();
 		mc->m_previousState = 0;
@@ -6138,6 +6133,11 @@ void CMenuPcs::SetWorldParam(int code, int value)
 	}
 	case 0x1b:
 		GbaQue.SetControllerMode(static_cast<int>((static_cast<unsigned int>(-value) | static_cast<unsigned int>(value)) >> 31));
+		break;
+	default:
+		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+			System.Printf(const_cast<char*>(s__s__d___Error_function_code_not_f_801dc3ec), s_wm_menu_cpp, 0x1482, code);
+		}
 		break;
 	}
 }
@@ -6250,13 +6250,13 @@ unsigned int CMenuPcs::GetWorldParam(int code)
 		}
 		break;
 	}
+	case 0x15:
+		result = 0x16;
+		break;
 	default:
 		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
 			System.Printf(const_cast<char*>(s__s__d___Error_function_code_not_f_801dc3ec), s_wm_menu_cpp, 0x1521, code);
 		}
-		break;
-	case 0x15:
-		result = 0x16;
 		break;
 	}
 
@@ -8546,8 +8546,8 @@ void CMenuPcs::DrawChara()
 			}
 			LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
 		}
-		if (handle->m_charaKind != 3) {
-			handle->Draw(5);
+		if (GetWmCharaHandles(this)[i]->m_charaKind != 3) {
+			GetWmCharaHandles(this)[i]->Draw(5);
 		} else {
 			DrawInit();
 			GXSetZMode(GX_TRUE, static_cast<GXCompare>(7), GX_TRUE);
@@ -10685,21 +10685,18 @@ void CMenuPcs::DrawMainMenuSub()
 			int remaining = 5 - next;
 			float* fpInner = depthValues + next;
 			unsigned int* opInner = drawOrder + next;
-			if (next < 5) {
-				do {
-					float depth = *fp;
-					if (*fp > *fpInner) {
-						unsigned int idx = *op;
-						unsigned int idxInner = *opInner;
-						*fp = *fpInner;
-						*op = idxInner;
-						*fpInner = depth;
-						*opInner = idx;
-					}
-					fpInner++;
-					opInner++;
-					remaining--;
-				} while (remaining != 0);
+			for (int k = 0; k < remaining; k++) {
+				float depth = *fp;
+				if (*fp > *fpInner) {
+					unsigned int idx = *op;
+					unsigned int idxInner = *opInner;
+					*fp = *fpInner;
+					*op = idxInner;
+					*fpInner = depth;
+					*opInner = idx;
+				}
+				fpInner++;
+				opInner++;
 			}
 			op++;
 			fp++;
@@ -12035,16 +12032,20 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	const float bottom = (sy + sh) - border;
 	const float uv0 = FLOAT_803313dc;
 	for (int i = 0; i < 4; i++) {
-		float x = sx;
-		float y = sy;
+		float x;
+		float y;
 		unsigned long flags = 0;
 		if (i & 1) {
 			x = right;
 			flags |= 8;
+		} else {
+			x = sx;
 		}
 		if (i & 2) {
 			y = bottom;
 			flags |= 4;
+		} else {
+			y = sy;
 		}
 		MenuPcs.DrawRect(flags, x, y, border, border, uv0, uv0, FLOAT_803313e8, FLOAT_803313e8, uv0);
 	}
@@ -12126,12 +12127,11 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 	const int languageIndex = Game.m_gameWork.m_languageId - 1;
 	const unsigned char* const winMess = reinterpret_cast<unsigned char*>(GetWinMess(winType));
 
-	const int count = *reinterpret_cast<const int*>(winMess);
 	float posX;
 	if (winType != 0) {
 		int maxWidth = 0;
 		const unsigned char* entry = winMess;
-		for (int i = 0; i < count; i++) {
+		for (int i = 0; i < *reinterpret_cast<const int*>(winMess); i++) {
 			const short msgId = *reinterpret_cast<const short*>(entry + 4);
 			const char* text = msgTable[msgId];
 			if (text != 0) {
@@ -12153,17 +12153,20 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 
 	char textBuf[128];
 	const unsigned char* entry = winMess + 4;
-	for (int i = 0; i < count; i++) {
+	for (int i = 0; i < *reinterpret_cast<const int*>(winMess); i++) {
 		const short msgId = *reinterpret_cast<const short*>(entry);
 		const char* text = msgTable[msgId];
 		if (strlen(text) != 0) {
-			if (text[0] != '$') {
-				strcpy(textBuf, text);
-			} else {
+			int isDollar;
+			if (text[0] == '$') {
 				strcpy(textBuf, text + 1);
+				isDollar = 1;
+			} else {
+				strcpy(textBuf, text);
+				isDollar = 0;
 			}
 
-			if (winType == 0 || text[0] == '$') {
+			if (winType == 0 || isDollar != 0) {
 				const int textWidth = font->GetWidth(textBuf);
 				posX = static_cast<float>(static_cast<double>(m_menuWindowInfo->x) + static_cast<double>(m_menuWindowInfo->width - textWidth) * DOUBLE_803313f8);
 			}
@@ -12222,7 +12225,7 @@ void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
 #define count (*reinterpret_cast<const int*>(winMess))
 	int maxWidth = 0;
 
-	const unsigned char* entry = winMess + 4;
+	const unsigned char* entry = winMess;
 	for (int i = 0; i < count; i++) {
 		const short msgId = *reinterpret_cast<const short*>(entry + 4);
 		const char* text = msgTable[msgId];
@@ -12235,7 +12238,7 @@ void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
 				maxWidth = textWidth;
 			}
 		}
-		entry += 8;
+		entry += 2;
 	}
 
 	int cols = maxWidth / 0x16;

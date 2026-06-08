@@ -922,6 +922,9 @@ void CCameraPcs::draw()
     }
 
     if (g_map_draw_prof != 0) {
+        float posX = g_shadow_pos.x;
+        float posY = g_shadow_pos.y;
+        float posZ = g_shadow_pos.z;
         PSMTXCopy(m_cameraMatrix, cameraMtx);
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         GXSetZCompLoc(0);
@@ -937,9 +940,6 @@ void CCameraPcs::draw()
         GXClearVtxDesc();
         GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
         GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-        float posX = g_shadow_pos.x;
-        float posY = g_shadow_pos.y;
-        float posZ = g_shadow_pos.z;
         PSMTXScale(shadowMtx, kCameraTwoF, kCameraTwoF, kCameraTwoF);
         shadowMtx[0][3] = posX;
         shadowMtx[1][3] = posY;
@@ -954,6 +954,9 @@ void CCameraPcs::draw()
         GXSetChanMatColor(GX_COLOR0A0, redColor);
         Graphic.DrawSphere();
 
+        float refPosX = g_shadow_refpos.x;
+        float refPosY = g_shadow_refpos.y;
+        float refPosZ = g_shadow_refpos.z;
         PSMTXCopy(m_cameraMatrix, cameraMtx);
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         GXSetZCompLoc(0);
@@ -969,9 +972,6 @@ void CCameraPcs::draw()
         GXClearVtxDesc();
         GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
         GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-        float refPosX = g_shadow_refpos.x;
-        float refPosY = g_shadow_refpos.y;
-        float refPosZ = g_shadow_refpos.z;
         PSMTXScale(shadowMtx, kCameraTwoF, kCameraTwoF, kCameraTwoF);
         shadowMtx[0][3] = refPosX;
         shadowMtx[1][3] = refPosY;

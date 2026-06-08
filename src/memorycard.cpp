@@ -1564,12 +1564,12 @@ void CMemoryCardMan::MakeSaveData()
     CGame* g = &Game;
     for (int i = 0; i < 4; i++)
     {
-        CCaravanWork* cw = &g->m_caravanWorkArr[g->m_gameWork.m_wmBackupParams[i]];
-        if (cw->m_shopState == 0)
+        int idx = g->m_gameWork.m_wmBackupParams[i];
+        if (g->m_caravanWorkArr[idx].m_shopState == 0)
         {
             g->m_gameWork.m_wmBackupParams[i] = -1;
         }
-        if (cw->m_shopBusyFlag != 0)
+        if (g->m_caravanWorkArr[idx].m_shopBusyFlag != 0)
         {
             g->m_gameWork.m_wmBackupParams[i] = -1;
         }

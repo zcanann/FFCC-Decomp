@@ -755,7 +755,7 @@ int CCaravanWork::FindItem(int itemId)
 	int itemIdx = 0;
 
 	for (int row = 0; row < 8; row++) {
-		short item = cur->m_inventoryItems[0];
+		unsigned short item = cur->m_inventoryItems[0];
 		if (item != -1 && item == itemId) {
 			return itemIdx;
 		}

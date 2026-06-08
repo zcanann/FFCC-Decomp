@@ -155,6 +155,17 @@ struct SawBossWork {
 STATIC_ASSERT(offsetof(SawBossWork, m_cooldown) == 0x08);
 STATIC_ASSERT(offsetof(SawBossWork, m_flags) == 0x14);
 
+struct MeteoParasiteCGameFlags {
+    union {
+        u8 m_flags;
+        struct {
+            s8 m_pad : 2;
+            s8 m_bit5 : 1;
+            u8 m_rest : 5;
+        } bits;
+    };
+};
+
 /*
  * --INFO--
  * PAL Address: 0x80132f68
@@ -1865,7 +1876,7 @@ void CGMonObj::frameStatFuncMeteoParasiteC()
 			    ->m_objs[reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex]
 			    ->changeStat(0x65, 0, 0);
 			prgObj->reqAnim(reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex + 0x25, 0, 0);
-			CFlatGameFlags() = static_cast<u8>((CFlatGameFlags() & ~CFlatGameFlag_Bit5) | CFlatGameFlag_Bit5);
+			reinterpret_cast<MeteoParasiteCGameFlags*>(&CFlatGameFlags())->bits.m_bit5 = 1;
 			CFlatBossState() = CFlatBossState() + 1;
 		} else if (prgObj->isLoopAnim() != 0) {
 			reinterpret_cast<CGObject*>(this)->SetAnimSlot(0, 0);

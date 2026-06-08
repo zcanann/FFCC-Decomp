@@ -1296,7 +1296,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         MenuPcs.m_mcCtrl.m_cardChannel = m_accessCardChannel;
         m_cardChannel = static_cast<char>(MenuPcs.m_mcCtrl.m_cardChannel);
         m_saveIndex = static_cast<char>(m_accessSaveIndex);
-        m_memCardResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(static_cast<unsigned char>(m_cardChannel));
+        m_memCardResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(static_cast<signed char>(m_cardChannel));
         if (m_memCardResult == 1) {
             MenuPcs.m_mcCtrl.m_saveIndex = static_cast<unsigned char>(m_saveIndex);
             MenuPcs.m_mcCtrl.m_cardChannel = static_cast<unsigned char>(m_cardChannel);
@@ -1566,9 +1566,15 @@ void CGoOutMenu::CalcGoOut()
         }
 
         input = GetGoOutInputMask();
-        if ((input & 0x100) != 0) {
-            Sound.PlaySe(2, 0x40, 0x7f, 0);
+        {
+            bool pressed;
             if ((input & 0x100) != 0) {
+                Sound.PlaySe(2, 0x40, 0x7f, 0);
+                pressed = true;
+            } else {
+                pressed = false;
+            }
+            if (pressed) {
                 if (m_returnGoOutMode == -1) {
                     SetMainMode(1);
                 } else {
@@ -1583,9 +1589,15 @@ void CGoOutMenu::CalcGoOut()
         }
 
         input = GetGoOutInputMask();
-        if ((input & 0x100) != 0) {
-            Sound.PlaySe(2, 0x40, 0x7f, 0);
+        {
+            bool pressed;
             if ((input & 0x100) != 0) {
+                Sound.PlaySe(2, 0x40, 0x7f, 0);
+                pressed = true;
+            } else {
+                pressed = false;
+            }
+            if (pressed) {
                 SetMainMode(1);
             }
         }
@@ -1596,9 +1608,15 @@ void CGoOutMenu::CalcGoOut()
         }
 
         input = GetGoOutInputMask();
-        if ((input & 0x100) != 0) {
-            Sound.PlaySe(2, 0x40, 0x7f, 0);
+        {
+            bool pressed;
             if ((input & 0x100) != 0) {
+                Sound.PlaySe(2, 0x40, 0x7f, 0);
+                pressed = true;
+            } else {
+                pressed = false;
+            }
+            if (pressed) {
                 SetGoOutMode(8);
             }
         }
@@ -1824,11 +1842,11 @@ void CGoOutMenu::CalcGoOut()
         }
 
         switch (next) {
-        case 2:
-            SetGoOutMode(0xf);
-            break;
         case 1:
             SetGoOutMode(0x11);
+            break;
+        case 2:
+            SetGoOutMode(0xf);
             break;
         }
         break;
@@ -1869,11 +1887,11 @@ void CGoOutMenu::CalcGoOut()
         }
 
         switch (next) {
-        case 2:
-            SetGoOutMode(0xf);
-            break;
         case 1:
             SetGoOutMode(0x12);
+            break;
+        case 2:
+            SetGoOutMode(0xf);
             break;
         }
         break;
@@ -1935,11 +1953,11 @@ void CGoOutMenu::CalcGoOut()
         }
 
         switch (next) {
-        case 2:
-            SetMainMode(1);
-            break;
         case 1:
             SetGoOutMode(4);
+            break;
+        case 2:
+            SetMainMode(1);
             break;
         }
         break;
@@ -1974,11 +1992,11 @@ void CGoOutMenu::CalcGoOut()
         }
 
         switch (next) {
-        case 2:
-            SetMainMode(1);
-            break;
         case 1:
             SetGoOutMode(5);
+            break;
+        case 2:
+            SetMainMode(1);
             break;
         }
         break;
@@ -2295,11 +2313,11 @@ void CGoOutMenu::CalcDel()
         }
 
         switch (next) {
-        case 2:
-            SetDelMode(2);
-            break;
         case 1:
             SetDelMode(4);
+            break;
+        case 2:
+            SetDelMode(2);
             break;
         }
         break;
@@ -2347,16 +2365,16 @@ void CGoOutMenu::CalcDel()
         }
 
         switch (next) {
-        case 2:
-            SetDelMode(2);
-            break;
         case 1:
             SetDelMode(5);
+            break;
+        case 2:
+            SetDelMode(2);
             break;
         }
         break;
     case 5:
-        if (m_messageWindowOpen != 0 && MenuPcs.IsMenuCharaAnimIdle(m_selectedChara) != 0) {
+        if (m_messageWindowOpen != 0 && static_cast<int>(MenuPcs.IsMenuCharaAnimIdle(m_selectedChara)) != 0) {
             input = GetGoOutInputMask();
             if ((input & 0x100) != 0) {
                 Sound.PlaySe(2, 0x40, 0x7f, 0);
@@ -2412,11 +2430,11 @@ void CGoOutMenu::CalcDel()
         }
 
         switch (next) {
-        case 2:
-            SetDelMode(2);
-            break;
         case 1:
             SetDelMode(7);
+            break;
+        case 2:
+            SetDelMode(2);
             break;
         }
         break;
@@ -2464,17 +2482,17 @@ void CGoOutMenu::CalcDel()
         }
 
         switch (next) {
-        case 2:
-            SetDelMode(2);
-            break;
         case 1:
             Game.m_caravanWorkArr[m_selectedChara].m_shopBusyFlag = 0;
             SetDelMode(8);
             break;
+        case 2:
+            SetDelMode(2);
+            break;
         }
         break;
     case 8:
-        if (m_messageWindowOpen != 0 && MenuPcs.IsMenuCharaAnimIdle(m_selectedChara) != 0) {
+        if (m_messageWindowOpen != 0 && static_cast<int>(MenuPcs.IsMenuCharaAnimIdle(m_selectedChara)) != 0) {
             input = GetGoOutInputMask();
             if ((input & 0x100) != 0) {
                 Sound.PlaySe(2, 0x40, 0x7f, 0);
@@ -2569,11 +2587,15 @@ void CGoOutMenu::Calc()
         case 0:
             if (m_messageWindowOpen != 0) {
                 input = GetGoOutInputMask();
+                bool pressed;
                 if ((input & 0x100) != 0) {
                     Sound.PlaySe(2, 0x40, 0x7f, 0);
-                    if ((input & 0x100) != 0) {
-                        SetMainMode(m_nextMainMode);
-                    }
+                    pressed = true;
+                } else {
+                    pressed = false;
+                }
+                if (pressed) {
+                    SetMainMode(m_nextMainMode);
                 }
             }
             break;
@@ -2608,7 +2630,7 @@ void CGoOutMenu::Calc()
                 m_cursorListY1 = 0xB0;
                 m_cursorMode = 1;
 
-                unsigned char nextMode = 0;
+                signed char nextMode = 0;
                 if (MenuPcs.m_menuWindowInfo->state == 1) {
                     input = GetGoOutInputMask();
                     if ((input & 0xC) != 0) {
@@ -2618,41 +2640,13 @@ void CGoOutMenu::Calc()
                         input = GetGoOutInputMask();
                         if ((input & 0x100) != 0) {
                             Sound.PlaySe(2, 0x40, 0x7f, 0);
-                            nextMode = static_cast<unsigned char>(m_cursorChoice + 1);
+                            nextMode = static_cast<signed char>(m_cursorChoice + 1);
                         }
                     }
                 }
 
-                if (nextMode == 2) {
-                    unsigned int activeCount = 0;
-                    for (int i = 0; i < 8; i++) {
-                        if (Game.m_caravanWorkArr[i].m_shopState != 0) {
-                            activeCount++;
-                            if (Game.m_caravanWorkArr[i].m_shopBusyFlag != 0) {
-                                activeCount++;
-                            }
-                        }
-                    }
-
-                    if (activeCount < 2) {
-                        int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
-                        SetMenuStr(0, 2,
-                                   GetGoOutMessageLine(languageId, 108),
-                                   GetGoOutMessageLine(languageId, 109));
-                        m_nextMainMode = 1;
-                        SetMainMode(0);
-                    } else {
-                        SetMainMode(3);
-                        if (m_currentMessage >= 0) {
-                            MenuPcs.m_menuWindowInfo->state = 2;
-                            MenuGoOutState().m_animFrame = 0;
-                        }
-                        m_messageWindowOpen = 0;
-                        m_pendingMessage = -1;
-                        m_messageCloseMode = 0;
-                        m_pendingMessageTimer = 0;
-                    }
-                } else if (nextMode == 1) {
+                switch (nextMode) {
+                case 1: {
                     int characterCount = 0;
                     for (unsigned int i = 0; i < 8; i++) {
                         if (Game.m_caravanWorkArr[i].m_shopState != 0) {
@@ -2695,6 +2689,39 @@ void CGoOutMenu::Calc()
                             SetMainMode(0);
                         }
                     }
+                    break;
+                }
+                case 2: {
+                    unsigned int activeCount = 0;
+                    for (int i = 0; i < 8; i++) {
+                        if (Game.m_caravanWorkArr[i].m_shopState != 0) {
+                            activeCount++;
+                            if (Game.m_caravanWorkArr[i].m_shopBusyFlag != 0) {
+                                activeCount++;
+                            }
+                        }
+                    }
+
+                    if (activeCount < 2) {
+                        int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+                        SetMenuStr(0, 2,
+                                   GetGoOutMessageLine(languageId, 108),
+                                   GetGoOutMessageLine(languageId, 109));
+                        m_nextMainMode = 1;
+                        SetMainMode(0);
+                    } else {
+                        SetMainMode(3);
+                        if (m_currentMessage >= 0) {
+                            MenuPcs.m_menuWindowInfo->state = 2;
+                            MenuGoOutState().m_animFrame = 0;
+                        }
+                        m_messageWindowOpen = 0;
+                        m_pendingMessage = -1;
+                        m_messageCloseMode = 0;
+                        m_pendingMessageTimer = 0;
+                    }
+                    break;
+                }
                 }
             }
             break;

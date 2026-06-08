@@ -836,7 +836,7 @@ void CGMonObj::frameStatFuncSaw()
 
 	switch (prgObj->m_lastStateId) {
 	case 100:
-		mon[0x63C] = mon[0x63C] & 0x7F | 0x80;
+		reinterpret_cast<CGCharaObj*>(this)->m_unk63CBits.m_bit80 = 1;
 
 		if (prgObj->m_subState == 0) {
 			if (prgObj->m_subFrame == 0) {

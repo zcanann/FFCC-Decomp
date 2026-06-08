@@ -2820,8 +2820,9 @@ void CGMonObj::setRepop(int mode)
 	int option;
 	if ((mode != 0) && (option = static_cast<int>(*reinterpret_cast<short*>(&Game.m_gameWork.m_optionValue)), option < 9)) {
 		unsigned long long bit = 1ULL << reinterpret_cast<int>(scriptHandle[2]);
-		if (((CFlatSpawnBitHi(option) & static_cast<unsigned int>(bit)) |
-			 (CFlatSpawnBitLo(option) & static_cast<unsigned int>(bit >> 32))) != 0) {
+		unsigned long long spawnBits =
+			(static_cast<unsigned long long>(CFlatSpawnBitHi(option)) << 32) | CFlatSpawnBitLo(option);
+		if ((spawnBits & bit) != 0) {
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle) + 0x1C) = 0;
 			object->m_bgColMask = 0;
 			object->m_displayFlags = 0;

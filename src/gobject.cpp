@@ -1037,7 +1037,7 @@ void CGObject::bgNormalCollision()
     pos.y -= m_capsuleHalfHeight;
     PSVECAdd(&pos, &move, &pos);
 
-    if ((m_jumpLandingDampening <= sZeroFloat) || (sLandingDampenCutoff <= m_groundHitOffset.y)) {
+    if (!(m_jumpLandingDampening > sZeroFloat) || !(m_groundHitOffset.y < sLandingDampenCutoff)) {
         m_groundHitOffset.x = pos.x - m_worldPosition.x;
         m_groundHitOffset.y = pos.y - m_worldPosition.y;
         m_groundHitOffset.z = pos.z - m_worldPosition.z;

@@ -2585,16 +2585,16 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 	double barY1 = static_cast<double>(static_cast<float>(barY0 + static_cast<double>(static_cast<float>(h - DOUBLE_80333120))));
 	for (int side = 0; side < 2; ++side) {
 		double x = (side == 0) ? barX0 : barX1;
-		double y = barY0;
+		float y = static_cast<float>(barY0);
 		while (y < barY1) {
-			double seg = static_cast<double>(static_cast<float>(barY1 - y));
-			if (DOUBLE_80333118 <= seg) {
-				seg = static_cast<double>(FLOAT_8033310c);
+			float seg = static_cast<float>(barY1 - y);
+			if (seg >= DOUBLE_80333118) {
+				seg = FLOAT_8033310c;
 			}
 			MenuPcs.DrawRect(
-			    0, static_cast<float>(x), static_cast<float>(y), FLOAT_80333108, static_cast<float>(seg),
+			    0, static_cast<float>(x), y, FLOAT_80333108, seg,
 			    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
-			y = static_cast<double>(static_cast<float>(y + seg));
+			y = y + seg;
 		}
 	}
 

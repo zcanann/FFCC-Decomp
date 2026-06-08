@@ -1650,13 +1650,10 @@ int CAmemCacheSet::GetData(short index, char* source, int line)
 
         if (entry.m_cacheData == 0) {
             if (entry.m_dmaCopy != 0) {
-                char* allocSource = source;
-                if (allocSource == 0) {
-                    allocSource = const_cast<char*>(sEmptyAllocSourceName);
-                }
-
                 entry.m_cacheData =
-                    m_rStage->alloc(static_cast<unsigned long>(entry.m_size), allocSource, static_cast<unsigned long>(line), 1);
+                    m_rStage->alloc(static_cast<unsigned long>(entry.m_size),
+                                    source != 0 ? source : const_cast<char*>(sEmptyAllocSourceName),
+                                    static_cast<unsigned long>(line), 1);
                 if (entry.m_cacheData == 0) {
                     data = 0;
                 } else {
@@ -1691,7 +1688,7 @@ int CAmemCacheSet::GetData(short index, char* source, int line)
         if (data != 0) {
             return data;
         }
-        AmemFreeLowPrio(entry.m_size);
+        AmemFreeLowPrio(cacheEntryAt(this, index).m_size);
     }
 }
 
@@ -1876,20 +1873,18 @@ void CAmemCacheSet::AddRef(short index)
     CAmemCache& entry = cacheEntryAt(this, index);
 
     entry.m_refCount += 1;
-    if (entry.m_refCount == 0xFFFF) {
+    if (entry.m_refCount >= 0xFFFF) {
         if (static_cast<unsigned int>(System.m_execParam) >= 3) {
             System.Printf(const_cast<char*>(sAmemCacheAddRefFmt), static_cast<int>(index));
         }
 
         for (int i = 0; i < m_cacheCount; i++) {
             CAmemCache& current = cacheEntryAt(this, i);
-            unsigned int data = reinterpret_cast<int>(current.m_cacheData);
-            if ((current.m_inUse != 0) || (data != 0)) {
-                if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-                    System.Printf(
-                        const_cast<char*>(sAmemCacheEntryFmt), i, cacheStateName(current),
-                        cacheTypeName(current), current.m_refCount, current.m_priority, data);
-                }
+            if (((current.m_inUse != 0) || (current.m_cacheData != 0)) && (static_cast<unsigned int>(System.m_execParam) >= 3)) {
+                System.Printf(
+                    const_cast<char*>(sAmemCacheEntryFmt), i, cacheStateName(current),
+                    cacheTypeName(current), current.m_refCount, current.m_priority,
+                    reinterpret_cast<int>(current.m_cacheData));
             }
         }
 
@@ -2006,11 +2001,11 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
 
             for (unsigned int i = 0; i < m_cacheCount; i++) {
                 CAmemCache& entry = cacheEntryAt(this, i);
-                int data = reinterpret_cast<int>(entry.m_cacheData);
-                if (((entry.m_inUse != 0) || (data != 0)) && (static_cast<int>(System.m_execParam) >= 3)) {
+                if (((entry.m_inUse != 0) || (entry.m_cacheData != 0)) && (static_cast<int>(System.m_execParam) >= 3)) {
                     System.Printf(
                         const_cast<char*>(strBase + 0xd8), i, cacheStateName(entry),
-                        cacheTypeName(entry), entry.m_refCount, entry.m_priority, data);
+                        cacheTypeName(entry), entry.m_refCount, entry.m_priority,
+                        reinterpret_cast<int>(entry.m_cacheData));
                 }
             }
 

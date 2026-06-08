@@ -2025,8 +2025,8 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 				candidates[write] = 0;
 			} else {
 				candidates[write] = 0;
-				candidates[write + 1] = 0;
 				write++;
+				candidates[write] = 0;
 				slot++;
 				if (caravan->m_commandListExtra[slot] < 0) {
 					candidates[write + 1] = 0;

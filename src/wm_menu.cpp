@@ -4971,17 +4971,20 @@ void CMenuPcs::DrawCMakeMenu()
 void CMenuPcs::DrawMoveMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmWorldState* const worldState = m_wmWorldState;
+#define worldState m_wmWorldState
 	if (worldState == 0) {
 		return;
 	}
 
-	const short state = worldState->m_mainState;
-	if (((state == 0) && bytes[0x12] == 0) || state >= 4) {
-		return;
+	{
+		const short state = worldState->m_mainState;
+		if (((state == 0) && bytes[0x12] == 0) || state > 3) {
+			return;
+		}
 	}
 
 	DrawFukidashi();
+	const short state = worldState->m_mainState;
 	const short step = worldState->m_frameCounter;
 	float moveAlpha;
 	if (state == 1) {
@@ -5109,6 +5112,7 @@ void CMenuPcs::DrawMoveMenu()
 		stackData[2].m_word = 0;
 		gCFlatRuntime().SystemCall(0, 1, 4, 3, stackData, 0);
 	}
+#undef worldState
 }
 
 /*

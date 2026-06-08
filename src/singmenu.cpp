@@ -3418,8 +3418,9 @@ u8 CMenuPcs::GetItemIcon(int index)
  */
 int CMenuPcs::GetItemType(int itemId, int useRawItemId)
 {
+    const CCaravanWork* caravanWork = SingleCaravanWork();
     if (useRawItemId == 0) {
-        itemId = static_cast<int>(SingleCaravanWork()->m_inventoryItems[itemId]);
+        itemId = static_cast<int>(caravanWork->m_inventoryItems[itemId]);
     }
 
     if (itemId <= 0) {
@@ -3439,6 +3440,9 @@ int CMenuPcs::GetItemType(int itemId, int useRawItemId)
     }
     if (itemId <= 0x129) {
         return 5;
+    }
+    if (itemId <= 0x17C) {
+        return 6;
     }
     if (itemId <= 0x17C) {
         return 6;

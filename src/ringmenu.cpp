@@ -165,8 +165,9 @@ void CRingMenu::DrawIcon()
 	PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
 	Math.MTX44MultVec4(screenMtx, &viewPos, &clipPos);
 
-	clipPos.x = clipPos.x * (kRingMenuOne / clipPos.w);
-	clipPos.y = clipPos.y * (kRingMenuOne / clipPos.w);
+	float invW = kRingMenuOne / clipPos.w;
+	clipPos.x = clipPos.x * invW;
+	clipPos.y = clipPos.y * invW;
 	if ((clipPos.x > kRingMenuNegativeOne) && (clipPos.x < kRingMenuOne) && (clipPos.y > kRingMenuNegativeOne) &&
 	    (clipPos.y < kRingMenuOne)) {
 		return;
@@ -181,6 +182,7 @@ void CRingMenu::DrawIcon()
 			clampedX = kRingMenuClipMaxX;
 		}
 	}
+	clipPos.x = clampedX;
 
 	float clampedY;
 	if (kRingMenuClipMinY > clipPos.y) {
@@ -191,8 +193,9 @@ void CRingMenu::DrawIcon()
 			clampedY = kRingMenuClipMaxY;
 		}
 	}
+	clipPos.y = clampedY;
 
-	float angle = static_cast<float>(atan2(static_cast<double>(clampedX), static_cast<double>(clampedY)));
+	float angle = static_cast<float>(atan2(static_cast<double>(clipPos.x), static_cast<double>(clipPos.y)));
 
 	float posX = kRingMenuScreenHalfWidth * clampedX + kRingMenuScreenHalfWidth;
 	float posY = -(kRingMenuScreenHalfHeight * clampedY - kRingMenuScreenHalfHeight);

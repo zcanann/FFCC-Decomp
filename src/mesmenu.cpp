@@ -570,10 +570,10 @@ void CMesMenu::onDraw()
                     FLOAT_803308d8);
 
                 if (m_nameIndex >= 0) {
-                    char* actionName = Game.m_cFlatDataArr[1].TableStrings(2)[m_nameIndex];
                     font->SetScale(FLOAT_8033094C);
                     font->SetShadow(1);
                     font->SetMargin(FLOAT_803308d8);
+                    char* actionName = Game.m_cFlatDataArr[1].TableStrings(2)[m_nameIndex];
                     float textWidth = font->GetWidth(actionName);
                     font->DrawInit();
                     font->SetTlut(0xF);
@@ -743,10 +743,10 @@ void CMesMenu::onDraw()
                     FLOAT_803308d8);
 
                 if (m_nameIndex >= 0) {
-                    char* actionName = Game.m_cFlatDataArr[1].TableStrings(2)[m_nameIndex];
                     font->SetScale(FLOAT_8033094C);
                     font->SetShadow(1);
                     font->SetMargin(FLOAT_803308d8);
+                    char* actionName = Game.m_cFlatDataArr[1].TableStrings(2)[m_nameIndex];
                     float textWidth = font->GetWidth(actionName);
                     font->DrawInit();
                     font->SetTlut(0xF);

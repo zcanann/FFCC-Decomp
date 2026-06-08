@@ -280,8 +280,9 @@ void CMenuPcs::ArtiDraw()
 			} else {
 				float itemAlpha = entry->alpha;
 				if (tex == 0x37) {
-					short itemCount = caravanWork->m_artifacts[drawIndex + m_artiState->scrollOffset];
-					if (itemCount < 1) {
+					int itemCount = caravanWork->m_artifacts[drawIndex + m_artiState->scrollOffset];
+					if (itemCount > 0) {
+					} else {
 						tex = 0x34;
 						itemAlpha = (float)(kArtiHalfDouble * (double)itemAlpha);
 					}

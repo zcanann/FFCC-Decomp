@@ -202,17 +202,8 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 	unsigned char c;
 	while ((c = in[0]) != 0)
 	{
-		if (c != 0xFF)
+		if (c == 0xFF)
 		{
-			if (branchMode != 2)
-			{
-				*dst = (char)c;
-				dst++;
-			}
-			in++;
-			continue;
-		}
-
 		unsigned int tag = ((unsigned int)in[1] - 0xA0U) & 0xFFU;
 		next = in + 2;
 
@@ -474,6 +465,15 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		}
 
 		in = next;
+		continue;
+		}
+
+		if (branchMode != 2)
+		{
+			*dst = (char)c;
+			dst++;
+		}
+		in++;
 	}
 }
 

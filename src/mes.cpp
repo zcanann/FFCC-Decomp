@@ -903,8 +903,11 @@ void CMes::addString(char** text, int branchMode)
 	bool running = true;
 	unsigned char caseMode = 0;
 	signed char flowMode = 0;
-	char name[32];
-	char* namePtr = name;
+	char nameTag2D[32];
+	char nameTag2C[32];
+	char nameTag2B[32];
+	char nameMon[32];
+	char nameItem[32];
 
 	while (running)
 	{
@@ -1015,6 +1018,7 @@ void CMes::addString(char** text, int branchMode)
 				mColor = 5;
 			}
 			int value = mFlagVars[ReadTagS8(text)] & 0xFFFF;
+			char* namePtr = nameItem;
 			switch (uch)
 			{
 			case 9:
@@ -1060,6 +1064,7 @@ void CMes::addString(char** text, int branchMode)
 				mColor = 0;
 			}
 			int value = mFlagVars[ReadTagS8(text)] & 0xFFFF;
+			char* namePtr = nameMon;
 			switch (uch)
 			{
 			case 0x2A:
@@ -1099,6 +1104,7 @@ void CMes::addString(char** text, int branchMode)
 			{
 				mColor = 6;
 			}
+			char* namePtr = nameTag2B;
 			strcpy(namePtr, FlatNameDirect(2, mFlagVars[ReadTagS8(text)] & 0xFFFF));
 			ApplyCaseMode(namePtr, caseMode);
 			addString(&namePtr, branchMode);
@@ -1112,6 +1118,7 @@ void CMes::addString(char** text, int branchMode)
 			{
 				mColor = 4;
 			}
+			char* namePtr = nameTag2C;
 			strcpy(namePtr, FlatNameDirect(3, mFlagVars[ReadTagS8(text)] & 0xFFFF));
 			ApplyCaseMode(namePtr, caseMode);
 			addString(&namePtr, branchMode);
@@ -1125,6 +1132,7 @@ void CMes::addString(char** text, int branchMode)
 			{
 				mColor = 3;
 			}
+			char* namePtr = nameTag2D;
 			strcpy(namePtr, FlatNameDirect(3, (mFlagVars[ReadTagS8(text)] & 0xFFFF) + 0x3C));
 			ApplyCaseMode(namePtr, caseMode);
 			addString(&namePtr, branchMode);

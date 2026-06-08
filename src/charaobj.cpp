@@ -3121,7 +3121,7 @@ int CGCharaObj::calcCastTime(int itemId)
 	}
 
 	int itemNo = *reinterpret_cast<short*>(itemData + 0x0);
-	short itemType = *reinterpret_cast<unsigned short*>(itemData + 0xE);
+	int itemType = *reinterpret_cast<unsigned short*>(itemData + 0xE);
 
 	if (itemNo != 0x1F8 && itemType == 2) {
 		unsigned int castBonus = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0x194);

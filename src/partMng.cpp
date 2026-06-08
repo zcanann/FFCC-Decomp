@@ -2467,7 +2467,7 @@ void CPartMng::pppEditDrawShadow()
         cameraPos.y = invCamera[1][3];
         cameraPos.z = invCamera[2][3];
 
-        for (int i = 0; i < 0x180; i++) {
+        for (unsigned int i = 0; i < 0x180; i++) {
             _pppMngSt* mng = &m_pppMng[i];
             if (mng->m_hitBgFlag == 0 && mng->m_baseTime != -0x1000 && (signed char)mng->m_drawPass == 3
                 && mng->m_baseTime < 0 && mng->m_slotVisible != 0 && mng->m_ownerFacing != 0) {
@@ -2939,7 +2939,7 @@ void CPartMng::pppDrawPrio(unsigned char drawMode)
     cameraPos.y = invCamera[1][3];
     cameraPos.z = invCamera[2][3];
 
-    for (int i = 0; i < 0x180; i++) {
+    for (unsigned int i = 0; i < 0x180; i++) {
         _pppMngSt* mng = &m_pppMng[i];
         if (mng->m_hitBgFlag == 0 && mng->m_baseTime != -0x1000
             && (signed char)mng->m_drawPass == drawMode && mng->m_baseTime < 0

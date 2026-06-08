@@ -919,25 +919,16 @@ void CGItemObj::onFrameStat()
 		if (m_stateFrame == m_carryFrame) {
 			Vec safePos;
 			float launchSpeed;
-			bool useMenuLaunchSpeed = false;
 
-			if (Game.m_gameWork.m_menuStageMode != 0) {
-				if (Game.m_gameWork.m_menuStageMode != 0 &&
-				    Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-					int carryCid = static_cast<unsigned short>(m_owner->GetCID());
-					if ((carryCid & 0x6D) == 0x6D &&
-					    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_owner->m_scriptHandle) + 0x3B4) != 0) {
-						useMenuLaunchSpeed = true;
-					}
-				}
-			}
-
-			if (useMenuLaunchSpeed) {
+			if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_menuStageMode != 0 &&
+			    Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
+			    (static_cast<unsigned short>(m_owner->GetCID()) & 0x6D) == 0x6D &&
+			    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_owner->m_scriptHandle) + 0x3B4) != 0) {
 				launchSpeed = kItemObjUnitScale;
 			} else if (static_cast<int>(CFlatCenterState()) == 1) {
 				int carryCid = static_cast<unsigned short>(m_owner->GetCID());
 				if ((carryCid & 0x6D) == 0x6D &&
-				    1 < *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_owner->m_scriptHandle) + 0x3E0)) {
+				    2 <= *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_owner->m_scriptHandle) + 0x3E0)) {
 					launchSpeed = kItemObjUnitScale;
 				} else {
 					launchSpeed = kItemObjDouble;

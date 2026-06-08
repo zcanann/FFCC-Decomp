@@ -1525,9 +1525,10 @@ void CGObject::update()
                 modelMtx[2][3] = swayZero2.z;
                 PSMTXConcat(rotScratch, modelMtx, modelMtx);
                 const float swayTan = tan(-swayAngle);
+                const float swayTanScaled = 2.0f * swayTan;
                 modelMtx[0][3] = mtx0;
                 modelMtx[2][3] = mtx2;
-                modelMtx[1][3] = mtx1 - 2.0f * swayTan;
+                modelMtx[1][3] = mtx1 - swayTanScaled;
             }
 
             float swayClamp = swayDot < sAnimFrameOffset ? swayDot : sAnimFrameOffset;

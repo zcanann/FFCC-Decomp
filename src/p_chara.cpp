@@ -575,18 +575,13 @@ void CCharaPcs::Init()
             lightColor.g = intensity;
             lightColor.b = intensity;
             lightColor.a = 0xFF;
+            if (i == 0) {
+                m_viewerDiffusePos[lightIndex].x = 0.0f;
+                m_viewerDiffusePos[lightIndex].y = 0.0f;
+                m_viewerDiffusePos[lightIndex].z = 1.0f;
+            }
         }
     }
-
-    m_viewerDiffusePos[0].x = 0.0f;
-    m_viewerDiffusePos[0].y = 0.0f;
-    m_viewerDiffusePos[0].z = 1.0f;
-    m_viewerDiffusePos[1].x = 0.0f;
-    m_viewerDiffusePos[1].y = 0.0f;
-    m_viewerDiffusePos[1].z = 1.0f;
-    m_viewerDiffusePos[2].x = 0.0f;
-    m_viewerDiffusePos[2].y = 0.0f;
-    m_viewerDiffusePos[2].z = 1.0f;
 
     for (int i = 0; i < 5; i++) {
         CColor white(0xFF, 0xFF, 0xFF, 0xFF);

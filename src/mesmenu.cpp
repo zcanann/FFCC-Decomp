@@ -1076,17 +1076,18 @@ void CMesMenu::onCalc()
     m_stateTimer = m_stateTimer + 1;
     if (m_stateTimerMax < m_stateTimer) {
         int nextState = m_state;
-        if (nextState == 2) {
+        switch (nextState) {
+        case 0:
+            m_state = 1;
+            m_stateTimer = 0;
+            m_stateTimerMax = 0;
+            break;
+        case 2:
             m_state = 3;
             m_stateTimer = 0;
             m_stateTimerMax = 8;
-        } else if (nextState < 2) {
-            if (nextState == 0) {
-                m_state = 1;
-                m_stateTimer = 0;
-                m_stateTimerMax = 0;
-            }
-        } else if (nextState < 4) {
+            break;
+        case 3: {
             CFlatRuntime::CStack stack[2];
             m_state = 4;
             m_stateTimer = 0;
@@ -1100,6 +1101,8 @@ void CMesMenu::onCalc()
             if (m_menuIndex < 4) {
                 MenuPcs.m_battleRingMenus[m_menuIndex]->SetFade(1);
             }
+            break;
+        }
         }
     }
 }

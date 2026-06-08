@@ -11237,11 +11237,36 @@ LAB_draw:
 				if (locationStr[0] != 0) {
 					locationStr[0] = static_cast<char>(toupperLatin1(static_cast<unsigned char>(locationStr[0])));
 				}
-				const float locationY = static_cast<float>(static_cast<double>(slotY) + static_cast<double>(FLOAT_80331558));
-				const int locationWidth = static_cast<int>(fontF8->GetWidth(locationStr));
-				fontF8->SetPosX(static_cast<float>(static_cast<double>(FLOAT_80331518) - static_cast<double>(locationWidth)));
-				fontF8->SetPosY(locationY);
-				fontF8->Draw(locationStr);
+				float locationY = static_cast<float>(static_cast<double>(slotY) + static_cast<double>(FLOAT_80331558));
+				if (fontF8->GetWidth(locationStr) <= FLOAT_8033155C) {
+					const int locationWidth = static_cast<int>(fontF8->GetWidth(locationStr));
+					fontF8->SetPosX(static_cast<float>(static_cast<double>(FLOAT_80331518) - static_cast<double>(locationWidth)));
+					fontF8->SetPosY(locationY);
+					fontF8->Draw(locationStr);
+				} else {
+					char line1[64];
+					char line2[64];
+					char part[64];
+					locationY = locationY + FLOAT_80331550;
+					strcpy(line1, locationStr);
+					line2[0] = 0;
+					char* space = strchr(locationStr, ' ');
+					if (space != 0) {
+						const int firstLen = space - locationStr;
+						memcpy(part, locationStr, firstLen);
+						part[firstLen] = 0;
+						if (static_cast<int>(fontF8->GetWidth(part)) <= 0x90) {
+							strcpy(line1, part);
+							strcpy(line2, space + 1);
+						}
+					}
+					fontF8->SetPosX(static_cast<float>(static_cast<double>(FLOAT_80331518) - static_cast<double>(static_cast<int>(fontF8->GetWidth(line1)))));
+					fontF8->SetPosY(static_cast<float>(static_cast<double>(locationY) - static_cast<double>(FLOAT_80331590)));
+					fontF8->Draw(line1);
+					fontF8->SetPosX(static_cast<float>(static_cast<double>(FLOAT_80331518) - static_cast<double>(static_cast<int>(fontF8->GetWidth(line2)))));
+					fontF8->SetPosY(locationY);
+					fontF8->Draw(line2);
+				}
 			}
 		}
 	}

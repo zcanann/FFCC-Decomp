@@ -318,7 +318,7 @@ void CGMonObj::undeadOn()
 		object->SetTexAnim(const_cast<char*>(s_monObjTexAnimU1));
 	}
 
-	if (static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags)) << 24)) < 0) {
+	if ((static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags)) << 24) & 0xC0000000) >> 31) != 0) {
 		if (classId == 0x83) {
 			reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x987A, 0x32, 0x96, 0, (Vec*)0);
 		} else if (classId == 0x7F) {

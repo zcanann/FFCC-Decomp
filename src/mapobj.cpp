@@ -606,7 +606,8 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             if (chunk.m_version == 6) {
                 chunkFile.PushChunk();
                 while (chunkFile.GetNextChunk(chunk) != 0) {
-                    if (chunk.m_id == CHUNK_LDAT) {
+                    switch (chunk.m_id) {
+                    case CHUNK_LDAT: {
                         spotLight->m_baseColor.r = chunkFile.Get1();
                         spotLight->m_baseColor.g = chunkFile.Get1();
                         spotLight->m_baseColor.b = chunkFile.Get1();
@@ -649,18 +650,26 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
 
                         spotLight->m_color = spotLight->m_colors[0];
                         spotLight->m_altColor = spotLight->m_altColors[0];
-                    } else if (chunk.m_id == CHUNK_CJUN) {
+                        break;
+                    }
+                    case CHUNK_CJUN:
                         spotLight->m_altColorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
-                    } else if (chunk.m_id == CHUNK_CFRM) {
+                        break;
+                    case CHUNK_CFRM:
                         spotLight->m_altColorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
-                    } else if (chunk.m_id == CHUNK_CKEY) {
+                        break;
+                    case CHUNK_CKEY:
                         spotLight->m_altColorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
-                    } else if (chunk.m_id == CHUNK_MJUN) {
+                        break;
+                    case CHUNK_MJUN:
                         spotLight->m_colorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
-                    } else if (chunk.m_id == CHUNK_MFRM) {
+                        break;
+                    case CHUNK_MFRM:
                         spotLight->m_colorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
-                    } else if (chunk.m_id == CHUNK_MKEY) {
+                        break;
+                    case CHUNK_MKEY:
                         spotLight->m_colorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
+                        break;
                     }
                 }
                 chunkFile.PopChunk();

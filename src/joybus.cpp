@@ -274,7 +274,7 @@ void JoyBus::CreateInit()
     {
         m_gbaBootImage = new char[0x38000];
 
-        if (m_gbaBootImage == 0 && System.m_execParam != 0)
+        if (m_gbaBootImage == 0 && (unsigned int)System.m_execParam != 0)
         {
             System.Printf(const_cast<char*>(s_mem_alloc_error_fmt),
                 const_cast<char*>(s_joybus_cpp), 0x126);
@@ -303,7 +303,7 @@ void JoyBus::CreateInit()
     {
         m_fileBaseA = reinterpret_cast<unsigned int*>(new char[len + 0x20]);
 
-        if (m_fileBaseA == (unsigned int*)nullptr && System.m_execParam != 0)
+        if (m_fileBaseA == (unsigned int*)nullptr && (unsigned int)System.m_execParam != 0)
         {
             System.Printf(const_cast<char*>(s_mem_alloc_error_fmt), const_cast<char*>(s_joybus_cpp), 0x13A);
         }
@@ -318,7 +318,7 @@ void JoyBus::CreateInit()
     {
         m_fileBaseB = reinterpret_cast<unsigned int*>(new char[0x5000]);
 
-        if (m_fileBaseB == 0 && System.m_execParam != 0)
+        if (m_fileBaseB == 0 && (unsigned int)System.m_execParam != 0)
         {
             System.Printf(const_cast<char*>(s_mem_alloc_error_fmt), const_cast<char*>(s_joybus_cpp), 0x146);
         }
@@ -334,7 +334,7 @@ void JoyBus::CreateInit()
         {
             m_letterBuffer[i] = new char[0x2800];
 
-            if (m_letterBuffer[i] == 0 && System.m_execParam != 0)
+            if (m_letterBuffer[i] == 0 && (unsigned int)System.m_execParam != 0)
             {
                 System.Printf(const_cast<char*>(s_mem_alloc_error_fmt), const_cast<char*>(s_joybus_cpp), 0x155);
             }

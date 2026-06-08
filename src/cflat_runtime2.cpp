@@ -1827,7 +1827,7 @@ void CFlatRuntime2::drawLayer(
 	const float texW = static_cast<float>(texture->m_width);
 	const float texH = static_cast<float>(texture->m_height);
 	PSMTXScale(texMtx, 1.0f / texW, 1.0f / texH, 1.0f);
-	GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX3x4);
+	GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
 	GXSetNumTexGens(1);
 	GXSetTexCoordGen2(
 		GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);

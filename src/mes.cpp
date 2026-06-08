@@ -1585,7 +1585,7 @@ void CMes::Next()
 				curr = curr + 5;
 			}
 			runLength = (unsigned int)(j - i);
-			groupWidth = (curr[-5] - *start) + start[1] + *(float*)((char*)this + 0x3d3c);
+			groupWidth = (curr[-5] - *start) + (start[1] + *(float*)((char*)this + 0x3d3c));
 			for (; runLength != 0; runLength = runLength - 1)
 			{
 				type = (int)(((unsigned int)*(unsigned char*)((char*)start + 0xe) >> 4) & 0xF);

@@ -190,7 +190,7 @@ void CGMonObj::onFramePreCalc()
 		}
 
 		int nextState = *reinterpret_cast<int*>(CGMonObj::m_aiWork + 4);
-		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) {
+		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) {
 			if ((nextState != -1) && (nextState != prgObj->m_lastStateId)) {
 				prgObj->changeStat(nextState, 0, 0);
 			}
@@ -387,7 +387,7 @@ static inline void CGMonObj_SetAttackAfter(CGMonObj* monObj, int attackKind)
 	if (delay != 0) {
 		int range = delay / 5;
 		int clampedRange = 1;
-		if (0 < range) {
+		if (range >= 1) {
 			clampedRange = range;
 		}
 
@@ -526,21 +526,21 @@ int CGMonObj::getNearParty(int targetOrdinal, int flags, float minDist, float ma
 			(((Game.m_gameWork.m_menuStageMode == 0) ||
 				(0xF <= Game.m_gameWork.m_bossArtifactStageIndex) ||
 				((static_cast<unsigned short>(partyPrg->GetCID()) & 0x6D) != 0x6D) ||
-				(partyObj->m_scriptHandle[0xED] == NULL))) &&
+				(reinterpret_cast<int>(partyObj->m_scriptHandle[0xED]) == 0))) &&
 			(((flags & 1) == 0) ||
-				((*reinterpret_cast<short*>(partyObj->m_scriptHandle + 7) != 0) &&
+				((*reinterpret_cast<unsigned short*>(partyObj->m_scriptHandle + 7) != 0) &&
 					(partyPrg->m_lastStateId != 9) && (partyPrg->m_lastStateId != 0x22) &&
 					((Game.m_gameWork.m_menuStageMode == 0) ||
 						(0xF <= Game.m_gameWork.m_bossArtifactStageIndex) ||
 						((static_cast<unsigned short>(partyPrg->GetCID()) & 0x6D) != 0x6D) ||
-						(partyObj->m_scriptHandle[0xED] == NULL)))) &&
+						(reinterpret_cast<int>(partyObj->m_scriptHandle[0xED]) == 0)))) &&
 			(((flags & 0x10) == 0) ||
-				(*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(partyObj->m_scriptHandle) + 0x4E) != 0)) &&
+				(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(partyObj->m_scriptHandle) + 0x4E) != 0)) &&
 			(((flags & 0x20) == 0) ||
 				(((partyPrg->m_lastStateId == 6) || (partyPrg->m_lastStateId == 2)) &&
 					(partyPrg->m_subState == 1))) &&
 			(((flags & 0x40) == 0) ||
-				((static_cast<signed char>(party->m_partyData.unk6C0) >= 0) &&
+				((party->m_partyData.unk6C0 >= 0) &&
 					(reinterpret_cast<int>(partyObj->m_scriptHandle[4]) == classId))) &&
 			(((flags & 2) != 0) || (minDist <= *reinterpret_cast<float*>(mon + 0x5D0 + partyIndex * 4))) &&
 			(((flags & 4) != 0) || (*reinterpret_cast<float*>(mon + 0x5D0 + partyIndex * 4) <= maxDist))) {
@@ -588,11 +588,12 @@ void CGMonObj::onChangeStat(int state)
 
 	if ((state < 3) && (state < -4) && (state >= -14)) {
 		int scriptOffset = (state + 0xE) * 2;
-		unsigned int action = *reinterpret_cast<unsigned short*>((unsigned char*)object->m_scriptHandle + scriptOffset + 0xD0);
-		unsigned int motion = *reinterpret_cast<unsigned short*>((unsigned char*)object->m_scriptHandle + scriptOffset + 0xF0);
+		unsigned char* script = (unsigned char*)object->m_scriptHandle;
 		int actionType;
 
+		unsigned int action = *reinterpret_cast<unsigned short*>(script + scriptOffset + 0xD0);
 		*reinterpret_cast<unsigned int*>(mon + 0x560) = action;
+		unsigned int motion = *reinterpret_cast<unsigned short*>(script + scriptOffset + 0xF0);
 		*reinterpret_cast<unsigned int*>(mon + 0x550) = motion;
 		*reinterpret_cast<int*>(mon + 0x554) = *reinterpret_cast<int*>(mon + 0x550) + 1;
 		*reinterpret_cast<int*>(mon + 0x558) = *reinterpret_cast<int*>(mon + 0x554) + 1;
@@ -2140,7 +2141,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 			PSVECSubtract(&coneStart, &sideOffset, &coneStart);
 		}
 
-		float coneLength = static_cast<float>(static_cast<double>(distance) + static_cast<double>(sideDist));
+		float coneLength = distance + sideDist;
 		{
 			CVector scaled;
 			PSVECScale(reinterpret_cast<Vec*>(&forward), reinterpret_cast<Vec*>(&scaled), sideDist);
@@ -2153,7 +2154,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 
 		unsigned char didHit = 0;
 		for (int rank = 0; rank < 4; rank++) {
-			if (((flags & 4) != 0) && (((static_cast<int>(mon[0x54C]) + rank) & 3) != 0)) {
+			if (((flags & 4) != 0) && (((*reinterpret_cast<int*>(mon + 0x54C) + rank) & 3) != 0)) {
 				continue;
 			}
 
@@ -3677,7 +3678,7 @@ void CGMonObj::statWatch()
 					((Game.m_gameWork.m_menuStageMode == 0) ||
 					 (0xF <= Game.m_gameWork.m_bossArtifactStageIndex) ||
 					 ((static_cast<unsigned short>(reinterpret_cast<CGPrgObj*>(party)->GetCID()) & 0x6D) != 0x6D) ||
-					 (reinterpret_cast<CGObject*>(party)->m_scriptHandle[0xED] == NULL))) {
+					 (reinterpret_cast<int>(reinterpret_cast<CGObject*>(party)->m_scriptHandle[0xED]) == 0))) {
 					validCount++;
 				}
 			}
@@ -3685,10 +3686,9 @@ void CGMonObj::statWatch()
 			int pick = Math.Rand(validCount);
 			unsigned int minHp = 10000000;
 			int validIndex = 0;
-			double homeRange2 = static_cast<double>(static_cast<float>(
-				*reinterpret_cast<unsigned short*>(script + 0xCC)));
+			float homeRange2 = static_cast<float>(
+				*reinterpret_cast<unsigned short*>(script + 0xCC));
 			int accum = -1;
-			int mode0Target = -1;
 
 			// Pass 2: select target.
 			int result = -1;
@@ -3703,11 +3703,12 @@ void CGMonObj::statWatch()
 					((Game.m_gameWork.m_menuStageMode == 0) ||
 					 (0xF <= Game.m_gameWork.m_bossArtifactStageIndex) ||
 					 ((static_cast<unsigned short>(reinterpret_cast<CGPrgObj*>(party)->GetCID()) & 0x6D) != 0x6D) ||
-					 (reinterpret_cast<CGObject*>(party)->m_scriptHandle[0xED] == NULL))) {
-					if ((static_cast<double>(*reinterpret_cast<float*>(mon + partyIndex * 4 + 0x5D0)) < homeRange2) &&
-						(mode0Target = partyIndex, targetMode == 0)) {
+					 (reinterpret_cast<int>(reinterpret_cast<CGObject*>(party)->m_scriptHandle[0xED]) == 0))) {
+					if (*reinterpret_cast<float*>(mon + partyIndex * 4 + 0x5D0) < homeRange2) {
 						result = partyIndex;
-						break;
+						if (targetMode == 0) {
+							break;
+						}
 					}
 					candidate = partyIndex;
 					if ((targetMode != 3) ||
@@ -3730,7 +3731,6 @@ void CGMonObj::statWatch()
 					}
 					validIndex++;
 				}
-				result = mode0Target;
 				accum = candidate;
 			}
 

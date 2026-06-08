@@ -474,9 +474,10 @@ void CPartMng::pppDumpMngSt()
         System.Printf(const_cast<char*>(sPartMngDumpSeparator));
     }
 
+    unsigned char* base = self;
     PppMngStDumpRaw* mngBase = reinterpret_cast<PppMngStDumpRaw*>(self + 0x2A18);
-    PppMngStDumpRaw* mng = mngBase;
     for (int i = 0; i < 0x180; i++) {
+        PppMngStDumpRaw* mng = reinterpret_cast<PppMngStDumpRaw*>(base + 0x2A18);
         if (mng->m_baseTime != -0x1000 && static_cast<unsigned int>(System.m_execParam) >= 1U) {
             int kind = static_cast<int>(mng->m_kind);
             int heapGroup = static_cast<int>(reinterpret_cast<char*>(mng) - reinterpret_cast<char*>(mngBase)) / 0x158;
@@ -488,7 +489,7 @@ void CPartMng::pppDumpMngSt()
                 pdtSlots[kind].m_name);
         }
 
-        mng = reinterpret_cast<PppMngStDumpRaw*>(reinterpret_cast<unsigned char*>(mng) + 0x158);
+        base += 0x158;
     }
 
     ppvEnv->m_stagePtr->heapInfo(heapTotal, heapUse, heapFree);

@@ -1029,10 +1029,12 @@ void CGMonObj::onFrameStat()
 			if (*reinterpret_cast<unsigned short*>(script9 + 0x10C) == 1) {
 				if (prgObj->m_subState == 0) {
 					unsigned int chaseFlag = 0;
-					unsigned char* aiData2 = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
-					if (aiState != 0) {
+					unsigned char* aiData2;
+					if (aiState == 0) {
+						aiData2 = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
+					} else {
 						aiData2 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-							(aiState + *reinterpret_cast<unsigned short*>(aiData2 + 0x100)) * 0x1D0 + 0x10;
+							(aiState + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x100)) * 0x1D0 + 0x10;
 					}
 					if ((*reinterpret_cast<unsigned short*>(aiData2 + 0x102) & 0x10) != 0) {
 						chaseFlag |= 0x8000;
@@ -3155,8 +3157,10 @@ void CGMonObj::moveFrame()
 
 		float dstRot = Math.DstRot(rotY, oldRotY);
 		float hitNrmX = object->m_hitNormal.x;
-		rotY = rotY - (dstRot * (1.0f - hitNrmX));
-		object->m_rotBaseY += dstRot * hitNrmX;
+		float baseDelta = dstRot * hitNrmX;
+		float rotDelta = dstRot * (1.0f - hitNrmX);
+		object->m_rotBaseY = object->m_rotBaseY + baseDelta;
+		rotY = rotY - rotDelta;
 		object->m_rotTargetY = object->m_rotBaseY;
 
 		float s = sinf(dstRot);
@@ -3204,17 +3208,17 @@ void CGMonObj::moveFrame()
 		moveDelta.z = local_74.z;
 	}
 
-	if ((moveFlags & 0x4000) == 0) {
+	if ((moveFlags & 0x4000) != 0) {
+		PSVECAdd(&object->m_groundHitOffset, static_cast<Vec*>(moveDelta), &object->m_groundHitOffset);
+	} else {
 		object->m_groundHitOffset.x += moveDelta.x;
 		object->m_groundHitOffset.z += moveDelta.z;
-	} else {
-		PSVECAdd(&object->m_groundHitOffset, static_cast<Vec*>(moveDelta), &object->m_groundHitOffset);
 	}
 
-	if ((moveFlags & 0x8000) == 0) {
-		object->m_rotTargetY = rotY;
-	} else {
+	if ((moveFlags & 0x8000) != 0) {
 		object->m_rotTargetY = 3.1415927f + rotY;
+	} else {
+		object->m_rotTargetY = rotY;
 	}
 
 	if (((moveFlags & 0x20) == 0 || moveRange <= (in_f29 - stepDist)) &&
@@ -3506,6 +3510,7 @@ body:
 					if (((*reinterpret_cast<unsigned short*>(script + 0xFE) & 8) == 0) &&
 						((*reinterpret_cast<unsigned short*>(aiScript + 0x102) & 0x100) == 0)) {
 						actionState = 0x21;
+						CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
 						if (monObj->m_moveWork.m_mode != 1) {
 							memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
 							monObj->m_moveWork.m_flags = 0x205;
@@ -3520,7 +3525,7 @@ body:
 							}
 							monObj->m_moveWork.m_mode = 1;
 						}
-						monObj->m_moveWork.m_target = Game.m_partyObjArr[targetPartyIndex];
+						monObj->m_moveWork.m_target = target;
 						if (((monObj->m_moveWork.m_stateFlags & 1) != 0) ||
 							(static_cast<int>(*reinterpret_cast<unsigned short*>(script + 0x1BA)) <=
 							 monObj->m_moveWork.m_frame)) {
@@ -4013,13 +4018,7 @@ void CGMonObj::statMove(int* targetIndex)
 
 	case 5: {
 		{
-			if (*targetPartyIdx < 0) {
-				*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
-				memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
-				*chaseState = 0;
-				*chaseTimer = 0;
-				monObj->m_chaseDirty = 1;
-			} else {
+			if (*targetPartyIdx >= 0) {
 				*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x21;
 				CGPartyObj* partyObj = Game.m_partyObjArr[*targetPartyIdx];
 				if (monObj->m_moveWork.m_mode != 4) {
@@ -4058,6 +4057,12 @@ void CGMonObj::statMove(int* targetIndex)
 					*chaseTimer = 0;
 					monObj->m_chaseDirty = 1;
 				}
+			} else {
+				*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
+				memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
+				*chaseState = 0;
+				*chaseTimer = 0;
+				monObj->m_chaseDirty = 1;
 			}
 		}
 		break;

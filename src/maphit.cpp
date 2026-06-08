@@ -498,7 +498,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         return 0;
     }
 
-    if (hitT < kMapHitEdgeMinT || g_hit_t_min <= hitT) {
+    if (hitT < kMapHitEdgeMinT || !(hitT < g_hit_t_min)) {
         goto edge_loop;
     }
 

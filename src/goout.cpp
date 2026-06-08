@@ -691,8 +691,8 @@ void DrawGoOutMenu()
     if (goOutMenu.m_currentMessage != -1) {
         MenuPcs.DrawMcWin(-1, 0);
         if (MenuPcs.m_menuWindowInfo->state == 1) {
-            const int message = static_cast<int>(goOutMenu.m_currentMessage);
-            MenuPcs.DrawMcWinMess(message, (message >= 0x1E) ? 2 : 0);
+            const unsigned int message = static_cast<unsigned int>(goOutMenu.m_currentMessage);
+            MenuPcs.DrawMcWinMess(message, (goOutMenu.m_currentMessage < 0x1E) ? 0 : 2);
         }
     }
 
@@ -702,12 +702,12 @@ void DrawGoOutMenu()
         const float cursorX = (float)(MenuPcs.m_menuWindowInfo->x + 0x20);
         const unsigned char cursorMode = goOutMenu.m_cursorMode;
 
-        if (cursorMode == 0) {
-            const int cursorX = MenuPcs.GetYesNoXPos(goOutMenu.m_cursorChoice);
-            MenuPcs.DrawCursor(cursorX, (int)cursorY, 1.0f);
-        } else {
+        if (cursorMode != 0) {
             const int localY = goOutMenu.m_cursorListY1 + goOutMenu.m_cursorChoice * 0x1E;
             MenuPcs.DrawCursor((int)cursorX, localY, 1.0f);
+        } else {
+            const int cursorX = MenuPcs.GetYesNoXPos(goOutMenu.m_cursorChoice);
+            MenuPcs.DrawCursor(cursorX, (int)cursorY, 1.0f);
         }
     }
 }
@@ -1570,10 +1570,12 @@ void CGoOutMenu::CalcGoOut()
         input = GetGoOutInputMask();
         if ((input & 0x100) != 0) {
             Sound.PlaySe(2, 0x40, 0x7f, 0);
-            if (m_returnGoOutMode == -1) {
-                SetMainMode(1);
-            } else {
-                SetGoOutMode(m_returnGoOutMode);
+            if ((input & 0x100) != 0) {
+                if (m_returnGoOutMode == -1) {
+                    SetMainMode(1);
+                } else {
+                    SetGoOutMode(m_returnGoOutMode);
+                }
             }
         }
         break;
@@ -1585,7 +1587,9 @@ void CGoOutMenu::CalcGoOut()
         input = GetGoOutInputMask();
         if ((input & 0x100) != 0) {
             Sound.PlaySe(2, 0x40, 0x7f, 0);
-            SetMainMode(1);
+            if ((input & 0x100) != 0) {
+                SetMainMode(1);
+            }
         }
         break;
     case 7:
@@ -1596,7 +1600,9 @@ void CGoOutMenu::CalcGoOut()
         input = GetGoOutInputMask();
         if ((input & 0x100) != 0) {
             Sound.PlaySe(2, 0x40, 0x7f, 0);
-            SetGoOutMode(8);
+            if ((input & 0x100) != 0) {
+                SetGoOutMode(8);
+            }
         }
         break;
     case 8:
@@ -1620,28 +1626,6 @@ void CGoOutMenu::CalcGoOut()
             return;
         }
         SetGoOutMode(0xC);
-        break;
-    case 10:
-        if (MenuPcs.GetMcCtrl()->ChkConnect(1) == -1) {
-            return;
-        }
-        m_modeFrame = 0;
-        SetGoOutMode(0xB);
-        break;
-    case 0xB:
-        if (m_modeFrame < 0x14) {
-            return;
-        }
-        if (MenuPcs.GetMcCtrl()->ChkConnect(1) == -3) {
-            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
-            SetMenuStr(0, 2,
-                       GetGoOutMessageLine(languageId, 46),
-                       GetGoOutMessageLine(languageId, 47));
-            m_returnGoOutMode = -1;
-            SetGoOutMode(0);
-            return;
-        }
-        SetGoOutMode(0xE);
         break;
     case 0xC:
         if (m_memCardResult != 0) {
@@ -1668,6 +1652,28 @@ void CGoOutMenu::CalcGoOut()
                 SetGoOutMode(10);
             }
         }
+        break;
+    case 10:
+        if (MenuPcs.GetMcCtrl()->ChkConnect(1) == -1) {
+            return;
+        }
+        m_modeFrame = 0;
+        SetGoOutMode(0xB);
+        break;
+    case 0xB:
+        if (m_modeFrame < 0x14) {
+            return;
+        }
+        if (MenuPcs.GetMcCtrl()->ChkConnect(1) == -3) {
+            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+            SetMenuStr(0, 2,
+                       GetGoOutMessageLine(languageId, 46),
+                       GetGoOutMessageLine(languageId, 47));
+            m_returnGoOutMode = -1;
+            SetGoOutMode(0);
+            return;
+        }
+        SetGoOutMode(0xE);
         break;
     case 0xE:
         if (MenuPcs.m_goOutLoadFinished != 0) {
@@ -1804,7 +1810,10 @@ void CGoOutMenu::CalcGoOut()
 
         if (MenuPcs.m_menuWindowInfo->state == 1) {
             input = GetGoOutInputMask();
-            if ((input & 3) == 0) {
+            if ((input & 3) != 0) {
+                m_cursorChoice ^= 1;
+                Sound.PlaySe(1, 0x40, 0x7f, 0);
+            } else {
                 input = GetGoOutInputMask();
                 if ((input & 0x100) != 0) {
                     if (m_cursorChoice == 0) {
@@ -1812,11 +1821,8 @@ void CGoOutMenu::CalcGoOut()
                     } else if (m_cursorChoice == 1) {
                         Sound.PlaySe(3, 0x40, 0x7f, 0);
                     }
-                    next = static_cast<unsigned char>(m_cursorChoice + 1);
+                    next = static_cast<signed char>(m_cursorChoice + 1);
                 }
-            } else {
-                m_cursorChoice ^= 1;
-                Sound.PlaySe(1, 0x40, 0x7f, 0);
             }
         }
 
@@ -1846,7 +1852,10 @@ void CGoOutMenu::CalcGoOut()
 
         if (MenuPcs.m_menuWindowInfo->state == 1) {
             input = GetGoOutInputMask();
-            if ((input & 3) == 0) {
+            if ((input & 3) != 0) {
+                m_cursorChoice ^= 1;
+                Sound.PlaySe(1, 0x40, 0x7f, 0);
+            } else {
                 input = GetGoOutInputMask();
                 if ((input & 0x100) != 0) {
                     if (m_cursorChoice == 0) {
@@ -1854,11 +1863,8 @@ void CGoOutMenu::CalcGoOut()
                     } else if (m_cursorChoice == 1) {
                         Sound.PlaySe(3, 0x40, 0x7f, 0);
                     }
-                    next = static_cast<unsigned char>(m_cursorChoice + 1);
+                    next = static_cast<signed char>(m_cursorChoice + 1);
                 }
-            } else {
-                m_cursorChoice ^= 1;
-                Sound.PlaySe(1, 0x40, 0x7f, 0);
             }
         }
 
@@ -1908,7 +1914,10 @@ void CGoOutMenu::CalcGoOut()
 
         if (MenuPcs.m_menuWindowInfo->state == 1) {
             input = GetGoOutInputMask();
-            if ((input & 3) == 0) {
+            if ((input & 3) != 0) {
+                m_cursorChoice ^= 1;
+                Sound.PlaySe(1, 0x40, 0x7f, 0);
+            } else {
                 input = GetGoOutInputMask();
                 if ((input & 0x100) != 0) {
                     if (m_cursorChoice == 0) {
@@ -1917,11 +1926,8 @@ void CGoOutMenu::CalcGoOut()
                         Sound.PlaySe(3, 0x40, 0x7f, 0);
                     }
 
-                    next = static_cast<unsigned char>(m_cursorChoice + 1);
+                    next = static_cast<signed char>(m_cursorChoice + 1);
                 }
-            } else {
-                m_cursorChoice ^= 1;
-                Sound.PlaySe(1, 0x40, 0x7f, 0);
             }
         }
 
@@ -1944,7 +1950,10 @@ void CGoOutMenu::CalcGoOut()
 
         if (MenuPcs.m_menuWindowInfo->state == 1) {
             input = GetGoOutInputMask();
-            if ((input & 3) == 0) {
+            if ((input & 3) != 0) {
+                m_cursorChoice ^= 1;
+                Sound.PlaySe(1, 0x40, 0x7f, 0);
+            } else {
                 input = GetGoOutInputMask();
                 if ((input & 0x100) != 0) {
                     if (m_cursorChoice == 0) {
@@ -1953,11 +1962,8 @@ void CGoOutMenu::CalcGoOut()
                         Sound.PlaySe(3, 0x40, 0x7f, 0);
                     }
 
-                    next = static_cast<unsigned char>(m_cursorChoice + 1);
+                    next = static_cast<signed char>(m_cursorChoice + 1);
                 }
-            } else {
-                m_cursorChoice ^= 1;
-                Sound.PlaySe(1, 0x40, 0x7f, 0);
             }
         }
 
@@ -2224,10 +2230,10 @@ void CGoOutMenu::CalcDel()
         if (m_selectedChara == -2) {
             SetDelMode(1);
         } else if (m_selectedChara != -1) {
-            if (Game.m_caravanWorkArr[m_selectedChara].m_shopBusyFlag == 0) {
-                SetDelMode(3);
-            } else {
+            if (Game.m_caravanWorkArr[m_selectedChara].m_shopBusyFlag != 0) {
                 SetDelMode(6);
+            } else {
+                SetDelMode(3);
             }
         }
         break;
@@ -2250,7 +2256,10 @@ void CGoOutMenu::CalcDel()
 
         if (MenuPcs.m_menuWindowInfo->state == 1) {
             input = GetGoOutInputMask();
-            if ((input & 3) == 0) {
+            if ((input & 3) != 0) {
+                m_cursorChoice ^= 1;
+                Sound.PlaySe(1, 0x40, 0x7f, 0);
+            } else {
                 input = GetGoOutInputMask();
                 if ((input & 0x100) != 0) {
                     if (m_cursorChoice == 0) {
@@ -2258,11 +2267,8 @@ void CGoOutMenu::CalcDel()
                     } else if (m_cursorChoice == 1) {
                         Sound.PlaySe(3, 0x40, 0x7f, 0);
                     }
-                    next = static_cast<unsigned char>(m_cursorChoice + 1);
+                    next = static_cast<signed char>(m_cursorChoice + 1);
                 }
-            } else {
-                m_cursorChoice ^= 1;
-                Sound.PlaySe(1, 0x40, 0x7f, 0);
             }
         }
 
@@ -2291,7 +2297,10 @@ void CGoOutMenu::CalcDel()
 
         if (MenuPcs.m_menuWindowInfo->state == 1) {
             input = GetGoOutInputMask();
-            if ((input & 3) == 0) {
+            if ((input & 3) != 0) {
+                m_cursorChoice ^= 1;
+                Sound.PlaySe(1, 0x40, 0x7f, 0);
+            } else {
                 input = GetGoOutInputMask();
                 if ((input & 0x100) != 0) {
                     if (m_cursorChoice == 0) {
@@ -2301,9 +2310,6 @@ void CGoOutMenu::CalcDel()
                     }
                     next = static_cast<unsigned char>(m_cursorChoice + 1);
                 }
-            } else {
-                m_cursorChoice ^= 1;
-                Sound.PlaySe(1, 0x40, 0x7f, 0);
             }
         }
 
@@ -2345,7 +2351,10 @@ void CGoOutMenu::CalcDel()
 
         if (MenuPcs.m_menuWindowInfo->state == 1) {
             input = GetGoOutInputMask();
-            if ((input & 3) == 0) {
+            if ((input & 3) != 0) {
+                m_cursorChoice ^= 1;
+                Sound.PlaySe(1, 0x40, 0x7f, 0);
+            } else {
                 input = GetGoOutInputMask();
                 if ((input & 0x100) != 0) {
                     if (m_cursorChoice == 0) {
@@ -2353,11 +2362,8 @@ void CGoOutMenu::CalcDel()
                     } else if (m_cursorChoice == 1) {
                         Sound.PlaySe(3, 0x40, 0x7f, 0);
                     }
-                    next = static_cast<unsigned char>(m_cursorChoice + 1);
+                    next = static_cast<signed char>(m_cursorChoice + 1);
                 }
-            } else {
-                m_cursorChoice ^= 1;
-                Sound.PlaySe(1, 0x40, 0x7f, 0);
             }
         }
 
@@ -2386,7 +2392,10 @@ void CGoOutMenu::CalcDel()
 
         if (MenuPcs.m_menuWindowInfo->state == 1) {
             input = GetGoOutInputMask();
-            if ((input & 3) == 0) {
+            if ((input & 3) != 0) {
+                m_cursorChoice ^= 1;
+                Sound.PlaySe(1, 0x40, 0x7f, 0);
+            } else {
                 input = GetGoOutInputMask();
                 if ((input & 0x100) != 0) {
                     if (m_cursorChoice == 0) {
@@ -2396,9 +2405,6 @@ void CGoOutMenu::CalcDel()
                     }
                     next = static_cast<unsigned char>(m_cursorChoice + 1);
                 }
-            } else {
-                m_cursorChoice ^= 1;
-                Sound.PlaySe(1, 0x40, 0x7f, 0);
             }
         }
 
@@ -2507,7 +2513,9 @@ void CGoOutMenu::Calc()
                 input = GetGoOutInputMask();
                 if ((input & 0x100) != 0) {
                     Sound.PlaySe(2, 0x40, 0x7f, 0);
-                    SetMainMode(m_nextMainMode);
+                    if ((input & 0x100) != 0) {
+                        SetMainMode(m_nextMainMode);
+                    }
                 }
             }
             break;
@@ -2517,7 +2525,7 @@ void CGoOutMenu::Calc()
                 if ((input & 0x200) != 0) {
                     Sound.PlaySe(3, 0x40, 0x7f, 0);
                     MenuPcs.InitSaveLoadMenu();
-                    MenuPcs.SetMenuCharaAnim(0, 0);
+                    SetMenuCharaAnim__8CMenuPcsFii2(&MenuPcs);
                     MenuGoOutState().m_resultSelect = -1;
 
                     if (MenuPcs.m_goOutTransferSaveData != 0) {
@@ -2545,25 +2553,24 @@ void CGoOutMenu::Calc()
                 unsigned char nextMode = 0;
                 if (MenuPcs.m_menuWindowInfo->state == 1) {
                     input = GetGoOutInputMask();
-                    if ((input & 0xC) == 0) {
+                    if ((input & 0xC) != 0) {
+                        m_cursorChoice ^= 1;
+                        Sound.PlaySe(1, 0x40, 0x7f, 0);
+                    } else {
                         input = GetGoOutInputMask();
                         if ((input & 0x100) != 0) {
                             Sound.PlaySe(2, 0x40, 0x7f, 0);
                             nextMode = static_cast<unsigned char>(m_cursorChoice + 1);
                         }
-                    } else {
-                        m_cursorChoice ^= 1;
-                        Sound.PlaySe(1, 0x40, 0x7f, 0);
                     }
                 }
 
                 if (nextMode == 2) {
-                    int activeCount = 0;
+                    unsigned int activeCount = 0;
                     for (int i = 0; i < 8; i++) {
-                        CCaravanWork& caravanWork = Game.m_caravanWorkArr[i];
-                        if (caravanWork.m_shopState != 0) {
+                        if (Game.m_caravanWorkArr[i].m_shopState != 0) {
                             activeCount++;
-                            if (caravanWork.m_shopBusyFlag != 0) {
+                            if (Game.m_caravanWorkArr[i].m_shopBusyFlag != 0) {
                                 activeCount++;
                             }
                         }
@@ -2589,7 +2596,7 @@ void CGoOutMenu::Calc()
                     }
                 } else if (nextMode == 1) {
                     int characterCount = 0;
-                    for (int i = 0; i < 8; i++) {
+                    for (unsigned int i = 0; i < 8; i++) {
                         if (Game.m_caravanWorkArr[i].m_shopState != 0) {
                             characterCount++;
                         }
@@ -2610,8 +2617,7 @@ void CGoOutMenu::Calc()
                     } else {
                         int transferableCount = 0;
                         for (int i = 0; i < 8; i++) {
-                            CCaravanWork& caravanWork = Game.m_caravanWorkArr[i];
-                            if (caravanWork.m_shopState != 0 && caravanWork.m_shopBusyFlag == 0) {
+                            if (Game.m_caravanWorkArr[i].m_shopState != 0 && Game.m_caravanWorkArr[i].m_shopBusyFlag == 0) {
                                 transferableCount++;
                             }
                         }
@@ -2658,7 +2664,7 @@ void CGoOutMenu::Calc()
         if (m_pendingMessage == -1) {
             m_messageState = 1;
         } else {
-            MenuPcs.GetWinSize(static_cast<unsigned short>(m_currentMessage), &x, &y, (m_currentMessage >= 0x1E) ? 2 : 0);
+            MenuPcs.GetWinSize(static_cast<short>(m_currentMessage), &x, &y, (m_currentMessage < 0x1E) ? 0 : 2);
             MenuPcs.SetMcWinInfo(x, y);
             MenuPcs.m_menuWindowInfo->state = 0;
             MenuGoOutState().m_animFrame = 0;
@@ -2668,8 +2674,9 @@ void CGoOutMenu::Calc()
     }
 
     if (m_messageTimer != 0) {
-        m_messageTimer--;
-        if (m_messageTimer == 0) {
+        int remaining = m_messageTimer - 1;
+        m_messageTimer = remaining;
+        if (remaining == 0) {
             if (m_currentMessage >= 0) {
                 MenuPcs.m_menuWindowInfo->state = 2;
                 MenuGoOutState().m_animFrame = 0;

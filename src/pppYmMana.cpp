@@ -353,18 +353,18 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
 
     int waterCmp = strcmp(mesh->m_name, s_ymManaShapeObj4);
     if ((waterCmp == 0 && stepData->m_type == 1) || (strcmp(mesh->m_name, s_ymManaShapeObj2) == 0 && stepData->m_type == 2)) {
-        Mtx cameraMtx;
-        Mtx rotXMtx;
-        Mtx rotZMtx;
         Mtx offsetMtx;
+        Mtx cameraMtx;
         Mtx worldMtx;
+        Mtx rotZMtx;
+        Mtx rotXMtx;
 
         PSMTXCopy(CameraMatrix(), cameraMtx);
         PSMTXCopy(mtx, mana->m_waterMtx);
         GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
         GXSetCullMode(GX_CULL_NONE);
-        PSMTXRotRad(rotXMtx, 'x', kPppYmMoveParabolaNegHalfPi);
-        PSMTXRotRad(rotZMtx, 'z', kPppYmMoveParabolaNegHalfPi);
+        PSMTXRotRad(rotXMtx, 'x', LoadFloat(kPppYmMoveParabolaNegHalfPi));
+        PSMTXRotRad(rotZMtx, 'z', LoadFloat(kPppYmMoveParabolaNegHalfPi));
         PSMTXIdentity(offsetMtx);
         offsetMtx[1][3] = -stepData->m_waterOffset;
         PSMTXConcat(rotZMtx, offsetMtx, offsetMtx);

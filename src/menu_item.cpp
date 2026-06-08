@@ -200,10 +200,8 @@ int CMenuPcs::ItemCtrlCur()
                     idx -= 0x40;
                 }
 
-                s16 itemId = caravanWork->m_inventoryItems[idx];
-
-                if ((itemId <= 0) || (EquipChk(idx) != 0) ||
-                    ((letterAttachFlg >= 0) && (itemId < 0x125))) {
+                if ((caravanWork->m_inventoryItems[idx] <= 0) || ((u8)EquipChk(idx) != 0) ||
+                    ((letterAttachFlg >= 0) && (caravanWork->m_inventoryItems[idx] < 0x125))) {
                     Sound.PlaySe(4, 0x40, 0x7F, 0);
                 } else if (letterAttachFlg >= 0) {
                     LetterSetAttachItem((unsigned int)idx, 1);

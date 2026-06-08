@@ -286,7 +286,7 @@ void CGMonObj::frameStatFuncGiantCrab()
 				break;
 			}
 
-			*(int*)(CGMonObj::m_boss + 0x4) = (soundStep + 1) % 4;
+			*(int*)(CGMonObj::m_boss + 0x4) = (*(int*)(CGMonObj::m_boss + 0x4) + 1) % 4;
 			reinterpret_cast<CGPrgObj*>(self)->reqAnim(0xc, 0, 0);
 
 			reinterpret_cast<CGPrgObj*>(self)->putParticle(

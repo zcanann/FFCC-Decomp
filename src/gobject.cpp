@@ -1131,13 +1131,12 @@ void CGObject::bgWorldCollision()
     m_groundHitOffset.y = newOffset.y;
     m_groundHitOffset.z = newOffset.z;
 
-    const signed char mapGroup = gMapHitFace->m_groupIndex;
-    CMapIdGrp* mapGroupData = MapMng.GetMapIdGrpArray() + mapGroup;
-    if ((mapGroupData->m_mask & 0x20) == 0) {
+    if ((MapMng.GetMapIdGrpArray()[gMapHitFace->m_groupIndex].m_mask & 0x20) == 0) {
         m_stateFlags0Bits.unk7 = 1;
-        m_radiusCtrl.x = *reinterpret_cast<float*>(&mapGroupData->m_mask);
-        if (mapGroup != 0) {
-            m_lastBgGroup = static_cast<short>(mapGroup);
+        m_radiusCtrl.x =
+            *reinterpret_cast<float*>(&MapMng.GetMapIdGrpArray()[gMapHitFace->m_groupIndex].m_mask);
+        if (gMapHitFace->m_groupIndex != 0) {
+            m_lastBgGroup = static_cast<short>(gMapHitFace->m_groupIndex);
         }
         MapMng.m_hitMapObj->GetHitFaceNormal(&HitFaceNormal());
     }

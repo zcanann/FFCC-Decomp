@@ -171,7 +171,7 @@ void CGMonObj::damagedFuncGiantCrab()
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	*reinterpret_cast<int*>(SoundBuffer + 1260) = 1;
 
-	const int branch = *reinterpret_cast<int*>(mon + 0x6B4);
+	const int branch = m_actionBranch;
 	unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
 	if (script == 0) {
 		return;
@@ -185,10 +185,7 @@ void CGMonObj::damagedFuncGiantCrab()
 		int pdtNo = object->m_charaModelHandle->GetPdtSlot();
 		prgObj->putParticle((pdtNo << 8) | 0x0D, 0, object, kMonObjBossOne, 0);
 		prgObj->playSe3D(0x4E37, 0x32, 500, 0, 0);
-	} else {
-		if (branch != 0) {
-			return;
-		}
+	} else if (branch == 0) {
 		if (((script[0x1A / 2] * 2) / 3) <= script[7]) {
 			return;
 		}
@@ -196,10 +193,12 @@ void CGMonObj::damagedFuncGiantCrab()
 		int pdtNo = object->m_charaModelHandle->GetPdtSlot();
 		prgObj->putParticle((pdtNo << 8) | 0x0C, 0, object, kMonObjBossOne, 0);
 		prgObj->playSe3D(0x4E36, 0x32, 500, 0, 0);
+	} else {
+		return;
 	}
 
 	prgObj->changeStat(4, 0, 0);
-	*reinterpret_cast<int*>(mon + 0x6B4) = branch + 1;
+	m_actionBranch = branch + 1;
 	m_unk6C8 = 0;
 }
 

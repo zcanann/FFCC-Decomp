@@ -219,11 +219,12 @@ void CMenuPcs::TmpArtiDraw()
 			float height = (float)entry->height;
 			float s = entry->s;
 			float t = entry->t;
-			float alpha = entry->alpha;
+			float rawAlpha = entry->alpha;
+			float alpha = rawAlpha;
 
 			if (caravanWork->m_treasures[i] < 0) {
 				tex = 0x34;
-				alpha = (float)(kTmpArtiHalfDouble * (double)alpha);
+				alpha = (float)(kTmpArtiHalfDouble * (double)rawAlpha);
 			}
 
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));

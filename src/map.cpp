@@ -3238,9 +3238,9 @@ void CMapMng::SetMeshCameraSemiTransRange(unsigned short id, float nearRange, fl
                                           float maxAlpha, float fadeRange)
 {
     int found = 0;
-    CMapObj* mapObj = GetMapObjArray();
 
     for (int i = 0; i < m_mapObjCount; i++) {
+        CMapObj* mapObj = &m_mapObjArray[i];
         if (mapObj->m_meshId == id) {
             mapObj->m_cameraSemiTransNear = nearRange;
             mapObj->m_cameraSemiTransFar = farRange;
@@ -3258,7 +3258,6 @@ void CMapMng::SetMeshCameraSemiTransRange(unsigned short id, float nearRange, fl
             mapObj->m_cameraSemiTransAlpha = 0x4000;
             mapObj->m_cameraSemiTransStep = 0;
         }
-        mapObj++;
     }
 
     if (!found) {
@@ -3289,9 +3288,9 @@ void CMapMng::SetMeshCameraSemiTransRange(unsigned short id, float nearRange, fl
 void CMapMng::SetMeshCameraSemiTransAlpha(unsigned short id, int alpha, int frameCount)
 {
     int found = 0;
-    CMapObj* mapObj = GetMapObjArray();
 
     for (int i = 0; i < m_mapObjCount; i++) {
+        CMapObj* mapObj = &m_mapObjArray[i];
         if (mapObj->m_meshId == id) {
             mapObj->m_cameraSemiTransTargetAlpha = static_cast<short>(alpha << 7);
             found = 1;
@@ -3300,7 +3299,6 @@ void CMapMng::SetMeshCameraSemiTransAlpha(unsigned short id, int alpha, int fram
                  static_cast<int>(mapObj->m_cameraSemiTransAlpha)) /
                 frameCount);
         }
-        mapObj++;
     }
 
     if (!found) {

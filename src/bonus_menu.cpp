@@ -1171,13 +1171,15 @@ void CMenuPcs::CalcSelectWait()
 	int padSlot = currentParty->m_partySlot;
 	unsigned short repeat;
 	unsigned short down;
-	if (Pad.m_debugPadLock != 0 || (padSlot == 0 && Pad.m_debugPadPort != -1)) {
+	unsigned char padLocked = (Pad.m_debugPadLock != 0 || (padSlot == 0 && Pad.m_debugPadPort != -1));
+	if (padLocked) {
 		repeat = 0;
 	} else {
 		int resolvedPadSlot = (Pad.m_debugPadPort == padSlot) ? 0 : padSlot;
 		repeat = Pad.m_padInputs[resolvedPadSlot].repeatButton;
 	}
-	if (Pad.m_debugPadLock != 0 || (padSlot == 0 && Pad.m_debugPadPort != -1)) {
+	padLocked = (Pad.m_debugPadLock != 0 || (padSlot == 0 && Pad.m_debugPadPort != -1));
+	if (padLocked) {
 		down = 0;
 	} else {
 		int resolvedPadSlot = (Pad.m_debugPadPort == padSlot) ? 0 : padSlot;

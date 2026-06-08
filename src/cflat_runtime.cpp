@@ -1763,8 +1763,12 @@ frameLoop:
 			                 | (static_cast<unsigned int>(prevReqFlags) << 15);
 
 			int clearCount = func->m_localCount - func->m_argCount;
-			for (unsigned int* clear = object->m_localBase + func->m_argCount; clearCount > 0; clearCount--) {
-				*clear++ = 0;
+			if (clearCount != 0) {
+				unsigned int* clear = object->m_localBase + func->m_argCount;
+				while (clearCount > 0) {
+					*clear++ = 0;
+					clearCount--;
+				}
 			}
 
 			if (((func->m_systemKind != 1) && (func->m_systemKind != 2)) || (func->m_systemIndex >= 0)) {
@@ -1819,8 +1823,12 @@ frameLoop:
 			                    | (static_cast<unsigned int>(prevReqFlags) << 15);
 
 			int clearCount = func->m_localCount - func->m_argCount;
-			for (unsigned int* clear = newObject->m_localBase + func->m_argCount; clearCount > 0; clearCount--) {
-				*clear++ = 0;
+			if (clearCount != 0) {
+				unsigned int* clear = newObject->m_localBase + func->m_argCount;
+				while (clearCount > 0) {
+					*clear++ = 0;
+					clearCount--;
+				}
 			}
 
 			objectFrame(newObject);

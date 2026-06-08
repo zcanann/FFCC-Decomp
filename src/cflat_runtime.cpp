@@ -1567,12 +1567,14 @@ frameLoop:
 				if (index < 0) {
 					value = reinterpret_cast<unsigned int*>(
 					    (arg & 0x10) == 0 ? onClassSystemVal(object, index) : onSystemVal(object, index));
-				} else if ((arg & 8) == 0) {
-					value = object->m_localBase + index;
-				} else if ((arg & 0x10) == 0) {
-					value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x0C) + (index * 4));
+				} else if ((arg & 8) != 0) {
+					if ((arg & 0x10) != 0) {
+						value = object->m_thisBase + index;
+					} else {
+						value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x0C) + (index * 4));
+					}
 				} else {
-					value = object->m_thisBase + index;
+					value = object->m_localBase + index;
 				}
 				*object->m_sp++ = *value;
 			} else if ((arg & 2) != 0) {
@@ -1581,27 +1583,31 @@ frameLoop:
 					value = reinterpret_cast<unsigned int*>((arg & 0x10) == 0
 					                                            ? onClassSystemVal(object, index + static_cast<int>(*object->m_sp))
 					                                            : onSystemVal(object, index + static_cast<int>(*object->m_sp)));
-				} else if ((arg & 8) == 0) {
-					--object->m_sp;
-					value = object->m_localBase + index + static_cast<int>(*object->m_sp);
-				} else if ((arg & 0x10) == 0) {
-					--object->m_sp;
-					value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x0C) + ((index + static_cast<int>(*object->m_sp)) * 4));
+				} else if ((arg & 8) != 0) {
+					if ((arg & 0x10) != 0) {
+						--object->m_sp;
+						value = object->m_thisBase + index + static_cast<int>(*object->m_sp);
+					} else {
+						--object->m_sp;
+						value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x0C) + ((index + static_cast<int>(*object->m_sp)) * 4));
+					}
 				} else {
 					--object->m_sp;
-					value = object->m_thisBase + index + static_cast<int>(*object->m_sp);
+					value = object->m_localBase + index + static_cast<int>(*object->m_sp);
 				}
 				*object->m_sp++ = *value;
 			} else if ((arg & 4) != 0) {
 				if (index < 0) {
 					value = reinterpret_cast<unsigned int*>(
 					    (arg & 0x10) == 0 ? onClassSystemVal(object, index) : onSystemVal(object, index));
-				} else if ((arg & 8) == 0) {
-					value = object->m_localBase + index;
-				} else if ((arg & 0x10) == 0) {
-					value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x0C) + (index * 4));
+				} else if ((arg & 8) != 0) {
+					if ((arg & 0x10) != 0) {
+						value = object->m_thisBase + index;
+					} else {
+						value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x0C) + (index * 4));
+					}
 				} else {
-					value = object->m_thisBase + index;
+					value = object->m_localBase + index;
 				}
 				--object->m_sp;
 				*object->m_sp = *reinterpret_cast<unsigned int*>(*value + (*object->m_sp * 4));
@@ -1617,12 +1623,14 @@ frameLoop:
 				if (index < 0) {
 					value = reinterpret_cast<unsigned int*>(
 					    (arg & 0x10) == 0 ? onClassSystemVal(object, index) : onSystemVal(object, index));
-				} else if ((arg & 8) == 0) {
-					value = object->m_localBase + index;
-				} else if ((arg & 0x10) == 0) {
-					value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x0C) + (index * 4));
+				} else if ((arg & 8) != 0) {
+					if ((arg & 0x10) != 0) {
+						value = object->m_thisBase + index;
+					} else {
+						value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x0C) + (index * 4));
+					}
 				} else {
-					value = object->m_thisBase + index;
+					value = object->m_localBase + index;
 				}
 				*object->m_sp++ = reinterpret_cast<u32>(value);
 			} else if ((arg & 2) != 0) {
@@ -1631,27 +1639,31 @@ frameLoop:
 					value = reinterpret_cast<unsigned int*>((arg & 0x10) == 0
 					                                            ? onClassSystemVal(object, index + static_cast<int>(*object->m_sp))
 					                                            : onSystemVal(object, index + static_cast<int>(*object->m_sp)));
-				} else if ((arg & 8) == 0) {
-					--object->m_sp;
-					value = object->m_localBase + index + static_cast<int>(*object->m_sp);
-				} else if ((arg & 0x10) == 0) {
-					--object->m_sp;
-					value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x0C) + ((index + static_cast<int>(*object->m_sp)) * 4));
+				} else if ((arg & 8) != 0) {
+					if ((arg & 0x10) != 0) {
+						--object->m_sp;
+						value = object->m_thisBase + index + static_cast<int>(*object->m_sp);
+					} else {
+						--object->m_sp;
+						value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x0C) + ((index + static_cast<int>(*object->m_sp)) * 4));
+					}
 				} else {
 					--object->m_sp;
-					value = object->m_thisBase + index + static_cast<int>(*object->m_sp);
+					value = object->m_localBase + index + static_cast<int>(*object->m_sp);
 				}
 				*object->m_sp++ = reinterpret_cast<u32>(value);
 			} else if ((arg & 4) != 0) {
 				if (index < 0) {
 					value = reinterpret_cast<unsigned int*>(
 					    (arg & 0x10) == 0 ? onClassSystemVal(object, index) : onSystemVal(object, index));
-				} else if ((arg & 8) == 0) {
-					value = object->m_localBase + index;
-				} else if ((arg & 0x10) == 0) {
-					value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x0C) + (index * 4));
+				} else if ((arg & 8) != 0) {
+					if ((arg & 0x10) != 0) {
+						value = object->m_thisBase + index;
+					} else {
+						value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x0C) + (index * 4));
+					}
 				} else {
-					value = object->m_thisBase + index;
+					value = object->m_localBase + index;
 				}
 				--object->m_sp;
 				*object->m_sp = reinterpret_cast<u32>(value) + (*object->m_sp * 4);

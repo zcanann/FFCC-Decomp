@@ -1296,9 +1296,6 @@ void CMenuPcs::drawSingleMenu()
 
         s16 mode = m_singleMenuPhase;
         switch (mode) {
-        case 1:
-            SingleDrawCtrl();
-            return;
         case 0:
         {
             SingleFadeState* fadeState = m_singleFadeState;
@@ -1368,6 +1365,9 @@ void CMenuPcs::drawSingleMenu()
             }
             return;
         }
+        case 1:
+            SingleDrawCtrl();
+            return;
         case 2:
         {
             SingleFadeState* fadeState = m_singleFadeState;

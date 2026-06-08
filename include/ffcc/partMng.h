@@ -79,7 +79,7 @@ struct PPPCREATEPARAM
     void* m_owner;                    // 0x2c
     PPPSEST m_soundEffectParams;      // 0x30
     int m_hitParamA;                  // 0x44
-    unsigned short m_hitParamB;       // 0x48
+    short m_hitParamB;                // 0x48
     unsigned char m_hitObjectCount;   // 0x4a
     unsigned char m_hitFlags;         // 0x4b
     int m_hitObjectIds[8];            // 0x4c

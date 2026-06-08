@@ -1719,15 +1719,13 @@ int CAmemCacheSet::GetData(short index, char* source, int line)
  */
 int CAmemCacheSet::SetData(void* src, int size, CAmemCache::TYPE type, int dmaCopy)
 {
-    short slot = 0;
     short index = -1;
 
     for (int i = 0; i < m_cacheCount; i++) {
-        if (cacheEntryAt(this, slot).m_inUse == 0) {
-            index = slot;
+        if (cacheEntryAt(this, i).m_inUse == 0) {
+            index = static_cast<short>(i);
             break;
         }
-        slot++;
     }
 
     if (index == -1) {

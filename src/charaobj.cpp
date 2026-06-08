@@ -621,18 +621,20 @@ void CGCharaObj::onFramePostCalc()
 		if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
 		    (i == 0 || i == 4 || i == 9 || i == 3) &&
 		    statusValue > 0) {
-			char slot = m_animStateMisc;
+			int slot = m_animStateMisc;
 			unsigned short padMask = 0;
 			bool useDebugPad = (Pad.m_debugPadLock != 0) || ((slot == 0) && (Pad.m_debugPadPort != -1));
 			if (!useDebugPad) {
-				int idx = slot & ~((~(Pad.m_debugPadPort - static_cast<int>(slot) | static_cast<int>(slot) - Pad.m_debugPadPort)) >> 31);
+				int activePad = Pad.m_debugPadPort;
+				int idx = slot & ~(static_cast<int>(~((activePad - slot) | (slot - activePad))) >> 31);
 				padMask = Pad.GetPadInputs()[idx].buttonDown[0];
 			}
 			if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x100) != 0) {
 				useDebugPad = (Pad.m_debugPadLock != 0) || ((slot == 0) && (Pad.m_debugPadPort != -1));
 				unsigned short heldMask = 0;
 				if (!useDebugPad) {
-					int idx = slot & ~((~(Pad.m_debugPadPort - static_cast<int>(slot) | static_cast<int>(slot) - Pad.m_debugPadPort)) >> 31);
+					int activePad = Pad.m_debugPadPort;
+					int idx = slot & ~(static_cast<int>(~((activePad - slot) | (slot - activePad))) >> 31);
 					heldMask = Pad.GetPadInputs()[idx].repeatButton;
 				}
 				padMask |= heldMask;
@@ -657,28 +659,32 @@ void CGCharaObj::onFramePostCalc()
 
 	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x38) += 1;
 
-	if ((static_cast<signed char>(m_ignoreHit[0].m_flag) < 0) && m_ignoreHit[0].m_timer != 0) {
-		m_ignoreHit[0].m_timer = static_cast<unsigned short>(m_ignoreHit[0].m_timer - 1);
-		if (m_ignoreHit[0].m_timer == 0) {
-			m_ignoreHit[0].m_flag &= 0x7F;
+	if (m_ignoreHit[0].m_flagBits.m_flag_80 && m_ignoreHit[0].m_timer != 0) {
+		short t = static_cast<short>(m_ignoreHit[0].m_timer - 1);
+		m_ignoreHit[0].m_timer = t;
+		if (t == 0) {
+			m_ignoreHit[0].m_flagBits.m_flag_80 = 0;
 		}
 	}
-	if ((static_cast<signed char>(m_ignoreHit[1].m_flag) < 0) && m_ignoreHit[1].m_timer != 0) {
-		m_ignoreHit[1].m_timer = static_cast<unsigned short>(m_ignoreHit[1].m_timer - 1);
-		if (m_ignoreHit[1].m_timer == 0) {
-			m_ignoreHit[1].m_flag &= 0x7F;
+	if (m_ignoreHit[1].m_flagBits.m_flag_80 && m_ignoreHit[1].m_timer != 0) {
+		short t = static_cast<short>(m_ignoreHit[1].m_timer - 1);
+		m_ignoreHit[1].m_timer = t;
+		if (t == 0) {
+			m_ignoreHit[1].m_flagBits.m_flag_80 = 0;
 		}
 	}
-	if ((static_cast<signed char>(m_ignoreHit[2].m_flag) < 0) && m_ignoreHit[2].m_timer != 0) {
-		m_ignoreHit[2].m_timer = static_cast<unsigned short>(m_ignoreHit[2].m_timer - 1);
-		if (m_ignoreHit[2].m_timer == 0) {
-			m_ignoreHit[2].m_flag &= 0x7F;
+	if (m_ignoreHit[2].m_flagBits.m_flag_80 && m_ignoreHit[2].m_timer != 0) {
+		short t = static_cast<short>(m_ignoreHit[2].m_timer - 1);
+		m_ignoreHit[2].m_timer = t;
+		if (t == 0) {
+			m_ignoreHit[2].m_flagBits.m_flag_80 = 0;
 		}
 	}
-	if ((static_cast<signed char>(m_ignoreHit[3].m_flag) < 0) && m_ignoreHit[3].m_timer != 0) {
-		m_ignoreHit[3].m_timer = static_cast<unsigned short>(m_ignoreHit[3].m_timer - 1);
-		if (m_ignoreHit[3].m_timer == 0) {
-			m_ignoreHit[3].m_flag &= 0x7F;
+	if (m_ignoreHit[3].m_flagBits.m_flag_80 && m_ignoreHit[3].m_timer != 0) {
+		short t = static_cast<short>(m_ignoreHit[3].m_timer - 1);
+		m_ignoreHit[3].m_timer = t;
+		if (t == 0) {
+			m_ignoreHit[3].m_flagBits.m_flag_80 = 0;
 		}
 	}
 }
@@ -769,11 +775,12 @@ void CGCharaObj::onFramePreCalc()
 		if (static_cast<CGPartyObj*>(this)->m_partyData.carryObject != nullptr) {
 			push += 10;
 		}
-		unsigned char slot = m_animStateMisc;
+		int slot = m_animStateMisc;
 		int padHeld = 0;
 		bool useDebugPad = (Pad.m_debugPadLock != 0) || ((slot == 0) && (Pad.m_debugPadPort != -1));
 		if (!useDebugPad) {
-			int idx = slot & ~((~(Pad.m_debugPadPort - static_cast<int>(slot) | static_cast<int>(slot) - Pad.m_debugPadPort)) >> 31);
+			int activePad = Pad.m_debugPadPort;
+			int idx = slot & ~(static_cast<int>(~((activePad - slot) | (slot - activePad))) >> 31);
 			padHeld = Pad.GetPadInputs()[idx].gbaMode;
 		}
 		if (padHeld != 0) {
@@ -2318,34 +2325,25 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
  */
 int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 {
-	if ((staIndex == 0 || staIndex == 4) &&
-		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E + (staIndex * 2)) != 0) {
-		System.Printf(const_cast<char*>(sCharaObjEffectTimeNoOverwriteMsg));
-		return static_cast<int>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E + (staIndex * 2)));
+	if (staIndex == 0 || staIndex == 4) {
+		unsigned short* staField =
+			reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + (staIndex * 2));
+		if (staField[0x1F] != 0) {
+			System.Printf(const_cast<char*>(sCharaObjEffectTimeNoOverwriteMsg));
+			return static_cast<int>(staField[0x1F]);
+		}
 	}
 
 	unsigned int base = 0;
 	switch (staIndex) {
-		case 0:
-			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x10);
-			break;
 		case 1:
 			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x0E);
 			break;
-		case 2:
-			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x1E);
-			break;
-		case 3:
-			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x22);
+		case 0:
+			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x10);
 			break;
 		case 4:
 			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x12);
-			break;
-		case 6:
-			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x20);
-			break;
-		case 7:
-			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x18);
 			break;
 		case 8:
 			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x14);
@@ -2353,11 +2351,23 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 		case 9:
 			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x16);
 			break;
+		case 7:
+			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x18);
+			break;
 		case 10:
 			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x1A);
 			break;
 		case 0x1C:
 			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x1C);
+			break;
+		case 2:
+			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x1E);
+			break;
+		case 6:
+			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x20);
+			break;
+		case 3:
+			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x22);
 			break;
 		case 0x6A:
 			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x24);
@@ -2974,7 +2984,7 @@ void CGCharaObj::statAttack()
 	itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + m_itemId * 0x48;
 	seFrame = *reinterpret_cast<unsigned short*>(itemData + 0x3E);
 	if ((seFrame & 0x8000) == 0 && m_stateFrame == seFrame) {
-		unsigned int seSpec = *reinterpret_cast<unsigned short*>(itemData + 0x3C);
+		int seSpec = *reinterpret_cast<unsigned short*>(itemData + 0x3C);
 		if (seSpec != 0) {
 			if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
 				int seNo = (seSpec == 0xFFFF) ? 0 : ((seSpec & 0xFF) + ((seSpec >> 8) * 1000));
@@ -3123,8 +3133,8 @@ int CGCharaObj::calcCastTime(int itemId)
 		castScale = kOneF32;
 	}
 
-	int itemNo = *reinterpret_cast<unsigned short*>(itemData + 0x0);
-	unsigned short itemType = *reinterpret_cast<unsigned short*>(itemData + 0xE);
+	int itemNo = *reinterpret_cast<short*>(itemData + 0x0);
+	short itemType = *reinterpret_cast<unsigned short*>(itemData + 0xE);
 
 	if (itemNo != 0x1F8 && itemType == 2) {
 		unsigned int castBonus = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0x194);
@@ -3268,7 +3278,7 @@ void CGCharaObj::StaticFrame()
 			unsigned short hp = *reinterpret_cast<unsigned short*>(script + 0x1C);
 			unsigned short maxHp = *reinterpret_cast<unsigned short*>(script + 0x1A);
 			if (hp != 0 && hp <= (maxHp >> 2)) {
-				if ((System.m_frameCounter % 0x1E) == 0) {
+				if ((static_cast<int>(System.m_frameCounter) % 0x1E) == 0) {
 					Sound.PlaySe(0x53, 0x40, 0x7F, 0);
 				}
 				break;

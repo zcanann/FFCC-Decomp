@@ -2484,30 +2484,29 @@ void CMaterialMan::SetPosition(
             }
 
             Vec delta;
-            if (ignoreFrustumCheck != 0) {
-                PSVECSubtract(&shadowPos, position, &delta);
-                candidateWrite->distance = PSVECSquareMag(&delta);
-                candidateWrite->shadow = shadow;
-                candidateWrite->index = i;
-                candidateWrite++;
-                candidateCount++;
-            } else {
-                if ((shadow->m_yFilterMode == 1) && (position->y < shadowPos.y)) {
-                    continue;
-                }
-                if ((shadow->m_yFilterMode == 2) && (position->y > shadowPos.y)) {
-                    continue;
-                }
-                if (reinterpret_cast<CBound*>(searchBoundStorage)
-                        ->CheckFrustum(shadowPos, scaledShadowMtx, kMaterialShadowBoundsRadius) == 0) {
-                    continue;
-                }
-                PSVECSubtract(&shadowPos, position, &delta);
-                candidateWrite->distance = PSVECSquareMag(&delta);
-                candidateWrite->shadow = shadow;
-                candidateWrite->index = i;
-                candidateWrite++;
-                candidateCount++;
+            if (ignoreFrustumCheck == 0) {
+                goto frustumCheck;
+            }
+
+        writeCandidate:
+            PSVECSubtract(&shadowPos, position, &delta);
+            candidateWrite->distance = PSVECSquareMag(&delta);
+            candidateWrite->shadow = shadow;
+            candidateWrite->index = i;
+            candidateWrite++;
+            candidateCount++;
+            continue;
+
+        frustumCheck:
+            if ((shadow->m_yFilterMode == 1) && (position->y < shadowPos.y)) {
+                continue;
+            }
+            if ((shadow->m_yFilterMode == 2) && (position->y > shadowPos.y)) {
+                continue;
+            }
+            if (reinterpret_cast<CBound*>(searchBoundStorage)
+                    ->CheckFrustum(shadowPos, scaledShadowMtx, kMaterialShadowBoundsRadius) != 0) {
+                goto writeCandidate;
             }
         }
 

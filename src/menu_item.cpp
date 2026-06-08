@@ -144,7 +144,7 @@ int CMenuPcs::ItemCtrlCur()
         return 0;
     }
 
-    int mode = this->m_itemMenuState->mode;
+    unsigned int mode = this->m_itemMenuState->mode;
     s16 letterAttachFlg = SingGetLetterAttachflg();
 
     if (mode == 0) {
@@ -329,9 +329,9 @@ void CMenuPcs::ItemDraw()
         float h = (float)entry->h;
         float u = entry->u;
         float v = entry->v;
-        float alpha = entry->alpha;
 
         if (i == 0) {
+            float alpha = entry->alpha;
             MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
             MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
 
@@ -363,18 +363,6 @@ void CMenuPcs::ItemDraw()
             }
 
             if (w > LoadFloat(kItemZero) && w < entry->w) {
-                colors[0].r = 0xFF;
-                colors[0].g = 0xFF;
-                colors[0].b = 0xFF;
-                colors[0].a = 0;
-                colors[1].r = 0xFF;
-                colors[1].g = 0xFF;
-                colors[1].b = 0xFF;
-                colors[1].a = 0;
-                colors[2].r = 0xFF;
-                colors[2].g = 0xFF;
-                colors[2].b = 0xFF;
-                colors[2].a = 0;
                 colors[3].r = 0xFF;
                 colors[3].g = 0xFF;
                 colors[3].b = 0xFF;
@@ -387,23 +375,23 @@ void CMenuPcs::ItemDraw()
 
             MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
         } else {
-            float itemAlpha = alpha;
+            float itemAlpha = entry->alpha;
             if (tex == 0x37) {
-                unsigned int menuIndex = drawIndex + this->m_itemMenuState->scroll;
-                if (menuIndex > 0x3F) {
+                int menuIndex = drawIndex + this->m_itemMenuState->scroll;
+                if (menuIndex >= 0x40) {
                     menuIndex -= 0x40;
                 }
 
                 s16 itemId = caravanWork->m_inventoryItems[menuIndex];
-                if ((itemId < 1) || (EquipChk(menuIndex) != 0) ||
+                if ((itemId <= 0) || (EquipChk(menuIndex) != 0) ||
                     (hasLetterAttach && (itemId < 0x125))) {
                     if (EquipChk(menuIndex) != 0) {
                         int markX = (int)(x - LoadFloat(kItemMarkXOffset));
                         int markY = (int)((h - LoadFloat(kItemMarkHeight)) * LoadDouble(kItemHalfDouble) + y);
-                        DrawEquipMark(markX, markY, alpha);
+                        DrawEquipMark(markX, markY, entry->alpha);
                     }
                     tex = 0x34;
-                    itemAlpha = (float)((double)LoadDouble(kItemHalfDouble) * (double)alpha);
+                    itemAlpha = (float)((double)LoadDouble(kItemHalfDouble) * (double)entry->alpha);
                 }
 
                 if (tex == 0x37 && drawIndex == this->m_itemMenuState->cursorIndex[0]) {
@@ -460,8 +448,10 @@ void CMenuPcs::ItemDraw()
             }
 
             listFont->GetWidth(text);
-            listFont->SetPosX((float)(textEntry->x + 0x1C));
-            listFont->SetPosY((float)(textEntry->y + 0xB) - LoadFloat(kItemTextYOffset));
+            float textX = (float)(textEntry->x + 0x1C);
+            float textY = (float)(textEntry->y + 0xB);
+            listFont->SetPosX(textX);
+            listFont->SetPosY(textY - LoadFloat(kItemTextYOffset));
             listFont->Draw(text);
         }
     }
@@ -513,7 +503,7 @@ void CMenuPcs::ItemDraw()
 
             cursorEntry += this->m_itemMenuState->cursorIndex[0];
             cursorX = (float)(cursorEntry->x - 0x14);
-            cursorY = (float)((float)(cursorEntry->h - 0x20) * (float)LoadDouble(kItemHalfDouble) + (float)cursorEntry->y);
+            cursorY = (float)((double)(cursorEntry->h - 0x20) * LoadDouble(kItemHalfDouble) + (double)cursorEntry->y);
         } else {
             MenuWindowInfo* window = this->m_menuWindowInfo;
             cursorX = (float)window->x;
@@ -530,13 +520,14 @@ void CMenuPcs::ItemDraw()
     DrawSingLife();
 
     CFont* helpFont = this->m_fonts[0];
-    CColor helpColor(0xFF, 0xFF, 0xFF, (u8)(LoadFloat(kItemColorMax) * cursorEntry->alpha));
+    u8 helpAlpha = (u8)(LoadFloat(kItemColorMax) * cursorEntry->alpha);
     if (!foundSelected) {
         selectedItemId = -1;
     }
+    CColor helpColor(0xFF, 0xFF, 0xFF, helpAlpha);
     float helpBaseX = LoadFloat(kItemHelpCenterX);
     float helpOffsetX = LoadFloat(kItemHalf);
-    int helpX = (unsigned int)(helpBaseX - (float)(LoadDouble(kItemHalfDouble) * (double)helpOffsetX));
+    int helpX = (int)(helpBaseX - LoadFloat(kItemHalf) * helpOffsetX);
     int helpY = (int)LoadFloat(kItemHelpY);
     DrawHelpMessage(
         selectedItemId,

@@ -3046,31 +3046,31 @@ void JoyBus::ResetQueue(ThreadParam* threadParam)
 
     for (int index = 0; index < 8; index++)
 	{
-		int offset = 0x20 * index;
+		int base = index * 8;
 
-        *(unsigned int*)((char*)m_cmdQueueData[threadParam->m_portIndex] + offset) = 0;
-        *(unsigned int*)((char*)m_recvQueueEntriesArr[threadParam->m_portIndex] + offset) = 0;
+        m_cmdQueueData[threadParam->m_portIndex][base] = 0;
+        m_recvQueueEntriesArr[threadParam->m_portIndex][base] = 0;
 
-        *(unsigned int*)((char*)m_cmdQueueData[threadParam->m_portIndex] + offset + 4) = 0;
-        *(unsigned int*)((char*)m_recvQueueEntriesArr[threadParam->m_portIndex] + offset + 4) = 0;
+        m_cmdQueueData[threadParam->m_portIndex][base + 1] = 0;
+        m_recvQueueEntriesArr[threadParam->m_portIndex][base + 1] = 0;
 
-        *(unsigned int*)((char*)m_cmdQueueData[threadParam->m_portIndex] + offset + 8) = 0;
-        *(unsigned int*)((char*)m_recvQueueEntriesArr[threadParam->m_portIndex] + offset + 8) = 0;
+        m_cmdQueueData[threadParam->m_portIndex][base + 2] = 0;
+        m_recvQueueEntriesArr[threadParam->m_portIndex][base + 2] = 0;
 
-        *(unsigned int*)((char*)m_cmdQueueData[threadParam->m_portIndex] + offset + 0xC) = 0;
-        *(unsigned int*)((char*)m_recvQueueEntriesArr[threadParam->m_portIndex] + offset + 0xC) = 0;
+        m_cmdQueueData[threadParam->m_portIndex][base + 3] = 0;
+        m_recvQueueEntriesArr[threadParam->m_portIndex][base + 3] = 0;
 
-        *(unsigned int*)((char*)m_cmdQueueData[threadParam->m_portIndex] + offset + 0x10) = 0;
-        *(unsigned int*)((char*)m_recvQueueEntriesArr[threadParam->m_portIndex] + offset + 0x10) = 0;
+        m_cmdQueueData[threadParam->m_portIndex][base + 4] = 0;
+        m_recvQueueEntriesArr[threadParam->m_portIndex][base + 4] = 0;
 
-        *(unsigned int*)((char*)m_cmdQueueData[threadParam->m_portIndex] + offset + 0x14) = 0;
-        *(unsigned int*)((char*)m_recvQueueEntriesArr[threadParam->m_portIndex] + offset + 0x14) = 0;
+        m_cmdQueueData[threadParam->m_portIndex][base + 5] = 0;
+        m_recvQueueEntriesArr[threadParam->m_portIndex][base + 5] = 0;
 
-        *(unsigned int*)((char*)m_cmdQueueData[threadParam->m_portIndex] + offset + 0x18) = 0;
-        *(unsigned int*)((char*)m_recvQueueEntriesArr[threadParam->m_portIndex] + offset + 0x18) = 0;
+        m_cmdQueueData[threadParam->m_portIndex][base + 6] = 0;
+        m_recvQueueEntriesArr[threadParam->m_portIndex][base + 6] = 0;
 
-        *(unsigned int*)((char*)m_cmdQueueData[threadParam->m_portIndex] + offset + 0x1C) = 0;
-        *(unsigned int*)((char*)m_recvQueueEntriesArr[threadParam->m_portIndex] + offset + 0x1C) = 0;
+        m_cmdQueueData[threadParam->m_portIndex][base + 7] = 0;
+        m_recvQueueEntriesArr[threadParam->m_portIndex][base + 7] = 0;
     }
 
     m_cmdCount[threadParam->m_portIndex] = 0;

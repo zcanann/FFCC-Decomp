@@ -512,10 +512,12 @@ void CGObject::move()
         }
 
         const double moveMag = static_cast<double>(PSVECMag(&moveVec));
-        if (moveMag == static_cast<double>(sZeroFloat)) {
+        if (static_cast<double>(sZeroFloat) == moveMag) {
             scriptMoveEnd = 1;
-        } else if (m_weaponNodeFlagAll.m_bits1.m_bit10
-                   || (moveMag >= static_cast<double>(m_moveTimer))) {
+        } else if (m_weaponNodeFlagAll.m_bits1.m_bit10) {
+            PSVECNormalize(&moveVec, &moveVec);
+            PSVECScale(&moveVec, &moveVec, static_cast<float>(m_moveTimer));
+        } else if (!(moveMag < static_cast<double>(m_moveTimer))) {
             PSVECNormalize(&moveVec, &moveVec);
             PSVECScale(&moveVec, &moveVec, static_cast<float>(m_moveTimer));
         } else {

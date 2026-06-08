@@ -533,57 +533,45 @@ void CGCharaObj::onCancelStat(int)
 {
 	int state = m_lastStateId;
 
-	if (state == 6) {
-		goto cancel_damage;
-	}
-	if (state < 6) {
-		if (state == 2) {
-			goto cancel_state2;
-		}
-		goto cancel_done;
-	}
-	if (state == 0x12) {
-		goto cancel_state18;
-	}
-	goto cancel_done;
-
-cancel_state18:
-	{
-		unsigned char* self = reinterpret_cast<unsigned char*>(this);
-		int i = 0;
-		for (; i < 0x16; i++, self += 4) {
-			if (((1U << i) & 1U) != 0) {
-				CFlatRuntime2Storage().EndParticleSlot(*reinterpret_cast<int*>(self + 0x564), 1);
+	switch (state) {
+		case 0x12:
+			{
+				unsigned char* self = reinterpret_cast<unsigned char*>(this);
+				int i = 0;
+				for (; i < 0x16; i++, self += 4) {
+					if (((1U << i) & 1U) != 0) {
+						CFlatRuntime2Storage().EndParticleSlot(*reinterpret_cast<int*>(self + 0x564), 1);
+					}
+				}
 			}
-		}
-	}
-	goto cancel_done;
+			break;
 
-cancel_state2:
-	{
-		unsigned char* self = reinterpret_cast<unsigned char*>(this);
-		int i = 0;
-		for (; i < 0x16; i++, self += 4) {
-			if (((1U << i) & 0x18U) != 0) {
-				CFlatRuntime2Storage().EndParticleSlot(*reinterpret_cast<int*>(self + 0x564), 1);
+		case 2:
+			{
+				unsigned char* self = reinterpret_cast<unsigned char*>(this);
+				int i = 0;
+				for (; i < 0x16; i++, self += 4) {
+					if (((1U << i) & 0x18U) != 0) {
+						CFlatRuntime2Storage().EndParticleSlot(*reinterpret_cast<int*>(self + 0x564), 1);
+					}
+				}
 			}
-		}
-	}
-	goto cancel_done;
+			break;
 
-cancel_damage:
-	{
-		unsigned char* self = reinterpret_cast<unsigned char*>(this);
-		int i = 0;
-		for (; i < 0x16; i++, self += 4) {
-			if (((1U << i) & 0x138U) != 0) {
-				CFlatRuntime2Storage().EndParticleSlot(*reinterpret_cast<int*>(self + 0x564), 1);
+		case 6:
+			{
+				unsigned char* self = reinterpret_cast<unsigned char*>(this);
+				int i = 0;
+				for (; i < 0x16; i++, self += 4) {
+					if (((1U << i) & 0x138U) != 0) {
+						CFlatRuntime2Storage().EndParticleSlot(*reinterpret_cast<int*>(self + 0x564), 1);
+					}
+				}
 			}
-		}
+			m_damageParticle = -1;
+			break;
 	}
-	m_damageParticle = -1;
 
-cancel_done:
 	m_comboFrame = 0;
 	m_comboState = 0;
 

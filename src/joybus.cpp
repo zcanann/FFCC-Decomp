@@ -7199,31 +7199,32 @@ int JoyBus::IsInitSend(int portIndex)
     int state = m_threadParams[portIndex].m_state;
     OSSignalSemaphore(&m_accessSemaphores[portIndex]);
 
-    unsigned int result = 0;
+    unsigned int result;
 
     // Determine desired "init send" state
-    if (m_threadParams[portIndex].m_sentStartFlag == 0 && state <= 0x384)
-    {
-        if (state < 2)
-        {
-            result = 0;
-        }
-        else if (state == 2)
-        {
-            result = (m_threadParams[portIndex].m_flags[0] ? 1 : 0);
-        }
-        else
-        {
-            result = 1;
-        }
-    }
-    else
+    if (m_threadParams[portIndex].m_sentStartFlag != 0)
     {
         result = 0;
     }
+    else if (state > 0x384)
+    {
+        result = 0;
+    }
+    else if (state < 2)
+    {
+        result = 0;
+    }
+    else if (state == 2)
+    {
+        result = (m_threadParams[portIndex].m_flags[0] ? 1 : 0);
+    }
+    else
+    {
+        result = 1;
+    }
 
     // Stabilizer logic: detect and debounce changes to result
-    if (m_threadParams[portIndex].m_flags[2] == result)
+    if (m_threadParams[portIndex].m_flags[2] == (unsigned char)result)
     {
         m_threadParams[portIndex].m_flags[3] = 0;
     }

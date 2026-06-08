@@ -3638,10 +3638,10 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 				unsigned short* fallbackCursor = slotCursor;
 				if (slot < reqCount) {
 					do {
-						unsigned int objParticle = static_cast<unsigned int>(partyObj->m_itemId);
+						int objParticle = partyObj->m_itemId;
 						int itemMatch;
 						if ((slot == lastSlot &&
-							*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (objParticle * 0x48)) == 0x1F8 &&
+							*reinterpret_cast<short*>(Game.unkCFlatData0[2] + (objParticle * 0x48)) == 0x1F8 &&
 							fallbackCursor[0] == 0x1F8) ||
 							objParticle == fallbackCursor[0]) {
 							itemMatch = 1;

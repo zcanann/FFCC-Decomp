@@ -5242,10 +5242,10 @@ void CGPartyObj::gpmMove()
 		if (*reinterpret_cast<int*>(self + 0x668) == 0) {
 			return;
 		}
-		if ((PartyData(leader).partyFlags & 0x40) != 0) {
+		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(PartyData(leader).partyFlags) << 26) & 0xC0000000) >> 31) != 0) {
 			sGhostPartyWork.gauge = 0;
 		}
-		if ((PartyData(this).partyFlags & 0x80) == 0) {
+		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(PartyData(this).partyFlags) << 25) & 0xC0000000) >> 31) == 0) {
 			return;
 		}
 
@@ -5254,10 +5254,10 @@ void CGPartyObj::gpmMove()
 		if (sGhostPartyWork.gauge < 0x10) {
 			return;
 		}
-		if ((PartyData(this).partyFlags & 0x40) != 0) {
+		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(PartyData(this).partyFlags) << 25) & 0xC0000000) >> 31) != 0) {
 			return;
 		}
-	} else if ((PartyData(this).partyFlags & 0x40) == 0) {
+	} else if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(sGhostPartyWork.flags) << 26) & 0xC0000000) >> 31) == 0) {
 		changeStat(0, 0, 0);
 		return;
 	}

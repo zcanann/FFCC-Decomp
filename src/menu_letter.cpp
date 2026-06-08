@@ -1616,7 +1616,6 @@ bool CMenuPcs::LetterConfirmOpen()
 			sprintf(lines[0], s_fmt_pcts_sp_pcts_dot, GetMenuStr(0x26), title);
 			break;
 		}
-		case 0:
 		case 1:
 		default: {
 			const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];

@@ -1137,9 +1137,9 @@ void CMenuPcs::CalcSelectWait()
 		int walkOff = 0;
 		int i = 0;
 		while (i < (int)*(short*)this->m_bonusAnimPtr) {
-			animBase = this->m_bonusAnimPtr;
-			*(float*)(animBase + walkOff + 0x18) = 1.0f;
-			*(int*)(animBase + walkOff + 0x34) = 3;
+			animBase = this->m_bonusAnimPtr + walkOff + 8;
+			*(float*)(animBase + 0x10) = 1.0f;
+			*(int*)(animBase + 0x2c) = 3;
 			walkOff += 0x40;
 			i++;
 		}
@@ -2102,7 +2102,8 @@ void CMenuPcs::CalcResultCloseAnim()
 		}
 
 		for (int i = 0; i < activePartyCount; i++) {
-			*(int*)(this->m_bonusAnimPtr + (i + 1) * 0x40 + 0x2c) = 0x10;
+			int sprite = this->m_bonusAnimPtr + (i + 1) * 0x40 + 8;
+			*(int*)(sprite + 0x24) = 0x10;
 		}
 
 		// iconBase block: src = frameBase (back = activePartyCount sprites); dance
@@ -2129,7 +2130,8 @@ void CMenuPcs::CalcResultCloseAnim()
 		// frameEchoBase block: startFrame = 0
 		base += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
-			*(int*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 0x2c) = 0;
+			int sprite = this->m_bonusAnimPtr + (base + i) * 0x40 + 8;
+			*(int*)(sprite + 0x24) = 0;
 		}
 
 		// iconEchoBase block: startFrame = 9999, flags = 3
@@ -2178,7 +2180,8 @@ void CMenuPcs::CalcResultCloseAnim()
 		// extraBase + pc block: flags = 0
 		base += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
-			*(int*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 0x2c) = 0;
+			int sprite = this->m_bonusAnimPtr + (base + i) * 0x40 + 8;
+			*(int*)(sprite + 0x24) = 0;
 		}
 
 		// extraBase + 2*pc block: src = extraBase + pc (back = activePartyCount sprites); dance
@@ -2195,7 +2198,8 @@ void CMenuPcs::CalcResultCloseAnim()
 		// extraBase + 3*pc block: flags = 0
 		base += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
-			*(int*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 0x2c) = 0;
+			int sprite = this->m_bonusAnimPtr + (base + i) * 0x40 + 8;
+			*(int*)(sprite + 0x24) = 0;
 		}
 
 		// extraBase + 4*pc block: src = iconBase (back = base - (pc+1)); dance
@@ -3477,17 +3481,21 @@ void CMenuPcs::createBonus()
 			s_Rinfo->m_party[activeCount].m_tribeId = (unsigned int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_tribeId;
 			activeCount++;
 
-			if (reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[0] > 0) {
-				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[0];
+			int treasure0 = (int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[0];
+			if (treasure0 > 0) {
+				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = (short)treasure0;
 			}
-			if (reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[1] > 0) {
-				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[1];
+			int treasure1 = (int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[1];
+			if (treasure1 > 0) {
+				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = (short)treasure1;
 			}
-			if (reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[2] > 0) {
-				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[2];
+			int treasure2 = (int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[2];
+			if (treasure2 > 0) {
+				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = (short)treasure2;
 			}
-			if (reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[3] > 0) {
-				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[3];
+			int treasure3 = (int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[3];
+			if (treasure3 > 0) {
+				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = (short)treasure3;
 			}
 		}
 

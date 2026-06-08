@@ -1989,7 +1989,7 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
 	{
 		_pppPDataVal* pDataVal = (_pppPDataVal*)((u8*)pppMngSt->m_pppPDataVals + pDataValOffset);
 		if (pDataVal != 0 && pDataVal->m_programSetDef != 0 &&
-		    (int)((u32)pDataVal->m_programSetDef->m_drawFlags << 24) >= 0 && pDataVal->m_activeCount > 0)
+		    (s8)((s32)((u32)pDataVal->m_programSetDef->m_drawFlags << 24) >> 31) == 0 && pDataVal->m_activeCount > 0)
 		{
 			s32 workOffsetStep = 0;
 			_pppProgSetDef* progSet = pDataVal->m_programSetDef;

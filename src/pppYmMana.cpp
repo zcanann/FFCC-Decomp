@@ -710,7 +710,7 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
         param_2->m_map21Flag = 0;
     }
 
-    if ((*(u8*)&gObject->m_weaponNodeFlags & 1) != 0) {
+    if (gObject->m_weaponNodeFlagBits.m_attached != 0) {
         mana->m_attachedObject = gObject->m_attachOwner;
     }
 

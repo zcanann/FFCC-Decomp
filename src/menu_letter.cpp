@@ -2184,7 +2184,7 @@ int CMenuPcs::LetterCtrlCur()
 						*reinterpret_cast<u8*>(GetLetterStateBase(this) + 9) |= 2;
 					}
 				} else {
-					if (caravanWork->m_inventoryItemCount + 1 < 0x41) {
+					if (caravanWork->m_inventoryItemCount + 1 <= 0x40) {
 						*reinterpret_cast<u8*>(GetLetterStateBase(this) + 9) |= 2;
 					}
 				}

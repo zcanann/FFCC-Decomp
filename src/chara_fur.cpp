@@ -1374,7 +1374,7 @@ int CChara::CModel::PickFur(
  */
 void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 {
-	if (static_cast<signed char>(m_flags10C << 1) >= 0) {
+	if (m_flags10CBits.m_flag10C_40 == 0) {
 		return;
 	}
 

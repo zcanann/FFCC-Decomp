@@ -1793,71 +1793,13 @@ void pppInitPdt(long* progOffsetReconstructionTable, pppProg* pppProg)
 		entry = (int*)*head;
 	} while (*(int*)*head != 0);
 
-	int processed = 0;
 	*head = 0;
-	if (pppProgRelocCount > 0) {
-		if (pppProgRelocCount > 8) {
-			int blocks = (pppProgRelocCount - 8 + 7) >> 3;
-			int* reloc = pppProgRelocs;
-			if (pppProgRelocCount - 8 > 0) {
-				do {
-					processed += 8;
-					reloc[0] = (int)(pppProg + reloc[0]);
-					reloc[1] = (int)(pppProg + reloc[1]);
-					reloc[2] = (int)(pppProg + reloc[2]);
-					reloc[3] = (int)(pppProg + reloc[3]);
-					reloc[4] = (int)(pppProg + reloc[4]);
-					reloc[5] = (int)(pppProg + reloc[5]);
-					reloc[6] = (int)(pppProg + reloc[6]);
-					reloc[7] = (int)(pppProg + reloc[7]);
-					reloc += 8;
-					blocks--;
-				} while (blocks != 0);
-			}
-		}
-
-		int remain = pppProgRelocCount - processed;
-		int* reloc = pppProgRelocs + processed;
-		if (processed < pppProgRelocCount) {
-			do {
-				*reloc = (int)(pppProg + *reloc);
-				reloc++;
-				remain--;
-			} while (remain != 0);
-		}
+	for (int i = 0; i < pppProgRelocCount; i++) {
+		pppProgRelocs[i] = (int)(pppProg + pppProgRelocs[i]);
 	}
 
-	processed = 0;
-	if (pdtRelocCount > 0) {
-		if (pdtRelocCount > 8) {
-			int blocks = (pdtRelocCount - 8 + 7) >> 3;
-			int* reloc = pdtRelocs;
-			if (pdtRelocCount - 8 > 0) {
-				do {
-					processed += 8;
-					reloc[0] += (int)progOffsetReconstructionTable;
-					reloc[1] += (int)progOffsetReconstructionTable;
-					reloc[2] += (int)progOffsetReconstructionTable;
-					reloc[3] += (int)progOffsetReconstructionTable;
-					reloc[4] += (int)progOffsetReconstructionTable;
-					reloc[5] += (int)progOffsetReconstructionTable;
-					reloc[6] += (int)progOffsetReconstructionTable;
-					reloc[7] += (int)progOffsetReconstructionTable;
-					reloc += 8;
-					blocks--;
-				} while (blocks != 0);
-			}
-		}
-
-		int remain = pdtRelocCount - processed;
-		int* reloc = pdtRelocs + processed;
-		if (processed < pdtRelocCount) {
-			do {
-				*reloc += (int)progOffsetReconstructionTable;
-				reloc++;
-				remain--;
-			} while (remain != 0);
-		}
+	for (int i = 0; i < pdtRelocCount; i++) {
+		pdtRelocs[i] += (int)progOffsetReconstructionTable;
 	}
 }
 

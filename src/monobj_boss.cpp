@@ -564,15 +564,21 @@ void CGMonObj::frameStatFuncArmstrong()
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
 	CGCharaObj* charaObj = reinterpret_cast<CGCharaObj*>(this);
 	int state = prgObj->m_lastStateId;
-	if (state == 100) {
+	switch (state) {
+	case 100:
 		if (prgObj->m_stateFrame == 0) {
 			charaObj->enableDamageCol(0);
 		} else if (prgObj->m_stateFrame == 0x29) {
 			charaObj->enableDamageCol(1);
 		}
 		charaObj->statAttack();
-	} else if (state >= 100 && state < 0x69) {
+		break;
+	case 0x65:
+	case 0x66:
+	case 0x67:
+	case 0x68:
 		frameStatFuncGiantCrab();
+		break;
 	}
 }
 
@@ -608,48 +614,48 @@ void CGMonObj::frameStatFuncOrcKing()
 	u8* self = reinterpret_cast<u8*>(this);
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 
-	if (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId != 100) {
-		return;
-	}
+	switch (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId) {
+	case 100:
+		if (m_actionBranch == 0) {
+			int pdtNo = object->m_charaModelHandle->GetPdtSlot();
 
-	if (m_actionBranch == 0) {
-		int pdtNo = object->m_charaModelHandle->GetPdtSlot();
+			reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x18, *reinterpret_cast<int*>(self + 0x58C), object, kMonObjBossOne, 0x8CC0);
+			reinterpret_cast<CGPrgObj*>(this)->reqAnim(0xF, 0, 0);
+			object->SetAnimSlot(0x10, 0);
+			object->SetAnimSlot(0x15, 4);
+		} else if (m_actionBranch == 0x96) {
+			int pdtNo = object->m_charaModelHandle->GetPdtSlot();
 
-		reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x18, *reinterpret_cast<int*>(self + 0x58C), object, kMonObjBossOne, 0x8CC0);
-		reinterpret_cast<CGPrgObj*>(this)->reqAnim(0xF, 0, 0);
-		object->SetAnimSlot(0x10, 0);
-		object->SetAnimSlot(0x15, 4);
-	} else if (m_actionBranch == 0x96) {
-		int pdtNo = object->m_charaModelHandle->GetPdtSlot();
+			reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x19, *reinterpret_cast<int*>(self + 0x590), object, kMonObjBossOne, 0x8CC1);
+		} else if (m_actionBranch == 300) {
+			int pdtNo = object->m_charaModelHandle->GetPdtSlot();
 
-		reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x19, *reinterpret_cast<int*>(self + 0x590), object, kMonObjBossOne, 0x8CC1);
-	} else if (m_actionBranch == 300) {
-		int pdtNo = object->m_charaModelHandle->GetPdtSlot();
+			reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x1A, *reinterpret_cast<int*>(self + 0x590), object, kMonObjBossOne, 0x8CC2);
+		} else if (m_actionBranch == 0x1C2) {
+			int pdtNo = object->m_charaModelHandle->GetPdtSlot();
 
-		reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x1A, *reinterpret_cast<int*>(self + 0x590), object, kMonObjBossOne, 0x8CC2);
-	} else if (m_actionBranch == 0x1C2) {
-		int pdtNo = object->m_charaModelHandle->GetPdtSlot();
+			reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x1B, *reinterpret_cast<int*>(self + 0x590), object, kMonObjBossOne, 0x8CC3);
+		} else if (m_actionBranch == 600) {
+			reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0xC00);
+			object->m_bgColMask &= 0xFFF7FFFF;
+			reinterpret_cast<CGPrgObj*>(this)->changeStat(-9, 0, 0);
+			object->SetAnimSlot(0, 0);
 
-		reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x1B, *reinterpret_cast<int*>(self + 0x590), object, kMonObjBossOne, 0x8CC3);
-	} else if (m_actionBranch == 600) {
-		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0xC00);
-		object->m_bgColMask &= 0xFFF7FFFF;
-		reinterpret_cast<CGPrgObj*>(this)->changeStat(-9, 0, 0);
-		object->SetAnimSlot(0, 0);
-
-		CGMonObj* monObj = CFlat.FindGMonObjFirst();
-		while (monObj != 0) {
-			if (monObj != this) {
-				u8* monBytes = reinterpret_cast<u8*>(monObj);
-				u16* script = *reinterpret_cast<u16**>(monBytes + 0x58);
-				reinterpret_cast<CGCharaObj*>(monObj)->addHp(-script[0x1A / 2], 0);
+			CGMonObj* monObj = CFlat.FindGMonObjFirst();
+			while (monObj != 0) {
+				if (monObj != this) {
+					u8* monBytes = reinterpret_cast<u8*>(monObj);
+					u16* script = *reinterpret_cast<u16**>(monBytes + 0x58);
+					reinterpret_cast<CGCharaObj*>(monObj)->addHp(-script[0x1A / 2], 0);
+				}
+				monObj = CFlat.FindGMonObjNext(monObj);
 			}
-			monObj = CFlat.FindGMonObjNext(monObj);
+			*reinterpret_cast<int*>(CGMonObj::m_boss) = 1;
 		}
-		*reinterpret_cast<int*>(CGMonObj::m_boss) = 1;
-	}
 
-	m_actionBranch = m_actionBranch + 1;
+		m_actionBranch = m_actionBranch + 1;
+		break;
+	}
 }
 
 /*
@@ -828,7 +834,8 @@ void CGMonObj::frameStatFuncSaw()
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 
-	if (prgObj->m_lastStateId == 100) {
+	switch (prgObj->m_lastStateId) {
+	case 100:
 		mon[0x63C] = mon[0x63C] & 0x7F | 0x80;
 
 		if (prgObj->m_subState == 0) {
@@ -872,6 +879,7 @@ void CGMonObj::frameStatFuncSaw()
 		}
 
 		moveFrame();
+		break;
 	}
 }
 
@@ -1288,13 +1296,13 @@ void CGMonObj::frameStatFuncLich()
 	}
 
 	const int stat = prgObj->m_lastStateId;
-	if (stat < 0x65) {
-		if (stat >= 100) {
-			teleport(1, 0x0E, 0x29, 100, 0x11578, 0x11579, 0x2D, 0x2B, 0x2C, gLichTeleportPoints,
-			         reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_lichTeleportIndex,
-			         reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_lichTeleportVec);
-		}
-	} else if (stat == 0x65) {
+	switch (stat) {
+	case 100:
+		teleport(1, 0x0E, 0x29, 100, 0x11578, 0x11579, 0x2D, 0x2B, 0x2C, gLichTeleportPoints,
+		         reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_lichTeleportIndex,
+		         reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_lichTeleportVec);
+		break;
+	case 0x65:
 		if (prgObj->m_stateFrame == 0 && CFlatBossState() == 3) {
 			prgObj->changeStat(0, 0, 0);
 		} else {
@@ -1307,6 +1315,7 @@ void CGMonObj::frameStatFuncLich()
 				gCFlatRuntime().SystemCall(0, 1, 9, 3, stack, 0);
 			}
 		}
+		break;
 	}
 }
 
@@ -1339,17 +1348,17 @@ void CGMonObj::changeStatFuncTetsukyojin(int stat)
 	switch (stat) {
 	case 0x67:
 		setActionParam(-12);
-		return;
-	case -0xD:
 		break;
 	case 0x65:
 		setActionParam(-14);
+		reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_lichTeleportIndex++;
+		break;
+	case -0xD:
+		reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_lichTeleportIndex++;
 		break;
 	default:
-		return;
+		break;
 	}
-
-	reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_lichTeleportIndex++;
 }
 
 /*
@@ -1596,7 +1605,8 @@ void CGMonObj::frameStatFuncWifeLamia()
 {
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
 
-	if (prgObj->m_lastStateId == 100) {
+	switch (prgObj->m_lastStateId) {
+	case 100:
 		if (prgObj->m_subState == 0) {
 			if (prgObj->m_subFrame == 0) {
 				memset(&m_moveWork, 0, sizeof(m_moveWork));
@@ -1622,6 +1632,7 @@ void CGMonObj::frameStatFuncWifeLamia()
 		} else if (prgObj->m_subState == 2 && prgObj->m_subFrame == 0) {
 			prgObj->reqAnim(0x1B, 1, 0);
 		}
+		break;
 	}
 }
 
@@ -1701,23 +1712,20 @@ void CGMonObj::frameStatFuncMolbol()
 	u8* self = reinterpret_cast<u8*>(this);
 	int state = prgObj->m_lastStateId;
 
-	if (state != 0x65) {
-		if (state < 0x65) {
-			if (state < 100) {
-				return;
-			}
-			suikomi(0x53, kMonObjBossZero);
+	switch (state) {
+	case 100:
+		suikomi(0x53, kMonObjBossZero);
+		break;
+	case 0x65:
+		if (prgObj->m_stateFrame == 0 || prgObj->m_stateFrame == 5 || prgObj->m_stateFrame == 10) {
+			CVector pos(Game.m_partyObjArr[m_targetPartyIndex]->m_worldPosition);
+			pos.x += Math.RandFPM(static_cast<float>((prgObj->m_stateFrame == 0) ? 0 : 40));
+			pos.z += Math.RandFPM(static_cast<float>((prgObj->m_stateFrame == 0) ? 0 : 40));
+			charaObj->putParticleFromItem(charaObj->m_itemId, 3, charaObj->m_particleSlots[0], reinterpret_cast<Vec*>(&pos));
 		}
-		return;
+		charaObj->statAttack();
+		break;
 	}
-
-	if (prgObj->m_stateFrame == 0 || prgObj->m_stateFrame == 5 || prgObj->m_stateFrame == 10) {
-		CVector pos(Game.m_partyObjArr[m_targetPartyIndex]->m_worldPosition);
-		pos.x += Math.RandFPM(static_cast<float>((prgObj->m_stateFrame == 0) ? 0 : 40));
-		pos.z += Math.RandFPM(static_cast<float>((prgObj->m_stateFrame == 0) ? 0 : 40));
-		charaObj->putParticleFromItem(charaObj->m_itemId, 3, charaObj->m_particleSlots[0], reinterpret_cast<Vec*>(&pos));
-	}
-	charaObj->statAttack();
 }
 
 /*
@@ -2115,6 +2123,8 @@ void CGMonObj::frameStatFuncMeteoParasite()
 			prgObj->changeStat(0, 0, 0);
 		}
 		break;
+	case 0x68:
+		break;
 	}
 
 	if (scriptKind == 0x87 && prgObj->m_lastStateId == 0x67) {
@@ -2276,9 +2286,9 @@ void CGMonObj::logicFuncRamoe()
 	int activeCount = 0;
 	int nextState = -1;
 
-	unsigned int* scriptWork = &Game.m_scriptWork[0][0][1];
+	unsigned int* scriptWork = reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&Game) + 4);
 	for (int i = 0; i < 0x3F; i++, scriptWork++) {
-		CGPrgObj* monObj = reinterpret_cast<CGPrgObj*>(*scriptWork);
+		CGPrgObj* monObj = reinterpret_cast<CGPrgObj*>(scriptWork[0xC5D0 / 4]);
 		if (monObj != 0 && (monObj->m_lastStateId != 9 || monObj->m_subState != 2)) {
 			activeCount++;
 		}
@@ -2288,10 +2298,10 @@ void CGMonObj::logicFuncRamoe()
 		nextState = 100;
 	}
 
-	if (nextState == -1) {
-		logicFuncDefault();
-	} else {
+	if (nextState != -1) {
 		reinterpret_cast<CGPrgObj*>(this)->changeStat(nextState, 0, 0);
+	} else {
+		logicFuncDefault();
 	}
 }
 
@@ -2339,11 +2349,12 @@ void CGMonObj::cancelStatFuncRamoe()
 void CGMonObj::frameStatFuncRamoe()
 {
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	if (prgObj->m_lastStateId == 100) {
+	switch (prgObj->m_lastStateId) {
+	case 100:
 		if (prgObj->m_stateFrame == 0x3A) {
-			unsigned int* scriptWork = &Game.m_scriptWork[0][0][1];
+			unsigned int* scriptWork = reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&Game) + 4);
 			for (int i = 1; i < 0x40; i++, scriptWork++) {
-				CGMonObj* monObj = reinterpret_cast<CGMonObj*>(*scriptWork);
+				CGMonObj* monObj = reinterpret_cast<CGMonObj*>(scriptWork[0xC5D0 / 4]);
 				CGPrgObj* monPrg = reinterpret_cast<CGPrgObj*>(monObj);
 				if (monObj != 0 && monPrg->m_lastStateId == 9 && monPrg->m_subState == 2) {
 					monObj->setRepop(0);
@@ -2351,6 +2362,7 @@ void CGMonObj::frameStatFuncRamoe()
 			}
 		}
 		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+		break;
 	}
 }
 

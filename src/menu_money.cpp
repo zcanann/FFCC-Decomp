@@ -30,10 +30,10 @@ inline void CMenuPcs::MoneySetPlace(int row)
 {
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	int gil;
-	if (row == 0) {
-		gil = caravanWork->m_gil;
-	} else {
+	if (row != 0) {
 		gil = s_Money;
+	} else {
+		gil = caravanWork->m_gil;
 	}
 
 	signed char* place = s_place + row * 8;

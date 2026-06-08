@@ -454,12 +454,12 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 					StoreU32(stack, engineObject, 0x94, setMode);
 					break;
 				case -0xA: {
-					const int oldBit = static_cast<int>((static_cast<int>(*(engineObject + 0x50)) << 0x1C) >> 0x1F);
+					const int oldBit = static_cast<unsigned int>((static_cast<int>(*(engineObject + 0x50)) << 0x1C) >> 0x1F);
 					stack[-1].m_word = static_cast<unsigned int>(oldBit);
 					int bitValue = oldBit;
 					switch (setMode) {
 					case -1:
-						bitValue -= static_cast<int>(static_cast<signed char>(stack->m_word));
+						bitValue -= static_cast<int>(static_cast<unsigned char>(stack->m_word));
 						break;
 					case 0:
 						bitValue = static_cast<int>(static_cast<signed char>(stack->m_word));
@@ -523,7 +523,7 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 							value = static_cast<int>(kCFlatRuntime2Zero - static_cast<float>(stack->m_word));
 							break;
 						case 0:
-							value = static_cast<int>(static_cast<float>(stack->m_word));
+							value = static_cast<int>(*reinterpret_cast<float*>(&stack->m_word));
 							break;
 						case 1:
 							value = static_cast<int>(kCFlatRuntime2Zero + static_cast<float>(stack->m_word));

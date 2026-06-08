@@ -2145,24 +2145,24 @@ int JoyBus::RecvGBA(ThreadParam* threadParam, unsigned int* recvBuffer)
 
     *recvBuffer = 0;
 
-    OSWaitSemaphore(&m_accessSemaphores[port]);
-    secCount = m_secCmdCount[port];
-    OSSignalSemaphore(&m_accessSemaphores[port]);
+    OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+    secCount = m_secCmdCount[threadParam->m_portIndex];
+    OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
     if ((int)secCount >= 0x40)
     {
         return 0;
     }
 
-    bool isSingle = GbaQue.IsSingleMode(port);
+    bool isSingle = GbaQue.IsSingleMode(threadParam->m_portIndex);
 
-    if (isSingle && port != 1)
+    if (isSingle && threadParam->m_portIndex != 1)
     {
         threadParam->m_gbaStatus = 0;
     }
     else
     {
-        threadParam->m_gbaStatus = GBAGetStatus(port, &threadParam->m_unk3);
+        threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
     }
 
     if (threadParam->m_gbaStatus != 0)
@@ -2182,7 +2182,7 @@ int JoyBus::RecvGBA(ThreadParam* threadParam, unsigned int* recvBuffer)
 
     unsigned int data;
 
-    threadParam->m_gbaStatus = GBARead(port, (unsigned char*)&data, &threadParam->m_unk3);
+    threadParam->m_gbaStatus = GBARead(threadParam->m_portIndex, (unsigned char*)&data, &threadParam->m_unk3);
 
     if (threadParam->m_gbaStatus != 0)
     {
@@ -2205,24 +2205,24 @@ int JoyBus::RecvGBA(ThreadParam* threadParam, unsigned int* recvBuffer)
 
         if (b1 == 0)
         {
-            m_stateCodeArr[port] = b2;
-            m_stateFlagArr[port] = 1;
+            m_stateCodeArr[threadParam->m_portIndex] = b2;
+            m_stateFlagArr[threadParam->m_portIndex] = 1;
             return 1;
         }
         else
         {
-            OSWaitSemaphore(&m_accessSemaphores[port]);
-            m_recvQueueEntriesArr[port][ m_secCmdCount[port] ] = data;
-            m_secCmdCount[port]++;
-            OSSignalSemaphore(&m_accessSemaphores[port]);
+            OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+            m_recvQueueEntriesArr[threadParam->m_portIndex][ m_secCmdCount[threadParam->m_portIndex] ] = data;
+            m_secCmdCount[threadParam->m_portIndex]++;
+            OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
             return 2;
         }
     }
 
-    OSWaitSemaphore(&m_accessSemaphores[port]);
-    m_recvQueueEntriesArr[port][ m_secCmdCount[port] ] = data;
-    m_secCmdCount[port]++;
-    OSSignalSemaphore(&m_accessSemaphores[port]);
+    OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+    m_recvQueueEntriesArr[threadParam->m_portIndex][ m_secCmdCount[threadParam->m_portIndex] ] = data;
+    m_secCmdCount[threadParam->m_portIndex]++;
+    OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
     return 2;
 }

@@ -43,7 +43,7 @@ inline void CMenuPcs::MoneySetPlace(int row)
 	int started = 0;
 
 	do {
-		if ((!started) && (digitPlace <= gil)) {
+		if ((!started) && (gil >= digitPlace)) {
 			started = 1;
 		}
 		if (((!started) && (gil < digitPlace)) && (digitIndex != 7)) {

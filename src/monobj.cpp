@@ -1617,27 +1617,27 @@ int CGMonObj::getReplaceStat(int state)
 		}
 		break;
 	default:
-	if ((state < -4) && (-0xE <= state)) {
-		unsigned short action = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + ((state + 0xE) * 2 + 0xD0));
-		unsigned short actionType = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (action * 0x48 + 0xE));
-		switch (actionType) {
-		case 0:
-		case 1:
-			state = 1;
-			break;
-		case 2:
-			state = 2;
-			break;
-		case 3:
-			state = 0x12;
-			break;
-		case 4:
-			state = 8;
-			break;
+		if ((state < -4) && (-0xE <= state)) {
+			unsigned short action = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + ((state + 0xE) * 2 + 0xD0));
+			unsigned short actionType = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (action * 0x48 + 0xE));
+			switch (actionType) {
+			case 0:
+			case 1:
+				state = 1;
+				break;
+			case 2:
+				state = 2;
+				break;
+			case 3:
+				state = 0x12;
+				break;
+			case 4:
+				state = 8;
+				break;
+			}
+		} else {
+			return CGCharaObj::getReplaceStat(state);
 		}
-	} else {
-		state = CGCharaObj::getReplaceStat(state);
-	}
 		break;
 	}
 

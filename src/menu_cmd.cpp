@@ -1383,7 +1383,7 @@ void CMenuPcs::CmdDraw()
 			    ((static_cast<float>(panel->height) * panel->scale) - kCmdMenuChoicePaddingD) /
 			    static_cast<float>(choices));
 			cursorX = static_cast<float>(panel->x - 0x14);
-			cursorY = ((pitch - static_cast<float>(kCmdMenuTextLineHeightD)) * static_cast<float>(kCmdMenuHalfD)) +
+			cursorY = ((pitch - kCmdMenuTextLineHeightD) * kCmdMenuHalfD) +
 			          ((pitch * static_cast<float>(GetCmdStateView(this)->choice)) + static_cast<float>(panel->y + 8));
 		}
 

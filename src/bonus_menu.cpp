@@ -2876,7 +2876,7 @@ void CMenuPcs::CalcResultOpenAnim()
 	const int activePartyCount = s_Rinfo->m_partyCount;
 	const int frameBase = 1;
 
-	if (*(signed char*)(this->m_bonusStatePtr + 0xb) == 0) {
+	if (*(unsigned char*)(this->m_bonusStatePtr + 0xb) == 0) {
 		this->m_bonusAlpha = 0;
 		Sound.PlaySe(0x46, 0x40, 0x7f, 0);
 		memset((void*)this->m_bonusAnimPtr, 0, sizeof(BonusAnimList));
@@ -3011,7 +3011,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			count->depth = 1.0f;
 		}
 		int countTop = countBase + 1;
-		s_CntTop = (unsigned char)countTop;
+		s_CntTop = (signed char)countTop;
 
 		for (int i = 0; i < activePartyCount; i++) {
 			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + (countTop + i) * 0x40 + 8);

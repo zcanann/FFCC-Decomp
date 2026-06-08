@@ -1051,8 +1051,9 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
         if ((attr != 0) && (attr < 9)) {
             strcpy(textBuffer, s_PlusOne_80332d38);
             valueWidth = font->GetWidth(textBuffer);
+            float plusOneX = static_cast<float>(x) + (FLOAT_80332d3c - valueWidth);
             font->DrawInit();
-            MenuPcs.DrawNoShadowFont(font, textBuffer, static_cast<float>(x) + (FLOAT_80332d3c - valueWidth), static_cast<float>(attrY), 9, 0x12);
+            MenuPcs.DrawNoShadowFont(font, textBuffer, plusOneX, static_cast<float>(attrY), 9, 0x12);
             MenuPcs.DrawInit();
         }
     }

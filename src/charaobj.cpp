@@ -3493,14 +3493,13 @@ void CGCharaObj::combi2()
 void CGCharaObj::sendCombiToScript(CGCharaObj* target, int scriptArg, int)
 {
 	int entry = 0;
-	CGPrgObj** comboLinks = CharaObjComboLinks(this);
 	while (entry < CharaObjComboLinkCount(this)) {
-		if (comboLinks[entry] != 0) {
+		if (CharaObjComboLinks(this)[entry] != 0) {
 			if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
-			    (static_cast<unsigned short>(comboLinks[entry]->GetCID()) & 0x6D) == 0x6D &&
-			    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(comboLinks[entry]->m_scriptHandle) + 0x3B4) != 0) {
+			    (static_cast<unsigned short>(CharaObjComboLinks(this)[entry]->GetCID()) & 0x6D) == 0x6D &&
+			    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(CharaObjComboLinks(this)[entry]->m_scriptHandle) + 0x3B4) != 0) {
 				goto next_link;
-			} else if (comboLinks[entry]->m_lastStateId != 6 && comboLinks[entry]->m_lastStateId != 2) {
+			} else if (CharaObjComboLinks(this)[entry]->m_lastStateId != 6 && CharaObjComboLinks(this)[entry]->m_lastStateId != 2) {
 				break;
 			}
 		}

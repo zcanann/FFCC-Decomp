@@ -3399,8 +3399,11 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
     if (yesNoSel != 0) {
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-        GXColor cursorCol = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
-        GXSetChanMatColor(GX_COLOR0A0, cursorCol);
+        col.r = 0xFF;
+        col.g = 0xFF;
+        col.b = 0xFF;
+        col.a = static_cast<unsigned char>(static_cast<int>(255.0f * alpha));
+        GXSetChanMatColor(GX_COLOR0A0, col);
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x64 : 0x3D));
         MenuPcs.DrawRect(
             0, 516.0f, 360.0f, 48.0f, 48.0f,

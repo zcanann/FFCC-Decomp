@@ -1729,14 +1729,7 @@ void CMenuPcs::calcWorld()
 	} else if (animState == 2) {
 		int nextAnim = static_cast<signed char>(bytes[0xE]);
 
-		if (nextAnim == 0) {
-			if (animTime < animEnd) {
-				model->AddFrame(FLOAT_80331698);
-			} else {
-				handle->SetAnim(1, -1, -1, -1, 0);
-				reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 1;
-			}
-		} else {
+		if (nextAnim != 0) {
 			if (nextAnim == 1) {
 				Sound.PlaySe(0x138C, 0x40, 0x7F, 0);
 				nextAnim = 2;
@@ -1765,6 +1758,13 @@ void CMenuPcs::calcWorld()
 				}
 			}
 			bytes[0xE] = 0;
+		} else {
+			if (animTime < animEnd) {
+				model->AddFrame(FLOAT_80331698);
+			} else {
+				handle->SetAnim(1, -1, -1, -1, 0);
+				reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 1;
+			}
 		}
 	} else if (animState == 3 && m_wmWorldState->m_frameCounter >= 10) {
 		if (animTime < animEnd) {

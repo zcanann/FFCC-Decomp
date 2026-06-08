@@ -1802,14 +1802,14 @@ void CCaravanWork::CalcStatus()
 
 	if (m_tempStatBuffTimer != 0) {
 		int tempStatBuffId = m_tempStatBuffId;
-		if (tempStatBuffId < 0x183) {
-			if (tempStatBuffId >= 0x180) {
-				m_defense += *(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + 0x6C);
-			} else if (tempStatBuffId > 0x17C) {
-				m_magic += *(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + 0x6E);
+		if (tempStatBuffId >= 0x183) {
+			if (tempStatBuffId < 0x185) {
+				m_strength += *(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + 0x6A);
 			}
-		} else if (tempStatBuffId < 0x185) {
-			m_strength += *(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + 0x6A);
+		} else if (tempStatBuffId >= 0x180) {
+			m_defense += *(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + 0x6C);
+		} else if (tempStatBuffId > 0x17C) {
+			m_magic += *(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + 0x6E);
 		}
 		m_tempStatBuffTimer--;
 	}

@@ -1708,7 +1708,7 @@ void CalcReflectionVector2(
     PSVECAdd(&nodePos, &matrixPos, &worldPos);
 
     PSMTXCopy(workMtx, nodeRotMtx);
-    PSMTXRotRad(rotateMtx, 'y', kPppYmMoveParabolaNegHalfPi);
+    PSMTXRotRad(rotateMtx, 'y', LoadFloat(kPppYmMoveParabolaNegHalfPi));
     nodeRotMtx[0][3] = worldPos.x;
     nodeRotMtx[1][3] = worldPos.y;
     nodeRotMtx[2][3] = worldPos.z;

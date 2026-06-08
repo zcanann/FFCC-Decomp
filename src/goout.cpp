@@ -1529,7 +1529,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
 void CGoOutMenu::CalcGoOut()
 {
     unsigned short input;
-    unsigned char next;
+    signed char next;
     int selResult = -1;
 
     if (m_watchCardDisconnect != 0 && m_modeFrame >= 0x14 && (m_modeFrame & 0xF) == 0) {
@@ -1812,7 +1812,7 @@ void CGoOutMenu::CalcGoOut()
                     } else if (m_cursorChoice == 1) {
                         Sound.PlaySe(3, 0x40, 0x7f, 0);
                     }
-                    next = static_cast<unsigned char>(m_cursorChoice + 1);
+                    next = static_cast<signed char>(m_cursorChoice + 1);
                 }
             } else {
                 m_cursorChoice ^= 1;
@@ -1854,7 +1854,7 @@ void CGoOutMenu::CalcGoOut()
                     } else if (m_cursorChoice == 1) {
                         Sound.PlaySe(3, 0x40, 0x7f, 0);
                     }
-                    next = static_cast<unsigned char>(m_cursorChoice + 1);
+                    next = static_cast<signed char>(m_cursorChoice + 1);
                 }
             } else {
                 m_cursorChoice ^= 1;
@@ -1917,7 +1917,7 @@ void CGoOutMenu::CalcGoOut()
                         Sound.PlaySe(3, 0x40, 0x7f, 0);
                     }
 
-                    next = static_cast<unsigned char>(m_cursorChoice + 1);
+                    next = static_cast<signed char>(m_cursorChoice + 1);
                 }
             } else {
                 m_cursorChoice ^= 1;
@@ -1953,7 +1953,7 @@ void CGoOutMenu::CalcGoOut()
                         Sound.PlaySe(3, 0x40, 0x7f, 0);
                     }
 
-                    next = static_cast<unsigned char>(m_cursorChoice + 1);
+                    next = static_cast<signed char>(m_cursorChoice + 1);
                 }
             } else {
                 m_cursorChoice ^= 1;
@@ -2517,7 +2517,7 @@ void CGoOutMenu::Calc()
                 if ((input & 0x200) != 0) {
                     Sound.PlaySe(3, 0x40, 0x7f, 0);
                     MenuPcs.InitSaveLoadMenu();
-                    MenuPcs.SetMenuCharaAnim(0, 0);
+                    SetMenuCharaAnim__8CMenuPcsFii2(&MenuPcs);
                     MenuGoOutState().m_resultSelect = -1;
 
                     if (MenuPcs.m_goOutTransferSaveData != 0) {

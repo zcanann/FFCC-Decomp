@@ -978,7 +978,7 @@ void CMenuPcs::CmdDraw()
 			const float x = static_cast<float>(entry->x);
 			float y = static_cast<float>(entry->y);
 			const float w = static_cast<float>(entry->width);
-			double h = static_cast<double>(entry->height);
+			float h = static_cast<float>(entry->height);
 			const float u = entry->u;
 			float t = smallOffset;
 

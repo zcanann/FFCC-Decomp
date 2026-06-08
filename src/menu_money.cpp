@@ -246,12 +246,12 @@ int CMenuPcs::MoneyCtrlCur()
 					Sound.PlaySe(2, 0x40, 0x7F, 0);
 				}
 			} else if ((press & 0x200) != 0) {
-				if (attachFlag < 0) {
-					this->m_moneyState->closeRequested = 1;
+				if (-1 < attachFlag) {
+					LetterSetAttachItem(0, 0xFFFFFFFF);
 					Sound.PlaySe(3, 0x40, 0x7F, 0);
 					return 1;
 				}
-				LetterSetAttachItem(0, 0xFFFFFFFF);
+				this->m_moneyState->closeRequested = 1;
 				Sound.PlaySe(3, 0x40, 0x7F, 0);
 				return 1;
 			}

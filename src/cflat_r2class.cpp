@@ -110,11 +110,11 @@ static inline void StoreU16Value(CFlatRuntime::CStack* stack, unsigned short& va
 	stack[-1].m_word = value;
 
 	switch (setMode) {
-	case 0:
-		value = stack->m_word;
-		break;
 	case -1:
 		value = value - stack->m_word;
+		break;
+	case 0:
+		value = stack->m_word;
 		break;
 	case 1:
 		value = value + stack->m_word;
@@ -133,11 +133,11 @@ static inline void StoreS16(CFlatRuntime::CStack* stack, u8* base, int offset, i
 	stack[-1].m_word = *value;
 
 	switch (setMode) {
-	case 0:
-		*value = stack->m_word;
-		break;
 	case -1:
 		*value = *value - stack->m_word;
+		break;
+	case 0:
+		*value = stack->m_word;
 		break;
 	case 1:
 		*value = *value + stack->m_word;
@@ -150,11 +150,11 @@ static inline void StoreU32Value(CFlatRuntime::CStack* stack, unsigned int& valu
 	stack[-1].m_word = value;
 
 	switch (setMode) {
-	case 0:
-		value = stack->m_word;
-		break;
 	case -1:
 		value -= stack->m_word;
+		break;
+	case 0:
+		value = stack->m_word;
 		break;
 	case 1:
 		value += stack->m_word;
@@ -173,11 +173,11 @@ static inline void StoreF32(CFlatRuntime::CStack* stack, u8* base, int offset, i
 	*reinterpret_cast<float*>(&stack[-1].m_word) = *value;
 
 	switch (setMode) {
-	case 0:
-		*value = *reinterpret_cast<float*>(&stack->m_word);
-		break;
 	case -1:
 		*value -= *reinterpret_cast<float*>(&stack->m_word);
+		break;
+	case 0:
+		*value = *reinterpret_cast<float*>(&stack->m_word);
 		break;
 	case 1:
 		*value += *reinterpret_cast<float*>(&stack->m_word);

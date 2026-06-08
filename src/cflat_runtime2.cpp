@@ -1389,12 +1389,13 @@ void CFlatRuntime2::Calc()
 				continue;
 			}
 
+			record.m_particleId = Swap32(static_cast<u32>(static_cast<int>(object->m_particleId)));
+
 			Vec pos = object->m_worldPosition;
 			if (object->m_weaponNodeFlagBits.m_attached != 0) {
 				PSVECAdd(&pos, &object->m_attachOwner->m_worldPosition, &pos);
 			}
 
-			record.m_particleId = Swap32(static_cast<u32>(static_cast<int>(object->m_particleId)));
 			record.m_positionX = SwapToF32(pos.x);
 			record.m_positionY = SwapToF32(pos.y);
 			record.m_positionZ = SwapToF32(pos.z);

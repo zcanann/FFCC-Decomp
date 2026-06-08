@@ -3350,13 +3350,13 @@ void CGPartyObj::statPut()
 		int anim;
 		int seNo;
 		switch (m_lastStateId) {
-		case 0x0D:
-			anim = 0x19;
-			seNo = 0x24;
-			break;
 		case 0x0C:
 			anim = 0x0E;
 			seNo = 0x23;
+			break;
+		case 0x0D:
+			anim = 0x19;
+			seNo = 0x24;
 			break;
 		case 0x1B:
 			anim = 9;

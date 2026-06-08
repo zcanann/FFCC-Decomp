@@ -1913,11 +1913,11 @@ void CFlatRuntime2::drawLayer(
 			}
 			int rectY = static_cast<int>(by);
 
-			short quadU0 = u0;
+			short quadU0 = static_cast<short>(texU);
 			if ((quad & 1) != 0) {
 				quadU0 = static_cast<short>(texU + static_cast<short>(pixelWidth));
 			}
-			short quadV0 = v0;
+			short quadV0 = static_cast<short>(texV);
 			if ((quad & 2) != 0) {
 				quadV0 = static_cast<short>(texV + static_cast<short>(pixelHeight));
 			}

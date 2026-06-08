@@ -1013,12 +1013,14 @@ void CMenuPcs::CmdDraw()
 	entry = entries;
 	for (i = 0; i < caravan->m_numCmdListSlots; i++) {
 		if ((i >= 8) || (caravan->m_commandListExtra[i] == 0)) {
-			float alpha = entry->alpha;
+			u8 alphaByte;
 			if (cmdMode == 3) {
-				alpha = kCmdMenuOne;
+				alphaByte = static_cast<u8>(kCmdMenuAlphaMax * kCmdMenuOneD);
+			} else {
+				alphaByte = static_cast<u8>(kCmdMenuAlphaMax * static_cast<double>(entry->alpha));
 			}
 
-			nameFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(kCmdMenuAlphaMax * alpha)).color);
+			nameFont->SetColor(CColor(0xFF, 0xFF, 0xFF, alphaByte).color);
 
 			const char* text;
 			if (i < 2) {

@@ -1015,8 +1015,12 @@ int CFlatRuntime::SystemCall(CFlatRuntime::CObject* objectParam, int systemKind,
 	                | (static_cast<unsigned int>(prevReqFlags) << 15);
 
 	int clearCount = *reinterpret_cast<int*>(func + 0x28) - *reinterpret_cast<int*>(func + 0x24);
-	for (unsigned int* clear = object->m_localBase + *reinterpret_cast<int*>(func + 0x24); clearCount > 0; clearCount--) {
-		*clear++ = 0;
+	if (clearCount != 0) {
+		unsigned int* clear = object->m_localBase + *reinterpret_cast<int*>(func + 0x24);
+		while (clearCount > 0) {
+			*clear++ = 0;
+			clearCount--;
+		}
 	}
 
 	objectFrame(object);

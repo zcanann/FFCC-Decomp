@@ -1099,7 +1099,6 @@ void CShopMenu::DrawItemInfo0()
         return;
     }
 
-    const CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
     int itemNo = getItemNo(m_selectedIndex);
 
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
@@ -1139,7 +1138,7 @@ void CShopMenu::DrawItemInfo0()
             if (itemNo < 1) {
                 totalGil = 0;
             } else {
-                totalGil = static_cast<int>(caravanWork->m_shopParam) *
+                totalGil = static_cast<int>(ShopMenuCaravanWork(this)->m_shopParam) *
                            *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 0x20);
                 totalGil = totalGil / 100;
             }
@@ -1147,7 +1146,7 @@ void CShopMenu::DrawItemInfo0()
             if (itemNo < 1) {
                 totalGil = 0;
             } else {
-                int gil = static_cast<int>(caravanWork->m_shopParam) *
+                int gil = static_cast<int>(ShopMenuCaravanWork(this)->m_shopParam) *
                           *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 0x20);
                 gil = gil / 100;
                 totalGil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil));

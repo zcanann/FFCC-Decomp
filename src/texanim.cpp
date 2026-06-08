@@ -9,7 +9,6 @@
 #include <math.h>
 #include "dolphin/mtx.h"
 
-static const char s_texanim_cpp[] = "texanim.cpp";
 extern const float kTexAnimZero = 0.0f;
 extern const float kTexAnimOne = 1.0f;
 extern const double kTexAnimIntToDoubleBias = 4503599627370496.0;
@@ -322,9 +321,10 @@ inline void CTexAnimSeq::Interp(float frame, Vec& texGen)
         }
 
         if (((float)keyData->m_frame <= currentFrame) && (currentFrame < nextFrame)) {
-            float t = kTexAnimZero;
+            float t;
             float frameSpan = nextFrame - (float)keyData->m_frame;
             if (frameSpan == kTexAnimZero) {
+                t = kTexAnimZero;
             } else {
                 t = (currentFrame - (float)keyData->m_frame) / frameSpan;
             }
@@ -431,11 +431,10 @@ inline void CTexAnim::AddFrame(float frameStep)
         if (m_mode != -3) {
             m_frame = m_frame + frameStep;
             if ((float)seq->m_totalFrames <= m_frame) {
-                int mode = m_mode;
-                if (mode == -1) {
+                if (m_mode == -1) {
                     m_frame = (float)seq->m_totalFrames;
-                } else if (mode >= 0) {
-                    m_seqIndex = mode;
+                } else if (m_mode >= 0) {
+                    m_seqIndex = m_mode;
                     m_mode = -2;
                 }
                 m_frame = m_frame - (float)seq->m_totalFrames;
@@ -537,7 +536,7 @@ void CTexAnimSet::AttachMaterialSet(CMaterialSet* materialSet)
  */
 inline CTexAnim* CTexAnim::Duplicate(CMemory::CStage* stage)
 {
-    CTexAnim* copy = new (stage, const_cast<char*>(s_texanim_cpp), 0xF4) CTexAnim;
+    CTexAnim* copy = new (stage, const_cast<char*>("texanim.cpp"), 0xF4) CTexAnim;
 
     copy->m_refData = m_refData;
     copy->m_refData->AddRef();
@@ -581,7 +580,7 @@ inline void CTexAnimSeq::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
         case 'KEY ':
             m_keyCount = chunk.m_size / 0x30;
             m_keys = static_cast<CTexAnimKey*>(
-                Memory._Alloc(chunk.m_size, stage, const_cast<char*>(s_texanim_cpp), 0x1D4, 0));
+                Memory._Alloc(chunk.m_size, stage, const_cast<char*>("texanim.cpp"), 0x1D4, 0));
             memcpy(m_keys, chunkFile.GetAddress(), chunk.m_size);
             continue;
         default:
@@ -610,7 +609,7 @@ inline void CTexAnim::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
         }
         m_refData = 0;
     }
-    CTexAnim::CRefData* refData = new (stage, const_cast<char*>(s_texanim_cpp), 0xD3) CTexAnim::CRefData;
+    CTexAnim::CRefData* refData = new (stage, const_cast<char*>("texanim.cpp"), 0xD3) CTexAnim::CRefData;
     m_refData = refData;
     m_refData->m_texAnimSeqs.SetStage(stage);
 
@@ -622,7 +621,7 @@ inline void CTexAnim::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
             strcpy(m_refData->m_name, chunkFile.GetString());
             break;
         case 'SEQ ': {
-            CTexAnimSeq* seq = new (stage, const_cast<char*>(s_texanim_cpp), 0xE2) CTexAnimSeq;
+            CTexAnimSeq* seq = new (stage, const_cast<char*>("texanim.cpp"), 0xE2) CTexAnimSeq;
             seq->Create(chunkFile, stage);
             m_refData->m_texAnimSeqs.Add(seq);
             break;
@@ -645,7 +644,7 @@ inline void CTexAnim::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
  */
 CTexAnimSet* CTexAnimSet::Duplicate(CMemory::CStage* stage)
 {
-    CTexAnimSet* dup = new (stage, const_cast<char*>(s_texanim_cpp), 0x54) CTexAnimSet;
+    CTexAnimSet* dup = new (stage, const_cast<char*>("texanim.cpp"), 0x54) CTexAnimSet;
 
     dup->m_texAnims.SetStage(stage);
     for (unsigned int i = 0; i < static_cast<unsigned int>(m_texAnims.GetSize()); i++) {
@@ -680,7 +679,7 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
             continue;
         }
 
-        CTexAnim* texAnim = new (stage, const_cast<char*>(s_texanim_cpp), 0x3F) CTexAnim;
+        CTexAnim* texAnim = new (stage, const_cast<char*>("texanim.cpp"), 0x3F) CTexAnim;
         texAnim->Create(chunkFile, stage);
         m_texAnims.Add(texAnim);
     }

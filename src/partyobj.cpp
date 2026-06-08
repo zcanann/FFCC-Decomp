@@ -3054,21 +3054,20 @@ void CGPartyObj::onStatMagic()
  */
 void CGPartyObj::onStatDie()
 {
-	if (m_subState == 0) {
+	switch (m_subState) {
+	case 0:
 		if (m_subFrame == 0) {
 			enableDamageCol(0);
 		}
 		if (isLoopAnimDirect() != 0) {
 			changeSubStat(1);
 		}
-		return;
-	}
-
-	if (m_subState == 1) {
+		break;
+	case 1:
 		if (m_subFrame == 0) {
 			m_bgColMask &= 0xFFFEFFF1;
 			enableDamageCol(1);
-			if ((PartyData(this).partyFlags & 0x04) != 0) {
+			if (PartyData(this).flags.flag04) {
 				putParticleFromItem(0x220, 2, 0, &m_worldPosition);
 				putParticleFromItem(0x220, 3, 0, &m_worldPosition);
 				changeSubStat(2);
@@ -3076,14 +3075,15 @@ void CGPartyObj::onStatDie()
 		} else if (m_subFrame == 0x19) {
 			changeStat(0x22, 0, 0);
 		}
-		return;
-	}
-
-	if (m_subState == 2 && m_subFrame > 0xBA) {
-		if ((unsigned int)System.m_execParam > 1) {
-			System.Printf(const_cast<char*>(lbl_801DCCB0));
+		break;
+	case 2:
+		if (m_subFrame > 0xBA) {
+			if ((unsigned int)System.m_execParam > 1) {
+				System.Printf(const_cast<char*>(lbl_801DCCB0));
+			}
+			changeStat(0x22, 0, 0);
 		}
-		changeStat(0x22, 0, 0);
+		break;
 	}
 }
 

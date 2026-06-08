@@ -1008,56 +1008,46 @@ void CGMonObj::frameStatFuncLKShooter()
 	*reinterpret_cast<int*>(CGMonObj::m_boss + 0x10) = cooldown1 & ~(cooldown1 >> 31);
 
 	const int state = *reinterpret_cast<int*>(self + 0x520);
-	if (state == 0x65) {
-		goto state101;
-	}
-	if (state >= 0x65) {
-		goto resetBranch;
-	}
-	if (state >= 100) {
-		goto state100;
-	}
-	goto resetBranch;
+	switch (state) {
+	case 100:
+		reinterpret_cast<CGCharaObj*>(this)->m_unk63CBits.m_bit80 = 1;
+		if (*reinterpret_cast<int*>(self + 0x528) == 0) {
+			memset(&m_moveWork, 0, sizeof(m_moveWork));
+			m_moveWork.m_flags = 0x322;
 
-state100:
-	reinterpret_cast<CGCharaObj*>(this)->m_unk63CBits.m_bit80 = 1;
-	if (*reinterpret_cast<int*>(self + 0x528) == 0) {
-		memset(&m_moveWork, 0, sizeof(m_moveWork));
-		m_moveWork.m_flags = 0x322;
-
-		Vec targetPos;
-		if (m_actionBranch == 1) {
-			targetPos = CVector(kMonObjBossRightTargetXZ, kMonObjBossZero, kMonObjBossRightTargetXZ);
-		} else {
-			targetPos = CVector(kMonObjBossLeftTargetX, kMonObjBossZero, kMonObjBossLeftTargetZ);
+			Vec targetPos;
+			if (m_actionBranch == 1) {
+				targetPos = CVector(kMonObjBossRightTargetXZ, kMonObjBossZero, kMonObjBossRightTargetXZ);
+			} else {
+				targetPos = CVector(kMonObjBossLeftTargetX, kMonObjBossZero, kMonObjBossLeftTargetZ);
+			}
+			m_moveWork.m_targetPos.x = targetPos.x;
+			m_moveWork.m_targetPos.y = targetPos.y;
+			m_moveWork.m_targetPos.z = targetPos.z;
+			m_moveWork.m_range = kMonObjBossShortMoveRange;
+			m_moveWork.m_changeStat = 0x65;
 		}
-		m_moveWork.m_targetPos.x = targetPos.x;
-		m_moveWork.m_targetPos.y = targetPos.y;
-		m_moveWork.m_targetPos.z = targetPos.z;
-		m_moveWork.m_range = kMonObjBossShortMoveRange;
-		m_moveWork.m_changeStat = 0x65;
+
+		moveFrame();
+		if ((reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->bits.m_bit80 != 0) ||
+		    ((m_actionBranch == 1) && ((CFlatBossState() & 1) != 0)) ||
+		    ((m_actionBranch == 2) && ((CFlatBossState() & 2) != 0))) {
+			reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
+		}
+		return;
+
+	case 0x65:
+		if (*reinterpret_cast<int*>(self + 0x528) == 0) {
+			reinterpret_cast<CGPrgObj*>(this)->reqAnim(-1, 0, 0);
+			rotTarget(m_targetPartyIndex, kMonObjBossTurnAroundDeg);
+		}
+		if ((reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->bits.m_bit80 != 0) ||
+		    (*reinterpret_cast<float*>(self + 0x5D0 + *reinterpret_cast<int*>(self + 0x620) * 4) < kMonObjBossFrameThreshold)) {
+			reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
+		}
+		return;
 	}
 
-	moveFrame();
-	if ((reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->bits.m_bit80 != 0) ||
-	    ((m_actionBranch == 1) && ((CFlatBossState() & 1) != 0)) ||
-	    ((m_actionBranch == 2) && ((CFlatBossState() & 2) != 0))) {
-		reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
-	}
-	return;
-
-state101:
-	if (*reinterpret_cast<int*>(self + 0x528) == 0) {
-		reinterpret_cast<CGPrgObj*>(this)->reqAnim(-1, 0, 0);
-		rotTarget(m_targetPartyIndex, kMonObjBossTurnAroundDeg);
-	}
-	if ((reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->bits.m_bit80 != 0) ||
-	    (*reinterpret_cast<float*>(self + 0x5D0 + *reinterpret_cast<int*>(self + 0x620) * 4) < kMonObjBossFrameThreshold)) {
-		reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
-	}
-	return;
-
-resetBranch:
 	if (m_actionBranch == 1) {
 		m_actionBranch = 0;
 		reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->bits.m_bit20 = 0;

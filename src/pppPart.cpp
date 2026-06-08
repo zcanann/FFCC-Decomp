@@ -687,7 +687,7 @@ void callCon2Prog(_pppPObject* pObject)
 	_pppProgSetDef* progSet = owner->m_programSetDef;
 	int stageIdx = 0;
 
-	gPppInConstructor = 1;
+	ppvIsLoopCalc = 1;
 
 	_pppProgSetDef* stageSet = progSet;
 	u32* initWork = (u32*)(((u8*)pObject) + progSet->m_workBaseOffset);
@@ -745,7 +745,7 @@ void callCon2Prog(_pppPObject* pObject)
 		}
 	}
 
-	gPppInConstructor = 0;
+	ppvIsLoopCalc = 0;
 }
 
 /*
@@ -1429,21 +1429,21 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
 
 	PSMTXCopy(ppvMng->m_matrix.value, local_44);
 	if (pppMngSt->m_fpBillboard != 0) {
-		PSMTXConcat(ppvCameraMatrix0, ppvMng->m_matrix.value, ppvWorldMatrix);
+		PSMTXConcat(ppvCameraMatrix, ppvMng->m_matrix.value, ppvWorldMatrix);
 		local_50.x = local_44[0][3];
 		local_50.y = local_44[1][3];
 		local_50.z = local_44[2][3];
-		PSMTXMultVecSR(ppvCameraMatrix0, &local_50, &local_50);
+		PSMTXMultVecSR(ppvCameraMatrix, &local_50, &local_50);
 		local_50.y += CameraPcs.m_positionY;
 		ppvWorldMatrix[0][3] = local_50.x;
 		ppvWorldMatrix[1][3] = local_50.y;
 		ppvWorldMatrix[2][3] = local_50.z;
 	} else {
-		PSMTXConcat(ppvCameraMatrix0, ppvMng->m_matrix.value, ppvWorldMatrix);
+		PSMTXConcat(ppvCameraMatrix, ppvMng->m_matrix.value, ppvWorldMatrix);
 		local_50.x = local_44[0][3];
 		local_50.y = local_44[1][3];
 		local_50.z = local_44[2][3];
-		PSMTXMultVec(ppvCameraMatrix0, &local_50, &local_50);
+		PSMTXMultVec(ppvCameraMatrix, &local_50, &local_50);
 		ppvWorldMatrix[0][3] = local_50.x;
 		ppvWorldMatrix[1][3] = local_50.y;
 		ppvWorldMatrix[2][3] = local_50.z;
@@ -1793,71 +1793,13 @@ void pppInitPdt(long* progOffsetReconstructionTable, pppProg* pppProg)
 		entry = (int*)*head;
 	} while (*(int*)*head != 0);
 
-	int processed = 0;
 	*head = 0;
-	if (pppProgRelocCount > 0) {
-		if (pppProgRelocCount > 8) {
-			int blocks = (pppProgRelocCount - 8 + 7) >> 3;
-			int* reloc = pppProgRelocs;
-			if (pppProgRelocCount - 8 > 0) {
-				do {
-					processed += 8;
-					reloc[0] = (int)(pppProg + reloc[0]);
-					reloc[1] = (int)(pppProg + reloc[1]);
-					reloc[2] = (int)(pppProg + reloc[2]);
-					reloc[3] = (int)(pppProg + reloc[3]);
-					reloc[4] = (int)(pppProg + reloc[4]);
-					reloc[5] = (int)(pppProg + reloc[5]);
-					reloc[6] = (int)(pppProg + reloc[6]);
-					reloc[7] = (int)(pppProg + reloc[7]);
-					reloc += 8;
-					blocks--;
-				} while (blocks != 0);
-			}
-		}
-
-		int remain = pppProgRelocCount - processed;
-		int* reloc = pppProgRelocs + processed;
-		if (processed < pppProgRelocCount) {
-			do {
-				*reloc = (int)(pppProg + *reloc);
-				reloc++;
-				remain--;
-			} while (remain != 0);
-		}
+	for (int i = 0; i < pppProgRelocCount; i++) {
+		pppProgRelocs[i] = (int)(pppProg + pppProgRelocs[i]);
 	}
 
-	processed = 0;
-	if (pdtRelocCount > 0) {
-		if (pdtRelocCount > 8) {
-			int blocks = (pdtRelocCount - 8 + 7) >> 3;
-			int* reloc = pdtRelocs;
-			if (pdtRelocCount - 8 > 0) {
-				do {
-					processed += 8;
-					reloc[0] += (int)progOffsetReconstructionTable;
-					reloc[1] += (int)progOffsetReconstructionTable;
-					reloc[2] += (int)progOffsetReconstructionTable;
-					reloc[3] += (int)progOffsetReconstructionTable;
-					reloc[4] += (int)progOffsetReconstructionTable;
-					reloc[5] += (int)progOffsetReconstructionTable;
-					reloc[6] += (int)progOffsetReconstructionTable;
-					reloc[7] += (int)progOffsetReconstructionTable;
-					reloc += 8;
-					blocks--;
-				} while (blocks != 0);
-			}
-		}
-
-		int remain = pdtRelocCount - processed;
-		int* reloc = pdtRelocs + processed;
-		if (processed < pdtRelocCount) {
-			do {
-				*reloc += (int)progOffsetReconstructionTable;
-				reloc++;
-				remain--;
-			} while (remain != 0);
-		}
+	for (int i = 0; i < pdtRelocCount; i++) {
+		pdtRelocs[i] += (int)progOffsetReconstructionTable;
 	}
 }
 
@@ -1901,8 +1843,8 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 	    pppModelSt*[pppDataHead->m_modelCount];
 	pppDataHead->m_modelNames = reinterpret_cast<u32>(modelRefs);
 
-	pppModelSt* modelArray = PartMng.m_pppModelStArr;
 	for (int i = 0; i < pppDataHead->m_modelCount; i++) {
+		pppModelSt* modelArray = PartMng.m_pppModelStArr;
 		pppModelSt* model = 0;
 		for (u32 j = 0; j < 0x100; j++) {
 			if (modelArray[j].m_isUsed != 0 && strcmp(modelArray[j].m_name, modelName) == 0) {
@@ -1921,8 +1863,8 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 	    pppShapeSt*[pppDataHead->m_shapeCount];
 	pppDataHead->m_shapeNames = reinterpret_cast<u32>(shapeRefs);
 
-	pppShapeSt* shapeArray = PartMng.m_pppShapeStArr;
 	for (int i = 0; i < pppDataHead->m_shapeCount; i++) {
+		pppShapeSt* shapeArray = PartMng.m_pppShapeStArr;
 		pppShapeSt* shape = 0;
 		for (u32 j = 0; j < 0x100; j++) {
 			if (shapeArray[j].m_inUse != 0 && strcmp(shapeArray[j].m_name, shapeName) == 0) {
@@ -2290,7 +2232,7 @@ void _pppCalcPart(_pppMngSt* pppMngSt)
 
 	ppvMng = pppMngSt;
 	if (se->m_soundEffectSlot >= 0 &&
-		se->m_soundEffectStartFrame <= pppMngSt->m_currentFrame &&
+		pppMngSt->m_currentFrame >= se->m_soundEffectStartFrame &&
 		se->m_soundEffectStopFlag == 0)
 	{
 		Vec soundPos;
@@ -2302,11 +2244,11 @@ void _pppCalcPart(_pppMngSt* pppMngSt)
 		{
 			if (se->m_soundEffectStartedOnce == 0)
 			{
-				u32 soundTableIndex = (u32)se->m_soundEffectKind - 3;
+				u32 soundTableKind = (u32)se->m_soundEffectKind;
 				se->m_soundEffectHandle = Sound.PlaySe3D(
 					se->m_soundEffectSlot, &soundPos,
-					ppvEnv->m_soundVolumeTable[soundTableIndex],
-					ppvEnv->m_soundPitchTable[soundTableIndex], 0);
+					(PartMng.m_pppEnvSt.m_soundVolumeTable - 3)[soundTableKind],
+					(PartMng.m_pppEnvSt.m_soundPitchTable - 3)[soundTableKind], 0);
 				se->m_soundEffectStartedOnce = 1;
 			}
 		}

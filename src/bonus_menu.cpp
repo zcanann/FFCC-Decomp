@@ -1207,7 +1207,10 @@ void CMenuPcs::CalcSelectWait()
 
 	if (promptMode != 3) {
 		if (promptMode == 1) {
-			if ((repeat & 3) == 0) {
+			if ((repeat & 3) != 0) {
+				confirmSel = (short)(confirmSel ^ 1);
+				Sound.PlaySe(1, 0x40, 0x7f, 0);
+			} else {
 				if ((down & 0x100) == 0) {
 					if ((down & 0x200) != 0) {
 						promptMode = 2;
@@ -1218,9 +1221,6 @@ void CMenuPcs::CalcSelectWait()
 					promptMode = 2;
 					Sound.PlaySe(2, 0x40, 0x7f, 0);
 				}
-			} else {
-				confirmSel = (short)(confirmSel ^ 1);
-				Sound.PlaySe(1, 0x40, 0x7f, 0);
 			}
 		} else if (promptMode == 2) {
 			if (window->frame == 1 && confirmSel == 0) {

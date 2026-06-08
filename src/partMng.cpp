@@ -4149,24 +4149,25 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
         return -1;
     }
 
-    int freeIdx = -1;
+    unsigned char* fpData = reinterpret_cast<unsigned char*>(pdt) + 0x20 + fpNo * 0x60;
+
+    PppMngStCreateRaw* mng = 0;
     for (int i = 0; i < 0x180; i++) {
         if (m_pppMng[i].m_baseTime == -0x1000) {
-            freeIdx = i;
+            mng = reinterpret_cast<PppMngStCreateRaw*>(self + 0x2A18 + i * 0x158);
             break;
         }
     }
-    if (freeIdx < 0) {
+    if (mng == 0) {
         return -1;
     }
 
-    PppMngStCreateRaw* mng = reinterpret_cast<PppMngStCreateRaw*>(self + 0x2A18 + freeIdx * 0x158);
+    int freeIdx = mng - reinterpret_cast<PppMngStCreateRaw*>(self + 0x2A18);
     if (System.m_execParam != 0) {
         System.Printf(const_cast<char*>(sPppCreateLogFmt), pdtSlotIndex, fpNo, freeIdx,
                       slot->m_name);
     }
 
-    unsigned char* fpData = reinterpret_cast<unsigned char*>(pdt) + 0x20 + fpNo * 0x60;
     unsigned char* fpData1 = fpData + 0x20;
     unsigned char* fpData2 = fpData + 0x40;
 

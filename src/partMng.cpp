@@ -4313,7 +4313,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     mng->m_fieldF2 = 1;
     if (allowFpOverride != 0) {
         const int mode = *reinterpret_cast<unsigned char*>(fpData2 + 0x05);
-        if (mode == 4 || mode < 3 || mode > 8) {
+        if (mode == 4 || mode > 8 || mode < 3) {
             mng->m_fieldF2 = *reinterpret_cast<unsigned char*>(fpData2 + 0x0F);
         }
     }

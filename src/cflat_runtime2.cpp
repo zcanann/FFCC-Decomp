@@ -39,6 +39,17 @@ inline void* operator new(unsigned long, void* ptr)
 extern "C" void StaticFrame__10CGCharaObjFv();
 extern const float kCFlatAngleHalfTurnDeg;
 extern const float kCFlatAnglePi;
+extern "C" const float FLOAT_80330140;
+extern "C" const float FLOAT_80330144;
+extern "C" const float FLOAT_80330148;
+extern "C" const float FLOAT_8033014C;
+extern "C" const float FLOAT_80330150;
+extern "C" const float FLOAT_80330154;
+extern "C" const float FLOAT_80330180;
+extern "C" const float FLOAT_80330184;
+extern "C" const float FLOAT_80330188;
+extern "C" const float FLOAT_8033018C;
+extern "C" const float FLOAT_80330190;
 
 CFlatRuntime2 CFlat ATTRIBUTE_ALIGN(32);
 CFlatRuntime2& gCFlatRuntime2 = CFlat;
@@ -1374,8 +1385,8 @@ void CFlatRuntime2::Calc()
  */
 void CFlatRuntime2::Draw()
 {
-	CFont* font = *reinterpret_cast<CFont**>(MenuPcsRaw() + 0x248);
-	font->SetScale(1.0f);
+	CFont* font = MenuPcs.m_fonts[0];
+	font->SetScale(0.65f);
 	font->SetShadow(1);
 	font->SetMargin(0.0f);
 	font->SetZMode(0, 0);
@@ -1398,7 +1409,7 @@ void CFlatRuntime2::Draw()
 	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcsRaw() + 0x40), projection);
 	GXSetProjection(projection, GX_PERSPECTIVE);
 
-	font->SetScale(0.875f);
+	font->SetScale(0.85f);
 	font->SetShadow(1);
 	font->SetMargin(0.0f);
 	font->SetZMode(1, 1);
@@ -1779,7 +1790,7 @@ void CFlatRuntime2::drawLayer(
 	GXSetChanMatColor(GX_COLOR0A0, *color);
 
 	Mtx44 ortho;
-	C_MTXOrtho(ortho, 0.0f, 448.0f, 0.0f, 640.0f, 0.0f, -100.0f);
+	C_MTXOrtho(ortho, FLOAT_80330144, FLOAT_80330148, FLOAT_80330144, FLOAT_8033014C, FLOAT_80330144, FLOAT_80330150);
 	GXSetProjection(ortho, GX_ORTHOGRAPHIC);
 
 	Mtx identity;

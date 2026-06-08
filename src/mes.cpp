@@ -673,7 +673,7 @@ void CMes::Draw()
 
 					MenuPcs.DrawRect(
 					    0, *(float*)((char*)this + 0x3C9C) + *glyph,
-					    kMesIconDrawYOffset + *(float*)((char*)this + 0x3CA0) + (float)*(short*)(glyph + 2),
+					    kMesIconDrawYOffset + *(float*)((char*)this + 0x3CA0) + (float)*(unsigned short*)(glyph + 2),
 					    kMesIconDefaultWidth, kMesIconDefaultWidth, (float)((iconId % 5) * 0x16),
 					    (float)((iconId / 5) * 0x16), kMesOne, kMesOne, 0.0f);
 
@@ -1578,7 +1578,7 @@ void CMes::Next()
 			for (; j < remaining; j = j + 1, curr = curr + 5)
 			{
 				if ((((unsigned int)*(unsigned char*)((char*)start + 0xe) >> 4 & 0xF) != ((unsigned int)*(unsigned char*)((char*)curr + 0xe) >> 4 & 0xF)) ||
-				    (*(short*)(start + 2) != *(short*)(curr + 2)))
+				    (*(unsigned short*)(start + 2) != *(short*)(curr + 2)))
 				{
 					break;
 				}
@@ -1588,7 +1588,7 @@ void CMes::Next()
 			for (; runLength != 0; runLength = runLength - 1)
 			{
 				type = (int)(((unsigned int)*(unsigned char*)((char*)start + 0xe) >> 4) & 0xF);
-				if ((unsigned int)type == 1)
+				if ((int)type == 1)
 				{
 					*start = halfVal * (*(float*)((char*)this + 0x3ca4) - groupWidth) + *start;
 				}

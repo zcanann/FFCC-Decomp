@@ -209,8 +209,6 @@ void CGraphicPcs::drawScreenFade()
         if ((invert == 0) && (slotData->m_timer == 0)) {
             continue;
         }
-        const int timer = slotData->m_timer;
-        const int duration = slotData->m_duration;
         _GXSetBlendMode((GXBlendMode)1, (GXBlendFactor)4, (GXBlendFactor)5, (GXLogicOp)1);
         GXSetZCompLoc(0);
         _GXSetAlphaCompare((GXCompare)6, 1, (GXAlphaOp)0, (GXCompare)7, 0);
@@ -232,7 +230,7 @@ void CGraphicPcs::drawScreenFade()
         _GXColor baseColor = slotData->m_colorA;
         _GXColor baseColor2 = slotData->m_colorB;
 
-        float t = (float)timer / (float)duration;
+        float t = (float)slotData->m_timer / (float)slotData->m_duration;
         if (invert != 0) {
             t = kGraphicOne - t;
         }
@@ -349,7 +347,7 @@ void CGraphicPcs::drawScreenFade()
         }
 
         if (slot == 0) {
-            if (timer < (duration - 1)) {
+            if (slotData->m_timer < (slotData->m_duration - 1)) {
                 GXSetNumTexGens(1);
                 GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
                 _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);

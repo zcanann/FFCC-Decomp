@@ -3413,8 +3413,8 @@ void CMaterial::Create(unsigned long tag, CMaterialMan::TEV_BIT tevBit)
     float scale = kTextureOne;
     m_bumpLight = 0;
     m_textureCount = 0;
-    m_scaleU = scale;
     m_scaleV = scale;
+    m_scaleU = scale;
     m_singleTextureFlag = 0;
     m_textureCount = static_cast<unsigned short>(tag);
 }

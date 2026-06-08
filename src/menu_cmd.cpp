@@ -2634,11 +2634,11 @@ unsigned int CMenuPcs::CmdOpen1()
 			chainCount = 0;
 		}
 
-		f32 panelScale = 1.0f;
+		f64 panelScale = kCmdMenuOneD;
 		if (chainCount != 0) {
-			panelScale = static_cast<f32>(kCmdMenuUnitePanelScaleD);
+			panelScale = kCmdMenuUnitePanelScaleD;
 		}
-		animEntry->scale = panelScale;
+		animEntry->scale = static_cast<f32>(panelScale);
 		animEntry->width = 0xC0;
 		animEntry->height = 0x40;
 		animEntry->y = static_cast<s16>(((-((static_cast<f64>(animEntry->height) * animEntry->scale) -

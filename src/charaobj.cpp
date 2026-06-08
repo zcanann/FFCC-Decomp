@@ -645,17 +645,21 @@ void CGCharaObj::onFramePostCalc()
 		    (i == 0 || i == 4 || i == 9 || i == 3) &&
 		    statusValue > 0) {
 			int slot = static_cast<signed char>(m_animStateMisc);
-			unsigned short padMask = 0;
+			unsigned short padMask;
 			bool useDebugPad = (Pad.m_debugPadLock != 0) || ((slot == 0) && (Pad.m_debugPadPort != -1));
-			if (!useDebugPad) {
+			if (useDebugPad) {
+				padMask = 0;
+			} else {
 				int activePad = Pad.m_debugPadPort;
 				int idx = slot & ~(static_cast<int>(~((activePad - slot) | (slot - activePad))) >> 31);
 				padMask = Pad.GetPadInputs()[idx].buttonDown[0];
 			}
 			if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x100) != 0) {
 				useDebugPad = (Pad.m_debugPadLock != 0) || ((slot == 0) && (Pad.m_debugPadPort != -1));
-				unsigned short heldMask = 0;
-				if (!useDebugPad) {
+				unsigned short heldMask;
+				if (useDebugPad) {
+					heldMask = 0;
+				} else {
 					int activePad = Pad.m_debugPadPort;
 					int idx = slot & ~(static_cast<int>(~((activePad - slot) | (slot - activePad))) >> 31);
 					heldMask = Pad.GetPadInputs()[idx].repeatButton;

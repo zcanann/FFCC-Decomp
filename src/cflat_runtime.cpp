@@ -2298,7 +2298,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 			CStopWatch watch("no name");
 			watch.Reset();
 			watch.Start();
-			ret = onSystemFunc(object, systemKind, systemIndex, result);
+			ret = onClassSystemFunc(object, systemKind, systemIndex, result);
 			watch.Stop();
 			*reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + ((-systemIndex) * 4) + 0x4C) += watch.Get();
 			*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + ((-systemIndex) * 4) + 0x44C) += 1;
@@ -2404,7 +2404,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 		CStopWatch watch("no name");
 		watch.Reset();
 		watch.Start();
-		ret = onClassSystemFunc(object, systemKind, systemIndex, result);
+		ret = onSystemFunc(object, systemKind, systemIndex, result);
 		watch.Stop();
 		*reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + ((-systemIndex) * 4) + 0x24C) += watch.Get();
 		*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + ((-systemIndex) * 4) + 0x64C) += 1;

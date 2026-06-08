@@ -425,7 +425,7 @@ public:
     }
     CTexture* GetFurTexture(int index)
     {
-        return m_textureData.m_textures[index + 2];
+        return m_textureData.m_textures[index];
     }
     void SetTag(int);
     void AddTextureIdx(int, int);

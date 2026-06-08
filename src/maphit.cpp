@@ -1038,7 +1038,7 @@ int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder&
         return 0;
     }
 
-    f32 disc = radiusSq - (px * px + py * py);
+    f32 disc = radiusSq - px * px - py * py;
     if (disc < 0.0f) {
         return 0;
     }

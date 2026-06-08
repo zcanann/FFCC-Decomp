@@ -3155,8 +3155,10 @@ void CGMonObj::moveFrame()
 
 		float dstRot = Math.DstRot(rotY, oldRotY);
 		float hitNrmX = object->m_hitNormal.x;
-		rotY = rotY - (dstRot * (1.0f - hitNrmX));
-		object->m_rotBaseY += dstRot * hitNrmX;
+		float baseDelta = dstRot * hitNrmX;
+		float rotDelta = dstRot * (1.0f - hitNrmX);
+		object->m_rotBaseY = object->m_rotBaseY + baseDelta;
+		rotY = rotY - rotDelta;
 		object->m_rotTargetY = object->m_rotBaseY;
 
 		float s = sinf(dstRot);

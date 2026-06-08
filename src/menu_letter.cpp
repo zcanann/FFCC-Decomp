@@ -2272,7 +2272,7 @@ int CMenuPcs::LetterCtrlCur()
 			} else {
 				*reinterpret_cast<u8*>(GetLetterStateBase(this) + 8) = 1;
 			}
-			*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) + 1;
+			*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<u16*>(GetLetterStateBase(this) + 0x12) + 1;
 			m_menuWindowInfo->state = 2;
 			Sound.PlaySe(2, 0x40, 0x7F, 0);
 			return 0;

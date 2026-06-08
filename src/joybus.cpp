@@ -4843,14 +4843,9 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
             unsigned short statHalf = __lhbrx(&playerData[threadParam->m_portIndex * 0xDC + 0x14], 0);
             memcpy(&payload[0x91], &statHalf, 2);
 
-            unsigned char compatBuf[64];
-            memset(compatBuf, 0, sizeof(compatBuf));
-
-            int compatLen = GbaQue.GetCompatibility(threadParam->m_portIndex, compatBuf);
-
             unsigned char* body = &payload[0x93];
 
-            memcpy(body, compatBuf, compatLen);
+            int compatLen = GbaQue.GetCompatibility(threadParam->m_portIndex, body);
 
             memcpy(body + compatLen, &playerData[threadParam->m_portIndex * 0xDC + 0x18], 8);
 

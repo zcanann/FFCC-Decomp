@@ -3677,27 +3677,38 @@ int CPartMng::pppLoadPmd(const char* baseName)
                 case kChunkNAME: {
                     char* name = chunkFile.GetString();
 
-                    targetModel = 0;
-                    for (unsigned int i = 0; i < 0x100; i++) {
-                        if (modelArray[i].m_isUsed != 0 && strcmp(modelArray[i].m_name, name) == 0) {
-                            targetModel = &modelArray[i];
+                    pppModelSt* searchModel = modelArray;
+                    unsigned int i = 0;
+                    do {
+                        if (searchModel->m_isUsed != 0 && strcmp(searchModel->m_name, name) == 0) {
                             break;
                         }
+                        i++;
+                        searchModel++;
+                    } while (i < 0x100);
+                    if (i >= 0x100) {
+                        searchModel = 0;
                     }
 
-                    if (targetModel == 0) {
-                        for (int i = 0; i < 0x100; i++) {
-                            if (modelArray[i].m_isUsed == 0) {
-                                targetModel = &modelArray[i];
-                                break;
+                    if (searchModel == 0) {
+                        int freeIndex = 0;
+                        int remaining = 0x100;
+                        pppModelSt* freeModel = modelArray;
+                        do {
+                            if (freeModel->m_isUsed == 0) {
+                                targetModel = modelArray + freeIndex;
+                                goto foundFreeModel;
                             }
-                        }
+                            freeModel++;
+                            freeIndex++;
+                            remaining--;
+                        } while (remaining != 0);
+                        targetModel = 0;
+                    foundFreeModel:
 
-                        if (targetModel != 0) {
-                            targetModel->m_refCount = 0;
-                            targetModel->m_isUsed = 1;
-                            strcpy(targetModel->m_name, name);
-                        }
+                        targetModel->m_refCount = 0;
+                        targetModel->m_isUsed = 1;
+                        strcpy(targetModel->m_name, name);
                     } else {
                         targetModel = 0;
                     }

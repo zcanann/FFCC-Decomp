@@ -109,8 +109,7 @@ namespace {
 
 static inline const char* GetStrikeListName(int itemId)
 {
-	switch (itemId) {
-	case 0x207:
+	if (itemId == 0x207) {
 		switch (Game.m_gameWork.m_languageId) {
 		case 2:
 			return s_SkillStr_ge[0];
@@ -125,7 +124,7 @@ static inline const char* GetStrikeListName(int itemId)
 		default:
 			return s_SkillStr_us[0];
 		}
-	case 0x20B:
+	} else if (itemId == 0x20B) {
 		switch (Game.m_gameWork.m_languageId) {
 		case 2:
 			return s_SkillStr_ge[1];
@@ -140,7 +139,7 @@ static inline const char* GetStrikeListName(int itemId)
 		default:
 			return s_SkillStr_us[1];
 		}
-	case 0x20F:
+	} else if (itemId == 0x20F) {
 		switch (Game.m_gameWork.m_languageId) {
 		case 2:
 			return s_SkillStr_ge[2];
@@ -155,7 +154,7 @@ static inline const char* GetStrikeListName(int itemId)
 		default:
 			return s_SkillStr_us[2];
 		}
-	case 0x222:
+	} else if (itemId == 0x222) {
 		switch (Game.m_gameWork.m_languageId) {
 		case 2:
 			return s_SkillStr_ge[3];
@@ -170,7 +169,7 @@ static inline const char* GetStrikeListName(int itemId)
 		default:
 			return s_SkillStr_us[3];
 		}
-	case 0x227:
+	} else if (itemId == 0x227) {
 		switch (Game.m_gameWork.m_languageId) {
 		case 2:
 			return s_SkillStr_ge[4];
@@ -185,10 +184,9 @@ static inline const char* GetStrikeListName(int itemId)
 		default:
 			return s_SkillStr_us[4];
 		}
-	default: {
+	} else {
 		char** flatText = Game.m_cFlatDataArr[1].TableStrings(0);
 		return flatText[itemId * 5 + 4];
-	}
 	}
 }
 

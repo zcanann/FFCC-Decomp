@@ -2801,7 +2801,7 @@ void CGMonObj::setRepop(int mode)
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	void** scriptHandle = object->m_scriptHandle;
-	void* classId = scriptHandle[4];
+	int classId = reinterpret_cast<int>(scriptHandle[4]);
 
 	int option;
 	if ((mode != 0) && (option = static_cast<int>(*reinterpret_cast<short*>(&Game.m_gameWork.m_optionValue)), option < 9)) {
@@ -2860,7 +2860,7 @@ void CGMonObj::setRepop(int mode)
 	unsigned short scriptFlags = *reinterpret_cast<unsigned short*>(monsterScript + 0xFE);
 
 	if ((scriptFlags & 0x80) == 0 && (scriptFlags & 0x20) == 0) {
-		if ((scriptFlags & 0x40) != 0 || classId == reinterpret_cast<void*>(0x39)) {
+		if ((scriptFlags & 0x40) != 0 || classId == 0x39) {
 			m_chaseState = 4;
 			m_chaseTimer = 0;
 			m_chaseDirty = 1;
@@ -2890,7 +2890,7 @@ void CGMonObj::setRepop(int mode)
 		enableDamageCol(0);
 	}
 
-	if (classId == reinterpret_cast<void*>(0x55)) {
+	if (classId == 0x55) {
 		m_chaseState = 4;
 		m_chaseTimer = 0;
 		m_chaseDirty = 1;
@@ -2899,13 +2899,13 @@ void CGMonObj::setRepop(int mode)
 	unsigned short countA = *reinterpret_cast<unsigned short*>(monsterScript + 0x1A8);
 	for (int i = 0; i < static_cast<int>(countA); i++) {
 		int particleBase = 0;
-		if (reinterpret_cast<int>(classId) < 0xA7) {
-			if (classId == reinterpret_cast<void*>(0x9C)) {
+		if (classId < 0xA7) {
+			if (classId == 0x9C) {
 				particleBase = 1;
 			}
-		} else if (classId == reinterpret_cast<void*>(0xA9)) {
+		} else if (classId == 0xA9) {
 			particleBase = 0;
-		} else if (reinterpret_cast<int>(classId) < 0xA9) {
+		} else if (classId < 0xA9) {
 			particleBase = 2;
 		}
 
@@ -2927,7 +2927,7 @@ void CGMonObj::setRepop(int mode)
 
 	*reinterpret_cast<float*>(mon + 0x694) = 1.0f;
 	scriptHandle = object->m_scriptHandle;
-	classId = scriptHandle[4];
+	classId = reinterpret_cast<int>(scriptHandle[4]);
 	int weaponMode = static_cast<int>((static_cast<unsigned int>(object->m_weaponNodeFlags) << 24) >> 31);
 	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(scriptHandle[9]) + 0xFC) != 0xB) {
 		weaponMode = 1;
@@ -2950,9 +2950,9 @@ void CGMonObj::setRepop(int mode)
 	}
 
 	if (static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags)) << 24)) < 0) {
-		if (classId == reinterpret_cast<void*>(0x83)) {
+		if (classId == 0x83) {
 			prgObj->playSe3D(0x987A, 0x32, 0x96, 0, (Vec*)0);
-		} else if (classId == reinterpret_cast<void*>(0x7F)) {
+		} else if (classId == 0x7F) {
 			prgObj->playSe3D(0x11585, 0x32, 0x96, 0, (Vec*)0);
 		}
 	}

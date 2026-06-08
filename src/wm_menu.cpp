@@ -1248,7 +1248,7 @@ void CMenuPcs::loadData()
 	m_wm.m_handles[1]->SetAnim(0, -1, -1, -1, 0);
 
 	{
-		unsigned char* const worldState = reinterpret_cast<unsigned char*>(m_wmWorldState);
+#define worldState (reinterpret_cast<unsigned char*>(m_wmWorldState))
 		*reinterpret_cast<short*>(worldState + 0x1C) = 0;
 		*reinterpret_cast<short*>(worldState + 0x36) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[0]);
 		*reinterpret_cast<short*>(worldState + 0x3E) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[0]);
@@ -1258,6 +1258,7 @@ void CMenuPcs::loadData()
 		*reinterpret_cast<short*>(worldState + 0x42) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[2]);
 		*reinterpret_cast<short*>(worldState + 0x3C) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[3]);
 		*reinterpret_cast<short*>(worldState + 0x44) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[3]);
+#undef worldState
 	}
 
 	char fontPath[128];

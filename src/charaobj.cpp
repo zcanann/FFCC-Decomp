@@ -888,8 +888,8 @@ void CGCharaObj::onFrameStat()
 			break;
 
 		case 2:
-			if (m_subState < 1) {
-				if (m_subState >= 0) {
+			switch (m_subState) {
+				case 0:
 					if (m_subFrame == 0) {
 						reqAnim(m_attackAnimId, 0, 0);
 					}
@@ -902,30 +902,32 @@ void CGCharaObj::onFrameStat()
 						}
 						return;
 					}
-				}
-			} else if (m_subState == 1) {
-				if (m_subFrame == 0) {
-					reqAnim(m_unk554, 1, 0);
-				}
-			} else if (m_subState < 3) {
-				if (m_subFrame == 0) {
-					for (int i = 0; i < 0x16; i++) {
-						if ((8U & (1U << i)) != 0) {
-							CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
-						}
+					break;
+				case 1:
+					if (m_subFrame == 0) {
+						reqAnim(m_unk554, 1, 0);
 					}
-					reqAnim(m_unk558, 0, 0);
-				}
+					break;
+				case 2:
+					if (m_subFrame == 0) {
+						for (int i = 0; i < 0x16; i++) {
+							if ((8U & (1U << i)) != 0) {
+								CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
+							}
+						}
+						reqAnim(m_unk558, 0, 0);
+					}
 
-				if (m_itemId != 0 && m_subFrame == 10) {
-					for (int i = 0; i < 0x16; i++) {
-						if ((2U & (1U << i)) != 0) {
-							CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
+					if (m_itemId != 0 && m_subFrame == 10) {
+						for (int i = 0; i < 0x16; i++) {
+							if ((2U & (1U << i)) != 0) {
+								CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
+							}
 						}
+						putParticleFromItem(m_itemId, 2, m_particleSlots[1], &CharaObjComboCenter(this));
+						putParticleFromItem(m_itemId, 3, m_particleSlots[1], &CharaObjComboCenter(this));
 					}
-					putParticleFromItem(m_itemId, 2, m_particleSlots[1], &CharaObjComboCenter(this));
-					putParticleFromItem(m_itemId, 3, m_particleSlots[1], &CharaObjComboCenter(this));
-				}
+					break;
 			}
 
 			onStatMagic();

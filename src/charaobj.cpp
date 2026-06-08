@@ -662,7 +662,7 @@ void CGCharaObj::onFramePostCalc()
 				} else {
 					int activePad = Pad.m_debugPadPort;
 					int idx = slot & ~(static_cast<int>(~((activePad - slot) | (slot - activePad))) >> 31);
-					heldMask = Pad.GetPadInputs()[idx].repeatButton;
+					heldMask = Pad.GetPadInputs()[idx].stickBitsDown;
 				}
 				padMask |= heldMask;
 			}

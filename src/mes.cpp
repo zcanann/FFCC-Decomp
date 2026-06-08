@@ -150,17 +150,18 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
 		else if (ch == 0xFF)
 		{
 			int tag = ((int)*src++ - 0xA0) & 0xFFFF;
-			if (tag != 1)
+			switch (tag)
 			{
-				if ((tag == 0) && (breakOnLineTag != 0))
+			case 0:
+				if (breakOnLineTag != 0)
 				{
 					font->SetPosX((float)(int)lineStartX);
 					font->SetPosY((float)lineBaseY + (font->posY + (float)font->m_glyphHeight * font->scaleY));
 				}
-			}
-			else
-			{
+				break;
+			case 1:
 				continueDraw = false;
+				break;
 			}
 		}
 		else

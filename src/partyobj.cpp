@@ -154,7 +154,8 @@ static unsigned short getPadHeldForSlot(int slot)
 		return 0;
 	}
 
-	int idx = slot & ~((~(Pad.m_debugPadPort - slot | slot - Pad.m_debugPadPort) >> 31));
+	int selectedPort = Pad.m_debugPadPort;
+	unsigned int idx = slot & ~((int)~(selectedPort - slot | slot - selectedPort) >> 31);
 	return Pad.GetPadInputs()[idx].button[0];
 }
 
@@ -1638,9 +1639,13 @@ void CGPartyObj::shouki()
 	    static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 27) & 0xC0000000) >> 31) == 0) {
 		int healCount = 0;
 		if (PartyData(this).carryObject == reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)) {
-			healCount = isFrameInterval(frame, *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 4));
+			if (isFrameInterval(frame, *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 4))) {
+				healCount = 1;
+			}
 		} else {
-			healCount = isFrameInterval(frame, *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 6));
+			if (isFrameInterval(frame, *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 6))) {
+				healCount = 1;
+			}
 		}
 		const unsigned char periodicHeal = script[0xBDC];
 		if (periodicHeal != 0 && isFrameInterval(frame, periodicHeal)) {
@@ -2477,12 +2482,9 @@ void CGPartyObj::onStatAttack(int chargeType)
 void CGPartyObj::onStatShield()
 {
 	if (m_subState == 1) {
-		bool suppressInput = false;
 		unsigned short trig;
 		int padSlot = static_cast<signed char>(m_animStateMisc);
-		if ((Pad.m_debugPadLock != 0) || ((padSlot == 0) && (Pad.m_debugPadPort != -1))) {
-			suppressInput = true;
-		}
+		bool suppressInput = (Pad.m_debugPadLock != 0) || ((padSlot == 0) && (Pad.m_debugPadPort != -1));
 		if (suppressInput) {
 			trig = 0;
 		} else {
@@ -3386,7 +3388,6 @@ void CGPartyObj::statPut()
 	}
 
 	if (isLoopAnim() != 0) {
-		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
 		PartyObjOverlay& party = PartyData(this);
 		if (party.carryObject != 0) {
 			if (static_cast<int>(CFlatCenterState()) == 0) {
@@ -3401,7 +3402,7 @@ void CGPartyObj::statPut()
 				SetAnimSlot(0x0B, 0);
 				SetAnimSlot(0x0C, 1);
 			}
-		} else if (*reinterpret_cast<unsigned short*>(script + 0x1C) != 0) {
+		} else if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
 			if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
 				SetAnimSlot(0, 0);
 				SetAnimSlot(1, 1);

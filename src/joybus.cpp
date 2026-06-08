@@ -6886,25 +6886,26 @@ int JoyBus::SendMemorys(ThreadParam* threadParam)
     cmdBytes[0] = 0x14;
     cmdBytes[1] = 0x13;
     cmdBytes[2] = value;
+    unsigned int word = cmd;
 
     if (static_cast<signed char>(m_threadRunningMask) == 0)
 	{
         return 0;
 	}
 
-    unsigned int result = 0;
-
     OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+
+    int result = 0;
 
     unsigned int queuePort = threadParam->m_portIndex;
     if ((int)m_cmdCount[queuePort] >= 0x40)
     {
         OSSignalSemaphore(&m_accessSemaphores[queuePort]);
-        result = 0xFFFFFFFF;
+        result = -1;
     }
     else
     {
-        m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
+        m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = word;
         m_cmdCount[threadParam->m_portIndex]++;
         OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
     }

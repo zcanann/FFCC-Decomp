@@ -1240,16 +1240,20 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
-		case -0x46:
-			engineObject->LookAt(object->m_localBase[0] != 0 ? FindRuntimeObject(this, object->m_localBase[0]) : 0, 0);
+		case -0x46: {
+			CGObject* target = static_cast<int>(object->m_localBase[0]) != 0 ? FindRuntimeObject(this, object->m_localBase[0]) : 0;
+			engineObject->LookAt(target, 0);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
-		case -0x8C:
-			engineObject->LookAt(object->m_localBase[0] != 0 ? FindRuntimeObject(this, object->m_localBase[0]) : 0, RuntimeString(this, object->m_localBase[1]));
+		}
+		case -0x8C: {
+			CGObject* target = static_cast<int>(object->m_localBase[0]) != 0 ? FindRuntimeObject(this, object->m_localBase[0]) : 0;
+			engineObject->LookAt(target, RuntimeString(this, object->m_localBase[1]));
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
+		}
 		case -0x48:
 			engineObject->m_stepSlopeLimit = reinterpret_cast<float*>(object->m_localBase)[1];
 			if (object->m_localBase[0] != 0) {

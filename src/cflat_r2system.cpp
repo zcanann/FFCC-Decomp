@@ -1776,7 +1776,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             buttons = 0;
         }
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
-            buttons &= 0xF3FF;
+            buttons &= ~0xC00;
         }
         this->push(object, static_cast<short>(buttons));
         outResult = 0;
@@ -1911,7 +1911,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             buttons = 0;
         }
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
-            buttons &= 0xF3FF;
+            buttons &= ~0xC00;
         }
         this->push(object, static_cast<short>(buttons));
         outResult = 0;
@@ -1925,7 +1925,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             buttons = 0;
         }
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
-            buttons &= 0xF3FF;
+            buttons &= ~0xC00;
         }
         this->push(object, static_cast<short>(buttons));
         outResult = 0;
@@ -3158,7 +3158,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     case -0x74: {
         unsigned short buttonDown = Pad.GetGbaButtonDown(*object->m_localBase);
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
-            buttonDown &= 0xF3FF;
+            buttonDown &= ~0xC00;
         }
         this->push(object, static_cast<int>(static_cast<short>(buttonDown)));
         outResult = 0;

@@ -223,7 +223,7 @@ void CMenuPcs::ArtiDraw()
 	const CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	short artiState = m_artiState->state;
 	ArtiOpenAnim* entry = GetArtiOpenAnimList(this)->entries;
-	int drawIndex = 0;
+	unsigned int drawIndex = 0;
 	float helpWidth;
 
 	for (int i = 0; i < GetArtiOpenAnimList(this)->count; i++) {
@@ -324,7 +324,7 @@ void CMenuPcs::ArtiDraw()
 
 	ArtiOpenAnim* textEntry = listStart;
 	for (int i = 0; i < 8; i++) {
-		s8 alpha = (u8)(kArtiColorMax * textEntry->alpha);
+		u8 alpha = (u8)(kArtiColorMax * textEntry->alpha);
 		CColor color(0xFF, 0xFF, 0xFF, alpha);
 		listFont->SetColor(color.color);
 

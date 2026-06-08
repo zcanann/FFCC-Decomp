@@ -1841,7 +1841,7 @@ void CMiniGamePcs::MngThreadMain(void*)
         {
             self[0x649D] = 0;
 
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i <= 3; i++)
             {
                 MiniGameThreadSleepTicks(OSMillisecondsToTicks(100));
 

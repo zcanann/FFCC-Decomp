@@ -10844,7 +10844,7 @@ void CMenuPcs::DrawMCList()
 	unsigned char* const lbl_801DC294 = reinterpret_cast<unsigned char*>(lbl_801DB7F8 + 0xA9C);
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	CFont* fontF8 = m_fonts[0];
-	WmWorldState* const worldState = m_wmWorldState;
+#define worldState GetWmWorldState(this)
 	const double kSlope = DOUBLE_80331498;
 	const double kBase = DOUBLE_80331490;
 	short state = worldState->m_mainState;
@@ -11337,6 +11337,7 @@ LAB_draw:
 		}
 	}
 	DrawInit();
+#undef worldState
 }
 
 /*

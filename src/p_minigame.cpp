@@ -780,31 +780,20 @@ receive_message:
     contextRecvOffset = 0;
     step = 0;
     param[0xC2] = 0;
-    if (message == 5)
+    switch (message)
     {
+    case 5:
         timeoutTicks = OSMillisecondsToTicks(1000);
-    }
-    else if (message < 5)
-    {
-        if (message == 3)
-        {
-            timeoutTicks = OSMillisecondsToTicks(500);
-        }
-        else
-        {
-            timeoutTicks = OSMillisecondsToTicks(1000);
-        }
-    }
-    else
-    {
-        if (message != 10)
-        {
-            timeoutTicks = OSMillisecondsToTicks(1000);
-        }
-        else
-        {
-            timeoutTicks = OSMillisecondsToTicks(500);
-        }
+        break;
+    case 3:
+        timeoutTicks = OSMillisecondsToTicks(500);
+        break;
+    case 10:
+        timeoutTicks = OSMillisecondsToTicks(500);
+        break;
+    default:
+        timeoutTicks = OSMillisecondsToTicks(1000);
+        break;
     }
     startTime = OSGetTime();
     retryLine = 0x22C;

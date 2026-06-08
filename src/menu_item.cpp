@@ -115,7 +115,7 @@ int CMenuPcs::ItemCtrlCur()
 {
     bool blocked = false;
     unsigned int press;
-    unsigned int hold;
+    int hold;
     CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 
     if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
@@ -209,7 +209,7 @@ int CMenuPcs::ItemCtrlCur()
                     return 1;
                 } else {
                     this->m_itemMenuState->optionFlags = 0xC;
-                    int itemType = GetItemType(idx, 0);
+                    unsigned int itemType = GetItemType(idx, 0);
 
                     if ((itemType == 7) && (caravanWork->CanPlayerUseItem() != 0)) {
                         this->m_itemMenuState->optionFlags = this->m_itemMenuState->optionFlags | 1;

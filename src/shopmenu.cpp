@@ -2774,7 +2774,7 @@ void CShopMenu::SelectFigure()
                     int itemId = getItemNo(m_selectedIndex);
                     int unitGil;
                     if (m_listType == 0) {
-                        if (itemId < 1) {
+                        if (itemId <= 0) {
                             unitGil = 0;
                         } else {
                             int gil = caravanWork->m_shopParam *
@@ -2783,7 +2783,7 @@ void CShopMenu::SelectFigure()
                             unitGil = gil - (gil >> 0x1F);
                         }
                     } else if (m_listType == 1) {
-                        if (itemId < 1) {
+                        if (itemId <= 0) {
                             unitGil = 0;
                         } else {
                             int gil = caravanWork->m_shopParam *

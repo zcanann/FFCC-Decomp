@@ -173,11 +173,11 @@ void CMenuPcs::CompaDraw()
 	color.r = 0xFF;
 	color.g = 0xFF;
 	color.b = 0xFF;
-	color.a = static_cast<unsigned char>(globalAlpha * kCompaColorMax);
+	color.a = static_cast<signed char>(globalAlpha * kCompaColorMax);
 	GXSetChanMatColor(GX_COLOR0A0, color);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3A));
 
-	unsigned int familyCount = 2;
+	int familyCount = 2;
 	for (int i = 2; i < 7; i++) {
 		if (caravanWork->m_evtWordArr[19 + i] > 0) {
 			familyCount++;
@@ -191,7 +191,7 @@ void CMenuPcs::CompaDraw()
 		familyCount = 4;
 	}
 
-	for (int i = 0; i < familyCount; i++) {
+	for (unsigned int i = 0; i < familyCount; i++) {
 		MenuPcs.DrawRect(
 			0,
 			static_cast<float>(compaList->entries[0].x + 0x10),
@@ -273,7 +273,7 @@ void CMenuPcs::CompaDraw()
 		font->SetPosY(y);
 		font->Draw(name);
 
-		unsigned short food = caravanWork->m_evtWordArr[19 + drawIndex];
+		short food = caravanWork->m_evtWordArr[19 + drawIndex];
 		const char* value = Game.m_cFlatDataArr[1].TableStrings(2)[food];
 		font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x90));
 		font->SetPosY(y);

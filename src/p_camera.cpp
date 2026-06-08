@@ -1285,9 +1285,9 @@ void CCameraPcs::calcMap()
     DirectionVec().z = kCameraOneF;
     PSMTXMultVecSR(rotMtx, &DirectionVec(), &DirectionVec());
 
-    moveDelta.x = kCameraZeroF;
-    moveDelta.y = kCameraZeroF;
     moveDelta.z = kCameraZeroF;
+    moveDelta.y = kCameraZeroF;
+    moveDelta.x = kCameraZeroF;
 
     if ((buttons & 0x100) != 0) {
         PSVECScale(&moveDelta, &DirectionVec(), kCameraDebugMoveStep);
@@ -1306,23 +1306,23 @@ void CCameraPcs::calcMap()
     }
 
     if ((buttons & 0x1) != 0) {
-        sideVec.x = kCameraDebugMoveStep;
         sideVec.y = kCameraZeroF;
         sideVec.z = kCameraZeroF;
+        sideVec.x = kCameraDebugMoveStep;
         PSMTXMultVecSR(rotMtx, &sideVec, &sideVec);
         sideVec.y = kCameraZeroF;
         PSVECAdd(&moveDelta, &moveDelta, &sideVec);
     } else if ((buttons & 0x2) != 0) {
-        sideVec.x = kCameraNegativeDebugMoveStep;
         sideVec.y = kCameraZeroF;
         sideVec.z = kCameraZeroF;
+        sideVec.x = kCameraNegativeDebugMoveStep;
         PSMTXMultVecSR(rotMtx, &sideVec, &sideVec);
         sideVec.y = kCameraZeroF;
         PSVECAdd(&moveDelta, &moveDelta, &sideVec);
     }
 
     if ((moveDelta.x != kCameraZeroF) || (moveDelta.y != kCameraZeroF) || (moveDelta.z != kCameraZeroF)) {
-        for (i = 0; i < 4; i++) {
+        for (i = 4; i != 0; i--) {
             hitCylinder.m_min.x = kCameraBoundsMinInitial;
             hitCylinder.m_min.y = kCameraBoundsMinInitial;
             hitCylinder.m_min.z = kCameraBoundsMinInitial;
@@ -1331,13 +1331,14 @@ void CCameraPcs::calcMap()
             hitCylinder.m_max.z = kCameraBoundsMaxInitial;
             hitCylinder.m_radius = kCameraDefaultNearZ;
             hitCylinder.m_bottom = PositionVec();
-            if (MapMng.CheckHitCylinder(reinterpret_cast<CMapCylinder*>(&hitCylinder), &moveDelta, 0xFFFFFFFF) == 0) {
+            if (MapMng.CheckHitCylinder(reinterpret_cast<CMapCylinder*>(&hitCylinder), &moveDelta, 0xFFFFFFFF) != 0) {
+                MapMng.m_hitMapObj->CalcHitSlide(&moveDelta, kCameraTwoF);
+            } else {
                 PositionVec().x += moveDelta.x;
                 PositionVec().y += moveDelta.y;
                 PositionVec().z += moveDelta.z;
                 break;
             }
-            MapMng.m_hitMapObj->CalcHitSlide(&moveDelta, kCameraTwoF);
         }
     }
 
@@ -1441,8 +1442,6 @@ void CCameraPcs::createFullShadow()
  */
 void CCameraPcs::destroyFullShadow()
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
-
     if (m_fullScreenShadow.m_shadowTexture != 0) {
         delete static_cast<u8*>(m_fullScreenShadow.m_shadowTexture);
         m_fullScreenShadow.m_shadowTexture = 0;

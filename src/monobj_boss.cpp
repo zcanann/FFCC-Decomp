@@ -270,7 +270,8 @@ void CGMonObj::frameStatFuncGiantCrab()
 	u8* self = (u8*)this;
 	int state = *(int*)(self + 0x520);
 
-	if (state == 100) {
+	switch (state) {
+	case 100: {
 		if (*(int*)(self + 0x528) == 0) {
 			int soundStep = *(int*)(CGMonObj::m_boss + 0x4);
 			switch (soundStep) {
@@ -333,7 +334,12 @@ void CGMonObj::frameStatFuncGiantCrab()
 			reinterpret_cast<CGPrgObj*>(self)->changeStat(0, 0, 0);
 			*(u32*)(self + 0x1c0) |= 0x80002;
 		}
-	} else if (state >= 100 && state < 0x69) {
+		break;
+	}
+	case 0x65:
+	case 0x66:
+	case 0x67:
+	case 0x68: {
 		if (*(int*)(self + 0x528) == 0) {
 			float turnOffset;
 			int animId;
@@ -390,6 +396,8 @@ void CGMonObj::frameStatFuncGiantCrab()
 		if (*(int*)(self + 0x528) == 0x19) {
 			reinterpret_cast<CGPrgObj*>(self)->changeStat(0, 0, 0);
 		}
+		break;
+	}
 	}
 }
 
@@ -1484,8 +1492,8 @@ void CGMonObj::frameStatFuncTetsukyojin()
 			memset(&m_moveWork, 0, sizeof(m_moveWork));
 			m_moveWork.m_flags = 0x2410;
 
-			CVector storedVec(*reinterpret_cast<Vec*>(CGMonObj::m_boss + 0x4));
-			CVector attackDir(-storedVec.x, -storedVec.y, -storedVec.z);
+			const CVector& storedVec = CVector(*reinterpret_cast<Vec*>(CGMonObj::m_boss + 0x4));
+			const CVector& attackDir = CVector(-storedVec.x, -storedVec.y, -storedVec.z);
 			m_moveWork.m_targetPos.x = attackDir.x;
 			m_moveWork.m_targetPos.y = attackDir.y;
 			m_moveWork.m_targetPos.z = attackDir.z;
@@ -1645,7 +1653,8 @@ void CGMonObj::frameStatFuncWifeLamia()
 				memset(&m_moveWork, 0, sizeof(m_moveWork));
 				m_moveWork.m_flags = 0x10022;
 
-				CVector attackOffset(kMeteoParasiteAttackOffsetX, kMeteoParasiteAttackOffsetY, kMeteoParasiteAttackOffsetZ);
+				const CVector& attackOffset =
+				    CVector(kMeteoParasiteAttackOffsetX, kMeteoParasiteAttackOffsetY, kMeteoParasiteAttackOffsetZ);
 				m_moveWork.m_targetPos.x = attackOffset.x;
 				m_moveWork.m_targetPos.y = attackOffset.y;
 				m_moveWork.m_targetPos.z = attackOffset.z;
@@ -1948,10 +1957,11 @@ void CGMonObj::logicFuncMeteoParasiteC()
 	} else {
 		work->m_wait = (work->m_wait - 1) & ~((work->m_wait - 1) >> 31);
 		if (m_actionBranch == 0) {
-			if (work->m_wait != 0) {
+			if (work->m_wait == 0) {
+				nextState = 0x65;
+			} else {
 				return;
 			}
-			nextState = 0x65;
 		}
 	}
 	if (nextState != -1) {
@@ -2287,8 +2297,8 @@ void CGMonObj::damagedFuncDuct()
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	void* scriptKind = object->m_scriptHandle[4];
-	int slot = reinterpret_cast<int>(scriptKind) - 0x8E;
 	int pdtNo = object->m_charaModelHandle->GetPdtSlot();
+	int slot = reinterpret_cast<int>(scriptKind) - 0x8E;
 	reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 2, 0, object, kMonObjBossOne, 0);
 
 	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x1C) == 0) {

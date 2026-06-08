@@ -3397,7 +3397,7 @@ void CGCharaObj::combi2()
 		}
 	}
 
-	const unsigned short comboCmd = comboData[0xC];
+	const short comboCmd = comboData[0xC];
 	const bool isSharedResult = comboData[participantCount * 3 - 3] != 0x1F8;
 	if (isSharedResult) {
 		comboCenter.Identity();

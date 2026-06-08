@@ -1643,21 +1643,21 @@ void CChara::makeFurTex()
 	static CColor furTipColor(0xF0, 0xF0, 0xF0, 0);
 	static CColor furNoiseBase(0, 0, 0, 0);
 	static CColor furNoiseRange(8, 8, 8, 0);
-	static CVector velBase(kCharaFurDepthZero, FLOAT_80331160, kCharaFurDepthZero);
-	static CVector velRand(kCharaFurDepthZero, kYmEnvQuarter, kCharaFurDepthZero);
-	static CVector accelBase(kCharaFurDepthZero, kCharaFurDepthZero, kCharaFurDepthZero);
-	static CVector accelRand(kCharaFurDepthZero, kCharaFurDepthZero, kCharaFurDepthZero);
+	static Vec velBase = CVector(kCharaFurDepthZero, FLOAT_80331160, kCharaFurDepthZero);
+	static Vec velRand = CVector(kCharaFurDepthZero, kYmEnvQuarter, kCharaFurDepthZero);
+	static Vec accelBase = CVector(kCharaFurDepthZero, kCharaFurDepthZero, kCharaFurDepthZero);
+	static Vec accelRand = CVector(kCharaFurDepthZero, kCharaFurDepthZero, kCharaFurDepthZero);
 
 	s_mogFurRand = 0;
 	s_mogFurMaxY = 0.0f;
 
 	for (unsigned int i = 0; i < 0x20; i++) {
 		CVector scaled;
-		PSVECScale(velRand, scaled, FurRandScale());
-		PSVECAdd(velBase, scaled, hairSet[i].m_vec0);
+		PSVECScale(&velRand, scaled, FurRandScale());
+		PSVECAdd(&velBase, scaled, hairSet[i].m_vec0);
 
-		PSVECScale(accelRand, scaled, FurRandScale());
-		PSVECAdd(accelBase, scaled, hairSet[i].m_vec1);
+		PSVECScale(&accelRand, scaled, FurRandScale());
+		PSVECAdd(&accelBase, scaled, hairSet[i].m_vec1);
 
 		hairSet[i].m_colors[0] = FurNoiseColor(furBaseColor, furNoiseBase, FurRandScale());
 		hairSet[i].m_colors[1] = FurNoiseColor(furTipColor, furNoiseRange, FurRandScale());
@@ -1680,8 +1680,8 @@ void CChara::makeFurTex()
 	GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 	GXSetCullMode(GX_CULL_NONE);
 	GXSetNumTevStages(1);
-	GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
-	GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+	_GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+	_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
 	GXSetNumChans(1);
 	GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
 	GXClearVtxDesc();
@@ -1694,16 +1694,16 @@ void CChara::makeFurTex()
 
 	Mtx posMtx;
 	posMtx[0][0] = kCharaFurDepthScaleBase;
-	posMtx[0][1] = kCharaFurDepthZero;
-	posMtx[0][2] = kCharaFurDepthZero;
-	posMtx[0][3] = kCharaFurDepthZero;
 	posMtx[1][0] = kCharaFurDepthZero;
-	posMtx[1][1] = kCharaFurDepthZero;
-	posMtx[1][2] = FLOAT_8033116C * (kCharaFurViewDepthThreshold / s_mogFurMaxY);
-	posMtx[1][3] = kCharaFurDepthZero;
 	posMtx[2][0] = kCharaFurDepthZero;
+	posMtx[0][1] = kCharaFurDepthZero;
+	posMtx[1][1] = kCharaFurDepthZero;
 	posMtx[2][1] = kCharaFurDepthScaleBase;
+	posMtx[0][2] = kCharaFurDepthZero;
+	posMtx[1][2] = FLOAT_8033116C * (kCharaFurViewDepthThreshold / s_mogFurMaxY);
 	posMtx[2][2] = kCharaFurDepthZero;
+	posMtx[0][3] = kCharaFurDepthZero;
+	posMtx[1][3] = kCharaFurDepthZero;
 	posMtx[2][3] = kCharaFurDepthZero;
 
 	Mtx44 projection;
@@ -1742,7 +1742,7 @@ void CChara::makeFurTex()
 			CVector root(rootX, kCharaFurDepthZero, rootZ);
 
 			s_mogFurRand = s_mogFurRand * 0x41C64E6D + 0x3039;
-			CHairSet& src = hairSet[(s_mogFurRand >> 11) & 0x1F];
+			CHairSet& src = hairSet[(s_mogFurRand >> 16) & 0x1F];
 
 			float t = kCharaFurDepthZero;
 			for (int v = 0; v < 5; v++) {

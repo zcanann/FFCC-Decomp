@@ -110,11 +110,11 @@ static inline void StoreU16Value(CFlatRuntime::CStack* stack, unsigned short& va
 	stack[-1].m_word = value;
 
 	switch (setMode) {
-	case 0:
-		value = stack->m_word;
-		break;
 	case -1:
 		value = value - stack->m_word;
+		break;
+	case 0:
+		value = stack->m_word;
 		break;
 	case 1:
 		value = value + stack->m_word;
@@ -133,11 +133,11 @@ static inline void StoreS16(CFlatRuntime::CStack* stack, u8* base, int offset, i
 	stack[-1].m_word = *value;
 
 	switch (setMode) {
-	case 0:
-		*value = stack->m_word;
-		break;
 	case -1:
 		*value = *value - stack->m_word;
+		break;
+	case 0:
+		*value = stack->m_word;
 		break;
 	case 1:
 		*value = *value + stack->m_word;
@@ -150,11 +150,11 @@ static inline void StoreU32Value(CFlatRuntime::CStack* stack, unsigned int& valu
 	stack[-1].m_word = value;
 
 	switch (setMode) {
-	case 0:
-		value = stack->m_word;
-		break;
 	case -1:
 		value -= stack->m_word;
+		break;
+	case 0:
+		value = stack->m_word;
 		break;
 	case 1:
 		value += stack->m_word;
@@ -173,11 +173,11 @@ static inline void StoreF32(CFlatRuntime::CStack* stack, u8* base, int offset, i
 	*reinterpret_cast<float*>(&stack[-1].m_word) = *value;
 
 	switch (setMode) {
-	case 0:
-		*value = *reinterpret_cast<float*>(&stack->m_word);
-		break;
 	case -1:
 		*value -= *reinterpret_cast<float*>(&stack->m_word);
+		break;
+	case 0:
+		*value = *reinterpret_cast<float*>(&stack->m_word);
 		break;
 	case 1:
 		*value += *reinterpret_cast<float*>(&stack->m_word);
@@ -364,17 +364,17 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 						}
 					} else if (systemVal == -0xDB8) {
 						StoreU16Value(stack, reinterpret_cast<CGMonObj*>(engineObject)->m_groupTag, setMode);
+					} else if (systemVal > -0xDBA) {
+						StoreU16Value(stack, reinterpret_cast<CGMonObj*>(engineObject)->m_repop.delay, setMode);
 					} else if (systemVal == -0xDBA) {
 						StoreU32Value(stack, reinterpret_cast<CGMonObj*>(engineObject)->m_controlMask, setMode);
-					} else if (systemVal > -0xDBB) {
-						StoreU16Value(stack, reinterpret_cast<CGMonObj*>(engineObject)->m_repop.delay, setMode);
 					}
 			} else if (systemVal <= -400) {
 				if (systemVal <= -1000 && systemVal >= -0xBE7) {
 					const int bit = systemVal + 0xBE7;
-					u8* const byteRef = classData + (bit / 8) + 0x8A4;
-					const u8 mask = static_cast<u8>(1 << (bit % 8));
-					const int oldValue = (*byteRef & mask) != 0;
+					u8* const byteRef = classData + (bit / 8);
+					const int mask = 1 << (bit % 8);
+					const int oldValue = (byteRef[0x8A4] & mask) != 0;
 
 					stack[-1].m_word = oldValue;
 					int newValue = oldValue;
@@ -391,10 +391,10 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 						break;
 					}
 
-					if (newValue == 0) {
-						*byteRef &= static_cast<u8>(~mask);
+					if (newValue != 0) {
+						byteRef[0x8A4] |= mask;
 					} else {
-						*byteRef |= mask;
+						byteRef[0x8A4] &= ~mask;
 					}
 				} else if (systemVal <= -0x1F4 && systemVal >= -0x2F3) {
 					StoreS16(stack, classData, (systemVal + 0x2F3) * 2 + 0x9A4, setMode);
@@ -415,17 +415,7 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 						StoreU16(stack, classData, (systemVal + 0x199) * 2 + 0x3B8, setMode);
 					}
 				} else {
-					unsigned short* value = reinterpret_cast<unsigned short*>(classData + 0x3C8);
-					stack[-1].m_word = *value;
-					if (setMode == 0) {
-						*value = stack->m_word;
-					} else if (setMode < 0) {
-						if (setMode > -2) {
-							*value = *value - stack->m_word;
-						}
-					} else if (setMode < 2) {
-						*value = *value + stack->m_word;
-					}
+					StoreU16(stack, classData, 0x3C8, setMode);
 				}
 			} else if (systemVal <= -0x96 && systemVal >= -0x175) {
 				u8* const itemTable = *reinterpret_cast<u8**>(classData + 0x24);
@@ -464,15 +454,19 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 					StoreU32(stack, engineObject, 0x94, setMode);
 					break;
 				case -0xA: {
-					const int oldBit = static_cast<int>((static_cast<unsigned int>(*(engineObject + 0x50)) << 0x1C) >> 0x1F);
+					const int oldBit = static_cast<unsigned int>((static_cast<int>(*(engineObject + 0x50)) << 0x1C) >> 0x1F);
 					stack[-1].m_word = static_cast<unsigned int>(oldBit);
 					int bitValue = oldBit;
-					if (setMode == 0) {
+					switch (setMode) {
+					case -1:
+						bitValue -= static_cast<int>(static_cast<unsigned char>(stack->m_word));
+						break;
+					case 0:
 						bitValue = static_cast<int>(static_cast<signed char>(stack->m_word));
-					} else if (setMode == -1) {
-						bitValue -= static_cast<int>(static_cast<signed char>(stack->m_word));
-					} else if (setMode == 1) {
+						break;
+					case 1:
 						bitValue += static_cast<int>(static_cast<signed char>(stack->m_word));
+						break;
 					}
 					*(engineObject + 0x50) =
 					    static_cast<u8>((static_cast<unsigned int>(bitValue) << 3) & 8) | (*(engineObject + 0x50) & 0xF7);
@@ -481,12 +475,16 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 				case -0xB: {
 					signed char* value = reinterpret_cast<signed char*>(engineObject + 0x53);
 					stack[-1].m_word = static_cast<unsigned int>(static_cast<int>(*value));
-					if (setMode == 0) {
-						*value = static_cast<signed char>(stack->m_word);
-					} else if (setMode == -1) {
+					switch (setMode) {
+					case -1:
 						*value = static_cast<signed char>(*value - static_cast<signed char>(stack->m_word));
-					} else if (setMode == 1) {
+						break;
+					case 0:
+						*value = static_cast<signed char>(stack->m_word);
+						break;
+					case 1:
 						*value = static_cast<signed char>(*value + static_cast<signed char>(stack->m_word));
+						break;
 					}
 					break;
 				}
@@ -520,14 +518,16 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 					case -0x1A: {
 						int value = 0;
 						*reinterpret_cast<float*>(&stack[-1].m_word) = kCFlatRuntime2Zero;
-						if (setMode == 0) {
-							value = static_cast<int>(static_cast<float>(stack->m_word));
-						} else if (setMode < 0) {
-							if (setMode > -2) {
-								value = static_cast<int>(kCFlatRuntime2Zero - static_cast<float>(stack->m_word));
-							}
-						} else if (setMode < 2) {
+						switch (setMode) {
+						case -1:
+							value = static_cast<int>(kCFlatRuntime2Zero - static_cast<float>(stack->m_word));
+							break;
+						case 0:
+							value = static_cast<int>(*reinterpret_cast<float*>(&stack->m_word));
+							break;
+						case 1:
 							value = static_cast<int>(kCFlatRuntime2Zero + static_cast<float>(stack->m_word));
+							break;
 						}
 						*(engineObject + 0x56) = static_cast<u8>(static_cast<int>(kCFlatRuntime2SystemValScale * static_cast<float>(value)));
 						break;
@@ -605,69 +605,78 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 					value = static_cast<unsigned int>((byteValue & mask) != 0);
 				} else if (systemVal <= -500 && systemVal >= -0x2F3) {
 					value = LoadS16(classData, (systemVal + 0x2F3) * 2 + 0x9A4);
-				} else if (systemVal != -0x1AA) {
-					if (systemVal < -0x1AA) {
-						if (systemVal != -0x1C8) {
-							if (systemVal > -0x1C8) {
-								if (systemVal == -0x1B6) {
-									value = LoadU16(classData, 0x3DE);
-								}
-							} else if (systemVal >= -0x1C9) {
-								value = LoadU16(classData, 0xBC8);
-							}
-						} else {
-							CGObject* const carryObject = reinterpret_cast<CGPartyObj*>(engineObject)->m_partyData.carryObject;
-							if (carryObject != 0) {
-								value = static_cast<unsigned int>(*reinterpret_cast<short*>(reinterpret_cast<u8*>(carryObject) + 0x30));
-							} else {
-								value = 0;
-							}
-						}
-					} else if (systemVal == -0x19C) {
-						value = LoadU32(classData, 0x200);
-					} else if (systemVal < -0x19C) {
-						if (systemVal < -0x1A5) {
-							value = LoadS16(classData, (systemVal + 0x1A9) * 2 + 0xAC);
-						} else if (systemVal == -0x19D) {
-							value = LoadU16(classData, 0x3C8);
-						}
-					} else if (systemVal < -0x191 && systemVal >= -0x199) {
-						value = LoadU16(classData, (systemVal + 0x199) * 2 + 0x3B8);
-					}
 				} else {
-					value = LoadU16(classData, 0xB4);
+					switch (systemVal) {
+					case -0x1AA:
+						value = LoadU16(classData, 0xB4);
+						break;
+					case -0x1C8: {
+						CGObject* const carryObject = reinterpret_cast<CGPartyObj*>(engineObject)->m_partyData.carryObject;
+						if (carryObject != 0) {
+							value = static_cast<unsigned int>(*reinterpret_cast<short*>(reinterpret_cast<u8*>(carryObject) + 0x30));
+						} else {
+							value = 0;
+						}
+						break;
+					}
+					case -0x1B6:
+						value = LoadU16(classData, 0x3DE);
+						break;
+					case -0x1C9:
+						value = LoadU16(classData, 0xBC8);
+						break;
+					case -0x19C:
+						value = LoadU32(classData, 0x200);
+						break;
+					case -0x19D:
+						value = LoadU16(classData, 0x3C8);
+						break;
+					default:
+						if (systemVal <= -0x1A6 && systemVal >= -0x1A9) {
+							value = LoadS16(classData, (systemVal + 0x1A9) * 2 + 0xAC);
+						} else if (systemVal < -0x191 && systemVal >= -0x199) {
+							value = LoadU16(classData, (systemVal + 0x199) * 2 + 0x3B8);
+						}
+						break;
+					}
 				}
 			} else if (systemVal <= -0x96 && systemVal >= -0x175) {
 				u8* itemTable = *reinterpret_cast<u8**>(classData + 0x24);
 				value = LoadU16(itemTable, (systemVal + 0x175) * 2);
-			} else if (systemVal == -0x45) {
-				value = LoadU16(classData, 0x22);
-			} else if (systemVal < -0x45) {
-				if (systemVal == -0x82) {
+			} else {
+				switch (systemVal) {
+				case -0x82:
 					value = LoadU16(classData, 0x14);
-				} else if (systemVal < -0x82) {
-					if (systemVal == -0x84) {
-						value = LoadU16(classData, 0x18);
-					} else if (systemVal < -0x84) {
-						if (systemVal > -0x95) {
-							value = LoadU16(classData, (systemVal + 0x94) * 2 + 0x8C);
-						}
-					} else {
-						value = LoadU16(classData, 0x16);
-					}
-				} else if (systemVal < -0x52 && systemVal > -0x7A) {
-					value = LoadU16(classData, (-0x53 - systemVal) * 2 + 0x3E);
-				}
-			} else if (systemVal == -0x41) {
-				value = LoadU16(classData, 0x1C);
-			} else if (systemVal < -0x41) {
-				if (systemVal == -0x43) {
+					break;
+				case -0x83:
+					value = LoadU16(classData, 0x16);
+					break;
+				case -0x84:
+					value = LoadU16(classData, 0x18);
+					break;
+				case -0x40:
+					value = LoadU16(classData, 0x1A);
+					break;
+				case -0x41:
+					value = LoadU16(classData, 0x1C);
+					break;
+				case -0x43:
 					value = LoadU16(classData, 0x1E);
-				} else if (systemVal < -0x43) {
+					break;
+				case -0x44:
 					value = LoadU16(classData, 0x20);
+					break;
+				case -0x45:
+					value = LoadU16(classData, 0x22);
+					break;
+				default:
+					if (systemVal <= -0x85 && systemVal > -0x95) {
+						value = LoadU16(classData, (systemVal + 0x94) * 2 + 0x8C);
+					} else if (systemVal < -0x52 && systemVal > -0x7A) {
+						value = LoadU16(classData, (-0x53 - systemVal) * 2 + 0x3E);
+					}
+					break;
 				}
-			} else if (systemVal < -0x3F) {
-				value = LoadU16(classData, 0x1A);
 			}
 
 			LastResult(this) = value;
@@ -797,7 +806,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		case -8:
 			*(reinterpret_cast<u8*>(&engineObject->m_weaponNodeFlags) + 1) =
-			    static_cast<u8>((static_cast<signed char>(object->m_localBase[0]) << 7) & 0x80) |
+			    static_cast<u8>((static_cast<unsigned char>(object->m_localBase[0]) << 7) & 0x80) |
 			    (*(reinterpret_cast<u8*>(&engineObject->m_weaponNodeFlags) + 1) & 0x7F);
 			PushValue(this, object, 0);
 			outResult = 0;
@@ -968,7 +977,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			hitTarget.y = params[3];
 			hitTarget.z = params[4];
 			PSVECSubtract(&hitTarget, &hitStart, &hitMove);
-			int hit = MapPcs.CheckHitCylinderNear(&hitStart, &hitMove, params[5], object->m_localBase[0]);
+			unsigned int hit = MapPcs.CheckHitCylinderNear(&hitStart, &hitMove, params[5], object->m_localBase[0]);
 			AddDebugDrawCC(&hitStart, &hitMove, params[5], 1, 0);
 			if (hit != 0) {
 				*reinterpret_cast<int*>(object->m_localBase[6]) = 0;
@@ -1062,7 +1071,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			hitMove.x = kCFlatRuntime2Zero;
 			hitMove.y = -height;
 			hitMove.z = kCFlatRuntime2Zero;
-			int hit = MapPcs.CheckHitCylinderNear(&hitStart, &hitMove, radius, object->m_localBase[0]);
+			unsigned int hit = MapPcs.CheckHitCylinderNear(&hitStart, &hitMove, radius, object->m_localBase[0]);
 			AddDebugDrawCC(&hitStart, &hitMove, radius, 1, 0);
 			if (hit != 0) {
 				*reinterpret_cast<int*>(object->m_localBase[6]) = 0;
@@ -1233,11 +1242,11 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		case -0x4F: {
 			CCaravanWork* caravanWork = ScriptCaravan(engineObject);
 			int mode = static_cast<int>(object->m_localBase[0]);
+			int itemId = static_cast<int>(object->m_localBase[1]);
 			int slot = -1;
 			if (mode != 2) {
-				int itemId = static_cast<unsigned short>(object->m_localBase[1]);
 				if (mode < 2) {
-					if (mode > 0) {
+					if (mode >= 1) {
 						caravanWork->AddItem(itemId, &slot);
 					}
 				} else if (mode < 4) {
@@ -1579,7 +1588,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		case -0x86: {
 			CChara::CModel* model = engineObject->m_charaModelHandle->m_model;
-			model->m_flags10C = static_cast<unsigned char>((static_cast<signed char>(object->m_localBase[0]) << 6) & 0x40) |
+			model->m_flags10C = static_cast<unsigned char>((static_cast<unsigned char>(object->m_localBase[0]) << 6) & 0x40) |
 			    (model->m_flags10C & 0xBF);
 			PushValue(this, object, 0);
 			outResult = 0;

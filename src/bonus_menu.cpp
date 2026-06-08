@@ -1980,7 +1980,7 @@ void CMenuPcs::DrawResultCloseAnim()
 				} else {
 					if ((signed char)s_CntTop <= i && i < (signed char)s_CntTop + activePartyCount) {
 						int value = s_Rinfo->m_party[i - (signed char)s_CntTop].m_totalValue;
-						int digits[3];
+						unsigned int digits[3];
 						int digitCount;
 
 						if (value >= 100) {
@@ -2429,7 +2429,7 @@ void CMenuPcs::DrawResultCountAnim()
 							value = (int)frame;
 						}
 					}
-					int digits[3];
+					unsigned int digits[3];
 					int digitCount;
 
 					if (value >= 100) {
@@ -2702,7 +2702,7 @@ void CMenuPcs::DrawResultOpenAnim()
 
 		int modelIndex = 0;
 
-		for (int i = 0; i < (int)((BonusAnimList*)this->m_bonusAnimPtr)->header.count; i++) {
+		for (int i = 0; i < (unsigned int)((BonusAnimList*)this->m_bonusAnimPtr)->header.count; i++) {
 			BonusAnimSprite* sprite = &((BonusAnimList*)this->m_bonusAnimPtr)->sprites[i];
 			int kind = sprite->kind;
 

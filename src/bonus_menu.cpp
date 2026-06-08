@@ -1229,6 +1229,22 @@ void CMenuPcs::CalcSelectWait()
 			promptMode = 3;
 		}
 	} else {
+		unsigned short repeat;
+		unsigned short down;
+		unsigned char padLocked = (Pad.m_debugPadLock != 0 || (padSlot == 0 && Pad.m_debugPadPort != -1));
+		if (padLocked) {
+			repeat = 0;
+		} else {
+			int resolvedPadSlot = (Pad.m_debugPadPort == padSlot) ? 0 : padSlot;
+			repeat = Pad.m_padInputs[resolvedPadSlot].repeatButton;
+		}
+		padLocked = (Pad.m_debugPadLock != 0 || (padSlot == 0 && Pad.m_debugPadPort != -1));
+		if (padLocked) {
+			down = 0;
+		} else {
+			int resolvedPadSlot = (Pad.m_debugPadPort == padSlot) ? 0 : padSlot;
+			down = Pad.m_padInputs[resolvedPadSlot].buttonDown[0];
+		}
 		if (delay == 0 && currentPartyIndex < activePartyCount) {
 			if ((repeat & 9) != 0) {
 				selection = (short)(selection + 1);

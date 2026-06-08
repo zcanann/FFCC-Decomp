@@ -197,7 +197,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 	}
 
 	unsigned char caseMode = 0;
-	int branchMode = 0;
+	unsigned char branchMode = 0;
 
 	char* townName = Game.m_gameWork.m_townName;
 	const unsigned char* next;
@@ -430,7 +430,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x0E:
 		case 0x13:
 		case 0x14:
-			if ((unsigned int)System.m_execParam > 1U)
+			if ((unsigned int)System.m_execParam >= 2U)
 			{
 				System.Printf(const_cast<char*>(s_mesTagMissing), tag + 0xA0);
 			}
@@ -457,7 +457,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x28:
 		case 0x29:
 		case 0x55:
-			if (System.m_execParam != 0)
+			if ((unsigned int)System.m_execParam >= 1U)
 			{
 				System.Printf(const_cast<char*>(s_mesTagUnknown), tag + 0xA0);
 			}

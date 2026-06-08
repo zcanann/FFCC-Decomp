@@ -359,9 +359,9 @@ void pppDestroyHeap(_pppEnvSt* pppEnvSt)
  */
 void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, int line)
 {
-	bool firstAllocFailure = true;
-	bool canRetry = true;
-	u8 denied[0x180];
+	int firstAllocFailure = 1;
+	int canRetry = 1;
+	s8 denied[0x180];
 
 	ppvMemAllocErrorF = 0;
 	do
@@ -374,7 +374,7 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 
 		if (firstAllocFailure)
 		{
-			firstAllocFailure = false;
+			firstAllocFailure = 0;
 			memset(denied, 0, sizeof(denied));
 
 			s32 currentIdx = ppvMng - PartMng.m_pppMng;
@@ -382,7 +382,7 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 		}
 
 		_pppMngSt* selectedMngSt = 0;
-		u8 selectedPrio = 1;
+		int selectedPrio = 1;
 		int selectedPrioTime = 0;
 
 		for (s32 i = 0; i < 0x180; i += 2)
@@ -391,29 +391,45 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 			if (denied[i] == 0 && candidateA->m_baseTime != -0x1000 && candidateA->m_kind != 0)
 			{
 				u8 prioA = candidateA->m_prio;
-				if (prioA > 1 && (selectedPrio < prioA || (selectedPrio == prioA && selectedPrioTime < candidateA->m_prioTime)))
+				if (prioA > 1)
 				{
-					selectedMngSt = candidateA;
-					selectedPrio = prioA;
-					selectedPrioTime = candidateA->m_prioTime;
+					if (selectedPrio < prioA)
+					{
+						selectedPrioTime = candidateA->m_prioTime;
+						selectedPrio = prioA;
+						selectedMngSt = candidateA;
+					}
+					else if (selectedPrio == prioA && selectedPrioTime < candidateA->m_prioTime)
+					{
+						selectedPrioTime = candidateA->m_prioTime;
+						selectedMngSt = candidateA;
+					}
 				}
 			}
 			_pppMngSt* candidateB = candidateA + 1;
 			if (denied[i + 1] == 0 && candidateB->m_baseTime != -0x1000 && candidateB->m_kind != 0)
 			{
 				u8 prioB = candidateB->m_prio;
-				if (prioB > 1 && (selectedPrio < prioB || (selectedPrio == prioB && selectedPrioTime < candidateB->m_prioTime)))
+				if (prioB > 1)
 				{
-					selectedMngSt = candidateB;
-					selectedPrio = prioB;
-					selectedPrioTime = candidateB->m_prioTime;
+					if (selectedPrio < prioB)
+					{
+						selectedPrioTime = candidateB->m_prioTime;
+						selectedPrio = prioB;
+						selectedMngSt = candidateB;
+					}
+					else if (selectedPrio == prioB && selectedPrioTime < candidateB->m_prioTime)
+					{
+						selectedPrioTime = candidateB->m_prioTime;
+						selectedMngSt = candidateB;
+					}
 				}
 			}
 		}
 
 		if (selectedMngSt == 0)
 		{
-			canRetry = false;
+			canRetry = 0;
 		}
 		else
 		{
@@ -479,8 +495,8 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
  */
 extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage, char* file, int line)
 {
-	bool firstAllocFailure = true;
-	bool canRetry = true;
+	int firstAllocFailure = 1;
+	int canRetry = 1;
 	char denied[0x180];
 
 	ppvMemAllocErrorF = 0;
@@ -494,7 +510,7 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 
 		if (firstAllocFailure)
 		{
-			firstAllocFailure = false;
+			firstAllocFailure = 0;
 			memset(denied, 0, sizeof(denied));
 
 			s32 currentIdx = ppvMng - PartMng.m_pppMng;
@@ -502,7 +518,7 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 		}
 
 		_pppMngSt* selectedMngSt = 0;
-		u8 selectedPrio = 1;
+		int selectedPrio = 1;
 		int selectedPrioTime;
 		for (s32 i = 0; i < 0x180; i += 2)
 		{
@@ -510,11 +526,19 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 			if (denied[i] == 0 && candidateA->m_baseTime != -0x1000 && candidateA->m_kind != 0)
 			{
 				u8 prioA = candidateA->m_prio;
-				if (prioA > 1 && (selectedPrio < prioA || (selectedPrio == prioA && selectedPrioTime < candidateA->m_prioTime)))
+				if (prioA > 1)
 				{
-					selectedMngSt = candidateA;
-					selectedPrio = prioA;
-					selectedPrioTime = candidateA->m_prioTime;
+					if (selectedPrio < prioA)
+					{
+						selectedPrioTime = candidateA->m_prioTime;
+						selectedPrio = prioA;
+						selectedMngSt = candidateA;
+					}
+					else if (selectedPrio == prioA && selectedPrioTime < candidateA->m_prioTime)
+					{
+						selectedPrioTime = candidateA->m_prioTime;
+						selectedMngSt = candidateA;
+					}
 				}
 			}
 
@@ -522,18 +546,26 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 			if (denied[i + 1] == 0 && candidateB->m_baseTime != -0x1000 && candidateB->m_kind != 0)
 			{
 				u8 prioB = candidateB->m_prio;
-				if (prioB > 1 && (selectedPrio < prioB || (selectedPrio == prioB && selectedPrioTime < candidateB->m_prioTime)))
+				if (prioB > 1)
 				{
-					selectedMngSt = candidateB;
-					selectedPrio = prioB;
-					selectedPrioTime = candidateB->m_prioTime;
+					if (selectedPrio < prioB)
+					{
+						selectedPrioTime = candidateB->m_prioTime;
+						selectedPrio = prioB;
+						selectedMngSt = candidateB;
+					}
+					else if (selectedPrio == prioB && selectedPrioTime < candidateB->m_prioTime)
+					{
+						selectedPrioTime = candidateB->m_prioTime;
+						selectedMngSt = candidateB;
+					}
 				}
 			}
 		}
 
 		if (selectedMngSt == 0)
 		{
-			canRetry = false;
+			canRetry = 0;
 		}
 		else
 		{
@@ -729,9 +761,9 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 	u32 allocSize = programSet->m_workBaseOffset;
 	CMemory::CStage* stage = ppvEnv->m_stagePtr;
 	_pppPObjLink* newObj = 0;
-	bool firstFailure = true;
-	bool canRetry = true;
-	u8 denied[0x180];
+	int firstFailure = 1;
+	int canRetry = 1;
+	s8 denied[0x180];
 
 	ppvMemAllocErrorF = 0;
 	do
@@ -745,7 +777,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 
 		if (firstFailure)
 		{
-			firstFailure = false;
+			firstFailure = 0;
 			memset(denied, 0, sizeof(denied));
 
 			s32 currentIdx = ppvMng - PartMng.m_pppMng;
@@ -753,7 +785,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 		}
 
 		_pppMngSt* selectedMngSt = 0;
-		u8 selectedPrio = 1;
+		int selectedPrio = 1;
 		int selectedPrioTime = 0;
 
 		for (s32 i = 0; i < 0x180; i += 2)
@@ -762,12 +794,19 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 			if (denied[i] == 0 && candidateA->m_baseTime != -0x1000 && candidateA->m_kind != 0)
 			{
 				u8 prioA = candidateA->m_prio;
-				if (prioA > 1 &&
-					(selectedPrio < prioA || (selectedPrio == prioA && selectedPrioTime < candidateA->m_prioTime)))
+				if (prioA > 1)
 				{
-					selectedMngSt = candidateA;
-					selectedPrio = prioA;
-					selectedPrioTime = candidateA->m_prioTime;
+					if (selectedPrio < prioA)
+					{
+						selectedPrioTime = candidateA->m_prioTime;
+						selectedPrio = prioA;
+						selectedMngSt = candidateA;
+					}
+					else if (selectedPrio == prioA && selectedPrioTime < candidateA->m_prioTime)
+					{
+						selectedPrioTime = candidateA->m_prioTime;
+						selectedMngSt = candidateA;
+					}
 				}
 			}
 
@@ -775,19 +814,26 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 			if (denied[i + 1] == 0 && candidateB->m_baseTime != -0x1000 && candidateB->m_kind != 0)
 			{
 				u8 prioB = candidateB->m_prio;
-				if (prioB > 1 &&
-					(selectedPrio < prioB || (selectedPrio == prioB && selectedPrioTime < candidateB->m_prioTime)))
+				if (prioB > 1)
 				{
-					selectedMngSt = candidateB;
-					selectedPrio = prioB;
-					selectedPrioTime = candidateB->m_prioTime;
+					if (selectedPrio < prioB)
+					{
+						selectedPrioTime = candidateB->m_prioTime;
+						selectedPrio = prioB;
+						selectedMngSt = candidateB;
+					}
+					else if (selectedPrio == prioB && selectedPrioTime < candidateB->m_prioTime)
+					{
+						selectedPrioTime = candidateB->m_prioTime;
+						selectedMngSt = candidateB;
+					}
 				}
 			}
 		}
 
 		if (selectedMngSt == 0)
 		{
-			canRetry = false;
+			canRetry = 0;
 		}
 		else
 		{
@@ -1481,8 +1527,8 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 	ppvMng = pppMngSt;
 	pppMngSt->m_lifeEnd = (int)pdt[0];
 	pppMngSt->m_mode = (u8)pdt[1];
-	int controlOffset = (int)pdt[2];
-	int programOffset = (int)pdt[3];
+	int* controlPrograms = (int*)((u8*)pdt + pdt[2]);
+	int* programs = (int*)((u8*)pdt + pdt[3]);
 	short* shapeIndices = (short*)((u8*)pdt + pdt[5]);
 	short* modelIndices = (short*)((u8*)pdt + pdt[4]);
 
@@ -1522,8 +1568,6 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 	}
 
 	pppMngSt->m_isFinished = 0;
-	int* controlPrograms = (int*)((u8*)pdt + controlOffset);
-	int* programs = (int*)((u8*)pdt + programOffset);
 	pppMngSt->m_numControlPrograms = *controlPrograms++;
 	pppMngSt->m_pppPObjLinkHead.m_owner = (_pppPDataVal*)controlPrograms;
 	pppMngSt->m_numPrograms = *programs++;
@@ -1536,10 +1580,10 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 	else
 	{
 		CMemory::CStage* stage = ppvEnv->m_stagePtr;
-		bool firstAllocFailure = true;
-		bool canRetry = true;
+		int firstAllocFailure = 1;
+		int canRetry = 1;
 		_pppPDataVal* pDataVals = 0;
-		u8 denied[0x180];
+		s8 denied[0x180];
 
 		ppvMemAllocErrorF = 0;
 		do
@@ -1553,14 +1597,14 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 
 			if (firstAllocFailure)
 			{
-				firstAllocFailure = false;
+				firstAllocFailure = 0;
 				memset(denied, 0, sizeof(denied));
 				int currentIdx = ppvMng - PartMng.m_pppMng;
 				denied[currentIdx] = 1;
 			}
 
 			_pppMngSt* selectedMngSt = 0;
-			u8 selectedPrio = 1;
+			int selectedPrio = 1;
 			int selectedPrioTime = 0;
 
 			for (int i = 0; i < 0x180; i += 2)
@@ -1569,11 +1613,19 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 				if (denied[i] == 0 && candidateA->m_baseTime != -0x1000 && candidateA->m_kind != 0)
 				{
 					u8 prioA = candidateA->m_prio;
-					if (prioA > 1 && (selectedPrio < prioA || (selectedPrio == prioA && selectedPrioTime < candidateA->m_prioTime)))
+					if (prioA > 1)
 					{
-						selectedMngSt = candidateA;
-						selectedPrio = prioA;
-						selectedPrioTime = candidateA->m_prioTime;
+						if (selectedPrio < prioA)
+						{
+							selectedPrioTime = candidateA->m_prioTime;
+							selectedPrio = prioA;
+							selectedMngSt = candidateA;
+						}
+						else if (selectedPrio == prioA && selectedPrioTime < candidateA->m_prioTime)
+						{
+							selectedPrioTime = candidateA->m_prioTime;
+							selectedMngSt = candidateA;
+						}
 					}
 				}
 
@@ -1581,18 +1633,26 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 				if (denied[i + 1] == 0 && candidateB->m_baseTime != -0x1000 && candidateB->m_kind != 0)
 				{
 					u8 prioB = candidateB->m_prio;
-					if (prioB > 1 && (selectedPrio < prioB || (selectedPrio == prioB && selectedPrioTime < candidateB->m_prioTime)))
+					if (prioB > 1)
 					{
-						selectedMngSt = candidateB;
-						selectedPrio = prioB;
-						selectedPrioTime = candidateB->m_prioTime;
+						if (selectedPrio < prioB)
+						{
+							selectedPrioTime = candidateB->m_prioTime;
+							selectedPrio = prioB;
+							selectedMngSt = candidateB;
+						}
+						else if (selectedPrio == prioB && selectedPrioTime < candidateB->m_prioTime)
+						{
+							selectedPrioTime = candidateB->m_prioTime;
+							selectedMngSt = candidateB;
+						}
 					}
 				}
 			}
 
 			if (selectedMngSt == 0)
 			{
-				canRetry = false;
+				canRetry = 0;
 			}
 			else
 			{
@@ -2540,9 +2600,9 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 		u8 m_pad1[0xBC - 0x78];
 		u32 m_objHitMask;
 		u32 m_cylinderAttribute;
-		u8 m_pad2[0xE5 - 0xC4];
+		u8 m_pad2[0xE8 - 0xC4];
 		u8 m_endRequested;
-		u8 m_pad3[0x11C - 0xE6];
+		u8 m_pad3[0x11C - 0xE9];
 		PPPSEST m_soundEffectData;
 		PPPIFPARAM m_hitParams;
 		s16 m_hitObjectIds[0x10];

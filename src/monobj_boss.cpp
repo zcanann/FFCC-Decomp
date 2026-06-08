@@ -936,7 +936,7 @@ void CGMonObj::moveFrameFuncSaw()
 	m_moveWork.m_targetPos.x = wave * (kMonObjBossWaveXRadius * sinf(*reinterpret_cast<float*>(CGMonObj::m_boss)));
 	m_moveWork.m_targetPos.z = wave * (kMonObjBossAttackRange * cosf(*reinterpret_cast<float*>(CGMonObj::m_boss)));
 	*reinterpret_cast<float*>(CGMonObj::m_boss) = *reinterpret_cast<float*>(CGMonObj::m_boss) +
-	    kMonObjBossWavePhaseAccel * (kMonObjBossHalf - (wave - kMonObjBossHalf)) + kMonObjBossScaleStep;
+	    (kMonObjBossWavePhaseAccel * (kMonObjBossHalf - (wave - kMonObjBossHalf)) + kMonObjBossScaleStep);
 	*reinterpret_cast<float*>(CGMonObj::m_boss + 0x4) = *reinterpret_cast<float*>(CGMonObj::m_boss + 0x4) + kMonObjBossWavePhaseStep;
 }
 
@@ -2292,7 +2292,7 @@ void CGMonObj::logicFuncRamoe()
 	int nextState = -1;
 
 	unsigned int* scriptWork = reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&Game) + 4);
-	for (int i = 0; i < 0x3F; i++, scriptWork++) {
+	for (int i = 0; i < 0x3F; scriptWork++, i++) {
 		CGPrgObj* monObj = reinterpret_cast<CGPrgObj*>(scriptWork[0xC5D0 / 4]);
 		if (monObj != 0 && (monObj->m_lastStateId != 9 || monObj->m_subState != 2)) {
 			activeCount++;

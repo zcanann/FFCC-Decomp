@@ -798,18 +798,9 @@ void CMenuPcs::ItemInit()
     memset(this->m_itemList, 0, sizeof(*this->m_itemList));
     float one = LoadFloat(kItemOne);
     entry = this->m_itemList->anims;
-    int initCount = 8;
-    do {
-        entry[0].uvScale = one;
-        entry[1].uvScale = one;
-        entry[2].uvScale = one;
-        entry[3].uvScale = one;
-        entry[4].uvScale = one;
-        entry[5].uvScale = one;
-        entry[6].uvScale = one;
-        entry[7].uvScale = one;
-        entry += 8;
-    } while (--initCount != 0);
+    for (int initCount = 0; initCount < 64; initCount++, entry++) {
+        entry->uvScale = one;
+    }
 
     index = 0;
     entry = &this->m_itemList->anims[index++];

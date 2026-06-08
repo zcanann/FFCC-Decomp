@@ -1227,11 +1227,10 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
                     mana2Work->m_displayListCopies[dlIndex] = copiedDisplayList;
                     mana2Work->m_displayListCopies[dlIndex] = reinterpret_cast<void*>(
                         (reinterpret_cast<u32>(mana2Work->m_displayListCopies[dlIndex]) + 0x1F) & 0xFFFFFFE0);
-                    copiedDisplayList = mana2Work->m_displayListCopies[dlIndex];
                     mana2Work->m_displayListSize = displayList->m_size;
-                    memcpy(copiedDisplayList, displayList->m_data, displayList->m_size);
-                    DCFlushRange(copiedDisplayList, displayList->m_size);
-                    gUtil.ReWriteDisplayList(copiedDisplayList, displayList->m_size, 1);
+                    memcpy(mana2Work->m_displayListCopies[dlIndex], displayList->m_data, displayList->m_size);
+                    DCFlushRange(mana2Work->m_displayListCopies[dlIndex], displayList->m_size);
+                    gUtil.ReWriteDisplayList(mana2Work->m_displayListCopies[dlIndex], displayList->m_size, 1);
                     displayList++;
                 }
             }

@@ -7879,8 +7879,12 @@ int JoyBus::SetCmdLst(int portIndex, int param_3, short param_4)
  */
 int JoyBus::SetTmpArti(int portIndex, int param3, int param4)
 {
-    unsigned int cmd = MakeJoyCmd32(0x20, static_cast<unsigned char>(param3),
-                                    static_cast<unsigned char>(param4 + 'a'), 0);
+    unsigned int cmd = 0;
+    unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
+    cmdBytes[0] = 0x20;
+    cmdBytes[1] = static_cast<unsigned char>(param3);
+    cmdBytes[2] = static_cast<unsigned char>(param4 + 'a');
+    unsigned int word = cmd;
     unsigned int port;
 
     if (m_threadRunningMask == 0)
@@ -7900,7 +7904,7 @@ int JoyBus::SetTmpArti(int portIndex, int param3, int param4)
     }
     else
     {
-        m_cmdQueueData[port][m_cmdCount[port]] = cmd;
+        m_cmdQueueData[port][m_cmdCount[port]] = word;
         port = m_threadParams[portIndex].m_portIndex;
         m_cmdCount[port]++;
         OSSignalSemaphore(m_accessSemaphores + m_threadParams[portIndex].m_portIndex);
@@ -7972,6 +7976,7 @@ int JoyBus::SendHitEnemy(int portIndex, char enemyId, short hitValue)
     cmdBytes[0] = 0x22;
     cmdBytes[1] = enemyId;
     *reinterpret_cast<unsigned short*>(cmdBytes + 2) = __lhbrx(&hit, 0);
+    unsigned int word = cmd;
 
     if (static_cast<signed char>(m_threadRunningMask) != 0) {
         OSWaitSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
@@ -7981,7 +7986,7 @@ int JoyBus::SendHitEnemy(int portIndex, char enemyId, short hitValue)
             OSSignalSemaphore(&m_accessSemaphores[port]);
             result = 0xFFFFFFFF;
         } else {
-            m_cmdQueueData[port][m_cmdCount[port]] = cmd;
+            m_cmdQueueData[port][m_cmdCount[port]] = word;
             port = m_threadParams[portIndex].m_portIndex;
             m_cmdCount[port]++;
             OSSignalSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);

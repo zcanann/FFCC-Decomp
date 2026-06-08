@@ -895,7 +895,11 @@ retry_loop:
             goto retry_loop;
         }
         ret = GBAGetStatus(channel, param + 0xC0);
-        if (ret == 0 && (param[0xC0] & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_FLAGS_MASK)
+        if (!(ret == 0 && (param[0xC0] & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_FLAGS_MASK))
+        {
+            System.Printf(const_cast<char*>(s_miniGameSourceLineFmt), s_miniGameSourceName, 0x27F);
+        }
+        else
         {
             if (step < 0x19)
             {
@@ -948,10 +952,6 @@ retry_loop:
                 }
                 System.Printf(const_cast<char*>(s_miniGameSourceLineFmt), s_miniGameSourceName, 0x2B2);
             }
-        }
-        else
-        {
-            System.Printf(const_cast<char*>(s_miniGameSourceLineFmt), s_miniGameSourceName, 0x27F);
         }
 comm_fail:
         System.Printf(const_cast<char*>(s_miniGameRecvStatusFmt), ret,

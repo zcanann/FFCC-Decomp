@@ -2914,7 +2914,7 @@ void CShopMenu::Calc()
         }
         m_fade = static_cast<float>(timer) * 0.125f;
         if (timer == 8) {
-            unsigned short recipeMaterial[8];
+            short recipeMaterial[8];
             CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
 
             MenuPcs.GetRecipeMaterial(getItemNo(m_selectedIndex), reinterpret_cast<CMenuPcs::MaterialInfo*>(recipeMaterial));

@@ -393,7 +393,7 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
         memcpy(managerImage, readBuffer, *reinterpret_cast<unsigned int*>(self + 0x1358));
     }
 
-    int offset = 0xA0;
+    unsigned int offset = 0xA0;
     int managerBase = *reinterpret_cast<int*>(self + 0x1354);
     int checksum = 0xE7;
 
@@ -1421,7 +1421,7 @@ void CMiniGamePcs::OpenCallback(MgGbaThreadParam* param, void* context)
     }
     else
     {
-        unsigned char swapByte = paramBytes[0x2A];
+        signed char swapByte = paramBytes[0x2A];
         int swapWord = *reinterpret_cast<int*>(paramBytes + 0x34);
 
         paramBytes[0x2A] = self[static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16AE];
@@ -1449,7 +1449,7 @@ void CMiniGamePcs::OpenCallback(MgGbaThreadParam* param, void* context)
 
     if ((!doWrite || wasResync) && GBAGetStatus(static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)), paramBytes + 0xC0) == 0 && paramBytes[0xC0] == '0')
     {
-        int sendTick = baseTick;
+        unsigned int sendTick = baseTick;
         int readTick;
         int readStatus;
 

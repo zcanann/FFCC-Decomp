@@ -870,8 +870,9 @@ void CSound::loadWaveFrame()
                 readSize = 0x100000;
             }
 
+            unsigned int curOffset = (unsigned int)waveOffset;
             waveFile->m_chunkSize = readSize;
-            waveFile->m_currentOffset = (unsigned int)waveOffset;
+            waveFile->m_currentOffset = curOffset;
             File.ReadASync(waveFile);
 
             if (waveSyncMode != 0) {
@@ -924,8 +925,9 @@ void CSound::loadWaveFrame()
                 }
 
                 if (readSize != 0) {
+                    unsigned int curOffset = (unsigned int)streamOffset;
                     streamFile->m_chunkSize = (unsigned int)readSize;
-                    streamFile->m_currentOffset = (unsigned int)streamOffset;
+                    streamFile->m_currentOffset = curOffset;
                     File.ReadASync(streamFile);
 
                     streamOffset += readSize;

@@ -2540,7 +2540,7 @@ void GbaQueue::ReplyLetter(int channel)
 		(static_cast<unsigned int>(recvBuffer[4]) << 16) |
 		(static_cast<unsigned int>(recvBuffer[5]) << 8) |
 		recvBuffer[6];
-	unsigned int itemId = 0;
+	int itemId = 0;
 	unsigned int gil = value;
 
 	if (recvBuffer[2] == 0) {

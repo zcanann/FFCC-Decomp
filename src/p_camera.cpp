@@ -1236,12 +1236,12 @@ void CCameraPcs::calcMap()
     int i;
 
     struct HitCylinder {
-        Vec center;
-        Vec delta;
-        float radiusXZ;
-        float radiusY;
-        float height;
-        float unk;
+        Vec m_bottom;  // 0x00
+        Vec m_top;     // 0x0c
+        Vec m_axis;    // 0x18
+        float m_radius; // 0x24
+        Vec m_min;     // 0x28
+        Vec m_max;     // 0x34
     };
     HitCylinder hitCylinder;
 
@@ -1306,12 +1306,14 @@ void CCameraPcs::calcMap()
 
     if ((moveDelta.x != kCameraZeroF) || (moveDelta.y != kCameraZeroF) || (moveDelta.z != kCameraZeroF)) {
         for (i = 0; i < 4; i++) {
-            hitCylinder.radiusXZ = kCameraBoundsMinInitial;
-            hitCylinder.radiusY = kCameraBoundsMinInitial;
-            hitCylinder.height = kCameraBoundsMinInitial;
-            hitCylinder.unk = kCameraDefaultNearZ;
-            hitCylinder.center = PositionVec();
-            hitCylinder.delta = moveDelta;
+            hitCylinder.m_min.x = kCameraBoundsMinInitial;
+            hitCylinder.m_min.y = kCameraBoundsMinInitial;
+            hitCylinder.m_min.z = kCameraBoundsMinInitial;
+            hitCylinder.m_max.x = kCameraBoundsMaxInitial;
+            hitCylinder.m_max.y = kCameraBoundsMaxInitial;
+            hitCylinder.m_max.z = kCameraBoundsMaxInitial;
+            hitCylinder.m_radius = kCameraDefaultNearZ;
+            hitCylinder.m_bottom = PositionVec();
             if (MapMng.CheckHitCylinder(reinterpret_cast<CMapCylinder*>(&hitCylinder), &moveDelta, 0xFFFFFFFF) == 0) {
                 PositionVec().x += moveDelta.x;
                 PositionVec().y += moveDelta.y;

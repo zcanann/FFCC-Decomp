@@ -794,44 +794,46 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
         handle = next;
     }
 
-    if (resetMode != 1) {
-        if (resetMode == 0) {
-            const unsigned int releaseMask = ~(FreeMergeMask(this) | 0x10000000U);
-            releaseUnuseLoadModel(static_cast<int>(releaseMask));
+    switch (resetMode) {
+    case 0: {
+        const unsigned int releaseMask = ~(FreeMergeMask(this) | 0x10000000U);
+        releaseUnuseLoadModel(static_cast<int>(releaseMask));
 
-            for (int i = LoadAnimArray(this)->GetSize() - 1; i >= 0; i--) {
-                CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
-                if (!(((loadAnim->m_mergeFileId < 0) && (loadAnim->GetRef() == 1)) ||
-                      ((loadAnim->m_mergeFileId >= 0) && ((releaseMask & static_cast<unsigned int>(loadAnim->m_mergeFlags)) != 0)))) {
-                    continue;
-                }
-
-                CRef* loadAnimRef = loadAnim;
-                if (loadAnimRef->DecRef() == 0) {
-                    delete loadAnimRef;
-                }
-                LoadAnimArray(this)->RemoveAt(static_cast<unsigned long>(i));
+        for (int i = LoadAnimArray(this)->GetSize() - 1; i >= 0; i--) {
+            CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
+            if (!(((loadAnim->m_mergeFileId < 0) && (loadAnim->GetRef() == 1)) ||
+                  ((loadAnim->m_mergeFileId >= 0) && ((releaseMask & static_cast<unsigned int>(loadAnim->m_mergeFlags)) != 0)))) {
+                continue;
             }
 
-            System.Printf(const_cast<char*>(s_charaFreeMergeFmt), releaseMask);
-            LoadPdtArray(this)->ReleaseAndRemoveAll();
-            int charaAmemSize = correctLoadAnimAmem();
-            if (charaAmemSize >= 0) {
-                CharaAmemSize() = static_cast<unsigned int>(charaAmemSize);
-                goto complete;
+            CRef* loadAnimRef = loadAnim;
+            if (loadAnimRef->DecRef() == 0) {
+                delete loadAnimRef;
             }
+            LoadAnimArray(this)->RemoveAt(static_cast<unsigned long>(i));
+        }
 
-            if (static_cast<unsigned int>(System.m_execParam) >= 2) {
-                System.Printf(const_cast<char*>(s_charaAmemCompactFailed));
-            }
+        System.Printf(const_cast<char*>(s_charaFreeMergeFmt), releaseMask);
+        LoadPdtArray(this)->ReleaseAndRemoveAll();
+        int charaAmemSize = correctLoadAnimAmem();
+        if (charaAmemSize >= 0) {
+            CharaAmemSize() = static_cast<unsigned int>(charaAmemSize);
+            goto complete;
+        }
+
+        if (static_cast<unsigned int>(System.m_execParam) >= 2) {
+            System.Printf(const_cast<char*>(s_charaAmemCompactFailed));
         }
     }
-
-    LoadModelArray(this)->ReleaseAndRemoveAll();
-    LoadAnimArray(this)->ReleaseAndRemoveAll();
-    LoadTextureArray(this)->ReleaseAndRemoveAll();
-    LoadPdtArray(this)->ReleaseAndRemoveAll();
-    CharaAmemSize() = 0;
+        // fallthrough
+    case 1:
+        LoadModelArray(this)->ReleaseAndRemoveAll();
+        LoadAnimArray(this)->ReleaseAndRemoveAll();
+        LoadTextureArray(this)->ReleaseAndRemoveAll();
+        LoadPdtArray(this)->ReleaseAndRemoveAll();
+        CharaAmemSize() = 0;
+        break;
+    }
 
 complete:
     gCharaPartWorkPtr->m_bumpShade[3] = 0xFF;

@@ -2337,11 +2337,7 @@ void CMenuPcs::DrawResultCountAnim()
 				GXSetChanMatColor(GX_COLOR0A0, color);
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kind));
 
-				if ((signed char)s_CntTop > i || i >= (signed char)s_CntTop + activePartyCount) {
-					MenuPcs.DrawRect(0, (float)sprite->x + sprite->motionX, (float)sprite->y + sprite->motionY,
-					    (float)sprite->w, (float)sprite->h,
-					    sprite->mulX, sprite->mulY, sprite->depth, sprite->depth, 0.0f);
-				} else {
+				if ((signed char)s_CntTop <= i && i < (signed char)s_CntTop + activePartyCount) {
 					int value = s_Rinfo->m_party[i - (signed char)s_CntTop].m_totalValue;
 					if (*(short*)(this->m_bonusStatePtr + 0x10) == 0) {
 						int frame = (int)*(short*)(this->m_bonusStatePtr + 0x22) - 8;
@@ -2379,6 +2375,10 @@ void CMenuPcs::DrawResultCountAnim()
 						    sprite->depth, sprite->depth, 0.0f);
 						digitX += digitW;
 					}
+				} else {
+					MenuPcs.DrawRect(0, (float)sprite->x + sprite->motionX, (float)sprite->y + sprite->motionY,
+					    (float)sprite->w, (float)sprite->h,
+					    sprite->mulX, sprite->mulY, sprite->depth, sprite->depth, 0.0f);
 				}
 				lastKind = sprite->kind;
 			}

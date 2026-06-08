@@ -84,7 +84,7 @@ void CMenuPcs::MLstDraw()
 			MenuPcs.DrawRect(0, x, y, w, h, zero, v, item->z, item->z, zero);
 
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x5c));
-			float iconX = (float)item->x;
+			float iconX = (float)((double)item->x - kMLstRowHeight * kMLstHalfDouble);
 			float iconY = (float)(item->y - 6);
 			v = zero;
 			if ((menuMode == 1) && (i == this->m_menuLstState->cursor)) {
@@ -92,7 +92,7 @@ void CMenuPcs::MLstDraw()
 			}
 			MenuPcs.DrawRect(
 				0,
-				(float)-((kMLstRowHeight * kMLstHalfDouble) - (double)iconX),
+				iconX,
 				iconY,
 				40.0f,
 				40.0f,

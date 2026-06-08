@@ -317,14 +317,14 @@ found_fallback:
 	posX += advance;
 
 	if (glyphInfo[0] == 0) {
-		u0 += kFontOne;
+		u0 += LoadFloat(kFontOne);
 	}
 	if (m_glyphWidth == glyphInfo[0] + glyphInfo[1]) {
-		u1 -= kFontOne;
+		u1 -= LoadFloat(kFontOne);
 	}
 
-	v0 += kFontOne;
-	v1 -= kFontOne;
+	v0 += LoadFloat(kFontOne);
+	v1 -= LoadFloat(kFontOne);
 
 	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
 	GXPosition3f32(x0, y0, posZ);

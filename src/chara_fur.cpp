@@ -468,10 +468,10 @@ void CChara::TimeMogFur()
 				g = b;
 			}
 
-			a = a + 2;
-			unsigned int clampedA = 7;
-			if (a < 7) {
-				clampedA = a;
+			int aPlus = static_cast<int>(a) + 2;
+			int clampedA = 7;
+			if (aPlus < 7) {
+				clampedA = aPlus;
 			}
 
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(texels) + tileIndex) =

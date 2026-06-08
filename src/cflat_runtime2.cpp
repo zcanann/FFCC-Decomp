@@ -147,9 +147,12 @@ void CLine<64>::Draw()
 	GXBegin((GXPrimitive)0xB0, GX_VTXFMT0, (u16)(pointCount & 0xFFFF));
 	u32 i = 0;
 	while (i < pointCount) {
-		GXWGFifo.f32 = points[i].x;
-		GXWGFifo.f32 = points[i].y;
-		GXWGFifo.f32 = points[i].z;
+		const float x = points[i].x;
+		const float y = points[i].y;
+		const float z = points[i].z;
+		GXWGFifo.f32 = x;
+		GXWGFifo.f32 = y;
+		GXWGFifo.f32 = z;
 		i++;
 	}
 
@@ -157,21 +160,27 @@ void CLine<64>::Draw()
 	GXBegin((GXPrimitive)0xB0, GX_VTXFMT0, (u16)(pointCount & 0xFFFF));
 	i = 0;
 	while (i < pointCount) {
-		GXWGFifo.f32 = points[i].x;
-		GXWGFifo.f32 = yOffset + points[i].y;
-		GXWGFifo.f32 = points[i].z;
+		const float x = points[i].x;
+		const float y = yOffset + points[i].y;
+		const float z = points[i].z;
+		GXWGFifo.f32 = x;
+		GXWGFifo.f32 = y;
+		GXWGFifo.f32 = z;
 		i++;
 	}
 
 	GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, (u16)((pointCount & 0x7FFF) << 1));
 	i = 0;
 	while (i < pointCount) {
-		GXWGFifo.f32 = points[i].x;
-		GXWGFifo.f32 = points[i].y;
-		GXWGFifo.f32 = points[i].z;
-		GXWGFifo.f32 = points[i].x;
-		GXWGFifo.f32 = yOffset + points[i].y;
-		GXWGFifo.f32 = points[i].z;
+		const float x = points[i].x;
+		const float y = points[i].y;
+		const float z = points[i].z;
+		GXWGFifo.f32 = x;
+		GXWGFifo.f32 = y;
+		GXWGFifo.f32 = z;
+		GXWGFifo.f32 = x;
+		GXWGFifo.f32 = yOffset + y;
+		GXWGFifo.f32 = z;
 		i++;
 	}
 }

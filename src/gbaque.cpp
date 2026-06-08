@@ -1928,22 +1928,10 @@ int GbaQueue::GetMapObjInfo(int channel, unsigned char* outData)
 	int count = 4;
 	do {
 		unsigned char* out = outData;
-		out[0] = mapObj[0x000];
-		out[1] = mapObj[0x014];
-		out[2] = mapObj[0x028];
-		out[3] = mapObj[0x03C];
-		out[4] = mapObj[0x050];
-		out[5] = mapObj[0x064];
-		out[6] = mapObj[0x078];
-		out[7] = mapObj[0x08C];
-		out[8] = mapObj[0x0A0];
-		out[9] = mapObj[0x0B4];
-		out[10] = mapObj[0x0C8];
-		out[11] = mapObj[0x0DC];
-		out[12] = mapObj[0x0F0];
-		out[13] = mapObj[0x104];
-		out[14] = mapObj[0x118];
-		out[15] = mapObj[0x12C];
+		int k;
+		for (k = 0; k < 0x10; k++) {
+			out[k] = mapObj[k * 0x14];
+		}
 		mapObj += 0x140;
 		count--;
 		outData += 0x10;

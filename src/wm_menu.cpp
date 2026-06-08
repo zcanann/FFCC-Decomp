@@ -1915,7 +1915,7 @@ void CMenuPcs::CalcDiaryMenu()
 			int frameStep = 0;
 			if (state == 0) {
 				frameStep = m_wmWorldState->m_frameCounter - 10;
-			} else if (state < 1 || state > 3) {
+			} else if (state <= 0 || state >= 4) {
 				frameStep = -m_wmWorldState->m_frameCounter;
 			}
 			CalcWmFrame0Inline(this, frameStep);
@@ -1948,7 +1948,7 @@ void CMenuPcs::CalcDiaryMenu()
 				int frameStep = 0;
 				if (state == 0) {
 					frameStep = m_wmWorldState->m_frameCounter - 10;
-				} else if (state < 1 || state > 3) {
+				} else if (state <= 0 || state >= 4) {
 					frameStep = -m_wmWorldState->m_frameCounter;
 				}
 				CalcWmFrame0Inline(this, frameStep);
@@ -5998,11 +5998,13 @@ void CMenuPcs::SetWorldParam(int code, int value)
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
 	switch (code) {
-	case 0:
+	case 0: {
+		const unsigned char primaryMask = s_wmWorldParamPrimaryDirtyMask;
 		bytes[5] = bytes[4];
 		bytes[4] = static_cast<unsigned char>(value);
-		bytes[0xA] = bytes[0xA] | s_wmWorldParamPrimaryDirtyMask;
+		bytes[0xA] = bytes[0xA] | primaryMask;
 		break;
+	}
 	case 1:
 		bytes[6] = static_cast<unsigned char>(value);
 		break;
@@ -6024,11 +6026,13 @@ void CMenuPcs::SetWorldParam(int code, int value)
 	case 7:
 		bytes[9] = static_cast<unsigned char>(value);
 		break;
-	case 8:
+	case 8: {
+		const unsigned char secondaryMask = s_wmWorldParamSecondaryDirtyMask;
 		bytes[0xB] = bytes[0xC];
 		bytes[0xC] = static_cast<unsigned char>(value);
-		bytes[0xA] = bytes[0xA] | s_wmWorldParamSecondaryDirtyMask;
+		bytes[0xA] = bytes[0xA] | secondaryMask;
 		break;
+	}
 	case 9:
 		if (static_cast<int>(static_cast<signed char>(bytes[0xD])) != value) {
 			bytes[0xD] = static_cast<unsigned char>(value);
@@ -6172,10 +6176,10 @@ unsigned int CMenuPcs::GetWorldParam(int code)
 		result = static_cast<unsigned int>(static_cast<signed char>(bytes[0xD]));
 		break;
 	case 10:
-		result = -static_cast<unsigned int>(bytes[0x10]) >> 31;
+		result = (-static_cast<unsigned int>(bytes[0x10]) | static_cast<unsigned int>(bytes[0x10])) >> 31;
 		break;
 	case 11:
-		result = -static_cast<unsigned int>(bytes[0x11]) >> 31;
+		result = (-static_cast<unsigned int>(bytes[0x11]) | static_cast<unsigned int>(bytes[0x11])) >> 31;
 		break;
 	case 12:
 		result = static_cast<unsigned int>(static_cast<signed char>(bytes[0xE]));
@@ -6184,10 +6188,10 @@ unsigned int CMenuPcs::GetWorldParam(int code)
 		result = static_cast<unsigned int>(static_cast<signed char>(bytes[0xF]));
 		break;
 	case 14:
-		result = -static_cast<unsigned int>(bytes[0x12]) >> 31;
+		result = (-static_cast<unsigned int>(bytes[0x12]) | static_cast<unsigned int>(bytes[0x12])) >> 31;
 		break;
 	case 15:
-		result = -static_cast<unsigned int>(bytes[0x13]) >> 31;
+		result = (-static_cast<unsigned int>(bytes[0x13]) | static_cast<unsigned int>(bytes[0x13])) >> 31;
 		break;
 	case 16:
 		result = static_cast<unsigned int>(static_cast<signed char>(bytes[0x17]));
@@ -6201,16 +6205,16 @@ unsigned int CMenuPcs::GetWorldParam(int code)
 			iVar3 = iVar3 + 1;
 		} while (iVar3 < 10);
 		if (iVar1 == 0) {
-			result = 1;
+			result = result | 1;
 		} else if (iVar1 == 1) {
-			result = 7;
+			result = result | 7;
 		} else if (iVar1 != -1) {
 			if (iVar1 == -2) {
-				result = 2;
+				result = result | 2;
 			} else if (iVar1 == -3) {
-				result = 3;
+				result = result | 3;
 			} else {
-				result = 6;
+				result = result | 6;
 			}
 		}
 		iVar3 = 0;
@@ -8798,7 +8802,7 @@ void CMenuPcs::CalcCharaSelect()
 						text++;
 					}
 					const int width = static_cast<int>(static_cast<double>(font->GetWidth(text)));
-					if (maxWidth < width) {
+					if (width > maxWidth) {
 						maxWidth = width;
 					}
 				}
@@ -10217,18 +10221,19 @@ void CMenuPcs::SetAnim(int anim)
 	m_wm.m_handles[handleIdx]->LoadAnim(s_wmCharaAnimSleep, animBase++, 1, 0, modelBase, -1, 0);
 	m_wm.m_handles[handleIdx]->LoadAnim(s_wmCharaAnimAngry, animBase, 1, 0, modelBase, -1, 0);
 
-	int* const animState = m_wmCharaAnimState + anim * 5;
+#define animState (m_wmCharaAnimState + anim * 5)
 	animState[0] = 0;
 	animState[1] = -1;
 	animState[2] = rand() % 250;
 
 	const int currentAnimIndex = m_wm.m_handles[handleIdx]->m_currentAnimIndex;
-	const int blendMode = -1 - (currentAnimIndex >> 31);
+	const int blendMode = (static_cast<unsigned int>(currentAnimIndex) >> 31) - 1;
 	m_wm.m_handles[handleIdx]->SetAnim((animBase - 5) + animState[0], -1, -1, blendMode, 1);
 
 	unsigned char* const model = reinterpret_cast<unsigned char*>(m_wm.m_handles[handleIdx]->m_model);
 	reinterpret_cast<float*>(animState)[3] = reinterpret_cast<float*>(model + 0xB4)[0];
 	reinterpret_cast<float*>(animState)[4] = reinterpret_cast<float*>(model + 0xC0)[0];
+#undef animState
 }
 
 /*
@@ -12128,7 +12133,7 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 					text++;
 				}
 				const int width = font->GetWidth(const_cast<char*>(text));
-				if (maxWidth < width) {
+				if (width > maxWidth) {
 					maxWidth = width;
 				}
 			}

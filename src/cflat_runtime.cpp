@@ -2052,7 +2052,7 @@ frameLoop:
 			*object->m_sp++ = returnValue;
 			object->m_localBase = previousLocalBase;
 			object->m_codePos = previousCodePos;
-			object->m_flags = static_cast<u8>((object->m_flags & 0xDF) | ((static_cast<s8>(previousActive) << 5) & 0x20));
+			object->m_flagBits.m_callFlag = static_cast<s8>(previousActive);
 			object->m_waitCounter = static_cast<int>(packedFlags) >> 16;
 			*reinterpret_cast<int*>(&object->m_reqFlag0) = (packedFlags >> 15) & 1;
 			object->m_argCount = static_cast<s16>(packedFlags);
@@ -2137,7 +2137,7 @@ callSystemFunction:
 		*object->m_sp++ = returnValue;
 		object->m_localBase = previousLocalBase;
 		object->m_codePos = previousCodePos;
-		object->m_flags = static_cast<u8>((object->m_flags & 0xDF) | ((static_cast<s8>(previousActive) << 5) & 0x20));
+		object->m_flagBits.m_callFlag = static_cast<s8>(previousActive);
 		object->m_waitCounter = static_cast<int>(packedFlags) >> 16;
 		*reinterpret_cast<int*>(&object->m_reqFlag0) = (packedFlags >> 15) & 1;
 		object->m_argCount = static_cast<s16>(packedFlags);

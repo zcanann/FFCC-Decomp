@@ -12314,7 +12314,6 @@ float CMenuPcs::GetMaxAnimWait()
 void CMenuPcs::BindMcObj()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned int* charaState = reinterpret_cast<unsigned int*>(m_wmCharaState);
 
 	for (int i = 0; i < 4; i++) {
 		EffectInfo* const effectA = &m_effectWork[i + 0x11];
@@ -12335,6 +12334,7 @@ void CMenuPcs::BindMcObj()
 	}
 
 	const float kOne = FLOAT_803313e8;
+	unsigned int* charaState = reinterpret_cast<unsigned int*>(m_wmCharaState);
 	for (int i = 0; i < 4; i++) {
 		const int modelNo = static_cast<int>(charaState[i * 0x12 + 3]);
 		const int slot = i + 0x11;

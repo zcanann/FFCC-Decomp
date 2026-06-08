@@ -1528,7 +1528,6 @@ void CFlatRuntime2::Draw()
 
 		CFlatRuntime2::CDebugDrawCC* entry = DebugDrawCCEntries(runtime);
 		for (int i = 0; i < debugCount; i++) {
-			const u8 flags = entry->m_flags;
 			GXColor* drawColor = &greenColor;
 			if (entry->m_flagBits.m_bit7 != 0) {
 				drawColor = &redColor;
@@ -1563,13 +1562,12 @@ void CFlatRuntime2::Draw()
 			PSMTXConcat(cameraMtx, orientMtx, orientMtx);
 			GXLoadPosMtxImm(orientMtx, GX_PNMTX0);
 
-			const float radius = entry->m_radius;
 			GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, 0x20);
 			float* vtx = ringVerts[0];
 			for (int j = 0; j < 8; j++) {
 				const float angle = static_cast<float>(j) * FLOAT_80330190;
-				vtx[0] = radius * sinf(angle);
-				vtx[1] = radius * cosf(angle);
+				vtx[0] = entry->m_radius * sinf(angle);
+				vtx[1] = entry->m_radius * cosf(angle);
 				vtx[2] = length;
 				if ((entry->m_flags & 0x40) != 0) {
 					GXWGFifo.f32 = vtx[0];
@@ -1589,8 +1587,8 @@ void CFlatRuntime2::Draw()
 			vtx = ringVerts[0];
 			for (int j = 0; j < 8; j++) {
 				const float angle = static_cast<float>(j) * FLOAT_80330190;
-				vtx[0] = radius * sinf(angle);
-				vtx[1] = radius * cosf(angle);
+				vtx[0] = entry->m_radius * sinf(angle);
+				vtx[1] = entry->m_radius * cosf(angle);
 				vtx[2] = length;
 				GXWGFifo.f32 = vtx[0];
 				GXWGFifo.f32 = vtx[1];

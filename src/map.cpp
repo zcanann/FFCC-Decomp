@@ -2543,7 +2543,7 @@ void CMapMng::Calc()
     }
 
     for (int i = 0; i < m_mapObjCount; i++) {
-        MapMng.GetMapObjArray()[i].Calc();
+        MapMng.m_mapObjArray[i].Calc();
     }
 
     CMapTexAnimSet* mapTexAnimSet = m_mapTexAnimSet;
@@ -2555,21 +2555,19 @@ void CMapMng::Calc()
     materialSet->Calc();
 
     for (int i = 0; i < m_octTreeCount; i++) {
-        COctTree* octTree = GetOctTreeArray() + i;
-        LightPcs.InsertOctTree(static_cast<CLightPcs::TARGET>(1), *octTree);
+        LightPcs.InsertOctTree(static_cast<CLightPcs::TARGET>(1), m_octTreeArray[i]);
     }
 
     for (int i = 0; i < m_octTreeCount; i++) {
-        COctTree* octTree = GetOctTreeArray() + i;
-        CMapShadowInsertOctTree(static_cast<CMapShadow::TARGET>(1), *octTree);
+        CMapShadowInsertOctTree(static_cast<CMapShadow::TARGET>(1), m_octTreeArray[i]);
     }
 
     for (int i = 0; i < m_octTreeCount; i++) {
-        GetOctTreeArray()[i].SetDrawFlag();
+        m_octTreeArray[i].SetDrawFlag();
     }
 
     for (int i = 0; i < m_mapObjCount; i++) {
-        MapMng.GetMapObjArray()[i].SetDrawFlag();
+        MapMng.m_mapObjArray[i].SetDrawFlag();
     }
 }
 

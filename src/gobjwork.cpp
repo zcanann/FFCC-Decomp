@@ -1947,6 +1947,9 @@ void CCaravanWork::CalcStatus()
 			case 8:
 				m_statusTimers[2]++;
 				break;
+			case 0x13:
+				m_elementResistances[0]++;
+				break;
 			case 9:
 				m_equipEffectParams[0] += (char)itemValue;
 				break;
@@ -1967,9 +1970,6 @@ void CCaravanWork::CalcStatus()
 				break;
 			case 0x12:
 				m_equipEffectParams[6] += (char)itemValue;
-				break;
-			case 0x13:
-				m_elementResistances[0]++;
 				break;
 			}
 			m_equipEffectFlags |= 1 << itemEffect;

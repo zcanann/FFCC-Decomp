@@ -4349,7 +4349,7 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
             unsigned char* flagByte = reinterpret_cast<unsigned char*>(gameWork.m_eventFlags) + bitIndex / 8;
             unsigned int mask = 1U << (bitIndex % 8);
             unsigned int flag = *flagByte & mask;
-            unsigned int value = (-flag | flag) >> 31;
+            int value = (-flag | flag) >> 31;
             stack[-1].m_word = value;
 
             if (setMode < 0) {

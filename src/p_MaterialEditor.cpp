@@ -170,8 +170,8 @@ void CMaterialEditorPcs::drawViewer()
         _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 
-        GXColor ambColor = kMaterialEditorDefaultColorRgba;
-        GXColor matColor = kMaterialEditorDefaultColorRgba;
+        GXColor ambColor = {0xFF, 0xFF, 0xFF, 0xFF};
+        GXColor matColor = ambColor;
         GXSetChanAmbColor(GX_COLOR0, ambColor);
         GXSetChanMatColor(GX_COLOR0, matColor);
 

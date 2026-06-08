@@ -606,8 +606,8 @@ void JoyBus::ThreadMain(void* arg)
 	ThreadParam* threadParam = (ThreadParam*)arg;
 
     unsigned int padType = 0;
-    unsigned int stateTimeoutTicks = 0;
-    unsigned long long stateStartTime = 0;
+    long long stateTimeoutTicks = 0;
+    long long stateStartTime = 0;
 
     unsigned short localCrc[2];
     unsigned int localWord;
@@ -786,8 +786,8 @@ loop_body:
 
 timeout_expiry:
         {
-            unsigned long long now = OSGetTime();
-            unsigned int elapsed = (unsigned int)(now - stateStartTime);
+            long long now = OSGetTime();
+            long long elapsed = now - stateStartTime;
 
             if (elapsed > stateTimeoutTicks)
             {

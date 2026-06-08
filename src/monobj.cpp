@@ -3950,13 +3950,25 @@ void CGMonObj::statMove(int* targetIndex)
 				static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xC8)),
 				&hitScale, &hitPartyIndex);
 			if (hitPartyIndex >= 0) {
-				goto haveHit;
+				*targetPartyIdx = hitPartyIndex;
+				*chaseState = 2;
+				*chaseTimer = 0;
+				monObj->m_chaseDirty = 1;
+				if (monObj->m_unk6B8 == 0) {
+					void** scriptHandle = object->m_scriptHandle;
+					int randVal = Math.Rand(3);
+					unsigned char* script = reinterpret_cast<unsigned char*>(scriptHandle[9]);
+					prgObj->playSe3D(
+						*reinterpret_cast<unsigned short*>(script + 0x192) +
+							*reinterpret_cast<unsigned short*>(script + 0x190) * 1000 + randVal,
+						0x32, 0x96, 0, reinterpret_cast<Vec*>(NULL));
+					monObj->m_unk6B8 = 1;
+				}
+				break;
 			}
 		}
-		hitPartyIndex = -1;
-	haveHit:;
 
-		if (hitPartyIndex < 0) {
+		{
 			unsigned char* aiData;
 			if (monObj->m_aiState == 0) {
 				aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
@@ -3990,21 +4002,6 @@ void CGMonObj::statMove(int* targetIndex)
 				}
 				break;
 			}
-			}
-		} else {
-			*targetPartyIdx = hitPartyIndex;
-			*chaseState = 2;
-			*chaseTimer = 0;
-			monObj->m_chaseDirty = 1;
-			if (monObj->m_unk6B8 == 0) {
-				void** scriptHandle = object->m_scriptHandle;
-				int randVal = Math.Rand(3);
-				unsigned char* script = reinterpret_cast<unsigned char*>(scriptHandle[9]);
-				prgObj->playSe3D(
-					*reinterpret_cast<unsigned short*>(script + 0x192) +
-						*reinterpret_cast<unsigned short*>(script + 0x190) * 1000 + randVal,
-					0x32, 0x96, 0, reinterpret_cast<Vec*>(NULL));
-				monObj->m_unk6B8 = 1;
 			}
 		}
 		break;

@@ -906,6 +906,8 @@ void CShopMenu::Destroy()
  * Address:	TODO
  * Size:	TODO
  */
+#pragma push
+#pragma peephole off
 void CShopMenu::DrawItemHelp(int index, int centerX, int y)
 {
     int itemNo = getItemNo(index);
@@ -951,6 +953,7 @@ void CShopMenu::DrawItemHelp(int index, int centerX, int y)
     font->Draw(helpText);
     delete[] helpText;
 }
+#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x801507e0
@@ -1313,6 +1316,8 @@ void CShopMenu::DrawBuySellInfo()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_common_subs off
 void CShopMenu::DrawItemList()
 {
     int y = 0x4C;
@@ -1405,6 +1410,7 @@ void CShopMenu::DrawItemList()
         drawShapeSeqScale(2, 0, 0x24E, 0xEC, scale, scale, alpha);
     }
 }
+#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x801524C4
@@ -1480,6 +1486,8 @@ inline void CShopMenu::DrawObi(int)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_propagation off
 void CShopMenu::DrawMakeBase()
 {
     MenuPcs.DrawSingleBase(FLOAT_80332d28);
@@ -1531,6 +1539,7 @@ void CShopMenu::DrawMakeBase()
     }
     drawShapeSeq(3, 0, x, 0x8C, 0xFF, 1, 0, FLOAT_80332d9c, 0);
 }
+#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x80152B2C
@@ -2047,6 +2056,8 @@ void CShopMenu::DrawSmith0()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_lifetimes off
 void CShopMenu::DrawShop0()
 {
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
@@ -2110,6 +2121,7 @@ void CShopMenu::DrawShop0()
     MenuPcs.DrawInit();
     Graphic.SetDrawDoneDebugData(0x28);
 }
+#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x801553a8
@@ -3048,6 +3060,8 @@ void drawShapeSeqGrouad(int shapeNo, int groupNo, int x, int y, float scaleX, fl
  * Address:	TODO
  * Size:	TODO
  */
+#pragma push
+#pragma peephole off
 void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, float scaleY, unsigned char alpha)
 {
     Mtx44 projectionMtx;
@@ -3103,6 +3117,7 @@ void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, flo
         displayList += 8;
     }
 }
+#pragma pop
 /*
  * --INFO--
  * Address:	TODO

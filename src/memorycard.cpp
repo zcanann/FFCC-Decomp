@@ -1479,45 +1479,41 @@ void CMemoryCardMan::SetLoadData()
 
     }
 
-    int wm = gameWork->m_wmBackupParams[0];
-    CCaravanWork* wmWork = &Game.m_caravanWorkArr[wm];
-    if (wmWork->m_shopState == 0)
+    CCaravanWork* wmWork0 = &Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[0]];
+    if (wmWork0->m_shopState == 0)
     {
-        gameWork->m_wmBackupParams[0] = -1;
+        Game.m_gameWork.m_wmBackupParams[0] = -1;
     }
-    if (wmWork->m_shopBusyFlag != 0)
+    if (wmWork0->m_shopBusyFlag != 0)
     {
-        gameWork->m_wmBackupParams[0] = -1;
+        Game.m_gameWork.m_wmBackupParams[0] = -1;
     }
-    wm = gameWork->m_wmBackupParams[1];
-    wmWork = &Game.m_caravanWorkArr[wm];
-    if (wmWork->m_shopState == 0)
+    CCaravanWork* wmWork1 = &Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[1]];
+    if (wmWork1->m_shopState == 0)
     {
-        gameWork->m_wmBackupParams[1] = -1;
+        Game.m_gameWork.m_wmBackupParams[1] = -1;
     }
-    if (wmWork->m_shopBusyFlag != 0)
+    if (wmWork1->m_shopBusyFlag != 0)
     {
-        gameWork->m_wmBackupParams[1] = -1;
+        Game.m_gameWork.m_wmBackupParams[1] = -1;
     }
-    wm = gameWork->m_wmBackupParams[2];
-    wmWork = &Game.m_caravanWorkArr[wm];
-    if (wmWork->m_shopState == 0)
+    CCaravanWork* wmWork2 = &Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[2]];
+    if (wmWork2->m_shopState == 0)
     {
-        gameWork->m_wmBackupParams[2] = -1;
+        Game.m_gameWork.m_wmBackupParams[2] = -1;
     }
-    if (wmWork->m_shopBusyFlag != 0)
+    if (wmWork2->m_shopBusyFlag != 0)
     {
-        gameWork->m_wmBackupParams[2] = -1;
+        Game.m_gameWork.m_wmBackupParams[2] = -1;
     }
-    wm = gameWork->m_wmBackupParams[3];
-    wmWork = &Game.m_caravanWorkArr[wm];
-    if (wmWork->m_shopState == 0)
+    CCaravanWork* wmWork3 = &Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[3]];
+    if (wmWork3->m_shopState == 0)
     {
-        gameWork->m_wmBackupParams[3] = -1;
+        Game.m_gameWork.m_wmBackupParams[3] = -1;
     }
-    if (wmWork->m_shopBusyFlag != 0)
+    if (wmWork3->m_shopBusyFlag != 0)
     {
-        gameWork->m_wmBackupParams[3] = -1;
+        Game.m_gameWork.m_wmBackupParams[3] = -1;
     }
 
     Game.LoadScript(reinterpret_cast<char*>(save + 0x62D0));

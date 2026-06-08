@@ -4339,7 +4339,7 @@ int GbaQueue::GetTmpArtifactData(int channel, unsigned char* outData)
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	for (int i = 0; i < 4; i++) {
-		tmpArtifacts[i] = SwapU16(localPlayerData.m_tmpArtifacts[i]);
+		tmpArtifacts[i] = __lhbrx(&localPlayerData.m_tmpArtifacts[i], 0);
 	}
 	memcpy(outData, tmpArtifacts, sizeof(tmpArtifacts));
 

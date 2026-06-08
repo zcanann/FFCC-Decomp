@@ -2433,26 +2433,28 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 		return;
 	}
 
-	u16 blendFrames = 0;
+	int blendFrames = 0;
 	if (ModelAttachMode(this) == 0) {
-		blendFrames = (AnimFlags(m_anim) & 0x80) != 0 ? static_cast<u16>(blendMode) : 0;
+		blendFrames = (AnimFlags(m_anim) & 0x80) != 0 ? blendMode : 0;
 	} else if (ModelAttachMode(this) == 1) {
-		blendFrames = static_cast<u16>(blendMode);
+		blendFrames = blendMode;
 	}
 
-	*reinterpret_cast<u16*>(reinterpret_cast<u8*>(this) + 0xD8) = blendFrames;
-	*reinterpret_cast<u16*>(reinterpret_cast<u8*>(this) + 0xDA) = blendFrames;
+	m_blendCur = static_cast<u16>(blendFrames);
+	m_blendMax = m_blendCur;
 
 	if (startFrame < 0) {
 		startFrame = 0;
 	}
+
+	m_curFrame = static_cast<float>(startFrame);
+	m_time = m_curFrame;
+	m_animStart = m_curFrame;
+
 	if (endFrame < 0) {
 		endFrame = static_cast<int>(AnimFrameCount(m_anim)) - 1;
 	}
 
-	m_animStart = static_cast<float>(startFrame);
-	m_curFrame = m_animStart;
-	m_time = m_animStart;
 	m_animEnd = static_cast<float>(endFrame);
 }
 

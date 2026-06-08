@@ -1100,21 +1100,21 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		if (pickResult >= 0) {
 			MogWork().m_pickTicks++;
 
-			if (Chara.MogFur().m_score[0] >= MogWork().m_prevScoreA + 5) {
+			if (MogWork().m_prevScoreA + 5 <= Chara.MogFur().m_score[0]) {
 				MogWork().m_prevScoreA = Chara.MogFur().m_score[0];
 				messageId = 1;
 			} else if (Chara.MogFur().m_score[0] < MogWork().m_prevScoreA - 5) {
 				MogWork().m_prevScoreA = Chara.MogFur().m_score[0];
 				messageId = 6;
 			}
-			if (Chara.MogFur().m_score[1] >= MogWork().m_prevScoreB + 5) {
+			if (MogWork().m_prevScoreB + 5 <= Chara.MogFur().m_score[1]) {
 				MogWork().m_prevScoreB = Chara.MogFur().m_score[1];
 				messageId = 1;
 			} else if (Chara.MogFur().m_score[1] < MogWork().m_prevScoreB - 5) {
 				MogWork().m_prevScoreB = Chara.MogFur().m_score[1];
 				messageId = 6;
 			}
-			if (Chara.MogFur().m_score[2] >= MogWork().m_prevScoreC + 5) {
+			if (MogWork().m_prevScoreC + 5 <= Chara.MogFur().m_score[2]) {
 				MogWork().m_prevScoreC = Chara.MogFur().m_score[2];
 				messageId = 1;
 			} else if (Chara.MogFur().m_score[2] < MogWork().m_prevScoreC - 5) {
@@ -1124,9 +1124,9 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 
 			if (pickResult == 0) {
 				MogWork().m_idleTicks++;
-				if (MogWork().m_idleTicks == 0x3C && messageId < 0) {
+				if (MogWork().m_idleTicks == 0x3C && messageId == -1) {
 					messageId = 3;
-				} else if (MogWork().m_idleTicks == 0xF0 && messageId < 0) {
+				} else if (MogWork().m_idleTicks == 0xF0 && messageId == -1) {
 					messageId = 4;
 				}
 			} else {
@@ -1195,19 +1195,19 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 				}
 
 				if (MogWork().m_offColorTicks == 10) {
-					if (messageId < 0) {
+					if (messageId == -1) {
 						messageId = 2;
 					}
 					MogWork().m_offColorTicks = 0x0B;
 				}
 				if (MogWork().m_eraseTicks == 10) {
-					if (messageId < 0) {
+					if (messageId == -1) {
 						messageId = 5;
 					}
 					MogWork().m_eraseTicks = 0x0B;
 				}
 				if (MogWork().m_eraseTicks == 0x32) {
-					if (messageId < 0) {
+					if (messageId == -1) {
 						messageId = 6;
 					}
 					MogWork().m_eraseTicks = 0x33;

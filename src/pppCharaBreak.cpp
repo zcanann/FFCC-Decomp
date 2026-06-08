@@ -19,9 +19,9 @@
 #include "ffcc/ppp_linkage.h"
 
 extern const Vec kPppCharaBreakUpVector = {0.0f, 1.0f, 0.0f};
-extern const int kCharaBreakInitialVertexFlag0 = 0;
-extern const int kCharaBreakInitialVertexFlag1 = 0;
-extern const int kCharaBreakInitialVertexFlag2 = 0;
+extern const int kCharaBreakInitialVertexFlag0;
+extern const int kCharaBreakInitialVertexFlag1;
+extern const int kCharaBreakInitialVertexFlag2;
 static const char s_pppCharaBreak_cpp[] = "pppCharaBreak.cpp";
 extern const float kPppCharaBreakZero = 0.0f;
 extern const float kPppCharaBreakOne = 1.0f;
@@ -973,3 +973,7 @@ static int CharaBreak_BeforeCalcMatrixCallback(CChara::CModel* model, void* mode
 
     return (u32)__cntlzw(1 - (u32)stepData->m_worldSpaceMode) >> 5;
 }
+
+const int kCharaBreakInitialVertexFlag0 = 0;
+const int kCharaBreakInitialVertexFlag1 = 0;
+const int kCharaBreakInitialVertexFlag2 = 0;

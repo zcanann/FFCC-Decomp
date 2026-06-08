@@ -5087,7 +5087,7 @@ void CMenuPcs::DrawMoveMenu()
 		WmMenuLightTable& lightTable = gWmMenuLightTables[0];
 		LightPcs.SetAmbient(lightTable.m_ambient);
 		LightPcs.SetNumDiffuse(lightTable.m_diffuseCount);
-		for (int lightIndex = 0; lightIndex < lightTable.m_diffuseCount; lightIndex++) {
+		for (unsigned int lightIndex = 0; lightIndex < lightTable.m_diffuseCount; lightIndex++) {
 			LightPcs.SetDiffuse(
 				lightIndex, lightTable.m_diffuseColors[lightIndex],
 				&lightTable.m_diffuseDirs[lightIndex], 0);
@@ -5098,7 +5098,7 @@ void CMenuPcs::DrawMoveMenu()
 			*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(m_effectWork) + 0x1E70) = handle->m_model->m_lightAlpha;
 			handle->Draw(5);
 			pppFVECTOR4 color;
-			const short partColorIndex = m_crystalPart;
+			const unsigned short partColorIndex = m_crystalPart;
 			PartPcs.GetParColIdx(partColorIndex, color);
 			color.w = handle->m_model->m_lightAlpha;
 			PartPcs.SetParColIdx(partColorIndex, color);

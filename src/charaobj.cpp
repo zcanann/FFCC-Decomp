@@ -3395,9 +3395,9 @@ void CGCharaObj::combi2()
 		}
 		continue;
 	changed:
-		comboFlags->m_nearby = hasNearbyPartner ? -1 : 0;
+		comboFlags->m_nearby = -static_cast<int>(hasNearbyPartner != 0);
 		comboFlags->m_active = -1;
-		party->playSe3D(hasNearbyPartner ? 0x3E : 0x3D, 0x32, 0x96, 0, 0);
+		party->playSe3D(0x3D + static_cast<int>(hasNearbyPartner != 0), 0x32, 0x96, 0, 0);
 	}
 
 	for (int i = 0; i < candidateCount - 1; i++) {
@@ -3457,7 +3457,7 @@ void CGCharaObj::combi2()
 	}
 
 	const short comboCmd = comboData[0xC];
-	const bool isSharedResult = comboData[participantCount * 3 - 3] != 0x1F8;
+	const int isSharedResult = comboData[participantCount * 3 - 3] != 0x1F8;
 	if (isSharedResult) {
 		comboCenter.Identity();
 		for (int i = 0; i < participantCount; i++) {

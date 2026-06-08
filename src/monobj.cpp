@@ -595,16 +595,21 @@ void CGMonObj::onChangeStat(int state)
 		*reinterpret_cast<int*>(mon + 0x55C) = *reinterpret_cast<int*>(mon + 0x558) + 1;
 
 		actionType = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<int*>(mon + 0x560) * 0x48 + 0xE);
-		if ((actionType == 3) || ((actionType < 2) && (actionType >= 0))) {
+		switch (actionType) {
+		case 0:
+		case 1:
+		case 3:
 			*reinterpret_cast<unsigned int*>(mon + 0x630) =
 				*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<int*>(mon + 0x560) * 0x48 + 0x20);
 			*reinterpret_cast<unsigned int*>(mon + 0x634) =
 				*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (*reinterpret_cast<int*>(mon + 0x560) * 0x48 + 0x22));
 			*reinterpret_cast<unsigned int*>(mon + 0x638) =
 				*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (*reinterpret_cast<int*>(mon + 0x560) * 0x48 + 0x22));
-		} else if (actionType == 2) {
+			break;
+		case 2:
 			*reinterpret_cast<unsigned int*>(mon + 0x68C) =
 				CGCharaObj::calcCastTime(*reinterpret_cast<int*>(mon + 0x560));
+			break;
 		}
 	}
 

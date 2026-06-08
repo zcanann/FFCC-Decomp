@@ -2200,7 +2200,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	char** subjectTable = Game.m_cFlatDataArr[1].TableStrings(5);
 	char tempName[kGbaQueueLetterTempNameBytes];
 
-	for (int i = 0; i < caravanWork->m_letterCount; i++) {
+	for (int i = 0; i < static_cast<int>(letterCount); i++) {
 		int matchedSubject = -1;
 		int matchedNpc = -1;
 
@@ -2293,7 +2293,7 @@ System.Printf(const_cast<char*>(s_letter_data_error), const_cast<char*>(s_gbaque
 	header[0] = SwapU32(letterCount);
 	header[1] = SwapU32(subjectCount);
 	header[2] = SwapU32(npcCount);
-	header[3] = reinterpret_cast<unsigned int*>(&CFlat)[0x1042];
+	header[3] = reinterpret_cast<unsigned int*>(&CFlat)[0x4102];
 
 	memcpy(outData, header, sizeof(header));
 

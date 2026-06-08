@@ -774,10 +774,10 @@ void CGPartyObj::menu()
 			}
 			int connected = bVar3 ? 0 : Pad.GetPadInputs()[slot & ~((~(Pad.m_debugPadPort - slot | slot - Pad.m_debugPadPort) >> 0x1F))].gbaMode;
 			if (connected == 0) {
-				if ((CFlatEventFlagsByte() & CFlatEventFlagByte_GbaSound) != 0) {
+				if ((CFlatEventFlags() & CFlatEventFlagByte_GbaSound) != 0) {
 					Sound.PlaySe(7, 0x40, 0x7F, 0);
 				}
-			} else if ((CFlatEventFlagsByte() & CFlatEventFlagByte_GbaSound) != 0) {
+			} else if ((CFlatEventFlags() & CFlatEventFlagByte_GbaSound) != 0) {
 				Sound.PlaySe(8, 0x40, 0x7F, 0);
 			}
 
@@ -827,7 +827,7 @@ void CGPartyObj::menu()
 	}
 
 	Joybus.ChgCtrlMode(reinterpret_cast<int>(portIndex));
-	if ((CFlatEventFlagsByte() & CFlatEventFlagByte_GbaSound) != 0) {
+	if ((CFlatEventFlags() & CFlatEventFlagByte_GbaSound) != 0) {
 		Sound.PlaySe(8, 0x40, 0x7F, 0);
 	}
 }

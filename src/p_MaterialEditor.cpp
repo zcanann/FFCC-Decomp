@@ -207,7 +207,7 @@ void CMaterialEditorPcs::drawViewer()
                     int srcFactor = 1;
                     int dstFactor = 1;
                     int src = blendMode & 3;
-                    unsigned int dst = (blendMode >> 2) & 3;
+                    int dst = (blendMode >> 2) & 3;
 
                     if ((src == 0) && (dst == 0)) {
                         srcFactor = 4;

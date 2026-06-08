@@ -322,9 +322,10 @@ inline void CTexAnimSeq::Interp(float frame, Vec& texGen)
         }
 
         if (((float)keyData->m_frame <= currentFrame) && (currentFrame < nextFrame)) {
-            float t = kTexAnimZero;
+            float t;
             float frameSpan = nextFrame - (float)keyData->m_frame;
             if (frameSpan == kTexAnimZero) {
+                t = kTexAnimZero;
             } else {
                 t = (currentFrame - (float)keyData->m_frame) / frameSpan;
             }

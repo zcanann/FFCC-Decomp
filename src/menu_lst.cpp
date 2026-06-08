@@ -78,24 +78,24 @@ void CMenuPcs::MLstDraw()
 
 			if ((menuMode == 1) && (i == this->m_menuLstState->cursor)) {
 				x = (float)(x + 20.0);
-				v += (float)((double)item->height);
+				v += (float)item->height;
 			}
 
 			MenuPcs.DrawRect(0, x, y, w, h, zero, v, item->z, item->z, zero);
 
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x5c));
-			float iconX = (float)item->x;
+			float iconX = (float)((double)item->x - kMLstRowHeight * kMLstHalfDouble);
 			float iconY = (float)(item->y - 6);
 			v = zero;
 			if ((menuMode == 1) && (i == this->m_menuLstState->cursor)) {
-				v += (float)((double)item->height);
+				v += (float)item->height;
 			}
 			MenuPcs.DrawRect(
 				0,
-				(float)-((kMLstRowHeight * kMLstHalfDouble) - (double)iconX),
+				iconX,
 				iconY,
-				40.0f,
-				40.0f,
+				kMLstRowHeight,
+				kMLstRowHeight,
 				zero,
 				v,
 				item->z,
@@ -150,7 +150,7 @@ void CMenuPcs::MLstDraw()
 		helpFont,
 		(int)helpX,
 		(int)helpY,
-		CColor(0xff, 0xff, 0xff, (unsigned char)(255.0f * this->m_menuLstList->entries[0].alpha)).color,
+		CColor(0xff, 0xff, 0xff, (signed char)(255.0f * this->m_menuLstList->entries[0].alpha)).color,
 		0x0a,
 		kMLstOne,
 		3.0f);

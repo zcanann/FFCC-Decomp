@@ -458,13 +458,11 @@ noReset:
 		setupEntry->startFrame = 7;
 		setupEntry->duration = 5;
 
-		unsigned int entryCount = compaList->count;
-		CompaOpenAnim* entry = compaList->entries;
-		while (entryCount != 0) {
+		CompaOpenAnim* entry = this->m_compaList->entries;
+		for (int entryCount = this->m_compaList->count; entryCount > 0; entryCount--) {
 			entry->frame = 0;
 			entry->alpha = LoadFloat(kCompaOne);
 			entry++;
-			entryCount--;
 		}
 	}
 }

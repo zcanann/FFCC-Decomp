@@ -1014,13 +1014,7 @@ comm_fail:
         *reinterpret_cast<int*>(param + 0x9C) = 1;
         param[0xC3] = 0;
 
-        if (param[0xC7] < 2)
-        {
-            ret = GBAJoyBoot(channel, channel << 1, 2, *reinterpret_cast<u8**>(param + 0x8C),
-                             *reinterpret_cast<int*>(param + 0x90), param + 0xC0);
-            param[0xC7]++;
-        }
-        else
+        if (param[0xC7] >= 2)
         {
             ret = 1;
             for (unsigned int i = 0; i < 100; i++)
@@ -1032,6 +1026,12 @@ comm_fail:
                     break;
                 }
             }
+        }
+        else
+        {
+            ret = GBAJoyBoot(channel, channel << 1, 2, *reinterpret_cast<u8**>(param + 0x8C),
+                             *reinterpret_cast<int*>(param + 0x90), param + 0xC0);
+            param[0xC7]++;
         }
 
         if (ret == 0)

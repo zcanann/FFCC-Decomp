@@ -311,12 +311,12 @@ extern double DOUBLE_80331408;
 extern double DOUBLE_803314e8;
 extern unsigned char s_wmWorldParamPrimaryDirtyMask;
 extern unsigned char s_wmWorldParamSecondaryDirtyMask;
-extern char s_wmCharaAnimStand[];
-extern char s_wmCharaAnimWalk[];
-extern char s_wmCharaAnimRun[];
-extern char s_wmCharaAnimGlad[];
-extern char s_wmCharaAnimSleep[];
-extern char s_wmCharaAnimAngry[];
+extern char s_wmCharaAnimStand[6];
+extern char s_wmCharaAnimWalk[5];
+extern char s_wmCharaAnimRun[4];
+extern char s_wmCharaAnimGlad[5];
+extern char s_wmCharaAnimSleep[6];
+extern char s_wmCharaAnimAngry[6];
 const char* s_wmEmptyCreatingTextEn_8032E8F0[] = {s_Empty_803313A4, s_Creating_801DC250};
 const char* s_wmEmptyCreatingTextDe_8032E8F8[] = {s_Frei_803313AC, s_Wird_kreiert_801DC25C};
 const char* s_wmEmptyCreatingTextIt_8032E900[] = {s_Vuoto_803313B4, s_Creazione_801DC26C};
@@ -10123,33 +10123,32 @@ void CMenuPcs::ChgModel(int slot, int tribe, int job, int isFemale)
 void CMenuPcs::SetAnim(int anim)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	CCharaPcs::CHandle** const handles = GetWmCharaHandles(this);
-	CCharaPcs::CHandle* const handle = handles[anim];
-	if (handle->m_charaKind == 3) {
+	const int handleIdx = anim + 0x20;
+	if (m_wm.m_handles[handleIdx]->m_charaKind == 3) {
 		return;
 	}
 
-	const unsigned int charaNo = handle->m_charaNo;
+	const unsigned int charaNo = m_wm.m_handles[handleIdx]->m_charaNo;
 	const int modelBase = static_cast<int>(charaNo / 100) * 100;
-	const int animBase = (static_cast<int>(charaNo / 100) - 1) * 6;
+	int animBase = (static_cast<int>(charaNo / 100) - 1) * 6;
 
-	handle->LoadAnim(s_wmCharaAnimStand, animBase + 0, 1, 0, modelBase, -1, 0);
-	handles[anim]->LoadAnim(s_wmCharaAnimWalk, animBase + 1, 1, 0, modelBase, -1, 0);
-	handles[anim]->LoadAnim(s_wmCharaAnimRun, animBase + 2, 1, 0, modelBase, -1, 0);
-	handles[anim]->LoadAnim(s_wmCharaAnimGlad, animBase + 3, 3, 0, modelBase, -1, 0);
-	handles[anim]->LoadAnim(s_wmCharaAnimSleep, animBase + 4, 1, 0, modelBase, -1, 0);
-	handles[anim]->LoadAnim(s_wmCharaAnimAngry, animBase + 5, 1, 0, modelBase, -1, 0);
+	m_wm.m_handles[handleIdx]->LoadAnim(s_wmCharaAnimStand, animBase++, 1, 0, modelBase, -1, 0);
+	m_wm.m_handles[handleIdx]->LoadAnim(s_wmCharaAnimWalk, animBase++, 1, 0, modelBase, -1, 0);
+	m_wm.m_handles[handleIdx]->LoadAnim(s_wmCharaAnimRun, animBase++, 1, 0, modelBase, -1, 0);
+	m_wm.m_handles[handleIdx]->LoadAnim(s_wmCharaAnimGlad, animBase++, 3, 0, modelBase, -1, 0);
+	m_wm.m_handles[handleIdx]->LoadAnim(s_wmCharaAnimSleep, animBase++, 1, 0, modelBase, -1, 0);
+	m_wm.m_handles[handleIdx]->LoadAnim(s_wmCharaAnimAngry, animBase, 1, 0, modelBase, -1, 0);
 
 	int* const animState = m_wmCharaAnimState + anim * 5;
 	animState[0] = 0;
 	animState[1] = -1;
 	animState[2] = rand() % 250;
 
-	const int currentAnimIndex = handles[anim]->m_currentAnimIndex;
+	const int currentAnimIndex = m_wm.m_handles[handleIdx]->m_currentAnimIndex;
 	const int blendMode = -1 - (currentAnimIndex >> 31);
-	handles[anim]->SetAnim(animBase + animState[0], -1, -1, blendMode, 1);
+	m_wm.m_handles[handleIdx]->SetAnim((animBase - 5) + animState[0], -1, -1, blendMode, 1);
 
-	unsigned char* const model = reinterpret_cast<unsigned char*>(handles[anim]->m_model);
+	unsigned char* const model = reinterpret_cast<unsigned char*>(m_wm.m_handles[handleIdx]->m_model);
 	reinterpret_cast<float*>(animState)[3] = reinterpret_cast<float*>(model + 0xB4)[0];
 	reinterpret_cast<float*>(animState)[4] = reinterpret_cast<float*>(model + 0xC0)[0];
 }

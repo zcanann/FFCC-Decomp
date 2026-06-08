@@ -4288,6 +4288,7 @@ int JoyBus::SendMBase(ThreadParam* threadParam)
             m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = wordX;
             m_cmdCount[threadParam->m_portIndex]++;
             OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+            result = 0;
         }
     }
 

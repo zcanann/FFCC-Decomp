@@ -1755,10 +1755,10 @@ void CShopMenu::DrawSoubi()
 {
     DrawSoubiBase();
 
-    unsigned int resultItem = m_resultItem;
+    int resultItem = m_resultItem;
     drawShapeSeq(0xF, 0, 0xA8, 0x5A, 0xFF, 0, 0, FLOAT_80332d9c, 0);
     MenuPcs.DrawInit();
-    MenuPcs.DrawSingleIcon(resultItem, 0x40, 0x42, FLOAT_80332d28, 0, FLOAT_80332d28);
+    MenuPcs.DrawSingleIcon(m_resultItem, 0x40, 0x42, FLOAT_80332d28, 0, FLOAT_80332d28);
 
     CFont* font = MenuPcs.m_fonts[0];
     font->SetMargin(FLOAT_80332d28);
@@ -1776,7 +1776,7 @@ void CShopMenu::DrawSoubi()
     MenuPcs.DrawShadowFont(font, itemName, FLOAT_80332d54, 112.0f, 0x18, 0x12);
     MenuPcs.DrawInit();
 
-    DrawItemInfo(resultItem, 0x98, 0x7E, 0x98, 0x9C, 0, 0, 0);
+    DrawItemInfo(m_resultItem, 0x98, 0x7E, 0x98, 0x9C, 0x98, 0xBA, 0x138);
     MenuPcs.DrawInit();
 
     int barX = 0x1F6;
@@ -1787,24 +1787,27 @@ void CShopMenu::DrawSoubi()
     drawShapeSeq(0xB, 0, 0x226, 0x158, 0xFF, 0, 0, FLOAT_80332d9c, 0);
     drawShapeSeq(1, 1, barX, 0x17C, 0xFF, 0, 0, FLOAT_80332d9c, 0);
 
-    int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
     CFont* labelFont = MenuPcs.m_fonts[4];
     labelFont->SetMargin(FLOAT_80332d28);
     labelFont->SetShadow(0);
+    {
+        CColor labelWhite(0xFF, 0xFF, 0xFF, 0xFF);
+        labelFont->SetColor(labelWhite.color);
+    }
     labelFont->SetScaleX(FLOAT_80332d2c);
     labelFont->SetScaleY(FLOAT_80332d28);
-    labelFont->SetColor(white.color);
+    labelFont->DrawInit();
 
+    int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+    labelFont->SetPosY(312.0f);
     char* equipText = ShopMenuMes(languageId, SHOP_MENU_TEXT_EQUIP);
     float equipTextX = CalcCenteredShopMenuX(labelFont, equipText);
-    labelFont->DrawInit();
     labelFont->SetPosX(equipTextX);
     labelFont->SetPosY(312.0f);
     labelFont->Draw(equipText);
 
     char* cancelText = ShopMenuMes(languageId, SHOP_MENU_TEXT_CANCEL);
     float cancelTextX = CalcCenteredShopMenuX(labelFont, cancelText);
-    labelFont->DrawInit();
     labelFont->SetPosX(cancelTextX);
     labelFont->SetPosY(346.0f);
     labelFont->Draw(cancelText);

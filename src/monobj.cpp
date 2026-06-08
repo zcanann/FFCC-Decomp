@@ -3080,9 +3080,8 @@ void CGMonObj::moveFrame()
 	(this->*m_funcs->moveFrame)();
 
 	if ((moveFlags & 1) != 0) {
-		CGCharaObj* target = m_moveWork.m_target;
 		{
-			CVector tmp(target->m_worldPosition);
+			CVector tmp(m_moveWork.m_target->m_worldPosition);
 			local_68.x = tmp.x;
 			local_68.y = tmp.y;
 			local_68.z = tmp.z;
@@ -3090,7 +3089,7 @@ void CGMonObj::moveFrame()
 		in_f29 = PSVECDistance(reinterpret_cast<Vec*>(&local_68), &object->m_worldPosition);
 
 		if (((moveFlags & 0x30000) != 0) && (AStar.m_portalCount != 0)) {
-			short targetAStarGroupId = target->m_aStarGroupId;
+			short targetAStarGroupId = m_moveWork.m_target->m_aStarGroupId;
 			moveAStar(aStarGroupId, targetAStarGroupId, local_68);
 		}
 	} else if ((moveFlags & 2) != 0) {
@@ -3108,8 +3107,9 @@ void CGMonObj::moveFrame()
 		}
 	} else if ((moveFlags & 0x2000) != 0) {
 		CVector tmpTarget(m_moveWork.m_targetPos);
+		CVector tmpWorld(object->m_worldPosition);
 		CVector result;
-		PSVECAdd(&object->m_worldPosition, reinterpret_cast<Vec*>(&tmpTarget), reinterpret_cast<Vec*>(&result));
+		PSVECAdd(reinterpret_cast<Vec*>(&tmpWorld), reinterpret_cast<Vec*>(&tmpTarget), reinterpret_cast<Vec*>(&result));
 		local_68.x = result.x;
 		local_68.y = result.y;
 		local_68.z = result.z;
@@ -3194,24 +3194,27 @@ void CGMonObj::moveFrame()
 		stepDist = moveSpeed;
 	}
 
-	Vec moveDelta;
+	CVector moveDelta;
 	if ((moveFlags & 0x1000) == 0) {
-		if (fabsf(distance) >= 0.001f) {
-			PSVECScale(reinterpret_cast<Vec*>(&local_74), &moveDelta, (1.0f / distance) * stepDist);
+		if (fabsf(distance) < 0.001f) {
+			CVector zero(0.0f, 0.0f, 0.0f);
+			moveDelta.x = zero.x;
+			moveDelta.y = zero.y;
+			moveDelta.z = zero.z;
 		} else {
-			moveDelta.x = 0.0f;
-			moveDelta.y = 0.0f;
-			moveDelta.z = 0.0f;
+			PSVECScale(reinterpret_cast<Vec*>(&local_74), static_cast<Vec*>(moveDelta), (1.0f / distance) * stepDist);
 		}
 	} else {
-		moveDelta = local_74;
+		moveDelta.x = local_74.x;
+		moveDelta.y = local_74.y;
+		moveDelta.z = local_74.z;
 	}
 
 	if ((moveFlags & 0x4000) == 0) {
 		object->m_groundHitOffset.x += moveDelta.x;
 		object->m_groundHitOffset.z += moveDelta.z;
 	} else {
-		PSVECAdd(&object->m_groundHitOffset, &moveDelta, &object->m_groundHitOffset);
+		PSVECAdd(&object->m_groundHitOffset, static_cast<Vec*>(moveDelta), &object->m_groundHitOffset);
 	}
 
 	if ((moveFlags & 0x8000) == 0) {

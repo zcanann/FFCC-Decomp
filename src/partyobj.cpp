@@ -3342,10 +3342,11 @@ void CGPartyObj::statPut()
 	    Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
 	    (static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
 	    reinterpret_cast<int*>(m_scriptHandle)[0xED] != 0) {
+		unsigned int chalice = Game.unk_flat3_0xc7d0;
 		if (m_stateFrame == 0) {
 			CancelMove(1);
 			FLOAT_8032EE80 = FLOAT_80331AB0;
-			FLOAT_8032EE84 = *reinterpret_cast<float*>(Game.unk_flat3_0xc7d0 + 0x160) - m_worldPosition.y;
+			FLOAT_8032EE84 = *reinterpret_cast<float*>(chalice + 0x160) - m_worldPosition.y;
 		}
 
 		if (m_stateFrame <= 0x0B) {

@@ -428,7 +428,7 @@ void birth(
 
     pppUnitMatrix(*(pppFMATRIX*)&particleData->m_matrix);
 
-    if ((s8)params->m_spawnMode < 8) {
+    if (params->m_spawnMode < 8) {
         Vec baseDirection;
         Vec angles;
         Vec forward;

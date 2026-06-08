@@ -545,7 +545,7 @@ void CMenuPcs::FavoInit()
 	float fVar7;
 	short sVar9;
 	short sVar10;
-	short sVar11;
+	unsigned short sVar11;
 	int iVar16;
 	int iVar17;
 

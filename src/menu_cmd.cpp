@@ -1805,11 +1805,13 @@ unsigned int CMenuPcs::CmdOpen0()
 				entry->dy = fVar1;
 			} else {
 				entry->timer++;
-				const float t = static_cast<float>(
+				entry->alpha = static_cast<float>(
 					(kCmdMenuOneD / static_cast<double>(entry->duration)) *
 					static_cast<double>(entry->timer));
-				entry->alpha = t;
 				if ((entry->flags & 2) == 0) {
+					const float t = static_cast<float>(
+						(kCmdMenuOneD / static_cast<double>(entry->duration)) *
+						static_cast<double>(entry->timer));
 					const float dx = entry->targetX - static_cast<float>(entry->x);
 					const float dy = entry->targetY - static_cast<float>(entry->y);
 					entry->dx = t * dx;

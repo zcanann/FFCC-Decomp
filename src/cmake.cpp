@@ -2056,7 +2056,8 @@ void CMenuPcs::CmakeTribeDraw()
     hairFont->SetShadow(1);
     hairFont->SetScale(1.0f);
     hairFont->DrawInit();
-    hairFont->SetColor(tribeRgba.color);
+    CColor hairRgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a));
+    hairFont->SetColor(hairRgba.color);
     hairFont->SetTlut(6);
 
     int hairBase = MenuS16(this, 0x862) * 8;

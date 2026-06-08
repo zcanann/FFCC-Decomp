@@ -4081,8 +4081,8 @@ void CGPartyObj::SetBonusCondition(int useRandom, int bonus0, int bonus1, int bo
 
 				int* scan = chosenBonus;
 				int duplicateIndex = 0;
-				for (int n = chosenCount; n != 0; n--) {
-					if (*scan == bonusIndex) {
+				while (duplicateIndex < chosenCount) {
+					if (bonusIndex == *scan) {
 						break;
 					}
 					scan++;

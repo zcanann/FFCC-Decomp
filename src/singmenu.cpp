@@ -689,7 +689,7 @@ char* CMenuPcs::GetTribeStr(int index)
 void CMenuPcs::GetRaceStr(int itemNo, char* outText)
 {
     unsigned short raceBits;
-    unsigned int raceType;
+    int raceType;
     char* text;
     char* suffix;
 
@@ -1626,7 +1626,7 @@ void CMenuPcs::DrawSingleBase(float alpha)
 void CMenuPcs::DrawSingleStat(float alpha)
 {
     u8* self = reinterpret_cast<u8*>(this);
-    int languageId = Game.m_gameWork.m_languageId;
+    unsigned int languageId = Game.m_gameWork.m_languageId;
 
     DrawInit();
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -1822,31 +1822,29 @@ void CMenuPcs::DrawSingleCrescent(float scaleX, float alpha)
  */
 void CMenuPcs::SingleCalcFadeIn()
 {
-    SingleFadeState* fadeState = m_singleFadeState;
-    if (fadeState->active == 0) {
+    if (m_singleFadeState->active == 0) {
         Sound.PlaySe(0xE, 0x40, 0x7F, 0);
-        memset(fadeState, 0, sizeof(SingleFadeState));
+        memset(m_singleFadeState, 0, sizeof(SingleFadeState));
 
-        int phase = (m_singleMenuMode == 8) ? 10 : 0;
-        fadeState->entries[0].startFrame = 0;
-        fadeState->entries[0].duration = 10;
-        fadeState->entries[1].startFrame = phase;
-        fadeState->entries[1].duration = 10;
-        fadeState->entries[2].startFrame = phase;
-        fadeState->entries[2].duration = 10;
-        fadeState->entries[3].startFrame = phase;
-        fadeState->entries[3].duration = 10;
+        m_singleFadeState->entries[0].startFrame = 0;
+        m_singleFadeState->entries[0].duration = 10;
+        m_singleFadeState->entries[1].startFrame = (m_singleMenuMode == 8) ? 10 : 0;
+        m_singleFadeState->entries[1].duration = 10;
+        m_singleFadeState->entries[2].startFrame = (m_singleMenuMode == 8) ? 10 : 0;
+        m_singleFadeState->entries[2].duration = 10;
+        m_singleFadeState->entries[3].startFrame = (m_singleMenuMode == 8) ? 10 : 0;
+        m_singleFadeState->entries[3].duration = 10;
 
-        fadeState->count = 4;
-        fadeState->done = 0;
-        fadeState->active = 1;
+        m_singleFadeState->count = 4;
+        m_singleFadeState->done = 0;
+        m_singleFadeState->active = 1;
     }
 
     int completed = 0;
     m_singMenuState->frame = m_singMenuState->frame + 1;
 
-    int count = static_cast<int>(fadeState->count);
-    SingleFadeEntry* entry = fadeState->entries;
+    int count = static_cast<int>(m_singleFadeState->count);
+    SingleFadeEntry* entry = m_singleFadeState->entries;
     int frame = static_cast<int>(m_singMenuState->frame);
     if (0 < count) {
         do {
@@ -1865,11 +1863,10 @@ void CMenuPcs::SingleCalcFadeIn()
         } while (count != 0);
     }
 
-    CChara::CModel* model = m_wm.m_handles[0]->m_model;
-    if (model->m_animEnd < model->m_curFrame) {
-        model->AddFrame(1.0f);
+    if (m_wm.m_handles[0]->m_model->m_animEnd < m_wm.m_handles[0]->m_model->m_time) {
+        m_wm.m_handles[0]->m_model->SetFrame(0.0f);
     } else {
-        model->SetFrame(0.0f);
+        m_wm.m_handles[0]->m_model->AddFrame(1.0f);
     }
 
     unsigned short modelScaleIndex = SingleCaravanWork()->m_tribeId;
@@ -1880,13 +1877,13 @@ void CMenuPcs::SingleCalcFadeIn()
     scaleMtx[0][3] = 0.0f;
     scaleMtx[2][3] = 0.0f;
 
-    model->m_flags10C = (model->m_flags10C & 0x7F) | 0x80;
-    model->SetMatrix(scaleMtx);
-    model->CalcMatrix();
-    model->CalcSkin();
+    m_wm.m_handles[0]->m_model->m_flags10C = (m_wm.m_handles[0]->m_model->m_flags10C & 0x7F) | 0x80;
+    m_wm.m_handles[0]->m_model->SetMatrix(scaleMtx);
+    m_wm.m_handles[0]->m_model->CalcMatrix();
+    m_wm.m_handles[0]->m_model->CalcSkin();
 
-    if (fadeState->count == completed) {
-        fadeState->done = 1;
+    if (m_singleFadeState->count == completed) {
+        m_singleFadeState->done = 1;
     }
 }
 
@@ -1923,56 +1920,52 @@ inline void CMenuPcs::SingleDrawFadeIn()
  */
 void CMenuPcs::SingleCalcFadeOut()
 {
-    SingleFadeState* fadeState = m_singleFadeState;
-
-    if (fadeState->active == 0) {
+    if (m_singleFadeState->active == 0) {
         Sound.PlaySe(0xF, 0x40, 0x7F, 0);
-        memset(fadeState, 0, sizeof(SingleFadeState));
+        memset(m_singleFadeState, 0, sizeof(SingleFadeState));
 
-        fadeState->entries[0].startFrame = (m_singleMenuMode == 8) * 10;
-        fadeState->entries[0].duration = 10;
-        fadeState->entries[1].startFrame = 0;
-        fadeState->entries[1].duration = 10;
-        fadeState->entries[2].startFrame = 0;
-        fadeState->entries[2].duration = 10;
-        fadeState->entries[3].startFrame = 0;
-        fadeState->entries[3].duration = 10;
+        m_singleFadeState->entries[0].startFrame = (m_singleMenuMode == 8) ? 10 : 0;
+        m_singleFadeState->entries[0].duration = 10;
+        m_singleFadeState->entries[1].startFrame = 0;
+        m_singleFadeState->entries[1].duration = 10;
+        m_singleFadeState->entries[2].startFrame = 0;
+        m_singleFadeState->entries[2].duration = 10;
+        m_singleFadeState->entries[3].startFrame = 0;
+        m_singleFadeState->entries[3].duration = 10;
 
-        fadeState->count = 4;
-        fadeState->done = 0;
-        fadeState->active = 1;
+        m_singleFadeState->count = 4;
+        m_singleFadeState->done = 0;
+        m_singleFadeState->active = 1;
     }
 
     int completed = 0;
-    SingMenuState* state = m_singMenuState;
-    ++state->frame;
+    ++m_singMenuState->frame;
 
-    int totalEntries = static_cast<int>(fadeState->count);
-    int frame = static_cast<int>(state->frame);
-    for (int i = 0; i < totalEntries; i++) {
-        SingleFadeEntry* entry = &fadeState->entries[i];
-        int start = entry->startFrame;
-        if (frame < start) {
-            entry->alpha = 1.0f;
-        } else {
-            int duration = entry->duration;
-            if (frame < start + duration) {
-                int elapsed = ++entry->elapsed;
+    int count = static_cast<int>(m_singleFadeState->count);
+    SingleFadeEntry* entry = m_singleFadeState->entries;
+    int frame = static_cast<int>(m_singMenuState->frame);
+    if (0 < count) {
+        do {
+            if (frame < entry->startFrame) {
+                entry->alpha = 1.0f;
+            } else if (frame < entry->startFrame + entry->duration) {
+                entry->elapsed = entry->elapsed + 1;
                 entry->alpha =
-                    static_cast<float>(-((1.0 / static_cast<double>(duration)) *
-                                          static_cast<double>(elapsed) - 1.0));
+                    static_cast<float>(-((1.0 / static_cast<double>(entry->duration)) *
+                                          static_cast<double>(entry->elapsed) - 1.0));
             } else {
-                completed++;
+                completed = completed + 1;
                 entry->alpha = 0.0f;
             }
-        }
+            entry = entry + 1;
+            count = count - 1;
+        } while (count != 0);
     }
 
-    CChara::CModel* model = m_wm.m_handles[0]->m_model;
-    if (model->m_animEnd < model->m_curFrame) {
-        model->AddFrame(1.0f);
+    if (m_wm.m_handles[0]->m_model->m_animEnd < m_wm.m_handles[0]->m_model->m_time) {
+        m_wm.m_handles[0]->m_model->SetFrame(0.0f);
     } else {
-        model->SetFrame(0.0f);
+        m_wm.m_handles[0]->m_model->AddFrame(1.0f);
     }
 
     unsigned short modelScaleIndex = SingleCaravanWork()->m_tribeId;
@@ -1983,13 +1976,13 @@ void CMenuPcs::SingleCalcFadeOut()
     scaleMtx[0][3] = 0.0f;
     scaleMtx[2][3] = 0.0f;
 
-    model->m_flags10C = (model->m_flags10C & 0x7F) | 0x80;
-    model->SetMatrix(scaleMtx);
-    model->CalcMatrix();
-    model->CalcSkin();
+    m_wm.m_handles[0]->m_model->m_flags10C = (m_wm.m_handles[0]->m_model->m_flags10C & 0x7F) | 0x80;
+    m_wm.m_handles[0]->m_model->SetMatrix(scaleMtx);
+    m_wm.m_handles[0]->m_model->CalcMatrix();
+    m_wm.m_handles[0]->m_model->CalcSkin();
 
-    if (totalEntries == completed) {
-        fadeState->done = 1;
+    if (m_singleFadeState->count == completed) {
+        m_singleFadeState->done = 1;
     }
 }
 
@@ -2037,12 +2030,11 @@ void CMenuPcs::SingleCalcCtrl()
         m_singleMenuCtrlResetFlag = 0;
     }
 
-    unsigned short result = 0;
-    CChara::CModel* model = m_wm.m_handles[0]->m_model;
-    if (model->m_animEnd < model->m_curFrame) {
-        model->AddFrame(1.0f);
+    int result = 0;
+    if (m_wm.m_handles[0]->m_model->m_animEnd < m_wm.m_handles[0]->m_model->m_time) {
+        m_wm.m_handles[0]->m_model->SetFrame(0.0f);
     } else {
-        model->SetFrame(0.0f);
+        m_wm.m_handles[0]->m_model->AddFrame(1.0f);
     }
 
     unsigned short modelScaleIndex = SingleCaravanWork()->m_tribeId;
@@ -2053,15 +2045,14 @@ void CMenuPcs::SingleCalcCtrl()
     scaleMtx[0][3] = 0.0f;
     scaleMtx[2][3] = 0.0f;
 
-    model->m_flags10C = (model->m_flags10C & 0x7F) | 0x80;
-    model->SetMatrix(scaleMtx);
-    model->CalcMatrix();
-    model->CalcSkin();
+    m_wm.m_handles[0]->m_model->m_flags10C = (m_wm.m_handles[0]->m_model->m_flags10C & 0x7F) | 0x80;
+    m_wm.m_handles[0]->m_model->SetMatrix(scaleMtx);
+    m_wm.m_handles[0]->m_model->CalcMatrix();
+    m_wm.m_handles[0]->m_model->CalcSkin();
 
-    s16 mode = m_singleMenuMode;
-    s16 proc = state->stepState;
-    switch (mode) {
-    case 0:
+    switch (m_singleMenuMode) {
+    case 0: {
+        s16 proc = m_singMenuState->stepState;
         if (proc == 0) {
             CmdOpen();
         } else if (proc == 1) {
@@ -2070,16 +2061,23 @@ void CMenuPcs::SingleCalcCtrl()
             result = CmdClose();
         }
         break;
-    case 1:
-        result = (proc == 0) ? ItemOpen() : ((proc == 1) ? ItemCtrl() : ItemClose());
-        if (m_singleLifeTimer >= 0) {
-            ++m_singleLifeTimer;
-            if (m_singleLifeTimer > 0x31) {
-                m_singleLifeTimer = -1;
-            }
+    }
+    case 1: {
+        s16 proc = m_singMenuState->stepState;
+        if (proc == 0) {
+            result = ItemOpen();
+        } else if (proc == 1) {
+            result = ItemCtrl();
+        } else {
+            result = ItemClose();
+        }
+        if ((m_singleLifeTimer >= 0) && (++m_singleLifeTimer, m_singleLifeTimer >= 0x32)) {
+            m_singleLifeTimer = -1;
         }
         break;
-    case 2:
+    }
+    case 2: {
+        s16 proc = m_singMenuState->stepState;
         if (proc == 0) {
             result = EquipOpen();
         } else if (proc == 1) {
@@ -2088,10 +2086,20 @@ void CMenuPcs::SingleCalcCtrl()
             result = EquipClose();
         }
         break;
-    case 3:
-        result = (proc == 0) ? ArtiOpen() : ((proc == 1) ? ArtiCtrl() : ArtiClose());
+    }
+    case 3: {
+        s16 proc = m_singMenuState->stepState;
+        if (proc == 0) {
+            result = ArtiOpen();
+        } else if (proc == 1) {
+            result = ArtiCtrl();
+        } else {
+            result = ArtiClose();
+        }
         break;
-    case 4:
+    }
+    case 4: {
+        s16 proc = m_singMenuState->stepState;
         if (proc == 0) {
             result = TmpArtiOpen();
         } else if (proc == 1) {
@@ -2100,13 +2108,31 @@ void CMenuPcs::SingleCalcCtrl()
             result = TmpArtiClose();
         }
         break;
-    case 5:
-        result = (proc == 0) ? MoneyOpen() : ((proc == 1) ? MoneyCtrl() : MoneyClose());
+    }
+    case 5: {
+        s16 proc = m_singMenuState->stepState;
+        if (proc == 0) {
+            result = MoneyOpen();
+        } else if (proc == 1) {
+            result = MoneyCtrl();
+        } else {
+            result = MoneyClose();
+        }
         break;
-    case 6:
-        result = (proc == 0) ? FavoOpen() : ((proc == 1) ? FavoCtrl() : FavoClose());
+    }
+    case 6: {
+        s16 proc = m_singMenuState->stepState;
+        if (proc == 0) {
+            result = FavoOpen();
+        } else if (proc == 1) {
+            result = FavoCtrl();
+        } else {
+            result = FavoClose();
+        }
         break;
-    case 7:
+    }
+    case 7: {
+        s16 proc = m_singMenuState->stepState;
         if (proc == 0) {
             result = CompaOpen();
         } else if (proc == 1) {
@@ -2115,16 +2141,33 @@ void CMenuPcs::SingleCalcCtrl()
             result = CompaClose();
         }
         break;
-    case 8:
-        result = (proc == 0) ? LetterOpen() : ((proc == 1) ? LetterCtrl() : LetterClose());
-        break;
-    case 9:
-        result = (proc == 0) ? MLstOpen() : ((proc == 1) ? MLstCtrl() : MLstClose());
+    }
+    case 8: {
+        s16 proc = m_singMenuState->stepState;
+        if (proc == 0) {
+            result = LetterOpen();
+        } else if (proc == 1) {
+            result = LetterCtrl();
+        } else {
+            result = LetterClose();
+        }
         break;
     }
+    case 9: {
+        s16 proc = m_singMenuState->stepState;
+        if (proc == 0) {
+            result = MLstOpen();
+        } else if (proc == 1) {
+            result = MLstCtrl();
+        } else {
+            result = MLstClose();
+        }
+        break;
+    }
+    }
 
-    reinterpret_cast<CMesMenu*>(*reinterpret_cast<void**>(self + 0x268))->CalcHeart();
-    state->result = result;
+    reinterpret_cast<CMesMenu*>(*reinterpret_cast<void**>(reinterpret_cast<u8*>(&MenuPcs) + 0x268))->CalcHeart();
+    m_singMenuState->result = result;
 
     bool hasInput = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
     unsigned short press;
@@ -2567,28 +2610,27 @@ void CMenuPcs::DrawEquipMark(int x, int y, float alpha)
  */
 void CMenuPcs::DrawSingWin(short mode)
 {
-    MenuWindowInfo* win = m_menuWindowInfo;
-    if (mode >= 0 && win->state != mode) {
-        win->state = mode;
+    if (mode >= 0 && m_menuWindowInfo->state != mode) {
+        m_menuWindowInfo->state = mode;
     }
 
-    if (win->state == 3) {
+    if (m_menuWindowInfo->state == 3) {
         return;
     }
 
-    float left = static_cast<float>(win->x) + static_cast<float>(win->width) * 0.5f;
-    float top = static_cast<float>(win->y) + static_cast<float>(win->height) * 0.5f;
+    float left = static_cast<float>(m_menuWindowInfo->x) + static_cast<float>(m_menuWindowInfo->width) * 0.5f;
+    float top = static_cast<float>(m_menuWindowInfo->y) + static_cast<float>(m_menuWindowInfo->height) * 0.5f;
     float width;
     float height;
 
-    if (win->state == 1) {
-        left = static_cast<float>(win->x);
-        top = static_cast<float>(win->y);
-        width = static_cast<float>(win->width);
-        height = static_cast<float>(win->height);
+    if (m_menuWindowInfo->state == 1) {
+        left = static_cast<float>(m_menuWindowInfo->x);
+        top = static_cast<float>(m_menuWindowInfo->y);
+        width = static_cast<float>(m_menuWindowInfo->width);
+        height = static_cast<float>(m_menuWindowInfo->height);
     } else {
-        float leftScale = (((left - static_cast<float>(win->x)) - 32.0f) / 6.0f) * static_cast<float>(win->frame);
-        float topScale = (((top - static_cast<float>(win->y)) - 32.0f) / 6.0f) * static_cast<float>(win->frame);
+        float leftScale = (((left - static_cast<float>(m_menuWindowInfo->x)) - 32.0f) / 6.0f) * static_cast<float>(m_menuWindowInfo->frame);
+        float topScale = (((top - static_cast<float>(m_menuWindowInfo->y)) - 32.0f) / 6.0f) * static_cast<float>(m_menuWindowInfo->frame);
         left = (left - 32.0f) - leftScale;
         width = static_cast<float>(2.0 * static_cast<double>(32.0f + leftScale));
         height = static_cast<float>(2.0 * static_cast<double>(32.0f + topScale));
@@ -2655,6 +2697,7 @@ void CMenuPcs::DrawSingWin(short mode)
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x42));
     MenuPcs.DrawRect(0, innerX, innerY, innerW, innerH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
+    MenuWindowInfo* win = m_menuWindowInfo;
     s16 state = win->state;
     if (state == 0) {
         win->frame = win->frame + 1;
@@ -2718,14 +2761,14 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     }
 
     MenuWindowInfo* win = m_menuWindowInfo;
-    int lineHeight = static_cast<int>(22.0f * FLOAT_8032ea78);
+    unsigned int lineHeight = static_cast<int>(22.0f * FLOAT_8032ea78);
     if (0.0f < 22.0f * FLOAT_8032ea78 - static_cast<float>(lineHeight)) {
         lineHeight++;
     }
 
     float x = static_cast<float>(win->x) + static_cast<float>(win->width - maxWidth) * static_cast<float>(0.5);
     float y = static_cast<float>(win->y + 0x20);
-    int lineStep = lineHeight + 3;
+    unsigned int lineStep = lineHeight + 3;
 
     dynamicText = s_DynamicMessStr;
     for (int i = 0; i < lineCount; i++) {
@@ -2766,7 +2809,7 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
     font->SetShadow(1);
     font->SetScale(FLOAT_8032ea78);
 
-    int lineCount;
+    unsigned int lineCount;
     if (useDynamic != 0) {
         lineCount = s_DynamicMess[0];
     } else {
@@ -3026,7 +3069,7 @@ int CMenuPcs::SingWinMessHeight()
 int CMenuPcs::ChkEquipPossible(int itemNo)
 {
     unsigned int genderMask = 0x10;
-    u16 flags = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 4);
+    s16 flags = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 4);
     unsigned int raceMask = 1 << (SingleCaravanWork()->m_tribeId & 3);
 
     if (SingleCaravanWork()->m_genderFlag != 0) {
@@ -3090,64 +3133,47 @@ int CMenuPcs::GetEquipType(int itemNo)
  */
 int CMenuPcs::GetSmithItem(int itemNo)
 {
-    const CCaravanWork* const caravanWork = SingleCaravanWork();
+    unsigned int caravanWork = reinterpret_cast<unsigned int>(SingleCaravanWork());
 
     GetItemType(itemNo, 1);
-    u16 race = caravanWork->m_tribeId;
+    u16 race = *reinterpret_cast<u16*>(caravanWork + 0x3e0);
     u16 raceType = race & 3;
     int itemBase = Game.unkCFlatData0[2] + itemNo * 0x48;
 
-    int smithItem = *reinterpret_cast<u16*>(itemBase + raceType * 2 + 0x38);
-    if (smithItem > 0) {
-        u16 flags = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + smithItem * 0x48 + 4);
-        unsigned int raceMask = 1 << (caravanWork->m_tribeId & 3);
+    unsigned int smithItem = *reinterpret_cast<u16*>(itemBase + (race & 3) * 2 + 0x38);
+    if (smithItem != 0) {
         unsigned int genderMask = 0x10;
-        if (caravanWork->m_genderFlag != 0) {
+        u16 flags = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + smithItem * 0x48 + 4);
+        unsigned int raceMask = 1 << (*reinterpret_cast<u16*>(reinterpret_cast<unsigned int>(SingleCaravanWork()) + 0x3e0) & 3);
+        if (*reinterpret_cast<short*>(reinterpret_cast<unsigned int>(SingleCaravanWork()) + 0x3e2) != 0) {
             genderMask = 0x20;
         }
 
-        bool valid;
-        if (((flags & 0xF) == 0) || ((flags & 0x30) == 0)) {
-            if ((flags & 0xF) == 0) {
-                valid = (flags & 0x30 & genderMask) != 0;
+        unsigned int valid;
+        if (((flags & 0xF) != 0) && ((flags & 0x30) != 0)) {
+            if (((flags & 0xF & raceMask) == 0) || ((flags & 0x30 & genderMask) == 0)) {
+                valid = 0;
             } else {
-                valid = (flags & 0xF & raceMask) != 0;
+                valid = 1;
             }
+        } else if ((flags & 0xF) == 0) {
+            valid = static_cast<unsigned int>(-static_cast<int>(flags & 0x30 & genderMask)) >> 0x1f;
         } else {
-            valid = ((flags & 0xF & raceMask) != 0) && ((flags & 0x30 & genderMask) != 0);
+            valid = static_cast<unsigned int>(-static_cast<int>(flags & 0xF & raceMask)) >> 0x1f;
         }
 
-        if (valid) {
-            return smithItem;
-        }
-    }
-
-    if (raceType != 0) {
-        smithItem = *reinterpret_cast<u16*>(itemBase + 0x38);
-        if (smithItem > 0) {
-            return smithItem;
-        }
-    }
-    if (raceType != 1) {
-        smithItem = *reinterpret_cast<u16*>(itemBase + 0x3A);
-        if (smithItem > 0) {
-            return smithItem;
-        }
-    }
-    if (raceType != 2) {
-        smithItem = *reinterpret_cast<u16*>(itemBase + 0x3C);
-        if (smithItem > 0) {
-            return smithItem;
-        }
-    }
-    if (raceType != 3) {
-        smithItem = *reinterpret_cast<u16*>(itemBase + 0x3E);
-        if (smithItem > 0) {
+        if (valid != 0) {
             return smithItem;
         }
     }
 
-    return -1;
+    if ((((((race & 3) == 0) || (smithItem = *reinterpret_cast<u16*>(itemBase + 0x38), smithItem == 0)) &&
+          ((raceType == 1) || (smithItem = *reinterpret_cast<u16*>(itemBase + 0x3A), smithItem == 0))) &&
+         ((raceType == 2) || (smithItem = *reinterpret_cast<u16*>(itemBase + 0x3C), smithItem == 0))) &&
+        ((raceType == 3) || (smithItem = *reinterpret_cast<u16*>(itemBase + 0x3E), smithItem == 0))) {
+        smithItem = 0xFFFFFFFF;
+    }
+    return smithItem;
 }
 
 /*
@@ -3290,33 +3316,44 @@ void CMenuPcs::DrawSingLife()
 {
     const CCaravanWork* const caravanWork = SingleCaravanWork();
     int lifeTimer = m_singleLifeTimer;
+    float xBase = 366.0f;
+    float yBase = -32.0f;
     if (lifeTimer < 0) {
         return;
     }
 
-    float y = -32.0f;
+    float y;
     if (lifeTimer < 10) {
-        int phase = lifeTimer;
-        if (phase < 0) {
+        int phase;
+        if (lifeTimer < 0) {
             phase = 0;
-        } else if (phase > 10) {
+        } else {
             phase = 10;
+            if (lifeTimer <= 10) {
+                phase = lifeTimer;
+            }
         }
-        y = 64.0f * static_cast<float>(sin(0.01745329238474369f * 9.0f * static_cast<float>(phase))) + -32.0f;
-    } else if (lifeTimer > 0x27) {
-        int phase = 10 - (lifeTimer - 0x28);
-        if (phase < 0) {
-            phase = 0;
-        } else if (phase > 10) {
-            phase = 10;
+        y = 64.0f * static_cast<float>(sin(0.01745329238474369f * (9.0f * static_cast<float>(phase)))) + yBase;
+    } else {
+        y = 32.0f;
+        if (lifeTimer > 0x27) {
+            int t = 10 - (lifeTimer - 0x28);
+            int phase;
+            if (t < 0) {
+                phase = 0;
+            } else {
+                phase = 10;
+                if (t <= 10) {
+                    phase = t;
+                }
+            }
+            y = 64.0f * static_cast<float>(sin(0.01745329238474369f * (9.0f * static_cast<float>(phase)))) + yBase;
         }
-        y = 64.0f * static_cast<float>(sin(0.01745329238474369f * 9.0f * static_cast<float>(phase))) + -32.0f;
     }
 
     int halfHearts = static_cast<unsigned int>(caravanWork->m_maxHp >> 1);
-    float x = 366.0f + static_cast<float>(((8 - halfHearts) * 0x18) / 2);
-    reinterpret_cast<CMesMenu*>(*reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0x268))
-        ->DrawHeart(x, y - 8.0f, 1.0f, 1.0f);
+    reinterpret_cast<CMesMenu*>(*reinterpret_cast<void**>(reinterpret_cast<u8*>(&MenuPcs) + 0x268))
+        ->DrawHeart(xBase + static_cast<float>(((8 - halfHearts) * 0x18) / 2), y - 8.0f, 1.0f, 1.0f);
 }
 
 /*

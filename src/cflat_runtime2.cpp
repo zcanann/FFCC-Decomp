@@ -828,14 +828,14 @@ void* CFlatRuntime2::intToClass(int classId)
  */
 int CFlatRuntime2::Frame(int arg0, int mode)
 {
-	CStopWatch watch((char*)-1);
+	CStopWatch watch("no name");
 
 	if (mode == 0) {
 		StaticFrame__10CGCharaObjFv();
 		CGPartyObj::CheckGameOver();
-		reinterpret_cast<CFlatRuntime*>(this)->Frame(arg0, mode);
+		reinterpret_cast<CFlatRuntime*>(this)->CFlatRuntime::Frame(arg0, mode);
 
-		CFlatRuntime::CObject* const root = FlatObjectRoot(this);
+		CFlatRuntime::CObject* const root = FlatObjectRoot(&CFlat);
 		for (CGBaseObj* obj = FindNextGBaseObjByCidMask(this, root->m_next->m_next, 5); obj != 0;
 			 obj = FindNextGBaseObjByCidMask(this, reinterpret_cast<CFlatRuntime::CObject*>(obj)->m_next, 5)) {
 			obj->Frame();
@@ -1521,8 +1521,8 @@ void CFlatRuntime2::Draw()
 			PSVECNormalize(&dir, &dir);
 
 			const float dot = PSVECDotProduct(&worldUp, &dir);
-			if (dot < 0.9999f) {
-				if (dot >= -0.9999f) {
+			if (dot < FLOAT_80330188) {
+				if (dot >= FLOAT_8033018C) {
 					Vec axis;
 					PSVECCrossProduct(&dir, &worldUp, &axis);
 					PSMTXRotAxisRad(orientMtx, &axis, -acosf(dot));
@@ -1540,7 +1540,7 @@ void CFlatRuntime2::Draw()
 			const float radius = entry->m_radius;
 			GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, 0x20);
 			for (int j = 0; j < 8; j++) {
-				const float angle = static_cast<float>(j) * 0.7853982f;
+				const float angle = static_cast<float>(j) * FLOAT_80330190;
 				ringVerts[j][0] = radius * sinf(angle);
 				ringVerts[j][1] = radius * cosf(angle);
 				ringVerts[j][2] = length;

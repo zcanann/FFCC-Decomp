@@ -332,7 +332,11 @@ void CGMonObj::frameStatFuncGiantCrab()
 			if (state == 0x67) {
 				turnOffset = kMonObjBossHalfPi;
 				animId = 0x12;
-			} else if (state >= 0x68) {
+			} else if (state < 0x67) {
+				if (state == 0x65) {
+					turnOffset = kMonObjBossZero;
+				}
+			} else if (state < 0x69) {
 				turnOffset = kMonObjBossThreeHalfPi;
 				animId = 0x13;
 			}

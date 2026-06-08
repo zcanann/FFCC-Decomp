@@ -372,9 +372,9 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 			} else if (systemVal <= -400) {
 				if (systemVal <= -1000 && systemVal >= -0xBE7) {
 					const int bit = systemVal + 0xBE7;
-					u8* const byteRef = classData + (bit / 8) + 0x8A4;
-					const u8 mask = static_cast<u8>(1 << (bit % 8));
-					const int oldValue = (*byteRef & mask) != 0;
+					u8* const byteRef = classData + (bit / 8);
+					const int mask = 1 << (bit % 8);
+					const int oldValue = (byteRef[0x8A4] & mask) != 0;
 
 					stack[-1].m_word = oldValue;
 					int newValue = oldValue;
@@ -391,10 +391,10 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 						break;
 					}
 
-					if (newValue == 0) {
-						*byteRef &= static_cast<u8>(~mask);
+					if (newValue != 0) {
+						byteRef[0x8A4] |= mask;
 					} else {
-						*byteRef |= mask;
+						byteRef[0x8A4] &= ~mask;
 					}
 				} else if (systemVal <= -0x1F4 && systemVal >= -0x2F3) {
 					StoreS16(stack, classData, (systemVal + 0x2F3) * 2 + 0x9A4, setMode);

@@ -1544,6 +1544,9 @@ void CMes::Next()
 				*slot = *slot + 1;
 				break;
 			}
+			case 3:
+			case 4:
+				break;
 			}
 			flagEntry += 6;
 			*(int*)((char*)this + 0x3c10) = *(int*)((char*)this + 0x3c10) + 1;

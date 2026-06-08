@@ -587,8 +587,7 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
         pppModelSt** modelNames = reinterpret_cast<pppModelSt**>(pdt->m_modelNames);
         for (int i = 0; i < pdt->m_modelCount; i++) {
             pppModelSt* model = modelNames[i];
-            model->m_refCount--;
-            if (model->m_refCount < 1) {
+            if (--model->m_refCount <= 0) {
                 if (model->m_cacheId != -1) {
                     ppvAmemCacheSet.DestroyCache(model->m_cacheId);
                     *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(model) + 0x24) = 0;
@@ -608,8 +607,7 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
         pppShapeSt** shapeNames = reinterpret_cast<pppShapeSt**>(pdt->m_shapeNames);
         for (int i = 0; i < pdt->m_shapeCount; i++) {
             pppShapeSt* shape = shapeNames[i];
-            shape->m_refCount--;
-            if (shape->m_refCount < 1) {
+            if (--shape->m_refCount <= 0) {
                 if (shape->m_animData != 0) {
                     delete[] reinterpret_cast<u8*>(shape->m_animData);
                     shape->m_animData = 0;
@@ -1752,8 +1750,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             int slotIndex = static_cast<int>(*reinterpret_cast<short*>(payload));
             pppModelSt*& modelSlot = (*modelTablePtr)[slotIndex];
             if (modelSlot != 0) {
-                modelSlot->m_refCount--;
-                if (modelSlot->m_refCount < 1) {
+                if (--modelSlot->m_refCount <= 0) {
                     if (modelSlot->m_cacheId != -1) {
                         ppvAmemCacheSet.DestroyCache(modelSlot->m_cacheId);
                         modelSlot->m_meshData = 0;
@@ -1795,8 +1792,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             int slotIndex = payloadWords[0];
             pppShapeSt*& shapeSlot = (*shapeSlotTablePtr)[slotIndex];
             if (shapeSlot != 0) {
-                shapeSlot->m_refCount--;
-                if (shapeSlot->m_refCount < 1) {
+                if (--shapeSlot->m_refCount <= 0) {
                     if (shapeSlot->m_animData != 0) {
                         delete[] reinterpret_cast<u8*>(shapeSlot->m_animData);
                         shapeSlot->m_animData = 0;

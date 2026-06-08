@@ -1533,9 +1533,7 @@ void CAmemCacheSet::DestroyCache(int index)
     if (entry.m_dmaCopy != 0) {
         unsigned long cacheData = reinterpret_cast<unsigned long>(entry.m_cacheData);
         if (cacheData != 0) {
-            if (cacheData != 0) {
-                freeStageBlock(reinterpret_cast<void*>(cacheData));
-            }
+            freeStageBlock(reinterpret_cast<void*>(cacheData));
             entry.m_cacheData = 0;
         }
         unsigned long workData = reinterpret_cast<unsigned long>(entry.m_workData);
@@ -1545,9 +1543,7 @@ void CAmemCacheSet::DestroyCache(int index)
     } else {
         unsigned long workData = reinterpret_cast<unsigned long>(entry.m_workData);
         if (workData != 0) {
-            if (workData != 0) {
-                freeStageBlock(reinterpret_cast<void*>(workData));
-            }
+            freeStageBlock(reinterpret_cast<void*>(workData));
         }
         entry.m_cacheData = 0;
         entry.m_workData = 0;

@@ -2538,7 +2538,7 @@ void CGObject::boundCheck()
     if ((m_charaModelHandle != 0) && (m_charaModelHandle->m_model != 0)) {
         const double zero = static_cast<double>(sZeroFloat);
         const double one = static_cast<double>(sAnimFrameOffset);
-        const double clipLimit = 2.0;
+        const float clipLimit = 2.0f;
 
         for (u32 i = 0; (clipMask != 0) && (i < 8); i++) {
             clipCorner.x = m_worldPosition.x + (((i & 1) == 0) ? m_nearColRadius : -m_nearColRadius);
@@ -2557,10 +2557,10 @@ void CGObject::boundCheck()
             clipPos.x *= invW;
             clipPos.y *= invW;
 
-            if (clipLimit < static_cast<double>(clipPos.x)) {
+            if (clipLimit < clipPos.x) {
                 clipMask &= 0xFFFFFFFE;
             }
-            if (clipLimit < static_cast<double>(clipPos.y)) {
+            if (clipLimit < clipPos.y) {
                 clipMask &= 0xFFFFFFFD;
             }
             if (static_cast<double>(clipPos.x) < one) {

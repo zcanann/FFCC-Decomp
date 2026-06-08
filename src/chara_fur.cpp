@@ -1103,21 +1103,21 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 			if (MogWork().m_prevScoreA + 5 <= Chara.MogFur().m_score[0]) {
 				MogWork().m_prevScoreA = Chara.MogFur().m_score[0];
 				messageId = 1;
-			} else if (Chara.MogFur().m_score[0] < MogWork().m_prevScoreA - 5) {
+			} else if (MogWork().m_prevScoreA - 5 > Chara.MogFur().m_score[0]) {
 				MogWork().m_prevScoreA = Chara.MogFur().m_score[0];
 				messageId = 6;
 			}
 			if (MogWork().m_prevScoreB + 5 <= Chara.MogFur().m_score[1]) {
 				MogWork().m_prevScoreB = Chara.MogFur().m_score[1];
 				messageId = 1;
-			} else if (Chara.MogFur().m_score[1] < MogWork().m_prevScoreB - 5) {
+			} else if (MogWork().m_prevScoreB - 5 > Chara.MogFur().m_score[1]) {
 				MogWork().m_prevScoreB = Chara.MogFur().m_score[1];
 				messageId = 6;
 			}
 			if (MogWork().m_prevScoreC + 5 <= Chara.MogFur().m_score[2]) {
 				MogWork().m_prevScoreC = Chara.MogFur().m_score[2];
 				messageId = 1;
-			} else if (Chara.MogFur().m_score[2] < MogWork().m_prevScoreC - 5) {
+			} else if (MogWork().m_prevScoreC - 5 > Chara.MogFur().m_score[2]) {
 				MogWork().m_prevScoreC = Chara.MogFur().m_score[2];
 				messageId = 6;
 			}

@@ -607,21 +607,20 @@ void CCameraPcs::CalcQuake()
 {
     Vec offset;
     Vec jitter;
-    float zero = kCameraZeroF;
 
     if ((System.m_scenegraphStepMode == 2) || ((m_quake.m_mode == 2) && (m_quake.m_state == 0))) {
         return;
     }
 
-    s32 randomValue = rand();
-    s16 randomSign = static_cast<s16>(randomValue >> 0x1F);
-    m_quake.m_signX = static_cast<u16>((randomValue & 1) ^ -randomSign) + randomSign;
+    u32 randomValue = static_cast<u32>(rand());
+    u32 randomSign = randomValue >> 0x1F;
+    m_quake.m_signX = ((randomValue & 1) ^ randomSign) - randomSign;
 
     m_quake.m_signY = 1 - m_quake.m_signY;
 
-    randomValue = rand();
-    randomSign = static_cast<s16>(randomValue >> 0x1F);
-    m_quake.m_signZ = static_cast<u16>((randomValue & 1) ^ -randomSign) + randomSign;
+    randomValue = static_cast<u32>(rand());
+    randomSign = randomValue >> 0x1F;
+    m_quake.m_signZ = ((randomValue & 1) ^ randomSign) - randomSign;
 
     if (m_quake.m_signX == 0) {
         offset.x = -m_quake.m_positionAmplitude.x;
@@ -694,12 +693,12 @@ void CCameraPcs::CalcQuake()
                 m_quake.m_startDuration = 0;
                 m_quake.m_endTimer = 0;
                 m_quake.m_endDuration = 0;
-                m_quake.m_positionAmplitude.z = zero;
-                m_quake.m_positionAmplitude.y = zero;
-                m_quake.m_positionAmplitude.x = zero;
-                m_quake.m_jitterAmplitude.z = zero;
-                m_quake.m_jitterAmplitude.y = zero;
-                m_quake.m_jitterAmplitude.x = zero;
+                m_quake.m_positionAmplitude.z = kCameraZeroF;
+                m_quake.m_positionAmplitude.y = kCameraZeroF;
+                m_quake.m_positionAmplitude.x = kCameraZeroF;
+                m_quake.m_jitterAmplitude.z = kCameraZeroF;
+                m_quake.m_jitterAmplitude.y = kCameraZeroF;
+                m_quake.m_jitterAmplitude.x = kCameraZeroF;
             } else {
                 float ratio = static_cast<float>(m_quake.m_endTimer) /
                               static_cast<float>(m_quake.m_endDuration);

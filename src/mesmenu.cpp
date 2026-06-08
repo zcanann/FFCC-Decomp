@@ -444,7 +444,8 @@ void CMesMenu::CalcHeart()
  */
 void CMesMenu::onDraw()
 {
-    if ((m_menuIndex == 0) && ((int)((unsigned int)CFlatGameFlags() << 30) < 0)) {
+    if ((m_menuIndex == 0) &&
+        (static_cast<signed char>(static_cast<int>(static_cast<unsigned int>(CFlatGameFlags()) << 30) >> 31) != 0)) {
         int iconFrame = 0;
         int charaMode = Chara.MogFur().m_commandIndex;
         switch (charaMode) {
@@ -461,12 +462,9 @@ void CMesMenu::onDraw()
             iconFrame = 2;
             break;
         case 4: {
-            unsigned short buttons;
-            if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
-                buttons = 0;
-            } else {
-                buttons = Pad.GetPadInputs()[__cntlzw((unsigned int)Pad.m_debugPadPort) >> 5].button[0];
-            }
+            unsigned short buttons = ((Pad.m_debugPadLock == 0) && (Pad.m_debugPadPort != -1))
+                ? Pad.GetPadInputs()[__cntlzw((unsigned int)Pad.m_debugPadPort) >> 5].button[0]
+                : 0;
 
             iconFrame = s_mesMenuIconFrames[0];
             if ((buttons & 0x100) != 0) {

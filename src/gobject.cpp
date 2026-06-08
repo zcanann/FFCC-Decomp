@@ -660,7 +660,7 @@ void CGObject::move()
                     if (sZeroFloat < dirDot) {
                         centerDist /= CFlatCenterDistanceScale();
                         float clampDist = centerDist;
-                        if (sZeroFloat <= clampDist) {
+                        if (!(clampDist < sZeroFloat)) {
                             if (sAnimFrameOffset < clampDist) {
                                 clampDist = sAnimFrameOffset;
                             }

@@ -1146,7 +1146,7 @@ void CMenuPcs::CmdDraw()
 								canUse = static_cast<u32>(
 								    ChkUnite(GetCmdStateView(this)->selected, combo) > 0);
 							} else {
-								canUse = static_cast<u32>(EquipChk(static_cast<int>(canBuf[sel - 1])) != 0);
+								canUse = static_cast<u32>(static_cast<u8>(EquipChk(static_cast<int>(canBuf[sel - 1]))) != 0);
 							}
 
 							if (canUse == 0) {

@@ -532,8 +532,8 @@ void CGObject::move()
         movingWithScript = true;
     } else {
         const s8 player = m_animStateMisc;
-        if ((static_cast<char>(player) >= 0)
-            && (static_cast<char>(player) < 4)
+        if ((player >= 0)
+            && (player < 4)
             && m_weaponNodeFlagAll.m_bits1.m_shield
             && m_weaponNodeFlagAll.m_bits1.m_menuReady
             && ((Game.m_gameWork.m_menuStageMode == 0) || (player == 0))) {
@@ -1245,6 +1245,7 @@ void CGObject::hit()
         return;
     }
 
+    const float zero = sZeroFloat;
     for (CGObject* other = CFlat.FindGObjFirst(); other != 0;
          other = CFlat.FindGObjNext(other)) {
         if (((other->m_bgColMask & 0x80000) == 0) || (other == this)) {
@@ -1268,8 +1269,8 @@ void CGObject::hit()
             for (int damageIndex = 0; damageIndex < 8; damageIndex++) {
                 DamageCol* damage = &other->m_damageColliders[damageIndex];
                 if (((attack->m_hitMask & damage->m_hitMask) == 0) ||
-                    (sZeroFloat == damage->m_innerRadius) ||
-                    (sZeroFloat == damage->m_outerRadius)) {
+                    (zero == damage->m_innerRadius) ||
+                    (zero == damage->m_outerRadius)) {
                     continue;
                 }
 
@@ -1294,7 +1295,13 @@ void CGObject::hit()
                     stackIn[6].m_word = reinterpret_cast<u32>(m_scriptHandle);
                     CFlatRuntime::CStack stackOut;
                     gCFlatRuntime().SystemCall(this, 2, 0x13, 7, stackIn, &stackOut);
-                    onHit(attackIndex, other, damageIndex, &hitPos);
+                    const int hitResult = onHit(attackIndex, other, damageIndex, &hitPos);
+                    if (hitResult == 1) {
+                        continue;
+                    }
+                    if (hitResult == 2) {
+                        break;
+                    }
                 }
             }
         }
@@ -2488,9 +2495,9 @@ void CGObject::boundCheck()
 
     PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
     PSMTXCopy(cameraMtx, clipMtx);
-    clipMtx[3][0] = sZeroFloat;
-    clipMtx[3][1] = sZeroFloat;
     clipMtx[3][2] = sZeroFloat;
+    clipMtx[3][1] = sZeroFloat;
+    clipMtx[3][0] = sZeroFloat;
     clipMtx[3][3] = sAnimFrameOffset;
 
     PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
@@ -2508,7 +2515,7 @@ void CGObject::boundCheck()
             clipCorner.z = m_worldPosition.z + (((i & 2) != 0) ? -m_nearColRadius : m_nearColRadius);
 
             Math.MTX44MultVec4(screenMtx, &clipCorner, &clipPos);
-            if (zero < static_cast<double>(clipPos.w)) {
+            if (static_cast<double>(clipPos.w) > zero) {
                 clipMask &= 0xFFFFFFEF;
             }
             if (clipMask == 0) {
@@ -2519,10 +2526,10 @@ void CGObject::boundCheck()
             clipPos.x *= invW;
             clipPos.y *= invW;
 
-            if (clipLimit < clipPos.x) {
+            if (clipPos.x > clipLimit) {
                 clipMask &= 0xFFFFFFFE;
             }
-            if (clipLimit < clipPos.y) {
+            if (clipPos.y > clipLimit) {
                 clipMask &= 0xFFFFFFFD;
             }
             if (static_cast<double>(clipPos.x) < one) {
@@ -2824,40 +2831,40 @@ int CGObject::IsLoopAnim(int mode)
     }
 
     CModelAnimState& model = ModelAnimState(handle->m_model);
-    if (model.m_anim == 0) {
-        return 1;
+    if (model.m_anim != 0) {
+        const float span = sAnimFrameOffset + (model.m_animEnd - model.m_animStart);
+
+        if (sAnimFrameOffset == span) {
+            return 1;
+        }
+
+        float base;
+        if (mode != 0) {
+            base = m_turnSpeed;
+        } else {
+            base = model.m_time;
+        }
+
+        double threshold = static_cast<double>(base);
+
+        if (mode == 2) {
+            threshold = static_cast<double>(static_cast<float>(threshold + sLoopBias));
+        }
+
+        const float lastAttr = m_lastBgAttr;
+
+        if (static_cast<double>(lastAttr) < static_cast<double>(sZeroFloat)) {
+            return (static_cast<u32>(static_cast<u8>(
+                        (static_cast<double>(sZeroFloat) >= threshold) << 1))
+                    << 0x1C)
+                   >> 0x1D;
+        }
+
+        const double diff = static_cast<double>(span - sAnimFrameOffset);
+        return (static_cast<u32>(static_cast<u8>((diff < threshold) << 3)) << 0x1C) >> 0x1F;
     }
 
-    const float span = sAnimFrameOffset + (model.m_animEnd - model.m_animStart);
-
-    if (sAnimFrameOffset == span) {
-        return 1;
-    }
-
-    float base;
-    if (mode != 0) {
-        base = m_turnSpeed;
-    } else {
-        base = model.m_time;
-    }
-
-    double threshold = static_cast<double>(base);
-
-    if (mode == 2) {
-        threshold = static_cast<double>(static_cast<float>(threshold + sLoopBias));
-    }
-
-    const float lastAttr = m_lastBgAttr;
-
-    if (static_cast<double>(lastAttr) < static_cast<double>(sZeroFloat)) {
-        return (static_cast<u32>(static_cast<u8>(
-                    (threshold <= static_cast<double>(sZeroFloat)) << 1))
-                << 0x1C)
-               >> 0x1D;
-    }
-
-    const double diff = static_cast<double>(span - sAnimFrameOffset);
-    return (static_cast<u32>(static_cast<u8>((diff < threshold) << 3)) << 0x1C) >> 0x1F;
+    return 1;
 }
 
 /*
@@ -2925,7 +2932,7 @@ int CGObject::IsAnimFinished(int mode)
                                 < static_cast<double>(sZeroFloat)) {
                                 result =
                                     (static_cast<u32>(static_cast<u8>(
-                                         (threshold <= static_cast<double>(sZeroFloat)) << 1))
+                                         (static_cast<double>(sZeroFloat) >= threshold) << 1))
                                      << 0x1C)
                                     >> 0x1D;
                             } else {
@@ -3137,9 +3144,7 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
 
             if (MapMng.CheckHitCylinderNear(
                     &attrCylinder,
-                    reinterpret_cast<Vec*>(&attrDirection), 0x78000000) == 0) {
-                m_bgAttrValue = sAnimFrameOffset;
-            } else {
+                    reinterpret_cast<Vec*>(&attrDirection), 0x78000000) != 0) {
                 switch (gMapHitFace->m_groupIndex - 0x28) {
                 case 0:
                     m_bgAttrValue = sBgAttrSlow;
@@ -3156,6 +3161,8 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
                 default:
                     break;
                 }
+            } else {
+                m_bgAttrValue = sAnimFrameOffset;
             }
         }
         m_animBlend = m_bgAttrValue;
@@ -3317,7 +3324,7 @@ float CGObject::CalcSafePos(int hitMask, CGObject* other, Vec* outSafePos)
     float safeDistance = sZeroFloat;
 
     centerPos.x = other->m_worldPosition.x;
-    if (other->m_worldPosition.y < m_worldPosition.y) {
+    if (m_worldPosition.y > other->m_worldPosition.y) {
         centerPos.y = m_worldPosition.y;
     } else {
         centerPos.y = other->m_worldPosition.y;

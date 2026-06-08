@@ -3972,11 +3972,14 @@ void CGMonObj::statMove(int* targetIndex)
 					0x10;
 			}
 			unsigned short alertMode = *reinterpret_cast<unsigned short*>(aiData + 0x104);
-			if (alertMode == 1) {
-				*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x10;
-			} else if (alertMode == 0) {
+			switch (alertMode) {
+			case 0:
 				*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
-			} else if (alertMode < 3) {
+				break;
+			case 1:
+				*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x10;
+				break;
+			case 2: {
 				double soundLimit2 = (Game.m_gameWork.m_soundOptionFlag != 0) ? kMonObjWideSoundRange : kMonObjNormalSoundRange;
 				if (static_cast<double>(*reinterpret_cast<float*>(mon + 0x5BC)) < soundLimit2) {
 					*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x1D;
@@ -3989,6 +3992,8 @@ void CGMonObj::statMove(int* targetIndex)
 				} else {
 					*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
 				}
+				break;
+			}
 			}
 		} else {
 			*targetPartyIdx = hitPartyIndex;
@@ -4035,17 +4040,16 @@ void CGMonObj::statMove(int* targetIndex)
 				if (monObj->m_moveWork.m_mode != 4) {
 					memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
 					monObj->m_moveWork.m_flags = 0x855;
-					unsigned char* script = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
-					if ((*reinterpret_cast<unsigned short*>(script + 0xFE) & 4) != 0) {
+					if ((*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFE) & 4) != 0) {
 						monObj->m_moveWork.m_flags |= 0x400;
 					}
 					unsigned char* aiData;
 					if (monObj->m_aiState == 0) {
-						aiData = script;
+						aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
 					} else {
 						aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
 							(monObj->m_aiState +
-							 *reinterpret_cast<unsigned short*>(script + 0x100)) *
+							 *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x100)) *
 								0x1D0 +
 							0x10;
 					}
@@ -4054,8 +4058,8 @@ void CGMonObj::statMove(int* targetIndex)
 					}
 					monObj->m_moveWork.m_mode = 4;
 					monObj->m_moveWork.m_range =
-						static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xCE));
-					monObj->m_moveWork.m_limitFrame = *reinterpret_cast<unsigned short*>(script + 0x1B6);
+						static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xCE));
+					monObj->m_moveWork.m_limitFrame = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1B6);
 				}
 				monObj->m_moveWork.m_target = partyObj;
 				if (((monObj->m_moveWork.m_stateFlags & 1) != 0) ||

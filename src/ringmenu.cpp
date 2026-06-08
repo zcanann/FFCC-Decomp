@@ -173,7 +173,7 @@ void CRingMenu::DrawIcon()
 	}
 
 	float clampedX = kRingMenuClipMinX;
-	if (kRingMenuClipMinX <= clipPos.x) {
+	if (clipPos.x >= kRingMenuClipMinX) {
 		clampedX = clipPos.x;
 		if (kRingMenuClipMaxX < clipPos.x) {
 			clampedX = kRingMenuClipMaxX;
@@ -181,7 +181,7 @@ void CRingMenu::DrawIcon()
 	}
 
 	float clampedY = kRingMenuClipMinY;
-	if (kRingMenuClipMinY <= clipPos.y) {
+	if (clipPos.y >= kRingMenuClipMinY) {
 		clampedY = clipPos.y;
 		if (kRingMenuClipMaxY < clipPos.y) {
 			clampedY = kRingMenuClipMaxY;

@@ -4306,9 +4306,9 @@ int GbaQueue::MakeArtiData(int channel, char* outData)
 	unsigned int artifactData[3];
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	artifactData[0] = SwapU32Value(*reinterpret_cast<unsigned int*>(compatibilityStr + channel * 0xDC + 0x24));
-	artifactData[1] = SwapU32Value(*reinterpret_cast<unsigned int*>(compatibilityStr + channel * 0xDC + 0x28));
-	artifactData[2] = SwapU32Value(*reinterpret_cast<unsigned int*>(compatibilityStr + channel * 0xDC + 0x2C));
+	artifactData[0] = __lwbrx(reinterpret_cast<unsigned int*>(compatibilityStr + channel * 0xDC + 0x24), 0);
+	artifactData[1] = __lwbrx(reinterpret_cast<unsigned int*>(compatibilityStr + channel * 0xDC + 0x28), 0);
+	artifactData[2] = __lwbrx(reinterpret_cast<unsigned int*>(compatibilityStr + channel * 0xDC + 0x2C), 0);
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	memcpy(outData, artifactData, sizeof(artifactData));

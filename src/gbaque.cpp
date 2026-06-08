@@ -1422,37 +1422,41 @@ void GbaQueue::LoadPlayerStat()
 		int j;
 
 		if (memcmp(base + 0x7C4 + 0x18, base + 0x454 + 0x18, 8) != 0) {
-			m_compatibilityFlg[0] = static_cast<unsigned char>(m_compatibilityFlg[0] | (1 << i));
+			m_favoriteFlags = static_cast<unsigned char>(m_favoriteFlags | (1 << i));
 		}
 		if (*reinterpret_cast<unsigned int*>(base + 0x7C4 + 0x24) != *reinterpret_cast<unsigned int*>(base + 0x454 + 0x24)) {
-			m_compatibilityFlg[1] = static_cast<unsigned char>(m_compatibilityFlg[1] | (1 << i));
+			m_moneyFlags = static_cast<unsigned char>(m_moneyFlags | (1 << i));
 		}
 
-		for (j = 0; j < 8; j++) {
-			if (memcmp(base + 0x7C4 + 4, base + 0x454 + 4, 8) != 0) {
-				m_maskSendState[i] = static_cast<signed char>(m_maskSendState[i] | (1 << j));
+		{
+			char* oldMask = base + 0x7C4 + 4;
+			char* newMask = base + 0x454 + 4;
+			for (j = 0; j < 8; j++) {
+				if (memcmp(oldMask, newMask, 8) != 0) {
+					m_compatibilityFlg[i] = static_cast<unsigned char>(m_compatibilityFlg[i] | (1 << j));
+				}
 			}
 		}
 
 		if (base[0x7C4 + 0x23] != base[0x454 + 0x23]) {
-			m_moneyState[0] = static_cast<unsigned char>(m_moneyState[0] | (1 << i));
+			m_chgUseItemFlags = static_cast<unsigned char>(m_chgUseItemFlags | (1 << i));
 		}
 		if (memcmp(base + 0x7C4 + 0x20, base + 0x454 + 0x20, 3) != 0) {
-			m_moneyState[1] = static_cast<unsigned char>(m_moneyState[1] | (1 << i));
+			m_strengthFlags = static_cast<unsigned char>(m_strengthFlags | (1 << i));
 		}
 		if (memcmp(base + 0x7C4 + 0x28, base + 0x454 + 0x28, 0xC) != 0) {
-			m_moneyState[2] = static_cast<unsigned char>(m_moneyState[2] | (1 << i));
+			m_artifactFlags = static_cast<unsigned char>(m_artifactFlags | (1 << i));
 		}
 		if (*reinterpret_cast<unsigned short*>(base + 0x7C4 + 0x14) !=
-		    *reinterpret_cast<unsigned short*>(base + 0x454 + 0x14)) {
-			m_compatibilityFlg[2] = static_cast<unsigned char>(m_compatibilityFlg[2] | (1 << i));
+		    *reinterpret_cast<unsigned short*>(localPlayerStat + (i * 0xDC) + 0x14)) {
+			m_memorysFlags = static_cast<unsigned char>(m_memorysFlags | (1 << i));
 		}
 
 		if (base[0x7C4 + 0xD3] != base[0x454 + 0xD3]) {
 			const int shift = i << 1;
-			m_radarMode = static_cast<unsigned char>(m_radarMode | (1 << shift));
+			m_cmdNumFlags = static_cast<unsigned char>(m_cmdNumFlags | (1 << shift));
 			if ((static_cast<int>(base[0x454 + 0xD3]) - static_cast<int>(base[0x7C4 + 0xD3])) != 1) {
-				m_radarMode = static_cast<unsigned char>(m_radarMode | (2 << shift));
+				m_cmdNumFlags = static_cast<unsigned char>(m_cmdNumFlags | (2 << shift));
 			}
 		}
 	}

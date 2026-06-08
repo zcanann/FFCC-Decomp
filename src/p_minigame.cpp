@@ -1019,7 +1019,7 @@ comm_fail:
         if (param[0xC7] >= 2)
         {
             ret = 1;
-            for (unsigned int i = 0; i < 100; i++)
+            for (int i = 0; i < 100; i++)
             {
                 ret = GBAJoyBoot(channel, channel << 1, 2, *reinterpret_cast<u8**>(param + 0x8C),
                                  *reinterpret_cast<int*>(param + 0x90), param + 0xC0);
@@ -1254,7 +1254,7 @@ comm_fail:
             {
                 MiniGameThreadSleepTicks(OSMicrosecondsToTicks(10));
                 ret = GBARead(channel, param + 0xA0, param + 0xC0);
-                if (ret != 0 || ((*reinterpret_cast<int*>(param + 0xA0) >> 24) != 0x20))
+                if (ret != 0 || ((*reinterpret_cast<unsigned int*>(param + 0xA0) >> 24) != 0x20))
                 {
                     System.Printf(const_cast<char*>(s_miniGameSourceLineFmt), s_miniGameSourceName, 0x372);
                     goto comm_fail;

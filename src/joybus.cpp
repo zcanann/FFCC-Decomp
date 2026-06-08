@@ -2064,7 +2064,7 @@ void JoyBus::WriteContext(ThreadParam* threadParam)
 void JoyBus::SetPadData(ThreadParam* threadParam, unsigned char* data)
 {
     unsigned short flags = 0;
-    unsigned char b1 = data[1];
+    signed char b1 = data[1];
 
     if (b1 & 0x01) flags |= 0x0100;
     if (b1 & 0x02) flags |= 0x0200;
@@ -6709,7 +6709,7 @@ int JoyBus::IsInitSend(int portIndex)
     ThreadParam& tp = m_threadParams[portIndex];
 
     OSWaitSemaphore(&m_accessSemaphores[portIndex]);
-    unsigned int state = tp.m_state;
+    int state = tp.m_state;
     OSSignalSemaphore(&m_accessSemaphores[portIndex]);
 
     unsigned int result = 0;
@@ -7149,7 +7149,7 @@ int JoyBus::SetMoney(int portIndex, unsigned int money)
  */
 int JoyBus::SetMType(int portIndex, int mtype)
 {
-    unsigned int state;
+    int state;
 
     OSWaitSemaphore(&m_accessSemaphores[portIndex]);
     state = m_threadParams[portIndex].m_state;
@@ -7271,7 +7271,7 @@ void JoyBus::RestartThread()
             int left = 1;
 
             unsigned char sum =
-                (unsigned char)(
+                (signed char)(
                     ((((((((((((((((((((((((((((-0x19
                     - Joybus.m_gbaBootImage[0xA0])
                     - Joybus.m_gbaBootImage[0xA1])

@@ -306,9 +306,9 @@ void CGMonObj::frameStatFuncGiantCrab()
 			}
 
 			*(u32*)(self + 0x1c0) &= 0xfff7fffd;
-			float moveScale = PSVECDistance((Vec*)(CGMonObj::m_boss + 0x8), (Vec*)(self + 0x15c)) * kMonObjBossOneSixteenth;
-			Vec moveDir = { 0.0f, 0.0f, 0.0f };
-			reinterpret_cast<CGObject*>(self)->Move(&moveDir, moveScale, 0x10, 1, 0, 0, 0);
+			Vec* moveDir = (Vec*)(CGMonObj::m_boss + 0x8);
+			float moveScale = PSVECDistance(moveDir, (Vec*)(self + 0x15c)) * kMonObjBossOneSixteenth;
+			reinterpret_cast<CGObject*>(self)->Move(moveDir, moveScale, 0x10, 1, 0, 0, 0);
 
 			int targetIdx = *(int*)(self + 0x6c4);
 			if (targetIdx >= 0) {

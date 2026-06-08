@@ -1116,7 +1116,8 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 				*reinterpret_cast<int*>(&engineObject->m_attackColliders[7].m_localStart.x) = x;
 				*reinterpret_cast<int*>(&engineObject->m_damageColliders[0].m_localPosition.x) = x;
 			} else {
-				*reinterpret_cast<int*>(&engineObject->m_attackColliders[index + 1].m_localStart.x) = x;
+				*reinterpret_cast<int*>(
+				    reinterpret_cast<u8*>(&engineObject->m_attackColliders[1].m_localStart.x) + index * 0x30) = x;
 			}
 			PushValue(this, object, 0);
 			outResult = 0;

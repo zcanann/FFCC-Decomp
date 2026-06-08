@@ -873,18 +873,18 @@ void CGPartyObj::onFrameAlways()
 		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
 		int shieldIndex = *reinterpret_cast<short*>(script + 0xB0);
 		int shieldItem;
-		if (shieldIndex < 0) {
-			shieldItem = 0;
-		} else {
+		if (shieldIndex >= 0) {
 			shieldItem = *reinterpret_cast<short*>(script + shieldIndex * 2 + 0xB6);
-		}
-		if (shieldItem <= 0) {
-			LoadShield(-1);
 		} else {
+			shieldItem = 0;
+		}
+		if (shieldItem > 0) {
 			int shieldModel = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + shieldItem * 0x48 + 2) & 0xFFF;
 			if (m_shieldModelHandle == nullptr || static_cast<unsigned int>(m_shieldModelHandle->m_charaNo) != static_cast<unsigned int>(shieldModel)) {
 				LoadShield(shieldModel);
 			}
+		} else {
+			LoadShield(-1);
 		}
 	} else {
 		LoadWeapon(-1, 0);
@@ -895,10 +895,10 @@ void CGPartyObj::onFrameAlways()
 	int port = reinterpret_cast<int>(m_scriptHandle[0xED]);
 	bool showTraceParticle = false;
 	if ((Game.m_gameWork.m_gameInitFlag != 0) &&
-	    ((CFlatGameFlags() & 0x10) != 0) &&
-	    ((CFlatGameFlags() & 0x08) != 0) &&
+	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 28) & 0xC0000000) >> 31) != 0) &&
+	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 29) & 0xC0000000) >> 31) != 0) &&
 	    ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) << 24) & 0xC0000000) >> 31) != 0) &&
-	     (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(static_cast<unsigned char>(m_weaponNodeFlags >> 8)) << 24) & 0xC0000000) >> 31) != 0)) &&
+	     (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1)) << 24) & 0xC0000000) >> 31) != 0)) &&
 	    (m_lastStateId != 6 && m_lastStateId != 2)) {
 		if ((Game.m_gameWork.m_menuStageMode == 0) ||
 		    (Game.m_gameWork.m_bossArtifactStageIndex >= 0x0F) ||
@@ -1656,7 +1656,7 @@ void CGPartyObj::shouki()
 		}
 		if (isFrameInterval(*reinterpret_cast<int*>(&m_flagBits), damageInterval)) {
 			playSe3D(0x19, 0x32, 0x96, 0, 0);
-			if ((CFlatGameFlags() & 0x20) == 0) {
+			if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 26) & 0xC0000000) >> 31) == 0) {
 				addHp(-1, static_cast<CGPrgObj*>(0));
 			}
 		}
@@ -3026,7 +3026,7 @@ void CGPartyObj::onStatMagic()
 		break;
 	}
 
-	if (m_subState >= 2) {
+	if (m_subState > 1) {
 		return;
 	}
 
@@ -3453,7 +3453,7 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 		return;
 	}
 
-	unsigned int bonusSlot = reinterpret_cast<unsigned char*>(m_scriptHandle)[0xBA4];
+	int bonusSlot = reinterpret_cast<unsigned char*>(m_scriptHandle)[0xBA4];
 	unsigned int addValue = 0;
 	unsigned int subValue = 0;
 	unsigned short currentAdd = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBCA);
@@ -3496,7 +3496,7 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 	case 4:
 	case 6:
 		if (kind == 4) {
-			unsigned short item = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + value * 0x48);
+			int item = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + value * 0x48);
 			if ((bonusSlot == 4 && item == 0x100) || (bonusSlot == 6 && item == 400)) {
 				addValue = stageAdd;
 			} else if (bonusSlot == 2) {
@@ -3526,7 +3526,7 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 	case 3:
 	case 0xE:
 		if (kind == 5) {
-			short item = *reinterpret_cast<short*>(Game.unkCFlatData0[2] + value * 0x48);
+			int item = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + value * 0x48);
 			if ((bonusSlot == 0xE && (item == 0x17D || item == 0x186)) ||
 			    (bonusSlot == 3 && item != 0x17D && item != 0x186)) {
 				addValue = stageAdd;
@@ -3728,28 +3728,30 @@ int CGPartyObj::useItem(int itemId)
 			case 0x17D: {
 				int heal;
 				int foodIndex = itemId - 0x17D;
-				if ((foodIndex < 0) || (foodIndex >= 8)) {
-					heal = 4;
-				} else {
+				if ((foodIndex >= 0) && (foodIndex < 8)) {
 					unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
-					unsigned int value = *reinterpret_cast<unsigned short*>(script + foodIndex * 2 + 0x3B8) / 10;
+					int value = *reinterpret_cast<unsigned short*>(script + foodIndex * 2 + 0x3B8) / 10;
 					heal = 1;
-					if (value != 0) {
+					if (value > 0) {
 						heal = value;
 					}
 					m_scriptHandle[0x2F4] =
 					    reinterpret_cast<void*>(static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x68)));
 					m_scriptHandle[0x2F5] = reinterpret_cast<void*>(itemId);
+				} else {
+					heal = 4;
 				}
 				addHp(heal, 0);
 				System.Printf(const_cast<char*>(msgBase + 0x194), heal);
 				break;
 			}
 			case 0x186: {
-				int heal = 2;
+				int heal;
 				if ((itemId == 0x188) &&
 				    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) == 2)) {
 					heal = 4;
+				} else {
+					heal = 2;
 				}
 				addHp(heal, 0);
 				System.Printf(const_cast<char*>(msgBase + 0x1AC), heal);
@@ -5027,14 +5029,16 @@ void CGPartyObj::gpmMove()
 
 	float frameScale = static_cast<float>(CharaGhostValue(0x2054)) / kMonObjPercentMax;
 	float pressureScale;
-	if (stageMode == 2) {
-		pressureScale = FLOAT_80331A58 * frameScale + FLOAT_80331A58;
-	} else if (stageMode > 2) {
+	switch (stageMode) {
+	default:
 		pressureScale = kMonObjOne;
-	} else if (stageMode == 1) {
+		break;
+	case 1:
 		pressureScale = FLOAT_80331A58 * (kMonObjOne - frameScale) + FLOAT_80331A58;
-	} else {
-		pressureScale = kMonObjOne;
+		break;
+	case 2:
+		pressureScale = FLOAT_80331A58 * frameScale + FLOAT_80331A58;
+		break;
 	}
 
 	int pressureLimit = static_cast<int>(FLOAT_80331A5C * pressureScale);
@@ -5050,11 +5054,13 @@ void CGPartyObj::gpmMove()
 		sGhostPartyWork.pressure -= 4;
 	}
 
-	if (sGhostPartyWork.pressure < 0) {
-		sGhostPartyWork.pressure = 0;
-	} else if (sGhostPartyWork.pressure > pressureLimit + 100) {
-		sGhostPartyWork.pressure = pressureLimit + 100;
+	int clampedPressure = sGhostPartyWork.pressure;
+	if (clampedPressure < 0) {
+		clampedPressure = 0;
+	} else if (clampedPressure > pressureLimit + 100) {
+		clampedPressure = pressureLimit + 100;
 	}
+	sGhostPartyWork.pressure = clampedPressure;
 
 	if (sGhostPartyWork.pressure < pressureLimit / 3) {
 		sGhostPartyWork.flagBits.flag04 = 0;

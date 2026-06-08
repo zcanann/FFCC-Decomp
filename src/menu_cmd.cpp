@@ -2320,8 +2320,9 @@ void CMenuPcs::DrawUniteList()
 			x = (target - x) * t + x;
 		}
 
+		const float uniteListPy = static_cast<float>(entry->y + 3) - kCmdMenuTextYOffset;
 		font->SetPosX(x);
-		font->SetPosY(static_cast<float>(entry->y + 3) - kCmdMenuTextYOffset);
+		font->SetPosY(uniteListPy);
 		font->Draw(text);
 	}
 
@@ -2416,14 +2417,16 @@ void CMenuPcs::DrawUniteList()
 		const int itemId = caravan->m_commandListExtra[s_UniteTop[i]];
 		const char* text = GetStrikeListName(itemId);
 		const float width = static_cast<float>(font->GetWidth(text));
+		const float unitePanelPy =
+		    static_cast<float>(((static_cast<float>(panel->height) - kCmdMenuTextLineHeightD) *
+		                            kCmdMenuHalfD +
+		                        static_cast<float>(panel->y)) -
+		                       kCmdMenuTextBaselineOffsetD) -
+		    kCmdMenuTextYOffset;
 		font->SetPosX(static_cast<float>((static_cast<double>(panel->width) - width) *
 		                  kCmdMenuHalfD +
 		              static_cast<double>(panel->x)));
-		font->SetPosY(static_cast<float>(((static_cast<float>(panel->height) - kCmdMenuTextLineHeightD) *
-		                                      kCmdMenuHalfD +
-		                                  static_cast<float>(panel->y)) -
-		                                 kCmdMenuTextBaselineOffsetD) -
-		              kCmdMenuTextYOffset);
+		font->SetPosY(unitePanelPy);
 		font->Draw(text);
 	}
 

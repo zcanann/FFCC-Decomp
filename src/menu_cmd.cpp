@@ -2315,7 +2315,7 @@ void CMenuPcs::DrawUniteList()
 	const u16 topX = GetCmdListStorage(this)->entries[0].x;
 	for (s32 i = 0; i < caravan->m_numCmdListSlots; i++) {
 		const s16 slotType = caravan->m_commandListExtra[i];
-		if ((i <= 7) && (slotType == 0)) {
+		if ((i < 8) && (slotType == 0)) {
 			continue;
 		}
 

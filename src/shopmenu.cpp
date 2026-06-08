@@ -1225,8 +1225,11 @@ void CShopMenu::DrawItemInfo0()
 
         SetupShopMenuInfoFont(font);
         const char* quantityText = ShopMenuMes(languageId, SHOP_MENU_TEXT_QUANTITY);
+        float quantityWidth = font->GetWidth(quantityText);
         font->DrawInit();
-        DrawShopMenuRightAlignedTextTrunc(font, quantityText, static_cast<float>(countRightX) - FLOAT_80332d5c, FLOAT_80332d6c, 0x18);
+        int quantityX = static_cast<int>(static_cast<float>(countRightX) - FLOAT_80332d5c - quantityWidth);
+        MenuPcs.DrawNoShadowFont(font, const_cast<char*>(quantityText), static_cast<float>(quantityX), FLOAT_80332d6c, 0x18, 0x12);
+        MenuPcs.DrawInit();
 
         int x = static_cast<int>(-(static_cast<float>(m_figureMode) * FLOAT_80332d74 - FLOAT_80332d70));
         drawShapeSeqScale(0x12, 0, x, 0xD4, FLOAT_80332d78, FLOAT_80332d78, 0xFF);

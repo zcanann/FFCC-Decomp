@@ -1997,7 +1997,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 		}
 	}
 
-	memset(candidates, -1, sizeof(candidates));
+	memset(candidates, 0xff, sizeof(candidates));
 
 	int write = 2;
 	for (int slot = 2; slot < 8;) {
@@ -2027,7 +2027,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 		slot = nextSlot;
 	}
 
-	memset(itemKinds, -1, sizeof(itemKinds));
+	memset(itemKinds, 0xff, sizeof(itemKinds));
 
 	int index = 2;
 	for (int slot = 2; slot < 8; slot++, index++) {
@@ -2063,7 +2063,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 
 	unsigned int matchCount = 0;
 	if (itemKinds[selected] > 0) {
-		memset(matches, -1, sizeof(matches));
+		memset(matches, 0xff, sizeof(matches));
 
 		if ((itemKinds[selected] == 999) && (selected > 2)) {
 			int patIdx = 0;

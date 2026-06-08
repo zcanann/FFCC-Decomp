@@ -13653,6 +13653,8 @@ int McCtrl::ChkEmpty(int param_2)
 			}
 		}
 		break;
+	case 4:
+		break;
 	}
 
 	int result;

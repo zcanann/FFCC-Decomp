@@ -2103,7 +2103,7 @@ void CMenuPcs::CalcResultCloseAnim()
 		}
 
 		for (int i = 0; i < activePartyCount; i++) {
-			int sprite = this->m_bonusAnimPtr + (i + 1) * 0x40 + 8;
+			int sprite =  (s32)(this->m_bonusAnimPtr + (i + 1) * 0x40 + 8);
 			*(int*)(sprite + 0x24) = 0x10;
 		}
 
@@ -2147,7 +2147,8 @@ void CMenuPcs::CalcResultCloseAnim()
 		base += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
 			short* sprite = (short*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
-			*(int*)(sprite + 0x12) = *(int*)(sprite - (base - activePartyCount - 1) * 0x20 + 0x12);
+			int __p16 = activePartyCount;
+			*(int*)(sprite + 0x12) = *(int*)(sprite - (base - __p16 - 1) * 0x20 + 0x12);
 			*(int*)((int)sprite + 0x2c) = 1;
 			*(float*)(sprite + 0x1c) = (float)(int)*sprite;
 			*(float*)(sprite + 0x18) = FLOAT_80331ED0;
@@ -2199,7 +2200,7 @@ void CMenuPcs::CalcResultCloseAnim()
 		// extraBase + 3*pc block: flags = 0
 		base += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
-			int sprite = this->m_bonusAnimPtr + (base + i) * 0x40 + 8;
+			int sprite =  (int)(unsigned int)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
 			*(int*)(sprite + 0x24) = 0;
 		}
 

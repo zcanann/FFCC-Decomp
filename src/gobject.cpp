@@ -3137,9 +3137,7 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
 
             if (MapMng.CheckHitCylinderNear(
                     &attrCylinder,
-                    reinterpret_cast<Vec*>(&attrDirection), 0x78000000) == 0) {
-                m_bgAttrValue = sAnimFrameOffset;
-            } else {
+                    reinterpret_cast<Vec*>(&attrDirection), 0x78000000) != 0) {
                 switch (gMapHitFace->m_groupIndex - 0x28) {
                 case 0:
                     m_bgAttrValue = sBgAttrSlow;
@@ -3156,6 +3154,8 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
                 default:
                     break;
                 }
+            } else {
+                m_bgAttrValue = sAnimFrameOffset;
             }
         }
         m_animBlend = m_bgAttrValue;

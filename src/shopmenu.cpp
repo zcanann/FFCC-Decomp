@@ -1066,7 +1066,9 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
         MenuPcs.DrawInit();
 
         int fontColor = 9;
-        if ((attr == 0) || (attr >= 9)) {
+        if ((attr >= 1) && (attr <= 8)) {
+            sprintf(textBuffer, s_StringFormat_80332d40, s_PlusOne_80332d38);
+        } else {
             if ((attr == 0xB) || (attr == 0x11) || (attr == 0x12)) {
                 sprintf(textBuffer, s_StringDecimalFormat_80332d44, s_Plus_80332d4c, statValue);
             } else {
@@ -1076,8 +1078,6 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
                 sprintf(textBuffer, s_StringDecimalFormat_80332d44, s_Minus_80332d50, statValue);
                 fontColor = 3;
             }
-        } else {
-            sprintf(textBuffer, s_StringFormat_80332d40, s_PlusOne_80332d38);
         }
 
         font->SetScaleX(FLOAT_80332d28);

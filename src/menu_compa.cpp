@@ -193,11 +193,11 @@ void CMenuPcs::CompaDraw()
 		familyCount = 4;
 	}
 
-	for (unsigned int i = 0; i < familyCount; i++) {
+	for (int i = 0; i < familyCount; i++) {
 		MenuPcs.DrawRect(
 			0,
 			static_cast<float>(compaList->entries[0].x + 0x10),
-			static_cast<float>(compaList->entries[0].y + 0x40 + i * 0x28),
+			static_cast<float>(compaList->entries[0].y + 0x40) + static_cast<float>(i * 0x28),
 			kCompaFoodIconWidth, kCompaFoodIconHeight, kCompaZero, kCompaZero, kCompaOne,
 			kCompaOne, kCompaZero);
 	}

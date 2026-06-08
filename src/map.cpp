@@ -1807,14 +1807,12 @@ int CMapMng::ReadMtx(char* mapName)
 
         void* filePtr;
         if (m_asyncLoadState.m_mapReadMode == 1) {
-            int& readIndex = m_asyncLoadState.m_asyncReadIndex;
-            int size = m_asyncLoadState.m_fileSizes[readIndex];
-            void* amemCursor = m_asyncLoadState.m_mapLoadCursor;
+            int size = m_asyncLoadState.m_fileSizes[m_asyncLoadState.m_asyncReadIndex];
             filePtr = File.m_readBuffer;
-            Memory.CopyFromAMemorySync(filePtr, amemCursor, static_cast<unsigned long>((size + 0x1F) & ~0x1F));
+            Memory.CopyFromAMemorySync(filePtr, m_asyncLoadState.m_mapLoadCursor, static_cast<unsigned long>((size + 0x1F) & ~0x1F));
             m_asyncLoadState.m_mapLoadCursor = reinterpret_cast<unsigned char*>(m_asyncLoadState.m_mapLoadCursor) + size;
             CheckSum(filePtr, size);
-            readIndex += 1;
+            m_asyncLoadState.m_asyncReadIndex += 1;
         } else {
             CFile::CHandle* handle = File.Open(strTmp, 0, CFile::PRI_LOW);
             if (handle == 0) {
@@ -1824,21 +1822,18 @@ int CMapMng::ReadMtx(char* mapName)
                 if (m_asyncLoadState.m_mapReadMode == 3) {
                     File.ReadASync(handle);
                     filePtr = reinterpret_cast<void*>(1);
-                    int& openIndex = m_asyncLoadState.m_asyncOpenIndex;
-                    m_asyncLoadState.m_asyncHandles[openIndex] = handle;
-                    openIndex += 1;
+                    m_asyncLoadState.m_asyncHandles[m_asyncLoadState.m_asyncOpenIndex] = handle;
+                    m_asyncLoadState.m_asyncOpenIndex += 1;
                 } else {
                     File.Read(handle);
                     File.SyncCompleted(handle);
                     filePtr = File.m_readBuffer;
                     File.Close(handle);
                     if (m_asyncLoadState.m_mapReadMode == 2) {
-                        int& readIndex = m_asyncLoadState.m_asyncReadIndex;
-                        void* amemCursor = m_asyncLoadState.m_mapLoadCursor;
-                        Memory.CopyToAMemorySync(filePtr, amemCursor, static_cast<unsigned long>(size));
-                        m_asyncLoadState.m_fileSizes[readIndex] = size;
-                        m_asyncLoadState.m_fileChecksums[readIndex] = CheckSum(filePtr, size);
-                        readIndex += 1;
+                        Memory.CopyToAMemorySync(filePtr, m_asyncLoadState.m_mapLoadCursor, static_cast<unsigned long>(size));
+                        m_asyncLoadState.m_fileSizes[m_asyncLoadState.m_asyncReadIndex] = size;
+                        m_asyncLoadState.m_fileChecksums[m_asyncLoadState.m_asyncReadIndex] = CheckSum(filePtr, size);
+                        m_asyncLoadState.m_asyncReadIndex += 1;
                         m_asyncLoadState.m_mapLoadCursor =
                             reinterpret_cast<unsigned char*>(m_asyncLoadState.m_mapLoadCursor) + size;
                     }

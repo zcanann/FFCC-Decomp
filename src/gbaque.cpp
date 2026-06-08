@@ -3675,9 +3675,9 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 			memset(sellInfo, 0, sizeof(sellInfo));
 		} else {
 			const int itemBase = Game.unkCFlatData0[2] + itemId * 0x48;
-			sellInfo[0] = SwapU16(*reinterpret_cast<unsigned short*>(itemBase + 4));
-			sellInfo[1] = SwapU16(*reinterpret_cast<unsigned short*>(itemBase + 6));
-			sellInfo[2] = SwapU16(*reinterpret_cast<unsigned short*>(itemBase + 8));
+			sellInfo[0] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 4), 0);
+			sellInfo[1] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 6), 0);
+			sellInfo[2] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 8), 0);
 			sellInfo[3] = 0;
 		}
 		memcpy(outData, sellInfo, 8);

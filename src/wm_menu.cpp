@@ -6912,11 +6912,11 @@ void CMenuPcs::CalcFukidashi()
 		rotXMtx[2][3] = *reinterpret_cast<float*>(puVar20 + 9);
 		PSMTXConcat(rotXMtx, scaleMtx, scaleMtx);
 
-		CChara::CModel* const modelPtr =
-		    *reinterpret_cast<CChara::CModel**>(*reinterpret_cast<int*>(bytes + 0x7F4 + modelIdx * 4) + 0x168);
+#define modelPtr (*reinterpret_cast<CChara::CModel**>(*reinterpret_cast<int*>(bytes + 0x7F4 + modelIdx * 4) + 0x168))
 		modelPtr->SetMatrix(scaleMtx);
 		modelPtr->CalcMatrix();
 		modelPtr->CalcSkin();
+#undef modelPtr
 
 		puVar20[1] = puVar20[1] + 1;
 		if (static_cast<double>(static_cast<float>(static_cast<double>(puVar20[1]))) >=

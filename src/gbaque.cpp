@@ -449,7 +449,7 @@ void GbaQueue::ClrShopMode()
 			continue;
 		}
 
-		if (caravanWork->m_shopBusyFlag == 1) {
+		if (caravanWork->m_shopRequestState == 1) {
 			OSWaitSemaphore(accessSemaphores + i);
 			{
 				const unsigned char playerMask = static_cast<unsigned char>(1 << i);
@@ -466,7 +466,7 @@ void GbaQueue::ClrShopMode()
 			caravanWork->CallShop(0, 0, 0, 0, 0);
 		}
 
-		if (caravanWork->m_shopBusyFlag == 2) {
+		if (caravanWork->m_shopRequestState == 2) {
 			OSWaitSemaphore(accessSemaphores + i);
 			{
 				const unsigned char shopMask = static_cast<unsigned char>(0x10 << i);

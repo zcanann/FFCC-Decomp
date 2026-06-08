@@ -244,8 +244,8 @@ void CGraphicPcs::drawScreenFade()
         baseColor2.a = fadeAlpha;
 
         if (slot == 3) {
-            const int barHeight = (int)(kGraphicScreenHeight * fadeWave);
-            const int barEdge = (int)(kScreenFadeBarEdge * fadeWave);
+            const int barHeight = (int)(kScreenFadeBarEdge * fadeWave);
+            const int barEdge = (int)(kScreenFadeRingWidth * fadeWave);
 
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
             GXPosition3f32(kGraphicZero, kGraphicZero, kGraphicZero);

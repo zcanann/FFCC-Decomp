@@ -10958,7 +10958,7 @@ LAB_draw:
 			         static_cast<float>(*reinterpret_cast<short*>(frameEntry + 6)),
 			         *reinterpret_cast<float*>(frameEntry + 8), *reinterpret_cast<float*>(frameEntry + 0x0C),
 			         FLOAT_803313e8, FLOAT_803313e8,
-			         static_cast<float>(*reinterpret_cast<unsigned int*>(frameEntry + 0x18)));
+			         static_cast<float>(*reinterpret_cast<int*>(frameEntry + 0x18)));
 		}
 	}
 
@@ -11006,7 +11006,7 @@ LAB_draw:
 				if (*reinterpret_cast<int*>(slotData + 0x24) >= 0) {
 					memberCount++;
 				}
-				const unsigned int panelWidth = memberCount * 0x30 + 0x40;
+				const int panelWidth = memberCount * 0x30 + 0x40;
 				MenuPcs.DrawRect(0xFFFFFFFF,
 				         FLOAT_80331468 + FLOAT_803314d8 + static_cast<float>(static_cast<int>(panelWidth)),
 				         rowY, FLOAT_803314d8, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc,

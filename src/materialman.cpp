@@ -135,7 +135,7 @@ struct ShadowCandidate
 
 static inline CLightPcs::CBumpLight* GetMapBumpLight(int bumpIndex)
 {
-    return LightPcs.GetBumpLight(static_cast<CLightPcs::TARGET>(1), bumpIndex);
+    return LightPcs.GetBumpLight(static_cast<CLightPcs::TARGET>(1), 0) + bumpIndex;
 }
 
 static void ReleaseRefNonNull(CRef* object)

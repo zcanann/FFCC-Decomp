@@ -513,9 +513,15 @@ void CGMonObj::frameStatFuncGolem()
 		setAttackAfter(*reinterpret_cast<int*>(self + 0x560));
 	} else {
 		if (reinterpret_cast<CGPrgObj*>(this)->m_stateFrame == 0) {
-			float turnOffset = kMonObjBossZero;
-			if (state == 0x68) {
-				turnOffset = kMonObjBossPi;
+			float turnOffset;
+			if (state != 0x67) {
+				if (state < 0x67) {
+					if (state > 0x65) {
+						turnOffset = kMonObjBossZero;
+					}
+				} else if (state < 0x69) {
+					turnOffset = kMonObjBossPi;
+				}
 			}
 			reinterpret_cast<CGPrgObj*>(this)->reqAnim(1, 1, 0);
 			reinterpret_cast<CGObject*>(this)->m_rotTargetY =

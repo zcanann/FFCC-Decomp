@@ -822,7 +822,7 @@ void CGPartyObj::menu()
 		}
 	}
 
-	if (System.m_execParam > 2) {
+	if (static_cast<unsigned int>(System.m_execParam) >= 3) {
 		System.Printf(const_cast<char*>("port:%d mode:%d"), portIndex, Joybus.GetCtrlMode(static_cast<char>(m_animStateMisc)));
 	}
 
@@ -894,7 +894,7 @@ void CGPartyObj::onFrameAlways()
 
 	reinterpret_cast<CCaravanWork*>(m_scriptHandle)->CalcStatus();
 	int port = reinterpret_cast<int>(m_scriptHandle[0xED]);
-	bool showTraceParticle = false;
+	int showTraceParticle = 0;
 	if ((Game.m_gameWork.m_gameInitFlag != 0) &&
 	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 28) & 0xC0000000) >> 31) != 0) &&
 	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 29) & 0xC0000000) >> 31) != 0) &&
@@ -904,8 +904,8 @@ void CGPartyObj::onFrameAlways()
 		if ((Game.m_gameWork.m_menuStageMode == 0) ||
 		    (Game.m_gameWork.m_bossArtifactStageIndex >= 0x0F) ||
 		    ((static_cast<unsigned short>(GetCID()) & 0x6D) != 0x6D) ||
-		    (m_scriptHandle[0xED] == nullptr)) {
-			showTraceParticle = true;
+		    (reinterpret_cast<int>(m_scriptHandle[0xED]) == 0)) {
+			showTraceParticle = 1;
 		}
 	}
 
@@ -918,7 +918,7 @@ void CGPartyObj::onFrameAlways()
 		traceSlot = 0;
 	}
 
-	if (m_scriptHandle[0xED] == nullptr && (MiniGamePcs.m_flags & 0x400) != 0) {
+	if (reinterpret_cast<int>(m_scriptHandle[0xED]) == 0 && (MiniGamePcs.m_flags & 0x400) != 0) {
 		reinterpret_cast<CAStar*>(reinterpret_cast<unsigned char*>(&DbgMenuPcs) + 0x2A5C)->addRealTime(this);
 	}
 
@@ -934,7 +934,7 @@ void CGPartyObj::onFrameAlways()
 		         ((itemModel & 0x0FFF) == 0x0FFF) ||
 		         (itemId == 400));
 
-		if (m_scriptHandle[0xED] == nullptr) {
+		if (reinterpret_cast<int>(m_scriptHandle[0xED]) == 0) {
 			CGItemObj::CreateFromScript(0, 4, itemId, this, FLOAT_80331a78, (CGItemObj::CCFS*)0);
 			if (Math.Rand(10) == 0) {
 				CGItemObj::CreateFromScript(2, 4, 0x3039, this, FLOAT_80331a78, (CGItemObj::CCFS*)0);
@@ -1211,7 +1211,7 @@ void CGPartyObj::command()
 				canAddBlock = true;
 				break;
 			case 0xCA:
-				if (CFlatCenterState() == 0) {
+				if (static_cast<int>(CFlatCenterState()) == 0) {
 					secondaryAvailable = true;
 					secondaryCommand = 0x1C;
 				} else {
@@ -1224,7 +1224,7 @@ void CGPartyObj::command()
 				secondaryCommand = 6;
 				break;
 			case 0xC8:
-				if (CFlatCenterState() == 0) {
+				if (static_cast<int>(CFlatCenterState()) == 0) {
 					secondaryAvailable = true;
 					secondaryCommand = 0x0B;
 				} else {
@@ -1233,7 +1233,7 @@ void CGPartyObj::command()
 				}
 				break;
 			case 0xC9:
-				if (CFlatCenterState() == 0) {
+				if (static_cast<int>(CFlatCenterState()) == 0) {
 					secondaryAvailable = true;
 					secondaryCommand = 0x0A;
 				} else {
@@ -1786,7 +1786,7 @@ void CGPartyObj::onFrameStat()
 				FLOAT_8032EE7C = *reinterpret_cast<float*>(Game.unk_flat3_0xc7d0 + 0x160) - m_worldPosition.y;
 			}
 
-			if (m_stateFrame < 0x0C) {
+			if (m_stateFrame <= 0x0B) {
 				const float phase = sinf((FLOAT_80331AB8 * static_cast<float>(m_stateFrame)) / FLOAT_80331AC0);
 				m_extraMoveVec.x = FLOAT_8032EE78 * phase * sinf(m_rotBaseY);
 				m_extraMoveVec.z = FLOAT_8032EE78 * phase * cosf(m_rotBaseY);
@@ -1895,7 +1895,7 @@ void CGPartyObj::onFrameStat()
 				enableDamageCol(0);
 			}
 			if ((getPadHeldForSlot(static_cast<signed char>(m_animStateMisc)) & 0x100) == 0) {
-				if (m_subFrame > 0x18) {
+				if (m_subFrame >= 0x19) {
 					playSe3D(0x30, 0x32, 0x96, 0, 0);
 				}
 				m_alpha = kMonObjOne;
@@ -2225,9 +2225,7 @@ void CGPartyObj::statCharge()
 					CVector dest(m_comboCenter);
 					if ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 0x32) & 0x10) != 0) {
 						unsigned int maxReach = *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x70);
-						if (mag <= static_cast<float>(maxReach)) {
-							mag = FLOAT_80331a78;
-						} else {
+						if (static_cast<float>(maxReach) < mag) {
 							CVector dir(delta);
 							CVector scaled;
 							PSVECScale(reinterpret_cast<Vec*>(&dir), reinterpret_cast<Vec*>(&scaled), mag - static_cast<float>(maxReach));
@@ -2240,6 +2238,8 @@ void CGPartyObj::statCharge()
 							dest.y = sum.y;
 							dest.z = sum.z;
 							mag = mag - static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x70));
+						} else {
+							mag = FLOAT_80331a78;
 						}
 					}
 					if (FLOAT_80331a78 != mag) {
@@ -2276,7 +2276,9 @@ void CGPartyObj::statCharge()
 				if (FLOAT_80331a78 != diff.y && FLOAT_80331a78 != horiz) {
 					float ang = -static_cast<float>(atan2(diff.y, horiz));
 					float clamped = -angLimit;
-					if (-angLimit <= ang) {
+					if (ang < -angLimit) {
+						clamped = -angLimit;
+					} else {
 						clamped = ang;
 						if (angLimit < ang) {
 							clamped = angLimit;
@@ -2292,7 +2294,7 @@ void CGPartyObj::statCharge()
 	}
 	}
 
-	if (m_subState < 2) {
+	if (m_subState <= 1) {
 		int slot = static_cast<signed char>(m_animStateMisc);
 		if ((getPadHeldForSlot(slot) & 0x100) == 0) {
 			if (m_subState == 0 || (m_subState == 1 && m_comboState == 0)) {
@@ -2436,7 +2438,7 @@ void CGPartyObj::onStatAttack(int chargeType)
 
 	const unsigned short comboStart = *reinterpret_cast<unsigned short*>(attackEntry + 0x0C);
 	const unsigned short comboEnd = *reinterpret_cast<unsigned short*>(attackEntry + 0x0E);
-	if (comboStart <= m_stateFrame && m_stateFrame <= comboEnd) {
+	if (m_stateFrame >= comboStart && m_stateFrame <= comboEnd) {
 		if ((getPadTrigForSlot(static_cast<signed char>(m_animStateMisc)) & 0x100) != 0) {
 			party.commandFlagBits.commandActive = 1;
 		}
@@ -3550,7 +3552,7 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 		}
 		break;
 	case 10:
-		if ((unsigned int)(kind - 0x12) < 3 || kind == 0x15) {
+		if ((unsigned int)(kind - 0x12) <= 2 || kind == 0x15) {
 			subValue = stageSub;
 		}
 		if (kind == 0x17) {
@@ -3558,12 +3560,12 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 		}
 		break;
 	case 0x0B:
-		if ((unsigned int)(kind - 0x0E) < 3 || kind == 0x11) {
+		if ((unsigned int)(kind - 0x0E) <= 2 || kind == 0x11) {
 			addValue = stageAdd;
 		}
 		break;
 	case 0x0C:
-		if ((unsigned int)(kind - 0x12) < 3 || kind == 0x15) {
+		if ((unsigned int)(kind - 0x12) <= 2 || kind == 0x15) {
 			subValue = stageSub;
 		}
 		break;
@@ -3733,7 +3735,7 @@ int CGPartyObj::useItem(int itemId)
 					unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
 					int value = *reinterpret_cast<unsigned short*>(script + foodIndex * 2 + 0x3B8) / 10;
 					heal = 1;
-					if (value > 0) {
+					if (value >= 1) {
 						heal = value;
 					}
 					m_scriptHandle[0x2F4] =
@@ -4775,13 +4777,11 @@ void CGPartyObj::gpmCol()
 	} while (i < 5);
 
 	trailIndex = newIndex;
-	int clamp = activeTrailCount - 1;
-	if (clamp < 0) {
-		clamp = 0;
+#define gpmColClamp ((activeTrailCount - 1) & ~((activeTrailCount - 1) >> 31))
+	if (trailIndex >= gpmColClamp) {
+		trailIndex = gpmColClamp;
 	}
-	if (clamp <= trailIndex) {
-		trailIndex = clamp;
-	}
+#undef gpmColClamp
 }
 
 /*
@@ -4839,9 +4839,11 @@ void CGPartyObj::ghostPartyMog()
 	unsigned int distFar = static_cast<unsigned int>(static_cast<int>(FLOAT_80331A5C * scale));
 
 	unsigned char* flags = &CGPartyObj::m_ghostWork[0];
-	int& bossState = *reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x1C);
+#define bossState (*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x1C))
 
-	if (static_cast<double>(m_partyDistance[0]) <= DOUBLE_80331A90) {
+	if (static_cast<double>(m_partyDistance[0]) > DOUBLE_80331A90) {
+		bossState = 1;
+	} else {
 		int exceeded;
 		if (static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x24)) >= CharaGhostValue(0x2048) ||
 		    static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x28)) >= CharaGhostValue(0x204C) ||
@@ -4935,8 +4937,6 @@ void CGPartyObj::ghostPartyMog()
 			}
 			flags[0] = (flags[0] & 0xF7) | 8;
 		}
-	} else {
-		bossState = 1;
 	}
 
 messageMenu:
@@ -4956,15 +4956,15 @@ messageMenu:
 
 	int auraSlot = 0;
 	int gauge = *reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x38);
-	if (static_cast<int>(distFar * 3) / 3 < gauge) {
+	if (gauge > static_cast<int>(distFar * 3) / 3) {
 		auraSlot = 0xF;
-	} else if (static_cast<int>(distFar << 1) / 3 < gauge) {
+	} else if (gauge > static_cast<int>(distFar << 1) / 3) {
 		auraSlot = 0xE;
-	} else if (static_cast<int>(distFar) / 3 < gauge) {
+	} else if (gauge > static_cast<int>(distFar) / 3) {
 		auraSlot = 0xD;
 	}
 
-	unsigned int prevSlot = *reinterpret_cast<unsigned int*>(CGPartyObj::m_ghostWork + 0x8C);
+	int prevSlot = *reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x8C);
 	if (prevSlot != auraSlot) {
 		endPSlotBit(0x400);
 		prevSlot = auraSlot;
@@ -4973,6 +4973,7 @@ messageMenu:
 		}
 	}
 	*reinterpret_cast<unsigned int*>(CGPartyObj::m_ghostWork + 0x8C) = prevSlot;
+#undef bossState
 }
 
 /*
@@ -5056,7 +5057,7 @@ void CGPartyObj::gpmMove()
 	int clampedPressure = sGhostPartyWork.pressure;
 	if (clampedPressure < 0) {
 		clampedPressure = 0;
-	} else if (clampedPressure > pressureLimit + 100) {
+	} else if (pressureLimit + 100 < clampedPressure) {
 		clampedPressure = pressureLimit + 100;
 	}
 	sGhostPartyWork.pressure = clampedPressure;
@@ -5064,8 +5065,9 @@ void CGPartyObj::gpmMove()
 	if (sGhostPartyWork.pressure < pressureLimit / 3) {
 		sGhostPartyWork.flagBits.flag04 = 0;
 	}
-	if (sGhostPartyWork.activeTrailCount > 0) {
-		sGhostPartyWork.activeTrailCount--;
+	{
+		int trailDec = sGhostPartyWork.activeTrailCount - 1;
+		sGhostPartyWork.activeTrailCount = trailDec & ~(trailDec >> 31);
 	}
 
 	Vec pathVec;
@@ -5250,7 +5252,7 @@ void CGPartyObj::gpmMove()
 
 		PartyData(this).partyFlags |= 0x20;
 		sGhostPartyWork.gauge++;
-		if (sGhostPartyWork.gauge < 0x10) {
+		if (sGhostPartyWork.gauge <= 0xF) {
 			return;
 		}
 		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(PartyData(this).partyFlags) << 25) & 0xC0000000) >> 31) != 0) {
@@ -5299,7 +5301,7 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 	CGCharaObj::onDrawDebug(font, x, y, z);
 
 	if ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(static_cast<unsigned char>(m_weaponNodeFlags)) << 24) & 0xC0000000) >> 31) == 0) ||
-	    (CFlatCenterState() != 0) ||
+	    (static_cast<int>(CFlatCenterState()) != 0) ||
 	    ((MiniGamePcs.m_flags & 0x80) == 0)) {
 		return;
 	}

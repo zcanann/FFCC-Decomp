@@ -278,7 +278,7 @@ void GbaQueue::LoadAll()
 {
 	int i;
 	char* obj;
-	unsigned char prevMenuStageMode;
+	char prevMenuStageMode;
 	char spModeBits;
 	char spModeChangeBits;
 	unsigned int cflatFlag;
@@ -289,9 +289,9 @@ void GbaQueue::LoadAll()
 	}
 
 	obj = reinterpret_cast<char*>(this);
-	prevMenuStageMode = static_cast<unsigned char>(m_singleMode);
+	prevMenuStageMode = m_singleMode;
 	m_singleMode = static_cast<char>(Game.m_gameWork.m_menuStageMode != 0);
-	if (prevMenuStageMode != static_cast<unsigned char>(m_singleMode)) {
+	if (prevMenuStageMode != m_singleMode) {
 		m_makeMapObjFlg = 0xF;
 	}
 

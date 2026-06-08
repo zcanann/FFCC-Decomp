@@ -1264,34 +1264,39 @@ void CCharaPcs::drawBefore()
  */
 void CCharaPcs::drawMakeTexShadow()
 {
-    if (GetNumTexShadow() == 0) {
+    int shadowCount = 0;
+    for (CHandle* handle = m_handleList->m_next; m_handleList != handle; handle = handle->m_next) {
+        if ((handle->m_flags & 0x200) != 0) {
+            shadowCount++;
+        }
+    }
+    if (shadowCount == 0) {
         return;
     }
 
-    const int texSize = m_texShadowSize;
     _GXTexObj backBufferTexObj;
-    _GXColor clearColor = {0x00, 0x00, 0x00, 0x00};
-    _GXColor shadowColor = {0x00, 0x00, 0x00, 0xFF};
 
     GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
-    Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backBufferTexObj, 0, 0, texSize, texSize, 0, GX_NEAR, GX_TF_RGBA8, 0);
+    Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backBufferTexObj, 0, 0, m_texShadowSize, m_texShadowSize, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
     _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-    LightPcs.SetAmbient(shadowColor);
+    CColor shadowColor(0x00, 0x00, 0x00, 0xFF);
+    LightPcs.SetAmbient(shadowColor.color);
     LightPcs.SetNumDiffuse(0);
     LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
 
     GXSetPixelFmt((GXPixelFmt)1, GX_ZC_LINEAR);
     GXSetAlphaUpdate(GX_TRUE);
-    GXSetViewport(0.0f, 0.0f, static_cast<float>(texSize), static_cast<float>(texSize), 0.0f, 1.0f);
-    GXSetScissor(0, 0, static_cast<unsigned int>(texSize), static_cast<unsigned int>(texSize));
-    Graphic.SetCopyClear(clearColor, 0);
+    GXSetViewport(0.0f, 0.0f, static_cast<float>(m_texShadowSize), static_cast<float>(m_texShadowSize), 0.0f, 1.0f);
+    GXSetScissor(0, 0, static_cast<unsigned int>(m_texShadowSize), static_cast<unsigned int>(m_texShadowSize));
+    CColor clearColor(0x00, 0x00, 0x00, 0x00);
+    Graphic.SetCopyClear(clearColor.color, 0xFFFFFF);
 
     m_texShadowTextureBase = Graphic.m_scratchTextureBuffer;
     m_texShadowTextureSize = 0xD2000;
-    m_texShadowTextureOffset = texSize * texSize * 4;
+    m_texShadowTextureOffset = m_texShadowSize * m_texShadowSize * 4;
     C_MTXLightPerspective(m_texShadowProjectionMtx, CameraPcs.m_fov, 1.0f, 0.5f, -0.5f, 0.5f, 0.5f);
 
     CHandle* handle = m_handleList->m_next;
@@ -1304,9 +1309,9 @@ void CCharaPcs::drawMakeTexShadow()
 
     Graphic.SetViewport();
     Graphic.SetStdPixelFmt();
-    Graphic.SetCopyClear(clearColor, 0);
+    Graphic.SetCopyClear(clearColor.color, 0xFFFFFF);
     gUtil.RenderTextureQuad(
-        0.0f, 0.0f, static_cast<float>(texSize), static_cast<float>(texSize), &backBufferTexObj, 0, 0, 0,
+        0.0f, 0.0f, static_cast<float>(m_texShadowSize), static_cast<float>(m_texShadowSize), &backBufferTexObj, 0, 0, 0,
         GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 }
 

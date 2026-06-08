@@ -61,7 +61,7 @@ void CMenuPcs::CompaDraw()
 
 	const CCaravanWork* caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	CompaOpenAnim* entry = this->m_compaList->entries;
-	for (int i = 0; i < this->m_compaList->count; i++) {
+	for (unsigned int i = 0; i < this->m_compaList->count; i++) {
 		int tex = entry->tex;
 		if (tex >= 0) {
 			float x = static_cast<float>(entry->x);
@@ -177,11 +177,14 @@ void CMenuPcs::CompaDraw()
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3A));
 
 	int familyCount = 2;
-	for (int i = 2; i < 7; i++) {
-		if (caravanWork->m_evtWordArr[19 + i] > 0) {
+	const short* evtWord = &caravanWork->m_evtWordArr[19];
+	int i = 2;
+	do {
+		if (evtWord[i] > 0) {
 			familyCount++;
 		}
-	}
+		i++;
+	} while (i < 7);
 	if (familyCount > 4 && System.m_execParam >= 1) {
 		System.Printf(const_cast<char*>(sCompaFamilyCountErrorFmt), s_menu_compa_cpp, 0x1BF,
 		              familyCount);
@@ -190,7 +193,7 @@ void CMenuPcs::CompaDraw()
 		familyCount = 4;
 	}
 
-	for (int i = 0; i < familyCount; i++) {
+	for (unsigned int i = 0; i < familyCount; i++) {
 		MenuPcs.DrawRect(
 			0,
 			static_cast<float>(compaList->entries[0].x + 0x10),
@@ -200,7 +203,7 @@ void CMenuPcs::CompaDraw()
 	}
 
 	int memberIndex = 0;
-	int shown = 0;
+	unsigned int shown = 0;
 	for (int i = 0; i < 8 && shown < familyCount; i++) {
 		int drawIndex = shown;
 		if (shown > 1) {
@@ -249,13 +252,13 @@ void CMenuPcs::CompaDraw()
 	font->SetScaleY(kCompaOne);
 	font->DrawInit();
 
-	GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<signed char>(kCompaColorMax * compaList->entries[0].alpha)).color;
+	GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(kCompaColorMax * compaList->entries[0].alpha)).color;
 	font->SetColor(textColor);
 
 	const CCaravanWork* nameWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	memberIndex = 0;
 	shown = 0;
-	for (int i = 0; i < 8 && shown < familyCount; i++) {
+	for (unsigned int i = 0; i < 8 && shown < familyCount; i++) {
 		int drawIndex = shown;
 		if (shown > 1) {
 			drawIndex = memberIndex;
@@ -275,7 +278,7 @@ void CMenuPcs::CompaDraw()
 		font->SetPosY(y);
 		font->Draw(name);
 
-		unsigned short food = nameWork->m_evtWordArr[19 + drawIndex];
+		short food = nameWork->m_evtWordArr[19 + drawIndex];
 		const char* value = Game.m_cFlatDataArr[1].TableStrings(2)[food];
 		font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x90));
 		font->SetPosY(y);

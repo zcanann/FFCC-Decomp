@@ -1738,30 +1738,28 @@ unsigned int CFlatRuntime2::isLoadLayerASyncCompleted(int layerNo)
  */
 void CFlatRuntime2::loadLayerASync(int layerNo, char* fileName)
 {
-	CFlatLayerResource* layer = &LayerResources(this)[layerNo];
-
-	CFile::CHandle* fileHandle = layer->m_fileHandle;
+	CFile::CHandle* fileHandle = LayerResources(this)[layerNo].m_fileHandle;
 	if (fileHandle != 0) {
 		File.Close(fileHandle);
-		layer->m_fileHandle = 0;
+		LayerResources(this)[layerNo].m_fileHandle = 0;
 	}
 
-	CTextureSet* textureSet = layer->m_textureSet;
+	CTextureSet* textureSet = LayerResources(this)[layerNo].m_textureSet;
 	if (textureSet != 0) {
 		delete textureSet;
-		layer->m_textureSet = 0;
+		LayerResources(this)[layerNo].m_textureSet = 0;
 	}
 
 	char path[0x104];
 	sprintf(path, sCFlatRuntime2TexturePathFmt, Game.GetLangString(), fileName);
 
 	fileHandle = File.Open(path, 0, CFile::PRI_LOW);
-	layer->m_fileHandle = fileHandle;
+	LayerResources(this)[layerNo].m_fileHandle = fileHandle;
 	if (fileHandle != 0) {
 		File.ReadASync(fileHandle);
 	}
 
-	layer->m_allocStage = CharaPcs.m_charaAllocStage;
+	LayerResources(this)[layerNo].m_allocStage = CharaPcs.m_charaAllocStage;
 }
 
 /*

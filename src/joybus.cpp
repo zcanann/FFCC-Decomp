@@ -3795,15 +3795,14 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
     m_recvQueueEntriesArr[port][m_secCmdCount[port]] = 0;
     m_secCmdCount[port]--;
 
-    localWord = (localWord & 0xFFFF0000u) |
-                static_cast<unsigned short>(static_cast<char>(localWord >> 24));
+    *reinterpret_cast<unsigned short*>(&localWord) =
+        static_cast<unsigned short>(static_cast<short>(localWord >> 24));
 
     OSSignalSemaphore(&m_accessSemaphores[port]);
 
-    const unsigned char cmd = static_cast<unsigned char>(localWord & 0x3F);
-    const unsigned char seq = static_cast<signed char>((localWord >> 8) & 0xFF);
+    const unsigned char seq = static_cast<signed char>((localWord >> 16) & 0xFF);
 
-    if (cmd == 7)
+    if ((static_cast<unsigned char>(localWord >> 24) & 0x3F) == 7)
     {
         step = 0;
         phase = 0;

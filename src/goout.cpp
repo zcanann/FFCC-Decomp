@@ -2676,8 +2676,9 @@ void CGoOutMenu::Calc()
     }
 
     if (m_messageTimer != 0) {
-        m_messageTimer--;
-        if (m_messageTimer == 0) {
+        int remaining = m_messageTimer - 1;
+        m_messageTimer = remaining;
+        if (remaining == 0) {
             if (m_currentMessage >= 0) {
                 MenuPcs.m_menuWindowInfo->state = 2;
                 MenuGoOutState().m_animFrame = 0;

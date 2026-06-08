@@ -1805,12 +1805,13 @@ int CMapMng::ReadMtx(char* mapName)
             System.Printf(const_cast<char*>(s_mapReadMtxFmt), strTmp);
         }
 
-        void* filePtr = File.m_readBuffer;
+        void* filePtr;
         if (m_asyncLoadState.m_mapReadMode == 1) {
             int& readIndex = m_asyncLoadState.m_asyncReadIndex;
             int size = m_asyncLoadState.m_fileSizes[readIndex];
             void* amemCursor = m_asyncLoadState.m_mapLoadCursor;
-            Memory.CopyFromAMemorySync(File.m_readBuffer, amemCursor, static_cast<unsigned long>((size + 0x1F) & ~0x1F));
+            filePtr = File.m_readBuffer;
+            Memory.CopyFromAMemorySync(filePtr, amemCursor, static_cast<unsigned long>((size + 0x1F) & ~0x1F));
             m_asyncLoadState.m_mapLoadCursor = reinterpret_cast<unsigned char*>(m_asyncLoadState.m_mapLoadCursor) + size;
             CheckSum(filePtr, size);
             readIndex += 1;

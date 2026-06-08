@@ -10221,18 +10221,19 @@ void CMenuPcs::SetAnim(int anim)
 	m_wm.m_handles[handleIdx]->LoadAnim(s_wmCharaAnimSleep, animBase++, 1, 0, modelBase, -1, 0);
 	m_wm.m_handles[handleIdx]->LoadAnim(s_wmCharaAnimAngry, animBase, 1, 0, modelBase, -1, 0);
 
-	int* const animState = m_wmCharaAnimState + anim * 5;
+#define animState (m_wmCharaAnimState + anim * 5)
 	animState[0] = 0;
 	animState[1] = -1;
 	animState[2] = rand() % 250;
 
 	const int currentAnimIndex = m_wm.m_handles[handleIdx]->m_currentAnimIndex;
-	const int blendMode = -1 - (currentAnimIndex >> 31);
+	const int blendMode = (static_cast<unsigned int>(currentAnimIndex) >> 31) - 1;
 	m_wm.m_handles[handleIdx]->SetAnim((animBase - 5) + animState[0], -1, -1, blendMode, 1);
 
 	unsigned char* const model = reinterpret_cast<unsigned char*>(m_wm.m_handles[handleIdx]->m_model);
 	reinterpret_cast<float*>(animState)[3] = reinterpret_cast<float*>(model + 0xB4)[0];
 	reinterpret_cast<float*>(animState)[4] = reinterpret_cast<float*>(model + 0xC0)[0];
+#undef animState
 }
 
 /*

@@ -1588,8 +1588,6 @@ void CGObject::update()
     }
 
     if (HasLoadedModel(m_charaModelHandle)) {
-        CChara::CModel* model = m_charaModelHandle->m_model;
-
         m_animBlend += ClampFloat(m_bgAttrValue - m_animBlend, -0.25f, 0.25f);
 
         float lookYaw = m_lookAtAccumYaw;
@@ -1666,7 +1664,7 @@ void CGObject::update()
         if ((m_displayFlags & 1) != 0) {
             if ((m_weaponNodeFlagBits.m_unk20 && miniGameModelPass == 0) || m_currentAnimSlot != -1 ||
                 m_animSlotSel != static_cast<signed char>(shieldFlagsHi)) {
-                model->CalcMatrix();
+                m_charaModelHandle->m_model->CalcMatrix();
             }
             if (m_weaponNodeFlagBits.m_unk20 && miniGameModelPass == 0) {
                 m_charaModelHandle->m_model->CalcSkin();
@@ -1705,8 +1703,8 @@ void CGObject::update()
                 frameStep = m_turnSpeed + frameDelta * 1.2f;
             }
 
-            const float prevTime = model->m_time;
-            model->SetFrame(frameStep);
+            const float prevTime = m_charaModelHandle->m_model->m_time;
+            m_charaModelHandle->m_model->SetFrame(frameStep);
 
             const int activeAnimIndex = m_charaModelHandle->m_currentAnimIndex;
             if (activeAnimIndex >= 0 && m_charaModelHandle->m_animSlot[activeAnimIndex] != 0) {
@@ -1723,7 +1721,7 @@ void CGObject::update()
                     for (int i = 0; i < pointCount; i++) {
                         const unsigned short pointFrame = *reinterpret_cast<unsigned short*>(animRefBytes + 0x30 + i * 4);
                         const short pointValue = *reinterpret_cast<short*>(animRefBytes + 0x32 + i * 4);
-                        const float eventFrame = WrapAnimFrame(static_cast<float>(pointFrame) + ModelAnimStart(model), animSpan);
+                        const float eventFrame = WrapAnimFrame(static_cast<float>(pointFrame) + ModelAnimStart(m_charaModelHandle->m_model), animSpan);
                         if ((!wrapped && prevWrapped < eventFrame && eventFrame <= nextWrapped) ||
                             (wrapped && (eventFrame > prevWrapped || eventFrame <= nextWrapped))) {
                             CFlatRuntime::CStack stackIn[2];
@@ -1741,11 +1739,11 @@ void CGObject::update()
 
         if (m_currentAnimSlot != -1 && (weaponFlagsHi & 0x1) == 0) {
             bool animFinished = true;
-            if (ModelAnim(model) != 0) {
-                const float animSpan = sAnimFrameOffset + (ModelAnimEnd(model) - ModelAnimStart(model));
+            if (ModelAnim(m_charaModelHandle->m_model) != 0) {
+                const float animSpan = sAnimFrameOffset + (ModelAnimEnd(m_charaModelHandle->m_model) - ModelAnimStart(m_charaModelHandle->m_model));
                 if (animSpan != sAnimFrameOffset) {
-                    animFinished = m_lastBgAttr >= sZeroFloat ? (ModelTime(model) >= animSpan - sAnimFrameOffset)
-                                                            : (ModelTime(model) <= sZeroFloat);
+                    animFinished = m_lastBgAttr >= sZeroFloat ? (ModelTime(m_charaModelHandle->m_model) >= animSpan - sAnimFrameOffset)
+                                                            : (ModelTime(m_charaModelHandle->m_model) <= sZeroFloat);
                 }
             }
 
@@ -1786,7 +1784,7 @@ void CGObject::update()
 
         if (HasLoadedModel(m_weaponModelHandle) && (m_displayFlags & 1) != 0 && m_weaponAttachNode >= 0) {
             Mtx attachMtx;
-            PSMTXCopy(ModelNodeMtx(model, m_weaponAttachNode), attachMtx);
+            PSMTXCopy(ModelNodeMtx(m_charaModelHandle->m_model, m_weaponAttachNode), attachMtx);
             PSMTXTransApply(attachMtx, attachMtx, m_worldPosition.x, m_worldPosition.y, m_worldPosition.z);
             m_weaponModelHandle->m_model->SetMatrix(attachMtx);
             m_weaponModelHandle->m_model->CalcMatrix();
@@ -1801,7 +1799,7 @@ void CGObject::update()
 
         if (HasLoadedModel(m_shieldModelHandle) && (m_displayFlags & 1) != 0 && m_shieldAttachNodeIndex >= 0) {
             Mtx attachMtx;
-            PSMTXCopy(ModelNodeMtx(model, m_shieldAttachNodeIndex), attachMtx);
+            PSMTXCopy(ModelNodeMtx(m_charaModelHandle->m_model, m_shieldAttachNodeIndex), attachMtx);
             PSMTXTransApply(attachMtx, attachMtx, m_worldPosition.x, m_worldPosition.y, m_worldPosition.z);
             m_shieldModelHandle->m_model->SetMatrix(attachMtx);
             m_shieldModelHandle->m_model->CalcMatrix();

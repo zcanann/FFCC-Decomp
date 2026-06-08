@@ -2094,8 +2094,9 @@ void CShopMenu::DrawShop0()
     font->DrawInit();
 
     Graphic.SetDrawDoneDebugData(0x21);
+    char* titleText = ShopMenuMes(languageId, SHOP_MENU_TEXT_TITLE);
     font->DrawInit();
-    MenuPcs.DrawNoShadowFont(font, ShopMenuMes(languageId, SHOP_MENU_TEXT_TITLE), FLOAT_80332d54, FLOAT_80332e30, 9, 0x12);
+    MenuPcs.DrawNoShadowFont(font, titleText, FLOAT_80332d54, FLOAT_80332e30, 9, 0x12);
     MenuPcs.DrawInit();
 
     Graphic.SetDrawDoneDebugData(0x22);
@@ -2106,10 +2107,11 @@ void CShopMenu::DrawShop0()
     for (unsigned int i = 0; i < 3; i++, entry++) {
         s_currentShopMenuTopMenuEntry = entry;
         Graphic.SetDrawDoneDebugData(0x23);
-        float entryX = static_cast<float>(s_currentShopMenuTopMenuEntry->x - 0x10);
         float entryY = static_cast<float>(s_currentShopMenuTopMenuEntry->y - 0x0B);
+        float entryX = static_cast<float>(s_currentShopMenuTopMenuEntry->x - 0x10);
+        char* entryText = s_currentShopMenuTopMenuEntry->text;
         font->DrawInit();
-        MenuPcs.DrawNoShadowFont(font, s_currentShopMenuTopMenuEntry->text,
+        MenuPcs.DrawNoShadowFont(font, entryText,
             entryX, entryY, 0x18, 0x12);
         MenuPcs.DrawInit();
         Graphic.SetDrawDoneDebugData(0x24);

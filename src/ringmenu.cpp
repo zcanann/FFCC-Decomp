@@ -173,23 +173,23 @@ void CRingMenu::DrawIcon()
 	}
 
 	float clampedX;
-	if (clipPos.x >= kRingMenuClipMinX) {
+	if (kRingMenuClipMinX > clipPos.x) {
+		clampedX = kRingMenuClipMinX;
+	} else {
 		clampedX = clipPos.x;
 		if (kRingMenuClipMaxX < clipPos.x) {
 			clampedX = kRingMenuClipMaxX;
 		}
-	} else {
-		clampedX = kRingMenuClipMinX;
 	}
 
 	float clampedY;
-	if (clipPos.y >= kRingMenuClipMinY) {
+	if (kRingMenuClipMinY > clipPos.y) {
+		clampedY = kRingMenuClipMinY;
+	} else {
 		clampedY = clipPos.y;
 		if (kRingMenuClipMaxY < clipPos.y) {
 			clampedY = kRingMenuClipMaxY;
 		}
-	} else {
-		clampedY = kRingMenuClipMinY;
 	}
 
 	float angle = static_cast<float>(atan2(static_cast<double>(clampedX), static_cast<double>(clampedY)));

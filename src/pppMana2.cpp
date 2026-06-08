@@ -481,42 +481,47 @@ static int UpdateWaterMesh(VMana2* mana2)
         for (int col = 1; col < 0x10; col += 5, index += 5) {
             int above0 = index - 0x11;
             int below0 = index + 0x11;
+            float* center0 = &waterHeightA[index];
 
-            waterHeightB[index] = currentScale * waterHeightA[index] +
+            waterHeightB[index] = currentScale * center0[0] +
                                   neighborScale * (waterHeightA[above0] + waterHeightA[below0] +
-                                                   waterHeightA[index - 1] + waterHeightA[index + 1]) -
+                                                   center0[-1] + center0[1]) -
                                   waterHeightB[index];
 
             int index1 = index + 1;
             int above1 = index1 - 0x11;
             int below1 = index1 + 0x11;
-            waterHeightB[index1] = currentScale * waterHeightA[index1] +
+            float* center1 = &waterHeightA[index1];
+            waterHeightB[index1] = currentScale * center1[0] +
                                    neighborScale * (waterHeightA[above1] + waterHeightA[below1] +
-                                                    waterHeightA[index1 - 1] + waterHeightA[index1 + 1]) -
+                                                    center1[-1] + center1[1]) -
                                    waterHeightB[index1];
 
             int index2 = index + 2;
             int above2 = index2 - 0x11;
             int below2 = index2 + 0x11;
-            waterHeightB[index2] = currentScale * waterHeightA[index2] +
+            float* center2 = &waterHeightA[index2];
+            waterHeightB[index2] = currentScale * center2[0] +
                                    neighborScale * (waterHeightA[above2] + waterHeightA[below2] +
-                                                    waterHeightA[index2 - 1] + waterHeightA[index2 + 1]) -
+                                                    center2[-1] + center2[1]) -
                                    waterHeightB[index2];
 
             int index3 = index + 3;
             int above3 = index3 - 0x11;
             int below3 = index3 + 0x11;
-            waterHeightB[index3] = currentScale * waterHeightA[index3] +
+            float* center3 = &waterHeightA[index3];
+            waterHeightB[index3] = currentScale * center3[0] +
                                    neighborScale * (waterHeightA[above3] + waterHeightA[below3] +
-                                                    waterHeightA[index3 - 1] + waterHeightA[index3 + 1]) -
+                                                    center3[-1] + center3[1]) -
                                    waterHeightB[index3];
 
             int index4 = index + 4;
             int above4 = index4 - 0x11;
             int below4 = index4 + 0x11;
-            waterHeightB[index4] = currentScale * waterHeightA[index4] +
+            float* center4 = &waterHeightA[index4];
+            waterHeightB[index4] = currentScale * center4[0] +
                                    neighborScale * (waterHeightA[above4] + waterHeightA[below4] +
-                                                    waterHeightA[index4 - 1] + waterHeightA[index4 + 1]) -
+                                                    center4[-1] + center4[1]) -
                                    waterHeightB[index4];
         }
         row++;
@@ -931,8 +936,14 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
             case 0:
                 cameraPos.x = centerPos.x + LoadFloat(kMana2One);
                 break;
+            case 4:
+                cameraPos.z = centerPos.z + LoadFloat(kMana2One);
+                break;
             case 1:
                 cameraPos.x = centerPos.x - LoadFloat(kMana2One);
+                break;
+            case 5:
+                cameraPos.z = centerPos.z - LoadFloat(kMana2One);
                 break;
             case 2:
                 cameraPos.y = centerPos.y + LoadFloat(kMana2One);
@@ -945,12 +956,6 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
                 cameraUp.x = LoadFloat(kMana2Zero);
                 cameraUp.y = LoadFloat(kMana2Zero);
                 cameraUp.z = LoadFloat(kMana2One);
-                break;
-            case 4:
-                cameraPos.z = centerPos.z + LoadFloat(kMana2One);
-                break;
-            case 5:
-                cameraPos.z = centerPos.z - LoadFloat(kMana2One);
                 break;
             }
 
@@ -1151,10 +1156,12 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
         dstBuffer = (void*)((char*)dstBuffer + 0x20);
     }
 
-    mana2Work->m_envTexture0->m_format = 0;
-    mana2Work->m_envTexture0->InitTexObj();
-    mana2Work->m_envTexture1->m_format = 0;
-    mana2Work->m_envTexture1->InitTexObj();
+    CTexture* envTexture0 = mana2Work->m_envTexture0;
+    CTexture* envTexture1 = mana2Work->m_envTexture1;
+    envTexture0->m_wrapMode = 0;
+    envTexture0->InitTexObj();
+    envTexture1->m_wrapMode = 0;
+    envTexture1->InitTexObj();
 
     if (mana2Work->m_paraboloidMap == 0) {
         mana2Work->m_paraboloidMap =
@@ -1166,11 +1173,10 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
     if (mana2Work->m_positions == 0 && mana2Work->m_normals == 0 && mana2Work->m_waterHeightA == 0) {
         for (meshIndex = 0; meshIndex < model->m_data->m_meshCount; meshIndex++) {
             meshData = mesh->m_data;
-            u8 type = param_2->m_type;
 
-            if (((type == 1) && strcmp(meshData->m_name, s_manaShapeObj5) == 0) ||
-                ((type == 2) && strcmp(meshData->m_name, s_manaShapeObj3) == 0) ||
-                ((type == 3) && strcmp(meshData->m_name, s_manaShapeObj1) == 0)) {
+            if (((param_2->m_type == 1) && strcmp(meshData->m_name, s_manaShapeObj5) == 0) ||
+                ((param_2->m_type == 2) && strcmp(meshData->m_name, s_manaShapeObj3) == 0) ||
+                ((param_2->m_type == 3) && strcmp(meshData->m_name, s_manaShapeObj1) == 0)) {
                 if (mana2Work->m_meshReflectionVec == 0) {
                     mana2Work->m_meshReflectionVec =
                         static_cast<Vec*>(pppMemAlloc(meshData->m_vertexCount * sizeof(Vec), ppvEnv->m_stagePtr,
@@ -1228,8 +1234,8 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
                 }
             }
 
-            if (((type == 1) && strcmp(meshData->m_name, s_manaShapeObj4) == 0) ||
-                ((type == 2) && strcmp(meshData->m_name, s_manaShapeObj2) == 0)) {
+            if (((param_2->m_type == 1) && strcmp(meshData->m_name, s_manaShapeObj4) == 0) ||
+                ((param_2->m_type == 2) && strcmp(meshData->m_name, s_manaShapeObj2) == 0)) {
                 mana2Work->m_positions = static_cast<Vec*>(pppMemAlloc(0xD8C, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26A));
                 mana2Work->m_normals = static_cast<Vec*>(pppMemAlloc(0xD8C, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26B));
                 mana2Work->m_colors = static_cast<GXColor*>(pppMemAlloc(0x484, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26C));
@@ -1269,11 +1275,10 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
         mesh = model->m_meshes;
         for (meshIndex = 0; meshIndex < model->m_data->m_meshCount; meshIndex++) {
             meshData = mesh->m_data;
-            u8 type = param_2->m_type;
 
-            if (((type == 1) && strcmp(meshData->m_name, s_manaShapeObj5) == 0) ||
-                ((type == 2) && strcmp(meshData->m_name, s_manaShapeObj3) == 0) ||
-                ((type == 3) && strcmp(meshData->m_name, s_manaShapeObj1) == 0)) {
+            if (((param_2->m_type == 1) && strcmp(meshData->m_name, s_manaShapeObj5) == 0) ||
+                ((param_2->m_type == 2) && strcmp(meshData->m_name, s_manaShapeObj3) == 0) ||
+                ((param_2->m_type == 3) && strcmp(meshData->m_name, s_manaShapeObj1) == 0)) {
                 for (s32 dlIndex = meshData->m_displayListCount - 1; dlIndex >= 0; dlIndex--) {
                     CalcReflectionVector2(
                         mana2Work->m_meshReflectionVec, meshData->m_vertices, meshData->m_normals,
@@ -1553,8 +1558,8 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
     int waterCmp = strcmp(meshData->m_name, s_manaShapeObj4);
     if ((waterCmp == 0 && stepData->m_type == 1) || (strcmp(meshData->m_name, s_manaShapeObj2) == 0 && stepData->m_type == 2)) {
         Mtx cameraMtx;
-        Mtx rotMtx;
         Mtx posMtx;
+        Mtx rotMtx;
         Vec offset;
 
         PSMTXCopy(CameraMatrix(), cameraMtx);

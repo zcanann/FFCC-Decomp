@@ -2723,7 +2723,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + effectId * 0x48;
 	int particleClass = *reinterpret_cast<unsigned short*>(itemData + 0x12);
 	int particleBank = CharaObjResolveParticleBank(this, particleClass);
-	unsigned short particleEntry = 0xFFFF;
+	short particleEntry = 0xFFFF;
 	unsigned short particleFlags = 0;
 	int particleNo = effectId;
 	int seNo = 0;
@@ -2731,7 +2731,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 	int hasParticle = 0;
 
 	if (particleBank != -1) {
-		particleEntry = *reinterpret_cast<unsigned short*>(itemData + 0x14 + effectArg0 * 2);
+		particleEntry = *reinterpret_cast<short*>(itemData + 0x14 + effectArg0 * 2);
 		if (particleEntry != 0xFFFF) {
 			particleFlags = particleEntry;
 			particleNo = particleEntry & 0xFF;
@@ -3368,7 +3368,7 @@ void CGCharaObj::combi2()
 			continue;
 		}
 
-		int hasNearbyPartner = 0;
+		unsigned int hasNearbyPartner = 0;
 		Vec* partyCenter = &CharaObjComboCenter(party);
 		for (int j = 0; j < candidateCount; j++) {
 			if (i == j) {
@@ -3401,7 +3401,7 @@ void CGCharaObj::combi2()
 	}
 
 	for (int i = 0; i < candidateCount - 1; i++) {
-		for (int j = i + 1; j < candidateCount; j++) {
+		for (unsigned int j = i + 1; j < candidateCount; j++) {
 			if (candidates[i]->m_comboFrame < candidates[j]->m_comboFrame) {
 				CGPartyObj* swap = candidates[i];
 				candidates[i] = candidates[j];

@@ -863,9 +863,9 @@ void CMenuPcs::ItemInit()
         entry->flags = 2;
         entry->tex = 0x37;
         count = count + 2;
-        entry->x = this->m_itemList->anims[0].x + 0x24;
+        entry->x = itemList->anims[0].x + 0x24;
         int nextY = yOffset + 0x20;
-        entry->y = this->m_itemList->anims[0].y + yOffset;
+        entry->y = itemList->anims[0].y + yOffset;
         entry->w = 200;
         entry->h = 0x28;
         entry->u = zero;
@@ -876,9 +876,9 @@ void CMenuPcs::ItemInit()
         entry = &this->m_itemList->anims[index++];
         entry->flags = 2;
         entry->tex = 0x37;
-        entry->x = this->m_itemList->anims[0].x + 0x24;
+        entry->x = itemList->anims[0].x + 0x24;
         yOffset = yOffset + 0x40;
-        entry->y = this->m_itemList->anims[0].y + nextY;
+        entry->y = itemList->anims[0].y + nextY;
         entry->w = 200;
         entry->h = 0x28;
         entry->u = zero;

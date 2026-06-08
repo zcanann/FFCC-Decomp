@@ -315,8 +315,8 @@ void CMenuPcs::MoneyDraw()
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	s16 selectionState = this->m_moneyState->listState;
-	s16 mode = this->m_moneyState->mode;
+	int selectionState = this->m_moneyState->listState;
+	int mode = this->m_moneyState->mode;
 	MoneyMenuAnim* entry = this->m_moneyPanel->anims;
 
 	for (int i = 0; i < this->m_moneyPanel->count; i++, entry++) {

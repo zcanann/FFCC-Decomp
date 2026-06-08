@@ -3835,7 +3835,8 @@ void CGPartyObj::statRebound()
  */
 void CGPartyObj::statKorobi()
 {
-	if (m_subState == 0) {
+	switch (m_subState) {
+	case 0:
 		if (m_subFrame == 0) {
 			damageDelete();
 			carry(1, (CGObject*)0, 1);
@@ -3844,26 +3845,23 @@ void CGPartyObj::statKorobi()
 		if (isLoopAnim() != 0) {
 			changeSubStat(1);
 		}
-		return;
-	}
-
-	if (m_subState == 1) {
+		break;
+	case 1:
 		if (m_subFrame == 0) {
 			reqAnim(0x1F, 0, 0);
 		}
 		if (isLoopAnim() != 0) {
 			changeSubStat(2);
 		}
-		return;
-	}
-
-	if (m_subState == 2) {
+		break;
+	case 2:
 		if (m_subFrame == 0) {
 			reqAnim(0x20, 0, 0);
 		}
 		if (isLoopAnim() != 0) {
 			changeStat(0, 0, 0);
 		}
+		break;
 	}
 }
 

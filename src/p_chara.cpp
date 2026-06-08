@@ -1339,14 +1339,9 @@ void CCharaPcs::drawShadow()
 CTextureSet* CCharaPcs::createTextureSet(void* textureData, int useWeaponStage)
 {
     CTextureSet* textureSet = new (m_stage, const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
-    if (textureSet != 0) {
-        textureSet = textureSet;
-    }
 
-    if (textureSet != 0) {
-        CMemory::CStage* textureStage = useWeaponStage != 0 ? m_weaponTextureStage : m_viewerTextureStage;
-        textureSet->Create(textureData, SelectLoadStage(this, textureStage), 0, 0, 0, 0);
-    }
+    CMemory::CStage* textureStage = (&m_viewerModelStage)[useWeaponStage != 0 ? 3 : 1];
+    textureSet->Create(textureData, SelectLoadStage(this, textureStage), 0, 0, 0, 0);
 
     return textureSet;
 }

@@ -1348,15 +1348,9 @@ int CChara::CModel::PickFur(
 					if (static_cast<double>(curViewPos.z) < static_cast<double>(kCharaFurDepthZero)) {
 						curValid = curValid & 0x7fffffff | 0x80000000;
 						Math.MTX44MultVec4(screenMtx, &curViewPos, &curClip);
-						const double scaledY = static_cast<double>(kCharaFurScreenCenterY) * static_cast<double>(curClip.y);
 						const float invW = kCharaFurDepthScaleBase / curClip.w;
-						curScreenX = static_cast<float>(
-						    static_cast<double>(static_cast<float>(static_cast<double>(kCharaFurScreenCenterX) *
-						                                           static_cast<double>(curClip.x))) *
-						        static_cast<double>(invW) +
-						    static_cast<double>(kCharaFurScreenCenterX));
-						curScreenY = -static_cast<float>(scaledY * static_cast<double>(invW) -
-						                                 static_cast<double>(kCharaFurScreenCenterY));
+						curScreenX = kCharaFurScreenCenterX * curClip.x * invW + kCharaFurScreenCenterX;
+						curScreenY = kCharaFurScreenCenterY - kCharaFurScreenCenterY * curClip.y * invW;
 					} else {
 						curValid = curValid & 0x7fffffff;
 					}

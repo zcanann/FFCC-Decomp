@@ -1558,8 +1558,8 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
     int waterCmp = strcmp(meshData->m_name, s_manaShapeObj4);
     if ((waterCmp == 0 && stepData->m_type == 1) || (strcmp(meshData->m_name, s_manaShapeObj2) == 0 && stepData->m_type == 2)) {
         Mtx cameraMtx;
-        Mtx rotMtx;
         Mtx posMtx;
+        Mtx rotMtx;
         Vec offset;
 
         PSMTXCopy(CameraMatrix(), cameraMtx);

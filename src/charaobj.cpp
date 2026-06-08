@@ -3405,7 +3405,7 @@ void CGCharaObj::combi2()
 	}
 
 	for (int i = 0; i < candidateCount - 1; i++) {
-		for (unsigned int j = i + 1; j < candidateCount; j++) {
+		for (int j = i + 1; j < candidateCount; j++) {
 			if (candidates[i]->m_comboFrame < candidates[j]->m_comboFrame) {
 				CGPartyObj* swap = candidates[i];
 				candidates[i] = candidates[j];
@@ -3416,8 +3416,10 @@ void CGCharaObj::combi2()
 
 	for (int i = 1; i < candidateCount; ) {
 		if (kQuadObjDebugHeight < PSVECDistance(&CharaObjComboCenter(candidates[0]), &CharaObjComboCenter(candidates[i]))) {
-			for (int j = i; j < candidateCount - 1; j++) {
-				candidates[j] = candidates[j + 1];
+			CGPartyObj** shiftCursor = &candidates[i];
+			for (int remaining = (candidateCount - 1) - i; remaining != 0; remaining--) {
+				shiftCursor[0] = shiftCursor[1];
+				shiftCursor++;
 			}
 			candidateCount--;
 			continue;

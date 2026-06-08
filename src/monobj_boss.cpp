@@ -983,15 +983,9 @@ state100:
 		m_moveWork.m_flags = 0x322;
 
 		if (m_actionBranch == 1) {
-			CVector targetPos(kMonObjBossRightTargetXZ, kMonObjBossZero, kMonObjBossRightTargetXZ);
-			m_moveWork.m_targetPos.x = targetPos.x;
-			m_moveWork.m_targetPos.y = targetPos.y;
-			m_moveWork.m_targetPos.z = targetPos.z;
+			m_moveWork.m_targetPos = CVector(kMonObjBossRightTargetXZ, kMonObjBossZero, kMonObjBossRightTargetXZ);
 		} else {
-			CVector targetPos(kMonObjBossLeftTargetX, kMonObjBossZero, kMonObjBossLeftTargetZ);
-			m_moveWork.m_targetPos.x = targetPos.x;
-			m_moveWork.m_targetPos.y = targetPos.y;
-			m_moveWork.m_targetPos.z = targetPos.z;
+			m_moveWork.m_targetPos = CVector(kMonObjBossLeftTargetX, kMonObjBossZero, kMonObjBossLeftTargetZ);
 		}
 		m_moveWork.m_range = kMonObjBossShortMoveRange;
 		m_moveWork.m_changeStat = 0x65;

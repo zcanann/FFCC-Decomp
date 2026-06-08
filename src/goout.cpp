@@ -1296,7 +1296,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         MenuPcs.m_mcCtrl.m_cardChannel = m_accessCardChannel;
         m_cardChannel = static_cast<char>(MenuPcs.m_mcCtrl.m_cardChannel);
         m_saveIndex = static_cast<char>(m_accessSaveIndex);
-        m_memCardResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(static_cast<unsigned char>(m_cardChannel));
+        m_memCardResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(static_cast<signed char>(m_cardChannel));
         if (m_memCardResult == 1) {
             MenuPcs.m_mcCtrl.m_saveIndex = static_cast<unsigned char>(m_saveIndex);
             MenuPcs.m_mcCtrl.m_cardChannel = static_cast<unsigned char>(m_cardChannel);

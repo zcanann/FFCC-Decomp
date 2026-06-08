@@ -466,9 +466,10 @@ void CMesMenu::onDraw()
                 ? Pad.GetPadInputs()[__cntlzw((unsigned int)Pad.m_debugPadPort) >> 5].button[0]
                 : 0;
 
-            iconFrame = s_mesMenuIconFrames[0];
             if ((buttons & 0x100) != 0) {
                 iconFrame = s_mesMenuIconFrames[(System.m_frameCounter & 6) >> 1];
+            } else {
+                iconFrame = s_mesMenuIconFrames[0];
             }
             break;
         }

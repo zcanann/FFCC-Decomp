@@ -1465,8 +1465,8 @@ void CGMonObj::onAnimPoint(int param2, int param3)
 {
 #define object (reinterpret_cast<CGObject*>(this))
 	int soundEffect;
-	unsigned int particleId = 0xFFFF;
-	unsigned int soundId = 0xFFFF;
+	int particleId = 0xFFFF;
+	int soundId = 0xFFFF;
 
 	if ((param3 < 0xC) && (param3 >= 0xA)) {
 		unsigned char* scriptData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);

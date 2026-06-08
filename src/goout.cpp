@@ -1529,7 +1529,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
 void CGoOutMenu::CalcGoOut()
 {
     unsigned short input;
-    signed char next;
+    unsigned char next;
     int selResult = -1;
 
     if (m_watchCardDisconnect != 0 && m_modeFrame >= 0x14 && (m_modeFrame & 0xF) == 0) {

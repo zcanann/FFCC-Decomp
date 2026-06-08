@@ -7093,15 +7093,17 @@ int JoyBus::ChgCtrlMode(int portIndex)
  */
 int JoyBus::SetCtrlMode(int portIndex, int controlMode)
 {
-    bool isSingle = GbaQue.IsSingleMode(portIndex);
-
-    if (isSingle)
+    if (GbaQue.IsSingleMode(portIndex))
 	{
         return 0;
 	}
 
     unsigned char modeFlag =
         (unsigned char)(((unsigned int)(controlMode | -controlMode)) >> 31);
+
+    unsigned int cmd = 0;
+    unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
+
     bool isSinglePort = GbaQue.IsSingleMode(m_threadParams[portIndex].m_portIndex);
 
     if (isSinglePort)
@@ -7109,17 +7111,18 @@ int JoyBus::SetCtrlMode(int portIndex, int controlMode)
         modeFlag = 0;
 	}
 
-    unsigned int cmd = 0;
-    unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
     cmdBytes[0] = 0x09;
     cmdBytes[1] = modeFlag;
     unsigned int cmdWord = cmd;
 
-    int result = 0;
+    int result;
 
-    if (static_cast<signed char>(m_threadRunningMask) != 0)
+    if (static_cast<signed char>(m_threadRunningMask) == 0)
     {
-
+        result = 0;
+    }
+    else
+    {
         OSWaitSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
 
         if ((int)m_cmdCount[m_threadParams[portIndex].m_portIndex] >= 0x40)

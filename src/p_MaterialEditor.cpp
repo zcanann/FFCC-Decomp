@@ -137,11 +137,11 @@ void CMaterialEditorPcs::CreateBoundaryBox(Vec& minPos, Vec& maxPos, long count,
  */
 void CMaterialEditorPcs::drawViewer()
 {
-    static char initialized;
+    static char color;
 
-    if (initialized == 0) {
+    if (color == 0) {
         q = const_cast<char*>(sMaterialEditorSpinnerText);
-        initialized = 1;
+        color = 1;
     }
 
     static int pFan = 0;
@@ -170,8 +170,8 @@ void CMaterialEditorPcs::drawViewer()
         _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 
-        GXColor ambColor = kMaterialEditorDefaultColorRgba;
-        GXColor matColor = kMaterialEditorDefaultColorRgba;
+        GXColor ambColor = {0xFF, 0xFF, 0xFF, 0xFF};
+        GXColor matColor = ambColor;
         GXSetChanAmbColor(GX_COLOR0, ambColor);
         GXSetChanMatColor(GX_COLOR0, matColor);
 
@@ -189,13 +189,12 @@ void CMaterialEditorPcs::drawViewer()
         _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
 
         for (int pass = 0; pass < 2; pass++) {
-            MaterialEditorPolygon* polygon = static_cast<MaterialEditorPolygon*>(model->ptr18);
-
-            for (u32 polyIndex = 0; polyIndex < model->countC; polyIndex++, polygon++) {
-                if ((polygon->flags & 0x200) == 0) {
-                    GXSetCullMode(GX_CULL_BACK);
-                } else {
+            for (u32 polyIndex = 0; polyIndex < model->countC; polyIndex++) {
+#define polygon (&static_cast<MaterialEditorPolygon*>(model->ptr18)[polyIndex])
+                if ((polygon->flags & 0x200) != 0) {
                     GXSetCullMode(GX_CULL_NONE);
+                } else {
+                    GXSetCullMode(GX_CULL_BACK);
                 }
 
                 if (pass == 1) {
@@ -237,36 +236,45 @@ void CMaterialEditorPcs::drawViewer()
                     _GXSetBlendMode(GX_BM_NONE, GX_BL_ZERO, GX_BL_ZERO, GX_LO_OR);
                 }
 
+                int flags = polygon->flags & 0xf;
                 switch (polygon->textureMarker) {
                 case 'H':
-                if (polygon->textureIndex < static_cast<s16>(m_loadedTextureCount)) {
+                if (static_cast<s16>(m_loadedTextureCount) > polygon->textureIndex) {
                     s16* textureHeader = m_textureHeader[polygon->textureIndex];
                     float scaleU = static_cast<float>(LoadDouble(kMaterialEditorOneF64) / S16ToDouble(textureHeader[2]));
                     float scaleV = static_cast<float>(LoadDouble(kMaterialEditorOneF64) / S16ToDouble(textureHeader[3]));
+                    MaterialEditorPolygon* pp = polygon;
+                    s16 u = pp->u0;
 
-                    if (polygon->u0 < 0) {
-                        polygon->texCoord[0][0] =
-                            (scaleU * static_cast<float>(S16ToDouble(polygon->u0))) + LoadFloat(kMaterialEditorOneF);
+                    if (u < 0) {
+                        pp->texCoord[0][0] =
+                            (scaleU * static_cast<float>(S16ToDouble(u))) + LoadFloat(kMaterialEditorOneF);
                     } else {
-                        polygon->texCoord[0][0] = scaleU * static_cast<float>(S16ToDouble(polygon->u0));
+                        pp->texCoord[0][0] = scaleU * static_cast<float>(S16ToDouble(u));
                     }
-                    if (polygon->u1 < 0) {
-                        polygon->texCoord[1][0] =
-                            (scaleU * static_cast<float>(S16ToDouble(polygon->u1))) + LoadFloat(kMaterialEditorOneF);
+                    pp = polygon;
+                    u = pp->u1;
+                    if (u < 0) {
+                        pp->texCoord[1][0] =
+                            (scaleU * static_cast<float>(S16ToDouble(u))) + LoadFloat(kMaterialEditorOneF);
                     } else {
-                        polygon->texCoord[1][0] = scaleU * static_cast<float>(S16ToDouble(polygon->u1));
+                        pp->texCoord[1][0] = scaleU * static_cast<float>(S16ToDouble(u));
                     }
-                    if (polygon->u2 < 0) {
-                        polygon->texCoord[2][0] =
-                            (scaleU * static_cast<float>(S16ToDouble(polygon->u2))) + LoadFloat(kMaterialEditorOneF);
+                    pp = polygon;
+                    u = pp->u2;
+                    if (u < 0) {
+                        pp->texCoord[2][0] =
+                            (scaleU * static_cast<float>(S16ToDouble(u))) + LoadFloat(kMaterialEditorOneF);
                     } else {
-                        polygon->texCoord[2][0] = scaleU * static_cast<float>(S16ToDouble(polygon->u2));
+                        pp->texCoord[2][0] = scaleU * static_cast<float>(S16ToDouble(u));
                     }
-                    if (polygon->u3 < 0) {
-                        polygon->texCoord[3][0] =
-                            (scaleU * static_cast<float>(S16ToDouble(polygon->u3))) + LoadFloat(kMaterialEditorOneF);
+                    pp = polygon;
+                    u = pp->u3;
+                    if (u < 0) {
+                        pp->texCoord[3][0] =
+                            (scaleU * static_cast<float>(S16ToDouble(u))) + LoadFloat(kMaterialEditorOneF);
                     } else {
-                        polygon->texCoord[3][0] = scaleU * static_cast<float>(S16ToDouble(polygon->u3));
+                        pp->texCoord[3][0] = scaleU * static_cast<float>(S16ToDouble(u));
                     }
 
                     if (polygon->v0 < 0) {
@@ -282,10 +290,14 @@ void CMaterialEditorPcs::drawViewer()
                         polygon->v3 = -polygon->v3;
                     }
 
-                    polygon->texCoord[0][1] = -(scaleV * static_cast<float>(S16ToDouble(polygon->v0)) - LoadFloat(kMaterialEditorOneF));
-                    polygon->texCoord[1][1] = -(scaleV * static_cast<float>(S16ToDouble(polygon->v1)) - LoadFloat(kMaterialEditorOneF));
-                    polygon->texCoord[2][1] = -(scaleV * static_cast<float>(S16ToDouble(polygon->v2)) - LoadFloat(kMaterialEditorOneF));
-                    polygon->texCoord[3][1] = -(scaleV * static_cast<float>(S16ToDouble(polygon->v3)) - LoadFloat(kMaterialEditorOneF));
+                    pp = polygon;
+                    pp->texCoord[0][1] = -(scaleV * static_cast<float>(S16ToDouble(pp->v0)) - LoadFloat(kMaterialEditorOneF));
+                    pp = polygon;
+                    pp->texCoord[1][1] = -(scaleV * static_cast<float>(S16ToDouble(pp->v1)) - LoadFloat(kMaterialEditorOneF));
+                    pp = polygon;
+                    pp->texCoord[2][1] = -(scaleV * static_cast<float>(S16ToDouble(pp->v2)) - LoadFloat(kMaterialEditorOneF));
+                    pp = polygon;
+                    pp->texCoord[3][1] = -(scaleV * static_cast<float>(S16ToDouble(pp->v3)) - LoadFloat(kMaterialEditorOneF));
                     DCStoreRange(polygon, sizeof(MaterialEditorPolygon));
 
                     if (textureHeader[1] == 0x20) {
@@ -352,37 +364,36 @@ void CMaterialEditorPcs::drawViewer()
                 GXSetArray(GX_VA_CLR0, polygon->_30, 4);
                 GXSetArray(GX_VA_TEX0, polygon->texCoord, 8);
 
-                u32 vertexIndex[5];
-                u32 quadIndex2;
-                u32 quadIndex3;
-                u32 quadColorIndex;
-                u8 vertexCount = 3;
+                u32 vertexIndex[8];
+                unsigned int vertexCount = 3;
                 vertexIndex[4] = polygon->index0;
-                quadIndex2 = polygon->index1;
-                quadIndex3 = polygon->index2;
+                vertexIndex[5] = polygon->index1;
+                vertexIndex[6] = polygon->index2;
                 vertexIndex[0] = 0;
                 vertexIndex[1] = 1;
                 vertexIndex[2] = 2;
 
-                if ((polygon->flags & 0xf) == 0) {
+                if (flags == 0) {
                     GXBegin(GX_TRIANGLES, GX_VTXFMT0, 3);
                 }
-                if ((polygon->flags & 0xf) == 1) {
+                if (flags == 1) {
                     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
                     vertexCount = 4;
-                    quadIndex3 = polygon->index3;
-                    quadColorIndex = polygon->index2;
+                    vertexIndex[6] = polygon->index3;
+                    vertexIndex[7] = polygon->index2;
                     vertexIndex[2] = 3;
                     vertexIndex[3] = 2;
                 }
 
-                for (u8 i = 0; i < vertexCount; i++) {
-                    u32 index = (&vertexIndex[4])[i];
-                    GXWGFifo.u16 = static_cast<u16>(index);
-                    GXWGFifo.u16 = static_cast<u16>(index);
+                u8 i = 0;
+                while (i < vertexCount) {
+                    GXWGFifo.u16 = static_cast<u16>((&vertexIndex[4])[i]);
+                    GXWGFifo.u16 = static_cast<u16>((&vertexIndex[4])[i]);
                     GXWGFifo.u8 = static_cast<u8>(vertexIndex[i]);
                     GXWGFifo.u16 = static_cast<u16>(vertexIndex[i]);
+                    i++;
                 }
+#undef polygon
             }
         }
     }
@@ -635,9 +646,9 @@ void CMaterialEditorPcs::Init()
     m_viewerLightColors[0].b = 0x7f;
     m_viewerLightColors[0].a = 0xff;
 
-    float zero = LoadFloat(kMaterialEditorZeroF);
-    float minusOne = LoadFloat(kMaterialEditorNegativeOneF);
     float one = LoadFloat(kMaterialEditorOneF);
+    float minusOne = LoadFloat(kMaterialEditorNegativeOneF);
+    float zero = LoadFloat(kMaterialEditorZeroF);
 
     for (int i = 0; i < 3; i++) {
         u8 shade = (i == 0) ? 0x3f : 0;

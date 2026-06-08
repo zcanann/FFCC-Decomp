@@ -22,7 +22,7 @@ struct RSDITEM {
 };
 
 struct MaterialEditorPolygon {
-    u16 flags;
+    s16 flags;
     u16 blendMode;
     u32 _04;
     u16 index0;
@@ -125,7 +125,7 @@ public:
     ZLIST m_zlist1; // 0xC8
     ZLIST m_zlist2; // 0xD8
 
-    u32 m_displayTextureEnabled; // 0xE8
+    int m_displayTextureEnabled; // 0xE8
     MaterialEditorUsbTransform m_usbTransform; // 0xEC
     pppFMATRIX m_unkMatrix; // 0x20C
     GXTexObj* m_texObj[16]; // 0x23C

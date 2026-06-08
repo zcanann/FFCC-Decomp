@@ -422,7 +422,7 @@ static inline void PruneUnsharedAnimRefs(CCharaPcs* self, CCharaPcs::CLoadAnim* 
 {
     for (int i = LoadAnimArray(self)->GetSize() - 1; i >= 0; i--) {
         CCharaPcs::CLoadAnim* loadAnim = (*LoadAnimArray(self))[static_cast<unsigned long>(i)];
-        if (loadAnim == 0 || loadAnim->m_mergeFileId >= 0 || loadAnim->GetRef() != 1) {
+        if (loadAnim->m_mergeFileId >= 0 || loadAnim->GetRef() != 1) {
             continue;
         }
         if (target != 0 && loadAnim != target) {
@@ -985,10 +985,9 @@ void CCharaPcs::onScriptChanging(char*)
  */
 void CCharaPcs::calc()
 {
-    CHandle* head = m_handleList;
-    CHandle* handle = head->m_next;
+    CHandle* handle = m_handleList->m_next;
 
-    while (head != handle) {
+    while (m_handleList != handle) {
         CHandle* next = handle->m_next;
         handle->m_shadowTexturePtr = 0;
         handle->loadModelASyncFrame();
@@ -1007,24 +1006,15 @@ void CCharaPcs::calcAfter()
 
     for (int i = LoadAnimArray(this)->GetSize() - 1; i >= 0; i--) {
         CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
-        if (loadAnim == 0 || loadAnim->m_anim == 0) {
-            continue;
-        }
-
-        void*& bankPtr = loadAnim->m_anim->m_bank;
-        const int bankRefCount = loadAnim->m_anim->GetRef();
-        if (bankRefCount == 1 && bankPtr != 0) {
-            operator delete(bankPtr);
-            bankPtr = 0;
+        CChara::CAnim* anim = loadAnim->m_anim;
+        if (anim->GetRef() == 1 && anim->m_bank != 0) {
+            operator delete(anim->m_bank);
+            anim->m_bank = 0;
         }
     }
 
     for (int i = LoadAnimArray(this)->GetSize() - 1; i >= 0; i--) {
         CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
-        if (loadAnim == 0 || loadAnim->m_anim == 0) {
-            continue;
-        }
-
         const int bankRefCount = loadAnim->m_anim->GetRef();
         if (bankRefCount == 1) {
             loadAnim->m_anim->m_lastFrame++;
@@ -1093,12 +1083,11 @@ int CCharaPcs::TryReleaseAnimBank(int requiredSize)
 
     for (int i = LoadAnimArray(this)->GetSize() - 1; i >= 0; i--) {
         CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
+        CChara::CAnim* anim = loadAnim->m_anim;
 
-        void* bankPtr = loadAnim->m_anim->m_bank;
-        const int bankHistory = loadAnim->m_anim->m_lastFrame;
-        if (bankPtr != 0 && releaseSize < bankHistory) {
+        if (anim->m_bank && releaseSize < anim->m_lastFrame) {
             releaseAnim = loadAnim;
-            releaseSize = bankHistory;
+            releaseSize = anim->m_lastFrame;
         }
     }
 
@@ -1145,8 +1134,8 @@ void CCharaPcs::InitEnv(int envMode)
     _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
 
     if (envMode == 1 || envMode == 2) {
-        _GXColor black = {0x00, 0x00, 0x00, 0xFF};
-        LightPcs.SetAmbient(black);
+        CColor black(0x00, 0x00, 0x00, 0xFF);
+        LightPcs.SetAmbient(black.color);
         LightPcs.SetNumDiffuse(0);
         LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
     } else {
@@ -1193,7 +1182,7 @@ void CCharaPcs::GetTexShadow(int startIndex, int maxCount, _GXTexObj* texObjs, V
     int shadowIndex = 0;
     CHandle* handle = m_handleList->m_next;
 
-    while (handle != m_handleList) {
+    while (m_handleList != handle) {
         if ((handle->m_flags & 0x200) != 0 && handle->m_shadowTexturePtr != 0) {
             if (startIndex <= shadowIndex) {
                 const int outIndex = shadowIndex - startIndex;
@@ -1230,12 +1219,8 @@ void CCharaPcs::draw()
 {
     SetupBaseCharaLights(this);
 
-    if (m_handleList == 0) {
-        return;
-    }
-
     CHandle* handle = m_handleList->m_next;
-    while (handle != m_handleList) {
+    while (m_handleList != handle) {
         if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x8000) != 0) {
             handle->draw(0, 1);
         }
@@ -1253,12 +1238,8 @@ void CCharaPcs::drawBefore()
     CameraPcs.SetStdProjectionMatrix();
     SetupBaseCharaLights(this);
 
-    if (m_handleList == 0) {
-        return;
-    }
-
     CHandle* handle = m_handleList->m_next;
-    while (handle != m_handleList) {
+    while (m_handleList != handle) {
         if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x8000) != 0) {
             handle->draw(3, 1);
         }
@@ -1273,38 +1254,43 @@ void CCharaPcs::drawBefore()
  */
 void CCharaPcs::drawMakeTexShadow()
 {
-    if (GetNumTexShadow() == 0) {
+    int shadowCount = 0;
+    for (CHandle* handle = m_handleList->m_next; m_handleList != handle; handle = handle->m_next) {
+        if ((handle->m_flags & 0x200) != 0) {
+            shadowCount++;
+        }
+    }
+    if (shadowCount == 0) {
         return;
     }
 
-    const int texSize = m_texShadowSize;
     _GXTexObj backBufferTexObj;
-    _GXColor clearColor = {0x00, 0x00, 0x00, 0x00};
-    _GXColor shadowColor = {0x00, 0x00, 0x00, 0xFF};
 
     GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
-    Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backBufferTexObj, 0, 0, texSize, texSize, 0, GX_NEAR, GX_TF_RGBA8, 0);
+    Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backBufferTexObj, 0, 0, m_texShadowSize, m_texShadowSize, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
     _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-    LightPcs.SetAmbient(shadowColor);
+    CColor shadowColor(0x00, 0x00, 0x00, 0xFF);
+    LightPcs.SetAmbient(shadowColor.color);
     LightPcs.SetNumDiffuse(0);
     LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
 
     GXSetPixelFmt((GXPixelFmt)1, GX_ZC_LINEAR);
     GXSetAlphaUpdate(GX_TRUE);
-    GXSetViewport(0.0f, 0.0f, static_cast<float>(texSize), static_cast<float>(texSize), 0.0f, 1.0f);
-    GXSetScissor(0, 0, static_cast<unsigned int>(texSize), static_cast<unsigned int>(texSize));
-    Graphic.SetCopyClear(clearColor, 0);
+    GXSetViewport(0.0f, 0.0f, static_cast<float>(m_texShadowSize), static_cast<float>(m_texShadowSize), 0.0f, 1.0f);
+    GXSetScissor(0, 0, static_cast<unsigned int>(m_texShadowSize), static_cast<unsigned int>(m_texShadowSize));
+    CColor clearColor(0x00, 0x00, 0x00, 0x00);
+    Graphic.SetCopyClear(clearColor.color, 0xFFFFFF);
 
     m_texShadowTextureBase = Graphic.m_scratchTextureBuffer;
     m_texShadowTextureSize = 0xD2000;
-    m_texShadowTextureOffset = texSize * texSize * 4;
+    m_texShadowTextureOffset = m_texShadowSize * m_texShadowSize * 4;
     C_MTXLightPerspective(m_texShadowProjectionMtx, CameraPcs.m_fov, 1.0f, 0.5f, -0.5f, 0.5f, 0.5f);
 
     CHandle* handle = m_handleList->m_next;
-    while (handle != m_handleList) {
+    while (m_handleList != handle) {
         if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x8000) != 0) {
             handle->draw(2, 1);
         }
@@ -1313,9 +1299,9 @@ void CCharaPcs::drawMakeTexShadow()
 
     Graphic.SetViewport();
     Graphic.SetStdPixelFmt();
-    Graphic.SetCopyClear(clearColor, 0);
+    Graphic.SetCopyClear(clearColor.color, 0xFFFFFF);
     gUtil.RenderTextureQuad(
-        0.0f, 0.0f, static_cast<float>(texSize), static_cast<float>(texSize), &backBufferTexObj, 0, 0, 0,
+        0.0f, 0.0f, static_cast<float>(m_texShadowSize), static_cast<float>(m_texShadowSize), &backBufferTexObj, 0, 0, 0,
         GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 }
 
@@ -1334,17 +1320,13 @@ void CCharaPcs::drawShadow()
     _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
 
-    _GXColor shadowColor = {0x00, 0x00, 0x00, 0xFF};
-    LightPcs.SetAmbient(shadowColor);
+    CColor shadowColor(0x00, 0x00, 0x00, 0xFF);
+    LightPcs.SetAmbient(shadowColor.color);
     LightPcs.SetNumDiffuse(0);
     LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
 
-    if (m_handleList == 0) {
-        return;
-    }
-
     CHandle* handle = m_handleList->m_next;
-    while (handle != m_handleList) {
+    while (m_handleList != handle) {
         if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x8000) != 0) {
             handle->draw(1, 1);
         }
@@ -1383,11 +1365,8 @@ int CCharaPcs::releaseUnuseLoadModel(int releaseMask)
 
     for (int i = LoadModelArray(this)->GetSize() - 1; i >= 0; i--) {
         CLoadModel* loadModel = (*LoadModelArray(this))[static_cast<unsigned long>(i)];
-        const bool shouldRelease =
-            (((loadModel->m_mergeFileId < 0) || (loadModel->m_streamMode != 0)) && loadModel->GetRef() == 1) ||
-            (loadModel->m_mergeFileId >= 0 && (releaseMask & loadModel->m_mergeFlags) != 0);
-
-        if (!shouldRelease) {
+        if (!((((loadModel->m_mergeFileId < 0) || (loadModel->m_streamMode != 0)) && loadModel->GetRef() == 1) ||
+              (loadModel->m_mergeFileId >= 0 && (releaseMask & loadModel->m_mergeFlags) != 0))) {
             activeCount++;
             continue;
         }
@@ -1404,11 +1383,8 @@ int CCharaPcs::releaseUnuseLoadModel(int releaseMask)
 
     for (int i = LoadTextureArray(this)->GetSize() - 1; i >= 0; i--) {
         CLoadTexture* loadTexture = (*LoadTextureArray(this))[static_cast<unsigned long>(i)];
-        const bool shouldRelease =
-            (((loadTexture->m_mergeFileId < 0) || (loadTexture->m_streamMode != 0)) && loadTexture->GetRef() == 1) ||
-            (loadTexture->m_mergeFileId >= 0 && (releaseMask & loadTexture->m_mergeFlags) != 0);
-
-        if (!shouldRelease) {
+        if (!((((loadTexture->m_mergeFileId < 0) || (loadTexture->m_streamMode != 0)) && loadTexture->GetRef() == 1) ||
+              (loadTexture->m_mergeFileId >= 0 && (releaseMask & loadTexture->m_mergeFlags) != 0))) {
             activeCount++;
             continue;
         }
@@ -1425,11 +1401,8 @@ int CCharaPcs::releaseUnuseLoadModel(int releaseMask)
 
     for (int i = LoadPdtArray(this)->GetSize() - 1; i >= 0; i--) {
         CLoadPdt* loadPdt = (*LoadPdtArray(this))[static_cast<unsigned long>(i)];
-        const bool shouldRelease =
-            (loadPdt->m_mergeFileId < 0 && loadPdt->GetRef() == 1) ||
-            (loadPdt->m_mergeFileId >= 0 && (releaseMask & loadPdt->m_mergeFlags) != 0);
-
-        if (!shouldRelease) {
+        if (!((loadPdt->m_mergeFileId < 0 && loadPdt->GetRef() == 1) ||
+              (loadPdt->m_mergeFileId >= 0 && (releaseMask & loadPdt->m_mergeFlags) != 0))) {
             activeCount++;
             continue;
         }
@@ -1459,76 +1432,104 @@ void CCharaPcs::releaseUnuseLoadAnim(CCharaPcs::CLoadAnim*, int)
  */
 void CCharaPcs::DumpLoad()
 {
-    if (System.m_execParam <= 2) {
-        return;
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        System.Printf(const_cast<char*>(s_charaDumpModelHdr1));
     }
-
-    System.Printf(const_cast<char*>(s_charaDumpModelHdr1));
-    System.Printf(const_cast<char*>(s_charaDumpModelHdr2));
-    System.Printf(const_cast<char*>(s_charaDumpLineSep));
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        System.Printf(const_cast<char*>(s_charaDumpModelHdr2));
+    }
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        System.Printf(const_cast<char*>(s_charaDumpLineSep));
+    }
     for (int i = 0; i < LoadModelArray(this)->GetSize(); i++) {
         CLoadModel* loadModel = (*LoadModelArray(this))[static_cast<unsigned long>(i)];
-        unsigned int streamAddr = 0;
-        unsigned int streamSize = 0;
-        if (loadModel->m_streamMode != 0) {
-            streamAddr = reinterpret_cast<unsigned int>(loadModel->m_streamOffset);
-            streamSize = static_cast<unsigned int>(loadModel->m_streamSize);
-        }
+        if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+            unsigned int streamAddr = 0;
+            unsigned int streamSize = 0;
+            if (loadModel->m_streamMode != 0) {
+                streamAddr = reinterpret_cast<unsigned int>(loadModel->m_streamOffset);
+                streamSize = static_cast<unsigned int>(loadModel->m_streamSize);
+            }
 
-        System.Printf(
-            const_cast<char*>(s_charaDumpModelFmt), i, reinterpret_cast<int>(loadModel->m_keyTag), loadModel->m_keyId,
-            loadModel->m_mergeFileId, loadModel->m_mergeFlags, reinterpret_cast<unsigned int>(loadModel->m_model),
-            loadModel->m_streamMode, streamAddr, streamSize);
+            System.Printf(
+                const_cast<char*>(s_charaDumpModelFmt), i, reinterpret_cast<int>(loadModel->m_keyTag), loadModel->m_keyId,
+                loadModel->m_mergeFileId, loadModel->m_mergeFlags, reinterpret_cast<unsigned int>(loadModel->m_model),
+                loadModel->m_streamMode, streamAddr, streamSize);
+        }
     }
 
-    System.Printf(const_cast<char*>(s_charaDumpTextureHdr1));
-    System.Printf(const_cast<char*>(s_charaDumpTextureHdr2));
-    System.Printf(const_cast<char*>(s_charaDumpLineSep));
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        System.Printf(const_cast<char*>(s_charaDumpTextureHdr1));
+    }
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        System.Printf(const_cast<char*>(s_charaDumpTextureHdr2));
+    }
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        System.Printf(const_cast<char*>(s_charaDumpLineSep));
+    }
     for (int i = 0; i < LoadTextureArray(this)->GetSize(); i++) {
         CLoadTexture* loadTexture = (*LoadTextureArray(this))[static_cast<unsigned long>(i)];
-        unsigned int streamAddr = 0;
-        unsigned int streamSize = 0;
-        if (loadTexture->m_streamMode != 0) {
-            streamAddr = reinterpret_cast<unsigned int>(loadTexture->m_streamOffset);
-            streamSize = static_cast<unsigned int>(loadTexture->m_streamSize);
-        }
+        if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+            unsigned int streamAddr = 0;
+            unsigned int streamSize = 0;
+            if (loadTexture->m_streamMode != 0) {
+                streamAddr = reinterpret_cast<unsigned int>(loadTexture->m_streamOffset);
+                streamSize = static_cast<unsigned int>(loadTexture->m_streamSize);
+            }
 
-        System.Printf(
-            const_cast<char*>(s_charaDumpTextureFmt), i, reinterpret_cast<int>(loadTexture->m_keyTag), loadTexture->m_keyId,
-            reinterpret_cast<int>(loadTexture->m_variantTag), loadTexture->m_mergeFileId, loadTexture->m_mergeFlags,
-            reinterpret_cast<unsigned int>(loadTexture->m_textureSet), loadTexture->m_streamMode, streamAddr, streamSize);
+            System.Printf(
+                const_cast<char*>(s_charaDumpTextureFmt), i, reinterpret_cast<int>(loadTexture->m_keyTag), loadTexture->m_keyId,
+                reinterpret_cast<int>(loadTexture->m_variantTag), loadTexture->m_mergeFileId, loadTexture->m_mergeFlags,
+                reinterpret_cast<unsigned int>(loadTexture->m_textureSet), loadTexture->m_streamMode, streamAddr, streamSize);
+        }
     }
 
-    System.Printf(const_cast<char*>(s_charaDumpPdtHdr1));
-    System.Printf(const_cast<char*>(s_charaDumpPdtHdr2));
-    System.Printf(const_cast<char*>(s_charaDumpLineSep));
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        System.Printf(const_cast<char*>(s_charaDumpPdtHdr1));
+    }
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        System.Printf(const_cast<char*>(s_charaDumpPdtHdr2));
+    }
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        System.Printf(const_cast<char*>(s_charaDumpLineSep));
+    }
     for (int i = 0; i < LoadPdtArray(this)->GetSize(); i++) {
         CLoadPdt* loadPdt = (*LoadPdtArray(this))[static_cast<unsigned long>(i)];
-        System.Printf(
-            const_cast<char*>(s_charaDumpPdtFmt), i, reinterpret_cast<int>(loadPdt->m_keyTag), loadPdt->m_keyId,
-            reinterpret_cast<int>(loadPdt->m_variantTag), loadPdt->m_pdtSlot, loadPdt->m_mergeFileId,
-            loadPdt->m_mergeFlags);
+        if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+            System.Printf(
+                const_cast<char*>(s_charaDumpPdtFmt), i, reinterpret_cast<int>(loadPdt->m_keyTag), loadPdt->m_keyId,
+                reinterpret_cast<int>(loadPdt->m_variantTag), loadPdt->m_pdtSlot, loadPdt->m_mergeFileId,
+                loadPdt->m_mergeFlags);
+        }
     }
 
-    System.Printf(const_cast<char*>(s_charaDumpAnimHdr1));
-    System.Printf(const_cast<char*>(s_charaDumpAnimHdr2));
-    System.Printf(const_cast<char*>(s_charaDumpLineSep));
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        System.Printf(const_cast<char*>(s_charaDumpAnimHdr1));
+    }
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        System.Printf(const_cast<char*>(s_charaDumpAnimHdr2));
+    }
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        System.Printf(const_cast<char*>(s_charaDumpLineSep));
+    }
     int totalBankSize = 0;
     for (int i = 0; i < LoadAnimArray(this)->GetSize(); i++) {
         CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
-        unsigned int animAddr = 0;
-        int bankSize = 0;
-        unsigned int bankAddr = 0;
-        if (loadAnim->m_anim != 0) {
-            animAddr = reinterpret_cast<unsigned int>(loadAnim->m_anim);
-            bankSize = loadAnim->m_anim->m_bankSize;
-            bankAddr = loadAnim->m_anim->m_bankAddress;
-        }
+        if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+            unsigned int animAddr = 0;
+            int bankSize = 0;
+            unsigned int bankAddr = 0;
+            if (loadAnim->m_anim != 0) {
+                animAddr = reinterpret_cast<unsigned int>(loadAnim->m_anim);
+                bankSize = loadAnim->m_anim->m_bankSize;
+                bankAddr = loadAnim->m_anim->m_bankAddress;
+            }
 
-        System.Printf(
-            const_cast<char*>(s_charaDumpAnimFmt), i, reinterpret_cast<int>(loadAnim->m_keyTag), loadAnim->m_keyId,
-            loadAnim->m_name, loadAnim->m_mergeFileId, loadAnim->m_mergeFlags, animAddr, bankSize, totalBankSize, bankAddr);
-        totalBankSize += bankSize;
+            System.Printf(
+                const_cast<char*>(s_charaDumpAnimFmt), i, reinterpret_cast<int>(loadAnim->m_keyTag), loadAnim->m_keyId,
+                loadAnim->m_name, loadAnim->m_mergeFileId, loadAnim->m_mergeFlags, animAddr, bankSize, totalBankSize, bankAddr);
+            totalBankSize += bankSize;
+        }
     }
 }
 
@@ -2014,7 +2015,7 @@ void CCharaPcs::drawOverlap()
     SetupBaseCharaLights(this);
 
     CHandle* handle = m_handleList->m_next;
-    while (handle != m_handleList) {
+    while (m_handleList != handle) {
         if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x8000) != 0) {
             handle->draw(0, 1);
         }
@@ -2571,12 +2572,12 @@ int CCharaPcs::CHandle::SetAnim(int animIndex, int startFrame, int endFrame, int
     }
 
     CChara::CAnim* anim = 0;
-    if (animIndex >= 0 && m_animSlot[animIndex] != 0) {
+    if (animIndex != -1 && m_animSlot[animIndex] != 0) {
         anim = reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex])->m_anim;
     }
 
     if (anim == 0) {
-        if (m_charaKind != 3 && System.m_execParam > 1) {
+        if (m_charaKind != 3 && static_cast<unsigned int>(System.m_execParam) > 1) {
             System.Printf(const_cast<char*>(s_charaSetAnimMissingFmt), m_charaKind, m_charaNo, animIndex);
         }
         return 0;
@@ -2904,10 +2905,10 @@ void CCharaPcs::CHandle::loadModelASyncFrame()
             strcpy(path, basePath);
             strcat(path, s_charaDynamicsSuffix);
         } else {
-            if (m_asyncTextureVariant < 1) {
-                strcpy(path, basePath);
-            } else {
+            if (m_asyncTextureVariant >= 1) {
                 sprintf(path, s_charaTextureVariantFmt, basePath, m_asyncTextureVariant + 0x61);
+            } else {
+                strcpy(path, basePath);
             }
             strcat(path, s_charaTextureSuffix);
         }

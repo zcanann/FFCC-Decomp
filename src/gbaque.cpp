@@ -3820,7 +3820,6 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	memset(smithIndices, 0xFF, 0x40);
 
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
-	const unsigned int flatBase = Game.unkCFlatData0[2];
 
 	char smithCount = 0;
 	for (int i = 0; i < 0x40; i++) {
@@ -3839,6 +3838,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	char* writePtr = outData + 1 + totalSize;
 	totalSize += 1;
 
+	const unsigned int flatBase = Game.unkCFlatData0[2];
 	for (int i = 0; i < 0x40; i++) {
 		const int itemId = caravanWork->m_inventoryItems[i];
 		if (itemId >= 401) {

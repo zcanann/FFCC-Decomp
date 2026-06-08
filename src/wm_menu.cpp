@@ -9932,7 +9932,7 @@ void CMenuPcs::SetCMakeEnd(int channel)
 void CMenuPcs::ClrCMakeFlg(int channel)
 {
 	m_wm.m_charaSelectData[channel * 0x10 + 0xB] = 0;
-	const int current = *reinterpret_cast<short*>(m_wm.m_charaSelectData + channel * 0x10 + 4);
+	const int current = *reinterpret_cast<short*>(&m_wm.m_charaSelectData[channel * 0x10 + 4]);
 	if ((unsigned int)System.m_execParam >= 3) {
 		System.Printf(const_cast<char*>(s_ClrCMakeFlg_chan_pctd_cur_pctd_801DC390), channel, current);
 	}

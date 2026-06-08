@@ -1593,8 +1593,8 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 	unsigned char farAlpha;
 	float xOffset;
 	float yOffset;
-	bool hasNearAlpha;
-	bool hasFarAlpha;
+	int hasNearAlpha;
+	int hasFarAlpha;
 
 	if (mode > 3) {
 		return;
@@ -1615,8 +1615,8 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 
 	nearAlpha = 0;
 	farAlpha = 0;
-	hasNearAlpha = false;
-	hasFarAlpha = false;
+	hasNearAlpha = 0;
+	hasFarAlpha = 0;
 	texBufferSize = GXGetTexBufferSize(0x140, 0xE0, GX_TF_RGBA8, GX_FALSE, GX_FALSE);
 
 	cameraPos.x = CameraWorldX();
@@ -1640,7 +1640,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 			depthAlphaNear = 0xFF;
 		}
 		nearAlpha = (unsigned char)depthAlphaNear;
-		hasNearAlpha = true;
+		hasNearAlpha = 1;
 	}
 
 	if (mode != 1) {
@@ -1664,7 +1664,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 			depthAlphaFar = 0xFF;
 		}
 		farAlpha = (unsigned char)depthAlphaFar;
-		hasFarAlpha = true;
+		hasFarAlpha = 1;
 	}
 
 	if (!hasNearAlpha) {

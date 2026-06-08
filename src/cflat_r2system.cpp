@@ -4447,16 +4447,16 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
             case -0x4A:
             case -0x49:
             case -0x48: {
-                unsigned char* value = gameWork.m_linkTable[0][3][4] + systemValue * 4;
-                stack[-1].m_word = *reinterpret_cast<unsigned int*>(value);
+                int* value = &gameWork.m_bossArtifactStageTable[systemValue + 0x56];
+                stack[-1].m_word = *value;
                 if (setMode < 0) {
                     if (setMode >= -1) {
-                        *reinterpret_cast<unsigned int*>(value) = *value - stack->m_word;
+                        *value = *value - stack->m_word;
                     }
                 } else if (setMode == 0) {
-                    *reinterpret_cast<unsigned int*>(value) = stack->m_word;
+                    *value = stack->m_word;
                 } else if (setMode < 2) {
-                    *reinterpret_cast<unsigned int*>(value) = *value + stack->m_word;
+                    *value = *value + stack->m_word;
                 }
                 break;
             }

@@ -1088,7 +1088,7 @@ void CGItemObj::onFrameStat()
 			float current = prgObj->m_groundHitOffset.y;
 			float clamped = kItemObjDouble * -timer;
 
-			if (current >= clamped) {
+			if (!(current < clamped)) {
 				float maxClamp = kItemObjDouble * timer;
 				clamped = current;
 				if (maxClamp < current) {

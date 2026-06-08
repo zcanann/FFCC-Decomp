@@ -2932,7 +2932,7 @@ int CGObject::IsAnimFinished(int mode)
                                 < static_cast<double>(sZeroFloat)) {
                                 result =
                                     (static_cast<u32>(static_cast<u8>(
-                                         (threshold <= static_cast<double>(sZeroFloat)) << 1))
+                                         (static_cast<double>(sZeroFloat) >= threshold) << 1))
                                      << 0x1C)
                                     >> 0x1D;
                             } else {

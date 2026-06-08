@@ -2002,7 +2002,7 @@ void CMenuPcs::LetterMessDraw()
 	}
 
 	DrawSingWin(-1);
-	int state = GetLetterStateBase(this);
+	unsigned int state = GetLetterStateBase(this);
 	if ((*reinterpret_cast<s16*>(state + 0x12) == 1) &&
 	    (m_menuWindowInfo->state == 1)) {
 		int msgType = static_cast<int>(*reinterpret_cast<signed char*>(state + 9));
@@ -2272,7 +2272,7 @@ int CMenuPcs::LetterCtrlCur()
 			} else {
 				*reinterpret_cast<u8*>(GetLetterStateBase(this) + 8) = 1;
 			}
-			*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) + 1;
+			*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<u16*>(GetLetterStateBase(this) + 0x12) + 1;
 			m_menuWindowInfo->state = 2;
 			Sound.PlaySe(2, 0x40, 0x7F, 0);
 			return 0;
@@ -2473,10 +2473,10 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 		return;
 	}
 
-	float x0 = static_cast<float>(static_cast<int>(static_cast<double>(FLOAT_803330d4 - static_cast<float>(FLOAT_803330d0 * param_1 * DOUBLE_803330a8)) - DOUBLE_803330a8));
-	float y0 = static_cast<float>(static_cast<int>(static_cast<double>(static_cast<float>(DOUBLE_803330d8 + FLOAT_803330d0 * param_1)) - DOUBLE_803330e8));
-	float w = static_cast<float>(static_cast<int>(FLOAT_803330e0 - DOUBLE_803330a8));
 	float h = static_cast<float>(static_cast<int>(FLOAT_803330f0 - DOUBLE_803330e8));
+	float w = static_cast<float>(static_cast<int>(FLOAT_803330e0 - DOUBLE_803330a8));
+	float y0 = static_cast<float>(static_cast<int>(static_cast<double>(static_cast<float>(DOUBLE_803330d8 + FLOAT_803330d0 * param_1)) - DOUBLE_803330e8));
+	float x0 = static_cast<float>(static_cast<int>(static_cast<double>(FLOAT_803330d4 - static_cast<float>(static_cast<float>(FLOAT_803330d0 * param_1) * DOUBLE_803330a8)) - DOUBLE_803330a8));
 
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	GXColor white;
@@ -2486,10 +2486,12 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 	white.a = 0xFF;
 	GXSetChanMatColor(GX_COLOR0A0, white);
 
-	float x1 = static_cast<float>(x0 + w - FLOAT_803330f4);
-	float y1 = static_cast<float>(y0 + h - FLOAT_803330f4);
+	float xw = static_cast<float>(x0 + w);
+	float yh = static_cast<float>(y0 + h);
+	float x1 = static_cast<float>(xw - FLOAT_803330f4);
+	float y1 = static_cast<float>(yh - FLOAT_803330f4);
 
-	for (int i = 0; i < 4; ++i) {
+	for (unsigned int i = 0; i < 4; ++i) {
 		int tex;
 		int flip = 0;
 		if (i == 0) {
@@ -2526,7 +2528,7 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 	float innerY = static_cast<float>(y0 + FLOAT_803330f4);
 
 	for (int i = 0; i < 2; ++i) {
-		int tex = (i == 0) ? 0x49 : 0x4C;
+		unsigned int tex = (i == 0) ? 0x49 : 0x4C;
 		float y = (i == 0) ? y0 : y1;
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
 		MenuPcs.DrawRect(
@@ -2553,10 +2555,10 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 	    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x4F));
-	double decoX0 = static_cast<double>(static_cast<float>(x0 + w - static_cast<double>(FLOAT_80333108)));
+	double decoX0 = static_cast<double>(static_cast<float>(xw - static_cast<double>(FLOAT_80333108)));
 	double decoY0 = y0 - DOUBLE_80333100;
 	double decoX1 = DOUBLE_80333100 + decoX0;
-	double decoY1 = DOUBLE_80333100 + static_cast<double>(static_cast<float>(y0 + h - static_cast<double>(FLOAT_8033310c)));
+	double decoY1 = DOUBLE_80333100 + static_cast<double>(static_cast<float>(yh - static_cast<double>(FLOAT_8033310c)));
 	for (int i = 0; i < 4; ++i) {
 		double x;
 		if ((i & 1) == 0) {
@@ -2604,8 +2606,8 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 		    static_cast<float>(y0 - static_cast<double>(FLOAT_80333108)),
 		    FLOAT_80333128, FLOAT_8033312c, FLOAT_80333130, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
 		MenuPcs.DrawRect(
-		    0, static_cast<float>(x0 + w - static_cast<double>(FLOAT_80333134)),
-		    static_cast<float>(y0 + h - static_cast<double>(FLOAT_803330c0)),
+		    0, static_cast<float>(xw - static_cast<double>(FLOAT_80333134)),
+		    static_cast<float>(yh - static_cast<double>(FLOAT_803330c0)),
 		    FLOAT_80333130, FLOAT_80333138, FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
 	}
 }

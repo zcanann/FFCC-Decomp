@@ -2690,7 +2690,10 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
             blended.color.b = static_cast<unsigned char>(curCopy.color.b + nextCopy.color.b);
             blended.color.a = static_cast<unsigned char>(curCopy.color.a + nextCopy.color.a);
             CColor blendedCopy(blended);
-            shade = blendedCopy;
+            shade.color.r = blendedCopy.color.r;
+            shade.color.g = blendedCopy.color.g;
+            shade.color.b = blendedCopy.color.b;
+            shade.color.a = blendedCopy.color.a;
         }
 
         CColor3 ambientBase(CharaPcs.m_viewerAmbientColor[lightBank]);

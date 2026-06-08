@@ -834,7 +834,7 @@ void CMenuPcs::CmakeVillageDraw()
     font->DrawInit();
     GetRenderFlagBits(font->renderFlags).fixedWidth = 1;
     font->SetMargin(4.9f);
-    CColor textColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(255.0f * alpha)));
+    CColor textColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha));
     font->SetColor(textColor.color);
 
     int tableBase = villageWork->m_table * 5;
@@ -1244,8 +1244,7 @@ void CMenuPcs::CmakeResultDraw1()
     labelFont->SetScale(1.0f);
     labelFont->DrawInit();
 
-    int textColor = static_cast<int>(static_cast<double>(255.0f) * textAlpha);
-    CColor color(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textColor));
+    CColor color(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * textAlpha));
     labelFont->SetColor(color.color);
 
     float labelWidths[4];
@@ -1266,7 +1265,8 @@ void CMenuPcs::CmakeResultDraw1()
     valueFont->SetShadow(1);
     valueFont->SetScale(1.0f);
     valueFont->DrawInit();
-    valueFont->SetColor(color.color);
+    CColor valueColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * textAlpha));
+    valueFont->SetColor(valueColor.color);
     valueFont->SetTlut(6);
 
     for (int i = 0; i < 4; i++) {
@@ -1543,8 +1543,7 @@ void CMenuPcs::CmakeResultDraw()
     labelFont->SetScale(1.0f);
     labelFont->DrawInit();
 
-    int textColor = static_cast<int>(255.0f * textAlpha);
-    CColor color(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textColor));
+    CColor color(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * textAlpha));
     labelFont->SetColor(color.color);
 
     float labelWidths[4];
@@ -1564,7 +1563,8 @@ void CMenuPcs::CmakeResultDraw()
     valueFont->SetShadow(1);
     valueFont->SetScale(1.0f);
     valueFont->DrawInit();
-    valueFont->SetColor(color.color);
+    CColor valueColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * textAlpha));
+    valueFont->SetColor(valueColor.color);
     valueFont->SetTlut(6);
 
     char tribeWithSlash[0x40];
@@ -1763,7 +1763,7 @@ void CMenuPcs::CmakeJobDraw()
     font->SetScale(1.0f);
     font->DrawInit();
 
-    CColor textColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(255.0f * alpha)));
+    CColor textColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha));
     font->SetColor(textColor.color);
 
     for (int i = 0; i < 8; ++i) {
@@ -2039,7 +2039,7 @@ void CMenuPcs::CmakeTribeDraw()
     tribeFont->SetShadow(0);
     tribeFont->SetScale(1.0f);
     tribeFont->DrawInit();
-    CColor tribeRgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a));
+    CColor tribeRgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha));
     tribeFont->SetColor(tribeRgba.color);
 
     for (int i = 0; i < 4; i++) {
@@ -2054,7 +2054,8 @@ void CMenuPcs::CmakeTribeDraw()
     hairFont->SetShadow(1);
     hairFont->SetScale(1.0f);
     hairFont->DrawInit();
-    hairFont->SetColor(tribeRgba.color);
+    CColor hairRgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha));
+    hairFont->SetColor(hairRgba.color);
     hairFont->SetTlut(6);
 
     int hairBase = MenuS16(this, 0x862) * 8;
@@ -2335,7 +2336,7 @@ void CMenuPcs::CmakeSexDraw()
     font->SetScale(1.0f);
     font->DrawInit();
 
-    CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(255.0f * alpha)));
+    CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha));
     font->SetColor(rgba.color);
 
     float maxWidth = 0.0f;
@@ -2506,7 +2507,7 @@ void CMenuPcs::CmakeNameDraw()
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-    int a = static_cast<int>(static_cast<double>(255.0f) * static_cast<double>(alpha));
+    int a = static_cast<int>(255.0f * alpha);
     GXColor col;
     col.r = 0xFF;
     col.g = 0xFF;
@@ -2584,7 +2585,7 @@ void CMenuPcs::CmakeNameDraw()
     font->DrawInit();
     GetRenderFlagBits(font->renderFlags).fixedWidth = 1;
     font->SetMargin(4.9f);
-    CColor textCol(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a));
+    CColor textCol(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha));
     font->SetColor(textCol.color);
 
     int y = 0x6C;
@@ -3092,7 +3093,7 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
     font->DrawInit();
     font->SetTlut(7);
 
-    CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(255.0f * alpha)));
+    CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha));
     font->SetColor(rgba.color);
 
     const char* yesStr = GetMenuStr(1);
@@ -3416,7 +3417,7 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
     font->DrawInit();
     font->SetTlut(7);
 
-    CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(255.0f * alpha)));
+    CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha));
     font->SetColor(rgba.color);
 
     const char* txt = GetMenuStr(0x29);

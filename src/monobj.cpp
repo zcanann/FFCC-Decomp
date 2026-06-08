@@ -1794,11 +1794,11 @@ void CGMonObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 
 	charaObj->CGCharaObj::onDrawDebug(font, posX, posY, posZ);
 
-	if ((((static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags)) << 24) & 0xC0000000) >> 31) != 0) &&
-			(CFlatCenterState() == 0)) &&
+	if ((static_cast<signed char>((static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags)) << 24) & 0xC0000000) >> 31)) != 0) &&
+			(CFlatCenterState() == 0) &&
 		((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&DbgMenuPcs) + 0x6484) & 0x80) != 0)) {
 		char text[0x100];
-		unsigned short aiState = static_cast<unsigned short>(m_aiState);
+		unsigned short aiState = m_groupTag;
 		int targetIndex = m_targetPartyIndex;
 		int targetChar = '-';
 		int aiChar = '-';
@@ -1811,12 +1811,13 @@ void CGMonObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 		}
 
 		sprintf(text, s_monObjAiStateFmt, (int)object->m_scriptHandle[2], aiChar,
-		        m_actionBranch, targetChar);
+		        m_chaseState, targetChar);
+		float curPosY = posY;
 		font->SetPosX(posX - static_cast<float>(font->GetWidth(text)) * 0.5f);
-		font->SetPosY(posY);
+		font->SetPosY(curPosY);
 		font->SetPosZ(posZ);
 		font->Draw(text);
-		posY -= static_cast<float>(font->m_glyphWidth) * font->scaleY;
+		posY -= static_cast<float>(font->m_glyphHeight) * font->scaleY;
 
 		int targetDist = 0;
 		if (targetIndex >= 0) {
@@ -1830,7 +1831,7 @@ void CGMonObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 		font->SetPosY(posY);
 		font->SetPosZ(posZ);
 		font->Draw(text);
-		posY -= static_cast<float>(font->m_glyphWidth) * font->scaleY;
+		posY -= static_cast<float>(font->m_glyphHeight) * font->scaleY;
 	}
 }
 

@@ -2268,7 +2268,7 @@ void _pppCalcPart(_pppMngSt* pppMngSt)
 	{
 		_pppPDataVal* pDataVals = pppMngSt->m_pppPDataVals;
 		_pppPDataVal* pDataVal = (_pppPDataVal*)((u8*)pDataVals + pDataValOffset);
-		if (pDataVals != 0 && pDataVal != 0 && pDataVal->m_nextSpawnTime <= pppMngSt->m_currentFrame)
+		if (pDataVals != 0 && pDataVal != 0 && pppMngSt->m_currentFrame >= pDataVal->m_nextSpawnTime)
 		{
 			pDataVal->m_nextSpawnTime = 0x7FFFFFFF;
 			_pppPObject* pObject = pppCreatePObject(pppMngSt, pDataVal);

@@ -685,6 +685,13 @@ void CGMonObj::alwaysFuncOrcKing()
 			(pdtNo << 8) | 0x1D, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x590), object,
 			kMonObjBossOne, 0);
 	} else if (timer == 300 && Game.m_gameWork.m_gameOverFlag == 0) {
+		CGMonObj* monObj = CFlat.FindGMonObjFirst();
+		while (monObj != 0) {
+			u8* monBytes = reinterpret_cast<u8*>(monObj);
+			u16* script = *reinterpret_cast<u16**>(monBytes + 0x58);
+			reinterpret_cast<CGCharaObj*>(monObj)->addHp(-script[0x1A / 2], 0);
+			monObj = CFlat.FindGMonObjNext(monObj);
+		}
 		prgObj->playSe3D(0x8CBF, 0x32, 0x96, 0, 0);
 		active = 0;
 		CFlatBossState() = 1;

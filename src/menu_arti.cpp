@@ -323,7 +323,7 @@ void CMenuPcs::ArtiDraw()
 
 	ArtiOpenAnim* textEntry = listStart;
 	for (int i = 0; i < 8; i++) {
-		u8 alpha = (u8)(kArtiColorMax * textEntry->alpha);
+		s8 alpha = (u8)(kArtiColorMax * textEntry->alpha);
 		CColor color(0xFF, 0xFF, 0xFF, alpha);
 		listFont->SetColor(color.color);
 
@@ -387,7 +387,7 @@ void CMenuPcs::ArtiDraw()
 	}
 
 	CFont* helpFont = GetArtiHelpFont(this);
-	u8 helpAlpha = (u8)(kArtiColorMax * GetArtiOpenAnimList(this)->entries[0].alpha);
+	s8 helpAlpha = (s8)(kArtiColorMax * GetArtiOpenAnimList(this)->entries[0].alpha);
 	if (!hasSelectedArtifact) {
 		selectedArtifactId = -1;
 	}

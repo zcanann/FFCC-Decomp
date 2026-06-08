@@ -762,16 +762,16 @@ void CGObject::objectCollision()
     PSVECAdd(&selfBasePos, &selfCapsuleOffset, &selfCapsulePos);
 
     if ((m_bgColMask & 0x10000) != 0) {
-        for (CGQuadObj* quad = gCFlatRuntime2.FindGQuadObjFirst(); quad != 0;
-            quad = gCFlatRuntime2.FindGQuadObjNext(quad)) {
+        for (CGQuadObj* quad = CFlat.FindGQuadObjFirst(); quad != 0;
+            quad = CFlat.FindGQuadObjNext(quad)) {
             if (quad->isInner(&selfBasePos)) {
                 CallOnPush(quad, this, 0);
             }
         }
     }
 
-    for (CGObject* other = gCFlatRuntime2.FindGObjNext(this); other != 0;
-         other = gCFlatRuntime2.FindGObjNext(other)) {
+    for (CGObject* other = CFlat.FindGObjNext(this); other != 0;
+         other = CFlat.FindGObjNext(other)) {
         if (((m_bgColMask & 0xE) == 0) || ((other->m_bgColMask & 0xE) == 0)) {
             continue;
         }

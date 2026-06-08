@@ -141,18 +141,11 @@ void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, _pppCtrlTable* param_2)
 void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* step, _pppCtrlTable* param_3)
 {
     KeShpTail3XWork* work;
+    Vec* history;
     tagOAN3_SHAPE* shapeEntry;
     pppShapeAnimData* shapeAnim;
     int count;
     float alphaMul;
-    float colorR;
-    float colorG;
-    float colorB;
-    float colorA;
-    float colorStepR;
-    float colorStepG;
-    float colorStepB;
-    float colorStepA;
     float invCountMinusOne;
     pppFVECTOR4 colorStart;
     pppFVECTOR4 colorEnd;
@@ -207,10 +200,6 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     S4ToF32(&colorEnd, &work->m_values[4]);
     colorStart.w *= alphaMul;
     colorEnd.w *= alphaMul;
-    colorR = colorStart.x;
-    colorG = colorStart.y;
-    colorB = colorStart.z;
-    colorA = colorStart.w;
     if (invCountMinusOne != zero) {
         colorStep.x = (colorStart.x - colorEnd.x) / invCountMinusOne;
         colorStep.y = (colorStart.y - colorEnd.y) / invCountMinusOne;
@@ -222,10 +211,6 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
         colorStep.z = kPppKeShpTail3XHalf;
         colorStep.w = kPppKeShpTail3XHalf;
     }
-    colorStepR = colorStep.x;
-    colorStepG = colorStep.y;
-    colorStepB = colorStep.z;
-    colorStepA = colorStep.w;
 
     shapeAnim = static_cast<pppShapeAnimData*>(ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex]->m_animData);
 
@@ -240,17 +225,18 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
         count = 0;
     }
 
+    history = work->m_posHistory;
     currentIndex = work->m_head;
-    segBaseX = work->m_posHistory[currentIndex].x;
-    segBaseY = work->m_posHistory[currentIndex].y;
-    segBaseZ = work->m_posHistory[currentIndex].z;
+    segBaseX = history[currentIndex].x;
+    segBaseY = history[currentIndex].y;
+    segBaseZ = history[currentIndex].z;
     nextIndex = currentIndex + 1;
     if (currentIndex == 0x1b) {
         nextIndex = 0;
     }
-    nextBaseX = work->m_posHistory[nextIndex].x;
-    nextBaseY = work->m_posHistory[nextIndex].y;
-    nextBaseZ = work->m_posHistory[nextIndex].z;
+    nextBaseX = history[nextIndex].x;
+    nextBaseY = history[nextIndex].y;
+    nextBaseZ = history[nextIndex].z;
     segDx = nextBaseX - segBaseX;
     segDy = nextBaseY - segBaseY;
     segDz = nextBaseZ - segBaseZ;
@@ -326,10 +312,10 @@ draw_loop:
     {
         GXColor amb;
 
-        amb.r = (u8)colorR;
-        amb.g = (u8)colorG;
-        amb.b = (u8)colorB;
-        amb.a = (u8)colorA;
+        amb.r = (u8)colorStart.x;
+        amb.g = (u8)colorStart.y;
+        amb.b = (u8)colorStart.z;
+        amb.a = (u8)colorStart.w;
         GXSetChanAmbColor(GX_COLOR0A0, amb);
     }
 
@@ -342,10 +328,10 @@ update_step:
         return;
     }
 
-    colorR -= colorStepR;
-    colorG -= colorStepG;
-    colorB -= colorStepB;
-    colorA -= colorStepA;
+    colorStart.x -= colorStep.x;
+    colorStart.y -= colorStep.y;
+    colorStart.z -= colorStep.z;
+    colorStart.w -= colorStep.w;
     shapeScale -= shapeScaleStep;
     trailStep -= trailStepDelta;
     if (trailStep <= zero) {
@@ -377,9 +363,9 @@ advance_segment:
     segBaseX = nextBaseX;
     segBaseY = nextBaseY;
     segBaseZ = nextBaseZ;
-    nextBaseX = work->m_posHistory[nextIndex].x;
-    nextBaseY = work->m_posHistory[nextIndex].y;
-    nextBaseZ = work->m_posHistory[nextIndex].z;
+    nextBaseX = history[nextIndex].x;
+    nextBaseY = history[nextIndex].y;
+    nextBaseZ = history[nextIndex].z;
     segDx = nextBaseX - segBaseX;
     segDy = nextBaseY - segBaseY;
     segDz = nextBaseZ - segBaseZ;

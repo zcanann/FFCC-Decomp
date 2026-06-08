@@ -1367,7 +1367,7 @@ void CFlatRuntime2::Calc()
 			}
 
 			Vec pos = object->m_worldPosition;
-			if ((object->m_weaponNodeFlags & 1) != 0) {
+			if (object->m_weaponNodeFlagBits.m_attached != 0) {
 				PSVECAdd(&pos, &object->m_attachOwner->m_worldPosition, &pos);
 			}
 

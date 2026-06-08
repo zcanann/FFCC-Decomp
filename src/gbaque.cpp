@@ -373,7 +373,7 @@ void GbaQueue::LoadAll()
 			unsigned int bit = static_cast<unsigned int>(1U << i);
 			if ((resetMask & bit) != 0) {
 				CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(scriptFoodBase[i]);
-				if (caravanWork->m_shopBusyFlag == 1) {
+				if (caravanWork->m_shopRequestState == 1) {
 					OSWaitSemaphore(accessSemaphores + i);
 					m_shopFlags = static_cast<unsigned char>(m_shopFlags & ~static_cast<unsigned char>(bit));
 					m_shopStatusFlags = static_cast<unsigned char>(m_shopStatusFlags & ~static_cast<unsigned char>(bit));
@@ -385,7 +385,7 @@ void GbaQueue::LoadAll()
 					}
 					caravanWork->CallShop(0, 0, 0, 0, 0);
 				}
-				if (caravanWork->m_shopBusyFlag == 2) {
+				if (caravanWork->m_shopRequestState == 2) {
 					unsigned char shopMask = static_cast<unsigned char>(0x10 << i);
 					OSWaitSemaphore(accessSemaphores + i);
 					m_shopFlags = static_cast<unsigned char>(m_shopFlags & ~shopMask);
@@ -449,7 +449,7 @@ void GbaQueue::ClrShopMode()
 			continue;
 		}
 
-		if (caravanWork->m_shopBusyFlag == 1) {
+		if (caravanWork->m_shopRequestState == 1) {
 			OSWaitSemaphore(accessSemaphores + i);
 			{
 				const unsigned char playerMask = static_cast<unsigned char>(1 << i);
@@ -466,7 +466,7 @@ void GbaQueue::ClrShopMode()
 			caravanWork->CallShop(0, 0, 0, 0, 0);
 		}
 
-		if (caravanWork->m_shopBusyFlag == 2) {
+		if (caravanWork->m_shopRequestState == 2) {
 			OSWaitSemaphore(accessSemaphores + i);
 			{
 				const unsigned char shopMask = static_cast<unsigned char>(0x10 << i);
@@ -1948,22 +1948,46 @@ int GbaQueue::GetMapObjInfo(int channel, unsigned char* outData)
 
 	OSWaitSemaphore(accessSemaphores + channel);
 
-	unsigned char* mapObj = obj + 0xB35;
-	int count = 4;
-	do {
-		unsigned char* out = outData;
-		int k;
-		for (k = 0; k < 0x10; k++) {
-			out[k] = mapObj[k * 0x14];
-		}
+	unsigned char* mapObj = obj;
+	unsigned char* out;
+	for (int count = 0; count < 4; count++) {
+		out = outData;
+		out[0] = mapObj[0xB35];
+		out[1] = mapObj[0xB49];
+		out[2] = mapObj[0xB5D];
+		out[3] = mapObj[0xB71];
+		out[4] = mapObj[0xB85];
+		out[5] = mapObj[0xB99];
+		out[6] = mapObj[0xBAD];
+		out[7] = mapObj[0xBC1];
+		out[8] = mapObj[0xBD5];
+		out[9] = mapObj[0xBE9];
+		out[0xA] = mapObj[0xBFD];
+		out[0xB] = mapObj[0xC11];
+		out[0xC] = mapObj[0xC25];
+		out[0xD] = mapObj[0xC39];
+		out[0xE] = mapObj[0xC4D];
+		out[0xF] = mapObj[0xC61];
 		mapObj += 0x140;
-		count--;
-		outData += 0x10;
-	} while (count != 0);
-
-	for (int i = 0; i < 0x10; i++) {
-		outData[i] = obj[0x2435 + i * 0x14];
+		outData = out + 0x10;
 	}
+
+	out[0x10] = obj[0x2435];
+	out[0x11] = obj[0x2449];
+	out[0x12] = obj[0x245D];
+	out[0x13] = obj[0x2471];
+	out[0x14] = obj[0x2485];
+	out[0x15] = obj[0x2499];
+	out[0x16] = obj[0x24AD];
+	out[0x17] = obj[0x24C1];
+	out[0x18] = obj[0x24D5];
+	out[0x19] = obj[0x24E9];
+	out[0x1A] = obj[0x24FD];
+	out[0x1B] = obj[0x2511];
+	out[0x1C] = obj[0x2525];
+	out[0x1D] = obj[0x2539];
+	out[0x1E] = obj[0x254D];
+	out[0x1F] = obj[0x2561];
 
 	OSSignalSemaphore(accessSemaphores + channel);
 	return 0x50;
@@ -3398,6 +3422,7 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 	outData[2] = 0;
 	outData[3] = 0;
 	itemPtr = localPlayerData;
+	cmdData[3] = 0;
 
 	for (i = 0; i < 0x40; i++, itemPtr += 2) {
 		int itemId = *reinterpret_cast<short*>(itemPtr + 0x3A);
@@ -3409,7 +3434,6 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 			cmdData[0] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 4), 0);
 			cmdData[1] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 6), 0);
 			cmdData[2] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 8), 0);
-			cmdData[3] = 0;
 			memcpy(writePtr, cmdData, sizeof(cmdData));
 
 			writePtr += 8;
@@ -3533,6 +3557,7 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 
 	dataSize = indexBytes + 4;
 	writePtr = outData + 4 + indexBytes;
+	equipData[3] = 0;
 	for (i = 0; i < equipCount; i++) {
 		int itemId = *reinterpret_cast<short*>(localPlayerData + 0x3A + equipIndices[i] * 2);
 		int itemBase = Game.unkCFlatData0[2] + itemId * 0x48;
@@ -3540,7 +3565,6 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 		equipData[0] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 4), 0);
 		equipData[1] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 6), 0);
 		equipData[2] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 8), 0);
-		equipData[3] = 0;
 		memcpy(writePtr, equipData, sizeof(equipData));
 		writePtr += 8;
 		dataSize += 8;
@@ -3748,6 +3772,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	for (int i = 0; i < 0x40; i++) {
 		const int itemId = reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_inventoryItems[i];
 		unsigned short sellInfo[4];
+		sellInfo[3] = 0;
 		if ((itemId < 1) || (itemId > 0x9E)) {
 			memset(sellInfo, 0, sizeof(sellInfo));
 		} else {
@@ -3755,7 +3780,6 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 			sellInfo[0] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 4), 0);
 			sellInfo[1] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 6), 0);
 			sellInfo[2] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 8), 0);
-			sellInfo[3] = 0;
 		}
 		memcpy(outData, sellInfo, 8);
 		outData += 8;
@@ -4306,9 +4330,9 @@ int GbaQueue::MakeArtiData(int channel, char* outData)
 	unsigned int artifactData[3];
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	artifactData[0] = SwapU32Value(*reinterpret_cast<unsigned int*>(compatibilityStr + channel * 0xDC + 0x24));
-	artifactData[1] = SwapU32Value(*reinterpret_cast<unsigned int*>(compatibilityStr + channel * 0xDC + 0x28));
-	artifactData[2] = SwapU32Value(*reinterpret_cast<unsigned int*>(compatibilityStr + channel * 0xDC + 0x2C));
+	artifactData[0] = __lwbrx(reinterpret_cast<unsigned int*>(compatibilityStr + channel * 0xDC + 0x24), 0);
+	artifactData[1] = __lwbrx(reinterpret_cast<unsigned int*>(compatibilityStr + channel * 0xDC + 0x28), 0);
+	artifactData[2] = __lwbrx(reinterpret_cast<unsigned int*>(compatibilityStr + channel * 0xDC + 0x2C), 0);
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	memcpy(outData, artifactData, sizeof(artifactData));

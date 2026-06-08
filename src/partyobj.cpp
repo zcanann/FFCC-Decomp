@@ -4825,14 +4825,16 @@ void CGPartyObj::ghostPartyMog()
 
 	float ramp = static_cast<float>(CharaGhostValue(0x2054)) / kMonObjPercentMax;
 	float scale;
-	if (stageMode == 2) {
-		scale = FLOAT_80331A58 * ramp + FLOAT_80331A58;
-	} else if (stageMode > 2) {
+	switch (stageMode) {
+	default:
 		scale = kMonObjOne;
-	} else if (stageMode == 1) {
+		break;
+	case 1:
 		scale = FLOAT_80331A58 * (kMonObjOne - ramp) + FLOAT_80331A58;
-	} else {
-		scale = kMonObjOne;
+		break;
+	case 2:
+		scale = FLOAT_80331A58 * ramp + FLOAT_80331A58;
+		break;
 	}
 	unsigned int distFar = static_cast<unsigned int>(static_cast<int>(FLOAT_80331A5C * scale));
 
@@ -4841,12 +4843,12 @@ void CGPartyObj::ghostPartyMog()
 
 	if (static_cast<double>(m_partyDistance[0]) <= DOUBLE_80331A90) {
 		int exceeded;
-		if (static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x24)) < CharaGhostValue(0x2048) &&
-		    static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x28)) < CharaGhostValue(0x204C) &&
-		    static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x2C)) < CharaGhostValue(0x2050)) {
-			exceeded = 0;
-		} else {
+		if (static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x24)) >= CharaGhostValue(0x2048) ||
+		    static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x28)) >= CharaGhostValue(0x204C) ||
+		    static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x2C)) >= CharaGhostValue(0x2050)) {
 			exceeded = 1;
+		} else {
+			exceeded = 0;
 		}
 
 		if (exceeded && sGhostPartyWork.flagBits.flag10 >= 0) {

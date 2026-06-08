@@ -1394,8 +1394,6 @@ void CMenuPcs::CmakeResultOpen1()
  */
 void CMenuPcs::CmakeResultDraw()
 {
-    short mode = CmakeState(this)->m_mode;
-    short resultDir = CmakeState(this)->m_resultDir;
     float alpha = CalcCmakeFadeAlpha(this);
 
     DrawWMFrame0(1, 1.0f);
@@ -1467,7 +1465,7 @@ void CMenuPcs::CmakeResultDraw()
     }
 
     float panelAlphaValue = alpha;
-    if ((mode == 2) && (resultDir < 0)) {
+    if ((CmakeState(this)->m_mode == 2) && (CmakeState(this)->m_resultDir < 0)) {
         panelAlphaValue = 1.0f;
     }
     int panelAlpha = static_cast<int>(255.0f * panelAlphaValue);
@@ -1485,13 +1483,13 @@ void CMenuPcs::CmakeResultDraw()
         0, 192.0f, 56.0f, 416.0f, 264.0f,
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
-    if ((mode == 2) && (resultDir > 0)) {
+    if ((CmakeState(this)->m_mode == 2) && (CmakeState(this)->m_resultDir > 0)) {
         DrawCmakeTitle(6, 1.0f, alpha);
     } else {
         DrawCmakeTitle(6, alpha, 1.0f);
     }
 
-    if ((mode == 2) && (resultDir < 0)) {
+    if ((CmakeState(this)->m_mode == 2) && (CmakeState(this)->m_resultDir < 0)) {
         int tribe = static_cast<int>(s_CmakeInfo.m_tribe);
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -1537,7 +1535,7 @@ void CMenuPcs::CmakeResultDraw()
     DrawCmakeYesNo(yesNoSel, alpha);
 
     float textAlpha = alpha;
-    if ((mode == 2) && (resultDir < 0)) {
+    if ((CmakeState(this)->m_mode == 2) && (CmakeState(this)->m_resultDir < 0)) {
         textAlpha = 1.0f;
     }
 

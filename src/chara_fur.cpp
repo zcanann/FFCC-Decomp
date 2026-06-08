@@ -446,46 +446,36 @@ void CChara::TimeMogFur()
 
 	for (int y = 0; y < 0x40; y++) {
 		for (int x = 0; x < 0x40; x++) {
-			int light;
-			int r;
-			int g;
-			int b;
-			int a;
-			int newA;
 			unsigned int tileIndex = ((x % 4) + ((y % 4) * 4) + (x / 4) * 0x10 + (y / 4) * 0x100) * 2;
 			unsigned short packed = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(texels) + tileIndex);
 
-			a = (packed >> 12) & 7;
-			light = 7 - a;
-			r = light + ((packed >> 8) & 0xF) + 4;
-			g = light + ((packed >> 4) & 0xF) + 4;
-			b = light + (packed & 0xF) + 4;
+			unsigned int a = (packed >> 12) & 7;
+			int light = 7 - a;
+			int r = light + ((packed >> 8) & 0xF) + 4;
+			int b = light + (packed & 0xF) + 4;
+			int g = light + ((packed >> 4) & 0xF) + 4;
 
-			int clampedR = 0xF;
+			light = 0xF;
 			if (r < 0xF) {
-				clampedR = r;
+				light = r;
 			}
-			r = clampedR;
-			int clampedG = 0xF;
+			r = 0xF;
 			if (g < 0xF) {
-				clampedG = g;
+				r = g;
 			}
-			g = clampedG;
-			int clampedB = 0xF;
+			g = 0xF;
 			if (b < 0xF) {
-				clampedB = b;
+				g = b;
 			}
-			b = clampedB;
 
-			newA = static_cast<unsigned int>(a + 2);
+			a = a + 2;
 			unsigned int clampedA = 7;
-			if (newA < 7) {
-				clampedA = newA;
+			if (a < 7) {
+				clampedA = a;
 			}
-			newA = clampedA;
 
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(texels) + tileIndex) =
-			    static_cast<unsigned short>((newA << 12) | (r << 8) | (g << 4) | b);
+			    static_cast<unsigned short>(g | (r << 4) | (clampedA << 12) | (light << 8));
 		}
 	}
 

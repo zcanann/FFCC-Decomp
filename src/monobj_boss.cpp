@@ -264,42 +264,42 @@ void CGMonObj::frameStatFuncGiantCrab()
 	if (state == 100) {
 		if (*(int*)(self + 0x528) == 0) {
 			int soundStep = *(int*)(SoundBuffer + 0x4f0);
-			if (soundStep == 2) {
+			switch (soundStep) {
+			case 0:
+				*(float*)(SoundBuffer + 0x4f4) = kMonObjBossDuctOffsetPositive;
+				*(float*)(SoundBuffer + 0x4f8) = kMonObjBossZero;
+				*(float*)(SoundBuffer + 0x4fc) = kMonObjBossDuctOffsetNegative;
+				break;
+			case 1:
+				*(float*)(SoundBuffer + 0x4f4) = kMonObjBossDuctOffsetPositive;
+				*(float*)(SoundBuffer + 0x4f8) = kMonObjBossZero;
+				*(float*)(SoundBuffer + 0x4fc) = kMonObjBossDuctOffsetPositive;
+				break;
+			case 2:
 				*(float*)(SoundBuffer + 0x4f4) = kMonObjBossDuctOffsetLow;
 				*(float*)(SoundBuffer + 0x4f8) = kMonObjBossZero;
 				*(float*)(SoundBuffer + 0x4fc) = kMonObjBossDuctOffsetNegative;
-			} else if (soundStep < 2) {
-				if (soundStep == 0) {
-					*(float*)(SoundBuffer + 0x4f4) = kMonObjBossDuctOffsetPositive;
-					*(float*)(SoundBuffer + 0x4f8) = kMonObjBossZero;
-					*(float*)(SoundBuffer + 0x4fc) = kMonObjBossDuctOffsetNegative;
-				} else if (soundStep > -1) {
-					*(float*)(SoundBuffer + 0x4f4) = kMonObjBossDuctOffsetPositive;
-					*(float*)(SoundBuffer + 0x4f8) = kMonObjBossZero;
-					*(float*)(SoundBuffer + 0x4fc) = kMonObjBossDuctOffsetPositive;
-				}
-			} else if (soundStep < 4) {
+				break;
+			case 3:
 				*(float*)(SoundBuffer + 0x4f4) = kMonObjBossDuctOffsetLow;
 				*(float*)(SoundBuffer + 0x4f8) = kMonObjBossZero;
 				*(float*)(SoundBuffer + 0x4fc) = kMonObjBossDuctOffsetPositive;
+				break;
 			}
 
-			*(int*)(SoundBuffer + 0x4f0) = (soundStep + 1) & 3;
+			*(int*)(SoundBuffer + 0x4f0) = (soundStep + 1) % 4;
 			reinterpret_cast<CGPrgObj*>(self)->reqAnim(0xc, 0, 0);
 
-			int pdtIndex = -1;
-			CCharaPcs::CHandle* charaModelHandle = reinterpret_cast<CGObject*>(self)->m_charaModelHandle;
-			if (charaModelHandle != 0) {
-				pdtIndex = charaModelHandle->GetPdtSlot();
-			}
 			reinterpret_cast<CGPrgObj*>(self)->putParticle(
-				(pdtIndex << 8) | 6, 0, reinterpret_cast<CGObject*>(self), kMonObjBossOne, 0);
+				(reinterpret_cast<CGObject*>(self)->m_charaModelHandle->GetPdtSlot() << 8) | 6, 0,
+				reinterpret_cast<CGObject*>(self), kMonObjBossOne, 0);
 			reinterpret_cast<CGPrgObj*>(self)->putParticle(
-				(pdtIndex << 8) | 7, 0, reinterpret_cast<CGObject*>(self), kMonObjBossOne, 0);
+				(reinterpret_cast<CGObject*>(self)->m_charaModelHandle->GetPdtSlot() << 8) | 7, 0,
+				reinterpret_cast<CGObject*>(self), kMonObjBossOne, 0);
 		}
 
 		int frame = *(int*)(self + 0x528);
-		if (frame > 0x20) {
+		if (frame >= 0x21) {
 			if (frame == 0x21) {
 				reinterpret_cast<CGPrgObj*>(self)->playSe3D(0x4e30, 0x32, 0x1c2, 0, 0);
 			} else if (frame == 0x32) {
@@ -312,7 +312,7 @@ void CGMonObj::frameStatFuncGiantCrab()
 			reinterpret_cast<CGObject*>(self)->Move(&moveDir, moveScale, 0x10, 1, 0, 0, 0);
 
 			int targetIdx = *(int*)(self + 0x6c4);
-			if (targetIdx > -1) {
+			if (targetIdx >= 0) {
 				u8* target = (u8*)Game.m_partyObjArr[targetIdx];
 				if (target != 0) {
 					*(float*)(self + 0x1b4) = (float)atan2(
@@ -326,7 +326,7 @@ void CGMonObj::frameStatFuncGiantCrab()
 			reinterpret_cast<CGPrgObj*>(self)->changeStat(0, 0, 0);
 			*(u32*)(self + 0x1c0) |= 0x80002;
 		}
-	} else if (state > 99 && state < 0x69) {
+	} else if (state >= 100 && state < 0x69) {
 		if (*(int*)(self + 0x528) == 0) {
 			float turnOffset = kMonObjBossPi;
 			int animId = 1;
@@ -347,7 +347,7 @@ void CGMonObj::frameStatFuncGiantCrab()
 				*(float*)(self + 0x1b4) + turnOffset, kMonObjBossZero, moveMagnitude, 0x1e);
 
 			int targetIdx = *(int*)(self + 0x6c4);
-			if (targetIdx > -1) {
+			if (targetIdx >= 0) {
 				u8* target = (u8*)Game.m_partyObjArr[targetIdx];
 				if (target != 0) {
 					*(float*)(self + 0x1b4) = (float)atan2(

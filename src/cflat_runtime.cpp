@@ -2306,15 +2306,16 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 	} else {
 		switch (systemIndex) {
 		case -1: {
-			const u32 reqFlags = *reinterpret_cast<u32*>(&object->m_reqFlag0);
+			const int reqFlags = *reinterpret_cast<int*>(&object->m_reqFlag0);
 			if (reqFlags != 0) {
-				*object->m_sp++ = 0;
+				*object->m_sp = 0;
+				object->m_sp++;
 				result = 0;
-				return 1;
+				return ret;
 			}
 
 			const u32 requestIndex = object->m_localBase[0];
-			const u32 noPush = object->m_localBase[1];
+			const int noPush = object->m_localBase[1];
 			object->m_waitCounter = 1;
 			*reinterpret_cast<int*>(&object->m_reqFlag0) = 1;
 
@@ -2325,9 +2326,10 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 					return 1;
 				}
 
-				*object->m_sp++ = 0;
+				*object->m_sp = 0;
+				object->m_sp++;
 				result = 0;
-				return 1;
+				return ret;
 			}
 
 			*reinterpret_cast<int*>(&object->m_reqFlag0) = 0;
@@ -2336,9 +2338,10 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 				return 1;
 			}
 
-			*object->m_sp++ = 0;
+			*object->m_sp = 0;
+			object->m_sp++;
 			result = 0;
-			return 1;
+			return ret;
 		}
 		case -2: {
 			CObject* const engineObject = reinterpret_cast<CObject*>(object->m_engineObject);
@@ -2364,7 +2367,8 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 			it->m_previous = engineObject;
 			engineObject->m_0x32 = static_cast<s16>(scriptGroup);
 
-			*object->m_sp++ = 0;
+			*object->m_sp = 0;
+			object->m_sp++;
 			result = 0;
 			return ret;
 		}
@@ -2387,17 +2391,19 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 				object->m_flagBits.m_deleteFlag = 1;
 			}
 
-			*object->m_sp++ = 0;
+			*object->m_sp = 0;
+			object->m_sp++;
 			result = 0;
-			return 1;
+			return ret;
 		}
 		case -4:
 			SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
 			    this, object, 2, *object->m_localBase, object->m_argCount - 1,
 			    reinterpret_cast<CStack*>(object->m_localBase + 1), 0);
-			*object->m_sp++ = 0;
+			*object->m_sp = 0;
+			object->m_sp++;
 			result = 0;
-			return 1;
+			return ret;
 		}
 
 		CStopWatch watch("no name");

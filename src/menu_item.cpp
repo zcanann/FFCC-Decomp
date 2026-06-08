@@ -329,9 +329,9 @@ void CMenuPcs::ItemDraw()
         float h = (float)entry->h;
         float u = entry->u;
         float v = entry->v;
-        float alpha = entry->alpha;
 
         if (i == 0) {
+            float alpha = entry->alpha;
             MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
             MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
 
@@ -387,6 +387,7 @@ void CMenuPcs::ItemDraw()
 
             MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
         } else {
+            float alpha = entry->alpha;
             float itemAlpha = alpha;
             if (tex == 0x37) {
                 unsigned int menuIndex = drawIndex + this->m_itemMenuState->scroll;

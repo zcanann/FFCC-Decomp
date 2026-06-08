@@ -4266,9 +4266,8 @@ int JoyBus::SendMBase(ThreadParam* threadParam)
 
     unsigned int cmdX = 0;
     unsigned char* cmdXBytes = reinterpret_cast<unsigned char*>(&cmdX);
-    unsigned short xValue = posX;
     cmdXBytes[0] = 0x0F;
-    *reinterpret_cast<unsigned short*>(cmdXBytes + 2) = __lhbrx(&xValue, 0);
+    *reinterpret_cast<unsigned short*>(cmdXBytes + 2) = __lhbrx(&posX, 0);
     unsigned int wordX = cmdX;
     int result = 0;
 
@@ -4298,9 +4297,8 @@ int JoyBus::SendMBase(ThreadParam* threadParam)
 
     unsigned int cmdY = 0;
     unsigned char* cmdYBytes = reinterpret_cast<unsigned char*>(&cmdY);
-    unsigned short yValue = posY;
     cmdYBytes[0] = 0x4F;
-    *reinterpret_cast<unsigned short*>(cmdYBytes + 2) = __lhbrx(&yValue, 0);
+    *reinterpret_cast<unsigned short*>(cmdYBytes + 2) = __lhbrx(&posY, 0);
     unsigned int wordY = cmdY;
 
     if (static_cast<signed char>(m_threadRunningMask) != 0)

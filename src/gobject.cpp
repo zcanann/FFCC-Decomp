@@ -2894,11 +2894,14 @@ int CGObject::IsLoopAnim(int mode)
     const float lastAttr = m_lastBgAttr;
 
     if (static_cast<double>(lastAttr) < static_cast<double>(sZeroFloat)) {
-        return (threshold <= static_cast<double>(sZeroFloat)) ? 1 : 0;
+        return (static_cast<u32>(static_cast<u8>(
+                    (threshold <= static_cast<double>(sZeroFloat)) << 1))
+                << 0x1C)
+               >> 0x1D;
     }
 
     const double diff = static_cast<double>(span - sAnimFrameOffset);
-    return (diff < threshold) ? 1 : 0;
+    return (static_cast<u32>(static_cast<u8>((diff < threshold) << 3)) << 0x1C) >> 0x1F;
 }
 
 /*

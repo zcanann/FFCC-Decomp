@@ -1816,19 +1816,20 @@ void CCaravanWork::CalcStatus()
 	}
 
 	int chaliceElement = Game.m_gameWork.m_chaliceElement;
-	if (chaliceElement != 4) {
-		if (chaliceElement < 4) {
-			if (chaliceElement == 2) {
-				m_elementResistances[2]++;
-			} else if ((chaliceElement < 2) && (chaliceElement > 0)) {
-				m_elementResistances[1]++;
-			}
-		} else if (chaliceElement == 8) {
-			m_statusTimers[0]++;
-			m_statusTimers[2]++;
-		}
-	} else {
+	switch (chaliceElement) {
+	case 1:
+		m_elementResistances[1]++;
+		break;
+	case 2:
+		m_elementResistances[2]++;
+		break;
+	case 4:
 		m_elementResistances[3]++;
+		break;
+	case 8:
+		m_statusTimers[0]++;
+		m_statusTimers[2]++;
+		break;
 	}
 
 	short hpBonus = 0;

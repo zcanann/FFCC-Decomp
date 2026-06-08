@@ -1135,8 +1135,8 @@ void CCharaPcs::InitEnv(int envMode)
     _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
 
     if (envMode == 1 || envMode == 2) {
-        _GXColor black = {0x00, 0x00, 0x00, 0xFF};
-        LightPcs.SetAmbient(black);
+        CColor black(0x00, 0x00, 0x00, 0xFF);
+        LightPcs.SetAmbient(black.color);
         LightPcs.SetNumDiffuse(0);
         LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
     } else {

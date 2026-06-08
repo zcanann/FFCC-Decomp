@@ -41,9 +41,6 @@ extern int __float_huge[];
 static const char s_partyObjGhostFmt[] = "%d/%d %d/%d %d/%d";
 static const char s_partyObjGhostAngleFmt[] = "%d/%d a=%d";
 static const char s_partyObjDebugScriptFmt[] = "%d %d %d %d %d %d";
-static const char s_partyBonusCountFmt[] = "SetBonusCondition num:%d";
-static const char s_partyBonusRandomFmt[] = "SetBonusCondition slot:%d idx:%d bonus:%d";
-static const char s_partyBonusFixedFmt[] = "SetBonusCondition slot:%d bonus:%d";
 static const char s_partyBonusKind0Fmt[] = "bonus kind0:%d";
 static const char s_partyBonusKind1Fmt[] = "bonus kind1:%d";
 static const char s_partyBonusKind4Fmt[] = "bonus kind4:%d";
@@ -247,7 +244,7 @@ static bool isBossArtifactStage()
 
 static bool isFrameInterval(int frame, int interval)
 {
-	return interval != 0 && frame == (frame / interval) * interval;
+	return frame % interval == 0;
 }
 
 static bool isGhostPartyTargetMode(CGPartyObj* self)
@@ -436,6 +433,12 @@ void CGPartyObj::onChangeStat(int state)
 		}
 		*reinterpret_cast<int*>(self + 0x68C) = castTime;
 		break;
+	case 8:
+		*reinterpret_cast<int*>(self + 0x550) = 0x15;
+		*reinterpret_cast<int*>(self + 0x554) = 0x16;
+		*reinterpret_cast<int*>(self + 0x558) = 0x17;
+		*reinterpret_cast<int*>(self + 0x55C) = 0x18;
+		break;
 	case 6:
 		System.Printf(const_cast<char*>(msgBase + 0x370), *reinterpret_cast<int*>(self + 0x560));
 		*reinterpret_cast<int*>(self + 0x560) =
@@ -469,12 +472,6 @@ void CGPartyObj::onChangeStat(int state)
 				m_comboItemState = cmdListItem;
 			}
 		}
-		break;
-	case 8:
-		*reinterpret_cast<int*>(self + 0x550) = 0x15;
-		*reinterpret_cast<int*>(self + 0x554) = 0x16;
-		*reinterpret_cast<int*>(self + 0x558) = 0x17;
-		*reinterpret_cast<int*>(self + 0x55C) = 0x18;
 		break;
 	default:
 		break;
@@ -542,21 +539,21 @@ void CGPartyObj::onCancelStat(int state)
 					SetAnimSlot(0x0B, 0);
 					SetAnimSlot(0x0C, 1);
 				}
-			} else if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+			} else if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
+				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+					SetAnimSlot(0x25, 0);
+					SetAnimSlot(0x24, 1);
+				} else {
+					SetAnimSlot(0x25, 0);
+					SetAnimSlot(0x24, 1);
+				}
+			} else {
 				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
 					SetAnimSlot(0, 0);
 					SetAnimSlot(1, 1);
 				} else {
 					SetAnimSlot(0x25, 0);
 					SetAnimSlot(0x30, 1);
-				}
-			} else {
-				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
-					SetAnimSlot(0x25, 0);
-					SetAnimSlot(0x24, 1);
-				} else {
-					SetAnimSlot(0x25, 0);
-					SetAnimSlot(0x24, 1);
 				}
 			}
 		}
@@ -577,21 +574,21 @@ void CGPartyObj::onCancelStat(int state)
 					SetAnimSlot(0x0B, 0);
 					SetAnimSlot(0x0C, 1);
 				}
-			} else if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+			} else if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
+				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+					SetAnimSlot(0x25, 0);
+					SetAnimSlot(0x24, 1);
+				} else {
+					SetAnimSlot(0x25, 0);
+					SetAnimSlot(0x24, 1);
+				}
+			} else {
 				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
 					SetAnimSlot(0, 0);
 					SetAnimSlot(1, 1);
 				} else {
 					SetAnimSlot(0x25, 0);
 					SetAnimSlot(0x30, 1);
-				}
-			} else {
-				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
-					SetAnimSlot(0x25, 0);
-					SetAnimSlot(0x24, 1);
-				} else {
-					SetAnimSlot(0x25, 0);
-					SetAnimSlot(0x24, 1);
 				}
 			}
 		}
@@ -621,7 +618,15 @@ void CGPartyObj::onCancelStat(int state)
 					SetAnimSlot(0x0B, 0);
 					SetAnimSlot(0x0C, 1);
 				}
-			} else if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+			} else if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
+				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+					SetAnimSlot(0x25, 0);
+					SetAnimSlot(0x24, 1);
+				} else {
+					SetAnimSlot(0x25, 0);
+					SetAnimSlot(0x24, 1);
+				}
+			} else {
 				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
 					SetAnimSlot(0, 0);
 					SetAnimSlot(1, 1);
@@ -629,23 +634,15 @@ void CGPartyObj::onCancelStat(int state)
 					SetAnimSlot(0x25, 0);
 					SetAnimSlot(0x30, 1);
 				}
-			} else {
-				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
-					SetAnimSlot(0x25, 0);
-					SetAnimSlot(0x24, 1);
-				} else {
-					SetAnimSlot(0x25, 0);
-					SetAnimSlot(0x24, 1);
-				}
 			}
 		}
-		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
-			m_alpha = FLOAT_80331A7C;
-			m_bgColMask &= 0xFFFEFFF1;
-		} else {
+		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
 			endPSlotBit(0x10000);
 			m_alpha = kMonObjOne;
 			m_bgColMask |= 0x1000E;
+		} else {
+			m_alpha = FLOAT_80331A7C;
+			m_bgColMask &= 0xFFFEFFF1;
 		}
 		break;
 	case 0x22:
@@ -670,7 +667,15 @@ void CGPartyObj::onCancelStat(int state)
 					SetAnimSlot(0x0B, 0);
 					SetAnimSlot(0x0C, 1);
 				}
-			} else if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+			} else if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
+				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+					SetAnimSlot(0x25, 0);
+					SetAnimSlot(0x24, 1);
+				} else {
+					SetAnimSlot(0x25, 0);
+					SetAnimSlot(0x24, 1);
+				}
+			} else {
 				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
 					SetAnimSlot(0, 0);
 					SetAnimSlot(1, 1);
@@ -678,23 +683,15 @@ void CGPartyObj::onCancelStat(int state)
 					SetAnimSlot(0x25, 0);
 					SetAnimSlot(0x30, 1);
 				}
-			} else {
-				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
-					SetAnimSlot(0x25, 0);
-					SetAnimSlot(0x24, 1);
-				} else {
-					SetAnimSlot(0x25, 0);
-					SetAnimSlot(0x24, 1);
-				}
 			}
 		}
-		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
-			m_alpha = FLOAT_80331A7C;
-			m_bgColMask &= 0xFFFEFFF1;
-		} else {
+		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
 			endPSlotBit(0x10000);
 			m_alpha = kMonObjOne;
 			m_bgColMask |= 0x1000E;
+		} else {
+			m_alpha = FLOAT_80331A7C;
+			m_bgColMask &= 0xFFFEFFF1;
 		}
 		break;
 	case 6:
@@ -3396,15 +3393,20 @@ void CGPartyObj::statPut()
 				SetAnimSlot(0x0B, 0);
 				SetAnimSlot(0x0C, 1);
 			}
-		} else if (*reinterpret_cast<unsigned short*>(script + 0x1C) == 0) {
+		} else if (*reinterpret_cast<unsigned short*>(script + 0x1C) != 0) {
+			if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+				SetAnimSlot(0, 0);
+				SetAnimSlot(1, 1);
+			} else {
+				SetAnimSlot(0x25, 0);
+				SetAnimSlot(0x30, 1);
+			}
+		} else if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
 			SetAnimSlot(0x25, 0);
 			SetAnimSlot(0x24, 1);
-		} else if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
-			SetAnimSlot(0, 0);
-			SetAnimSlot(1, 1);
 		} else {
 			SetAnimSlot(0x25, 0);
-			SetAnimSlot(0x30, 1);
+			SetAnimSlot(0x24, 1);
 		}
 		changeStat(0, 0, 0);
 	}
@@ -4046,12 +4048,13 @@ void CGPartyObj::CheckGameOver()
  */
 void CGPartyObj::SetBonusCondition(int useRandom, int bonus0, int bonus1, int bonus2, int bonus3)
 {
+	const char* msgBase = lbl_801DCA48;
 	int bonusCount = 0x10;
 	if (Game.m_gameWork.m_radarType != 0) {
 		bonusCount = 4;
 	}
 
-	System.Printf(const_cast<char*>(s_partyBonusCountFmt), bonusCount);
+	System.Printf(const_cast<char*>(msgBase + 0x114), bonusCount);
 
 	int chosenBonus[5];
 	int chosenCount = 0;
@@ -4088,7 +4091,7 @@ void CGPartyObj::SetBonusCondition(int useRandom, int bonus0, int bonus1, int bo
 			reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)
 			    ->SetBonusCondition(bossArtifacts->m_bonusConditions[bonusIndex]);
 			if ((unsigned int)System.m_execParam >= 3) {
-				System.Printf(const_cast<char*>(s_partyBonusRandomFmt), slot, bonusIndex,
+				System.Printf(const_cast<char*>(msgBase + 0x134), slot, bonusIndex,
 				    bossArtifacts->m_bonusConditions[bonusIndex]);
 			}
 		} else {
@@ -4110,7 +4113,7 @@ void CGPartyObj::SetBonusCondition(int useRandom, int bonus0, int bonus1, int bo
 
 			reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)->SetBonusCondition(bonus);
 			if ((unsigned int)System.m_execParam >= 3) {
-				System.Printf(const_cast<char*>(s_partyBonusFixedFmt), slot, bonus);
+				System.Printf(const_cast<char*>(msgBase + 0x154), slot, bonus);
 			}
 		}
 

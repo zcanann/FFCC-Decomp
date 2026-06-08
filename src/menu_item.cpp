@@ -398,8 +398,8 @@ void CMenuPcs::ItemDraw()
                 if ((itemId < 1) || (EquipChk(menuIndex) != 0) ||
                     (hasLetterAttach && (itemId < 0x125))) {
                     if (EquipChk(menuIndex) != 0) {
-                        int markX = (unsigned int)(x - LoadFloat(kItemMarkXOffset));
-                        int markY = (unsigned int)((float)((h - LoadFloat(kItemMarkHeight)) * (float)LoadDouble(kItemHalfDouble)) + y);
+                        int markX = (int)(x - LoadFloat(kItemMarkXOffset));
+                        int markY = (int)((h - LoadFloat(kItemMarkHeight)) * LoadDouble(kItemHalfDouble) + y);
                         DrawEquipMark(markX, markY, alpha);
                     }
                     tex = 0x34;

@@ -510,7 +510,6 @@ int CMes::useFlag(int maxCount, int stopOnClear)
 			*slot = *slot + 1;
 			break;
 		}
-		case 3:
 		case 4:
 			if ((mFlagVars[flagEntry->m_index] == 0) && (stopOnClear == 0))
 			{
@@ -796,6 +795,7 @@ void CMes::Calc()
 
 	unsigned char* flagEntry =
 	    (unsigned char*)((char*)this + *(int*)((char*)this + 0x3C10) * 6 + 0x3C14);
+	int advance;
 	while (*(int*)((char*)this + 0x3C10) < (int)maxAdvance)
 	{
 		int type = *flagEntry;
@@ -811,10 +811,10 @@ void CMes::Calc()
 			*slot = *slot + 1;
 			break;
 		}
-		case 3:
 		case 4:
 			if (*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3CC0) == 0)
 			{
+				advance = 0;
 				goto doneAdvance;
 			}
 			break;
@@ -823,7 +823,10 @@ void CMes::Calc()
 		flagEntry += 6;
 		*(int*)((char*)this + 0x3C10) = *(int*)((char*)this + 0x3C10) + 1;
 	}
+	advance = 1;
 
+doneAdvance:
+	if (advance)
 	{
 		int next = *(int*)((char*)this + 0x3C80) + 1;
 		int max = 0x7FFF;
@@ -834,7 +837,6 @@ void CMes::Calc()
 		*(int*)((char*)this + 0x3C80) = max;
 	}
 
-doneAdvance:
 	if (*(int*)((char*)this + 0x3CAC) != 0)
 	{
 		int next = *(int*)((char*)this + 0x3CBC) + 1;
@@ -901,23 +903,25 @@ void CMes::addString(char** text, int branchMode)
 	bool running = true;
 	unsigned char caseMode = 0;
 	signed char flowMode = 0;
-	char name[32];
-	char* namePtr = name;
+	char nameTag2D[32];
+	char nameTag2C[32];
+	char nameTag2B[32];
+	char nameMon[32];
+	char nameItem[32];
 
 	while (running)
 	{
 		unsigned char* p = (unsigned char*)*text;
 		*text = (char*)(p + 1);
-		unsigned char ch = *p;
-		unsigned int uch = (unsigned int)ch;
+		unsigned int uch = (unsigned int)*p;
 
-		if (ch == 0)
+		if (uch == 0)
 		{
 			running = false;
 			goto updateBounds;
 		}
 
-		if (ch != 0xFF)
+		if (uch != 0xFF)
 		{
 			goto renderChar;
 		}
@@ -1013,6 +1017,7 @@ void CMes::addString(char** text, int branchMode)
 				mColor = 5;
 			}
 			int value = mFlagVars[ReadTagS8(text)] & 0xFFFF;
+			char* namePtr = nameItem;
 			switch (uch)
 			{
 			case 9:
@@ -1058,6 +1063,7 @@ void CMes::addString(char** text, int branchMode)
 				mColor = 0;
 			}
 			int value = mFlagVars[ReadTagS8(text)] & 0xFFFF;
+			char* namePtr = nameMon;
 			switch (uch)
 			{
 			case 0x2A:
@@ -1097,6 +1103,7 @@ void CMes::addString(char** text, int branchMode)
 			{
 				mColor = 6;
 			}
+			char* namePtr = nameTag2B;
 			strcpy(namePtr, FlatNameDirect(2, mFlagVars[ReadTagS8(text)] & 0xFFFF));
 			ApplyCaseMode(namePtr, caseMode);
 			addString(&namePtr, branchMode);
@@ -1110,6 +1117,7 @@ void CMes::addString(char** text, int branchMode)
 			{
 				mColor = 4;
 			}
+			char* namePtr = nameTag2C;
 			strcpy(namePtr, FlatNameDirect(3, mFlagVars[ReadTagS8(text)] & 0xFFFF));
 			ApplyCaseMode(namePtr, caseMode);
 			addString(&namePtr, branchMode);
@@ -1123,6 +1131,7 @@ void CMes::addString(char** text, int branchMode)
 			{
 				mColor = 3;
 			}
+			char* namePtr = nameTag2D;
 			strcpy(namePtr, FlatNameDirect(3, (mFlagVars[ReadTagS8(text)] & 0xFFFF) + 0x3C));
 			ApplyCaseMode(namePtr, caseMode);
 			addString(&namePtr, branchMode);

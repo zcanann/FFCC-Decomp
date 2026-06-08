@@ -2784,11 +2784,16 @@ void GbaQueue::SetAddLetter(int channel)
  */
 unsigned int GbaQueue::GetFavoriteFlg(int channel)
 {
+	int flag;
+	char value;
+
 	OSWaitSemaphore(accessSemaphores + channel);
-	unsigned int mask = static_cast<unsigned int>(m_favoriteFlags) & (1U << channel);
-	mask = (-mask | mask) >> 31;
+	value = static_cast<char>(m_favoriteFlags);
+	flag = static_cast<int>(value) & (1 << channel);
+	flag = static_cast<unsigned int>(-flag | flag) >> 31;
 	OSSignalSemaphore(accessSemaphores + channel);
-	return mask;
+
+	return static_cast<unsigned int>(flag);
 }
 
 /*
@@ -2838,11 +2843,16 @@ int GbaQueue::GetFavorite(int channel, char* favorite)
  */
 unsigned int GbaQueue::GetMoneyFlg(int channel)
 {
+	int flag;
+	char value;
+
 	OSWaitSemaphore(accessSemaphores + channel);
-	unsigned int mask = static_cast<unsigned int>(m_moneyFlags) & (1U << channel);
-	mask = (-mask | mask) >> 31;
+	value = static_cast<char>(m_moneyFlags);
+	flag = static_cast<int>(value) & (1 << channel);
+	flag = static_cast<unsigned int>(-flag | flag) >> 31;
 	OSSignalSemaphore(accessSemaphores + channel);
-	return mask;
+
+	return static_cast<unsigned int>(flag);
 }
 
 /*

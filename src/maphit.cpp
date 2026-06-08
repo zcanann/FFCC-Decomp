@@ -937,7 +937,7 @@ int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder&
 
     if (fabs(vz) >= 1.0f) {
         f32 disc = radiusSq - px * px - py * py;
-        if (disc < 0.0f) {
+        if (disc < 0.0) {
             return 0;
         }
 
@@ -954,11 +954,11 @@ cylinder_body:
         const f32 radialB = px * vx + py * vy;
         const f32 radialA = vx * vx + vy * vy;
         f32 disc = radialB * radialB - radialA * radialC;
-        if (disc < 0.0f) {
+        if (disc < 0.0) {
             return 0;
         }
 
-        if (disc == 0.0f) {
+        if (disc == 0.0) {
             const f32 t = -radialB / radialA;
             const f32 z = (t * vz) + pz;
             if (kMapHitZero <= z && z <= axisLen) {
@@ -985,7 +985,7 @@ cylinder_body:
             f32 capC = (pz * pz) + radialC;
             f32 capB = (pz * vz) + radialB;
             disc = capB * capB - capC;
-            if (disc == 0.0f) {
+            if (disc == 0.0) {
                 const f32 t = -capB;
                 if ((t * vz) + pz <= kMapHitZero) {
                     outT = t * tScale;
@@ -994,7 +994,7 @@ cylinder_body:
                     }
                     return 0;
                 }
-            } else if (disc > 0.0f) {
+            } else if (disc > 0.0) {
                 disc = sqrtf(disc);
                 f32 t = -capB - disc;
                 if ((t * vz) + pz <= kMapHitZero) {
@@ -1017,7 +1017,7 @@ cylinder_body:
 
             capB = -((vz * axisLen) - capB);
             disc = capB * capB - (axisLen * -((2.0f * pz) - axisLen) + capC);
-            if (disc == 0.0f) {
+            if (disc == 0.0) {
                 const f32 t = -capB;
                 if (axisLen <= (t * vz) + pz) {
                     outT = t * tScale;
@@ -1026,7 +1026,7 @@ cylinder_body:
                     }
                     return 0;
                 }
-            } else if (disc > 0.0f) {
+            } else if (disc > 0.0) {
                 disc = sqrtf(disc);
                 f32 t = -capB - disc;
                 if (axisLen <= (t * vz) + pz) {

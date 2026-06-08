@@ -2454,8 +2454,7 @@ void CPartMng::pppEditDrawShadow()
     }
 
     char* self = reinterpret_cast<char*>(this);
-    PppPdtSlot* pdtSlots = m_pdtSlots;
-    if (pdtSlots[0].m_pppDataHead != 0 && *reinterpret_cast<int*>(self + 0x174) <= 3) {
+    if (*reinterpret_cast<long**>(self + 0x5dc) != 0 && *reinterpret_cast<int*>(self + 0x174) <= 3) {
         Mtx invCamera;
         Vec cameraPos;
         Vec partPos;

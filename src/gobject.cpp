@@ -1376,9 +1376,9 @@ void CGObject::update()
     if (HasLoadedModel(m_charaModelHandle) && (m_displayFlags & 2) != 0) {
         const int forceSet = m_shieldNodeFlagBits.m_bit08 ? 1 : 0;
         const int blendMode = m_shieldNodeFlagBits.m_bit02 ? 0 : -1;
-        const int endFrame = m_currentAnimSlot == -1 ? -1 : m_collisionPushTimer;
-        const int startFrame = m_currentAnimSlot == -1 ? -1 : m_animExtraIndex;
-        const int animIndex = m_currentAnimSlot == -1 ? m_animSlotSel : m_currentAnimSlot;
+        const int endFrame = m_currentAnimSlot != -1 ? m_collisionPushTimer : -1;
+        const int startFrame = m_currentAnimSlot != -1 ? m_animExtraIndex : -1;
+        const int animIndex = m_currentAnimSlot != -1 ? m_currentAnimSlot : m_animSlotSel;
 
         if (m_charaModelHandle->SetAnim(animIndex, startFrame, endFrame, blendMode, forceSet) != 0 &&
             m_currentAnimSlot != -1) {

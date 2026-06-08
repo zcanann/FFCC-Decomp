@@ -478,7 +478,7 @@ void CMesMenu::onDraw()
         MenuPcs.SetColor(colorStorage);
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0));
         MenuPcs.DrawRect(
-            0, (float)(*(int*)((char*)&Chara + 0x200C) - 0x20), (float)*(int*)((char*)&Chara + 0x2010),
+            0, (float)(*(unsigned int*)((char*)&Chara + 0x200C) - 0x20), (float)*(int*)((char*)&Chara + 0x2010),
             FLOAT_8033092c, FLOAT_8033092c, FLOAT_803308d8, (float)(iconFrame << 5), FLOAT_80330914, FLOAT_80330914,
             FLOAT_803308d8);
     }
@@ -556,7 +556,7 @@ void CMesMenu::onDraw()
 
             if ((m_itemIndex >= 0) || (m_nameIndex >= 0)) {
                 MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x14));
-                colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF);
+                colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(unsigned int)alphaF);
                 MenuPcs.SetColor(colorStorage);
 
                 float cursorWave = sinf(FLOAT_80330930 * (FLOAT_80330914 - stateBlend) + FLOAT_80330930);
@@ -587,7 +587,7 @@ void CMesMenu::onDraw()
 
                 if (m_itemIndex >= 0) {
                     int itemIndex = m_itemIndex;
-                    colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF);
+                    colorStorage = CColor(0xFF, 0xFF, 0xFF, (signed char)(unsigned int)alphaF);
                     MenuPcs.SetColor(colorStorage);
                     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x18));
                     MenuPcs.m_textures[0x18]->SetExternalTlut(nullptr, 1);
@@ -602,7 +602,7 @@ void CMesMenu::onDraw()
             }
 
             MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x16));
-            colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80330908 * stageBlend));
+            colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(unsigned int)(FLOAT_80330908 * stageBlend));
             MenuPcs.SetColor(colorStorage);
             float frameX = baseX - (float)(((m_menuIndex & 1) != 0) ? 128 : 0);
             float frameY = baseY - (float)(((m_menuIndex & 2) != 0) ? 56 : 0);
@@ -692,7 +692,7 @@ void CMesMenu::onDraw()
                 }
             }
 
-            unsigned int foodTimer = m_foodShakeTimer;
+            int foodTimer = m_foodShakeTimer;
             unsigned int foodAmount = (unsigned int)scriptFood->m_id;
             int foodTier = (int)foodAmount - 100;
             foodTier = foodTier / 100 + (foodTier >> 31);

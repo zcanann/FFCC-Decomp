@@ -2517,6 +2517,8 @@ void GbaQueue::ReplyLetter(int channel)
 
 	Joybus.GetRecvBuffer(channel, recvBuffer);
 
+	unsigned char arg0 = recvBuffer[0];
+	unsigned char arg1 = recvBuffer[1];
 	unsigned int value =
 		(static_cast<unsigned int>(recvBuffer[3]) << 24) |
 		(static_cast<unsigned int>(recvBuffer[4]) << 16) |
@@ -2526,12 +2528,12 @@ void GbaQueue::ReplyLetter(int channel)
 	unsigned int gil = value;
 
 	if (recvBuffer[2] == 0) {
-		itemId = (static_cast<unsigned int>(recvBuffer[5]) << 8) | recvBuffer[6];
+		itemId = value & 0xffff;
 		gil = 0;
 	}
 
 	unsigned int* scriptFoodBase = Game.m_scriptFoodBase + channel;
-	reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->FGLetterReply(recvBuffer[0], recvBuffer[1], itemId, gil);
+	reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->FGLetterReply(arg0, arg1, itemId, gil);
 	Joybus.ClrRecvBuffer(channel);
 	Joybus.SendResult(channel, 0, 0x15, 0);
 

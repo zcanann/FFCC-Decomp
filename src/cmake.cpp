@@ -2880,10 +2880,10 @@ int CMenuPcs::CmakeNameCtrl()
                     }
                     bsRet = 0;
                 }
-                if (bsRet == 0) {
-                    Sound.PlaySe(3, 0x40, 0x7F, 0);
-                } else {
+                if (bsRet != 0) {
                     Sound.PlaySe(4, 0x40, 0x7F, 0);
+                } else {
+                    Sound.PlaySe(3, 0x40, 0x7F, 0);
                 }
                 return 0;
             }

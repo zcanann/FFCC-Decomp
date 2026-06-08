@@ -965,8 +965,8 @@ void CGCharaObj::onFrameStat()
 				case 2:
 					if (m_subFrame == 0) {
 						{
-							unsigned char* slot = reinterpret_cast<unsigned char*>(this);
 							int i = 0;
+							unsigned char* slot = reinterpret_cast<unsigned char*>(this);
 							for (; i < 0x16; i++, slot += 4) {
 								if ((8U & (1U << i)) != 0) {
 									CFlatRuntime2Storage().EndParticleSlot(*reinterpret_cast<int*>(slot + 0x564), 1);
@@ -2280,8 +2280,8 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 				setSta(4, 0);
 				Sound.StopSe3DGroup(m_particleId);
 				{
-					unsigned char* slot = reinterpret_cast<unsigned char*>(this);
 					int i = 0;
+					unsigned char* slot = reinterpret_cast<unsigned char*>(this);
 					for (; i < 0x16; i++, slot += 4) {
 						if (((1U << i) & 0x3bU) != 0) {
 							CFlatRuntime2Storage().DeleteParticleSlot(*reinterpret_cast<int*>(slot + 0x564), 1);

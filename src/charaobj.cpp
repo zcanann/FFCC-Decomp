@@ -266,6 +266,13 @@ struct CharaObjSignedLowBit
 	signed char m_low : 1;
 };
 
+struct CharaObjPartyFlag04
+{
+	unsigned char m_pad_hi : 5;
+	unsigned char m_bit04 : 1;
+	unsigned char m_pad_lo : 2;
+};
+
 struct CharaObjComboFlagBits
 {
 	signed char m_bit80 : 1;
@@ -2536,8 +2543,7 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 		for (int i = 2; i < *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBAA); i++) {
 			if (caravan->DelCmdListAndItem(i) == 0x125) {
 				caravan->GetNumCombi(i, 1);
-				unsigned char& flags = party->m_partyData.partyFlags;
-				flags = (flags & 0xFB) | 4;
+				reinterpret_cast<CharaObjPartyFlag04*>(&party->m_partyData.partyFlags)->m_bit04 = 1;
 				return;
 			}
 		}

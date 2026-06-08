@@ -636,9 +636,11 @@ void CRingMenu::onDraw()
 					scroll += kRingMenuOne;
 				}
 
-				double labelAlphaScale = kRingMenuOneD;
+				double labelAlphaScale;
 				if (fabs(static_cast<double>(m_spinAccumulator)) < kRingMenuSpinEpsilon) {
 					labelAlphaScale = kRingMenuSpinAlphaScale * fabs(static_cast<double>(m_spinAccumulator));
+				} else {
+					labelAlphaScale = kRingMenuOneD;
 				}
 				labelAlphaScale = static_cast<double>(static_cast<float>(labelAlphaScale * static_cast<double>(iconAlphaScale)));
 

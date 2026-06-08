@@ -169,14 +169,14 @@ void CGItemObj::ItemJump(int state, float jump)
 		CGObject* object = reinterpret_cast<CGObject*>(itemObj);
 
 		if ((object->m_objectFlags & 0x10) == 0) {
-			unsigned int mapMask = object->m_bgHitMask;
 			Vec bottom = object->m_worldPosition;
 			Vec move;
 
-			bottom.y += kItemObjHeightOffset;
 			move.x = kItemObjZero;
 			move.z = kItemObjZero;
 			move.y = kItemObjGroundProbeDown;
+			bottom.y += kItemObjHeightOffset;
+			unsigned int mapMask = object->m_bgHitMask;
 			CMapCylinder cylinder(kItemObjBoundsInitMin, kItemObjBoundsInitMax);
 			cylinder.m_bottom = bottom;
 			cylinder.m_axis.x = kItemObjZero;
@@ -982,7 +982,8 @@ void CGItemObj::onFrameStat()
 	case 0xE:
 		if (m_stateFrame == 0) {
 			prgObj->m_bgColMask = 0;
-			*reinterpret_cast<unsigned char*>(&prgObj->m_weaponNodeFlags) &= 0xEF;
+			*reinterpret_cast<unsigned char*>(&prgObj->m_weaponNodeFlags) =
+			    static_cast<unsigned char>(__rlwimi(*reinterpret_cast<unsigned char*>(&prgObj->m_weaponNodeFlags), 0, 4, 27, 27));
 			prgObj->m_groundHitOffset.z = zero;
 			prgObj->m_groundHitOffset.y = zero;
 			prgObj->m_groundHitOffset.x = zero;
@@ -1018,11 +1019,8 @@ void CGItemObj::onFrameStat()
 	case 0x1F:
 		PartMng.pppSetLocSlot(m_particleSlot, &prgObj->m_worldPosition);
 
-		if (m_subState == 1) {
-			if (m_subFrame == 0x7D) {
-				ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
-			}
-		} else if (m_subState < 1 && -1 < m_subState && m_subFrame == 0) {
+		if (m_subState != 1) {
+			if (m_subState < 1 && 0 <= m_subState && m_subFrame == 0) {
 			int particleNoA;
 			int particleNoB;
 
@@ -1047,6 +1045,9 @@ void CGItemObj::onFrameStat()
 			SetDamageCol(0, itemObjStrings + kItemObjStrF051Root, kItemObjDamageRadius, kItemObjDamageRadius,
 			             reinterpret_cast<Vec*>(&damageOffset));
 			*reinterpret_cast<int*>(&prgObj->m_damageColliders[1].m_localPosition.x) = 9;
+			}
+		} else if (m_subFrame == 0x7D) {
+			ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
 		}
 		break;
 	case 0x23:
@@ -1087,7 +1088,7 @@ void CGItemObj::onFrameStat()
 			float current = prgObj->m_groundHitOffset.y;
 			float clamped = kItemObjDouble * -timer;
 
-			if (current >= clamped) {
+			if (!(current < clamped)) {
 				float maxClamp = kItemObjDouble * timer;
 				clamped = current;
 				if (maxClamp < current) {
@@ -1118,16 +1119,16 @@ void CGItemObj::onFrameStat()
 		float distance = PSVECMag(reinterpret_cast<Vec*>(&monTarget));
 		if (distance < kItemObjMemoryRadius) {
 			changeStat(0x27, 0, 0);
-		} else if (distance <= zero) {
-			prgObj->m_groundHitOffset.z = zero;
-			prgObj->m_groundHitOffset.y = zero;
-			prgObj->m_groundHitOffset.x = zero;
-		} else {
+		} else if (zero < distance) {
 			float moveScale = kItemObjMemoryChaseAccel * prgObj->m_moveTimer;
 
 			prgObj->m_groundHitOffset.x += kItemObjMemoryChaseScale * monTarget.x * moveScale;
 			prgObj->m_groundHitOffset.y += kItemObjMemoryChaseScale * monTarget.y * moveScale;
 			prgObj->m_groundHitOffset.z += kItemObjMemoryChaseScale * monTarget.z * moveScale;
+		} else {
+			prgObj->m_groundHitOffset.z = zero;
+			prgObj->m_groundHitOffset.y = zero;
+			prgObj->m_groundHitOffset.x = zero;
 		}
 		break;
 	}

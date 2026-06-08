@@ -11450,8 +11450,8 @@ void CMenuPcs::CalcMcObj()
 							float u3 = u2 * u;
 							rotResult =
 							    width * (prev[3] * (u + (u3 - FLOAT_803314c8 * u2)) + cur[2] * (u3 - u2)) +
-							    prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2)) +
-							    cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2);
+							    (prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2)) +
+							    cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2));
 						}
 						break;
 					}

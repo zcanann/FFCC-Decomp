@@ -962,13 +962,13 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* stepData, _p
 {
     PRyjMegaBirthModel* params = (PRyjMegaBirthModel*)stepData;
     RyjMegaBirthModelDataOffsets* offsets = GetRyjMegaBirthModelDataOffsets(ctrlTable);
-    VColor* baseColor = (VColor*)(obj->m_workArea + offsets->m_colorOffset);
     VRyjMegaBirthModel* work =
         (VRyjMegaBirthModel*)(obj->m_workArea + offsets->m_workOffset);
+    VColor* baseColor = (VColor*)(obj->m_workArea + offsets->m_colorOffset);
     _PARTICLE_DATA* particleBlock = work->m_particleBlock;
+    s32 numParticles = work->m_numParticles;
     _PARTICLE_WMAT* particleWorldMatrixBlock = work->m_worldMatrixBlock;
     _PARTICLE_COLOR* colorBlock = work->m_colorBlock;
-    s32 numParticles = work->m_numParticles;
     s8 hasRequiredMemory;
 
     if (particleBlock == NULL) {

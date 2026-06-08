@@ -4373,12 +4373,12 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
             stack[-1].m_word = *artifact;
             if (setMode < 0) {
                 if (setMode >= -1) {
-                    *artifact = static_cast<short>(*artifact - static_cast<short>(stack->m_word));
+                    *artifact = static_cast<short>(*artifact - stack->m_word);
                 }
             } else if (setMode == 0) {
                 *artifact = static_cast<short>(stack->m_word);
             } else if (setMode < 2) {
-                *artifact = static_cast<short>(*artifact + static_cast<short>(stack->m_word));
+                *artifact = static_cast<short>(*artifact + stack->m_word);
             }
         } else {
             switch (systemValue) {

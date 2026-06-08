@@ -4082,10 +4082,10 @@ void CGMonObj::statMove(int* targetIndex)
 
 	}
 
-	if (monObj->m_chaseDirty == 0) {
-		*chaseTimer += 1;
-	} else {
+	if (monObj->m_chaseDirty != 0) {
 		monObj->m_chaseDirty = 0;
+	} else {
+		*chaseTimer += 1;
 	}
 }
 #pragma dont_inline off

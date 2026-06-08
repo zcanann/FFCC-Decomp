@@ -1159,12 +1159,12 @@ void CMenuPcs::CmdDraw()
 								itemIdx -= itemCount;
 							}
 
-							bool equippable = true;
+							int equippable = 1;
 							if (itemIdx + 2 < itemCount) {
-								equippable = EquipChk(static_cast<int>(letterBuf[itemIdx + 1])) != 0;
+								equippable = EquipChk(static_cast<int>(letterBuf[itemIdx + 1]));
 							}
 
-							if (equippable) {
+							if (static_cast<u8>(equippable) != 0) {
 								if (itemIdx + 2 < itemCount) {
 									const float markX = rowX - kCmdMenuTwelve;
 									const float markY = (rowH - kCmdMenuTwentyFour) *

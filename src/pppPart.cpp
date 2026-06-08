@@ -2558,19 +2558,10 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 
 	if (kPppPartZero != cylScale)
 	{
-		CMapCylinder cylinder;
+		CMapCylinder cylinder(kMapHitBoundsMinInit, kMapHitBoundsMaxInit);
 		cylinder.m_bottom = *origin;
-		cylinder.Probe().m_direction.x = kPppPartHugePositive;
-		cylinder.Probe().m_direction.y = kPppPartHugePositive;
-		cylinder.Probe().m_direction.z = kPppPartHugePositive;
-		cylinder.Probe().m_radius = radius;
-		cylinder.Probe().m_height = kPppPartHugePositive;
-		cylinder.Probe().m_top = *vector;
-		cylinder.Probe().m_direction2.x = kPppPartHugeNegative;
-		cylinder.Probe().m_direction2.y = kPppPartHugeNegative;
-		cylinder.Probe().m_direction2.z = kPppPartHugeNegative;
-		cylinder.Probe().m_radius2 = cylScale;
-		cylinder.Probe().m_height2 = kPppPartHugePositive;
+		cylinder.m_axis = *vector;
+		cylinder.m_radius = radius;
 
 		if (MapMng.CheckHitCylinder(&cylinder, vector, hitRaw->m_cylinderAttribute) != 0)
 		{

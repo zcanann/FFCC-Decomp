@@ -1883,8 +1883,8 @@ void CCameraPcs::drawShadowEndAll()
 
     unsigned int* dstWords = reinterpret_cast<unsigned int*>(&CurrentCameraState());
     unsigned int* srcWords = reinterpret_cast<unsigned int*>(&m_savedCamera);
-    float* dstFloats = &m_fov;
-    float* srcFloats = &m_savedCamera.m_fov;
+    float* dstFloats = &m_yaw;
+    float* srcFloats = &m_savedCamera.m_yaw;
 
 #define COPY_SHADOW_CAMERA_WORD_PAIR(index) \
     do {                                    \

@@ -1390,7 +1390,7 @@ void CGObject::update()
             m_charaModelHandle->m_model->SetFrame(m_turnSpeed);
         }
 
-        shieldFlagsLo &= ~0x8;
+        m_shieldNodeFlagBits.m_bit08 = 0;
     }
 
     PSVECAdd(&m_worldPosition, &m_groundHitOffset, &m_worldPosition);

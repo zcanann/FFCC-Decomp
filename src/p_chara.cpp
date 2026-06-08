@@ -37,6 +37,7 @@ extern const float kCharaBumpLightTargetZ;
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
 #include <PowerPC_EABI_Support/Runtime/New.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
+#include <math.h>
 
 CCharaPcs CharaPcs;
 CLightPcs::CBumpLight* gCharaPartWorkPtr = 0;
@@ -2627,7 +2628,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         return;
     }
     const float lightAlpha = m_model->m_lightAlpha;
-    if (lightAlpha == kCharaZero && (flags & 0x80) == 0) {
+    if (kCharaZero == lightAlpha && (flags & 0x80) == 0) {
         return;
     }
     if ((flags & 0x100) != 0 && drawPass != 5) {
@@ -2642,15 +2643,16 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
     if (drawPass == 0 && (flags & 0x4000) != 0) {
         return;
     }
+
+    if (immediatePass != 0 && drawPass == 0 && (lightAlpha < kCharaOne || (flags & 0x40000) != 0)) {
+        ppvDrawMng.AddPrim(-m_sortZ, this);
+        return;
+    }
+
     if (drawPass == 3 && (flags & 0x81C) == 0) {
         return;
     }
     if ((drawPass == 0 || drawPass == 4) && (flags & 0x10) != 0) {
-        return;
-    }
-
-    if (immediatePass != 0 && drawPass == 0 && (lightAlpha < kCharaOne || (flags & 0x40000) != 0)) {
-        ppvDrawMng.AddPrim(-m_sortZ, this);
         return;
     }
 
@@ -2664,24 +2666,56 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         if (phaseIndex > 3) {
             phaseIndex = 3;
         }
-        _GXColor shade;
-        if ((flags & 0x20000) == 0 || drawPass == 3) {
-            const float blendT = phase - static_cast<float>(phaseIndex);
-            shade = BlendColor(CharaPcs.m_viewerChoiceColor[phaseIndex].color,
-                               CharaPcs.m_viewerChoiceColor[phaseIndex + 1].color, blendT);
+        const float blendT = static_cast<float>(fmod(static_cast<double>(phase), 1.0));
+        CColor shade;
+        if ((m_flags & 0x20000) == 0 || drawPass == 3) {
+            CColor next;
+            next.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(CharaPcs.m_viewerChoiceColor[phaseIndex + 1].color.r) * blendT));
+            next.color.g = static_cast<unsigned char>(static_cast<int>(static_cast<float>(CharaPcs.m_viewerChoiceColor[phaseIndex + 1].color.g) * blendT));
+            next.color.b = static_cast<unsigned char>(static_cast<int>(static_cast<float>(CharaPcs.m_viewerChoiceColor[phaseIndex + 1].color.b) * blendT));
+            next.color.a = static_cast<unsigned char>(static_cast<int>(static_cast<float>(CharaPcs.m_viewerChoiceColor[phaseIndex + 1].color.a) * blendT));
+            CColor nextCopy(next);
+
+            const float inv = kCharaOne - blendT;
+            CColor cur;
+            cur.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(CharaPcs.m_viewerChoiceColor[phaseIndex].color.r) * inv));
+            cur.color.g = static_cast<unsigned char>(static_cast<int>(static_cast<float>(CharaPcs.m_viewerChoiceColor[phaseIndex].color.g) * inv));
+            cur.color.b = static_cast<unsigned char>(static_cast<int>(static_cast<float>(CharaPcs.m_viewerChoiceColor[phaseIndex].color.b) * inv));
+            cur.color.a = static_cast<unsigned char>(static_cast<int>(static_cast<float>(CharaPcs.m_viewerChoiceColor[phaseIndex].color.a) * inv));
+            CColor curCopy(cur);
+
+            CColor blended;
+            blended.color.r = static_cast<unsigned char>(curCopy.color.r + nextCopy.color.r);
+            blended.color.g = static_cast<unsigned char>(curCopy.color.g + nextCopy.color.g);
+            blended.color.b = static_cast<unsigned char>(curCopy.color.b + nextCopy.color.b);
+            blended.color.a = static_cast<unsigned char>(curCopy.color.a + nextCopy.color.a);
+            CColor blendedCopy(blended);
+            shade = blendedCopy;
         } else {
-            shade.r = 0xFF;
-            shade.g = 0xFF;
-            shade.b = 0xFF;
-            shade.a = 0xFF;
+            CColor white(0xFF, 0xFF, 0xFF, 0xFF);
+            shade = white;
         }
-        const _GXColor ambientBase = CharaPcs.m_viewerAmbientColor[lightBank];
-        const _GXColor ambientColor = ModulateColor(ambientBase, shade);
-        LightPcs.SetAmbient(ambientColor);
+
+        CColor3 ambientBase(CharaPcs.m_viewerAmbientColor[lightBank]);
+        CColor3 ambientShade;
+        ambientShade.color.r = static_cast<unsigned char>((static_cast<unsigned int>(ambientBase.color.r) * shade.color.r) / 255);
+        ambientShade.color.g = static_cast<unsigned char>((static_cast<unsigned int>(ambientBase.color.g) * shade.color.g) / 255);
+        ambientShade.color.b = static_cast<unsigned char>((static_cast<unsigned int>(ambientBase.color.b) * shade.color.b) / 255);
+        ambientShade.color.a = ambientBase.color.a;
+        CColor3 ambientColor(ambientShade);
+        _GXColor ambientGX = ambientColor.color;
+        LightPcs.SetAmbient(ambientGX);
 
         for (unsigned long i = 0; i < 3; i++) {
-            const _GXColor diffuseBase = CharaPcs.m_viewerDiffuseColor[lightBank][i];
-            LightPcs.SetDiffuseColor(i, ModulateColor(diffuseBase, shade));
+            CColor3 diffuseBase(CharaPcs.m_viewerDiffuseColor[lightBank][i]);
+            CColor3 diffuseShade;
+            diffuseShade.color.r = static_cast<unsigned char>((static_cast<unsigned int>(diffuseBase.color.r) * shade.color.r) / 255);
+            diffuseShade.color.g = static_cast<unsigned char>((static_cast<unsigned int>(diffuseBase.color.g) * shade.color.g) / 255);
+            diffuseShade.color.b = static_cast<unsigned char>((static_cast<unsigned int>(diffuseBase.color.b) * shade.color.b) / 255);
+            diffuseShade.color.a = diffuseBase.color.a;
+            CColor3 diffuseColor(diffuseShade);
+            _GXColor diffuseGX = diffuseColor.color;
+            LightPcs.SetDiffuseColor(i, diffuseGX);
         }
 
         Vec lightPos;
@@ -2696,7 +2730,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
     PSMTXCopy(CameraPcs.m_cameraMatrix, viewMtx);
 
     if (drawPass == 3) {
-        if ((flags & 4) != 0) {
+        if ((m_flags & 4) != 0) {
             const float offsetY = 0.25f * (m_worldPosY - m_bgCharmPlaneY);
             viewMtx[0][3] += viewMtx[0][1] * offsetY;
             viewMtx[1][3] += viewMtx[1][1] * offsetY;
@@ -2704,7 +2738,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
             viewMtx[0][1] *= 0.5f;
             viewMtx[1][1] *= 0.5f;
             viewMtx[2][1] *= 0.5f;
-        } else if ((flags & 8) != 0) {
+        } else if ((m_flags & 8) != 0) {
             PSMTXConcat(viewMtx, CFlatCenterMatrix(), viewMtx);
         }
     } else if (drawPass == 2) {
@@ -2811,26 +2845,27 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         }
     } else {
         int modelDrawFlags = 0;
-        if (drawPass == 3 && (flags & 0x0C) != 0) {
+        if (drawPass == 3 && (m_flags & 0x0C) != 0) {
             modelDrawFlags |= 1;
         }
-        if ((flags & 0x400) != 0) {
+        const unsigned int drawFlags = m_flags;
+        if ((drawFlags & 0x400) != 0) {
             modelDrawFlags |= 2;
         }
-        if ((flags & 0x2000) != 0) {
+        if ((drawFlags & 0x2000) != 0) {
             modelDrawFlags |= 4;
         }
-        if (drawPass == 3 && (flags & 0x8000) != 0) {
+        if (drawPass == 3 && (drawFlags & 0x8000) != 0) {
             modelDrawFlags |= 8;
         }
-        if ((flags & 0x100000) != 0) {
+        if ((drawFlags & 0x100000) != 0) {
             modelDrawFlags |= 0x10;
         }
         m_model->Draw(viewMtx, modelDrawFlags, 0);
     }
 
     if (drawPass == 0 || drawPass == 4) {
-        m_model->DrawFur(viewMtx, static_cast<int>((flags >> 23) & 1));
+        m_model->DrawFur(viewMtx, static_cast<int>((m_flags >> 23) & 1));
     }
 
     if (restoreFog) {

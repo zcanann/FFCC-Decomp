@@ -1592,7 +1592,7 @@ void CGPartyObj::shouki()
 
 	const unsigned int frame = static_cast<unsigned char>(m_flags);
 	if (m_unk688 == 0 && (CFlatGameFlags() & 0x10) == 0) {
-		unsigned int healCount = 0;
+		int healCount = 0;
 		if (PartyData(this).carryObject == reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)) {
 			healCount = isFrameInterval(frame, *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 4));
 		} else {
@@ -3347,7 +3347,7 @@ void CGPartyObj::statPut()
 				SetAnimSlot(0x0B, 0);
 				SetAnimSlot(0x0C, 1);
 			}
-		} else if (*reinterpret_cast<short*>(script + 0x1C) == 0) {
+		} else if (*reinterpret_cast<unsigned short*>(script + 0x1C) == 0) {
 			SetAnimSlot(0x25, 0);
 			SetAnimSlot(0x24, 1);
 		} else if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
@@ -4902,7 +4902,7 @@ messageMenu:
 		}
 	}
 
-	unsigned int auraSlot = 0;
+	int auraSlot = 0;
 	int gauge = *reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x38);
 	if (static_cast<int>(distFar * 3) / 3 < gauge) {
 		auraSlot = 0xF;

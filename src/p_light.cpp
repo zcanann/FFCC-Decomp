@@ -865,9 +865,9 @@ void CLightPcs::CBumpLight::MakeLightMap()
     _GXColor chanMat2;
 
     unsigned char u0 = m_bumpShade[0];
-    unsigned char u1 = m_bumpShade[1];
-    unsigned char u2 = m_bumpShade[2];
-    unsigned char u3 = m_bumpShade[3];
+    signed char u1 = m_bumpShade[1];
+    signed char u2 = m_bumpShade[2];
+    signed char u3 = m_bumpShade[3];
 
     chanAmb.a = u0;
     chanAmb.b = u0;

@@ -960,7 +960,7 @@ void CGObject::bgNormalCollision()
             break;
         }
 
-        m_stateFlags0 = (m_stateFlags0 & 0xBF) | 0x40;
+        m_stateFlags0Bits.unk6 = 1;
         MapMng.m_hitMapObj->CalcHitSlide(&move, sJumpLift);
 
         if (fabs(static_cast<double>(move.x)) < DOUBLE_80330400) {
@@ -1012,7 +1012,7 @@ void CGObject::bgNormalCollision()
     const unsigned char mapGroup = gMapHitFace->m_groupIndex;
     CMapIdGrp* mapGroupData = MapMng.GetMapIdGrpArray() + mapGroup;
     if ((mapGroupData->m_mask & 0x20) == 0) {
-        m_stateFlags0 = (m_stateFlags0 & 0x7F) | 0x80;
+        m_stateFlags0Bits.unk7 = 1;
         m_radiusCtrl.x = *reinterpret_cast<float*>(&mapGroupData->m_mask);
         if (mapGroup != 0) {
             m_lastBgGroup = static_cast<short>(mapGroup);
@@ -1133,7 +1133,7 @@ void CGObject::bgWorldCollision()
     const unsigned char mapGroup = gMapHitFace->m_groupIndex;
     CMapIdGrp* mapGroupData = MapMng.GetMapIdGrpArray() + mapGroup;
     if ((mapGroupData->m_mask & 0x20) == 0) {
-        m_stateFlags0 = (m_stateFlags0 & 0x7F) | 0x80;
+        m_stateFlags0Bits.unk7 = 1;
         m_radiusCtrl.x = *reinterpret_cast<float*>(&mapGroupData->m_mask);
         if (mapGroup != 0) {
             m_lastBgGroup = static_cast<short>(mapGroup);

@@ -540,7 +540,7 @@ static int CountShopMenuOwnedItems(CCaravanWork* caravanWork, int itemNo)
 
 static bool CanTradeShopMenuItem(CShopMenu* shopMenu, int index, int itemNo)
 {
-    if ((index < 0) || (itemNo < 1)) {
+    if ((index < 0) || (itemNo <= 0)) {
         return false;
     }
 
@@ -2425,7 +2425,7 @@ void CShopMenu::SelectMake()
     short* material = recipeMaterial;
     for (int i = 0; i < 3; i++, material++) {
         short itemNo = *material;
-        if (itemNo < 1) {
+        if (itemNo <= 0) {
             break;
         }
 
@@ -2486,7 +2486,7 @@ void CShopMenu::SelectMake()
 
             int itemId = getItemNo(m_selectedIndex);
             int makeGil;
-            if (itemId < 1) {
+            if (itemId <= 0) {
                 makeGil = 0;
             } else {
                 int gil = m_caravanWork->m_shopParam *
@@ -2549,7 +2549,7 @@ void CShopMenu::SelectYesNo()
                 static_cast<short>(caravanWork->m_inventoryItemCount + 1) < 0x41)) {
             int gilValue;
             if (m_listType == 0) {
-                if (itemId < 1) {
+                if (itemId <= 0) {
                     gilValue = 0;
                 } else {
                     int gil = caravanWork->m_shopParam *
@@ -2557,7 +2557,7 @@ void CShopMenu::SelectYesNo()
                     gilValue = gil / 100;
                 }
             } else if (m_listType == 1) {
-                if (itemId < 1) {
+                if (itemId <= 0) {
                     gilValue = 0;
                 } else {
                     int gil = caravanWork->m_shopParam *
@@ -2575,7 +2575,7 @@ void CShopMenu::SelectYesNo()
             m_caravanWork->AddItem(static_cast<short>(itemId), 0);
             int gilValue2;
             if (m_listType == 0) {
-                if (itemId < 1) {
+                if (itemId <= 0) {
                     gilValue2 = 0;
                 } else {
                     int gil = m_caravanWork->m_shopParam *
@@ -2583,7 +2583,7 @@ void CShopMenu::SelectYesNo()
                     gilValue2 = gil / 100;
                 }
             } else if (m_listType == 1) {
-                if (itemId < 1) {
+                if (itemId <= 0) {
                     gilValue2 = 0;
                 } else {
                     int gil = m_caravanWork->m_shopParam *
@@ -2603,7 +2603,7 @@ void CShopMenu::SelectYesNo()
     bool canTrade = false;
     if (itemIndex != -1) {
         int tradeItem = getItemNo(itemIndex);
-        if (tradeItem < 1) {
+        if (tradeItem <= 0) {
             canTrade = false;
         } else if (m_listType == 0) {
             canTrade = true;
@@ -2631,7 +2631,7 @@ void CShopMenu::SelectYesNo()
         int sellId = getItemNo(m_selectedIndex);
         int gilValue;
         if (m_listType == 0) {
-            if (sellId < 1) {
+            if (sellId <= 0) {
                 gilValue = 0;
             } else {
                 int gil = m_caravanWork->m_shopParam *
@@ -2640,7 +2640,7 @@ void CShopMenu::SelectYesNo()
                 gilValue = gil - (gil >> 0x1F);
             }
         } else if (m_listType == 1) {
-            if (sellId < 1) {
+            if (sellId <= 0) {
                 gilValue = 0;
             } else {
                 int gil = m_caravanWork->m_shopParam *
@@ -2656,7 +2656,7 @@ void CShopMenu::SelectYesNo()
             m_caravanWork->DeleteItemIdx(m_selectedIndex, 0);
             int gilValue2;
             if (m_listType == 0) {
-                if (sellId < 1) {
+                if (sellId <= 0) {
                     gilValue2 = 0;
                 } else {
                     int gil = m_caravanWork->m_shopParam *
@@ -2665,7 +2665,7 @@ void CShopMenu::SelectYesNo()
                     gilValue2 = gil - (gil >> 0x1F);
                 }
             } else if (m_listType == 1) {
-                if (sellId < 1) {
+                if (sellId <= 0) {
                     gilValue2 = 0;
                 } else {
                     int gil = m_caravanWork->m_shopParam *
@@ -2774,7 +2774,7 @@ void CShopMenu::SelectFigure()
                     int itemId = getItemNo(m_selectedIndex);
                     int unitGil;
                     if (m_listType == 0) {
-                        if (itemId < 1) {
+                        if (itemId <= 0) {
                             unitGil = 0;
                         } else {
                             int gil = caravanWork->m_shopParam *
@@ -2783,7 +2783,7 @@ void CShopMenu::SelectFigure()
                             unitGil = gil - (gil >> 0x1F);
                         }
                     } else if (m_listType == 1) {
-                        if (itemId < 1) {
+                        if (itemId <= 0) {
                             unitGil = 0;
                         } else {
                             int gil = caravanWork->m_shopParam *
@@ -2884,7 +2884,7 @@ void CShopMenu::SelectItemIdx()
                     int itemId = getItemNo(m_selectedIndex);
                     int unitGil;
                     if (m_listType == 0) {
-                        if (itemId < 1) {
+                        if (itemId <= 0) {
                             unitGil = 0;
                         } else {
                             int gil = caravanWork->m_shopParam *
@@ -2892,7 +2892,7 @@ void CShopMenu::SelectItemIdx()
                             unitGil = gil / 100;
                         }
                     } else if (m_listType == 1) {
-                        if (itemId < 1) {
+                        if (itemId <= 0) {
                             unitGil = 0;
                         } else {
                             int gil = caravanWork->m_shopParam *
@@ -2937,7 +2937,7 @@ void CShopMenu::SelectItemIdx()
     }
 
 updateWindow:
-    if (m_selectedIndex < m_listTop) {
+    if (m_listTop > m_selectedIndex) {
         m_listTop = m_selectedIndex;
     }
     if ((m_listTop + m_visibleRows) <= m_selectedIndex) {
@@ -3197,7 +3197,7 @@ void CShopMenu::Calc()
             ShopMenuCaravanWork(this)->DeleteItem(getItemNo(m_selectedIndex), 0);
 
             for (int i = 0; i < 3; i++) {
-                if (recipeMaterial[i] < 1) {
+                if (recipeMaterial[i] <= 0) {
                     break;
                 }
                 for (int count = 0; count < recipeMaterial[i + 3]; count++) {

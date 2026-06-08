@@ -318,22 +318,27 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
     CGObject* object = mana->m_object;
     int draw = 0;
 
-    if (type != 2) {
-        if (type < 2) {
-            if (type == 0) {
-                if (strcmp(mesh->m_name, s_ymManaShapeObj) == 0) {
-                    draw = 1;
-                }
-            } else if (strcmp(mesh->m_name, s_ymManaShapeObj) == 0 || strcmp(mesh->m_name, s_ymManaShapeObj5) == 0) {
-                draw = 1;
-            }
-        } else if (type < 4 && (strcmp(mesh->m_name, s_ymManaShapeObj) == 0 || strcmp(mesh->m_name, s_ymManaShapeObj1) == 0)) {
+    switch (type) {
+    case 0:
+        if (strcmp(mesh->m_name, s_ymManaShapeObj) == 0) {
             draw = 1;
         }
-    } else {
+        break;
+    case 1:
+        if (strcmp(mesh->m_name, s_ymManaShapeObj) == 0 || strcmp(mesh->m_name, s_ymManaShapeObj5) == 0) {
+            draw = 1;
+        }
+        break;
+    case 2:
         if (strcmp(mesh->m_name, s_ymManaShapeObj) == 0 || strcmp(mesh->m_name, s_ymManaShapeObj3) == 0) {
             draw = 1;
         }
+        break;
+    case 3:
+        if (strcmp(mesh->m_name, s_ymManaShapeObj) == 0 || strcmp(mesh->m_name, s_ymManaShapeObj1) == 0) {
+            draw = 1;
+        }
+        break;
     }
 
     int waterCmp = strcmp(mesh->m_name, s_ymManaShapeObj4);

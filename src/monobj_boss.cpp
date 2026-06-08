@@ -86,8 +86,8 @@ struct MeteoParasiteCBossWork {
     union {
         u8 m_lichFlags;
         struct {
-            u8 m_lichBit80 : 1;
-            u8 m_lichBit40 : 1;
+            s8 m_lichBit80 : 1;
+            s8 m_lichBit40 : 1;
             u8 m_lichRest : 6;
         } lichBits;
     };
@@ -1271,14 +1271,13 @@ void CGMonObj::cancelStatFuncLich()
 void CGMonObj::frameStatFuncLich()
 {
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	const int flatFlags = CFlatBossState();
 
-	if (((flatFlags & 1) == 0) && (reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit80 != 0)) {
+	if (((CFlatBossState() & 1) == 0) && (reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit80 != 0)) {
 		reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit80 = 0;
 		reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit40 = 1;
 		m_unk6C8 = 0;
 		prgObj->playSe3D(0x1157C, 0x32, 0x96, 0, 0);
-	} else if (((flatFlags & 1) != 0) && (reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit80 == 0)) {
+	} else if (((CFlatBossState() & 1) != 0) && (reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit80 == 0)) {
 		reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit80 = 1;
 		reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit40 = 1;
 		m_unk6C8 = 0;
@@ -1303,7 +1302,7 @@ void CGMonObj::frameStatFuncLich()
 			         reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_lichTeleportVec);
 		}
 	} else if (stat == 0x65) {
-		if (prgObj->m_stateFrame == 0 && flatFlags == 3) {
+		if (prgObj->m_stateFrame == 0 && CFlatBossState() == 3) {
 			prgObj->changeStat(0, 0, 0);
 		} else {
 			reinterpret_cast<CGCharaObj*>(this)->statAttack();

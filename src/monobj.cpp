@@ -183,21 +183,20 @@ void CGMonObj::onFramePreCalc()
 		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 8) = m_targetPartyIndex;
 		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 0) = -1;
 
+		int aiLocal = 0;
 		if ((0x9A <= reinterpret_cast<int>(object->m_scriptHandle[4])) ||
 			(reinterpret_cast<int>(object->m_scriptHandle[4]) < 0x8E)) {
 			(this->*m_funcs->logic)();
 		} else {
-			int aiLocal = 0;
 			aiAddDuct(aiLocal);
 		}
 
-		int nextState = *reinterpret_cast<int*>(CGMonObj::m_aiWork + 4);
 		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) {
-			if ((nextState != -1) && (nextState != prgObj->m_lastStateId)) {
-				prgObj->changeStat(nextState, 0, 0);
+			if ((*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) != -1) && (*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) != prgObj->m_lastStateId)) {
+				prgObj->changeStat(*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4), 0, 0);
 			}
-		} else if (nextState != prgObj->m_lastStateId) {
-			prgObj->changeStat(nextState, 0, 0);
+		} else if (*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) != prgObj->m_lastStateId) {
+			prgObj->changeStat(*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4), 0, 0);
 		}
 	}
 }

@@ -3786,33 +3786,11 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 		if (*reinterpret_cast<int*>(caravan + 0x1794) != 0) {
 			validCount = 1;
 		}
-		caravan += 0xC30;
-		if (*reinterpret_cast<int*>(caravan + 0x1794) != 0) {
-			validCount++;
-		}
-		caravan += 0xC30;
-		if (*reinterpret_cast<int*>(caravan + 0x1794) != 0) {
-			validCount++;
-		}
-		caravan += 0xC30;
-		if (*reinterpret_cast<int*>(caravan + 0x1794) != 0) {
-			validCount++;
-		}
-		caravan += 0xC30;
-		if (*reinterpret_cast<int*>(caravan + 0x1794) != 0) {
-			validCount++;
-		}
-		caravan += 0xC30;
-		if (*reinterpret_cast<int*>(caravan + 0x1794) != 0) {
-			validCount++;
-		}
-		caravan += 0xC30;
-		if (*reinterpret_cast<int*>(caravan + 0x1794) != 0) {
-			validCount++;
-		}
-		caravan += 0xC30;
-		if (*reinterpret_cast<int*>(caravan + 0x1794) != 0) {
-			validCount++;
+		for (int ci = 0; ci < 7; ci++) {
+			caravan += 0xC30;
+			if (*reinterpret_cast<int*>(caravan + 0x1794) != 0) {
+				validCount++;
+			}
 		}
 	}
 

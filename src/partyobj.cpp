@@ -5122,21 +5122,27 @@ void CGPartyObj::gpmMove()
 
 				int pick = Math.Rand(choices);
 				int cursor = 0;
-				if (sGhostPartyWork.thresholdA >= threshold0) {
-					if (cursor == pick) {
-						sGhostPartyWork.slotSel = 0;
+				int newSlotSel;
+				if (sGhostPartyWork.thresholdA >= threshold0 && cursor == pick) {
+					newSlotSel = 0;
+				} else {
+					if (sGhostPartyWork.thresholdA >= threshold0) {
+						cursor++;
 					}
-					cursor++;
-				}
-				if (cursor <= pick && sGhostPartyWork.thresholdB >= threshold1) {
-					if (cursor == pick) {
-						sGhostPartyWork.slotSel = 1;
+					if (sGhostPartyWork.thresholdB >= threshold1 && cursor == pick) {
+						newSlotSel = 1;
+					} else {
+						if (sGhostPartyWork.thresholdB >= threshold1) {
+							cursor++;
+						}
+						if (sGhostPartyWork.thresholdC >= threshold2 && cursor == pick) {
+							newSlotSel = 2;
+						} else {
+							newSlotSel = 0;
+						}
 					}
-					cursor++;
 				}
-				if (cursor <= pick && sGhostPartyWork.thresholdC >= threshold2) {
-					sGhostPartyWork.slotSel = 2;
-				}
+				sGhostPartyWork.slotSel = newSlotSel;
 
 				switch (sGhostPartyWork.slotSel) {
 				case 1:

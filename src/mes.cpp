@@ -1208,7 +1208,7 @@ void CMes::addString(char** text, int branchMode)
 			break;
 		case 0x25:
 		{
-			unsigned int value = ReadTagS8(text);
+			int value = ReadTagS8(text);
 			if (mFontCount != 0)
 			{
 				if (System.m_execParam != 0)

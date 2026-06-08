@@ -243,30 +243,34 @@ void CMaterialEditorPcs::drawViewer()
                     s16* textureHeader = m_textureHeader[polygon->textureIndex];
                     float scaleU = static_cast<float>(LoadDouble(kMaterialEditorOneF64) / S16ToDouble(textureHeader[2]));
                     float scaleV = static_cast<float>(LoadDouble(kMaterialEditorOneF64) / S16ToDouble(textureHeader[3]));
+                    MaterialEditorPolygon* pp = polygon;
 
-                    if (polygon->u0 < 0) {
-                        polygon->texCoord[0][0] =
-                            (scaleU * static_cast<float>(S16ToDouble(polygon->u0))) + LoadFloat(kMaterialEditorOneF);
+                    if (pp->u0 < 0) {
+                        pp->texCoord[0][0] =
+                            (scaleU * static_cast<float>(S16ToDouble(pp->u0))) + LoadFloat(kMaterialEditorOneF);
                     } else {
-                        polygon->texCoord[0][0] = scaleU * static_cast<float>(S16ToDouble(polygon->u0));
+                        pp->texCoord[0][0] = scaleU * static_cast<float>(S16ToDouble(pp->u0));
                     }
-                    if (polygon->u1 < 0) {
-                        polygon->texCoord[1][0] =
-                            (scaleU * static_cast<float>(S16ToDouble(polygon->u1))) + LoadFloat(kMaterialEditorOneF);
+                    pp = polygon;
+                    if (pp->u1 < 0) {
+                        pp->texCoord[1][0] =
+                            (scaleU * static_cast<float>(S16ToDouble(pp->u1))) + LoadFloat(kMaterialEditorOneF);
                     } else {
-                        polygon->texCoord[1][0] = scaleU * static_cast<float>(S16ToDouble(polygon->u1));
+                        pp->texCoord[1][0] = scaleU * static_cast<float>(S16ToDouble(pp->u1));
                     }
-                    if (polygon->u2 < 0) {
-                        polygon->texCoord[2][0] =
-                            (scaleU * static_cast<float>(S16ToDouble(polygon->u2))) + LoadFloat(kMaterialEditorOneF);
+                    pp = polygon;
+                    if (pp->u2 < 0) {
+                        pp->texCoord[2][0] =
+                            (scaleU * static_cast<float>(S16ToDouble(pp->u2))) + LoadFloat(kMaterialEditorOneF);
                     } else {
-                        polygon->texCoord[2][0] = scaleU * static_cast<float>(S16ToDouble(polygon->u2));
+                        pp->texCoord[2][0] = scaleU * static_cast<float>(S16ToDouble(pp->u2));
                     }
-                    if (polygon->u3 < 0) {
-                        polygon->texCoord[3][0] =
-                            (scaleU * static_cast<float>(S16ToDouble(polygon->u3))) + LoadFloat(kMaterialEditorOneF);
+                    pp = polygon;
+                    if (pp->u3 < 0) {
+                        pp->texCoord[3][0] =
+                            (scaleU * static_cast<float>(S16ToDouble(pp->u3))) + LoadFloat(kMaterialEditorOneF);
                     } else {
-                        polygon->texCoord[3][0] = scaleU * static_cast<float>(S16ToDouble(polygon->u3));
+                        pp->texCoord[3][0] = scaleU * static_cast<float>(S16ToDouble(pp->u3));
                     }
 
                     if (polygon->v0 < 0) {
@@ -282,10 +286,14 @@ void CMaterialEditorPcs::drawViewer()
                         polygon->v3 = -polygon->v3;
                     }
 
-                    polygon->texCoord[0][1] = -(scaleV * static_cast<float>(S16ToDouble(polygon->v0)) - LoadFloat(kMaterialEditorOneF));
-                    polygon->texCoord[1][1] = -(scaleV * static_cast<float>(S16ToDouble(polygon->v1)) - LoadFloat(kMaterialEditorOneF));
-                    polygon->texCoord[2][1] = -(scaleV * static_cast<float>(S16ToDouble(polygon->v2)) - LoadFloat(kMaterialEditorOneF));
-                    polygon->texCoord[3][1] = -(scaleV * static_cast<float>(S16ToDouble(polygon->v3)) - LoadFloat(kMaterialEditorOneF));
+                    pp = polygon;
+                    pp->texCoord[0][1] = -(scaleV * static_cast<float>(S16ToDouble(pp->v0)) - LoadFloat(kMaterialEditorOneF));
+                    pp = polygon;
+                    pp->texCoord[1][1] = -(scaleV * static_cast<float>(S16ToDouble(pp->v1)) - LoadFloat(kMaterialEditorOneF));
+                    pp = polygon;
+                    pp->texCoord[2][1] = -(scaleV * static_cast<float>(S16ToDouble(pp->v2)) - LoadFloat(kMaterialEditorOneF));
+                    pp = polygon;
+                    pp->texCoord[3][1] = -(scaleV * static_cast<float>(S16ToDouble(pp->v3)) - LoadFloat(kMaterialEditorOneF));
                     DCStoreRange(polygon, sizeof(MaterialEditorPolygon));
 
                     if (textureHeader[1] == 0x20) {

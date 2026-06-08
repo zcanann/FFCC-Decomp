@@ -1604,8 +1604,8 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float radius
 	}
 
 	const float radiusSq = radius * radius;
-	CFlatRuntime::CObject* root = FlatObjectRoot(this);
-	CGBaseObj* baseObj = FindNextGBaseObjByCidMask(this, root->m_next->m_next, 5);
+	CFlatRuntime::CObject* root = FlatObjectRoot(&CFlat);
+	CGBaseObj* baseObj = FindNextGBaseObjByCidMask(&CFlat, root->m_next->m_next, 5);
 	int count = 0;
 
 	while (baseObj != 0) {
@@ -1637,7 +1637,7 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float radius
 								facing.z = cos(angle);
 								if (PSVECDotProduct(&offset, &facing) <= 0.0f) {
 									baseObj = FindNextGBaseObjByCidMask(
-										this, reinterpret_cast<CFlatRuntime::CObject*>(object)->m_next, 5);
+										&CFlat, reinterpret_cast<CFlatRuntime::CObject*>(object)->m_next, 5);
 									continue;
 								}
 							}
@@ -1673,7 +1673,7 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float radius
 			}
 		}
 
-		baseObj = FindNextGBaseObjByCidMask(this, reinterpret_cast<CFlatRuntime::CObject*>(object)->m_next, 5);
+		baseObj = FindNextGBaseObjByCidMask(&CFlat, reinterpret_cast<CFlatRuntime::CObject*>(object)->m_next, 5);
 	}
 
 	return count;

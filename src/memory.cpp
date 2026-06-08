@@ -360,9 +360,10 @@ void CMemory::Init()
     m_heapWalkerVisible = 0;
     m_defaultGroup = 0;
 
-    for (int pass = 0; pass < 3; pass++) {
+    CMode* modePtr = m_modes;
+    for (int pass = 0; pass < 3; pass++, modePtr++) {
         if ((pass != 1) || (OSGetConsoleSimulatedMemSize() == 0x3000000)) {
-            CMode& modeData = m_modes[pass];
+            CMode& modeData = *modePtr;
             if ((pass == 0) || (pass == 1)) {
                 unsigned int arenaHi = reinterpret_cast<unsigned int>(OSGetArenaHi());
                 if (pass == 0) {

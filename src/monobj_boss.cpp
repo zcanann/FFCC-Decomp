@@ -2156,27 +2156,26 @@ void CGMonObj::frameStatFuncMeteoParasite()
 void CGMonObj::logicFuncMeteoParasite()
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
-	u8* mon = reinterpret_cast<u8*>(this);
-	u8 flags = CGMonObj::m_boss[0x5C];
+	MeteoParasiteCBossWork* work = reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss);
 	int nextState = -1;
 
-	if ((flags & 0x40) != 0) {
+	if (work->bits.m_meteo3) {
 		nextState = 0x68;
-	} else if (reinterpret_cast<int>(object->m_scriptHandle[4]) == 0x87 &&
-	           *reinterpret_cast<int*>(CGMonObj::m_boss + 0x58) == 2 && m_actionBranch < 2) {
-		CGPrgObj* bossObj = *reinterpret_cast<CGPrgObj**>(CGMonObj::m_boss + 0x54);
-		if (bossObj->m_lastStateId > 99) {
-			return;
-		}
-		if ((flags & 0x80) != 0) {
-			return;
+	} else if (reinterpret_cast<int>(object->m_scriptHandle[4]) == 0x87) {
+		if (work->m_coreIndex == 2 && m_actionBranch < 2) {
+			if (work->m_objs[3]->m_lastStateId >= 100) {
+				return;
+			}
+			if (work->bits.m_bit80) {
+				return;
+			}
 		}
 	}
 
-	if (nextState == -1) {
-		logicFuncDefault();
-	} else {
+	if (nextState != -1) {
 		reinterpret_cast<CGPrgObj*>(this)->changeStat(nextState, 0, 0);
+	} else {
+		logicFuncDefault();
 	}
 }
 

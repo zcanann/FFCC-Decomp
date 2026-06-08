@@ -964,15 +964,15 @@ void* CMemory::CStage::alloc(unsigned long size, char* source, unsigned long lin
                     (allocSize <= static_cast<unsigned int>(node->m_size))) {
                     if (allocSize < static_cast<unsigned int>(node->m_size - 0x40)) {
                         CBlock* split = stageBlockAt(reinterpret_cast<unsigned long>(node) + allocSize);
-                        split->m_flags = 0;
-                        split->m_size = (node->m_size - static_cast<int>(allocSize)) - 0x40;
+                        split[1].m_flags = 0;
+                        split[1].m_size = (node->m_size - static_cast<int>(allocSize)) - 0x40;
                         node->m_size = allocSize;
-                        split->m_magicStart = kMemoryBlockStartMagic;
-                        split->m_magicEnd = kMemoryBlockEndMagic;
-                        split->m_prev = node;
-                        split->m_next = node->m_next;
+                        split[1].m_magicStart = kMemoryBlockStartMagic;
+                        split[1].m_magicEnd = kMemoryBlockEndMagic;
+                        split[1].m_prev = node;
+                        split[1].m_next = node->m_next;
                         node->m_next = split + 1;
-                        split->m_next->m_prev = split + 1;
+                        split[1].m_next->m_prev = split + 1;
                     }
 
                     node->m_line = static_cast<unsigned short>(line);

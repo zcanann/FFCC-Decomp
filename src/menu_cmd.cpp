@@ -892,8 +892,8 @@ int CMenuPcs::CmdClose()
 		entry++;
 	}
 
-	if (list->count == doneCount) {
-		entry = list->entries;
+	if (GetCmdListStorage(this)->count == doneCount) {
+		entry = GetCmdListStorage(this)->entries;
 		if (count != 0) {
 			u32 blockCount = count >> 3;
 			if (blockCount != 0) {

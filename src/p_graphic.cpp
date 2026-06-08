@@ -811,33 +811,35 @@ void CGraphicPcs::drawBar()
     }
 
     CColor frameColor = (Graphic.IsFrameRateOver() == 0) ? CColor(0, 0xFF, 0, 0xFF) : CColor(0xFF, 0, 0, 0xFF);
+    const u32 frameColorWord = *reinterpret_cast<u32*>(&frameColor.color);
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
     GXPosition3f32(kDebugBarLeft, kDebugIndicatorTop, kGraphicZero);
-    GXColor1u32(*reinterpret_cast<u32*>(&frameColor.color));
+    GXColor1u32(frameColorWord);
     GXTexCoord2u16(0, 0);
     GXPosition3f32(kDebugIndicatorFrameRight, kDebugIndicatorTop, kGraphicZero);
-    GXColor1u32(*reinterpret_cast<u32*>(&frameColor.color));
+    GXColor1u32(frameColorWord);
     GXTexCoord2u16(2, 0);
     GXPosition3f32(kDebugIndicatorFrameRight, kDebugIndicatorBottom, kGraphicZero);
-    GXColor1u32(*reinterpret_cast<u32*>(&frameColor.color));
+    GXColor1u32(frameColorWord);
     GXTexCoord2u16(2, 2);
     GXPosition3f32(kDebugBarLeft, kDebugIndicatorBottom, kGraphicZero);
-    GXColor1u32(*reinterpret_cast<u32*>(&frameColor.color));
+    GXColor1u32(frameColorWord);
     GXTexCoord2u16(0, 2);
 
     CColor fifoColor = (Graphic.IsFifoOver() == 0) ? CColor(0, 0xFF, 0, 0xFF) : CColor(0xFF, 0, 0, 0xFF);
+    const u32 fifoColorWord = *reinterpret_cast<u32*>(&fifoColor.color);
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
     GXPosition3f32(kDebugIndicatorFifoLeft, kDebugIndicatorTop, kGraphicZero);
-    GXColor1u32(*reinterpret_cast<u32*>(&fifoColor.color));
+    GXColor1u32(fifoColorWord);
     GXTexCoord2u16(0, 0);
     GXPosition3f32(kDebugIndicatorFifoRight, kDebugIndicatorTop, kGraphicZero);
-    GXColor1u32(*reinterpret_cast<u32*>(&fifoColor.color));
+    GXColor1u32(fifoColorWord);
     GXTexCoord2u16(2, 0);
     GXPosition3f32(kDebugIndicatorFifoRight, kDebugIndicatorBottom, kGraphicZero);
-    GXColor1u32(*reinterpret_cast<u32*>(&fifoColor.color));
+    GXColor1u32(fifoColorWord);
     GXTexCoord2u16(2, 2);
     GXPosition3f32(kDebugIndicatorFifoLeft, kDebugIndicatorBottom, kGraphicZero);
-    GXColor1u32(*reinterpret_cast<u32*>(&fifoColor.color));
+    GXColor1u32(fifoColorWord);
     GXTexCoord2u16(0, 2);
 
     if (drawText) {

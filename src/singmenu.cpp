@@ -1296,9 +1296,6 @@ void CMenuPcs::drawSingleMenu()
 
         s16 mode = m_singleMenuPhase;
         switch (mode) {
-        case 1:
-            SingleDrawCtrl();
-            return;
         case 0:
         {
             SingleFadeState* fadeState = m_singleFadeState;
@@ -1368,6 +1365,9 @@ void CMenuPcs::drawSingleMenu()
             }
             return;
         }
+        case 1:
+            SingleDrawCtrl();
+            return;
         case 2:
         {
             SingleFadeState* fadeState = m_singleFadeState;
@@ -1476,7 +1476,9 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
 
     if (SingleCaravanWork()->m_shopRequestState == 0) {
         int loadIndex = m_singleMenuTextureLoadIndex;
-        if (loadIndex < 2) {
+        if (loadIndex >= 2) {
+            gSingMenuAsyncLoadCompleted = 1;
+        } else {
             if (m_singleMenuTextureLoadState == 0) {
                 char path[260];
                 const char* language = Game.GetLangString();
@@ -1514,8 +1516,6 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
                 }
                 gSingMenuAsyncLoadCompleted = 1;
             }
-        } else {
-            gSingMenuAsyncLoadCompleted = 1;
         }
     }
 
@@ -1876,21 +1876,18 @@ void CMenuPcs::SingleCalcFadeIn()
     int count = static_cast<int>(m_singleFadeState->count);
     SingleFadeEntry* entry = m_singleFadeState->entries;
     int frame = static_cast<int>(m_singMenuState->frame);
-    if (0 < count) {
-        do {
-            if (entry->startFrame <= frame) {
-                if (frame < entry->startFrame + entry->duration) {
-                    entry->elapsed = entry->elapsed + 1;
-                    entry->alpha = static_cast<float>((1.0 / (double)entry->duration) *
-                                                      (double)entry->elapsed);
-                } else {
-                    completed = completed + 1;
-                    entry->alpha = 1.0f;
-                }
+    for (int i = 0; i < count; i++) {
+        if (entry->startFrame <= frame) {
+            if (entry->startFrame + entry->duration <= frame) {
+                completed = completed + 1;
+                entry->alpha = 1.0f;
+            } else {
+                entry->elapsed = entry->elapsed + 1;
+                entry->alpha = static_cast<float>((1.0 / (double)entry->duration) *
+                                                  (double)entry->elapsed);
             }
-            entry = entry + 1;
-            count = count - 1;
-        } while (count != 0);
+        }
+        entry = entry + 1;
     }
 
     if (m_wm.m_handles[0]->m_model->m_animEnd < m_wm.m_handles[0]->m_model->m_time) {
@@ -1974,22 +1971,19 @@ void CMenuPcs::SingleCalcFadeOut()
     int count = static_cast<int>(m_singleFadeState->count);
     SingleFadeEntry* entry = m_singleFadeState->entries;
     int frame = static_cast<int>(m_singMenuState->frame);
-    if (0 < count) {
-        do {
-            if (frame < entry->startFrame) {
-                entry->alpha = 1.0f;
-            } else if (frame < entry->startFrame + entry->duration) {
-                entry->elapsed = entry->elapsed + 1;
-                entry->alpha =
-                    static_cast<float>(-((1.0 / static_cast<double>(entry->duration)) *
-                                          static_cast<double>(entry->elapsed) - 1.0));
-            } else {
-                completed = completed + 1;
-                entry->alpha = 0.0f;
-            }
-            entry = entry + 1;
-            count = count - 1;
-        } while (count != 0);
+    for (int i = 0; i < count; i++) {
+        if (entry->startFrame > frame) {
+            entry->alpha = 1.0f;
+        } else if (entry->startFrame + entry->duration <= frame) {
+            completed = completed + 1;
+            entry->alpha = 0.0f;
+        } else {
+            entry->elapsed = entry->elapsed + 1;
+            entry->alpha =
+                static_cast<float>(-((1.0 / static_cast<double>(entry->duration)) *
+                                      static_cast<double>(entry->elapsed) - 1.0));
+        }
+        entry = entry + 1;
     }
 
     if (m_wm.m_handles[0]->m_model->m_animEnd < m_wm.m_handles[0]->m_model->m_time) {
@@ -3363,13 +3357,12 @@ void CMenuPcs::DrawSingLife()
 {
     const CCaravanWork* const caravanWork = SingleCaravanWork();
     int lifeTimer = m_singleLifeTimer;
+    float y = -32.0f;
     float xBase = 366.0f;
-    float yBase = -32.0f;
     if (lifeTimer < 0) {
         return;
     }
 
-    float y;
     if (lifeTimer < 10) {
         int phase;
         if (lifeTimer < 0) {
@@ -3380,22 +3373,21 @@ void CMenuPcs::DrawSingLife()
                 phase = lifeTimer;
             }
         }
-        y = 64.0f * static_cast<float>(sin(0.01745329238474369f * (9.0f * static_cast<float>(phase)))) + yBase;
-    } else {
+        y += 64.0f * static_cast<float>(sin(0.01745329238474369f * (9.0f * static_cast<float>(phase))));
+    } else if (lifeTimer < 0x28) {
         y = 32.0f;
-        if (lifeTimer >= 0x28) {
-            int t = 10 - (lifeTimer - 0x28);
-            int phase;
-            if (t < 0) {
-                phase = 0;
-            } else {
-                phase = 10;
-                if (t <= 10) {
-                    phase = t;
-                }
+    } else {
+        int t = 10 - (lifeTimer - 0x28);
+        int phase;
+        if (t < 0) {
+            phase = 0;
+        } else {
+            phase = 10;
+            if (t <= 10) {
+                phase = t;
             }
-            y = 64.0f * static_cast<float>(sin(0.01745329238474369f * (9.0f * static_cast<float>(phase)))) + yBase;
         }
+        y += 64.0f * static_cast<float>(sin(0.01745329238474369f * (9.0f * static_cast<float>(phase))));
     }
 
     int halfHearts = static_cast<unsigned int>(caravanWork->m_maxHp) >> 1;

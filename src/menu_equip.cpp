@@ -1106,8 +1106,7 @@ void CMenuPcs::EquipInit1()
 	puVar12->duration = 5;
 
 	psVar10 = &GetEquipListStorage(this)->entries[GetEquipListStorage(this)->count];
-	iVar8 = 4;
-	do {
+	for (iVar8 = 0; iVar8 < 4; iVar8++) {
 		psVar13 = &GetEquipListStorage(this)->entries[iVar9];
 		psVar13[0].flags = 2;
 		psVar13[0].tex = 0x37;
@@ -1134,8 +1133,7 @@ void CMenuPcs::EquipInit1()
 		psVar13[1].startFrame = 7;
 		fVar3 = kEquipZero;
 		psVar13[1].duration = 5;
-		iVar8 = iVar8 - 1;
-	} while (iVar8 != 0);
+	}
 
 	GetEquipListStorage(this)->listEnd = (short)iVar9;
 	uVar6 = (unsigned int)((int)GetEquipListStorage(this)->listEnd - (int)GetEquipListStorage(this)->count);

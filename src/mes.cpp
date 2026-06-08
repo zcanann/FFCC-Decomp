@@ -884,23 +884,17 @@ void CMes::addString(char** text, int branchMode)
 {
 	int fontSel = mFontIndex;
 	CFont* font;
-	if (fontSel == 2)
+	switch (fontSel)
 	{
-		font = MenuPcs.m_fonts[2];
-	}
-	else if (fontSel > 2)
-	{
-		if (fontSel >= 4)
-		{
-		}
-		else
-		{
-			font = MenuPcs.m_fonts[2];
-		}
-	}
-	else if (fontSel == 0)
-	{
+	case 0:
 		font = MenuPcs.m_fonts[0];
+		break;
+	case 2:
+		font = MenuPcs.m_fonts[2];
+		break;
+	case 3:
+		font = MenuPcs.m_fonts[2];
+		break;
 	}
 
 	font->SetShadow(mShadow);

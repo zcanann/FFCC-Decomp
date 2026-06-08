@@ -648,7 +648,7 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 	case 0: {
 		unsigned char* obj = reinterpret_cast<unsigned char*>(m_objBase);
 		for (int i = 0; i < 40; i++) {
-			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active == 0) {
 				count++;
 			}
 			obj += 0x50;
@@ -658,7 +658,7 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 	case 1: {
 		unsigned char* obj = reinterpret_cast<unsigned char*>(m_objQuad);
 		for (int i = 0; i < 24; i++) {
-			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active == 0) {
 				count++;
 			}
 			obj += 0xAC;
@@ -668,7 +668,7 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 	case 2: {
 		unsigned char* obj = reinterpret_cast<unsigned char*>(m_obj);
 		for (int i = 0; i < 56; i++) {
-			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active == 0) {
 				count++;
 			}
 			obj += 0x518;
@@ -678,7 +678,7 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 	case 3: {
 		CGPartyObj* obj = reinterpret_cast<CGPartyObj*>(m_objParty);
 		for (int i = 0; i < kFlatPartyObjCount; i++, obj++) {
-			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active == 0) {
 				count++;
 			}
 		}
@@ -687,7 +687,7 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 	case 4: {
 		CGMonObj* obj = reinterpret_cast<CGMonObj*>(m_objMon);
 		for (int i = 0; i < kFlatMonObjCount; i++, obj++) {
-			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active == 0) {
 				count++;
 			}
 		}
@@ -696,7 +696,7 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 	case 5: {
 		unsigned char* obj = reinterpret_cast<unsigned char*>(m_objItem);
 		for (int i = 0; i < 32; i++) {
-			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active == 0) {
 				count++;
 			}
 			obj += 0x57C;
@@ -723,7 +723,7 @@ CGObject* CFlatRuntime2::getFreeObject(int classType)
 	case 0: {
 		unsigned char* obj = reinterpret_cast<unsigned char*>(m_objBase);
 		for (int i = 0; i < 0x28; i++) {
-			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active == 0) {
 				return reinterpret_cast<CGObject*>(&m_objBase[i]);
 			}
 			obj += 0x50;
@@ -733,7 +733,7 @@ CGObject* CFlatRuntime2::getFreeObject(int classType)
 	case 1: {
 		unsigned char* obj = reinterpret_cast<unsigned char*>(m_objQuad);
 		for (int i = 0; i < 0x18; i++) {
-			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active == 0) {
 				return reinterpret_cast<CGObject*>(&m_objQuad[i]);
 			}
 			obj += 0xAC;
@@ -743,7 +743,7 @@ CGObject* CFlatRuntime2::getFreeObject(int classType)
 	case 2: {
 		unsigned char* obj = reinterpret_cast<unsigned char*>(m_obj);
 		for (int i = 0; i < 0x38; i++) {
-			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active == 0) {
 				return &m_obj[i];
 			}
 			obj += 0x518;
@@ -753,7 +753,7 @@ CGObject* CFlatRuntime2::getFreeObject(int classType)
 	case 3: {
 		unsigned char* obj = reinterpret_cast<unsigned char*>(m_objParty);
 		for (int i = 0; i < 4; i++) {
-			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active == 0) {
 				return reinterpret_cast<CGObject*>(&m_objParty[i]);
 			}
 			obj += 0x6F8;
@@ -763,7 +763,7 @@ CGObject* CFlatRuntime2::getFreeObject(int classType)
 	case 4: {
 		unsigned char* obj = reinterpret_cast<unsigned char*>(m_objMon);
 		for (int i = 0; i < 0x40; i++) {
-			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active == 0) {
 				return reinterpret_cast<CGObject*>(&m_objMon[i]);
 			}
 			obj += 0x740;
@@ -773,7 +773,7 @@ CGObject* CFlatRuntime2::getFreeObject(int classType)
 	case 5: {
 		unsigned char* obj = reinterpret_cast<unsigned char*>(m_objItem);
 		for (int i = 0; i < 0x20; i++) {
-			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active >= 0) {
+			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active == 0) {
 				return reinterpret_cast<CGObject*>(&m_objItem[i]);
 			}
 			obj += 0x57C;

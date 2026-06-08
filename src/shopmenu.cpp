@@ -1538,7 +1538,7 @@ void CShopMenu::DrawBuySellInfo()
 
     SetupShopMenuUnitFont(font);
     font->DrawInit();
-    MenuPcs.DrawNoShadowFont(font, unitText, static_cast<float>(static_cast<int>(rightPrice)), FLOAT_80332d98, 0x19, 0x12);
+    MenuPcs.DrawNoShadowFont(font, unitText, static_cast<float>(static_cast<unsigned int>(rightPrice)), FLOAT_80332d98, 0x19, 0x12);
     MenuPcs.DrawInit();
 
     font->DrawInit();

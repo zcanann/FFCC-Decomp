@@ -186,7 +186,7 @@ static inline void DrawCmakePreviewCharaAlpha(CMenuPcs* menu, float alpha)
         return;
     }
 
-    *reinterpret_cast<unsigned short*>(modelBlock + 0x6E8) = 0xFF24;
+    *reinterpret_cast<short*>(modelBlock + 0x6E8) = 0xFF24;
     *reinterpret_cast<unsigned short*>(modelBlock + 0x6EA) = 4;
     menu->DrawInit();
 
@@ -228,7 +228,7 @@ static inline void DrawNamePreviewChara(CMenuPcs* menu, float modelAlpha, int gx
         return;
     }
 
-    *reinterpret_cast<unsigned short*>(modelBlock + 0x6E8) = 0xFF24;
+    *reinterpret_cast<short*>(modelBlock + 0x6E8) = 0xFF24;
     *reinterpret_cast<unsigned short*>(modelBlock + 0x6EA) = 4;
     menu->DrawInit();
 

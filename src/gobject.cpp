@@ -3085,11 +3085,13 @@ void CGObject::DrawDebug(CFont* font)
          < 0)
         && (sZeroFloat < m_screenDepth)) {
         float invDepth = sAnimFrameOffset / m_screenDepth;
+        float xProd = sDebugScreenX * m_projection.z;
+        float yProd = sDebugScreenY * m_projection.y;
         float screenX[2];
-        screenX[0] = -(sDebugScreenX * m_projection.z * invDepth - sDebugScreenX);
+        screenX[0] = -(xProd * invDepth - sDebugScreenX);
 
         onDrawDebug(font,
-                    sDebugScreenY * m_projection.y * invDepth + sDebugScreenY,
+                    yProd * invDepth + sDebugScreenY,
                     screenX[0],
                     m_projection.w * invDepth);
     }

@@ -111,7 +111,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                 const u8 trailReadIndex = *(u8*)(particle + 0x38);
                 const u8 trailMaxIndex = (u8)(*(u8*)(particle + 0x37) - 1);
                 u8 trailNextIndex = (u8)(trailReadIndex + 1);
-                const float alphaScale = (float)*(s16*)((u8*)colorWork + 6) / kPppYmMegaBirthShpTail3AlphaDivisor;
+                const float alphaScale = (float)*(s16*)((u8*)colorWork + 6) / LoadFloat(kPppYmMegaBirthShpTail3AlphaDivisor);
                 const float stepDivisor = (float)((s32)frameCountRaw - 1);
                 float fadeA = (float)(*(s16*)(workBytes + 0x56) >> 7) * alphaScale;
                 float fadeR = (float)(*(s16*)(workBytes + 0x50) >> 7);
@@ -121,7 +121,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                 float fadeGStep = kPppYmMegaBirthShpTail3Zero;
                 float fadeBStep = kPppYmMegaBirthShpTail3Zero;
                 float fadeAStep = kPppYmMegaBirthShpTail3Zero;
-                if (stepDivisor != kPppYmMegaBirthShpTail3Zero) {
+                if (stepDivisor != LoadFloat(kPppYmMegaBirthShpTail3Zero)) {
                     fadeRStep =
                         (fadeR - (float)(*(s16*)(workBytes + 0x58) >> 7)) / stepDivisor;
                     fadeGStep =
@@ -197,7 +197,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                         drawMtx.value[1][1] = drawScale * ppvMng->m_scale.y;
                         drawMtx.value[2][2] = drawScale * ppvMng->m_scale.z;
 
-                        if (*(s16*)(payload + 0x94) != 0) {
+                        if (*(u16*)(payload + 0x94) != 0) {
                             pppFMATRIX rotMtx;
                             pppFMATRIX tmpMtx;
                             PSMTXRotRad(rotMtx.value, 'z',

@@ -641,14 +641,21 @@ void CMesMenu::onDraw()
                     float heartBaseX = frameX + (float)heartOffset;
                     int heartValueOffset = 0;
 
+                    float pulseSinScale = FLOAT_80330910;
+                    float pulseTimerScale = FLOAT_80330918;
+                    float pulseOne = FLOAT_80330914;
+                    float pulseAmp = FLOAT_8033091c;
+                    float pulseBase = FLOAT_80330920;
+                    float heartZero = FLOAT_803308d8;
+
                     for (int heartIndex = 0; heartIndex < (int)((unsigned int)heartFood->m_maxHp >> 1);
                          heartIndex++) {
                         int heartValue = m_heartValue - heartValueOffset;
                         float heartTimer = (float)(unsigned int)m_heartGrowTimers[heartIndex];
                         float heartPulse =
-                            (FLOAT_8033091c * (float)sin(FLOAT_80330910 * -(heartTimer * FLOAT_80330918 - FLOAT_80330914)) +
-                             FLOAT_80330914) *
-                            FLOAT_80330920;
+                            (pulseAmp * (float)sin(pulseSinScale * -(heartTimer * pulseTimerScale - pulseOne)) +
+                             pulseOne) *
+                            pulseBase;
 
                         unsigned int heartSubTimer = (unsigned int)m_heartDropTimers[heartIndex];
                         int heartShakeX = 0;
@@ -665,8 +672,8 @@ void CMesMenu::onDraw()
                         float heartY = heartBaseY + (float)heartShakeY;
 
                         MenuPcs.DrawRect(
-                            3, heartX, heartY, FLOAT_803308dc, FLOAT_803308dc, FLOAT_803308d8, FLOAT_803308d8,
-                            heartPulse, heartPulse, FLOAT_803308d8);
+                            3, heartX, heartY, FLOAT_803308dc, FLOAT_803308dc, heartZero, heartZero,
+                            heartPulse, heartPulse, heartZero);
 
                         if (heartValue > 0) {
                             int fillAmount = 0x0B;
@@ -678,7 +685,7 @@ void CMesMenu::onDraw()
                             float v = (float)((0x0C - fillAmount) * 0x18);
                             MenuPcs.DrawRect(
                                 3, heartX, heartY, FLOAT_803308dc, FLOAT_803308dc, u, v, heartPulse, heartPulse,
-                                FLOAT_803308d8);
+                                heartZero);
                         }
 
                         heartBaseX += ((m_menuIndex & 1) != 0) ? FLOAT_80330924 : FLOAT_80330928;

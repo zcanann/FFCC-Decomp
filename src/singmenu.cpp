@@ -1865,7 +1865,7 @@ void CMenuPcs::SingleCalcFadeIn()
         } while (count != 0);
     }
 
-    if (m_wm.m_handles[0]->m_model->m_animEnd < m_wm.m_handles[0]->m_model->m_curFrame) {
+    if (m_wm.m_handles[0]->m_model->m_animEnd > m_wm.m_handles[0]->m_model->m_time) {
         m_wm.m_handles[0]->m_model->AddFrame(1.0f);
     } else {
         m_wm.m_handles[0]->m_model->SetFrame(0.0f);
@@ -1967,7 +1967,7 @@ void CMenuPcs::SingleCalcFadeOut()
         }
     }
 
-    if (m_wm.m_handles[0]->m_model->m_animEnd < m_wm.m_handles[0]->m_model->m_curFrame) {
+    if (m_wm.m_handles[0]->m_model->m_animEnd > m_wm.m_handles[0]->m_model->m_time) {
         m_wm.m_handles[0]->m_model->AddFrame(1.0f);
     } else {
         m_wm.m_handles[0]->m_model->SetFrame(0.0f);
@@ -2036,7 +2036,7 @@ void CMenuPcs::SingleCalcCtrl()
     }
 
     unsigned short result = 0;
-    if (m_wm.m_handles[0]->m_model->m_animEnd < m_wm.m_handles[0]->m_model->m_curFrame) {
+    if (m_wm.m_handles[0]->m_model->m_animEnd > m_wm.m_handles[0]->m_model->m_time) {
         m_wm.m_handles[0]->m_model->AddFrame(1.0f);
     } else {
         m_wm.m_handles[0]->m_model->SetFrame(0.0f);

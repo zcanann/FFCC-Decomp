@@ -10877,7 +10877,7 @@ void CMenuPcs::DrawMCList()
 			} else {
 LAB_draw:
 				if (alpha > FLOAT_803314f0) {
-					float slotY = (float)(DOUBLE_80331498 * (double)(int)slotIdx + DOUBLE_80331490);
+					float slotY = (float)(kSlope * (double)(int)slotIdx + kBase);
 					MenuPcs.SetAttrFmt((FMT)0);
 					GXColor slotColor;
 					slotColor.r = 0xFF;

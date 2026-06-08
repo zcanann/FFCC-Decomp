@@ -3452,7 +3452,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         *reinterpret_cast<float*>(object->m_localBase[7]) = -cameraSlotRef[cameraFrame].m_values[5].m_float;
         *reinterpret_cast<int*>(object->m_localBase[8]) = cameraSlotRef[cameraFrame].m_values[6].m_int;
         *reinterpret_cast<float*>(object->m_localBase[9]) =
-            -(kCFlatPi * cameraSlotRef[cameraFrame].m_values[7].m_float) / kCFlatDegrees180;
+            -((kCFlatPi * cameraSlotRef[cameraFrame].m_values[7].m_float) / kCFlatDegrees180);
         this->push(object, 1);
         outResult = 0;
         break;

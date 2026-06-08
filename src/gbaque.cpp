@@ -3436,7 +3436,7 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 	remaining = 0x40;
 	do {
 		int itemId = *reinterpret_cast<short*>(itemPtr + 0x3A);
-		if (itemId >= 0 && itemId < 0x9F) {
+		if ((itemId >= 0) && (itemId <= 0x9E)) {
 			*indexPtr = static_cast<unsigned char>(itemIndex);
 			equipCount++;
 			indexPtr++;

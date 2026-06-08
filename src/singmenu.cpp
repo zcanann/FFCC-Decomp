@@ -3116,7 +3116,11 @@ int CMenuPcs::ChkEquipPossible(int itemNo)
 
     int result;
     if (raceBits != 0 && genderBits != 0) {
-        result = (raceBits & raceMask) != 0 && (genderBits & genderMask) != 0;
+        if ((raceBits & raceMask) != 0 && (genderBits & genderMask) != 0) {
+            result = 1;
+        } else {
+            result = 0;
+        }
     } else if (raceBits != 0) {
         result = (raceBits & raceMask) != 0;
     } else {

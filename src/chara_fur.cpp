@@ -985,7 +985,7 @@ void CChara::CModel::InitMogFurTex()
  */
 void CChara::CModel::MogFurFrame(CGObject* gObject)
 {
-	const unsigned short heldButtons = MogHeldButtons();
+	const short heldButtons = MogHeldButtons();
 	const unsigned short triggerButtons = MogTriggerButtons();
 	const unsigned short rotateButtons = (MogPadInt(64) == 0) ? MogHeldButtons() : 0;
 	int messageId = -1;
@@ -1064,7 +1064,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 	PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
 
 	if ((heldButtons & 0x100) != 0) {
-		const unsigned char radarType = MogRadarType();
+		const signed char radarType = MogRadarType();
 		if (Chara.MogFur().m_prevRadarType != radarType) {
 			Chara.MogFur().m_prevRadarType = radarType;
 			MogWork().m_pickTicks = 0;

@@ -731,7 +731,7 @@ void CGPartyObj::menu()
 			if (Game.m_gameWork.m_gamePaused != 0) {
 				return;
 			}
-			if (m_animStateMisc != 0) {
+			if (static_cast<char>(m_animStateMisc) != 0) {
 				return;
 			}
 		}

@@ -714,17 +714,16 @@ void callCon2Prog(_pppPObject* pObject)
 	}
 
 	pObject->m_graphId = 0;
-	while (true)
+	while (pObject->m_graphId <= progSet->m_endFrame)
 	{
 		stageSet = progSet;
 		int stageCount = 0;
 		u32 stageSlotOffset = 0;
 		for (; stageCount < progSet->m_numStages; stageCount++)
 		{
-			_pppCtrlTable* stage = stageSet->m_stages;
 			s32** slotPtr = (s32**)(((u8*)pObject) + progSet->m_workBaseOffset + stageSlotOffset);
-			pppProg* prog = stage->m_prog;
-			s32* nextSlot = (s32*)(((u8*)*slotPtr) + stage->m_workOffset);
+			s32* nextSlot = (s32*)(((u8*)*slotPtr) + stageSet->m_stages[0].m_workOffset);
+			pppProg* prog = stageSet->m_stages[0].m_prog;
 
 			if (*nextSlot == pObject->m_graphId)
 			{
@@ -740,10 +739,6 @@ void callCon2Prog(_pppPObject* pObject)
 		}
 
 		pObject->m_graphId += 0x1000;
-		if (pObject->m_graphId > progSet->m_endFrame)
-		{
-			break;
-		}
 	}
 
 	ppvIsLoopCalc = 0;

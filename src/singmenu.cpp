@@ -2395,12 +2395,15 @@ void CMenuPcs::DrawSingleIcon(int iconNo, int posX, int posY, float alpha, int r
     GXSetChanMatColor(GX_COLOR0A0, color);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x25));
-    if (rawIcon == 0) {
-        iconNo = static_cast<int>(gSingMenuItemIconByType[iconNo]);
+    int icon;
+    if (rawIcon != 0) {
+        icon = iconNo;
+    } else {
+        icon = static_cast<int>(gSingMenuItemIconByType[iconNo]);
     }
 
-    int row = iconNo / 8;
-    int col = iconNo % 8;
+    int row = icon / 8;
+    int col = icon % 8;
 
     MenuPcs.DrawRect(0, static_cast<float>(posX), static_cast<float>(posY), 32.0f, 32.0f,
         static_cast<float>(col * 0x20), static_cast<float>(row * 0x20), uvScale, uvScale, 0.0f);

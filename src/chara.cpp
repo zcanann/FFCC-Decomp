@@ -1522,25 +1522,21 @@ void CChara::CModel::calcMatrix()
 	CNode* node = ModelNodes(this);
 	u32 nodeCount = ModelNodeCount(this);
 	for (u32 i = 0; i < nodeCount; i++, node++) {
+		CChara::CNode::CRefData* ref = node->m_refData;
 		CNode* parentNode;
-		if (NodeParentIndex(node) < 0) {
+		if (ref->m_parentIndex < 0) {
 			parentNode = 0;
 		} else {
-			parentNode = ModelNodes(this) + NodeParentIndex(node);
+			parentNode = ModelNodes(this) + ref->m_parentIndex;
 		}
 
-		MtxPtr localMtx = NodeLocalRuntimeMtx(node);
 		SRTView srt;
 
-		if (NodeAnimNode0(node) == 0 && NodeAnimNode1(node) == 0) {
-			if (NodeRuntimeFlag80(node)) {
-				PSMTXCopy(NodeRefLocalMtx(node), localMtx);
-			}
-		} else {
+		if (NodeAnimNode0(node) != 0 || NodeAnimNode1(node) != 0) {
 			if (parentNode != 0 && NodeAnimNode0(parentNode) != 0 && AnimNodeUsesScale(NodeAnimNode0(parentNode))) {
 				if (NodeRuntimeFlag80(node)) {
 					float* parentScale = NodeRuntimeScale(parentNode);
-					PSMTXScale(localMtx,
+					PSMTXScale(NodeLocalRuntimeMtx(node),
 					           FLOAT_803301BC / parentScale[0],
 					           FLOAT_803301BC / parentScale[1],
 					           FLOAT_803301BC / parentScale[2]);
@@ -1548,14 +1544,14 @@ void CChara::CModel::calcMatrix()
 			} else if (NodeRuntimeFlag80(node)) {
 				float baseScale;
 				if (parentNode != 0 || (baseScale = ModelBaseScale(this)) == FLOAT_803301BC) {
-					PSMTXIdentity(localMtx);
+					PSMTXIdentity(NodeLocalRuntimeMtx(node));
 				} else {
-					PSMTXScale(localMtx, baseScale, baseScale, baseScale);
+					PSMTXScale(NodeLocalRuntimeMtx(node), baseScale, baseScale, baseScale);
 				}
 			}
 
-			if (NodeUsesParentLenX(node) != 0) {
-				localMtx[0][3] = NodeBoneLen(parentNode);
+			if (ref->m_usesParentLenX != 0) {
+				NodeLocalRuntimeMtx(node)[0][3] = NodeBoneLen(parentNode);
 			}
 
 			if (NodeAnimNode1(node) != 0) {
@@ -1566,18 +1562,18 @@ void CChara::CModel::calcMatrix()
 				} else {
 					Math.SRTToMatrixRT(animMtx, reinterpret_cast<SRT*>(&srt));
 				}
-				PSMTXConcat(localMtx, animMtx, localMtx);
+				PSMTXConcat(NodeLocalRuntimeMtx(node), animMtx, NodeLocalRuntimeMtx(node));
 				PSMTXScale(animMtx,
 				           FLOAT_803301BC / srt.m_scale.x,
 				           FLOAT_803301BC / srt.m_scale.y,
 				           FLOAT_803301BC / srt.m_scale.z);
-				PSMTXConcat(localMtx, animMtx, localMtx);
+				PSMTXConcat(NodeLocalRuntimeMtx(node), animMtx, NodeLocalRuntimeMtx(node));
 			}
 
 			if (NodeAnimNode0(node) != 0) {
 				Mtx animMtx;
 				NodeAnimNode0(node)->Interp(m_anim, reinterpret_cast<SRT*>(&srt), frame);
-				u16 nodeIndex = NodeRefIndex(node);
+				u16 nodeIndex = ref->m_index;
 				if (nodeIndex == ModelChest1Index(this) || nodeIndex == ModelChest2Index(this) ||
 				    nodeIndex == ModelChest3Index(this)) {
 					float tiltScale;
@@ -1598,7 +1594,7 @@ void CChara::CModel::calcMatrix()
 					Math.SRTToMatrixRT(animMtx, reinterpret_cast<SRT*>(&srt));
 				}
 				if (NodeRuntimeFlag80(node)) {
-					PSMTXConcat(localMtx, animMtx, localMtx);
+					PSMTXConcat(NodeLocalRuntimeMtx(node), animMtx, NodeLocalRuntimeMtx(node));
 				}
 				float* runtimeScale = NodeRuntimeScale(node);
 				runtimeScale[0] = srt.m_scale.x;
@@ -1610,13 +1606,17 @@ void CChara::CModel::calcMatrix()
 				runtimeScale[1] = FLOAT_803301b0;
 				runtimeScale[0] = FLOAT_803301b0;
 			}
+		} else {
+			if (NodeRuntimeFlag80(node)) {
+				PSMTXCopy(ref->m_localMtx, NodeLocalRuntimeMtx(node));
+			}
 		}
 
 		u16 blendCur = ModelBlendCur(this);
 		if (blendCur != 0) {
 			u16 blendMax = ModelBlendMax(this);
 			float alpha = FLOAT_803301BC - (static_cast<float>(blendCur) * (FLOAT_803301BC / static_cast<float>(blendMax)));
-			Vec targetPos = {localMtx[0][3], localMtx[1][3], localMtx[2][3]};
+			Vec targetPos = {NodeLocalRuntimeMtx(node)[0][3], NodeLocalRuntimeMtx(node)[1][3], NodeLocalRuntimeMtx(node)[2][3]};
 			Vec targetScale;
 			Quaternion targetQuat;
 			Vec positionScaleA;
@@ -1625,7 +1625,7 @@ void CChara::CModel::calcMatrix()
 			Mtx quatMtx;
 			Mtx scaleMtx;
 
-			Math.MTXGetScale(localMtx, &targetScale);
+			Math.MTXGetScale(NodeLocalRuntimeMtx(node), &targetScale);
 			if (FLOAT_803301E4 <= targetScale.x) {
 				PSVECScale(&NodePreviousScale(node), &positionScaleA, FLOAT_803301BC - alpha);
 				PSVECScale(&targetScale, &positionScaleB, alpha);
@@ -1637,27 +1637,27 @@ void CChara::CModel::calcMatrix()
 			PSVECScale(&NodePreviousPosition(node), &positionScaleA, FLOAT_803301BC - alpha);
 			PSVECScale(&targetPos, &positionScaleB, alpha);
 			PSVECAdd(&positionScaleA, &positionScaleB, &blendedPos);
-			C_QUATMtx(&targetQuat, localMtx);
+			C_QUATMtx(&targetQuat, NodeLocalRuntimeMtx(node));
 			C_QUATSlerp(&NodePreviousQuat(node), &targetQuat, &targetQuat, alpha);
 			PSMTXScale(scaleMtx, targetScale.x, targetScale.y, targetScale.z);
 			PSMTXQuat(quatMtx, &targetQuat);
-			PSMTXConcat(quatMtx, scaleMtx, localMtx);
-			localMtx[0][3] = blendedPos.x;
-			localMtx[1][3] = blendedPos.y;
-			localMtx[2][3] = blendedPos.z;
+			PSMTXConcat(quatMtx, scaleMtx, NodeLocalRuntimeMtx(node));
+			NodeLocalRuntimeMtx(node)[0][3] = blendedPos.x;
+			NodeLocalRuntimeMtx(node)[1][3] = blendedPos.y;
+			NodeLocalRuntimeMtx(node)[2][3] = blendedPos.z;
 		}
 
 		if (parentNode == 0) {
-			PSMTXConcat(ModelWorldBaseMtx(this), localMtx, NodeWorldMtx(node));
+			PSMTXConcat(ModelWorldBaseMtx(this), NodeLocalRuntimeMtx(node), NodeWorldMtx(node));
 		} else {
-			PSMTXConcat(NodeWorldMtx(parentNode), localMtx, NodeWorldMtx(node));
+			PSMTXConcat(NodeWorldMtx(parentNode), NodeLocalRuntimeMtx(node), NodeWorldMtx(node));
 		}
 
-		if (NodeDynParamIndex(node) >= 0) {
+		if (ref->m_dynParamIndex >= 0) {
 			dynamics(node, parentNode);
 		}
 
-		if (NodeRefIndex(node) == ModelChest1Index(this) && ModelTwistAngle(this) != FLOAT_803301b0) {
+		if (ref->m_index == ModelChest1Index(this) && ModelTwistAngle(this) != FLOAT_803301b0) {
 			Vec twistAxis;
 			twistAxis.x = FLOAT_803301b0;
 			twistAxis.y = FLOAT_803301BC;

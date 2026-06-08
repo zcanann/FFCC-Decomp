@@ -10659,10 +10659,9 @@ void CMenuPcs::DrawMainMenuSub()
 		unsigned int* op = drawOrder;
 		for (int i = 0; i < 5; i++) {
 			int next = i + 1;
-			int remaining = 5 - next;
 			float* fpInner = depthValues + next;
 			unsigned int* opInner = drawOrder + next;
-			for (int k = 0; k < remaining; k++) {
+			for (int j = next; j < 5; j++) {
 				float depth = *fp;
 				if (*fp > *fpInner) {
 					unsigned int idx = *op;
@@ -11854,7 +11853,19 @@ void CMenuPcs::DrawRect2(unsigned long flags, float x, float y, float w, float h
 
 	for (int i = 0; i < 4; i++) {
 		GXPosition3f32(out[i].x, out[i].y, out[i].z);
-		GXTexCoord2f32((i & 1) != 0 ? u1 : u0, i >= 2 ? v1 : v0);
+		float uu;
+		if ((i & 1) != 0) {
+			uu = u1;
+		} else {
+			uu = u0;
+		}
+		float vv;
+		if (i < 2) {
+			vv = v0;
+		} else {
+			vv = v1;
+		}
+		GXTexCoord2f32(uu, vv);
 	}
 }
 
@@ -11925,7 +11936,19 @@ void CMenuPcs::DrawRect3d(unsigned long flags, float x, float y, float z, float 
 
 	for (int i = 0; i < 4; i++) {
 		GXPosition3f32(out[i].x, out[i].y, out[i].z);
-		GXTexCoord2f32((i & 1) != 0 ? u1 : u0, i >= 2 ? v1 : v0);
+		float uu;
+		if ((i & 1) != 0) {
+			uu = u1;
+		} else {
+			uu = u0;
+		}
+		float vv;
+		if (i < 2) {
+			vv = v0;
+		} else {
+			vv = v1;
+		}
+		GXTexCoord2f32(uu, vv);
 	}
 }
 
@@ -12777,7 +12800,7 @@ int McCtrl::LoadMcList()
 					char m_byte43;
 				};
 				McListEntry entry;
-				memset(&entry, 0, sizeof(entry));
+				memset(&entry, 0, 0x48);
 				entry.m_byte42 = 1;
 				for (int i = 0; i < kMcListCount; i++) {
 					*reinterpret_cast<McListEntry*>(MenuPcs.m_wmCharaState + i * kMcListEntrySize) = entry;
@@ -13094,7 +13117,7 @@ int McCtrl::SaveDat()
 					char m_byte43;
 				};
 				McListEntry entry;
-				memset(&entry, 0, sizeof(entry));
+				memset(&entry, 0, 0x48);
 				for (int i = 0; i < kMcListCount; i++) {
 					*reinterpret_cast<McListEntry*>(MenuPcs.m_wmCharaState + i * kMcListEntrySize) = entry;
 				}
@@ -14227,7 +14250,7 @@ int McCtrl::EraseDat()
 					char m_byte43;
 				};
 				McListEntry entry;
-				memset(&entry, 0, sizeof(entry));
+				memset(&entry, 0, 0x48);
 				entry.m_byte42 = 0;
 				for (int i = 0; i < kMcListCount; i++) {
 					*reinterpret_cast<McListEntry*>(MenuPcs.m_wmCharaState + i * kMcListEntrySize) = entry;

@@ -378,7 +378,7 @@ CLightPcs::CBumpLight* CLightPcs::AddBump(CLightPcs::CLight* srcLight, CLightPcs
     CBumpLight* bumpLight = GetFreeBumpLight(target);
 
     if (bumpLight == 0) {
-        if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+        if (static_cast<int>(System.m_execParam) >= 1) {
             System.Printf(const_cast<char*>(sLightTextureFullMsg));
         }
         return 0;
@@ -865,9 +865,9 @@ void CLightPcs::CBumpLight::MakeLightMap()
     _GXColor chanMat2;
 
     unsigned char u0 = m_bumpShade[0];
-    unsigned char u1 = m_bumpShade[1];
-    unsigned char u2 = m_bumpShade[2];
-    unsigned char u3 = m_bumpShade[3];
+    signed char u1 = m_bumpShade[1];
+    signed char u2 = m_bumpShade[2];
+    signed char u3 = m_bumpShade[3];
 
     chanAmb.a = u0;
     chanAmb.b = u0;
@@ -902,9 +902,9 @@ void CLightPcs::CBumpLight::MakeLightMap()
 
         Vec eye;
         Vec up;
-        eye.x = kLightZero;
-        eye.y = kLightZero;
         eye.z = kLightZero;
+        eye.y = kLightZero;
+        eye.x = kLightZero;
         up.x = kLightZero;
         up.y = kLightOne;
         up.z = kLightZero;
@@ -1115,6 +1115,7 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
     Mtx texMtx;
     Mtx out;
     Mtx nrm;
+    Mtx posOnly;
 
     if (mode != 0) {
         Vec pos;
@@ -1140,11 +1141,11 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
             yAxis.y = cam[1][1];
             yAxis.z = cam[2][1];
             PSVECNormalize(&yAxis, &yAxis);
-            xAxis.y = -yAxis.x;
             cam[0][1] = yAxis.x;
             cam[1][1] = yAxis.y;
             cam[2][1] = yAxis.z;
             xAxis.x = yAxis.y;
+            xAxis.y = -yAxis.x;
             xAxis.z = kLightZero;
             PSVECNormalize(&xAxis, &xAxis);
             cam[0][0] = xAxis.x;
@@ -1211,7 +1212,6 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
             PSMTXConcat(texMtx, nrm, m_bumpTexMtx0);
             PSMTXScale(texMtx, kBumpTexMtxScale, kBumpTexMtxScale, kBumpTexMtxScale);
             PSMTXConcat(m_bumpTexMtx0, texMtx, m_bumpTexMtx0);
-            Mtx posOnly;
             PSMTXCopy(out, posOnly);
             posOnly[0][3] = kLightZero;
             posOnly[1][3] = kLightZero;
@@ -1229,26 +1229,26 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
             PSMTXIdentity(reinterpret_cast<float(*)[4]>(m_bumpTexScratch));
             float* scratch = m_bumpTexScratch;
 
-            float f0 = kBumpTexScrollScale;
-            float f1 = kLightZero;
+            float scrollScale = kBumpTexScrollScale;
+            float zero = kLightZero;
             scratch[0] = kBumpTexScrollScale;
-            float f2 = kLightHalf;
-            scratch[6] = f0;
-            float f3 = kBumpTexMtxScale;
-            scratch[10] = f1;
-            scratch[5] = f1;
-            scratch[9] = f1;
+            float half = kLightHalf;
+            scratch[6] = scrollScale;
+            float mtxScale = kBumpTexMtxScale;
+            scratch[10] = zero;
+            scratch[5] = zero;
+            scratch[9] = zero;
             scratch[3] =
-                -(f0 * (camX + bump->m_offsetX) - f2);
+                -(scrollScale * (camX + bump->m_offsetX) - half);
             scratch[7] =
-                -(f0 * (camZ + bump->m_offsetZ) - f2);
-            scratch[11] = f1;
-            scratch[16] = f3;
-            scratch[12] = f3;
-            scratch[17] = f1;
-            scratch[15] = f1;
-            scratch[14] = f1;
-            scratch[13] = f1;
+                -(scrollScale * (camZ + bump->m_offsetZ) - half);
+            scratch[11] = zero;
+            scratch[16] = mtxScale;
+            scratch[12] = mtxScale;
+            scratch[17] = zero;
+            scratch[15] = zero;
+            scratch[14] = zero;
+            scratch[13] = zero;
         }
     }
 }

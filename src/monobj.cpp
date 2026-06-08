@@ -2578,11 +2578,17 @@ void CGMonObj::InitFinished()
 
 	void* classId = object->m_scriptHandle[4];
 	switch (reinterpret_cast<unsigned int>(classId)) {
+	default:
+		m_funcs = &funcsDefault;
+		break;
 	case 0x5B:
 		m_funcs = &funcsGiantCrab;
 		break;
-	case 0x5F:
-		m_funcs = &funcsMolbol;
+	case 0x71:
+		m_funcs = &funcsGolem;
+		break;
+	case 0x6B:
+		m_funcs = &funcsArmstrong;
 		break;
 	case 0x63:
 		m_funcs = &funcsOrcKing;
@@ -2590,8 +2596,14 @@ void CGMonObj::InitFinished()
 	case 0x67:
 		m_funcs = &funcsGoblinKing;
 		break;
-	case 0x6B:
-		m_funcs = &funcsArmstrong;
+	case 0x5F:
+		m_funcs = &funcsMolbol;
+		break;
+	case 0x73:
+		m_funcs = &funcsLizardmanKing;
+		break;
+	case 0x77:
+		m_funcs = &funcsCaveWorm;
 		break;
 	case 0x6F:
 		m_funcs = &funcsGigasLoad;
@@ -2599,38 +2611,13 @@ void CGMonObj::InitFinished()
 	case 0x70:
 		m_funcs = &funcsWifeLamia;
 		break;
-	case 0x71:
-		m_funcs = &funcsGolem;
-		break;
-	case 0x73:
-		m_funcs = &funcsLizardmanKing;
-		break;
-	case 0x74:
-	case 0x75:
-		m_funcs = &funcsLKShooter;
-		break;
-	case 0x77:
-		m_funcs = &funcsCaveWorm;
-		break;
-	case 0x79:
-		m_funcs = &funcsTetsukyojin;
-		break;
-	case 0x7B:
-		m_funcs = &funcsAntrion;
-		break;
-	case 0x7F:
-		m_funcs = &funcsLich;
-		break;
-	case 0x83:
-		m_funcs = &funcsDragonZombie;
+	case 0x88:
+		m_funcs = &funcsMeteoParasiteC;
 		break;
 	case 0x85:
 	case 0x86:
 	case 0x87:
 		m_funcs = &funcsMeteoParasite;
-		break;
-	case 0x88:
-		m_funcs = &funcsMeteoParasiteC;
 		break;
 	case 0x8E:
 	case 0x8F:
@@ -2646,17 +2633,30 @@ void CGMonObj::InitFinished()
 	case 0x99:
 		m_funcs = &funcsDuct;
 		break;
-	case 0x9A:
-		m_funcs = &funcsLastBoss;
+	case 0x83:
+		m_funcs = &funcsDragonZombie;
+		break;
+	case 0x7B:
+		m_funcs = &funcsAntrion;
+		break;
+	case 0x79:
+		m_funcs = &funcsTetsukyojin;
+		break;
+	case 0x7F:
+		m_funcs = &funcsLich;
 		break;
 	case 0x9B:
 		m_funcs = &funcsRamoe;
 		break;
+	case 0x9A:
+		m_funcs = &funcsLastBoss;
+		break;
 	case 0x9E:
 		m_funcs = &funcsSaw;
 		break;
-	default:
-		m_funcs = &funcsDefault;
+	case 0x74:
+	case 0x75:
+		m_funcs = &funcsLKShooter;
 		break;
 	}
 

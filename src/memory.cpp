@@ -213,7 +213,7 @@ static inline int stageHasUnfreedBlocks(CMemory::CStage* stage)
 
 static inline void stageReleaseMode2Buffer(CMemory::CStage* stage)
 {
-    int ptr = stageGetHeapHead(stage);
+    unsigned int ptr = static_cast<unsigned int>(stageGetHeapHead(stage));
     if (ptr != 0) {
         if (ptr != 0x10) {
             operator delete[](reinterpret_cast<void*>(ptr - 0x10));
@@ -222,14 +222,14 @@ static inline void stageReleaseMode2Buffer(CMemory::CStage* stage)
     }
 }
 
-static inline void stageDestroyAndPool(CMemory* memory, CMemory::CStage* stage)
+static inline void stageDestroyAndPool(CMemory* memory, CMemory::CStage* stage, const char* strBase)
 {
     int mode = stageGetAllocationMode(stage);
     CMemory::CMode& modeData = memory->Mode(mode);
 
     if (mode != 2) {
         if (stageHasUnfreedBlocks(stage)) {
-            System.Printf(const_cast<char*>(sStageQuitBlockUnfreedAllocFmt), stageGetSourceName(stage));
+            System.Printf(const_cast<char*>(strBase + 0x5d4), stageGetSourceName(stage));
             stage->heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
         }
     } else {
@@ -423,7 +423,7 @@ void CMemory::Quit()
 {
     const char* strBase = reinterpret_cast<const char*>(sHeapBarColors);
 
-    stageDestroyAndPool(this, m_mainMemoryStage);
+    stageDestroyAndPool(this, m_mainMemoryStage, strBase);
 
     CMode* modeData = m_modes;
     for (int pass = 0; pass < 3; pass++, modeData++) {
@@ -436,18 +436,18 @@ void CMemory::Quit()
                 if (pass == 0) {
                     if (stage != m_currentMemoryStage) {
                         System.Printf(const_cast<char*>(strBase + 0x7b0), stage->m_allocationSourceStr);
-                        stageDestroyAndPool(this, stage);
+                        stageDestroyAndPool(this, stage, strBase);
                     }
                 } else {
                     System.Printf(const_cast<char*>(strBase + 0x7b0), stage->m_allocationSourceStr);
-                    stageDestroyAndPool(this, stage);
+                    stageDestroyAndPool(this, stage, strBase);
                 }
                 stage = next;
             }
         }
     }
 
-    stageDestroyAndPool(this, m_currentMemoryStage);
+    stageDestroyAndPool(this, m_currentMemoryStage, strBase);
 }
 
 /*
@@ -609,7 +609,8 @@ CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int mode
     }
 
     {
-        unsigned int alignedSize = (size + 0x3F) & ~0x3FU;
+        size = (size + 0x3F) & ~0x3FU;
+        unsigned int alignedSize = static_cast<unsigned int>(size);
         CMode& modeData = m_modes[mode];
         CStage* stage = modeData.m_freeList.m_next;
         CStage* list = &modeData.m_activeList;
@@ -1921,14 +1922,16 @@ void CAmemCacheSet::Release(short index)
             System.Printf(const_cast<char*>(sAmemCacheAddRefFmt));
         }
 
+        int offset = 0;
         for (int i = 0; i < m_cacheCount; i++) {
-            CAmemCache& cache = cacheEntryAt(this, i);
+            CAmemCache& cache = *reinterpret_cast<CAmemCache*>(reinterpret_cast<char*>(m_cacheTable) + offset);
             if (((cache.m_inUse != 0) || (cache.m_cacheData != 0)) && (static_cast<unsigned int>(System.m_execParam) >= 3)) {
                 System.Printf(
                     const_cast<char*>(sAmemCacheEntryFmt), i, cacheStateName(cache),
                     cacheTypeName(cache), cache.m_refCount,
                     cache.m_priority, reinterpret_cast<int>(cache.m_cacheData));
             }
+            offset += sizeof(CAmemCache);
         }
 
         if (static_cast<unsigned int>(System.m_execParam) >= 3) {
@@ -1984,16 +1987,11 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
         }
 
         if (currentSize != 0) {
-            currentSize -= size / 2;
-            if (currentSize < 0) {
-                currentSize = 0;
-            }
-            continue;
+            goto shrink;
         }
 
         if (bestPriority != 0xFFFFFFFF) {
-            bestPriority = 0xFFFFFFFF;
-            continue;
+            goto dropPriority;
         }
 
         if (m_releaseAction == 0 || m_releaseAction(m_releaseActionArg) == 0) {
@@ -2002,20 +2000,33 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
                 System.Printf(const_cast<char*>(strBase + 0x4c));
             }
 
-            for (unsigned int i = 0; i < m_cacheCount; i++) {
-                CAmemCache& entry = cacheEntryAt(this, i);
-                if (((entry.m_inUse != 0) || (entry.m_cacheData != 0)) && (static_cast<int>(System.m_execParam) >= 3)) {
+            int offset2 = 0;
+            for (int i = 0; i < m_cacheCount; i++) {
+                CAmemCache& entry = *reinterpret_cast<CAmemCache*>(reinterpret_cast<char*>(m_cacheTable) + offset2);
+                if (((entry.m_inUse != 0) || (entry.m_cacheData != 0)) && (static_cast<unsigned int>(System.m_execParam) >= 3)) {
                     System.Printf(
                         const_cast<char*>(strBase + 0xd8), i, cacheStateName(entry),
                         cacheTypeName(entry), entry.m_refCount, entry.m_priority,
                         reinterpret_cast<int>(entry.m_cacheData));
                 }
+                offset2 += sizeof(CAmemCache);
             }
 
             if (static_cast<unsigned int>(System.m_execParam) >= 3) {
                 System.Printf(const_cast<char*>(sAmemCacheSeparator));
             }
             m_rStage->heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
+        }
+        continue;
+
+    dropPriority:
+        bestPriority = 0xFFFFFFFF;
+        continue;
+
+    shrink:
+        currentSize -= size / 2;
+        if (currentSize < 0) {
+            currentSize = 0;
         }
     }
 }

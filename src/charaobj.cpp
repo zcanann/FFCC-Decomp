@@ -2608,7 +2608,6 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
 	switch (staIndex) {
 		case 0x24:
 		case 0x25:
-		case 0x26:
 		case 0x69:
 		case 0x6A:
 		case 0x6B:

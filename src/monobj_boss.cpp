@@ -501,14 +501,14 @@ void CGMonObj::frameStatFuncGolem()
 			reinterpret_cast<CGObject*>(this)->m_rotTargetY =
 			    reinterpret_cast<CGPrgObj*>(this)->getTargetRot(
 			        reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]));
-			*reinterpret_cast<float*>(SoundBuffer + 0x4FC) = reinterpret_cast<CGObject*>(this)->m_rotTargetY + turnOffset;
+			*reinterpret_cast<float*>(CGMonObj::m_boss + 0x10) = reinterpret_cast<CGObject*>(this)->m_rotTargetY + turnOffset;
 		}
 		unsigned short scriptScale =
 		    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(reinterpret_cast<CGObject*>(this)->m_scriptHandle[9]) + 0xD4);
 		float moveSpeed =
 		    *reinterpret_cast<float*>(self + 0x690) *
 		    (kMonObjBossScaleStep * (static_cast<float>(static_cast<double>(scriptScale) - kMonObjBossUnsignedIntBias)) + kMonObjBossEpsilon);
-		reinterpret_cast<CGObject*>(this)->moveVectorHRot(*reinterpret_cast<float*>(SoundBuffer + 0x4FC), kMonObjBossZero,
+		reinterpret_cast<CGObject*>(this)->moveVectorHRot(*reinterpret_cast<float*>(CGMonObj::m_boss + 0x10), kMonObjBossZero,
 		                                                  moveSpeed, 1);
 	}
 }

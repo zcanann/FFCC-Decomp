@@ -696,22 +696,12 @@ void CGObject::move()
                     tangent = sMap21TangentAxis;
                     PSVECNormalize(&m_worldPosition, &worldPosNorm);
                     float upDot = PSVECDotProduct(&worldUp, &worldPosNorm);
-                    if (upDot > 1.0f) {
-                        upDot = 1.0f;
-                    } else if (upDot < sNegativeOne) {
-                        upDot = sNegativeOne;
-                    }
                     PSMTXRotRad(pitchMtx, 'x', acosf(upDot));
                     PSMTXConcat(yawMtx, pitchMtx, yawMtx);
 
                     PSVECNormalize(&m_groundHitOffset, &moveNorm);
                     PSMTXMultVec(yawMtx, &tangent, &tangent);
                     float tanDot = PSVECDotProduct(&tangent, &moveNorm);
-                    if (tanDot > 1.0f) {
-                        tanDot = 1.0f;
-                    } else if (tanDot < sNegativeOne) {
-                        tanDot = sNegativeOne;
-                    }
                     float targetRot = acosf(tanDot);
 
                     PSVECCrossProduct(&tangent, &moveNorm, &cross);

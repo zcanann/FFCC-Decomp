@@ -267,7 +267,7 @@ void CMenuPcs::ArtiDraw()
 					u += fillW;
 				}
 
-				if (fillW > 0.0f && fillW < (float)entry->w) {
+				if (fillW > LoadFloat(kArtiZero) && fillW < (float)entry->w) {
 					colors[0].a = 0;
 					colors[1].a = 0;
 					colors[2].a = 0;

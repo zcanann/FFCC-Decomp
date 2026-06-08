@@ -2398,6 +2398,7 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 
 	if (anim != m_anim) {
 		ReleaseRefCounted(m_anim);
+		m_anim = 0;
 		m_anim = anim;
 		RetainRefCounted(m_anim);
 	}
@@ -2409,7 +2410,7 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 		NodeAnimNode0(node) = 0;
 		NodeAnimNode1(node) = 0;
 
-		MtxPtr localMtx = NodeRefLocalMtx(node);
+		MtxPtr localMtx = NodeLocalRuntimeMtx(node);
 		C_QUATMtx(&NodePreviousQuat(node), localMtx);
 		NodePreviousPosition(node).x = localMtx[0][3];
 		NodePreviousPosition(node).y = localMtx[1][3];

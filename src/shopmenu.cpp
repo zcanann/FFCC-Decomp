@@ -1826,6 +1826,8 @@ void CShopMenu::DrawSoubi()
  * Address:	TODO
  * Size:	TODO
  */
+#pragma push
+#pragma opt_loop_invariants off
 void CShopMenu::DrawMake()
 {
     DrawMakeBase();
@@ -1993,6 +1995,7 @@ void CShopMenu::DrawMake()
     DrawItemHelp(m_selectedIndex, 0x140, 0x172);
     MenuPcs.DrawCursor(0xD8, m_yesNo * 0x18 + 0x14C, 1.0f);
 }
+#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x80154E98

@@ -857,8 +857,6 @@ static void OpenMogHintMessage(int messageId)
 void CChara::InitFurTexBuffer()
 {
 	MogFurState& fur = MogFur();
-	MogFurState& charaFur = Chara.MogFur();
-	unsigned char* texels = reinterpret_cast<unsigned char*>(charaFur.m_texels);
 	int rowCount = 0;
 	int row = 0;
 	do {
@@ -866,16 +864,17 @@ void CChara::InitFurTexBuffer()
 		int byteOffset = row << 1;
 		int count = 8;
 		do {
+			unsigned short* texels = Chara.MogFur().m_texels;
 			int idxBase = inner + row;
-			*reinterpret_cast<unsigned short*>(texels + byteOffset) = 0x7FFF;
+			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(texels) + byteOffset) = 0x7FFF;
 			byteOffset += 0x10;
-			*reinterpret_cast<unsigned short*>(texels + idxBase * 2 + 2) = 0x7FFF;
-			*reinterpret_cast<unsigned short*>(texels + idxBase * 2 + 4) = 0x7FFF;
-			*reinterpret_cast<unsigned short*>(texels + idxBase * 2 + 6) = 0x7FFF;
-			*reinterpret_cast<unsigned short*>(texels + idxBase * 2 + 8) = 0x7FFF;
-			*reinterpret_cast<unsigned short*>(texels + idxBase * 2 + 10) = 0x7FFF;
-			*reinterpret_cast<unsigned short*>(texels + idxBase * 2 + 12) = 0x7FFF;
-			*reinterpret_cast<unsigned short*>(texels + idxBase * 2 + 14) = 0x7FFF;
+			texels[idxBase + 1] = 0x7FFF;
+			texels[idxBase + 2] = 0x7FFF;
+			texels[idxBase + 3] = 0x7FFF;
+			texels[idxBase + 4] = 0x7FFF;
+			texels[idxBase + 5] = 0x7FFF;
+			texels[idxBase + 6] = 0x7FFF;
+			texels[idxBase + 7] = 0x7FFF;
 			inner += 8;
 			count--;
 		} while (count != 0);
@@ -884,7 +883,7 @@ void CChara::InitFurTexBuffer()
 	} while (rowCount < 0x40);
 
 	fur.m_dirty = 0;
-	charaFur.m_timestamp = System.m_frameCounter;
+	Chara.MogFur().m_timestamp = System.m_frameCounter;
 	memset(fur.m_score, 0, 0x40);
 	CalcMogScore();
 }

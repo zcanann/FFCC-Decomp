@@ -2475,14 +2475,7 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 	int hpValue = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C);
 	int next = hpValue;
 
-	if (delta > 0) {
-		unsigned short maxHp = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1A);
-		next = hpValue + delta;
-		if (static_cast<int>(next) > static_cast<int>(maxHp)) {
-			next = maxHp;
-		}
-		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) = static_cast<unsigned short>(next);
-	} else if (delta < 0 && hpValue != 0) {
+	if (hpValue != 0 && delta < 0) {
 		if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
 		    reinterpret_cast<CharaObjSignedLowBit*>(&CFlatGameFlags())->m_low != 0 &&
 		    static_cast<int>(hpValue + delta) <= 0) {
@@ -2525,28 +2518,37 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 		if (sourceObj != 0) {
 			onDamaged(sourceObj);
 		}
-	}
 
-	if (next != 0) {
+		if (next != 0) {
+			return;
+		}
+
+		for (int i = 0; i < 0x27; i++) {
+			setSta(i, 0);
+		}
+		m_displayFlags |= 2;
+		changeStat(9, 0, 0);
+
+		if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D) {
+			CGPartyObj* party = static_cast<CGPartyObj*>(this);
+			for (int i = 2; i < *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBAA); i++) {
+				if (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->DelCmdListAndItem(i) == 0x125) {
+					reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetNumCombi(i, 1);
+					reinterpret_cast<CharaObjPartyFlag04*>(&party->m_partyData.partyFlags)->m_bit04 = 1;
+					return;
+				}
+			}
+		}
 		return;
 	}
 
-	for (int i = 0; i < 0x27; i++) {
-		setSta(i, 0);
-	}
-	m_displayFlags |= 2;
-	changeStat(9, 0, 0);
-
-	if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D) {
-		CGPartyObj* party = static_cast<CGPartyObj*>(this);
-		CCaravanWork* caravan = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
-		for (int i = 2; i < *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBAA); i++) {
-			if (caravan->DelCmdListAndItem(i) == 0x125) {
-				caravan->GetNumCombi(i, 1);
-				reinterpret_cast<CharaObjPartyFlag04*>(&party->m_partyData.partyFlags)->m_bit04 = 1;
-				return;
-			}
+	if (delta > 0) {
+		unsigned short maxHp = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1A);
+		next = hpValue + delta;
+		if (static_cast<int>(next) > static_cast<int>(maxHp)) {
+			next = maxHp;
 		}
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) = static_cast<unsigned short>(next);
 	}
 }
 

@@ -8427,10 +8427,10 @@ void CMenuPcs::PCAnimCtrl()
 					handle->SetAnim((static_cast<int>(static_cast<unsigned int>(GetWmCharaHandles(this)[i]->m_charaNo) / 100) - 1) * 6 + animState[0], -1, -1, blendMode, 0);
 					reinterpret_cast<float*>(animState)[3] = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xB4)[0];
 					reinterpret_cast<float*>(animState)[4] = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xC0)[0];
-					if (isSelected == 0) {
-						animState[2] = 0;
-					} else {
+					if (isSelected != 0) {
 						animState[2] = 0x834;
+					} else {
+						animState[2] = 0;
 					}
 				}
 				handle->m_model->SetFrame(FLOAT_803313dc);

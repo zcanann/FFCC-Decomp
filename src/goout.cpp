@@ -1826,10 +1826,13 @@ void CGoOutMenu::CalcGoOut()
             }
         }
 
-        if (next == 2) {
+        switch (next) {
+        case 2:
             SetGoOutMode(0xf);
-        } else if (next == 1) {
+            break;
+        case 1:
             SetGoOutMode(0x11);
+            break;
         }
         break;
     case 0x11:
@@ -1868,10 +1871,13 @@ void CGoOutMenu::CalcGoOut()
             }
         }
 
-        if (next == 2) {
+        switch (next) {
+        case 2:
             SetGoOutMode(0xf);
-        } else if (next == 1) {
+            break;
+        case 1:
             SetGoOutMode(0x12);
+            break;
         }
         break;
     case 0x12:
@@ -1931,10 +1937,13 @@ void CGoOutMenu::CalcGoOut()
             }
         }
 
-        if (next == 2) {
+        switch (next) {
+        case 2:
             SetMainMode(1);
-        } else if (next == 1) {
+            break;
+        case 1:
             SetGoOutMode(4);
+            break;
         }
         break;
     case 4:
@@ -1967,10 +1976,13 @@ void CGoOutMenu::CalcGoOut()
             }
         }
 
-        if (next == 2) {
+        switch (next) {
+        case 2:
             SetMainMode(1);
-        } else if (next == 1) {
+            break;
+        case 1:
             SetGoOutMode(5);
+            break;
         }
         break;
     case 5:

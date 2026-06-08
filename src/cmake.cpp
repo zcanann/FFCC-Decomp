@@ -933,10 +933,10 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
     if ((repeat & 0x8) != 0) {
         if (row != 0) {
             row = static_cast<short>(row - 1);
-        } else if (select < 10) {
-            row = 4;
-        } else {
+        } else if (select >= 10) {
             row = 5;
+        } else {
+            row = 4;
         }
         Sound.PlaySe(1, 0x40, 0x7f, 0);
     } else if ((repeat & 0x4) != 0) {
@@ -948,28 +948,28 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
         Sound.PlaySe(1, 0x40, 0x7f, 0);
     }
 
-    if ((repeat & 0x1) == 0) {
-        if ((repeat & 0x2) != 0) {
-            if (row < 5) {
-                if (select < 0xB) {
-                    select = static_cast<short>(select + 1);
-                } else {
-                    select = 0;
-                }
-                Sound.PlaySe(1, 0x40, 0x7f, 0);
-            } else {
-                Sound.PlaySe(4, 0x40, 0x7f, 0);
-            }
-        }
-    } else if (row < 5) {
-        if (select > 0) {
-            select = static_cast<short>(select - 1);
+    if ((repeat & 0x1) != 0) {
+        if (row >= 5) {
+            Sound.PlaySe(4, 0x40, 0x7f, 0);
         } else {
-            select = 0xB;
+            if (select != 0) {
+                select = static_cast<short>(select - 1);
+            } else {
+                select = 0xB;
+            }
+            Sound.PlaySe(1, 0x40, 0x7f, 0);
         }
-        Sound.PlaySe(1, 0x40, 0x7f, 0);
-    } else {
-        Sound.PlaySe(4, 0x40, 0x7f, 0);
+    } else if ((repeat & 0x2) != 0) {
+        if (row >= 5) {
+            Sound.PlaySe(4, 0x40, 0x7f, 0);
+        } else {
+            if (select < 0xB) {
+                select = static_cast<short>(select + 1);
+            } else {
+                select = 0;
+            }
+            Sound.PlaySe(1, 0x40, 0x7f, 0);
+        }
     }
 
     if ((repeat & 0xF) == 0) {

@@ -842,11 +842,10 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
                     }
                 }
                 if (mana->m_meshTexCoords0 == 0) {
-                    s32 texCoordSize = meshShape->m_vertexCount * 6;
                     mana->m_meshTexCoords0 = static_cast<S16Vec2d*>(
-                        pppMemAlloc(texCoordSize, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x3FA));
+                        pppMemAlloc(meshShape->m_vertexCount * 6, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x3FA));
                     mana->m_meshTexCoords1 = static_cast<S16Vec2d*>(
-                        pppMemAlloc(texCoordSize, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x3FB));
+                        pppMemAlloc(meshShape->m_vertexCount * 6, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x3FB));
                     u16* texCoordA = reinterpret_cast<u16*>(mana->m_meshTexCoords0);
                     u16* texCoordB = reinterpret_cast<u16*>(mana->m_meshTexCoords1);
                     for (vertexIndex = 0; vertexIndex < meshShape->m_vertexCount; vertexIndex++) {

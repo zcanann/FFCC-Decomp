@@ -244,7 +244,7 @@ static bool isBossArtifactStage()
 
 static bool isFrameInterval(int frame, int interval)
 {
-	return interval != 0 && frame == (frame / interval) * interval;
+	return frame % interval == 0;
 }
 
 static bool isGhostPartyTargetMode(CGPartyObj* self)

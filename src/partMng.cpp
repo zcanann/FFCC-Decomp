@@ -1378,29 +1378,29 @@ void CPartMng::pppEditAllReleaseResource()
             *reinterpret_cast<void**>(iter + 0x1D4) = 0;
         }
         iVar3 = iVar3 + 1;
-        iter = iter + 0xC;
+        iter = iter + 0x4;
     } while (iVar3 < 0x80);
 
     iVar3 = 0;
     iter = self;
     do {
-        if (*reinterpret_cast<void**>(iter + 0x1D8) != 0) {
-            operator delete(*reinterpret_cast<void**>(iter + 0x1D8));
-            *reinterpret_cast<void**>(iter + 0x1D8) = 0;
+        if (*reinterpret_cast<void**>(iter + 0x3D8) != 0) {
+            operator delete(*reinterpret_cast<void**>(iter + 0x3D8));
+            *reinterpret_cast<void**>(iter + 0x3D8) = 0;
         }
         iVar3 = iVar3 + 1;
-        iter = iter + 0xC;
+        iter = iter + 0x4;
     } while (iVar3 < 0x80);
 
     iVar3 = 0;
     iter = self;
     do {
-        if (*reinterpret_cast<long**>(iter + 0x1DC) != 0) {
-            operator delete(*reinterpret_cast<long**>(iter + 0x1DC));
-            *reinterpret_cast<long**>(iter + 0x1DC) = 0;
+        if (*reinterpret_cast<long**>(iter + 0x5DC) != 0) {
+            operator delete(*reinterpret_cast<long**>(iter + 0x5DC));
+            *reinterpret_cast<long**>(iter + 0x5DC) = 0;
         }
         iVar3 = iVar3 + 1;
-        iter = iter + 0xC;
+        iter = iter + 0x4;
     } while (iVar3 < 0x80);
 
     u8*& recvBuffer = *reinterpret_cast<u8**>(self + kRecvBuffOffset);

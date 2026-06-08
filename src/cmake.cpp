@@ -334,10 +334,10 @@ static inline unsigned char* GetCmakeRosterEntry(CMenuPcs* menu, int slot)
 
 static inline CFont* GetCmakeKeyboardFont(CMenuPcs* menu)
 {
-    if (CmakeResult(menu) == 0) {
-        return menu->m_fonts[CMAKE_FONT_LABEL];
+    if (CmakeResult(menu) != 0) {
+        return menu->m_fonts[CMAKE_FONT_VILLAGE];
     }
-    return menu->m_fonts[CMAKE_FONT_VILLAGE];
+    return menu->m_fonts[CMAKE_FONT_LABEL];
 }
 
 extern "C" const char s_ABCDEFGHIJKL_801E2F30[];

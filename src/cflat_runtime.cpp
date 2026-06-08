@@ -2247,8 +2247,8 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 						char* scan = spec + 1;
 						if (spec[0] == '%') {
 							int fmtIndex = 1;
-							int width = 0;
-							u32 started = static_cast<u32>(__cntlzw(static_cast<u32>(0x30 - spec[1]))) >> 5 & 0xFF;
+							unsigned int width = 0;
+							s32 started = static_cast<u32>(__cntlzw(static_cast<u32>(0x30 - spec[1]))) >> 5 & 0xFF;
 							for (; (*scan >= '0') && (*scan <= '9'); scan++) {
 								fmtIndex++;
 								width = width * 10 + (*scan - '0');

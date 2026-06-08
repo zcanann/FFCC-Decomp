@@ -1902,12 +1902,7 @@ unsigned short CMenuPcs::CmakeJobCtrl()
                 }
             found:
 
-                if (slot > 7) {
-                    s_CmakeInfo.m_job = static_cast<signed char>(CmakeState(this)->m_select);
-                    CmakeState(this)->m_resultDir = 1;
-                    Sound.PlaySe(2, 0x40, 0x7F, 0);
-                    return 1;
-                } else {
+                if (slot < 8) {
                     short winX = 0;
                     short winY = 0;
                     Sound.PlaySe(4, 0x40, 0x7F, 0);
@@ -1915,6 +1910,11 @@ unsigned short CMenuPcs::CmakeJobCtrl()
                     SetMcWinInfo((int)winX, (int)winY);
                     CmakeMcState(this) = 0;
                     return 0;
+                } else {
+                    s_CmakeInfo.m_job = static_cast<signed char>(CmakeState(this)->m_select);
+                    CmakeState(this)->m_resultDir = 1;
+                    Sound.PlaySe(2, 0x40, 0x7F, 0);
+                    return 1;
                 }
             } else if ((down & 0x200) != 0) {
                 ChgModel(static_cast<int>(CmakeSlot(this)), -1, -1, -1);

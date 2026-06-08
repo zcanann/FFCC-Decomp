@@ -1203,8 +1203,7 @@ void CMenuPcs::loadData()
 	}
 
 	{
-		int* animState = m_wmCharaAnimState;
-		for (int i = 0; i < 8; i++, animState += 5) {
+		for (int i = 0; i < 8; i++) {
 			CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[i];
 			if (handle->m_charaKind != 3) {
 				const unsigned int charaBase = static_cast<unsigned int>(handle->m_charaNo) / 100;
@@ -1216,13 +1215,13 @@ void CMenuPcs::loadData()
 				GetWmCharaHandles(this)[i]->LoadAnim(s_wmCharaAnimGlad, animBase + 3, 3, 0, modelNo, -1, 0);
 				GetWmCharaHandles(this)[i]->LoadAnim(s_wmCharaAnimSleep, animBase + 4, 1, 0, modelNo, -1, 0);
 				GetWmCharaHandles(this)[i]->LoadAnim(s_wmCharaAnimAngry, animBase + 5, 1, 0, modelNo, -1, 0);
-				animState[0] = 0;
-				animState[1] = -1;
-				animState[2] = rand() % 250;
+				(m_wmCharaAnimState + i * 5)[0] = 0;
+				(m_wmCharaAnimState + i * 5)[1] = -1;
+				(m_wmCharaAnimState + i * 5)[2] = rand() % 250;
 				GetWmCharaHandles(this)[i]->SetAnim(animBase, -1, -1, 0, 0);
-				animState[3] = *reinterpret_cast<int*>(
+				(m_wmCharaAnimState + i * 5)[3] = *reinterpret_cast<int*>(
 				    reinterpret_cast<unsigned char*>(GetWmCharaHandles(this)[i]->m_model) + 0xB4);
-				animState[4] = *reinterpret_cast<int*>(
+				(m_wmCharaAnimState + i * 5)[4] = *reinterpret_cast<int*>(
 				    reinterpret_cast<unsigned char*>(GetWmCharaHandles(this)[i]->m_model) + 0xC0);
 				float maxWait = static_cast<float>(
 				    static_cast<double>(*reinterpret_cast<unsigned short*>(
@@ -7561,11 +7560,10 @@ LAB_calc:
 			if (i != 0 && uVar14 != 2) {
 				break;
 			}
-			int base = reinterpret_cast<int>(m_wm.m_frameData);
 			float fVar1 = static_cast<float>(
-			    static_cast<double>(static_cast<float>(10 - *reinterpret_cast<int*>(base + 8))) / dE8);
-			*reinterpret_cast<float*>(base + off + 0xC4) = fVar1;
-			*reinterpret_cast<float*>(base + off + 200) =
+			    static_cast<double>(static_cast<float>(10 - *reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_frameData) + 8))) / dE8);
+			*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + off + 0xC4) = fVar1;
+			*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + off + 200) =
 			    static_cast<float>(dF8 * static_cast<double>(fVar1) + dF8);
 
 			int entry = reinterpret_cast<int>(m_wm.m_frameData) + off;
@@ -10241,9 +10239,10 @@ void CMenuPcs::SetAnim(int anim)
 	const int blendMode = (static_cast<unsigned int>(currentAnimIndex) >> 31) - 1;
 	m_wm.m_handles[handleIdx]->SetAnim((animBase - 5) + animState[0], -1, -1, blendMode, 1);
 
-	unsigned char* const model = reinterpret_cast<unsigned char*>(m_wm.m_handles[handleIdx]->m_model);
-	reinterpret_cast<float*>(animState)[3] = reinterpret_cast<float*>(model + 0xB4)[0];
-	reinterpret_cast<float*>(animState)[4] = reinterpret_cast<float*>(model + 0xC0)[0];
+	reinterpret_cast<float*>(animState)[3] =
+	    reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(m_wm.m_handles[handleIdx]->m_model) + 0xB4)[0];
+	reinterpret_cast<float*>(animState)[4] =
+	    reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(m_wm.m_handles[handleIdx]->m_model) + 0xC0)[0];
 #undef animState
 }
 

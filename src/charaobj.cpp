@@ -2790,7 +2790,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 			break;
 		}
 
-		if (effectId > 500) {
+		if (effectId >= 501) {
 			int itemType = *reinterpret_cast<unsigned short*>(itemData + 2);
 			int colType;
 			switch (itemType) {

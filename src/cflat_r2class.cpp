@@ -457,12 +457,16 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 					const int oldBit = static_cast<int>((static_cast<int>(*(engineObject + 0x50)) << 0x1C) >> 0x1F);
 					stack[-1].m_word = static_cast<unsigned int>(oldBit);
 					int bitValue = oldBit;
-					if (setMode == 0) {
-						bitValue = static_cast<int>(static_cast<signed char>(stack->m_word));
-					} else if (setMode == -1) {
+					switch (setMode) {
+					case -1:
 						bitValue -= static_cast<int>(static_cast<signed char>(stack->m_word));
-					} else if (setMode == 1) {
+						break;
+					case 0:
+						bitValue = static_cast<int>(static_cast<signed char>(stack->m_word));
+						break;
+					case 1:
 						bitValue += static_cast<int>(static_cast<signed char>(stack->m_word));
+						break;
 					}
 					*(engineObject + 0x50) =
 					    static_cast<u8>((static_cast<unsigned int>(bitValue) << 3) & 8) | (*(engineObject + 0x50) & 0xF7);
@@ -471,12 +475,16 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 				case -0xB: {
 					signed char* value = reinterpret_cast<signed char*>(engineObject + 0x53);
 					stack[-1].m_word = static_cast<unsigned int>(static_cast<int>(*value));
-					if (setMode == 0) {
-						*value = static_cast<signed char>(stack->m_word);
-					} else if (setMode == -1) {
+					switch (setMode) {
+					case -1:
 						*value = static_cast<signed char>(*value - static_cast<signed char>(stack->m_word));
-					} else if (setMode == 1) {
+						break;
+					case 0:
+						*value = static_cast<signed char>(stack->m_word);
+						break;
+					case 1:
 						*value = static_cast<signed char>(*value + static_cast<signed char>(stack->m_word));
+						break;
 					}
 					break;
 				}

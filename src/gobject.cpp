@@ -1183,7 +1183,7 @@ void CGObject::bgAttribCollision()
         }
     }
 
-    if ((m_weaponNodeFlags & 1) != 0) {
+    if (m_weaponNodeFlagBits.m_attached) {
         m_bgAttrValue = m_attachOwner->m_bgAttrValue;
         return;
     }

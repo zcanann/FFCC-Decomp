@@ -8057,7 +8057,7 @@ void CMenuPcs::DrawCharaBase()
 	} else if (state == 2) {
 		alpha = FLOAT_80331668;
 	} else {
-		alpha = static_cast<float>(1.0 - DOUBLE_803316C0 * static_cast<double>(worldState->m_frameCounter));
+		alpha = static_cast<float>(DOUBLE_80331448 - DOUBLE_803316C0 * static_cast<double>(worldState->m_frameCounter));
 	}
 
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));

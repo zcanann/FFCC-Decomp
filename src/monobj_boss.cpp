@@ -2472,18 +2472,33 @@ void CGMonObj::frameStatFuncLastBoss()
 	const int state = prgObj->m_lastStateId;
 	const int stateFrame = prgObj->m_stateFrame;
 
-	if (state == 0x65) {
+	switch (state) {
+	case 100:
+		if (stateFrame == 0) {
+			reinterpret_cast<CGCharaObj*>(this)->damageDelete();
+			object->m_bgColMask &= 0xFFF7FFFF;
+			prgObj->reqAnim(0x18, 0, 0);
+
+			prgObj->putParticle((object->m_charaModelHandle->GetPdtSlot() << 8) | 0x10, 0, object, 1.0f, 0);
+			prgObj->playSe3D(0x12912, 0x32, 0x96, 0, 0);
+		} else if (stateFrame == 0x7D) {
+			object->m_bodyEllipsoidRadius = kMonObjBossQuarter;
+		} else if (prgObj->isLoopAnim() != 0) {
+			object->m_bgColMask |= 0x80000;
+			object->SetAnimSlot(0x12, 0);
+			object->SetAnimSlot(0x14, 1);
+			object->SetAnimSlot(0x16, 4);
+			prgObj->changeStat(0, 0, 0);
+			m_actionBranch = 2;
+		}
+		return;
+	case 0x65:
 		if (stateFrame == 0) {
 			object->m_bgColMask &= 0xFFF7FFFF;
 			prgObj->reqAnim(0x19, 0, 0);
 
-			int pdtNo = -1;
-			if (object->m_charaModelHandle->m_pdtLoadRef != 0) {
-				pdtNo = reinterpret_cast<int>(object->m_charaModelHandle->m_pdtLoadRef->m_keyTag);
-			}
-
-			prgObj->putParticle((pdtNo << 8) | 0x11, 0, object, 1.0f, 0);
-			prgObj->putParticle((pdtNo << 8) | 0x12, 0, object, 1.0f, 0);
+			prgObj->putParticle((object->m_charaModelHandle->GetPdtSlot() << 8) | 0x11, 0, object, 1.0f, 0);
+			prgObj->putParticle((object->m_charaModelHandle->GetPdtSlot() << 8) | 0x12, 0, object, 1.0f, 0);
 			prgObj->playSe3D(0x12913, 0x32, 0x96, 0, 0);
 		} else if (stateFrame == 0x29) {
 			object->m_bodyEllipsoidRadius = kMonObjBossLargeBodyRadius;
@@ -2493,40 +2508,12 @@ void CGMonObj::frameStatFuncLastBoss()
 			object->SetAnimSlot(0x13, 0);
 			object->SetAnimSlot(0x15, 1);
 			object->SetAnimSlot(0x17, 4);
-			mon[0x6B4] = 0;
+			m_actionBranch = 0;
 		}
-	} else if (state < 0x65) {
-		if (99 < state) {
-			if (stateFrame == 0) {
-				reinterpret_cast<CGCharaObj*>(this)->damageDelete();
-				object->m_bgColMask &= 0xFFF7FFFF;
-				prgObj->reqAnim(0x18, 0, 0);
-
-				int pdtNo = -1;
-				if (object->m_charaModelHandle->m_pdtLoadRef != 0) {
-					pdtNo = reinterpret_cast<int>(object->m_charaModelHandle->m_pdtLoadRef->m_keyTag);
-				}
-
-				prgObj->putParticle((pdtNo << 8) | 0x10, 0, object, 1.0f, 0);
-				prgObj->playSe3D(0x12912, 0x32, 0x96, 0, 0);
-			} else if (stateFrame == 0x7D) {
-				object->m_bodyEllipsoidRadius = kMonObjBossQuarter;
-			} else if (prgObj->isLoopAnim() != 0) {
-				object->m_bgColMask |= 0x80000;
-				object->SetAnimSlot(0x12, 0);
-				object->SetAnimSlot(0x14, 1);
-				object->SetAnimSlot(0x16, 4);
-				prgObj->changeStat(0, 0, 0);
-				mon[0x6B4] = 2;
-			}
-		}
-	} else if (state < 0x67) {
+		return;
+	case 0x66:
 		if (stateFrame == 0) {
-			int pdtNo = -1;
-			if (object->m_charaModelHandle->m_pdtLoadRef != 0) {
-				pdtNo = reinterpret_cast<int>(object->m_charaModelHandle->m_pdtLoadRef->m_keyTag);
-			}
-			prgObj->putParticle((pdtNo << 8) | 5, *reinterpret_cast<int*>(mon + 0x58C), object, 1.0f, 0x12902);
+			prgObj->putParticle((object->m_charaModelHandle->GetPdtSlot() << 8) | 5, *reinterpret_cast<int*>(mon + 0x58C), object, 1.0f, 0x12902);
 		} else if (stateFrame == 0x4B) {
 			CGPartyObj** work = reinterpret_cast<CGPartyObj**>(CGMonObj::m_boss);
 			for (int i = 0; i < 4; i++) {
@@ -2555,6 +2542,9 @@ void CGMonObj::frameStatFuncLastBoss()
 		}
 
 		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+		return;
+	default:
+		return;
 	}
 }
 

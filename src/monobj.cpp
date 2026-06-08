@@ -778,7 +778,7 @@ void CGMonObj::isValidTarget()
 	}
 
 	if (((*reinterpret_cast<unsigned short*>(script9 + 0x10C) != 1) || (m_moveWork.m_frame < 0x19)) &&
-	    ((*reinterpret_cast<unsigned short*>(script9 + 0x10C) == 1) || (homeDist >= kMonObjHalf * maxDist))) {
+	    ((*reinterpret_cast<unsigned short*>(script9 + 0x10C) == 1) || !(homeDist < kMonObjHalf * maxDist))) {
 		goto check_home;
 	}
 

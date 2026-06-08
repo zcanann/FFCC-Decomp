@@ -1681,7 +1681,7 @@ void CGMonObj::onStatDie()
 				(Vec*)0
 			);
 
-			unsigned short pId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x19E);
+			int pId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x19E);
 			if (pId != 0xFFFF) {
 				int dataNo = -1;
 				dataNo = object->m_charaModelHandle->GetPdtSlot();
@@ -2674,13 +2674,13 @@ void CGMonObj::initFinishedFuncDefault()
 		}
 	}
 
-	short animPoint = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A0);
-	if (animPoint != -1) {
+	int animPoint = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A0);
+	if (animPoint != 0xFFFF) {
 		object->AddAnimPoint(1, animPoint, 0xB);
 	}
 
-	animPoint = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A2);
-	if (animPoint != -1) {
+	animPoint = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A2);
+	if (animPoint != 0xFFFF) {
 		object->AddAnimPoint(1, animPoint, 0xA);
 	}
 

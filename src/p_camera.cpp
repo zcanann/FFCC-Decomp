@@ -1644,7 +1644,7 @@ void CCameraPcs::drawShadowBegin()
             m_targetZ = m_fullScreenShadowPosition.z;
             PSVECSubtract(reinterpret_cast<Vec*>(&m_targetX), reinterpret_cast<Vec*>(&m_positionX), &delta);
             depth = static_cast<double>(PSVECMag(&delta));
-            m_fullScreenShadow.m_span = static_cast<float>(depth * static_cast<double>(m_fullScreenShadow.m_scale));
+            m_fullScreenShadow.m_span = static_cast<float>(depth) * m_fullScreenShadow.m_scale;
         }
 
         double currentDepth = static_cast<double>(m_fullScreenShadowDepth);

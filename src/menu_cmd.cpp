@@ -324,7 +324,7 @@ static inline s16 GetUniteRecipeCount(int recipe)
  */
 bool IsMagicArti(int itemId)
 {
-	return (0xdf <= itemId) && (itemId < 0xe4);
+	return (0xdf <= itemId) && (itemId <= 0xe3);
 }
 
 /*

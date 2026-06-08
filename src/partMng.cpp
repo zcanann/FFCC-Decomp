@@ -590,9 +590,8 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
 
     pdt = pdtSlot->m_pppDataHead;
     if (pdt != 0) {
-        pppModelSt** modelNames = reinterpret_cast<pppModelSt**>(pdt->m_modelNames);
         for (int i = 0; i < pdt->m_modelCount; i++) {
-            pppModelSt* model = modelNames[i];
+            pppModelSt* model = reinterpret_cast<pppModelSt**>(pdt->m_modelNames)[i];
             if (--model->m_refCount <= 0) {
                 if (model->m_cacheId != -1) {
                     ppvAmemCacheSet.DestroyCache(model->m_cacheId);
@@ -605,14 +604,13 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
             }
         }
 
-        if (modelNames != 0) {
-            delete[] modelNames;
+        if (reinterpret_cast<pppModelSt**>(pdt->m_modelNames) != 0) {
+            delete[] reinterpret_cast<pppModelSt**>(pdt->m_modelNames);
             pdt->m_modelNames = 0;
         }
 
-        pppShapeSt** shapeNames = reinterpret_cast<pppShapeSt**>(pdt->m_shapeNames);
         for (int i = 0; i < pdt->m_shapeCount; i++) {
-            pppShapeSt* shape = shapeNames[i];
+            pppShapeSt* shape = reinterpret_cast<pppShapeSt**>(pdt->m_shapeNames)[i];
             if (--shape->m_refCount <= 0) {
                 if (shape->m_animData != 0) {
                     delete[] reinterpret_cast<u8*>(shape->m_animData);
@@ -627,27 +625,26 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
             }
         }
 
-        if (shapeNames != 0) {
-            delete[] shapeNames;
+        if (reinterpret_cast<pppShapeSt**>(pdt->m_shapeNames) != 0) {
+            delete[] reinterpret_cast<pppShapeSt**>(pdt->m_shapeNames);
             pdt->m_shapeNames = 0;
         }
 
-        pppShapeGroupRaw* shapeGroups = reinterpret_cast<pppShapeGroupRaw*>(pdt->m_shapeGroups);
         for (int i = 0; i < pdt->m_shapeGroupCount; i++) {
+            pppShapeGroupRaw* shapeGroups = reinterpret_cast<pppShapeGroupRaw*>(pdt->m_shapeGroups);
             if (shapeGroups[i].m_shapeList != 0) {
                 delete[] shapeGroups[i].m_shapeList;
                 shapeGroups[i].m_shapeList = 0;
             }
         }
 
-        if (shapeGroups != 0) {
-            delete[] shapeGroups;
+        if (reinterpret_cast<pppShapeGroupRaw*>(pdt->m_shapeGroups) != 0) {
+            delete[] reinterpret_cast<pppShapeGroupRaw*>(pdt->m_shapeGroups);
             pdt->m_shapeGroups = 0;
         }
 
-        s16* cacheChunks = reinterpret_cast<s16*>(pdt->m_cacheChunks);
         for (int i = 0; i < pdt->m_cacheChunkCount; i++) {
-            ppvAmemCacheSet.DestroyCache(cacheChunks[i * 4]);
+            ppvAmemCacheSet.DestroyCache(reinterpret_cast<s16*>(pdt->m_cacheChunks)[i * 4]);
         }
 
         if (pdt->m_cacheChunks != 0) {

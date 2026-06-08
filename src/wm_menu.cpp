@@ -10280,10 +10280,10 @@ input_check_done:
 
 			const float selA = *reinterpret_cast<float*>(bytes + 0x78);
 			const float selB = *reinterpret_cast<float*>(bytes + 0x7C);
-			const float lo = (selB > selA) ? selA : selB;
-			const float hi = (selB > selA) ? selB : selA;
-			const float delta = FLOAT_803315cc * (lo - hi);
-			if (selB > selA) {
+			const float hi = (selB < selA) ? selA : selB;
+			const float lo = (selB < selA) ? selB : selA;
+			const float delta = FLOAT_803315cc * (hi - lo);
+			if (selB <= selA) {
 				*reinterpret_cast<float*>(bytes + 0x7C) += delta;
 			} else {
 				*reinterpret_cast<float*>(bytes + 0x7C) -= delta;

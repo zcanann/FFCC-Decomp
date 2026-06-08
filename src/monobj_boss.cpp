@@ -483,7 +483,7 @@ void CGMonObj::frameStatFuncGolem()
 	}
 
 	if ((reinterpret_cast<CGPrgObj*>(this)->m_stateFrame == 0x14) ||
-	    ((reinterpret_cast<CGObject*>(this)->m_stateFlags0 & 0x40) != 0) ||
+	    (reinterpret_cast<CGObject*>(this)->m_stateFlags0Bits.unk1 != 0) ||
 	    ((state == 0x66) &&
 	     (*reinterpret_cast<float*>(self + 0x5D0 + m_targetPartyIndex * 4) <
 	      kMonObjBossTwo * reinterpret_cast<CGObject*>(this)->m_bodyEllipsoidRadius))) {
@@ -836,7 +836,7 @@ void CGMonObj::frameStatFuncSaw()
 
 	switch (prgObj->m_lastStateId) {
 	case 100:
-		mon[0x63C] = mon[0x63C] & 0x7F | 0x80;
+		reinterpret_cast<CGCharaObj*>(this)->m_unk63CBits.m_bit80 = 1;
 
 		if (prgObj->m_subState == 0) {
 			if (prgObj->m_subFrame == 0) {
@@ -984,7 +984,7 @@ void CGMonObj::frameStatFuncLKShooter()
 	goto resetBranch;
 
 state100:
-	self[0x63C] = (self[0x63C] & 0x7F) | 0x80;
+	reinterpret_cast<CGCharaObj*>(this)->m_unk63CBits.m_bit80 = 1;
 	if (*reinterpret_cast<int*>(self + 0x528) == 0) {
 		memset(&m_moveWork, 0, sizeof(m_moveWork));
 		m_moveWork.m_flags = 0x322;
@@ -2047,13 +2047,11 @@ void CGMonObj::alwaysFuncMeteoParasite()
 		PSMTXRotRad(reinterpret_cast<CChara::CNode**>(CGMonObj::m_boss)[1]->m_localRuntimeMtx, 'x',
 		            -MG_GBA_THREAD_MSG_SETPORT_ct);
 
-		float rotBase = kMonObjBossTwo;
-		float rotStep = kMonObjBossPi;
-		float rotDivisor = kMonObjBossTwelve;
-		CGObject** rotObjects = reinterpret_cast<CGObject**>(CGMonObj::m_boss + 0x38);
+		CGObject** rotObjects = reinterpret_cast<CGObject**>(CGMonObj::m_boss);
 		for (int i = 0; i < 12; i++) {
-			rotObjects[i]->m_rotTargetY =
-			    rotBase * (rotStep * static_cast<float>(i + 3)) / rotDivisor + MG_GBA_THREAD_MSG_SETPORT_ct;
+			rotObjects[i + 14]->m_rotTargetY =
+			    kMonObjBossTwo * (kMonObjBossPi * static_cast<float>(i + 3)) / kMonObjBossTwelve +
+			    MG_GBA_THREAD_MSG_SETPORT_ct;
 		}
 
 		MG_GBA_THREAD_MSG_SETPORT_ct += kMonObjBossScaleStep;
@@ -2487,18 +2485,17 @@ void CGMonObj::frameStatFuncLastBoss()
 	bossPos->z = nodeMtx[2][3];
 
 	const int state = prgObj->m_lastStateId;
-	const int stateFrame = prgObj->m_stateFrame;
 
 	switch (state) {
 	case 100:
-		if (stateFrame == 0) {
+		if (prgObj->m_stateFrame == 0) {
 			reinterpret_cast<CGCharaObj*>(this)->damageDelete();
 			object->m_bgColMask &= 0xFFF7FFFF;
 			prgObj->reqAnim(0x18, 0, 0);
 
 			prgObj->putParticle((object->m_charaModelHandle->GetPdtSlot() << 8) | 0x10, 0, object, 1.0f, 0);
 			prgObj->playSe3D(0x12912, 0x32, 0x96, 0, 0);
-		} else if (stateFrame == 0x7D) {
+		} else if (prgObj->m_stateFrame == 0x7D) {
 			object->m_bodyEllipsoidRadius = kMonObjBossQuarter;
 		} else if (prgObj->isLoopAnim() != 0) {
 			object->m_bgColMask |= 0x80000;
@@ -2510,14 +2507,14 @@ void CGMonObj::frameStatFuncLastBoss()
 		}
 		return;
 	case 0x65:
-		if (stateFrame == 0) {
+		if (prgObj->m_stateFrame == 0) {
 			object->m_bgColMask &= 0xFFF7FFFF;
 			prgObj->reqAnim(0x19, 0, 0);
 
 			prgObj->putParticle((object->m_charaModelHandle->GetPdtSlot() << 8) | 0x11, 0, object, 1.0f, 0);
 			prgObj->putParticle((object->m_charaModelHandle->GetPdtSlot() << 8) | 0x12, 0, object, 1.0f, 0);
 			prgObj->playSe3D(0x12913, 0x32, 0x96, 0, 0);
-		} else if (stateFrame == 0x29) {
+		} else if (prgObj->m_stateFrame == 0x29) {
 			object->m_bodyEllipsoidRadius = kMonObjBossLargeBodyRadius;
 		} else if (prgObj->isLoopAnim() != 0) {
 			object->m_bgColMask |= 0x80000;
@@ -2529,9 +2526,9 @@ void CGMonObj::frameStatFuncLastBoss()
 		}
 		return;
 	case 0x66:
-		if (stateFrame == 0) {
+		if (prgObj->m_stateFrame == 0) {
 			prgObj->putParticle((object->m_charaModelHandle->GetPdtSlot() << 8) | 5, *reinterpret_cast<int*>(mon + 0x58C), object, 1.0f, 0x12902);
-		} else if (stateFrame == 0x4B) {
+		} else if (prgObj->m_stateFrame == 0x4B) {
 			CGPartyObj** work = reinterpret_cast<CGPartyObj**>(CGMonObj::m_boss);
 			for (int i = 0; i < 4; i++) {
 				CGPartyObj* party = work[i + 2];
@@ -2544,7 +2541,7 @@ void CGMonObj::frameStatFuncLastBoss()
 					}
 				}
 			}
-		} else if (stateFrame == 200) {
+		} else if (prgObj->m_stateFrame == 200) {
 			CGPartyObj** work = reinterpret_cast<CGPartyObj**>(CGMonObj::m_boss);
 			for (int i = 0; i < 4; i++) {
 				CGPartyObj* party = work[i + 2];
@@ -2639,7 +2636,7 @@ void CGMonObj::teleport(
 	if (prgObj->m_stateFrame == 0) {
 		int pdtNo;
 		object->m_bgColMask &= 0xFFF3FFFC;
-		*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags) &= 0xEF;
+		object->m_weaponNodeFlagBits.m_unk10 = 0;
 		object->m_groundHitOffset.z = kMonObjBossZero;
 		object->m_groundHitOffset.y = kMonObjBossZero;
 		object->m_groundHitOffset.x = kMonObjBossZero;
@@ -2717,8 +2714,7 @@ void CGMonObj::teleport(
 				}
 
 				object->m_bgColMask |= 3;
-				*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags) =
-					(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags) & 0xEF) | 0x10;
+				object->m_weaponNodeFlagBits.m_unk10 = 1;
 				object->m_groundHitOffset.z = kMonObjBossZero;
 				object->m_groundHitOffset.y = kMonObjBossZero;
 				object->m_groundHitOffset.x = kMonObjBossZero;

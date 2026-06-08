@@ -834,11 +834,11 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 				engineObject->m_bodyEllipsoidRadius = radius;
 				engineObject->m_bodyEllipsoidOffset = offset;
 				break;
-			case 2:
-				engineObject->m_bodyColRadius = radius;
-				break;
 			case 3:
 				engineObject->m_attackColRadius = radius;
+				break;
+			case 2:
+				engineObject->m_bodyColRadius = radius;
 				break;
 			case 4:
 				engineObject->m_nearColRadius = radius;

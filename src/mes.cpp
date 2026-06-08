@@ -685,25 +685,23 @@ void CMes::Draw()
 					int fontId = (int)((unsigned int)*(unsigned char*)((char*)glyph + 0x0E) & 0x0F);
 					if (activeFontId != fontId)
 					{
-						nextFont = MenuPcs.m_fonts[2];
-						if (fontId != 2)
+						switch (fontId)
 						{
-							if (fontId < 2)
-							{
-								nextFont = MenuPcs.m_fonts[0];
-								if (fontId != 0)
-								{
-									nextFont = font;
-								}
-							}
-							else
-							{
-								nextFont = font;
-								if (fontId < 4)
-								{
-									nextFont = MenuPcs.m_fonts[2];
-								}
-							}
+						case 0:
+							nextFont = MenuPcs.m_fonts[0];
+							break;
+						case 1:
+							nextFont = font;
+							break;
+						case 2:
+							nextFont = MenuPcs.m_fonts[2];
+							break;
+						case 3:
+							nextFont = MenuPcs.m_fonts[2];
+							break;
+						default:
+							nextFont = font;
+							break;
 						}
 
 						nextFont->SetShadow(*(int*)((char*)this + 0x3D38));

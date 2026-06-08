@@ -195,11 +195,13 @@ void CMenuPcs::FavoDraw()
 		rankFont->SetTlut(6);
 		rankFont->SetColor(
 		    CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * drawEntry->alpha)).color);
+		float posX = static_cast<float>(drawEntry->x - 0xC);
+		float posY = static_cast<float>(drawEntry->y + 0xA) - 4.0f;
 		rankFont->renderFlags = (rankFont->renderFlags & 0xEF) | 0x10;
 		rankFont->SetMargin(1.0f);
 		sprintf(textBuf, sFavoRankFormat, static_cast<int>(rank->place));
-		rankFont->SetPosX(static_cast<float>(drawEntry->x - 0xC));
-		rankFont->SetPosY(static_cast<float>(drawEntry->y + 0xA) - 4.0f);
+		rankFont->SetPosX(posX);
+		rankFont->SetPosY(posY);
 		rankFont->Draw(textBuf);
 		rankFont->SetShadow(0);
 		rank++;

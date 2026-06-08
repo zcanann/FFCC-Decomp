@@ -4269,7 +4269,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     mng->m_pppPDataVals = 0;
 
     *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(mng) + 0xFC) =
-        *reinterpret_cast<unsigned short*>(fpData2 + 0x0);
+        *reinterpret_cast<short*>(fpData2 + 0x0);
     mng->m_field118 = *reinterpret_cast<unsigned short*>(fpData2 + 0x2);
     mng->m_matrixMode = *reinterpret_cast<unsigned char*>(fpData2 + 0x5);
     mng->m_drawVariant = *reinterpret_cast<unsigned char*>(fpData2 + 0x6);
@@ -4321,7 +4321,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
         *reinterpret_cast<int*>(&mng->m_rotation.z) = *reinterpret_cast<int*>(fpData + 0x14);
         mng->m_rotationSpeed = *reinterpret_cast<int*>(fpData + 0x18);
     } else {
-        int rotX = static_cast<int>(createParam->m_rotationPtr->x * 65536.0f / 360.0f);
+        int rotX = static_cast<unsigned int>(createParam->m_rotationPtr->x * 65536.0f / 360.0f);
         int rotY = static_cast<int>(createParam->m_rotationPtr->y * 65536.0f / 360.0f);
         mng->m_rotation.x = static_cast<short>(rotX >> 16);
         mng->m_rotation.y = static_cast<short>(rotX);

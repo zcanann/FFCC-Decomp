@@ -52,6 +52,8 @@ extern float FLOAT_80332dfc;
 extern float FLOAT_80332e00;
 extern float FLOAT_80332de0;
 extern float FLOAT_80332e0c;
+extern float FLOAT_80332E04;
+extern float FLOAT_80332E08;
 extern float FLOAT_80332e10;
 extern float FLOAT_80332e14;
 extern float FLOAT_80332e18;
@@ -1819,7 +1821,7 @@ void CShopMenu::DrawSoubi()
     font->DrawInit();
 
     char* itemName = GetItemName(m_resultItem);
-    MenuPcs.DrawShadowFont(font, itemName, FLOAT_80332d54, 112.0f, 0x18, 0x12);
+    MenuPcs.DrawShadowFont(font, itemName, FLOAT_80332d54, FLOAT_80332E04, 0x18, 0x12);
     MenuPcs.DrawInit();
 
     DrawItemInfo(m_resultItem, 0x98, 0x7E, 0x98, 0x9C, 0x98, 0xBA, 0x138);
@@ -1844,21 +1846,21 @@ void CShopMenu::DrawSoubi()
     labelFont->DrawInit();
 
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
-    labelFont->SetPosY(312.0f);
+    labelFont->SetPosY(FLOAT_80332E08);
     char* equipText = ShopMenuMes(languageId, SHOP_MENU_TEXT_EQUIP);
     float equipTextX = CalcCenteredShopMenuX(labelFont, equipText);
     labelFont->SetPosX(equipTextX);
-    labelFont->SetPosY(312.0f);
+    labelFont->SetPosY(FLOAT_80332E08);
     labelFont->Draw(equipText);
 
     char* cancelText = ShopMenuMes(languageId, SHOP_MENU_TEXT_CANCEL);
     float cancelTextX = CalcCenteredShopMenuX(labelFont, cancelText);
     labelFont->SetPosX(cancelTextX);
-    labelFont->SetPosY(346.0f);
+    labelFont->SetPosY(FLOAT_80332d88);
     labelFont->Draw(cancelText);
     MenuPcs.DrawInit();
 
-    MenuPcs.DrawCursor(static_cast<unsigned int>(cancelTextX) - 0x24, m_yesNo * 0x18 + 0x13C, 1.0f);
+    MenuPcs.DrawCursor(static_cast<unsigned int>(cancelTextX) - 0x24, m_yesNo * 0x18 + 0x13C, FLOAT_80332d28);
 }
 /*
  * --INFO--

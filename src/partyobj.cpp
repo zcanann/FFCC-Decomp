@@ -503,8 +503,86 @@ void CGPartyObj::onCancelStat(int state)
 		endPSlotBit(0x10);
 		endPSlotBit(0x100);
 		break;
-	case 6:
-		*reinterpret_cast<float*>(self + 0x4FC) = FLOAT_80331a78;
+	case 0x0F:
+		if ((party.commandFlags & 0x20) != 0) {
+			checkAndSetWeapon();
+		}
+		break;
+	case 0x15:
+		enableDamageCol(1);
+		break;
+	case 0x14:
+		m_alpha = FLOAT_80331a54;
+		enableDamageCol(1);
+		break;
+	case 0x0B:
+		{
+			if (party.carryObject != 0) {
+				if (CFlatItemCarryMode() == 0) {
+					if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+						SetAnimSlot(0x0B, 0);
+						SetAnimSlot(0x0C, 1);
+					} else {
+						SetAnimSlot(0x0B, 0);
+						SetAnimSlot(2, 1);
+					}
+				} else {
+					SetAnimSlot(0x0B, 0);
+					SetAnimSlot(0x0C, 1);
+				}
+			} else if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+					SetAnimSlot(0, 0);
+					SetAnimSlot(1, 1);
+				} else {
+					SetAnimSlot(0x25, 0);
+					SetAnimSlot(0x30, 1);
+				}
+			} else {
+				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+					SetAnimSlot(0x25, 0);
+					SetAnimSlot(0x24, 1);
+				} else {
+					SetAnimSlot(0x25, 0);
+					SetAnimSlot(0x24, 1);
+				}
+			}
+		}
+		break;
+	case 0x0C:
+	case 0x0D:
+		{
+			if (party.carryObject != 0) {
+				if (CFlatItemCarryMode() == 0) {
+					if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+						SetAnimSlot(0x0B, 0);
+						SetAnimSlot(0x0C, 1);
+					} else {
+						SetAnimSlot(0x0B, 0);
+						SetAnimSlot(2, 1);
+					}
+				} else {
+					SetAnimSlot(0x0B, 0);
+					SetAnimSlot(0x0C, 1);
+				}
+			} else if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+					SetAnimSlot(0, 0);
+					SetAnimSlot(1, 1);
+				} else {
+					SetAnimSlot(0x25, 0);
+					SetAnimSlot(0x30, 1);
+				}
+			} else {
+				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+					SetAnimSlot(0x25, 0);
+					SetAnimSlot(0x24, 1);
+				} else {
+					SetAnimSlot(0x25, 0);
+					SetAnimSlot(0x24, 1);
+				}
+			}
+		}
 		break;
 	case 9:
 		if (state == 0x22) {
@@ -532,14 +610,21 @@ void CGPartyObj::onCancelStat(int state)
 					SetAnimSlot(0x0C, 1);
 				}
 			} else if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
-				SetAnimSlot(0x25, 0);
-				SetAnimSlot(0x24, 1);
-			} else if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
-				SetAnimSlot(0, 0);
-				SetAnimSlot(1, 1);
+				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+					SetAnimSlot(0, 0);
+					SetAnimSlot(1, 1);
+				} else {
+					SetAnimSlot(0x25, 0);
+					SetAnimSlot(0x30, 1);
+				}
 			} else {
-				SetAnimSlot(0x25, 0);
-				SetAnimSlot(0x30, 1);
+				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+					SetAnimSlot(0x25, 0);
+					SetAnimSlot(0x24, 1);
+				} else {
+					SetAnimSlot(0x25, 0);
+					SetAnimSlot(0x24, 1);
+				}
 			}
 		}
 		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
@@ -550,73 +635,6 @@ void CGPartyObj::onCancelStat(int state)
 			m_alpha = FLOAT_80331a54;
 			m_bgColMask |= 0x1000E;
 		}
-		break;
-	case 0x0B:
-		{
-			if (party.carryObject != 0) {
-				if (CFlatItemCarryMode() == 0) {
-					if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
-						SetAnimSlot(0x0B, 0);
-						SetAnimSlot(0x0C, 1);
-					} else {
-						SetAnimSlot(0x0B, 0);
-						SetAnimSlot(2, 1);
-					}
-				} else {
-					SetAnimSlot(0x0B, 0);
-					SetAnimSlot(0x0C, 1);
-				}
-			} else if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
-				SetAnimSlot(0x25, 0);
-				SetAnimSlot(0x24, 1);
-			} else if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
-				SetAnimSlot(0, 0);
-				SetAnimSlot(1, 1);
-			} else {
-				SetAnimSlot(0x25, 0);
-				SetAnimSlot(0x30, 1);
-			}
-		}
-		break;
-	case 0x0C:
-	case 0x0D:
-		{
-			if (party.carryObject != 0) {
-				if (CFlatItemCarryMode() == 0) {
-					if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
-						SetAnimSlot(0x0B, 0);
-						SetAnimSlot(0x0C, 1);
-					} else {
-						SetAnimSlot(0x0B, 0);
-						SetAnimSlot(2, 1);
-					}
-				} else {
-					SetAnimSlot(0x0B, 0);
-					SetAnimSlot(0x0C, 1);
-				}
-			} else if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
-				SetAnimSlot(0x25, 0);
-				SetAnimSlot(0x24, 1);
-			} else if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
-				SetAnimSlot(0, 0);
-				SetAnimSlot(1, 1);
-			} else {
-				SetAnimSlot(0x25, 0);
-				SetAnimSlot(0x30, 1);
-			}
-		}
-		break;
-	case 0x0F:
-		if ((party.commandFlags & 0x20) != 0) {
-			checkAndSetWeapon();
-		}
-		break;
-	case 0x14:
-		m_alpha = FLOAT_80331a54;
-		enableDamageCol(1);
-		break;
-	case 0x15:
-		enableDamageCol(1);
 		break;
 	case 0x22:
 		if (party.flags.flag04) {
@@ -641,14 +659,21 @@ void CGPartyObj::onCancelStat(int state)
 					SetAnimSlot(0x0C, 1);
 				}
 			} else if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
-				SetAnimSlot(0x25, 0);
-				SetAnimSlot(0x24, 1);
-			} else if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
-				SetAnimSlot(0, 0);
-				SetAnimSlot(1, 1);
+				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+					SetAnimSlot(0, 0);
+					SetAnimSlot(1, 1);
+				} else {
+					SetAnimSlot(0x25, 0);
+					SetAnimSlot(0x30, 1);
+				}
 			} else {
-				SetAnimSlot(0x25, 0);
-				SetAnimSlot(0x30, 1);
+				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+					SetAnimSlot(0x25, 0);
+					SetAnimSlot(0x24, 1);
+				} else {
+					SetAnimSlot(0x25, 0);
+					SetAnimSlot(0x24, 1);
+				}
 			}
 		}
 		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
@@ -659,6 +684,9 @@ void CGPartyObj::onCancelStat(int state)
 			m_alpha = FLOAT_80331a54;
 			m_bgColMask |= 0x1000E;
 		}
+		break;
+	case 6:
+		*reinterpret_cast<float*>(self + 0x4FC) = FLOAT_80331a78;
 		break;
 	default:
 		break;
@@ -3195,14 +3223,21 @@ void CGPartyObj::carry(int carryType, CGObject* object, int forceMode)
 					SetAnimSlot(0x0C, 1);
 				}
 			} else if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
-				SetAnimSlot(0x25, 0);
-				SetAnimSlot(0x24, 1);
-			} else if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
-				SetAnimSlot(0, 0);
-				SetAnimSlot(1, 1);
+				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+					SetAnimSlot(0, 0);
+					SetAnimSlot(1, 1);
+				} else {
+					SetAnimSlot(0x25, 0);
+					SetAnimSlot(0x30, 1);
+				}
 			} else {
-				SetAnimSlot(0x25, 0);
-				SetAnimSlot(0x30, 1);
+				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+					SetAnimSlot(0x25, 0);
+					SetAnimSlot(0x24, 1);
+				} else {
+					SetAnimSlot(0x25, 0);
+					SetAnimSlot(0x24, 1);
+				}
 			}
 			reinterpret_cast<CGItemObj*>(PartyData(this).carryObject)->carry(this, 0, 0);
 		} else {
@@ -3232,14 +3267,21 @@ void CGPartyObj::carry(int carryType, CGObject* object, int forceMode)
 						SetAnimSlot(0x0C, 1);
 					}
 				} else if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
-					SetAnimSlot(0x25, 0);
-					SetAnimSlot(0x24, 1);
-				} else if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
-					SetAnimSlot(0, 0);
-					SetAnimSlot(1, 1);
+					if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+						SetAnimSlot(0, 0);
+						SetAnimSlot(1, 1);
+					} else {
+						SetAnimSlot(0x25, 0);
+						SetAnimSlot(0x30, 1);
+					}
 				} else {
-					SetAnimSlot(0x25, 0);
-					SetAnimSlot(0x30, 1);
+					if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+						SetAnimSlot(0x25, 0);
+						SetAnimSlot(0x24, 1);
+					} else {
+						SetAnimSlot(0x25, 0);
+						SetAnimSlot(0x24, 1);
+					}
 				}
 		} else {
 			changeStat((carryType == 1) ? 0x0C : 0x0D, 0, 0);

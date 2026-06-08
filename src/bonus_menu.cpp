@@ -1889,7 +1889,7 @@ void CMenuPcs::DrawResultCloseAnim()
 					colors[3].g = 0xFF;
 					colors[3].b = 0xFF;
 					colors[3].a = 0xFF;
-					_GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
+					_GXColor color = colors[0];
 					GXSetChanMatColor(GX_COLOR0A0, color);
 				} else {
 					_GXColor color;

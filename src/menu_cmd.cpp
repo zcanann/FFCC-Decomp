@@ -1031,17 +1031,18 @@ void CMenuPcs::CmdDraw()
 			if (i < 2) {
 				text = GetMenuStr(i + 9);
 			} else {
-				const s16 cmdId = caravan->m_commandListInventorySlotRef[i];
-				if (cmdId < 0) {
+				const int cmdId = caravan->m_commandListInventorySlotRef[i];
+				if (cmdId >= 0) {
+					const u16 skillId = caravan->m_inventoryItems[cmdId];
+					char** flatText = Game.m_cFlatDataArr[1].TableStrings(0);
+					text = flatText[skillId * 5 + 4];
+					if ((cmdMode == 0) && (i == GetCmdStateView(this)->selected)) {
+						hasItemHelp = true;
+						helpId = skillId;
+					}
+				} else {
 					entry++;
 					continue;
-				}
-				const u16 skillId = caravan->m_inventoryItems[cmdId];
-				char** flatText = Game.m_cFlatDataArr[1].TableStrings(0);
-				text = flatText[skillId * 5 + 4];
-				if ((cmdMode == 0) && (i == GetCmdStateView(this)->selected)) {
-					hasItemHelp = true;
-					helpId = skillId;
 				}
 			}
 

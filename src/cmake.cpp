@@ -470,9 +470,8 @@ static bool IsDuplicateCmakeName(CMenuPcs* menu, const char* name)
     }
 
     if (!found) {
-        char** nameTable = Game.m_cFlatDataArr[1].TableStrings(2);
         for (int i = 0; i < 0x100; ++i) {
-            if (strcmp(nameTable[i], name) == 0) {
+            if (strcmp(Game.m_cFlatDataArr[1].TableStrings(2)[i], name) == 0) {
                 found = true;
                 break;
             }

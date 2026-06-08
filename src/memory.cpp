@@ -478,7 +478,7 @@ frame_input_done:
         trigger = 0;
     } else {
         int port = 0;
-        unsigned int clamped = (unsigned int)port & ~-((int)(__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) >> 5));
+        unsigned int clamped = (unsigned int)port & ~-(int)((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) >> 5) & 1);
         trigger = Pad.GetPadInputs()[clamped].lockedButton[1];
     }
 

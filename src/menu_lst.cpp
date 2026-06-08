@@ -56,16 +56,17 @@ void CMenuPcs::MLstDraw()
 
 	short menuMode = this->m_menuLstState->mode;
 	MenuLstEntry* item = this->m_menuLstList->entries;
+	float rowHeight = kMLstRowHeight;
 
-	for (int i = 0; i < this->m_menuLstList->count; i++) {
+	for (int i = 0; i < this->m_menuLstList->count; i++, item++) {
 		int tex = item->tex;
 		if (tex >= 0) {
 			float x = (float)item->x;
+			float zero = kMLstZero;
+			float v = zero;
 			float y = (float)item->y;
 			float w = (float)item->width;
 			float h = (float)item->height;
-			float zero = kMLstZero;
-			float v = zero;
 			float alpha = item->alpha;
 
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
@@ -94,15 +95,14 @@ void CMenuPcs::MLstDraw()
 				0,
 				iconX,
 				iconY,
-				kMLstRowHeight,
-				kMLstRowHeight,
+				rowHeight,
+				rowHeight,
 				zero,
 				v,
 				item->z,
 				item->z,
 				zero);
 		}
-		item++;
 	}
 
 	CFont* font = this->m_fonts[4];
@@ -143,8 +143,8 @@ void CMenuPcs::MLstDraw()
 	DrawInit();
 	int helpMessageId = this->m_menuLstState->cursor + 0x25c;
 	CFont* helpFont = this->m_fonts[0];
-	float helpX = kMLstHelpCenterX;
-	float helpY = 352.0f;
+	float helpX = (float)-(rowHeight * kMLstHalf - kMLstHelpCenterX);
+	float helpY = kMLstHelpY;
 	DrawHelpMessage(
 		helpMessageId,
 		helpFont,

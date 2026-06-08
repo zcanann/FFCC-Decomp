@@ -1662,7 +1662,8 @@ void CMenuPcs::CalcSelectOpenAnim()
 		MenuBoardEntry* boardEntries = GetBonusBoardEntries(this);
 		BonusAnimSprite* boardSprite = &sprites[1];
 		for (int i = 0; i < 8; i++) {
-			MenuBoardEntry& entry = boardEntries[activePartyCount * 2 + i];
+			int __p3 = activePartyCount;
+			MenuBoardEntry& entry = boardEntries[__p3 * 2 + i];
 			entry.m_rotZ = 0.0f;
 			entry.m_rotY = 0.0f;
 			entry.m_rotX = 0.0f;
@@ -1792,7 +1793,8 @@ void CMenuPcs::CalcSelectOpenAnim()
 			unsigned int artifactIndex = i - activePartyCount;
 			unsigned int fcvIndex = duration / 5;
 			float rate = (float)(450.0 / (double)(float)duration);
-			int phase = (int)(((double)duration / 10.0) * (double)(10 - artifactIndex));
+			int __p2 = artifactIndex;
+			int phase = (int)(((double)duration / 10.0) * (double)(10 - __p2));
 
 			if (frame == iconSprite->startFrame && this->m_bonusCursorFlag == 0) {
 				this->m_bonusCursorFlag = 1;
@@ -1808,7 +1810,8 @@ void CMenuPcs::CalcSelectOpenAnim()
 				angle = (float)(45.0 * (double)(8 - artifactIndex));
 			} else {
 				int last = iconSprite->timer - 1;
-				if (fcvIndex < last) {
+				int __p4 = fcvIndex;
+				if (last > __p4) {
 					srcVec.x = ((s_BonusModelScale[5] - s_BonusModelScale[4]) /
 					    ((float)phase - (float)fcvIndex)) *
 					    (float)(last - fcvIndex) - s_BonusModelScale[5];
@@ -2934,7 +2937,8 @@ void CMenuPcs::CalcResultOpenAnim()
 		base += activePartyCount;
 		for (int i = activePartyCount; i != 0; i--) {
 			int idx = base + activePartyCount - i;
-			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + idx * 0x40 + 8);
+			int __p12 = idx;
+			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + __p12 * 0x40 + 8);
 			BonusAnimSprite* icon = (BonusAnimSprite*)((int)sprite - activePartyCount * 0x40);
 			sprite->kind = -2;
 			sprite->x = 0;
@@ -2949,7 +2953,7 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		base += activePartyCount;
-		for (int i = 0; i < activePartyCount; i++) {
+		for (int i = 0; activePartyCount > i; i++) {
 			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
 			sprite->kind = -2;
 			sprite->x = 0;
@@ -3044,7 +3048,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			MenuBoardEntry& entry = boardEntries[activePartyCount + i];
 			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + ((signed char)s_CntTop + i) * 0x40 + 8);
 			int extent = sprite->w * 3 + 0x20;
-			int centerX = (int)((double)(float)((double)(sprite->w * 3) * 0.5 + (double)sprite->x) - 320.0);
+			int centerX =  (int)(long)((int)((double)(float)((double)(sprite->w * 3) * 0.5 + (double)sprite->x) - 320.0));
 			int centerY = (int)((double)(float)((double)sprite->h * 0.5 + (double)sprite->y) - 240.0);
 			entry.m_centerX = (short)centerX;
 			entry.m_centerY = (short)centerY;
@@ -3086,7 +3090,8 @@ void CMenuPcs::CalcResultOpenAnim()
 				sprite->timer++;
 				sprite->alpha = (float)((1.0 / (double)sprite->duration) * (double)sprite->timer);
 			} else {
-				doneCount++;
+				int __p5 = doneCount;
+				__p5++;
 				sprite->alpha = 1.0f;
 			}
 
@@ -3116,7 +3121,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
 		} else {
 			handle = GetBonusDisplayHandleSlots(this)[i - activePartyCount];
-			if (i < activePartyCount * 2) {
+			if (activePartyCount > i * 2) {
 				PSMTXScale(scaleMtx, 1.0f, 1.0f, 1.0f);
 			} else {
 				float modelScale = 0.5f;

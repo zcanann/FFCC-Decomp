@@ -1026,8 +1026,8 @@ void CMaterialMan::SetUnderWaterTex()
     PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
     PSMTXCopy(CameraPcs.m_cameraMatrix, matrixB);
 
-    matrixA[0][0] = screenMtx[0][0] * (kMaterialProjectionWidthScale / static_cast<float>(width));
-    matrixA[1][1] = screenMtx[1][1] * -(kMaterialProjectionHeightScale / static_cast<float>(height));
+    matrixA[0][0] = screenMtx[0][0];
+    matrixA[1][1] = screenMtx[1][1];
     matrixA[1][0] = screenMtx[1][0];
     matrixA[2][0] = screenMtx[2][0];
     matrixA[0][1] = screenMtx[0][1];
@@ -1035,6 +1035,8 @@ void CMaterialMan::SetUnderWaterTex()
     matrixA[0][2] = kMaterialProjectionCenter;
     matrixA[1][2] = kMaterialProjectionCenter;
     matrixA[2][2] = kMaterialProjectionDepthScale;
+    matrixA[0][0] *= (kMaterialProjectionWidthScale / static_cast<float>(width));
+    matrixA[1][1] *= -(kMaterialProjectionHeightScale / static_cast<float>(height));
 
     PSMTXConcat(matrixA, matrixB, m_underWaterTexMtx);
 }
@@ -2481,8 +2483,8 @@ void CMaterialMan::SetPosition(
                 continue;
             }
 
+            Vec delta;
             if (ignoreFrustumCheck != 0) {
-                Vec delta;
                 PSVECSubtract(&shadowPos, position, &delta);
                 candidateWrite->distance = PSVECSquareMag(&delta);
                 candidateWrite->shadow = shadow;
@@ -2500,7 +2502,6 @@ void CMaterialMan::SetPosition(
                         ->CheckFrustum(shadowPos, scaledShadowMtx, kMaterialShadowBoundsRadius) == 0) {
                     continue;
                 }
-                Vec delta;
                 PSVECSubtract(&shadowPos, position, &delta);
                 candidateWrite->distance = PSVECSquareMag(&delta);
                 candidateWrite->shadow = shadow;
@@ -3044,7 +3045,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
         CHUNK_VKEY = 0x564B4559,
     };
 
-    CMaterial* material = 0;
+    CMaterial* material;
     CChunkFile::CChunk chunk;
     unsigned long materialIndex = 0;
 
@@ -3412,8 +3413,8 @@ void CMaterial::Create(unsigned long tag, CMaterialMan::TEV_BIT tevBit)
     float scale = kTextureOne;
     m_bumpLight = 0;
     m_textureCount = 0;
-    m_scaleU = scale;
     m_scaleV = scale;
+    m_scaleU = scale;
     m_singleTextureFlag = 0;
     m_textureCount = static_cast<unsigned short>(tag);
 }

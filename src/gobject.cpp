@@ -1398,12 +1398,12 @@ void CGObject::update()
     PSVECAdd(&m_worldPosition, &m_groundHitOffset, &m_worldPosition);
 
     float turnDelta = Math.DstRot(m_rotTargetY, m_rotBaseY);
-    if (m_animSlotSel == -1 || !m_shieldNodeFlagBits.m_bit80) {
-        m_rotBaseY += turnDelta * m_hitNormal.x;
-    } else {
+    if (m_animSlotSel != -1 && m_shieldNodeFlagBits.m_bit80) {
         const float turnLimit = fabsf(m_turnBaseSpeed);
         turnDelta = ClampFloat(turnDelta, -turnLimit, turnLimit);
         m_rotBaseY += turnDelta;
+    } else {
+        m_rotBaseY += turnDelta * m_hitNormal.x;
     }
 
     Mtx modelMtx;

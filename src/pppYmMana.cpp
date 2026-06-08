@@ -379,28 +379,34 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
         return;
     }
 
-    if (strcmp(mesh->m_name, s_ymManaShapeObj) != 0) {
-        PSMTXCopy(mtx, mana->m_reflectionMtx);
-        if (mana->m_paraboloidReady != 0) {
-            mana->m_runtimeColor.r = mesh->m_colors[0];
-            mana->m_runtimeColor.g = mesh->m_colors[1];
-            mana->m_runtimeColor.b = mesh->m_colors[2];
-            mana->m_runtimeColor.a = 0x80;
-            DCFlushRange(&mana->m_runtimeColor, 4);
-            GXSetArray((GXAttr)0xB, mana->m_meshColors, 4);
-            GXSetArray((GXAttr)0xD, mana->m_meshTexCoords0, 4);
-            GXSetArray((GXAttr)0xE, mana->m_meshTexCoords1, 4);
-            MaterialMan.SetManaReflectionEnv(mana->m_meshReflectionVec, mana->m_generatedTexObj0, mana->m_generatedTexObj1, 0xAEE0F);
-            GXSetCullMode((GXCullMode)1);
-            GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
-            MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
-            SetEnvMap((PYmMana*)stepData, mana);
-            GXCallDisplayList(mana->m_displayListCopies[dlIndex], displayList->m_size);
-            for (int i = 0; i < 16; i++) {
-                GXSetTevKColorSel((GXTevStageID)i, (GXTevKColorSel)6);
-                GXSetTevKAlphaSel((GXTevStageID)i, (GXTevKAlphaSel)0);
+    if (draw == 1) {
+        if (strcmp(mesh->m_name, s_ymManaShapeObj) != 0) {
+            PSMTXCopy(mtx, mana->m_reflectionMtx);
+            if (mana->m_paraboloidReady != 0) {
+                mana->m_runtimeColor.r = mesh->m_colors[0];
+                mana->m_runtimeColor.g = mesh->m_colors[1];
+                mana->m_runtimeColor.b = mesh->m_colors[2];
+                mana->m_runtimeColor.a = 0x80;
+                DCFlushRange(&mana->m_runtimeColor, 4);
+                GXSetArray((GXAttr)0xB, mana->m_meshColors, 4);
+                GXSetArray((GXAttr)0xD, mana->m_meshTexCoords0, 4);
+                GXSetArray((GXAttr)0xE, mana->m_meshTexCoords1, 4);
+                MaterialMan.SetManaReflectionEnv(mana->m_meshReflectionVec, mana->m_generatedTexObj0, mana->m_generatedTexObj1, 0xAEE0F);
+                GXSetCullMode((GXCullMode)1);
+                GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
+                MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
+                SetEnvMap((PYmMana*)stepData, mana);
+                GXCallDisplayList(mana->m_displayListCopies[dlIndex], displayList->m_size);
+                for (int i = 0; i < 16; i++) {
+                    GXSetTevKColorSel((GXTevStageID)i, (GXTevKColorSel)6);
+                    GXSetTevKAlphaSel((GXTevStageID)i, (GXTevKAlphaSel)0);
+                }
             }
+            return;
         }
+    }
+
+    if (strcmp(mesh->m_name, s_ymManaShapeObj) != 0) {
         return;
     }
 

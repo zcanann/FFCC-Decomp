@@ -2225,9 +2225,7 @@ void CGPartyObj::statCharge()
 					CVector dest(m_comboCenter);
 					if ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 0x32) & 0x10) != 0) {
 						unsigned int maxReach = *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x70);
-						if (mag <= static_cast<float>(maxReach)) {
-							mag = FLOAT_80331a78;
-						} else {
+						if (static_cast<float>(maxReach) < mag) {
 							CVector dir(delta);
 							CVector scaled;
 							PSVECScale(reinterpret_cast<Vec*>(&dir), reinterpret_cast<Vec*>(&scaled), mag - static_cast<float>(maxReach));
@@ -2240,6 +2238,8 @@ void CGPartyObj::statCharge()
 							dest.y = sum.y;
 							dest.z = sum.z;
 							mag = mag - static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x70));
+						} else {
+							mag = FLOAT_80331a78;
 						}
 					}
 					if (FLOAT_80331a78 != mag) {

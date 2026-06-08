@@ -167,10 +167,10 @@ extern "C" const float sZeroFloat;
 
 static inline float WrapAnimFrame(float value, float span)
 {
-    if (sZeroFloat <= value) {
-        return fmodf(value, span);
+    if (value < sZeroFloat) {
+        return (span - sAnimFrameOffset) - fmodf(-value, span);
     }
-    return (span - sAnimFrameOffset) - fmodf(-value, span);
+    return fmodf(value, span);
 }
 
 static const float sBgDefaultGravityY = 0.0;
@@ -487,9 +487,6 @@ void CGObject::move()
     bool hasStickInput = false;
     m_groundHitOffset.y += m_gravityY;
     Vec moveVec;
-    moveVec.x = sZeroFloat;
-    moveVec.y = sZeroFloat;
-    moveVec.z = sZeroFloat;
 
     if (m_weaponNodeFlagAll.m_bits1.m_bit20) {
         int scriptMoveEnd = 0;
@@ -1517,7 +1514,7 @@ void CGObject::update()
         }
     }
 
-    if (m_weaponNodeFlagBits.m_attached && m_attachOwner != 0 && HasLoadedModel(m_attachOwner->m_charaModelHandle)) {
+    if (m_weaponNodeFlagBits.m_attached) {
         CChara::CModel* ownerModel = m_attachOwner->m_charaModelHandle->m_model;
         PSMTXCopy(ModelNodeMtx(ownerModel, m_attachNode), modelMtx);
 
@@ -1567,7 +1564,7 @@ void CGObject::update()
             PSVECSubtract(&m_worldPosition, &m_lookAtTarget->m_worldPosition, &lookDelta);
 
             float targetNodeY = m_lookAtTarget->unk_0x184;
-            if (m_lookAtTargetNodeIndex != -1 && HasLoadedModel(m_lookAtTarget->m_charaModelHandle)) {
+            if (m_lookAtTargetNodeIndex != -1) {
                 targetNodeY = ModelNodeMtx(m_lookAtTarget->m_charaModelHandle->m_model, m_lookAtTargetNodeIndex)[1][3];
             }
             lookDelta.y += unk_0x184 - targetNodeY;
@@ -1722,10 +1719,10 @@ void CGObject::update()
                     const float animSpan = sAnimFrameOffset + (ModelAnimEnd(m_charaModelHandle->m_model) - ModelAnimStart(m_charaModelHandle->m_model));
                     if (animSpan == sAnimFrameOffset) {
                         animFinished = true;
-                    } else if (m_lastBgAttr >= sZeroFloat) {
-                        animFinished = animSpan - sAnimFrameOffset < ModelTime(m_charaModelHandle->m_model);
-                    } else {
+                    } else if (m_lastBgAttr < sZeroFloat) {
                         animFinished = ModelTime(m_charaModelHandle->m_model) <= sZeroFloat;
+                    } else {
+                        animFinished = animSpan - sAnimFrameOffset < ModelTime(m_charaModelHandle->m_model);
                     }
                 }
             } else {

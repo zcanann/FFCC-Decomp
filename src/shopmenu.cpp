@@ -2719,13 +2719,13 @@ void CShopMenu::Calc()
     case 1:
         if ((GetPadButtons() & 4) != 0) {
             ++choice;
-            if (choice > 2) {
+            if (choice >= 3) {
                 choice = 0;
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else if ((GetPadButtons() & 8) != 0) {
             --choice;
-            if (choice > 2) {
+            if (choice >= 3) {
                 choice = 2;
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);

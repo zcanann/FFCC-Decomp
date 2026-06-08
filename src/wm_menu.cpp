@@ -4154,8 +4154,7 @@ void CMenuPcs::DrawMainMenu()
 
 	DrawMainMenuSub();
 	PSMTXCopy(reinterpret_cast<float(*)[4]>(bytes + 0x744), CameraPcs.m_cameraMatrix);
-	unsigned int clearColor = 0;
-	GXSetCopyClear(*reinterpret_cast<GXColor*>(&clearColor), 0xFFFFFF);
+	GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0xFFFFFF);
 	Mtx44 projectionMtx;
 	PSMTX44Copy(CameraPcs.m_screenMatrix, projectionMtx);
 	GXSetProjection(projectionMtx, GX_PERSPECTIVE);

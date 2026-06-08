@@ -1992,7 +1992,7 @@ void CShopMenu::Draw()
     float fade = m_fade;
     if (FLOAT_80332d28 != fade) {
         int fadeStep = static_cast<int>(FLOAT_80332de0 * fade);
-        signed char alpha = static_cast<unsigned char>(0xFF - (fadeStep & 0xFF));
+        unsigned char alpha = static_cast<unsigned char>(0xFF - (fadeStep & 0xFF));
 
         Graphic.SetDrawDoneDebugData(0x32);
 
@@ -2705,7 +2705,7 @@ void CShopMenu::SelectFigure()
 {
     if ((GetPadButtons() & 1) != 0) {
         ++m_figureMode;
-        if (m_figureMode >= 2) {
+        if (m_figureMode > 1) {
             m_figureMode = 1;
             Sound.PlaySe(4, 0x40, 0x7F, 0);
         } else {

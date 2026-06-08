@@ -1170,7 +1170,32 @@ void CMenuPcs::CalcSelectWait()
 	}
 	int unavailableMask = GetBonusUnavailableMask(statePtr, currentParty);
 
-	if (promptMode == 3) {
+	if (promptMode != 3) {
+		if (promptMode == 1) {
+			if ((repeat & 3) == 0) {
+				if ((down & 0x100) == 0) {
+					if ((down & 0x200) != 0) {
+						promptMode = 2;
+						confirmSel = 1;
+						Sound.PlaySe(3, 0x40, 0x7f, 0);
+					}
+				} else {
+					promptMode = 2;
+					Sound.PlaySe(2, 0x40, 0x7f, 0);
+				}
+			} else {
+				confirmSel = (short)(confirmSel ^ 1);
+				Sound.PlaySe(1, 0x40, 0x7f, 0);
+			}
+		} else if (promptMode == 2) {
+			if (window->frame == 1 && confirmSel == 0) {
+				delay = 10;
+				*(unsigned char*)(statePtr + 8) = 0xff;
+			}
+		} else {
+			promptMode = 3;
+		}
+	} else {
 		if (delay == 0 && currentPartyIndex < activePartyCount) {
 			if ((repeat & 9) != 0) {
 				selection = (short)(selection + 1);
@@ -1220,29 +1245,6 @@ void CMenuPcs::CalcSelectWait()
 		} else {
 			delay = 0;
 		}
-	} else if (promptMode == 1) {
-		if ((repeat & 3) == 0) {
-			if ((down & 0x100) == 0) {
-				if ((down & 0x200) != 0) {
-					promptMode = 2;
-					confirmSel = 1;
-					Sound.PlaySe(3, 0x40, 0x7f, 0);
-				}
-			} else {
-				promptMode = 2;
-				Sound.PlaySe(2, 0x40, 0x7f, 0);
-			}
-		} else {
-			confirmSel = (short)(confirmSel ^ 1);
-			Sound.PlaySe(1, 0x40, 0x7f, 0);
-		}
-	} else if (promptMode == 2) {
-		if (window->frame == 1 && confirmSel == 0) {
-			delay = 10;
-			*(unsigned char*)(statePtr + 8) = 0xff;
-		}
-	} else {
-		promptMode = 3;
 	}
 
 	float* base = s_Base[0];

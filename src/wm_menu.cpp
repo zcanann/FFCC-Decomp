@@ -8381,7 +8381,9 @@ void CMenuPcs::PCAnimCtrl()
 			reinterpret_cast<float*>(animState)[4] = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xC0)[0];
 		} else {
 		frameStep:
-			if (frameEnd <= frame) {
+			if (frame < frameEnd) {
+				handle->m_model->AddFrame(FLOAT_80331698);
+			} else {
 				if (animState[0] == 3 || animState[0] == 4 || animState[0] == 5) {
 					animState[0] = 0;
 					handle->SetAnim((static_cast<int>(static_cast<unsigned int>(GetWmCharaHandles(this)[i]->m_charaNo) / 100) - 1) * 6 + animState[0], -1, -1, blendMode, 0);
@@ -8394,8 +8396,6 @@ void CMenuPcs::PCAnimCtrl()
 					}
 				}
 				handle->m_model->SetFrame(FLOAT_803313dc);
-			} else {
-				handle->m_model->AddFrame(FLOAT_80331698);
 			}
 			animState[2]++;
 		}

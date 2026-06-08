@@ -446,7 +446,9 @@ int CGMonObj::calcBranchFuncGolem(int)
 	}
 
 	unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
-	return static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(script[0x1C / 2] >= (script[0x1A / 2] >> 1)))) >> 5;
+	return static_cast<unsigned int>(
+	           __cntlzw(script[0x1C / 2] >= static_cast<int>(static_cast<unsigned int>(script[0x1A / 2]) >> 1))) >>
+	       5;
 }
 
 /*

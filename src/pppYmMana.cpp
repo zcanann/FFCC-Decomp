@@ -152,14 +152,14 @@ void SetEnvMap(PYmMana*, VYmMana* vYmMana)
     _GXColor alphaOnly;
     _GXColor whiteAlpha;
     _GXColor white;
-    white.r = 0xff;
-    white.g = 0xff;
     alphaOnly.r = 0x00;
     alphaOnly.g = 0x00;
-    alphaOnly.b = 0x00;
-    alphaOnly.a = alpha;
+    white.r = 0xff;
+    white.g = 0xff;
     white.b = 0xff;
     white.a = 0xff;
+    alphaOnly.b = 0x00;
+    alphaOnly.a = alpha;
     whiteAlpha.r = 0xff;
     whiteAlpha.g = 0xff;
     whiteAlpha.b = 0xff;
@@ -1760,8 +1760,8 @@ void CalcReflectionVector2(
             uv.y *= half;
             uv.x += half;
             uv.y += half;
-            uv.x = -(scale * (warp * (uv.x - half)) - uv.x);
-            uv.y = -(scale * (warp * (uv.y - half)) - uv.y);
+            uv.x = uv.x - scale * (warp * (uv.x - half));
+            uv.y = uv.y - scale * (warp * (uv.y - half));
             gUtil.ConvF2IVector2d(texCoordA[posIndex], uv, 12);
 
             denom = denomBias - reflectionVec[posIndex].z;

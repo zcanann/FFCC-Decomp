@@ -3389,7 +3389,7 @@ void CGCharaObj::combi2()
 				continue;
 			}
 
-			if (PSVECDistance(&CharaObjComboCenter(party), &CharaObjComboCenter(other)) < kQuadObjDebugHeight) {
+			if (PSVECDistance(&CharaObjComboCenter(candidates[i]), &CharaObjComboCenter(other)) < kQuadObjDebugHeight) {
 				hasNearbyPartner = 1;
 				break;
 			}

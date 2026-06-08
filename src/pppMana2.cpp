@@ -716,6 +716,7 @@ void CalcReflectionVector2(
         u8 drawFmt = *(u8*)dl;
         u16 itemCount = *(u16*)((u8*)dl + 1);
         unsigned int i;
+        u32 fmt = drawFmt & 7;
 
         if (gUtil.IsHasDrawFmtDL(drawFmt) == 0) {
             break;
@@ -732,7 +733,7 @@ void CalcReflectionVector2(
             u8* clr;
 
             dl += 4;
-            if ((drawFmt & 7) == 2) {
+            if (fmt == 2) {
                 dl++;
             }
 
@@ -882,7 +883,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     PSMTXIdentity(identityMtx);
     PSMTXCopy(CameraMatrix(), savedCameraMtx);
     PSMTX44Copy(CameraScreenMatrix(), savedScreenMtx);
-    Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &sceneTexObj, 0, 0, 0x80, 0x80, 0, GX_NEAR, GX_TF_RGBA8, 0);
+    Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &sceneTexObj, 0, 0, 0x80, 0x80, 0, GX_LINEAR, GX_TF_RGBA8, 0);
 
     gObject = work->m_object;
     if (gObject == NULL) {
@@ -910,7 +911,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     sourceTexObjs = work->m_sourceTexObjs;
 
     if (step->m_rippleLevel != 0) {
-        Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &depthTexObj, 0, 0, 0x80, 0x80, depthTexSize, GX_LINEAR,
+        Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &depthTexObj, 0, 0, 0x80, 0x80, depthTexSize, GX_NEAR,
                                    (_GXTexFmt)0x16, 1);
         GXSetViewport(LoadFloat(kMana2Zero), LoadFloat(kMana2Zero), LoadFloat(kMana2ParaboloidTexSize),
                       LoadFloat(kMana2ParaboloidTexSize), LoadFloat(kMana2Zero), LoadFloat(kMana2One));

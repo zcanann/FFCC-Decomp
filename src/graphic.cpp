@@ -899,7 +899,7 @@ void CGraphic::DrawDebugStringDirect(unsigned long x, unsigned long y, char* tex
                 lineStart++;
 
                 GXWGFifo.s16 = px;
-                GXWGFifo.s16 = (s16)y;
+                GXWGFifo.u16 = (s16)y;
                 GXWGFifo.s16 = 0;
                 GXWGFifo.s16 = tx;
                 GXWGFifo.s16 = ty;

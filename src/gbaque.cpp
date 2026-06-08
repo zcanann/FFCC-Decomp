@@ -3005,7 +3005,7 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 
 	crc[0] = 0xFFFF;
 	if (Joybus.Crc16(0x10, reinterpret_cast<unsigned char*>(localInfo.m_name), crc) != localInfo.m_crc) {
-		if (System.m_execParam != 0) {
+		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
 			System.Printf(const_cast<char*>(s_cmake_name_crc_error), const_cast<char*>(s_gbaque_cpp), 0xAD3);
 		}
 		Joybus.SendResult(channel, 1, localInfo.m_resultCode, 0);
@@ -3346,7 +3346,7 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 		count++;
 	}
 
-	if ((count > 4) && (System.m_execParam != 0)) {
+	if ((count > 4) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
 		System.Printf(const_cast<char*>(s_compatibility_data_error));
 	}
 
@@ -4346,7 +4346,7 @@ int GbaQueue::MakeArtiData(int channel, char* outData)
 {
 	char* itemNameScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x100F) char[kGbaQueueScratchTextSize];
 	if (itemNameScratch == 0) {
-		if (System.m_execParam != 0) {
+		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
 			System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp),
 			              0x1011);
 		}
@@ -4356,7 +4356,7 @@ int GbaQueue::MakeArtiData(int channel, char* outData)
 
 	char* agbStringScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x1017) char[kGbaQueueScratchTextSize];
 	if (agbStringScratch == 0) {
-		if (System.m_execParam != 0) {
+		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
 			System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp),
 			              0x1019);
 		}

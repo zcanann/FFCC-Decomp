@@ -169,17 +169,15 @@ static inline float ClampFloat(float value, float minValue, float maxValue)
     return value;
 }
 
+extern "C" float sAnimFrameOffset;
+extern "C" const float sZeroFloat;
+
 static inline float WrapAnimFrame(float value, float span)
 {
-    if (span <= 0.0f) {
-        return 0.0f;
+    if (sZeroFloat <= value) {
+        return fmodf(value, span);
     }
-
-    float wrapped = fmodf(value, span);
-    if (wrapped < 0.0f) {
-        wrapped += span;
-    }
-    return wrapped;
+    return (span - sAnimFrameOffset) - fmodf(-value, span);
 }
 
 static const float sBgDefaultGravityY = 0.0;
@@ -1714,16 +1712,18 @@ void CGObject::update()
                 if (pointCount > 0) {
                     const float animSpan =
                         sAnimFrameOffset + (ModelAnimEnd(m_charaModelHandle->m_model) - ModelAnimStart(m_charaModelHandle->m_model));
-                    const float prevWrapped = WrapAnimFrame(prevTime, animSpan);
-                    const float nextWrapped = WrapAnimFrame(frameStep, animSpan);
-                    const bool wrapped = nextWrapped < prevWrapped && frameStep >= prevTime;
+                    float prevWrapped = WrapAnimFrame(prevTime, animSpan);
+                    float nextWrapped = WrapAnimFrame(frameStep, animSpan);
+                    if (frameStep < prevTime) {
+                        prevWrapped = (animSpan - sAnimFrameOffset) - prevWrapped;
+                        nextWrapped = (animSpan - sAnimFrameOffset) - nextWrapped;
+                    }
 
                     for (int i = 0; i < pointCount; i++) {
                         const unsigned short pointFrame = *reinterpret_cast<unsigned short*>(animRefBytes + 0x30 + i * 4);
                         const short pointValue = *reinterpret_cast<short*>(animRefBytes + 0x32 + i * 4);
-                        const float eventFrame = WrapAnimFrame(static_cast<float>(pointFrame) + ModelAnimStart(m_charaModelHandle->m_model), animSpan);
-                        if ((!wrapped && prevWrapped < eventFrame && eventFrame <= nextWrapped) ||
-                            (wrapped && (eventFrame > prevWrapped || eventFrame <= nextWrapped))) {
+                        const float eventFrame = static_cast<float>(pointFrame) + ModelAnimStart(m_charaModelHandle->m_model);
+                        if (prevWrapped < eventFrame && (eventFrame <= nextWrapped || nextWrapped < prevWrapped)) {
                             CFlatRuntime::CStack stackIn[2];
                             stackIn[0].m_word = static_cast<unsigned int>(m_animSlotSel);
                             stackIn[1].m_word = static_cast<unsigned int>(pointValue);

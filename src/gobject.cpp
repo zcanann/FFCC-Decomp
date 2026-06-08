@@ -1734,13 +1734,22 @@ void CGObject::update()
         }
 
         if (m_currentAnimSlot != -1 && (weaponFlagsHi & 0x1) == 0) {
-            bool animFinished = true;
-            if (ModelAnim(m_charaModelHandle->m_model) != 0) {
-                const float animSpan = sAnimFrameOffset + (ModelAnimEnd(m_charaModelHandle->m_model) - ModelAnimStart(m_charaModelHandle->m_model));
-                if (animSpan != sAnimFrameOffset) {
-                    animFinished = m_lastBgAttr >= sZeroFloat ? (ModelTime(m_charaModelHandle->m_model) >= animSpan - sAnimFrameOffset)
-                                                            : (ModelTime(m_charaModelHandle->m_model) <= sZeroFloat);
+            bool animFinished = HasLoadedModel(m_charaModelHandle);
+            if (animFinished && m_currentAnimSlot != -1) {
+                if (ModelAnim(m_charaModelHandle->m_model) == 0) {
+                    animFinished = true;
+                } else {
+                    const float animSpan = sAnimFrameOffset + (ModelAnimEnd(m_charaModelHandle->m_model) - ModelAnimStart(m_charaModelHandle->m_model));
+                    if (animSpan == sAnimFrameOffset) {
+                        animFinished = true;
+                    } else if (m_lastBgAttr >= sZeroFloat) {
+                        animFinished = animSpan - sAnimFrameOffset < ModelTime(m_charaModelHandle->m_model);
+                    } else {
+                        animFinished = ModelTime(m_charaModelHandle->m_model) <= sZeroFloat;
+                    }
                 }
+            } else {
+                animFinished = true;
             }
 
             if (animFinished) {

@@ -6518,7 +6518,7 @@ void CMenuPcs::CalcFukidashi()
 #define WOBJ() reinterpret_cast<int>(m_wm.m_worldObjData)
 
 #define BUB() reinterpret_cast<int>(m_wm.m_bubbleData)
-	*reinterpret_cast<short*>(BUB()) = *reinterpret_cast<short*>(bytes + 0x1C);
+	*reinterpret_cast<unsigned short*>(BUB()) = *reinterpret_cast<short*>(bytes + 0x1C);
 	*reinterpret_cast<short*>(BUB() + 2) = *reinterpret_cast<short*>(bytes + 0x1E);
 	*reinterpret_cast<short*>(BUB() + 4) = 0xF0;
 	*reinterpret_cast<short*>(BUB() + 6) = 0xC4;
@@ -6664,7 +6664,7 @@ void CMenuPcs::CalcFukidashi()
 	        static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(BUB())))));
 	float fVar2 = FLOAT_803314a4;
 	fVar1 = FLOAT_803313dc;
-	unsigned short uVar3 = *reinterpret_cast<unsigned short*>(bytes + 0x1A);
+	unsigned short uVar3 = *reinterpret_cast<short*>(bytes + 0x1A);
 	if ((uVar3 & 0x3F0) != 0) {
 		sVar15 = 0x6C;
 	}
@@ -7827,7 +7827,7 @@ void CMenuPcs::DrawWMFrame()
 			unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 			int dispValue =
 			    bytes[0xA] & 2
-			        ? *reinterpret_cast<int*>(&Game.m_gameWork.m_scriptSysVal0) + static_cast<signed char>(bytes[0xB])
+			        ? *reinterpret_cast<int*>(&Game.m_gameWork.m_scriptSysVal0) + static_cast<unsigned char>(bytes[0xB])
 			        : *reinterpret_cast<int*>(&Game.m_gameWork.m_scriptSysVal0) + static_cast<signed char>(bytes[0xC]);
 			int digitCnt = (dispValue > 9) + 1;
 			if (dispValue > 99) {
@@ -7904,7 +7904,7 @@ void CMenuPcs::DrawWMFrame()
 				} else if (language == 2) {
 					suffixY += FLOAT_80331550;
 				}
-				unsigned char alphaU8 =
+				signed char alphaU8 =
 				    static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(*reinterpret_cast<float*>(off + 0x10))));
 				MenuPcs.SetAttrFmt((FMT)0);
 				GXColor color;
@@ -10395,14 +10395,14 @@ input_check_done:
 		}
 
 		for (int i = 0; i < 5; i++) {
-			const short curState = m_wmWorldState->m_mainState;
+			const unsigned short curState = m_wmWorldState->m_mainState;
 			if (!(((curState > 0) && (curState < 4)) || i == 1)) {
 				continue;
 			}
 
 			unsigned char* const panel = worldObj + i * 0x50;
 			*reinterpret_cast<int*>(panel) = 1;
-			unsigned int frame = 0;
+			int frame = 0;
 			float modelScale = FLOAT_803315d4;
 			if (i == 0) {
 				modelScale = static_cast<float>(static_cast<double>(modelScale) * DOUBLE_803315D8);

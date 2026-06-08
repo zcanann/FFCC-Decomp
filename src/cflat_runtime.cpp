@@ -604,7 +604,7 @@ int CFlatRuntime::Frame(int mode, int unused)
 						object->m_0x34 = static_cast<s16>(object->m_0x34 & ~(1U << scriptIndex));
 
 						scriptIndex = 0x1F;
-						scriptMask = static_cast<unsigned int>(static_cast<short>(object->m_0x34));
+						scriptMask = static_cast<unsigned int>(static_cast<unsigned short>(object->m_0x34));
 
 						for (int frameScan2 = 0; frameScan2 < 4; frameScan2++) {
 							for (int bit = 0; bit < 8; bit++) {

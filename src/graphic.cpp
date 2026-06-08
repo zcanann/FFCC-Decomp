@@ -520,7 +520,7 @@ void CGraphic::Thread()
             if (debugCountdown == 0) {
                 u32 drawSyncRaw = GXReadDrawSync();
                 drawSyncRaw &= 0xFFFF;
-                int drawSyncPart = drawSyncRaw;
+                unsigned int drawSyncPart = drawSyncRaw;
                 if ((drawSyncRaw & 0x8000) != 0) {
                     drawSyncPart &= 0x7FFF;
                     if (drawSyncPart == 0x7FFF) {
@@ -1639,7 +1639,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		if (depthAlphaNear > 0xFF) {
 			depthAlphaNear = 0xFF;
 		}
-		nearAlpha = (unsigned char)depthAlphaNear;
+		nearAlpha = (signed char)depthAlphaNear;
 		hasNearAlpha = 1;
 	}
 
@@ -1956,7 +1956,7 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
     GXSetNumTexGens(1);
 
     int blurOffsetInt = offset;
-    int negativeBlurOffset = -blurOffsetInt;
+    unsigned int negativeBlurOffset = -blurOffsetInt;
     int textureOffset = 0;
     for (int i = 0; i < static_cast<int>(m_blurTextureCount); i++) {
         u8* textureBase = reinterpret_cast<u8*>(m_savedFrameBuffer) + textureOffset;

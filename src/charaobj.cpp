@@ -3204,7 +3204,7 @@ int CGCharaObj::calcCastTime(int itemId)
 		unsigned int playerCid = (static_cast<unsigned int>(__cntlzw(0x6D - static_cast<int>(static_cast<unsigned short>(GetCID()) & 0x6D))) >> 5) & 0xFFU;
 		unsigned int castReduction = playerCid != 0 ? static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBD8)) : 0;
 		int totalCast = static_cast<int>(baseCast + castBonus) - static_cast<int>(castReduction);
-		int cast = static_cast<int>(castScale * static_cast<float>(totalCast));
+		unsigned int cast = static_cast<int>(castScale * static_cast<float>(totalCast));
 		System.Printf(fmt + 0x74, baseCast, castBonus, castScale);
 		return cast & ~(cast >> 31);
 	}

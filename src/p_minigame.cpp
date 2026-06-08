@@ -982,24 +982,27 @@ comm_fail:
         param[0xC4] = 0;
         *reinterpret_cast<int*>(param + 0x9C) = 1;
         param[0xC3] = 0;
-        *reinterpret_cast<int*>(param + 0x98) = SIProbe(channel);
-        if (*reinterpret_cast<int*>(param + 0x98) == 0x80)
         {
-            retryLine = 0x2CB;
-            goto retry_sleep;
-        }
-        if (*reinterpret_cast<int*>(param + 0x98) == 0x40000)
-        {
-            *reinterpret_cast<int*>(param + 0x94) = 0x40000;
-            param[0xBF] = 0;
-        }
-        else
-        {
-            if (*reinterpret_cast<int*>(param + 0x98) != 8 && *reinterpret_cast<int*>(param + 0x98) != 0x40)
+            int probe = SIProbe(channel);
+            *reinterpret_cast<int*>(param + 0x98) = probe;
+            if (probe == 0x80)
             {
-                *reinterpret_cast<int*>(param + 0x94) = *reinterpret_cast<int*>(param + 0x98);
+                retryLine = 0x2CB;
+                goto retry_sleep;
             }
-            param[0xBF] = 1;
+            if (probe == 0x40000)
+            {
+                *reinterpret_cast<int*>(param + 0x94) = 0x40000;
+                param[0xBF] = 0;
+            }
+            else
+            {
+                if (probe != 8 && probe != 0x40)
+                {
+                    *reinterpret_cast<int*>(param + 0x94) = probe;
+                }
+                param[0xBF] = 1;
+            }
         }
         goto receive_message;
     case 7:

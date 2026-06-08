@@ -937,6 +937,22 @@ int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder&
     const f32 radiusSq = radius * radius;
 
     if (fabs(vz) < 1.0f) {
+        goto cylinder_body;
+    }
+
+    {
+        f32 disc = radiusSq - px * px - py * py;
+        if (disc < 0.0f) {
+            return 0;
+        }
+
+        disc = sqrtf(disc);
+        outT = (-(pz + disc)) * tScale;
+        return 1;
+    }
+
+cylinder_body:
+    {
         const f32 radialC = (px * px + py * py) - radiusSq;
         const f32 radialB = px * vx + py * vy;
         const f32 radialA = vx * vx + vy * vy;
@@ -1037,13 +1053,4 @@ int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder&
 
         return 0;
     }
-
-    f32 disc = radiusSq - px * px - py * py;
-    if (disc < 0.0f) {
-        return 0;
-    }
-
-    disc = sqrtf(disc);
-    outT = (-(pz + disc)) * tScale;
-    return 1;
 }

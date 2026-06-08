@@ -531,7 +531,7 @@ static inline CFont* GetWmFont(CMenuPcs* menu)
 
 static inline void CalcWmFrame0Inline(CMenuPcs* menu, int param)
 {
-	unsigned char* const frame = menu->m_wm.m_frameInfo;
+#define frame (menu->m_wm.m_frameInfo)
 
 	*reinterpret_cast<short*>(frame + 4) = 0x10;
 	int frameAddr = reinterpret_cast<int>(frame);
@@ -561,6 +561,7 @@ static inline void CalcWmFrame0Inline(CMenuPcs* menu, int param)
 		*reinterpret_cast<short*>(frame + 0x20) =
 		    static_cast<short>(static_cast<int>(static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(frame + 0x20))) + offset));
 	}
+#undef frame
 }
 
 static inline void QueueWmCharaAnimState(CMenuPcs* menu, int slot, int state)
@@ -1203,8 +1204,7 @@ void CMenuPcs::loadData()
 	}
 
 	{
-		int* animState = m_wmCharaAnimState;
-		for (int i = 0; i < 8; i++, animState += 5) {
+		for (int i = 0; i < 8; i++) {
 			CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[i];
 			if (handle->m_charaKind != 3) {
 				const unsigned int charaBase = static_cast<unsigned int>(handle->m_charaNo) / 100;
@@ -1216,13 +1216,13 @@ void CMenuPcs::loadData()
 				GetWmCharaHandles(this)[i]->LoadAnim(s_wmCharaAnimGlad, animBase + 3, 3, 0, modelNo, -1, 0);
 				GetWmCharaHandles(this)[i]->LoadAnim(s_wmCharaAnimSleep, animBase + 4, 1, 0, modelNo, -1, 0);
 				GetWmCharaHandles(this)[i]->LoadAnim(s_wmCharaAnimAngry, animBase + 5, 1, 0, modelNo, -1, 0);
-				animState[0] = 0;
-				animState[1] = -1;
-				animState[2] = rand() % 250;
+				(m_wmCharaAnimState + i * 5)[0] = 0;
+				(m_wmCharaAnimState + i * 5)[1] = -1;
+				(m_wmCharaAnimState + i * 5)[2] = rand() % 250;
 				GetWmCharaHandles(this)[i]->SetAnim(animBase, -1, -1, 0, 0);
-				animState[3] = *reinterpret_cast<int*>(
+				(m_wmCharaAnimState + i * 5)[3] = *reinterpret_cast<int*>(
 				    reinterpret_cast<unsigned char*>(GetWmCharaHandles(this)[i]->m_model) + 0xB4);
-				animState[4] = *reinterpret_cast<int*>(
+				(m_wmCharaAnimState + i * 5)[4] = *reinterpret_cast<int*>(
 				    reinterpret_cast<unsigned char*>(GetWmCharaHandles(this)[i]->m_model) + 0xC0);
 				float maxWait = static_cast<float>(
 				    static_cast<double>(*reinterpret_cast<unsigned short*>(
@@ -1248,7 +1248,7 @@ void CMenuPcs::loadData()
 	m_wm.m_handles[1]->SetAnim(0, -1, -1, -1, 0);
 
 	{
-		unsigned char* const worldState = reinterpret_cast<unsigned char*>(m_wmWorldState);
+#define worldState (reinterpret_cast<unsigned char*>(m_wmWorldState))
 		*reinterpret_cast<short*>(worldState + 0x1C) = 0;
 		*reinterpret_cast<short*>(worldState + 0x36) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[0]);
 		*reinterpret_cast<short*>(worldState + 0x3E) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[0]);
@@ -1258,6 +1258,7 @@ void CMenuPcs::loadData()
 		*reinterpret_cast<short*>(worldState + 0x42) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[2]);
 		*reinterpret_cast<short*>(worldState + 0x3C) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[3]);
 		*reinterpret_cast<short*>(worldState + 0x44) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[3]);
+#undef worldState
 	}
 
 	char fontPath[128];
@@ -1942,15 +1943,14 @@ void CMenuPcs::CalcDiaryMenu()
 	case 3:
 		if (m_singleCmakeMode == 0) {
 			if (m_wmWorldState->m_modelFlagsInitialized == 0) {
-				unsigned char* const modelData = m_wm.m_charaModelData;
-				modelData[0x0C] = 1;
-				modelData[0x40] = 1;
-				modelData[0x74] = 1;
-				modelData[0xA8] = 1;
-				modelData[0xDC] = 1;
-				modelData[0x110] = 1;
-				modelData[0x144] = 1;
-				modelData[0x178] = 1;
+				m_wm.m_charaModelData[0x0C] = 1;
+				m_wm.m_charaModelData[0x40] = 1;
+				m_wm.m_charaModelData[0x74] = 1;
+				m_wm.m_charaModelData[0xA8] = 1;
+				m_wm.m_charaModelData[0xDC] = 1;
+				m_wm.m_charaModelData[0x110] = 1;
+				m_wm.m_charaModelData[0x144] = 1;
+				m_wm.m_charaModelData[0x178] = 1;
 				m_wmWorldState->m_modelFlagsInitialized = 1;
 			}
 			if (m_wmWorldState->m_mainState <= 4) {
@@ -5084,7 +5084,7 @@ void CMenuPcs::DrawMoveMenu()
 
 	if (worldState->m_mainState > 0 && worldState->m_mainState < 3) {
 		unsigned char* const worldObj = m_wm.m_worldObjData;
-		CCharaPcs::CHandle* const handle = reinterpret_cast<CCharaPcs::CHandle*>(reinterpret_cast<unsigned int*>(bytes + 0x788)[0]);
+#define handle (reinterpret_cast<CCharaPcs::CHandle*>(reinterpret_cast<unsigned int*>(bytes + 0x788)[0]))
 		Mtx savedCamera;
 		Mtx lookAtMtx;
 		Mtx44 projectionMtx;
@@ -5147,6 +5147,7 @@ void CMenuPcs::DrawMoveMenu()
 		Graphic.SetViewport();
 		GXSetScissor(0, 0, 0x280, 0x1C0);
 		DrawInit();
+#undef handle
 	}
 
 	if (worldState->m_mainState != 2 || bytes[0x13] != 0) {
@@ -6911,11 +6912,11 @@ void CMenuPcs::CalcFukidashi()
 		rotXMtx[2][3] = *reinterpret_cast<float*>(puVar20 + 9);
 		PSMTXConcat(rotXMtx, scaleMtx, scaleMtx);
 
-		CChara::CModel* const modelPtr =
-		    *reinterpret_cast<CChara::CModel**>(*reinterpret_cast<int*>(bytes + 0x7F4 + modelIdx * 4) + 0x168);
+#define modelPtr (*reinterpret_cast<CChara::CModel**>(*reinterpret_cast<int*>(bytes + 0x7F4 + modelIdx * 4) + 0x168))
 		modelPtr->SetMatrix(scaleMtx);
 		modelPtr->CalcMatrix();
 		modelPtr->CalcSkin();
+#undef modelPtr
 
 		puVar20[1] = puVar20[1] + 1;
 		if (static_cast<double>(static_cast<float>(static_cast<double>(puVar20[1]))) >=
@@ -7051,11 +7052,11 @@ void CMenuPcs::CalcFukidashi()
 				rxMtx[2][3] = *reinterpret_cast<float*>(puVar20 + 9);
 				PSMTXConcat(rxMtx, sMtx, sMtx);
 
-				CChara::CModel* const mdl =
-				    *reinterpret_cast<CChara::CModel**>(*reinterpret_cast<int*>(bytes + 0x7F4 + (padIdx + 8) * 4) + 0x168);
+#define mdl (*reinterpret_cast<CChara::CModel**>(*reinterpret_cast<int*>(bytes + 0x7F4 + (padIdx + 8) * 4) + 0x168))
 				mdl->SetMatrix(sMtx);
 				mdl->CalcMatrix();
 				mdl->CalcSkin();
+#undef mdl
 
 				puVar20[1] = puVar20[1] + 1;
 				if (static_cast<double>(static_cast<float>(static_cast<double>(puVar20[1]))) >=
@@ -7561,11 +7562,10 @@ LAB_calc:
 			if (i != 0 && uVar14 != 2) {
 				break;
 			}
-			int base = reinterpret_cast<int>(m_wm.m_frameData);
 			float fVar1 = static_cast<float>(
-			    static_cast<double>(static_cast<float>(10 - *reinterpret_cast<int*>(base + 8))) / dE8);
-			*reinterpret_cast<float*>(base + off + 0xC4) = fVar1;
-			*reinterpret_cast<float*>(base + off + 200) =
+			    static_cast<double>(static_cast<float>(10 - *reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_frameData) + 8))) / dE8);
+			*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + off + 0xC4) = fVar1;
+			*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + off + 200) =
 			    static_cast<float>(dF8 * static_cast<double>(fVar1) + dF8);
 
 			int entry = reinterpret_cast<int>(m_wm.m_frameData) + off;
@@ -10241,9 +10241,10 @@ void CMenuPcs::SetAnim(int anim)
 	const int blendMode = (static_cast<unsigned int>(currentAnimIndex) >> 31) - 1;
 	m_wm.m_handles[handleIdx]->SetAnim((animBase - 5) + animState[0], -1, -1, blendMode, 1);
 
-	unsigned char* const model = reinterpret_cast<unsigned char*>(m_wm.m_handles[handleIdx]->m_model);
-	reinterpret_cast<float*>(animState)[3] = reinterpret_cast<float*>(model + 0xB4)[0];
-	reinterpret_cast<float*>(animState)[4] = reinterpret_cast<float*>(model + 0xC0)[0];
+	reinterpret_cast<float*>(animState)[3] =
+	    reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(m_wm.m_handles[handleIdx]->m_model) + 0xB4)[0];
+	reinterpret_cast<float*>(animState)[4] =
+	    reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(m_wm.m_handles[handleIdx]->m_model) + 0xC0)[0];
 #undef animState
 }
 

@@ -2102,7 +2102,8 @@ void CMenuPcs::CalcResultCloseAnim()
 		}
 
 		for (int i = 0; i < activePartyCount; i++) {
-			*(int*)(this->m_bonusAnimPtr + (i + 1) * 0x40 + 0x2c) = 0x10;
+			int sprite = this->m_bonusAnimPtr + (i + 1) * 0x40 + 8;
+			*(int*)(sprite + 0x24) = 0x10;
 		}
 
 		// iconBase block: src = frameBase (back = activePartyCount sprites); dance
@@ -2129,7 +2130,8 @@ void CMenuPcs::CalcResultCloseAnim()
 		// frameEchoBase block: startFrame = 0
 		base += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
-			*(int*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 0x2c) = 0;
+			int sprite = this->m_bonusAnimPtr + (base + i) * 0x40 + 8;
+			*(int*)(sprite + 0x24) = 0;
 		}
 
 		// iconEchoBase block: startFrame = 9999, flags = 3
@@ -2178,7 +2180,8 @@ void CMenuPcs::CalcResultCloseAnim()
 		// extraBase + pc block: flags = 0
 		base += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
-			*(int*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 0x2c) = 0;
+			int sprite = this->m_bonusAnimPtr + (base + i) * 0x40 + 8;
+			*(int*)(sprite + 0x24) = 0;
 		}
 
 		// extraBase + 2*pc block: src = extraBase + pc (back = activePartyCount sprites); dance
@@ -2195,7 +2198,8 @@ void CMenuPcs::CalcResultCloseAnim()
 		// extraBase + 3*pc block: flags = 0
 		base += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
-			*(int*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 0x2c) = 0;
+			int sprite = this->m_bonusAnimPtr + (base + i) * 0x40 + 8;
+			*(int*)(sprite + 0x24) = 0;
 		}
 
 		// extraBase + 4*pc block: src = iconBase (back = base - (pc+1)); dance

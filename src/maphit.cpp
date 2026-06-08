@@ -120,12 +120,11 @@ void CMapHit::Draw()
     GXSetVtxDesc(GX_VA_NRM, GX_DIRECT);
     GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
 
-    CMapIdGrp* mapIdGrps = MapMng.GetMapIdGrpArray();
-    CMapHitFace* face = m_faces;
     int faceIndex = 0;
+    CMapHitFace* face = m_faces;
     while (faceIndex < m_faceCount) {
         if ((face->m_drawFlags & 1) == 0) {
-            const CMapIdGrp* mapIdGrp = mapIdGrps + face->m_groupIndex;
+            const CMapIdGrp* mapIdGrp = &MapMng.m_mapIdGrpArray[face->m_groupIndex];
             const GXColor colorABytes = *reinterpret_cast<const GXColor*>(&mapIdGrp->m_primaryColor);
             const GXColor colorBBytes = *reinterpret_cast<const GXColor*>(&mapIdGrp->m_secondaryColor);
 

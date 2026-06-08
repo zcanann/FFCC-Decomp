@@ -1413,9 +1413,9 @@ void CFlatRuntime2::Calc()
 void CFlatRuntime2::Draw()
 {
 	CFont* font = MenuPcs.m_fonts[0];
-	font->SetScale(0.65f);
+	font->SetScale(FLOAT_80330180);
 	font->SetShadow(1);
-	font->SetMargin(0.0f);
+	font->SetMargin(FLOAT_80330140);
 	font->SetZMode(0, 0);
 	font->DrawInit();
 	font->SetTlut(7);
@@ -1431,15 +1431,15 @@ void CFlatRuntime2::Draw()
 	}
 
 	font->SetZMode(0, 0);
-	font->SetPosZ(1.0f);
+	font->SetPosZ(FLOAT_80330144);
 	Mtx44 projection;
 	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcsRaw() + 0x94), projection);
 	GXSetProjection(projection, GX_PERSPECTIVE);
 
 	font = MenuPcs.m_fonts[0];
-	font->SetScale(0.85f);
+	font->SetScale(FLOAT_80330184);
 	font->SetShadow(1);
-	font->SetMargin(0.0f);
+	font->SetMargin(FLOAT_80330140);
 	font->SetZMode(1, 1);
 	font->DrawInit();
 
@@ -1452,7 +1452,7 @@ void CFlatRuntime2::Draw()
 	}
 
 	font->SetZMode(0, 0);
-	font->SetPosZ(1.0f);
+	font->SetPosZ(FLOAT_80330144);
 	Mtx44 projection2;
 	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcsRaw() + 0x94), projection2);
 	GXSetProjection(projection2, GX_PERSPECTIVE);

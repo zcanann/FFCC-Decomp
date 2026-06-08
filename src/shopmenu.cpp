@@ -1144,7 +1144,7 @@ void CShopMenu::Destroy()
  * Size:	TODO
  */
 #pragma push
-#pragma peephole off
+#pragma peephole on
 void CShopMenu::DrawItemHelp(int index, int centerX, int y)
 {
     int itemNo = getItemNo(index);

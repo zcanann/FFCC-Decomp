@@ -154,6 +154,32 @@ static const char s_charaMergePathFmt[] = "dvd/mrg/m%04d_%02d.mrg";
 static const char s_charaMergeDupFmt[] = "CCharaPcs duplicate merge %d\n";
 static const char s_charaMergeOpenFmt[] = "CCharaPcs missing merge %d\n";
 static const char s_charaMergeDoneFmt[] = "CCharaPcs LoadMergeFile %d 0x%x\n";
+static const char s_charaModelLoadAmemFmt[] =
+    "\x4d\x65\x72\x67\x65\x3a\x20\x1b\x5b\x33\x32\x6d\x83\x82\x83\x66\x83\x8b\x82\xf0\x41\x4d\x45\x4d\x82\xa9\x82"
+    "\xe7\x93\xc7\x82\xdd\x8d\x9e\x82\xdd\x82\xdc\x82\xb5\x82\xbd\x81\x42\x74\x79\x70\x65\x20\x3d\x20\x25\x64\x20"
+    "\x6e\x75\x6d\x62\x65\x72\x20\x3d\x20\x25\x64\x0a\x1b\x5b\x30\x6d";
+static const char s_charaModelLoadDvdFmt[] =
+    "\x1b\x5b\x33\x31\x6d\x4d\x65\x72\x67\x65\x3a\x20\x83\x82\x83\x66\x83\x8b\x82\xf0\x44\x56\x44\x82\xa9\x82\xe7"
+    "\x93\xc7\x82\xdd\x8d\x9e\x82\xdd\x82\xdc\x82\xb5\x82\xbd\x81\x42\x74\x79\x70\x65\x20\x3d\x20\x25\x64\x20\x6e"
+    "\x75\x6d\x62\x65\x72\x20\x3d\x20\x25\x64\x0a\x1b\x5b\x30\x6d";
+static const char s_charaDynamicsLoadDvdFmt[] =
+    "\x1b\x5b\x33\x31\x6d\x4d\x65\x72\x67\x65\x3a\x20\x83\x5f\x83\x43\x83\x69\x83\x7e\x83\x4e\x83\x58\x82\xf0\x44"
+    "\x56\x44\x82\xa9\x82\xe7\x93\xc7\x82\xdd\x8d\x9e\x82\xdd\x82\xdc\x82\xb5\x82\xbd\x81\x42\x74\x79\x70\x65\x20"
+    "\x3d\x20\x25\x64\x20\x6e\x75\x6d\x62\x65\x72\x20\x3d\x20\x25\x64\x0a";
+static const char s_charaTexLoadAmemFmt[] =
+    "\x4d\x65\x72\x67\x65\x3a\x20\x1b\x5b\x33\x32\x6d\x83\x65\x83\x4e\x83\x58\x83\x60\x83\x83\x82\xf0\x41\x4d\x45"
+    "\x4d\x82\xa9\x82\xe7\x93\xc7\x82\xdd\x8d\x9e\x82\xdd\x82\xdc\x82\xb5\x82\xbd\x81\x42\x74\x79\x70\x65\x20\x3d"
+    "\x20\x25\x64\x20\x6e\x75\x6d\x62\x65\x72\x20\x3d\x20\x25\x64\x20\x74\x65\x78\x20\x3d\x20\x25\x64\x0a\x1b\x5b"
+    "\x30\x6d";
+static const char s_charaTexLoadDvdFmt[] =
+    "\x1b\x5b\x33\x31\x6d\x4d\x65\x72\x67\x65\x3a\x20\x83\x65\x83\x4e\x83\x58\x83\x60\x83\x83\x82\xf0\x44\x56\x44"
+    "\x82\xa9\x82\xe7\x93\xc7\x82\xdd\x8d\x9e\x82\xdd\x82\xdc\x82\xb5\x82\xbd\x81\x42\x74\x79\x70\x65\x20\x3d\x20"
+    "\x25\x64\x20\x6e\x75\x6d\x62\x65\x72\x20\x3d\x20\x25\x64\x20\x74\x65\x78\x20\x3d\x20\x25\x64\x0a\x1b\x5b\x30"
+    "\x6d";
+static const char s_charaTexMissingFmt[] =
+    "\x83\x65\x83\x4e\x83\x58\x83\x60\x83\x83\x82\xaa\x82\xa0\x82\xe8\x82\xdc\x82\xb9\x82\xf1\x81\x42\x8f\xea\x8d"
+    "\x87\x82\xc9\x82\xe6\x82\xc1\x82\xc4\x82\xcd\x83\x6e\x83\x93\x83\x4f\x82\xb7\x82\xe9\x82\xa9\x82\xe0\x82\xb5"
+    "\x82\xea\x82\xdc\x82\xb9\x82\xf1\x81\x42\x25\x73\x0a";
 static const char s_charaFreeMergeFmt[] = "CCharaPcs.FreeMergeFile: 0x%08x\n";
 static const char s_charaAmemAnimCompactStart[] =
     "\x61\x6d\x65\x6d\x20\x61\x6e\x69\x6d\x20\x83\x4b\x83\x78\x81\x5b\x83\x57"
@@ -465,7 +491,8 @@ static inline CMemory::CStage* HandleModelStage(int charaKind, int specialModelS
 
 static inline CMemory::CStage* HandleTextureStage(int charaKind)
 {
-    CMemory::CStage* stage = charaKind == 4 ? CharaPcs.m_weaponTextureStage : CharaPcs.m_viewerTextureStage;
+    int index = charaKind == 4 ? 3 : 1;
+    CMemory::CStage* stage = (&CharaPcs.m_viewerModelStage)[index];
     return SelectLoadStage(&CharaPcs, stage);
 }
 
@@ -599,8 +626,8 @@ void CCharaPcs::Init()
 
         float scale = static_cast<float>(i) * 0.25f;
         shade.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.r) * scale));
-        shade.color.g = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.g) * scale));
-        shade.color.b = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.b) * scale));
+        shade.color.g = static_cast<unsigned char>(static_cast<unsigned int>(static_cast<float>(white.color.g) * scale));
+        shade.color.b = static_cast<unsigned char>(static_cast<unsigned int>(static_cast<float>(white.color.b) * scale));
         shade.color.a = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.a) * scale));
         CColor shadeCopy(shade);
 
@@ -901,7 +928,7 @@ int CCharaPcs::correctLoadAnimAmem()
     do {
         int chunkLoadCount = 0;
         int chunkSize = 0;
-        int nextOffset = scanOffset;
+        unsigned int nextOffset = scanOffset;
         const unsigned int scanEnd = static_cast<unsigned int>(scanOffset + 0x80000);
 
         for (int i = 0; i < loadAnimCount; i++) {
@@ -961,13 +988,13 @@ int CCharaPcs::correctLoadAnimAmem()
  */
 void CCharaPcs::onScriptChanging(char*)
 {
-    for (int i = 0; i < 5; i++) {
+    for (unsigned int i = 0; i < 5; i++) {
         CColor white(0xFF, 0xFF, 0xFF, 0xFF);
         CColor shade;
 
         float scale = static_cast<float>(i) * 0.25f;
         shade.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.r) * scale));
-        shade.color.g = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.g) * scale));
+        shade.color.g = static_cast<unsigned char>(static_cast<unsigned int>(static_cast<float>(white.color.g) * scale));
         shade.color.b = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.b) * scale));
         shade.color.a = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.a) * scale));
         CColor shadeCopy(shade);
@@ -1210,7 +1237,7 @@ void CCharaPcs::GetTexShadow(int startIndex, int maxCount, _GXTexObj* texObjs, V
             }
 
             shadowIndex++;
-            if (shadowIndex >= startIndex + maxCount) {
+            if (startIndex + maxCount <= shadowIndex) {
                 return;
             }
         }
@@ -1630,7 +1657,7 @@ void CCharaPcs::LoadCam(int index, char* fileName)
  */
 void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
 {
-    int hasLoaded;
+    unsigned int hasLoaded;
     unsigned int i;
 
     for (i = 0; i < LoadModelArray(this)->GetSize(); i++) {
@@ -1674,7 +1701,7 @@ checkLoaded:
     }
 
     CCharaPcs* pcs = &CharaPcs;
-    int mergePartCount = 1;
+    unsigned int mergePartCount = 1;
     for (int mergePartIndex = 0; mergePartIndex < mergePartCount; mergePartIndex++) {
         char path[0x100];
         sprintf(path, s_charaMergePathFmt, mergeFileId, mergePartIndex);
@@ -2213,7 +2240,7 @@ void CCharaPcs::CHandle::ChangeTexture(
     CLoadTexture* loadTexture;
     for (unsigned int i = 0; i < static_cast<unsigned int>(LoadTextureArray(&CharaPcs)->GetSize()); i++) {
         CLoadTexture* it = (*LoadTextureArray(&CharaPcs))[i];
-        if (reinterpret_cast<int>(it->m_keyTag) == charaKind && it->m_keyId == static_cast<unsigned int>(charaNo) &&
+        if (reinterpret_cast<int>(it->m_keyTag) == charaKind && it->m_keyId == static_cast<int>(charaNo) &&
             it->m_variantTag == reinterpret_cast<void*>(textureVariant)) {
             loadTexture = it;
             goto foundTexture;
@@ -2236,7 +2263,17 @@ foundTexture:
             loadTexture->m_textureSet = textureSet;
             File.UnlockBuffer();
         }
+
+        if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+            System.Printf(const_cast<char*>(s_charaTexLoadAmemFmt), charaKind, static_cast<int>(charaNo),
+                          static_cast<int>(textureVariant));
+        }
     } else {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+            System.Printf(const_cast<char*>(s_charaTexLoadDvdFmt), charaKind, static_cast<int>(charaNo),
+                          static_cast<int>(textureVariant));
+        }
+
         if (textureVariant == 0) {
             strcpy(path, basePath);
         } else {
@@ -2247,7 +2284,10 @@ foundTexture:
         CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
         if (fileHandle == 0) {
             m_textureSet = 0;
-            return;
+            if (charaKind != 5 && static_cast<unsigned int>(System.m_execParam) >= 2) {
+                System.Printf(const_cast<char*>(s_charaTexMissingFmt), path);
+            }
+            goto attach;
         }
 
         File.Read(fileHandle);
@@ -2267,18 +2307,13 @@ foundTexture:
         loadTexture->m_textureSet = textureSet;
 
         File.Close(fileHandle);
-        m_texLoadRef = loadTexture;
-        m_texLoadRef->AddRef();
-        m_textureSet = reinterpret_cast<CLoadTexture*>(m_texLoadRef)->m_textureSet;
-        m_textureSet->AddRef();
-        m_model->AttachTextureSet(m_textureSet);
-        return;
     }
 
     m_texLoadRef = loadTexture;
     m_texLoadRef->AddRef();
     m_textureSet = reinterpret_cast<CLoadTexture*>(m_texLoadRef)->m_textureSet;
     m_textureSet->AddRef();
+attach:
     m_model->AttachTextureSet(m_textureSet);
 }
 
@@ -2346,6 +2381,10 @@ foundModel:
                 File.UnlockBuffer();
             }
 
+            if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+                System.Printf(const_cast<char*>(s_charaModelLoadAmemFmt), charaKind, static_cast<int>(charaNo));
+            }
+
             m_modelLoadRef->AddRef();
             m_model = loadModel->m_model;
             m_model->AddRef();
@@ -2355,6 +2394,10 @@ foundModel:
             m_model = loadModel->m_model->Duplicate(SelectLoadStage(&CharaPcs, modelStage));
         }
     } else {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+            System.Printf(const_cast<char*>(s_charaModelLoadDvdFmt), charaKind, static_cast<int>(charaNo));
+        }
+
         strcpy(path, basePath);
         strcat(path, s_charaModelSuffix);
 
@@ -2393,6 +2436,9 @@ foundModel:
             File.SyncCompleted(fileHandle);
             m_model->CreateDynamics(File.m_readBuffer, HandleModelStage(charaKind, 0));
             File.Close(fileHandle);
+            if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+                System.Printf(const_cast<char*>(s_charaDynamicsLoadDvdFmt), charaKind, static_cast<int>(charaNo));
+            }
         }
     }
 
@@ -2425,7 +2471,7 @@ foundModel:
             reinterpret_cast<CLoadPdt*>(m_pdtLoadRef)->m_pdtSlot =
                 PartPcs.LoadMonsterPdt(static_cast<int>(charaNo), static_cast<int>(textureVariant), 0, 0, 0, 0);
             if (System.m_execParam != 0) {
-                System.Printf(const_cast<char*>(s_charaLoadPdtLogFmt), 1, static_cast<int>(charaNo), static_cast<int>(textureVariant));
+                System.Printf(const_cast<char*>(s_charaLoadPdtLogFmt), charaKind, static_cast<int>(charaNo), static_cast<int>(textureVariant));
             }
             LoadPdtArray(&CharaPcs)->Add(reinterpret_cast<CLoadPdt*>(m_pdtLoadRef));
             m_pdtLoadRef->AddRef();
@@ -2445,7 +2491,7 @@ int CCharaPcs::CHandle::LoadAnim(
     char* animName, int animIndex, int animFlags, int charaKind, int charaNo, int mergeFileId, int mergeFlags)
 {
     if (animIndex == -1) {
-        for (int i = 0; i < 64; i++) {
+        for (unsigned int i = 0; i < 64; i++) {
             ReleaseHandleAnimSlot(this, i);
         }
         PruneUnsharedAnimRefs(&CharaPcs, 0);
@@ -2470,13 +2516,14 @@ int CCharaPcs::CHandle::LoadAnim(
     }
 
     m_animSlot[animIndex] = loadAnim;
-    AddSharedRef(m_animSlot[animIndex]);
+    reinterpret_cast<CRef*>(loadAnim)->AddRef();
 
-    *reinterpret_cast<unsigned int*>(Ptr(loadAnim, 0x70)) = static_cast<unsigned int>(animFlags);
-    if (loadAnim->m_anim != 0) {
-        unsigned char& flags = loadAnim->m_anim->m_flags;
-        flags = static_cast<unsigned char>((flags & 0x7F) | ((animFlags << 7) & 0x80));
-        flags = static_cast<unsigned char>((flags & 0xBF) | ((animFlags << 5) & 0x40));
+    *reinterpret_cast<unsigned int*>(Ptr(m_animSlot[animIndex], 0x70)) = static_cast<unsigned int>(animFlags);
+    if (reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex])->m_anim != 0) {
+        unsigned char& flags1 = reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex])->m_anim->m_flags;
+        flags1 = static_cast<unsigned char>((flags1 & 0x7F) | ((animFlags << 7) & 0x80));
+        unsigned char& flags2 = reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex])->m_anim->m_flags;
+        flags2 = static_cast<unsigned char>((flags2 & 0xBF) | ((animFlags << 5) & 0x40));
     }
 
     return 1;
@@ -2508,7 +2555,10 @@ int CCharaPcs::LoadAnim(int charaKind, int charaNo, char* animName, int unusedAr
         loadAnim = LoadAnimFromDisk(&CharaPcs, charaKind, charaNo, animName, mergeFileId, mergeFlags);
     }
 
-    return loadAnim != 0;
+    if (loadAnim == 0) {
+        return 0;
+    }
+    return 1;
 }
 
 /*
@@ -2621,8 +2671,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
     if ((flags & 1) == 0 || (flags & 0x400000) != 0) {
         return;
     }
-    const float lightAlpha = m_model->m_lightAlpha;
-    if (kCharaZero == lightAlpha && (flags & 0x80) == 0) {
+    if (kCharaZero == m_model->m_lightAlpha && (flags & 0x80) == 0) {
         return;
     }
     if ((flags & 0x100) != 0 && drawPass != 5) {
@@ -2638,7 +2687,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         return;
     }
 
-    if (immediatePass != 0 && drawPass == 0 && (lightAlpha < kCharaOne || (flags & 0x40000) != 0)) {
+    if (immediatePass != 0 && drawPass == 0 && (m_model->m_lightAlpha < kCharaOne || (flags & 0x40000) != 0)) {
         ppvDrawMng.AddPrim(-m_sortZ, this);
         return;
     }
@@ -2664,7 +2713,10 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         CColor shade;
         if ((m_flags & 0x20000) != 0 && drawPass != 3) {
             CColor white(0xFF, 0xFF, 0xFF, 0xFF);
-            shade = white;
+            shade.color.r = white.color.r;
+            shade.color.g = white.color.g;
+            shade.color.b = white.color.b;
+            shade.color.a = white.color.a;
         } else {
             CColor next;
             next.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(CharaPcs.m_viewerChoiceColor[phaseIndex + 1].color.r) * blendT));
@@ -2687,7 +2739,10 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
             blended.color.b = static_cast<unsigned char>(curCopy.color.b + nextCopy.color.b);
             blended.color.a = static_cast<unsigned char>(curCopy.color.a + nextCopy.color.a);
             CColor blendedCopy(blended);
-            shade = blendedCopy;
+            shade.color.r = blendedCopy.color.r;
+            shade.color.g = blendedCopy.color.g;
+            shade.color.b = blendedCopy.color.b;
+            shade.color.a = blendedCopy.color.a;
         }
 
         CColor3 ambientBase(CharaPcs.m_viewerAmbientColor[lightBank]);

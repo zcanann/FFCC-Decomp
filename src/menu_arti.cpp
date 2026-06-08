@@ -88,7 +88,7 @@ static inline ArtiOpenAnim* GetArtiOpenAnim(CMenuPcs* menu, int index)
 
 static inline CFont* GetArtiListFont(CMenuPcs* menu)
 {
-	return menu->m_fonts[1];
+	return menu->m_fonts[4];
 }
 
 static inline CFont* GetArtiHelpFont(CMenuPcs* menu)

@@ -2485,8 +2485,8 @@ void CPartMng::pppEditDrawShadow()
                 mng->m_sortDepth = viewPos.z;
                 ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4);
                 ppvMng = mng;
-                pppSetFpMatrix(ppvMng);
-                _pppDrawPart(ppvMng);
+                pppSetFpMatrix(mng);
+                _pppDrawPart(mng);
                 continue;
 
             checkCull:
@@ -2584,8 +2584,8 @@ void CPartMng::pppEditDraw()
                         mng->m_sortDepth = viewPos.z;                                                      \
                         ppvMng = mng;                                                                      \
                         ppvEnv = reinterpret_cast<_pppEnvSt*>(*reinterpret_cast<char**>(mng) + 4);         \
-                        pppSetFpMatrix(ppvMng);                                                            \
-                        _pppDrawPart(ppvMng);                                                              \
+                        pppSetFpMatrix(reinterpret_cast<_pppMngSt*>(mng));                                  \
+                        _pppDrawPart(reinterpret_cast<_pppMngSt*>(mng));                                    \
                         continue;                                                                          \
                                                                                                            \
                     checkCull##drawPass:                                                                   \
@@ -2698,8 +2698,8 @@ void CPartMng::pppEditPartDrawAfter()
                         mng->m_sortDepth = viewPos.z;                                                      \
                         ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4); \
                         ppvMng = mng;                                                                      \
-                        pppSetFpMatrix(ppvMng);                                                            \
-                        _pppDrawPart(ppvMng);                                                              \
+                        pppSetFpMatrix(reinterpret_cast<_pppMngSt*>(mng));                                  \
+                        _pppDrawPart(reinterpret_cast<_pppMngSt*>(mng));                                    \
                         continue;                                                                          \
                                                                                                            \
                     checkCull##drawPass:                                                                   \
@@ -2958,8 +2958,8 @@ void CPartMng::pppDrawPrio(unsigned char drawMode)
             mng->m_sortDepth = viewPos.z;
             ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4);
             ppvMng = mng;
-            pppSetFpMatrix(ppvMng);
-            _pppDrawPart(ppvMng);
+            pppSetFpMatrix(mng);
+            _pppDrawPart(mng);
             continue;
 
         checkCull:
@@ -3070,8 +3070,8 @@ void CPartMng::pppDrawPrioPdtFpno(unsigned char drawMode, short kind, short node
         mng->m_sortDepth = viewPos.z;
         ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4);
         ppvMng = reinterpret_cast<_pppMngSt*>(mng);
-        pppSetFpMatrix(ppvMng);
-        _pppDrawPart(ppvMng);
+        pppSetFpMatrix(reinterpret_cast<_pppMngSt*>(mng));
+        _pppDrawPart(reinterpret_cast<_pppMngSt*>(mng));
         return;
 
     checkCull:
@@ -3318,8 +3318,8 @@ void CPartMng::pppPartDrawAfter()
             mng->m_sortDepth = viewPos.z;
             ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4);
             ppvMng = mng;
-            pppSetFpMatrix(ppvMng);
-            _pppDrawPart(ppvMng);
+            pppSetFpMatrix(mng);
+            _pppDrawPart(mng);
             continue;
 
         checkCull:

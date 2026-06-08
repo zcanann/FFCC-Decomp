@@ -1573,19 +1573,19 @@ void CMes::Next()
 		memcpy(mFlagVars, tempFlags, sizeof(tempFlags));
 		halfVal = kMesHalf;
 		i = 0;
-		curr = (float*)((char*)this + 0xc);
-		while ((start = curr, remaining = mCounter, i < remaining))
+		start = (float*)((char*)this + 0xc);
+		while ((remaining = mCounter, i < remaining))
 		{
-			i = i + 1;
+			int j = i + 1;
 			curr = start + 5;
-			for (entryCount = remaining - i; entryCount != 0; entryCount = entryCount - 1)
+			for (entryCount = remaining - j; entryCount != 0; entryCount = entryCount - 1)
 			{
 				if ((((unsigned int)*(unsigned char*)((char*)start + 0xe) >> 4 & 0xF) != ((unsigned int)*(unsigned char*)((char*)curr + 0xe) >> 4 & 0xF)) ||
 				    (*(short*)(start + 2) != *(short*)(curr + 2)))
 				{
 					break;
 				}
-				i = i + 1;
+				j = j + 1;
 				curr = curr + 5;
 			}
 			runLength = (unsigned int)((int)curr - (int)start) / 0x14;
@@ -1603,6 +1603,8 @@ void CMes::Next()
 				}
 				start = start + 5;
 			}
+			i = j;
+			start = curr;
 		}
 	}
 }

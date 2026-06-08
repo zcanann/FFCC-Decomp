@@ -545,8 +545,8 @@ int CGMonObj::getNearParty(int targetOrdinal, int flags, float minDist, float ma
 			(((flags & 0x40) == 0) ||
 				((party->m_partyData.unk6C0 >= 0) &&
 					(reinterpret_cast<int>(partyObj->m_scriptHandle[4]) == classId))) &&
-			(((flags & 2) != 0) || (minDist <= *reinterpret_cast<float*>(mon + 0x5D0 + partyIndex * 4))) &&
-			(((flags & 4) != 0) || (*reinterpret_cast<float*>(mon + 0x5D0 + partyIndex * 4) <= maxDist))) {
+			(((flags & 2) != 0) || !(*reinterpret_cast<float*>(mon + 0x5D0 + partyIndex * 4) < minDist)) &&
+			(((flags & 4) != 0) || !(maxDist < *reinterpret_cast<float*>(mon + 0x5D0 + partyIndex * 4)))) {
 			if (((flags & 8) != 0) && (0.0f < *reinterpret_cast<float*>(mon + 0x5D0 + partyIndex * 4))) {
 				Vec toParty;
 				Vec facing;

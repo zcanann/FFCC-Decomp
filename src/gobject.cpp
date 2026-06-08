@@ -1653,7 +1653,9 @@ void CGObject::update()
         if (m_lookAtTimer == sZeroFloat) {
             m_weaponNodeFlagBits.m_unk20 = 0;
         }
-        m_weaponNodeFlagBits.m_unk40 = (weaponFlagsLo & 0x60) != 0 ? 1 : 0;
+        m_weaponNodeFlagBits.m_unk40 =
+            (static_cast<s32>(static_cast<u32>(weaponFlagsLo) << 25 | static_cast<u32>(weaponFlagsLo) >> 7) |
+             static_cast<s32>(static_cast<u32>(weaponFlagsLo) << 26 | static_cast<u32>(weaponFlagsLo) >> 6)) < 0;
 
         if ((m_displayFlags & 1) != 0) {
             if ((static_cast<s32>(static_cast<u32>(weaponFlagsLo) << 26 | static_cast<u32>(weaponFlagsLo) >> 6) < 0 &&

@@ -539,9 +539,11 @@ void CMesMenu::onDraw()
                 ? -m_windowWidth
                 : (m_windowWidth - width));
 
-            float edgeY = FLOAT_803308f8;
+            float edgeY;
             if ((m_menuIndex & 2) != 0) {
                 edgeY = (FLOAT_80330934 - m_windowHeight) + (m_windowHeight - height);
+            } else {
+                edgeY = FLOAT_803308f8;
             }
             float drawY = baseY + edgeY;
 

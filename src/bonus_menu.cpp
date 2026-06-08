@@ -2730,7 +2730,13 @@ void CMenuPcs::DrawResultOpenAnim()
 							x += fillWidth;
 						}
 						if (fillWidth > 0.0f && fillWidth < (float)sprite->w) {
-							colors[0].a = 0;
+							colors[1].r = 0xFF;
+							colors[1].g = 0xFF;
+							colors[1].b = 0xFF;
+							colors[1].a = 0;
+							colors[3].r = 0xFF;
+							colors[3].g = 0xFF;
+							colors[3].b = 0xFF;
 							colors[3].a = 0;
 							MenuPcs.DrawRect(0, x, y, (float)sprite->w / (float)sprite->duration, (float)sprite->h,
 							    fillWidth, sprite->mulY, colors, 1.0f, 1.0f, 0.0f);

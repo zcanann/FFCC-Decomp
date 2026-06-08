@@ -21,10 +21,10 @@ void decMagic(int);
 void calcWeightMax();
 
 struct PartyObjFlags {
-    unsigned char commandActive : 1;
-    unsigned char flag40 : 1;
-    unsigned char flag20 : 1;
-    unsigned char flag10 : 1;
+    signed char commandActive : 1;
+    signed char flag40 : 1;
+    signed char flag20 : 1;
+    signed char flag10 : 1;
     signed char flag08 : 1;
     signed char flag04 : 1;
     signed char flag02 : 1;

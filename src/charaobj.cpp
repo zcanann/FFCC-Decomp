@@ -816,7 +816,7 @@ void CGCharaObj::onFramePreCalc()
 		if (static_cast<CGPartyObj*>(this)->m_partyData.carryObject != nullptr) {
 			push += 10;
 		}
-		int slot = m_animStateMisc;
+		int slot = static_cast<signed char>(m_animStateMisc);
 		int padHeld;
 		bool useDebugPad = (Pad.m_debugPadLock != 0) || ((slot == 0) && (Pad.m_debugPadPort != -1));
 		if (useDebugPad) {
@@ -839,7 +839,7 @@ void CGCharaObj::onFramePreCalc()
 		m_pushParamB = 100;
 	}
 
-	if ((DbgMenuPcs.GetDbgFlagsRaw() & 1) != 0) {
+	if ((AStar.m_flags & 1) != 0) {
 		m_aStarGroupId = static_cast<unsigned short>(AStar.calcSpecialPolygonGroup(&m_worldPosition));
 	} else {
 		m_aStarGroupId = static_cast<unsigned short>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0xE8));

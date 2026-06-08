@@ -1262,9 +1262,10 @@ void CGItemObj::onFrame()
 
 			CGObject* owner = m_owner;
 			int ownerScriptSlot = *(int*)(*(int*)((unsigned char*)owner + 0x58) + 0x3B4);
-			int soundEntry = *(int*)(*(int*)(*reinterpret_cast<int*>(CGMonObj::m_boss) + 0xF8) + 0x178);
-			if (soundEntry != 0) {
-				soundEntry = *(int*)(soundEntry + 0x14);
+			int* soundData = *(int**)(*(int*)(*reinterpret_cast<int*>(CGMonObj::m_boss) + 0xF8) + 0x178);
+			int soundEntry;
+			if (soundData != 0) {
+				soundEntry = soundData[5];
 			} else {
 				soundEntry = -1;
 			}

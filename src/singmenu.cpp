@@ -3435,8 +3435,9 @@ void CMenuPcs::DrawSingLife()
     }
 
     int halfHearts = static_cast<unsigned int>(caravanWork->m_maxHp) >> 1;
+    xBase += static_cast<float>(((8 - halfHearts) * 0x18) / 2);
     reinterpret_cast<CMesMenu*>(*reinterpret_cast<void**>(reinterpret_cast<u8*>(&MenuPcs) + 0x268))
-        ->DrawHeart(xBase + static_cast<float>(((8 - halfHearts) * 0x18) / 2), y - 8.0f, 1.0f, 1.0f);
+        ->DrawHeart(xBase, y - 8.0f, 1.0f, 1.0f);
 }
 
 /*

@@ -772,39 +772,9 @@ void CMenuPcs::ItemInit1()
     itemList = this->m_itemList;
     count = (unsigned int)itemList->count;
     entry = itemList->anims;
-    if (0 < (int)count) {
-        blocks = count >> 3;
-        if (blocks != 0) {
-            do {
-                entry[0].frame = 0;
-                entry[0].alpha = progress;
-                entry[1].frame = 0;
-                entry[1].alpha = progress;
-                entry[2].frame = 0;
-                entry[2].alpha = progress;
-                entry[3].frame = 0;
-                entry[3].alpha = progress;
-                entry[4].frame = 0;
-                entry[4].alpha = progress;
-                entry[5].frame = 0;
-                entry[5].alpha = progress;
-                entry[6].frame = 0;
-                entry[6].alpha = progress;
-                entry[7].frame = 0;
-                entry[7].alpha = progress;
-                entry += 8;
-                blocks--;
-            } while (blocks != 0);
-            count &= 7;
-        }
-        if (count != 0) {
-            do {
-                entry->frame = 0;
-                entry->alpha = progress;
-                entry++;
-                count--;
-            } while (count != 0);
-        }
+    for (unsigned int i = 0; i < count; i++, entry++) {
+        entry->frame = 0;
+        entry->alpha = progress;
     }
 }
 

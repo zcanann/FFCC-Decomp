@@ -2323,7 +2323,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 			            reinterpret_cast<CStack*>(object->m_localBase + 2)) != 0) {
 				if (object == reinterpret_cast<CObject*>(object->m_engineObject)) {
 					result = 2;
-					return 1;
+					return ret;
 				}
 
 				*object->m_sp = 0;
@@ -2335,7 +2335,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 			*reinterpret_cast<int*>(&object->m_reqFlag0) = 0;
 
 			if (noPush != 0) {
-				return 1;
+				return ret;
 			}
 
 			*object->m_sp = 0;

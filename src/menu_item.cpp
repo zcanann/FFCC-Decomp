@@ -154,12 +154,13 @@ int CMenuPcs::ItemCtrlCur()
                 this->m_itemMenuState->selectedIndex = this->m_itemMenuState->selectedIndex - 1;
                 Sound.PlaySe(1, 0x40, 0x7F, 0);
             } else {
-                if (this->m_itemMenuState->scroll == 0) {
-                    this->m_itemMenuState->scroll = 0x3F;
-                } else {
+                if (this->m_itemMenuState->scroll != 0) {
                     this->m_itemMenuState->scroll = this->m_itemMenuState->scroll - 1;
+                    Sound.PlaySe(1, 0x40, 0x7F, 0);
+                } else {
+                    this->m_itemMenuState->scroll = 0x3F;
+                    Sound.PlaySe(1, 0x40, 0x7F, 0);
                 }
-                Sound.PlaySe(1, 0x40, 0x7F, 0);
             }
         } else if ((hold & 4) != 0) {
             if (this->m_itemMenuState->selectedIndex < 7) {
@@ -167,11 +168,11 @@ int CMenuPcs::ItemCtrlCur()
                 Sound.PlaySe(1, 0x40, 0x7F, 0);
             } else {
                 s16 scroll = this->m_itemMenuState->scroll;
-                if (scroll >= 0x3F) {
-                    this->m_itemMenuState->scroll = 0;
+                if (scroll < 0x3F) {
+                    this->m_itemMenuState->scroll = scroll + 1;
                     Sound.PlaySe(1, 0x40, 0x7F, 0);
                 } else {
-                    this->m_itemMenuState->scroll = scroll + 1;
+                    this->m_itemMenuState->scroll = 0;
                     Sound.PlaySe(1, 0x40, 0x7F, 0);
                 }
             }

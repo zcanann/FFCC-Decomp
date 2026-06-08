@@ -940,11 +940,12 @@ void CMesMenu::onCalc()
     }
 
     int state = m_state;
-    if (state < 2) {
-        if (state == 0) {
-            (void)sin(FLOAT_80330980 +
-                      (FLOAT_80330910 * (float)m_stateTimer) / (float)m_stateTimerMax);
-        } else {
+    switch (state) {
+    case 0:
+        (void)sin(FLOAT_80330980 +
+                  (FLOAT_80330910 * (float)m_stateTimer) / (float)m_stateTimerMax);
+        break;
+    case 1: {
             m_windowScale = FLOAT_80330914;
             m_mes.Calc();
 
@@ -1069,11 +1070,12 @@ void CMesMenu::onCalc()
                 }
             }
         }
-    } else if (state < 4) {
-        if (state == 3) {
-            float step = FLOAT_80330914 - (float)m_stateTimer / (float)m_stateTimerMax;
-            m_windowScale = FLOAT_803308ec * (FLOAT_80330914 + (float)sin(FLOAT_80330910 * step + FLOAT_80330980));
-        }
+        break;
+    case 3: {
+        float step = FLOAT_80330914 - (float)m_stateTimer / (float)m_stateTimerMax;
+        m_windowScale = FLOAT_803308ec * (FLOAT_80330914 + (float)sin(FLOAT_80330910 * step + FLOAT_80330980));
+        break;
+    }
     }
 
     m_stateTimer = m_stateTimer + 1;

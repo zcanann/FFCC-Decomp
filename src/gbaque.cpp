@@ -3288,7 +3288,7 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 	unsigned char compatibilityData[0x10];
 	int count;
 	unsigned char* writePtr;
-	int outSize = 2;
+	int outSize;
 	int selectedCount;
 
 	OSWaitSemaphore(accessSemaphores + channel);
@@ -3297,6 +3297,7 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 
 	outCompatibility[0] = reinterpret_cast<unsigned char*>(this)[channel * 0xDC + 0x529];
 	count = 2;
+	outSize = 2;
 	if (compatibilityData[3] != 0) {
 		count++;
 	}

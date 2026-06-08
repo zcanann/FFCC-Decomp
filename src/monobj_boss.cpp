@@ -1008,56 +1008,46 @@ void CGMonObj::frameStatFuncLKShooter()
 	*reinterpret_cast<int*>(CGMonObj::m_boss + 0x10) = cooldown1 & ~(cooldown1 >> 31);
 
 	const int state = *reinterpret_cast<int*>(self + 0x520);
-	if (state == 0x65) {
-		goto state101;
-	}
-	if (state >= 0x65) {
-		goto resetBranch;
-	}
-	if (state >= 100) {
-		goto state100;
-	}
-	goto resetBranch;
+	switch (state) {
+	case 100:
+		reinterpret_cast<CGCharaObj*>(this)->m_unk63CBits.m_bit80 = 1;
+		if (*reinterpret_cast<int*>(self + 0x528) == 0) {
+			memset(&m_moveWork, 0, sizeof(m_moveWork));
+			m_moveWork.m_flags = 0x322;
 
-state100:
-	reinterpret_cast<CGCharaObj*>(this)->m_unk63CBits.m_bit80 = 1;
-	if (*reinterpret_cast<int*>(self + 0x528) == 0) {
-		memset(&m_moveWork, 0, sizeof(m_moveWork));
-		m_moveWork.m_flags = 0x322;
-
-		Vec targetPos;
-		if (m_actionBranch == 1) {
-			targetPos = CVector(kMonObjBossRightTargetXZ, kMonObjBossZero, kMonObjBossRightTargetXZ);
-		} else {
-			targetPos = CVector(kMonObjBossLeftTargetX, kMonObjBossZero, kMonObjBossLeftTargetZ);
+			const CVector* targetPos;
+			if (m_actionBranch == 1) {
+				targetPos = &CVector(kMonObjBossRightTargetXZ, kMonObjBossZero, kMonObjBossRightTargetXZ);
+			} else {
+				targetPos = &CVector(kMonObjBossLeftTargetX, kMonObjBossZero, kMonObjBossLeftTargetZ);
+			}
+			m_moveWork.m_targetPos.x = targetPos->x;
+			m_moveWork.m_targetPos.y = targetPos->y;
+			m_moveWork.m_targetPos.z = targetPos->z;
+			m_moveWork.m_range = kMonObjBossShortMoveRange;
+			m_moveWork.m_changeStat = 0x65;
 		}
-		m_moveWork.m_targetPos.x = targetPos.x;
-		m_moveWork.m_targetPos.y = targetPos.y;
-		m_moveWork.m_targetPos.z = targetPos.z;
-		m_moveWork.m_range = kMonObjBossShortMoveRange;
-		m_moveWork.m_changeStat = 0x65;
+
+		moveFrame();
+		if ((reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->bits.m_bit80 != 0) ||
+		    ((m_actionBranch == 1) && ((CFlatBossState() & 1) != 0)) ||
+		    ((m_actionBranch == 2) && ((CFlatBossState() & 2) != 0))) {
+			reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
+		}
+		return;
+
+	case 0x65:
+		if (*reinterpret_cast<int*>(self + 0x528) == 0) {
+			reinterpret_cast<CGPrgObj*>(this)->reqAnim(-1, 0, 0);
+			rotTarget(m_targetPartyIndex, kMonObjBossTurnAroundDeg);
+		}
+		if ((reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->bits.m_bit80 != 0) ||
+		    (*reinterpret_cast<float*>(self + 0x5D0 + *reinterpret_cast<int*>(self + 0x620) * 4) < kMonObjBossFrameThreshold)) {
+			reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
+		}
+		return;
 	}
 
-	moveFrame();
-	if ((reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->bits.m_bit80 != 0) ||
-	    ((m_actionBranch == 1) && ((CFlatBossState() & 1) != 0)) ||
-	    ((m_actionBranch == 2) && ((CFlatBossState() & 2) != 0))) {
-		reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
-	}
-	return;
-
-state101:
-	if (*reinterpret_cast<int*>(self + 0x528) == 0) {
-		reinterpret_cast<CGPrgObj*>(this)->reqAnim(-1, 0, 0);
-		rotTarget(m_targetPartyIndex, kMonObjBossTurnAroundDeg);
-	}
-	if ((reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->bits.m_bit80 != 0) ||
-	    (*reinterpret_cast<float*>(self + 0x5D0 + *reinterpret_cast<int*>(self + 0x620) * 4) < kMonObjBossFrameThreshold)) {
-		reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
-	}
-	return;
-
-resetBranch:
 	if (m_actionBranch == 1) {
 		m_actionBranch = 0;
 		reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->bits.m_bit20 = 0;
@@ -1086,8 +1076,8 @@ int CGMonObj::attackCheckFuncLKShooter(int)
 
 	if (work->m_stunTimer == 0) {
 		if (work->bits.m_bit40 == 0 && (CFlatBossState() & 2) == 0) {
-			CVector left(kMonObjBossLeftTargetX, kMonObjBossZero, kMonObjBossLeftTargetZ);
-			if (PSVECDistance(reinterpret_cast<Vec*>(&left), &object->m_worldPosition) < kMonObjBossSideTargetRange &&
+			const CVector& left = CVector(kMonObjBossLeftTargetX, kMonObjBossZero, kMonObjBossLeftTargetZ);
+			if (PSVECDistance(reinterpret_cast<Vec*>(const_cast<CVector*>(&left)), &object->m_worldPosition) < kMonObjBossSideTargetRange &&
 			    reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->m_leftCooldown == 0) {
 				reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->m_leftCooldown = 300;
 				work->bits.m_bit40 = 1;
@@ -1096,8 +1086,8 @@ int CGMonObj::attackCheckFuncLKShooter(int)
 			}
 		}
 		if (work->bits.m_bit20 == 0 && (CFlatBossState() & 1) == 0) {
-			CVector right(kMonObjBossRightTargetXZ, kMonObjBossZero, kMonObjBossRightTargetXZ);
-			if (PSVECDistance(reinterpret_cast<Vec*>(&right), &object->m_worldPosition) < kMonObjBossSideTargetRange &&
+			const CVector& right = CVector(kMonObjBossRightTargetXZ, kMonObjBossZero, kMonObjBossRightTargetXZ);
+			if (PSVECDistance(reinterpret_cast<Vec*>(const_cast<CVector*>(&right)), &object->m_worldPosition) < kMonObjBossSideTargetRange &&
 			    reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->m_rightCooldown == 0) {
 				work->bits.m_bit20 = 1;
 				m_actionBranch = 1;
@@ -1509,29 +1499,29 @@ void CGMonObj::frameStatFuncTetsukyojin()
 	case 0x65:
 		if ((CFlatBossState() != 0) && (prgObj->m_stateFrame == 0x25)) {
 			int flatCount = CFlatBossState();
-			if (flatCount < 1) {
-				CFlatBossState() = 0;
-			} else if (((flatCount == 1) && (*reinterpret_cast<int*>(CGMonObj::m_boss) >= 0x14)) ||
-			           ((flatCount > 1) && (*reinterpret_cast<int*>(CGMonObj::m_boss) >= 5))) {
-				*reinterpret_cast<int*>(CGMonObj::m_boss) = 0;
-				object->DispCharaParts(1);
+			if (flatCount >= 1) {
+				if (((flatCount == 1) && (*reinterpret_cast<int*>(CGMonObj::m_boss) >= 0x14)) ||
+				    ((flatCount > 1) && (*reinterpret_cast<int*>(CGMonObj::m_boss) >= 5))) {
+					*reinterpret_cast<int*>(CGMonObj::m_boss) = 0;
+					object->DispCharaParts(1);
 
-				int pdtNo = object->m_charaModelHandle->GetPdtSlot();
-				prgObj->putParticle((pdtNo << 8) | 0x2D, 0, object, kMonObjBossOne, 0x101E4);
+					int pdtNo = object->m_charaModelHandle->GetPdtSlot();
+					prgObj->putParticle((pdtNo << 8) | 0x2D, 0, object, kMonObjBossOne, 0x101E4);
 
-				if (m_actionBranch == 0) {
-					CFlatBossState() = CFlatBossState() - 1;
+					if (m_actionBranch == 0) {
+						CFlatBossState() = CFlatBossState() - 1;
+					}
+					m_actionBranch = 1;
+					m_unk6C8 = 0;
 				}
-				m_actionBranch = 1;
-				m_unk6C8 = 0;
+			} else {
+				CFlatBossState() = 0;
 			}
 		}
 		reinterpret_cast<CGCharaObj*>(this)->statAttack();
 		return;
 	case 0x66:
-		if (CFlatBossState() < 1) {
-			prgObj->changeStat(0, 0, 0);
-		} else {
+		if (CFlatBossState() >= 1) {
 			if ((m_actionBranch == 1) && (prgObj->m_stateFrame == 0)) {
 				CFlatRuntime::CStack stack[3];
 
@@ -1549,6 +1539,8 @@ void CGMonObj::frameStatFuncTetsukyojin()
 				m_unk6C8 = 0;
 				prgObj->changeStat(0, 0, 0);
 			}
+		} else {
+			prgObj->changeStat(0, 0, 0);
 		}
 		return;
 	}
@@ -1901,8 +1893,8 @@ void CGMonObj::frameStatFuncMeteoParasiteC()
 			    ->m_objs[reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex]
 			    ->changeStat(0x65, 0, 0);
 			prgObj->reqAnim(reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex + 0x25, 0, 0);
-			reinterpret_cast<MeteoParasiteCGameFlags*>(&CFlatGameFlags())->bits.m_bit5 = 1;
 			CFlatBossState() = CFlatBossState() + 1;
+			reinterpret_cast<MeteoParasiteCGameFlags*>(&CFlatGameFlags())->bits.m_bit5 = 1;
 		} else if (prgObj->isLoopAnim() != 0) {
 			reinterpret_cast<CGObject*>(this)->SetAnimSlot(0, 0);
 			prgObj->changeStat(0, 0, 0);
@@ -2097,9 +2089,12 @@ void CGMonObj::alwaysFuncMeteoParasite()
 		MG_GBA_THREAD_MSG_SETPORT_ct += kMonObjBossScaleStep;
 	}
 
-	if (scriptKind < 0x88 && scriptKind >= 0x85 &&
-	    *reinterpret_cast<int*>(CGMonObj::m_boss + 0x78) == scriptKind - 0x85 &&
-	    reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_bit80 != 0) {
+	switch (scriptKind) {
+	case 0x85:
+	case 0x86:
+	case 0x87:
+		if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x78) == scriptKind - 0x85 &&
+		    reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_bit80 != 0) {
 		int effect;
 		int arg0;
 		int arg1;
@@ -2118,6 +2113,8 @@ void CGMonObj::alwaysFuncMeteoParasite()
 			}
 			reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_bit80 = 0;
 		}
+		}
+		break;
 	}
 }
 
@@ -2724,18 +2721,18 @@ void CGMonObj::teleport(
 
 			const float ratio = static_cast<float>(stateFrame - blendStartFrame) / static_cast<float>(blendFrameCount);
 			const float blend = kMonObjBossHalf * (kMonObjBossOne + static_cast<float>(cos(kMonObjBossPi * ratio)));
-			CVector point(teleportPoints[teleportIndex]);
+			const CVector& point = CVector(teleportPoints[teleportIndex]);
 			CVector scaledPoint;
-			PSVECScale(reinterpret_cast<Vec*>(&point), reinterpret_cast<Vec*>(&scaledPoint), kMonObjBossOne - blend);
+			PSVECScale(reinterpret_cast<Vec*>(const_cast<CVector*>(&point)), reinterpret_cast<Vec*>(&scaledPoint), kMonObjBossOne - blend);
 
 			Vec scaledPointCopy;
 			scaledPointCopy.x = scaledPoint.x;
 			scaledPointCopy.y = scaledPoint.y;
 			scaledPointCopy.z = scaledPoint.z;
 
-			CVector current(object->m_worldPosition);
+			const CVector& current = CVector(object->m_worldPosition);
 			CVector scaledCurrent;
-			PSVECScale(reinterpret_cast<Vec*>(&current), reinterpret_cast<Vec*>(&scaledCurrent), blend);
+			PSVECScale(reinterpret_cast<Vec*>(const_cast<CVector*>(&current)), reinterpret_cast<Vec*>(&scaledCurrent), blend);
 
 			Vec scaledCurrentCopy;
 			scaledCurrentCopy.x = scaledCurrent.x;

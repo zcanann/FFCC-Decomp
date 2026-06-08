@@ -1543,14 +1543,16 @@ search:
             stride;
 
         if (mapObj < mapObjEnd) {
-            do {
+            for (unsigned int i = 0; i < remaining; i++) {
+                if (mapObj >= mapObjEnd) {
+                    break;
+                }
                 CMapObjAtr* mapObjAtr = mapObj->m_attribute;
                 if (mapObjAtr != 0 && mapObjAtr->m_type == CMapObjAtr::MESH_NAME) {
                     goto found;
                 }
                 mapObj++;
-                remaining--;
-            } while (remaining != 0);
+            }
         }
 
         mapObj = 0;
@@ -1793,7 +1795,7 @@ int CMapMng::ReadMtx(char* mapName)
                 return 1;
             }
             if (loadIndex == 0) {
-                if (System.m_execParam != 0) {
+                if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                     System.Printf(const_cast<char*>(s_mapReadOpenErrorFmt), strTmp);
                 }
                 return 0;
@@ -1807,14 +1809,12 @@ int CMapMng::ReadMtx(char* mapName)
 
         void* filePtr;
         if (m_asyncLoadState.m_mapReadMode == 1) {
-            int& readIndex = m_asyncLoadState.m_asyncReadIndex;
-            int size = m_asyncLoadState.m_fileSizes[readIndex];
-            void* amemCursor = m_asyncLoadState.m_mapLoadCursor;
+            int size = m_asyncLoadState.m_fileSizes[m_asyncLoadState.m_asyncReadIndex];
             filePtr = File.m_readBuffer;
-            Memory.CopyFromAMemorySync(filePtr, amemCursor, static_cast<unsigned long>((size + 0x1F) & ~0x1F));
+            Memory.CopyFromAMemorySync(filePtr, m_asyncLoadState.m_mapLoadCursor, static_cast<unsigned long>((size + 0x1F) & ~0x1F));
             m_asyncLoadState.m_mapLoadCursor = reinterpret_cast<unsigned char*>(m_asyncLoadState.m_mapLoadCursor) + size;
             CheckSum(filePtr, size);
-            readIndex += 1;
+            m_asyncLoadState.m_asyncReadIndex += 1;
         } else {
             CFile::CHandle* handle = File.Open(strTmp, 0, CFile::PRI_LOW);
             if (handle == 0) {
@@ -1824,21 +1824,18 @@ int CMapMng::ReadMtx(char* mapName)
                 if (m_asyncLoadState.m_mapReadMode == 3) {
                     File.ReadASync(handle);
                     filePtr = reinterpret_cast<void*>(1);
-                    int& openIndex = m_asyncLoadState.m_asyncOpenIndex;
-                    m_asyncLoadState.m_asyncHandles[openIndex] = handle;
-                    openIndex += 1;
+                    m_asyncLoadState.m_asyncHandles[m_asyncLoadState.m_asyncOpenIndex] = handle;
+                    m_asyncLoadState.m_asyncOpenIndex += 1;
                 } else {
                     File.Read(handle);
                     File.SyncCompleted(handle);
                     filePtr = File.m_readBuffer;
                     File.Close(handle);
                     if (m_asyncLoadState.m_mapReadMode == 2) {
-                        int& readIndex = m_asyncLoadState.m_asyncReadIndex;
-                        void* amemCursor = m_asyncLoadState.m_mapLoadCursor;
-                        Memory.CopyToAMemorySync(filePtr, amemCursor, static_cast<unsigned long>(size));
-                        m_asyncLoadState.m_fileSizes[readIndex] = size;
-                        m_asyncLoadState.m_fileChecksums[readIndex] = CheckSum(filePtr, size);
-                        readIndex += 1;
+                        Memory.CopyToAMemorySync(filePtr, m_asyncLoadState.m_mapLoadCursor, static_cast<unsigned long>(size));
+                        m_asyncLoadState.m_fileSizes[m_asyncLoadState.m_asyncReadIndex] = size;
+                        m_asyncLoadState.m_fileChecksums[m_asyncLoadState.m_asyncReadIndex] = CheckSum(filePtr, size);
+                        m_asyncLoadState.m_asyncReadIndex += 1;
                         m_asyncLoadState.m_mapLoadCursor =
                             reinterpret_cast<unsigned char*>(m_asyncLoadState.m_mapLoadCursor) + size;
                     }
@@ -1847,7 +1844,7 @@ int CMapMng::ReadMtx(char* mapName)
         }
 
         if (filePtr == 0) {
-            if (System.m_execParam != 0) {
+            if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                 System.Printf(const_cast<char*>(s_mapReadErrorFmt), strTmp);
             }
             return 0;
@@ -1860,18 +1857,24 @@ int CMapMng::ReadMtx(char* mapName)
 
             if (m_asyncLoadState.m_mapReadMode == 2) {
                 while (chunkFile.GetNextChunk(chunk)) {
-                    if (chunk.m_id == 0x54534554 && chunk.m_arg0 == 1) {
-                        return 1;
+                    switch (chunk.m_id) {
+                    case 0x54534554:
+                        if (chunk.m_arg0 == 1) {
+                            return 1;
+                        }
+                        break;
                     }
                 }
             } else {
                 while (chunkFile.GetNextChunk(chunk)) {
-                    if (chunk.m_id == 0x54534554) {
+                    switch (chunk.m_id) {
+                    case 0x54534554:
                         m_textureSet->Create(chunkFile, MapMng.m_stage, append, 0, 0, 0);
                         append = 1;
                         if (chunk.m_arg0 == 1) {
                             return 1;
                         }
+                        break;
                     }
                 }
             }
@@ -1934,15 +1937,13 @@ int CMapMng::ReadMpl(char* mapName)
 
         void* filePtr;
         if (m_asyncLoadState.m_mapReadMode == 1) {
-            int& readIndex = m_asyncLoadState.m_asyncReadIndex;
-            const int size = m_asyncLoadState.m_fileSizes[readIndex];
-            void* amemCursor = m_asyncLoadState.m_mapLoadCursor;
+            const int size = m_asyncLoadState.m_fileSizes[m_asyncLoadState.m_asyncReadIndex];
             filePtr = File.m_readBuffer;
 
-            Memory.CopyFromAMemorySync(filePtr, amemCursor, (size + 0x1F) & ~0x1F);
+            Memory.CopyFromAMemorySync(filePtr, m_asyncLoadState.m_mapLoadCursor, (size + 0x1F) & ~0x1F);
             m_asyncLoadState.m_mapLoadCursor = reinterpret_cast<unsigned char*>(m_asyncLoadState.m_mapLoadCursor) + size;
             CheckSum(filePtr, size);
-            readIndex += 1;
+            m_asyncLoadState.m_asyncReadIndex += 1;
         } else {
             CFile::CHandle* fileHandle = File.Open(strTmp, 0, CFile::PRI_LOW);
             if (fileHandle == 0) {
@@ -1952,21 +1953,18 @@ int CMapMng::ReadMpl(char* mapName)
                 if (m_asyncLoadState.m_mapReadMode == 3) {
                     File.ReadASync(fileHandle);
                     filePtr = reinterpret_cast<void*>(1);
-                    int& openIndex = m_asyncLoadState.m_asyncOpenIndex;
-                    m_asyncLoadState.m_asyncHandles[openIndex] = fileHandle;
-                    openIndex += 1;
+                    m_asyncLoadState.m_asyncHandles[m_asyncLoadState.m_asyncOpenIndex] = fileHandle;
+                    m_asyncLoadState.m_asyncOpenIndex += 1;
                 } else {
                     File.Read(fileHandle);
                     File.SyncCompleted(fileHandle);
                     filePtr = File.m_readBuffer;
                     File.Close(fileHandle);
                     if (m_asyncLoadState.m_mapReadMode == 2) {
-                        int& readIndex = m_asyncLoadState.m_asyncReadIndex;
-                        void* amemCursor = m_asyncLoadState.m_mapLoadCursor;
-                        Memory.CopyToAMemorySync(filePtr, amemCursor, static_cast<unsigned long>(size));
-                        m_asyncLoadState.m_fileSizes[readIndex] = size;
-                        m_asyncLoadState.m_fileChecksums[readIndex] = CheckSum(filePtr, size);
-                        readIndex += 1;
+                        Memory.CopyToAMemorySync(filePtr, m_asyncLoadState.m_mapLoadCursor, static_cast<unsigned long>(size));
+                        m_asyncLoadState.m_fileSizes[m_asyncLoadState.m_asyncReadIndex] = size;
+                        m_asyncLoadState.m_fileChecksums[m_asyncLoadState.m_asyncReadIndex] = CheckSum(filePtr, size);
+                        m_asyncLoadState.m_asyncReadIndex += 1;
                         m_asyncLoadState.m_mapLoadCursor =
                             reinterpret_cast<unsigned char*>(m_asyncLoadState.m_mapLoadCursor) + size;
                     }
@@ -1994,25 +1992,33 @@ int CMapMng::ReadMpl(char* mapName)
                 }
             } else {
                 while (chunkFile.GetNextChunk(chunk)) {
-                    if (chunk.m_id != 0x4D455348) {
+                    switch (chunk.m_id) {
+                    case 0x4D455348:
+                        break;
+                    default:
                         continue;
                     }
 
                     chunkFile.PushChunk();
                     CChunkFile::CChunk meshChunk;
                     while (chunkFile.GetNextChunk(meshChunk)) {
-                        if (meshChunk.m_id == 0x56534554) {
+                        switch (meshChunk.m_id) {
+                        case 0x56534554: {
                             short& meshCount = m_mapMeshCount;
-                            if (meshCount > 0x9F) {
+                            if (meshCount >= 0xA0) {
                                 return 0;
                             }
                             CMapMesh* mesh = GetMapMeshArray() + meshCount;
                             mesh->ReadOtmMesh(chunkFile, m_stage, 1, 1);
-                        } else if (meshChunk.m_id == 0x44534554) {
+                            break;
+                        }
+                        case 0x44534554: {
                             short& meshCount = m_mapMeshCount;
                             CMapMesh* mesh = GetMapMeshArray() + meshCount;
                             mesh->ReadOtmMesh(chunkFile, m_stage, 1, 1);
                             meshCount += 1;
+                            break;
+                        }
                         }
                     }
                     chunkFile.PopChunk();
@@ -2050,15 +2056,13 @@ int CMapMng::ReadOtm(char* mapName)
     m_mapAnimFrame = 0;
 
     if (m_asyncLoadState.m_mapReadMode == 1) {
-        int& readIndex = m_asyncLoadState.m_asyncReadIndex;
-        const int size = m_asyncLoadState.m_fileSizes[readIndex];
-        void* amemCursor = m_asyncLoadState.m_mapLoadCursor;
+        const int size = m_asyncLoadState.m_fileSizes[m_asyncLoadState.m_asyncReadIndex];
         filePtr = File.m_readBuffer;
 
-        Memory.CopyFromAMemorySync(filePtr, amemCursor, (size + 0x1F) & ~0x1F);
+        Memory.CopyFromAMemorySync(filePtr, m_asyncLoadState.m_mapLoadCursor, (size + 0x1F) & ~0x1F);
         m_asyncLoadState.m_mapLoadCursor = reinterpret_cast<unsigned char*>(m_asyncLoadState.m_mapLoadCursor) + size;
         CheckSum(filePtr, size);
-        readIndex += 1;
+        m_asyncLoadState.m_asyncReadIndex += 1;
     } else {
         CFile::CHandle* fileHandle = File.Open(strTmp, 0, CFile::PRI_LOW);
         if (fileHandle != 0) {
@@ -2066,9 +2070,8 @@ int CMapMng::ReadOtm(char* mapName)
             if (m_asyncLoadState.m_mapReadMode == 3) {
                 File.ReadASync(fileHandle);
                 filePtr = reinterpret_cast<void*>(1);
-                int& openIndex = m_asyncLoadState.m_asyncOpenIndex;
-                m_asyncLoadState.m_asyncHandles[openIndex] = fileHandle;
-                openIndex += 1;
+                m_asyncLoadState.m_asyncHandles[m_asyncLoadState.m_asyncOpenIndex] = fileHandle;
+                m_asyncLoadState.m_asyncOpenIndex += 1;
             } else {
                 File.Read(fileHandle);
                 File.SyncCompleted(fileHandle);
@@ -2076,12 +2079,10 @@ int CMapMng::ReadOtm(char* mapName)
                 File.Close(fileHandle);
 
                 if (m_asyncLoadState.m_mapReadMode == 2) {
-                    int& readIndex = m_asyncLoadState.m_asyncReadIndex;
-                    void* amemCursor = m_asyncLoadState.m_mapLoadCursor;
-                    Memory.CopyToAMemorySync(filePtr, amemCursor, static_cast<unsigned long>(size));
-                    m_asyncLoadState.m_fileSizes[readIndex] = size;
-                    m_asyncLoadState.m_fileChecksums[readIndex] = CheckSum(filePtr, size);
-                    readIndex += 1;
+                    Memory.CopyToAMemorySync(filePtr, m_asyncLoadState.m_mapLoadCursor, static_cast<unsigned long>(size));
+                    m_asyncLoadState.m_fileSizes[m_asyncLoadState.m_asyncReadIndex] = size;
+                    m_asyncLoadState.m_fileChecksums[m_asyncLoadState.m_asyncReadIndex] = CheckSum(filePtr, size);
+                    m_asyncLoadState.m_asyncReadIndex += 1;
                     m_asyncLoadState.m_mapLoadCursor =
                         reinterpret_cast<unsigned char*>(m_asyncLoadState.m_mapLoadCursor) + size;
                 }
@@ -2092,7 +2093,7 @@ int CMapMng::ReadOtm(char* mapName)
     }
 
     if (filePtr == 0) {
-        if (System.m_execParam != 0) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1) {
             System.Printf(const_cast<char*>(s_mapReadErrorFmt), strTmp);
         }
         return 0;
@@ -2107,15 +2108,19 @@ int CMapMng::ReadOtm(char* mapName)
 
     CChunkFile::CChunk chunk;
     while (chunkFile.GetNextChunk(chunk)) {
-        if (chunk.m_id != 0x4F544D20) {
+        switch (chunk.m_id) {
+        case 0x4F544D20:
+            break;
+        default:
             continue;
         }
 
         chunkFile.PushChunk();
         while (chunkFile.GetNextChunk(chunk)) {
-            if (chunk.m_id == 0x4F43544D) {
+            switch (chunk.m_id) {
+            case 0x4F43544D: {
                 short& octTreeCount = m_octTreeCount;
-                if (octTreeCount > 0xF) {
+                if (octTreeCount >= 0x10) {
                     return 0;
                 }
 
@@ -2125,11 +2130,7 @@ int CMapMng::ReadOtm(char* mapName)
                 continue;
             }
 
-            if (static_cast<int>(chunk.m_id) < 0x4F43544D) {
-                if (chunk.m_id != 0x4C495448) {
-                    break;
-                }
-
+            case 0x4C495448: {
                 CMapLightHolder* light = static_cast<CMapLightHolder*>(
                     operator new(0x10, MapMng.m_stage, const_cast<char*>(s_map_cpp), 0x4D3));
                 unsigned char* lightRaw = reinterpret_cast<unsigned char*>(light);
@@ -2145,71 +2146,75 @@ int CMapMng::ReadOtm(char* mapName)
                 continue;
             }
 
-            if (chunk.m_id != 0x5343454E) {
+            case 0x5343454E:
                 break;
+            default:
+                goto otmDone;
             }
 
             chunkFile.PushChunk();
             while (chunkFile.GetNextChunk(chunk)) {
-                if (chunk.m_id == 0x4D455348) {
+                switch (chunk.m_id) {
+                case 0x4D534554: {
+                    m_materialSet =
+                        new (MapMng.m_stage, const_cast<char*>(s_map_cpp), 0x482) CMaterialSet();
+                    m_materialSet->m_materials.SetDefaultSize(0x180);
+                    m_materialSet->m_materials.SetGrow(0);
+                    m_materialSet->Create(chunkFile, m_textureSet, static_cast<CMaterialMan::TEV_BIT>(0xFFF53060), 0);
+                    break;
+                }
+
+                case 0x41534554: {
+                    m_mapTexAnimSet =
+                        new (MapMng.m_stage, const_cast<char*>(s_map_cpp), 0x49A) CMapTexAnimSet();
+                    m_mapTexAnimSet->Create(chunkFile, m_materialSet, m_textureSet);
+                    break;
+                }
+
+                case 0x4D455348: {
                     short& meshCount = m_mapMeshCount;
-                    if (meshCount > 0x9F) {
+                    if (meshCount >= 0xA0) {
                         return 0;
                     }
                     CMapMesh* mesh = GetMapMeshArray() + meshCount;
                     mesh->ReadOtmMesh(chunkFile, MapMng.m_stage, 0, 1);
                     meshCount += 1;
-                    continue;
+                    break;
                 }
 
-                if (chunk.m_id == 0x41534554) {
-                    CMapTexAnimSet* texAnimSet =
-                        new (MapMng.m_stage, const_cast<char*>(s_map_cpp), 0x49A) CMapTexAnimSet();
-                    m_mapTexAnimSet = texAnimSet;
-                    texAnimSet->Create(chunkFile, m_materialSet, m_textureSet);
-                    continue;
-                }
-
-                if (chunk.m_id == 0x414E494D) {
-                    CMapAnim* mapAnim = new (MapMng.m_stage, const_cast<char*>(s_map_cpp), 0x4BF) CMapAnim();
-                    mapAnim->ReadOtmAnim(chunkFile);
-                    GetMapAnimArray().Add(mapAnim);
-                    continue;
-                }
-
-                if (chunk.m_id == 0x48495420) {
+                case 0x48495420: {
                     short& hitCount = m_mapHitCount;
-                    if (hitCount > 0x1F) {
+                    if (hitCount >= 0x20) {
                         return 0;
                     }
                     CMapHit* hit = GetMapHitArray() + hitCount;
                     hit->ReadOtmHit(chunkFile);
                     hitCount += 1;
-                    continue;
+                    break;
                 }
 
-                if (chunk.m_id == 0x4E4F4445) {
+                case 0x4E4F4445: {
                     short& mapObjCount = m_mapObjCount;
-                    if (mapObjCount > 0x1FF) {
+                    if (mapObjCount >= 0x200) {
                         return 0;
                     }
                     CMapObj* mapObj = GetMapObjArray() + mapObjCount;
                     mapObj->ReadOtmObj(chunkFile);
                     mapObjCount += 1;
-                    continue;
+                    break;
                 }
 
-                if (chunk.m_id == 0x4D534554) {
-                    CMaterialSet* materialSet =
-                        new (MapMng.m_stage, const_cast<char*>(s_map_cpp), 0x482) CMaterialSet();
-                    m_materialSet = materialSet;
-                    materialSet->m_materials.SetDefaultSize(0x180);
-                    materialSet->m_materials.SetGrow(0);
-                    materialSet->Create(chunkFile, m_textureSet, static_cast<CMaterialMan::TEV_BIT>(0xFFF53060), 0);
+                case 0x414E494D: {
+                    CMapAnim* mapAnim = new (MapMng.m_stage, const_cast<char*>(s_map_cpp), 0x4BF) CMapAnim();
+                    mapAnim->ReadOtmAnim(chunkFile);
+                    GetMapAnimArray().Add(mapAnim);
+                    break;
+                }
                 }
             }
             chunkFile.PopChunk();
         }
+    otmDone:
         chunkFile.PopChunk();
     }
 
@@ -2325,21 +2330,19 @@ int CMapMng::ReadMid(char* mapName)
     sprintf(strTmp, const_cast<char*>(s_mapMidPathFmt), mapName);
     int ok = 1;
 
-    if (static_cast<int>(System.m_execParam) >= 3) {
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
         System.Printf(const_cast<char*>(s_read_mid_fmt), strTmp);
     }
 
     void* filePtr;
     if (m_asyncLoadState.m_mapReadMode == 1) {
-        int& readIndex = m_asyncLoadState.m_asyncReadIndex;
-        const int size = m_asyncLoadState.m_fileSizes[readIndex];
-        void* amemCursor = m_asyncLoadState.m_mapLoadCursor;
+        const int size = m_asyncLoadState.m_fileSizes[m_asyncLoadState.m_asyncReadIndex];
         filePtr = File.m_readBuffer;
 
-        Memory.CopyFromAMemorySync(filePtr, amemCursor, static_cast<unsigned long>((size + 0x1F) & ~0x1F));
+        Memory.CopyFromAMemorySync(filePtr, m_asyncLoadState.m_mapLoadCursor, static_cast<unsigned long>((size + 0x1F) & ~0x1F));
         m_asyncLoadState.m_mapLoadCursor = reinterpret_cast<unsigned char*>(m_asyncLoadState.m_mapLoadCursor) + size;
         CheckSum(filePtr, size);
-        readIndex += 1;
+        m_asyncLoadState.m_asyncReadIndex += 1;
     } else {
         CFile::CHandle* fileHandle = File.Open(strTmp, 0, CFile::PRI_LOW);
         if (fileHandle == 0) {
@@ -2349,9 +2352,8 @@ int CMapMng::ReadMid(char* mapName)
             if (m_asyncLoadState.m_mapReadMode == 3) {
                 File.ReadASync(fileHandle);
                 filePtr = reinterpret_cast<void*>(1);
-                int& openIndex = m_asyncLoadState.m_asyncOpenIndex;
-                m_asyncLoadState.m_asyncHandles[openIndex] = fileHandle;
-                openIndex += 1;
+                m_asyncLoadState.m_asyncHandles[m_asyncLoadState.m_asyncOpenIndex] = fileHandle;
+                m_asyncLoadState.m_asyncOpenIndex += 1;
             } else {
                 File.Read(fileHandle);
                 File.SyncCompleted(fileHandle);
@@ -2359,12 +2361,10 @@ int CMapMng::ReadMid(char* mapName)
                 File.Close(fileHandle);
 
                 if (m_asyncLoadState.m_mapReadMode == 2) {
-                    int& readIndex = m_asyncLoadState.m_asyncReadIndex;
-                    void* amemCursor = m_asyncLoadState.m_mapLoadCursor;
-                    Memory.CopyToAMemorySync(filePtr, amemCursor, static_cast<unsigned long>(size));
-                    m_asyncLoadState.m_fileSizes[readIndex] = size;
-                    m_asyncLoadState.m_fileChecksums[readIndex] = CheckSum(filePtr, size);
-                    readIndex += 1;
+                    Memory.CopyToAMemorySync(filePtr, m_asyncLoadState.m_mapLoadCursor, static_cast<unsigned long>(size));
+                    m_asyncLoadState.m_fileSizes[m_asyncLoadState.m_asyncReadIndex] = size;
+                    m_asyncLoadState.m_fileChecksums[m_asyncLoadState.m_asyncReadIndex] = CheckSum(filePtr, size);
+                    m_asyncLoadState.m_asyncReadIndex += 1;
                     m_asyncLoadState.m_mapLoadCursor =
                         reinterpret_cast<unsigned char*>(m_asyncLoadState.m_mapLoadCursor) + size;
                 }
@@ -2389,13 +2389,17 @@ int CMapMng::ReadMid(char* mapName)
     CMapObj* nextMapObj = GetMapObjArray();
     CChunkFile::CChunk chunk;
     while (chunkFile.GetNextChunk(chunk)) {
-        if (chunk.m_id != 0x4D494420) {
+        switch (chunk.m_id) {
+        case 0x4D494420:
+            break;
+        default:
             continue;
         }
 
         chunkFile.PushChunk();
         while (chunkFile.GetNextChunk(chunk)) {
-            if (chunk.m_id == 0x5343454E) {
+            switch (chunk.m_id) {
+            case 0x5343454E: {
                 chunkFile.PushChunk();
                 while (chunkFile.GetNextChunk(chunk)) {
                     if (chunk.m_id != 0x48495420) {
@@ -2403,7 +2407,7 @@ int CMapMng::ReadMid(char* mapName)
                     }
 
                     short& hitCount = m_mapHitCount;
-                    if (hitCount > 0x1F) {
+                    if (hitCount >= 0x20) {
                         return 0;
                     }
                     CMapHit* hit = GetMapHitArray() + hitCount;
@@ -2413,8 +2417,9 @@ int CMapMng::ReadMid(char* mapName)
                 chunkFile.PopChunk();
                 continue;
             }
-
-            if (chunk.m_id != 0x4F43544D) {
+            case 0x4F43544D:
+                break;
+            default:
                 continue;
             }
 
@@ -2423,7 +2428,7 @@ int CMapMng::ReadMid(char* mapName)
             while (mapObjIndex < m_mapObjCount) {
                 if (mapObj->m_meshType == 1 || mapObj->m_meshType == 2) {
                     short& octTreeCount = m_octTreeCount;
-                    if (octTreeCount > 0xF) {
+                    if (octTreeCount >= 0x10) {
                         return 0;
                     }
 

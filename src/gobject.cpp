@@ -2599,10 +2599,7 @@ void CGObject::Turn(float targetRot, int turnFrames)
         Math.DstRot(m_rotBaseY, m_rotTargetY) / static_cast<float>(turnFrames);
     *reinterpret_cast<int*>(&m_attackColliders[0].m_localStart.x) = turnFrames;
 
-    int animSlot = 2;
-    if (m_turnBaseSpeed >= sZeroFloat) {
-        animSlot = 3;
-    }
+    const int animSlot = (m_turnBaseSpeed < sZeroFloat) ? 2 : 3;
 
     m_currentAnimSlot = m_animQueue[animSlot - 0x41];
     *(reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1) =

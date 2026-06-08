@@ -5269,9 +5269,18 @@ void CGPartyObj::gpmMove()
 		return;
 	}
 
-	sGhostPartyWork.thresholdA = (sGhostPartyWork.slotSel == 0) ? 0 : sGhostPartyWork.thresholdA / 2;
-	sGhostPartyWork.thresholdB = (sGhostPartyWork.slotSel == 1) ? 0 : sGhostPartyWork.thresholdB / 2;
-	sGhostPartyWork.thresholdC = (sGhostPartyWork.slotSel == 2) ? 0 : sGhostPartyWork.thresholdC / 2;
+	{
+		int* threshold = &sGhostPartyWork.thresholdA;
+		const int slotSel = sGhostPartyWork.slotSel;
+		for (int slot = 0; slot < 3; slot++) {
+			if (slot == slotSel) {
+				*threshold = 0;
+			} else {
+				*threshold = *threshold / 2;
+			}
+			threshold++;
+		}
+	}
 	PartyData(this).partyFlags = (PartyData(this).partyFlags & 0xAF) | 0x40;
 }
 

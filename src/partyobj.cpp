@@ -4853,13 +4853,13 @@ void CGPartyObj::ghostPartyMog()
 			exceeded = 0;
 		}
 
-		if (exceeded && sGhostPartyWork.flagBits.flag10 >= 0) {
+		if (exceeded && sGhostPartyWork.flagBits.flag10 == 0) {
 			sGhostPartyWork.flagBits.flag10 = 1;
 			bossState = 2;
 			putParticle(299, 0, this, kMonObjOne, 0);
-		} else if (sGhostPartyWork.flagBits.flag08 < 0 ||
+		} else if (sGhostPartyWork.flagBits.flag08 != 0 ||
 		           static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x38)) < 10) {
-			if (sGhostPartyWork.flagBits.flag10 >= 0) {
+			if (sGhostPartyWork.flagBits.flag10 == 0) {
 				int innerMode;
 				switch (Game.m_gameWork.m_bossArtifactStageIndex) {
 				default:

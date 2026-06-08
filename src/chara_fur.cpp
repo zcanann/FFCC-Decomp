@@ -1748,15 +1748,31 @@ void CChara::makeFurTex()
 
 		float layerFactor = static_cast<float>(layer) * FLOAT_8033115C;
 		layerFactor = layerFactor * layerFactor;
-		CColor layerColor(
-		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.r * (kCharaFurDepthScaleBase - layerFactor)) +
-		                               static_cast<int>(furTipColor.color.r * layerFactor)),
-		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.g * (kCharaFurDepthScaleBase - layerFactor)) +
-		                               static_cast<int>(furTipColor.color.g * layerFactor)),
-		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.b * (kCharaFurDepthScaleBase - layerFactor)) +
-		                               static_cast<int>(furTipColor.color.b * layerFactor)),
-		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.a * (kCharaFurDepthScaleBase - layerFactor)) +
-		                               static_cast<int>(furTipColor.color.a * layerFactor)));
+
+		CColor tipPartTmp;
+		tipPartTmp.color.r = static_cast<unsigned char>(static_cast<int>(furTipColor.color.r * layerFactor));
+		tipPartTmp.color.g = static_cast<unsigned char>(static_cast<int>(furTipColor.color.g * layerFactor));
+		tipPartTmp.color.b = static_cast<unsigned char>(static_cast<int>(furTipColor.color.b * layerFactor));
+		tipPartTmp.color.a = static_cast<unsigned char>(static_cast<int>(furTipColor.color.a * layerFactor));
+		CColor tipPart = tipPartTmp;
+
+		CColor basePartTmp;
+		basePartTmp.color.r =
+		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.r * (kCharaFurDepthScaleBase - layerFactor)));
+		basePartTmp.color.g =
+		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.g * (kCharaFurDepthScaleBase - layerFactor)));
+		basePartTmp.color.b =
+		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.b * (kCharaFurDepthScaleBase - layerFactor)));
+		basePartTmp.color.a =
+		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.a * (kCharaFurDepthScaleBase - layerFactor)));
+		CColor basePart = basePartTmp;
+
+		CColor layerColorTmp;
+		layerColorTmp.color.r = static_cast<unsigned char>(basePart.color.r + tipPart.color.r);
+		layerColorTmp.color.g = static_cast<unsigned char>(basePart.color.g + tipPart.color.g);
+		layerColorTmp.color.b = static_cast<unsigned char>(basePart.color.b + tipPart.color.b);
+		layerColorTmp.color.a = static_cast<unsigned char>(basePart.color.a + tipPart.color.a);
+		CColor layerColor = layerColorTmp;
 		Graphic.SetCopyClear(layerColor, 0xFFFFFF);
 		GXCopyTex(static_cast<unsigned char*>(gMogFurTexBuffer) + layer * 0x4000, GX_TRUE);
 		GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);

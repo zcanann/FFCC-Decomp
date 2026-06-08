@@ -1100,7 +1100,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 		handle->m_model->SetMatrix(scaleMtx);
 		handle->m_model->CalcMatrix();
 		handle->m_model->CalcSkin();
-		handle->m_model->m_lightAlpha = sprites[(int)(signed char)s_PlayerTop + i].alpha;
+		handle->m_model->m_lightAlpha = sprites[(int)(unsigned char)s_PlayerTop + i].alpha;
 	}
 
 	if (doneCount == (int)header->count) {

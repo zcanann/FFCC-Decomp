@@ -811,7 +811,7 @@ done:
     particleData->m_matrix[2][3] = param->m_sizeStart;
     if (param->m_colorDeltaAdd[3] != 0.0f) {
         particleData->m_matrix[2][2] +=
-            (kPppYmMegaBirthShpTail2Double * param->m_colorDeltaAdd[3]) * Math.RandF() - param->m_colorDeltaAdd[3];
+            (kPppYmMegaBirthShpTail2Double * param->m_colorDeltaAdd[3]) * Math.RandF() - *(float*)(paramBytes + 0x48);
     }
 
     if (*(u16*)(paramBytes + 0x14) == 0) {

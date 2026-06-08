@@ -453,8 +453,25 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 							break;
 						default:
 							if (systemVal <= -0x96 && systemVal >= -0x175) {
-								u8* const itemTable = *reinterpret_cast<u8**>(classData + 0x24);
-								StoreU16(stack, itemTable, (systemVal + 0x175) * 2, setMode);
+								const int itemOffset = (systemVal + 0x175) * 2;
+								stack[-1].m_word =
+								    *reinterpret_cast<unsigned short*>(*reinterpret_cast<u8**>(classData + 0x24) + itemOffset);
+								switch (setMode) {
+								case -1:
+									*reinterpret_cast<unsigned short*>(*reinterpret_cast<u8**>(classData + 0x24) + itemOffset) =
+									    *reinterpret_cast<unsigned short*>(*reinterpret_cast<u8**>(classData + 0x24) + itemOffset) -
+									    stack->m_word;
+									break;
+								case 0:
+									*reinterpret_cast<unsigned short*>(*reinterpret_cast<u8**>(classData + 0x24) + itemOffset) =
+									    stack->m_word;
+									break;
+								case 1:
+									*reinterpret_cast<unsigned short*>(*reinterpret_cast<u8**>(classData + 0x24) + itemOffset) =
+									    *reinterpret_cast<unsigned short*>(*reinterpret_cast<u8**>(classData + 0x24) + itemOffset) +
+									    stack->m_word;
+									break;
+								}
 							} else {
 								switch (systemVal) {
 								case -0x40:
@@ -542,22 +559,21 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 					StoreU32(stack, engineObject, 0x94, setMode);
 					break;
 				case -0xA: {
-					const int oldBit = static_cast<unsigned int>((static_cast<int>(*(engineObject + 0x50) & 0xC) << 0x1C) >> 0x1F);
-					stack[-1].m_word = static_cast<unsigned int>(oldBit);
-					int bitValue = oldBit;
+					CGObject* obj = reinterpret_cast<CGObject*>(engineObject);
+					stack[-1].m_word = static_cast<unsigned int>(static_cast<int>(obj->m_stateFlags0Bits.unk4));
 					switch (setMode) {
 					case -1:
-						bitValue -= static_cast<int>(static_cast<signed char>(stack->m_word));
+						obj->m_stateFlags0Bits.unk4 = static_cast<signed char>(
+						    obj->m_stateFlags0Bits.unk4 - static_cast<int>(stack->m_word));
 						break;
 					case 0:
-						bitValue = static_cast<int>(static_cast<signed char>(stack->m_word));
+						obj->m_stateFlags0Bits.unk4 = static_cast<signed char>(static_cast<signed char>(stack->m_word));
 						break;
 					case 1:
-						bitValue += static_cast<int>(static_cast<signed char>(stack->m_word));
+						obj->m_stateFlags0Bits.unk4 = static_cast<signed char>(
+						    obj->m_stateFlags0Bits.unk4 + static_cast<int>(stack->m_word));
 						break;
 					}
-					*(engineObject + 0x50) =
-					    static_cast<u8>((static_cast<unsigned int>(bitValue) << 3) & 8) | (*(engineObject + 0x50) & 0xF7);
 					break;
 				}
 				case -0xB: {
@@ -1298,12 +1314,13 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		}
 		case -0x2D: {
-			float* params = reinterpret_cast<float*>(object->m_localBase);
 			engineObject->SetAttackCol(
 			    static_cast<int>(object->m_localBase[0]),
 			    RuntimeString(this, object->m_localBase[1]),
-			    params[2],
-			    CVector(params[3], params[4], params[5]));
+			    reinterpret_cast<float*>(object->m_localBase)[2],
+			    CVector(reinterpret_cast<float*>(object->m_localBase)[3],
+			            reinterpret_cast<float*>(object->m_localBase)[4],
+			            reinterpret_cast<float*>(object->m_localBase)[5]));
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

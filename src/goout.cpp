@@ -2261,7 +2261,7 @@ void CGoOutMenu::CalcDel()
                     } else if (m_cursorChoice == 1) {
                         Sound.PlaySe(3, 0x40, 0x7f, 0);
                     }
-                    next = static_cast<unsigned char>(m_cursorChoice + 1);
+                    next = static_cast<signed char>(m_cursorChoice + 1);
                 }
             }
         }
@@ -2353,7 +2353,7 @@ void CGoOutMenu::CalcDel()
                     } else if (m_cursorChoice == 1) {
                         Sound.PlaySe(3, 0x40, 0x7f, 0);
                     }
-                    next = static_cast<unsigned char>(m_cursorChoice + 1);
+                    next = static_cast<signed char>(m_cursorChoice + 1);
                 }
             } else {
                 m_cursorChoice ^= 1;

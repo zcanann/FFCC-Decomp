@@ -256,33 +256,35 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		{
 			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 4);
 			int value = CMes::m_tempVar[varIndex];
-			if ((tag == 9) || (tag == 0x37))
+			switch (tag)
 			{
+			case 9:
+			case 0x37:
 				strcpy(dst, FlatNameDirect(0, value * 5 + 1));
-			}
-			else if (tag == 0x1D)
-			{
+				break;
+			case 0x1D:
 				strcpy(dst, FlatNameDirect(0, value * 5));
-			}
-			else if (tag == 0x39)
-			{
+				break;
+			case 0x39:
 				strcpy(dst, FlatNameDirect(0, value * 5 + 3));
-			}
-			else if (tag == 0x3B)
-			{
+				break;
+			case 0x3B:
 				Game.MakeArtItemName(dst, value, 1);
-			}
-			else if (tag == 0x3D)
+				break;
+			case 0x3D:
 			{
 				signed char countIdx = (signed char)GetMesNibbleValue((const char*)in + 6);
 				int count = (unsigned int)CMes::m_tempVar[countIdx] & 0xFFFF;
 				Game.MakeArtItemName(dst, value, count);
+				break;
 			}
-			else
+			case 0x3F:
 			{
 				signed char countIdx = (signed char)GetMesNibbleValue((const char*)in + 6);
 				int count = (unsigned int)CMes::m_tempVar[countIdx] & 0xFFFF;
 				Game.MakeNumItemName(dst, value, count);
+				break;
+			}
 			}
 			ApplyCaseMode(dst, caseMode);
 			dst += strlen(dst);
@@ -299,33 +301,35 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		{
 			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 4);
 			int value = CMes::m_tempVar[varIndex];
-			if ((tag == 0x2A) || (tag == 0x38))
+			switch (tag)
 			{
-				strcpy(dst, FlatNameDirect(1, value * 5 + 1));
-			}
-			else if (tag == 0x1E)
-			{
+			case 0x1E:
 				strcpy(dst, FlatNameDirect(1, value * 5));
-			}
-			else if (tag == 0x3A)
-			{
+				break;
+			case 0x2A:
+			case 0x38:
+				strcpy(dst, FlatNameDirect(1, value * 5 + 1));
+				break;
+			case 0x3A:
 				strcpy(dst, FlatNameDirect(1, value * 5 + 3));
-			}
-			else if (tag == 0x3C)
-			{
+				break;
+			case 0x3C:
 				Game.MakeArtMonName(dst, value, 1);
-			}
-			else if (tag == 0x3E)
+				break;
+			case 0x3E:
 			{
 				signed char countIdx = (signed char)GetMesNibbleValue((const char*)in + 6);
 				int count = (unsigned int)CMes::m_tempVar[countIdx] & 0xFFFF;
 				Game.MakeArtMonName(dst, value, count);
+				break;
 			}
-			else
+			case 0x40:
 			{
 				signed char countIdx = (signed char)GetMesNibbleValue((const char*)in + 6);
 				int count = (unsigned int)CMes::m_tempVar[countIdx] & 0xFFFF;
 				Game.MakeNumMonName(dst, value, count);
+				break;
+			}
 			}
 			ApplyCaseMode(dst, caseMode);
 			dst += strlen(dst);

@@ -2692,23 +2692,23 @@ void CMenuPcs::DrawSingWin(short mode)
         return;
     }
 
-    float left = static_cast<float>(m_menuWindowInfo->x) + static_cast<float>(m_menuWindowInfo->width) * 0.5f;
-    float top = static_cast<float>(m_menuWindowInfo->y) + static_cast<float>(m_menuWindowInfo->height) * 0.5f;
+    float left = static_cast<float>(m_menuWindowInfo->x) + static_cast<float>(static_cast<double>(m_menuWindowInfo->width) * 0.5);
+    float top = static_cast<float>(m_menuWindowInfo->y) + static_cast<float>(static_cast<double>(m_menuWindowInfo->height) * 0.5);
     float width;
     float height;
 
-    if (m_menuWindowInfo->state == 1) {
-        left = static_cast<float>(m_menuWindowInfo->x);
-        top = static_cast<float>(m_menuWindowInfo->y);
-        width = static_cast<float>(m_menuWindowInfo->width);
-        height = static_cast<float>(m_menuWindowInfo->height);
-    } else {
+    if (m_menuWindowInfo->state != 1) {
         float leftScale = (((left - static_cast<float>(m_menuWindowInfo->x)) - 32.0f) / 6.0f) * static_cast<float>(m_menuWindowInfo->frame);
         float topScale = (((top - static_cast<float>(m_menuWindowInfo->y)) - 32.0f) / 6.0f) * static_cast<float>(m_menuWindowInfo->frame);
         left = (left - 32.0f) - leftScale;
         width = static_cast<float>(2.0 * static_cast<double>(32.0f + leftScale));
         height = static_cast<float>(2.0 * static_cast<double>(32.0f + topScale));
         top = (top - 32.0f) - topScale;
+    } else {
+        left = static_cast<float>(m_menuWindowInfo->x);
+        top = static_cast<float>(m_menuWindowInfo->y);
+        width = static_cast<float>(m_menuWindowInfo->width);
+        height = static_cast<float>(m_menuWindowInfo->height);
     }
 
     int leftPx = static_cast<int>(static_cast<double>(left) - 0.5);

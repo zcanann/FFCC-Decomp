@@ -310,10 +310,10 @@ void CMenuPcs::ItemDraw()
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
     CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+    s16 listState = this->m_itemMenuState->listState;
+    s16 mode = this->m_itemMenuState->mode;
     ItemMenuState* itemState = this->m_itemMenuState;
     ItemMenuAnimList* itemList = this->m_itemList;
-    s16 listState = itemState->listState;
-    s16 mode = itemState->mode;
     bool hasLetterAttach = SingGetLetterAttachflg() >= 0;
     int drawIndex = 0;
     int count = itemList->count;
@@ -400,7 +400,7 @@ void CMenuPcs::ItemDraw()
                 if ((itemId < 1) || (EquipChk(menuIndex) != 0) ||
                     (hasLetterAttach && (itemId < 0x125))) {
                     if (EquipChk(menuIndex) != 0) {
-                        int markX = (int)(x - LoadFloat(kItemMarkXOffset));
+                        int markX = (unsigned int)(x - LoadFloat(kItemMarkXOffset));
                         int markY = (int)((float)((h - LoadFloat(kItemMarkHeight)) * (float)LoadDouble(kItemHalfDouble)) + y);
                         DrawEquipMark(markX, markY, alpha);
                     }
@@ -440,7 +440,7 @@ void CMenuPcs::ItemDraw()
     }
 
     MenuItemOpenAnim* textEntry = listStart;
-    for (int i = 0; i < 8; i++, textEntry++) {
+    for (unsigned int i = 0; i < 8; i++, textEntry++) {
         int menuIndex = i + itemState->scroll;
         if (menuIndex > 0x3F) {
             menuIndex -= 0x40;
@@ -538,7 +538,7 @@ void CMenuPcs::ItemDraw()
     }
     float helpBaseX = LoadFloat(kItemHelpCenterX);
     float helpOffsetX = LoadFloat(kItemHalf);
-    int helpX = (int)(helpBaseX - (float)(LoadDouble(kItemHalfDouble) * (double)helpOffsetX));
+    int helpX = (unsigned int)(helpBaseX - (float)(LoadDouble(kItemHalfDouble) * (double)helpOffsetX));
     int helpY = (int)LoadFloat(kItemHelpY);
     DrawHelpMessage(
         selectedItemId,

@@ -63,7 +63,7 @@ extern const char s_Creando_801DC288[];
 extern float gWmLifeYOffsetSplinePoints[];
 
 char* DAT_8032E8A8 = lbl_80331208;
-unsigned char DAT_8032e8ac = 1;
+unsigned char lbl_8032E8AC = 1;
 int gWmModelYOffsetSplineCount = 9;
 float* gWmModelYOffsetSpline = gWmModelYOffsetSplinePoints;
 int gWmModelRotationSplineCount = 5;
@@ -104,18 +104,53 @@ inline CGObject::CGObject()
 {
 }
 
-float FLOAT_8032ee18;
-unsigned char DAT_8032ee1c;
-unsigned char DAT_8032ee20;
-unsigned char uRam8032ee21;
-unsigned char DAT_8032ee24;
-unsigned char uRam8032ee25;
-int DAT_8032ee28;
-int DAT_8032ee2c;
+extern float FLOAT_8032ee18;
+unsigned char lbl_8032EE1C;
+char gWmMenuCursorX[1];
+char gWmMenuCursorY[1];
+int gWmMenuWorkA;
+int gWmMenuWorkB;
+unsigned char gWmMenuScriptValueCache;
 unsigned char s_wmMenuLastMountState;
 unsigned char s_wmMenuMountStateInitialized;
-char* DAT_8032EE34;
-unsigned char lbl_8032EE38[8];
+extern char* DAT_8032EE34;
+extern unsigned char lbl_8032EE38[8];
+
+// wm_menu.o owns this .sdata2 constant pool (0x80331134-0x803311BC). These
+// named float/int constants are emitted into wm_menu's .sdata2 in address
+// order; defining them in-unit makes wm_menu.o's .sdata2 match the target.
+extern const float kCharaFurScreenCenterY = 224.0f;
+extern const float kCharaFurDepthScaleBase = 1.0f;
+extern const float kCharaFurScreenCenterX = 320.0f;
+extern const float kCharaFurTriangleVertexCount = 3.0f;
+extern const float kCharaFurPickRayFarZ = -100.0f;
+extern const float kCharaFurWeightScale = 0.5f;
+extern const float kCharaFurViewDepthThreshold = -1.0f;
+extern const float kCharaFurShadeScale = 255.0f;
+extern const float kCharaFurShadowRange = 100.0f;
+extern const float kCharaFurShadowFade = 20.0f;
+extern const float FLOAT_8033115C = 0.125f;
+extern const float FLOAT_80331160 = 4.0f;
+extern const float FLOAT_80331164 = 6.103701889514923e-05f;
+extern const float FLOAT_80331168 = 128.0f;
+extern const float FLOAT_8033116C = 8.0f;
+extern const int sYmEnvXAxisIdsWord = 0x79797979;
+extern const short sYmEnvXAxisIdsTail = 0x7878;
+extern const float sYmEnvYAxisAngle0 = 0.0f;
+extern const float sYmEnvYAxisAngle180 = 180.0f;
+extern const float kYmEnvRenderZero = 0.0f;
+extern const float kYmEnvRenderOne = 1.0f;
+extern const float kYmEnvNegativeOne = -1.0f;
+extern const float kYmEnvOrthoFarZ = 100.0f;
+extern const float kYmEnvTwo = 2.0f;
+extern const float kYmEnvFrustumExtent = 1.0199999809265137f;
+extern const float kYmEnvFrustumNegExtent = -1.0199999809265137f;
+extern const float kYmEnvFrustumScale = 0.5f;
+extern const float kYmEnvDegToRadF = 0.01745329238474369f;
+extern const float kYmEnvPi = 3.1415927410125732f;
+extern const float kYmEnvParaboloidNormalScale = -2.0f;
+extern const float kYmEnvNegativeTwoPi = -6.2831854820251465f;
+
 extern float FLOAT_803313dc;
 extern float FLOAT_803313e0;
 extern float FLOAT_803313e4;
@@ -324,11 +359,6 @@ const char* s_wmEmptyCreatingTextFr_8032E908[] = {s_Vide_803313BC, s_Creation_80
 const char* s_wmEmptyCreatingTextEs_8032E910[] = {s_Vacio_803313C4, s_Creando_801DC288};
 int gWmLifeYOffsetSplineCount = 3;
 float* gWmLifeYOffsetSpline = gWmLifeYOffsetSplinePoints;
-char gWmMenuCursorX[2];
-char gWmMenuCursorY[2];
-int gWmMenuWorkA;
-int gWmMenuWorkB;
-unsigned char gWmMenuScriptValueCache;
 extern "C" const char s_wm_menu_cpp[] = "wm_menu.cpp";
 static const char s_SetCMakeEnd_chan_pctd_cur_pctd_801DC3B4[] = "SetCMakeEnd : chan = %d  cur = %d\n";
 static const char s_ClrCMakeFlg_chan_pctd_cur_pctd_801DC390[] = "ClrCMakeFlg : chan = %d  cur = %d\n";
@@ -1244,8 +1274,8 @@ void CMenuPcs::loadData()
 		*reinterpret_cast<short*>(worldState + 0x1E) = 0;
 		*reinterpret_cast<short*>(worldState + 0x18) = 0;
 	}
-	DAT_8032ee1c = 1;
-	DAT_8032e8ac = 1;
+	lbl_8032EE1C = 1;
+	lbl_8032E8AC = 1;
 
 	for (int i = 4; i < 6; i++) {
 		CMesMenu* mesMenu =
@@ -2502,10 +2532,10 @@ void CMenuPcs::CalcMCardMenu()
 			if (m_wmWorldState->m_mcResult == 0) break;
 			if (m_wmWorldState->m_subState == 0x13) {
 				if (m_wmWorldState->m_menuMode != 8) {
-					DAT_8032ee28 = m_mcCtrl.m_serialLo;
-					DAT_8032ee2c = m_mcCtrl.m_serialHi;
-					DAT_8032ee20 = (unsigned char)m_mcCtrl.m_cardChannel;
-					uRam8032ee21 = (unsigned char)m_mcCtrl.m_saveIndex;
+					gWmMenuWorkA = m_mcCtrl.m_serialLo;
+					gWmMenuWorkB = m_mcCtrl.m_serialHi;
+					gWmMenuCursorX[0] = (unsigned char)m_mcCtrl.m_cardChannel;
+					gWmMenuCursorX[1] = (unsigned char)m_mcCtrl.m_saveIndex;
 				}
 				int unk838 = reinterpret_cast<int>(m_wmCharaState);
 				*reinterpret_cast<int*>(unk838 + m_mcCtrl.m_saveIndex * 0x48 + 8) = *reinterpret_cast<int*>(reinterpret_cast<char*>(&Game.m_gameWork) + 8);
@@ -3584,7 +3614,7 @@ void CMenuPcs::CalcTitleMenu()
 
 	{
 		if (static_cast<signed char>(m_wmWorldState->m_worldReady) == 0) {
-			if (static_cast<signed char>(DAT_8032ee1c) == 1) {
+			if (static_cast<signed char>(lbl_8032EE1C) == 1) {
 				PPPCREATEPARAM param;
 				EffectInfo* titleEffect = &m_effectWork[23];
 				titleEffect->m_effectNo = 0x1F;
@@ -3608,10 +3638,10 @@ void CMenuPcs::CalcTitleMenu()
 				flatArgs[2].m_word = 0;
 				gCFlatRuntime().SystemCall(0, 1, 4, 3, flatArgs, 0);
 				m_wmWorldState->m_cardChannel = 0;
-				DAT_8032ee1c = 0;
+				lbl_8032EE1C = 0;
 				return;
 			}
-			DAT_8032e8ac = 0;
+			lbl_8032E8AC = 0;
 			THPSimpleInit(1);
 			THPSimpleOpen(DAT_8032EE34);
 			int thpMemory = THPSimpleCalcNeedMemory();
@@ -5662,7 +5692,7 @@ void CMenuPcs::DrawTitleMenu()
 
 		// Fade-in overlay (state 1)
 			state = m_wmWorldState->m_mainState;
-			if (state == 1 && DAT_8032e8ac == 0) {
+			if (state == 1 && lbl_8032E8AC == 0) {
 				float fadeAlpha = static_cast<float>(-(DOUBLE_80331770 *
 				                                        static_cast<double>(m_wmWorldState->m_frameCounter) -
 				                                        DOUBLE_80331420));
@@ -5836,7 +5866,7 @@ void CMenuPcs::DrawTitleMenu()
 
 		// Fade out / transition to next state
 		state = m_wmWorldState->m_mainState;
-		if (state == 3 || (state == 1 && DAT_8032e8ac != 0)) {
+		if (state == 3 || (state == 1 && lbl_8032E8AC != 0)) {
 			float fadeAlpha2;
 			if (state == 3) {
 				fadeAlpha2 = static_cast<float>(DOUBLE_803314e8 * static_cast<double>(m_wmWorldState->m_frameCounter + 1));
@@ -5865,7 +5895,7 @@ void CMenuPcs::DrawTitleMenu()
 		if (state == 3 && m_wmWorldState->m_frameCounter >= 0xA) {
 			PartMng.pppDeletePart(m_effectWork[23].m_partNo);
 			if (m_wmWorldState->m_state0E != 0) {
-				DAT_8032e8ac = 1;
+				lbl_8032E8AC = 1;
 				m_wmWorldState->m_changeRequest = 1;
 				CFlatRuntime::CStack flatArgs2[3];
 				flatArgs2[0].m_word = 7;
@@ -5874,7 +5904,7 @@ void CMenuPcs::DrawTitleMenu()
 				gCFlatRuntime().SystemCall(0, 1, 4, 3, flatArgs2, 0);
 				bytes[0x0D] = 0;
 			} else {
-				DAT_8032e8ac = 0;
+				lbl_8032E8AC = 0;
 			}
 			m_wmWorldState->m_mainState = 0;
 			m_wmWorldState->m_frameCounter = 0;
@@ -9419,7 +9449,7 @@ void CMenuPcs::WMChgMenu()
 	}
 
 	int iVar14 = m_wmWorldState->m_menuMode;
-	DAT_8032ee1c = 1;
+	lbl_8032EE1C = 1;
 
 	short sVar2 = m_wmWorldState->m_changeRequest;
 
@@ -9430,7 +9460,7 @@ void CMenuPcs::WMChgMenu()
 		} else if (cVar1 == 2) {
 			m_wmWorldState->m_menuMode = 5;
 		} else if (cVar1 == 3) {
-			DAT_8032ee1c = 1;
+			lbl_8032EE1C = 1;
 			if (iVar14 == 6) {
 				m_wmWorldState->m_changeRequest = 0;
 				return;
@@ -9482,7 +9512,7 @@ void CMenuPcs::WMChgMenu()
 			stackA[2].m_word = 0;
 			gCFlatRuntime().SystemCall(0, 1, 4, 3, stackA, 0);
 		} else if (sVar2 == -1) {
-			DAT_8032ee1c = 1;
+			lbl_8032EE1C = 1;
 			m_wmWorldState->m_menuMode = 6;
 			CFlatRuntime::CStack stackB[3];
 			stackB[0].m_word = 1;

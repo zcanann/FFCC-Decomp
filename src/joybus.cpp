@@ -5428,7 +5428,9 @@ int JoyBus::SendMapObjDrawFlg(ThreadParam* threadParam)
 
         crc = ~crc;
 
-        unsigned int cmds[2] = { 0, 0 };
+        unsigned int cmds[2];
+        cmds[0] = 0;
+        cmds[1] = 0;
         unsigned char* cmdBytes = (unsigned char*)cmds;
         cmdBytes[0] = 0x16;
         cmdBytes[1] = (unsigned char)(crc & 0xFF);
@@ -5441,9 +5443,11 @@ int JoyBus::SendMapObjDrawFlg(ThreadParam* threadParam)
         unsigned int cmd1 = cmds[0];
         unsigned int cmd2 = cmds[1];
 
-        result = 0;
-
-        if (m_threadRunningMask != 0)
+        if (static_cast<signed char>(m_threadRunningMask) == 0)
+        {
+            result = 0;
+        }
+        else
         {
             OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
@@ -5458,6 +5462,7 @@ int JoyBus::SendMapObjDrawFlg(ThreadParam* threadParam)
                 m_cmdQueueData[port][m_cmdCount[port]] = cmd1;
                 m_cmdCount[threadParam->m_portIndex]++;
                 OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+                result = 0;
             }
         }
 

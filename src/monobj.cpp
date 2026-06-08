@@ -4016,13 +4016,7 @@ void CGMonObj::statMove(int* targetIndex)
 
 	case 5: {
 		{
-			if (*targetPartyIdx < 0) {
-				*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
-				memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
-				*chaseState = 0;
-				*chaseTimer = 0;
-				monObj->m_chaseDirty = 1;
-			} else {
+			if (*targetPartyIdx >= 0) {
 				*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x21;
 				CGPartyObj* partyObj = Game.m_partyObjArr[*targetPartyIdx];
 				if (monObj->m_moveWork.m_mode != 4) {
@@ -4061,6 +4055,12 @@ void CGMonObj::statMove(int* targetIndex)
 					*chaseTimer = 0;
 					monObj->m_chaseDirty = 1;
 				}
+			} else {
+				*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
+				memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
+				*chaseState = 0;
+				*chaseTimer = 0;
+				monObj->m_chaseDirty = 1;
 			}
 		}
 		break;

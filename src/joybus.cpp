@@ -5542,7 +5542,7 @@ int JoyBus::SendFavorite(ThreadParam* threadParam)
             unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
             unsigned int word = *wordPtr;
 
-            if (m_threadRunningMask != 0)
+            if (static_cast<signed char>(m_threadRunningMask) != 0)
             {
                 OSWaitSemaphore(&m_accessSemaphores[port]);
 
@@ -5623,7 +5623,7 @@ unsigned int JoyBus::RequestData(ThreadParam* threadParam, int a, int b)
     unsigned int cmd = MakeJoyCmd32(0x0C, static_cast<signed char>(a), static_cast<unsigned char>(b), 0);
     int result = 0;
 
-    if (m_threadRunningMask != 0)
+    if (static_cast<signed char>(m_threadRunningMask) != 0)
     {
         OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
@@ -5693,7 +5693,7 @@ int JoyBus::SendMType(ThreadParam* threadParam, int modeType)
 
     int result = 0;
 
-    if (m_threadRunningMask != 0)
+    if (static_cast<signed char>(m_threadRunningMask) != 0)
     {
         OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
@@ -5719,7 +5719,7 @@ int JoyBus::SendMType(ThreadParam* threadParam, int modeType)
 
     unsigned int cmd = (0x1Bu << 24) | ((unsigned char)modeType << 16);
 
-    if (m_threadRunningMask != 0)
+    if (static_cast<signed char>(m_threadRunningMask) != 0)
     {
         OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 

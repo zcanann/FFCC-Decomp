@@ -1291,29 +1291,29 @@ void CFlatRuntime2::Calc()
 	u8* runtime = reinterpret_cast<u8*>(this);
 
 	for (int i = 0; i < 8; i++) {
-		CFile::CHandle* fileHandle = LayerResources(this)[i].m_fileHandle;
+		CFlatLayerResource* layer = &LayerResources(this)[i];
+		CFile::CHandle* fileHandle = layer->m_fileHandle;
 		if (fileHandle == 0) {
 			continue;
 		}
 
 		if (File.IsCompleted(fileHandle)) {
-			CTextureSet* textureSet = LayerResources(this)[i].m_textureSet;
+			CTextureSet* textureSet = layer->m_textureSet;
 			if (textureSet != 0) {
 				delete textureSet;
-				LayerResources(this)[i].m_textureSet = 0;
+				layer->m_textureSet = 0;
 			}
 
 			textureSet = new (getStage(), const_cast<char*>(sCFlatRuntime2FileTag), 0x335) CTextureSet;
-			LayerResources(this)[i].m_textureSet = textureSet;
-			if (textureSet != 0) {
-				textureSet->Create(
-					File.m_readBuffer,
-					GET_CHARA_ALLOC_STAGE_S(LayerResources(this)[i].m_allocStage, Game.m_mainStage),
-					0, 0, 0, 0);
-			}
+			layer->m_textureSet = textureSet;
+			void* readBuffer = File.m_readBuffer;
+			textureSet->Create(
+				readBuffer,
+				GET_CHARA_ALLOC_STAGE_S(layer->m_allocStage, Game.m_mainStage),
+				0, 0, 0, 0);
 
-			File.Close(LayerResources(this)[i].m_fileHandle);
-			LayerResources(this)[i].m_fileHandle = 0;
+			File.Close(layer->m_fileHandle);
+			layer->m_fileHandle = 0;
 		}
 	}
 

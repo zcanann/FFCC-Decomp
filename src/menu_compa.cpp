@@ -96,7 +96,7 @@ void CMenuPcs::CompaDraw()
 
 				float fillW = entry->alpha * w;
 				if (fillW > kCompaZero) {
-					if (tex == 0x51) {
+					if (entry->tex == 0x51) {
 						int yStep = static_cast<int>(y);
 						float end = y + h;
 						while (static_cast<float>(yStep) < end) {
@@ -130,7 +130,7 @@ void CMenuPcs::CompaDraw()
 					colors[3].b = 0xFF;
 					colors[3].a = 0;
 					float remainW = static_cast<float>((LoadDouble(kCompaOneDouble) / (double)entry->duration) * (double)static_cast<float>(entry->w));
-					if (tex == 0x51) {
+					if (entry->tex == 0x51) {
 						int yStep = static_cast<int>(y);
 						float end = y + h;
 						while (static_cast<float>(yStep) < end) {

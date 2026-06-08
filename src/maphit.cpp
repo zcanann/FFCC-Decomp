@@ -993,7 +993,7 @@ cylinder_body:
         if (disc > 0.0) {
             disc = sqrtf(disc);
             f32 t = -capB - disc;
-            if ((t * localDirection.z) + pz <= kMapHitZero) {
+            if ((t * localDirection.z) + pz <= 0.0) {
                 outT = t * tScale;
                 if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {
                     return 1;
@@ -1002,7 +1002,7 @@ cylinder_body:
             }
 
             t = -capB + disc;
-            if ((t * localDirection.z) + pz <= kMapHitZero) {
+            if ((t * localDirection.z) + pz <= 0.0) {
                 outT = t * tScale;
                 if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {
                     return 1;
@@ -1011,7 +1011,7 @@ cylinder_body:
             }
         } else if (disc == 0.0) {
             const f32 t = -capB;
-            if ((t * localDirection.z) + pz <= kMapHitZero) {
+            if ((t * localDirection.z) + pz <= 0.0) {
                 outT = t * tScale;
                 if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {
                     return 1;

@@ -964,49 +964,13 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
 
 		for (int materialIdx = 0; materialIdx < static_cast<int>(materialCount); materialIdx++) {
 			CCaravanWork* currentWork = reinterpret_cast<CCaravanWork*>(*scriptFoodBase);
-			int foundSlot = 0;
-			int rowBase = 0;
-			int row = 0;
-			int remainingRows = 8;
+			int foundSlot;
 
-			do {
-				if (static_cast<int>(currentWork->m_inventoryItems[rowBase + 0]) == static_cast<int>(materialId)) {
+			for (foundSlot = 0; foundSlot < 0x40; foundSlot++) {
+				if (static_cast<int>(currentWork->m_inventoryItems[foundSlot]) == static_cast<int>(materialId)) {
 					break;
 				}
-				if (static_cast<int>(currentWork->m_inventoryItems[rowBase + 1]) == static_cast<int>(materialId)) {
-					foundSlot += 1;
-					break;
-				}
-				if (static_cast<int>(currentWork->m_inventoryItems[rowBase + 2]) == static_cast<int>(materialId)) {
-					foundSlot += 2;
-					break;
-				}
-				if (static_cast<int>(currentWork->m_inventoryItems[rowBase + 3]) == static_cast<int>(materialId)) {
-					foundSlot += 3;
-					break;
-				}
-				if (static_cast<int>(currentWork->m_inventoryItems[rowBase + 4]) == static_cast<int>(materialId)) {
-					foundSlot += 4;
-					break;
-				}
-				if (static_cast<int>(currentWork->m_inventoryItems[rowBase + 5]) == static_cast<int>(materialId)) {
-					foundSlot += 5;
-					break;
-				}
-				if (static_cast<int>(currentWork->m_inventoryItems[rowBase + 6]) == static_cast<int>(materialId)) {
-					foundSlot += 6;
-					break;
-				}
-				if (static_cast<int>(currentWork->m_inventoryItems[rowBase + 7]) == static_cast<int>(materialId)) {
-					foundSlot += 7;
-					break;
-				}
-
-				row++;
-				rowBase += 8;
-				foundSlot = row * 8;
-				remainingRows--;
-			} while (remainingRows != 0);
+			}
 
 			currentWork->DeleteItemIdx(foundSlot, 1);
 		}

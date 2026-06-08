@@ -396,7 +396,9 @@ extern "C" WmMenuLightTable gWmMenuLightTables[];
 		float* wmSplineTable = (table);                                                        \
 		int wmSplineCount = (count);                                                           \
 		result = FLOAT_803313dc;                                                               \
-		if ((time) < wmSplineTable[wmSplineCount * 4 - 4]) {                                   \
+		if ((time) >= wmSplineTable[wmSplineCount * 4 - 4]) {                                  \
+			result = (table)[(count) * 4 - 3];                                                  \
+		} else {                                                                               \
 			int wmSplineIndex = 0;                                                             \
 			while (wmSplineCount != 0) {                                                       \
 				if ((time) <= *wmSplineTable) {                                                \
@@ -428,8 +430,6 @@ extern "C" WmMenuLightTable gWmMenuLightTables[];
 				wmSplineIndex++;                                                               \
 				wmSplineCount--;                                                               \
 			}                                                                                  \
-		} else {                                                                               \
-			result = (table)[(count) * 4 - 3];                                                  \
 		}                                                                                      \
 	} while (0)
 

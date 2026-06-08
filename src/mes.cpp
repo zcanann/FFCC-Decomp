@@ -898,7 +898,7 @@ void CMes::addString(char** text, int branchMode)
 
 	bool running = true;
 	unsigned char caseMode = 0;
-	unsigned char flowMode = 0;
+	signed char flowMode = 0;
 
 	do
 	{
@@ -1216,7 +1216,7 @@ void CMes::addString(char** text, int branchMode)
 			break;
 		case 0x25:
 		{
-			int value = ReadTagS8(text);
+			unsigned int value = ReadTagS8(text);
 			if (mFontCount == 0)
 			{
 				if (value == 0x7F)
@@ -1292,7 +1292,7 @@ void CMes::addString(char** text, int branchMode)
 			break;
 		case 0x36:
 		{
-			unsigned char idx = (unsigned char)ReadTagU8(text);
+			signed char idx = (unsigned char)ReadTagU8(text);
 			if (branchMode == 0)
 			{
 				int count = mFlagCount;
@@ -1350,7 +1350,7 @@ void CMes::addString(char** text, int branchMode)
 			break;
 		case 0x20:
 		{
-			unsigned char vowel =
+			signed char vowel =
 			    (unsigned char)Game.m_caravanWorkArr[mFlagVars[ReadTagS8(text)]].m_name[0];
 			if ((vowel == 'A') || (vowel == 'I') || (vowel == 'U') ||
 			    (vowel == 'E') || (vowel == 'O') || (vowel == 'Y'))

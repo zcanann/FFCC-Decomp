@@ -2973,9 +2973,10 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 		short packetCount = *reinterpret_cast<short*>(cmakeBase + 0x2CB4);
 		char* writeBase = cmakeBase + 0x2CB9;
 		*reinterpret_cast<short*>(cmakeBase + 0x2CB4) = static_cast<short>(packetCount + 1);
-		writeBase[static_cast<int>(packetCount) * 3 - 2] = static_cast<char>(valueBytes[1]);
-		writeBase[static_cast<int>(packetCount) * 3 - 1] = static_cast<char>(valueBytes[2]);
-		writeBase[static_cast<int>(packetCount) * 3] = static_cast<char>(valueBytes[3]);
+		int writeIndex = static_cast<int>(packetCount) * 3 - 2;
+		writeBase[writeIndex] = static_cast<char>(valueBytes[1]);
+		writeBase[writeIndex + 1] = static_cast<char>(valueBytes[2]);
+		writeBase[writeIndex + 2] = static_cast<char>(valueBytes[3]);
 
 		if (*reinterpret_cast<short*>(cmakeBase + 0x2CB4) >= 6) {
 			localInfo = cmakeInfo[channel];

@@ -446,46 +446,36 @@ void CChara::TimeMogFur()
 
 	for (int y = 0; y < 0x40; y++) {
 		for (int x = 0; x < 0x40; x++) {
-			int light;
-			int r;
-			int g;
-			int b;
-			int a;
-			int newA;
 			unsigned int tileIndex = ((x % 4) + ((y % 4) * 4) + (x / 4) * 0x10 + (y / 4) * 0x100) * 2;
 			unsigned short packed = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(texels) + tileIndex);
 
-			a = (packed >> 12) & 7;
-			light = 7 - a;
-			r = light + ((packed >> 8) & 0xF) + 4;
-			g = light + ((packed >> 4) & 0xF) + 4;
-			b = light + (packed & 0xF) + 4;
+			unsigned int a = (packed >> 12) & 7;
+			int light = 7 - a;
+			int r = light + ((packed >> 8) & 0xF) + 4;
+			int b = light + (packed & 0xF) + 4;
+			int g = light + ((packed >> 4) & 0xF) + 4;
 
-			int clampedR = 0xF;
+			light = 0xF;
 			if (r < 0xF) {
-				clampedR = r;
+				light = r;
 			}
-			r = clampedR;
-			int clampedG = 0xF;
+			r = 0xF;
 			if (g < 0xF) {
-				clampedG = g;
+				r = g;
 			}
-			g = clampedG;
-			int clampedB = 0xF;
+			g = 0xF;
 			if (b < 0xF) {
-				clampedB = b;
+				g = b;
 			}
-			b = clampedB;
 
-			newA = static_cast<unsigned int>(a + 2);
+			a = a + 2;
 			unsigned int clampedA = 7;
-			if (newA < 7) {
-				clampedA = newA;
+			if (a < 7) {
+				clampedA = a;
 			}
-			newA = clampedA;
 
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(texels) + tileIndex) =
-			    static_cast<unsigned short>((newA << 12) | (r << 8) | (g << 4) | b);
+			    static_cast<unsigned short>(g | (r << 4) | (clampedA << 12) | (light << 8));
 		}
 	}
 
@@ -859,18 +849,13 @@ static void OpenMogHintMessage(int messageId)
 		return;
 	}
 
-	CMesMenu* mesMenu = *reinterpret_cast<CMesMenu**>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0x288);
-	if (mesMenu == 0) {
-		return;
-	}
-
-	if (mesMenu->IsActiveMessage()) {
+	if ((*reinterpret_cast<CMesMenu**>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0x120))->IsActiveMessage()) {
 		return;
 	}
 
 	CFlatData* flatData = reinterpret_cast<CFlatData*>(reinterpret_cast<unsigned char*>(&Game) + 0xCC38 + sizeof(CFlatData));
 	char** mesPtr = reinterpret_cast<char**>(reinterpret_cast<unsigned char*>(flatData) + 0xD4);
-	mesMenu->Open(mesPtr[messageId + 8], 0x160, 0x20, 0x220, 0, -1, -1);
+	(*reinterpret_cast<CMesMenu**>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0x120))->Open(mesPtr[messageId + 8], 0x160, 0x20, 0x220, 0, -1, -1);
 }
 
 } // namespace
@@ -1054,19 +1039,23 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 	Chara.MogFur().m_cursorY = static_cast<int>(-(kYmEnvTen * MogPadFloat(40) -
 	                                     static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorY))));
 
-	if (static_cast<int>(Chara.MogFur().m_cursorX) < 0) {
+	const int cursorXv = static_cast<int>(Chara.MogFur().m_cursorX);
+	if (cursorXv < 0) {
 		Chara.MogFur().m_cursorX = 0;
-	} else if (static_cast<int>(Chara.MogFur().m_cursorX) > 0x280) {
+	} else {
 		Chara.MogFur().m_cursorX = 0x280;
-	} else {
-		Chara.MogFur().m_cursorX = Chara.MogFur().m_cursorX;
+		if (cursorXv < 0x281) {
+			Chara.MogFur().m_cursorX = cursorXv;
+		}
 	}
-	if (static_cast<int>(Chara.MogFur().m_cursorY) < 0) {
+	const int cursorYv = static_cast<int>(Chara.MogFur().m_cursorY);
+	if (cursorYv < 0) {
 		Chara.MogFur().m_cursorY = 0;
-	} else if (static_cast<int>(Chara.MogFur().m_cursorY) > 0x1C0) {
-		Chara.MogFur().m_cursorY = 0x1C0;
 	} else {
-		Chara.MogFur().m_cursorY = Chara.MogFur().m_cursorY;
+		Chara.MogFur().m_cursorY = 0x1C0;
+		if (cursorYv < 0x1C1) {
+			Chara.MogFur().m_cursorY = cursorYv;
+		}
 	}
 
 	Mtx cameraMtx;
@@ -1080,9 +1069,25 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 			Sound.StopSe(MogWork().m_loopSeHandle);
 			MogWork().m_loopSeHandle = 0;
 		}
-		const _GXColor brushColor = MogBrushColor(radarType);
-		const int eraseMode = (radarType == 4) ? 1 : 0;
-		const int doPaint = (radarType == 3 || radarType == 4) ? (((System.m_frameCounter & 3U) == 0) ? 1 : 0) : 1;
+		int eraseMode = 0;
+		int doPaint = 1;
+		_GXColor brushColor;
+		if (radarType == 2) {
+			brushColor = CColor(4, 0xF, 4, 2).color;
+		} else if (radarType < 2) {
+			if (radarType == 0) {
+				brushColor = CColor(0xF, 4, 4, 2).color;
+			} else if (radarType >= 0) {
+				brushColor = CColor(4, 8, 0xF, 2).color;
+			}
+		} else if (radarType == 4) {
+			brushColor = CColor(0, 0, 0, 2).color;
+			eraseMode = 1;
+			doPaint = ((System.m_frameCounter & 3U) == 0) ? 1 : 0;
+		} else if (radarType < 4) {
+			brushColor = CColor(0xF, 0xF, 0xF, 4).color;
+			doPaint = ((System.m_frameCounter & 3U) == 0) ? 1 : 0;
+		}
 		_GXColor centerBefore = CColor(0xF, 0xF, 0xF, 0).color;
 		_GXColor centerAfter = centerBefore;
 		Vec worldPos;
@@ -1128,74 +1133,87 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 				MogWork().m_idleTicks = 0;
 			}
 
-			if (eraseMode != 0) {
-				MogWork().m_offColorTicks = 0;
-				if ((centerBefore.a != 0) && (centerAfter.a < centerBefore.a)) {
-					MogWork().m_eraseTicks++;
+			if (doPaint != 0) {
+				int particleNo = 0;
+				int seId = 0;
+				int emitParticle = ((System.m_frameCounter & 1) == 0);
+				int playGate = ((System.m_frameCounter & 3) == 0);
+				_GXColor particleColor = CColor(centerBefore).color;
+				if (radarType == 2) {
+					MogWork().m_offColorTicks = 0;
+					particleNo = 0x73;
+					MogWork().m_eraseTicks = 0;
+					particleColor = CColor(4, 0xF, 4, 2).color;
+				} else if (radarType < 2) {
+					if (radarType == 0) {
+						MogWork().m_offColorTicks = 0;
+						particleNo = 0x73;
+						MogWork().m_eraseTicks = 0;
+						particleColor = CColor(0xF, 4, 4, 2).color;
+					} else if (radarType >= 0) {
+						MogWork().m_offColorTicks = 0;
+						particleNo = 0x73;
+						MogWork().m_eraseTicks = 0;
+						particleColor = CColor(4, 8, 0xF, 2).color;
+					}
+				} else if (radarType == 4) {
+					MogWork().m_offColorTicks = 0;
+					if ((doPaint != 0) && (centerBefore.a != 0) && (centerAfter.a == 0)) {
+						MogWork().m_eraseTicks++;
+					}
+					emitParticle = 1;
+					particleNo = 0x72;
+					if (doPaint == 0) {
+						particleColor.a = 0;
+					}
+					seId = 0x249f3;
+					playGate = ((System.m_frameCounter & 7) == 0);
+				} else if (radarType < 4) {
+					MogWork().m_eraseTicks = 0;
+					if ((((centerBefore.r < 0x0D) || (centerBefore.g < 0x0D)) || (centerBefore.b < 0x0D)) && (centerBefore.a != 0)) {
+						MogWork().m_offColorTicks++;
+					}
+					seId = 0x249f4;
+					particleNo = 0x74;
+					emitParticle = ((System.m_frameCounter & 7) == 0);
+					playGate = ((System.m_frameCounter & 0xF) == 0);
 				}
-				if ((System.m_frameCounter & 7) == 0) {
-					Sound.PlaySe(0x249f3, 0x40, 0x7F, 0);
-				}
-			} else if (radarType == 3) {
-				MogWork().m_eraseTicks = 0;
-				if ((((centerAfter.r < 0x0D) || (centerAfter.g < 0x0D)) || (centerAfter.b < 0x0D)) && (centerAfter.a != 0)) {
-					MogWork().m_offColorTicks++;
-				}
-				if ((System.m_frameCounter & 0xF) == 0) {
-					Sound.PlaySe(0x249f4, 0x40, 0x7F, 0);
-				}
-			} else {
-				MogWork().m_offColorTicks = 0;
-				MogWork().m_eraseTicks = 0;
-			}
 
-			int particleNo = 0;
-			int emitParticle = 0;
-			_GXColor particleColor = centerBefore;
-			if (radarType < 3) {
-				particleNo = 0x73;
-				particleColor = brushColor;
-				emitParticle = ((System.m_frameCounter & 1) == 0);
-			} else if (eraseMode != 0) {
-				particleNo = 0x72;
-				emitParticle = 1;
-			} else if (radarType == 3) {
-				particleNo = 0x74;
-				emitParticle = ((System.m_frameCounter & 7) == 0);
-			}
-			if (emitParticle != 0) {
-				CFlatRuntime2Storage().ResetParticleWork(particleNo | 0x100, 0);
-				CFlatRuntime2Storage().SetParticleWorkPos(worldPos, kCharaFurDepthZero);
-				const int particleIndex = CFlatRuntime2Storage().PutParticleWork();
-				pppFVECTOR4 color;
-				color.x = static_cast<float>(particleColor.r) / kCharaFurColorComponentScale;
-				color.y = static_cast<float>(particleColor.g) / kCharaFurColorComponentScale;
-				color.z = static_cast<float>(particleColor.b) / kCharaFurColorComponentScale;
-				color.w = static_cast<float>(particleColor.a) / kCharaFurAlphaComponentScale;
-				PartPcs.SetParColIdx(particleIndex, color);
-			}
+				if (emitParticle != 0) {
+					CFlatRuntime2Storage().ResetParticleWork(particleNo | 0x100, 0);
+					CFlatRuntime2Storage().SetParticleWorkPos(worldPos, kCharaFurDepthZero);
+					const int particleIndex = CFlatRuntime2Storage().PutParticleWork();
+					pppFVECTOR4 color;
+					color.x = static_cast<float>(particleColor.r) / kCharaFurColorComponentScale;
+					color.y = static_cast<float>(particleColor.g) / kCharaFurColorComponentScale;
+					color.z = static_cast<float>(particleColor.b) / kCharaFurColorComponentScale;
+					color.w = static_cast<float>(particleColor.a) / kCharaFurAlphaComponentScale;
+					PartPcs.SetParColIdx(particleIndex, color);
+				}
+				if ((playGate != 0) && (seId != 0)) {
+					Sound.PlaySe(seId, 0x40, 0x7F, 0);
+				}
 
-			if (MogWork().m_offColorTicks == 10) {
-				if (messageId < 0) {
-					messageId = 2;
+				if (MogWork().m_offColorTicks == 10) {
+					if (messageId < 0) {
+						messageId = 2;
+					}
+					MogWork().m_offColorTicks = 0x0B;
 				}
-				MogWork().m_offColorTicks = 0x0B;
-			}
-			if (MogWork().m_eraseTicks == 10) {
-				if (messageId < 0) {
-					messageId = 5;
+				if (MogWork().m_eraseTicks == 10) {
+					if (messageId < 0) {
+						messageId = 5;
+					}
+					MogWork().m_eraseTicks = 0x0B;
 				}
-				MogWork().m_eraseTicks = 0x0B;
-			}
-			if (MogWork().m_eraseTicks == 0x32) {
-				if (messageId < 0) {
-					messageId = 6;
+				if (MogWork().m_eraseTicks == 0x32) {
+					if (messageId < 0) {
+						messageId = 6;
+					}
+					MogWork().m_eraseTicks = 0x33;
 				}
-				MogWork().m_eraseTicks = 0x33;
-			}
 
-			if (radarType < 3) {
-				if (MogWork().m_loopSeHandle == 0) {
+				if (radarType >= 0 && radarType < 3 && doPaint != 0 && MogWork().m_loopSeHandle == 0) {
 					MogWork().m_loopSeHandle = Sound.PlaySe(0x249f2, 0x40, 0x7F, 0);
 				}
 			}
@@ -1782,7 +1800,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 			for (unsigned int layer = 0; layer < 8; layer++) {
 				GXTexObj texObj;
 				void* texData = reinterpret_cast<unsigned char*>(gMogFurTexBuffer) + (layer * 0x4000);
-				GXInitTexObj(&texObj, texData, 0x80, 0x80, GX_TF_RGB5A3, GX_CLAMP, GX_CLAMP, GX_FALSE);
+				GXInitTexObj(&texObj, texData, 0x80, 0x80, GX_TF_IA4, GX_REPEAT, GX_REPEAT, GX_FALSE);
 				GXLoadTexObj(&texObj, GX_TEXMAP1);
 
 				const float shellOffset = furLength * (static_cast<float>(layer) * 0.125f);
@@ -1820,6 +1838,8 @@ void CChara::freeFurTex()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_common_subs off
 void CChara::makeFurTex()
 {
 	CHairSet hairSet[0x20];
@@ -2099,6 +2119,7 @@ void CChara::makeFurTex()
 	Graphic.SetStdPixelFmt();
 	GXSetAlphaUpdate(GX_FALSE);
 }
+#pragma pop
 
 /*
  * --INFO--

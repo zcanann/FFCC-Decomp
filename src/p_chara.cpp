@@ -1742,122 +1742,107 @@ checkLoaded:
 
                     if (dataType == 0) {
                         CLoadModel* loadModel = 0;
-                        for (int i = 0; i < LoadModelArray(pcs)->GetSize(); i++) {
-                            CLoadModel* it = (*LoadModelArray(pcs))[static_cast<unsigned long>(i)];
-                            if (it != 0 && it->m_keyTag == keyTag && it->m_keyId == keyId) {
+                        for (unsigned int i = 0; i < static_cast<unsigned int>(LoadModelArray(pcs)->GetSize()); i++) {
+                            CLoadModel* it = (*LoadModelArray(pcs))[i];
+                            if (it->m_keyTag == keyTag && it->m_keyId == keyId) {
                                 loadModel = it;
                                 break;
                             }
                         }
 
                         if (loadModel == 0) {
+                            void* rawAddr = rawData;
                             loadModel = new (pcs->m_stage, const_cast<char*>(s_p_chara_cpp), 0x5E8) CLoadModel;
-                            if (loadModel != 0) {
-                                loadModel->m_keyTag = keyTag;
-                                loadModel->m_keyId = keyId;
-                                loadModel->m_mergeFileId = mergeFileId;
-                                loadModel->m_mergeFlags = mergeFlags;
-                                loadModel->m_model = 0;
-                                loadModel->m_streamMode = 0;
-                                loadModel->m_streamOffset = 0;
-                                loadModel->m_streamSize = 0;
-                                LoadModelArray(pcs)->Add(loadModel);
+                            loadModel->m_keyTag = keyTag;
+                            loadModel->m_keyId = keyId;
+                            loadModel->m_mergeFileId = mergeFileId;
+                            loadModel->m_mergeFlags = mergeFlags;
+                            LoadModelArray(pcs)->Add(loadModel);
 
-                                if (streamToAmem == 0) {
-                                    loadModel->m_model =
-                                        new (pcs->m_stage, const_cast<char*>(s_p_chara_cpp), 0x5F1) CChara::CModel;
-                                    if (loadModel->m_model != 0) {
-                                        loadModel->m_model->Create(rawData, SelectLoadStage(pcs, pcs->m_viewerModelStage));
-                                    }
-                                } else {
-                                    loadModel->m_streamMode = 1;
-                                    loadModel->m_streamOffset = reinterpret_cast<void*>(LoadStreamCursor(this));
-                                    loadModel->m_streamSize = rawSize;
-                                    Memory.CopyToAMemorySync(
-                                        rawData, reinterpret_cast<unsigned char*>(StageBase(m_amemWorkStage)) + LoadStreamCursor(this),
-                                        static_cast<unsigned long>(rawSize));
-                                    LoadStreamCursor(this) += static_cast<unsigned int>(rawSize);
-                                }
+                            if (streamToAmem == 0) {
+                                CChara::CModel* model =
+                                    new (pcs->m_stage, const_cast<char*>(s_p_chara_cpp), 0x5F1) CChara::CModel;
+                                model->Create(rawAddr, SelectLoadStage(pcs, pcs->m_viewerModelStage));
+                                loadModel->m_model = model;
+                            } else {
+                                loadModel->m_streamOffset = reinterpret_cast<void*>(LoadStreamCursor(this));
+                                loadModel->m_streamSize = rawSize;
+                                loadModel->m_streamMode = 1;
+                                Memory.CopyToAMemorySync(
+                                    rawAddr, reinterpret_cast<unsigned char*>(StageBase(m_amemWorkStage)) + LoadStreamCursor(this),
+                                    static_cast<unsigned long>(rawSize));
+                                LoadStreamCursor(this) += static_cast<unsigned int>(rawSize);
                             }
-                        }
 
-                        if (hasDynamics != 0 && loadModel != 0 && loadModel->m_model != 0 && chunkFile.GetNextChunk(chunk)) {
-                            loadModel->m_model->CreateDynamics(
-                                chunkFile.GetAddress(), SelectLoadStage(pcs, pcs->m_viewerModelStage));
+                            if (hasDynamics != 0) {
+                                chunkFile.GetNextChunk(chunk);
+                                CMemory::CStage* dynStage = SelectLoadStage(pcs, pcs->m_viewerModelStage);
+                                loadModel->m_model->CreateDynamics(chunkFile.GetAddress(), dynStage);
+                            }
                         }
                     } else if (dataType == 1) {
                         CLoadTexture* loadTexture = 0;
-                        for (int i = 0; i < LoadTextureArray(pcs)->GetSize(); i++) {
-                            CLoadTexture* it = (*LoadTextureArray(pcs))[static_cast<unsigned long>(i)];
-                            if (it != 0 && it->m_keyTag == keyTag && it->m_keyId == keyId && it->m_variantTag == variantTag) {
+                        for (unsigned int i = 0; i < static_cast<unsigned int>(LoadTextureArray(pcs)->GetSize()); i++) {
+                            CLoadTexture* it = (*LoadTextureArray(pcs))[i];
+                            if (it->m_keyTag == keyTag && it->m_keyId == keyId && it->m_variantTag == variantTag) {
                                 loadTexture = it;
                                 break;
                             }
                         }
 
                         if (loadTexture == 0) {
+                            void* rawAddr = rawData;
                             loadTexture = new (pcs->m_stage, const_cast<char*>(s_p_chara_cpp), 0x609) CLoadTexture;
-                            if (loadTexture != 0) {
-                                loadTexture->m_keyTag = keyTag;
-                                loadTexture->m_keyId = keyId;
-                                loadTexture->m_mergeFileId = mergeFileId;
-                                loadTexture->m_mergeFlags = mergeFlags;
-                                loadTexture->m_variantTag = variantTag;
-                                loadTexture->m_textureSet = 0;
-                                loadTexture->m_streamMode = 0;
-                                loadTexture->m_streamOffset = 0;
-                                loadTexture->m_streamSize = 0;
-                                LoadTextureArray(pcs)->Add(loadTexture);
+                            loadTexture->m_keyTag = keyTag;
+                            loadTexture->m_keyId = keyId;
+                            loadTexture->m_variantTag = variantTag;
+                            loadTexture->m_mergeFileId = mergeFileId;
+                            loadTexture->m_mergeFlags = mergeFlags;
+                            LoadTextureArray(pcs)->Add(loadTexture);
 
-                                if (streamToAmem == 0) {
-                                    loadTexture->m_textureSet =
-                                        new (pcs->m_stage, const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
-                                    if (loadTexture->m_textureSet != 0) {
-                                        CMemory::CStage* textureStage =
-                                            variantTag == reinterpret_cast<void*>(4) ? pcs->m_weaponTextureStage
-                                                                                    : pcs->m_viewerTextureStage;
-                                        loadTexture->m_textureSet->Create(
-                                            rawData, SelectLoadStage(pcs, textureStage), 0, 0, 0, 0);
-                                    }
-                                } else {
-                                    loadTexture->m_streamMode = 1;
-                                    loadTexture->m_streamOffset = reinterpret_cast<void*>(LoadStreamCursor(this));
-                                    loadTexture->m_streamSize = rawSize;
-                                    Memory.CopyToAMemorySync(
-                                        rawData, reinterpret_cast<unsigned char*>(StageBase(m_amemWorkStage)) + LoadStreamCursor(this),
-                                        static_cast<unsigned long>(rawSize));
-                                    LoadStreamCursor(this) += static_cast<unsigned int>(rawSize);
-                                }
+                            if (streamToAmem == 0) {
+                                CTextureSet* textureSet =
+                                    new (pcs->m_stage, const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
+                                CMemory::CStage* textureStage =
+                                    keyTag == reinterpret_cast<void*>(4) ? pcs->m_weaponTextureStage
+                                                                        : pcs->m_viewerTextureStage;
+                                textureSet->Create(rawAddr, SelectLoadStage(pcs, textureStage), 0, 0, 0, 0);
+                                loadTexture->m_textureSet = textureSet;
+                            } else {
+                                loadTexture->m_streamOffset = reinterpret_cast<void*>(LoadStreamCursor(this));
+                                loadTexture->m_streamSize = rawSize;
+                                loadTexture->m_streamMode = 1;
+                                Memory.CopyToAMemorySync(
+                                    rawAddr, reinterpret_cast<unsigned char*>(StageBase(m_amemWorkStage)) + LoadStreamCursor(this),
+                                    static_cast<unsigned long>(rawSize));
+                                LoadStreamCursor(this) += static_cast<unsigned int>(rawSize);
                             }
                         }
                     } else if (dataType == 2) {
                         CLoadAnim* loadAnim = 0;
-                        for (int i = 0; i < LoadAnimArray(pcs)->GetSize(); i++) {
-                            CLoadAnim* it = (*LoadAnimArray(pcs))[static_cast<unsigned long>(i)];
-                            if (it != 0 && it->m_keyTag == keyTag && it->m_keyId == keyId &&
-                                animName != 0 && strcmp(it->m_name, animName) == 0) {
+                        for (unsigned int i = 0; i < static_cast<unsigned int>(LoadAnimArray(pcs)->GetSize()); i++) {
+                            CLoadAnim* it = (*LoadAnimArray(pcs))[i];
+                            if (it->m_keyTag == keyTag && it->m_keyId == keyId &&
+                                strcmp(animName, it->m_name) == 0) {
                                 loadAnim = it;
                                 break;
                             }
                         }
 
                         if (loadAnim == 0) {
+                            void* rawAddr = rawData;
                             CChara::CAnim* anim =
                                 new (pcs->m_stage, const_cast<char*>(s_p_chara_cpp), 0x62A) CChara::CAnim;
-                            if (anim != 0) {
-                                anim->Create(rawData, pcs->m_viewerAnimStage);
-                            }
+                            anim->Create(rawAddr, pcs->m_viewerAnimStage);
 
                             loadAnim = new (pcs->m_stage, const_cast<char*>(s_p_chara_cpp), 0x62D) CLoadAnim;
-                            if (loadAnim != 0) {
-                                loadAnim->m_keyTag = keyTag;
-                                loadAnim->m_keyId = keyId;
-                                loadAnim->m_mergeFileId = mergeFileId;
-                                loadAnim->m_mergeFlags = mergeFlags;
-                                strcpy(loadAnim->m_name, animName != 0 ? animName : "");
-                                loadAnim->m_anim = anim;
-                                LoadAnimArray(pcs)->Add(loadAnim);
-                            }
+                            loadAnim->m_keyId = keyId;
+                            loadAnim->m_keyTag = keyTag;
+                            strcpy(loadAnim->m_name, animName);
+                            loadAnim->m_anim = anim;
+                            loadAnim->m_mergeFileId = mergeFileId;
+                            loadAnim->m_mergeFlags = mergeFlags;
+                            LoadAnimArray(pcs)->Add(loadAnim);
                         }
                     } else if (dataType == 3) {
                         Sound.LoadSe(rawData);
@@ -1865,27 +1850,29 @@ checkLoaded:
                         Sound.LoadWave(rawData);
                     } else if (dataType == 5) {
                         CLoadPdt* loadPdt = 0;
-                        for (int i = 0; i < LoadPdtArray(pcs)->GetSize(); i++) {
-                            CLoadPdt* it = (*LoadPdtArray(pcs))[static_cast<unsigned long>(i)];
-                            if (it != 0 && it->m_keyTag == keyTag && it->m_keyId == keyId && it->m_variantTag == variantTag) {
+                        for (unsigned int i = 0; i < static_cast<unsigned int>(LoadPdtArray(pcs)->GetSize()); i++) {
+                            CLoadPdt* it = (*LoadPdtArray(pcs))[i];
+                            if (it->m_keyTag == keyTag && it->m_keyId == keyId && it->m_variantTag == variantTag) {
                                 loadPdt = it;
                                 break;
                             }
                         }
 
-                        if (loadPdt == 0 && chunkFile.GetNextChunk(chunk)) {
+                        void* primaryData = rawData;
+                        const int primarySize = rawSize;
+                        if (loadPdt == 0) {
+                            chunkFile.GetNextChunk(chunk);
+                            void* secondaryData = chunkFile.GetAddress();
+                            const int secondarySize = static_cast<int>(chunk.m_size);
                             loadPdt = new (pcs->m_stage, const_cast<char*>(s_p_chara_cpp), 0x572) CLoadPdt;
-                            if (loadPdt != 0) {
-                                loadPdt->m_keyTag = keyTag;
-                                loadPdt->m_keyId = keyId;
-                                loadPdt->m_variantTag = variantTag;
-                                loadPdt->m_pdtSlot = PartPcs.LoadMonsterPdt(
-                                    keyId, reinterpret_cast<int>(variantTag), rawData, rawSize, chunkFile.GetAddress(),
-                                    static_cast<int>(chunk.m_size));
-                                loadPdt->m_mergeFileId = mergeFileId;
-                                loadPdt->m_mergeFlags = mergeFlags;
-                                LoadPdtArray(pcs)->Add(loadPdt);
-                            }
+                            loadPdt->m_keyTag = keyTag;
+                            loadPdt->m_keyId = keyId;
+                            loadPdt->m_variantTag = variantTag;
+                            loadPdt->m_mergeFileId = mergeFileId;
+                            loadPdt->m_mergeFlags = mergeFlags;
+                            loadPdt->m_pdtSlot = PartPcs.LoadMonsterPdt(
+                                keyId, reinterpret_cast<int>(variantTag), primaryData, primarySize, secondaryData, secondarySize);
+                            LoadPdtArray(pcs)->Add(loadPdt);
                         }
                     }
                 }

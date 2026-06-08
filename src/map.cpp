@@ -2099,7 +2099,10 @@ int CMapMng::ReadOtm(char* mapName)
         return 0;
     }
 
-    if (m_asyncLoadState.m_mapReadMode == 2 || m_asyncLoadState.m_mapReadMode == 3) {
+    if (m_asyncLoadState.m_mapReadMode == 2) {
+        return 1;
+    }
+    if (m_asyncLoadState.m_mapReadMode == 3) {
         return 1;
     }
 

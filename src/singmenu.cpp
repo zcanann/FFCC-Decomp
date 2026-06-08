@@ -1328,8 +1328,8 @@ void CMenuPcs::drawSingleMenu()
                                                          1.0f, 1.0f, 0.0f);
 
                         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x28));
-                        unsigned int step = 0x20;
-                        for (unsigned int y = 0x40; y < 0x180; y += step) {
+                        int step = 0x20;
+                        for (int y = 0x40; y < 0x180; y += step) {
                             if ((0x180 - y) < step) {
                                 step = 0x180 - y;
                             }
@@ -1397,8 +1397,8 @@ void CMenuPcs::drawSingleMenu()
                                                          1.0f, 1.0f, 0.0f);
 
                         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x28));
-                        unsigned int step = 0x20;
-                        for (unsigned int y = 0x40; y < 0x180; y += step) {
+                        int step = 0x20;
+                        for (int y = 0x40; y < 0x180; y += step) {
                             if ((0x180 - y) < step) {
                                 step = 0x180 - y;
                             }

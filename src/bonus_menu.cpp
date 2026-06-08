@@ -3090,8 +3090,7 @@ void CMenuPcs::CalcResultOpenAnim()
 				sprite->timer++;
 				sprite->alpha = (float)((1.0 / (double)sprite->duration) * (double)sprite->timer);
 			} else {
-				int __p5 = doneCount;
-				__p5++;
+				doneCount++;
 				sprite->alpha = 1.0f;
 			}
 

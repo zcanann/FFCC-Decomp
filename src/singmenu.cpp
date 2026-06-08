@@ -3104,16 +3104,16 @@ int CMenuPcs::GetSmithItem(int itemNo)
         }
 
         unsigned int valid;
-        if (((flags & 0xF) == 0) || ((flags & 0x30) == 0)) {
-            if ((flags & 0xF) == 0) {
-                valid = static_cast<unsigned int>(-static_cast<int>(flags & 0x30 & genderMask)) >> 0x1f;
+        if (((flags & 0xF) != 0) && ((flags & 0x30) != 0)) {
+            if (((flags & 0xF & raceMask) == 0) || ((flags & 0x30 & genderMask) == 0)) {
+                valid = 0;
             } else {
-                valid = static_cast<unsigned int>(-static_cast<int>(flags & 0xF & raceMask)) >> 0x1f;
+                valid = 1;
             }
-        } else if (((flags & 0xF & raceMask) == 0) || ((flags & 0x30 & genderMask) == 0)) {
-            valid = 0;
+        } else if ((flags & 0xF) == 0) {
+            valid = static_cast<unsigned int>(-static_cast<int>(flags & 0x30 & genderMask)) >> 0x1f;
         } else {
-            valid = 1;
+            valid = static_cast<unsigned int>(-static_cast<int>(flags & 0xF & raceMask)) >> 0x1f;
         }
 
         if (valid != 0) {

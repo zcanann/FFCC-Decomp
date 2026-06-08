@@ -422,7 +422,7 @@ void CCaravanWork::AddLetter(int letterType, int senderId, int moneyValue, int h
 	m_letters[0].m_half.m_tempVars[2] = static_cast<unsigned short>(itemC);
 	m_letters[0].m_half.m_tempVars[3] = static_cast<unsigned short>(itemD);
 
-	int nextCount = m_letterCount + 1;
+	unsigned int nextCount = m_letterCount + 1;
 	int letterCount = 100;
 	if (nextCount < 100) {
 		letterCount = nextCount;
@@ -1805,10 +1805,10 @@ void CCaravanWork::CalcStatus()
 			if (tempStatBuffId >= 0x180) {
 				m_defense += *(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + 0x6C);
 			} else if (tempStatBuffId > 0x17C) {
-				m_magic += *(short*)(Game.unk_flat3_field_8_0xc7dc + 0x6E);
+				m_magic += *(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + 0x6E);
 			}
 		} else if (tempStatBuffId < 0x185) {
-			m_strength += *(short*)(Game.unk_flat3_field_8_0xc7dc + 0x6A);
+			m_strength += *(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + 0x6A);
 		}
 		m_tempStatBuffTimer--;
 	}
@@ -1830,7 +1830,7 @@ void CCaravanWork::CalcStatus()
 		break;
 	}
 
-	short hpBonus = 0;
+	unsigned short hpBonus = 0;
 	short cmdBonus = 0;
 	short strBonus = 0;
 	short magBonus = 0;

@@ -1590,7 +1590,7 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
     }
 
     if (draw) {
-        if (strcmp(meshData->m_name, s_manaShapeObj) != 0) {
+        if (draw == 1 && strcmp(meshData->m_name, s_manaShapeObj) != 0) {
             PSMTXCopy(mtx, mana2->m_reflectionMtx);
             if (mana2->m_paraboloidReady != 0) {
                 mana2->m_runtimeColor.r = meshData->m_colors[0];

@@ -2934,7 +2934,8 @@ void CMenuPcs::CalcResultOpenAnim()
 		base += activePartyCount;
 		for (int i = activePartyCount; i != 0; i--) {
 			int idx = base + activePartyCount - i;
-			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + idx * 0x40 + 8);
+			int __p12 = idx;
+			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + __p12 * 0x40 + 8);
 			BonusAnimSprite* icon = (BonusAnimSprite*)((int)sprite - activePartyCount * 0x40);
 			sprite->kind = -2;
 			sprite->x = 0;
@@ -2949,7 +2950,7 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		base += activePartyCount;
-		for (int i = 0; i < activePartyCount; i++) {
+		for (int i = 0; activePartyCount > i; i++) {
 			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
 			sprite->kind = -2;
 			sprite->x = 0;
@@ -3044,7 +3045,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			MenuBoardEntry& entry = boardEntries[activePartyCount + i];
 			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + ((signed char)s_CntTop + i) * 0x40 + 8);
 			int extent = sprite->w * 3 + 0x20;
-			int centerX = (int)((double)(float)((double)(sprite->w * 3) * 0.5 + (double)sprite->x) - 320.0);
+			int centerX =  (int)(long)((int)((double)(float)((double)(sprite->w * 3) * 0.5 + (double)sprite->x) - 320.0));
 			int centerY = (int)((double)(float)((double)sprite->h * 0.5 + (double)sprite->y) - 240.0);
 			entry.m_centerX = (short)centerX;
 			entry.m_centerY = (short)centerY;
@@ -3086,7 +3087,8 @@ void CMenuPcs::CalcResultOpenAnim()
 				sprite->timer++;
 				sprite->alpha = (float)((1.0 / (double)sprite->duration) * (double)sprite->timer);
 			} else {
-				doneCount++;
+				int __p5 = doneCount;
+				__p5++;
 				sprite->alpha = 1.0f;
 			}
 
@@ -3116,7 +3118,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
 		} else {
 			handle = GetBonusDisplayHandleSlots(this)[i - activePartyCount];
-			if (i < activePartyCount * 2) {
+			if (activePartyCount > i * 2) {
 				PSMTXScale(scaleMtx, 1.0f, 1.0f, 1.0f);
 			} else {
 				float modelScale = 0.5f;

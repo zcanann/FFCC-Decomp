@@ -1073,13 +1073,12 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		case -0x2C: {
 			Vec hitStart;
 			Vec hitMove;
-			float* params = reinterpret_cast<float*>(object->m_localBase);
-			float angle = params[2];
-			float distance = params[3];
-			float height = params[4];
-			float radius = params[5];
+			float angle = reinterpret_cast<float*>(object->m_localBase)[2];
+			float distance = reinterpret_cast<float*>(object->m_localBase)[3];
+			float height = reinterpret_cast<float*>(object->m_localBase)[4];
+			float radius = reinterpret_cast<float*>(object->m_localBase)[5];
 			hitStart.x = engineObject->m_worldPosition.x + static_cast<float>(sin(angle)) * distance;
-			hitStart.y = engineObject->m_worldPosition.y + params[1];
+			hitStart.y = engineObject->m_worldPosition.y + reinterpret_cast<float*>(object->m_localBase)[1];
 			hitStart.z = engineObject->m_worldPosition.z + static_cast<float>(cos(angle)) * distance;
 			hitMove.x = kCFlatRuntime2Zero;
 			hitMove.y = -height;

@@ -2174,7 +2174,7 @@ void CGPartyObj::statCharge()
 		}
 
 		int phase = (m_comboItemState == -1) ? m_subFrame : (m_subFrame - 0x10);
-		unsigned short itemType =
+		int itemType =
 		    *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 10) & 0xFF;
 
 		if (phase == 0) {

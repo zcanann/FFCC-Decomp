@@ -11164,7 +11164,7 @@ LAB_draw:
 					int playMinutes;
 					MemoryCardMan.CnvPlayTime(*reinterpret_cast<unsigned int*>(slotData + 0x14), &playHours, &playMinutes);
 					const int* const playDigitWidths = reinterpret_cast<int*>(lbl_801DC294 + 0x14);
-					const unsigned int playColonWidth = *reinterpret_cast<int*>(lbl_801DC294 + 0x3C);
+					const int playColonWidth = *reinterpret_cast<int*>(lbl_801DC294 + 0x3C);
 					int playDigits[5];
 					float playWidth = FLOAT_803313dc;
 					int hundreds = playHours / 100 + (playHours >> 0x1F);
@@ -11333,10 +11333,10 @@ LAB_draw:
 							strcpy(line2, space + 1);
 						}
 					}
-					fontF8->SetPosX(static_cast<float>(static_cast<double>(FLOAT_80331518) - static_cast<double>(static_cast<int>(fontF8->GetWidth(line1)))));
+					fontF8->SetPosX(static_cast<float>(static_cast<double>(FLOAT_80331518) - static_cast<double>(static_cast<unsigned int>(fontF8->GetWidth(line1)))));
 					fontF8->SetPosY(static_cast<float>(static_cast<double>(locationY) - static_cast<double>(FLOAT_80331590)));
 					fontF8->Draw(line1);
-					fontF8->SetPosX(static_cast<float>(static_cast<double>(FLOAT_80331518) - static_cast<double>(static_cast<int>(fontF8->GetWidth(line2)))));
+					fontF8->SetPosX(static_cast<float>(static_cast<double>(FLOAT_80331518) - static_cast<double>(static_cast<unsigned int>(fontF8->GetWidth(line2)))));
 					fontF8->SetPosY(locationY);
 					fontF8->Draw(line2);
 				}
@@ -11344,7 +11344,7 @@ LAB_draw:
 		}
 	}
 	if (worldState->m_subState == 0x11) {
-		short mode = worldState->m_menuMode;
+		unsigned short mode = worldState->m_menuMode;
 		if (mode == 5) {
 			CColor color(0xFF, 0xFF, 0xFF, 0xFF);
 			char* text = const_cast<char*>(GetMcStr(2));

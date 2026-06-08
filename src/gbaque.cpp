@@ -620,16 +620,17 @@ void GbaQueue::ExecutQueue()
 	obj = reinterpret_cast<char*>(this);
 
 	for (channel = 0; channel < 4; channel++) {
+		if (queue->m_queueFull[channel] != 0) {
+			continue;
+		}
+
+		{
 		const unsigned int playerBit = (1U << channel);
 		const unsigned int shopBit = (0x10U << channel);
 		unsigned int* queueWords = localQueueData[channel];
 		int queueCount = localQueueCount[channel];
 		CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
 		int i;
-
-		if (queue->m_queueFull[channel] != 0) {
-			continue;
-		}
 
 		for (i = 0; i < queueCount; i++) {
 			unsigned int cmdWord = queueWords[i];
@@ -864,6 +865,7 @@ void GbaQueue::ExecutQueue()
 				m_letterFlags = static_cast<unsigned char>(m_letterFlags & ~static_cast<unsigned char>(playerBit));
 			}
 		}
+		}
 	}
 }
 
@@ -963,16 +965,30 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
 		}
 
 		for (int materialIdx = 0; materialIdx < static_cast<int>(materialCount); materialIdx++) {
-			CCaravanWork* currentWork = reinterpret_cast<CCaravanWork*>(*scriptFoodBase);
-			int foundSlot;
+			int slotCounter = 0;
+			int byteOffset = 0;
+			int foundSlot = 0;
+			int groups;
 
-			for (foundSlot = 0; foundSlot < 0x40; foundSlot++) {
-				if (static_cast<int>(currentWork->m_inventoryItems[foundSlot]) == static_cast<int>(materialId)) {
+			for (groups = 0; groups < 8; groups++) {
+				char* invBase = static_cast<char*>(reinterpret_cast<void*>(*scriptFoodBase));
+				foundSlot = slotCounter;
+				if ((static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xB6)) == materialId) ||
+				    (foundSlot = slotCounter + 1, static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xB8)) == materialId) ||
+				    (foundSlot = slotCounter + 2, static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xBA)) == materialId) ||
+				    (foundSlot = slotCounter + 3, static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xBC)) == materialId) ||
+				    (foundSlot = slotCounter + 4, static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xBE)) == materialId) ||
+				    (foundSlot = slotCounter + 5, static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xC0)) == materialId) ||
+				    (foundSlot = slotCounter + 6, static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xC2)) == materialId) ||
+				    (foundSlot = slotCounter + 7, static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xC4)) == materialId)) {
 					break;
 				}
+				byteOffset += 0x10;
+				slotCounter += 8;
+				foundSlot = slotCounter;
 			}
 
-			currentWork->DeleteItemIdx(foundSlot, 1);
+			reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->DeleteItemIdx(foundSlot, 1);
 		}
 	}
 
@@ -1127,7 +1143,10 @@ void GbaQueue::SetRadarType()
 	int prevAssignedType;
 	int i;
 
-	if ((static_cast<signed char>(m_radarTypeFlags) != 0) || (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)) {
+	if (static_cast<signed char>(m_radarTypeFlags) != 0) {
+		return;
+	}
+	if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
 		return;
 	}
 
@@ -1261,20 +1280,20 @@ void GbaQueue::LoadPlayerStat()
 		memcpy(localNames + (i * 0x10), Game.m_caravanWorkArr[i].m_name, 0x10);
 	}
 
-	outOfShoukiMask = 0;
 	if (reinterpret_cast<int*>(&CFlat)[0x4101] != 0) {
 		unsigned char* entry = localPlayerStat;
+		outOfShoukiMask = 0;
 		for (i = 0; i < 4; i++) {
 			char menuStageMode = m_singleMode;
 			CGPartyObj* partyObj;
 			CCaravanWork* caravanWork;
 
-			if ((menuStageMode == 0) || (i != 1)) {
-				partyObj = Game.m_partyObjArr[i];
-				caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i]);
-			} else {
-				partyObj = Game.m_partyObjArr[0];
+			if ((menuStageMode != 0) && (i == 1)) {
 				caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+				partyObj = Game.m_partyObjArr[0];
+			} else {
+				caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i]);
+				partyObj = Game.m_partyObjArr[i];
 			}
 
 			if (caravanWork != 0) {
@@ -1286,17 +1305,22 @@ void GbaQueue::LoadPlayerStat()
 
 				entry[0x16] = static_cast<unsigned char>(caravanWork->m_maxHp);
 				entry[0x17] = static_cast<unsigned char>(caravanWork->m_hp);
-				entry[2] = static_cast<unsigned char>((caravanWork->m_tribeId & 3) |
-				                                      ((caravanWork->m_appearanceVariant & 3) << 2));
-				if (caravanWork->m_genderFlag != 0) {
-					entry[2] |= 0x80;
+				{
+					unsigned char tribeAppearance = static_cast<unsigned char>((caravanWork->m_tribeId & 3) |
+					                                      ((caravanWork->m_appearanceVariant & 3) << 2));
+					if (caravanWork->m_genderFlag != 0) {
+						tribeAppearance |= 0x80;
+					}
+					entry[2] = tribeAppearance;
 				}
 
 				*reinterpret_cast<int*>(entry + 0x24) = caravanWork->m_gil;
-				if (caravanWork->m_progressValue > 0xFF) {
-					*reinterpret_cast<unsigned short*>(entry + 0x14) = 0xFF;
-				} else {
-					*reinterpret_cast<unsigned short*>(entry + 0x14) = caravanWork->m_progressValue;
+				{
+					unsigned short progress = 0xFF;
+					if (caravanWork->m_progressValue <= 0xFF) {
+						progress = caravanWork->m_progressValue;
+					}
+					*reinterpret_cast<unsigned short*>(entry + 0x14) = progress;
 				}
 
 				entry[0x18] = static_cast<unsigned char>(caravanWork->m_letterMeta[0]);
@@ -1326,10 +1350,25 @@ void GbaQueue::LoadPlayerStat()
 				entry[0xD5] = static_cast<unsigned char>(caravanWork->unk_0x3ac);
 
 				memcpy(entry + 0x3A, caravanWork->m_inventoryItems, 0x80);
-				for (int artifactIndex = 0; artifactIndex < 96; artifactIndex++) {
-					if (static_cast<short>(caravanWork->m_artifacts[artifactIndex]) > 0) {
-						reinterpret_cast<unsigned int*>(entry + 0x28)[artifactIndex >> 5] |=
-						    static_cast<unsigned int>(1U << (artifactIndex & 0x1F));
+				{
+					int artifactIndex = 0;
+					int artifactGroup;
+					for (artifactGroup = 0; artifactGroup < 0x20; artifactGroup++) {
+						if (static_cast<short>(caravanWork->m_artifacts[artifactIndex]) > 0) {
+							reinterpret_cast<unsigned int*>(entry + 0x28)[artifactIndex / 32] |=
+							    static_cast<unsigned int>(1U << (artifactIndex % 32));
+						}
+						artifactIndex++;
+						if (static_cast<short>(caravanWork->m_artifacts[artifactIndex]) > 0) {
+							reinterpret_cast<unsigned int*>(entry + 0x28)[artifactIndex / 32] |=
+							    static_cast<unsigned int>(1U << (artifactIndex % 32));
+						}
+						artifactIndex++;
+						if (static_cast<short>(caravanWork->m_artifacts[artifactIndex]) > 0) {
+							reinterpret_cast<unsigned int*>(entry + 0x28)[artifactIndex / 32] |=
+							    static_cast<unsigned int>(1U << (artifactIndex % 32));
+						}
+						artifactIndex++;
 					}
 				}
 
@@ -1364,17 +1403,19 @@ void GbaQueue::LoadPlayerStat()
 				}
 
 				if (caravanWork->CanPlayerUseItem() != 0) {
-					entry[0xD6] |= 1;
+					entry[0xD6] |= GbaQueConst::CAN_REPLY;
 				}
 				if (caravanWork->CanPlayerPutItem() != 0) {
-					entry[0xD6] |= 2;
+					entry[0xD6] |= GbaQueConst::ITEM_ATTACH;
 				}
 			}
 
 			if (partyObj != 0) {
+				short posX = static_cast<short>(partyObj->m_worldPosition.x / kGbaQueueMapCoordScale);
+				short posZ = static_cast<short>(partyObj->m_worldPosition.z / kGbaQueueMapCoordScale);
 				entry[1] = 1;
-				*reinterpret_cast<short*>(entry + 0x36) = static_cast<short>(partyObj->m_worldPosition.x / kGbaQueueMapCoordScale);
-				*reinterpret_cast<short*>(entry + 0x38) = static_cast<short>(partyObj->m_worldPosition.z / kGbaQueueMapCoordScale);
+				*reinterpret_cast<short*>(entry + 0x36) = posX;
+				*reinterpret_cast<short*>(entry + 0x38) = posZ;
 			}
 
 			entry += 0xDC;
@@ -1388,50 +1429,53 @@ void GbaQueue::LoadPlayerStat()
 	} while (i < 4);
 
 	obj = reinterpret_cast<char*>(this);
-	memcpy(obj + 0x7C4, GetPlayerDataBlock(this), kGbaQueuePlayerDataBlockBytes);
-	memcpy(GetPlayerDataBlock(this), localPlayerStat, kGbaQueuePlayerDataBlockBytes);
+	memcpy(obj + 0x7C4, obj + 0x454, kGbaQueuePlayerDataBlockBytes);
+	memcpy(obj + 0x454, localPlayerStat, kGbaQueuePlayerDataBlockBytes);
 	memcpy(obj + 0x2A74, localNames, kGbaQueueCaravanNameBlockBytes);
 
 	m_prevOutOfShoukiFlags = m_outOfShoukiFlags;
 	m_outOfShoukiFlags = static_cast<unsigned char>(outOfShoukiMask);
 
 	for (i = 0; i < 4; i++) {
-		const int oldBase = 0x7C4 + (i * 0xDC);
-		const int newBase = 0x454 + (i * 0xDC);
+		char* base = obj + (i * 0xDC);
 		int j;
 
-		if (memcmp(obj + oldBase + 0x18, obj + newBase + 0x18, 8) != 0) {
-			m_compatibilityFlg[0] = static_cast<unsigned char>(m_compatibilityFlg[0] | (1 << i));
+		if (memcmp(base + 0x7C4 + 0x18, base + 0x454 + 0x18, 8) != 0) {
+			m_favoriteFlags = static_cast<unsigned char>(m_favoriteFlags | (1 << i));
 		}
-		if (*reinterpret_cast<int*>(obj + oldBase + 0x24) != *reinterpret_cast<int*>(obj + newBase + 0x24)) {
-			m_compatibilityFlg[1] = static_cast<unsigned char>(m_compatibilityFlg[1] | (1 << i));
+		if (*reinterpret_cast<unsigned int*>(base + 0x7C4 + 0x24) != *reinterpret_cast<unsigned int*>(base + 0x454 + 0x24)) {
+			m_moneyFlags = static_cast<unsigned char>(m_moneyFlags | (1 << i));
 		}
 
-		for (j = 0; j < 8; j++) {
-			if (memcmp(obj + oldBase + 4, obj + newBase + 4, 8) != 0) {
-				m_maskSendState[i] = static_cast<signed char>(m_maskSendState[i] | (1 << j));
+		{
+			char* oldMask = base + 0x7C4 + 4;
+			char* newMask = base + 0x454 + 4;
+			for (j = 0; j < 8; j++) {
+				if (memcmp(oldMask, newMask, 8) != 0) {
+					m_compatibilityFlg[i] = static_cast<unsigned char>(m_compatibilityFlg[i] | (1 << j));
+				}
 			}
 		}
 
-		if (obj[oldBase + 0x23] != obj[newBase + 0x23]) {
-			m_moneyState[0] = static_cast<unsigned char>(m_moneyState[0] | (1 << i));
+		if (base[0x7C4 + 0x23] != base[0x454 + 0x23]) {
+			m_chgUseItemFlags = static_cast<unsigned char>(m_chgUseItemFlags | (1 << i));
 		}
-		if (memcmp(obj + oldBase + 0x20, obj + newBase + 0x20, 3) != 0) {
-			m_moneyState[1] = static_cast<unsigned char>(m_moneyState[1] | (1 << i));
+		if (memcmp(base + 0x7C4 + 0x20, base + 0x454 + 0x20, 3) != 0) {
+			m_strengthFlags = static_cast<unsigned char>(m_strengthFlags | (1 << i));
 		}
-		if (memcmp(obj + oldBase + 0x28, obj + newBase + 0x28, 0xC) != 0) {
-			m_moneyState[2] = static_cast<unsigned char>(m_moneyState[2] | (1 << i));
+		if (memcmp(base + 0x7C4 + 0x28, base + 0x454 + 0x28, 0xC) != 0) {
+			m_artifactFlags = static_cast<unsigned char>(m_artifactFlags | (1 << i));
 		}
-		if (*reinterpret_cast<unsigned short*>(obj + oldBase + 0x14) !=
-		    *reinterpret_cast<unsigned short*>(obj + newBase + 0x14)) {
-			m_compatibilityFlg[2] = static_cast<unsigned char>(m_compatibilityFlg[2] | (1 << i));
+		if (*reinterpret_cast<unsigned short*>(base + 0x7C4 + 0x14) !=
+		    *reinterpret_cast<unsigned short*>(localPlayerStat + (i * 0xDC) + 0x14)) {
+			m_memorysFlags = static_cast<unsigned char>(m_memorysFlags | (1 << i));
 		}
 
-		if (obj[oldBase + 0xD3] != obj[newBase + 0xD3]) {
+		if (base[0x7C4 + 0xD3] != base[0x454 + 0xD3]) {
 			const int shift = i << 1;
-			m_radarMode = static_cast<unsigned char>(m_radarMode | (1 << shift));
-			if ((static_cast<int>(obj[newBase + 0xD3]) - static_cast<int>(obj[oldBase + 0xD3])) != 1) {
-				m_radarMode = static_cast<unsigned char>(m_radarMode | (2 << shift));
+			m_cmdNumFlags = static_cast<unsigned char>(m_cmdNumFlags | (1 << shift));
+			if ((static_cast<int>(base[0x454 + 0xD3]) - static_cast<int>(base[0x7C4 + 0xD3])) != 1) {
+				m_cmdNumFlags = static_cast<unsigned char>(m_cmdNumFlags | (2 << shift));
 			}
 		}
 	}
@@ -1455,23 +1499,19 @@ void GbaQueue::LoadPlayerStat()
 void GbaQueue::LoadEnemyStat()
 {
 	unsigned char localEnemyData[kGbaQueueEnemyDataBytes];
-	unsigned int* enemyObjPtrs;
-	unsigned int* enemyWorkPtrs;
 	int i;
 
 	memset(localEnemyData, 0, sizeof(localEnemyData));
 
 	if (reinterpret_cast<int*>(&CFlat)[0x4101] != 0) {
 		unsigned char* enemyEntry = localEnemyData;
-		enemyObjPtrs = &Game.m_scriptWork[0][0][0];
-		enemyWorkPtrs = &Game.m_scriptWork[4][0][0];
 
 		for (i = 0; i < 0x40; i++) {
-			if (enemyObjPtrs[i] == 0) {
+			if (Game.m_scriptWork[0][0][i] == 0) {
 				enemyEntry[3] = 0;
 			} else {
 				const int enemyDataBase = Game.unkCFlatData0[1] +
-				    reinterpret_cast<CMonWork*>(enemyWorkPtrs[i])->m_baseDataIndex * 0x1D0;
+				    reinterpret_cast<CMonWork*>(Game.m_scriptWork[4][0][i])->m_baseDataIndex * 0x1D0;
 				const unsigned int enemyKind = *reinterpret_cast<unsigned short*>(enemyDataBase + 0x10C);
 
 				if (enemyKind == 10) {
@@ -1482,13 +1522,13 @@ void GbaQueue::LoadEnemyStat()
 					enemyEntry[1] = 2;
 				}
 
-				CMonWork* enemyWork = reinterpret_cast<CMonWork*>(enemyWorkPtrs[i]);
-				CGObject* enemyObj = reinterpret_cast<CGObject*>(enemyObjPtrs[i]);
+				CMonWork* enemyWork = reinterpret_cast<CMonWork*>(Game.m_scriptWork[4][0][i]);
+				CGObject* enemyObj = reinterpret_cast<CGObject*>(Game.m_scriptWork[0][0][i]);
 				enemyEntry[3] = static_cast<unsigned char>(enemyWork->m_baseDataIndex);
 				*reinterpret_cast<unsigned short*>(enemyEntry + 4) = enemyWork->m_hp;
 				*reinterpret_cast<unsigned short*>(enemyEntry + 6) = enemyWork->m_maxHp;
 				int isDispRadar = static_cast<int>(enemyObj->IsDispRader());
-				int isDispRadarMask = -isDispRadar | isDispRadar;
+				unsigned int isDispRadarMask = static_cast<unsigned int>(-isDispRadar | isDispRadar);
 				enemyEntry[2] = static_cast<unsigned char>(isDispRadarMask >> 31);
 				*reinterpret_cast<unsigned short*>(enemyEntry + 0xC) =
 				    *reinterpret_cast<short*>(reinterpret_cast<char*>(enemyObj) + 0x510);
@@ -1543,17 +1583,19 @@ void GbaQueue::LoadMapItemStat()
 	numMapItems = 0;
 
 	if (reinterpret_cast<int*>(&CFlat)[0x4101] != 0) {
-		unsigned char* mapItemEntry = localMapItems;
-		object = gCFlatRuntime2.FindGObjFirst();
+		unsigned char* mapItemEntry;
+		object = CFlat.FindGObjFirst();
+		mapItemEntry = localMapItems;
 
 		while (object != 0) {
 			if ((object->m_objectFlags & 0x100) != 0) {
-				if ((object->m_dropItemCodes[0] & 0xC000) == 0x4000) {
+				const int dropItemCode = *reinterpret_cast<short*>(&object->m_dropItemCodes[0]);
+				if ((dropItemCode & 0xC000) == 0x4000) {
 					mapItemEntry[1] = 4;
 				} else {
 					const int itemDataBase = Game.unkCFlatData0[2];
 					const int bossStageLimit = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex] + 2;
-					const int itemStage = *reinterpret_cast<unsigned short*>(itemDataBase + object->m_dropItemCodes[0] * 0x48 + 0xC);
+					const int itemStage = *reinterpret_cast<unsigned short*>(itemDataBase + dropItemCode * 0x48 + 0xC);
 					if (itemStage >= bossStageLimit) {
 						mapItemEntry[1] = 5;
 					} else {
@@ -1563,13 +1605,17 @@ void GbaQueue::LoadMapItemStat()
 
 				int isDispRader = object->IsDispRader();
 				numMapItems++;
-				mapItemEntry[2] = static_cast<unsigned char>((-isDispRader | isDispRader) >> 31);
-				*reinterpret_cast<short*>(mapItemEntry + 8) = static_cast<short>(object->m_worldPosition.x / kGbaQueueMapCoordScale);
-				*reinterpret_cast<short*>(mapItemEntry + 0xA) = static_cast<short>(object->m_worldPosition.z / kGbaQueueMapCoordScale);
+				mapItemEntry[2] = static_cast<unsigned char>(static_cast<unsigned int>(-isDispRader | isDispRader) >> 31);
+				{
+					short posX = static_cast<short>(object->m_worldPosition.x / kGbaQueueMapCoordScale);
+					short posZ = static_cast<short>(object->m_worldPosition.z / kGbaQueueMapCoordScale);
+					*reinterpret_cast<short*>(mapItemEntry + 8) = posX;
+					*reinterpret_cast<short*>(mapItemEntry + 0xA) = posZ;
+				}
 				mapItemEntry += 0x14;
 			}
 
-			object = gCFlatRuntime2.FindGObjNext(object);
+			object = CFlat.FindGObjNext(object);
 		}
 	}
 
@@ -4403,10 +4449,13 @@ int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
 					scouterEntry[7] = 0xFF;
 				} else {
 					const short scouterValue = *reinterpret_cast<short*>(enemyEntry + 0xB40);
-					if ((scouterValue < 1) || ((scouterValue & 0xC000) == 0x4000)) {
+					if (scouterValue < 1) {
+						*reinterpret_cast<unsigned short*>(scouterEntry + 6) = 0;
+					} else if ((scouterValue & 0xC000) == 0x4000) {
 						*reinterpret_cast<unsigned short*>(scouterEntry + 6) = 0;
 					} else {
-						*reinterpret_cast<unsigned short*>(scouterEntry + 6) = SwapU16(static_cast<unsigned short>(scouterValue));
+						*reinterpret_cast<unsigned short*>(scouterEntry + 6) =
+							__lhbrx(reinterpret_cast<unsigned short*>(enemyEntry + 0xB40), 0);
 					}
 				}
 

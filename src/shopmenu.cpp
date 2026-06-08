@@ -2055,7 +2055,7 @@ void CShopMenu::DrawSmith0()
  * JP Size: TODO
  */
 #pragma push
-#pragma opt_lifetimes off
+#pragma opt_lifetimes on
 void CShopMenu::DrawShop0()
 {
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;

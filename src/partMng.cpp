@@ -1221,17 +1221,22 @@ unsigned int CPartMng::pppReadRsd(CChunkFile& chunkFile, pppModelSt* modelSt)
 
     while (chunkFile.GetNextChunk(chunk)) {
         chunkFile.PushChunk();
-        if (chunk.m_id == 'RSD ') {
+        switch (chunk.m_id) {
+        case 'RSD ':
             while (chunkFile.GetNextChunk(chunk)) {
-                if (chunk.m_id == 'TXNM') {
+                switch (chunk.m_id) {
+                case 'TXNM':
                     for (unsigned int i = 0; i < chunk.m_arg0; i++) {
                         textureNames[i] = chunkFile.GetString();
                     }
-                } else if (chunk.m_id == 'MESH') {
+                    break;
+                case 'MESH':
                     meshSize = modelSt->ReadOtmMesh(chunkFile, PartPcs.m_usbStreamState.m_stageLoad, 0, 0);
                     modelSt->SetDisplayListMaterial(m_materialSet, textureNames, &ppvAmemCacheSet);
+                    break;
                 }
             }
+            break;
         }
         chunkFile.PopChunk();
     }

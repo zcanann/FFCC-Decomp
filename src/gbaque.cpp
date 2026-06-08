@@ -4410,8 +4410,7 @@ int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
 				if (*reinterpret_cast<short*>(enemyEntry + 0xE) < 1) {
 					const unsigned short scouterValue = *reinterpret_cast<unsigned short*>(enemyEntry + 0xC);
 					if ((static_cast<short>(scouterValue) < 1) || ((scouterValue & 0xC000) == 0x4000)) {
-						scouterEntry[6] = 0;
-						scouterEntry[7] = 0;
+						*reinterpret_cast<unsigned short*>(scouterEntry + 6) = 0;
 					} else {
 						*reinterpret_cast<unsigned short*>(scouterEntry + 6) = SwapU16(scouterValue);
 					}

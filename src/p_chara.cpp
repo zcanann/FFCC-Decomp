@@ -2561,11 +2561,11 @@ int CCharaPcs::CHandle::SetAnim(int animIndex, int startFrame, int endFrame, int
     }
 
     CChara::CAnim* anim;
-    if (animIndex != -1) {
+    if (animIndex == -1) {
+        anim = 0;
+    } else {
         CLoadAnim* loadAnim = reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex]);
         anim = loadAnim != 0 ? loadAnim->m_anim : 0;
-    } else {
-        anim = 0;
     }
 
     if (anim == 0) {

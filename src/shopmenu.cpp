@@ -1876,18 +1876,20 @@ void CShopMenu::DrawMake()
     MenuPcs.DrawInit();
 
     const char* gilUnitText = ShopMenuMes(languageId, SHOP_MENU_TEXT_GIL);
+    int makeItemNo = getItemNo(m_selectedIndex);
+    int makeGil = makeItemNo > 0 ? CalcShopMenuMakeGil(this, makeItemNo) : 0;
     SetupShopMenuUnitFont(font);
     float gilUnitWidth = font->GetWidth(gilUnitText);
 
+    int makeAmountX = static_cast<int>(FLOAT_80332e14 - gilUnitWidth - FLOAT_80332d5c - FLOAT_80332d5c);
     SetupShopMenuAmountFont(font);
-    int makeItemNo = getItemNo(m_selectedIndex);
-    int makeGil = makeItemNo > 0 ? CalcShopMenuMakeGil(this, makeItemNo) : 0;
-    DrawShopMenuAmount(font, makeGil, FLOAT_80332e14 - gilUnitWidth - FLOAT_80332d5c - FLOAT_80332d5c, FLOAT_80332e18, 0x13);
-    SetupShopMenuAmountFont(font);
+    DrawShopMenuAmountTrunc(font, makeGil, makeAmountX, FLOAT_80332e18, 0x13);
+    int gilAmountX = static_cast<int>(FLOAT_80332e1c - gilUnitWidth - FLOAT_80332d5c);
     int makeItemNo2 = getItemNo(m_selectedIndex);
     int makeGil2 = makeItemNo2 > 0 ? CalcShopMenuMakeGil(this, makeItemNo2) : 0;
-    DrawShopMenuAmount(font, ShopMenuCaravanWork(this)->m_gil,
-        FLOAT_80332e1c - gilUnitWidth - FLOAT_80332d5c, FLOAT_80332e18,
+    SetupShopMenuAmountFont(font);
+    DrawShopMenuAmountTrunc(font, ShopMenuCaravanWork(this)->m_gil,
+        gilAmountX, FLOAT_80332e18,
         (makeGil2 <= ShopMenuCaravanWork(this)->m_gil) ? 0x14 : 2);
 
     SetupShopMenuUnitFont(font);

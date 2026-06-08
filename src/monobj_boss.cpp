@@ -270,7 +270,8 @@ void CGMonObj::frameStatFuncGiantCrab()
 	u8* self = (u8*)this;
 	int state = *(int*)(self + 0x520);
 
-	if (state == 100) {
+	switch (state) {
+	case 100: {
 		if (*(int*)(self + 0x528) == 0) {
 			int soundStep = *(int*)(CGMonObj::m_boss + 0x4);
 			switch (soundStep) {
@@ -333,7 +334,12 @@ void CGMonObj::frameStatFuncGiantCrab()
 			reinterpret_cast<CGPrgObj*>(self)->changeStat(0, 0, 0);
 			*(u32*)(self + 0x1c0) |= 0x80002;
 		}
-	} else if (state >= 100 && state < 0x69) {
+		break;
+	}
+	case 0x65:
+	case 0x66:
+	case 0x67:
+	case 0x68: {
 		if (*(int*)(self + 0x528) == 0) {
 			float turnOffset;
 			int animId;
@@ -390,6 +396,8 @@ void CGMonObj::frameStatFuncGiantCrab()
 		if (*(int*)(self + 0x528) == 0x19) {
 			reinterpret_cast<CGPrgObj*>(self)->changeStat(0, 0, 0);
 		}
+		break;
+	}
 	}
 }
 

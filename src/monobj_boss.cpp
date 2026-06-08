@@ -1404,29 +1404,8 @@ void CGMonObj::frameStatFuncTetsukyojin()
 	u8* self = reinterpret_cast<u8*>(this);
 	const int state = prgObj->m_lastStateId;
 
-	if (state == 0x66) {
-		if (CFlatBossState() < 1) {
-			prgObj->changeStat(0, 0, 0);
-		} else {
-			if ((*reinterpret_cast<int*>(self + 0x6B4) == 1) && (prgObj->m_stateFrame == 0)) {
-				CFlatRuntime::CStack stack[3];
-
-				object->m_bgColMask &= 0xFFF3FFFD;
-				*reinterpret_cast<int*>(self + 0x6B4) = 2;
-				CFlatBossSubState() = 1;
-				stack[0].m_word = 10;
-				stack[1].m_word = 0;
-				stack[2].m_word = 0;
-				gCFlatRuntime().SystemCall(0, 1, 9, 3, stack, 0);
-			}
-
-			if (CFlatBossSubState() == 0) {
-				*reinterpret_cast<int*>(self + 0x6B4) = 0;
-				m_unk6C8 = 0;
-				prgObj->changeStat(0, 0, 0);
-			}
-		}
-	} else if (state == 100) {
+	switch (state) {
+	case 100:
 		if (prgObj->m_stateFrame == 0) {
 			CVector partyPos(Game.m_partyObjArr[m_targetPartyIndex]->m_worldPosition);
 			CVector attackDir(-partyPos.x, -partyPos.y, -partyPos.z);
@@ -1466,7 +1445,8 @@ void CGMonObj::frameStatFuncTetsukyojin()
 			m_moveWork.m_changeStat = 0x67;
 		}
 		moveFrame();
-	} else if (state == 0x67) {
+		return;
+	case 0x67:
 		if (prgObj->m_stateFrame == 0x10) {
 			memset(&m_moveWork, 0, sizeof(m_moveWork));
 			m_moveWork.m_flags = 0x2410;
@@ -1484,7 +1464,8 @@ void CGMonObj::frameStatFuncTetsukyojin()
 			moveFrame();
 		}
 		reinterpret_cast<CGCharaObj*>(this)->statAttack();
-	} else if (state > 99) {
+		return;
+	default:
 		if ((CFlatBossState() != 0) && (prgObj->m_stateFrame == 0x25)) {
 			int flatCount = CFlatBossState();
 			if (flatCount < 1) {
@@ -1497,14 +1478,38 @@ void CGMonObj::frameStatFuncTetsukyojin()
 				int pdtNo = object->m_charaModelHandle->GetPdtSlot();
 				prgObj->putParticle((pdtNo << 8) | 0x2D, 0, object, kMonObjBossOne, 0x101E4);
 
-				if (*reinterpret_cast<int*>(self + 0x6B4) == 0) {
+				if (m_actionBranch == 0) {
 					CFlatBossState() = CFlatBossState() - 1;
 				}
-				*reinterpret_cast<int*>(self + 0x6B4) = 1;
+				m_actionBranch = 1;
 				m_unk6C8 = 0;
 			}
 		}
 		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+		return;
+	case 0x66:
+		if (CFlatBossState() < 1) {
+			prgObj->changeStat(0, 0, 0);
+		} else {
+			if ((m_actionBranch == 1) && (prgObj->m_stateFrame == 0)) {
+				CFlatRuntime::CStack stack[3];
+
+				object->m_bgColMask &= 0xFFF3FFFD;
+				m_actionBranch = 2;
+				CFlatBossSubState() = 1;
+				stack[0].m_word = 10;
+				stack[1].m_word = 0;
+				stack[2].m_word = 0;
+				gCFlatRuntime().SystemCall(0, 1, 9, 3, stack, 0);
+			}
+
+			if (CFlatBossSubState() == 0) {
+				m_actionBranch = 0;
+				m_unk6C8 = 0;
+				prgObj->changeStat(0, 0, 0);
+			}
+		}
+		return;
 	}
 }
 

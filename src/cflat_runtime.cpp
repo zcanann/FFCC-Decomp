@@ -2006,7 +2006,7 @@ frameLoop:
 		case 0x36: {
 			float* sp = reinterpret_cast<float*>(object->m_sp);
 			--object->m_sp;
-			sp[-2] = static_cast<float>(static_cast<unsigned int>(sp[-1] < sp[-2]));
+			sp[-2] = static_cast<float>(static_cast<unsigned int>(sp[-2] > sp[-1]));
 			break;
 		}
 		case 0x37: {

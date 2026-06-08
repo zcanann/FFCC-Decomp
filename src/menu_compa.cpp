@@ -177,11 +177,14 @@ void CMenuPcs::CompaDraw()
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3A));
 
 	int familyCount = 2;
-	for (int i = 2; i < 7; i++) {
-		if (caravanWork->m_evtWordArr[19 + i] > 0) {
+	const short* evtWord = caravanWork->m_evtWordArr;
+	int i = 2;
+	do {
+		if (evtWord[19 + i] > 0) {
 			familyCount++;
 		}
-	}
+		i++;
+	} while (i < 7);
 	if (familyCount > 4 && System.m_execParam >= 1) {
 		System.Printf(const_cast<char*>(sCompaFamilyCountErrorFmt), s_menu_compa_cpp, 0x1BF,
 		              familyCount);

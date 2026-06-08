@@ -834,7 +834,8 @@ void CGMonObj::frameStatFuncSaw()
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 
-	if (prgObj->m_lastStateId == 100) {
+	switch (prgObj->m_lastStateId) {
+	case 100:
 		mon[0x63C] = mon[0x63C] & 0x7F | 0x80;
 
 		if (prgObj->m_subState == 0) {
@@ -878,6 +879,7 @@ void CGMonObj::frameStatFuncSaw()
 		}
 
 		moveFrame();
+		break;
 	}
 }
 

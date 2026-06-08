@@ -733,7 +733,8 @@ void CMiniGamePcs::GbaThreadMain(void* threadParam)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     unsigned char* param = reinterpret_cast<unsigned char*>(threadParam);
-    unsigned int message;
+    unsigned int messageBuf[2];
+    unsigned char gbaReadScratch[4];
     unsigned int command;
     unsigned int command7;
     unsigned int command8;
@@ -746,13 +747,14 @@ void CMiniGamePcs::GbaThreadMain(void* threadParam)
     OSTime timeoutTicks;
     OSTime startTime;
 #define channel (reinterpret_cast<signed char*>(param)[0xBC])
+#define message (messageBuf[0])
 
 receive_message:
-    ret = OSReceiveMessage(reinterpret_cast<OSMessageQueue*>(param), reinterpret_cast<OSMessage*>(&message), 0);
+    ret = OSReceiveMessage(reinterpret_cast<OSMessageQueue*>(param), reinterpret_cast<OSMessage*>(messageBuf), 0);
     if (ret == 0)
     {
         param[0xBD] = 0;
-        OSReceiveMessage(reinterpret_cast<OSMessageQueue*>(param), reinterpret_cast<OSMessage*>(&message), 1);
+        OSReceiveMessage(reinterpret_cast<OSMessageQueue*>(param), reinterpret_cast<OSMessage*>(messageBuf), 1);
         param[0xBE] = 0;
     }
 
@@ -1014,13 +1016,7 @@ comm_fail:
         *reinterpret_cast<int*>(param + 0x9C) = 1;
         param[0xC3] = 0;
 
-        if (param[0xC7] < 2)
-        {
-            ret = GBAJoyBoot(channel, channel << 1, 2, *reinterpret_cast<u8**>(param + 0x8C),
-                             *reinterpret_cast<int*>(param + 0x90), param + 0xC0);
-            param[0xC7]++;
-        }
-        else
+        if (param[0xC7] >= 2)
         {
             ret = 1;
             for (unsigned int i = 0; i < 100; i++)
@@ -1032,6 +1028,12 @@ comm_fail:
                     break;
                 }
             }
+        }
+        else
+        {
+            ret = GBAJoyBoot(channel, channel << 1, 2, *reinterpret_cast<u8**>(param + 0x8C),
+                             *reinterpret_cast<int*>(param + 0x90), param + 0xC0);
+            param[0xC7]++;
         }
 
         if (ret == 0)
@@ -1050,27 +1052,22 @@ comm_fail:
             {
                 if ((param[0xC0] & GBA_JSTAT_FLAGS_MASK) != GBA_JSTAT_PSF0)
                 {
-                    GBARead(channel, param + 0x254, param + 0xC0);
+                    GBARead(channel, gbaReadScratch, param + 0xC0);
                 }
             }
             else
             {
-                int status = GBAGetStatus(channel, param + 0xC0);
-                if (status == 0)
+                int status;
+                if (GBAGetStatus(channel, param + 0xC0) == 0 && param[0xC0] == 0x28 &&
+                    GBARead(channel, reinterpret_cast<u8*>(&identity7), param + 0xC0) == 0)
                 {
-                    if (param[0xC0] == 0x28)
-                    {
-                        status = GBARead(channel, reinterpret_cast<u8*>(&identity7), param + 0xC0);
-                        if (status == 0)
-                        {
-                            *reinterpret_cast<unsigned int*>(param + 0xA4) = identity7;
-                            param[0xC3] = 1;
-                        }
-                    }
-                    else
-                    {
-                        status = 1;
-                    }
+                    *reinterpret_cast<unsigned int*>(param + 0xA4) = identity7;
+                    param[0xC3] = 1;
+                    status = 0;
+                }
+                else
+                {
+                    status = 1;
                 }
                 if (status == 0 &&
                     (memcmp(param + 0xA4, self + 0x1344, 4) == 0 || *reinterpret_cast<unsigned int*>(param + 0xA4) == 0x414D4752))
@@ -1080,21 +1077,11 @@ comm_fail:
                         *reinterpret_cast<int*>(param + 0x9C) = 0;
                     }
 
-                    status = GBAGetStatus(channel, param + 0xC0);
-                    if (status == 0 && param[0xC0] == 0x20)
+                    if (GBAGetStatus(channel, param + 0xC0) == 0 && param[0xC0] == 0x20 &&
+                        GBAWrite(channel, self + 0x1344, param + 0xC0) == 0 &&
+                        GBAGetStatus(channel, param + 0xC0) == 0 && param[0xC0] == 0x30)
                     {
-                        status = GBAWrite(channel, self + 0x1344, param + 0xC0);
-                        if (status == 0 && GBAGetStatus(channel, param + 0xC0) == 0)
-                        {
-                            if (param[0xC0] == 0x30)
-                            {
-                                status = 0;
-                            }
-                            else
-                            {
-                                status = 1;
-                            }
-                        }
+                        status = 0;
                     }
                     else
                     {
@@ -1147,22 +1134,17 @@ comm_fail:
         ret = GBAReset(channel, param + 0xC0);
         if (ret == 0)
         {
-            int status = GBAGetStatus(channel, param + 0xC0);
-            if (status == 0)
+            int status;
+            if (GBAGetStatus(channel, param + 0xC0) == 0 && param[0xC0] == 0x28 &&
+                GBARead(channel, reinterpret_cast<u8*>(&identity8), param + 0xC0) == 0)
             {
-                if (param[0xC0] == 0x28)
-                {
-                    status = GBARead(channel, reinterpret_cast<u8*>(&identity8), param + 0xC0);
-                    if (status == 0)
-                    {
-                        *reinterpret_cast<unsigned int*>(param + 0xA4) = identity8;
-                        param[0xC3] = 1;
-                    }
-                }
-                else
-                {
-                    status = 1;
-                }
+                *reinterpret_cast<unsigned int*>(param + 0xA4) = identity8;
+                param[0xC3] = 1;
+                status = 0;
+            }
+            else
+            {
+                status = 1;
             }
             if (status == 0 &&
                 (memcmp(param + 0xA4, self + 0x1344, 4) == 0 || *reinterpret_cast<unsigned int*>(param + 0xA4) == 0x414D4752))
@@ -1171,21 +1153,11 @@ comm_fail:
                 {
                     *reinterpret_cast<int*>(param + 0x9C) = 0;
                 }
-                status = GBAGetStatus(channel, param + 0xC0);
-                if (status == 0 && param[0xC0] == 0x20)
+                if (GBAGetStatus(channel, param + 0xC0) == 0 && param[0xC0] == 0x20 &&
+                    GBAWrite(channel, self + 0x1344, param + 0xC0) == 0 &&
+                    GBAGetStatus(channel, param + 0xC0) == 0 && param[0xC0] == 0x30)
                 {
-                    status = GBAWrite(channel, self + 0x1344, param + 0xC0);
-                    if (status == 0 && GBAGetStatus(channel, param + 0xC0) == 0)
-                    {
-                        if (param[0xC0] == 0x30)
-                        {
-                            status = 0;
-                        }
-                        else
-                        {
-                            status = 1;
-                        }
-                    }
+                    status = 0;
                 }
                 else
                 {
@@ -1794,12 +1766,12 @@ void CMiniGamePcs::MngThreadMain(void*)
     int managerStackOffset = 0x1000;
     unsigned char* threadParam = self;
     unsigned char* threadState = self;
-    unsigned char* spMode = Game.m_gameWork.m_spModeFlags;
+    unsigned char* spMode = reinterpret_cast<unsigned char*>(&Game);
 
     int i = 0;
     do
     {
-        int mode = *spMode;
+        int mode = spMode[0xA];
         unsigned int imageSize = (mode == 0)
                                      ? *reinterpret_cast<unsigned int*>(self + 0x1358)
                                      : *reinterpret_cast<unsigned int*>(self + 0x1360);
@@ -1841,7 +1813,7 @@ void CMiniGamePcs::MngThreadMain(void*)
         {
             self[0x649D] = 0;
 
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i <= 3; i++)
             {
                 MiniGameThreadSleepTicks(OSMillisecondsToTicks(100));
 

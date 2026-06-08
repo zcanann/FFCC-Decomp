@@ -269,8 +269,8 @@ void CGObject::onCreate()
     m_shieldModelHandle = 0;
 
     m_animStateMisc = 0xFF;
-    m_weaponNodeFlagBytes.m_flags1 &= 0x7F;
-    m_weaponNodeFlagBytes.m_flags1 = (m_weaponNodeFlagBytes.m_flags1 & 0xBF) | 0x40;
+    m_weaponNodeFlagAll.m_bits1.m_shield = 0;
+    m_weaponNodeFlagAll.m_bits1.m_menuReady = 1;
 
     m_moveBaseSpeed = sDefaultMoveBaseSpeed;
     m_currentAnimSlot = -1;
@@ -285,10 +285,10 @@ void CGObject::onCreate()
     m_nearColRadius = sJumpLift;
     m_bgColMask = 0;
 
-    m_weaponNodeFlagBytes.m_flags1 &= 0xDF;
-    m_weaponNodeFlagBytes.m_flags0 = (m_weaponNodeFlagBytes.m_flags0 & 0xEF) | 0x10;
-    m_weaponNodeFlagBytes.m_flags0 &= 0xF7;
-    m_weaponNodeFlagBytes.m_flags0 = (m_weaponNodeFlagBytes.m_flags0 & 0xFB) | 4;
+    m_weaponNodeFlagAll.m_bits1.m_bit20 = 0;
+    m_weaponNodeFlagBits.m_unk10 = 1;
+    m_weaponNodeFlagBits.m_control3 = 0;
+    m_weaponNodeFlagBits.m_unk04 = 1;
 
     m_objectFlags = 1;
     m_displayFlags = 3;
@@ -303,20 +303,20 @@ void CGObject::onCreate()
     unk_0x184 = 0.0f;
     unk_0x188 = 0.0f;
     m_bgHitMask = -1;
-    m_weaponNodeFlagBytes.m_flags0 &= 0xFE;
-    m_weaponNodeFlagBytes.m_flags0 = (m_weaponNodeFlagBytes.m_flags0 & 0xDF) | 0x20;
-    m_weaponNodeFlagBytes.m_flags0 &= 0xBF;
+    m_weaponNodeFlagBits.m_attached = 0;
+    m_weaponNodeFlagBits.m_unk20 = 1;
+    m_weaponNodeFlagBits.m_unk40 = 0;
     m_animSlotSel = -1;
     m_turnSpeed = 0.0f;
     m_pushParamA = 0;
     m_pushParamB = 0;
 
-    *((u8*)&m_shieldNodeFlags) &= 0xBF;
+    m_shieldNodeFlagBits.m_bit40 = 0;
     m_frontHitAngle = sDefaultFrontHitAngle;
     m_lookAtTarget = 0;
     m_stepSlopeLimit = 1.0f;
     m_lookAtTimer = 1.0f;
-    *((u8*)&m_shieldNodeFlags) &= 0xDF;
+    m_shieldNodeFlagBits.m_bit20 = 0;
     m_animBlend = 1.0f;
     m_bgAttrValue = 1.0f;
     m_bounceFactor = 1.0f;
@@ -330,12 +330,12 @@ void CGObject::onCreate()
     m_bgCollisionQtrn.z = 0.0f;
     m_bgCollisionQtrn.w = 1.0f;
 
-    *((u8*)&m_shieldNodeFlags) &= 0xEF;
+    m_shieldNodeFlagBits.m_bit10 = 0;
     m_dispItemTimer = 0;
-    *((u8*)&m_shieldNodeFlags) &= 0x7F;
+    m_shieldNodeFlagBits.m_bit80 = 0;
     m_lastBgAttr = 1.0f;
-    *((u8*)&m_shieldNodeFlags) &= 0xF7;
-    *((u8*)&m_shieldNodeFlags) &= 0xFB;
+    m_shieldNodeFlagBits.m_bit08 = 0;
+    m_shieldNodeFlagBits.m_bit04 = 0;
     m_collisionPushTimerMax = 0x32;
 
     m_radiusCtrl.x = 0.0f;

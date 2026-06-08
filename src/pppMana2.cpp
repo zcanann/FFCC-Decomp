@@ -1525,34 +1525,33 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
     VMana2* mana2 = (VMana2*)work;
     pppMana2Step* stepData = static_cast<pppMana2Step*>(step);
     int type = stepData->m_type;
-    const char* shape = meshData->m_name;
-    bool draw = false;
+    int draw = 0;
 
     switch (type) {
     case 0:
-        if (strcmp(shape, s_manaShapeObj) == 0) {
-            draw = true;
+        if (strcmp(meshData->m_name, s_manaShapeObj) == 0) {
+            draw = 1;
         }
         break;
     case 1:
-        if (strcmp(shape, s_manaShapeObj) == 0 || strcmp(shape, s_manaShapeObj5) == 0) {
-            draw = true;
+        if (strcmp(meshData->m_name, s_manaShapeObj) == 0 || strcmp(meshData->m_name, s_manaShapeObj5) == 0) {
+            draw = 1;
         }
         break;
     case 2:
-        if (strcmp(shape, s_manaShapeObj) == 0 || strcmp(shape, s_manaShapeObj3) == 0) {
-            draw = true;
+        if (strcmp(meshData->m_name, s_manaShapeObj) == 0 || strcmp(meshData->m_name, s_manaShapeObj3) == 0) {
+            draw = 1;
         }
         break;
     case 3:
-        if (strcmp(shape, s_manaShapeObj) == 0 || strcmp(shape, s_manaShapeObj1) == 0) {
-            draw = true;
+        if (strcmp(meshData->m_name, s_manaShapeObj) == 0 || strcmp(meshData->m_name, s_manaShapeObj1) == 0) {
+            draw = 1;
         }
         break;
     }
 
-    int waterCmp = strcmp(shape, s_manaShapeObj4);
-    if ((waterCmp == 0 && stepData->m_type == 1) || (strcmp(shape, s_manaShapeObj2) == 0 && stepData->m_type == 2)) {
+    int waterCmp = strcmp(meshData->m_name, s_manaShapeObj4);
+    if ((waterCmp == 0 && stepData->m_type == 1) || (strcmp(meshData->m_name, s_manaShapeObj2) == 0 && stepData->m_type == 2)) {
         Mtx cameraMtx;
         Mtx rotMtx;
         Mtx posMtx;
@@ -1586,7 +1585,7 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
     }
 
     if (draw) {
-        if (strcmp(shape, s_manaShapeObj) != 0) {
+        if (strcmp(meshData->m_name, s_manaShapeObj) != 0) {
             PSMTXCopy(mtx, mana2->m_reflectionMtx);
             if (mana2->m_paraboloidReady != 0) {
                 mana2->m_runtimeColor.r = meshData->m_colors[0];

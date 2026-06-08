@@ -393,7 +393,7 @@ void CMemory::Init()
             modeData.m_activeList.m_next = &modeData.m_activeList;
             modeData.m_freeList.m_next = &modeData.m_stagePool[0];
 
-            for (int index = 0; index < 32; index++) {
+            for (unsigned int index = 0; index < 32; index++) {
                 CStage* next;
 
                 if (index == 0x1F) {
@@ -1355,7 +1355,7 @@ void CMemory::CStage::drawHeapTitle(int y)
     unsigned int totalUnuse = 0;
     unsigned int maxUnuse = 0;
     CBlock* prev = node->m_prev;
-    int heapTop = m_heapTop;
+    unsigned int heapTop = m_heapTop;
     char line[264];
 
     while ((node->m_flags & 2) == 0) {
@@ -1369,7 +1369,7 @@ void CMemory::CStage::drawHeapTitle(int y)
             }
         }
 
-        if ((node->m_size != reinterpret_cast<int>(node->m_next) - reinterpret_cast<int>(payloadFromBlock(node))) ||
+        if ((node->m_size != reinterpret_cast<unsigned int>(node->m_next) - reinterpret_cast<int>(payloadFromBlock(node))) ||
             (node->m_prev != prev)) {
             if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                 System.Printf(const_cast<char*>(sHeapCorruptAbortDrawMsg));
@@ -1952,7 +1952,7 @@ void CAmemCacheSet::Release(short index)
 
         void (*onUnderflow)(int) = reinterpret_cast<void (*)(int)>(m_overflowHook);
         if (onUnderflow != 0) {
-            onUnderflow(static_cast<int>(index));
+            onUnderflow(static_cast<unsigned int>(index));
         }
     }
 }

@@ -542,11 +542,10 @@ static inline void CalcWmFrame0Inline(CMenuPcs* menu, int param)
 	if (param < 0) {
 		float offset = static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(frame + 8)) +
 		                                  static_cast<int>(*reinterpret_cast<short*>(frame + 4)));
-		if (param > -11) {
-			unsigned int sign = static_cast<unsigned int>(param) >> 31;
-			unsigned int absParam = (sign ^ static_cast<unsigned int>(param)) - sign;
-			float tUnclamped = static_cast<float>(static_cast<int>(absParam));
-			float scaledOffset = offset * 0.1f * tUnclamped;
+		if (param >= -10) {
+			int sign = param >> 31;
+			unsigned int absParam = static_cast<unsigned int>((param ^ sign) - sign);
+			float scaledOffset = offset * static_cast<float>(DOUBLE_803314E8 * static_cast<double>(static_cast<int>(absParam)));
 			if (static_cast<int>(absParam) < 0) {
 				absParam = 0;
 			}

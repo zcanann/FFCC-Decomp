@@ -2325,6 +2325,11 @@ void CCharaPcs::CHandle::LoadModel(
     if (loadModel != 0) {
         m_modelLoadRef = loadModel;
 
+        CMemory::CStage* modelStage = CharaPcs.m_viewerModelStage;
+        if (specialModelStage != 0) {
+            modelStage = m_charaKind == 3 ? CharaPcs.m_familyModelStage : CharaPcs.m_weaponModelStage;
+        }
+
         if (loadModel->GetRef() == 1) {
             if (loadModel->m_streamMode != 0) {
                 File.LockBuffer();
@@ -2335,7 +2340,7 @@ void CCharaPcs::CHandle::LoadModel(
                     static_cast<unsigned long>(loadModel->m_streamSize));
                 CChara::CModel* model =
                     new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x7C7) CChara::CModel;
-                model->Create(File.m_readBuffer, HandleModelStage(m_charaKind, specialModelStage));
+                model->Create(File.m_readBuffer, SelectLoadStage(&CharaPcs, modelStage));
                 loadModel->m_model = model;
                 File.UnlockBuffer();
             }
@@ -2346,7 +2351,7 @@ void CCharaPcs::CHandle::LoadModel(
             m_model->Init();
         } else {
             m_modelLoadRef->AddRef();
-            m_model = loadModel->m_model->Duplicate(HandleModelStage(m_charaKind, specialModelStage));
+            m_model = loadModel->m_model->Duplicate(SelectLoadStage(&CharaPcs, modelStage));
         }
     } else {
         strcpy(path, basePath);

@@ -2716,10 +2716,7 @@ unsigned int CMenuPcs::CmdClose1()
 		GetCmdListStorage(this)->entries[static_cast<s32>(GetCmdListStorage(this)->listEnd) + 3].alpha =
 			static_cast<float>(-(kCmdMenuTransitionStepD * static_cast<f64>(GetCmdStateView(this)->transitionTimer) - kCmdMenuOneD));
 
-		done = 0;
-		if (static_cast<f64>(GetCmdStateView(this)->transitionTimer) >= kCmdMenuTransitionFramesD) {
-			done = 1;
-		}
+		done = (static_cast<f64>(GetCmdStateView(this)->transitionTimer) >= kCmdMenuTransitionFramesD) ? 1 : 0;
 		if ((done != 0) && (GetCmdStateView(this)->commandResult != 0)) {
 			GetCmdStateView(this)->commandResult = 0;
 			if (GetCmdStateView(this)->choice == 0) {
@@ -2746,14 +2743,15 @@ unsigned int CMenuPcs::CmdClose1()
 
 		done = static_cast<u32>(UniteCloseAnim(uniteIdx));
 		if (done != 0) {
+			CCaravanWork* const cw = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 			s32 ununiteCount = 1;
-			if (caravanWork->m_commandListExtra[selected + 1] == -1) {
+			if (cw->m_commandListExtra[selected + 1] == -1) {
 				ununiteCount = 2;
-				if (caravanWork->m_commandListExtra[selected + 2] == -1) {
+				if (cw->m_commandListExtra[selected + 2] == -1) {
 					ununiteCount = 3;
 				}
 			}
-			caravanWork->UnuniteComList(selected, ununiteCount);
+			cw->UnuniteComList(selected, ununiteCount);
 		}
 	} else if (state == 2) {
 		const s16 selected = GetCmdStateView(this)->selected;
@@ -2781,16 +2779,17 @@ unsigned int CMenuPcs::CmdClose1()
 			int combo[2][2];
 			ChkUnite(static_cast<int>(selected), combo);
 
+			CCaravanWork* const cw = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 			s32 ununiteCount = 1;
-			if (caravanWork->m_commandListExtra[selected + 1] == -1) {
+			if (cw->m_commandListExtra[selected + 1] == -1) {
 				ununiteCount = 2;
-				if (caravanWork->m_commandListExtra[selected + 2] == -1) {
+				if (cw->m_commandListExtra[selected + 2] == -1) {
 					ununiteCount = 3;
 				}
 			}
 
-			caravanWork->UnuniteComList(selected, ununiteCount);
-			caravanWork->UniteComList(combo[0][1], GetUniteRecipeCount(combo[0][0]), GetUniteRecipeCmd(combo[0][0]));
+			cw->UnuniteComList(selected, ununiteCount);
+			cw->UniteComList(combo[0][1], GetUniteRecipeCount(combo[0][0]), GetUniteRecipeCmd(combo[0][0]));
 
 			done = 0;
 			GetCmdStateView(this)->selected = static_cast<s16>(combo[0][1]);

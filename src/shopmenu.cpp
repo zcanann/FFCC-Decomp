@@ -1937,7 +1937,7 @@ void CShopMenu::DrawShopBase()
  * Size:	TODO
  */
 #pragma push
-#pragma peephole off
+#pragma peephole on
 void CShopMenu::Draw()
 {
     if (reinterpret_cast<int>(m_unk00) == 0) {

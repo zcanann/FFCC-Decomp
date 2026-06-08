@@ -1182,29 +1182,13 @@ void GbaQueue::SetRadarType()
 		validMemberCount++;
 	}
 
-	m_radarType[0] = 1;
 	activeMask = 0;
-	if ((Game.m_scriptFoodBase[0] != 0) &&
-	    (reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0])->m_shopState != 0)) {
-		activeMask = 1;
-	}
-
-	m_radarType[1] = 1;
-	if ((Game.m_scriptFoodBase[1] != 0) &&
-	    (reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[1])->m_shopState != 0)) {
-		activeMask |= 2;
-	}
-
-	m_radarType[2] = 1;
-	if ((Game.m_scriptFoodBase[2] != 0) &&
-	    (reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[2])->m_shopState != 0)) {
-		activeMask |= 4;
-	}
-
-	m_radarType[3] = 1;
-	if ((Game.m_scriptFoodBase[3] != 0) &&
-	    (reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[3])->m_shopState != 0)) {
-		activeMask |= 8;
+	for (i = 0; i < 4; i++) {
+		m_radarType[i] = 1;
+		if ((Game.m_scriptFoodBase[i] != 0) &&
+		    (reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_shopState != 0)) {
+			activeMask |= (1 << i);
+		}
 	}
 
 	assignedCount = 0;

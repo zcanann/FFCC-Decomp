@@ -904,12 +904,30 @@ void CMesMenu::onCalc()
             }
 
             unsigned int value;
-            for (int heartIndex = 0; heartIndex < 8; heartIndex++) {
+            for (int heartIndex = 0; heartIndex < 8; heartIndex += 4) {
                 value = m_heartGrowTimers[heartIndex] - 1;
                 m_heartGrowTimers[heartIndex] = value & ~((int)value >> 0x1F);
 
                 value = m_heartDropTimers[heartIndex] - 1;
                 m_heartDropTimers[heartIndex] = value & ~((int)value >> 0x1F);
+
+                value = m_heartGrowTimers[heartIndex + 1] - 1;
+                m_heartGrowTimers[heartIndex + 1] = value & ~((int)value >> 0x1F);
+
+                value = m_heartDropTimers[heartIndex + 1] - 1;
+                m_heartDropTimers[heartIndex + 1] = value & ~((int)value >> 0x1F);
+
+                value = m_heartGrowTimers[heartIndex + 2] - 1;
+                m_heartGrowTimers[heartIndex + 2] = value & ~((int)value >> 0x1F);
+
+                value = m_heartDropTimers[heartIndex + 2] - 1;
+                m_heartDropTimers[heartIndex + 2] = value & ~((int)value >> 0x1F);
+
+                value = m_heartGrowTimers[heartIndex + 3] - 1;
+                m_heartGrowTimers[heartIndex + 3] = value & ~((int)value >> 0x1F);
+
+                value = m_heartDropTimers[heartIndex + 3] - 1;
+                m_heartDropTimers[heartIndex + 3] = value & ~((int)value >> 0x1F);
             }
 
             value = m_foodShakeTimer - 1;

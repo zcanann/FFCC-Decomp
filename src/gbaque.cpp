@@ -1494,23 +1494,19 @@ void GbaQueue::LoadPlayerStat()
 void GbaQueue::LoadEnemyStat()
 {
 	unsigned char localEnemyData[kGbaQueueEnemyDataBytes];
-	unsigned int* enemyObjPtrs;
-	unsigned int* enemyWorkPtrs;
 	int i;
 
 	memset(localEnemyData, 0, sizeof(localEnemyData));
 
 	if (reinterpret_cast<int*>(&CFlat)[0x4101] != 0) {
 		unsigned char* enemyEntry = localEnemyData;
-		enemyObjPtrs = &Game.m_scriptWork[0][0][0];
-		enemyWorkPtrs = &Game.m_scriptWork[4][0][0];
 
 		for (i = 0; i < 0x40; i++) {
-			if (enemyObjPtrs[i] == 0) {
+			if (Game.m_scriptWork[0][0][i] == 0) {
 				enemyEntry[3] = 0;
 			} else {
 				const int enemyDataBase = Game.unkCFlatData0[1] +
-				    reinterpret_cast<CMonWork*>(enemyWorkPtrs[i])->m_baseDataIndex * 0x1D0;
+				    reinterpret_cast<CMonWork*>(Game.m_scriptWork[4][0][i])->m_baseDataIndex * 0x1D0;
 				const unsigned int enemyKind = *reinterpret_cast<unsigned short*>(enemyDataBase + 0x10C);
 
 				if (enemyKind == 10) {
@@ -1521,13 +1517,13 @@ void GbaQueue::LoadEnemyStat()
 					enemyEntry[1] = 2;
 				}
 
-				CMonWork* enemyWork = reinterpret_cast<CMonWork*>(enemyWorkPtrs[i]);
-				CGObject* enemyObj = reinterpret_cast<CGObject*>(enemyObjPtrs[i]);
+				CMonWork* enemyWork = reinterpret_cast<CMonWork*>(Game.m_scriptWork[4][0][i]);
+				CGObject* enemyObj = reinterpret_cast<CGObject*>(Game.m_scriptWork[0][0][i]);
 				enemyEntry[3] = static_cast<unsigned char>(enemyWork->m_baseDataIndex);
 				*reinterpret_cast<unsigned short*>(enemyEntry + 4) = enemyWork->m_hp;
 				*reinterpret_cast<unsigned short*>(enemyEntry + 6) = enemyWork->m_maxHp;
 				int isDispRadar = static_cast<int>(enemyObj->IsDispRader());
-				int isDispRadarMask = -isDispRadar | isDispRadar;
+				unsigned int isDispRadarMask = static_cast<unsigned int>(-isDispRadar | isDispRadar);
 				enemyEntry[2] = static_cast<unsigned char>(isDispRadarMask >> 31);
 				*reinterpret_cast<unsigned short*>(enemyEntry + 0xC) =
 				    *reinterpret_cast<short*>(reinterpret_cast<char*>(enemyObj) + 0x510);

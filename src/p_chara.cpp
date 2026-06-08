@@ -928,7 +928,7 @@ int CCharaPcs::correctLoadAnimAmem()
     do {
         int chunkLoadCount = 0;
         int chunkSize = 0;
-        int nextOffset = scanOffset;
+        unsigned int nextOffset = scanOffset;
         const unsigned int scanEnd = static_cast<unsigned int>(scanOffset + 0x80000);
 
         for (int i = 0; i < loadAnimCount; i++) {

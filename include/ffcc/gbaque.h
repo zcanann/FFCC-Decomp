@@ -64,8 +64,9 @@ struct GbaQueuePlayerDataView
     unsigned char m_strength[3];
     unsigned char _pad23;
     unsigned int m_artifacts[3];
-    unsigned short _pad30;
-    unsigned char _pad32[8];
+    unsigned char _pad30[4];
+    unsigned short _pad34;
+    unsigned char _pad36[4];
     unsigned short m_items[0x40];
     unsigned short m_tmpArtifacts[4];
     unsigned short m_artifactList[8];

@@ -973,40 +973,60 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
 		}
 
 		for (int materialIdx = 0; materialIdx < static_cast<int>(materialCount); materialIdx++) {
-			int slotCounter = 0;
 			int byteOffset = 0;
 			int foundSlot = 0;
 			int groups;
 
 			for (groups = 0; groups < 8; groups++) {
 				char* invBase = static_cast<char*>(reinterpret_cast<void*>(*scriptFoodBase));
-				foundSlot = slotCounter;
-				if ((static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xB6)) == materialId) ||
-				    (foundSlot = slotCounter + 1, static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xB8)) == materialId) ||
-				    (foundSlot = slotCounter + 2, static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xBA)) == materialId) ||
-				    (foundSlot = slotCounter + 3, static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xBC)) == materialId) ||
-				    (foundSlot = slotCounter + 4, static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xBE)) == materialId) ||
-				    (foundSlot = slotCounter + 5, static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xC0)) == materialId) ||
-				    (foundSlot = slotCounter + 6, static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xC2)) == materialId) ||
-				    (foundSlot = slotCounter + 7, static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xC4)) == materialId)) {
+				if (static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xB6)) == materialId) {
 					break;
 				}
+				foundSlot++;
+				if (static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xB8)) == materialId) {
+					break;
+				}
+				foundSlot++;
+				if (static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xBA)) == materialId) {
+					break;
+				}
+				foundSlot++;
+				if (static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xBC)) == materialId) {
+					break;
+				}
+				foundSlot++;
+				if (static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xBE)) == materialId) {
+					break;
+				}
+				foundSlot++;
+				if (static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xC0)) == materialId) {
+					break;
+				}
+				foundSlot++;
+				if (static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xC2)) == materialId) {
+					break;
+				}
+				foundSlot++;
+				if (static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xC4)) == materialId) {
+					break;
+				}
+				foundSlot++;
 				byteOffset += 0x10;
-				slotCounter += 8;
-				foundSlot = slotCounter;
 			}
 
 			reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->DeleteItemIdx(foundSlot, 1);
 		}
 	}
 
-	if (reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->AddItem(smithItem, 0) == 0) {
+	const int addItemResult = reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->AddItem(smithItem, 0);
+	if ((static_cast<unsigned int>(-addItemResult | addItemResult) >> 31) == 0) {
 		Joybus.SendResult(channel, 1, valueBytes[0], valueBytes[1]);
 	}
 
 	const float smithRate = static_cast<float>(static_cast<double>(reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->m_shopParam) / 100.0);
 	const int gilCost = -static_cast<int>(static_cast<float>(*reinterpret_cast<unsigned short*>(itemTableBase + 0x24)) * smithRate);
-	if (reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->AddGil(gilCost) == 0) {
+	const int addGilResult = reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->AddGil(gilCost);
+	if ((static_cast<unsigned int>(-addGilResult | addGilResult) >> 31) == 0) {
 		Joybus.SendResult(channel, 1, valueBytes[0], valueBytes[1]);
 	}
 
@@ -2110,18 +2130,14 @@ int GbaQueue::GetPlayerHP(int channel, unsigned char* outData)
 		OSSignalSemaphore(accessSemaphores + i);
 	}
 
-	int hpChanged = hp != prevHp;
 	unsigned int changed = static_cast<unsigned int>(
 	    (static_cast<unsigned int>(prevHpFlags) - static_cast<int>(hpFlags)) |
 	    (static_cast<int>(hpFlags) - static_cast<int>(prevHpFlags))) >> 31;
-	if (hpChanged) {
+	if (hp != prevHp) {
 		changed = 1;
 	}
 
 	int channelMask = 1 << channel;
-	if (hp != prevHp) {
-		changed = 1;
-	}
 	if ((m_outOfShoukiFlags & channelMask) != (m_prevOutOfShoukiFlags & channelMask)) {
 		changed = 1;
 	}
@@ -2454,16 +2470,17 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 {
 	unsigned int stackValue = value;
 	unsigned char* valueBytes = reinterpret_cast<unsigned char*>(&stackValue);
-	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
-	int letterIndex = valueBytes[2];
-	int hasGil = caravanWork->m_letters[letterIndex].FlagsBits().m_attachmentIsGil;
+	unsigned int* foodBasePtr = &Game.m_scriptFoodBase[channel];
+	int letterOffset = valueBytes[2] * 0xC;
+	char* letter = reinterpret_cast<char*>(*foodBasePtr) + letterOffset;
+	int hasGil = reinterpret_cast<CCaravanWork::CLetterWork*>(letter + 0x3EC)->FlagsBits().m_attachmentIsGil;
 	int result;
 
 	if (hasGil == 0) {
-		int item = caravanWork->m_letters[letterIndex].AttachmentValue();
+		int item = *reinterpret_cast<unsigned short*>(letter + 0x3EE) & 0x1FF;
 		if (item != 0) {
 			if ((item < 1) || (item > 0x9E)) {
-				if (caravanWork->AddItem(item, 0) == 0) {
+				if (reinterpret_cast<CCaravanWork*>(*foodBasePtr)->AddItem(item, 0) == 0) {
 					result = 1;
 				} else {
 					result = 0;
@@ -2471,13 +2488,14 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 			}
 		}
 	} else {
-		int item = caravanWork->m_letters[letterIndex].AttachmentValue();
+		letter = reinterpret_cast<char*>(*foodBasePtr) + letterOffset;
+		int item = *reinterpret_cast<unsigned short*>(letter + 0x3EE) & 0x1FF;
 		if (item != 0) {
 			int gil = item * 100;
-			if (caravanWork->CanAddGil(gil) == 0) {
+			if (reinterpret_cast<CCaravanWork*>(*foodBasePtr)->CanAddGil(gil) == 0) {
 				result = 1;
 			} else {
-				caravanWork->AddGil(gil);
+				reinterpret_cast<CCaravanWork*>(*foodBasePtr)->AddGil(gil);
 				result = 0;
 			}
 		}
@@ -2492,7 +2510,8 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 	} while (i < 10);
 
 	if ((result == 0) && (i < 10)) {
-		caravanWork->m_letters[letterIndex].SetAttachmentClaimed();
+		char* base = reinterpret_cast<char*>(*foodBasePtr);
+		reinterpret_cast<CCaravanWork::CLetterWork*>(base + letterOffset + 0x3EC)->FlagsBits().m_attachmentClaimed = 1;
 	}
 }
 
@@ -3267,16 +3286,18 @@ void GbaQueue::ClrCompatibilityFlg(int channel)
 int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 {
 	unsigned char compatibilityData[0x10];
-	int count = 2;
+	int count;
 	unsigned char* writePtr;
-	int outSize = 2;
-	int selectedCount = 0;
+	int outSize;
+	int selectedCount;
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	memcpy(compatibilityData, reinterpret_cast<unsigned char*>(this) + channel * 0xDC + 0x458, sizeof(compatibilityData));
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	outCompatibility[0] = reinterpret_cast<unsigned char*>(this)[channel * 0xDC + 0x529];
+	count = 2;
+	outSize = 2;
 	if (compatibilityData[3] != 0) {
 		count++;
 	}
@@ -3299,6 +3320,7 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 
 	outCompatibility[1] = count;
 	writePtr = outCompatibility + 2;
+	selectedCount = 0;
 	for (int slot = 1; (selectedCount < count) && (slot < 8); slot++) {
 		unsigned char slotValue = compatibilityData[slot];
 		if ((selectedCount < 2) || (slotValue != 0)) {
@@ -4105,9 +4127,9 @@ int GbaQueue::GetArtifactData(int channel, unsigned char* outData)
 	localPlayerData = m_playerData[channel];
 	OSSignalSemaphore(accessSemaphores + channel);
 
-	artifactData[0] = SwapU32Value(localPlayerData.m_artifacts[0]);
-	artifactData[1] = SwapU32Value(localPlayerData.m_artifacts[1]);
-	artifactData[2] = SwapU32Value(localPlayerData.m_artifacts[2]);
+	artifactData[0] = __lwbrx(&localPlayerData.m_artifacts[0], 0);
+	artifactData[1] = __lwbrx(&localPlayerData.m_artifacts[1], 0);
+	artifactData[2] = __lwbrx(&localPlayerData.m_artifacts[2], 0);
 	memcpy(outData, artifactData, sizeof(artifactData));
 	return 0xC;
 }
@@ -4317,7 +4339,7 @@ int GbaQueue::GetTmpArtifactData(int channel, unsigned char* outData)
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	for (int i = 0; i < 4; i++) {
-		tmpArtifacts[i] = SwapU16(localPlayerData.m_tmpArtifacts[i]);
+		tmpArtifacts[i] = __lhbrx(&localPlayerData.m_tmpArtifacts[i], 0);
 	}
 	memcpy(outData, tmpArtifacts, sizeof(tmpArtifacts));
 

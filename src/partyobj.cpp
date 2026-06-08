@@ -1037,7 +1037,7 @@ void CGPartyObj::onFramePreCalc()
 		}
 	}
 
-	onChangePrg(2);
+	bonus(2, 0, 0);
 
 	if (Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
 		if (party.carryObject == nullptr &&
@@ -1505,14 +1505,14 @@ void CGPartyObj::command()
 				System.Printf(const_cast<char*>(msgBase + 0x2F8), addedItem, addedSlot);
 			}
 			if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(party.target) + 0x560) != 1) {
-				enableAttackCol(4, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504), 0);
+				bonus(4, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504), 0);
 			}
 		} else if (itemIdx == 0x190) {
-			enableAttackCol(5, 0x190, 0);
+			bonus(5, 0x190, 0);
 			System.Printf(const_cast<char*>(msgBase + 0x324), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x558));
 			caravan->AddGil(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x558));
 			if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(party.target) + 0x560) != 1) {
-				enableAttackCol(4, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504), 0);
+				bonus(4, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504), 0);
 			}
 		}
 	}
@@ -2985,7 +2985,7 @@ void CGPartyObj::onStatMagic()
 		break;
 	case 2:
 		if (m_subFrame == 0) {
-			reqAnim(0x19, 0, 0);
+			bonus(0x19, 0, 0);
 			if (m_itemId == 0x103) {
 				m_comboCenter = m_worldPosition;
 				m_comboTarget = m_comboCenter;

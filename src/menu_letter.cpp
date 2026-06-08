@@ -2537,8 +2537,12 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x4A));
 	for (int i = 0; i < 2; ++i) {
-		int flip = (i == 0) ? 0 : 8;
-		double x = (i == 0) ? x0 : x1;
+		int flip = 0;
+		double x = x0;
+		if (i != 0) {
+			x = x1;
+			flip |= 8;
+		}
 		MenuPcs.DrawRect(
 		    flip, static_cast<float>(x), static_cast<float>(innerY), FLOAT_803330f4, static_cast<float>(innerH),
 		    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);

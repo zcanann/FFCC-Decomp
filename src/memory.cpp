@@ -1727,7 +1727,7 @@ found:
     }
 
     CAmemCache& entry = cacheEntryAt(this, index);
-    unsigned int allocSize = (static_cast<unsigned int>(size) + 0x1F) & ~0x1F;
+    int allocSize = (static_cast<unsigned int>(size) + 0x1F) & ~0x1F;
     entry.m_inUse = 1;
     entry.m_type = static_cast<unsigned char>(type);
     entry.m_dmaCopy = static_cast<unsigned char>(dmaCopy);

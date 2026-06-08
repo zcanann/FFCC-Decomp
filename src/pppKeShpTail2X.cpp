@@ -149,7 +149,7 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     s32 nextIndex;
     s32 lastIndex;
     u8 zEnable;
-    s32 dataValIndex;
+    u32 dataValIndex;
 
     zero = kPppKeShpTail2XZero;
     dataValIndex = step->m_dataValIndex;

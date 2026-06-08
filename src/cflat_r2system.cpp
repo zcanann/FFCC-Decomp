@@ -1637,14 +1637,13 @@ int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long*
             }
         }
 
-        CLineSegment& segment = segments[i];
-        float dotTarget = PSVECDotProduct(targetPosition, &segment.delta);
-        float dotPoint = PSVECDotProduct(&points[i], &segment.delta);
-        float segmentT = (dotTarget - dotPoint) / (segment.length * segment.length);
+        float dotTarget = PSVECDotProduct(targetPosition, &segments[i].delta);
+        float dotPoint = PSVECDotProduct(&points[i], &segments[i].delta);
+        float segmentT = (dotTarget - dotPoint) / (segments[i].length * segments[i].length);
         if (((kLineSegmentMinT <= segmentT) && (segmentT <= kLineSegmentMaxT)) || infiniteRange) {
             Vec scaled;
             Vec projected;
-            PSVECScale(&segment.delta, &scaled, segmentT);
+            PSVECScale(&segments[i].delta, &scaled, segmentT);
             PSVECAdd(&points[i], &scaled, &projected);
             float distance = PSVECDistance(targetPosition, &projected);
             if (distance < bestDistance) {

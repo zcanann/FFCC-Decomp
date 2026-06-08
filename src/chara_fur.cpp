@@ -1817,6 +1817,8 @@ void CChara::freeFurTex()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_common_subs off
 void CChara::makeFurTex()
 {
 	CHairSet hairSet[0x20];
@@ -2096,6 +2098,7 @@ void CChara::makeFurTex()
 	Graphic.SetStdPixelFmt();
 	GXSetAlphaUpdate(GX_FALSE);
 }
+#pragma pop
 
 /*
  * --INFO--

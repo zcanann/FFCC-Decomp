@@ -3800,11 +3800,11 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
 
     OSSignalSemaphore(&m_accessSemaphores[port]);
 
-    if ((static_cast<unsigned char>(localWord >> 24) & 0x3F) == 7)
+    if ((*reinterpret_cast<unsigned char*>(&localWord) & 0x3F) == 7)
     {
         step = 0;
-        phase = 0;
         blockIndex = 0;
+        phase = 0;
         localWord = 0;
 
         ResetQueue(threadParam);

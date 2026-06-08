@@ -2025,12 +2025,12 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 				candidates[write] = 0;
 			} else {
 				candidates[write] = 0;
-				candidates[write + 1] = 0;
 				write++;
+				candidates[write] = 0;
 				slot++;
 				if (caravan->m_commandListExtra[slot] < 0) {
-					candidates[write + 1] = 0;
 					write++;
+					candidates[write] = 0;
 					slot++;
 				}
 			}
@@ -2123,9 +2123,8 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 		}
 
 		int group = 1;
-		int* matchWrite = matches + matchCount * 2;
 		for (const s16* pat = s_uniteRecipePatterns + 6; pat[1] >= 0; pat += 6, group++) {
-			if (((pat[0] != 0) && (itemKinds[selected] == 999) && (selected >= 3)) ||
+			if (((pat[0] != 0) && (itemKinds[selected] == 999) && (selected > 2)) ||
 			    ((pat[2] == 2) && (static_cast<s32>(selectedNegMask) < 0))) {
 				continue;
 			}
@@ -2148,9 +2147,8 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 				}
 
 				if (ok == len) {
-					matchWrite[0] = group;
-					matchWrite[1] = start + (selected - (len - 1));
-					matchWrite += 2;
+					matches[matchCount * 2] = group;
+					matches[matchCount * 2 + 1] = start + (selected - (len - 1));
 					matchCount++;
 				}
 			}

@@ -1306,11 +1306,11 @@ void CFlatRuntime2::Calc()
 		button = Pad.GetPadInputs()[padIndex].lockedButton[1];
 	}
 
-	if (((button & 0x400) != 0) && (CFlatSaveSceneEnabled() != 0)) {
-		CFlatSaveSceneEnabled() = 0;
+	if (((button & 0x400) != 0) && (m_saveSceneEnabled != 0)) {
+		m_saveSceneEnabled = 0;
 	}
 
-	if (CFlatSaveSceneEnabled() != 0) {
+	if (m_saveSceneEnabled != 0) {
 		Graphic.Printf(2, 3, const_cast<char*>(sCFlatRuntime2SaveSceneMsg));
 
 		u32* saveData = new (getStage(), const_cast<char*>(sCFlatRuntime2FileTag), 0x36F) u32[0x3FF];

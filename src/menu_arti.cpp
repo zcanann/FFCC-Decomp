@@ -88,7 +88,7 @@ static inline ArtiOpenAnim* GetArtiOpenAnim(CMenuPcs* menu, int index)
 
 static inline CFont* GetArtiListFont(CMenuPcs* menu)
 {
-	return menu->m_fonts[1];
+	return menu->m_fonts[4];
 }
 
 static inline CFont* GetArtiHelpFont(CMenuPcs* menu)
@@ -223,7 +223,7 @@ void CMenuPcs::ArtiDraw()
 	const CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	short artiState = m_artiState->state;
 	ArtiOpenAnim* entry = GetArtiOpenAnimList(this)->entries;
-	int drawIndex = 0;
+	unsigned int drawIndex = 0;
 	float helpWidth;
 
 	for (int i = 0; i < GetArtiOpenAnimList(this)->count; i++) {
@@ -239,7 +239,7 @@ void CMenuPcs::ArtiDraw()
 
 			if (i == 0) {
 				MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
-				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
+				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(entry->tex));
 
 				GXColor colors[4];
 				colors[0].r = 0xFF;
@@ -267,7 +267,7 @@ void CMenuPcs::ArtiDraw()
 					u += fillW;
 				}
 
-				if (fillW > 0.0f && fillW < (float)entry->w) {
+				if (fillW > LoadFloat(kArtiZero) && fillW < (float)entry->w) {
 					colors[0].a = 0;
 					colors[1].a = 0;
 					colors[2].a = 0;
@@ -324,7 +324,7 @@ void CMenuPcs::ArtiDraw()
 
 	ArtiOpenAnim* textEntry = listStart;
 	for (int i = 0; i < 8; i++) {
-		s8 alpha = (u8)(kArtiColorMax * textEntry->alpha);
+		u8 alpha = (u8)(kArtiColorMax * textEntry->alpha);
 		CColor color(0xFF, 0xFF, 0xFF, alpha);
 		listFont->SetColor(color.color);
 

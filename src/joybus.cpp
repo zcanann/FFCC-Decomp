@@ -712,12 +712,79 @@ loop_body:
             m_modeXArr[threadParam->m_portIndex]        = m_nextModeTypeArr[threadParam->m_portIndex];
         }
 
-        int gamePadState = 0;
-        bool single = GbaQue.IsSingleMode(threadParam->m_portIndex);
-        // TODO: unsigned int statusIndex = (single != 0 && threadParam->m_portIndex != 1) ? 0 : (unsigned int)threadParam->m_portIndex;
-        // TODO: int* padPtr = (int*)(&Game.field_0xc5c0 + statusIndex * 4);
-        // TODO: gamePadState = *padPtr;
+        unsigned int statusIndex;
+        if (GbaQue.IsSingleMode(threadParam->m_portIndex) && threadParam->m_portIndex == 1)
+        {
+            statusIndex = 0;
+        }
+        else
+        {
+            statusIndex = (unsigned int)threadParam->m_portIndex;
+        }
 
+        int gamePadState = (int)Game.m_scriptFoodBase[statusIndex];
+
+        if (gamePadState == 0 && padType != 0x00040000)
+        {
+            int s = (unsigned int)threadParam->m_state;
+
+            if ((s >= 0x1D && s <= 0x20))
+            {
+                if (SendCancel(threadParam) < 0)
+                {
+                    goto sleep_retry;
+                }
+                threadParam->m_state = ';';
+                goto timeout_expiry;
+            }
+            else if (s == 5 || (s >= 7 && s <= 0x13) || (s >= 0x17 && s <= 0x1C) ||
+                     (s >= 0x21 && s <= 0x383) || s >= 0x387)
+            {
+                if (GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf)) < 0)
+                {
+                    goto sleep_retry;
+                }
+                if (m_ctrlModeArr[threadParam->m_portIndex] == 0)
+                {
+                    goto recompute_timeout;
+                }
+                if (SendCtrlMode(threadParam, 0) < 0)
+                {
+                    goto sleep_retry;
+                }
+                goto recompute_timeout;
+            }
+        }
+        else
+        {
+            if (gamePadState != 0 && padType == 0x00040000)
+            {
+                goto timeout_expiry;
+            }
+
+            m_ctrlModeArr[threadParam->m_portIndex] = 0;
+
+            if (Game.m_scriptFoodBase[statusIndex] != 0)
+            {
+                if (threadParam->m_state == 2)
+                {
+                    threadParam->m_state = 1;
+                }
+                else
+                {
+                    threadParam->m_state = 0;
+                }
+            }
+            else
+            {
+                threadParam->m_state = 0;
+            }
+
+            ThreadSleep(OSMillisecondsToTicks(15));
+            goto recompute_timeout;
+        }
+
+timeout_expiry:
         {
             unsigned long long now = OSGetTime();
             unsigned int elapsed = (unsigned int)(now - stateStartTime);

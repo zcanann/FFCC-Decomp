@@ -170,7 +170,7 @@ void CGMonObj::onFramePreCalc()
 		(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x50) == 0) &&
 		(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x44) == 0) &&
 		(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x46) == 0) &&
-		((static_cast<int>((static_cast<unsigned int>(mon[0x63C]) << 24) & 0xC0000000) >> 31) != 0) &&
+		(static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(mon[0x63C]) << 24) & 0xC0000000) >> 31) != 0) &&
 		(m_unk6B9 == 0) &&
 		(m_unk6C1 == 0)) {
 		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) {
@@ -363,7 +363,7 @@ void CGMonObj::rotTarget(int targetPartyIndex, float rotLimit)
 
 static inline void CGMonObj_SetAttackAfter(CGMonObj* monObj, int attackKind)
 {
-	unsigned int delay = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (attackKind * 0x48 + 0xA));
+	int delay = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (attackKind * 0x48 + 0xA));
 	if (delay == 0xFFFF) {
 		delay = 0;
 	}
@@ -384,11 +384,8 @@ static inline void CGMonObj_SetAttackAfter(CGMonObj* monObj, int attackKind)
 		delay &= ~((int)delay >> 31);
 	}
 
-	if (delay == 0) {
-		reinterpret_cast<CGPrgObj*>(monObj)->changeStat(0, 0, 0);
-	} else {
-		int range = (int)delay / 5 + ((int)delay >> 31);
-		range -= range >> 31;
+	if (delay != 0) {
+		int range = delay / 5;
 		int clampedRange = 1;
 		if (0 < range) {
 			clampedRange = range;
@@ -396,6 +393,8 @@ static inline void CGMonObj_SetAttackAfter(CGMonObj* monObj, int attackKind)
 
 		monObj->m_attackDelay = delay + Math.Rand(clampedRange);
 		reinterpret_cast<CGPrgObj*>(monObj)->changeStat(0x11, 0, 0);
+	} else {
+		reinterpret_cast<CGPrgObj*>(monObj)->changeStat(0, 0, 0);
 	}
 }
 
@@ -1465,8 +1464,8 @@ void CGMonObj::onAnimPoint(int param2, int param3)
 {
 #define object (reinterpret_cast<CGObject*>(this))
 	int soundEffect;
-	unsigned int particleId = 0xFFFF;
-	unsigned int soundId = 0xFFFF;
+	int particleId = 0xFFFF;
+	int soundId = 0xFFFF;
 
 	if ((param3 < 0xC) && (param3 >= 0xA)) {
 		unsigned char* scriptData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
@@ -1681,7 +1680,7 @@ void CGMonObj::onStatDie()
 				(Vec*)0
 			);
 
-			unsigned short pId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x19E);
+			int pId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x19E);
 			if (pId != 0xFFFF) {
 				int dataNo = -1;
 				dataNo = object->m_charaModelHandle->GetPdtSlot();
@@ -1776,7 +1775,7 @@ void CGMonObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 
 	charaObj->CGCharaObj::onDrawDebug(font, posX, posY, posZ);
 
-	if ((((int)(static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags)) << 0x18) < 0) &&
+	if ((((static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags)) << 24) & 0xC0000000) >> 31) != 0) &&
 			(CFlatCenterState() == 0)) &&
 		((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&DbgMenuPcs) + 0x6484) & 0x80) != 0)) {
 		char text[0x100];
@@ -2674,13 +2673,13 @@ void CGMonObj::initFinishedFuncDefault()
 		}
 	}
 
-	short animPoint = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A0);
-	if (animPoint != -1) {
+	int animPoint = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A0);
+	if (animPoint != 0xFFFF) {
 		object->AddAnimPoint(1, animPoint, 0xB);
 	}
 
-	animPoint = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A2);
-	if (animPoint != -1) {
+	animPoint = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A2);
+	if (animPoint != 0xFFFF) {
 		object->AddAnimPoint(1, animPoint, 0xA);
 	}
 
@@ -3269,8 +3268,8 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 
 	float targetDist = *reinterpret_cast<float*>(mon + partyIndex * 4 + 0x5D0);
 
-	short selectorType = *reinterpret_cast<short*>(aiScript + 0x108);
-	if (selectorType == -1) {
+	int selectorType = *reinterpret_cast<unsigned short*>(aiScript + 0x108);
+	if (selectorType == 0xFFFF) {
 		return -1;
 	}
 

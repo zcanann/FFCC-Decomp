@@ -3977,7 +3977,7 @@ void CGPartyObj::CheckGameOver()
 		}
 
 		if ((*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(party->m_scriptHandle) + 0x1C) == 0) &&
-		    ((PartyData(party).partyFlags & 0x04) == 0)) {
+		    (PartyData(party).flags.flag04 == 0)) {
 			continue;
 		}
 

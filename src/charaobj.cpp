@@ -3096,9 +3096,9 @@ void CGCharaObj::onChangePrg(int arg)
  */
 int CGCharaObj::calcCastTime(int itemId)
 {
-	unsigned short cid = GetCID();
+	char* fmt = s_CGCharaObj_801DC548;
 
-	if ((cid & 0x6D) == 0x6D &&
+	if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
 		Game.m_gameWork.m_menuStageMode != 0 &&
 		Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
 		(static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
@@ -3107,18 +3107,20 @@ int CGCharaObj::calcCastTime(int itemId)
 	}
 
 	int itemOffset = itemId * 0x48;
-	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
 	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + itemOffset;
-	unsigned short itemNo = *reinterpret_cast<unsigned short*>(itemData + 0x0);
 	unsigned int baseCast = *reinterpret_cast<unsigned short*>(itemData + 0x2E);
-	unsigned short itemType = *reinterpret_cast<unsigned short*>(itemData + 0xE);
-	float castScale = kOneF32;
+	float castScale;
 
-	if (*reinterpret_cast<unsigned short*>(script + 0x4E) != 0) {
+	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x4E) != 0) {
 		castScale = CharaObjGetStatusMultiplier(0x0);
-	} else if (*reinterpret_cast<unsigned short*>(script + 0x4C) != 0) {
+	} else if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x4C) != 0) {
 		castScale = CharaObjGetStatusMultiplier(0x2);
+	} else {
+		castScale = kOneF32;
 	}
+
+	unsigned short itemNo = *reinterpret_cast<unsigned short*>(itemData + 0x0);
+	unsigned short itemType = *reinterpret_cast<unsigned short*>(itemData + 0xE);
 
 	if (itemNo != 0x1F8 && itemType == 2) {
 		unsigned int castBonus = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0x194);
@@ -3140,28 +3142,28 @@ int CGCharaObj::calcCastTime(int itemId)
 		}
 
 		unsigned int playerCid = (static_cast<unsigned int>(__cntlzw(0x6D - static_cast<int>(static_cast<unsigned short>(GetCID()) & 0x6D))) >> 5) & 0xFFU;
-		unsigned int castReduction = playerCid != 0 ? static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(script + 0xBD8)) : 0;
+		unsigned int castReduction = playerCid != 0 ? static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBD8)) : 0;
 		int totalCast = static_cast<int>(baseCast + castBonus) - static_cast<int>(castReduction);
 		int cast = static_cast<int>(castScale * static_cast<float>(totalCast));
-		System.Printf(sCharaObjDebugStatFormat + 0x10, baseCast, castBonus, castScale);
+		System.Printf(fmt + 0x74, baseCast, castBonus, castScale);
 		return cast & ~(cast >> 31);
 	}
 
 	if (itemType == 3) {
-		System.Printf(sCharaObjDebugStatFormat + 0x38, baseCast);
+		System.Printf(fmt + 0x9C, baseCast);
 		return static_cast<int>(baseCast);
 	}
 	if (itemType == 4) {
-		System.Printf(sCharaObjDebugStatFormat + 0x4C, baseCast);
+		System.Printf(fmt + 0xB0, baseCast);
 		return static_cast<int>(baseCast);
 	}
 	if (itemNo == 0x1F8) {
 		unsigned int castBonus = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0x196);
 		unsigned int playerCid = (static_cast<unsigned int>(__cntlzw(0x6D - static_cast<int>(static_cast<unsigned short>(GetCID()) & 0x6D))) >> 5) & 0xFFU;
-		unsigned int castReduction = playerCid != 0 ? static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(script + 0xBD9)) : 0;
+		unsigned int castReduction = playerCid != 0 ? static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBD9)) : 0;
 		int totalCast = static_cast<int>(baseCast + castBonus) - static_cast<int>(castReduction);
 		int cast = static_cast<int>(castScale * static_cast<float>(totalCast));
-		System.Printf(sCharaObjDebugStatFormat + 0x60, baseCast, castBonus, castScale);
+		System.Printf(fmt + 0xC4, baseCast, castBonus, castScale);
 		return cast & ~(cast >> 31);
 	}
 

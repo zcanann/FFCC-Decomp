@@ -3079,8 +3079,8 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 material->m_tevBit = static_cast<unsigned long>(tevBit);
                 material->m_bumpLight = 0;
                 material->m_textureCount = 0;
-                material->m_scaleU = kTextureOne;
                 material->m_scaleV = kTextureOne;
+                material->m_scaleU = kTextureOne;
                 material->m_singleTextureFlag = 0;
                 material->m_textureCount = static_cast<unsigned short>(chunk.m_arg0);
 
@@ -3144,7 +3144,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 AddTextureIndex(material, chunkFile.Get2());
                 material->m_scaleU = kTextureOne / chunkFile.GetF4();
                 material->m_scaleV = kTextureOne / chunkFile.GetF4();
-                material->m_unkA6 = static_cast<unsigned char>(chunkFile.Get4());
+                material->m_unk36 = static_cast<unsigned char>(chunkFile.Get4());
                 SetMaterialColor(material, chunkFile.Get4());
                 material->m_materialType = 1;
 
@@ -3166,7 +3166,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 AddTextureIndex(material, chunkFile.Get2());
                 unsigned short bumpIndex = chunkFile.Get2();
                 unsigned char waterMode = chunkFile.Get1();
-                material->m_fogEnable = chunkFile.Get1();
+                material->m_unkA5 = chunkFile.Get1();
                 material->m_scaleU = kTextureOne / chunkFile.GetF4();
                 material->m_scaleV = kTextureOne / chunkFile.GetF4();
                 material->m_materialType = 2;
@@ -3178,7 +3178,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 chunkFile.Get4();
                 SetMaterialColor(material, chunkFile.Get4());
 
-                if ((waterMode == 0) && (material->m_fogEnable == 0)) {
+                if ((waterMode == 0) && (material->m_unkA5 == 0)) {
                     material->m_tevBit |= 8;
                 } else {
                     material->m_tevBit |= 0x80000;
@@ -3189,7 +3189,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 AddTextureIndex(material, chunkFile.Get2());
                 AddTextureIndex(material, chunkFile.Get2());
                 unsigned short bumpIndex = chunkFile.Get2();
-                material->m_fogEnable = chunkFile.Get1();
+                material->m_unkA5 = chunkFile.Get1();
                 if (chunkFile.Get1() != 0) {
                     material->m_tevBit |= 0x20000;
                 }

@@ -458,8 +458,8 @@ private:
     short m_textureIndices[5];            // 0x01A
     unsigned long m_tevBit;               // 0x024
     CLightPcs::CBumpLight* m_bumpLight;   // 0x028
-    float m_scaleV;                       // 0x02C
-    float m_scaleU;                       // 0x030
+    float m_scaleU;                       // 0x02C
+    float m_scaleV;                       // 0x030
     char m_texShiftU;                     // 0x034
     char m_texShiftV;                     // 0x035
     unsigned char m_unk36;                // 0x036

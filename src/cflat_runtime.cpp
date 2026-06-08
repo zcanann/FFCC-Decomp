@@ -2304,7 +2304,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 		CObject* begin = root->m_next;
 		CObject* it = begin;
 		do {
-			if (static_cast<int>(scriptGroup) < it->m_particleId) {
+			if (static_cast<int>(scriptGroup) < it->m_0x32) {
 				break;
 			}
 			it = it->m_next;
@@ -2315,7 +2315,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 		engineObject->m_previous = it->m_previous;
 		it->m_previous->m_next = engineObject;
 		it->m_previous = engineObject;
-		engineObject->m_particleId = static_cast<s16>(scriptGroup);
+		engineObject->m_0x32 = static_cast<s16>(scriptGroup);
 
 		*object->m_sp++ = 0;
 		result = 0;

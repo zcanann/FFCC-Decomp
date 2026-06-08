@@ -1751,7 +1751,7 @@ frameLoop:
 			    static_cast<u16>((static_cast<s16>(func->m_index) << 4)
 			                     | (*reinterpret_cast<u16*>(&object->m_codePos) & 0x000F));
 			object->m_codePos &= 0xFFF00000;
-			object->m_flags = static_cast<u8>(object->m_flags & 0xDF);
+			object->m_flagBits.m_callFlag = 0;
 			object->m_waitCounter = 0;
 			*reinterpret_cast<int*>(&object->m_reqFlag0) = 0;
 

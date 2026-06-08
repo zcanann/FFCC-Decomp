@@ -2783,31 +2783,6 @@ void CPartMng::pppPartCalc()
  */
 void CPartMng::pppRefCnt0Up()
 {
-    struct PppPartResourceRaw {
-        short m_cacheIndex;
-        short m_pad;
-        long* m_pdt;
-    };
-
-    CAmemCacheSet* cacheSet = &ppvAmemCacheSet;
-    cacheSet->RefCnt0Clear();
-
-    PppPdtSlot* slot = m_pdtSlots;
-    for (int slotIndex = 0; slotIndex < 0x20; slotIndex++) {
-        _pppDataHead* pdtHead = slot->m_pppDataHead;
-        if (pdtHead != 0) {
-            PppPartResourceRaw* partResource =
-                reinterpret_cast<PppPartResourceRaw*>(pdtHead->m_cacheChunks);
-
-            for (int cacheIndex = 0; cacheIndex < pdtHead->m_cacheChunkCount; cacheIndex++) {
-                cacheSet->RefCnt0Up(partResource->m_cacheIndex);
-                partResource++;
-            }
-        }
-        slot++;
-    }
-
-    cacheSet->RefCnt0Compare();
 }
 
 /*

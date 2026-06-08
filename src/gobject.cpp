@@ -1673,17 +1673,20 @@ void CGObject::update()
         m_weaponNodeFlagBits.m_unk40 = (weaponFlagsLo & 0x60) != 0 ? 1 : 0;
 
         if ((m_displayFlags & 1) != 0) {
-            model->CalcMatrix();
-            if (m_weaponNodeFlagBits.m_unk40 && miniGameModelPass) {
-                model->CalcSkin();
+            if ((m_weaponNodeFlagBits.m_unk20 && miniGameModelPass == 0) || m_currentAnimSlot != -1 ||
+                m_animSlotSel != static_cast<signed char>(shieldFlagsHi)) {
+                model->CalcMatrix();
+            }
+            if (m_weaponNodeFlagBits.m_unk20 && miniGameModelPass == 0) {
+                m_charaModelHandle->m_model->CalcSkin();
             }
 
-            ModelLightAlpha(model) = m_lookAtTimer;
-            model->m_flagsA0Bits.m_flagA0_20 = m_weaponNodeFlagBits.m_unk40;
-            model->m_flagsA0Bits.m_flagA0_80 = (m_displayFlags & 0x20) != 0;
+            ModelLightAlpha(m_charaModelHandle->m_model) = m_lookAtTimer;
+            m_charaModelHandle->m_model->m_flagsA0Bits.m_flagA0_20 = m_weaponNodeFlagBits.m_unk20;
+            m_charaModelHandle->m_model->m_flagsA0Bits.m_flagA0_80 = (m_displayFlags & 0x20) != 0;
         }
 
-        model->CalcFurColor();
+        m_charaModelHandle->m_model->CalcFurColor();
 
         if ((m_displayFlags & 2) != 0) {
             float frameStep = m_turnSpeed;

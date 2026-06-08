@@ -1642,7 +1642,7 @@ void CMes::Set(char* text, int param)
 			mLineHeight = lineZero;
 			mLineWidth = lineZero;
 
-			addString((char**)((char*)this + 4), 1);
+			addString(&mText, 1);
 
 			float width = mLineWidth;
 			if (width < mMaxWidth) {

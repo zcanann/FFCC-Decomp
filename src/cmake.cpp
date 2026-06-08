@@ -2685,10 +2685,10 @@ int CMenuPcs::CmakeNameCtrl()
         if ((repeat & 0x8) != 0) {
             if (CmakeState(this)->m_row != 0) {
                 CmakeState(this)->m_row = static_cast<short>(CmakeState(this)->m_row - 1);
-            } else if (CmakeState(this)->m_select < 10) {
-                CmakeState(this)->m_row = 4;
-            } else {
+            } else if (CmakeState(this)->m_select >= 10) {
                 CmakeState(this)->m_row = 5;
+            } else {
+                CmakeState(this)->m_row = 4;
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else if ((repeat & 0x4) != 0) {

@@ -205,8 +205,10 @@ void CMenuPcs::CompaDraw()
 	for (int i = 0; i < 8 && shown < familyCount; i++) {
 		int drawIndex = memberIndex;
 		if (memberIndex > 1) {
-			while (drawIndex < 8 && caravanWork->m_evtWordArr[19 + drawIndex] == 0) {
-				drawIndex++;
+			for (; drawIndex < 8; drawIndex++) {
+				if (caravanWork->m_evtWordArr[19 + drawIndex] != 0) {
+					break;
+				}
 			}
 			if (drawIndex > 7) {
 				break;
@@ -255,8 +257,10 @@ void CMenuPcs::CompaDraw()
 	for (int i = 0; i < 8 && shown < familyCount; i++) {
 		int drawIndex = memberIndex;
 		if (memberIndex > 1) {
-			while (drawIndex < 8 && caravanWork->m_evtWordArr[19 + drawIndex] <= 0) {
-				drawIndex++;
+			for (; drawIndex < 8; drawIndex++) {
+				if (caravanWork->m_evtWordArr[19 + drawIndex] > 0) {
+					break;
+				}
 			}
 			if (drawIndex > 7) {
 				break;

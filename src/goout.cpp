@@ -2247,9 +2247,15 @@ void CGoOutMenu::CalcDel()
         }
 
         input = GetGoOutInputMask();
-        if ((input & 0x200) != 0) {
-            Sound.PlaySe(3, 0x40, 0x7f, 0);
-            SetDelMode(2);
+        {
+            bool pressed = false;
+            if ((input & 0x200) != 0) {
+                Sound.PlaySe(3, 0x40, 0x7f, 0);
+                pressed = true;
+            }
+            if (pressed) {
+                SetDelMode(2);
+            }
         }
 
         m_drawCursor = 1;
@@ -2288,9 +2294,15 @@ void CGoOutMenu::CalcDel()
         }
 
         input = GetGoOutInputMask();
-        if ((input & 0x200) != 0) {
-            Sound.PlaySe(3, 0x40, 0x7f, 0);
-            SetDelMode(2);
+        {
+            bool pressed = false;
+            if ((input & 0x200) != 0) {
+                Sound.PlaySe(3, 0x40, 0x7f, 0);
+                pressed = true;
+            }
+            if (pressed) {
+                SetDelMode(2);
+            }
         }
 
         m_drawCursor = 1;
@@ -2342,9 +2354,15 @@ void CGoOutMenu::CalcDel()
         }
 
         input = GetGoOutInputMask();
-        if ((input & 0x200) != 0) {
-            Sound.PlaySe(3, 0x40, 0x7f, 0);
-            SetDelMode(2);
+        {
+            bool pressed = false;
+            if ((input & 0x200) != 0) {
+                Sound.PlaySe(3, 0x40, 0x7f, 0);
+                pressed = true;
+            }
+            if (pressed) {
+                SetDelMode(2);
+            }
         }
 
         m_drawCursor = 1;
@@ -2383,9 +2401,15 @@ void CGoOutMenu::CalcDel()
         }
 
         input = GetGoOutInputMask();
-        if ((input & 0x200) != 0) {
-            Sound.PlaySe(3, 0x40, 0x7f, 0);
-            SetDelMode(2);
+        {
+            bool pressed = false;
+            if ((input & 0x200) != 0) {
+                Sound.PlaySe(3, 0x40, 0x7f, 0);
+                pressed = true;
+            }
+            if (pressed) {
+                SetDelMode(2);
+            }
         }
 
         m_drawCursor = 1;

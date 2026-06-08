@@ -1685,10 +1685,11 @@ int CAmemCacheSet::GetData(short index, char* source, int line)
             data = 0;
         }
 
-        if (data != 0) {
-            return data;
+        if (data == 0) {
+            AmemFreeLowPrio(cacheEntryAt(this, index).m_size);
+            continue;
         }
-        AmemFreeLowPrio(cacheEntryAt(this, index).m_size);
+        return data;
     }
 }
 
@@ -1915,7 +1916,7 @@ void CAmemCacheSet::Release(short index)
     CAmemCache& entry = cacheEntryAt(this, index);
     entry.m_refCount -= 1;
 
-    if (entry.m_refCount == 0xFFFF) {
+    if (entry.m_refCount >= 0xFFFF) {
         if (static_cast<unsigned int>(System.m_execParam) >= 3) {
             System.Printf(const_cast<char*>(sAmemCacheAddRefFmt));
         }
@@ -1959,14 +1960,16 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
     while (true) {
         CAmemCache* bestEntry = 0;
 
+        int offset = 0;
         for (int i = 0; i < m_cacheCount; i++) {
-            CAmemCache& entry = cacheEntryAt(this, i);
+            CAmemCache& entry = *reinterpret_cast<CAmemCache*>(reinterpret_cast<char*>(m_cacheTable) + offset);
             if (entry.m_inUse != 0 && entry.m_refCount == 0 && entry.m_dmaCopy != 0 &&
                 entry.m_cacheData != 0 && entry.m_size >= currentSize &&
                 static_cast<unsigned int>(entry.m_priority) < bestPriority) {
                 bestEntry = &entry;
                 bestPriority = static_cast<unsigned int>(entry.m_priority);
             }
+            offset += sizeof(CAmemCache);
         }
 
         if (bestEntry != 0) {
@@ -2028,8 +2031,9 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
  */
 void CAmemCacheSet::CacheClear()
 {
+    int offset = 0;
     for (int i = 0; i < m_cacheCount; i++) {
-        CAmemCache& entry = cacheEntryAt(this, i);
+        CAmemCache& entry = *reinterpret_cast<CAmemCache*>(reinterpret_cast<char*>(m_cacheTable) + offset);
 
         if ((entry.m_inUse != 0) && (entry.m_refCount == 0) && (entry.m_dmaCopy != 0)) {
             void* data = entry.m_cacheData;
@@ -2038,6 +2042,7 @@ void CAmemCacheSet::CacheClear()
                 entry.m_cacheData = 0;
             }
         }
+        offset += sizeof(CAmemCache);
     }
 }
 

@@ -173,23 +173,23 @@ void CRingMenu::DrawIcon()
 	}
 
 	float clampedX;
-	if (clipPos.x >= kRingMenuClipMinX) {
+	if (kRingMenuClipMinX > clipPos.x) {
+		clampedX = kRingMenuClipMinX;
+	} else {
 		clampedX = clipPos.x;
 		if (kRingMenuClipMaxX < clipPos.x) {
 			clampedX = kRingMenuClipMaxX;
 		}
-	} else {
-		clampedX = kRingMenuClipMinX;
 	}
 
 	float clampedY;
-	if (clipPos.y >= kRingMenuClipMinY) {
+	if (kRingMenuClipMinY > clipPos.y) {
+		clampedY = kRingMenuClipMinY;
+	} else {
 		clampedY = clipPos.y;
 		if (kRingMenuClipMaxY < clipPos.y) {
 			clampedY = kRingMenuClipMaxY;
 		}
-	} else {
-		clampedY = kRingMenuClipMinY;
 	}
 
 	float angle = static_cast<float>(atan2(static_cast<double>(clampedX), static_cast<double>(clampedY)));
@@ -225,6 +225,10 @@ void CRingMenu::DrawIcon()
 	    angle);
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x18));
+	unsigned int colValue = iconCol;
+	int colSign = colValue >> 31;
+	int uInt = (((colSign * 8) | (colValue * 0x20000000 + colSign) >> 29) - colSign) * 0x30;
+	int vInt = ((colValue >> 3) + ((colValue < 0) && ((iconCol & 7) != 0))) * 0x30;
 	void* tlut = MenuPcs.m_externalFontTlut;
 	if (caravanWork->m_hp != 0) {
 		tlut = 0;
@@ -241,10 +245,8 @@ void CRingMenu::DrawIcon()
 	CColor iconColor(0xFF, 0xFF, 0xFF, blinkAlpha);
 	MenuPcs.SetColor(iconColor);
 
-	unsigned int colValue = iconCol;
-	int colSign = colValue >> 31;
-	float u = static_cast<float>((((colSign * 8) | (colValue * 0x20000000 + colSign) >> 29) - colSign) * 0x30);
-	float v = static_cast<float>(((colValue >> 3) + ((colValue < 0) && ((iconCol & 7) != 0))) * 0x30);
+	float u = static_cast<float>(uInt);
+	float v = static_cast<float>(vInt);
 	MenuPcs.DrawRect(3, static_cast<float>(posX), static_cast<float>(posY), kRingMenuMarkerSize,
 	                                 kRingMenuMarkerSize, u, v, kRingMenuMarkerUvScale, kRingMenuMarkerUvScale, angle);
 }
@@ -768,7 +770,7 @@ void CRingMenu::onDraw()
 							float blink = kRingMenuZero;
 							if (charge == 0) {
 								if (!caravanWork->IsSelectedCmdList(i)) {
-									CColor color(0x80, 0x80, 0x80, static_cast<unsigned char>(static_cast<int>(dimAlpha)));
+									CColor color(0x80, 0x80, 0x80, static_cast<signed char>(static_cast<int>(dimAlpha)));
 									MenuPcs.SetColor(color);
 								} else {
 									CColor color(0x20, 0xFF, 0x20, static_cast<unsigned char>(static_cast<int>(fullAlpha)));

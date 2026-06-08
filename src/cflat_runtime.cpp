@@ -752,7 +752,7 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 	object->m_flagBits.m_callFlag = clearBit;
 	object->m_flagBits.m_constructFlag = setBit;
 	object->m_0x34 = 0;
-	object->m_particleId = 0xF;
+	object->m_0x32 = 0xF;
 	object->m_waitCounter = 0;
 	*reinterpret_cast<int*>(&object->m_reqFlag0) = 0;
 	object->m_classIndex = static_cast<s16>(classIndex);

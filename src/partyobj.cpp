@@ -1629,21 +1629,20 @@ void CGPartyObj::shouki()
 		}
 	}
 
-	const int frame = *reinterpret_cast<int*>(&m_flagBits);
 	if (m_unk688 == 0 &&
 	    static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 27) & 0xC0000000) >> 31) == 0) {
 		int healCount = 0;
 		if (PartyData(this).carryObject == reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)) {
-			if (isFrameInterval(frame, *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 4))) {
+			if (isFrameInterval(*reinterpret_cast<int*>(&m_flagBits), *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 4))) {
 				healCount = 1;
 			}
 		} else {
-			if (isFrameInterval(frame, *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 6))) {
+			if (isFrameInterval(*reinterpret_cast<int*>(&m_flagBits), *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 6))) {
 				healCount = 1;
 			}
 		}
 		const unsigned char periodicHeal = script[0xBDC];
-		if (periodicHeal != 0 && isFrameInterval(frame, periodicHeal)) {
+		if (periodicHeal != 0 && isFrameInterval(*reinterpret_cast<int*>(&m_flagBits), periodicHeal)) {
 			healCount += 1;
 		}
 		if (healCount != 0) {
@@ -1655,7 +1654,7 @@ void CGPartyObj::shouki()
 		if ((*reinterpret_cast<unsigned int*>(script + 0x3B0) & 0x2000) != 0) {
 			damageInterval += *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 8);
 		}
-		if (isFrameInterval(frame, damageInterval)) {
+		if (isFrameInterval(*reinterpret_cast<int*>(&m_flagBits), damageInterval)) {
 			playSe3D(0x19, 0x32, 0x96, 0, 0);
 			if ((CFlatGameFlags() & 0x20) == 0) {
 				addHp(-1, static_cast<CGPrgObj*>(0));

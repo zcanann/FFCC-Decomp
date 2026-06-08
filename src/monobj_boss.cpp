@@ -1531,9 +1531,7 @@ void CGMonObj::frameStatFuncTetsukyojin()
 		reinterpret_cast<CGCharaObj*>(this)->statAttack();
 		return;
 	case 0x66:
-		if (CFlatBossState() < 1) {
-			prgObj->changeStat(0, 0, 0);
-		} else {
+		if (CFlatBossState() >= 1) {
 			if ((m_actionBranch == 1) && (prgObj->m_stateFrame == 0)) {
 				CFlatRuntime::CStack stack[3];
 
@@ -1551,6 +1549,8 @@ void CGMonObj::frameStatFuncTetsukyojin()
 				m_unk6C8 = 0;
 				prgObj->changeStat(0, 0, 0);
 			}
+		} else {
+			prgObj->changeStat(0, 0, 0);
 		}
 		return;
 	}

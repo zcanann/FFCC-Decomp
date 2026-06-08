@@ -2527,7 +2527,9 @@ void GbaQueue::ReplyLetter(int channel)
 	int itemId = 0;
 	unsigned int gil = value;
 
-	if (recvBuffer[2] == 0) {
+	if (recvBuffer[2] != 0) {
+		gil = value;
+	} else {
 		itemId = value & 0xffff;
 		gil = 0;
 	}

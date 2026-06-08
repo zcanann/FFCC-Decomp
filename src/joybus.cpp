@@ -3864,9 +3864,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
     {
         if (step == 0)
         {
-            signed char type = sendType;
-
-            if (type != 3 && type != 2 && type != 6 && type != 7 && type != 8 && type != 9)
+            if ((signed char)sendType != 3 && (signed char)sendType != 2 && (signed char)sendType != 6 && (signed char)sendType != 7 && (signed char)sendType != 8 && (signed char)sendType != 9)
             {
                 GbaQue.IsSingleMode(threadParam->m_portIndex);
 
@@ -3902,13 +3900,13 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
                 m_ctrlModeArr[port] = 0;
             }
 
-            if (type == 0)
+            if ((signed char)sendType == 0)
             {
                 dataBase = reinterpret_cast<unsigned char*>(m_fileBaseA);
                 dataPtr = dataBase;
                 totalSize = static_cast<unsigned short>(m_fileBaseA_dup);
             }
-            else if (type == 1)
+            else if ((signed char)sendType == 1)
             {
                 dataBase = reinterpret_cast<unsigned char*>(m_fileBaseB);
                 dataPtr = dataBase;
@@ -3916,7 +3914,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
             }
             else
             {
-                if (type != 3 && type != 2 && type != 6 && type != 7 && type != 8 && type != 9)
+                if ((signed char)sendType != 3 && (signed char)sendType != 2 && (signed char)sendType != 6 && (signed char)sendType != 7 && (signed char)sendType != 8 && (signed char)sendType != 9)
                 {
                     if (System.m_execParam != 0)
                     {

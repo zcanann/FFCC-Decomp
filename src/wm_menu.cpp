@@ -11998,20 +11998,19 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 void CMenuPcs::DrawMcWinMess(int winType, int messType)
 {
 	CFont* const font = m_fonts[0];
-	MenuWindowInfo* const win = m_menuWindowInfo;
 
 	font->SetMargin(FLOAT_803313e8);
 	font->SetShadow(0);
 	font->SetScale(FLOAT_803313e8);
 	font->DrawInit();
 
-	GXColor textColor = {0xFF, 0xFF, 0xFF, 0xFF};
-	font->SetColor(textColor);
+	CColor textColor(0xFF, 0xFF, 0xFF, 0xFF);
+	font->SetColor(textColor.color);
 	font->SetTlut(0x23);
 
 	const char* const* msgTable = GetMcWinMessBuff(messType);
-	const unsigned char* const winMess = reinterpret_cast<unsigned char*>(GetWinMess(winType));
 	const int languageIndex = Game.m_gameWork.m_languageId - 1;
+	const unsigned char* const winMess = reinterpret_cast<unsigned char*>(GetWinMess(winType));
 
 	const int count = *reinterpret_cast<const int*>(winMess);
 	float posX;
@@ -12032,10 +12031,10 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 			}
 			entry += 2;
 		}
-		posX = static_cast<float>(win->x) + static_cast<float>(win->width - maxWidth) * static_cast<float>(DOUBLE_803313f8);
+		posX = static_cast<float>(static_cast<double>(m_menuWindowInfo->x) + static_cast<double>(m_menuWindowInfo->width - maxWidth) * DOUBLE_803313f8);
 	}
 
-	float y = static_cast<float>(win->y + 0x20);
+	float y = static_cast<float>(m_menuWindowInfo->y + 0x20);
 
 	char textBuf[128];
 	const unsigned char* entry = winMess + 4;
@@ -12052,7 +12051,7 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 
 			if (winType == 0 || !noMarker) {
 				const int textWidth = font->GetWidth(textBuf);
-				posX = static_cast<float>(win->x) + static_cast<float>(win->width - textWidth) * static_cast<float>(DOUBLE_803313f8);
+				posX = static_cast<float>(static_cast<double>(m_menuWindowInfo->x) + static_cast<double>(m_menuWindowInfo->width - textWidth) * DOUBLE_803313f8);
 			}
 			font->SetPosX(posX);
 			font->SetPosY(y);

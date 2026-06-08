@@ -8113,7 +8113,7 @@ unsigned short JoyBus::Crc16(int len, unsigned char* data, unsigned short* crc)
 loop:
     idx = *crc;
     hi = idx << 8;
-    idx = (unsigned int)((int)idx >> 8);
+    idx = (unsigned int)((int)(short)idx >> 8);
     idx = (unsigned char)idx;
     idx = idx ^ (unsigned int)*data;
     data = data + 1;

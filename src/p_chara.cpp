@@ -404,7 +404,7 @@ static CCharaPcs::CLoadAnim* LoadAnimFromDisk(
 
     File.Close(fileHandle);
 
-    if (System.m_execParam != 0) {
+    if (static_cast<unsigned int>(System.m_execParam) >= 1) {
         System.Printf(const_cast<char*>(s_charaLoadAnimLogFmt), animName, charaKind, charaNo);
     }
 

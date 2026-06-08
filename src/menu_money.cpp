@@ -109,8 +109,9 @@ int CMenuPcs::MoneyCtrlCur()
 	unsigned int press;
 	unsigned int hold;
 
+	int padLock = Pad.m_debugPadLock;
 	blocked = false;
-	if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
+	if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
 		blocked = true;
 	}
 	if (blocked) {
@@ -122,7 +123,7 @@ int CMenuPcs::MoneyCtrlCur()
 	}
 
 	blocked = false;
-	if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
+	if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
 		blocked = true;
 	}
 	if (blocked) {

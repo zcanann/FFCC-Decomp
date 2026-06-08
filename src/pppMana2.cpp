@@ -1263,8 +1263,12 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
         }
     }
 
-    if ((param_2->m_type == 1 || param_2->m_type == 2) && mana2Work->m_waterHeightA != 0) {
-        mana2Work->m_waterHeightA[0x90] = param_2->m_rippleHeight;
+    if (param_2->m_type == 1 || param_2->m_type == 2) {
+        float* waterHeightA = mana2Work->m_waterHeightA;
+        float rippleHeight = param_2->m_rippleHeight;
+        if (waterHeightA != 0) {
+            waterHeightA[0x90] = rippleHeight;
+        }
     }
     }
 

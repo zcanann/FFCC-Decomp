@@ -275,7 +275,7 @@ void CMenuPcs::CompaDraw()
 		font->SetPosY(y);
 		font->Draw(name);
 
-		short food = nameWork->m_evtWordArr[19 + drawIndex];
+		unsigned short food = nameWork->m_evtWordArr[19 + drawIndex];
 		const char* value = Game.m_cFlatDataArr[1].TableStrings(2)[food];
 		font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x90));
 		font->SetPosY(y);
@@ -290,7 +290,7 @@ void CMenuPcs::CompaDraw()
 	font->SetShadow(0);
 	font->SetScale(kCompaJobFontScale);
 	font->DrawInit();
-	GXColor jobColor = CColor(0xFF, 0xFF, 0xFF, static_cast<signed char>(kCompaColorMax * compaList->entries[0].alpha)).color;
+	GXColor jobColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(kCompaColorMax * compaList->entries[0].alpha)).color;
 	font->SetColor(jobColor);
 
 	const char* job = GetJobStr(nameWork->unk_0x3ac);

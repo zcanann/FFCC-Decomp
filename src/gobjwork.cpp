@@ -967,10 +967,8 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 {
 	int foundCount = 0;
 
-	if (maxResults > 0) {
-		for (int i = 0; i < maxResults; i++) {
-			romLetterWork[i] = 0;
-		}
+	for (int i = 0; i < maxResults; i++) {
+		romLetterWork[i] = 0;
 	}
 
 	CRomLetterWork* curLetter = reinterpret_cast<CRomLetterWork*>(Game.m_romLetterWorkBase);

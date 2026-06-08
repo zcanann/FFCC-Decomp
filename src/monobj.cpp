@@ -387,7 +387,7 @@ static inline void CGMonObj_SetAttackAfter(CGMonObj* monObj, int attackKind)
 	if (delay != 0) {
 		int range = delay / 5;
 		int clampedRange = 1;
-		if (0 < range) {
+		if (range >= 1) {
 			clampedRange = range;
 		}
 

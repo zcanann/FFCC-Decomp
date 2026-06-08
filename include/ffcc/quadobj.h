@@ -14,7 +14,7 @@ public:
     virtual void onDestroy();
     virtual void onDraw();
     virtual int GetCID();
-    bool isInner(Vec*);
+    int isInner(Vec*);
     void Reset(float base, float height);
     void Add(float x, float y);
     

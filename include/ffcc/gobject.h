@@ -127,14 +127,14 @@ public:
     union {
         unsigned char m_stateFlags0;  // 0x50
         struct {
-            unsigned char unk0 : 1;
-            unsigned char unk1 : 1;
-            unsigned char unk2 : 1;
-            unsigned char unk3 : 1;
-            unsigned char unk4 : 1;
-            unsigned char unk5 : 1;
-            unsigned char unk6 : 1;
-            unsigned char unk7 : 1;
+            signed char unk0 : 1;
+            signed char unk1 : 1;
+            signed char unk2 : 1;
+            signed char unk3 : 1;
+            signed char unk4 : 1;
+            signed char unk5 : 1;
+            signed char unk6 : 1;
+            signed char unk7 : 1;
         } m_stateFlags0Bits;
     };
     char m_ownerType;                 // 0x51
@@ -193,7 +193,20 @@ public:
         WeaponNodeFlagBytes m_weaponNodeFlagBytes;
         WeaponNodeFlagAll m_weaponNodeFlagAll;
     };
-    unsigned short m_shieldNodeFlags; // 0x9C
+    struct ShieldNodeFlagBits {
+        signed char m_bit80 : 1;
+        signed char m_bit40 : 1;
+        signed char m_bit20 : 1;
+        signed char m_bit10 : 1;
+        signed char m_bit08 : 1;
+        signed char m_bit04 : 1;
+        signed char m_bit02 : 1;
+        signed char m_bit01 : 1;
+    };
+    union {
+        unsigned short m_shieldNodeFlags; // 0x9C
+        ShieldNodeFlagBits m_shieldNodeFlagBits;
+    };
     unsigned short m_animStartFrame;  // 0x9E
     unsigned short m_animEndFrame;    // 0xA0
     unsigned short m_pushTimer;       // 0xA2

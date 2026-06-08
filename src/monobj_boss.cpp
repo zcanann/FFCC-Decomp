@@ -1076,8 +1076,8 @@ int CGMonObj::attackCheckFuncLKShooter(int)
 
 	if (work->m_stunTimer == 0) {
 		if (work->bits.m_bit40 == 0 && (CFlatBossState() & 2) == 0) {
-			CVector left(kMonObjBossLeftTargetX, kMonObjBossZero, kMonObjBossLeftTargetZ);
-			if (PSVECDistance(reinterpret_cast<Vec*>(&left), &object->m_worldPosition) < kMonObjBossSideTargetRange &&
+			const CVector& left = CVector(kMonObjBossLeftTargetX, kMonObjBossZero, kMonObjBossLeftTargetZ);
+			if (PSVECDistance(reinterpret_cast<Vec*>(const_cast<CVector*>(&left)), &object->m_worldPosition) < kMonObjBossSideTargetRange &&
 			    reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->m_leftCooldown == 0) {
 				reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->m_leftCooldown = 300;
 				work->bits.m_bit40 = 1;
@@ -1086,8 +1086,8 @@ int CGMonObj::attackCheckFuncLKShooter(int)
 			}
 		}
 		if (work->bits.m_bit20 == 0 && (CFlatBossState() & 1) == 0) {
-			CVector right(kMonObjBossRightTargetXZ, kMonObjBossZero, kMonObjBossRightTargetXZ);
-			if (PSVECDistance(reinterpret_cast<Vec*>(&right), &object->m_worldPosition) < kMonObjBossSideTargetRange &&
+			const CVector& right = CVector(kMonObjBossRightTargetXZ, kMonObjBossZero, kMonObjBossRightTargetXZ);
+			if (PSVECDistance(reinterpret_cast<Vec*>(const_cast<CVector*>(&right)), &object->m_worldPosition) < kMonObjBossSideTargetRange &&
 			    reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->m_rightCooldown == 0) {
 				work->bits.m_bit20 = 1;
 				m_actionBranch = 1;

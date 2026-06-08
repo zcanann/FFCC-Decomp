@@ -2313,9 +2313,8 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 	case 0x11:
 	case 0x15:
 	case 0x16: {
-		CGMonObj** monArr = reinterpret_cast<CGMonObj**>(&Game.m_scriptWork[0][0][0]);
 		for (int i = 0; i < 0x40; i++) {
-			CGMonObj* mon = monArr[i];
+			CGMonObj* mon = reinterpret_cast<CGMonObj*>(Game.m_scriptWork[0][0][i]);
 			if ((mon != 0) &&
 			    ((controlValue == 0) || ((mon->m_controlMask & static_cast<unsigned int>(controlValue)) != 0))) {
 				mon->sysControl(controlNo);
@@ -2375,9 +2374,8 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 			}
 		}
 
-		CGMonObj** monArr = reinterpret_cast<CGMonObj**>(&Game.m_scriptWork[0][0][0]);
 		for (int i = 0; i < kFlatMonObjCount; i++) {
-			CGMonObj* mon = monArr[i];
+			CGMonObj* mon = reinterpret_cast<CGMonObj*>(Game.m_scriptWork[0][0][i]);
 			if (mon != 0) {
 				mon->damageDelete();
 			}

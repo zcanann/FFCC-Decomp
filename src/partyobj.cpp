@@ -3026,7 +3026,7 @@ void CGPartyObj::onStatMagic()
 		break;
 	}
 
-	if (m_subState >= 2) {
+	if (m_subState > 1) {
 		return;
 	}
 

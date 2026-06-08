@@ -54,6 +54,7 @@ extern float FLOAT_80332de0;
 extern float FLOAT_80332e0c;
 extern float FLOAT_80332E04;
 extern float FLOAT_80332E08;
+extern float FLOAT_80332E50;
 extern float FLOAT_80332e10;
 extern float FLOAT_80332e14;
 extern float FLOAT_80332e18;
@@ -2752,7 +2753,7 @@ void CShopMenu::Calc()
         if (timer == 1) {
             Sound.PlaySe(5, 0x40, 0x7F, 0);
         }
-        m_fade = static_cast<float>(timer) * 0.125f;
+        m_fade = static_cast<float>(timer) * FLOAT_80332E50;
         if (timer == 8) {
             this->SetMode(1);
         }
@@ -2782,7 +2783,7 @@ void CShopMenu::Calc()
         }
         break;
     case 2:
-        m_fade = static_cast<float>(8 - timer) * 0.125f;
+        m_fade = static_cast<float>(8 - timer) * FLOAT_80332E50;
         if (timer == 8) {
             switch (choice) {
             case 0:
@@ -2805,7 +2806,7 @@ void CShopMenu::Calc()
         if (timer == 0) {
             Sound.PlaySe(5, 0x40, 0x7F, 0);
         }
-        m_fade = static_cast<float>(timer) * 0.125f;
+        m_fade = static_cast<float>(timer) * FLOAT_80332E50;
         if (timer == 8) {
             this->SetMode(4);
         }
@@ -2835,7 +2836,7 @@ void CShopMenu::Calc()
         break;
     case 5:
     case 8:
-        m_fade = static_cast<float>(8 - timer) * 0.125f;
+        m_fade = static_cast<float>(8 - timer) * FLOAT_80332E50;
         if (timer == 8) {
             this->SetMode(0);
         }
@@ -2844,7 +2845,7 @@ void CShopMenu::Calc()
         if (timer == 0) {
             Sound.PlaySe(5, 0x40, 0x7F, 0);
         }
-        m_fade = static_cast<float>(timer) * 0.125f;
+        m_fade = static_cast<float>(timer) * FLOAT_80332E50;
         if (timer == 8) {
             this->SetMode(7);
         }
@@ -2872,7 +2873,7 @@ void CShopMenu::Calc()
         if (timer == 1) {
             Sound.PlaySe(5, 0x40, 0x7F, 0);
         }
-        m_fade = static_cast<float>(timer) * 0.125f;
+        m_fade = static_cast<float>(timer) * FLOAT_80332E50;
         if (timer == 8) {
             this->SetMode(10);
         }
@@ -2886,7 +2887,7 @@ void CShopMenu::Calc()
         }
         break;
     case 11:
-        m_fade = static_cast<float>(8 - timer) * 0.125f;
+        m_fade = static_cast<float>(8 - timer) * FLOAT_80332E50;
         if (timer == 8) {
             if (m_nextMode == -1) {
                 PartPcs.ReleasePdt(m_pdtSlot);
@@ -2903,7 +2904,7 @@ void CShopMenu::Calc()
         if (timer == 1) {
             Sound.PlaySe(5, 0x40, 0x7F, 0);
         }
-        m_fade = static_cast<float>(timer) * 0.125f;
+        m_fade = static_cast<float>(timer) * FLOAT_80332E50;
         if (timer == 8) {
             this->SetMode(0xD);
         }
@@ -2917,7 +2918,7 @@ void CShopMenu::Calc()
         }
         break;
     case 14:
-        m_fade = static_cast<float>(8 - timer) * 0.125f;
+        m_fade = static_cast<float>(8 - timer) * FLOAT_80332E50;
         if (timer == 8) {
             this->SetMode(m_nextMode);
         }
@@ -2926,7 +2927,7 @@ void CShopMenu::Calc()
         if (timer == 1) {
             Sound.PlaySe(5, 0x40, 0x7F, 0);
         }
-        m_fade = static_cast<float>(timer) * 0.125f;
+        m_fade = static_cast<float>(timer) * FLOAT_80332E50;
         if (timer == 8) {
             short recipeMaterial[8];
             CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
@@ -2952,7 +2953,7 @@ void CShopMenu::Calc()
         this->SelectSOUBI();
         break;
     case 17:
-        m_fade = static_cast<float>(8 - timer) * 0.125f;
+        m_fade = static_cast<float>(8 - timer) * FLOAT_80332E50;
         if (timer == 8) {
             this->SetMode(m_nextMode);
         }

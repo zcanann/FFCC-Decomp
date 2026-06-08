@@ -1965,7 +1965,7 @@ void CGMonObj::initFinishedFuncMeteoParasite()
 			sprintf(nodeName, sLichTeleportNodeFormat, i + 1);
 			nodeIndex = object->m_charaModelHandle->m_model->SearchNode(nodeName);
 			nodes[i + 2] = object->m_charaModelHandle->m_model->m_nodes + nodeIndex;
-			if ((CGMonObj::m_boss[0x5C] & 0x40) != 0) {
+			if (reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_meteo3 != 0) {
 				int dispIndex = object->m_charaModelHandle->m_model->GetDispIndex(nodes[i + 2]);
 				object->m_charaModelHandle->m_model->m_meshVisibleMask &= ~(1 << dispIndex);
 			}
@@ -1975,7 +1975,7 @@ void CGMonObj::initFinishedFuncMeteoParasite()
 	CGMonObj** bossObjArr = reinterpret_cast<CGMonObj**>(CGMonObj::m_boss + 0x48);
 	bossObjArr[scriptKind - 0x85] = this;
 
-	if ((CGMonObj::m_boss[0x5C] & 0x40) != 0) {
+	if (reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_meteo3 != 0) {
 		reinterpret_cast<CGObject*>(this)->SetAnimSlot(scriptKind == 0x87 ? 0x0D : 0x0E, 0);
 		reinterpret_cast<CGPrgObj*>(this)->reqAnim(0, 1, 0);
 	}

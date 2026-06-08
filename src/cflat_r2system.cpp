@@ -4352,17 +4352,18 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
             int value = (-flag | flag) >> 31;
             stack[-1].m_word = value;
 
+            int result = value;
             if (setMode < 0) {
                 if (setMode >= -1) {
-                    value = value - stack->m_word;
+                    result = value - stack->m_word;
                 }
             } else if (setMode == 0) {
-                value = stack->m_word;
+                result = stack->m_word;
             } else if (setMode < 2) {
-                value = value + stack->m_word;
+                result = value + stack->m_word;
             }
 
-            if (value != 0) {
+            if (result != 0) {
                 *flagByte |= mask;
             } else {
                 *flagByte &= ~mask;

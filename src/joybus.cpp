@@ -5340,7 +5340,7 @@ int JoyBus::SendCtrlMode(ThreadParam* threadParam, int controlMode)
  */
 int JoyBus::SendMapObjDrawFlg(ThreadParam* threadParam)
 {
-    unsigned int flgWord = 0;
+    unsigned int flgWord;
     int result = GBARecvSend(threadParam, &flgWord);
 
     if (result < 0)

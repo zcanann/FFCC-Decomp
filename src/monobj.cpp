@@ -844,7 +844,7 @@ void CGMonObj::seKiduki()
 		return;
 	}
 
-	bool notice = false;
+	int notice = false;
 	int partyIndex;
 
 	if (m_unk6BD != 0) {

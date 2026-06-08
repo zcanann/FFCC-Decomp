@@ -2019,7 +2019,7 @@ void CGObject::onDraw()
     }
 
     if (((CFlat.m_debugFlags & 0x40000) != 0) && ((m_bgColMask & 0x40000) != 0)) {
-        for (int i = 0; i < 8; i++) {
+        for (unsigned int i = 0; i < 8; i++) {
             AttackCol* collider = &m_attackColliders[i];
             if (*reinterpret_cast<int*>(&collider->m_localStart.x) == 0) {
                 continue;

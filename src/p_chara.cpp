@@ -1080,10 +1080,11 @@ int CCharaPcs::TryReleaseAnimBank(int requiredSize)
 {
     (void)requiredSize;
 
-    CLoadAnim* releaseAnim = 0;
+    int i = LoadAnimArray(this)->GetSize() - 1;
     int releaseSize = -1;
+    CLoadAnim* releaseAnim = 0;
 
-    for (int i = LoadAnimArray(this)->GetSize() - 1; i >= 0; i--) {
+    for (; i >= 0; i--) {
         CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
         CChara::CAnim* anim = loadAnim->m_anim;
 

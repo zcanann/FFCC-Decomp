@@ -3050,7 +3050,10 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
 
     chunkFile.PushChunk();
     while (chunkFile.GetNextChunk(chunk) != 0) {
-        if (chunk.m_id != CHUNK_MATL) {
+        switch (chunk.m_id) {
+        case CHUNK_MATL:
+            break;
+        default:
             continue;
         }
 

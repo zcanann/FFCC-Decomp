@@ -200,10 +200,8 @@ int CMenuPcs::ItemCtrlCur()
                     idx -= 0x40;
                 }
 
-                s16 itemId = caravanWork->m_inventoryItems[idx];
-
-                if ((itemId <= 0) || (EquipChk(idx) != 0) ||
-                    ((letterAttachFlg >= 0) && (itemId < 0x125))) {
+                if ((caravanWork->m_inventoryItems[idx] <= 0) || ((u8)EquipChk(idx) != 0) ||
+                    ((letterAttachFlg >= 0) && (caravanWork->m_inventoryItems[idx] < 0x125))) {
                     Sound.PlaySe(4, 0x40, 0x7F, 0);
                 } else if (letterAttachFlg >= 0) {
                     LetterSetAttachItem((unsigned int)idx, 1);
@@ -384,10 +382,9 @@ void CMenuPcs::ItemDraw()
                     menuIndex -= 0x40;
                 }
 
-                s16 itemId = caravanWork->m_inventoryItems[menuIndex];
-                if ((itemId <= 0) || (EquipChk(menuIndex) != 0) ||
-                    (hasLetterAttach && (itemId < 0x125))) {
-                    if (EquipChk(menuIndex) != 0) {
+                if ((caravanWork->m_inventoryItems[menuIndex] <= 0) || ((u8)EquipChk(menuIndex) != 0) ||
+                    (hasLetterAttach && (caravanWork->m_inventoryItems[menuIndex] < 0x125))) {
+                    if ((u8)EquipChk(menuIndex) != 0) {
                         int markX = (int)(x - LoadFloat(kItemMarkXOffset));
                         int markY = (int)((h - LoadFloat(kItemMarkHeight)) * LoadDouble(kItemHalfDouble) + y);
                         DrawEquipMark(markX, markY, entry->alpha);
@@ -440,8 +437,8 @@ void CMenuPcs::ItemDraw()
         s16 itemId = caravanWork->m_inventoryItems[menuIndex];
         if (itemId > 0) {
             const char* text = Game.m_cFlatDataArr[1].TableStrings(0)[itemId * 5 + 4];
-            unsigned int selectedIndex = this->m_itemMenuState->cursorIndex[0] + this->m_itemMenuState->scroll;
-            if (selectedIndex > 0x3F) {
+            int selectedIndex = this->m_itemMenuState->cursorIndex[0] + this->m_itemMenuState->scroll;
+            if (selectedIndex >= 0x40) {
                 selectedIndex -= 0x40;
             }
             if (menuIndex == selectedIndex) {

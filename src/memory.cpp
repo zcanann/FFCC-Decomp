@@ -1085,6 +1085,7 @@ void CMemory::CStage::free(void*)
  */
 int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
 {
+    const char* strBase = reinterpret_cast<const char*>(sHeapBarColors);
     int mode = stageGetAllocationMode(this);
     CBlock* node;
     if (mode == 2) {
@@ -1092,8 +1093,6 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
     } else {
         node = stageBlockAt(stageGetHeapHead(this))->m_next;
     }
-
-    const char* strBase = reinterpret_cast<const char*>(sHeapBarColors);
 
     if (flag == -1) {
         System.Printf(const_cast<char*>(sHeapWalkerNewline));

@@ -10969,11 +10969,12 @@ LAB_draw:
 	short separatorSub = worldState->m_subState;
 	if (separatorSub != 0 && separatorSub > 1 &&
 	    worldState->m_mainState == 2) {
+		const double sepOff = DOUBLE_80331510;
 		for (int slot = 0; slot < kMcListCount; slot++) {
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 			MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_803314d8,
 			         static_cast<float>((kSlope * static_cast<double>(slot) + kBase) -
-			                            DOUBLE_80331510),
+			                            sepOff),
 			         FLOAT_803314d8, FLOAT_803314d8,
 			         static_cast<float>(kBase * static_cast<double>(slot)), FLOAT_803313e0,
 			         FLOAT_803313e8, FLOAT_803313e8, 0.0f);

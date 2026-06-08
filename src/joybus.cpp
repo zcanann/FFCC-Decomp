@@ -2233,7 +2233,6 @@ int JoyBus::RecvGBA(ThreadParam* threadParam, unsigned int* recvBuffer)
  */
 int JoyBus::SendGBA(ThreadParam* threadParam)
 {
-
     unsigned int firstCmd;
     unsigned int count;
 
@@ -2312,7 +2311,6 @@ int JoyBus::SendGBA(ThreadParam* threadParam)
  */
 int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
 {
-
 
     int recvResult = RecvGBA(threadParam, cmdOut);
 
@@ -3845,7 +3843,6 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
  */
 int JoyBus::SendMBase(ThreadParam* threadParam)
 {
-
     short posX, posY;
 
     GbaQue.GetMBasePos(threadParam->m_portIndex, &posX, &posY);
@@ -4337,7 +4334,6 @@ int JoyBus::MakeJoyData(char* src, int length, unsigned int* outBuffer)
  */
 int JoyBus::SendPlayerStat(ThreadParam* threadParam)
 {
-
     unsigned int result = 0;
 
     if (threadParam->m_subState != 1)
@@ -6286,7 +6282,6 @@ int JoyBus::SendScouInfo(ThreadParam* threadParam)
  */
 int JoyBus::SendOpenMenu(ThreadParam* threadParam, char menuId)
 {
-
     bool isSingle = GbaQue.IsSingleMode(threadParam->m_portIndex);
 
     if (isSingle)
@@ -6415,7 +6410,6 @@ void JoyBus::SendSPMode(ThreadParam* threadParam)
  */
 int JoyBus::SendMemorys(ThreadParam* threadParam)
 {
-
     unsigned char value = GbaQue.GetMemorys(threadParam->m_portIndex);
     unsigned int cmd = 0;
     unsigned char* cmdBytes = (unsigned char*)&cmd;
@@ -6455,7 +6449,6 @@ int JoyBus::SendMemorys(ThreadParam* threadParam)
  */
 int JoyBus::SendChgCmdNum(ThreadParam* threadParam)
 {
-
     unsigned char cmdNum = GbaQue.GetCmdNum(threadParam->m_portIndex);
     unsigned int cmd = MakeJoyCmd16(0x1412, cmdNum, 0);
 

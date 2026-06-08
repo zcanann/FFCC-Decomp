@@ -1410,8 +1410,8 @@ void GbaQueue::LoadPlayerStat()
 	} while (i < 4);
 
 	obj = reinterpret_cast<char*>(this);
-	memcpy(obj + 0x7C4, GetPlayerDataBlock(this), kGbaQueuePlayerDataBlockBytes);
-	memcpy(GetPlayerDataBlock(this), localPlayerStat, kGbaQueuePlayerDataBlockBytes);
+	memcpy(obj + 0x7C4, obj + 0x454, kGbaQueuePlayerDataBlockBytes);
+	memcpy(obj + 0x454, localPlayerStat, kGbaQueuePlayerDataBlockBytes);
 	memcpy(obj + 0x2A74, localNames, kGbaQueueCaravanNameBlockBytes);
 
 	m_prevOutOfShoukiFlags = m_outOfShoukiFlags;

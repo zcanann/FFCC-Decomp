@@ -1709,7 +1709,7 @@ void CGObject::update()
             if (activeAnimIndex >= 0 && m_charaModelHandle->m_animSlot[activeAnimIndex] != 0) {
                 unsigned char* animRefBytes =
                     reinterpret_cast<unsigned char*>(m_charaModelHandle->m_animSlot[activeAnimIndex]);
-                const unsigned short pointCount = *reinterpret_cast<short*>(animRefBytes + 0x2C);
+                const unsigned short pointCount = *reinterpret_cast<unsigned short*>(animRefBytes + 0x2C);
                 if (pointCount > 0) {
                     const float animSpan =
                         sAnimFrameOffset + (ModelAnimEnd(m_charaModelHandle->m_model) - ModelAnimStart(m_charaModelHandle->m_model));

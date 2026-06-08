@@ -5138,12 +5138,16 @@ void CGPartyObj::gpmMove()
 					sGhostPartyWork.slotSel = 2;
 				}
 
-				if (sGhostPartyWork.slotSel == 1) {
-					*reinterpret_cast<int*>(self + 0x550) = 0x20F;
-				} else if (sGhostPartyWork.slotSel == 0) {
-					*reinterpret_cast<int*>(self + 0x550) = 0x207;
-				} else if ((unsigned int)sGhostPartyWork.slotSel < 3) {
-					*reinterpret_cast<int*>(self + 0x550) = 0x20B;
+				switch (sGhostPartyWork.slotSel) {
+				case 1:
+					*reinterpret_cast<int*>(self + 0x560) = 0x20F;
+					break;
+				case 0:
+					*reinterpret_cast<int*>(self + 0x560) = 0x207;
+					break;
+				case 2:
+					*reinterpret_cast<int*>(self + 0x560) = 0x20B;
+					break;
 				}
 				changeStat(2, 0, 0);
 				sGhostPartyWork.gauge = 0;

@@ -1531,8 +1531,11 @@ void CGoOutMenu::CalcGoOut()
     int selResult = -1;
 
     if (m_watchCardDisconnect != 0 && m_modeFrame >= 0x14 && (m_modeFrame & 0xF) == 0) {
-        const int cardStatus = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(((m_modeFrame & 0x10) == 0) ? 1 : 0);
-        if (cardStatus != 1) {
+        if ((m_modeFrame & 0x10) != 0) {
+            if (static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(0) == 1) {
+                goto card_connected;
+            }
+        card_disconnected:
             m_watchCardDisconnect = 0;
             m_returnGoOutMode = -1;
             m_goOutMode = 0;
@@ -1552,7 +1555,11 @@ void CGoOutMenu::CalcGoOut()
             }
             return;
         }
+        if (static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(1) != 1) {
+            goto card_disconnected;
+        }
     }
+card_connected:;
 
     if (m_saveLoadMenuOpen != 0) {
         const unsigned char selInit = static_cast<unsigned char>(__cntlzw(0xF - static_cast<int>(m_goOutMode)) >> 5 & 0xFF);

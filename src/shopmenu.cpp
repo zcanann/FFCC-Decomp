@@ -2743,11 +2743,14 @@ void CShopMenu::Calc()
     case 2:
         m_fade = static_cast<float>(8 - timer) * 0.125f;
         if (timer == 8) {
-            if (choice == 0) {
+            switch (choice) {
+            case 0:
                 this->SetMode(3);
-            } else if (choice == 1) {
+                break;
+            case 1:
                 this->SetMode(6);
-            } else if (choice == 2) {
+                break;
+            case 2:
                 PartPcs.ReleasePdt(m_pdtSlot);
                 reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0])->CallShop(0, 0, 0, 0, 0);
                 MenuPcs.m_singleFadeState->done = 1;

@@ -1262,7 +1262,7 @@ CChara::CModel* CChara::CModel::Duplicate(CMemory::CStage* stage)
 	RetainRefCounted(ModelRef(clone));
 
 	const u16 nodeCount = ModelNodeCount(this);
-	CChara::CNode* cloneNodes = new (stage, const_cast<char*>("chara.cpp"), 0x263) CChara::CNode[nodeCount];
+	CChara::CNode* cloneNodes = new (stage, const_cast<char*>(s_chara_cpp), 0x263) CChara::CNode[nodeCount];
 	clone->m_nodes = cloneNodes;
 	for (u32 i = 0; i < nodeCount; i++) {
 		CChara::CNode* dst = &cloneNodes[i];
@@ -1274,13 +1274,11 @@ CChara::CModel* CChara::CModel::Duplicate(CMemory::CStage* stage)
 		NodePreviousQuat(dst) = NodePreviousQuat(src);
 		NodePreviousPosition(dst) = NodePreviousPosition(src);
 		NodePreviousScale(dst) = NodePreviousScale(src);
-		NodeAnimNode0(dst) = 0;
-		NodeAnimNode1(dst) = 0;
-		NodeRuntimeFlags(dst) = (NodeRuntimeFlags(dst) & 0x7F) | (NodeRuntimeFlags(src) & 0x80);
+		dst->m_flagsBits.m_flag_80 = src->m_flagsBits.m_flag_80;
 	}
 
 	const u16 meshCount = ModelMeshCount(this);
-	CChara::CMesh* cloneMeshes = new (stage, const_cast<char*>("chara.cpp"), 0x26C) CChara::CMesh[meshCount];
+	CChara::CMesh* cloneMeshes = new (stage, const_cast<char*>(s_chara_cpp), 0x26C) CChara::CMesh[meshCount];
 	clone->m_meshes = cloneMeshes;
 	for (u32 i = 0; i < meshCount; i++) {
 		CChara::CMesh* dst = &cloneMeshes[i];

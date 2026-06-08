@@ -1107,9 +1107,9 @@ void CMenuPcs::DrawOptionMenu()
 	CTexture* banner = GetMenuTexture(this, 0xD4);
 	float bannerWidth = static_cast<float>(banner->m_width);
 	float bannerHeight = static_cast<float>(banner->m_height);
-	gUtil.CalcUV(uv0.x, uv0.y, 0, 0, static_cast<unsigned int>(bannerWidth), static_cast<unsigned int>(bannerHeight));
+	gUtil.CalcUV(uv0.x, uv0.y, 0, 0, static_cast<int>(bannerWidth), static_cast<unsigned int>(bannerHeight));
 	gUtil.CalcUV(uv1.x, uv1.y, 0x280, static_cast<unsigned int>(bannerHeight),
-	             static_cast<unsigned int>(bannerWidth), static_cast<unsigned int>(bannerHeight));
+	             static_cast<int>(bannerWidth), static_cast<unsigned int>(bannerHeight));
 	gUtil.RenderTextureQuad(kOptionAnimMin,
 	                        -(bannerHeight * kMenuCenteringHalfWidth - kOptionBannerCenterY) - kOptionBannerYOffset,
 	                        kOptionScreenWidth, bannerHeight, banner, &uv0, &uv1, &color, GX_BL_SRCALPHA,

@@ -1192,26 +1192,22 @@ void CGObject::bgAttribCollision()
                 (m_charaModelHandle != (CCharaPcs::CHandle*)0) &&
                 (m_charaModelHandle->m_model != (CChara::CModel*)0);
             if (hasModel) {
-                Vec probePos;
                 CVector probeMove(sZeroFloat, sDownProbeDistance, sZeroFloat);
                 CVector probeBase(m_worldPosition.x, m_worldPosition.y + sStepProbeHeight, m_worldPosition.z);
 
                 GObjectMapCylinder attrCylinder;
-                probePos.x = probeBase.x;
-                probePos.y = probeBase.y;
-                probePos.z = probeBase.z;
-                attrCylinder.m_bottom = probePos;
-                attrCylinder.Probe().m_direction.x = probeMove.x;
-                attrCylinder.Probe().m_direction.y = probeMove.y;
-                attrCylinder.Probe().m_direction.z = probeMove.z;
                 attrCylinder.Probe().m_radius = sHugeCylinderExtent;
                 attrCylinder.Probe().m_height = sHugeCylinderExtent;
-                attrCylinder.Probe().m_top = attrCylinder.Probe().m_direction;
+                attrCylinder.Probe().m_radius2 = sZeroFloat;
+                attrCylinder.Probe().m_height2 = sZeroFloat;
                 attrCylinder.Probe().m_direction2.x = sNegHugeCylinderExtent;
                 attrCylinder.Probe().m_direction2.y = sNegHugeCylinderExtent;
                 attrCylinder.Probe().m_direction2.z = sNegHugeCylinderExtent;
-                attrCylinder.Probe().m_radius2 = sZeroFloat;
-                attrCylinder.Probe().m_height2 = sZeroFloat;
+                attrCylinder.m_bottom = probeBase;
+                attrCylinder.Probe().m_direction.x = probeMove.x;
+                attrCylinder.Probe().m_direction.y = probeMove.y;
+                attrCylinder.Probe().m_direction.z = probeMove.z;
+                attrCylinder.Probe().m_top = attrCylinder.Probe().m_direction;
 
                 if (MapMng.CheckHitCylinderNear(
                         reinterpret_cast<CMapCylinder*>(&attrCylinder), reinterpret_cast<Vec*>(&probeMove),

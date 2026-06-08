@@ -4133,9 +4133,7 @@ void CGPartyObj::InitFinished()
 		*reinterpret_cast<float*>(self + 0x13C) = FLOAT_80331A98;
 		*reinterpret_cast<float*>(self + 0x4E8) = FLOAT_80331AB4;
 		unsigned int leadingZeros = __cntlzw(*reinterpret_cast<unsigned int*>(self + 0x6F0));
-		CGPartyObj::m_ghostWork[0] = static_cast<unsigned char>(
-		    (static_cast<int>(static_cast<signed char>(leadingZeros >> 5)) << 7)) |
-		    (CGPartyObj::m_ghostWork[0] & 0x7F);
+		sGhostPartyWork.flagBits.flag80 = static_cast<signed char>(leadingZeros >> 5);
 	}
 }
 

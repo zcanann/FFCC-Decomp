@@ -1446,8 +1446,8 @@ void CGObject::update()
         srt.m_scale.y = m_rotationY;
         srt.m_scale.z = m_rotationZ;
 
-        if (m_worldParamA == 0x20 || m_worldParamA == 0x13 || m_worldParamA == 0x14 ||
-            m_worldParamA == 0x15 || m_worldParamA == 0x16 || m_worldParamA == 0x17) {
+        if (m_worldParamA == 0x20 || m_worldParamA == 0x13 || m_worldParamA == 0x15 ||
+            m_worldParamA == 0x16 || m_worldParamA == 0x17 || m_worldParamA == 0x14) {
             const float wobbleBias = m_worldParamA == 0x20 ? -0.125f : -0.0625f;
             m_radiusCtrl.z += (-0.5f * m_radiusCtrl.y) + wobbleBias;
             m_radiusCtrl.y *= 0.8f;

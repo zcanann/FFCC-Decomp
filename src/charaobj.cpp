@@ -3667,15 +3667,17 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 			}
 
 			int diff = reinterpret_cast<CGCharaObj*>(partyList[0])->m_comboFrame - partyObj->m_comboFrame;
-			int minWindow = static_cast<int>(combiCursor[slot * 3 + 1]);
-			int maxWindow = static_cast<int>(combiCursor[slot * 3 + 2]);
 			int windowOk;
-			if (minWindow <= diff && diff <= maxWindow) {
+			if (partyList[0] == obj) {
 				windowOk = 1;
-			} else {
+			} else if (static_cast<int>(combiCursor[slot * 3 + 1]) > diff) {
 				windowOk = 0;
+			} else if (static_cast<int>(combiCursor[slot * 3 + 2]) < diff) {
+				windowOk = 0;
+			} else {
+				windowOk = 1;
 			}
-			if (!(partyList[0] == obj || windowOk)) {
+			if (!windowOk) {
 				break;
 			}
 

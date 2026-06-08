@@ -49,6 +49,8 @@ extern const float FLOAT_803319A0;
 extern const float FLOAT_803319A4;
 }
 
+extern const float kQuadObjDebugHeight;
+
 static float& CharaObjTargetAngle(CGCharaObj* charaObj)
 {
 	return charaObj->m_targetAngle;
@@ -3378,7 +3380,7 @@ void CGCharaObj::combi2()
 				continue;
 			}
 
-			if (PSVECDistance(partyCenter, &CharaObjComboCenter(other)) < 20.0f) {
+			if (PSVECDistance(partyCenter, &CharaObjComboCenter(other)) < kQuadObjDebugHeight) {
 				hasNearbyPartner = 1;
 				break;
 			}
@@ -3409,7 +3411,7 @@ void CGCharaObj::combi2()
 	}
 
 	for (int i = 1; i < candidateCount; ) {
-		if (PSVECDistance(&CharaObjComboCenter(candidates[0]), &CharaObjComboCenter(candidates[i])) > 20.0f) {
+		if (kQuadObjDebugHeight < PSVECDistance(&CharaObjComboCenter(candidates[0]), &CharaObjComboCenter(candidates[i]))) {
 			for (int j = i; j < candidateCount - 1; j++) {
 				candidates[j] = candidates[j + 1];
 			}

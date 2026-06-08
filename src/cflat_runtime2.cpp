@@ -441,7 +441,7 @@ CFlatRuntime2::CFlatRuntime2()
 	RuntimeDebugFlags(runtime) = 0;
 	m_eventFlags = 0;
 	m_eventMask = -1;
-	m_gameFlags = (m_gameFlags & 0xFB) | 4;
+	m_gameFlagBits.m_flagBit2 = 1;
 	m_debugDataIndex = 0;
 	m_letterEventEnabled = 0;
 	memset(m_savedNextScript, 0, sizeof(m_savedNextScript));

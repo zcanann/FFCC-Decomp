@@ -936,8 +936,14 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
             case 0:
                 cameraPos.x = centerPos.x + LoadFloat(kMana2One);
                 break;
+            case 4:
+                cameraPos.z = centerPos.z + LoadFloat(kMana2One);
+                break;
             case 1:
                 cameraPos.x = centerPos.x - LoadFloat(kMana2One);
+                break;
+            case 5:
+                cameraPos.z = centerPos.z - LoadFloat(kMana2One);
                 break;
             case 2:
                 cameraPos.y = centerPos.y + LoadFloat(kMana2One);
@@ -950,12 +956,6 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
                 cameraUp.x = LoadFloat(kMana2Zero);
                 cameraUp.y = LoadFloat(kMana2Zero);
                 cameraUp.z = LoadFloat(kMana2One);
-                break;
-            case 4:
-                cameraPos.z = centerPos.z + LoadFloat(kMana2One);
-                break;
-            case 5:
-                cameraPos.z = centerPos.z - LoadFloat(kMana2One);
                 break;
             }
 

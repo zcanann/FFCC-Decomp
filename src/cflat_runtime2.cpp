@@ -1634,12 +1634,11 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float radius
 
 		CGObject* object = reinterpret_cast<CGObject*>(baseObj);
 		int newCount = count;
-		const bool passesClassMask = (object->m_attrFlags & static_cast<unsigned int>(classMask)) != 0;
-		const bool passesScriptFilter =
-			((flags & 1) == 0) ||
-			((object->m_scriptHandle != 0) && (*reinterpret_cast<short*>(reinterpret_cast<u8*>(object->m_scriptHandle) + 0x1C) != 0));
 
-		if (passesClassMask && passesScriptFilter) {
+		if (((object->m_attrFlags & static_cast<unsigned int>(classMask)) != 0) &&
+		    (((flags & 1) == 0) ||
+		     ((object->m_scriptHandle != 0) &&
+		      (*reinterpret_cast<short*>(reinterpret_cast<u8*>(object->m_scriptHandle) + 0x1C) != 0)))) {
 			if ((object->m_worldPosition.x != center->x) || (object->m_worldPosition.z != center->z)) {
 				if ((center->x - radius <= object->m_worldPosition.x) &&
 				    (center->z - radius <= object->m_worldPosition.z) &&

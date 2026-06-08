@@ -1485,7 +1485,11 @@ void CShopMenu::DrawSoubiBase()
         drawShapeSeqGrouad(9, 0, x, 0x10C, FLOAT_80332d78, FLOAT_80332dc8, white, white, white, white);
         x += 0x20;
     }
-    drawShapeSeqGrouad(9, 0, x, 0x10C, FLOAT_80332d78, FLOAT_80332dc8, white, fadeA, white, fadeC);
+    _GXColor white2;
+    white2.r = 0xFF; white2.g = 0xFF; white2.b = 0xFF; white2.a = 0xFF;
+    _GXColor fadeA2;
+    fadeA2.r = 0xFF; fadeA2.g = 0xFF; fadeA2.b = 0xFF; fadeA2.a = 0x00;
+    drawShapeSeqGrouad(9, 0, x, 0x10C, FLOAT_80332d78, FLOAT_80332dc8, white2, fadeA2, white2, fadeA2);
 
     drawShapeSeqScale(3, 0, 0x106, 0xA4, FLOAT_80332d78, FLOAT_80332dcc, 0xFF);
     x = 0x106;

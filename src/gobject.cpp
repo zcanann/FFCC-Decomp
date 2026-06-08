@@ -3103,9 +3103,10 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
 
     if (((*reinterpret_cast<u8*>(&m_weaponNodeFlags) & 0x10) != 0) && (Game.m_currentMapId != 0x21)) {
         {
+            Vec bottom = m_worldPosition;
+            bottom.y += useCapsuleOffset != 0 ? m_capsuleHalfHeight : sPushDistance;
             GObjectMapCylinder bodyCylinder;
-            bodyCylinder.m_bottom = m_worldPosition;
-            bodyCylinder.m_bottom.y += useCapsuleOffset != 0 ? m_capsuleHalfHeight : sPushDistance;
+            bodyCylinder.m_bottom = bottom;
             bodyCylinder.Probe().m_direction.x = sZeroFloat;
             bodyCylinder.Probe().m_direction.y = sDownUnitY;
             bodyCylinder.Probe().m_direction.z = sZeroFloat;

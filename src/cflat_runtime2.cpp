@@ -1793,9 +1793,7 @@ void CFlatRuntime2::drawLayer(
 	}
 
 	int textureIndex = layer->m_textureSet->Find(textureName);
-	if (textureIndex < 0) {
-		return;
-	}
+	if (textureIndex >= 0) {
 
 	CTexture* texture = layer->m_textureSet->GetTexture(static_cast<unsigned long>(textureIndex));
 
@@ -1954,6 +1952,12 @@ void CFlatRuntime2::drawLayer(
 	Mtx44 projection;
 	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcsRaw() + 0x94), projection);
 	GXSetProjection(projection, GX_PERSPECTIVE);
+
+	} else {
+		if (static_cast<unsigned int>(System.m_execParam) >= 2) {
+			System.Printf(const_cast<char*>(sCFlatRuntime2LayerMissingMsg), textureName);
+		}
+	}
 }
 
 /*

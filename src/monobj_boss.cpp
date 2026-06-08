@@ -2047,13 +2047,11 @@ void CGMonObj::alwaysFuncMeteoParasite()
 		PSMTXRotRad(reinterpret_cast<CChara::CNode**>(CGMonObj::m_boss)[1]->m_localRuntimeMtx, 'x',
 		            -MG_GBA_THREAD_MSG_SETPORT_ct);
 
-		float rotBase = kMonObjBossTwo;
-		float rotStep = kMonObjBossPi;
-		float rotDivisor = kMonObjBossTwelve;
-		CGObject** rotObjects = reinterpret_cast<CGObject**>(CGMonObj::m_boss + 0x38);
+		CGObject** rotObjects = reinterpret_cast<CGObject**>(CGMonObj::m_boss);
 		for (int i = 0; i < 12; i++) {
-			rotObjects[i]->m_rotTargetY =
-			    rotBase * (rotStep * static_cast<float>(i + 3)) / rotDivisor + MG_GBA_THREAD_MSG_SETPORT_ct;
+			rotObjects[i + 14]->m_rotTargetY =
+			    kMonObjBossTwo * (kMonObjBossPi * static_cast<float>(i + 3)) / kMonObjBossTwelve +
+			    MG_GBA_THREAD_MSG_SETPORT_ct;
 		}
 
 		MG_GBA_THREAD_MSG_SETPORT_ct += kMonObjBossScaleStep;

@@ -2674,7 +2674,10 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         }
         const float blendT = static_cast<float>(fmod(static_cast<double>(phase), 1.0));
         CColor shade;
-        if ((m_flags & 0x20000) == 0 || drawPass == 3) {
+        if ((m_flags & 0x20000) != 0 && drawPass != 3) {
+            CColor white(0xFF, 0xFF, 0xFF, 0xFF);
+            shade = white;
+        } else {
             CColor next;
             next.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(CharaPcs.m_viewerChoiceColor[phaseIndex + 1].color.r) * blendT));
             next.color.g = static_cast<unsigned char>(static_cast<int>(static_cast<float>(CharaPcs.m_viewerChoiceColor[phaseIndex + 1].color.g) * blendT));
@@ -2697,9 +2700,6 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
             blended.color.a = static_cast<unsigned char>(curCopy.color.a + nextCopy.color.a);
             CColor blendedCopy(blended);
             shade = blendedCopy;
-        } else {
-            CColor white(0xFF, 0xFF, 0xFF, 0xFF);
-            shade = white;
         }
 
         CColor3 ambientBase(CharaPcs.m_viewerAmbientColor[lightBank]);

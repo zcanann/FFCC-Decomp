@@ -2880,7 +2880,7 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
     font->SetShadow(1);
     font->SetScale(FLOAT_8032ea78);
 
-    unsigned int lineCount;
+    int lineCount;
     if (useDynamic != 0) {
         lineCount = s_DynamicMess[0];
     } else {

@@ -1197,8 +1197,12 @@ void CShopMenu::DrawItemInfo0()
         SetupShopMenuUnitFont(font);
         const char* message = (m_listType == 0) ? ShopMenuMes(languageId, SHOP_MENU_TEXT_CANNOT_BUY) :
                                                 ShopMenuMes(languageId, SHOP_MENU_TEXT_CANNOT_SELL);
+        float messageWidth = font->GetWidth(message);
         font->DrawInit();
-        DrawShopMenuRightAlignedText(font, message, FLOAT_80332d3c, FLOAT_80332d68, 0x19);
+        int messageX = static_cast<int>(FLOAT_80332d3c - messageWidth);
+        MenuPcs.DrawNoShadowFont(font, const_cast<char*>(message), static_cast<float>(messageX), FLOAT_80332d68, 0x19, 0x12);
+        MenuPcs.DrawInit();
+        font->SetMargin(FLOAT_80332d28);
     }
 
     if (m_subMode == 0) {

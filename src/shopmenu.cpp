@@ -1400,7 +1400,7 @@ void CShopMenu::DrawItemList()
             drawShapeSeq(frame, 1, frameX, y - 4, 0xFF, 0, 0, FLOAT_80332d9c, 0);
             MenuPcs.DrawInit();
             if (m_subMode == 0) {
-                MenuPcs.DrawCursor(0x114 + (System.m_frameCounter & 7), y - 0x14, FLOAT_80332d28);
+                MenuPcs.DrawCursor(0x114 + (static_cast<int>(System.m_frameCounter) % 8), y - 0x14, FLOAT_80332d28);
             } else if ((System.m_frameCounter & 1) == 0) {
                 MenuPcs.DrawCursor(0x114, y - 0x14, FLOAT_80332d28);
             }

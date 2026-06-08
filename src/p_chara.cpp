@@ -985,10 +985,9 @@ void CCharaPcs::onScriptChanging(char*)
  */
 void CCharaPcs::calc()
 {
-    CHandle* head = m_handleList;
-    CHandle* handle = head->m_next;
+    CHandle* handle = m_handleList->m_next;
 
-    while (head != handle) {
+    while (m_handleList != handle) {
         CHandle* next = handle->m_next;
         handle->m_shadowTexturePtr = 0;
         handle->loadModelASyncFrame();

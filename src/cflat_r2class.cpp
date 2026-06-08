@@ -987,6 +987,19 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
+		case -0x23: {
+			float* params = reinterpret_cast<float*>(object->m_localBase);
+			CGObject* result = engineObject->CCClassRot(
+			    static_cast<int>(object->m_localBase[0]), static_cast<int>(object->m_localBase[1]), params[2], params[3],
+			    params[4], params[5]);
+			if (result != 0) {
+				*reinterpret_cast<int*>(object->m_localBase[6]) =
+				    *reinterpret_cast<short*>(reinterpret_cast<u8*>(result) + 0x30);
+			}
+			PushValue(this, object, result != 0);
+			outResult = 0;
+			break;
+		}
 		case -0x24: {
 			Vec hitStart;
 			Vec hitMove;

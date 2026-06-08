@@ -2153,14 +2153,14 @@ void CGObject::Attach(CGObject* owner, char* nodeName, Vec* attachLocal)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGObject::CCClassRot(int useBodyRadius, int classMask, float yOffset, float rotY, float distance, float radius)
+CGObject* CGObject::CCClassRot(int useBodyRadius, int classMask, float yOffset, float rotY, float distance, float radius)
 {
     Vec targetPos;
 
     targetPos.x = distance * static_cast<float>(sin(rotY)) + m_worldPosition.x;
     targetPos.y = m_worldPosition.y + yOffset;
     targetPos.z = distance * static_cast<float>(cos(rotY)) + m_worldPosition.z;
-    CCClass(useBodyRadius, classMask, yOffset, &targetPos, radius);
+    return CCClass(useBodyRadius, classMask, yOffset, &targetPos, radius);
 }
 
 /*

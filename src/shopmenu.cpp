@@ -1674,7 +1674,7 @@ void CShopMenu::DrawShopBase()
         font->SetShadow(0);
         font->SetScaleX(FLOAT_80332d2c);
         font->SetScaleY(FLOAT_80332d28);
-        font->SetColor(white);
+        font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 
         font->DrawInit();
         Graphic.SetDrawDoneDebugData(0x10);

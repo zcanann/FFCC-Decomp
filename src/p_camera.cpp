@@ -1222,7 +1222,7 @@ void CCameraPcs::destroyMap()
 void CCameraPcs::calcMap()
 {
     bool useDebugPad = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
-    s16 buttons;
+    u16 buttons;
     float stickH;
     float stickV;
     float triggerL;

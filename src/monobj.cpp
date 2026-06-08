@@ -363,7 +363,7 @@ void CGMonObj::rotTarget(int targetPartyIndex, float rotLimit)
 
 static inline void CGMonObj_SetAttackAfter(CGMonObj* monObj, int attackKind)
 {
-	unsigned int delay = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (attackKind * 0x48 + 0xA));
+	int delay = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (attackKind * 0x48 + 0xA));
 	if (delay == 0xFFFF) {
 		delay = 0;
 	}
@@ -384,11 +384,8 @@ static inline void CGMonObj_SetAttackAfter(CGMonObj* monObj, int attackKind)
 		delay &= ~((int)delay >> 31);
 	}
 
-	if (delay == 0) {
-		reinterpret_cast<CGPrgObj*>(monObj)->changeStat(0, 0, 0);
-	} else {
-		int range = (int)delay / 5 + ((int)delay >> 31);
-		range -= range >> 31;
+	if (delay != 0) {
+		int range = delay / 5;
 		int clampedRange = 1;
 		if (0 < range) {
 			clampedRange = range;
@@ -396,6 +393,8 @@ static inline void CGMonObj_SetAttackAfter(CGMonObj* monObj, int attackKind)
 
 		monObj->m_attackDelay = delay + Math.Rand(clampedRange);
 		reinterpret_cast<CGPrgObj*>(monObj)->changeStat(0x11, 0, 0);
+	} else {
+		reinterpret_cast<CGPrgObj*>(monObj)->changeStat(0, 0, 0);
 	}
 }
 

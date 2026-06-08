@@ -2500,7 +2500,7 @@ void CChara::CModel::AttachTextureSet(CTextureSet* texSet)
  */
 void CChara::CModel::AddFrame(float frame)
 {
-	m_curFrame += frame;
+	m_time += frame;
 }
 
 /*
@@ -2514,7 +2514,7 @@ void CChara::CModel::AddFrame(float frame)
  */
 void CChara::CModel::SetFrame(float frame)
 {
-	m_curFrame = frame;
+	m_time = frame;
 }
 
 /*

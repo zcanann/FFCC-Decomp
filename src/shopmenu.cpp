@@ -2344,7 +2344,11 @@ void CShopMenu::SelectYesNo()
             }
         } else {
             if (MenuPcs.EquipChk(itemIndex) == 0) {
-                canTrade = tradeItem >= 0x9F;
+                if (tradeItem >= 0x9F) {
+                    canTrade = true;
+                } else {
+                    canTrade = false;
+                }
             } else {
                 canTrade = false;
             }

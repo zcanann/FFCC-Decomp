@@ -5037,7 +5037,10 @@ void CMenuPcs::DrawMoveMenu()
 
 	{
 		const short state = worldState->m_mainState;
-		if (((state == 0) && bytes[0x12] == 0) || state > 3) {
+		if ((state == 0) && bytes[0x12] == 0) {
+			return;
+		}
+		if (state > 3) {
 			return;
 		}
 	}

@@ -1190,9 +1190,9 @@ void GbaQueue::SetRadarType()
 		const int slot = rand() & 3;
 		if ((activeMask & (1 << slot)) != 0) {
 			int assignedType = assignedCount;
-			if (assignedCount > 1) {
+			if (assignedCount >= 2) {
 				if (assignedCount == 2) {
-					assignedType = (rand() & 1) + 2;
+					assignedType = assignedCount + (rand() & 1);
 				} else {
 					assignedType = (prevAssignedType == 2) ? 3 : 2;
 				}

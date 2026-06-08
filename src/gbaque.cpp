@@ -652,10 +652,10 @@ void GbaQueue::ExecutQueue()
 			} else if (cmd == 0x1A) {
 				if (caravanWork != 0) {
 					unsigned int cmdWord = queueWords[i];
-					const unsigned char p0 = static_cast<signed char>(cmdWord >> 24);
+					const signed char p0 = static_cast<signed char>(cmdWord >> 24);
 					const signed char p1 = static_cast<unsigned char>(cmdWord >> 16);
 					const signed char p2 = static_cast<unsigned char>(cmdWord >> 8);
-					const unsigned char p3 = static_cast<unsigned char>(cmdWord);
+					const signed char p3 = static_cast<unsigned char>(cmdWord);
 
 					if ((static_cast<int>(p0) >> 6) == 0) {
 						m_moneyState[channel] = static_cast<unsigned char>(p1 | 0x80);
@@ -750,7 +750,7 @@ void GbaQueue::ExecutQueue()
 				} else if (request == 3) {
 					ChkCMakeJob(channel, cmdWord);
 				} else if (request == 4 || request == 5) {
-					unsigned char status = cmdBytes[1];
+					signed char status = cmdBytes[1];
 					int retry;
 					for (retry = 0; retry < 10; retry++) {
 						if (Joybus.SetMType(channel, 4) == 0) {

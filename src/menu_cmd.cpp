@@ -2411,10 +2411,11 @@ void CMenuPcs::DrawUniteList()
 		font->SetPosX((static_cast<float>(panel->width) - width) *
 		                  static_cast<float>(kCmdMenuHalfD) +
 		              static_cast<float>(panel->x));
-		font->SetPosY(((static_cast<float>(panel->height) - static_cast<float>(kCmdMenuTextLineHeightD)) *
-		                   static_cast<float>(kCmdMenuHalfD) +
-		               static_cast<float>(panel->y)) -
-		              kCmdMenuTextYOffset - static_cast<float>(kCmdMenuTextBaselineOffsetD));
+		font->SetPosY(static_cast<float>(((static_cast<float>(panel->height) - kCmdMenuTextLineHeightD) *
+		                                      kCmdMenuHalfD +
+		                                  static_cast<float>(panel->y)) -
+		                                 kCmdMenuTextBaselineOffsetD) -
+		              kCmdMenuTextYOffset);
 		font->Draw(text);
 	}
 

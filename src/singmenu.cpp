@@ -2071,11 +2071,8 @@ void CMenuPcs::SingleCalcCtrl()
         } else {
             result = ItemClose();
         }
-        if (m_singleLifeTimer >= 0) {
-            ++m_singleLifeTimer;
-            if (m_singleLifeTimer > 0x31) {
-                m_singleLifeTimer = -1;
-            }
+        if ((m_singleLifeTimer >= 0) && (++m_singleLifeTimer, m_singleLifeTimer >= 0x32)) {
+            m_singleLifeTimer = -1;
         }
         break;
     }

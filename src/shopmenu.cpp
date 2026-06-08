@@ -348,8 +348,7 @@ static void SetupShopMenuInfoFont(CFont* font)
     font->SetMargin(FLOAT_80332d28);
     font->SetShadow(1);
     font->SetScale(FLOAT_80332d28);
-    CColor white(0xFF, 0xFF, 0xFF, 0xFF);
-    font->SetColor(white.color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 }
 
 static void SetupShopMenuUnitFont(CFont* font)
@@ -365,8 +364,7 @@ static void SetupShopMenuAmountFont(CFont* font)
     font->SetShadow(1);
     font->SetScaleX(FLOAT_80332d28);
     font->SetScaleY(FLOAT_80332d8c);
-    CColor white(0xFF, 0xFF, 0xFF, 0xFF);
-    font->SetColor(white.color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
     font->DrawInit();
     reinterpret_cast<unsigned char*>(font)[0x24] = (reinterpret_cast<unsigned char*>(font)[0x24] & 0xEF) | 0x10;
     font->SetMargin(FLOAT_80332d64);
@@ -376,8 +374,7 @@ static void SetupShopMenuMakeAmountFont(CFont* font)
 {
     font->SetShadow(1);
     font->SetScale(FLOAT_80332d28);
-    CColor white(0xFF, 0xFF, 0xFF, 0xFF);
-    font->SetColor(white.color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
     font->DrawInit();
     reinterpret_cast<unsigned char*>(font)[0x24] = (reinterpret_cast<unsigned char*>(font)[0x24] & 0xEF) | 0x10;
     font->SetMargin(FLOAT_80332e10 * FLOAT_80332d28 + FLOAT_80332d10);
@@ -387,8 +384,7 @@ static void SetupShopMenuMakeOwnedFont(CFont* font)
 {
     font->SetShadow(1);
     font->SetScale(FLOAT_80332d28);
-    CColor white(0xFF, 0xFF, 0xFF, 0xFF);
-    font->SetColor(white.color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
     font->DrawInit();
     reinterpret_cast<unsigned char*>(font)[0x24] = (reinterpret_cast<unsigned char*>(font)[0x24] & 0xEF) | 0x10;
     font->SetMargin(FLOAT_80332d64);
@@ -441,8 +437,7 @@ static void SetupShopMenuLabelFont(CFont* font)
     font->SetShadow(0);
     font->SetScaleX(FLOAT_80332d2c);
     font->SetScaleY(FLOAT_80332d28);
-    CColor white(0xFF, 0xFF, 0xFF, 0xFF);
-    font->SetColor(white.color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 }
 
 static inline CFont* GetShopMenuInfoPanelFont()
@@ -943,8 +938,7 @@ void CShopMenu::DrawItemHelp(int index, int centerX, int y)
     font->SetScaleX(FLOAT_80332d2c);
     font->SetScaleY(FLOAT_80332d28);
 
-    CColor white(0xFF, 0xFF, 0xFF, 0xFF);
-    font->SetColor(white.color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
     font->DrawInit();
     int x = centerX - static_cast<int>(font->GetWidth(helpText)) / 2;
     font->SetPosX(static_cast<float>(x + 1));
@@ -982,8 +976,7 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
     font->SetShadow(1);
     font->SetScaleX(FLOAT_80332d2c);
     font->SetScaleY(FLOAT_80332d28);
-    CColor white(0xFF, 0xFF, 0xFF, 0xFF);
-    font->SetColor(white.color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
     font->DrawInit();
 
     int languageId = static_cast<unsigned int>(Game.m_gameWork.m_languageId);
@@ -1020,8 +1013,7 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
     font->SetShadow(1);
     font->SetScale(FLOAT_80332d28);
     {
-        CColor valueWhite(0xFF, 0xFF, 0xFF, 0xFF);
-        font->SetColor(valueWhite.color);
+        font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
     }
     font->DrawInit();
     reinterpret_cast<unsigned char*>(font)[0x24] = (reinterpret_cast<unsigned char*>(font)[0x24] & 0xEF) | 0x10;
@@ -1117,8 +1109,7 @@ void CShopMenu::DrawItemInfo0()
     font->SetShadow(1);
     font->SetScaleX(FLOAT_80332d2c);
     font->SetScaleY(FLOAT_80332d28);
-    CColor white(0xFF, 0xFF, 0xFF, 0xFF);
-    font->SetColor(white.color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
     font->DrawInit();
 
     if (itemNo > 0) {
@@ -1205,7 +1196,7 @@ void CShopMenu::DrawItemInfo0()
         int amount = m_quantity;
         font->SetShadow(1);
         font->SetScale(FLOAT_80332d28);
-        font->SetColor(white.color);
+        font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
         font->DrawInit();
         reinterpret_cast<unsigned char*>(font)[0x24] = (reinterpret_cast<unsigned char*>(font)[0x24] & 0xEF) | 0x10;
         font->SetMargin(FLOAT_80332d34);
@@ -1402,8 +1393,7 @@ void CShopMenu::DrawItemList()
             font->SetShadow(0);
             font->SetScale(FLOAT_80332d28);
 
-            CColor white(0xFF, 0xFF, 0xFF, 0xFF);
-            font->SetColor(white.color);
+            font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
             font->DrawInit();
             font->SetPosX(static_cast<float>(frameX - 0x54));
             font->SetPosY(static_cast<float>(y - 0x14));
@@ -1789,8 +1779,7 @@ void CShopMenu::DrawSoubi()
     font->SetShadow(1);
     font->SetScale(FLOAT_80332d28);
 
-    CColor white(0xFF, 0xFF, 0xFF, 0xFF);
-    font->SetColor(white.color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
     font->DrawInit();
 
     char* itemName = 0;
@@ -1815,8 +1804,7 @@ void CShopMenu::DrawSoubi()
     labelFont->SetMargin(FLOAT_80332d28);
     labelFont->SetShadow(0);
     {
-        CColor labelWhite(0xFF, 0xFF, 0xFF, 0xFF);
-        labelFont->SetColor(labelWhite.color);
+        labelFont->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
     }
     labelFont->SetScaleX(FLOAT_80332d2c);
     labelFont->SetScaleY(FLOAT_80332d28);
@@ -1858,8 +1846,7 @@ void CShopMenu::DrawMake()
     font->SetMargin(FLOAT_80332d28);
     font->SetShadow(1);
     font->SetScale(FLOAT_80332d28);
-    CColor white(0xFF, 0xFF, 0xFF, 0xFF);
-    font->SetColor(white.color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 
     const char* itemName = GetItemName(m_resultItem);
     font->DrawInit();
@@ -1927,8 +1914,7 @@ void CShopMenu::DrawMake()
     font->SetShadow(1);
     font->SetScale(FLOAT_80332d28);
     {
-        CColor materialsColor(0xFF, 0xFF, 0xFF, 0xFF);
-        font->SetColor(materialsColor.color);
+        font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
     }
     font->DrawInit();
     const char* materialsText = ShopMenuMes(languageId, SHOP_MENU_TEXT_MATERIALS);
@@ -2034,8 +2020,7 @@ void CShopMenu::DrawSmith0()
     font->SetShadow(1);
     font->SetScale(FLOAT_80332d8c);
 
-    CColor white(0xFF, 0xFF, 0xFF, 0xFF);
-    font->SetColor(white.color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
     font->DrawInit();
 
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
@@ -2097,8 +2082,7 @@ void CShopMenu::DrawShop0()
     font->SetMargin(FLOAT_80332d28);
     font->SetShadow(1);
     font->SetScale(FLOAT_80332d8c);
-    CColor white(0xFF, 0xFF, 0xFF, 0xFF);
-    font->SetColor(white.color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
     font->DrawInit();
 
     Graphic.SetDrawDoneDebugData(0x21);

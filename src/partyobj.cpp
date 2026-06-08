@@ -4954,15 +4954,15 @@ messageMenu:
 
 	int auraSlot = 0;
 	int gauge = *reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x38);
-	if (static_cast<int>(distFar * 3) / 3 < gauge) {
+	if (gauge > static_cast<int>(distFar * 3) / 3) {
 		auraSlot = 0xF;
-	} else if (static_cast<int>(distFar << 1) / 3 < gauge) {
+	} else if (gauge > static_cast<int>(distFar << 1) / 3) {
 		auraSlot = 0xE;
-	} else if (static_cast<int>(distFar) / 3 < gauge) {
+	} else if (gauge > static_cast<int>(distFar) / 3) {
 		auraSlot = 0xD;
 	}
 
-	unsigned int prevSlot = *reinterpret_cast<unsigned int*>(CGPartyObj::m_ghostWork + 0x8C);
+	int prevSlot = *reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x8C);
 	if (prevSlot != auraSlot) {
 		endPSlotBit(0x400);
 		prevSlot = auraSlot;

@@ -1915,7 +1915,7 @@ void CMenuPcs::CalcDiaryMenu()
 			int frameStep = 0;
 			if (state == 0) {
 				frameStep = m_wmWorldState->m_frameCounter - 10;
-			} else if (state < 1 || state > 3) {
+			} else if (state <= 0 || state >= 4) {
 				frameStep = -m_wmWorldState->m_frameCounter;
 			}
 			CalcWmFrame0Inline(this, frameStep);
@@ -1948,7 +1948,7 @@ void CMenuPcs::CalcDiaryMenu()
 				int frameStep = 0;
 				if (state == 0) {
 					frameStep = m_wmWorldState->m_frameCounter - 10;
-				} else if (state < 1 || state > 3) {
+				} else if (state <= 0 || state >= 4) {
 					frameStep = -m_wmWorldState->m_frameCounter;
 				}
 				CalcWmFrame0Inline(this, frameStep);

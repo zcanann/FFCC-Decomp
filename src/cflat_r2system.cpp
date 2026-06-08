@@ -4299,20 +4299,26 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
             break;
         case -0x7A: {
             unsigned int languageValue = 1;
-            if (gameWork.m_languageId == 3) {
+            switch (gameWork.m_languageId) {
+            case 0:
+                languageValue = 1;
+                break;
+            case 1:
+                languageValue = 3;
+                break;
+            case 3:
                 languageValue = 6;
-            } else if (gameWork.m_languageId < 3) {
-                if (gameWork.m_languageId == 1) {
-                    languageValue = 3;
-                } else if (gameWork.m_languageId == 0) {
-                    languageValue = 1;
-                } else {
-                    languageValue = 5;
-                }
-            } else if (gameWork.m_languageId == 5) {
+                break;
+            case 5:
                 languageValue = 7;
-            } else if (gameWork.m_languageId < 5) {
-                languageValue = 4;
+                break;
+            default:
+                if (gameWork.m_languageId < 3) {
+                    languageValue = 5;
+                } else if (gameWork.m_languageId < 5) {
+                    languageValue = 4;
+                }
+                break;
             }
             FlatLastResult(this) = languageValue;
             break;

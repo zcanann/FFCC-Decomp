@@ -505,8 +505,19 @@ void CGPartyObj::onCancelStat(int state)
 		endPSlotBit(0x100);
 		break;
 	case 0x0F:
-		if ((party.commandFlags & 0x20) != 0) {
-			checkAndSetWeapon();
+		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x6C4]) << 26) & 0xC0000000) >> 31) != 0) {
+			int weaponB = *reinterpret_cast<int*>(self + 0x6D4);
+			int weaponA = *reinterpret_cast<int*>(self + 0x6D8);
+			if (weaponA < 1) {
+				LoadWeapon(-1, 0);
+			} else {
+				unsigned short packedItem = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + weaponA * 0x48 + 2);
+				LoadWeapon(packedItem & 0xFFF, packedItem >> 12);
+			}
+			*reinterpret_cast<int*>(self + 0x6DC) = weaponB;
+			*reinterpret_cast<int*>(self + 0x6E0) = weaponA;
+			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->SetCurrentWeaponIdx(*reinterpret_cast<int*>(self + 0x6DC));
+			party.commandFlagBits.flag20 = 0;
 		}
 		break;
 	case 0x15:

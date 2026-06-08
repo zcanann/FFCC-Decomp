@@ -11710,15 +11710,14 @@ unsigned int CMenuPcs::BindEffect(int slot, int effectNo, int cameraSlot)
 void CMenuPcs::SetLight(int mode)
 {
 	Graphic.SetFog(1, 0);
-	WmMenuLightTable& lightTable = gWmMenuLightTables[mode];
 
-	LightPcs.SetAmbient(lightTable.m_ambient);
-	LightPcs.SetNumDiffuse(static_cast<unsigned long>(lightTable.m_diffuseCount));
+	LightPcs.SetAmbient(gWmMenuLightTables[mode].m_ambient);
+	LightPcs.SetNumDiffuse(static_cast<unsigned long>(gWmMenuLightTables[mode].m_diffuseCount));
 
-	for (int i = 0; i < lightTable.m_diffuseCount; i++) {
+	for (int i = 0; i < gWmMenuLightTables[mode].m_diffuseCount; i++) {
 		LightPcs.SetDiffuse(
-			static_cast<unsigned long>(i), lightTable.m_diffuseColors[i],
-			&lightTable.m_diffuseDirs[i], 0);
+			static_cast<unsigned long>(i), gWmMenuLightTables[mode].m_diffuseColors[i],
+			&gWmMenuLightTables[mode].m_diffuseDirs[i], 0);
 	}
 
 	LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);

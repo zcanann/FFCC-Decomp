@@ -1405,9 +1405,8 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 			const int sourceIdx = cmpType & 0x7FF;
 
 			if (sourceType != 3) {
-				if (sourceType == 1) {
-					cmpValue = Game.m_gameWork.m_eventWork[sourceIdx];
-				} else if (sourceType == 0) {
+				switch (sourceType) {
+				case 0:
 					switch (sourceIdx) {
 					case 0:
 						cmpValue = sysVal0;
@@ -1422,8 +1421,13 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 						cmpValue = sysVal3;
 						break;
 					}
-				} else if (sourceType < 3) {
+					break;
+				case 1:
+					cmpValue = Game.m_gameWork.m_eventWork[sourceIdx];
+					break;
+				case 2:
 					cmpValue = m_evtWordArr[sourceIdx];
+					break;
 				}
 
 				const int op = cmpType >> 13;
@@ -1445,7 +1449,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 					}
 					break;
 				case 3:
-					if (compareValue < cmpValue) {
+					if (cmpValue > compareValue) {
 						goto NextLetter;
 					}
 					break;
@@ -1455,7 +1459,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 					}
 					break;
 				case 5:
-					if (compareValue <= cmpValue) {
+					if (cmpValue >= compareValue) {
 						goto NextLetter;
 					}
 					break;

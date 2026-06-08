@@ -13539,16 +13539,16 @@ int McCtrl::ChkEmpty(int param_2)
 
 	int state = m_state;
 
-	if (state < 2)
+	switch (state)
 	{
-		if (state == 0)
-		{
-			MemoryCardMan.McMount(m_cardChannel);
-			m_lastResult = MemoryCardMan.GetResult();
-			m_state = 1;
-			m_iteration = 0;
-		}
-		else if (state > -1 && MemoryCardMan.AsyncFinished() == 1)
+	case 0:
+		MemoryCardMan.McMount(m_cardChannel);
+		m_lastResult = MemoryCardMan.GetResult();
+		m_state = 1;
+		m_iteration = 0;
+		break;
+	case 1:
+		if (MemoryCardMan.AsyncFinished() == 1)
 		{
 			m_lastResult = MemoryCardMan.GetResult();
 
@@ -13587,8 +13587,8 @@ int McCtrl::ChkEmpty(int param_2)
 				m_state = -1;
 			}
 		}
-	}
-	else if (state == 2)
+		break;
+	case 2:
 	{
 		m_lastResult = MemoryCardMan.McOpen(m_cardChannel);
 
@@ -13596,14 +13596,16 @@ int McCtrl::ChkEmpty(int param_2)
 		{
 			if (m_lastResult == -4)
 			{
-				if (param_2 != 0)
+				if (param_2 == 0)
+				{
+					m_state = 3;
+				}
+				else
 				{
 					MemoryCardMan.McUnmount(m_cardChannel);
 					m_state = -1;
 					return -6;
 				}
-
-				m_state = 3;
 			}
 			else
 			{
@@ -13624,38 +13626,41 @@ int McCtrl::ChkEmpty(int param_2)
 			MemoryCardMan.McUnmount(m_cardChannel);
 			m_state = 4;
 		}
+		break;
 	}
-	else if (state != 4 && state < 4)
-	{
-		m_lastResult = MemoryCardMan.McFreeBlocks(m_cardChannel, bytesFree, &filesFree);
-		MemoryCardMan.McUnmount(m_cardChannel);
-
-		if (m_lastResult < 0)
+	case 3:
 		{
-			if (m_lastResult == -5)
-			{
-				m_state = -1;
-				return -5;
-			}
+			m_lastResult = MemoryCardMan.McFreeBlocks(m_cardChannel, bytesFree, &filesFree);
+			MemoryCardMan.McUnmount(m_cardChannel);
 
-			m_state = -1;
+			if (m_lastResult < 0)
+			{
+				if (m_lastResult == -5)
+				{
+					m_state = -1;
+					return -5;
+				}
+
+				m_state = -1;
+			}
+			else
+			{
+				if (filesFree == 0)
+				{
+					m_state = -1;
+					return -2;
+				}
+
+				if (bytesFree[0] < 0x2C000)
+				{
+					m_state = -1;
+					return -2;
+				}
+
+				m_state = 4;
+			}
 		}
-		else
-		{
-			if (filesFree == 0)
-			{
-				m_state = -1;
-				return -2;
-			}
-
-			if (bytesFree[0] < 0x2C000)
-			{
-				m_state = -1;
-				return -2;
-			}
-
-			m_state = 4;
-		}
+		break;
 	}
 
 	int result;

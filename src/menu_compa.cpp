@@ -298,8 +298,9 @@ void CMenuPcs::CompaDraw()
 
 	const char* job = GetJobStr(nameWork->unk_0x3ac);
 	font->GetWidth(job);
+	float jobY = static_cast<float>(compaList->entries[0].y + 0x20);
 	font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x18));
-	font->SetPosY(static_cast<float>(compaList->entries[0].y + 0x20) - kCompaTextYOffset - kCompaJobYOffset);
+	font->SetPosY(jobY - kCompaTextYOffset - kCompaJobYOffset);
 	font->Draw(job);
 
 	DrawInit();

@@ -2295,12 +2295,12 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 		m_bossState = controlValue;
 		break;
 
-	case 4:
-		Game.m_gameWork.m_radarType = value8;
-		break;
-
 	case 5:
 		m_bossSubState = controlValue;
+		break;
+
+	case 4:
+		Game.m_gameWork.m_radarType = value8;
 		break;
 
 	case 6:
@@ -2327,6 +2327,10 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 		MenuPcs.ClrBattleItem();
 		break;
 
+	case 0x14:
+		Chara.TimeMogFur();
+		break;
+
 	case 0xA:
 		m_gameFlags = static_cast<u8>((m_gameFlags & 0xEF) | ((value8 & 1) << 4));
 		break;
@@ -2337,7 +2341,7 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 
 	case 0xE:
 		m_gameFlags = static_cast<u8>((m_gameFlags & 0xFD) | ((value8 & 1) << 1));
-		gChara.ChangeMogMode(controlValue);
+		Chara.ChangeMogMode(controlValue);
 		break;
 
 	case 0x12:
@@ -2353,10 +2357,6 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 		}
 		break;
 	}
-
-	case 0x14:
-		gChara.TimeMogFur();
-		break;
 
 	case 0x17:
 	Pad.m_stickDigitalThreshold = static_cast<int>(controlValue);

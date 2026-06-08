@@ -1771,7 +1771,7 @@ void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
     radarMode = m_radarType[channel];
     localEntry = localEnemyData;
     for (i = 0; i < 0x40; i++) {
-        *reinterpret_cast<short*>(localEntry + 8) = *reinterpret_cast<short*>(localEntry + 8) - baseX;
+        *reinterpret_cast<short*>(localEntry + 8) = *reinterpret_cast<unsigned short*>(localEntry + 8) - baseX;
         *reinterpret_cast<short*>(localEntry + 10) = *reinterpret_cast<short*>(localEntry + 10) - baseZ;
 
         int enemyX = *reinterpret_cast<short*>(localEntry + 8);

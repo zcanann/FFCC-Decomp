@@ -1055,22 +1055,17 @@ comm_fail:
             }
             else
             {
-                int status = GBAGetStatus(channel, param + 0xC0);
-                if (status == 0)
+                int status;
+                if (GBAGetStatus(channel, param + 0xC0) == 0 && param[0xC0] == 0x28 &&
+                    GBARead(channel, reinterpret_cast<u8*>(&identity7), param + 0xC0) == 0)
                 {
-                    if (param[0xC0] == 0x28)
-                    {
-                        status = GBARead(channel, reinterpret_cast<u8*>(&identity7), param + 0xC0);
-                        if (status == 0)
-                        {
-                            *reinterpret_cast<unsigned int*>(param + 0xA4) = identity7;
-                            param[0xC3] = 1;
-                        }
-                    }
-                    else
-                    {
-                        status = 1;
-                    }
+                    *reinterpret_cast<unsigned int*>(param + 0xA4) = identity7;
+                    param[0xC3] = 1;
+                    status = 0;
+                }
+                else
+                {
+                    status = 1;
                 }
                 if (status == 0 &&
                     (memcmp(param + 0xA4, self + 0x1344, 4) == 0 || *reinterpret_cast<unsigned int*>(param + 0xA4) == 0x414D4752))
@@ -1137,22 +1132,17 @@ comm_fail:
         ret = GBAReset(channel, param + 0xC0);
         if (ret == 0)
         {
-            int status = GBAGetStatus(channel, param + 0xC0);
-            if (status == 0)
+            int status;
+            if (GBAGetStatus(channel, param + 0xC0) == 0 && param[0xC0] == 0x28 &&
+                GBARead(channel, reinterpret_cast<u8*>(&identity8), param + 0xC0) == 0)
             {
-                if (param[0xC0] == 0x28)
-                {
-                    status = GBARead(channel, reinterpret_cast<u8*>(&identity8), param + 0xC0);
-                    if (status == 0)
-                    {
-                        *reinterpret_cast<unsigned int*>(param + 0xA4) = identity8;
-                        param[0xC3] = 1;
-                    }
-                }
-                else
-                {
-                    status = 1;
-                }
+                *reinterpret_cast<unsigned int*>(param + 0xA4) = identity8;
+                param[0xC3] = 1;
+                status = 0;
+            }
+            else
+            {
+                status = 1;
             }
             if (status == 0 &&
                 (memcmp(param + 0xA4, self + 0x1344, 4) == 0 || *reinterpret_cast<unsigned int*>(param + 0xA4) == 0x414D4752))

@@ -2288,13 +2288,12 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
     memset(workText, 0, kGbaQueueScratchTextSize);
 
     CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
-    CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[letterIndex];
-    CMes::m_tempVar[0] = letter->TempVar(0);
-    CMes::m_tempVar[1] = letter->TempVar(1);
-    CMes::m_tempVar[2] = letter->TempVar(2);
-    CMes::m_tempVar[3] = letter->TempVar(3);
+    CMes::m_tempVar[0] = caravanWork->m_letters[letterIndex].TempVar(0);
+    CMes::m_tempVar[1] = caravanWork->m_letters[letterIndex].TempVar(1);
+    CMes::m_tempVar[2] = caravanWork->m_letters[letterIndex].TempVar(2);
+    CMes::m_tempVar[3] = caravanWork->m_letters[letterIndex].TempVar(3);
 
-    unsigned short msgIndex = letter->HeaderWord();
+    unsigned short msgIndex = caravanWork->m_letters[letterIndex].HeaderWord();
     int mesIndex = (msgIndex & 0x7FC) >> 1;
     char** mesPtr = reinterpret_cast<char**>(Game.m_cFlatDataArr[1].Data(3).m_data);
 

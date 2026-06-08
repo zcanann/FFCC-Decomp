@@ -33,15 +33,6 @@ extern double DOUBLE_80330400;
 extern const Vec DAT_801D9B88;
 extern const Vec DAT_801D9B94;
 
-struct GObjectMapCylinder {
-    Vec m_bottom;
-    CMapCylinderProbeView m_probe;
-
-    CMapCylinderProbeView& Probe() { return m_probe; }
-    const CMapCylinderProbeView& Probe() const { return m_probe; }
-};
-typedef char GObjectMapCylinder_size_check[(sizeof(GObjectMapCylinder) == sizeof(CMapCylinder)) ? 1 : -1];
-
 struct CModelAnimState {
     u8 _padB4[0xB4];
     float m_time;
@@ -927,20 +918,14 @@ void CGObject::bgNormalCollision()
     pos.y += sStepProbeHeight + m_capsuleHalfHeight;
 
     unsigned int retry = 4;
+    const float capsuleRadius = m_capsuleHalfHeight;
     while (retry != 0) {
-        GObjectMapCylinder bodyCylinder;
-        bodyCylinder.Probe().m_radius2 = m_capsuleHalfHeight;
-        bodyCylinder.Probe().m_radius = sHugeCylinderExtent;
-        bodyCylinder.Probe().m_height = sHugeCylinderExtent;
-        bodyCylinder.Probe().m_height2 = sZeroFloat;
-        bodyCylinder.Probe().m_direction2.x = sNegHugeCylinderExtent;
-        bodyCylinder.Probe().m_direction2.y = sNegHugeCylinderExtent;
-        bodyCylinder.Probe().m_direction2.z = sNegHugeCylinderExtent;
+        CMapCylinder bodyCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
         bodyCylinder.m_bottom = pos;
-        bodyCylinder.Probe().m_direction = move;
-        bodyCylinder.Probe().m_top = move;
+        bodyCylinder.m_axis = move;
+        bodyCylinder.m_radius = capsuleRadius;
 
-        if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&bodyCylinder), &move, m_bgHitMask) == 0) {
+        if (MapMng.CheckHitCylinderNear(&bodyCylinder, &move, m_bgHitMask) == 0) {
             break;
         }
 
@@ -972,21 +957,14 @@ void CGObject::bgNormalCollision()
     move.y = m_groundHitOffset.y - sStepProbeHeight;
     move.z = sZeroFloat;
 
-    GObjectMapCylinder stepCylinder;
-    stepCylinder.Probe().m_radius2 = m_capsuleHalfHeight;
-    stepCylinder.Probe().m_radius = sHugeCylinderExtent;
-    stepCylinder.Probe().m_height = sHugeCylinderExtent;
-    stepCylinder.Probe().m_height2 = sZeroFloat;
-    stepCylinder.Probe().m_direction2.x = sNegHugeCylinderExtent;
-    stepCylinder.Probe().m_direction2.y = sNegHugeCylinderExtent;
-    stepCylinder.Probe().m_direction2.z = sNegHugeCylinderExtent;
+    CMapCylinder stepCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
     stepCylinder.m_bottom = pos;
-    stepCylinder.Probe().m_direction.x = sZeroFloat;
-    stepCylinder.Probe().m_direction.z = sZeroFloat;
-    stepCylinder.Probe().m_direction.y = move.y;
-    stepCylinder.Probe().m_top = stepCylinder.Probe().m_direction;
+    stepCylinder.m_axis.x = sZeroFloat;
+    stepCylinder.m_axis.z = sZeroFloat;
+    stepCylinder.m_axis.y = move.y;
+    stepCylinder.m_radius = m_capsuleHalfHeight;
 
-    if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&stepCylinder), &move, m_bgHitMask) == 0) {
+    if (MapMng.CheckHitCylinderNear(&stepCylinder, &move, m_bgHitMask) == 0) {
         pos.y -= m_capsuleHalfHeight;
         PSVECAdd(&pos, &move, &pos);
         PSVECSubtract(&pos, &m_worldPosition, &m_groundHitOffset);
@@ -1004,19 +982,12 @@ void CGObject::bgNormalCollision()
     }
 
     if (MapMng.m_hitMapObj->CalcHitSlide(&move, sBgAttrNormal) != 0) {
-        GObjectMapCylinder hitCylinder;
-        hitCylinder.Probe().m_radius2 = m_capsuleHalfHeight;
-        hitCylinder.Probe().m_radius = sHugeCylinderExtent;
-        hitCylinder.Probe().m_height = sHugeCylinderExtent;
-        hitCylinder.Probe().m_height2 = 0.0f;
-        hitCylinder.Probe().m_direction2.x = sNegHugeCylinderExtent;
-        hitCylinder.Probe().m_direction2.y = sNegHugeCylinderExtent;
-        hitCylinder.Probe().m_direction2.z = sNegHugeCylinderExtent;
+        CMapCylinder hitCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
         hitCylinder.m_bottom = pos;
-        hitCylinder.Probe().m_direction = move;
-        hitCylinder.Probe().m_top = move;
+        hitCylinder.m_axis = move;
+        hitCylinder.m_radius = m_capsuleHalfHeight;
 
-        if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&hitCylinder), &move, m_bgHitMask) != 0) {
+        if (MapMng.CheckHitCylinderNear(&hitCylinder, &move, m_bgHitMask) != 0) {
             Vec hitPos;
             MapMng.m_hitMapObj->CalcHitPosition(&hitPos);
             PSVECSubtract(&hitPos, &pos, &move);
@@ -1070,7 +1041,6 @@ void CGObject::bgNormalCollision()
  */
 void CGObject::bgWorldCollision()
 {
-    GObjectMapCylinder bodyCylinder;
     CVector groundOffset(m_groundHitOffset);
     CVector worldPosition(m_worldPosition);
     CVector radialSum;
@@ -1095,19 +1065,13 @@ void CGObject::bgWorldCollision()
     hitMove.y = scaledHitMove.y;
     hitMove.z = scaledHitMove.z;
 
+    CMapCylinder bodyCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
     bodyCylinder.m_bottom = radial;
-    bodyCylinder.Probe().m_direction = hitMove;
-    bodyCylinder.Probe().m_radius = sHugeCylinderExtent;
-    bodyCylinder.Probe().m_height = sHugeCylinderExtent;
-    bodyCylinder.Probe().m_top = hitMove;
-    bodyCylinder.Probe().m_direction2.x = sNegHugeCylinderExtent;
-    bodyCylinder.Probe().m_direction2.y = sNegHugeCylinderExtent;
-    bodyCylinder.Probe().m_direction2.z = sNegHugeCylinderExtent;
-    bodyCylinder.Probe().m_radius2 = sZeroFloat;
-    bodyCylinder.Probe().m_height2 = sZeroFloat;
+    bodyCylinder.m_axis = hitMove;
+    bodyCylinder.m_radius = sZeroFloat;
 
     const u32 hitMask = m_bgHitMask;
-    if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&bodyCylinder), &hitMove, hitMask) == 0) {
+    if (MapMng.CheckHitCylinderNear(&bodyCylinder, &hitMove, hitMask) == 0) {
         return;
     }
 
@@ -1151,22 +1115,13 @@ void CGObject::bgAttribCollision()
         CVector probeMove(sZeroFloat, sDownProbeDistance, sZeroFloat);
         CVector probeBase(m_worldPosition.x, m_worldPosition.y + sHitProbeHeight, m_worldPosition.z);
 
-        GObjectMapCylinder charmCylinder;
-        charmCylinder.Probe().m_radius = sHugeCylinderExtent;
-        charmCylinder.Probe().m_height = sHugeCylinderExtent;
-        charmCylinder.Probe().m_radius2 = sZeroFloat;
-        charmCylinder.Probe().m_height2 = sZeroFloat;
-        charmCylinder.Probe().m_direction2.x = sNegHugeCylinderExtent;
-        charmCylinder.Probe().m_direction2.y = sNegHugeCylinderExtent;
-        charmCylinder.Probe().m_direction2.z = sNegHugeCylinderExtent;
+        CMapCylinder charmCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
         charmCylinder.m_bottom = probeBase;
-        charmCylinder.Probe().m_direction.x = probeMove.x;
-        charmCylinder.Probe().m_direction.y = probeMove.y;
-        charmCylinder.Probe().m_direction.z = probeMove.z;
-        charmCylinder.Probe().m_top = charmCylinder.Probe().m_direction;
+        charmCylinder.m_axis = probeMove;
+        charmCylinder.m_radius = sZeroFloat;
 
         if (MapMng.CheckHitCylinderNear(
-                reinterpret_cast<CMapCylinder*>(&charmCylinder), reinterpret_cast<Vec*>(&probeMove),
+                &charmCylinder, reinterpret_cast<Vec*>(&probeMove),
                 0x80000000) != 0) {
             Vec hitPos;
             MapMng.m_hitMapObj->CalcHitPosition(&hitPos);
@@ -1189,22 +1144,13 @@ void CGObject::bgAttribCollision()
                 CVector probeMove(sZeroFloat, sDownProbeDistance, sZeroFloat);
                 CVector probeBase(m_worldPosition.x, m_worldPosition.y + sStepProbeHeight, m_worldPosition.z);
 
-                GObjectMapCylinder attrCylinder;
-                attrCylinder.Probe().m_radius = sHugeCylinderExtent;
-                attrCylinder.Probe().m_height = sHugeCylinderExtent;
-                attrCylinder.Probe().m_radius2 = sZeroFloat;
-                attrCylinder.Probe().m_height2 = sZeroFloat;
-                attrCylinder.Probe().m_direction2.x = sNegHugeCylinderExtent;
-                attrCylinder.Probe().m_direction2.y = sNegHugeCylinderExtent;
-                attrCylinder.Probe().m_direction2.z = sNegHugeCylinderExtent;
+                CMapCylinder attrCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
                 attrCylinder.m_bottom = probeBase;
-                attrCylinder.Probe().m_direction.x = probeMove.x;
-                attrCylinder.Probe().m_direction.y = probeMove.y;
-                attrCylinder.Probe().m_direction.z = probeMove.z;
-                attrCylinder.Probe().m_top = attrCylinder.Probe().m_direction;
+                attrCylinder.m_axis = probeMove;
+                attrCylinder.m_radius = sZeroFloat;
 
                 if (MapMng.CheckHitCylinderNear(
-                        reinterpret_cast<CMapCylinder*>(&attrCylinder), reinterpret_cast<Vec*>(&probeMove),
+                        &attrCylinder, reinterpret_cast<Vec*>(&probeMove),
                         0x78000000) != 0) {
                     switch (gMapHitFace->m_groupIndex - 0x28) {
                     case 0:
@@ -3135,22 +3081,17 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
         {
             Vec bottom = m_worldPosition;
             bottom.y += useCapsuleOffset != 0 ? m_capsuleHalfHeight : sPushDistance;
-            GObjectMapCylinder bodyCylinder;
+            Vec direction;
+            direction.x = sZeroFloat;
+            direction.y = sDownUnitY;
+            direction.z = sZeroFloat;
+            CMapCylinder bodyCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
             bodyCylinder.m_bottom = bottom;
-            bodyCylinder.Probe().m_direction.x = sZeroFloat;
-            bodyCylinder.Probe().m_direction.y = sDownUnitY;
-            bodyCylinder.Probe().m_direction.z = sZeroFloat;
-            bodyCylinder.Probe().m_radius = 0.3f;
-            bodyCylinder.Probe().m_height = 0.3f;
-            bodyCylinder.Probe().m_top = bodyCylinder.Probe().m_direction;
-            bodyCylinder.Probe().m_direction2.x = 0.3f;
-            bodyCylinder.Probe().m_direction2.y = 0.6f;
-            bodyCylinder.Probe().m_direction2.z = 0.6f;
-            bodyCylinder.Probe().m_radius2 = 0.6f;
-            bodyCylinder.Probe().m_height2 = sZeroFloat;
+            bodyCylinder.m_axis = direction;
+            bodyCylinder.m_radius = sZeroFloat;
 
             if (MapMng.CheckHitCylinderNear(
-                    reinterpret_cast<CMapCylinder*>(&bodyCylinder), &bodyCylinder.Probe().m_direction,
+                    &bodyCylinder, &direction,
                     m_bgHitMask) != 0) {
                 MapMng.m_hitMapObj->CalcHitPosition(&m_worldPosition);
             }
@@ -3159,23 +3100,16 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
         if ((m_charaModelHandle != 0) && (m_charaModelHandle->m_model != 0)) {
             CVector attrDirection(sZeroFloat, sDownProbeDistance, sZeroFloat);
             CVector attrBottom(m_worldPosition.x, m_worldPosition.y + sStepProbeHeight, m_worldPosition.z);
-            GObjectMapCylinder attrCylinder;
+            CMapCylinder attrCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
 
-            attrCylinder.Probe().m_radius = sHugeCylinderExtent;
-            attrCylinder.Probe().m_height = sHugeCylinderExtent;
-            attrCylinder.Probe().m_radius2 = sZeroFloat;
-            attrCylinder.Probe().m_height2 = sZeroFloat;
-            attrCylinder.Probe().m_direction2.x = sNegHugeCylinderExtent;
-            attrCylinder.Probe().m_direction2.y = sNegHugeCylinderExtent;
-            attrCylinder.Probe().m_direction2.z = sNegHugeCylinderExtent;
             attrCylinder.m_bottom = attrBottom;
-            attrCylinder.Probe().m_direction.x = attrDirection.x;
-            attrCylinder.Probe().m_direction.y = attrDirection.y;
-            attrCylinder.Probe().m_direction.z = attrDirection.z;
-            attrCylinder.Probe().m_top = attrCylinder.Probe().m_direction;
+            attrCylinder.m_axis.x = attrDirection.x;
+            attrCylinder.m_axis.y = attrDirection.y;
+            attrCylinder.m_axis.z = attrDirection.z;
+            attrCylinder.m_radius = sZeroFloat;
 
             if (MapMng.CheckHitCylinderNear(
-                    reinterpret_cast<CMapCylinder*>(&attrCylinder),
+                    &attrCylinder,
                     reinterpret_cast<Vec*>(&attrDirection), 0x78000000) == 0) {
                 m_bgAttrValue = sAnimFrameOffset;
             } else {
@@ -3353,7 +3287,6 @@ float CGObject::CalcSafePos(int hitMask, CGObject* other, Vec* outSafePos)
 {
     Vec centerPos;
     Vec hitMove;
-    GObjectMapCylinder hitCylinder;
     float safeDistance = sZeroFloat;
 
     centerPos.x = other->m_worldPosition.x;
@@ -3367,18 +3300,12 @@ float CGObject::CalcSafePos(int hitMask, CGObject* other, Vec* outSafePos)
     PSVECSubtract(&m_worldPosition, &centerPos, &hitMove);
     hitMove.y = sZeroFloat;
 
+    CMapCylinder hitCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
     hitCylinder.m_bottom = centerPos;
-    hitCylinder.Probe().m_direction = hitMove;
-    hitCylinder.Probe().m_radius = sHugeCylinderExtent;
-    hitCylinder.Probe().m_height = sHugeCylinderExtent;
-    hitCylinder.Probe().m_top = hitMove;
-    hitCylinder.Probe().m_direction2.x = sNegHugeCylinderExtent;
-    hitCylinder.Probe().m_direction2.y = sNegHugeCylinderExtent;
-    hitCylinder.Probe().m_direction2.z = sNegHugeCylinderExtent;
-    hitCylinder.Probe().m_radius2 = m_capsuleHalfHeight;
-    hitCylinder.Probe().m_height2 = sZeroFloat;
+    hitCylinder.m_axis = hitMove;
+    hitCylinder.m_radius = m_capsuleHalfHeight;
 
-    if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&hitCylinder), &hitMove, hitMask) != 0) {
+    if (MapMng.CheckHitCylinderNear(&hitCylinder, &hitMove, hitMask) != 0) {
         MapMng.m_hitMapObj->CalcHitPosition(&centerPos);
         centerPos.y -= m_capsuleHalfHeight;
         *outSafePos = centerPos;
@@ -3389,19 +3316,12 @@ float CGObject::CalcSafePos(int hitMask, CGObject* other, Vec* outSafePos)
         hitMove.x = (m_capsuleHalfHeight + other->m_capsuleHalfHeight) * (float)sin((double)other->m_rotBaseY);
         hitMove.z = (m_capsuleHalfHeight + other->m_capsuleHalfHeight) * (float)cos((double)other->m_rotBaseY);
 
-        GObjectMapCylinder safeCylinder;
+        CMapCylinder safeCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
         safeCylinder.m_bottom = centerPos;
-        safeCylinder.Probe().m_direction = hitMove;
-        safeCylinder.Probe().m_radius = sHugeCylinderExtent;
-        safeCylinder.Probe().m_height = sHugeCylinderExtent;
-        safeCylinder.Probe().m_top = hitMove;
-        safeCylinder.Probe().m_direction2.x = sNegHugeCylinderExtent;
-        safeCylinder.Probe().m_direction2.y = sNegHugeCylinderExtent;
-        safeCylinder.Probe().m_direction2.z = sNegHugeCylinderExtent;
-        safeCylinder.Probe().m_radius2 = m_capsuleHalfHeight;
-        safeCylinder.Probe().m_height2 = sZeroFloat;
+        safeCylinder.m_axis = hitMove;
+        safeCylinder.m_radius = m_capsuleHalfHeight;
 
-        if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&safeCylinder), &hitMove, hitMask) != 0) {
+        if (MapMng.CheckHitCylinderNear(&safeCylinder, &hitMove, hitMask) != 0) {
             MapMng.m_hitMapObj->CalcHitPosition(&centerPos);
             safeDistance = (m_capsuleHalfHeight + other->m_capsuleHalfHeight) -
                            PSVECDistance(&m_worldPosition, &centerPos);

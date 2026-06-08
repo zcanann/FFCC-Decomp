@@ -875,7 +875,7 @@ int CMenuPcs::CmdClose()
 
 	if (list->count == doneCount) {
 		entry = list->entries;
-		if (count != 0) {
+		if (list->count != 0) {
 			u32 blockCount = count >> 3;
 			if (blockCount != 0) {
 				do {

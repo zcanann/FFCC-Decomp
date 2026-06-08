@@ -1298,8 +1298,8 @@ void CGObject::hit()
         return;
     }
 
-    for (CGObject* other = gCFlatRuntime2.FindGObjFirst(); other != 0;
-         other = gCFlatRuntime2.FindGObjNext(other)) {
+    for (CGObject* other = CFlat.FindGObjFirst(); other != 0;
+         other = CFlat.FindGObjNext(other)) {
         if ((other == this) || ((other->m_bgColMask & 0x80000) == 0)) {
             continue;
         }
@@ -2164,8 +2164,8 @@ CGObject* CGObject::CCClass(int useBodyRadius, int classMask, float yOffset, Vec
     double bestDist = static_cast<double>(sLargeDistance);
     best = 0;
 
-    for (CGObject* other = gCFlatRuntime2.FindGObjFirst(); other != 0;
-         other = gCFlatRuntime2.FindGObjNext(other)) {
+    for (CGObject* other = CFlat.FindGObjFirst(); other != 0;
+         other = CFlat.FindGObjNext(other)) {
         if (other == this) {
             continue;
         }
@@ -2194,7 +2194,7 @@ CGObject* CGObject::CCClass(int useBodyRadius, int classMask, float yOffset, Vec
         }
     }
 
-    gCFlatRuntime2.AddDebugDrawCC(&origin, &toTarget, radius, 0, 0);
+    CFlat.AddDebugDrawCC(&origin, &toTarget, radius, 0, 0);
     return best;
 }
 

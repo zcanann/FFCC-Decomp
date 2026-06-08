@@ -1096,10 +1096,11 @@ int CCharaPcs::TryReleaseAnimBank(int requiredSize)
         return 0;
     }
 
-    void* bankPtr = releaseAnim->m_anim->m_bank;
+    CChara::CAnim* releaseAnimData = releaseAnim->m_anim;
+    void* bankPtr = releaseAnimData->m_bank;
     if (bankPtr != 0) {
         operator delete(bankPtr);
-        releaseAnim->m_anim->m_bank = 0;
+        releaseAnimData->m_bank = 0;
     }
 
     if (static_cast<unsigned int>(System.m_execParam) >= 3) {

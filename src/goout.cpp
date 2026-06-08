@@ -2230,10 +2230,10 @@ void CGoOutMenu::CalcDel()
         if (m_selectedChara == -2) {
             SetDelMode(1);
         } else if (m_selectedChara != -1) {
-            if (Game.m_caravanWorkArr[m_selectedChara].m_shopBusyFlag == 0) {
-                SetDelMode(3);
-            } else {
+            if (Game.m_caravanWorkArr[m_selectedChara].m_shopBusyFlag != 0) {
                 SetDelMode(6);
+            } else {
+                SetDelMode(3);
             }
         }
         break;

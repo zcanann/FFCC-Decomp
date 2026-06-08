@@ -1225,8 +1225,8 @@ void CCameraPcs::calcMap()
     float stickH;
     float stickV;
     float triggerL;
-    Mtx rotXMtx;
     Mtx rotYMtx;
+    Mtx rotXMtx;
     Mtx rotMtx;
     Mtx invViewMtx;
     Vec dir;

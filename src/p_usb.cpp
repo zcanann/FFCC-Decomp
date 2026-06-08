@@ -96,10 +96,10 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
     packet->m_packetSize = value;
     packet->m_packetType = 4;
     packet->m_packetCode = Swap32((unsigned int)code);
-    packet->m_payloadSize = Swap32(count);
     packet->m_elementCount = Swap32((unsigned int)elemCount);
-    packet->m_reserved2C = Swap32(0);
     packet->m_dataSize = Swap32(count);
+    packet->m_reserved2C = Swap32(0);
+    packet->m_payloadSize = Swap32(count);
     memcpy(packet + 1, src, count);
 
     connected = USB.IsConnected();

@@ -1840,16 +1840,18 @@ void CMenuPcs::DrawResultCloseAnim()
 					handle = GetBonusDisplayHandleSlots(this)[modelIndex - activePartyCount];
 				}
 
-				if ((double)handle->m_model->m_lightAlpha > 0.0) {
-					SetProjection(modelIndex);
-					SetLight(1);
-					unsigned int oldFlags = handle->m_flags;
-					handle->m_flags = 0x300543;
-					handle->Draw(5);
-					handle->m_flags = oldFlags;
-					RestoreProjection();
-					lastKind = sprite->kind;
+				if ((double)handle->m_model->m_lightAlpha <= 0.0) {
+					modelIndex++;
+					continue;
 				}
+				SetProjection(modelIndex);
+				SetLight(1);
+				unsigned int oldFlags = handle->m_flags;
+				handle->m_flags = 0x300543;
+				handle->Draw(5);
+				handle->m_flags = oldFlags;
+				RestoreProjection();
+				lastKind = sprite->kind;
 				modelIndex++;
 			} else {
 				if (lastKind < 0) {

@@ -53,6 +53,7 @@ static const char s_partyBonusUnknownFmt[] = "bonus unknown";
 
 extern float FLOAT_80331A50;
 extern const float FLOAT_80331a54;
+extern "C" const float kMonObjOne;
 extern const float FLOAT_80331A58 = 0.5f;
 extern const float FLOAT_80331A5C = 1800.0f;
 extern const double DOUBLE_80331A60 = 4503601774854144.0;
@@ -2118,9 +2119,9 @@ void CGPartyObj::statCharge()
 			int window = m_unk68C;
 			int counter = m_comboFramePrev;
 			if (counter == window * 3) {
-				putParticle(0x578, 0, reinterpret_cast<CGObject*>(this), FLOAT_80331a54, 0x80D);
+				putParticle(0x578, 0, reinterpret_cast<CGObject*>(this), kMonObjOne, 0x80D);
 			} else if (counter == window << 1) {
-				putParticle(0x577, 0, reinterpret_cast<CGObject*>(this), FLOAT_80331a54, 0x80D);
+				putParticle(0x577, 0, reinterpret_cast<CGObject*>(this), kMonObjOne, 0x80D);
 			}
 		}
 		m_comboFramePrev++;
@@ -2129,7 +2130,7 @@ void CGPartyObj::statCharge()
 		if (m_subFrame == 0) {
 			m_comboFramePrev = 0;
 			reqAnim(m_attackAnimId, 0, 0);
-			putParticle(0x210, m_particleSlots[3], reinterpret_cast<CGObject*>(this), FLOAT_80331a54, 0x7EE);
+			putParticle(0x210, m_particleSlots[3], reinterpret_cast<CGObject*>(this), kMonObjOne, 0x7EE);
 		}
 		if (isLoopAnim() != 0) {
 			changeSubStat(1);

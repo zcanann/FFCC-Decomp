@@ -5356,6 +5356,7 @@ int JoyBus::SendCtrlMode(ThreadParam* threadParam, int controlMode)
 
     cmdBytes[0] = 9;
     cmdBytes[1] = modeByte;
+    unsigned int cmdWord = cmd;
     int result = 0;
 
     if (static_cast<signed char>(m_threadRunningMask) != 0)
@@ -5370,7 +5371,7 @@ int JoyBus::SendCtrlMode(ThreadParam* threadParam, int controlMode)
         }
         else
         {
-            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
+            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmdWord;
             m_cmdCount[threadParam->m_portIndex]++;
             OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
             result = 0;

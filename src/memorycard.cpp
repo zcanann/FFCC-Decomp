@@ -1350,7 +1350,7 @@ void CMemoryCardMan::SetLoadData()
     gameWork->m_spModeFlags[2] = MakeLoadBool(static_cast<s8>(save[0x13E3]));
     gameWork->m_spModeFlags[3] = MakeLoadBool(static_cast<s8>(save[0x13E4]));
 
-    for (int c = 0; c < 8; c++)
+    for (unsigned int c = 0; c < 8; c++)
     {
         u8* src = save + 0x14D0 + c * 0x9C0;
         CCaravanWork* caravanWork = &Game.m_caravanWorkArr[c];
@@ -1413,7 +1413,7 @@ void CMemoryCardMan::SetLoadData()
         {
             letterDst[0x3EC] = ((letterSrc[0x104] >> 3 & 1) << 3) | (letterDst[0x3EC] & 0xF7);
             *reinterpret_cast<u16*>(letterDst + 0x3EC) =
-                (*reinterpret_cast<u16*>(letterSrc + 0x104) & 0x07FC) | (*reinterpret_cast<u16*>(letterDst + 0x3EC) & 0xF803);
+                (*reinterpret_cast<u16*>(letterSrc + 0x104) & 0x07FC) | (*reinterpret_cast<s16*>(letterDst + 0x3EC) & 0xF803);
             *reinterpret_cast<u32*>(letterDst + 0x3EC) =
                 (*reinterpret_cast<u32*>(letterSrc + 0x104) & 0x0003FE00) |
                 (*reinterpret_cast<u32*>(letterDst + 0x3EC) & 0xFFFC01FF);

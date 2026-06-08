@@ -12791,26 +12791,25 @@ void McCtrl::SetListDat(int slot, int clearPlayTime)
 			*reinterpret_cast<unsigned int*>(entry + 0x10) = *reinterpret_cast<unsigned int*>(save + 0x28);
 			*reinterpret_cast<unsigned int*>(entry + 0x14) = *reinterpret_cast<unsigned int*>(save + 0x2C);
 
-			const int invalid = -1;
 			const int party0 = *reinterpret_cast<int*>(save + 0x30);
 			unsigned char* const party0Base = save + party0 * 0x9C0;
 			if (*reinterpret_cast<int*>(party0Base + 0x1A84) == 0 || party0Base[0x1D90] != 0) {
-				*reinterpret_cast<int*>(save + 0x30) = invalid;
+				*reinterpret_cast<int*>(save + 0x30) = -1;
 			}
 			const int party1 = *reinterpret_cast<int*>(save + 0x34);
 			unsigned char* const party1Base = save + party1 * 0x9C0;
 			if (*reinterpret_cast<int*>(party1Base + 0x1A84) == 0 || party1Base[0x1D90] != 0) {
-				*reinterpret_cast<int*>(save + 0x34) = invalid;
+				*reinterpret_cast<int*>(save + 0x34) = -1;
 			}
 			const int party2 = *reinterpret_cast<int*>(save + 0x38);
 			unsigned char* const party2Base = save + party2 * 0x9C0;
 			if (*reinterpret_cast<int*>(party2Base + 0x1A84) == 0 || party2Base[0x1D90] != 0) {
-				*reinterpret_cast<int*>(save + 0x38) = invalid;
+				*reinterpret_cast<int*>(save + 0x38) = -1;
 			}
 			const int party3 = *reinterpret_cast<int*>(save + 0x3C);
 			unsigned char* const party3Base = save + party3 * 0x9C0;
 			if (*reinterpret_cast<int*>(party3Base + 0x1A84) == 0 || party3Base[0x1D90] != 0) {
-				*reinterpret_cast<int*>(save + 0x3C) = invalid;
+				*reinterpret_cast<int*>(save + 0x3C) = -1;
 			}
 
 			*reinterpret_cast<unsigned int*>(save + 0x1C) = MemoryCardMan.CalcCrc(reinterpret_cast<Mc::SaveDat*>(save));
@@ -13788,16 +13787,10 @@ int McCtrl::ChkNowData()
  * JP Address: TODO
  * JP Size: TODO
  */
-void McCtrl::SaveDataBuffer(char* buffer)
+int McCtrl::SaveDataBuffer(char* buffer)
 {
-	unsigned int serialLo = 0;
-	unsigned int serialHi = 0;
-
-	m_userBuffer = buffer;
-
 	if (m_state < 0) {
-		m_lastResult = -1000;
-		return;
+		return -1000;
 	}
 
 	m_previousState = m_state;
@@ -13820,12 +13813,10 @@ void McCtrl::SaveDataBuffer(char* buffer)
 					m_state = 2;
 				} else if (m_lastResult == -0xD) {
 					m_state = -1;
-					m_lastResult = -13;
-					return;
+					return -13;
 				} else if (m_lastResult == -5) {
 					m_state = -1;
-					m_lastResult = -5;
-					return;
+					return -5;
 				} else {
 					m_state = -1;
 				}
@@ -13847,9 +13838,9 @@ void McCtrl::SaveDataBuffer(char* buffer)
 			if (m_lastResult != 0) {
 				MemoryCardMan.McUnmount(m_cardChannel);
 				m_state = -1;
-			} else {
-				m_state = 7;
+				return (m_lastResult == -5) ? -5 : -6;
 			}
+			m_state = 7;
 		}
 		break;
 
@@ -13858,13 +13849,11 @@ void McCtrl::SaveDataBuffer(char* buffer)
 		if (m_lastResult == -4) {
 			m_state = -1;
 			MemoryCardMan.McUnmount(m_cardChannel);
-			m_lastResult = -4;
-			return;
+			return -4;
 		} else if (m_lastResult == -5) {
 			m_state = -1;
 			MemoryCardMan.McUnmount(m_cardChannel);
-			m_lastResult = -5;
-			return;
+			return -5;
 		} else {
 			MemoryCardMan.CreateMcBuff();
 			m_state = 0x10;
@@ -13872,41 +13861,47 @@ void McCtrl::SaveDataBuffer(char* buffer)
 		break;
 
 	case 0x10: {
-		if (CARDGetSerialNo(m_cardChannel, reinterpret_cast<unsigned long long*>(&serialLo)) != 0) {
+		unsigned long long serial;
+		if (CARDGetSerialNo(m_cardChannel, &serial) == 0) {
+			m_serialHi = static_cast<unsigned int>(serial);
+			m_serialLo = static_cast<unsigned int>(serial >> 32);
+		} else {
 			MemoryCardMan.McClose();
 			MemoryCardMan.McUnmount(m_cardChannel);
 			MemoryCardMan.DestroyMcBuff();
 			m_state = -1;
-			m_lastResult = -999;
-			break;
+			return -999;
 		}
-
-		m_serialLo = serialLo;
-		m_serialHi = serialHi;
 
 		unsigned char* const save = reinterpret_cast<unsigned char*>(MemoryCardMan.m_saveBuffer);
-		if (save == 0 || m_userBuffer == 0) {
-			m_state = -1;
-			m_lastResult = -999;
-			break;
-		}
+		memcpy(save, buffer, 0x8BD0);
 
-		memcpy(save, m_userBuffer, 0x8BD0);
-
-		int member = *reinterpret_cast<int*>(save + 0x30);
-		if (member < 0 || member >= 8 || *reinterpret_cast<int*>(save + member * 0x9C0 + 0x1A84) == 0 || save[member * 0x9C0 + 0x1D90] != 0) {
+		unsigned char* entry = save + *reinterpret_cast<int*>(save + 0x30) * 0x9C0;
+		if (*reinterpret_cast<int*>(entry + 0x1A84) == 0) {
 			*reinterpret_cast<int*>(save + 0x30) = -1;
 		}
-		member = *reinterpret_cast<int*>(save + 0x34);
-		if (member < 0 || member >= 8 || *reinterpret_cast<int*>(save + member * 0x9C0 + 0x1A84) == 0 || save[member * 0x9C0 + 0x1D90] != 0) {
+		if (entry[0x1D90] != 0) {
+			*reinterpret_cast<int*>(save + 0x30) = -1;
+		}
+		entry = save + *reinterpret_cast<int*>(save + 0x34) * 0x9C0;
+		if (*reinterpret_cast<int*>(entry + 0x1A84) == 0) {
 			*reinterpret_cast<int*>(save + 0x34) = -1;
 		}
-		member = *reinterpret_cast<int*>(save + 0x38);
-		if (member < 0 || member >= 8 || *reinterpret_cast<int*>(save + member * 0x9C0 + 0x1A84) == 0 || save[member * 0x9C0 + 0x1D90] != 0) {
+		if (entry[0x1D90] != 0) {
+			*reinterpret_cast<int*>(save + 0x34) = -1;
+		}
+		entry = save + *reinterpret_cast<int*>(save + 0x38) * 0x9C0;
+		if (*reinterpret_cast<int*>(entry + 0x1A84) == 0) {
 			*reinterpret_cast<int*>(save + 0x38) = -1;
 		}
-		member = *reinterpret_cast<int*>(save + 0x3C);
-		if (member < 0 || member >= 8 || *reinterpret_cast<int*>(save + member * 0x9C0 + 0x1A84) == 0 || save[member * 0x9C0 + 0x1D90] != 0) {
+		if (entry[0x1D90] != 0) {
+			*reinterpret_cast<int*>(save + 0x38) = -1;
+		}
+		entry = save + *reinterpret_cast<int*>(save + 0x3C) * 0x9C0;
+		if (*reinterpret_cast<int*>(entry + 0x1A84) == 0) {
+			*reinterpret_cast<int*>(save + 0x3C) = -1;
+		}
+		if (entry[0x1D90] != 0) {
 			*reinterpret_cast<int*>(save + 0x3C) = -1;
 		}
 
@@ -13926,8 +13921,7 @@ void McCtrl::SaveDataBuffer(char* buffer)
 					MemoryCardMan.McClose();
 					MemoryCardMan.McUnmount(m_cardChannel);
 					MemoryCardMan.DestroyMcBuff();
-					m_lastResult = -5;
-					return;
+					return -5;
 				}
 			} else {
 				m_state = 0x12;
@@ -13943,15 +13937,18 @@ void McCtrl::SaveDataBuffer(char* buffer)
 			}
 		}
 		break;
+
+	case 0x12:
+		break;
 	}
 
 	if (m_state == -1) {
-		m_lastResult = -999;
-	} else if (m_state == 0x12) {
-		m_lastResult = 1;
-	} else {
-		m_lastResult = 0;
+		return -999;
 	}
+	if (m_state == 0x12) {
+		return 1;
+	}
+	return 0;
 }
 
 /*

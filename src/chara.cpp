@@ -30,7 +30,7 @@ extern "C" float FLOAT_803301E0;
 extern "C" float FLOAT_803301E4;
 extern "C" float FLOAT_803301E8;
 extern "C" float FLOAT_803301F8;
-extern const char sCharaStageName[];
+extern const char sCharaStageName[7];
 
 extern const char lbl_80330200[];
 extern const char lbl_80330208[];
@@ -1228,10 +1228,11 @@ void CChara::CModel::setup()
 	AttachAnim(m_anim, -1, -1, 0);
 
 	CTextureSet* texSet = m_texSet;
-	if (texSet != m_texSet) {
-		if (m_texSet != 0) {
-			if (m_texSet->DecRef() == 0) {
-				delete m_texSet;
+	CTextureSet* oldTexSet = m_texSet;
+	if (texSet != oldTexSet) {
+		if (oldTexSet != 0) {
+			if (oldTexSet->DecRef() == 0) {
+				delete oldTexSet;
 			}
 			m_texSet = 0;
 		}
@@ -2500,7 +2501,7 @@ void CChara::CModel::AttachTextureSet(CTextureSet* texSet)
  */
 void CChara::CModel::AddFrame(float frame)
 {
-	m_curFrame += frame;
+	m_time += frame;
 }
 
 /*
@@ -2514,7 +2515,7 @@ void CChara::CModel::AddFrame(float frame)
  */
 void CChara::CModel::SetFrame(float frame)
 {
-	m_curFrame = frame;
+	m_time = frame;
 }
 
 /*

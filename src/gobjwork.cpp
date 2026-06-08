@@ -2588,7 +2588,7 @@ void CCaravanWork::SortBeforeReturnWorldMap()
 
 					for (int slot = 2; slot < 8; slot++) {
 						if (static_cast<short>(m_commandListInventorySlotRef[slot]) == j) {
-							m_commandListInventorySlotRef[slot] = static_cast<unsigned short>(i);
+							m_commandListInventorySlotRef[slot] = static_cast<short>(i);
 						}
 					}
 
@@ -2605,7 +2605,7 @@ void CCaravanWork::SortBeforeReturnWorldMap()
 				for (int slot = 2; slot < 8; slot++) {
 					short cur = static_cast<short>(m_commandListInventorySlotRef[slot]);
 					if (cur == i) {
-						m_commandListInventorySlotRef[slot] = static_cast<unsigned short>(j);
+						m_commandListInventorySlotRef[slot] = static_cast<short>(j);
 					} else if (cur == j) {
 						m_commandListInventorySlotRef[slot] = static_cast<unsigned short>(i);
 					}
@@ -2905,7 +2905,7 @@ void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
 		(Game.m_gameWork.m_bossArtifactStageIndex < 0xF)) {
 		CGame::CBossArtifactStage* bossArtifacts =
 			&Game.m_bossArtifactBase[Game.m_gameWork.m_bossArtifactStageIndex];
-		unsigned short artifactScale = bossArtifacts->m_entries[8].m_values[0];
+		short artifactScale = bossArtifacts->m_entries[8].m_values[0];
 		m_maxHp = (unsigned short)((float)m_maxHp *
 								   ((((float)artifactScale) * kGObjWorkStatusScaleStep) + kGObjWorkStatusScaleBase));
 	}

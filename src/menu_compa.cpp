@@ -215,11 +215,12 @@ void CMenuPcs::CompaDraw()
 			}
 		}
 
-		u8 food = Game.m_gameWork.m_linkTable[caravanWork->m_saveSlot][0][caravanWork->m_saveSlot][drawIndex + 1];
-		if (food == 0 && System.m_execParam >= 1) {
+		const u8* foodPtr = &Game.m_gameWork.m_linkTable[caravanWork->m_saveSlot][0][caravanWork->m_saveSlot][drawIndex + 1];
+		if (*foodPtr == 0 && System.m_execParam >= 1) {
 			System.Printf(const_cast<char*>(sCompaFamilyCountErrorFmt), s_menu_compa_cpp, 0x1E0,
 			              shown);
 		}
+		u8 food = *foodPtr;
 		int icon = 0x1D;
 		if (food <= 0x14) {
 			icon = 0x21;

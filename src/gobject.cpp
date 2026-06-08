@@ -2488,7 +2488,7 @@ void CGObject::boundCheck()
     Mtx cameraMtx;
     Mtx44 clipMtx;
     Mtx44 screenMtx;
-    u32 clipMask;
+    int clipMask;
 
     PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
     PSMTXCopy(cameraMtx, clipMtx);

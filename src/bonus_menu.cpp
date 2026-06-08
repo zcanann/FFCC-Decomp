@@ -2085,7 +2085,7 @@ void CMenuPcs::CalcResultCloseAnim()
 {
 	const int activePartyCount = s_Rinfo->m_partyCount;
 
-	if (*(signed char*)(this->m_bonusStatePtr + 0xb) == 0) {
+	if (*(unsigned char*)(this->m_bonusStatePtr + 0xb) == 0) {
 		int off = 0;
 		short* count = (short*)this->m_bonusAnimPtr;
 		for (int i = 0; i < *count; i++, count = (short*)this->m_bonusAnimPtr) {
@@ -2150,7 +2150,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			*(int*)((int)sprite + 0x2c) = 1;
 			*(float*)(sprite + 0x1c) = (float)(int)*sprite;
 			*(float*)(sprite + 0x18) = FLOAT_80331ED0;
-			*sprite = (short)(int)((float)(int)*sprite - *(float*)(sprite + 0x18));
+			*sprite = (unsigned short)(int)((float)(int)*sprite - *(float*)(sprite + 0x18));
 		}
 
 		// sprites[digitEchoBase + pc].startFrame = sprites[1].startFrame
@@ -2246,7 +2246,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			}
 			if (frame < (int)(*(int*)(sprite + 0x12) + *(unsigned int*)(sprite + 0x14))) {
 				*(float*)(sprite + 8) =
-				    1.0f - ((float)*(int*)(sprite + 0x10) / (float)*(unsigned int*)(sprite + 0x14));
+				    1.0f - ((float)*(int*)(sprite + 0x10) / (float)*(int*)(sprite + 0x14));
 			} else {
 				*(float*)(sprite + 8) = 0.0f;
 			}

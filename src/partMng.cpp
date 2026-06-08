@@ -2895,7 +2895,7 @@ void CPartMng::pppDumpCacheIdx()
             mng->m_spawnedCount += *reinterpret_cast<int*>(&mng->m_envColorR);
             gPppInSubFrameCalc = 0;
 
-            while (mng->m_spawnedCount > 0xFFF) {
+            while (mng->m_spawnedCount >= 0x1000) {
                 _pppCalcPart(reinterpret_cast<_pppMngSt*>(mng));
                 _pppDeadPart(reinterpret_cast<_pppMngSt*>(mng));
                 if (mng->m_isFinished != 0) {

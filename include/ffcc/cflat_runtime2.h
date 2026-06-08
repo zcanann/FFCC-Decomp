@@ -71,6 +71,15 @@ public:
 	public:
 		CParticleWork()
 		{
+			m_seFrame = -1;
+			m_seNo = -1;
+			m_seUnk0 = 0;
+			m_seKind = 1;
+			m_seParam = 0;
+			m_seUnk2 = 0;
+			m_seDelay = 0x1E;
+			m_paramNo = 0;
+			m_paramId = 0;
 			m_pos = 0;
 			m_posVec = 0;
 			m_scale = 0;
@@ -83,15 +92,6 @@ public:
 			m_speed = 1.0f;
 			m_colorLerp = 1.0f;
 			m_enable = 0;
-			m_seNo = -1;
-			m_seUnk0 = 0;
-			m_seKind = 1;
-			m_seUnk2 = 0;
-			m_seParam = 0;
-			m_seDelay = 0x1E;
-			m_seFrame = -1;
-			m_paramNo = 0;
-			m_paramId = 0;
 		}
 
 		float* m_pos;

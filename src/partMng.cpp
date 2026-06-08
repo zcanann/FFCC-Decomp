@@ -940,8 +940,8 @@ void CPartMng::pppGet2Dpos()
         unsigned char pad00[0x10];
         int requestFlag;
         unsigned char pad14[0x14];
-        int cursorX;
-        int cursorY;
+        unsigned int cursorX;
+        unsigned int cursorY;
     };
 
     int zAtPixel;

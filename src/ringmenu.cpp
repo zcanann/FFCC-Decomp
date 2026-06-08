@@ -225,6 +225,10 @@ void CRingMenu::DrawIcon()
 	    angle);
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x18));
+	unsigned int colValue = iconCol;
+	int colSign = colValue >> 31;
+	int uInt = (((colSign * 8) | (colValue * 0x20000000 + colSign) >> 29) - colSign) * 0x30;
+	int vInt = ((colValue >> 3) + ((colValue < 0) && ((iconCol & 7) != 0))) * 0x30;
 	void* tlut = MenuPcs.m_externalFontTlut;
 	if (caravanWork->m_hp != 0) {
 		tlut = 0;
@@ -241,10 +245,8 @@ void CRingMenu::DrawIcon()
 	CColor iconColor(0xFF, 0xFF, 0xFF, blinkAlpha);
 	MenuPcs.SetColor(iconColor);
 
-	unsigned int colValue = iconCol;
-	int colSign = colValue >> 31;
-	float u = static_cast<float>((((colSign * 8) | (colValue * 0x20000000 + colSign) >> 29) - colSign) * 0x30);
-	float v = static_cast<float>(((colValue >> 3) + ((colValue < 0) && ((iconCol & 7) != 0))) * 0x30);
+	float u = static_cast<float>(uInt);
+	float v = static_cast<float>(vInt);
 	MenuPcs.DrawRect(3, static_cast<float>(posX), static_cast<float>(posY), kRingMenuMarkerSize,
 	                                 kRingMenuMarkerSize, u, v, kRingMenuMarkerUvScale, kRingMenuMarkerUvScale, angle);
 }

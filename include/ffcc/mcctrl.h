@@ -32,7 +32,7 @@ public:
     int ChkEmpty(int param_2);
     int ChkConnect(int chan);
     int ChkNowData();
-    void SaveDataBuffer(char*);
+    int SaveDataBuffer(char*);
     void ChkParty(char*);
     int EraseDat();
     void GetDno();

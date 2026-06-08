@@ -690,6 +690,8 @@ void CMenuPcs::CmdOpen()
 	}
 }
 
+#pragma push
+#pragma opt_propagation off
 /*
  * --INFO--
  * PAL Address: 0x8014f4e8
@@ -832,6 +834,7 @@ int CMenuPcs::CmdCtrl()
 
 	GetCmdStateView(this)->commandResult = 0;
 }
+#pragma pop
 
 /*
  * --INFO--

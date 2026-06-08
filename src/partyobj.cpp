@@ -112,7 +112,8 @@ struct BossGhostPartyCounters {
 struct GhostMogMenuWork {
 	struct {
 		signed char carryActive : 1;
-		signed char _bits : 7;
+		signed char flag40 : 1;
+		signed char _bits : 6;
 	} flags;
 	unsigned char _pad1[0x3F];
 	int mood;
@@ -3058,7 +3059,7 @@ void CGPartyObj::onStatMagic()
 	}
 
 	if (m_subState == 1 && m_comboState != 0 &&
-	    sGhostMogMenuWork.flags.carryActive < 0) {
+	    sGhostMogMenuWork.flags.flag40 < 0) {
 		if (m_comboFrame == 1) {
 			putParticleTrace(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) + 0x4FU | 0x100,
 			    m_particleSlots[8], this, kMonObjOne, 0);

@@ -1688,6 +1688,11 @@ void CShopMenu::Draw()
     case 3:
     case 4:
     case 5:
+        DrawShopBase();
+        DrawItemList();
+        DrawItemInfo0();
+        DrawBuySellInfo();
+        break;
     case 6:
     case 7:
     case 8:

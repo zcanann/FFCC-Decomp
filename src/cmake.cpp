@@ -1244,8 +1244,7 @@ void CMenuPcs::CmakeResultDraw1()
     labelFont->SetScale(1.0f);
     labelFont->DrawInit();
 
-    int textColor = static_cast<int>(255.0f * textAlpha);
-    CColor color(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textColor));
+    CColor color(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * textAlpha));
     labelFont->SetColor(color.color);
 
     float labelWidths[4];
@@ -1266,7 +1265,7 @@ void CMenuPcs::CmakeResultDraw1()
     valueFont->SetShadow(1);
     valueFont->SetScale(1.0f);
     valueFont->DrawInit();
-    CColor valueColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textColor));
+    CColor valueColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * textAlpha));
     valueFont->SetColor(valueColor.color);
     valueFont->SetTlut(6);
 
@@ -1544,8 +1543,7 @@ void CMenuPcs::CmakeResultDraw()
     labelFont->SetScale(1.0f);
     labelFont->DrawInit();
 
-    int textColor = static_cast<int>(255.0f * textAlpha);
-    CColor color(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textColor));
+    CColor color(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * textAlpha));
     labelFont->SetColor(color.color);
 
     float labelWidths[4];
@@ -1565,7 +1563,7 @@ void CMenuPcs::CmakeResultDraw()
     valueFont->SetShadow(1);
     valueFont->SetScale(1.0f);
     valueFont->DrawInit();
-    CColor valueColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textColor));
+    CColor valueColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * textAlpha));
     valueFont->SetColor(valueColor.color);
     valueFont->SetTlut(6);
 

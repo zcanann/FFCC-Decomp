@@ -1920,49 +1920,46 @@ inline void CMenuPcs::SingleDrawFadeIn()
  */
 void CMenuPcs::SingleCalcFadeOut()
 {
-    SingleFadeState* fadeState = m_singleFadeState;
-
-    if (fadeState->active == 0) {
+    if (m_singleFadeState->active == 0) {
         Sound.PlaySe(0xF, 0x40, 0x7F, 0);
-        memset(fadeState, 0, sizeof(SingleFadeState));
+        memset(m_singleFadeState, 0, sizeof(SingleFadeState));
 
-        fadeState->entries[0].startFrame = (m_singleMenuMode == 8) * 10;
-        fadeState->entries[0].duration = 10;
-        fadeState->entries[1].startFrame = 0;
-        fadeState->entries[1].duration = 10;
-        fadeState->entries[2].startFrame = 0;
-        fadeState->entries[2].duration = 10;
-        fadeState->entries[3].startFrame = 0;
-        fadeState->entries[3].duration = 10;
+        m_singleFadeState->entries[0].startFrame = (m_singleMenuMode == 8) ? 10 : 0;
+        m_singleFadeState->entries[0].duration = 10;
+        m_singleFadeState->entries[1].startFrame = 0;
+        m_singleFadeState->entries[1].duration = 10;
+        m_singleFadeState->entries[2].startFrame = 0;
+        m_singleFadeState->entries[2].duration = 10;
+        m_singleFadeState->entries[3].startFrame = 0;
+        m_singleFadeState->entries[3].duration = 10;
 
-        fadeState->count = 4;
-        fadeState->done = 0;
-        fadeState->active = 1;
+        m_singleFadeState->count = 4;
+        m_singleFadeState->done = 0;
+        m_singleFadeState->active = 1;
     }
 
     int completed = 0;
-    SingMenuState* state = m_singMenuState;
-    ++state->frame;
+    ++m_singMenuState->frame;
 
-    int totalEntries = static_cast<int>(fadeState->count);
-    int frame = static_cast<int>(state->frame);
-    for (int i = 0; i < totalEntries; i++) {
-        SingleFadeEntry* entry = &fadeState->entries[i];
-        int start = entry->startFrame;
-        if (frame < start) {
-            entry->alpha = 1.0f;
-        } else {
-            int duration = entry->duration;
-            if (frame < start + duration) {
-                int elapsed = ++entry->elapsed;
+    int count = static_cast<int>(m_singleFadeState->count);
+    SingleFadeEntry* entry = m_singleFadeState->entries;
+    int frame = static_cast<int>(m_singMenuState->frame);
+    if (0 < count) {
+        do {
+            if (frame < entry->startFrame) {
+                entry->alpha = 1.0f;
+            } else if (frame < entry->startFrame + entry->duration) {
+                entry->elapsed = entry->elapsed + 1;
                 entry->alpha =
-                    static_cast<float>(-((1.0 / static_cast<double>(duration)) *
-                                          static_cast<double>(elapsed) - 1.0));
+                    static_cast<float>(-((1.0 / static_cast<double>(entry->duration)) *
+                                          static_cast<double>(entry->elapsed) - 1.0));
             } else {
-                completed++;
+                completed = completed + 1;
                 entry->alpha = 0.0f;
             }
-        }
+            entry = entry + 1;
+            count = count - 1;
+        } while (count != 0);
     }
 
     if (m_wm.m_handles[0]->m_model->m_animEnd < m_wm.m_handles[0]->m_model->m_time) {
@@ -1984,8 +1981,8 @@ void CMenuPcs::SingleCalcFadeOut()
     m_wm.m_handles[0]->m_model->CalcMatrix();
     m_wm.m_handles[0]->m_model->CalcSkin();
 
-    if (totalEntries == completed) {
-        fadeState->done = 1;
+    if (m_singleFadeState->count == completed) {
+        m_singleFadeState->done = 1;
     }
 }
 

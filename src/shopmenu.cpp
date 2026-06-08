@@ -1892,13 +1892,13 @@ void CShopMenu::DrawSoubi()
     labelFont->Draw(equipText);
 
     char* cancelText = ShopMenuMes(languageId, SHOP_MENU_TEXT_CANCEL);
-    float cancelTextX = CalcCenteredShopMenuX(labelFont, cancelText, 0x1F8);
-    labelFont->SetPosX(cancelTextX);
+    int cancelTextX = static_cast<int>((FLOAT_80332dd4 - labelFont->GetWidth(cancelText)) * FLOAT_80332d78 + 0x1F8);
+    labelFont->SetPosX(static_cast<float>(cancelTextX));
     labelFont->SetPosY(FLOAT_80332d88);
     labelFont->Draw(cancelText);
     MenuPcs.DrawInit();
 
-    MenuPcs.DrawCursor(static_cast<int>(cancelTextX) - 0x24, m_yesNo * 0x18 + 0x13C, FLOAT_80332d28);
+    MenuPcs.DrawCursor(cancelTextX - 0x24, m_yesNo * 0x18 + 0x13C, FLOAT_80332d28);
 }
 /*
  * --INFO--

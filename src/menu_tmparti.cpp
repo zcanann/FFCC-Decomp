@@ -213,13 +213,13 @@ void CMenuPcs::TmpArtiDraw()
 	for (int i = 0; i < GetTmpArtiList(this)->count; i++) {
 		int tex = entry->tex;
 		if (tex >= 0) {
-			float alpha = entry->alpha;
 			float left = (float)entry->x;
 			float top = (float)entry->y;
 			float width = (float)entry->width;
 			float height = (float)entry->height;
 			float s = entry->s;
 			float t = entry->t;
+			float alpha = entry->alpha;
 
 			if (caravanWork->m_treasures[i] < 0) {
 				tex = 0x34;

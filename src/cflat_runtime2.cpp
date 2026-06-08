@@ -1653,7 +1653,6 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float radius
 					if ((0.0f < distanceSq) && (distanceSq < radiusSq)) {
 						const float distance = sqrtf(distanceSq);
 						if (distance < radius) {
-							bool rejected = false;
 							if ((flags & 2) != 0) {
 								Vec facing;
 								PSVECScale(&offset, &offset, 1.0f / distance);
@@ -1661,36 +1660,34 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float radius
 								facing.y = 0.0f;
 								facing.z = cos(angle);
 								if (PSVECDotProduct(&offset, &facing) <= 0.0f) {
-									rejected = true;
+									goto advance;
 								}
 							}
 
-							if (!rejected) {
-								if ((flags & 4) == 0) {
-									int insertIndex = 0;
-									for (; insertIndex < count; insertIndex++) {
-										if (distance < *reinterpret_cast<float*>(&objects[insertIndex]->m_0x44)) {
-											break;
-										}
+							if ((flags & 4) == 0) {
+								int insertIndex = 0;
+								for (; insertIndex < count; insertIndex++) {
+									if (distance < *reinterpret_cast<float*>(&objects[insertIndex]->m_0x44)) {
+										break;
 									}
+								}
 
-									const int endIndex = (count < (maxCount - 1)) ? count : (maxCount - 1);
-									for (int i = endIndex; i > insertIndex; i--) {
-										objects[i] = objects[i - 1];
-									}
+								const int endIndex = (count < (maxCount - 1)) ? count : (maxCount - 1);
+								for (int i = endIndex; i > insertIndex; i--) {
+									objects[i] = objects[i - 1];
+								}
 
-									*reinterpret_cast<float*>(&object->m_0x44) = distance;
-									objects[insertIndex] = object;
-									newCount = maxCount;
-									if (count + 1 < maxCount) {
-										newCount = count + 1;
-									}
-								} else {
+								*reinterpret_cast<float*>(&object->m_0x44) = distance;
+								objects[insertIndex] = object;
+								newCount = maxCount;
+								if (count + 1 < maxCount) {
 									newCount = count + 1;
-									objects[count] = object;
-									if (newCount == maxCount) {
-										return newCount;
-									}
+								}
+							} else {
+								newCount = count + 1;
+								objects[count] = object;
+								if (newCount == maxCount) {
+									return newCount;
 								}
 							}
 						}
@@ -1699,6 +1696,7 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float radius
 			}
 		}
 
+	advance:
 		baseObj = FindNextGBaseObjByCidMask(&CFlat, reinterpret_cast<CFlatRuntime::CObject*>(object)->m_next, 5);
 		count = newCount;
 	} while (true);

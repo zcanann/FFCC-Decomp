@@ -782,14 +782,14 @@ receive_message:
     param[0xC2] = 0;
     switch (message)
     {
-    case 5:
-        timeoutTicks = OSMillisecondsToTicks(1000);
-        break;
     case 3:
         timeoutTicks = OSMillisecondsToTicks(500);
         break;
     case 10:
         timeoutTicks = OSMillisecondsToTicks(500);
+        break;
+    case 5:
+        timeoutTicks = OSMillisecondsToTicks(1000);
         break;
     default:
         timeoutTicks = OSMillisecondsToTicks(1000);

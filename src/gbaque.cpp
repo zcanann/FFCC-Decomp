@@ -1141,7 +1141,10 @@ void GbaQueue::SetRadarType()
 	int prevAssignedType;
 	int i;
 
-	if ((static_cast<signed char>(m_radarTypeFlags) != 0) || (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)) {
+	if (static_cast<signed char>(m_radarTypeFlags) != 0) {
+		return;
+	}
+	if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
 		return;
 	}
 

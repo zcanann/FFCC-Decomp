@@ -2426,37 +2426,36 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 		}
 	}
 
-	if (m_anim == 0) {
+	if (m_anim != 0) {
+		int blendFrames = 0;
+		if (ModelAttachMode(this) == 0) {
+			blendFrames = (AnimFlags(m_anim) & 0x80) != 0 ? blendMode : 0;
+		} else if (ModelAttachMode(this) == 1) {
+			blendFrames = blendMode;
+		}
+
+		m_blendCur = static_cast<u16>(blendFrames);
+		m_blendMax = m_blendCur;
+
+		if (startFrame < 0) {
+			startFrame = 0;
+		}
+
+		m_curFrame = static_cast<float>(startFrame);
+		m_time = m_curFrame;
+		m_animStart = m_curFrame;
+
+		if (endFrame == -1) {
+			endFrame = static_cast<int>(AnimFrameCount(m_anim)) - 1;
+		}
+
+		m_animEnd = static_cast<float>(endFrame);
+	} else {
 		m_curFrame = 0.0f;
 		m_time = 0.0f;
 		m_animEnd = 0.0f;
 		m_animStart = 0.0f;
-		return;
 	}
-
-	int blendFrames = 0;
-	if (ModelAttachMode(this) == 0) {
-		blendFrames = (AnimFlags(m_anim) & 0x80) != 0 ? blendMode : 0;
-	} else if (ModelAttachMode(this) == 1) {
-		blendFrames = blendMode;
-	}
-
-	m_blendCur = static_cast<u16>(blendFrames);
-	m_blendMax = m_blendCur;
-
-	if (startFrame < 0) {
-		startFrame = 0;
-	}
-
-	m_curFrame = static_cast<float>(startFrame);
-	m_time = m_curFrame;
-	m_animStart = m_curFrame;
-
-	if (endFrame == -1) {
-		endFrame = static_cast<int>(AnimFrameCount(m_anim)) - 1;
-	}
-
-	m_animEnd = static_cast<float>(endFrame);
 }
 
 /*

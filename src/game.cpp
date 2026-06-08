@@ -492,10 +492,12 @@ void CGame::Create()
         u32* dst = reinterpret_cast<u32*>(&m_nextScript);
         int count = sizeof(scriptName) / (sizeof(u32) * 2);
         do {
-            dst[1] = src[1];
+            u32 a = src[1];
+            u32 b = src[2];
             src += 2;
+            dst[1] = a;
+            dst[2] = b;
             dst += 2;
-            dst[0] = src[0];
         } while (--count != 0);
         m_newGameFlag = 1;
     }

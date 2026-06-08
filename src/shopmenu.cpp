@@ -3197,7 +3197,7 @@ void CShopMenu::Calc()
             ShopMenuCaravanWork(this)->DeleteItem(getItemNo(m_selectedIndex), 0);
 
             for (int i = 0; i < 3; i++) {
-                if (recipeMaterial[i] < 1) {
+                if (recipeMaterial[i] <= 0) {
                     break;
                 }
                 for (int count = 0; count < recipeMaterial[i + 3]; count++) {

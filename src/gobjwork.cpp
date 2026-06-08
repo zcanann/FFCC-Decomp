@@ -1398,7 +1398,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 		int sysVal2 = Game.m_gameWork.m_scriptGlobalTime;
 		int sysVal3 = Game.m_gameWork.m_frameCounter;
 		for (int i = 0; i < 4; i++) {
-			const short cmpType = curLetter->m_compareRules[i].m_rule;
+			const unsigned short cmpType = curLetter->m_compareRules[i].m_rule;
 			const int sourceType = (cmpType >> 11) & 3;
 			const int sourceIdx = cmpType & 0x7FF;
 
@@ -1553,7 +1553,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 				}
 			}
 
-			const unsigned short curPriority = curLetter->m_priorityFlags & 0xF00;
+			const short curPriority = curLetter->m_priorityFlags & 0xF00;
 			if (minPriority < curPriority) {
 				romLetterWork[replaceIndex] = curLetter;
 			}

@@ -1488,7 +1488,7 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
                                              &gObject->m_weaponNodeFlags)) << 26) &
                                          0xC0000000) >>
                         31) != 0) {
-                    if ((displayFlags & 0x80) != 0 || gObject->m_lookAtTimer == kCameraOneF) {
+                    if ((displayFlags & 0x80) != 0 || kCameraOneF == gObject->m_lookAtTimer) {
                         include = true;
                     }
                 }

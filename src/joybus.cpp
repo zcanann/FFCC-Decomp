@@ -6825,13 +6825,14 @@ int JoyBus::SendItemUse(ThreadParam* threadParam)
  */
 int JoyBus::SendSPMode(ThreadParam* threadParam)
 {
-    unsigned int mode = GbaQue.GetSPMode(threadParam->m_portIndex);
-    const unsigned char bVar1 = (mode & 0xFF) != 0;
     unsigned int cmd = 0;
     unsigned char* cmdBytes = (unsigned char*)&cmd;
+    unsigned int mode = GbaQue.GetSPMode(threadParam->m_portIndex);
+    const unsigned char bVar1 = (mode & 0xFF) != 0;
     cmdBytes[0] = 0x14;
     cmdBytes[1] = 0x11;
     cmdBytes[2] = bVar1;
+    unsigned int cmdWord = cmd;
     int result = 0;
 
     if (m_threadRunningMask != 0)
@@ -6846,7 +6847,7 @@ int JoyBus::SendSPMode(ThreadParam* threadParam)
         }
         else
         {
-            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
+            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmdWord;
             m_cmdCount[threadParam->m_portIndex]++;
             OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
         }

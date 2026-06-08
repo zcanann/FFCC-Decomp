@@ -893,17 +893,15 @@ haveNotice:
 	}
 
 	int classId = (*reinterpret_cast<int**>(mon + 0x58))[4];
-	if (classId != 0x70) {
-		if (classId < 0x70) {
-			if (classId == 0x6A) {
-				notice = true;
-				*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x35;
-			}
-		} else if (classId == 0x7B) {
-			notice = true;
-		}
-	} else {
+	switch (classId) {
+	case 0x6A:
 		notice = true;
+		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x35;
+		break;
+	case 0x70:
+	case 0x7B:
+		notice = true;
+		break;
 	}
 
 	if (notice) {
@@ -1715,8 +1713,9 @@ void CGMonObj::onStatDie()
 			if (option < 9 && m_repop.delay == 0) {
 				int shift = reinterpret_cast<int>(object->m_scriptHandle[2]);
 				unsigned long long bit = 1ULL << shift;
-				CFlatSpawnBitHi(option) |= static_cast<unsigned int>(bit);
-				CFlatSpawnBitLo(option) |= static_cast<unsigned int>(bit >> 32);
+				CFlatRuntime2::CSpawnBits& spawnBit = CFlatRuntime2Storage().m_spawnBits[option];
+				spawnBit.m_hi |= static_cast<unsigned int>(bit);
+				spawnBit.m_lo |= static_cast<unsigned int>(bit >> 32);
 			}
 			return;
 		}

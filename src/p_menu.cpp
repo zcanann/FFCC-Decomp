@@ -846,10 +846,10 @@ void CMenuPcs::calc()
  */
 void CMenuPcs::draw()
 {
-    Mtx modelMtx;
-    Mtx texMtx;
     Mtx44 orthoMtx;
+    Mtx modelMtx;
     Mtx44 screenMtx;
+    Mtx texMtx;
 
     PSMTXIdentity(modelMtx);
     GXLoadPosMtxImm(modelMtx, 0);
@@ -911,7 +911,7 @@ void CMenuPcs::draw()
         TextureMan.SetTextureTev(texture);
 
         {
-            int alpha = static_cast<int>(127.5f * (1.0f + sinf(System.m_frameCounter * kMenuPulseStep)));
+            int alpha = static_cast<int>(LoadFloat(kMenuAlphaMax) * (LoadFloat(kMenuHalf) * (LoadFloat(kMenuOne) + sinf(System.m_frameCounter * LoadFloat(kMenuPulseStep)))));
             CColor color(0xFF, 0xFF, 0xFF, static_cast<u8>(alpha));
             GXSetChanMatColor(GX_COLOR0A0, color.color);
             DrawRect(3, LoadFloat(kMenuScreenCenterX), LoadFloat(kMenuScreenCenterY), LoadFloat(kMenuInitRectWidth),

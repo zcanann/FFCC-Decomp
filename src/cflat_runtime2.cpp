@@ -2313,9 +2313,10 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 	case 0x11:
 	case 0x15:
 	case 0x16: {
-		CGMonObj* mon = reinterpret_cast<CGMonObj*>(m_objMon);
-		for (int i = 0; i < 0x40; i++, mon++) {
-			if ((*reinterpret_cast<unsigned int*>(mon) != 0) &&
+		CGMonObj** monArr = reinterpret_cast<CGMonObj**>(&Game.m_scriptWork[0][0][0]);
+		for (int i = 0; i < 0x40; i++) {
+			CGMonObj* mon = monArr[i];
+			if ((mon != 0) &&
 			    ((controlValue == 0) || ((mon->m_controlMask & static_cast<unsigned int>(controlValue)) != 0))) {
 				mon->sysControl(controlNo);
 			}
@@ -2349,9 +2350,9 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 		break;
 
 	case 0x13: {
-		CGPartyObj* party = reinterpret_cast<CGPartyObj*>(m_objParty);
-		for (int i = 0; i < kFlatPartyObjCount; i++, party++) {
-			if (*reinterpret_cast<unsigned int*>(party) != 0) {
+		for (int i = 0; i < kFlatPartyObjCount; i++) {
+			CGPartyObj* party = Game.m_partyObjArr[i];
+			if (party != 0) {
 				party->sysControl(controlNo, controlValue);
 			}
 		}
@@ -2367,16 +2368,17 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 		break;
 
 	case 0x19: {
-		CGPartyObj* party = reinterpret_cast<CGPartyObj*>(m_objParty);
-		for (int i = 0; i < kFlatPartyObjCount; i++, party++) {
-			if (*reinterpret_cast<unsigned int*>(party) != 0) {
+		for (int i = 0; i < kFlatPartyObjCount; i++) {
+			CGPartyObj* party = Game.m_partyObjArr[i];
+			if (party != 0) {
 				party->damageDelete();
 			}
 		}
 
-		CGMonObj* mon = reinterpret_cast<CGMonObj*>(m_objMon);
-		for (int i = 0; i < kFlatMonObjCount; i++, mon++) {
-			if (*reinterpret_cast<unsigned int*>(mon) != 0) {
+		CGMonObj** monArr = reinterpret_cast<CGMonObj**>(&Game.m_scriptWork[0][0][0]);
+		for (int i = 0; i < kFlatMonObjCount; i++) {
+			CGMonObj* mon = monArr[i];
+			if (mon != 0) {
 				mon->damageDelete();
 			}
 		}

@@ -166,39 +166,38 @@ STATIC_ASSERT(offsetof(SawBossWork, m_flags) == 0x14);
  */
 void CGMonObj::damagedFuncGiantCrab()
 {
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
 	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	*reinterpret_cast<int*>(SoundBuffer + 1260) = 1;
+	*reinterpret_cast<int*>(CGMonObj::m_boss) = 1;
 
-	const int branch = m_actionBranch;
-	unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
-	if (script == 0) {
-		return;
-	}
-
-	if (branch == 1) {
-		if ((script[0x1A / 2] / 3) <= script[7]) {
-			return;
-		}
-		object->DispCharaParts(1);
-		int pdtNo = object->m_charaModelHandle->GetPdtSlot();
-		prgObj->putParticle((pdtNo << 8) | 0x0D, 0, object, kMonObjBossOne, 0);
-		prgObj->playSe3D(0x4E37, 0x32, 500, 0, 0);
-	} else if (branch == 0) {
-		if (((script[0x1A / 2] * 2) / 3) <= script[7]) {
+	switch (m_actionBranch) {
+	case 0: {
+		unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
+		if (script[0x1C / 2] >= ((script[0x1A / 2] * 2) / 3)) {
 			return;
 		}
 		object->DispCharaParts(3);
 		int pdtNo = object->m_charaModelHandle->GetPdtSlot();
-		prgObj->putParticle((pdtNo << 8) | 0x0C, 0, object, kMonObjBossOne, 0);
-		prgObj->playSe3D(0x4E36, 0x32, 500, 0, 0);
-	} else {
+		reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x0C, 0, object, kMonObjBossOne, 0);
+		reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x4E36, 0x32, 500, 0, 0);
+		break;
+	}
+	case 1: {
+		unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
+		if (script[0x1C / 2] >= (script[0x1A / 2] / 3)) {
+			return;
+		}
+		object->DispCharaParts(1);
+		int pdtNo = object->m_charaModelHandle->GetPdtSlot();
+		reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x0D, 0, object, kMonObjBossOne, 0);
+		reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x4E37, 0x32, 500, 0, 0);
+		break;
+	}
+	default:
 		return;
 	}
 
-	prgObj->changeStat(4, 0, 0);
-	m_actionBranch = branch + 1;
+	reinterpret_cast<CGPrgObj*>(this)->changeStat(4, 0, 0);
+	m_actionBranch = m_actionBranch + 1;
 	m_unk6C8 = 0;
 }
 

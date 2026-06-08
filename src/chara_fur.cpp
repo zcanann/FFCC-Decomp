@@ -91,6 +91,7 @@ extern float FLOAT_80331164;
 extern float FLOAT_80331168;
 extern float FLOAT_8033116C;
 extern float kYmEnvQuarter;
+extern float kYmEnvTen;
 extern double kYmEnvSignedDoubleMagic;
 extern double kPppEmissionDoubleBias;
 
@@ -1022,11 +1023,10 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		}
 	}
 
-	const float cursorStep = 0.1f;
-	Chara.MogFur().m_cursorX = static_cast<int>(static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorX)) +
-	                                     static_cast<float>(MogPadInt(36)) * cursorStep);
-	Chara.MogFur().m_cursorY = static_cast<int>(static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorY)) -
-	                                     static_cast<float>(MogPadInt(40)) * cursorStep);
+	Chara.MogFur().m_cursorX = static_cast<int>(kYmEnvTen * static_cast<float>(MogPadInt(36)) +
+	                                     static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorX)));
+	Chara.MogFur().m_cursorY = static_cast<int>(-(kYmEnvTen * static_cast<float>(MogPadInt(40)) -
+	                                     static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorY))));
 
 	if (static_cast<int>(Chara.MogFur().m_cursorX) < 0) {
 		Chara.MogFur().m_cursorX = 0;

@@ -776,11 +776,13 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 
 	for (int i = 0; i < 8; i++) {
 		if (*(short*)(this->m_bonusStatePtr + 0x1c) == 4) {
-			float rgb = 1.0f;
+			float rgb;
 			unsigned int mask = ((int)(signed char)s_Rinfo->pad_0008 | (int)(signed char)s_Rinfo->m_missingArtifactMask) |
 			    s_Rinfo->m_party[partyIndex].m_ownedArtifactMask;
 			if ((mask & (1 << i)) != 0) {
 				rgb = 0.7f;
+			} else {
+				rgb = 1.0f;
 			}
 			_GXColor color = {
 			    (unsigned char)(rgb * 255.0f),

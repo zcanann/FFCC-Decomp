@@ -10,7 +10,7 @@ extern "C" {
 extern int ppvUserStopPartF;
 extern int gPppCalcDisabled;
 extern unsigned char gPppInConstructor;
-extern unsigned char gPppInSubFrameCalc;
+extern signed char gPppInSubFrameCalc;
 extern unsigned char ppvIsLoopCalc;
 extern unsigned char ppvIs2ndCalc;
 

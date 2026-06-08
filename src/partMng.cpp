@@ -81,7 +81,7 @@ extern int ppvSysGoPartF;
 unsigned char gPppDefaultValueBuffer[0x40] = {0};
 int gPppHeapUseRateWords[3] = {0, 0, 0};
 unsigned char gPppInConstructor = 0;
-unsigned char gPppInSubFrameCalc = 0;
+signed char gPppInSubFrameCalc = 0;
 extern int ppvEmptyLoop;
 unsigned char gPppEditorAnimIndex = 0;
 unsigned char gPppEditorAnimIndexInitialized = 0;
@@ -108,6 +108,7 @@ static const char sPartMngHeapSummaryFmt[] =
 enum PppChunkId {
     kChunkNAME = 0x4E414D45,
     kChunkPDT = 0x50445420,
+    kChunkPDTS = 0x50445453,
     kChunkRSDM = 0x5253444D,
     kChunkRSET = 0x52534554,
     kChunkSHPM = 0x5348504D,
@@ -275,8 +276,8 @@ void CPartMng::Create()
     ppvZeroVector.y = kPartMngZero;
     ppvZeroVector.z = kPartMngZero;
 
-    gPppInConstructor = 0;
-    gPppInSubFrameCalc = 0;
+    ppvIsLoopCalc = 0;
+    ppvIs2ndCalc = 0;
 
     PSMTXIdentity(ppvWorldMatrix);
     PSMTXIdentity(ppvWorldMatrix);
@@ -371,8 +372,7 @@ void CPartMng::Destroy()
         for (unsigned int i = 0; i < 0x100; i++) {
             pppModelSt* model = &modelArr[i];
             if (model->m_isUsed != 0) {
-                model->m_refCount--;
-                if (model->m_refCount < 1) {
+                if (--model->m_refCount < 1) {
                     if (model->m_cacheId != -1) {
                         ppvAmemCacheSet.DestroyCache(model->m_cacheId);
                         *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(model) + 0x24) = 0;
@@ -392,8 +392,7 @@ void CPartMng::Destroy()
         for (unsigned int i = 0; i < 0x100; i++) {
             pppShapeSt* shape = &res->m_pppShapeStArr[i];
             if (shape->m_inUse != 0) {
-                shape->m_refCount--;
-                if (shape->m_refCount < 1) {
+                if (--shape->m_refCount < 1) {
                     if (shape->m_animData != 0) {
                         delete[] reinterpret_cast<u8*>(shape->m_animData);
                         shape->m_animData = 0;
@@ -1222,17 +1221,22 @@ unsigned int CPartMng::pppReadRsd(CChunkFile& chunkFile, pppModelSt* modelSt)
 
     while (chunkFile.GetNextChunk(chunk)) {
         chunkFile.PushChunk();
-        if (chunk.m_id == 'RSD ') {
+        switch (chunk.m_id) {
+        case 'RSD ':
             while (chunkFile.GetNextChunk(chunk)) {
-                if (chunk.m_id == 'TXNM') {
+                switch (chunk.m_id) {
+                case 'TXNM':
                     for (unsigned int i = 0; i < chunk.m_arg0; i++) {
                         textureNames[i] = chunkFile.GetString();
                     }
-                } else if (chunk.m_id == 'MESH') {
+                    break;
+                case 'MESH':
                     meshSize = modelSt->ReadOtmMesh(chunkFile, PartPcs.m_usbStreamState.m_stageLoad, 0, 0);
                     modelSt->SetDisplayListMaterial(m_materialSet, textureNames, &ppvAmemCacheSet);
+                    break;
                 }
             }
+            break;
         }
         chunkFile.PopChunk();
     }
@@ -2256,16 +2260,16 @@ void CPartMng::pppEditBeforeCalc()
     case 0x1a:
         if (*editorObj != 0) {
             Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x7ce);
-            if (gPppEditorAnimIndexInitialized == 0) {
-                gPppEditorAnimIndex = 0;
-                gPppEditorAnimIndexInitialized = 1;
+            if (gPppInSubFrameCalc == 0) {
+                gPppInConstructor = 0;
+                gPppInSubFrameCalc = 1;
             }
 
             CCharaPcs::CHandle* handle = (*editorObj)->m_charaModelHandle;
             if (handle != 0) {
-                handle->LoadAnim(reinterpret_cast<char*>(self + 0x19c), gPppEditorAnimIndex, 0, -1, -1, -1, 0);
-                handle->SetAnim(gPppEditorAnimIndex, -1, -1, -1, 0);
-                gPppEditorAnimIndex++;
+                handle->LoadAnim(reinterpret_cast<char*>(self + 0x19c), gPppInConstructor, 0, -1, -1, -1, 0);
+                handle->SetAnim(gPppInConstructor, -1, -1, -1, 0);
+                gPppInConstructor++;
             }
         }
         break;
@@ -2304,7 +2308,7 @@ void CPartMng::pppEditPartCalc()
     static const int kPppMngCount = 0x180;
 
     char* self = reinterpret_cast<char*>(this);
-    unsigned char* usbEdit = reinterpret_cast<unsigned char*>(self + kUsbEditOffset);
+    char* usbEdit = reinterpret_cast<char*>(self + kUsbEditOffset);
     PppPdtSlot* pdtSlots = m_pdtSlots;
 
     if (ppvSysGoPartF != 0) {
@@ -2849,7 +2853,7 @@ void CPartMng::pppDumpCacheIdx()
 
     pppSetRendMatrix();
 
-    unsigned char gamePaused = Game.m_gameWork.m_gamePaused;
+    int gamePaused = Game.m_gameWork.m_gamePaused;
     for (int i = 0; i < 0x180; i++) {
         PppMngStDumpRaw* mng = reinterpret_cast<PppMngStDumpRaw*>(
             reinterpret_cast<unsigned char*>(this) + 0x2A18 + i * 0x158);
@@ -3572,8 +3576,10 @@ int CPartMng::pppLoadPtx(const char* baseName, int pdtSlotIndex, int appendMode,
 
     CChunkFile::CChunk chunk;
     while (chunkFile.GetNextChunk(chunk)) {
-        if (chunk.m_id == kChunkTSET) {
+        switch (chunk.m_id) {
+        case kChunkTSET:
             m_textureSet->Create(chunkFile, PartPcs.m_usbStreamState.m_stageLoad, 1, &ppvAmemCacheSet, appendMode, 0);
+            break;
         }
     }
 
@@ -3637,7 +3643,8 @@ void CPartMng::pppLoadPmd(const char* baseName)
     CChunkFile::CChunk outerChunk;
     while (chunkFile.GetNextChunk(outerChunk)) {
         chunkFile.PushChunk();
-        if (outerChunk.m_id == kChunkRSET) {
+        switch (outerChunk.m_id) {
+        case kChunkRSET: {
             pppModelSt* modelArray = m_pppModelStArr;
             pppModelSt* targetModel = 0;
 
@@ -3696,6 +3703,8 @@ void CPartMng::pppLoadPmd(const char* baseName)
                 }
                 }
             }
+            break;
+        }
         }
         chunkFile.PopChunk();
     }
@@ -3755,7 +3764,8 @@ void CPartMng::pppLoadPan(const char* baseName)
     CChunkFile::CChunk outerChunk;
     while (chunkFile.GetNextChunk(outerChunk)) {
         chunkFile.PushChunk();
-        if (outerChunk.m_id == kChunkSSET) {
+        switch (outerChunk.m_id) {
+        case kChunkSSET: {
             pppShapeSt* shapeArray = m_pppShapeStArr;
             pppShapeSt* targetShape = 0;
 
@@ -3802,6 +3812,8 @@ void CPartMng::pppLoadPan(const char* baseName)
                 }
                 }
             }
+            break;
+        }
         }
         chunkFile.PopChunk();
     }
@@ -3858,7 +3870,8 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
             CChunkFile::CChunk childChunk;
             while (pdtFile.GetNextChunk(childChunk)) {
                 pdtFile.PushChunk();
-                if (childChunk.m_id == 0x50445453) { // "PDTS"
+                switch (childChunk.m_id) {
+                case kChunkPDTS: {
                     _pppDataHead* sourceHead = reinterpret_cast<_pppDataHead*>(pdtFile.GetAddress());
                     pppInitData(sourceHead, pppGetSysProgTable(), cachePriority);
 
@@ -3879,7 +3892,9 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
                         pdtSlot->m_envFields[4] = copiedHead->m_shapeGroups;
                     }
                     pdtSlot->m_envFields[0] = reinterpret_cast<unsigned int>(m_pppEnvSt.m_stagePtr);
-                } else if (childChunk.m_id == kChunkRSET) {
+                    break;
+                }
+                case kChunkRSET: {
                     pppModelSt* modelArray = m_pppModelStArr;
                     pppModelSt* targetModel = 0;
 
@@ -3932,7 +3947,9 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
                             }
                         }
                     }
-                } else if (childChunk.m_id == kChunkSSET) {
+                    break;
+                }
+                case kChunkSSET: {
                     pppShapeSt* shapeArray = m_pppShapeStArr;
                     pppShapeSt* targetShape = 0;
 
@@ -3974,6 +3991,8 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
                             }
                         }
                     }
+                    break;
+                }
                 }
                 pdtFile.PopChunk();
             }
@@ -4062,6 +4081,10 @@ PPPCREATEPARAM* CPartMng::pppGetDefaultCreateParam()
  * JP Address: TODO
  * JP Size: TODO
  */
+struct PppHitIdBlock {
+    int m_ids[8];
+};
+
 int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam, int allowFpOverride)
 {
     struct PppMngStCreateRaw {
@@ -4090,15 +4113,18 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
         unsigned char m_envColorG;   // 0xA9
         unsigned char m_envColorB;   // 0xAA
         unsigned char m_envColorA;   // 0xAB
-        int m_prioTime;              // 0xAC
+        int m_spawnedCount;          // 0xAC
         int m_previousFrame2;        // 0xB0
-        int m_numPrograms;           // 0xB4
-        int m_reservedB8;            // 0xB8
+        int m_numControlPrograms2;   // 0xB4
+        int m_numPrograms2;          // 0xB8
         unsigned int m_objHitMask;   // 0xBC
         unsigned int m_cylinderAttribute; // 0xC0
-        _pppPObjLink m_pppPObjLinkHead;   // 0xC4
-        void* m_pppPDataVals;        // 0xCC
-        unsigned char m_padD0[0xE4 - 0xD0];
+        _pppPObjLink m_pppPObjLinkHead;   // 0xC4 (size 0xC)
+        void* m_programTable;        // 0xD0
+        void* m_pppPDataVals;        // 0xD4
+        void* m_owner;               // 0xD8
+        void* m_lookTarget;          // 0xDC
+        void* m_bindNode;            // 0xE0
         unsigned char m_endRequested;     // 0xE4
         unsigned char m_stopRequested;    // 0xE5
         unsigned char m_isFinished;       // 0xE6
@@ -4119,8 +4145,9 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
         unsigned char m_hasMapRef;        // 0xF6
         unsigned char m_fpBillboard;      // 0xF7
         unsigned char m_prio;             // 0xF8
-        short m_frameCounter;             // 0xF9
-        unsigned char m_padFB[0x100 - 0xFB];
+        unsigned char m_padF9;            // 0xF9
+        unsigned short m_prioTime;        // 0xFA
+        unsigned char m_padFC[0x100 - 0xFC];
         int m_paramA;                     // 0x100
         unsigned int m_paramB;            // 0x104
         float m_cullRadiusSq;             // 0x108
@@ -4131,7 +4158,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
         short m_mapObjIndex;              // 0x11A
         PPPSEST m_soundEffectData;        // 0x11C
         PPPIFPARAM m_hitParams;           // 0x130
-        short m_hitObjectIds[0x10];       // 0x138
+        int m_hitObjectIds[8];            // 0x138
     };
 
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
@@ -4141,25 +4168,25 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
         return -1;
     }
 
-    int freeIdx = -1;
+    unsigned char* fpData = reinterpret_cast<unsigned char*>(pdt) + 0x20 + fpNo * 0x60;
+
+    PppMngStCreateRaw* mng = 0;
     for (int i = 0; i < 0x180; i++) {
-        unsigned char* mngBytes = self + 0x2A18 + i * 0x158;
-        if (*reinterpret_cast<int*>(mngBytes + 0x14) == -0x1000) {
-            freeIdx = i;
+        if (m_pppMng[i].m_baseTime == -0x1000) {
+            mng = reinterpret_cast<PppMngStCreateRaw*>(self + 0x2A18 + i * 0x158);
             break;
         }
     }
-    if (freeIdx < 0) {
+    if (mng == 0) {
         return -1;
     }
 
-    PppMngStCreateRaw* mng = reinterpret_cast<PppMngStCreateRaw*>(self + 0x2A18 + freeIdx * 0x158);
+    int freeIdx = mng - reinterpret_cast<PppMngStCreateRaw*>(self + 0x2A18);
     if (System.m_execParam != 0) {
         System.Printf(const_cast<char*>(sPppCreateLogFmt), pdtSlotIndex, fpNo, freeIdx,
                       slot->m_name);
     }
 
-    unsigned char* fpData = reinterpret_cast<unsigned char*>(pdt) + 0x20 + fpNo * 0x60;
     unsigned char* fpData1 = fpData + 0x20;
     unsigned char* fpData2 = fpData + 0x40;
 
@@ -4172,19 +4199,14 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     mng->m_hitParams.m_classId = createParam->m_hitParamB;
     mng->m_hitParams.m_hitObjectCount = createParam->m_hitObjectCount;
     mng->m_hitParams.m_hitFlags = createParam->m_hitFlags;
-    memcpy(mng->m_hitObjectIds, createParam->m_hitObjectIds, sizeof(mng->m_hitObjectIds));
+    *reinterpret_cast<PppHitIdBlock*>(mng->m_hitObjectIds) =
+        *reinterpret_cast<const PppHitIdBlock*>(createParam->m_hitObjectIds);
 
     mng->m_mapTexLoaded = 0;
     mng->m_hasMapRef = 0;
-    mng->m_envColorR = 0;
-    mng->m_envColorG = 0;
-    mng->m_envColorB = 0x13;
-    mng->m_envColorA = 0x33;
+    *reinterpret_cast<unsigned int*>(&mng->m_envColorR) = 0x1333;
     if (reinterpret_cast<unsigned char*>(&PartPcs)[0x5b145] != 0 && pdtSlotIndex == 7 && fpNo == 0) {
-        mng->m_envColorR = 0;
-        mng->m_envColorG = 0;
-        mng->m_envColorB = 0x10;
-        mng->m_envColorA = 0;
+        *reinterpret_cast<unsigned int*>(&mng->m_envColorR) = 0x1000;
     }
 
     mng->m_soundEffectData = createParam->m_soundEffectParams;
@@ -4200,15 +4222,13 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     if (initialTime == -0x1000) {
         mng->m_baseTime = 0;
     } else {
-        int scaled = initialTime * 0x19;
-        scaled = scaled / 0x1E + (scaled >> 0x1F);
-        mng->m_baseTime = scaled - (scaled >> 0x1F);
+        mng->m_baseTime = initialTime * 0x19 / 0x1E;
     }
 
     mng->m_pppResSet = slot;
     mng->m_partIndex = *reinterpret_cast<int*>(fpData1 + 0x10);
     mng->m_cullRadiusSq = *reinterpret_cast<float*>(fpData1 + 0x14);
-    if (mng->m_cullRadiusSq > 0.0f) {
+    if (mng->m_cullRadiusSq > 0.0) {
         mng->m_cullRadiusSq *= mng->m_cullRadiusSq;
     }
     mng->m_cullRadius = *reinterpret_cast<float*>(fpData1 + 0x18);
@@ -4229,7 +4249,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     mng->m_nodeScaleInitialized = *reinterpret_cast<unsigned char*>(fpData2 + 0x0E);
     mng->m_fieldF2 = 1;
     if (allowFpOverride != 0) {
-        const unsigned char mode = *reinterpret_cast<unsigned char*>(fpData2 + 0x05);
+        const int mode = *reinterpret_cast<unsigned char*>(fpData2 + 0x05);
         if (mode == 4 || mode < 3 || mode > 8) {
             mng->m_fieldF2 = *reinterpret_cast<unsigned char*>(fpData2 + 0x0F);
         }

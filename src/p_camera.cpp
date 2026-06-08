@@ -608,8 +608,14 @@ void CCameraPcs::CalcQuake()
     Vec offset;
     Vec jitter;
 
-    if ((System.m_scenegraphStepMode == 2) || ((m_quake.m_mode == 2) && (m_quake.m_state == 0)) ||
-        ((m_quake.m_mode == 1) && (m_quake.m_state == 0) && (m_quake.m_endTimer <= 0))) {
+    if (System.m_scenegraphStepMode == 2) {
+        return;
+    }
+    unsigned char mode = m_quake.m_mode;
+    if (mode == 2 && m_quake.m_state == 0) {
+        return;
+    }
+    if (mode == 1 && m_quake.m_state == 0 && m_quake.m_endTimer <= 0) {
         return;
     }
 

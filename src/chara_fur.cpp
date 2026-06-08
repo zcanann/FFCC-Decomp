@@ -452,7 +452,7 @@ void CChara::TimeMogFur()
 			int a;
 			int newA;
 			unsigned int tileIndex = ((x % 4) + ((y % 4) * 4) + (x / 4) * 0x10 + (y / 4) * 0x100) * 2;
-			short packed = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(texels) + tileIndex);
+			unsigned short packed = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(texels) + tileIndex);
 
 			a = (packed >> 12) & 7;
 			light = 7 - a;
@@ -484,7 +484,7 @@ void CChara::TimeMogFur()
 			newA = clampedA;
 
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(texels) + tileIndex) =
-			    static_cast<unsigned short>((b & 0xF) | ((g & 0xF) << 4) | ((r & 0xF) << 8) | ((newA & 7) << 12));
+			    static_cast<unsigned short>((newA << 12) | (r << 8) | (g << 4) | b);
 		}
 	}
 
@@ -1868,7 +1868,7 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 			int ux = px;
 			unsigned int uy = py;
 			tileIndex = ((ux & 3) + ((uy & 3) * 4) + (ux >> 2) * 0x10 + (uy >> 2) * width * 4) * 2;
-			packed = *(short*)(((char*)pixels) + tileIndex);
+			packed = *(unsigned short*)(((char*)pixels) + tileIndex);
 
 			b = packed & 0x0f;
 			g = (packed >> 4) & 0x0f;
@@ -1914,7 +1914,7 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 				}
 			}
 
-			*(unsigned short*)(((char*)pixels) + tileIndex) = (unsigned short)((b & 0x0f) | ((g & 0x0f) << 4) | ((r & 0x0f) << 8) | ((a & 0x07) << 12));
+			*(unsigned short*)(((char*)pixels) + tileIndex) = (unsigned short)((a << 12) | (r << 8) | (g << 4) | b);
 
 			if (distance == 0) {
 				_GXColor afterColor = CColor((unsigned char)r, (unsigned char)g, (unsigned char)b, (unsigned char)a).color;

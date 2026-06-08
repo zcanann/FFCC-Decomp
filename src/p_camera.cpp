@@ -1778,7 +1778,7 @@ void CCameraPcs::drawShadowEnd()
     GXSetTexCopySrc(0, 0, 0x1E0, 0x1E0);
     GXSetTexCopyDst(0x1E0, 0x1E0, GX_TF_I8, GX_FALSE);
     GXCopyTex(m_fullScreenShadow.m_shadowTexture, GX_TRUE);
-    GXSetCullMode(GX_CULL_BACK);
+    GXSetCullMode(GX_CULL_FRONT);
 
     {
         float span = m_fullScreenShadow.m_span;

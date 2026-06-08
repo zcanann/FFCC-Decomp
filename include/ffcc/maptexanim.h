@@ -38,13 +38,7 @@ public:
     CMapTexAnim()
     {
         float frameStep = kMapTexAnimDefaultFrameStep;
-        m_keyFrame.m_junTable = 0;
         float currentFrame = kMapTexAnimZero;
-        m_keyFrame.m_keyFrame = 0;
-        m_keyFrame.m_keyValue = 0;
-        m_keyFrame.m_splineTable = 0;
-        m_keyFrame.m_loop = 1;
-        m_keyFrame.m_isRun = 0;
         m_frameTable = 0;
         m_frameStep = frameStep;
         m_currentFrame = currentFrame;

@@ -1245,6 +1245,7 @@ void CGObject::hit()
         return;
     }
 
+    const float zero = sZeroFloat;
     for (CGObject* other = CFlat.FindGObjFirst(); other != 0;
          other = CFlat.FindGObjNext(other)) {
         if (((other->m_bgColMask & 0x80000) == 0) || (other == this)) {
@@ -1268,8 +1269,8 @@ void CGObject::hit()
             for (int damageIndex = 0; damageIndex < 8; damageIndex++) {
                 DamageCol* damage = &other->m_damageColliders[damageIndex];
                 if (((attack->m_hitMask & damage->m_hitMask) == 0) ||
-                    (sZeroFloat == damage->m_innerRadius) ||
-                    (sZeroFloat == damage->m_outerRadius)) {
+                    (zero == damage->m_innerRadius) ||
+                    (zero == damage->m_outerRadius)) {
                     continue;
                 }
 

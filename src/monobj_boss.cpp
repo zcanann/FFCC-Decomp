@@ -849,9 +849,9 @@ void CGMonObj::frameStatFuncSaw()
 			if (prgObj->m_subFrame == 0) {
 				prgObj->reqAnim(10, 0, 0);
 
-				int pdtNo = object->m_charaModelHandle->GetPdtSlot();
+				int pdtNo = reinterpret_cast<CGObject*>(this)->m_charaModelHandle->GetPdtSlot();
 
-				prgObj->putParticle(pdtNo << 8, *reinterpret_cast<int*>(mon + 0x564), object, kMonObjBossOne, 0x1C52C);
+				prgObj->putParticle(pdtNo << 8, *reinterpret_cast<int*>(mon + 0x564), reinterpret_cast<CGObject*>(this), kMonObjBossOne, 0x1C52C);
 				prgObj->playSe3D(0x1C52B, 0x32, 0x96, 0, 0);
 				memset(&m_moveWork, 0, sizeof(m_moveWork));
 				m_moveWork.m_flags = 0x1402;

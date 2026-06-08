@@ -1158,7 +1158,7 @@ void CShopMenu::DrawItemInfo0()
     bool canTrade = CanTradeShopMenuItem(this, m_selectedIndex, getItemNo(m_selectedIndex));
 
     if (canTrade) {
-        SetupShopMenuUnitFont(font);
+        font->SetMargin(FLOAT_80332d28);
         char* unitText = ShopMenuMes(languageId, SHOP_MENU_TEXT_GIL);
         float unitWidth = font->GetWidth(unitText);
         float rightX = FLOAT_80332d3c - unitWidth;
@@ -1189,12 +1189,12 @@ void CShopMenu::DrawItemInfo0()
         SetupShopMenuAmountFont(font);
         DrawShopMenuAmountTrunc(font, totalGil, amountRightX, FLOAT_80332d68, 0x1B);
 
-        SetupShopMenuUnitFont(font);
+        font->SetMargin(FLOAT_80332d28);
         font->DrawInit();
         MenuPcs.DrawNoShadowFont(font, unitText, static_cast<float>(static_cast<int>(rightX)), FLOAT_80332d68, 0x19, 0x12);
         MenuPcs.DrawInit();
     } else {
-        SetupShopMenuUnitFont(font);
+        font->SetMargin(FLOAT_80332d28);
         const char* message = (m_listType == 0) ? ShopMenuMes(languageId, SHOP_MENU_TEXT_CANNOT_BUY) :
                                                 ShopMenuMes(languageId, SHOP_MENU_TEXT_CANNOT_SELL);
         float messageWidth = font->GetWidth(message);

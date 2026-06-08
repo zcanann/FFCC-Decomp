@@ -270,10 +270,10 @@ CFunnyShapePcs::~CFunnyShapePcs()
 {
 }
 
-static CProcessTableCallback s_tableDesc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__14CFunnyShapePcsFv)};
-static CProcessTableCallback s_tableDesc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__14CFunnyShapePcsFv)};
-static CProcessTableCallback s_tableDesc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__14CFunnyShapePcsFv)};
-static CProcessTableCallback s_tableDesc3 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__14CFunnyShapePcsFv)};
+static const CProcessTableCallback s_tableDesc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__14CFunnyShapePcsFv)};
+static const CProcessTableCallback s_tableDesc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__14CFunnyShapePcsFv)};
+static const CProcessTableCallback s_tableDesc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__14CFunnyShapePcsFv)};
+static const CProcessTableCallback s_tableDesc3 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__14CFunnyShapePcsFv)};
 CFunnyShapePcs FunnyShapePcs;
 CProcessTable CFunnyShapePcs::m_table = {
     const_cast<char*>(s_CFunnyShapePcsViewer),

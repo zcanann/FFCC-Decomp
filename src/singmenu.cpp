@@ -1974,22 +1974,19 @@ void CMenuPcs::SingleCalcFadeOut()
     int count = static_cast<int>(m_singleFadeState->count);
     SingleFadeEntry* entry = m_singleFadeState->entries;
     int frame = static_cast<int>(m_singMenuState->frame);
-    if (0 < count) {
-        do {
-            if (frame < entry->startFrame) {
-                entry->alpha = 1.0f;
-            } else if (frame < entry->startFrame + entry->duration) {
-                entry->elapsed = entry->elapsed + 1;
-                entry->alpha =
-                    static_cast<float>(-((1.0 / static_cast<double>(entry->duration)) *
-                                          static_cast<double>(entry->elapsed) - 1.0));
-            } else {
-                completed = completed + 1;
-                entry->alpha = 0.0f;
-            }
-            entry = entry + 1;
-            count = count - 1;
-        } while (count != 0);
+    for (int i = 0; i < count; i++) {
+        if (entry->startFrame > frame) {
+            entry->alpha = 1.0f;
+        } else if (entry->startFrame + entry->duration <= frame) {
+            completed = completed + 1;
+            entry->alpha = 0.0f;
+        } else {
+            entry->elapsed = entry->elapsed + 1;
+            entry->alpha =
+                static_cast<float>(-((1.0 / static_cast<double>(entry->duration)) *
+                                      static_cast<double>(entry->elapsed) - 1.0));
+        }
+        entry = entry + 1;
     }
 
     if (m_wm.m_handles[0]->m_model->m_animEnd < m_wm.m_handles[0]->m_model->m_time) {

@@ -3901,14 +3901,16 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
 
             if ((signed char)sendType == 0)
             {
-                dataPtr = reinterpret_cast<unsigned char*>(m_fileBaseA);
-                dataBase = reinterpret_cast<unsigned char*>(m_fileBaseA);
+                unsigned char* baseA = reinterpret_cast<unsigned char*>(m_fileBaseA);
+                dataPtr = baseA;
+                dataBase = baseA;
                 totalSize = static_cast<unsigned short>(m_fileBaseA_dup);
             }
             else if ((signed char)sendType == 1)
             {
-                dataPtr = reinterpret_cast<unsigned char*>(m_fileBaseB);
-                dataBase = reinterpret_cast<unsigned char*>(m_fileBaseB);
+                unsigned char* baseB = reinterpret_cast<unsigned char*>(m_fileBaseB);
+                dataPtr = baseB;
+                dataBase = baseB;
                 totalSize = static_cast<unsigned short>(m_fileBaseB_dup);
             }
             else

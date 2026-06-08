@@ -557,7 +557,7 @@ void CCharaPcs::Init()
     LoadPdtArray(this)->SetDefaultSize(0x80);
     LoadPdtArray(this)->SetGrow(0);
 
-    for (int i = 0; i < 2; i++) {
+    for (unsigned int i = 0; i < 2; i++) {
         _GXColor& ambientColor = m_viewerAmbientColor[i];
         ambientColor.r = 0x3F;
         ambientColor.g = 0x3F;
@@ -794,44 +794,46 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
         handle = next;
     }
 
-    if (resetMode != 1) {
-        if (resetMode == 0) {
-            const unsigned int releaseMask = ~(FreeMergeMask(this) | 0x10000000U);
-            releaseUnuseLoadModel(static_cast<int>(releaseMask));
+    switch (resetMode) {
+    case 0: {
+        const unsigned int releaseMask = ~(FreeMergeMask(this) | 0x10000000U);
+        releaseUnuseLoadModel(static_cast<int>(releaseMask));
 
-            for (int i = LoadAnimArray(this)->GetSize() - 1; i >= 0; i--) {
-                CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
-                if (!(((loadAnim->m_mergeFileId < 0) && (loadAnim->GetRef() == 1)) ||
-                      ((loadAnim->m_mergeFileId >= 0) && ((releaseMask & static_cast<unsigned int>(loadAnim->m_mergeFlags)) != 0)))) {
-                    continue;
-                }
-
-                CRef* loadAnimRef = loadAnim;
-                if (loadAnimRef->DecRef() == 0) {
-                    delete loadAnimRef;
-                }
-                LoadAnimArray(this)->RemoveAt(static_cast<unsigned long>(i));
+        for (int i = LoadAnimArray(this)->GetSize() - 1; i >= 0; i--) {
+            CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
+            if (!(((loadAnim->m_mergeFileId < 0) && (loadAnim->GetRef() == 1)) ||
+                  ((loadAnim->m_mergeFileId >= 0) && ((releaseMask & static_cast<unsigned int>(loadAnim->m_mergeFlags)) != 0)))) {
+                continue;
             }
 
-            System.Printf(const_cast<char*>(s_charaFreeMergeFmt), releaseMask);
-            LoadPdtArray(this)->ReleaseAndRemoveAll();
-            int charaAmemSize = correctLoadAnimAmem();
-            if (charaAmemSize >= 0) {
-                CharaAmemSize() = static_cast<unsigned int>(charaAmemSize);
-                goto complete;
+            CRef* loadAnimRef = loadAnim;
+            if (loadAnimRef->DecRef() == 0) {
+                delete loadAnimRef;
             }
+            LoadAnimArray(this)->RemoveAt(static_cast<unsigned long>(i));
+        }
 
-            if (static_cast<unsigned int>(System.m_execParam) >= 2) {
-                System.Printf(const_cast<char*>(s_charaAmemCompactFailed));
-            }
+        System.Printf(const_cast<char*>(s_charaFreeMergeFmt), releaseMask);
+        LoadPdtArray(this)->ReleaseAndRemoveAll();
+        int charaAmemSize = correctLoadAnimAmem();
+        if (charaAmemSize >= 0) {
+            CharaAmemSize() = static_cast<unsigned int>(charaAmemSize);
+            goto complete;
+        }
+
+        if (static_cast<unsigned int>(System.m_execParam) >= 2) {
+            System.Printf(const_cast<char*>(s_charaAmemCompactFailed));
         }
     }
-
-    LoadModelArray(this)->ReleaseAndRemoveAll();
-    LoadAnimArray(this)->ReleaseAndRemoveAll();
-    LoadTextureArray(this)->ReleaseAndRemoveAll();
-    LoadPdtArray(this)->ReleaseAndRemoveAll();
-    CharaAmemSize() = 0;
+        // fallthrough
+    case 1:
+        LoadModelArray(this)->ReleaseAndRemoveAll();
+        LoadAnimArray(this)->ReleaseAndRemoveAll();
+        LoadTextureArray(this)->ReleaseAndRemoveAll();
+        LoadPdtArray(this)->ReleaseAndRemoveAll();
+        CharaAmemSize() = 0;
+        break;
+    }
 
 complete:
     gCharaPartWorkPtr->m_bumpShade[3] = 0xFF;
@@ -1334,10 +1336,10 @@ void CCharaPcs::drawShadow()
  */
 CTextureSet* CCharaPcs::createTextureSet(void* textureData, int useWeaponStage)
 {
-    CTextureSet* textureSet = new (m_stage, const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
+    CTextureSet* textureSet = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
 
-    CMemory::CStage* textureStage = (&m_viewerModelStage)[useWeaponStage != 0 ? 3 : 1];
-    textureSet->Create(textureData, SelectLoadStage(this, textureStage), 0, 0, 0, 0);
+    CMemory::CStage* textureStage = (&CharaPcs.m_viewerModelStage)[useWeaponStage != 0 ? 3 : 1];
+    textureSet->Create(textureData, SelectLoadStage(&CharaPcs, textureStage), 0, 0, 0, 0);
 
     return textureSet;
 }
@@ -2216,14 +2218,28 @@ void CCharaPcs::CHandle::ChangeTexture(
     CLoadTexture* loadTexture = 0;
     for (unsigned int i = 0; i < static_cast<unsigned int>(LoadTextureArray(&CharaPcs)->GetSize()); i++) {
         CLoadTexture* it = (*LoadTextureArray(&CharaPcs))[i];
-        if (it->m_keyTag == reinterpret_cast<void*>(charaKind) && it->m_keyId == static_cast<int>(charaNo) &&
+        if (it->m_keyTag == reinterpret_cast<void*>(charaKind) && it->m_keyId == static_cast<unsigned int>(charaNo) &&
             it->m_variantTag == reinterpret_cast<void*>(textureVariant)) {
             loadTexture = it;
             break;
         }
     }
 
-    if (loadTexture == 0) {
+    if (loadTexture != 0) {
+        if (loadTexture->m_streamMode != 0 && loadTexture->GetRef() == 1) {
+            File.LockBuffer();
+            Memory.CopyFromAMemorySync(
+                File.m_readBuffer,
+                reinterpret_cast<unsigned char*>(StageBase(CharaPcs.m_amemWorkStage)) +
+                    reinterpret_cast<unsigned int>(loadTexture->m_streamOffset),
+                static_cast<unsigned long>(loadTexture->m_streamSize));
+            void* readBuffer = File.m_readBuffer;
+            CTextureSet* textureSet = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
+            textureSet->Create(readBuffer, HandleTextureStage(charaKind), 0, 0, 0, 0);
+            loadTexture->m_textureSet = textureSet;
+            File.UnlockBuffer();
+        }
+    } else {
         if (textureVariant == 0) {
             strcpy(path, basePath);
         } else {
@@ -2262,20 +2278,6 @@ void CCharaPcs::CHandle::ChangeTexture(
         return;
     }
 
-    if (loadTexture->m_streamOffset != 0 && loadTexture->GetRef() == 1) {
-        File.LockBuffer();
-        Memory.CopyFromAMemorySync(
-            File.m_readBuffer,
-            reinterpret_cast<unsigned char*>(StageBase(CharaPcs.m_amemWorkStage)) +
-                reinterpret_cast<unsigned int>(loadTexture->m_streamOffset),
-            static_cast<unsigned long>(loadTexture->m_streamSize));
-        void* readBuffer = File.m_readBuffer;
-        CTextureSet* textureSet = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
-        textureSet->Create(readBuffer, HandleTextureStage(charaKind), 0, 0, 0, 0);
-        loadTexture->m_textureSet = textureSet;
-        File.UnlockBuffer();
-    }
-
     m_texLoadRef = loadTexture;
     m_texLoadRef->AddRef();
     m_textureSet = reinterpret_cast<CLoadTexture*>(m_texLoadRef)->m_textureSet;
@@ -2307,7 +2309,7 @@ void CCharaPcs::CHandle::LoadModel(
 
     m_charaKind = charaKind;
     m_charaNo = static_cast<int>(charaNo);
-    m_textureVariant = static_cast<int>(textureVariant);
+    m_textureVariant = static_cast<unsigned int>(textureVariant);
 
     char basePath[0x100];
     char path[0x100];
@@ -2322,7 +2324,38 @@ void CCharaPcs::CHandle::LoadModel(
         }
     }
 
-    if (loadModel == 0) {
+    if (loadModel != 0) {
+        m_modelLoadRef = loadModel;
+
+        CMemory::CStage* modelStage = CharaPcs.m_viewerModelStage;
+        if (specialModelStage != 0) {
+            modelStage = m_charaKind == 3 ? CharaPcs.m_familyModelStage : CharaPcs.m_weaponModelStage;
+        }
+
+        if (loadModel->GetRef() == 1) {
+            if (loadModel->m_streamMode != 0) {
+                File.LockBuffer();
+                Memory.CopyFromAMemorySync(
+                    File.m_readBuffer,
+                    reinterpret_cast<unsigned char*>(StageBase(CharaPcs.m_amemWorkStage)) +
+                        reinterpret_cast<unsigned int>(loadModel->m_streamOffset),
+                    static_cast<unsigned long>(loadModel->m_streamSize));
+                CChara::CModel* model =
+                    new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x7C7) CChara::CModel;
+                model->Create(File.m_readBuffer, SelectLoadStage(&CharaPcs, modelStage));
+                loadModel->m_model = model;
+                File.UnlockBuffer();
+            }
+
+            m_modelLoadRef->AddRef();
+            m_model = loadModel->m_model;
+            m_model->AddRef();
+            m_model->Init();
+        } else {
+            m_modelLoadRef->AddRef();
+            m_model = loadModel->m_model->Duplicate(SelectLoadStage(&CharaPcs, modelStage));
+        }
+    } else {
         strcpy(path, basePath);
         strcat(path, s_charaModelSuffix);
 
@@ -2362,32 +2395,6 @@ void CCharaPcs::CHandle::LoadModel(
             m_model->CreateDynamics(File.m_readBuffer, HandleModelStage(charaKind, 0));
             File.Close(fileHandle);
         }
-    } else {
-        m_modelLoadRef = loadModel;
-
-        if (loadModel->GetRef() == 1) {
-            if (loadModel->m_streamMode != 0) {
-                File.LockBuffer();
-                Memory.CopyFromAMemorySync(
-                    File.m_readBuffer,
-                    reinterpret_cast<unsigned char*>(StageBase(CharaPcs.m_amemWorkStage)) +
-                        reinterpret_cast<unsigned int>(loadModel->m_streamOffset),
-                    static_cast<unsigned long>(loadModel->m_streamSize));
-                CChara::CModel* model =
-                    new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x7C7) CChara::CModel;
-                model->Create(File.m_readBuffer, HandleModelStage(m_charaKind, specialModelStage));
-                loadModel->m_model = model;
-                File.UnlockBuffer();
-            }
-
-            m_modelLoadRef->AddRef();
-            m_model = loadModel->m_model;
-            m_model->AddRef();
-            m_model->Init();
-        } else {
-            m_modelLoadRef->AddRef();
-            m_model = loadModel->m_model->Duplicate(HandleModelStage(m_charaKind, specialModelStage));
-        }
     }
 
     ChangeTexture(charaKind, charaNo, textureVariant, mergeFileId, mergeFlags);
@@ -2410,7 +2417,7 @@ void CCharaPcs::CHandle::LoadModel(
             loadPdt = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x868) CLoadPdt;
             m_pdtLoadRef = loadPdt;
             reinterpret_cast<CLoadPdt*>(m_pdtLoadRef)->m_keyTag = reinterpret_cast<void*>(1);
-            reinterpret_cast<CLoadPdt*>(m_pdtLoadRef)->m_keyId = static_cast<int>(charaNo);
+            reinterpret_cast<CLoadPdt*>(m_pdtLoadRef)->m_keyId = static_cast<unsigned int>(charaNo);
             reinterpret_cast<CLoadPdt*>(m_pdtLoadRef)->m_variantTag = reinterpret_cast<void*>(textureVariant);
             reinterpret_cast<CLoadPdt*>(m_pdtLoadRef)->m_mergeFileId = mergeFileId;
             reinterpret_cast<CLoadPdt*>(m_pdtLoadRef)->m_mergeFlags = mergeFlags;

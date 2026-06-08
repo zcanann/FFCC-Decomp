@@ -2125,7 +2125,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 		int group = 1;
 		int* matchWrite = matches + matchCount * 2;
 		for (const s16* pat = s_uniteRecipePatterns + 6; pat[1] >= 0; pat += 6, group++) {
-			if (((pat[0] != 0) && (itemKinds[selected] == 999) && (selected >= 3)) ||
+			if (((pat[0] != 0) && (itemKinds[selected] == 999) && (selected > 2)) ||
 			    ((pat[2] == 2) && (static_cast<s32>(selectedNegMask) < 0))) {
 				continue;
 			}

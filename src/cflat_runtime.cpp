@@ -815,14 +815,8 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 		allowKeep = static_cast<u32>(__cntlzw(*reinterpret_cast<u32*>(self + 0x970))) >> 5 & 0xFF;
 	}
 
-	u8* defs = 0;
-	unsigned int clearCount = 0;
-	if (classIndex == -1) {
-		defs = *reinterpret_cast<u8**>(self + 0x28);
-		clearCount = *reinterpret_cast<int*>(self + 0x24);
-	} else {
-		clearCount = classBase->m_localCount;
-	}
+	u8* defs = (classIndex == -1) ? *reinterpret_cast<u8**>(self + 0x28) : 0;
+	unsigned int clearCount = (classIndex == -1) ? *reinterpret_cast<int*>(self + 0x24) : classBase->m_localCount;
 
 	unsigned int* write = object->m_thisBase;
 	while (clearCount > 0) {

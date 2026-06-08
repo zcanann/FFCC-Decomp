@@ -571,25 +571,31 @@ void CRingMenu::onDraw()
 
 		float drawX = posX;
 		float drawY = posY;
-		if (group == 1 || group == 0) {
-			const float wobble = static_cast<float>(sin(static_cast<double>(kRingMenuHalfPi * buttonAlpha)));
-			drawX = -(kRingMenuButtonInsetX * wobble - ((group == 0) ? (kRingMenuWobbleDivisor + posX) : posX));
-			drawY = posY + ((group == 1) ? kRingMenuIconSize : kRingMenuZero);
-		}
-
-		if (group == 2) {
+		switch (group) {
+		case 2:
 			MenuPcs.DrawRect(0, posX, posY, kRingMenuCommandPanelWidth, kRingMenuButtonHeight, kRingMenuZero, kRingMenuCommandIconY,
 			                                 kRingMenuOne, kRingMenuOne, 0.0f);
-		} else if (group == 1) {
-			MenuPcs.DrawRect(0, drawX, drawY, kRingMenuLabelPanelWidth, kRingMenuIconSize, kRingMenuZero, kRingMenuButtonHeight,
-			                                 kRingMenuOne, kRingMenuOne, 0.0f);
-			MenuPcs.DrawRect(0, drawX, drawY, kRingMenuIconSize, kRingMenuIconSize, kRingMenuButtonWidth, kRingMenuCommandCellSize,
-			                                 kRingMenuOne, kRingMenuOne, 0.0f);
-		} else {
+			break;
+		case 0: {
+			const float wobble = static_cast<float>(sin(static_cast<double>(kRingMenuHalfPi * buttonAlpha)));
+			drawX = -(kRingMenuButtonInsetX * wobble - (kRingMenuWobbleDivisor + posX));
+			drawY = posY;
 			MenuPcs.DrawRect(0, drawX, drawY, kRingMenuLabelPanelWidth, kRingMenuButtonHeight, kRingMenuZero, kRingMenuZero,
 			                                 kRingMenuOne, kRingMenuOne, 0.0f);
 			MenuPcs.DrawRect(0, drawX, drawY, kRingMenuButtonWidth, kRingMenuButtonHeight, kRingMenuZero, kRingMenuCommandCellSize,
 			                                 kRingMenuOne, kRingMenuOne, 0.0f);
+			break;
+		}
+		case 1: {
+			const float wobble = static_cast<float>(sin(static_cast<double>(kRingMenuHalfPi * buttonAlpha)));
+			drawX = -(kRingMenuButtonInsetX * wobble - posX);
+			drawY = posY + kRingMenuIconSize;
+			MenuPcs.DrawRect(0, drawX, drawY, kRingMenuLabelPanelWidth, kRingMenuIconSize, kRingMenuZero, kRingMenuButtonHeight,
+			                                 kRingMenuOne, kRingMenuOne, 0.0f);
+			MenuPcs.DrawRect(0, drawX, drawY, kRingMenuIconSize, kRingMenuIconSize, kRingMenuButtonWidth, kRingMenuCommandCellSize,
+			                                 kRingMenuOne, kRingMenuOne, 0.0f);
+			break;
+		}
 		}
 
 		if (group == 2) {

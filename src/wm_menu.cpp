@@ -86,8 +86,8 @@ float* DAT_8032E8EC = lbl_80210B04;
 extern int DAT_8032ef08;
 extern int DAT_80238028;
 extern char cRam8032ee21;
-extern "C" char lbl_80331380[];
-extern "C" char lbl_80331400[];
+extern "C" char lbl_80331380[4];
+extern "C" char lbl_80331400[3];
 extern "C" unsigned char lbl_801DC294[];
 extern "C" const char* lbl_80210D10[];
 extern "C" const char* lbl_80210D54[];
@@ -180,14 +180,14 @@ extern float FLOAT_803315d0;
 extern float FLOAT_80331598;
 extern float FLOAT_803317FC;
 extern double DOUBLE_803313F0;
-extern char lbl_80331800[];
-extern char lbl_80331808[];
-extern char lbl_80331810[];
-extern char lbl_80331818[];
-extern char lbl_80331820[];
-extern char lbl_80331828[];
-extern char lbl_80331830[];
-extern char lbl_80331838[];
+extern char lbl_80331800[7];
+extern char lbl_80331808[7];
+extern char lbl_80331810[7];
+extern char lbl_80331818[7];
+extern char lbl_80331820[7];
+extern char lbl_80331828[7];
+extern char lbl_80331830[8];
+extern char lbl_80331838[7];
 extern char lbl_801DB7F8[];
 extern float FLOAT_80331588;
 extern float FLOAT_80331590;
@@ -1729,14 +1729,7 @@ void CMenuPcs::calcWorld()
 	} else if (animState == 2) {
 		int nextAnim = static_cast<signed char>(bytes[0xE]);
 
-		if (nextAnim == 0) {
-			if (animTime < animEnd) {
-				model->AddFrame(FLOAT_80331698);
-			} else {
-				handle->SetAnim(1, -1, -1, -1, 0);
-				reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 1;
-			}
-		} else {
+		if (nextAnim != 0) {
 			if (nextAnim == 1) {
 				Sound.PlaySe(0x138C, 0x40, 0x7F, 0);
 				nextAnim = 2;
@@ -1765,6 +1758,13 @@ void CMenuPcs::calcWorld()
 				}
 			}
 			bytes[0xE] = 0;
+		} else {
+			if (animTime < animEnd) {
+				model->AddFrame(FLOAT_80331698);
+			} else {
+				handle->SetAnim(1, -1, -1, -1, 0);
+				reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 1;
+			}
 		}
 	} else if (animState == 3 && m_wmWorldState->m_frameCounter >= 10) {
 		if (animTime < animEnd) {
@@ -3361,25 +3361,25 @@ void CMenuPcs::CalcLoadMenu()
 						if (m_wmWorldState->m_menuMode == 8
 						    && m_cmakeWork != 0) {
 							int iVar6 = reinterpret_cast<int>(m_cmakeWork) + iVar23 + 0x14D0;
-							if (*reinterpret_cast<int*>(iVar6 + 0x5B4) == 0) {
-								*reinterpret_cast<int*>(iVar17 + 8) = -1;
-							} else {
+							if (*reinterpret_cast<int*>(iVar6 + 0x5B4) != 0) {
 								unsigned int uVar15b = (unsigned int)*reinterpret_cast<unsigned short*>(iVar6 + 0x2E);
 								unsigned int uVar11 = (unsigned int)*reinterpret_cast<unsigned short*>(iVar6 + 0x30);
 								unsigned int uVar16 = (unsigned int)*reinterpret_cast<unsigned short*>(iVar6 + 0x32);
 								int cost = uVar15b * 200 + 100;
 								if (uVar11 != 0) cost = uVar15b * 200 + 200;
 								*reinterpret_cast<int*>(iVar17 + 8) = cost + uVar16;
+							} else {
+								*reinterpret_cast<int*>(iVar17 + 8) = -1;
 							}
-						} else if (*reinterpret_cast<int*>(iVar25 + 0x1794) == 0) {
-							*reinterpret_cast<int*>(iVar17 + 8) = -1;
-						} else {
+						} else if (*reinterpret_cast<int*>(iVar25 + 0x1794) != 0) {
 							unsigned int uVar15b = (unsigned int)*reinterpret_cast<unsigned short*>(iVar25 + 0x17D0);
 							unsigned int uVar11 = (unsigned int)*reinterpret_cast<unsigned short*>(iVar25 + 0x17D2);
 							unsigned int uVar16 = (unsigned int)*reinterpret_cast<unsigned short*>(iVar25 + 0x17D4);
 							int cost = uVar15b * 200 + 100;
 							if (uVar11 != 0) cost = uVar15b * 200 + 200;
 							*reinterpret_cast<int*>(iVar17 + 8) = cost + uVar16;
+						} else {
+							*reinterpret_cast<int*>(iVar17 + 8) = -1;
 						}
 						iVar17 = reinterpret_cast<int>(m_wm.m_charaModelData) + iVar10;
 						int charaId = *reinterpret_cast<int*>(iVar17 + 8);
@@ -5609,15 +5609,17 @@ void CMenuPcs::DrawLoadMenu()
 			if (m_wmWorldState->m_mcResult < 0) {
 				m_wmWorldState->m_subState = 3;
 			} else if (m_wmWorldState->m_state0E != 0) {
-				if (m_wmWorldState->m_state0E >= 0) {
-					m_wmWorldState->m_subState = 0x16;
-				} else if (m_wmWorldState->m_menuMode == 8 && m_goOutSaveLoadMode != 0) {
-					m_wmWorldState->m_nextMenuMode = 1;
-					m_wmWorldState->m_delay = 1;
-					memset(m_wmCharaState, 0, kWmMenuCharaStateBytes);
-					m_wmTransitionCode = 1;
+				if (m_wmWorldState->m_state0E < 0) {
+					if (m_wmWorldState->m_menuMode == 8 && m_goOutSaveLoadMode != 0) {
+						m_wmWorldState->m_nextMenuMode = 1;
+						m_wmWorldState->m_delay = 1;
+						memset(m_wmCharaState, 0, kWmMenuCharaStateBytes);
+						m_wmTransitionCode = 1;
+					} else {
+						m_wmWorldState->m_subState = 2;
+					}
 				} else {
-					m_wmWorldState->m_subState = 2;
+					m_wmWorldState->m_subState = 0x16;
 				}
 			}
 			break;

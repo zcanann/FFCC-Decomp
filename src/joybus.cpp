@@ -610,9 +610,9 @@ void JoyBus::ThreadMain(void* arg)
     unsigned long long stateStartTime = 0;
 
     unsigned short localCrc[2];
-    unsigned int localWord = 0;
-    unsigned int localCmd = 0;
-    unsigned char localBuf[4] = {};
+    unsigned int localWord;
+    unsigned int localCmd;
+    unsigned char localBuf[4];
 
     threadParam->m_gbaStatus = GBAReset(threadParam->m_portIndex, &threadParam->m_unk3);
 

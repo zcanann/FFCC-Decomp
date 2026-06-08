@@ -760,11 +760,11 @@ int CMenuPcs::CmdCtrl()
 	} else if ((mode == 2) && (GetCmdStateView(this)->phase == 2)) {
 		actionHandled = CmdClose1();
 		if (actionHandled != 0) {
-			if (GetCmdStateView(this)->commandResult == 0) {
-				GetCmdStateView(this)->mode = 0;
-			} else {
+			if (GetCmdStateView(this)->commandResult != 0) {
 				GetCmdStateView(this)->uniteState = 0;
 				GetCmdStateView(this)->mode = 3;
+			} else {
+				GetCmdStateView(this)->mode = 0;
 			}
 			actionHandled = 0;
 			GetCmdStateView(this)->phase = 0;
@@ -774,17 +774,19 @@ int CMenuPcs::CmdCtrl()
 		GetCmdStateView(this)->transitionTimer = static_cast<s16>(GetCmdStateView(this)->transitionTimer + 1);
 
 		s32 selected = static_cast<s32>(GetCmdStateView(this)->selected);
-		u32 prev = selected - 1;
-		for (; prev > 2; --prev) {
-			if (caravanWork->m_commandListExtra[prev] >= 0) {
+		s32 prev = selected - 1;
+		const s16* prevPtr = &caravanWork->m_commandListExtra[prev];
+		for (; prev > 2; --prev, --prevPtr) {
+			if (*prevPtr >= 0) {
 				break;
 			}
 		}
 
 		s32 next = selected + 1;
 		s32 limit = static_cast<s32>(caravanWork->m_numCmdListSlots);
-		for (; next < limit; ++next) {
-			if (caravanWork->m_commandListExtra[next] >= 0) {
+		const s16* nextPtr = &caravanWork->m_commandListExtra[next];
+		for (; next < limit; ++next, ++nextPtr) {
+			if (*nextPtr >= 0) {
 				break;
 			}
 		}

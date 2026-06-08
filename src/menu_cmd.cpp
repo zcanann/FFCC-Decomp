@@ -1441,9 +1441,11 @@ void CMenuPcs::CmdDraw()
 	    kCmdMenuHalf, kCmdMenuScreenHalfWidth);
 }
 
+#pragma push
+#pragma optimization_level 3
 /*
  * --INFO--
- * PAL Address: TODO  
+ * PAL Address: TODO
  * PAL Size: 2836b
  * EN Address: TODO
  * EN Size: TODO
@@ -1758,6 +1760,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 
 	return 0;
 }
+#pragma pop
 
 /*
  * --INFO--

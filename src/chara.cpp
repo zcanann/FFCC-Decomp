@@ -1034,7 +1034,7 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 
 				chunkFile.PushChunk();
 				while (chunkFile.GetNextChunk(chunk)) {
-					if (chunk.m_id == 0x4E4F4445 && m_nodes != 0) {
+					if (chunk.m_id == 0x4E4F4445) {
 						CNode* node = &m_nodes[m_data->m_nodeCount];
 						node->Create(chunkFile, this, static_cast<CChara::CNode::TYPE>(chunk.m_arg0), stage);
 						if (strcmp(NodeRefName(node), lbl_80330200) == 0) {
@@ -1061,7 +1061,7 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 
 				chunkFile.PushChunk();
 				while (chunkFile.GetNextChunk(chunk)) {
-					if (chunk.m_id == 0x4D455348 && m_meshes != 0) {
+					if (chunk.m_id == 0x4D455348) {
 						CMesh* mesh = &m_meshes[m_data->m_meshCount];
 						mesh->Create(this, chunkFile, stage);
 						m_data->m_meshCount = m_data->m_meshCount + 1;

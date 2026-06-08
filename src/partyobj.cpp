@@ -1522,7 +1522,7 @@ void CGPartyObj::command()
 		}
 	}
 
-	party.partyFlags |= 0x80;
+	party.flags.commandActive = 1;
 	CGObject* tgt = party.target;
 	CFlatRuntime::CStack stack[2];
 	stack[0].m_word = secondaryCommand;

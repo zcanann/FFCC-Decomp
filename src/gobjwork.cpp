@@ -560,7 +560,8 @@ void CCaravanWork::FGPutGil(int gilToRemove)
 {
 	int put = static_cast<CGPartyObj*>(m_ownerObj)->putGil(gilToRemove);
 	if (put != 0) {
-		m_gil += -gilToRemove;
+		gilToRemove = -gilToRemove;
+		m_gil += gilToRemove;
 		if (m_gil > 99999999) {
 			m_gil -= m_gil - 99999999;
 		} else if (m_gil < 0) {

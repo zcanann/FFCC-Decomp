@@ -1870,7 +1870,7 @@ unsigned short CMenuPcs::CmakeJobCtrl()
         }
 
         if ((repeat & 0x3) != 0) {
-            if (CmakeState(this)->m_select < 4) {
+            if (CmakeState(this)->m_select <= 3) {
                 CmakeState(this)->m_select = static_cast<short>(CmakeState(this)->m_select + 4);
             } else {
                 CmakeState(this)->m_select = static_cast<short>(CmakeState(this)->m_select - 4);

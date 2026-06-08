@@ -2707,17 +2707,29 @@ void CGMonObj::teleport(
 			CVector scaledPoint;
 			PSVECScale(reinterpret_cast<Vec*>(&point), reinterpret_cast<Vec*>(&scaledPoint), kMonObjBossOne - blend);
 
-			CVector scaledPointCopy(scaledPoint);
+			Vec scaledPointCopy;
+			scaledPointCopy.x = scaledPoint.x;
+			scaledPointCopy.y = scaledPoint.y;
+			scaledPointCopy.z = scaledPoint.z;
+
 			CVector current(object->m_worldPosition);
 			CVector scaledCurrent;
 			PSVECScale(reinterpret_cast<Vec*>(&current), reinterpret_cast<Vec*>(&scaledCurrent), blend);
 
-			CVector scaledCurrentCopy(scaledCurrent);
+			Vec scaledCurrentCopy;
+			scaledCurrentCopy.x = scaledCurrent.x;
+			scaledCurrentCopy.y = scaledCurrent.y;
+			scaledCurrentCopy.z = scaledCurrent.z;
+
 			CVector blended;
-			PSVECAdd(reinterpret_cast<Vec*>(&scaledCurrentCopy), reinterpret_cast<Vec*>(&scaledPointCopy), reinterpret_cast<Vec*>(&blended));
-			object->m_worldPosition.x = blended.x;
-			object->m_worldPosition.y = blended.y;
-			object->m_worldPosition.z = blended.z;
+			PSVECAdd(&scaledCurrentCopy, &scaledPointCopy, reinterpret_cast<Vec*>(&blended));
+			Vec blendedCopy;
+			blendedCopy.x = blended.x;
+			blendedCopy.y = blended.y;
+			blendedCopy.z = blended.z;
+			object->m_worldPosition.x = blendedCopy.x;
+			object->m_worldPosition.y = blendedCopy.y;
+			object->m_worldPosition.z = blendedCopy.z;
 
 			if (mode == 1 && stateFrame == blendEndFrame - 0x2A) {
 				int pdtNo = object->m_charaModelHandle->GetPdtSlot();

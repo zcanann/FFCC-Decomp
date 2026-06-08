@@ -416,28 +416,28 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 			} else if (systemVal <= -0x96 && systemVal >= -0x175) {
 				u8* const itemTable = *reinterpret_cast<u8**>(classData + 0x24);
 				StoreU16(stack, itemTable, (systemVal + 0x175) * 2, setMode);
-			} else if (systemVal < -0x52) {
-				if (systemVal < -0x84) {
-					if (systemVal >= -0x94) {
-						StoreU16(stack, classData, (systemVal + 0x94) * 2 + 0x8C, setMode);
+			} else if (systemVal >= -0x52) {
+				if (systemVal == -0x40) {
+					unsigned short* value = reinterpret_cast<unsigned short*>(classData + 0x1A);
+					stack[-1].m_word = *value;
+					if (setMode == 0) {
+						*value = stack->m_word;
+					} else if (setMode < 0) {
+						if (setMode > -2) {
+							*value = *value - stack->m_word;
+						}
+					} else if (setMode < 2) {
+						*value = *value + stack->m_word;
 					}
-				} else if (systemVal > -0x7A) {
+				} else if (systemVal == -0x41) {
+					StoreU16(stack, classData, 0x1C, setMode);
+				}
+			} else if (systemVal >= -0x84) {
+				if (systemVal > -0x7A) {
 					StoreU16(stack, classData, (-0x53 - systemVal) * 2 + 0x3E, setMode);
 				}
-			} else if (systemVal == -0x40) {
-				unsigned short* value = reinterpret_cast<unsigned short*>(classData + 0x1A);
-				stack[-1].m_word = *value;
-				if (setMode == 0) {
-					*value = stack->m_word;
-				} else if (setMode < 0) {
-					if (setMode > -2) {
-						*value = *value - stack->m_word;
-					}
-				} else if (setMode < 2) {
-					*value = *value + stack->m_word;
-				}
-			} else if (systemVal < -0x40 && systemVal > -0x42) {
-				StoreU16(stack, classData, 0x1C, setMode);
+			} else if (systemVal >= -0x94) {
+				StoreU16(stack, classData, (systemVal + 0x94) * 2 + 0x8C, setMode);
 			}
 
 			LastResult(this) = 0;

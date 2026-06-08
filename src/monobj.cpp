@@ -1720,13 +1720,9 @@ void CGMonObj::onStatDie()
 
 	case 1: {
 		unsigned char* aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
-		int subFrame = *reinterpret_cast<int*>(mon + 0x530);
+#define subFrame (*reinterpret_cast<int*>(mon + 0x530))
 
-		if ((*reinterpret_cast<unsigned short*>(aiData + 0xFE) & 2) == 0) {
-			if (subFrame != 0) {
-				return;
-			}
-		} else {
+		if ((*reinterpret_cast<unsigned short*>(aiData + 0xFE) & 2) != 0) {
 			if (subFrame == 0) {
 				int particleId = *reinterpret_cast<int*>(mon + 0x560);
 				int classId = reinterpret_cast<int>(object->m_scriptHandle[4]);
@@ -1752,7 +1748,12 @@ void CGMonObj::onStatDie()
 			if (subFrame != 0x19) {
 				return;
 			}
+		} else {
+			if (subFrame != 0) {
+				return;
+			}
 		}
+#undef subFrame
 
 		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x231000);
 		*reinterpret_cast<float*>(mon + 0x694) = kMonObjZero;

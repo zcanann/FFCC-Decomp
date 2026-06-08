@@ -314,7 +314,7 @@ void GbaQueue::LoadAll()
 		OSSignalSemaphore(&accessSemaphores[i]);
 	}
 
-	cflatFlag = reinterpret_cast<int*>(&CFlat)[0x1041];
+	cflatFlag = reinterpret_cast<int*>(&CFlat)[0x4101];
 
 	LoadPlayerStat();
 	LoadEnemyStat();
@@ -1322,7 +1322,7 @@ void GbaQueue::LoadPlayerStat()
 	}
 
 	outOfShoukiMask = 0;
-	if (reinterpret_cast<int*>(&CFlat)[0x1041] != 0) {
+	if (reinterpret_cast<int*>(&CFlat)[0x4101] != 0) {
 		unsigned char* entry = localPlayerStat;
 		for (i = 0; i < 4; i++) {
 			char menuStageMode = m_singleMode;
@@ -1601,7 +1601,7 @@ void GbaQueue::LoadMapItemStat()
 	memset(localMapItems, 0, sizeof(localMapItems));
 	numMapItems = 0;
 
-	if (reinterpret_cast<unsigned int*>(&CFlat)[0x1041] != 0) {
+	if (reinterpret_cast<unsigned int*>(&CFlat)[0x4101] != 0) {
 		unsigned char* mapItemEntry = localMapItems;
 		object = gCFlatRuntime2.FindGObjFirst();
 

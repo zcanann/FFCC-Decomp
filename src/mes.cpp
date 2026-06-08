@@ -801,29 +801,25 @@ void CMes::Calc()
 	while ((int)maxAdvance > *(int*)((char*)this + 0x3C10))
 	{
 		int type = *flagEntry;
-		if (type != 3)
+		switch (type)
 		{
-			if (type < 3)
-			{
-				if (type != 1)
-				{
-					if (type != 0)
-					{
-						*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3CC0) =
-						    (int)*(short*)(flagEntry + 4);
-					}
-				}
-				else
-				{
-					int* slot = (int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3CC0);
-					*slot = *slot + 1;
-				}
-			}
-			else if ((type < 5) &&
-			         (*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3CC0) == 0))
+		case 2:
+			*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3CC0) =
+			    (int)*(short*)(flagEntry + 4);
+			break;
+		case 1:
+		{
+			int* slot = (int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3CC0);
+			*slot = *slot + 1;
+			break;
+		}
+		case 3:
+		case 4:
+			if (*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3CC0) == 0)
 			{
 				goto doneAdvance;
 			}
+			break;
 		}
 
 		flagEntry += 6;

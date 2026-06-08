@@ -1768,15 +1768,16 @@ int CMapMng::ReadMtx(char* mapName)
         m_textureSet = textureSet;
     }
 
+    char* strTmp = g_StrTmp;
     int loadIndex = 0;
     while (true) {
-        sprintf(g_StrTmp, const_cast<char*>(s_mapMtxPathFmt), mapName, loadIndex);
+        sprintf(strTmp, const_cast<char*>(s_mapMtxPathFmt), mapName, loadIndex);
 
         int exists;
         if (m_asyncLoadState.m_mapReadMode == 1) {
             exists = 1;
         } else {
-            CFile::CHandle* openProbe = File.Open(g_StrTmp, 0, CFile::PRI_LOW);
+            CFile::CHandle* openProbe = File.Open(strTmp, 0, CFile::PRI_LOW);
             if (openProbe != 0) {
                 File.Close(openProbe);
                 exists = 1;
@@ -1793,7 +1794,7 @@ int CMapMng::ReadMtx(char* mapName)
             }
             if (loadIndex == 0) {
                 if (System.m_execParam != 0) {
-                    System.Printf(const_cast<char*>(s_mapReadOpenErrorFmt), g_StrTmp);
+                    System.Printf(const_cast<char*>(s_mapReadOpenErrorFmt), strTmp);
                 }
                 return 0;
             }
@@ -1801,7 +1802,7 @@ int CMapMng::ReadMtx(char* mapName)
         }
 
         if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-            System.Printf(const_cast<char*>(s_mapReadMtxFmt), g_StrTmp);
+            System.Printf(const_cast<char*>(s_mapReadMtxFmt), strTmp);
         }
 
         void* filePtr = File.m_readBuffer;
@@ -1814,7 +1815,7 @@ int CMapMng::ReadMtx(char* mapName)
             CheckSum(filePtr, size);
             readIndex += 1;
         } else {
-            CFile::CHandle* handle = File.Open(g_StrTmp, 0, CFile::PRI_LOW);
+            CFile::CHandle* handle = File.Open(strTmp, 0, CFile::PRI_LOW);
             if (handle == 0) {
                 filePtr = 0;
             } else {
@@ -1846,7 +1847,7 @@ int CMapMng::ReadMtx(char* mapName)
 
         if (filePtr == 0) {
             if (System.m_execParam != 0) {
-                System.Printf(const_cast<char*>(s_mapReadErrorFmt), g_StrTmp);
+                System.Printf(const_cast<char*>(s_mapReadErrorFmt), strTmp);
             }
             return 0;
         }
@@ -1896,14 +1897,15 @@ int CMapMng::ReadMpl(char* mapName)
 
     MapMng.m_mapReadReady = 1;
 
+    char* strTmp = g_StrTmp;
     while (true) {
-        sprintf(g_StrTmp, const_cast<char*>(s_mapMplPathFmt), mapName, loadIndex);
+        sprintf(strTmp, const_cast<char*>(s_mapMplPathFmt), mapName, loadIndex);
 
         int canRead;
         if (m_asyncLoadState.m_mapReadMode == 1) {
             canRead = 1;
         } else {
-            CFile::CHandle* existsHandle = File.Open(g_StrTmp, 0, CFile::PRI_LOW);
+            CFile::CHandle* existsHandle = File.Open(strTmp, 0, CFile::PRI_LOW);
             if (existsHandle != 0) {
                 File.Close(existsHandle);
                 canRead = 1;
@@ -1918,7 +1920,7 @@ int CMapMng::ReadMpl(char* mapName)
             }
             if (loadIndex == 0) {
                 if (System.m_execParam != 0) {
-                    System.Printf(const_cast<char*>(s_mapReadOpenErrorFmt), g_StrTmp);
+                    System.Printf(const_cast<char*>(s_mapReadOpenErrorFmt), strTmp);
                 }
                 return 0;
             }
@@ -1926,7 +1928,7 @@ int CMapMng::ReadMpl(char* mapName)
         }
 
         if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-            System.Printf(const_cast<char*>(s_mapReadMplFmt), g_StrTmp);
+            System.Printf(const_cast<char*>(s_mapReadMplFmt), strTmp);
         }
 
         void* filePtr = File.m_readBuffer;
@@ -1940,7 +1942,7 @@ int CMapMng::ReadMpl(char* mapName)
             CheckSum(filePtr, size);
             readIndex += 1;
         } else {
-            CFile::CHandle* fileHandle = File.Open(g_StrTmp, 0, CFile::PRI_LOW);
+            CFile::CHandle* fileHandle = File.Open(strTmp, 0, CFile::PRI_LOW);
             if (fileHandle == 0) {
                 filePtr = 0;
             } else {
@@ -1972,7 +1974,7 @@ int CMapMng::ReadMpl(char* mapName)
 
         if (filePtr == 0) {
             if (System.m_execParam != 0) {
-                System.Printf(const_cast<char*>(s_mapReadErrorFmt), g_StrTmp);
+                System.Printf(const_cast<char*>(s_mapReadErrorFmt), strTmp);
             }
             return 0;
         }

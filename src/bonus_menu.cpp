@@ -1171,13 +1171,15 @@ void CMenuPcs::CalcSelectWait()
 	int padSlot = currentParty->m_partySlot;
 	unsigned short repeat;
 	unsigned short down;
-	if (Pad.m_debugPadLock != 0 || (padSlot == 0 && Pad.m_debugPadPort != -1)) {
+	unsigned char padLocked = (Pad.m_debugPadLock != 0 || (padSlot == 0 && Pad.m_debugPadPort != -1));
+	if (padLocked) {
 		repeat = 0;
 	} else {
 		int resolvedPadSlot = (Pad.m_debugPadPort == padSlot) ? 0 : padSlot;
 		repeat = Pad.m_padInputs[resolvedPadSlot].repeatButton;
 	}
-	if (Pad.m_debugPadLock != 0 || (padSlot == 0 && Pad.m_debugPadPort != -1)) {
+	padLocked = (Pad.m_debugPadLock != 0 || (padSlot == 0 && Pad.m_debugPadPort != -1));
+	if (padLocked) {
 		down = 0;
 	} else {
 		int resolvedPadSlot = (Pad.m_debugPadPort == padSlot) ? 0 : padSlot;
@@ -2613,7 +2615,8 @@ void CMenuPcs::CalcResultCountAnim()
 		for (int i = 0; i < s_Rinfo->m_partyCount; i++) {
 			unsigned int padIndex = s_Rinfo->m_party[i].m_partySlot;
 			unsigned short down;
-			if (padLock != 0 || (padIndex == 0 && padRemap != -1)) {
+			unsigned char padLocked = (padLock != 0 || (padIndex == 0 && padRemap != -1));
+			if (padLocked) {
 				down = 0;
 			} else {
 				unsigned int resolvedIndex = (padRemap == (int)padIndex) ? 0 : padIndex;

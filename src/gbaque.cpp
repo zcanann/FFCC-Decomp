@@ -2398,12 +2398,11 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 	unsigned char* valueBytes = reinterpret_cast<unsigned char*>(&stackValue);
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
 	int letterIndex = valueBytes[2];
-	CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[letterIndex];
-	int hasGil = letter->AttachmentIsGil();
+	int hasGil = caravanWork->m_letters[letterIndex].FlagsBits().m_attachmentIsGil;
 	int result;
 
 	if (hasGil == 0) {
-		int item = letter->AttachmentValue();
+		int item = caravanWork->m_letters[letterIndex].AttachmentValue();
 		if (item != 0) {
 			if ((item < 1) || (item > 0x9E)) {
 				if (caravanWork->AddItem(item, 0) == 0) {
@@ -2413,9 +2412,8 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 				}
 			}
 		}
-	}
-	if (hasGil != 0) {
-		int item = letter->AttachmentValue();
+	} else {
+		int item = caravanWork->m_letters[letterIndex].AttachmentValue();
 		if (item != 0) {
 			int gil = item * 100;
 			if (caravanWork->CanAddGil(gil) == 0) {
@@ -2436,7 +2434,7 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 	} while (i < 10);
 
 	if ((result == 0) && (i < 10)) {
-		letter->SetAttachmentClaimed();
+		caravanWork->m_letters[letterIndex].SetAttachmentClaimed();
 	}
 }
 

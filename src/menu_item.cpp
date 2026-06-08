@@ -210,7 +210,7 @@ int CMenuPcs::ItemCtrlCur()
                     return 1;
                 } else {
                     this->m_itemMenuState->optionFlags = 0xC;
-                    unsigned int itemType = GetItemType(idx, 0);
+                    int itemType = GetItemType(idx, 0);
 
                     if ((itemType == 7) && (caravanWork->CanPlayerUseItem() != 0)) {
                         this->m_itemMenuState->optionFlags = this->m_itemMenuState->optionFlags | 1;

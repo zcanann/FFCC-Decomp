@@ -3157,7 +3157,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
             threadParam->m_gbaStatus = 0;
         }
 
-        unsigned int status = threadParam->m_gbaStatus;
+        int status = threadParam->m_gbaStatus;
 
         if (status == 0)
         {
@@ -3452,7 +3452,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
         GbaQue.GetStageNo(threadParam->m_portIndex, &stageMajor, &stageMinor);
 
         unsigned int cmdStage = MakeJoyCmd32(0x0E, 1, ((unsigned char*)&stageMajor)[3], ((unsigned char*)&stageMinor)[3]);
-        unsigned int stageResult = 0;
+        int stageResult = 0;
 
         if (static_cast<signed char>(m_threadRunningMask) != 0)
         {

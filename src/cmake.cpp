@@ -2138,8 +2138,9 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
     unsigned short down;
     unsigned short repeat;
 
+    int padLock = Pad.m_debugPadLock;
     bool padBusy = false;
-    if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
+    if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
         padBusy = true;
     }
     if (padBusy) {
@@ -2151,7 +2152,7 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
     }
 
     padBusy = false;
-    if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
+    if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
         padBusy = true;
     }
     if (padBusy) {

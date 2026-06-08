@@ -859,11 +859,8 @@ void CGObject::objectCollision()
     }
 
     if (keepPushTimer) {
-        short dec = m_collisionPushTimerMax - 1;
-        if (dec < 0) {
-            dec = 0;
-        }
-        m_collisionPushTimerMax = dec;
+        int dec = m_collisionPushTimerMax - 1;
+        m_collisionPushTimerMax = dec & ~(dec >> 31);
     } else {
         m_collisionPushTimerMax = 0x32;
     }

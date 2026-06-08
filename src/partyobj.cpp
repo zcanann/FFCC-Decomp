@@ -2632,7 +2632,7 @@ int CGPartyObj::isRideTarget()
 	PartyObjOverlay& party = PartyData(this);
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	bool hasTarget = false;
-	int result = 0;
+	unsigned char result = 0;
 
 	if (m_lastStateId == 2 || m_lastStateId == 6) {
 		if (*reinterpret_cast<int*>(self + 0x668) != 0) {
@@ -2641,8 +2641,8 @@ int CGPartyObj::isRideTarget()
 	}
 
 	if (hasTarget) {
-		unsigned int flags = party.partyFlags;
-		if (static_cast<int>((flags << 25) | (flags >> 7)) < 0) {
+		unsigned char flags = party.partyFlags;
+		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(flags) << 25) & 0xC0000000) >> 31) != 0) {
 			result = 1;
 		}
 	}

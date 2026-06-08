@@ -2556,9 +2556,7 @@ void CGObject::boundCheck()
  */
 void CGObject::Turn(float targetRot, int turnFrames)
 {
-    u8* shieldFlags = reinterpret_cast<u8*>(&m_shieldNodeFlags);
-
-    *shieldFlags = static_cast<u8>(__rlwimi(*shieldFlags, 1, 6, 25, 25));
+    m_shieldNodeFlagBits.m_bit40 = 1;
     m_rotTargetY = targetRot;
     m_turnBaseSpeed =
         Math.DstRot(m_rotBaseY, m_rotTargetY) / static_cast<float>(turnFrames);
@@ -2567,13 +2565,12 @@ void CGObject::Turn(float targetRot, int turnFrames)
     const int animSlot = (m_turnBaseSpeed < sZeroFloat) ? 2 : 3;
 
     m_currentAnimSlot = m_animQueue[animSlot - 0x41];
-    *(reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1) =
-        static_cast<u8>(__rlwimi(*(reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1), 0, 0, 31, 31));
+    m_weaponNodeFlagAll.m_bits1.m_bit01 = 0;
     m_animExtraIndex = -1;
     m_collisionPushTimer = -1;
-    *shieldFlags = static_cast<u8>(__rlwimi(*shieldFlags, 0, 1, 30, 30));
-    *shieldFlags = static_cast<u8>(__rlwimi(*shieldFlags, 0, 7, 24, 24));
-    *shieldFlags = static_cast<u8>(__rlwimi(*shieldFlags, 1, 3, 28, 28));
+    m_shieldNodeFlagBits.m_bit02 = 0;
+    m_shieldNodeFlagBits.m_bit80 = 0;
+    m_shieldNodeFlagBits.m_bit08 = 1;
     const float& zero = sZeroFloat;
     m_turnSpeed = zero;
 }

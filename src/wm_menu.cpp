@@ -8546,8 +8546,8 @@ void CMenuPcs::DrawChara()
 			}
 			LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
 		}
-		if (handle->m_charaKind != 3) {
-			handle->Draw(5);
+		if (GetWmCharaHandles(this)[i]->m_charaKind != 3) {
+			GetWmCharaHandles(this)[i]->Draw(5);
 		} else {
 			DrawInit();
 			GXSetZMode(GX_TRUE, static_cast<GXCompare>(7), GX_TRUE);

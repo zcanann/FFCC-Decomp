@@ -1808,8 +1808,8 @@ void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 		*reinterpret_cast<short*>(localEntry + 10) =
 			static_cast<short>(*reinterpret_cast<short*>(localEntry + 10) - baseZ);
 
-		short localX = *reinterpret_cast<short*>(localEntry + 8);
-		short localZ = *reinterpret_cast<short*>(localEntry + 10);
+		int localX = *reinterpret_cast<short*>(localEntry + 8);
+		int localZ = *reinterpret_cast<short*>(localEntry + 10);
 
 		if ((localX < 0 ? -localX : localX) < 0x50 && (localZ < 0 ? -localZ : localZ) < 0x40) {
 			localEntry[0] = 1;

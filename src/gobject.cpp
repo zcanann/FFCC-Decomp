@@ -487,9 +487,6 @@ void CGObject::move()
     bool hasStickInput = false;
     m_groundHitOffset.y += m_gravityY;
     Vec moveVec;
-    moveVec.x = sZeroFloat;
-    moveVec.y = sZeroFloat;
-    moveVec.z = sZeroFloat;
 
     if (m_weaponNodeFlagAll.m_bits1.m_bit20) {
         int scriptMoveEnd = 0;

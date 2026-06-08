@@ -681,8 +681,8 @@ void CGObject::move()
 
         if (!movingWithScript || m_weaponNodeFlagAll.m_bits1.m_bit08) {
             if (Game.m_currentMapId == 0x21) {
-                const double slideSq = static_cast<double>(PSVECSquareMag(&m_groundHitOffset));
-                if (static_cast<double>(sSlideThreshold) < slideSq) {
+                const float slideSq = PSVECSquareMag(&m_groundHitOffset);
+                if (sSlideThreshold < slideSq) {
                     Mtx yawMtx;
                     Mtx pitchMtx;
                     Vec worldUp;

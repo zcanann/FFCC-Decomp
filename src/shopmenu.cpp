@@ -925,14 +925,13 @@ void CShopMenu::DrawItemHelp(int index, int centerX, int y)
 
     CColor white(0xFF, 0xFF, 0xFF, 0xFF);
     font->SetColor(white.color);
-    float width = font->GetWidth(helpText);
-    float x = static_cast<float>(centerX) - width * 0.5f;
     font->DrawInit();
-    font->SetPosX(x + 1.0f);
+    int x = centerX - static_cast<int>(font->GetWidth(helpText)) / 2;
+    font->SetPosX(static_cast<float>(x + 1));
     font->SetPosY(static_cast<float>(y - 3));
     font->SetTlut(0x12);
     font->Draw(helpText);
-    font->SetPosX(x);
+    font->SetPosX(static_cast<float>(x));
     font->SetPosY(static_cast<float>(y - 4));
     font->SetTlut(7);
     font->Draw(helpText);

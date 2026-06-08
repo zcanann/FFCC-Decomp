@@ -961,9 +961,10 @@ cylinder_body:
 
         if (disc > 0.0) {
             disc = sqrtf(disc);
-            const f32 t = (-radialB - disc) / radialA;
+            const f32 invA = 1.0 / radialA;
+            const f32 t = (-radialB - disc) * invA;
             const f32 z = (t * localDirection.z) + pz;
-            if (kMapHitZero <= z && z <= axisLen) {
+            if (0.0 <= z && z <= axisLen) {
                 outT = t * tScale;
                 if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {
                     return 1;
@@ -973,7 +974,7 @@ cylinder_body:
         } else {
             const f32 t = -radialB / radialA;
             const f32 z = (t * localDirection.z) + pz;
-            if (kMapHitZero <= z && z <= axisLen) {
+            if (0.0 <= z && z <= axisLen) {
                 outT = t * tScale;
                 if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {
                     return 1;

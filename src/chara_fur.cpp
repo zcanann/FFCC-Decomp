@@ -1837,8 +1837,8 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 {
 	int dy;
 
-	CColor defaultColor(0x0f, 0x0f, 0x0f, 0);
-	*centerAfter = defaultColor.color;
+	_GXColor defaultColor = CColor(0x0f, 0x0f, 0x0f, 0).color;
+	*centerAfter = defaultColor;
 	*centerBefore = *centerAfter;
 
 	int texelCountBytes = width * height * 2;

@@ -980,10 +980,9 @@ void* CMemory::CStage::alloc(unsigned long size, char* source, unsigned long lin
                     node->m_level = static_cast<unsigned char>(Memory.GetHeapWalkerLevel());
                     memset(node->m_source, 0, sizeof(node->m_source));
 
-                    if (source == (char*)nullptr) {
-                        source = const_cast<char*>(sEmptyAllocSourceName);
-                    }
-                    strncpy(node->m_source, source, sizeof(node->m_source) - 1);
+                    strncpy(node->m_source,
+                            source != (char*)nullptr ? source : const_cast<char*>(sEmptyAllocSourceName),
+                            sizeof(node->m_source) - 1);
 
                     allocated = reinterpret_cast<int>(payloadFromBlock(node));
                     node->m_flags = kMemoryBlockUsedFlag;
@@ -1008,11 +1007,9 @@ void* CMemory::CStage::alloc(unsigned long size, char* source, unsigned long lin
     }
 
     if ((noError == 0) && (allocated == 0)) {
-        if (source == (char*)nullptr) {
-            source = const_cast<char*>(sEmptyAllocSourceName);
-        }
         System.Printf(
-            const_cast<char*>(sStageAllocNoMemoryFmt), stageGetSourceName(this), allocSize, source, line);
+            const_cast<char*>(sStageAllocNoMemoryFmt), stageGetSourceName(this), allocSize,
+            source != (char*)nullptr ? source : const_cast<char*>(sEmptyAllocSourceName), line);
         heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
     }
 

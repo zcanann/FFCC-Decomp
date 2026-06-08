@@ -2232,7 +2232,7 @@ void _pppCalcPart(_pppMngSt* pppMngSt)
 
 	ppvMng = pppMngSt;
 	if (se->m_soundEffectSlot >= 0 &&
-		se->m_soundEffectStartFrame <= pppMngSt->m_currentFrame &&
+		pppMngSt->m_currentFrame >= se->m_soundEffectStartFrame &&
 		se->m_soundEffectStopFlag == 0)
 	{
 		Vec soundPos;
@@ -2244,11 +2244,11 @@ void _pppCalcPart(_pppMngSt* pppMngSt)
 		{
 			if (se->m_soundEffectStartedOnce == 0)
 			{
-				u32 soundTableIndex = (u32)se->m_soundEffectKind - 3;
+				u32 soundTableKind = (u32)se->m_soundEffectKind;
 				se->m_soundEffectHandle = Sound.PlaySe3D(
 					se->m_soundEffectSlot, &soundPos,
-					ppvEnv->m_soundVolumeTable[soundTableIndex],
-					ppvEnv->m_soundPitchTable[soundTableIndex], 0);
+					(PartMng.m_pppEnvSt.m_soundVolumeTable - 3)[soundTableKind],
+					(PartMng.m_pppEnvSt.m_soundPitchTable - 3)[soundTableKind], 0);
 				se->m_soundEffectStartedOnce = 1;
 			}
 		}

@@ -1795,7 +1795,7 @@ int CMapMng::ReadMtx(char* mapName)
                 return 1;
             }
             if (loadIndex == 0) {
-                if (System.m_execParam != 0) {
+                if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                     System.Printf(const_cast<char*>(s_mapReadOpenErrorFmt), strTmp);
                 }
                 return 0;
@@ -1844,7 +1844,7 @@ int CMapMng::ReadMtx(char* mapName)
         }
 
         if (filePtr == 0) {
-            if (System.m_execParam != 0) {
+            if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                 System.Printf(const_cast<char*>(s_mapReadErrorFmt), strTmp);
             }
             return 0;

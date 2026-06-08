@@ -733,7 +733,8 @@ void CMiniGamePcs::GbaThreadMain(void* threadParam)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     unsigned char* param = reinterpret_cast<unsigned char*>(threadParam);
-    unsigned int message;
+    unsigned int messageBuf[2];
+    unsigned char gbaReadScratch[4];
     unsigned int command;
     unsigned int command7;
     unsigned int command8;
@@ -746,13 +747,14 @@ void CMiniGamePcs::GbaThreadMain(void* threadParam)
     OSTime timeoutTicks;
     OSTime startTime;
 #define channel (reinterpret_cast<signed char*>(param)[0xBC])
+#define message (messageBuf[0])
 
 receive_message:
-    ret = OSReceiveMessage(reinterpret_cast<OSMessageQueue*>(param), reinterpret_cast<OSMessage*>(&message), 0);
+    ret = OSReceiveMessage(reinterpret_cast<OSMessageQueue*>(param), reinterpret_cast<OSMessage*>(messageBuf), 0);
     if (ret == 0)
     {
         param[0xBD] = 0;
-        OSReceiveMessage(reinterpret_cast<OSMessageQueue*>(param), reinterpret_cast<OSMessage*>(&message), 1);
+        OSReceiveMessage(reinterpret_cast<OSMessageQueue*>(param), reinterpret_cast<OSMessage*>(messageBuf), 1);
         param[0xBE] = 0;
     }
 
@@ -1050,7 +1052,7 @@ comm_fail:
             {
                 if ((param[0xC0] & GBA_JSTAT_FLAGS_MASK) != GBA_JSTAT_PSF0)
                 {
-                    GBARead(channel, param + 0x254, param + 0xC0);
+                    GBARead(channel, gbaReadScratch, param + 0xC0);
                 }
             }
             else

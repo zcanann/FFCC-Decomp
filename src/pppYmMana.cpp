@@ -1017,9 +1017,9 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     model = GetCharaModelPtr(handle);
 
     if ((int)Game.m_currentSceneId == 7) {
-        centerPos.x = kPppYmMoveParabolaZero;
-        centerPos.y = kPppYmMoveParabolaZero;
-        centerPos.z = kPppYmMoveParabolaZero;
+        centerPos.z = LoadFloat(kPppYmMoveParabolaZero);
+        centerPos.y = LoadFloat(kPppYmMoveParabolaZero);
+        centerPos.x = LoadFloat(kPppYmMoveParabolaZero);
     } else {
         centerPos = gObject->m_worldPosition;
     }

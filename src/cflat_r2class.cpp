@@ -956,9 +956,9 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			if (hit != 0) {
 				*reinterpret_cast<int*>(object->m_localBase[7]) =
 				    *reinterpret_cast<short*>(reinterpret_cast<u8*>(hit) + 0x30);
-				PushValue(this, object, hit != 0);
-				outResult = 0;
 			}
+			PushValue(this, object, hit != 0);
+			outResult = 0;
 			break;
 		}
 		case -0x21: {

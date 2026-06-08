@@ -1179,7 +1179,8 @@ void CMenuPcs::DrawOptionMenu()
 			DrawFont(0x5E, static_cast<int>(kOptionTextYOffset + static_cast<float>(selectedY)), color, 0x16,
 			         *option, kOptionAnimMax, kOptionAnimMax);
 		} else {
-			DrawFont(0x60, static_cast<int>(kOptionTextYOffset + static_cast<float>(normalY)), color, 6,
+			int __p16 = normalY;
+			DrawFont(0x60, static_cast<int>(kOptionTextYOffset + static_cast<float>(__p16)), color, 6,
 			         *option, kOptionAnimMax, kOptionAnimMax);
 		}
 	}
@@ -1221,7 +1222,8 @@ void CMenuPcs::DrawOptionMenu()
 
 		SetUv(uv0, kOptionAnimMin, kOptionAnimMin);
 		SetUv(uv1, kMenuCenteringHalfWidth, kOptionAnimMax);
-		gUtil.RenderTextureQuad(leftX, row[1], static_cast<float>(sideWidth) * kMenuCenteringHalfWidth,
+		int __p10 =  (sideWidth - 0);
+		gUtil.RenderTextureQuad(leftX, row[1], static_cast<float>(__p10) * kMenuCenteringHalfWidth,
 		                        static_cast<float>(sideHeight), sideTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 		SetUv(uv0, kMenuCenteringHalfWidth, kOptionAnimMin);
@@ -1354,7 +1356,8 @@ void CMenuPcs::DrawOptionMenu()
 	case 2: {
 		CTexture* meterTexture = GetTextureSetTexture(GetMenuTextureSet(this, 0xBC), 3);
 		unsigned int meterWidth = static_cast<unsigned int>(static_cast<float>(meterTexture->m_width));
-		unsigned int meterHeight = static_cast<unsigned int>(static_cast<float>(meterTexture->m_height));
+		unsigned int meterHeight;
+		meterHeight = static_cast<unsigned int>(static_cast<float>(meterTexture->m_height));
 		float iconWave = kOptionUiTwenty * rowSin;
 		float leftIconX =
 		    static_cast<float>(static_cast<int>((kOptionIconWaveTargetX - kOptionIconWaveOriginX) * rowCos + kOptionIconWaveOriginX));

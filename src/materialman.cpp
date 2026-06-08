@@ -3095,7 +3095,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 material->m_singleTextureFlag = 0;
                 material->m_textureCount = static_cast<unsigned short>(chunk.m_arg0);
 
-                if (material->m_textureCount == 0) {
+                if (static_cast<int>(material->m_textureCount) == 0) {
                     material->m_tevBit |= 1;
                 } else {
                     for (int i = 0; i < static_cast<int>(material->m_textureCount); i++) {

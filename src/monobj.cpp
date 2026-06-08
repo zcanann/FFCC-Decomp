@@ -190,7 +190,7 @@ void CGMonObj::onFramePreCalc()
 		}
 
 		int nextState = *reinterpret_cast<int*>(CGMonObj::m_aiWork + 4);
-		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) {
+		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) {
 			if ((nextState != -1) && (nextState != prgObj->m_lastStateId)) {
 				prgObj->changeStat(nextState, 0, 0);
 			}

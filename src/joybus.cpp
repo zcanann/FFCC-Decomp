@@ -7159,16 +7159,15 @@ int JoyBus::GetGBAConnect(int portIndex)
  */
 int JoyBus::IsInitSend(int portIndex)
 {
-    ThreadParam& tp = m_threadParams[portIndex];
 
     OSWaitSemaphore(&m_accessSemaphores[portIndex]);
-    int state = tp.m_state;
+    int state = m_threadParams[portIndex].m_state;
     OSSignalSemaphore(&m_accessSemaphores[portIndex]);
 
     unsigned int result = 0;
 
     // Determine desired "init send" state
-    if (tp.m_sentStartFlag == 0 && state < 0x385)
+    if (m_threadParams[portIndex].m_sentStartFlag == 0 && state <= 0x384)
     {
         if (state < 2)
         {
@@ -7176,7 +7175,7 @@ int JoyBus::IsInitSend(int portIndex)
         }
         else if (state == 2)
         {
-            result = (tp.m_flags[0] ? 1 : 0);
+            result = (m_threadParams[portIndex].m_flags[0] ? 1 : 0);
         }
         else
         {
@@ -7189,23 +7188,23 @@ int JoyBus::IsInitSend(int portIndex)
     }
 
     // Stabilizer logic: detect and debounce changes to result
-    if (tp.m_flags[2] == result)
+    if (m_threadParams[portIndex].m_flags[2] == result)
     {
-        tp.m_flags[3] = 0;
+        m_threadParams[portIndex].m_flags[3] = 0;
     }
     else
     {
-        unsigned char cnt = tp.m_flags[3];
+        unsigned char cnt = m_threadParams[portIndex].m_flags[3];
 
         if (cnt < 8)
         {
-            tp.m_flags[3] = cnt + 1;
-            result = tp.m_flags[2];
+            m_threadParams[portIndex].m_flags[3] = cnt + 1;
+            result = m_threadParams[portIndex].m_flags[2];
         }
         else
         {
-            tp.m_flags[2] = (unsigned char)result;
-            tp.m_flags[3] = 0;
+            m_threadParams[portIndex].m_flags[2] = (unsigned char)result;
+            m_threadParams[portIndex].m_flags[3] = 0;
         }
     }
 

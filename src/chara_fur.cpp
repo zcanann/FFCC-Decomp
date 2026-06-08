@@ -613,11 +613,11 @@ void CChara::CalcMogScore()
 		const int b1 = fur.m_score[1];
 		const int b2 = fur.m_score[2];
 
-		if (b0 > 2 && kYmEnvDefaultScale * static_cast<float>(b1 + b2) < static_cast<float>(b0)) {
+		if (b0 >= 3 && kYmEnvDefaultScale * static_cast<float>(b1 + b2) < static_cast<float>(b0)) {
 			Game.m_gameWork.m_mogScoreRadarType = 1;
-		} else if (b1 > 2 && kYmEnvDefaultScale * static_cast<float>(b0 + b2) < static_cast<float>(b1)) {
+		} else if (b1 >= 3 && kYmEnvDefaultScale * static_cast<float>(b0 + b2) < static_cast<float>(b1)) {
 			Game.m_gameWork.m_mogScoreRadarType = 2;
-		} else if (b2 > 2 && kYmEnvDefaultScale * static_cast<float>(b0 + b1) < static_cast<float>(b2)) {
+		} else if (b2 >= 3 && kYmEnvDefaultScale * static_cast<float>(b0 + b1) < static_cast<float>(b2)) {
 			Game.m_gameWork.m_mogScoreRadarType = 3;
 		} else {
 			Game.m_gameWork.m_mogScoreRadarType = 0;

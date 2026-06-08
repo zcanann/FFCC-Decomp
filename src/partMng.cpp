@@ -2871,24 +2871,26 @@ void CPartMng::pppDumpCacheIdx()
 
             if (mng->m_baseTime >= 0) {
                 mng->m_baseTime--;
-                if (mng->m_baseTime < 0) {
-                    _pppDataHead* pdtHead = *reinterpret_cast<_pppDataHead**>(mng->m_pppResSet);
-                    PppPartResourceRaw* partResource =
-                        reinterpret_cast<PppPartResourceRaw*>(reinterpret_cast<unsigned char*>(pdtHead->m_cacheChunks) +
-                                                              mng->m_partIndex * sizeof(PppPartResourceRaw));
-
-                    CAmemCacheSet* cacheSet = &ppvAmemCacheSet;
-                    if ((unsigned int)cacheSet->IsEnable(partResource->m_cacheIndex) == 0) {
-                        partResource->m_pdt = reinterpret_cast<long*>(
-                            cacheSet->GetData(
-                                partResource->m_cacheIndex, const_cast<char*>(s_partMng_cpp), 0x9A9));
-                        pppInitPdt(partResource->m_pdt, pppGetSysProgTable());
-                    }
-
-                    cacheSet->AddRef(partResource->m_cacheIndex);
-                    mng->m_hasMapRef = 1;
-                    _pppStartPart(reinterpret_cast<_pppMngSt*>(mng), partResource->m_pdt, 1);
+                if (mng->m_baseTime >= 0) {
+                    continue;
                 }
+
+                _pppDataHead* pdtHead = *reinterpret_cast<_pppDataHead**>(mng->m_pppResSet);
+                PppPartResourceRaw* partResource =
+                    reinterpret_cast<PppPartResourceRaw*>(reinterpret_cast<unsigned char*>(pdtHead->m_cacheChunks) +
+                                                          mng->m_partIndex * sizeof(PppPartResourceRaw));
+
+                CAmemCacheSet* cacheSet = &ppvAmemCacheSet;
+                if ((unsigned int)cacheSet->IsEnable(partResource->m_cacheIndex) == 0) {
+                    partResource->m_pdt = reinterpret_cast<long*>(
+                        cacheSet->GetData(
+                            partResource->m_cacheIndex, const_cast<char*>(s_partMng_cpp), 0x9A9));
+                    pppInitPdt(partResource->m_pdt, pppGetSysProgTable());
+                }
+
+                cacheSet->AddRef(partResource->m_cacheIndex);
+                mng->m_hasMapRef = 1;
+                _pppStartPart(reinterpret_cast<_pppMngSt*>(mng), partResource->m_pdt, 1);
             }
 
             pppSetMatrix(reinterpret_cast<_pppMngSt*>(mng));

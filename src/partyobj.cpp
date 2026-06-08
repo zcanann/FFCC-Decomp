@@ -5191,9 +5191,9 @@ void CGPartyObj::gpmMove()
 			}
 		}
 
-		if (PartyData(this).unk6BC != moveKind) {
-			PartyData(this).unk6C0 = 0;
-			PartyData(this).unk6BC = moveKind;
+		if (sGhostPartyWork.field04 != moveKind) {
+			sGhostPartyWork.field04 = moveKind;
+			sGhostPartyWork.field08 = 0;
 		}
 
 		CVector moveDir;
@@ -5210,15 +5210,19 @@ void CGPartyObj::gpmMove()
 		}
 
 		float nextSpeed = sGhostPartyWork.carrySpeed + FLOAT_80331A70;
-		float speedScale = (pressureLimit <= sGhostPartyWork.pressure) ? 1.0f : 0.9f;
-		float speedLimit = speedScale * m_moveBaseSpeed * *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(Game.m_partyObjArr[0]) + 0x690);
-		sGhostPartyWork.carrySpeed = (nextSpeed >= 0.0f && speedLimit < nextSpeed) ? speedLimit : nextSpeed;
+		float speedScale = (pressureLimit <= sGhostPartyWork.pressure) ? kMonObjOne : FLOAT_80331A88;
+		if (nextSpeed < 0.0f) {
+			sGhostPartyWork.carrySpeed = nextSpeed;
+		} else {
+			float speedLimit = speedScale * m_moveBaseSpeed * *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(Game.m_partyObjArr[0]) + 0x690);
+			sGhostPartyWork.carrySpeed = (speedLimit < nextSpeed) ? speedLimit : nextSpeed;
+		}
 
 		sGhostPartyWork.carryDir = *reinterpret_cast<Vec*>(&moveDir);
-		if (PartyData(this).unk6C0 + 1 != 4) {
-			PartyData(this).unk6C0++;
+		if (sGhostPartyWork.field08 + 1 != 4) {
+			sGhostPartyWork.field08++;
 		} else {
-			PartyData(this).unk6C0 = 0;
+			sGhostPartyWork.field08 = 0;
 		}
 		return;
 	}
@@ -5226,7 +5230,7 @@ void CGPartyObj::gpmMove()
 	if (m_lastStateId != 2) {
 		return;
 	}
-	if (static_cast<signed char>(PartyData(this).partyFlags) >= 0) {
+	if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(sGhostPartyWork.flags) << 24) & 0xC0000000) >> 31) == 0) {
 		changeStat(0, 0, 0);
 		return;
 	}

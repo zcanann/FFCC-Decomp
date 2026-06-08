@@ -1008,7 +1008,6 @@ void CMesMenu::onCalc()
                 }
             }
 
-            bool advance = false;
             if ((downMask & 0x100) != 0) {
                 int wait2 = m_mes.GetWait();
                 if (wait2 == 0) {
@@ -1030,14 +1029,10 @@ void CMesMenu::onCalc()
                     *(int*)((char*)this + 0x3CC8) = 1;
                     *(int*)((char*)this + 0x3CD8) = 0;
                 }
-                advance = (*(int*)((char*)this + 0x3CC8) != 0) &&
-                          (*(int*)((char*)this + 0x3CD8) == *(int*)((char*)this + 0x3CD4));
-            } else {
-                advance = (*(int*)((char*)this + 0x3CC8) != 0) &&
-                          (*(int*)((char*)this + 0x3CD8) == *(int*)((char*)this + 0x3CD4));
             }
 
-            if (advance) {
+            if ((*(int*)((char*)this + 0x3CC8) != 0) &&
+                (*(int*)((char*)this + 0x3CD8) == *(int*)((char*)this + 0x3CD4))) {
                 if (*(int*)((char*)this + 0x3C90) != 0) {
                     int wait5 = m_mes.GetWait();
                     if (wait5 != 4) {

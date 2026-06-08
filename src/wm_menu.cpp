@@ -7931,8 +7931,8 @@ void CMenuPcs::DrawWMFrame0(int mask, float alpha)
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 
-	int i = 0;
 	int offset = 0;
+	int i = 0;
 	do {
 		if ((static_cast<unsigned int>(mask) & (1 << i)) != 0) {
 			short* psVar1 = reinterpret_cast<short*>(m_wm.m_frameInfo + offset + 4);

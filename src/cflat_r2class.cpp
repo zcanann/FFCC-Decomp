@@ -60,13 +60,9 @@ static inline CGObject* FindRuntimeObject(CFlatRuntime2* runtime, unsigned int o
 	return static_cast<CGObject*>(runtime->intToClass(static_cast<int>(objectId)));
 }
 
-static inline char* RuntimeString(CFlatRuntime2* runtime, unsigned int index)
-{
-	u8* const bytes = reinterpret_cast<u8*>(runtime);
-	char* const blob = *reinterpret_cast<char**>(bytes + 0x28);
-	unsigned short* const offsets = *reinterpret_cast<unsigned short**>(bytes + 0x2C);
-	return blob + offsets[index];
-}
+#define RuntimeString(runtime, index)                                                                         \
+	(*reinterpret_cast<char**>(reinterpret_cast<u8*>(runtime) + 0x28) +                                        \
+	 (*reinterpret_cast<unsigned short**>(reinterpret_cast<u8*>(runtime) + 0x2C))[index])
 
 static inline unsigned int& RuntimeWorkAssignIndex(CFlatRuntime2* runtime)
 {
@@ -1160,6 +1156,17 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		case -0x36: {
 			float* params = reinterpret_cast<float*>(object->m_localBase);
 			engineObject->moveVectorH(CVector(params[0], params[1], params[2]), params[3], static_cast<int>(object->m_localBase[4]));
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		}
+		case -0x37: {
+			Vec moveTarget;
+			float* params = reinterpret_cast<float*>(object->m_localBase);
+			moveTarget.x = params[0];
+			moveTarget.y = params[1];
+			moveTarget.z = params[2];
+			engineObject->Move(&moveTarget, params[3], static_cast<int>(object->m_localBase[4]), 1, 0, 0, 0);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

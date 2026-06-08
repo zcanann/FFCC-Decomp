@@ -116,6 +116,42 @@ unsigned char s_wmMenuLastMountState;
 unsigned char s_wmMenuMountStateInitialized;
 char* DAT_8032EE34;
 unsigned char lbl_8032EE38[8];
+
+// wm_menu.o owns this .sdata2 constant pool (0x80331134-0x803311BC). These
+// named float/int constants are emitted into wm_menu's .sdata2 in address
+// order; defining them in-unit makes wm_menu.o's .sdata2 match the target.
+extern const float kCharaFurScreenCenterY = 224.0f;
+extern const float kCharaFurDepthScaleBase = 1.0f;
+extern const float kCharaFurScreenCenterX = 320.0f;
+extern const float kCharaFurTriangleVertexCount = 3.0f;
+extern const float kCharaFurPickRayFarZ = -100.0f;
+extern const float kCharaFurWeightScale = 0.5f;
+extern const float kCharaFurViewDepthThreshold = -1.0f;
+extern const float kCharaFurShadeScale = 255.0f;
+extern const float kCharaFurShadowRange = 100.0f;
+extern const float kCharaFurShadowFade = 20.0f;
+extern const float FLOAT_8033115C = 0.125f;
+extern const float FLOAT_80331160 = 4.0f;
+extern const float FLOAT_80331164 = 6.103701889514923e-05f;
+extern const float FLOAT_80331168 = 128.0f;
+extern const float FLOAT_8033116C = 8.0f;
+extern const int sYmEnvXAxisIdsWord = 0x79797979;
+extern const short sYmEnvXAxisIdsTail = 0x7878;
+extern const float sYmEnvYAxisAngle0 = 0.0f;
+extern const float sYmEnvYAxisAngle180 = 180.0f;
+extern const float kYmEnvRenderZero = 0.0f;
+extern const float kYmEnvRenderOne = 1.0f;
+extern const float kYmEnvNegativeOne = -1.0f;
+extern const float kYmEnvOrthoFarZ = 100.0f;
+extern const float kYmEnvTwo = 2.0f;
+extern const float kYmEnvFrustumExtent = 1.0199999809265137f;
+extern const float kYmEnvFrustumNegExtent = -1.0199999809265137f;
+extern const float kYmEnvFrustumScale = 0.5f;
+extern const float kYmEnvDegToRadF = 0.01745329238474369f;
+extern const float kYmEnvPi = 3.1415927410125732f;
+extern const float kYmEnvParaboloidNormalScale = -2.0f;
+extern const float kYmEnvNegativeTwoPi = -6.2831854820251465f;
+
 extern float FLOAT_803313dc;
 extern float FLOAT_803313e0;
 extern float FLOAT_803313e4;

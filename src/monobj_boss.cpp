@@ -607,51 +607,49 @@ void CGMonObj::frameStatFuncOrcKing()
 {
 	u8* self = reinterpret_cast<u8*>(this);
 	CGObject* object = reinterpret_cast<CGObject*>(this);
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
 
-	if (prgObj->m_lastStateId != 100) {
+	if (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId != 100) {
 		return;
 	}
 
-	int branch = m_actionBranch;
-	if (branch == 0) {
+	if (m_actionBranch == 0) {
 		int pdtNo = object->m_charaModelHandle->GetPdtSlot();
 
-		prgObj->putParticle((pdtNo << 8) | 0x18, *reinterpret_cast<int*>(self + 0x58C), object, kMonObjBossOne, 0x8CC0);
-		prgObj->reqAnim(0xF, 0, 0);
+		reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x18, *reinterpret_cast<int*>(self + 0x58C), object, kMonObjBossOne, 0x8CC0);
+		reinterpret_cast<CGPrgObj*>(this)->reqAnim(0xF, 0, 0);
 		object->SetAnimSlot(0x10, 0);
 		object->SetAnimSlot(0x15, 4);
-	} else if (branch == 0x96) {
+	} else if (m_actionBranch == 0x96) {
 		int pdtNo = object->m_charaModelHandle->GetPdtSlot();
 
-		prgObj->putParticle((pdtNo << 8) | 0x19, *reinterpret_cast<int*>(self + 0x590), object, kMonObjBossOne, 0x8CC1);
-	} else if (branch == 300) {
+		reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x19, *reinterpret_cast<int*>(self + 0x590), object, kMonObjBossOne, 0x8CC1);
+	} else if (m_actionBranch == 300) {
 		int pdtNo = object->m_charaModelHandle->GetPdtSlot();
 
-		prgObj->putParticle((pdtNo << 8) | 0x1A, *reinterpret_cast<int*>(self + 0x590), object, kMonObjBossOne, 0x8CC2);
-	} else if (branch == 0x1C2) {
+		reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x1A, *reinterpret_cast<int*>(self + 0x590), object, kMonObjBossOne, 0x8CC2);
+	} else if (m_actionBranch == 0x1C2) {
 		int pdtNo = object->m_charaModelHandle->GetPdtSlot();
 
-		prgObj->putParticle((pdtNo << 8) | 0x1B, *reinterpret_cast<int*>(self + 0x590), object, kMonObjBossOne, 0x8CC3);
-	} else if (branch == 600) {
+		reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x1B, *reinterpret_cast<int*>(self + 0x590), object, kMonObjBossOne, 0x8CC3);
+	} else if (m_actionBranch == 600) {
 		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0xC00);
 		object->m_bgColMask &= 0xFFF7FFFF;
-		prgObj->changeStat(-9, 0, 0);
+		reinterpret_cast<CGPrgObj*>(this)->changeStat(-9, 0, 0);
 		object->SetAnimSlot(0, 0);
 
-		CGMonObj* monObj = gCFlatRuntime2.FindGMonObjFirst();
+		CGMonObj* monObj = CFlat.FindGMonObjFirst();
 		while (monObj != 0) {
 			if (monObj != this) {
 				u8* monBytes = reinterpret_cast<u8*>(monObj);
 				u16* script = *reinterpret_cast<u16**>(monBytes + 0x58);
 				reinterpret_cast<CGCharaObj*>(monObj)->addHp(-script[0x1A / 2], 0);
 			}
-			monObj = gCFlatRuntime2.FindGMonObjNext(monObj);
+			monObj = CFlat.FindGMonObjNext(monObj);
 		}
-		*reinterpret_cast<int*>(SoundBuffer + 1260) = 1;
+		*reinterpret_cast<int*>(CGMonObj::m_boss) = 1;
 	}
 
-	m_actionBranch = branch + 1;
+	m_actionBranch = m_actionBranch + 1;
 }
 
 /*

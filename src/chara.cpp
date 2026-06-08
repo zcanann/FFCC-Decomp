@@ -1268,8 +1268,7 @@ CChara::CModel* CChara::CModel::Duplicate(CMemory::CStage* stage)
 		CChara::CNode* dst = &cloneNodes[i];
 		CChara::CNode* src = &ModelNodes(this)[i];
 		dst->m_refData = src->m_refData;
-		PSMTXCopy(reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(src) + 8),
-		          reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(dst) + 8));
+		PSMTXCopy(NodeLocalRuntimeMtx(src), NodeLocalRuntimeMtx(dst));
 		PSMTXCopy(NodeWorldMtx(src), NodeWorldMtx(dst));
 		NodePreviousQuat(dst) = NodePreviousQuat(src);
 		NodePreviousPosition(dst) = NodePreviousPosition(src);
@@ -1277,17 +1276,16 @@ CChara::CModel* CChara::CModel::Duplicate(CMemory::CStage* stage)
 		dst->m_flagsBits.m_flag_80 = src->m_flagsBits.m_flag_80;
 	}
 
-	const u16 meshCount = ModelMeshCount(this);
-	CChara::CMesh* cloneMeshes = new (stage, const_cast<char*>(s_chara_cpp), 0x26C) CChara::CMesh[meshCount];
+	CChara::CMesh* cloneMeshes = new (stage, const_cast<char*>(s_chara_cpp), 0x26C) CChara::CMesh[ModelMeshCount(this)];
 	clone->m_meshes = cloneMeshes;
-	for (u32 i = 0; i < meshCount; i++) {
-		CChara::CMesh* dst = &cloneMeshes[i];
+	for (u32 i = 0; i < ModelMeshCount(this); i++) {
+		CChara::CMesh* dst = &reinterpret_cast<CChara::CMesh*>(clone->m_meshes)[i];
 		CChara::CMesh* src = &reinterpret_cast<CChara::CMesh*>(ModelMeshes(this))[i];
 		u8* dstRaw = reinterpret_cast<u8*>(dst);
 		u8* srcRaw = reinterpret_cast<u8*>(src);
-		*reinterpret_cast<void**>(dstRaw) = *reinterpret_cast<void**>(srcRaw);
-		*reinterpret_cast<void**>(dstRaw + 4) = 0;
-		*reinterpret_cast<void**>(dstRaw + 8) = 0;
+		*reinterpret_cast<void**>(dstRaw + 8) = *reinterpret_cast<void**>(srcRaw + 8);
+		*reinterpret_cast<void**>(dstRaw + 0xc) = 0;
+		*reinterpret_cast<void**>(dstRaw + 0x10) = 0;
 	}
 
 	if (m_texSet != 0) {

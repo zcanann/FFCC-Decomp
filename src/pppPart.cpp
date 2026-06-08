@@ -2600,9 +2600,9 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 		u8 m_pad1[0xBC - 0x78];
 		u32 m_objHitMask;
 		u32 m_cylinderAttribute;
-		u8 m_pad2[0xE5 - 0xC4];
+		u8 m_pad2[0xE8 - 0xC4];
 		u8 m_endRequested;
-		u8 m_pad3[0x11C - 0xE6];
+		u8 m_pad3[0x11C - 0xE9];
 		PPPSEST m_soundEffectData;
 		PPPIFPARAM m_hitParams;
 		s16 m_hitObjectIds[0x10];

@@ -417,7 +417,7 @@ void CMenuPcs::MoneyDraw()
 		cursorY += (float)(this->m_moneyState->selections[1] * SingWinMessHeight());
 
 		int anim = (int)System.m_frameCounter % 8;
-		DrawCursor((int)((float)window->x + (float)anim), (int)cursorY, 1.0f);
+		DrawCursor((unsigned int)((float)window->x + (float)anim), (int)cursorY, 1.0f);
 	}
 }
 

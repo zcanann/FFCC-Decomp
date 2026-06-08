@@ -1132,12 +1132,12 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
             cam[2][1] = kLightZero;
             cam[2][2] = kLightOne;
         } else if (mode == 2) {
+            Vec xAxis;
             Vec yAxis;
             yAxis.x = cam[0][1];
             yAxis.y = cam[1][1];
             yAxis.z = cam[2][1];
             PSVECNormalize(&yAxis, &yAxis);
-            Vec xAxis;
             xAxis.y = -yAxis.x;
             cam[0][1] = yAxis.x;
             cam[1][1] = yAxis.y;

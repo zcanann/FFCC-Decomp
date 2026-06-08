@@ -531,7 +531,7 @@ static inline CFont* GetWmFont(CMenuPcs* menu)
 
 static inline void CalcWmFrame0Inline(CMenuPcs* menu, int param)
 {
-	unsigned char* const frame = menu->m_wm.m_frameInfo;
+#define frame (menu->m_wm.m_frameInfo)
 
 	*reinterpret_cast<short*>(frame + 4) = 0x10;
 	int frameAddr = reinterpret_cast<int>(frame);
@@ -561,6 +561,7 @@ static inline void CalcWmFrame0Inline(CMenuPcs* menu, int param)
 		*reinterpret_cast<short*>(frame + 0x20) =
 		    static_cast<short>(static_cast<int>(static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(frame + 0x20))) + offset));
 	}
+#undef frame
 }
 
 static inline void QueueWmCharaAnimState(CMenuPcs* menu, int slot, int state)
@@ -1941,15 +1942,14 @@ void CMenuPcs::CalcDiaryMenu()
 	case 3:
 		if (m_singleCmakeMode == 0) {
 			if (m_wmWorldState->m_modelFlagsInitialized == 0) {
-				unsigned char* const modelData = m_wm.m_charaModelData;
-				modelData[0x0C] = 1;
-				modelData[0x40] = 1;
-				modelData[0x74] = 1;
-				modelData[0xA8] = 1;
-				modelData[0xDC] = 1;
-				modelData[0x110] = 1;
-				modelData[0x144] = 1;
-				modelData[0x178] = 1;
+				m_wm.m_charaModelData[0x0C] = 1;
+				m_wm.m_charaModelData[0x40] = 1;
+				m_wm.m_charaModelData[0x74] = 1;
+				m_wm.m_charaModelData[0xA8] = 1;
+				m_wm.m_charaModelData[0xDC] = 1;
+				m_wm.m_charaModelData[0x110] = 1;
+				m_wm.m_charaModelData[0x144] = 1;
+				m_wm.m_charaModelData[0x178] = 1;
 				m_wmWorldState->m_modelFlagsInitialized = 1;
 			}
 			if (m_wmWorldState->m_mainState <= 4) {

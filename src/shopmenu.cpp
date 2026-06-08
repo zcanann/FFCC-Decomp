@@ -2759,15 +2759,13 @@ inline void CShopMenu::SelectSOUBI()
         return;
     }
 
+    m_nextMode = 9;
+    SetMode(0x11);
+
     if (m_yesNo != 0) {
-        m_nextMode = 9;
-        SetMode(0x11);
         Sound.PlaySe(4, 0x40, 0x7F, 0);
         return;
     }
-
-    m_nextMode = 9;
-    SetMode(0x11);
 
     int equipType = MenuPcs.GetEquipType(m_resultItem);
     ShopMenuCaravanWork(this)->ChgEquipPos(equipType, static_cast<short>(m_resultParam));

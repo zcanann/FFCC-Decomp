@@ -3800,8 +3800,6 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
 
     OSSignalSemaphore(&m_accessSemaphores[port]);
 
-    const unsigned char seq = static_cast<signed char>((localWord >> 16) & 0xFF);
-
     if ((static_cast<unsigned char>(localWord >> 24) & 0x3F) == 7)
     {
         step = 0;
@@ -3834,7 +3832,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
         }
 
         const unsigned int typeVal = static_cast<char>(sendType);
-        const int respVal = seq;
+        const int respVal = static_cast<signed char>((localWord >> 16) & 0xFF);
 
         if (result != 0)
         {
@@ -3846,7 +3844,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
         return diffMask - 1;
     }
 
-    if ((int)seq == (int)static_cast<char>(sendType))
+    if ((int)static_cast<signed char>((localWord >> 16) & 0xFF) == (int)static_cast<char>(sendType))
     {
         step = 0;
         phase = 1;

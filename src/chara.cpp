@@ -2418,7 +2418,7 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 			CAnimNode* animNode = &AnimNodes(m_anim)[animIndex];
 			char* animName = AnimNodeName(animNode);
 
-			for (int slot = 0; slot < 2; slot++) {
+			for (unsigned int slot = 0; slot < 2; slot++) {
 				char* name = node->m_refData->m_name + slot * 0x10;
 				if (name[0] != '\0' && strcmp(animName, name) == 0) {
 					(&NodeAnimNode0(node))[slot] = animNode;

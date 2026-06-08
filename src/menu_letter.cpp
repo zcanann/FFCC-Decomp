@@ -2218,7 +2218,7 @@ int CMenuPcs::LetterCtrlCur()
 		*reinterpret_cast<int*>(openAnim + 0x70) = 10;
 
 		float f = FLOAT_803330f8;
-		int panelCount = static_cast<int>(GetLetterAnimStorage(this)->count);
+		unsigned int panelCount = static_cast<int>(GetLetterAnimStorage(this)->count);
 		s16* panel = GetLetterPanelBase(this);
 		for (int i = 0; i < panelCount; ++i, panel += 0x20) {
 			*reinterpret_cast<int*>(panel + 0x10) = 0;

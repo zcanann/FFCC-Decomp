@@ -7284,10 +7284,9 @@ int JoyBus::SendAllStat(int portIndex)
 
     OSWaitSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
 
-    int i = 8;
     int wordOffset = 0;
 
-    do
+    for (int i = 0; i < 8; i++)
     {
         m_cmdQueueData[m_threadParams[portIndex].m_portIndex][wordOffset + 0] = 0;
         m_recvQueueEntriesArr[m_threadParams[portIndex].m_portIndex][wordOffset + 0] = 0;
@@ -7306,9 +7305,8 @@ int JoyBus::SendAllStat(int portIndex)
         m_cmdQueueData[m_threadParams[portIndex].m_portIndex][wordOffset + 7] = 0;
         m_recvQueueEntriesArr[m_threadParams[portIndex].m_portIndex][wordOffset + 7] = 0;
 
-        i--;
         wordOffset += 8;
-    } while (i != 0);
+    }
 
     m_cmdCount[m_threadParams[portIndex].m_portIndex] = 0;
     m_secCmdCount[m_threadParams[portIndex].m_portIndex] = 0;

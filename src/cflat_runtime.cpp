@@ -288,7 +288,7 @@ void CFlatRuntime::Create(void* filePtr)
 							classBase->m_variableCount = chunkFile.Get4();
 							break;
 						case 'VTBL':
-							for (int i = 0; i < 0x80; i++) {
+							for (unsigned int i = 0; i < 0x80; i++) {
 								classBase->m_functionTable[i] = chunkFile.Get4();
 							}
 							break;
@@ -400,7 +400,7 @@ void CFlatRuntime::Create(void* filePtr)
 				        char[chunk.m_size];
 
 				memcpy(*reinterpret_cast<void**>(self + 0x38), chunkFile.GetAddress(), chunk.m_size);
-				const short base = *reinterpret_cast<short*>(chunkFile.GetAddress());
+				const unsigned short base = *reinterpret_cast<short*>(chunkFile.GetAddress());
 				int offset = 0;
 				for (int i = 0; i < strCount; i++) {
 					const short cur = *reinterpret_cast<short*>(chunkFile.GetAddress());
@@ -502,7 +502,7 @@ int CFlatRuntime::CreateDebug(void* filePtr, int debugChunkIndex)
 
 							while ((hasChunk = chunkFile.GetNextChunk(chunk), hasChunk != 0)) {
 								if (((chunk.m_id != 'NAME')
-								     && (static_cast<int>(chunk.m_id) < static_cast<int>('NAME')))
+								     && (chunk.m_id < static_cast<unsigned int>('NAME')))
 								    && (chunk.m_id == 'CODE')) {
 									if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(funcs) + blockOffset + 0x30)
 									    == 0) {
@@ -618,7 +618,7 @@ int CFlatRuntime::Frame(int mode, int unused)
 						object->m_0x34 = static_cast<s16>(object->m_0x34 & ~(1U << scriptIndex));
 
 						scriptIndex = 0x1F;
-						scriptMask = static_cast<unsigned int>(static_cast<unsigned short>(object->m_0x34));
+						scriptMask = static_cast<unsigned int>(static_cast<short>(object->m_0x34));
 						scanCount = 4;
 
 						do {
@@ -845,7 +845,7 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 	}
 
 	u8* defs = 0;
-	int clearCount = 0;
+	unsigned int clearCount = 0;
 	if (classIndex == -1) {
 		defs = *reinterpret_cast<u8**>(self + 0x28);
 		clearCount = *reinterpret_cast<int*>(self + 0x24);
@@ -944,7 +944,7 @@ int CFlatRuntime::SystemCall(CFlatRuntime::CObject* objectParam, int systemKind,
 		}
 	} else {
 		u8* searchFunc = m_funcs;
-		int funcCount = m_funcCount;
+		unsigned int funcCount = m_funcCount;
 
 		for (; funcCount > 0; funcCount--, searchFunc += 0x50) {
 			if ((*reinterpret_cast<int*>(searchFunc + 0x40) == systemKind)
@@ -963,7 +963,7 @@ int CFlatRuntime::SystemCall(CFlatRuntime::CObject* objectParam, int systemKind,
 	if (argCount > 0) {
 		u8* const objectBytes = reinterpret_cast<u8*>(object);
 		if (argCount > 8) {
-			unsigned int batchCount = (static_cast<unsigned int>(argCount) - 1) >> 3;
+			unsigned int batchCount = (static_cast<int>(argCount) - 1) >> 3;
 			int byteOffset = 0;
 			CStack* batchArgs = args;
 
@@ -1543,19 +1543,20 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 
 	int watchdog = 100000;
 	u8* code;
+	u8* const self = reinterpret_cast<u8*>(this);
 
 	if (object->m_waitCounter != 0) {
 		goto callSystemFunction;
 	}
 
 	code = *reinterpret_cast<u8**>(
-	    m_funcs + (object->m_codeIndex.m_codeFunc * 0x50) + 0x34)
+	    *reinterpret_cast<u8**>(self + 0x20) + (object->m_codeIndex.m_codeFunc * 0x50) + 0x34)
 	    + object->m_codeIndex.m_codeOffset;
 
 	while (true) {
 frameLoop:
-		m_previousCodePos = m_currentCodePos;
-		m_currentCodePos = object->m_codePos;
+		*reinterpret_cast<u32*>(self + 0x968) = *reinterpret_cast<u32*>(self + 0x964);
+		*reinterpret_cast<u32*>(self + 0x964) = object->m_codePos;
 
 		switch (code[0]) {
 		case 0: {
@@ -1566,12 +1567,14 @@ frameLoop:
 				if (index < 0) {
 					value = reinterpret_cast<unsigned int*>(
 					    (arg & 0x10) == 0 ? onClassSystemVal(object, index) : onSystemVal(object, index));
-				} else if ((arg & 8) == 0) {
-					value = object->m_localBase + index;
-				} else if ((arg & 0x10) == 0) {
-					value = reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(m_permanentVarValues) + (index * 4));
+				} else if ((arg & 8) != 0) {
+					if ((arg & 0x10) != 0) {
+						value = object->m_thisBase + index;
+					} else {
+						value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x0C) + (index * 4));
+					}
 				} else {
-					value = object->m_thisBase + index;
+					value = object->m_localBase + index;
 				}
 				*object->m_sp++ = *value;
 			} else if ((arg & 2) != 0) {
@@ -1580,27 +1583,31 @@ frameLoop:
 					value = reinterpret_cast<unsigned int*>((arg & 0x10) == 0
 					                                            ? onClassSystemVal(object, index + static_cast<int>(*object->m_sp))
 					                                            : onSystemVal(object, index + static_cast<int>(*object->m_sp)));
-				} else if ((arg & 8) == 0) {
-					--object->m_sp;
-					value = object->m_localBase + index + static_cast<int>(*object->m_sp);
-				} else if ((arg & 0x10) == 0) {
-					--object->m_sp;
-					value = reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(m_permanentVarValues) + ((index + static_cast<int>(*object->m_sp)) * 4));
+				} else if ((arg & 8) != 0) {
+					if ((arg & 0x10) != 0) {
+						--object->m_sp;
+						value = object->m_thisBase + index + static_cast<int>(*object->m_sp);
+					} else {
+						--object->m_sp;
+						value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x0C) + ((index + static_cast<int>(*object->m_sp)) * 4));
+					}
 				} else {
 					--object->m_sp;
-					value = object->m_thisBase + index + static_cast<int>(*object->m_sp);
+					value = object->m_localBase + index + static_cast<int>(*object->m_sp);
 				}
 				*object->m_sp++ = *value;
 			} else if ((arg & 4) != 0) {
 				if (index < 0) {
 					value = reinterpret_cast<unsigned int*>(
 					    (arg & 0x10) == 0 ? onClassSystemVal(object, index) : onSystemVal(object, index));
-				} else if ((arg & 8) == 0) {
-					value = object->m_localBase + index;
-				} else if ((arg & 0x10) == 0) {
-					value = reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(m_permanentVarValues) + (index * 4));
+				} else if ((arg & 8) != 0) {
+					if ((arg & 0x10) != 0) {
+						value = object->m_thisBase + index;
+					} else {
+						value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x0C) + (index * 4));
+					}
 				} else {
-					value = object->m_thisBase + index;
+					value = object->m_localBase + index;
 				}
 				--object->m_sp;
 				*object->m_sp = *reinterpret_cast<unsigned int*>(*value + (*object->m_sp * 4));
@@ -1616,12 +1623,14 @@ frameLoop:
 				if (index < 0) {
 					value = reinterpret_cast<unsigned int*>(
 					    (arg & 0x10) == 0 ? onClassSystemVal(object, index) : onSystemVal(object, index));
-				} else if ((arg & 8) == 0) {
-					value = object->m_localBase + index;
-				} else if ((arg & 0x10) == 0) {
-					value = reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(m_permanentVarValues) + (index * 4));
+				} else if ((arg & 8) != 0) {
+					if ((arg & 0x10) != 0) {
+						value = object->m_thisBase + index;
+					} else {
+						value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x0C) + (index * 4));
+					}
 				} else {
-					value = object->m_thisBase + index;
+					value = object->m_localBase + index;
 				}
 				*object->m_sp++ = reinterpret_cast<u32>(value);
 			} else if ((arg & 2) != 0) {
@@ -1630,27 +1639,31 @@ frameLoop:
 					value = reinterpret_cast<unsigned int*>((arg & 0x10) == 0
 					                                            ? onClassSystemVal(object, index + static_cast<int>(*object->m_sp))
 					                                            : onSystemVal(object, index + static_cast<int>(*object->m_sp)));
-				} else if ((arg & 8) == 0) {
-					--object->m_sp;
-					value = object->m_localBase + index + static_cast<int>(*object->m_sp);
-				} else if ((arg & 0x10) == 0) {
-					--object->m_sp;
-					value = reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(m_permanentVarValues) + ((index + static_cast<int>(*object->m_sp)) * 4));
+				} else if ((arg & 8) != 0) {
+					if ((arg & 0x10) != 0) {
+						--object->m_sp;
+						value = object->m_thisBase + index + static_cast<int>(*object->m_sp);
+					} else {
+						--object->m_sp;
+						value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x0C) + ((index + static_cast<int>(*object->m_sp)) * 4));
+					}
 				} else {
 					--object->m_sp;
-					value = object->m_thisBase + index + static_cast<int>(*object->m_sp);
+					value = object->m_localBase + index + static_cast<int>(*object->m_sp);
 				}
 				*object->m_sp++ = reinterpret_cast<u32>(value);
 			} else if ((arg & 4) != 0) {
 				if (index < 0) {
 					value = reinterpret_cast<unsigned int*>(
 					    (arg & 0x10) == 0 ? onClassSystemVal(object, index) : onSystemVal(object, index));
-				} else if ((arg & 8) == 0) {
-					value = object->m_localBase + index;
-				} else if ((arg & 0x10) == 0) {
-					value = reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(m_permanentVarValues) + (index * 4));
+				} else if ((arg & 8) != 0) {
+					if ((arg & 0x10) != 0) {
+						value = object->m_thisBase + index;
+					} else {
+						value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x0C) + (index * 4));
+					}
 				} else {
-					value = object->m_thisBase + index;
+					value = object->m_localBase + index;
 				}
 				--object->m_sp;
 				*object->m_sp = reinterpret_cast<u32>(value) + (*object->m_sp * 4);
@@ -1739,14 +1752,14 @@ frameLoop:
 		}
 		case 0x0A: {
 			const u32 arg = *reinterpret_cast<u32*>(code + 1);
-			CFunc* func = reinterpret_cast<CFunc*>(m_funcs) + (arg & 0xFFFF);
+			CFunc* func = reinterpret_cast<CFunc*>(*reinterpret_cast<u8**>(self + 0x20)) + (arg & 0xFFFF);
 
 			if ((static_cast<int>(arg) >> 16) >= 0) {
-				const int funcIndex = m_classes[object->m_classIndex].m_functionTable[func->m_systemIndex];
+				const int funcIndex = *reinterpret_cast<int*>(*reinterpret_cast<u8**>(self + 0x18) + (object->m_classIndex * 0x22C) + 0x24 + (func->m_systemIndex * 4));
 				if (funcIndex < 0) {
 					continue;
 				}
-				func = reinterpret_cast<CFunc*>(m_funcs) + funcIndex;
+				func = reinterpret_cast<CFunc*>(*reinterpret_cast<u8**>(self + 0x20)) + funcIndex;
 			}
 
 			const unsigned int prevCodePos = object->m_codePos;
@@ -1789,7 +1802,7 @@ frameLoop:
 
 			if (((func->m_systemKind != 1) && (func->m_systemKind != 2)) || (func->m_systemIndex >= 0)) {
 				code = *reinterpret_cast<u8**>(
-				    m_funcs + (object->m_codeIndex.m_codeFunc * 0x50) + 0x34)
+				    *reinterpret_cast<u8**>(self + 0x20) + (object->m_codeIndex.m_codeFunc * 0x50) + 0x34)
 				    + object->m_codeIndex.m_codeOffset;
 				continue;
 			}
@@ -1797,8 +1810,8 @@ frameLoop:
 		}
 		case 0x0B: {
 			CObject* newObject = createObject(*reinterpret_cast<int*>(code + 1));
-			CFunc* func = reinterpret_cast<CFunc*>(m_funcs)
-			              + m_classes[newObject->m_activeClassIndex].m_functionTable[0];
+			CFunc* func = reinterpret_cast<CFunc*>(*reinterpret_cast<u8**>(self + 0x20))
+			              + *reinterpret_cast<int*>(*reinterpret_cast<u8**>(self + 0x18) + (newObject->m_activeClassIndex * 0x22C) + 0x24);
 
 			for (int i = 0; i < func->m_argCount; i++) {
 				newObject->m_sp[i] = object->m_sp[i - func->m_argCount];
@@ -2076,7 +2089,7 @@ frameLoop:
 			}
 
 			code = *reinterpret_cast<u8**>(
-			    m_funcs + (object->m_codeIndex.m_codeFunc * 0x50) + 0x34)
+			    *reinterpret_cast<u8**>(self + 0x20) + (object->m_codeIndex.m_codeFunc * 0x50) + 0x34)
 			    + object->m_codeIndex.m_codeOffset;
 			continue;
 		}
@@ -2116,7 +2129,7 @@ frameLoop:
 callSystemFunction:
 	{
 		const int funcIndex = object->m_codeIndex.m_codeFunc;
-		CFunc* func = reinterpret_cast<CFunc*>(m_funcs) + funcIndex;
+		CFunc* func = reinterpret_cast<CFunc*>(*reinterpret_cast<u8**>(self + 0x20)) + funcIndex;
 		int systemResult;
 		const int ret = systemFunc(object, func->m_systemKind, func->m_systemIndex, systemResult);
 
@@ -2127,7 +2140,7 @@ callSystemFunction:
 				object->m_waitCounter++;
 			}
 			watch.Stop();
-			m_performanceTotalTime += watch.Get();
+			*reinterpret_cast<float*>(self + 0x48) += watch.Get();
 			return 0;
 		}
 
@@ -2161,7 +2174,7 @@ callSystemFunction:
 		}
 
 		code = *reinterpret_cast<u8**>(
-		    m_funcs + (object->m_codeIndex.m_codeFunc * 0x50) + 0x34)
+		    *reinterpret_cast<u8**>(self + 0x20) + (object->m_codeIndex.m_codeFunc * 0x50) + 0x34)
 		    + object->m_codeIndex.m_codeOffset;
 		goto frameLoop;
 	}
@@ -2247,8 +2260,8 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 						char* scan = spec + 1;
 						if (spec[0] == '%') {
 							int fmtIndex = 1;
-							int width = 0;
-							u32 started = static_cast<u32>(__cntlzw(static_cast<u32>(0x30 - spec[1]))) >> 5 & 0xFF;
+							unsigned int width = 0;
+							s32 started = static_cast<u32>(__cntlzw(static_cast<u32>(0x30 - spec[1]))) >> 5 & 0xFF;
 							for (; (*scan >= '0') && (*scan <= '9'); scan++) {
 								fmtIndex++;
 								width = width * 10 + (*scan - '0');

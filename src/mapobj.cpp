@@ -186,6 +186,7 @@ int CPtrArray<CMapAnimRun*>::setSize(unsigned long newSize)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 template <>
 int CPtrArray<CMapShadow*>::Add(CMapShadow* item)
 {
@@ -197,6 +198,7 @@ int CPtrArray<CMapShadow*>::Add(CMapShadow* item)
     m_numItems = m_numItems + 1;
     return 1;
 }
+#pragma dont_inline off
 
 /*
  * --INFO--

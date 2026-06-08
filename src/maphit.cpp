@@ -440,20 +440,24 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         return 0;
     }
 
-    int boundsOverlap = 0;
-    int partialOverlap = 0;
+    unsigned char boundsOverlap = 0;
+    unsigned char partialOverlap = 0;
     int axisOverlap;
     if (g_hit_lpface->m_boundsMin.x < g_hit_cyl.m_bound.m_min.x) {
         axisOverlap = g_hit_cyl.m_bound.m_min.x <= g_hit_lpface->m_boundsMax.x;
-    } else {
+    } else if (g_hit_lpface->m_boundsMin.x > g_hit_cyl.m_bound.m_min.x) {
         axisOverlap = g_hit_lpface->m_boundsMin.x <= g_hit_cyl.m_bound.m_max.x;
+    } else {
+        axisOverlap = 1;
     }
 
     if (axisOverlap) {
         if (g_hit_lpface->m_boundsMin.y < g_hit_cyl.m_bound.m_min.y) {
             axisOverlap = g_hit_cyl.m_bound.m_min.y <= g_hit_lpface->m_boundsMax.y;
-        } else {
+        } else if (g_hit_lpface->m_boundsMin.y > g_hit_cyl.m_bound.m_min.y) {
             axisOverlap = g_hit_lpface->m_boundsMin.y <= g_hit_cyl.m_bound.m_max.y;
+        } else {
+            axisOverlap = 1;
         }
 
         if (axisOverlap) {
@@ -464,8 +468,10 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
     if (partialOverlap) {
         if (g_hit_lpface->m_boundsMin.z < g_hit_cyl.m_bound.m_min.z) {
             axisOverlap = g_hit_cyl.m_bound.m_min.z <= g_hit_lpface->m_boundsMax.z;
-        } else {
+        } else if (g_hit_lpface->m_boundsMin.z > g_hit_cyl.m_bound.m_min.z) {
             axisOverlap = g_hit_lpface->m_boundsMin.z <= g_hit_cyl.m_bound.m_max.z;
+        } else {
+            axisOverlap = 1;
         }
 
         if (axisOverlap) {
@@ -477,28 +483,33 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         return 0;
     }
 
-    Vec* normal = &g_hit_lpface->m_normal;
     Vec* hitDirection = &g_hit_cyl.m_axis;
-    float dot = PSVECDotProduct(hitDirection, normal);
+    float dot = PSVECDotProduct(hitDirection, &g_hit_lpface->m_normal);
     if (dot >= kMapHitZero) {
         return 0;
     }
 
-    float hitDot = PSVECDotProduct(&g_hit_cyl.m_bottom, normal);
-    float hitT = -((hitDot - (g_hit_lpface->m_planeD + g_hit_cyl.m_radius)) / dot);
+    float hitDot = PSVECDotProduct(&g_hit_cyl.m_bottom, &g_hit_lpface->m_normal);
+    g_hit_t = -((hitDot - (g_hit_lpface->m_planeD + g_hit_cyl.m_radius)) / dot);
+    float hitT = g_hit_t;
     int edgeIndex = -1;
 
     if (hitT > kMapHitEdgeMaxT) {
         return 0;
     }
 
-    if (!(hitT < kMapHitEdgeMinT) && hitT < g_hit_t_min) {
+    if (hitT < kMapHitEdgeMinT || !(hitT < g_hit_t_min)) {
+        goto edge_loop;
+    }
+
+    {
         PSVECScale(hitDirection, &g_hit_hpv, hitT);
         PSVECAdd(&g_hit_cyl.m_bottom, &g_hit_hpv, &g_hit_hpv);
 
+        Vec scaledNormal;
+        PSVECScale(&g_hit_lpface->m_normal, &scaledNormal, g_hit_cyl.m_radius);
         Vec pushedHit;
-        PSVECScale(normal, &pushedHit, g_hit_cyl.m_radius);
-        PSVECSubtract(&g_hit_hpv, &pushedHit, &pushedHit);
+        PSVECSubtract(&g_hit_hpv, &scaledNormal, &pushedHit);
 
         unsigned int sideMask = 3;
         Vec previous = m_vertices[g_hit_lpface->m_vertexIndices[g_hit_lpface->m_vertexCount - 1]];
@@ -509,36 +520,8 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         Vec edge;
         Vec toPoint;
         Vec cross;
-        if (g_hit_lpface->m_projectionAxis == 1) {
-            point.x = pushedHit.x;
-            point.y = pushedHit.z;
-            point.z = kMapHitZero;
-
-            for (int i = 0; i < static_cast<int>(g_hit_lpface->m_vertexCount); i++) {
-                current = m_vertices[g_hit_lpface->m_vertexIndices[i]];
-                edgeStart.x = previous.x + g_hit_lpface->m_vertexOffsets[i][0];
-                edgeStart.y = previous.z + g_hit_lpface->m_vertexOffsets[i][1];
-                edgeStart.z = kMapHitZero;
-                edgeEnd.x = current.x + g_hit_lpface->m_vertexOffsets[i][0];
-                edgeEnd.y = current.z + g_hit_lpface->m_vertexOffsets[i][1];
-                edgeEnd.z = kMapHitZero;
-
-                PSVECSubtract(&edgeEnd, &edgeStart, &edge);
-                PSVECSubtract(&point, &edgeEnd, &toPoint);
-                PSVECCrossProduct(&edge, &toPoint, &cross);
-                if (cross.z <= kMapHitZero) {
-                    sideMask &= 2;
-                } else {
-                    sideMask &= 1;
-                }
-
-                if (sideMask == 0) {
-                    break;
-                }
-
-                previous = current;
-            }
-        } else if (g_hit_lpface->m_projectionAxis == 0) {
+        switch (g_hit_lpface->m_projectionAxis) {
+        case 0:
             point.x = pushedHit.y;
             point.y = pushedHit.z;
             point.z = kMapHitZero;
@@ -555,19 +538,54 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
                 PSVECSubtract(&edgeEnd, &edgeStart, &edge);
                 PSVECSubtract(&point, &edgeEnd, &toPoint);
                 PSVECCrossProduct(&edge, &toPoint, &cross);
-                if (cross.z <= kMapHitZero) {
-                    sideMask &= 2;
-                } else {
+                if (cross.z >= kMapHitZero) {
                     sideMask &= 1;
-                }
-
-                if (sideMask == 0) {
-                    break;
+                    if (sideMask == 0) {
+                        goto edge_loop;
+                    }
+                } else if (cross.z <= kMapHitZero) {
+                    sideMask &= 2;
+                    if (sideMask == 0) {
+                        goto edge_loop;
+                    }
                 }
 
                 previous = current;
             }
-        } else if (g_hit_lpface->m_projectionAxis < 3) {
+            break;
+        case 1:
+            point.x = pushedHit.x;
+            point.y = pushedHit.z;
+            point.z = kMapHitZero;
+
+            for (int i = 0; i < static_cast<int>(g_hit_lpface->m_vertexCount); i++) {
+                current = m_vertices[g_hit_lpface->m_vertexIndices[i]];
+                edgeStart.x = previous.x + g_hit_lpface->m_vertexOffsets[i][0];
+                edgeStart.y = previous.z + g_hit_lpface->m_vertexOffsets[i][1];
+                edgeStart.z = kMapHitZero;
+                edgeEnd.x = current.x + g_hit_lpface->m_vertexOffsets[i][0];
+                edgeEnd.y = current.z + g_hit_lpface->m_vertexOffsets[i][1];
+                edgeEnd.z = kMapHitZero;
+
+                PSVECSubtract(&edgeEnd, &edgeStart, &edge);
+                PSVECSubtract(&point, &edgeEnd, &toPoint);
+                PSVECCrossProduct(&edge, &toPoint, &cross);
+                if (cross.z >= kMapHitZero) {
+                    sideMask &= 1;
+                    if (sideMask == 0) {
+                        goto edge_loop;
+                    }
+                } else if (cross.z <= kMapHitZero) {
+                    sideMask &= 2;
+                    if (sideMask == 0) {
+                        goto edge_loop;
+                    }
+                }
+
+                previous = current;
+            }
+            break;
+        case 2:
             point.x = pushedHit.x;
             point.y = pushedHit.y;
             point.z = kMapHitZero;
@@ -584,34 +602,48 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
                 PSVECSubtract(&edgeEnd, &edgeStart, &edge);
                 PSVECSubtract(&point, &edgeEnd, &toPoint);
                 PSVECCrossProduct(&edge, &toPoint, &cross);
-                if (cross.z <= kMapHitZero) {
-                    sideMask &= 2;
-                } else {
+                if (cross.z >= kMapHitZero) {
                     sideMask &= 1;
-                }
-
-                if (sideMask == 0) {
-                    break;
+                    if (sideMask == 0) {
+                        goto edge_loop;
+                    }
+                } else if (cross.z <= kMapHitZero) {
+                    sideMask &= 2;
+                    if (sideMask == 0) {
+                        goto edge_loop;
+                    }
                 }
 
                 previous = current;
             }
-        }
-
-        if (sideMask != 0) {
-            edgeIndex = -1;
+            break;
         }
     }
 
-    if (edgeIndex != -1 || hitT < kMapHitEdgeMinT || g_hit_t_min <= hitT) {
-        if (s_bitMask.m_fields.m_mode != 0) {
-            g_hit_lpface->m_drawFlags = s_bitMask.m_fields.m_drawFlags;
-        }
+commit:
+    if (s_bitMask.m_fields.m_mode != 0) {
+        g_hit_lpface->m_drawFlags = s_bitMask.m_fields.m_drawFlags;
+    }
+    g_hit_t_slide_min = g_hit_t;
+    g_hit_t_min = g_hit_t;
+    g_hit_f = g_hit_lpface;
+    g_hit_cyl_min = g_hit_cyl;
+    g_hit_mvec_min = g_hit_mvec;
+    g_hit_hpv_min = g_hit_hpv;
+    g_hit_edge_idx_min = edgeIndex;
+    gMapHitFaceFlag = 1;
+    return 1;
 
-        if (g_hit_lpface->m_edgeFlags == 0) {
-            return 0;
-        }
+edge_loop:
+    if (s_bitMask.m_fields.m_mode != 0) {
+        g_hit_lpface->m_drawFlags = s_bitMask.m_fields.m_drawFlags;
+    }
 
+    if (g_hit_lpface->m_edgeFlags == 0) {
+        return 0;
+    }
+
+    {
         Vec previous = m_vertices[g_hit_lpface->m_vertexIndices[g_hit_lpface->m_vertexCount - 1]];
         for (int i = 0; i < static_cast<int>(g_hit_lpface->m_vertexCount); i++) {
             Vec current = m_vertices[g_hit_lpface->m_vertexIndices[i]];
@@ -627,34 +659,18 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
                 float edgeT;
                 if (FindIntersection(g_hit_cyl.m_bottom, *hitDirection, edgeCylinder, edgeT) != 0 &&
                     edgeT < g_hit_t_min) {
-                    hitT = edgeT;
+                    g_hit_t = edgeT;
                     edgeIndex = i;
-                    PSVECScale(hitDirection, &g_hit_hpv, hitT);
+                    PSVECScale(hitDirection, &g_hit_hpv, g_hit_t);
                     PSVECAdd(&g_hit_cyl.m_bottom, &g_hit_hpv, &g_hit_hpv);
-                    break;
+                    goto commit;
                 }
             }
             previous = current;
         }
-
-        if (edgeIndex == -1 || g_hit_t_min <= hitT) {
-            return 0;
-        }
     }
 
-    g_hit_t = hitT;
-    g_hit_t_slide_min = hitT;
-    g_hit_t_min = hitT;
-    g_hit_f = g_hit_lpface;
-    g_hit_cyl_min = g_hit_cyl;
-    if (s_bitMask.m_fields.m_mode != 0) {
-        g_hit_lpface->m_drawFlags = s_bitMask.m_fields.m_drawFlags;
-    }
-    g_hit_mvec_min = g_hit_mvec;
-    g_hit_hpv_min = g_hit_hpv;
-    gMapHitFaceFlag = 1;
-    g_hit_edge_idx_min = edgeIndex;
-    return 1;
+    return 0;
 }
 
 /*
@@ -885,9 +901,11 @@ int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder&
     const f32 axisLen = PSVECMag(&axis);
     PSVECScale(&axis, &axis, kMapHitUnitScale / axisLen);
 
-    if (fabs(axis.x) >= fabs(axis.y) && fabs(axis.x) >= fabs(axis.z)) {
+    const f32 axisX = axis.x;
+    const double absAxisX = fabs(axisX);
+    if (absAxisX >= fabs(axis.y) && absAxisX >= fabs(axis.z)) {
         orthogonal.x = -axis.y;
-        orthogonal.y = axis.x;
+        orthogonal.y = axisX;
         orthogonal.z = kMapHitZero;
     } else {
         orthogonal.x = kMapHitZero;
@@ -914,38 +932,49 @@ int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder&
     const f32 py = PSVECDotProduct(&bitangent, &relStart);
     const f32 pz = PSVECDotProduct(&axis, &relStart);
 
-    const f32 vx = localDirection.x;
-    const f32 vy = localDirection.y;
     const f32 vz = localDirection.z;
     const f32 radius = cyl.m_radius;
     const f32 radiusSq = radius * radius;
 
-    if (fabs(vz) < 1.0f) {
+    if (fabs(vz) >= 1.0f) {
+        f32 disc = radiusSq - px * px - py * py;
+        if (disc >= 0.0) {
+            disc = sqrtf(disc);
+            outT = (-(pz + disc)) * tScale;
+            return 1;
+        }
+        return 0;
+    }
+
+cylinder_body:
+    {
+        const f32 vx = localDirection.x;
+        const f32 vy = localDirection.y;
         const f32 radialC = (px * px + py * py) - radiusSq;
         const f32 radialB = px * vx + py * vy;
         const f32 radialA = vx * vx + vy * vy;
         f32 disc = radialB * radialB - radialA * radialC;
-        if (disc < 0.0f) {
+        if (disc < 0.0) {
             return 0;
         }
 
-        if (disc == 0.0f) {
-            const f32 t = -radialB / radialA;
+        if (disc > 0.0) {
+            disc = sqrtf(disc);
+            const f32 t = (-radialB - disc) / radialA;
             const f32 z = (t * vz) + pz;
-            if (0.0f <= z && z <= axisLen) {
+            if (kMapHitZero <= z && z <= axisLen) {
                 outT = t * tScale;
-                if (0.0f <= outT && outT <= 1.0f) {
+                if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {
                     return 1;
                 }
                 return 0;
             }
         } else {
-            disc = sqrtf(disc);
-            const f32 t = (-radialB - disc) / radialA;
+            const f32 t = -radialB / radialA;
             const f32 z = (t * vz) + pz;
-            if (0.0f <= z && z <= axisLen) {
+            if (kMapHitZero <= z && z <= axisLen) {
                 outT = t * tScale;
-                if (0.0f <= outT && outT <= 1.0f) {
+                if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {
                     return 1;
                 }
                 return 0;
@@ -956,30 +985,30 @@ int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder&
             f32 capC = (pz * pz) + radialC;
             f32 capB = (pz * vz) + radialB;
             disc = capB * capB - capC;
-            if (disc == 0.0f) {
-                const f32 t = -capB;
-                if ((t * vz) + pz <= 0.0f) {
-                    outT = t * tScale;
-                    if (0.0f <= outT && outT <= 1.0f) {
-                        return 1;
-                    }
-                    return 0;
-                }
-            } else if (disc > 0.0f) {
+            if (disc > 0.0) {
                 disc = sqrtf(disc);
                 f32 t = -capB - disc;
-                if ((t * vz) + pz <= 0.0f) {
+                if ((t * vz) + pz <= kMapHitZero) {
                     outT = t * tScale;
-                    if (0.0f <= outT && outT <= 1.0f) {
+                    if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {
                         return 1;
                     }
                     return 0;
                 }
 
                 t = -capB + disc;
-                if ((t * vz) + pz <= 0.0f) {
+                if ((t * vz) + pz <= kMapHitZero) {
                     outT = t * tScale;
-                    if (0.0f <= outT && outT <= 1.0f) {
+                    if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {
+                        return 1;
+                    }
+                    return 0;
+                }
+            } else if (disc == 0.0) {
+                const f32 t = -capB;
+                if ((t * vz) + pz <= kMapHitZero) {
+                    outT = t * tScale;
+                    if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {
                         return 1;
                     }
                     return 0;
@@ -988,30 +1017,30 @@ int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder&
 
             capB = -((vz * axisLen) - capB);
             disc = capB * capB - (axisLen * -((2.0f * pz) - axisLen) + capC);
-            if (disc == 0.0f) {
-                const f32 t = -capB;
-                if (axisLen <= (t * vz) + pz) {
-                    outT = t * tScale;
-                    if (0.0f <= outT && outT <= 1.0f) {
-                        return 1;
-                    }
-                    return 0;
-                }
-            } else if (disc > 0.0f) {
+            if (disc > 0.0) {
                 disc = sqrtf(disc);
                 f32 t = -capB - disc;
-                if (axisLen <= (t * vz) + pz) {
+                if ((t * vz) + pz >= axisLen) {
                     outT = t * tScale;
-                    if (0.0f <= outT && outT <= 1.0f) {
+                    if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {
                         return 1;
                     }
                     return 0;
                 }
 
                 t = -capB + disc;
-                if (axisLen <= (t * vz) + pz) {
+                if ((t * vz) + pz >= axisLen) {
                     outT = t * tScale;
-                    if (0.0f <= outT && outT <= 1.0f) {
+                    if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {
+                        return 1;
+                    }
+                    return 0;
+                }
+            } else if (disc == 0.0) {
+                const f32 t = -capB;
+                if ((t * vz) + pz >= axisLen) {
+                    outT = t * tScale;
+                    if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {
                         return 1;
                     }
                     return 0;
@@ -1019,15 +1048,7 @@ int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder&
             }
         }
 
-        return 0;
     }
 
-    f32 disc = radiusSq - (px * px + py * py);
-    if (disc < 0.0f) {
-        return 0;
-    }
-
-    disc = sqrtf(disc);
-    outT = (-(pz + disc)) * tScale;
-    return 1;
+    return 0;
 }

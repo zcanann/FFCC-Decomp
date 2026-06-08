@@ -784,11 +784,11 @@ void CGPartyObj::menu()
 		}
 
 		bool bVar3;
-		if ((static_cast<int>(static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) << 0x18) < 0) &&
-		    ((static_cast<int>(static_cast<unsigned int>(static_cast<unsigned char>(m_shieldAttachNodeIndex)) << 0x18) < 0) ||
+		if ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) << 24) & 0xC0000000) >> 31) != 0) &&
+		    ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)[1]) << 24) & 0xC0000000) >> 31) != 0) ||
 		     ((party.commandMode & 2) != 0) ||
 		     ((party.commandMode & 4) != 0)) &&
-		    (static_cast<int>(static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x63C)) << 0x18) < 0) &&
+		    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x63C)) << 24) & 0xC0000000) >> 31) != 0) &&
 		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0)) {
 			bVar3 = true;
 		} else {

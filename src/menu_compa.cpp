@@ -273,15 +273,15 @@ void CMenuPcs::CompaDraw()
 		}
 
 		const char* name = GetMenuStr(drawIndex + 0x16);
-		float y = static_cast<float>(compaList->entries[0].y + 0x45 + shown * 0x28) - kCompaTextYOffset;
+		float y = static_cast<float>(compaList->entries[0].y + 0x45) + static_cast<float>(shown * 0x28);
 		font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x18));
-		font->SetPosY(y);
+		font->SetPosY(y - kCompaTextYOffset);
 		font->Draw(name);
 
 		short food = nameWork->m_evtWordArr[19 + drawIndex];
 		const char* value = Game.m_cFlatDataArr[1].TableStrings(2)[food];
 		font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x90));
-		font->SetPosY(y);
+		font->SetPosY(y - kCompaTextYOffset);
 		font->Draw(value);
 
 		shown++;

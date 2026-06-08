@@ -3841,7 +3841,7 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 
 	unsigned short repeat = 0;
 	unsigned short down = 0;
-	if (entry.m_connected != 0 && entry.m_cmakePending == 0) {
+	if (entry.m_connected == 1 && entry.m_cmakePending == 0) {
 		const int port = 0;
 		bool noRepeatInput = false;
 		if (Pad.m_debugPadLock == 0) {
@@ -12157,13 +12157,16 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 		const short msgId = *reinterpret_cast<const short*>(entry);
 		const char* text = msgTable[msgId];
 		if (strlen(text) != 0) {
-			if (text[0] != '$') {
-				strcpy(textBuf, text);
-			} else {
+			int isDollar;
+			if (text[0] == '$') {
 				strcpy(textBuf, text + 1);
+				isDollar = 1;
+			} else {
+				strcpy(textBuf, text);
+				isDollar = 0;
 			}
 
-			if (winType == 0 || text[0] == '$') {
+			if (winType == 0 || isDollar != 0) {
 				const int textWidth = font->GetWidth(textBuf);
 				posX = static_cast<float>(static_cast<double>(m_menuWindowInfo->x) + static_cast<double>(m_menuWindowInfo->width - textWidth) * DOUBLE_803313f8);
 			}

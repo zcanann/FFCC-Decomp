@@ -2779,12 +2779,10 @@ void CMenuPcs::DrawResultOpenAnim()
  */
 void CMenuPcs::CalcResultOpenAnim()
 {
-	int statePtr = this->m_bonusStatePtr;
 	const int activePartyCount = s_Rinfo->m_partyCount;
 	const int frameBase = 1;
-	const int iconBase = frameBase + activePartyCount;
 
-	if (*(signed char*)(statePtr + 0xb) == 0) {
+	if (*(signed char*)(this->m_bonusStatePtr + 0xb) == 0) {
 		int animPtr = this->m_bonusAnimPtr;
 		BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
 		BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
@@ -2821,7 +2819,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			sprite->depth = 1.0f;
 		}
 
-		int base = iconBase;
+		int base = frameBase + activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
 			BonusAnimSprite* sprite = &sprites[base + i];
 			unsigned int partySlot = s_Rinfo->m_party[i].m_partySlot;
@@ -2990,8 +2988,8 @@ void CMenuPcs::CalcResultOpenAnim()
 	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 
-	*(short*)(statePtr + 0x22) = *(short*)(statePtr + 0x22) + 1;
-	int frame = (int)*(short*)(statePtr + 0x22);
+	*(short*)(this->m_bonusStatePtr + 0x22) = *(short*)(this->m_bonusStatePtr + 0x22) + 1;
+	int frame = (int)*(short*)(this->m_bonusStatePtr + 0x22);
 	int doneCount = 0;
 
 	for (int i = 0; i < (int)header->count; i++) {
@@ -3050,7 +3048,7 @@ void CMenuPcs::CalcResultOpenAnim()
 		if (i / activePartyCount == 1) {
 			PSMTXRotRad(rotXMtx, 'x', 0.2617993950843811f);
 			PSMTXConcat(scaleMtx, rotXMtx, scaleMtx);
-			PSMTXRotRad(rotYMtx, 'y', 0.01745329238474369f * *reinterpret_cast<float*>(statePtr));
+			PSMTXRotRad(rotYMtx, 'y', 0.01745329238474369f * *reinterpret_cast<float*>(this->m_bonusStatePtr));
 			PSMTXConcat(scaleMtx, rotYMtx, scaleMtx);
 		}
 

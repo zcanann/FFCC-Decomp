@@ -1140,74 +1140,87 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 				MogWork().m_idleTicks = 0;
 			}
 
-			if (eraseMode != 0) {
-				MogWork().m_offColorTicks = 0;
-				if ((centerBefore.a != 0) && (centerAfter.a < centerBefore.a)) {
-					MogWork().m_eraseTicks++;
+			if (doPaint != 0) {
+				int particleNo = 0;
+				int seId = 0;
+				int emitParticle = ((System.m_frameCounter & 1) == 0);
+				int playGate = ((System.m_frameCounter & 3) == 0);
+				_GXColor particleColor = CColor(centerBefore).color;
+				if (radarType == 2) {
+					MogWork().m_offColorTicks = 0;
+					particleNo = 0x73;
+					MogWork().m_eraseTicks = 0;
+					particleColor = CColor(4, 0xF, 4, 2).color;
+				} else if (radarType < 2) {
+					if (radarType == 0) {
+						MogWork().m_offColorTicks = 0;
+						particleNo = 0x73;
+						MogWork().m_eraseTicks = 0;
+						particleColor = CColor(0xF, 4, 4, 2).color;
+					} else if (radarType >= 0) {
+						MogWork().m_offColorTicks = 0;
+						particleNo = 0x73;
+						MogWork().m_eraseTicks = 0;
+						particleColor = CColor(4, 8, 0xF, 2).color;
+					}
+				} else if (radarType == 4) {
+					MogWork().m_offColorTicks = 0;
+					if ((doPaint != 0) && (centerBefore.a != 0) && (centerAfter.a == 0)) {
+						MogWork().m_eraseTicks++;
+					}
+					emitParticle = 1;
+					particleNo = 0x72;
+					if (doPaint == 0) {
+						particleColor.a = 0;
+					}
+					seId = 0x249f3;
+					playGate = ((System.m_frameCounter & 7) == 0);
+				} else if (radarType < 4) {
+					MogWork().m_eraseTicks = 0;
+					if ((((centerBefore.r < 0x0D) || (centerBefore.g < 0x0D)) || (centerBefore.b < 0x0D)) && (centerBefore.a != 0)) {
+						MogWork().m_offColorTicks++;
+					}
+					seId = 0x249f4;
+					particleNo = 0x74;
+					emitParticle = ((System.m_frameCounter & 7) == 0);
+					playGate = ((System.m_frameCounter & 0xF) == 0);
 				}
-				if ((System.m_frameCounter & 7) == 0) {
-					Sound.PlaySe(0x249f3, 0x40, 0x7F, 0);
-				}
-			} else if (radarType == 3) {
-				MogWork().m_eraseTicks = 0;
-				if ((((centerAfter.r < 0x0D) || (centerAfter.g < 0x0D)) || (centerAfter.b < 0x0D)) && (centerAfter.a != 0)) {
-					MogWork().m_offColorTicks++;
-				}
-				if ((System.m_frameCounter & 0xF) == 0) {
-					Sound.PlaySe(0x249f4, 0x40, 0x7F, 0);
-				}
-			} else {
-				MogWork().m_offColorTicks = 0;
-				MogWork().m_eraseTicks = 0;
-			}
 
-			int particleNo = 0;
-			int emitParticle = 0;
-			_GXColor particleColor = centerBefore;
-			if (radarType < 3) {
-				particleNo = 0x73;
-				particleColor = brushColor;
-				emitParticle = ((System.m_frameCounter & 1) == 0);
-			} else if (eraseMode != 0) {
-				particleNo = 0x72;
-				emitParticle = 1;
-			} else if (radarType == 3) {
-				particleNo = 0x74;
-				emitParticle = ((System.m_frameCounter & 7) == 0);
-			}
-			if (emitParticle != 0) {
-				CFlatRuntime2Storage().ResetParticleWork(particleNo | 0x100, 0);
-				CFlatRuntime2Storage().SetParticleWorkPos(worldPos, kCharaFurDepthZero);
-				const int particleIndex = CFlatRuntime2Storage().PutParticleWork();
-				pppFVECTOR4 color;
-				color.x = static_cast<float>(particleColor.r) / kCharaFurColorComponentScale;
-				color.y = static_cast<float>(particleColor.g) / kCharaFurColorComponentScale;
-				color.z = static_cast<float>(particleColor.b) / kCharaFurColorComponentScale;
-				color.w = static_cast<float>(particleColor.a) / kCharaFurAlphaComponentScale;
-				PartPcs.SetParColIdx(particleIndex, color);
-			}
+				if (emitParticle != 0) {
+					CFlatRuntime2Storage().ResetParticleWork(particleNo | 0x100, 0);
+					CFlatRuntime2Storage().SetParticleWorkPos(worldPos, kCharaFurDepthZero);
+					const int particleIndex = CFlatRuntime2Storage().PutParticleWork();
+					pppFVECTOR4 color;
+					color.x = static_cast<float>(particleColor.r) / kCharaFurColorComponentScale;
+					color.y = static_cast<float>(particleColor.g) / kCharaFurColorComponentScale;
+					color.z = static_cast<float>(particleColor.b) / kCharaFurColorComponentScale;
+					color.w = static_cast<float>(particleColor.a) / kCharaFurAlphaComponentScale;
+					PartPcs.SetParColIdx(particleIndex, color);
+				}
+				if ((playGate != 0) && (seId != 0)) {
+					Sound.PlaySe(seId, 0x40, 0x7F, 0);
+				}
 
-			if (MogWork().m_offColorTicks == 10) {
-				if (messageId < 0) {
-					messageId = 2;
+				if (MogWork().m_offColorTicks == 10) {
+					if (messageId < 0) {
+						messageId = 2;
+					}
+					MogWork().m_offColorTicks = 0x0B;
 				}
-				MogWork().m_offColorTicks = 0x0B;
-			}
-			if (MogWork().m_eraseTicks == 10) {
-				if (messageId < 0) {
-					messageId = 5;
+				if (MogWork().m_eraseTicks == 10) {
+					if (messageId < 0) {
+						messageId = 5;
+					}
+					MogWork().m_eraseTicks = 0x0B;
 				}
-				MogWork().m_eraseTicks = 0x0B;
-			}
-			if (MogWork().m_eraseTicks == 0x32) {
-				if (messageId < 0) {
-					messageId = 6;
+				if (MogWork().m_eraseTicks == 0x32) {
+					if (messageId < 0) {
+						messageId = 6;
+					}
+					MogWork().m_eraseTicks = 0x33;
 				}
-				MogWork().m_eraseTicks = 0x33;
-			}
 
-			if (radarType < 3) {
-				if (MogWork().m_loopSeHandle == 0) {
+				if (radarType >= 0 && radarType < 3 && doPaint != 0 && MogWork().m_loopSeHandle == 0) {
 					MogWork().m_loopSeHandle = Sound.PlaySe(0x249f2, 0x40, 0x7F, 0);
 				}
 			}

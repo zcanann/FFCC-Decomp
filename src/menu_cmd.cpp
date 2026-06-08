@@ -1864,12 +1864,13 @@ unsigned int CMenuPcs::CmdClose0()
 				entry->dy = 0.0f;
 			} else {
 				entry->timer++;
-				const f32 t = static_cast<f32>(
+				entry->alpha = static_cast<f32>(
 				    1.0 - ((kCmdMenuOneD / static_cast<f64>(entry->duration)) *
 				           static_cast<f64>(entry->timer)));
-
-				entry->alpha = t;
 				if ((entry->flags & 2) == 0) {
+					const f32 t = static_cast<f32>(
+					    1.0 - ((kCmdMenuOneD / static_cast<f64>(entry->duration)) *
+					           static_cast<f64>(entry->timer)));
 					const f32 dx = entry->targetX - static_cast<f32>(entry->x);
 					const f32 dy = entry->targetY - static_cast<f32>(entry->y);
 					entry->dx = t * dx;

@@ -6134,19 +6134,19 @@ unsigned int CMenuPcs::GetWorldParam(int code)
 
 	switch (code) {
 	case 0:
-		result = static_cast<unsigned int>(static_cast<signed char>(bytes[4]));
+		result = *reinterpret_cast<signed char*>(bytes + 4);
 		break;
 	case 1:
-		result = static_cast<unsigned int>(static_cast<signed char>(bytes[6]));
+		result = *reinterpret_cast<signed char*>(bytes + 6);
 		break;
 	case 2:
 		result = static_cast<unsigned int>(*reinterpret_cast<short*>(bytes + 0x1A));
 		break;
 	case 3:
-		result = static_cast<unsigned int>(static_cast<signed char>(bytes[7]));
+		result = *reinterpret_cast<signed char*>(bytes + 7);
 		break;
 	case 4:
-		result = static_cast<unsigned int>(static_cast<signed char>(bytes[8]));
+		result = *reinterpret_cast<signed char*>(bytes + 8);
 		break;
 	case 5:
 		result = static_cast<unsigned int>(*reinterpret_cast<short*>(bytes + 0x1C));
@@ -6155,13 +6155,13 @@ unsigned int CMenuPcs::GetWorldParam(int code)
 		result = static_cast<unsigned int>(*reinterpret_cast<short*>(bytes + 0x1E));
 		break;
 	case 7:
-		result = static_cast<unsigned int>(static_cast<signed char>(bytes[9]));
+		result = *reinterpret_cast<signed char*>(bytes + 9);
 		break;
 	case 8:
-		result = static_cast<unsigned int>(static_cast<signed char>(bytes[0xC]));
+		result = *reinterpret_cast<signed char*>(bytes + 0xC);
 		break;
 	case 9:
-		result = static_cast<unsigned int>(static_cast<signed char>(bytes[0xD]));
+		result = *reinterpret_cast<signed char*>(bytes + 0xD);
 		break;
 	case 10:
 		result = (-static_cast<unsigned int>(bytes[0x10]) | static_cast<unsigned int>(bytes[0x10])) >> 31;
@@ -6170,7 +6170,7 @@ unsigned int CMenuPcs::GetWorldParam(int code)
 		result = (-static_cast<unsigned int>(bytes[0x11]) | static_cast<unsigned int>(bytes[0x11])) >> 31;
 		break;
 	case 12:
-		result = static_cast<unsigned int>(static_cast<signed char>(bytes[0xE]));
+		result = *reinterpret_cast<signed char*>(bytes + 0xE);
 		break;
 	case 13:
 		result = static_cast<unsigned int>(static_cast<signed char>(bytes[0xF]));
@@ -6182,7 +6182,7 @@ unsigned int CMenuPcs::GetWorldParam(int code)
 		result = (-static_cast<unsigned int>(bytes[0x13]) | static_cast<unsigned int>(bytes[0x13])) >> 31;
 		break;
 	case 16:
-		result = static_cast<unsigned int>(static_cast<signed char>(bytes[0x17]));
+		result = *reinterpret_cast<signed char*>(bytes + 0x17);
 		break;
 	case 0x11: {
 		int iVar1;
@@ -6229,6 +6229,12 @@ unsigned int CMenuPcs::GetWorldParam(int code)
 	case 0x15:
 		result = 0x16;
 		break;
+	case 0x16:
+	case 0x17:
+	case 0x18:
+	case 0x19:
+	case 0x1a:
+	case 0x1b:
 	default:
 		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
 			System.Printf(const_cast<char*>(s__s__d___Error_function_code_not_f_801dc3ec), s_wm_menu_cpp, 0x1521, code);

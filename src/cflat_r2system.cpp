@@ -1594,7 +1594,7 @@ int CCameraPcs::IsAbsolute()
 int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long* nearestSegment,
                     float* nearestSegmentRatio, Vec* targetPosition, float maxDistance)
 {
-    const bool infiniteRange = (kLineSegmentMinT == maxDistance);
+    const int infiniteRange = (kLineSegmentMinT == maxDistance);
     float bestDistance = infiniteRange ? kLineBoundsInitMin : maxDistance;
     const float maxDistanceSq = maxDistance * maxDistance;
     int found = 0;
@@ -1633,8 +1633,8 @@ int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long*
 
         float dotTarget = PSVECDotProduct(targetPosition, &segments[i].delta);
         float dotPoint = PSVECDotProduct(&points[i], &segments[i].delta);
-        float segmentT = (dotTarget - dotPoint) / (segments[i].length * segments[i].length);
-        if (((kLineSegmentMinT <= segmentT) && (segmentT <= kLineSegmentMaxT)) || infiniteRange) {
+        float segmentT = (-dotPoint + dotTarget) / (segments[i].length * segments[i].length);
+        if (((segmentT >= kLineSegmentMinT) && (segmentT <= kCFlatOneF)) || infiniteRange) {
             Vec scaled;
             Vec projected;
             PSVECScale(&segments[i].delta, &scaled, segmentT);
@@ -1776,7 +1776,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             buttons = 0;
         }
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
-            buttons &= 0xF3FF;
+            buttons &= ~0xC00;
         }
         this->push(object, static_cast<short>(buttons));
         outResult = 0;
@@ -1837,10 +1837,10 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
 
                     if (spec[fmtIndex] == 'b') {
                         char* out = rendered;
-                        unsigned int value = object->m_localBase[argIndex];
+                        int value = object->m_localBase[argIndex];
                         int outLen = 0;
                         for (int bit = 0; bit < width; bit++) {
-                            const unsigned int cur = (value >> ((width - bit) - 1U)) & 1U;
+                            const int cur = (value >> ((width - bit) - 1)) & 1;
                             if (started == 0 && cur != 0) {
                                 started = 1;
                             }
@@ -1911,7 +1911,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             buttons = 0;
         }
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
-            buttons &= 0xF3FF;
+            buttons &= ~0xC00;
         }
         this->push(object, static_cast<short>(buttons));
         outResult = 0;
@@ -1925,7 +1925,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             buttons = 0;
         }
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
-            buttons &= 0xF3FF;
+            buttons &= ~0xC00;
         }
         this->push(object, static_cast<short>(buttons));
         outResult = 0;
@@ -2593,18 +2593,20 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     }
     case -0x3A:
         this->SetParticleWorkVector(
-            static_cast<float>(*object->m_localBase), static_cast<float>(object->m_localBase[1]));
+            reinterpret_cast<float*>(object->m_localBase)[0],
+            reinterpret_cast<float*>(object->m_localBase)[1]);
         this->push(object, 0);
         outResult = 0;
         break;
     case -0x3B:
-        this->SetParticleWorkScale(static_cast<float>(*object->m_localBase));
+        this->SetParticleWorkScale(reinterpret_cast<float*>(object->m_localBase)[0]);
         this->push(object, 0);
         outResult = 0;
         break;
     case -0x3C:
         this->SetParticleWorkCol(
-            *object->m_localBase, object->m_localBase[1], static_cast<float>(object->m_localBase[2]));
+            *object->m_localBase, object->m_localBase[1],
+            static_cast<float>(static_cast<int>(object->m_localBase[2])));
         this->push(object, 0);
         outResult = 0;
         break;
@@ -2616,7 +2618,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     }
     case -0x49:
-        this->SetParticleWorkSpeed(static_cast<float>(*object->m_localBase));
+        this->SetParticleWorkSpeed(reinterpret_cast<float*>(object->m_localBase)[0]);
         this->push(object, 0);
         outResult = 0;
         break;
@@ -3158,7 +3160,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     case -0x74: {
         unsigned short buttonDown = Pad.GetGbaButtonDown(*object->m_localBase);
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
-            buttonDown &= 0xF3FF;
+            buttonDown &= ~0xC00;
         }
         this->push(object, static_cast<int>(static_cast<short>(buttonDown)));
         outResult = 0;
@@ -3223,12 +3225,12 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     case -0x81: {
-        float angle = static_cast<float>(object->m_localBase[2]);
+        float angle = reinterpret_cast<float*>(object->m_localBase)[2];
         Mtx& reflectMtx = m_centerMatrix;
         PSMTXReflect(
             reflectMtx,
-            CVector(static_cast<float>(*object->m_localBase), kCFlatPadStickZero,
-                static_cast<float>(object->m_localBase[1])),
+            CVector(reinterpret_cast<float*>(object->m_localBase)[0], kCFlatPadStickZero,
+                reinterpret_cast<float*>(object->m_localBase)[1]),
             CVector(std::sinf(angle), kCFlatPadStickZero, std::cosf(angle)));
         this->push(object, 0);
         outResult = 0;
@@ -3250,7 +3252,8 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     case -0x85:
         this->push(
-            object, Wind.AddAmbient(static_cast<float>(*object->m_localBase), static_cast<float>(object->m_localBase[1])));
+            object, Wind.AddAmbient(reinterpret_cast<float*>(object->m_localBase)[0],
+                                    reinterpret_cast<float*>(object->m_localBase)[1]));
         outResult = 0;
         break;
     case -0x86: {
@@ -3270,7 +3273,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     }
     case -0x88:
-        Wind.ChangePower(*object->m_localBase, static_cast<float>(object->m_localBase[1]));
+        Wind.ChangePower(*object->m_localBase, reinterpret_cast<float*>(object->m_localBase)[1]);
         this->push(object, 0);
         outResult = 0;
         break;

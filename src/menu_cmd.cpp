@@ -1340,9 +1340,11 @@ void CMenuPcs::CmdDraw()
 			if (caravan->m_commandListExtra[index] == 0) {
 				cursorEntry = &GetCmdListStorage(this)->entries[index];
 			} else {
-				s32 uniteIdx = 0;
-				while ((uniteIdx < s_unitePanelCount) && (s_UniteTop[uniteIdx] != index)) {
-					uniteIdx++;
+				s32 uniteIdx;
+				for (uniteIdx = 0; uniteIdx < s_unitePanelCount; uniteIdx++) {
+					if (s_UniteTop[uniteIdx] == index) {
+						break;
+					}
 				}
 				cursorEntry = &GetCmdListStorage(this)->entries[GetCmdListStorage(this)->listEnd + uniteIdx];
 				cursorOnUnite = true;

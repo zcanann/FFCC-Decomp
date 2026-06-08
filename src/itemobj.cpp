@@ -682,7 +682,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 
 	CGPrgObj* newItem = 0;
 	if (createMode != 1) {
-		newItem = (CGPrgObj*)ItemCFlatRuntime()->intToClass((int)outStack.m_word);
+		newItem = (CGPrgObj*)CFlat.intToClass((int)outStack.m_word);
 		unsigned char* itemSelf = (unsigned char*)newItem;
 
 		if (createMode == 2) {

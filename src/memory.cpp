@@ -354,8 +354,7 @@ unsigned int CheckSum(void* data, int size)
  */
 void CMemory::Init()
 {
-    int arenaLo = reinterpret_cast<int>(OSGetArenaLo());
-    OSInitAlloc(OSGetArenaLo(), reinterpret_cast<void*>(arenaLo + 0x14000), 1);
+    OSInitAlloc(OSGetArenaLo(), reinterpret_cast<void*>(reinterpret_cast<int>(OSGetArenaLo()) + 0x14000), 1);
 
     m_heapWalkerLevel = 0;
     m_heapWalkerVisible = 0;

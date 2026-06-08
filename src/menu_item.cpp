@@ -440,8 +440,8 @@ void CMenuPcs::ItemDraw()
         s16 itemId = caravanWork->m_inventoryItems[menuIndex];
         if (itemId > 0) {
             const char* text = Game.m_cFlatDataArr[1].TableStrings(0)[itemId * 5 + 4];
-            unsigned int selectedIndex = this->m_itemMenuState->cursorIndex[0] + this->m_itemMenuState->scroll;
-            if (selectedIndex > 0x3F) {
+            int selectedIndex = this->m_itemMenuState->cursorIndex[0] + this->m_itemMenuState->scroll;
+            if (selectedIndex >= 0x40) {
                 selectedIndex -= 0x40;
             }
             if (menuIndex == selectedIndex) {

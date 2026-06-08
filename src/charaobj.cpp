@@ -3219,7 +3219,6 @@ void CGCharaObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 		char text[0x100];
 		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
 		double posYDouble;
-		double widthDouble;
 
 		sprintf(text, sCharaObjDebugStatFormat,
 		        *reinterpret_cast<unsigned short*>(script + 0x1C),
@@ -3229,12 +3228,12 @@ void CGCharaObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 		        *reinterpret_cast<unsigned short*>(script + 0x22));
 
 		posYDouble = (double)posY;
-		widthDouble = (double)font->GetWidth(text);
-		font->SetPosX(-(float)((double)kHalfF32 * widthDouble - (double)posX));
+		font->SetPosX(-(kHalfF32 * (float)font->GetWidth(text) - posX));
 		font->SetPosY((float)posYDouble);
 		font->SetPosZ((float)posZ);
 		font->Draw(text);
-		posY -= (float)((double)(unsigned short)font->m_glyphHeight * (double)font->scaleY);
+		float glyphOffset = (float)(unsigned short)font->m_glyphHeight * font->scaleY;
+		posY = posY - glyphOffset;
 	}
 }
 

@@ -2020,9 +2020,9 @@ void CMenuPcs::CalcResultCloseAnim()
 		}
 
 		{
-			BonusAnimSprite* headerSprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + 8);
-			headerSprite->startFrame = 9999;
-			*(int*)((int)headerSprite + 0x2c) = 3;
+			int headerSprite = this->m_bonusAnimPtr + 0 * 0x40 + 8;
+			*(int*)(headerSprite + 0x24) = 9999;
+			*(int*)(headerSprite + 0x2c) = 3;
 		}
 
 		for (int i = 0; i < activePartyCount; i++) {

@@ -134,7 +134,7 @@ static inline CCharaModelRefRaw* ModelRef(CChara::CModel* model)
 	return model->m_data;
 }
 
-static inline u16 ModelMeshCount(CChara::CModel* model)
+static inline u32 ModelMeshCount(CChara::CModel* model)
 {
 	return model->m_data->m_meshCount;
 }
@@ -1262,10 +1262,9 @@ CChara::CModel* CChara::CModel::Duplicate(CMemory::CStage* stage)
 	clone->m_data = ModelRef(this);
 	RetainRefCounted(ModelRef(clone));
 
-	const u16 nodeCount = ModelNodeCount(this);
-	CChara::CNode* cloneNodes = new (stage, const_cast<char*>(s_chara_cpp), 0x263) CChara::CNode[nodeCount];
+	CChara::CNode* cloneNodes = new (stage, const_cast<char*>(s_chara_cpp), 0x263) CChara::CNode[ModelNodeCount(this)];
 	clone->m_nodes = cloneNodes;
-	for (u32 i = 0; i < nodeCount; i++) {
+	for (u32 i = 0; i < ModelNodeCount(this); i++) {
 		CChara::CNode* dst = &cloneNodes[i];
 		CChara::CNode* src = &ModelNodes(this)[i];
 		dst->m_refData = src->m_refData;

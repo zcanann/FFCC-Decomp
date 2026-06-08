@@ -116,8 +116,9 @@ int CMenuPcs::ItemCtrlCur()
     unsigned int press;
     int hold;
     CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+    int padLock = Pad.m_debugPadLock;
 
-    if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
+    if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
         blocked = true;
     }
     if (blocked) {
@@ -129,7 +130,7 @@ int CMenuPcs::ItemCtrlCur()
     }
 
     blocked = false;
-    if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
+    if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
         blocked = true;
     }
     if (blocked) {

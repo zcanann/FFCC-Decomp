@@ -320,18 +320,18 @@ void GbaQueue::LoadAll()
 	LoadEnemyStat();
 	LoadMapItemStat();
 
-	if ((obj[0x2CE8] == 0) && (cflatFlag != 0)) {
+	if ((m_scrInitEnd == 0) && (cflatFlag != 0)) {
 		SetRadarType();
 	}
 	if (cflatFlag == 0) {
-		memset(obj + 0x2CB8, 0xFF, 0x10);
-		obj[0x2CD8] = 0;
+		memset(obj + 0x2D44, 0xFF, 0x10);
+		obj[0x2D54] = 0;
 	}
 
 	for (i = 0; i < 4; i++) {
 		OSWaitSemaphore(&accessSemaphores[i]);
 	}
-	obj[0x2CE8] = static_cast<char>(cflatFlag);
+	m_scrInitEnd = cflatFlag;
 	for (i = 0; i < 4; i++) {
 		OSSignalSemaphore(&accessSemaphores[i]);
 	}

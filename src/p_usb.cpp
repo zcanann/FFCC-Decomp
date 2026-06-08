@@ -83,8 +83,6 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
     unsigned int count;
     int result;
     int connected;
-    unsigned char* packetStorage;
-    unsigned char* dstStorage;
     CDataHeader* packet;
     CDataHeader* dstBuffer;
     CMemory::CStage* stage;
@@ -94,15 +92,14 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
     value = (count + 0x5F) & ~0x1F;
     stage = (m_bigStage != (CMemory::CStage*)nullptr) ? m_bigStage : m_smallStage;
 
-    packetStorage = new (stage, const_cast<char*>(s_p_usb_cpp), 0x1ca) unsigned char[value];
-    packet = reinterpret_cast<CDataHeader*>(packetStorage);
-    packet->m_packetType = 4;
+    packet = reinterpret_cast<CDataHeader*>(new (stage, const_cast<char*>(s_p_usb_cpp), 0x1ca) unsigned char[value]);
     packet->m_packetSize = value;
-    packet->m_payloadSize = Swap32(count);
+    packet->m_packetType = 4;
     packet->m_packetCode = Swap32((unsigned int)code);
     packet->m_elementCount = Swap32((unsigned int)elemCount);
-    packet->m_reserved2C = Swap32(0);
     packet->m_dataSize = Swap32(count);
+    packet->m_reserved2C = Swap32(0);
+    packet->m_payloadSize = Swap32(count);
     memcpy(packet + 1, src, count);
 
     connected = USB.IsConnected();
@@ -111,9 +108,8 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
     } else {
         stage = (m_bigStage != (CMemory::CStage*)nullptr) ? m_bigStage : m_smallStage;
 
-        dstStorage = new (stage, const_cast<char*>(s_p_usb_cpp), 0x19e)
-            unsigned char[(packet->m_packetSize + 0x1F) & ~0x1F];
-        dstBuffer = reinterpret_cast<CDataHeader*>(dstStorage);
+        dstBuffer = reinterpret_cast<CDataHeader*>(new (stage, const_cast<char*>(s_p_usb_cpp), 0x19e)
+            unsigned char[(packet->m_packetSize + 0x1F) & ~0x1F]);
         memcpy(dstBuffer, packet, (packet->m_packetSize + 0x1F) & ~0x1F);
 
         dstBuffer->m_packetType = Swap32(packet->m_packetType);
@@ -123,19 +119,19 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
         DCInvalidateRange(dstBuffer, (packet->m_packetSize + 0x1F) & ~0x1F);
 
         if (USB.Write(dstBuffer, (packet->m_packetSize + 0x1F) & ~0x1F) == 0) {
-            delete[] dstStorage;
+            delete[] dstBuffer;
             result = 0;
         } else if (USB.SendMessage(0, (MCCChannel)9) == 0) {
-            delete[] dstStorage;
+            delete[] dstBuffer;
             result = 0;
         } else {
-            delete[] dstStorage;
+            delete[] dstBuffer;
             result = 1;
         }
     }
 
     if (packet != (CDataHeader*)nullptr) {
-        delete[] packetStorage;
+        delete[] packet;
     }
     return result;
 }

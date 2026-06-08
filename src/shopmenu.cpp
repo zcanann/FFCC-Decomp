@@ -2009,11 +2009,12 @@ void CShopMenu::DrawSmith0()
     font->SetColor(white.color);
     font->DrawInit();
 
+    int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
     const char* title;
-    if (m_caravanWork->m_shopRequestFlags != '\0') {
+    if (static_cast<signed char>(m_caravanWork->m_shopRequestFlags) != '\0') {
         title = MenuPcs.GetJobStr(1);
     } else {
-        title = ShopMenuMes(static_cast<int>(Game.m_gameWork.m_languageId) - 1, SHOP_MENU_TEXT_BLACKSMITH);
+        title = ShopMenuMes(languageId, SHOP_MENU_TEXT_BLACKSMITH);
     }
 
     float width = font->GetWidth(title);

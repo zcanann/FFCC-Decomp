@@ -2337,6 +2337,8 @@ void CGPartyObj::statAttackSel()
  * JP Address: TODO
  * JP Size: TODO
  */
+extern "C" float dstTargetRot__8CGPrgObjFP8CGPrgObj(CGPrgObj*, CGPrgObj*);
+
 CGPrgObj* CGPartyObj::getBestAngleObject(float range, float)
 {
 	CGPrgObj* best = 0;
@@ -2377,7 +2379,7 @@ CGPrgObj* CGPartyObj::getBestAngleObject(float range, float)
 				diff.y = 0.0f;
 				float distSq = PSVECSquareMag(&diff);
 				if (0.0f < distSq && distSq < radius * radius) {
-					float absAngle = fabsf(getTargetRot(reinterpret_cast<CGPrgObj*>(obj)));
+					float absAngle = fabsf(dstTargetRot__8CGPrgObjFP8CGPrgObj(this, reinterpret_cast<CGPrgObj*>(obj)));
 					if (absAngle > bestAbsAngle) {
 						bestAbsAngle = absAngle;
 						best = reinterpret_cast<CGPrgObj*>(obj);

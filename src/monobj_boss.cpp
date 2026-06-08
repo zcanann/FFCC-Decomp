@@ -1415,7 +1415,7 @@ void CGMonObj::frameStatFuncTetsukyojin()
 
 			PSVECNormalize(&attackVec, &attackVec);
 			PSVECScale(&attackVec, &attackVec, kMonObjBossAttackRange - object->m_capsuleHalfHeight);
-			*reinterpret_cast<Vec*>(SoundBuffer + 0x4F0) = attackVec;
+			*reinterpret_cast<Vec*>(CGMonObj::m_boss + 0x4) = attackVec;
 
 			CVector objectPos(object->m_worldPosition);
 			CVector delta;
@@ -1443,7 +1443,7 @@ void CGMonObj::frameStatFuncTetsukyojin()
 			memset(&m_moveWork, 0, sizeof(m_moveWork));
 			m_moveWork.m_flags = 0x2410;
 
-			CVector storedVec(*reinterpret_cast<Vec*>(SoundBuffer + 0x4F0));
+			CVector storedVec(*reinterpret_cast<Vec*>(CGMonObj::m_boss + 0x4));
 			CVector attackDir(-storedVec.x, -storedVec.y, -storedVec.z);
 			m_moveWork.m_targetPos.x = attackDir.x;
 			m_moveWork.m_targetPos.y = attackDir.y;
@@ -1462,9 +1462,9 @@ void CGMonObj::frameStatFuncTetsukyojin()
 			int flatCount = CFlatBossState();
 			if (flatCount < 1) {
 				CFlatBossState() = 0;
-			} else if (((flatCount == 1) && (*reinterpret_cast<int*>(SoundBuffer + 0x4EC) > 0x13)) ||
-			           ((flatCount > 1) && (*reinterpret_cast<int*>(SoundBuffer + 0x4EC) > 4))) {
-				*reinterpret_cast<int*>(SoundBuffer + 0x4EC) = 0;
+			} else if (((flatCount == 1) && (*reinterpret_cast<int*>(CGMonObj::m_boss) > 0x13)) ||
+			           ((flatCount > 1) && (*reinterpret_cast<int*>(CGMonObj::m_boss) > 4))) {
+				*reinterpret_cast<int*>(CGMonObj::m_boss) = 0;
 				object->DispCharaParts(1);
 
 				int pdtNo = object->m_charaModelHandle->GetPdtSlot();

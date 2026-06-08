@@ -115,7 +115,7 @@ int CMenuPcs::ItemCtrlCur()
 {
     bool blocked = false;
     unsigned int press;
-    unsigned int hold;
+    int hold;
     CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 
     if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
@@ -209,7 +209,7 @@ int CMenuPcs::ItemCtrlCur()
                     return 1;
                 } else {
                     this->m_itemMenuState->optionFlags = 0xC;
-                    int itemType = GetItemType(idx, 0);
+                    unsigned int itemType = GetItemType(idx, 0);
 
                     if ((itemType == 7) && (caravanWork->CanPlayerUseItem() != 0)) {
                         this->m_itemMenuState->optionFlags = this->m_itemMenuState->optionFlags | 1;
@@ -310,16 +310,14 @@ void CMenuPcs::ItemDraw()
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
     CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
-    ItemMenuState* itemState = this->m_itemMenuState;
+    s16 listState = this->m_itemMenuState->listState;
+    s16 mode = this->m_itemMenuState->mode;
     ItemMenuAnimList* itemList = this->m_itemList;
-    s16 listState = itemState->listState;
-    s16 mode = itemState->mode;
     bool hasLetterAttach = SingGetLetterAttachflg() >= 0;
     int drawIndex = 0;
-    int count = itemList->count;
     MenuItemOpenAnim* entry = itemList->anims;
 
-    for (int i = 0; i < count; i++, entry++) {
+    for (int i = 0; i < this->m_itemList->count; i++, entry++) {
         int tex = entry->tex;
         if (tex < 0) {
             continue;
@@ -391,7 +389,7 @@ void CMenuPcs::ItemDraw()
         } else {
             float itemAlpha = alpha;
             if (tex == 0x37) {
-                int menuIndex = drawIndex + itemState->scroll;
+                unsigned int menuIndex = drawIndex + this->m_itemMenuState->scroll;
                 if (menuIndex > 0x3F) {
                     menuIndex -= 0x40;
                 }
@@ -400,15 +398,15 @@ void CMenuPcs::ItemDraw()
                 if ((itemId < 1) || (EquipChk(menuIndex) != 0) ||
                     (hasLetterAttach && (itemId < 0x125))) {
                     if (EquipChk(menuIndex) != 0) {
-                        int markX = (int)(x - LoadFloat(kItemMarkXOffset));
-                        int markY = (int)((float)((h - LoadFloat(kItemMarkHeight)) * (float)LoadDouble(kItemHalfDouble)) + y);
+                        int markX = (unsigned int)(x - LoadFloat(kItemMarkXOffset));
+                        int markY = (unsigned int)((float)((h - LoadFloat(kItemMarkHeight)) * (float)LoadDouble(kItemHalfDouble)) + y);
                         DrawEquipMark(markX, markY, alpha);
                     }
                     tex = 0x34;
                     itemAlpha = (float)((double)LoadDouble(kItemHalfDouble) * (double)alpha);
                 }
 
-                if (tex == 0x37 && drawIndex == itemState->selectedIndex) {
+                if (tex == 0x37 && drawIndex == this->m_itemMenuState->selectedIndex) {
                     v += h;
                 }
                 drawIndex++;
@@ -441,7 +439,7 @@ void CMenuPcs::ItemDraw()
 
     MenuItemOpenAnim* textEntry = listStart;
     for (int i = 0; i < 8; i++, textEntry++) {
-        int menuIndex = i + itemState->scroll;
+        int menuIndex = i + this->m_itemMenuState->scroll;
         if (menuIndex > 0x3F) {
             menuIndex -= 0x40;
         }
@@ -452,7 +450,7 @@ void CMenuPcs::ItemDraw()
         s16 itemId = caravanWork->m_inventoryItems[menuIndex];
         if (itemId > 0) {
             const char* text = Game.m_cFlatDataArr[1].TableStrings(0)[itemId * 5 + 4];
-            int selectedIndex = itemState->selectedIndex + itemState->scroll;
+            unsigned int selectedIndex = this->m_itemMenuState->selectedIndex + this->m_itemMenuState->scroll;
             if (selectedIndex > 0x3F) {
                 selectedIndex -= 0x40;
             }
@@ -472,7 +470,7 @@ void CMenuPcs::ItemDraw()
 
     MenuItemOpenAnim* iconEntry = listStart;
     for (int i = 0; i < 8; i++, iconEntry++) {
-        int menuIndex = i + itemState->scroll;
+        int menuIndex = i + this->m_itemMenuState->scroll;
         if (menuIndex > 0x3F) {
             menuIndex -= 0x40;
         }
@@ -486,7 +484,7 @@ void CMenuPcs::ItemDraw()
     }
 
     if (listState == 1) {
-        float mark = CalcListPos(itemState->scroll, 0x40, 1);
+        float mark = CalcListPos(this->m_itemMenuState->scroll, 0x40, 1);
         if (mark > LoadFloat(kItemZero)) {
             DrawListPosMark((float)itemList->anims[0].x, (float)itemList->anims[0].y, mark);
         }
@@ -500,7 +498,7 @@ void CMenuPcs::ItemDraw()
     }
 
     MenuItemOpenAnim* cursorEntry = listStart;
-    if ((mode == 0 && listState == 1) || (mode != 0 && itemState->optionFrame == 1)) {
+    if ((mode == 0 && listState == 1) || (mode != 0 && this->m_itemMenuState->optionFrame == 1)) {
         float cursorX;
         float cursorY;
 
@@ -513,7 +511,7 @@ void CMenuPcs::ItemDraw()
                 }
             }
 
-            cursorEntry += itemState->selectedIndex;
+            cursorEntry += this->m_itemMenuState->selectedIndex;
             cursorX = (float)(cursorEntry->x - 0x14);
             cursorY = (float)((float)(cursorEntry->h - 0x20) * (float)LoadDouble(kItemHalfDouble) + (float)cursorEntry->y);
         } else {
@@ -538,7 +536,7 @@ void CMenuPcs::ItemDraw()
     }
     float helpBaseX = LoadFloat(kItemHelpCenterX);
     float helpOffsetX = LoadFloat(kItemHalf);
-    int helpX = (int)(helpBaseX - (float)(LoadDouble(kItemHalfDouble) * (double)helpOffsetX));
+    int helpX = (unsigned int)(helpBaseX - (float)(LoadDouble(kItemHalfDouble) * (double)helpOffsetX));
     int helpY = (int)LoadFloat(kItemHelpY);
     DrawHelpMessage(
         selectedItemId,
@@ -614,24 +612,24 @@ bool CMenuPcs::ItemClose()
  */
 int CMenuPcs::ItemCtrl()
 {
-    ItemMenuState* state = this->m_itemMenuState;
     int changed = 0;
 
-    state->prevMode = state->mode;
+    this->m_itemMenuState->prevMode = this->m_itemMenuState->mode;
 
-    if ((state->mode == 0) || ((state->mode != 0) && (state->optionFrame == 1))) {
+    if ((this->m_itemMenuState->mode == 0) ||
+        ((this->m_itemMenuState->mode != 0) && (this->m_itemMenuState->optionFrame == 1))) {
         changed = ItemCtrlCur();
-    } else if ((state->mode == 1) && (state->optionFrame == 0)) {
+    } else if ((this->m_itemMenuState->mode == 1) && (this->m_itemMenuState->optionFrame == 0)) {
         if (this->m_menuWindowInfo->state == 1) {
             changed = 0;
-            state->optionFrame++;
+            this->m_itemMenuState->optionFrame++;
         }
-    } else if (((state->mode == 1) && (state->optionFrame == 2)) &&
+    } else if (((this->m_itemMenuState->mode == 1) && (this->m_itemMenuState->optionFrame == 2)) &&
                (this->m_menuWindowInfo->state == 3)) {
         changed = 0;
-        state->optionFrame = 0;
-        state->mode = 0;
-        state->frame = 0;
+        this->m_itemMenuState->optionFrame = 0;
+        this->m_itemMenuState->mode = 0;
+        this->m_itemMenuState->frame = 0;
     }
 
     if (changed != 0) {
@@ -706,7 +704,7 @@ bool CMenuPcs::ItemOpen()
 void CMenuPcs::ItemInit1()
 {
     float progress;
-    unsigned int count;
+    int count;
     unsigned int blocks;
     int index;
     MenuItemOpenAnim* entry;
@@ -774,39 +772,9 @@ void CMenuPcs::ItemInit1()
     itemList = this->m_itemList;
     count = (unsigned int)itemList->count;
     entry = itemList->anims;
-    if (0 < (int)count) {
-        blocks = count >> 3;
-        if (blocks != 0) {
-            do {
-                entry[0].frame = 0;
-                entry[0].alpha = progress;
-                entry[1].frame = 0;
-                entry[1].alpha = progress;
-                entry[2].frame = 0;
-                entry[2].alpha = progress;
-                entry[3].frame = 0;
-                entry[3].alpha = progress;
-                entry[4].frame = 0;
-                entry[4].alpha = progress;
-                entry[5].frame = 0;
-                entry[5].alpha = progress;
-                entry[6].frame = 0;
-                entry[6].alpha = progress;
-                entry[7].frame = 0;
-                entry[7].alpha = progress;
-                entry += 8;
-                blocks--;
-            } while (blocks != 0);
-            count &= 7;
-        }
-        if (count != 0) {
-            do {
-                entry->frame = 0;
-                entry->alpha = progress;
-                entry++;
-                count--;
-            } while (count != 0);
-        }
+    for (unsigned int i = 0; i < count; i++, entry++) {
+        entry->frame = 0;
+        entry->alpha = progress;
     }
 }
 
@@ -830,19 +798,9 @@ void CMenuPcs::ItemInit()
     memset(this->m_itemList, 0, sizeof(*this->m_itemList));
     float one = LoadFloat(kItemOne);
     entry = this->m_itemList->anims;
-    int initCount = 8;
-    do {
-        entry[0].uvScale = one;
-        entry[1].uvScale = one;
-        entry[2].uvScale = one;
-        entry[3].uvScale = one;
-        entry[4].uvScale = one;
-        entry[5].uvScale = one;
-        entry[6].uvScale = one;
-        entry[7].uvScale = one;
-        entry += 8;
-        initCount--;
-    } while (initCount != 0);
+    for (int initCount = 0; initCount < 64; initCount++, entry++) {
+        entry->uvScale = one;
+    }
 
     index = 0;
     entry = &this->m_itemList->anims[index++];
@@ -900,9 +858,8 @@ void CMenuPcs::ItemInit()
 
     itemList = this->m_itemList;
     yOffset = 0;
-    int loopCount = 4;
-    do {
-        entry = &itemList->anims[index++];
+    for (int loopCount = 0; loopCount < 4; loopCount++) {
+        entry = &this->m_itemList->anims[index++];
         entry->flags = 2;
         entry->tex = 0x37;
         count = count + 2;
@@ -916,7 +873,7 @@ void CMenuPcs::ItemInit()
         entry->startFrame = 7;
         entry->duration = 5;
 
-        entry = &itemList->anims[index++];
+        entry = &this->m_itemList->anims[index++];
         entry->flags = 2;
         entry->tex = 0x37;
         entry->x = itemList->anims[0].x + 0x24;
@@ -928,8 +885,7 @@ void CMenuPcs::ItemInit()
         entry->v = zero;
         entry->startFrame = 7;
         entry->duration = 5;
-        loopCount--;
-    } while (loopCount != 0);
+    }
 
     this->m_itemList->count = count;
     this->m_itemMenuState->selectedIndex = 0;

@@ -441,7 +441,7 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 			{
 				_pppPObjLink* next = obj->m_next;
 				_pppPDataVal* owner = obj->m_owner;
-				if ((int)((u32)owner->m_programSetDef->m_drawFlags << 30) >= 0)
+				if ((s8)((s32)((u32)owner->m_programSetDef->m_drawFlags << 30) >> 31) == 0)
 				{
 					prev->m_next = next;
 
@@ -578,7 +578,7 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 			{
 				_pppPObjLink* next = obj->m_next;
 				_pppPDataVal* owner = obj->m_owner;
-				if ((int)((u32)owner->m_programSetDef->m_drawFlags << 30) >= 0)
+				if ((s8)((s32)((u32)owner->m_programSetDef->m_drawFlags << 30) >> 31) == 0)
 				{
 					prev->m_next = next;
 
@@ -845,7 +845,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 			{
 				_pppPObjLink* next = obj->m_next;
 				_pppPDataVal* owner = obj->m_owner;
-				if ((int)((u32)owner->m_programSetDef->m_drawFlags << 30) >= 0)
+				if ((s8)((s32)((u32)owner->m_programSetDef->m_drawFlags << 30) >> 31) == 0)
 				{
 					prev->m_next = next;
 
@@ -1665,7 +1665,7 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 				{
 					_pppPObjLink* next = obj->m_next;
 					_pppPDataVal* owner = obj->m_owner;
-					if ((int)((u32)owner->m_programSetDef->m_drawFlags << 30) >= 0)
+					if ((s8)((s32)((u32)owner->m_programSetDef->m_drawFlags << 30) >> 31) == 0)
 					{
 						prev->m_next = next;
 

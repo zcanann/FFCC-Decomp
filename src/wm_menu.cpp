@@ -12209,7 +12209,7 @@ void CMenuPcs::BindMcObj()
 			effectA->m_effectNo = -1;
 		}
 
-		EffectInfo* const effectB = &m_effectWork[i + 0x12];
+		EffectInfo* const effectB = effectA + 1;
 		if (effectB->m_partNo >= 0) {
 			PartMng.pppDeletePart(effectB->m_partNo);
 			effectB->m_partNo = -1;
@@ -12218,6 +12218,7 @@ void CMenuPcs::BindMcObj()
 		}
 	}
 
+	const float kOne = FLOAT_803313e8;
 	for (int i = 0; i < 4; i++) {
 		const int modelNo = static_cast<int>(charaState[i * 0x12 + 3]);
 		const int slot = i + 0x11;
@@ -12244,8 +12245,8 @@ void CMenuPcs::BindMcObj()
 			*reinterpret_cast<void**>(createParam + 0x18) = 0;
 			*reinterpret_cast<unsigned int*>(createParam + 0x1C) = 0;
 			*reinterpret_cast<unsigned int*>(createParam + 0x20) = 0;
-			*reinterpret_cast<float*>(createParam + 0x24) = FLOAT_803313e8;
-			*reinterpret_cast<float*>(createParam + 0x28) = FLOAT_803313e8;
+			*reinterpret_cast<float*>(createParam + 0x24) = kOne;
+			*reinterpret_cast<float*>(createParam + 0x28) = kOne;
 			createParam[0x2C] = 0;
 
 			const unsigned int effectNo = static_cast<unsigned int>(modelNo + 0x16);

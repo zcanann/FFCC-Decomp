@@ -4074,7 +4074,7 @@ void CGPartyObj::SetBonusCondition(int useRandom, int bonus0, int bonus1, int bo
 
 			reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)
 			    ->SetBonusCondition(bossArtifacts->m_bonusConditions[bonusIndex]);
-			if ((unsigned int)System.m_execParam > 2) {
+			if ((unsigned int)System.m_execParam >= 3) {
 				System.Printf(const_cast<char*>(s_partyBonusRandomFmt), slot, bonusIndex,
 				    bossArtifacts->m_bonusConditions[bonusIndex]);
 			}
@@ -4096,7 +4096,7 @@ void CGPartyObj::SetBonusCondition(int useRandom, int bonus0, int bonus1, int bo
 			}
 
 			reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)->SetBonusCondition(bonus);
-			if ((unsigned int)System.m_execParam > 2) {
+			if ((unsigned int)System.m_execParam >= 3) {
 				System.Printf(const_cast<char*>(s_partyBonusFixedFmt), slot, bonus);
 			}
 		}

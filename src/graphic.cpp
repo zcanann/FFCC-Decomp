@@ -668,7 +668,7 @@ void CGraphic::Flip()
 
     m_lastRetraceCount = VIGetRetraceCount();
 
-    u8 frameReady;
+    int frameReady;
     if (System.m_scenegraphStepMode == 1) {
         frameReady = ((u32)__cntlzw(System.m_frameCounter & 3) >> 5) & 0xFF;
     } else {

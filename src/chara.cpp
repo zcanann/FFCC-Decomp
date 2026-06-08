@@ -1522,20 +1522,17 @@ void CChara::CModel::calcMatrix()
 	CNode* node = ModelNodes(this);
 	u32 nodeCount = ModelNodeCount(this);
 	for (u32 i = 0; i < nodeCount; i++, node++) {
+		CChara::CNode::CRefData* ref = node->m_refData;
 		CNode* parentNode;
-		if (NodeParentIndex(node) < 0) {
+		if (ref->m_parentIndex < 0) {
 			parentNode = 0;
 		} else {
-			parentNode = ModelNodes(this) + NodeParentIndex(node);
+			parentNode = ModelNodes(this) + ref->m_parentIndex;
 		}
 
 		SRTView srt;
 
-		if (NodeAnimNode0(node) == 0 && NodeAnimNode1(node) == 0) {
-			if (NodeRuntimeFlag80(node)) {
-				PSMTXCopy(NodeRefLocalMtx(node), NodeLocalRuntimeMtx(node));
-			}
-		} else {
+		if (NodeAnimNode0(node) != 0 || NodeAnimNode1(node) != 0) {
 			if (parentNode != 0 && NodeAnimNode0(parentNode) != 0 && AnimNodeUsesScale(NodeAnimNode0(parentNode))) {
 				if (NodeRuntimeFlag80(node)) {
 					float* parentScale = NodeRuntimeScale(parentNode);
@@ -1553,7 +1550,7 @@ void CChara::CModel::calcMatrix()
 				}
 			}
 
-			if (NodeUsesParentLenX(node) != 0) {
+			if (ref->m_usesParentLenX != 0) {
 				NodeLocalRuntimeMtx(node)[0][3] = NodeBoneLen(parentNode);
 			}
 
@@ -1576,7 +1573,7 @@ void CChara::CModel::calcMatrix()
 			if (NodeAnimNode0(node) != 0) {
 				Mtx animMtx;
 				NodeAnimNode0(node)->Interp(m_anim, reinterpret_cast<SRT*>(&srt), frame);
-				u16 nodeIndex = NodeRefIndex(node);
+				u16 nodeIndex = ref->m_index;
 				if (nodeIndex == ModelChest1Index(this) || nodeIndex == ModelChest2Index(this) ||
 				    nodeIndex == ModelChest3Index(this)) {
 					float tiltScale;
@@ -1608,6 +1605,10 @@ void CChara::CModel::calcMatrix()
 				runtimeScale[2] = FLOAT_803301b0;
 				runtimeScale[1] = FLOAT_803301b0;
 				runtimeScale[0] = FLOAT_803301b0;
+			}
+		} else {
+			if (NodeRuntimeFlag80(node)) {
+				PSMTXCopy(ref->m_localMtx, NodeLocalRuntimeMtx(node));
 			}
 		}
 
@@ -1652,11 +1653,11 @@ void CChara::CModel::calcMatrix()
 			PSMTXConcat(NodeWorldMtx(parentNode), NodeLocalRuntimeMtx(node), NodeWorldMtx(node));
 		}
 
-		if (NodeDynParamIndex(node) >= 0) {
+		if (ref->m_dynParamIndex >= 0) {
 			dynamics(node, parentNode);
 		}
 
-		if (NodeRefIndex(node) == ModelChest1Index(this) && ModelTwistAngle(this) != FLOAT_803301b0) {
+		if (ref->m_index == ModelChest1Index(this) && ModelTwistAngle(this) != FLOAT_803301b0) {
 			Vec twistAxis;
 			twistAxis.x = FLOAT_803301b0;
 			twistAxis.y = FLOAT_803301BC;

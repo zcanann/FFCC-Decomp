@@ -1724,14 +1724,14 @@ void CMenuPcs::DrawSingleStat(float alpha)
     color2.r = 0xFF;
     color2.g = 0xFF;
     color2.b = 0xFF;
-    color2.a = static_cast<u8>(255.0f * static_cast<float>(0.5) * alpha);
+    color2.a = static_cast<u8>(255.0 * (0.5 * alpha));
     GXSetChanMatColor(GX_COLOR0A0, color2);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x22));
 
     unsigned short charaNo = SingleCaravanWork()->m_tribeId;
     float iconStep = 216.0f;
     float texU = static_cast<float>(charaNo & 1) * iconStep;
-    float texV = static_cast<float>(charaNo >> 1) * iconStep;
+    float texV = static_cast<float>(static_cast<short>(charaNo) / 2) * iconStep;
     MenuPcs.DrawRect(0, 440.0f - 32.0f, 176.0f, iconStep, iconStep,
                                      texU, texV, 1.0f, 1.0f, 0.0f);
 

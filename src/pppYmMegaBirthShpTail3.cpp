@@ -803,18 +803,47 @@ path:
                 } else {
                     float sampleT;
 
-                    if (pYmMegaBirthShpTail3->m_randType == 1) {
+                    switch (pYmMegaBirthShpTail3->m_randType) {
+                    case 1:
                         Math.RandF();
                         sampleT = Math.RandF();
-                    } else if (pYmMegaBirthShpTail3->m_randType == 3) {
-                        sampleT = static_cast<float>(kPppYmMegaBirthShpTail3OneDouble - (Math.RandF() * Math.RandF() * Math.RandF()));
-                    } else if (pYmMegaBirthShpTail3->m_randType == 5) {
-                        sampleT = static_cast<float>(kPppYmMegaBirthShpTail3OneDouble -
-                            (Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF()));
-                    } else if (pYmMegaBirthShpTail3->m_randType == 2) {
-                        sampleT = Math.RandF() * Math.RandF() * Math.RandF();
-                    } else {
-                        sampleT = Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF();
+                        break;
+                    case 2:
+                    {
+                        float r0 = Math.RandF();
+                        float r1 = Math.RandF();
+                        float r2 = Math.RandF();
+                        sampleT = r2 * (r1 * r0);
+                        break;
+                    }
+                    case 3:
+                    {
+                        float r0 = Math.RandF();
+                        float r1 = Math.RandF();
+                        float r2 = Math.RandF();
+                        sampleT = static_cast<float>(kPppYmMegaBirthShpTail3OneDouble - (r2 * (r1 * r0)));
+                        break;
+                    }
+                    case 5:
+                    {
+                        float r0 = Math.RandF();
+                        float r1 = Math.RandF();
+                        float r2 = Math.RandF();
+                        float r3 = Math.RandF();
+                        float r4 = Math.RandF();
+                        sampleT = static_cast<float>(kPppYmMegaBirthShpTail3OneDouble - (r4 * (r3 * (r2 * (r1 * r0)))));
+                        break;
+                    }
+                    case 4:
+                    default:
+                    {
+                        float r0 = Math.RandF();
+                        float r1 = Math.RandF();
+                        float r2 = Math.RandF();
+                        float r3 = Math.RandF();
+                        sampleT = r3 * (r2 * (r1 * r0));
+                        break;
+                    }
                     }
 
                     if ((u16)vYmMegaBirthShpTail3->m_pathIndex >= (s16)pathInfo[1]) {

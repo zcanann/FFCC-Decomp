@@ -2711,7 +2711,7 @@ unsigned int CMenuPcs::CmdClose1()
 			}
 		}
 
-		done = static_cast<u32>(UniteCloseAnim(uniteIdx) != 0);
+		done = static_cast<u32>(UniteCloseAnim(uniteIdx));
 		if (done != 0) {
 			s32 ununiteCount = 1;
 			if (caravanWork->m_commandListExtra[selected + 1] == -1) {
@@ -2743,7 +2743,7 @@ unsigned int CMenuPcs::CmdClose1()
 			}
 		}
 
-		done = static_cast<u32>(UniteCloseAnim(uniteIdx) != 0);
+		done = static_cast<u32>(UniteCloseAnim(uniteIdx));
 		if (done != 0) {
 			int combo[2][2];
 			ChkUnite(static_cast<int>(selected), combo);
@@ -2764,7 +2764,7 @@ unsigned int CMenuPcs::CmdClose1()
 			GetCmdStateView(this)->uniteState = 4;
 		}
 	} else if (state == 4) {
-		done = static_cast<u32>(UniteOpenAnim(-1) != 0);
+		done = static_cast<u32>(UniteOpenAnim(-1));
 	}
 
 	return done;

@@ -38,6 +38,11 @@ extern const float FLOAT_803302CC;
 extern const float FLOAT_803302D0;
 extern const float FLOAT_803302D4;
 extern const float FLOAT_803302D8;
+extern const float FLOAT_803302DC;
+extern const float FLOAT_803302E0;
+extern const float FLOAT_803302FC;
+extern const float FLOAT_80330300;
+extern const float FLOAT_80330304;
 extern const float kCharaBumpLightPosX;
 extern const float kCharaBumpLightPosY;
 extern const float kCharaBumpLightPosZ;
@@ -1982,7 +1987,7 @@ void CCharaPcs::drawOverlap()
 
     PSMTXCopy(CameraPcs.m_cameraMatrix, savedCameraMtx);
 
-    C_MTXOrtho(projectionMtx, 0.0f, 448.0f, 0.0f, 640.0f, 0.5f, -0.5f);
+    C_MTXOrtho(projectionMtx, kCharaZero, FLOAT_803302C8, kCharaZero, FLOAT_803302CC, 0.5f, -0.5f);
     GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
@@ -2038,7 +2043,7 @@ void CCharaPcs::drawOverlap()
     PSMTXIdentity(identityMtx);
     GXLoadPosMtxImm(identityMtx, GX_PNMTX0);
     GXSetCullMode(GX_CULL_NONE);
-    C_MTXOrtho(projectionMtx, 0.0f, 448.0f, 0.0f, 640.0f, 0.0f, -1.0f);
+    C_MTXOrtho(projectionMtx, kCharaZero, FLOAT_803302C8, kCharaZero, FLOAT_803302CC, kCharaZero, FLOAT_803302A4);
     GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
     PSMTXIdentity(identityMtx);
     GXLoadPosMtxImm(identityMtx, GX_PNMTX0);
@@ -2065,7 +2070,7 @@ void CCharaPcs::drawOverlap()
     _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
     GXSetChanMatColor(GX_COLOR0A0, white);
     GXLoadTexObj(backBufferTex, GX_TEXMAP0);
-    PSMTXScale(texMtx, 0.003125f, -0.002232143f, 1.0f);
+    PSMTXScale(texMtx, FLOAT_803302DC, FLOAT_803302E0, kCharaOne);
     GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
     GXSetNumTexGens(1);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);

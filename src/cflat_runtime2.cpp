@@ -1793,9 +1793,7 @@ void CFlatRuntime2::drawLayer(
 	}
 
 	int textureIndex = layer->m_textureSet->Find(textureName);
-	if (textureIndex < 0) {
-		return;
-	}
+	if (textureIndex >= 0) {
 
 	CTexture* texture = layer->m_textureSet->GetTexture(static_cast<unsigned long>(textureIndex));
 
@@ -1831,9 +1829,9 @@ void CFlatRuntime2::drawLayer(
 	TextureMan.SetTexture(GX_TEXMAP0, texture);
 
 	Mtx texMtx;
-	const float texW = static_cast<float>(texture->m_width);
-	const float texH = static_cast<float>(texture->m_height);
-	PSMTXScale(texMtx, 1.0f / texW, 1.0f / texH, 1.0f);
+	const float texW = static_cast<float>(static_cast<unsigned int>(texture->m_width));
+	const float texH = static_cast<float>(static_cast<unsigned int>(texture->m_height));
+	PSMTXScale(texMtx, FLOAT_80330140 / texW, FLOAT_80330140 / texH, FLOAT_80330140);
 	GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
 	GXSetNumTexGens(1);
 	GXSetTexCoordGen2(
@@ -1848,18 +1846,37 @@ void CFlatRuntime2::drawLayer(
 
 	const float scaledWidth = static_cast<float>(width) * scaleX;
 	const float scaledHeight = static_cast<float>(height) * scaleY;
-	const float xAnchor = (flags & 1) != 0 ? scaledWidth * 0.5f : 0.0f;
-	const float yAnchor = (flags & 1) != 0 ? scaledHeight * 0.5f : 0.0f;
+	unsigned short u1 = static_cast<short>(texU + width);
+	short v1 = static_cast<unsigned short>(texV + height);
+	float xAnchor = FLOAT_80330144;
+	if ((flags & 1) != 0) {
+		xAnchor = FLOAT_80330154 * scaledWidth;
+	}
 	const float x0 = static_cast<float>(x) - xAnchor;
+	float yAnchor = FLOAT_80330144;
+	if ((flags & 1) != 0) {
+		yAnchor = FLOAT_80330154 * scaledHeight;
+	}
 	const float y0 = static_cast<float>(y) - yAnchor;
 	const float x1 = x0 + scaledWidth;
 	const float y1 = y0 + scaledHeight;
-	short u0 = static_cast<short>(texU);
+	unsigned short u0 = static_cast<unsigned short>(texU);
 	short v0 = static_cast<short>(texV);
-	short u1 = static_cast<short>(texU + width);
-	short v1 = static_cast<short>(texV + height);
 
-	if (blendMode == 3) {
+	if (blendMode != 3) {
+		GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+		GXPosition3f32(x0, y0, FLOAT_80330144);
+		GXTexCoord2s16(u0, v0);
+
+		GXPosition3f32(x1, y0, FLOAT_80330144);
+		GXTexCoord2s16(u1, v0);
+
+		GXPosition3f32(x1, y1, FLOAT_80330144);
+		GXTexCoord2s16(u1, v1);
+
+		GXPosition3f32(x0, y1, FLOAT_80330144);
+		GXTexCoord2s16(u0, v1);
+	} else {
 		GXSetNumTexGens(2);
 		GXSetTexCoordGen2(
 			GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
@@ -1878,82 +1895,69 @@ void CFlatRuntime2::drawLayer(
 		_GXSetTevAlphaIn((_GXTevStageID)tevStage, (_GXTevAlphaArg)7, (_GXTevAlphaArg)4, (_GXTevAlphaArg)0, (_GXTevAlphaArg)7);
 		_GXSetTevAlphaOp((_GXTevStageID)tevStage, (_GXTevOp)0, (_GXTevBias)0, (_GXTevScale)0, 1, (_GXTevRegID)0);
 
-		const int pixelWidth = static_cast<int>(scaledWidth * 0.5f);
-		const int pixelHeight = static_cast<int>(scaledHeight * 0.5f);
+		const int pixelWidth = static_cast<int>(scaledWidth * FLOAT_80330154);
+		const int pixelHeight = static_cast<int>(scaledHeight * FLOAT_80330154);
 
 		for (int quad = 0; quad < 4; quad++) {
-			int bx = static_cast<int>(x0);
-			int by = static_cast<int>(y0);
-			int bw = pixelWidth;
-			int bh = pixelHeight;
+			CColor texCol0;
+			CColor texCol1;
 
+			float bx = x0;
 			if ((quad & 1) != 0) {
-				bx += pixelWidth;
+				bx = x0 + static_cast<float>(pixelWidth);
 			}
+			int rectX = static_cast<int>(bx);
+			float by = y0;
 			if ((quad & 2) != 0) {
-				by += pixelHeight;
+				by = y0 + static_cast<float>(pixelHeight);
 			}
+			int rectY = static_cast<int>(by);
 
-			short quadU0 = u0;
-			short quadV0 = v0;
-			short quadU1 = static_cast<short>(quadU0 + bw);
-			short quadV1 = static_cast<short>(quadV0 + bh);
+			unsigned short quadU0 = static_cast<short>(texU);
 			if ((quad & 1) != 0) {
-				quadU0 = static_cast<short>(quadU0 + pixelWidth);
-				quadU1 = static_cast<short>(quadU0 + bw);
+				quadU0 = static_cast<short>(texU + static_cast<short>(pixelWidth));
 			}
+			short quadV0 = static_cast<short>(texV);
 			if ((quad & 2) != 0) {
-				quadV0 = static_cast<short>(quadV0 + pixelHeight);
-				quadV1 = static_cast<short>(quadV0 + bh);
+				quadV0 = static_cast<short>(texV + static_cast<short>(pixelHeight));
 			}
 
-			int rectX = bx;
-			int rectY = by;
-			int rectW = bw;
-			int rectH = bh;
+			int rectW = pixelWidth;
+			int rectH = pixelHeight;
 			_GXTexObj* backTex = Graphic.GetBackBufferRect(rectX, rectY, rectW, rectH, 0);
 			GXLoadTexObj(backTex, GX_TEXMAP1);
 
-			const float fx0 = static_cast<float>(rectX);
-			const float fy0 = static_cast<float>(rectY);
-			const float fx1 = static_cast<float>(rectX + rectW);
-			const float fy1 = static_cast<float>(rectY + rectH);
-
 			GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-			GXPosition3f32(fx0, fy0, 0.0f);
+			short quadU1 = static_cast<short>(quadU0 + static_cast<short>(rectW));
+			short quadV1 = static_cast<short>(quadV0 + static_cast<short>(rectH));
+
+			GXPosition3f32(static_cast<float>(rectX), static_cast<float>(rectY), FLOAT_80330144);
 			GXTexCoord2s16(quadU0, quadV0);
 			GXTexCoord2s16(0, 0);
 
-			GXPosition3f32(fx1, fy0, 0.0f);
+			GXPosition3f32(static_cast<float>(rectX + rectW), static_cast<float>(rectY), FLOAT_80330144);
 			GXTexCoord2s16(quadU1, quadV0);
 			GXTexCoord2s16(2, 0);
 
-			GXPosition3f32(fx1, fy1, 0.0f);
+			GXPosition3f32(static_cast<float>(rectX + rectW), static_cast<float>(rectY + rectH), FLOAT_80330144);
 			GXTexCoord2s16(quadU1, quadV1);
 			GXTexCoord2s16(2, 2);
 
-			GXPosition3f32(fx0, fy1, 0.0f);
+			GXPosition3f32(static_cast<float>(rectX), static_cast<float>(rectY + rectH), FLOAT_80330144);
 			GXTexCoord2s16(quadU0, quadV1);
 			GXTexCoord2s16(0, 2);
 		}
-	} else {
-		GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-		GXPosition3f32(x0, y0, 0.0f);
-		GXTexCoord2s16(u0, v0);
-
-		GXPosition3f32(x1, y0, 0.0f);
-		GXTexCoord2s16(u1, v0);
-
-		GXPosition3f32(x1, y1, 0.0f);
-		GXTexCoord2s16(u1, v1);
-
-		GXPosition3f32(x0, y1, 0.0f);
-		GXTexCoord2s16(u0, v1);
 	}
 
 	Mtx44 projection;
 	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcsRaw() + 0x94), projection);
 	GXSetProjection(projection, GX_PERSPECTIVE);
+
+	} else {
+		if (static_cast<unsigned int>(System.m_execParam) >= 2) {
+			System.Printf(const_cast<char*>(sCFlatRuntime2LayerMissingMsg), textureName);
+		}
+	}
 }
 
 /*

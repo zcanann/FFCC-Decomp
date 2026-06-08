@@ -796,7 +796,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		case -8:
 			*(reinterpret_cast<u8*>(&engineObject->m_weaponNodeFlags) + 1) =
-			    static_cast<u8>((static_cast<signed char>(object->m_localBase[0]) << 7) & 0x80) |
+			    static_cast<u8>((static_cast<unsigned char>(object->m_localBase[0]) << 7) & 0x80) |
 			    (*(reinterpret_cast<u8*>(&engineObject->m_weaponNodeFlags) + 1) & 0x7F);
 			PushValue(this, object, 0);
 			outResult = 0;
@@ -1578,7 +1578,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		case -0x86: {
 			CChara::CModel* model = engineObject->m_charaModelHandle->m_model;
-			model->m_flags10C = static_cast<unsigned char>((static_cast<signed char>(object->m_localBase[0]) << 6) & 0x40) |
+			model->m_flags10C = static_cast<unsigned char>((static_cast<unsigned char>(object->m_localBase[0]) << 6) & 0x40) |
 			    (model->m_flags10C & 0xBF);
 			PushValue(this, object, 0);
 			outResult = 0;

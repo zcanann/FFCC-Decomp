@@ -68,6 +68,11 @@ static inline s16& GetEquipModeSelected(EquipMenuState* state, int mode)
 	return (&state->selectedIndex)[mode];
 }
 
+static inline s16& GetEquipCurSelected(EquipMenuState* state)
+{
+	return (&state->selectedIndex)[state->mode];
+}
+
 static inline EquipOpenAnimList* GetEquipListStorage(CMenuPcs* menu)
 {
 	return menu->m_equipList;
@@ -240,19 +245,19 @@ int CMenuPcs::EquipCtrlCur()
 
 	if (mode == 0) {
 		if ((hold & 8) != 0) {
-			if (GetEquipModeSelected(GetEquipMenuState(this), mode) != 0) {
-				GetEquipModeSelected(GetEquipMenuState(this), mode) =
-				    GetEquipModeSelected(GetEquipMenuState(this), mode) - 1;
+			if (GetEquipCurSelected(GetEquipMenuState(this)) != 0) {
+				GetEquipCurSelected(GetEquipMenuState(this)) =
+				    GetEquipCurSelected(GetEquipMenuState(this)) - 1;
 			} else {
-				GetEquipModeSelected(GetEquipMenuState(this), mode) = 3;
+				GetEquipCurSelected(GetEquipMenuState(this)) = 3;
 			}
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		} else if ((hold & 4) != 0) {
-			if (GetEquipModeSelected(GetEquipMenuState(this), mode) < 3) {
-				GetEquipModeSelected(GetEquipMenuState(this), mode) =
-				    GetEquipModeSelected(GetEquipMenuState(this), mode) + 1;
+			if (GetEquipCurSelected(GetEquipMenuState(this)) < 3) {
+				GetEquipCurSelected(GetEquipMenuState(this)) =
+				    GetEquipCurSelected(GetEquipMenuState(this)) + 1;
 			} else {
-				GetEquipModeSelected(GetEquipMenuState(this), mode) = 0;
+				GetEquipCurSelected(GetEquipMenuState(this)) = 0;
 			}
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		}
@@ -289,9 +294,9 @@ int CMenuPcs::EquipCtrlCur()
 		s16* letterBuffer = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 
 		if ((hold & 8) != 0) {
-			if (GetEquipModeSelected(GetEquipMenuState(this), mode) != 0) {
-				GetEquipModeSelected(GetEquipMenuState(this), mode) =
-				    GetEquipModeSelected(GetEquipMenuState(this), mode) - 1;
+			if (GetEquipCurSelected(GetEquipMenuState(this)) != 0) {
+				GetEquipCurSelected(GetEquipMenuState(this)) =
+				    GetEquipCurSelected(GetEquipMenuState(this)) - 1;
 				Sound.PlaySe(1, 0x40, 0x7f, 0);
 			} else if (GetEquipMenuState(this)->scroll == 0) {
 				Sound.PlaySe(4, 0x40, 0x7f, 0);
@@ -300,10 +305,10 @@ int CMenuPcs::EquipCtrlCur()
 				Sound.PlaySe(1, 0x40, 0x7f, 0);
 			}
 		} else if ((hold & 4) != 0) {
-			s16 selected = GetEquipModeSelected(GetEquipMenuState(this), mode);
+			s16 selected = GetEquipCurSelected(GetEquipMenuState(this));
 
 			if (selected < 7) {
-				GetEquipModeSelected(GetEquipMenuState(this), mode) = selected + 1;
+				GetEquipCurSelected(GetEquipMenuState(this)) = selected + 1;
 			} else if (static_cast<int>(GetEquipMenuState(this)->scroll) + static_cast<int>(selected) < letterBuffer[0] - 1) {
 				GetEquipMenuState(this)->scroll = GetEquipMenuState(this)->scroll + 1;
 				Sound.PlaySe(1, 0x40, 0x7f, 0);
@@ -317,7 +322,7 @@ int CMenuPcs::EquipCtrlCur()
 		if ((hold & 0xc) == 0) {
 			if ((press & 0x100) != 0) {
 				int index = static_cast<int>(GetEquipMenuState(this)->scroll) +
-				            static_cast<int>(GetEquipModeSelected(GetEquipMenuState(this), mode));
+				            static_cast<int>(GetEquipCurSelected(GetEquipMenuState(this)));
 				s16* entries = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 				int equipIndex = static_cast<int>(GetEquipMenuState(this)->selectedIndex);
 				unsigned int valid = ChkEquipActive(index);

@@ -192,7 +192,7 @@ void CMenuPcs::CompaDraw()
 		familyCount = 4;
 	}
 
-	for (int i = 0; i < familyCount; i++) {
+	for (unsigned int i = 0; i < familyCount; i++) {
 		MenuPcs.DrawRect(
 			0,
 			static_cast<float>(compaList->entries[0].x + 0x10),
@@ -202,7 +202,7 @@ void CMenuPcs::CompaDraw()
 	}
 
 	int memberIndex = 0;
-	int shown = 0;
+	unsigned int shown = 0;
 	for (int i = 0; i < 8 && shown < familyCount; i++) {
 		int drawIndex = memberIndex;
 		if (memberIndex > 1) {

@@ -3332,7 +3332,7 @@ void CMenuPcs::DrawSingBar(int x, int y, int value, float alpha)
     }
 
     int bars = value / 10;
-    if (value != bars * 10) {
+    if (value % 10 != 0) {
         ++bars;
     }
 

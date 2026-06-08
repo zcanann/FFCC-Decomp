@@ -337,20 +337,23 @@ void CGMonObj::frameStatFuncGiantCrab()
 		if (*(int*)(self + 0x528) == 0) {
 			float turnOffset;
 			int animId;
-			if (state == 0x67) {
+			switch (state) {
+			case 0x65:
+				turnOffset = kMonObjBossZero;
+				animId = 1;
+				break;
+			case 0x66:
+				turnOffset = kMonObjBossPi;
+				animId = 1;
+				break;
+			case 0x67:
 				turnOffset = kMonObjBossHalfPi;
 				animId = 0x12;
-			} else if (state < 0x67) {
-				if (state == 0x65) {
-					turnOffset = kMonObjBossZero;
-					animId = 1;
-				} else if (state > 100) {
-					turnOffset = kMonObjBossPi;
-					animId = 1;
-				}
-			} else if (state < 0x69) {
+				break;
+			case 0x68:
 				turnOffset = kMonObjBossThreeHalfPi;
 				animId = 0x13;
+				break;
 			}
 
 			reinterpret_cast<CGPrgObj*>(self)->reqAnim(animId, 0, 0);
@@ -371,14 +374,16 @@ void CGMonObj::frameStatFuncGiantCrab()
 			}
 
 			int action = reinterpret_cast<int>(reinterpret_cast<CGObject*>(self)->m_scriptHandle[4]);
-			if (action == 0x63) {
+			switch (action) {
+			case 0x5b:
+				reinterpret_cast<CGPrgObj*>(self)->playSe3D(0x4e2a, 0x32, 0x1c2, 0, 0);
+				break;
+			case 0x63:
 				reinterpret_cast<CGPrgObj*>(self)->playSe3D(0x8cab, 0x32, 0x1c2, 0, 0);
-			} else if (action < 99) {
-				if (action == 0x5b) {
-					reinterpret_cast<CGPrgObj*>(self)->playSe3D(0x4e2a, 0x32, 0x1c2, 0, 0);
-				}
-			} else if (action == 0x6b) {
+				break;
+			case 0x6b:
 				reinterpret_cast<CGPrgObj*>(self)->playSe3D(0xfdf3, 0x32, 0x1c2, 0, 0);
+				break;
 			}
 		}
 
@@ -1488,7 +1493,7 @@ void CGMonObj::frameStatFuncTetsukyojin()
 			m_moveWork.m_limitFrame =
 			    static_cast<int>((kMonObjBossTwo * (kMonObjBossAttackRange - object->m_capsuleHalfHeight)) / kMonObjBossFastMoveSpeed);
 		}
-		if (prgObj->m_stateFrame > 0xF) {
+		if (prgObj->m_stateFrame >= 0x10) {
 			moveFrame();
 		}
 		reinterpret_cast<CGCharaObj*>(this)->statAttack();
@@ -1498,8 +1503,8 @@ void CGMonObj::frameStatFuncTetsukyojin()
 			int flatCount = CFlatBossState();
 			if (flatCount < 1) {
 				CFlatBossState() = 0;
-			} else if (((flatCount == 1) && (*reinterpret_cast<int*>(CGMonObj::m_boss) > 0x13)) ||
-			           ((flatCount > 1) && (*reinterpret_cast<int*>(CGMonObj::m_boss) > 4))) {
+			} else if (((flatCount == 1) && (*reinterpret_cast<int*>(CGMonObj::m_boss) >= 0x14)) ||
+			           ((flatCount > 1) && (*reinterpret_cast<int*>(CGMonObj::m_boss) >= 5))) {
 				*reinterpret_cast<int*>(CGMonObj::m_boss) = 0;
 				object->DispCharaParts(1);
 
@@ -2059,9 +2064,6 @@ void CGMonObj::changeStatFuncMeteoParasite(int stat)
 void CGMonObj::alwaysFuncMeteoParasite()
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
-	CGCharaObj* chara = reinterpret_cast<CGCharaObj*>(this);
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	u8* mon = reinterpret_cast<u8*>(this);
 	const int scriptKind = reinterpret_cast<int>(object->m_scriptHandle[4]);
 
 	if (scriptKind == 0x85 && reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_meteo3 == 0) {
@@ -2091,17 +2093,17 @@ void CGMonObj::alwaysFuncMeteoParasite()
 		int effect;
 		int arg0;
 		int arg1;
-		if (chara->getItemPdt(0, 0, effect, arg0, arg1) != 0) {
+		if (reinterpret_cast<CGCharaObj*>(this)->getItemPdt(0, 0, effect, arg0, arg1) != 0) {
 			if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x80) == 0) {
-				prgObj->changeStat(100, 0, 0);
+				reinterpret_cast<CGPrgObj*>(this)->changeStat(100, 0, 0);
 				m_actionBranch = 0;
 			}
 			if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x80) == 2) {
-				prgObj->changeStat(0x65, 0, 0);
+				reinterpret_cast<CGPrgObj*>(this)->changeStat(0x65, 0, 0);
 				m_actionBranch = 2;
 			}
 			if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x80) == 1) {
-				prgObj->changeStat(0x66, 0, 0);
+				reinterpret_cast<CGPrgObj*>(this)->changeStat(0x66, 0, 0);
 				m_actionBranch = 1;
 			}
 			reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_bit80 = 0;
@@ -2155,7 +2157,7 @@ void CGMonObj::frameStatFuncMeteoParasite()
 
 	if (scriptKind == 0x87 && prgObj->m_lastStateId == 0x67) {
 		int frame = prgObj->m_stateFrame;
-		if (frame > 0x18 && frame < 0x32) {
+		if (frame >= 0x19 && frame < 0x32) {
 			if (frame == 0x19) {
 				prgObj->playSe3D(0x11D5B, 0x32, 0x96, 0, 0);
 			}

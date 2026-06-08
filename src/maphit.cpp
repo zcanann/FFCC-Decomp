@@ -981,70 +981,72 @@ cylinder_body:
             }
         }
 
-        if (g_hit_lpface->m_projectionAxis == 1) {
-            f32 capC = (pz * pz) + radialC;
-            f32 capB = (pz * vz) + radialB;
-            disc = capB * capB - capC;
-            if (disc > 0.0) {
-                disc = sqrtf(disc);
-                f32 t = -capB - disc;
-                if ((t * vz) + pz <= kMapHitZero) {
-                    outT = t * tScale;
-                    if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {
-                        return 1;
-                    }
-                    return 0;
-                }
+        if (g_hit_lpface->m_projectionAxis != 1) {
+            return 0;
+        }
 
-                t = -capB + disc;
-                if ((t * vz) + pz <= kMapHitZero) {
-                    outT = t * tScale;
-                    if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {
-                        return 1;
-                    }
-                    return 0;
+        f32 capC = (pz * pz) + radialC;
+        f32 capB = (pz * vz) + radialB;
+        disc = capB * capB - capC;
+        if (disc > 0.0) {
+            disc = sqrtf(disc);
+            f32 t = -capB - disc;
+            if ((t * vz) + pz <= kMapHitZero) {
+                outT = t * tScale;
+                if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {
+                    return 1;
                 }
-            } else if (disc == 0.0) {
-                const f32 t = -capB;
-                if ((t * vz) + pz <= kMapHitZero) {
-                    outT = t * tScale;
-                    if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {
-                        return 1;
-                    }
-                    return 0;
-                }
+                return 0;
             }
 
-            capB = -((vz * axisLen) - capB);
-            disc = capB * capB - (axisLen * -((2.0f * pz) - axisLen) + capC);
-            if (disc > 0.0) {
-                disc = sqrtf(disc);
-                f32 t = -capB - disc;
-                if ((t * vz) + pz >= axisLen) {
-                    outT = t * tScale;
-                    if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {
-                        return 1;
-                    }
-                    return 0;
+            t = -capB + disc;
+            if ((t * vz) + pz <= kMapHitZero) {
+                outT = t * tScale;
+                if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {
+                    return 1;
                 }
+                return 0;
+            }
+        } else if (disc == 0.0) {
+            const f32 t = -capB;
+            if ((t * vz) + pz <= kMapHitZero) {
+                outT = t * tScale;
+                if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {
+                    return 1;
+                }
+                return 0;
+            }
+        }
 
-                t = -capB + disc;
-                if ((t * vz) + pz >= axisLen) {
-                    outT = t * tScale;
-                    if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {
-                        return 1;
-                    }
-                    return 0;
+        capB = -((vz * axisLen) - capB);
+        disc = capB * capB - (axisLen * -((2.0f * pz) - axisLen) + capC);
+        if (disc > 0.0) {
+            disc = sqrtf(disc);
+            f32 t = -capB - disc;
+            if ((t * vz) + pz >= axisLen) {
+                outT = t * tScale;
+                if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {
+                    return 1;
                 }
-            } else if (disc == 0.0) {
-                const f32 t = -capB;
-                if ((t * vz) + pz >= axisLen) {
-                    outT = t * tScale;
-                    if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {
-                        return 1;
-                    }
-                    return 0;
+                return 0;
+            }
+
+            t = -capB + disc;
+            if ((t * vz) + pz >= axisLen) {
+                outT = t * tScale;
+                if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {
+                    return 1;
                 }
+                return 0;
+            }
+        } else if (disc == 0.0) {
+            const f32 t = -capB;
+            if ((t * vz) + pz >= axisLen) {
+                outT = t * tScale;
+                if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {
+                    return 1;
+                }
+                return 0;
             }
         }
 

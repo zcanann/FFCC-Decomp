@@ -2173,17 +2173,21 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			changeStat(10, 0, 0);
 			break;
 		case 1:
-			if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E) == 0) {
-				setSta(1, calcSta(1, amount, reinterpret_cast<CGObject*>(sourceObj)));
-				setSta(4, 0);
-			} else {
+			if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E) != 0) {
 				setSta(0, 0);
 				setSta(1, 0);
 				outValue = 0;
+			} else {
+				setSta(1, calcSta(1, amount, reinterpret_cast<CGObject*>(sourceObj)));
+				setSta(4, 0);
 			}
 			break;
 		case 0:
-			if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x40) == 0) {
+			if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x40) != 0) {
+				setSta(0, 0);
+				setSta(1, 0);
+				outValue = 0;
+			} else {
 				setSta(0, calcSta(0, amount, reinterpret_cast<CGObject*>(sourceObj)));
 				setSta(4, 0);
 				Sound.StopSe3DGroup(m_particleId);
@@ -2194,10 +2198,6 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 					}
 				}
 				changeStat(0, 0, 0);
-			} else {
-				setSta(0, 0);
-				setSta(1, 0);
-				outValue = 0;
 			}
 			break;
 		case 4:
@@ -2237,22 +2237,22 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			setSta(0x1C, calcSta(0x1C, amount, reinterpret_cast<CGObject*>(sourceObj)));
 			break;
 		case 8:
-			if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x4C) == 0) {
-				setSta(8, calcSta(8, amount, reinterpret_cast<CGObject*>(sourceObj)));
-				putHitParticleFromItem(sourceObj, amount);
-			} else {
+			if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x4C) != 0) {
 				setSta(7, 0);
 				setSta(8, 0);
+			} else {
+				setSta(8, calcSta(8, amount, reinterpret_cast<CGObject*>(sourceObj)));
+				putHitParticleFromItem(sourceObj, amount);
 			}
 			outValue = 0;
 			break;
 		case 7:
-			if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x4E) == 0) {
-				setSta(7, calcSta(7, amount, reinterpret_cast<CGObject*>(sourceObj)));
-				putHitParticleFromItem(sourceObj, amount);
-			} else {
+			if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x4E) != 0) {
 				setSta(7, 0);
 				setSta(8, 0);
+			} else {
+				setSta(7, calcSta(7, amount, reinterpret_cast<CGObject*>(sourceObj)));
+				putHitParticleFromItem(sourceObj, amount);
 			}
 			outValue = 0;
 			break;

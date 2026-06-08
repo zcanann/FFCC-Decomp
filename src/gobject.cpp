@@ -3128,7 +3128,11 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
             }
         }
 
+        bool hasModel = false;
         if ((m_charaModelHandle != 0) && (m_charaModelHandle->m_model != 0)) {
+            hasModel = true;
+        }
+        if (hasModel) {
             CVector attrDirection(sZeroFloat, sDownProbeDistance, sZeroFloat);
             CVector attrBottom(m_worldPosition.x, m_worldPosition.y + sStepProbeHeight, m_worldPosition.z);
             CMapCylinder attrCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);

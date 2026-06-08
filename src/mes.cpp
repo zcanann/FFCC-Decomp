@@ -1296,7 +1296,7 @@ void CMes::addString(char** text, int branchMode)
 			break;
 		case 0x36:
 		{
-			signed char idx = (unsigned char)ReadTagU8(text);
+			unsigned char idx = (unsigned char)ReadTagU8(text);
 			if (branchMode == 0)
 			{
 				int count = mFlagCount;

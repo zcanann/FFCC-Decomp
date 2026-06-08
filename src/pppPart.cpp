@@ -687,7 +687,7 @@ void callCon2Prog(_pppPObject* pObject)
 	_pppProgSetDef* progSet = owner->m_programSetDef;
 	int stageIdx = 0;
 
-	gPppInConstructor = 1;
+	ppvIsLoopCalc = 1;
 
 	_pppProgSetDef* stageSet = progSet;
 	u32* initWork = (u32*)(((u8*)pObject) + progSet->m_workBaseOffset);
@@ -745,7 +745,7 @@ void callCon2Prog(_pppPObject* pObject)
 		}
 	}
 
-	gPppInConstructor = 0;
+	ppvIsLoopCalc = 0;
 }
 
 /*

@@ -2356,7 +2356,7 @@ void CGoOutMenu::CalcDel()
         }
         break;
     case 5:
-        if (m_messageWindowOpen != 0 && MenuPcs.IsMenuCharaAnimIdle(m_selectedChara) != 0) {
+        if (m_messageWindowOpen != 0 && static_cast<int>(MenuPcs.IsMenuCharaAnimIdle(m_selectedChara)) != 0) {
             input = GetGoOutInputMask();
             if ((input & 0x100) != 0) {
                 Sound.PlaySe(2, 0x40, 0x7f, 0);
@@ -2474,7 +2474,7 @@ void CGoOutMenu::CalcDel()
         }
         break;
     case 8:
-        if (m_messageWindowOpen != 0 && MenuPcs.IsMenuCharaAnimIdle(m_selectedChara) != 0) {
+        if (m_messageWindowOpen != 0 && static_cast<int>(MenuPcs.IsMenuCharaAnimIdle(m_selectedChara)) != 0) {
             input = GetGoOutInputMask();
             if ((input & 0x100) != 0) {
                 Sound.PlaySe(2, 0x40, 0x7f, 0);

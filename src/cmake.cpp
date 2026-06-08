@@ -516,7 +516,7 @@ void CMenuPcs::CalcSingleCMakeChara()
     unsigned char* modelWork = reinterpret_cast<unsigned char*>(MenuS32(this, 0x814) + slot * 0x50 + 0xA00);
 
     if (handle->m_model == nullptr ||
-        *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xB0) == 0) {
+        *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xB0) == 0) {
         *reinterpret_cast<int*>(modelWork + 0x00) = 0;
         return;
     }

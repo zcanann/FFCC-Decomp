@@ -72,8 +72,6 @@ void CMenuPcs::CompaDraw()
 			float h = static_cast<float>(entry->h);
 			float u = entry->u;
 			float v = entry->v;
-			float alpha = entry->alpha;
-			float uvScale = entry->uvScale;
 
 			if (i < 3) {
 				MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
@@ -98,7 +96,7 @@ void CMenuPcs::CompaDraw()
 				colors[3].a = 0xFF;
 				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 
-				float fillW = alpha * w;
+				float fillW = entry->alpha * w;
 				if (fillW > kCompaZero) {
 					if (tex == 0x51) {
 						int yStep = static_cast<int>(y);
@@ -111,17 +109,17 @@ void CMenuPcs::CompaDraw()
 							MenuPcs.DrawRect(
 								static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
 								fillW, static_cast<float>(tileH), u, v,
-								colors, uvScale, kCompaOne, kCompaZero);
+								colors, entry->uvScale, kCompaOne, kCompaZero);
 							yStep += 0x18;
 						}
 					} else {
 						MenuPcs.DrawRect(
 							static_cast<unsigned long>(entry->drawFlags), x, y, fillW, h, u, v,
-							colors, uvScale, kCompaOne, kCompaZero);
+							colors, entry->uvScale, kCompaOne, kCompaZero);
 					}
 
 					u += fillW;
-					x += fillW * uvScale;
+					x += fillW * entry->uvScale;
 				}
 
 				if (fillW > kCompaZero && fillW < w) {
@@ -145,13 +143,13 @@ void CMenuPcs::CompaDraw()
 							MenuPcs.DrawRect(
 								static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
 								remainW, static_cast<float>(tileH), u, v,
-								colors, uvScale, kCompaOne, kCompaZero);
+								colors, entry->uvScale, kCompaOne, kCompaZero);
 							yStep += 0x18;
 						}
 					} else {
 						MenuPcs.DrawRect(
 							static_cast<unsigned long>(entry->drawFlags), x, y, remainW, h, u, v,
-							colors, uvScale, kCompaOne, kCompaZero);
+							colors, entry->uvScale, kCompaOne, kCompaZero);
 					}
 				}
 
@@ -162,9 +160,9 @@ void CMenuPcs::CompaDraw()
 				color.r = 0xFF;
 				color.g = 0xFF;
 				color.b = 0xFF;
-				color.a = static_cast<unsigned char>(alpha * kCompaColorMax);
+				color.a = static_cast<unsigned char>(entry->alpha * kCompaColorMax);
 				GXSetChanMatColor(GX_COLOR0A0, color);
-				MenuPcs.DrawRect(0, x, y, w, h, u, v, uvScale, uvScale, kCompaZero);
+				MenuPcs.DrawRect(0, x, y, w, h, u, v, entry->uvScale, entry->uvScale, kCompaZero);
 			}
 		}
 

@@ -2494,8 +2494,8 @@ void CMaterialMan::SetPosition(
             if (ignoreFrustumCheck != 0) {
                 Vec delta;
                 PSVECSubtract(&shadowPos, position, &delta);
-                candidateWrite->shadow = shadow;
                 candidateWrite->distance = PSVECSquareMag(&delta);
+                candidateWrite->shadow = shadow;
                 candidateWrite->index = i;
                 candidateWrite++;
                 candidateCount++;
@@ -2512,8 +2512,8 @@ void CMaterialMan::SetPosition(
                 }
                 Vec delta;
                 PSVECSubtract(&shadowPos, position, &delta);
-                candidateWrite->shadow = shadow;
                 candidateWrite->distance = PSVECSquareMag(&delta);
+                candidateWrite->shadow = shadow;
                 candidateWrite->index = i;
                 candidateWrite++;
                 candidateCount++;
@@ -2638,8 +2638,8 @@ int CMaterialMan::GetCharaShadow(
                   ->CheckFrustum(shadowPos, scaledShadowMtx, kMaterialShadowBoundsRadius) != 0))) {
             Vec delta;
             PSVECSubtract(&shadowPos, position, &delta);
-            candidateWrite->shadow = shadow;
             candidateWrite->distance = PSVECSquareMag(&delta);
+            candidateWrite->shadow = shadow;
             candidateWrite->index = i;
             candidateWrite++;
             candidateCount++;

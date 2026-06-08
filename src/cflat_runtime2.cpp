@@ -3,6 +3,7 @@
 #include "ffcc/astar.h"
 #include "ffcc/baseobj.h"
 #include "ffcc/cflat_data.h"
+#include "ffcc/color.h"
 #include "ffcc/game.h"
 #include "ffcc/goout.h"
 #include "ffcc/graphic.h"
@@ -1380,8 +1381,7 @@ void CFlatRuntime2::Draw()
 	font->SetZMode(0, 0);
 	font->DrawInit();
 	font->SetTlut(7);
-	GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
-	font->SetColor(color);
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 
 	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
 	for (CGObject* object = reinterpret_cast<CGObject*>(

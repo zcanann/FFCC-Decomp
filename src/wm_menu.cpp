@@ -5083,7 +5083,7 @@ void CMenuPcs::DrawMoveMenu()
 
 	if (worldState->m_mainState > 0 && worldState->m_mainState < 3) {
 		unsigned char* const worldObj = m_wm.m_worldObjData;
-		CCharaPcs::CHandle* const handle = reinterpret_cast<CCharaPcs::CHandle*>(reinterpret_cast<unsigned int*>(bytes + 0x788)[0]);
+#define handle (reinterpret_cast<CCharaPcs::CHandle*>(reinterpret_cast<unsigned int*>(bytes + 0x788)[0]))
 		Mtx savedCamera;
 		Mtx lookAtMtx;
 		Mtx44 projectionMtx;
@@ -5146,6 +5146,7 @@ void CMenuPcs::DrawMoveMenu()
 		Graphic.SetViewport();
 		GXSetScissor(0, 0, 0x280, 0x1C0);
 		DrawInit();
+#undef handle
 	}
 
 	if (worldState->m_mainState != 2 || bytes[0x13] != 0) {

@@ -2609,16 +2609,8 @@ void CShopMenu::SelectItemIdx()
             }
             Sound.PlaySe(4, 0x40, 0x7F, 0);
         } else if (listType == 1) {
-            int idx = m_selectedIndex;
-            if (idx != -1) {
-                int itemNo = getItemNo(m_selectedIndex);
-                if (itemNo < 1) {
-                    canSelect = false;
-                } else if (MenuPcs.EquipChk(idx) == 0) {
-                    canSelect = itemNo >= 0x9F;
-                } else {
-                    canSelect = false;
-                }
+            if (m_selectedIndex != -1) {
+                canSelect = CanTradeShopMenuItem(this, m_selectedIndex, getItemNo(m_selectedIndex));
             }
             if (canSelect) {
                 m_subMode = 2;
@@ -2628,16 +2620,7 @@ void CShopMenu::SelectItemIdx()
             }
         } else if (listType == 2) {
             if (m_selectedIndex != -1) {
-                int itemNo = getItemNo(m_selectedIndex);
-                if (itemNo < 1) {
-                    canSelect = false;
-                } else {
-                    canSelect = true;
-                    if ((m_caravanWork->m_shopArgs[((int)(itemNo - 0x191U) >> 5)] &
-                         (1 << ((itemNo - 0x191U) & 0x1F))) == 0) {
-                        canSelect = false;
-                    }
-                }
+                canSelect = CanTradeShopMenuItem(this, m_selectedIndex, getItemNo(m_selectedIndex));
             }
             if (canSelect) {
                 m_nextMode = 0xC;

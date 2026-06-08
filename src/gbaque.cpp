@@ -3286,16 +3286,17 @@ void GbaQueue::ClrCompatibilityFlg(int channel)
 int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 {
 	unsigned char compatibilityData[0x10];
-	int count = 2;
+	int count;
 	unsigned char* writePtr;
 	int outSize = 2;
-	int selectedCount = 0;
+	int selectedCount;
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	memcpy(compatibilityData, reinterpret_cast<unsigned char*>(this) + channel * 0xDC + 0x458, sizeof(compatibilityData));
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	outCompatibility[0] = reinterpret_cast<unsigned char*>(this)[channel * 0xDC + 0x529];
+	count = 2;
 	if (compatibilityData[3] != 0) {
 		count++;
 	}
@@ -3318,6 +3319,7 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 
 	outCompatibility[1] = count;
 	writePtr = outCompatibility + 2;
+	selectedCount = 0;
 	for (int slot = 1; (selectedCount < count) && (slot < 8); slot++) {
 		unsigned char slotValue = compatibilityData[slot];
 		if ((selectedCount < 2) || (slotValue != 0)) {

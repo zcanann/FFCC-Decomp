@@ -5019,9 +5019,7 @@ int JoyBus::SendItemAll(ThreadParam* threadParam)
 
             unsigned char* itemBuf = &payload[1];
 
-            int itemLen = GbaQue.GetItemAll(threadParam->m_portIndex, itemBuf);
-
-            const int byteLen = itemLen + 1; // +1 for the type byte
+            int byteLen = GbaQue.GetItemAll(threadParam->m_portIndex, itemBuf) + 1; // +1 for the type byte
 
             int wordCount = MakeJoyData(
                 (char*)payload,
@@ -5135,8 +5133,7 @@ int JoyBus::SendMapObj(ThreadParam* threadParam)
 
             unsigned char* mapObjBuf = &payload[1];
 
-            int dataLen = GbaQue.GetMapObj(mapObjBuf);
-            const int byteLen = dataLen + 1;
+            int byteLen = GbaQue.GetMapObj(mapObjBuf) + 1;
 
             int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2));
 
@@ -5249,9 +5246,7 @@ int JoyBus::SendCompatibility(ThreadParam* threadParam)
 
             unsigned char* compatBuf = &payload[1];
 
-            int compatLen = GbaQue.GetCompatibility(threadParam->m_portIndex, compatBuf);
-
-            const int byteLen = compatLen + 1;
+            int byteLen = GbaQue.GetCompatibility(threadParam->m_portIndex, compatBuf) + 1;
 
             int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(void*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2));
 
@@ -5793,9 +5788,7 @@ int JoyBus::SendEquip(ThreadParam* threadParam)
 
             unsigned char* equipBuf = &payload[1];
 
-            int dataLen = GbaQue.GetEquipData(threadParam->m_portIndex, equipBuf);
-
-            const int byteLen = dataLen + 1;
+            int byteLen = GbaQue.GetEquipData(threadParam->m_portIndex, equipBuf) + 1;
 
             int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2));
 
@@ -5909,9 +5902,7 @@ int JoyBus::SendCmd(ThreadParam* threadParam)
 
             unsigned char* cmdBuf = &payload[1];
 
-            int dataLen = GbaQue.GetCmdData(threadParam->m_portIndex, cmdBuf);
-
-            const int byteLen = dataLen + 1;
+            int byteLen = GbaQue.GetCmdData(threadParam->m_portIndex, cmdBuf) + 1;
 
             int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2));
 
@@ -6168,9 +6159,7 @@ int JoyBus::SendArtifact(ThreadParam* threadParam)
 
             unsigned char* artiBuf = &payload[1];
 
-            int dataLen = GbaQue.GetArtifactData(threadParam->m_portIndex, artiBuf);
-
-            const int byteLen = dataLen + 1;
+            int byteLen = GbaQue.GetArtifactData(threadParam->m_portIndex, artiBuf) + 1;
             int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2));
 
             if (wordCount < 0)
@@ -6283,9 +6272,7 @@ int JoyBus::SendTmpArtifact(ThreadParam* threadParam)
 
             unsigned char* artiBuf = &payload[1];
 
-            int dataLen = GbaQue.GetTmpArtifactData(threadParam->m_portIndex, artiBuf);
-
-            const int byteLen = dataLen + 1;
+            int byteLen = GbaQue.GetTmpArtifactData(threadParam->m_portIndex, artiBuf) + 1;
             int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2));
 
             if (wordCount < 0)
@@ -6398,9 +6385,7 @@ int JoyBus::SendMapObjInfo(ThreadParam* threadParam)
 
             unsigned char* mapObjBuf = &payload[1];
 
-            int dataLen = GbaQue.GetMapObjInfo(threadParam->m_portIndex, mapObjBuf);
-
-            const int byteLen = dataLen + 1;
+            int byteLen = GbaQue.GetMapObjInfo(threadParam->m_portIndex, mapObjBuf) + 1;
 
             int wordCount = MakeJoyData(
                 (char*)payload,
@@ -6640,9 +6625,7 @@ int JoyBus::SendScouInfo(ThreadParam* threadParam)
 
             unsigned char* scouterBuf = &payload[1];
 
-            int dataLen = GbaQue.GetScouterInfo(threadParam->m_portIndex, scouterBuf);
-
-            const int byteLen = dataLen + 1;
+            int byteLen = GbaQue.GetScouterInfo(threadParam->m_portIndex, scouterBuf) + 1;
 
             int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(void*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2));
 

@@ -1353,10 +1353,10 @@ void GbaQueue::LoadPlayerStat()
 				}
 
 				*reinterpret_cast<int*>(entry + 0x24) = caravanWork->m_gil;
-				if (caravanWork->m_progressValue < 0x100) {
-					*reinterpret_cast<unsigned short*>(entry + 0x14) = caravanWork->m_progressValue;
-				} else {
+				if (caravanWork->m_progressValue > 0xFF) {
 					*reinterpret_cast<unsigned short*>(entry + 0x14) = 0xFF;
+				} else {
+					*reinterpret_cast<unsigned short*>(entry + 0x14) = caravanWork->m_progressValue;
 				}
 
 				entry[0x18] = static_cast<unsigned char>(caravanWork->m_letterMeta[0]);
@@ -1379,9 +1379,9 @@ void GbaQueue::LoadPlayerStat()
 				entry[0xB] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x19]);
 				memcpy(entry + 0xC, &Game.m_gameWork.m_linkTable[caravanWork->m_saveSlot][0][0][0], 8);
 
-				entry[0x20] = static_cast<unsigned char>(caravanWork->m_strength >= 100 ? 99 : caravanWork->m_strength);
-				entry[0x21] = static_cast<unsigned char>(caravanWork->m_defense >= 100 ? 99 : caravanWork->m_defense);
-				entry[0x22] = static_cast<unsigned char>(caravanWork->m_magic >= 100 ? 99 : caravanWork->m_magic);
+				entry[0x20] = static_cast<unsigned char>(caravanWork->m_strength > 99 ? 99 : caravanWork->m_strength);
+				entry[0x21] = static_cast<unsigned char>(caravanWork->m_defense > 99 ? 99 : caravanWork->m_defense);
+				entry[0x22] = static_cast<unsigned char>(caravanWork->m_magic > 99 ? 99 : caravanWork->m_magic);
 				entry[0xD2] = caravanWork->m_bonusCondition;
 				entry[0xD5] = static_cast<unsigned char>(caravanWork->unk_0x3ac);
 

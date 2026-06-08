@@ -167,7 +167,7 @@ void CMenuPcs::FavoDraw()
 	FavoEntry* drawEntry = rankEntry;
 	FoodRank* rank = s_rank;
 	for (int i = 0; i < 8; i++) {
-		int barX = drawEntry->x + drawEntry->w + 0x18;
+		int barX = static_cast<int>(static_cast<float>(drawEntry->x + drawEntry->w + 0x18));
 		int barY = static_cast<int>(static_cast<float>((static_cast<float>(drawEntry->h) - 24.0f) * 0.5 +
 		                            static_cast<float>(drawEntry->y)));
 		DrawSingBar(barX, barY, rank->score, drawEntry->alpha);
@@ -178,7 +178,7 @@ void CMenuPcs::FavoDraw()
 	rank = s_rank;
 	drawEntry = rankEntry;
 	for (unsigned int i = 0; i < 8; i++) {
-		int iconX = drawEntry->x + drawEntry->w - 0x10;
+		int iconX = static_cast<int>(static_cast<float>(drawEntry->x + drawEntry->w - 0x10));
 		int iconY = static_cast<int>((static_cast<float>(drawEntry->h) - 32.0f) * 0.5 +
 		                             static_cast<float>(drawEntry->y));
 		DrawSingleIcon(static_cast<char>(rank->foodId) + 0x14, iconX, iconY, drawEntry->alpha, 1, 1.0f);

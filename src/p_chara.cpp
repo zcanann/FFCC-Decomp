@@ -358,11 +358,12 @@ static inline CCharaPcs::CLoadAnim* FindLoadedAnim(CCharaPcs* self, int charaKin
 {
     for (int i = 0; i < LoadAnimArray(self)->GetSize(); i++) {
         CCharaPcs::CLoadAnim* loadAnim = (*LoadAnimArray(self))[static_cast<unsigned long>(i)];
-        if (loadAnim == 0 || loadAnim->m_keyTag != reinterpret_cast<void*>(charaKind) || loadAnim->m_keyId != charaNo) {
+        if (reinterpret_cast<int>(loadAnim->m_keyTag) != charaKind ||
+            static_cast<unsigned long>(loadAnim->m_keyId) != static_cast<unsigned long>(charaNo)) {
             continue;
         }
 
-        if (strcmp(loadAnim->m_name, animName) == 0) {
+        if (strcmp(animName, loadAnim->m_name) == 0) {
             return loadAnim;
         }
     }
@@ -828,7 +829,7 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
                 goto complete;
             }
 
-            if (System.m_execParam > 1) {
+            if (static_cast<unsigned int>(System.m_execParam) >= 2) {
                 System.Printf(const_cast<char*>(s_charaAmemCompactFailed));
             }
         }
@@ -1101,7 +1102,7 @@ int CCharaPcs::TryReleaseAnimBank(int requiredSize)
         releaseAnim->m_anim->m_bank = 0;
     }
 
-    if (System.m_execParam > 2) {
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
         System.Printf(const_cast<char*>(s_charaReleaseAnimBankFmt), releaseSize, releaseAnim->m_name);
     }
 
@@ -1143,7 +1144,7 @@ void CCharaPcs::InitEnv(int envMode)
     }
 
     if (envMode == 4) {
-        GXSetProjection(reinterpret_cast<Mtx44Ptr>(Ptr(&Graphic, 0x73A4)), GX_ORTHOGRAPHIC);
+        GXSetProjection(CameraPcs.m_screenMatrix, GX_ORTHOGRAPHIC);
     }
 }
 
@@ -1615,9 +1616,10 @@ void CCharaPcs::LoadCam(int index, char* fileName)
         cameraBuffer = new (m_viewerAnimStage, s_p_chara_cpp, 0x4D4)
             CCameraFrame[static_cast<unsigned long>(m_cameraFrameCount[index])];
 
-        CCameraFrame::Value* values = reinterpret_cast<CCameraFrame::Value*>(cameraBuffer);
-        for (int i = 0; i < m_cameraFrameCount[index] * 8; i++) {
-            values[i].m_float = chunkFile.GetF4();
+        for (int frame = 0; frame < m_cameraFrameCount[index]; frame++) {
+            for (int j = 0; j < 8; j++) {
+                reinterpret_cast<CCameraFrame::Value*>(cameraBuffer)[frame * 8 + j].m_float = chunkFile.GetF4();
+            }
         }
     }
 
@@ -1635,46 +1637,41 @@ void CCharaPcs::LoadCam(int index, char* fileName)
  */
 void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
 {
-    bool hasLoaded = false;
+    int hasLoaded = 0;
 
     for (unsigned int i = 0; i < LoadModelArray(this)->GetSize(); i++) {
         CLoadModel* loadModel = (*LoadModelArray(this))[i];
         if (loadModel->m_mergeFileId == mergeFileId) {
-            hasLoaded = true;
-            break;
+            hasLoaded = 1;
+            goto checkLoaded;
         }
     }
 
-    if (!hasLoaded) {
-        for (unsigned int i = 0; i < LoadTextureArray(this)->GetSize(); i++) {
-            CLoadTexture* loadTexture = (*LoadTextureArray(this))[i];
-            if (loadTexture->m_mergeFileId == mergeFileId) {
-                hasLoaded = true;
-                break;
-            }
+    for (unsigned int i = 0; i < LoadTextureArray(this)->GetSize(); i++) {
+        CLoadTexture* loadTexture = (*LoadTextureArray(this))[i];
+        if (loadTexture->m_mergeFileId == mergeFileId) {
+            hasLoaded = 1;
+            goto checkLoaded;
         }
     }
 
-    if (!hasLoaded) {
-        for (unsigned int i = 0; i < LoadPdtArray(this)->GetSize(); i++) {
-            CLoadPdt* loadPdt = (*LoadPdtArray(this))[i];
-            if (loadPdt->m_mergeFileId == mergeFileId) {
-                hasLoaded = true;
-                break;
-            }
+    for (unsigned int i = 0; i < LoadPdtArray(this)->GetSize(); i++) {
+        CLoadPdt* loadPdt = (*LoadPdtArray(this))[i];
+        if (loadPdt->m_mergeFileId == mergeFileId) {
+            hasLoaded = 1;
+            goto checkLoaded;
         }
     }
 
-    if (!hasLoaded) {
-        for (unsigned int i = 0; i < LoadAnimArray(this)->GetSize(); i++) {
-            CLoadAnim* loadAnim = (*LoadAnimArray(this))[i];
-            if (loadAnim->m_mergeFileId == mergeFileId) {
-                hasLoaded = true;
-                break;
-            }
+    for (unsigned int i = 0; i < LoadAnimArray(this)->GetSize(); i++) {
+        CLoadAnim* loadAnim = (*LoadAnimArray(this))[i];
+        if (loadAnim->m_mergeFileId == mergeFileId) {
+            hasLoaded = 1;
+            goto checkLoaded;
         }
     }
 
+checkLoaded:
     if (hasLoaded) {
         System.Printf(const_cast<char*>(s_charaMergeDupFmt), mergeFileId);
         return;
@@ -1979,8 +1976,8 @@ void CCharaPcs::drawOverlap()
     C_MTXOrtho(projectionMtx, 0.0f, 448.0f, 0.0f, 640.0f, 0.5f, -0.5f);
     GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
     GXSetNumChans(1);
-    GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
-    GXSetChanCtrl(GX_COLOR1A1, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXSetChanCtrl(GX_COLOR0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
+    GXSetChanCtrl(GX_ALPHA0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 
     _GXColor black = {0x00, 0x00, 0x00, 0xFF};
@@ -2023,8 +2020,8 @@ void CCharaPcs::drawOverlap()
     }
 
     GXSetNumChans(1);
-    GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
-    GXSetChanCtrl(GX_COLOR1A1, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXSetChanCtrl(GX_COLOR0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
+    GXSetChanCtrl(GX_ALPHA0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
 
     black.a = static_cast<unsigned char>(m_overlapAlpha & 0xFF);
     GXSetChanMatColor(GX_COLOR0A0, black);
@@ -2330,7 +2327,7 @@ void CCharaPcs::CHandle::LoadModel(
     CLoadModel* loadModel = 0;
     for (int i = 0; i < LoadModelArray(&CharaPcs)->GetSize(); i++) {
         CLoadModel* it = (*LoadModelArray(&CharaPcs))[static_cast<unsigned long>(i)];
-        if (it != 0 && it->m_keyTag == reinterpret_cast<void*>(charaKind) && it->m_keyId == static_cast<int>(charaNo)) {
+        if (reinterpret_cast<int>(it->m_keyTag) == charaKind && static_cast<unsigned long>(it->m_keyId) == charaNo) {
             loadModel = it;
             break;
         }
@@ -2577,7 +2574,7 @@ int CCharaPcs::CHandle::SetAnim(int animIndex, int startFrame, int endFrame, int
     }
 
     if (anim == 0) {
-        if (m_charaKind != 3 && static_cast<unsigned int>(System.m_execParam) > 1) {
+        if (m_charaKind != 3 && static_cast<unsigned int>(System.m_execParam) >= 2) {
             System.Printf(const_cast<char*>(s_charaSetAnimMissingFmt), m_charaKind, m_charaNo, animIndex);
         }
         return 0;
@@ -2852,14 +2849,14 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
  */
 void CCharaPcs::CHandle::LoadModelASync(int charaKind, unsigned long charaNo, unsigned long textureVariant)
 {
-    if (System.m_execParam > 2)
+    if (static_cast<unsigned int>(System.m_execParam) >= 3)
     {
         System.Printf(const_cast<char*>(s_charaAsyncEntryFmt));
     }
 
     if (m_asyncFileHandle != 0)
 	{
-        if (System.m_execParam > 1)
+        if (static_cast<unsigned int>(System.m_execParam) >= 2)
         {
             System.Printf(const_cast<char*>(s_charaAsyncCancelFmt));
         }
@@ -2974,7 +2971,7 @@ void CCharaPcs::CHandle::loadModelASyncFrame()
     m_asyncFileHandle = 0;
     if (m_asyncState == 6) {
         m_asyncState = 7;
-        if (System.m_execParam > 2) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 3) {
             System.Printf(const_cast<char*>(s_charaAsyncCompleteFmt));
         }
     } else {

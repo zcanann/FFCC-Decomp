@@ -19,6 +19,15 @@ public:
 		TODO,
 	};
 	
+    CMapShadow()
+    {
+        m_enabled = 1;
+        m_materialIndex = 0;
+        m_modelA = 0;
+        m_modelB = 0;
+        m_modelC = 0;
+        m_yFilterMode = 0;
+    }
     void Init();
     void Calc();
     void Draw();

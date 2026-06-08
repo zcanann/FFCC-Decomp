@@ -13,6 +13,7 @@ extern const char s_CPtrArrayFile[];
 #include "ffcc/chunkfile.h"
 #include "ffcc/maphit.h"
 #include "ffcc/mapmesh.h"
+#include "ffcc/mapshadow.h"
 #include "ffcc/linkage.h"
 #include "ffcc/materialman.h"
 #include "ffcc/math.h"
@@ -421,6 +422,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         CHUNK_PSTA = 0x50535441,
         CHUNK_PRIO = 0x5052494F,
         CHUNK_SDST = 0x53445354,
+        CHUNK_SHKI = 0x53484B49,
         CHUNK_SLIT = 0x534C4954,
         CHUNK_TFRM = 0x5446524D,
         CHUNK_TRNS = 0x54524E53,
@@ -444,35 +446,6 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
     CChunkFile::CChunk chunk;
     while (chunkFile.GetNextChunk(chunk) != 0) {
         switch (chunk.m_id) {
-        case CHUNK_FSDW: {
-            CameraPcs.m_fullScreenShadowEnabled = chunkFile.Get1();
-            break;
-        }
-        case CHUNK_ID: {
-            m_objId = chunkFile.Get2();
-            break;
-        }
-        case CHUNK_MSID: {
-            m_meshId = static_cast<unsigned short>(chunkFile.Get4());
-            break;
-        }
-        case CHUNK_PRIO: {
-            unsigned char priority = chunkFile.Get1();
-            m_drawPriority = priority;
-            m_baseDrawPriority = priority;
-            break;
-        }
-        case CHUNK_LTST: {
-            if (chunk.m_version == 1) {
-                m_lightSetIndex = static_cast<int>(chunkFile.Get4());
-            } else if (chunkFile.Get1() == 0) {
-                m_lightSetIndex = 0;
-            }
-            break;
-        }
-        case CHUNK_LSDW: {
-            break;
-        }
         case CHUNK_PIDX: {
             short parentIdx = static_cast<short>(chunkFile.Get2());
             int meshOrHitIdx = static_cast<short>(chunkFile.Get2());
@@ -483,7 +456,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             if (parentIdx == -1) {
                 m_parent = 0;
             } else {
-                m_parent = MapMng.m_mapObjArray + parentIdx;
+                m_parent = MapMng.GetMapObjArray() + parentIdx;
             }
 
             if (meshOrHitIdx == -1) {
@@ -512,30 +485,8 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             }
             break;
         }
-        case CHUNK_TRNS: {
-            m_transRateX = chunkFile.GetF4();
-            m_transRateY = chunkFile.GetF4();
-            m_transRateZ = chunkFile.GetF4();
-            break;
-        }
-        case CHUNK_SDST: {
-            if (chunk.m_version == 2) {
-                m_enableFullScreenShadow = chunkFile.Get1();
-                chunkFile.Get1();
-                chunkFile.Get1();
-                chunkFile.Get1();
-                m_shadowTarget = static_cast<int>(chunkFile.Get4());
-            } else if (chunk.m_version == 1) {
-                m_enableFullScreenShadow = chunkFile.Get1();
-                if (chunkFile.Get1() == 0) {
-                    m_shadowTarget = 0;
-                } else {
-                    m_shadowTarget = -1;
-                }
-            } else {
-                m_enableFullScreenShadow = chunkFile.Get1();
-                m_shadowTarget = -1;
-            }
+        case CHUNK_BOBJ: {
+            m_bumpObjId = chunkFile.Get2();
             break;
         }
         case CHUNK_TFRM: {
@@ -566,58 +517,73 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             m_calcMtxPending = 1;
             break;
         }
-        case CHUNK_EFID: {
-            m_effectId = chunkFile.Get2();
-            break;
-        }
-        case CHUNK_MIME: {
+        case CHUNK_PLIT: {
             if (m_attribute != 0) {
                 System.Printf(const_cast<char*>(sMapObjTooManyAttributesWarn), objIndex);
             }
-            CMapObjAtrMime* mimeAttr =
-                new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x33B) CMapObjAtrMime();
-            CMapObjAtrMime* mime = mimeAttr;
+            CMapObjAtrPointLight* pointLightAttr =
+                new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0xD4) CMapObjAtrPointLight();
+            CMapObjAtrPointLight* pointLight = pointLightAttr;
 
-            chunkFile.PushChunk();
-            CChunkFile::CChunk mimeChunk;
-            while (chunkFile.GetNextChunk(mimeChunk) != 0) {
-                if (mimeChunk.m_id == CHUNK_KEY) {
-                    mime->m_keyFrame.ReadKey(chunkFile, mimeChunk.m_arg0);
-                } else if (mimeChunk.m_id == CHUNK_JUN) {
-                    mime->m_keyFrame.ReadJun(chunkFile, static_cast<char>(mimeChunk.m_arg0));
-                } else if (mimeChunk.m_id == CHUNK_FRAM) {
-                    mime->m_keyFrame.ReadFrame(chunkFile, mimeChunk.m_arg0);
-                } else if (mimeChunk.m_id == CHUNK_VTXL) {
-                    mime->m_vertexListCount = static_cast<unsigned char>(mimeChunk.m_arg0);
-                    mime->m_vertexLists = reinterpret_cast<float**>(
-                        operator new[](static_cast<unsigned long>(mime->m_vertexListCount) << 2,
-                                       MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x348));
+            if (chunk.m_version == 2) {
+                chunkFile.PushChunk();
+                while (chunkFile.GetNextChunk(chunk) != 0) {
+                    if (chunk.m_id == CHUNK_LDAT) {
+                        pointLight->m_radius = chunkFile.GetF4();
+                        pointLight->m_intensity = chunkFile.GetF4();
+                        pointLight->m_colorMode = chunkFile.Get1();
+                        pointLight->m_useAltColor = chunkFile.Get1();
+                        pointLight->m_unknown20 = chunkFile.Get1();
+                        chunkFile.Get1();
 
-                    chunkFile.PushChunk();
-                    CChunkFile::CChunk vtxChunk;
-                    int vtxTableIndex = 0;
-                    while (chunkFile.GetNextChunk(vtxChunk) != 0) {
-                        if (vtxChunk.m_id == CHUNK_VTX) {
-                            float* vtx = reinterpret_cast<float*>(operator new[](
-                                static_cast<unsigned long>(vtxChunk.m_arg0) * 0xC,
-                                MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x353));
-                            mime->m_vertexLists[vtxTableIndex] = vtx;
-                            vtxTableIndex++;
-                            mime->m_vertexCount = static_cast<int>(vtxChunk.m_arg0);
-
-                            for (unsigned int i = 0; i < vtxChunk.m_arg0; i++) {
-                                vtx[0] = chunkFile.GetF4();
-                                vtx[1] = chunkFile.GetF4();
-                                vtx[2] = chunkFile.GetF4();
-                                vtx += 3;
-                            }
+                        unsigned char colorCount = chunkFile.Get1();
+                        pointLight->m_colorCount = colorCount;
+                        for (int i = 0; i < static_cast<int>(colorCount); i++) {
+                            pointLight->m_colors[i].r = chunkFile.Get1();
+                            pointLight->m_colors[i].g = chunkFile.Get1();
+                            pointLight->m_colors[i].b = chunkFile.Get1();
+                            pointLight->m_colors[i].a = chunkFile.Get1();
                         }
+
+                        pointLight->m_altColorCount = chunkFile.Get1();
+                        for (int i = 0; i < static_cast<int>(pointLight->m_altColorCount); i++) {
+                            pointLight->m_altColors[i].r = chunkFile.Get1();
+                            pointLight->m_altColors[i].g = chunkFile.Get1();
+                            pointLight->m_altColors[i].b = chunkFile.Get1();
+                            pointLight->m_altColors[i].a = chunkFile.Get1();
+                        }
+
+                        pointLight->m_color = pointLight->m_colors[0];
+                        pointLight->m_altColor = pointLight->m_altColors[0];
+                    } else if (chunk.m_id == CHUNK_CJUN) {
+                        pointLight->m_altColorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
+                    } else if (chunk.m_id == CHUNK_CFRM) {
+                        pointLight->m_altColorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
+                    } else if (chunk.m_id == CHUNK_CKEY) {
+                        pointLight->m_altColorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
+                    } else if (chunk.m_id == CHUNK_MJUN) {
+                        pointLight->m_colorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
+                    } else if (chunk.m_id == CHUNK_MFRM) {
+                        pointLight->m_colorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
+                    } else if (chunk.m_id == CHUNK_MKEY) {
+                        pointLight->m_colorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
                     }
-                    chunkFile.PopChunk();
                 }
+                chunkFile.PopChunk();
+            } else if (chunk.m_version == 1) {
+                pointLight->m_color.r = chunkFile.Get1();
+                pointLight->m_color.g = chunkFile.Get1();
+                pointLight->m_color.b = chunkFile.Get1();
+                pointLight->m_color.a = chunkFile.Get1();
+                pointLight->m_altColor.r = chunkFile.Get1();
+                pointLight->m_altColor.g = chunkFile.Get1();
+                pointLight->m_altColor.b = chunkFile.Get1();
+                pointLight->m_altColor.a = chunkFile.Get1();
+                pointLight->m_radius = chunkFile.GetF4();
+                pointLight->m_intensity = chunkFile.GetF4();
+                pointLight->m_colorMode = chunkFile.Get1();
             }
-            chunkFile.PopChunk();
-            m_attribute = mimeAttr;
+            m_attribute = pointLightAttr;
             break;
         }
         case CHUNK_SLIT: {
@@ -674,25 +640,18 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
 
                         spotLight->m_color = spotLight->m_colors[0];
                         spotLight->m_altColor = spotLight->m_altColors[0];
-                    } else switch (chunk.m_id) {
-                    case CHUNK_CFRM:
-                        spotLight->m_altColorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
-                        break;
-                    case CHUNK_CJUN:
+                    } else if (chunk.m_id == CHUNK_CJUN) {
                         spotLight->m_altColorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
-                        break;
-                    case CHUNK_CKEY:
+                    } else if (chunk.m_id == CHUNK_CFRM) {
+                        spotLight->m_altColorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
+                    } else if (chunk.m_id == CHUNK_CKEY) {
                         spotLight->m_altColorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
-                        break;
-                    case CHUNK_MFRM:
-                        spotLight->m_colorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
-                        break;
-                    case CHUNK_MJUN:
+                    } else if (chunk.m_id == CHUNK_MJUN) {
                         spotLight->m_colorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
-                        break;
-                    case CHUNK_MKEY:
+                    } else if (chunk.m_id == CHUNK_MFRM) {
+                        spotLight->m_colorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
+                    } else if (chunk.m_id == CHUNK_MKEY) {
                         spotLight->m_colorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
-                        break;
                     }
                 }
                 chunkFile.PopChunk();
@@ -725,20 +684,6 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             m_attribute = spotLightAttr;
             break;
         }
-        case CHUNK_GEOM: {
-            m_zBufferOffset = chunkFile.GetF4();
-            m_bumpTexMatrixMode = chunkFile.Get1();
-            m_disableZWrite = chunkFile.Get1();
-            break;
-        }
-        case CHUNK_AMBI: {
-            m_ambientColor.r = chunkFile.Get1();
-            m_ambientColor.g = chunkFile.Get1();
-            m_ambientColor.b = chunkFile.Get1();
-            m_ambientColor.a = chunkFile.Get1();
-            m_useAmbientColor = 1;
-            break;
-        }
         case CHUNK_ANIM: {
             CMapAnimRun* animRun = static_cast<CMapAnimRun*>(
                 operator new(sizeof(CMapAnimRun), MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x21E));
@@ -758,89 +703,213 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             MapMng.GetMapAnimRunArray().Add(animRun);
             break;
         }
-        case CHUNK_BOBJ: {
-            m_bumpObjId = chunkFile.Get2();
+        case CHUNK_AMBI: {
+            m_ambientColor.r = chunkFile.Get1();
+            m_ambientColor.g = chunkFile.Get1();
+            m_ambientColor.b = chunkFile.Get1();
+            m_ambientColor.a = chunkFile.Get1();
+            m_useAmbientColor = 1;
+            break;
+        }
+        case CHUNK_LSDW: {
+            CMapShadow* shadow =
+                new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x241) CMapShadow();
+            shadow->m_yFilterMode = 0;
+
+            if (chunk.m_version == 4) {
+                shadow->m_materialIndex = static_cast<unsigned short>(chunkFile.Get4());
+                shadow->m_modelA = MapMng.m_mapObjArray + chunkFile.Get2();
+                shadow->m_modelB = MapMng.m_mapObjArray + chunkFile.Get2();
+                shadow->m_modelC = MapMng.m_mapObjArray + chunkFile.Get2();
+                shadow->m_useFrustum = chunkFile.Get1();
+                shadow->m_shadowMaterialType = chunkFile.Get1();
+                shadow->m_targetEnabled[1] = (chunkFile.Get1() == 0);
+                shadow->m_targetEnabled[0] = (chunkFile.Get1() == 0);
+                shadow->m_yFilterMode = chunkFile.Get1();
+                chunkFile.Get1();
+                shadow->m_targetBoundsScale = chunkFile.GetF4();
+                shadow->m_shadowScale = chunkFile.GetF4();
+                shadow->m_frustumNear = chunkFile.GetF4();
+                shadow->m_frustumFar = chunkFile.GetF4();
+                shadow->m_scrollStepX = chunkFile.GetF4();
+                shadow->m_scrollStepY = chunkFile.GetF4();
+                shadow->m_targetBounds[0].m_min.x = chunkFile.GetF4();
+                shadow->m_targetBounds[0].m_min.y = chunkFile.GetF4();
+                shadow->m_targetBounds[0].m_min.z = chunkFile.GetF4();
+                shadow->m_targetBounds[0].m_max.x = chunkFile.GetF4();
+                shadow->m_targetBounds[0].m_max.y = chunkFile.GetF4();
+                shadow->m_targetBounds[0].m_max.z = chunkFile.GetF4();
+            } else if (chunk.m_version == 3) {
+                shadow->m_materialIndex = static_cast<unsigned short>(chunkFile.Get4());
+                shadow->m_modelA = MapMng.m_mapObjArray + chunkFile.Get2();
+                shadow->m_modelB = MapMng.m_mapObjArray + chunkFile.Get2();
+                shadow->m_modelC = MapMng.m_mapObjArray + chunkFile.Get2();
+                shadow->m_useFrustum = chunkFile.Get1();
+                shadow->m_shadowMaterialType = chunkFile.Get1();
+                chunkFile.Get1();
+                chunkFile.Get1();
+                chunkFile.Get1();
+                chunkFile.Get1();
+                shadow->m_shadowScale = chunkFile.GetF4();
+                shadow->m_frustumNear = chunkFile.GetF4();
+                shadow->m_frustumFar = chunkFile.GetF4();
+                shadow->m_scrollStepX = chunkFile.GetF4();
+                shadow->m_scrollStepY = chunkFile.GetF4();
+                shadow->m_targetBounds[0].m_min.x = chunkFile.GetF4();
+                shadow->m_targetBounds[0].m_min.y = chunkFile.GetF4();
+                shadow->m_targetBounds[0].m_min.z = chunkFile.GetF4();
+                shadow->m_targetBounds[0].m_max.x = chunkFile.GetF4();
+                shadow->m_targetBounds[0].m_max.y = chunkFile.GetF4();
+                shadow->m_targetBounds[0].m_max.z = chunkFile.GetF4();
+                shadow->m_targetEnabled[1] = 1;
+                shadow->m_targetEnabled[0] = 1;
+                shadow->m_targetBoundsScale = kMapObjZero;
+            }
+
+            shadow->m_targetBounds[1].m_min.x = shadow->m_targetBounds[0].m_min.x * shadow->m_targetBoundsScale;
+            shadow->m_targetBounds[1].m_min.y = shadow->m_targetBounds[0].m_min.y * shadow->m_targetBoundsScale;
+            shadow->m_targetBounds[1].m_min.z = shadow->m_targetBounds[0].m_min.z * shadow->m_targetBoundsScale;
+            shadow->m_targetBounds[1].m_max.x = shadow->m_targetBounds[0].m_max.x * shadow->m_targetBoundsScale;
+            shadow->m_targetBounds[1].m_max.y = shadow->m_targetBounds[0].m_max.y * shadow->m_targetBoundsScale;
+            shadow->m_targetBounds[1].m_max.z = shadow->m_targetBounds[0].m_max.z * shadow->m_targetBoundsScale;
+
+            MapMng.GetMapShadowArray().Add(shadow);
+            break;
+        }
+        case CHUNK_PRIO: {
+            unsigned char priority = chunkFile.Get1();
+            m_drawPriority = priority;
+            m_baseDrawPriority = priority;
+            break;
+        }
+        case CHUNK_FSDW: {
+            CameraPcs.m_fullScreenShadowEnabled = chunkFile.Get1();
+            break;
+        }
+        case CHUNK_SDST: {
+            if (chunk.m_version == 2) {
+                m_enableFullScreenShadow = chunkFile.Get1();
+                chunkFile.Get1();
+                chunkFile.Get1();
+                chunkFile.Get1();
+                m_shadowTarget = static_cast<int>(chunkFile.Get4());
+            } else if (chunk.m_version == 1) {
+                m_enableFullScreenShadow = chunkFile.Get1();
+                if (chunkFile.Get1() == 0) {
+                    m_shadowTarget = 0;
+                } else {
+                    m_shadowTarget = -1;
+                }
+            } else {
+                m_enableFullScreenShadow = chunkFile.Get1();
+                m_shadowTarget = -1;
+            }
+            break;
+        }
+        case CHUNK_LTST: {
+            if (chunk.m_version == 1) {
+                m_lightSetIndex = static_cast<int>(chunkFile.Get4());
+            } else if (chunkFile.Get1() == 0) {
+                m_lightSetIndex = 0;
+            }
+            break;
+        }
+        case CHUNK_GEOM: {
+            m_zBufferOffset = chunkFile.GetF4();
+            m_bumpTexMatrixMode = chunkFile.Get1();
+            m_disableZWrite = chunkFile.Get1();
+            break;
+        }
+        case CHUNK_ID: {
+            m_objId = chunkFile.Get2();
+            break;
+        }
+        case CHUNK_EFID: {
+            m_effectId = chunkFile.Get2();
             break;
         }
         case CHUNK_GBID: {
             m_groupId = chunkFile.Get2();
             break;
         }
-        case CHUNK_PLIT: {
+        case CHUNK_MSID: {
+            m_meshId = static_cast<unsigned short>(chunkFile.Get4());
+            break;
+        }
+        case CHUNK_MIME: {
             if (m_attribute != 0) {
                 System.Printf(const_cast<char*>(sMapObjTooManyAttributesWarn), objIndex);
             }
-            CMapObjAtrPointLight* pointLightAttr =
-                new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0xD4) CMapObjAtrPointLight();
-            CMapObjAtrPointLight* pointLight = pointLightAttr;
+            CMapObjAtrMime* mimeAttr =
+                new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x33B) CMapObjAtrMime();
+            CMapObjAtrMime* mime = mimeAttr;
 
-            if (chunk.m_version == 2) {
-                chunkFile.PushChunk();
-                while (chunkFile.GetNextChunk(chunk) != 0) {
-                    if (chunk.m_id == CHUNK_LDAT) {
-                        pointLight->m_radius = chunkFile.GetF4();
-                        pointLight->m_intensity = chunkFile.GetF4();
-                        pointLight->m_colorMode = chunkFile.Get1();
-                        pointLight->m_useAltColor = chunkFile.Get1();
-                        pointLight->m_unknown20 = chunkFile.Get1();
-                        chunkFile.Get1();
+            chunkFile.PushChunk();
+            CChunkFile::CChunk mimeChunk;
+            while (chunkFile.GetNextChunk(mimeChunk) != 0) {
+                if (mimeChunk.m_id == CHUNK_JUN) {
+                    mime->m_keyFrame.ReadJun(chunkFile, static_cast<char>(mimeChunk.m_arg0));
+                } else if (mimeChunk.m_id == CHUNK_FRAM) {
+                    mime->m_keyFrame.ReadFrame(chunkFile, mimeChunk.m_arg0);
+                } else if (mimeChunk.m_id == CHUNK_KEY) {
+                    mime->m_keyFrame.ReadKey(chunkFile, mimeChunk.m_arg0);
+                } else if (mimeChunk.m_id == CHUNK_VTXL) {
+                    mime->m_vertexListCount = static_cast<unsigned char>(mimeChunk.m_arg0);
+                    mime->m_vertexLists = reinterpret_cast<float**>(
+                        operator new[](static_cast<unsigned long>(mime->m_vertexListCount) << 2,
+                                       MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x348));
 
-                        unsigned char colorCount = chunkFile.Get1();
-                        pointLight->m_colorCount = colorCount;
-                        for (int i = 0; i < static_cast<int>(colorCount); i++) {
-                            pointLight->m_colors[i].r = chunkFile.Get1();
-                            pointLight->m_colors[i].g = chunkFile.Get1();
-                            pointLight->m_colors[i].b = chunkFile.Get1();
-                            pointLight->m_colors[i].a = chunkFile.Get1();
-                        }
+                    chunkFile.PushChunk();
+                    CChunkFile::CChunk vtxChunk;
+                    int vtxTableIndex = 0;
+                    while (chunkFile.GetNextChunk(vtxChunk) != 0) {
+                        if (vtxChunk.m_id == CHUNK_VTX) {
+                            float* vtx = reinterpret_cast<float*>(operator new[](
+                                static_cast<unsigned long>(vtxChunk.m_arg0) * 0xC,
+                                MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x353));
+                            mime->m_vertexLists[vtxTableIndex] = vtx;
+                            vtxTableIndex++;
+                            mime->m_vertexCount = static_cast<int>(vtxChunk.m_arg0);
 
-                        pointLight->m_altColorCount = chunkFile.Get1();
-                        for (int i = 0; i < static_cast<int>(pointLight->m_altColorCount); i++) {
-                            pointLight->m_altColors[i].r = chunkFile.Get1();
-                            pointLight->m_altColors[i].g = chunkFile.Get1();
-                            pointLight->m_altColors[i].b = chunkFile.Get1();
-                            pointLight->m_altColors[i].a = chunkFile.Get1();
-                        }
-
-                        pointLight->m_color = pointLight->m_colors[0];
-                        pointLight->m_altColor = pointLight->m_altColors[0];
-                    } else {
-                        if (static_cast<int>(chunk.m_id) < CHUNK_LDAT) {
-                            if (chunk.m_id == CHUNK_CJUN) {
-                                pointLight->m_altColorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
-                            } else if (static_cast<int>(chunk.m_id) < CHUNK_CJUN) {
-                                if (chunk.m_id == CHUNK_CFRM) {
-                                    pointLight->m_altColorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
-                                }
-                            } else if (chunk.m_id == CHUNK_CKEY) {
-                                pointLight->m_altColorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
+                            for (int i = 0; i < mime->m_vertexCount; i++) {
+                                vtx[0] = chunkFile.GetF4();
+                                vtx[1] = chunkFile.GetF4();
+                                vtx[2] = chunkFile.GetF4();
+                                vtx += 3;
                             }
-                        } else if (chunk.m_id == CHUNK_MJUN) {
-                            pointLight->m_colorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
-                        } else if (static_cast<int>(chunk.m_id) < CHUNK_MJUN) {
-                            if (chunk.m_id == CHUNK_MFRM) {
-                                pointLight->m_colorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
-                            }
-                        } else if (chunk.m_id == CHUNK_MKEY) {
-                            pointLight->m_colorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
                         }
                     }
+                    chunkFile.PopChunk();
                 }
-                chunkFile.PopChunk();
-            } else if (static_cast<int>(chunk.m_version) == 1) {
-                pointLight->m_color.r = chunkFile.Get1();
-                pointLight->m_color.g = chunkFile.Get1();
-                pointLight->m_color.b = chunkFile.Get1();
-                pointLight->m_color.a = chunkFile.Get1();
-                pointLight->m_altColor.r = chunkFile.Get1();
-                pointLight->m_altColor.g = chunkFile.Get1();
-                pointLight->m_altColor.b = chunkFile.Get1();
-                pointLight->m_altColor.a = chunkFile.Get1();
-                pointLight->m_radius = chunkFile.GetF4();
-                pointLight->m_intensity = chunkFile.GetF4();
-                pointLight->m_colorMode = chunkFile.Get1();
             }
-            m_attribute = pointLightAttr;
+            chunkFile.PopChunk();
+            m_attribute = mimeAttr;
+            break;
+        }
+        case CHUNK_TRNS: {
+            m_transRateX = chunkFile.GetF4();
+            m_transRateY = chunkFile.GetF4();
+            m_transRateZ = chunkFile.GetF4();
+            break;
+        }
+        case CHUNK_SHKI: {
+            if (MapMng.m_shadowKeyInfoCount >= 4) {
+                break;
+            }
+            CMapShadowKeyInfo* keyInfo = &MapMng.m_shadowKeyInfos[MapMng.m_shadowKeyInfoCount];
+            MapMng.m_shadowKeyInfoCount++;
+            keyInfo->m_key = chunkFile.Get4();
+            keyInfo->m_frame = static_cast<short>(static_cast<int>(chunkFile.GetF4()));
+            keyInfo->m_unknown06 = chunkFile.Get1();
+            keyInfo->m_unknown07 = chunkFile.Get1();
+            keyInfo->m_primaryColor.r = chunkFile.Get1();
+            keyInfo->m_primaryColor.g = chunkFile.Get1();
+            keyInfo->m_primaryColor.b = chunkFile.Get1();
+            keyInfo->m_primaryColor.a = chunkFile.Get1();
+            keyInfo->m_secondaryColor.r = chunkFile.Get1();
+            keyInfo->m_secondaryColor.g = chunkFile.Get1();
+            keyInfo->m_secondaryColor.b = chunkFile.Get1();
+            keyInfo->m_secondaryColor.a = chunkFile.Get1();
             break;
         }
         case CHUNK_PSTA: {

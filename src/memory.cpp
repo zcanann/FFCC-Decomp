@@ -627,10 +627,8 @@ CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int mode
                     stage->m_heapTop = list->m_heapBottom;
                     stage->m_heapBottom = stage->m_heapTop + alignedSize;
 
-                    if (source == (char*)nullptr) {
-                        source = const_cast<char*>(sEmptyAllocSourceName);
-                    }
-                    strcpy(stage->m_allocationSourceStr, source);
+                    strcpy(stage->m_allocationSourceStr,
+                           source != (char*)nullptr ? source : const_cast<char*>(sEmptyAllocSourceName));
                     stage->m_allocationMode = mode;
 
                     if (mode != 2) {

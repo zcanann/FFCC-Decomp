@@ -1689,23 +1689,12 @@ void CGObject::update()
         m_charaModelHandle->m_model->CalcFurColor();
 
         if ((m_displayFlags & 2) != 0) {
-            float frameStep = m_turnSpeed;
-            if (m_animSlotSel == -1 || (shieldFlagsLo & 0x80) == 0) {
-                float frameDelta = m_lastBgAttr;
-                const int activeAnimIndex = m_charaModelHandle->m_currentAnimIndex;
-                if (activeAnimIndex >= 0 && m_charaModelHandle->m_animSlot[activeAnimIndex] != 0) {
-                    CRef* animRef = m_charaModelHandle->m_animSlot[activeAnimIndex];
-                    if ((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(animRef) + 0x70) & 0x4) != 0 &&
-                        frameDelta < sZeroFloat) {
-                        frameDelta = sNegativeOne;
-                    }
-                }
-                frameStep += frameDelta;
-            } else {
+            float frameStep;
+            if (m_animSlotSel != -1 && (shieldFlagsLo & 0x80) != 0) {
                 if (ModelAnim(model) != 0) {
                     const unsigned short frameCount =
                         *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(ModelAnim(model)) + 0x10);
-                    frameStep += static_cast<float>(frameCount) /
+                    frameStep = m_turnSpeed + static_cast<float>(frameCount) /
                                  static_cast<float>(*reinterpret_cast<unsigned int*>(&m_attackColliders[0].m_localStart.x));
                 } else {
                     if (static_cast<unsigned int>(System.m_execParam) >= 2) {
@@ -1713,6 +1702,16 @@ void CGObject::update()
                     }
                     frameStep = m_turnSpeed + sAnimFrameOffset;
                 }
+            } else {
+                float frameDelta = m_lastBgAttr;
+                const int activeAnimIndex = m_charaModelHandle->m_currentAnimIndex;
+                if (activeAnimIndex >= 0 &&
+                    (*reinterpret_cast<unsigned int*>(
+                         reinterpret_cast<unsigned char*>(m_charaModelHandle->m_animSlot[activeAnimIndex]) + 0x70) &
+                     0x4) != 0) {
+                    frameDelta = m_lastBgAttr < sZeroFloat ? sNegativeOne : sAnimFrameOffset;
+                }
+                frameStep = m_turnSpeed + frameDelta * 1.2f;
             }
 
             const float prevTime = ModelTime(model);

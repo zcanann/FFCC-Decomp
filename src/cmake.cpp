@@ -3067,12 +3067,11 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-    int a = static_cast<int>(255.0f * alpha);
     GXColor col;
     col.r = 0xFF;
     col.g = 0xFF;
     col.b = 0xFF;
-    col.a = static_cast<unsigned char>(a);
+    col.a = static_cast<unsigned char>(static_cast<int>(255.0f * alpha));
     GXSetChanMatColor(GX_COLOR0A0, col);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3A));
@@ -3097,8 +3096,8 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
     font->DrawInit();
     font->SetTlut(7);
 
-    GXColor rgba = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
-    font->SetColor(rgba);
+    CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(255.0f * alpha)));
+    font->SetColor(rgba.color);
 
     const char* yesStr = GetMenuStr(1);
     float yesW = static_cast<float>(font->GetWidth(yesStr));

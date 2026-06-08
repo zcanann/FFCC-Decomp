@@ -1302,8 +1302,9 @@ void CGObject::hit()
 
         Vec delta;
         PSVECSubtract(&m_worldPosition, &other->m_worldPosition, &delta);
+        const float distSq = PSVECDotProduct(&delta, &delta);
         const float nearRadius = m_nearColRadius + other->m_nearColRadius;
-        if (PSVECDotProduct(&delta, &delta) > (nearRadius * nearRadius)) {
+        if ((nearRadius * nearRadius) < distSq) {
             continue;
         }
 

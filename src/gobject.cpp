@@ -2900,7 +2900,10 @@ int CGObject::IsAnimFinished(int mode)
     }
 
     if (hasModel) {
-        if (m_currentAnimSlot != -1) {
+        if (m_currentAnimSlot == -1) {
+            return 1;
+        }
+        {
             shieldFlag = static_cast<signed char>(
                 static_cast<int>((static_cast<u32>(*reinterpret_cast<u8*>(&m_shieldNodeFlags)) << 0x1C) >> 0x1F));
             shieldFlagClz = static_cast<u32>(__cntlzw(static_cast<u32>(shieldFlag)));

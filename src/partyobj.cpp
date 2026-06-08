@@ -4079,11 +4079,13 @@ void CGPartyObj::SetBonusCondition(int useRandom, int bonus0, int bonus1, int bo
 			for (;;) {
 				bonusIndex = Math.Rand(bonusCount);
 
+				int* scan = chosenBonus;
 				int duplicateIndex = 0;
-				while (duplicateIndex < chosenCount) {
-					if (chosenBonus[duplicateIndex] == bonusIndex) {
+				for (int n = chosenCount; n != 0; n--) {
+					if (*scan == bonusIndex) {
 						break;
 					}
+					scan++;
 					duplicateIndex++;
 				}
 

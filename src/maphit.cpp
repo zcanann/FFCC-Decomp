@@ -440,8 +440,8 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         return 0;
     }
 
-    int boundsOverlap = 0;
-    int partialOverlap = 0;
+    unsigned char boundsOverlap = 0;
+    unsigned char partialOverlap = 0;
     int axisOverlap;
     if (g_hit_lpface->m_boundsMin.x < g_hit_cyl.m_bound.m_min.x) {
         axisOverlap = g_hit_cyl.m_bound.m_min.x <= g_hit_lpface->m_boundsMax.x;

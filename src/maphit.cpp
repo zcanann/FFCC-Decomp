@@ -931,8 +931,6 @@ int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder&
     const f32 py = PSVECDotProduct(&bitangent, &relStart);
     const f32 pz = PSVECDotProduct(&axis, &relStart);
 
-    const f32 vx = localDirection.x;
-    const f32 vy = localDirection.y;
     const f32 vz = localDirection.z;
     const f32 radius = cyl.m_radius;
     const f32 radiusSq = radius * radius;
@@ -954,6 +952,8 @@ int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder&
 
 cylinder_body:
     {
+        const f32 vx = localDirection.x;
+        const f32 vy = localDirection.y;
         const f32 radialC = (px * px + py * py) - radiusSq;
         const f32 radialB = px * vx + py * vy;
         const f32 radialA = vx * vx + vy * vy;

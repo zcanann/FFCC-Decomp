@@ -79,7 +79,7 @@ STATIC_ASSERT(sizeof(m_objItem) == sizeof(CGItemObj) * kFlatItemObjCount);
 STATIC_ASSERT(sizeof(m_objMon) == sizeof(CGMonObj) * kFlatMonObjCount);
 
 int gCFlatRuntime2DebugDrawOverflowFrame = 0;
-unsigned char gCFlatRuntime2DebugDrawOverflowInit = 0;
+char gCFlatRuntime2DebugDrawOverflowInit = 0;
 const char sCFlatRuntime2DebugDrawOverflowMsg[] =
 	"CFlatRuntime2.AddDebugDrawCC: "
 	"\x8e\x8b\x90\xfc\x83\x60\x83\x46\x83\x62\x83\x4e\x83\x66\x83\x6f\x83\x62\x83\x4f"

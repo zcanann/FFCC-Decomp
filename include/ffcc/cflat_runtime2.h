@@ -26,7 +26,7 @@ struct CFlatPathPoint
 };
 
 extern int gCFlatRuntime2DebugDrawOverflowFrame;
-extern unsigned char gCFlatRuntime2DebugDrawOverflowInit;
+extern char gCFlatRuntime2DebugDrawOverflowInit;
 extern const char sCFlatRuntime2DebugDrawOverflowMsg[];
 extern u32 CFlatFlags;
 

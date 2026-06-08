@@ -3080,10 +3080,7 @@ void CGObject::SetDispItemName(int showName)
  */
 void CGObject::DrawDebug(CFont* font)
 {
-    if ((static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<u8*>(&m_weaponNodeFlags)) << 0x1A)
-                          | (*reinterpret_cast<u8*>(&m_weaponNodeFlags) >> 6))
-         < 0)
-        && (sZeroFloat < m_screenDepth)) {
+    if (m_weaponNodeFlagBits.m_unk20 && (sZeroFloat < m_screenDepth)) {
         float invDepth = sAnimFrameOffset / m_screenDepth;
         float xProd = sDebugScreenX * m_projection.z;
         float yProd = sDebugScreenY * m_projection.y;

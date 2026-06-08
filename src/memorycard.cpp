@@ -1432,7 +1432,7 @@ void CMemoryCardMan::SetLoadData()
         for (int artifact = 0; artifact < 96; artifact += 2)
         {
             const int slot = artifact >> 5;
-            const u32 bit = 1u << (artifact & 31);
+            const u32 bit = 1u << (artifact % 32);
             if ((*reinterpret_cast<u32*>(src + 0xBC + slot * 4) & bit) != 0)
             {
                 caravanWork->m_artifacts[artifact] = static_cast<u16>(0x9F + artifact);
@@ -1444,7 +1444,7 @@ void CMemoryCardMan::SetLoadData()
 
             const int nextArtifact = artifact + 1;
             const int nextSlot = nextArtifact >> 5;
-            const u32 nextBit = 1u << (nextArtifact & 31);
+            const u32 nextBit = 1u << (nextArtifact % 32);
             if ((*reinterpret_cast<u32*>(src + 0xBC + nextSlot * 4) & nextBit) != 0)
             {
                 caravanWork->m_artifacts[nextArtifact] = static_cast<u16>(0x9F + nextArtifact);

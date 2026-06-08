@@ -3003,38 +3003,25 @@ void CGObject::CancelAnim(int keepFacing)
  */
 void CGObject::PlayAnim(int slot, int param2, int param3, int param4, int param5, signed char* animData)
 {
-    signed char weaponFlag = static_cast<unsigned char>(param2);
-    u8 flags;
-
     m_currentAnimSlot = m_animQueue[slot - 0x41];
 
-    flags = *(reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1);
-    flags = static_cast<u8>(__rlwimi(flags, weaponFlag, 0, 31, 31));
-    *(reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1) = flags;
+    m_weaponNodeFlagAll.m_bits1.m_bit01 = static_cast<signed char>(param2);
 
     m_animExtraIndex = static_cast<short>(param4);
     m_collisionPushTimer = static_cast<short>(param5);
 
     signed char shieldFlag = static_cast<signed char>(param3);
-    flags = *reinterpret_cast<u8*>(&m_shieldNodeFlags);
-    flags = static_cast<u8>(__rlwimi(flags, shieldFlag, 1, 30, 30));
-    *reinterpret_cast<u8*>(&m_shieldNodeFlags) = flags;
+    m_shieldNodeFlagBits.m_bit02 = shieldFlag;
 
     if (animData != 0) {
-        flags = *reinterpret_cast<u8*>(&m_shieldNodeFlags);
-        flags = static_cast<u8>(__rlwimi(flags, 1, 7, 24, 24));
-        *reinterpret_cast<u8*>(&m_shieldNodeFlags) = flags;
+        m_shieldNodeFlagBits.m_bit80 = 1;
         m_animQueuePos = '\0';
         memcpy(m_animQueue, animData, 4);
     } else {
-        flags = *reinterpret_cast<u8*>(&m_shieldNodeFlags);
-        flags = static_cast<u8>(__rlwimi(flags, 0, 7, 24, 24));
-        *reinterpret_cast<u8*>(&m_shieldNodeFlags) = flags;
+        m_shieldNodeFlagBits.m_bit80 = 0;
     }
 
-    flags = *reinterpret_cast<u8*>(&m_shieldNodeFlags);
-    flags = static_cast<u8>(__rlwimi(flags, 1, 3, 28, 28));
-    *reinterpret_cast<u8*>(&m_shieldNodeFlags) = flags;
+    m_shieldNodeFlagBits.m_bit08 = 1;
     const float& zero = sZeroFloat;
     m_turnSpeed = zero;
 }

@@ -3940,21 +3940,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
             blockCount = blocks;
 
             unsigned short crcAcc = 0xFFFF;
-            unsigned char* p = dataBase;
-            unsigned int count = size;
-
-            while (static_cast<int>(count) > 0)
-            {
-                unsigned char b = *p++;
-                count--;
-
-                crcAcc = static_cast<unsigned short>(
-                    (crcAcc << 8) ^
-                    JoyBusCrcTable[(crcAcc >> 8) ^ b]
-                );
-            }
-
-            crc = static_cast<unsigned short>(~crcAcc);
+            crc = Crc16(size, dataBase, &crcAcc);
 
             unsigned int word =
                 (static_cast<unsigned int>(0x0B) << 24) |
@@ -4034,21 +4020,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
         else
         {
             unsigned short crcAcc = 0xFFFF;
-            unsigned char* p = dataBase;
-            unsigned int count = chunkSize;
-
-            while (static_cast<int>(count) > 0)
-            {
-                unsigned char b = *p++;
-                count--;
-
-                crcAcc = static_cast<unsigned short>(
-                    (crcAcc << 8) ^
-                    JoyBusCrcTable[(crcAcc >> 8) ^ b]
-                );
-            }
-
-            unsigned short crcChunk = static_cast<unsigned short>(~crcAcc);
+            unsigned short crcChunk = Crc16(chunkSize, dataBase, &crcAcc);
 
             unsigned int word =
                 (static_cast<unsigned int>(0x0B00) << 16) |
@@ -4156,21 +4128,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
         else
         {
             unsigned short crcAcc = 0xFFFF;
-            unsigned char* p = dataPtr;
-            unsigned int count = chunkSize;
-
-            while (static_cast<int>(count) > 0)
-            {
-                unsigned char b = *p++;
-                count--;
-
-                crcAcc = static_cast<unsigned short>(
-                    (crcAcc << 8) ^
-                    JoyBusCrcTable[(crcAcc >> 8) ^ b]
-                );
-            }
-
-            unsigned short crcChunk = static_cast<unsigned short>(~crcAcc);
+            unsigned short crcChunk = Crc16(chunkSize, dataPtr, &crcAcc);
 
             unsigned int word =
                 (static_cast<unsigned int>(0x4B) << 24) |

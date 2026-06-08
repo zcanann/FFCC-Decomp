@@ -12161,12 +12161,8 @@ void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
 		cols++;
 	}
 
-	if (w != 0) {
-		*w = static_cast<short>((cols + 2) * 0x16 + 0x40);
-	}
-	if (h != 0) {
-		*h = static_cast<short>(count * 0x1E + 0x40);
-	}
+	*w = static_cast<short>((cols + 2) * 0x16 + 0x40);
+	*h = static_cast<short>(count * 0x1E + 0x40);
 }
 
 /*

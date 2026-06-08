@@ -1397,7 +1397,6 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 		return;
 	}
 
-	float furStep = ModelFurStep(this);
 	float furDepth = kCharaFurDepthZero;
 	CVector modelPos;
 	CVector viewPos;
@@ -1412,6 +1411,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	}
 
 	float furLength = ModelFurLenScale(this) * (kCharaFurDepthScaleBase - furDepth) + ModelFurLenScale(this);
+	float furStep = ModelFurStep(this);
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	GXSetZCompLoc((u8)0);

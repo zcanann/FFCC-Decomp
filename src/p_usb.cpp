@@ -93,10 +93,10 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
     stage = (m_bigStage != (CMemory::CStage*)nullptr) ? m_bigStage : m_smallStage;
 
     packet = reinterpret_cast<CDataHeader*>(new (stage, const_cast<char*>(s_p_usb_cpp), 0x1ca) unsigned char[value]);
-    packet->m_packetType = 4;
     packet->m_packetSize = value;
-    packet->m_payloadSize = Swap32(count);
+    packet->m_packetType = 4;
     packet->m_packetCode = Swap32((unsigned int)code);
+    packet->m_payloadSize = Swap32(count);
     packet->m_elementCount = Swap32((unsigned int)elemCount);
     packet->m_reserved2C = Swap32(0);
     packet->m_dataSize = Swap32(count);

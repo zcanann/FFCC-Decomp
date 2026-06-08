@@ -1274,7 +1274,7 @@ int CChara::CModel::PickFur(
 			if (pickTexture != 0 && pickTexture->m_format == 5) {
 				paintableMaterial = 1;
 			}
-			const int furMaterial = material->IsFurEnabled();
+			const unsigned int furMaterial = material->IsFurEnabled();
 
 			const unsigned char* cursor = reinterpret_cast<const unsigned char*>(displayList->m_data);
 			int remaining = displayList->m_size;
@@ -1670,7 +1670,7 @@ void CChara::makeFurTex()
 	s_mogFurRand = 0;
 	s_mogFurMaxY = 0.0f;
 
-	for (unsigned int i = 0; i < 0x20; i++) {
+	for (int i = 0; i < 0x20; i++) {
 		CVector scaled;
 		PSVECScale(&velRand, scaled, FurRandScale());
 		PSVECAdd(&velBase, scaled, hairSet[i].m_vec0);
@@ -1779,7 +1779,7 @@ void CChara::makeFurTex()
 				float pz = pos.z;
 
 				CColor color(
-				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.r * (kCharaFurDepthScaleBase - t2)) +
+				    static_cast<signed char>(static_cast<int>(src.m_colors[0].color.r * (kCharaFurDepthScaleBase - t2)) +
 				                               static_cast<int>(src.m_colors[1].color.r * t2)),
 				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.g * (kCharaFurDepthScaleBase - t2)) +
 				                               static_cast<int>(src.m_colors[1].color.g * t2)),
@@ -1900,7 +1900,7 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 			}
 
 			if (mode != 0) {
-				int reduce = (targetColor.a * (4 - distance)) / 4;
+				unsigned int reduce = (targetColor.a * (4 - distance)) / 4;
 				a = a - reduce;
 				a = a < 0 ? 0 : a;
 			} else {

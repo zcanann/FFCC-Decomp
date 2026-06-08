@@ -1205,8 +1205,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x1B: {
-			u8 flags = *(reinterpret_cast<u8*>(&engineObject->m_weaponNodeFlags) + 1);
-			if (static_cast<int>((static_cast<unsigned int>(flags) << 0x1A) | (static_cast<unsigned int>(flags) >> 6)) >= 0) {
+			if (engineObject->m_weaponNodeFlagAll.m_bits1.m_bit20 == 0) {
 				PushValue(this, object, 0);
 				outResult = 0;
 			}

@@ -1664,7 +1664,7 @@ void CMenuPcs::calcWorld()
 
 	if (animState == 1) {
 		if (animEnd <= animTime) {
-			if (m_wmWorldState->m_frameCounter > 9) {
+			if (m_wmWorldState->m_frameCounter >= 10) {
 				CFlatRuntime::CStack stackData[3];
 
 				handle->SetAnim(1, -1, -1, -1, 0);
@@ -1720,7 +1720,7 @@ void CMenuPcs::calcWorld()
 			}
 			bytes[0xE] = 0;
 		}
-	} else if (animState == 3 && m_wmWorldState->m_frameCounter > 9) {
+	} else if (animState == 3 && m_wmWorldState->m_frameCounter >= 10) {
 		if (animEnd <= animTime) {
 			handle->SetAnim(0, -1, -1, -1, 0);
 			reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 0;
@@ -4932,7 +4932,7 @@ void CMenuPcs::DrawCMakeMenu()
 
 	if (m_wmWorldState->m_mainState != 2) {
 		m_wmWorldState->m_frameCounter++;
-		if (m_wmWorldState->m_frameCounter > 9) {
+		if (m_wmWorldState->m_frameCounter >= 10) {
 			m_wmWorldState->m_mainState++;
 			m_wmWorldState->m_frameCounter = 0;
 			if (m_wmWorldState->m_mainState > 4) {
@@ -5082,7 +5082,7 @@ void CMenuPcs::DrawMoveMenu()
 			*reinterpret_cast<int*>(m_wm.m_frameData + 8) = 0;
 			worldState->m_frameCounter = 0;
 		}
-	} else if (worldState->m_mainState == 1 && worldState->m_frameCounter > 9) {
+	} else if (worldState->m_mainState == 1 && worldState->m_frameCounter >= 10) {
 		worldState->m_mainState++;
 		worldState->m_frameCounter = 0;
 		CFlatRuntime::CStack stackData[3];
@@ -5090,10 +5090,10 @@ void CMenuPcs::DrawMoveMenu()
 		stackData[1].m_word = 0;
 		stackData[2].m_word = 0;
 		gCFlatRuntime().SystemCall(0, 1, 4, 3, stackData, 0);
-	} else if (worldState->m_mainState == 2 && worldState->m_frameCounter > 9) {
+	} else if (worldState->m_mainState == 2 && worldState->m_frameCounter >= 10) {
 		worldState->m_mainState++;
 		worldState->m_frameCounter = 0;
-	} else if (worldState->m_mainState == 3 && worldState->m_frameCounter > 9) {
+	} else if (worldState->m_mainState == 3 && worldState->m_frameCounter >= 10) {
 		worldState->m_mainState++;
 		worldState->m_frameCounter = 0;
 		CFlatRuntime::CStack stackData[3];

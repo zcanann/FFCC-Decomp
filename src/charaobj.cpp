@@ -1860,7 +1860,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 	}
 
 	unsigned char* staSlot = reinterpret_cast<unsigned char*>(m_scriptHandle) + (staIndex * 2);
-	unsigned short current = *reinterpret_cast<unsigned short*>(staSlot + 0x3E);
+	int current = *reinterpret_cast<unsigned short*>(staSlot + 0x3E);
 	value &= ~(value >> 31);
 
 	if (current == 0 && value != 0) {

@@ -209,14 +209,14 @@ void CMenuPcs::CompaDraw()
 		float iconY = static_cast<float>(compaList->entries[0].y + 0x40);
 
 		int drawIndex = shown;
-		if (shown > 1) {
+		if (shown >= 2) {
 			drawIndex = memberIndex;
 			for (; drawIndex < 7; drawIndex++) {
 				if (caravanWork->m_evtWordArr[19 + drawIndex] != 0) {
 					break;
 				}
 			}
-			if (drawIndex > 7) {
+			if (drawIndex >= 8) {
 				break;
 			}
 		}
@@ -257,22 +257,21 @@ void CMenuPcs::CompaDraw()
 	font->SetScaleY(kCompaOne);
 	font->DrawInit();
 
-	GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(kCompaColorMax * compaList->entries[0].alpha)).color;
-	font->SetColor(textColor);
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(kCompaColorMax * compaList->entries[0].alpha)).color);
 
 	const CCaravanWork* nameWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	memberIndex = 0;
 	shown = 0;
 	for (int i = 0; i < 8 && shown < familyCount; i++) {
 		int drawIndex = shown;
-		if (shown > 1) {
+		if (shown >= 2) {
 			drawIndex = memberIndex;
 			for (; drawIndex < 7; drawIndex++) {
 				if (nameWork->m_evtWordArr[19 + drawIndex] > 0) {
 					break;
 				}
 			}
-			if (drawIndex > 7) {
+			if (drawIndex >= 8) {
 				break;
 			}
 		}

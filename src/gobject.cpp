@@ -1130,7 +1130,7 @@ void CGObject::bgWorldCollision()
     m_groundHitOffset.y = newOffset.y;
     m_groundHitOffset.z = newOffset.z;
 
-    const unsigned char mapGroup = gMapHitFace->m_groupIndex;
+    const signed char mapGroup = gMapHitFace->m_groupIndex;
     CMapIdGrp* mapGroupData = MapMng.GetMapIdGrpArray() + mapGroup;
     if ((mapGroupData->m_mask & 0x20) == 0) {
         m_stateFlags0Bits.unk7 = 1;
@@ -1649,7 +1649,7 @@ void CGObject::update()
             } else {
                 unsigned short frameCount = 1;
                 if (ModelAnim(model) != 0) {
-                    frameCount = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(ModelAnim(model)) + 0x10);
+                    frameCount = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(ModelAnim(model)) + 0x10);
                 }
                 float denom = m_attackColliders[0].m_localStart.x;
                 if (denom <= sZeroFloat) {
@@ -1674,7 +1674,7 @@ void CGObject::update()
 
                     for (int i = 0; i < pointCount; i++) {
                         const unsigned short pointFrame = *reinterpret_cast<unsigned short*>(animRefBytes + 0x30 + i * 4);
-                        const unsigned short pointValue = *reinterpret_cast<unsigned short*>(animRefBytes + 0x32 + i * 4);
+                        const short pointValue = *reinterpret_cast<unsigned short*>(animRefBytes + 0x32 + i * 4);
                         const float eventFrame = WrapAnimFrame(static_cast<float>(pointFrame) + ModelAnimStart(model), animSpan);
                         if ((!wrapped && prevWrapped < eventFrame && eventFrame <= nextWrapped) ||
                             (wrapped && (eventFrame > prevWrapped || eventFrame <= nextWrapped))) {

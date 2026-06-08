@@ -487,69 +487,70 @@ void CPad::Frame()
 				*puVar7 = static_cast<u16>(*puVar7 | *puVar12);
 				if (iVar14 == 0)
 				{
-					*reinterpret_cast<u32*>(self + 0x18C) =
-						*reinterpret_cast<u32*>(self + 0x18C) | *reinterpret_cast<u32*>(p12 + 0x38);
-					*reinterpret_cast<u32*>(self + 0x190) =
-						*reinterpret_cast<u32*>(self + 0x190) | *reinterpret_cast<u32*>(p12 + 0x3C);
-					*reinterpret_cast<u16*>(self + 0x162) =
-						static_cast<u16>(*reinterpret_cast<u16*>(self + 0x162) | *reinterpret_cast<u16*>(p12 + 0x0E));
-					*reinterpret_cast<u16*>(self + 0x15E) =
-						static_cast<u16>(*reinterpret_cast<u16*>(self + 0x15E) | *reinterpret_cast<u16*>(p12 + 0x0A));
-					*reinterpret_cast<u16*>(self + 0x160) =
-						static_cast<u16>(*reinterpret_cast<u16*>(self + 0x160) | *reinterpret_cast<u16*>(p12 + 0x0C));
-					*reinterpret_cast<s16*>(self + 0x164) =
-						static_cast<u16>(*reinterpret_cast<u16*>(self + 0x164) | *reinterpret_cast<u16*>(p12 + 0x10));
-					*reinterpret_cast<u16*>(self + 0x186) =
-						static_cast<u16>(*reinterpret_cast<u16*>(self + 0x186) | *reinterpret_cast<u16*>(p12 + 0x32));
-					*reinterpret_cast<u16*>(self + 0x184) =
-						static_cast<u16>(*reinterpret_cast<u16*>(self + 0x184) | *reinterpret_cast<u16*>(p12 + 0x30));
-					*reinterpret_cast<u16*>(self + 0x188) =
-						static_cast<u16>(*reinterpret_cast<u16*>(self + 0x188) | *reinterpret_cast<u16*>(p12 + 0x34));
+					u8* p10 = reinterpret_cast<u8*>(puVar10);
+					*reinterpret_cast<u32*>(p10 + 0x38) =
+						*reinterpret_cast<u32*>(p10 + 0x38) | *reinterpret_cast<u32*>(p12 + 0x38);
+					*reinterpret_cast<u32*>(p10 + 0x3C) =
+						*reinterpret_cast<u32*>(p10 + 0x3C) | *reinterpret_cast<u32*>(p12 + 0x3C);
+					*reinterpret_cast<u16*>(p10 + 0x0E) =
+						static_cast<u16>(*reinterpret_cast<u16*>(p10 + 0x0E) | *reinterpret_cast<u16*>(p12 + 0x0E));
+					*reinterpret_cast<u16*>(p10 + 0x0A) =
+						static_cast<u16>(*reinterpret_cast<u16*>(p10 + 0x0A) | *reinterpret_cast<u16*>(p12 + 0x0A));
+					*reinterpret_cast<u16*>(p10 + 0x0C) =
+						static_cast<u16>(*reinterpret_cast<u16*>(p10 + 0x0C) | *reinterpret_cast<u16*>(p12 + 0x0C));
+					*reinterpret_cast<s16*>(p10 + 0x10) =
+						static_cast<u16>(*reinterpret_cast<u16*>(p10 + 0x10) | *reinterpret_cast<u16*>(p12 + 0x10));
+					*reinterpret_cast<u16*>(p10 + 0x32) =
+						static_cast<u16>(*reinterpret_cast<u16*>(p10 + 0x32) | *reinterpret_cast<u16*>(p12 + 0x32));
+					*reinterpret_cast<u16*>(p10 + 0x30) =
+						static_cast<u16>(*reinterpret_cast<u16*>(p10 + 0x30) | *reinterpret_cast<u16*>(p12 + 0x30));
+					*reinterpret_cast<u16*>(p10 + 0x34) =
+						static_cast<u16>(*reinterpret_cast<u16*>(p10 + 0x34) | *reinterpret_cast<u16*>(p12 + 0x34));
 					cVar9 = *reinterpret_cast<s8*>(p12 + 0x14);
-					uVar15 = static_cast<int>(*reinterpret_cast<s8*>(self + 0x168)) >> 0x1F;
+					uVar15 = static_cast<int>(*reinterpret_cast<s8*>(p10 + 0x14)) >> 0x1F;
 					uVar16 = static_cast<int>(cVar9) >> 0x1F;
-					if (static_cast<int>((uVar15 ^ static_cast<int>(*reinterpret_cast<s8*>(self + 0x168))) - uVar15) <
+					if (static_cast<int>((uVar15 ^ static_cast<int>(*reinterpret_cast<s8*>(p10 + 0x14))) - uVar15) <
 					    static_cast<int>((uVar16 ^ static_cast<int>(cVar9)) - uVar16))
 					{
-						*reinterpret_cast<s8*>(self + 0x168) = cVar9;
-						*reinterpret_cast<float*>(self + 0x174) = *reinterpret_cast<float*>(p12 + 0x20);
+						*reinterpret_cast<s8*>(p10 + 0x14) = cVar9;
+						*reinterpret_cast<float*>(p10 + 0x20) = *reinterpret_cast<float*>(p12 + 0x20);
 					}
 					cVar9 = *reinterpret_cast<s8*>(p12 + 0x15);
-					uVar15 = static_cast<int>(*reinterpret_cast<s8*>(self + 0x169)) >> 0x1F;
+					uVar15 = static_cast<int>(*reinterpret_cast<s8*>(p10 + 0x15)) >> 0x1F;
 					uVar16 = static_cast<int>(cVar9) >> 0x1F;
-					if (static_cast<int>((uVar15 ^ static_cast<int>(*reinterpret_cast<s8*>(self + 0x169))) - uVar15) <
+					if (static_cast<int>((uVar15 ^ static_cast<int>(*reinterpret_cast<s8*>(p10 + 0x15))) - uVar15) <
 					    static_cast<int>((uVar16 ^ static_cast<int>(cVar9)) - uVar16))
 					{
-						*reinterpret_cast<s8*>(self + 0x169) = cVar9;
-						*reinterpret_cast<float*>(self + 0x178) = *reinterpret_cast<float*>(p12 + 0x24);
+						*reinterpret_cast<s8*>(p10 + 0x15) = cVar9;
+						*reinterpret_cast<float*>(p10 + 0x24) = *reinterpret_cast<float*>(p12 + 0x24);
 					}
 					cVar9 = *reinterpret_cast<s8*>(p12 + 0x16);
-					uVar15 = static_cast<int>(*reinterpret_cast<s8*>(self + 0x16A)) >> 0x1F;
+					uVar15 = static_cast<int>(*reinterpret_cast<s8*>(p10 + 0x16)) >> 0x1F;
 					uVar16 = static_cast<int>(cVar9) >> 0x1F;
-					if (static_cast<int>((uVar15 ^ static_cast<int>(*reinterpret_cast<s8*>(self + 0x16A))) - uVar15) <
+					if (static_cast<int>((uVar15 ^ static_cast<int>(*reinterpret_cast<s8*>(p10 + 0x16))) - uVar15) <
 					    static_cast<int>((uVar16 ^ static_cast<int>(cVar9)) - uVar16))
 					{
-						*reinterpret_cast<s8*>(self + 0x16A) = cVar9;
-						*reinterpret_cast<float*>(self + 0x17C) = *reinterpret_cast<float*>(p12 + 0x28);
+						*reinterpret_cast<s8*>(p10 + 0x16) = cVar9;
+						*reinterpret_cast<float*>(p10 + 0x28) = *reinterpret_cast<float*>(p12 + 0x28);
 					}
 					cVar9 = *reinterpret_cast<s8*>(p12 + 0x17);
-					uVar15 = static_cast<int>(*reinterpret_cast<s8*>(self + 0x16B)) >> 0x1F;
+					uVar15 = static_cast<int>(*reinterpret_cast<s8*>(p10 + 0x17)) >> 0x1F;
 					uVar16 = static_cast<int>(cVar9) >> 0x1F;
-					if (static_cast<int>((uVar15 ^ static_cast<int>(*reinterpret_cast<s8*>(self + 0x16B))) - uVar15) <
+					if (static_cast<int>((uVar15 ^ static_cast<int>(*reinterpret_cast<s8*>(p10 + 0x17))) - uVar15) <
 					    static_cast<int>((uVar16 ^ static_cast<int>(cVar9)) - uVar16))
 					{
-						*reinterpret_cast<s8*>(self + 0x16B) = cVar9;
-						*reinterpret_cast<float*>(self + 0x180) = *reinterpret_cast<float*>(p12 + 0x2C);
+						*reinterpret_cast<s8*>(p10 + 0x17) = cVar9;
+						*reinterpret_cast<float*>(p10 + 0x2C) = *reinterpret_cast<float*>(p12 + 0x2C);
 					}
-					if (*reinterpret_cast<u8*>(self + 0x166) < *reinterpret_cast<u8*>(p12 + 0x12))
+					if (*reinterpret_cast<u8*>(p10 + 0x12) < *reinterpret_cast<u8*>(p12 + 0x12))
 					{
-						*reinterpret_cast<u8*>(self + 0x166) = *reinterpret_cast<u8*>(p12 + 0x12);
-						*reinterpret_cast<float*>(self + 0x16C) = *reinterpret_cast<float*>(p12 + 0x18);
+						*reinterpret_cast<u8*>(p10 + 0x12) = *reinterpret_cast<u8*>(p12 + 0x12);
+						*reinterpret_cast<float*>(p10 + 0x18) = *reinterpret_cast<float*>(p12 + 0x18);
 					}
-					if (*reinterpret_cast<u8*>(self + 0x167) < *reinterpret_cast<u8*>(p12 + 0x13))
+					if (*reinterpret_cast<u8*>(p10 + 0x13) < *reinterpret_cast<u8*>(p12 + 0x13))
 					{
-						*reinterpret_cast<u8*>(self + 0x167) = *reinterpret_cast<u8*>(p12 + 0x13);
-						*reinterpret_cast<float*>(self + 0x170) = *reinterpret_cast<float*>(p12 + 0x1C);
+						*reinterpret_cast<u8*>(p10 + 0x13) = *reinterpret_cast<u8*>(p12 + 0x13);
+						*reinterpret_cast<float*>(p10 + 0x1C) = *reinterpret_cast<float*>(p12 + 0x1C);
 					}
 				}
 			}

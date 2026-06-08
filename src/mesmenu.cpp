@@ -1019,9 +1019,7 @@ void CMesMenu::onCalc()
             }
 
             if (advance) {
-                if (*(int*)((char*)this + 0x3C90) == 0) {
-                    m_mes.Next();
-                } else {
+                if (*(int*)((char*)this + 0x3C90) != 0) {
                     int wait5 = m_mes.GetWait();
                     if (wait5 != 4) {
                         m_closeReason = 0;
@@ -1048,6 +1046,8 @@ void CMesMenu::onCalc()
                             }
                         }
                     }
+                } else {
+                    m_mes.Next();
                 }
             }
         }

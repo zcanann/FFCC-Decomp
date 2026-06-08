@@ -108,6 +108,7 @@ static const char sPartMngHeapSummaryFmt[] =
 enum PppChunkId {
     kChunkNAME = 0x4E414D45,
     kChunkPDT = 0x50445420,
+    kChunkPDTS = 0x50445453,
     kChunkRSDM = 0x5253444D,
     kChunkRSET = 0x52534554,
     kChunkSHPM = 0x5348504D,
@@ -3858,7 +3859,8 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
             CChunkFile::CChunk childChunk;
             while (pdtFile.GetNextChunk(childChunk)) {
                 pdtFile.PushChunk();
-                if (childChunk.m_id == 0x50445453) { // "PDTS"
+                switch (childChunk.m_id) {
+                case kChunkPDTS: {
                     _pppDataHead* sourceHead = reinterpret_cast<_pppDataHead*>(pdtFile.GetAddress());
                     pppInitData(sourceHead, pppGetSysProgTable(), cachePriority);
 
@@ -3879,7 +3881,9 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
                         pdtSlot->m_envFields[4] = copiedHead->m_shapeGroups;
                     }
                     pdtSlot->m_envFields[0] = reinterpret_cast<unsigned int>(m_pppEnvSt.m_stagePtr);
-                } else if (childChunk.m_id == kChunkRSET) {
+                    break;
+                }
+                case kChunkRSET: {
                     pppModelSt* modelArray = m_pppModelStArr;
                     pppModelSt* targetModel = 0;
 
@@ -3932,7 +3936,9 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
                             }
                         }
                     }
-                } else if (childChunk.m_id == kChunkSSET) {
+                    break;
+                }
+                case kChunkSSET: {
                     pppShapeSt* shapeArray = m_pppShapeStArr;
                     pppShapeSt* targetShape = 0;
 
@@ -3974,6 +3980,8 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
                             }
                         }
                     }
+                    break;
+                }
                 }
                 pdtFile.PopChunk();
             }

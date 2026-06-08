@@ -1658,7 +1658,7 @@ void CMenuPcs::calcWorld()
 
 	CCharaPcs::CHandle* const handle = GetWmWorldHandles(this)[1];
 	CChara::CModel* const model = handle->m_model;
-	const short animState = m_wmWorldState->m_mainState;
+	const int animState = m_wmWorldState->m_mainState;
 	const float animEnd = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0xC0)[0];
 	const float animTime = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0xB4)[0];
 

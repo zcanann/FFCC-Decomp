@@ -393,7 +393,7 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
         memcpy(managerImage, readBuffer, *reinterpret_cast<unsigned int*>(self + 0x1358));
     }
 
-    int offset = 0xA0;
+    unsigned int offset = 0xA0;
     int managerBase = *reinterpret_cast<int*>(self + 0x1354);
     int checksum = 0xE7;
 
@@ -733,12 +733,12 @@ void CMiniGamePcs::GbaThreadMain(void* threadParam)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     unsigned char* param = reinterpret_cast<unsigned char*>(threadParam);
-    unsigned int identity8;
-    unsigned int identity7;
-    unsigned int command8;
-    unsigned int command7;
-    unsigned int command;
     int message;
+    unsigned int command;
+    unsigned int command7;
+    unsigned int command8;
+    unsigned int identity7;
+    unsigned int identity8;
     int ret;
     int step;
     int contextRecvOffset;
@@ -780,31 +780,20 @@ receive_message:
     contextRecvOffset = 0;
     step = 0;
     param[0xC2] = 0;
-    if (message == 5)
+    switch (message)
     {
+    case 3:
+        timeoutTicks = OSMillisecondsToTicks(500);
+        break;
+    case 10:
+        timeoutTicks = OSMillisecondsToTicks(500);
+        break;
+    case 5:
         timeoutTicks = OSMillisecondsToTicks(1000);
-    }
-    else if (message < 5)
-    {
-        if (message == 3)
-        {
-            timeoutTicks = OSMillisecondsToTicks(500);
-        }
-        else
-        {
-            timeoutTicks = OSMillisecondsToTicks(1000);
-        }
-    }
-    else
-    {
-        if (message != 10)
-        {
-            timeoutTicks = OSMillisecondsToTicks(1000);
-        }
-        else
-        {
-            timeoutTicks = OSMillisecondsToTicks(500);
-        }
+        break;
+    default:
+        timeoutTicks = OSMillisecondsToTicks(1000);
+        break;
     }
     startTime = OSGetTime();
     retryLine = 0x22C;
@@ -860,14 +849,14 @@ retry_loop:
         }
         param[0xC4] = 0;
         ret = GBAReset(channel, param + 0xC0);
-        if (ret != 0)
+        if (ret == 0)
         {
-            param[0xBF] = 0;
-            goto receive_message;
+            ret = 3;
+            retryLine = 0x256;
+            goto retry_sleep;
         }
-        ret = 3;
-        retryLine = 0x256;
-        goto retry_sleep;
+        param[0xBF] = 0;
+        goto receive_message;
     case 4:
         if (param[0xC4] != 0)
         {
@@ -906,7 +895,11 @@ retry_loop:
             goto retry_loop;
         }
         ret = GBAGetStatus(channel, param + 0xC0);
-        if (ret == 0 && (param[0xC0] & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_FLAGS_MASK)
+        if (!(ret == 0 && (param[0xC0] & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_FLAGS_MASK))
+        {
+            System.Printf(const_cast<char*>(s_miniGameSourceLineFmt), s_miniGameSourceName, 0x27F);
+        }
+        else
         {
             if (step < 0x19)
             {
@@ -927,13 +920,16 @@ retry_loop:
                         param + 0xC0);
                 }
 
-                if (ret == 0 && (param[0xC0] & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_FLAGS_MASK)
+                if (!(ret == 0 && (param[0xC0] & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_FLAGS_MASK))
+                {
+                    System.Printf(const_cast<char*>(s_miniGameSourceLineFmt), s_miniGameSourceName, 0x2A1);
+                }
+                else
                 {
                     step++;
                     retryLine = 0x2BF;
                     goto retry_loop;
                 }
-                System.Printf(const_cast<char*>(s_miniGameSourceLineFmt), s_miniGameSourceName, 0x2A1);
             }
             else
             {
@@ -943,7 +939,11 @@ retry_loop:
                     goto retry_loop;
                 }
                 ret = GBARead(channel, param + contextRecvOffset + 0x28, param + 0xC0);
-                if (ret == 0 && (param[0xC0] & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_FLAGS_MASK)
+                if (!(ret == 0 && (param[0xC0] & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_FLAGS_MASK))
+                {
+                    System.Printf(const_cast<char*>(s_miniGameSourceLineFmt), s_miniGameSourceName, 0x2B2);
+                }
+                else
                 {
                     contextRecvOffset += 4;
                     if (contextRecvOffset == 0x60)
@@ -957,12 +957,7 @@ retry_loop:
                     retryLine = 0x2BF;
                     goto retry_loop;
                 }
-                System.Printf(const_cast<char*>(s_miniGameSourceLineFmt), s_miniGameSourceName, 0x2B2);
             }
-        }
-        else
-        {
-            System.Printf(const_cast<char*>(s_miniGameSourceLineFmt), s_miniGameSourceName, 0x27F);
         }
 comm_fail:
         System.Printf(const_cast<char*>(s_miniGameRecvStatusFmt), ret,
@@ -987,26 +982,29 @@ comm_fail:
         param[0xC4] = 0;
         *reinterpret_cast<int*>(param + 0x9C) = 1;
         param[0xC3] = 0;
-        *reinterpret_cast<int*>(param + 0x98) = SIProbe(channel);
-        if (*reinterpret_cast<int*>(param + 0x98) != 0x80)
         {
-            if (*reinterpret_cast<int*>(param + 0x98) == 0x40000)
+            unsigned int probe = SIProbe(channel);
+            *reinterpret_cast<unsigned int*>(param + 0x98) = probe;
+            if (probe == 0x80)
             {
-                *reinterpret_cast<int*>(param + 0x94) = 0x40000;
+                retryLine = 0x2CB;
+                goto retry_sleep;
+            }
+            if (probe == 0x40000)
+            {
+                *reinterpret_cast<unsigned int*>(param + 0x94) = probe;
                 param[0xBF] = 0;
             }
             else
             {
-                if (*reinterpret_cast<int*>(param + 0x98) != 8 && *reinterpret_cast<int*>(param + 0x98) != 0x40)
+                if (probe != 8 && probe != 0x40)
                 {
-                    *reinterpret_cast<int*>(param + 0x94) = *reinterpret_cast<int*>(param + 0x98);
+                    *reinterpret_cast<unsigned int*>(param + 0x94) = probe;
                 }
                 param[0xBF] = 1;
             }
-            goto receive_message;
         }
-        retryLine = 0x2CB;
-        goto retry_sleep;
+        goto receive_message;
     case 7:
         if (param[0xC4] != 0)
         {
@@ -1025,7 +1023,7 @@ comm_fail:
         else
         {
             ret = 1;
-            for (int i = 0; i < 100; i++)
+            for (unsigned int i = 0; i < 100; i++)
             {
                 ret = GBAJoyBoot(channel, channel << 1, 2, *reinterpret_cast<u8**>(param + 0x8C),
                                  *reinterpret_cast<int*>(param + 0x90), param + 0xC0);
@@ -1242,58 +1240,58 @@ comm_fail:
             }
 
             ret = GBAGetStatus(channel, param + 0xC0);
-            if (ret == 0 && (param[0xC0] & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_PSF0)
+            if (!(ret == 0 && (param[0xC0] & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_PSF0))
             {
-                command = 0x10000000;
-                ret = GBAWrite(channel, reinterpret_cast<u8*>(&command), param + 0xC0);
-                if (ret != 0)
-                {
-                    System.Printf(const_cast<char*>(s_miniGameSourceLineFmt), s_miniGameSourceName, 0x33C);
-                    goto comm_fail;
-                }
-                startTime = OSGetTime();
-                retryLine = 0x341;
-                step = 1;
+                MiniGameThreadSleepTicks(OSMicrosecondsToTicks(100));
+                retryLine = 0x333;
                 goto retry_loop;
             }
 
-            MiniGameThreadSleepTicks(OSMicrosecondsToTicks(100));
-            retryLine = 0x333;
+            command = 0x10000000;
+            ret = GBAWrite(channel, reinterpret_cast<u8*>(&command), param + 0xC0);
+            if (ret != 0)
+            {
+                System.Printf(const_cast<char*>(s_miniGameSourceLineFmt), s_miniGameSourceName, 0x33C);
+                goto comm_fail;
+            }
+            startTime = OSGetTime();
+            retryLine = 0x341;
+            step = 1;
             goto retry_loop;
         }
 
         if (step == 1)
         {
             ret = GBAGetStatus(channel, param + 0xC0);
-            if ((param[0xC0] & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_FLAGS_MASK)
+            if ((param[0xC0] & GBA_JSTAT_FLAGS_MASK) != GBA_JSTAT_FLAGS_MASK)
             {
-                if ((param[0xC0] & (GBA_JSTAT_SEND | GBA_JSTAT_RECV)) == GBA_JSTAT_SEND)
+                MiniGameThreadSleepTicks(OSMicrosecondsToTicks(100));
+                if (MiniGameThreadTimedOut(startTime, OSMillisecondsToTicks(200)))
                 {
-                    MiniGameThreadSleepTicks(OSMicrosecondsToTicks(10));
-                    ret = GBARead(channel, param + 0xA0, param + 0xC0);
-                    if (ret != 0 || ((*reinterpret_cast<unsigned int*>(param + 0xA0) >> 24) != 0x20))
-                    {
-                        System.Printf(const_cast<char*>(s_miniGameSourceLineFmt), s_miniGameSourceName, 0x372);
-                        goto comm_fail;
-                    }
-                    retryLine = 0x376;
-                    step = 2;
-                    goto retry_loop;
+                    System.Printf(const_cast<char*>(s_miniGameFlagsRetryFmt), channel);
+                    command = 0x10000000;
+                    GBAWrite(channel, reinterpret_cast<u8*>(&command), param + 0xC0);
+                    startTime = OSGetTime();
+                    MiniGameThreadSleepTicks(OSMicrosecondsToTicks(100));
                 }
-                retryLine = 0x367;
+                retryLine = 0x352;
                 goto retry_loop;
             }
 
-            MiniGameThreadSleepTicks(OSMicrosecondsToTicks(100));
-            if (MiniGameThreadTimedOut(startTime, OSMillisecondsToTicks(200)))
+            if ((param[0xC0] & (GBA_JSTAT_SEND | GBA_JSTAT_RECV)) == GBA_JSTAT_SEND)
             {
-                System.Printf(const_cast<char*>(s_miniGameFlagsRetryFmt), channel);
-                command = 0x10000000;
-                GBAWrite(channel, reinterpret_cast<u8*>(&command), param + 0xC0);
-                startTime = OSGetTime();
-                MiniGameThreadSleepTicks(OSMicrosecondsToTicks(100));
+                MiniGameThreadSleepTicks(OSMicrosecondsToTicks(10));
+                ret = GBARead(channel, param + 0xA0, param + 0xC0);
+                if (ret != 0 || ((*reinterpret_cast<int*>(param + 0xA0) >> 24) != 0x20))
+                {
+                    System.Printf(const_cast<char*>(s_miniGameSourceLineFmt), s_miniGameSourceName, 0x372);
+                    goto comm_fail;
+                }
+                retryLine = 0x376;
+                step = 2;
+                goto retry_loop;
             }
-            retryLine = 0x352;
+            retryLine = 0x367;
             goto retry_loop;
         }
 
@@ -1421,7 +1419,7 @@ void CMiniGamePcs::OpenCallback(MgGbaThreadParam* param, void* context)
     }
     else
     {
-        unsigned char swapByte = paramBytes[0x2A];
+        signed char swapByte = paramBytes[0x2A];
         int swapWord = *reinterpret_cast<int*>(paramBytes + 0x34);
 
         paramBytes[0x2A] = self[static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16AE];
@@ -1449,7 +1447,7 @@ void CMiniGamePcs::OpenCallback(MgGbaThreadParam* param, void* context)
 
     if ((!doWrite || wasResync) && GBAGetStatus(static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)), paramBytes + 0xC0) == 0 && paramBytes[0xC0] == '0')
     {
-        int sendTick = baseTick;
+        unsigned int sendTick = baseTick;
         int readTick;
         int readStatus;
 

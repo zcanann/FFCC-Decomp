@@ -796,8 +796,8 @@ void CGObject::objectCollision()
             const bool otherDamage = (other->m_objectFlags & 0xC) != 0;
             const bool thisDamage = (m_objectFlags & 0xC) != 0;
             const bool otherAttack = (other->m_objectFlags & 2) != 0;
-            const bool allowAttachA = ((m_weaponNodeFlags & 1) == 0) || (m_attachOwner != other);
-            const bool allowAttachB = ((other->m_weaponNodeFlags & 1) == 0) || (other->m_attachOwner != this);
+            const bool allowAttachA = (m_weaponNodeFlagBits.m_attached == 0) || (m_attachOwner != other);
+            const bool allowAttachB = (other->m_weaponNodeFlagBits.m_attached == 0) || (other->m_attachOwner != this);
 
             if (((thisAttack && otherDamage) || (thisDamage && otherAttack))
                 && allowAttachA
@@ -826,8 +826,8 @@ void CGObject::objectCollision()
         if (((m_bgColMask & 2) != 0) && ((other->m_bgColMask & 2) != 0)
             && (sZeroFloat < m_bodyEllipsoidRadius)
             && (sZeroFloat < other->m_bodyEllipsoidRadius)) {
-            const bool allowAttachA = ((m_weaponNodeFlags & 1) == 0) || (m_attachOwner != other);
-            const bool allowAttachB = ((other->m_weaponNodeFlags & 1) == 0) || (other->m_attachOwner != this);
+            const bool allowAttachA = (m_weaponNodeFlagBits.m_attached == 0) || (m_attachOwner != other);
+            const bool allowAttachB = (other->m_weaponNodeFlagBits.m_attached == 0) || (other->m_attachOwner != this);
 
             if (allowAttachA && allowAttachB) {
                 const bool usePushTimers = ((m_objectFlags & 0x40) != 0) && ((other->m_objectFlags & 0x40) != 0);

@@ -90,6 +90,8 @@ static const char sCFlatRuntime2FileNameFmt[] = "dvd/cft/%s.cft";
 static const char sCFlatRuntime2DebugFileNameFmt[] = "dvd/cft/%s.cft.dbg";
 static const char sCFlatRuntime2LoadMsg[] = "CFlatRuntime2::Load\n";
 static const char sCFlatRuntime2FileTag[] = "cflat_runtime2.cpp";
+static const char sCFlatRuntime2LayerMissingMsg[] =
+	"layer\x82\xaa\x82\xa0\x82\xe8\x82\xdc\x82\xb9\x82\xf1\x81\x42%s\n";
 static const char sCFlatRuntime2TexturePathFmt[] = "dvd/%s%s.tex";
 
 struct CFlatLayerResource {
@@ -1794,8 +1796,8 @@ void CFlatRuntime2::drawLayer(
 
 	GXSetNumChans(1);
 	GXSetChanCtrl(
-		GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
-	GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPEC);
+		GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
+	GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
 	GXSetChanMatColor(GX_COLOR0A0, *color);
 
 	Mtx44 ortho;

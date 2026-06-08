@@ -2336,20 +2336,18 @@ int CCaravanWork::DelCmdListAndItem(int cmdListIdx)
 		}
 	} else {
 		int numGrouped;
-		short* cmdListSlot = m_commandListExtra + cmdListIdx;
 		if (Game.m_gameWork.m_menuStageMode == 0) {
 			numGrouped = 1;
-		} else if (cmdListSlot[0] == 0) {
+		} else if (m_commandListExtra[cmdListIdx] == 0) {
 			numGrouped = 1;
 		} else {
 			int scanCount = cmdListIdx + 1;
 			int topIdx = cmdListIdx;
 			if (cmdListIdx >= 0) {
 				while (scanCount != 0) {
-					if (cmdListSlot[0] != -1) {
+					if (m_commandListExtra[topIdx] != -1) {
 						break;
 					}
-					cmdListSlot--;
 					topIdx--;
 					scanCount--;
 				}
@@ -2357,14 +2355,14 @@ int CCaravanWork::DelCmdListAndItem(int cmdListIdx)
 
 			numGrouped = 1;
 			scanCount = (short)m_numCmdListSlots - (topIdx + 1);
-			cmdListSlot = m_commandListExtra + topIdx + 1;
+			int nextIdx = topIdx + 1;
 			if ((topIdx + 1) < (short)m_numCmdListSlots) {
 				while (scanCount != 0) {
-					if (cmdListSlot[0] != -1) {
+					if (m_commandListExtra[nextIdx] != -1) {
 						break;
 					}
 					numGrouped++;
-					cmdListSlot++;
+					nextIdx++;
 					scanCount--;
 				}
 			}
@@ -2372,13 +2370,11 @@ int CCaravanWork::DelCmdListAndItem(int cmdListIdx)
 
 		if (numGrouped > 1) {
 			int scanCount = cmdListIdx + 1;
-			cmdListSlot = m_commandListExtra + cmdListIdx;
 			if (cmdListIdx >= 0) {
 				while (scanCount != 0) {
-					if (cmdListSlot[0] != -1) {
+					if (m_commandListExtra[cmdListIdx] != -1) {
 						break;
 					}
-					cmdListSlot--;
 					cmdListIdx--;
 					scanCount--;
 				}

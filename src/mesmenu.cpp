@@ -852,7 +852,7 @@ void CMesMenu::onCalc()
     }
 
     int desiredStageFlag = stageBit != 0;
-    if (m_stageFadeOut != desiredStageFlag) {
+    if (desiredStageFlag != m_stageFadeOut) {
         System.Printf(const_cast<char*>(s_mesMenuOnOffChangedFmt));
         m_stageFadeOut =
             ((unsigned int)__cntlzw(m_stageFadeOut) >> 5) & 0xFF;

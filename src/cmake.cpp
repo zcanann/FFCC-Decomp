@@ -1143,9 +1143,8 @@ void CMenuPcs::CmakeVillageOpen()
  */
 void CMenuPcs::CmakeResultDraw1()
 {
-    short mode = CmakeState(this)->m_mode;
     float alpha = CalcCmakeFadeAlpha(this);
-    float popupAlpha = (mode == 0) ? 1.0f : alpha;
+    float popupAlpha = (CmakeState(this)->m_mode == 0) ? 1.0f : alpha;
 
     DrawWMFrame0(1, 1.0f);
 
@@ -1185,7 +1184,7 @@ void CMenuPcs::CmakeResultDraw1()
 
     DrawCmakePreviewChara(this);
 
-    if (mode == 0) {
+    if (CmakeState(this)->m_mode == 0) {
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
         GXColor panelCol;
@@ -1216,7 +1215,7 @@ void CMenuPcs::CmakeResultDraw1()
     DrawCmakeTitle(7, 1.0f, alpha);
 
     float textAlpha = alpha;
-    if (mode == 0) {
+    if (CmakeState(this)->m_mode == 0) {
         textAlpha = 1.0f;
     }
     {

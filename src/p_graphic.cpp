@@ -742,7 +742,7 @@ void CGraphicPcs::drawBar()
 
     CSystem::COrder* order = System.GetFirstOrder();
     const int orderCount = System.m_orderCount;
-    const int lastOrder = orderCount - 1;
+    const unsigned int lastOrder = orderCount - 1;
     float x = kDebugBarLeft;
     int hue = 0;
     u32 y = 0x10;

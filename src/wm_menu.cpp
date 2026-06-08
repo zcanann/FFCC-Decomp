@@ -361,6 +361,7 @@ int gWmLifeYOffsetSplineCount = 3;
 float* gWmLifeYOffsetSpline = gWmLifeYOffsetSplinePoints;
 extern "C" const char s_wm_menu_cpp[] = "wm_menu.cpp";
 static const char s_SetCMakeEnd_chan_pctd_cur_pctd_801DC3B4[] = "SetCMakeEnd : chan = %d  cur = %d\n";
+static const char s_chan_pctd_cur_pctd_801DC3D8[] = "chan = %d  cur = %d\n";
 static const char s_ClrCMakeFlg_chan_pctd_cur_pctd_801DC390[] = "ClrCMakeFlg : chan = %d  cur = %d\n";
 static const char s__s__d___Error_WM_menu_no_error___801dc424[] = "%s(%d): Error:WM menu no error(%d)\n";
 static const char s__s__d___Error_function_code_not_f_801dc3ec[] = "%s(%d): Error:function code not found(%d)\n";
@@ -1975,7 +1976,7 @@ void CMenuPcs::CalcDiaryMenu()
 		break;
 	case 4:
 		if (((m_wmWorldState->m_mainState != 0) || bytes[0x12] != 0) &&
-		    m_wmWorldState->m_mainState < 4) {
+		    m_wmWorldState->m_mainState <= 3) {
 			if (Game.m_gameWork.m_chaliceElement != m_crystalElem) {
 				SetCrystalCageAttr();
 			}
@@ -5016,7 +5017,7 @@ void CMenuPcs::DrawCMakeMenu()
 		if (m_wmWorldState->m_frameCounter >= 10) {
 			m_wmWorldState->m_mainState++;
 			m_wmWorldState->m_frameCounter = 0;
-			if (m_wmWorldState->m_mainState > 4) {
+			if (m_wmWorldState->m_mainState >= 5) {
 				m_wmWorldState->m_changeRequest = m_wmWorldState->m_nextMenuMode;
 				m_wmWorldState->m_nextMenuMode = 0;
 			}
@@ -5024,7 +5025,7 @@ void CMenuPcs::DrawCMakeMenu()
 	} else {
 		if (m_wmWorldState->m_delay != 0) {
 			m_wmWorldState->m_delay--;
-			if (m_wmWorldState->m_delay < 1) {
+			if (m_wmWorldState->m_delay <= 0) {
 				m_wmWorldState->m_mainState++;
 				m_wmWorldState->m_frameCounter = 0;
 				Sound.PlaySe(0x31 + static_cast<int>(static_cast<unsigned int>(static_cast<int>(m_wmWorldState->m_nextMenuMode)) >> 31), 0x40, 0x7F, 0);
@@ -8742,7 +8743,7 @@ void CMenuPcs::CalcCharaSelect()
 
 			if (entry.m_connected == 0) {
 				GbaQue.ClrCmakeInfo(i);
-				if (entry.m_cmakeReady != 0) {
+				if (entry.m_cmakeReady == 1) {
 					entry.m_cmakeReady = 0;
 				} else if ((pendingMask & (1u << static_cast<unsigned int>(entry.m_currentSlot))) != 0) {
 					continue;
@@ -8752,8 +8753,8 @@ void CMenuPcs::CalcCharaSelect()
 				    entry.m_cmakeReady == 0) {
 					CCharaPcs::CHandle* const handle = GetWmWorldHandles(this)[entry.m_currentSlot];
 					if (handle->IsModelLoaded(1) && handle->m_charaKind != 3) {
-						if (static_cast<unsigned int>(System.m_execParam) > 2) {
-							System.Printf(const_cast<char*>(s_SetCMakeEnd_chan_pctd_cur_pctd_801DC3B4), i,
+						if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+							System.Printf(const_cast<char*>(s_chan_pctd_cur_pctd_801DC3D8), i,
 							              static_cast<int>(entry.m_currentSlot));
 						}
 						const int loadSlot = static_cast<int>(entry.m_currentSlot);
@@ -8845,7 +8846,7 @@ void CMenuPcs::CalcCharaSelect()
 		bool requestFinalize = false;
 		for (int i = 3; i >= 0; i--) {
 			WmCharaSelectEntry& entry = GetWmCharaSelectEntries(this)[i];
-			if (entry.m_cmakeReady != 0) {
+			if (entry.m_cmakeReady == 1) {
 				GbaCMakeInfoRaw info;
 				entry.m_confirmed = 1;
 				entry.m_cmakePending = 0;
@@ -12371,7 +12372,7 @@ void CMenuPcs::BindMcObj()
 			EffectInfo* effect = &m_effectWork[slot];
 			if (slot == 5 && static_cast<int>(effectNo) < 0x13) {
 				effect++;
-			} else if (slot > 0x10 && slot < 0x15 && static_cast<int>(effectNo) > 0x19) {
+			} else if (slot >= 0x11 && slot <= 0x14 && static_cast<int>(effectNo) > 0x19) {
 				effect += 4;
 			}
 
@@ -12429,7 +12430,7 @@ void CMenuPcs::BindMcObj()
 		EffectInfo* effect = &m_effectWork[slot];
 		if (slot == 5 && static_cast<int>(effectNo) < 0x13) {
 			effect++;
-		} else if (slot > 0x10 && slot < 0x15 && static_cast<int>(effectNo) > 0x19) {
+		} else if (slot >= 0x11 && slot <= 0x14 && static_cast<int>(effectNo) > 0x19) {
 			effect += 4;
 		}
 

@@ -318,9 +318,9 @@ void CGObject::onCreate()
 
     m_stateFlags0Bits.unk3 = 0;
 
-    m_bgCollisionQtrn.x = 0.0f;
-    m_bgCollisionQtrn.y = 0.0f;
     m_bgCollisionQtrn.z = 0.0f;
+    m_bgCollisionQtrn.y = 0.0f;
+    m_bgCollisionQtrn.x = 0.0f;
     m_bgCollisionQtrn.w = 1.0f;
 
     m_shieldNodeFlagBits.m_bit10 = 0;
@@ -367,9 +367,9 @@ void CGObject::onCreate()
     m_lastMapIdHit = 0;
     m_lastMapIdExtra = 0;
     m_weaponNodeFlagBits.m_prg = 0;
-    m_extraMoveVec.x = 0.0f;
-    m_extraMoveVec.y = 0.0f;
     m_extraMoveVec.z = 0.0f;
+    m_extraMoveVec.y = 0.0f;
+    m_extraMoveVec.x = 0.0f;
     m_shieldNodeFlagBits.m_bit01 = 0;
 
     int animStateOffset = 0;

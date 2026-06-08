@@ -1203,27 +1203,25 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
     GXLoadNrmMtxImm(nrm, 0);
 
     if ((bump != nullptr) && (bump->m_hasTexture != 0)) {
-        Mtx* bumpMat0 = &m_bumpTexMtx0;
-        Mtx* bumpMat1 = &m_bumpTexMtx1;
         Mtx texMtx;
 
         if (bump->m_useViewSpace == 1) {
             PSMTXTrans(texMtx, kLightHalf, kLightHalf, kLightZero);
-            PSMTXConcat(texMtx, nrm, *bumpMat0);
+            PSMTXConcat(texMtx, nrm, m_bumpTexMtx0);
             PSMTXScale(texMtx, kBumpTexMtxScale, kBumpTexMtxScale, kBumpTexMtxScale);
-            PSMTXConcat(*bumpMat0, texMtx, *bumpMat0);
+            PSMTXConcat(m_bumpTexMtx0, texMtx, m_bumpTexMtx0);
             Mtx posOnly;
             PSMTXCopy(out, posOnly);
             posOnly[0][3] = kLightZero;
             posOnly[1][3] = kLightZero;
             posOnly[2][3] = kLightZero;
-            PSMTXConcat(posOnly, texMtx, *bumpMat1);
+            PSMTXConcat(posOnly, texMtx, m_bumpTexMtx1);
         } else {
             PSMTXIdentity(nrm);
             PSMTXTrans(texMtx, kLightHalf, kLightHalf, kLightZero);
-            PSMTXConcat(texMtx, nrm, *bumpMat0);
+            PSMTXConcat(texMtx, nrm, m_bumpTexMtx0);
             PSMTXScale(texMtx, kBumpTexMtxScale, kBumpTexMtxScale, kBumpTexMtxScale);
-            PSMTXConcat(*bumpMat0, texMtx, *bumpMat0);
+            PSMTXConcat(m_bumpTexMtx0, texMtx, m_bumpTexMtx0);
 
             float camX = CameraPosX();
             float camZ = CameraPosZ();

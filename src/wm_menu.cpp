@@ -1646,9 +1646,8 @@ void CMenuPcs::destroyWorld()
 		THPSimpleLoadStop();
 		THPSimpleClose();
 		THPSimpleQuit();
-		bool bVar1 = m_wmWorkBuffer != 0;
-		if (bVar1) {
-			if (bVar1) {
+		if (m_wmWorkBuffer != 0) {
+			if (m_wmWorkBuffer != 0) {
 				Memory.Free(m_wmWorkBuffer);
 				m_wmWorkBuffer = 0;
 			}

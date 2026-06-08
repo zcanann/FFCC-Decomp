@@ -763,16 +763,17 @@ void CGCharaObj::onFramePreCalc()
 	}
 
 	m_pushScale = 1.0f;
-	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
-	if (*reinterpret_cast<unsigned short*>(script + 0x4E) != 0) {
+#define CHARA_SCRIPT (reinterpret_cast<unsigned char*>(m_scriptHandle))
+	if (*reinterpret_cast<unsigned short*>(CHARA_SCRIPT + 0x4E) != 0) {
 		m_pushScale *= (static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x34)) * 0.01f) + 1.0e-07f;
 	}
-	if (*reinterpret_cast<unsigned short*>(script + 0x4C) != 0) {
+	if (*reinterpret_cast<unsigned short*>(CHARA_SCRIPT + 0x4C) != 0) {
 		m_pushScale *= (static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x36)) * 0.01f) + 1.0e-07f;
 	}
-	if (*reinterpret_cast<unsigned short*>(script + 0x40) != 0) {
+	if (*reinterpret_cast<unsigned short*>(CHARA_SCRIPT + 0x40) != 0) {
 		m_pushScale *= (static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x40)) * 0.01f) + 1.0e-07f;
 	}
+#undef CHARA_SCRIPT
 	float pushScale = 1.5f;
 	if (m_pushScale < 1.5f) {
 		pushScale = m_pushScale;
@@ -791,6 +792,7 @@ void CGCharaObj::onFramePreCalc()
 			break;
 	}
 
+	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
 	if (*reinterpret_cast<unsigned short*>(script + 0x3E) != 0 ||
 	    *reinterpret_cast<unsigned short*>(script + 0x50) != 0 ||
 	    *reinterpret_cast<unsigned short*>(script + 0x44) != 0) {
@@ -828,7 +830,7 @@ void CGCharaObj::onFramePreCalc()
 	if ((DbgMenuPcs.GetDbgFlagsRaw() & 1) != 0) {
 		m_aStarGroupId = static_cast<unsigned short>(AStar.calcSpecialPolygonGroup(&m_worldPosition));
 	} else {
-		m_aStarGroupId = static_cast<unsigned short>(static_cast<unsigned char>(m_lastBgGroup));
+		m_aStarGroupId = static_cast<unsigned short>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0xE8));
 	}
 }
 
@@ -950,18 +952,26 @@ void CGCharaObj::onFrameStat()
 					break;
 				case 2:
 					if (m_subFrame == 0) {
-						for (int i = 0; i < 0x16; i++) {
-							if ((8U & (1U << i)) != 0) {
-								CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
+						{
+							unsigned char* slot = reinterpret_cast<unsigned char*>(this);
+							int i = 0;
+							for (; i < 0x16; i++, slot += 4) {
+								if ((8U & (1U << i)) != 0) {
+									CFlatRuntime2Storage().EndParticleSlot(*reinterpret_cast<int*>(slot + 0x564), 1);
+								}
 							}
 						}
 						reqAnim(m_unk558, 0, 0);
 					}
 
 					if (m_itemId != 0 && m_subFrame == 10) {
-						for (int i = 0; i < 0x16; i++) {
-							if ((2U & (1U << i)) != 0) {
-								CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
+						{
+							unsigned char* slot = reinterpret_cast<unsigned char*>(this);
+							int i = 0;
+							for (; i < 0x16; i++, slot += 4) {
+								if ((2U & (1U << i)) != 0) {
+									CFlatRuntime2Storage().EndParticleSlot(*reinterpret_cast<int*>(slot + 0x564), 1);
+								}
 							}
 						}
 						putParticleFromItem(m_itemId, 2, m_particleSlots[1], &CharaObjComboCenter(this));
@@ -976,9 +986,13 @@ void CGCharaObj::onFrameStat()
 		case 4:
 			if (m_stateFrame == 0) {
 				Sound.StopSe3DGroup(m_particleId);
-				for (int i = 0; i < 0x16; i++) {
-					if ((0x3BU & (1U << i)) != 0) {
-						CFlatRuntime2Storage().DeleteParticleSlot(m_particleSlots[i], 1);
+				{
+					unsigned char* slot = reinterpret_cast<unsigned char*>(this);
+					int i = 0;
+					for (; i < 0x16; i++, slot += 4) {
+						if ((0x3BU & (1U << i)) != 0) {
+							CFlatRuntime2Storage().DeleteParticleSlot(*reinterpret_cast<int*>(slot + 0x564), 1);
+						}
 					}
 				}
 				reqAnim(4, 0, 0);
@@ -996,9 +1010,13 @@ void CGCharaObj::onFrameStat()
 				}
 
 				Sound.StopSe3DGroup(m_particleId);
-				for (int i = 0; i < 0x16; i++) {
-					if ((0x3BU & (1U << i)) != 0) {
-						CFlatRuntime2Storage().DeleteParticleSlot(m_particleSlots[i], 1);
+				{
+					unsigned char* slot = reinterpret_cast<unsigned char*>(this);
+					int i = 0;
+					for (; i < 0x16; i++, slot += 4) {
+						if ((0x3BU & (1U << i)) != 0) {
+							CFlatRuntime2Storage().DeleteParticleSlot(*reinterpret_cast<int*>(slot + 0x564), 1);
+						}
 					}
 				}
 				reqAnim(0x1D, 0, 0);
@@ -1012,9 +1030,13 @@ void CGCharaObj::onFrameStat()
 		case 9:
 			if (m_subState == 0 && m_subFrame == 0) {
 				Sound.StopSe3DGroup(m_particleId);
-				for (int i = 0; i < 0x16; i++) {
-					if ((0x3BU & (1U << i)) != 0) {
-						CFlatRuntime2Storage().DeleteParticleSlot(m_particleSlots[i], 1);
+				{
+					unsigned char* slot = reinterpret_cast<unsigned char*>(this);
+					int i = 0;
+					for (; i < 0x16; i++, slot += 4) {
+						if ((0x3BU & (1U << i)) != 0) {
+							CFlatRuntime2Storage().DeleteParticleSlot(*reinterpret_cast<int*>(slot + 0x564), 1);
+						}
 					}
 				}
 				reqAnim(6, 1, 0);
@@ -1033,9 +1055,13 @@ void CGCharaObj::onFrameStat()
 			case 0:
 				if (m_subFrame == 0) {
 					Sound.StopSe3DGroup(m_particleId);
-					for (int i = 0; i < 0x16; i++) {
-						if ((0x3BU & (1U << i)) != 0) {
-							CFlatRuntime2Storage().DeleteParticleSlot(m_particleSlots[i], 1);
+					{
+						unsigned char* slot = reinterpret_cast<unsigned char*>(this);
+						int i = 0;
+						for (; i < 0x16; i++, slot += 4) {
+							if ((0x3BU & (1U << i)) != 0) {
+								CFlatRuntime2Storage().DeleteParticleSlot(*reinterpret_cast<int*>(slot + 0x564), 1);
+							}
 						}
 					}
 					reqAnim(0x1A, 0, 0);
@@ -2243,8 +2269,8 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 				setSta(4, 0);
 				Sound.StopSe3DGroup(m_particleId);
 				{
-					int i = 0;
 					unsigned char* slot = reinterpret_cast<unsigned char*>(this);
+					int i = 0;
 					for (; i < 0x16; i++, slot += 4) {
 						if (((1U << i) & 0x3bU) != 0) {
 							CFlatRuntime2Storage().DeleteParticleSlot(*reinterpret_cast<int*>(slot + 0x564), 1);
@@ -2318,8 +2344,8 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			putHitParticleFromItem(sourceObj, amount);
 			Sound.StopSe3DGroup(m_particleId);
 			{
-				int i = 0;
 				unsigned char* slot = reinterpret_cast<unsigned char*>(this);
+				int i = 0;
 				for (; i < 0x16; i++, slot += 4) {
 					if (((1U << i) & 0x3bU) != 0) {
 						CFlatRuntime2Storage().DeleteParticleSlot(*reinterpret_cast<int*>(slot + 0x564), 1);
@@ -2348,8 +2374,8 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			putHitParticleFromItem(sourceObj, amount);
 			Sound.StopSe3DGroup(m_particleId);
 			{
-				int i = 0;
 				unsigned char* slot = reinterpret_cast<unsigned char*>(this);
+				int i = 0;
 				for (; i < 0x16; i++, slot += 4) {
 					if (((1U << i) & 0x3bU) != 0) {
 						CFlatRuntime2Storage().DeleteParticleSlot(*reinterpret_cast<int*>(slot + 0x564), 1);

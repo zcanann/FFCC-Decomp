@@ -2414,9 +2414,9 @@ void CMenuPcs::DrawUniteList()
 		const int itemId = caravan->m_commandListExtra[s_UniteTop[i]];
 		const char* text = GetStrikeListName(itemId);
 		const float width = static_cast<float>(font->GetWidth(text));
-		font->SetPosX((static_cast<float>(panel->width) - width) *
-		                  static_cast<float>(kCmdMenuHalfD) +
-		              static_cast<float>(panel->x));
+		font->SetPosX(static_cast<float>((static_cast<double>(panel->width) - width) *
+		                  kCmdMenuHalfD +
+		              static_cast<double>(panel->x)));
 		font->SetPosY(static_cast<float>(((static_cast<float>(panel->height) - kCmdMenuTextLineHeightD) *
 		                                      kCmdMenuHalfD +
 		                                  static_cast<float>(panel->y)) -

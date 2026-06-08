@@ -1504,12 +1504,53 @@ void CGObject::update()
             modelMtx[2][3] = tz;
         } else if ((m_objectFlags & 0x90) != 0 && (m_stateFlags0 & 0x80) != 0) {
             if (m_groundHitOffset.x != sZeroFloat || m_groundHitOffset.z != sZeroFloat) {
-                m_radiusCtrl.y += -0.2f * m_groundHitOffset.x;
-                m_radiusCtrlVel.x += -0.2f * m_groundHitOffset.z;
+                m_radiusCtrl.y += 0.2f * m_groundHitOffset.x;
+                m_radiusCtrlVel.x += 0.2f * m_groundHitOffset.z;
             }
 
-            m_radiusCtrlVel.y += sBgAttrNormal * (m_radiusCtrl.y - m_radiusCtrlVel.y);
-            m_groundFriction += sBgAttrNormal * (m_radiusCtrlVel.x - m_groundFriction);
+            const float swayDx = m_radiusCtrlVel.x - m_groundFriction;
+            const float swayDz = m_radiusCtrl.y - m_radiusCtrlVel.y;
+            m_radiusCtrlVel.y += sBgAttrNormal * swayDz;
+            m_groundFriction += sBgAttrNormal * swayDx;
+
+            Vec swayDir;
+            PSVECNormalize(reinterpret_cast<Vec*>(&m_radiusCtrlVel.y), &swayDir);
+            CVector swayUp(sZeroFloat, sAnimFrameOffset, sZeroFloat);
+            const float swayDot = PSVECDotProduct(&swayDir, swayUp);
+            if (swayDot < 0.9999f) {
+                const float swayAngle = acosf(swayDot);
+                CVector swayAxisUp(sZeroFloat, sAnimFrameOffset, sZeroFloat);
+                Vec swayAxis;
+                PSVECCrossProduct(&swayDir, swayAxisUp, &swayAxis);
+                Mtx swayMtx;
+                PSMTXRotAxisRad(swayMtx, &swayAxis, -swayAngle);
+
+                const float mtx0 = modelMtx[0][3];
+                const float mtx1 = modelMtx[1][3];
+                const float mtx2 = modelMtx[2][3];
+                CVector swayZero0(sZeroFloat, sZeroFloat, sZeroFloat);
+                modelMtx[0][3] = swayZero0.x;
+                CVector swayZero1(sZeroFloat, sZeroFloat, sZeroFloat);
+                modelMtx[1][3] = swayZero1.y;
+                CVector swayZero2(sZeroFloat, sZeroFloat, sZeroFloat);
+                modelMtx[2][3] = swayZero2.z;
+                PSMTXConcat(swayMtx, modelMtx, modelMtx);
+                const float swayTan = tan(-swayAngle);
+                modelMtx[0][3] = mtx0;
+                modelMtx[2][3] = mtx2;
+                modelMtx[1][3] = mtx1 - 2.0f * swayTan;
+            }
+
+            float swayClamp = swayDot < sAnimFrameOffset ? swayDot : sAnimFrameOffset;
+            swayClamp = swayClamp < sZeroFloat ? sZeroFloat : swayClamp;
+            const float swaySin = sinf(swayClamp);
+            const float swayCos = cosf(swayClamp);
+            const float swayRy = m_radiusCtrl.y;
+            const float swayRx = m_radiusCtrlVel.x;
+            m_radiusCtrl.y = swayCos * swayRy - swaySin * swayRx;
+            m_radiusCtrlVel.x = swaySin * swayRy + swayCos * swayRx;
+            m_radiusCtrl.y *= 0.9f;
+            m_radiusCtrlVel.x *= 0.9f;
         }
     }
 

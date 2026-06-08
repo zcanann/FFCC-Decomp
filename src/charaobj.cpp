@@ -637,7 +637,7 @@ void CGCharaObj::onFramePostCalc()
 		if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
 		    (i == 0 || i == 4 || i == 9 || i == 3) &&
 		    statusValue > 0) {
-			int slot = m_animStateMisc;
+			int slot = static_cast<signed char>(m_animStateMisc);
 			unsigned short padMask = 0;
 			bool useDebugPad = (Pad.m_debugPadLock != 0) || ((slot == 0) && (Pad.m_debugPadPort != -1));
 			if (!useDebugPad) {

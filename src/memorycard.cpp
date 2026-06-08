@@ -1503,12 +1503,12 @@ void CMemoryCardMan::SetLoadData()
 
     for (unsigned int i = 0; i < 4; i++)
     {
-        CCaravanWork* wmWork = &Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[i]];
-        if (wmWork->m_shopState == 0)
+        int idx = Game.m_gameWork.m_wmBackupParams[i];
+        if (Game.m_caravanWorkArr[idx].m_shopState == 0)
         {
             Game.m_gameWork.m_wmBackupParams[i] = -1;
         }
-        if (wmWork->m_shopBusyFlag != 0)
+        if (Game.m_caravanWorkArr[idx].m_shopBusyFlag != 0)
         {
             Game.m_gameWork.m_wmBackupParams[i] = -1;
         }

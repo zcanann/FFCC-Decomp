@@ -102,6 +102,27 @@ struct CFlatLayerResource {
 
 STATIC_ASSERT(sizeof(CFlatLayerResource) * kFlatLayerResourceCount == 0x60);
 
+struct CFlatSaveHeader {
+	float m_positionX;
+	float m_positionY;
+	float m_positionZ;
+	float m_targetX;
+	float m_targetY;
+	float m_targetZ;
+	float m_fov;
+	float m_rotate;
+};
+
+struct CFlatSaveObject {
+	u32 m_particleId;
+	float m_positionX;
+	float m_positionY;
+	float m_positionZ;
+	float m_rotateY;
+	float m_unk188;
+	float m_bodyRadius;
+};
+
 static inline void InitFlatObjectSlot(CGBaseObj* object, u16 particleId)
 {
 	object->m_isActiveBits.active = 0;
@@ -409,6 +430,12 @@ static inline u32 Swap32(u32 value)
 static inline u32 SwapF32(float value)
 {
 	return __lwbrx(&value, 0);
+}
+
+static inline float SwapToF32(float value)
+{
+	u32 swapped = __lwbrx(&value, 0);
+	return *reinterpret_cast<float*>(&swapped);
 }
 
 } // namespace
@@ -1334,32 +1361,28 @@ void CFlatRuntime2::Calc()
 
 		u32* saveData = new (getStage(), const_cast<char*>(sCFlatRuntime2FileTag), 0x36F) u32[0x3FF];
 
-		u32 headerX = SwapF32(CameraPcs.m_positionX);
-		u32 headerY = SwapF32(CameraPcs.m_positionY);
-		u32 headerZ = SwapF32(CameraPcs.m_positionZ);
-		u32 headerTargetX = SwapF32(CameraPcs.m_targetX);
-		u32 headerTargetY = SwapF32(CameraPcs.m_targetY);
-		u32 headerTargetZ = SwapF32(CameraPcs.m_targetZ);
-		u32 headerFov = SwapF32(CameraPcs.m_fov);
-		u32 headerRotate = SwapF32((kCFlatAngleHalfTurnDeg * CameraPcs.m_zRotate) / kCFlatAnglePi);
+		CFlatSaveHeader header;
+		header.m_positionX = SwapToF32(CameraPcs.m_positionX);
+		header.m_positionY = SwapToF32(CameraPcs.m_positionY);
+		header.m_positionZ = SwapToF32(CameraPcs.m_positionZ);
+		header.m_targetX = SwapToF32(CameraPcs.m_targetX);
+		header.m_targetY = SwapToF32(CameraPcs.m_targetY);
+		header.m_targetZ = SwapToF32(CameraPcs.m_targetZ);
+		header.m_fov = SwapToF32(CameraPcs.m_fov);
+		header.m_rotate = SwapToF32((kCFlatAngleHalfTurnDeg * CameraPcs.m_zRotate) / kCFlatAnglePi);
 
 		u32* objectData = saveData + 8;
 
-		saveData[0] = headerX;
-		saveData[1] = headerY;
-		saveData[2] = headerZ;
-		saveData[3] = headerTargetX;
-		saveData[4] = headerTargetY;
-		saveData[5] = headerTargetZ;
-		saveData[6] = headerFov;
-		saveData[7] = headerRotate;
+		saveData[0] = reinterpret_cast<u32*>(&header)[0];
+		saveData[1] = reinterpret_cast<u32*>(&header)[1];
+		saveData[2] = reinterpret_cast<u32*>(&header)[2];
+		saveData[3] = reinterpret_cast<u32*>(&header)[3];
+		saveData[4] = reinterpret_cast<u32*>(&header)[4];
+		saveData[5] = reinterpret_cast<u32*>(&header)[5];
+		reinterpret_cast<float*>(saveData)[6] = header.m_fov;
+		reinterpret_cast<float*>(saveData)[7] = header.m_rotate;
 
-		u32 lastX = 0;
-		u32 lastY = 0;
-		u32 lastZ = 0;
-		u32 lastRotY = 0;
-		u32 lastUnknown188 = 0;
-		u32 lastBodyRadius = 0;
+		CFlatSaveObject record;
 
 		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
 			if (object->m_charaModelHandle == 0) {
@@ -1371,29 +1394,31 @@ void CFlatRuntime2::Calc()
 				PSVECAdd(&pos, &object->m_attachOwner->m_worldPosition, &pos);
 			}
 
-			objectData[0] = Swap32(static_cast<u32>(static_cast<int>(object->m_particleId)));
-			lastX = SwapF32(pos.x);
-			lastY = SwapF32(pos.y);
-			lastZ = SwapF32(pos.z);
-			lastRotY = SwapF32(object->m_rotBaseY);
-			lastUnknown188 = SwapF32(object->unk_0x188);
-			lastBodyRadius = SwapF32(object->m_bodyEllipsoidRadius);
-			objectData[1] = lastX;
-			objectData[2] = lastY;
-			objectData[3] = lastZ;
-			objectData[4] = lastRotY;
-			objectData[5] = lastUnknown188;
-			objectData[6] = lastBodyRadius;
+			record.m_particleId = Swap32(static_cast<u32>(static_cast<int>(object->m_particleId)));
+			record.m_positionX = SwapToF32(pos.x);
+			record.m_positionY = SwapToF32(pos.y);
+			record.m_positionZ = SwapToF32(pos.z);
+			record.m_rotateY = SwapToF32(object->m_rotBaseY);
+			record.m_unk188 = SwapToF32(object->unk_0x188);
+			record.m_bodyRadius = SwapToF32(object->m_bodyEllipsoidRadius);
+			objectData[0] = reinterpret_cast<u32*>(&record)[0];
+			objectData[1] = reinterpret_cast<u32*>(&record)[1];
+			objectData[2] = reinterpret_cast<u32*>(&record)[2];
+			objectData[3] = reinterpret_cast<u32*>(&record)[3];
+			objectData[4] = reinterpret_cast<u32*>(&record)[4];
+			objectData[5] = reinterpret_cast<u32*>(&record)[5];
+			objectData[6] = reinterpret_cast<u32*>(&record)[6];
 			objectData += 7;
 		}
 
-		objectData[0] = Swap32(0xFFFFFFFF);
-		objectData[1] = lastX;
-		objectData[2] = lastY;
-		objectData[3] = lastZ;
-		objectData[4] = lastRotY;
-		objectData[5] = lastUnknown188;
-		objectData[6] = lastBodyRadius;
+		record.m_particleId = Swap32(0xFFFFFFFF);
+		objectData[0] = reinterpret_cast<u32*>(&record)[0];
+		objectData[1] = reinterpret_cast<u32*>(&record)[1];
+		objectData[2] = reinterpret_cast<u32*>(&record)[2];
+		objectData[3] = reinterpret_cast<u32*>(&record)[3];
+		objectData[4] = reinterpret_cast<u32*>(&record)[4];
+		objectData[5] = reinterpret_cast<u32*>(&record)[5];
+		objectData[6] = reinterpret_cast<u32*>(&record)[6];
 		delete[] saveData;
 	}
 

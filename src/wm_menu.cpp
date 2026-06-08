@@ -3766,7 +3766,8 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 
 	unsigned int loadedCount = 0;
 	for (int i = 0; i < 8; i++) {
-		CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[i];
+		const int handleIdx = i + 0x20;
+		CCharaPcs::CHandle* const handle = m_wm.m_handles[handleIdx];
 		if (handle->m_charaKind != 3 && handle->IsLoadModelASyncCompleted() != 0) {
 			loadedCount++;
 		}

@@ -2276,7 +2276,9 @@ void CGPartyObj::statCharge()
 				if (FLOAT_80331a78 != diff.y && FLOAT_80331a78 != horiz) {
 					float ang = -static_cast<float>(atan2(diff.y, horiz));
 					float clamped = -angLimit;
-					if (-angLimit <= ang) {
+					if (ang < -angLimit) {
+						clamped = -angLimit;
+					} else {
 						clamped = ang;
 						if (angLimit < ang) {
 							clamped = angLimit;

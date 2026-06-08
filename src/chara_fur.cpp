@@ -1140,8 +1140,8 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 			if (doPaint != 0) {
 				int particleNo = 0;
 				int seId = 0;
-				int emitParticle = ((System.m_frameCounter & 1) == 0);
-				int playGate = ((System.m_frameCounter & 3) == 0);
+				int emitParticle = ((static_cast<int>(System.m_frameCounter) % 2) == 0);
+				int playGate = ((static_cast<int>(System.m_frameCounter) % 4) == 0);
 				_GXColor particleColor = CColor(centerBefore).color;
 				switch (radarType) {
 				case 0:

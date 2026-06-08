@@ -3759,11 +3759,11 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	}
 	memset(smithIndices, 0xFF, 0x40);
 
-	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
+	unsigned int* foodBasePtr = &Game.m_scriptFoodBase[channel];
 
 	char smithCount = 0;
 	for (int i = 0; i < 0x40; i++) {
-		if (reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_inventoryItems[i] >= 401) {
+		if (reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_inventoryItems[i] >= 401) {
 			smithIndices[smithCount++] = static_cast<unsigned char>(i);
 		}
 	}
@@ -3779,7 +3779,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	totalSize += 1;
 
 	for (int i = 0; i < 0x40; i++) {
-		const int itemId = caravanWork->m_inventoryItems[i];
+		const int itemId = reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_inventoryItems[i];
 		if (itemId >= 401) {
 			unsigned int itemBuf[0xE];
 			memset(itemBuf, 0, sizeof(itemBuf));
@@ -3787,7 +3787,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 			const int itemBase = Game.unkCFlatData0[2] + itemId * 0x48;
 			int price = static_cast<int>(
 				static_cast<float>(static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(itemBase + 0x24))) *
-				static_cast<float>(static_cast<double>(caravanWork->m_shopParam) / 100.0));
+				static_cast<float>(static_cast<double>(reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_shopParam) / 100.0));
 
 			itemBuf[0] = SwapU32(static_cast<unsigned int>(price));
 
@@ -3843,7 +3843,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	}
 
 	for (int i = 0; i < 4; i++) {
-		unsigned int value = __lwbrx(reinterpret_cast<unsigned int*>(&caravanWork->m_shopArgs[i]), 0);
+		unsigned int value = __lwbrx(reinterpret_cast<unsigned int*>(&reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_shopArgs[i]), 0);
 		memcpy(writePtr, &value, 4);
 		writePtr += 4;
 		totalSize += 4;

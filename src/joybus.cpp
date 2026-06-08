@@ -7900,7 +7900,7 @@ int JoyBus::SetTmpArti(int portIndex, int param3, int param4)
     unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
     cmdBytes[0] = 0x20;
     cmdBytes[1] = static_cast<unsigned char>(param3);
-    cmdBytes[2] = static_cast<unsigned char>(param4 + 'a');
+    cmdBytes[2] = static_cast<unsigned char>(param4 - 0x9f);
     unsigned int word = cmd;
     unsigned int port;
 

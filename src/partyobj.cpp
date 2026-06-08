@@ -2082,12 +2082,14 @@ void CGPartyObj::enableDamageCol(int onOff)
  */
 int CGPartyObj::getReplaceStat(int state)
 {
-	if (state != 7) {
-		if (state < 7 && state == -20) {
-			state = -1;
-		} else {
-			return CGCharaObj::getReplaceStat(state);
-		}
+	switch (state) {
+	case 7:
+		break;
+	case -20:
+		state = -1;
+		break;
+	default:
+		return CGCharaObj::getReplaceStat(state);
 	}
 
 	return state;

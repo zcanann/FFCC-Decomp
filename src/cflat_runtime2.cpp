@@ -1332,16 +1332,26 @@ void CFlatRuntime2::Calc()
 		Graphic.Printf(2, 3, const_cast<char*>(sCFlatRuntime2SaveSceneMsg));
 
 		u32* saveData = new (getStage(), const_cast<char*>(sCFlatRuntime2FileTag), 0x36F) u32[0x3FF];
+
+		u32 headerX = SwapF32(CameraPcs.m_positionX);
+		u32 headerY = SwapF32(CameraPcs.m_positionY);
+		u32 headerZ = SwapF32(CameraPcs.m_positionZ);
+		u32 headerTargetX = SwapF32(CameraPcs.m_targetX);
+		u32 headerTargetY = SwapF32(CameraPcs.m_targetY);
+		u32 headerTargetZ = SwapF32(CameraPcs.m_targetZ);
+		u32 headerFov = SwapF32(CameraPcs.m_fov);
+		u32 headerRotate = SwapF32((kCFlatAngleHalfTurnDeg * CameraPcs.m_zRotate) / kCFlatAnglePi);
+
 		u32* objectData = saveData + 8;
 
-		saveData[0] = SwapF32(CameraPcs.m_positionX);
-		saveData[1] = SwapF32(CameraPcs.m_positionY);
-		saveData[2] = SwapF32(CameraPcs.m_positionZ);
-		saveData[3] = SwapF32(CameraPcs.m_targetX);
-		saveData[4] = SwapF32(CameraPcs.m_targetY);
-		saveData[5] = SwapF32(CameraPcs.m_targetZ);
-		saveData[6] = SwapF32(CameraPcs.m_fov);
-		saveData[7] = SwapF32((kCFlatAngleHalfTurnDeg * CameraPcs.m_zRotate) / kCFlatAnglePi);
+		saveData[0] = headerX;
+		saveData[1] = headerY;
+		saveData[2] = headerZ;
+		saveData[3] = headerTargetX;
+		saveData[4] = headerTargetY;
+		saveData[5] = headerTargetZ;
+		saveData[6] = headerFov;
+		saveData[7] = headerRotate;
 
 		u32 lastX = 0;
 		u32 lastY = 0;

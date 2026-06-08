@@ -1499,7 +1499,7 @@ void CMenuPcs::DrawOptionMenu()
 		for (int i = 0; i < 4; i++, y += 0x28, uvY += 0x20, modeU += 0x40) {
 			if ((m_specialModeEdit != 0) && (m_specialModeCursor == i)) {
 				CTexture* cursorPanel = GetTextureSetTexture(textureSet, 4);
-				unsigned int cursorWidth = static_cast<unsigned int>(static_cast<float>(cursorPanel->m_width));
+				int cursorWidth = static_cast<int>(static_cast<float>(cursorPanel->m_width));
 				unsigned int cursorHeight = static_cast<unsigned int>(static_cast<float>(cursorPanel->m_height));
 				gUtil.CalcUV(uv0.x, uv0.y, cursorWidth - 0x30, 0, cursorWidth, cursorHeight);
 				gUtil.CalcUV(uv1.x, uv1.y, cursorWidth, 0x28, cursorWidth, cursorHeight);
@@ -1521,7 +1521,7 @@ void CMenuPcs::DrawOptionMenu()
 
 			CTexture* modePanel = GetTextureSetTexture(textureSet, 7);
 			unsigned int modeWidth = static_cast<unsigned int>(static_cast<float>(modePanel->m_width));
-			unsigned int modeHeight = static_cast<unsigned int>(static_cast<float>(modePanel->m_height));
+			unsigned int modeHeight = static_cast<int>(static_cast<float>(modePanel->m_height));
 			gUtil.CalcUV(uv0.x, uv0.y, static_cast<unsigned int>(static_cast<float>(modeWidth) - kOptionSelectorHeight),
 			             uvY, modeWidth, modeHeight);
 			gUtil.CalcUV(uv1.x, uv1.y, modeWidth, uvY + 0x18, modeWidth, modeHeight);

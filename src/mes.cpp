@@ -780,7 +780,7 @@ void CMes::Calc()
 	{
 		if ((int)(unsigned int)*(unsigned short*)(textEntry + 0xC) <= *(int*)((char*)this + 0x3C80))
 		{
-			int fadeMax = (*(unsigned char*)(textEntry + 0xF) >> 4) & 0xF;
+			int fadeMax = (*(signed char*)(textEntry + 0xF) >> 4) & 0xF;
 			int fadeCurr = (*(unsigned char*)(textEntry + 0xF) & 0xF) + 1;
 			if (fadeCurr < fadeMax)
 			{

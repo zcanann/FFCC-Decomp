@@ -1268,27 +1268,24 @@ void CCameraPcs::calcMap()
     if (useDebugPad) {
         buttons = 0;
     } else {
-        buttons = Pad.GetPadInputs()[0].button[0];
+        buttons = CameraRawPadInput().button[0];
     }
 
     stickH = kCameraZeroF;
     if (!useDebugPad) {
-        __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
-        stickH = *reinterpret_cast<float*>(reinterpret_cast<u8*>(&Pad) + 0x44);
+        stickH = CameraRawPadInput().substickYF;
     }
     stickH = kCameraDegToRad * (stickH / kCameraOneEighthF);
 
     stickV = kCameraZeroF;
     if (!useDebugPad) {
-        __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
-        stickV = *reinterpret_cast<float*>(reinterpret_cast<u8*>(&Pad) + 0x48);
+        stickV = *reinterpret_cast<float*>(&CameraRawPadInput().lockedButton[0]);
     }
     stickV = kCameraDegToRad * (stickV / kCameraOneEighthF);
 
     triggerL = kCameraZeroF;
     if (!useDebugPad) {
-        __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
-        triggerL = *reinterpret_cast<float*>(reinterpret_cast<u8*>(&Pad) + 0x36);
+        triggerL = CameraRawPadInput().stickYF;
     }
 
     m_fov += triggerL;

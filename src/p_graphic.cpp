@@ -309,6 +309,7 @@ void CGraphicPcs::drawScreenFade()
                     pos.y += slotData->m_targetYOffs;
                     PSMTX44MultVec(worldScreenMtx, &pos, &pos);
 
+                    const int radius = (unsigned int)(kGraphicScreenWidth * (kGraphicOne - fadeWave));
                     float sx = pos.x * kGraphicScreenCenterX + kGraphicScreenCenterX;
                     float sy = -(pos.y * kGraphicScreenCenterY - kGraphicScreenCenterY);
                     if (sx < kGraphicZero) {
@@ -322,9 +323,10 @@ void CGraphicPcs::drawScreenFade()
                         sy = kGraphicScreenHeight;
                     }
 
-                    const int radius = (unsigned int)(kGraphicScreenWidth * (kGraphicOne - fadeWave));
-                    drawSFCircle(static_cast<unsigned int>(kScreenFadeCircleRadius), radius, (unsigned int)sx, (unsigned int)sy, baseColor, baseColor);
-                    drawSFCircle(radius, radius - static_cast<unsigned int>(kScreenFadeRingWidth), (int)sx, (int)sy, baseColor, baseColor2);
+                    const unsigned int ix = (unsigned int)sx;
+                    const unsigned int iy = (unsigned int)sy;
+                    drawSFCircle(static_cast<unsigned int>(kScreenFadeCircleRadius), radius, ix, iy, baseColor, baseColor);
+                    drawSFCircle(radius, radius - static_cast<unsigned int>(kScreenFadeRingWidth), ix, iy, baseColor, baseColor2);
                     continue;
                 }
             }

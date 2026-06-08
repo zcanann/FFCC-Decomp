@@ -2057,7 +2057,7 @@ frameLoop:
 			*reinterpret_cast<int*>(&object->m_reqFlag0) = (packedFlags >> 15) & 1;
 			object->m_argCount = static_cast<s16>(packedFlags);
 
-			if ((static_cast<int>(object->m_flags) << 24) < 0) {
+			if (object->m_flagBits.m_deleteFlag != 0) {
 				return 0;
 			}
 			if ((static_cast<int>(oldFlags) << 26) < 0) {

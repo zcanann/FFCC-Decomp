@@ -59,26 +59,28 @@ static inline float RotateShapeX(const u8* entry, u32 xOffset, u32 yOffset, floa
 {
     float sinA = static_cast<float>(sin(angle));
     float cosA = static_cast<float>(cos(angle));
-    return static_cast<float>(Div16Floor(S16At(entry, xOffset))) * cosA -
-           static_cast<float>(Div16Floor(S16At(entry, yOffset))) * sinA;
+    float cx = static_cast<float>(Div16Floor(S16At(entry, xOffset)));
+    float cy = static_cast<float>(Div16Floor(S16At(entry, yOffset)));
+    return cx * cosA - cy * sinA;
 }
 
 static inline float RotateShapeY(const u8* entry, u32 xOffset, u32 yOffset, float angle)
 {
     float cosA = static_cast<float>(cos(angle));
     float sinA = static_cast<float>(sin(angle));
-    return static_cast<float>(Div16Floor(S16At(entry, xOffset))) * sinA +
-           static_cast<float>(Div16Floor(S16At(entry, yOffset))) * cosA;
+    float cx = static_cast<float>(Div16Floor(S16At(entry, xOffset)));
+    float cy = static_cast<float>(Div16Floor(S16At(entry, yOffset)));
+    return cx * sinA + cy * cosA;
 }
 
-static inline void WriteVertex(float px, float py, float pz, u32 color, float tu, float tv)
+static inline void WriteVertex(const float* pos, u32 color, const float* tex)
 {
-    GXWGFifo.f32 = px;
-    GXWGFifo.f32 = py;
-    GXWGFifo.f32 = pz;
+    GXWGFifo.f32 = pos[0];
+    GXWGFifo.f32 = pos[1];
+    GXWGFifo.f32 = pos[2];
     GXWGFifo.u32 = color;
-    GXWGFifo.f32 = tu;
-    GXWGFifo.f32 = tv;
+    GXWGFifo.f32 = tex[0];
+    GXWGFifo.f32 = tex[1];
 }
 
 static inline GXColor ToGXColor(u32 color)
@@ -354,10 +356,10 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
 
         DCStoreRange(&color, 4);
         GXBegin((GXPrimitive)0x80, GX_VTXFMT0, 4);
-        WriteVertex(pos[0][0], pos[0][1], pos[0][2], color, tex[0][0], tex[0][1]);
-        WriteVertex(pos[1][0], pos[1][1], pos[1][2], color, tex[1][0], tex[1][1]);
-        WriteVertex(pos[2][0], pos[2][1], pos[2][2], color, tex[2][0], tex[2][1]);
-        WriteVertex(pos[3][0], pos[3][1], pos[3][2], color, tex[3][0], tex[3][1]);
+        WriteVertex(pos[0], color, tex[0]);
+        WriteVertex(pos[1], color, tex[1]);
+        WriteVertex(pos[2], color, tex[2]);
+        WriteVertex(pos[3], color, tex[3]);
 
         packedStride += 0x24;
         rotatedStride += 0x2C;

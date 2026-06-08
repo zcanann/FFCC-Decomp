@@ -1609,9 +1609,11 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
                 GXCallDisplayList(mana2->m_displayListCopies[dlIndex], displayList->m_size);
             }
         } else {
-            GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_ENABLE);
-            MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
-            GXCallDisplayList(displayList->m_data, displayList->m_size);
+            if (strcmp(meshData->m_name, s_manaShapeObj) == 0) {
+                GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_ENABLE);
+                MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
+                GXCallDisplayList(displayList->m_data, displayList->m_size);
+            }
         }
     }
 }

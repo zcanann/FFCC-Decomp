@@ -2705,7 +2705,7 @@ int CGCharaObj::getItemPdt(int itemId, int level, int& outEffect, int& outArg0, 
 				frame = static_cast<int>(m_turnSpeed);
 				int frameMod = frame % period;
 				if (m_lastBgAttr < kCharaObjZero) {
-					result = static_cast<unsigned int>(__cntlzw(frameMod)) >> 5;
+					result = __rlwnm(1, static_cast<unsigned int>(__cntlzw(frameMod)), 31, 31) & 0xFF;
 				} else {
 					bool isPeriod = (period <= frame);
 					result = isPeriod;

@@ -1077,17 +1077,18 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
                 _PARTICLE_DATA* particleData, _PARTICLE_WMAT* particleWMat, pppFMATRIX& out, unsigned char copyOut)
 {
     Mtx scale;
+    Vec sharedPos;
 
     if (params->m_matrixMode != 0) {
         pppCopyMatrix(mtxB, *(pppFMATRIX*)&particleData->m_matrix);
     } else {
         pppUnitMatrix(mtxB);
-        float posX = particleData->m_matrix[0][3];
-        float posY = particleData->m_matrix[1][3];
-        float posZ = particleData->m_matrix[2][3];
-        mtxB.value[0][3] = posX;
-        mtxB.value[1][3] = posY;
-        mtxB.value[2][3] = posZ;
+        sharedPos.x = particleData->m_matrix[0][3];
+        sharedPos.y = particleData->m_matrix[1][3];
+        sharedPos.z = particleData->m_matrix[2][3];
+        mtxB.value[0][3] = sharedPos.x;
+        mtxB.value[1][3] = sharedPos.y;
+        mtxB.value[2][3] = sharedPos.z;
     }
 
     if (*s32_at(particleData, 0x38) != 0 ||
@@ -1129,13 +1130,12 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
     case 5:
     case 7:
     case 9: {
-        Vec localPos;
         Vec transformedPos;
 
-        localPos.x = mtxB.value[0][3];
-        localPos.y = mtxB.value[1][3];
-        localPos.z = mtxB.value[2][3];
-        pppApplyMatrix(transformedPos, mtxA, localPos);
+        sharedPos.x = mtxB.value[0][3];
+        sharedPos.y = mtxB.value[1][3];
+        sharedPos.z = mtxB.value[2][3];
+        pppApplyMatrix(transformedPos, mtxA, sharedPos);
 
         pppMulMatrix(mtxB, *(pppFMATRIX*)&ppvWorldMatrixWood, mtxB);
         mtxB.value[0][3] = transformedPos.x;
@@ -1152,13 +1152,13 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
         Vec objectPos;
         Vec endPos;
 
-        objectPos.x = pObject->m_localMatrix.value[0][3];
-        objectPos.y = pObject->m_localMatrix.value[1][3];
-        objectPos.z = pObject->m_localMatrix.value[2][3];
-
         endPos.x = mtxB.value[0][3];
         endPos.y = mtxB.value[1][3];
         endPos.z = mtxB.value[2][3];
+
+        objectPos.x = pObject->m_localMatrix.value[0][3];
+        objectPos.y = pObject->m_localMatrix.value[1][3];
+        objectPos.z = pObject->m_localMatrix.value[2][3];
         pppAddVector(endPos, endPos, objectPos);
 
         pppUnitMatrix(mtxB);

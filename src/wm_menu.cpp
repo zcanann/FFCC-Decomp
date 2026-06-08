@@ -5747,8 +5747,6 @@ void CMenuPcs::DrawTitleMenu()
 
 		// Menu item labels (2 items: New Game, Continue)
 		MenuPcs.SetAttrFmt((FMT)0);
-		GXColor itemLabelColor = {0xFF, 0xFF, 0xFF, 0xFF};
-		GXSetChanMatColor(GX_COLOR0A0, itemLabelColor);
 		const float kColorScale = FLOAT_80331458;
 		const float kZero = FLOAT_803313dc;
 		unsigned int uVar7 = 0xFFFFFFF8;

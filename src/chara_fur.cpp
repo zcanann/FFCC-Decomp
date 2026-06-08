@@ -1022,24 +1022,24 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 	}
 
 	const float cursorStep = 0.1f;
-	const unsigned int cursorX = static_cast<int>(static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorX)) +
+	Chara.MogFur().m_cursorX = static_cast<int>(static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorX)) +
 	                                     static_cast<float>(MogPadInt(36)) * cursorStep);
-	const int cursorY = static_cast<int>(static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorY)) -
+	Chara.MogFur().m_cursorY = static_cast<int>(static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorY)) -
 	                                     static_cast<float>(MogPadInt(40)) * cursorStep);
 
-	if (cursorX < 0) {
+	if (static_cast<int>(Chara.MogFur().m_cursorX) < 0) {
 		Chara.MogFur().m_cursorX = 0;
-	} else if (cursorX > 0x280) {
+	} else if (static_cast<int>(Chara.MogFur().m_cursorX) > 0x280) {
 		Chara.MogFur().m_cursorX = 0x280;
 	} else {
-		Chara.MogFur().m_cursorX = static_cast<unsigned int>(cursorX);
+		Chara.MogFur().m_cursorX = Chara.MogFur().m_cursorX;
 	}
-	if (cursorY < 0) {
+	if (static_cast<int>(Chara.MogFur().m_cursorY) < 0) {
 		Chara.MogFur().m_cursorY = 0;
-	} else if (cursorY > 0x1C0) {
+	} else if (static_cast<int>(Chara.MogFur().m_cursorY) > 0x1C0) {
 		Chara.MogFur().m_cursorY = 0x1C0;
 	} else {
-		Chara.MogFur().m_cursorY = static_cast<unsigned int>(cursorY);
+		Chara.MogFur().m_cursorY = Chara.MogFur().m_cursorY;
 	}
 
 	Mtx cameraMtx;
@@ -1384,11 +1384,11 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 
 	const int materialCount = materialSet->m_materials.GetSize();
 
-	bool hasFurMaterial = false;
+	int hasFurMaterial = 0;
 	for (int i = 0; i < materialCount; i++) {
 		CMaterial* material = materialSet->m_materials[i];
 		if (material->IsFurEnabled()) {
-			hasFurMaterial = true;
+			hasFurMaterial = 1;
 			break;
 		}
 	}
@@ -1404,17 +1404,13 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	modelPos.y = ModelDrawMtx(this)[1][3];
 	modelPos.z = ModelDrawMtx(this)[2][3];
 	PSMTXMultVec(viewMtx, reinterpret_cast<Vec*>(&modelPos), reinterpret_cast<Vec*>(&viewPos));
-	if (viewPos.z < kCharaFurViewDepthThreshold) {
+	if (kCharaFurViewDepthThreshold > viewPos.z) {
 		Vec4d clipPos;
 		Math.MTX44MultVec4(CameraPcs.m_screenMatrix, reinterpret_cast<Vec*>(&viewPos), &clipPos);
 		furDepth = -clipPos.z / clipPos.w;
 	}
 
 	float furLength = ModelFurLenScale(this) * (kCharaFurDepthScaleBase - furDepth) + ModelFurLenScale(this);
-	const int furShade = static_cast<int>(kCharaFurShadeScale * ModelFurCur(this));
-	const GXColor furColor = CColor(static_cast<unsigned char>(furShade), static_cast<unsigned char>(furShade),
-	                                static_cast<unsigned char>(furShade), 0xFF)
-	                             .color;
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	GXSetZCompLoc((u8)0);
@@ -1430,6 +1426,10 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_U16, 0x0C);
 	LightPcs.EnableLight(1, 1);
 	GXSetZMode((u8)1, (GXCompare)3, (u8)0);
+	const int furShade = static_cast<int>(kCharaFurShadeScale * ModelFurCur(this));
+	const GXColor furColor = CColor(static_cast<unsigned char>(furShade), static_cast<unsigned char>(furShade),
+	                                static_cast<unsigned char>(furShade), 0xFF)
+	                             .color;
 	GXSetChanMatColor(GX_COLOR0A0, furColor);
 	LightPcs.SetAmbientAlpha(ModelLightAlpha(this));
 	GXSetNumIndStages(0);
@@ -1470,10 +1470,10 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 		}
 
 		Mtx meshMtx;
-		if (mesh->m_data->m_skinCount == 0) {
-			PSMTXConcat(ModelDrawMtx(this), nodes[mesh->m_data->m_nodeIndex].m_mtx, meshMtx);
-		} else {
+		if (mesh->m_data->m_skinCount != 0) {
 			PSMTXCopy(ModelDrawMtx(this), meshMtx);
+		} else {
+			PSMTXConcat(ModelDrawMtx(this), nodes[mesh->m_data->m_nodeIndex].m_mtx, meshMtx);
 		}
 
 		int shadowCount = 0;

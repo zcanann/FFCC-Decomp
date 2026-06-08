@@ -9174,8 +9174,7 @@ void CMenuPcs::DrawCharaName()
 	font->SetShadow(1);
 	font->SetScale(FLOAT_8033158C);
 	font->DrawInit();
-	CColor shadeColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(alphaF)));
-	font->SetColor(shadeColor.color);
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(alphaF))).color);
 
 	const float xBase2 = FLOAT_80331410;
 	const float xMax2 = FLOAT_8033155C;
@@ -9240,8 +9239,7 @@ void CMenuPcs::DrawCharaName()
 					blinkFade = static_cast<float>(-(DOUBLE_80331460 * (cvt.d - DOUBLE_80331408) - DOUBLE_80331420));
 					restoreColor = 1;
 				}
-				CColor blinkColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * blinkFade)));
-				font->SetColor(blinkColor.color);
+				font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * blinkFade))).color);
 			} else {
 				if ((activeMask & (1u << slot)) != 0) {
 					font->SetTlut(7);
@@ -9257,8 +9255,7 @@ void CMenuPcs::DrawCharaName()
 			font->SetPosY(y);
 			font->Draw(text);
 			if (restoreColor) {
-				CColor whiteColor(0xFF, 0xFF, 0xFF, 0xFF);
-				font->SetColor(whiteColor.color);
+				font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 			}
 			cmakeOffset += 0x9C0;
 			caravanOffset += 0xC30;

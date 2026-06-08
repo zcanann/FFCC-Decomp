@@ -3617,7 +3617,7 @@ int JoyBus::SendGBAStop(ThreadParam* threadParam)
     cmdBytes[1] = 0;
     unsigned int word = cmd;
 
-    unsigned int result = 0;
+    int result = 0;
 
     if (static_cast<signed char>(m_threadRunningMask) != 0)
     {
@@ -3627,7 +3627,7 @@ int JoyBus::SendGBAStop(ThreadParam* threadParam)
         if ((int)m_cmdCount[queuePort] >= 0x40)
         {
             OSSignalSemaphore(&m_accessSemaphores[queuePort]);
-            result = 0xFFFFFFFF;
+            result = -1;
         }
         else
         {

@@ -260,6 +260,15 @@ struct CharaObjSignedTopBit
 	signed char m_pad : 7;
 };
 
+struct CharaObjComboFlagBits
+{
+	signed char m_bit80 : 1;
+	signed char m_nearby : 1;
+	signed char m_bit20 : 1;
+	signed char m_active : 1;
+	signed char m_lo : 4;
+};
+
 static bool CharaObjCanFrontGuard(CGCharaObj* self, CGPrgObj* sourceObj)
 {
 	CVector selfPos(self->m_worldPosition);
@@ -3332,11 +3341,11 @@ void CGCharaObj::combi2()
 			}
 		}
 
-		unsigned char& comboFlags = CharaObjComboFlags(party);
-		const bool hadNearbyPartner = (comboFlags & 0x40) != 0;
+		CharaObjComboFlagBits* comboFlags = reinterpret_cast<CharaObjComboFlagBits*>(&CharaObjComboFlags(party));
+		const bool hadNearbyPartner = comboFlags->m_nearby;
 		if (hasNearbyPartner != hadNearbyPartner) {
-			comboFlags = (comboFlags & ~0x40) | (hasNearbyPartner ? 0x40 : 0);
-			comboFlags = (comboFlags & ~0x10) | 0x10;
+			comboFlags->m_nearby = hasNearbyPartner ? -1 : 0;
+			comboFlags->m_active = -1;
 			party->playSe3D(hasNearbyPartner ? 0x3E : 0x3D, 0x32, 0x96, 0, 0);
 		}
 	}

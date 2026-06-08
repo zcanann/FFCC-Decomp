@@ -1698,25 +1698,23 @@ unsigned int CMenuPcs::CmdCtrlCur()
 			int prev = selected - 1;
 			int remaining = selected - 3;
 			if (prev > 2) {
-				do {
+				for (; remaining != 0; remaining--) {
 					if (caravanWork->m_commandListExtra[prev] >= 0) {
 						break;
 					}
 					prev--;
-					remaining--;
-				} while (remaining != 0);
+				}
 			}
 
 			unsigned int next = selected + 1;
 			remaining = caravanWork->m_numCmdListSlots - next;
 			if (next < caravanWork->m_numCmdListSlots) {
-				do {
+				for (; remaining != 0; remaining--) {
 					if (caravanWork->m_commandListExtra[next] >= 0) {
 						break;
 					}
 					next++;
-					remaining--;
-				} while (remaining != 0);
+				}
 			}
 
 			s16* modeCursor = GetCmdStateSelections(GetCmdStateView(this)) + mode;

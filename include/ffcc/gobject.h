@@ -47,7 +47,7 @@ public:
     void moveVectorRot(float, float, float, int);
     void moveVectorHRot(float, float, float, int);
     CGObject* CCClass(int, int, float, Vec*, float);
-    void CCClassRot(int, int, float, float, float, float);
+    CGObject* CCClassRot(int, int, float, float, float, float);
     void Attach(CGObject*, char*, Vec*);
     void Detach();
     void DispCharaParts(int);

@@ -352,15 +352,12 @@ void CMaterialEditorPcs::drawViewer()
                 GXSetArray(GX_VA_CLR0, polygon->_30, 4);
                 GXSetArray(GX_VA_TEX0, polygon->texCoord, 8);
 
-                u32 vertexIndex[5];
-                u32 quadIndex2;
-                u32 quadIndex3;
-                u32 quadColorIndex;
+                u32 vertexIndex[8];
                 u8 vertexCount = 3;
                 MaterialEditorPolygon* poly = polygon;
                 vertexIndex[4] = poly->index0;
-                quadIndex2 = poly->index1;
-                quadIndex3 = poly->index2;
+                vertexIndex[5] = poly->index1;
+                vertexIndex[6] = poly->index2;
                 vertexIndex[0] = 0;
                 vertexIndex[1] = 1;
                 vertexIndex[2] = 2;
@@ -371,8 +368,8 @@ void CMaterialEditorPcs::drawViewer()
                 if ((flags & 0xf) == 1) {
                     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
                     vertexCount = 4;
-                    quadIndex3 = polygon->index3;
-                    quadColorIndex = polygon->index2;
+                    vertexIndex[6] = polygon->index3;
+                    vertexIndex[7] = polygon->index2;
                     vertexIndex[2] = 3;
                     vertexIndex[3] = 2;
                 }

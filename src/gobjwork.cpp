@@ -1499,7 +1499,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 
 				checkValue = bit0;
 
-				switch (evtRule >> 13) {
+				switch ((evtRule >> 13) & 7) {
 				case 0:
 				case 1:
 					break;

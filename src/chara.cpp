@@ -2930,7 +2930,9 @@ void CChara::CMesh::Duplicate(CChara::CMesh* src, CMemory::CStage* stage)
  */
 void CChara::CMesh::skin(int meshIndex, int start, int count, CChara::CSkin* skinRef, void* srcPos, void* srcNrm, void* srcWgt, S16Vec* dstPos, S16Vec* dstNrm, S16Vec* dstTan, S16Vec* dstBinorm)
 {
+	u8 framePad[0x20];
 	asm {
+		lwz r0, framePad
 		mr. r3, r4
 		stw r4, 0x8(r1)
 		stw r5, 0xc(r1)

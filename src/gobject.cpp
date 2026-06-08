@@ -1364,7 +1364,7 @@ void CGObject::update()
         double clampedTurn;
         if (turnDelta < -turnLimit) {
             clampedTurn = -turnLimit;
-        } else if (turnDelta > turnLimit) {
+        } else if (turnLimit < turnDelta) {
             clampedTurn = turnLimit;
         } else {
             clampedTurn = turnDelta;
@@ -2021,7 +2021,7 @@ void CGObject::onDraw()
     if (((CFlat.m_debugFlags & 0x40000) != 0) && ((m_bgColMask & 0x40000) != 0)) {
         for (int i = 0; i < 8; i++) {
             AttackCol* collider = &m_attackColliders[i];
-            if (collider->m_localStart.x == sZeroFloat) {
+            if (*reinterpret_cast<int*>(&collider->m_localStart.x) == 0) {
                 continue;
             }
 
@@ -2038,7 +2038,7 @@ void CGObject::onDraw()
     if (((CFlat.m_debugFlags & 0x80000) != 0) && ((m_bgColMask & 0x80000) != 0)) {
         for (int i = 0; i < 8; i++) {
             DamageCol* collider = &m_damageColliders[i];
-            if (collider->m_localPosition.x == sZeroFloat) {
+            if (*reinterpret_cast<int*>(&collider->m_localPosition.x) == 0) {
                 continue;
             }
 
@@ -2488,7 +2488,7 @@ void CGObject::boundCheck()
     Mtx cameraMtx;
     Mtx44 clipMtx;
     Mtx44 screenMtx;
-    u32 clipMask;
+    int clipMask;
 
     PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
     PSMTXCopy(cameraMtx, clipMtx);
@@ -3080,16 +3080,15 @@ void CGObject::SetDispItemName(int showName)
  */
 void CGObject::DrawDebug(CFont* font)
 {
-    if ((static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<u8*>(&m_weaponNodeFlags)) << 0x1A)
-                          | (*reinterpret_cast<u8*>(&m_weaponNodeFlags) >> 6))
-         < 0)
-        && (sZeroFloat < m_screenDepth)) {
+    if (m_weaponNodeFlagBits.m_unk20 && (sZeroFloat < m_screenDepth)) {
         float invDepth = sAnimFrameOffset / m_screenDepth;
+        float xProd = sDebugScreenX * m_projection.z;
+        float yProd = sDebugScreenY * m_projection.y;
         float screenX[2];
-        screenX[0] = -(sDebugScreenX * m_projection.z * invDepth - sDebugScreenX);
+        screenX[0] = -(xProd * invDepth - sDebugScreenX);
 
         onDrawDebug(font,
-                    sDebugScreenY * m_projection.y * invDepth + sDebugScreenY,
+                    yProd * invDepth + sDebugScreenY,
                     screenX[0],
                     m_projection.w * invDepth);
     }
@@ -3128,7 +3127,11 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
             }
         }
 
+        bool hasModel = false;
         if ((m_charaModelHandle != 0) && (m_charaModelHandle->m_model != 0)) {
+            hasModel = true;
+        }
+        if (hasModel) {
             CVector attrDirection(sZeroFloat, sDownProbeDistance, sZeroFloat);
             CVector attrBottom(m_worldPosition.x, m_worldPosition.y + sStepProbeHeight, m_worldPosition.z);
             CMapCylinder attrCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
@@ -3377,8 +3380,8 @@ void CGObject::PutDropItem()
     s32 dropCount = 0;
 
     for (int i = 0; i < 4; i++) {
-        s32 dropCode = static_cast<u16>(m_dropItemCodes[i]);
-        if ((short)m_dropItemCodes[i] > 0) {
+        s32 dropCode = *reinterpret_cast<s16*>(&m_dropItemCodes[i]);
+        if (dropCode > 0) {
             int createMode;
             if ((dropCode & 0xC000) == 0x4000) {
                 dropCode &= 0x3FFF;

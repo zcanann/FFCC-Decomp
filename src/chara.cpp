@@ -37,6 +37,7 @@ extern const char lbl_80330208[7];
 extern const char lbl_80330210[5];
 extern const char lbl_80330218[5];
 extern "C" const char lbl_801D90D4[];
+extern const Vec DAT_801D9078;
 
 inline void* operator new(unsigned long, void* ptr)
 {
@@ -1656,10 +1657,7 @@ void CChara::CModel::calcMatrix()
 		}
 
 		if (ref->m_index == ModelHeadIndex(this) && ModelTwistAngle(this) != FLOAT_803301b0) {
-			Vec twistAxis;
-			twistAxis.x = FLOAT_803301b0;
-			twistAxis.y = FLOAT_803301BC;
-			twistAxis.z = FLOAT_803301b0;
+			Vec twistAxis = DAT_801D9078;
 			Mtx twistRotate;
 			Mtx nodeBase;
 			Mtx axisBase;
@@ -1667,12 +1665,12 @@ void CChara::CModel::calcMatrix()
 			PSMTXRotAxisRad(twistRotate, &twistAxis, ModelTwistAngle(this));
 			PSMTXCopy(NodeWorldMtx(node), nodeBase);
 			PSMTXCopy(twistRotate, axisBase);
-			nodeBase[0][3] = FLOAT_803301b0;
-			nodeBase[1][3] = FLOAT_803301b0;
-			nodeBase[2][3] = FLOAT_803301b0;
-			axisBase[0][3] = FLOAT_803301b0;
-			axisBase[1][3] = FLOAT_803301b0;
-			axisBase[2][3] = FLOAT_803301b0;
+			nodeBase[0][3] = CVector(FLOAT_803301b0, FLOAT_803301b0, FLOAT_803301b0).x;
+			nodeBase[1][3] = CVector(FLOAT_803301b0, FLOAT_803301b0, FLOAT_803301b0).y;
+			nodeBase[2][3] = CVector(FLOAT_803301b0, FLOAT_803301b0, FLOAT_803301b0).z;
+			axisBase[0][3] = CVector(FLOAT_803301b0, FLOAT_803301b0, FLOAT_803301b0).x;
+			axisBase[1][3] = CVector(FLOAT_803301b0, FLOAT_803301b0, FLOAT_803301b0).y;
+			axisBase[2][3] = CVector(FLOAT_803301b0, FLOAT_803301b0, FLOAT_803301b0).z;
 			PSMTXConcat(axisBase, nodeBase, twistRotate);
 			NodeWorldMtx(node)[0][0] = twistRotate[0][0];
 			NodeWorldMtx(node)[1][0] = twistRotate[1][0];

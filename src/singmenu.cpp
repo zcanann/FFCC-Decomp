@@ -1953,7 +1953,7 @@ void CMenuPcs::SingleCalcFadeIn()
     scaleMtx[0][3] = 0.0f;
     scaleMtx[2][3] = 0.0f;
 
-    m_wm.m_handles[0]->m_model->m_flags10C = (m_wm.m_handles[0]->m_model->m_flags10C & 0x7F) | 0x80;
+    m_wm.m_handles[0]->m_model->m_flags10CBits.m_flag10C_80 = 1;
     m_wm.m_handles[0]->m_model->SetMatrix(scaleMtx);
     m_wm.m_handles[0]->m_model->CalcMatrix();
     m_wm.m_handles[0]->m_model->CalcSkin();
@@ -2049,7 +2049,7 @@ void CMenuPcs::SingleCalcFadeOut()
     scaleMtx[0][3] = 0.0f;
     scaleMtx[2][3] = 0.0f;
 
-    m_wm.m_handles[0]->m_model->m_flags10C = (m_wm.m_handles[0]->m_model->m_flags10C & 0x7F) | 0x80;
+    m_wm.m_handles[0]->m_model->m_flags10CBits.m_flag10C_80 = 1;
     m_wm.m_handles[0]->m_model->SetMatrix(scaleMtx);
     m_wm.m_handles[0]->m_model->CalcMatrix();
     m_wm.m_handles[0]->m_model->CalcSkin();
@@ -2118,7 +2118,7 @@ void CMenuPcs::SingleCalcCtrl()
     scaleMtx[0][3] = 0.0f;
     scaleMtx[2][3] = 0.0f;
 
-    m_wm.m_handles[0]->m_model->m_flags10C = (m_wm.m_handles[0]->m_model->m_flags10C & 0x7F) | 0x80;
+    m_wm.m_handles[0]->m_model->m_flags10CBits.m_flag10C_80 = 1;
     m_wm.m_handles[0]->m_model->SetMatrix(scaleMtx);
     m_wm.m_handles[0]->m_model->CalcMatrix();
     m_wm.m_handles[0]->m_model->CalcSkin();

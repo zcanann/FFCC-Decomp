@@ -947,8 +947,8 @@ void CMenuPcs::CmdDraw()
 	CmdListEntry* entries = GetCmdListStorage(this)->entries;
 	CCaravanWork* const caravan = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	CmdListEntry* entry = entries;
-	const s16 animState = GetCmdStateView(this)->animState;
-	const s16 cmdMode = GetCmdStateView(this)->mode;
+	const s32 animState = GetCmdStateView(this)->animState;
+	const s32 cmdMode = GetCmdStateView(this)->mode;
 
 	for (i = 0; i < GetCmdListStorage(this)->count; i++) {
 		const s32 tex = entry->tex;

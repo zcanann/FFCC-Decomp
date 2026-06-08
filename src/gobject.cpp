@@ -30,6 +30,7 @@ extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
     CMath*, Vec*, float*, Vec*, Vec*, Vec*, float, float, float);
 extern double DOUBLE_803303e8;
 extern double DOUBLE_80330400;
+extern const Vec DAT_801D9B88;
 
 struct GObjectMapCylinder {
     Vec m_bottom;
@@ -1409,10 +1410,10 @@ void CGObject::update()
     Mtx ecScratch;
     if (Game.m_currentMapId == 0x21) {
         Mtx tempMtx;
-        Vec mapUp = sMap21WorldUpAxis;
         Vec worldNorm;
 
         PSMTXRotRad(modelMtx, 'y', atan2f(m_worldPosition.x, m_worldPosition.z));
+        Vec mapUp = DAT_801D9B88;
         PSVECNormalize(&m_worldPosition, &worldNorm);
         PSMTXRotRad(tempMtx, 'x', acosf(PSVECDotProduct(&mapUp, &worldNorm)));
         PSMTXConcat(modelMtx, tempMtx, modelMtx);

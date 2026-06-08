@@ -504,7 +504,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	if (rangeKind != 0) {
 		int baseIndex = drawPrefix + 2;
 		u32 baseY = lineBaseY[baseIndex];
-		int y = baseY;
+		unsigned int y = baseY;
 		if (drawPrefix != 0) {
 			font->SetPosX(kOptionRowLeft);
 			font->SetPosY(static_cast<float>(static_cast<int>(y)));
@@ -596,7 +596,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 						currentItem = 3;
 					}
 
-					int equipmentSlot = caravanWork->m_equipment[currentItem];
+					unsigned int equipmentSlot = caravanWork->m_equipment[currentItem];
 					currentItem = (equipmentSlot >= 0) ? caravanWork->m_inventoryItems[equipmentSlot] : -1;
 
 					if (static_cast<unsigned char>(ChkEquipActive(static_cast<int>(m_artiState->selections[1]) +
@@ -674,7 +674,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			font->SetPosY(static_cast<float>(static_cast<int>(y)));
 			font->Draw(itemName);
 			font->Draw(suffix);
-			y = static_cast<int>(static_cast<float>(static_cast<int>(y)) + lineStep);
+			y = static_cast<int>(static_cast<float>(static_cast<unsigned int>(y)) + lineStep);
 		}
 
 		for (int i = 0; i < lineCount; i++) {

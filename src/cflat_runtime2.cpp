@@ -2470,23 +2470,23 @@ void CFlatRuntime2::resetChangeScript()
 	}
 
 	for (int i = 0; i < 32; i++) {
-		m_mapObjectInfo[i].m_type = -1;
 		m_mapObjectInfo[i].m_drawFlag = 0;
+		m_mapObjectInfo[i].m_type = -1;
 	}
 
 	m_workAssignIndex = 0;
 	m_partyAssignIndex = 0;
 	m_cameraScriptTargetMode = 0;
 	m_gameFlags = (m_gameFlags & 0x7F) | 0x80;
-	m_gameFlags &= 0xDF;
-	m_gameFlags &= 0xEF;
+	m_gameFlagBits.m_flagBit5 = 0;
+	m_gameFlagBits.m_flagBit4 = 0;
 	m_bossState = 0;
 	m_bossSubState = 0;
 	memset(m_partyTraceParticleSlot, 0, sizeof(m_partyTraceParticleSlot) + sizeof(m_itemTraceParticleSlot));
 	memset(CGMonObj::m_boss, 0, sizeof(CGMonObj::m_boss));
-	m_gameFlags &= 0xFD;
-	m_gameFlags &= 0xF7;
-	m_gameFlags &= 0xFE;
+	m_gameFlagBits.m_flagBit1 = 0;
+	m_gameFlagBits.m_flagBit3 = 0;
+	m_gameFlagBits.m_flagBit0 = 0;
 	Pad.m_stickDigitalThreshold = 1;
 	GraphicPcs.m_screenFade[1].m_mode = 0;
 	CameraPcs.m_shadowAuto = 1;

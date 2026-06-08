@@ -3361,25 +3361,25 @@ void CMenuPcs::CalcLoadMenu()
 						if (m_wmWorldState->m_menuMode == 8
 						    && m_cmakeWork != 0) {
 							int iVar6 = reinterpret_cast<int>(m_cmakeWork) + iVar23 + 0x14D0;
-							if (*reinterpret_cast<int*>(iVar6 + 0x5B4) == 0) {
-								*reinterpret_cast<int*>(iVar17 + 8) = -1;
-							} else {
+							if (*reinterpret_cast<int*>(iVar6 + 0x5B4) != 0) {
 								unsigned int uVar15b = (unsigned int)*reinterpret_cast<unsigned short*>(iVar6 + 0x2E);
 								unsigned int uVar11 = (unsigned int)*reinterpret_cast<unsigned short*>(iVar6 + 0x30);
 								unsigned int uVar16 = (unsigned int)*reinterpret_cast<unsigned short*>(iVar6 + 0x32);
 								int cost = uVar15b * 200 + 100;
 								if (uVar11 != 0) cost = uVar15b * 200 + 200;
 								*reinterpret_cast<int*>(iVar17 + 8) = cost + uVar16;
+							} else {
+								*reinterpret_cast<int*>(iVar17 + 8) = -1;
 							}
-						} else if (*reinterpret_cast<int*>(iVar25 + 0x1794) == 0) {
-							*reinterpret_cast<int*>(iVar17 + 8) = -1;
-						} else {
+						} else if (*reinterpret_cast<int*>(iVar25 + 0x1794) != 0) {
 							unsigned int uVar15b = (unsigned int)*reinterpret_cast<unsigned short*>(iVar25 + 0x17D0);
 							unsigned int uVar11 = (unsigned int)*reinterpret_cast<unsigned short*>(iVar25 + 0x17D2);
 							unsigned int uVar16 = (unsigned int)*reinterpret_cast<unsigned short*>(iVar25 + 0x17D4);
 							int cost = uVar15b * 200 + 100;
 							if (uVar11 != 0) cost = uVar15b * 200 + 200;
 							*reinterpret_cast<int*>(iVar17 + 8) = cost + uVar16;
+						} else {
+							*reinterpret_cast<int*>(iVar17 + 8) = -1;
 						}
 						iVar17 = reinterpret_cast<int>(m_wm.m_charaModelData) + iVar10;
 						int charaId = *reinterpret_cast<int*>(iVar17 + 8);

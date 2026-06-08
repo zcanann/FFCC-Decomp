@@ -42,6 +42,8 @@ extern float FLOAT_80332d78;
 extern float FLOAT_80332dc8;
 extern float FLOAT_80332dcc;
 extern float FLOAT_80332dd0;
+extern float FLOAT_80332dd8;
+extern float FLOAT_80332ddc;
 extern float FLOAT_80332de4;
 extern float FLOAT_80332de8;
 extern float FLOAT_80332dec;
@@ -1667,13 +1669,13 @@ void CShopMenu::DrawShopBase()
         char* confirmText = (m_listType == 0) ? ShopMenuMes(languageId, SHOP_MENU_TEXT_BUY) :
                                                 ShopMenuMes(languageId, SHOP_MENU_TEXT_SELL);
         font->SetPosX(CalcCenteredShopMenuX(font, confirmText));
-        font->SetPosY(312.0f);
+        font->SetPosY(FLOAT_80332dd8);
         font->Draw(confirmText);
         Graphic.SetDrawDoneDebugData(0x11);
 
         char* cancelText = ShopMenuMes(languageId, SHOP_MENU_TEXT_CANCEL);
         font->SetPosX(CalcCenteredShopMenuX(font, cancelText));
-        font->SetPosY(346.0f);
+        font->SetPosY(FLOAT_80332ddc);
         font->Draw(cancelText);
         Graphic.SetDrawDoneDebugData(0x12);
         MenuPcs.DrawInit();
@@ -2071,10 +2073,8 @@ void CShopMenu::DrawSmith0()
         title = ShopMenuMes(languageId, SHOP_MENU_TEXT_BLACKSMITH);
     }
 
-    float width = font->GetWidth(title);
-
     font->DrawInit();
-    MenuPcs.DrawNoShadowFont(font, const_cast<char*>(title), 264.0f - width, FLOAT_80332e4c, 9, 0x12);
+    MenuPcs.DrawNoShadowFont(font, const_cast<char*>(title), 264 - font->GetWidth(title), FLOAT_80332e4c, 9, 0x12);
     MenuPcs.DrawInit();
     MenuPcs.DrawInit();
 }

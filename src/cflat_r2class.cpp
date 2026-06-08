@@ -1451,7 +1451,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		}
 		case -0x75: {
 			CCaravanWork* caravanWork = ScriptCaravan(engineObject);
-			if (caravanWork->m_evtState0 != object->m_localBase[0]) {
+			if (static_cast<int>(caravanWork->m_evtState0) != static_cast<int>(object->m_localBase[0])) {
 				caravanWork->m_evtState0 = object->m_localBase[0];
 				caravanWork->m_evtState1 = 0;
 			}
@@ -1460,7 +1460,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		}
 		case -0x6E:
-			*reinterpret_cast<unsigned int*>(&engineObject->m_lastBgAttr) = object->m_localBase[0];
+			engineObject->m_lastBgAttr = reinterpret_cast<float*>(object->m_localBase)[0];
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

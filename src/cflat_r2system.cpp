@@ -4546,13 +4546,13 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
                 if (setMode < 0) {
                     if (setMode >= -1) {
                         gameWork.m_bossArtifactStageIndex =
-                            static_cast<short>(gameWork.m_bossArtifactStageIndex - static_cast<short>(stack->m_word));
+                            static_cast<short>(gameWork.m_bossArtifactStageIndex - stack->m_word);
                     }
                 } else if (setMode == 0) {
                     gameWork.m_bossArtifactStageIndex = static_cast<short>(stack->m_word);
                 } else if (setMode < 2) {
                     gameWork.m_bossArtifactStageIndex =
-                        static_cast<short>(gameWork.m_bossArtifactStageIndex + static_cast<short>(stack->m_word));
+                        static_cast<short>(gameWork.m_bossArtifactStageIndex + stack->m_word);
                 }
                 break;
             case -0x76: {
@@ -4575,13 +4575,13 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
                 if (setMode < 0) {
                     if (setMode >= -1) {
                         gameWork.m_soundOptionFlag =
-                            static_cast<unsigned char>(gameWork.m_soundOptionFlag - static_cast<char>(stack->m_word));
+                            static_cast<unsigned char>(gameWork.m_soundOptionFlag - stack->m_word);
                     }
                 } else if (setMode == 0) {
                     gameWork.m_soundOptionFlag = static_cast<unsigned char>(stack->m_word);
                 } else if (setMode < 2) {
                     gameWork.m_soundOptionFlag =
-                        static_cast<unsigned char>(gameWork.m_soundOptionFlag + static_cast<char>(stack->m_word));
+                        static_cast<unsigned char>(gameWork.m_soundOptionFlag + stack->m_word);
                 }
                 break;
             case -0x79:
@@ -4589,13 +4589,13 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
                 if (setMode < 0) {
                     if (setMode >= -1) {
                         gameWork.m_optionValue =
-                            static_cast<unsigned short>(gameWork.m_optionValue - static_cast<short>(stack->m_word));
+                            static_cast<unsigned short>(gameWork.m_optionValue - stack->m_word);
                     }
                 } else if (setMode == 0) {
                     gameWork.m_optionValue = static_cast<unsigned short>(stack->m_word);
                 } else if (setMode < 2) {
                     gameWork.m_optionValue =
-                        static_cast<unsigned short>(gameWork.m_optionValue + static_cast<short>(stack->m_word));
+                        static_cast<unsigned short>(gameWork.m_optionValue + stack->m_word);
                 }
                 break;
             default:

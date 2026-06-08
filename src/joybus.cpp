@@ -7541,20 +7541,18 @@ int JoyBus::SetMoney(int portIndex, unsigned int money)
 
 		if (static_cast<signed char>(m_threadRunningMask) != 0)
 		{
-			unsigned int port = m_threadParams[portIndex].m_portIndex;
 
-			OSWaitSemaphore(&m_accessSemaphores[port]);
+			OSWaitSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
 
-			if ((int)m_cmdCount[port] >= 0x40)
+			if ((int)m_cmdCount[m_threadParams[portIndex].m_portIndex] >= 0x40)
 			{
-				OSSignalSemaphore(&m_accessSemaphores[port]);
+				OSSignalSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
 				result = -1;
 			}
 			else
 			{
-				m_cmdQueueData[port][m_cmdCount[port]] = cmd;
-				port = m_threadParams[portIndex].m_portIndex;
-				m_cmdCount[port]++;
+				m_cmdQueueData[m_threadParams[portIndex].m_portIndex][m_cmdCount[m_threadParams[portIndex].m_portIndex]] = cmd;
+				m_cmdCount[m_threadParams[portIndex].m_portIndex]++;
 				OSSignalSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
 				result = 0;
 			}
@@ -7574,20 +7572,18 @@ int JoyBus::SetMoney(int portIndex, unsigned int money)
 
 		if (static_cast<signed char>(m_threadRunningMask) != 0)
 		{
-			unsigned int port = m_threadParams[portIndex].m_portIndex;
 
-			OSWaitSemaphore(&m_accessSemaphores[port]);
+			OSWaitSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
 
-			if ((int)m_cmdCount[port] >= 0x40)
+			if ((int)m_cmdCount[m_threadParams[portIndex].m_portIndex] >= 0x40)
 			{
-				OSSignalSemaphore(&m_accessSemaphores[port]);
+				OSSignalSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
 				result = -1;
 			}
 			else
 			{
-				m_cmdQueueData[port][m_cmdCount[port]] = cmd;
-				port = m_threadParams[portIndex].m_portIndex;
-				m_cmdCount[port]++;
+				m_cmdQueueData[m_threadParams[portIndex].m_portIndex][m_cmdCount[m_threadParams[portIndex].m_portIndex]] = cmd;
+				m_cmdCount[m_threadParams[portIndex].m_portIndex]++;
 				OSSignalSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
 				result = 0;
 			}

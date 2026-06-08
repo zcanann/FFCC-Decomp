@@ -4759,8 +4759,9 @@ int JoyBus::MakeJoyData(char* src, int length, unsigned int* outBuffer)
 int JoyBus::SendPlayerStat(ThreadParam* threadParam)
 {
     unsigned int result = 0;
+    unsigned char subState = threadParam->m_subState;
 
-    switch ((signed char)threadParam->m_subState)
+    switch (subState)
     {
     case 0:
         {
@@ -4842,14 +4843,9 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
             unsigned short statHalf = __lhbrx(&playerData[threadParam->m_portIndex * 0xDC + 0x14], 0);
             memcpy(&payload[0x91], &statHalf, 2);
 
-            unsigned char compatBuf[64];
-            memset(compatBuf, 0, sizeof(compatBuf));
-
-            int compatLen = GbaQue.GetCompatibility(threadParam->m_portIndex, compatBuf);
-
             unsigned char* body = &payload[0x93];
 
-            memcpy(body, compatBuf, compatLen);
+            int compatLen = GbaQue.GetCompatibility(threadParam->m_portIndex, body);
 
             memcpy(body + compatLen, &playerData[threadParam->m_portIndex * 0xDC + 0x18], 8);
 
@@ -5443,7 +5439,6 @@ int JoyBus::SendMapObjDrawFlg(ThreadParam* threadParam)
         cmdBytes[6] = crcBytes[2];
         cmdBytes[7] = crcBytes[3];
         unsigned int cmd1 = cmds[0];
-        unsigned int cmd2 = cmds[1];
 
         if (static_cast<signed char>(m_threadRunningMask) == 0)
         {
@@ -5486,7 +5481,7 @@ int JoyBus::SendMapObjDrawFlg(ThreadParam* threadParam)
                 }
                 else
                 {
-                    m_cmdQueueData[port][m_cmdCount[port]] = cmd2;
+                    m_cmdQueueData[port][m_cmdCount[port]] = cmds[1];
                     m_cmdCount[threadParam->m_portIndex]++;
                     OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
                     result = 0;
@@ -7052,10 +7047,9 @@ int JoyBus::ChgCtrlMode(int portIndex)
         return 0;
     }
 
-    unsigned int x = mode ^ kPppYmMeltMaskBit0;
+    mode = (unsigned char)(mode ^ kPppYmMeltMaskBit0);
     wordBytes[0] = 0x09;
-    wordBytes[1] = (unsigned char)x;
-    mode = (unsigned char)x;
+    wordBytes[1] = mode;
     unsigned int wordCache = word;
     int ret = 0;
 
@@ -7101,7 +7095,7 @@ int JoyBus::SetCtrlMode(int portIndex, int controlMode)
 	}
 
     unsigned char modeFlag =
-        (unsigned char)(((unsigned int)(controlMode | -controlMode)) >> 31);
+        (unsigned char)(((unsigned int)(-controlMode | controlMode)) >> 31);
 
     unsigned int cmd = 0;
     unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
@@ -7204,31 +7198,32 @@ int JoyBus::IsInitSend(int portIndex)
     int state = m_threadParams[portIndex].m_state;
     OSSignalSemaphore(&m_accessSemaphores[portIndex]);
 
-    unsigned int result = 0;
+    unsigned int result;
 
     // Determine desired "init send" state
-    if (m_threadParams[portIndex].m_sentStartFlag == 0 && state <= 0x384)
-    {
-        if (state < 2)
-        {
-            result = 0;
-        }
-        else if (state == 2)
-        {
-            result = (m_threadParams[portIndex].m_flags[0] ? 1 : 0);
-        }
-        else
-        {
-            result = 1;
-        }
-    }
-    else
+    if (m_threadParams[portIndex].m_sentStartFlag != 0)
     {
         result = 0;
     }
+    else if (state > 0x384)
+    {
+        result = 0;
+    }
+    else if (state < 2)
+    {
+        result = 0;
+    }
+    else if (state == 2)
+    {
+        result = (m_threadParams[portIndex].m_flags[0] ? 1 : 0);
+    }
+    else
+    {
+        result = 1;
+    }
 
     // Stabilizer logic: detect and debounce changes to result
-    if (m_threadParams[portIndex].m_flags[2] == result)
+    if (m_threadParams[portIndex].m_flags[2] == (unsigned char)result)
     {
         m_threadParams[portIndex].m_flags[3] = 0;
     }

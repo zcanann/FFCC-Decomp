@@ -3777,9 +3777,9 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         int foundCount = this->CcClass2D(
             *object->m_localBase, object->m_localBase[1], center, localFloats[5],
             localFloats[6], maxCount, foundObjects);
-        int* outIds = reinterpret_cast<int*>(object->m_localBase[8]);
         for (int i = 0; i < foundCount; i++) {
-            outIds[i] = reinterpret_cast<CFlatRuntime::CObject*>(foundObjects[i])->m_particleId;
+            reinterpret_cast<int*>(object->m_localBase[8])[i] =
+                reinterpret_cast<CFlatRuntime::CObject*>(foundObjects[i])->m_particleId;
         }
 
         this->push(object, foundCount);

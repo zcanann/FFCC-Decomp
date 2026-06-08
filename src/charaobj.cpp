@@ -2325,34 +2325,25 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
  */
 int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 {
-	if ((staIndex == 0 || staIndex == 4) &&
-		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E + (staIndex * 2)) != 0) {
-		System.Printf(const_cast<char*>(sCharaObjEffectTimeNoOverwriteMsg));
-		return static_cast<int>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E + (staIndex * 2)));
+	if (staIndex == 0 || staIndex == 4) {
+		unsigned short* staField =
+			reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + (staIndex * 2));
+		if (staField[0x1F] != 0) {
+			System.Printf(const_cast<char*>(sCharaObjEffectTimeNoOverwriteMsg));
+			return static_cast<int>(staField[0x1F]);
+		}
 	}
 
 	unsigned int base = 0;
 	switch (staIndex) {
-		case 0:
-			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x10);
-			break;
 		case 1:
 			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x0E);
 			break;
-		case 2:
-			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x1E);
-			break;
-		case 3:
-			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x22);
+		case 0:
+			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x10);
 			break;
 		case 4:
 			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x12);
-			break;
-		case 6:
-			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x20);
-			break;
-		case 7:
-			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x18);
 			break;
 		case 8:
 			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x14);
@@ -2360,11 +2351,23 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 		case 9:
 			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x16);
 			break;
+		case 7:
+			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x18);
+			break;
 		case 10:
 			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x1A);
 			break;
 		case 0x1C:
 			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x1C);
+			break;
+		case 2:
+			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x1E);
+			break;
+		case 6:
+			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x20);
+			break;
+		case 3:
+			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x22);
 			break;
 		case 0x6A:
 			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x24);

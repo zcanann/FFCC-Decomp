@@ -1405,6 +1405,7 @@ void CGObject::update()
     }
 
     Mtx modelMtx;
+    Mtx ecScratch;
     if (Game.m_currentMapId == 0x21) {
         Mtx tempMtx;
         Vec mapUp = sMap21WorldUpAxis;
@@ -1545,14 +1546,12 @@ void CGObject::update()
         PSMTXCopy(ModelNodeMtx(ownerModel, m_attachNode), modelMtx);
 
         if (m_worldParamA == 0x24 || m_worldParamB == 0x125) {
-            Mtx rotMtx;
-            PSMTXRotRad(rotMtx, 'y', -m_attachOwner->m_rotBaseY);
-            PSMTXConcat(modelMtx, rotMtx, modelMtx);
+            PSMTXRotRad(ecScratch, 'y', -m_attachOwner->m_rotBaseY);
+            PSMTXConcat(modelMtx, ecScratch, modelMtx);
         }
         if (m_worldParamA != 0x24 || m_worldParamB == 0x125) {
-            Mtx rotMtx;
-            PSMTXRotRad(rotMtx, 'y', m_rotBaseY);
-            PSMTXConcat(modelMtx, rotMtx, modelMtx);
+            PSMTXRotRad(ecScratch, 'y', m_rotBaseY);
+            PSMTXConcat(modelMtx, ecScratch, modelMtx);
         }
 
         Vec ownerPos = m_attachOwner->m_worldPosition;
@@ -1583,7 +1582,6 @@ void CGObject::update()
     }
 
     if (HasLoadedModel(m_charaModelHandle)) {
-        Mtx attachScratch;
         m_animBlend += ClampFloat(m_bgAttrValue - m_animBlend, -0.25f, 0.25f);
 
         float lookYaw = m_lookAtAccumYaw;
@@ -1781,9 +1779,9 @@ void CGObject::update()
         }
 
         if (HasLoadedModel(m_weaponModelHandle) && (m_displayFlags & 1) != 0 && m_weaponAttachNode >= 0) {
-            PSMTXCopy(ModelNodeMtx(m_charaModelHandle->m_model, m_weaponAttachNode), attachScratch);
-            PSMTXTransApply(attachScratch, attachScratch, m_worldPosition.x, m_worldPosition.y, m_worldPosition.z);
-            m_weaponModelHandle->m_model->SetMatrix(attachScratch);
+            PSMTXCopy(ModelNodeMtx(m_charaModelHandle->m_model, m_weaponAttachNode), ecScratch);
+            PSMTXTransApply(ecScratch, ecScratch, m_worldPosition.x, m_worldPosition.y, m_worldPosition.z);
+            m_weaponModelHandle->m_model->SetMatrix(ecScratch);
             m_weaponModelHandle->m_model->CalcMatrix();
             if ((weaponFlagsLo & 0x40) != 0) {
                 m_weaponModelHandle->m_model->CalcSkin();
@@ -1795,9 +1793,9 @@ void CGObject::update()
         }
 
         if (HasLoadedModel(m_shieldModelHandle) && (m_displayFlags & 1) != 0 && m_shieldAttachNodeIndex >= 0) {
-            PSMTXCopy(ModelNodeMtx(m_charaModelHandle->m_model, m_shieldAttachNodeIndex), attachScratch);
-            PSMTXTransApply(attachScratch, attachScratch, m_worldPosition.x, m_worldPosition.y, m_worldPosition.z);
-            m_shieldModelHandle->m_model->SetMatrix(attachScratch);
+            PSMTXCopy(ModelNodeMtx(m_charaModelHandle->m_model, m_shieldAttachNodeIndex), ecScratch);
+            PSMTXTransApply(ecScratch, ecScratch, m_worldPosition.x, m_worldPosition.y, m_worldPosition.z);
+            m_shieldModelHandle->m_model->SetMatrix(ecScratch);
             m_shieldModelHandle->m_model->CalcMatrix();
             if ((weaponFlagsLo & 0x40) != 0) {
                 m_shieldModelHandle->m_model->CalcSkin();

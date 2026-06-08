@@ -1427,10 +1427,12 @@ void CMenuPcs::InitCharaInfo()
 			*reinterpret_cast<unsigned int*>(entry0 + 8) = 0xFFFFFFFF;
 		} else {
 			int modelNo = *reinterpret_cast<unsigned short*>(gameData + 0x17D0) * 200 + 100;
-			if (*reinterpret_cast<unsigned short*>(gameData + 0x17D2) != 0) {
-				modelNo = *reinterpret_cast<unsigned short*>(gameData + 0x17D0) * 200 + 200;
+			short flag0 = *reinterpret_cast<short*>(gameData + 0x17D2);
+			unsigned short add0  = *reinterpret_cast<unsigned short*>(gameData + 0x17D4);
+			if (flag0 != 0) {
+				modelNo += 100;
 			}
-			*reinterpret_cast<unsigned int*>(entry0 + 8) = modelNo + *reinterpret_cast<unsigned short*>(gameData + 0x17D4);
+			*reinterpret_cast<unsigned int*>(entry0 + 8) = modelNo + add0;
 		}
 
 		unsigned char* entry1 = entry0 + 0x34;
@@ -1438,10 +1440,12 @@ void CMenuPcs::InitCharaInfo()
 			*reinterpret_cast<unsigned int*>(entry1 + 8) = 0xFFFFFFFF;
 		} else {
 			int modelNo = *reinterpret_cast<unsigned short*>(gameData + 0x2400) * 200 + 100;
-			if (*reinterpret_cast<unsigned short*>(gameData + 0x2402) != 0) {
-				modelNo = *reinterpret_cast<unsigned short*>(gameData + 0x2400) * 200 + 200;
+			short flag1 = *reinterpret_cast<short*>(gameData + 0x2402);
+			unsigned short add1  = *reinterpret_cast<unsigned short*>(gameData + 0x2404);
+			if (flag1 != 0) {
+				modelNo += 100;
 			}
-			*reinterpret_cast<unsigned int*>(entry1 + 8) = modelNo + *reinterpret_cast<unsigned short*>(gameData + 0x2404);
+			*reinterpret_cast<unsigned int*>(entry1 + 8) = modelNo + add1;
 		}
 
 		gameData += 0x1860;

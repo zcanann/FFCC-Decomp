@@ -795,6 +795,7 @@ void CMes::Calc()
 
 	unsigned char* flagEntry =
 	    (unsigned char*)((char*)this + *(int*)((char*)this + 0x3C10) * 6 + 0x3C14);
+	int advance;
 	while (*(int*)((char*)this + 0x3C10) < (int)maxAdvance)
 	{
 		int type = *flagEntry;
@@ -810,10 +811,10 @@ void CMes::Calc()
 			*slot = *slot + 1;
 			break;
 		}
-		case 3:
 		case 4:
 			if (*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3CC0) == 0)
 			{
+				advance = 0;
 				goto doneAdvance;
 			}
 			break;
@@ -822,7 +823,10 @@ void CMes::Calc()
 		flagEntry += 6;
 		*(int*)((char*)this + 0x3C10) = *(int*)((char*)this + 0x3C10) + 1;
 	}
+	advance = 1;
 
+doneAdvance:
+	if (advance)
 	{
 		int next = *(int*)((char*)this + 0x3C80) + 1;
 		int max = 0x7FFF;
@@ -833,7 +837,6 @@ void CMes::Calc()
 		*(int*)((char*)this + 0x3C80) = max;
 	}
 
-doneAdvance:
 	if (*(int*)((char*)this + 0x3CAC) != 0)
 	{
 		int next = *(int*)((char*)this + 0x3CBC) + 1;

@@ -339,7 +339,7 @@ void CPad::Frame()
 						if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x100) != 0)
 						{
 							uVar16 = static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x18)) >> 0x1F;
-							if ((static_cast<int>((uVar16 ^ static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x18))) - uVar16) >= m_stickDigitalThreshold) ||
+							if ((static_cast<int>((uVar16 ^ static_cast<int>(*reinterpret_cast<u8*>(iVar6 + 0x18))) - uVar16) >= m_stickDigitalThreshold) ||
 								((uVar16 = static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x19)) >> 0x1F),
 								 (static_cast<int>((uVar16 ^ static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x19))) - uVar16) >= m_stickDigitalThreshold)))
 							{
@@ -486,7 +486,7 @@ void CPad::Frame()
 						static_cast<u16>(*reinterpret_cast<u16*>(self + 0x15E) | *reinterpret_cast<u16*>(iVar6 + 0x0E));
 					*reinterpret_cast<u16*>(self + 0x160) =
 						static_cast<u16>(*reinterpret_cast<u16*>(self + 0x160) | *reinterpret_cast<u16*>(iVar6 + 0x10));
-					*reinterpret_cast<u16*>(self + 0x164) =
+					*reinterpret_cast<s16*>(self + 0x164) =
 						static_cast<u16>(*reinterpret_cast<u16*>(self + 0x164) | *reinterpret_cast<u16*>(iVar6 + 0x14));
 					*reinterpret_cast<u16*>(self + 0x186) =
 						static_cast<u16>(*reinterpret_cast<u16*>(self + 0x186) | *reinterpret_cast<u16*>(iVar6 + 0x36));

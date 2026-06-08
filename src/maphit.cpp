@@ -521,17 +521,17 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         Vec toPoint;
         Vec cross;
         switch (g_hit_lpface->m_projectionAxis) {
-        case 1:
-            point.x = pushedHit.x;
+        case 0:
+            point.x = pushedHit.y;
             point.y = pushedHit.z;
             point.z = kMapHitZero;
 
             for (int i = 0; i < static_cast<int>(g_hit_lpface->m_vertexCount); i++) {
                 current = m_vertices[g_hit_lpface->m_vertexIndices[i]];
-                edgeStart.x = previous.x + g_hit_lpface->m_vertexOffsets[i][0];
+                edgeStart.x = previous.y + g_hit_lpface->m_vertexOffsets[i][0];
                 edgeStart.y = previous.z + g_hit_lpface->m_vertexOffsets[i][1];
                 edgeStart.z = kMapHitZero;
-                edgeEnd.x = current.x + g_hit_lpface->m_vertexOffsets[i][0];
+                edgeEnd.x = current.y + g_hit_lpface->m_vertexOffsets[i][0];
                 edgeEnd.y = current.z + g_hit_lpface->m_vertexOffsets[i][1];
                 edgeEnd.z = kMapHitZero;
 
@@ -553,17 +553,17 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
                 previous = current;
             }
             break;
-        case 0:
-            point.x = pushedHit.y;
+        case 1:
+            point.x = pushedHit.x;
             point.y = pushedHit.z;
             point.z = kMapHitZero;
 
             for (int i = 0; i < static_cast<int>(g_hit_lpface->m_vertexCount); i++) {
                 current = m_vertices[g_hit_lpface->m_vertexIndices[i]];
-                edgeStart.x = previous.y + g_hit_lpface->m_vertexOffsets[i][0];
+                edgeStart.x = previous.x + g_hit_lpface->m_vertexOffsets[i][0];
                 edgeStart.y = previous.z + g_hit_lpface->m_vertexOffsets[i][1];
                 edgeStart.z = kMapHitZero;
-                edgeEnd.x = current.y + g_hit_lpface->m_vertexOffsets[i][0];
+                edgeEnd.x = current.x + g_hit_lpface->m_vertexOffsets[i][0];
                 edgeEnd.y = current.z + g_hit_lpface->m_vertexOffsets[i][1];
                 edgeEnd.z = kMapHitZero;
 

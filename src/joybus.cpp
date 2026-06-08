@@ -3800,11 +3800,11 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
 
     OSSignalSemaphore(&m_accessSemaphores[port]);
 
-    if ((static_cast<unsigned char>(localWord >> 24) & 0x3F) == 7)
+    if ((*reinterpret_cast<unsigned char*>(&localWord) & 0x3F) == 7)
     {
         step = 0;
-        phase = 0;
         blockIndex = 0;
+        phase = 0;
         localWord = 0;
 
         ResetQueue(threadParam);
@@ -3864,9 +3864,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
     {
         if (step == 0)
         {
-            signed char type = sendType;
-
-            if (type != 3 && type != 2 && type != 6 && type != 7 && type != 8 && type != 9)
+            if ((signed char)sendType != 3 && (signed char)sendType != 2 && (signed char)sendType != 6 && (signed char)sendType != 7 && (signed char)sendType != 8 && (signed char)sendType != 9)
             {
                 GbaQue.IsSingleMode(threadParam->m_portIndex);
 
@@ -3902,13 +3900,13 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
                 m_ctrlModeArr[port] = 0;
             }
 
-            if (type == 0)
+            if ((signed char)sendType == 0)
             {
                 dataBase = reinterpret_cast<unsigned char*>(m_fileBaseA);
                 dataPtr = dataBase;
                 totalSize = static_cast<unsigned short>(m_fileBaseA_dup);
             }
-            else if (type == 1)
+            else if ((signed char)sendType == 1)
             {
                 dataBase = reinterpret_cast<unsigned char*>(m_fileBaseB);
                 dataPtr = dataBase;
@@ -3916,7 +3914,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
             }
             else
             {
-                if (type != 3 && type != 2 && type != 6 && type != 7 && type != 8 && type != 9)
+                if ((signed char)sendType != 3 && (signed char)sendType != 2 && (signed char)sendType != 6 && (signed char)sendType != 7 && (signed char)sendType != 8 && (signed char)sendType != 9)
                 {
                     if (System.m_execParam != 0)
                     {
@@ -3942,21 +3940,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
             blockCount = blocks;
 
             unsigned short crcAcc = 0xFFFF;
-            unsigned char* p = dataBase;
-            unsigned int count = size;
-
-            while (static_cast<int>(count) > 0)
-            {
-                unsigned char b = *p++;
-                count--;
-
-                crcAcc = static_cast<unsigned short>(
-                    (crcAcc << 8) ^
-                    JoyBusCrcTable[(crcAcc >> 8) ^ b]
-                );
-            }
-
-            crc = static_cast<unsigned short>(~crcAcc);
+            crc = Crc16(size, dataBase, &crcAcc);
 
             unsigned int word =
                 (static_cast<unsigned int>(0x0B) << 24) |
@@ -4036,21 +4020,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
         else
         {
             unsigned short crcAcc = 0xFFFF;
-            unsigned char* p = dataBase;
-            unsigned int count = chunkSize;
-
-            while (static_cast<int>(count) > 0)
-            {
-                unsigned char b = *p++;
-                count--;
-
-                crcAcc = static_cast<unsigned short>(
-                    (crcAcc << 8) ^
-                    JoyBusCrcTable[(crcAcc >> 8) ^ b]
-                );
-            }
-
-            unsigned short crcChunk = static_cast<unsigned short>(~crcAcc);
+            unsigned short crcChunk = Crc16(chunkSize, dataBase, &crcAcc);
 
             unsigned int word =
                 (static_cast<unsigned int>(0x0B00) << 16) |
@@ -4158,21 +4128,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
         else
         {
             unsigned short crcAcc = 0xFFFF;
-            unsigned char* p = dataPtr;
-            unsigned int count = chunkSize;
-
-            while (static_cast<int>(count) > 0)
-            {
-                unsigned char b = *p++;
-                count--;
-
-                crcAcc = static_cast<unsigned short>(
-                    (crcAcc << 8) ^
-                    JoyBusCrcTable[(crcAcc >> 8) ^ b]
-                );
-            }
-
-            unsigned short crcChunk = static_cast<unsigned short>(~crcAcc);
+            unsigned short crcChunk = Crc16(chunkSize, dataPtr, &crcAcc);
 
             unsigned int word =
                 (static_cast<unsigned int>(0x4B) << 24) |
@@ -8157,7 +8113,7 @@ unsigned short JoyBus::Crc16(int len, unsigned char* data, unsigned short* crc)
 loop:
     idx = *crc;
     hi = idx << 8;
-    idx = (unsigned int)((int)idx >> 8);
+    idx = (unsigned int)((int)(short)idx >> 8);
     idx = (unsigned char)idx;
     idx = idx ^ (unsigned int)*data;
     data = data + 1;

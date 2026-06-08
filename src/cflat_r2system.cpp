@@ -4157,12 +4157,11 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
     if (systemValue <= -0x1000) {
         int valueIndex = -0x1000 - systemValue;
         unsigned int result = 0;
-        int valueGroup = valueIndex / 0x600;
         const unsigned short* row =
             reinterpret_cast<const unsigned short*>(Game.unkCFlatData0[2]) +
-            (0x5FF - (valueIndex - valueGroup * 0x600)) * 0x24;
+            (0x5FF - (valueIndex - valueIndex / 0x600 * 0x600)) * 0x24;
 
-        switch (valueGroup) {
+        switch (valueIndex / 0x600) {
         case 0: result = row[0]; break;
         case 1: result = row[1]; break;
         case 2: result = row[2]; break;

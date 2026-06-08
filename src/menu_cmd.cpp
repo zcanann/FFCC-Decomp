@@ -698,6 +698,8 @@ void CMenuPcs::CmdOpen()
 
 #pragma push
 #pragma opt_propagation off
+#pragma opt_strength_reduction off
+#pragma opt_loop_invariants off
 /*
  * --INFO--
  * PAL Address: 0x8014f4e8

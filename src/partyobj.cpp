@@ -2711,8 +2711,7 @@ void CGPartyObj::checkTargetParticle()
 		}
 	} else {
 		CGPartyObj* leader = Game.m_partyObjArr[0];
-		if (leader != nullptr &&
-		    (leader->m_lastStateId == 2 || leader->m_lastStateId == 6) &&
+		if ((leader->m_lastStateId == 2 || leader->m_lastStateId == 6) &&
 		    leader->m_comboState != 0) {
 			CVector leaderCenter(leader->m_comboCenter);
 			CVector selfCenter(m_comboCenter);

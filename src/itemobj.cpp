@@ -1078,7 +1078,7 @@ void CGItemObj::onFrameStat()
 
 		if (prgObj->m_worldPosition.y < kItemObjHeightOffset) {
 			prgObj->m_groundHitOffset.y += kItemObjBounceAccel * prgObj->m_moveTimer;
-		} else if (kItemObjMemoryRadius < prgObj->m_worldPosition.y) {
+		} else if (prgObj->m_worldPosition.y > kItemObjMemoryRadius) {
 			prgObj->m_groundHitOffset.y = -(kItemObjBounceAccel * prgObj->m_moveTimer - prgObj->m_groundHitOffset.y);
 		}
 
@@ -1087,7 +1087,7 @@ void CGItemObj::onFrameStat()
 			float current = prgObj->m_groundHitOffset.y;
 			float clamped = kItemObjDouble * -timer;
 
-			if (clamped <= current) {
+			if (current >= clamped) {
 				float maxClamp = kItemObjDouble * timer;
 				clamped = current;
 				if (maxClamp < current) {

@@ -1772,7 +1772,7 @@ void CGObject::update()
                     } else {
                         m_currentAnimSlot =
                             (queuedAnim >= 'A' && queuedAnim < 'A' + 4) ? m_animQueue[queuedAnim - 'A'] : queuedAnim;
-                        weaponFlagsHi &= ~0x1;
+                        m_weaponNodeFlagAll.m_bits1.m_bit01 = 0;
                         m_animExtraIndex = -1;
                         m_collisionPushTimer = -1;
                         m_shieldNodeFlagBits.m_bit02 = 0;

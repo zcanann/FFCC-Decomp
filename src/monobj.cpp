@@ -3495,59 +3495,59 @@ body:
 				return;
 			}
 			if (nextAction == -1) {
-				if (*reinterpret_cast<unsigned short*>(script + 0x10C) != 1) {
-					if (static_cast<int>(*reinterpret_cast<unsigned short*>(script + 0x1BA)) <=
-						monObj->m_chaseTimer) {
-						monObj->m_chaseState = 3;
-						monObj->m_chaseTimer = 0;
-						monObj->m_chaseDirty = 1;
+				if (*reinterpret_cast<unsigned short*>(script + 0x10C) == 1) {
+					unsigned char* aiScript = script;
+					short aiState = monObj->m_aiState;
+					if (aiState != 0) {
+						aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+							(static_cast<int>(aiState) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
+					}
+					if (((*reinterpret_cast<unsigned short*>(script + 0xFE) & 8) == 0) &&
+						((*reinterpret_cast<unsigned short*>(aiScript + 0x102) & 0x100) == 0)) {
+						actionState = 0x21;
+						if (monObj->m_moveWork.m_mode != 1) {
+							memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
+							monObj->m_moveWork.m_flags = 0x205;
+							if (aiState == 0) {
+								aiScript = script;
+							} else {
+								aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+									(static_cast<int>(aiState) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
+							}
+							if ((*reinterpret_cast<unsigned short*>(aiScript + 0x102) & 0x40) != 0) {
+								monObj->m_moveWork.m_flags |= 0x10000;
+							}
+							monObj->m_moveWork.m_mode = 1;
+						}
+						monObj->m_moveWork.m_target = Game.m_partyObjArr[targetPartyIndex];
+						if (((monObj->m_moveWork.m_stateFlags & 1) != 0) ||
+							(static_cast<int>(*reinterpret_cast<unsigned short*>(script + 0x1BA)) <=
+							 monObj->m_moveWork.m_frame)) {
+							actionState = 0;
+							memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
+							monObj->m_chaseState = 3;
+							monObj->m_chaseTimer = 0;
+							monObj->m_chaseDirty = 1;
+						}
 						return;
 					}
-					actionState = 3;
+
+					actionState = 0;
+					memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
+					monObj->m_chaseState = 2;
+					monObj->m_chaseTimer = 0;
+					monObj->m_chaseDirty = 1;
 					return;
 				}
 
-				unsigned char* aiScript = script;
-				short aiState = monObj->m_aiState;
-				if (aiState != 0) {
-					aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-						(static_cast<int>(aiState) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
-				}
-				if (((*reinterpret_cast<unsigned short*>(script + 0xFE) & 8) == 0) &&
-					((*reinterpret_cast<unsigned short*>(aiScript + 0x102) & 0x100) == 0)) {
-					actionState = 0x21;
-					if (monObj->m_moveWork.m_mode != 1) {
-						memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
-						monObj->m_moveWork.m_flags = 0x205;
-						if (aiState == 0) {
-							aiScript = script;
-						} else {
-							aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-								(static_cast<int>(aiState) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
-						}
-						if ((*reinterpret_cast<unsigned short*>(aiScript + 0x102) & 0x40) != 0) {
-							monObj->m_moveWork.m_flags |= 0x10000;
-						}
-						monObj->m_moveWork.m_mode = 1;
-					}
-					monObj->m_moveWork.m_target = Game.m_partyObjArr[targetPartyIndex];
-					if (((monObj->m_moveWork.m_stateFlags & 1) != 0) ||
-						(static_cast<int>(*reinterpret_cast<unsigned short*>(script + 0x1BA)) <=
-						 monObj->m_moveWork.m_frame)) {
-						actionState = 0;
-						memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
-						monObj->m_chaseState = 3;
-						monObj->m_chaseTimer = 0;
-						monObj->m_chaseDirty = 1;
-					}
+				if (static_cast<int>(*reinterpret_cast<unsigned short*>(script + 0x1BA)) <=
+					monObj->m_chaseTimer) {
+					monObj->m_chaseState = 3;
+					monObj->m_chaseTimer = 0;
+					monObj->m_chaseDirty = 1;
 					return;
 				}
-
-				actionState = 0;
-				memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
-				monObj->m_chaseState = 2;
-				monObj->m_chaseTimer = 0;
-				monObj->m_chaseDirty = 1;
+				actionState = 3;
 				return;
 			}
 

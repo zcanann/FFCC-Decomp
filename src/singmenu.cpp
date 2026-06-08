@@ -2030,7 +2030,7 @@ void CMenuPcs::SingleCalcCtrl()
         m_singleMenuCtrlResetFlag = 0;
     }
 
-    unsigned short result = 0;
+    int result = 0;
     if (m_wm.m_handles[0]->m_model->m_animEnd < m_wm.m_handles[0]->m_model->m_time) {
         m_wm.m_handles[0]->m_model->SetFrame(0.0f);
     } else {

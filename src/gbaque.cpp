@@ -3609,7 +3609,6 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
-	const unsigned int flatBase = Game.unkCFlatData0[2];
 	const unsigned int itemCount = static_cast<unsigned short>(caravanWork->m_shopListCount);
 
 	int totalSize = 4;
@@ -3634,7 +3633,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	for (unsigned int i = 0; i < itemCount; i++) {
 		const int itemId = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_shopList[i];
 		int itemPrice = static_cast<unsigned short>(
-			*reinterpret_cast<unsigned short*>(flatBase + itemId * 0x48 + 0x20));
+			*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x20));
 		itemPrice = static_cast<int>(static_cast<float>(itemPrice) * userRate);
 		if (itemPrice < 1) {
 			itemPrice = 1;

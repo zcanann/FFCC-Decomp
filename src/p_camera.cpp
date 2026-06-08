@@ -1860,9 +1860,8 @@ void CCameraPcs::drawShadowChrBegin()
 
     if (m_fullScreenShadowEnabled != 0) {
         float shadowX = m_fullScreenShadow.m_depthScaleMtx[0][3];
-        float scale = kCameraOnePointFiveF;
-        m_fullScreenShadow.m_depthScaleMtx[0][3] = shadowX * scale;
-        m_fullScreenShadow.m_depthScaleMtx[1][3] *= scale;
+        m_fullScreenShadow.m_depthScaleMtx[0][3] = shadowX * kCameraOnePointFiveF;
+        m_fullScreenShadow.m_depthScaleMtx[1][3] *= kCameraOnePointFiveF;
         PSMTXConcat(m_fullScreenShadow.m_depthScaleMtx,
                     m_shadowCamera.m_cameraMatrix,
                     m_fullScreenShadow.m_depthMtx);

@@ -894,10 +894,10 @@ int CMenuPcs::CmdClose()
 
 	if (list->count == doneCount) {
 		entry = list->entries;
-		if (list->count != 0) {
+		if (count != 0) {
 			u32 blockCount = count >> 3;
 			if (blockCount != 0) {
-				do {
+				for (; blockCount != 0; blockCount--) {
 					entry[0].startFrame = 0;
 					entry[0].duration = 1;
 					entry[0].alpha = 0.0f;
@@ -923,8 +923,7 @@ int CMenuPcs::CmdClose()
 					entry[7].duration = 1;
 					entry[7].alpha = 0.0f;
 					entry += 8;
-					blockCount = blockCount - 1;
-				} while (blockCount != 0);
+				}
 				count = count & 7;
 				if (count == 0) {
 					return 1;

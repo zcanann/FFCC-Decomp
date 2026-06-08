@@ -1539,21 +1539,18 @@ void CMes::Next()
 		while ((halfVal = kMesZero, *(int*)((char*)this + 0x3c10) < entryCount))
 		{
 			type = *flagEntry;
-			if ((type != 3) && (type < 3))
+			switch (type)
 			{
-				if (type != 1)
-				{
-					if (type != 0)
-					{
-						*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0) =
-						    (int)*(short*)(flagEntry + 4);
-					}
-				}
-				else
-				{
-					int* slot = (int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0);
-					*slot = *slot + 1;
-				}
+			case 2:
+				*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0) =
+				    (int)*(short*)(flagEntry + 4);
+				break;
+			case 1:
+			{
+				int* slot = (int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0);
+				*slot = *slot + 1;
+				break;
+			}
 			}
 			flagEntry += 6;
 			*(int*)((char*)this + 0x3c10) = *(int*)((char*)this + 0x3c10) + 1;

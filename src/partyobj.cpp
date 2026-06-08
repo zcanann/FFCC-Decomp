@@ -894,7 +894,7 @@ void CGPartyObj::onFrameAlways()
 
 	reinterpret_cast<CCaravanWork*>(m_scriptHandle)->CalcStatus();
 	int port = reinterpret_cast<int>(m_scriptHandle[0xED]);
-	bool showTraceParticle = false;
+	int showTraceParticle = 0;
 	if ((Game.m_gameWork.m_gameInitFlag != 0) &&
 	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 28) & 0xC0000000) >> 31) != 0) &&
 	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 29) & 0xC0000000) >> 31) != 0) &&
@@ -905,7 +905,7 @@ void CGPartyObj::onFrameAlways()
 		    (Game.m_gameWork.m_bossArtifactStageIndex >= 0x0F) ||
 		    ((static_cast<unsigned short>(GetCID()) & 0x6D) != 0x6D) ||
 		    (m_scriptHandle[0xED] == nullptr)) {
-			showTraceParticle = true;
+			showTraceParticle = 1;
 		}
 	}
 

@@ -1514,7 +1514,7 @@ void CGObject::update()
         }
     }
 
-    if (m_weaponNodeFlagBits.m_attached && m_attachOwner != 0 && HasLoadedModel(m_attachOwner->m_charaModelHandle)) {
+    if (m_weaponNodeFlagBits.m_attached) {
         CChara::CModel* ownerModel = m_attachOwner->m_charaModelHandle->m_model;
         PSMTXCopy(ModelNodeMtx(ownerModel, m_attachNode), modelMtx);
 

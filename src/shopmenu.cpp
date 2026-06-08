@@ -20,6 +20,7 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
 
 char s_shopmenu_cpp[] = "shopmenu.cpp";
+static const char s_shopMenuAllocErrorFmt[] = "%s(%d): Error: memory allocation error\n";
 extern char s_shop_80332e54[];
 unsigned short gShopMenuInputLatch;
 extern CShopMenu* g_shopMenu;
@@ -940,8 +941,8 @@ void CShopMenu::DrawItemHelp(int index, int centerX, int y)
 
     char* helpText = new((Game.m_gameWork.m_menuStageMode != 0) ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage,
                          s_shopmenu_cpp, 0xBFF) char[0x200];
-    if (helpText == 0) {
-        return;
+    if ((helpText == 0) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
+        System.Printf(const_cast<char*>(s_shopMenuAllocErrorFmt), s_shopmenu_cpp, 0xC01);
     }
     memset(helpText, 0, 0x200);
     CMes::MakeAgbString(helpText, const_cast<char*>(sourceText), 0, 1);

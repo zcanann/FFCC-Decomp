@@ -1807,9 +1807,7 @@ void CMenuPcs::CalcSelectOpenAnim()
  */
 void CMenuPcs::DrawResultCloseAnim()
 {
-	int statePtr = this->m_bonusStatePtr;
-
-	if (*(signed char*)(statePtr + 0xb) == 0) {
+	if (*(signed char*)(this->m_bonusStatePtr + 0xb) == 0) {
 		return;
 	}
 

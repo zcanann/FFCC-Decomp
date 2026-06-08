@@ -493,29 +493,24 @@ int CMes::useFlag(int maxCount, int stopOnClear)
 	{
 		int type = flagEntry->m_type;
 
-		if (type != 3)
+		switch (type)
 		{
-			if (type < 3)
-			{
-				if (type != 1)
-				{
-					if (type != 0)
-					{
-						mFlagVars[flagEntry->m_index] = flagEntry->m_value;
-					}
-				}
-				else
-				{
-					int* slot = &mFlagVars[flagEntry->m_index];
-					*slot = *slot + 1;
-				}
-			}
-			else if ((type < 5) &&
-			         (mFlagVars[flagEntry->m_index] == 0) &&
-			         (stopOnClear == 0))
+		case 2:
+			mFlagVars[flagEntry->m_index] = flagEntry->m_value;
+			break;
+		case 1:
+		{
+			int* slot = &mFlagVars[flagEntry->m_index];
+			*slot = *slot + 1;
+			break;
+		}
+		case 3:
+		case 4:
+			if ((mFlagVars[flagEntry->m_index] == 0) && (stopOnClear == 0))
 			{
 				return 0;
 			}
+			break;
 		}
 
 		flagEntry++;

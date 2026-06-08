@@ -572,12 +572,13 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
     Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x13a);
 
     ppvEnv = reinterpret_cast<_pppEnvSt*>(pdtSlot->m_envFields);
-    PppMngStRaw* pppMngSt = reinterpret_cast<PppMngStRaw*>(self + 0x2A18);
+    unsigned char* mngWalk = self;
     for (int i = 0; i < 0x180; i++) {
+        PppMngStRaw* pppMngSt = reinterpret_cast<PppMngStRaw*>(mngWalk + 0x2A18);
         if (pppMngSt->m_pppResSet == pdtSlot) {
             _pppAllFreePObject(reinterpret_cast<_pppMngSt*>(pppMngSt));
         }
-        pppMngSt++;
+        mngWalk += 0x158;
     }
 
     Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x149);

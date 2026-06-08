@@ -132,9 +132,9 @@ struct LKShooterBossWork {
     union {
         u8 m_flags;
         struct {
-            u8 m_bit80 : 1;
-            u8 m_bit40 : 1;
-            u8 m_bit20 : 1;
+            s8 m_bit80 : 1;
+            s8 m_bit40 : 1;
+            s8 m_bit20 : 1;
             u8 m_rest : 5;
         } bits;
     };
@@ -1008,10 +1008,9 @@ state100:
 	}
 
 	moveFrame();
-	const int branch = m_actionBranch;
-	const int flatFlags = CFlatBossState();
-	if ((*reinterpret_cast<volatile signed char*>(CGMonObj::m_boss + 0x14) < 0) ||
-	    ((branch == 1) && ((flatFlags & 1) != 0)) || ((branch == 2) && ((flatFlags & 2) != 0))) {
+	if ((reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->bits.m_bit80 != 0) ||
+	    ((m_actionBranch == 1) && ((CFlatBossState() & 1) != 0)) ||
+	    ((m_actionBranch == 2) && ((CFlatBossState() & 2) != 0))) {
 		reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
 	}
 	return;
@@ -1021,7 +1020,7 @@ state101:
 		reinterpret_cast<CGPrgObj*>(this)->reqAnim(-1, 0, 0);
 		rotTarget(m_targetPartyIndex, kMonObjBossTurnAroundDeg);
 	}
-	if ((*reinterpret_cast<volatile signed char*>(CGMonObj::m_boss + 0x14) < 0) ||
+	if ((reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->bits.m_bit80 != 0) ||
 	    (*reinterpret_cast<float*>(self + 0x5D0 + *reinterpret_cast<int*>(self + 0x620) * 4) < kMonObjBossFrameThreshold)) {
 		reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
 	}
@@ -1030,12 +1029,12 @@ state101:
 resetBranch:
 	if (m_actionBranch == 1) {
 		m_actionBranch = 0;
-		*reinterpret_cast<volatile unsigned char*>(CGMonObj::m_boss + 0x14) &= 0xDF;
+		reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->bits.m_bit20 = 0;
 		*reinterpret_cast<int*>(CGMonObj::m_boss + 0x10) = 0xFA;
 	}
 	if (m_actionBranch == 2) {
 		m_actionBranch = 0;
-		*reinterpret_cast<volatile unsigned char*>(CGMonObj::m_boss + 0x14) &= 0xBF;
+		reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->bits.m_bit40 = 0;
 		*reinterpret_cast<int*>(CGMonObj::m_boss + 0xC) = 0xFA;
 	}
 }

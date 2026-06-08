@@ -309,8 +309,8 @@ extern double DOUBLE_803313f8;
 extern double DOUBLE_803313F8;
 extern double DOUBLE_80331408;
 extern double DOUBLE_803314e8;
-extern unsigned char s_wmWorldParamPrimaryDirtyMask;
-extern unsigned char s_wmWorldParamSecondaryDirtyMask;
+extern unsigned int s_wmWorldParamPrimaryDirtyMask;
+extern unsigned int s_wmWorldParamSecondaryDirtyMask;
 extern char s_wmCharaAnimStand[6];
 extern char s_wmCharaAnimWalk[5];
 extern char s_wmCharaAnimRun[4];
@@ -5931,68 +5931,65 @@ void CMenuPcs::DrawTitleMenu()
 void CMenuPcs::SetWorldParam(int code, int value)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char bVar6 = static_cast<unsigned char>(value);
-	unsigned short uVar5 = static_cast<unsigned short>(value);
-	unsigned char bVar1 = static_cast<unsigned char>(static_cast<unsigned int>(value) >> 24);
 
 	switch (code) {
 	case 0:
 		bytes[5] = bytes[4];
-		bytes[4] = bVar6;
+		bytes[4] = static_cast<unsigned char>(value);
 		bytes[0xA] = bytes[0xA] | s_wmWorldParamPrimaryDirtyMask;
 		break;
 	case 1:
-		bytes[6] = bVar6;
+		bytes[6] = static_cast<unsigned char>(value);
 		break;
 	case 2:
-		*reinterpret_cast<unsigned short*>(bytes + 0x1A) = uVar5 & 0x3FF;
+		*reinterpret_cast<unsigned short*>(bytes + 0x1A) = static_cast<unsigned short>(value) & 0x3FF;
 		break;
 	case 3:
-		bytes[7] = bVar6;
+		bytes[7] = static_cast<unsigned char>(value);
 		break;
 	case 4:
-		bytes[8] = bVar6;
+		bytes[8] = static_cast<unsigned char>(value);
 		break;
 	case 5:
-		*reinterpret_cast<unsigned short*>(bytes + 0x1C) = uVar5;
+		*reinterpret_cast<unsigned short*>(bytes + 0x1C) = static_cast<unsigned short>(value);
 		break;
 	case 6:
-		*reinterpret_cast<unsigned short*>(bytes + 0x1E) = uVar5;
+		*reinterpret_cast<unsigned short*>(bytes + 0x1E) = static_cast<unsigned short>(value);
 		break;
 	case 7:
-		bytes[9] = bVar6;
+		bytes[9] = static_cast<unsigned char>(value);
 		break;
 	case 8:
 		bytes[0xB] = bytes[0xC];
-		bytes[0xC] = bVar6;
+		bytes[0xC] = static_cast<unsigned char>(value);
 		bytes[0xA] = bytes[0xA] | s_wmWorldParamSecondaryDirtyMask;
 		break;
 	case 9:
 		if (static_cast<int>(static_cast<signed char>(bytes[0xD])) != value) {
-			bytes[0xD] = bVar6;
+			bytes[0xD] = static_cast<unsigned char>(value);
 		}
 		m_wmWorldState->m_changeRequest = 2;
 		break;
 	case 10:
-		bytes[0x10] = static_cast<unsigned char>(static_cast<unsigned char>(static_cast<unsigned int>(-value) >> 24) | bVar1) >> 7;
+		bytes[0x10] = static_cast<unsigned char>(((static_cast<unsigned int>(-value) >> 24) | static_cast<unsigned int>(value)) >> 31);
 		break;
 	case 11:
-		bytes[0x11] = static_cast<unsigned char>(static_cast<unsigned char>(static_cast<unsigned int>(-value) >> 24) | bVar1) >> 7;
+		bytes[0x11] = static_cast<unsigned char>(((static_cast<unsigned int>(-value) >> 24) | static_cast<unsigned int>(value)) >> 31);
 		break;
 	case 12:
-		bytes[0xE] = bVar6;
+		bytes[0xE] = static_cast<unsigned char>(value);
 		break;
 	case 13:
-		bytes[0xF] = bVar6 & 3;
+		bytes[0xF] = static_cast<unsigned char>(value) & 3;
 		break;
 	case 14:
-		bytes[0x12] = static_cast<unsigned char>(static_cast<unsigned char>(static_cast<unsigned int>(-value) >> 24) | bVar1) >> 7;
+		bytes[0x12] = static_cast<unsigned char>(((static_cast<unsigned int>(-value) >> 24) | static_cast<unsigned int>(value)) >> 31);
 		break;
 	case 15:
-		bytes[0x13] = static_cast<unsigned char>(static_cast<unsigned char>(static_cast<unsigned int>(-value) >> 24) | bVar1) >> 7;
+		bytes[0x13] = static_cast<unsigned char>(((static_cast<unsigned int>(-value) >> 24) | static_cast<unsigned int>(value)) >> 31);
 		break;
 	case 16:
-		bytes[0x17] = bVar6;
+		bytes[0x17] = static_cast<unsigned char>(value);
 		break;
 	default:
 		if (System.m_execParam != 0) {

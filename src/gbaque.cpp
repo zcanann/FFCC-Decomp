@@ -1521,7 +1521,7 @@ void GbaQueue::LoadEnemyStat()
 
 	memset(localEnemyData, 0, sizeof(localEnemyData));
 
-	if (reinterpret_cast<int*>(&CFlat)[0x1041] != 0) {
+	if (reinterpret_cast<int*>(&CFlat)[0x4101] != 0) {
 		unsigned char* enemyEntry = localEnemyData;
 		enemyObjPtrs = &Game.m_scriptWork[0][0][0];
 		enemyWorkPtrs = &Game.m_scriptWork[4][0][0];

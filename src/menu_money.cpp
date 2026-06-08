@@ -30,10 +30,10 @@ inline void CMenuPcs::MoneySetPlace(int row)
 {
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	int gil;
-	if (row == 0) {
-		gil = caravanWork->m_gil;
-	} else {
+	if (row != 0) {
 		gil = s_Money;
+	} else {
+		gil = caravanWork->m_gil;
 	}
 
 	signed char* place = s_place + row * 8;
@@ -43,10 +43,10 @@ inline void CMenuPcs::MoneySetPlace(int row)
 	int started = 0;
 
 	do {
-		if ((!started) && (digitPlace <= gil)) {
+		if ((!started) && (gil >= digitPlace)) {
 			started = 1;
 		}
-		if (((!started) && (gil < digitPlace)) && (digitIndex != 7)) {
+		if (((!started) && (gil < digitPlace)) && (digitIndex < 7)) {
 			*place = -1;
 		} else {
 			int digit = gil / digitPlace;
@@ -155,9 +155,9 @@ int CMenuPcs::MoneyCtrlCur()
 	int attachFlag = SingGetLetterAttachflg();
 
 	if (mode == 0) {
-		unsigned int cursor = this->m_moneyState->selections[mode];
+		int cursor = this->m_moneyState->selections[mode];
 		unsigned int placeValue = 1;
-		while (cursor != 0) {
+		while (0 < cursor) {
 			placeValue *= 10;
 			cursor--;
 		}
@@ -167,7 +167,7 @@ int CMenuPcs::MoneyCtrlCur()
 				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			} else {
 				unsigned int gil = s_Money + placeValue;
-				gil = ((unsigned int)caravanWork->m_gil < gil) ? 0u : gil;
+				gil = (gil <= (unsigned int)caravanWork->m_gil) ? gil : 0u;
 				s_Money = gil;
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
 				gil = s_Money;
@@ -227,7 +227,7 @@ int CMenuPcs::MoneyCtrlCur()
 				if (s_Money < 1) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else {
-					if (-1 < attachFlag) {
+					if (attachFlag >= 0) {
 						LetterSetAttachItem(s_Money, 1);
 						Sound.PlaySe(2, 0x40, 0x7F, 0);
 						return 1;
@@ -246,7 +246,7 @@ int CMenuPcs::MoneyCtrlCur()
 					Sound.PlaySe(2, 0x40, 0x7F, 0);
 				}
 			} else if ((press & 0x200) != 0) {
-				if (-1 < attachFlag) {
+				if (attachFlag >= 0) {
 					LetterSetAttachItem(0, 0xFFFFFFFF);
 					Sound.PlaySe(3, 0x40, 0x7F, 0);
 					return 1;
@@ -258,7 +258,7 @@ int CMenuPcs::MoneyCtrlCur()
 		}
 	} else {
 		if ((hold & 8) != 0) {
-			if (this->m_moneyState->selections[mode] != 0) {
+			if ((int)this->m_moneyState->selections[mode] != 0) {
 				this->m_moneyState->selections[mode] = this->m_moneyState->selections[mode] - 1;
 			} else {
 				this->m_moneyState->selections[mode] = 1;
@@ -266,7 +266,7 @@ int CMenuPcs::MoneyCtrlCur()
 			Sound.PlaySe(1, 0x40, 0x7F, 0);
 		} else {
 			if ((hold & 4) != 0) {
-				if (this->m_moneyState->selections[mode] < 1) {
+				if ((int)this->m_moneyState->selections[mode] < 1) {
 					this->m_moneyState->selections[mode] = this->m_moneyState->selections[mode] + 1;
 				} else {
 					this->m_moneyState->selections[mode] = 0;

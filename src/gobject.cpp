@@ -882,7 +882,7 @@ void CGObject::bgCollision()
     m_stateFlags0Bits.unk0 = 0;
     m_stateFlags0Bits.unk1 = 0;
 
-    m_radiusCtrl.x = 0.0f;
+    *reinterpret_cast<int*>(&m_radiusCtrl.x) = 0;
     m_gravityY = sBgDefaultGravityY;
 
     bgAttribCollision();

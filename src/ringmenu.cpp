@@ -872,14 +872,11 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 	int alpha = static_cast<int>((kRingMenuAlphaMax * alphaScale) * clampedAlpha);
 	CColor color(0xFF, 0xFF, 0xFF, alpha);
 	font->SetColor(color.color);
-	font->SetPosX(static_cast<float>(waveX + -(static_cast<double>(static_cast<float>(
-		textWidth * static_cast<double>(kRingMenuHalf) -
-		static_cast<double>(static_cast<float>(static_cast<double>(kRingMenuTextBaseX) + static_cast<double>(posX))))))));
-	font->SetPosY(
-		kRingMenuGbaOrbitYScale +
-			static_cast<float>(waveY + -(static_cast<double>(static_cast<float>(
-				textHeight * static_cast<double>(kRingMenuHalf) -
-				static_cast<double>(static_cast<float>(static_cast<double>(kRingMenuShadowOffset) + static_cast<double>(posY))))))));
+	font->SetPosX(static_cast<float>(waveX) +
+		((kRingMenuTextBaseX + posX) - static_cast<float>(textWidth) * kRingMenuHalf));
+	font->SetPosY(kRingMenuGbaOrbitYScale +
+		(static_cast<float>(waveY) +
+			((kRingMenuShadowOffset + posY) - static_cast<float>(textHeight) * kRingMenuHalf)));
 	font->SetPosZ(kRingMenuZero);
 	font->Draw(commandLabel);
 }

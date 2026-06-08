@@ -2159,9 +2159,8 @@ void CGMonObj::logicFuncMeteoParasite()
 
 	if ((flags & 0x40) != 0) {
 		nextState = 0x68;
-	} else if (object->m_scriptHandle[4] == reinterpret_cast<void*>(0x87) &&
-	           *reinterpret_cast<int*>(CGMonObj::m_boss + 0x58) == 2 &&
-	           *reinterpret_cast<int*>(mon + 0x6B4) < 2) {
+	} else if (reinterpret_cast<int>(object->m_scriptHandle[4]) == 0x87 &&
+	           *reinterpret_cast<int*>(CGMonObj::m_boss + 0x58) == 2 && m_actionBranch < 2) {
 		CGPrgObj* bossObj = *reinterpret_cast<CGPrgObj**>(CGMonObj::m_boss + 0x54);
 		if (bossObj->m_lastStateId > 99) {
 			return;

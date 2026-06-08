@@ -1156,10 +1156,12 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
         dstBuffer = (void*)((char*)dstBuffer + 0x20);
     }
 
-    mana2Work->m_envTexture0->m_format = 0;
-    mana2Work->m_envTexture0->InitTexObj();
-    mana2Work->m_envTexture1->m_format = 0;
-    mana2Work->m_envTexture1->InitTexObj();
+    CTexture* envTexture0 = mana2Work->m_envTexture0;
+    CTexture* envTexture1 = mana2Work->m_envTexture1;
+    envTexture0->m_wrapMode = 0;
+    envTexture0->InitTexObj();
+    envTexture1->m_wrapMode = 0;
+    envTexture1->InitTexObj();
 
     if (mana2Work->m_paraboloidMap == 0) {
         mana2Work->m_paraboloidMap =

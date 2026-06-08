@@ -614,24 +614,24 @@ bool CMenuPcs::ItemClose()
  */
 int CMenuPcs::ItemCtrl()
 {
-    ItemMenuState* state = this->m_itemMenuState;
     int changed = 0;
 
-    state->prevMode = state->mode;
+    this->m_itemMenuState->prevMode = this->m_itemMenuState->mode;
 
-    if ((state->mode == 0) || ((state->mode != 0) && (state->optionFrame == 1))) {
+    if ((this->m_itemMenuState->mode == 0) ||
+        ((this->m_itemMenuState->mode != 0) && (this->m_itemMenuState->optionFrame == 1))) {
         changed = ItemCtrlCur();
-    } else if ((state->mode == 1) && (state->optionFrame == 0)) {
+    } else if ((this->m_itemMenuState->mode == 1) && (this->m_itemMenuState->optionFrame == 0)) {
         if (this->m_menuWindowInfo->state == 1) {
             changed = 0;
-            state->optionFrame++;
+            this->m_itemMenuState->optionFrame++;
         }
-    } else if (((state->mode == 1) && (state->optionFrame == 2)) &&
+    } else if (((this->m_itemMenuState->mode == 1) && (this->m_itemMenuState->optionFrame == 2)) &&
                (this->m_menuWindowInfo->state == 3)) {
         changed = 0;
-        state->optionFrame = 0;
-        state->mode = 0;
-        state->frame = 0;
+        this->m_itemMenuState->optionFrame = 0;
+        this->m_itemMenuState->mode = 0;
+        this->m_itemMenuState->frame = 0;
     }
 
     if (changed != 0) {
@@ -841,8 +841,7 @@ void CMenuPcs::ItemInit()
         entry[6].uvScale = one;
         entry[7].uvScale = one;
         entry += 8;
-        initCount--;
-    } while (initCount != 0);
+    } while (--initCount != 0);
 
     index = 0;
     entry = &this->m_itemList->anims[index++];

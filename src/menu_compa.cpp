@@ -61,7 +61,7 @@ void CMenuPcs::CompaDraw()
 
 	const CCaravanWork* caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	CompaOpenAnim* entry = this->m_compaList->entries;
-	for (int i = 0; i < this->m_compaList->count; i++) {
+	for (unsigned int i = 0; i < this->m_compaList->count; i++) {
 		int tex = entry->tex;
 		if (tex >= 0) {
 			float x = static_cast<float>(entry->x);
@@ -177,10 +177,10 @@ void CMenuPcs::CompaDraw()
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3A));
 
 	int familyCount = 2;
-	const short* evtWord = caravanWork->m_evtWordArr;
+	const short* evtWord = &caravanWork->m_evtWordArr[19];
 	int i = 2;
 	do {
-		if (evtWord[19 + i] > 0) {
+		if (evtWord[i] > 0) {
 			familyCount++;
 		}
 		i++;
@@ -278,7 +278,7 @@ void CMenuPcs::CompaDraw()
 		font->SetPosY(y);
 		font->Draw(name);
 
-		unsigned short food = nameWork->m_evtWordArr[19 + drawIndex];
+		short food = nameWork->m_evtWordArr[19 + drawIndex];
 		const char* value = Game.m_cFlatDataArr[1].TableStrings(2)[food];
 		font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x90));
 		font->SetPosY(y);

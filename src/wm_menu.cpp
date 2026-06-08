@@ -6304,15 +6304,15 @@ double CMenuPcs::GetFcvValue(CMenuPcs::FCV fcv, float value)
 
 	float* cur = keys;
 	int idx = 0;
-	if (keyCount <= 0) {
-		return static_cast<double>(def);
-	}
 	for (int rem = keyCount; rem > 0; rem--) {
 		if (t <= *cur) {
 			break;
 		}
 		cur = cur + 4;
 		idx = idx + 1;
+	}
+	if (keyCount <= 0) {
+		return static_cast<double>(def);
 	}
 
 	if (idx == 0) {
@@ -10844,7 +10844,7 @@ void CMenuPcs::DrawMCList()
 	unsigned char* const lbl_801DC294 = reinterpret_cast<unsigned char*>(lbl_801DB7F8 + 0xA9C);
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	CFont* fontF8 = m_fonts[0];
-	WmWorldState* const worldState = m_wmWorldState;
+#define worldState GetWmWorldState(this)
 	const double kSlope = DOUBLE_80331498;
 	const double kBase = DOUBLE_80331490;
 	short state = worldState->m_mainState;
@@ -11337,6 +11337,7 @@ LAB_draw:
 		}
 	}
 	DrawInit();
+#undef worldState
 }
 
 /*
@@ -12314,7 +12315,6 @@ float CMenuPcs::GetMaxAnimWait()
 void CMenuPcs::BindMcObj()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned int* charaState = reinterpret_cast<unsigned int*>(m_wmCharaState);
 
 	for (int i = 0; i < 4; i++) {
 		EffectInfo* const effectA = &m_effectWork[i + 0x11];
@@ -12335,6 +12335,7 @@ void CMenuPcs::BindMcObj()
 	}
 
 	const float kOne = FLOAT_803313e8;
+	unsigned int* charaState = reinterpret_cast<unsigned int*>(m_wmCharaState);
 	for (int i = 0; i < 4; i++) {
 		const int modelNo = static_cast<int>(charaState[i * 0x12 + 3]);
 		const int slot = i + 0x11;

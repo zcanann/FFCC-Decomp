@@ -2002,7 +2002,7 @@ void CMenuPcs::LetterMessDraw()
 	}
 
 	DrawSingWin(-1);
-	int state = GetLetterStateBase(this);
+	unsigned int state = GetLetterStateBase(this);
 	if ((*reinterpret_cast<s16*>(state + 0x12) == 1) &&
 	    (m_menuWindowInfo->state == 1)) {
 		int msgType = static_cast<int>(*reinterpret_cast<signed char*>(state + 9));

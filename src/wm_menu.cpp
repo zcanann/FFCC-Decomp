@@ -542,11 +542,10 @@ static inline void CalcWmFrame0Inline(CMenuPcs* menu, int param)
 	if (param < 0) {
 		float offset = static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(frame + 8)) +
 		                                  static_cast<int>(*reinterpret_cast<short*>(frame + 4)));
-		if (param > -11) {
-			unsigned int sign = static_cast<unsigned int>(param) >> 31;
-			unsigned int absParam = (sign ^ static_cast<unsigned int>(param)) - sign;
-			float tUnclamped = static_cast<float>(static_cast<int>(absParam));
-			float scaledOffset = offset * 0.1f * tUnclamped;
+		if (param >= -10) {
+			int sign = param >> 31;
+			unsigned int absParam = static_cast<unsigned int>((param ^ sign) - sign);
+			float scaledOffset = offset * static_cast<float>(DOUBLE_803314E8 * static_cast<double>(static_cast<int>(absParam)));
 			if (static_cast<int>(absParam) < 0) {
 				absParam = 0;
 			}
@@ -1647,9 +1646,8 @@ void CMenuPcs::destroyWorld()
 		THPSimpleLoadStop();
 		THPSimpleClose();
 		THPSimpleQuit();
-		bool bVar1 = m_wmWorkBuffer != 0;
-		if (bVar1) {
-			if (bVar1) {
+		if (m_wmWorkBuffer != 0) {
+			if (m_wmWorkBuffer != 0) {
 				Memory.Free(m_wmWorkBuffer);
 				m_wmWorkBuffer = 0;
 			}
@@ -1990,7 +1988,7 @@ void CMenuPcs::CalcDiaryMenu()
 		CalcGoOutMenu();
 		break;
 	default:
-		if (System.m_execParam != 0) {
+		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
 			System.Printf(const_cast<char*>(s__s__d___Error_WM_menu_no_error___801dc424), s_wm_menu_cpp, 0x4c0);
 		}
 		break;
@@ -3831,8 +3829,42 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 	unsigned short repeat = 0;
 	unsigned short down = 0;
 	if (entry.m_connected != 0 && entry.m_cmakePending == 0) {
-		repeat = GetButtonRepeat(0);
-		down = GetButtonDown(0);
+		const int port = 0;
+		bool noRepeatInput = false;
+		if (Pad.m_debugPadLock == 0) {
+			if (port != 0) {
+				goto repeat_check_done;
+			}
+			if (Pad.m_debugPadPort == -1) {
+				goto repeat_check_done;
+			}
+		}
+		noRepeatInput = true;
+	repeat_check_done:
+		if (noRepeatInput) {
+			repeat = 0;
+		} else {
+			u32 clamped = (Pad.m_debugPadPort == port) ? 0 : port;
+			repeat = static_cast<unsigned short>(Pad.GetPadInputs()[clamped].repeatButton);
+		}
+
+		bool noDownInput = false;
+		if (Pad.m_debugPadLock == 0) {
+			if (port != 0) {
+				goto down_check_done;
+			}
+			if (Pad.m_debugPadPort == -1) {
+				goto down_check_done;
+			}
+		}
+		noDownInput = true;
+	down_check_done:
+		if (noDownInput) {
+			down = 0;
+		} else {
+			u32 clamped = (Pad.m_debugPadPort == port) ? 0 : port;
+			down = static_cast<unsigned short>(Pad.GetPadInputs()[clamped].buttonDown[0]);
+		}
 	}
 
 	if (m_wmWorldState->m_mainState != 2 || m_wmWorldState->m_nextMenuMode != 0) {
@@ -4091,7 +4123,7 @@ void CMenuPcs::drawWorld()
 			DrawGoOutMenu();
 			break;
 		default:
-			if (System.m_execParam != 0) {
+			if (static_cast<unsigned int>(System.m_execParam) >= 1) {
 				System.Printf(const_cast<char*>(s__s__d___Error_WM_menu_no_error___801dc424), s_wm_menu_cpp, 0xC59);
 			}
 			break;
@@ -5005,7 +5037,10 @@ void CMenuPcs::DrawMoveMenu()
 
 	{
 		const short state = worldState->m_mainState;
-		if (((state == 0) && bytes[0x12] == 0) || state > 3) {
+		if ((state == 0) && bytes[0x12] == 0) {
+			return;
+		}
+		if (state > 3) {
 			return;
 		}
 	}
@@ -6022,7 +6057,7 @@ void CMenuPcs::SetWorldParam(int code, int value)
 		bytes[0x17] = static_cast<unsigned char>(value);
 		break;
 	default:
-		if (System.m_execParam != 0) {
+		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
 			System.Printf(const_cast<char*>(s__s__d___Error_function_code_not_f_801dc3ec), s_wm_menu_cpp, 0x1482, code);
 		}
 		break;
@@ -6200,7 +6235,7 @@ unsigned int CMenuPcs::GetWorldParam(int code)
 		break;
 	}
 	default:
-		if (System.m_execParam != 0) {
+		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
 			System.Printf(const_cast<char*>(s__s__d___Error_function_code_not_f_801dc3ec), s_wm_menu_cpp, 0x1521, code);
 		}
 		break;
@@ -8100,7 +8135,13 @@ void CMenuPcs::DrawCharaBase()
 	for (int row = 0; row < 2; row++) {
 		for (int col = 0; col < 4; col++) {
 			const float x = static_cast<float>(0x1C + col * 0x90);
-			const float y = static_cast<float>((row == 0 ? 0x22 : 0xCA) + (row != 0 ? 8 : 0));
+			int yInt;
+			if (row == 0) {
+				yInt = 0x22;
+			} else {
+				yInt = 0xCA + 8;
+			}
+			const float y = static_cast<float>(yInt);
 			MenuPcs.DrawRect(0, x, y, FLOAT_803316C8, FLOAT_803316CC, kZero, kZero, FLOAT_803313e8, FLOAT_803313e8, kZero);
 		}
 	}
@@ -8389,10 +8430,10 @@ void CMenuPcs::PCAnimCtrl()
 					handle->SetAnim((static_cast<int>(static_cast<unsigned int>(GetWmCharaHandles(this)[i]->m_charaNo) / 100) - 1) * 6 + animState[0], -1, -1, blendMode, 0);
 					reinterpret_cast<float*>(animState)[3] = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xB4)[0];
 					reinterpret_cast<float*>(animState)[4] = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xC0)[0];
-					if (isSelected == 0) {
-						animState[2] = 0;
-					} else {
+					if (isSelected != 0) {
 						animState[2] = 0x834;
+					} else {
+						animState[2] = 0;
 					}
 				}
 				handle->m_model->SetFrame(FLOAT_803313dc);
@@ -10280,10 +10321,10 @@ input_check_done:
 
 			const float selA = *reinterpret_cast<float*>(bytes + 0x78);
 			const float selB = *reinterpret_cast<float*>(bytes + 0x7C);
-			const float lo = (selB > selA) ? selA : selB;
-			const float hi = (selB > selA) ? selB : selA;
-			const float delta = FLOAT_803315cc * (lo - hi);
-			if (selB > selA) {
+			const float hi = (selB < selA) ? selA : selB;
+			const float lo = (selB < selA) ? selB : selA;
+			const float delta = FLOAT_803315cc * (hi - lo);
+			if (selB <= selA) {
 				*reinterpret_cast<float*>(bytes + 0x7C) += delta;
 			} else {
 				*reinterpret_cast<float*>(bytes + 0x7C) -= delta;
@@ -10633,7 +10674,7 @@ void CMenuPcs::DrawMainMenuSub()
 			if (next < 5) {
 				do {
 					float depth = *fp;
-					if (*fpInner < depth) {
+					if (*fp > *fpInner) {
 						unsigned int idx = *op;
 						unsigned int idxInner = *opInner;
 						*fp = *fpInner;
@@ -12104,14 +12145,13 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 		const short msgId = *reinterpret_cast<const short*>(entry);
 		const char* text = msgTable[msgId];
 		if (strlen(text) != 0) {
-			const bool noMarker = text[0] != '$';
-			if (noMarker) {
+			if (text[0] != '$') {
 				strcpy(textBuf, text);
 			} else {
 				strcpy(textBuf, text + 1);
 			}
 
-			if (winType == 0 || !noMarker) {
+			if (winType == 0 || text[0] == '$') {
 				const int textWidth = font->GetWidth(textBuf);
 				posX = static_cast<float>(static_cast<double>(m_menuWindowInfo->x) + static_cast<double>(m_menuWindowInfo->width - textWidth) * DOUBLE_803313f8);
 			}
@@ -12527,17 +12567,14 @@ int CMenuPcs::GetSameCharaData(Mc::SaveDat* source, Mc::SaveDat* target, int mem
 		result = index;
 	} while (count != 0);
 
-	if (strictMode != 0) {
-		if (result < 8) {
-			return -3;
+	if (strictMode == 0) {
+		if (static_cast<int>(result) < 8) {
+			return result;
 		}
-		return -4;
+		return -1;
 	}
 
-	if (static_cast<int>(result) < 8) {
-		return result;
-	}
-	return -1;
+	return (static_cast<int>(result) < 8) - 4;
 }
 
 /*

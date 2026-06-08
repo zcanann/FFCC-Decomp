@@ -4346,7 +4346,7 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
     if (systemValue > -0x1000) {
         if (systemValue <= -500) {
             int bitIndex = systemValue + 0x9F3;
-            unsigned char* flagByte = reinterpret_cast<unsigned char*>(Game.m_gameWork.m_eventFlags) + bitIndex / 8;
+            unsigned char* flagByte = reinterpret_cast<unsigned char*>(gameWork.m_eventFlags) + bitIndex / 8;
             unsigned int mask = 1U << (bitIndex % 8);
             unsigned int flag = *flagByte & mask;
             unsigned int value = (-flag | flag) >> 31;

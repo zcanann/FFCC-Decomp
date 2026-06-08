@@ -2171,9 +2171,12 @@ CGObject* CGObject::CCClass(int useBodyRadius, int classMask, float yOffset, Vec
         if ((other->m_attrFlags & static_cast<unsigned int>(classMask)) == 0) {
             continue;
         }
-        if (!(other->m_worldPosition.x - maxDist <= origin.x) || !(other->m_worldPosition.y - maxDist <= origin.y)
-            || !(other->m_worldPosition.z - maxDist <= origin.z) || !(other->m_worldPosition.x + maxDist >= origin.x)
-            || !(other->m_worldPosition.y + maxDist >= origin.y) || !(other->m_worldPosition.z + maxDist >= origin.z)) {
+        const float otherX = other->m_worldPosition.x;
+        const float otherY = other->m_worldPosition.y;
+        const float otherZ = other->m_worldPosition.z;
+        if (!(otherX - maxDist <= origin.x) || !(otherY - maxDist <= origin.y)
+            || !(otherZ - maxDist <= origin.z) || !(otherX + maxDist >= origin.x)
+            || !(otherY + maxDist >= origin.y) || !(otherZ + maxDist >= origin.z)) {
             continue;
         }
 

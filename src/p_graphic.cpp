@@ -720,7 +720,7 @@ void CGraphicPcs::drawBar()
         padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
         padState = Pad.GetPadInputs()[padIndex].holdOverride;
     }
-    const bool drawText = (padState != 0) && (Joybus.GetPadType(0) != 0x40000);
+    const int drawText = (padState != 0) && (Joybus.GetPadType(0) != 0x40000);
 
     GXColor backColor = s_debug_bar_color;
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);

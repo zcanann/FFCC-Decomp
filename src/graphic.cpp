@@ -596,7 +596,7 @@ void CGraphic::Thread()
  * Address:	TODO
  * Size:	TODO
  */
-u8 CGraphic::IsFifoOver()
+int CGraphic::IsFifoOver()
 {
 	GXBool overhi;
 	GXBool underflow;
@@ -614,7 +614,7 @@ u8 CGraphic::IsFifoOver()
  * Address:	TODO
  * Size:	TODO
  */
-u32 CGraphic::IsFrameRateOver()
+int CGraphic::IsFrameRateOver()
 {
 	return m_frameRateOver;
 }

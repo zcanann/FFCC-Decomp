@@ -647,24 +647,20 @@ CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int mode
                         stage->m_heapHead = stage->m_heapTop;
                         stage->m_heapTail = stage->m_heapBottom - 0x40;
 
-                        CStage::CBlock* headBlock = stageBlockAt(stage->m_heapHead);
-                        CStage::CBlock* firstBlock = headBlock + 1;
-                        CStage::CBlock* tailBlock = stageBlockAt(stage->m_heapTail);
+                        stageBlockAt(stage->m_heapHead)->m_flags = 5;
+                        stageBlockAt(stage->m_heapHead)->m_prev = 0;
+                        stageBlockAt(stage->m_heapHead)->m_next = stageBlockAt(stage->m_heapHead) + 1;
 
-                        headBlock->m_flags = 5;
-                        headBlock->m_prev = 0;
-                        headBlock->m_next = firstBlock;
+                        (stageBlockAt(stage->m_heapHead) + 1)->m_magicStart = kMemoryBlockStartMagic;
+                        (stageBlockAt(stage->m_heapHead) + 1)->m_magicEnd = kMemoryBlockEndMagic;
+                        (stageBlockAt(stage->m_heapHead) + 1)->m_flags = 0;
+                        (stageBlockAt(stage->m_heapHead) + 1)->m_size = stage->m_heapTail - reinterpret_cast<unsigned long>(stageBlockAt(stage->m_heapHead) + 2);
+                        (stageBlockAt(stage->m_heapHead) + 1)->m_prev = stageBlockAt(stage->m_heapHead);
+                        (stageBlockAt(stage->m_heapHead) + 1)->m_next = stageBlockAt(stage->m_heapTail);
 
-                        firstBlock->m_magicStart = kMemoryBlockStartMagic;
-                        firstBlock->m_magicEnd = kMemoryBlockEndMagic;
-                        firstBlock->m_flags = 0;
-                        firstBlock->m_size = stage->m_heapTail - reinterpret_cast<unsigned long>(firstBlock + 1);
-                        firstBlock->m_prev = headBlock;
-                        firstBlock->m_next = tailBlock;
-
-                        tailBlock->m_flags = 6;
-                        tailBlock->m_prev = firstBlock;
-                        tailBlock->m_next = 0;
+                        stageBlockAt(stage->m_heapTail)->m_flags = 6;
+                        stageBlockAt(stage->m_heapTail)->m_prev = stageBlockAt(stage->m_heapHead) + 1;
+                        stageBlockAt(stage->m_heapTail)->m_next = 0;
                         stage->m_allocCount = 0;
                     }
 

@@ -2141,7 +2141,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 			PSVECSubtract(&coneStart, &sideOffset, &coneStart);
 		}
 
-		float coneLength = static_cast<float>(static_cast<double>(distance) + static_cast<double>(sideDist));
+		float coneLength = distance + sideDist;
 		{
 			CVector scaled;
 			PSVECScale(reinterpret_cast<Vec*>(&forward), reinterpret_cast<Vec*>(&scaled), sideDist);
@@ -2154,7 +2154,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 
 		unsigned char didHit = 0;
 		for (int rank = 0; rank < 4; rank++) {
-			if (((flags & 4) != 0) && (((static_cast<int>(mon[0x54C]) + rank) & 3) != 0)) {
+			if (((flags & 4) != 0) && (((*reinterpret_cast<int*>(mon + 0x54C) + rank) & 3) != 0)) {
 				continue;
 			}
 

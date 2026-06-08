@@ -1803,7 +1803,10 @@ void CMenuPcs::CalcSelectOpenAnim()
 			if (frame < iconSprite->startFrame) {
 				srcVec.x = s_BonusModelScale[6];
 				angle = -90.0f;
-			} else if (iconSprite->timer < phase) {
+			} else if (iconSprite->timer >= phase) {
+				srcVec.x = s_BonusModelScale[4];
+				angle = (float)(45.0 * (double)(8 - artifactIndex));
+			} else {
 				int last = iconSprite->timer - 1;
 				if (fcvIndex < last) {
 					srcVec.x = ((s_BonusModelScale[5] - s_BonusModelScale[4]) /
@@ -1816,9 +1819,6 @@ void CMenuPcs::CalcSelectOpenAnim()
 				}
 				srcVec.x = -srcVec.x;
 				angle = (float)(-90.0 + (double)(float)(rate * (double)(float)last));
-			} else {
-				srcVec.x = s_BonusModelScale[4];
-				angle = (float)(45.0 * (double)(8 - artifactIndex));
 			}
 			srcVec.y = 0.0f;
 			srcVec.z = 0.0f;
@@ -3138,11 +3138,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			scaleMtx[0][3] = 0.0f;
 			scaleMtx[1][3] = s_BonusModelYPos[tribeId];
 			scaleMtx[2][3] = 0.0f;
-		} else if (i < activePartyCount * 2) {
-			scaleMtx[0][3] = 0.0f;
-			scaleMtx[1][3] = 0.0f;
-			scaleMtx[2][3] = 0.0f;
-		} else {
+		} else if (i >= activePartyCount * 2) {
 			scaleMtx[0][3] = (float)GetFcvValue(s_BallTrnsX, (float)(sprite->timer - 1));
 			if (sprite->timer == 8) {
 				Sound.PlaySe(0x47, 0x40, 0x7f, 0);
@@ -3154,6 +3150,10 @@ void CMenuPcs::CalcResultOpenAnim()
 			if (itemIndex > 0 && itemIndex < 3) {
 				scaleMtx[1][3] = (float)((double)ty - 1.8);
 			}
+		} else {
+			scaleMtx[0][3] = 0.0f;
+			scaleMtx[1][3] = 0.0f;
+			scaleMtx[2][3] = 0.0f;
 		}
 
 		handle->m_model->m_flags10CBits.m_flag10C_80 = 1;
@@ -3161,14 +3161,14 @@ void CMenuPcs::CalcResultOpenAnim()
 		handle->m_model->CalcMatrix();
 		handle->m_model->CalcSkin();
 		if (activePartyCount * 2 <= i) {
-			if (sprite->timer < 0x18) {
-				sprite->alpha = 1.0f;
-			} else {
+			if (sprite->timer >= 0x18) {
 				sprite->alpha = (float)(1.0 - (double)((float)(sprite->timer - 0x18) /
 				                 (float)(sprite->duration - 0x18)));
 				if ((double)sprite->alpha < 0.0) {
 					sprite->alpha = 0.0f;
 				}
+			} else {
+				sprite->alpha = 1.0f;
 			}
 		}
 		handle->m_model->m_lightAlpha = sprite->alpha;

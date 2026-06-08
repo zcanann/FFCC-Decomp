@@ -1722,8 +1722,8 @@ void CMenuPcs::DrawSingleStat(float alpha)
     font->SetShadow(1);
     font->SetScale(0.8999999761581421f);
 
-    _GXColor fontColor = {0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * alpha)};
-    font->SetColor(fontColor);
+    CColor fontColor(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * alpha));
+    font->SetColor(fontColor.color);
     font->DrawInit();
 
     CCaravanWork* caravanWork = SingleCaravanWork();

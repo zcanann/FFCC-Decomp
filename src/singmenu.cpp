@@ -1719,20 +1719,22 @@ void CMenuPcs::DrawSingleStat(float alpha)
         font->SetPosY(y - 5.0f);
 
         char* label;
-        if (languageId == 3) {
-            label = (char*)gSingMenuTextTableIt[i + 5];
-        } else if (languageId < 3) {
-            if ((languageId == 0) || (languageId == 1)) {
-                label = (char*)gSingMenuTextTableEn[i + 5];
-            } else {
+        switch (Game.m_gameWork.m_languageId) {
+            case 2:
                 label = (char*)gSingMenuTextTableDe[i + 5];
-            }
-        } else if (languageId == 5) {
-            label = (char*)gSingMenuTextTableEs[i + 5];
-        } else if (languageId > 4) {
-            label = (char*)gSingMenuTextTableEn[i + 5];
-        } else {
-            label = (char*)gSingMenuTextTableFr[i + 5];
+                break;
+            case 3:
+                label = (char*)gSingMenuTextTableIt[i + 5];
+                break;
+            case 4:
+                label = (char*)gSingMenuTextTableFr[i + 5];
+                break;
+            case 5:
+                label = (char*)gSingMenuTextTableEs[i + 5];
+                break;
+            default:
+                label = (char*)gSingMenuTextTableEn[i + 5];
+                break;
         }
 
         if ((languageId == 2) && (i == 3)) {

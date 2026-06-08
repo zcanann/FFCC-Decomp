@@ -1805,7 +1805,7 @@ void CCaravanWork::CalcStatus()
 		int tempStatBuffId = m_tempStatBuffId;
 		if (tempStatBuffId < 0x183) {
 			if (tempStatBuffId >= 0x180) {
-				m_defense += *(short*)(Game.unk_flat3_field_8_0xc7dc + 0x6C);
+				m_defense += *(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + 0x6C);
 			} else if (tempStatBuffId > 0x17C) {
 				m_magic += *(short*)(Game.unk_flat3_field_8_0xc7dc + 0x6E);
 			}
@@ -1902,7 +1902,7 @@ void CCaravanWork::CalcStatus()
 				}
 			}
 
-			short itemValue = (short)itemData[3];
+			unsigned short itemValue = (short)itemData[3];
 			if (itemType != 0x45) {
 				if (itemType >= 0x45) {
 					if (itemType == 0x7F) {

@@ -2156,12 +2156,15 @@ int GbaQueue::GetPlayerHP(int channel, unsigned char* outData)
 	unsigned int changed = static_cast<unsigned int>(
 	    (static_cast<unsigned int>(prevHpFlags) - static_cast<int>(hpFlags)) |
 	    (static_cast<int>(hpFlags) - static_cast<int>(prevHpFlags))) >> 31;
+
 	if (hp != prevHp) {
 		changed = 1;
 	}
 
 	int channelMask = 1 << channel;
-	if ((m_outOfShoukiFlags & channelMask) != (m_prevOutOfShoukiFlags & channelMask)) {
+	char curShouki = static_cast<char>(m_outOfShoukiFlags & channelMask);
+	char prevShouki = static_cast<char>(m_prevOutOfShoukiFlags & channelMask);
+	if (curShouki != prevShouki) {
 		changed = 1;
 	}
 

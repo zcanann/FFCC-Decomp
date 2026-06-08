@@ -508,7 +508,7 @@ void CGPartyObj::onCancelStat(int state)
 		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x6C4]) << 26) & 0xC0000000) >> 31) != 0) {
 			int weaponB = *reinterpret_cast<int*>(self + 0x6D4);
 			int weaponA = *reinterpret_cast<int*>(self + 0x6D8);
-			if (weaponA < 1) {
+			if (weaponA <= 0) {
 				LoadWeapon(-1, 0);
 			} else {
 				unsigned short packedItem = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + weaponA * 0x48 + 2);

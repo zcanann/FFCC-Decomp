@@ -1566,9 +1566,15 @@ void CGoOutMenu::CalcGoOut()
         }
 
         input = GetGoOutInputMask();
-        if ((input & 0x100) != 0) {
-            Sound.PlaySe(2, 0x40, 0x7f, 0);
+        {
+            bool pressed;
             if ((input & 0x100) != 0) {
+                Sound.PlaySe(2, 0x40, 0x7f, 0);
+                pressed = true;
+            } else {
+                pressed = false;
+            }
+            if (pressed) {
                 if (m_returnGoOutMode == -1) {
                     SetMainMode(1);
                 } else {
@@ -1583,9 +1589,15 @@ void CGoOutMenu::CalcGoOut()
         }
 
         input = GetGoOutInputMask();
-        if ((input & 0x100) != 0) {
-            Sound.PlaySe(2, 0x40, 0x7f, 0);
+        {
+            bool pressed;
             if ((input & 0x100) != 0) {
+                Sound.PlaySe(2, 0x40, 0x7f, 0);
+                pressed = true;
+            } else {
+                pressed = false;
+            }
+            if (pressed) {
                 SetMainMode(1);
             }
         }

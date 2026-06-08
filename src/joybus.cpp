@@ -7891,7 +7891,7 @@ int JoyBus::SetTmpArti(int portIndex, int param3, int param4)
     unsigned int word = cmd;
     unsigned int port;
 
-    if (m_threadRunningMask == 0)
+    if (static_cast<signed char>(m_threadRunningMask) == 0)
     {
         return 0;
     }

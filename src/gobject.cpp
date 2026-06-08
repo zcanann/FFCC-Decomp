@@ -538,7 +538,7 @@ void CGObject::move()
 
         movingWithScript = true;
     } else {
-        const u8 player = m_animStateMisc;
+        const s8 player = m_animStateMisc;
         const bool canReadPad = (static_cast<char>(player) >= 0)
             && (static_cast<char>(player) <= 3)
             && m_weaponNodeFlagAll.m_bits1.m_shield
@@ -643,7 +643,7 @@ void CGObject::move()
                     speed *= sAnalogSpeedScale;
                 }
 
-                const u32 cflatCenterState = CFlatCenterState();
+                const s32 cflatCenterState = CFlatCenterState();
                 if (cflatCenterState == 1) {
                     Vec partyCenter;
                     partyCenter.x = (Game.m_partyMinX + Game.m_partyMaxX) * sBgAttrNormal;

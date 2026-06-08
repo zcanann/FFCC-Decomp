@@ -1576,7 +1576,7 @@ void CCameraPcs::drawShadowBegin()
     Mtx tempMtx;
     Vec up;
     Vec delta;
-    double depth;
+    float depth;
 
     if (m_fullScreenShadowEnabled == 0) {
         return;
@@ -1612,35 +1612,34 @@ void CCameraPcs::drawShadowBegin()
             m_targetZ = (m_shadowRectBound.m_min.z + m_shadowRectBound.m_max.z) * kCameraHalfF;
             m_targetY = m_fullScreenShadowPosition.y;
 
-            double w = static_cast<double>(m_shadowRectBound.m_max.x - m_shadowRectBound.m_min.x);
-            double h = static_cast<double>(m_shadowRectBound.m_max.z - m_shadowRectBound.m_min.z);
+            float w = m_shadowRectBound.m_max.x - m_shadowRectBound.m_min.x;
+            float h = m_shadowRectBound.m_max.z - m_shadowRectBound.m_min.z;
             if (w < h) {
                 w = h;
             }
-            m_fullScreenShadow.m_span = static_cast<float>(static_cast<double>(kCameraHalfF) * w);
+            m_fullScreenShadow.m_span = kCameraHalfF * w;
             depth = w;
         } else if (m_shadowAuto == 2) {
             m_targetX = m_fullScreenShadowPosition.x;
             m_targetY = m_fullScreenShadowPosition.y;
             m_targetZ = m_fullScreenShadowPosition.z;
             PSVECSubtract(reinterpret_cast<Vec*>(&m_targetX), reinterpret_cast<Vec*>(&m_positionX), &delta);
-            depth = static_cast<double>(m_fullScreenShadowCamLen);
+            depth = m_fullScreenShadowCamLen;
             m_fullScreenShadow.m_span = kCameraShadowSpanScale * m_fullScreenShadow.m_scale;
         } else {
             m_targetX = m_fullScreenShadowPosition.x;
             m_targetY = m_fullScreenShadowPosition.y;
             m_targetZ = m_fullScreenShadowPosition.z;
             PSVECSubtract(reinterpret_cast<Vec*>(&m_targetX), reinterpret_cast<Vec*>(&m_positionX), &delta);
-            depth = static_cast<double>(PSVECMag(&delta));
-            m_fullScreenShadow.m_span = static_cast<float>(depth) * m_fullScreenShadow.m_scale;
+            depth = PSVECMag(&delta);
+            m_fullScreenShadow.m_span = depth * m_fullScreenShadow.m_scale;
         }
 
-        double currentDepth = static_cast<double>(m_fullScreenShadowDepth);
-        if (currentDepth >= static_cast<double>(kCameraZeroF)) {
-            m_fullScreenShadowDepth = static_cast<float>(currentDepth +
-                                                         static_cast<double>((static_cast<float>(depth - currentDepth)) * kCameraShadowDepthBlend));
+        float currentDepth = m_fullScreenShadowDepth;
+        if (currentDepth >= kCameraZeroF) {
+            m_fullScreenShadowDepth = currentDepth + (depth - currentDepth) * kCameraShadowDepthBlend;
         } else {
-            m_fullScreenShadowDepth = static_cast<float>(depth);
+            m_fullScreenShadowDepth = depth;
         }
     } else {
         m_fullScreenShadow.m_span = kCameraHundredF;

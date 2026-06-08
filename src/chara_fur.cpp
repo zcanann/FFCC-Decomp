@@ -156,7 +156,7 @@ static inline CChara::CNode* ModelNodes(CChara::CModel* model)
     return model->m_nodes;
 }
 
-static inline unsigned short ModelMeshCount(CChara::CModel* model)
+static inline unsigned int ModelMeshCount(CChara::CModel* model)
 {
     return model->m_data->m_meshCount;
 }
@@ -636,7 +636,11 @@ void CChara::CalcMogScore()
 	}
 
 	{
-		char** radarLabel = reinterpret_cast<char**>(sMogRadarTypeLabels);
+		char* radarLabel[4];
+		radarLabel[0] = sMogRadarTypeLabels[4];
+		radarLabel[1] = sMogRadarTypeLabels[5];
+		radarLabel[2] = sMogRadarTypeLabels[6];
+		radarLabel[3] = sMogRadarTypeLabels[7];
 		Graphic.Printf(
 		    5,
 		    0xB,
@@ -1047,7 +1051,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 	PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
 
 	if ((heldButtons & 0x100) != 0) {
-		const signed char radarType = MogRadarType();
+		const unsigned char radarType = MogRadarType();
 		if (Chara.MogFur().m_prevRadarType != radarType) {
 			Chara.MogFur().m_prevRadarType = radarType;
 			work.m_pickTicks = 0;
@@ -1379,15 +1383,11 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 		return;
 	}
 
-	CMaterialSet* materialSet = ModelMaterialSet(this);
-	FurMeshRaw* mesh = ModelMeshes(this);
-	CChara::CNode* nodes = ModelNodes(this);
-
-	const int materialCount = materialSet->m_materials.GetSize();
+	const int materialCount = ModelMaterialSet(this)->m_materials.GetSize();
 
 	int hasFurMaterial = 0;
 	for (int i = 0; i < materialCount; i++) {
-		CMaterial* material = materialSet->m_materials[i];
+		CMaterial* material = ModelMaterialSet(this)->m_materials[i];
 		if (material->IsFurEnabled()) {
 			hasFurMaterial = 1;
 			break;
@@ -1397,7 +1397,6 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 		return;
 	}
 
-	float furStep = ModelFurStep(this);
 	float furDepth = kCharaFurDepthZero;
 	CVector modelPos;
 	CVector viewPos;
@@ -1412,6 +1411,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	}
 
 	float furLength = ModelFurLenScale(this) * (kCharaFurDepthScaleBase - furDepth) + ModelFurLenScale(this);
+	float furStep = ModelFurStep(this);
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	GXSetZCompLoc((u8)0);
@@ -1456,13 +1456,15 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	texMtx[1][1] = furStep;
 	GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
 
-	const unsigned short meshCount = ModelMeshCount(this);
 	const int posQuant = ModelPosQuant(this) & 0xFF;
 	const int normQuant = ModelNormQuant(this) & 0xFF;
-	unsigned int prevExtraTexture = 0xFFFFFFFF;
+	int prevExtraTexture = -1;
 	int prevExtraTextureFormat = -1;
 
-	for (unsigned int meshIndex = 0; meshIndex < meshCount; meshIndex++, mesh++) {
+	CChara::CNode* nodes = ModelNodes(this);
+	FurMeshRaw* mesh = ModelMeshes(this);
+
+	for (unsigned int meshIndex = 0; meshIndex < ModelMeshCount(this); meshIndex++, mesh++) {
 		if (mesh->m_workPositions == 0) {
 			continue;
 		}
@@ -1512,13 +1514,13 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 		Chara.gqrInit(posGqr << 0x18 | 0x70000 | posGqr << 8 | 7, normGqr << 0x18 | 0x70000 | normGqr << 8 | 7,
 		              0xC070C07);
 		for (unsigned int displayIndex = 0; displayIndex < mesh->m_data->m_displayListCount; displayIndex++, displayList++) {
-			CMaterial* material = materialSet->m_materials[displayList->m_material];
+			CMaterial* material = ModelMaterialSet(this)->m_materials[displayList->m_material];
 			if (!material->IsFurEnabled()) {
 				continue;
 			}
 
 			TextureMan.SetTexture(GX_TEXMAP0, material->GetFurTexture(0));
-			unsigned int hasExtraTexture = 0;
+			int hasExtraTexture = 0;
 			int extraTextureFormat = -1;
 			if (static_cast<short>(material->GetTextureIndex(1)) != -1) {
 				CTexture* extraTexture = material->GetFurTexture(1);

@@ -2729,6 +2729,10 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     case -0xBD:
+        PartMng.pppFieldEndFpNo(static_cast<short>(*object->m_localBase));
+        this->push(object, 0);
+        outResult = 0;
+        break;
     case -0x3F: {
         Mtx matrix;
         Quaternion rotation;

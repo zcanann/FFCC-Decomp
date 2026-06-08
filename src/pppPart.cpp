@@ -685,13 +685,13 @@ void callCon2Prog(_pppPObject* pObject)
 {
 	_pppPDataVal* owner = pObject->m_link.m_owner;
 	_pppProgSetDef* progSet = owner->m_programSetDef;
-	int stageIdx = 0;
 
 	ppvIsLoopCalc = 1;
 
 	_pppProgSetDef* stageSet = progSet;
+	int stageIdx = 0;
 	u32* initWork = (u32*)(((u8*)pObject) + progSet->m_workBaseOffset);
-	for (stageIdx = 0; stageIdx < progSet->m_numStages; stageIdx++)
+	for (; stageIdx < progSet->m_numStages; stageIdx++)
 	{
 		_pppCtrlTable* stage = stageSet->m_stages;
 		pppProg* prog = stage->m_prog;
@@ -717,20 +717,21 @@ void callCon2Prog(_pppPObject* pObject)
 	while (true)
 	{
 		stageSet = progSet;
+		int stageCount = 0;
 		u32 stageSlotOffset = 0;
-		for (stageIdx = 0; stageIdx < progSet->m_numStages; stageIdx++)
+		for (; stageCount < progSet->m_numStages; stageCount++)
 		{
 			_pppCtrlTable* stage = stageSet->m_stages;
-			s32* stageSlot = *(s32**)(((u8*)pObject) + progSet->m_workBaseOffset + stageSlotOffset);
+			s32** slotPtr = (s32**)(((u8*)pObject) + progSet->m_workBaseOffset + stageSlotOffset);
 			pppProg* prog = stage->m_prog;
-			s32* nextSlot = (s32*)(((u8*)stageSlot) + stage->m_workOffset);
+			s32* nextSlot = (s32*)(((u8*)*slotPtr) + stage->m_workOffset);
 
 			if (*nextSlot == pObject->m_graphId)
 			{
-				*(s32**)(((u8*)pObject) + progSet->m_workBaseOffset + stageSlotOffset) = nextSlot;
+				*slotPtr = nextSlot;
 				if (prog != 0 && prog->m_pppFunctionOperation != 0 && prog->m_pppFunctionConstructor2 != 0)
 				{
-					((pppProgOperation2Callback)prog->m_pppFunctionOperation)(pObject, nextSlot);
+					((pppProgOperation2Callback)prog->m_pppFunctionOperation)(pObject, *slotPtr);
 				}
 			}
 

@@ -81,7 +81,7 @@ extern int ppvSysGoPartF;
 unsigned char gPppDefaultValueBuffer[0x40] = {0};
 int gPppHeapUseRateWords[3] = {0, 0, 0};
 unsigned char gPppInConstructor = 0;
-unsigned char gPppInSubFrameCalc = 0;
+signed char gPppInSubFrameCalc = 0;
 extern int ppvEmptyLoop;
 unsigned char gPppEditorAnimIndex = 0;
 unsigned char gPppEditorAnimIndexInitialized = 0;
@@ -2260,16 +2260,16 @@ void CPartMng::pppEditBeforeCalc()
     case 0x1a:
         if (*editorObj != 0) {
             Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x7ce);
-            if (gPppEditorAnimIndexInitialized == 0) {
-                gPppEditorAnimIndex = 0;
-                gPppEditorAnimIndexInitialized = 1;
+            if (gPppInSubFrameCalc == 0) {
+                gPppInConstructor = 0;
+                gPppInSubFrameCalc = 1;
             }
 
             CCharaPcs::CHandle* handle = (*editorObj)->m_charaModelHandle;
             if (handle != 0) {
-                handle->LoadAnim(reinterpret_cast<char*>(self + 0x19c), gPppEditorAnimIndex, 0, -1, -1, -1, 0);
-                handle->SetAnim(gPppEditorAnimIndex, -1, -1, -1, 0);
-                gPppEditorAnimIndex++;
+                handle->LoadAnim(reinterpret_cast<char*>(self + 0x19c), gPppInConstructor, 0, -1, -1, -1, 0);
+                handle->SetAnim(gPppInConstructor, -1, -1, -1, 0);
+                gPppInConstructor++;
             }
         }
         break;

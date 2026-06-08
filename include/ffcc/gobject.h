@@ -127,14 +127,14 @@ public:
     union {
         unsigned char m_stateFlags0;  // 0x50
         struct {
-            unsigned char unk0 : 1;
-            unsigned char unk1 : 1;
-            unsigned char unk2 : 1;
-            unsigned char unk3 : 1;
-            unsigned char unk4 : 1;
-            unsigned char unk5 : 1;
-            unsigned char unk6 : 1;
-            unsigned char unk7 : 1;
+            signed char unk0 : 1;
+            signed char unk1 : 1;
+            signed char unk2 : 1;
+            signed char unk3 : 1;
+            signed char unk4 : 1;
+            signed char unk5 : 1;
+            signed char unk6 : 1;
+            signed char unk7 : 1;
         } m_stateFlags0Bits;
     };
     char m_ownerType;                 // 0x51

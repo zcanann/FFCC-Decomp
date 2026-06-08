@@ -1467,7 +1467,7 @@ void CGObject::update()
 
         Math.SRTToMatrix(modelMtx, reinterpret_cast<SRT*>(&srt));
 
-        if ((m_stateFlags0 & 0x10) != 0) {
+        if (m_stateFlags0Bits.unk3) {
             Mtx tiltMtx;
             if (m_groundHitOffset.x != sZeroFloat || m_groundHitOffset.z != sZeroFloat) {
                 Vec axis;
@@ -1498,7 +1498,7 @@ void CGObject::update()
             modelMtx[0][3] = tx;
             modelMtx[1][3] = ty;
             modelMtx[2][3] = tz;
-        } else if ((m_objectFlags & 0x90) != 0 && (m_stateFlags0 & 0x80) != 0) {
+        } else if ((m_objectFlags & 0x90) != 0 && m_stateFlags0Bits.unk0) {
             if (m_groundHitOffset.x != sZeroFloat || m_groundHitOffset.z != sZeroFloat) {
                 m_radiusCtrl.y += 0.2f * m_groundHitOffset.x;
                 m_radiusCtrlVel.x += 0.2f * m_groundHitOffset.z;

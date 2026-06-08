@@ -504,30 +504,47 @@ void birth(
 
     s32 mode = params->m_spawnMode;
     if (mode < 6) {
-        if (mode >= 4) {
+        if (mode < 4) {
             if (kPppRyjMegaBirthSharedZero != params->m_speed) {
-                u8 speedMode = params->m_speedMode;
-                Vec speed;
-                speed.x = particleData->m_matrix[0][3];
-                speed.y = particleData->m_matrix[1][3];
-                speed.z = particleData->m_matrix[2][3];
-                speed.x = calc_spawn_speed(params, speedMode);
-                speed.y = calc_spawn_speed(params, speedMode);
-                speed.z = calc_spawn_speed(params, speedMode);
-                particleData->m_matrix[0][3] = speed.x;
-                particleData->m_matrix[1][3] = speed.y;
-                particleData->m_matrix[2][3] = speed.z;
+                float speedScalar = calc_direction_speed(params, params->m_speedMode);
+                Vec direction;
+                Vec position;
 
-                float speedY = particleData->m_matrix[1][3];
-                float scaleY = params->m_directionScale.y;
-                float speedZ = particleData->m_matrix[2][3];
-                float scaleZ = params->m_directionScale.z;
-                particleData->m_matrix[0][3] = particleData->m_matrix[0][3] * params->m_directionScale.x;
-                particleData->m_matrix[1][3] = speedY * scaleY;
-                particleData->m_matrix[2][3] = speedZ * scaleZ;
+                direction.x = particleData->m_matrix[0][1];
+                direction.y = particleData->m_matrix[1][1];
+                direction.z = particleData->m_matrix[2][1];
+                position.x = particleData->m_matrix[0][3];
+                position.y = particleData->m_matrix[1][3];
+                position.z = particleData->m_matrix[2][3];
+                pppScaleVectorXYZ(position, direction, speedScalar);
+                particleData->m_matrix[0][3] = position.x;
+                particleData->m_matrix[1][3] = position.y;
+                particleData->m_matrix[2][3] = position.z;
             }
             goto join_position;
         }
+        if (kPppRyjMegaBirthSharedZero != params->m_speed) {
+            u8 speedMode = params->m_speedMode;
+            Vec speed;
+            speed.x = particleData->m_matrix[0][3];
+            speed.y = particleData->m_matrix[1][3];
+            speed.z = particleData->m_matrix[2][3];
+            speed.x = calc_spawn_speed(params, speedMode);
+            speed.y = calc_spawn_speed(params, speedMode);
+            speed.z = calc_spawn_speed(params, speedMode);
+            particleData->m_matrix[0][3] = speed.x;
+            particleData->m_matrix[1][3] = speed.y;
+            particleData->m_matrix[2][3] = speed.z;
+
+            float speedY = particleData->m_matrix[1][3];
+            float scaleY = params->m_directionScale.y;
+            float speedZ = particleData->m_matrix[2][3];
+            float scaleZ = params->m_directionScale.z;
+            particleData->m_matrix[0][3] = particleData->m_matrix[0][3] * params->m_directionScale.x;
+            particleData->m_matrix[1][3] = speedY * scaleY;
+            particleData->m_matrix[2][3] = speedZ * scaleZ;
+        }
+        goto join_position;
     } else if (mode < 10) {
         s8 speedMode = params->m_speedMode;
         s16 pathIndex = *(s16*)(payload + 0x138);
@@ -589,23 +606,6 @@ void birth(
             }
         }
         goto join_position;
-    }
-
-    if (kPppRyjMegaBirthSharedZero != params->m_speed) {
-        float speedScalar = calc_direction_speed(params, params->m_speedMode);
-        Vec direction;
-        Vec position;
-
-        direction.x = particleData->m_matrix[0][1];
-        direction.y = particleData->m_matrix[1][1];
-        direction.z = particleData->m_matrix[2][1];
-        position.x = particleData->m_matrix[0][3];
-        position.y = particleData->m_matrix[1][3];
-        position.z = particleData->m_matrix[2][3];
-        pppScaleVectorXYZ(position, direction, speedScalar);
-        particleData->m_matrix[0][3] = position.x;
-        particleData->m_matrix[1][3] = position.y;
-        particleData->m_matrix[2][3] = position.z;
     }
 
 join_position:

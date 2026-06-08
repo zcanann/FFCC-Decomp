@@ -195,7 +195,7 @@ static inline CChara* GetCharaGlobal()
 
 static inline u8 MakeSaveBool(u8 value)
 {
-    return static_cast<u8>((0U - static_cast<u32>(value)) >> 31);
+    return static_cast<u8>((static_cast<u32>(-value) | static_cast<u32>(value)) >> 31);
 }
 
 static inline u8 MakeLoadBool(s8 value)
@@ -1598,7 +1598,8 @@ void CMemoryCardMan::MakeSaveData()
     save[0x13DD] = static_cast<u8>(Sound.GetBgmMasterVolume());
     save[0x13DE] = static_cast<u8>(Sound.GetSeMasterVolume());
     save[0x13DE] = static_cast<u8>(Sound.GetSeMasterVolume());
-    save[0x13DF] = static_cast<u8>((0U - static_cast<u32>(__cntlzw(Sound.GetSoundMode()) >> 5)) >> 31);
+    u32 soundModeBit = static_cast<u32>(__cntlzw(Sound.GetSoundMode())) >> 5;
+    save[0x13DF] = static_cast<u8>((static_cast<u32>(-static_cast<s32>(soundModeBit)) | soundModeBit) >> 31);
     save[0x13E0] = MakeSaveBool(Game.m_gameWork.m_gameInitFlag);
     save[0x13E1] = MakeSaveBool(Game.m_gameWork.m_spModeFlags[0]);
     save[0x13E2] = MakeSaveBool(Game.m_gameWork.m_spModeFlags[1]);

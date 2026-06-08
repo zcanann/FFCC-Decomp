@@ -3140,11 +3140,15 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 material->m_materialType = 1;
 
                 CLightPcs::CBumpLight* bumpLight = bumpLights;
-                if (bumpLight == 0) {
-                    bumpLight = GetMapBumpLight(bumpIndex);
-                    material->m_bumpLightDirect = (bumpLightDirect == 0) ? 0 : 1;
-                } else {
+                if (bumpLight != 0) {
                     material->m_bumpLightDirect = 1;
+                } else {
+                    bumpLight = GetMapBumpLight(bumpIndex);
+                    if (bumpLightDirect != 0) {
+                        material->m_bumpLightDirect = 1;
+                    } else {
+                        material->m_bumpLightDirect = 0;
+                    }
                 }
 
                 material->m_bumpLight = bumpLight;

@@ -1615,13 +1615,13 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 
 	nearAlpha = 0;
 	farAlpha = 0;
-	hasNearAlpha = 0;
-	hasFarAlpha = 0;
 	texBufferSize = GXGetTexBufferSize(0x140, 0xE0, GX_TF_RGBA8, GX_FALSE, GX_FALSE);
 
 	cameraPos.x = CameraWorldX();
 	cameraPos.z = CameraWorldZ();
+	hasNearAlpha = 0;
 	cameraPos.y = kGraphicZeroF;
+	hasFarAlpha = 0;
 
 	targetPos.y = kGraphicZeroF;
 	PSVECSubtract(&targetPos, &cameraPos, &cameraToTarget);

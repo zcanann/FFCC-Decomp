@@ -631,7 +631,7 @@ void CGCharaObj::onFramePostCalc()
 	}
 
 	for (int statusOffset = 0, i = 0; i < 0x27; i++, statusOffset += 2) {
-		int statusValue = static_cast<int>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E + statusOffset)) - 1;
+		unsigned int statusValue = static_cast<int>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E + statusOffset)) - 1;
 		if (statusValue != 0 && i == 2) {
 			m_stateTick += 1;
 		}

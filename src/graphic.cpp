@@ -1589,7 +1589,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 	unsigned int texBufferSize;
 	unsigned int depthAlphaNear;
 	unsigned int depthAlphaFar;
-	unsigned char nearAlpha;
+	signed char nearAlpha;
 	unsigned char farAlpha;
 	float xOffset;
 	float yOffset;
@@ -1663,7 +1663,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		if (depthAlphaFar > 0xFF) {
 			depthAlphaFar = 0xFF;
 		}
-		farAlpha = (unsigned char)depthAlphaFar;
+		farAlpha = (signed char)depthAlphaFar;
 		hasFarAlpha = 1;
 	}
 
@@ -1687,7 +1687,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 	for (int pass = 0; pass < 2; pass++) {
 		int kColorSel = 0x0C;
 		int kAlphaSel = 0x1C;
-		unsigned char passAlpha = nearAlpha;
+		signed char passAlpha = nearAlpha;
 
 		if ((pass == 0) && !((mode != 2) && hasNearAlpha && (mode != 1) && hasFarAlpha)) {
 			continue;

@@ -2617,7 +2617,7 @@ void CMenuPcs::CalcResultCountAnim()
 		handle->m_model->m_lightAlpha = 1.0f;
 	}
 
-	if (*(short*)(this->m_bonusStatePtr + 0x10) == 0 && frame >= 0 && frame <= s_Rinfo->m_winnerTotalValue) {
+	if (*(short*)(this->m_bonusStatePtr + 0x10) == 0 && frame >= 0 && !(s_Rinfo->m_winnerTotalValue < frame)) {
 		Sound.PlaySe(0x4a, 0x40, 0x7f, 0);
 	}
 

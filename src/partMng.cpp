@@ -2840,34 +2840,15 @@ void CPartMng::pppDumpCacheIdx()
             ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
 
             if (mng->m_baseTime >= 0) {
-                mng->m_baseTime--;
-                if (mng->m_baseTime >= 0) {
-                    continue;
-                }
-
-                _pppDataHead* pdtHead = *reinterpret_cast<_pppDataHead**>(mng->m_pppResSet);
-                PppPartResourceRaw* partResource =
-                    reinterpret_cast<PppPartResourceRaw*>(reinterpret_cast<unsigned char*>(pdtHead->m_cacheChunks) +
-                                                          mng->m_partIndex * sizeof(PppPartResourceRaw));
-
-                CAmemCacheSet* cacheSet = &ppvAmemCacheSet;
-                if (cacheSet->IsEnable(partResource->m_cacheIndex) == 0) {
-                    partResource->m_pdt = reinterpret_cast<long*>(
-                        cacheSet->GetData(
-                            partResource->m_cacheIndex, const_cast<char*>(s_partMng_cpp), 0x9A9));
-                    pppInitPdt(partResource->m_pdt, pppGetSysProgTable());
-                }
-
-                cacheSet->AddRef(partResource->m_cacheIndex);
-                mng->m_hasMapRef = 1;
-                _pppStartPart(reinterpret_cast<_pppMngSt*>(mng), partResource->m_pdt, 1);
+                goto decrementTimer;
             }
 
+        runFrame:
             pppSetMatrix(reinterpret_cast<_pppMngSt*>(mng));
             pppSetFpMatrix(reinterpret_cast<_pppMngSt*>(mng));
 
             mng->m_spawnedCount += *reinterpret_cast<int*>(&mng->m_envColorR);
-            gPppInSubFrameCalc = 0;
+            ppvIs2ndCalc = 0;
 
             while (mng->m_spawnedCount >= 0x1000) {
                 _pppCalcPart(reinterpret_cast<_pppMngSt*>(mng));
@@ -2876,11 +2857,40 @@ void CPartMng::pppDumpCacheIdx()
                     break;
                 }
 
-                gPppInSubFrameCalc = 1;
+                ppvIs2ndCalc = 1;
                 mng->m_spawnedCount -= 0x1000;
             }
 
-            gPppInSubFrameCalc = 0;
+            ppvIs2ndCalc = 0;
+            continue;
+
+        decrementTimer:
+            {
+                int newBaseTime = mng->m_baseTime - 1;
+                mng->m_baseTime = newBaseTime;
+                if (newBaseTime >= 0) {
+                    continue;
+                }
+            }
+
+            {
+                _pppDataHead* pdtHead = *reinterpret_cast<_pppDataHead**>(mng->m_pppResSet);
+                PppPartResourceRaw* partResource =
+                    reinterpret_cast<PppPartResourceRaw*>(reinterpret_cast<unsigned char*>(pdtHead->m_cacheChunks) +
+                                                          mng->m_partIndex * sizeof(PppPartResourceRaw));
+
+                if (ppvAmemCacheSet.IsEnable(partResource->m_cacheIndex) == 0) {
+                    partResource->m_pdt = reinterpret_cast<long*>(
+                        ppvAmemCacheSet.GetData(
+                            partResource->m_cacheIndex, const_cast<char*>(s_partMng_cpp), 0x9A9));
+                    pppInitPdt(partResource->m_pdt, pppGetSysProgTable());
+                }
+
+                ppvAmemCacheSet.AddRef(partResource->m_cacheIndex);
+                mng->m_hasMapRef = 1;
+                _pppStartPart(reinterpret_cast<_pppMngSt*>(mng), partResource->m_pdt, 1);
+            }
+            goto runFrame;
         }
     }
 }

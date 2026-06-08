@@ -1675,24 +1675,24 @@ void CMemoryCardMan::MakeSaveData()
         *reinterpret_cast<u32*>(dst + 0xEC) = caravanWork->m_gil;
         memcpy(dst + 0xF0, caravanWork->m_name, 0x10);
         *reinterpret_cast<u32*>(dst + 0x100) = caravanWork->m_letterCount;
-        u8* letterDst = dst + kMemoryCardSaveLetterOffset;
-        u8* letterSrc = reinterpret_cast<u8*>(caravanWork->m_letters);
+        u8* letterDst = dst;
+        u8* letterSrc = reinterpret_cast<u8*>(caravanWork);
         for (int letter = 0; letter < 100; letter++)
         {
-            letterDst[0] = ((letterSrc[0] >> 3 & 1) << 3) | (letterDst[0] & 0xF7);
-            *reinterpret_cast<u16*>(letterDst) =
-                (*reinterpret_cast<u16*>(letterSrc) & 0x07FC) | (*reinterpret_cast<u16*>(letterDst) & 0xF803);
-            *reinterpret_cast<u32*>(letterDst) =
-                (*reinterpret_cast<u32*>(letterSrc) & 0x0003FE00) |
-                (*reinterpret_cast<u32*>(letterDst) & 0xFFFC01FF);
-            *reinterpret_cast<u16*>(letterDst + 2) =
-                (*reinterpret_cast<u16*>(letterSrc + 2) & 0x01FF) |
-                (*reinterpret_cast<u16*>(letterDst + 2) & 0xFE00);
-            memcpy(letterDst + 4, letterSrc + 4, 8);
-            letterDst[0] = (letterSrc[0] & 0x80) | (letterDst[0] & 0x7F);
-            letterDst[0] = (letterSrc[0] & 0x40) | (letterDst[0] & 0xBF);
-            letterDst[0] = (letterSrc[0] & 0x20) | (letterDst[0] & 0xDF);
-            letterDst[0] = (letterSrc[0] & 0x10) | (letterDst[0] & 0xEF);
+            letterDst[0x104] = ((letterSrc[0x3EC] >> 3 & 1) << 3) | (letterDst[0x104] & 0xF7);
+            *reinterpret_cast<u16*>(letterDst + 0x104) =
+                (*reinterpret_cast<u16*>(letterSrc + 0x3EC) & 0x07FC) | (*reinterpret_cast<u16*>(letterDst + 0x104) & 0xF803);
+            *reinterpret_cast<u32*>(letterDst + 0x104) =
+                (*reinterpret_cast<u32*>(letterSrc + 0x3EC) & 0x0003FE00) |
+                (*reinterpret_cast<u32*>(letterDst + 0x104) & 0xFFFC01FF);
+            *reinterpret_cast<u16*>(letterDst + 0x106) =
+                (*reinterpret_cast<u16*>(letterSrc + 0x3EE) & 0x01FF) |
+                (*reinterpret_cast<u16*>(letterDst + 0x106) & 0xFE00);
+            memcpy(letterDst + 0x108, letterSrc + 0x3F0, 8);
+            letterDst[0x104] = (letterSrc[0x3EC] & 0x80) | (letterDst[0x104] & 0x7F);
+            letterDst[0x104] = (letterSrc[0x3EC] & 0x40) | (letterDst[0x104] & 0xBF);
+            letterDst[0x104] = (letterSrc[0x3EC] & 0x20) | (letterDst[0x104] & 0xDF);
+            letterDst[0x104] = (letterSrc[0x3EC] & 0x10) | (letterDst[0x104] & 0xEF);
             letterSrc += sizeof(CCaravanWork::CLetterWork);
             letterDst += 0xC;
         }

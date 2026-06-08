@@ -2342,16 +2342,15 @@ void CGObject::MoveVector(Vec* moveVec, float moveTimer, int turnFrames, int use
     const signed char useFacingFlag = static_cast<signed char>(useFacing);
     const signed char flagAValue = static_cast<signed char>(flagA);
     const signed char flagBValue = static_cast<signed char>(flagB);
-    u8* const weaponFlagsHi = reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1;
 
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 5, 26, 26));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 4, 27, 27));
+    m_weaponNodeFlagAll.m_bits1.m_bit20 = 1;
+    m_weaponNodeFlagAll.m_bits1.m_bit10 = 1;
     m_turnFrames = static_cast<u32>(turnFrames);
     m_moveTarget = *moveVec;
     m_moveTimer = moveTimer;
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, useFacingFlag, 3, 28, 28));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, flagAValue, 1, 30, 30));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, flagBValue, 2, 29, 29));
+    m_weaponNodeFlagAll.m_bits1.m_bit08 = useFacingFlag;
+    m_weaponNodeFlagAll.m_bits1.m_bit02 = flagAValue;
+    m_weaponNodeFlagAll.m_bits1.m_bit04 = flagBValue;
 }
 
 /*
@@ -2369,18 +2368,16 @@ void CGObject::Move(Vec* moveVec, float moveTimer, int turnFrames, int moveMode,
     const signed char useFacingFlag = static_cast<signed char>(useFacing);
     const signed char flagAValue = static_cast<signed char>(flagA);
     const signed char flagBValue = static_cast<signed char>(flagB);
-    u8* const weaponFlagsLo = &m_weaponNodeFlagBytes.m_flags0;
-    u8* const weaponFlagsHi = &m_weaponNodeFlagBytes.m_flags1;
 
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 5, 26, 26));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 4, 27, 27));
+    m_weaponNodeFlagAll.m_bits1.m_bit20 = 1;
+    m_weaponNodeFlagAll.m_bits1.m_bit10 = 0;
     m_turnFrames = static_cast<u32>(turnFrames);
     m_moveTarget = *moveVec;
     m_moveTimer = moveTimer;
-    *weaponFlagsLo = static_cast<u8>(__rlwimi(*weaponFlagsLo, moveModeFlag, 1, 30, 30));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, useFacingFlag, 3, 28, 28));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, flagAValue, 1, 30, 30));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, flagBValue, 2, 29, 29));
+    m_weaponNodeFlagBits.m_unk02 = moveModeFlag;
+    m_weaponNodeFlagAll.m_bits1.m_bit08 = useFacingFlag;
+    m_weaponNodeFlagAll.m_bits1.m_bit02 = flagAValue;
+    m_weaponNodeFlagAll.m_bits1.m_bit04 = flagBValue;
 }
 
 /*
@@ -2394,8 +2391,7 @@ void CGObject::Move(Vec* moveVec, float moveTimer, int turnFrames, int moveMode,
  */
 void CGObject::CancelMove(int moveType)
 {
-    m_weaponNodeFlagBytes.m_flags1 =
-        static_cast<u8>(__rlwimi(m_weaponNodeFlagBytes.m_flags1, 0, 5, 26, 26));
+    m_weaponNodeFlagAll.m_bits1.m_bit20 = 0;
 
     CFlatRuntime::CStack arg;
     arg.m_word = static_cast<u32>(moveType);

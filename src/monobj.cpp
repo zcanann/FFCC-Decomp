@@ -293,7 +293,7 @@ void CGMonObj::undeadOn()
 {
 #define object (reinterpret_cast<CGObject*>(this))
 	*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x694) = kMonObjTwoFifths;
-	void* classId = object->m_scriptHandle[4];
+	int classId = reinterpret_cast<int>(object->m_scriptHandle[4]);
 	unsigned char weaponFlags = *reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags);
 	int weaponMode = static_cast<int>((static_cast<unsigned int>(weaponFlags) << 24) & 0xC0000000) >> 31;
 	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC) != 0xB) {
@@ -317,9 +317,9 @@ void CGMonObj::undeadOn()
 	}
 
 	if (static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags)) << 24)) < 0) {
-		if (classId == reinterpret_cast<void*>(0x83)) {
+		if (classId == 0x83) {
 			reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x987A, 0x32, 0x96, 0, (Vec*)0);
-		} else if (classId == reinterpret_cast<void*>(0x7F)) {
+		} else if (classId == 0x7F) {
 			reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x11585, 0x32, 0x96, 0, (Vec*)0);
 		}
 	}

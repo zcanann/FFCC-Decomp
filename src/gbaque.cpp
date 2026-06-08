@@ -2130,18 +2130,14 @@ int GbaQueue::GetPlayerHP(int channel, unsigned char* outData)
 		OSSignalSemaphore(accessSemaphores + i);
 	}
 
-	int hpChanged = hp != prevHp;
 	unsigned int changed = static_cast<unsigned int>(
 	    (static_cast<unsigned int>(prevHpFlags) - static_cast<int>(hpFlags)) |
 	    (static_cast<int>(hpFlags) - static_cast<int>(prevHpFlags))) >> 31;
-	if (hpChanged) {
+	if (hp != prevHp) {
 		changed = 1;
 	}
 
 	int channelMask = 1 << channel;
-	if (hp != prevHp) {
-		changed = 1;
-	}
 	if ((m_outOfShoukiFlags & channelMask) != (m_prevOutOfShoukiFlags & channelMask)) {
 		changed = 1;
 	}

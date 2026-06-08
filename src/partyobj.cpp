@@ -1687,7 +1687,7 @@ void CGPartyObj::onFrameStat()
 		}
 		if ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(m_weaponNodeFlagBytes.m_flags1) << 24) & 0xC0000000) >> 31) != 0) &&
 		    Game.m_gameWork.m_menuStageMode != 0 &&
-		    m_scriptHandle[0xED] == nullptr &&
+		    reinterpret_cast<int*>(m_scriptHandle)[0xED] == 0 &&
 		    Game.m_partyObjArr[1] != nullptr &&
 		    Game.m_partyObjArr[1]->m_lastStateId == 0) {
 			unsigned short held = getPadHeldForSlot(static_cast<signed char>(m_animStateMisc));

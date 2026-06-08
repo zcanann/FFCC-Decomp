@@ -1718,8 +1718,6 @@ void CalcReflectionVector2(
             u16 posIndex = dl[0];
             u16 normalIndex = dl[1];
             float denom;
-            float uVal;
-            float vVal;
             u8* colorBytes = (u8*)&color[posIndex];
 
             dl += 4;
@@ -1752,17 +1750,25 @@ void CalcReflectionVector2(
             }
 
             denom = denomBias + reflectionVec[posIndex].z;
-            uVal = (-reflectionVec[posIndex].x / denom) * half + half;
-            vVal = (-reflectionVec[posIndex].y / denom) * half + half;
-            uv.x = -(scale * (warp * (uVal - half)) - uVal);
-            uv.y = -(scale * (warp * (vVal - half)) - vVal);
+            uv.x = -reflectionVec[posIndex].x / denom;
+            uv.y = -reflectionVec[posIndex].y / denom;
+            uv.x *= half;
+            uv.y *= half;
+            uv.x += half;
+            uv.y += half;
+            uv.x = -(scale * (warp * (uv.x - half)) - uv.x);
+            uv.y = -(scale * (warp * (uv.y - half)) - uv.y);
             gUtil.ConvF2IVector2d(texCoordA[posIndex], uv, 12);
 
             denom = denomBias - reflectionVec[posIndex].z;
-            uVal = (-reflectionVec[posIndex].x / denom) * half + half;
-            vVal = (-reflectionVec[posIndex].y / denom) * half + half;
-            uv.x = -(scale * (warp * (uVal - half)) - uVal);
-            uv.y = -(scale * (warp * (vVal - half)) - vVal);
+            uv.x = -reflectionVec[posIndex].x / denom;
+            uv.y = -reflectionVec[posIndex].y / denom;
+            uv.x *= half;
+            uv.y *= half;
+            uv.x += half;
+            uv.y += half;
+            uv.x = -(scale * (warp * (uv.x - half)) - uv.x);
+            uv.y = -(scale * (warp * (uv.y - half)) - uv.y);
             gUtil.ConvF2IVector2d(texCoordB[posIndex], uv, 12);
         }
     }

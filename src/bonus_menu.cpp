@@ -1471,15 +1471,15 @@ void CMenuPcs::DrawSelectOpenAnim()
 				color.b = 0xFF;
 				color.a = (unsigned char)(sprite->alpha * 255.0f);
 				GXSetChanMatColor(GX_COLOR0A0, color);
-				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(sprite->tex));
-				if (sprite->tex == 0x20) {
+				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(sprite->kind));
+				if (sprite->kind == 0x20) {
 					_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_NOOP);
 				}
 				MenuPcs.DrawRect(0,
 				    (float)sprite->x + sprite->motionX, (float)sprite->y + sprite->motionY,
 				    (float)sprite->w, (float)sprite->h,
 				    sprite->mulX, sprite->mulY, sprite->depth, sprite->depth, 0.0f);
-				if (sprite->tex == 0x20) {
+				if (sprite->kind == 0x20) {
 					_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 				}
 				lastKind = sprite->kind;

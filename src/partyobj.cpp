@@ -2294,7 +2294,7 @@ void CGPartyObj::statCharge()
 	}
 	}
 
-	if (m_subState < 2) {
+	if (m_subState <= 1) {
 		int slot = static_cast<signed char>(m_animStateMisc);
 		if ((getPadHeldForSlot(slot) & 0x100) == 0) {
 			if (m_subState == 0 || (m_subState == 1 && m_comboState == 0)) {

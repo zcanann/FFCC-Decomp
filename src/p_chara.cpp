@@ -1101,7 +1101,7 @@ int CCharaPcs::TryReleaseAnimBank(int requiredSize)
         releaseAnim->m_anim->m_bank = 0;
     }
 
-    if (System.m_execParam > 2) {
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
         System.Printf(const_cast<char*>(s_charaReleaseAnimBankFmt), releaseSize, releaseAnim->m_name);
     }
 

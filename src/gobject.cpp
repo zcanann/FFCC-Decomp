@@ -3119,7 +3119,7 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
 {
     m_worldPosition = *position;
 
-    if (((*reinterpret_cast<u8*>(&m_weaponNodeFlags) & 0x10) != 0) && (Game.m_currentMapId != 0x21)) {
+    if (m_weaponNodeFlagBits.m_unk10 && (Game.m_currentMapId != 0x21)) {
         {
             Vec bottom = m_worldPosition;
             bottom.y += useCapsuleOffset != 0 ? m_capsuleHalfHeight : sPushDistance;
@@ -3146,26 +3146,22 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
         }
 
         if ((m_charaModelHandle != 0) && (m_charaModelHandle->m_model != 0)) {
-            Vec probePos;
             CVector attrDirection(sZeroFloat, sDownProbeDistance, sZeroFloat);
             CVector attrBottom(m_worldPosition.x, m_worldPosition.y + sStepProbeHeight, m_worldPosition.z);
             GObjectMapCylinder attrCylinder;
 
-            probePos.x = attrBottom.x;
-            probePos.y = attrBottom.y;
-            probePos.z = attrBottom.z;
-            attrCylinder.m_bottom = probePos;
-            attrCylinder.Probe().m_direction.x = attrDirection.x;
-            attrCylinder.Probe().m_direction.y = attrDirection.y;
-            attrCylinder.Probe().m_direction.z = attrDirection.z;
             attrCylinder.Probe().m_radius = sHugeCylinderExtent;
             attrCylinder.Probe().m_height = sHugeCylinderExtent;
-            attrCylinder.Probe().m_top = attrCylinder.Probe().m_direction;
+            attrCylinder.Probe().m_radius2 = sZeroFloat;
+            attrCylinder.Probe().m_height2 = sZeroFloat;
             attrCylinder.Probe().m_direction2.x = sNegHugeCylinderExtent;
             attrCylinder.Probe().m_direction2.y = sNegHugeCylinderExtent;
             attrCylinder.Probe().m_direction2.z = sNegHugeCylinderExtent;
-            attrCylinder.Probe().m_radius2 = sZeroFloat;
-            attrCylinder.Probe().m_height2 = sZeroFloat;
+            attrCylinder.m_bottom = attrBottom;
+            attrCylinder.Probe().m_direction.x = attrDirection.x;
+            attrCylinder.Probe().m_direction.y = attrDirection.y;
+            attrCylinder.Probe().m_direction.z = attrDirection.z;
+            attrCylinder.Probe().m_top = attrCylinder.Probe().m_direction;
 
             if (MapMng.CheckHitCylinderNear(
                     reinterpret_cast<CMapCylinder*>(&attrCylinder),

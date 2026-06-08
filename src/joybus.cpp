@@ -2234,25 +2234,25 @@ int JoyBus::RecvGBA(ThreadParam* threadParam, unsigned int* recvBuffer)
  */
 int JoyBus::SendGBA(ThreadParam* threadParam)
 {
-    const int port = threadParam->m_portIndex;
+
     unsigned int firstCmd;
     unsigned int count;
 
-    OSWaitSemaphore(&m_accessSemaphores[port]);
-    count = m_cmdCount[port];
-    firstCmd = m_cmdQueueData[port][0];
-    OSSignalSemaphore(&m_accessSemaphores[port]);
+    OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+    count = m_cmdCount[threadParam->m_portIndex];
+    firstCmd = m_cmdQueueData[threadParam->m_portIndex][0];
+    OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
     if (static_cast<int>(count) <= 0)
 	{
         return 0;
 	}
 
-    bool isSingle = GbaQue.IsSingleMode(port);
+    bool isSingle = GbaQue.IsSingleMode(threadParam->m_portIndex);
 
-    if (isSingle == 0 || port == 1)
+    if (isSingle == 0 || threadParam->m_portIndex == 1)
     {
-        threadParam->m_gbaStatus = GBAGetStatus(port, &threadParam->m_unk3);
+        threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
     }
     else
     {
@@ -2274,7 +2274,7 @@ int JoyBus::SendGBA(ThreadParam* threadParam)
 		return 0;
 	}
 
-    int gbaResult = GBAWrite(port, (unsigned char*)&firstCmd, &threadParam->m_unk3);
+    int gbaResult = GBAWrite(threadParam->m_portIndex, (unsigned char*)&firstCmd, &threadParam->m_unk3);
 
     threadParam->m_gbaStatus = gbaResult;
 
@@ -2285,23 +2285,23 @@ int JoyBus::SendGBA(ThreadParam* threadParam)
 
     unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&firstCmd);
 
-    if (m_stateCodeArr[port] == 0x09 && (cmdBytes[0] & 0x3F) == 0x09 && cmdBytes[1] == 0x01)
+    if (m_stateCodeArr[threadParam->m_portIndex] == 0x09 && (cmdBytes[0] & 0x3F) == 0x09 && cmdBytes[1] == 0x01)
     {
         threadParam->m_state = '!';
         threadParam->m_subState = 0;
         threadParam->m_skipProcessingFlag = 1;
     }
 
-    OSWaitSemaphore(&m_accessSemaphores[port]);
+    OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
-    for (int i = 1; i < (int)m_cmdCount[port]; ++i)
+    for (int i = 1; i < (int)m_cmdCount[threadParam->m_portIndex]; ++i)
 	{
-        m_cmdQueueData[port][i - 1] = m_cmdQueueData[port][i];
+        m_cmdQueueData[threadParam->m_portIndex][i - 1] = m_cmdQueueData[threadParam->m_portIndex][i];
 	}
 
-    m_cmdCount[port]--;
+    m_cmdCount[threadParam->m_portIndex]--;
 
-    OSSignalSemaphore(&m_accessSemaphores[port]);
+    OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
     return 1;
 }

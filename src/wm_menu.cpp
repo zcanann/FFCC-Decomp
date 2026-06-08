@@ -1651,7 +1651,7 @@ void CMenuPcs::destroyWorld()
 		m_menuWindowInfo = 0;
 	}
 
-	if (m_wmThpActive != 0) {
+	if (static_cast<signed char>(m_wmThpActive) != 0) {
 		THPSimpleAudioStop();
 		THPSimpleLoadStop();
 		THPSimpleClose();
@@ -1669,12 +1669,7 @@ void CMenuPcs::destroyWorld()
 	PartMng.pppDestroyAll();
 	MemoryCardMan.McEnd();
 
-	GXColor clearColor;
-	clearColor.r = 0;
-	clearColor.g = 0;
-	clearColor.b = 0;
-	clearColor.a = 0;
-	GXSetCopyClear(clearColor, 0x00FFFFFF);
+	GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0x00FFFFFF);
 	GbaQue.SetControllerMode(0);
 }
 

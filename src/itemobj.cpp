@@ -635,14 +635,15 @@ CGPrgObj* CGItemObj::CreateFromScript(
 	System.Printf(itemObjStrings + kItemObjStrNumFreeItemFmt, freeItemCount);
 
 	if (freeItemCount == 0) {
+		CFlatRuntime2* runtime = ItemCFlatRuntime();
 		int deletedCount = 0;
 		unsigned char* bestItemObj = 0;
 		int bestScriptObjectPos = 0x00989680;
 
-		for (unsigned char* itemObj = reinterpret_cast<unsigned char*>(ItemCFlatRuntime()->FindGItemObjFirst());
+		for (unsigned char* itemObj = reinterpret_cast<unsigned char*>(runtime->FindGItemObjFirst());
 			 itemObj != 0;
 		     itemObj = reinterpret_cast<unsigned char*>(
-		         ItemCFlatRuntime()->FindGItemObjNext(reinterpret_cast<CGItemObj*>(itemObj)))) {
+		         runtime->FindGItemObjNext(reinterpret_cast<CGItemObj*>(itemObj)))) {
 			if (*(void**)(itemObj + 0x550) == 0 &&
 			    static_cast<signed char>(
 			        static_cast<int>((static_cast<unsigned int>(itemObj[0x50]) << 28) & 0xC0000000) >> 31) != 0 &&
@@ -653,7 +654,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 		}
 
 		if (bestItemObj != 0) {
-			gCFlatRuntime().deleteObject(reinterpret_cast<CFlatRuntime::CObject*>(bestItemObj));
+			runtime->deleteObject(reinterpret_cast<CFlatRuntime::CObject*>(bestItemObj));
 			deletedCount = 1;
 		} else {
 			if ((unsigned int)System.m_execParam >= 3U) {

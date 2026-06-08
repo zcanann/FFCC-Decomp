@@ -4024,7 +4024,7 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
                         pdtSlot->m_envFields[3] = copiedHead->m_shapeNames;
                         pdtSlot->m_envFields[4] = copiedHead->m_shapeGroups;
                     }
-                    pdtSlot->m_envFields[0] = reinterpret_cast<unsigned int>(m_pppEnvSt.m_stagePtr);
+                    pdtSlot->m_envFields[0] = reinterpret_cast<unsigned int>(PartMng.m_pppEnvSt.m_stagePtr);
                     break;
                 }
                 }

@@ -2319,9 +2319,9 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 {
 	if ((staIndex == 0 || staIndex == 4) &&
-		*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E + (staIndex * 2)) != 0) {
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E + (staIndex * 2)) != 0) {
 		System.Printf(const_cast<char*>(sCharaObjEffectTimeNoOverwriteMsg));
-		return static_cast<int>(*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E + (staIndex * 2)));
+		return static_cast<int>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E + (staIndex * 2)));
 	}
 
 	unsigned int base = 0;

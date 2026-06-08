@@ -612,7 +612,7 @@ void GbaQueue::ExecutQueue()
 	GbaQueueSetQueueView* queue = GetSetQueueView(this);
 	char* obj;
 	int scriptFoodBase[4];
-	unsigned int channel;
+	int channel;
 
 	for (channel = 0; channel < 4; channel++) {
 		OSWaitSemaphore(accessSemaphores + channel);

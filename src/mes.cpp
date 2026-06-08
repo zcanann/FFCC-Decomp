@@ -47,17 +47,17 @@ static inline CFontRenderFlagBits& GetRenderFlagBits(unsigned char& flags)
 
 static inline int GetMesNibbleValue(const char* data)
 {
+	signed char high = (signed char)(((unsigned char)data[0] & 0x0F) << 4);
 	int low = (unsigned char)data[1] & 0x0F;
-	int high = (unsigned char)data[0] & 0x0F;
-	return low | (high << 4);
+	return (int)high | low;
 }
 
 static inline char ReadTagByte(char** text)
 {
 	char* p0 = *text;
 	*text = p0 + 1;
+	signed char hi = (signed char)((*p0 & 0x0F) << 4);
 	char* p1 = *text;
-	char hi = (char)((*p0 & 0x0F) << 4);
 	*text = p1 + 1;
 	return (char)(hi | (*p1 & 0x0F));
 }
@@ -150,17 +150,18 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
 		else if (ch == 0xFF)
 		{
 			int tag = ((int)*src++ - 0xA0) & 0xFFFF;
-			if (tag != 1)
+			switch (tag)
 			{
-				if ((tag == 0) && (breakOnLineTag != 0))
+			case 0:
+				if (breakOnLineTag != 0)
 				{
 					font->SetPosX((float)(int)lineStartX);
 					font->SetPosY((float)lineBaseY + (font->posY + (float)font->m_glyphHeight * font->scaleY));
 				}
-			}
-			else
-			{
+				break;
+			case 1:
 				continueDraw = false;
+				break;
 			}
 		}
 		else
@@ -186,8 +187,8 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
  */
 void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOnLineBreak)
 {
-	const unsigned char* in = (const unsigned char*)src;
 	char* dst = out;
+	const unsigned char* in = (const unsigned char*)src;
 
 	if (sTag54Init == 0)
 	{
@@ -196,25 +197,18 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 	}
 
 	unsigned char caseMode = 0;
-	int branchMode = 0;
+	unsigned char branchMode = 0;
 
-	const unsigned char* next;
-	unsigned char c;
+	char* townName = Game.m_gameWork.m_townName;
+	const unsigned char* op;
+	signed char c;
 	while ((c = in[0]) != 0)
 	{
-		if (c != 0xFF)
+		if (c == 0xFF)
 		{
-			if (branchMode != 2)
-			{
-				*dst = (char)c;
-				dst++;
-			}
-			in++;
-			continue;
-		}
-
 		unsigned int tag = ((unsigned int)in[1] - 0xA0U) & 0xFFU;
-		next = in + 2;
+		op = in + 2;
+		in++;
 
 		switch (tag)
 		{
@@ -240,10 +234,10 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			break;
 		case 8:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 4);
+			signed char varIndex = (signed char)GetMesNibbleValue((const char*)(op + 2));
 			strcpy(dst, FlatNameDirect(5, CMes::m_tempVar[varIndex]));
 			dst += strlen(dst);
-			next = in + 6;
+			in += 4;
 			break;
 		}
 		case 9:
@@ -254,39 +248,41 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x3D:
 		case 0x3F:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 4);
+			signed char varIndex = (signed char)GetMesNibbleValue((const char*)(op + 2));
 			int value = CMes::m_tempVar[varIndex];
-			if ((tag == 9) || (tag == 0x37))
+			switch (tag)
 			{
+			case 9:
+			case 0x37:
 				strcpy(dst, FlatNameDirect(0, value * 5 + 1));
-			}
-			else if (tag == 0x1D)
-			{
+				break;
+			case 0x1D:
 				strcpy(dst, FlatNameDirect(0, value * 5));
-			}
-			else if (tag == 0x39)
-			{
+				break;
+			case 0x39:
 				strcpy(dst, FlatNameDirect(0, value * 5 + 3));
-			}
-			else if (tag == 0x3B)
-			{
+				break;
+			case 0x3B:
 				Game.MakeArtItemName(dst, value, 1);
-			}
-			else if (tag == 0x3D)
+				break;
+			case 0x3D:
 			{
-				signed char countIdx = (signed char)GetMesNibbleValue((const char*)in + 6);
+				signed char countIdx = (signed char)GetMesNibbleValue((const char*)(op + 4));
 				int count = (unsigned int)CMes::m_tempVar[countIdx] & 0xFFFF;
 				Game.MakeArtItemName(dst, value, count);
+				break;
 			}
-			else
+			case 0x3F:
 			{
-				signed char countIdx = (signed char)GetMesNibbleValue((const char*)in + 6);
+				signed char countIdx = (signed char)GetMesNibbleValue((const char*)(op + 4));
 				int count = (unsigned int)CMes::m_tempVar[countIdx] & 0xFFFF;
 				Game.MakeNumItemName(dst, value, count);
+				break;
+			}
 			}
 			ApplyCaseMode(dst, caseMode);
 			dst += strlen(dst);
-			next = in + 6;
+			in += 4;
 			break;
 		}
 		case 0x1E:
@@ -297,88 +293,90 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x3E:
 		case 0x40:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 4);
+			signed char varIndex = (signed char)GetMesNibbleValue((const char*)(op + 2));
 			int value = CMes::m_tempVar[varIndex];
-			if ((tag == 0x2A) || (tag == 0x38))
+			switch (tag)
 			{
-				strcpy(dst, FlatNameDirect(1, value * 5 + 1));
-			}
-			else if (tag == 0x1E)
-			{
+			case 0x1E:
 				strcpy(dst, FlatNameDirect(1, value * 5));
-			}
-			else if (tag == 0x3A)
-			{
+				break;
+			case 0x2A:
+			case 0x38:
+				strcpy(dst, FlatNameDirect(1, value * 5 + 1));
+				break;
+			case 0x3A:
 				strcpy(dst, FlatNameDirect(1, value * 5 + 3));
-			}
-			else if (tag == 0x3C)
-			{
+				break;
+			case 0x3C:
 				Game.MakeArtMonName(dst, value, 1);
-			}
-			else if (tag == 0x3E)
+				break;
+			case 0x3E:
 			{
-				signed char countIdx = (signed char)GetMesNibbleValue((const char*)in + 6);
+				signed char countIdx = (signed char)GetMesNibbleValue((const char*)(op + 4));
 				int count = (unsigned int)CMes::m_tempVar[countIdx] & 0xFFFF;
 				Game.MakeArtMonName(dst, value, count);
+				break;
 			}
-			else
+			case 0x40:
 			{
-				signed char countIdx = (signed char)GetMesNibbleValue((const char*)in + 6);
+				signed char countIdx = (signed char)GetMesNibbleValue((const char*)(op + 4));
 				int count = (unsigned int)CMes::m_tempVar[countIdx] & 0xFFFF;
 				Game.MakeNumMonName(dst, value, count);
+				break;
+			}
 			}
 			ApplyCaseMode(dst, caseMode);
 			dst += strlen(dst);
-			next = in + 6;
+			in += 4;
 			break;
 		}
 		case 0x2B:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 4);
+			signed char varIndex = (unsigned char)GetMesNibbleValue((const char*)(op + 2));
 			strcpy(dst, FlatNameDirect(2, CMes::m_tempVar[varIndex]));
 			dst += strlen(dst);
-			next = in + 6;
+			in += 4;
 			break;
 		}
 		case 0x2C:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 4);
+			signed char varIndex = (unsigned char)GetMesNibbleValue((const char*)(op + 2));
 			strcpy(dst, FlatNameDirect(3, CMes::m_tempVar[varIndex]));
 			dst += strlen(dst);
-			next = in + 6;
+			in += 4;
 			break;
 		}
 		case 0x2D:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 4);
+			signed char varIndex = (unsigned char)GetMesNibbleValue((const char*)(op + 2));
 			strcpy(dst, FlatNameDirect(3, CMes::m_tempVar[varIndex] + 0x3C));
 			dst += strlen(dst);
-			next = in + 6;
+			in += 4;
 			break;
 		}
 		case 0x2E:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 2);
+			signed char varIndex = (unsigned char)GetMesNibbleValue((const char*)op);
 			strcpy(dst, FlatNameDirect(5, CMes::m_tempVar[varIndex]));
 			dst += strlen(dst);
-			next = in + 4;
+			in += 2;
 			break;
 		}
 		case 0x2F:
-			strcpy(dst, s_mesFallback);
+			strcpy(dst, townName);
 			dst += strlen(dst);
 			break;
 		case 0x30:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 2);
+			signed char varIndex = (signed char)GetMesNibbleValue((const char*)op);
 			sprintf(dst, s_mesNumFmt, CMes::m_tempVar[varIndex]);
 			dst += strlen(dst);
-			next = in + 4;
+			in += 2;
 			break;
 		}
 		case 0x41:
 		{
-			unsigned char mode = (unsigned char)GetMesNibbleValue((const char*)in + 2);
+			signed char mode = (signed char)GetMesNibbleValue((const char*)op);
 			if (mode == 1)
 			{
 				caseMode = 1;
@@ -391,7 +389,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			{
 				caseMode = 2;
 			}
-			next = in + 4;
+			in += 2;
 			break;
 		}
 		case 0x44:
@@ -399,17 +397,17 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			break;
 		case 0x42:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 2);
+			signed char varIndex = (signed char)GetMesNibbleValue((const char*)op);
 			branchMode = (CMes::m_tempVar[varIndex] == 1) ? 1 : 2;
-			next = in + 4;
+			in += 2;
 			break;
 		}
 		case 0x45:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 2);
+			signed char varIndex = (signed char)GetMesNibbleValue((const char*)op);
 			int caravanIdx = CMes::m_tempVar[varIndex];
 			branchMode = (Game.m_caravanWorkArr[caravanIdx].m_genderFlag == 0) ? 1 : 2;
-			next = in + 4;
+			in += 2;
 			break;
 		}
 		case 0x46:
@@ -433,7 +431,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x0E:
 		case 0x13:
 		case 0x14:
-			if ((unsigned int)System.m_execParam > 1U)
+			if ((unsigned int)System.m_execParam >= 2U)
 			{
 				System.Printf(const_cast<char*>(s_mesTagMissing), tag + 0xA0);
 			}
@@ -460,7 +458,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x28:
 		case 0x29:
 		case 0x55:
-			if (System.m_execParam != 0)
+			if ((unsigned int)System.m_execParam >= 1U)
 			{
 				System.Printf(const_cast<char*>(s_mesTagUnknown), tag + 0xA0);
 			}
@@ -469,7 +467,15 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			break;
 		}
 
-		in = next;
+		continue;
+		}
+
+		if (branchMode != 2)
+		{
+			*dst = (char)c;
+			dst++;
+		}
+		in++;
 	}
 }
 
@@ -489,29 +495,24 @@ int CMes::useFlag(int maxCount, int stopOnClear)
 	{
 		int type = flagEntry->m_type;
 
-		if (type != 3)
+		switch (type)
 		{
-			if (type < 3)
-			{
-				if (type != 1)
-				{
-					if (type != 0)
-					{
-						mFlagVars[flagEntry->m_index] = flagEntry->m_value;
-					}
-				}
-				else
-				{
-					int* slot = &mFlagVars[flagEntry->m_index];
-					*slot = *slot + 1;
-				}
-			}
-			else if ((type < 5) &&
-			         (mFlagVars[flagEntry->m_index] == 0) &&
-			         (stopOnClear == 0))
+		case 2:
+			mFlagVars[flagEntry->m_index] = flagEntry->m_value;
+			break;
+		case 1:
+		{
+			int* slot = &mFlagVars[flagEntry->m_index];
+			*slot = *slot + 1;
+			break;
+		}
+		case 3:
+		case 4:
+			if ((mFlagVars[flagEntry->m_index] == 0) && (stopOnClear == 0))
 			{
 				return 0;
 			}
+			break;
 		}
 
 		flagEntry++;
@@ -684,25 +685,23 @@ void CMes::Draw()
 					int fontId = (int)((unsigned int)*(unsigned char*)((char*)glyph + 0x0E) & 0x0F);
 					if (activeFontId != fontId)
 					{
-						nextFont = MenuPcs.m_fonts[2];
-						if (fontId != 2)
+						switch (fontId)
 						{
-							if (fontId < 2)
-							{
-								nextFont = MenuPcs.m_fonts[0];
-								if (fontId != 0)
-								{
-									nextFont = font;
-								}
-							}
-							else
-							{
-								nextFont = font;
-								if (fontId < 4)
-								{
-									nextFont = MenuPcs.m_fonts[2];
-								}
-							}
+						case 0:
+							nextFont = MenuPcs.m_fonts[0];
+							break;
+						case 1:
+							nextFont = font;
+							break;
+						case 2:
+							nextFont = MenuPcs.m_fonts[2];
+							break;
+						case 3:
+							nextFont = MenuPcs.m_fonts[2];
+							break;
+						default:
+							nextFont = font;
+							break;
 						}
 
 						nextFont->SetShadow(*(int*)((char*)this + 0x3D38));
@@ -716,7 +715,7 @@ void CMes::Draw()
 					}
 
 					unsigned int fadeCur = (unsigned int)*(unsigned char*)((char*)glyph + 0x0F) & 0x0F;
-					unsigned int fadeMax = (unsigned int)*(unsigned char*)((char*)glyph + 0x0F) >> 4 & 0xF;
+					unsigned int fadeMax = (unsigned int)*(signed char*)((char*)glyph + 0x0F) >> 4 & 0xF;
 					float ratio = (float)fadeCur / (float)fadeMax;
 					unsigned char alpha;
 					if (ratio >= kMesOne)
@@ -725,7 +724,7 @@ void CMes::Draw()
 					}
 					else
 					{
-						alpha = (unsigned char)((float)globalAlpha * ratio);
+						alpha = (signed char)((float)globalAlpha * ratio);
 					}
 
 					_GXColor color = {0xFF, 0xFF, 0xFF, alpha};
@@ -779,7 +778,7 @@ void CMes::Calc()
 	{
 		if ((int)(unsigned int)*(unsigned short*)(textEntry + 0xC) <= *(int*)((char*)this + 0x3C80))
 		{
-			int fadeMax = (*(unsigned char*)(textEntry + 0xF) >> 4) & 0xF;
+			int fadeMax = (*(signed char*)(textEntry + 0xF) >> 4) & 0xF;
 			int fadeCurr = (*(unsigned char*)(textEntry + 0xF) & 0xF) + 1;
 			if (fadeCurr < fadeMax)
 			{
@@ -797,29 +796,25 @@ void CMes::Calc()
 	while ((int)maxAdvance > *(int*)((char*)this + 0x3C10))
 	{
 		int type = *flagEntry;
-		if (type != 3)
+		switch (type)
 		{
-			if (type < 3)
-			{
-				if (type != 1)
-				{
-					if (type != 0)
-					{
-						*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3CC0) =
-						    (int)*(short*)(flagEntry + 4);
-					}
-				}
-				else
-				{
-					int* slot = (int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3CC0);
-					*slot = *slot + 1;
-				}
-			}
-			else if ((type < 5) &&
-			         (*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3CC0) == 0))
+		case 2:
+			*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3CC0) =
+			    (int)*(short*)(flagEntry + 4);
+			break;
+		case 1:
+		{
+			int* slot = (int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3CC0);
+			*slot = *slot + 1;
+			break;
+		}
+		case 3:
+		case 4:
+			if (*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3CC0) == 0)
 			{
 				goto doneAdvance;
 			}
+			break;
 		}
 
 		flagEntry += 6;
@@ -879,35 +874,30 @@ int CMes::GetWait()
 void CMes::addString(char** text, int branchMode)
 {
 	int fontSel = mFontIndex;
-	CFont* font;
-	if (fontSel == 2)
+	CFont* setupFont;
+	switch (fontSel)
 	{
-		font = MenuPcs.m_fonts[2];
-	}
-	else if (fontSel > 2)
-	{
-		if (fontSel >= 4)
-		{
-		}
-		else
-		{
-			font = MenuPcs.m_fonts[2];
-		}
-	}
-	else if (fontSel == 0)
-	{
-		font = MenuPcs.m_fonts[0];
+	case 0:
+		setupFont = MenuPcs.m_fonts[0];
+		break;
+	case 2:
+		setupFont = MenuPcs.m_fonts[2];
+		break;
+	case 3:
+		setupFont = MenuPcs.m_fonts[2];
+		break;
 	}
 
-	font->SetShadow(mShadow);
-	font->SetMargin(kMesZero);
+	setupFont->SetShadow(mShadow);
+	setupFont->SetMargin(kMesZero);
 	float setupScaleY = mScaleY;
-	font->SetScaleX(mScaleX);
-	font->SetScaleY(setupScaleY);
+	setupFont->SetScaleX(mScaleX);
+	setupFont->SetScaleY(setupScaleY);
+	CFont* font = setupFont;
 
 	bool running = true;
 	unsigned char caseMode = 0;
-	unsigned char flowMode = 0;
+	signed char flowMode = 0;
 
 	do
 	{
@@ -988,7 +978,10 @@ void CMes::addString(char** text, int branchMode)
 			mRubyEnabled = 1;
 			mRubyLine = 0;
 			mRubyHeight = ReadTagS8(text);
-			mRubySpacing = (int)(kMesLineHeightAdjust + (float)font->m_glyphHeight * font->scaleY);
+			{
+				float rubyAdvance = (float)font->m_glyphHeight * font->scaleY;
+				mRubySpacing = kMesLineHeightAdjust + rubyAdvance;
+			}
 			mRubyY = mCurrentY;
 			mRubyOffset = ReadTagS8(text);
 			mCurrentX = mCurrentX + kMesRubyLineIndent + mLineSpacing;
@@ -1225,7 +1218,7 @@ void CMes::addString(char** text, int branchMode)
 			break;
 		case 0x25:
 		{
-			int value = ReadTagS8(text);
+			unsigned int value = ReadTagS8(text);
 			if (mFontCount == 0)
 			{
 				if (value == 0x7F)
@@ -1264,25 +1257,30 @@ void CMes::addString(char** text, int branchMode)
 		{
 			mFontIndex = ReadTagS8(text);
 			int sel = mFontIndex;
-			font = MenuPcs.m_fonts[2];
-			if (sel == 0)
+			CFont* newFont;
+			switch (sel)
 			{
-				font = MenuPcs.m_fonts[0];
+			case 0:
+				newFont = MenuPcs.m_fonts[0];
+				break;
+			case 1:
+				newFont = MenuPcs.m_fonts[2];
+				break;
+			case 2:
+				newFont = MenuPcs.m_fonts[2];
+				break;
+			case 3:
+				newFont = MenuPcs.m_fonts[2];
+				break;
+			default:
+				newFont = MenuPcs.m_fonts[2];
+				break;
 			}
-			else if (sel == 1)
-			{
-			}
-			else if (sel >= 4)
-			{
-			}
-			else
-			{
-				font = MenuPcs.m_fonts[2];
-			}
-			font->SetShadow(mShadow);
-			font->SetMargin(kMesZero);
-			font->SetScaleX(mScaleX);
-			font->SetScaleY(mScaleY);
+			newFont->SetShadow(mShadow);
+			newFont->SetMargin(kMesZero);
+			newFont->SetScaleX(mScaleX);
+			newFont->SetScaleY(mScaleY);
+			font = newFont;
 			break;
 		}
 		case 0x35:
@@ -1301,7 +1299,7 @@ void CMes::addString(char** text, int branchMode)
 			break;
 		case 0x36:
 		{
-			unsigned char idx = (unsigned char)ReadTagU8(text);
+			signed char idx = (unsigned char)ReadTagU8(text);
 			if (branchMode == 0)
 			{
 				int count = mFlagCount;
@@ -1359,7 +1357,7 @@ void CMes::addString(char** text, int branchMode)
 			break;
 		case 0x20:
 		{
-			unsigned char vowel =
+			signed char vowel =
 			    (unsigned char)Game.m_caravanWorkArr[mFlagVars[ReadTagS8(text)]].m_name[0];
 			if ((vowel == 'A') || (vowel == 'I') || (vowel == 'U') ||
 			    (vowel == 'E') || (vowel == 'O') || (vowel == 'Y'))
@@ -1541,21 +1539,21 @@ void CMes::Next()
 		while ((halfVal = kMesZero, *(int*)((char*)this + 0x3c10) < entryCount))
 		{
 			type = *flagEntry;
-			if ((type != 3) && (type < 3))
+			switch (type)
 			{
-				if (type != 1)
-				{
-					if (type != 0)
-					{
-						*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0) =
-						    (int)*(short*)(flagEntry + 4);
-					}
-				}
-				else
-				{
-					int* slot = (int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0);
-					*slot = *slot + 1;
-				}
+			case 2:
+				*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0) =
+				    (int)*(short*)(flagEntry + 4);
+				break;
+			case 1:
+			{
+				int* slot = (int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0);
+				*slot = *slot + 1;
+				break;
+			}
+			case 3:
+			case 4:
+				break;
 			}
 			flagEntry += 6;
 			*(int*)((char*)this + 0x3c10) = *(int*)((char*)this + 0x3c10) + 1;
@@ -1647,7 +1645,7 @@ void CMes::Set(char* text, int param)
 			mLineHeight = lineZero;
 			mLineWidth = lineZero;
 
-			addString((char**)((char*)this + 4), 1);
+			addString(&mText, 1);
 
 			float width = mLineWidth;
 			if (width < mMaxWidth) {

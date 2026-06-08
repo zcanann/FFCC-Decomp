@@ -80,7 +80,7 @@ private:
     int mRubyHeight;            // 0x3D18
     int mRubyOffset;            // 0x3D1C
     float mRubyY;               // 0x3D20
-    int mRubySpacing;           // 0x3D24
+    float mRubySpacing;         // 0x3D24
     int mColor;                 // 0x3D28
     int mFontAlign;             // 0x3D2C
     int mFontCount;             // 0x3D30

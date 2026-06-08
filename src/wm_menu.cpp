@@ -1226,7 +1226,7 @@ void CMenuPcs::loadData()
 				    reinterpret_cast<unsigned char*>(GetWmCharaHandles(this)[i]->m_model) + 0xC0);
 				float maxWait = static_cast<float>(
 				    static_cast<double>(*reinterpret_cast<unsigned short*>(
-				        reinterpret_cast<unsigned char*>(
+				        reinterpret_cast<signed char*>(
 				            reinterpret_cast<int**>(GetWmCharaHandles(this)[i]->m_model)[(animBase + 6)])[10] + 0x10)) -
 				    DOUBLE_803313F0);
 				if (FLOAT_8032ee18 < maxWait) {
@@ -2039,7 +2039,7 @@ void CMenuPcs::CalcMCardMenu()
 	}
 	unsigned short uVar6 = GetButtonRepeat(0);
 
-	if ((signed char)m_wmWorldState->m_worldReady == 0) {
+	if ((unsigned char)m_wmWorldState->m_worldReady == 0) {
 		m_mcCtrl.m_previousState = 0;
 		m_mcCtrl.m_state = 0;
 		m_mcCtrl.m_lastResult = 0;
@@ -2925,7 +2925,7 @@ void CMenuPcs::CalcLoadMenu()
 	switch (iVar10) {
 	case 0:
 	case 2:
-		if ((signed char)m_wmWorldState->m_flag09 == 0) {
+		if ((unsigned char)m_wmWorldState->m_flag09 == 0) {
 			m_wmWorldState->m_cardChannel = (short)m_mcCtrl.m_cardChannel;
 			CFont* pFont = m_fonts[0];
 			pFont->SetMargin(fVar2);
@@ -4165,7 +4165,7 @@ void CMenuPcs::DrawMainMenu()
 	} while (bit < 2);
 
 	if (m_wmWorldState->m_mainState >= 1 && m_wmWorldState->m_mainState <= 3) {
-		const short tileState = m_wmWorldState->m_mainState;
+		const unsigned short tileState = m_wmWorldState->m_mainState;
 		float tileAlpha;
 		if (tileState == 1) {
 			tileAlpha = static_cast<float>(DOUBLE_803314e8 * static_cast<double>(m_wmWorldState->m_frameCounter));
@@ -5087,7 +5087,7 @@ void CMenuPcs::DrawMoveMenu()
 		WmMenuLightTable& lightTable = gWmMenuLightTables[0];
 		LightPcs.SetAmbient(lightTable.m_ambient);
 		LightPcs.SetNumDiffuse(lightTable.m_diffuseCount);
-		for (int lightIndex = 0; lightIndex < lightTable.m_diffuseCount; lightIndex++) {
+		for (unsigned int lightIndex = 0; lightIndex < lightTable.m_diffuseCount; lightIndex++) {
 			LightPcs.SetDiffuse(
 				lightIndex, lightTable.m_diffuseColors[lightIndex],
 				&lightTable.m_diffuseDirs[lightIndex], 0);
@@ -5098,7 +5098,7 @@ void CMenuPcs::DrawMoveMenu()
 			*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(m_effectWork) + 0x1E70) = handle->m_model->m_lightAlpha;
 			handle->Draw(5);
 			pppFVECTOR4 color;
-			const short partColorIndex = m_crystalPart;
+			const unsigned short partColorIndex = m_crystalPart;
 			PartPcs.GetParColIdx(partColorIndex, color);
 			color.w = handle->m_model->m_lightAlpha;
 			PartPcs.SetParColIdx(partColorIndex, color);
@@ -5929,7 +5929,7 @@ void CMenuPcs::DrawTitleMenu()
 			m_wmWorldState->m_frameCounter = 0;
 			m_wmWorldState->m_worldReady = 0;
 		} else if (state != 2) {
-			int threshold = 10;
+			unsigned int threshold = 10;
 			m_wmWorldState->m_frameCounter++;
 			if (m_wmWorldState->m_mainState == 1) {
 				threshold = 0x28;
@@ -6079,7 +6079,7 @@ void CMenuPcs::SetWorldParam(int code, int value)
 	case 0x17: {
 		unsigned int clz = __cntlzw(static_cast<unsigned int>(value));
 		CameraPcs.m_worldMapEffect.m_flags =
-		    static_cast<unsigned char>(static_cast<int>(static_cast<signed char>(clz >> 5)) << 7) |
+		    static_cast<unsigned char>(static_cast<int>(static_cast<unsigned char>(clz >> 5)) << 7) |
 		    (CameraPcs.m_worldMapEffect.m_flags & 0x7F);
 		CameraPcs.m_worldMapEffect.m_timer = 0x4B;
 		CameraPcs.m_worldMapEffect.m_duration = 0x4B;
@@ -6518,7 +6518,7 @@ void CMenuPcs::CalcFukidashi()
 #define WOBJ() reinterpret_cast<int>(m_wm.m_worldObjData)
 
 #define BUB() reinterpret_cast<int>(m_wm.m_bubbleData)
-	*reinterpret_cast<short*>(BUB()) = *reinterpret_cast<short*>(bytes + 0x1C);
+	*reinterpret_cast<unsigned short*>(BUB()) = *reinterpret_cast<short*>(bytes + 0x1C);
 	*reinterpret_cast<short*>(BUB() + 2) = *reinterpret_cast<short*>(bytes + 0x1E);
 	*reinterpret_cast<short*>(BUB() + 4) = 0xF0;
 	*reinterpret_cast<short*>(BUB() + 6) = 0xC4;
@@ -6664,7 +6664,7 @@ void CMenuPcs::CalcFukidashi()
 	        static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(BUB())))));
 	float fVar2 = FLOAT_803314a4;
 	fVar1 = FLOAT_803313dc;
-	unsigned short uVar3 = *reinterpret_cast<unsigned short*>(bytes + 0x1A);
+	unsigned short uVar3 = *reinterpret_cast<short*>(bytes + 0x1A);
 	if ((uVar3 & 0x3F0) != 0) {
 		sVar15 = 0x6C;
 	}
@@ -7092,7 +7092,7 @@ void CMenuPcs::DrawFukidashi()
 	if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0x3F0) != 0) {
 		int bd = reinterpret_cast<int>(m_wm.m_bubbleData);
 		MenuPcs.DrawRect(0,
-			(float)*reinterpret_cast<short*>(bd + 0x1C), (float)*reinterpret_cast<short*>(bd + 0x1E),
+			(float)*reinterpret_cast<unsigned short*>(bd + 0x1C), (float)*reinterpret_cast<short*>(bd + 0x1E),
 			(float)*reinterpret_cast<short*>(bd + 0x20), (float)*reinterpret_cast<short*>(bd + 0x22),
 			*reinterpret_cast<float*>(bd + 0x24), *reinterpret_cast<float*>(bd + 0x28),
 			FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
@@ -7827,7 +7827,7 @@ void CMenuPcs::DrawWMFrame()
 			unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 			int dispValue =
 			    bytes[0xA] & 2
-			        ? *reinterpret_cast<int*>(&Game.m_gameWork.m_scriptSysVal0) + static_cast<signed char>(bytes[0xB])
+			        ? *reinterpret_cast<int*>(&Game.m_gameWork.m_scriptSysVal0) + static_cast<unsigned char>(bytes[0xB])
 			        : *reinterpret_cast<int*>(&Game.m_gameWork.m_scriptSysVal0) + static_cast<signed char>(bytes[0xC]);
 			int digitCnt = (dispValue > 9) + 1;
 			if (dispValue > 99) {
@@ -7904,7 +7904,7 @@ void CMenuPcs::DrawWMFrame()
 				} else if (language == 2) {
 					suffixY += FLOAT_80331550;
 				}
-				unsigned char alphaU8 =
+				signed char alphaU8 =
 				    static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(*reinterpret_cast<float*>(off + 0x10))));
 				MenuPcs.SetAttrFmt((FMT)0);
 				GXColor color;
@@ -8154,7 +8154,7 @@ void CMenuPcs::CalcChara()
 	unsigned int selectedMask = 0;
 
 	if (m_wm.m_charaSelectData[0x0D] == 1) {
-		selectedMask = 1u << static_cast<unsigned int>(*reinterpret_cast<short*>(m_wm.m_charaSelectData + 0x04));
+		selectedMask = 1u << static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(m_wm.m_charaSelectData + 0x04));
 	}
 	if (m_wm.m_charaSelectData[0x1D] == 1) {
 		selectedMask |= 1u << static_cast<unsigned int>(*reinterpret_cast<short*>(m_wm.m_charaSelectData + 0x14));
@@ -8628,7 +8628,7 @@ void CMenuPcs::CalcCharaSelect()
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
 	unsigned short padTrig[4];
-	unsigned short padRepeat[4];
+	short padRepeat[4];
 
 	*reinterpret_cast<short*>(bytes + 0x74) = static_cast<short>(*reinterpret_cast<short*>(bytes + 0x74) + 1);
 	const unsigned int clz = __cntlzw(static_cast<unsigned int>(Game.m_gameWork.m_menuStageMode));
@@ -8683,7 +8683,7 @@ void CMenuPcs::CalcCharaSelect()
 	if (winState != 3) {
 		unsigned short anyTrig = 0;
 		for (int i = 0; i < 4; i++) {
-			anyTrig = static_cast<unsigned short>(anyTrig | padTrig[i]);
+			anyTrig = static_cast<short>(anyTrig | padTrig[i]);
 		}
 		if (winState == 1 && (anyTrig & 0x0300) != 0) {
 			m_menuWindowInfo->state = 2;
@@ -9166,7 +9166,7 @@ void CMenuPcs::DrawCharaName()
 	WmI2D cvt;
 	int yCounter = 0;
 	int slotBase = 0;
-	for (int row = 0; row < 2; row++) {
+	for (unsigned int row = 0; row < 2; row++) {
 		cvt.w.hi = 0x43300000;
 		cvt.w.lo = static_cast<unsigned int>(yCounter) ^ 0x80000000;
 		float y = (yBase1 + static_cast<float>(cvt.d - bias1)) + yExtra1;
@@ -9620,7 +9620,7 @@ void CMenuPcs::WMChgMenu()
 	*reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0x1C) = 0;
 
 	int frameInfo = reinterpret_cast<int>(m_wm.m_frameInfo);
-	*reinterpret_cast<short*>(frameInfo + 0x20) = *reinterpret_cast<short*>(frameInfo + 4);
+	*reinterpret_cast<short*>(frameInfo + 0x20) = *reinterpret_cast<unsigned short*>(frameInfo + 4);
 	*reinterpret_cast<short*>(frameInfo + 0x22) = *reinterpret_cast<short*>(frameInfo + 6);
 	*reinterpret_cast<short*>(frameInfo + 0x24) = *reinterpret_cast<short*>(frameInfo + 8);
 	*reinterpret_cast<short*>(frameInfo + 0x26) = *reinterpret_cast<short*>(frameInfo + 10);
@@ -10059,7 +10059,7 @@ void CMenuPcs::ChgAllModel()
 
 		if (*reinterpret_cast<int*>(gameData + 0x1794) != 0) {
 			race = *reinterpret_cast<unsigned short*>(caravanData + 0x3E0);
-			variant = *reinterpret_cast<unsigned short*>(caravanData + 0x3E2);
+			variant = *reinterpret_cast<short*>(caravanData + 0x3E2);
 			index = *reinterpret_cast<unsigned short*>(caravanData + 0x3E4);
 			modelId = race * 200 + 100;
 			if (variant != 0) {
@@ -10395,14 +10395,14 @@ input_check_done:
 		}
 
 		for (int i = 0; i < 5; i++) {
-			const short curState = m_wmWorldState->m_mainState;
+			const unsigned short curState = m_wmWorldState->m_mainState;
 			if (!(((curState > 0) && (curState < 4)) || i == 1)) {
 				continue;
 			}
 
 			unsigned char* const panel = worldObj + i * 0x50;
 			*reinterpret_cast<int*>(panel) = 1;
-			unsigned int frame = 0;
+			int frame = 0;
 			float modelScale = FLOAT_803315d4;
 			if (i == 0) {
 				modelScale = static_cast<float>(static_cast<double>(modelScale) * DOUBLE_803315D8);
@@ -10753,7 +10753,7 @@ void CMenuPcs::DrawMainMenuSub()
 		GXSetScissor(*reinterpret_cast<unsigned int*>(view + 0x40), *reinterpret_cast<unsigned int*>(view + 0x44),
 		             *reinterpret_cast<unsigned int*>(view + 0x48), *reinterpret_cast<unsigned int*>(view + 0x4C));
 
-		if (*reinterpret_cast<short*>(reinterpret_cast<int>(m_wmWorldState) + 0x10) == 2) {
+		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<int>(m_wmWorldState) + 0x10) == 2) {
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 			MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 			GXSetChanMatColor(static_cast<GXChannelID>(4), white);
@@ -12937,7 +12937,7 @@ void McCtrl::SetListDat(int slot, int clearPlayTime)
 			*reinterpret_cast<unsigned int*>(save + 0x1C) = MemoryCardMan.CalcCrc(reinterpret_cast<Mc::SaveDat*>(save));
 
 			if (*reinterpret_cast<int*>(save + 0x30) >= 0) {
-				*reinterpret_cast<unsigned int*>(entry + 0x18) = *reinterpret_cast<unsigned short*>(save + *reinterpret_cast<int*>(save + 0x30) * 0x9C0 + 0x14D0);
+				*reinterpret_cast<unsigned int*>(entry + 0x18) = *reinterpret_cast<short*>(save + *reinterpret_cast<int*>(save + 0x30) * 0x9C0 + 0x14D0);
 			} else {
 				*reinterpret_cast<unsigned int*>(entry + 0x18) = 0xFFFFFFFFu;
 			}
@@ -13226,7 +13226,7 @@ int McCtrl::SaveDat()
 	case 0x12: {
 		unsigned long long serial;
 		if (CARDGetSerialNo(m_cardChannel, &serial) == 0) {
-			if (static_cast<signed char>(Game.m_gameWork.m_mcHasSerial) == 0) {
+			if (static_cast<unsigned char>(Game.m_gameWork.m_mcHasSerial) == 0) {
 				Game.m_gameWork.m_mcSerial1 = static_cast<unsigned int>(serial);
 				Game.m_gameWork.m_mcSerial0 = static_cast<unsigned int>(serial >> 32);
 				Game.m_gameWork.m_mcRandom = Math.Rand(0x7FFFFFFF);

@@ -637,7 +637,7 @@ void CGCharaObj::onFramePostCalc()
 		if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
 		    (i == 0 || i == 4 || i == 9 || i == 3) &&
 		    statusValue > 0) {
-			int slot = m_animStateMisc;
+			int slot = static_cast<signed char>(m_animStateMisc);
 			unsigned short padMask = 0;
 			bool useDebugPad = (Pad.m_debugPadLock != 0) || ((slot == 0) && (Pad.m_debugPadPort != -1));
 			if (!useDebugPad) {
@@ -768,7 +768,7 @@ void CGCharaObj::onFramePreCalc()
 	}
 	m_pushScale = pushScale;
 
-	unsigned int push = 0;
+	int push = 0;
 	switch (m_lastStateId) {
 		case 1: case 2: case 4: case 6: case 7: case 8: case 9:
 		case 10: case 0xB: case 0xC: case 0xD: case 0xE: case 0xF:
@@ -802,7 +802,7 @@ void CGCharaObj::onFramePreCalc()
 		if (padHeld != 0) {
 			push += 0x19;
 		}
-		if (static_cast<signed char>(reinterpret_cast<unsigned char*>(this)[0x9B]) >= 0) {
+		if (static_cast<signed char>(static_cast<int>(static_cast<unsigned int>(reinterpret_cast<unsigned char*>(this)[0x9B]) << 24 >> 30) << 30 >> 31) == 0) {
 			push += 0x19;
 		}
 	}
@@ -1016,7 +1016,8 @@ void CGCharaObj::onFrameStat()
 			break;
 
 		case 0xA:
-			if (m_subState == 0) {
+			switch (m_subState) {
+			case 0:
 				if (m_subFrame == 0) {
 					Sound.StopSe3DGroup(m_particleId);
 					for (int i = 0; i < 0x16; i++) {
@@ -1030,7 +1031,8 @@ void CGCharaObj::onFrameStat()
 				if (isLoopAnim() != 0) {
 					changeSubStat(1);
 				}
-			} else if (m_subState == 1) {
+				break;
+			case 1:
 				if (m_subFrame == 0) {
 					reqAnim(0x1B, 1, 0);
 				}
@@ -1039,7 +1041,8 @@ void CGCharaObj::onFrameStat()
 				    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x46) == 0) {
 					changeSubStat(2);
 				}
-			} else if (m_subState < 3) {
+				break;
+			case 2:
 				if (m_subFrame == 0) {
 					reqAnim(0x1C, 0, 0);
 				}
@@ -1047,20 +1050,13 @@ void CGCharaObj::onFrameStat()
 				if (isLoopAnim() != 0) {
 					changeStat(0, 0, 0);
 				}
+				break;
 			}
 			break;
 
 		case 8:
-			if (m_subState == 2) {
-				if (m_subFrame == 0) {
-					reqAnim(m_unk558, 0, 0);
-				}
-
-				if (isLoopAnim() != 0) {
-					changeSubStat(1);
-					return;
-				}
-			} else if (m_subState == 0) {
+			switch (m_subState) {
+			case 0:
 				if (m_subFrame == 0) {
 					reqAnim(m_attackAnimId, 0, 0);
 				}
@@ -1069,11 +1065,23 @@ void CGCharaObj::onFrameStat()
 					changeSubStat(1);
 					return;
 				}
-			} else if (m_subState == 1) {
+				break;
+			case 1:
 				if (m_subFrame == 0) {
 					reqAnim(m_unk554, 1, 0);
 				}
-			} else if (m_subState < 4) {
+				break;
+			case 2:
+				if (m_subFrame == 0) {
+					reqAnim(m_unk558, 0, 0);
+				}
+
+				if (isLoopAnim() != 0) {
+					changeSubStat(1);
+					return;
+				}
+				break;
+			case 3:
 				if (m_subFrame == 0) {
 					reqAnim(((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) ? m_unk558 : m_unk55C, 0, 0);
 				}
@@ -1082,6 +1090,7 @@ void CGCharaObj::onFrameStat()
 					changeStat(0, 0, 0);
 					return;
 				}
+				break;
 			}
 
 			onStatShield();
@@ -1442,8 +1451,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 	}
 
 	if (m_lastStateId == 6 &&
-	    static_cast<int>((static_cast<unsigned int>(*(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1)) << 0x1A) |
-	                     (static_cast<unsigned int>(*(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1)) >> 6)) < 0) {
+	    static_cast<signed char>(static_cast<int>(static_cast<unsigned int>(*(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1)) << 26 >> 30) << 30 >> 31) != 0) {
 		int currentKind =
 			*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 0x0A) & 0xFF;
 		if (currentKind == 2) {
@@ -1514,9 +1522,11 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 
 	int damageAmount = 0;
 	if (effectResult != 0) {
-		int itemKind = 1;
+		int itemKind;
 		if (resolvedItemId >= 0x1F5) {
-			itemKind = *reinterpret_cast<short*>(itemData + 2);
+			itemKind = *reinterpret_cast<unsigned short*>(itemData + 2);
+		} else {
+			itemKind = 1;
 		}
 
 		if (itemKind == 1 || (itemKind == 9 && (static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && (static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D)) {
@@ -2618,7 +2628,7 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
 	}
 
 	if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x10) == 0x7F &&
-	    static_cast<signed char>(SoundBuffer[0x4FC]) < 0) {
+	    static_cast<signed char>(static_cast<int>(static_cast<unsigned int>(CGMonObj::m_boss[0x10]) << 24 >> 30) << 30 >> 31) != 0) {
 		outA = 3;
 	}
 
@@ -2628,12 +2638,16 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
 
 	System.Printf(const_cast<char*>(sCharaObjResistanceFmt), outA);
 
-	if (outA == 1) {
+	switch (outA) {
+	case 1:
 		outB = (isNormal != 0) ? 1 : 0;
-	} else if (outA == 0) {
+		break;
+	case 0:
 		outB = 1;
-	} else {
+		break;
+	default:
 		outB = 0;
+		break;
 	}
 	outC = (outA ^ 3) / 2;
 }

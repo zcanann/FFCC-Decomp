@@ -1182,7 +1182,7 @@ void CMenuPcs::CalcSelectWait()
 	short& promptMode = window->state;
 	int currentPartySlot = 0;
 	for (; currentPartySlot < activePartyCount; currentPartySlot++) {
-		if (s_Rinfo->m_party[currentPartySlot].m_rank == currentPartyIndex) {
+		if (currentPartyIndex == s_Rinfo->m_party[currentPartySlot].m_rank) {
 			break;
 		}
 	}
@@ -1243,7 +1243,7 @@ void CMenuPcs::CalcSelectWait()
 		if (padLocked) {
 			down = 0;
 		} else {
-			int resolvedPadSlot = (Pad.m_debugPadPort == padSlot) ? 0 : padSlot;
+			int resolvedPadSlot = (padSlot == Pad.m_debugPadPort) ? 0 : padSlot;
 			down = Pad.m_padInputs[resolvedPadSlot].buttonDown[0];
 		}
 		if (delay == 0 && currentPartyIndex < activePartyCount) {
@@ -1277,8 +1277,8 @@ void CMenuPcs::CalcSelectWait()
 					short winH = 0;
 					GetWinSize(0x18, &winW, &winH, 1);
 					SetMcWinInfo((int)winW, (int)winH);
-					promptMode = 0;
 					confirmSel = 1;
+					promptMode = 0;
 					Sound.PlaySe(3, 0x40, 0x7f, 0);
 				}
 			}

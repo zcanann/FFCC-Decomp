@@ -2916,7 +2916,7 @@ int CGObject::IsAnimFinished(int mode)
         }
         {
             shieldFlag = static_cast<signed char>(
-                static_cast<int>((static_cast<u32>(*reinterpret_cast<u8*>(&m_shieldNodeFlags)) << 0x1C) >> 0x1F));
+                static_cast<int>(static_cast<u32>(*reinterpret_cast<u8*>(&m_shieldNodeFlags)) << 0x1C) >> 0x1F);
             shieldFlagClz = static_cast<u32>(__cntlzw(static_cast<u32>(shieldFlag)));
             result = shieldFlagClz >> 5;
 

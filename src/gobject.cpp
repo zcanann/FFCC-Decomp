@@ -180,6 +180,9 @@ static const float sBgDefaultGravityY = 0.0;
 static const char s_gobject_cpp[] = "gobject.cpp";
 static const char s_l_item2[] = "l_item2";
 static const char s_r_item[] = "r_item";
+static const char s_noTurnMotion[36] =
+    "\203\136\201\133\203\223\203\202\201\133\203\126\203\207\203\223"
+    "\202\315\202\240\202\350\202\334\202\271\202\361\201\102\012";
 extern "C" float sAnimFrameOffset;                    // FLOAT_80330338
 static const float sHugeCylinderExtent = 10000000000.0f; // FLOAT_8033033c
 static const float sNegHugeCylinderExtent = -10000000000.0f; // FLOAT_80330340
@@ -1696,15 +1699,17 @@ void CGObject::update()
                 }
                 frameStep += frameDelta;
             } else {
-                unsigned short frameCount = 1;
                 if (ModelAnim(model) != 0) {
-                    frameCount = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(ModelAnim(model)) + 0x10);
+                    const unsigned short frameCount =
+                        *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(ModelAnim(model)) + 0x10);
+                    frameStep += static_cast<float>(frameCount) /
+                                 static_cast<float>(*reinterpret_cast<unsigned int*>(&m_attackColliders[0].m_localStart.x));
+                } else {
+                    if (static_cast<unsigned int>(System.m_execParam) >= 2) {
+                        System.Printf(const_cast<char*>(s_noTurnMotion));
+                    }
+                    frameStep = m_turnSpeed + sAnimFrameOffset;
                 }
-                float denom = m_attackColliders[0].m_localStart.x;
-                if (denom <= sZeroFloat) {
-                    denom = sAnimFrameOffset;
-                }
-                frameStep += static_cast<float>(frameCount) / denom;
             }
 
             const float prevTime = ModelTime(model);

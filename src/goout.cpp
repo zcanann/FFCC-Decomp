@@ -702,12 +702,12 @@ void DrawGoOutMenu()
         const float cursorX = (float)(MenuPcs.m_menuWindowInfo->x + 0x20);
         const unsigned char cursorMode = goOutMenu.m_cursorMode;
 
-        if (cursorMode == 0) {
-            const int cursorX = MenuPcs.GetYesNoXPos(goOutMenu.m_cursorChoice);
-            MenuPcs.DrawCursor(cursorX, (int)cursorY, 1.0f);
-        } else {
+        if (cursorMode != 0) {
             const int localY = goOutMenu.m_cursorListY1 + goOutMenu.m_cursorChoice * 0x1E;
             MenuPcs.DrawCursor((int)cursorX, localY, 1.0f);
+        } else {
+            const int cursorX = MenuPcs.GetYesNoXPos(goOutMenu.m_cursorChoice);
+            MenuPcs.DrawCursor(cursorX, (int)cursorY, 1.0f);
         }
     }
 }

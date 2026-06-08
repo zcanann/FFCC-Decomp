@@ -3075,7 +3075,7 @@ void CPartMng::pppDrawPrioPdtFpno(unsigned char drawMode, short kind, short node
 
     checkCull:
         PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
-        if (PSVECSquareMag(&cameraDelta) >= mng->m_cullRadiusSq) {
+        if (!(PSVECSquareMag(&cameraDelta) < mng->m_cullRadiusSq)) {
             return;
         }
 
@@ -3168,7 +3168,7 @@ drawPart:
 
 checkCull:
     PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
-    if (PSVECSquareMag(&cameraDelta) >= mng->m_cullRadiusSq) {
+    if (!(PSVECSquareMag(&cameraDelta) < mng->m_cullRadiusSq)) {
         return;
     }
 
@@ -4067,18 +4067,14 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
 int CPartMng::pppGetFreeDataMng()
 {
     PppPdtSlot* freeSlot = 0;
-    PppPdtSlot* slot = &m_pdtSlots[8];
     int slotIndex = 8;
-    int count = 0x18;
-    do {
-        if (slot->m_pppDataHead == 0) {
+    for (int count = 0x18; count != 0; count--) {
+        if (m_pdtSlots[slotIndex].m_pppDataHead == 0) {
             freeSlot = &m_pdtSlots[slotIndex];
             break;
         }
-        count--;
-        slot++;
         slotIndex++;
-    } while (count != 0);
+    }
 
     if (freeSlot == 0) {
         if ((unsigned int)System.m_execParam >= 1) {

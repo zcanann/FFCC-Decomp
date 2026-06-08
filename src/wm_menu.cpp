@@ -13899,6 +13899,9 @@ int McCtrl::ChkNowData()
 			}
 		}
 		break;
+
+	case 7:
+		break;
 	}
 
 	if (m_state == -1)

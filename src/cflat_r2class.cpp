@@ -801,9 +801,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -8:
-			*(reinterpret_cast<u8*>(&engineObject->m_weaponNodeFlags) + 1) =
-			    static_cast<u8>((static_cast<unsigned char>(object->m_localBase[0]) << 7) & 0x80) |
-			    (*(reinterpret_cast<u8*>(&engineObject->m_weaponNodeFlags) + 1) & 0x7F);
+			engineObject->m_weaponNodeFlagAll.m_bits1.m_shield = static_cast<signed char>(object->m_localBase[0]);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -933,13 +931,15 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		}
-		case -0x1D: {
-			float* params = reinterpret_cast<float*>(object->m_localBase);
-			engineObject->moveVector(CVector(params[0], params[1], params[2]), params[3], static_cast<int>(object->m_localBase[4]));
+		case -0x1D:
+			engineObject->moveVector(
+			    CVector(reinterpret_cast<float*>(object->m_localBase)[0],
+			            reinterpret_cast<float*>(object->m_localBase)[1],
+			            reinterpret_cast<float*>(object->m_localBase)[2]),
+			    reinterpret_cast<float*>(object->m_localBase)[3], static_cast<int>(object->m_localBase[4]));
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
-		}
 		case -0x1F:
 			engineObject->m_attrFlags = object->m_localBase[0];
 			PushValue(this, object, 0);
@@ -956,9 +956,9 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			if (hit != 0) {
 				*reinterpret_cast<int*>(object->m_localBase[7]) =
 				    *reinterpret_cast<short*>(reinterpret_cast<u8*>(hit) + 0x30);
-				PushValue(this, object, hit != 0);
-				outResult = 0;
 			}
+			PushValue(this, object, hit != 0);
+			outResult = 0;
 			break;
 		}
 		case -0x21: {
@@ -1005,14 +1005,17 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			Vec hitStart;
 			Vec hitMove;
 			float* params = reinterpret_cast<float*>(object->m_localBase);
+			float angle = params[2];
+			float length = params[3];
+			float radius = params[4];
 			hitStart.x = engineObject->m_worldPosition.x;
 			hitStart.y = engineObject->m_worldPosition.y + params[1];
 			hitStart.z = engineObject->m_worldPosition.z;
-			hitMove.x = static_cast<float>(sin(params[2])) * params[3];
+			hitMove.x = static_cast<float>(sin(angle)) * length;
 			hitMove.y = kCFlatRuntime2Zero;
-			hitMove.z = static_cast<float>(cos(params[2])) * params[3];
-			int hit = MapPcs.CheckHitCylinderNear(&hitStart, &hitMove, params[4], object->m_localBase[0]);
-			AddDebugDrawCC(&hitStart, &hitMove, params[4], 1, 0);
+			hitMove.z = static_cast<float>(cos(angle)) * length;
+			int hit = MapPcs.CheckHitCylinderNear(&hitStart, &hitMove, radius, object->m_localBase[0]);
+			AddDebugDrawCC(&hitStart, &hitMove, radius, 1, 0);
 			if (hit != 0) {
 				*reinterpret_cast<int*>(object->m_localBase[5]) = 0;
 			}
@@ -1070,13 +1073,12 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		case -0x2C: {
 			Vec hitStart;
 			Vec hitMove;
-			float* params = reinterpret_cast<float*>(object->m_localBase);
-			float angle = params[2];
-			float distance = params[3];
-			float height = params[4];
-			float radius = params[5];
+			float angle = reinterpret_cast<float*>(object->m_localBase)[2];
+			float height = reinterpret_cast<float*>(object->m_localBase)[4];
+			float distance = reinterpret_cast<float*>(object->m_localBase)[3];
+			float radius = reinterpret_cast<float*>(object->m_localBase)[5];
 			hitStart.x = engineObject->m_worldPosition.x + static_cast<float>(sin(angle)) * distance;
-			hitStart.y = engineObject->m_worldPosition.y + params[1];
+			hitStart.y = engineObject->m_worldPosition.y + reinterpret_cast<float*>(object->m_localBase)[1];
 			hitStart.z = engineObject->m_worldPosition.z + static_cast<float>(cos(angle)) * distance;
 			hitMove.x = kCFlatRuntime2Zero;
 			hitMove.y = -height;
@@ -1114,7 +1116,8 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 				*reinterpret_cast<int*>(&engineObject->m_attackColliders[7].m_localStart.x) = x;
 				*reinterpret_cast<int*>(&engineObject->m_damageColliders[0].m_localPosition.x) = x;
 			} else {
-				*reinterpret_cast<int*>(&engineObject->m_attackColliders[index + 1].m_localStart.x) = x;
+				*reinterpret_cast<int*>(
+				    reinterpret_cast<u8*>(&engineObject->m_attackColliders[1].m_localStart.x) + index * 0x30) = x;
 			}
 			PushValue(this, object, 0);
 			outResult = 0;
@@ -1224,14 +1227,14 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		case -0x43: {
 			float* params = reinterpret_cast<float*>(object->m_localBase);
-			engineObject->moveVectorRot(params[0], params[1], params[2], static_cast<unsigned int>(params[3]));
+			engineObject->moveVectorRot(params[0], params[1], params[2], object->m_localBase[3]);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
 		}
 		case -0x44: {
 			float* params = reinterpret_cast<float*>(object->m_localBase);
-			engineObject->moveVectorHRot(params[0], params[1], params[2], static_cast<int>(params[3]));
+			engineObject->moveVectorHRot(params[0], params[1], params[2], object->m_localBase[3]);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1242,7 +1245,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x46: {
-			CGObject* target = static_cast<unsigned int>(object->m_localBase[0]) != 0 ? FindRuntimeObject(this, object->m_localBase[0]) : 0;
+			CGObject* target = static_cast<int>(object->m_localBase[0]) != 0 ? FindRuntimeObject(this, object->m_localBase[0]) : 0;
 			engineObject->LookAt(target, 0);
 			PushValue(this, object, 0);
 			outResult = 0;
@@ -1343,10 +1346,10 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			    static_cast<int>(object->m_localBase[2]),
 			    static_cast<int>(object->m_localBase[3]),
 			    static_cast<int>(object->m_localBase[4]),
-			    static_cast<short>(object->m_localBase[5]),
-			    static_cast<short>(object->m_localBase[6]),
-			    static_cast<short>(object->m_localBase[7]),
-			    static_cast<short>(object->m_localBase[8]));
+			    static_cast<int>(object->m_localBase[5]),
+			    static_cast<int>(object->m_localBase[6]),
+			    static_cast<int>(object->m_localBase[7]),
+			    static_cast<int>(object->m_localBase[8]));
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1488,7 +1491,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		}
 		case -0x78:
 			engineObject->PlayAnim(
-			    static_cast<int>(object->m_localBase[0]), 0, 0, static_cast<short>(object->m_localBase[1]), static_cast<short>(object->m_localBase[2]), 0);
+			    static_cast<int>(object->m_localBase[0]), 0, 0, static_cast<int>(object->m_localBase[1]), static_cast<int>(object->m_localBase[2]), 0);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1520,7 +1523,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		}
 		case -0x7A:
 			engineObject->PlayAnim(
-			    static_cast<int>(object->m_localBase[0]), 1, 0, static_cast<short>(object->m_localBase[1]), static_cast<short>(object->m_localBase[2]), 0);
+			    static_cast<int>(object->m_localBase[0]), 1, 0, static_cast<int>(object->m_localBase[1]), static_cast<int>(object->m_localBase[2]), 0);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1728,13 +1731,13 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		case -0x9A:
 			engineObject->PlayAnim(
-			    static_cast<int>(object->m_localBase[0]), 1, 1, static_cast<short>(object->m_localBase[1]), static_cast<short>(object->m_localBase[2]), 0);
+			    static_cast<int>(object->m_localBase[0]), 1, 1, static_cast<int>(object->m_localBase[1]), static_cast<int>(object->m_localBase[2]), 0);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
 		case -0x99:
 			engineObject->PlayAnim(
-			    static_cast<int>(object->m_localBase[0]), 0, 1, static_cast<short>(object->m_localBase[1]), static_cast<short>(object->m_localBase[2]), 0);
+			    static_cast<int>(object->m_localBase[0]), 0, 1, static_cast<int>(object->m_localBase[1]), static_cast<int>(object->m_localBase[2]), 0);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

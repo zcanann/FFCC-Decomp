@@ -1470,10 +1470,10 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 		}
 
 		Mtx meshMtx;
-		if (mesh->m_data->m_skinCount == 0) {
-			PSMTXConcat(ModelDrawMtx(this), nodes[mesh->m_data->m_nodeIndex].m_mtx, meshMtx);
-		} else {
+		if (mesh->m_data->m_skinCount != 0) {
 			PSMTXCopy(ModelDrawMtx(this), meshMtx);
+		} else {
+			PSMTXConcat(ModelDrawMtx(this), nodes[mesh->m_data->m_nodeIndex].m_mtx, meshMtx);
 		}
 
 		int shadowCount = 0;

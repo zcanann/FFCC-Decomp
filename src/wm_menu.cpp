@@ -6772,9 +6772,9 @@ void CMenuPcs::CalcFukidashi()
 							float u = (t - *prev) / dt2;
 							float u2 = u * u;
 							float u3 = u2 * u;
-							yResult = dt2 * (prev[3] * (u - FLOAT_803314c8 * u2 + u3) + cur[2] * (u3 - u2)) +
-							          prev[1] * (FLOAT_803313e8 + FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2) +
-							          cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2);
+							yResult = dt2 * (prev[3] * (u + (u3 - FLOAT_803314c8 * u2)) + cur[2] * (u3 - u2)) +
+							          (prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2)) +
+							           cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2));
 						}
 						break;
 					}
@@ -6807,9 +6807,9 @@ void CMenuPcs::CalcFukidashi()
 							float u = (t - *prev) / dt2;
 							float u2 = u * u;
 							float u3 = u2 * u;
-							rotResult = dt2 * (prev[3] * (u - FLOAT_803314c8 * u2 + u3) + cur[2] * (u3 - u2)) +
-							            prev[1] * (FLOAT_803313e8 + FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2) +
-							            cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2);
+							rotResult = dt2 * (prev[3] * (u + (u3 - FLOAT_803314c8 * u2)) + cur[2] * (u3 - u2)) +
+							            (prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2)) +
+							             cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2));
 						}
 						break;
 					}
@@ -6909,9 +6909,9 @@ void CMenuPcs::CalcFukidashi()
 									float u = (t2 - *pr) / d;
 									float u2 = u * u;
 									float u3 = u2 * u;
-									yRes2 = d * (pr[3] * (u - FLOAT_803314c8 * u2 + u3) + cr[2] * (u3 - u2)) +
-									        pr[1] * (FLOAT_803313e8 + FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2) +
-									        cr[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2);
+									yRes2 = d * (pr[3] * (u + (u3 - FLOAT_803314c8 * u2)) + cr[2] * (u3 - u2)) +
+									        (pr[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2)) +
+									         cr[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2));
 								}
 								break;
 							}
@@ -6944,9 +6944,9 @@ void CMenuPcs::CalcFukidashi()
 									float u = (t2 - *pr) / d;
 									float u2 = u * u;
 									float u3 = u2 * u;
-									rotRes2 = d * (pr[3] * (u - FLOAT_803314c8 * u2 + u3) + cr[2] * (u3 - u2)) +
-									          pr[1] * (FLOAT_803313e8 + FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2) +
-									          cr[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2);
+									rotRes2 = d * (pr[3] * (u + (u3 - FLOAT_803314c8 * u2)) + cr[2] * (u3 - u2)) +
+									          (pr[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2)) +
+									           cr[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2));
 								}
 								break;
 							}

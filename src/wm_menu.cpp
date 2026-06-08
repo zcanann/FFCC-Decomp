@@ -6377,7 +6377,7 @@ void CMenuPcs::CalcPitcher()
 	unsigned char* worldObj = m_wm.m_worldObjData;
 
 	short state = m_wmWorldState->m_mainState;
-	if (state == 0 || state >= 3) {
+	if (state == 0 || state > 2) {
 		return;
 	}
 

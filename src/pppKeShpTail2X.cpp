@@ -7,6 +7,8 @@ extern "C" {
 extern const float kPppKeShpTail2XZero = 0.0f;
 extern const float kPppKeShpTail2XAlphaScale = 16384.0f;
 extern const float kPppKeShpTail2XHalf = 0.5f;
+extern const double kPppKeShpTail2XSignedIntBias = 4503601774854144.0;
+extern const double kPppKeShpTail2XUnsignedIntBias = 4503599627370496.0;
 }
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
@@ -147,7 +149,7 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     s32 nextIndex;
     s32 lastIndex;
     u8 zEnable;
-    s32 dataValIndex;
+    u32 dataValIndex;
 
     zero = kPppKeShpTail2XZero;
     dataValIndex = step->m_dataValIndex;
@@ -178,10 +180,7 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
         colorStep.z = (colorStart.z - colorEnd.z) / invCountMinusOne;
         colorStep.w = (colorStart.w - colorEnd.w) / invCountMinusOne;
     } else {
-        colorStep.x = kPppKeShpTail2XHalf;
-        colorStep.y = kPppKeShpTail2XHalf;
-        colorStep.z = kPppKeShpTail2XHalf;
-        colorStep.w = kPppKeShpTail2XHalf;
+        colorStep.x = colorStep.y = colorStep.z = colorStep.w = kPppKeShpTail2XHalf;
     }
     colorStepR = colorStep.x;
     colorStepG = colorStep.y;

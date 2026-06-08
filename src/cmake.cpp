@@ -190,12 +190,12 @@ static inline void DrawCmakePreviewCharaAlpha(CMenuPcs* menu, float alpha)
     *reinterpret_cast<unsigned short*>(modelBlock + 0x6EA) = 4;
     menu->DrawInit();
 
-    CCharaPcs::CHandle* handle = GetCmakeCharaHandle(menu, slot);
-    if (handle->m_charaKind != 3) {
+    int handleIndex = slot + 0x20;
+    if (menu->m_wm.m_handles[handleIndex]->m_charaKind != 3) {
         menu->SetProjection(0x16);
         menu->SetLight(2);
-        *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = alpha;
-        handle->Draw(5);
+        *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(menu->m_wm.m_handles[handleIndex]->m_model) + 0x9C) = alpha;
+        menu->m_wm.m_handles[handleIndex]->Draw(5);
         menu->RestoreProjection();
     } else {
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x32));
@@ -232,12 +232,12 @@ static inline void DrawNamePreviewChara(CMenuPcs* menu, float modelAlpha, int gx
     *reinterpret_cast<unsigned short*>(modelBlock + 0x6EA) = 4;
     menu->DrawInit();
 
-    CCharaPcs::CHandle* handle = GetCmakeCharaHandle(menu, slot);
-    if (handle->m_charaKind != 3) {
+    int handleIndex = slot + 0x20;
+    if (menu->m_wm.m_handles[handleIndex]->m_charaKind != 3) {
         menu->SetProjection(0x16);
         menu->SetLight(2);
-        *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = modelAlpha;
-        handle->Draw(5);
+        *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(menu->m_wm.m_handles[handleIndex]->m_model) + 0x9C) = modelAlpha;
+        menu->m_wm.m_handles[handleIndex]->Draw(5);
         menu->RestoreProjection();
     } else {
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x32));
@@ -1702,7 +1702,6 @@ void CMenuPcs::CmakeResultOpen()
  */
 void CMenuPcs::CmakeJobDraw()
 {
-    short mode = CmakeState(this)->m_mode;
     float alpha = CalcCmakeFadeAlpha(this);
 
     DrawWMFrame0(1, 1.0f);

@@ -1245,7 +1245,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x46: {
-			CGObject* target = static_cast<unsigned int>(object->m_localBase[0]) != 0 ? FindRuntimeObject(this, object->m_localBase[0]) : 0;
+			CGObject* target = static_cast<int>(object->m_localBase[0]) != 0 ? FindRuntimeObject(this, object->m_localBase[0]) : 0;
 			engineObject->LookAt(target, 0);
 			PushValue(this, object, 0);
 			outResult = 0;

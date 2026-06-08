@@ -2925,7 +2925,7 @@ void CMenuPcs::CalcLoadMenu()
 	switch (iVar10) {
 	case 0:
 	case 2:
-		if ((signed char)m_wmWorldState->m_flag09 == 0) {
+		if ((unsigned char)m_wmWorldState->m_flag09 == 0) {
 			m_wmWorldState->m_cardChannel = (short)m_mcCtrl.m_cardChannel;
 			CFont* pFont = m_fonts[0];
 			pFont->SetMargin(fVar2);
@@ -4165,7 +4165,7 @@ void CMenuPcs::DrawMainMenu()
 	} while (bit < 2);
 
 	if (m_wmWorldState->m_mainState >= 1 && m_wmWorldState->m_mainState <= 3) {
-		const short tileState = m_wmWorldState->m_mainState;
+		const unsigned short tileState = m_wmWorldState->m_mainState;
 		float tileAlpha;
 		if (tileState == 1) {
 			tileAlpha = static_cast<float>(DOUBLE_803314e8 * static_cast<double>(m_wmWorldState->m_frameCounter));
@@ -8154,7 +8154,7 @@ void CMenuPcs::CalcChara()
 	unsigned int selectedMask = 0;
 
 	if (m_wm.m_charaSelectData[0x0D] == 1) {
-		selectedMask = 1u << static_cast<unsigned int>(*reinterpret_cast<short*>(m_wm.m_charaSelectData + 0x04));
+		selectedMask = 1u << static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(m_wm.m_charaSelectData + 0x04));
 	}
 	if (m_wm.m_charaSelectData[0x1D] == 1) {
 		selectedMask |= 1u << static_cast<unsigned int>(*reinterpret_cast<short*>(m_wm.m_charaSelectData + 0x14));
@@ -10754,7 +10754,7 @@ void CMenuPcs::DrawMainMenuSub()
 		GXSetScissor(*reinterpret_cast<unsigned int*>(view + 0x40), *reinterpret_cast<unsigned int*>(view + 0x44),
 		             *reinterpret_cast<unsigned int*>(view + 0x48), *reinterpret_cast<unsigned int*>(view + 0x4C));
 
-		if (*reinterpret_cast<short*>(reinterpret_cast<int>(m_wmWorldState) + 0x10) == 2) {
+		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<int>(m_wmWorldState) + 0x10) == 2) {
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 			MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 			GXSetChanMatColor(static_cast<GXChannelID>(4), white);

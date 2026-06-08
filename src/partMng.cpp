@@ -2305,7 +2305,7 @@ void CPartMng::pppEditPartCalc()
     static const int kPppMngCount = 0x180;
 
     char* self = reinterpret_cast<char*>(this);
-    unsigned char* usbEdit = reinterpret_cast<unsigned char*>(self + kUsbEditOffset);
+    char* usbEdit = reinterpret_cast<char*>(self + kUsbEditOffset);
     PppPdtSlot* pdtSlots = m_pdtSlots;
 
     if (ppvSysGoPartF != 0) {

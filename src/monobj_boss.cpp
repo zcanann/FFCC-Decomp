@@ -2212,12 +2212,11 @@ int CGMonObj::attackCheckFuncMeteoParasite(int)
  */
 void CGMonObj::aiAddDuct(int& seq)
 {
-	if (Math.Rand(300) == 0) {
+	if (static_cast<unsigned int>(Math.Rand(300)) == 0) {
 		aiTarget();
 		aiSeq(-14, seq, 0, 1, 100, -1);
 		aiSeq(-13, seq, 1, 0, 100, -1);
-		const int seOffset = Math.Rand(3);
-		reinterpret_cast<CGPrgObj*>(this)->playSe3D(seOffset + 0x11D40, 0x32, 0x96, 0, 0);
+		reinterpret_cast<CGPrgObj*>(this)->playSe3D(Math.Rand(3) + 0x11D40, 0x32, 0x96, 0, 0);
 	}
 }
 

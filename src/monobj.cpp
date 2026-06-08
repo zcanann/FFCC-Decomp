@@ -2839,11 +2839,13 @@ void CGMonObj::setRepop(int mode)
 		m_homePosition.y = object->unk_0x16C;
 		m_homePosition.z = object->unk_0x170;
 		object->m_worldPosition = m_homePosition;
-		object->m_rotBaseY = *reinterpret_cast<float*>(&object->m_bgFlags);
-		object->m_rotTargetY = object->m_rotBaseY;
+		float baseRot = *reinterpret_cast<float*>(&object->m_bgFlags);
+		object->m_rotBaseY = baseRot;
+		object->m_rotTargetY = baseRot;
 
-		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle) + 0x1C) =
-			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle) + 0x1A);
+		void** repopHandle = object->m_scriptHandle;
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(repopHandle) + 0x1C) =
+			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(repopHandle) + 0x1A);
 		m_targetPartyIndex = -1;
 		m_aiState = 0;
 		m_aiStatePrev = 0;

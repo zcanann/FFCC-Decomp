@@ -7602,23 +7602,19 @@ int JoyBus::SetMType(int portIndex, int mtype)
     state = m_threadParams[portIndex].m_state;
     OSSignalSemaphore(&m_accessSemaphores[portIndex]);
 
-    if (state < 5)
+    if (state <= 4)
 	{
         return -1;
     }
-	else if (state < 0x14 || state > 0x16)
-	{
-        if (state < 900)
-		{
-            return SendMType(&m_threadParams[portIndex], mtype);
-        } else
-		{
-            return -1;
-        }
-    } else
+	if (state >= 0x14 && state <= 0x16)
 	{
         return -1;
     }
+    if (state >= 900)
+    {
+        return -1;
+    }
+    return SendMType(&m_threadParams[portIndex], mtype);
 }
 
 /*

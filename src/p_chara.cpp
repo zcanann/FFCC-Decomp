@@ -2664,7 +2664,10 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         CColor shade;
         if ((m_flags & 0x20000) != 0 && drawPass != 3) {
             CColor white(0xFF, 0xFF, 0xFF, 0xFF);
-            shade = white;
+            shade.color.r = white.color.r;
+            shade.color.g = white.color.g;
+            shade.color.b = white.color.b;
+            shade.color.a = white.color.a;
         } else {
             CColor next;
             next.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(CharaPcs.m_viewerChoiceColor[phaseIndex + 1].color.r) * blendT));

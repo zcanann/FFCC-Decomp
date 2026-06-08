@@ -1615,7 +1615,8 @@ void CGPartyObj::shouki()
 	}
 
 	const unsigned int frame = static_cast<unsigned char>(m_flags);
-	if (m_unk688 == 0 && (CFlatGameFlags() & 0x10) == 0) {
+	if (m_unk688 == 0 &&
+	    static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 27) & 0xC0000000) >> 31) == 0) {
 		int healCount = 0;
 		if (PartyData(this).carryObject == reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)) {
 			healCount = isFrameInterval(frame, *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 4));

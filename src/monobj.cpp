@@ -3693,7 +3693,6 @@ void CGMonObj::statWatch()
 			for (int slot = 0; slot < 4; slot++) {
 				int partyIndex = *reinterpret_cast<int*>(mon + slot * 4 + 0x620);
 				CGPartyObj* party = Game.m_partyObjArr[partyIndex];
-				int candidate = accum;
 				if ((party != NULL) &&
 					(*reinterpret_cast<unsigned short*>(reinterpret_cast<CGObject*>(party)->m_scriptHandle + 7) != 0) &&
 					(reinterpret_cast<CGPrgObj*>(party)->m_lastStateId != 9) &&
@@ -3708,28 +3707,22 @@ void CGMonObj::statWatch()
 							break;
 						}
 					}
-					candidate = partyIndex;
-					if ((targetMode != 3) ||
-						((reinterpret_cast<CGPrgObj*>(party)->m_lastStateId != 6) &&
-						 (reinterpret_cast<CGPrgObj*>(party)->m_lastStateId != 2))) {
-						if (targetMode == 2) {
-							unsigned int hp = *reinterpret_cast<unsigned short*>(
-								reinterpret_cast<CGObject*>(party)->m_scriptHandle + 7);
-							candidate = accum;
-							if (hp < minHp) {
-								minHp = hp;
-								candidate = partyIndex;
-							}
-						} else {
-							candidate = accum;
-							if ((targetMode == 4) && (validIndex == pick)) {
-								candidate = partyIndex;
-							}
+					if ((targetMode == 3) &&
+						((reinterpret_cast<CGPrgObj*>(party)->m_lastStateId == 6) ||
+						 (reinterpret_cast<CGPrgObj*>(party)->m_lastStateId == 2))) {
+						accum = partyIndex;
+					} else if (targetMode == 2) {
+						unsigned int hp = *reinterpret_cast<unsigned short*>(
+							reinterpret_cast<CGObject*>(party)->m_scriptHandle + 7);
+						if (hp < minHp) {
+							minHp = hp;
+							accum = partyIndex;
 						}
+					} else if ((targetMode == 4) && (validIndex == pick)) {
+						accum = partyIndex;
 					}
 					validIndex++;
 				}
-				accum = candidate;
 			}
 
 			switch (targetMode) {

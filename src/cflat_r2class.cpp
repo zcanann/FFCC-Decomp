@@ -394,24 +394,24 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 					}
 				} else if (systemVal <= -0x1F4 && systemVal >= -0x2F3) {
 					StoreS16(stack, classData, (systemVal + 0x2F3) * 2 + 0x9A4, setMode);
-				} else if (systemVal != -0x19D) {
-					if (systemVal < -0x19D) {
-						if (systemVal < -0x1A9) {
-							if (systemVal == -0x1B6) {
-								StoreU16(stack, classData, 0x3DE, setMode);
-							}
-						} else if (systemVal < -0x1A5) {
+				} else if (systemVal > -0x19D) {
+					if (systemVal >= -0x199) {
+						if (systemVal < -0x191) {
+							StoreU16(stack, classData, (systemVal + 0x199) * 2 + 0x3B8, setMode);
+						}
+					} else if (systemVal < -0x19B) {
+						StoreU32(stack, classData, 0x200, setMode);
+					}
+				} else if (systemVal == -0x19D) {
+					StoreU16(stack, classData, 0x3C8, setMode);
+				} else {
+					if (systemVal >= -0x1A9) {
+						if (systemVal < -0x1A5) {
 							StoreS16(stack, classData, (systemVal + 0x1A9) * 2 + 0xAC, setMode);
 						}
-					} else if (systemVal < -0x199) {
-						if (systemVal < -0x19B) {
-							StoreU32(stack, classData, 0x200, setMode);
-						}
-					} else if (systemVal < -0x191) {
-						StoreU16(stack, classData, (systemVal + 0x199) * 2 + 0x3B8, setMode);
+					} else if (systemVal == -0x1B6) {
+						StoreU16(stack, classData, 0x3DE, setMode);
 					}
-				} else {
-					StoreU16(stack, classData, 0x3C8, setMode);
 				}
 			} else if (systemVal <= -0x96 && systemVal >= -0x175) {
 				u8* const itemTable = *reinterpret_cast<u8**>(classData + 0x24);

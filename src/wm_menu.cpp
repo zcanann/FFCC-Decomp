@@ -3808,9 +3808,9 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 		Sound.PlaySe(1, 0x40, 0x7F, 0);
 	}
 
-	const unsigned int row = static_cast<unsigned int>(cursor) >> 2;
+	const int row = static_cast<int>(cursor) >> 2;
 	if ((repeat & 1) != 0) {
-		if (static_cast<int>(((-static_cast<int>(row) | static_cast<int>(row)) >> 31) & 4U) < cursor) {
+		if (cursor > static_cast<int>(((-row | row) >> 31) & 4)) {
 			cursor--;
 		} else {
 			cursor += 3;

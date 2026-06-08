@@ -373,11 +373,11 @@ void CGObject::onCreate()
     m_shieldAttachNodeIndex = -1;
     m_lastMapIdHit = 0;
     m_lastMapIdExtra = 0;
-    m_weaponNodeFlagBytes.m_flags0 &= 0x7F;
+    m_weaponNodeFlagBits.m_prg = 0;
     m_extraMoveVec.x = 0.0f;
     m_extraMoveVec.y = 0.0f;
     m_extraMoveVec.z = 0.0f;
-    *((u8*)&m_shieldNodeFlags) &= 0xFE;
+    m_shieldNodeFlagBits.m_bit01 = 0;
 
     int animStateOffset = 0;
     for (int i = 0; i < 2; i++) {

@@ -2082,9 +2082,9 @@ void CShopMenu::DrawShop0()
             8, highlight, s_currentShopMenuTopMenuEntry->x - 0x30, s_currentShopMenuTopMenuEntry->y, 0xFF, 0, 0,
             FLOAT_80332d9c, 0);
         Graphic.SetDrawDoneDebugData(0x20);
-        font = MenuPcs.m_fonts[0];
     }
 
+    font = MenuPcs.m_fonts[0];
     font->SetMargin(FLOAT_80332d28);
     font->SetShadow(1);
     font->SetScale(FLOAT_80332d8c);

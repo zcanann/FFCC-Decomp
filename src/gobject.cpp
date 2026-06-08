@@ -242,12 +242,12 @@ void CGBaseObj::onFrame()
  */
 void CGObject::onCreate()
 {
-    m_worldPosition.x = 0.0f;
-    m_worldPosition.y = 0.0f;
     m_worldPosition.z = 0.0f;
-    m_groundHitOffset.x = 0.0f;
-    m_groundHitOffset.y = 0.0f;
+    m_worldPosition.y = 0.0f;
+    m_worldPosition.x = 0.0f;
     m_groundHitOffset.z = 0.0f;
+    m_groundHitOffset.y = 0.0f;
+    m_groundHitOffset.x = 0.0f;
 
     m_rotBaseX = 0.0f;
     m_rotBaseY = 0.0f;

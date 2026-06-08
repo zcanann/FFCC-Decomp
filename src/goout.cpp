@@ -2295,11 +2295,11 @@ void CGoOutMenu::CalcDel()
         }
 
         switch (next) {
-        case 2:
-            SetDelMode(2);
-            break;
         case 1:
             SetDelMode(4);
+            break;
+        case 2:
+            SetDelMode(2);
             break;
         }
         break;
@@ -2347,11 +2347,11 @@ void CGoOutMenu::CalcDel()
         }
 
         switch (next) {
-        case 2:
-            SetDelMode(2);
-            break;
         case 1:
             SetDelMode(5);
+            break;
+        case 2:
+            SetDelMode(2);
             break;
         }
         break;
@@ -2412,11 +2412,11 @@ void CGoOutMenu::CalcDel()
         }
 
         switch (next) {
-        case 2:
-            SetDelMode(2);
-            break;
         case 1:
             SetDelMode(7);
+            break;
+        case 2:
+            SetDelMode(2);
             break;
         }
         break;
@@ -2464,12 +2464,12 @@ void CGoOutMenu::CalcDel()
         }
 
         switch (next) {
-        case 2:
-            SetDelMode(2);
-            break;
         case 1:
             Game.m_caravanWorkArr[m_selectedChara].m_shopBusyFlag = 0;
             SetDelMode(8);
+            break;
+        case 2:
+            SetDelMode(2);
             break;
         }
         break;

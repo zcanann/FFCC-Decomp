@@ -3135,16 +3135,8 @@ void CGMonObj::moveFrame()
 	float rotY = local_74.GetRotateY();
 	float distance = PSVECMag(reinterpret_cast<Vec*>(&local_74));
 
-	if (((moveFlags & 0x20) != 0) && (moveRange <= in_f29)) {
-		moveStateFlags |= 1;
-		(this->*m_funcs->moveCancel)();
-		moveStateFlags |= 2;
-		if ((moveFlags & 0x100) != 0) {
-			reinterpret_cast<CGPrgObj*>(this)->changeStat(moveChangeStat, 0, 0);
-		}
-		return;
-	}
-	if (((moveFlags & 0x40) != 0) && (in_f29 < moveRange)) {
+	if ((((moveFlags & 0x20) != 0) && (moveRange <= in_f29)) ||
+		(((moveFlags & 0x40) != 0) && (in_f29 < moveRange))) {
 		moveStateFlags |= 1;
 		(this->*m_funcs->moveCancel)();
 		moveStateFlags |= 2;
@@ -3197,7 +3189,7 @@ void CGMonObj::moveFrame()
 
 	CVector moveDelta;
 	if ((moveFlags & 0x1000) == 0) {
-		if (fabsf(distance) < 0.001f) {
+		if (__fabs(distance) < kMonObjSmallStepF64) {
 			CVector zero(0.0f, 0.0f, 0.0f);
 			moveDelta.x = zero.x;
 			moveDelta.y = zero.y;
@@ -3469,6 +3461,20 @@ void CGMonObj::statAround()
 		float homeRange = static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xCC));
 		float homeDist = PSVECDistance(&monObj->m_homePosition, &object->m_worldPosition);
 		if (!(homeRange <= homeDist)) {
+			goto body;
+		}
+	}
+
+	targetPartyIndex = -1;
+	actionState = 0;
+	memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
+	monObj->m_chaseState = 3;
+	monObj->m_chaseTimer = 0;
+	monObj->m_chaseDirty = 1;
+	return;
+
+body:
+	{
 			if (monObj->m_unk6BD != 0) {
 				float reacquireRange = static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xC8));
 				int hitPartyIndex;
@@ -3600,15 +3606,7 @@ void CGMonObj::statAround()
 			monObj->m_chaseTimer = 0;
 			monObj->m_chaseDirty = 1;
 			return;
-		}
 	}
-
-	targetPartyIndex = -1;
-	actionState = 0;
-	memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
-	monObj->m_chaseState = 3;
-	monObj->m_chaseTimer = 0;
-	monObj->m_chaseDirty = 1;
 #undef script
 #undef actionState
 }

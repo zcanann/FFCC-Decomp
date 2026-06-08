@@ -1611,10 +1611,9 @@ void CGPartyObj::shouki()
 		m_unk688 = 2;
 	} else {
 		deletePSlotBit(0x200);
-		if (FLOAT_80331a74 * Game.unkFloat_0xca10 > chaliceDist) {
-			m_unk688 = 0;
-		} else {
-			if ((static_cast<unsigned char>(m_flags) & 3) == 0) {
+		if (FLOAT_80331a74 * Game.unkFloat_0xca10 <= chaliceDist) {
+			int flagFrame = *reinterpret_cast<int*>(&m_flagBits);
+			if (flagFrame % 4 == 0) {
 				playSe3D(0x1E, 0x32, 0x96, 0, 0);
 				CFlat.ResetParticleWork(2, 0);
 				CFlat.SetParticleWorkPos(m_worldPosition, m_rotBaseY);
@@ -1623,10 +1622,12 @@ void CGPartyObj::shouki()
 				CFlat.PutParticleWork();
 			}
 			m_unk688 = 1;
+		} else {
+			m_unk688 = 0;
 		}
 	}
 
-	const unsigned int frame = static_cast<unsigned char>(m_flags);
+	const int frame = *reinterpret_cast<int*>(&m_flagBits);
 	if (m_unk688 == 0 &&
 	    static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 27) & 0xC0000000) >> 31) == 0) {
 		int healCount = 0;

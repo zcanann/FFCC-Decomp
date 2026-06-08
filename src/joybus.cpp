@@ -7847,12 +7847,13 @@ void JoyBus::RestartThread()
  */
 int JoyBus::SetCmdLst(int portIndex, int param_3, short param_4)
 {
-    unsigned char cmdBytes[4];
+    unsigned int cmd = 0;
+    unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
     unsigned short param = param_4;
     cmdBytes[0] = 0x1F;
     cmdBytes[1] = static_cast<unsigned char>(param_3);
     *reinterpret_cast<unsigned short*>(cmdBytes + 2) = __lhbrx(&param, 0);
-    unsigned int cmd = *reinterpret_cast<unsigned int*>(cmdBytes);
+    unsigned int cmdWord = cmd;
     unsigned int result;
 
     if (static_cast<signed char>(m_threadRunningMask) == 0)
@@ -7871,7 +7872,7 @@ int JoyBus::SetCmdLst(int portIndex, int param_3, short param_4)
         }
         else
         {
-            m_cmdQueueData[port][m_cmdCount[port]] = cmd;
+            m_cmdQueueData[port][m_cmdCount[port]] = cmdWord;
             port = m_threadParams[portIndex].m_portIndex;
             m_cmdCount[port]++;
             OSSignalSemaphore(m_accessSemaphores + m_threadParams[portIndex].m_portIndex);

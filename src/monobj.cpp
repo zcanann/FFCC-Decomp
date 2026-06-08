@@ -588,11 +588,12 @@ void CGMonObj::onChangeStat(int state)
 
 	if ((state < 3) && (state < -4) && (state >= -14)) {
 		int scriptOffset = (state + 0xE) * 2;
-		unsigned int action = *reinterpret_cast<unsigned short*>((unsigned char*)object->m_scriptHandle + scriptOffset + 0xD0);
-		unsigned int motion = *reinterpret_cast<unsigned short*>((unsigned char*)object->m_scriptHandle + scriptOffset + 0xF0);
+		unsigned char* script = (unsigned char*)object->m_scriptHandle;
 		int actionType;
 
+		unsigned int action = *reinterpret_cast<unsigned short*>(script + scriptOffset + 0xD0);
 		*reinterpret_cast<unsigned int*>(mon + 0x560) = action;
+		unsigned int motion = *reinterpret_cast<unsigned short*>(script + scriptOffset + 0xF0);
 		*reinterpret_cast<unsigned int*>(mon + 0x550) = motion;
 		*reinterpret_cast<int*>(mon + 0x554) = *reinterpret_cast<int*>(mon + 0x550) + 1;
 		*reinterpret_cast<int*>(mon + 0x558) = *reinterpret_cast<int*>(mon + 0x554) + 1;

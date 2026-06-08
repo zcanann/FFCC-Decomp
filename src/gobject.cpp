@@ -31,6 +31,7 @@ extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
 extern double DOUBLE_803303e8;
 extern double DOUBLE_80330400;
 extern const Vec DAT_801D9B88;
+extern const Vec DAT_801D9B94;
 
 struct GObjectMapCylinder {
     Vec m_bottom;
@@ -3259,9 +3260,7 @@ void CGObject::CalcSphereNearPos(float scale, float angleOffset, Vec& outPos)
     Vec offset;
     Mtx rotationMtx;
 
-    up.x = 0.0f;
-    up.y = 1.0f;
-    up.z = 0.0f;
+    up = DAT_801D9B94;
 
     PSVECNormalize(&m_worldPosition, &normal);
     PSVECCrossProduct(&normal, &up, &bitangent);

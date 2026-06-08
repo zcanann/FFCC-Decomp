@@ -11054,20 +11054,21 @@ LAB_draw:
 						}
 						float digitX = FLOAT_80331520 +
 						               static_cast<float>((0x20 - static_cast<int>(static_cast<float>(adjustedWidth) * digitScale)) / 2);
-						const double colSlope = DOUBLE_80331490;
-						const double rowSlope = DOUBLE_80331540;
 						const double rowBase = DOUBLE_80331538;
+						const double rowSlope = DOUBLE_80331540;
+						const double colSlope = DOUBLE_80331490;
 						for (int digitIdx = 0; digitIdx < digitCount; digitIdx++) {
 							const int digit = digits[digitIdx];
 							const int digitWidth = DAT_801dc118[digit];
 							const int row = digit / 5 + (digit >> 0x1F);
 							const int rowIndex = row - (row >> 0x1F);
 							const int col = digit + rowIndex * -5;
-							MenuPcs.DrawRect(0xFFFFFFFF, digitX, dateY, static_cast<float>(digitWidth), FLOAT_80331410,
+							const float digitWidthF = static_cast<float>(digitWidth);
+							MenuPcs.DrawRect(0xFFFFFFFF, digitX, dateY, digitWidthF, FLOAT_80331410,
 							         static_cast<float>(colSlope * static_cast<double>(col)),
 							         static_cast<float>(rowSlope * static_cast<double>(rowIndex) + rowBase),
 							         digitScale, FLOAT_803313e8, 0.0f);
-							digitX += static_cast<float>(digitWidth) * digitScale;
+							digitX += digitWidthF * digitScale;
 						}
 						if (language != 5) {
 							float suffixWidth = FLOAT_80331410;

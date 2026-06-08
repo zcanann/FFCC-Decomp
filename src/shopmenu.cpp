@@ -1564,16 +1564,13 @@ void CShopMenu::DrawShopBase()
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
     GXSetColorUpdate(GX_TRUE);
 
-    int mode = m_mode;
-    int panelY;
-    if (mode < 3) {
+    int panelY = 0xEA;
+    if (m_mode <= 2) {
         panelY = 0xE6;
-    } else if (mode < 9) {
+    } else if (m_mode <= 8) {
         panelY = 0x154;
-    } else if (mode < 0xC) {
+    } else if (m_mode <= 0xB) {
         panelY = 0x118;
-    } else {
-        panelY = 0xEA;
     }
 
     Graphic.SetDrawDoneDebugData(3);
@@ -1606,8 +1603,8 @@ void CShopMenu::DrawShopBase()
     drawShapeSeqGrouad(9, 0, x, panelY + 0x22, FLOAT_80332d78, FLOAT_80332dc8, endA, endB, endC, endD);
     Graphic.SetDrawDoneDebugData(4);
 
-    if ((mode >= 3) && (mode < 0xC)) {
-        int listX = (mode < 9) ? 0x64 : 0x118;
+    if (m_mode >= 3) {
+        int listX = (m_mode < 9) ? 0x64 : 0x118;
         for (int barX = listX + 0x48; barX < 0x244; barX += 8) {
             Graphic.SetDrawDoneDebugData(5);
             drawShapeSeq(0x10, 0, barX, 0x11E, 0xFF, 0, 0, FLOAT_80332d9c, 0);
@@ -1621,7 +1618,7 @@ void CShopMenu::DrawShopBase()
         Graphic.SetDrawDoneDebugData(10);
     }
 
-    if ((mode >= 3) && (mode < 9)) {
+    if (m_mode < 9) {
         for (int sideX = 0x4E; sideX > 0x32; sideX -= 0x10) {
             Graphic.SetDrawDoneDebugData(0xB);
             drawShapeSeq(0xC, 0, sideX, 0x174, 0xFF, 0, 0, FLOAT_80332d9c, 0);

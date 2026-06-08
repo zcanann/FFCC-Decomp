@@ -220,9 +220,11 @@ void CMenuPcs::FavoDraw()
 	for (int i = 0; i < 8; i++) {
 		nameFont->SetColor(
 		    CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * drawEntry->alpha)).color);
+		float posX = static_cast<float>(drawEntry->x + 0x1C);
 		const char* name = Game.m_cFlatDataArr[1].TableStrings(0)[(static_cast<char>(rank->foodId) + 0x17D) * 5 + 4];
-		nameFont->SetPosX(static_cast<float>(drawEntry->x + 0x1C));
-		nameFont->SetPosY(static_cast<float>(drawEntry->y + 0xB) - 4.0f);
+		float posY = static_cast<float>(drawEntry->y + 0xB) - 4.0f;
+		nameFont->SetPosX(posX);
+		nameFont->SetPosY(posY);
 		nameFont->Draw(const_cast<char*>(name));
 		rank++;
 		drawEntry++;

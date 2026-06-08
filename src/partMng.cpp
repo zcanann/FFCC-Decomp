@@ -4062,6 +4062,10 @@ PPPCREATEPARAM* CPartMng::pppGetDefaultCreateParam()
  * JP Address: TODO
  * JP Size: TODO
  */
+struct PppHitIdBlock {
+    int m_ids[8];
+};
+
 int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam, int allowFpOverride)
 {
     struct PppMngStCreateRaw {
@@ -4090,15 +4094,18 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
         unsigned char m_envColorG;   // 0xA9
         unsigned char m_envColorB;   // 0xAA
         unsigned char m_envColorA;   // 0xAB
-        int m_prioTime;              // 0xAC
+        int m_spawnedCount;          // 0xAC
         int m_previousFrame2;        // 0xB0
-        int m_numPrograms;           // 0xB4
-        int m_reservedB8;            // 0xB8
+        int m_numControlPrograms2;   // 0xB4
+        int m_numPrograms2;          // 0xB8
         unsigned int m_objHitMask;   // 0xBC
         unsigned int m_cylinderAttribute; // 0xC0
-        _pppPObjLink m_pppPObjLinkHead;   // 0xC4
-        void* m_pppPDataVals;        // 0xCC
-        unsigned char m_padD0[0xE4 - 0xD0];
+        _pppPObjLink m_pppPObjLinkHead;   // 0xC4 (size 0xC)
+        void* m_programTable;        // 0xD0
+        void* m_pppPDataVals;        // 0xD4
+        void* m_owner;               // 0xD8
+        void* m_lookTarget;          // 0xDC
+        void* m_bindNode;            // 0xE0
         unsigned char m_endRequested;     // 0xE4
         unsigned char m_stopRequested;    // 0xE5
         unsigned char m_isFinished;       // 0xE6
@@ -4119,8 +4126,9 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
         unsigned char m_hasMapRef;        // 0xF6
         unsigned char m_fpBillboard;      // 0xF7
         unsigned char m_prio;             // 0xF8
-        short m_frameCounter;             // 0xF9
-        unsigned char m_padFB[0x100 - 0xFB];
+        unsigned char m_padF9;            // 0xF9
+        unsigned short m_prioTime;        // 0xFA
+        unsigned char m_padFC[0x100 - 0xFC];
         int m_paramA;                     // 0x100
         unsigned int m_paramB;            // 0x104
         float m_cullRadiusSq;             // 0x108
@@ -4131,7 +4139,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
         short m_mapObjIndex;              // 0x11A
         PPPSEST m_soundEffectData;        // 0x11C
         PPPIFPARAM m_hitParams;           // 0x130
-        short m_hitObjectIds[0x10];       // 0x138
+        int m_hitObjectIds[8];            // 0x138
     };
 
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
@@ -4143,8 +4151,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
 
     int freeIdx = -1;
     for (int i = 0; i < 0x180; i++) {
-        unsigned char* mngBytes = self + 0x2A18 + i * 0x158;
-        if (*reinterpret_cast<int*>(mngBytes + 0x14) == -0x1000) {
+        if (m_pppMng[i].m_baseTime == -0x1000) {
             freeIdx = i;
             break;
         }
@@ -4172,19 +4179,14 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     mng->m_hitParams.m_classId = createParam->m_hitParamB;
     mng->m_hitParams.m_hitObjectCount = createParam->m_hitObjectCount;
     mng->m_hitParams.m_hitFlags = createParam->m_hitFlags;
-    memcpy(mng->m_hitObjectIds, createParam->m_hitObjectIds, sizeof(mng->m_hitObjectIds));
+    *reinterpret_cast<PppHitIdBlock*>(mng->m_hitObjectIds) =
+        *reinterpret_cast<const PppHitIdBlock*>(createParam->m_hitObjectIds);
 
     mng->m_mapTexLoaded = 0;
     mng->m_hasMapRef = 0;
-    mng->m_envColorR = 0;
-    mng->m_envColorG = 0;
-    mng->m_envColorB = 0x13;
-    mng->m_envColorA = 0x33;
+    *reinterpret_cast<unsigned int*>(&mng->m_envColorR) = 0x1333;
     if (reinterpret_cast<unsigned char*>(&PartPcs)[0x5b145] != 0 && pdtSlotIndex == 7 && fpNo == 0) {
-        mng->m_envColorR = 0;
-        mng->m_envColorG = 0;
-        mng->m_envColorB = 0x10;
-        mng->m_envColorA = 0;
+        *reinterpret_cast<unsigned int*>(&mng->m_envColorR) = 0x1000;
     }
 
     mng->m_soundEffectData = createParam->m_soundEffectParams;

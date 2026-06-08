@@ -7722,7 +7722,11 @@ void CMenuPcs::DrawWMFrame()
 		    DOUBLE_80331508 *
 		    ((gaugeConv.d - DOUBLE_80331408) /
 		     DOUBLE_803316e8)));
-		GXColor gaugeColor = {0xFF, 0xFF, 0xFF, gaugeAlpha};
+		GXColor gaugeColor;
+		gaugeColor.r = 0xFF;
+		gaugeColor.g = 0xFF;
+		gaugeColor.b = 0xFF;
+		gaugeColor.a = gaugeAlpha;
 		GXSetChanMatColor(static_cast<GXChannelID>(4), gaugeColor);
 		MenuPcs.DrawRect(0,
 			(float)*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0x98),
@@ -7738,7 +7742,11 @@ void CMenuPcs::DrawWMFrame()
 		if (m_wmWorldState->m_mainState <= 2) {
 			const int language = Game.m_gameWork.m_languageId;
 			MenuPcs.SetAttrFmt((FMT)0);
-			GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
+			GXColor white;
+			white.r = 0xFF;
+			white.g = 0xFF;
+			white.b = 0xFF;
+			white.a = 0xFF;
 			GXSetChanMatColor(static_cast<GXChannelID>(4), white);
 			MenuPcs.SetTexture((TEX)0x21);
 			float yearY = language != 5 ? FLOAT_803316F4 : FLOAT_803316F8;
@@ -7767,7 +7775,11 @@ void CMenuPcs::DrawWMFrame()
 				int off = reinterpret_cast<int>(m_wm.m_frameData) + 0xB4;
 				unsigned char alphaU8 =
 				    static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(*reinterpret_cast<float*>(off + 0x10))));
-				GXColor color = {0xFF, 0xFF, 0xFF, alphaU8};
+				GXColor color;
+				color.r = 0xFF;
+				color.g = 0xFF;
+				color.b = 0xFF;
+				color.a = alphaU8;
 				GXSetChanMatColor(static_cast<GXChannelID>(4), color);
 				MenuPcs.DrawRect(0,
 					(float)*reinterpret_cast<short*>(off),
@@ -7784,7 +7796,11 @@ void CMenuPcs::DrawWMFrame()
 					int off = reinterpret_cast<int>(m_wm.m_frameData) + 0xB4 + i * 0x1C;
 					unsigned char alphaU8 =
 					    static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(*reinterpret_cast<float*>(off + 0x10))));
-					GXColor color = {0xFF, 0xFF, 0xFF, alphaU8};
+					GXColor color;
+					color.r = 0xFF;
+					color.g = 0xFF;
+					color.b = 0xFF;
+					color.a = alphaU8;
 					GXSetChanMatColor(static_cast<GXChannelID>(4), color);
 					MenuPcs.DrawRect(0,
 						(float)*reinterpret_cast<short*>(off),
@@ -7827,7 +7843,11 @@ void CMenuPcs::DrawWMFrame()
 				unsigned char alphaU8 =
 				    static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(*reinterpret_cast<float*>(off + 0x10))));
 				MenuPcs.SetAttrFmt((FMT)0);
-				GXColor color = {0xFF, 0xFF, 0xFF, alphaU8};
+				GXColor color;
+				color.r = 0xFF;
+				color.g = 0xFF;
+				color.b = 0xFF;
+				color.a = alphaU8;
 				GXSetChanMatColor(static_cast<GXChannelID>(4), color);
 				MenuPcs.SetTexture((TEX)0x34);
 				MenuPcs.DrawRect(0,

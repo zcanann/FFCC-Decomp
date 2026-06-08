@@ -965,7 +965,7 @@ int CFlatRuntime2::Load(char* fileName)
 	}
 
 	resetChangeScript();
-	if (System.m_execParam > 2) {
+	if (static_cast<unsigned int>(System.m_execParam) >= 3) {
 		System.Printf(const_cast<char*>(sCFlatRuntime2LoadMsg));
 	}
 	return 1;

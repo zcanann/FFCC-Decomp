@@ -2041,7 +2041,7 @@ int CMapMng::ReadOtm(char* mapName)
 {
     void* filePtr;
 
-    m_mapReadReady = 1;
+    MapMng.m_mapReadReady = 1;
     char* strTmp = g_StrTmp;
     sprintf(strTmp, const_cast<char*>(s_mapOtmPathFmt), mapName);
     if (static_cast<unsigned int>(System.m_execParam) >= 3) {

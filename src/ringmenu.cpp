@@ -751,9 +751,9 @@ void CRingMenu::onDraw()
 					if ((caravanWork != 0) && ((CFlatGameFlags() & CFlatGameFlag_Bit1) == 0)) {
 						const float barY = kRingMenuTextOffsetX + textY;
 						const float fullAlpha =
-							static_cast<float>(showScale * static_cast<double>(static_cast<float>(kRingMenuAlphaMax * fade) * static_cast<float>(transitionScale)));
+							showScale * (static_cast<float>(kRingMenuAlphaMax * fade) * transitionScale);
 						const float dimAlpha =
-							static_cast<float>(showScale * static_cast<double>(static_cast<float>(kRingMenuCommandPanelWidth * fade) * static_cast<float>(transitionScale)));
+							showScale * (static_cast<float>(kRingMenuCommandPanelWidth * fade) * transitionScale);
 						const float centerBase =
 							(kRingMenuTextBaseX + posX) -
 							static_cast<float>(static_cast<double>((((caravanWork->m_numCmdListSlots >> 28) & 1) +

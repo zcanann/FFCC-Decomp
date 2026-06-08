@@ -74,14 +74,16 @@ inline int CMenuPcs::TmpArtiCtrlCur()
         hasInput = true;
     }
 
-    unsigned short buttonDown;
+    unsigned int rawPress;
     if (hasInput) {
-        buttonDown = 0;
+        rawPress = 0;
     } else {
-        int padIndex = 0;
-        padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
-        buttonDown = Pad.GetPadInputs()[padIndex].buttonDown[0];
+        unsigned int padIndex = 0;
+        int mask = -((__cntlzw((unsigned int)Pad.m_debugPadPort) >> 5) & 1);
+        padIndex &= ~mask;
+        rawPress = Pad.GetPadInputs()[padIndex].buttonDown[0];
     }
+    short buttonDown = rawPress & 0xffff;
 
     if (buttonDown == 0) {
         return 0;

@@ -12531,10 +12531,7 @@ int CMenuPcs::GetSameCharaData(Mc::SaveDat* source, Mc::SaveDat* target, int mem
 	} while (count != 0);
 
 	if (strictMode != 0) {
-		if (result < 8) {
-			return -3;
-		}
-		return -4;
+		return (static_cast<int>(result) < 8) - 4;
 	}
 
 	if (static_cast<int>(result) < 8) {

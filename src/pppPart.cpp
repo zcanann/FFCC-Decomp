@@ -463,7 +463,7 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 					}
 					else if (owner->m_pppPObjLink == obj)
 					{
-						owner->m_pppPObjLink = next;
+						owner->m_pppPObjLink = obj->m_next;
 					}
 
 					Memory.Free(obj);
@@ -600,7 +600,7 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 					}
 					else if (owner->m_pppPObjLink == obj)
 					{
-						owner->m_pppPObjLink = next;
+						owner->m_pppPObjLink = obj->m_next;
 					}
 
 					Memory.Free(obj);
@@ -1689,7 +1689,7 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 						}
 						else if (owner->m_pppPObjLink == obj)
 						{
-							owner->m_pppPObjLink = next;
+							owner->m_pppPObjLink = obj->m_next;
 						}
 
 						Memory.Free(obj);
@@ -2121,7 +2121,7 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 						}
 						else if (owner->m_pppPObjLink == obj)
 						{
-							owner->m_pppPObjLink = next;
+							owner->m_pppPObjLink = obj->m_next;
 						}
 
 						Memory.Free(obj);
@@ -2164,7 +2164,7 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 				}
 				else if (owner->m_pppPObjLink == obj)
 				{
-					owner->m_pppPObjLink = next;
+					owner->m_pppPObjLink = obj->m_next;
 				}
 
 				Memory.Free(obj);

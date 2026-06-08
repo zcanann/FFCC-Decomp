@@ -47,9 +47,9 @@ static inline CFontRenderFlagBits& GetRenderFlagBits(unsigned char& flags)
 
 static inline int GetMesNibbleValue(const char* data)
 {
+	signed char high = (signed char)(((unsigned char)data[0] & 0x0F) << 4);
 	int low = (unsigned char)data[1] & 0x0F;
-	int high = (unsigned char)data[0] & 0x0F;
-	return low | (high << 4);
+	return (int)high | low;
 }
 
 static inline char ReadTagByte(char** text)

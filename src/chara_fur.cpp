@@ -1143,24 +1143,36 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 				int emitParticle = ((System.m_frameCounter & 1) == 0);
 				int playGate = ((System.m_frameCounter & 3) == 0);
 				_GXColor particleColor = CColor(centerBefore).color;
-				if (radarType == 2) {
+				switch (radarType) {
+				case 0:
+					MogWork().m_offColorTicks = 0;
+					particleNo = 0x73;
+					MogWork().m_eraseTicks = 0;
+					particleColor = CColor(0xF, 4, 4, 2).color;
+					break;
+				case 1:
+					MogWork().m_offColorTicks = 0;
+					particleNo = 0x73;
+					MogWork().m_eraseTicks = 0;
+					particleColor = CColor(4, 8, 0xF, 2).color;
+					break;
+				case 2:
 					MogWork().m_offColorTicks = 0;
 					particleNo = 0x73;
 					MogWork().m_eraseTicks = 0;
 					particleColor = CColor(4, 0xF, 4, 2).color;
-				} else if (radarType < 2) {
-					if (radarType == 0) {
-						MogWork().m_offColorTicks = 0;
-						particleNo = 0x73;
-						MogWork().m_eraseTicks = 0;
-						particleColor = CColor(0xF, 4, 4, 2).color;
-					} else if (radarType >= 0) {
-						MogWork().m_offColorTicks = 0;
-						particleNo = 0x73;
-						MogWork().m_eraseTicks = 0;
-						particleColor = CColor(4, 8, 0xF, 2).color;
+					break;
+				case 3:
+					MogWork().m_eraseTicks = 0;
+					if ((((centerBefore.r < 0x0D) || (centerBefore.g < 0x0D)) || (centerBefore.b < 0x0D)) && (centerBefore.a != 0)) {
+						MogWork().m_offColorTicks++;
 					}
-				} else if (radarType == 4) {
+					seId = 0x249f4;
+					particleNo = 0x74;
+					emitParticle = ((System.m_frameCounter & 7) == 0);
+					playGate = ((System.m_frameCounter & 0xF) == 0);
+					break;
+				case 4:
 					MogWork().m_offColorTicks = 0;
 					if ((doPaint != 0) && (centerBefore.a != 0) && (centerAfter.a == 0)) {
 						MogWork().m_eraseTicks++;
@@ -1172,15 +1184,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 					}
 					seId = 0x249f3;
 					playGate = ((System.m_frameCounter & 7) == 0);
-				} else if (radarType < 4) {
-					MogWork().m_eraseTicks = 0;
-					if ((((centerBefore.r < 0x0D) || (centerBefore.g < 0x0D)) || (centerBefore.b < 0x0D)) && (centerBefore.a != 0)) {
-						MogWork().m_offColorTicks++;
-					}
-					seId = 0x249f4;
-					particleNo = 0x74;
-					emitParticle = ((System.m_frameCounter & 7) == 0);
-					playGate = ((System.m_frameCounter & 0xF) == 0);
+					break;
 				}
 
 				if (emitParticle != 0) {

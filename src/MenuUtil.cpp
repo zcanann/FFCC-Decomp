@@ -411,6 +411,8 @@ void CMenuPcs::DrawFont2(int posX, int posY, _GXColor color, int tlut, char* tex
  * Address:	TODO
  * Size:	TODO
  */
+#pragma push
+#pragma optimization_level 4
 void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor color, int tlut, float margin, float scale)
 {
 	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
@@ -688,6 +690,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		}
 	}
 }
+#pragma pop
 
 /*
  * --INFO--

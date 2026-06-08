@@ -776,7 +776,7 @@ void CMes::Calc()
 
 	int textEntry = (int)((char*)this + 0xC);
 	unsigned int maxAdvance = 0;
-	for (int i = 0; i < *(int*)((char*)this + 8); i++)
+	for (int i = 0; i < *(int*)((char*)this + 8); i++, textEntry += 0x14)
 	{
 		if ((int)(unsigned int)*(unsigned short*)(textEntry + 0xC) <= *(int*)((char*)this + 0x3C80))
 		{
@@ -790,7 +790,6 @@ void CMes::Calc()
 			    (unsigned char)((fadeMax & 0xF) | (*(unsigned char*)(textEntry + 0xF) & 0xF0));
 			maxAdvance = (unsigned int)*(unsigned char*)(textEntry + 0x13);
 		}
-		textEntry += 0x14;
 	}
 
 	unsigned char* flagEntry =

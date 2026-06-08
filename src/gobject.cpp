@@ -1049,7 +1049,6 @@ void CGObject::bgNormalCollision()
  */
 void CGObject::bgWorldCollision()
 {
-    GObjectMapCylinder bodyCylinder;
     CVector groundOffset(m_groundHitOffset);
     CVector worldPosition(m_worldPosition);
     CVector radialSum;
@@ -1074,19 +1073,13 @@ void CGObject::bgWorldCollision()
     hitMove.y = scaledHitMove.y;
     hitMove.z = scaledHitMove.z;
 
+    CMapCylinder bodyCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
     bodyCylinder.m_bottom = radial;
-    bodyCylinder.Probe().m_direction = hitMove;
-    bodyCylinder.Probe().m_radius = sHugeCylinderExtent;
-    bodyCylinder.Probe().m_height = sHugeCylinderExtent;
-    bodyCylinder.Probe().m_top = hitMove;
-    bodyCylinder.Probe().m_direction2.x = sNegHugeCylinderExtent;
-    bodyCylinder.Probe().m_direction2.y = sNegHugeCylinderExtent;
-    bodyCylinder.Probe().m_direction2.z = sNegHugeCylinderExtent;
-    bodyCylinder.Probe().m_radius2 = sZeroFloat;
-    bodyCylinder.Probe().m_height2 = sZeroFloat;
+    bodyCylinder.m_axis = hitMove;
+    bodyCylinder.m_radius = sZeroFloat;
 
     const u32 hitMask = m_bgHitMask;
-    if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&bodyCylinder), &hitMove, hitMask) == 0) {
+    if (MapMng.CheckHitCylinderNear(&bodyCylinder, &hitMove, hitMask) == 0) {
         return;
     }
 

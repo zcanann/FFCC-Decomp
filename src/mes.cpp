@@ -980,7 +980,10 @@ void CMes::addString(char** text, int branchMode)
 			mRubyEnabled = 1;
 			mRubyLine = 0;
 			mRubyHeight = ReadTagS8(text);
-			mRubySpacing = (int)(kMesLineHeightAdjust + (float)font->m_glyphHeight * font->scaleY);
+			{
+				float rubyAdvance = (float)font->m_glyphHeight * font->scaleY;
+				mRubySpacing = kMesLineHeightAdjust + rubyAdvance;
+			}
 			mRubyY = mCurrentY;
 			mRubyOffset = ReadTagS8(text);
 			mCurrentX = mCurrentX + kMesRubyLineIndent + mLineSpacing;

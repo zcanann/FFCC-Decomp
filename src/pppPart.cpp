@@ -997,7 +997,7 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 		}
 		else if (owner->m_pppPObjLink == obj)
 		{
-			owner->m_pppPObjLink = next;
+			owner->m_pppPObjLink = obj->m_next;
 		}
 
 		Memory.Free(obj);

@@ -33,6 +33,7 @@ extern const double kSoundU32ToDoubleBias = 4503599627370496.0;
 extern const float kLineBoundsInitMin = 10000000.0f;
 extern const double kLineBoundsHalf = 0.5;
 extern const float kVectorFive;
+extern const float kVectorOne;
 extern const char sSoundNoFreeWaveWarn[] =
     "\x82\xb1\x82\xea\x88\xc8\x8f\xe3noFreeWaev\x82\xf0\x92\xc7\x89\xc1\x82\xc5"
     "\x82\xab\x82\xdc\x82\xb9\x82\xf1\x81\x42\n";
@@ -126,14 +127,8 @@ CLine<PointCount>::CLine()
 
 int CLine<10>::Calc(Vec* outPos, float* outDistance, u32* outIndex, float* outT, Vec* queryPos, float maxDistance)
 {
-    const float zero = kLineSegmentMinT;
-    const bool infiniteRange = (zero == maxDistance);
-    float bestDistance;
-    if (infiniteRange) {
-        bestDistance = kLineBoundsInitMin;
-    } else {
-        bestDistance = maxDistance;
-    }
+    const int infiniteRange = (kLineSegmentMinT == maxDistance);
+    float bestDistance = infiniteRange ? kLineBoundsInitMin : maxDistance;
     const float maxDistanceSq = maxDistance * maxDistance;
     int found = 0;
     u32 bestIndex = 0;
@@ -163,20 +158,19 @@ int CLine<10>::Calc(Vec* outPos, float* outDistance, u32* outIndex, float* outT,
                     bestDistance = distance;
                     bestPos = candidatePosition;
                     bestIndex = i;
-                    bestT = kLineSegmentMaxT;
+                    bestT = kVectorOne;
                     found = 1;
                 }
             }
         }
 
-        CLineSegment& segment = segments[i];
-        const float dotQuery = PSVECDotProduct(queryPos, &segment.delta);
-        const float dotStart = PSVECDotProduct(&points[i], &segment.delta);
-        const float t = (-dotStart + dotQuery) / (segment.length * segment.length);
-        if (((t >= kLineSegmentMinT) && (t <= kLineSegmentMaxT)) || infiniteRange) {
-            Vec projected;
+        const float dotQuery = PSVECDotProduct(queryPos, &segments[i].delta);
+        const float dotStart = PSVECDotProduct(&points[i], &segments[i].delta);
+        const float t = (-dotStart + dotQuery) / (segments[i].length * segments[i].length);
+        if (((t >= kLineSegmentMinT) && (t <= kVectorOne)) || infiniteRange) {
             Vec scaled;
-            PSVECScale(&segment.delta, &scaled, t);
+            Vec projected;
+            PSVECScale(&segments[i].delta, &scaled, t);
             PSVECAdd(&points[i], &scaled, &projected);
             const float distance = PSVECDistance(queryPos, &projected);
             if (distance < bestDistance) {

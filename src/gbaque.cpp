@@ -1542,7 +1542,7 @@ void GbaQueue::LoadMapItemStat()
 	memset(localMapItems, 0, sizeof(localMapItems));
 	numMapItems = 0;
 
-	if (reinterpret_cast<unsigned int*>(&CFlat)[0x4101] != 0) {
+	if (reinterpret_cast<int*>(&CFlat)[0x4101] != 0) {
 		unsigned char* mapItemEntry = localMapItems;
 		object = gCFlatRuntime2.FindGObjFirst();
 
@@ -1554,7 +1554,11 @@ void GbaQueue::LoadMapItemStat()
 					const int itemDataBase = Game.unkCFlatData0[2];
 					const int bossStageLimit = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex] + 2;
 					const int itemStage = *reinterpret_cast<unsigned short*>(itemDataBase + object->m_dropItemCodes[0] * 0x48 + 0xC);
-					mapItemEntry[1] = (itemStage < bossStageLimit) ? 4 : 5;
+					if (itemStage >= bossStageLimit) {
+						mapItemEntry[1] = 5;
+					} else {
+						mapItemEntry[1] = 4;
+					}
 				}
 
 				int isDispRader = object->IsDispRader();
@@ -1705,8 +1709,8 @@ void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
 
     OSWaitSemaphore(accessSemaphores + channel);
 
-    baseX = *reinterpret_cast<short*>(obj + channel * 0xDC + 0x32);
-    baseZ = *reinterpret_cast<short*>(obj + channel * 0xDC + 0x34);
+    baseX = *reinterpret_cast<short*>(obj + channel * 0xDC + 0x48A);
+    baseZ = *reinterpret_cast<short*>(obj + channel * 0xDC + 0x48C);
     memcpy(localEnemyData, obj + 0xB34, kGbaQueueEnemyDataBytes);
 
     prevEntry = obj + channel * kGbaQueueEnemyDataBytes + 0x1034;
@@ -1811,12 +1815,12 @@ void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 		int localX = *reinterpret_cast<short*>(localEntry + 8);
 		int localZ = *reinterpret_cast<short*>(localEntry + 10);
 
-		if ((localX < 0 ? -localX : localX) < 0x50 && (localZ < 0 ? -localZ : localZ) < 0x40) {
-			localEntry[0] = 1;
-		} else {
+		if ((localX < 0 ? -localX : localX) >= 0x50 || (localZ < 0 ? -localZ : localZ) >= 0x40) {
 			*reinterpret_cast<short*>(localEntry + 8) = -1;
 			*reinterpret_cast<short*>(localEntry + 10) = -1;
 			localEntry[0] = 0;
+		} else {
+			localEntry[0] = 1;
 		}
 
 		if (localEntry[2] == 0) {
@@ -2288,24 +2292,22 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
     memset(workText, 0, kGbaQueueScratchTextSize);
 
     CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
-    CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[letterIndex];
-    CMes::m_tempVar[0] = letter->TempVar(0);
-    CMes::m_tempVar[1] = letter->TempVar(1);
-    CMes::m_tempVar[2] = letter->TempVar(2);
-    CMes::m_tempVar[3] = letter->TempVar(3);
+    CMes::m_tempVar[0] = caravanWork->m_letters[letterIndex].TempVar(0);
+    CMes::m_tempVar[1] = caravanWork->m_letters[letterIndex].TempVar(1);
+    CMes::m_tempVar[2] = caravanWork->m_letters[letterIndex].TempVar(2);
+    CMes::m_tempVar[3] = caravanWork->m_letters[letterIndex].TempVar(3);
 
-    unsigned short msgIndex = letter->HeaderWord();
+    unsigned short msgIndex = caravanWork->m_letters[letterIndex].HeaderWord();
     int mesIndex = (msgIndex & 0x7FC) >> 1;
-    char** mesPtr = reinterpret_cast<char**>(Game.m_cFlatDataArr[1].Data(3).m_data);
 
-    strcpy(srcText, mesPtr[mesIndex]);
+    strcpy(srcText, reinterpret_cast<char**>(Game.m_cFlatDataArr[1].Data(3).m_data)[mesIndex]);
     CMes::MakeAgbString(workText, srcText, caravanWork->m_genderFlag, 0);
     int totalSize = static_cast<int>(strlen(workText) + 1);
     memcpy(outData, workText, totalSize);
 
     memset(srcText, 0, kGbaQueueScratchTextSize);
     memset(workText, 0, kGbaQueueScratchTextSize);
-    strcpy(srcText, mesPtr[mesIndex + 1]);
+    strcpy(srcText, reinterpret_cast<char**>(Game.m_cFlatDataArr[1].Data(3).m_data)[mesIndex + 1]);
     CMes::MakeAgbString(workText, srcText, caravanWork->m_genderFlag, 0);
     int line2Size = static_cast<int>(strlen(workText));
     memcpy(outData + totalSize, workText, line2Size + 1);
@@ -2400,12 +2402,11 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 	unsigned char* valueBytes = reinterpret_cast<unsigned char*>(&stackValue);
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
 	int letterIndex = valueBytes[2];
-	CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[letterIndex];
-	int hasGil = letter->AttachmentIsGil();
+	int hasGil = caravanWork->m_letters[letterIndex].FlagsBits().m_attachmentIsGil;
 	int result;
 
 	if (hasGil == 0) {
-		int item = letter->AttachmentValue();
+		int item = caravanWork->m_letters[letterIndex].AttachmentValue();
 		if (item != 0) {
 			if ((item < 1) || (item > 0x9E)) {
 				if (caravanWork->AddItem(item, 0) == 0) {
@@ -2415,9 +2416,8 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 				}
 			}
 		}
-	}
-	if (hasGil != 0) {
-		int item = letter->AttachmentValue();
+	} else {
+		int item = caravanWork->m_letters[letterIndex].AttachmentValue();
 		if (item != 0) {
 			int gil = item * 100;
 			if (caravanWork->CanAddGil(gil) == 0) {
@@ -2438,7 +2438,7 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 	} while (i < 10);
 
 	if ((result == 0) && (i < 10)) {
-		letter->SetAttachmentClaimed();
+		caravanWork->m_letters[letterIndex].SetAttachmentClaimed();
 	}
 }
 
@@ -2881,7 +2881,7 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 		writeBase[0x2CB9] = static_cast<char>(valueBytes[3]);
 
 		if (*reinterpret_cast<short*>(cmakeBase + 0x2CB4) >= 6) {
-			memcpy(&localInfo, &cmakeInfo[channel], sizeof(localInfo));
+			localInfo = cmakeInfo[channel];
 		}
 	}
 	OSSignalSemaphore(accessSemaphores + channel);
@@ -3138,12 +3138,13 @@ void GbaQueue::CMakeFavorite(int channel, unsigned int value)
 		int writeOffset = static_cast<int>(*reinterpret_cast<short*>(obj + 0x2CB4 + channel * 0x20)) * 3;
 		*reinterpret_cast<short*>(obj + 0x2CB4 + channel * 0x20) =
 			static_cast<short>(*reinterpret_cast<short*>(obj + 0x2CB4 + channel * 0x20) + 1);
-		obj[0x2CCB + channel * 0x20 + writeOffset] = static_cast<char>(valueBytes[1]);
-		obj[0x2CCC + channel * 0x20 + writeOffset] = static_cast<char>(valueBytes[2]);
-		obj[0x2CCD + channel * 0x20 + writeOffset] = static_cast<char>(valueBytes[3]);
+		char* favBase = obj + 0x2CCD + channel * 0x20;
+		favBase[writeOffset - 2] = static_cast<char>(valueBytes[1]);
+		favBase[writeOffset - 1] = static_cast<char>(valueBytes[2]);
+		favBase[writeOffset] = static_cast<char>(valueBytes[3]);
 
 		if (*reinterpret_cast<short*>(obj + 0x2CB4 + channel * 0x20) >= 2) {
-			memcpy(&localInfo, &cmakeInfo[channel], sizeof(localInfo));
+			localInfo = cmakeInfo[channel];
 		}
 	}
 	OSSignalSemaphore(accessSemaphores + channel);
@@ -3218,12 +3219,10 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 	int selectedCount = 0;
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	memcpy(compatibilityData, reinterpret_cast<unsigned char*>(this) + channel * 0xDC + 0x524, sizeof(compatibilityData));
+	memcpy(compatibilityData, reinterpret_cast<unsigned char*>(this) + channel * 0xDC + 0x458, sizeof(compatibilityData));
 	OSSignalSemaphore(accessSemaphores + channel);
 
-	char** nameTable = Game.m_cFlatDataArr[1].TableStrings(2);
-
-	outCompatibility[0] = compatibilityData[5];
+	outCompatibility[0] = reinterpret_cast<unsigned char*>(this)[channel * 0xDC + 0x529];
 	if (compatibilityData[3] != 0) {
 		count++;
 	}
@@ -3261,7 +3260,7 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 	for (int slot = 1; (selectedCount < count) && (slot < 8); slot++) {
 		unsigned char slotValue = compatibilityData[slot];
 		if ((selectedCount < 2) || (slotValue != 0)) {
-			char* src = nameTable[slotValue];
+			char* src = Game.m_cFlatDataArr[1].TableStrings(2)[slotValue];
 			int len = strlen(src);
 			memcpy(writePtr, src, len + 1);
 			writePtr += len + 1;
@@ -3326,8 +3325,9 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 
 	for (i = 0; i < 0x40; i++, itemPtr += 2) {
 		int itemId = *reinterpret_cast<short*>(itemPtr + 0x3A);
-		if ((MenuPcs.GetItemType(itemId, 1) == 1) &&
-		    (MenuPcs.GetItemIcon(itemId) == (localPlayerData[2] & 3))) {
+		if (MenuPcs.GetItemType(itemId, 1) == 1) {
+		const int iconMask = localPlayerData[2] & 3;
+		if (MenuPcs.GetItemIcon(itemId) == iconMask) {
 			int itemBase = Game.unkCFlatData0[2] + itemId * 0x48;
 
 			cmdData[0] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 4), 0);
@@ -3339,6 +3339,7 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 			writePtr += 8;
 			size += 8;
 			count++;
+		}
 		}
 	}
 
@@ -3435,7 +3436,7 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 	remaining = 0x40;
 	do {
 		int itemId = *reinterpret_cast<short*>(itemPtr + 0x3A);
-		if (itemId >= 0 && itemId < 0x9F) {
+		if ((itemId >= 0) && (itemId <= 0x9E)) {
 			*indexPtr = static_cast<unsigned char>(itemIndex);
 			equipCount++;
 			indexPtr++;
@@ -3665,19 +3666,19 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	}
 	memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
-	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
+	unsigned int* foodBasePtr = &Game.m_scriptFoodBase[channel];
 	int totalSize = 0;
 
 	for (int i = 0; i < 0x40; i++) {
-		const int itemId = caravanWork->m_inventoryItems[i];
+		const int itemId = reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_inventoryItems[i];
 		unsigned short sellInfo[4];
 		if ((itemId < 1) || (itemId > 0x9E)) {
 			memset(sellInfo, 0, sizeof(sellInfo));
 		} else {
 			const int itemBase = Game.unkCFlatData0[2] + itemId * 0x48;
-			sellInfo[0] = SwapU16(*reinterpret_cast<unsigned short*>(itemBase + 4));
-			sellInfo[1] = SwapU16(*reinterpret_cast<unsigned short*>(itemBase + 6));
-			sellInfo[2] = SwapU16(*reinterpret_cast<unsigned short*>(itemBase + 8));
+			sellInfo[0] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 4), 0);
+			sellInfo[1] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 6), 0);
+			sellInfo[2] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 8), 0);
 			sellInfo[3] = 0;
 		}
 		memcpy(outData, sellInfo, 8);
@@ -3685,9 +3686,9 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 		totalSize += 8;
 	}
 
-	const float userRate = static_cast<float>(static_cast<double>(caravanWork->m_shopParam) / 100.0) * kGbaQueueQuarter;
+	const float userRate = static_cast<float>(static_cast<double>(reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_shopParam) / 100.0) * kGbaQueueQuarter;
 	for (int i = 0; i < 0x40; i++) {
-		const int itemId = caravanWork->m_inventoryItems[i];
+		const int itemId = reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_inventoryItems[i];
 		unsigned int packedPrice;
 		if (itemId > 0) {
 			int itemPrice = static_cast<unsigned short>(
@@ -3711,7 +3712,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 		memset(itemNameScratch, 0, kGbaQueueScratchTextSize);
 		memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
-		const int itemId = caravanWork->m_inventoryItems[i];
+		const int itemId = reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_inventoryItems[i];
 		if (itemId < 1) {
 			outData[0] = 0;
 			outData += 1;
@@ -3759,11 +3760,11 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	}
 	memset(smithIndices, 0xFF, 0x40);
 
-	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
+	unsigned int* foodBasePtr = &Game.m_scriptFoodBase[channel];
 
 	char smithCount = 0;
 	for (int i = 0; i < 0x40; i++) {
-		if (reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_inventoryItems[i] >= 401) {
+		if (reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_inventoryItems[i] >= 401) {
 			smithIndices[smithCount++] = static_cast<unsigned char>(i);
 		}
 	}
@@ -3779,60 +3780,50 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	totalSize += 1;
 
 	for (int i = 0; i < 0x40; i++) {
-		const int itemId = caravanWork->m_inventoryItems[i];
+		const int itemId = reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_inventoryItems[i];
 		if (itemId >= 401) {
 			unsigned int itemBuf[0xE];
 			memset(itemBuf, 0, sizeof(itemBuf));
 
-			const int itemBase = Game.unkCFlatData0[2] + itemId * 0x48;
+			const int itemOffset = itemId * 0x48;
+			unsigned short* itemBase = reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemOffset);
 			int price = static_cast<int>(
-				static_cast<float>(static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(itemBase + 0x24))) *
-				static_cast<float>(static_cast<double>(caravanWork->m_shopParam) / 100.0));
+				static_cast<float>(static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(reinterpret_cast<int>(itemBase) + 0x24))) *
+				static_cast<float>(static_cast<double>(reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_shopParam) / 100.0));
 
 			itemBuf[0] = SwapU32(static_cast<unsigned int>(price));
 
-			reinterpret_cast<unsigned short*>(itemBuf)[2] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 0x26), 0);
-			reinterpret_cast<unsigned short*>(itemBuf)[3] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 0x28), 0);
-			reinterpret_cast<unsigned short*>(itemBuf)[4] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 0x2A), 0);
-			reinterpret_cast<unsigned short*>(itemBuf)[5] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 0x2C), 0);
-			reinterpret_cast<unsigned short*>(itemBuf)[6] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 0x2E), 0);
-			reinterpret_cast<unsigned short*>(itemBuf)[7] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 0x30), 0);
+			for (int k = 3; k < 9; k++) {
+				reinterpret_cast<unsigned short*>(itemBuf)[k - 1] = __lhbrx(itemBase, k * 2 + 0x20);
+			}
 
 			for (int j = 0; j < 2; j++) {
-				const int recipeBase = itemBase + j * 4;
+				const int recipeBase = Game.unkCFlatData0[2] + itemOffset + j * 4;
 
-				const unsigned short materialA = *reinterpret_cast<unsigned short*>(recipeBase + 0x38);
-				reinterpret_cast<unsigned short*>(itemBuf)[8 + j * 2] =
-					__lhbrx(reinterpret_cast<unsigned short*>(recipeBase + 0x38), 0);
+				reinterpret_cast<unsigned short*>(itemBuf)[8 + j * 2] = __lhbrx(reinterpret_cast<unsigned short*>(recipeBase + 0x38), 0);
+				const int materialA = *reinterpret_cast<unsigned short*>(recipeBase + 0x38);
 				if (materialA == 0) {
 					reinterpret_cast<unsigned short*>(itemBuf)[12 + j * 8] = 0;
 					reinterpret_cast<unsigned short*>(itemBuf)[13 + j * 8] = 0;
 					reinterpret_cast<unsigned short*>(itemBuf)[14 + j * 8] = 0;
 				} else {
 					const int materialBase = Game.unkCFlatData0[2] + materialA * 0x48;
-					reinterpret_cast<unsigned short*>(itemBuf)[12 + j * 8] =
-						__lhbrx(reinterpret_cast<unsigned short*>(materialBase + 4), 0);
-					reinterpret_cast<unsigned short*>(itemBuf)[13 + j * 8] =
-						__lhbrx(reinterpret_cast<unsigned short*>(materialBase + 6), 0);
-					reinterpret_cast<unsigned short*>(itemBuf)[14 + j * 8] =
-						__lhbrx(reinterpret_cast<unsigned short*>(materialBase + 8), 0);
+					reinterpret_cast<unsigned short*>(itemBuf)[12 + j * 8] = __lhbrx(reinterpret_cast<unsigned short*>(materialBase + 4), 0);
+					reinterpret_cast<unsigned short*>(itemBuf)[13 + j * 8] = __lhbrx(reinterpret_cast<unsigned short*>(materialBase + 6), 0);
+					reinterpret_cast<unsigned short*>(itemBuf)[14 + j * 8] = __lhbrx(reinterpret_cast<unsigned short*>(materialBase + 8), 0);
 				}
 
-				const unsigned short materialB = *reinterpret_cast<unsigned short*>(recipeBase + 0x3A);
-				reinterpret_cast<unsigned short*>(itemBuf)[9 + j * 2] =
-					__lhbrx(reinterpret_cast<unsigned short*>(recipeBase + 0x3A), 0);
+				reinterpret_cast<unsigned short*>(itemBuf)[9 + j * 2] = __lhbrx(reinterpret_cast<unsigned short*>(recipeBase + 0x3A), 0);
+				const int materialB = *reinterpret_cast<unsigned short*>(recipeBase + 0x3A);
 				if (materialB == 0) {
 					reinterpret_cast<unsigned short*>(itemBuf)[16 + j * 8] = 0;
 					reinterpret_cast<unsigned short*>(itemBuf)[17 + j * 8] = 0;
 					reinterpret_cast<unsigned short*>(itemBuf)[18 + j * 8] = 0;
 				} else {
 					const int materialBase = Game.unkCFlatData0[2] + materialB * 0x48;
-					reinterpret_cast<unsigned short*>(itemBuf)[16 + j * 8] =
-						__lhbrx(reinterpret_cast<unsigned short*>(materialBase + 4), 0);
-					reinterpret_cast<unsigned short*>(itemBuf)[17 + j * 8] =
-						__lhbrx(reinterpret_cast<unsigned short*>(materialBase + 6), 0);
-					reinterpret_cast<unsigned short*>(itemBuf)[18 + j * 8] =
-						__lhbrx(reinterpret_cast<unsigned short*>(materialBase + 8), 0);
+					reinterpret_cast<unsigned short*>(itemBuf)[16 + j * 8] = __lhbrx(reinterpret_cast<unsigned short*>(materialBase + 4), 0);
+					reinterpret_cast<unsigned short*>(itemBuf)[17 + j * 8] = __lhbrx(reinterpret_cast<unsigned short*>(materialBase + 6), 0);
+					reinterpret_cast<unsigned short*>(itemBuf)[18 + j * 8] = __lhbrx(reinterpret_cast<unsigned short*>(materialBase + 8), 0);
 				}
 			}
 
@@ -3843,7 +3834,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	}
 
 	for (int i = 0; i < 4; i++) {
-		unsigned int value = __lwbrx(reinterpret_cast<unsigned int*>(&caravanWork->m_shopArgs[i]), 0);
+		unsigned int value = __lwbrx(reinterpret_cast<unsigned int*>(&reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_shopArgs[i]), 0);
 		memcpy(writePtr, &value, 4);
 		writePtr += 4;
 		totalSize += 4;
@@ -4397,26 +4388,26 @@ int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
 	OSWaitSemaphore(accessSemaphores + channel);
 	{
 		unsigned char* scouterEntry = localScouterInfo;
-		unsigned char* enemyEntry = reinterpret_cast<unsigned char*>(this) + 0xB34;
+		unsigned char* enemyEntry = reinterpret_cast<unsigned char*>(this);
 
 		for (int i = 0; i < 0x40; i++) {
-			scouterEntry[0] = enemyEntry[3];
+			scouterEntry[0] = enemyEntry[0xB37];
 			if (scouterEntry[0] != 0) {
 				CMonWork* enemyWork = reinterpret_cast<CMonWork*>(enemyWorkPtrs[i]);
-				const int enemyDataBase = Game.unkCFlatData0[1] + static_cast<unsigned char>(enemyEntry[3]) * 0x1D0;
+				const int enemyDataBase = Game.unkCFlatData0[1] + static_cast<unsigned char>(enemyEntry[0xB37]) * 0x1D0;
 
 				*reinterpret_cast<unsigned short*>(scouterEntry + 4) = SwapU16(enemyWork->m_maxHp);
 
-				if (*reinterpret_cast<short*>(enemyEntry + 0xE) < 1) {
-					const unsigned short scouterValue = *reinterpret_cast<unsigned short*>(enemyEntry + 0xC);
-					if ((static_cast<short>(scouterValue) < 1) || ((scouterValue & 0xC000) == 0x4000)) {
-						*reinterpret_cast<unsigned short*>(scouterEntry + 6) = 0;
-					} else {
-						*reinterpret_cast<unsigned short*>(scouterEntry + 6) = SwapU16(scouterValue);
-					}
-				} else {
+				if (*reinterpret_cast<short*>(enemyEntry + 0xB42) > 0) {
 					scouterEntry[6] = 0xFF;
 					scouterEntry[7] = 0xFF;
+				} else {
+					const short scouterValue = *reinterpret_cast<short*>(enemyEntry + 0xB40);
+					if ((scouterValue < 1) || ((scouterValue & 0xC000) == 0x4000)) {
+						*reinterpret_cast<unsigned short*>(scouterEntry + 6) = 0;
+					} else {
+						*reinterpret_cast<unsigned short*>(scouterEntry + 6) = SwapU16(static_cast<unsigned short>(scouterValue));
+					}
 				}
 
 				const unsigned short enemyFlags = *reinterpret_cast<unsigned short*>(enemyDataBase + 0x10E);

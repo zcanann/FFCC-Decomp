@@ -2218,12 +2218,13 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 					for (int i = 0; i < object->m_argCount - 1; i++) {
 						while (true) {
 							int specLen = 0;
-							while ((format[specLen] != '\0') && ((specLen == 0) || (format[specLen] != '%'))) {
-								spec[specLen] = format[specLen];
+							char specChar;
+							while (((specChar = *format) != '\0') && ((specLen == 0) || (specChar != '%'))) {
+								spec[specLen] = specChar;
 								specLen++;
+								format++;
 							}
 							spec[specLen] = '\0';
-							format += specLen;
 
 							if (spec[0] == '%') {
 								break;

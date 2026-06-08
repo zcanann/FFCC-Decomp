@@ -973,7 +973,7 @@ void CGPartyObj::onFramePreCalc()
 
 	int weaponItem;
 	int weaponRef;
-	if ((CFlatCenterState() == 0) &&
+	if ((static_cast<int>(CFlatCenterState()) == 0) &&
 	    (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCurrentWeaponItem(weaponItem, weaponRef),
 	     (party.weaponItem != weaponItem) || (party.pendingWeaponItem != weaponRef))) {
 		bool canImmediateSwap =
@@ -1011,7 +1011,7 @@ void CGPartyObj::onFramePreCalc()
 			m_moveBaseSpeed = FLOAT_80331ad4;
 		} else {
 			float speedScale = FLOAT_80331a54;
-			if (CFlatCenterState() == 0) {
+			if (static_cast<int>(CFlatCenterState()) == 0) {
 				speedScale = FLOAT_80331b08;
 			}
 			m_moveBaseSpeed = static_cast<float>(static_cast<int>(FLOAT_80331b04 * speedScale));
@@ -3334,7 +3334,7 @@ void CGPartyObj::statPut()
 		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
 		PartyObjOverlay& party = PartyData(this);
 		if (party.carryObject != 0) {
-			if (CFlatCenterState() == 0) {
+			if (static_cast<int>(CFlatCenterState()) == 0) {
 				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
 					SetAnimSlot(0x0B, 0);
 					SetAnimSlot(0x0C, 1);
@@ -4370,7 +4370,7 @@ void CGPartyObj::setAlive(int restoreDamageCol, int keepTarget)
 
 	short mapId = *reinterpret_cast<short*>(&m_lastMapIdHit);
 	if (party.carryObject != 0) {
-		if (CFlatCenterState() == 0) {
+		if (static_cast<int>(CFlatCenterState()) == 0) {
 			if (mapId == 1) {
 				SetAnimSlot(0x0B, 0);
 				SetAnimSlot(0x0C, 1);

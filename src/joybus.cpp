@@ -622,6 +622,8 @@ recompute_timeout:
     switch ((unsigned int)threadParam->m_state)
     {
     case 4:
+        stateTimeoutTicks = OSMillisecondsToTicks(500);
+        break;
     case 5:
     case 900:
         stateTimeoutTicks = OSMillisecondsToTicks(500);

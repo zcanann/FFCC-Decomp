@@ -788,12 +788,11 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 			} else {
 				rgb = 1.0f;
 			}
-			_GXColor color = {
-			    (unsigned char)(rgb * 255.0f),
-			    (unsigned char)(rgb * 255.0f),
-			    (unsigned char)(rgb * 255.0f),
-			    (unsigned char)(alpha * 255.0f),
-			};
+			_GXColor color;
+			color.r = (unsigned char)(rgb * 255.0f);
+			color.g = (unsigned char)(rgb * 255.0f);
+			color.b = (unsigned char)(rgb * 255.0f);
+			color.a = (unsigned char)(alpha * 255.0f);
 			GXSetChanMatColor(GX_COLOR0A0, color);
 		}
 		MenuPcs.DrawRect(0, s_Base[0][i * 2 + 2], s_Base[0][i * 2 + 3], width, height,

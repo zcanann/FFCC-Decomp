@@ -3444,16 +3444,14 @@ void CMenuPcs::CalcLoadMenu()
 				if (m_wmWorldState->m_menuMode == 8) {
 					int unk838 = reinterpret_cast<int>(m_wmCharaState);
 					int iVar23 = 0;
-					int cnt = 4;
 					int off = 0;
-					do {
+					for (int i = 0; i < 4; i++) {
 						if (*reinterpret_cast<char*>(unk838 + off + 0x42) == 0
 						    && *reinterpret_cast<int*>(unk838 + off + 8) > 0) {
 							iVar23++;
 						}
 						off += 0x48;
-						cnt--;
-					} while (cnt != 0);
+					}
 					if (iVar23 == 0) {
 						m_wmWorldState->m_mcResult = (short)0xFC19;
 					}
@@ -3473,10 +3471,9 @@ void CMenuPcs::CalcLoadMenu()
 
 				int iVar23 = 0;
 				iVar10 = 0;
-				int cnt2 = 4;
 				int bestIdx = -1;
 				int* piVar5 = calTimes;
-				do {
+				for (; iVar23 < 4; iVar23++) {
 					int iVar17 = bestIdx;
 					if (*reinterpret_cast<char*>(unk838 + iVar10 + 0x42) == 0
 					    && *reinterpret_cast<int*>(unk838 + iVar10 + 8) > 0) {
@@ -3502,26 +3499,21 @@ void CMenuPcs::CalcLoadMenu()
 					}
 					iVar10 += 0x48;
 					piVar5 += 10;
-					iVar23++;
-					cnt2--;
 					bestIdx = iVar17;
-				} while (cnt2 != 0);
+				}
 				if (bestIdx < 0) bestIdx = 0;
 
 				m_wmWorldState->m_cardChannel = (short)bestIdx;
 				iVar10 = 0;
 				iVar14 = 0;
-				int cnt3 = 4;
-				do {
+				for (; iVar10 < 4; iVar10++) {
 					if (*reinterpret_cast<char*>(unk838 + iVar14 + 0x42) != 0) {
 						m_mcCtrl.m_saveIndex = iVar10;
 						m_wmWorldState->m_cardChannel = (short)iVar10;
 						break;
 					}
 					iVar14 += 0x48;
-					iVar10++;
-					cnt3--;
-				} while (cnt3 != 0);
+				}
 				m_wmWorldState->m_state0E = 1;
 				m_wmWorldState->m_counter1A = 10;
 			}

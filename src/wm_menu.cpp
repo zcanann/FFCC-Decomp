@@ -10879,9 +10879,12 @@ LAB_draw:
 				if (alpha > FLOAT_803314f0) {
 					float slotY = (float)(DOUBLE_80331498 * (double)(int)slotIdx + DOUBLE_80331490);
 					MenuPcs.SetAttrFmt((FMT)0);
-					unsigned int slotAlpha = (unsigned int)(int)(FLOAT_80331458 * alpha) & 0xFF;
-					slotAlpha = slotAlpha | 0xFFFFFF00;
-					GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&slotAlpha);
+					GXColor slotColor;
+					slotColor.r = 0xFF;
+					slotColor.g = 0xFF;
+					slotColor.b = 0xFF;
+					slotColor.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * alpha));
+					GXSetChanMatColor(GX_COLOR0A0, slotColor);
 
 					// Draw slot background
 					MenuPcs.SetTexture((TEX)0x24);
@@ -10900,7 +10903,7 @@ LAB_draw:
 					contentColors[0].r = 0xFF;
 					contentColors[0].g = 0xFF;
 					contentColors[0].b = 0xFF;
-					contentColors[0].a = static_cast<unsigned char>(slotAlpha);
+					contentColors[0].a = slotColor.a;
 					contentColors[1].r = 0xFF;
 					contentColors[1].g = 0xFF;
 					contentColors[1].b = 0xFF;
@@ -10908,7 +10911,7 @@ LAB_draw:
 					contentColors[2].r = 0xFF;
 					contentColors[2].g = 0xFF;
 					contentColors[2].b = 0xFF;
-					contentColors[2].a = static_cast<unsigned char>(slotAlpha);
+					contentColors[2].a = slotColor.a;
 					contentColors[3].r = 0xFF;
 					contentColors[3].g = 0xFF;
 					contentColors[3].b = 0xFF;
@@ -10920,7 +10923,7 @@ LAB_draw:
 			}
 			slotIdx++;
 			iVar16 += 3;
-		} while ((int)slotIdx < 4);
+		} while ((unsigned int)slotIdx < 4);
 	}
 
 	float frameAlpha;
@@ -10946,7 +10949,7 @@ LAB_draw:
 	GXSetChanMatColor(static_cast<GXChannelID>(4), frameColor);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 	unsigned char* const frame = m_wm.m_frameInfo;
-	for (int i = 0, offset = 0; i < 2; i++, offset += 0x1C) {
+	for (unsigned int i = 0, offset = 0; i < 2; i++, offset += 0x1C) {
 		if (((1 << i) & 2) != 0) {
 			unsigned char* const frameEntry = frame + offset + 4;
 			MenuPcs.DrawRect(0xFFFFFFFF, static_cast<float>(*reinterpret_cast<short*>(frameEntry)),
@@ -10955,7 +10958,7 @@ LAB_draw:
 			         static_cast<float>(*reinterpret_cast<short*>(frameEntry + 6)),
 			         *reinterpret_cast<float*>(frameEntry + 8), *reinterpret_cast<float*>(frameEntry + 0x0C),
 			         FLOAT_803313e8, FLOAT_803313e8,
-			         static_cast<float>(*reinterpret_cast<unsigned int*>(frameEntry + 0x18)));
+			         static_cast<float>(*reinterpret_cast<int*>(frameEntry + 0x18)));
 		}
 	}
 
@@ -10969,11 +10972,12 @@ LAB_draw:
 	short separatorSub = worldState->m_subState;
 	if (separatorSub != 0 && separatorSub > 1 &&
 	    worldState->m_mainState == 2) {
+		const double sepOff = DOUBLE_80331510;
 		for (int slot = 0; slot < kMcListCount; slot++) {
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 			MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_803314d8,
 			         static_cast<float>((kSlope * static_cast<double>(slot) + kBase) -
-			                            DOUBLE_80331510),
+			                            sepOff),
 			         FLOAT_803314d8, FLOAT_803314d8,
 			         static_cast<float>(kBase * static_cast<double>(slot)), FLOAT_803313e0,
 			         FLOAT_803313e8, FLOAT_803313e8, 0.0f);
@@ -11002,7 +11006,7 @@ LAB_draw:
 				if (*reinterpret_cast<int*>(slotData + 0x24) >= 0) {
 					memberCount++;
 				}
-				const unsigned int panelWidth = memberCount * 0x30 + 0x40;
+				const int panelWidth = memberCount * 0x30 + 0x40;
 				MenuPcs.DrawRect(0xFFFFFFFF,
 				         FLOAT_80331468 + FLOAT_803314d8 + static_cast<float>(static_cast<int>(panelWidth)),
 				         rowY, FLOAT_803314d8, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc,
@@ -11028,17 +11032,20 @@ LAB_draw:
 						MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_80331520, dateY, static_cast<float>(DAT_801dc140), FLOAT_80331410,
 						         FLOAT_80331524, FLOAT_80331528, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
 					} else {
-						int digits[2];
-						int totalWidth;
-						if (digitCount == 1) {
-							const int tens = static_cast<int>(saveYear) / 10 + (static_cast<int>(saveYear) >> 0x1F);
-							digits[0] = static_cast<int>(saveYear) + (tens - (tens >> 0x1F)) * -10;
-							totalWidth = DAT_801dc118[digits[0]];
-						} else {
-							const int tens = static_cast<int>(saveYear) / 10 + (static_cast<int>(saveYear) >> 0x1F);
-							digits[0] = tens - (tens >> 0x1F);
-							digits[1] = static_cast<int>(saveYear) + digits[0] * -10;
-							totalWidth = DAT_801dc118[digits[0]] + DAT_801dc118[digits[1]];
+						int totalWidth = 0;
+						for (int di = 0; di < digitCount; di++) {
+							int digit;
+							if (digitCount == 1) {
+								const unsigned int t = saveYear / 10 + (saveYear >> 0x1F);
+								digit = saveYear + (t - (t >> 0x1F)) * -10;
+							} else if (di == 0) {
+								const int t = saveYear / 10 + (saveYear >> 0x1F);
+								digit = t - (t >> 0x1F);
+							} else {
+								const int t = saveYear / 10 + (saveYear >> 0x1F);
+								digit = saveYear + (t - (t >> 0x1F)) * -10;
+							}
+							totalWidth += DAT_801dc118[digit];
 						}
 						float digitScale = static_cast<float>(DOUBLE_80331420);
 						if (language != 5) {
@@ -11054,17 +11061,31 @@ LAB_draw:
 						}
 						float digitX = FLOAT_80331520 +
 						               static_cast<float>((0x20 - static_cast<int>(static_cast<float>(adjustedWidth) * digitScale)) / 2);
+						const double rowBase = DOUBLE_80331538;
+						const double rowSlope = DOUBLE_80331540;
+						const double colSlope = DOUBLE_80331490;
 						for (int digitIdx = 0; digitIdx < digitCount; digitIdx++) {
-							const int digit = digits[digitIdx];
+							int digit;
+							if (digitCount == 1) {
+								const int t = saveYear / 10 + (saveYear >> 0x1F);
+								digit = saveYear + (t - (t >> 0x1F)) * -10;
+							} else if (digitIdx == 0) {
+								const int t = saveYear / 10 + (saveYear >> 0x1F);
+								digit = t - (t >> 0x1F);
+							} else {
+								const int t = saveYear / 10 + (saveYear >> 0x1F);
+								digit = saveYear + (t - (t >> 0x1F)) * -10;
+							}
 							const int digitWidth = DAT_801dc118[digit];
 							const int row = digit / 5 + (digit >> 0x1F);
-							const int rowIndex = row - (row >> 0x1F);
+							const unsigned int rowIndex = row - (row >> 0x1F);
 							const int col = digit + rowIndex * -5;
-							MenuPcs.DrawRect(0xFFFFFFFF, digitX, dateY, static_cast<float>(digitWidth), FLOAT_80331410,
-							         static_cast<float>(DOUBLE_80331490 * static_cast<double>(col)),
-							         static_cast<float>(DOUBLE_80331540 * static_cast<double>(rowIndex) + DOUBLE_80331538),
+							const float digitWidthF = static_cast<float>(digitWidth);
+							MenuPcs.DrawRect(0xFFFFFFFF, digitX, dateY, digitWidthF, FLOAT_80331410,
+							         static_cast<float>(colSlope * static_cast<double>(col)),
+							         static_cast<float>(rowSlope * static_cast<double>(rowIndex) + rowBase),
 							         digitScale, FLOAT_803313e8, 0.0f);
-							digitX += static_cast<float>(digitWidth) * digitScale;
+							digitX += digitWidthF * digitScale;
 						}
 						if (language != 5) {
 							float suffixWidth = FLOAT_80331410;
@@ -11079,7 +11100,7 @@ LAB_draw:
 								suffixScale = static_cast<float>(DOUBLE_80331530);
 							}
 							if (language == 1) {
-								const int tens = static_cast<int>(saveYear) / 10 + (static_cast<int>(saveYear) >> 0x1F);
+								const int tens = static_cast<int>(saveYear) / 10 + (static_cast<unsigned int>(saveYear) >> 0x1F);
 								if (tens - (tens >> 0x1F) == 1) {
 									suffixU = FLOAT_8033151c;
 								} else {
@@ -11121,12 +11142,12 @@ LAB_draw:
 					if (modelNo >= 0) {
 						const int faceNo = modelNo - 100;
 						const int tribe = faceNo / 100 + (faceNo >> 31);
-						const unsigned int tribeIndex = static_cast<unsigned int>(tribe - (tribe >> 31));
+						const int tribeIndex = static_cast<unsigned int>(tribe - (tribe >> 31));
 						float texU = FLOAT_803314f0;
 						if ((tribeIndex & 1) != 0) {
 							texU = FLOAT_80331560;
 						}
-						const int variant = faceNo + (tribe - (tribe >> 31)) * -100;
+						const unsigned int variant = faceNo + (tribe - (tribe >> 31)) * -100;
 						MenuPcs.DrawRect(0xFFFFFFFF, iconX, slotY + FLOAT_803314d8, FLOAT_80331468, FLOAT_80331468,
 						         texU + FLOAT_80331468 * static_cast<float>(variant),
 						         FLOAT_80331468 * static_cast<float>(static_cast<int>(tribeIndex / 2)),
@@ -11204,7 +11225,7 @@ LAB_draw:
 					         static_cast<float>(static_cast<double>(slotY) + DOUBLE_80331510),
 					         FLOAT_80331578, FLOAT_80331578,
 					         static_cast<float>(static_cast<int>(static_cast<char>(mapInfo[1])) << 7),
-					         static_cast<float>(static_cast<int>(static_cast<char>(mapInfo[2])) << 7),
+					         static_cast<float>(static_cast<unsigned int>(static_cast<char>(mapInfo[2])) << 7),
 					         FLOAT_80331434, FLOAT_80331434, 0.0f);
 				}
 			}
@@ -11242,7 +11263,7 @@ LAB_draw:
 				fontF8->DrawInit();
 				fontF8->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 				fontF8->SetTlut(0x19);
-				const unsigned int msgId = static_cast<unsigned int>(
+				const unsigned int msgId = static_cast<int>(
 					__cntlzw(static_cast<unsigned int>(static_cast<int>(*reinterpret_cast<char*>(slotData + 0x42))))) >> 5;
 				char* text = const_cast<char*>(GetMcStr(msgId));
 				const int width = static_cast<int>(fontF8->GetWidth(text));
@@ -11312,10 +11333,10 @@ LAB_draw:
 							strcpy(line2, space + 1);
 						}
 					}
-					fontF8->SetPosX(static_cast<float>(static_cast<double>(FLOAT_80331518) - static_cast<double>(static_cast<int>(fontF8->GetWidth(line1)))));
+					fontF8->SetPosX(static_cast<float>(static_cast<double>(FLOAT_80331518) - static_cast<double>(static_cast<unsigned int>(fontF8->GetWidth(line1)))));
 					fontF8->SetPosY(static_cast<float>(static_cast<double>(locationY) - static_cast<double>(FLOAT_80331590)));
 					fontF8->Draw(line1);
-					fontF8->SetPosX(static_cast<float>(static_cast<double>(FLOAT_80331518) - static_cast<double>(static_cast<int>(fontF8->GetWidth(line2)))));
+					fontF8->SetPosX(static_cast<float>(static_cast<double>(FLOAT_80331518) - static_cast<double>(static_cast<unsigned int>(fontF8->GetWidth(line2)))));
 					fontF8->SetPosY(locationY);
 					fontF8->Draw(line2);
 				}
@@ -11323,7 +11344,7 @@ LAB_draw:
 		}
 	}
 	if (worldState->m_subState == 0x11) {
-		short mode = worldState->m_menuMode;
+		unsigned short mode = worldState->m_menuMode;
 		if (mode == 5) {
 			CColor color(0xFF, 0xFF, 0xFF, 0xFF);
 			char* text = const_cast<char*>(GetMcStr(2));

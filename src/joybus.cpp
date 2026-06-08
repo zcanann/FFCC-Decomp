@@ -2983,7 +2983,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
             OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
         }
 
-        const unsigned char state = threadParam->m_state;
+        const int state = threadParam->m_state;
 
         if (m_stateFlagArr[threadParam->m_portIndex] != 0 &&
             m_stateCodeArr[threadParam->m_portIndex] != 0x09 &&

@@ -5013,11 +5013,6 @@ void CMenuPcs::DrawMoveMenu()
 		Mtx savedCamera;
 		Mtx lookAtMtx;
 		Mtx44 projectionMtx;
-		GXColor clearColor;
-		clearColor.r = 0;
-		clearColor.g = 0;
-		clearColor.b = 0;
-		clearColor.a = 0;
 
 		CVector target(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
 		CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
@@ -5032,7 +5027,7 @@ void CMenuPcs::DrawMoveMenu()
 		CharaPcs.InitEnv(5);
 		GXSetColorUpdate(0);
 		GXSetAlphaUpdate(0);
-		GXSetCopyClear(clearColor, 0x00FFFFFF);
+		GXSetCopyClear(CColor(0, 0, 0, 0).color, 0x00FFFFFF);
 		GXSetColorUpdate(1);
 		GXSetAlphaUpdate(1);
 		GXSetViewport(static_cast<float>(*reinterpret_cast<short*>(worldObj + 0x198)),
@@ -5071,7 +5066,7 @@ void CMenuPcs::DrawMoveMenu()
 		}
 
 		PSMTXCopy(savedCamera, CameraPcs.m_cameraMatrix);
-		GXSetCopyClear(clearColor, 0x00FFFFFF);
+		GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0x00FFFFFF);
 		PSMTX44Copy(CameraPcs.m_screenMatrix, projectionMtx);
 		GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 		Graphic.SetViewport();

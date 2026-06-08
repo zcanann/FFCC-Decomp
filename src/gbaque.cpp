@@ -1334,12 +1334,12 @@ void GbaQueue::LoadPlayerStat()
 				entry[0x16] = static_cast<unsigned char>(caravanWork->m_maxHp);
 				entry[0x17] = static_cast<unsigned char>(caravanWork->m_hp);
 				{
-					unsigned char tribeAppearance = static_cast<unsigned char>((caravanWork->m_tribeId & 3) |
-					                                      ((caravanWork->m_appearanceVariant & 3) << 2));
+					int tribeAppearance = (caravanWork->m_tribeId & 3) |
+					                                      ((caravanWork->m_appearanceVariant & 3) << 2);
 					if (caravanWork->m_genderFlag != 0) {
 						tribeAppearance |= 0x80;
 					}
-					entry[2] = tribeAppearance;
+					entry[2] = static_cast<unsigned char>(tribeAppearance);
 				}
 
 				*reinterpret_cast<int*>(entry + 0x24) = caravanWork->m_gil;

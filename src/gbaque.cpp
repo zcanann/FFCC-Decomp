@@ -738,7 +738,8 @@ void GbaQueue::ExecutQueue()
 				}
 			} else if (cmd == 0x14) {
 				unsigned int cmdWord = queueWords[i];
-				const unsigned char request = static_cast<unsigned char>(cmdWord >> 8);
+				const unsigned char* cmdBytes = reinterpret_cast<const unsigned char*>(&cmdWord);
+				const unsigned char request = cmdBytes[2];
 				if (request == 0 || request == 1) {
 					if (caravanWork != 0) {
 						MoveLetterItem(channel, cmdWord);
@@ -748,7 +749,7 @@ void GbaQueue::ExecutQueue()
 				} else if (request == 3) {
 					ChkCMakeJob(channel, cmdWord);
 				} else if (request == 4 || request == 5) {
-					unsigned char status = static_cast<unsigned char>(cmdWord >> 16);
+					unsigned char status = cmdBytes[1];
 					int retry;
 					for (retry = 0; retry < 10; retry++) {
 						if (Joybus.SetMType(channel, 4) == 0) {
@@ -766,10 +767,10 @@ void GbaQueue::ExecutQueue()
 				} else if (request == 6) {
 					OSWaitSemaphore(accessSemaphores + channel);
 					unsigned int cmakeOffset = channel * sizeof(GbaCMakeInfo);
-					obj[0x2CCB + cmakeOffset] = static_cast<char>(cmdWord >> 8);
-					obj[0x2CCC + cmakeOffset] = static_cast<char>(cmdWord);
+					obj[0x2CCB + cmakeOffset] = static_cast<char>(cmdBytes[2]);
+					obj[0x2CCC + cmakeOffset] = static_cast<char>(cmdBytes[3]);
 					OSSignalSemaphore(accessSemaphores + channel);
-					Joybus.SendResult(channel, 0, static_cast<unsigned char>(cmdWord >> 16), 0);
+					Joybus.SendResult(channel, 0, cmdBytes[1], 0);
 				} else if (request == 7) {
 					OSWaitSemaphore(accessSemaphores + channel);
 					m_shopFlags = static_cast<unsigned char>(m_shopFlags & ~static_cast<unsigned char>(playerBit));
@@ -785,7 +786,7 @@ void GbaQueue::ExecutQueue()
 					}
 				} else if (request == 8) {
 					if (caravanWork != 0) {
-						const int itemIdx = static_cast<unsigned char>(cmdWord >> 8);
+						const int itemIdx = cmdBytes[2];
 						const short itemId = caravanWork->m_inventoryItems[itemIdx];
 						caravanWork->DeleteItemIdx(itemIdx, 1);
 						const unsigned short baseGil =
@@ -796,17 +797,16 @@ void GbaQueue::ExecutQueue()
 							gil = 1;
 						}
 						caravanWork->AddGil(gil);
-						Joybus.SendResult(channel, 0, static_cast<unsigned char>(cmdWord >> 24), static_cast<unsigned char>(cmdWord >> 16));
+						Joybus.SendResult(channel, 0, cmdBytes[0], cmdBytes[1]);
 					}
 				} else if (request == 9) {
 					if (caravanWork != 0) {
-						const unsigned int quantity = static_cast<unsigned char>(cmdWord);
-						const int shopIndex = static_cast<unsigned char>(cmdWord >> 8);
+						const unsigned int quantity = cmdBytes[3];
+						const int shopIndex = cmdBytes[2];
 						int shopItem = caravanWork->m_shopList[shopIndex];
 						for (unsigned int n = 0; n < quantity; n++) {
 							if (caravanWork->AddItem(shopItem, 0) == 0) {
-								Joybus.SendResult(channel, 1, static_cast<unsigned char>(cmdWord >> 24),
-									static_cast<unsigned char>(cmdWord >> 16));
+								Joybus.SendResult(channel, 1, cmdBytes[0], cmdBytes[1]);
 							}
 						}
 						const unsigned short baseGil =
@@ -814,7 +814,7 @@ void GbaQueue::ExecutQueue()
 						const int gil =
 							static_cast<int>(static_cast<float>(static_cast<double>(caravanWork->m_shopParam) / 100.0) * static_cast<float>(baseGil));
 						caravanWork->AddGil(-static_cast<int>(gil * quantity));
-						Joybus.SendResult(channel, 0, static_cast<unsigned char>(cmdWord >> 24), static_cast<unsigned char>(cmdWord >> 16));
+						Joybus.SendResult(channel, 0, cmdBytes[0], cmdBytes[1]);
 					}
 				} else if (request == 10) {
 					if (caravanWork != 0) {

@@ -270,7 +270,6 @@ void CGMonObj::frameStatFuncGiantCrab()
 	u8* self = (u8*)this;
 	int state = *(int*)(self + 0x520);
 
-	if (state >= 100 && state < 0x69) {
 	if (state == 100) {
 		if (*(int*)(self + 0x528) == 0) {
 			int soundStep = *(int*)(CGMonObj::m_boss + 0x4);
@@ -324,11 +323,9 @@ void CGMonObj::frameStatFuncGiantCrab()
 			int targetIdx = *(int*)(self + 0x6c4);
 			if (targetIdx >= 0) {
 				u8* target = (u8*)Game.m_partyObjArr[targetIdx];
-				if (target != 0) {
-					*(float*)(self + 0x1b4) = (float)atan2(
-					    (double)(*(float*)(target + 0x15c) - *(float*)(self + 0x15c)),
-					    (double)(*(float*)(target + 0x164) - *(float*)(self + 0x164)));
-				}
+				*(float*)(self + 0x1b4) = (float)atan2(
+				    (double)(*(float*)(target + 0x15c) - *(float*)(self + 0x15c)),
+				    (double)(*(float*)(target + 0x164) - *(float*)(self + 0x164)));
 			}
 		}
 
@@ -336,16 +333,20 @@ void CGMonObj::frameStatFuncGiantCrab()
 			reinterpret_cast<CGPrgObj*>(self)->changeStat(0, 0, 0);
 			*(u32*)(self + 0x1c0) |= 0x80002;
 		}
-	} else {
+	} else if (state >= 100 && state < 0x69) {
 		if (*(int*)(self + 0x528) == 0) {
-			float turnOffset = kMonObjBossPi;
-			int animId = 1;
+			float turnOffset;
+			int animId;
 			if (state == 0x67) {
 				turnOffset = kMonObjBossHalfPi;
 				animId = 0x12;
 			} else if (state < 0x67) {
 				if (state == 0x65) {
 					turnOffset = kMonObjBossZero;
+					animId = 1;
+				} else if (state > 100) {
+					turnOffset = kMonObjBossPi;
+					animId = 1;
 				}
 			} else if (state < 0x69) {
 				turnOffset = kMonObjBossThreeHalfPi;
@@ -364,11 +365,9 @@ void CGMonObj::frameStatFuncGiantCrab()
 			int targetIdx = *(int*)(self + 0x6c4);
 			if (targetIdx >= 0) {
 				u8* target = (u8*)Game.m_partyObjArr[targetIdx];
-				if (target != 0) {
-					*(float*)(self + 0x1b4) = (float)atan2(
-					    (double)(*(float*)(target + 0x15c) - *(float*)(self + 0x15c)),
-					    (double)(*(float*)(target + 0x164) - *(float*)(self + 0x164)));
-				}
+				*(float*)(self + 0x1b4) = (float)atan2(
+				    (double)(*(float*)(target + 0x15c) - *(float*)(self + 0x15c)),
+				    (double)(*(float*)(target + 0x164) - *(float*)(self + 0x164)));
 			}
 
 			int action = reinterpret_cast<int>(reinterpret_cast<CGObject*>(self)->m_scriptHandle[4]);
@@ -386,7 +385,6 @@ void CGMonObj::frameStatFuncGiantCrab()
 		if (*(int*)(self + 0x528) == 0x19) {
 			reinterpret_cast<CGPrgObj*>(self)->changeStat(0, 0, 0);
 		}
-	}
 	}
 }
 
@@ -513,9 +511,15 @@ void CGMonObj::frameStatFuncGolem()
 		setAttackAfter(*reinterpret_cast<int*>(self + 0x560));
 	} else {
 		if (reinterpret_cast<CGPrgObj*>(this)->m_stateFrame == 0) {
-			float turnOffset = kMonObjBossZero;
-			if (state == 0x68) {
-				turnOffset = kMonObjBossPi;
+			float turnOffset;
+			if (state != 0x67) {
+				if (state < 0x67) {
+					if (state > 0x65) {
+						turnOffset = kMonObjBossZero;
+					}
+				} else if (state < 0x69) {
+					turnOffset = kMonObjBossPi;
+				}
 			}
 			reinterpret_cast<CGPrgObj*>(this)->reqAnim(1, 1, 0);
 			reinterpret_cast<CGObject*>(this)->m_rotTargetY =
@@ -1008,11 +1012,15 @@ state100:
 		memset(&m_moveWork, 0, sizeof(m_moveWork));
 		m_moveWork.m_flags = 0x322;
 
+		Vec targetPos;
 		if (m_actionBranch == 1) {
-			m_moveWork.m_targetPos = CVector(kMonObjBossRightTargetXZ, kMonObjBossZero, kMonObjBossRightTargetXZ);
+			targetPos = CVector(kMonObjBossRightTargetXZ, kMonObjBossZero, kMonObjBossRightTargetXZ);
 		} else {
-			m_moveWork.m_targetPos = CVector(kMonObjBossLeftTargetX, kMonObjBossZero, kMonObjBossLeftTargetZ);
+			targetPos = CVector(kMonObjBossLeftTargetX, kMonObjBossZero, kMonObjBossLeftTargetZ);
 		}
+		m_moveWork.m_targetPos.x = targetPos.x;
+		m_moveWork.m_targetPos.y = targetPos.y;
+		m_moveWork.m_targetPos.z = targetPos.z;
 		m_moveWork.m_range = kMonObjBossShortMoveRange;
 		m_moveWork.m_changeStat = 0x65;
 	}
@@ -1430,8 +1438,9 @@ void CGMonObj::frameStatFuncTetsukyojin()
 			CVector attackDir(-partyPos.x, -partyPos.y, -partyPos.z);
 			Vec attackVec;
 			attackVec.x = attackDir.x;
-			attackVec.y = kMonObjBossZero;
+			attackVec.y = attackDir.y;
 			attackVec.z = attackDir.z;
+			attackVec.y = kMonObjBossZero;
 
 			if (PSVECMag(&attackVec) < kMonObjBossMinAttackDistance) {
 				CVector fallback(kMonObjBossZero, kMonObjBossZero, kMonObjBossNegativeOne);
@@ -1484,7 +1493,7 @@ void CGMonObj::frameStatFuncTetsukyojin()
 		}
 		reinterpret_cast<CGCharaObj*>(this)->statAttack();
 		return;
-	default:
+	case 0x65:
 		if ((CFlatBossState() != 0) && (prgObj->m_stateFrame == 0x25)) {
 			int flatCount = CFlatBossState();
 			if (flatCount < 1) {
@@ -2707,17 +2716,29 @@ void CGMonObj::teleport(
 			CVector scaledPoint;
 			PSVECScale(reinterpret_cast<Vec*>(&point), reinterpret_cast<Vec*>(&scaledPoint), kMonObjBossOne - blend);
 
-			CVector scaledPointCopy(scaledPoint);
+			Vec scaledPointCopy;
+			scaledPointCopy.x = scaledPoint.x;
+			scaledPointCopy.y = scaledPoint.y;
+			scaledPointCopy.z = scaledPoint.z;
+
 			CVector current(object->m_worldPosition);
 			CVector scaledCurrent;
 			PSVECScale(reinterpret_cast<Vec*>(&current), reinterpret_cast<Vec*>(&scaledCurrent), blend);
 
-			CVector scaledCurrentCopy(scaledCurrent);
+			Vec scaledCurrentCopy;
+			scaledCurrentCopy.x = scaledCurrent.x;
+			scaledCurrentCopy.y = scaledCurrent.y;
+			scaledCurrentCopy.z = scaledCurrent.z;
+
 			CVector blended;
-			PSVECAdd(reinterpret_cast<Vec*>(&scaledCurrentCopy), reinterpret_cast<Vec*>(&scaledPointCopy), reinterpret_cast<Vec*>(&blended));
-			object->m_worldPosition.x = blended.x;
-			object->m_worldPosition.y = blended.y;
-			object->m_worldPosition.z = blended.z;
+			PSVECAdd(&scaledCurrentCopy, &scaledPointCopy, reinterpret_cast<Vec*>(&blended));
+			Vec blendedCopy;
+			blendedCopy.x = blended.x;
+			blendedCopy.y = blended.y;
+			blendedCopy.z = blended.z;
+			object->m_worldPosition.x = blendedCopy.x;
+			object->m_worldPosition.y = blendedCopy.y;
+			object->m_worldPosition.z = blendedCopy.z;
 
 			if (mode == 1 && stateFrame == blendEndFrame - 0x2A) {
 				int pdtNo = object->m_charaModelHandle->GetPdtSlot();

@@ -1990,7 +1990,7 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
             bestEntry->m_cacheData = 0;
         }
 
-        int allocated = reinterpret_cast<int>(m_rStage->alloc(size, const_cast<char*>(strBase + 0x1e8), 0x86D, 1));
+        unsigned int allocated = reinterpret_cast<int>(m_rStage->alloc(size, const_cast<char*>(strBase + 0x1e8), 0x86D, 1));
         if (allocated != 0) {
             freeStageBlock(reinterpret_cast<void*>(allocated));
             return;
@@ -2015,10 +2015,10 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
                 System.Printf(const_cast<char*>(strBase + 0x4c));
             }
 
-            for (int i = 0; i < m_cacheCount; i++) {
+            for (unsigned int i = 0; i < m_cacheCount; i++) {
                 CAmemCache& entry = cacheEntryAt(this, i);
                 int data = reinterpret_cast<int>(entry.m_cacheData);
-                if (((entry.m_inUse != 0) || (data != 0)) && (static_cast<unsigned int>(System.m_execParam) >= 3)) {
+                if (((entry.m_inUse != 0) || (data != 0)) && (static_cast<int>(System.m_execParam) >= 3)) {
                     System.Printf(
                         const_cast<char*>(strBase + 0xd8), i, cacheStateName(entry),
                         cacheTypeName(entry), entry.m_refCount, entry.m_priority, data);

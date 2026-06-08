@@ -1678,7 +1678,7 @@ void CalcReflectionVector2(
     Mtx workMtx;
     u16* dl = (u16*)displayList;
     const float zero = kPppYmMoveParabolaZero;
-    const float denomBias = kYmManaReflectionDenomBias;
+    const float denomBias = kYmManaOne;
     const float half = kYmManaHalf;
     const float warp = kYmManaReflectionUvWarp;
     const float scale = kYmManaReflectionUvWarpScale;
@@ -1774,8 +1774,8 @@ void CalcReflectionVector2(
             uv.y *= half;
             uv.x += half;
             uv.y += half;
-            uv.x = -(scale * (warp * (uv.x - half)) - uv.x);
-            uv.y = -(scale * (warp * (uv.y - half)) - uv.y);
+            uv.x = uv.x - scale * (warp * (uv.x - half));
+            uv.y = uv.y - scale * (warp * (uv.y - half));
             gUtil.ConvF2IVector2d(texCoordB[posIndex], uv, 12);
         }
     }

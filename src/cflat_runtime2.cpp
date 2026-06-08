@@ -470,10 +470,10 @@ CFlatRuntime2::CFlatRuntime2()
 		gObj++;
 	}
 
-	CGPartyObj* partyObj = reinterpret_cast<CGPartyObj*>(m_objParty);
-	for (int i = 0; i < kFlatPartyObjCount; i++, partyObj++) {
-		InitFlatObjectSlot(partyObj, static_cast<u16>((i + 1) | 0x300));
-	}
+	InitFlatObjectSlot(&m_objParty[0], 0x301);
+	InitFlatObjectSlot(&m_objParty[1], 0x302);
+	InitFlatObjectSlot(&m_objParty[2], 0x303);
+	InitFlatObjectSlot(&m_objParty[3], 0x304);
 
 	CGMonObj* monObj = reinterpret_cast<CGMonObj*>(m_objMon);
 	for (int i = 0; i < kFlatMonObjCount; i++, monObj++) {

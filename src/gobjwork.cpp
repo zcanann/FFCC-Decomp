@@ -1676,14 +1676,14 @@ void CCaravanWork::SafeDeleteTempItem()
 		System.Printf(const_cast<char*>(sNoWorldReturnItemWarning));
 	}
 
-	short* artifact = reinterpret_cast<short*>(m_artifacts);
-	for (int i = 0; i < 50; i++, artifactIndex += 2, artifact += 2) {
-		if (artifactIndex < 96 && (short)artifact[0] > 0) {
+	for (int i = 0; i < 50; i++, artifactIndex += 2) {
+		if (artifactIndex < 96 && m_artifacts[artifactIndex] > 0) {
 			unsigned short* artifactData =
-				(unsigned short*)(Game.unkCFlatData0[2] + (short)artifact[0] * 0x48);
+				(unsigned short*)(Game.unkCFlatData0[2] + m_artifacts[artifactIndex] * 0x48);
+			unsigned short slots = artifactData[3];
 			switch (artifactData[0]) {
 			case 0xDB:
-				totalSlots += artifactData[3];
+				totalSlots += slots;
 				break;
 			case 0x9F:
 			case 0xB6:
@@ -1695,12 +1695,13 @@ void CCaravanWork::SafeDeleteTempItem()
 			}
 		}
 
-		if ((artifactIndex + 1) < 96 && (short)artifact[1] > 0) {
+		if ((artifactIndex + 1) < 96 && m_artifacts[artifactIndex + 1] > 0) {
 			unsigned short* artifactData = (unsigned short*)(Game.unkCFlatData0[2] +
-															 (short)artifact[1] * 0x48);
+															 m_artifacts[artifactIndex + 1] * 0x48);
+			unsigned short slots = artifactData[3];
 			switch (artifactData[0]) {
 			case 0xDB:
-				totalSlots += artifactData[3];
+				totalSlots += slots;
 				break;
 			case 0x9F:
 			case 0xB6:

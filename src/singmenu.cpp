@@ -1435,6 +1435,50 @@ void CMenuPcs::drawSingleMenu()
                 }
                 ++entry;
             }
+
+            if (m_singleFadeState->done != 0) {
+                Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 0;
+                Graphic._WaitDrawDone(s_singmenu_cpp, 0x62B);
+                m_singleMenuInitialized = 0;
+
+                if (gSingMenuAsyncFileHandle != 0) {
+                    File.Close(gSingMenuAsyncFileHandle);
+                    gSingMenuAsyncFileHandle = 0;
+                }
+
+                freeTexture(5, 2, 0x2D, 0x33);
+
+                if (m_wm.m_handles[0] != 0) {
+                    delete m_wm.m_handles[0];
+                    m_wm.m_handles[0] = 0;
+                }
+
+                if (m_bonus.m_bonusBoardPtr != 0) {
+                    delete[] static_cast<u8*>(reinterpret_cast<void*>(m_bonus.m_bonusBoardPtr));
+                    m_bonus.m_bonusBoardPtr = 0;
+                }
+
+                if (m_singMenuState != 0) {
+                    delete[] reinterpret_cast<u8*>(m_singMenuState);
+                    m_singMenuState = 0;
+                }
+
+                if (m_singleFadeState != 0) {
+                    delete m_singleFadeState;
+                    m_singleFadeState = 0;
+                }
+
+                if (m_menuWindowInfo != 0) {
+                    delete m_menuWindowInfo;
+                    m_menuWindowInfo = 0;
+                }
+
+                m_stageF4->heapWalker(-1, 0, 0xFFFFFFFF);
+                Graphic.CreateTempBuffer();
+                m_stageF4 = 0;
+                m_singleMenuCtrlResetFlag = 0;
+                Joybus.SetCtrlMode(0, 0);
+            }
             return;
         }
         }

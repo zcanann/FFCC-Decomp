@@ -1451,10 +1451,12 @@ void CGMonObj::onStatMagic()
 			prgObj->changeSubStat(2);
 		}
 		return;
-	}
 
-	if ((prgObj->m_subState < 3) && (prgObj->isLoopAnim() != 0)) {
-		CGMonObj_SetAttackAfter(this, *reinterpret_cast<int*>(mon + 0x560));
+	case 2:
+		if (prgObj->isLoopAnim() != 0) {
+			CGMonObj_SetAttackAfter(this, *reinterpret_cast<int*>(mon + 0x560));
+		}
+		return;
 	}
 #undef prgObj
 #undef object

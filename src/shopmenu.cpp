@@ -1383,7 +1383,7 @@ void CShopMenu::DrawItemList()
             font->DrawInit();
             font->SetPosX(static_cast<float>(frameX - 0x54));
             font->SetPosY(static_cast<float>(y - 0x14));
-            font->Draw(reinterpret_cast<char*>(reinterpret_cast<int*>(Game.m_cFlatDataArr[1].TableStrings(0))[itemNo * 5 + 4]));
+            font->Draw(GetItemName(itemNo));
             MenuPcs.DrawInit();
             MenuPcs.DrawSingleIcon(itemNo, frameX + 0x54, y - 0x18, FLOAT_80332d28, 0, FLOAT_80332d28);
         }
@@ -1788,10 +1788,7 @@ void CShopMenu::DrawSoubi()
     font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
     font->DrawInit();
 
-    char* itemName = 0;
-    if (resultItem >= 1) {
-        itemName = reinterpret_cast<char*>(reinterpret_cast<int*>(Game.m_cFlatDataArr[1].TableStrings(0))[resultItem * 5 + 4]);
-    }
+    char* itemName = GetItemName(resultItem);
     MenuPcs.DrawShadowFont(font, itemName, FLOAT_80332d54, 112.0f, 0x18, 0x12);
     MenuPcs.DrawInit();
 

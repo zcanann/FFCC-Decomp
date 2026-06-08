@@ -1339,17 +1339,17 @@ void CGMonObj::changeStatFuncTetsukyojin(int stat)
 	switch (stat) {
 	case 0x67:
 		setActionParam(-12);
-		return;
-	case -0xD:
 		break;
 	case 0x65:
 		setActionParam(-14);
+		reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_lichTeleportIndex++;
+		break;
+	case -0xD:
+		reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_lichTeleportIndex++;
 		break;
 	default:
-		return;
+		break;
 	}
-
-	reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_lichTeleportIndex++;
 }
 
 /*

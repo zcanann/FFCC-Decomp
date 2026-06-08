@@ -200,7 +200,7 @@ int CMenuPcs::ItemCtrlCur()
 
                 s16 itemId = caravanWork->m_inventoryItems[idx];
 
-                if ((itemId < 1) || (EquipChk(idx) != 0) ||
+                if ((itemId <= 0) || (EquipChk(idx) != 0) ||
                     ((letterAttachFlg >= 0) && (itemId < 0x125))) {
                     Sound.PlaySe(4, 0x40, 0x7F, 0);
                 } else if (letterAttachFlg >= 0) {

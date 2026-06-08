@@ -2911,12 +2911,11 @@ void CShopMenu::Calc()
         m_fade = static_cast<float>(timer) * 0.125f;
         if (timer == 8) {
             unsigned short recipeMaterial[8];
-            int itemId = getItemNo(m_selectedIndex);
             CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
 
-            MenuPcs.GetRecipeMaterial(itemId, reinterpret_cast<CMenuPcs::MaterialInfo*>(recipeMaterial));
-            caravanWork->AddGil(-CalcShopMenuMakeGil(this, itemId));
-            caravanWork->DeleteItem(itemId, 0);
+            MenuPcs.GetRecipeMaterial(getItemNo(m_selectedIndex), reinterpret_cast<CMenuPcs::MaterialInfo*>(recipeMaterial));
+            caravanWork->AddGil(-CalcShopMenuMakeGil(this, getItemNo(m_selectedIndex)));
+            caravanWork->DeleteItem(getItemNo(m_selectedIndex), 0);
 
             for (int i = 0; i < 3; i++) {
                 if (recipeMaterial[i] < 1) {

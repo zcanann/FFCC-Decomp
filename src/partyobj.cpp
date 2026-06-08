@@ -1786,7 +1786,7 @@ void CGPartyObj::onFrameStat()
 				FLOAT_8032EE7C = *reinterpret_cast<float*>(Game.unk_flat3_0xc7d0 + 0x160) - m_worldPosition.y;
 			}
 
-			if (m_stateFrame < 0x0C) {
+			if (m_stateFrame <= 0x0B) {
 				const float phase = sinf((FLOAT_80331AB8 * static_cast<float>(m_stateFrame)) / FLOAT_80331AC0);
 				m_extraMoveVec.x = FLOAT_8032EE78 * phase * sinf(m_rotBaseY);
 				m_extraMoveVec.z = FLOAT_8032EE78 * phase * cosf(m_rotBaseY);
@@ -1895,7 +1895,7 @@ void CGPartyObj::onFrameStat()
 				enableDamageCol(0);
 			}
 			if ((getPadHeldForSlot(static_cast<signed char>(m_animStateMisc)) & 0x100) == 0) {
-				if (m_subFrame > 0x18) {
+				if (m_subFrame >= 0x19) {
 					playSe3D(0x30, 0x32, 0x96, 0, 0);
 				}
 				m_alpha = kMonObjOne;

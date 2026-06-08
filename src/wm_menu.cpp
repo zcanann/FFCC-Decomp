@@ -6072,11 +6072,6 @@ void CMenuPcs::SetWorldParam(int code, int value)
 	case 16:
 		bytes[0x17] = static_cast<unsigned char>(value);
 		break;
-	default:
-		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-			System.Printf(const_cast<char*>(s__s__d___Error_function_code_not_f_801dc3ec), s_wm_menu_cpp, 0x1482, code);
-		}
-		break;
 	case 0x12: {
 		McCtrl* mc = GetMcCtrl();
 		mc->m_previousState = 0;
@@ -6138,6 +6133,11 @@ void CMenuPcs::SetWorldParam(int code, int value)
 	}
 	case 0x1b:
 		GbaQue.SetControllerMode(static_cast<int>((static_cast<unsigned int>(-value) | static_cast<unsigned int>(value)) >> 31));
+		break;
+	default:
+		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+			System.Printf(const_cast<char*>(s__s__d___Error_function_code_not_f_801dc3ec), s_wm_menu_cpp, 0x1482, code);
+		}
 		break;
 	}
 }
@@ -6250,13 +6250,13 @@ unsigned int CMenuPcs::GetWorldParam(int code)
 		}
 		break;
 	}
+	case 0x15:
+		result = 0x16;
+		break;
 	default:
 		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
 			System.Printf(const_cast<char*>(s__s__d___Error_function_code_not_f_801dc3ec), s_wm_menu_cpp, 0x1521, code);
 		}
-		break;
-	case 0x15:
-		result = 0x16;
 		break;
 	}
 

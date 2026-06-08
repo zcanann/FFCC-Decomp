@@ -6243,8 +6243,8 @@ double CMenuPcs::GetFcvValue(CMenuPcs::FCV fcv, float value)
 		return static_cast<double>(keys[keyCount * 4 - 3]);
 	}
 
-	int idx = 0;
 	float* cur = keys;
+	int idx = 0;
 	if (keyCount < 1) {
 		return static_cast<double>(FLOAT_803313dc);
 	}

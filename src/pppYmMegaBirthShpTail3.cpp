@@ -862,7 +862,7 @@ done:
     if (*(u16*)(paramBytes + 0x14) == 0) {
         *(u16*)((u8*)particleData + 0x22) = 0xFFFF;
     } else {
-        *(s16*)((u8*)particleData + 0x22) = *(s16*)(paramBytes + 0x14);
+        *(s16*)((u8*)particleData + 0x22) = *(u16*)(paramBytes + 0x14);
     }
     particleBytes[0x34] = 0;
 

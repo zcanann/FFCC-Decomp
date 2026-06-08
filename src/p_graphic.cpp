@@ -742,9 +742,9 @@ void CGraphicPcs::drawBar()
     int hue = 0;
     u32 y = 0x10;
     for (int i = 0; i < orderCount; i++) {
+        const float width = (kGraphicScreenCenterX * order->m_lastTime) / kDebugBarFrameBudget;
         GXColor rgb;
         *reinterpret_cast<u32*>(&rgb) = Math.Hsb2Rgb(hue / orderCount, 100, 100);
-        const float width = (kGraphicScreenCenterX * order->m_lastTime) / kDebugBarFrameBudget;
 
         if (order->m_priority == 0x26) {
             const float y0 = drawText ? static_cast<float>(y) : kDebugBarMoveBottom;

@@ -2703,15 +2703,15 @@ void CMenuPcs::DrawResultOpenAnim()
 							    fillWidth, sprite->mulY, colors, 1.0f, 1.0f, 0.0f);
 						}
 					} else {
-						if (i < s_CntTop || i >= s_CntTop + activePartyCount) {
-							MenuPcs.DrawRect(0, (float)sprite->x + sprite->motionX, (float)sprite->y + sprite->motionY,
-							    (float)sprite->w, (float)sprite->h,
-							    sprite->mulX, sprite->mulY, sprite->depth, sprite->depth, 0.0f);
-						} else {
+						if ((signed char)s_CntTop <= i && i < (signed char)s_CntTop + activePartyCount) {
 							MenuPcs.DrawRect(0,
 							    (float)sprite->x + ((float)(3 * sprite->w - sprite->w) * 0.5f),
 							    (float)sprite->y, (float)sprite->w, (float)sprite->h,
 							    0.0f, sprite->mulY, sprite->depth, sprite->depth, 0.0f);
+						} else {
+							MenuPcs.DrawRect(0, (float)sprite->x + sprite->motionX, (float)sprite->y + sprite->motionY,
+							    (float)sprite->w, (float)sprite->h,
+							    sprite->mulX, sprite->mulY, sprite->depth, sprite->depth, 0.0f);
 						}
 					}
 					lastKind = kind;

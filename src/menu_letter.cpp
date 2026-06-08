@@ -2491,7 +2491,7 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 	float x1 = static_cast<float>(xw - FLOAT_803330f4);
 	float y1 = static_cast<float>(yh - FLOAT_803330f4);
 
-	for (int i = 0; i < 4; ++i) {
+	for (unsigned int i = 0; i < 4; ++i) {
 		int tex;
 		int flip = 0;
 		if (i == 0) {
@@ -2528,7 +2528,7 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 	float innerY = static_cast<float>(y0 + FLOAT_803330f4);
 
 	for (int i = 0; i < 2; ++i) {
-		int tex = (i == 0) ? 0x49 : 0x4C;
+		unsigned int tex = (i == 0) ? 0x49 : 0x4C;
 		float y = (i == 0) ? y0 : y1;
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
 		MenuPcs.DrawRect(

@@ -2140,9 +2140,9 @@ unsigned int CCaravanWork::GetMagicCharge(int cmdListIdx, int&, int&)
 
 			groupedCountLocal = 1;
 			int nextIdx = topIdx + 1;
-			scanCount = static_cast<short>(m_numCmdListSlots) - nextIdx;
+			int remaining = static_cast<short>(m_numCmdListSlots) - nextIdx;
 			if (nextIdx < static_cast<short>(m_numCmdListSlots)) {
-				for (; scanCount != 0; scanCount--) {
+				for (; remaining != 0; remaining--) {
 					if (m_commandListExtra[nextIdx] != -1) {
 						break;
 					}

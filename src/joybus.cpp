@@ -6867,9 +6867,9 @@ int JoyBus::SendSPMode(ThreadParam* threadParam)
  */
 int JoyBus::SendMemorys(ThreadParam* threadParam)
 {
-    unsigned char value = GbaQue.GetMemorys(threadParam->m_portIndex);
     unsigned int cmd = 0;
     unsigned char* cmdBytes = (unsigned char*)&cmd;
+    unsigned char value = GbaQue.GetMemorys(threadParam->m_portIndex);
     cmdBytes[0] = 0x14;
     cmdBytes[1] = 0x13;
     cmdBytes[2] = value;
@@ -6908,10 +6908,9 @@ int JoyBus::SendMemorys(ThreadParam* threadParam)
  */
 int JoyBus::SendChgCmdNum(ThreadParam* threadParam)
 {
-    unsigned char cmdNum = GbaQue.GetCmdNum(threadParam->m_portIndex);
-
     unsigned int cmd = 0;
     unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
+    unsigned char cmdNum = GbaQue.GetCmdNum(threadParam->m_portIndex);
     cmdBytes[0] = 0x14;
     cmdBytes[1] = 0x12;
     cmdBytes[2] = cmdNum;

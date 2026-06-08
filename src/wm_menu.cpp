@@ -3755,7 +3755,7 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 		return;
 	}
 
-	unsigned int validCount = 0;
+	int validCount = 0;
 	if (m_cmakeWorkActive == 1) {
 		if (*reinterpret_cast<int*>(m_cmakeWork + 0x1A84) != 0) {
 			validCount = 1;
@@ -3794,7 +3794,7 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 		}
 	}
 
-	unsigned int loadedCount = 0;
+	int loadedCount = 0;
 	for (int i = 0; i < 8; i++) {
 		const int handleIdx = i + 0x20;
 		CCharaPcs::CHandle* const handle = m_wm.m_handles[handleIdx];

@@ -777,16 +777,15 @@ void CGraphic::DrawDebugString()
     GXSetNumTexGens(1);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x1E, GX_FALSE, 0x7D);
 
-    s16 y = 0x10;
+    int y = 0x10;
     for (u32 i = 0; i < static_cast<u32>(m_debugStringCount); ++i) {
         s16 xCell = m_debugStringPositions[i].x;
-        s16 yCell = m_debugStringPositions[i].y;
-        char* text = m_debugStrings[i];
 
         if (xCell == -1) {
-            DrawDebugStringDirect(0x10, static_cast<u32>(y), text, 0xC);
+            DrawDebugStringDirect(0x10, static_cast<u32>(y), m_debugStrings[i], 0xC);
         } else {
-            DrawDebugStringDirect(static_cast<u32>(xCell * 0xC + 0x10), static_cast<u32>(yCell * 0xC + 0x10), text, 0xC);
+            s16 yCell = m_debugStringPositions[i].y;
+            DrawDebugStringDirect(static_cast<u32>(xCell * 0xC + 0x10), static_cast<u32>(yCell * 0xC + 0x10), m_debugStrings[i], 0xC);
         }
 
         y += 0xC;

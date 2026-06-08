@@ -338,7 +338,8 @@ void CGMonObj::frameStatFuncGiantCrab()
 			}
 
 			reinterpret_cast<CGPrgObj*>(self)->reqAnim(animId, 0, 0);
-			u16 scriptScale = *(u16*)(*(u8**)(self + 0x7c) + 0xd4);
+			u16 scriptScale =
+			    *(u16*)((u8*)reinterpret_cast<CGObject*>(self)->m_scriptHandle[9] + 0xd4);
 			float moveMagnitude =
 			    *(float*)(self + 0x690) *
 			    (kMonObjBossScaleStep * (float)((double)scriptScale - kMonObjBossUnsignedIntBias) + kMonObjBossEpsilon);

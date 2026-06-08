@@ -4207,7 +4207,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
         int byteIndex = bitIndex / 8 + 8;
         unsigned int mask = 1U << (bitIndex % 8);
         unsigned int flag = static_cast<unsigned int>(static_cast<unsigned char>(gameWork.m_eventFlags[byteIndex])) & mask;
-        FlatLastResult(this) = (flag | -flag) >> 31;
+        FlatLastResult(this) = (-flag | flag) >> 31;
     } else if (systemValue <= -200) {
         short* artifact = gameWork.m_eventWork + systemValue + 0x1C7;
         FlatLastResult(this) = static_cast<unsigned int>(static_cast<int>(*artifact));
@@ -4349,7 +4349,7 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
             unsigned char* flagByte = reinterpret_cast<unsigned char*>(Game.m_gameWork.m_eventFlags) + bitIndex / 8;
             unsigned int mask = 1U << (bitIndex % 8);
             unsigned int flag = *flagByte & mask;
-            unsigned int value = (flag | -flag) >> 31;
+            unsigned int value = (-flag | flag) >> 31;
             stack[-1].m_word = value;
 
             if (setMode < 0) {
@@ -4566,7 +4566,7 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
                 } else if (setMode < 2) {
                     value = value + stack->m_word;
                 }
-                MenuPcs.ChgPlayModeFromScript(static_cast<bool>((value | -value) >> 31));
+                MenuPcs.ChgPlayModeFromScript(static_cast<bool>((-value | value) >> 31));
                 break;
             }
             case -0x77:

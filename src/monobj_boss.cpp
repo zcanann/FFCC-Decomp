@@ -1509,21 +1509,23 @@ void CGMonObj::frameStatFuncTetsukyojin()
 	case 0x65:
 		if ((CFlatBossState() != 0) && (prgObj->m_stateFrame == 0x25)) {
 			int flatCount = CFlatBossState();
-			if (flatCount < 1) {
-				CFlatBossState() = 0;
-			} else if (((flatCount == 1) && (*reinterpret_cast<int*>(CGMonObj::m_boss) >= 0x14)) ||
-			           ((flatCount > 1) && (*reinterpret_cast<int*>(CGMonObj::m_boss) >= 5))) {
-				*reinterpret_cast<int*>(CGMonObj::m_boss) = 0;
-				object->DispCharaParts(1);
+			if (flatCount >= 1) {
+				if (((flatCount == 1) && (*reinterpret_cast<int*>(CGMonObj::m_boss) >= 0x14)) ||
+				    ((flatCount > 1) && (*reinterpret_cast<int*>(CGMonObj::m_boss) >= 5))) {
+					*reinterpret_cast<int*>(CGMonObj::m_boss) = 0;
+					object->DispCharaParts(1);
 
-				int pdtNo = object->m_charaModelHandle->GetPdtSlot();
-				prgObj->putParticle((pdtNo << 8) | 0x2D, 0, object, kMonObjBossOne, 0x101E4);
+					int pdtNo = object->m_charaModelHandle->GetPdtSlot();
+					prgObj->putParticle((pdtNo << 8) | 0x2D, 0, object, kMonObjBossOne, 0x101E4);
 
-				if (m_actionBranch == 0) {
-					CFlatBossState() = CFlatBossState() - 1;
+					if (m_actionBranch == 0) {
+						CFlatBossState() = CFlatBossState() - 1;
+					}
+					m_actionBranch = 1;
+					m_unk6C8 = 0;
 				}
-				m_actionBranch = 1;
-				m_unk6C8 = 0;
+			} else {
+				CFlatBossState() = 0;
 			}
 		}
 		reinterpret_cast<CGCharaObj*>(this)->statAttack();

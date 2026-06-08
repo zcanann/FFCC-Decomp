@@ -1307,7 +1307,7 @@ void CCharaPcs::drawMakeTexShadow()
  */
 void CCharaPcs::drawShadow()
 {
-    if (CameraPcs.m_fullScreenShadowEnabled == 0) {
+    if (static_cast<int>(CameraPcs.m_fullScreenShadowEnabled) == 0) {
         return;
     }
 

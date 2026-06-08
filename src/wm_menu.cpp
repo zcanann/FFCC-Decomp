@@ -1651,7 +1651,7 @@ void CMenuPcs::destroyWorld()
 		m_menuWindowInfo = 0;
 	}
 
-	if (m_wmThpActive != 0) {
+	if (static_cast<signed char>(m_wmThpActive) != 0) {
 		THPSimpleAudioStop();
 		THPSimpleLoadStop();
 		THPSimpleClose();
@@ -1669,12 +1669,7 @@ void CMenuPcs::destroyWorld()
 	PartMng.pppDestroyAll();
 	MemoryCardMan.McEnd();
 
-	GXColor clearColor;
-	clearColor.r = 0;
-	clearColor.g = 0;
-	clearColor.b = 0;
-	clearColor.a = 0;
-	GXSetCopyClear(clearColor, 0x00FFFFFF);
+	GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0x00FFFFFF);
 	GbaQue.SetControllerMode(0);
 }
 
@@ -11804,26 +11799,26 @@ void CMenuPcs::DrawRect2(unsigned long flags, float x, float y, float w, float h
 		return;
 	}
 
-	const float halfTexel = FLOAT_80331434;
+#define halfTexel FLOAT_80331434
 	float u0;
 	float u1;
 	float v0;
 	float v1;
 
-	if ((flags & 8) == 0) {
-		u0 = tx + halfTexel;
-		u1 = (tx + w) - halfTexel;
-	} else {
+	if ((flags & 8) != 0) {
 		u1 = tx + halfTexel;
 		u0 = (tx + w) - halfTexel;
+	} else {
+		u0 = tx + halfTexel;
+		u1 = (tx + w) - halfTexel;
 	}
 
-	if ((flags & 4) == 0) {
-		v0 = ty + halfTexel;
-		v1 = (ty + h) - halfTexel;
-	} else {
+	if ((flags & 4) != 0) {
 		v1 = ty + halfTexel;
 		v0 = (ty + h) - halfTexel;
+	} else {
+		v0 = ty + halfTexel;
+		v1 = (ty + h) - halfTexel;
 	}
 
 	if ((flags & 1) != 0) {
@@ -11832,6 +11827,7 @@ void CMenuPcs::DrawRect2(unsigned long flags, float x, float y, float w, float h
 	if ((flags & 2) != 0) {
 		y = y - halfTexel * (h * scaleY);
 	}
+#undef halfTexel
 
 	Vec in[4];
 	Vec out[4];
@@ -11877,7 +11873,7 @@ void CMenuPcs::DrawRect3d(unsigned long flags, float x, float y, float z, float 
 		return;
 	}
 
-	const float halfTexel = FLOAT_80331434;
+#define halfTexel FLOAT_80331434
 	float u0;
 	float u1;
 	float v0;
@@ -11905,6 +11901,7 @@ void CMenuPcs::DrawRect3d(unsigned long flags, float x, float y, float z, float 
 	if ((flags & 2) != 0) {
 		y = y - halfTexel * (h * scaleY);
 	}
+#undef halfTexel
 
 	Vec out[4];
 
@@ -12849,10 +12846,11 @@ int McCtrl::LoadMcList()
 	if (m_state == -1) {
 		return -1;
 	}
+	int result = 0;
 	if (m_state == 7) {
-		return 1;
+		result = 1;
 	}
-	return 0;
+	return result;
 }
 
 /*
@@ -13267,10 +13265,11 @@ int McCtrl::SaveDat()
 	if (m_state == -1) {
 		return -1;
 	}
+	int result = 0;
 	if (m_state == 0x14) {
-		return 1;
+		result = 1;
 	}
-	return 0;
+	return result;
 }
 
 /*
@@ -13308,12 +13307,10 @@ int McCtrl::LoadDat()
 					m_state = 2;
 				} else if (m_lastResult == -0x0D) {
 					m_state = -1;
-					m_lastResult = -2;
-					return;
+					return -2;
 				} else if (m_lastResult == -5) {
 					m_state = -1;
-					m_lastResult = -4;
-					return;
+					return -4;
 				} else {
 					m_state = -1;
 				}
@@ -13337,11 +13334,9 @@ int McCtrl::LoadDat()
 				MemoryCardMan.DestroyMcBuff();
 				m_state = 7;
 				if (m_lastResult == -5) {
-					m_lastResult = -4;
-					return;
+					return -4;
 				}
-				m_lastResult = -3;
-				return;
+				return -3;
 			}
 			m_state = 4;
 		}
@@ -13356,8 +13351,7 @@ int McCtrl::LoadDat()
 				m_state = 7;
 			} else if (m_lastResult == -5) {
 				m_state = -1;
-				m_lastResult = -4;
-				return;
+				return -4;
 			} else {
 				m_state = -1;
 			}
@@ -13374,8 +13368,7 @@ int McCtrl::LoadDat()
 			MemoryCardMan.McUnmount(m_cardChannel);
 			MemoryCardMan.DestroyMcBuff();
 			m_state = -1;
-			m_lastResult = -1;
-			return;
+			return -1;
 		}
 		m_serialHi = serialHi;
 		m_serialLo = serialLo;
@@ -13394,8 +13387,7 @@ int McCtrl::LoadDat()
 				MemoryCardMan.DestroyMcBuff();
 				m_state = -1;
 				if (m_lastResult == -5) {
-					m_lastResult = -4;
-					return;
+					return -4;
 				}
 			} else {
 				MemoryCardMan.DecodeData();
@@ -13419,13 +13411,16 @@ int McCtrl::LoadDat()
 		break;
 	}
 
+	int result;
 	if (m_state == -1) {
-		m_lastResult = -1;
+		result = -1;
 	} else if (m_state == 7) {
-		m_lastResult = 1;
+		result = 1;
 	} else {
-		m_lastResult = 0;
+		result = 0;
 	}
+
+	return result;
 }
 
 /*
@@ -13462,7 +13457,6 @@ int McCtrl::Format(int unmountAfter)
 					MemoryCardMan.m_opDoneFlag = 1;
 					MemoryCardMan.m_currentSlot = static_cast<char>(0xFF);
 					m_state = -1;
-					m_lastResult = -2;
 					return -2;
 				}
 				MemoryCardMan.m_opDoneFlag = 1;
@@ -13482,7 +13476,6 @@ int McCtrl::Format(int unmountAfter)
 				MemoryCardMan.McUnmount(m_cardChannel);
 				m_state = -1;
 				if (m_lastResult == -5) {
-					m_lastResult = -2;
 					return -2;
 				}
 			} else {
@@ -13506,7 +13499,6 @@ int McCtrl::Format(int unmountAfter)
 		result = 0;
 	}
 
-	m_lastResult = result;
 	return result;
 }
 
@@ -13913,11 +13905,12 @@ int McCtrl::ChkNowData()
 	{
 		return -999;
 	}
+	int result = 0;
 	if (m_state == 7)
 	{
-		return 1;
+		result = 1;
 	}
-	return 0;
+	return result;
 }
 
 /*
@@ -14087,10 +14080,11 @@ int McCtrl::SaveDataBuffer(char* buffer)
 	if (m_state == -1) {
 		return -999;
 	}
+	int result = 0;
 	if (m_state == 0x12) {
-		return 1;
+		result = 1;
 	}
-	return 0;
+	return result;
 }
 
 /*
@@ -14399,10 +14393,11 @@ int McCtrl::EraseDat()
 	if (m_state == -1) {
 		return -1;
 	}
+	int result = 0;
 	if (m_state == 0x14) {
-		return 1;
+		result = 1;
 	}
-	return 0;
+	return result;
 }
 
 /*

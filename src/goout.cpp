@@ -797,7 +797,7 @@ void CGoOutMenu::CalcMemCardProc()
  * JP Address: TODO
  * JP Size: TODO
  */
-int CGoOutMenu::SetMemCardError()
+unsigned char CGoOutMenu::SetMemCardError()
 {
     switch (m_memCardResult) {
     case -5:

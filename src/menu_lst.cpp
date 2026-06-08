@@ -150,7 +150,7 @@ void CMenuPcs::MLstDraw()
 		helpFont,
 		(int)helpX,
 		(int)helpY,
-		CColor(0xff, 0xff, 0xff, (unsigned char)(255.0f * this->m_menuLstList->entries[0].alpha)).color,
+		CColor(0xff, 0xff, 0xff, (signed char)(255.0f * this->m_menuLstList->entries[0].alpha)).color,
 		0x0a,
 		kMLstOne,
 		3.0f);

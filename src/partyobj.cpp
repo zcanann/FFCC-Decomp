@@ -904,7 +904,7 @@ void CGPartyObj::onFrameAlways()
 		if ((Game.m_gameWork.m_menuStageMode == 0) ||
 		    (Game.m_gameWork.m_bossArtifactStageIndex >= 0x0F) ||
 		    ((static_cast<unsigned short>(GetCID()) & 0x6D) != 0x6D) ||
-		    (m_scriptHandle[0xED] == nullptr)) {
+		    (reinterpret_cast<int>(m_scriptHandle[0xED]) == 0)) {
 			showTraceParticle = 1;
 		}
 	}
@@ -918,7 +918,7 @@ void CGPartyObj::onFrameAlways()
 		traceSlot = 0;
 	}
 
-	if (m_scriptHandle[0xED] == nullptr && (MiniGamePcs.m_flags & 0x400) != 0) {
+	if (reinterpret_cast<int>(m_scriptHandle[0xED]) == 0 && (MiniGamePcs.m_flags & 0x400) != 0) {
 		reinterpret_cast<CAStar*>(reinterpret_cast<unsigned char*>(&DbgMenuPcs) + 0x2A5C)->addRealTime(this);
 	}
 
@@ -934,7 +934,7 @@ void CGPartyObj::onFrameAlways()
 		         ((itemModel & 0x0FFF) == 0x0FFF) ||
 		         (itemId == 400));
 
-		if (m_scriptHandle[0xED] == nullptr) {
+		if (reinterpret_cast<int>(m_scriptHandle[0xED]) == 0) {
 			CGItemObj::CreateFromScript(0, 4, itemId, this, FLOAT_80331a78, (CGItemObj::CCFS*)0);
 			if (Math.Rand(10) == 0) {
 				CGItemObj::CreateFromScript(2, 4, 0x3039, this, FLOAT_80331a78, (CGItemObj::CCFS*)0);

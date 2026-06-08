@@ -849,14 +849,14 @@ retry_loop:
         }
         param[0xC4] = 0;
         ret = GBAReset(channel, param + 0xC0);
-        if (ret != 0)
+        if (ret == 0)
         {
-            param[0xBF] = 0;
-            goto receive_message;
+            ret = 3;
+            retryLine = 0x256;
+            goto retry_sleep;
         }
-        ret = 3;
-        retryLine = 0x256;
-        goto retry_sleep;
+        param[0xBF] = 0;
+        goto receive_message;
     case 4:
         if (param[0xC4] != 0)
         {

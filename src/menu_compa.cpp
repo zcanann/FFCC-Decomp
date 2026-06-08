@@ -115,7 +115,7 @@ void CMenuPcs::CompaDraw()
 					} else {
 						MenuPcs.DrawRect(
 							static_cast<unsigned long>(entry->drawFlags), x, y, fillW, h, u, v,
-							colors, entry->uvScale, kCompaOne, kCompaZero);
+							colors, kCompaOne, kCompaOne, kCompaZero);
 					}
 
 					u += fillW;
@@ -147,7 +147,7 @@ void CMenuPcs::CompaDraw()
 					} else {
 						MenuPcs.DrawRect(
 							static_cast<unsigned long>(entry->drawFlags), x, y, remainW, h, u, v,
-							colors, entry->uvScale, kCompaOne, kCompaZero);
+							colors, kCompaOne, kCompaOne, kCompaZero);
 					}
 				}
 

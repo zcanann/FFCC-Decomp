@@ -48,7 +48,7 @@ void CMenuPcs::FavoDraw()
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	FavoEntry* entry = m_favoList->entries;
-	for (int i = 0; i < m_favoList->count; i++) {
+	for (unsigned int i = 0; i < m_favoList->count; i++) {
 		if (entry->tex >= 0) {
 			float x = static_cast<float>(entry->x);
 			float y = static_cast<float>(entry->y);
@@ -119,7 +119,7 @@ void CMenuPcs::FavoDraw()
 						int yStep = static_cast<int>(y);
 						float end = y + h;
 						while (static_cast<float>(yStep) < end) {
-							int tileH = static_cast<int>(end - static_cast<float>(yStep));
+							int tileH = static_cast<unsigned int>(end - static_cast<float>(yStep));
 							if (static_cast<float>(tileH) > 32.0f) {
 								tileH = 0x20;
 							}
@@ -173,7 +173,7 @@ void CMenuPcs::FavoDraw()
 
 	rank = s_rank;
 	drawEntry = rankEntry;
-	for (int i = 0; i < 8; i++) {
+	for (unsigned int i = 0; i < 8; i++) {
 		int iconX = drawEntry->x + drawEntry->w - 0x10;
 		int iconY = static_cast<int>((static_cast<float>(drawEntry->h) - 32.0f) * 0.5 +
 		                             static_cast<float>(drawEntry->y));

@@ -2258,37 +2258,33 @@ int CMapMng::ReadOtm(char* mapName)
             continue;
         }
 
-        CLightPcs::CLight light;
-        unsigned char* lightRaw = reinterpret_cast<unsigned char*>(&light);
-        *reinterpret_cast<int*>(lightRaw + 0x8) = 1;
-        *reinterpret_cast<float*>(lightRaw + 0xC) = MapObjWorldX(obj);
-        *reinterpret_cast<float*>(lightRaw + 0x10) = MapObjWorldY(obj);
-        *reinterpret_cast<float*>(lightRaw + 0x14) = MapObjWorldZ(obj);
+        CLightPcs::CBumpLight light;
+        light.m_type = 1;
+        light.m_position.x = MapObjWorldX(obj);
+        light.m_position.y = MapObjWorldY(obj);
+        light.m_position.z = MapObjWorldZ(obj);
 
         CMapObj* targetObj = spotAttr->m_target;
-        Vec source;
-        source.x = MapObjWorldX(targetObj);
-        source.y = MapObjWorldY(targetObj);
-        source.z = MapObjWorldZ(targetObj);
-        Vec target;
-        target.x = MapObjWorldX(obj);
-        target.y = MapObjWorldY(obj);
-        target.z = MapObjWorldZ(obj);
-        Vec dir;
-        PSVECSubtract(&source, &target, &dir);
-        PSVECNormalize(&dir, &dir);
+        light.m_targetPosition.x = MapObjWorldX(targetObj);
+        light.m_targetPosition.y = MapObjWorldY(targetObj);
+        light.m_targetPosition.z = MapObjWorldZ(targetObj);
+        PSVECSubtract(
+            reinterpret_cast<Vec*>(&light.m_targetPosition),
+            reinterpret_cast<Vec*>(&light.m_position),
+            reinterpret_cast<Vec*>(&light.m_direction));
+        PSVECNormalize(
+            reinterpret_cast<Vec*>(&light.m_direction),
+            reinterpret_cast<Vec*>(&light.m_direction));
 
-        *reinterpret_cast<float*>(lightRaw + 0x40) = dir.x;
-        *reinterpret_cast<float*>(lightRaw + 0x44) = dir.y;
-        *reinterpret_cast<float*>(lightRaw + 0x48) = dir.z;
-        *reinterpret_cast<unsigned int*>(lightRaw + 0x4C) = *reinterpret_cast<unsigned int*>(&spotAttr->m_baseColor);
-        *reinterpret_cast<unsigned int*>(lightRaw + 0x20) = *reinterpret_cast<unsigned int*>(&spotAttr->m_intensity);
-        *reinterpret_cast<unsigned int*>(lightRaw + 0x24) = *reinterpret_cast<unsigned int*>(&spotAttr->m_falloff);
-        *reinterpret_cast<unsigned int*>(lightRaw + 0x28) = *reinterpret_cast<unsigned int*>(&spotAttr->m_angle);
-        lightRaw[0x58] = spotAttr->m_color.r;
-        lightRaw[0x59] = spotAttr->m_color.g;
-        lightRaw[0x5A] = spotAttr->m_color.b;
-        lightRaw[0x5B] = spotAttr->m_color.a;
+        *reinterpret_cast<unsigned int*>(&light.m_bumpShade) =
+            *reinterpret_cast<unsigned int*>(&spotAttr->m_baseColor);
+        light.m_offsetX = spotAttr->m_intensity;
+        light.m_offsetZ = spotAttr->m_falloff;
+        light.m_specularScale = spotAttr->m_angle;
+        light.m_targetColor[1].r = spotAttr->m_color.r;
+        light.m_targetColor[1].g = spotAttr->m_color.g;
+        light.m_targetColor[1].b = spotAttr->m_color.b;
+        light.m_targetColor[1].a = spotAttr->m_color.a;
 
         CLightPcs::CBumpLight* bump = LightPcs.AddBump(
             &light,

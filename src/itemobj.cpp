@@ -924,7 +924,7 @@ void CGItemObj::onFrameStat()
 			if (Game.m_gameWork.m_menuStageMode != 0) {
 				if (Game.m_gameWork.m_menuStageMode != 0 &&
 				    Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-					unsigned int carryCid = static_cast<unsigned short>(m_owner->GetCID());
+					int carryCid = static_cast<unsigned short>(m_owner->GetCID());
 					if ((carryCid & 0x6D) == 0x6D &&
 					    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_owner->m_scriptHandle) + 0x3B4) != 0) {
 						useMenuLaunchSpeed = true;
@@ -935,7 +935,7 @@ void CGItemObj::onFrameStat()
 			if (useMenuLaunchSpeed) {
 				launchSpeed = kItemObjUnitScale;
 			} else if (static_cast<int>(CFlatCenterState()) == 1) {
-				unsigned int carryCid = static_cast<unsigned short>(m_owner->GetCID());
+				int carryCid = static_cast<unsigned short>(m_owner->GetCID());
 				if ((carryCid & 0x6D) == 0x6D &&
 				    1 < *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_owner->m_scriptHandle) + 0x3E0)) {
 					launchSpeed = kItemObjUnitScale;

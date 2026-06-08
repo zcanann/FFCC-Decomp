@@ -2002,14 +2002,16 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
                 System.Printf(const_cast<char*>(strBase + 0x4c));
             }
 
-            for (unsigned int i = 0; i < m_cacheCount; i++) {
-                CAmemCache& entry = cacheEntryAt(this, i);
-                if (((entry.m_inUse != 0) || (entry.m_cacheData != 0)) && (static_cast<int>(System.m_execParam) >= 3)) {
+            int offset2 = 0;
+            for (int i = 0; i < m_cacheCount; i++) {
+                CAmemCache& entry = *reinterpret_cast<CAmemCache*>(reinterpret_cast<char*>(m_cacheTable) + offset2);
+                if (((entry.m_inUse != 0) || (entry.m_cacheData != 0)) && (static_cast<unsigned int>(System.m_execParam) >= 3)) {
                     System.Printf(
                         const_cast<char*>(strBase + 0xd8), i, cacheStateName(entry),
                         cacheTypeName(entry), entry.m_refCount, entry.m_priority,
                         reinterpret_cast<int>(entry.m_cacheData));
                 }
+                offset2 += sizeof(CAmemCache);
             }
 
             if (static_cast<unsigned int>(System.m_execParam) >= 3) {

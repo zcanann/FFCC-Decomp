@@ -1600,12 +1600,12 @@ void CCameraPcs::drawShadowBegin()
     PSMTXConcat(rotY, rotX, rotXY);
 
     if (Game.m_currentSceneId == 4) {
-        m_shadowRectBound.m_min.x = kCameraBoundsMinInitial;
-        m_shadowRectBound.m_min.y = kCameraBoundsMinInitial;
         m_shadowRectBound.m_min.z = kCameraBoundsMinInitial;
-        m_shadowRectBound.m_max.x = kCameraBoundsMaxInitial;
-        m_shadowRectBound.m_max.y = kCameraBoundsMaxInitial;
+        m_shadowRectBound.m_min.y = kCameraBoundsMinInitial;
+        m_shadowRectBound.m_min.x = kCameraBoundsMinInitial;
         m_shadowRectBound.m_max.z = kCameraBoundsMaxInitial;
+        m_shadowRectBound.m_max.y = kCameraBoundsMaxInitial;
+        m_shadowRectBound.m_max.x = kCameraBoundsMaxInitial;
 
         if (m_shadowAuto == 1 && GetShadowRect(m_shadowRectBound) != 0) {
             m_targetX = (m_shadowRectBound.m_min.x + m_shadowRectBound.m_max.x) * kCameraHalfF;

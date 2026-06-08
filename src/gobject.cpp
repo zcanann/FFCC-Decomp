@@ -1357,8 +1357,16 @@ void CGObject::update()
 
     float turnDelta = Math.DstRot(m_rotTargetY, m_rotBaseY);
     if (m_animSlotSel != -1 && m_shieldNodeFlagBits.m_bit40) {
-        const float turnLimit = fabsf(m_turnBaseSpeed);
-        turnDelta = ClampFloat(turnDelta, -turnLimit, turnLimit);
+        const double turnLimit = fabs(m_turnBaseSpeed);
+        double clampedTurn;
+        if (turnDelta < -turnLimit) {
+            clampedTurn = -turnLimit;
+        } else if (turnDelta > turnLimit) {
+            clampedTurn = turnLimit;
+        } else {
+            clampedTurn = turnDelta;
+        }
+        turnDelta = clampedTurn;
         m_rotBaseY += turnDelta;
     } else {
         m_rotBaseY += turnDelta * m_hitNormal.x;

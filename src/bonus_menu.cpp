@@ -2396,12 +2396,10 @@ void CMenuPcs::DrawResultCountAnim()
 					int value = s_Rinfo->m_party[i - (signed char)s_CntTop].m_totalValue;
 					if (*(short*)(this->m_bonusStatePtr + 0x10) == 0) {
 						double frame = (double)*(short*)(this->m_bonusStatePtr + 0x22) - 8.0;
-						if (frame > 0.0) {
-							if (frame < (double)value) {
-								value = (int)frame;
-							}
-						} else {
+						if (frame <= 0.0) {
 							value = 0;
+						} else if (frame < (double)value) {
+							value = (int)frame;
 						}
 					}
 					int digits[3];

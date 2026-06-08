@@ -1417,10 +1417,10 @@ void CGObject::update()
             srt.m_rot.y += m_radiusCtrl.z;
         } else if (m_worldParamA == 0x24 || m_worldParamB == 0x125) {
             const float cameraYaw = CameraPcs.m_yaw;
-            srt.m_rot.y = sQuarterTurn - cameraYaw;
+            srt.m_rot.y = 3.1415927f - cameraYaw;
             srt.m_rot.y += sBgAttrNormal * cosf(sBgAttrNormal * m_radiusCtrl.y);
             srt.m_trans.y += sAnimFrameOffset + sinf(m_radiusCtrl.y);
-            m_radiusCtrl.y += 0.125f;
+            m_radiusCtrl.y += 0.1f;
         }
 
         Math.SRTToMatrix(modelMtx, reinterpret_cast<SRT*>(&srt));

@@ -640,7 +640,7 @@ void CGObject::move()
                 && m_weaponNodeFlagAll.m_bits1.m_menuReady
                 && (m_ownerType == 0)) {
                 if ((MiniGamePcs.m_flags & 2) != 0) {
-                    speed *= static_cast<double>(sAnalogSpeedScale);
+                    speed *= sAnalogSpeedScale;
                 }
 
                 const u32 cflatCenterState = CFlatCenterState();
@@ -652,28 +652,28 @@ void CGObject::move()
 
                     Vec centerDelta;
                     PSVECSubtract(&m_worldPosition, &partyCenter, &centerDelta);
-                    double centerDist = static_cast<double>(PSVECMag(&centerDelta));
+                    float centerDist = PSVECMag(&centerDelta);
                     PSVECNormalize(&centerDelta, &centerDelta);
 
-                    const double dirDot = static_cast<double>(PSVECDotProduct(&moveVec, &centerDelta));
-                    if (static_cast<double>(sZeroFloat) < dirDot) {
-                        centerDist /= static_cast<double>(CFlatCenterDistanceScale());
-                        double clampDist = centerDist;
-                        if (static_cast<double>(sZeroFloat) <= clampDist) {
-                            if (static_cast<double>(sAnimFrameOffset) < clampDist) {
-                                clampDist = static_cast<double>(sAnimFrameOffset);
+                    const float dirDot = PSVECDotProduct(&moveVec, &centerDelta);
+                    if (sZeroFloat < dirDot) {
+                        centerDist /= CFlatCenterDistanceScale();
+                        float clampDist = centerDist;
+                        if (sZeroFloat <= clampDist) {
+                            if (sAnimFrameOffset < clampDist) {
+                                clampDist = sAnimFrameOffset;
                             }
-                            speed *= -((clampDist * clampDist) - static_cast<double>(sAnimFrameOffset));
+                            speed *= -((clampDist * clampDist) - sAnimFrameOffset);
                         }
                     }
                 }
             }
 
             if ((*reinterpret_cast<u32*>(&m_radiusCtrl.x) & 0x400000) != 0) {
-                speed *= static_cast<double>(sQuarterTurn);
+                speed *= sQuarterTurn;
             }
 
-            PSVECScale(&moveVec, &moveVec, static_cast<float>(speed));
+            PSVECScale(&moveVec, &moveVec, speed);
         }
 
         PSVECAdd(&m_groundHitOffset, &moveVec, &m_groundHitOffset);

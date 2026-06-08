@@ -1198,20 +1198,20 @@ void CCameraPcs::createMap()
     fVar1 = kCameraZeroF;
     fVar2 = kCameraHalfScreenHeight;
     m_mapRotZ = fVar1;
-    fVar4 = kCameraDefaultPitch;
+    fVar3 = kCameraDefaultPitch;
     m_mapRotY = fVar1;
-    fVar5 = kCameraDefaultFov;
+    fVar4 = kCameraDefaultFov;
     m_mapRotX = fVar1;
-    fVar3 = kCameraDefaultNearZ;
+    fVar5 = kCameraDefaultNearZ;
     m_positionZ = fVar1;
     fVar6 = kCameraDefaultFarZ;
     m_positionY = fVar1;
     m_positionX = fVar1;
     m_yaw = fVar1;
     m_distance = fVar2;
-    m_pitch = fVar4;
-    m_fov = fVar5;
-    m_nearZ = fVar3;
+    m_pitch = fVar3;
+    m_fov = fVar4;
+    m_nearZ = fVar5;
     m_farZ = fVar6;
 }
 

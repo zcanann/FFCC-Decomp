@@ -646,27 +646,32 @@ void CCameraPcs::CalcQuake()
 
     u32 randX = static_cast<u32>(rand());
     u16 signX = static_cast<u16>(randX >> 0x1F);
+    short jitterSignX = static_cast<short>(((randX & 1) ^ signX) - signX);
+
     u32 randY = static_cast<u32>(rand());
     u16 signY = static_cast<u16>(randY >> 0x1F);
+    short jitterSignY = static_cast<short>(((randY & 1) ^ signY) - signY);
+
     u32 randZ = static_cast<u32>(rand());
     u16 signZ = static_cast<u16>(randZ >> 0x1F);
+    short jitterSignZ = static_cast<short>(((randZ & 1) ^ signZ) - signZ);
 
     float jitterAmount;
-    if (((randX & 1) ^ signX) == signX) {
+    if (jitterSignX == 0) {
         jitterAmount = Math.RandF(m_quake.m_jitterAmplitude.x);
     } else {
         jitterAmount = -Math.RandF(m_quake.m_jitterAmplitude.x);
     }
     jitter.x = jitterAmount;
 
-    if (((randY & 1) ^ signY) == signY) {
+    if (jitterSignY == 0) {
         jitterAmount = Math.RandF(m_quake.m_jitterAmplitude.y);
     } else {
         jitterAmount = -Math.RandF(m_quake.m_jitterAmplitude.y);
     }
     jitter.y = jitterAmount;
 
-    if (((randZ & 1) ^ signZ) == signZ) {
+    if (jitterSignZ == 0) {
         jitterAmount = Math.RandF(m_quake.m_jitterAmplitude.z);
     } else {
         jitterAmount = -Math.RandF(m_quake.m_jitterAmplitude.z);

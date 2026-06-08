@@ -4837,9 +4837,11 @@ void CGPartyObj::ghostPartyMog()
 	unsigned int distFar = static_cast<unsigned int>(static_cast<int>(FLOAT_80331A5C * scale));
 
 	unsigned char* flags = &CGPartyObj::m_ghostWork[0];
-	int& bossState = *reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x1C);
+#define bossState (*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x1C))
 
-	if (static_cast<double>(m_partyDistance[0]) <= DOUBLE_80331A90) {
+	if (static_cast<double>(m_partyDistance[0]) > DOUBLE_80331A90) {
+		bossState = 1;
+	} else {
 		int exceeded;
 		if (static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x24)) >= CharaGhostValue(0x2048) ||
 		    static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x28)) >= CharaGhostValue(0x204C) ||
@@ -4933,8 +4935,6 @@ void CGPartyObj::ghostPartyMog()
 			}
 			flags[0] = (flags[0] & 0xF7) | 8;
 		}
-	} else {
-		bossState = 1;
 	}
 
 messageMenu:
@@ -4971,6 +4971,7 @@ messageMenu:
 		}
 	}
 	*reinterpret_cast<unsigned int*>(CGPartyObj::m_ghostWork + 0x8C) = prevSlot;
+#undef bossState
 }
 
 /*

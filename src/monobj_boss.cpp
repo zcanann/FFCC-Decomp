@@ -2101,40 +2101,42 @@ void CGMonObj::frameStatFuncMeteoParasite()
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	CGCharaObj* chara = reinterpret_cast<CGCharaObj*>(this);
 	int state = prgObj->m_lastStateId;
-	void* scriptKind = object->m_scriptHandle[4];
+	int scriptKind = reinterpret_cast<int>(object->m_scriptHandle[4]);
 
-	if (state == 0x66) {
+	switch (state) {
+	case 100:
+		if (prgObj->m_stateFrame == 0) {
+			prgObj->reqAnim(10, 0, 0);
+		} else if (prgObj->isLoopAnim() != 0) {
+			object->SetAnimSlot(0xB, 0);
+			prgObj->changeStat(0, 0, 0);
+		}
+		break;
+	case 0x65:
+		if (prgObj->m_stateFrame == 0) {
+			prgObj->reqAnim(0xD, 0, 0);
+		} else if (prgObj->isLoopAnim() != 0) {
+			object->SetAnimSlot(0xE, 0);
+			prgObj->changeStat(0, 0, 0);
+		}
+		break;
+	case 0x66:
 		if (prgObj->m_stateFrame == 0) {
 			prgObj->reqAnim(0xC, 0, 0);
 		} else if (prgObj->isLoopAnim() != 0) {
 			object->SetAnimSlot(0, 0);
 			prgObj->changeStat(0, 0, 0);
 		}
-	} else if (state < 0x66) {
-		if (state == 100) {
-			if (prgObj->m_stateFrame == 0) {
-				prgObj->reqAnim(10, 0, 0);
-			} else if (prgObj->isLoopAnim() != 0) {
-				object->SetAnimSlot(0xB, 0);
-				prgObj->changeStat(0, 0, 0);
-			}
-		} else if (state > 99) {
-			if (prgObj->m_stateFrame == 0) {
-				prgObj->reqAnim(0xD, 0, 0);
-			} else if (prgObj->isLoopAnim() != 0) {
-				object->SetAnimSlot(0xE, 0);
-				prgObj->changeStat(0, 0, 0);
-			}
-		}
+		break;
 	}
 
-	if (scriptKind == reinterpret_cast<void*>(0x87) && prgObj->m_lastStateId == 0x67) {
+	if (scriptKind == 0x87 && prgObj->m_lastStateId == 0x67) {
 		int frame = prgObj->m_stateFrame;
 		if (frame > 0x18 && frame < 0x32) {
 			if (frame == 0x19) {
 				prgObj->playSe3D(0x11D5B, 0x32, 0x96, 0, 0);
 			}
-			if (prgObj->m_stateFrame == (prgObj->m_stateFrame / 3) * 3) {
+			if (prgObj->m_stateFrame % 3 == 0) {
 				chara->putParticleFromItem(chara->m_itemId, 2, chara->m_particleSlots[0], 0);
 			}
 		}

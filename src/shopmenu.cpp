@@ -2109,10 +2109,11 @@ void CShopMenu::DrawShop0()
     for (unsigned int i = 0; i < 3; i++, entry++) {
         s_currentShopMenuTopMenuEntry = entry;
         Graphic.SetDrawDoneDebugData(0x23);
+        float entryX = static_cast<float>(s_currentShopMenuTopMenuEntry->x - 0x10);
+        float entryY = static_cast<float>(s_currentShopMenuTopMenuEntry->y - 0x0B);
         font->DrawInit();
         MenuPcs.DrawNoShadowFont(font, s_currentShopMenuTopMenuEntry->text,
-            static_cast<float>(s_currentShopMenuTopMenuEntry->x - 0x10),
-            static_cast<float>(s_currentShopMenuTopMenuEntry->y - 0x0B), 0x18, 0x12);
+            entryX, entryY, 0x18, 0x12);
         MenuPcs.DrawInit();
         Graphic.SetDrawDoneDebugData(0x24);
     }

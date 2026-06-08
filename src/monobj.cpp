@@ -183,12 +183,12 @@ void CGMonObj::onFramePreCalc()
 		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 8) = m_targetPartyIndex;
 		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 0) = -1;
 
-		if ((0x8E <= reinterpret_cast<int>(object->m_scriptHandle[4])) &&
-			(reinterpret_cast<int>(object->m_scriptHandle[4]) < 0x9A)) {
+		if ((0x9A <= reinterpret_cast<int>(object->m_scriptHandle[4])) ||
+			(reinterpret_cast<int>(object->m_scriptHandle[4]) < 0x8E)) {
+			(this->*m_funcs->logic)();
+		} else {
 			int aiLocal = 0;
 			aiAddDuct(aiLocal);
-		} else {
-			(this->*m_funcs->logic)();
 		}
 
 		int nextState = *reinterpret_cast<int*>(CGMonObj::m_aiWork + 4);
@@ -318,7 +318,8 @@ void CGMonObj::undeadOn()
 		object->SetTexAnim(const_cast<char*>(s_monObjTexAnimU1));
 	}
 
-	if ((static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags)) << 24) & 0xC0000000) >> 31) != 0) {
+	signed char weaponSign = static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags)) << 24) & 0xC0000000) >> 31);
+	if (weaponSign != 0) {
 		if (classId == 0x83) {
 			reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x987A, 0x32, 0x96, 0, (Vec*)0);
 		} else if (classId == 0x7F) {
@@ -1440,7 +1441,7 @@ void CGMonObj::onStatMagic()
 					}
 				}
 
-				CGPrgObj* targetPrg = reinterpret_cast<CGPrgObj*>(target);
+				CGPrgObj* targetPrg = reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]);
 				targetPrg->bonus(0x17, *reinterpret_cast<int*>(mon + 0x560), targetPrg);
 			}
 

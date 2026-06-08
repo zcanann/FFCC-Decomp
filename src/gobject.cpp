@@ -2989,7 +2989,7 @@ void CGObject::CancelAnim(int keepFacing)
  */
 void CGObject::PlayAnim(int slot, int param2, int param3, int param4, int param5, signed char* animData)
 {
-    signed char weaponFlag = static_cast<signed char>(param2);
+    signed char weaponFlag = static_cast<unsigned char>(param2);
     u8 flags;
 
     m_currentAnimSlot = m_animQueue[slot - 0x41];
@@ -3386,10 +3386,10 @@ float CGObject::CalcSafePos(int hitMask, CGObject* other, Vec* outSafePos)
  */
 void CGObject::PutDropItem()
 {
-    u32 dropCount = 0;
+    s32 dropCount = 0;
 
     for (int i = 0; i < 4; i++) {
-        u32 dropCode = static_cast<u16>(m_dropItemCodes[i]);
+        s32 dropCode = static_cast<u16>(m_dropItemCodes[i]);
         if ((short)m_dropItemCodes[i] > 0) {
             int createMode;
             if ((dropCode & 0xC000) == 0x4000) {

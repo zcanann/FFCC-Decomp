@@ -12032,16 +12032,20 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	const float bottom = (sy + sh) - border;
 	const float uv0 = FLOAT_803313dc;
 	for (int i = 0; i < 4; i++) {
-		float x = sx;
-		float y = sy;
+		float x;
+		float y;
 		unsigned long flags = 0;
 		if (i & 1) {
 			x = right;
 			flags |= 8;
+		} else {
+			x = sx;
 		}
 		if (i & 2) {
 			y = bottom;
 			flags |= 4;
+		} else {
+			y = sy;
 		}
 		MenuPcs.DrawRect(flags, x, y, border, border, uv0, uv0, FLOAT_803313e8, FLOAT_803313e8, uv0);
 	}

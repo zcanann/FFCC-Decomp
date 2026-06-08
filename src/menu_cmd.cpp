@@ -2352,7 +2352,7 @@ void CMenuPcs::DrawUniteList()
 		const bool active = (i <= GetCmdStateView(this)->selected) && (GetCmdStateView(this)->selected < i + groupSize);
 		const float panelX = static_cast<float>(topX * 2 - anchorEntry->x);
 		const float panelY = (static_cast<float>(endEntry->width + endEntry->height - startEntry->width) -
-		                      kCmdMenuPanelSize64) * static_cast<float>(kCmdMenuHalfD) +
+		                      kCmdMenuPanelSize64) * kCmdMenuHalfD +
 		                     static_cast<float>(startEntry->y);
 		const float panelTone = active ? kCmdMenuPanelSize64 : kCmdMenuZero;
 		float panelAlpha;

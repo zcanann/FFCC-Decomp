@@ -710,32 +710,30 @@ void CCameraPcs::CalcQuake()
             m_quake.m_state = 0;
         }
     } else {
-        if (m_quake.m_state == 0) {
-            if (m_quake.m_endTimer <= 0) {
-                m_quake.m_state = 0;
-                m_quake.m_startTimer = 0;
-                m_quake.m_startDuration = 0;
-                m_quake.m_endTimer = 0;
-                m_quake.m_endDuration = 0;
-                m_quake.m_positionAmplitude.z = kCameraZeroF;
-                m_quake.m_positionAmplitude.y = kCameraZeroF;
-                m_quake.m_positionAmplitude.x = kCameraZeroF;
-                m_quake.m_jitterAmplitude.z = kCameraZeroF;
-                m_quake.m_jitterAmplitude.y = kCameraZeroF;
-                m_quake.m_jitterAmplitude.x = kCameraZeroF;
-            } else {
-                float ratio = static_cast<float>(m_quake.m_endTimer) /
-                              static_cast<float>(m_quake.m_endDuration);
-                PSVECScale(&offset, &offset, ratio);
-                PSVECSubtract(&offset, &jitter, &offset);
-                PSVECAdd(&offset, &PositionVec(), &PositionVec());
-                PSVECAdd(&offset, &TargetVec(), &TargetVec());
-                m_quake.m_endTimer = m_quake.m_endTimer - 1;
-            }
-        } else {
+        if (m_quake.m_state != 0) {
             PSVECAdd(&offset, &jitter, &offset);
             PSVECAdd(&offset, &PositionVec(), &PositionVec());
             PSVECAdd(&offset, &TargetVec(), &TargetVec());
+        } else if (m_quake.m_endTimer > 0) {
+            float ratio = static_cast<float>(m_quake.m_endTimer) /
+                          static_cast<float>(m_quake.m_endDuration);
+            PSVECScale(&offset, &offset, ratio);
+            PSVECSubtract(&offset, &jitter, &offset);
+            PSVECAdd(&offset, &PositionVec(), &PositionVec());
+            PSVECAdd(&offset, &TargetVec(), &TargetVec());
+            m_quake.m_endTimer = m_quake.m_endTimer - 1;
+        } else {
+            m_quake.m_state = 0;
+            m_quake.m_startTimer = 0;
+            m_quake.m_startDuration = 0;
+            m_quake.m_endTimer = 0;
+            m_quake.m_endDuration = 0;
+            m_quake.m_positionAmplitude.z = kCameraZeroF;
+            m_quake.m_positionAmplitude.y = kCameraZeroF;
+            m_quake.m_positionAmplitude.x = kCameraZeroF;
+            m_quake.m_jitterAmplitude.z = kCameraZeroF;
+            m_quake.m_jitterAmplitude.y = kCameraZeroF;
+            m_quake.m_jitterAmplitude.x = kCameraZeroF;
         }
     }
 }

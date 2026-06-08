@@ -490,7 +490,8 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
     }
 
     float hitDot = PSVECDotProduct(&g_hit_cyl.m_bottom, &g_hit_lpface->m_normal);
-    float hitT = -((hitDot - (g_hit_lpface->m_planeD + g_hit_cyl.m_radius)) / dot);
+    g_hit_t = -((hitDot - (g_hit_lpface->m_planeD + g_hit_cyl.m_radius)) / dot);
+    float hitT = g_hit_t;
     int edgeIndex = -1;
 
     if (hitT > kMapHitEdgeMaxT) {

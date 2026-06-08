@@ -2168,9 +2168,9 @@ static void _KeyOnControl()
         } while ((voiceData != 0) && (reserve < RedKeyOnGetEnd(RedKeyOnDataGet())));
     }
 
-    soundControl = RedSoundControlGetBegin();
-    if ((soundControl->m_activeTrackCount != 0) &&
-        ((soundControl->m_flags & REDSOUND_CONTROL_FLAG_PAUSE) == 0)) {
+    if ((RedSoundControlGetBegin()->m_activeTrackCount != 0) &&
+        ((RedSoundControlGetBegin()->m_flags & REDSOUND_CONTROL_FLAG_PAUSE) == 0)) {
+        soundControl = RedSoundControlGetBegin();
         track = soundControl->m_tracks;
         do {
             if ((track->m_command != 0) && (track->m_shakeFunc != 0)) {
@@ -2185,9 +2185,9 @@ static void _KeyOnControl()
         } while (track < RedSoundControlGetTrackEnd(soundControl));
     }
 
-    soundControl = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SECONDARY);
-    if ((soundControl->m_activeTrackCount != 0) &&
-        ((soundControl->m_flags & REDSOUND_CONTROL_FLAG_PAUSE) == 0)) {
+    if ((RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SECONDARY)->m_activeTrackCount != 0) &&
+        ((RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SECONDARY)->m_flags & REDSOUND_CONTROL_FLAG_PAUSE) == 0)) {
+        soundControl = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SECONDARY);
         track = soundControl->m_tracks;
         do {
             if ((track->m_command != 0) && (track->m_shakeFunc != 0)) {

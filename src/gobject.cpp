@@ -1316,8 +1316,8 @@ void CGObject::hit()
             for (int damageIndex = 0; damageIndex < 8; damageIndex++) {
                 DamageCol* damage = &other->m_damageColliders[damageIndex];
                 if (((attack->m_hitMask & damage->m_hitMask) == 0) ||
-                    (damage->m_innerRadius == sZeroFloat) ||
-                    (damage->m_outerRadius == sZeroFloat)) {
+                    (sZeroFloat == damage->m_innerRadius) ||
+                    (sZeroFloat == damage->m_outerRadius)) {
                     continue;
                 }
 
@@ -1331,7 +1331,7 @@ void CGObject::hit()
                     continue;
                 }
 
-                if ((GetCID() & 0x2D) == 0x2D) {
+                if ((static_cast<unsigned short>(GetCID()) & 0x2D) == 0x2D) {
                     CFlatRuntime::CStack stackIn[7];
                     stackIn[0].m_word = static_cast<u32>(attackIndex);
                     stackIn[1].m_word = static_cast<u32>(other->m_particleId);

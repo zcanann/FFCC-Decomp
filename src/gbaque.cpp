@@ -2208,10 +2208,10 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 
 		for (int j = 0; j < i; j++) {
 			const CCaravanWork::CLetterWork* prev = &caravanWork->m_letters[j];
-			if (((cur->Word0() >> 9) & 0x1FF) == ((prev->Word0() >> 9) & 0x1FF)) {
+			if (cur->SenderId() == prev->SenderId()) {
 				matchedNpc = j;
 			}
-			if (((cur->HeaderWord() >> 2) & 0x1FF) == ((prev->HeaderWord() >> 2) & 0x1FF)) {
+			if (cur->MessageType() == prev->MessageType()) {
 				matchedSubject = j;
 			}
 			if (matchedSubject != -1 && matchedNpc != -1) {

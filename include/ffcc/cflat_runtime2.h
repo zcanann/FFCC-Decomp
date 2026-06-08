@@ -257,8 +257,7 @@ public:
 	u8 m_pad_E3F4_E400[0xC];        // 0xE3F4
 	int m_debugDataBuffer[0x800];   // 0xE400
 	int m_debugDataIndex;           // 0x10400
-	u8 m_initAllFinishedFlag;       // 0x10404
-	u8 m_pad_10405_10408[0x3];      // 0x10405
+	int m_initAllFinishedFlag;      // 0x10404
 	int m_letterEventEnabled;       // 0x10408
 	unsigned int m_workAssignIndex; // 0x1040C
 	unsigned int m_partyAssignIndex; // 0x10410

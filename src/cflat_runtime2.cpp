@@ -1384,7 +1384,7 @@ void CFlatRuntime2::Calc()
 
 		CFlatSaveObject record;
 
-		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
+		for (CGObject* object = CFlat.FindGObjFirst(); object != 0; object = CFlat.FindGObjNext(object)) {
 			if (object->m_charaModelHandle == 0) {
 				continue;
 			}

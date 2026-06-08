@@ -1278,7 +1278,6 @@ int CMemoryCardMan::DummySave()
  */
 void CMemoryCardMan::SetLoadData()
 {
-    u8* save = reinterpret_cast<u8*>(m_saveBuffer);
     Mc::SaveDat* saveDat = GetSaveDat(m_saveBuffer);
 
     if (memcmp(saveDat->m_maker, CardConst::MCDAT_MAKER, strlen(CardConst::MCDAT_MAKER)) != 0)
@@ -1322,6 +1321,7 @@ void CMemoryCardMan::SetLoadData()
         return;
     }
 
+    u8* save = reinterpret_cast<u8*>(saveDat);
     *reinterpret_cast<u32*>(&Game.m_gameWork.m_scriptSysVal0) = *reinterpret_cast<u32*>(save + 0x20);
     Game.m_gameWork.m_timerA = *reinterpret_cast<int*>(save + 0x24);
     Game.m_gameWork.m_scriptGlobalTime = *reinterpret_cast<int*>(save + 0x28);

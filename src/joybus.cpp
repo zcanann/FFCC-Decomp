@@ -5343,9 +5343,10 @@ int JoyBus::SendCompatibility(ThreadParam* threadParam)
  */
 int JoyBus::SendCtrlMode(ThreadParam* threadParam, int controlMode)
 {
-    const int port = threadParam->m_portIndex;
+    unsigned int cmd = 0;
+    unsigned char* cmdBytes = (unsigned char*)&cmd;
     int modeByte = controlMode;
-    bool isSingle = GbaQue.IsSingleMode(port);
+    bool isSingle = GbaQue.IsSingleMode(threadParam->m_portIndex);
 
     // If single-player, force modeByte = 0
     if (isSingle)
@@ -5353,8 +5354,6 @@ int JoyBus::SendCtrlMode(ThreadParam* threadParam, int controlMode)
         modeByte = 0;
 	}
 
-    unsigned int cmd = 0;
-    unsigned char* cmdBytes = (unsigned char*)&cmd;
     cmdBytes[0] = 9;
     cmdBytes[1] = modeByte;
     int result = 0;
@@ -5380,7 +5379,7 @@ int JoyBus::SendCtrlMode(ThreadParam* threadParam, int controlMode)
 
     if (result == 0)
 	{
-        m_ctrlModeArr[port] = modeByte;
+        m_ctrlModeArr[threadParam->m_portIndex] = modeByte;
 	}
 
 	return result;

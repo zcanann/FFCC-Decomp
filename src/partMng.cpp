@@ -4276,7 +4276,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     mng->m_soundEffectData.m_soundEffectStartFrame <<= 0xC;
 
     mng->m_isFinished = 0;
-    mng->m_endRequested = 0;
+    mng->m_hitBgFlag = 0;
     mng->m_stopRequested = 0;
     mng->m_slotVisible = 1;
     mng->m_ownerFacing = 1;
@@ -4327,25 +4327,25 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     mng->m_paramA = createParam->m_paramA;
     mng->m_paramB = createParam->m_paramB;
 
-    const float baseX = *reinterpret_cast<float*>(fpData + 0x00);
-    const float baseY = *reinterpret_cast<float*>(fpData + 0x04);
-    const float baseZ = *reinterpret_cast<float*>(fpData + 0x08);
     if (createParam->m_positionOffsetPtr == 0) {
-        mng->m_position.x = baseX;
-        mng->m_position.y = baseY;
-        mng->m_position.z = baseZ;
+        mng->m_position.x = *reinterpret_cast<float*>(fpData + 0x00);
+        mng->m_position.y = *reinterpret_cast<float*>(fpData + 0x04);
+        mng->m_position.z = *reinterpret_cast<float*>(fpData + 0x08);
     } else {
-        mng->m_position.x = createParam->m_positionOffsetPtr->x + baseX;
-        mng->m_position.y = createParam->m_positionOffsetPtr->y + baseY;
-        mng->m_position.z = createParam->m_positionOffsetPtr->z + baseZ;
+        mng->m_position.x = createParam->m_positionOffsetPtr->x + *reinterpret_cast<float*>(fpData + 0x00);
+        mng->m_position.y = createParam->m_positionOffsetPtr->y + *reinterpret_cast<float*>(fpData + 0x04);
+        mng->m_position.z = createParam->m_positionOffsetPtr->z + *reinterpret_cast<float*>(fpData + 0x08);
     }
     mng->m_savedPosition = mng->m_position;
     mng->m_previousPosition = mng->m_position;
 
     if (createParam->m_extraPositionPtr != 0) {
-        mng->m_paramVec0.x = createParam->m_extraPositionPtr->x + baseX;
-        mng->m_paramVec0.y = createParam->m_extraPositionPtr->y + baseY;
-        mng->m_paramVec0.z = createParam->m_extraPositionPtr->z + baseZ;
+        mng->m_paramVec0.x = createParam->m_extraPositionPtr->x;
+        mng->m_paramVec0.y = createParam->m_extraPositionPtr->y;
+        mng->m_paramVec0.z = createParam->m_extraPositionPtr->z;
+        mng->m_paramVec0.x = mng->m_paramVec0.x + *reinterpret_cast<float*>(fpData + 0x00);
+        mng->m_paramVec0.y = mng->m_paramVec0.y + *reinterpret_cast<float*>(fpData + 0x04);
+        mng->m_paramVec0.z = mng->m_paramVec0.z + *reinterpret_cast<float*>(fpData + 0x08);
     }
 
     if (createParam->m_rotationPtr == 0) {
@@ -4355,27 +4355,23 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
         mng->m_rotation.w = *reinterpret_cast<short*>(fpData + 0x16);
         mng->m_rotationSpeed = *reinterpret_cast<int*>(fpData + 0x18);
     } else {
-        const float rotScale = 65536.0f / 360.0f;
-        int rotX = static_cast<int>(createParam->m_rotationPtr->x * rotScale);
-        int rotY = static_cast<int>(createParam->m_rotationPtr->y * rotScale);
+        int rotX = static_cast<int>(createParam->m_rotationPtr->x * 65536.0f / 360.0f);
+        int rotY = static_cast<int>(createParam->m_rotationPtr->y * 65536.0f / 360.0f);
         mng->m_rotation.x = static_cast<short>(rotX >> 16);
         mng->m_rotation.y = static_cast<short>(rotX);
         mng->m_rotation.z = static_cast<short>(rotY >> 16);
         mng->m_rotation.w = static_cast<short>(rotY);
-        mng->m_rotationSpeed = static_cast<int>(createParam->m_rotationPtr->z * rotScale);
+        mng->m_rotationSpeed = static_cast<int>(createParam->m_rotationPtr->z * 65536.0f / 360.0f);
     }
 
-    const float scaleX = *reinterpret_cast<float*>(fpData1 + 0x00);
-    const float scaleY = *reinterpret_cast<float*>(fpData1 + 0x04);
-    const float scaleZ = *reinterpret_cast<float*>(fpData1 + 0x08);
     if (createParam->m_scalePtr == 0) {
-        mng->m_scale.x = scaleX;
-        mng->m_scale.y = scaleY;
-        mng->m_scale.z = scaleZ;
+        mng->m_scale.x = *reinterpret_cast<float*>(fpData1 + 0x00);
+        mng->m_scale.y = *reinterpret_cast<float*>(fpData1 + 0x04);
+        mng->m_scale.z = *reinterpret_cast<float*>(fpData1 + 0x08);
     } else {
-        mng->m_scale.x = createParam->m_scalePtr->x * scaleX;
-        mng->m_scale.y = createParam->m_scalePtr->y * scaleY;
-        mng->m_scale.z = createParam->m_scalePtr->z * scaleZ;
+        mng->m_scale.x = createParam->m_scalePtr->x * *reinterpret_cast<float*>(fpData1 + 0x00);
+        mng->m_scale.y = createParam->m_scalePtr->y * *reinterpret_cast<float*>(fpData1 + 0x04);
+        mng->m_scale.z = createParam->m_scalePtr->z * *reinterpret_cast<float*>(fpData1 + 0x08);
     }
 
     mng->m_ownerScale = kPartMngOne;

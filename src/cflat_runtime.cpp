@@ -196,14 +196,14 @@ void CFlatRuntime::clear()
 
 	m_objectSentinel.m_previous = &m_objectSentinel;
 	m_objectSentinel.m_next = &m_objectSentinel;
-	m_objectSentinel.m_particleId = 0x10;
+	m_objectSentinel.m_0x32 = 0x10;
 
 	m_freeListPrev = reinterpret_cast<void**>(self + 0x978);
 	m_freeListNext = reinterpret_cast<void**>(self + 0x978);
 	m_freeListCount = 0x5220;
 	m_0x984 = 0;
-	m_objectPoolBase = self + 0x1288;
 	m_objectFreeListHead = reinterpret_cast<void**>(self + 0x998);
+	m_objectPoolBase = self + 0x1288;
 
 	u8* const freeNodes = self + 0x998;
 	for (int block = 0; block < 0x30; block++) {

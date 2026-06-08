@@ -394,50 +394,50 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 					}
 				} else if (systemVal <= -0x1F4 && systemVal >= -0x2F3) {
 					StoreS16(stack, classData, (systemVal + 0x2F3) * 2 + 0x9A4, setMode);
-				} else if (systemVal != -0x19D) {
-					if (systemVal < -0x19D) {
-						if (systemVal < -0x1A9) {
-							if (systemVal == -0x1B6) {
-								StoreU16(stack, classData, 0x3DE, setMode);
-							}
-						} else if (systemVal < -0x1A5) {
+				} else if (systemVal > -0x19D) {
+					if (systemVal >= -0x199) {
+						if (systemVal < -0x191) {
+							StoreU16(stack, classData, (systemVal + 0x199) * 2 + 0x3B8, setMode);
+						}
+					} else if (systemVal < -0x19B) {
+						StoreU32(stack, classData, 0x200, setMode);
+					}
+				} else if (systemVal == -0x19D) {
+					StoreU16(stack, classData, 0x3C8, setMode);
+				} else {
+					if (systemVal >= -0x1A9) {
+						if (systemVal < -0x1A5) {
 							StoreS16(stack, classData, (systemVal + 0x1A9) * 2 + 0xAC, setMode);
 						}
-					} else if (systemVal < -0x199) {
-						if (systemVal < -0x19B) {
-							StoreU32(stack, classData, 0x200, setMode);
-						}
-					} else if (systemVal < -0x191) {
-						StoreU16(stack, classData, (systemVal + 0x199) * 2 + 0x3B8, setMode);
+					} else if (systemVal == -0x1B6) {
+						StoreU16(stack, classData, 0x3DE, setMode);
 					}
-				} else {
-					StoreU16(stack, classData, 0x3C8, setMode);
 				}
 			} else if (systemVal <= -0x96 && systemVal >= -0x175) {
 				u8* const itemTable = *reinterpret_cast<u8**>(classData + 0x24);
 				StoreU16(stack, itemTable, (systemVal + 0x175) * 2, setMode);
-			} else if (systemVal < -0x52) {
-				if (systemVal < -0x84) {
-					if (systemVal >= -0x94) {
-						StoreU16(stack, classData, (systemVal + 0x94) * 2 + 0x8C, setMode);
+			} else if (systemVal >= -0x52) {
+				if (systemVal == -0x40) {
+					unsigned short* value = reinterpret_cast<unsigned short*>(classData + 0x1A);
+					stack[-1].m_word = *value;
+					if (setMode == 0) {
+						*value = stack->m_word;
+					} else if (setMode < 0) {
+						if (setMode > -2) {
+							*value = *value - stack->m_word;
+						}
+					} else if (setMode < 2) {
+						*value = *value + stack->m_word;
 					}
-				} else if (systemVal > -0x7A) {
+				} else if (systemVal == -0x41) {
+					StoreU16(stack, classData, 0x1C, setMode);
+				}
+			} else if (systemVal >= -0x84) {
+				if (systemVal > -0x7A) {
 					StoreU16(stack, classData, (-0x53 - systemVal) * 2 + 0x3E, setMode);
 				}
-			} else if (systemVal == -0x40) {
-				unsigned short* value = reinterpret_cast<unsigned short*>(classData + 0x1A);
-				stack[-1].m_word = *value;
-				if (setMode == 0) {
-					*value = stack->m_word;
-				} else if (setMode < 0) {
-					if (setMode > -2) {
-						*value = *value - stack->m_word;
-					}
-				} else if (setMode < 2) {
-					*value = *value + stack->m_word;
-				}
-			} else if (systemVal < -0x40 && systemVal > -0x42) {
-				StoreU16(stack, classData, 0x1C, setMode);
+			} else if (systemVal >= -0x94) {
+				StoreU16(stack, classData, (systemVal + 0x94) * 2 + 0x8C, setMode);
 			}
 
 			LastResult(this) = 0;
@@ -666,10 +666,10 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 					value = LoadU16(classData, 0x22);
 					break;
 				default:
-					if (systemVal <= -0x85 && systemVal > -0x95) {
-						value = LoadU16(classData, (systemVal + 0x94) * 2 + 0x8C);
-					} else if (systemVal < -0x52 && systemVal > -0x7A) {
+					if (systemVal < -0x52 && systemVal > -0x7A) {
 						value = LoadU16(classData, (-0x53 - systemVal) * 2 + 0x3E);
+					} else if (systemVal <= -0x85 && systemVal > -0x95) {
+						value = LoadU16(classData, (systemVal + 0x94) * 2 + 0x8C);
 					}
 					break;
 				}
@@ -972,9 +972,10 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			hitTarget.x = params[2];
 			hitTarget.y = params[3];
 			hitTarget.z = params[4];
+			float radius = params[5];
 			PSVECSubtract(&hitTarget, &hitStart, &hitMove);
-			unsigned int hit = MapPcs.CheckHitCylinderNear(&hitStart, &hitMove, params[5], object->m_localBase[0]);
-			AddDebugDrawCC(&hitStart, &hitMove, params[5], 1, 0);
+			int hit = MapPcs.CheckHitCylinderNear(&hitStart, &hitMove, radius, object->m_localBase[0]);
+			AddDebugDrawCC(&hitStart, &hitMove, radius, 1, 0);
 			if (hit != 0) {
 				*reinterpret_cast<int*>(object->m_localBase[6]) = 0;
 			}
@@ -1080,7 +1081,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			hitMove.x = kCFlatRuntime2Zero;
 			hitMove.y = -height;
 			hitMove.z = kCFlatRuntime2Zero;
-			unsigned int hit = MapPcs.CheckHitCylinderNear(&hitStart, &hitMove, radius, object->m_localBase[0]);
+			int hit = MapPcs.CheckHitCylinderNear(&hitStart, &hitMove, radius, object->m_localBase[0]);
 			AddDebugDrawCC(&hitStart, &hitMove, radius, 1, 0);
 			if (hit != 0) {
 				*reinterpret_cast<int*>(object->m_localBase[6]) = 0;
@@ -1101,19 +1102,19 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		}
 		case -0x2E: {
-			unsigned int index = object->m_localBase[0];
-			float x = reinterpret_cast<float*>(object->m_localBase)[1];
-			if (index == static_cast<unsigned int>(-1)) {
-				engineObject->m_attackColliders[1].m_localStart.x = x;
-				engineObject->m_attackColliders[2].m_localStart.x = x;
-				engineObject->m_attackColliders[3].m_localStart.x = x;
-				engineObject->m_attackColliders[4].m_localStart.x = x;
-				engineObject->m_attackColliders[5].m_localStart.x = x;
-				engineObject->m_attackColliders[6].m_localStart.x = x;
-				engineObject->m_attackColliders[7].m_localStart.x = x;
-				engineObject->m_damageColliders[0].m_localPosition.x = x;
+			int index = static_cast<int>(object->m_localBase[0]);
+			int x = static_cast<int>(object->m_localBase[1]);
+			if (index == -1) {
+				*reinterpret_cast<int*>(&engineObject->m_attackColliders[1].m_localStart.x) = x;
+				*reinterpret_cast<int*>(&engineObject->m_attackColliders[2].m_localStart.x) = x;
+				*reinterpret_cast<int*>(&engineObject->m_attackColliders[3].m_localStart.x) = x;
+				*reinterpret_cast<int*>(&engineObject->m_attackColliders[4].m_localStart.x) = x;
+				*reinterpret_cast<int*>(&engineObject->m_attackColliders[5].m_localStart.x) = x;
+				*reinterpret_cast<int*>(&engineObject->m_attackColliders[6].m_localStart.x) = x;
+				*reinterpret_cast<int*>(&engineObject->m_attackColliders[7].m_localStart.x) = x;
+				*reinterpret_cast<int*>(&engineObject->m_damageColliders[0].m_localPosition.x) = x;
 			} else {
-				engineObject->m_attackColliders[index + 1].m_localStart.x = x;
+				*reinterpret_cast<int*>(&engineObject->m_attackColliders[index + 1].m_localStart.x) = x;
 			}
 			PushValue(this, object, 0);
 			outResult = 0;
@@ -1240,16 +1241,20 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
-		case -0x46:
-			engineObject->LookAt(object->m_localBase[0] != 0 ? FindRuntimeObject(this, object->m_localBase[0]) : 0, 0);
+		case -0x46: {
+			CGObject* target = static_cast<int>(object->m_localBase[0]) != 0 ? FindRuntimeObject(this, object->m_localBase[0]) : 0;
+			engineObject->LookAt(target, 0);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
-		case -0x8C:
-			engineObject->LookAt(object->m_localBase[0] != 0 ? FindRuntimeObject(this, object->m_localBase[0]) : 0, RuntimeString(this, object->m_localBase[1]));
+		}
+		case -0x8C: {
+			CGObject* target = static_cast<int>(object->m_localBase[0]) != 0 ? FindRuntimeObject(this, object->m_localBase[0]) : 0;
+			engineObject->LookAt(target, RuntimeString(this, object->m_localBase[1]));
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
+		}
 		case -0x48:
 			engineObject->m_stepSlopeLimit = reinterpret_cast<float*>(object->m_localBase)[1];
 			if (object->m_localBase[0] != 0) {
@@ -1324,9 +1329,9 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		case -0x60: {
 			Vec safePos;
 			float safeDist = engineObject->CalcSafePos(static_cast<int>(object->m_localBase[0]), FindRuntimeObject(this, object->m_localBase[1]), &safePos);
-			*reinterpret_cast<unsigned int*>(object->m_localBase[2]) = *reinterpret_cast<unsigned int*>(&safePos.x);
-			*reinterpret_cast<unsigned int*>(object->m_localBase[3]) = *reinterpret_cast<unsigned int*>(&safePos.y);
-			*reinterpret_cast<unsigned int*>(object->m_localBase[4]) = *reinterpret_cast<unsigned int*>(&safePos.z);
+			*reinterpret_cast<float*>(object->m_localBase[2]) = safePos.x;
+			*reinterpret_cast<float*>(object->m_localBase[3]) = safePos.y;
+			*reinterpret_cast<float*>(object->m_localBase[4]) = safePos.z;
 			PushValue(this, object, *reinterpret_cast<int*>(&safeDist));
 			outResult = 0;
 			break;
@@ -1447,7 +1452,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		}
 		case -0x75: {
 			CCaravanWork* caravanWork = ScriptCaravan(engineObject);
-			if (caravanWork->m_evtState0 != object->m_localBase[0]) {
+			if (static_cast<int>(caravanWork->m_evtState0) != static_cast<int>(object->m_localBase[0])) {
 				caravanWork->m_evtState0 = object->m_localBase[0];
 				caravanWork->m_evtState1 = 0;
 			}
@@ -1456,7 +1461,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		}
 		case -0x6E:
-			*reinterpret_cast<unsigned int*>(&engineObject->m_lastBgAttr) = object->m_localBase[0];
+			engineObject->m_lastBgAttr = reinterpret_cast<float*>(object->m_localBase)[0];
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1524,13 +1529,15 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			    this, object, ScriptCaravan(engineObject)->GetFoodRank(static_cast<int>(object->m_localBase[0])));
 			outResult = 0;
 			break;
-		case -0x7D:
-			if (object->m_localBase[0] == 1) {
-				engineObject->m_bodyEllipsoidAspect = reinterpret_cast<float*>(object->m_localBase)[1];
+		case -0x7D: {
+			float aspect = reinterpret_cast<float*>(object->m_localBase)[1];
+			if (static_cast<int>(object->m_localBase[0]) == 1) {
+				engineObject->m_bodyEllipsoidAspect = aspect;
 			}
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
+		}
 		case -0x7E: {
 			unsigned int workIndex = RuntimeWorkAssignIndex(this);
 			RuntimeWorkAssignIndex(this) = workIndex + 1;
@@ -1624,9 +1631,9 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		case -0x88: {
 			Vec nearPos;
 			engineObject->CalcSphereNearPos(reinterpret_cast<float*>(object->m_localBase)[0], reinterpret_cast<float*>(object->m_localBase)[1], nearPos);
-			*reinterpret_cast<unsigned int*>(object->m_localBase[2]) = *reinterpret_cast<unsigned int*>(&nearPos.x);
-			*reinterpret_cast<unsigned int*>(object->m_localBase[3]) = *reinterpret_cast<unsigned int*>(&nearPos.y);
-			*reinterpret_cast<unsigned int*>(object->m_localBase[4]) = *reinterpret_cast<unsigned int*>(&nearPos.z);
+			*reinterpret_cast<float*>(object->m_localBase[2]) = nearPos.x;
+			*reinterpret_cast<float*>(object->m_localBase[3]) = nearPos.y;
+			*reinterpret_cast<float*>(object->m_localBase[4]) = nearPos.z;
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1671,10 +1678,10 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		case -0x91: {
 			float furTarget = reinterpret_cast<float*>(object->m_localBase)[0];
-			float furSetCur = reinterpret_cast<float*>(object->m_localBase)[1];
+			int furSetCur = static_cast<int>(object->m_localBase[1]);
 			CChara::CModel* model = engineObject->m_charaModelHandle->m_model;
 			model->m_furTarget = furTarget;
-			if (furSetCur != 0.0f) {
+			if (furSetCur != 0) {
 				model->m_furCur = furTarget;
 			}
 			PushValue(this, object, 0);

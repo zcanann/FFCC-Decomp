@@ -4447,7 +4447,7 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
             case -0x4A:
             case -0x49:
             case -0x48: {
-                int* value = &gameWork.m_bossArtifactStageTable[systemValue + 0x56];
+                int* value = &Game.m_gameWork.m_bossArtifactStageTable[systemValue + 0x56];
                 stack[-1].m_word = *value;
                 if (setMode < 0) {
                     if (setMode >= -1) {
@@ -4475,7 +4475,7 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
             case -0x59:
             case -0x58:
             case -0x57: {
-                int* value = &gameWork.m_unkStageTable[systemValue + 0x65];
+                int* value = &Game.m_gameWork.m_unkStageTable[systemValue + 0x65];
                 stack[-1].m_word = *value;
                 if (setMode < 0) {
                     if (setMode >= -1) {
@@ -4505,7 +4505,7 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
             case -0x69:
             case -0x68:
             case -0x67: {
-                int* value = &gameWork.m_eventHeader[systemValue + 0x6B];
+                int* value = &Game.m_gameWork.m_eventHeader[systemValue + 0x6B];
                 stack[-1].m_word = *value;
                 if (setMode < 0) {
                     if (setMode >= -1) {
@@ -4522,7 +4522,7 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
             case -0x46:
             case -0x45:
             case -0x44: {
-                int* value = &gameWork.m_wmBackupParams[systemValue + 0x47];
+                int* value = &Game.m_gameWork.m_wmBackupParams[systemValue + 0x47];
                 stack[-1].m_word = *value;
                 if (setMode < 0) {
                     if (setMode >= -1) {

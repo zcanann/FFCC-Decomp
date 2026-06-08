@@ -1908,8 +1908,7 @@ void CMenuPcs::LetterMessDraw()
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	CCaravanWork* const caravanWork = GetLetterCaravanWork();
-	int state = GetLetterStateBase(this);
-	s16 mode = *reinterpret_cast<s16*>(state + 0x32);
+	s16 mode = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x32);
 
 	s16* panel = reinterpret_cast<s16*>(m_singleFadeState) + 4;
 	for (int i = 0; i < reinterpret_cast<s16*>(m_singleFadeState)[0]; ++i, panel += 0x20) {
@@ -2003,6 +2002,7 @@ void CMenuPcs::LetterMessDraw()
 	}
 
 	DrawSingWin(-1);
+	int state = GetLetterStateBase(this);
 	if ((*reinterpret_cast<s16*>(state + 0x12) == 1) &&
 	    (m_menuWindowInfo->state == 1)) {
 		int msgType = static_cast<int>(*reinterpret_cast<signed char*>(state + 9));

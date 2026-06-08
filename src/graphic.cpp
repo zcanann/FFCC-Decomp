@@ -1660,7 +1660,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		if (depthAlphaFar == 0) {
 			depthAlphaFar = 0xFF;
 		}
-		if (depthAlphaFar > 0xFF) {
+		if (depthAlphaFar >= 0xFF) {
 			depthAlphaFar = 0xFF;
 		}
 		farAlpha = (signed char)depthAlphaFar;
@@ -1675,8 +1675,8 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 	}
 
 	gUtil.SetVtxFmt_POS_CLR_TEX();
-	Graphic.CreateSmallBackTexture(Graphic.m_scratchTextureBuffer, &smallBackTex, 0x140, 0xE0, GX_NEAR, GX_TF_RGBA8, 0);
-	Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backBufferTex, 0, 0, 0x280, 0x1C0, texBufferSize, GX_NEAR,
+	Graphic.CreateSmallBackTexture(Graphic.m_scratchTextureBuffer, &smallBackTex, 0x140, 0xE0, GX_LINEAR, GX_TF_RGBA8, 0);
+	Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backBufferTex, 0, 0, 0x280, 0x1C0, texBufferSize, GX_LINEAR,
 	                   (_GXTexFmt)0x11, 0);
 	gUtil.SetVtxFmt_POS_CLR_TEX0_TEX1();
 	gUtil.SetOrthoEnv();

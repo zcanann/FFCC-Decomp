@@ -1815,7 +1815,7 @@ void CMenuPcs::CmakeJobClose()
  */
 unsigned short CMenuPcs::CmakeJobCtrl()
 {
-    short down;
+    unsigned short down;
     unsigned short repeat;
 
     int padLock = Pad.m_debugPadLock;

@@ -57,11 +57,11 @@ void CMenuPcs::FavoDraw()
 			float u = entry->u;
 			float v = entry->v;
 
+			GXColor colors[4];
 			if (i < 3) {
 				MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(entry->tex));
 
-				GXColor colors[4];
 				colors[0].r = 0xFF;
 				colors[0].g = 0xFF;
 				colors[0].b = 0xFF;
@@ -137,12 +137,11 @@ void CMenuPcs::FavoDraw()
 				MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 			} else {
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(entry->tex));
-				GXColor color;
-				color.r = 0xFF;
-				color.g = 0xFF;
-				color.b = 0xFF;
-				color.a = static_cast<unsigned char>(entry->alpha * 255.0f);
-				GXSetChanMatColor(GX_COLOR0A0, color);
+				colors[0].r = 0xFF;
+				colors[0].g = 0xFF;
+				colors[0].b = 0xFF;
+				colors[0].a = static_cast<unsigned char>(entry->alpha * 255.0f);
+				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 				MenuPcs.DrawRect(0, x, y, w, h, u, v, entry->uvScale, entry->uvScale, 0.0f);
 			}
 		}

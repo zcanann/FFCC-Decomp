@@ -447,15 +447,20 @@ void CMesMenu::onDraw()
     if ((m_menuIndex == 0) && ((int)((unsigned int)CFlatGameFlags() << 30) < 0)) {
         int iconFrame = 0;
         int charaMode = Chara.MogFur().m_commandIndex;
-        if (charaMode == 2) {
+        switch (charaMode) {
+        case 0:
+            iconFrame = 3;
+            break;
+        case 1:
+            iconFrame = 4;
+            break;
+        case 2:
             iconFrame = 5;
-        } else if (charaMode < 2) {
-            if (charaMode == 0) {
-                iconFrame = 3;
-            } else if (charaMode >= 0) {
-                iconFrame = 4;
-            }
-        } else if (charaMode == 4) {
+            break;
+        case 3:
+            iconFrame = 2;
+            break;
+        case 4: {
             unsigned short buttons;
             if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
                 buttons = 0;
@@ -467,8 +472,8 @@ void CMesMenu::onDraw()
             if ((buttons & 0x100) != 0) {
                 iconFrame = s_mesMenuIconFrames[(System.m_frameCounter & 6) >> 1];
             }
-        } else if (charaMode < 4) {
-            iconFrame = 2;
+            break;
+        }
         }
 
         CColor colorStorage(0xFF, 0xFF, 0xFF, 0xFF);

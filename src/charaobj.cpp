@@ -1162,21 +1162,19 @@ int CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos)
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	int slot = 4;
 	for (int i = 0; i < 4; i++) {
-		IgnoreHitSlot& slotData = m_ignoreHit[i];
-		unsigned char flag = slotData.m_flag;
-		if ((flag & 0x80) != 0) {
-			if (slotData.m_source == sourceObj) {
+		if (m_ignoreHit[i].m_flagBits.m_flag_80 != 0) {
+			if (m_ignoreHit[i].m_source == sourceObj) {
 				return 2;
 			}
 		} else {
 			slot = i;
-			slotData.m_flag = static_cast<unsigned char>((flag & 0x7F) | 0x80);
-			slotData.m_source = sourceObj;
+			m_ignoreHit[i].m_flagBits.m_flag_80 = 1;
+			m_ignoreHit[i].m_source = sourceObj;
 
 			unsigned int particleIndex = static_cast<unsigned int>(m_itemId);
 			unsigned short particleLife =
 				*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (particleIndex * 0x48) + 0xE);
-			slotData.m_timer = (particleLife == 3) ? 0x1E : 0;
+			m_ignoreHit[i].m_timer = (particleLife == 3) ? 0x1E : 0;
 			break;
 		}
 	}

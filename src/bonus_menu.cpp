@@ -2033,8 +2033,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			short* sprite = (short*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
 			*(int*)(sprite + 0x12) = *(int*)(sprite - activePartyCount * 0x20 + 0x12) +
 			    *(int*)(sprite - activePartyCount * 0x20 + 0x14);
-			sprite[0x16] = 0;
-			sprite[0x17] = 1;
+			*(int*)((int)sprite + 0x2c) = 1;
 			*(float*)(sprite + 0x1c) = (float)(int)*sprite;
 			*(float*)(sprite + 0x18) = FLOAT_80331ED0;
 			*sprite = (short)(int)((float)(int)*sprite - *(float*)(sprite + 0x18));
@@ -2068,8 +2067,7 @@ void CMenuPcs::CalcResultCloseAnim()
 		for (int i = 0; i < activePartyCount; i++) {
 			short* sprite = (short*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
 			*(int*)(sprite + 0x12) = *(int*)(sprite - (base - activePartyCount - 1) * 0x20 + 0x12);
-			sprite[0x16] = 0;
-			sprite[0x17] = 1;
+			*(int*)((int)sprite + 0x2c) = 1;
 			*(float*)(sprite + 0x1c) = (float)(int)*sprite;
 			*(float*)(sprite + 0x18) = FLOAT_80331ED0;
 			*sprite = (short)(int)((float)(int)*sprite - *(float*)(sprite + 0x18));
@@ -2093,8 +2091,7 @@ void CMenuPcs::CalcResultCloseAnim()
 		for (int i = 0; i < activePartyCount; i++) {
 			short* sprite = (short*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
 			*(int*)(sprite + 0x12) = *(int*)(sprite - (base - activePartyCount - 1) * 0x20 + 0x12);
-			sprite[0x16] = 0;
-			sprite[0x17] = 1;
+			*(int*)((int)sprite + 0x2c) = 1;
 			*(float*)(sprite + 0x1c) = (float)(int)*sprite;
 			*(float*)(sprite + 0x18) = FLOAT_80331ED0;
 			*sprite = (short)(int)((float)(int)*sprite - *(float*)(sprite + 0x18));
@@ -2111,8 +2108,7 @@ void CMenuPcs::CalcResultCloseAnim()
 		for (int i = 0; i < activePartyCount; i++) {
 			short* sprite = (short*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
 			*(int*)(sprite + 0x12) = *(int*)(sprite - activePartyCount * 0x20 + 0x12);
-			sprite[0x16] = 0;
-			sprite[0x17] = 1;
+			*(int*)((int)sprite + 0x2c) = 1;
 			*(float*)(sprite + 0x1c) = (float)(int)*sprite;
 			*(float*)(sprite + 0x18) = FLOAT_80331ED0;
 			*sprite = (short)(int)((float)(int)*sprite - *(float*)(sprite + 0x18));
@@ -2129,8 +2125,7 @@ void CMenuPcs::CalcResultCloseAnim()
 		for (int i = 0; i < activePartyCount; i++) {
 			short* sprite = (short*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
 			*(int*)(sprite + 0x12) = *(int*)(sprite - (base - activePartyCount - 1) * 0x20 + 0x12);
-			sprite[0x16] = 0;
-			sprite[0x17] = 1;
+			*(int*)((int)sprite + 0x2c) = 1;
 			*(float*)(sprite + 0x1c) = (float)(int)*sprite;
 			*(float*)(sprite + 0x18) = FLOAT_80331ED0;
 			*sprite = (short)(int)((float)(int)*sprite - *(float*)(sprite + 0x18));

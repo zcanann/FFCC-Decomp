@@ -2984,7 +2984,7 @@ void CGCharaObj::statAttack()
 	itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + m_itemId * 0x48;
 	seFrame = *reinterpret_cast<unsigned short*>(itemData + 0x3E);
 	if ((seFrame & 0x8000) == 0 && m_stateFrame == seFrame) {
-		unsigned int seSpec = *reinterpret_cast<unsigned short*>(itemData + 0x3C);
+		int seSpec = *reinterpret_cast<unsigned short*>(itemData + 0x3C);
 		if (seSpec != 0) {
 			if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
 				int seNo = (seSpec == 0xFFFF) ? 0 : ((seSpec & 0xFF) + ((seSpec >> 8) * 1000));

@@ -532,8 +532,8 @@ void CGObject::move()
         movingWithScript = true;
     } else {
         const s8 player = m_animStateMisc;
-        if ((static_cast<char>(player) >= 0)
-            && (static_cast<char>(player) < 4)
+        if ((player >= 0)
+            && (player < 4)
             && m_weaponNodeFlagAll.m_bits1.m_shield
             && m_weaponNodeFlagAll.m_bits1.m_menuReady
             && ((Game.m_gameWork.m_menuStageMode == 0) || (player == 0))) {
@@ -2858,7 +2858,7 @@ int CGObject::IsLoopAnim(int mode)
 
     if (static_cast<double>(lastAttr) < static_cast<double>(sZeroFloat)) {
         return (static_cast<u32>(static_cast<u8>(
-                    (threshold <= static_cast<double>(sZeroFloat)) << 1))
+                    (static_cast<double>(sZeroFloat) >= threshold) << 1))
                 << 0x1C)
                >> 0x1D;
     }

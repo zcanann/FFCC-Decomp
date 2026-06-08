@@ -988,13 +988,13 @@ int CCharaPcs::correctLoadAnimAmem()
  */
 void CCharaPcs::onScriptChanging(char*)
 {
-    for (int i = 0; i < 5; i++) {
+    for (unsigned int i = 0; i < 5; i++) {
         CColor white(0xFF, 0xFF, 0xFF, 0xFF);
         CColor shade;
 
         float scale = static_cast<float>(i) * 0.25f;
         shade.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.r) * scale));
-        shade.color.g = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.g) * scale));
+        shade.color.g = static_cast<unsigned char>(static_cast<unsigned int>(static_cast<float>(white.color.g) * scale));
         shade.color.b = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.b) * scale));
         shade.color.a = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.a) * scale));
         CColor shadeCopy(shade);

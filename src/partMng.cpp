@@ -4320,10 +4320,8 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     }
 
     if (createParam->m_rotationPtr == 0) {
-        mng->m_rotation.x = *reinterpret_cast<short*>(fpData + 0x10);
-        mng->m_rotation.y = *reinterpret_cast<short*>(fpData + 0x12);
-        mng->m_rotation.z = *reinterpret_cast<short*>(fpData + 0x14);
-        mng->m_rotation.w = *reinterpret_cast<short*>(fpData + 0x16);
+        *reinterpret_cast<int*>(&mng->m_rotation.x) = *reinterpret_cast<int*>(fpData + 0x10);
+        *reinterpret_cast<int*>(&mng->m_rotation.z) = *reinterpret_cast<int*>(fpData + 0x14);
         mng->m_rotationSpeed = *reinterpret_cast<int*>(fpData + 0x18);
     } else {
         int rotX = static_cast<int>(createParam->m_rotationPtr->x * 65536.0f / 360.0f);

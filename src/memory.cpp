@@ -222,14 +222,14 @@ static inline void stageReleaseMode2Buffer(CMemory::CStage* stage)
     }
 }
 
-static inline void stageDestroyAndPool(CMemory* memory, CMemory::CStage* stage)
+static inline void stageDestroyAndPool(CMemory* memory, CMemory::CStage* stage, const char* strBase)
 {
     int mode = stageGetAllocationMode(stage);
     CMemory::CMode& modeData = memory->Mode(mode);
 
     if (mode != 2) {
         if (stageHasUnfreedBlocks(stage)) {
-            System.Printf(const_cast<char*>(sStageQuitBlockUnfreedAllocFmt), stageGetSourceName(stage));
+            System.Printf(const_cast<char*>(strBase + 0x5d4), stageGetSourceName(stage));
             stage->heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
         }
     } else {
@@ -423,7 +423,7 @@ void CMemory::Quit()
 {
     const char* strBase = reinterpret_cast<const char*>(sHeapBarColors);
 
-    stageDestroyAndPool(this, m_mainMemoryStage);
+    stageDestroyAndPool(this, m_mainMemoryStage, strBase);
 
     CMode* modeData = m_modes;
     for (int pass = 0; pass < 3; pass++, modeData++) {
@@ -436,18 +436,18 @@ void CMemory::Quit()
                 if (pass == 0) {
                     if (stage != m_currentMemoryStage) {
                         System.Printf(const_cast<char*>(strBase + 0x7b0), stage->m_allocationSourceStr);
-                        stageDestroyAndPool(this, stage);
+                        stageDestroyAndPool(this, stage, strBase);
                     }
                 } else {
                     System.Printf(const_cast<char*>(strBase + 0x7b0), stage->m_allocationSourceStr);
-                    stageDestroyAndPool(this, stage);
+                    stageDestroyAndPool(this, stage, strBase);
                 }
                 stage = next;
             }
         }
     }
 
-    stageDestroyAndPool(this, m_currentMemoryStage);
+    stageDestroyAndPool(this, m_currentMemoryStage, strBase);
 }
 
 /*

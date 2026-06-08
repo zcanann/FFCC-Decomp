@@ -953,7 +953,7 @@ void CMesMenu::onCalc()
                     }
                 } else if ((repeatMask & 4) != 0) {
                     cursor++;
-                    if (*(unsigned int*)((char*)this + 0x3D30) <= cursor) {
+                    if (*(int*)((char*)this + 0x3D30) <= cursor) {
                         cursor = 0;
                     }
                     if ((m_flags & 0x4000) == 0) {

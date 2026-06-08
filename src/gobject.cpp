@@ -937,22 +937,22 @@ void CGObject::bgNormalCollision()
     unsigned int retry = 4;
     while (retry != 0) {
         GObjectMapCylinder bodyCylinder;
-        bodyCylinder.m_bottom = pos;
-        bodyCylinder.Probe().m_direction = move;
+        bodyCylinder.Probe().m_radius2 = m_capsuleHalfHeight;
         bodyCylinder.Probe().m_radius = sHugeCylinderExtent;
         bodyCylinder.Probe().m_height = sHugeCylinderExtent;
-        bodyCylinder.Probe().m_top = move;
+        bodyCylinder.Probe().m_height2 = sZeroFloat;
         bodyCylinder.Probe().m_direction2.x = sNegHugeCylinderExtent;
         bodyCylinder.Probe().m_direction2.y = sNegHugeCylinderExtent;
         bodyCylinder.Probe().m_direction2.z = sNegHugeCylinderExtent;
-        bodyCylinder.Probe().m_radius2 = m_capsuleHalfHeight;
-        bodyCylinder.Probe().m_height2 = sZeroFloat;
+        bodyCylinder.m_bottom = pos;
+        bodyCylinder.Probe().m_direction = move;
+        bodyCylinder.Probe().m_top = move;
 
         if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&bodyCylinder), &move, m_bgHitMask) == 0) {
             break;
         }
 
-        m_stateFlags0Bits.unk6 = 1;
+        m_stateFlags0Bits.unk1 = 1;
         MapMng.m_hitMapObj->CalcHitSlide(&move, sJumpLift);
 
         if (fabs(static_cast<double>(move.x)) < DOUBLE_80330400) {
@@ -981,18 +981,18 @@ void CGObject::bgNormalCollision()
     move.z = sZeroFloat;
 
     GObjectMapCylinder stepCylinder;
-    stepCylinder.m_bottom = pos;
-    stepCylinder.Probe().m_direction.x = sZeroFloat;
-    stepCylinder.Probe().m_direction.y = move.y;
-    stepCylinder.Probe().m_direction.z = sZeroFloat;
+    stepCylinder.Probe().m_radius2 = m_capsuleHalfHeight;
     stepCylinder.Probe().m_radius = sHugeCylinderExtent;
     stepCylinder.Probe().m_height = sHugeCylinderExtent;
-    stepCylinder.Probe().m_top = stepCylinder.Probe().m_direction;
+    stepCylinder.Probe().m_height2 = sZeroFloat;
     stepCylinder.Probe().m_direction2.x = sNegHugeCylinderExtent;
     stepCylinder.Probe().m_direction2.y = sNegHugeCylinderExtent;
     stepCylinder.Probe().m_direction2.z = sNegHugeCylinderExtent;
-    stepCylinder.Probe().m_radius2 = m_capsuleHalfHeight;
-    stepCylinder.Probe().m_height2 = sZeroFloat;
+    stepCylinder.m_bottom = pos;
+    stepCylinder.Probe().m_direction.x = sZeroFloat;
+    stepCylinder.Probe().m_direction.z = sZeroFloat;
+    stepCylinder.Probe().m_direction.y = move.y;
+    stepCylinder.Probe().m_top = stepCylinder.Probe().m_direction;
 
     if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&stepCylinder), &move, m_bgHitMask) == 0) {
         pos.y -= m_capsuleHalfHeight;

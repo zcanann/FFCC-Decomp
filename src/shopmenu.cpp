@@ -1134,18 +1134,19 @@ void CShopMenu::DrawItemInfo0()
     }
 
     bool canTrade = false;
-    if (itemNo > 0) {
+    int tradeItemNo = getItemNo(itemIndex);
+    if (tradeItemNo > 0) {
         if (m_listType == 0) {
             canTrade = true;
         } else if (m_listType == 2) {
             canTrade = true;
-            if ((caravanWork->m_shopArgs[(itemNo - 0x191) >> 5] &
-                 (1U << ((itemNo - 0x191) & 0x1F))) == 0) {
+            if ((caravanWork->m_shopArgs[(tradeItemNo - 0x191) >> 5] &
+                 (1U << ((tradeItemNo - 0x191) & 0x1F))) == 0) {
                 canTrade = false;
             }
         } else if (m_listType == 1) {
             if (MenuPcs.EquipChk(itemIndex) == 0) {
-                if (itemNo >= 0x9F) {
+                if (tradeItemNo >= 0x9F) {
                     canTrade = true;
                 }
             }

@@ -1863,7 +1863,20 @@ void CFlatRuntime2::drawLayer(
 	short u0 = static_cast<short>(texU);
 	short v0 = static_cast<short>(texV);
 
-	if (blendMode == 3) {
+	if (blendMode != 3) {
+		GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+		GXPosition3f32(x0, y0, FLOAT_80330144);
+		GXTexCoord2s16(u0, v0);
+
+		GXPosition3f32(x1, y0, FLOAT_80330144);
+		GXTexCoord2s16(u1, v0);
+
+		GXPosition3f32(x1, y1, FLOAT_80330144);
+		GXTexCoord2s16(u1, v1);
+
+		GXPosition3f32(x0, y1, FLOAT_80330144);
+		GXTexCoord2s16(u0, v1);
+	} else {
 		GXSetNumTexGens(2);
 		GXSetTexCoordGen2(
 			GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
@@ -1882,8 +1895,8 @@ void CFlatRuntime2::drawLayer(
 		_GXSetTevAlphaIn((_GXTevStageID)tevStage, (_GXTevAlphaArg)7, (_GXTevAlphaArg)4, (_GXTevAlphaArg)0, (_GXTevAlphaArg)7);
 		_GXSetTevAlphaOp((_GXTevStageID)tevStage, (_GXTevOp)0, (_GXTevBias)0, (_GXTevScale)0, 1, (_GXTevRegID)0);
 
-		const int pixelWidth = static_cast<int>(scaledWidth * 0.5f);
-		const int pixelHeight = static_cast<int>(scaledHeight * 0.5f);
+		const int pixelWidth = static_cast<int>(scaledWidth * FLOAT_80330154);
+		const int pixelHeight = static_cast<int>(scaledHeight * FLOAT_80330154);
 
 		for (int quad = 0; quad < 4; quad++) {
 			int bx = static_cast<int>(x0);
@@ -1940,19 +1953,6 @@ void CFlatRuntime2::drawLayer(
 			GXTexCoord2s16(quadU0, quadV1);
 			GXTexCoord2s16(0, 2);
 		}
-	} else {
-		GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-		GXPosition3f32(x0, y0, FLOAT_80330144);
-		GXTexCoord2s16(u0, v0);
-
-		GXPosition3f32(x1, y0, FLOAT_80330144);
-		GXTexCoord2s16(u1, v0);
-
-		GXPosition3f32(x1, y1, FLOAT_80330144);
-		GXTexCoord2s16(u1, v1);
-
-		GXPosition3f32(x0, y1, FLOAT_80330144);
-		GXTexCoord2s16(u0, v1);
 	}
 
 	Mtx44 projection;

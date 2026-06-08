@@ -3301,16 +3301,16 @@ void CMapMng::SetMeshCameraSemiTransAlpha(unsigned short id, int alpha, int fram
     }
 
     if (!found) {
-        if (System.m_execParam >= 1) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1) {
             System.Printf(g_MsgFlashy);
         }
-        if (System.m_execParam >= 1) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1) {
             System.Printf(const_cast<char*>(s_set_bg_camera_semi_trans_missing_fmt), id);
         }
-        if (System.m_execParam >= 1) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1) {
             System.Printf(g_MsgFlashy);
         }
-        if (System.m_execParam >= 1) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1) {
             System.Printf(const_cast<char*>(s_mapNewLine));
         }
     }

@@ -288,7 +288,8 @@ void CMenuPcs::CompaDraw()
 	font->SetShadow(0);
 	font->SetScale(kCompaJobFontScale);
 	font->DrawInit();
-	font->SetColor(textColor);
+	GXColor jobColor = CColor(0xFF, 0xFF, 0xFF, static_cast<signed char>(kCompaColorMax * compaList->entries[0].alpha)).color;
+	font->SetColor(jobColor);
 
 	const char* job = GetJobStr(caravanWork->unk_0x3ac);
 	font->GetWidth(job);

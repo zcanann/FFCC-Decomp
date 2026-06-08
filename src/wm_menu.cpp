@@ -11021,7 +11021,7 @@ LAB_draw:
 						dateY = slotY + FLOAT_803314d8;
 					}
 					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x17));
-					const unsigned int saveYear = *reinterpret_cast<int*>(slotData + 8);
+					const int saveYear = *reinterpret_cast<int*>(slotData + 8);
 					int digitCount = 1;
 					if (saveYear > 99) {
 						digitCount = 3;
@@ -11036,7 +11036,7 @@ LAB_draw:
 						for (int di = 0; di < digitCount; di++) {
 							int digit;
 							if (digitCount == 1) {
-								const int t = saveYear / 10 + (saveYear >> 0x1F);
+								const unsigned int t = saveYear / 10 + (saveYear >> 0x1F);
 								digit = saveYear + (t - (t >> 0x1F)) * -10;
 							} else if (di == 0) {
 								const int t = saveYear / 10 + (saveYear >> 0x1F);
@@ -11142,12 +11142,12 @@ LAB_draw:
 					if (modelNo >= 0) {
 						const int faceNo = modelNo - 100;
 						const int tribe = faceNo / 100 + (faceNo >> 31);
-						const unsigned int tribeIndex = static_cast<unsigned int>(tribe - (tribe >> 31));
+						const int tribeIndex = static_cast<unsigned int>(tribe - (tribe >> 31));
 						float texU = FLOAT_803314f0;
 						if ((tribeIndex & 1) != 0) {
 							texU = FLOAT_80331560;
 						}
-						const int variant = faceNo + (tribe - (tribe >> 31)) * -100;
+						const unsigned int variant = faceNo + (tribe - (tribe >> 31)) * -100;
 						MenuPcs.DrawRect(0xFFFFFFFF, iconX, slotY + FLOAT_803314d8, FLOAT_80331468, FLOAT_80331468,
 						         texU + FLOAT_80331468 * static_cast<float>(variant),
 						         FLOAT_80331468 * static_cast<float>(static_cast<int>(tribeIndex / 2)),
@@ -11225,7 +11225,7 @@ LAB_draw:
 					         static_cast<float>(static_cast<double>(slotY) + DOUBLE_80331510),
 					         FLOAT_80331578, FLOAT_80331578,
 					         static_cast<float>(static_cast<int>(static_cast<char>(mapInfo[1])) << 7),
-					         static_cast<float>(static_cast<int>(static_cast<char>(mapInfo[2])) << 7),
+					         static_cast<float>(static_cast<unsigned int>(static_cast<char>(mapInfo[2])) << 7),
 					         FLOAT_80331434, FLOAT_80331434, 0.0f);
 				}
 			}

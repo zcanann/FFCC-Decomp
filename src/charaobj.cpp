@@ -657,28 +657,32 @@ void CGCharaObj::onFramePostCalc()
 
 	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x38) += 1;
 
-	if ((static_cast<signed char>(m_ignoreHit[0].m_flag) < 0) && m_ignoreHit[0].m_timer != 0) {
-		m_ignoreHit[0].m_timer = static_cast<unsigned short>(m_ignoreHit[0].m_timer - 1);
-		if (m_ignoreHit[0].m_timer == 0) {
-			m_ignoreHit[0].m_flag &= 0x7F;
+	if (m_ignoreHit[0].m_flagBits.m_flag_80 && m_ignoreHit[0].m_timer != 0) {
+		short t = static_cast<short>(m_ignoreHit[0].m_timer - 1);
+		m_ignoreHit[0].m_timer = t;
+		if (t == 0) {
+			m_ignoreHit[0].m_flagBits.m_flag_80 = 0;
 		}
 	}
-	if ((static_cast<signed char>(m_ignoreHit[1].m_flag) < 0) && m_ignoreHit[1].m_timer != 0) {
-		m_ignoreHit[1].m_timer = static_cast<unsigned short>(m_ignoreHit[1].m_timer - 1);
-		if (m_ignoreHit[1].m_timer == 0) {
-			m_ignoreHit[1].m_flag &= 0x7F;
+	if (m_ignoreHit[1].m_flagBits.m_flag_80 && m_ignoreHit[1].m_timer != 0) {
+		short t = static_cast<short>(m_ignoreHit[1].m_timer - 1);
+		m_ignoreHit[1].m_timer = t;
+		if (t == 0) {
+			m_ignoreHit[1].m_flagBits.m_flag_80 = 0;
 		}
 	}
-	if ((static_cast<signed char>(m_ignoreHit[2].m_flag) < 0) && m_ignoreHit[2].m_timer != 0) {
-		m_ignoreHit[2].m_timer = static_cast<unsigned short>(m_ignoreHit[2].m_timer - 1);
-		if (m_ignoreHit[2].m_timer == 0) {
-			m_ignoreHit[2].m_flag &= 0x7F;
+	if (m_ignoreHit[2].m_flagBits.m_flag_80 && m_ignoreHit[2].m_timer != 0) {
+		short t = static_cast<short>(m_ignoreHit[2].m_timer - 1);
+		m_ignoreHit[2].m_timer = t;
+		if (t == 0) {
+			m_ignoreHit[2].m_flagBits.m_flag_80 = 0;
 		}
 	}
-	if ((static_cast<signed char>(m_ignoreHit[3].m_flag) < 0) && m_ignoreHit[3].m_timer != 0) {
-		m_ignoreHit[3].m_timer = static_cast<unsigned short>(m_ignoreHit[3].m_timer - 1);
-		if (m_ignoreHit[3].m_timer == 0) {
-			m_ignoreHit[3].m_flag &= 0x7F;
+	if (m_ignoreHit[3].m_flagBits.m_flag_80 && m_ignoreHit[3].m_timer != 0) {
+		short t = static_cast<short>(m_ignoreHit[3].m_timer - 1);
+		m_ignoreHit[3].m_timer = t;
+		if (t == 0) {
+			m_ignoreHit[3].m_flagBits.m_flag_80 = 0;
 		}
 	}
 }

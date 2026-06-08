@@ -26,9 +26,17 @@ class CGCharaObj : public CGPrgObj
 public:
 	struct IgnoreHitSlot
 	{
-		unsigned char m_flag;
+		union
+		{
+			unsigned char m_flag;
+			struct
+			{
+				unsigned char m_flag_80 : 1;
+				unsigned char m_flag_lo : 7;
+			} m_flagBits;
+		};
 		unsigned char m_pad;
-		unsigned short m_timer;
+		signed short m_timer;
 		CGObject* m_source;
 	};
 

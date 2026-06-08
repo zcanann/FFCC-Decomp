@@ -1183,7 +1183,7 @@ void CCharaPcs::GetTexShadow(int startIndex, int maxCount, _GXTexObj* texObjs, V
     int shadowIndex = 0;
     CHandle* handle = m_handleList->m_next;
 
-    while (handle != m_handleList) {
+    while (m_handleList != handle) {
         if ((handle->m_flags & 0x200) != 0 && handle->m_shadowTexturePtr != 0) {
             if (startIndex <= shadowIndex) {
                 const int outIndex = shadowIndex - startIndex;

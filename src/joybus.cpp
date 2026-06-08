@@ -2339,27 +2339,25 @@ void JoyBus::ThreadInit()
 
     m_threadInitFlag = 0;
     m_threadRunningMask = 0;
-    ThreadParam* threadParam = m_threadParams;
-    OSThread* thread = m_threads;
 
-    for (int i = 0; i < 4; i++, threadParam++, thread++)
+    for (int i = 0; i < 4; i++)
     {
-        threadParam->m_portIndex = i;
-        threadParam->m_gbaStatus = 1;
+        m_threadParams[i].m_portIndex = i;
+        m_threadParams[i].m_gbaStatus = 1;
 
         unsigned char* stackBase = m_sendBuffer[i] + sizeof(m_sendBuffer[0]);
 
         OSCreateThread(
-            thread,
+            &m_threads[i],
             (void* (*)(void*))JoyBus::_ThreadMain,
-            threadParam,
+            &m_threadParams[i],
             stackBase,
             sizeof(m_sendBuffer[0]),
             8,
             1
         );
 
-        OSResumeThread(thread);
+        OSResumeThread(&m_threads[i]);
 
         m_threadRunningMask |= (1 << i);
     }

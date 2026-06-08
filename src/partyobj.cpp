@@ -3291,7 +3291,7 @@ void CGPartyObj::statPut()
 	if (Game.m_gameWork.m_menuStageMode != 0 &&
 	    Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
 	    (static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
-	    m_scriptHandle[0xED] != 0) {
+	    reinterpret_cast<int*>(m_scriptHandle)[0xED] != 0) {
 		if (m_stateFrame == 0) {
 			CancelMove(1);
 			FLOAT_8032EE80 = FLOAT_80331AB0;

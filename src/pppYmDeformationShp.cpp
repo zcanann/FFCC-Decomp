@@ -74,8 +74,8 @@ inline void oddToEven(int& value)
 
 inline void calcScreenPos(Vec4d& out, Vec pos, Mtx drawMtx, Mtx44 screenMtx)
 {
-	Vec4d clipPos;
 	Vec worldPos;
+	Vec4d clipPos;
 
 	PSMTXMultVec(drawMtx, &pos, &worldPos);
 	clipPos.x = worldPos.x;

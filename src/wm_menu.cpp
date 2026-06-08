@@ -8140,8 +8140,6 @@ void CMenuPcs::CalcChara()
 		}
 	}
 
-	CalcCharaSelect();
-
 	int modelIndex = 0;
 	for (int i = 0; i < kWmMenuPlayerCount; i++, charaWork += 0x14, modelIndex += 0x34) {
 		CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[i];

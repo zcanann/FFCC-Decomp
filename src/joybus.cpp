@@ -4,6 +4,8 @@
 #include "ffcc/gbaque.h"
 #include "ffcc/game.h"
 #include "ffcc/p_menu.h"
+#include "ffcc/p_gba.h"
+#include "ffcc/memory.h"
 #include "ffcc/system.h"
 #include "global.h"
 
@@ -276,9 +278,9 @@ void JoyBus::CreateInit()
 
     if (m_gbaBootImage == 0)
     {
-        m_gbaBootImage = new char[0x38000];
+        m_gbaBootImage = new (GbaPcs.m_stage, const_cast<char*>(s_joybus_cpp), 0x122) char[0x38000];
 
-        if (m_gbaBootImage == 0 && (unsigned int)System.m_execParam != 0)
+        if (m_gbaBootImage == 0 && (unsigned int)System.m_execParam >= 1)
         {
             System.Printf(const_cast<char*>(s_mem_alloc_error_fmt),
                 const_cast<char*>(s_joybus_cpp), 0x126);
@@ -305,9 +307,9 @@ void JoyBus::CreateInit()
 
     if (m_fileBaseA == 0)
     {
-        m_fileBaseA = reinterpret_cast<unsigned int*>(new char[len + 0x20]);
+        m_fileBaseA = reinterpret_cast<unsigned int*>(new (GbaPcs.m_stage, const_cast<char*>(s_joybus_cpp), 0x137) char[len + 0x20]);
 
-        if (m_fileBaseA == (unsigned int*)nullptr && (unsigned int)System.m_execParam != 0)
+        if (m_fileBaseA == (unsigned int*)nullptr && (unsigned int)System.m_execParam >= 1)
         {
             System.Printf(const_cast<char*>(s_mem_alloc_error_fmt), const_cast<char*>(s_joybus_cpp), 0x13A);
         }
@@ -320,9 +322,9 @@ void JoyBus::CreateInit()
 
     if (m_fileBaseB == 0)
     {
-        m_fileBaseB = reinterpret_cast<unsigned int*>(new char[0x5000]);
+        m_fileBaseB = reinterpret_cast<unsigned int*>(new (GbaPcs.m_stage, const_cast<char*>(s_joybus_cpp), 0x143) char[0x5000]);
 
-        if (m_fileBaseB == 0 && (unsigned int)System.m_execParam != 0)
+        if (m_fileBaseB == 0 && (unsigned int)System.m_execParam >= 1)
         {
             System.Printf(const_cast<char*>(s_mem_alloc_error_fmt), const_cast<char*>(s_joybus_cpp), 0x146);
         }
@@ -336,9 +338,9 @@ void JoyBus::CreateInit()
     {
         if (m_letterBuffer[i] == 0)
         {
-            m_letterBuffer[i] = new char[0x2800];
+            m_letterBuffer[i] = new (GbaPcs.m_stage, const_cast<char*>(s_joybus_cpp), 0x152) char[0x2800];
 
-            if (m_letterBuffer[i] == 0 && (unsigned int)System.m_execParam != 0)
+            if (m_letterBuffer[i] == 0 && (unsigned int)System.m_execParam >= 1)
             {
                 System.Printf(const_cast<char*>(s_mem_alloc_error_fmt), const_cast<char*>(s_joybus_cpp), 0x155);
             }

@@ -748,8 +748,7 @@ void CMenuPcs::ArtiInit()
 	ArtiOpenAnim* entry0 = GetArtiOpenAnimList(this)->entries;
 	yOffset = 0;
 	int byteOffset = 0x100;
-	int loopCount = 4;
-	do {
+	for (int loopCount = 0; loopCount < 4; loopCount++) {
 		entry = (ArtiOpenAnim*)((char*)GetArtiOpenAnimList(this)->entries + byteOffset);
 		entry->flags = 2;
 		entry->tex = 0x37;
@@ -778,8 +777,7 @@ void CMenuPcs::ArtiInit()
 		entry->duration = 5;
 		yOffset = yOffset + 0x20;
 		byteOffset = byteOffset + 0x40;
-		loopCount--;
-	} while (loopCount != 0);
+	}
 
 	GetArtiOpenAnimList(this)->count = count;
 	GetArtiState(this)->selections[0] = 0;

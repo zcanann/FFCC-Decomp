@@ -3140,12 +3140,12 @@ int CMenuPcs::GetSmithItem(int itemNo)
     int raceType = race & 3;
     int itemBase = Game.unkCFlatData0[2] + itemNo * 0x48;
 
-    int smithItem = *reinterpret_cast<u16*>((itemBase + (race & 3) * 2) + 0x38);
+    int smithItem = *reinterpret_cast<u16*>(itemBase + (race & 3) * 2 + 0x38);
     if (smithItem > 0) {
         unsigned int genderMask = 0x10;
         u16 flags = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + smithItem * 0x48 + 4);
         unsigned int raceMask = 1 << (*reinterpret_cast<u16*>(reinterpret_cast<unsigned int>(SingleCaravanWork()) + 0x3e0) & 3);
-        if (*reinterpret_cast<short*>(reinterpret_cast<unsigned int>(SingleCaravanWork()) + 0x3e2) != 0) {
+        if (*reinterpret_cast<u16*>(reinterpret_cast<unsigned int>(SingleCaravanWork()) + 0x3e2) != 0) {
             genderMask = 0x20;
         }
 

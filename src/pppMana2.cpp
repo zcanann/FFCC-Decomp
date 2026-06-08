@@ -1009,19 +1009,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     }
 
     envTexObj0 = &work->m_envTexture0->m_texObj;
-    if (step->m_rippleLevel == 0) {
-        if (work->m_paraboloidReady == 0) {
-            GXInitTexObj(work->m_generatedTexObj0, work->m_generatedTexture0, 0x80, 0x80, (_GXTexFmt)4, (_GXTexWrapMode)1,
-                         (_GXTexWrapMode)1, GX_FALSE);
-            GXInitTexObj(work->m_generatedTexObj1, work->m_generatedTexture1, 0x80, 0x80, (_GXTexFmt)4, (_GXTexWrapMode)1,
-                         (_GXTexWrapMode)1, GX_FALSE);
-            drawParaboloidMap(work->m_baseParaboloidTexObjs, work->m_generatedTexObj1, work->m_paraboloidMap,
-                              work->m_paraboloidMapSize, envTexObj0, 1);
-            drawParaboloidMap(work->m_baseParaboloidTexObjs, work->m_generatedTexObj0, work->m_paraboloidMap,
-                              work->m_paraboloidMapSize, envTexObj0, 0);
-            work->m_paraboloidReady = 1;
-        }
-    } else {
+    if (step->m_rippleLevel != 0) {
         GXInitTexObj(work->m_generatedTexObj0, work->m_generatedTexture0, 0x80, 0x80, (_GXTexFmt)4, (_GXTexWrapMode)0,
                      (_GXTexWrapMode)0, GX_FALSE);
         GXInitTexObj(work->m_generatedTexObj1, work->m_generatedTexture1, 0x80, 0x80, (_GXTexFmt)4, (_GXTexWrapMode)0,
@@ -1033,6 +1021,18 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
         Graphic.SetViewport();
         GXSetProjection(savedScreenMtx, (_GXProjectionType)0);
         PSMTXCopy(savedCameraMtx, CameraMatrix());
+    } else {
+        if (work->m_paraboloidReady == 0) {
+            GXInitTexObj(work->m_generatedTexObj0, work->m_generatedTexture0, 0x80, 0x80, (_GXTexFmt)4, (_GXTexWrapMode)1,
+                         (_GXTexWrapMode)1, GX_FALSE);
+            GXInitTexObj(work->m_generatedTexObj1, work->m_generatedTexture1, 0x80, 0x80, (_GXTexFmt)4, (_GXTexWrapMode)1,
+                         (_GXTexWrapMode)1, GX_FALSE);
+            drawParaboloidMap(work->m_baseParaboloidTexObjs, work->m_generatedTexObj1, work->m_paraboloidMap,
+                              work->m_paraboloidMapSize, envTexObj0, 1);
+            drawParaboloidMap(work->m_baseParaboloidTexObjs, work->m_generatedTexObj0, work->m_paraboloidMap,
+                              work->m_paraboloidMapSize, envTexObj0, 0);
+            work->m_paraboloidReady = 1;
+        }
     }
 
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);

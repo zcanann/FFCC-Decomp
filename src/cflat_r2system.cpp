@@ -1607,10 +1607,9 @@ int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long*
     Vec bestPosition;
 
     for (unsigned int i = 0; i + 1 < pointCount; i++) {
-        Vec* candidate = &points[i];
-        float distanceSq = PSVECSquareDistance(candidate, targetPosition);
+        float distanceSq = PSVECSquareDistance(&points[i], targetPosition);
         if (distanceSq < maxDistanceSq || infiniteRange) {
-            Vec candidatePosition = *candidate;
+            Vec candidatePosition = points[i];
             float distance = sqrtf(distanceSq);
             if (distance < bestDistance) {
                 bestDistance = distance;
@@ -1622,10 +1621,9 @@ int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long*
         }
 
         if (i + 1 == pointCount - 1) {
-            candidate = &points[i + 1];
-            distanceSq = PSVECSquareDistance(candidate, targetPosition);
+            distanceSq = PSVECSquareDistance(&points[i + 1], targetPosition);
             if (distanceSq < maxDistanceSq || infiniteRange) {
-                Vec candidatePosition = *candidate;
+                Vec candidatePosition = points[i + 1];
                 float distance = sqrtf(distanceSq);
                 if (distance < bestDistance) {
                     bestDistance = distance;

@@ -695,57 +695,57 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
 
     GetItemType(itemNo, 1);
     raceBits = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 4);
+    int raceLow = raceBits & 0xF;
+    int genderMask = raceBits & 0x30;
     outText[0] = '\0';
 
-    if ((raceBits & 0xF) == 0xF) {
-        if (Game.m_gameWork.m_languageId == 3) {
+    if (raceLow == 0xF) {
+        switch (Game.m_gameWork.m_languageId) {
+        case 2:
+            text = (char*)gSingMenuTextTableDe[19];
+            break;
+        case 3:
             text = (char*)gSingMenuTextTableIt[19];
-        } else if (Game.m_gameWork.m_languageId < 3) {
-            if (Game.m_gameWork.m_languageId == 1 || Game.m_gameWork.m_languageId == 0) {
-                text = (char*)gSingMenuTextTableEn[19];
-            } else {
-                text = (char*)gSingMenuTextTableDe[19];
-            }
-        } else if (Game.m_gameWork.m_languageId == 5) {
-            text = (char*)gSingMenuTextTableEs[19];
-        } else if (Game.m_gameWork.m_languageId < 5) {
+            break;
+        case 4:
             text = (char*)gSingMenuTextTableFr[19];
-        } else {
+            break;
+        case 5:
+            text = (char*)gSingMenuTextTableEs[19];
+            break;
+        case 1:
+        default:
             text = (char*)gSingMenuTextTableEn[19];
+            break;
         }
         strcpy(outText, text);
         return;
     }
 
-    raceType = 0;
-    if ((raceBits & 1) == 0) {
-        raceType = 1;
-        if ((raceBits & 2) == 0) {
-            raceType = 2;
-            if ((raceBits & 4) == 0) {
-                raceType = 3;
-                if ((raceBits & 8) == 0) {
-                    raceType = 4;
-                }
-            }
+    for (raceType = 0; raceType < 4; raceType++) {
+        if ((raceBits & (1 << raceType)) != 0) {
+            break;
         }
     }
 
     if (raceType < 4) {
-        if (Game.m_gameWork.m_languageId == 3) {
+        switch (Game.m_gameWork.m_languageId) {
+        case 2:
+            text = (char*)PTR_s_Clavat_80214100[raceType];
+            break;
+        case 3:
             text = (char*)PTR_s_Clavat_80214110[raceType];
-        } else if (Game.m_gameWork.m_languageId < 3) {
-            if (Game.m_gameWork.m_languageId == 1 || Game.m_gameWork.m_languageId == 0) {
-                text = (char*)PTR_s_Clavat_802140f0[raceType];
-            } else {
-                text = (char*)PTR_s_Clavat_80214100[raceType];
-            }
-        } else if (Game.m_gameWork.m_languageId == 5) {
-            text = (char*)PTR_s_Clavate[raceType];
-        } else if (Game.m_gameWork.m_languageId < 5) {
+            break;
+        case 4:
             text = (char*)PTR_s_Clavat_80214120[raceType];
-        } else {
+            break;
+        case 5:
+            text = (char*)PTR_s_Clavate[raceType];
+            break;
+        case 1:
+        default:
             text = (char*)PTR_s_Clavat_802140f0[raceType];
+            break;
         }
 
         strcpy(outText, text);
@@ -754,28 +754,31 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
         }
     }
 
-    if ((raceBits & 0xF) != 0 && (raceBits & 0x30) != 0) {
+    if (raceLow != 0 && genderMask != 0) {
         strcpy(outText, (char*)s_space_8033295c);
     }
-    if ((raceBits & 0x30) == 0) {
+    if (genderMask == 0) {
         return;
     }
 
-    raceType = (raceBits & 0x30) >> 5;
-    if (Game.m_gameWork.m_languageId == 3) {
+    raceType = genderMask >> 5;
+    switch (Game.m_gameWork.m_languageId) {
+    case 2:
+        suffix = (char*)gSingMenuTextTableDe[raceType + 17];
+        break;
+    case 3:
         suffix = (char*)gSingMenuTextTableIt[raceType + 17];
-    } else if (Game.m_gameWork.m_languageId < 3) {
-        if (Game.m_gameWork.m_languageId == 1 || Game.m_gameWork.m_languageId == 0) {
-            suffix = (char*)gSingMenuTextTableEn[raceType + 17];
-        } else {
-            suffix = (char*)gSingMenuTextTableDe[raceType + 17];
-        }
-    } else if (Game.m_gameWork.m_languageId == 5) {
-        suffix = (char*)gSingMenuTextTableEs[raceType + 17];
-    } else if (Game.m_gameWork.m_languageId < 5) {
+        break;
+    case 4:
         suffix = (char*)gSingMenuTextTableFr[raceType + 17];
-    } else {
+        break;
+    case 5:
+        suffix = (char*)gSingMenuTextTableEs[raceType + 17];
+        break;
+    case 1:
+    default:
         suffix = (char*)gSingMenuTextTableEn[raceType + 17];
+        break;
     }
     strcat(outText, suffix);
 }
@@ -960,21 +963,18 @@ static inline const char* GetSingWinMessage(int staticText, const char* dynamicT
     }
 
     int languageId = Game.m_gameWork.m_languageId;
-    if (languageId == 3) {
+    switch (languageId) {
+    case 2:
+        return (char*)gSingMenuTextTableDe[staticText];
+    case 3:
         return (char*)gSingMenuTextTableIt[staticText];
-    } else if (languageId < 3) {
-        if ((languageId == 1) || (languageId == 0)) {
-            return (char*)gSingMenuTextTableEn[staticText];
-        } else {
-            return (char*)gSingMenuTextTableDe[staticText];
-        }
-    } else if (languageId == 5) {
-        return (char*)gSingMenuTextTableEs[staticText];
-    } else {
-        if (4 < languageId) {
-            return (char*)gSingMenuTextTableEn[staticText];
-        }
+    case 4:
         return (char*)gSingMenuTextTableFr[staticText];
+    case 5:
+        return (char*)gSingMenuTextTableEs[staticText];
+    case 1:
+    default:
+        return (char*)gSingMenuTextTableEn[staticText];
     }
 }
 
@@ -3137,29 +3137,31 @@ int CMenuPcs::GetSmithItem(int itemNo)
 
     GetItemType(itemNo, 1);
     u16 race = *reinterpret_cast<u16*>(caravanWork + 0x3e0);
-    u16 raceType = race & 3;
+    int raceType = race & 3;
     int itemBase = Game.unkCFlatData0[2] + itemNo * 0x48;
 
-    unsigned int smithItem = *reinterpret_cast<u16*>(itemBase + (race & 3) * 2 + 0x38);
-    if (smithItem != 0) {
+    int smithItem = *reinterpret_cast<u16*>(itemBase + (race & 3) * 2 + 0x38);
+    if (smithItem > 0) {
         unsigned int genderMask = 0x10;
         u16 flags = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + smithItem * 0x48 + 4);
         unsigned int raceMask = 1 << (*reinterpret_cast<u16*>(reinterpret_cast<unsigned int>(SingleCaravanWork()) + 0x3e0) & 3);
-        if (*reinterpret_cast<short*>(reinterpret_cast<unsigned int>(SingleCaravanWork()) + 0x3e2) != 0) {
+        if (*reinterpret_cast<u16*>(reinterpret_cast<unsigned int>(SingleCaravanWork()) + 0x3e2) != 0) {
             genderMask = 0x20;
         }
 
+        int raceFlags = flags & 0xF;
+        int genderFlags = flags & 0x30;
         unsigned int valid;
-        if (((flags & 0xF) != 0) && ((flags & 0x30) != 0)) {
-            if (((flags & 0xF & raceMask) == 0) || ((flags & 0x30 & genderMask) == 0)) {
-                valid = 0;
-            } else {
+        if ((raceFlags != 0) && (genderFlags != 0)) {
+            if (((raceFlags & raceMask) != 0) && ((genderFlags & genderMask) != 0)) {
                 valid = 1;
+            } else {
+                valid = 0;
             }
-        } else if ((flags & 0xF) == 0) {
-            valid = static_cast<unsigned int>(-static_cast<int>(flags & 0x30 & genderMask)) >> 0x1f;
+        } else if (raceFlags == 0) {
+            valid = static_cast<unsigned int>(-static_cast<int>(genderFlags & genderMask)) >> 0x1f;
         } else {
-            valid = static_cast<unsigned int>(-static_cast<int>(flags & 0xF & raceMask)) >> 0x1f;
+            valid = static_cast<unsigned int>(-static_cast<int>(raceFlags & raceMask)) >> 0x1f;
         }
 
         if (valid != 0) {
@@ -3167,13 +3169,15 @@ int CMenuPcs::GetSmithItem(int itemNo)
         }
     }
 
-    if ((((((race & 3) == 0) || (smithItem = *reinterpret_cast<u16*>(itemBase + 0x38), smithItem == 0)) &&
-          ((raceType == 1) || (smithItem = *reinterpret_cast<u16*>(itemBase + 0x3A), smithItem == 0))) &&
-         ((raceType == 2) || (smithItem = *reinterpret_cast<u16*>(itemBase + 0x3C), smithItem == 0))) &&
-        ((raceType == 3) || (smithItem = *reinterpret_cast<u16*>(itemBase + 0x3E), smithItem == 0))) {
-        smithItem = 0xFFFFFFFF;
+    for (int i = 0; i < 4; i++) {
+        if (raceType != i) {
+            smithItem = *reinterpret_cast<u16*>(itemBase + 0x38 + i * 2);
+            if (smithItem > 0) {
+                return smithItem;
+            }
+        }
     }
-    return smithItem;
+    return 0xFFFFFFFF;
 }
 
 /*
@@ -3336,7 +3340,7 @@ void CMenuPcs::DrawSingLife()
         y = 64.0f * static_cast<float>(sin(0.01745329238474369f * (9.0f * static_cast<float>(phase)))) + yBase;
     } else {
         y = 32.0f;
-        if (lifeTimer > 0x27) {
+        if (lifeTimer >= 0x28) {
             int t = 10 - (lifeTimer - 0x28);
             int phase;
             if (t < 0) {
@@ -3414,8 +3418,9 @@ u8 CMenuPcs::GetItemIcon(int index)
  */
 int CMenuPcs::GetItemType(int itemId, int useRawItemId)
 {
+    const CCaravanWork* caravanWork = SingleCaravanWork();
     if (useRawItemId == 0) {
-        itemId = static_cast<int>(SingleCaravanWork()->m_inventoryItems[itemId]);
+        itemId = static_cast<int>(caravanWork->m_inventoryItems[itemId]);
     }
 
     if (itemId <= 0) {
@@ -3435,6 +3440,9 @@ int CMenuPcs::GetItemType(int itemId, int useRawItemId)
     }
     if (itemId <= 0x129) {
         return 5;
+    }
+    if (itemId <= 0x17C) {
+        return 6;
     }
     if (itemId <= 0x17C) {
         return 6;

@@ -4159,7 +4159,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
         unsigned int result = 0;
         const unsigned short* row =
             reinterpret_cast<const unsigned short*>(Game.unkCFlatData0[2]) +
-            (0x5FF - (valueIndex - valueIndex / 0x600 * 0x600)) * 0x24;
+            (0x5FF - valueIndex % 0x600) * 0x24;
 
         switch (valueIndex / 0x600) {
         case 0: result = row[0]; break;

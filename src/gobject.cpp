@@ -2720,12 +2720,17 @@ void CGObject::InitWork(int index)
     char ownerType;
 
     ownerType = m_ownerType;
-    if (ownerType == 1) {
-        InitWorkFn initWork = reinterpret_cast<InitWorkFn>(reinterpret_cast<void**>(*m_scriptHandle)[3]);
-        initWork(m_scriptHandle, index, Game.unkCFlatData0[1] + index * 0x1D0, 0);
-    } else if ((ownerType < 1) && (ownerType > -1)) {
+    switch (ownerType) {
+    case 0: {
         InitWorkFn initWork = reinterpret_cast<InitWorkFn>(reinterpret_cast<void**>(*m_scriptHandle)[3]);
         initWork(m_scriptHandle, index, Game.unkCFlatData0[0] + index * 0x1D0, 0);
+        break;
+    }
+    case 1: {
+        InitWorkFn initWork = reinterpret_cast<InitWorkFn>(reinterpret_cast<void**>(*m_scriptHandle)[3]);
+        initWork(m_scriptHandle, index, Game.unkCFlatData0[1] + index * 0x1D0, 0);
+        break;
+    }
     }
 }
 

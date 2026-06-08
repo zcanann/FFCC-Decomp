@@ -1745,7 +1745,6 @@ void CMenuPcs::CmakeJobDraw()
 
     DrawCmakePreviewChara(this);
 
-    int panelAlpha = static_cast<int>(255.0f * alpha);
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
@@ -1753,7 +1752,7 @@ void CMenuPcs::CmakeJobDraw()
     panelColor.r = 0xFF;
     panelColor.g = 0xFF;
     panelColor.b = 0xFF;
-    panelColor.a = static_cast<unsigned char>(panelAlpha);
+    panelColor.a = static_cast<unsigned char>(static_cast<int>(255.0f * alpha));
     GXSetChanMatColor(GX_COLOR0A0, panelColor);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
     MenuPcs.DrawRect(
@@ -1769,7 +1768,7 @@ void CMenuPcs::CmakeJobDraw()
     font->SetScale(1.0f);
     font->DrawInit();
 
-    CColor textColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(panelAlpha));
+    CColor textColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(255.0f * alpha)));
     font->SetColor(textColor.color);
 
     for (int i = 0; i < 8; ++i) {

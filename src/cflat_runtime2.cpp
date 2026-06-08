@@ -1829,9 +1829,9 @@ void CFlatRuntime2::drawLayer(
 	TextureMan.SetTexture(GX_TEXMAP0, texture);
 
 	Mtx texMtx;
-	const float texW = static_cast<float>(texture->m_width);
-	const float texH = static_cast<float>(texture->m_height);
-	PSMTXScale(texMtx, 1.0f / texW, 1.0f / texH, 1.0f);
+	const float texW = static_cast<float>(static_cast<unsigned int>(texture->m_width));
+	const float texH = static_cast<float>(static_cast<unsigned int>(texture->m_height));
+	PSMTXScale(texMtx, FLOAT_80330140 / texW, FLOAT_80330140 / texH, FLOAT_80330140);
 	GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
 	GXSetNumTexGens(1);
 	GXSetTexCoordGen2(
@@ -1846,16 +1846,22 @@ void CFlatRuntime2::drawLayer(
 
 	const float scaledWidth = static_cast<float>(width) * scaleX;
 	const float scaledHeight = static_cast<float>(height) * scaleY;
-	const float xAnchor = (flags & 1) != 0 ? scaledWidth * 0.5f : 0.0f;
-	const float yAnchor = (flags & 1) != 0 ? scaledHeight * 0.5f : 0.0f;
+	short u1 = static_cast<short>(texU + static_cast<short>(width));
+	short v1 = static_cast<short>(texV + static_cast<short>(height));
+	float xAnchor = FLOAT_80330144;
+	if ((flags & 1) != 0) {
+		xAnchor = FLOAT_80330154 * scaledWidth;
+	}
 	const float x0 = static_cast<float>(x) - xAnchor;
+	float yAnchor = FLOAT_80330144;
+	if ((flags & 1) != 0) {
+		yAnchor = FLOAT_80330154 * scaledHeight;
+	}
 	const float y0 = static_cast<float>(y) - yAnchor;
 	const float x1 = x0 + scaledWidth;
 	const float y1 = y0 + scaledHeight;
 	short u0 = static_cast<short>(texU);
 	short v0 = static_cast<short>(texV);
-	short u1 = static_cast<short>(texU + width);
-	short v1 = static_cast<short>(texV + height);
 
 	if (blendMode == 3) {
 		GXSetNumTexGens(2);

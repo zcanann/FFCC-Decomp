@@ -34,10 +34,10 @@ enum GraphicCppStringOffset {
     kGraphicInitCGraphic = 0xA0,
     kGraphicInitSource = 0xB8,
     kGraphicInitCGraphic2 = 0x1F8,
-    kGraphicCppPartControlDoneFmt = 0x34,
-    kGraphicCppPartCharaDoneFmt = 0x78,
-    kGraphicCppPartDoneFmt = 0xB8,
-    kGraphicCppDrawDoneFmt = 0xF4,
+    kGraphicCppPartControlDoneFmt = 0xEC,
+    kGraphicCppPartCharaDoneFmt = 0x130,
+    kGraphicCppPartDoneFmt = 0x170,
+    kGraphicCppDrawDoneFmt = 0x1AC,
 };
 
 static inline float LoadFloat(const float& value) {
@@ -506,7 +506,7 @@ void CGraphic::_WaitDrawDone(char* file, int line)
  */
 void CGraphic::Thread()
 {
-    char* debugFmtBase = const_cast<char*>(sGraphicSourceStrings);
+    char* debugFmtBase = const_cast<char*>(sGraphicInitData);
     int lastCounter = -1;
     int debugCountdown = 5;
 
@@ -521,7 +521,7 @@ void CGraphic::Thread()
             if (debugCountdown == 0) {
                 u32 drawSyncRaw = GXReadDrawSync();
                 drawSyncRaw &= 0xFFFF;
-                unsigned int drawSyncPart = drawSyncRaw;
+                int drawSyncPart = drawSyncRaw;
                 if ((drawSyncRaw & 0x8000) != 0) {
                     drawSyncPart &= 0x7FFF;
                     if (drawSyncPart == 0x7FFF) {

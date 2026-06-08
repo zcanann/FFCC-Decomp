@@ -857,7 +857,7 @@ void CGPartyObj::onFrameAlways()
 		if (m_weaponModelHandle == nullptr) {
 			int weaponItem = party.pendingWeaponItem;
 			int weaponRef = party.weaponItem;
-			if (weaponItem < 1) {
+			if (weaponItem <= 0) {
 				LoadWeapon(-1, 0);
 			} else {
 				unsigned short packedItem = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + weaponItem * 0x48 + 2);
@@ -877,7 +877,7 @@ void CGPartyObj::onFrameAlways()
 		} else {
 			shieldItem = *reinterpret_cast<short*>(script + shieldIndex * 2 + 0xB6);
 		}
-		if (shieldItem < 1) {
+		if (shieldItem <= 0) {
 			LoadShield(-1);
 		} else {
 			int shieldModel = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + shieldItem * 0x48 + 2) & 0xFFF;
@@ -1021,7 +1021,7 @@ void CGPartyObj::onFramePreCalc()
 		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x44) == 0);
 
 		if (canImmediateSwap) {
-			if (weaponItem < 1) {
+			if (weaponItem <= 0) {
 				LoadWeapon(-1, 0);
 			} else {
 				unsigned short packedItem = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + weaponItem * 0x48 + 2);

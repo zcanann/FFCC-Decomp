@@ -2701,14 +2701,14 @@ unsigned int CMenuPcs::CmdClose1()
 
 	if (state == 0) {
 		const s32 selected = GetCmdStateView(this)->selected;
-		GetCmdListStorage(this)->entries[selected].alpha =
+		*reinterpret_cast<f32*>(reinterpret_cast<u8*>(GetCmdList(this)) + selected * 0x40 + 0x18) =
 			static_cast<float>(kCmdMenuTransitionStepD * static_cast<f64>(GetCmdStateView(this)->transitionTimer));
 
 		if (caravanWork->m_commandListExtra[selected + 1] == -1) {
-			GetCmdListStorage(this)->entries[selected + 1].alpha =
+			*reinterpret_cast<f32*>(reinterpret_cast<u8*>(GetCmdList(this)) + (selected + 1) * 0x40 + 0x18) =
 				static_cast<float>(kCmdMenuTransitionStepD * static_cast<f64>(GetCmdStateView(this)->transitionTimer));
 			if (caravanWork->m_commandListExtra[selected + 2] == -1) {
-				GetCmdListStorage(this)->entries[selected + 2].alpha =
+				*reinterpret_cast<f32*>(reinterpret_cast<u8*>(GetCmdList(this)) + (selected + 2) * 0x40 + 0x18) =
 					static_cast<float>(kCmdMenuTransitionStepD * static_cast<f64>(GetCmdStateView(this)->transitionTimer));
 			}
 		}

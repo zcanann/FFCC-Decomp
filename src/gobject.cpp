@@ -510,7 +510,7 @@ void CGObject::move()
         if (moveMag == static_cast<double>(sZeroFloat)) {
             scriptMoveEnd = 1;
         } else if (m_weaponNodeFlagAll.m_bits1.m_bit10
-                   || (static_cast<double>(m_moveTimer) <= moveMag)) {
+                   || (moveMag >= static_cast<double>(m_moveTimer))) {
             PSVECNormalize(&moveVec, &moveVec);
             PSVECScale(&moveVec, &moveVec, static_cast<float>(m_moveTimer));
         } else {

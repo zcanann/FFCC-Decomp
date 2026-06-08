@@ -1121,7 +1121,7 @@ int CMenuPcs::LetterCtrl()
  * JP Address: TODO
  * JP Size: TODO
  */
-bool CMenuPcs::LetterClose()
+int CMenuPcs::LetterClose()
 {
 	s_OpenClose = 1;
 	int finished = 0;
@@ -1160,9 +1160,9 @@ bool CMenuPcs::LetterClose()
 		}
 	}
 
-	bool allFinished = false;
+	int allFinished = 0;
 	if (panelCount == finished) {
-		allFinished = true;
+		allFinished = 1;
 	}
 	if (allFinished && SingGetLetterAttachflg() >= 0) {
 		int state2 = GetLetterStateBase(this);
@@ -1990,8 +1990,8 @@ void CMenuPcs::LetterMessDraw()
 
 	DrawInit();
 
-	if (letter->AttachmentValue() != 0) {
-		int icon = 0x26 + (letter->IsAttachmentClaimed() ? 1 : 0);
+	if (caravanWork->m_letters[s_SelLetter].AttachmentValue() != 0) {
+		int icon = 0x26 + (caravanWork->m_letters[s_SelLetter].IsAttachmentClaimed() ? 1 : 0);
 		DrawSingleIcon(
 		    icon, static_cast<int>(FLOAT_8033314c), static_cast<int>(FLOAT_80333150),
 		    *reinterpret_cast<float*>(animBase + 0xC), 1, FLOAT_80333154);

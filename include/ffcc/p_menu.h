@@ -593,7 +593,7 @@ public:
     inline void LetterInit4();
     bool LetterOpen();
     int LetterCtrl();
-    bool LetterClose();
+    int LetterClose();
     inline void LetterLstOpen();
     inline void LetterLstClose();
     inline void LetterMessOpen();

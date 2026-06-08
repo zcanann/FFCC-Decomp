@@ -3454,14 +3454,14 @@ void* CPartMng::pppFileRead(char* filePath, unsigned long& fileSize, void* readB
         loadState->m_partAsyncBusy[loadState->m_asyncHandleCount] = fileHandle;
         loadState->m_asyncHandleCount++;
     } else {
-        if (readBuffer == 0) {
+        if (readBuffer != 0) {
+            fileSize = readBufferSize;
+        } else {
             fileSize = File.GetLength(fileHandle);
             File.Read(fileHandle);
             File.SyncCompleted(fileHandle);
             readBuffer = File.m_readBuffer;
             File.Close(fileHandle);
-        } else {
-            fileSize = readBufferSize;
         }
         if (loadState->m_partLoadMode == 2) {
             Memory.CopyToAMemorySync(readBuffer, reinterpret_cast<void*>(loadState->m_partAMemCursor), fileSize);

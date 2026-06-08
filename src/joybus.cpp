@@ -3125,7 +3125,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
 
             threadParam->m_gbaStatus = GBARead(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(readBuf), &threadParam->m_unk3);
 
-            if (threadParam->m_gbaStatus == 0)
+            if ((int)threadParam->m_gbaStatus == 0)
             {
                 threadParam->m_recvReadIdx = readBuf[0];
 
@@ -3238,15 +3238,14 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
                 if (status == 0)
                 {
                     header = tmpBuf.h;
-                    flags  = tmpBuf.f;
 
                     if (header == 1)
                     {
                         status = 0;
 
-                        threadParam->m_gbaBootFlag    = (unsigned char)((int)(signed char)flags >> 6);
-                        threadParam->m_unk2           = (unsigned char)((flags >> 4) & 0x03);
-                        threadParam->m_bootRetryCount = (unsigned char)(flags & 0x0F);
+                        threadParam->m_gbaBootFlag    = (unsigned char)((int)(signed char)tmpBuf.f >> 6);
+                        threadParam->m_unk2           = (unsigned char)((tmpBuf.f >> 4) & 0x03);
+                        threadParam->m_bootRetryCount = (unsigned char)(tmpBuf.f & 0x0F);
                     }
                     else
                     {
@@ -3299,10 +3298,10 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
                 if (status == 0)
                 {
                     // Bit-twiddly inequality check preserved from decomp
-                    unsigned char a = (signed char)((timeValue - threadParam->m_timestamp) >> 24);
-                    unsigned char b = (unsigned char)((threadParam->m_timestamp - timeValue) >> 24);
+                    unsigned int a = timeValue - threadParam->m_timestamp;
+                    unsigned int b = threadParam->m_timestamp - timeValue;
 
-                    threadParam->m_timeChangedFlag = (unsigned char)((a | b) >> 7);
+                    threadParam->m_timeChangedFlag = (unsigned char)((a | b) >> 31);
                     threadParam->m_timestamp = timeValue;
                     status = 0;
                 }

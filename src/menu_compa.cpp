@@ -153,12 +153,13 @@ void CMenuPcs::CompaDraw()
 
 				MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 			} else {
+				float alpha = entry->alpha;
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
 				GXColor color;
 				color.r = 0xFF;
 				color.g = 0xFF;
 				color.b = 0xFF;
-				color.a = static_cast<unsigned char>(entry->alpha * kCompaColorMax);
+				color.a = static_cast<unsigned char>(alpha * kCompaColorMax);
 				GXSetChanMatColor(GX_COLOR0A0, color);
 				MenuPcs.DrawRect(0, x, y, w, h, u, v, entry->uvScale, entry->uvScale, kCompaZero);
 			}

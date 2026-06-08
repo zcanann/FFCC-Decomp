@@ -2411,7 +2411,7 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 	}
 
 	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + (amount * 0x48);
-	unsigned short itemType;
+	int itemType;
 	if (amount >= 0x1F5) {
 		itemType = *reinterpret_cast<unsigned short*>(itemData + 2);
 	} else {

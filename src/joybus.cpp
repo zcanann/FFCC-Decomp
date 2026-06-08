@@ -2477,44 +2477,43 @@ void JoyBus::WriteContext(ThreadParam* threadParam)
 void JoyBus::SetPadData(ThreadParam* threadParam, unsigned char* data)
 {
     unsigned short flags = 0;
-    signed char b1 = data[1];
+    unsigned char bytes[2];
+    bytes[1] = data[1];
+    bytes[0] = data[2];
+    unsigned short combined = *reinterpret_cast<unsigned short*>(bytes);
 
-    if (b1 & 0x01) flags |= 0x0100;
-    if (b1 & 0x02) flags |= 0x0200;
-    if (b1 & 0x08) flags |= 0x1000;
-    if (b1 & 0x10) flags |= 0x0002;
-    if (b1 & 0x20) flags |= 0x0001;
-    if (b1 & 0x40) flags |= 0x0008;
-    if (b1 & 0x80) flags |= 0x0004;
+    if (combined & 0x0001) flags |= 0x0100;
+    if (combined & 0x0002) flags |= 0x0200;
+    if (combined & 0x0008) flags |= 0x1000;
+    if (combined & 0x0010) flags |= 0x0002;
+    if (combined & 0x0020) flags |= 0x0001;
+    if (combined & 0x0040) flags |= 0x0008;
+    if (combined & 0x0080) flags |= 0x0004;
 
     unsigned char state = threadParam->m_state;
 
-    if ((((state != 0x05) && (state != '!')) && (state != '"')) &&
-        ((state != '#' && (state != '$'))))
+    if ((((state != 0x05) && (state != 0x21)) && (state != 0x22)) &&
+        ((state != 0x23 && (state != 0x24))))
     {
-        if (m_stageId != '!')
+        if (m_stageId != 0x21)
         {
             goto skipStartFlag;
         }
     }
 
-    if (b1 & 0x04)
+    if (combined & 0x0004)
     {
         flags |= 0x0010;
     }
 
 skipStartFlag:
 
-    unsigned char b2 = data[2];
+    if (combined & 0x0100) flags |= 0x0020;
+    if (combined & 0x0200) flags |= 0x0040;
 
-    if (b2 & 0x01) flags |= 0x0020;
-    if (b2 & 0x02) flags |= 0x0040;
-
-    int port = threadParam->m_portIndex;
-
-    OSWaitSemaphore(&m_accessSemaphores[port]);
-    m_stageFlags[port] = flags;
-    OSSignalSemaphore(&m_accessSemaphores[port]);
+    OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+    m_stageFlags[threadParam->m_portIndex] = flags;
+    OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 }
 
 /*

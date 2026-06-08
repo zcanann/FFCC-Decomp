@@ -3212,8 +3212,11 @@ void CMenuPcs::DrawSingBar(int x, int y, int value, float alpha)
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-    unsigned char alphaU8 = static_cast<unsigned char>(255.0f * alpha);
-    _GXColor color = {0xFF, 0xFF, 0xFF, alphaU8};
+    _GXColor color;
+    color.r = 0xFF;
+    color.g = 0xFF;
+    color.b = 0xFF;
+    color.a = static_cast<unsigned char>(255.0f * alpha);
     GXSetChanMatColor(GX_COLOR0A0, color);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x53));
@@ -3229,15 +3232,16 @@ void CMenuPcs::DrawSingBar(int x, int y, int value, float alpha)
                                     80.0f, 24.0f, 0.0f, 0.0f,
                                     1.0f, 1.0f, 0.0f);
 
-    int tex = 0x55;
-    if (value < 0x29) {
+    int tex;
+    if (value <= 0x28) {
         tex = 0x59;
-    } else if (value < 0x3D) {
+    } else if (value <= 0x3C) {
         tex = 0x57;
+    } else {
+        tex = 0x55;
     }
 
-    int bars = value / 10 + (value >> 31);
-    bars -= bars >> 31;
+    int bars = value / 10;
     if (value != bars * 10) {
         ++bars;
     }

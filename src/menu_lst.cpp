@@ -58,7 +58,7 @@ void CMenuPcs::MLstDraw()
 	MenuLstEntry* item = this->m_menuLstList->entries;
 	float rowHeight = kMLstRowHeight;
 
-	for (int i = 0; i < this->m_menuLstList->count; i++) {
+	for (int i = 0; i < this->m_menuLstList->count; i++, item++) {
 		int tex = item->tex;
 		if (tex >= 0) {
 			float x = (float)item->x;
@@ -103,7 +103,6 @@ void CMenuPcs::MLstDraw()
 				item->z,
 				zero);
 		}
-		item++;
 	}
 
 	CFont* font = this->m_fonts[4];

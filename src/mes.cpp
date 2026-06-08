@@ -899,13 +899,8 @@ void CMes::addString(char** text, int branchMode)
 	unsigned char caseMode = 0;
 	signed char flowMode = 0;
 
-	do
+	while (running)
 	{
-		if (!running)
-		{
-			return;
-		}
-
 		unsigned char* p = (unsigned char*)*text;
 		*text = (char*)(p + 1);
 		unsigned char ch = *p;
@@ -1506,7 +1501,7 @@ void CMes::addString(char** text, int branchMode)
 			}
 			mLineHeight = h;
 		}
-	} while (true);
+	}
 }
 
 /*

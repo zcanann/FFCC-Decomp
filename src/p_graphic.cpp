@@ -104,39 +104,39 @@ static const char s_scenegraph_step_x1_8[] = "x1/8";
 static const char s_scenegraph_step_x1_4[] = "x1/4";
 static const char s_scenegraph_step_x1_2[] = "x1/2";
 static const GXColor s_debug_bar_color = {0x80, 0x80, 0x80, 0xFF};
-static const float kGraphicZero = 0.0f;
-static const float kGraphicScreenHeight = 448.0f;
-static const float kGraphicScreenWidth = 640.0f;
-static const float kGraphicOrthoFarZ = -100.0f;
-static const float kGraphicOne = 1.0f;
-static const float kScreenFadeHalfPi = 1.5707964f;
-static const float kGraphicColorMax = 255.0f;
-static const float kScreenFadeBarEdge = 48.0f;
-static const float kScreenFadeRingWidth = 8.0f;
-static const float kGraphicScreenCenterX = 320.0f;
-static const float kGraphicScreenCenterY = 224.0f;
-static const float kScreenFadeCircleRadius = 1280.0f;
-static const float kGraphicHalf = 0.5f;
-static const double kIntToDoubleBias = 4503601774854144.0;
-static const double kUnsignedToDoubleBias = 4503599627370496.0;
-static const float kSFCircleAngleStep = 0.19634955f;
-static const float kDebugBarLeft = 16.0f;
-static const float kDebugBarTop = 440.0f;
-static const float kDebugBarRight = 336.0f;
-static const float kDebugBarBottom = 441.0f;
-static const float kDebugBarFrameBudget = 100.0f;
-static const float kDebugBarMoveBottom = 436.0f;
-static const float kDebugBarObjectTop = 432.0f;
-static const float kDebugIndicatorTop = 420.0f;
-static const float kDebugIndicatorFrameRight = 32.0f;
-static const float kDebugIndicatorBottom = 424.0f;
-static const float kDebugIndicatorFifoLeft = 40.0f;
-static const float kDebugIndicatorFifoRight = 56.0f;
+extern const float kGraphicZero;
+extern const float kGraphicScreenHeight;
+extern const float kGraphicScreenWidth;
+extern const float kGraphicOrthoFarZ;
+extern const float kGraphicOne;
+extern const float kScreenFadeHalfPi;
+extern const float kGraphicColorMax;
+extern const float kScreenFadeBarEdge;
+extern const float kScreenFadeRingWidth;
+extern const float kGraphicScreenCenterX;
+extern const float kGraphicScreenCenterY;
+extern const float kScreenFadeCircleRadius;
+extern const float kGraphicHalf;
+extern const double kIntToDoubleBias = 4503601774854144.0;
+extern const double kUnsignedToDoubleBias = 4503599627370496.0;
+extern const float kSFCircleAngleStep;
+extern const float kDebugBarLeft;
+extern const float kDebugBarTop;
+extern const float kDebugBarRight;
+extern const float kDebugBarBottom;
+extern const float kDebugBarFrameBudget;
+extern const float kDebugBarMoveBottom;
+extern const float kDebugBarObjectTop;
+extern const float kDebugIndicatorTop;
+extern const float kDebugIndicatorFrameRight;
+extern const float kDebugIndicatorBottom;
+extern const float kDebugIndicatorFifoLeft;
+extern const float kDebugIndicatorFifoRight;
 static const int kDebugBarLineStep = 8;
 static const char s_debug_pad_port_fmt[] = "%dP";
 static const char s_debug_frame_fmt[] = "%d";
-static const float kDofDefaultNearZ = 0.6f;
-static const float kDofDefaultFarZ = 200.0f;
+extern const float kDofDefaultNearZ;
+extern const float kDofDefaultFarZ;
 
 static const char s_graphic_order_debug_fmt[] = "%s(%d) %.3f%%";
 static const char s_graphic_move_debug_fmt[] = " MOVE=%.1f%% BG=%.1f%% OBJ=%.1f%% UP=%.1f%% HIT=%.1f%% SCR=%.1f%%";
@@ -245,7 +245,7 @@ void CGraphicPcs::drawScreenFade()
 
         if (slot == 3) {
             const int barHeight = (int)(kGraphicScreenHeight * fadeWave);
-            const int barEdge = (int)(32.0f * fadeWave);
+            const int barEdge = (int)(kScreenFadeBarEdge * fadeWave);
 
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
             GXPosition3f32(kGraphicZero, kGraphicZero, kGraphicZero);
@@ -370,16 +370,16 @@ void CGraphicPcs::drawScreenFade()
                 const float h = kGraphicScreenCenterY * size;
 
                 GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-                GXPosition3f32(cx - w, cy - h, 0.0f);
+                GXPosition3f32(cx - w, cy - h, kGraphicZero);
                 GXColor1u32(*(u32*)&baseColor);
                 GXTexCoord2u16(0, 0);
-                GXPosition3f32(cx + w, cy - h, 0.0f);
+                GXPosition3f32(cx + w, cy - h, kGraphicZero);
                 GXColor1u32(*(u32*)&baseColor);
                 GXTexCoord2u16(2, 0);
-                GXPosition3f32(cx + w, cy + h, 0.0f);
+                GXPosition3f32(cx + w, cy + h, kGraphicZero);
                 GXColor1u32(*(u32*)&baseColor);
                 GXTexCoord2u16(2, 2);
-                GXPosition3f32(cx - w, cy + h, 0.0f);
+                GXPosition3f32(cx - w, cy + h, kGraphicZero);
                 GXColor1u32(*(u32*)&baseColor);
                 GXTexCoord2u16(0, 2);
                 continue;
@@ -402,7 +402,7 @@ void CGraphicPcs::drawScreenFade()
                     const int x = (tile & 1) ? 0x140 : 0;
                     const int y = (tile & 2) ? 0xE0 : 0;
                     const float t0 = ((tile & 2) ? kGraphicOne : kGraphicZero) * kGraphicHalf;
-                    const float t1 = t0 + 0.5f;
+                    const float t1 = t0 + kGraphicHalf;
 
                     Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backTexObj, x, y, 0x140, 0xE0, 0,
                                                GX_LINEAR, GX_TF_RGBA8, 0);
@@ -421,16 +421,16 @@ void CGraphicPcs::drawScreenFade()
                     bottomColor.color.a = 0xFF;
 
                     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-                    GXPosition3f32((float)x, (float)y, 0.0f);
+                    GXPosition3f32((float)x, (float)y, kGraphicZero);
                     GXColor1u32(*(u32*)&topColor.color);
                     GXTexCoord2u16(0, 0);
-                    GXPosition3f32((float)(x + 0x140), (float)y, 0.0f);
+                    GXPosition3f32((float)(x + 0x140), (float)y, kGraphicZero);
                     GXColor1u32(*(u32*)&topColor.color);
                     GXTexCoord2u16(2, 0);
-                    GXPosition3f32((float)(x + 0x140), (float)(y + 0xE0), 0.0f);
+                    GXPosition3f32((float)(x + 0x140), (float)(y + 0xE0), kGraphicZero);
                     GXColor1u32(*(u32*)&bottomColor.color);
                     GXTexCoord2u16(2, 2);
-                    GXPosition3f32((float)x, (float)(y + 0xE0), 0.0f);
+                    GXPosition3f32((float)x, (float)(y + 0xE0), kGraphicZero);
                     GXColor1u32(*(u32*)&bottomColor.color);
                     GXTexCoord2u16(0, 2);
                 }

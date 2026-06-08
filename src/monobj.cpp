@@ -1452,7 +1452,7 @@ void CGMonObj::onStatMagic()
 		return;
 
 	case 1:
-		if (*reinterpret_cast<int*>(mon + 0x68C) < prgObj->m_subFrame) {
+		if (prgObj->m_subFrame > *reinterpret_cast<int*>(mon + 0x68C)) {
 			prgObj->changeSubStat(2);
 		}
 		return;

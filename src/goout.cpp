@@ -691,7 +691,7 @@ void DrawGoOutMenu()
     if (goOutMenu.m_currentMessage != -1) {
         MenuPcs.DrawMcWin(-1, 0);
         if (MenuPcs.m_menuWindowInfo->state == 1) {
-            const int message = static_cast<int>(goOutMenu.m_currentMessage);
+            const unsigned int message = static_cast<unsigned int>(goOutMenu.m_currentMessage);
             MenuPcs.DrawMcWinMess(message, (message >= 0x1E) ? 2 : 0);
         }
     }

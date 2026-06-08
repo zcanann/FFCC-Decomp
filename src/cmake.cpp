@@ -1289,7 +1289,7 @@ void CMenuPcs::CmakeResultDraw1()
         }
 
         float x = 8.0f + labelWidths[i];
-        float y = 0x70 + i * 0x28 - 4.0f;
+        float y = static_cast<float>(0x70 + i * 0x28) - 4.0f;
         float valueWidth = static_cast<float>(valueFont->GetWidth(txt));
         valueFont->SetPosX(x);
         valueFont->SetPosY(y);

@@ -792,7 +792,7 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
     }
 
     CHandle* handle = m_handleList->m_next;
-    while (handle != m_handleList) {
+    while (m_handleList != handle) {
         CHandle* next = handle->m_next;
         delete handle;
         handle = next;
@@ -1646,9 +1646,10 @@ void CCharaPcs::LoadCam(int index, char* fileName)
  */
 void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
 {
-    int hasLoaded = 0;
+    int hasLoaded;
+    unsigned int i;
 
-    for (unsigned int i = 0; i < LoadModelArray(this)->GetSize(); i++) {
+    for (i = 0; i < LoadModelArray(this)->GetSize(); i++) {
         CLoadModel* loadModel = (*LoadModelArray(this))[i];
         if (loadModel->m_mergeFileId == mergeFileId) {
             hasLoaded = 1;
@@ -1656,7 +1657,7 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
         }
     }
 
-    for (unsigned int i = 0; i < LoadTextureArray(this)->GetSize(); i++) {
+    for (i = 0; i < LoadTextureArray(this)->GetSize(); i++) {
         CLoadTexture* loadTexture = (*LoadTextureArray(this))[i];
         if (loadTexture->m_mergeFileId == mergeFileId) {
             hasLoaded = 1;
@@ -1664,7 +1665,7 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
         }
     }
 
-    for (unsigned int i = 0; i < LoadPdtArray(this)->GetSize(); i++) {
+    for (i = 0; i < LoadPdtArray(this)->GetSize(); i++) {
         CLoadPdt* loadPdt = (*LoadPdtArray(this))[i];
         if (loadPdt->m_mergeFileId == mergeFileId) {
             hasLoaded = 1;
@@ -1672,13 +1673,15 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
         }
     }
 
-    for (unsigned int i = 0; i < LoadAnimArray(this)->GetSize(); i++) {
+    for (i = 0; i < LoadAnimArray(this)->GetSize(); i++) {
         CLoadAnim* loadAnim = (*LoadAnimArray(this))[i];
         if (loadAnim->m_mergeFileId == mergeFileId) {
             hasLoaded = 1;
             goto checkLoaded;
         }
     }
+
+    hasLoaded = 0;
 
 checkLoaded:
     if (hasLoaded) {
@@ -2564,9 +2567,12 @@ int CCharaPcs::CHandle::SetAnim(int animIndex, int startFrame, int endFrame, int
         return 0;
     }
 
-    CChara::CAnim* anim = 0;
-    if (animIndex != -1 && m_animSlot[animIndex] != 0) {
-        anim = reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex])->m_anim;
+    CChara::CAnim* anim;
+    if (animIndex != -1) {
+        CLoadAnim* loadAnim = reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex]);
+        anim = loadAnim != 0 ? loadAnim->m_anim : 0;
+    } else {
+        anim = 0;
     }
 
     if (anim == 0) {

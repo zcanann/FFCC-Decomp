@@ -1720,25 +1720,21 @@ int CAmemCacheSet::GetData(short index, char* source, int line)
 int CAmemCacheSet::SetData(void* src, int size, CAmemCache::TYPE type, int dmaCopy)
 {
     short slot = 0;
-    int remaining = m_cacheCount;
-    int index = -1;
+    short index = -1;
 
-    if (remaining > 0) {
-        do {
-            if (cacheEntryAt(this, slot).m_inUse == 0) {
-                index = slot;
-                break;
-            }
-            slot++;
-            remaining--;
-        } while (remaining != 0);
+    for (int i = 0; i < m_cacheCount; i++) {
+        if (cacheEntryAt(this, slot).m_inUse == 0) {
+            index = slot;
+            break;
+        }
+        slot++;
     }
 
-    if (static_cast<short>(index) == -1) {
+    if (index == -1) {
         return -1;
     }
 
-    CAmemCache& entry = cacheEntryAt(this, static_cast<short>(index));
+    CAmemCache& entry = cacheEntryAt(this, index);
     unsigned int allocSize = (static_cast<unsigned int>(size) + 0x1F) & ~0x1F;
     entry.m_inUse = 1;
     entry.m_type = static_cast<unsigned char>(type);

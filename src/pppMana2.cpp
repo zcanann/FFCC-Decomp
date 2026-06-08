@@ -922,30 +922,37 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
             cameraPos.x = centerPos.x;
             cameraPos.y = centerPos.y;
             cameraPos.z = centerPos.z;
+            cameraUp.x = LoadFloat(kMana2Zero);
             cameraUp.y = LoadFloat(kMana2One);
             cameraUp.z = LoadFloat(kMana2Zero);
 
-            if (i == 3) {
+            switch (i) {
+            case 0:
+                cameraPos.x = centerPos.x + LoadFloat(kMana2One);
+                break;
+            case 1:
+                cameraPos.x = centerPos.x - LoadFloat(kMana2One);
+                break;
+            case 2:
+                cameraPos.y = centerPos.y + LoadFloat(kMana2One);
+                cameraUp.x = LoadFloat(kMana2Zero);
+                cameraUp.y = LoadFloat(kMana2Zero);
+                cameraUp.z = LoadFloat(kMana2NegativeOne);
+                break;
+            case 3:
                 cameraPos.y = centerPos.y - LoadFloat(kMana2One);
+                cameraUp.x = LoadFloat(kMana2Zero);
                 cameraUp.y = LoadFloat(kMana2Zero);
                 cameraUp.z = LoadFloat(kMana2One);
-            } else if (i < 3) {
-                if (i == 1) {
-                    cameraPos.x = centerPos.x - LoadFloat(kMana2One);
-                } else if (i < 1) {
-                    cameraPos.x = centerPos.x + LoadFloat(kMana2One);
-                } else {
-                    cameraPos.y = centerPos.y + LoadFloat(kMana2One);
-                    cameraUp.y = LoadFloat(kMana2Zero);
-                    cameraUp.z = LoadFloat(kMana2NegativeOne);
-                }
-            } else if (i == 5) {
-                cameraPos.z = centerPos.z - LoadFloat(kMana2One);
-            } else if (i < 5) {
+                break;
+            case 4:
                 cameraPos.z = centerPos.z + LoadFloat(kMana2One);
+                break;
+            case 5:
+                cameraPos.z = centerPos.z - LoadFloat(kMana2One);
+                break;
             }
 
-            cameraUp.x = LoadFloat(kMana2Zero);
             C_MTXLookAt(lookAtMtx, (Point3d*)&centerPos, &cameraUp, (Point3d*)&cameraPos);
             Graphic.SetViewport();
             GXSetScissor(0, 0, 0x280, 0x1C0);

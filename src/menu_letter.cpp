@@ -86,7 +86,9 @@ static int s_BackUpTopPos = 0;
 static char s_ReplyStr[0x80];
 
 extern "C" const char s_menu_letter_cpp[] = "menu_letter.cpp";
-static const char s_letterItemInfoFmt[] = "%s%s%s%s";
+namespace {
+const char s_letterItemInfoFmt[] = "%s%s%s%s";
+}  // namespace
 static const char s_pctspctspctspcts[] = "%s%s%s%s?";
 static const char s_pctspctd_pcts_801DEE20[] = "%s%d %s?";
 

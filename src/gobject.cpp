@@ -1069,7 +1069,7 @@ void CGObject::bgNormalCollision()
     m_groundHitOffset.z = pos.z - m_worldPosition.z;
     m_gravityY = m_jumpLandingDampening * -((clampedY - (oldY - move.y)) + (oldY - move.y));
 
-    if (((m_displayFlags & 1) != 0) && ((m_weaponNodeFlags & 1) == 0)) {
+    if (((m_displayFlags & 1) != 0) && (m_weaponNodeFlagBits.m_attached == 0)) {
         Sound.PlaySe3D(
             0x26,
             &m_worldPosition,

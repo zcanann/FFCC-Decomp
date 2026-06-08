@@ -4393,7 +4393,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
     {
     case 0:
     {
-        if ((System.m_execParam % 4) != 0)
+        if (((int)System.m_frameCounter % 4) != 0)
         {
             return 0;
         }

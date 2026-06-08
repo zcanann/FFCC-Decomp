@@ -2564,28 +2564,27 @@ void CMenuPcs::DrawEquipMark(int x, int y, float alpha)
  */
 void CMenuPcs::DrawSingWin(short mode)
 {
-    MenuWindowInfo* win = m_menuWindowInfo;
-    if (mode >= 0 && win->state != mode) {
-        win->state = mode;
+    if (mode >= 0 && m_menuWindowInfo->state != mode) {
+        m_menuWindowInfo->state = mode;
     }
 
-    if (win->state == 3) {
+    if (m_menuWindowInfo->state == 3) {
         return;
     }
 
-    float left = static_cast<float>(win->x) + static_cast<float>(win->width) * 0.5f;
-    float top = static_cast<float>(win->y) + static_cast<float>(win->height) * 0.5f;
+    float left = static_cast<float>(m_menuWindowInfo->x) + static_cast<float>(m_menuWindowInfo->width) * 0.5f;
+    float top = static_cast<float>(m_menuWindowInfo->y) + static_cast<float>(m_menuWindowInfo->height) * 0.5f;
     float width;
     float height;
 
-    if (win->state == 1) {
-        left = static_cast<float>(win->x);
-        top = static_cast<float>(win->y);
-        width = static_cast<float>(win->width);
-        height = static_cast<float>(win->height);
+    if (m_menuWindowInfo->state == 1) {
+        left = static_cast<float>(m_menuWindowInfo->x);
+        top = static_cast<float>(m_menuWindowInfo->y);
+        width = static_cast<float>(m_menuWindowInfo->width);
+        height = static_cast<float>(m_menuWindowInfo->height);
     } else {
-        float leftScale = (((left - static_cast<float>(win->x)) - 32.0f) / 6.0f) * static_cast<float>(win->frame);
-        float topScale = (((top - static_cast<float>(win->y)) - 32.0f) / 6.0f) * static_cast<float>(win->frame);
+        float leftScale = (((left - static_cast<float>(m_menuWindowInfo->x)) - 32.0f) / 6.0f) * static_cast<float>(m_menuWindowInfo->frame);
+        float topScale = (((top - static_cast<float>(m_menuWindowInfo->y)) - 32.0f) / 6.0f) * static_cast<float>(m_menuWindowInfo->frame);
         left = (left - 32.0f) - leftScale;
         width = static_cast<float>(2.0 * static_cast<double>(32.0f + leftScale));
         height = static_cast<float>(2.0 * static_cast<double>(32.0f + topScale));
@@ -2652,6 +2651,7 @@ void CMenuPcs::DrawSingWin(short mode)
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x42));
     MenuPcs.DrawRect(0, innerX, innerY, innerW, innerH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
+    MenuWindowInfo* win = m_menuWindowInfo;
     s16 state = win->state;
     if (state == 0) {
         win->frame = win->frame + 1;

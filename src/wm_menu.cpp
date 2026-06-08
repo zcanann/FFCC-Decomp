@@ -5929,7 +5929,7 @@ void CMenuPcs::DrawTitleMenu()
 			m_wmWorldState->m_frameCounter = 0;
 			m_wmWorldState->m_worldReady = 0;
 		} else if (state != 2) {
-			int threshold = 10;
+			unsigned int threshold = 10;
 			m_wmWorldState->m_frameCounter++;
 			if (m_wmWorldState->m_mainState == 1) {
 				threshold = 0x28;
@@ -7092,7 +7092,7 @@ void CMenuPcs::DrawFukidashi()
 	if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0x3F0) != 0) {
 		int bd = reinterpret_cast<int>(m_wm.m_bubbleData);
 		MenuPcs.DrawRect(0,
-			(float)*reinterpret_cast<short*>(bd + 0x1C), (float)*reinterpret_cast<short*>(bd + 0x1E),
+			(float)*reinterpret_cast<unsigned short*>(bd + 0x1C), (float)*reinterpret_cast<short*>(bd + 0x1E),
 			(float)*reinterpret_cast<short*>(bd + 0x20), (float)*reinterpret_cast<short*>(bd + 0x22),
 			*reinterpret_cast<float*>(bd + 0x24), *reinterpret_cast<float*>(bd + 0x28),
 			FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
@@ -9166,7 +9166,7 @@ void CMenuPcs::DrawCharaName()
 	WmI2D cvt;
 	int yCounter = 0;
 	int slotBase = 0;
-	for (int row = 0; row < 2; row++) {
+	for (unsigned int row = 0; row < 2; row++) {
 		cvt.w.hi = 0x43300000;
 		cvt.w.lo = static_cast<unsigned int>(yCounter) ^ 0x80000000;
 		float y = (yBase1 + static_cast<float>(cvt.d - bias1)) + yExtra1;
@@ -12914,7 +12914,7 @@ void McCtrl::SetListDat(int slot, int clearPlayTime)
 			*reinterpret_cast<unsigned int*>(save + 0x1C) = MemoryCardMan.CalcCrc(reinterpret_cast<Mc::SaveDat*>(save));
 
 			if (*reinterpret_cast<int*>(save + 0x30) >= 0) {
-				*reinterpret_cast<unsigned int*>(entry + 0x18) = *reinterpret_cast<unsigned short*>(save + *reinterpret_cast<int*>(save + 0x30) * 0x9C0 + 0x14D0);
+				*reinterpret_cast<unsigned int*>(entry + 0x18) = *reinterpret_cast<short*>(save + *reinterpret_cast<int*>(save + 0x30) * 0x9C0 + 0x14D0);
 			} else {
 				*reinterpret_cast<unsigned int*>(entry + 0x18) = 0xFFFFFFFFu;
 			}
@@ -13203,7 +13203,7 @@ int McCtrl::SaveDat()
 	case 0x12: {
 		unsigned long long serial;
 		if (CARDGetSerialNo(m_cardChannel, &serial) == 0) {
-			if (static_cast<signed char>(Game.m_gameWork.m_mcHasSerial) == 0) {
+			if (static_cast<unsigned char>(Game.m_gameWork.m_mcHasSerial) == 0) {
 				Game.m_gameWork.m_mcSerial1 = static_cast<unsigned int>(serial);
 				Game.m_gameWork.m_mcSerial0 = static_cast<unsigned int>(serial >> 32);
 				Game.m_gameWork.m_mcRandom = Math.Rand(0x7FFFFFFF);

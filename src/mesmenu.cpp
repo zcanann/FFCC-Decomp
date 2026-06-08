@@ -1023,7 +1023,7 @@ void CMesMenu::onCalc()
                     int wait5 = m_mes.GetWait();
                     if (wait5 != 4) {
                         m_closeReason = 0;
-                        if (m_state < 2) {
+                        if (m_state <= 1) {
                             if ((m_flags & 0x40) != 0) {
                                 CFlatRuntime::CStack stack[2];
                                 m_mes.Set(0, 0);

@@ -239,7 +239,7 @@ void CMaterialEditorPcs::drawViewer()
                 u16 flags = polygon->flags;
                 switch (polygon->textureMarker) {
                 case 'H':
-                if (polygon->textureIndex < static_cast<s16>(m_loadedTextureCount)) {
+                if (static_cast<s16>(m_loadedTextureCount) > polygon->textureIndex) {
                     s16* textureHeader = m_textureHeader[polygon->textureIndex];
                     float scaleU = static_cast<float>(LoadDouble(kMaterialEditorOneF64) / S16ToDouble(textureHeader[2]));
                     float scaleV = static_cast<float>(LoadDouble(kMaterialEditorOneF64) / S16ToDouble(textureHeader[3]));

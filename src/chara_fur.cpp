@@ -1044,7 +1044,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		Chara.MogFur().m_cursorX = 0;
 	} else {
 		Chara.MogFur().m_cursorX = 0x280;
-		if (cursorXv < 0x281) {
+		if (cursorXv <= 0x280) {
 			Chara.MogFur().m_cursorX = cursorXv;
 		}
 	}
@@ -1053,7 +1053,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		Chara.MogFur().m_cursorY = 0;
 	} else {
 		Chara.MogFur().m_cursorY = 0x1C0;
-		if (cursorYv < 0x1C1) {
+		if (cursorYv <= 0x1C0) {
 			Chara.MogFur().m_cursorY = cursorYv;
 		}
 	}

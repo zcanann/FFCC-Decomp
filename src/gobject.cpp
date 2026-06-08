@@ -1467,10 +1467,10 @@ void CGObject::update()
                 const float slideMag = sqrtf(slideMagSq);
                 CVector worldUp(sZeroFloat, sAnimFrameOffset, sZeroFloat);
                 PSVECCrossProduct(&m_groundHitOffset, worldUp, &axis);
-                PSMTXRotAxisRad(tiltMtx, &axis, slideMag * -0.125f);
-                Mtx quatMtx;
-                PSMTXQuat(quatMtx, &m_bgCollisionQtrn);
-                PSMTXConcat(tiltMtx, quatMtx, tiltMtx);
+                Mtx rotAxisMtx;
+                PSMTXRotAxisRad(rotAxisMtx, &axis, slideMag * -0.125f);
+                PSMTXQuat(tiltMtx, &m_bgCollisionQtrn);
+                PSMTXConcat(rotAxisMtx, tiltMtx, tiltMtx);
                 C_QUATMtx(&m_bgCollisionQtrn, tiltMtx);
             } else {
                 PSMTXQuat(tiltMtx, &m_bgCollisionQtrn);

@@ -30,6 +30,8 @@ extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
     CMath*, Vec*, float*, Vec*, Vec*, Vec*, float, float, float);
 extern double DOUBLE_803303e8;
 extern double DOUBLE_80330400;
+extern const Vec DAT_801D9B88;
+extern const Vec DAT_801D9B94;
 
 struct GObjectMapCylinder {
     Vec m_bottom;
@@ -99,7 +101,7 @@ static inline unsigned char* ModelNodes(CChara::CModel* model)
 
 static inline MtxPtr ModelNodeMtx(CChara::CModel* model, int nodeIndex)
 {
-    return reinterpret_cast<MtxPtr>(ModelNodes(model) + nodeIndex * 0xC0 + 0xC);
+    return reinterpret_cast<MtxPtr>(ModelNodes(model) + nodeIndex * 0xC0 + 0x6C);
 }
 
 static inline float& ModelLightAlpha(CChara::CModel* model)
@@ -511,10 +513,12 @@ void CGObject::move()
         }
 
         const double moveMag = static_cast<double>(PSVECMag(&moveVec));
-        if (moveMag == static_cast<double>(sZeroFloat)) {
+        if (static_cast<double>(sZeroFloat) == moveMag) {
             scriptMoveEnd = 1;
-        } else if (m_weaponNodeFlagAll.m_bits1.m_bit10
-                   || (moveMag >= static_cast<double>(m_moveTimer))) {
+        } else if (m_weaponNodeFlagAll.m_bits1.m_bit10) {
+            PSVECNormalize(&moveVec, &moveVec);
+            PSVECScale(&moveVec, &moveVec, static_cast<float>(m_moveTimer));
+        } else if (!(moveMag < static_cast<double>(m_moveTimer))) {
             PSVECNormalize(&moveVec, &moveVec);
             PSVECScale(&moveVec, &moveVec, static_cast<float>(m_moveTimer));
         } else {
@@ -657,7 +661,7 @@ void CGObject::move()
                     if (sZeroFloat < dirDot) {
                         centerDist /= CFlatCenterDistanceScale();
                         float clampDist = centerDist;
-                        if (sZeroFloat <= clampDist) {
+                        if (!(clampDist < sZeroFloat)) {
                             if (sAnimFrameOffset < clampDist) {
                                 clampDist = sAnimFrameOffset;
                             }
@@ -678,8 +682,8 @@ void CGObject::move()
 
         if (!movingWithScript || m_weaponNodeFlagAll.m_bits1.m_bit08) {
             if (Game.m_currentMapId == 0x21) {
-                const double slideSq = static_cast<double>(PSVECSquareMag(&m_groundHitOffset));
-                if (static_cast<double>(sSlideThreshold) < slideSq) {
+                const float slideSq = PSVECSquareMag(&m_groundHitOffset);
+                if (sSlideThreshold < slideSq) {
                     Mtx yawMtx;
                     Mtx pitchMtx;
                     Vec worldUp;
@@ -784,15 +788,15 @@ void CGObject::objectCollision()
         PSVECAdd(&otherBasePos, &otherCapsuleOffset, &otherCapsulePos);
 
         const double capsuleDistance = PSVECDistance(&selfCapsulePos, &otherCapsulePos);
-        if ((capsuleDistance == static_cast<double>(sZeroFloat))
-            || (capsuleDistance > static_cast<double>(m_nearColRadius + other->m_nearColRadius))) {
+        if ((static_cast<double>(sZeroFloat) == capsuleDistance)
+            || (static_cast<double>(m_nearColRadius + other->m_nearColRadius) < capsuleDistance)) {
             continue;
         }
 
         if (((m_bgColMask & 8) != 0) && ((other->m_bgColMask & 8) != 0)) {
-            const bool thisAttack = (m_objectFlags & 2) != 0;
+            const int thisAttack = m_objectFlags & 2;
 
-            if ((((m_objectFlags & 2) != 0 && (other->m_objectFlags & 0xC) != 0)
+            if (((thisAttack != 0 && (other->m_objectFlags & 0xC) != 0)
                  || ((m_objectFlags & 0xC) != 0 && (other->m_objectFlags & 2) != 0))
                 && ((m_weaponNodeFlagBits.m_attached == 0) || (m_attachOwner != other))
                 && ((other->m_weaponNodeFlagBits.m_attached == 0) || (other->m_attachOwner != this))
@@ -1034,7 +1038,7 @@ void CGObject::bgNormalCollision()
     pos.y -= m_capsuleHalfHeight;
     PSVECAdd(&pos, &move, &pos);
 
-    if ((m_jumpLandingDampening <= sZeroFloat) || (sLandingDampenCutoff <= m_groundHitOffset.y)) {
+    if (!(m_jumpLandingDampening > sZeroFloat) || !(m_groundHitOffset.y < sLandingDampenCutoff)) {
         m_groundHitOffset.x = pos.x - m_worldPosition.x;
         m_groundHitOffset.y = pos.y - m_worldPosition.y;
         m_groundHitOffset.z = pos.z - m_worldPosition.z;
@@ -1265,23 +1269,28 @@ void CGObject::hit()
     if (!hasModel) {
         return;
     }
-    u8* const modelBytes = reinterpret_cast<u8*>(m_charaModelHandle->m_model);
-    u8* const modelNodes = *reinterpret_cast<u8**>(modelBytes + 0xA8);
-
     for (int i = 0; i < 8; i++) {
         AttackCol* attack = &m_attackColliders[i];
         const int node = attack->m_nodeIndex;
-        PSMTXMultVec(reinterpret_cast<const float (*)[4]>(modelNodes + node * 0xC0 + 0xC),
-                     &attack->m_localStart, &attack->m_worldPosition);
-        PSVECAdd(&attack->m_worldPosition, &m_worldPosition, &attack->m_worldPosition);
+        u8* const modelNodes =
+            *reinterpret_cast<u8**>(reinterpret_cast<u8*>(m_charaModelHandle->m_model) + 0xA8);
+        PSMTXMultVec(reinterpret_cast<const float (*)[4]>(modelNodes + node * 0xC0 + 0x6C),
+                     reinterpret_cast<Vec*>(&attack->m_localStart.y),
+                     reinterpret_cast<Vec*>(&attack->m_worldPosition.y));
+        PSVECAdd(reinterpret_cast<Vec*>(&attack->m_worldPosition.y), &m_worldPosition,
+                 reinterpret_cast<Vec*>(&attack->m_worldPosition.y));
     }
 
     for (int i = 0; i < 8; i++) {
         DamageCol* damage = &m_damageColliders[i];
         const int node = damage->m_nodeIndex;
-        PSMTXMultVec(reinterpret_cast<const float (*)[4]>(modelNodes + node * 0xC0 + 0xC),
-                     &damage->m_localPosition, &damage->m_worldPosition);
-        PSVECAdd(&damage->m_worldPosition, &m_worldPosition, &damage->m_worldPosition);
+        u8* const modelNodes =
+            *reinterpret_cast<u8**>(reinterpret_cast<u8*>(m_charaModelHandle->m_model) + 0xA8);
+        PSMTXMultVec(reinterpret_cast<const float (*)[4]>(modelNodes + node * 0xC0 + 0x6C),
+                     reinterpret_cast<Vec*>(&damage->m_localPosition.y),
+                     reinterpret_cast<Vec*>(&damage->m_worldPosition.y));
+        PSVECAdd(reinterpret_cast<Vec*>(&damage->m_worldPosition.y), &m_worldPosition,
+                 reinterpret_cast<Vec*>(&damage->m_worldPosition.y));
     }
 
     if ((m_bgColMask & 0x40000) == 0) {
@@ -1290,14 +1299,15 @@ void CGObject::hit()
 
     for (CGObject* other = CFlat.FindGObjFirst(); other != 0;
          other = CFlat.FindGObjNext(other)) {
-        if ((other == this) || ((other->m_bgColMask & 0x80000) == 0)) {
+        if (((other->m_bgColMask & 0x80000) == 0) || (other == this)) {
             continue;
         }
 
         Vec delta;
         PSVECSubtract(&m_worldPosition, &other->m_worldPosition, &delta);
+        const float distSq = PSVECDotProduct(&delta, &delta);
         const float nearRadius = m_nearColRadius + other->m_nearColRadius;
-        if (PSVECDotProduct(&delta, &delta) > (nearRadius * nearRadius)) {
+        if ((nearRadius * nearRadius) < distSq) {
             continue;
         }
 
@@ -1310,8 +1320,8 @@ void CGObject::hit()
             for (int damageIndex = 0; damageIndex < 8; damageIndex++) {
                 DamageCol* damage = &other->m_damageColliders[damageIndex];
                 if (((attack->m_hitMask & damage->m_hitMask) == 0) ||
-                    (damage->m_innerRadius == sZeroFloat) ||
-                    (damage->m_outerRadius == sZeroFloat)) {
+                    (sZeroFloat == damage->m_innerRadius) ||
+                    (sZeroFloat == damage->m_outerRadius)) {
                     continue;
                 }
 
@@ -1325,7 +1335,7 @@ void CGObject::hit()
                     continue;
                 }
 
-                if ((GetCID() & 0x2D) == 0x2D) {
+                if ((static_cast<unsigned short>(GetCID()) & 0x2D) == 0x2D) {
                     CFlatRuntime::CStack stackIn[7];
                     stackIn[0].m_word = static_cast<u32>(attackIndex);
                     stackIn[1].m_word = static_cast<u32>(other->m_particleId);
@@ -1408,10 +1418,10 @@ void CGObject::update()
     Mtx ecScratch;
     if (Game.m_currentMapId == 0x21) {
         Mtx tempMtx;
-        Vec mapUp = sMap21WorldUpAxis;
         Vec worldNorm;
 
         PSMTXRotRad(modelMtx, 'y', atan2f(m_worldPosition.x, m_worldPosition.z));
+        Vec mapUp = DAT_801D9B88;
         PSVECNormalize(&m_worldPosition, &worldNorm);
         PSMTXRotRad(tempMtx, 'x', acosf(PSVECDotProduct(&mapUp, &worldNorm)));
         PSMTXConcat(modelMtx, tempMtx, modelMtx);
@@ -1452,7 +1462,7 @@ void CGObject::update()
         } else if (m_worldParamA == 0x24 || m_worldParamB == 0x125) {
             const float cameraYaw = CameraPcs.m_yaw;
             srt.m_rot.y = sQuarterTurn - cameraYaw;
-            srt.m_rot.y += cosf(sBgAttrNormal * m_radiusCtrl.y);
+            srt.m_rot.y += sBgAttrNormal * cosf(sBgAttrNormal * m_radiusCtrl.y);
             srt.m_trans.y += sAnimFrameOffset + sinf(m_radiusCtrl.y);
             m_radiusCtrl.y += 0.125f;
         }
@@ -1469,7 +1479,7 @@ void CGObject::update()
                 const float slideMag = sqrtf(slideMagSq);
                 CVector worldUp(sZeroFloat, sAnimFrameOffset, sZeroFloat);
                 PSVECCrossProduct(&m_groundHitOffset, worldUp, &axis);
-                PSMTXRotAxisRad(rotScratch, &axis, slideMag * -0.125f);
+                PSMTXRotAxisRad(rotScratch, &axis, -slideMag / 8.0f);
                 PSMTXQuat(tiltMtx, &m_bgCollisionQtrn);
                 PSMTXConcat(rotScratch, tiltMtx, tiltMtx);
                 C_QUATMtx(&m_bgCollisionQtrn, tiltMtx);
@@ -1523,9 +1533,10 @@ void CGObject::update()
                 modelMtx[2][3] = swayZero2.z;
                 PSMTXConcat(rotScratch, modelMtx, modelMtx);
                 const float swayTan = tan(-swayAngle);
+                const float swayTanScaled = 2.0f * swayTan;
                 modelMtx[0][3] = mtx0;
                 modelMtx[2][3] = mtx2;
-                modelMtx[1][3] = mtx1 - 2.0f * swayTan;
+                modelMtx[1][3] = mtx1 - swayTanScaled;
             }
 
             float swayClamp = swayDot < sAnimFrameOffset ? swayDot : sAnimFrameOffset;
@@ -2203,9 +2214,9 @@ CGObject* CGObject::CCClass(int useBodyRadius, int classMask, float yOffset, Vec
         if ((other->m_attrFlags & static_cast<unsigned int>(classMask)) == 0) {
             continue;
         }
-        if ((other->m_worldPosition.x - maxDist > origin.x) || (other->m_worldPosition.y - maxDist > origin.y)
-            || (other->m_worldPosition.z - maxDist > origin.z) || (origin.x > other->m_worldPosition.x + maxDist)
-            || (origin.y > other->m_worldPosition.y + maxDist) || (origin.z > other->m_worldPosition.z + maxDist)) {
+        if (!(other->m_worldPosition.x - maxDist <= origin.x) || !(other->m_worldPosition.y - maxDist <= origin.y)
+            || !(other->m_worldPosition.z - maxDist <= origin.z) || !(origin.x <= other->m_worldPosition.x + maxDist)
+            || !(origin.y <= other->m_worldPosition.y + maxDist) || !(origin.z <= other->m_worldPosition.z + maxDist)) {
             continue;
         }
 
@@ -2528,7 +2539,7 @@ void CGObject::boundCheck()
     if ((m_charaModelHandle != 0) && (m_charaModelHandle->m_model != 0)) {
         const double zero = static_cast<double>(sZeroFloat);
         const double one = static_cast<double>(sAnimFrameOffset);
-        const double clipLimit = 2.0;
+        const float clipLimit = 2.0f;
 
         for (u32 i = 0; (clipMask != 0) && (i < 8); i++) {
             clipCorner.x = m_worldPosition.x + (((i & 1) == 0) ? m_nearColRadius : -m_nearColRadius);
@@ -2547,10 +2558,10 @@ void CGObject::boundCheck()
             clipPos.x *= invW;
             clipPos.y *= invW;
 
-            if (clipLimit < static_cast<double>(clipPos.x)) {
+            if (clipLimit < clipPos.x) {
                 clipMask &= 0xFFFFFFFE;
             }
-            if (clipLimit < static_cast<double>(clipPos.y)) {
+            if (clipLimit < clipPos.y) {
                 clipMask &= 0xFFFFFFFD;
             }
             if (static_cast<double>(clipPos.x) < one) {
@@ -2586,7 +2597,7 @@ void CGObject::Turn(float targetRot, int turnFrames)
     m_rotTargetY = targetRot;
     m_turnBaseSpeed =
         Math.DstRot(m_rotBaseY, m_rotTargetY) / static_cast<float>(turnFrames);
-    m_attackColliders[0].m_localStart.x = static_cast<float>(turnFrames);
+    *reinterpret_cast<int*>(&m_attackColliders[0].m_localStart.x) = turnFrames;
 
     int animSlot = 2;
     if (m_turnBaseSpeed >= sZeroFloat) {
@@ -2863,15 +2874,15 @@ int CGObject::IsLoopAnim(int mode)
 
     const float span = sAnimFrameOffset + (model.m_animEnd - model.m_animStart);
 
-    if (span == sAnimFrameOffset) {
+    if (sAnimFrameOffset == span) {
         return 1;
     }
 
     float base;
-    if (mode == 0) {
-        base = model.m_time;
-    } else {
+    if (mode != 0) {
         base = m_turnSpeed;
+    } else {
+        base = model.m_time;
     }
 
     double threshold = static_cast<double>(base);
@@ -2920,8 +2931,7 @@ int CGObject::IsAnimFinished(int mode)
             return 1;
         }
         {
-            shieldFlag = static_cast<signed char>(
-                static_cast<int>(static_cast<u32>(*reinterpret_cast<u8*>(&m_shieldNodeFlags)) << 0x1C) >> 0x1F);
+            shieldFlag = static_cast<signed char>(m_shieldNodeFlagBits.m_bit08);
             shieldFlagClz = static_cast<u32>(__cntlzw(static_cast<u32>(shieldFlag)));
             result = shieldFlagClz >> 5;
 
@@ -2940,10 +2950,10 @@ int CGObject::IsAnimFinished(int mode)
                         if (sAnimFrameOffset == animSpan) {
                             result = 1;
                         } else {
-                            if (mode == 0) {
-                                frame = model.m_time;
-                            } else {
+                            if (mode != 0) {
                                 frame = m_turnSpeed;
+                            } else {
+                                frame = model.m_time;
                             }
 
                             threshold = static_cast<double>(frame);
@@ -2951,8 +2961,8 @@ int CGObject::IsAnimFinished(int mode)
                                 threshold = static_cast<double>(static_cast<float>(threshold + sLoopBias));
                             }
 
-                            if (static_cast<double>(sZeroFloat)
-                                <= static_cast<double>(m_lastBgAttr)) {
+                            if (static_cast<double>(m_lastBgAttr)
+                                >= static_cast<double>(sZeroFloat)) {
                                 result =
                                     (static_cast<u32>(static_cast<u8>(
                                          (static_cast<double>(animSpan - sAnimFrameOffset) < threshold) << 3))
@@ -3250,9 +3260,7 @@ void CGObject::CalcSphereNearPos(float scale, float angleOffset, Vec& outPos)
     Vec offset;
     Mtx rotationMtx;
 
-    up.x = 0.0f;
-    up.y = 1.0f;
-    up.z = 0.0f;
+    up = DAT_801D9B94;
 
     PSVECNormalize(&m_worldPosition, &normal);
     PSVECCrossProduct(&normal, &up, &bitangent);

@@ -785,15 +785,15 @@ void CGObject::objectCollision()
         PSVECAdd(&otherBasePos, &otherCapsuleOffset, &otherCapsulePos);
 
         const double capsuleDistance = PSVECDistance(&selfCapsulePos, &otherCapsulePos);
-        if ((capsuleDistance == static_cast<double>(sZeroFloat))
-            || (capsuleDistance > static_cast<double>(m_nearColRadius + other->m_nearColRadius))) {
+        if ((static_cast<double>(sZeroFloat) == capsuleDistance)
+            || (static_cast<double>(m_nearColRadius + other->m_nearColRadius) < capsuleDistance)) {
             continue;
         }
 
         if (((m_bgColMask & 8) != 0) && ((other->m_bgColMask & 8) != 0)) {
-            const bool thisAttack = (m_objectFlags & 2) != 0;
+            const int thisAttack = m_objectFlags & 2;
 
-            if ((((m_objectFlags & 2) != 0 && (other->m_objectFlags & 0xC) != 0)
+            if (((thisAttack != 0 && (other->m_objectFlags & 0xC) != 0)
                  || ((m_objectFlags & 0xC) != 0 && (other->m_objectFlags & 2) != 0))
                 && ((m_weaponNodeFlagBits.m_attached == 0) || (m_attachOwner != other))
                 && ((other->m_weaponNodeFlagBits.m_attached == 0) || (other->m_attachOwner != this))

@@ -4760,7 +4760,7 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
 {
     unsigned int result = 0;
 
-    switch ((unsigned char)threadParam->m_subState)
+    switch ((signed char)threadParam->m_subState)
     {
     case 0:
         {
@@ -4783,6 +4783,7 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
             GbaQue.GetCaravanName((char*)&payload[1]);
 
             signed char* p = (signed char*)&playerInfo;
+            unsigned char* cf = classFlags;
             unsigned char lowBits = 0;
             unsigned char highBits = 0;
 
@@ -4791,39 +4792,40 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
                 if (p[0x16] != 0)
                 {
                     int idx = (int)p[0] >> 1;
-                    signed char v = (classFlags[idx] & 0x0F) | lowBits;
+                    signed char v = (cf[idx] & 0x0F) | lowBits;
 
                     if ((p[0] & 1) != 0)
                     {
-                        v = (classFlags[idx] & 0xF0) | highBits;
+                        v = (cf[idx] & 0xF0) | highBits;
                     }
 
-                    classFlags[idx] = v;
+                    cf[idx] = v;
                 }
+
+                lowBits  += 0x10;
+                highBits += 1;
 
                 if (p[0xF2] != 0)
                 {
                     int idx = (int)p[0xDC] >> 1;
-                    unsigned char v =
-                        (classFlags[idx] & 0x0F) | (signed char)(lowBits + 0x10);
+                    signed char v = (cf[idx] & 0x0F) | lowBits;
 
                     if ((p[0xDC] & 1) != 0)
                     {
-                        v = (classFlags[idx] & 0xF0) | (signed char)(highBits + 1);
+                        v = (cf[idx] & 0xF0) | highBits;
                     }
 
-                    classFlags[idx] = v;
+                    cf[idx] = v;
                 }
 
-                p       += 0x1B8;
-                lowBits += 0x20;
-                highBits += 2;
+                p        += 0x1B8;
+                lowBits  += 0x10;
+                highBits += 1;
             }
 
             memcpy(&payload[0x81], classFlags, sizeof(classFlags));
 
             unsigned char* playerData = playerInfo.m_data;
-            int playerOffset = threadParam->m_portIndex * 0xDC;
 
             payload[0x85] = playerData[0x16];
             payload[0x86] = playerData[0x17];
@@ -4833,12 +4835,12 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
             payload[0x8A] = playerData[0x1CF];
             payload[0x8B] = playerData[0x2AA];
             payload[0x8C] = playerData[0x2AB];
-            payload[0x8D] = playerData[playerOffset + 2];
+            payload[0x8D] = playerData[threadParam->m_portIndex * 0xDC + 2];
 
-            memcpy(&payload[0x8E], &playerData[playerOffset + 0x20], 3);
+            memcpy(&payload[0x8E], &playerData[threadParam->m_portIndex * 0xDC + 0x20], 3);
 
-            payload[0x91] = playerData[playerOffset + 0x14];
-            payload[0x92] = playerData[playerOffset + 0x15];
+            unsigned short statHalf = __lhbrx(&playerData[threadParam->m_portIndex * 0xDC + 0x14], 0);
+            memcpy(&payload[0x91], &statHalf, 2);
 
             unsigned char compatBuf[64];
             memset(compatBuf, 0, sizeof(compatBuf));
@@ -4849,12 +4851,9 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
 
             memcpy(body, compatBuf, compatLen);
 
-            memcpy(body + compatLen, &playerData[playerOffset + 0x18], 8);
+            memcpy(body + compatLen, &playerData[threadParam->m_portIndex * 0xDC + 0x18], 8);
 
-            unsigned int statWord = ((unsigned int)playerData[playerOffset + 0x27] << 24) |
-                                    ((unsigned int)playerData[playerOffset + 0x26] << 16) |
-                                    ((unsigned int)playerData[playerOffset + 0x25] << 8) |
-                                     (unsigned int)playerData[playerOffset + 0x24];
+            unsigned int statWord = __lwbrx(&playerData[threadParam->m_portIndex * 0xDC + 0x24], 0);
             memcpy(body + compatLen + 8, &statWord, sizeof(statWord));
 
             const int byteLen = compatLen + 0xA3;

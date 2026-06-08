@@ -181,8 +181,8 @@ void CGMonObj::onFramePreCalc()
 		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 8) = m_targetPartyIndex;
 		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 0) = -1;
 
-		if ((reinterpret_cast<unsigned int>(object->m_scriptHandle[4]) < 0x9A) &&
-			(0x8D < reinterpret_cast<unsigned int>(object->m_scriptHandle[4]))) {
+		if ((reinterpret_cast<int>(object->m_scriptHandle[4]) < 0x9A) &&
+			(0x8E <= reinterpret_cast<int>(object->m_scriptHandle[4]))) {
 			int aiLocal = 0;
 			aiAddDuct(aiLocal);
 		} else {

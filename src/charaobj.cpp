@@ -768,7 +768,7 @@ void CGCharaObj::onFramePreCalc()
 	}
 	m_pushScale = pushScale;
 
-	unsigned int push = 0;
+	int push = 0;
 	switch (m_lastStateId) {
 		case 1: case 2: case 4: case 6: case 7: case 8: case 9:
 		case 10: case 0xB: case 0xC: case 0xD: case 0xE: case 0xF:
@@ -802,7 +802,7 @@ void CGCharaObj::onFramePreCalc()
 		if (padHeld != 0) {
 			push += 0x19;
 		}
-		if (static_cast<signed char>(reinterpret_cast<unsigned char*>(this)[0x9B]) >= 0) {
+		if (static_cast<signed char>(static_cast<int>(static_cast<unsigned int>(reinterpret_cast<unsigned char*>(this)[0x9B]) << 24 >> 30) << 30 >> 31) == 0) {
 			push += 0x19;
 		}
 	}

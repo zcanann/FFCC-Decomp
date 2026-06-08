@@ -142,7 +142,8 @@ struct CharaObjModelAnimState
 
 static bool CharaObjIsAttackAnimBoundary(CGCharaObj* charaObj)
 {
-	if (charaObj->m_charaModelHandle == 0 || charaObj->m_charaModelHandle->m_model == 0) {
+	bool valid = charaObj->m_charaModelHandle != 0 && charaObj->m_charaModelHandle->m_model != 0;
+	if (!valid) {
 		return true;
 	}
 
@@ -157,7 +158,7 @@ static bool CharaObjIsAttackAnimBoundary(CGCharaObj* charaObj)
 	}
 
 	int frame = static_cast<int>(charaObj->m_turnSpeed);
-	if (kCharaObjZero <= charaObj->m_lastBgAttr) {
+	if (charaObj->m_lastBgAttr >= kCharaObjZero) {
 		return span <= frame;
 	}
 

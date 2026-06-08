@@ -714,17 +714,16 @@ void callCon2Prog(_pppPObject* pObject)
 	}
 
 	pObject->m_graphId = 0;
-	while (true)
+	while (pObject->m_graphId <= progSet->m_endFrame)
 	{
 		stageSet = progSet;
 		int stageCount = 0;
 		u32 stageSlotOffset = 0;
 		for (; stageCount < progSet->m_numStages; stageCount++)
 		{
-			_pppCtrlTable* stage = stageSet->m_stages;
 			s32** slotPtr = (s32**)(((u8*)pObject) + progSet->m_workBaseOffset + stageSlotOffset);
-			pppProg* prog = stage->m_prog;
-			s32* nextSlot = (s32*)(((u8*)*slotPtr) + stage->m_workOffset);
+			s32* nextSlot = (s32*)(((u8*)*slotPtr) + stageSet->m_stages[0].m_workOffset);
+			pppProg* prog = stageSet->m_stages[0].m_prog;
 
 			if (*nextSlot == pObject->m_graphId)
 			{
@@ -740,10 +739,6 @@ void callCon2Prog(_pppPObject* pObject)
 		}
 
 		pObject->m_graphId += 0x1000;
-		if (pObject->m_graphId > progSet->m_endFrame)
-		{
-			break;
-		}
 	}
 
 	ppvIsLoopCalc = 0;
@@ -1452,10 +1447,9 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
 		ppvWorldMatrix[2][3] = local_50.z;
 	}
 
-	local_70.x = ppvWorldMatrix[0][1];
-	local_70.y = ppvWorldMatrix[1][1];
-	local_70.z = ppvWorldMatrix[2][1];
-	local_90 = local_70;
+	local_90.x = local_70.x = ppvWorldMatrix[0][1];
+	local_90.y = local_70.y = ppvWorldMatrix[1][1];
+	local_90.z = local_70.z = ppvWorldMatrix[2][1];
 	if ((local_90.x != kPppPartZero) || (local_90.y != kPppPartZero) || (local_90.z != kPppPartZero)) {
 		PSVECNormalize(&local_90, &local_70);
 	}
@@ -1463,7 +1457,9 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
 	local_9c.x = local_70.y;
 	local_9c.y = -local_70.x;
 	local_9c.z = kPppPartZero;
-	local_60 = local_9c;
+	local_60.x = local_9c.x;
+	local_60.y = local_9c.y;
+	local_60.z = local_9c.z;
 	ppvWorldMatrixWood[0][1] = local_70.x;
 	ppvWorldMatrixWood[1][1] = local_70.y;
 	ppvWorldMatrixWood[2][1] = local_70.z;
@@ -1476,7 +1472,9 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
 	ppvWorldMatrixWood[1][0] = local_60.y;
 	ppvWorldMatrixWood[2][0] = local_60.z;
 	PSVECCrossProduct(&local_60, &local_70, &local_80);
-	local_a8 = local_80;
+	local_a8.x = local_80.x;
+	local_a8.y = local_80.y;
+	local_a8.z = local_80.z;
 
 	if ((local_a8.x != kPppPartZero) || (local_a8.y != kPppPartZero) || (local_a8.z != kPppPartZero)) {
 		PSVECNormalize(&local_a8, &local_80);

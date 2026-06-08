@@ -35,6 +35,7 @@ static const float kMapObjInitNegOne = 1000000000000000.0f;
 static const float kMapObjColorBlendScale = 255.0f;
 static const float kMapObjDegToRad = 0.017453292f;
 static const float kMapObjInitValue50 = -1.0f;
+static const float kMapObjDefaultAngle = 48.0f;
 extern const char s_mapobj_cpp[] = "mapobj.cpp";
 extern const char sMapObjScaleWithoutNameWarn[0x78] = {
     (char)0x83, (char)0x47, (char)0x83, (char)0x89, (char)0x81, (char)0x5b, (char)0x81, (char)0x49,
@@ -706,6 +707,31 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 spotLight->m_useAltColor = chunkFile.Get1();
                 spotLight->m_angle = chunkFile.GetF4();
                 spotLight->m_unknown2E = chunkFile.Get1();
+            } else if (chunk.m_version == 4) {
+                spotLight->m_color.r = chunkFile.Get1();
+                spotLight->m_color.g = chunkFile.Get1();
+                spotLight->m_color.b = chunkFile.Get1();
+                spotLight->m_color.a = chunkFile.Get1();
+                spotLight->m_altColor.r = chunkFile.Get1();
+                spotLight->m_altColor.g = chunkFile.Get1();
+                spotLight->m_altColor.b = chunkFile.Get1();
+                spotLight->m_altColor.a = chunkFile.Get1();
+                spotLight->m_baseColor.r = chunkFile.Get1();
+                spotLight->m_baseColor.g = chunkFile.Get1();
+                spotLight->m_baseColor.b = chunkFile.Get1();
+                spotLight->m_baseColor.a = chunkFile.Get1();
+                spotLight->m_radius = chunkFile.GetF4();
+                spotLight->m_nearRange = chunkFile.GetF4();
+                spotLight->m_farRange = chunkFile.GetF4();
+                spotLight->m_intensity = chunkFile.GetF4();
+                chunkFile.GetF4();
+                spotLight->m_falloff = chunkFile.GetF4();
+                unsigned short targetIndex = chunkFile.Get2();
+                spotLight->m_target = MapMng.m_mapObjArray + targetIndex;
+                spotLight->m_colorMode = chunkFile.Get1();
+                spotLight->m_useAltColor = chunkFile.Get1();
+                spotLight->m_angle = kMapObjDefaultAngle;
+                spotLight->m_unknown2E = 0;
             }
             m_attribute = spotLightAttr;
             break;

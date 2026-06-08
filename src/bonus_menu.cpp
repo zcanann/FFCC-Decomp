@@ -2610,12 +2610,11 @@ void CMenuPcs::CalcResultCountAnim()
 			scaleMtx[2][3] = 0.0f;
 		}
 
-		CChara::CModel* model = handle->m_model;
-		model->m_flags10CBits.m_flag10C_80 = 1;
-		model->SetMatrix(scaleMtx);
-		model->CalcMatrix();
-		model->CalcSkin();
-		model->m_lightAlpha = 1.0f;
+		handle->m_model->m_flags10CBits.m_flag10C_80 = 1;
+		handle->m_model->SetMatrix(scaleMtx);
+		handle->m_model->CalcMatrix();
+		handle->m_model->CalcSkin();
+		handle->m_model->m_lightAlpha = 1.0f;
 	}
 
 	if (*(short*)(this->m_bonusStatePtr + 0x10) == 0 && frame >= 0 && frame <= s_Rinfo->m_winnerTotalValue) {

@@ -636,7 +636,7 @@ void CFunnyShape::Render()
 
         u8* animData = reinterpret_cast<u8*>(AnimData(this));
         s16 frame = work->frame;
-        FS_tagOAN3_SHAPE* shape = reinterpret_cast<FS_tagOAN3_SHAPE*>(animData + *reinterpret_cast<s16*>(animData + 0x10 + frame * 8));
+        FS_tagOAN3_SHAPE* shape = reinterpret_cast<FS_tagOAN3_SHAPE*>(animData + *reinterpret_cast<u16*>(animData + 0x10 + frame * 8));
         RenderShape(shape, posCopy, work->angle);
         work++;
     }

@@ -2425,7 +2425,7 @@ void CShopMenu::SelectMake()
     short* material = recipeMaterial;
     for (int i = 0; i < 3; i++, material++) {
         short itemNo = *material;
-        if (itemNo < 1) {
+        if (itemNo <= 0) {
             break;
         }
 
@@ -2486,7 +2486,7 @@ void CShopMenu::SelectMake()
 
             int itemId = getItemNo(m_selectedIndex);
             int makeGil;
-            if (itemId < 1) {
+            if (itemId <= 0) {
                 makeGil = 0;
             } else {
                 int gil = m_caravanWork->m_shopParam *

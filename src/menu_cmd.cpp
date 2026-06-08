@@ -1247,8 +1247,9 @@ void CMenuPcs::CmdDraw()
 			}
 
 			listFont->GetWidth(text);
+			const float listPy = static_cast<float>(textRow->y + 0x0B) - kCmdMenuTextYOffset;
 			listFont->SetPosX(static_cast<float>(textRow->x + 0x1C));
-			listFont->SetPosY(static_cast<float>(textRow->y + 0x0B) - kCmdMenuTextYOffset);
+			listFont->SetPosY(listPy);
 			listFont->Draw(text);
 
 			textRow++;

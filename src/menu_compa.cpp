@@ -62,7 +62,7 @@ void CMenuPcs::CompaDraw()
 	const CCaravanWork* caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	CompaOpenAnimList* compaList = this->m_compaList;
 	CompaOpenAnim* entry = compaList->entries;
-	int count = compaList->count;
+	unsigned int count = compaList->count;
 	for (int i = 0; i < count; i++) {
 		int tex = entry->tex;
 		if (tex >= 0) {
@@ -137,7 +137,7 @@ void CMenuPcs::CompaDraw()
 						float end = y + h;
 						while (static_cast<float>(yStep) < end) {
 							float diff = end - static_cast<float>(yStep);
-							int tileH = (diff >= kCompaTileHeight) ? 0x18 : static_cast<int>(diff);
+							int tileH = (diff >= kCompaTileHeight) ? 0x18 : static_cast<unsigned int>(diff);
 							MenuPcs.DrawRect(
 								static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
 								remainW, static_cast<float>(tileH), u, v,
@@ -192,7 +192,7 @@ void CMenuPcs::CompaDraw()
 		familyCount = 4;
 	}
 
-	for (unsigned int i = 0; i < familyCount; i++) {
+	for (int i = 0; i < familyCount; i++) {
 		MenuPcs.DrawRect(
 			0,
 			static_cast<float>(compaList->entries[0].x + 0x10),
@@ -248,7 +248,7 @@ void CMenuPcs::CompaDraw()
 	font->SetScaleY(kCompaOne);
 	font->DrawInit();
 
-	GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(kCompaColorMax * globalAlpha)).color;
+	GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<signed char>(kCompaColorMax * globalAlpha)).color;
 	font->SetColor(textColor);
 
 	memberIndex = 0;

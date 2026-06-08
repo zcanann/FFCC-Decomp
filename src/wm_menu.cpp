@@ -11183,7 +11183,21 @@ LAB_draw:
 
 			unsigned char* slotData = reinterpret_cast<unsigned char*>(mcData) + slot * 0x48;
 			const float slotY = static_cast<float>(kSlope * static_cast<double>(slot) + kBase);
-			if (*reinterpret_cast<char*>(slotData + 0x42) == 0 && *reinterpret_cast<int*>(slotData + 8) > 0) {
+			if (*reinterpret_cast<char*>(slotData + 0x42) != 0 || *reinterpret_cast<int*>(slotData + 8) <= 0) {
+				fontF8->SetMargin(FLOAT_803313e8);
+				fontF8->SetShadow(1);
+				fontF8->SetScale(FLOAT_803313e8);
+				fontF8->DrawInit();
+				fontF8->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
+				fontF8->SetTlut(0x19);
+				const unsigned int msgId = static_cast<unsigned int>(
+					__cntlzw(static_cast<unsigned int>(static_cast<int>(*reinterpret_cast<char*>(slotData + 0x42))))) >> 5;
+				char* text = const_cast<char*>(GetMcStr(msgId));
+				const int width = static_cast<int>(fontF8->GetWidth(text));
+				fontF8->SetPosX(static_cast<float>((0x238 - width) * DOUBLE_803313f8 + static_cast<double>(FLOAT_803314d8)));
+				fontF8->SetPosY(static_cast<float>(static_cast<double>(slotY) + DOUBLE_80331580));
+				fontF8->Draw(text);
+			} else {
 				fontF8->SetMargin(FLOAT_803313e8);
 				fontF8->SetShadow(0);
 				fontF8->SetScale(FLOAT_80331588);
@@ -11204,44 +11218,30 @@ LAB_draw:
 				fontF8->SetScale(FLOAT_8033158C);
 				fontF8->DrawInit();
 				fontF8->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
-					fontF8->SetTlut(7);
-					char locationStr[64];
-					const int locationIndex = *reinterpret_cast<int*>(slotData + 0x10);
-					if (locationIndex == 0x0F) {
+				fontF8->SetTlut(7);
+				char locationStr[64];
+				const int locationIndex = *reinterpret_cast<int*>(slotData + 0x10);
+				if (locationIndex == 0x0F) {
+					strcpy(locationStr, reinterpret_cast<char*>(slotData + 0x2C));
+				} else if (locationIndex == 0x16) {
+					if (Game.m_gameWork.m_languageId == 2) {
 						strcpy(locationStr, reinterpret_cast<char*>(slotData + 0x2C));
-					} else if (locationIndex == 0x16) {
-						if (Game.m_gameWork.m_languageId == 2) {
-							strcpy(locationStr, reinterpret_cast<char*>(slotData + 0x2C));
-							strcat(locationStr, lbl_80210D10[1]);
-						} else {
-							strcpy(locationStr, lbl_80210D10[Game.m_gameWork.m_languageId - 1]);
-							strcat(locationStr, reinterpret_cast<char*>(slotData + 0x2C));
-						}
+						strcat(locationStr, lbl_80210D10[1]);
 					} else {
-						strcpy(locationStr, Game.m_cFlatDataArr[1].TableStrings(3)[locationIndex]);
+						strcpy(locationStr, lbl_80210D10[Game.m_gameWork.m_languageId - 1]);
+						strcat(locationStr, reinterpret_cast<char*>(slotData + 0x2C));
+					}
+				} else {
+					strcpy(locationStr, Game.m_cFlatDataArr[1].TableStrings(3)[locationIndex]);
 				}
 				if (locationStr[0] != 0) {
 					locationStr[0] = static_cast<char>(toupperLatin1(static_cast<unsigned char>(locationStr[0])));
-					}
-					const float locationY = static_cast<float>(static_cast<double>(slotY) + static_cast<double>(FLOAT_80331558));
-					const int locationWidth = static_cast<int>(fontF8->GetWidth(locationStr));
-					fontF8->SetPosX(static_cast<float>(static_cast<double>(FLOAT_80331518) - static_cast<double>(locationWidth)));
-					fontF8->SetPosY(locationY);
-					fontF8->Draw(locationStr);
-				} else {
-				fontF8->SetMargin(FLOAT_803313e8);
-				fontF8->SetShadow(1);
-				fontF8->SetScale(FLOAT_803313e8);
-				fontF8->DrawInit();
-				fontF8->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
-				fontF8->SetTlut(0x19);
-				const unsigned int msgId = static_cast<unsigned int>(
-					__cntlzw(static_cast<unsigned int>(static_cast<int>(*reinterpret_cast<char*>(slotData + 0x42))))) >> 5;
-				char* text = const_cast<char*>(GetMcStr(msgId));
-				const int width = static_cast<int>(fontF8->GetWidth(text));
-				fontF8->SetPosX(static_cast<float>((0x238 - width) * DOUBLE_803313f8 + static_cast<double>(FLOAT_803314d8)));
-				fontF8->SetPosY(static_cast<float>(static_cast<double>(slotY) + DOUBLE_80331580));
-				fontF8->Draw(text);
+				}
+				const float locationY = static_cast<float>(static_cast<double>(slotY) + static_cast<double>(FLOAT_80331558));
+				const int locationWidth = static_cast<int>(fontF8->GetWidth(locationStr));
+				fontF8->SetPosX(static_cast<float>(static_cast<double>(FLOAT_80331518) - static_cast<double>(locationWidth)));
+				fontF8->SetPosY(locationY);
+				fontF8->Draw(locationStr);
 			}
 		}
 	}

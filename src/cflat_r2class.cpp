@@ -801,9 +801,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -8:
-			*(reinterpret_cast<u8*>(&engineObject->m_weaponNodeFlags) + 1) =
-			    static_cast<u8>((static_cast<unsigned char>(object->m_localBase[0]) << 7) & 0x80) |
-			    (*(reinterpret_cast<u8*>(&engineObject->m_weaponNodeFlags) + 1) & 0x7F);
+			engineObject->m_weaponNodeFlagAll.m_bits1.m_shield = static_cast<signed char>(object->m_localBase[0]);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

@@ -2151,7 +2151,26 @@ int CMapMng::ReadOtm(char* mapName)
 
             chunkFile.PushChunk();
             while (chunkFile.GetNextChunk(chunk)) {
-                if (chunk.m_id == 0x4D455348) {
+                switch (chunk.m_id) {
+                case 0x4D534554: {
+                    CMaterialSet* materialSet =
+                        new (MapMng.m_stage, const_cast<char*>(s_map_cpp), 0x482) CMaterialSet();
+                    m_materialSet = materialSet;
+                    materialSet->m_materials.SetDefaultSize(0x180);
+                    materialSet->m_materials.SetGrow(0);
+                    materialSet->Create(chunkFile, m_textureSet, static_cast<CMaterialMan::TEV_BIT>(0xFFF53060), 0);
+                    break;
+                }
+
+                case 0x41534554: {
+                    CMapTexAnimSet* texAnimSet =
+                        new (MapMng.m_stage, const_cast<char*>(s_map_cpp), 0x49A) CMapTexAnimSet();
+                    m_mapTexAnimSet = texAnimSet;
+                    texAnimSet->Create(chunkFile, m_materialSet, m_textureSet);
+                    break;
+                }
+
+                case 0x4D455348: {
                     short& meshCount = m_mapMeshCount;
                     if (meshCount > 0x9F) {
                         return 0;
@@ -2159,25 +2178,10 @@ int CMapMng::ReadOtm(char* mapName)
                     CMapMesh* mesh = GetMapMeshArray() + meshCount;
                     mesh->ReadOtmMesh(chunkFile, MapMng.m_stage, 0, 1);
                     meshCount += 1;
-                    continue;
+                    break;
                 }
 
-                if (chunk.m_id == 0x41534554) {
-                    CMapTexAnimSet* texAnimSet =
-                        new (MapMng.m_stage, const_cast<char*>(s_map_cpp), 0x49A) CMapTexAnimSet();
-                    m_mapTexAnimSet = texAnimSet;
-                    texAnimSet->Create(chunkFile, m_materialSet, m_textureSet);
-                    continue;
-                }
-
-                if (chunk.m_id == 0x414E494D) {
-                    CMapAnim* mapAnim = new (MapMng.m_stage, const_cast<char*>(s_map_cpp), 0x4BF) CMapAnim();
-                    mapAnim->ReadOtmAnim(chunkFile);
-                    GetMapAnimArray().Add(mapAnim);
-                    continue;
-                }
-
-                if (chunk.m_id == 0x48495420) {
+                case 0x48495420: {
                     short& hitCount = m_mapHitCount;
                     if (hitCount > 0x1F) {
                         return 0;
@@ -2185,10 +2189,10 @@ int CMapMng::ReadOtm(char* mapName)
                     CMapHit* hit = GetMapHitArray() + hitCount;
                     hit->ReadOtmHit(chunkFile);
                     hitCount += 1;
-                    continue;
+                    break;
                 }
 
-                if (chunk.m_id == 0x4E4F4445) {
+                case 0x4E4F4445: {
                     short& mapObjCount = m_mapObjCount;
                     if (mapObjCount > 0x1FF) {
                         return 0;
@@ -2196,16 +2200,15 @@ int CMapMng::ReadOtm(char* mapName)
                     CMapObj* mapObj = GetMapObjArray() + mapObjCount;
                     mapObj->ReadOtmObj(chunkFile);
                     mapObjCount += 1;
-                    continue;
+                    break;
                 }
 
-                if (chunk.m_id == 0x4D534554) {
-                    CMaterialSet* materialSet =
-                        new (MapMng.m_stage, const_cast<char*>(s_map_cpp), 0x482) CMaterialSet();
-                    m_materialSet = materialSet;
-                    materialSet->m_materials.SetDefaultSize(0x180);
-                    materialSet->m_materials.SetGrow(0);
-                    materialSet->Create(chunkFile, m_textureSet, static_cast<CMaterialMan::TEV_BIT>(0xFFF53060), 0);
+                case 0x414E494D: {
+                    CMapAnim* mapAnim = new (MapMng.m_stage, const_cast<char*>(s_map_cpp), 0x4BF) CMapAnim();
+                    mapAnim->ReadOtmAnim(chunkFile);
+                    GetMapAnimArray().Add(mapAnim);
+                    break;
+                }
                 }
             }
             chunkFile.PopChunk();

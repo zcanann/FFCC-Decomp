@@ -2281,7 +2281,7 @@ void CPartMng::pppEditBeforeCalc()
         break;
     case 0x1c:
         if (*editorObj != 0 && (*editorObj)->m_charaModelHandle != 0) {
-            if (*reinterpret_cast<int*>(self + 0x1c0) != 0) {
+            if (*reinterpret_cast<unsigned int*>(self + 0x1c0) != 0) {
                 (*editorObj)->m_charaModelHandle->m_flags |= 1;
             } else {
                 (*editorObj)->m_charaModelHandle->m_flags &= ~1;
@@ -3215,7 +3215,7 @@ void CPartMng::pppDraw()
     cameraPos.y = invCamera[1][3];
     cameraPos.z = invCamera[2][3];
 
-    for (int i = 0; i < 0x180; i++) {
+    for (unsigned int i = 0; i < 0x180; i++) {
         _pppMngSt* mng = &m_pppMng[i];
         if (mng->m_hitBgFlag == 0 && mng->m_baseTime != -0x1000 && (signed char)mng->m_drawPass <= 2 && mng->m_baseTime < 0
             && mng->m_slotVisible != 0 && mng->m_ownerFacing != 0) {
@@ -3233,7 +3233,7 @@ void CPartMng::pppDraw()
             mng->m_sortDepth = viewPos.z;
 
             if ((signed char)mng->m_drawPass != 1) {
-                if ((signed char)mng->m_drawPass < 1) {
+                if ((unsigned char)mng->m_drawPass < 1) {
                     if ((signed char)mng->m_drawPass >= 0) {
                         ppvDrawMng.AddPrim(viewPos.z, reinterpret_cast<_pppMngSt*>(mng), mng->m_drawSubType);
                     }
@@ -3299,7 +3299,7 @@ void CPartMng::pppPartDrawAfter()
     cameraPos.y = invCamera[1][3];
     cameraPos.z = invCamera[2][3];
 
-    for (int i = 0; i < 0x180; i++) {
+    for (unsigned int i = 0; i < 0x180; i++) {
         _pppMngSt* mng = &m_pppMng[i];
         if (mng->m_hitBgFlag == 0 && mng->m_baseTime != -0x1000 && (signed char)mng->m_drawPass == 5
             && mng->m_baseTime < 0 && mng->m_slotVisible != 0 && mng->m_ownerFacing != 0) {

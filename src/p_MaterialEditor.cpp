@@ -366,10 +366,9 @@ void CMaterialEditorPcs::drawViewer()
 
                 u32 vertexIndex[8];
                 unsigned int vertexCount = 3;
-                MaterialEditorPolygon* poly = polygon;
-                vertexIndex[4] = poly->index0;
-                vertexIndex[5] = poly->index1;
-                vertexIndex[6] = poly->index2;
+                vertexIndex[4] = polygon->index0;
+                vertexIndex[5] = polygon->index1;
+                vertexIndex[6] = polygon->index2;
                 vertexIndex[0] = 0;
                 vertexIndex[1] = 1;
                 vertexIndex[2] = 2;

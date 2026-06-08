@@ -1397,20 +1397,23 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 		return;
 	}
 
-	float furDepth = kCharaFurDepthZero;
+	float furDepth;
 	CVector modelPos;
 	CVector viewPos;
 	modelPos.x = ModelDrawMtx(this)[0][3];
 	modelPos.y = ModelDrawMtx(this)[1][3];
 	modelPos.z = ModelDrawMtx(this)[2][3];
 	PSMTXMultVec(viewMtx, reinterpret_cast<Vec*>(&modelPos), reinterpret_cast<Vec*>(&viewPos));
-	if (kCharaFurViewDepthThreshold > viewPos.z) {
+	if (kCharaFurViewDepthThreshold <= viewPos.z) {
+		furDepth = kCharaFurDepthZero;
+	} else {
 		Vec4d clipPos;
 		Math.MTX44MultVec4(CameraPcs.m_screenMatrix, reinterpret_cast<Vec*>(&viewPos), &clipPos);
 		furDepth = -clipPos.z / clipPos.w;
 	}
 
-	float furLength = ModelFurLenScale(this) * (kCharaFurDepthScaleBase - furDepth) + ModelFurLenScale(this);
+	const float lenScale = ModelFurLenScale(this);
+	float furLength = lenScale * (kCharaFurDepthScaleBase - furDepth) + lenScale;
 	float furStep = ModelFurStep(this);
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);

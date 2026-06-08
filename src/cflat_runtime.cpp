@@ -288,7 +288,7 @@ void CFlatRuntime::Create(void* filePtr)
 							classBase->m_variableCount = chunkFile.Get4();
 							break;
 						case 'VTBL':
-							for (int i = 0; i < 0x80; i++) {
+							for (unsigned int i = 0; i < 0x80; i++) {
 								classBase->m_functionTable[i] = chunkFile.Get4();
 							}
 							break;
@@ -400,7 +400,7 @@ void CFlatRuntime::Create(void* filePtr)
 				        char[chunk.m_size];
 
 				memcpy(*reinterpret_cast<void**>(self + 0x38), chunkFile.GetAddress(), chunk.m_size);
-				const short base = *reinterpret_cast<short*>(chunkFile.GetAddress());
+				const unsigned short base = *reinterpret_cast<short*>(chunkFile.GetAddress());
 				int offset = 0;
 				for (int i = 0; i < strCount; i++) {
 					const short cur = *reinterpret_cast<short*>(chunkFile.GetAddress());

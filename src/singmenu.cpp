@@ -2038,11 +2038,10 @@ void CMenuPcs::SingleCalcCtrl()
     }
 
     unsigned short result = 0;
-    CChara::CModel* model = m_wm.m_handles[0]->m_model;
-    if (model->m_animEnd < model->m_curFrame) {
-        model->AddFrame(1.0f);
+    if (m_wm.m_handles[0]->m_model->m_animEnd < m_wm.m_handles[0]->m_model->m_curFrame) {
+        m_wm.m_handles[0]->m_model->AddFrame(1.0f);
     } else {
-        model->SetFrame(0.0f);
+        m_wm.m_handles[0]->m_model->SetFrame(0.0f);
     }
 
     short modelScaleIndex = SingleCaravanWork()->m_tribeId;
@@ -2053,10 +2052,10 @@ void CMenuPcs::SingleCalcCtrl()
     scaleMtx[0][3] = 0.0f;
     scaleMtx[2][3] = 0.0f;
 
-    model->m_flags10C = (model->m_flags10C & 0x7F) | 0x80;
-    model->SetMatrix(scaleMtx);
-    model->CalcMatrix();
-    model->CalcSkin();
+    m_wm.m_handles[0]->m_model->m_flags10C = (m_wm.m_handles[0]->m_model->m_flags10C & 0x7F) | 0x80;
+    m_wm.m_handles[0]->m_model->SetMatrix(scaleMtx);
+    m_wm.m_handles[0]->m_model->CalcMatrix();
+    m_wm.m_handles[0]->m_model->CalcSkin();
 
     s16 mode = m_singleMenuMode;
     s16 proc = state->stepState;

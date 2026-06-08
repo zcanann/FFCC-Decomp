@@ -1331,11 +1331,25 @@ void GbaQueue::LoadPlayerStat()
 				entry[0xD5] = static_cast<unsigned char>(caravanWork->unk_0x3ac);
 
 				memcpy(entry + 0x3A, caravanWork->m_inventoryItems, 0x80);
-				for (int artifactIndex = 0; artifactIndex < 96; artifactIndex++) {
-					if (static_cast<short>(caravanWork->m_artifacts[artifactIndex]) > 0) {
-						reinterpret_cast<unsigned int*>(entry + 0x28)[artifactIndex >> 5] |=
-						    static_cast<unsigned int>(1U << (artifactIndex & 0x1F));
-					}
+				{
+					int artifactIndex = 0;
+					int artifactGroup = 0x20;
+					do {
+						if (static_cast<short>(caravanWork->m_artifacts[artifactIndex]) > 0) {
+							reinterpret_cast<unsigned int*>(entry + 0x28)[artifactIndex / 32] |=
+							    static_cast<unsigned int>(1U << (artifactIndex % 32));
+						}
+						if (static_cast<short>(caravanWork->m_artifacts[artifactIndex + 1]) > 0) {
+							reinterpret_cast<unsigned int*>(entry + 0x28)[(artifactIndex + 1) / 32] |=
+							    static_cast<unsigned int>(1U << ((artifactIndex + 1) % 32));
+						}
+						if (static_cast<short>(caravanWork->m_artifacts[artifactIndex + 2]) > 0) {
+							reinterpret_cast<unsigned int*>(entry + 0x28)[(artifactIndex + 2) / 32] |=
+							    static_cast<unsigned int>(1U << ((artifactIndex + 2) % 32));
+						}
+						artifactIndex += 3;
+						artifactGroup--;
+					} while (artifactGroup != 0);
 				}
 
 				*reinterpret_cast<unsigned short*>(entry + 0xBA) = caravanWork->m_treasures[0];

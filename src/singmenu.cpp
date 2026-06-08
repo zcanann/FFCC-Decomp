@@ -998,7 +998,7 @@ static inline double SingWinUIntToDouble(unsigned int value)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
+#pragma auto_inline off
 void CMenuPcs::createSingleMenu()
 {
     u8* self = reinterpret_cast<u8*>(this);
@@ -1044,7 +1044,7 @@ void CMenuPcs::createSingleMenu()
         }
     }
 }
-#pragma dont_inline reset
+#pragma auto_inline reset
 
 /*
  * --INFO--
@@ -2579,42 +2579,35 @@ void CMenuPcs::DrawListPosMark(float x, float y, float z)
  */
 int CMenuPcs::EquipChk(int itemNo)
 {
-    const CCaravanWork* const caravanWork = SingleCaravanWork();
-    int slot;
+    CCaravanWork* caravanWork = SingleCaravanWork();
     int commandItem;
 
-    slot = 2;
-    if (slot < caravanWork->m_numCmdListSlots) {
+    if (2 < caravanWork->m_numCmdListSlots) {
         commandItem = caravanWork->m_commandListInventorySlotRef[2];
         if ((commandItem >= 0) && (commandItem == itemNo)) {
             return 1;
         }
-        slot = 3;
-        if (slot < caravanWork->m_numCmdListSlots) {
+        if (3 < caravanWork->m_numCmdListSlots) {
             commandItem = caravanWork->m_commandListInventorySlotRef[3];
             if ((commandItem >= 0) && (commandItem == itemNo)) {
                 return 1;
             }
-            slot = 4;
-            if (slot < caravanWork->m_numCmdListSlots) {
+            if (4 < caravanWork->m_numCmdListSlots) {
                 commandItem = caravanWork->m_commandListInventorySlotRef[4];
                 if ((commandItem >= 0) && (commandItem == itemNo)) {
                     return 1;
                 }
-                slot = 5;
-                if (slot < caravanWork->m_numCmdListSlots) {
+                if (5 < caravanWork->m_numCmdListSlots) {
                     commandItem = caravanWork->m_commandListInventorySlotRef[5];
                     if ((commandItem >= 0) && (commandItem == itemNo)) {
                         return 1;
                     }
-                    slot = 6;
-                    if (slot < caravanWork->m_numCmdListSlots) {
+                    if (6 < caravanWork->m_numCmdListSlots) {
                         commandItem = caravanWork->m_commandListInventorySlotRef[6];
                         if ((commandItem >= 0) && (commandItem == itemNo)) {
                             return 1;
                         }
-                        slot = 7;
-                        if (slot < caravanWork->m_numCmdListSlots) {
+                        if (7 < caravanWork->m_numCmdListSlots) {
                             commandItem = caravanWork->m_commandListInventorySlotRef[7];
                             if ((commandItem >= 0) && (commandItem == itemNo)) {
                                 return 1;
@@ -2887,7 +2880,7 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
     font->SetShadow(1);
     font->SetScale(FLOAT_8032ea78);
 
-    unsigned int lineCount;
+    int lineCount;
     if (useDynamic != 0) {
         lineCount = s_DynamicMess[0];
     } else {
@@ -3157,19 +3150,24 @@ int CMenuPcs::ChkEquipPossible(int itemNo)
     int raceBits = flags & 0xF;
     int genderBits = flags & 0x30;
 
-    int result;
-    if (raceBits != 0 && genderBits != 0) {
-        if ((raceBits & raceMask) != 0 && (genderBits & genderMask) != 0) {
-            result = 1;
-        } else {
-            result = 0;
+    unsigned int result;
+    if (raceBits != 0) {
+        if (genderBits != 0) {
+            if (((raceBits & raceMask) == 0) || ((genderBits & genderMask) == 0)) {
+                result = 0;
+            } else {
+                result = 1;
+            }
+            goto done;
         }
-    } else if (raceBits != 0) {
-        result = (raceBits & raceMask) != 0;
-    } else {
-        result = (genderBits & genderMask) != 0;
     }
-    return result;
+    if (raceBits == 0) {
+        result = (genderBits & genderMask) != 0;
+    } else {
+        result = (raceBits & raceMask) != 0;
+    }
+done:
+    return result != 0;
 }
 
 /*
@@ -3225,7 +3223,7 @@ int CMenuPcs::GetSmithItem(int itemNo)
     int smithItem = *reinterpret_cast<u16*>(itemBase + (race & 3) * 2 + 0x38);
     if (smithItem > 0) {
         unsigned int genderMask = 0x10;
-        u16 flags = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + smithItem * 0x48 + 4);
+        s16 flags = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + smithItem * 0x48 + 4);
         unsigned int raceMask = 1 << (*reinterpret_cast<u16*>(reinterpret_cast<unsigned int>(SingleCaravanWork()) + 0x3e0) & 3);
         if (*reinterpret_cast<u16*>(reinterpret_cast<unsigned int>(SingleCaravanWork()) + 0x3e2) != 0) {
             genderMask = 0x20;
@@ -3233,19 +3231,23 @@ int CMenuPcs::GetSmithItem(int itemNo)
 
         int raceFlags = flags & 0xF;
         int genderFlags = flags & 0x30;
-        unsigned int valid;
-        if ((raceFlags != 0) && (genderFlags != 0)) {
-            if (((raceFlags & raceMask) != 0) && ((genderFlags & genderMask) != 0)) {
-                valid = 1;
-            } else {
-                valid = 0;
+        int valid;
+        if (raceFlags != 0) {
+            if (genderFlags != 0) {
+                if (((raceFlags & raceMask) == 0) || ((genderFlags & genderMask) == 0)) {
+                    valid = 0;
+                } else {
+                    valid = 1;
+                }
+                goto checked;
             }
-        } else if (raceFlags == 0) {
-            valid = static_cast<unsigned int>(-static_cast<int>(genderFlags & genderMask)) >> 0x1f;
-        } else {
-            valid = static_cast<unsigned int>(-static_cast<int>(raceFlags & raceMask)) >> 0x1f;
         }
-
+        if (raceFlags == 0) {
+            valid = (genderFlags & genderMask) != 0;
+        } else {
+            valid = (raceFlags & raceMask) != 0;
+        }
+checked:
         if (valid != 0) {
             return smithItem;
         }

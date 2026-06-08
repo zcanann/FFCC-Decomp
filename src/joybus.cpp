@@ -6563,7 +6563,10 @@ int JoyBus::ChgCtrlMode(int portIndex)
     {
         mode ^= (unsigned char)JoyBusConst::JOY_CODE_MASK;
 
-        unsigned int word = MakeJoyCmd16(0x0900, mode, 0);
+        unsigned int word = 0;
+        unsigned char* wordBytes = reinterpret_cast<unsigned char*>(&word);
+        wordBytes[0] = 0x09;
+        wordBytes[1] = mode;
         int ret = 0;
 
         if (m_threadRunningMask != 0)

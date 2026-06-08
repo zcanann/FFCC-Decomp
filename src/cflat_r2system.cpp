@@ -1594,7 +1594,7 @@ int CCameraPcs::IsAbsolute()
 int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long* nearestSegment,
                     float* nearestSegmentRatio, Vec* targetPosition, float maxDistance)
 {
-    const bool infiniteRange = (kLineSegmentMinT == maxDistance);
+    const int infiniteRange = (kLineSegmentMinT == maxDistance);
     float bestDistance = infiniteRange ? kLineBoundsInitMin : maxDistance;
     const float maxDistanceSq = maxDistance * maxDistance;
     int found = 0;

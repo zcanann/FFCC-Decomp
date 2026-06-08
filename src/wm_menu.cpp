@@ -7145,8 +7145,7 @@ void CMenuPcs::DrawFukidashi()
 	fontFC->SetShadow(0);
 	fontFC->SetScale(FLOAT_803313e8);
 	fontFC->DrawInit();
-	CColor whiteColor(0xFF, 0xFF, 0xFF, 0xFF);
-	fontFC->SetColor(whiteColor.color);
+	fontFC->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 	fontFC->SetPosX((float)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x70));
 	fontFC->SetPosY((float)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x72));
 	fontFC->Draw(nameBuffer);
@@ -11214,8 +11213,7 @@ LAB_draw:
 				fontF8->SetShadow(0);
 				fontF8->SetScale(FLOAT_80331588);
 				fontF8->DrawInit();
-				CColor nameColor(0xFF, 0xFF, 0xFF, 0xFF);
-				fontF8->SetColor(nameColor.color);
+				fontF8->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 				fontF8->SetTlut(0x2C);
 				fontF8->SetPosX(FLOAT_80331520);
 				fontF8->SetPosY(static_cast<float>(static_cast<double>(slotY) - DOUBLE_80331510));
@@ -11230,8 +11228,7 @@ LAB_draw:
 				fontF8->SetShadow(1);
 				fontF8->SetScale(FLOAT_8033158C);
 				fontF8->DrawInit();
-				CColor locationColor(0xFF, 0xFF, 0xFF, 0xFF);
-				fontF8->SetColor(locationColor.color);
+				fontF8->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 					fontF8->SetTlut(7);
 					char locationStr[64];
 					const int locationIndex = *reinterpret_cast<int*>(slotData + 0x10);
@@ -11261,8 +11258,7 @@ LAB_draw:
 				fontF8->SetShadow(1);
 				fontF8->SetScale(FLOAT_803313e8);
 				fontF8->DrawInit();
-				CColor noDataColor(0xFF, 0xFF, 0xFF, 0xFF);
-				fontF8->SetColor(noDataColor.color);
+				fontF8->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 				fontF8->SetTlut(0x19);
 				const unsigned int msgId = static_cast<unsigned int>(
 					__cntlzw(static_cast<unsigned int>(static_cast<int>(*reinterpret_cast<char*>(slotData + 0x42))))) >> 5;

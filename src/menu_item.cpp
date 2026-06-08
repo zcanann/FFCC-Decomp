@@ -387,24 +387,23 @@ void CMenuPcs::ItemDraw()
 
             MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
         } else {
-            float alpha = entry->alpha;
-            float itemAlpha = alpha;
+            float itemAlpha = entry->alpha;
             if (tex == 0x37) {
-                unsigned int menuIndex = drawIndex + this->m_itemMenuState->scroll;
-                if (menuIndex > 0x3F) {
+                int menuIndex = drawIndex + this->m_itemMenuState->scroll;
+                if (menuIndex >= 0x40) {
                     menuIndex -= 0x40;
                 }
 
                 s16 itemId = caravanWork->m_inventoryItems[menuIndex];
-                if ((itemId < 1) || (EquipChk(menuIndex) != 0) ||
+                if ((itemId <= 0) || (EquipChk(menuIndex) != 0) ||
                     (hasLetterAttach && (itemId < 0x125))) {
                     if (EquipChk(menuIndex) != 0) {
                         int markX = (int)(x - LoadFloat(kItemMarkXOffset));
                         int markY = (int)((h - LoadFloat(kItemMarkHeight)) * LoadDouble(kItemHalfDouble) + y);
-                        DrawEquipMark(markX, markY, alpha);
+                        DrawEquipMark(markX, markY, entry->alpha);
                     }
                     tex = 0x34;
-                    itemAlpha = (float)((double)LoadDouble(kItemHalfDouble) * (double)alpha);
+                    itemAlpha = (float)((double)LoadDouble(kItemHalfDouble) * (double)entry->alpha);
                 }
 
                 if (tex == 0x37 && drawIndex == this->m_itemMenuState->cursorIndex[0]) {

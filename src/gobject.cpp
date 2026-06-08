@@ -1013,16 +1013,16 @@ void CGObject::bgNormalCollision()
 
     if (MapMng.m_hitMapObj->CalcHitSlide(&move, sBgAttrNormal) != 0) {
         GObjectMapCylinder hitCylinder;
-        hitCylinder.m_bottom = pos;
-        hitCylinder.Probe().m_direction = move;
+        hitCylinder.Probe().m_radius2 = m_capsuleHalfHeight;
         hitCylinder.Probe().m_radius = sHugeCylinderExtent;
         hitCylinder.Probe().m_height = sHugeCylinderExtent;
-        hitCylinder.Probe().m_top = move;
+        hitCylinder.Probe().m_height2 = 0.0f;
         hitCylinder.Probe().m_direction2.x = sNegHugeCylinderExtent;
         hitCylinder.Probe().m_direction2.y = sNegHugeCylinderExtent;
         hitCylinder.Probe().m_direction2.z = sNegHugeCylinderExtent;
-        hitCylinder.Probe().m_radius2 = m_capsuleHalfHeight;
-        hitCylinder.Probe().m_height2 = 0.0f;
+        hitCylinder.m_bottom = pos;
+        hitCylinder.Probe().m_direction = move;
+        hitCylinder.Probe().m_top = move;
 
         if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&hitCylinder), &move, m_bgHitMask) != 0) {
             Vec hitPos;

@@ -185,7 +185,7 @@ void CMenuPcs::CompaDraw()
 		}
 		i++;
 	} while (i < 7);
-	if (familyCount > 4 && System.m_execParam >= 1) {
+	if (familyCount > 4 && static_cast<unsigned int>(System.m_execParam) >= 1) {
 		System.Printf(const_cast<char*>(sCompaFamilyCountErrorFmt), s_menu_compa_cpp, 0x1BF,
 		              familyCount);
 	}
@@ -222,7 +222,7 @@ void CMenuPcs::CompaDraw()
 		}
 
 		const u8* foodPtr = &Game.m_gameWork.m_linkTable[caravanWork->m_saveSlot][0][caravanWork->m_saveSlot][drawIndex + 1];
-		if (*foodPtr == 0 && System.m_execParam >= 1) {
+		if (*foodPtr == 0 && static_cast<unsigned int>(System.m_execParam) >= 1) {
 			System.Printf(const_cast<char*>(sCompaFamilyCountErrorFmt), s_menu_compa_cpp, 0x1E0,
 			              shown);
 		}

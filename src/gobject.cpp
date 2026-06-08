@@ -1628,10 +1628,8 @@ void CGObject::update()
             }
 
             ModelLightAlpha(model) = m_lookAtTimer;
-            ModelFlagsA0(model) =
-                static_cast<unsigned char>((ModelFlagsA0(model) & 0x5F) |
-                                           ((weaponFlagsLo & 0x40) != 0 ? 0x20 : 0) |
-                                           ((m_displayFlags & 0x20) != 0 ? 0x80 : 0));
+            model->m_flagsA0Bits.m_flagA0_20 = m_weaponNodeFlagBits.m_unk40;
+            model->m_flagsA0Bits.m_flagA0_80 = (m_displayFlags & 0x20) != 0;
         }
 
         model->CalcFurColor();
@@ -1750,10 +1748,8 @@ void CGObject::update()
             }
 
             ModelLightAlpha(m_weaponModelHandle->m_model) = m_lookAtTimer;
-            ModelFlagsA0(m_weaponModelHandle->m_model) =
-                static_cast<unsigned char>((ModelFlagsA0(m_weaponModelHandle->m_model) & 0x5F) |
-                                           ((weaponFlagsLo & 0x40) != 0 ? 0x20 : 0) |
-                                           ((m_displayFlags & 0x20) != 0 ? 0x80 : 0));
+            m_weaponModelHandle->m_model->m_flagsA0Bits.m_flagA0_20 = (weaponFlagsLo & 0x40) != 0;
+            m_weaponModelHandle->m_model->m_flagsA0Bits.m_flagA0_80 = (m_displayFlags & 0x20) != 0;
         }
 
         if (HasLoadedModel(m_shieldModelHandle) && (m_displayFlags & 1) != 0 && m_shieldAttachNodeIndex >= 0) {
@@ -1767,10 +1763,8 @@ void CGObject::update()
             }
 
             ModelLightAlpha(m_shieldModelHandle->m_model) = m_lookAtTimer;
-            ModelFlagsA0(m_shieldModelHandle->m_model) =
-                static_cast<unsigned char>((ModelFlagsA0(m_shieldModelHandle->m_model) & 0x5F) |
-                                           ((weaponFlagsLo & 0x40) != 0 ? 0x20 : 0) |
-                                           ((m_displayFlags & 0x20) != 0 ? 0x80 : 0));
+            m_shieldModelHandle->m_model->m_flagsA0Bits.m_flagA0_20 = (weaponFlagsLo & 0x40) != 0;
+            m_shieldModelHandle->m_model->m_flagsA0Bits.m_flagA0_80 = (m_displayFlags & 0x20) != 0;
         }
     }
 

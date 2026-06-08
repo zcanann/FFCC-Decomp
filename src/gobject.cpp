@@ -1991,15 +1991,12 @@ void CGObject::onDraw()
 
     if (((CFlat.m_debugFlags & 0x1) != 0) && ((m_bgColMask & 0x1) != 0)) {
         CColor color(0xFF, 0x00, 0x00, 0xFF);
-        Vec pos;
-        pos.x = m_worldPosition.x;
-        pos.y = m_worldPosition.y + m_capsuleHalfHeight;
-        pos.z = m_worldPosition.z;
-        Graphic.DrawSphere(FlatPosMtx(), &pos, m_capsuleHalfHeight, &color.color);
+        CVector pos(m_worldPosition.x, m_worldPosition.y + m_capsuleHalfHeight, m_worldPosition.z);
+        Graphic.DrawSphere(FlatPosMtx(), pos, m_capsuleHalfHeight, &color.color);
     }
 
     if (((CFlat.m_debugFlags & 0x2) != 0) && ((m_bgColMask & 0x2) != 0)) {
-        Vec capsuleOffset;
+        CVector capsuleOffset;
         capsuleOffset.x = sZeroFloat;
         capsuleOffset.y = sZeroFloat;
         capsuleOffset.z = sZeroFloat;
@@ -2017,11 +2014,8 @@ void CGObject::onDraw()
         PSMTXRotRad(rotMtx, 'y', m_rotBaseY);
         PSMTXConcat(rotMtx, scaleMtx, scaleMtx);
 
-        Vec spherePos;
-        spherePos.x = m_worldPosition.x;
-        spherePos.y = m_worldPosition.y + m_bodyEllipsoidRadius;
-        spherePos.z = m_worldPosition.z;
-        PSVECAdd(&spherePos, &capsuleOffset, &spherePos);
+        CVector spherePos(m_worldPosition.x, m_worldPosition.y + m_bodyEllipsoidRadius, m_worldPosition.z);
+        PSVECAdd(spherePos, capsuleOffset, spherePos);
 
         scaleMtx[0][3] = spherePos.x;
         scaleMtx[1][3] = spherePos.y;
@@ -2036,20 +2030,14 @@ void CGObject::onDraw()
 
     if (((CFlat.m_debugFlags & 0x4) != 0) && ((m_bgColMask & 0x4) != 0)) {
         CColor color(0x00, 0x00, 0xFF, 0xFF);
-        Vec pos;
-        pos.x = m_worldPosition.x;
-        pos.y = m_worldPosition.y + m_bodyColRadius;
-        pos.z = m_worldPosition.z;
-        Graphic.DrawSphere(FlatPosMtx(), &pos, m_bodyColRadius, &color.color);
+        CVector pos(m_worldPosition.x, m_worldPosition.y + m_bodyColRadius, m_worldPosition.z);
+        Graphic.DrawSphere(FlatPosMtx(), pos, m_bodyColRadius, &color.color);
     }
 
     if (((CFlat.m_debugFlags & 0x8) != 0) && ((m_bgColMask & 0x8) != 0)) {
         CColor color(0xFF, 0xFF, 0x00, 0xFF);
-        Vec pos;
-        pos.x = m_worldPosition.x;
-        pos.y = m_worldPosition.y + m_attackColRadius;
-        pos.z = m_worldPosition.z;
-        Graphic.DrawSphere(FlatPosMtx(), &pos, m_attackColRadius, &color.color);
+        CVector pos(m_worldPosition.x, m_worldPosition.y + m_attackColRadius, m_worldPosition.z);
+        Graphic.DrawSphere(FlatPosMtx(), pos, m_attackColRadius, &color.color);
     }
 
     if (((CFlat.m_debugFlags & 0x10) != 0) && ((m_bgColMask & 0x10) != 0)) {
@@ -2082,11 +2070,8 @@ void CGObject::onDraw()
             }
 
             CColor color(0x80, 0x80, 0xFF, 0xFF);
-            Vec scale;
-            scale.x = collider->m_innerRadius;
-            scale.y = collider->m_outerRadius;
-            scale.z = collider->m_innerRadius;
-            Graphic.DrawSphere(FlatPosMtx(), &collider->m_worldPosition, &scale, &color.color);
+            CVector scale(collider->m_innerRadius, collider->m_outerRadius, collider->m_innerRadius);
+            Graphic.DrawSphere(FlatPosMtx(), &collider->m_worldPosition, scale, &color.color);
         }
     }
 }

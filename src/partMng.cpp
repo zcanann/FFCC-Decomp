@@ -940,8 +940,8 @@ void CPartMng::pppGet2Dpos()
         unsigned char pad00[0x10];
         int requestFlag;
         unsigned char pad14[0x14];
-        int cursorX;
-        int cursorY;
+        unsigned int cursorX;
+        unsigned int cursorY;
     };
 
     int zAtPixel;
@@ -1149,7 +1149,7 @@ void CPartMng::SetFp()
         if (mode == 2 || mode == 4) {
             mng->m_mapObjIndex = static_cast<short>(MapMng.GetMapObjEffectIdx(*reinterpret_cast<short*>(fpBytes + 0x48)));
         } else if (mode >= 3 && mode <= 8) {
-            CGObject* owner = *reinterpret_cast<CGObject**>(self + kUsbEditOffset + 0x1C);
+#define owner (*reinterpret_cast<CGObject**>(self + kUsbEditOffset + 0x1C))
             mng->m_ownerFlagA = 0;
             mng->m_owner = owner;
             mng->m_lookTarget = owner;
@@ -1162,6 +1162,7 @@ void CPartMng::SetFp()
                                                 node * 0xC0));
                 }
             }
+#undef owner
         }
 
         mng = reinterpret_cast<PppMngSetFpRaw*>(reinterpret_cast<unsigned char*>(mng) + sizeof(_pppMngSt));
@@ -2281,7 +2282,7 @@ void CPartMng::pppEditBeforeCalc()
         break;
     case 0x1c:
         if (*editorObj != 0 && (*editorObj)->m_charaModelHandle != 0) {
-            if (*reinterpret_cast<int*>(self + 0x1c0) != 0) {
+            if (*reinterpret_cast<unsigned int*>(self + 0x1c0) != 0) {
                 (*editorObj)->m_charaModelHandle->m_flags |= 1;
             } else {
                 (*editorObj)->m_charaModelHandle->m_flags &= ~1;
@@ -2466,7 +2467,7 @@ void CPartMng::pppEditDrawShadow()
         cameraPos.y = invCamera[1][3];
         cameraPos.z = invCamera[2][3];
 
-        for (int i = 0; i < 0x180; i++) {
+        for (unsigned int i = 0; i < 0x180; i++) {
             _pppMngSt* mng = &m_pppMng[i];
             if (mng->m_hitBgFlag == 0 && mng->m_baseTime != -0x1000 && (signed char)mng->m_drawPass == 3
                 && mng->m_baseTime < 0 && mng->m_slotVisible != 0 && mng->m_ownerFacing != 0) {
@@ -2938,7 +2939,7 @@ void CPartMng::pppDrawPrio(unsigned char drawMode)
     cameraPos.y = invCamera[1][3];
     cameraPos.z = invCamera[2][3];
 
-    for (int i = 0; i < 0x180; i++) {
+    for (unsigned int i = 0; i < 0x180; i++) {
         _pppMngSt* mng = &m_pppMng[i];
         if (mng->m_hitBgFlag == 0 && mng->m_baseTime != -0x1000
             && (signed char)mng->m_drawPass == drawMode && mng->m_baseTime < 0
@@ -3215,7 +3216,7 @@ void CPartMng::pppDraw()
     cameraPos.y = invCamera[1][3];
     cameraPos.z = invCamera[2][3];
 
-    for (int i = 0; i < 0x180; i++) {
+    for (unsigned int i = 0; i < 0x180; i++) {
         _pppMngSt* mng = &m_pppMng[i];
         if (mng->m_hitBgFlag == 0 && mng->m_baseTime != -0x1000 && (signed char)mng->m_drawPass <= 2 && mng->m_baseTime < 0
             && mng->m_slotVisible != 0 && mng->m_ownerFacing != 0) {
@@ -3233,7 +3234,7 @@ void CPartMng::pppDraw()
             mng->m_sortDepth = viewPos.z;
 
             if ((signed char)mng->m_drawPass != 1) {
-                if ((signed char)mng->m_drawPass < 1) {
+                if ((unsigned char)mng->m_drawPass < 1) {
                     if ((signed char)mng->m_drawPass >= 0) {
                         ppvDrawMng.AddPrim(viewPos.z, reinterpret_cast<_pppMngSt*>(mng), mng->m_drawSubType);
                     }
@@ -3299,7 +3300,7 @@ void CPartMng::pppPartDrawAfter()
     cameraPos.y = invCamera[1][3];
     cameraPos.z = invCamera[2][3];
 
-    for (int i = 0; i < 0x180; i++) {
+    for (unsigned int i = 0; i < 0x180; i++) {
         _pppMngSt* mng = &m_pppMng[i];
         if (mng->m_hitBgFlag == 0 && mng->m_baseTime != -0x1000 && (signed char)mng->m_drawPass == 5
             && mng->m_baseTime < 0 && mng->m_slotVisible != 0 && mng->m_ownerFacing != 0) {
@@ -4269,7 +4270,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     mng->m_pppPDataVals = 0;
 
     *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(mng) + 0xFC) =
-        *reinterpret_cast<unsigned short*>(fpData2 + 0x0);
+        *reinterpret_cast<short*>(fpData2 + 0x0);
     mng->m_field118 = *reinterpret_cast<unsigned short*>(fpData2 + 0x2);
     mng->m_matrixMode = *reinterpret_cast<unsigned char*>(fpData2 + 0x5);
     mng->m_drawVariant = *reinterpret_cast<unsigned char*>(fpData2 + 0x6);
@@ -4321,7 +4322,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
         *reinterpret_cast<int*>(&mng->m_rotation.z) = *reinterpret_cast<int*>(fpData + 0x14);
         mng->m_rotationSpeed = *reinterpret_cast<int*>(fpData + 0x18);
     } else {
-        int rotX = static_cast<int>(createParam->m_rotationPtr->x * 65536.0f / 360.0f);
+        int rotX = static_cast<unsigned int>(createParam->m_rotationPtr->x * 65536.0f / 360.0f);
         int rotY = static_cast<int>(createParam->m_rotationPtr->y * 65536.0f / 360.0f);
         mng->m_rotation.x = static_cast<short>(rotX >> 16);
         mng->m_rotation.y = static_cast<short>(rotX);

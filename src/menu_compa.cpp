@@ -226,8 +226,8 @@ void CMenuPcs::CompaDraw()
 			System.Printf(const_cast<char*>(sCompaFamilyCountErrorFmt), s_menu_compa_cpp, 0x1E0,
 			              shown);
 		}
-		u8 food = *foodPtr;
-		int icon = 0x1D;
+		unsigned int food = *foodPtr;
+		int icon;
 		if (food <= 0x14) {
 			icon = 0x21;
 		} else if (food <= 0x28) {
@@ -236,6 +236,8 @@ void CMenuPcs::CompaDraw()
 			icon = 0x1F;
 		} else if (food <= 0x50) {
 			icon = 0x1E;
+		} else {
+			icon = 0x1D;
 		}
 
 		DrawSingleIcon(

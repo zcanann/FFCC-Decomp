@@ -1648,7 +1648,7 @@ void CMenuPcs::destroyWorld()
 void CMenuPcs::calcWorld()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldParams = m_wmWorldParams;
+#define worldParams m_wmWorldParams
 
 	reinterpret_cast<unsigned int*>(worldParams + 4)[0] = reinterpret_cast<unsigned int*>(worldParams + 8)[0];
 
@@ -1660,8 +1660,8 @@ void CMenuPcs::calcWorld()
 		m_wmWorldState->m_mainState = 1;
 	}
 
-	CCharaPcs::CHandle* const handle = GetWmWorldHandles(this)[1];
-	CChara::CModel* const model = handle->m_model;
+#define handle GetWmWorldHandles(this)[1]
+#define model handle->m_model
 	const int animState = m_wmWorldState->m_mainState;
 	const float animEnd = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0xC0)[0];
 	const float animTime = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0xB4)[0];
@@ -1791,6 +1791,9 @@ void CMenuPcs::calcWorld()
 	} else if (updatedAnimState == 3 && m_wmWorldState->m_frameCounter < 10) {
 		m_wmWorldState->m_frameCounter++;
 	}
+#undef worldParams
+#undef model
+#undef handle
 }
 
 /*

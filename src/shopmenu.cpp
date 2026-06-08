@@ -1775,7 +1775,6 @@ void CShopMenu::DrawSoubi()
 {
     DrawSoubiBase();
 
-    int resultItem = m_resultItem;
     drawShapeSeq(0xF, 0, 0xA8, 0x5A, 0xFF, 0, 0, FLOAT_80332d9c, 0);
     MenuPcs.DrawInit();
     MenuPcs.DrawSingleIcon(m_resultItem, 0x40, 0x42, FLOAT_80332d28, 0, FLOAT_80332d28);
@@ -1788,7 +1787,7 @@ void CShopMenu::DrawSoubi()
     font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
     font->DrawInit();
 
-    char* itemName = GetItemName(resultItem);
+    char* itemName = GetItemName(m_resultItem);
     MenuPcs.DrawShadowFont(font, itemName, FLOAT_80332d54, 112.0f, 0x18, 0x12);
     MenuPcs.DrawInit();
 

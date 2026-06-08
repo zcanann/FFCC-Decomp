@@ -1429,8 +1429,10 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 0x0C);
 	LightPcs.EnableLight(1, 1);
 	GXSetZMode((u8)1, (GXCompare)3, (u8)0);
-	const unsigned char furShade = static_cast<unsigned char>(kCharaFurShadeScale * ModelFurCur(this));
-	const GXColor furColor = CColor(furShade, furShade, furShade, 0xFF).color;
+	const GXColor furColor = CColor(static_cast<unsigned char>(kCharaFurShadeScale * ModelFurCur(this)),
+	                                static_cast<unsigned char>(kCharaFurShadeScale * ModelFurCur(this)),
+	                                static_cast<unsigned char>(kCharaFurShadeScale * ModelFurCur(this)), 0xFF)
+	                             .color;
 	GXSetChanMatColor(GX_COLOR0A0, furColor);
 	LightPcs.SetAmbientAlpha(ModelLightAlpha(this));
 	GXSetNumIndStages(0);

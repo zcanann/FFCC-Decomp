@@ -490,8 +490,8 @@ int CFlatRuntime::CreateDebug(void* filePtr, int debugChunkIndex)
 			int funcOffset = debugOffset;
 
 			while ((hasChunk = chunkFile.GetNextChunk(chunk), hasChunk != 0)) {
-				if (((chunk.m_id != 'NAME') && (static_cast<int>(chunk.m_id) < static_cast<int>('NAME')))
-				    && (chunk.m_id == 'FUNC')) {
+				if ((static_cast<int>(chunk.m_id) < static_cast<int>('NAME'))
+				    && (static_cast<int>(chunk.m_id) == static_cast<int>('FUNC'))) {
 					chunkFile.PushChunk();
 					int blockOffset = funcOffset;
 
@@ -501,8 +501,7 @@ int CFlatRuntime::CreateDebug(void* filePtr, int debugChunkIndex)
 							chunkFile.PushChunk();
 
 							while ((hasChunk = chunkFile.GetNextChunk(chunk), hasChunk != 0)) {
-								if (((chunk.m_id != 'NAME')
-								     && (chunk.m_id < static_cast<unsigned int>('NAME')))
+								if ((static_cast<int>(chunk.m_id) < static_cast<int>('NAME'))
 								    && (chunk.m_id == 'CODE')) {
 									if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(funcs) + blockOffset + 0x30)
 									    == 0) {

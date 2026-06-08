@@ -11032,17 +11032,20 @@ LAB_draw:
 						MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_80331520, dateY, static_cast<float>(DAT_801dc140), FLOAT_80331410,
 						         FLOAT_80331524, FLOAT_80331528, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
 					} else {
-						int digits[2];
-						int totalWidth;
-						if (digitCount == 1) {
-							const int tens = static_cast<int>(saveYear) / 10 + (static_cast<int>(saveYear) >> 0x1F);
-							digits[0] = static_cast<int>(saveYear) + (tens - (tens >> 0x1F)) * -10;
-							totalWidth = DAT_801dc118[digits[0]];
-						} else {
-							const int tens = static_cast<int>(saveYear) / 10 + (static_cast<int>(saveYear) >> 0x1F);
-							digits[0] = tens - (tens >> 0x1F);
-							digits[1] = static_cast<int>(saveYear) + digits[0] * -10;
-							totalWidth = DAT_801dc118[digits[0]] + DAT_801dc118[digits[1]];
+						int totalWidth = 0;
+						for (int di = 0; di < digitCount; di++) {
+							int digit;
+							if (digitCount == 1) {
+								const int t = saveYear / 10 + (saveYear >> 0x1F);
+								digit = saveYear + (t - (t >> 0x1F)) * -10;
+							} else if (di == 0) {
+								const int t = saveYear / 10 + (saveYear >> 0x1F);
+								digit = t - (t >> 0x1F);
+							} else {
+								const int t = saveYear / 10 + (saveYear >> 0x1F);
+								digit = saveYear + (t - (t >> 0x1F)) * -10;
+							}
+							totalWidth += DAT_801dc118[digit];
 						}
 						float digitScale = static_cast<float>(DOUBLE_80331420);
 						if (language != 5) {
@@ -11062,7 +11065,17 @@ LAB_draw:
 						const double rowSlope = DOUBLE_80331540;
 						const double colSlope = DOUBLE_80331490;
 						for (int digitIdx = 0; digitIdx < digitCount; digitIdx++) {
-							const int digit = digits[digitIdx];
+							int digit;
+							if (digitCount == 1) {
+								const int t = saveYear / 10 + (saveYear >> 0x1F);
+								digit = saveYear + (t - (t >> 0x1F)) * -10;
+							} else if (digitIdx == 0) {
+								const int t = saveYear / 10 + (saveYear >> 0x1F);
+								digit = t - (t >> 0x1F);
+							} else {
+								const int t = saveYear / 10 + (saveYear >> 0x1F);
+								digit = saveYear + (t - (t >> 0x1F)) * -10;
+							}
 							const int digitWidth = DAT_801dc118[digit];
 							const int row = digit / 5 + (digit >> 0x1F);
 							const int rowIndex = row - (row >> 0x1F);

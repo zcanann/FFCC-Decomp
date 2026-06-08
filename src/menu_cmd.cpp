@@ -1361,14 +1361,13 @@ void CMenuPcs::CmdDraw()
 			}
 		} else if (cmdMode == 1) {
 			const s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
-			s32 idx = 0;
-			CmdListEntry* scan = &GetCmdListStorage(this)->entries[GetCmdListStorage(this)->count];
-			while (idx < 8) {
+			CmdListStorage* const list = GetCmdListStorage(this);
+			CmdListEntry* scan = &list->entries[list->count];
+			for (s32 idx = list->count; idx < list->listEnd; idx++) {
 				if (scan->tex == 0x37) {
 					break;
 				}
 				scan++;
-				idx++;
 			}
 			const s32 cur = GetCmdStateView(this)->itemSelected + GetCmdStateView(this)->scrollTop;
 			s32 wrapped = cur;

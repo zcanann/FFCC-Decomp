@@ -645,7 +645,7 @@ void CMenuPcs::EquipDraw()
 	                kEquipOne, kEquipHelpScale);
 	if ((mode == 1) && (listIndex < 1)) {
 		float listHelpAlpha = GetEquipListStorage(this)->entries[GetEquipListStorage(this)->count].alpha;
-		CColor listHelpColor(0xff, 0xff, 0xff, static_cast<u8>(kEquipColorMax * listHelpAlpha));
+		CColor listHelpColor(0xff, 0xff, 0xff, static_cast<s8>(kEquipColorMax * listHelpAlpha));
 		DrawHelpMessage(0x265, m_fonts[0], helpX, helpY, listHelpColor.color, 10,
 		                kEquipOne, kEquipHelpScale);
 	}

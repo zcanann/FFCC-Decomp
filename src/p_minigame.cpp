@@ -1080,21 +1080,11 @@ comm_fail:
                         *reinterpret_cast<int*>(param + 0x9C) = 0;
                     }
 
-                    status = GBAGetStatus(channel, param + 0xC0);
-                    if (status == 0 && param[0xC0] == 0x20)
+                    if (GBAGetStatus(channel, param + 0xC0) == 0 && param[0xC0] == 0x20 &&
+                        GBAWrite(channel, self + 0x1344, param + 0xC0) == 0 &&
+                        GBAGetStatus(channel, param + 0xC0) == 0 && param[0xC0] == 0x30)
                     {
-                        status = GBAWrite(channel, self + 0x1344, param + 0xC0);
-                        if (status == 0 && GBAGetStatus(channel, param + 0xC0) == 0)
-                        {
-                            if (param[0xC0] == 0x30)
-                            {
-                                status = 0;
-                            }
-                            else
-                            {
-                                status = 1;
-                            }
-                        }
+                        status = 0;
                     }
                     else
                     {

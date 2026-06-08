@@ -1974,6 +1974,7 @@ void CAmemCacheSet::Release(short index)
  */
 void CAmemCacheSet::AmemFreeLowPrio(int size)
 {
+    const char* strBase = reinterpret_cast<const char*>(sHeapBarColors);
     unsigned int bestPriority = 0x7ffffff1;
     int currentSize = size;
 
@@ -1995,7 +1996,7 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
             bestEntry->m_cacheData = 0;
         }
 
-        int allocated = reinterpret_cast<int>(m_rStage->alloc(size, const_cast<char*>(s_memory_cpp), 0x86D, 1));
+        int allocated = reinterpret_cast<int>(m_rStage->alloc(size, const_cast<char*>(strBase + 0x1e8), 0x86D, 1));
         if (allocated != 0) {
             freeStageBlock(reinterpret_cast<void*>(allocated));
             return;
@@ -2017,7 +2018,7 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
         if (m_releaseAction == 0 || m_releaseAction(m_releaseActionArg) == 0) {
             m_releaseCheck(m_releaseCheckArg);
             if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-                System.Printf(const_cast<char*>(sAmemCacheAddRefFmt));
+                System.Printf(const_cast<char*>(strBase + 0x4c));
             }
 
             for (int i = 0; i < m_cacheCount; i++) {
@@ -2025,7 +2026,7 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
                 int data = reinterpret_cast<int>(entry.m_cacheData);
                 if (((entry.m_inUse != 0) || (data != 0)) && (static_cast<unsigned int>(System.m_execParam) >= 3)) {
                     System.Printf(
-                        const_cast<char*>(sAmemCacheEntryFmt), i, cacheStateName(entry),
+                        const_cast<char*>(strBase + 0xd8), i, cacheStateName(entry),
                         cacheTypeName(entry), entry.m_refCount, entry.m_priority, data);
                 }
             }

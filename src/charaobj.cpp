@@ -260,6 +260,12 @@ struct CharaObjSignedTopBit
 	signed char m_pad : 7;
 };
 
+struct CharaObjSignedLowBit
+{
+	signed char m_pad : 7;
+	signed char m_low : 1;
+};
+
 struct CharaObjComboFlagBits
 {
 	signed char m_bit80 : 1;
@@ -2470,7 +2476,8 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 		}
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) = static_cast<unsigned short>(next);
 	} else if (delta < 0 && hpValue != 0) {
-		if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D && (CFlatGameFlags() & CFlatGameFlag_Bit0) != 0 &&
+		if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
+		    reinterpret_cast<CharaObjSignedLowBit*>(&CFlatGameFlags())->m_low != 0 &&
 		    static_cast<int>(hpValue + delta) <= 0) {
 			delta = -(static_cast<int>(hpValue) - 1);
 		}

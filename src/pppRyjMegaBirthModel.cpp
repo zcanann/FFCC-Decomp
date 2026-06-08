@@ -437,9 +437,12 @@ void birth(
         baseDirection.x = params->m_baseDirection.x;
         baseDirection.y = params->m_baseDirection.y;
         baseDirection.z = params->m_baseDirection.z;
-        angles.x = (kPppRyjMegaBirthAngleIndexScale * (float)(randomRange * Math.RandF() - halfSpread)) / kPppRyjMegaBirthModelDegrees180;
-        angles.y = (kPppRyjMegaBirthAngleIndexScale * (float)(randomRange * Math.RandF() - halfSpread)) / kPppRyjMegaBirthModelDegrees180;
-        angles.z = (kPppRyjMegaBirthAngleIndexScale * (float)(randomRange * Math.RandF() - halfSpread)) / kPppRyjMegaBirthModelDegrees180;
+        angles.x = (float)(randomRange * Math.RandF() - halfSpread);
+        angles.x = (kPppRyjMegaBirthAngleIndexScale * angles.x) / kPppRyjMegaBirthModelDegrees180;
+        angles.y = (float)(randomRange * Math.RandF() - halfSpread);
+        angles.y = (kPppRyjMegaBirthAngleIndexScale * angles.y) / kPppRyjMegaBirthModelDegrees180;
+        angles.z = (float)(randomRange * Math.RandF() - halfSpread);
+        angles.z = (kPppRyjMegaBirthAngleIndexScale * angles.z) / kPppRyjMegaBirthModelDegrees180;
 
         if ((params->m_spawnMode == 2) || (params->m_spawnMode == 3)) {
             angles.x = kPppRyjMegaBirthSharedZero;

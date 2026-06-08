@@ -1144,7 +1144,7 @@ void CShopMenu::Destroy()
  * Size:	TODO
  */
 #pragma push
-#pragma peephole off
+#pragma peephole on
 void CShopMenu::DrawItemHelp(int index, int centerX, int y)
 {
     int itemNo = getItemNo(index);
@@ -1743,7 +1743,7 @@ inline void CShopMenu::DrawObi(int)
  * JP Size: TODO
  */
 #pragma push
-#pragma opt_propagation off
+#pragma optimization_level 4
 void CShopMenu::DrawMakeBase()
 {
     MenuPcs.DrawSingleBase(FLOAT_80332d28);
@@ -1937,7 +1937,7 @@ void CShopMenu::DrawShopBase()
  * Size:	TODO
  */
 #pragma push
-#pragma peephole off
+#pragma peephole on
 void CShopMenu::Draw()
 {
     if (reinterpret_cast<int>(m_unk00) == 0) {
@@ -2410,6 +2410,9 @@ void CShopMenu::DrawShop0()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_common_subs off
+#pragma opt_strength_reduction off
 void CShopMenu::SelectMake()
 {
     bool canSelect = MenuPcs.ChkEquipPossible(m_resultItem) &&
@@ -2503,6 +2506,7 @@ void CShopMenu::SelectMake()
         SetMode(0xE);
     }
 }
+#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x80155934
@@ -2995,6 +2999,8 @@ inline void CShopMenu::SelectSOUBI()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_dead_assignments off
 void CShopMenu::Calc()
 {
     int mode = m_mode;
@@ -3221,6 +3227,7 @@ void CShopMenu::Calc()
         gShopMenuInputLatch = 0;
     }
 }
+#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x801588ac

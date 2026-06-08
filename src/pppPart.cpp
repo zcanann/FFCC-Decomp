@@ -2093,7 +2093,7 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 
 				if (mng->m_loopMode != 0 &&
 					((_pppPObject*)obj)->m_graphId >= progSet->m_loopFrame &&
-					(progSet->m_loopFrame & 0xF0000000) != 0x70000000)
+					progSet->m_loopFrame != 0x70000000)
 				{
 					((_pppPObject*)obj)->m_graphId = progSet->m_endFrame;
 					callCon2Prog((_pppPObject*)obj);

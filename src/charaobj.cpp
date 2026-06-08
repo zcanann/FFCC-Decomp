@@ -2500,9 +2500,10 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 	if ((static_cast<unsigned short>(source->GetCID()) & 0xAD) == 0xAD) {
 		int stageLevel;
 		if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-			stageLevel = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
-			if (stageLevel > 2) {
-				stageLevel = 2;
+			int rawStage = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
+			stageLevel = 2;
+			if (rawStage < 2) {
+				stageLevel = rawStage;
 			}
 		} else {
 			stageLevel = 0;
@@ -3251,9 +3252,10 @@ int CGCharaObj::calcCastTime(int itemId)
 		unsigned int playerCid = (static_cast<unsigned int>(__cntlzw(0x6D - static_cast<int>(static_cast<unsigned short>(GetCID()) & 0x6D))) >> 5) & 0xFFU;
 		unsigned int castReduction = playerCid != 0 ? static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBD8)) : 0;
 		int totalCast = static_cast<int>(baseCast + castBonus) - static_cast<int>(castReduction);
-		unsigned int cast = static_cast<int>(castScale * static_cast<float>(totalCast));
+		int cast = static_cast<int>(castScale * static_cast<float>(totalCast));
+		cast = cast & ~(cast >> 31);
 		System.Printf(fmt + 0x74, baseCast, castBonus, castScale);
-		return cast & ~(cast >> 31);
+		return cast;
 	}
 
 	if (itemType == 3) {
@@ -3270,8 +3272,9 @@ int CGCharaObj::calcCastTime(int itemId)
 		unsigned int castReduction = playerCid != 0 ? static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBD9)) : 0;
 		int totalCast = static_cast<int>(baseCast + castBonus) - static_cast<int>(castReduction);
 		int cast = static_cast<int>(castScale * static_cast<float>(totalCast));
+		cast = cast & ~(cast >> 31);
 		System.Printf(fmt + 0xC4, baseCast, castBonus, castScale);
-		return cast & ~(cast >> 31);
+		return cast;
 	}
 
 	return static_cast<int>(baseCast);

@@ -733,8 +733,8 @@ void CGraphic::Printf(unsigned long x, unsigned long y, char* fmt, ...)
  */
 void CGraphic::DrawDebugString()
 {
-    Mtx44 proj;
     Mtx model;
+    Mtx44 proj;
     Mtx texMtx;
     GXTexObj texObj;
 

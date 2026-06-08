@@ -5270,15 +5270,16 @@ void CGPartyObj::gpmMove()
 	}
 
 	{
-		int* threshold = &sGhostPartyWork.thresholdA;
+		unsigned char* base = CGPartyObj::m_ghostWork;
 		const int slotSel = sGhostPartyWork.slotSel;
 		for (int slot = 0; slot < 3; slot++) {
+			int* threshold = reinterpret_cast<int*>(base + 0x24);
 			if (slot == slotSel) {
 				*threshold = 0;
 			} else {
 				*threshold = *threshold / 2;
 			}
-			threshold++;
+			base += 4;
 		}
 	}
 	PartyData(this).partyFlags = (PartyData(this).partyFlags & 0xAF) | 0x40;

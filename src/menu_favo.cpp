@@ -719,17 +719,15 @@ void CMenuPcs::FavoInit()
 
 	int place = 0;
 	iVar17 = 0;
-	iVar16 = 8;
 	rank = ranks;
 	do {
 		if ((iVar17 != 0) && (rank[-1].score != rank->score)) {
 			place = iVar17;
 		}
-		iVar17++;
 		rank->place = place + 1;
 		rank++;
-		iVar16--;
-	} while (iVar16 != 0);
+		iVar17++;
+	} while (iVar17 < 8);
 
 	m_singMenuState->selectedIndex = 0;
 	m_singMenuState->initialized = 1;

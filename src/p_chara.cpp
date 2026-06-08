@@ -874,7 +874,7 @@ int CCharaPcs::correctLoadAnimAmem()
     for (int i = 0; i < loadAnimCount; i++) {
         CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
         CChara::CAnim* anim = loadAnim->m_anim;
-        const int animEnd = anim->m_bankAddress + static_cast<int>(anim->m_bankSize);
+        const int animEnd = static_cast<int>(anim->m_bankSize) + anim->m_bankAddress;
         if (maxEnd < animEnd) {
             maxEnd = animEnd;
         }

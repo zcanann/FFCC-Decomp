@@ -834,7 +834,7 @@ void CMenuPcs::CmakeVillageDraw()
     font->DrawInit();
     GetRenderFlagBits(font->renderFlags).fixedWidth = 1;
     font->SetMargin(4.9f);
-    CColor textColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(255.0f * alpha)));
+    CColor textColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha));
     font->SetColor(textColor.color);
 
     int tableBase = villageWork->m_table * 5;
@@ -1765,7 +1765,7 @@ void CMenuPcs::CmakeJobDraw()
     font->SetScale(1.0f);
     font->DrawInit();
 
-    CColor textColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(255.0f * alpha)));
+    CColor textColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha));
     font->SetColor(textColor.color);
 
     for (int i = 0; i < 8; ++i) {
@@ -2338,7 +2338,7 @@ void CMenuPcs::CmakeSexDraw()
     font->SetScale(1.0f);
     font->DrawInit();
 
-    CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(255.0f * alpha)));
+    CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha));
     font->SetColor(rgba.color);
 
     float maxWidth = 0.0f;
@@ -3419,7 +3419,7 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
     font->DrawInit();
     font->SetTlut(7);
 
-    CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(255.0f * alpha)));
+    CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha));
     font->SetColor(rgba.color);
 
     const char* txt = GetMenuStr(0x29);

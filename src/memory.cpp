@@ -609,7 +609,8 @@ CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int mode
     }
 
     {
-        unsigned int alignedSize = (size + 0x3F) & ~0x3FU;
+        size = (size + 0x3F) & ~0x3FU;
+        unsigned int alignedSize = static_cast<unsigned int>(size);
         CMode& modeData = m_modes[mode];
         CStage* stage = modeData.m_freeList.m_next;
         CStage* list = &modeData.m_activeList;

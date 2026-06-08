@@ -2611,7 +2611,7 @@ void CMenuPcs::CalcResultCountAnim()
 		}
 
 		CChara::CModel* model = handle->m_model;
-		model->m_flags10C = (model->m_flags10C & 0x7F) | 0x80;
+		model->m_flags10CBits.m_flag10C_80 = 1;
 		model->SetMatrix(scaleMtx);
 		model->CalcMatrix();
 		model->CalcSkin();

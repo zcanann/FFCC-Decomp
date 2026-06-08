@@ -201,7 +201,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 
 	char* townName = Game.m_gameWork.m_townName;
 	const unsigned char* op;
-	unsigned char c;
+	signed char c;
 	while ((c = in[0]) != 0)
 	{
 		if (c == 0xFF)
@@ -332,7 +332,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		}
 		case 0x2B:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)(op + 2));
+			signed char varIndex = (unsigned char)GetMesNibbleValue((const char*)(op + 2));
 			strcpy(dst, FlatNameDirect(2, CMes::m_tempVar[varIndex]));
 			dst += strlen(dst);
 			in += 4;
@@ -340,7 +340,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		}
 		case 0x2C:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)(op + 2));
+			signed char varIndex = (unsigned char)GetMesNibbleValue((const char*)(op + 2));
 			strcpy(dst, FlatNameDirect(3, CMes::m_tempVar[varIndex]));
 			dst += strlen(dst);
 			in += 4;
@@ -348,7 +348,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		}
 		case 0x2D:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)(op + 2));
+			signed char varIndex = (unsigned char)GetMesNibbleValue((const char*)(op + 2));
 			strcpy(dst, FlatNameDirect(3, CMes::m_tempVar[varIndex] + 0x3C));
 			dst += strlen(dst);
 			in += 4;
@@ -356,7 +356,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		}
 		case 0x2E:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)op);
+			signed char varIndex = (unsigned char)GetMesNibbleValue((const char*)op);
 			strcpy(dst, FlatNameDirect(5, CMes::m_tempVar[varIndex]));
 			dst += strlen(dst);
 			in += 2;
@@ -376,7 +376,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		}
 		case 0x41:
 		{
-			unsigned char mode = (unsigned char)GetMesNibbleValue((const char*)op);
+			signed char mode = (signed char)GetMesNibbleValue((const char*)op);
 			if (mode == 1)
 			{
 				caseMode = 1;

@@ -2042,7 +2042,7 @@ void CMenuPcs::SingleCalcCtrl()
         m_wm.m_handles[0]->m_model->SetFrame(0.0f);
     }
 
-    short modelScaleIndex = SingleCaravanWork()->m_tribeId;
+    unsigned short modelScaleIndex = SingleCaravanWork()->m_tribeId;
     float modelScale = gSingMenuRaceModelScales[modelScaleIndex];
     Mtx scaleMtx;
     PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);

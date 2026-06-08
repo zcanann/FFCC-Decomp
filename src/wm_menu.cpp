@@ -7052,11 +7052,11 @@ void CMenuPcs::CalcFukidashi()
 				rxMtx[2][3] = *reinterpret_cast<float*>(puVar20 + 9);
 				PSMTXConcat(rxMtx, sMtx, sMtx);
 
-				CChara::CModel* const mdl =
-				    *reinterpret_cast<CChara::CModel**>(*reinterpret_cast<int*>(bytes + 0x7F4 + (padIdx + 8) * 4) + 0x168);
+#define mdl (*reinterpret_cast<CChara::CModel**>(*reinterpret_cast<int*>(bytes + 0x7F4 + (padIdx + 8) * 4) + 0x168))
 				mdl->SetMatrix(sMtx);
 				mdl->CalcMatrix();
 				mdl->CalcSkin();
+#undef mdl
 
 				puVar20[1] = puVar20[1] + 1;
 				if (static_cast<double>(static_cast<float>(static_cast<double>(puVar20[1]))) >=

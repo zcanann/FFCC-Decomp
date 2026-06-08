@@ -8608,10 +8608,10 @@ void CMenuPcs::CalcCharaSelect()
 		entry.m_padType = Joybus.GetPadType(i);
 		if ((entry.m_padType == 0x09000000) || (entry.m_padType == -0x74F00000) ||
 		    (entry.m_padType == -0x78000000)) {
-			if (Game.m_gameWork.m_menuStageMode != 0) {
-				entry.m_connected = 1;
-			} else {
+			if (Game.m_gameWork.m_menuStageMode == 0) {
 				entry.m_connected = 0;
+			} else {
+				entry.m_connected = 1;
 			}
 		} else {
 			entry.m_connected = static_cast<unsigned char>(Joybus.GetGBAConnect(i));

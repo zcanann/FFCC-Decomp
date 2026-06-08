@@ -2865,7 +2865,7 @@ void CShopMenu::SelectItemIdx()
             if (canSelect) {
                 CCaravanWork* caravanWork = m_caravanWork;
                 if (m_quantity <= (0x40 - static_cast<unsigned short>(caravanWork->m_inventoryItemCount))) {
-                    int itemId = getItemNo(m_selectedIndex);
+                    unsigned int itemId = getItemNo(m_selectedIndex);
                     int unitGil;
                     if (m_listType == 0) {
                         if (itemId <= 0) {

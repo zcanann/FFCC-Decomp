@@ -515,14 +515,13 @@ void CGObject::move()
         }
 
         m_turnFrames -= 1;
-        if (static_cast<int>(m_turnFrames) < 1) {
+        if (static_cast<int>(m_turnFrames) <= 0) {
             scriptMoveEnd = 2;
         }
 
-        const bool scriptMoveFlag = m_weaponNodeFlagAll.m_bits1.m_bit10;
-        if ((!scriptMoveFlag && (scriptMoveEnd != 0))
-            || (scriptMoveFlag && (scriptMoveEnd == 2))) {
-            *(reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1) &= 0xDF;
+        if ((!m_weaponNodeFlagAll.m_bits1.m_bit10 && (scriptMoveEnd != 0))
+            || (m_weaponNodeFlagAll.m_bits1.m_bit10 && (scriptMoveEnd == 2))) {
+            m_weaponNodeFlagAll.m_bits1.m_bit20 = 0;
             CFlatRuntime::CStack stack;
             stack.m_word = static_cast<u32>(__cntlzw(static_cast<u32>(2 - scriptMoveEnd))) >> 5;
             gCFlatRuntime().SystemCall(this, 2, 7, 1, &stack, 0);

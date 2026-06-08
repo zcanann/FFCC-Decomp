@@ -1549,18 +1549,17 @@ void CMenuPcs::CalcSelectOpenAnim()
 
 		idx = 0;
 		sprites[idx].kind = 0x16;
-		sprites[idx].x = 0;
 		sprites[idx].y = 0;
+		sprites[idx].x = 0;
 		sprites[idx].w = 0x280;
 		sprites[idx].h = 0x1c0;
-		sprites[idx].mulX = 0.0f;
 		sprites[idx].mulY = 0.0f;
+		sprites[idx].mulX = 0.0f;
 		sprites[idx].startFrame = 0;
 		sprites[idx].duration = 0;
 		sprites[idx].depth = 1.0f;
+		BonusSpriteFlags(&sprites[idx]) = 3;
 		idx++;
-		BonusSpriteFlags(&sprites[0]) = 3;
-		sprites[0].alpha = 0.0f;
 
 		sprites[idx].kind = -3;
 		sprites[idx].x = 0xf0;

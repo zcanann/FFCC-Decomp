@@ -193,7 +193,7 @@ void CMenuPcs::CompaDraw()
 		familyCount = 4;
 	}
 
-	for (int i = 0; i < familyCount; i++) {
+	for (unsigned int i = 0; i < familyCount; i++) {
 		MenuPcs.DrawRect(
 			0,
 			static_cast<float>(compaList->entries[0].x + 0x10),
@@ -203,7 +203,7 @@ void CMenuPcs::CompaDraw()
 	}
 
 	int memberIndex = 0;
-	int shown = 0;
+	unsigned int shown = 0;
 	for (int i = 0; i < 8 && shown < familyCount; i++) {
 		int drawIndex = shown;
 		if (shown > 1) {
@@ -252,7 +252,7 @@ void CMenuPcs::CompaDraw()
 	font->SetScaleY(kCompaOne);
 	font->DrawInit();
 
-	GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<signed char>(kCompaColorMax * compaList->entries[0].alpha)).color;
+	GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(kCompaColorMax * compaList->entries[0].alpha)).color;
 	font->SetColor(textColor);
 
 	const CCaravanWork* nameWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);

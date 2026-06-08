@@ -221,13 +221,13 @@ void CMenuPcs::CompaDraw()
 			              shown);
 		}
 		int icon = 0x1D;
-		if (food < 0x15) {
+		if (food <= 0x14) {
 			icon = 0x21;
-		} else if (food < 0x29) {
+		} else if (food <= 0x28) {
 			icon = 0x20;
-		} else if (food < 0x3D) {
+		} else if (food <= 0x3C) {
 			icon = 0x1F;
-		} else if (food < 0x51) {
+		} else if (food <= 0x50) {
 			icon = 0x1E;
 		}
 

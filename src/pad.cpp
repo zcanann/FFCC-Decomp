@@ -229,32 +229,42 @@ void CPad::Frame()
 	{
 		cVar9 = *reinterpret_cast<s8*>(puVar7 + 5);
 		uVar15 = 0x80000000 >> uVar17;
-		if (cVar9 != -1)
+		if (cVar9 == -1)
 		{
-			if (cVar9 >= -1)
-			{
-				if (cVar9 < 1)
-				{
-					_1a8_4_ = _1a8_4_ | uVar15;
-				}
-			}
-			else if (cVar9 == -3)
-			{
-				_1a8_4_ = _1a8_4_ | uVar15;
-			}
-			else if (cVar9 >= -3)
-			{
-				_1a8_4_ = _1a8_4_ & ~uVar15;
-			}
+			goto gba_ready;
 		}
-		else
+		if (cVar9 >= -1)
 		{
-			if (static_cast<u8>(Joybus.GBAReady(uVar17)) == 0)
-			{
-				uVar16 = uVar16 | uVar15;
-			}
-			_1a8_4_ = _1a8_4_ & ~uVar15;
+			goto flag_set_low;
 		}
+		if (cVar9 == -3)
+		{
+			goto flag_set_neg3;
+		}
+		if (cVar9 >= -3)
+		{
+			goto flag_clear;
+		}
+		goto flag_done;
+	flag_set_low:
+		if (cVar9 < 1)
+		{
+			_1a8_4_ = _1a8_4_ | uVar15;
+		}
+		goto flag_done;
+	flag_set_neg3:
+		_1a8_4_ = _1a8_4_ | uVar15;
+		goto flag_done;
+	gba_ready:
+		if (static_cast<u8>(Joybus.GBAReady(uVar17)) == 0)
+		{
+			uVar16 = uVar16 | uVar15;
+		}
+		_1a8_4_ = _1a8_4_ & ~uVar15;
+		goto flag_done;
+	flag_clear:
+		_1a8_4_ = _1a8_4_ & ~uVar15;
+	flag_done:
 		uVar17 = uVar17 + 1;
 		puVar7 = puVar7 + 6;
 	} while (uVar17 < 4);

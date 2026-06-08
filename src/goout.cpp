@@ -2203,7 +2203,7 @@ void CGoOutMenu::CalcDel()
     const unsigned char selInit = static_cast<unsigned char>(__cntlzw(2 - static_cast<int>(m_deleteMode)) >> 5 & 0xFF);
     const int selResult = MenuPcs.CalcGoOutSelChar(selInit, 0);
     unsigned short input;
-    unsigned char next;
+    signed char next;
 
     switch (m_deleteMode) {
     case 0:

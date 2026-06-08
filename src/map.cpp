@@ -2623,8 +2623,7 @@ void CMapMng::DrawBefore()
             }
 
             for (int i = 0; i < m_octTreeCount; i++) {
-                COctTree* octTree = GetOctTreeArray() + i;
-                octTree->Draw(0xFF);
+                m_octTreeArray[i].Draw(0xFF);
             }
         }
     }
@@ -2991,8 +2990,7 @@ void CMapMng::DrawAfter()
 
         if (static_cast<signed char>(s_bitMask.m_fields.m_mode) == 0) {
             for (int i = 0; i < m_octTreeCount; i++) {
-                COctTree* octTree = GetOctTreeArray() + i;
-                octTree->Draw(2);
+                m_octTreeArray[i].Draw(2);
             }
 
             for (int i = 0; i < m_mapObjCount; i++) {

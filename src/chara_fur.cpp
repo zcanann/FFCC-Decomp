@@ -1240,17 +1240,18 @@ int CChara::CModel::PickFur(
 	CChara::CNode* nodes = ModelNodes(this);
 
 	const unsigned short meshCount = ModelMeshCount(this);
-	const float cursorX = static_cast<float>(Chara.MogFur().m_cursorX);
-	const float cursorY = static_cast<float>(Chara.MogFur().m_cursorY);
+	const double cursorXd = static_cast<float>(Chara.MogFur().m_cursorX);
+	const double cursorYd = static_cast<float>(Chara.MogFur().m_cursorY);
 	float hitU = 0.0f;
 	float hitV = 0.0f;
-	float nearestDepth = kCharaFurNoHitDepth;
+	double nearestDepth = static_cast<double>(kCharaFurNoHitDepth);
 	int hitAny = 0;
 	int hitPaintable = 0;
 	CVector hitViewPos;
 	hitViewPos.Identity();
 	Mtx44 screenMtx;
 	PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+	const double negCursorY = -static_cast<double>(static_cast<float>(cursorYd - static_cast<double>(kCharaFurScreenCenterY)));
 
 	FurProjectedVertex verts[3];
 	unsigned long curValid = 0;
@@ -1347,12 +1348,14 @@ int CChara::CModel::PickFur(
 					if (static_cast<double>(curViewPos.z) < static_cast<double>(kCharaFurDepthZero)) {
 						curValid = curValid & 0x7fffffff | 0x80000000;
 						Math.MTX44MultVec4(screenMtx, &curViewPos, &curClip);
-						curU = curU;
+						const double scaledY = static_cast<double>(kCharaFurScreenCenterY) * static_cast<double>(curClip.y);
 						const float invW = kCharaFurDepthScaleBase / curClip.w;
-						curV = curV;
-						curScreenX = static_cast<float>(static_cast<double>(kCharaFurScreenCenterX * curClip.x) * invW +
-						                                static_cast<double>(kCharaFurScreenCenterX));
-						curScreenY = -static_cast<float>(static_cast<double>(kCharaFurScreenCenterY * curClip.y) * invW -
+						curScreenX = static_cast<float>(
+						    static_cast<double>(static_cast<float>(static_cast<double>(kCharaFurScreenCenterX) *
+						                                           static_cast<double>(curClip.x))) *
+						        static_cast<double>(invW) +
+						    static_cast<double>(kCharaFurScreenCenterX));
+						curScreenY = -static_cast<float>(scaledY * static_cast<double>(invW) -
 						                                 static_cast<double>(kCharaFurScreenCenterY));
 					} else {
 						curValid = curValid & 0x7fffffff;
@@ -1382,16 +1385,21 @@ int CChara::CModel::PickFur(
 								break;
 							}
 							int next = (passed + 1) % 3;
-							const float edge = (cursorY - vp->m_screenY) * (verts[next].m_screenX - vp->m_screenX) -
-							                   (cursorX - vp->m_screenX) * (verts[next].m_screenY - vp->m_screenY);
+							const double edge = static_cast<double>(
+							    static_cast<float>(cursorYd - static_cast<double>(vp->m_screenY)) *
+							        static_cast<float>(static_cast<double>(verts[next].m_screenX) -
+							                           static_cast<double>(vp->m_screenX)) -
+							    static_cast<float>(cursorXd - static_cast<double>(vp->m_screenX)) *
+							        static_cast<float>(static_cast<double>(verts[next].m_screenY) -
+							                           static_cast<double>(vp->m_screenY)));
 							if (primitive == 0x90 || (vertexIndex & 1) == 0) {
 								vp->m_valid = vp->m_valid & 0xffffffbf;
-								if (kCharaFurDepthZero < edge) {
+								if (static_cast<double>(kCharaFurDepthZero) < edge) {
 									break;
 								}
 							} else {
 								vp->m_valid = vp->m_valid & 0xffffffbf | 0x40;
-								if (edge < kCharaFurDepthZero) {
+								if (edge < static_cast<double>(kCharaFurDepthZero)) {
 									break;
 								}
 							}
@@ -1401,8 +1409,9 @@ int CChara::CModel::PickFur(
 							remainEdges--;
 						} while (remainEdges != 0);
 
-						float depth;
-						if (passed != 3 || nearestDepth <= (depth = depthAccum / kCharaFurTriangleVertexCount)) {
+						double depth;
+						if (passed != 3 ||
+						    nearestDepth <= (depth = static_cast<double>(depthAccum / kCharaFurTriangleVertexCount))) {
 							goto nextVertex;
 						}
 
@@ -1412,8 +1421,11 @@ int CChara::CModel::PickFur(
 
 						CVector rayStart;
 						CVector rayEnd;
-						CVector rayStartInit((cursorX - kCharaFurScreenCenterX) / kCharaFurScreenCenterX,
-						                     -(cursorY - kCharaFurScreenCenterY) / kCharaFurScreenCenterY, kCharaFurDepthZero);
+						CVector rayStartInit(
+						    static_cast<float>(static_cast<double>(static_cast<float>(cursorXd -
+						                                                              static_cast<double>(kCharaFurScreenCenterX))) /
+						                       static_cast<double>(kCharaFurScreenCenterX)),
+						    static_cast<float>(negCursorY / static_cast<double>(kCharaFurScreenCenterY)), kCharaFurDepthZero);
 						rayStart.x = rayStartInit.x;
 						rayStart.y = rayStartInit.y;
 						rayStart.z = rayStartInit.z;

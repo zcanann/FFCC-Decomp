@@ -10192,7 +10192,7 @@ void CMenuPcs::SetAnim(int anim)
 void CMenuPcs::DrawCursor(int x, int y, float scale)
 {
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-	unsigned char alpha = static_cast<unsigned char>(static_cast<int>(static_cast<double>(FLOAT_80331458) * static_cast<double>(scale)));
+	unsigned char alpha = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * scale));
 	GXColor color;
 	color.r = 0xFF;
 	color.g = 0xFF;

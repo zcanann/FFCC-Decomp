@@ -6344,9 +6344,10 @@ void CMenuPcs::SetProjection(int mode)
  */
 void CMenuPcs::RestoreProjection()
 {
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	PSMTXCopy(reinterpret_cast<float(*)[4]>(bytes + 0x744), CameraPcs.m_cameraMatrix);
+	GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0x00FFFFFF);
 	Mtx44 projectionMtx;
-	_GXColor clearColor = {0, 0, 0, 0};
-	GXSetCopyClear(clearColor, 0x00FFFFFF);
 	PSMTX44Copy(CameraPcs.m_screenMatrix, projectionMtx);
 	GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 	Graphic.SetViewport();

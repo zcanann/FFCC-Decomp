@@ -4054,7 +4054,7 @@ void CGMonObj::statMove(int* targetIndex)
 				}
 				monObj->m_moveWork.m_target = partyObj;
 				if (((monObj->m_moveWork.m_stateFlags & 1) != 0) ||
-					((object->m_stateFlags0 & 0x40) != 0)) {
+					((static_cast<int>(((unsigned int)object->m_stateFlags0 << 0x19) | ((unsigned int)object->m_stateFlags0 >> 7))) < 0)) {
 					*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
 					memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
 					if (*targetPartyIdx >= 0) {

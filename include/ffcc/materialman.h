@@ -431,11 +431,7 @@ public:
     void AddTextureIdx(int, int);
     void SetMaterialColor(unsigned int rgba)
     {
-        GXColor& color = m_materialColor;
-        color.r = static_cast<unsigned char>((rgba >> 24) & 0xFF);
-        color.g = static_cast<unsigned char>((rgba >> 16) & 0xFF);
-        color.b = static_cast<unsigned char>((rgba >> 8) & 0xFF);
-        color.a = static_cast<unsigned char>(rgba & 0xFF);
+        m_materialColor = *reinterpret_cast<GXColor*>(&rgba);
     }
     unsigned long GetTevBit()
     {

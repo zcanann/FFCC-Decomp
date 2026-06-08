@@ -5361,7 +5361,7 @@ void CMenuPcs::DrawLoadMenu()
 			}
 			break;
 		case 1:
-			if (m_wmWorldState->m_frameCounter > 0x12) {
+			if (m_wmWorldState->m_frameCounter >= 0x13) {
 				m_wmWorldState->m_subState = 3;
 			}
 			m_wmWorldState->m_frameCounter++;

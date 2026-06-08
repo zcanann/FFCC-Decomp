@@ -882,15 +882,17 @@ void CMenuPcs::draw()
     {
         int mode = m_mode;
 
-        if (mode == 1) {
-            drawWorld();
-        } else if (mode < 1) {
-            if (mode >= 0) {
-                drawBattle();
-                drawVillageMenu();
+        if (mode != 1) {
+            if (mode < 1) {
+                if (mode >= 0) {
+                    drawBattle();
+                    drawVillageMenu();
+                }
+            } else if (mode < 3) {
+                drawBonus();
             }
-        } else if (mode < 3) {
-            drawBonus();
+        } else {
+            drawWorld();
         }
     }
 

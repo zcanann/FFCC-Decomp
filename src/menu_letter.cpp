@@ -1121,7 +1121,7 @@ int CMenuPcs::LetterCtrl()
  * JP Address: TODO
  * JP Size: TODO
  */
-bool CMenuPcs::LetterClose()
+int CMenuPcs::LetterClose()
 {
 	s_OpenClose = 1;
 	int finished = 0;
@@ -1160,9 +1160,9 @@ bool CMenuPcs::LetterClose()
 		}
 	}
 
-	bool allFinished = false;
+	int allFinished = 0;
 	if (panelCount == finished) {
-		allFinished = true;
+		allFinished = 1;
 	}
 	if (allFinished && SingGetLetterAttachflg() >= 0) {
 		int state2 = GetLetterStateBase(this);

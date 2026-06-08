@@ -2488,9 +2488,9 @@ void CGObject::boundCheck()
 
     PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
     PSMTXCopy(cameraMtx, clipMtx);
-    clipMtx[3][0] = sZeroFloat;
-    clipMtx[3][1] = sZeroFloat;
     clipMtx[3][2] = sZeroFloat;
+    clipMtx[3][1] = sZeroFloat;
+    clipMtx[3][0] = sZeroFloat;
     clipMtx[3][3] = sAnimFrameOffset;
 
     PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
@@ -2508,7 +2508,7 @@ void CGObject::boundCheck()
             clipCorner.z = m_worldPosition.z + (((i & 2) != 0) ? -m_nearColRadius : m_nearColRadius);
 
             Math.MTX44MultVec4(screenMtx, &clipCorner, &clipPos);
-            if (zero < static_cast<double>(clipPos.w)) {
+            if (static_cast<double>(clipPos.w) > zero) {
                 clipMask &= 0xFFFFFFEF;
             }
             if (clipMask == 0) {
@@ -2519,10 +2519,10 @@ void CGObject::boundCheck()
             clipPos.x *= invW;
             clipPos.y *= invW;
 
-            if (clipLimit < clipPos.x) {
+            if (clipPos.x > clipLimit) {
                 clipMask &= 0xFFFFFFFE;
             }
-            if (clipLimit < clipPos.y) {
+            if (clipPos.y > clipLimit) {
                 clipMask &= 0xFFFFFFFD;
             }
             if (static_cast<double>(clipPos.x) < one) {

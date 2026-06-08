@@ -240,12 +240,12 @@ void CGObject::onCreate()
     m_groundHitOffset.y = 0.0f;
     m_groundHitOffset.x = 0.0f;
 
-    m_rotBaseX = 0.0f;
-    m_rotBaseY = 0.0f;
     m_rotBaseZ = 0.0f;
-    m_rotTargetX = 0.0f;
-    m_rotTargetY = 0.0f;
+    m_rotBaseY = 0.0f;
+    m_rotBaseX = 0.0f;
     m_rotTargetZ = 0.0f;
+    m_rotTargetY = 0.0f;
+    m_rotTargetX = 0.0f;
 
     m_bodyOffset.x = 0.0f;
     m_bodyOffset.y = sNegativeOne;
@@ -301,8 +301,8 @@ void CGObject::onCreate()
     m_weaponNodeFlagBits.m_unk40 = 0;
     m_animSlotSel = -1;
     m_turnSpeed = 0.0f;
-    m_pushParamA = 0;
     m_pushParamB = 0;
+    m_pushParamA = 0;
 
     m_shieldNodeFlagBits.m_bit40 = 0;
     m_frontHitAngle = sDefaultFrontHitAngle;

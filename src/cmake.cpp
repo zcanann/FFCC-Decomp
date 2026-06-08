@@ -2169,10 +2169,10 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
             reinterpret_cast<char*>(CmakeState(this)) + fieldSelect * 2 + offsetof(CmakeMenuState, m_select));
 
         if ((repeat & 0x8) != 0) {
-            if (currentValue == 0) {
-                currentValue = 3;
-            } else {
+            if (currentValue != 0) {
                 currentValue = static_cast<short>(currentValue - 1);
+            } else {
+                currentValue = 3;
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else if ((repeat & 0x4) != 0) {

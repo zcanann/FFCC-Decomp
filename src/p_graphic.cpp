@@ -117,8 +117,6 @@ extern const float kGraphicScreenCenterX;
 extern const float kGraphicScreenCenterY;
 extern const float kScreenFadeCircleRadius;
 extern const float kGraphicHalf;
-extern const double kIntToDoubleBias = 4503601774854144.0;
-extern const double kUnsignedToDoubleBias = 4503599627370496.0;
 extern const float kSFCircleAngleStep;
 extern const float kDebugBarLeft;
 extern const float kDebugBarTop;
@@ -198,7 +196,7 @@ void CGraphicPcs::drawScreenFade()
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_U16, 1);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 1);
 
     PSMTXIdentity(identityMtx);
     GXLoadPosMtxImm(identityMtx, 0);

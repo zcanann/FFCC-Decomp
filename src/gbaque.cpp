@@ -659,11 +659,13 @@ void GbaQueue::ExecutQueue()
 
 					if ((static_cast<int>(p0) >> 6) == 0) {
 						m_moneyState[channel] = static_cast<unsigned char>(p1 | 0x80);
-						m_pendingMoney[channel] = (static_cast<unsigned int>(p2) << 24) | (static_cast<unsigned int>(p3) << 16);
+						m_pendingMoney[channel] = static_cast<unsigned int>(p2) << 24;
+						m_pendingMoney[channel] |= static_cast<unsigned int>(p3) << 16;
 					} else if (m_moneyState[channel] == 0) {
 						Joybus.SendResult(channel, 1, p0, p1);
 					} else {
-						m_pendingMoney[channel] |= (static_cast<unsigned int>(p1) << 8) | p2;
+						m_pendingMoney[channel] |= static_cast<unsigned int>(p1) << 8;
+						m_pendingMoney[channel] |= p2;
 						Joybus.SendResult(channel, 0, p0, m_moneyState[channel] & 7);
 						if ((m_moneyState[channel] & 7) == 1) {
 							caravanWork->FGPutGil(m_pendingMoney[channel]);

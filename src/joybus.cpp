@@ -4757,9 +4757,9 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
 {
     unsigned int result = 0;
 
-    if (threadParam->m_subState != 1)
+    switch ((unsigned char)threadParam->m_subState)
     {
-        if (threadParam->m_subState == 0)
+    case 0:
         {
             GbaPInfo playerInfo;
 
@@ -4894,34 +4894,37 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
                 }
             }
         }
-    }
-    else
-    {
-        unsigned int statPort = threadParam->m_portIndex;
-        unsigned int word = *(unsigned int*)&m_joyDataPacketBuffer[statPort][2 + m_txWordIndex[statPort] * 4];
+        break;
 
-        if (static_cast<signed char>(m_threadRunningMask) == 0)
+    case 1:
         {
-            result = 0;
-        }
-        else
-        {
-            OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+            unsigned int statPort = threadParam->m_portIndex;
+            unsigned int word = *(unsigned int*)&m_joyDataPacketBuffer[statPort][2 + m_txWordIndex[statPort] * 4];
 
-            if ((int)m_cmdCount[threadParam->m_portIndex] >= 0x40)
+            if (static_cast<signed char>(m_threadRunningMask) == 0)
             {
-                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-                result = -1;
+                result = 0;
             }
             else
             {
-                m_cmdQueueData[threadParam->m_portIndex][m_cmdCount[threadParam->m_portIndex]] = word;
-                m_cmdCount[threadParam->m_portIndex]++;
+                OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
-                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-                result = 0;
+                if ((int)m_cmdCount[threadParam->m_portIndex] >= 0x40)
+                {
+                    OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+                    result = -1;
+                }
+                else
+                {
+                    m_cmdQueueData[threadParam->m_portIndex][m_cmdCount[threadParam->m_portIndex]] = word;
+                    m_cmdCount[threadParam->m_portIndex]++;
+
+                    OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+                    result = 0;
+                }
             }
         }
+        break;
     }
 
     // Common tail: advance word index and clear GBA flag when finished.

@@ -1924,34 +1924,34 @@ void CFlatRuntime2::drawLayer(
 			const float fy1 = static_cast<float>(rectY + rectH);
 
 			GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-			GXPosition3f32(fx0, fy0, 0.0f);
+			GXPosition3f32(fx0, fy0, FLOAT_80330144);
 			GXTexCoord2s16(quadU0, quadV0);
 			GXTexCoord2s16(0, 0);
 
-			GXPosition3f32(fx1, fy0, 0.0f);
+			GXPosition3f32(fx1, fy0, FLOAT_80330144);
 			GXTexCoord2s16(quadU1, quadV0);
 			GXTexCoord2s16(2, 0);
 
-			GXPosition3f32(fx1, fy1, 0.0f);
+			GXPosition3f32(fx1, fy1, FLOAT_80330144);
 			GXTexCoord2s16(quadU1, quadV1);
 			GXTexCoord2s16(2, 2);
 
-			GXPosition3f32(fx0, fy1, 0.0f);
+			GXPosition3f32(fx0, fy1, FLOAT_80330144);
 			GXTexCoord2s16(quadU0, quadV1);
 			GXTexCoord2s16(0, 2);
 		}
 	} else {
 		GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-		GXPosition3f32(x0, y0, 0.0f);
+		GXPosition3f32(x0, y0, FLOAT_80330144);
 		GXTexCoord2s16(u0, v0);
 
-		GXPosition3f32(x1, y0, 0.0f);
+		GXPosition3f32(x1, y0, FLOAT_80330144);
 		GXTexCoord2s16(u1, v0);
 
-		GXPosition3f32(x1, y1, 0.0f);
+		GXPosition3f32(x1, y1, FLOAT_80330144);
 		GXTexCoord2s16(u1, v1);
 
-		GXPosition3f32(x0, y1, 0.0f);
+		GXPosition3f32(x0, y1, FLOAT_80330144);
 		GXTexCoord2s16(u0, v1);
 	}
 

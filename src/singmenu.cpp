@@ -3401,8 +3401,8 @@ void CMenuPcs::DrawSingLife()
 {
     const CCaravanWork* const caravanWork = SingleCaravanWork();
     int lifeTimer = m_singleLifeTimer;
-    float y = -32.0f;
     float xBase = 366.0f;
+    float y = -32.0f;
     if (lifeTimer < 0) {
         return;
     }

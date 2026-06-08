@@ -1635,46 +1635,41 @@ void CCharaPcs::LoadCam(int index, char* fileName)
  */
 void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
 {
-    bool hasLoaded = false;
+    int hasLoaded = 0;
 
     for (unsigned int i = 0; i < LoadModelArray(this)->GetSize(); i++) {
         CLoadModel* loadModel = (*LoadModelArray(this))[i];
         if (loadModel->m_mergeFileId == mergeFileId) {
-            hasLoaded = true;
-            break;
+            hasLoaded = 1;
+            goto checkLoaded;
         }
     }
 
-    if (!hasLoaded) {
-        for (unsigned int i = 0; i < LoadTextureArray(this)->GetSize(); i++) {
-            CLoadTexture* loadTexture = (*LoadTextureArray(this))[i];
-            if (loadTexture->m_mergeFileId == mergeFileId) {
-                hasLoaded = true;
-                break;
-            }
+    for (unsigned int i = 0; i < LoadTextureArray(this)->GetSize(); i++) {
+        CLoadTexture* loadTexture = (*LoadTextureArray(this))[i];
+        if (loadTexture->m_mergeFileId == mergeFileId) {
+            hasLoaded = 1;
+            goto checkLoaded;
         }
     }
 
-    if (!hasLoaded) {
-        for (unsigned int i = 0; i < LoadPdtArray(this)->GetSize(); i++) {
-            CLoadPdt* loadPdt = (*LoadPdtArray(this))[i];
-            if (loadPdt->m_mergeFileId == mergeFileId) {
-                hasLoaded = true;
-                break;
-            }
+    for (unsigned int i = 0; i < LoadPdtArray(this)->GetSize(); i++) {
+        CLoadPdt* loadPdt = (*LoadPdtArray(this))[i];
+        if (loadPdt->m_mergeFileId == mergeFileId) {
+            hasLoaded = 1;
+            goto checkLoaded;
         }
     }
 
-    if (!hasLoaded) {
-        for (unsigned int i = 0; i < LoadAnimArray(this)->GetSize(); i++) {
-            CLoadAnim* loadAnim = (*LoadAnimArray(this))[i];
-            if (loadAnim->m_mergeFileId == mergeFileId) {
-                hasLoaded = true;
-                break;
-            }
+    for (unsigned int i = 0; i < LoadAnimArray(this)->GetSize(); i++) {
+        CLoadAnim* loadAnim = (*LoadAnimArray(this))[i];
+        if (loadAnim->m_mergeFileId == mergeFileId) {
+            hasLoaded = 1;
+            goto checkLoaded;
         }
     }
 
+checkLoaded:
     if (hasLoaded) {
         System.Printf(const_cast<char*>(s_charaMergeDupFmt), mergeFileId);
         return;

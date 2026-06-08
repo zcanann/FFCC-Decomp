@@ -1960,12 +1960,14 @@ void CShopMenu::DrawMake()
     }
     font->DrawInit();
     const char* materialsText = ShopMenuMes(languageId, SHOP_MENU_TEXT_MATERIALS);
-    float materialsX = FLOAT_80332e30 - font->GetWidth(materialsText) * FLOAT_80332d78;
-    MenuPcs.DrawNoShadowFont(font, const_cast<char*>(materialsText), materialsX, FLOAT_80332e34, 4, 0x12);
+    int materialsX = static_cast<int>(FLOAT_80332e30 - font->GetWidth(materialsText) * FLOAT_80332d78);
+    font->DrawInit();
+    MenuPcs.DrawNoShadowFont(font, const_cast<char*>(materialsText), static_cast<float>(materialsX), FLOAT_80332e34, 4, 0x12);
     MenuPcs.DrawInit();
     const char* stockText = ShopMenuMes(languageId, SHOP_MENU_TEXT_STOCK);
-    float stockX = FLOAT_80332e38 - font->GetWidth(stockText) * FLOAT_80332d78;
-    MenuPcs.DrawNoShadowFont(font, const_cast<char*>(stockText), stockX, FLOAT_80332e34, 9, 0x12);
+    int stockX = static_cast<int>(FLOAT_80332e38 - font->GetWidth(stockText) * FLOAT_80332d78);
+    font->DrawInit();
+    MenuPcs.DrawNoShadowFont(font, const_cast<char*>(stockText), static_cast<float>(stockX), FLOAT_80332e34, 9, 0x12);
     MenuPcs.DrawInit();
 
     unsigned short recipeMaterial[8];

@@ -927,9 +927,11 @@ void CLightPcs::CBumpLight::MakeLightMap()
         Vec diff;
         PSVECSubtract(&lightPos, &nrm, &diff);
 
-        float scale = kLightOne;
+        float scale;
         if (m_target == 1) {
             scale = kBumpLightTargetScale;
+        } else {
+            scale = kLightOne;
         }
         PSVECScale(&diff, &diff, scale);
         PSVECAdd(&nrm, &diff, &nrm);
@@ -975,7 +977,7 @@ void CLightPcs::CBumpLight::MakeLightMap()
 
         GXLoadLightObjImm(&lightObj, (GXLightID)1);
 
-        unsigned int y = 0;
+        int y = 0;
         do {
             unsigned int yBase = y;
             GXBegin((GXPrimitive)0x98, (GXVtxFmt)0, 0x42);
@@ -1110,8 +1112,9 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
 {
     Mtx cam;
     PSMTXCopy(CameraMatrix(), cam);
-    Mtx nrm;
+    Mtx texMtx;
     Mtx out;
+    Mtx nrm;
 
     if (mode != 0) {
         Vec pos;
@@ -1203,27 +1206,23 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
     GXLoadNrmMtxImm(nrm, 0);
 
     if ((bump != nullptr) && (bump->m_hasTexture != 0)) {
-        Mtx* bumpMat0 = &m_bumpTexMtx0;
-        Mtx* bumpMat1 = &m_bumpTexMtx1;
-        Mtx texMtx;
-
         if (bump->m_useViewSpace == 1) {
             PSMTXTrans(texMtx, kLightHalf, kLightHalf, kLightZero);
-            PSMTXConcat(texMtx, nrm, *bumpMat0);
+            PSMTXConcat(texMtx, nrm, m_bumpTexMtx0);
             PSMTXScale(texMtx, kBumpTexMtxScale, kBumpTexMtxScale, kBumpTexMtxScale);
-            PSMTXConcat(*bumpMat0, texMtx, *bumpMat0);
+            PSMTXConcat(m_bumpTexMtx0, texMtx, m_bumpTexMtx0);
             Mtx posOnly;
             PSMTXCopy(out, posOnly);
             posOnly[0][3] = kLightZero;
             posOnly[1][3] = kLightZero;
             posOnly[2][3] = kLightZero;
-            PSMTXConcat(posOnly, texMtx, *bumpMat1);
+            PSMTXConcat(posOnly, texMtx, m_bumpTexMtx1);
         } else {
             PSMTXIdentity(nrm);
             PSMTXTrans(texMtx, kLightHalf, kLightHalf, kLightZero);
-            PSMTXConcat(texMtx, nrm, *bumpMat0);
+            PSMTXConcat(texMtx, nrm, m_bumpTexMtx0);
             PSMTXScale(texMtx, kBumpTexMtxScale, kBumpTexMtxScale, kBumpTexMtxScale);
-            PSMTXConcat(*bumpMat0, texMtx, *bumpMat0);
+            PSMTXConcat(m_bumpTexMtx0, texMtx, m_bumpTexMtx0);
 
             float camX = CameraPosX();
             float camZ = CameraPosZ();

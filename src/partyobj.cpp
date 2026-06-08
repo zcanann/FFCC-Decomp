@@ -2994,14 +2994,14 @@ void CGPartyObj::onStatMagic()
 				m_comboCenter = m_worldPosition;
 				m_comboTarget = m_comboCenter;
 				switch (Math.Rand(4)) {
-				case 2:
-					m_itemId = 0x232;
-					break;
 				case 0:
 					m_itemId = 0x230;
 					break;
 				case 1:
 					m_itemId = 0x231;
+					break;
+				case 2:
+					m_itemId = 0x232;
 					break;
 				case 3:
 					m_itemId = 0x238;

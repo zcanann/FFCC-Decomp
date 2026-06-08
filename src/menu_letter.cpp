@@ -2092,29 +2092,29 @@ int CMenuPcs::LetterCtrlCur()
 			return 0;
 		}
 
-		if ((hold & 8) == 0) {
-			if ((hold & 4) != 0) {
-				int cursor = static_cast<int>(*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x26));
-				if ((cursor < 8) && (cursor < letterCount - 1)) {
-					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x26) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x26) + 1;
-					Sound.PlaySe(1, 0x40, 0x7F, 0);
-				} else if (*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x34) + cursor < letterCount - 1) {
-					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x34) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x34) + 1;
-					Sound.PlaySe(1, 0x40, 0x7F, 0);
-				} else {
+		if ((hold & 8) != 0) {
+			if (*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x26) == 0) {
+				if (*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x34) == 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
+				} else {
+					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x34) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x34) - 1;
+					Sound.PlaySe(1, 0x40, 0x7F, 0);
 				}
-			}
-		} else if (*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x26) == 0) {
-			if (*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x34) == 0) {
-				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			} else {
-				*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x34) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x34) - 1;
+				*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x26) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x26) - 1;
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			}
-		} else {
-			*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x26) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x26) - 1;
-			Sound.PlaySe(1, 0x40, 0x7F, 0);
+		} else if ((hold & 4) != 0) {
+			int cursor = static_cast<int>(*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x26));
+			if ((cursor < 8) && (cursor < letterCount - 1)) {
+				*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x26) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x26) + 1;
+				Sound.PlaySe(1, 0x40, 0x7F, 0);
+			} else if (*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x34) + cursor < letterCount - 1) {
+				*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x34) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x34) + 1;
+				Sound.PlaySe(1, 0x40, 0x7F, 0);
+			} else {
+				Sound.PlaySe(4, 0x40, 0x7F, 0);
+			}
 		}
 
 		if ((hold & 0xC) != 0) {
@@ -2175,17 +2175,16 @@ int CMenuPcs::LetterCtrlCur()
 
 	if (menuMode == 1) {
 		if ((press & 0x100) != 0) {
-			CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[s_SelLetter];
-			if ((letter->AttachmentValue() != 0) && !letter->IsAttachmentClaimed()) {
+			if ((caravanWork->m_letters[s_SelLetter].AttachmentValue() != 0) && !caravanWork->m_letters[s_SelLetter].IsAttachmentClaimed()) {
 				*reinterpret_cast<u8*>(GetLetterStateBase(this) + 8) = 1;
 				*reinterpret_cast<u8*>(GetLetterStateBase(this) + 9) = 5;
-				if (!letter->AttachmentIsGil()) {
-					if (caravanWork->m_inventoryItemCount + 1 < 0x41) {
+				if (caravanWork->m_letters[s_SelLetter].AttachmentIsGil()) {
+					int canAdd = caravanWork->CanAddGil(caravanWork->m_letters[s_SelLetter].AttachmentValue() * 100);
+					if (canAdd != 0) {
 						*reinterpret_cast<u8*>(GetLetterStateBase(this) + 9) |= 2;
 					}
 				} else {
-					int canAdd = caravanWork->CanAddGil(letter->AttachmentValue() * 100);
-					if (canAdd != 0) {
+					if (caravanWork->m_inventoryItemCount + 1 <= 0x40) {
 						*reinterpret_cast<u8*>(GetLetterStateBase(this) + 9) |= 2;
 					}
 				}
@@ -2195,8 +2194,8 @@ int CMenuPcs::LetterCtrlCur()
 			}
 
 			if ((CFlatLetterEventEnabled() != 0) &&
-			    letter->HasReply() &&
-			    !letter->IsReplySent()) {
+			    caravanWork->m_letters[s_SelLetter].HasReply() &&
+			    !caravanWork->m_letters[s_SelLetter].IsReplySent()) {
 				*reinterpret_cast<u8*>(GetLetterStateBase(this) + 8) = 2;
 				*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) + 1;
 				Sound.PlaySe(2, 0x40, 0x7F, 0);

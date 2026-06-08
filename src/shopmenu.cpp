@@ -41,8 +41,14 @@ extern float FLOAT_80332d78;
 extern float FLOAT_80332dc8;
 extern float FLOAT_80332dcc;
 extern float FLOAT_80332dd0;
+extern float FLOAT_80332de4;
+extern float FLOAT_80332de8;
 extern float FLOAT_80332dec;
 extern float FLOAT_80332df0;
+extern float FLOAT_80332df4;
+extern float FLOAT_80332df8;
+extern float FLOAT_80332dfc;
+extern float FLOAT_80332e00;
 extern float FLOAT_80332de0;
 extern float FLOAT_80332e0c;
 extern float FLOAT_80332e10;
@@ -1735,13 +1741,13 @@ void CShopMenu::Draw()
         screenMtx[0][0] = FLOAT_80332d78;
         screenMtx[1][1] = FLOAT_80332dd0;
         screenMtx[2][2] = FLOAT_80332d78;
-        screenMtx[0][3] = 0.0f;
-        screenMtx[1][3] = 480.0f;
+        screenMtx[0][3] = FLOAT_80332de4;
+        screenMtx[1][3] = FLOAT_80332de8;
         GXLoadPosMtxImm(screenMtx, 0);
         GXSetCurrentMtx(0);
 
-        C_MTXOrtho(projectionMtx, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, FLOAT_80332d28);
-        projectionMtx[2][3] += 0.0f;
+        C_MTXOrtho(projectionMtx, FLOAT_80332d9c, FLOAT_80332dec, FLOAT_80332d9c, FLOAT_80332df0, FLOAT_80332d9c, FLOAT_80332d28);
+        projectionMtx[2][3] += FLOAT_80332d9c;
         GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
 
         _GXColor fadeColor = {0, 0, 0, alpha};
@@ -1763,8 +1769,14 @@ void CShopMenu::Draw()
         GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
         GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
 
-        Vec topLeft = {0.0f, 0.0f, 0.0f};
-        Vec bottomRight = {640.0f, 480.0f, 0.0f};
+        Vec topLeft;
+        topLeft.x = FLOAT_80332df4;
+        topLeft.y = FLOAT_80332df8;
+        topLeft.z = FLOAT_80332d9c;
+        Vec bottomRight;
+        bottomRight.x = FLOAT_80332dfc;
+        bottomRight.y = FLOAT_80332e00;
+        bottomRight.z = FLOAT_80332d9c;
         Graphic.RenderNoTexQuadGrouad(topLeft, bottomRight, fadeColor, fadeColor, fadeColor, fadeColor);
 
         Graphic.SetDrawDoneDebugData(0x33);

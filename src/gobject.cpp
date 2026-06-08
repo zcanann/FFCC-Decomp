@@ -1354,6 +1354,7 @@ void CGObject::update()
     PSVECAdd(&m_worldPosition, &m_groundHitOffset, &m_worldPosition);
 
     float turnDelta = Math.DstRot(m_rotTargetY, m_rotBaseY);
+    float turnFactor;
     if (m_animSlotSel != -1 && m_shieldNodeFlagBits.m_bit40) {
         const double turnLimit = fabs(m_turnBaseSpeed);
         double clampedTurn;
@@ -1365,10 +1366,11 @@ void CGObject::update()
             clampedTurn = turnDelta;
         }
         turnDelta = clampedTurn;
-        m_rotBaseY += turnDelta;
+        turnFactor = sAnimFrameOffset;
     } else {
-        m_rotBaseY += turnDelta * m_hitNormal.x;
+        turnFactor = m_hitNormal.x;
     }
+    m_rotBaseY += turnDelta * turnFactor;
 
     Mtx modelMtx;
     Mtx ecScratch;

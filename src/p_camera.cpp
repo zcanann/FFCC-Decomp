@@ -1648,7 +1648,7 @@ void CCameraPcs::drawShadowBegin()
         }
 
         double currentDepth = static_cast<double>(m_fullScreenShadowDepth);
-        if (static_cast<double>(kCameraZeroF) <= currentDepth) {
+        if (currentDepth >= static_cast<double>(kCameraZeroF)) {
             m_fullScreenShadowDepth = static_cast<float>(currentDepth +
                                                          static_cast<double>((static_cast<float>(depth - currentDepth)) * kCameraShadowDepthBlend));
         } else {

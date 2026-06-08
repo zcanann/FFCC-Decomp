@@ -885,7 +885,7 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x21));
 	MenuPcs.DrawRect(0, right, yCorner, corner, innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
-	MenuPcs.DrawRect(0, xCorner, yCorner, innerW, innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
+	MenuPcs.DrawRect(0, xCorner, yCorner, (float)((double)w - 16.0), innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
 }
 
 #pragma push
@@ -2001,13 +2001,13 @@ void CMenuPcs::DrawResultCloseAnim()
 						for (int digitIndex = 0; digitIndex < digitCount; digitIndex++) {
 							MenuPcs.DrawRect(0, digitX, (float)sprite->y, digitW, (float)sprite->h,
 							    digitW * (float)digits[digitIndex], sprite->mulY,
-							    sprite->depth, sprite->depth, 0.0f);
+							    sprite->depth, sprite->depth, kBonusZClearOrigin);
 							digitX += digitW;
 						}
 					} else {
 						MenuPcs.DrawRect(0, (float)sprite->x + sprite->motionX, (float)sprite->y + sprite->motionY,
 						    (float)sprite->w, (float)sprite->h,
-						    sprite->mulX, sprite->mulY, sprite->depth, sprite->depth, 0.0f);
+						    sprite->mulX, sprite->mulY, sprite->depth, sprite->depth, kBonusZClearOrigin);
 					}
 				}
 				lastKind = sprite->kind;
@@ -2450,13 +2450,13 @@ void CMenuPcs::DrawResultCountAnim()
 					for (int digitIndex = 0; digitIndex < digitCount; digitIndex++) {
 						MenuPcs.DrawRect(0, digitX, (float)sprite->y, digitW, (float)sprite->h,
 						    digitW * (float)digits[digitIndex], sprite->mulY,
-						    sprite->depth, sprite->depth, 0.0f);
+						    sprite->depth, sprite->depth, kBonusZClearOrigin);
 						digitX += digitW;
 					}
 				} else {
 					MenuPcs.DrawRect(0, (float)sprite->x + sprite->motionX, (float)sprite->y + sprite->motionY,
 					    (float)sprite->w, (float)sprite->h,
-					    sprite->mulX, sprite->mulY, sprite->depth, sprite->depth, 0.0f);
+					    sprite->mulX, sprite->mulY, sprite->depth, sprite->depth, kBonusZClearOrigin);
 				}
 				lastKind = sprite->kind;
 			}
@@ -3446,7 +3446,7 @@ void CMenuPcs::createBonus()
 			s_Rinfo->m_party[activeCount].m_partySlot = i;
 			s_Rinfo->m_party[activeCount].m_partyHandle =
 			    *reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(Game.m_partyObjArr[i]) + 0xF8);
-			s_Rinfo->m_party[activeCount].m_partyHandle->m_model->m_lightAlpha = 0.0f;
+			s_Rinfo->m_party[activeCount].m_partyHandle->m_model->m_lightAlpha = kBonusZClearOrigin;
 			s_Rinfo->m_party[activeCount].m_bonusCondition = (int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_bonusCondition;
 			int foodValue = (int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_artifactRelated[3] + (int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_artifactRelated[4];
 			int foodClamped;

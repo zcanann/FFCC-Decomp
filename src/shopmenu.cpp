@@ -1666,7 +1666,7 @@ void CShopMenu::DrawShopBase()
  */
 void CShopMenu::Draw()
 {
-    if (m_unk00 == 0) {
+    if (reinterpret_cast<int>(m_unk00) == 0) {
         m_unk00 = reinterpret_cast<void*>(1);
         return;
     }

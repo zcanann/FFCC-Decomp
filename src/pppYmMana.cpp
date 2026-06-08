@@ -1593,7 +1593,7 @@ static void CalcWaterReflectionVector(
     zero = LoadFloat(kPppYmMoveParabolaZero);
     half = LoadFloat(kYmManaHalf);
 
-    for (i = 0; i < count; i++) {
+    for (i = 0; i < count;) {
         PSVECSubtract(positionIt, &transformedCameraPos, &reflected);
         C_VECReflect(&reflected, normalIt, reflectionIt);
         PSMTXMultVec(matrixNoTranslate, reflectionIt, reflectionIt);
@@ -1624,6 +1624,7 @@ static void CalcWaterReflectionVector(
         reflectionIt++;
         normalIt++;
         colorBytes += 4;
+        i++;
         *texCoordFloat = *texCoordFloat * half;
         *texCoordFloat = *texCoordFloat + half;
         texCoordFloat[1] = texCoordFloat[1] * half;

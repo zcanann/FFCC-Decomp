@@ -932,9 +932,9 @@ int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder&
         if (disc == 0.0f) {
             const f32 t = -radialB / radialA;
             const f32 z = (t * vz) + pz;
-            if (0.0f <= z && z <= axisLen) {
+            if (kMapHitZero <= z && z <= axisLen) {
                 outT = t * tScale;
-                if (0.0f <= outT && outT <= 1.0f) {
+                if (kMapHitZero <= outT && outT <= kMapHitUnitScale) {
                     return 1;
                 }
                 return 0;
@@ -943,9 +943,9 @@ int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder&
             disc = sqrtf(disc);
             const f32 t = (-radialB - disc) / radialA;
             const f32 z = (t * vz) + pz;
-            if (0.0f <= z && z <= axisLen) {
+            if (kMapHitZero <= z && z <= axisLen) {
                 outT = t * tScale;
-                if (0.0f <= outT && outT <= 1.0f) {
+                if (kMapHitZero <= outT && outT <= kMapHitUnitScale) {
                     return 1;
                 }
                 return 0;
@@ -958,9 +958,9 @@ int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder&
             disc = capB * capB - capC;
             if (disc == 0.0f) {
                 const f32 t = -capB;
-                if ((t * vz) + pz <= 0.0f) {
+                if ((t * vz) + pz <= kMapHitZero) {
                     outT = t * tScale;
-                    if (0.0f <= outT && outT <= 1.0f) {
+                    if (kMapHitZero <= outT && outT <= kMapHitUnitScale) {
                         return 1;
                     }
                     return 0;
@@ -968,18 +968,18 @@ int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder&
             } else if (disc > 0.0f) {
                 disc = sqrtf(disc);
                 f32 t = -capB - disc;
-                if ((t * vz) + pz <= 0.0f) {
+                if ((t * vz) + pz <= kMapHitZero) {
                     outT = t * tScale;
-                    if (0.0f <= outT && outT <= 1.0f) {
+                    if (kMapHitZero <= outT && outT <= kMapHitUnitScale) {
                         return 1;
                     }
                     return 0;
                 }
 
                 t = -capB + disc;
-                if ((t * vz) + pz <= 0.0f) {
+                if ((t * vz) + pz <= kMapHitZero) {
                     outT = t * tScale;
-                    if (0.0f <= outT && outT <= 1.0f) {
+                    if (kMapHitZero <= outT && outT <= kMapHitUnitScale) {
                         return 1;
                     }
                     return 0;
@@ -992,7 +992,7 @@ int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder&
                 const f32 t = -capB;
                 if (axisLen <= (t * vz) + pz) {
                     outT = t * tScale;
-                    if (0.0f <= outT && outT <= 1.0f) {
+                    if (kMapHitZero <= outT && outT <= kMapHitUnitScale) {
                         return 1;
                     }
                     return 0;
@@ -1002,7 +1002,7 @@ int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder&
                 f32 t = -capB - disc;
                 if (axisLen <= (t * vz) + pz) {
                     outT = t * tScale;
-                    if (0.0f <= outT && outT <= 1.0f) {
+                    if (kMapHitZero <= outT && outT <= kMapHitUnitScale) {
                         return 1;
                     }
                     return 0;
@@ -1011,7 +1011,7 @@ int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder&
                 t = -capB + disc;
                 if (axisLen <= (t * vz) + pz) {
                     outT = t * tScale;
-                    if (0.0f <= outT && outT <= 1.0f) {
+                    if (kMapHitZero <= outT && outT <= kMapHitUnitScale) {
                         return 1;
                     }
                     return 0;

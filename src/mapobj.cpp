@@ -850,10 +850,10 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 m_shadowTarget = static_cast<int>(chunkFile.Get4());
             } else if (chunk.m_version == 1) {
                 m_enableFullScreenShadow = chunkFile.Get1();
-                if (chunkFile.Get1() == 0) {
-                    m_shadowTarget = 0;
-                } else {
+                if (chunkFile.Get1() != 0) {
                     m_shadowTarget = -1;
+                } else {
+                    m_shadowTarget = 0;
                 }
             } else {
                 m_enableFullScreenShadow = chunkFile.Get1();

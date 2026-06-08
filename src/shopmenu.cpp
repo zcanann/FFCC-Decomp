@@ -2415,8 +2415,8 @@ void CShopMenu::DrawShop0()
 #pragma opt_strength_reduction off
 void CShopMenu::SelectMake()
 {
-    bool canSelect = MenuPcs.ChkEquipPossible(m_resultItem) &&
-                     (CalcShopMenuMakeGil(this, getItemNo(m_selectedIndex)) <= m_caravanWork->m_gil);
+    bool canSelect = static_cast<unsigned char>(MenuPcs.ChkEquipPossible(m_resultItem)) &&
+                     (m_caravanWork->m_gil >= CalcShopMenuMakeGil(this, getItemNo(m_selectedIndex)));
 
     int selected = getItemNo(m_selectedIndex);
     short recipeMaterial[8];
@@ -3191,22 +3191,21 @@ void CShopMenu::Calc()
         m_fade = static_cast<float>(timer) * FLOAT_80332E50;
         if (timer == 8) {
             short recipeMaterial[8];
-            CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
 
             MenuPcs.GetRecipeMaterial(getItemNo(m_selectedIndex), reinterpret_cast<CMenuPcs::MaterialInfo*>(recipeMaterial));
-            caravanWork->AddGil(-CalcShopMenuMakeGil(this, getItemNo(m_selectedIndex)));
-            caravanWork->DeleteItem(getItemNo(m_selectedIndex), 0);
+            ShopMenuCaravanWork(this)->AddGil(-CalcShopMenuMakeGil(this, getItemNo(m_selectedIndex)));
+            ShopMenuCaravanWork(this)->DeleteItem(getItemNo(m_selectedIndex), 0);
 
             for (int i = 0; i < 3; i++) {
                 if (recipeMaterial[i] < 1) {
                     break;
                 }
                 for (int count = 0; count < recipeMaterial[i + 3]; count++) {
-                    caravanWork->DeleteItem(recipeMaterial[i], 0);
+                    ShopMenuCaravanWork(this)->DeleteItem(recipeMaterial[i], 0);
                 }
             }
 
-            caravanWork->AddItem(static_cast<short>(m_resultItem), &m_resultParam);
+            ShopMenuCaravanWork(this)->AddItem(m_resultItem, &m_resultParam);
             this->SetMode(0x10);
         }
         break;

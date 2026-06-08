@@ -963,16 +963,30 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
 		}
 
 		for (int materialIdx = 0; materialIdx < static_cast<int>(materialCount); materialIdx++) {
-			CCaravanWork* currentWork = reinterpret_cast<CCaravanWork*>(*scriptFoodBase);
-			int foundSlot;
+			int slotCounter = 0;
+			int byteOffset = 0;
+			int foundSlot = 0;
+			int groups;
 
-			for (foundSlot = 0; foundSlot < 0x40; foundSlot++) {
-				if (static_cast<int>(currentWork->m_inventoryItems[foundSlot]) == static_cast<int>(materialId)) {
+			for (groups = 0; groups < 8; groups++) {
+				char* invBase = static_cast<char*>(reinterpret_cast<void*>(*scriptFoodBase));
+				foundSlot = slotCounter;
+				if ((static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xB6)) == materialId) ||
+				    (foundSlot = slotCounter + 1, static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xB8)) == materialId) ||
+				    (foundSlot = slotCounter + 2, static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xBA)) == materialId) ||
+				    (foundSlot = slotCounter + 3, static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xBC)) == materialId) ||
+				    (foundSlot = slotCounter + 4, static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xBE)) == materialId) ||
+				    (foundSlot = slotCounter + 5, static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xC0)) == materialId) ||
+				    (foundSlot = slotCounter + 6, static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xC2)) == materialId) ||
+				    (foundSlot = slotCounter + 7, static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xC4)) == materialId)) {
 					break;
 				}
+				byteOffset += 0x10;
+				slotCounter += 8;
+				foundSlot = slotCounter;
 			}
 
-			currentWork->DeleteItemIdx(foundSlot, 1);
+			reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->DeleteItemIdx(foundSlot, 1);
 		}
 	}
 

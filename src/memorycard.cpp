@@ -1544,43 +1544,41 @@ void CMemoryCardMan::MakeSaveData()
     saveDat->m_flags = 0;
 
     CGame::CGameWork* gameWork = &Game.m_gameWork;
-    CCaravanWork* caravanWorkArr = Game.m_caravanWorkArr;
-    int* wmBackupParams = gameWork->m_wmBackupParams;
-    int wm0 = wmBackupParams[0];
-    int wm1 = wmBackupParams[1];
-    int wm2 = wmBackupParams[2];
-    int wm3 = wmBackupParams[3];
-    if (caravanWorkArr[wm0].m_shopState == 0)
+    CCaravanWork* cw0 = &Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[0]];
+    if (cw0->m_shopState == 0)
     {
-        wmBackupParams[0] = -1;
+        Game.m_gameWork.m_wmBackupParams[0] = -1;
     }
-    if (caravanWorkArr[wm0].m_shopBusyFlag != 0)
+    if (cw0->m_shopBusyFlag != 0)
     {
-        wmBackupParams[0] = -1;
+        Game.m_gameWork.m_wmBackupParams[0] = -1;
     }
-    if (caravanWorkArr[wm1].m_shopState == 0)
+    CCaravanWork* cw1 = &Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[1]];
+    if (cw1->m_shopState == 0)
     {
-        wmBackupParams[1] = -1;
+        Game.m_gameWork.m_wmBackupParams[1] = -1;
     }
-    if (caravanWorkArr[wm1].m_shopBusyFlag != 0)
+    if (cw1->m_shopBusyFlag != 0)
     {
-        wmBackupParams[1] = -1;
+        Game.m_gameWork.m_wmBackupParams[1] = -1;
     }
-    if (caravanWorkArr[wm2].m_shopState == 0)
+    CCaravanWork* cw2 = &Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[2]];
+    if (cw2->m_shopState == 0)
     {
-        wmBackupParams[2] = -1;
+        Game.m_gameWork.m_wmBackupParams[2] = -1;
     }
-    if (caravanWorkArr[wm2].m_shopBusyFlag != 0)
+    if (cw2->m_shopBusyFlag != 0)
     {
-        wmBackupParams[2] = -1;
+        Game.m_gameWork.m_wmBackupParams[2] = -1;
     }
-    if (caravanWorkArr[wm3].m_shopState == 0)
+    CCaravanWork* cw3 = &Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[3]];
+    if (cw3->m_shopState == 0)
     {
-        wmBackupParams[3] = -1;
+        Game.m_gameWork.m_wmBackupParams[3] = -1;
     }
-    if (caravanWorkArr[wm3].m_shopBusyFlag != 0)
+    if (cw3->m_shopBusyFlag != 0)
     {
-        wmBackupParams[3] = -1;
+        Game.m_gameWork.m_wmBackupParams[3] = -1;
     }
 
     *reinterpret_cast<u32*>(save + 0x20) = *reinterpret_cast<u32*>(&gameWork->m_scriptSysVal0);

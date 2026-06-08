@@ -12069,6 +12069,7 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 	}
 
 	float y = static_cast<float>(m_menuWindowInfo->y + 0x20);
+	const float lineHeight = FLOAT_80331404;
 
 	char textBuf[128];
 	const unsigned char* entry = winMess + 4;
@@ -12113,7 +12114,7 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 			}
 			font->Draw(textBuf);
 		}
-		y += FLOAT_80331404;
+		y += lineHeight;
 		entry += 2;
 	}
 

@@ -557,7 +557,7 @@ void CCharaPcs::Init()
     LoadPdtArray(this)->SetDefaultSize(0x80);
     LoadPdtArray(this)->SetGrow(0);
 
-    for (int i = 0; i < 2; i++) {
+    for (unsigned int i = 0; i < 2; i++) {
         _GXColor& ambientColor = m_viewerAmbientColor[i];
         ambientColor.r = 0x3F;
         ambientColor.g = 0x3F;

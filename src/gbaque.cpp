@@ -3445,10 +3445,11 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 		remaining--;
 	} while (remaining != 0);
 
-	indexBytes = static_cast<unsigned int>(equipCount) + 1;
-	if ((indexBytes & 3) != 0) {
-		indexBytes = (((indexBytes >> 2) + 1) * 4);
+	int indexBytesS = equipCount + 1;
+	if ((indexBytesS & 3) != 0) {
+		indexBytesS = (((indexBytesS >> 2) + 1) * 4);
 	}
+	indexBytes = static_cast<unsigned int>(indexBytesS);
 
 	outData[4] = equipCount;
 	memcpy(outData + 5, equipIndices, indexBytes - 1);

@@ -489,12 +489,14 @@ static inline void DrawBonusSelectedArtifactHelp(CMenuPcs* menu, int statePtr, B
 	}
 
 	BonusAnimSprite* frame = 0;
+	int frameIndex = 0;
 	for (int i = 0; i < (int)header->count; i++) {
 		if (sprites[i].kind == -3) {
-			frame = &sprites[i];
+			frameIndex = i;
 			break;
 		}
 	}
+	frame = &sprites[frameIndex];
 
 	CFont* font = menu->m_fonts[1];
 	font->SetMargin(1.0f);
@@ -2232,7 +2234,9 @@ void CMenuPcs::CalcResultCloseAnim()
 	for (int i = 0; i < *(short*)this->m_bonusAnimPtr; i++) {
 		short* sprite = (short*)((int)this->m_bonusAnimPtr + off + 8);
 
-		if ((*(unsigned int*)(sprite + 0x16) & 1) == 0) {
+		if ((*(unsigned int*)(sprite + 0x16) & 1) != 0) {
+			*(float*)(sprite + 8) = 0.0f;
+		} else {
 			if (frame < *(int*)(sprite + 0x12)) {
 				*(float*)(sprite + 8) = 0.0f;
 			}
@@ -2242,8 +2246,6 @@ void CMenuPcs::CalcResultCloseAnim()
 			} else {
 				*(float*)(sprite + 8) = 0.0f;
 			}
-		} else {
-			*(float*)(sprite + 8) = 0.0f;
 		}
 
 		if ((int)(*(int*)(sprite + 0x12) + *(unsigned int*)(sprite + 0x14)) <= frame ||

@@ -2529,7 +2529,7 @@ void CMenuPcs::DrawNoShadowFont(CFont* font, char* text, float x, float y, int t
  * JP Address: TODO
  * JP Size: TODO
  */
-double CMenuPcs::CalcListPos(int listPos, int listSize, int mode)
+float CMenuPcs::CalcListPos(int listPos, int listSize, int mode)
 {
     float span;
 

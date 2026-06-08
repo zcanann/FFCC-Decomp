@@ -289,7 +289,7 @@ public:
     void DrawBar(float, float, float, TEX, float);
     void DrawWindow(float, float, float, float, TEX, float);
     void DrawSingleIcon(int, int, int, float, int, float);
-    double CalcListPos(int, int, int);
+    float CalcListPos(int, int, int);
     void DrawListPosMark(float, float, float);
     void DrawSingLife();
     float CalcCenteringPos(char*, CFont*);

@@ -1492,8 +1492,8 @@ void CGMonObj::frameStatFuncTetsukyojin()
 			memset(&m_moveWork, 0, sizeof(m_moveWork));
 			m_moveWork.m_flags = 0x2410;
 
-			CVector storedVec(*reinterpret_cast<Vec*>(CGMonObj::m_boss + 0x4));
-			CVector attackDir(-storedVec.x, -storedVec.y, -storedVec.z);
+			const CVector& storedVec = CVector(*reinterpret_cast<Vec*>(CGMonObj::m_boss + 0x4));
+			const CVector& attackDir = CVector(-storedVec.x, -storedVec.y, -storedVec.z);
 			m_moveWork.m_targetPos.x = attackDir.x;
 			m_moveWork.m_targetPos.y = attackDir.y;
 			m_moveWork.m_targetPos.z = attackDir.z;

@@ -1264,7 +1264,7 @@ int CGCharaObj::getReplaceStat(int state)
 void CGCharaObj::putHitParticleFromItem(CGPrgObj* sourceObj, int itemId)
 {
 	int particleOffset = 0;
-	unsigned int particleBank;
+	int particleBank;
 	unsigned short particleSpec;
 	unsigned short particleFlags;
 	unsigned short seSpec;
@@ -1278,7 +1278,7 @@ void CGCharaObj::putHitParticleFromItem(CGPrgObj* sourceObj, int itemId)
 	if (particleBank != 0xFFFF && particleBank != 0xFF) {
 		if (particleBank == 0xFE) {
 			int sourceData = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0xF8);
-			int effectData = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceData) + 0x178);
+			unsigned int effectData = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceData) + 0x178);
 			particleBank = effectData != 0 ? *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(effectData) + 0x14)
 			                               : 0xFFFFFFFF;
 		}

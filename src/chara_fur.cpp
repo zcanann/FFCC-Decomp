@@ -762,6 +762,16 @@ static inline int MogPadInt(int offset)
 	return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Pad) + padIndex * sizeof(CPad::PadInput) + offset);
 }
 
+static inline float MogPadFloat(int offset)
+{
+	if (HasDebugPadOverride()) {
+		return 0.0f;
+	}
+	int padIndex = 0;
+	padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+	return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + padIndex * sizeof(CPad::PadInput) + offset);
+}
+
 static inline unsigned char MogRadarType()
 {
 	return Game.m_gameWork.m_mogScoreRadarType;
@@ -1032,9 +1042,9 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		}
 	}
 
-	Chara.MogFur().m_cursorX = static_cast<int>(kYmEnvTen * static_cast<float>(MogPadInt(36)) +
+	Chara.MogFur().m_cursorX = static_cast<int>(kYmEnvTen * MogPadFloat(36) +
 	                                     static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorX)));
-	Chara.MogFur().m_cursorY = static_cast<int>(-(kYmEnvTen * static_cast<float>(MogPadInt(40)) -
+	Chara.MogFur().m_cursorY = static_cast<int>(-(kYmEnvTen * MogPadFloat(40) -
 	                                     static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorY))));
 
 	if (static_cast<int>(Chara.MogFur().m_cursorX) < 0) {

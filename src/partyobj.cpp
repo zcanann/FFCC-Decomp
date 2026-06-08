@@ -3459,8 +3459,8 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 	}
 
 	int bonusSlot = reinterpret_cast<unsigned char*>(m_scriptHandle)[0xBA4];
-	unsigned int addValue = 0;
-	unsigned int subValue = 0;
+	int addValue = 0;
+	int subValue = 0;
 	unsigned short currentAdd = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBCA);
 	unsigned short currentSub = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBCC);
 	CGame::CBossArtifactStage* bossArtifacts =
@@ -3628,9 +3628,11 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 	}
 
 	if (addValue != 0) {
-		unsigned int total = currentAdd + addValue;
-		if (total > 100) {
-			total = 100;
+		int total = static_cast<int>(currentAdd) + addValue;
+		if (total < 0) {
+			total = 0;
+		} else {
+			total = total > 100 ? 100 : total;
 		}
 		if (bonusSlot != 0) {
 			System.Printf(const_cast<char*>(msgBase + 0x230), bonusSlot, total);
@@ -3642,8 +3644,8 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 		int total = static_cast<int>(currentSub) - static_cast<int>(subValue);
 		if (total < 0) {
 			total = 0;
-		} else if (total > 100) {
-			total = 100;
+		} else {
+			total = total > 100 ? 100 : total;
 		}
 		System.Printf(const_cast<char*>(msgBase + 0x24C), bonusSlot, total);
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBCC) = static_cast<unsigned short>(total);

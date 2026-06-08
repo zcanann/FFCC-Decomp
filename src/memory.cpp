@@ -2043,9 +2043,7 @@ void CAmemCacheSet::CacheClear()
         if ((entry.m_inUse != 0) && (entry.m_refCount == 0) && (entry.m_dmaCopy != 0)) {
             void* data = entry.m_cacheData;
             if (data != 0) {
-                if (data != 0) {
-                    freeStageBlock(reinterpret_cast<void*>(data));
-                }
+                freeStageBlock(reinterpret_cast<void*>(data));
                 entry.m_cacheData = 0;
             }
         }

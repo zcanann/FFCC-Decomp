@@ -42,6 +42,7 @@ extern float FLOAT_80332d78;
 extern float FLOAT_80332dc8;
 extern float FLOAT_80332dcc;
 extern float FLOAT_80332dd0;
+extern float FLOAT_80332dd4;
 extern float FLOAT_80332dd8;
 extern float FLOAT_80332ddc;
 extern float FLOAT_80332de4;
@@ -229,9 +230,9 @@ static inline CCaravanWork* ShopMenuCaravanWork(CShopMenu* shopMenu)
     return shopMenu->m_caravanWork;
 }
 
-static float CalcCenteredShopMenuX(CFont* font, const char* text)
+static float CalcCenteredShopMenuX(CFont* font, const char* text, int centerX)
 {
-    return static_cast<float>(static_cast<int>((464.0f - font->GetWidth(text)) * 0.5f + 80.0f));
+    return static_cast<float>(static_cast<int>((FLOAT_80332dd4 - font->GetWidth(text)) * FLOAT_80332d78 + centerX));
 }
 
 static int ResolveShopMenuItemCount(CShopMenu* shopMenu)
@@ -839,7 +840,7 @@ void setOrtho(int x, int y, float scaleX, float scaleY, float zOffset)
     GXLoadPosMtxImm(screenMtx, 0);
     GXSetCurrentMtx(0);
 
-    C_MTXOrtho(projectionMtx, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, FLOAT_80332d28);
+    C_MTXOrtho(projectionMtx, FLOAT_80332d9c, FLOAT_80332dec, FLOAT_80332d9c, FLOAT_80332df0, FLOAT_80332d9c, FLOAT_80332d28);
     projectionMtx[2][3] += zOffset;
     GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
 
@@ -1668,13 +1669,13 @@ void CShopMenu::DrawShopBase()
         Graphic.SetDrawDoneDebugData(0x10);
         char* confirmText = (m_listType == 0) ? ShopMenuMes(languageId, SHOP_MENU_TEXT_BUY) :
                                                 ShopMenuMes(languageId, SHOP_MENU_TEXT_SELL);
-        font->SetPosX(CalcCenteredShopMenuX(font, confirmText));
+        font->SetPosX(CalcCenteredShopMenuX(font, confirmText, 0x50));
         font->SetPosY(FLOAT_80332dd8);
         font->Draw(confirmText);
         Graphic.SetDrawDoneDebugData(0x11);
 
         char* cancelText = ShopMenuMes(languageId, SHOP_MENU_TEXT_CANCEL);
-        font->SetPosX(CalcCenteredShopMenuX(font, cancelText));
+        font->SetPosX(CalcCenteredShopMenuX(font, cancelText, 0x50));
         font->SetPosY(FLOAT_80332ddc);
         font->Draw(cancelText);
         Graphic.SetDrawDoneDebugData(0x12);
@@ -1851,13 +1852,13 @@ void CShopMenu::DrawSoubi()
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
     labelFont->SetPosY(FLOAT_80332E08);
     char* equipText = ShopMenuMes(languageId, SHOP_MENU_TEXT_EQUIP);
-    float equipTextX = CalcCenteredShopMenuX(labelFont, equipText);
+    float equipTextX = CalcCenteredShopMenuX(labelFont, equipText, 0x1F8);
     labelFont->SetPosX(equipTextX);
     labelFont->SetPosY(FLOAT_80332E08);
     labelFont->Draw(equipText);
 
     char* cancelText = ShopMenuMes(languageId, SHOP_MENU_TEXT_CANCEL);
-    float cancelTextX = CalcCenteredShopMenuX(labelFont, cancelText);
+    float cancelTextX = CalcCenteredShopMenuX(labelFont, cancelText, 0x1F8);
     labelFont->SetPosX(cancelTextX);
     labelFont->SetPosY(FLOAT_80332d88);
     labelFont->Draw(cancelText);

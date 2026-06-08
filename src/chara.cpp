@@ -2930,138 +2930,252 @@ void CChara::CMesh::Duplicate(CChara::CMesh* src, CMemory::CStage* stage)
  */
 void CChara::CMesh::skin(int meshIndex, int start, int count, CChara::CSkin* skinRef, void* srcPos, void* srcNrm, void* srcWgt, S16Vec* dstPos, S16Vec* dstNrm, S16Vec* dstTan, S16Vec* dstBinorm)
 {
-	u8* oneWeightData = (u8*)srcPos;
-	u8* twoWeightData = (u8*)srcNrm;
-	u8* threeWeightData = (u8*)srcWgt;
-	S16Vec* srcVertices = dstPos;
-	S16Vec* outVertices = dstNrm;
-	S16Vec* srcNormals = dstTan;
-	S16Vec* outNormals = dstBinorm;
-
-	for (int i = 0; i < meshIndex; i++) {
-		u32 skinIndex = oneWeightData[0];
-		u16 vertexIndex = *(u16*)(oneWeightData + 2);
-		u16 normalCount = *(u16*)(oneWeightData + 4);
-		float* m = (float*)((u8*)skinRef + (skinIndex * 0x64));
-
-		float x = (float)srcVertices[vertexIndex].x;
-		float y = (float)srcVertices[vertexIndex].y;
-		float z = (float)srcVertices[vertexIndex].z;
-		outVertices[vertexIndex].x = (s16)(m[0] * x + m[1] * y + m[2] * z + m[3]);
-		outVertices[vertexIndex].y = (s16)(m[4] * x + m[5] * y + m[6] * z + m[7]);
-		outVertices[vertexIndex].z = (s16)(m[8] * x + m[9] * y + m[10] * z + m[11]);
-
-		for (u16 j = 0; j < normalCount; j++) {
-			u16 normalIndex = *(u16*)(oneWeightData + 6 + (j * 2));
-			float nx = (float)srcNormals[normalIndex].x;
-			float ny = (float)srcNormals[normalIndex].y;
-			float nz = (float)srcNormals[normalIndex].z;
-			outNormals[normalIndex].x = (s16)(m[0] * nx + m[1] * ny + m[2] * nz);
-			outNormals[normalIndex].y = (s16)(m[4] * nx + m[5] * ny + m[6] * nz);
-			outNormals[normalIndex].z = (s16)(m[8] * nx + m[9] * ny + m[10] * nz);
-		}
-
-		oneWeightData += 8 + (normalCount * 2);
-	}
-
-	for (int i = 0; i < start; i++) {
-		u32 skinIndexA = twoWeightData[0];
-		u32 skinIndexB = *(u16*)(twoWeightData + 2);
-		u16 wAraw = *(u16*)(twoWeightData + 4);
-		u16 wBraw = *(u16*)(twoWeightData + 6);
-		u16 vertexIndex = *(u16*)(twoWeightData + 8);
-		u16 normalCount = *(u16*)(twoWeightData + 10);
-		float totalW = (float)(wAraw + wBraw);
-		float wA = totalW > 0.0f ? (float)wAraw / totalW : 1.0f;
-		float wB = totalW > 0.0f ? (float)wBraw / totalW : 0.0f;
-		float* mA = (float*)((u8*)skinRef + (skinIndexA * 0x64));
-		float* mB = (float*)((u8*)skinRef + (skinIndexB * 0x64));
-
-		float x = (float)srcVertices[vertexIndex].x;
-		float y = (float)srcVertices[vertexIndex].y;
-		float z = (float)srcVertices[vertexIndex].z;
-		float pxA = mA[0] * x + mA[1] * y + mA[2] * z + mA[3];
-		float pyA = mA[4] * x + mA[5] * y + mA[6] * z + mA[7];
-		float pzA = mA[8] * x + mA[9] * y + mA[10] * z + mA[11];
-		float pxB = mB[0] * x + mB[1] * y + mB[2] * z + mB[3];
-		float pyB = mB[4] * x + mB[5] * y + mB[6] * z + mB[7];
-		float pzB = mB[8] * x + mB[9] * y + mB[10] * z + mB[11];
-		outVertices[vertexIndex].x = (s16)(pxA * wA + pxB * wB);
-		outVertices[vertexIndex].y = (s16)(pyA * wA + pyB * wB);
-		outVertices[vertexIndex].z = (s16)(pzA * wA + pzB * wB);
-
-		for (u16 j = 0; j < normalCount; j++) {
-			u16 normalIndex = *(u16*)(twoWeightData + 12 + (j * 2));
-			float nx = (float)srcNormals[normalIndex].x;
-			float ny = (float)srcNormals[normalIndex].y;
-			float nz = (float)srcNormals[normalIndex].z;
-			float nxa = mA[0] * nx + mA[1] * ny + mA[2] * nz;
-			float nya = mA[4] * nx + mA[5] * ny + mA[6] * nz;
-			float nza = mA[8] * nx + mA[9] * ny + mA[10] * nz;
-			float nxb = mB[0] * nx + mB[1] * ny + mB[2] * nz;
-			float nyb = mB[4] * nx + mB[5] * ny + mB[6] * nz;
-			float nzb = mB[8] * nx + mB[9] * ny + mB[10] * nz;
-			outNormals[normalIndex].x = (s16)(nxa * wA + nxb * wB);
-			outNormals[normalIndex].y = (s16)(nya * wA + nyb * wB);
-			outNormals[normalIndex].z = (s16)(nza * wA + nzb * wB);
-		}
-
-		twoWeightData += 12 + (normalCount * 2);
-	}
-
-	for (int i = 0; i < count; i++) {
-		u32 skinIndexA = *(u16*)(threeWeightData + 0);
-		u32 skinIndexB = *(u16*)(threeWeightData + 2);
-		u32 skinIndexC = *(u16*)(threeWeightData + 4);
-		u16 wAraw = *(u16*)(threeWeightData + 6);
-		u16 wBraw = *(u16*)(threeWeightData + 8);
-		u16 wCraw = *(u16*)(threeWeightData + 10);
-		u16 vertexIndex = *(u16*)(threeWeightData + 12);
-		u16 normalCount = *(u16*)(threeWeightData + 14);
-		float totalW = (float)(wAraw + wBraw + wCraw);
-		float wA = totalW > 0.0f ? (float)wAraw / totalW : 1.0f;
-		float wB = totalW > 0.0f ? (float)wBraw / totalW : 0.0f;
-		float wC = totalW > 0.0f ? (float)wCraw / totalW : 0.0f;
-		float* mA = (float*)((u8*)skinRef + (skinIndexA * 0x64));
-		float* mB = (float*)((u8*)skinRef + (skinIndexB * 0x64));
-		float* mC = (float*)((u8*)skinRef + (skinIndexC * 0x64));
-
-		float x = (float)srcVertices[vertexIndex].x;
-		float y = (float)srcVertices[vertexIndex].y;
-		float z = (float)srcVertices[vertexIndex].z;
-		float pxA = mA[0] * x + mA[1] * y + mA[2] * z + mA[3];
-		float pyA = mA[4] * x + mA[5] * y + mA[6] * z + mA[7];
-		float pzA = mA[8] * x + mA[9] * y + mA[10] * z + mA[11];
-		float pxB = mB[0] * x + mB[1] * y + mB[2] * z + mB[3];
-		float pyB = mB[4] * x + mB[5] * y + mB[6] * z + mB[7];
-		float pzB = mB[8] * x + mB[9] * y + mB[10] * z + mB[11];
-		float pxC = mC[0] * x + mC[1] * y + mC[2] * z + mC[3];
-		float pyC = mC[4] * x + mC[5] * y + mC[6] * z + mC[7];
-		float pzC = mC[8] * x + mC[9] * y + mC[10] * z + mC[11];
-		outVertices[vertexIndex].x = (s16)(pxA * wA + pxB * wB + pxC * wC);
-		outVertices[vertexIndex].y = (s16)(pyA * wA + pyB * wB + pyC * wC);
-		outVertices[vertexIndex].z = (s16)(pzA * wA + pzB * wB + pzC * wC);
-
-		for (u16 j = 0; j < normalCount; j++) {
-			u16 normalIndex = *(u16*)(threeWeightData + 16 + (j * 2));
-			float nx = (float)srcNormals[normalIndex].x;
-			float ny = (float)srcNormals[normalIndex].y;
-			float nz = (float)srcNormals[normalIndex].z;
-			float nxa = mA[0] * nx + mA[1] * ny + mA[2] * nz;
-			float nya = mA[4] * nx + mA[5] * ny + mA[6] * nz;
-			float nza = mA[8] * nx + mA[9] * ny + mA[10] * nz;
-			float nxb = mB[0] * nx + mB[1] * ny + mB[2] * nz;
-			float nyb = mB[4] * nx + mB[5] * ny + mB[6] * nz;
-			float nzb = mB[8] * nx + mB[9] * ny + mB[10] * nz;
-			float nxc = mC[0] * nx + mC[1] * ny + mC[2] * nz;
-			float nyc = mC[4] * nx + mC[5] * ny + mC[6] * nz;
-			float nzc = mC[8] * nx + mC[9] * ny + mC[10] * nz;
-			outNormals[normalIndex].x = (s16)(nxa * wA + nxb * wB + nxc * wC);
-			outNormals[normalIndex].y = (s16)(nya * wA + nyb * wB + nyc * wC);
-			outNormals[normalIndex].z = (s16)(nza * wA + nzb * wB + nzc * wC);
-		}
-
-		threeWeightData += 16 + (normalCount * 2);
+	asm {
+		mr. r3, r4
+		stw r4, 0x8(r1)
+		stw r5, 0xc(r1)
+		stw r6, 0x10(r1)
+		stw r7, 0x14(r1)
+		stw r8, 0x18(r1)
+		stw r9, 0x1c(r1)
+		stw r10, 0x20(r1)
+		beq _chk2
+		mr r4, r7
+		mr r5, r8
+		lwz r6, 0x158(r1)
+		lwz r7, 0x15c(r1)
+		lwz r8, 0x160(r1)
+		lwz r9, 0x164(r1)
+	_loop1:
+		lhz r10, 0x0(r5)
+		lhz r11, 0x2(r5)
+		mulli r10, r10, 0x64
+		mulli r11, r11, 0x6
+		add r10, r10, r4
+		add r12, r11, r6
+		add r11, r11, r7
+		psq_l f0, 0x0(r12), 0, 5
+		psq_l f1, 0x4(r12), 1, 5
+		psq_l f2, 0x0(r10), 0, 0
+		psq_l f4, 0x10(r10), 0, 0
+		psq_l f6, 0x20(r10), 0, 0
+		ps_mul f10, f2, f0
+		psq_l f3, 0x8(r10), 0, 0
+		ps_mul f11, f4, f0
+		psq_l f5, 0x18(r10), 0, 0
+		ps_mul f12, f6, f0
+		ps_madd f10, f3, f1, f10
+		psq_l f7, 0x28(r10), 0, 0
+		ps_madd f11, f5, f1, f11
+		ps_madd f12, f7, f1, f12
+		ps_sum0 f10, f10, f10, f10
+		ps_sum0 f11, f11, f11, f11
+		ps_sum0 f12, f12, f12, f12
+		psq_st f10, 0x0(r11), 1, 5
+		psq_st f11, 0x2(r11), 1, 5
+		psq_st f12, 0x4(r11), 1, 5
+		lhz r10, 0x4(r5)
+	_loop1i:
+		lhz r11, 0x6(r5)
+		mulli r11, r11, 0x6
+		add r12, r11, r8
+		add r11, r11, r9
+		psq_l f0, 0x0(r12), 0, 6
+		psq_l f1, 0x4(r12), 1, 6
+		ps_mul f10, f2, f0
+		ps_mul f11, f4, f0
+		ps_mul f12, f6, f0
+		ps_sum0 f10, f10, f10, f10
+		ps_sum0 f11, f11, f11, f11
+		ps_sum0 f12, f12, f12, f12
+		ps_madd f10, f3, f1, f10
+		ps_madd f11, f5, f1, f11
+		ps_madd f12, f7, f1, f12
+		psq_st f10, 0x0(r11), 1, 6
+		psq_st f11, 0x2(r11), 1, 6
+		psq_st f12, 0x4(r11), 1, 6
+		subic. r10, r10, 0x1
+		addi r5, r5, 0x2
+		subi r3, r3, 0x2
+		bne _loop1i
+		subic. r3, r3, 0x6
+		addi r5, r5, 0x6
+		bne _loop1
+	_chk2:
+		lwz r3, 0xc(r1)
+		cmpwi r3, 0x0
+		beq _chk3
+		lwz r5, 0x1c(r1)
+	_loop2:
+		lhz r10, 0x0(r5)
+		mulli r10, r10, 0x64
+		add r10, r10, r4
+		psq_l f13, 0x4(r5), 1, 7
+		psq_l f14, 0x6(r5), 1, 7
+		lhz r11, 0x8(r5)
+		mulli r11, r11, 0x6
+		add r12, r11, r6
+		add r11, r11, r7
+		psq_l f0, 0x0(r12), 0, 5
+		psq_l f1, 0x4(r12), 1, 5
+		psq_l f2, 0x0(r10), 0, 0
+		psq_l f4, 0x10(r10), 0, 0
+		psq_l f6, 0x20(r10), 0, 0
+		ps_mul f10, f2, f0
+		psq_l f3, 0x8(r10), 0, 0
+		ps_mul f11, f4, f0
+		psq_l f5, 0x18(r10), 0, 0
+		ps_mul f12, f6, f0
+		psq_l f7, 0x28(r10), 0, 0
+		lhz r10, 0x2(r5)
+		ps_madd f10, f3, f1, f10
+		ps_madd f11, f5, f1, f11
+		mulli r10, r10, 0x64
+		ps_madd f12, f7, f1, f12
+		ps_sum0 f10, f10, f10, f10
+		ps_sum0 f11, f11, f11, f11
+		add r10, r10, r4
+		ps_sum0 f12, f12, f12, f12
+		psq_l f15, 0x0(r10), 0, 0
+		ps_mul f10, f10, f13
+		psq_l f17, 0x10(r10), 0, 0
+		psq_l f19, 0x20(r10), 0, 0
+		ps_mul f21, f15, f0
+		psq_l f16, 0x8(r10), 0, 0
+		ps_mul f22, f17, f0
+		psq_l f18, 0x18(r10), 0, 0
+		ps_mul f23, f19, f0
+		ps_madd f21, f16, f1, f21
+		psq_l f20, 0x28(r10), 0, 0
+		ps_madd f22, f18, f1, f22
+		ps_mul f11, f11, f13
+		ps_madd f23, f20, f1, f23
+		ps_sum0 f21, f21, f21, f21
+		ps_sum0 f22, f22, f22, f22
+		ps_sum0 f23, f23, f23, f23
+		ps_mul f12, f12, f13
+		ps_madd f10, f21, f14, f10
+		ps_madd f11, f22, f14, f11
+		ps_madd f12, f23, f14, f12
+		psq_st f10, 0x0(r11), 1, 5
+		psq_st f11, 0x2(r11), 1, 5
+		psq_st f12, 0x4(r11), 1, 5
+		lhz r10, 0xa(r5)
+	_loop2i:
+		lhz r11, 0xc(r5)
+		mulli r11, r11, 0x6
+		add r12, r11, r8
+		add r11, r11, r9
+		psq_l f0, 0x0(r12), 0, 6
+		psq_l f1, 0x4(r12), 1, 6
+		ps_mul f10, f2, f0
+		ps_mul f11, f4, f0
+		ps_mul f12, f6, f0
+		ps_sum0 f10, f10, f10, f10
+		ps_mul f21, f15, f0
+		ps_sum0 f11, f11, f11, f11
+		ps_mul f22, f17, f0
+		ps_sum0 f12, f12, f12, f12
+		ps_madd f10, f3, f1, f10
+		ps_mul f23, f19, f0
+		ps_sum0 f21, f21, f21, f21
+		ps_madd f11, f5, f1, f11
+		ps_sum0 f22, f22, f22, f22
+		ps_madd f12, f7, f1, f12
+		ps_sum0 f23, f23, f23, f23
+		ps_madd f21, f16, f1, f21
+		ps_mul f10, f10, f13
+		ps_madd f22, f18, f1, f22
+		ps_mul f11, f11, f13
+		ps_madd f23, f20, f1, f23
+		ps_mul f12, f12, f13
+		ps_madd f10, f21, f14, f10
+		ps_madd f11, f22, f14, f11
+		ps_madd f12, f23, f14, f12
+		psq_st f10, 0x0(r11), 1, 6
+		psq_st f11, 0x2(r11), 1, 6
+		psq_st f12, 0x4(r11), 1, 6
+		subic. r10, r10, 0x1
+		addi r5, r5, 0x2
+		subi r3, r3, 0x2
+		bne _loop2i
+		subic. r3, r3, 0xc
+		addi r5, r5, 0xc
+		bne _loop2
+	_chk3:
+		lwz r3, 0x10(r1)
+		cmpwi r3, 0x0
+		beq _end
+		lwz r5, 0x20(r1)
+	_loop3:
+		lhz r10, 0x0(r5)
+		mulli r10, r10, 0x64
+		add r10, r10, r4
+		psq_l f13, 0x2(r5), 1, 7
+		lhz r11, 0x4(r5)
+		mulli r11, r11, 0x6
+		add r12, r11, r6
+		add r11, r11, r7
+		psq_l f0, 0x0(r12), 0, 5
+		psq_l f1, 0x4(r12), 1, 5
+		psq_l f2, 0x0(r10), 0, 0
+		psq_l f4, 0x10(r10), 0, 0
+		psq_l f6, 0x20(r10), 0, 0
+		ps_mul f10, f2, f0
+		psq_l f3, 0x8(r10), 0, 0
+		ps_mul f11, f4, f0
+		psq_l f5, 0x18(r10), 0, 0
+		ps_mul f12, f6, f0
+		ps_madd f10, f3, f1, f10
+		psq_l f7, 0x28(r10), 0, 0
+		ps_madd f11, f5, f1, f11
+		psq_l f14, 0x0(r11), 1, 5
+		ps_madd f12, f7, f1, f12
+		psq_l f15, 0x2(r11), 1, 5
+		ps_sum0 f10, f10, f10, f10
+		psq_l f16, 0x4(r11), 1, 5
+		ps_sum0 f11, f11, f11, f11
+		ps_sum0 f12, f12, f12, f12
+		ps_madd f10, f10, f13, f14
+		ps_madd f11, f11, f13, f15
+		ps_madd f12, f12, f13, f16
+		psq_st f10, 0x0(r11), 1, 5
+		psq_st f11, 0x2(r11), 1, 5
+		psq_st f12, 0x4(r11), 1, 5
+		lhz r10, 0x6(r5)
+	_loop3i:
+		lhz r11, 0x8(r5)
+		mulli r11, r11, 0x6
+		add r12, r11, r8
+		add r11, r11, r9
+		psq_l f0, 0x0(r12), 0, 6
+		psq_l f1, 0x4(r12), 1, 6
+		psq_l f14, 0x0(r11), 1, 6
+		psq_l f15, 0x2(r11), 1, 6
+		psq_l f16, 0x4(r11), 1, 6
+		ps_mul f10, f2, f0
+		ps_mul f11, f4, f0
+		ps_mul f12, f6, f0
+		ps_sum0 f10, f10, f10, f10
+		ps_sum0 f11, f11, f11, f11
+		ps_sum0 f12, f12, f12, f12
+		ps_madd f10, f3, f1, f10
+		ps_madd f11, f5, f1, f11
+		ps_madd f12, f7, f1, f12
+		ps_madd f10, f10, f13, f14
+		ps_madd f11, f11, f13, f15
+		ps_madd f12, f12, f13, f16
+		psq_st f10, 0x0(r11), 1, 6
+		psq_st f11, 0x2(r11), 1, 6
+		psq_st f12, 0x4(r11), 1, 6
+		subic. r10, r10, 0x1
+		addi r5, r5, 0x2
+		subi r3, r3, 0x2
+		bne _loop3i
+		subic. r3, r3, 0x8
+		addi r5, r5, 0x8
+		bne _loop3
+	_end:
 	}
 }
 

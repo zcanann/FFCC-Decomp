@@ -396,7 +396,9 @@ extern "C" WmMenuLightTable gWmMenuLightTables[];
 		float* wmSplineTable = (table);                                                        \
 		int wmSplineCount = (count);                                                           \
 		result = FLOAT_803313dc;                                                               \
-		if ((time) < wmSplineTable[wmSplineCount * 4 - 4]) {                                   \
+		if ((time) >= wmSplineTable[wmSplineCount * 4 - 4]) {                                  \
+			result = (table)[(count) * 4 - 3];                                                  \
+		} else {                                                                               \
 			int wmSplineIndex = 0;                                                             \
 			while (wmSplineCount != 0) {                                                       \
 				if ((time) <= *wmSplineTable) {                                                \
@@ -428,8 +430,6 @@ extern "C" WmMenuLightTable gWmMenuLightTables[];
 				wmSplineIndex++;                                                               \
 				wmSplineCount--;                                                               \
 			}                                                                                  \
-		} else {                                                                               \
-			result = (table)[(count) * 4 - 3];                                                  \
 		}                                                                                      \
 	} while (0)
 
@@ -1451,12 +1451,11 @@ void CMenuPcs::InitCharaInfo()
 
 	unsigned char* gameData = reinterpret_cast<unsigned char*>(&Game);
 	int modelOffset = 0;
+	const unsigned int invalidModel = 0xFFFFFFFF;
 	for (int i = 4; i != 0; i--) {
 		unsigned char* entry0 = m_wm.m_charaModelData + modelOffset;
 		unsigned char* src0 = gameData + 0x13F0;
-		if (*reinterpret_cast<int*>(gameData + 0x1794) == 0) {
-			*reinterpret_cast<unsigned int*>(entry0 + 8) = 0xFFFFFFFF;
-		} else {
+		if (*reinterpret_cast<int*>(gameData + 0x1794) != 0) {
 			int modelNo = *reinterpret_cast<unsigned short*>(src0 + 0x3E0) * 200 + 100;
 			int flag0 = *reinterpret_cast<unsigned short*>(src0 + 0x3E2);
 			unsigned short add0  = *reinterpret_cast<unsigned short*>(src0 + 0x3E4);
@@ -1464,14 +1463,14 @@ void CMenuPcs::InitCharaInfo()
 				modelNo += 100;
 			}
 			*reinterpret_cast<unsigned int*>(entry0 + 8) = modelNo + add0;
+		} else {
+			*reinterpret_cast<unsigned int*>(entry0 + 8) = invalidModel;
 		}
 
 		unsigned char* entry1 = entry0 + 0x34;
 		gameData += 0xC30;
 		unsigned char* src1 = gameData + 0x13F0;
-		if (*reinterpret_cast<int*>(gameData + 0x1794) == 0) {
-			*reinterpret_cast<unsigned int*>(entry1 + 8) = 0xFFFFFFFF;
-		} else {
+		if (*reinterpret_cast<int*>(gameData + 0x1794) != 0) {
 			int modelNo = *reinterpret_cast<unsigned short*>(src1 + 0x3E0) * 200 + 100;
 			int flag1 = *reinterpret_cast<unsigned short*>(src1 + 0x3E2);
 			unsigned short add1  = *reinterpret_cast<unsigned short*>(src1 + 0x3E4);
@@ -1479,6 +1478,8 @@ void CMenuPcs::InitCharaInfo()
 				modelNo += 100;
 			}
 			*reinterpret_cast<unsigned int*>(entry1 + 8) = modelNo + add1;
+		} else {
+			*reinterpret_cast<unsigned int*>(entry1 + 8) = invalidModel;
 		}
 
 		gameData += 0xC30;
@@ -1700,7 +1701,10 @@ void CMenuPcs::calcWorld()
 	const float animTime = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0xB4)[0];
 
 	if (animState == 1) {
-		if (animEnd <= animTime) {
+		if (animTime < animEnd) {
+			model->AddFrame(FLOAT_80331698);
+			m_wmWorldState->m_frameCounter = 0;
+		} else {
 			if (m_wmWorldState->m_frameCounter >= 10) {
 				CFlatRuntime::CStack stackData[3];
 
@@ -1713,19 +1717,16 @@ void CMenuPcs::calcWorld()
 				m_wmWorldState->m_mainState = 2;
 				m_wmWorldState->m_frameCounter = 0;
 			}
-		} else {
-			model->AddFrame(FLOAT_80331698);
-			m_wmWorldState->m_frameCounter = 0;
 		}
 	} else if (animState == 2) {
 		int nextAnim = static_cast<signed char>(bytes[0xE]);
 
 		if (nextAnim == 0) {
-			if (animEnd <= animTime) {
+			if (animTime < animEnd) {
+				model->AddFrame(FLOAT_80331698);
+			} else {
 				handle->SetAnim(1, -1, -1, -1, 0);
 				reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 1;
-			} else {
-				model->AddFrame(FLOAT_80331698);
 			}
 		} else {
 			if (nextAnim == 1) {
@@ -1758,15 +1759,15 @@ void CMenuPcs::calcWorld()
 			bytes[0xE] = 0;
 		}
 	} else if (animState == 3 && m_wmWorldState->m_frameCounter >= 10) {
-		if (animEnd <= animTime) {
+		if (animTime < animEnd) {
+			model->AddFrame(FLOAT_80331698);
+		} else {
 			handle->SetAnim(0, -1, -1, -1, 0);
 			reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 0;
 			m_wmWorldState->m_delay = 10;
 			m_wmWorldState->m_nextMenuMode = -1;
 			m_wmWorldState->m_mainState = 4;
 			Sound.PlaySe(0x32, 0x40, 0x7F, 0);
-		} else {
-			model->AddFrame(FLOAT_80331698);
 		}
 	} else if (animState == 4) {
 		if (m_wmWorldState->m_delay != 0) {
@@ -5874,7 +5875,7 @@ void CMenuPcs::DrawTitleMenu()
 				fadeAlpha2 = static_cast<float>(-(DOUBLE_80331770 * static_cast<double>(m_wmWorldState->m_frameCounter) -
 				                                 DOUBLE_80331420));
 			}
-			if (FLOAT_803313e8 <= fadeAlpha2) fadeAlpha2 = FLOAT_803313e8;
+			if (fadeAlpha2 >= FLOAT_803313e8) fadeAlpha2 = FLOAT_803313e8;
 			SetAttrFmt((FMT)2);
 			matColor.r = 0;
 			matColor.g = 0;
@@ -6867,8 +6868,8 @@ void CMenuPcs::CalcFukidashi()
 		modelPtr->CalcSkin();
 
 		puVar20[1] = puVar20[1] + 1;
-		if (DOUBLE_803314a8 * static_cast<double>(gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4]) <=
-		    static_cast<double>(static_cast<float>(static_cast<double>(puVar20[1])))) {
+		if (static_cast<double>(static_cast<float>(static_cast<double>(puVar20[1]))) >=
+		    DOUBLE_803314a8 * static_cast<double>(gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4])) {
 			puVar20[1] = 0;
 		}
 	}
@@ -7007,8 +7008,8 @@ void CMenuPcs::CalcFukidashi()
 				mdl->CalcSkin();
 
 				puVar20[1] = puVar20[1] + 1;
-				if (DOUBLE_803314a8 * static_cast<double>(gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4]) <=
-				    static_cast<double>(static_cast<float>(static_cast<double>(puVar20[1])))) {
+				if (static_cast<double>(static_cast<float>(static_cast<double>(puVar20[1]))) >=
+				    DOUBLE_803314a8 * static_cast<double>(gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4])) {
 					puVar20[1] = 0;
 				}
 				slotIdx++;
@@ -7427,13 +7428,12 @@ LAB_calc:
 		bytes[0x0A] = bytes[0x0A] & ~2;
 	}
 
-	char cVar2;
+	unsigned int uVar13;
 	if ((bytes[0x0A] & 2) != 0) {
-		cVar2 = (char)bytes[0x0B];
+		uVar13 = *reinterpret_cast<int*>(reinterpret_cast<char*>(&Game.m_gameWork) + 8) + (int)(char)bytes[0x0B];
 	} else {
-		cVar2 = (char)bytes[0x0C];
+		uVar13 = *reinterpret_cast<int*>(reinterpret_cast<char*>(&Game.m_gameWork) + 8) + (int)(char)bytes[0x0C];
 	}
-	unsigned int uVar13 = *reinterpret_cast<int*>(reinterpret_cast<char*>(&Game.m_gameWork) + 8) + (int)cVar2;
 	gWmMenuScriptValueCache = (unsigned char)uVar13;
 	if ((int)uVar13 > 99) {
 		gWmMenuScriptValueCache = 100;
@@ -7563,7 +7563,9 @@ LAB_calc:
 		    static_cast<float>(DOUBLE_803314a8 * static_cast<double>(s_YearTrns.data[s_YearTrns.count * 4 - 4]))) {
 			float t = (float)(uVar) / FLOAT_803314c0;
 			float fVar5 = fDc;
-			if (t < s_YearTrns.data[s_YearTrns.count * 4 - 4]) {
+			if (t >= s_YearTrns.data[s_YearTrns.count * 4 - 4]) {
+				fVar5 = s_YearTrns.data[s_YearTrns.count * 4 - 3];
+			} else {
 				float* pf = s_YearTrns.data;
 				int cnt = s_YearTrns.count;
 				for (int idx = 0; idx < cnt; idx++, pf += 4) {
@@ -7584,14 +7586,14 @@ LAB_calc:
 						break;
 					}
 				}
-			} else {
-				fVar5 = s_YearTrns.data[s_YearTrns.count * 4 - 3];
 			}
 			*reinterpret_cast<short*>(base + 0xD2) =
 			    static_cast<short>(static_cast<int>(static_cast<float>(*reinterpret_cast<short*>(base + 0xD2)) + fVar5));
 
 			float fVar1 = fDc;
-			if (t < DAT_8032e8cc[DAT_8032e8c8 * 4 - 4]) {
+			if (t >= DAT_8032e8cc[DAT_8032e8c8 * 4 - 4]) {
+				fVar1 = DAT_8032e8cc[DAT_8032e8c8 * 4 - 3];
+			} else {
 				float* pf = DAT_8032e8cc;
 				int cnt = DAT_8032e8c8;
 				for (int idx = 0; idx < cnt; idx++, pf += 4) {
@@ -7612,8 +7614,6 @@ LAB_calc:
 						break;
 					}
 				}
-			} else {
-				fVar1 = DAT_8032e8cc[DAT_8032e8c8 * 4 - 3];
 			}
 			*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xE0) = fVar1;
 
@@ -7623,7 +7623,9 @@ LAB_calc:
 			}
 			t = (float)(uVar) / FLOAT_803314c0;
 			fVar5 = fDc;
-			if (t < s_YearTrns.data[s_YearTrns.count * 4 - 4]) {
+			if (t >= s_YearTrns.data[s_YearTrns.count * 4 - 4]) {
+				fVar5 = s_YearTrns.data[s_YearTrns.count * 4 - 3];
+			} else {
 				float* pf = s_YearTrns.data;
 				int cnt = s_YearTrns.count;
 				for (int idx = 0; idx < cnt; idx++, pf += 4) {
@@ -7644,14 +7646,14 @@ LAB_calc:
 						break;
 					}
 				}
-			} else {
-				fVar5 = s_YearTrns.data[s_YearTrns.count * 4 - 3];
 			}
 			*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xB6) =
 			    static_cast<short>(static_cast<int>(
 			        static_cast<float>(*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xB6)) + fVar5));
 
-			if (t < DAT_8032e8cc[DAT_8032e8c8 * 4 - 4]) {
+			if (t >= DAT_8032e8cc[DAT_8032e8c8 * 4 - 4]) {
+				fVar1 = DAT_8032e8cc[DAT_8032e8c8 * 4 - 3];
+			} else {
 				float* pf = DAT_8032e8cc;
 				int cnt = DAT_8032e8c8;
 				for (int idx = 0; idx < cnt; idx++, pf += 4) {
@@ -7672,8 +7674,6 @@ LAB_calc:
 						break;
 					}
 				}
-			} else {
-				fVar1 = DAT_8032e8cc[DAT_8032e8c8 * 4 - 3];
 			}
 			*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xC4) = fVar1;
 			*reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_frameData) + 8) =
@@ -7704,7 +7704,7 @@ void CMenuPcs::DrawWMFrame()
 		alpha = static_cast<float>(DOUBLE_803316d8 * static_cast<double>(m_wmWorldState->m_frameCounter));
 	} else if (sVar == 3) {
 		m_wmWorldState->m_posX += FLOAT_80331550;
-		if (DOUBLE_803316e0 <= static_cast<double>(m_wmWorldState->m_posX)) {
+		if (static_cast<double>(m_wmWorldState->m_posX) >= DOUBLE_803316e0) {
 			m_wmWorldState->m_posX = FLOAT_80331440;
 		}
 		alpha = static_cast<float>(-(DOUBLE_803316d8 * static_cast<double>(m_wmWorldState->m_frameCounter) -
@@ -8381,7 +8381,9 @@ void CMenuPcs::PCAnimCtrl()
 			reinterpret_cast<float*>(animState)[4] = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xC0)[0];
 		} else {
 		frameStep:
-			if (frameEnd <= frame) {
+			if (frame < frameEnd) {
+				handle->m_model->AddFrame(FLOAT_80331698);
+			} else {
 				if (animState[0] == 3 || animState[0] == 4 || animState[0] == 5) {
 					animState[0] = 0;
 					handle->SetAnim((static_cast<int>(static_cast<unsigned int>(GetWmCharaHandles(this)[i]->m_charaNo) / 100) - 1) * 6 + animState[0], -1, -1, blendMode, 0);
@@ -8394,8 +8396,6 @@ void CMenuPcs::PCAnimCtrl()
 					}
 				}
 				handle->m_model->SetFrame(FLOAT_803313dc);
-			} else {
-				handle->m_model->AddFrame(FLOAT_80331698);
 			}
 			animState[2]++;
 		}
@@ -12845,7 +12845,11 @@ void McCtrl::SetListDat(int slot, int clearPlayTime)
 		const int formatMatch = memcmp(save + 0x0C, DAT_8032E8A8, 4);
 		const unsigned char crcOk = MemoryCardMan.ChkCrc(0);
 		if (crcOk == 1 && formatMatch == 0) {
-			*reinterpret_cast<unsigned int*>(entry + 0x08) = clearPlayTime == 0 ? *reinterpret_cast<unsigned int*>(save + 0x20) : 0;
+			if (clearPlayTime == 0) {
+				*reinterpret_cast<unsigned int*>(entry + 0x08) = *reinterpret_cast<unsigned int*>(save + 0x20);
+			} else {
+				*reinterpret_cast<unsigned int*>(entry + 0x08) = 0;
+			}
 			memcpy(entry + 0x00, save + 0x8AD0, 8);
 			*reinterpret_cast<unsigned int*>(entry + 0x0C) = *reinterpret_cast<unsigned int*>(save + 0x24);
 			*reinterpret_cast<unsigned int*>(entry + 0x10) = *reinterpret_cast<unsigned int*>(save + 0x28);
@@ -12882,10 +12886,26 @@ void McCtrl::SetListDat(int slot, int clearPlayTime)
 
 			*reinterpret_cast<unsigned int*>(save + 0x1C) = MemoryCardMan.CalcCrc(reinterpret_cast<Mc::SaveDat*>(save));
 
-			*reinterpret_cast<unsigned int*>(entry + 0x18) = (*reinterpret_cast<int*>(save + 0x30) < 0) ? 0xFFFFFFFFu : *reinterpret_cast<unsigned short*>(save + *reinterpret_cast<int*>(save + 0x30) * 0x9C0 + 0x14D0);
-			*reinterpret_cast<unsigned int*>(entry + 0x1C) = (*reinterpret_cast<int*>(save + 0x34) < 0) ? 0xFFFFFFFFu : *reinterpret_cast<unsigned short*>(save + *reinterpret_cast<int*>(save + 0x34) * 0x9C0 + 0x14D0);
-			*reinterpret_cast<unsigned int*>(entry + 0x20) = (*reinterpret_cast<int*>(save + 0x38) < 0) ? 0xFFFFFFFFu : *reinterpret_cast<unsigned short*>(save + *reinterpret_cast<int*>(save + 0x38) * 0x9C0 + 0x14D0);
-			*reinterpret_cast<unsigned int*>(entry + 0x24) = (*reinterpret_cast<int*>(save + 0x3C) < 0) ? 0xFFFFFFFFu : *reinterpret_cast<unsigned short*>(save + *reinterpret_cast<int*>(save + 0x3C) * 0x9C0 + 0x14D0);
+			if (*reinterpret_cast<int*>(save + 0x30) >= 0) {
+				*reinterpret_cast<unsigned int*>(entry + 0x18) = *reinterpret_cast<unsigned short*>(save + *reinterpret_cast<int*>(save + 0x30) * 0x9C0 + 0x14D0);
+			} else {
+				*reinterpret_cast<unsigned int*>(entry + 0x18) = 0xFFFFFFFFu;
+			}
+			if (*reinterpret_cast<int*>(save + 0x34) >= 0) {
+				*reinterpret_cast<unsigned int*>(entry + 0x1C) = *reinterpret_cast<unsigned short*>(save + *reinterpret_cast<int*>(save + 0x34) * 0x9C0 + 0x14D0);
+			} else {
+				*reinterpret_cast<unsigned int*>(entry + 0x1C) = 0xFFFFFFFFu;
+			}
+			if (*reinterpret_cast<int*>(save + 0x38) >= 0) {
+				*reinterpret_cast<unsigned int*>(entry + 0x20) = *reinterpret_cast<unsigned short*>(save + *reinterpret_cast<int*>(save + 0x38) * 0x9C0 + 0x14D0);
+			} else {
+				*reinterpret_cast<unsigned int*>(entry + 0x20) = 0xFFFFFFFFu;
+			}
+			if (*reinterpret_cast<int*>(save + 0x3C) >= 0) {
+				*reinterpret_cast<unsigned int*>(entry + 0x24) = *reinterpret_cast<unsigned short*>(save + *reinterpret_cast<int*>(save + 0x3C) * 0x9C0 + 0x14D0);
+			} else {
+				*reinterpret_cast<unsigned int*>(entry + 0x24) = 0xFFFFFFFFu;
+			}
 			*reinterpret_cast<unsigned int*>(entry + 0x28) = *reinterpret_cast<unsigned int*>(save + 0xB8);
 			memcpy(entry + 0x2C, save + 0x10C0, 0x10);
 			entry[0x41] = 1;

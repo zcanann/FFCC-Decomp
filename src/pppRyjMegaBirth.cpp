@@ -1027,14 +1027,10 @@ void birth(
 	*f32_at(particlePayload, 0x40) = *f32_at(payload, 0x64);
 
 	if (payload[0xEA] != 0) {
-		if ((payload[0xEA] & 0x20) == 0) {
-			*f32_at(particlePayload, 0x44) = *f32_at(payload, 0x80) * Math.RandF();
-			*f32_at(particlePayload, 0x48) = *f32_at(payload, 0x84) * Math.RandF();
-			apply_signed_randomization_2(particlePayload, 0x44, payload[0xEA]);
-		} else {
+		if ((payload[0xEA] & 0x20) != 0) {
 			float randomRotation = *f32_at(payload, 0x80) * Math.RandF();
-			*f32_at(particlePayload, 0x44) = randomRotation;
 			*f32_at(particlePayload, 0x48) = randomRotation;
+			*f32_at(particlePayload, 0x44) = randomRotation;
 			if (((payload[0xEA] & 1) != 0) && ((payload[0xEA] & 2) != 0)) {
 				if (kPppRyjMegaBirthHalfDouble < (double)Math.RandF()) {
 					*f32_at(particlePayload, 0x44) = *f32_at(particlePayload, 0x44) * kPppRyjMegaBirthSignFlipTable[0];
@@ -1044,6 +1040,10 @@ void birth(
 				*f32_at(particlePayload, 0x44) = *f32_at(particlePayload, 0x44) * kPppRyjMegaBirthSignFlipTable[0];
 				*f32_at(particlePayload, 0x48) = *f32_at(particlePayload, 0x48) * kPppRyjMegaBirthSignFlipTable[0];
 			}
+		} else {
+			*f32_at(particlePayload, 0x44) = *f32_at(payload, 0x80) * Math.RandF();
+			*f32_at(particlePayload, 0x48) = *f32_at(payload, 0x84) * Math.RandF();
+			apply_signed_randomization_2(particlePayload, 0x44, payload[0xEA]);
 		}
 	}
 	if ((payload[0xEA] & 4) != 0) {

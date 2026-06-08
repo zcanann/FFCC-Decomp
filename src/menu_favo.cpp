@@ -653,9 +653,11 @@ void CMenuPcs::FavoInit()
 	setupEntry->startFrame = 0;
 	setupEntry->duration = 5;
 
-	FavoEntry* firstEntry = m_favoList->entries;
-	for (iVar17 = 0; iVar17 < 4; iVar17++) {
-		setupEntry = &m_favoList->entries[entryIndex++];
+	FavoEntry* firstEntry = &list->entries[0];
+	int byteOff = 0x180;
+	iVar17 = 4;
+	do {
+		setupEntry = reinterpret_cast<FavoEntry*>(reinterpret_cast<char*>(this->m_favoList->entries) + byteOff);
 		setupEntry->flags = 2;
 		setupEntry->tex = 0x37;
 		sVar11 = sVar11 + 2;
@@ -669,7 +671,8 @@ void CMenuPcs::FavoInit()
 		setupEntry->startFrame = 7;
 		setupEntry->duration = 5;
 
-		setupEntry = &m_favoList->entries[entryIndex++];
+		setupEntry = reinterpret_cast<FavoEntry*>(reinterpret_cast<char*>(this->m_favoList->entries) + (byteOff + 0x40));
+		byteOff = byteOff + 0x80;
 		setupEntry->flags = 2;
 		setupEntry->tex = 0x37;
 		setupEntry->x = firstEntry->x + 0x28;
@@ -681,7 +684,7 @@ void CMenuPcs::FavoInit()
 		setupEntry->v = fVar4;
 		setupEntry->startFrame = 7;
 		setupEntry->duration = 5;
-	}
+	} while (--iVar17 != 0);
 
 	m_favoList->count = sVar11;
 

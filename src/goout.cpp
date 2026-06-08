@@ -1728,10 +1728,9 @@ void CGoOutMenu::CalcGoOut()
         }
         if (m_selectedTransferChara != -1) {
             Mc::SaveDat* transferWork = static_cast<Mc::SaveDat*>(MenuPcs.m_goOutTransferWork);
-            CGoOutSaveCaravan& caravan = GoOutSaveDat(transferWork).m_caravan[m_selectedTransferChara];
-            if (caravan.m_odekakeOutFlag == 0) {
+            if (GoOutSaveDat(transferWork).m_caravan[m_selectedTransferChara].m_odekakeOutFlag == 0) {
                 m_returnTransfer = 0;
-                if (caravan.m_odekakeReturnFlag == 0) {
+                if (GoOutSaveDat(transferWork).m_caravan[m_selectedTransferChara].m_odekakeReturnFlag == 0) {
                     int sameChara = MenuPcs.GetSameCharaData(MenuPcs.m_goOutTransferSaveData, transferWork, m_selectedTransferChara, 1);
                     if (sameChara == -3) {
                         m_returnGoOutMode = 0xF;

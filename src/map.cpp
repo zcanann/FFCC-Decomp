@@ -2853,10 +2853,8 @@ void CMapMng::Draw()
         _GXColor lightColor;
         *reinterpret_cast<u32*>(&lightColor) = 0xFFFFFFFF;
 
-        Vec lightDir0;
-        lightDir0.x = 1.0f;
-        lightDir0.y = 1.0f;
-        lightDir0.z = 1.0f;
+        static const Vec kMapHitLightDir0 = { 1.0f, 1.0f, 1.0f };
+        Vec lightDir0 = kMapHitLightDir0;
 
         Mtx cameraMtx0;
         PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx0);
@@ -2876,10 +2874,8 @@ void CMapMng::Draw()
         GXInitLightAttnK(&lightObj0, kMapZero, kMapTinyEpsilon, kMapZero);
         GXLoadLightObjImm(&lightObj0, GX_LIGHT0);
 
-        Vec lightDir1;
-        lightDir1.x = -1.0f;
-        lightDir1.y = 1.0f;
-        lightDir1.z = -1.0f;
+        static const Vec kMapHitLightDir1 = { -1.0f, 1.0f, -1.0f };
+        Vec lightDir1 = kMapHitLightDir1;
 
         Mtx cameraMtx1;
         PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx1);

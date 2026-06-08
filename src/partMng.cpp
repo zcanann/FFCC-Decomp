@@ -3025,7 +3025,7 @@ void CPartMng::pppDrawPrioPdtFpno(unsigned char drawMode, short kind, short node
         unsigned char m_ownerFacing;         // 0xEA
         unsigned char m_drawVariant;         // 0xEB
         unsigned char m_rotationOrder;       // 0xEC
-        unsigned char m_drawMode;            // 0xED
+        signed char m_drawMode;            // 0xED
         signed char m_drawSubType;           // 0xEE
         unsigned char m_useOwnerScaleSign;   // 0xEF
         unsigned char m_ownerVisible;        // 0xF0

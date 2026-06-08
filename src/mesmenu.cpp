@@ -852,7 +852,7 @@ void CMesMenu::onCalc()
     }
 
     int desiredStageFlag = stageBit != 0;
-    if (m_stageFadeOut != desiredStageFlag) {
+    if (desiredStageFlag != m_stageFadeOut) {
         System.Printf(const_cast<char*>(s_mesMenuOnOffChangedFmt));
         m_stageFadeOut =
             ((unsigned int)__cntlzw(m_stageFadeOut) >> 5) & 0xFF;
@@ -903,13 +903,31 @@ void CMesMenu::onCalc()
                 }
             }
 
-            unsigned int value;
-            for (int heartIndex = 0; heartIndex < 8; heartIndex++) {
+            int value;
+            for (int heartIndex = 0; heartIndex < 8; heartIndex += 4) {
                 value = m_heartGrowTimers[heartIndex] - 1;
                 m_heartGrowTimers[heartIndex] = value & ~((int)value >> 0x1F);
 
                 value = m_heartDropTimers[heartIndex] - 1;
                 m_heartDropTimers[heartIndex] = value & ~((int)value >> 0x1F);
+
+                value = m_heartGrowTimers[heartIndex + 1] - 1;
+                m_heartGrowTimers[heartIndex + 1] = value & ~((int)value >> 0x1F);
+
+                value = m_heartDropTimers[heartIndex + 1] - 1;
+                m_heartDropTimers[heartIndex + 1] = value & ~((int)value >> 0x1F);
+
+                value = m_heartGrowTimers[heartIndex + 2] - 1;
+                m_heartGrowTimers[heartIndex + 2] = value & ~((int)value >> 0x1F);
+
+                value = m_heartDropTimers[heartIndex + 2] - 1;
+                m_heartDropTimers[heartIndex + 2] = value & ~((int)value >> 0x1F);
+
+                value = m_heartGrowTimers[heartIndex + 3] - 1;
+                m_heartGrowTimers[heartIndex + 3] = value & ~((int)value >> 0x1F);
+
+                value = m_heartDropTimers[heartIndex + 3] - 1;
+                m_heartDropTimers[heartIndex + 3] = value & ~((int)value >> 0x1F);
             }
 
             value = m_foodShakeTimer - 1;
@@ -921,12 +939,13 @@ void CMesMenu::onCalc()
         return;
     }
 
-    unsigned int state = m_state;
-    if (state < 2) {
-        if (state == 0) {
-            (void)sin(FLOAT_80330980 +
-                      (FLOAT_80330910 * (float)m_stateTimer) / (float)m_stateTimerMax);
-        } else {
+    int state = m_state;
+    switch (state) {
+    case 0:
+        (void)sin(FLOAT_80330980 +
+                  (FLOAT_80330910 * (float)m_stateTimer) / (float)m_stateTimerMax);
+        break;
+    case 1: {
             m_windowScale = FLOAT_80330914;
             m_mes.Calc();
 
@@ -989,7 +1008,6 @@ void CMesMenu::onCalc()
                 }
             }
 
-            bool advance = false;
             if ((downMask & 0x100) != 0) {
                 int wait2 = m_mes.GetWait();
                 if (wait2 == 0) {
@@ -1011,14 +1029,10 @@ void CMesMenu::onCalc()
                     *(int*)((char*)this + 0x3CC8) = 1;
                     *(int*)((char*)this + 0x3CD8) = 0;
                 }
-                advance = (*(int*)((char*)this + 0x3CC8) != 0) &&
-                          (*(int*)((char*)this + 0x3CD8) == *(int*)((char*)this + 0x3CD4));
-            } else {
-                advance = (*(int*)((char*)this + 0x3CC8) != 0) &&
-                          (*(int*)((char*)this + 0x3CD8) == *(int*)((char*)this + 0x3CD4));
             }
 
-            if (advance) {
+            if ((*(int*)((char*)this + 0x3CC8) != 0) &&
+                (*(int*)((char*)this + 0x3CD8) == *(int*)((char*)this + 0x3CD4))) {
                 if (*(int*)((char*)this + 0x3C90) != 0) {
                     int wait5 = m_mes.GetWait();
                     if (wait5 != 4) {
@@ -1051,11 +1065,12 @@ void CMesMenu::onCalc()
                 }
             }
         }
-    } else if (state < 4) {
-        if (state == 3) {
-            float step = FLOAT_80330914 - (float)m_stateTimer / (float)m_stateTimerMax;
-            m_windowScale = FLOAT_803308ec * (FLOAT_80330914 + (float)sin(FLOAT_80330910 * step + FLOAT_80330980));
-        }
+        break;
+    case 3: {
+        float step = FLOAT_80330914 - (float)m_stateTimer / (float)m_stateTimerMax;
+        m_windowScale = FLOAT_803308ec * (FLOAT_80330914 + (float)sin(FLOAT_80330910 * step + FLOAT_80330980));
+        break;
+    }
     }
 
     m_stateTimer = m_stateTimer + 1;

@@ -1023,7 +1023,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     } else {
         centerPos = gObject->m_worldPosition;
     }
-    centerPos.y += kYmManaCaptureHeightOffset;
+    centerPos.y += LoadFloat(kYmManaCaptureHeightOffset);
 
     depthTexSize = GXGetTexBufferSize(0x80, 0x80, GX_TF_RGBA8, GX_FALSE, 0);
     texBufferStride = GXGetTexBufferSize(0x80, 0x80, GX_TF_RGB565, GX_FALSE, 0);
@@ -1044,35 +1044,35 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
             s32 nameCompare = strcmp(s_ymManaRuin2Name, compareName);
             if (nameCompare == 0) {
                 if (i == 0) {
-                    cameraPos.z -= kYmManaOne;
+                    cameraPos.z -= LoadFloat(kYmManaOne);
                 } else if (i == 1) {
-                    cameraPos.x += kYmManaOne;
+                    cameraPos.x += LoadFloat(kYmManaOne);
                 } else if (i == 2) {
-                    cameraPos.z += kYmManaOne;
+                    cameraPos.z += LoadFloat(kYmManaOne);
                 } else if (i == 3) {
-                    cameraPos.x -= kYmManaOne;
+                    cameraPos.x -= LoadFloat(kYmManaOne);
                 }
             }
 
             if (nameCompare != 0 || i == 4 || i == 5) {
                 if (i == 3) {
-                    cameraPos.z -= kYmManaOne;
+                    cameraPos.z -= LoadFloat(kYmManaOne);
                 } else if (i < 3) {
                     if (i == 1) {
-                        cameraPos.z += kYmManaOne;
+                        cameraPos.z += LoadFloat(kYmManaOne);
                     } else if (i >= 2) {
-                        cameraPos.x -= kYmManaOne;
+                        cameraPos.x -= LoadFloat(kYmManaOne);
                     } else if (i >= 0) {
-                        cameraPos.x += kYmManaOne;
+                        cameraPos.x += LoadFloat(kYmManaOne);
                     }
                 } else if (i == 5) {
-                    cameraPos.y -= kYmManaOne;
-                    cameraUp.y = kPppYmMoveParabolaZero;
-                    cameraUp.z = kPppYmMoveParabolaZero;
+                    cameraPos.y -= LoadFloat(kYmManaOne);
+                    cameraUp.y = LoadFloat(kPppYmMoveParabolaZero);
+                    cameraUp.z = LoadFloat(kPppYmMoveParabolaZero);
                 } else if (i < 5) {
-                    cameraPos.y += kYmManaOne;
-                    cameraUp.y = kPppYmMoveParabolaZero;
-                    cameraUp.z = kYmManaNegOne;
+                    cameraPos.y += LoadFloat(kYmManaOne);
+                    cameraUp.y = LoadFloat(kPppYmMoveParabolaZero);
+                    cameraUp.z = LoadFloat(kYmManaNegOne);
                 }
             }
 

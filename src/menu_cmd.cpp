@@ -2233,10 +2233,9 @@ void CMenuPcs::DrawUniteList()
 	s_unitePanelCount = 0;
 	bool active = false;
 	for (s32 i = 0; i < 8; i++) {
-		const s32 slotType = caravan->m_commandListExtra[i];
 		if (i == cmd->selected) {
 			active = true;
-		} else if (slotType >= 0) {
+		} else if (caravan->m_commandListExtra[i] >= 0) {
 			active = false;
 		}
 
@@ -2244,6 +2243,7 @@ void CMenuPcs::DrawUniteList()
 			break;
 		}
 
+		const s32 slotType = caravan->m_commandListExtra[i];
 		if (slotType == 0) {
 			continue;
 		}

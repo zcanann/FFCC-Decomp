@@ -9280,8 +9280,8 @@ void CMenuPcs::DrawCharaName()
  */
 void CMenuPcs::DrawCMLife()
 {
-	WmWorldState* const worldState = GetWmWorldState(this);
-	WmCharaSelectEntry* const selectEntries = GetWmCharaSelectEntries(this);
+#define worldState GetWmWorldState(this)
+#define selectEntries GetWmCharaSelectEntries(this)
 
 	float fade;
 	if (worldState->m_mainState == 1) {
@@ -9404,6 +9404,8 @@ void CMenuPcs::DrawCMLife()
 			                                FLOAT_803313e8, FLOAT_803313e8, 0.0f);
 		}
 	}
+#undef worldState
+#undef selectEntries
 }
 
 /*

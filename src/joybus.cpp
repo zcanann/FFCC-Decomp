@@ -5618,7 +5618,12 @@ int JoyBus::SendFavorite(ThreadParam* threadParam)
  */
 unsigned int JoyBus::RequestData(ThreadParam* threadParam, int a, int b)
 {
-    unsigned int cmd = MakeJoyCmd32(0x0C, static_cast<signed char>(a), static_cast<unsigned char>(b), 0);
+    unsigned int cmd = 0;
+    unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
+    cmdBytes[0] = 0x0C;
+    cmdBytes[1] = static_cast<signed char>(a);
+    cmdBytes[2] = static_cast<unsigned char>(b);
+    unsigned int word = cmd;
     int result = 0;
 
     if (static_cast<signed char>(m_threadRunningMask) != 0)
@@ -5634,7 +5639,7 @@ unsigned int JoyBus::RequestData(ThreadParam* threadParam, int a, int b)
         }
         else
         {
-            m_cmdQueueData[p][m_cmdCount[p]] = cmd;
+            m_cmdQueueData[p][m_cmdCount[p]] = word;
             m_cmdCount[threadParam->m_portIndex]++;
 
             OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);

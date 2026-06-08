@@ -2174,7 +2174,9 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
         return 0;
     } else {
         CmakeMenuState* cmakeState = CmakeState(this);
-        short& currentValue = CmakeStateSelectField(cmakeState, cmakeState->m_fieldSelect);
+        int fieldSelect = cmakeState->m_fieldSelect;
+        short& currentValue = *reinterpret_cast<short*>(
+            reinterpret_cast<char*>(cmakeState) + fieldSelect * 2 + offsetof(CmakeMenuState, m_select));
 
         if ((repeat & 0x8) != 0) {
             if (currentValue == 0) {
@@ -2193,21 +2195,10 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
         }
 
         if ((repeat & 0xC) == 0) {
-            if ((down & 0x200) != 0) {
-                Sound.PlaySe(3, 0x40, 0x7F, 0);
-                if (CmakeState(this)->m_fieldSelect == 0) {
-                    CmakeState(this)->m_resultDir = -1;
-                    return 1;
-                }
-
-                CmakeState(this)->m_fieldSelect = static_cast<short>(CmakeState(this)->m_fieldSelect - 1);
-                return 0;
-            }
-
             if ((down & 0x100) != 0) {
                 Sound.PlaySe(2, 0x40, 0x7F, 0);
-                if (CmakeState(this)->m_fieldSelect == 0) {
-                    CmakeState(this)->m_fieldSelect = static_cast<short>(CmakeState(this)->m_fieldSelect + 1);
+                if (fieldSelect == 0) {
+                    cmakeState->m_fieldSelect = static_cast<short>(fieldSelect + 1);
                     return 0;
                 }
 
@@ -2255,6 +2246,15 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
                 GetWinSize(0x15, &winX, &winY, 0);
                 SetMcWinInfo(static_cast<int>(winX), static_cast<int>(winY));
                 CmakeMcState(this) = 0;
+            } else if ((down & 0x200) != 0) {
+                Sound.PlaySe(3, 0x40, 0x7F, 0);
+                if (fieldSelect == 0) {
+                    cmakeState->m_resultDir = -1;
+                    return 1;
+                }
+
+                cmakeState->m_fieldSelect = static_cast<short>(fieldSelect - 1);
+                return 0;
             }
         }
 

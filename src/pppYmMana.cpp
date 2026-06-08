@@ -1679,12 +1679,12 @@ void CalcReflectionVector2(
     Vec normal;
     Vec eyeToPos;
     Vec2d uv;
-    Mtx matrixCopy;
-    Mtx nodeOffsetMtx;
-    Mtx nodeRotMtx;
-    Mtx workMtx;
     Mtx normalMtx;
+    Mtx nodeRotMtx;
+    Mtx matrixCopy;
     Mtx rotateMtx;
+    Mtx nodeOffsetMtx;
+    Mtx workMtx;
     u16* dl = (u16*)displayList;
     const float zero = kPppYmMoveParabolaZero;
     const float denomBias = kYmManaReflectionDenomBias;

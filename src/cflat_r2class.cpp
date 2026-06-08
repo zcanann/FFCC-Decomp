@@ -364,10 +364,10 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 						}
 					} else if (systemVal == -0xDB8) {
 						StoreU16Value(stack, reinterpret_cast<CGMonObj*>(engineObject)->m_groupTag, setMode);
+					} else if (systemVal > -0xDBA) {
+						StoreU16Value(stack, reinterpret_cast<CGMonObj*>(engineObject)->m_repop.delay, setMode);
 					} else if (systemVal == -0xDBA) {
 						StoreU32Value(stack, reinterpret_cast<CGMonObj*>(engineObject)->m_controlMask, setMode);
-					} else if (systemVal > -0xDBB) {
-						StoreU16Value(stack, reinterpret_cast<CGMonObj*>(engineObject)->m_repop.delay, setMode);
 					}
 			} else if (systemVal <= -400) {
 				if (systemVal <= -1000 && systemVal >= -0xBE7) {

@@ -2031,8 +2031,9 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
  */
 void CAmemCacheSet::CacheClear()
 {
+    int offset = 0;
     for (int i = 0; i < m_cacheCount; i++) {
-        CAmemCache& entry = cacheEntryAt(this, i);
+        CAmemCache& entry = *reinterpret_cast<CAmemCache*>(reinterpret_cast<char*>(m_cacheTable) + offset);
 
         if ((entry.m_inUse != 0) && (entry.m_refCount == 0) && (entry.m_dmaCopy != 0)) {
             void* data = entry.m_cacheData;
@@ -2041,6 +2042,7 @@ void CAmemCacheSet::CacheClear()
                 entry.m_cacheData = 0;
             }
         }
+        offset += sizeof(CAmemCache);
     }
 }
 

@@ -236,6 +236,7 @@ void CMaterialEditorPcs::drawViewer()
                     _GXSetBlendMode(GX_BM_NONE, GX_BL_ZERO, GX_BL_ZERO, GX_LO_OR);
                 }
 
+                u16 flags = polygon->flags;
                 switch (polygon->textureMarker) {
                 case 'H':
                 if (polygon->textureIndex < static_cast<s16>(m_loadedTextureCount)) {
@@ -356,17 +357,18 @@ void CMaterialEditorPcs::drawViewer()
                 u32 quadIndex3;
                 u32 quadColorIndex;
                 u8 vertexCount = 3;
-                vertexIndex[4] = polygon->index0;
-                quadIndex2 = polygon->index1;
-                quadIndex3 = polygon->index2;
+                MaterialEditorPolygon* poly = polygon;
+                vertexIndex[4] = poly->index0;
+                quadIndex2 = poly->index1;
+                quadIndex3 = poly->index2;
                 vertexIndex[0] = 0;
                 vertexIndex[1] = 1;
                 vertexIndex[2] = 2;
 
-                if ((polygon->flags & 0xf) == 0) {
+                if ((flags & 0xf) == 0) {
                     GXBegin(GX_TRIANGLES, GX_VTXFMT0, 3);
                 }
-                if ((polygon->flags & 0xf) == 1) {
+                if ((flags & 0xf) == 1) {
                     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
                     vertexCount = 4;
                     quadIndex3 = polygon->index3;

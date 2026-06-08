@@ -2549,7 +2549,7 @@ void CShopMenu::SelectYesNo()
                 static_cast<short>(caravanWork->m_inventoryItemCount + 1) < 0x41)) {
             int gilValue;
             if (m_listType == 0) {
-                if (itemId < 1) {
+                if (itemId <= 0) {
                     gilValue = 0;
                 } else {
                     int gil = caravanWork->m_shopParam *
@@ -2557,7 +2557,7 @@ void CShopMenu::SelectYesNo()
                     gilValue = gil / 100;
                 }
             } else if (m_listType == 1) {
-                if (itemId < 1) {
+                if (itemId <= 0) {
                     gilValue = 0;
                 } else {
                     int gil = caravanWork->m_shopParam *
@@ -2575,7 +2575,7 @@ void CShopMenu::SelectYesNo()
             m_caravanWork->AddItem(static_cast<short>(itemId), 0);
             int gilValue2;
             if (m_listType == 0) {
-                if (itemId < 1) {
+                if (itemId <= 0) {
                     gilValue2 = 0;
                 } else {
                     int gil = m_caravanWork->m_shopParam *
@@ -2583,7 +2583,7 @@ void CShopMenu::SelectYesNo()
                     gilValue2 = gil / 100;
                 }
             } else if (m_listType == 1) {
-                if (itemId < 1) {
+                if (itemId <= 0) {
                     gilValue2 = 0;
                 } else {
                     int gil = m_caravanWork->m_shopParam *
@@ -2603,7 +2603,7 @@ void CShopMenu::SelectYesNo()
     bool canTrade = false;
     if (itemIndex != -1) {
         int tradeItem = getItemNo(itemIndex);
-        if (tradeItem < 1) {
+        if (tradeItem <= 0) {
             canTrade = false;
         } else if (m_listType == 0) {
             canTrade = true;
@@ -2631,7 +2631,7 @@ void CShopMenu::SelectYesNo()
         int sellId = getItemNo(m_selectedIndex);
         int gilValue;
         if (m_listType == 0) {
-            if (sellId < 1) {
+            if (sellId <= 0) {
                 gilValue = 0;
             } else {
                 int gil = m_caravanWork->m_shopParam *
@@ -2640,7 +2640,7 @@ void CShopMenu::SelectYesNo()
                 gilValue = gil - (gil >> 0x1F);
             }
         } else if (m_listType == 1) {
-            if (sellId < 1) {
+            if (sellId <= 0) {
                 gilValue = 0;
             } else {
                 int gil = m_caravanWork->m_shopParam *
@@ -2656,7 +2656,7 @@ void CShopMenu::SelectYesNo()
             m_caravanWork->DeleteItemIdx(m_selectedIndex, 0);
             int gilValue2;
             if (m_listType == 0) {
-                if (sellId < 1) {
+                if (sellId <= 0) {
                     gilValue2 = 0;
                 } else {
                     int gil = m_caravanWork->m_shopParam *
@@ -2665,7 +2665,7 @@ void CShopMenu::SelectYesNo()
                     gilValue2 = gil - (gil >> 0x1F);
                 }
             } else if (m_listType == 1) {
-                if (sellId < 1) {
+                if (sellId <= 0) {
                     gilValue2 = 0;
                 } else {
                     int gil = m_caravanWork->m_shopParam *

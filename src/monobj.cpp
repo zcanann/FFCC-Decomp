@@ -1723,15 +1723,17 @@ void CGMonObj::onStatDie()
 		} else {
 			if (subFrame == 0) {
 				int particleId = *reinterpret_cast<int*>(mon + 0x560);
-				void* classId = object->m_scriptHandle[4];
-				if (classId == reinterpret_cast<void*>(5)) {
+				int classId = reinterpret_cast<int>(object->m_scriptHandle[4]);
+				switch (classId) {
+				case 4:
+					particleId = 0x253;
+					break;
+				case 5:
 					particleId = 599;
-				} else if (reinterpret_cast<int>(classId) < 5) {
-					if (3 < reinterpret_cast<int>(classId)) {
-						particleId = 0x253;
-					}
-				} else if (reinterpret_cast<int>(classId) < 7) {
+					break;
+				case 6:
 					particleId = 0x25B;
+					break;
 				}
 
 				*reinterpret_cast<int*>(mon + 0x560) = particleId;

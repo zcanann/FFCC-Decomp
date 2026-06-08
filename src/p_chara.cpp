@@ -2221,15 +2221,17 @@ void CCharaPcs::CHandle::ChangeTexture(
     char path[0x100];
     BuildCharaBasePath(charaKind, charaNo, basePath);
 
-    CLoadTexture* loadTexture = 0;
+    CLoadTexture* loadTexture;
     for (unsigned int i = 0; i < static_cast<unsigned int>(LoadTextureArray(&CharaPcs)->GetSize()); i++) {
         CLoadTexture* it = (*LoadTextureArray(&CharaPcs))[i];
         if (reinterpret_cast<int>(it->m_keyTag) == charaKind && it->m_keyId == static_cast<unsigned int>(charaNo) &&
             it->m_variantTag == reinterpret_cast<void*>(textureVariant)) {
             loadTexture = it;
-            break;
+            goto foundTexture;
         }
     }
+    loadTexture = 0;
+foundTexture:
 
     if (loadTexture != 0) {
         if (loadTexture->m_streamMode != 0 && loadTexture->GetRef() == 1) {

@@ -2356,8 +2356,6 @@ void CPartMng::pppEditPartCalc()
         return;
     }
 
-    int* recvBuff = *reinterpret_cast<int**>(self + 0x1C8);
-
     if (*reinterpret_cast<int*>(self + 0x174) <= 3) {
         for (int i = 0; i < *reinterpret_cast<int*>(self + 0x4); i++) {
             _pppMngSt* mng = &m_pppMng[i];
@@ -2391,14 +2389,17 @@ void CPartMng::pppEditPartCalc()
             continue;
 
         decrementTimerA:
-            baseTime -= 1;
-            mng->m_baseTime = baseTime;
-            if (baseTime >= 0) {
-                continue;
+            {
+                int newBaseTime = baseTime - 1;
+                mng->m_baseTime = newBaseTime;
+                if (newBaseTime >= 0) {
+                    continue;
+                }
             }
             mng->m_particleEnded = 0;
             *reinterpret_cast<int*>(&mng->m_envColorR) = *reinterpret_cast<int*>(self + 0x168);
-            _pppStartPart(mng, reinterpret_cast<long*>(self + 0x5dc) + recvBuff[i * 0x18 + 0xC], 1);
+            _pppStartPart(mng, reinterpret_cast<long*>(reinterpret_cast<long*>(self + 0x5dc)[
+                                   (*reinterpret_cast<int**>(self + 0x1C8))[i * 0x18 + 0xC]]), 1);
             goto runFrameA;
         }
     } else {

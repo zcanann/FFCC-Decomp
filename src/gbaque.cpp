@@ -1018,13 +1018,15 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
 		}
 	}
 
-	if (reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->AddItem(smithItem, 0) == 0) {
+	const int addItemResult = reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->AddItem(smithItem, 0);
+	if ((static_cast<unsigned int>(-addItemResult | addItemResult) >> 31) == 0) {
 		Joybus.SendResult(channel, 1, valueBytes[0], valueBytes[1]);
 	}
 
 	const float smithRate = static_cast<float>(static_cast<double>(reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->m_shopParam) / 100.0);
 	const int gilCost = -static_cast<int>(static_cast<float>(*reinterpret_cast<unsigned short*>(itemTableBase + 0x24)) * smithRate);
-	if (reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->AddGil(gilCost) == 0) {
+	const int addGilResult = reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->AddGil(gilCost);
+	if ((static_cast<unsigned int>(-addGilResult | addGilResult) >> 31) == 0) {
 		Joybus.SendResult(channel, 1, valueBytes[0], valueBytes[1]);
 	}
 

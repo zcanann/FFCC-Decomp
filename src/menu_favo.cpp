@@ -542,7 +542,6 @@ void CMenuPcs::FavoInit()
 {
 	float fVar4;
 	float fVar5;
-	float fVar7;
 	int sVar9;
 	int sVar10;
 	unsigned short sVar11;
@@ -610,7 +609,6 @@ void CMenuPcs::FavoInit()
 	setupEntry->duration = 5;
 
 	sVar9 = 0;
-	fVar7 = kFavoIconUvScale;
 	sVar11 = 6;
 	list = this->m_favoList;
 	setupEntry = &list->entries[entryIndex++];
@@ -634,7 +632,7 @@ void CMenuPcs::FavoInit()
 	setupEntry->y = static_cast<short>(0x150 - setupEntry->h);
 	setupEntry->u = fVar4;
 	setupEntry->v = fVar4;
-	setupEntry->uvScale = fVar7;
+	setupEntry->uvScale = kFavoIconUvScale;
 	setupEntry->startFrame = 0;
 	setupEntry->duration = 5;
 
@@ -696,26 +694,22 @@ void CMenuPcs::FavoInit()
 	FoodRank* rank = ranks;
 	do {
 		iVar17 = rankIndex + 1;
-		iVar16 = 8 - iVar17;
 		FoodRank* compareRank = ranks + iVar17;
-		if (iVar17 < 8) {
-			do {
-				if (rank->score < compareRank->score) {
-					signed char place = rank->place;
-					unsigned char foodId = rank->foodId;
-					short score = rank->score;
+		for (iVar16 = iVar17; iVar16 < 8; iVar16++) {
+			if (rank->score < compareRank->score) {
+				signed char place = rank->place;
+				unsigned char foodId = rank->foodId;
+				short score = rank->score;
 
-					rank->place = compareRank->place;
-					rank->foodId = compareRank->foodId;
-					rank->score = compareRank->score;
+				rank->place = compareRank->place;
+				rank->foodId = compareRank->foodId;
+				rank->score = compareRank->score;
 
-					compareRank->place = place;
-					compareRank->foodId = foodId;
-					compareRank->score = score;
-				}
-				compareRank++;
-				iVar16--;
-			} while (iVar16 != 0);
+				compareRank->place = place;
+				compareRank->foodId = foodId;
+				compareRank->score = score;
+			}
+			compareRank++;
 		}
 		rankIndex++;
 		rank++;

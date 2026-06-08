@@ -1731,14 +1731,13 @@ void CGObject::update()
 
                     for (int i = 0; i < pointCount; i++) {
                         const unsigned short pointFrame = *reinterpret_cast<unsigned short*>(animRefBytes + 0x30 + i * 4);
-                        const short pointValue = *reinterpret_cast<short*>(animRefBytes + 0x32 + i * 4);
                         const float eventFrame = static_cast<float>(pointFrame) + ModelAnimStart(m_charaModelHandle->m_model);
                         if (prevWrapped < eventFrame && (eventFrame <= nextWrapped || nextWrapped < prevWrapped)) {
                             CFlatRuntime::CStack stackIn[2];
                             stackIn[0].m_word = static_cast<unsigned int>(m_animSlotSel);
-                            stackIn[1].m_word = static_cast<unsigned int>(pointValue);
+                            stackIn[1].m_word = static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(animRefBytes + 0x32 + i * 4));
                             gCFlatRuntime().SystemCall(this, 2, 9, 2, stackIn, 0);
-                            onAnimPoint(m_animSlotSel, pointValue);
+                            onAnimPoint(m_animSlotSel, *reinterpret_cast<unsigned short*>(animRefBytes + 0x32 + i * 4));
                         }
                     }
                 }

@@ -169,14 +169,14 @@ void CGItemObj::ItemJump(int state, float jump)
 		CGObject* object = reinterpret_cast<CGObject*>(itemObj);
 
 		if ((object->m_objectFlags & 0x10) == 0) {
-			unsigned int mapMask = object->m_bgHitMask;
 			Vec bottom = object->m_worldPosition;
 			Vec move;
 
-			bottom.y += kItemObjHeightOffset;
 			move.x = kItemObjZero;
 			move.z = kItemObjZero;
 			move.y = kItemObjGroundProbeDown;
+			bottom.y += kItemObjHeightOffset;
+			unsigned int mapMask = object->m_bgHitMask;
 			CMapCylinder cylinder(kItemObjBoundsInitMin, kItemObjBoundsInitMax);
 			cylinder.m_bottom = bottom;
 			cylinder.m_axis.x = kItemObjZero;

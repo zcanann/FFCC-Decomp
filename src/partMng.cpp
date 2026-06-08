@@ -2337,13 +2337,10 @@ void CPartMng::pppEditPartCalc()
         usbEdit[0x1A] = 0;
 
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3a9);
-        _pppMngSt* mng = m_pppMng;
-        int activeCount = *reinterpret_cast<int*>(self + 0x4);
-        for (int i = 0; i < activeCount; i++) {
-            if (mng->m_baseTime != -0x1000) {
-                _pppAllFreePObject(mng);
+        for (int i = 0; i < *reinterpret_cast<int*>(self + 0x4); i++) {
+            if (m_pppMng[i].m_baseTime != -0x1000) {
+                _pppAllFreePObject(&m_pppMng[i]);
             }
-            mng++;
         }
 
         *reinterpret_cast<int*>(self + 0x4) = 0;

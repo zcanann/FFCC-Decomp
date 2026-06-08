@@ -1714,7 +1714,7 @@ void CShopMenu::Draw()
     }
 
     float fade = m_fade;
-    if (fade != FLOAT_80332d28) {
+    if (FLOAT_80332d28 != fade) {
         int fadeStep = static_cast<int>(FLOAT_80332de0 * fade);
         signed char alpha = static_cast<unsigned char>(0xFF - (fadeStep & 0xFF));
 
@@ -1748,8 +1748,8 @@ void CShopMenu::Draw()
         _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
         _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
         GXSetNumChans(1);
-        GXSetChanCtrl(GX_COLOR0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-        GXSetChanCtrl(GX_ALPHA0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+        GXSetChanCtrl(GX_COLOR0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+        GXSetChanCtrl(GX_ALPHA0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
         GXClearVtxDesc();
         GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
         GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);

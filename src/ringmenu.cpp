@@ -770,7 +770,7 @@ void CRingMenu::onDraw()
 							float blink = kRingMenuZero;
 							if (charge == 0) {
 								if (!caravanWork->IsSelectedCmdList(i)) {
-									CColor color(0x80, 0x80, 0x80, static_cast<unsigned char>(static_cast<int>(dimAlpha)));
+									CColor color(0x80, 0x80, 0x80, static_cast<signed char>(static_cast<int>(dimAlpha)));
 									MenuPcs.SetColor(color);
 								} else {
 									CColor color(0x20, 0xFF, 0x20, static_cast<unsigned char>(static_cast<int>(fullAlpha)));

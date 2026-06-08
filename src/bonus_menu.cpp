@@ -2554,6 +2554,7 @@ void CMenuPcs::CalcResultCountAnim()
 			sprite->timer = 0;
 		}
 
+		int newCount = countTop + activePartyCount;
 		for (int i = 0; i < 0x18; i++) {
 			CCharaPcs::CHandle* handle = GetBonusDisplayHandleSlots(this)[i];
 			if (handle != 0) {
@@ -2561,7 +2562,7 @@ void CMenuPcs::CalcResultCountAnim()
 			}
 		}
 
-		((BonusAnimHeader*)this->m_bonusAnimPtr)->count = (short)(countTop + activePartyCount);
+		((BonusAnimHeader*)this->m_bonusAnimPtr)->count = (short)newCount;
 		*(unsigned char*)(this->m_bonusStatePtr + 0xb) = 1;
 	}
 

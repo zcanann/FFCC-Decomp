@@ -3576,8 +3576,10 @@ int CPartMng::pppLoadPtx(const char* baseName, int pdtSlotIndex, int appendMode,
 
     CChunkFile::CChunk chunk;
     while (chunkFile.GetNextChunk(chunk)) {
-        if (chunk.m_id == kChunkTSET) {
+        switch (chunk.m_id) {
+        case kChunkTSET:
             m_textureSet->Create(chunkFile, PartPcs.m_usbStreamState.m_stageLoad, 1, &ppvAmemCacheSet, appendMode, 0);
+            break;
         }
     }
 
@@ -3641,7 +3643,8 @@ void CPartMng::pppLoadPmd(const char* baseName)
     CChunkFile::CChunk outerChunk;
     while (chunkFile.GetNextChunk(outerChunk)) {
         chunkFile.PushChunk();
-        if (outerChunk.m_id == kChunkRSET) {
+        switch (outerChunk.m_id) {
+        case kChunkRSET: {
             pppModelSt* modelArray = m_pppModelStArr;
             pppModelSt* targetModel = 0;
 
@@ -3700,6 +3703,8 @@ void CPartMng::pppLoadPmd(const char* baseName)
                 }
                 }
             }
+            break;
+        }
         }
         chunkFile.PopChunk();
     }
@@ -3759,7 +3764,8 @@ void CPartMng::pppLoadPan(const char* baseName)
     CChunkFile::CChunk outerChunk;
     while (chunkFile.GetNextChunk(outerChunk)) {
         chunkFile.PushChunk();
-        if (outerChunk.m_id == kChunkSSET) {
+        switch (outerChunk.m_id) {
+        case kChunkSSET: {
             pppShapeSt* shapeArray = m_pppShapeStArr;
             pppShapeSt* targetShape = 0;
 
@@ -3806,6 +3812,8 @@ void CPartMng::pppLoadPan(const char* baseName)
                 }
                 }
             }
+            break;
+        }
         }
         chunkFile.PopChunk();
     }

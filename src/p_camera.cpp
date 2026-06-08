@@ -1089,7 +1089,9 @@ void CCameraPcs::calcChara()
     C_MTXPerspective(m_screenMatrix, m_fov, kCameraAspectRatio, m_nearZ, m_farZ);
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 
-    if (m_viewerOverride == 0) {
+    if (m_viewerOverride != 0) {
+        m_viewerOverride = 0;
+    } else {
         if (Pad.m_debugPadLock != 0) {
             padButtons = 0;
         } else {
@@ -1117,8 +1119,6 @@ void CCameraPcs::calcChara()
 
         stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().triggerRightF;
         m_viewer.m_distance = zoomSpeed2 * stick + m_viewer.m_distance;
-    } else {
-        m_viewerOverride = 0;
     }
 
     PSMTXTrans(mtxA, m_viewer.m_position.x, m_viewer.m_position.y, m_viewer.m_position.z);

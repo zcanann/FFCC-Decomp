@@ -4671,9 +4671,11 @@ void GbaQueue::ClrChgHitFlg(int channel)
  */
 unsigned int GbaQueue::GetChgScouFlg(int channel)
 {
-	OSWaitSemaphore(accessSemaphores + channel);
-	int flag = static_cast<unsigned char>(m_chgScouFlags);
-	OSSignalSemaphore(accessSemaphores + channel);
+	char* obj = reinterpret_cast<char*>(this);
+	OSSemaphore* semaphore = accessSemaphores + channel;
+	OSWaitSemaphore(semaphore);
+	int flag = obj[0x2D55];
+	OSSignalSemaphore(semaphore);
 	unsigned int value = flag & (1U << channel);
 	return (-value | value) >> 31U;
 }
@@ -5027,9 +5029,11 @@ int GbaQueue::GetItemUse(int channel)
  */
 unsigned int GbaQueue::GetSPModeFlg(int channel)
 {
-	OSWaitSemaphore(accessSemaphores + channel);
-	int value = static_cast<unsigned char>(m_spModeFlags);
-	OSSignalSemaphore(accessSemaphores + channel);
+	char* obj = reinterpret_cast<char*>(this);
+	OSSemaphore* semaphore = accessSemaphores + channel;
+	OSWaitSemaphore(semaphore);
+	int value = obj[0x2D5D];
+	OSSignalSemaphore(semaphore);
 	unsigned int mask = value & (1U << channel);
 	return (-mask | mask) >> 31;
 }
@@ -5062,9 +5066,11 @@ void GbaQueue::ClrSPModeFlg(int channel)
  */
 unsigned int GbaQueue::GetSPMode(int channel)
 {
-	OSWaitSemaphore(accessSemaphores + channel);
-	int value = static_cast<unsigned char>(m_spModeBits);
-	OSSignalSemaphore(accessSemaphores + channel);
+	char* obj = reinterpret_cast<char*>(this);
+	OSSemaphore* semaphore = accessSemaphores + channel;
+	OSWaitSemaphore(semaphore);
+	int value = obj[0x2D5C];
+	OSSignalSemaphore(semaphore);
 	unsigned int mask = value & (1U << channel);
 	return (-mask | mask) >> 31;
 }
@@ -5080,9 +5086,11 @@ unsigned int GbaQueue::GetSPMode(int channel)
  */
 unsigned int GbaQueue::GetMemorysFlg(int channel)
 {
-	OSWaitSemaphore(accessSemaphores + channel);
-	int value = static_cast<unsigned char>(m_memorysFlags);
-	OSSignalSemaphore(accessSemaphores + channel);
+	char* obj = reinterpret_cast<char*>(this);
+	OSSemaphore* semaphore = accessSemaphores + channel;
+	OSWaitSemaphore(semaphore);
+	int value = obj[0x2D5E];
+	OSSignalSemaphore(semaphore);
 	unsigned int mask = value & (1U << channel);
 	return (-mask | mask) >> 31;
 }
@@ -5135,9 +5143,10 @@ unsigned int GbaQueue::GetMemorys(int channel)
  */
 unsigned int GbaQueue::GetCmdNumFlg(int channel)
 {
+	char* obj = reinterpret_cast<char*>(this);
 	OSSemaphore* semaphore = accessSemaphores + channel;
 	OSWaitSemaphore(semaphore);
-	int value = static_cast<signed char>(m_cmdNumFlags);
+	int value = obj[0x2D5F];
 	OSSignalSemaphore(semaphore);
 	return (value >> (channel << 1)) & 3;
 }
@@ -5190,9 +5199,11 @@ int GbaQueue::GetCmdNum(int channel)
  */
 unsigned int GbaQueue::GetPlayModeFlg(int channel)
 {
-	OSWaitSemaphore(accessSemaphores + channel);
-	int value = static_cast<unsigned char>(m_playModeFlags);
-	OSSignalSemaphore(accessSemaphores + channel);
+	char* obj = reinterpret_cast<char*>(this);
+	OSSemaphore* semaphore = accessSemaphores + channel;
+	OSWaitSemaphore(semaphore);
+	int value = obj[0x2D60];
+	OSSignalSemaphore(semaphore);
 	unsigned int mask = value & (1U << channel);
 	return (-mask | mask) >> 31;
 }
@@ -5251,9 +5262,11 @@ void GbaQueue::SetStartBonusFlg()
  */
 unsigned int GbaQueue::GetStartBonusFlg(int channel)
 {
-	OSWaitSemaphore(accessSemaphores + channel);
-	int value = static_cast<unsigned char>(m_startBonusFlags);
-	OSSignalSemaphore(accessSemaphores + channel);
+	char* obj = reinterpret_cast<char*>(this);
+	OSSemaphore* semaphore = accessSemaphores + channel;
+	OSWaitSemaphore(semaphore);
+	int value = obj[0x2D61];
+	OSSignalSemaphore(semaphore);
 	unsigned int mask = value & (1U << channel);
 	return (-mask | mask) >> 31;
 }

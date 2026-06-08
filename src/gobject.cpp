@@ -2163,7 +2163,7 @@ CGObject* CGObject::CCClass(int useBodyRadius, int classMask, float yOffset, Vec
     }
 
     PSVECNormalize(&toTarget, &targetDir);
-    const double maxAngle = static_cast<double>(static_cast<float>(atan2(static_cast<double>(radius), static_cast<double>(maxDist))));
+    const float maxAngle = static_cast<float>(atan2(static_cast<double>(radius), static_cast<double>(maxDist)));
     float bestDist = sLargeDistance;
     best = 0;
 
@@ -2187,13 +2187,13 @@ CGObject* CGObject::CCClass(int useBodyRadius, int classMask, float yOffset, Vec
         PSVECSubtract(&other->m_worldPosition, &origin, &toOther);
         const float dist = PSVECMag(&toOther);
         if ((sZeroFloat < dist) && (dist < maxDist)) {
-            double extraAngle = static_cast<double>(sZeroFloat);
+            float extraAngle = sZeroFloat;
             if (useBodyRadius != 0) {
-                extraAngle = static_cast<double>(static_cast<float>(atan(static_cast<double>(other->m_bodyEllipsoidRadius / maxDist))));
+                extraAngle = static_cast<float>(atan(static_cast<double>(other->m_bodyEllipsoidRadius / maxDist)));
             }
             PSVECScale(&toOther, &toOther, sAnimFrameOffset / dist);
-            const double angle = static_cast<double>(static_cast<float>(acos(static_cast<double>(PSVECDotProduct(&toOther, &targetDir)))));
-            if ((angle < maxAngle + extraAngle) && (dist < bestDist)) {
+            const float angle = static_cast<float>(acos(static_cast<double>(PSVECDotProduct(&toOther, &targetDir))));
+            if ((static_cast<double>(angle) < static_cast<double>(maxAngle + extraAngle)) && (dist < bestDist)) {
                 best = other;
                 bestDist = dist;
             }

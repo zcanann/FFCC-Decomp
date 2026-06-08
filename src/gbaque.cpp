@@ -3887,7 +3887,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 			const int itemBase = flatBase + itemId * 0x48;
 			int price = static_cast<int>(
 				static_cast<float>(static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(itemBase + 0x24))) *
-				static_cast<float>(static_cast<float>(caravanWork->m_shopParam) / 100.0f));
+				static_cast<float>(static_cast<double>(caravanWork->m_shopParam) / 100.0));
 
 			itemBuf[0] = SwapU32(static_cast<unsigned int>(price));
 

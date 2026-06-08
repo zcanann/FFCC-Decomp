@@ -1528,7 +1528,6 @@ void CGoOutMenu::CalcGoOut()
 {
     unsigned short input;
     unsigned char next;
-    int selResult = -1;
 
     if (m_watchCardDisconnect != 0 && m_modeFrame >= 0x14 && (m_modeFrame & 0xF) == 0) {
         if ((m_modeFrame & 0x10) != 0) {
@@ -1561,6 +1560,7 @@ void CGoOutMenu::CalcGoOut()
     }
 card_connected:;
 
+    int selResult = -1;
     if (m_saveLoadMenuOpen != 0) {
         const unsigned char selInit = static_cast<unsigned char>(__cntlzw(0xF - static_cast<int>(m_goOutMode)) >> 5 & 0xFF);
         selResult = MenuPcs.CalcGoOutSelChar(selInit, 1);

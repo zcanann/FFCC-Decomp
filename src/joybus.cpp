@@ -7704,7 +7704,7 @@ bool JoyBus::IsThreadRunning()
 void JoyBus::RestartThread()
 {
     m_threadInitFlag = 0;
-    // TODO: CreateInit__6JoyBusFv
+    CreateInit();
     int err = 0;
 
     if (static_cast<signed char>(Joybus.m_binLoaded) == 0)

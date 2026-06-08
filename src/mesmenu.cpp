@@ -530,8 +530,8 @@ void CMesMenu::onDraw()
         float pulse = FLOAT_8033092c * (FLOAT_80330914 - sinf(FLOAT_80330930 * stageBlend));
         (void)MenuPcs.m_battleRingMenus[menuIndex]->GetDispCounter();
         float pulseX = ((menuIndex & 1) != 0) ? pulse : -pulse;
-        float pulseY = ((menuIndex & 2) != 0) ? pulse : -pulse;
         float baseX = (m_baseX + m_offsetX) + pulseX;
+        float pulseY = ((menuIndex & 2) != 0) ? pulse : -pulse;
         float baseY = (m_baseY + m_offsetY) + pulseY;
 
         if (stateBlend > FLOAT_803308d8) {

@@ -423,6 +423,17 @@ static void DrawShopMenuRightAlignedText(CFont* font, const char* text, float ri
     MenuPcs.DrawInit();
 }
 
+static void DrawShopMenuRightAlignedTextTrunc(CFont* font, const char* text, float rightEdge, float y, int tlut)
+{
+    if (text == 0) {
+        return;
+    }
+
+    float textWidth = font->GetWidth(text);
+    MenuPcs.DrawNoShadowFont(font, const_cast<char*>(text), static_cast<float>(static_cast<int>(rightEdge - textWidth)), y, tlut, 0x12);
+    MenuPcs.DrawInit();
+}
+
 static void SetupShopMenuLabelFont(CFont* font)
 {
     font->DrawInit();
@@ -1196,14 +1207,14 @@ void CShopMenu::DrawItemInfo0()
         font->SetMargin(FLOAT_80332d34);
         char countBuffer[64];
         sprintf(countBuffer, s_TwoDigitFormat_80332d18, amount);
-        float countRightX = FLOAT_80332d70 - font->GetWidth(countBuffer);
-        MenuPcs.DrawNoShadowFont(font, countBuffer, countRightX, FLOAT_80332d6c, 4, 0x12);
+        int countRightX = static_cast<int>(FLOAT_80332d70 - font->GetWidth(countBuffer));
+        MenuPcs.DrawNoShadowFont(font, countBuffer, static_cast<float>(countRightX), FLOAT_80332d6c, 4, 0x12);
         MenuPcs.DrawInit();
 
         SetupShopMenuInfoFont(font);
         const char* quantityText = ShopMenuMes(languageId, SHOP_MENU_TEXT_QUANTITY);
         font->DrawInit();
-        DrawShopMenuRightAlignedText(font, quantityText, countRightX - FLOAT_80332d5c, FLOAT_80332d6c, 0x18);
+        DrawShopMenuRightAlignedTextTrunc(font, quantityText, static_cast<float>(countRightX) - FLOAT_80332d5c, FLOAT_80332d6c, 0x18);
 
         int x = static_cast<int>(-(static_cast<float>(m_figureMode) * FLOAT_80332d74 - FLOAT_80332d70));
         drawShapeSeqScale(0x12, 0, x, 0xD4, FLOAT_80332d78, FLOAT_80332d78, 0xFF);

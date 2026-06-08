@@ -8040,11 +8040,12 @@ void CMenuPcs::DrawCharaBase()
 	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x29));
 
+	const float kZero = FLOAT_803313dc;
 	for (int row = 0; row < 2; row++) {
 		for (int col = 0; col < 4; col++) {
 			const float x = static_cast<float>(0x1C + col * 0x90);
 			const float y = static_cast<float>((row == 0 ? 0x22 : 0xCA) + (row != 0 ? 8 : 0));
-			MenuPcs.DrawRect(0, x, y, FLOAT_803316C8, FLOAT_803316CC, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+			MenuPcs.DrawRect(0, x, y, FLOAT_803316C8, FLOAT_803316CC, kZero, kZero, FLOAT_803313e8, FLOAT_803313e8, kZero);
 		}
 	}
 }

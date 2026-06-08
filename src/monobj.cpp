@@ -2849,7 +2849,7 @@ void CGMonObj::setRepop(int mode)
 		m_aiStatePrev = 0;
 		m_unk6C8 = 0;
 		m_unk6CC = 0;
-		mon[0x6B4] = 0;
+		m_actionBranch = 0;
 		m_unk6B8 = 0;
 		m_unk6B9 = 0;
 		m_unk6BA = 0;

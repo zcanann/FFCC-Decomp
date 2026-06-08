@@ -1957,24 +1957,23 @@ void CGMonObj::initFinishedFuncMeteoParasite()
 	const int scriptKind = reinterpret_cast<int>(reinterpret_cast<CGObject*>(this)->m_scriptHandle[4]);
 	if (scriptKind == 0x85) {
 		CGObject* object = reinterpret_cast<CGObject*>(this);
-		CChara::CModel* model = object->m_charaModelHandle->m_model;
 		CChara::CNode** nodes = reinterpret_cast<CChara::CNode**>(CGMonObj::m_boss);
-		int nodeIndex = model->SearchNode(const_cast<char*>(sLichTeleportNodeA));
-		nodes[0] = model->m_nodes + nodeIndex;
-		nodes[0]->m_flags &= 0x7F;
+		int nodeIndex = object->m_charaModelHandle->m_model->SearchNode(const_cast<char*>(sLichTeleportNodeA));
+		nodes[0] = object->m_charaModelHandle->m_model->m_nodes + nodeIndex;
+		nodes[0]->m_flagsBits.m_flag_80 = 0;
 
-		nodeIndex = model->SearchNode(const_cast<char*>(sLichTeleportNodeB));
-		nodes[1] = model->m_nodes + nodeIndex;
-		nodes[1]->m_flags &= 0x7F;
+		nodeIndex = object->m_charaModelHandle->m_model->SearchNode(const_cast<char*>(sLichTeleportNodeB));
+		nodes[1] = object->m_charaModelHandle->m_model->m_nodes + nodeIndex;
+		nodes[1]->m_flagsBits.m_flag_80 = 0;
 
 		char nodeName[256];
 		for (int i = 0; i < 12; i++) {
 			sprintf(nodeName, sLichTeleportNodeFormat, i + 1);
-			nodeIndex = model->SearchNode(nodeName);
-			nodes[i + 2] = model->m_nodes + nodeIndex;
+			nodeIndex = object->m_charaModelHandle->m_model->SearchNode(nodeName);
+			nodes[i + 2] = object->m_charaModelHandle->m_model->m_nodes + nodeIndex;
 			if ((CGMonObj::m_boss[0x5C] & 0x40) != 0) {
-				int dispIndex = model->GetDispIndex(nodes[i + 2]);
-				model->m_meshVisibleMask &= ~(1 << dispIndex);
+				int dispIndex = object->m_charaModelHandle->m_model->GetDispIndex(nodes[i + 2]);
+				object->m_charaModelHandle->m_model->m_meshVisibleMask &= ~(1 << dispIndex);
 			}
 		}
 	}

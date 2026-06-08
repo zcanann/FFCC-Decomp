@@ -716,11 +716,20 @@ static inline float FurRandScale()
 
 static inline CColor FurNoiseColor(const CColor& base, const CColor& noise, float scale)
 {
-	return CColor(
-	    static_cast<unsigned char>(base.color.r + static_cast<int>(noise.color.r * scale)),
-	    static_cast<unsigned char>(base.color.g + static_cast<int>(noise.color.g * scale)),
-	    static_cast<unsigned char>(base.color.b + static_cast<int>(noise.color.b * scale)),
-	    static_cast<unsigned char>(base.color.a + static_cast<int>(noise.color.a * scale)));
+	CColor scaledNoiseTmp;
+	scaledNoiseTmp.color.r = static_cast<unsigned char>(static_cast<int>(noise.color.r * scale));
+	scaledNoiseTmp.color.g = static_cast<unsigned char>(static_cast<int>(noise.color.g * scale));
+	scaledNoiseTmp.color.b = static_cast<unsigned char>(static_cast<int>(noise.color.b * scale));
+	scaledNoiseTmp.color.a = static_cast<unsigned char>(static_cast<int>(noise.color.a * scale));
+	CColor scaledNoise = scaledNoiseTmp;
+
+	CColor resultTmp;
+	resultTmp.color.r = static_cast<unsigned char>(base.color.r + scaledNoise.color.r);
+	resultTmp.color.g = static_cast<unsigned char>(base.color.g + scaledNoise.color.g);
+	resultTmp.color.b = static_cast<unsigned char>(base.color.b + scaledNoise.color.b);
+	resultTmp.color.a = static_cast<unsigned char>(base.color.a + scaledNoise.color.a);
+	CColor result = resultTmp;
+	return result;
 }
 
 void brush(unsigned short*, int, int, float, float, int, _GXColor, _GXColor*, _GXColor*);
@@ -1671,12 +1680,29 @@ void CChara::makeFurTex()
 	s_mogFurMaxY = 0.0f;
 
 	for (int i = 0; i < 0x20; i++) {
-		CVector scaled;
-		PSVECScale(&velRand, scaled, FurRandScale());
-		PSVECAdd(&velBase, scaled, hairSet[i].m_vec0);
+		CVector velScaleOut;
+		PSVECScale(&velRand, velScaleOut, FurRandScale());
+		Vec velScaled;
+		velScaled.x = velScaleOut.x;
+		velScaled.y = velScaleOut.y;
+		velScaled.z = velScaleOut.z;
+		CVector velAddOut;
+		PSVECAdd(&velBase, &velScaled, velAddOut);
+		hairSet[i].m_vec0.x = velAddOut.x;
+		hairSet[i].m_vec0.y = velAddOut.y;
+		hairSet[i].m_vec0.z = velAddOut.z;
 
-		PSVECScale(&accelRand, scaled, FurRandScale());
-		PSVECAdd(&accelBase, scaled, hairSet[i].m_vec1);
+		CVector accelScaleOut;
+		PSVECScale(&accelRand, accelScaleOut, FurRandScale());
+		Vec accelScaled;
+		accelScaled.x = accelScaleOut.x;
+		accelScaled.y = accelScaleOut.y;
+		accelScaled.z = accelScaleOut.z;
+		CVector accelAddOut;
+		PSVECAdd(&accelBase, &accelScaled, accelAddOut);
+		hairSet[i].m_vec1.x = accelAddOut.x;
+		hairSet[i].m_vec1.y = accelAddOut.y;
+		hairSet[i].m_vec1.z = accelAddOut.z;
 
 		hairSet[i].m_colors[0] = FurNoiseColor(furBaseColor, furNoiseBase, FurRandScale());
 		hairSet[i].m_colors[1] = FurNoiseColor(furTipColor, furNoiseRange, FurRandScale());
@@ -1739,15 +1765,31 @@ void CChara::makeFurTex()
 
 		float layerFactor = static_cast<float>(layer) * FLOAT_8033115C;
 		layerFactor = layerFactor * layerFactor;
-		CColor layerColor(
-		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.r * (kCharaFurDepthScaleBase - layerFactor)) +
-		                               static_cast<int>(furTipColor.color.r * layerFactor)),
-		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.g * (kCharaFurDepthScaleBase - layerFactor)) +
-		                               static_cast<int>(furTipColor.color.g * layerFactor)),
-		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.b * (kCharaFurDepthScaleBase - layerFactor)) +
-		                               static_cast<int>(furTipColor.color.b * layerFactor)),
-		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.a * (kCharaFurDepthScaleBase - layerFactor)) +
-		                               static_cast<int>(furTipColor.color.a * layerFactor)));
+
+		CColor tipPartTmp;
+		tipPartTmp.color.r = static_cast<unsigned char>(static_cast<int>(furTipColor.color.r * layerFactor));
+		tipPartTmp.color.g = static_cast<unsigned char>(static_cast<int>(furTipColor.color.g * layerFactor));
+		tipPartTmp.color.b = static_cast<unsigned char>(static_cast<int>(furTipColor.color.b * layerFactor));
+		tipPartTmp.color.a = static_cast<unsigned char>(static_cast<int>(furTipColor.color.a * layerFactor));
+		CColor tipPart = tipPartTmp;
+
+		CColor basePartTmp;
+		basePartTmp.color.r =
+		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.r * (kCharaFurDepthScaleBase - layerFactor)));
+		basePartTmp.color.g =
+		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.g * (kCharaFurDepthScaleBase - layerFactor)));
+		basePartTmp.color.b =
+		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.b * (kCharaFurDepthScaleBase - layerFactor)));
+		basePartTmp.color.a =
+		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.a * (kCharaFurDepthScaleBase - layerFactor)));
+		CColor basePart = basePartTmp;
+
+		CColor layerColorTmp;
+		layerColorTmp.color.r = static_cast<unsigned char>(basePart.color.r + tipPart.color.r);
+		layerColorTmp.color.g = static_cast<unsigned char>(basePart.color.g + tipPart.color.g);
+		layerColorTmp.color.b = static_cast<unsigned char>(basePart.color.b + tipPart.color.b);
+		layerColorTmp.color.a = static_cast<unsigned char>(basePart.color.a + tipPart.color.a);
+		CColor layerColor = layerColorTmp;
 		Graphic.SetCopyClear(layerColor, 0xFFFFFF);
 		GXCopyTex(static_cast<unsigned char*>(gMogFurTexBuffer) + layer * 0x4000, GX_TRUE);
 		GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
@@ -1766,26 +1808,55 @@ void CChara::makeFurTex()
 			float t = kCharaFurDepthZero;
 			for (int v = 0; v < 5; v++) {
 				float t2 = t * t;
-				CVector accelTerm;
-				PSVECScale(src.m_vec1, accelTerm, kCharaFurWeightScale * t2);
-				CVector velTerm;
-				PSVECScale(src.m_vec0, velTerm, t);
-				CVector tmp;
-				PSVECAdd(root, velTerm, tmp);
+				CVector accelScaleOut;
+				PSVECScale(src.m_vec1, accelScaleOut, kCharaFurWeightScale * t2);
+				Vec accelTerm;
+				accelTerm.x = accelScaleOut.x;
+				accelTerm.y = accelScaleOut.y;
+				accelTerm.z = accelScaleOut.z;
+				CVector velScaleOut;
+				PSVECScale(src.m_vec0, velScaleOut, t);
+				Vec velTerm;
+				velTerm.x = velScaleOut.x;
+				velTerm.y = velScaleOut.y;
+				velTerm.z = velScaleOut.z;
+				CVector addOut1;
+				PSVECAdd(root, &velTerm, addOut1);
+				Vec tmp;
+				tmp.x = addOut1.x;
+				tmp.y = addOut1.y;
+				tmp.z = addOut1.z;
 				CVector pos;
-				PSVECAdd(tmp, accelTerm, pos);
+				PSVECAdd(&tmp, &accelTerm, pos);
 				float px = pos.x;
 				float py = pos.y;
 				float pz = pos.z;
 
-				CColor color(
-				    static_cast<signed char>(static_cast<int>(src.m_colors[0].color.r * (kCharaFurDepthScaleBase - t2)) +
-				                               static_cast<int>(src.m_colors[1].color.r * t2)),
-				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.g * (kCharaFurDepthScaleBase - t2)) +
-				                               static_cast<int>(src.m_colors[1].color.g * t2)),
-				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.b * (kCharaFurDepthScaleBase - t2)) +
-				                               static_cast<int>(src.m_colors[1].color.b * t2)),
-				    0);
+				CColor tipPartTmp;
+				tipPartTmp.color.r = static_cast<unsigned char>(static_cast<int>(src.m_colors[1].color.r * t2));
+				tipPartTmp.color.g = static_cast<unsigned char>(static_cast<int>(src.m_colors[1].color.g * t2));
+				tipPartTmp.color.b = static_cast<unsigned char>(static_cast<int>(src.m_colors[1].color.b * t2));
+				tipPartTmp.color.a = static_cast<unsigned char>(static_cast<int>(src.m_colors[1].color.a * t2));
+				CColor tipPart = tipPartTmp;
+
+				CColor basePartTmp;
+				basePartTmp.color.r =
+				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.r * (kCharaFurDepthScaleBase - t2)));
+				basePartTmp.color.g =
+				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.g * (kCharaFurDepthScaleBase - t2)));
+				basePartTmp.color.b =
+				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.b * (kCharaFurDepthScaleBase - t2)));
+				basePartTmp.color.a =
+				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.a * (kCharaFurDepthScaleBase - t2)));
+				CColor basePart = basePartTmp;
+
+				CColor colorTmp;
+				colorTmp.color.r = static_cast<unsigned char>(basePart.color.r + tipPart.color.r);
+				colorTmp.color.g = static_cast<unsigned char>(basePart.color.g + tipPart.color.g);
+				colorTmp.color.b = static_cast<unsigned char>(basePart.color.b + tipPart.color.b);
+				colorTmp.color.a = static_cast<unsigned char>(basePart.color.a + tipPart.color.a);
+				CColor colorCopy = colorTmp;
+				CColor color = colorCopy;
 				GXWGFifo.f32 = px;
 				GXWGFifo.f32 = py;
 				GXWGFifo.f32 = pz;
@@ -1797,26 +1868,55 @@ void CChara::makeFurTex()
 			t = kCharaFurDepthZero;
 			for (int v = 0; v < 5; v++) {
 				float t2 = t * t;
-				CVector accelTerm;
-				PSVECScale(src.m_vec1, accelTerm, kCharaFurWeightScale * t2);
-				CVector velTerm;
-				PSVECScale(src.m_vec0, velTerm, t);
-				CVector tmp;
-				PSVECAdd(root, velTerm, tmp);
+				CVector accelScaleOut;
+				PSVECScale(src.m_vec1, accelScaleOut, kCharaFurWeightScale * t2);
+				Vec accelTerm;
+				accelTerm.x = accelScaleOut.x;
+				accelTerm.y = accelScaleOut.y;
+				accelTerm.z = accelScaleOut.z;
+				CVector velScaleOut;
+				PSVECScale(src.m_vec0, velScaleOut, t);
+				Vec velTerm;
+				velTerm.x = velScaleOut.x;
+				velTerm.y = velScaleOut.y;
+				velTerm.z = velScaleOut.z;
+				CVector addOut1;
+				PSVECAdd(root, &velTerm, addOut1);
+				Vec tmp;
+				tmp.x = addOut1.x;
+				tmp.y = addOut1.y;
+				tmp.z = addOut1.z;
 				CVector pos;
-				PSVECAdd(tmp, accelTerm, pos);
+				PSVECAdd(&tmp, &accelTerm, pos);
 				float px = pos.x;
 				float py = pos.y;
 				float pz = pos.z;
 
-				CColor color(
-				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.r * (kCharaFurDepthScaleBase - t2)) +
-				                               static_cast<int>(src.m_colors[1].color.r * t2)),
-				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.g * (kCharaFurDepthScaleBase - t2)) +
-				                               static_cast<int>(src.m_colors[1].color.g * t2)),
-				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.b * (kCharaFurDepthScaleBase - t2)) +
-				                               static_cast<int>(src.m_colors[1].color.b * t2)),
-				    0);
+				CColor tipPartTmp;
+				tipPartTmp.color.r = static_cast<unsigned char>(static_cast<int>(src.m_colors[1].color.r * t2));
+				tipPartTmp.color.g = static_cast<unsigned char>(static_cast<int>(src.m_colors[1].color.g * t2));
+				tipPartTmp.color.b = static_cast<unsigned char>(static_cast<int>(src.m_colors[1].color.b * t2));
+				tipPartTmp.color.a = static_cast<unsigned char>(static_cast<int>(src.m_colors[1].color.a * t2));
+				CColor tipPart = tipPartTmp;
+
+				CColor basePartTmp;
+				basePartTmp.color.r =
+				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.r * (kCharaFurDepthScaleBase - t2)));
+				basePartTmp.color.g =
+				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.g * (kCharaFurDepthScaleBase - t2)));
+				basePartTmp.color.b =
+				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.b * (kCharaFurDepthScaleBase - t2)));
+				basePartTmp.color.a =
+				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.a * (kCharaFurDepthScaleBase - t2)));
+				CColor basePart = basePartTmp;
+
+				CColor colorTmp;
+				colorTmp.color.r = static_cast<unsigned char>(basePart.color.r + tipPart.color.r);
+				colorTmp.color.g = static_cast<unsigned char>(basePart.color.g + tipPart.color.g);
+				colorTmp.color.b = static_cast<unsigned char>(basePart.color.b + tipPart.color.b);
+				colorTmp.color.a = static_cast<unsigned char>(basePart.color.a + tipPart.color.a);
+				CColor colorCopy = colorTmp;
+				CColor color = colorCopy;
 				GXWGFifo.f32 = pz;
 				GXWGFifo.f32 = py;
 				GXWGFifo.f32 = px;

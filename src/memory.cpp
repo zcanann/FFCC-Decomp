@@ -764,7 +764,7 @@ void CMemory::DestroyStage(CMemory::CStage* stage)
             stage->heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
         }
     } else {
-        int heapHead = stageGetHeapHead(stage);
+        unsigned int heapHead = stageGetHeapHead(stage);
         if (heapHead != 0) {
             if (heapHead != 0x10) {
                 operator delete[](reinterpret_cast<void*>(heapHead - 0x10));

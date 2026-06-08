@@ -474,11 +474,12 @@ void CPartMng::pppDumpMngSt()
         System.Printf(const_cast<char*>(sPartMngDumpSeparator));
     }
 
-    PppMngStDumpRaw* mng = reinterpret_cast<PppMngStDumpRaw*>(self + 0x2A18);
+    PppMngStDumpRaw* mngBase = reinterpret_cast<PppMngStDumpRaw*>(self + 0x2A18);
+    PppMngStDumpRaw* mng = mngBase;
     for (int i = 0; i < 0x180; i++) {
         if (mng->m_baseTime != -0x1000 && static_cast<unsigned int>(System.m_execParam) >= 1U) {
             int kind = static_cast<int>(mng->m_kind);
-            int heapGroup = (mng->m_heapGroupRef + 0x2D) / 0x158;
+            int heapGroup = static_cast<int>(reinterpret_cast<char*>(mng) - reinterpret_cast<char*>(mngBase)) / 0x158;
             int heapSize = ppvEnv->m_stagePtr->heapWalker(0, 0, static_cast<unsigned long>(heapGroup));
 
             System.Printf(

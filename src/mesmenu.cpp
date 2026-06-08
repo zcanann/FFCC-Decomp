@@ -848,7 +848,7 @@ void CMesMenu::onCalc()
         stageBit = CFlatEnabledEventFlags() & 2;
     }
 
-    unsigned int desiredStageFlag = stageBit != 0;
+    int desiredStageFlag = stageBit != 0;
     if (m_stageFadeOut != desiredStageFlag) {
         System.Printf(const_cast<char*>(s_mesMenuOnOffChangedFmt));
         m_stageFadeOut =
@@ -918,7 +918,7 @@ void CMesMenu::onCalc()
         return;
     }
 
-    int state = m_state;
+    unsigned int state = m_state;
     if (state < 2) {
         if (state == 0) {
             (void)sin(FLOAT_80330980 +
@@ -953,7 +953,7 @@ void CMesMenu::onCalc()
                     }
                 } else if ((repeatMask & 4) != 0) {
                     cursor++;
-                    if (*(int*)((char*)this + 0x3D30) <= cursor) {
+                    if (*(unsigned int*)((char*)this + 0x3D30) <= cursor) {
                         cursor = 0;
                     }
                     if ((m_flags & 0x4000) == 0) {

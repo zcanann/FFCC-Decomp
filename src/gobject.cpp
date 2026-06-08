@@ -1750,7 +1750,7 @@ void CGObject::update()
 
             if (animFinished) {
                 if (m_shieldNodeFlagBits.m_bit80) {
-                    const signed char queuePos = m_animQueuePos++;
+                    const unsigned char queuePos = m_animQueuePos++;
                     const char queuedAnim = m_animQueue[queuePos];
                     if (queuedAnim == -1) {
                         m_currentAnimSlot = -1;

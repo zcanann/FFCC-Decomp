@@ -2389,8 +2389,10 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 					break;
 				}
 			}
+		} else if (currentAnim != 0) {
+			blendMode = 4;
 		} else {
-			blendMode = (currentAnim == 0) ? 0 : 4;
+			blendMode = 0;
 		}
 	}
 

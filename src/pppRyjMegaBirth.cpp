@@ -1061,7 +1061,7 @@ void birth(
 		float velocityRandom = *f32_at(payload, 0xC8);
 		if (velocityRandom != kPppRyjMegaBirthZero) {
 			*f32_at(particlePayload, 0x4C) =
-				*f32_at(particlePayload, 0x4C) + kPppRyjMegaBirthDouble * velocityRandom * Math.RandF() - velocityRandom;
+				*f32_at(particlePayload, 0x4C) + (kPppRyjMegaBirthDouble * velocityRandom * Math.RandF() - velocityRandom);
 		}
 	}
 

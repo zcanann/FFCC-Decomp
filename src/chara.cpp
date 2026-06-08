@@ -2203,13 +2203,13 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 		}
 
 		const int lightEnable = (mesh->m_data->m_flags & 0x80) == 0;
-		if (lightEnable != lastLightEnable) {
+		if (lastLightEnable != lightEnable) {
 			LightPcs.EnableLight(lightEnable, 0);
 			lastLightEnable = lightEnable;
 		}
 
 		const int zWriteEnable = (mesh->m_data->m_flags & 0x40) == 0;
-		if (zWriteEnable != lastZWrite) {
+		if (lastZWrite != zWriteEnable) {
 			GXSetZMode((u8)1, (GXCompare)3, (u8)zWriteEnable);
 			lastZWrite = zWriteEnable;
 		}

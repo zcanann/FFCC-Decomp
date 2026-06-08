@@ -1445,18 +1445,8 @@ void CCharaPcs::DumpLoad()
         CLoadModel* loadModel = (*LoadModelArray(this))[static_cast<unsigned long>(i)];
         if (static_cast<unsigned int>(System.m_execParam) >= 3) {
             int streamMode = loadModel->m_streamMode;
-            unsigned int streamSize = 0;
-            if (streamMode == 0) {
-                streamSize = 0;
-            } else {
-                streamSize = static_cast<unsigned int>(loadModel->m_streamSize);
-            }
-            unsigned int streamAddr = 0;
-            if (streamMode == 0) {
-                streamAddr = 0;
-            } else {
-                streamAddr = reinterpret_cast<unsigned int>(loadModel->m_streamOffset);
-            }
+            unsigned int streamSize = streamMode != 0 ? static_cast<unsigned int>(loadModel->m_streamSize) : 0;
+            unsigned int streamAddr = streamMode != 0 ? reinterpret_cast<unsigned int>(loadModel->m_streamOffset) : 0;
 
             System.Printf(
                 const_cast<char*>(s_charaDumpModelFmt), i, reinterpret_cast<int>(loadModel->m_keyTag), loadModel->m_keyId,
@@ -1479,18 +1469,8 @@ void CCharaPcs::DumpLoad()
         CLoadTexture* loadTexture = (*LoadTextureArray(this))[static_cast<unsigned long>(i)];
         if (static_cast<unsigned int>(System.m_execParam) >= 3) {
             int streamMode = loadTexture->m_streamMode;
-            unsigned int streamSize = 0;
-            if (streamMode == 0) {
-                streamSize = 0;
-            } else {
-                streamSize = static_cast<unsigned int>(loadTexture->m_streamSize);
-            }
-            unsigned int streamAddr = 0;
-            if (streamMode == 0) {
-                streamAddr = 0;
-            } else {
-                streamAddr = reinterpret_cast<unsigned int>(loadTexture->m_streamOffset);
-            }
+            unsigned int streamSize = streamMode != 0 ? static_cast<unsigned int>(loadTexture->m_streamSize) : 0;
+            unsigned int streamAddr = streamMode != 0 ? reinterpret_cast<unsigned int>(loadTexture->m_streamOffset) : 0;
 
             System.Printf(
                 const_cast<char*>(s_charaDumpTextureFmt), i, reinterpret_cast<int>(loadTexture->m_keyTag), loadTexture->m_keyId,

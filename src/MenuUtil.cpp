@@ -1206,11 +1206,8 @@ void CMenuPcs::DrawOptionMenu()
 	case 0: {
 		CTextureSet* textureSet = GetMenuTextureSet(this, 0xBC);
 		CTexture* sideTexture = GetTextureSetTexture(textureSet, 1);
-		CTexture* selectorTexture = GetTextureSetTexture(textureSet, 4);
 		unsigned int sideWidth = sideTexture->m_width;
 		unsigned int sideHeight = sideTexture->m_height;
-		unsigned int selectorWidth = selectorTexture->m_width;
-		unsigned int selectorHeight = selectorTexture->m_height;
 		const f32* row = &layoutBase[10];
 		signed char secondValue = m_gameInitMode;
 		char* firstText = langStrings[12];
@@ -1231,6 +1228,9 @@ void CMenuPcs::DrawOptionMenu()
 		                        static_cast<float>(sideHeight), sideTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
+		CTexture* selectorTexture = GetTextureSetTexture(textureSet, 4);
+		unsigned int selectorWidth = static_cast<unsigned int>(static_cast<float>(selectorTexture->m_width));
+		unsigned int selectorHeight = static_cast<unsigned int>(static_cast<float>(selectorTexture->m_height));
 		color.a = static_cast<unsigned char>(static_cast<int>(kOptionMenuAlphaMax * m_optionColumnAnim));
 		gUtil.CalcUV(uv0.x, uv0.y, 0, 0, selectorWidth, selectorHeight);
 		gUtil.CalcUV(uv1.x, uv1.y, 0x78, 0x30, selectorWidth, selectorHeight);
@@ -1279,11 +1279,8 @@ void CMenuPcs::DrawOptionMenu()
 	case 1: {
 		CTextureSet* textureSet = GetMenuTextureSet(this, 0xBC);
 		CTexture* sideTexture = GetTextureSetTexture(textureSet, 1);
-		CTexture* selectorTexture = GetTextureSetTexture(textureSet, 4);
 		unsigned int sideWidth = sideTexture->m_width;
 		unsigned int sideHeight = sideTexture->m_height;
-		unsigned int selectorWidth = selectorTexture->m_width;
-		unsigned int selectorHeight = selectorTexture->m_height;
 		const f32* row = &layoutBase[20];
 		signed char secondValue = m_stereoMode;
 		char* firstText = langStrings[14];
@@ -1304,6 +1301,9 @@ void CMenuPcs::DrawOptionMenu()
 		                        static_cast<float>(sideHeight), sideTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
+		CTexture* selectorTexture = GetTextureSetTexture(textureSet, 4);
+		unsigned int selectorWidth = static_cast<unsigned int>(static_cast<float>(selectorTexture->m_width));
+		unsigned int selectorHeight = static_cast<unsigned int>(static_cast<float>(selectorTexture->m_height));
 		color.a = static_cast<unsigned char>(static_cast<int>(kOptionMenuAlphaMax * m_optionColumnAnim));
 		gUtil.CalcUV(uv0.x, uv0.y, 0, 0, selectorWidth, selectorHeight);
 		gUtil.CalcUV(uv1.x, uv1.y, 0x78, 0x30, selectorWidth, selectorHeight);

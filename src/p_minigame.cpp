@@ -1834,10 +1834,14 @@ void CMiniGamePcs::MngThreadMain(void*)
 
             do
             {
-                int count = 0;
                 unsigned char* threadState = self;
-                while (OSIsThreadTerminated(reinterpret_cast<OSThread*>(threadState + 0x1830)) != 0)
+                int count = 0;
+                for (;;)
                 {
+                    if (OSIsThreadTerminated(reinterpret_cast<OSThread*>(threadState + 0x1830)) == 0)
+                    {
+                        break;
+                    }
                     count++;
                     threadState += sizeof(OSThread);
                     if (count > 3)

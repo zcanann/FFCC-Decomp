@@ -986,27 +986,26 @@ void CChara::CModel::InitMogFurTex()
  */
 void CChara::CModel::MogFurFrame(CGObject* gObject)
 {
-	MogWorkRaw& work = MogWork();
 	const unsigned short heldButtons = MogHeldButtons();
 	const unsigned short triggerButtons = MogTriggerButtons();
 	const unsigned short rotateButtons = (MogPadInt(64) == 0) ? MogHeldButtons() : 0;
 	int messageId = -1;
 
-	if (work.m_started == 0) {
+	if (MogWork().m_started == 0) {
 		if ((heldButtons & 0x100) != 0) {
 			return;
 		}
-		work.m_started = 1;
+		MogWork().m_started = 1;
 	}
 
-	if (work.m_frameCount == 0) {
+	if (MogWork().m_frameCount == 0) {
 		messageId = 0;
-		work.m_prevScoreA = Chara.MogFur().m_score[0];
-		work.m_prevScoreB = Chara.MogFur().m_score[1];
-		work.m_prevScoreC = Chara.MogFur().m_score[2];
+		MogWork().m_prevScoreA = Chara.MogFur().m_score[0];
+		MogWork().m_prevScoreB = Chara.MogFur().m_score[1];
+		MogWork().m_prevScoreC = Chara.MogFur().m_score[2];
 	}
 
-	if (work.m_state == 0) {
+	if (MogWork().m_state == 0) {
 		if ((rotateButtons & 1) != 0) {
 			gObject->m_rotTargetY -= kYmEnvQuarter;
 			if (gObject->m_currentAnimSlot < 0) {
@@ -1022,11 +1021,11 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		}
 
 		if ((rotateButtons & 8) != 0) {
-			work.m_state = 1;
+			MogWork().m_state = 1;
 			gObject->PlayAnim(0x37, 1, 0, -1, -1, 0);
 			messageId = 7;
 		}
-	} else if (work.m_state == 1) {
+	} else if (MogWork().m_state == 1) {
 		unsigned char* objectBytes = reinterpret_cast<unsigned char*>(gObject);
 		if (gObject->m_currentAnimSlot == static_cast<char>(objectBytes[0xD4])) {
 			if (gObject->IsLoopAnim(1) != 0) {
@@ -1038,7 +1037,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 			}
 		} else if (gObject->IsLoopAnim(1) != 0) {
 			gObject->CancelAnim(1);
-			work.m_state = 0;
+			MogWork().m_state = 0;
 		}
 	}
 
@@ -1069,9 +1068,9 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		const unsigned char radarType = MogRadarType();
 		if (Chara.MogFur().m_prevRadarType != radarType) {
 			Chara.MogFur().m_prevRadarType = radarType;
-			work.m_pickTicks = 0;
-			Sound.StopSe(work.m_loopSeHandle);
-			work.m_loopSeHandle = 0;
+			MogWork().m_pickTicks = 0;
+			Sound.StopSe(MogWork().m_loopSeHandle);
+			MogWork().m_loopSeHandle = 0;
 		}
 		const _GXColor brushColor = MogBrushColor(radarType);
 		const int eraseMode = (radarType == 4) ? 1 : 0;
@@ -1086,60 +1085,60 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		Chara.CalcMogScore();
 
 		if (pickResult >= 0) {
-			work.m_pickTicks++;
+			MogWork().m_pickTicks++;
 
-			if (Chara.MogFur().m_score[0] >= work.m_prevScoreA + 5) {
-				work.m_prevScoreA = Chara.MogFur().m_score[0];
+			if (Chara.MogFur().m_score[0] >= MogWork().m_prevScoreA + 5) {
+				MogWork().m_prevScoreA = Chara.MogFur().m_score[0];
 				messageId = 1;
-			} else if (Chara.MogFur().m_score[0] < work.m_prevScoreA - 5) {
-				work.m_prevScoreA = Chara.MogFur().m_score[0];
+			} else if (Chara.MogFur().m_score[0] < MogWork().m_prevScoreA - 5) {
+				MogWork().m_prevScoreA = Chara.MogFur().m_score[0];
 				messageId = 6;
 			}
-			if (Chara.MogFur().m_score[1] >= work.m_prevScoreB + 5) {
-				work.m_prevScoreB = Chara.MogFur().m_score[1];
+			if (Chara.MogFur().m_score[1] >= MogWork().m_prevScoreB + 5) {
+				MogWork().m_prevScoreB = Chara.MogFur().m_score[1];
 				messageId = 1;
-			} else if (Chara.MogFur().m_score[1] < work.m_prevScoreB - 5) {
-				work.m_prevScoreB = Chara.MogFur().m_score[1];
+			} else if (Chara.MogFur().m_score[1] < MogWork().m_prevScoreB - 5) {
+				MogWork().m_prevScoreB = Chara.MogFur().m_score[1];
 				messageId = 6;
 			}
-			if (Chara.MogFur().m_score[2] >= work.m_prevScoreC + 5) {
-				work.m_prevScoreC = Chara.MogFur().m_score[2];
+			if (Chara.MogFur().m_score[2] >= MogWork().m_prevScoreC + 5) {
+				MogWork().m_prevScoreC = Chara.MogFur().m_score[2];
 				messageId = 1;
-			} else if (Chara.MogFur().m_score[2] < work.m_prevScoreC - 5) {
-				work.m_prevScoreC = Chara.MogFur().m_score[2];
+			} else if (Chara.MogFur().m_score[2] < MogWork().m_prevScoreC - 5) {
+				MogWork().m_prevScoreC = Chara.MogFur().m_score[2];
 				messageId = 6;
 			}
 
 			if (pickResult == 0) {
-				work.m_idleTicks++;
-				if (work.m_idleTicks == 0x3C && messageId < 0) {
+				MogWork().m_idleTicks++;
+				if (MogWork().m_idleTicks == 0x3C && messageId < 0) {
 					messageId = 3;
-				} else if (work.m_idleTicks == 0xF0 && messageId < 0) {
+				} else if (MogWork().m_idleTicks == 0xF0 && messageId < 0) {
 					messageId = 4;
 				}
 			} else {
-				work.m_idleTicks = 0;
+				MogWork().m_idleTicks = 0;
 			}
 
 			if (eraseMode != 0) {
-				work.m_offColorTicks = 0;
+				MogWork().m_offColorTicks = 0;
 				if ((centerBefore.a != 0) && (centerAfter.a < centerBefore.a)) {
-					work.m_eraseTicks++;
+					MogWork().m_eraseTicks++;
 				}
 				if ((System.m_frameCounter & 7) == 0) {
 					Sound.PlaySe(0x249f3, 0x40, 0x7F, 0);
 				}
 			} else if (radarType == 3) {
-				work.m_eraseTicks = 0;
+				MogWork().m_eraseTicks = 0;
 				if ((((centerAfter.r < 0x0D) || (centerAfter.g < 0x0D)) || (centerAfter.b < 0x0D)) && (centerAfter.a != 0)) {
-					work.m_offColorTicks++;
+					MogWork().m_offColorTicks++;
 				}
 				if ((System.m_frameCounter & 0xF) == 0) {
 					Sound.PlaySe(0x249f4, 0x40, 0x7F, 0);
 				}
 			} else {
-				work.m_offColorTicks = 0;
-				work.m_eraseTicks = 0;
+				MogWork().m_offColorTicks = 0;
+				MogWork().m_eraseTicks = 0;
 			}
 
 			int particleNo = 0;
@@ -1168,34 +1167,34 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 				PartPcs.SetParColIdx(particleIndex, color);
 			}
 
-			if (work.m_offColorTicks == 10) {
+			if (MogWork().m_offColorTicks == 10) {
 				if (messageId < 0) {
 					messageId = 2;
 				}
-				work.m_offColorTicks = 0x0B;
+				MogWork().m_offColorTicks = 0x0B;
 			}
-			if (work.m_eraseTicks == 10) {
+			if (MogWork().m_eraseTicks == 10) {
 				if (messageId < 0) {
 					messageId = 5;
 				}
-				work.m_eraseTicks = 0x0B;
+				MogWork().m_eraseTicks = 0x0B;
 			}
-			if (work.m_eraseTicks == 0x32) {
+			if (MogWork().m_eraseTicks == 0x32) {
 				if (messageId < 0) {
 					messageId = 6;
 				}
-				work.m_eraseTicks = 0x33;
+				MogWork().m_eraseTicks = 0x33;
 			}
 
 			if (radarType < 3) {
-				if (work.m_loopSeHandle == 0) {
-					work.m_loopSeHandle = Sound.PlaySe(0x249f2, 0x40, 0x7F, 0);
+				if (MogWork().m_loopSeHandle == 0) {
+					MogWork().m_loopSeHandle = Sound.PlaySe(0x249f2, 0x40, 0x7F, 0);
 				}
 			}
 		}
 	} else {
 		if (MogRadarType() < 3) {
-			StopMogLoopSe(work);
+			StopMogLoopSe(MogWork());
 		}
 	}
 
@@ -1208,7 +1207,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 	}
 
 	OpenMogHintMessage(messageId);
-	work.m_frameCount++;
+	MogWork().m_frameCount++;
 }
 
 /*

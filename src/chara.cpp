@@ -1122,8 +1122,8 @@ void CChara::CModel::CreateDynamics(void* dynData, CMemory::CStage* stage)
 				}
 
 				ModelDynCount(this) = 0;
-				ModelDynParams(this) =
-				    static_cast<void*>(new (stage, const_cast<char*>(s_chara_cpp), 0x1E7) u8[chunk.m_size * 0x24]);
+				void* dynParams = static_cast<void*>(new (stage, const_cast<char*>(s_chara_cpp), 0x1E7) u8[chunk.m_size * 0x24]);
+				ModelDynParams(this) = dynParams;
 
 				chunkFile.PushChunk();
 				while (chunkFile.GetNextChunk(chunk)) {
@@ -2115,11 +2115,10 @@ int CChara::CModel::SearchNodeSk(char* name)
 		}
 	} else {
 		CNode* node = ModelNodes(this);
-		for (u32 i = 0; i < ModelNodeCount(this); i++) {
+		for (u32 i = 0; i < ModelNodeCount(this); i++, node++) {
 			if (strcmp(NodeRefName(node), name) == 0) {
 				return (int)i;
 			}
-			node++;
 		}
 	}
 
@@ -2204,13 +2203,13 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 		}
 
 		const int lightEnable = (mesh->m_data->m_flags & 0x80) == 0;
-		if (lightEnable != lastLightEnable) {
+		if (lastLightEnable != lightEnable) {
 			LightPcs.EnableLight(lightEnable, 0);
 			lastLightEnable = lightEnable;
 		}
 
 		const int zWriteEnable = (mesh->m_data->m_flags & 0x40) == 0;
-		if (zWriteEnable != lastZWrite) {
+		if (lastZWrite != zWriteEnable) {
 			GXSetZMode((u8)1, (GXCompare)3, (u8)zWriteEnable);
 			lastZWrite = zWriteEnable;
 		}
@@ -2855,17 +2854,17 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 				} else if (chunkInfo.m_id == 0x4F4E4520) {
 					m_data->m_oneWeightCountOrSize = chunkInfo.m_size;
 					m_data->m_oneWeightData =
-					    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp), 0x808, 0);
+					    Memory._Alloc(m_data->m_oneWeightCountOrSize, stage, const_cast<char*>(s_chara_cpp), 0x808, 0);
 					memcpy(m_data->m_oneWeightData, chunk.GetAddress(), chunkInfo.m_size);
 				} else if (chunkInfo.m_id == 0x54574F20) {
 					m_data->m_twoWeightCountOrSize = chunkInfo.m_size;
 					m_data->m_twoWeightData =
-					    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp), 0x80E, 0);
+					    Memory._Alloc(m_data->m_twoWeightCountOrSize, stage, const_cast<char*>(s_chara_cpp), 0x80E, 0);
 					memcpy(m_data->m_twoWeightData, chunk.GetAddress(), chunkInfo.m_size);
 				} else if (chunkInfo.m_id == 0x524D494E) {
 					m_data->m_threeWeightCountOrSize = chunkInfo.m_size;
 					m_data->m_threeWeightData =
-					    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp), 0x814, 0);
+					    Memory._Alloc(m_data->m_threeWeightCountOrSize, stage, const_cast<char*>(s_chara_cpp), 0x814, 0);
 					memcpy(m_data->m_threeWeightData, chunk.GetAddress(), chunkInfo.m_size);
 				}
 			}

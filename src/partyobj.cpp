@@ -2360,8 +2360,8 @@ void CGPartyObj::onStatAttack(int chargeType)
 
 		party.unk6CC = party.attackSel;
 		party.attackSel = 0;
-		party.commandFlags &= 0x7F;
-		party.commandFlags &= 0xBF;
+		party.commandFlagBits.commandActive = 0;
+		party.commandFlagBits.flag40 = 0;
 
 		CGPrgObj* target = getBestAngleObject(FLOAT_80331ad4 * m_bodyEllipsoidRadius, FLOAT_80331ad8);
 		if (target != 0) {

@@ -890,7 +890,7 @@ void birth(
 		memset(colorData, 0, sizeof(_PARTICLE_COLOR));
 	}
 
-	if (*(s8*)(payload + 0x2A) < 8) {
+	if ((s32)payload[0x2A] < 8 && (s32)payload[0x2A] >= 0) {
 		Vec baseDirection;
 		Vec* direction;
 		s32 angle[4];
@@ -920,7 +920,7 @@ void birth(
 	}
 
 	speed = *f32_at(payload, 0xD4);
-	if (*(s8*)(payload + 0x2A) >= 10) {
+	if ((s32)payload[0x2A] >= 10) {
 		if (speed != kPppRyjMegaBirthZero) {
 			u8 speedMode = payload[0xE8];
 
@@ -928,7 +928,7 @@ void birth(
 			Vec* position = (Vec*)particlePayload;
 			PSVECScale(direction, position, calc_direction_speed(speed, speedMode));
 		}
-	} else if (*(s8*)(payload + 0x2A) < 6) {
+	} else if ((s32)payload[0x2A] < 6) {
 		if (speed != kPppRyjMegaBirthZero) {
 			u8 speedMode = payload[0xE8];
 
@@ -937,8 +937,8 @@ void birth(
 			*f32_at(particlePayload, 0x04) = *f32_at(particlePayload, 0x04) * *f32_at(payload, 0xDC);
 			*f32_at(particlePayload, 0x08) = *f32_at(particlePayload, 0x08) * *f32_at(payload, 0xE0);
 		}
-	} else if (*(s8*)(payload + 0x2A) < 10) {
-		u8 speedMode = payload[0xE8];
+	} else if ((s32)payload[0x2A] < 10) {
+		s8 speedMode = payload[0xE8];
 		s16 pathIndex = *s16_at(payload, 0xF0);
 		Vec* pathBase = reinterpret_cast<Vec*>(pObject->m_drawMatrixPtr);
 

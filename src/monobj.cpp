@@ -449,18 +449,21 @@ void CGMonObj::onStatAttack(int state)
 	}
 
 	if (attackType == 3) {
-		if (prgObj->m_subState == 1) {
+		switch (prgObj->m_subState) {
+		case 0:
+			if (prgObj->isLoopAnim() != 0) {
+				prgObj->addSubStat();
+			}
+			break;
+		case 1:
 			if (prgObj->m_subFrame == 0) {
 				prgObj->reqAnim(*reinterpret_cast<int*>(mon + 0x554), 1, 0);
 			}
 			if (prgObj->m_subFrame == *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + (*reinterpret_cast<int*>(mon + 0x560) * 0x48 + 0x2E))) {
 				prgObj->addSubStat();
 			}
-		} else if (prgObj->m_subState == 0) {
-			if (prgObj->isLoopAnim() != 0) {
-				prgObj->addSubStat();
-			}
-		} else if (prgObj->m_subState < 3) {
+			break;
+		case 2:
 			if (prgObj->m_subFrame == 0) {
 				prgObj->reqAnim(*reinterpret_cast<int*>(mon + 0x558), 0, 0);
 				reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(1);
@@ -468,6 +471,7 @@ void CGMonObj::onStatAttack(int state)
 			if (prgObj->isLoopAnim() != 0) {
 				CGMonObj_SetAttackAfter(this, *reinterpret_cast<int*>(mon + 0x560));
 			}
+			break;
 		}
 		return;
 	}

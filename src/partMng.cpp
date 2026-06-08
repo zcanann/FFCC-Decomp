@@ -312,7 +312,7 @@ void CPartMng::Create()
     }
 
     for (int i = 0; i < kPppMngCount; i++) {
-        unsigned char* mng = self + (i * kPppMngStride);
+        unsigned char* mng = self + 0x2A18 + (i * kPppMngStride);
         *reinterpret_cast<int*>(mng + 0x14) = -0x1000;
         *reinterpret_cast<int*>(mng + 0x12c) = -1;
         *reinterpret_cast<int*>(mng + 0x11c) = -1;

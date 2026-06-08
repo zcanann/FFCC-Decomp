@@ -756,12 +756,12 @@ void CalcReflectionVector2(
             float absX = fabsf(outVec->x);
             float absZ = fabsf(outVec->z);
 
+            axis = absX < absY;
             maxAxis = absX;
-            if (absY > maxAxis) {
-                axis = 1;
+            if (axis) {
                 maxAxis = absY;
             }
-            if (absZ > maxAxis) {
+            if (maxAxis < absZ) {
                 axis = 2;
             }
             CVector reflected(outVec->x, outVec->y, outVec->z);

@@ -34,10 +34,10 @@ enum GraphicCppStringOffset {
     kGraphicInitCGraphic = 0xA0,
     kGraphicInitSource = 0xB8,
     kGraphicInitCGraphic2 = 0x1F8,
-    kGraphicCppPartControlDoneFmt = 0x34,
-    kGraphicCppPartCharaDoneFmt = 0x78,
-    kGraphicCppPartDoneFmt = 0xB8,
-    kGraphicCppDrawDoneFmt = 0xF4,
+    kGraphicCppPartControlDoneFmt = 0xEC,
+    kGraphicCppPartCharaDoneFmt = 0x130,
+    kGraphicCppPartDoneFmt = 0x170,
+    kGraphicCppDrawDoneFmt = 0x1AC,
 };
 
 static inline float LoadFloat(const float& value) {
@@ -130,7 +130,6 @@ int checkThread(void*)
 void CGraphic::Init()
 {
     char* graphicInitData = const_cast<char*>(sGraphicInitData);
-    char* graphicFileName = graphicInitData + kGraphicInitSource;
 
     m_graphicStage = Memory.CreateStage(0x19C000, graphicInitData + kGraphicInitCGraphic, 0);
     m_scratchStage = Memory.CreateStage(0xD6000, graphicInitData + kGraphicInitCGraphic2, 0);
@@ -159,23 +158,23 @@ void CGraphic::Init()
 
     GXRenderModeObj* renderMode = m_renderMode;
     u32 alignedWidth = (renderMode->fbWidth + 0xF) & 0xFFF0;
-    u16 efbHeight = renderMode->efbHeight;
+    s16 efbHeight = renderMode->efbHeight;
     u16 xfbHeight = renderMode->xfbHeight;
     u32 efbBufferSize = alignedWidth * efbHeight * 2;
     u32 xfbBufferSize = alignedWidth * xfbHeight * 2;
 
-    m_frameBuffer = new (m_graphicStage, graphicFileName, 0x86) u8[xfbBufferSize];
+    m_frameBuffer = new (m_graphicStage, graphicInitData + kGraphicInitSource, 0x86) u8[xfbBufferSize];
     memset(m_frameBuffer, 0, 4);
 
-    m_savedFrameBuffer = new (m_graphicStage, graphicFileName, 0x88) u8[efbBufferSize];
+    m_savedFrameBuffer = new (m_graphicStage, graphicInitData + kGraphicInitSource, 0x88) u8[efbBufferSize];
     memset(m_savedFrameBuffer, 0, 4);
 
     renderMode = m_renderMode;
     u32 scratchBufferSize = (((renderMode->fbWidth + 0xF) & 0xFFF0) * renderMode->efbHeight * 2) + 0x46000;
-    m_scratchTextureBuffer = Memory._Alloc(scratchBufferSize, m_scratchStage, graphicFileName, 0xB53, 0);
+    m_scratchTextureBuffer = Memory._Alloc(scratchBufferSize, m_scratchStage, graphicInitData + kGraphicInitSource, 0xB53, 0);
     memset(m_scratchTextureBuffer, 0, 0x46004);
 
-    m_fifoBuffer = new (m_graphicStage, graphicFileName, 0x8B) u8[0x60000];
+    m_fifoBuffer = new (m_graphicStage, graphicInitData + kGraphicInitSource, 0x8B) u8[0x60000];
 
     VIConfigure(m_renderMode);
     GXInit(m_fifoBuffer, 0x60000);
@@ -216,7 +215,7 @@ void CGraphic::Init()
     m_blurBufferIndex = 0;
     m_blurTextureCount = 0;
     GXCopyDisp(m_frameBuffer, GX_TRUE);
-    m_drawDoneFile = graphicFileName;
+    m_drawDoneFile = graphicInitData + kGraphicInitSource;
     m_drawDoneLine = 0xBE;
     m_drawDoneWaiting = 1;
     GXSetDrawDone();
@@ -393,8 +392,10 @@ void CGraphic::BeginFrame()
     GXInvalidateTexAll();
 
     const bool useDebugPad = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
-    u16 buttons = 0;
-    if (!useDebugPad) {
+    u16 buttons;
+    if (useDebugPad) {
+        buttons = 0;
+    } else {
         int padIndex = (Pad.m_debugPadPort == 0) ? Pad.m_debugPadPort : 0;
         buttons = Pad.GetPadInputs()[padIndex].lockedButton[1];
     }
@@ -504,7 +505,7 @@ void CGraphic::_WaitDrawDone(char* file, int line)
  */
 void CGraphic::Thread()
 {
-    char* debugFmtBase = const_cast<char*>(sGraphicSourceStrings);
+    char* debugFmtBase = const_cast<char*>(sGraphicInitData);
     int lastCounter = -1;
     int debugCountdown = 5;
 
@@ -636,13 +637,13 @@ void CGraphic::Flip()
 
         if (System.m_scenegraphStepMode != 1) {
             int retraceCount = VIGetRetraceCount();
-            if ((u32)(retraceCount - m_lastRetraceCount) < 2) {
+            if ((u32)(retraceCount - m_lastRetraceCount) > 1) {
+                m_frameRateOver = 1;
+            } else {
                 m_frameRateOver = 0;
                 while ((u32)((retraceCount = VIGetRetraceCount()) - m_lastRetraceCount) < 2) {
                     VIWaitForRetrace();
                 }
-            } else {
-                m_frameRateOver = 1;
             }
         }
 
@@ -667,11 +668,13 @@ void CGraphic::Flip()
 
     m_lastRetraceCount = VIGetRetraceCount();
 
+    int frameReady;
     if (System.m_scenegraphStepMode == 1) {
-        m_frameReady = ((u32)__cntlzw(System.m_frameCounter & 3) >> 5) & 0xFF;
+        frameReady = ((u32)__cntlzw(System.m_frameCounter & 3) >> 5) & 0xFF;
     } else {
-        m_frameReady = 1;
+        frameReady = 1;
     }
+    m_frameReady = frameReady;
 }
 
 /*
@@ -733,8 +736,8 @@ void CGraphic::Printf(unsigned long x, unsigned long y, char* fmt, ...)
  */
 void CGraphic::DrawDebugString()
 {
-    Mtx44 proj;
     Mtx model;
+    Mtx44 proj;
     Mtx texMtx;
     GXTexObj texObj;
 
@@ -887,18 +890,16 @@ void CGraphic::DrawDebugStringDirect(unsigned long x, unsigned long y, char* tex
 
         if (count > 0) {
             GXBegin((GXPrimitive)0x80, (GXVtxFmt)0, (u16)((count & 0x3FFF) << 2));
-            int i = 0;
-            while (count > 0) {
+            for (int i = 0; i < count; i++) {
                 int px = x + i * charSize;
                 int glyph = *lineStart - 0x20;
                 int tx = (glyph % 8) * 16;
                 int ty = (glyph / 8) * 16;
 
-                i++;
                 lineStart++;
 
                 GXWGFifo.s16 = px;
-                GXWGFifo.s16 = (s16)y;
+                GXWGFifo.u16 = (s16)y;
                 GXWGFifo.s16 = 0;
                 GXWGFifo.s16 = tx;
                 GXWGFifo.s16 = ty;
@@ -920,8 +921,6 @@ void CGraphic::DrawDebugStringDirect(unsigned long x, unsigned long y, char* tex
                 GXWGFifo.s16 = 0;
                 GXWGFifo.s16 = tx;
                 GXWGFifo.s16 = (s16)(ty + 0x10);
-
-                count -= 1;
             }
             count = 0;
         }
@@ -1594,10 +1593,10 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 	unsigned char farAlpha;
 	float xOffset;
 	float yOffset;
-	bool hasNearAlpha;
-	bool hasFarAlpha;
+	int hasNearAlpha;
+	int hasFarAlpha;
 
-	if (mode >= 4) {
+	if (mode > 3) {
 		return;
 	}
 
@@ -1610,14 +1609,14 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 	if (farDist < nearDist) {
 		farDist = nearDist;
 	}
-	if (blurWidth < 1) {
+	if (blurWidth <= 0) {
 		blurWidth = 1;
 	}
 
 	nearAlpha = 0;
 	farAlpha = 0;
-	hasNearAlpha = false;
-	hasFarAlpha = false;
+	hasNearAlpha = 0;
+	hasFarAlpha = 0;
 	texBufferSize = GXGetTexBufferSize(0x140, 0xE0, GX_TF_RGBA8, GX_FALSE, GX_FALSE);
 
 	cameraPos.x = CameraWorldX();
@@ -1640,8 +1639,8 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		if (depthAlphaNear > 0xFF) {
 			depthAlphaNear = 0xFF;
 		}
-		nearAlpha = (unsigned char)depthAlphaNear;
-		hasNearAlpha = true;
+		nearAlpha = (signed char)depthAlphaNear;
+		hasNearAlpha = 1;
 	}
 
 	if (mode != 1) {
@@ -1665,7 +1664,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 			depthAlphaFar = 0xFF;
 		}
 		farAlpha = (unsigned char)depthAlphaFar;
-		hasFarAlpha = true;
+		hasFarAlpha = 1;
 	}
 
 	if (!hasNearAlpha) {
@@ -1957,9 +1956,9 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
     GXSetNumTexGens(1);
 
     int blurOffsetInt = offset;
-    int negativeBlurOffset = -blurOffsetInt;
     int textureOffset = 0;
     for (int i = 0; i < static_cast<int>(m_blurTextureCount); i++) {
+        unsigned int negativeBlurOffset = -blurOffsetInt;
         u8* textureBase = reinterpret_cast<u8*>(m_savedFrameBuffer) + textureOffset;
         GXInitTexObj(&texObj, textureBase, 0x140, 0xE0, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
         GXInitTexObjLOD(&texObj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);

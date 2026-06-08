@@ -1063,12 +1063,12 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
 
             C_MTXLookAt(lookAtMtx, (Point3d*)&centerPos, &cameraUp, (Point3d*)&cameraPos);
             Graphic.SetViewport();
-            GXSetScissor(0, 0, 0x80, 0x80);
+            GXSetScissor((u32)LoadFloat(kPppYmMoveParabolaZero), (u32)LoadFloat(kPppYmMoveParabolaZero), 0x80, 0x80);
             gUtil.RenderTextureQuad(kPppYmMoveParabolaZero, kPppYmMoveParabolaZero, kYmManaCaptureTextureSize, kYmManaCaptureTextureSize,
                                     sourceTexObjs, 0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
 
             GXSetViewport(kPppYmMoveParabolaZero, kPppYmMoveParabolaZero, kYmManaCaptureTextureSize, kYmManaCaptureTextureSize, kPppYmMoveParabolaZero, kYmManaOne);
-            GXSetScissor(0, 0, 0x80, 0x80);
+            GXSetScissor((u32)LoadFloat(kPppYmMoveParabolaZero), (u32)LoadFloat(kPppYmMoveParabolaZero), 0x80, 0x80);
             PSMTXCopy(lookAtMtx, CameraMatrix());
             GXSetProjection(projectionMtx, (_GXProjectionType)0);
 

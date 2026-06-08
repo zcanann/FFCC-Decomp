@@ -5998,11 +5998,13 @@ void CMenuPcs::SetWorldParam(int code, int value)
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
 	switch (code) {
-	case 0:
+	case 0: {
+		const unsigned char primaryMask = s_wmWorldParamPrimaryDirtyMask;
 		bytes[5] = bytes[4];
 		bytes[4] = static_cast<unsigned char>(value);
-		bytes[0xA] = bytes[0xA] | s_wmWorldParamPrimaryDirtyMask;
+		bytes[0xA] = bytes[0xA] | primaryMask;
 		break;
+	}
 	case 1:
 		bytes[6] = static_cast<unsigned char>(value);
 		break;
@@ -6024,11 +6026,13 @@ void CMenuPcs::SetWorldParam(int code, int value)
 	case 7:
 		bytes[9] = static_cast<unsigned char>(value);
 		break;
-	case 8:
+	case 8: {
+		const unsigned char secondaryMask = s_wmWorldParamSecondaryDirtyMask;
 		bytes[0xB] = bytes[0xC];
 		bytes[0xC] = static_cast<unsigned char>(value);
-		bytes[0xA] = bytes[0xA] | s_wmWorldParamSecondaryDirtyMask;
+		bytes[0xA] = bytes[0xA] | secondaryMask;
 		break;
+	}
 	case 9:
 		if (static_cast<int>(static_cast<signed char>(bytes[0xD])) != value) {
 			bytes[0xD] = static_cast<unsigned char>(value);

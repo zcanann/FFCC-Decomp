@@ -766,10 +766,10 @@ CChara::CModel::CRefData::CRefData()
 	m_nodeRefData = 0;
 	m_meshRefData = 0;
 	m_bank = 0;
-	m_chest1NodeIndex = 0xFFFF;
-	m_chest2NodeIndex = 0xFFFF;
-	m_chest3NodeIndex = 0xFFFF;
-	m_headNodeIndex = 0xFFFF;
+	m_chest1NodeIndex = -1;
+	m_chest2NodeIndex = -1;
+	m_chest3NodeIndex = -1;
+	m_headNodeIndex = -1;
 	m_materialSet = 0;
 	m_baseScale = 1.0f;
 	m_posQuant = 7;

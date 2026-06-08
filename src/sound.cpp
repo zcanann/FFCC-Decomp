@@ -127,22 +127,27 @@ CLine<PointCount>::CLine()
 
 int CLine<10>::Calc(Vec* outPos, float* outDistance, u32* outIndex, float* outT, Vec* queryPos, float maxDistance)
 {
+    float bestPosX;
+    float bestPosY;
+    float bestPosZ;
+    float bestT = kLineSegmentMinT;
     const int infiniteRange = (kLineSegmentMinT == maxDistance);
     float bestDistance = infiniteRange ? kLineBoundsInitMin : maxDistance;
     const float maxDistanceSq = maxDistance * maxDistance;
+    u32 bestIndex;
     int found = 0;
-    u32 bestIndex = 0;
-    float bestT = kLineSegmentMinT;
-    Vec bestPos;
+    Vec candidatePosition;
 
     for (u32 i = 0; i < pointCount - 1; i++) {
         float distanceSq = PSVECSquareDistance(&points[i], queryPos);
         if (distanceSq < maxDistanceSq || infiniteRange) {
-            Vec candidatePosition = points[i];
+            candidatePosition = points[i];
             float distance = sqrtf(distanceSq);
             if (distance < bestDistance) {
                 bestDistance = distance;
-                bestPos = candidatePosition;
+                bestPosX = candidatePosition.x;
+                bestPosY = candidatePosition.y;
+                bestPosZ = candidatePosition.z;
                 bestIndex = i;
                 bestT = kLineSegmentMinT;
                 found = 1;
@@ -152,11 +157,13 @@ int CLine<10>::Calc(Vec* outPos, float* outDistance, u32* outIndex, float* outT,
         if (i == pointCount - 2) {
             distanceSq = PSVECSquareDistance(&points[i + 1], queryPos);
             if (distanceSq < maxDistanceSq || infiniteRange) {
-                Vec candidatePosition = points[i + 1];
+                candidatePosition = points[i + 1];
                 float distance = sqrtf(distanceSq);
                 if (distance < bestDistance) {
                     bestDistance = distance;
-                    bestPos = candidatePosition;
+                    bestPosX = candidatePosition.x;
+                    bestPosY = candidatePosition.y;
+                    bestPosZ = candidatePosition.z;
                     bestIndex = i;
                     bestT = kVectorOne;
                     found = 1;
@@ -169,13 +176,14 @@ int CLine<10>::Calc(Vec* outPos, float* outDistance, u32* outIndex, float* outT,
         const float t = (-dotStart + dotQuery) / (segments[i].length * segments[i].length);
         if (((t >= kLineSegmentMinT) && (t <= kVectorOne)) || infiniteRange) {
             Vec scaled;
-            Vec projected;
             PSVECScale(&segments[i].delta, &scaled, t);
-            PSVECAdd(&points[i], &scaled, &projected);
-            const float distance = PSVECDistance(queryPos, &projected);
+            PSVECAdd(&points[i], &scaled, &candidatePosition);
+            const float distance = PSVECDistance(queryPos, &candidatePosition);
             if (distance < bestDistance) {
                 bestDistance = distance;
-                bestPos = projected;
+                bestPosX = candidatePosition.x;
+                bestPosY = candidatePosition.y;
+                bestPosZ = candidatePosition.z;
                 bestIndex = i;
                 bestT = t;
                 found = 1;
@@ -185,7 +193,9 @@ int CLine<10>::Calc(Vec* outPos, float* outDistance, u32* outIndex, float* outT,
 
     if (found != 0) {
         if (outPos != nullptr) {
-            *outPos = bestPos;
+            outPos->x = bestPosX;
+            outPos->y = bestPosY;
+            outPos->z = bestPosZ;
         }
         if (outDistance != nullptr) {
             *outDistance = bestDistance;

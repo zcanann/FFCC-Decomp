@@ -2039,7 +2039,7 @@ void CMenuPcs::CalcMCardMenu()
 	}
 	unsigned short uVar6 = GetButtonRepeat(0);
 
-	if ((signed char)m_wmWorldState->m_worldReady == 0) {
+	if ((unsigned char)m_wmWorldState->m_worldReady == 0) {
 		m_mcCtrl.m_previousState = 0;
 		m_mcCtrl.m_state = 0;
 		m_mcCtrl.m_lastResult = 0;

@@ -1481,8 +1481,8 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 	ppvMng = pppMngSt;
 	pppMngSt->m_lifeEnd = (int)pdt[0];
 	pppMngSt->m_mode = (u8)pdt[1];
-	int controlOffset = (int)pdt[2];
-	int programOffset = (int)pdt[3];
+	int* controlPrograms = (int*)((u8*)pdt + pdt[2]);
+	int* programs = (int*)((u8*)pdt + pdt[3]);
 	short* shapeIndices = (short*)((u8*)pdt + pdt[5]);
 	short* modelIndices = (short*)((u8*)pdt + pdt[4]);
 
@@ -1522,8 +1522,6 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 	}
 
 	pppMngSt->m_isFinished = 0;
-	int* controlPrograms = (int*)((u8*)pdt + controlOffset);
-	int* programs = (int*)((u8*)pdt + programOffset);
 	pppMngSt->m_numControlPrograms = *controlPrograms++;
 	pppMngSt->m_pppPObjLinkHead.m_owner = (_pppPDataVal*)controlPrograms;
 	pppMngSt->m_numPrograms = *programs++;

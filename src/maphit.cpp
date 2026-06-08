@@ -445,15 +445,19 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
     int axisOverlap;
     if (g_hit_lpface->m_boundsMin.x < g_hit_cyl.m_bound.m_min.x) {
         axisOverlap = g_hit_cyl.m_bound.m_min.x <= g_hit_lpface->m_boundsMax.x;
-    } else {
+    } else if (g_hit_lpface->m_boundsMin.x > g_hit_cyl.m_bound.m_min.x) {
         axisOverlap = g_hit_lpface->m_boundsMin.x <= g_hit_cyl.m_bound.m_max.x;
+    } else {
+        axisOverlap = 1;
     }
 
     if (axisOverlap) {
         if (g_hit_lpface->m_boundsMin.y < g_hit_cyl.m_bound.m_min.y) {
             axisOverlap = g_hit_cyl.m_bound.m_min.y <= g_hit_lpface->m_boundsMax.y;
-        } else {
+        } else if (g_hit_lpface->m_boundsMin.y > g_hit_cyl.m_bound.m_min.y) {
             axisOverlap = g_hit_lpface->m_boundsMin.y <= g_hit_cyl.m_bound.m_max.y;
+        } else {
+            axisOverlap = 1;
         }
 
         if (axisOverlap) {
@@ -464,8 +468,10 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
     if (partialOverlap) {
         if (g_hit_lpface->m_boundsMin.z < g_hit_cyl.m_bound.m_min.z) {
             axisOverlap = g_hit_cyl.m_bound.m_min.z <= g_hit_lpface->m_boundsMax.z;
-        } else {
+        } else if (g_hit_lpface->m_boundsMin.z > g_hit_cyl.m_bound.m_min.z) {
             axisOverlap = g_hit_lpface->m_boundsMin.z <= g_hit_cyl.m_bound.m_max.z;
+        } else {
+            axisOverlap = 1;
         }
 
         if (axisOverlap) {

@@ -3660,6 +3660,7 @@ int JoyBus::SendChkCrc(ThreadParam* threadParam, int param3, unsigned short crc,
     *reinterpret_cast<unsigned short*>(cmdBytes + 2) = __lhbrx(&crcValue, 0);
 
     *outCmd = cmd;
+    unsigned int word = cmd;
 
     unsigned int result = 0;
 
@@ -3675,7 +3676,7 @@ int JoyBus::SendChkCrc(ThreadParam* threadParam, int param3, unsigned short crc,
         }
         else
         {
-            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
+            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = word;
             m_cmdCount[threadParam->m_portIndex]++;
             OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
             result = 0;

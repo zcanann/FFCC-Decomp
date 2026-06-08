@@ -2877,10 +2877,10 @@ void CCharaPcs::CHandle::loadModelASyncFrame()
             strcpy(path, basePath);
             strcat(path, s_charaDynamicsSuffix);
         } else {
-            if (m_asyncTextureVariant < 1) {
-                strcpy(path, basePath);
-            } else {
+            if (m_asyncTextureVariant >= 1) {
                 sprintf(path, s_charaTextureVariantFmt, basePath, m_asyncTextureVariant + 0x61);
+            } else {
+                strcpy(path, basePath);
             }
             strcat(path, s_charaTextureSuffix);
         }

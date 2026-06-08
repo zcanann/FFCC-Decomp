@@ -920,13 +920,16 @@ retry_loop:
                         param + 0xC0);
                 }
 
-                if (ret == 0 && (param[0xC0] & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_FLAGS_MASK)
+                if (!(ret == 0 && (param[0xC0] & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_FLAGS_MASK))
+                {
+                    System.Printf(const_cast<char*>(s_miniGameSourceLineFmt), s_miniGameSourceName, 0x2A1);
+                }
+                else
                 {
                     step++;
                     retryLine = 0x2BF;
                     goto retry_loop;
                 }
-                System.Printf(const_cast<char*>(s_miniGameSourceLineFmt), s_miniGameSourceName, 0x2A1);
             }
             else
             {
@@ -936,7 +939,11 @@ retry_loop:
                     goto retry_loop;
                 }
                 ret = GBARead(channel, param + contextRecvOffset + 0x28, param + 0xC0);
-                if (ret == 0 && (param[0xC0] & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_FLAGS_MASK)
+                if (!(ret == 0 && (param[0xC0] & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_FLAGS_MASK))
+                {
+                    System.Printf(const_cast<char*>(s_miniGameSourceLineFmt), s_miniGameSourceName, 0x2B2);
+                }
+                else
                 {
                     contextRecvOffset += 4;
                     if (contextRecvOffset == 0x60)
@@ -950,7 +957,6 @@ retry_loop:
                     retryLine = 0x2BF;
                     goto retry_loop;
                 }
-                System.Printf(const_cast<char*>(s_miniGameSourceLineFmt), s_miniGameSourceName, 0x2B2);
             }
         }
 comm_fail:

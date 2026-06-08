@@ -2161,9 +2161,9 @@ int CMenuPcs::LetterCtrlCur()
 		*reinterpret_cast<int*>(openAnim + 0x70) = 10;
 
 		float f = FLOAT_803330f8;
-		int panelCount = static_cast<int>(GetLetterAnimStorage(this)->count);
+		unsigned int panelCount = GetLetterAnimStorage(this)->count;
 		s16* panel = GetLetterPanelBase(this);
-		for (int i = 0; i < panelCount; ++i, panel += 0x20) {
+		for (unsigned int i = 0; i < panelCount; ++i, panel += 0x20) {
 			*reinterpret_cast<int*>(panel + 0x10) = 0;
 			*reinterpret_cast<float*>(panel + 8) = f;
 		}
@@ -2233,7 +2233,7 @@ int CMenuPcs::LetterCtrlCur()
 
 	if (menuMode == 2) {
 		if ((hold & 0xC) != 0) {
-			*reinterpret_cast<u16*>(GetLetterStateBase(this) + 0x28) ^= 1;
+			*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28) ^= 1;
 			Sound.PlaySe(1, 0x40, 0x7F, 0);
 			return 0;
 		}
@@ -2255,7 +2255,7 @@ int CMenuPcs::LetterCtrlCur()
 		}
 
 		s16 sel = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28);
-		if ((static_cast<int>(static_cast<signed char>(*reinterpret_cast<char*>(GetLetterStateBase(this) + 9))) & (1 << (sel + 1))) != 0) {
+		if ((static_cast<int>(static_cast<unsigned char>(*reinterpret_cast<char*>(GetLetterStateBase(this) + 9))) & (1 << (sel + 1))) != 0) {
 			CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[s_SelLetter];
 			if (sel == 0) {
 				unsigned int value = letter->AttachmentValue();
@@ -2328,7 +2328,7 @@ int CMenuPcs::LetterCtrlCur()
 			memset(workText, 0, kLetterTextScratchSize);
 
 			CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[s_SelLetter];
-			u16 msgIndex = letter->HeaderWord();
+			s16 msgIndex = letter->HeaderWord();
 			strcpy(srcText, Game.m_cFlatDataArr[1].Message(((msgIndex & 0x7FC) >> 1) + 0x11));
 			CMes::MakeAgbString(workText, srcText, caravanWork->m_genderFlag, 0);
 
@@ -2403,7 +2403,7 @@ int CMenuPcs::LetterCtrlCur()
 		if ((press & 0x200) == 0) {
 			return 0;
 		}
-		*reinterpret_cast<u8*>(GetLetterStateBase(this) + 8) = 0xFF;
+		*reinterpret_cast<s8*>(GetLetterStateBase(this) + 8) = 0xFF;
 		*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) + 1;
 		m_menuWindowInfo->state = 2;
 		Sound.PlaySe(3, 0x40, 0x7F, 0);
@@ -2441,7 +2441,7 @@ int CMenuPcs::LetterCtrlCur()
 			}
 			*reinterpret_cast<u8*>(GetLetterStateBase(this) + 8) = 1;
 		} else {
-			*reinterpret_cast<u8*>(GetLetterStateBase(this) + 8) = 0xFF;
+			*reinterpret_cast<s8*>(GetLetterStateBase(this) + 8) = 0xFF;
 		}
 
 		*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) + 1;

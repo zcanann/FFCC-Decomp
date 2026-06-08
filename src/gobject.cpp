@@ -1635,7 +1635,11 @@ void CGObject::update()
         Wind.Calc(&windVec, &m_worldPosition, 0);
         windVec.x = -(m_groundHitOffset.x * Math.RandF() - windVec.x);
         windVec.z = -(m_groundHitOffset.z * Math.RandF() - windVec.z);
-        ModelWindVector(m_charaModelHandle->m_model) = windVec;
+        CChara::CModel* windModel = m_charaModelHandle->m_model;
+        CVector windCopy(windVec);
+        ModelWindVector(windModel).x = windCopy.x;
+        ModelWindVector(windModel).y = windCopy.y;
+        ModelWindVector(windModel).z = windCopy.z;
 
         boundCheck();
 

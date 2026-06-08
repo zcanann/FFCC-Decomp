@@ -635,14 +635,15 @@ CGPrgObj* CGItemObj::CreateFromScript(
 	System.Printf(itemObjStrings + kItemObjStrNumFreeItemFmt, freeItemCount);
 
 	if (freeItemCount == 0) {
+		CFlatRuntime2* runtime = ItemCFlatRuntime();
 		int deletedCount = 0;
 		unsigned char* bestItemObj = 0;
 		int bestScriptObjectPos = 0x00989680;
 
-		for (unsigned char* itemObj = reinterpret_cast<unsigned char*>(ItemCFlatRuntime()->FindGItemObjFirst());
+		for (unsigned char* itemObj = reinterpret_cast<unsigned char*>(runtime->FindGItemObjFirst());
 			 itemObj != 0;
 		     itemObj = reinterpret_cast<unsigned char*>(
-		         ItemCFlatRuntime()->FindGItemObjNext(reinterpret_cast<CGItemObj*>(itemObj)))) {
+		         runtime->FindGItemObjNext(reinterpret_cast<CGItemObj*>(itemObj)))) {
 			if (*(void**)(itemObj + 0x550) == 0 &&
 			    static_cast<signed char>(
 			        static_cast<int>((static_cast<unsigned int>(itemObj[0x50]) << 28) & 0xC0000000) >> 31) != 0 &&
@@ -653,7 +654,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 		}
 
 		if (bestItemObj != 0) {
-			gCFlatRuntime().deleteObject(reinterpret_cast<CFlatRuntime::CObject*>(bestItemObj));
+			runtime->deleteObject(reinterpret_cast<CFlatRuntime::CObject*>(bestItemObj));
 			deletedCount = 1;
 		} else {
 			if ((unsigned int)System.m_execParam >= 3U) {
@@ -682,7 +683,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 
 	CGPrgObj* newItem = 0;
 	if (createMode != 1) {
-		newItem = (CGPrgObj*)ItemCFlatRuntime()->intToClass((int)outStack.m_word);
+		newItem = (CGPrgObj*)CFlat.intToClass((int)outStack.m_word);
 		unsigned char* itemSelf = (unsigned char*)newItem;
 
 		if (createMode == 2) {
@@ -919,25 +920,16 @@ void CGItemObj::onFrameStat()
 		if (m_stateFrame == m_carryFrame) {
 			Vec safePos;
 			float launchSpeed;
-			bool useMenuLaunchSpeed = false;
 
-			if (Game.m_gameWork.m_menuStageMode != 0) {
-				if (Game.m_gameWork.m_menuStageMode != 0 &&
-				    Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-					int carryCid = static_cast<unsigned short>(m_owner->GetCID());
-					if ((carryCid & 0x6D) == 0x6D &&
-					    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_owner->m_scriptHandle) + 0x3B4) != 0) {
-						useMenuLaunchSpeed = true;
-					}
-				}
-			}
-
-			if (useMenuLaunchSpeed) {
+			if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_menuStageMode != 0 &&
+			    Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
+			    (static_cast<unsigned short>(m_owner->GetCID()) & 0x6D) == 0x6D &&
+			    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_owner->m_scriptHandle) + 0x3B4) != 0) {
 				launchSpeed = kItemObjUnitScale;
 			} else if (static_cast<int>(CFlatCenterState()) == 1) {
 				int carryCid = static_cast<unsigned short>(m_owner->GetCID());
 				if ((carryCid & 0x6D) == 0x6D &&
-				    1 < *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_owner->m_scriptHandle) + 0x3E0)) {
+				    2 <= *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_owner->m_scriptHandle) + 0x3E0)) {
 					launchSpeed = kItemObjUnitScale;
 				} else {
 					launchSpeed = kItemObjDouble;

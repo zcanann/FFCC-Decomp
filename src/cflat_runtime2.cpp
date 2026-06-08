@@ -470,10 +470,10 @@ CFlatRuntime2::CFlatRuntime2()
 		gObj++;
 	}
 
-	CGPartyObj* partyObj = reinterpret_cast<CGPartyObj*>(m_objParty);
-	for (int i = 0; i < kFlatPartyObjCount; i++, partyObj++) {
-		InitFlatObjectSlot(partyObj, static_cast<u16>((i + 1) | 0x300));
-	}
+	InitFlatObjectSlot(&m_objParty[0], 0x301);
+	InitFlatObjectSlot(&m_objParty[1], 0x302);
+	InitFlatObjectSlot(&m_objParty[2], 0x303);
+	InitFlatObjectSlot(&m_objParty[3], 0x304);
 
 	CGMonObj* monObj = reinterpret_cast<CGMonObj*>(m_objMon);
 	for (int i = 0; i < kFlatMonObjCount; i++, monObj++) {
@@ -1332,16 +1332,26 @@ void CFlatRuntime2::Calc()
 		Graphic.Printf(2, 3, const_cast<char*>(sCFlatRuntime2SaveSceneMsg));
 
 		u32* saveData = new (getStage(), const_cast<char*>(sCFlatRuntime2FileTag), 0x36F) u32[0x3FF];
+
+		u32 headerX = SwapF32(CameraPcs.m_positionX);
+		u32 headerY = SwapF32(CameraPcs.m_positionY);
+		u32 headerZ = SwapF32(CameraPcs.m_positionZ);
+		u32 headerTargetX = SwapF32(CameraPcs.m_targetX);
+		u32 headerTargetY = SwapF32(CameraPcs.m_targetY);
+		u32 headerTargetZ = SwapF32(CameraPcs.m_targetZ);
+		u32 headerFov = SwapF32(CameraPcs.m_fov);
+		u32 headerRotate = SwapF32((kCFlatAngleHalfTurnDeg * CameraPcs.m_zRotate) / kCFlatAnglePi);
+
 		u32* objectData = saveData + 8;
 
-		saveData[0] = SwapF32(CameraPcs.m_positionX);
-		saveData[1] = SwapF32(CameraPcs.m_positionY);
-		saveData[2] = SwapF32(CameraPcs.m_positionZ);
-		saveData[3] = SwapF32(CameraPcs.m_targetX);
-		saveData[4] = SwapF32(CameraPcs.m_targetY);
-		saveData[5] = SwapF32(CameraPcs.m_targetZ);
-		saveData[6] = SwapF32(CameraPcs.m_fov);
-		saveData[7] = SwapF32((kCFlatAngleHalfTurnDeg * CameraPcs.m_zRotate) / kCFlatAnglePi);
+		saveData[0] = headerX;
+		saveData[1] = headerY;
+		saveData[2] = headerZ;
+		saveData[3] = headerTargetX;
+		saveData[4] = headerTargetY;
+		saveData[5] = headerTargetZ;
+		saveData[6] = headerFov;
+		saveData[7] = headerRotate;
 
 		u32 lastX = 0;
 		u32 lastY = 0;
@@ -1403,9 +1413,9 @@ void CFlatRuntime2::Calc()
 void CFlatRuntime2::Draw()
 {
 	CFont* font = MenuPcs.m_fonts[0];
-	font->SetScale(0.65f);
+	font->SetScale(FLOAT_80330180);
 	font->SetShadow(1);
-	font->SetMargin(0.0f);
+	font->SetMargin(FLOAT_80330140);
 	font->SetZMode(0, 0);
 	font->DrawInit();
 	font->SetTlut(7);
@@ -1421,15 +1431,15 @@ void CFlatRuntime2::Draw()
 	}
 
 	font->SetZMode(0, 0);
-	font->SetPosZ(1.0f);
+	font->SetPosZ(FLOAT_80330144);
 	Mtx44 projection;
 	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcsRaw() + 0x94), projection);
 	GXSetProjection(projection, GX_PERSPECTIVE);
 
 	font = MenuPcs.m_fonts[0];
-	font->SetScale(0.85f);
+	font->SetScale(FLOAT_80330184);
 	font->SetShadow(1);
-	font->SetMargin(0.0f);
+	font->SetMargin(FLOAT_80330140);
 	font->SetZMode(1, 1);
 	font->DrawInit();
 
@@ -1442,7 +1452,7 @@ void CFlatRuntime2::Draw()
 	}
 
 	font->SetZMode(0, 0);
-	font->SetPosZ(1.0f);
+	font->SetPosZ(FLOAT_80330144);
 	Mtx44 projection2;
 	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcsRaw() + 0x94), projection2);
 	GXSetProjection(projection2, GX_PERSPECTIVE);
@@ -1577,15 +1587,15 @@ void CFlatRuntime2::AddDebugDrawCC(Vec* from, Vec* to, float radius, int bit7, i
 	int& count = DebugDrawCCCount(runtime);
 
 	if (static_cast<unsigned int>(count) < 0x10U) {
-		DebugDrawCCEntries(runtime)[count].m_from = *from;
-		DebugDrawCCEntries(runtime)[count].m_to = *to;
+		reinterpret_cast<CFlatRuntime2*>(runtime)->m_debugDrawCCEntries[count].m_from = *from;
+		reinterpret_cast<CFlatRuntime2*>(runtime)->m_debugDrawCCEntries[count].m_to = *to;
 
-		DebugDrawCCEntries(runtime)[count].m_flagBits.m_bit7 = bit7;
-		DebugDrawCCEntries(runtime)[count].m_flagBits.m_bit6 = bit6;
+		reinterpret_cast<CFlatRuntime2*>(runtime)->m_debugDrawCCEntries[count].m_flagBits.m_bit7 = bit7;
+		reinterpret_cast<CFlatRuntime2*>(runtime)->m_debugDrawCCEntries[count].m_flagBits.m_bit6 = bit6;
 
 		const int index = count;
 		count = index + 1;
-		DebugDrawCCEntries(runtime)[index].m_radius = radius;
+		reinterpret_cast<CFlatRuntime2*>(runtime)->m_debugDrawCCEntries[index].m_radius = radius;
 		return;
 	}
 
@@ -1614,15 +1624,16 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float radius
 	const float radiusSq = radius * radius;
 	CFlatRuntime::CObject* root = FlatObjectRoot(&CFlat);
 
-	if (maxCount <= 0 || objects == 0) {
-		return 0;
-	}
-
 	CGBaseObj* baseObj = FindNextGBaseObjByCidMask(&CFlat, root->m_next->m_next, 5);
 	int count = 0;
 
-	while (baseObj != 0) {
+	do {
+		if (baseObj == 0) {
+			return count;
+		}
+
 		CGObject* object = reinterpret_cast<CGObject*>(baseObj);
+		int newCount = count;
 		const bool passesClassMask = (object->m_attrFlags & static_cast<unsigned int>(classMask)) != 0;
 		const bool passesScriptFilter =
 			((flags & 1) == 0) ||
@@ -1649,19 +1660,11 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float radius
 								facing.y = 0.0f;
 								facing.z = cos(angle);
 								if (PSVECDotProduct(&offset, &facing) <= 0.0f) {
-									baseObj = FindNextGBaseObjByCidMask(
-										&CFlat, reinterpret_cast<CFlatRuntime::CObject*>(object)->m_next, 5);
-									continue;
+									goto advance;
 								}
 							}
 
-							if ((flags & 4) != 0) {
-								objects[count] = object;
-								count++;
-								if (count == maxCount) {
-									return count;
-								}
-							} else {
+							if ((flags & 4) == 0) {
 								int insertIndex = 0;
 								for (; insertIndex < count; insertIndex++) {
 									if (distance < *reinterpret_cast<float*>(&objects[insertIndex]->m_0x44)) {
@@ -1676,8 +1679,15 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float radius
 
 								*reinterpret_cast<float*>(&object->m_0x44) = distance;
 								objects[insertIndex] = object;
-								if (count < maxCount) {
-									count++;
+								newCount = maxCount;
+								if (count + 1 < maxCount) {
+									newCount = count + 1;
+								}
+							} else {
+								newCount = count + 1;
+								objects[count] = object;
+								if (newCount == maxCount) {
+									return newCount;
 								}
 							}
 						}
@@ -1686,10 +1696,10 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float radius
 			}
 		}
 
+	advance:
 		baseObj = FindNextGBaseObjByCidMask(&CFlat, reinterpret_cast<CFlatRuntime::CObject*>(object)->m_next, 5);
-	}
-
-	return count;
+		count = newCount;
+	} while (true);
 }
 
 /*

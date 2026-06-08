@@ -3844,12 +3844,7 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 		return;
 	}
 
-	if ((down & 0x100) == 0) {
-		if ((down & 0x200) != 0) {
-			entry._pad0E = 1;
-			Sound.PlaySe(0x34, 0x40, 0x7F, 0);
-		}
-	} else {
+	if ((down & 0x100) != 0) {
 		int shopState;
 		if (m_cmakeWorkActive == 1 && m_cmakeWork != 0) {
 			shopState = *reinterpret_cast<int*>(m_cmakeWork + entry.m_currentSlot * 0x9C0 + 0x1A84);
@@ -3866,6 +3861,9 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 				GetWmCharaAnimState(this)[cursor * 5 + 1] = 3;
 			}
 		}
+	} else if ((down & 0x200) != 0) {
+		entry._pad0E = 1;
+		Sound.PlaySe(0x34, 0x40, 0x7F, 0);
 	}
 }
 

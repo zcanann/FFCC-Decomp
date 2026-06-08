@@ -761,6 +761,8 @@ void CMenuPcs::SetManaWaterEffect()
 	m_manaWaterTimerA = Game.m_gameWork.m_timerA;
 }
 
+#pragma push
+#pragma optimization_level 4
 /*
  * --INFO--
  * PAL Address: 0x80179d28
@@ -799,6 +801,7 @@ void CMenuPcs::GetOptionData()
 	flag = Game.m_gameWork.m_spModeFlags[3];
 	m_specialModeFlags[3] = static_cast<signed char>((-flag | flag) >> 31);
 }
+#pragma pop
 
 /*
  * --INFO--

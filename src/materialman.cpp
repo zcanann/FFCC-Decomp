@@ -476,7 +476,7 @@ void CMaterialMan::SetBlendMode(CMaterialSet* materialSet, int materialIndex)
  */
 void CMaterialMan::addtev_bump_st(int mode, _GXTevScale tevScale)
 {
-    float indMtx[9];
+    float indMtx[6];
 
     GXSetIndTexMtx((GXIndTexMtxID)1, reinterpret_cast<const float(*)[3]>(indMtx), 0);
     GXSetNumIndStages(1);
@@ -538,8 +538,7 @@ void CMaterialMan::addtev_bump_st(int mode, _GXTevScale tevScale)
         return;
     }
 
-    u8 hasProjTex =
-        (static_cast<unsigned int>(static_cast<int>(g_drawMaterial->m_textureIndices[3])) >> 0x1F) ^ 1;
+    int hasProjTex = g_drawMaterial->m_textureIndices[3] >= 0;
     if (hasProjTex != 0) {
         GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_bumpTexCoordIds[6]), GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY,
                           GX_FALSE, GX_PTIDENTITY);

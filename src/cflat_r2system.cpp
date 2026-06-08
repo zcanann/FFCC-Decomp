@@ -2605,7 +2605,8 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     case -0x3C:
         this->SetParticleWorkCol(
-            *object->m_localBase, object->m_localBase[1], static_cast<float>(object->m_localBase[2]));
+            *object->m_localBase, object->m_localBase[1],
+            static_cast<float>(static_cast<int>(object->m_localBase[2])));
         this->push(object, 0);
         outResult = 0;
         break;
@@ -2617,7 +2618,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     }
     case -0x49:
-        this->SetParticleWorkSpeed(static_cast<float>(*object->m_localBase));
+        this->SetParticleWorkSpeed(reinterpret_cast<float*>(object->m_localBase)[0]);
         this->push(object, 0);
         outResult = 0;
         break;

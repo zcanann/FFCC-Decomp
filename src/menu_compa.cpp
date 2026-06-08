@@ -60,10 +60,8 @@ void CMenuPcs::CompaDraw()
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	const CCaravanWork* caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
-	CompaOpenAnimList* compaList = this->m_compaList;
-	CompaOpenAnim* entry = compaList->entries;
-	unsigned int count = compaList->count;
-	for (int i = 0; i < count; i++) {
+	CompaOpenAnim* entry = this->m_compaList->entries;
+	for (int i = 0; i < this->m_compaList->count; i++) {
 		int tex = entry->tex;
 		if (tex >= 0) {
 			float x = static_cast<float>(entry->x);
@@ -168,6 +166,7 @@ void CMenuPcs::CompaDraw()
 		entry++;
 	}
 
+	CompaOpenAnimList* compaList = this->m_compaList;
 	float globalAlpha = compaList->entries[0].alpha;
 
 	GXColor color;

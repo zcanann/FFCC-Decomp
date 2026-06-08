@@ -129,7 +129,7 @@ static inline double MegaBirthHalfDouble()
     return kPppRyjMegaBirthModelHalfF64;
 }
 
-static inline unsigned char clamp_u8_int(int value)
+static inline int clamp_u8_int(int value)
 {
     if (value < 0) {
         return 0;
@@ -137,10 +137,10 @@ static inline unsigned char clamp_u8_int(int value)
     if (value > 0xFF) {
         return 0xFF;
     }
-    return (unsigned char)value;
+    return value;
 }
 
-static inline unsigned char clamp_alpha_7f(int value)
+static inline int clamp_alpha_7f(int value)
 {
     if (value < 0) {
         return 0;
@@ -148,7 +148,7 @@ static inline unsigned char clamp_alpha_7f(int value)
     if (value > 0x7F) {
         return 0x7F;
     }
-    return (unsigned char)value;
+    return value;
 }
 
 static inline float calc_spawn_speed(PRyjMegaBirthModel* params, u8 speedMode)
@@ -1039,15 +1039,15 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* stepData, _p
             alpha += (int)particleColor->m_color[3];
         }
 
-        u8 clampedRed = clamp_u8_int(red);
-        u8 clampedGreen = clamp_u8_int(green);
-        u8 clampedBlue = clamp_u8_int(blue);
-        u8 clampedAlpha = clamp_alpha_7f(alpha);
+        int clampedRed = clamp_u8_int(red);
+        int clampedGreen = clamp_u8_int(green);
+        int clampedBlue = clamp_u8_int(blue);
+        int clampedAlpha = clamp_alpha_7f(alpha);
         pppCVECTOR drawColor = {{
-            clampedRed,
-            clampedGreen,
-            clampedBlue,
-            clampedAlpha,
+            (u8)clampedRed,
+            (u8)clampedGreen,
+            (u8)clampedBlue,
+            (u8)clampedAlpha,
         }};
 
         GXSetChanAmbColor(GX_COLOR0A0, *(_GXColor*)drawColor.rgba);

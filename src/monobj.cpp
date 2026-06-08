@@ -1823,21 +1823,24 @@ void CGMonObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 		font->SetPosY(curPosY);
 		font->SetPosZ(posZ);
 		font->Draw(text);
-		posY -= static_cast<float>(font->m_glyphHeight) * font->scaleY;
+		float lineH = static_cast<float>(font->m_glyphHeight) * font->scaleY;
+		posY = posY - lineH;
 
 		int targetDist = 0;
-		if (targetIndex >= 0) {
-			targetDist = static_cast<int>(*reinterpret_cast<float*>(mon + targetIndex * 4 + 0x5D0));
+		if (m_targetPartyIndex >= 0) {
+			targetDist = static_cast<int>(*reinterpret_cast<float*>(mon + m_targetPartyIndex * 4 + 0x5D0));
 		}
 
 		int chaseRange = static_cast<int>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xCC));
 		int spawnDist = static_cast<int>(PSVECDistance(&m_homePosition, &object->m_worldPosition));
 		sprintf(text, s_monObjDistanceFmt, targetDist, spawnDist, chaseRange);
+		float curPosY2 = posY;
 		font->SetPosX(posX - static_cast<float>(font->GetWidth(text)) * 0.5f);
-		font->SetPosY(posY);
+		font->SetPosY(curPosY2);
 		font->SetPosZ(posZ);
 		font->Draw(text);
-		posY -= static_cast<float>(font->m_glyphHeight) * font->scaleY;
+		float lineH2 = static_cast<float>(font->m_glyphHeight) * font->scaleY;
+		posY = posY - lineH2;
 	}
 }
 

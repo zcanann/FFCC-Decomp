@@ -281,7 +281,7 @@ void GbaQueue::Init()
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::BlockSem(int channel)
+inline void GbaQueue::BlockSem(int channel)
 {
 	OSWaitSemaphore(accessSemaphores + channel);
 }
@@ -291,7 +291,7 @@ void GbaQueue::BlockSem(int channel)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::ReleaseSem(int channel)
+inline void GbaQueue::ReleaseSem(int channel)
 {
 	OSSignalSemaphore(accessSemaphores + channel);
 }

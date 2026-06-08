@@ -3137,7 +3137,7 @@ int CMenuPcs::GetSmithItem(int itemNo)
 
     GetItemType(itemNo, 1);
     u16 race = *reinterpret_cast<u16*>(caravanWork + 0x3e0);
-    u16 raceType = race & 3;
+    int raceType = race & 3;
     int itemBase = Game.unkCFlatData0[2] + itemNo * 0x48;
 
     int smithItem = *reinterpret_cast<u16*>((itemBase + (race & 3) * 2) + 0x38);
@@ -3169,13 +3169,31 @@ int CMenuPcs::GetSmithItem(int itemNo)
         }
     }
 
-    if ((((((race & 3) == 0) || (smithItem = *reinterpret_cast<u16*>(itemBase + 0x38), smithItem <= 0)) &&
-          ((raceType == 1) || (smithItem = *reinterpret_cast<u16*>(itemBase + 0x3A), smithItem <= 0))) &&
-         ((raceType == 2) || (smithItem = *reinterpret_cast<u16*>(itemBase + 0x3C), smithItem <= 0))) &&
-        ((raceType == 3) || (smithItem = *reinterpret_cast<u16*>(itemBase + 0x3E), smithItem <= 0))) {
-        smithItem = 0xFFFFFFFF;
+    if (raceType != 0) {
+        smithItem = *reinterpret_cast<u16*>(itemBase + 0x38);
+        if (smithItem > 0) {
+            return smithItem;
+        }
     }
-    return smithItem;
+    if (raceType != 1) {
+        smithItem = *reinterpret_cast<u16*>(itemBase + 0x3A);
+        if (smithItem > 0) {
+            return smithItem;
+        }
+    }
+    if (raceType != 2) {
+        smithItem = *reinterpret_cast<u16*>(itemBase + 0x3C);
+        if (smithItem > 0) {
+            return smithItem;
+        }
+    }
+    if (raceType != 3) {
+        smithItem = *reinterpret_cast<u16*>(itemBase + 0x3E);
+        if (smithItem > 0) {
+            return smithItem;
+        }
+    }
+    return 0xFFFFFFFF;
 }
 
 /*

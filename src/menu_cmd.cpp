@@ -636,14 +636,14 @@ void CMenuPcs::CmdOpen()
 		entry++;
 	}
 
-	bool done = false;
+	int done = 0;
 	if (list->count == finishedCount) {
 		float anim = kCmdMenuOne;
 		entry = entries;
 		if (static_cast<s32>(count) > 0) {
 			u32 batch = count >> 3;
 			if (batch != 0) {
-				do {
+				for (; batch != 0; batch--) {
 					entry[0].startFrame = 0;
 					entry[0].duration = 1;
 					entry[0].alpha = anim;
@@ -669,15 +669,14 @@ void CMenuPcs::CmdOpen()
 					entry[7].duration = 1;
 					entry[7].alpha = anim;
 					entry += 8;
-					batch -= 1;
-				} while (batch != 0);
+				}
 				count &= 7;
 				if (count == 0) {
-					done = true;
+					done = 1;
 				}
 			}
 
-			if (done == false) {
+			if (count != 0) {
 				do {
 					entry->startFrame = 0;
 					entry->duration = 1;
@@ -687,7 +686,7 @@ void CMenuPcs::CmdOpen()
 				} while (count != 0);
 			}
 		}
-		done = true;
+		done = 1;
 	}
 
 	if (done) {
@@ -894,10 +893,10 @@ int CMenuPcs::CmdClose()
 
 	if (list->count == doneCount) {
 		entry = list->entries;
-		if (list->count != 0) {
+		if (count != 0) {
 			u32 blockCount = count >> 3;
 			if (blockCount != 0) {
-				do {
+				for (; blockCount != 0; blockCount--) {
 					entry[0].startFrame = 0;
 					entry[0].duration = 1;
 					entry[0].alpha = 0.0f;
@@ -923,8 +922,7 @@ int CMenuPcs::CmdClose()
 					entry[7].duration = 1;
 					entry[7].alpha = 0.0f;
 					entry += 8;
-					blockCount = blockCount - 1;
-				} while (blockCount != 0);
+				}
 				count = count & 7;
 				if (count == 0) {
 					return 1;
@@ -1790,7 +1788,7 @@ unsigned int CMenuPcs::CmdOpen0()
 		entries[sel].x = static_cast<s16>(entries[sel].x - 0x13);
 	}
 
-	u32 doneCount = 0;
+	s32 doneCount = 0;
 	s32 entryCount = static_cast<s32>(GetCmdListStorage(this)->listEnd) - static_cast<s32>(GetCmdListStorage(this)->count);
 	CmdListEntry* entry = &entries[GetCmdListStorage(this)->count];
 	const float fVar1 = kCmdMenuZero;
@@ -1813,8 +1811,8 @@ unsigned int CMenuPcs::CmdOpen0()
 						static_cast<double>(entry->timer));
 					const float dx = entry->targetX - static_cast<float>(entry->x);
 					const float dy = entry->targetY - static_cast<float>(entry->y);
-					entry->dx = t * dx;
-					entry->dy = t * dy;
+					entry->dx = dx * t;
+					entry->dy = dy * t;
 				}
 			}
 		}
@@ -1850,7 +1848,7 @@ unsigned int CMenuPcs::CmdClose0()
 		entries[sel].x = static_cast<s16>(entries[sel].x + 0x13);
 	}
 
-	u32 doneCount = 0;
+	s32 doneCount = 0;
 	s32 entryCount = static_cast<s32>(GetCmdListStorage(this)->listEnd) - static_cast<s32>(GetCmdListStorage(this)->count);
 	CmdListEntry* entry = &entries[GetCmdListStorage(this)->count];
 
@@ -1872,8 +1870,8 @@ unsigned int CMenuPcs::CmdClose0()
 					           static_cast<f64>(entry->timer)));
 					const f32 dx = entry->targetX - static_cast<f32>(entry->x);
 					const f32 dy = entry->targetY - static_cast<f32>(entry->y);
-					entry->dx = t * dx;
-					entry->dy = t * dy;
+					entry->dx = dx * t;
+					entry->dy = dy * t;
 				}
 			}
 		}
@@ -2884,10 +2882,10 @@ unsigned int CMenuPcs::CmdClose2()
 		GetCmdStateView(this)->transitionTimer = 0;
 		if (GetCmdStateView(this)->commandResult < 0) {
 			GetCmdStateView(this)->uniteState = 3;
-		} else if (caravanWork->m_commandListExtra[selected] == 0) {
-			GetCmdStateView(this)->uniteState = 2;
-		} else {
+		} else if (caravanWork->m_commandListExtra[selected] != 0) {
 			GetCmdStateView(this)->uniteState = 1;
+		} else {
+			GetCmdStateView(this)->uniteState = 2;
 		}
 		return 0;
 	} else if (GetCmdStateView(this)->uniteState == 1) {
@@ -2904,9 +2902,9 @@ unsigned int CMenuPcs::CmdClose2()
 
 			s32 comboIdx = 0;
 			if (combo[0][1] < combo[1][1]) {
-				comboIdx = (combo[0][1] == modeSel) ? 0 : 1;
+				comboIdx = (modeSel == static_cast<u32>(combo[0][1])) ? 0 : 1;
 			} else {
-				comboIdx = (combo[1][1] == modeSel) ? 1 : 0;
+				comboIdx = (modeSel == static_cast<u32>(combo[1][1])) ? 1 : 0;
 			}
 
 			s32 ununiteCount = 1;
@@ -2931,9 +2929,9 @@ unsigned int CMenuPcs::CmdClose2()
 
 			s32 comboIdx = 0;
 			if (combo[0][1] < combo[1][1]) {
-				comboIdx = (combo[0][1] == modeSel) ? 0 : 1;
+				comboIdx = (modeSel == static_cast<u32>(combo[0][1])) ? 0 : 1;
 			} else {
-				comboIdx = (combo[1][1] == modeSel) ? 1 : 0;
+				comboIdx = (modeSel == static_cast<u32>(combo[1][1])) ? 1 : 0;
 			}
 
 			caravanWork->UniteComList(

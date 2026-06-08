@@ -3432,12 +3432,12 @@ void CMapMng::GetMapObjWMtx(int mapObjIndex, float (*destination)[4])
 #pragma dont_inline on
 void CMapMng::SetMapObjAnim(int mapObjIndex, int startFrame, int endFrame, int loop)
 {
-    CMapAnimRun* foundMapAnimRun;
+    CMapAnimRun* mapAnimRun;
     CMapObj* mapObj = m_mapObjArray + mapObjIndex;
     int mapAnimRunCount = m_mapAnimRunArray.GetSize();
 
     for (int mapAnimRunIndex = 0; mapAnimRunIndex < mapAnimRunCount; mapAnimRunIndex++) {
-        CMapAnimRun* mapAnimRun = m_mapAnimRunArray[mapAnimRunIndex];
+        mapAnimRun = m_mapAnimRunArray[mapAnimRunIndex];
         CPtrArray<CMapAnimNode*>* mapAnimNodeArray =
             reinterpret_cast<CPtrArray<CMapAnimNode*>*>(m_mapAnimArray[mapAnimRun->m_mapAnimIndex]);
         int mapAnimNodeCount = mapAnimNodeArray->GetSize();
@@ -3445,16 +3445,15 @@ void CMapMng::SetMapObjAnim(int mapObjIndex, int startFrame, int endFrame, int l
         for (int mapAnimNodeIndex = 0; mapAnimNodeIndex < mapAnimNodeCount; mapAnimNodeIndex++) {
             CMapAnimNode* mapAnimNode = (*mapAnimNodeArray)[mapAnimNodeIndex];
             if (mapAnimNode->m_node == reinterpret_cast<CMapAnimTargetNode*>(mapObj)) {
-                foundMapAnimRun = mapAnimRun;
                 goto startMapObjAnim;
             }
         }
     }
 
-    foundMapAnimRun = 0;
+    mapAnimRun = 0;
 
 startMapObjAnim:
-    foundMapAnimRun->Start(startFrame, endFrame, loop);
+    mapAnimRun->Start(startFrame, endFrame, loop);
 }
 #pragma dont_inline reset
 

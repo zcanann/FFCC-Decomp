@@ -2132,8 +2132,8 @@ int GbaQueue::GetPlayerHP(int channel, unsigned char* outData)
 	char* obj = reinterpret_cast<char*>(this);
 	char hpFlags = 0;
 	char prevHpFlags = 0;
-	char hp;
 	char prevHp;
+	char hp;
 
 	for (int i = 0; i < 4; i++) {
 		OSWaitSemaphore(accessSemaphores + i);

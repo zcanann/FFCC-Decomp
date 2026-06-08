@@ -2647,8 +2647,9 @@ int CMenuPcs::CmakeNameCtrl()
     unsigned short down;
     unsigned short repeat;
 
+    int padLock = Pad.m_debugPadLock;
     bool padBusy = false;
-    if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
+    if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
         padBusy = true;
     }
     if (padBusy) {
@@ -2660,7 +2661,7 @@ int CMenuPcs::CmakeNameCtrl()
     }
 
     padBusy = false;
-    if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
+    if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
         padBusy = true;
     }
     if (padBusy) {

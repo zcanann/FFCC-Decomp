@@ -3475,7 +3475,7 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 	default:
 		break;
 	case 0:
-		if (kind == 2 && (System.m_frameCounter % 30) == 0) {
+		if (kind == 2 && (static_cast<int>(System.m_frameCounter) % 30) == 0) {
 			addValue = stageAdd;
 		}
 		break;

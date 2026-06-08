@@ -440,7 +440,7 @@ void CMenuPcs::ItemDraw()
     MenuItemOpenAnim* textEntry = listStart;
     for (int i = 0; i < 8; i++, textEntry++) {
         int menuIndex = i + this->m_itemMenuState->scroll;
-        if (menuIndex > 0x3F) {
+        if (menuIndex >= 0x40) {
             menuIndex -= 0x40;
         }
 

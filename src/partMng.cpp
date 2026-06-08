@@ -2367,16 +2367,10 @@ void CPartMng::pppEditPartCalc()
                 continue;
             }
             if (baseTime >= 0) {
-                baseTime -= 1;
-                mng->m_baseTime = baseTime;
-                if (baseTime >= 0) {
-                    continue;
-                }
-                mng->m_particleEnded = 0;
-                *reinterpret_cast<int*>(&mng->m_envColorR) = *reinterpret_cast<int*>(self + 0x168);
-                _pppStartPart(mng, reinterpret_cast<long*>(self + 0x5dc) + recvBuff[i * 0x18 + 0xC], 1);
+                goto decrementTimerA;
             }
 
+        runFrameA:
             pppSetMatrix(mng);
             pppSetFpMatrix(mng);
             _pppCalcPart(mng);
@@ -2394,6 +2388,18 @@ void CPartMng::pppEditPartCalc()
                 }
                 gPppHeapUseRateWords[1] = 0;
             }
+            continue;
+
+        decrementTimerA:
+            baseTime -= 1;
+            mng->m_baseTime = baseTime;
+            if (baseTime >= 0) {
+                continue;
+            }
+            mng->m_particleEnded = 0;
+            *reinterpret_cast<int*>(&mng->m_envColorR) = *reinterpret_cast<int*>(self + 0x168);
+            _pppStartPart(mng, reinterpret_cast<long*>(self + 0x5dc) + recvBuff[i * 0x18 + 0xC], 1);
+            goto runFrameA;
         }
     } else {
         for (int i = 0; i < *reinterpret_cast<int*>(self + 0x4); i++) {

@@ -1096,7 +1096,7 @@ void CGCharaObj::onFrameStat()
 				break;
 			case 3:
 				if (m_subFrame == 0) {
-					reqAnim(((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) ? m_unk558 : m_unk55C, 0, 0);
+					reqAnim((((static_cast<unsigned int>(__cntlzw(0xAD - (static_cast<unsigned short>(GetCID()) & 0xAD))) >> 5) & 0xFFU) != 0) ? m_unk558 : m_unk55C, 0, 0);
 				}
 
 				if (isLoopAnim() != 0) {

@@ -959,19 +959,14 @@ cylinder_body:
             goto fail;
         }
 
+        f32 t;
         if (disc == 0.0) {
-            const f32 t = -radialB / radialA;
-            const f32 z = (t * vz) + pz;
-            if (kMapHitZero <= z && z <= axisLen) {
-                outT = t * tScale;
-                if (kMapHitZero <= outT && outT <= kMapHitUnitScale) {
-                    return 1;
-                }
-                return 0;
-            }
+            t = -radialB / radialA;
         } else {
             disc = sqrtf(disc);
-            const f32 t = (-radialB - disc) / radialA;
+            t = (-radialB - disc) / radialA;
+        }
+        {
             const f32 z = (t * vz) + pz;
             if (kMapHitZero <= z && z <= axisLen) {
                 outT = t * tScale;

@@ -1843,8 +1843,8 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 	    pppModelSt*[pppDataHead->m_modelCount];
 	pppDataHead->m_modelNames = reinterpret_cast<u32>(modelRefs);
 
-	pppModelSt* modelArray = PartMng.m_pppModelStArr;
 	for (int i = 0; i < pppDataHead->m_modelCount; i++) {
+		pppModelSt* modelArray = PartMng.m_pppModelStArr;
 		pppModelSt* model = 0;
 		for (u32 j = 0; j < 0x100; j++) {
 			if (modelArray[j].m_isUsed != 0 && strcmp(modelArray[j].m_name, modelName) == 0) {
@@ -1863,8 +1863,8 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 	    pppShapeSt*[pppDataHead->m_shapeCount];
 	pppDataHead->m_shapeNames = reinterpret_cast<u32>(shapeRefs);
 
-	pppShapeSt* shapeArray = PartMng.m_pppShapeStArr;
 	for (int i = 0; i < pppDataHead->m_shapeCount; i++) {
+		pppShapeSt* shapeArray = PartMng.m_pppShapeStArr;
 		pppShapeSt* shape = 0;
 		for (u32 j = 0; j < 0x100; j++) {
 			if (shapeArray[j].m_inUse != 0 && strcmp(shapeArray[j].m_name, shapeName) == 0) {

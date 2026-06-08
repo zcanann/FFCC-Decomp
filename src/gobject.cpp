@@ -785,8 +785,15 @@ void CGObject::objectCollision()
                 && ((m_weaponNodeFlagBits.m_attached == 0) || (m_attachOwner != other))
                 && ((other->m_weaponNodeFlagBits.m_attached == 0) || (other->m_attachOwner != this))
                 && (capsuleDistance < (m_attackColRadius + other->m_attackColRadius))) {
-                ColInfo* frontObj = thisAttack ? &self : &info;
-                ColInfo* hitObj = thisAttack ? &info : &self;
+                ColInfo* frontObj;
+                ColInfo* hitObj;
+                if (thisAttack) {
+                    frontObj = &self;
+                    hitObj = &info;
+                } else {
+                    frontObj = &info;
+                    hitObj = &self;
+                }
                 Vec dir;
                 PSVECSubtract(&hitObj->capsulePos, &frontObj->capsulePos, &dir);
                 const float hitRot = atan2f(dir.x, dir.z);

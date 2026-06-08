@@ -29,7 +29,7 @@ struct pppMana2Step {
     s32 m_envTextureId1;
     u8 m_pad2C[0x4];
     float m_waterScale;
-    u8 m_pad34[0x4];
+    float m_rippleHeight;
     u8 m_rippleLevel;
 };
 

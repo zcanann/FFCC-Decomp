@@ -715,7 +715,7 @@ void CalcReflectionVector2(
     while (dl < dlEnd) {
         u8 drawFmt = *(u8*)dl;
         u16 itemCount = *(u16*)((u8*)dl + 1);
-        unsigned int i;
+        int i;
         u32 fmt = drawFmt & 7;
 
         if (gUtil.IsHasDrawFmtDL(drawFmt) == 0) {
@@ -1257,7 +1257,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
     }
 
     if ((param_2->m_type == 1 || param_2->m_type == 2) && mana2Work->m_waterHeightA != 0) {
-        *reinterpret_cast<u32*>(reinterpret_cast<u8*>(mana2Work->m_waterHeightA) + 0x240) = param_2->m_rippleLevel;
+        mana2Work->m_waterHeightA[0x90] = param_2->m_rippleHeight;
     }
     }
 

@@ -650,19 +650,19 @@ void CMenuPcs::calcVillageMenu()
             short& frame = villageWork->m_frame;
 
             if (mode == 0) {
-                if (frame < 10) {
+                if (frame >= 10) {
+                    result = 1;
+                } else {
                     frame = frame + 1;
                     result = 0;
-                } else {
-                    result = 1;
                 }
             } else if (mode == 1) {
                 result = CmakeVillageCtrl();
-            } else if (frame < 10) {
+            } else if (frame >= 10) {
+                result = 1;
+            } else {
                 frame = frame + 1;
                 result = 0;
-            } else {
-                result = 1;
             }
 
             villageWork->m_resultFlag = static_cast<short>(result);

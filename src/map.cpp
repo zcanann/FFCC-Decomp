@@ -2319,25 +2319,27 @@ int CMapMng::ReadOtm(char* mapName)
  */
 int CMapMng::ReadMid(char* mapName)
 {
-    sprintf(g_StrTmp, const_cast<char*>(s_mapMidPathFmt), mapName);
+    char* strTmp = g_StrTmp;
+    sprintf(strTmp, const_cast<char*>(s_mapMidPathFmt), mapName);
     int ok = 1;
 
     if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-        System.Printf(const_cast<char*>(s_read_mid_fmt), g_StrTmp);
+        System.Printf(const_cast<char*>(s_read_mid_fmt), strTmp);
     }
 
-    void* filePtr = File.m_readBuffer;
+    void* filePtr;
     if (m_asyncLoadState.m_mapReadMode == 1) {
         int& readIndex = m_asyncLoadState.m_asyncReadIndex;
         const int size = m_asyncLoadState.m_fileSizes[readIndex];
         void* amemCursor = m_asyncLoadState.m_mapLoadCursor;
+        filePtr = File.m_readBuffer;
 
-        Memory.CopyFromAMemorySync(File.m_readBuffer, amemCursor, static_cast<unsigned long>((size + 0x1F) & ~0x1F));
+        Memory.CopyFromAMemorySync(filePtr, amemCursor, static_cast<unsigned long>((size + 0x1F) & ~0x1F));
         m_asyncLoadState.m_mapLoadCursor = reinterpret_cast<unsigned char*>(m_asyncLoadState.m_mapLoadCursor) + size;
         CheckSum(filePtr, size);
         readIndex += 1;
     } else {
-        CFile::CHandle* fileHandle = File.Open(g_StrTmp, 0, CFile::PRI_LOW);
+        CFile::CHandle* fileHandle = File.Open(strTmp, 0, CFile::PRI_LOW);
         if (fileHandle == 0) {
             filePtr = 0;
         } else {
@@ -2370,7 +2372,7 @@ int CMapMng::ReadMid(char* mapName)
 
     if (filePtr == 0) {
         if (System.m_execParam != 0) {
-            System.Printf(const_cast<char*>(s_mapReadErrorFmt), g_StrTmp);
+            System.Printf(const_cast<char*>(s_mapReadErrorFmt), strTmp);
         }
         return 0;
     }

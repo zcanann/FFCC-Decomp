@@ -1092,6 +1092,8 @@ void CMenuPcs::CalcSelectCloseAnim()
 }
 #pragma pop
 
+#pragma push
+#pragma opt_strength_reduction off
 /*
  * --INFO--
  * PAL Address: 0x8013473c
@@ -1366,7 +1368,10 @@ void CMenuPcs::CalcSelectWait()
 		}
 	}
 }
+#pragma pop
 
+#pragma push
+#pragma optimization_level 3
 /*
  * --INFO--
  * PAL Address: 0x80135258
@@ -1475,6 +1480,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 	DrawBonusSelectedArtifactHelp(this, statePtr, header, sprites);
 	DrawBonusMcWinOverlay(this, statePtr);
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -2037,6 +2043,7 @@ void CMenuPcs::DrawResultCloseAnim()
 #pragma push
 #pragma opt_loop_invariants off
 #pragma opt_strength_reduction off
+#pragma opt_dead_assignments off
 void CMenuPcs::CalcResultCloseAnim()
 {
 	const int activePartyCount = s_Rinfo->m_partyCount;
@@ -2311,6 +2318,7 @@ void CMenuPcs::CalcResultCloseAnim()
 
 #pragma push
 #pragma opt_dead_assignments off
+#pragma optimization_level 3
 /*
  * --INFO--
  * PAL Address: 0x80139b14

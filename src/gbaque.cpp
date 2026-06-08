@@ -345,7 +345,7 @@ void GbaQueue::LoadAll()
 		} else {
 			OSWaitSemaphore(accessSemaphores + i);
 			{
-				unsigned short maskValue = *reinterpret_cast<unsigned short*>(scriptFoodBase[i] + 0x89C);
+				unsigned short maskValue = *reinterpret_cast<short*>(scriptFoodBase[i] + 0x89C);
 				if ((maskValue != m_sendMask) && (Joybus.SendMask(i, maskValue) == 0)) {
 					m_sendMask = maskValue;
 					m_maskSendState[i] = 6;
@@ -359,7 +359,7 @@ void GbaQueue::LoadAll()
 		OSWaitSemaphore(&accessSemaphores[i]);
 	}
 	{
-		unsigned char resetMask = static_cast<unsigned char>(obj[0x2D30]);
+		signed char resetMask = static_cast<unsigned char>(obj[0x2D30]);
 		obj[0x2D30] = 0;
 		for (i = 0; i < 4; i++) {
 			OSSignalSemaphore(&accessSemaphores[i]);
@@ -1144,11 +1144,11 @@ void GbaQueue::SetRadarType()
 	char* obj = reinterpret_cast<char*>(this);
 	unsigned int validMemberCount;
 	unsigned int activeMask;
-	int assignedCount;
+	unsigned int assignedCount;
 	int prevAssignedType;
 	int i;
 
-	if (static_cast<signed char>(m_radarTypeFlags) != 0) {
+	if (static_cast<unsigned char>(m_radarTypeFlags) != 0) {
 		return;
 	}
 	if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
@@ -1321,7 +1321,7 @@ void GbaQueue::LoadPlayerStat()
 
 				*reinterpret_cast<int*>(entry + 0x24) = caravanWork->m_gil;
 				{
-					unsigned short progress = 0xFF;
+					short progress = 0xFF;
 					if (caravanWork->m_progressValue <= 0xFF) {
 						progress = caravanWork->m_progressValue;
 					}
@@ -1744,7 +1744,7 @@ void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
     short baseX;
     short baseZ;
     int count;
-    int i;
+    unsigned int i;
     char* localEntry;
     char* prevEntry;
     unsigned char* outPtr;
@@ -1807,7 +1807,7 @@ void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
         if ((localEntry[0] != 0 || prevEntry[0] != 0) && memcmp(localEntry, prevEntry, 0x14) != 0) {
             count++;
             outPtr[0] = 0x12;
-            outPtr[1] = static_cast<unsigned char>(i) | (static_cast<unsigned char>(localEntry[0]) << 7);
+            outPtr[1] = static_cast<unsigned char>(i) | (static_cast<signed char>(localEntry[0]) << 7);
             outPtr[2] = static_cast<unsigned char>(*reinterpret_cast<short*>(localEntry + 8));
             outPtr[3] = static_cast<unsigned char>(*reinterpret_cast<short*>(localEntry + 10));
             outPtr += 4;
@@ -2109,7 +2109,7 @@ int GbaQueue::GetPlayerHP(int channel, unsigned char* outData)
 
 	int hpChanged = hp != prevHp;
 	unsigned int changed = static_cast<unsigned int>(
-	    (static_cast<int>(prevHpFlags) - static_cast<int>(hpFlags)) |
+	    (static_cast<unsigned int>(prevHpFlags) - static_cast<int>(hpFlags)) |
 	    (static_cast<int>(hpFlags) - static_cast<int>(prevHpFlags))) >> 31;
 	if (hpChanged) {
 		changed = 1;
@@ -3031,7 +3031,7 @@ void GbaQueue::ChkCMakeCharaType(int channel, unsigned int value)
 		OSWaitSemaphore(accessSemaphores + i);
 	}
 
-	unsigned char playerSlot = static_cast<unsigned char>(obj[0x2CB8 + channel * 0x20]);
+	signed char playerSlot = static_cast<unsigned char>(obj[0x2CB8 + channel * 0x20]);
 	for (int i = 0; i < 4; i++) {
 		int otherOffset = i * 0x20;
 		if ((channel != i) && (cmakeInfo[i].m_active != 0) &&
@@ -3055,7 +3055,7 @@ void GbaQueue::ChkCMakeCharaType(int channel, unsigned int value)
 		char* caravanObj = reinterpret_cast<char*>(caravanWork);
 		if ((i != playerSlot) && (*reinterpret_cast<int*>(caravanObj + 0x3A4) != 0) &&
 		    (caravanObj[0xBA6] == '\0')) {
-			unsigned short existingCharaType = *reinterpret_cast<unsigned short*>(caravanObj + 0x3E0) & 0xFF;
+			short existingCharaType = *reinterpret_cast<unsigned short*>(caravanObj + 0x3E0) & 0xFF;
 			existingCharaType |= static_cast<unsigned short>(
 			    static_cast<unsigned char>(static_cast<char>(*reinterpret_cast<unsigned short*>(caravanObj + 0x3E4)) << 2));
 			if (*reinterpret_cast<short*>(caravanObj + 0x3E2) != 0) {

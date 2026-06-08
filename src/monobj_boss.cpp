@@ -2485,18 +2485,17 @@ void CGMonObj::frameStatFuncLastBoss()
 	bossPos->z = nodeMtx[2][3];
 
 	const int state = prgObj->m_lastStateId;
-	const int stateFrame = prgObj->m_stateFrame;
 
 	switch (state) {
 	case 100:
-		if (stateFrame == 0) {
+		if (prgObj->m_stateFrame == 0) {
 			reinterpret_cast<CGCharaObj*>(this)->damageDelete();
 			object->m_bgColMask &= 0xFFF7FFFF;
 			prgObj->reqAnim(0x18, 0, 0);
 
 			prgObj->putParticle((object->m_charaModelHandle->GetPdtSlot() << 8) | 0x10, 0, object, 1.0f, 0);
 			prgObj->playSe3D(0x12912, 0x32, 0x96, 0, 0);
-		} else if (stateFrame == 0x7D) {
+		} else if (prgObj->m_stateFrame == 0x7D) {
 			object->m_bodyEllipsoidRadius = kMonObjBossQuarter;
 		} else if (prgObj->isLoopAnim() != 0) {
 			object->m_bgColMask |= 0x80000;
@@ -2508,14 +2507,14 @@ void CGMonObj::frameStatFuncLastBoss()
 		}
 		return;
 	case 0x65:
-		if (stateFrame == 0) {
+		if (prgObj->m_stateFrame == 0) {
 			object->m_bgColMask &= 0xFFF7FFFF;
 			prgObj->reqAnim(0x19, 0, 0);
 
 			prgObj->putParticle((object->m_charaModelHandle->GetPdtSlot() << 8) | 0x11, 0, object, 1.0f, 0);
 			prgObj->putParticle((object->m_charaModelHandle->GetPdtSlot() << 8) | 0x12, 0, object, 1.0f, 0);
 			prgObj->playSe3D(0x12913, 0x32, 0x96, 0, 0);
-		} else if (stateFrame == 0x29) {
+		} else if (prgObj->m_stateFrame == 0x29) {
 			object->m_bodyEllipsoidRadius = kMonObjBossLargeBodyRadius;
 		} else if (prgObj->isLoopAnim() != 0) {
 			object->m_bgColMask |= 0x80000;
@@ -2527,9 +2526,9 @@ void CGMonObj::frameStatFuncLastBoss()
 		}
 		return;
 	case 0x66:
-		if (stateFrame == 0) {
+		if (prgObj->m_stateFrame == 0) {
 			prgObj->putParticle((object->m_charaModelHandle->GetPdtSlot() << 8) | 5, *reinterpret_cast<int*>(mon + 0x58C), object, 1.0f, 0x12902);
-		} else if (stateFrame == 0x4B) {
+		} else if (prgObj->m_stateFrame == 0x4B) {
 			CGPartyObj** work = reinterpret_cast<CGPartyObj**>(CGMonObj::m_boss);
 			for (int i = 0; i < 4; i++) {
 				CGPartyObj* party = work[i + 2];
@@ -2542,7 +2541,7 @@ void CGMonObj::frameStatFuncLastBoss()
 					}
 				}
 			}
-		} else if (stateFrame == 200) {
+		} else if (prgObj->m_stateFrame == 200) {
 			CGPartyObj** work = reinterpret_cast<CGPartyObj**>(CGMonObj::m_boss);
 			for (int i = 0; i < 4; i++) {
 				CGPartyObj* party = work[i + 2];

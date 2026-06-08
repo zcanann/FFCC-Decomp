@@ -140,17 +140,17 @@ static inline int RemapPadSlot(CPad* pad, int padIndex)
 
 static inline float& ModelChestAmp(CChara::CModel* model)
 {
-    return *reinterpret_cast<float*>(ModelBytes(model) + 0xB4);
+    return *reinterpret_cast<float*>(ModelBytes(model) + 0xDC);
 }
 
 static inline float& ModelChestTilt(CChara::CModel* model)
 {
-    return *reinterpret_cast<float*>(ModelBytes(model) + 0xB8);
+    return *reinterpret_cast<float*>(ModelBytes(model) + 0xE0);
 }
 
 static inline float& ModelTwistAngle(CChara::CModel* model)
 {
-    return *reinterpret_cast<float*>(ModelBytes(model) + 0xBC);
+    return *reinterpret_cast<float*>(ModelBytes(model) + 0x120);
 }
 
 static inline Vec& ModelWindVector(CChara::CModel* model)
@@ -1623,17 +1623,19 @@ void CGObject::update()
         if (lookBlend == sZeroFloat) {
             lookBlend = sBgAttrFast;
         }
-        ModelChestAmp(model) += lookBlend * (lookYaw - ModelChestAmp(model));
-        ModelChestTilt(model) += lookBlend * (lookPitch - ModelChestTilt(model));
-        ModelTwistAngle(model) += sBgAttrFast * (*reinterpret_cast<float*>(m_worldMode) - ModelTwistAngle(model));
+        CChara::CModel* chestModel = m_charaModelHandle->m_model;
+        ModelChestAmp(chestModel) += lookBlend * (lookYaw - ModelChestAmp(chestModel));
+        ModelChestTilt(chestModel) += lookBlend * (lookPitch - ModelChestTilt(chestModel));
+        ModelTwistAngle(m_charaModelHandle->m_model) +=
+            sBgAttrFast * (*reinterpret_cast<float*>(m_worldMode) - ModelTwistAngle(m_charaModelHandle->m_model));
 
-        model->SetMatrix(modelMtx);
+        m_charaModelHandle->m_model->SetMatrix(modelMtx);
 
         Vec windVec;
         Wind.Calc(&windVec, &m_worldPosition, 0);
         windVec.x = -(m_groundHitOffset.x * Math.RandF() - windVec.x);
         windVec.z = -(m_groundHitOffset.z * Math.RandF() - windVec.z);
-        ModelWindVector(model) = windVec;
+        ModelWindVector(m_charaModelHandle->m_model) = windVec;
 
         boundCheck();
 

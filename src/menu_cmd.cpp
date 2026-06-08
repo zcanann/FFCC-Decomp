@@ -2288,7 +2288,11 @@ void CMenuPcs::DrawUniteList()
 			}
 		}
 
-		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((groupSize == 2) ? 0x36 : 0x35));
+		s32 barTex = 0x35;
+		if (groupSize == 2) {
+			barTex = 0x36;
+		}
+		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(barTex));
 		MenuPcs.DrawRect(0,
 			rectX,
 			rectY,

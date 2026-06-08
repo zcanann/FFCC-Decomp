@@ -797,7 +797,7 @@ void CMenuPcs::CmakeVillageDraw()
     col.r = 0xFF;
     col.g = 0xFF;
     col.b = 0xFF;
-    col.a = static_cast<unsigned char>(static_cast<int>(255.0f * alpha));
+    col.a = static_cast<unsigned char>(static_cast<unsigned int>(255.0f * alpha));
     GXSetChanMatColor(GX_COLOR0A0, col);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x68 : 0x41));
     MenuPcs.DrawRect(

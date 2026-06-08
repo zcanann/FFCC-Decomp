@@ -917,13 +917,12 @@ void CGMonObj::logicFuncSaw()
  */
 void CGMonObj::moveFrameFuncSaw()
 {
-	float& phase0 = *reinterpret_cast<float*>(SoundBuffer + 1260);
-	float& phase1 = *reinterpret_cast<float*>(SoundBuffer + 1264);
-	const float wave = kMonObjBossQuarter * (kMonObjBossOne + sinf(phase1)) + kMonObjBossHalf;
-	m_moveWork.m_targetPos.x = wave * (kMonObjBossWaveXRadius * sinf(phase0));
-	m_moveWork.m_targetPos.z = wave * (kMonObjBossAttackRange * cosf(phase0));
-	phase0 = phase0 + kMonObjBossWavePhaseAccel * (kMonObjBossHalf - (wave - kMonObjBossHalf)) + kMonObjBossScaleStep;
-	phase1 = phase1 + kMonObjBossWavePhaseStep;
+	const float wave = kMonObjBossQuarter * (kMonObjBossOne + sinf(*reinterpret_cast<float*>(CGMonObj::m_boss + 0x4))) + kMonObjBossHalf;
+	m_moveWork.m_targetPos.x = wave * (kMonObjBossWaveXRadius * sinf(*reinterpret_cast<float*>(CGMonObj::m_boss)));
+	m_moveWork.m_targetPos.z = wave * (kMonObjBossAttackRange * cosf(*reinterpret_cast<float*>(CGMonObj::m_boss)));
+	*reinterpret_cast<float*>(CGMonObj::m_boss) = *reinterpret_cast<float*>(CGMonObj::m_boss) +
+	    kMonObjBossWavePhaseAccel * (kMonObjBossHalf - (wave - kMonObjBossHalf)) + kMonObjBossScaleStep;
+	*reinterpret_cast<float*>(CGMonObj::m_boss + 0x4) = *reinterpret_cast<float*>(CGMonObj::m_boss + 0x4) + kMonObjBossWavePhaseStep;
 }
 
 /*

@@ -135,7 +135,7 @@ public:
     int SendScouInfo(ThreadParam* threadParam);
     int SendOpenMenu(ThreadParam* threadParam, char menuId);
     int SendItemUse(ThreadParam* threadParam);
-    void SendSPMode(ThreadParam* threadParam);
+    int SendSPMode(ThreadParam* threadParam);
     int SendMemorys(ThreadParam* threadParam);
     int SendChgCmdNum(ThreadParam* threadParam);
     int SendStartBonus(ThreadParam* threadParam);

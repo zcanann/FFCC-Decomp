@@ -3444,16 +3444,14 @@ void CMenuPcs::CalcLoadMenu()
 				if (m_wmWorldState->m_menuMode == 8) {
 					int unk838 = reinterpret_cast<int>(m_wmCharaState);
 					int iVar23 = 0;
-					int cnt = 4;
 					int off = 0;
-					do {
+					for (int i = 0; i < 4; i++) {
 						if (*reinterpret_cast<char*>(unk838 + off + 0x42) == 0
 						    && *reinterpret_cast<int*>(unk838 + off + 8) > 0) {
 							iVar23++;
 						}
 						off += 0x48;
-						cnt--;
-					} while (cnt != 0);
+					}
 					if (iVar23 == 0) {
 						m_wmWorldState->m_mcResult = (short)0xFC19;
 					}
@@ -3473,10 +3471,9 @@ void CMenuPcs::CalcLoadMenu()
 
 				int iVar23 = 0;
 				iVar10 = 0;
-				int cnt2 = 4;
 				int bestIdx = -1;
 				int* piVar5 = calTimes;
-				do {
+				for (; iVar23 < 4; iVar23++) {
 					int iVar17 = bestIdx;
 					if (*reinterpret_cast<char*>(unk838 + iVar10 + 0x42) == 0
 					    && *reinterpret_cast<int*>(unk838 + iVar10 + 8) > 0) {
@@ -3502,26 +3499,21 @@ void CMenuPcs::CalcLoadMenu()
 					}
 					iVar10 += 0x48;
 					piVar5 += 10;
-					iVar23++;
-					cnt2--;
 					bestIdx = iVar17;
-				} while (cnt2 != 0);
+				}
 				if (bestIdx < 0) bestIdx = 0;
 
 				m_wmWorldState->m_cardChannel = (short)bestIdx;
 				iVar10 = 0;
 				iVar14 = 0;
-				int cnt3 = 4;
-				do {
+				for (; iVar10 < 4; iVar10++) {
 					if (*reinterpret_cast<char*>(unk838 + iVar14 + 0x42) != 0) {
 						m_mcCtrl.m_saveIndex = iVar10;
 						m_wmWorldState->m_cardChannel = (short)iVar10;
 						break;
 					}
 					iVar14 += 0x48;
-					iVar10++;
-					cnt3--;
-				} while (cnt3 != 0);
+				}
 				m_wmWorldState->m_state0E = 1;
 				m_wmWorldState->m_counter1A = 10;
 			}
@@ -5369,7 +5361,7 @@ void CMenuPcs::DrawLoadMenu()
 			}
 			break;
 		case 1:
-			if (m_wmWorldState->m_frameCounter > 0x12) {
+			if (m_wmWorldState->m_frameCounter >= 0x13) {
 				m_wmWorldState->m_subState = 3;
 			}
 			m_wmWorldState->m_frameCounter++;
@@ -6142,19 +6134,19 @@ unsigned int CMenuPcs::GetWorldParam(int code)
 
 	switch (code) {
 	case 0:
-		result = static_cast<unsigned int>(static_cast<signed char>(bytes[4]));
+		result = *reinterpret_cast<signed char*>(bytes + 4);
 		break;
 	case 1:
-		result = static_cast<unsigned int>(static_cast<signed char>(bytes[6]));
+		result = *reinterpret_cast<signed char*>(bytes + 6);
 		break;
 	case 2:
 		result = static_cast<unsigned int>(*reinterpret_cast<short*>(bytes + 0x1A));
 		break;
 	case 3:
-		result = static_cast<unsigned int>(static_cast<signed char>(bytes[7]));
+		result = *reinterpret_cast<signed char*>(bytes + 7);
 		break;
 	case 4:
-		result = static_cast<unsigned int>(static_cast<signed char>(bytes[8]));
+		result = *reinterpret_cast<signed char*>(bytes + 8);
 		break;
 	case 5:
 		result = static_cast<unsigned int>(*reinterpret_cast<short*>(bytes + 0x1C));
@@ -6163,13 +6155,13 @@ unsigned int CMenuPcs::GetWorldParam(int code)
 		result = static_cast<unsigned int>(*reinterpret_cast<short*>(bytes + 0x1E));
 		break;
 	case 7:
-		result = static_cast<unsigned int>(static_cast<signed char>(bytes[9]));
+		result = *reinterpret_cast<signed char*>(bytes + 9);
 		break;
 	case 8:
-		result = static_cast<unsigned int>(static_cast<signed char>(bytes[0xC]));
+		result = *reinterpret_cast<signed char*>(bytes + 0xC);
 		break;
 	case 9:
-		result = static_cast<unsigned int>(static_cast<signed char>(bytes[0xD]));
+		result = *reinterpret_cast<signed char*>(bytes + 0xD);
 		break;
 	case 10:
 		result = (-static_cast<unsigned int>(bytes[0x10]) | static_cast<unsigned int>(bytes[0x10])) >> 31;
@@ -6178,7 +6170,7 @@ unsigned int CMenuPcs::GetWorldParam(int code)
 		result = (-static_cast<unsigned int>(bytes[0x11]) | static_cast<unsigned int>(bytes[0x11])) >> 31;
 		break;
 	case 12:
-		result = static_cast<unsigned int>(static_cast<signed char>(bytes[0xE]));
+		result = *reinterpret_cast<signed char*>(bytes + 0xE);
 		break;
 	case 13:
 		result = static_cast<unsigned int>(static_cast<signed char>(bytes[0xF]));
@@ -6190,7 +6182,7 @@ unsigned int CMenuPcs::GetWorldParam(int code)
 		result = (-static_cast<unsigned int>(bytes[0x13]) | static_cast<unsigned int>(bytes[0x13])) >> 31;
 		break;
 	case 16:
-		result = static_cast<unsigned int>(static_cast<signed char>(bytes[0x17]));
+		result = *reinterpret_cast<signed char*>(bytes + 0x17);
 		break;
 	case 0x11: {
 		int iVar1;
@@ -6237,6 +6229,12 @@ unsigned int CMenuPcs::GetWorldParam(int code)
 	case 0x15:
 		result = 0x16;
 		break;
+	case 0x16:
+	case 0x17:
+	case 0x18:
+	case 0x19:
+	case 0x1a:
+	case 0x1b:
 	default:
 		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
 			System.Printf(const_cast<char*>(s__s__d___Error_function_code_not_f_801dc3ec), s_wm_menu_cpp, 0x1521, code);
@@ -10988,7 +10986,7 @@ LAB_draw:
 		}
 	}
 
-	if (worldState->m_subState > 0x10 &&
+	if (worldState->m_subState >= 0x11 &&
 	    worldState->m_mainState < 3) {
 		unsigned char* const mcData = m_wmCharaState;
 		for (int slot = 0; slot < kMcListCount; slot++) {
@@ -11219,7 +11217,7 @@ LAB_draw:
 	}
 
 	// Draw text info for each save slot
-	if (worldState->m_subState > 0x10 &&
+	if (worldState->m_subState >= 0x11 &&
 	    worldState->m_mainState < 3) {
 		unsigned int* mcData = reinterpret_cast<unsigned int*>(m_wmCharaState);
 		for (int slot = 0; slot < 4; slot++) {
@@ -13495,6 +13493,8 @@ int McCtrl::Format(int unmountAfter)
 			}
 		}
 		break;
+	case 4:
+		break;
 	}
 
 	int result;
@@ -13654,6 +13654,8 @@ int McCtrl::ChkEmpty(int param_2)
 				m_state = 4;
 			}
 		}
+		break;
+	case 4:
 		break;
 	}
 

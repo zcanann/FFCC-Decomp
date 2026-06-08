@@ -5205,15 +5205,14 @@ void CMenuPcs::DrawLoadMenu()
 	short state = m_wmWorldState->m_mainState;
 	float alpha;
 	if (state > 0 && state < 4) {
+		double raw;
 		if (state == 1) {
-			double raw;
 			reinterpret_cast<int*>(&raw)[0] = 0x43300000;
 			reinterpret_cast<int*>(&raw)[1] = static_cast<int>(m_wmWorldState->m_frameCounter) ^ 0x80000000;
 			alpha = static_cast<float>(DOUBLE_803314E8 * (raw - DOUBLE_80331408));
 		} else if (state == 2) {
 			alpha = FLOAT_803313e8;
 		} else {
-			double raw;
 			reinterpret_cast<int*>(&raw)[0] = 0x43300000;
 			reinterpret_cast<int*>(&raw)[1] = static_cast<int>(m_wmWorldState->m_frameCounter) ^ 0x80000000;
 			alpha = static_cast<float>(-(DOUBLE_803314E8 * (raw - DOUBLE_80331408) - DOUBLE_80331420));
@@ -13434,6 +13433,9 @@ int McCtrl::LoadDat()
 				m_state = 7;
 			}
 		}
+		break;
+
+	case 7:
 		break;
 	}
 

@@ -4770,7 +4770,7 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
 
             m_txWordIndex[threadParam->m_portIndex] = 0;
 
-            signed char classFlags[4];
+            unsigned char classFlags[4];
             memset(classFlags, 0xFF, sizeof(classFlags));
 
             unsigned char payload[0x300];

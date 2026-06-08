@@ -701,9 +701,11 @@ CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int mode
  */
 void CMemory::HeapWalker()
 {
+    const char* strBase = reinterpret_cast<const char*>(sHeapBarColors);
+
     System.Printf(const_cast<char*>(sHeapWalkerNewline));
     System.Printf(const_cast<char*>(sHeapWalkerSlashLine));
-    System.Printf(const_cast<char*>(sHeapWalkerTitle));
+    System.Printf(const_cast<char*>(strBase + 0x754));
     System.Printf(const_cast<char*>(sHeapWalkerSlashLine));
 
     CMode* modeData = m_modes;
@@ -724,19 +726,19 @@ void CMemory::HeapWalker()
             do {
                 unsigned int useKB = static_cast<unsigned int>(stage->m_heapBottom - stage->m_heapTop)
                     >> 10;
-                System.Printf(const_cast<char*>(sHeapWalkerUseFmt), useKB, stage->m_allocationSourceStr);
+                System.Printf(const_cast<char*>(strBase + 0x764), useKB, stage->m_allocationSourceStr);
                 useTotal += useKB;
 
                 unsigned int unuseKB = static_cast<unsigned int>(
                     stage->m_next->m_heapTop - stage->m_heapBottom)
                     >> 10;
-                System.Printf(const_cast<char*>(sHeapWalkerUnuseFmt), unuseKB);
+                System.Printf(const_cast<char*>(strBase + 0x778), unuseKB);
                 stage = stage->m_next;
                 unuseTotal += unuseKB;
             } while (stage != listHead);
 
             System.Printf(
-                const_cast<char*>(sHeapWalkerTotalFmt), useTotal + unuseTotal, useTotal, unuseTotal);
+                const_cast<char*>(strBase + 0x788), useTotal + unuseTotal, useTotal, unuseTotal);
         }
 
     }

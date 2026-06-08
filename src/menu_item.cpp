@@ -70,8 +70,7 @@ STATIC_ASSERT(offsetof(ItemMenuState, optionFrame) == 0x12);
 STATIC_ASSERT(offsetof(ItemMenuState, optionIndex) == 0x14);
 STATIC_ASSERT(offsetof(ItemMenuState, cursorMove) == 0x1E);
 STATIC_ASSERT(offsetof(ItemMenuState, frame) == 0x22);
-STATIC_ASSERT(offsetof(ItemMenuState, selectedIndex) == 0x26);
-STATIC_ASSERT(offsetof(ItemMenuState, subMenuIndex) == 0x28);
+STATIC_ASSERT(offsetof(ItemMenuState, cursorIndex) == 0x26);
 STATIC_ASSERT(offsetof(ItemMenuState, mode) == 0x30);
 STATIC_ASSERT(offsetof(ItemMenuState, prevMode) == 0x32);
 STATIC_ASSERT(offsetof(ItemMenuState, scroll) == 0x34);
@@ -150,28 +149,29 @@ int CMenuPcs::ItemCtrlCur()
 
     if (mode == 0) {
         if ((hold & 8) != 0) {
-            if (this->m_itemMenuState->selectedIndex != 0) {
-                this->m_itemMenuState->selectedIndex = this->m_itemMenuState->selectedIndex - 1;
+            if (this->m_itemMenuState->cursorIndex[mode] != 0) {
+                this->m_itemMenuState->cursorIndex[mode] = this->m_itemMenuState->cursorIndex[mode] - 1;
                 Sound.PlaySe(1, 0x40, 0x7F, 0);
             } else {
-                if (this->m_itemMenuState->scroll == 0) {
-                    this->m_itemMenuState->scroll = 0x3F;
-                } else {
+                if (this->m_itemMenuState->scroll != 0) {
                     this->m_itemMenuState->scroll = this->m_itemMenuState->scroll - 1;
+                    Sound.PlaySe(1, 0x40, 0x7F, 0);
+                } else {
+                    this->m_itemMenuState->scroll = 0x3F;
+                    Sound.PlaySe(1, 0x40, 0x7F, 0);
                 }
-                Sound.PlaySe(1, 0x40, 0x7F, 0);
             }
         } else if ((hold & 4) != 0) {
-            if (this->m_itemMenuState->selectedIndex < 7) {
-                this->m_itemMenuState->selectedIndex = this->m_itemMenuState->selectedIndex + 1;
+            if (this->m_itemMenuState->cursorIndex[mode] < 7) {
+                this->m_itemMenuState->cursorIndex[mode] = this->m_itemMenuState->cursorIndex[mode] + 1;
                 Sound.PlaySe(1, 0x40, 0x7F, 0);
             } else {
                 s16 scroll = this->m_itemMenuState->scroll;
-                if (scroll >= 0x3F) {
-                    this->m_itemMenuState->scroll = 0;
+                if (scroll < 0x3F) {
+                    this->m_itemMenuState->scroll = scroll + 1;
                     Sound.PlaySe(1, 0x40, 0x7F, 0);
                 } else {
-                    this->m_itemMenuState->scroll = scroll + 1;
+                    this->m_itemMenuState->scroll = 0;
                     Sound.PlaySe(1, 0x40, 0x7F, 0);
                 }
             }
@@ -193,14 +193,14 @@ int CMenuPcs::ItemCtrlCur()
                 }
                 Sound.PlaySe(4, 0x40, 0x7F, 0);
             } else if ((press & 0x100) != 0) {
-                int idx = this->m_itemMenuState->scroll + this->m_itemMenuState->selectedIndex;
+                int idx = this->m_itemMenuState->scroll + this->m_itemMenuState->cursorIndex[mode];
                 if (idx >= 0x40) {
                     idx -= 0x40;
                 }
 
                 s16 itemId = caravanWork->m_inventoryItems[idx];
 
-                if ((itemId < 1) || (EquipChk(idx) != 0) ||
+                if ((itemId <= 0) || (EquipChk(idx) != 0) ||
                     ((letterAttachFlg >= 0) && (itemId < 0x125))) {
                     Sound.PlaySe(4, 0x40, 0x7F, 0);
                 } else if (letterAttachFlg >= 0) {
@@ -209,7 +209,7 @@ int CMenuPcs::ItemCtrlCur()
                     return 1;
                 } else {
                     this->m_itemMenuState->optionFlags = 0xC;
-                    unsigned int itemType = GetItemType(idx, 0);
+                    int itemType = GetItemType(idx, 0);
 
                     if ((itemType == 7) && (caravanWork->CanPlayerUseItem() != 0)) {
                         this->m_itemMenuState->optionFlags = this->m_itemMenuState->optionFlags | 1;
@@ -241,28 +241,28 @@ int CMenuPcs::ItemCtrlCur()
         }
     } else {
         if ((hold & 8) != 0) {
-            if (this->m_itemMenuState->subMenuIndex != 0) {
-                this->m_itemMenuState->subMenuIndex = this->m_itemMenuState->subMenuIndex - 1;
+            if (this->m_itemMenuState->cursorIndex[mode] != 0) {
+                this->m_itemMenuState->cursorIndex[mode] = this->m_itemMenuState->cursorIndex[mode] - 1;
             } else {
-                this->m_itemMenuState->subMenuIndex = 3;
+                this->m_itemMenuState->cursorIndex[mode] = 3;
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else if ((hold & 4) != 0) {
-            if (this->m_itemMenuState->subMenuIndex < 3) {
-                this->m_itemMenuState->subMenuIndex = this->m_itemMenuState->subMenuIndex + 1;
+            if (this->m_itemMenuState->cursorIndex[mode] < 3) {
+                this->m_itemMenuState->cursorIndex[mode] = this->m_itemMenuState->cursorIndex[mode] + 1;
             } else {
-                this->m_itemMenuState->subMenuIndex = 0;
+                this->m_itemMenuState->cursorIndex[mode] = 0;
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
 
         if ((hold & 0xC) == 0) {
             if ((press & 0x100) != 0) {
-                int option = (int)this->m_itemMenuState->subMenuIndex;
+                int option = (int)this->m_itemMenuState->cursorIndex[mode];
                 if (((int)this->m_itemMenuState->optionFlags & (1 << option)) == 0) {
                     Sound.PlaySe(4, 0x40, 0x7F, 0);
                 } else {
-                    int idx = this->m_itemMenuState->scroll + this->m_itemMenuState->selectedIndex;
+                    int idx = this->m_itemMenuState->scroll + this->m_itemMenuState->cursorIndex[0];
                     if (idx >= 0x40) {
                         idx -= 0x40;
                     }
@@ -313,9 +313,9 @@ void CMenuPcs::ItemDraw()
     s16 listState = this->m_itemMenuState->listState;
     s16 mode = this->m_itemMenuState->mode;
     ItemMenuAnimList* itemList = this->m_itemList;
-    bool hasLetterAttach = SingGetLetterAttachflg() >= 0;
-    int drawIndex = 0;
     MenuItemOpenAnim* entry = itemList->anims;
+    int drawIndex = 0;
+    bool hasLetterAttach = SingGetLetterAttachflg() >= 0;
 
     for (int i = 0; i < this->m_itemList->count; i++, entry++) {
         int tex = entry->tex;
@@ -398,15 +398,15 @@ void CMenuPcs::ItemDraw()
                 if ((itemId < 1) || (EquipChk(menuIndex) != 0) ||
                     (hasLetterAttach && (itemId < 0x125))) {
                     if (EquipChk(menuIndex) != 0) {
-                        int markX = (unsigned int)(x - LoadFloat(kItemMarkXOffset));
-                        int markY = (unsigned int)((float)((h - LoadFloat(kItemMarkHeight)) * (float)LoadDouble(kItemHalfDouble)) + y);
+                        int markX = (int)(x - LoadFloat(kItemMarkXOffset));
+                        int markY = (int)((h - LoadFloat(kItemMarkHeight)) * LoadDouble(kItemHalfDouble) + y);
                         DrawEquipMark(markX, markY, alpha);
                     }
                     tex = 0x34;
                     itemAlpha = (float)((double)LoadDouble(kItemHalfDouble) * (double)alpha);
                 }
 
-                if (tex == 0x37 && drawIndex == this->m_itemMenuState->selectedIndex) {
+                if (tex == 0x37 && drawIndex == this->m_itemMenuState->cursorIndex[0]) {
                     v += h;
                 }
                 drawIndex++;
@@ -440,7 +440,7 @@ void CMenuPcs::ItemDraw()
     MenuItemOpenAnim* textEntry = listStart;
     for (int i = 0; i < 8; i++, textEntry++) {
         int menuIndex = i + this->m_itemMenuState->scroll;
-        if (menuIndex > 0x3F) {
+        if (menuIndex >= 0x40) {
             menuIndex -= 0x40;
         }
 
@@ -450,7 +450,7 @@ void CMenuPcs::ItemDraw()
         s16 itemId = caravanWork->m_inventoryItems[menuIndex];
         if (itemId > 0) {
             const char* text = Game.m_cFlatDataArr[1].TableStrings(0)[itemId * 5 + 4];
-            unsigned int selectedIndex = this->m_itemMenuState->selectedIndex + this->m_itemMenuState->scroll;
+            unsigned int selectedIndex = this->m_itemMenuState->cursorIndex[0] + this->m_itemMenuState->scroll;
             if (selectedIndex > 0x3F) {
                 selectedIndex -= 0x40;
             }
@@ -471,7 +471,7 @@ void CMenuPcs::ItemDraw()
     MenuItemOpenAnim* iconEntry = listStart;
     for (int i = 0; i < 8; i++, iconEntry++) {
         int menuIndex = i + this->m_itemMenuState->scroll;
-        if (menuIndex > 0x3F) {
+        if (menuIndex >= 0x40) {
             menuIndex -= 0x40;
         }
 
@@ -511,7 +511,7 @@ void CMenuPcs::ItemDraw()
                 }
             }
 
-            cursorEntry += this->m_itemMenuState->selectedIndex;
+            cursorEntry += this->m_itemMenuState->cursorIndex[0];
             cursorX = (float)(cursorEntry->x - 0x14);
             cursorY = (float)((float)(cursorEntry->h - 0x20) * (float)LoadDouble(kItemHalfDouble) + (float)cursorEntry->y);
         } else {
@@ -519,7 +519,7 @@ void CMenuPcs::ItemDraw()
             cursorX = (float)window->x;
             cursorY = (float)(window->y + 0x20);
             int messageHeight = SingWinMessHeight();
-            cursorY += (float)(this->m_itemMenuState->subMenuIndex * messageHeight);
+            cursorY += (float)(this->m_itemMenuState->cursorIndex[1] * messageHeight);
         }
 
         int cursorAnim = (int)System.m_frameCounter % 8;
@@ -864,8 +864,8 @@ void CMenuPcs::ItemInit()
         entry->tex = 0x37;
         count = count + 2;
         entry->x = itemList->anims[0].x + 0x24;
-        int nextY = yOffset + 0x20;
         entry->y = itemList->anims[0].y + yOffset;
+        yOffset = yOffset + 0x20;
         entry->w = 200;
         entry->h = 0x28;
         entry->u = zero;
@@ -877,8 +877,8 @@ void CMenuPcs::ItemInit()
         entry->flags = 2;
         entry->tex = 0x37;
         entry->x = itemList->anims[0].x + 0x24;
-        yOffset = yOffset + 0x40;
-        entry->y = itemList->anims[0].y + nextY;
+        entry->y = itemList->anims[0].y + yOffset;
+        yOffset = yOffset + 0x20;
         entry->w = 200;
         entry->h = 0x28;
         entry->u = zero;
@@ -888,6 +888,6 @@ void CMenuPcs::ItemInit()
     }
 
     this->m_itemList->count = count;
-    this->m_itemMenuState->selectedIndex = 0;
+    this->m_itemMenuState->cursorIndex[0] = 0;
     this->m_itemMenuState->initialized = 1;
 }

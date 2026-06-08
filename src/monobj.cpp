@@ -1440,7 +1440,7 @@ void CGMonObj::onStatMagic()
 					}
 				}
 
-				CGPrgObj* targetPrg = reinterpret_cast<CGPrgObj*>(target);
+				CGPrgObj* targetPrg = reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]);
 				targetPrg->bonus(0x17, *reinterpret_cast<int*>(mon + 0x560), targetPrg);
 			}
 

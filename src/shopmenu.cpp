@@ -881,7 +881,7 @@ void drawShp(tagOAN3_SHAPE* shape, CMaterialSet* materialSet, unsigned char alph
  */
 void drawShapeSeq0(int shapeNo, int groupNo, unsigned char alpha, unsigned char tlut)
 {
-    drawShapeSeq(shapeNo, groupNo, 0, 0, alpha, 0, 0, 0.0f, tlut);
+    drawShapeSeq(shapeNo, groupNo, 0, 0, alpha, 0, 0, FLOAT_80332d9c, tlut);
 }
 
 
@@ -1492,13 +1492,13 @@ void CShopMenu::DrawSoubiBase()
  */
 inline void CShopMenu::DrawObi(int)
 {
-    drawShapeSeq(5, 0, 0x32, 0x104, 0xFF, 0, 0, 0.0f, 0);
+    drawShapeSeq(5, 0, 0x32, 0x104, 0xFF, 0, 0, FLOAT_80332d9c, 0);
     int x = 0x52;
     while (x < 0x20E) {
-        drawShapeSeq(6, 0, x, 0x104, 0xFF, 0, 0, 0.0f, 0);
+        drawShapeSeq(6, 0, x, 0x104, 0xFF, 0, 0, FLOAT_80332d9c, 0);
         x += 0x20;
     }
-    drawShapeSeq(5, 0, x, 0x104, 0xFF, 1, 0, 0.0f, 0);
+    drawShapeSeq(5, 0, x, 0x104, 0xFF, 1, 0, FLOAT_80332d9c, 0);
 }
 /*
  * --INFO--
@@ -2024,10 +2024,10 @@ void CShopMenu::DrawMake()
     MenuPcs.DrawInit();
 
     for (int barX = 0x1F6; barX > 0x32; barX -= 0x10) {
-        drawShapeSeq(0xC, 0, barX, 0x18C, 0xFF, 0, 0, 0.0f, 0);
+        drawShapeSeq(0xC, 0, barX, 0x18C, 0xFF, 0, 0, FLOAT_80332d9c, 0);
     }
-    drawShapeSeq(0xB, 0, 0x226, 0x168, 0xFF, 0, 0, 0.0f, 0);
-    drawShapeSeq(1, 1, 0x36, 0x18C, 0xFF, 0, 0, 0.0f, 0);
+    drawShapeSeq(0xB, 0, 0x226, 0x168, 0xFF, 0, 0, FLOAT_80332d9c, 0);
+    drawShapeSeq(1, 1, 0x36, 0x18C, 0xFF, 0, 0, FLOAT_80332d9c, 0);
 
     SetupShopMenuLabelFont(labelFont);
     DrawShopMenuCenteredText(labelFont, ShopMenuMes(languageId, SHOP_MENU_TEXT_CRAFT), 148.0f, 332.0f);

@@ -159,7 +159,7 @@ void CGraphic::Init()
 
     GXRenderModeObj* renderMode = m_renderMode;
     u32 alignedWidth = (renderMode->fbWidth + 0xF) & 0xFFF0;
-    u16 efbHeight = renderMode->efbHeight;
+    s16 efbHeight = renderMode->efbHeight;
     u16 xfbHeight = renderMode->xfbHeight;
     u32 efbBufferSize = alignedWidth * efbHeight * 2;
     u32 xfbBufferSize = alignedWidth * xfbHeight * 2;
@@ -519,7 +519,7 @@ void CGraphic::Thread()
             if (debugCountdown == 0) {
                 u32 drawSyncRaw = GXReadDrawSync();
                 drawSyncRaw &= 0xFFFF;
-                int drawSyncPart = drawSyncRaw;
+                unsigned int drawSyncPart = drawSyncRaw;
                 if ((drawSyncRaw & 0x8000) != 0) {
                     drawSyncPart &= 0x7FFF;
                     if (drawSyncPart == 0x7FFF) {

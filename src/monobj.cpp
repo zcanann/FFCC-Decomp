@@ -3061,7 +3061,6 @@ void CGMonObj::moveFrame()
 
 	unsigned int& moveStateFlags = m_moveWork.m_stateFlags;
 	unsigned int& moveFlags = m_moveWork.m_flags;
-	Vec& moveTarget = m_moveWork.m_targetPos;
 	float& moveSpeed = m_moveWork.m_speed;
 	float& moveRange = m_moveWork.m_range;
 	unsigned int& moveLimitFrame = m_moveWork.m_limitFrame;
@@ -3096,7 +3095,7 @@ void CGMonObj::moveFrame()
 		}
 	} else if ((moveFlags & 2) != 0) {
 		{
-			CVector tmp(moveTarget);
+			CVector tmp(m_moveWork.m_targetPos);
 			local_68.x = tmp.x;
 			local_68.y = tmp.y;
 			local_68.z = tmp.z;
@@ -3108,7 +3107,7 @@ void CGMonObj::moveFrame()
 			moveAStar(aStarGroupId, polygonGroup, local_68);
 		}
 	} else if ((moveFlags & 0x2000) != 0) {
-		CVector tmpTarget(moveTarget);
+		CVector tmpTarget(m_moveWork.m_targetPos);
 		CVector result;
 		PSVECAdd(&object->m_worldPosition, reinterpret_cast<Vec*>(&tmpTarget), reinterpret_cast<Vec*>(&result));
 		local_68.x = result.x;

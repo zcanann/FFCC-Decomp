@@ -1190,7 +1190,7 @@ void CGPartyObj::command()
 			case 0x0F:
 			case 0x10:
 			case 0x11:
-				if (*reinterpret_cast<int*>(targetBytes + 0x550) == 0) {
+				if (*reinterpret_cast<unsigned int*>(targetBytes + 0x550) == 0) {
 					secondaryAvailable = true;
 					secondaryCommand = 4;
 				}
@@ -1339,11 +1339,11 @@ void CGPartyObj::command()
 			return;
 		}
 
-		if ((static_cast<signed char>(m_weaponNodeFlags >> 8) >= 0) ||
-		    (static_cast<signed char>(m_shieldAttachNodeIndex) >= 0) ||
+		if ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)[1]) << 24) & 0xC0000000) >> 31) >= 0) ||
+		    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x63C)) << 24) & 0xC0000000) >> 31) >= 0) ||
 		    caravan->m_hp == 0 ||
 		    ringCommand == -1 ||
-		    ((party.commandFlags & 8) != 0)) {
+		    ((*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(this) + 0x6F4) & 8) != 0)) {
 			return;
 		}
 
@@ -1464,8 +1464,8 @@ void CGPartyObj::command()
 		return;
 	}
 
-	if ((static_cast<signed char>(m_weaponNodeFlags >> 8) < 0) &&
-	    (static_cast<signed char>(m_shieldAttachNodeIndex) < 0) &&
+	if ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)[1]) << 24) & 0xC0000000) >> 31) < 0) &&
+	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x63C)) << 24) & 0xC0000000) >> 31) < 0) &&
 	    caravan->m_hp != 0 &&
 	    ringCommand != -1 &&
 	    secondaryCommand == 6) {
@@ -2174,7 +2174,7 @@ void CGPartyObj::statCharge()
 		}
 
 		int phase = (m_comboItemState == -1) ? m_subFrame : (m_subFrame - 0x10);
-		unsigned short itemType =
+		int itemType =
 		    *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 10) & 0xFF;
 
 		if (phase == 0) {
@@ -5171,7 +5171,7 @@ void CGPartyObj::gpmMove()
 			moveKind = 0;
 			if (chalice != nullptr &&
 			    PartyData(this).carryObject == nullptr &&
-			    (static_cast<signed char>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(chalice) + 0x9A)) < 0) &&
+			    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(chalice) + 0x9A)) << 24) & 0xC0000000) >> 31) < 0) &&
 			    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(chalice) + 0x550) == 0) {
 				float pickupRadius = (leader->m_bodyEllipsoidRadius + *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(chalice) + 0x144)) * FLOAT_80331A84;
 				if (dist < pickupRadius) {
@@ -5269,9 +5269,19 @@ void CGPartyObj::gpmMove()
 		return;
 	}
 
-	sGhostPartyWork.thresholdA = (sGhostPartyWork.slotSel == 0) ? 0 : sGhostPartyWork.thresholdA / 2;
-	sGhostPartyWork.thresholdB = (sGhostPartyWork.slotSel == 1) ? 0 : sGhostPartyWork.thresholdB / 2;
-	sGhostPartyWork.thresholdC = (sGhostPartyWork.slotSel == 2) ? 0 : sGhostPartyWork.thresholdC / 2;
+	{
+		unsigned char* base = CGPartyObj::m_ghostWork;
+		const int slotSel = sGhostPartyWork.slotSel;
+		for (int slot = 0; slot < 3; slot++) {
+			int* threshold = reinterpret_cast<int*>(base + 0x24);
+			if (slot == slotSel) {
+				*threshold = 0;
+			} else {
+				*threshold = *threshold / 2;
+			}
+			base += 4;
+		}
+	}
 	PartyData(this).partyFlags = (PartyData(this).partyFlags & 0xAF) | 0x40;
 }
 

@@ -1822,7 +1822,7 @@ void CMenuPcs::drawBattle()
             const CColor frameColor(0xFF, 0xFF, 0xFF, static_cast<u8>(alphaF));
             GXSetChanMatColor(GX_COLOR0A0, frameColor.color);
 
-            if (LoadFloat(kMenuInitOne) < static_cast<float>(totalWidth)) {
+            if (static_cast<float>(totalWidth) > LoadFloat(kMenuInitOne)) {
                 float bodyWidth = static_cast<float>(totalWidth) - LoadFloat(kMenuMarkerMinY);
                 if (bodyWidth < LoadFloat(kMenuInitOne)) {
                     bodyWidth = LoadFloat(kMenuInitOne);

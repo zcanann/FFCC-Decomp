@@ -2010,9 +2010,9 @@ void CCameraPcs::destroyMaterialEditor()
 void CCameraPcs::calcMaterialEditor()
 {
     unsigned short padButtons;
-    Mtx mtxA;
-    Mtx mtxB;
     Mtx mtxInv;
+    Mtx mtxB;
+    Mtx mtxA;
     float stick;
 
     C_MTXPerspective(m_screenMatrix, kCameraDebugFov, kCameraAspectRatio, kCameraOneEighthF, kCameraViewerFarZ);
@@ -2118,9 +2118,9 @@ void CCameraPcs::destroyFunnyShape()
 void CCameraPcs::calcFunnyShape()
 {
     unsigned short padButtons;
-    Mtx mtxA;
-    Mtx mtxB;
     Mtx mtxInv;
+    Mtx mtxB;
+    Mtx mtxA;
     float stick;
 
     C_MTXPerspective(m_screenMatrix, kCameraDebugFov, kCameraAspectRatio, kCameraOneEighthF, kCameraFarZ3000);

@@ -455,7 +455,7 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 					int bitValue = oldBit;
 					switch (setMode) {
 					case -1:
-						bitValue -= static_cast<int>(static_cast<unsigned char>(stack->m_word));
+						bitValue -= static_cast<int>(static_cast<signed char>(stack->m_word));
 						break;
 					case 0:
 						bitValue = static_cast<int>(static_cast<signed char>(stack->m_word));

@@ -1545,7 +1545,7 @@ void CMenuPcs::destroyWorld()
 	}
 
 	if (m_wm.m_frameData != 0) {
-		delete[] m_wm.m_frameData;
+		delete m_wm.m_frameData;
 		m_wm.m_frameData = 0;
 	}
 
@@ -1564,15 +1564,15 @@ void CMenuPcs::destroyWorld()
 		m_wm.m_worldObjData = 0;
 	}
 	if (m_wm.m_bubbleData != 0) {
-		delete[] m_wm.m_bubbleData;
+		delete m_wm.m_bubbleData;
 		m_wm.m_bubbleData = 0;
 	}
 	if (m_wm.m_frameData != 0) {
-		delete[] m_wm.m_frameData;
+		delete m_wm.m_frameData;
 		m_wm.m_frameData = 0;
 	}
 	if (m_wm.m_frameInfo != 0) {
-		delete[] m_wm.m_frameInfo;
+		delete m_wm.m_frameInfo;
 		m_wm.m_frameInfo = 0;
 	}
 	if (m_wm.m_charaModelData != 0) {
@@ -1588,7 +1588,7 @@ void CMenuPcs::destroyWorld()
 		m_wmCharaAnimState = 0;
 	}
 	if (m_wmWorldState != 0) {
-		delete[] m_wmWorldState;
+		delete m_wmWorldState;
 		m_wmWorldState = 0;
 	}
 	if (m_wmCharaState != 0) {
@@ -1596,7 +1596,7 @@ void CMenuPcs::destroyWorld()
 		m_wmCharaState = 0;
 	}
 	if (m_wmWorldParams != 0) {
-		delete[] m_wmWorldParams;
+		delete m_wmWorldParams;
 		m_wmWorldParams = 0;
 	}
 	{

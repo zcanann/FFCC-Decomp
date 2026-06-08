@@ -379,28 +379,34 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
         return;
     }
 
-    if (strcmp(mesh->m_name, s_ymManaShapeObj) != 0) {
-        PSMTXCopy(mtx, mana->m_reflectionMtx);
-        if (mana->m_paraboloidReady != 0) {
-            mana->m_runtimeColor.r = mesh->m_colors[0];
-            mana->m_runtimeColor.g = mesh->m_colors[1];
-            mana->m_runtimeColor.b = mesh->m_colors[2];
-            mana->m_runtimeColor.a = 0x80;
-            DCFlushRange(&mana->m_runtimeColor, 4);
-            GXSetArray((GXAttr)0xB, mana->m_meshColors, 4);
-            GXSetArray((GXAttr)0xD, mana->m_meshTexCoords0, 4);
-            GXSetArray((GXAttr)0xE, mana->m_meshTexCoords1, 4);
-            MaterialMan.SetManaReflectionEnv(mana->m_meshReflectionVec, mana->m_generatedTexObj0, mana->m_generatedTexObj1, 0xAEE0F);
-            GXSetCullMode((GXCullMode)1);
-            GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
-            MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
-            SetEnvMap((PYmMana*)stepData, mana);
-            GXCallDisplayList(mana->m_displayListCopies[dlIndex], displayList->m_size);
-            for (int i = 0; i < 16; i++) {
-                GXSetTevKColorSel((GXTevStageID)i, (GXTevKColorSel)6);
-                GXSetTevKAlphaSel((GXTevStageID)i, (GXTevKAlphaSel)0);
+    if (draw == 1) {
+        if (strcmp(mesh->m_name, s_ymManaShapeObj) != 0) {
+            PSMTXCopy(mtx, mana->m_reflectionMtx);
+            if (mana->m_paraboloidReady != 0) {
+                mana->m_runtimeColor.r = mesh->m_colors[0];
+                mana->m_runtimeColor.g = mesh->m_colors[1];
+                mana->m_runtimeColor.b = mesh->m_colors[2];
+                mana->m_runtimeColor.a = 0x80;
+                DCFlushRange(&mana->m_runtimeColor, 4);
+                GXSetArray((GXAttr)0xB, mana->m_meshColors, 4);
+                GXSetArray((GXAttr)0xD, mana->m_meshTexCoords0, 4);
+                GXSetArray((GXAttr)0xE, mana->m_meshTexCoords1, 4);
+                MaterialMan.SetManaReflectionEnv(mana->m_meshReflectionVec, mana->m_generatedTexObj0, mana->m_generatedTexObj1, 0xAEE0F);
+                GXSetCullMode((GXCullMode)1);
+                GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
+                MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
+                SetEnvMap((PYmMana*)stepData, mana);
+                GXCallDisplayList(mana->m_displayListCopies[dlIndex], displayList->m_size);
+                for (int i = 0; i < 16; i++) {
+                    GXSetTevKColorSel((GXTevStageID)i, (GXTevKColorSel)6);
+                    GXSetTevKAlphaSel((GXTevStageID)i, (GXTevKAlphaSel)0);
+                }
             }
+            return;
         }
+    }
+
+    if (strcmp(mesh->m_name, s_ymManaShapeObj) != 0) {
         return;
     }
 
@@ -697,8 +703,7 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
     s32 i;
     u32 meshIndex;
     u32 vertexIndex;
-    s32 setupOffset;
-    u8* workArea;
+    u8* setupArea;
 
     if (ppvUserStopPartF != 0) {
         return;
@@ -706,9 +711,8 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
 
     gObject = ppvMng->m_owner;
     YmManaDataOffsets* serializedOffsets = GetYmManaDataOffsets(param_3);
-    setupOffset = serializedOffsets->m_setupOffset;
-    workArea = reinterpret_cast<_pppPObject*>(pppYmMana)->m_workArea;
-    mana = reinterpret_cast<VYmMana*>(workArea + serializedOffsets->m_workOffset);
+    mana = reinterpret_cast<VYmMana*>(reinterpret_cast<_pppPObject*>(pppYmMana)->m_workArea + serializedOffsets->m_workOffset);
+    setupArea = reinterpret_cast<_pppPObject*>(pppYmMana)->m_workArea + serializedOffsets->m_setupOffset;
     if (gObject == NULL) {
         return;
     }
@@ -726,9 +730,9 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
 
     SetManaModelCallbacks(model, mana, param_2);
 
-    MaterialMan.SetManaAlpha((u8)((float)*(workArea + setupOffset + 0xB) * gObject->m_lookAtTimer));
+    MaterialMan.SetManaAlpha((u8)((float)*(setupArea + 0xB) * gObject->m_lookAtTimer));
     if (Game.m_currentMapId == 0x21) {
-        MaterialMan.SetManaAlpha((u8)(gObject->m_lookAtTimer * (float)*(workArea + setupOffset + 0xB)));
+        MaterialMan.SetManaAlpha((u8)(gObject->m_lookAtTimer * (float)*(setupArea + 0xB)));
     }
     mana->m_manaAlpha = MaterialMan.GetManaAlpha();
 
@@ -1191,7 +1195,7 @@ static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, u
     rowCount = 0;
     uvStep = LoadFloat(kYmManaWaterUvStep);
     radius = size * LoadFloat(kYmManaHalf);
-    for (z = radius; -radius <= z; z -= size * uvStep) {
+    for (z = radius; z >= -radius; z -= size * uvStep) {
         colCount = 0;
         positions = reinterpret_cast<float*>(positionsInOut);
         normals = reinterpret_cast<float*>(normalsOut);
@@ -1725,7 +1729,7 @@ void CalcReflectionVector2(
             float denom;
 
             dl += 4;
-            if ((drawFmt & 7) == 2) {
+            if ((drawFmt & 7u) == 2) {
                 dl++;
             }
 

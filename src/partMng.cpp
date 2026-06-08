@@ -280,8 +280,8 @@ void CPartMng::Create()
 
     PSMTXIdentity(ppvWorldMatrix);
     PSMTXIdentity(ppvWorldMatrix);
-    PSMTXIdentity(ppvCameraMatrix0);
-    PSMTXCopy(ppvCameraMatrix0, ppvCameraMatrix0);
+    PSMTXIdentity(ppvCameraMatrix);
+    PSMTXCopy(ppvCameraMatrix, ppvCameraMatrix0);
 
     m_materialSet = 0;
     m_textureSet = 0;
@@ -289,21 +289,21 @@ void CPartMng::Create()
     m_pppShapeStArr = 0;
 
     {
-        int* zero = reinterpret_cast<int*>(self + 0x1d4);
+        int* zero = reinterpret_cast<int*>(self);
         for (int i = 0; i < 0x80; i++) {
-            zero[i] = 0;
+            zero[0x75 + i] = 0;
         }
     }
     {
-        int* zero = reinterpret_cast<int*>(self + 0x3d8);
+        int* zero = reinterpret_cast<int*>(self);
         for (int i = 0; i < 0x80; i++) {
-            zero[i] = 0;
+            zero[0xf6 + i] = 0;
         }
     }
     {
-        int* zero = reinterpret_cast<int*>(self + 0x5dc);
+        int* zero = reinterpret_cast<int*>(self);
         for (int i = 0; i < 0x80; i++) {
-            zero[i] = 0;
+            zero[0x177 + i] = 0;
         }
     }
 
@@ -371,7 +371,7 @@ void CPartMng::Destroy()
         for (unsigned int i = 0; i < 0x100; i++) {
             pppModelSt* model = &modelArr[i];
             if (model->m_isUsed != 0) {
-                if (--model->m_refCount < 1) {
+                if (--model->m_refCount <= 0) {
                     if (model->m_cacheId != -1) {
                         ppvAmemCacheSet.DestroyCache(model->m_cacheId);
                         *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(model) + 0x24) = 0;
@@ -391,7 +391,7 @@ void CPartMng::Destroy()
         for (unsigned int i = 0; i < 0x100; i++) {
             pppShapeSt* shape = &res->m_pppShapeStArr[i];
             if (shape->m_inUse != 0) {
-                if (--shape->m_refCount < 1) {
+                if (--shape->m_refCount <= 0) {
                     if (shape->m_animData != 0) {
                         delete[] reinterpret_cast<u8*>(shape->m_animData);
                         shape->m_animData = 0;
@@ -587,8 +587,7 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
         pppModelSt** modelNames = reinterpret_cast<pppModelSt**>(pdt->m_modelNames);
         for (int i = 0; i < pdt->m_modelCount; i++) {
             pppModelSt* model = modelNames[i];
-            model->m_refCount--;
-            if (model->m_refCount < 1) {
+            if (--model->m_refCount <= 0) {
                 if (model->m_cacheId != -1) {
                     ppvAmemCacheSet.DestroyCache(model->m_cacheId);
                     *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(model) + 0x24) = 0;
@@ -608,8 +607,7 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
         pppShapeSt** shapeNames = reinterpret_cast<pppShapeSt**>(pdt->m_shapeNames);
         for (int i = 0; i < pdt->m_shapeCount; i++) {
             pppShapeSt* shape = shapeNames[i];
-            shape->m_refCount--;
-            if (shape->m_refCount < 1) {
+            if (--shape->m_refCount <= 0) {
                 if (shape->m_animData != 0) {
                     delete[] reinterpret_cast<u8*>(shape->m_animData);
                     shape->m_animData = 0;
@@ -957,9 +955,9 @@ void CPartMng::pppGet2Dpos()
             GXPeekZ(static_cast<u16>(x & 0xFFFF), static_cast<u16>(y & 0xFFFF), reinterpret_cast<u32*>(&zAtPixel));
 
             viewPos.z = ppvScreenMatrix0[2][3]
-                        / ((float)((double)(zAtPixel - 0xFFFFFF) / kPartMngDepthUnit) + ppvScreenMatrix0[2][2]);
-            viewPos.x = viewPos.z * (((float)((double)raw->cursorX / kPartMngScreenHalfWidth)) / ppvScreenMatrix0[0][0]);
-            viewPos.y = viewPos.z * ((-(float)((double)raw->cursorY / kPartMngScreenHalfHeight)) / ppvScreenMatrix0[1][1]);
+                        / ((float)(zAtPixel - 0xFFFFFF) / kPartMngDepthUnit + ppvScreenMatrix0[2][2]);
+            viewPos.x = viewPos.z * ((float)raw->cursorX / kPartMngScreenHalfWidth / ppvScreenMatrix0[0][0]);
+            viewPos.y = viewPos.z * (-((float)raw->cursorY / kPartMngScreenHalfHeight) / ppvScreenMatrix0[1][1]);
             viewPos.z = -viewPos.z;
 
             PSMTXInverse(ppvCameraMatrix0, invCamera);
@@ -1380,29 +1378,29 @@ void CPartMng::pppEditAllReleaseResource()
             *reinterpret_cast<void**>(iter + 0x1D4) = 0;
         }
         iVar3 = iVar3 + 1;
-        iter = iter + 0xC;
+        iter = iter + 0x4;
     } while (iVar3 < 0x80);
 
     iVar3 = 0;
     iter = self;
     do {
-        if (*reinterpret_cast<void**>(iter + 0x1D8) != 0) {
-            operator delete(*reinterpret_cast<void**>(iter + 0x1D8));
-            *reinterpret_cast<void**>(iter + 0x1D8) = 0;
+        if (*reinterpret_cast<void**>(iter + 0x3D8) != 0) {
+            operator delete(*reinterpret_cast<void**>(iter + 0x3D8));
+            *reinterpret_cast<void**>(iter + 0x3D8) = 0;
         }
         iVar3 = iVar3 + 1;
-        iter = iter + 0xC;
+        iter = iter + 0x4;
     } while (iVar3 < 0x80);
 
     iVar3 = 0;
     iter = self;
     do {
-        if (*reinterpret_cast<long**>(iter + 0x1DC) != 0) {
-            operator delete(*reinterpret_cast<long**>(iter + 0x1DC));
-            *reinterpret_cast<long**>(iter + 0x1DC) = 0;
+        if (*reinterpret_cast<long**>(iter + 0x5DC) != 0) {
+            operator delete(*reinterpret_cast<long**>(iter + 0x5DC));
+            *reinterpret_cast<long**>(iter + 0x5DC) = 0;
         }
         iVar3 = iVar3 + 1;
-        iter = iter + 0xC;
+        iter = iter + 0x4;
     } while (iVar3 < 0x80);
 
     u8*& recvBuffer = *reinterpret_cast<u8**>(self + kRecvBuffOffset);
@@ -1752,8 +1750,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             int slotIndex = static_cast<int>(*reinterpret_cast<short*>(payload));
             pppModelSt*& modelSlot = (*modelTablePtr)[slotIndex];
             if (modelSlot != 0) {
-                modelSlot->m_refCount--;
-                if (modelSlot->m_refCount < 1) {
+                if (--modelSlot->m_refCount <= 0) {
                     if (modelSlot->m_cacheId != -1) {
                         ppvAmemCacheSet.DestroyCache(modelSlot->m_cacheId);
                         modelSlot->m_meshData = 0;
@@ -1795,8 +1792,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             int slotIndex = payloadWords[0];
             pppShapeSt*& shapeSlot = (*shapeSlotTablePtr)[slotIndex];
             if (shapeSlot != 0) {
-                shapeSlot->m_refCount--;
-                if (shapeSlot->m_refCount < 1) {
+                if (--shapeSlot->m_refCount <= 0) {
                     if (shapeSlot->m_animData != 0) {
                         delete[] reinterpret_cast<u8*>(shapeSlot->m_animData);
                         shapeSlot->m_animData = 0;
@@ -2783,31 +2779,6 @@ void CPartMng::pppPartCalc()
  */
 void CPartMng::pppRefCnt0Up()
 {
-    struct PppPartResourceRaw {
-        short m_cacheIndex;
-        short m_pad;
-        long* m_pdt;
-    };
-
-    CAmemCacheSet* cacheSet = &ppvAmemCacheSet;
-    cacheSet->RefCnt0Clear();
-
-    PppPdtSlot* slot = m_pdtSlots;
-    for (int slotIndex = 0; slotIndex < 0x20; slotIndex++) {
-        _pppDataHead* pdtHead = slot->m_pppDataHead;
-        if (pdtHead != 0) {
-            PppPartResourceRaw* partResource =
-                reinterpret_cast<PppPartResourceRaw*>(pdtHead->m_cacheChunks);
-
-            for (int cacheIndex = 0; cacheIndex < pdtHead->m_cacheChunkCount; cacheIndex++) {
-                cacheSet->RefCnt0Up(partResource->m_cacheIndex);
-                partResource++;
-            }
-        }
-        slot++;
-    }
-
-    cacheSet->RefCnt0Compare();
 }
 
 /*
@@ -2880,7 +2851,7 @@ void CPartMng::pppDumpCacheIdx()
                                                           mng->m_partIndex * sizeof(PppPartResourceRaw));
 
                 CAmemCacheSet* cacheSet = &ppvAmemCacheSet;
-                if ((unsigned int)cacheSet->IsEnable(partResource->m_cacheIndex) == 0) {
+                if (cacheSet->IsEnable(partResource->m_cacheIndex) == 0) {
                     partResource->m_pdt = reinterpret_cast<long*>(
                         cacheSet->GetData(
                             partResource->m_cacheIndex, const_cast<char*>(s_partMng_cpp), 0x9A9));

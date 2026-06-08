@@ -2243,8 +2243,7 @@ int CMapMng::ReadOtm(char* mapName)
     PSMTXIdentity(identity);
     root->CalcMtx(identity, 1);
 
-    const int mapObjCount = m_mapObjCount;
-    for (int i = 0; i < mapObjCount; i++) {
+    for (int i = 0; i < m_mapObjCount; i++) {
         CMapObj* obj = GetMapObjArray() + i;
         CMapObjAtr* attr = obj->m_attribute;
         if (attr == 0) {
@@ -2298,10 +2297,10 @@ int CMapMng::ReadOtm(char* mapName)
             1);
         spotAttr->m_light = bump;
 
-        for (int j = 0; j < mapObjCount; j++) {
+        for (int j = 0; j < m_mapObjCount; j++) {
             CMapObj* scan = GetMapObjArray() + j;
             if (scan->m_bumpObjId == i) {
-                scan->m_bumpLight = bump;
+                scan->m_bumpLight = spotAttr->m_light;
             }
         }
 
@@ -2470,7 +2469,7 @@ int CMapMng::ReadMid(char* mapName)
         CMapHit* hit = static_cast<CMapHit*>(obj->m_mapData);
         if ((type == 2 || type == 3) && hit != 0) {
             int hitIndex = hit - GetMapHitArray();
-            if (m_mapHitCount <= hitIndex) {
+            if (hitIndex >= m_mapHitCount) {
                 if (System.m_execParam != 0) {
                     System.Printf(const_cast<char*>(s_read_mid_hit_error));
                 }

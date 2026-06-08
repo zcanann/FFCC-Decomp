@@ -901,6 +901,8 @@ void CMes::addString(char** text, int branchMode)
 	bool running = true;
 	unsigned char caseMode = 0;
 	signed char flowMode = 0;
+	char name[32];
+	char* namePtr = name;
 
 	while (running)
 	{
@@ -1010,8 +1012,6 @@ void CMes::addString(char** text, int branchMode)
 			{
 				mColor = 5;
 			}
-			char name[32];
-			char* namePtr = name;
 			int value = mFlagVars[ReadTagS8(text)] & 0xFFFF;
 			switch (uch)
 			{
@@ -1057,8 +1057,6 @@ void CMes::addString(char** text, int branchMode)
 			{
 				mColor = 0;
 			}
-			char name[32];
-			char* namePtr = name;
 			int value = mFlagVars[ReadTagS8(text)] & 0xFFFF;
 			switch (uch)
 			{
@@ -1099,8 +1097,6 @@ void CMes::addString(char** text, int branchMode)
 			{
 				mColor = 6;
 			}
-			char name[32];
-			char* namePtr = name;
 			strcpy(namePtr, FlatNameDirect(2, mFlagVars[ReadTagS8(text)] & 0xFFFF));
 			ApplyCaseMode(namePtr, caseMode);
 			addString(&namePtr, branchMode);
@@ -1114,8 +1110,6 @@ void CMes::addString(char** text, int branchMode)
 			{
 				mColor = 4;
 			}
-			char name[32];
-			char* namePtr = name;
 			strcpy(namePtr, FlatNameDirect(3, mFlagVars[ReadTagS8(text)] & 0xFFFF));
 			ApplyCaseMode(namePtr, caseMode);
 			addString(&namePtr, branchMode);
@@ -1129,8 +1123,6 @@ void CMes::addString(char** text, int branchMode)
 			{
 				mColor = 3;
 			}
-			char name[32];
-			char* namePtr = name;
 			strcpy(namePtr, FlatNameDirect(3, (mFlagVars[ReadTagS8(text)] & 0xFFFF) + 0x3C));
 			ApplyCaseMode(namePtr, caseMode);
 			addString(&namePtr, branchMode);
@@ -1216,7 +1208,7 @@ void CMes::addString(char** text, int branchMode)
 			break;
 		case 0x25:
 		{
-			unsigned int value = ReadTagS8(text);
+			int value = ReadTagS8(text);
 			if (mFontCount != 0)
 			{
 				if (System.m_execParam != 0)

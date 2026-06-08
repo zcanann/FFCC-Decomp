@@ -6176,10 +6176,10 @@ unsigned int CMenuPcs::GetWorldParam(int code)
 		result = static_cast<unsigned int>(static_cast<signed char>(bytes[0xD]));
 		break;
 	case 10:
-		result = -static_cast<unsigned int>(bytes[0x10]) >> 31;
+		result = (-static_cast<unsigned int>(bytes[0x10]) | static_cast<unsigned int>(bytes[0x10])) >> 31;
 		break;
 	case 11:
-		result = -static_cast<unsigned int>(bytes[0x11]) >> 31;
+		result = (-static_cast<unsigned int>(bytes[0x11]) | static_cast<unsigned int>(bytes[0x11])) >> 31;
 		break;
 	case 12:
 		result = static_cast<unsigned int>(static_cast<signed char>(bytes[0xE]));
@@ -6188,10 +6188,10 @@ unsigned int CMenuPcs::GetWorldParam(int code)
 		result = static_cast<unsigned int>(static_cast<signed char>(bytes[0xF]));
 		break;
 	case 14:
-		result = -static_cast<unsigned int>(bytes[0x12]) >> 31;
+		result = (-static_cast<unsigned int>(bytes[0x12]) | static_cast<unsigned int>(bytes[0x12])) >> 31;
 		break;
 	case 15:
-		result = -static_cast<unsigned int>(bytes[0x13]) >> 31;
+		result = (-static_cast<unsigned int>(bytes[0x13]) | static_cast<unsigned int>(bytes[0x13])) >> 31;
 		break;
 	case 16:
 		result = static_cast<unsigned int>(static_cast<signed char>(bytes[0x17]));
@@ -6205,16 +6205,16 @@ unsigned int CMenuPcs::GetWorldParam(int code)
 			iVar3 = iVar3 + 1;
 		} while (iVar3 < 10);
 		if (iVar1 == 0) {
-			result = 1;
+			result = result | 1;
 		} else if (iVar1 == 1) {
-			result = 7;
+			result = result | 7;
 		} else if (iVar1 != -1) {
 			if (iVar1 == -2) {
-				result = 2;
+				result = result | 2;
 			} else if (iVar1 == -3) {
-				result = 3;
+				result = result | 3;
 			} else {
-				result = 6;
+				result = result | 6;
 			}
 		}
 		iVar3 = 0;

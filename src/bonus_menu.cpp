@@ -3373,8 +3373,8 @@ void CMenuPcs::createBonus()
 			s_Rinfo->m_party[activeCount].m_partyHandle =
 			    *reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(Game.m_partyObjArr[i]) + 0xF8);
 			s_Rinfo->m_party[activeCount].m_partyHandle->m_model->m_lightAlpha = 0.0f;
-			s_Rinfo->m_party[activeCount].m_bonusCondition = (int)caravanWork->m_bonusCondition;
-			int foodValue = (int)caravanWork->m_artifactRelated[3] + (int)caravanWork->m_artifactRelated[4];
+			s_Rinfo->m_party[activeCount].m_bonusCondition = (int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_bonusCondition;
+			int foodValue = (int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_artifactRelated[3] + (int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_artifactRelated[4];
 			int foodClamped;
 			if (foodValue < 0) {
 				foodClamped = 0;
@@ -3386,7 +3386,7 @@ void CMenuPcs::createBonus()
 			}
 			s_Rinfo->m_party[activeCount].m_foodValue = foodClamped;
 			s_Rinfo->m_party[activeCount].m_artifactValue =
-			    (int)caravanWork->m_artifactRelated[0] + (int)caravanWork->m_artifactRelated[1] - (int)caravanWork->m_artifactRelated[2];
+			    (int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_artifactRelated[0] + (int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_artifactRelated[1] - (int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_artifactRelated[2];
 			s_Rinfo->m_party[activeCount].m_totalValue =
 			    s_Rinfo->m_party[activeCount].m_foodValue + s_Rinfo->m_party[activeCount].m_artifactValue;
 			s_Rinfo->m_party[activeCount].m_selectedItemId = -1;
@@ -3403,20 +3403,20 @@ void CMenuPcs::createBonus()
 			}
 			s_Rinfo->m_party[activeCount].m_totalValue = totalValueClamped;
 			totalValue += s_Rinfo->m_party[activeCount].m_totalValue;
-			s_Rinfo->m_party[activeCount].m_tribeId = (unsigned int)caravanWork->m_tribeId;
+			s_Rinfo->m_party[activeCount].m_tribeId = (unsigned int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_tribeId;
 			activeCount++;
 
-			if (caravanWork->m_treasures[0] > 0) {
-				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = caravanWork->m_treasures[0];
+			if (reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[0] > 0) {
+				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[0];
 			}
-			if (caravanWork->m_treasures[1] > 0) {
-				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = caravanWork->m_treasures[1];
+			if (reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[1] > 0) {
+				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[1];
 			}
-			if (caravanWork->m_treasures[2] > 0) {
-				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = caravanWork->m_treasures[2];
+			if (reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[2] > 0) {
+				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[2];
 			}
-			if (caravanWork->m_treasures[3] > 0) {
-				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = caravanWork->m_treasures[3];
+			if (reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[3] > 0) {
+				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[3];
 			}
 		}
 

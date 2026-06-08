@@ -158,7 +158,7 @@ void CGraphic::Init()
 
     GXRenderModeObj* renderMode = m_renderMode;
     u32 alignedWidth = (renderMode->fbWidth + 0xF) & 0xFFF0;
-    u16 efbHeight = renderMode->efbHeight;
+    s16 efbHeight = renderMode->efbHeight;
     u16 xfbHeight = renderMode->xfbHeight;
     u32 efbBufferSize = alignedWidth * efbHeight * 2;
     u32 xfbBufferSize = alignedWidth * xfbHeight * 2;

@@ -351,8 +351,15 @@ def t_scratch_temp(body, rng, mk):
         after = body[e:e + 2]
         if before.endswith(".") or before.endswith(">") or before.endswith("_"):
             continue
-        # skip if it's a write target: name =
-        nxt = body[e:e + 3].lstrip()
+        # skip pre-increment / pre-decrement target: ++name / --name
+        if before.endswith("++") or before.endswith("--"):
+            continue
+        # skip if this occurrence is a WRITE/MODIFY target. Hoisting the LHS of an
+        # assignment, compound-assignment (+=,-=,*=,...), or ++/-- into a dead int
+        # temp would silently DROP the write (semantics-breaking false match).
+        nxt = body[e:].lstrip()[:3]
+        if re.match(r"(\+\+|--|<<=|>>=|[-+*/%&|^]=)", nxt):
+            continue
         if nxt.startswith("=") and not nxt.startswith("=="):
             continue
         # find start of the line containing this occurrence

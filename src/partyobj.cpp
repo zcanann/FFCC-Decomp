@@ -3371,10 +3371,7 @@ void CGPartyObj::statPut()
 			seNo = 0x24;
 			break;
 		case 0x1B:
-			anim = 9;
-			if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
-				anim = 0x28;
-			}
+			anim = (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) ? 0x28 : 9;
 			seNo = 0x24;
 			break;
 		}

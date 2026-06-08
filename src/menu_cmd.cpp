@@ -731,14 +731,14 @@ int CMenuPcs::CmdCtrl()
 	} else if ((mode == 1) && (GetCmdStateView(this)->phase == 2)) {
 		actionHandled = CmdClose0();
 		if (actionHandled != 0) {
-			if (GetCmdStateView(this)->commandResult == 0) {
-				GetCmdStateView(this)->phase = static_cast<s16>(GetCmdStateView(this)->phase + 1);
-			} else {
+			if (GetCmdStateView(this)->commandResult != 0) {
 				GetCmdStateView(this)->phase = 0;
 				GetCmdStateView(this)->mode = 3;
 				GetCmdStateView(this)->transitionTimer = 0;
 				GetCmdStateView(this)->commandResult = 0;
 				CmdInit1();
+			} else {
+				GetCmdStateView(this)->phase = static_cast<s16>(GetCmdStateView(this)->phase + 1);
 			}
 			actionHandled = 0;
 		}
@@ -968,6 +968,7 @@ void CMenuPcs::CmdDraw()
 	CmdListEntry* entry = entries;
 	const s32 animState = GetCmdStateView(this)->animState;
 	const s32 cmdMode = GetCmdStateView(this)->mode;
+	const float smallOffset = kCmdMenuSmallOffset;
 
 	for (i = 0; i < GetCmdListStorage(this)->count; i++) {
 		const s32 tex = entry->tex;
@@ -977,7 +978,7 @@ void CMenuPcs::CmdDraw()
 			const float w = static_cast<float>(entry->width);
 			double h = static_cast<double>(entry->height);
 			const float u = entry->u;
-			float t = kCmdMenuSmallOffset;
+			float t = smallOffset;
 
 			if ((i >= 8) || (caravan->m_commandListExtra[i] == 0)) {
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
@@ -988,8 +989,8 @@ void CMenuPcs::CmdDraw()
 				if ((animState == 1) && (i < caravan->m_numCmdListSlots) &&
 				    (i == GetCmdStateView(this)->selected)) {
 					t = kCmdMenuSelectedUvY;
-					y -= kCmdMenuSmallOffset;
-					h += kCmdMenuSmallOffset;
+					y -= smallOffset;
+					h += smallOffset;
 				}
 
 				GXColor boxColor;

@@ -2477,12 +2477,9 @@ void CGPartyObj::onStatAttack(int chargeType)
 void CGPartyObj::onStatShield()
 {
 	if (m_subState == 1) {
-		bool suppressInput = false;
 		unsigned short trig;
 		int padSlot = static_cast<signed char>(m_animStateMisc);
-		if ((Pad.m_debugPadLock != 0) || ((padSlot == 0) && (Pad.m_debugPadPort != -1))) {
-			suppressInput = true;
-		}
+		bool suppressInput = (Pad.m_debugPadLock != 0) || ((padSlot == 0) && (Pad.m_debugPadPort != -1));
 		if (suppressInput) {
 			trig = 0;
 		} else {

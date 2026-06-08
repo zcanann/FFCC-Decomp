@@ -27,6 +27,11 @@ static const char s_p_chara_collection_ptrarray_h[] = "collection_ptrarray.h";
 
 extern const float kCharaZero;
 extern const float kCharaOne;
+extern const float FLOAT_803302A4;
+extern const float FLOAT_803302C8;
+extern const float FLOAT_803302CC;
+extern const float FLOAT_803302DC;
+extern const float FLOAT_803302E0;
 extern const float kCharaBumpLightPosX;
 extern const float kCharaBumpLightPosY;
 extern const float kCharaBumpLightPosZ;
@@ -1589,7 +1594,6 @@ void CCharaPcs::searchPdt(int, int, int)
  */
 void CCharaPcs::LoadCam(int index, char* fileName)
 {
-    static char s_p_chara_cpp[] = "p_chara.cpp";
     char path[0x104];
     CChunkFile::CChunk chunk;
 
@@ -1614,7 +1618,7 @@ void CCharaPcs::LoadCam(int index, char* fileName)
         if (chunk.m_id == 'CAM ') {
             m_cameraFrameCount[index] = static_cast<int>(chunk.m_arg0);
 
-            cameraBuffer = new (m_viewerAnimStage, s_p_chara_cpp, 0x4D4)
+            cameraBuffer = new (m_viewerAnimStage, const_cast<char*>(s_p_chara_cpp), 0x4D4)
                 CCameraFrame[static_cast<unsigned long>(m_cameraFrameCount[index])];
 
             int byteOffset = 0;
@@ -1972,7 +1976,7 @@ void CCharaPcs::drawOverlap()
 
     PSMTXCopy(CameraPcs.m_cameraMatrix, savedCameraMtx);
 
-    C_MTXOrtho(projectionMtx, 0.0f, 448.0f, 0.0f, 640.0f, 0.5f, -0.5f);
+    C_MTXOrtho(projectionMtx, kCharaZero, FLOAT_803302C8, kCharaZero, FLOAT_803302CC, 0.5f, -0.5f);
     GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
@@ -1997,10 +2001,10 @@ void CCharaPcs::drawOverlap()
     GXSetCullMode(GX_CULL_NONE);
 
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-    GXPosition3f32(0.0f, 0.0f, 1.0f);
-    GXPosition3f32(640.0f, 0.0f, 1.0f);
-    GXPosition3f32(0.0f, 448.0f, 1.0f);
-    GXPosition3f32(640.0f, 448.0f, 1.0f);
+    GXPosition3f32(kCharaZero, kCharaZero, kCharaOne);
+    GXPosition3f32(FLOAT_803302CC, kCharaZero, kCharaOne);
+    GXPosition3f32(kCharaZero, FLOAT_803302C8, kCharaOne);
+    GXPosition3f32(FLOAT_803302CC, FLOAT_803302C8, kCharaOne);
 
     PSMTX44Copy(CameraPcs.m_screenMatrix, projectionMtx);
     GXSetProjection(projectionMtx, GX_PERSPECTIVE);
@@ -2028,7 +2032,7 @@ void CCharaPcs::drawOverlap()
     PSMTXIdentity(identityMtx);
     GXLoadPosMtxImm(identityMtx, GX_PNMTX0);
     GXSetCullMode(GX_CULL_NONE);
-    C_MTXOrtho(projectionMtx, 0.0f, 448.0f, 0.0f, 640.0f, 0.0f, -1.0f);
+    C_MTXOrtho(projectionMtx, kCharaZero, FLOAT_803302C8, kCharaZero, FLOAT_803302CC, kCharaZero, FLOAT_803302A4);
     GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
     PSMTXIdentity(identityMtx);
     GXLoadPosMtxImm(identityMtx, GX_PNMTX0);
@@ -2046,16 +2050,16 @@ void CCharaPcs::drawOverlap()
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-    GXPosition3f32(0.0f, 0.0f, 0.0f);
-    GXPosition3f32(640.0f, 0.0f, 0.0f);
-    GXPosition3f32(0.0f, 448.0f, 0.0f);
-    GXPosition3f32(640.0f, 448.0f, 0.0f);
+    GXPosition3f32(kCharaZero, kCharaZero, kCharaZero);
+    GXPosition3f32(FLOAT_803302CC, kCharaZero, kCharaZero);
+    GXPosition3f32(kCharaZero, FLOAT_803302C8, kCharaZero);
+    GXPosition3f32(FLOAT_803302CC, FLOAT_803302C8, kCharaZero);
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_NOOP);
     _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
     GXSetChanMatColor(GX_COLOR0A0, white);
     GXLoadTexObj(backBufferTex, GX_TEXMAP0);
-    PSMTXScale(texMtx, 0.003125f, -0.002232143f, 1.0f);
+    PSMTXScale(texMtx, FLOAT_803302DC, FLOAT_803302E0, kCharaOne);
     GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
     GXSetNumTexGens(1);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
@@ -2516,9 +2520,9 @@ int CCharaPcs::LoadAnim(int charaKind, int charaNo, char* animName, int unusedAr
 {
     (void)unusedArg;
 
-    CLoadAnim* loadAnim = FindLoadedAnim(this, charaKind, charaNo, animName);
+    CLoadAnim* loadAnim = FindLoadedAnim(&CharaPcs, charaKind, charaNo, animName);
     if (loadAnim == 0) {
-        loadAnim = LoadAnimFromDisk(this, charaKind, charaNo, animName, mergeFileId, mergeFlags);
+        loadAnim = LoadAnimFromDisk(&CharaPcs, charaKind, charaNo, animName, mergeFileId, mergeFlags);
     }
 
     return loadAnim != 0;

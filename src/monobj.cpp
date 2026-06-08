@@ -1217,7 +1217,7 @@ void CGMonObj::onFrameStat()
 				soundId = 0xCB37;
 			}
 			*reinterpret_cast<float*>(mon + 0x694) = kMonObjDefaultScale;
-			object->m_weaponNodeFlagBytes.m_flags0 = (object->m_weaponNodeFlagBytes.m_flags0 & 0xEF) | 0x10;
+			object->m_weaponNodeFlagBits.m_unk10 = 1;
 			object->m_groundHitOffset.z = 0.0f;
 			object->m_groundHitOffset.y = 0.0f;
 			object->m_groundHitOffset.x = 0.0f;
@@ -1259,7 +1259,7 @@ void CGMonObj::onFrameStat()
 			void* classId = object->m_scriptHandle[4];
 			*reinterpret_cast<float*>(mon + 0x694) = kMonObjDefaultScale;
 			unsigned int clz = __cntlzw(0x3C - reinterpret_cast<int>(classId));
-			object->m_weaponNodeFlagBytes.m_flags0 = (object->m_weaponNodeFlagBytes.m_flags0 & 0xEF) | 0x10;
+			object->m_weaponNodeFlagBits.m_unk10 = 1;
 			object->m_groundHitOffset.z = 0.0f;
 			object->m_groundHitOffset.y = 0.0f;
 			object->m_groundHitOffset.x = 0.0f;
@@ -1291,7 +1291,7 @@ void CGMonObj::onFrameStat()
 				particleBase = 5;
 				soundId = 0xB3D1;
 			}
-			object->m_weaponNodeFlagBytes.m_flags0 = (object->m_weaponNodeFlagBytes.m_flags0 & 0xEF) | 0x10;
+			object->m_weaponNodeFlagBits.m_unk10 = 1;
 			object->m_groundHitOffset.z = 0.0f;
 			object->m_groundHitOffset.y = 0.0f;
 			object->m_groundHitOffset.x = 0.0f;

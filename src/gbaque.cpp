@@ -2156,12 +2156,15 @@ int GbaQueue::GetPlayerHP(int channel, unsigned char* outData)
 	unsigned int changed = static_cast<unsigned int>(
 	    (static_cast<unsigned int>(prevHpFlags) - static_cast<int>(hpFlags)) |
 	    (static_cast<int>(hpFlags) - static_cast<int>(prevHpFlags))) >> 31;
+
 	if (hp != prevHp) {
 		changed = 1;
 	}
 
 	int channelMask = 1 << channel;
-	if ((m_outOfShoukiFlags & channelMask) != (m_prevOutOfShoukiFlags & channelMask)) {
+	char curShouki = static_cast<char>(m_outOfShoukiFlags & channelMask);
+	char prevShouki = static_cast<char>(m_prevOutOfShoukiFlags & channelMask);
+	if (curShouki != prevShouki) {
 		changed = 1;
 	}
 
@@ -2974,9 +2977,9 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 		char* writeBase = cmakeBase + 0x2CB9;
 		*reinterpret_cast<short*>(cmakeBase + 0x2CB4) = static_cast<short>(packetCount + 1);
 		int writeIndex = static_cast<int>(packetCount) * 3 - 2;
-		writeBase[writeIndex] = static_cast<char>(valueBytes[1]);
-		writeBase[writeIndex + 1] = static_cast<char>(valueBytes[2]);
-		writeBase[writeIndex + 2] = static_cast<char>(valueBytes[3]);
+		writeBase[writeIndex++] = static_cast<char>(valueBytes[1]);
+		writeBase[writeIndex++] = static_cast<char>(valueBytes[2]);
+		writeBase[writeIndex] = static_cast<char>(valueBytes[3]);
 
 		if (*reinterpret_cast<short*>(cmakeBase + 0x2CB4) >= 6) {
 			localInfo = cmakeInfo[channel];
@@ -2989,8 +2992,8 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 	}
 
 	if (strlen(reinterpret_cast<char*>(obj + 0x2CB9 + channel * 0x20)) == 0) {
-		obj[0x2CCA + channel * 0x20] = static_cast<char>(0xFF);
-		obj[0x2CD1 + channel * 0x20] = static_cast<char>(0xFF);
+		reinterpret_cast<unsigned char*>(obj)[0x2CCA + channel * 0x20] = 0xFF;
+		reinterpret_cast<unsigned char*>(obj)[0x2CD1 + channel * 0x20] = 0xFF;
 		return;
 	}
 
@@ -3067,8 +3070,8 @@ void GbaQueue::ChkCMakeCharaType(int channel, unsigned int value)
 
 	if (charaType == 0xFF) {
 		OSWaitSemaphore(accessSemaphores + channel);
-		obj[0x2CCA + channel * 0x20] = static_cast<char>(0xFF);
-		obj[0x2CD1 + channel * 0x20] = static_cast<char>(0xFF);
+		reinterpret_cast<unsigned char*>(obj)[0x2CCA + channel * 0x20] = 0xFF;
+		reinterpret_cast<unsigned char*>(obj)[0x2CD1 + channel * 0x20] = 0xFF;
 		OSSignalSemaphore(accessSemaphores + channel);
 		return;
 	}
@@ -3101,7 +3104,7 @@ void GbaQueue::ChkCMakeCharaType(int channel, unsigned int value)
 		CCaravanWork* caravanWork = &Game.m_caravanWorkArr[i];
 		char* caravanObj = reinterpret_cast<char*>(caravanWork);
 		if ((i != playerSlot) && (*reinterpret_cast<int*>(caravanObj + 0x3A4) != 0) &&
-		    (caravanObj[0xBA6] == '\0')) {
+		    (static_cast<unsigned char>(caravanObj[0xBA6]) == 0)) {
 			short existingCharaType = *reinterpret_cast<unsigned short*>(caravanObj + 0x3E0) & 0xFF;
 			existingCharaType |= static_cast<unsigned short>(
 			    static_cast<unsigned char>(static_cast<char>(*reinterpret_cast<unsigned short*>(caravanObj + 0x3E4)) << 2));
@@ -3237,9 +3240,10 @@ void GbaQueue::CMakeFavorite(int channel, unsigned int value)
 		*reinterpret_cast<short*>(obj + 0x2CB4 + channel * 0x20) =
 			static_cast<short>(*reinterpret_cast<short*>(obj + 0x2CB4 + channel * 0x20) + 1);
 		char* favBase = obj + 0x2CCD + channel * 0x20;
-		favBase[writeOffset - 2] = static_cast<char>(valueBytes[1]);
-		favBase[writeOffset - 1] = static_cast<char>(valueBytes[2]);
-		favBase[writeOffset] = static_cast<char>(valueBytes[3]);
+		int writeIndex = writeOffset - 2;
+		favBase[writeIndex++] = static_cast<char>(valueBytes[1]);
+		favBase[writeIndex++] = static_cast<char>(valueBytes[2]);
+		favBase[writeIndex] = static_cast<char>(valueBytes[3]);
 
 		if (*reinterpret_cast<short*>(obj + 0x2CB4 + channel * 0x20) >= 2) {
 			localInfo = cmakeInfo[channel];
@@ -3423,7 +3427,6 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 	outData[2] = 0;
 	outData[3] = 0;
 	itemPtr = localPlayerData;
-	cmdData[3] = 0;
 
 	for (i = 0; i < 0x40; i++, itemPtr += 2) {
 		int itemId = *reinterpret_cast<short*>(itemPtr + 0x3A);
@@ -3536,7 +3539,7 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 	itemIndex = 0;
 	remaining = 0x40;
 	do {
-		int itemId = *reinterpret_cast<short*>(itemPtr + 0x3A);
+		short itemId = *reinterpret_cast<short*>(itemPtr + 0x3A);
 		if ((itemId >= 0) && (itemId <= 0x9E)) {
 			*indexPtr = static_cast<unsigned char>(itemIndex);
 			equipCount++;
@@ -3558,7 +3561,6 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 
 	dataSize = indexBytes + 4;
 	writePtr = outData + 4 + indexBytes;
-	equipData[3] = 0;
 	for (i = 0; i < equipCount; i++) {
 		int itemId = *reinterpret_cast<short*>(localPlayerData + 0x3A + equipIndices[i] * 2);
 		int itemBase = Game.unkCFlatData0[2] + itemId * 0x48;

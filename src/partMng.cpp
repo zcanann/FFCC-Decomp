@@ -957,9 +957,9 @@ void CPartMng::pppGet2Dpos()
             GXPeekZ(static_cast<u16>(x & 0xFFFF), static_cast<u16>(y & 0xFFFF), reinterpret_cast<u32*>(&zAtPixel));
 
             viewPos.z = ppvScreenMatrix0[2][3]
-                        / ((float)((double)(zAtPixel - 0xFFFFFF) / kPartMngDepthUnit) + ppvScreenMatrix0[2][2]);
-            viewPos.x = viewPos.z * (((float)((double)raw->cursorX / kPartMngScreenHalfWidth)) / ppvScreenMatrix0[0][0]);
-            viewPos.y = viewPos.z * ((-(float)((double)raw->cursorY / kPartMngScreenHalfHeight)) / ppvScreenMatrix0[1][1]);
+                        / ((float)(zAtPixel - 0xFFFFFF) / kPartMngDepthUnit + ppvScreenMatrix0[2][2]);
+            viewPos.x = viewPos.z * ((float)raw->cursorX / kPartMngScreenHalfWidth / ppvScreenMatrix0[0][0]);
+            viewPos.y = viewPos.z * (-((float)raw->cursorY / kPartMngScreenHalfHeight) / ppvScreenMatrix0[1][1]);
             viewPos.z = -viewPos.z;
 
             PSMTXInverse(ppvCameraMatrix0, invCamera);

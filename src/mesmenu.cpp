@@ -303,14 +303,14 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
         offset = 0x30;
     }
 
-    float baseY = FLOAT_8033090c + y;
     float stepScale = FLOAT_80330910;
+    float baseY = FLOAT_8033090c + y;
     int valueOffset = 0;
     float baseX = x + (float)offset;
-    float timerScale = FLOAT_80330918;
-    float one = FLOAT_80330914;
-    float pulseScale = FLOAT_8033091c;
     float pulseMul = FLOAT_80330920;
+    float pulseScale = FLOAT_8033091c;
+    float one = FLOAT_80330914;
+    float timerScale = FLOAT_80330918;
 
     for (unsigned int i = 0; i < (scriptFood->m_maxHp >> 1); i++) {
         int heartValue = m_heartValue - valueOffset;

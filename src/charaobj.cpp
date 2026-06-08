@@ -2629,12 +2629,16 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
 
 	System.Printf(const_cast<char*>(sCharaObjResistanceFmt), outA);
 
-	if (outA == 1) {
+	switch (outA) {
+	case 1:
 		outB = (isNormal != 0) ? 1 : 0;
-	} else if (outA == 0) {
+		break;
+	case 0:
 		outB = 1;
-	} else {
+		break;
+	default:
 		outB = 0;
+		break;
 	}
 	outC = (outA ^ 3) / 2;
 }

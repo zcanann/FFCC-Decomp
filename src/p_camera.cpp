@@ -1379,28 +1379,21 @@ void CCameraPcs::createFullShadow()
     m_fullScreenShadow.m_rampTexture = rampTex;
 
     for (i = 0; i < 0x100; i += 8) {
-        unsigned int i1 = i + 1;
-        unsigned int i2 = i + 2;
-        unsigned int i3 = i + 3;
-        unsigned int i4 = i + 4;
-        unsigned int i5 = i + 5;
-        unsigned int i6 = i + 6;
-        unsigned int i7 = i + 7;
-
         rampTex[(i & 0xC) * 0x10 + ((i >> 2) & 0x20) + ((i >> 4) & 7)] = static_cast<unsigned char>(i);
-        rampTex[((i1 * 8) & 0x18) + ((i1 * 0x10) & 0xC0) + ((i1 >> 2) & 0x20) + ((i1 >> 4) & 7)] =
-            static_cast<unsigned char>(i1);
-        rampTex[((i2 * 8) & 0x18) + ((i2 * 0x10) & 0xC0) + ((i2 >> 2) & 0x20) + ((i2 >> 4) & 7)] =
-            static_cast<unsigned char>(i2);
-        rampTex[((i3 * 8) & 0x18) + ((i3 * 0x10) & 0xC0) + ((i3 >> 2) & 0x20) + ((i3 >> 4) & 7)] =
-            static_cast<unsigned char>(i3);
-        rampTex[((i4 * 0x10) & 0xC0) + ((i4 >> 2) & 0x20) + ((i4 >> 4) & 7)] = static_cast<unsigned char>(i4);
-        rampTex[((i5 * 8) & 0x18) + ((i5 * 0x10) & 0xC0) + ((i5 >> 2) & 0x20) + ((i5 >> 4) & 7)] =
-            static_cast<unsigned char>(i5);
-        rampTex[((i6 * 8) & 0x18) + ((i6 * 0x10) & 0xC0) + ((i6 >> 2) & 0x20) + ((i6 >> 4) & 7)] =
-            static_cast<unsigned char>(i6);
-        rampTex[((i7 * 8) & 0x18) + ((i7 * 0x10) & 0xC0) + ((i7 >> 2) & 0x20) + ((i7 >> 4) & 7)] =
-            static_cast<unsigned char>(i7);
+        rampTex[(((i + 1) * 8) & 0x18) + (((i + 1) * 0x10) & 0xC0) + (((i + 1) >> 2) & 0x20) + (((i + 1) >> 4) & 7)] =
+            static_cast<unsigned char>(i + 1);
+        rampTex[(((i + 2) * 8) & 0x18) + (((i + 2) * 0x10) & 0xC0) + (((i + 2) >> 2) & 0x20) + (((i + 2) >> 4) & 7)] =
+            static_cast<unsigned char>(i + 2);
+        rampTex[(((i + 3) * 8) & 0x18) + (((i + 3) * 0x10) & 0xC0) + (((i + 3) >> 2) & 0x20) + (((i + 3) >> 4) & 7)] =
+            static_cast<unsigned char>(i + 3);
+        rampTex[(((i + 4) * 0x10) & 0xC0) + (((i + 4) >> 2) & 0x20) + (((i + 4) >> 4) & 7)] =
+            static_cast<unsigned char>(i + 4);
+        rampTex[(((i + 5) * 8) & 0x18) + (((i + 5) * 0x10) & 0xC0) + (((i + 5) >> 2) & 0x20) + (((i + 5) >> 4) & 7)] =
+            static_cast<unsigned char>(i + 5);
+        rampTex[(((i + 6) * 8) & 0x18) + (((i + 6) * 0x10) & 0xC0) + (((i + 6) >> 2) & 0x20) + (((i + 6) >> 4) & 7)] =
+            static_cast<unsigned char>(i + 6);
+        rampTex[(((i + 7) * 8) & 0x18) + (((i + 7) * 0x10) & 0xC0) + (((i + 7) >> 2) & 0x20) + (((i + 7) >> 4) & 7)] =
+            static_cast<unsigned char>(i + 7);
     }
 
     GXInitTexObj(&m_fullScreenShadow.m_texObjs[1], rampTex, 0x10, 0x10, GX_TF_I8,

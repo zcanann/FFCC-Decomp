@@ -6718,6 +6718,8 @@ int JoyBus::SendScouInfo(ThreadParam* threadParam)
  */
 int JoyBus::SendOpenMenu(ThreadParam* threadParam, char menuId)
 {
+    unsigned int cmd = 0;
+
     bool isSingle = GbaQue.IsSingleMode(threadParam->m_portIndex);
 
     if (isSingle)
@@ -6726,8 +6728,11 @@ int JoyBus::SendOpenMenu(ThreadParam* threadParam, char menuId)
 	}
 
     // Command: [0x14][0x0F][menuId][0]
-    unsigned short opcode = 0x140F;
-    unsigned int cmd = MakeJoyCmd16(opcode, menuId, 0);
+    unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
+    cmdBytes[0] = 0x14;
+    cmdBytes[1] = 0x0F;
+    cmdBytes[2] = menuId;
+    unsigned int word = cmd;
 
     if (static_cast<signed char>(m_threadRunningMask) == 0)
     {
@@ -6746,9 +6751,10 @@ int JoyBus::SendOpenMenu(ThreadParam* threadParam, char menuId)
     }
     else
     {
-        m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
+        m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = word;
         m_cmdCount[threadParam->m_portIndex]++;
         OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+        result = 0;
     }
 
     return result;

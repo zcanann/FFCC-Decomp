@@ -613,7 +613,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         }
     }
 
-    if (edgeIndex != -1 || hitT < kMapHitEdgeMinT || g_hit_t_min <= hitT) {
+    if (edgeIndex != -1 || g_hit_t < kMapHitEdgeMinT || g_hit_t_min <= g_hit_t) {
         if (s_bitMask.m_fields.m_mode != 0) {
             g_hit_lpface->m_drawFlags = s_bitMask.m_fields.m_drawFlags;
         }
@@ -637,9 +637,9 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
                 float edgeT;
                 if (FindIntersection(g_hit_cyl.m_bottom, *hitDirection, edgeCylinder, edgeT) != 0 &&
                     edgeT < g_hit_t_min) {
-                    hitT = edgeT;
+                    g_hit_t = edgeT;
                     edgeIndex = i;
-                    PSVECScale(hitDirection, &g_hit_hpv, hitT);
+                    PSVECScale(hitDirection, &g_hit_hpv, g_hit_t);
                     PSVECAdd(&g_hit_cyl.m_bottom, &g_hit_hpv, &g_hit_hpv);
                     break;
                 }
@@ -647,14 +647,13 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
             previous = current;
         }
 
-        if (edgeIndex == -1 || g_hit_t_min <= hitT) {
+        if (edgeIndex == -1 || g_hit_t_min <= g_hit_t) {
             return 0;
         }
     }
 
-    g_hit_t = hitT;
-    g_hit_t_slide_min = hitT;
-    g_hit_t_min = hitT;
+    g_hit_t_slide_min = g_hit_t;
+    g_hit_t_min = g_hit_t;
     g_hit_f = g_hit_lpface;
     g_hit_cyl_min = g_hit_cyl;
     if (s_bitMask.m_fields.m_mode != 0) {

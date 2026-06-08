@@ -2243,7 +2243,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			setSta(0x1C, calcSta(0x1C, amount, reinterpret_cast<CGObject*>(sourceObj)));
 			break;
 		case 8:
-			if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x4C) == 0) {
+			if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x4C) == 0) {
 				setSta(8, calcSta(8, amount, reinterpret_cast<CGObject*>(sourceObj)));
 				putHitParticleFromItem(sourceObj, amount);
 			} else {
@@ -2422,7 +2422,7 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 		affinity = static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0xBDA));
 	}
 
-	unsigned int selfCid = static_cast<unsigned int>(GetCID());
+	int selfCid = static_cast<unsigned int>(GetCID());
 	if ((selfCid & 0x6D) == 0x6D && (itemType == 8 || itemType == 9)) {
 		affinity -= *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBDB);
 	}

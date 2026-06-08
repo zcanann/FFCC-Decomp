@@ -3386,7 +3386,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     }
     case -0x96:
         m_centerState = *object->m_localBase;
-        *reinterpret_cast<int*>(&m_centerDistanceScale) = object->m_localBase[1];
+        m_centerDistanceScale = *reinterpret_cast<float*>(&object->m_localBase[1]);
         this->push(object, 0);
         outResult = 0;
         break;

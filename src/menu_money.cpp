@@ -155,9 +155,9 @@ int CMenuPcs::MoneyCtrlCur()
 	int attachFlag = SingGetLetterAttachflg();
 
 	if (mode == 0) {
-		unsigned int cursor = this->m_moneyState->selections[mode];
+		int cursor = this->m_moneyState->selections[mode];
 		unsigned int placeValue = 1;
-		while (cursor != 0) {
+		while (0 < cursor) {
 			placeValue *= 10;
 			cursor--;
 		}

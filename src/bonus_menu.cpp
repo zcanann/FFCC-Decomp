@@ -1662,7 +1662,8 @@ void CMenuPcs::CalcSelectOpenAnim()
 		MenuBoardEntry* boardEntries = GetBonusBoardEntries(this);
 		BonusAnimSprite* boardSprite = &sprites[1];
 		for (int i = 0; i < 8; i++) {
-			MenuBoardEntry& entry = boardEntries[activePartyCount * 2 + i];
+			int __p3 = activePartyCount;
+			MenuBoardEntry& entry = boardEntries[__p3 * 2 + i];
 			entry.m_rotZ = 0.0f;
 			entry.m_rotY = 0.0f;
 			entry.m_rotX = 0.0f;
@@ -1792,7 +1793,8 @@ void CMenuPcs::CalcSelectOpenAnim()
 			unsigned int artifactIndex = i - activePartyCount;
 			unsigned int fcvIndex = duration / 5;
 			float rate = (float)(450.0 / (double)(float)duration);
-			int phase = (int)(((double)duration / 10.0) * (double)(10 - artifactIndex));
+			int __p2 = artifactIndex;
+			int phase = (int)(((double)duration / 10.0) * (double)(10 - __p2));
 
 			if (frame == iconSprite->startFrame && this->m_bonusCursorFlag == 0) {
 				this->m_bonusCursorFlag = 1;
@@ -1808,7 +1810,8 @@ void CMenuPcs::CalcSelectOpenAnim()
 				angle = (float)(45.0 * (double)(8 - artifactIndex));
 			} else {
 				int last = iconSprite->timer - 1;
-				if (fcvIndex < last) {
+				int __p4 = fcvIndex;
+				if (last > __p4) {
 					srcVec.x = ((s_BonusModelScale[5] - s_BonusModelScale[4]) /
 					    ((float)phase - (float)fcvIndex)) *
 					    (float)(last - fcvIndex) - s_BonusModelScale[5];

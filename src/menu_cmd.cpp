@@ -1305,9 +1305,6 @@ void CMenuPcs::CmdDraw()
 		choiceFont->SetColor(panelColor);
 
 		const s32 choices = (kCmdMenuOneD == static_cast<double>(panel->scale)) ? 2 : 3;
-		const float pitch = static_cast<float>(
-		    ((static_cast<float>(panel->height) * panel->scale) - kCmdMenuChoicePaddingD) /
-		    choices);
 		for (s32 choice = 0; choice < choices; choice++) {
 			const char* text;
 			if (choice == 0) {
@@ -1318,6 +1315,9 @@ void CMenuPcs::CmdDraw()
 				text = GetMenuStr(0x37);
 			}
 			choiceFont->GetWidth(text);
+			const float pitch = static_cast<float>(
+			    ((static_cast<float>(panel->height) * panel->scale) - kCmdMenuChoicePaddingD) /
+			    choices);
 			choiceFont->SetPosX(static_cast<float>(panel->x + 0x18));
 			choiceFont->SetPosY(
 			    ((pitch * static_cast<float>(choice)) + static_cast<float>(panel->y + 8)) +

@@ -508,7 +508,7 @@ void CGPartyObj::onCancelStat(int state)
 		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x6C4]) << 26) & 0xC0000000) >> 31) != 0) {
 			int weaponB = *reinterpret_cast<int*>(self + 0x6D4);
 			int weaponA = *reinterpret_cast<int*>(self + 0x6D8);
-			if (weaponA < 1) {
+			if (weaponA <= 0) {
 				LoadWeapon(-1, 0);
 			} else {
 				unsigned short packedItem = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + weaponA * 0x48 + 2);
@@ -857,7 +857,7 @@ void CGPartyObj::onFrameAlways()
 		if (m_weaponModelHandle == nullptr) {
 			int weaponItem = party.pendingWeaponItem;
 			int weaponRef = party.weaponItem;
-			if (weaponItem < 1) {
+			if (weaponItem <= 0) {
 				LoadWeapon(-1, 0);
 			} else {
 				unsigned short packedItem = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + weaponItem * 0x48 + 2);
@@ -877,7 +877,7 @@ void CGPartyObj::onFrameAlways()
 		} else {
 			shieldItem = *reinterpret_cast<short*>(script + shieldIndex * 2 + 0xB6);
 		}
-		if (shieldItem < 1) {
+		if (shieldItem <= 0) {
 			LoadShield(-1);
 		} else {
 			int shieldModel = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + shieldItem * 0x48 + 2) & 0xFFF;
@@ -1009,9 +1009,9 @@ void CGPartyObj::onFramePreCalc()
 
 	int weaponItem;
 	int weaponRef;
-	if ((static_cast<int>(CFlatCenterState()) == 0) &&
-	    (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCurrentWeaponItem(weaponItem, weaponRef),
-	     (party.weaponItem != weaponItem) || (party.pendingWeaponItem != weaponRef))) {
+	if (static_cast<int>(CFlatCenterState()) == 0) {
+		reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCurrentWeaponItem(weaponItem, weaponRef);
+		if (party.weaponItem != weaponItem || party.pendingWeaponItem != weaponRef) {
 		bool canImmediateSwap =
 		    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x9A]) << 24) & 0xC0000000) >> 31) != 0) &&
 		    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x9B]) << 24) & 0xC0000000) >> 31) != 0) &&
@@ -1021,7 +1021,7 @@ void CGPartyObj::onFramePreCalc()
 		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x44) == 0);
 
 		if (canImmediateSwap) {
-			if (weaponItem < 1) {
+			if (weaponItem <= 0) {
 				LoadWeapon(-1, 0);
 			} else {
 				unsigned short packedItem = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + weaponItem * 0x48 + 2);
@@ -1036,6 +1036,7 @@ void CGPartyObj::onFramePreCalc()
 			party.weaponRef = weaponRef;
 			party.commandFlagBits.flag20 = 1;
 			changeStat(0x0F, 0, 0);
+		}
 		}
 	}
 
@@ -3371,10 +3372,7 @@ void CGPartyObj::statPut()
 			seNo = 0x24;
 			break;
 		case 0x1B:
-			anim = 9;
-			if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
-				anim = 0x28;
-			}
+			anim = (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) ? 0x28 : 9;
 			seNo = 0x24;
 			break;
 		}
@@ -4825,14 +4823,16 @@ void CGPartyObj::ghostPartyMog()
 
 	float ramp = static_cast<float>(CharaGhostValue(0x2054)) / kMonObjPercentMax;
 	float scale;
-	if (stageMode == 2) {
-		scale = FLOAT_80331A58 * ramp + FLOAT_80331A58;
-	} else if (stageMode > 2) {
+	switch (stageMode) {
+	default:
 		scale = kMonObjOne;
-	} else if (stageMode == 1) {
+		break;
+	case 1:
 		scale = FLOAT_80331A58 * (kMonObjOne - ramp) + FLOAT_80331A58;
-	} else {
-		scale = kMonObjOne;
+		break;
+	case 2:
+		scale = FLOAT_80331A58 * ramp + FLOAT_80331A58;
+		break;
 	}
 	unsigned int distFar = static_cast<unsigned int>(static_cast<int>(FLOAT_80331A5C * scale));
 
@@ -4841,12 +4841,12 @@ void CGPartyObj::ghostPartyMog()
 
 	if (static_cast<double>(m_partyDistance[0]) <= DOUBLE_80331A90) {
 		int exceeded;
-		if (static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x24)) < CharaGhostValue(0x2048) &&
-		    static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x28)) < CharaGhostValue(0x204C) &&
-		    static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x2C)) < CharaGhostValue(0x2050)) {
-			exceeded = 0;
-		} else {
+		if (static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x24)) >= CharaGhostValue(0x2048) ||
+		    static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x28)) >= CharaGhostValue(0x204C) ||
+		    static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x2C)) >= CharaGhostValue(0x2050)) {
 			exceeded = 1;
+		} else {
+			exceeded = 0;
 		}
 
 		if (exceeded && sGhostPartyWork.flagBits.flag10 >= 0) {

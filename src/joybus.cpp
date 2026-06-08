@@ -429,9 +429,11 @@ void JoyBus::Destroy()
  */
 int JoyBus::LoadBin()
 {
-    int result = 0;
+    if (static_cast<signed char>(m_binLoaded) != 0)
+    {
+        return 0;
+    }
 
-    if (static_cast<signed char>(m_binLoaded) == 0)
     {
         CFile::CHandle* file = File.Open((char*)this, 0, CFile::PRI_LOW);
 
@@ -442,7 +444,7 @@ int JoyBus::LoadBin()
                 System.Printf(const_cast<char*>(s_not_found_error_fmt), (char*)this);
             }
 
-            result = -1;
+            return -1;
         }
         else
         {
@@ -514,7 +516,7 @@ int JoyBus::LoadBin()
         }
     }
 
-    return result;
+    return 0;
 }
 
 

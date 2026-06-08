@@ -3400,9 +3400,9 @@ void CGCharaObj::combi2()
 		}
 		continue;
 	changed:
-		comboFlags->m_nearby = -static_cast<int>(hasNearbyPartner != 0);
-		comboFlags->m_active = -1;
-		party->playSe3D(0x3D + static_cast<int>(hasNearbyPartner != 0), 0x32, 0x96, 0, 0);
+		comboFlags->m_nearby = static_cast<signed char>(hasNearbyPartner);
+		comboFlags->m_active = 1;
+		party->playSe3D((static_cast<int>(-static_cast<int>(hasNearbyPartner) | static_cast<int>(hasNearbyPartner)) >> 31) + 0x3D, 0x32, 0x96, 0, 0);
 	}
 
 	for (int i = 0; i < candidateCount - 1; i++) {

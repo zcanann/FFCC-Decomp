@@ -1483,17 +1483,20 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 					continue;
 				}
 
-				if (sourceType == 2) {
+				switch (sourceType) {
+				case 2:
 					bit0 = ((evtWorkBytes[sourceIdx / 8] & (1 << (sourceIdx % 8))) != 0);
 					bit1 = ((evtWorkBytes[(sourceIdx + 1) / 8] & (1 << ((sourceIdx + 1) % 8))) != 0);
 					bit2 = ((evtWorkBytes[(sourceIdx + 2) / 8] & (1 << ((sourceIdx + 2) % 8))) != 0);
-				} else if ((sourceType < 2) && (sourceType != 0)) {
+					break;
+				case 1:
 					bit0 = ((static_cast<signed char>(Game.m_gameWork.m_eventFlags[sourceIdx / 8]) &
 							 (1 << (sourceIdx % 8))) != 0);
 					bit1 = ((static_cast<unsigned char>(Game.m_gameWork.m_eventFlags[(sourceIdx + 1) / 8]) &
 							 (1 << ((sourceIdx + 1) % 8))) != 0);
 					bit2 = ((static_cast<unsigned char>(Game.m_gameWork.m_eventFlags[(sourceIdx + 2) / 8]) &
 							 (1 << ((sourceIdx + 2) % 8))) != 0);
+					break;
 				}
 
 				checkValue = bit0;

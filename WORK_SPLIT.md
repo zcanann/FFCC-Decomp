@@ -40,6 +40,8 @@ Generated against `build/GCCP01/report.json` on latest `main` (overall ~91%). Sc
 
 **Frame-size matching:** duplicate shared expressions/multiplies into each branch, or give by-value struct args their own temporaries, to match the target stack frame (pppRyj set_matrix 80->97; gobject update 0x3d0->0x2b0).
 
+**FP-register-pressure matching (NEW — partially defeats the "register wall"):** when a function is opcode-correct but the target saves MORE callee-saved FP registers than your build (compare the prologue `stfd f18..f31` count + frame size vs `build/GCCP01/asm/<unit>.s`), **hoist the loop-invariant float/double layout constants/colors/coords into named function-scope `float`/`double` locals and reuse them across the draw loops** — MWCC then promotes them into callee-saved FP regs (f18-f31) and the prologue+frame converge to the target, snapping the body register-numbering into alignment. Decode WHICH values the target pins (trace each `stfd f29/f30/...`) and pin exactly those — over-promoting past the target's live range REGRESSES. (wm_menu DrawMCList 54->60.) NOTE: this only fixes an FP-SAVE-COUNT mismatch; pure FP-NUMBERING (f30 vs f31 with equal counts), GPR-numbering, and frame-size-from-an-extra-int-temp remain register walls.
+
 ## CONFIRMED DEAD-ENDS (do not spend time here)
 - **.rodata/.sdata2 pool ORDER is score-irrelevant** — objdiff matches relocations by target SYMBOL name, not numeric offset. Reordering string/const declarations does nothing. (Proven: map .sdata2 made byte-identical -> 0 score change.)
 - **CColor ctor inlining** — the original calls it out-of-line; inlining breaks linkage. Copy-ctor is non-const-ref (__ct__6CColorFR6CColor) and correct as-is.

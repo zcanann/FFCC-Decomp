@@ -1527,7 +1527,6 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
 void CGoOutMenu::CalcGoOut()
 {
     unsigned short input;
-    unsigned char next;
 
     if (m_watchCardDisconnect != 0 && m_modeFrame >= 0x14 && (m_modeFrame & 0xF) == 0) {
         if ((m_modeFrame & 0x10) != 0) {
@@ -1828,33 +1827,35 @@ card_connected:;
         }
         m_cursorListY1 = 0xdc;
         m_cursorMode = 0;
-        next = 0;
+        {
+            unsigned char next = 0;
 
-        if (MenuPcs.m_menuWindowInfo->state == 1) {
-            input = GetGoOutInputMask();
-            if ((input & 3) != 0) {
-                m_cursorChoice ^= 1;
-                Sound.PlaySe(1, 0x40, 0x7f, 0);
-            } else {
+            if (MenuPcs.m_menuWindowInfo->state == 1) {
                 input = GetGoOutInputMask();
-                if ((input & 0x100) != 0) {
-                    if (m_cursorChoice == 0) {
-                        Sound.PlaySe(2, 0x40, 0x7f, 0);
-                    } else if (m_cursorChoice == 1) {
-                        Sound.PlaySe(3, 0x40, 0x7f, 0);
+                if ((input & 3) != 0) {
+                    m_cursorChoice ^= 1;
+                    Sound.PlaySe(1, 0x40, 0x7f, 0);
+                } else {
+                    input = GetGoOutInputMask();
+                    if ((input & 0x100) != 0) {
+                        if (m_cursorChoice == 0) {
+                            Sound.PlaySe(2, 0x40, 0x7f, 0);
+                        } else if (m_cursorChoice == 1) {
+                            Sound.PlaySe(3, 0x40, 0x7f, 0);
+                        }
+                        next = static_cast<signed char>(m_cursorChoice + 1);
                     }
-                    next = static_cast<signed char>(m_cursorChoice + 1);
                 }
             }
-        }
 
-        switch (next) {
-        case 1:
-            SetGoOutMode(0x11);
-            break;
-        case 2:
-            SetGoOutMode(0xf);
-            break;
+            switch (next) {
+            case 1:
+                SetGoOutMode(0x11);
+                break;
+            case 2:
+                SetGoOutMode(0xf);
+                break;
+            }
         }
         break;
     case 0x11:
@@ -1873,33 +1874,35 @@ card_connected:;
         m_cursorListY0 = 0xd3;
         m_cursorListY1 = 0xe9;
         m_cursorMode = 0;
-        next = 0;
+        {
+            unsigned char next = 0;
 
-        if (MenuPcs.m_menuWindowInfo->state == 1) {
-            input = GetGoOutInputMask();
-            if ((input & 3) != 0) {
-                m_cursorChoice ^= 1;
-                Sound.PlaySe(1, 0x40, 0x7f, 0);
-            } else {
+            if (MenuPcs.m_menuWindowInfo->state == 1) {
                 input = GetGoOutInputMask();
-                if ((input & 0x100) != 0) {
-                    if (m_cursorChoice == 0) {
-                        Sound.PlaySe(2, 0x40, 0x7f, 0);
-                    } else if (m_cursorChoice == 1) {
-                        Sound.PlaySe(3, 0x40, 0x7f, 0);
+                if ((input & 3) != 0) {
+                    m_cursorChoice ^= 1;
+                    Sound.PlaySe(1, 0x40, 0x7f, 0);
+                } else {
+                    input = GetGoOutInputMask();
+                    if ((input & 0x100) != 0) {
+                        if (m_cursorChoice == 0) {
+                            Sound.PlaySe(2, 0x40, 0x7f, 0);
+                        } else if (m_cursorChoice == 1) {
+                            Sound.PlaySe(3, 0x40, 0x7f, 0);
+                        }
+                        next = static_cast<signed char>(m_cursorChoice + 1);
                     }
-                    next = static_cast<signed char>(m_cursorChoice + 1);
                 }
             }
-        }
 
-        switch (next) {
-        case 1:
-            SetGoOutMode(0x12);
-            break;
-        case 2:
-            SetGoOutMode(0xf);
-            break;
+            switch (next) {
+            case 1:
+                SetGoOutMode(0x12);
+                break;
+            case 2:
+                SetGoOutMode(0xf);
+                break;
+            }
         }
         break;
     case 0x12:
@@ -1938,34 +1941,36 @@ card_connected:;
         m_cursorListY0 = 0xcf;
         m_cursorListY1 = 0xe7;
         m_cursorMode = 0;
-        next = 0;
+        {
+            unsigned char next = 0;
 
-        if (MenuPcs.m_menuWindowInfo->state == 1) {
-            input = GetGoOutInputMask();
-            if ((input & 3) != 0) {
-                m_cursorChoice ^= 1;
-                Sound.PlaySe(1, 0x40, 0x7f, 0);
-            } else {
+            if (MenuPcs.m_menuWindowInfo->state == 1) {
                 input = GetGoOutInputMask();
-                if ((input & 0x100) != 0) {
-                    if (m_cursorChoice == 0) {
-                        Sound.PlaySe(2, 0x40, 0x7f, 0);
-                    } else if (m_cursorChoice == 1) {
-                        Sound.PlaySe(3, 0x40, 0x7f, 0);
-                    }
+                if ((input & 3) != 0) {
+                    m_cursorChoice ^= 1;
+                    Sound.PlaySe(1, 0x40, 0x7f, 0);
+                } else {
+                    input = GetGoOutInputMask();
+                    if ((input & 0x100) != 0) {
+                        if (m_cursorChoice == 0) {
+                            Sound.PlaySe(2, 0x40, 0x7f, 0);
+                        } else if (m_cursorChoice == 1) {
+                            Sound.PlaySe(3, 0x40, 0x7f, 0);
+                        }
 
-                    next = static_cast<signed char>(m_cursorChoice + 1);
+                        next = static_cast<signed char>(m_cursorChoice + 1);
+                    }
                 }
             }
-        }
 
-        switch (next) {
-        case 1:
-            SetGoOutMode(4);
-            break;
-        case 2:
-            SetMainMode(1);
-            break;
+            switch (next) {
+            case 1:
+                SetGoOutMode(4);
+                break;
+            case 2:
+                SetMainMode(1);
+                break;
+            }
         }
         break;
     case 4:
@@ -1977,34 +1982,36 @@ card_connected:;
         m_cursorListY0 = 0xce;
         m_cursorListY1 = 0xde;
         m_cursorMode = 0;
-        next = 0;
+        {
+            unsigned char next = 0;
 
-        if (MenuPcs.m_menuWindowInfo->state == 1) {
-            input = GetGoOutInputMask();
-            if ((input & 3) != 0) {
-                m_cursorChoice ^= 1;
-                Sound.PlaySe(1, 0x40, 0x7f, 0);
-            } else {
+            if (MenuPcs.m_menuWindowInfo->state == 1) {
                 input = GetGoOutInputMask();
-                if ((input & 0x100) != 0) {
-                    if (m_cursorChoice == 0) {
-                        Sound.PlaySe(2, 0x40, 0x7f, 0);
-                    } else if (m_cursorChoice == 1) {
-                        Sound.PlaySe(3, 0x40, 0x7f, 0);
-                    }
+                if ((input & 3) != 0) {
+                    m_cursorChoice ^= 1;
+                    Sound.PlaySe(1, 0x40, 0x7f, 0);
+                } else {
+                    input = GetGoOutInputMask();
+                    if ((input & 0x100) != 0) {
+                        if (m_cursorChoice == 0) {
+                            Sound.PlaySe(2, 0x40, 0x7f, 0);
+                        } else if (m_cursorChoice == 1) {
+                            Sound.PlaySe(3, 0x40, 0x7f, 0);
+                        }
 
-                    next = static_cast<signed char>(m_cursorChoice + 1);
+                        next = static_cast<signed char>(m_cursorChoice + 1);
+                    }
                 }
             }
-        }
 
-        switch (next) {
-        case 1:
-            SetGoOutMode(5);
-            break;
-        case 2:
-            SetMainMode(1);
-            break;
+            switch (next) {
+            case 1:
+                SetGoOutMode(5);
+                break;
+            case 2:
+                SetMainMode(1);
+                break;
+            }
         }
         break;
     case 5:

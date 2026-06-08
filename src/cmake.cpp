@@ -650,19 +650,19 @@ void CMenuPcs::calcVillageMenu()
             short& frame = villageWork->m_frame;
 
             if (mode == 0) {
-                if (frame < 10) {
+                if (frame >= 10) {
+                    result = 1;
+                } else {
                     frame = frame + 1;
                     result = 0;
-                } else {
-                    result = 1;
                 }
             } else if (mode == 1) {
                 result = CmakeVillageCtrl();
-            } else if (frame < 10) {
+            } else if (frame >= 10) {
+                result = 1;
+            } else {
                 frame = frame + 1;
                 result = 0;
-            } else {
-                result = 1;
             }
 
             villageWork->m_resultFlag = static_cast<short>(result);
@@ -1470,7 +1470,7 @@ void CMenuPcs::CmakeResultDraw()
     if ((mode == 2) && (resultDir < 0)) {
         panelAlphaValue = 1.0f;
     }
-    int panelAlpha = static_cast<int>(static_cast<double>(255.0f) * panelAlphaValue);
+    int panelAlpha = static_cast<int>(255.0f * panelAlphaValue);
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
@@ -1547,7 +1547,7 @@ void CMenuPcs::CmakeResultDraw()
     labelFont->SetScale(1.0f);
     labelFont->DrawInit();
 
-    int textColor = static_cast<int>(static_cast<double>(255.0f) * textAlpha);
+    int textColor = static_cast<int>(255.0f * textAlpha);
     CColor color(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textColor));
     labelFont->SetColor(color.color);
 
@@ -1745,7 +1745,6 @@ void CMenuPcs::CmakeJobDraw()
 
     DrawCmakePreviewChara(this);
 
-    int panelAlpha = static_cast<int>(255.0f * alpha);
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
@@ -1753,7 +1752,7 @@ void CMenuPcs::CmakeJobDraw()
     panelColor.r = 0xFF;
     panelColor.g = 0xFF;
     panelColor.b = 0xFF;
-    panelColor.a = static_cast<unsigned char>(panelAlpha);
+    panelColor.a = static_cast<unsigned char>(static_cast<int>(255.0f * alpha));
     GXSetChanMatColor(GX_COLOR0A0, panelColor);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
     MenuPcs.DrawRect(
@@ -1769,7 +1768,7 @@ void CMenuPcs::CmakeJobDraw()
     font->SetScale(1.0f);
     font->DrawInit();
 
-    CColor textColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(panelAlpha));
+    CColor textColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(255.0f * alpha)));
     font->SetColor(textColor.color);
 
     for (int i = 0; i < 8; ++i) {
@@ -2321,11 +2320,14 @@ void CMenuPcs::CmakeSexDraw()
 
     DrawCmakePreviewChara(this);
 
-    int panelAlpha = static_cast<int>(255.0f * alpha);
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-    GXColor panelColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(panelAlpha)};
+    GXColor panelColor;
+    panelColor.r = 0xFF;
+    panelColor.g = 0xFF;
+    panelColor.b = 0xFF;
+    panelColor.a = static_cast<unsigned char>(static_cast<int>(255.0f * alpha));
     GXSetChanMatColor(GX_COLOR0A0, panelColor);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
     MenuPcs.DrawRect(
@@ -2339,8 +2341,7 @@ void CMenuPcs::CmakeSexDraw()
     font->SetScale(1.0f);
     font->DrawInit();
 
-    int a = static_cast<int>(255.0f * alpha);
-    CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a));
+    CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(255.0f * alpha)));
     font->SetColor(rgba.color);
 
     float maxWidth = 0.0f;
@@ -3067,12 +3068,11 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-    int a = static_cast<int>(255.0f * alpha);
     GXColor col;
     col.r = 0xFF;
     col.g = 0xFF;
     col.b = 0xFF;
-    col.a = static_cast<unsigned char>(a);
+    col.a = static_cast<unsigned char>(static_cast<int>(255.0f * alpha));
     GXSetChanMatColor(GX_COLOR0A0, col);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3A));
@@ -3097,8 +3097,8 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
     font->DrawInit();
     font->SetTlut(7);
 
-    GXColor rgba = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
-    font->SetColor(rgba);
+    CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(255.0f * alpha)));
+    font->SetColor(rgba.color);
 
     const char* yesStr = GetMenuStr(1);
     float yesW = static_cast<float>(font->GetWidth(yesStr));
@@ -3384,12 +3384,11 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-    int a = static_cast<int>(255.0f * alpha);
     GXColor col;
     col.r = 0xFF;
     col.g = 0xFF;
     col.b = 0xFF;
-    col.a = static_cast<unsigned char>(a);
+    col.a = static_cast<unsigned char>(static_cast<int>(255.0f * alpha));
     GXSetChanMatColor(GX_COLOR0A0, col);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
@@ -3421,15 +3420,13 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
     font->DrawInit();
     font->SetTlut(7);
 
-    CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a));
+    CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(255.0f * alpha)));
     font->SetColor(rgba.color);
 
     const char* txt = GetMenuStr(0x29);
     float w = static_cast<float>(font->GetWidth(txt));
     int tx = static_cast<int>(
-        static_cast<double>(static_cast<float>(static_cast<double>(120.0f) - static_cast<double>(w))) *
-            0.5 +
-        480.0);
+        static_cast<double>(120.0f - w) * 0.5 + 480.0);
     int cursorY = static_cast<int>(373.0);
     font->SetPosX(static_cast<float>(tx));
     font->SetPosY(static_cast<float>(cursorY - 4));
@@ -3554,8 +3551,8 @@ void CMenuPcs::DrawCmakeTitle(int page, float x, float alpha)
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x65 : 0x3E));
 
-    float titleX = static_cast<float>(offsU + static_cast<unsigned int>(20.0));
-    float titleY = static_cast<float>(offsU + static_cast<int>(8.0));
+    float titleX = static_cast<float>(static_cast<int>(static_cast<double>(offsU) + 20.0));
+    float titleY = static_cast<float>(static_cast<int>(static_cast<double>(offsU) + 8.0));
     MenuPcs.DrawRect(
         0, titleX, titleY, 208.0f, 24.0f,
         0.0f, static_cast<float>(page * 0x18), 1.0f, 1.0f, 0.0f);
@@ -3798,7 +3795,7 @@ void CMenuPcs::CalcSingCMake()
         CmakeMcState(this) = 3;
     }
 
-    unsigned short result = 0;
+    unsigned short result;
 
     switch (CmakeState(this)->m_step) {
     case 0:

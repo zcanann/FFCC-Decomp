@@ -1907,11 +1907,11 @@ void CMenuPcs::SingleCalcFadeIn()
 
         m_singleFadeState->entries[0].startFrame = 0;
         m_singleFadeState->entries[0].duration = 10;
-        m_singleFadeState->entries[1].startFrame = (m_singleMenuMode == 8) ? 10 : 0;
+        m_singleFadeState->entries[1].startFrame = (m_singleMenuMode == 8) ? 0 : 10;
         m_singleFadeState->entries[1].duration = 10;
-        m_singleFadeState->entries[2].startFrame = (m_singleMenuMode == 8) ? 10 : 0;
+        m_singleFadeState->entries[2].startFrame = (m_singleMenuMode == 8) ? 0 : 10;
         m_singleFadeState->entries[2].duration = 10;
-        m_singleFadeState->entries[3].startFrame = (m_singleMenuMode == 8) ? 10 : 0;
+        m_singleFadeState->entries[3].startFrame = (m_singleMenuMode == 8) ? 0 : 10;
         m_singleFadeState->entries[3].duration = 10;
 
         m_singleFadeState->count = 4;
@@ -2000,7 +2000,7 @@ void CMenuPcs::SingleCalcFadeOut()
         Sound.PlaySe(0xF, 0x40, 0x7F, 0);
         memset(m_singleFadeState, 0, sizeof(SingleFadeState));
 
-        m_singleFadeState->entries[0].startFrame = (m_singleMenuMode == 8) ? 10 : 0;
+        m_singleFadeState->entries[0].startFrame = (m_singleMenuMode == 8) ? 0 : 10;
         m_singleFadeState->entries[0].duration = 10;
         m_singleFadeState->entries[1].startFrame = 0;
         m_singleFadeState->entries[1].duration = 10;

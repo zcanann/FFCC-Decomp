@@ -1996,7 +1996,7 @@ next_player:
                 i++;
                 channelBase += 4;
                 playerBase += 200;
-            } while (i < 4);
+            } while (i <= 3);
 
             if (successMask == (self[0x134B] & 0xF))
             {

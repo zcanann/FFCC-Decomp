@@ -8055,7 +8055,11 @@ int JoyBus::SetOpenMenu(int playerIndex, char menuId)
     {
         bool isSingle = GbaQue.IsSingleMode(m_threadParams[playerIndex].m_portIndex);
 
-        if (!isSingle)
+        if (isSingle)
+        {
+            result = 0;
+        }
+        else
         {
             unsigned int cmd = 0;
             unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
@@ -8086,16 +8090,16 @@ int JoyBus::SetOpenMenu(int playerIndex, char menuId)
                 }
             }
         }
-        else
-        {
-            result = 0;
-        }
     }
     else
     {
         bool isSingle = GbaQue.IsSingleMode(m_threadParams[playerIndex].m_portIndex);
 
-        if (!isSingle)
+        if (isSingle)
+        {
+            result = 0;
+        }
+        else
         {
             unsigned int cmd = 0;
             unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
@@ -8124,10 +8128,6 @@ int JoyBus::SetOpenMenu(int playerIndex, char menuId)
                     result = 0;
                 }
             }
-        }
-        else
-        {
-            result = 0;
         }
     }
 

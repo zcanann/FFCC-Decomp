@@ -1160,7 +1160,7 @@ void CGObject::bgAttribCollision()
         return;
     }
 
-    *(reinterpret_cast<u8*>(&m_shieldNodeFlags)) &= 0xDF;
+    m_shieldNodeFlagBits.m_bit20 = 0;
 
     if ((m_displayFlags & 4) != 0) {
         Vec probePos;
@@ -1190,7 +1190,7 @@ void CGObject::bgAttribCollision()
             Vec hitPos;
             MapMng.m_hitMapObj->CalcHitPosition(&hitPos);
             m_bgCharmFactor = m_worldPosition.y - hitPos.y;
-            *(reinterpret_cast<u8*>(&m_shieldNodeFlags)) |= 0x20;
+            m_shieldNodeFlagBits.m_bit20 = 1;
         }
     }
 

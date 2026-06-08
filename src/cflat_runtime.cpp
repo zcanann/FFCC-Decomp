@@ -305,7 +305,7 @@ void CFlatRuntime::Create(void* filePtr)
 							classBase->m_variableCount = chunkFile.Get4();
 							break;
 						case 'VTBL':
-							for (unsigned int i = 0; i < 0x80; i++) {
+							for (int i = 0; i < 0x80; i++) {
 								classBase->m_functionTable[i] = chunkFile.Get4();
 							}
 							break;

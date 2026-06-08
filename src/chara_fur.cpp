@@ -1051,7 +1051,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 	PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
 
 	if ((heldButtons & 0x100) != 0) {
-		const signed char radarType = MogRadarType();
+		const unsigned char radarType = MogRadarType();
 		if (Chara.MogFur().m_prevRadarType != radarType) {
 			Chara.MogFur().m_prevRadarType = radarType;
 			work.m_pickTicks = 0;

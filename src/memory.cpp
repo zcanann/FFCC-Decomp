@@ -198,16 +198,17 @@ static inline const char* cacheTypeName(const CAmemCache& entry)
     return amem_typeName[entry.m_type];
 }
 
-static inline bool stageHasUnfreedBlocks(CMemory::CStage* stage)
+static inline int stageHasUnfreedBlocks(CMemory::CStage* stage)
 {
+    int found = 0;
     CMemory::CStage::CBlock* node = stageBlockAt(stageGetHeapHead(stage))->m_next;
     while ((node->m_flags & 2) == 0) {
         if ((node->m_flags & kMemoryBlockUsedFlag) != 0) {
-            return true;
+            found = 1;
         }
         node = node->m_next;
     }
-    return false;
+    return found;
 }
 
 static inline void stageReleaseMode2Buffer(CMemory::CStage* stage)
@@ -759,6 +760,7 @@ void CMemory::HeapWalker()
 void CMemory::DestroyStage(CMemory::CStage* stage)
 {
     int mode = stageGetAllocationMode(stage);
+    CMode& modeData = Mode(mode);
 
     if (mode != 2) {
         if (stageHasUnfreedBlocks(stage)) {
@@ -775,7 +777,10 @@ void CMemory::DestroyStage(CMemory::CStage* stage)
         }
     }
 
-    stageMoveToPoolList(this, stage);
+    stage->m_prev->m_next = stage->m_next;
+    stage->m_next->m_prev = stage->m_prev;
+    stage->m_next = modeData.m_freeList.m_next;
+    modeData.m_freeList.m_next = stage;
 }
 
 /*

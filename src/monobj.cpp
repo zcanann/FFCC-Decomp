@@ -3945,10 +3945,7 @@ void CGMonObj::statMove(int* targetIndex)
 			object->m_rotTargetY = *reinterpret_cast<float*>(&object->m_bgFlags);
 		}
 
-		double soundLimit = kMonObjNormalSoundRange;
-		if (Game.m_gameWork.m_soundOptionFlag != 0) {
-			soundLimit = kMonObjWideSoundRange;
-		}
+		double soundLimit = (Game.m_gameWork.m_soundOptionFlag != 0) ? kMonObjWideSoundRange : kMonObjNormalSoundRange;
 
 		int hitPartyIndex;
 		if (static_cast<double>(*reinterpret_cast<float*>(mon + 0x5BC)) < soundLimit) {
@@ -3980,11 +3977,8 @@ void CGMonObj::statMove(int* targetIndex)
 			} else if (alertMode == 0) {
 				*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
 			} else if (alertMode < 3) {
-				double soundLimit2 = kMonObjNormalSoundRange;
-				if (Game.m_gameWork.m_soundOptionFlag != 0) {
-					soundLimit2 = kMonObjWideSoundRange;
-				}
-				if (soundLimit2 > static_cast<double>(*reinterpret_cast<float*>(mon + 0x5BC))) {
+				double soundLimit2 = (Game.m_gameWork.m_soundOptionFlag != 0) ? kMonObjWideSoundRange : kMonObjNormalSoundRange;
+				if (static_cast<double>(*reinterpret_cast<float*>(mon + 0x5BC)) < soundLimit2) {
 					*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x1D;
 					float repopDist =
 						static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xCC));

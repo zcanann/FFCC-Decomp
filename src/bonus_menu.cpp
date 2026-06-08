@@ -1831,11 +1831,11 @@ void CMenuPcs::DrawResultCloseAnim()
 				CCharaPcs::CHandle* handle = 0;
 				if (modelIndex < activePartyCount) {
 					handle = s_Rinfo->m_party[modelIndex].m_partyHandle;
-				} else if (modelIndex / activePartyCount <= 1) {
-					handle = GetBonusDisplayHandleSlots(this)[modelIndex - activePartyCount];
-				} else {
+				} else if (modelIndex / activePartyCount > 1) {
 					modelIndex++;
 					continue;
+				} else {
+					handle = GetBonusDisplayHandleSlots(this)[modelIndex - activePartyCount];
 				}
 
 				if ((double)handle->m_model->m_lightAlpha > 0.0) {

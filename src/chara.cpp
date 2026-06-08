@@ -1122,8 +1122,8 @@ void CChara::CModel::CreateDynamics(void* dynData, CMemory::CStage* stage)
 				}
 
 				ModelDynCount(this) = 0;
-				ModelDynParams(this) =
-				    static_cast<void*>(new (stage, const_cast<char*>(s_chara_cpp), 0x1E7) u8[chunk.m_size * 0x24]);
+				void* dynParams = static_cast<void*>(new (stage, const_cast<char*>(s_chara_cpp), 0x1E7) u8[chunk.m_size * 0x24]);
+				ModelDynParams(this) = dynParams;
 
 				chunkFile.PushChunk();
 				while (chunkFile.GetNextChunk(chunk)) {

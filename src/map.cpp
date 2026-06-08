@@ -2118,6 +2118,9 @@ int CMapMng::ReadOtm(char* mapName)
         chunkFile.PushChunk();
         while (chunkFile.GetNextChunk(chunk)) {
             switch (chunk.m_id) {
+            case 0x5343454E:
+                break;
+
             case 0x4F43544D: {
                 short& octTreeCount = m_octTreeCount;
                 if (octTreeCount >= 0x10) {
@@ -2146,8 +2149,6 @@ int CMapMng::ReadOtm(char* mapName)
                 continue;
             }
 
-            case 0x5343454E:
-                break;
             default:
                 goto otmDone;
             }

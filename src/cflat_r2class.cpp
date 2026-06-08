@@ -204,9 +204,23 @@ static inline unsigned int LoadU16(u8* base, int offset)
 	return *reinterpret_cast<unsigned short*>(base + offset);
 }
 
+template <int disp>
+static inline unsigned int LoadU16Idx(u8* base, int index)
+{
+	base = base + index;
+	return *reinterpret_cast<unsigned short*>(base + disp);
+}
+
 static inline unsigned int LoadS16(u8* base, int offset)
 {
 	return static_cast<unsigned int>(*reinterpret_cast<short*>(base + offset));
+}
+
+template <int disp>
+static inline unsigned int LoadS16Idx(u8* base, int index)
+{
+	base = base + index;
+	return static_cast<unsigned int>(*reinterpret_cast<short*>(base + disp));
 }
 
 static inline unsigned int LoadU32(u8* base, int offset)
@@ -694,7 +708,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 			case -0xD82:
 			case -0xD81:
 			case -0xD80:
-				value = LoadU16(classData, (systemVal + 0xD83) * 2 + 0xAC);
+				value = LoadU16Idx<0xAC>(classData, (systemVal + 0xD83) * 2);
 				break;
 			case -0xD91:
 			case -0xD90:
@@ -710,7 +724,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 			case -0xD86:
 			case -0xD85:
 			case -0xD84:
-				value = LoadU16(classData, (systemVal + 0xD91) * 2 + 0xB4);
+				value = LoadU16Idx<0xB4>(classData, (systemVal + 0xD91) * 2);
 				break;
 			case -0xD92: {
 				u8* p = *reinterpret_cast<u8**>(engineObject + 0xF8);
@@ -742,7 +756,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 			case -0xD9A:
 			case -0xD99:
 			case -0xD98:
-				value = LoadU16(classData, (systemVal + 0xDA7) * 2 + 0xD0);
+				value = LoadU16Idx<0xD0>(classData, (systemVal + 0xDA7) * 2);
 				break;
 			case -0xDB7:
 			case -0xDB6:
@@ -760,7 +774,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 			case -0xDAA:
 			case -0xDA9:
 			case -0xDA8:
-				value = LoadU16(classData, (systemVal + 0xDB7) * 2 + 0xF0);
+				value = LoadU16Idx<0xF0>(classData, (systemVal + 0xDB7) * 2);
 				break;
 			case -0xDBA:
 				value = reinterpret_cast<CGMonObj*>(engineObject)->m_controlMask;
@@ -772,7 +786,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 					const unsigned int mask = 1U << (bit % 8);
 					value = static_cast<unsigned int>((byteValue & mask) != 0);
 				} else if (systemVal <= -500 && systemVal >= -0x2F3) {
-					value = LoadS16(classData, (systemVal + 0x2F3) * 2 + 0x9A4);
+					value = LoadS16Idx<0x9A4>(classData, (systemVal + 0x2F3) * 2);
 				} else {
 					switch (systemVal) {
 					case -0x199:
@@ -783,7 +797,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 					case -0x194:
 					case -0x193:
 					case -0x192:
-						value = LoadU16(classData, (systemVal + 0x199) * 2 + 0x3B8);
+						value = LoadU16Idx<0x3B8>(classData, (systemVal + 0x199) * 2);
 						break;
 					case -0x19C:
 						value = LoadU32(classData, 0x200);
@@ -795,7 +809,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 					case -0x1A8:
 					case -0x1A7:
 					case -0x1A6:
-						value = LoadS16(classData, (systemVal + 0x1A9) * 2 + 0xAC);
+						value = LoadS16Idx<0xAC>(classData, (systemVal + 0x1A9) * 2);
 						break;
 					case -0x1AA:
 						value = LoadU16(classData, 0xB4);
@@ -884,7 +898,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 							case -0x55:
 							case -0x54:
 							case -0x53:
-								value = LoadU16(classData, (-0x53 - systemVal) * 2 + 0x3E);
+								value = LoadU16Idx<0x3E>(classData, (-0x53 - systemVal) * 2);
 								break;
 							case -0x94:
 							case -0x93:
@@ -902,7 +916,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 							case -0x87:
 							case -0x86:
 							case -0x85:
-								value = LoadU16(classData, (systemVal + 0x94) * 2 + 0x8C);
+								value = LoadU16Idx<0x8C>(classData, (systemVal + 0x94) * 2);
 								break;
 							default:
 								break;

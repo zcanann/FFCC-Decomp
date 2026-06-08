@@ -686,32 +686,44 @@ void CGCharaObj::onFramePostCalc()
 
 	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x54C) += 1;
 
-	if (m_ignoreHit[0].m_flagBits.m_flag_80 && m_ignoreHit[0].m_timer != 0) {
-		short t = static_cast<short>(m_ignoreHit[0].m_timer - 1);
-		m_ignoreHit[0].m_timer = t;
-		if (t == 0) {
-			m_ignoreHit[0].m_flagBits.m_flag_80 = 0;
+	if (m_ignoreHit[0].m_flagBits.m_flag_80) {
+		int t = m_ignoreHit[0].m_timer;
+		if (t != 0) {
+			t -= 1;
+			m_ignoreHit[0].m_timer = static_cast<short>(t);
+			if (static_cast<short>(t) == 0) {
+				m_ignoreHit[0].m_flagBits.m_flag_80 = 0;
+			}
 		}
 	}
-	if (m_ignoreHit[1].m_flagBits.m_flag_80 && m_ignoreHit[1].m_timer != 0) {
-		short t = static_cast<short>(m_ignoreHit[1].m_timer - 1);
-		m_ignoreHit[1].m_timer = t;
-		if (t == 0) {
-			m_ignoreHit[1].m_flagBits.m_flag_80 = 0;
+	if (m_ignoreHit[1].m_flagBits.m_flag_80) {
+		int t = m_ignoreHit[1].m_timer;
+		if (t != 0) {
+			t -= 1;
+			m_ignoreHit[1].m_timer = static_cast<short>(t);
+			if (static_cast<short>(t) == 0) {
+				m_ignoreHit[1].m_flagBits.m_flag_80 = 0;
+			}
 		}
 	}
-	if (m_ignoreHit[2].m_flagBits.m_flag_80 && m_ignoreHit[2].m_timer != 0) {
-		short t = static_cast<short>(m_ignoreHit[2].m_timer - 1);
-		m_ignoreHit[2].m_timer = t;
-		if (t == 0) {
-			m_ignoreHit[2].m_flagBits.m_flag_80 = 0;
+	if (m_ignoreHit[2].m_flagBits.m_flag_80) {
+		int t = m_ignoreHit[2].m_timer;
+		if (t != 0) {
+			t -= 1;
+			m_ignoreHit[2].m_timer = static_cast<short>(t);
+			if (static_cast<short>(t) == 0) {
+				m_ignoreHit[2].m_flagBits.m_flag_80 = 0;
+			}
 		}
 	}
-	if (m_ignoreHit[3].m_flagBits.m_flag_80 && m_ignoreHit[3].m_timer != 0) {
-		short t = static_cast<short>(m_ignoreHit[3].m_timer - 1);
-		m_ignoreHit[3].m_timer = t;
-		if (t == 0) {
-			m_ignoreHit[3].m_flagBits.m_flag_80 = 0;
+	if (m_ignoreHit[3].m_flagBits.m_flag_80) {
+		int t = m_ignoreHit[3].m_timer;
+		if (t != 0) {
+			t -= 1;
+			m_ignoreHit[3].m_timer = static_cast<short>(t);
+			if (static_cast<short>(t) == 0) {
+				m_ignoreHit[3].m_flagBits.m_flag_80 = 0;
+			}
 		}
 	}
 }
@@ -804,7 +816,7 @@ void CGCharaObj::onFramePreCalc()
 		if (static_cast<CGPartyObj*>(this)->m_partyData.carryObject != nullptr) {
 			push += 10;
 		}
-		int slot = m_animStateMisc;
+		int slot = static_cast<signed char>(m_animStateMisc);
 		int padHeld;
 		bool useDebugPad = (Pad.m_debugPadLock != 0) || ((slot == 0) && (Pad.m_debugPadPort != -1));
 		if (useDebugPad) {
@@ -827,7 +839,7 @@ void CGCharaObj::onFramePreCalc()
 		m_pushParamB = 100;
 	}
 
-	if ((DbgMenuPcs.GetDbgFlagsRaw() & 1) != 0) {
+	if ((AStar.m_flags & 1) != 0) {
 		m_aStarGroupId = static_cast<unsigned short>(AStar.calcSpecialPolygonGroup(&m_worldPosition));
 	} else {
 		m_aStarGroupId = static_cast<unsigned short>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0xE8));
@@ -1076,8 +1088,7 @@ void CGCharaObj::onFrameStat()
 					reqAnim(0x1B, 1, 0);
 				}
 
-				if (m_scriptHandle != 0 &&
-				    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x46) == 0) {
+				if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x46) == 0) {
 					changeSubStat(2);
 				}
 				break;
@@ -2778,11 +2789,11 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 				particleBank = 2;
 			} else if ((particleFlags & 0x4000) != 0) {
 				particleBank = 3;
-			} else if (particleBank == 1 && particleNo < 8 && m_scriptHandle != 0) {
+			} else if (particleBank == 1 && particleNo < 8) {
 				particleNo += *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0);
 			}
 
-			if ((particleFlags & 0x800) != 0 && m_scriptHandle != 0) {
+			if ((particleFlags & 0x800) != 0) {
 				particleNo += *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2);
 			}
 			hasParticle = 1;

@@ -620,16 +620,17 @@ void GbaQueue::ExecutQueue()
 	obj = reinterpret_cast<char*>(this);
 
 	for (channel = 0; channel < 4; channel++) {
+		if (queue->m_queueFull[channel] != 0) {
+			continue;
+		}
+
+		{
 		const unsigned int playerBit = (1U << channel);
 		const unsigned int shopBit = (0x10U << channel);
 		unsigned int* queueWords = localQueueData[channel];
 		int queueCount = localQueueCount[channel];
 		CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
 		int i;
-
-		if (queue->m_queueFull[channel] != 0) {
-			continue;
-		}
 
 		for (i = 0; i < queueCount; i++) {
 			unsigned int cmdWord = queueWords[i];
@@ -863,6 +864,7 @@ void GbaQueue::ExecutQueue()
 			} else if (Joybus.SendAddLetter(channel) == 0) {
 				m_letterFlags = static_cast<unsigned char>(m_letterFlags & ~static_cast<unsigned char>(playerBit));
 			}
+		}
 		}
 	}
 }

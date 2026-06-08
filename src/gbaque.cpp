@@ -3665,11 +3665,11 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	}
 	memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
-	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
+	unsigned int* foodBasePtr = &Game.m_scriptFoodBase[channel];
 	int totalSize = 0;
 
 	for (int i = 0; i < 0x40; i++) {
-		const int itemId = caravanWork->m_inventoryItems[i];
+		const int itemId = reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_inventoryItems[i];
 		unsigned short sellInfo[4];
 		if ((itemId < 1) || (itemId > 0x9E)) {
 			memset(sellInfo, 0, sizeof(sellInfo));
@@ -3685,9 +3685,9 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 		totalSize += 8;
 	}
 
-	const float userRate = static_cast<float>(static_cast<double>(caravanWork->m_shopParam) / 100.0) * kGbaQueueQuarter;
+	const float userRate = static_cast<float>(static_cast<double>(reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_shopParam) / 100.0) * kGbaQueueQuarter;
 	for (int i = 0; i < 0x40; i++) {
-		const int itemId = caravanWork->m_inventoryItems[i];
+		const int itemId = reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_inventoryItems[i];
 		unsigned int packedPrice;
 		if (itemId > 0) {
 			int itemPrice = static_cast<unsigned short>(
@@ -3711,7 +3711,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 		memset(itemNameScratch, 0, kGbaQueueScratchTextSize);
 		memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
-		const int itemId = caravanWork->m_inventoryItems[i];
+		const int itemId = reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_inventoryItems[i];
 		if (itemId < 1) {
 			outData[0] = 0;
 			outData += 1;

@@ -41,13 +41,6 @@ extern int __float_huge[];
 static const char s_partyObjGhostFmt[] = "%d/%d %d/%d %d/%d";
 static const char s_partyObjGhostAngleFmt[] = "%d/%d a=%d";
 static const char s_partyObjDebugScriptFmt[] = "%d %d %d %d %d %d";
-static const char s_partyBonusKind0Fmt[] = "bonus kind0:%d";
-static const char s_partyBonusKind1Fmt[] = "bonus kind1:%d";
-static const char s_partyBonusKind4Fmt[] = "bonus kind4:%d";
-static const char s_partyBonusAddFmt[] = "bonus slot:%d add:%d";
-static const char s_partyBonusSubFmt[] = "bonus slot:%d sub:%d";
-static const char s_partyBonusUnknownFmt[] = "bonus unknown";
-
 extern "C" const float kMonObjPercentMax;
 extern "C" const float kMonObjOne;
 extern const float FLOAT_80331A58 = 0.5f;
@@ -402,6 +395,8 @@ void CGPartyObj::onChangeStat(int state)
 	m_weaponNodeFlagAll.m_bits1.m_menuReady = 0;
 
 	switch (state) {
+	case -20:
+		break;
 	case 0:
 		m_weaponNodeFlagAll.m_bits1.m_menuReady = 1;
 		break;
@@ -736,7 +731,7 @@ void CGPartyObj::menu()
 			if (Game.m_gameWork.m_gamePaused != 0) {
 				return;
 			}
-			if (m_animStateMisc != 0) {
+			if (static_cast<char>(m_animStateMisc) != 0) {
 				return;
 			}
 		}
@@ -887,7 +882,7 @@ void CGPartyObj::onFrameAlways()
 			LoadShield(-1);
 		} else {
 			int shieldModel = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + shieldItem * 0x48 + 2) & 0xFFF;
-			if (m_shieldModelHandle == nullptr || m_shieldModelHandle->m_charaNo != shieldModel) {
+			if (m_shieldModelHandle == nullptr || static_cast<unsigned int>(m_shieldModelHandle->m_charaNo) != static_cast<unsigned int>(shieldModel)) {
 				LoadShield(shieldModel);
 			}
 		}
@@ -1634,21 +1629,20 @@ void CGPartyObj::shouki()
 		}
 	}
 
-	const int frame = *reinterpret_cast<int*>(&m_flagBits);
 	if (m_unk688 == 0 &&
 	    static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 27) & 0xC0000000) >> 31) == 0) {
 		int healCount = 0;
 		if (PartyData(this).carryObject == reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)) {
-			if (isFrameInterval(frame, *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 4))) {
+			if (isFrameInterval(*reinterpret_cast<int*>(&m_flagBits), *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 4))) {
 				healCount = 1;
 			}
 		} else {
-			if (isFrameInterval(frame, *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 6))) {
+			if (isFrameInterval(*reinterpret_cast<int*>(&m_flagBits), *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 6))) {
 				healCount = 1;
 			}
 		}
 		const unsigned char periodicHeal = script[0xBDC];
-		if (periodicHeal != 0 && isFrameInterval(frame, periodicHeal)) {
+		if (periodicHeal != 0 && isFrameInterval(*reinterpret_cast<int*>(&m_flagBits), periodicHeal)) {
 			healCount += 1;
 		}
 		if (healCount != 0) {
@@ -1660,7 +1654,7 @@ void CGPartyObj::shouki()
 		if ((*reinterpret_cast<unsigned int*>(script + 0x3B0) & 0x2000) != 0) {
 			damageInterval += *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 8);
 		}
-		if (isFrameInterval(frame, damageInterval)) {
+		if (isFrameInterval(*reinterpret_cast<int*>(&m_flagBits), damageInterval)) {
 			playSe3D(0x19, 0x32, 0x96, 0, 0);
 			if ((CFlatGameFlags() & 0x20) == 0) {
 				addHp(-1, static_cast<CGPrgObj*>(0));
@@ -2433,11 +2427,10 @@ void CGPartyObj::onStatAttack(int chargeType)
 	         0x1CA) +
 	    chain * 0x12);
 
-	const unsigned short stepStart = *reinterpret_cast<unsigned short*>(attackEntry + 4);
-	const unsigned short stepEnd = *reinterpret_cast<unsigned short*>(attackEntry + 6);
-	if (chain > 0 && m_stateFrame == stepStart && Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
+	if (chain > 0 && m_stateFrame == *reinterpret_cast<unsigned short*>(attackEntry + 4) && Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
 		const float stepSpeed = FLOAT_80331ADC * static_cast<float>(*reinterpret_cast<unsigned short*>(attackEntry + 8));
-		moveVectorRot(m_rotTargetY, FLOAT_80331a78, stepSpeed, (stepEnd - stepStart) + 1);
+		moveVectorRot(m_rotTargetY, FLOAT_80331a78, stepSpeed,
+		    (*reinterpret_cast<unsigned short*>(attackEntry + 6) - *reinterpret_cast<unsigned short*>(attackEntry + 4)) + 1);
 	}
 
 	const unsigned short comboStart = *reinterpret_cast<unsigned short*>(attackEntry + 0x0C);
@@ -2999,14 +2992,14 @@ void CGPartyObj::onStatMagic()
 				m_comboCenter = m_worldPosition;
 				m_comboTarget = m_comboCenter;
 				switch (Math.Rand(4)) {
-				case 2:
-					m_itemId = 0x232;
-					break;
 				case 0:
 					m_itemId = 0x230;
 					break;
 				case 1:
 					m_itemId = 0x231;
+					break;
+				case 2:
+					m_itemId = 0x232;
 					break;
 				case 3:
 					m_itemId = 0x238;
@@ -3455,39 +3448,35 @@ void CGPartyObj::statPickup()
  */
 void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 {
+	const char* msgBase = lbl_801DCA48;
 	if (source != nullptr && (static_cast<unsigned short>(source->GetCID()) & 0x2D) != 0x2D) {
 		return;
 	}
 
-	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
-	if (script == nullptr) {
-		return;
-	}
-
-	unsigned int bonusSlot = script[0xBA4];
+	unsigned int bonusSlot = reinterpret_cast<unsigned char*>(m_scriptHandle)[0xBA4];
 	unsigned int addValue = 0;
 	unsigned int subValue = 0;
-	unsigned short currentAdd = *reinterpret_cast<unsigned short*>(script + 0xBCA);
-	unsigned short currentSub = *reinterpret_cast<unsigned short*>(script + 0xBCC);
+	unsigned short currentAdd = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBCA);
+	unsigned short currentSub = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBCC);
 	CGame::CBossArtifactStage* bossArtifacts =
 		&Game.m_bossArtifactBase[Game.m_gameWork.m_bossArtifactStageIndex];
 	unsigned int stageAdd = bossArtifacts->m_entries[bonusSlot + 8].m_values[3];
 	unsigned int stageSub = bossArtifacts->m_entries[bonusSlot + 9].m_values[0];
 
 	if (kind == 0) {
-		unsigned short count = *reinterpret_cast<unsigned short*>(script + 0xBC8);
-		System.Printf(const_cast<char*>(s_partyBonusKind0Fmt), count + 1);
-		*reinterpret_cast<unsigned short*>(script + 0xBC8) = count + 1;
+		unsigned short count = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBC8);
+		System.Printf(const_cast<char*>(msgBase + 0x1C0), count + 1);
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBC8) = count + 1;
 	}
 	if (kind == 1) {
-		unsigned short count = *reinterpret_cast<unsigned short*>(script + 0xBC4);
-		System.Printf(const_cast<char*>(s_partyBonusKind1Fmt), count + 1);
-		*reinterpret_cast<unsigned short*>(script + 0xBC4) = count + 1;
+		unsigned short count = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBC4);
+		System.Printf(const_cast<char*>(msgBase + 0x1DC), count + 1);
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBC4) = count + 1;
 	}
 	if (kind == 4) {
-		unsigned short count = *reinterpret_cast<unsigned short*>(script + 0xBC6);
-		System.Printf(const_cast<char*>(s_partyBonusKind4Fmt), count + 1);
-		*reinterpret_cast<unsigned short*>(script + 0xBC6) = count + 1;
+		unsigned short count = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBC6);
+		System.Printf(const_cast<char*>(msgBase + 0x1F8), count + 1);
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBC6) = count + 1;
 	}
 
 	switch (bonusSlot) {
@@ -3613,7 +3602,7 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 		}
 		break;
 	case 0x15:
-		System.Printf(const_cast<char*>(s_partyBonusUnknownFmt));
+		System.Printf(const_cast<char*>(msgBase + 0x218));
 		break;
 	case 0x16:
 		if (kind == 0x14) {
@@ -3639,9 +3628,9 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 			total = 100;
 		}
 		if (bonusSlot != 0) {
-			System.Printf(const_cast<char*>(s_partyBonusAddFmt), bonusSlot, total);
+			System.Printf(const_cast<char*>(msgBase + 0x230), bonusSlot, total);
 		}
-		*reinterpret_cast<unsigned short*>(script + 0xBCA) = static_cast<unsigned short>(total);
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBCA) = static_cast<unsigned short>(total);
 	}
 
 	if (subValue != 0) {
@@ -3651,8 +3640,8 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 		} else if (total > 100) {
 			total = 100;
 		}
-		System.Printf(const_cast<char*>(s_partyBonusSubFmt), bonusSlot, total);
-		*reinterpret_cast<unsigned short*>(script + 0xBCC) = static_cast<unsigned short>(total);
+		System.Printf(const_cast<char*>(msgBase + 0x24C), bonusSlot, total);
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBCC) = static_cast<unsigned short>(total);
 	}
 }
 
@@ -4115,7 +4104,7 @@ void CGPartyObj::SetBonusCondition(int useRandom, int bonus0, int bonus1, int bo
 			case 2:
 				bonus = bonus2;
 				break;
-			default:
+			case 3:
 				bonus = bonus3;
 				break;
 			}
@@ -5301,6 +5290,17 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 	    ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D) && (reinterpret_cast<int*>(m_scriptHandle)[0xED] != 0)) {
 		unsigned int bossKind;
 		switch (Game.m_gameWork.m_bossArtifactStageIndex) {
+		default:
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+			bossKind = 0;
+			break;
+		case 6:
+		case 0x0A:
+			bossKind = 1;
+			break;
 		case 4:
 		case 8:
 		case 9:
@@ -5308,13 +5308,6 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 		case 0x0C:
 		case 0x0D:
 			bossKind = 2;
-			break;
-		case 6:
-		case 0x0A:
-			bossKind = 1;
-			break;
-		default:
-			bossKind = 0;
 			break;
 		}
 

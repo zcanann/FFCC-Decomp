@@ -3797,7 +3797,7 @@ void CMenuPcs::CalcSingCMake()
         CmakeMcState(this) = 3;
     }
 
-    unsigned short result = 0;
+    unsigned short result;
 
     switch (CmakeState(this)->m_step) {
     case 0:

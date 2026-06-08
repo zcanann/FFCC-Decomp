@@ -1014,11 +1014,15 @@ state100:
 		memset(&m_moveWork, 0, sizeof(m_moveWork));
 		m_moveWork.m_flags = 0x322;
 
+		Vec targetPos;
 		if (m_actionBranch == 1) {
-			m_moveWork.m_targetPos = CVector(kMonObjBossRightTargetXZ, kMonObjBossZero, kMonObjBossRightTargetXZ);
+			targetPos = CVector(kMonObjBossRightTargetXZ, kMonObjBossZero, kMonObjBossRightTargetXZ);
 		} else {
-			m_moveWork.m_targetPos = CVector(kMonObjBossLeftTargetX, kMonObjBossZero, kMonObjBossLeftTargetZ);
+			targetPos = CVector(kMonObjBossLeftTargetX, kMonObjBossZero, kMonObjBossLeftTargetZ);
 		}
+		m_moveWork.m_targetPos.x = targetPos.x;
+		m_moveWork.m_targetPos.y = targetPos.y;
+		m_moveWork.m_targetPos.z = targetPos.z;
 		m_moveWork.m_range = kMonObjBossShortMoveRange;
 		m_moveWork.m_changeStat = 0x65;
 	}

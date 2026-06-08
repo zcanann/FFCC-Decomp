@@ -2264,8 +2264,9 @@ void _pppCalcPart(_pppMngSt* pppMngSt)
 		}
 	}
 
+	s32 i = 0;
 	s32 pDataValOffset = 0;
-	for (s32 i = 0; i < pppMngSt->m_numPrograms; i++)
+	for (; i < pppMngSt->m_numPrograms; i++)
 	{
 		_pppPDataVal* pDataVals = pppMngSt->m_pppPDataVals;
 		_pppPDataVal* pDataVal = (_pppPDataVal*)((u8*)pDataVals + pDataValOffset);

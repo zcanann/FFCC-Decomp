@@ -1669,9 +1669,9 @@ card_connected:;
                 SetGoOutMode(0);
             } else {
                 m_accessCardChannel = 0;
-                MenuPcs.m_mcCtrl.m_cardChannel = m_accessCardChannel;
-                m_cardChannel = static_cast<char>(MenuPcs.m_mcCtrl.m_cardChannel);
+                m_cardChannel = static_cast<char>(m_accessCardChannel);
                 m_saveIndex = static_cast<char>(m_accessSaveIndex);
+                MenuPcs.m_mcCtrl.m_cardChannel = m_accessCardChannel;
                 SetGoOutMode(10);
             }
         }

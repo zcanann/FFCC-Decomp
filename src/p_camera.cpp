@@ -691,9 +691,9 @@ void CCameraPcs::CalcQuake()
         return;
     }
 
-    if (m_quake.m_startTimer < 1) {
+    if (m_quake.m_startTimer <= 0) {
         if (m_quake.m_state == 0) {
-            if (m_quake.m_endTimer < 1) {
+            if (m_quake.m_endTimer <= 0) {
                 m_quake.m_state = 0;
                 m_quake.m_startTimer = 0;
                 m_quake.m_startDuration = 0;

@@ -3763,6 +3763,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
     unsigned short& chunkSize = *reinterpret_cast<unsigned short*>(temp + 0x14);
 
     unsigned int localWord;
+    unsigned char* localBytes = reinterpret_cast<unsigned char*>(&localWord);
     unsigned int gbaStatus = GBARecvSend(threadParam, &localWord);
 
     if (threadParam->m_skipProcessingFlag != 0)
@@ -3795,12 +3796,9 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
     m_recvQueueEntriesArr[port][m_secCmdCount[port]] = 0;
     m_secCmdCount[port]--;
 
-    *reinterpret_cast<unsigned short*>(&localWord) =
-        static_cast<unsigned short>(static_cast<short>(localWord >> 24));
-
     OSSignalSemaphore(&m_accessSemaphores[port]);
 
-    if ((*reinterpret_cast<unsigned char*>(&localWord) & 0x3F) == 7)
+    if ((localBytes[0] & 0x3F) == 7)
     {
         step = 0;
         blockIndex = 0;
@@ -3832,7 +3830,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
         }
 
         const unsigned int typeVal = static_cast<char>(sendType);
-        const int respVal = static_cast<signed char>((localWord >> 16) & 0xFF);
+        const int respVal = static_cast<signed char>(localBytes[1]);
 
         if (result != 0)
         {
@@ -3844,7 +3842,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
         return diffMask - 1;
     }
 
-    if ((int)static_cast<signed char>((localWord >> 16) & 0xFF) == (int)static_cast<char>(sendType))
+    if ((int)static_cast<signed char>(localBytes[1]) == (int)static_cast<char>(sendType))
     {
         step = 0;
         phase = 1;
@@ -3858,7 +3856,8 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
     }
 
     result = 0;
-    localWord = 0x0B000000;
+    localWord = 0;
+    localBytes[0] = 0x0B;
 
     if (phase == 0)
     {
@@ -3942,10 +3941,10 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
             unsigned short crcAcc = 0xFFFF;
             crc = Crc16(size, dataBase, &crcAcc);
 
-            unsigned int word =
-                (static_cast<unsigned int>(0x0B) << 24) |
-                (static_cast<unsigned int>(sendType) << 16) |
-                (static_cast<unsigned int>(blockCount) << 8);
+            unsigned short blockHalf = blockCount;
+            localBytes[0] = 0x0B;
+            localBytes[1] = sendType;
+            *reinterpret_cast<unsigned short*>(localBytes + 2) = __lhbrx(&blockHalf, 0);
 
             if (m_threadRunningMask == 0)
             {
@@ -3953,8 +3952,6 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
             }
             else
             {
-                localWord = word;
-
                 OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
                 if ((int)m_cmdCount[threadParam->m_portIndex] >= 0x40)
@@ -3964,7 +3961,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
                 }
                 else
                 {
-                    m_cmdQueueData[threadParam->m_portIndex][m_cmdCount[threadParam->m_portIndex]] = word;
+                    m_cmdQueueData[threadParam->m_portIndex][m_cmdCount[threadParam->m_portIndex]] = localWord;
                     m_cmdCount[threadParam->m_portIndex]++;
 
                     OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
@@ -3981,18 +3978,11 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
         }
         else if (step == 1)
         {
-            unsigned short size = totalSize;
-            unsigned short len = size;
-
-            unsigned int word =
-                (static_cast<unsigned int>(0x0B00) << 16) |
-                (static_cast<unsigned int>(len & 0x00FF) << 8) |
-                static_cast<unsigned int>(len >> 8);
+            unsigned short len = totalSize;
+            *reinterpret_cast<unsigned short*>(localBytes + 2) = __lhbrx(&len, 0);
 
             if (m_threadRunningMask != 0)
             {
-                localWord = word;
-
                 OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
                 if ((int)m_cmdCount[threadParam->m_portIndex] >= 0x40)
@@ -4002,7 +3992,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
                 }
                 else
                 {
-                    m_cmdQueueData[threadParam->m_portIndex][m_cmdCount[threadParam->m_portIndex]] = word;
+                    m_cmdQueueData[threadParam->m_portIndex][m_cmdCount[threadParam->m_portIndex]] = localWord;
                     m_cmdCount[threadParam->m_portIndex]++;
 
                     OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
@@ -4022,14 +4012,10 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
             unsigned short crcAcc = 0xFFFF;
             unsigned short crcChunk = Crc16(chunkSize, dataBase, &crcAcc);
 
-            unsigned int word =
-                (static_cast<unsigned int>(0x0B00) << 16) |
-                static_cast<unsigned int>(crcChunk);
+            *reinterpret_cast<unsigned short*>(localBytes + 2) = crcChunk;
 
             if (m_threadRunningMask != 0)
             {
-                localWord = word;
-
                 OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
                 if ((int)m_cmdCount[threadParam->m_portIndex] >= 0x40)
@@ -4039,7 +4025,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
                 }
                 else
                 {
-                    m_cmdQueueData[threadParam->m_portIndex][m_cmdCount[threadParam->m_portIndex]] = word;
+                    m_cmdQueueData[threadParam->m_portIndex][m_cmdCount[threadParam->m_portIndex]] = localWord;
                     m_cmdCount[threadParam->m_portIndex]++;
 
                     OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);

@@ -1223,7 +1223,9 @@ void CShopMenu::DrawItemInfo0()
         MenuPcs.DrawNoShadowFont(font, countBuffer, static_cast<float>(countRightX), FLOAT_80332d6c, 4, 0x12);
         MenuPcs.DrawInit();
 
-        SetupShopMenuInfoFont(font);
+        font->DrawInit();
+        font->SetScale(FLOAT_80332d28);
+        font->SetMargin(FLOAT_80332d28);
         const char* quantityText = ShopMenuMes(languageId, SHOP_MENU_TEXT_QUANTITY);
         float quantityWidth = font->GetWidth(quantityText);
         font->DrawInit();

@@ -873,10 +873,10 @@ void CGPartyObj::onFrameAlways()
 		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
 		int shieldIndex = *reinterpret_cast<short*>(script + 0xB0);
 		int shieldItem;
-		if (shieldIndex < 0) {
-			shieldItem = 0;
-		} else {
+		if (shieldIndex >= 0) {
 			shieldItem = *reinterpret_cast<short*>(script + shieldIndex * 2 + 0xB6);
+		} else {
+			shieldItem = 0;
 		}
 		if (shieldItem <= 0) {
 			LoadShield(-1);
@@ -895,8 +895,8 @@ void CGPartyObj::onFrameAlways()
 	int port = reinterpret_cast<int>(m_scriptHandle[0xED]);
 	bool showTraceParticle = false;
 	if ((Game.m_gameWork.m_gameInitFlag != 0) &&
-	    ((CFlatGameFlags() & 0x10) != 0) &&
-	    ((CFlatGameFlags() & 0x08) != 0) &&
+	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 28) & 0xC0000000) >> 31) != 0) &&
+	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 29) & 0xC0000000) >> 31) != 0) &&
 	    ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) << 24) & 0xC0000000) >> 31) != 0) &&
 	     (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(static_cast<unsigned char>(m_weaponNodeFlags >> 8)) << 24) & 0xC0000000) >> 31) != 0)) &&
 	    (m_lastStateId != 6 && m_lastStateId != 2)) {

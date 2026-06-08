@@ -3278,7 +3278,7 @@ void CGCharaObj::StaticFrame()
 			unsigned short hp = *reinterpret_cast<unsigned short*>(script + 0x1C);
 			unsigned short maxHp = *reinterpret_cast<unsigned short*>(script + 0x1A);
 			if (hp != 0 && hp <= (maxHp >> 2)) {
-				if ((System.m_frameCounter % 0x1E) == 0) {
+				if ((static_cast<int>(System.m_frameCounter) % 0x1E) == 0) {
 					Sound.PlaySe(0x53, 0x40, 0x7F, 0);
 				}
 				break;

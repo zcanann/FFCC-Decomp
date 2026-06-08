@@ -927,9 +927,11 @@ void CLightPcs::CBumpLight::MakeLightMap()
         Vec diff;
         PSVECSubtract(&lightPos, &nrm, &diff);
 
-        float scale = kLightOne;
+        float scale;
         if (m_target == 1) {
             scale = kBumpLightTargetScale;
+        } else {
+            scale = kLightOne;
         }
         PSVECScale(&diff, &diff, scale);
         PSVECAdd(&nrm, &diff, &nrm);

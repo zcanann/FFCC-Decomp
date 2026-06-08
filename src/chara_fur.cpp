@@ -1062,7 +1062,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 	PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
 
 	if ((heldButtons & 0x100) != 0) {
-		const signed char radarType = MogRadarType();
+		const unsigned char radarType = MogRadarType();
 		if (Chara.MogFur().m_prevRadarType != radarType) {
 			Chara.MogFur().m_prevRadarType = radarType;
 			MogWork().m_pickTicks = 0;
@@ -1221,7 +1221,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 					MogWork().m_eraseTicks = 0x33;
 				}
 
-				if (radarType >= 0 && radarType < 3 && doPaint != 0 && MogWork().m_loopSeHandle == 0) {
+				if (radarType < 3 && doPaint != 0 && MogWork().m_loopSeHandle == 0) {
 					MogWork().m_loopSeHandle = Sound.PlaySe(0x249f2, 0x40, 0x7F, 0);
 				}
 			}

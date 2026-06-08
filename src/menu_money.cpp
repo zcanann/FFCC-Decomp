@@ -166,9 +166,7 @@ int CMenuPcs::MoneyCtrlCur()
 				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			} else {
 				unsigned int gil = s_Money + placeValue;
-				if ((unsigned int)caravanWork->m_gil < gil) {
-					gil = 0;
-				}
+				gil = ((unsigned int)caravanWork->m_gil < gil) ? 0u : gil;
 				s_Money = gil;
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
 				gil = s_Money;

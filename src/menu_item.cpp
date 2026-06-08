@@ -704,7 +704,7 @@ bool CMenuPcs::ItemOpen()
 void CMenuPcs::ItemInit1()
 {
     float progress;
-    unsigned int count;
+    int count;
     unsigned int blocks;
     int index;
     MenuItemOpenAnim* entry;

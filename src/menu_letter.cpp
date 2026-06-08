@@ -211,7 +211,7 @@ static inline CMemory::CStage* GetLetterMenuStage(CMenuPcs* menu)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::LetterInit()
+inline void CMenuPcs::LetterInit()
 {
 	int state = GetLetterStateBase(this);
 	ClearLetterAnimStorage(this);
@@ -251,7 +251,7 @@ void CMenuPcs::LetterInit()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::LetterInit0()
+inline void CMenuPcs::LetterInit0()
 {
 	int state = GetLetterStateBase(this);
 	ClearLetterAnimStorage(this);
@@ -341,7 +341,7 @@ void CMenuPcs::LetterInit1()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::LetterInit2()
+inline void CMenuPcs::LetterInit2()
 {
 	int state = GetLetterStateBase(this);
 	if (*reinterpret_cast<char*>(state + 0xC) != '\0') {
@@ -394,7 +394,7 @@ void CMenuPcs::LetterInit2()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::LetterInit3()
+inline void CMenuPcs::LetterInit3()
 {
 	int state = GetLetterStateBase(this);
 	if (*reinterpret_cast<char*>(state + 0xC) != '\0') {
@@ -460,7 +460,7 @@ void CMenuPcs::LetterInit3()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::LetterInit4()
+inline void CMenuPcs::LetterInit4()
 {
 	int state = GetLetterStateBase(this);
 	if (*reinterpret_cast<char*>(state + 0xC) != '\0') {
@@ -1179,7 +1179,7 @@ bool CMenuPcs::LetterClose()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::LetterLstOpen()
+inline void CMenuPcs::LetterLstOpen()
 {
 	int state = GetLetterStateBase(this);
 	*reinterpret_cast<s16*>(state + 0x22) = *reinterpret_cast<s16*>(state + 0x22) + 1;
@@ -1223,7 +1223,7 @@ void CMenuPcs::LetterLstOpen()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::LetterLstClose()
+inline void CMenuPcs::LetterLstClose()
 {
 	int state = GetLetterStateBase(this);
 	*reinterpret_cast<s16*>(state + 0x22) = *reinterpret_cast<s16*>(state + 0x22) + 1;
@@ -1272,7 +1272,7 @@ void CMenuPcs::LetterLstClose()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::LetterMessOpen()
+inline void CMenuPcs::LetterMessOpen()
 {
 	int state = GetLetterStateBase(this);
 	CCaravanWork::CLetterWork* letter = &GetLetterCaravanWork()->m_letters[s_SelLetter];
@@ -1333,7 +1333,7 @@ void CMenuPcs::LetterMessOpen()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::LetterItemWinOpen()
+inline void CMenuPcs::LetterItemWinOpen()
 {
 	int state = GetLetterStateBase(this);
 	if (*reinterpret_cast<char*>(state + 0xC) == '\0') {
@@ -1393,7 +1393,7 @@ void CMenuPcs::LetterItemWinOpen()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::LetterItemWinClose()
+inline void CMenuPcs::LetterItemWinClose()
 {
 	int state = GetLetterStateBase(this);
 	if (m_menuWindowInfo->state == 3) {
@@ -1499,7 +1499,7 @@ bool CMenuPcs::LetterReplyWinOpen()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::LetterReplyWinClose()
+inline void CMenuPcs::LetterReplyWinClose()
 {
 	int state = GetLetterStateBase(this);
 	if (m_menuWindowInfo->state == 3) {
@@ -1520,7 +1520,7 @@ void CMenuPcs::LetterReplyWinClose()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::LetterAttachWinOpen()
+inline void CMenuPcs::LetterAttachWinOpen()
 {
 	int state = GetLetterStateBase(this);
 	if (*reinterpret_cast<char*>(state + 0xC) == '\0') {
@@ -1544,7 +1544,7 @@ void CMenuPcs::LetterAttachWinOpen()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::LetterAttachWinClose()
+inline void CMenuPcs::LetterAttachWinClose()
 {
 	int state = GetLetterStateBase(this);
 	if (m_menuWindowInfo->state == 3) {
@@ -1698,7 +1698,7 @@ bool CMenuPcs::LetterConfirmOpen()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::LetterConfirmClose()
+inline void CMenuPcs::LetterConfirmClose()
 {
 	int state = GetLetterStateBase(this);
 	if (m_menuWindowInfo->state == 3) {

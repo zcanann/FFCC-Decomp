@@ -1663,7 +1663,7 @@ void CMapMng::SetLightSource()
             }
             case CMapObjAtr::SPOT_LIGHT: {
                 CMapObjAtrSpotLight* spotAttr = static_cast<CMapObjAtrSpotLight*>(attr);
-                if (*reinterpret_cast<int*>(&spotAttr->m_baseColor) != 0) {
+                if (*reinterpret_cast<unsigned int*>(&spotAttr->m_baseColor) != 0) {
                     CLightPcs::CLight* light = spotAttr->m_light;
                     light->m_type = 1;
                     light->m_targetColor[1] = spotAttr->m_color;

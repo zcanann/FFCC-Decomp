@@ -203,7 +203,7 @@ void CMenuPcs::CompaDraw()
 	}
 
 	int memberIndex = 0;
-	unsigned int shown = 0;
+	int shown = 0;
 	for (int i = 0; i < 8 && shown < familyCount; i++) {
 		int drawIndex = shown;
 		if (shown > 1) {
@@ -258,7 +258,7 @@ void CMenuPcs::CompaDraw()
 	const CCaravanWork* nameWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	memberIndex = 0;
 	shown = 0;
-	for (unsigned int i = 0; i < 8 && shown < familyCount; i++) {
+	for (int i = 0; i < 8 && shown < familyCount; i++) {
 		int drawIndex = shown;
 		if (shown > 1) {
 			drawIndex = memberIndex;

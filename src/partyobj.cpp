@@ -3047,7 +3047,7 @@ void CGPartyObj::onStatMagic()
 	bool canTargetMagic = false;
 	bool ghostTargetActive = false;
 	bool menuStageGhost = false;
-	const unsigned int magicReady = __cntlzw(0x103 - m_itemId);
+	const unsigned int magicReady = __cntlzw(0x103 - m_itemId) >> 5;
 	if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0x0F) {
 		menuStageGhost = true;
 	}
@@ -3064,7 +3064,7 @@ void CGPartyObj::onStatMagic()
 		unsigned short held = getPadHeldForSlot(static_cast<signed char>(m_animStateMisc));
 		if ((held & 0x100) == 0) {
 			if (m_subState == 0 || (m_subState == 1 && m_comboState == 0)) {
-				if ((magicReady >> 5) == 0) {
+				if (magicReady == 0) {
 					changeStat(0, 0, 0);
 				}
 			} else {
@@ -3077,7 +3077,7 @@ void CGPartyObj::onStatMagic()
 			}
 		} else {
 			unsigned short trig = getPadTrigForSlot(static_cast<signed char>(m_animStateMisc));
-			if ((trig & 0x200) != 0 && (magicReady >> 5) == 0) {
+			if ((trig & 0x200) != 0 && magicReady == 0) {
 				changeStat(0, 0, 0);
 			}
 		}

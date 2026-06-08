@@ -731,21 +731,27 @@ void CGObject::move()
  */
 void CGObject::objectCollision()
 {
-    bool keepPushTimer = false;
-    Vec selfBasePos;
-    Vec selfCapsuleOffset;
-    Vec selfCapsulePos;
+    struct ColInfo {
+        CGObject* obj;
+        Vec basePos;
+        Vec capsulePos;
+        Vec capsuleOffset;
+    };
 
-    PSVECAdd(&m_worldPosition, &m_groundHitOffset, &selfBasePos);
-    selfCapsuleOffset.x = m_bodyEllipsoidOffset * -sinf(m_rotBaseY);
-    selfCapsuleOffset.y = sZeroFloat;
-    selfCapsuleOffset.z = m_bodyEllipsoidOffset * -cosf(m_rotBaseY);
-    PSVECAdd(&selfBasePos, &selfCapsuleOffset, &selfCapsulePos);
+    int keepPushTimer = false;
+    ColInfo self;
+
+    self.obj = this;
+    PSVECAdd(&m_worldPosition, &m_groundHitOffset, &self.basePos);
+    self.capsuleOffset.x = m_bodyEllipsoidOffset * -sinf(m_rotBaseY);
+    self.capsuleOffset.y = sZeroFloat;
+    self.capsuleOffset.z = m_bodyEllipsoidOffset * -cosf(m_rotBaseY);
+    PSVECAdd(&self.basePos, &self.capsuleOffset, &self.capsulePos);
 
     if ((m_bgColMask & 0x10000) != 0) {
         for (CGQuadObj* quad = CFlat.FindGQuadObjFirst(); quad != 0;
             quad = CFlat.FindGQuadObjNext(quad)) {
-            if (quad->isInner(&selfBasePos)) {
+            if (quad->isInner(&self.basePos)) {
                 CallOnPush(quad, this, 0);
             }
         }
@@ -757,45 +763,52 @@ void CGObject::objectCollision()
             continue;
         }
 
-        Vec otherBasePos;
-        Vec otherCapsuleOffset;
-        Vec otherCapsulePos;
-        PSVECAdd(&other->m_worldPosition, &other->m_groundHitOffset, &otherBasePos);
-        otherCapsuleOffset.x = other->m_bodyEllipsoidOffset * -sinf(other->m_rotBaseY);
-        otherCapsuleOffset.y = sZeroFloat;
-        otherCapsuleOffset.z = other->m_bodyEllipsoidOffset * -cosf(other->m_rotBaseY);
-        PSVECAdd(&otherBasePos, &otherCapsuleOffset, &otherCapsulePos);
+        ColInfo info;
+        Vec scratch;
+        info.obj = other;
+        PSVECAdd(&other->m_worldPosition, &other->m_groundHitOffset, &info.basePos);
+        info.capsuleOffset.x = other->m_bodyEllipsoidOffset * -sinf(other->m_rotBaseY);
+        info.capsuleOffset.y = sZeroFloat;
+        info.capsuleOffset.z = other->m_bodyEllipsoidOffset * -cosf(other->m_rotBaseY);
+        PSVECAdd(&info.basePos, &info.capsuleOffset, &info.capsulePos);
 
-        const double capsuleDistance = PSVECDistance(&selfCapsulePos, &otherCapsulePos);
-        if ((static_cast<double>(sZeroFloat) == capsuleDistance)
-            || (static_cast<double>(m_nearColRadius + other->m_nearColRadius) < capsuleDistance)) {
+        const float capsuleDistance = PSVECDistance(&self.capsulePos, &info.capsulePos);
+        if ((sZeroFloat == capsuleDistance)
+            || ((m_nearColRadius + other->m_nearColRadius) < capsuleDistance)) {
             continue;
         }
 
         if (((m_bgColMask & 8) != 0) && ((other->m_bgColMask & 8) != 0)) {
-            const int thisAttack = m_objectFlags & 2;
+            const unsigned int thisAttack = m_objectFlags & 2;
 
             if (((thisAttack != 0 && (other->m_objectFlags & 0xC) != 0)
                  || ((m_objectFlags & 0xC) != 0 && (other->m_objectFlags & 2) != 0))
                 && ((m_weaponNodeFlagBits.m_attached == 0) || (m_attachOwner != other))
                 && ((other->m_weaponNodeFlagBits.m_attached == 0) || (other->m_attachOwner != this))
-                && (capsuleDistance < static_cast<double>(m_attackColRadius + other->m_attackColRadius))) {
-                CGObject* frontObj = thisAttack ? this : other;
-                CGObject* hitObj = thisAttack ? other : this;
-                Vec dir;
-                PSVECSubtract(&hitObj->m_worldPosition, &frontObj->m_worldPosition, &dir);
+                && (capsuleDistance < (m_attackColRadius + other->m_attackColRadius))) {
+                ColInfo* frontObj;
+                ColInfo* hitObj;
+                if (thisAttack) {
+                    frontObj = &self;
+                    hitObj = &info;
+                } else {
+                    frontObj = &info;
+                    hitObj = &self;
+                }
+                Vec& dir = scratch;
+                PSVECSubtract(&hitObj->capsulePos, &frontObj->capsulePos, &dir);
                 const float hitRot = atan2f(dir.x, dir.z);
-                const float rotDelta = Math.DstRot(frontObj->m_rotBaseY, hitRot);
+                const float rotDelta = Math.DstRot(frontObj->obj->m_rotBaseY, hitRot);
 
-                if (fabsf(rotDelta) < frontObj->m_frontHitAngle) {
-                    CallOnTalk(frontObj, hitObj, 1);
-                    CallOnTalk(hitObj, frontObj, 0);
+                if (fabs(rotDelta) < frontObj->obj->m_frontHitAngle) {
+                    CallOnTalk(frontObj->obj, hitObj->obj, 1);
+                    CallOnTalk(hitObj->obj, frontObj->obj, 0);
                 }
             }
         }
 
         if (((m_bgColMask & 4) != 0) && ((other->m_bgColMask & 4) != 0)
-            && (capsuleDistance < static_cast<double>(m_bodyColRadius + other->m_bodyColRadius))) {
+            && (capsuleDistance < (m_bodyColRadius + other->m_bodyColRadius))) {
             CallOnPush(this, other, 1);
             CallOnPush(other, this, 0);
         }
@@ -805,8 +818,8 @@ void CGObject::objectCollision()
             && (sZeroFloat < other->m_bodyEllipsoidRadius)) {
             if (((m_weaponNodeFlagBits.m_attached == 0) || (m_attachOwner != other))
                 && ((other->m_weaponNodeFlagBits.m_attached == 0) || (other->m_attachOwner != this))) {
-                const bool usePushTimers = ((m_objectFlags & 0x40) != 0) && ((other->m_objectFlags & 0x40) != 0);
-                const double bodyDistanceLimit = static_cast<double>(m_bodyEllipsoidRadius + other->m_bodyEllipsoidRadius);
+                const int usePushTimers = ((m_objectFlags & 0x40) != 0) && ((other->m_objectFlags & 0x40) != 0);
+                const float bodyDistanceLimit = m_bodyEllipsoidRadius + other->m_bodyEllipsoidRadius;
 
                 if (capsuleDistance < bodyDistanceLimit) {
                     if (usePushTimers
@@ -818,41 +831,42 @@ void CGObject::objectCollision()
                     if (!usePushTimers || (m_collisionPushTimerMax != 0) || (other->m_collisionPushTimerMax == 0)) {
                         const float thisPush = static_cast<float>(m_pushParamA + m_pushParamB);
                         const float otherPush = static_cast<float>(other->m_pushParamA + other->m_pushParamB);
-                        float split = 0.5f + (thisPush - otherPush) / 510.0f;
-                        if (split < sZeroFloat) {
+                        const float rawSplit = 0.5f + (thisPush - otherPush) / 510.0f;
+                        float split;
+                        if (rawSplit < sZeroFloat) {
                             split = sZeroFloat;
-                        }
-                        if (split > sAnimFrameOffset) {
+                        } else if (rawSplit > sAnimFrameOffset) {
                             split = sAnimFrameOffset;
+                        } else {
+                            split = rawSplit;
                         }
 
-                        Vec delta;
+                        Vec& delta = scratch;
                         Vec scaledDelta;
-                        PSVECSubtract(&selfCapsulePos, &otherCapsulePos, &delta);
-                        PSVECScale(&delta, &delta, static_cast<float>((bodyDistanceLimit - capsuleDistance) / bodyDistanceLimit));
+                        PSVECSubtract(&self.capsulePos, &info.capsulePos, &delta);
+                        PSVECScale(&delta, &delta, (bodyDistanceLimit - capsuleDistance) / bodyDistanceLimit);
                         PSVECScale(&delta, &scaledDelta, sAnimFrameOffset - split);
-                        PSVECAdd(&selfCapsulePos, &scaledDelta, &selfCapsulePos);
+                        PSVECAdd(&self.capsulePos, &scaledDelta, &self.capsulePos);
                         PSVECScale(&delta, &scaledDelta, -split);
-                        PSVECAdd(&otherCapsulePos, &scaledDelta, &otherCapsulePos);
+                        PSVECAdd(&info.capsulePos, &scaledDelta, &info.capsulePos);
                     }
                 }
             }
         }
 
-        PSVECSubtract(&otherCapsulePos, &other->m_worldPosition, &other->m_groundHitOffset);
-        PSVECSubtract(&other->m_groundHitOffset, &otherCapsuleOffset, &other->m_groundHitOffset);
+        PSVECSubtract(&info.capsulePos, &other->m_worldPosition, &other->m_groundHitOffset);
+        PSVECSubtract(&other->m_groundHitOffset, &info.capsuleOffset, &other->m_groundHitOffset);
     }
 
     if (keepPushTimer) {
-        if (m_collisionPushTimerMax > 0) {
-            --m_collisionPushTimerMax;
-        }
+        int dec = m_collisionPushTimerMax - 1;
+        m_collisionPushTimerMax = dec & ~(dec >> 31);
     } else {
         m_collisionPushTimerMax = 0x32;
     }
 
-    PSVECSubtract(&selfCapsulePos, &m_worldPosition, &m_groundHitOffset);
-    PSVECSubtract(&m_groundHitOffset, &selfCapsuleOffset, &m_groundHitOffset);
+    PSVECSubtract(&self.capsulePos, &m_worldPosition, &m_groundHitOffset);
+    PSVECSubtract(&m_groundHitOffset, &self.capsuleOffset, &m_groundHitOffset);
 }
 
 /*
@@ -1341,8 +1355,16 @@ void CGObject::update()
 
     float turnDelta = Math.DstRot(m_rotTargetY, m_rotBaseY);
     if (m_animSlotSel != -1 && m_shieldNodeFlagBits.m_bit40) {
-        const float turnLimit = fabsf(m_turnBaseSpeed);
-        turnDelta = ClampFloat(turnDelta, -turnLimit, turnLimit);
+        const double turnLimit = fabs(m_turnBaseSpeed);
+        double clampedTurn;
+        if (turnDelta < -turnLimit) {
+            clampedTurn = -turnLimit;
+        } else if (turnDelta > turnLimit) {
+            clampedTurn = turnLimit;
+        } else {
+            clampedTurn = turnDelta;
+        }
+        turnDelta = clampedTurn;
         m_rotBaseY += turnDelta;
     } else {
         m_rotBaseY += turnDelta * m_hitNormal.x;
@@ -1357,7 +1379,7 @@ void CGObject::update()
         PSMTXRotRad(modelMtx, 'y', atan2f(m_worldPosition.x, m_worldPosition.z));
         Vec mapUp = DAT_801D9B88;
         PSVECNormalize(&m_worldPosition, &worldNorm);
-        PSMTXRotRad(tempMtx, 'x', acosf(PSVECDotProduct(&mapUp, &worldNorm)));
+        PSMTXRotRad(tempMtx, 'x', acosf(PSVECDotProduct(&worldNorm, &mapUp)));
         PSMTXConcat(modelMtx, tempMtx, modelMtx);
 
         PSMTXRotRad(tempMtx, 'y', m_rotBaseY);
@@ -1389,16 +1411,16 @@ void CGObject::update()
 
         if (m_worldParamA == 0x20 || m_worldParamA == 0x13 || m_worldParamA == 0x15 ||
             m_worldParamA == 0x16 || m_worldParamA == 0x17 || m_worldParamA == 0x14) {
-            const float wobbleBias = m_worldParamA == 0x20 ? -0.125f : -0.0625f;
-            m_radiusCtrl.z += (-0.5f * m_radiusCtrl.y) + wobbleBias;
-            m_radiusCtrl.y *= 0.8f;
+            const float wobbleBias = m_worldParamA == 0x20 ? 0.3f : 0.05f;
+            m_radiusCtrl.z += 0.8f * m_radiusCtrl.y + wobbleBias;
+            m_radiusCtrl.y *= 0.95f;
             srt.m_rot.y += m_radiusCtrl.z;
         } else if (m_worldParamA == 0x24 || m_worldParamB == 0x125) {
             const float cameraYaw = CameraPcs.m_yaw;
-            srt.m_rot.y = sQuarterTurn - cameraYaw;
+            srt.m_rot.y = 3.1415927f - cameraYaw;
             srt.m_rot.y += sBgAttrNormal * cosf(sBgAttrNormal * m_radiusCtrl.y);
             srt.m_trans.y += sAnimFrameOffset + sinf(m_radiusCtrl.y);
-            m_radiusCtrl.y += 0.125f;
+            m_radiusCtrl.y += 0.1f;
         }
 
         Math.SRTToMatrix(modelMtx, reinterpret_cast<SRT*>(&srt));
@@ -1413,7 +1435,7 @@ void CGObject::update()
                 const float slideMag = sqrtf(slideMagSq);
                 CVector worldUp(sZeroFloat, sAnimFrameOffset, sZeroFloat);
                 PSVECCrossProduct(&m_groundHitOffset, worldUp, &axis);
-                PSMTXRotAxisRad(rotScratch, &axis, -slideMag / 8.0f);
+                PSMTXRotAxisRad(rotScratch, &axis, -slideMag / 3.0f);
                 PSMTXQuat(tiltMtx, &m_bgCollisionQtrn);
                 PSMTXConcat(rotScratch, tiltMtx, tiltMtx);
                 C_QUATMtx(&m_bgCollisionQtrn, tiltMtx);

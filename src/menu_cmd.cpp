@@ -428,6 +428,8 @@ void CMenuPcs::CmdInit0()
 	GetCmdStateView(this)->commandResult = 0;
 }
 
+#pragma push
+#pragma opt_unroll_loops off
 /*
  * --INFO--
  * PAL Address: 0x8014ff0c
@@ -533,6 +535,7 @@ void CMenuPcs::CmdInit1()
 		fillEntry++;
 	}
 }
+#pragma pop
 
 /*
  * --INFO--

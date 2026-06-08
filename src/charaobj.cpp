@@ -201,6 +201,11 @@ static int& CharaObjComboScriptArg(CGCharaObj* charaObj)
 	return charaObj->m_comboScriptArg;
 }
 
+static int& CharaObjComboItemId(CGCharaObj* charaObj)
+{
+	return charaObj->m_itemId;
+}
+
 static unsigned int& CharaObjComboScriptMode(CGCharaObj* charaObj)
 {
 	return charaObj->m_comboScriptMode;
@@ -3488,14 +3493,14 @@ void CGCharaObj::combi2()
 				party->playSe3D(0x3F, 0x32, 0x96, 0, 0);
 			} else {
 				CharaObjComboCenter(party) = leadParty->m_worldPosition;
-				CharaObjComboScriptArg(party) = 0;
+				CharaObjComboItemId(party) = 0;
 			}
 		} else {
 			CharaObjComboCenter(party) = comboCenter;
 			if (playedComboSe || CharaObjSkipComboScript(party)) {
-				CharaObjComboScriptArg(party) = 0;
+				CharaObjComboItemId(party) = 0;
 			} else {
-				CharaObjComboScriptArg(party) = comboCmd;
+				CharaObjComboItemId(party) = comboCmd;
 				party->playSe3D(0x3F, 0x32, 0x96, 0, 0);
 				playedComboSe = true;
 			}

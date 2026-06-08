@@ -1707,10 +1707,10 @@ void CFlatRuntime2::loadLayer(int layerNo, char* fileName)
 		File.Read(fileHandle);
 		File.SyncCompleted(fileHandle);
 
-		textureSet = new (Game.m_mainStage, const_cast<char*>(sCFlatRuntime2FileTag), 0x4F4) CTextureSet;
+		textureSet = new (getStage(), const_cast<char*>(sCFlatRuntime2FileTag), 0x4F4) CTextureSet;
 		layer->m_textureSet = textureSet;
 		if (textureSet != 0) {
-			textureSet->Create(File.m_readBuffer, Game.m_mainStage, 0, 0, 0, 0);
+			textureSet->Create(File.m_readBuffer, getStage(), 0, 0, 0, 0);
 		}
 
 		File.Close(fileHandle);

@@ -778,7 +778,7 @@ void CGObject::objectCollision()
         }
 
         if (((m_bgColMask & 8) != 0) && ((other->m_bgColMask & 8) != 0)) {
-            const int thisAttack = m_objectFlags & 2;
+            const unsigned int thisAttack = m_objectFlags & 2;
 
             if (((thisAttack != 0 && (other->m_objectFlags & 0xC) != 0)
                  || ((m_objectFlags & 0xC) != 0 && (other->m_objectFlags & 2) != 0))

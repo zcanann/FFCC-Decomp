@@ -175,7 +175,7 @@ static const char s_charaAmemCompactFailed[] =
     "\x83\x93\x82\xc9\x8e\xb8\x94\x73\x82\xb5\x82\xbd\x82\xcc\x82\xc5\x81\x41"
     "\x91\x53\x82\xc4\x8f\xc1\x8b\x8e\x82\xb5\x82\xdc\x82\xb7\x81\x42\n";
 static const char s_charaBasePathFmt[] = "dvd/char/%s/%s%03d/%s%03d%s";
-static const char s_charaAnimPathFmt[] = "dvd/char/k%02d/chara%03d/%s.cha";
+static const char s_charaAnimPathFmt[] = "dvd/char/%s/%s%03d/%s.cha";
 static const char s_charaModelSuffix[] = ".mdl";
 static const char s_charaDynamicsSuffix[] = ".dyn";
 static const char s_charaTextureSuffix[] = ".tex";
@@ -357,14 +357,11 @@ static inline void AddSharedRef(T* ptr)
 
 static inline CCharaPcs::CLoadAnim* FindLoadedAnim(CCharaPcs* self, int charaKind, int charaNo, const char* animName)
 {
-    for (int i = 0; i < LoadAnimArray(self)->GetSize(); i++) {
-        CCharaPcs::CLoadAnim* loadAnim = (*LoadAnimArray(self))[static_cast<unsigned long>(i)];
-        if (reinterpret_cast<int>(loadAnim->m_keyTag) != charaKind ||
-            static_cast<unsigned long>(loadAnim->m_keyId) != static_cast<unsigned long>(charaNo)) {
-            continue;
-        }
-
-        if (strcmp(animName, loadAnim->m_name) == 0) {
+    for (unsigned int i = 0; i < static_cast<unsigned int>(LoadAnimArray(self)->GetSize()); i++) {
+        CCharaPcs::CLoadAnim* loadAnim = (*LoadAnimArray(self))[i];
+        if (reinterpret_cast<int>(loadAnim->m_keyTag) == charaKind &&
+            loadAnim->m_keyId == static_cast<unsigned long>(charaNo) &&
+            strcmp(animName, loadAnim->m_name) == 0) {
             return loadAnim;
         }
     }
@@ -376,7 +373,8 @@ static CCharaPcs::CLoadAnim* LoadAnimFromDisk(
     CCharaPcs* self, int charaKind, int charaNo, const char* animName, int mergeFileId, int mergeFlags)
 {
     char path[0x100];
-    sprintf(path, s_charaAnimPathFmt, charaKind, charaNo, animName);
+    const char** pathParts = s_charaKindPathParts[charaKind];
+    sprintf(path, s_charaAnimPathFmt, pathParts[0], pathParts[1], charaNo, animName);
 
     CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
     if (fileHandle == 0) {

@@ -2369,7 +2369,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 
 			if (-5 < systemIndex) {
 				CObject* const engineObject = reinterpret_cast<CObject*>(object->m_engineObject);
-				if (engineObject != object) {
+				if ((static_cast<u32>(__cntlzw(static_cast<u32>(reinterpret_cast<u8*>(engineObject) - reinterpret_cast<u8*>(object)))) >> 5) == 0) {
 					engineObject->m_previous->m_next = engineObject->m_next;
 					engineObject->m_next->m_previous = engineObject->m_previous;
 

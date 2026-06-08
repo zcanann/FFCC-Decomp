@@ -6883,6 +6883,7 @@ int JoyBus::SendMemorys(ThreadParam* threadParam)
         m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = word;
         m_cmdCount[threadParam->m_portIndex]++;
         OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+        result = 0;
     }
 
     return result;
@@ -6924,6 +6925,7 @@ int JoyBus::SendChgCmdNum(ThreadParam* threadParam)
         m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = word;
         m_cmdCount[threadParam->m_portIndex]++;
         OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+        result = 0;
     }
 
     return result;

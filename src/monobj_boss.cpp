@@ -261,31 +261,31 @@ void CGMonObj::frameStatFuncGiantCrab()
 
 	if (state == 100) {
 		if (*(int*)(self + 0x528) == 0) {
-			int soundStep = *(int*)(SoundBuffer + 0x4f0);
+			int soundStep = *(int*)(CGMonObj::m_boss + 0x4);
 			switch (soundStep) {
 			case 0:
-				*(float*)(SoundBuffer + 0x4f4) = kMonObjBossDuctOffsetPositive;
-				*(float*)(SoundBuffer + 0x4f8) = kMonObjBossZero;
-				*(float*)(SoundBuffer + 0x4fc) = kMonObjBossDuctOffsetNegative;
+				*(float*)(CGMonObj::m_boss + 0x8) = kMonObjBossDuctOffsetPositive;
+				*(float*)(CGMonObj::m_boss + 0xc) = kMonObjBossZero;
+				*(float*)(CGMonObj::m_boss + 0x10) = kMonObjBossDuctOffsetNegative;
 				break;
 			case 1:
-				*(float*)(SoundBuffer + 0x4f4) = kMonObjBossDuctOffsetPositive;
-				*(float*)(SoundBuffer + 0x4f8) = kMonObjBossZero;
-				*(float*)(SoundBuffer + 0x4fc) = kMonObjBossDuctOffsetPositive;
+				*(float*)(CGMonObj::m_boss + 0x8) = kMonObjBossDuctOffsetPositive;
+				*(float*)(CGMonObj::m_boss + 0xc) = kMonObjBossZero;
+				*(float*)(CGMonObj::m_boss + 0x10) = kMonObjBossDuctOffsetPositive;
 				break;
 			case 2:
-				*(float*)(SoundBuffer + 0x4f4) = kMonObjBossDuctOffsetLow;
-				*(float*)(SoundBuffer + 0x4f8) = kMonObjBossZero;
-				*(float*)(SoundBuffer + 0x4fc) = kMonObjBossDuctOffsetNegative;
+				*(float*)(CGMonObj::m_boss + 0x8) = kMonObjBossDuctOffsetLow;
+				*(float*)(CGMonObj::m_boss + 0xc) = kMonObjBossZero;
+				*(float*)(CGMonObj::m_boss + 0x10) = kMonObjBossDuctOffsetNegative;
 				break;
 			case 3:
-				*(float*)(SoundBuffer + 0x4f4) = kMonObjBossDuctOffsetLow;
-				*(float*)(SoundBuffer + 0x4f8) = kMonObjBossZero;
-				*(float*)(SoundBuffer + 0x4fc) = kMonObjBossDuctOffsetPositive;
+				*(float*)(CGMonObj::m_boss + 0x8) = kMonObjBossDuctOffsetLow;
+				*(float*)(CGMonObj::m_boss + 0xc) = kMonObjBossZero;
+				*(float*)(CGMonObj::m_boss + 0x10) = kMonObjBossDuctOffsetPositive;
 				break;
 			}
 
-			*(int*)(SoundBuffer + 0x4f0) = (soundStep + 1) % 4;
+			*(int*)(CGMonObj::m_boss + 0x4) = (soundStep + 1) % 4;
 			reinterpret_cast<CGPrgObj*>(self)->reqAnim(0xc, 0, 0);
 
 			reinterpret_cast<CGPrgObj*>(self)->putParticle(
@@ -305,7 +305,7 @@ void CGMonObj::frameStatFuncGiantCrab()
 			}
 
 			*(u32*)(self + 0x1c0) &= 0xfff7fffd;
-			float moveScale = PSVECDistance((Vec*)(SoundBuffer + 0x4f4), (Vec*)(self + 0x15c)) * kMonObjBossOneSixteenth;
+			float moveScale = PSVECDistance((Vec*)(CGMonObj::m_boss + 0x8), (Vec*)(self + 0x15c)) * kMonObjBossOneSixteenth;
 			Vec moveDir = { 0.0f, 0.0f, 0.0f };
 			reinterpret_cast<CGObject*>(self)->Move(&moveDir, moveScale, 0x10, 1, 0, 0, 0);
 

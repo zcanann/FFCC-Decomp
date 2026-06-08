@@ -2823,15 +2823,16 @@ void CGMonObj::suikomi(int endFrame, float zOffset)
 				float dist = sqrtf(distSq);
 
 				if (kMonObjBossZero < dist) {
-					float accel = (float)((double)kMonObjBossOne / dist) * kMonObjBossQuarter *
-					              (float)(dist / (double)kMonObjBossLargeBodyRadius);
-					*(float*)((unsigned char*)party + 0x104) += dx * accel;
-					*(float*)((unsigned char*)party + 0x10c) += dz * accel;
+					float accel = kMonObjBossOne / dist * (kMonObjBossQuarter * (dist / kMonObjBossLargeBodyRadius));
+					float ax = dx * accel;
+					float az = dz * accel;
+					*(float*)((unsigned char*)party + 0x104) += ax;
+					*(float*)((unsigned char*)party + 0x10c) += az;
 				}
 			}
 		}
 
-		if ((Game.unk_flat3_0xc7d0 != 0) && (*(int*)(Game.unk_flat3_0xc7d0 + 0x550) == 0)) {
+		if ((Game.unk_flat3_0xc7d0 != 0) && (*(unsigned int*)(Game.unk_flat3_0xc7d0 + 0x550) == 0)) {
 			unsigned int target = Game.unk_flat3_0xc7d0;
 			float dx = *(float*)(self + 0x15c) - *(float*)(target + 0x15c);
 			float dz = zOffset + (*(float*)(self + 0x164) - *(float*)(target + 0x164));
@@ -2839,10 +2840,11 @@ void CGMonObj::suikomi(int endFrame, float zOffset)
 			float dist = sqrtf(distSq);
 
 			if (kMonObjBossZero < dist) {
-				float accel = (float)((double)kMonObjBossOne / dist) * kMonObjBossQuarter *
-				              (float)(dist / (double)kMonObjBossLargeBodyRadius);
-				*(float*)(target + 0x104) += dx * accel;
-				*(float*)(target + 0x10c) += dz * accel;
+				float accel = kMonObjBossOne / dist * (kMonObjBossQuarter * (dist / kMonObjBossLargeBodyRadius));
+				float ax = dx * accel;
+				float az = dz * accel;
+				*(float*)(target + 0x104) += ax;
+				*(float*)(target + 0x10c) += az;
 			}
 		}
 

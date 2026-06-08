@@ -2039,7 +2039,7 @@ next_player:
                     *reinterpret_cast<unsigned int*>(txBase + 0x1378) = (j + 0x40) * 0x1000000;
                     *reinterpret_cast<unsigned int*>(txBase + 0x1378) =
                         *reinterpret_cast<unsigned int*>(txBase + 0x1378) | masked;
-                    crc = MiniGameCrc8(*reinterpret_cast<unsigned int*>(txBase + 0x1378));
+                    crc = MiniGameCrc8(*reinterpret_cast<int*>(txBase + 0x1378));
                     j++;
                     *reinterpret_cast<unsigned int*>(txBase + 0x1378) =
                         *reinterpret_cast<unsigned int*>(txBase + 0x1378) | (crc & 0xFF);
@@ -2052,8 +2052,8 @@ next_player:
                     *reinterpret_cast<unsigned int*>(self + 5000) |
                     (((*reinterpret_cast<unsigned short*>(self + 0x134E) & 0xFF) << 8 |
                       (int)(unsigned int)*reinterpret_cast<unsigned short*>(self + 0x134E) >> 8) << 8);
-                seqCrc = MiniGameCrc8(*reinterpret_cast<unsigned int*>(self + 5000));
-                int k = 0;
+                seqCrc = MiniGameCrc8(*reinterpret_cast<int*>(self + 5000));
+                unsigned int k = 0;
                 *reinterpret_cast<unsigned int*>(self + 5000) =
                     *reinterpret_cast<unsigned int*>(self + 5000) | (seqCrc & 0xFF);
                 unsigned char* msgBase = self;

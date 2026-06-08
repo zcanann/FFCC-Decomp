@@ -3259,7 +3259,9 @@ void CGObject::CalcSphereNearPos(float scale, float angleOffset, Vec& outPos)
     Vec offset;
     Mtx rotationMtx;
 
-    up = DAT_801D9B94;
+    *reinterpret_cast<int*>(&up.x) = *reinterpret_cast<const int*>(&DAT_801D9B94.x);
+    *reinterpret_cast<int*>(&up.y) = *reinterpret_cast<const int*>(&DAT_801D9B94.y);
+    *reinterpret_cast<int*>(&up.z) = *reinterpret_cast<const int*>(&DAT_801D9B94.z);
 
     PSVECNormalize(&m_worldPosition, &normal);
     PSVECCrossProduct(&normal, &up, &bitangent);

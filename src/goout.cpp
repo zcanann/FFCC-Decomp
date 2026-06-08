@@ -2242,7 +2242,6 @@ void CGoOutMenu::CalcDel()
     const unsigned char selInit = static_cast<unsigned char>(__cntlzw(2 - static_cast<int>(m_deleteMode)) >> 5 & 0xFF);
     const int selResult = MenuPcs.CalcGoOutSelChar(selInit, 0);
     unsigned short input;
-    unsigned char next;
 
     switch (m_deleteMode) {
     case 0:
@@ -2299,33 +2298,35 @@ void CGoOutMenu::CalcDel()
         m_cursorListY0 = 0xad;
         m_cursorListY1 = 0xbc;
         m_cursorMode = 0;
-        next = 0;
+        {
+            unsigned char next = 0;
 
-        if (MenuPcs.m_menuWindowInfo->state == 1) {
-            input = GetGoOutInputMask();
-            if ((input & 3) != 0) {
-                m_cursorChoice ^= 1;
-                Sound.PlaySe(1, 0x40, 0x7f, 0);
-            } else {
+            if (MenuPcs.m_menuWindowInfo->state == 1) {
                 input = GetGoOutInputMask();
-                if ((input & 0x100) != 0) {
-                    if (m_cursorChoice == 0) {
-                        Sound.PlaySe(2, 0x40, 0x7f, 0);
-                    } else if (m_cursorChoice == 1) {
-                        Sound.PlaySe(3, 0x40, 0x7f, 0);
+                if ((input & 3) != 0) {
+                    m_cursorChoice ^= 1;
+                    Sound.PlaySe(1, 0x40, 0x7f, 0);
+                } else {
+                    input = GetGoOutInputMask();
+                    if ((input & 0x100) != 0) {
+                        if (m_cursorChoice == 0) {
+                            Sound.PlaySe(2, 0x40, 0x7f, 0);
+                        } else if (m_cursorChoice == 1) {
+                            Sound.PlaySe(3, 0x40, 0x7f, 0);
+                        }
+                        next = static_cast<signed char>(m_cursorChoice + 1);
                     }
-                    next = static_cast<signed char>(m_cursorChoice + 1);
                 }
             }
-        }
 
-        switch (next) {
-        case 1:
-            SetDelMode(4);
-            break;
-        case 2:
-            SetDelMode(2);
-            break;
+            switch (next) {
+            case 1:
+                SetDelMode(4);
+                break;
+            case 2:
+                SetDelMode(2);
+                break;
+            }
         }
         break;
     case 4:
@@ -2351,33 +2352,35 @@ void CGoOutMenu::CalcDel()
         m_cursorListY0 = 0xc2;
         m_cursorListY1 = 0xd1;
         m_cursorMode = 0;
-        next = 0;
+        {
+            unsigned char next = 0;
 
-        if (MenuPcs.m_menuWindowInfo->state == 1) {
-            input = GetGoOutInputMask();
-            if ((input & 3) != 0) {
-                m_cursorChoice ^= 1;
-                Sound.PlaySe(1, 0x40, 0x7f, 0);
-            } else {
+            if (MenuPcs.m_menuWindowInfo->state == 1) {
                 input = GetGoOutInputMask();
-                if ((input & 0x100) != 0) {
-                    if (m_cursorChoice == 0) {
-                        Sound.PlaySe(2, 0x40, 0x7f, 0);
-                    } else if (m_cursorChoice == 1) {
-                        Sound.PlaySe(3, 0x40, 0x7f, 0);
+                if ((input & 3) != 0) {
+                    m_cursorChoice ^= 1;
+                    Sound.PlaySe(1, 0x40, 0x7f, 0);
+                } else {
+                    input = GetGoOutInputMask();
+                    if ((input & 0x100) != 0) {
+                        if (m_cursorChoice == 0) {
+                            Sound.PlaySe(2, 0x40, 0x7f, 0);
+                        } else if (m_cursorChoice == 1) {
+                            Sound.PlaySe(3, 0x40, 0x7f, 0);
+                        }
+                        next = static_cast<unsigned char>(m_cursorChoice + 1);
                     }
-                    next = static_cast<unsigned char>(m_cursorChoice + 1);
                 }
             }
-        }
 
-        switch (next) {
-        case 1:
-            SetDelMode(5);
-            break;
-        case 2:
-            SetDelMode(2);
-            break;
+            switch (next) {
+            case 1:
+                SetDelMode(5);
+                break;
+            case 2:
+                SetDelMode(2);
+                break;
+            }
         }
         break;
     case 5:
@@ -2416,33 +2419,35 @@ void CGoOutMenu::CalcDel()
         m_cursorListY0 = 0x97;
         m_cursorListY1 = 0xe9;
         m_cursorMode = 0;
-        next = 0;
+        {
+            unsigned char next = 0;
 
-        if (MenuPcs.m_menuWindowInfo->state == 1) {
-            input = GetGoOutInputMask();
-            if ((input & 3) != 0) {
-                m_cursorChoice ^= 1;
-                Sound.PlaySe(1, 0x40, 0x7f, 0);
-            } else {
+            if (MenuPcs.m_menuWindowInfo->state == 1) {
                 input = GetGoOutInputMask();
-                if ((input & 0x100) != 0) {
-                    if (m_cursorChoice == 0) {
-                        Sound.PlaySe(2, 0x40, 0x7f, 0);
-                    } else if (m_cursorChoice == 1) {
-                        Sound.PlaySe(3, 0x40, 0x7f, 0);
+                if ((input & 3) != 0) {
+                    m_cursorChoice ^= 1;
+                    Sound.PlaySe(1, 0x40, 0x7f, 0);
+                } else {
+                    input = GetGoOutInputMask();
+                    if ((input & 0x100) != 0) {
+                        if (m_cursorChoice == 0) {
+                            Sound.PlaySe(2, 0x40, 0x7f, 0);
+                        } else if (m_cursorChoice == 1) {
+                            Sound.PlaySe(3, 0x40, 0x7f, 0);
+                        }
+                        next = static_cast<signed char>(m_cursorChoice + 1);
                     }
-                    next = static_cast<signed char>(m_cursorChoice + 1);
                 }
             }
-        }
 
-        switch (next) {
-        case 1:
-            SetDelMode(7);
-            break;
-        case 2:
-            SetDelMode(2);
-            break;
+            switch (next) {
+            case 1:
+                SetDelMode(7);
+                break;
+            case 2:
+                SetDelMode(2);
+                break;
+            }
         }
         break;
     case 7:
@@ -2468,34 +2473,36 @@ void CGoOutMenu::CalcDel()
         m_cursorListY0 = 0x9f;
         m_cursorListY1 = 0xdb;
         m_cursorMode = 0;
-        next = 0;
+        {
+            unsigned char next = 0;
 
-        if (MenuPcs.m_menuWindowInfo->state == 1) {
-            input = GetGoOutInputMask();
-            if ((input & 3) != 0) {
-                m_cursorChoice ^= 1;
-                Sound.PlaySe(1, 0x40, 0x7f, 0);
-            } else {
+            if (MenuPcs.m_menuWindowInfo->state == 1) {
                 input = GetGoOutInputMask();
-                if ((input & 0x100) != 0) {
-                    if (m_cursorChoice == 0) {
-                        Sound.PlaySe(2, 0x40, 0x7f, 0);
-                    } else if (m_cursorChoice == 1) {
-                        Sound.PlaySe(3, 0x40, 0x7f, 0);
+                if ((input & 3) != 0) {
+                    m_cursorChoice ^= 1;
+                    Sound.PlaySe(1, 0x40, 0x7f, 0);
+                } else {
+                    input = GetGoOutInputMask();
+                    if ((input & 0x100) != 0) {
+                        if (m_cursorChoice == 0) {
+                            Sound.PlaySe(2, 0x40, 0x7f, 0);
+                        } else if (m_cursorChoice == 1) {
+                            Sound.PlaySe(3, 0x40, 0x7f, 0);
+                        }
+                        next = static_cast<unsigned char>(m_cursorChoice + 1);
                     }
-                    next = static_cast<unsigned char>(m_cursorChoice + 1);
                 }
             }
-        }
 
-        switch (next) {
-        case 1:
-            Game.m_caravanWorkArr[m_selectedChara].m_shopBusyFlag = 0;
-            SetDelMode(8);
-            break;
-        case 2:
-            SetDelMode(2);
-            break;
+            switch (next) {
+            case 1:
+                Game.m_caravanWorkArr[m_selectedChara].m_shopBusyFlag = 0;
+                SetDelMode(8);
+                break;
+            case 2:
+                SetDelMode(2);
+                break;
+            }
         }
         break;
     case 8:

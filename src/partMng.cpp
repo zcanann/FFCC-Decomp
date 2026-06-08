@@ -2850,7 +2850,7 @@ void CPartMng::pppDumpCacheIdx()
 
     pppSetRendMatrix();
 
-    unsigned char gamePaused = Game.m_gameWork.m_gamePaused;
+    int gamePaused = Game.m_gameWork.m_gamePaused;
     for (int i = 0; i < 0x180; i++) {
         PppMngStDumpRaw* mng = reinterpret_cast<PppMngStDumpRaw*>(
             reinterpret_cast<unsigned char*>(this) + 0x2A18 + i * 0x158);

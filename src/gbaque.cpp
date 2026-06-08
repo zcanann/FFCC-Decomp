@@ -3326,8 +3326,9 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 
 	for (i = 0; i < 0x40; i++, itemPtr += 2) {
 		int itemId = *reinterpret_cast<short*>(itemPtr + 0x3A);
-		if ((MenuPcs.GetItemType(itemId, 1) == 1) &&
-		    (MenuPcs.GetItemIcon(itemId) == (localPlayerData[2] & 3))) {
+		if (MenuPcs.GetItemType(itemId, 1) == 1) {
+		const int iconMask = localPlayerData[2] & 3;
+		if (iconMask == MenuPcs.GetItemIcon(itemId)) {
 			int itemBase = Game.unkCFlatData0[2] + itemId * 0x48;
 
 			cmdData[0] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 4), 0);
@@ -3339,6 +3340,7 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 			writePtr += 8;
 			size += 8;
 			count++;
+		}
 		}
 	}
 

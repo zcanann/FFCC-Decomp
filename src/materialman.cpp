@@ -3140,7 +3140,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 material = m_materials[materialIndex];
                 AddTextureIndex(material, chunkFile.Get2());
                 AddTextureIndex(material, chunkFile.Get2());
-                unsigned short bumpIndex = chunkFile.Get2();
+                short bumpIndex = chunkFile.Get2();
                 AddTextureIndex(material, chunkFile.Get2());
                 material->m_scaleU = kTextureOne / chunkFile.GetF4();
                 material->m_scaleV = kTextureOne / chunkFile.GetF4();
@@ -3164,7 +3164,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 material = m_materials[materialIndex];
                 AddTextureIndex(material, chunkFile.Get2());
                 AddTextureIndex(material, chunkFile.Get2());
-                unsigned short bumpIndex = chunkFile.Get2();
+                short bumpIndex = chunkFile.Get2();
                 unsigned char waterMode = chunkFile.Get1();
                 material->m_unkA5 = chunkFile.Get1();
                 material->m_scaleU = kTextureOne / chunkFile.GetF4();
@@ -3188,7 +3188,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 material = m_materials[materialIndex];
                 AddTextureIndex(material, chunkFile.Get2());
                 AddTextureIndex(material, chunkFile.Get2());
-                unsigned short bumpIndex = chunkFile.Get2();
+                short bumpIndex = chunkFile.Get2();
                 material->m_unkA5 = chunkFile.Get1();
                 if (chunkFile.Get1() != 0) {
                     material->m_tevBit |= 0x20000;

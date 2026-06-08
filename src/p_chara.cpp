@@ -2006,7 +2006,7 @@ void CCharaPcs::drawOverlap()
     SetupBaseCharaLights(this);
 
     CHandle* handle = m_handleList->m_next;
-    while (handle != m_handleList) {
+    while (m_handleList != handle) {
         if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x8000) != 0) {
             handle->draw(0, 1);
         }

@@ -797,7 +797,7 @@ void CGoOutMenu::CalcMemCardProc()
  * JP Address: TODO
  * JP Size: TODO
  */
-int CGoOutMenu::SetMemCardError()
+unsigned char CGoOutMenu::SetMemCardError()
 {
     switch (m_memCardResult) {
     case -5:
@@ -1826,10 +1826,13 @@ void CGoOutMenu::CalcGoOut()
             }
         }
 
-        if (next == 2) {
+        switch (next) {
+        case 2:
             SetGoOutMode(0xf);
-        } else if (next == 1) {
+            break;
+        case 1:
             SetGoOutMode(0x11);
+            break;
         }
         break;
     case 0x11:
@@ -1868,10 +1871,13 @@ void CGoOutMenu::CalcGoOut()
             }
         }
 
-        if (next == 2) {
+        switch (next) {
+        case 2:
             SetGoOutMode(0xf);
-        } else if (next == 1) {
+            break;
+        case 1:
             SetGoOutMode(0x12);
+            break;
         }
         break;
     case 0x12:
@@ -1931,10 +1937,13 @@ void CGoOutMenu::CalcGoOut()
             }
         }
 
-        if (next == 2) {
+        switch (next) {
+        case 2:
             SetMainMode(1);
-        } else if (next == 1) {
+            break;
+        case 1:
             SetGoOutMode(4);
+            break;
         }
         break;
     case 4:
@@ -1967,10 +1976,13 @@ void CGoOutMenu::CalcGoOut()
             }
         }
 
-        if (next == 2) {
+        switch (next) {
+        case 2:
             SetMainMode(1);
-        } else if (next == 1) {
+            break;
+        case 1:
             SetGoOutMode(5);
+            break;
         }
         break;
     case 5:
@@ -2099,8 +2111,7 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
         if (Game.m_caravanWorkArr[m_selectedChara].m_caravanLocalFlags == 0) {
             int activeMainCharacterCount = 0;
             for (int i = 0; i < 8; i++) {
-                const CCaravanWork& caravanWork = Game.m_caravanWorkArr[i];
-                if (caravanWork.m_objType != 0 && caravanWork.m_caravanLocalFlags == 0) {
+                if (Game.m_caravanWorkArr[i].m_objType != 0 && Game.m_caravanWorkArr[i].m_caravanLocalFlags == 0) {
                     activeMainCharacterCount++;
                 }
             }
@@ -2215,8 +2226,14 @@ void CGoOutMenu::CalcDel()
     case 0:
         if (m_messageWindowOpen != 0) {
             input = GetGoOutInputMask();
+            bool pressed;
             if ((input & 0x100) != 0) {
                 Sound.PlaySe(2, 0x40, 0x7f, 0);
+                pressed = true;
+            } else {
+                pressed = false;
+            }
+            if (pressed) {
                 if (m_prevDeleteMode == -1) {
                     SetMainMode(1);
                 } else {
@@ -2243,9 +2260,17 @@ void CGoOutMenu::CalcDel()
         }
 
         input = GetGoOutInputMask();
-        if ((input & 0x200) != 0) {
-            Sound.PlaySe(3, 0x40, 0x7f, 0);
-            SetDelMode(2);
+        {
+            bool pressed;
+            if ((input & 0x200) != 0) {
+                Sound.PlaySe(3, 0x40, 0x7f, 0);
+                pressed = true;
+            } else {
+                pressed = false;
+            }
+            if (pressed) {
+                SetDelMode(2);
+            }
         }
 
         m_drawCursor = 1;
@@ -2272,10 +2297,13 @@ void CGoOutMenu::CalcDel()
             }
         }
 
-        if (next == 2) {
+        switch (next) {
+        case 2:
             SetDelMode(2);
-        } else if (next == 1) {
+            break;
+        case 1:
             SetDelMode(4);
+            break;
         }
         break;
     case 4:
@@ -2284,9 +2312,17 @@ void CGoOutMenu::CalcDel()
         }
 
         input = GetGoOutInputMask();
-        if ((input & 0x200) != 0) {
-            Sound.PlaySe(3, 0x40, 0x7f, 0);
-            SetDelMode(2);
+        {
+            bool pressed;
+            if ((input & 0x200) != 0) {
+                Sound.PlaySe(3, 0x40, 0x7f, 0);
+                pressed = true;
+            } else {
+                pressed = false;
+            }
+            if (pressed) {
+                SetDelMode(2);
+            }
         }
 
         m_drawCursor = 1;
@@ -2313,10 +2349,13 @@ void CGoOutMenu::CalcDel()
             }
         }
 
-        if (next == 2) {
+        switch (next) {
+        case 2:
             SetDelMode(2);
-        } else if (next == 1) {
+            break;
+        case 1:
             SetDelMode(5);
+            break;
         }
         break;
     case 5:
@@ -2338,9 +2377,17 @@ void CGoOutMenu::CalcDel()
         }
 
         input = GetGoOutInputMask();
-        if ((input & 0x200) != 0) {
-            Sound.PlaySe(3, 0x40, 0x7f, 0);
-            SetDelMode(2);
+        {
+            bool pressed;
+            if ((input & 0x200) != 0) {
+                Sound.PlaySe(3, 0x40, 0x7f, 0);
+                pressed = true;
+            } else {
+                pressed = false;
+            }
+            if (pressed) {
+                SetDelMode(2);
+            }
         }
 
         m_drawCursor = 1;
@@ -2367,10 +2414,13 @@ void CGoOutMenu::CalcDel()
             }
         }
 
-        if (next == 2) {
+        switch (next) {
+        case 2:
             SetDelMode(2);
-        } else if (next == 1) {
+            break;
+        case 1:
             SetDelMode(7);
+            break;
         }
         break;
     case 7:
@@ -2379,9 +2429,17 @@ void CGoOutMenu::CalcDel()
         }
 
         input = GetGoOutInputMask();
-        if ((input & 0x200) != 0) {
-            Sound.PlaySe(3, 0x40, 0x7f, 0);
-            SetDelMode(2);
+        {
+            bool pressed;
+            if ((input & 0x200) != 0) {
+                Sound.PlaySe(3, 0x40, 0x7f, 0);
+                pressed = true;
+            } else {
+                pressed = false;
+            }
+            if (pressed) {
+                SetDelMode(2);
+            }
         }
 
         m_drawCursor = 1;
@@ -2408,11 +2466,14 @@ void CGoOutMenu::CalcDel()
             }
         }
 
-        if (next == 2) {
+        switch (next) {
+        case 2:
             SetDelMode(2);
-        } else if (next == 1) {
+            break;
+        case 1:
             Game.m_caravanWorkArr[m_selectedChara].m_shopBusyFlag = 0;
             SetDelMode(8);
+            break;
         }
         break;
     case 8:

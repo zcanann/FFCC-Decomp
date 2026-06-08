@@ -30,7 +30,7 @@ public:
     void SetMemCardSaveBuff(void*);
     void GetMemCardResult();
     void CalcMemCardProc();
-    int SetMemCardError();
+    unsigned char SetMemCardError();
     void SetMenu(short, long);
     void SetMenuStr(long, int, ...);
     void CalcMenu();

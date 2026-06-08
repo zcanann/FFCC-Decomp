@@ -1169,17 +1169,10 @@ void GbaQueue::SetRadarType()
 
 	const int* wmParams = Game.m_gameWork.m_wmBackupParams;
 	validMemberCount = 0;
-	if (wmParams[0] >= 0) {
-		validMemberCount++;
-	}
-	if (wmParams[1] >= 0) {
-		validMemberCount++;
-	}
-	if (wmParams[2] >= 0) {
-		validMemberCount++;
-	}
-	if (wmParams[3] >= 0) {
-		validMemberCount++;
+	for (i = 0; i < 4; i++) {
+		if (wmParams[i] >= 0) {
+			validMemberCount++;
+		}
 	}
 
 	activeMask = 0;

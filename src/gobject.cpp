@@ -1670,7 +1670,7 @@ void CGObject::update()
             if (activeAnimIndex >= 0 && m_charaModelHandle->m_animSlot[activeAnimIndex] != 0) {
                 unsigned char* animRefBytes =
                     reinterpret_cast<unsigned char*>(m_charaModelHandle->m_animSlot[activeAnimIndex]);
-                const short pointCount = *reinterpret_cast<short*>(animRefBytes + 0x2C);
+                const unsigned short pointCount = *reinterpret_cast<short*>(animRefBytes + 0x2C);
                 if (pointCount > 0) {
                     const float animSpan = sAnimFrameOffset + (ModelAnimEnd(model) - ModelAnimStart(model));
                     const float prevWrapped = WrapAnimFrame(prevTime, animSpan);
@@ -1708,7 +1708,7 @@ void CGObject::update()
 
             if (animFinished) {
                 if ((shieldFlagsLo & 0x80) != 0) {
-                    const unsigned char queuePos = m_animQueuePos++;
+                    const signed char queuePos = m_animQueuePos++;
                     const char queuedAnim = m_animQueue[queuePos];
                     if (queuedAnim == -1) {
                         m_currentAnimSlot = -1;

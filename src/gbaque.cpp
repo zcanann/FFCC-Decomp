@@ -611,7 +611,7 @@ void GbaQueue::ExecutQueue()
 	int localQueueCount[4];
 	GbaQueueSetQueueView* queue = GetSetQueueView(this);
 	char* obj;
-	int scriptFoodBase[4];
+
 	int channel;
 
 	for (channel = 0; channel < 4; channel++) {
@@ -628,14 +628,13 @@ void GbaQueue::ExecutQueue()
 	}
 
 	obj = reinterpret_cast<char*>(this);
-	memcpy(scriptFoodBase, Game.m_scriptFoodBase, sizeof(scriptFoodBase));
 
 	for (channel = 0; channel < 4; channel++) {
 		const unsigned int playerBit = (1U << channel);
 		const unsigned int shopBit = (0x10U << channel);
 		unsigned int* queueWords = localQueueData[channel];
 		int queueCount = localQueueCount[channel];
-		CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(scriptFoodBase[channel]);
+		CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
 		int i;
 
 		if (queue->m_queueFull[channel] != 0) {

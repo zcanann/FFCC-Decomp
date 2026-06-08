@@ -50,6 +50,34 @@ struct GbaQueueMapObjWork
     GbaQueueMapObjEntry m_entries[32];
 };
 
+struct GbaQueuePlayerDataView
+{
+    unsigned char _pad00;
+    unsigned char _pad01;
+    unsigned char _pad02;
+    unsigned char _pad03;
+    unsigned int _pad04[4];
+    unsigned short _pad14;
+    unsigned char _pad16;
+    unsigned char _pad17;
+    unsigned int _pad18[2];
+    unsigned char m_strength[3];
+    unsigned char _pad23;
+    unsigned int m_artifacts[3];
+    unsigned short _pad30;
+    unsigned char _pad32[8];
+    unsigned short m_items[0x40];
+    unsigned short m_tmpArtifacts[4];
+    unsigned short m_artifactList[8];
+    unsigned char _padD2;
+    unsigned char m_artifactCount;
+    unsigned char _padD4;
+    unsigned char _padD5;
+    unsigned char _padD6;
+    unsigned char m_commandData[4];
+    unsigned char _padDB;
+};
+
 class GbaQueue
 {
 public:
@@ -196,7 +224,9 @@ private:
     int m_stageNo;                    // 0x0444
     int m_mapNo;                      // 0x0448
     unsigned char m_stageFlags;       // 0x044C
-    unsigned char _pad44D[0x26A7];    // 0x044D
+    unsigned char _pad44D[0x7];       // 0x044D
+    GbaQueuePlayerDataView m_playerData[4]; // 0x0454
+    unsigned char _pad7C4[0x2330];    // 0x07C4
     char m_mapItemCount;              // 0x2AF4
     unsigned char _pad2AF5[0x3];      // 0x2AF5
     int m_scrInitEnd;                 // 0x2AF8

@@ -146,7 +146,7 @@ int CMenuPcs::ItemCtrlCur()
     }
 
     s16 letterAttachFlg;
-    unsigned int mode = this->m_itemMenuState->mode;
+    int mode = this->m_itemMenuState->mode;
     letterAttachFlg = SingGetLetterAttachflg();
 
     if (mode == 0) {
@@ -519,7 +519,7 @@ void CMenuPcs::ItemDraw()
     DrawSingLife();
 
     CFont* helpFont = this->m_fonts[0];
-    u8 helpAlpha = (u8)(LoadFloat(kItemColorMax) * cursorEntry->alpha);
+    s8 helpAlpha = (s8)(LoadFloat(kItemColorMax) * cursorEntry->alpha);
     if (!foundSelected) {
         selectedItemId = -1;
     }

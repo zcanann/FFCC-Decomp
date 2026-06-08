@@ -594,6 +594,8 @@ void CMenuPcs::CmdInit2()
 	}
 }
 
+#pragma push
+#pragma opt_propagation off
 /*
  * --INFO--
  * PAL Address: 0x8014fa78
@@ -692,6 +694,7 @@ void CMenuPcs::CmdOpen()
 		UniteOpenAnim(-1);
 	}
 }
+#pragma pop
 
 #pragma push
 #pragma opt_propagation off
@@ -2839,6 +2842,8 @@ void CMenuPcs::CmdOpen2()
 	}
 }
 
+#pragma push
+#pragma opt_strength_reduction off
 /*
  * --INFO--
  * PAL Address: 0x8014a9dc
@@ -2936,6 +2941,7 @@ unsigned int CMenuPcs::CmdClose2()
 	}
 	return 0;
 }
+#pragma pop
 
 /*
  * --INFO--

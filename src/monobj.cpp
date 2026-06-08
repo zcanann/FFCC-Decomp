@@ -2824,7 +2824,7 @@ void CGMonObj::setRepop(int mode)
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle) + 0x1C) = 0;
 			object->m_bgColMask = 0;
 			object->m_displayFlags = 0;
-			object->m_weaponNodeFlags &= 0xFFEF;
+			object->m_weaponNodeFlagBits.m_unk10 = 0;
 			prgObj->changeStat(0x28, 0, 0);
 			return;
 		}
@@ -2941,7 +2941,7 @@ void CGMonObj::setRepop(int mode)
 	*reinterpret_cast<float*>(mon + 0x694) = 1.0f;
 	scriptHandle = object->m_scriptHandle;
 	classId = reinterpret_cast<int>(scriptHandle[4]);
-	int weaponMode = static_cast<int>((static_cast<unsigned int>(object->m_weaponNodeFlags) << 24) >> 31);
+	int weaponMode = object->m_weaponNodeFlagBits.m_prg;
 	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(scriptHandle[9]) + 0xFC) != 0xB) {
 		weaponMode = 1;
 	}
@@ -2962,7 +2962,7 @@ void CGMonObj::setRepop(int mode)
 		object->SetTexAnim(const_cast<char*>(s_monObjTexAnimU1));
 	}
 
-	if (static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags)) << 24)) < 0) {
+	if (object->m_weaponNodeFlagBits.m_prg != 0) {
 		if (classId == 0x83) {
 			prgObj->playSe3D(0x987A, 0x32, 0x96, 0, (Vec*)0);
 		} else if (classId == 0x7F) {

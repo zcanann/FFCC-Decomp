@@ -630,7 +630,7 @@ int CFlatRuntime::Frame(int mode, int unused)
 
 		CObject* const next = object->m_next;
 
-		if ((static_cast<int>(object->m_flags) << 24) < 0) {
+		if (object->m_flagBits.m_deleteFlag != 0) {
 			object->m_previous->m_next = object->m_next;
 			object->m_next->m_previous = object->m_previous;
 

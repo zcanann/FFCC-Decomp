@@ -810,11 +810,10 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
     if (mana->m_positions == 0 && mana->m_normals == 0 && mana->m_waterHeightA == 0) {
         for (meshIndex = 0; meshIndex < model->m_data->m_meshCount; meshIndex++, mesh++) {
             CChara::CMesh::CRefData* meshShape = mesh->m_data;
-            u8 type = param_2->m_type;
 
-            if (((type == 1) && strcmp(meshShape->m_name, s_ymManaShapeObj5) == 0) ||
-                ((type == 2) && strcmp(meshShape->m_name, s_ymManaShapeObj3) == 0) ||
-                ((type == 3) && strcmp(meshShape->m_name, s_ymManaShapeObj1) == 0)) {
+            if (((param_2->m_type == 1) && strcmp(meshShape->m_name, s_ymManaShapeObj5) == 0) ||
+                ((param_2->m_type == 2) && strcmp(meshShape->m_name, s_ymManaShapeObj3) == 0) ||
+                ((param_2->m_type == 3) && strcmp(meshShape->m_name, s_ymManaShapeObj1) == 0)) {
                 if (mana->m_meshReflectionVec == 0) {
                     mana->m_meshReflectionVec = static_cast<Vec*>(
                         pppMemAlloc(meshShape->m_vertexCount * sizeof(Vec), ppvEnv->m_stagePtr,
@@ -842,11 +841,10 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
                     }
                 }
                 if (mana->m_meshTexCoords0 == 0) {
-                    s32 texCoordSize = meshShape->m_vertexCount * 6;
                     mana->m_meshTexCoords0 = static_cast<S16Vec2d*>(
-                        pppMemAlloc(texCoordSize, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x3FA));
+                        pppMemAlloc(meshShape->m_vertexCount * 6, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x3FA));
                     mana->m_meshTexCoords1 = static_cast<S16Vec2d*>(
-                        pppMemAlloc(texCoordSize, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x3FB));
+                        pppMemAlloc(meshShape->m_vertexCount * 6, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x3FB));
                     u16* texCoordA = reinterpret_cast<u16*>(mana->m_meshTexCoords0);
                     u16* texCoordB = reinterpret_cast<u16*>(mana->m_meshTexCoords1);
                     for (vertexIndex = 0; vertexIndex < meshShape->m_vertexCount; vertexIndex++) {
@@ -877,8 +875,8 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
                 }
             }
 
-            if (((type == 1) && strcmp(meshShape->m_name, s_ymManaShapeObj4) == 0) ||
-                ((type == 2) && strcmp(meshShape->m_name, s_ymManaShapeObj2) == 0)) {
+            if (((param_2->m_type == 1) && strcmp(meshShape->m_name, s_ymManaShapeObj4) == 0) ||
+                ((param_2->m_type == 2) && strcmp(meshShape->m_name, s_ymManaShapeObj2) == 0)) {
                 mana->m_positions =
                     static_cast<Vec*>(pppMemAlloc(0xD8C, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x427));
                 mana->m_normals =
@@ -922,11 +920,10 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
         mesh = model->m_meshes;
         for (meshIndex = 0; meshIndex < model->m_data->m_meshCount; meshIndex++, mesh++) {
             CChara::CMesh::CRefData* meshShape = mesh->m_data;
-            u8 type = param_2->m_type;
 
-            if (((type == 1) && strcmp(meshShape->m_name, s_ymManaShapeObj5) == 0) ||
-                ((type == 2) && strcmp(meshShape->m_name, s_ymManaShapeObj3) == 0) ||
-                ((type == 3) && strcmp(meshShape->m_name, s_ymManaShapeObj1) == 0)) {
+            if (((param_2->m_type == 1) && strcmp(meshShape->m_name, s_ymManaShapeObj5) == 0) ||
+                ((param_2->m_type == 2) && strcmp(meshShape->m_name, s_ymManaShapeObj3) == 0) ||
+                ((param_2->m_type == 3) && strcmp(meshShape->m_name, s_ymManaShapeObj1) == 0)) {
                 for (s32 dlIndex = meshShape->m_displayListCount - 1; dlIndex >= 0; dlIndex--) {
                     CalcReflectionVector2(
                         mana->m_meshReflectionVec, meshShape->m_vertices, meshShape->m_normals, meshShape->m_vertexCount,
@@ -1020,13 +1017,13 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     model = GetCharaModelPtr(handle);
 
     if ((int)Game.m_currentSceneId == 7) {
-        centerPos.x = kPppYmMoveParabolaZero;
-        centerPos.y = kPppYmMoveParabolaZero;
-        centerPos.z = kPppYmMoveParabolaZero;
+        centerPos.z = LoadFloat(kPppYmMoveParabolaZero);
+        centerPos.y = LoadFloat(kPppYmMoveParabolaZero);
+        centerPos.x = LoadFloat(kPppYmMoveParabolaZero);
     } else {
         centerPos = gObject->m_worldPosition;
     }
-    centerPos.y += kYmManaCaptureHeightOffset;
+    centerPos.y += LoadFloat(kYmManaCaptureHeightOffset);
 
     depthTexSize = GXGetTexBufferSize(0x80, 0x80, GX_TF_RGBA8, GX_FALSE, 0);
     texBufferStride = GXGetTexBufferSize(0x80, 0x80, GX_TF_RGB565, GX_FALSE, 0);
@@ -1034,47 +1031,48 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
 
     if (stepData->m_map21Flag != 0) {
         char* compareName = Game.m_currentScriptName;
-        C_MTXPerspective(projectionMtx, kYmManaCaptureFovY, kYmManaOne, kYmManaOne, kYmManaCaptureFarClip);
+        C_MTXPerspective(projectionMtx, LoadFloat(kYmManaCaptureFovY), LoadFloat(kYmManaOne), LoadFloat(kYmManaOne),
+                         LoadFloat(kYmManaCaptureFarClip));
         GXSetProjection(projectionMtx, (_GXProjectionType)0);
 
         for (i = 0; i < 6; i++) {
             cameraPos = centerPos;
-            cameraUp.x = kPppYmMoveParabolaZero;
-            cameraUp.y = kYmManaOne;
-            cameraUp.z = kPppYmMoveParabolaZero;
+            cameraUp.x = LoadFloat(kPppYmMoveParabolaZero);
+            cameraUp.y = LoadFloat(kYmManaOne);
+            cameraUp.z = LoadFloat(kPppYmMoveParabolaZero);
 
             s32 nameCompare = strcmp(s_ymManaRuin2Name, compareName);
             if (nameCompare == 0) {
                 if (i == 0) {
-                    cameraPos.z -= kYmManaOne;
+                    cameraPos.z -= LoadFloat(kYmManaOne);
                 } else if (i == 1) {
-                    cameraPos.x += kYmManaOne;
+                    cameraPos.x += LoadFloat(kYmManaOne);
                 } else if (i == 2) {
-                    cameraPos.z += kYmManaOne;
+                    cameraPos.z += LoadFloat(kYmManaOne);
                 } else if (i == 3) {
-                    cameraPos.x -= kYmManaOne;
+                    cameraPos.x -= LoadFloat(kYmManaOne);
                 }
             }
 
             if (nameCompare != 0 || i == 4 || i == 5) {
                 if (i == 3) {
-                    cameraPos.z -= kYmManaOne;
+                    cameraPos.z -= LoadFloat(kYmManaOne);
                 } else if (i < 3) {
                     if (i == 1) {
-                        cameraPos.z += kYmManaOne;
+                        cameraPos.z += LoadFloat(kYmManaOne);
                     } else if (i >= 2) {
-                        cameraPos.x -= kYmManaOne;
+                        cameraPos.x -= LoadFloat(kYmManaOne);
                     } else if (i >= 0) {
-                        cameraPos.x += kYmManaOne;
+                        cameraPos.x += LoadFloat(kYmManaOne);
                     }
                 } else if (i == 5) {
-                    cameraPos.y -= kYmManaOne;
-                    cameraUp.y = kPppYmMoveParabolaZero;
-                    cameraUp.z = kPppYmMoveParabolaZero;
+                    cameraPos.y -= LoadFloat(kYmManaOne);
+                    cameraUp.y = LoadFloat(kPppYmMoveParabolaZero);
+                    cameraUp.z = LoadFloat(kPppYmMoveParabolaZero);
                 } else if (i < 5) {
-                    cameraPos.y += kYmManaOne;
-                    cameraUp.y = kPppYmMoveParabolaZero;
-                    cameraUp.z = kYmManaNegOne;
+                    cameraPos.y += LoadFloat(kYmManaOne);
+                    cameraUp.y = LoadFloat(kPppYmMoveParabolaZero);
+                    cameraUp.z = LoadFloat(kYmManaNegOne);
                 }
             }
 

@@ -7856,7 +7856,7 @@ void CMenuPcs::CalcWMFrame0(int param)
 
 	if (param < 0) {
 		float offset = static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(frame + 8)) + static_cast<int>(*reinterpret_cast<short*>(frame + 4)));
-		if (param > -11) {
+		if (param >= -10) {
 			unsigned int sign = static_cast<unsigned int>(param) >> 31;
 			unsigned int absParam = (sign ^ static_cast<unsigned int>(param)) - sign;
 			float t_unclamped = static_cast<float>(static_cast<int>(absParam));
@@ -9896,7 +9896,7 @@ void CMenuPcs::ClrCMakeFlg(int channel)
 
 	selectData[channel * 0x10 + 0xB] = 0;
 	const int current = *reinterpret_cast<short*>(selectData + channel * 0x10 + 4);
-	if ((unsigned int)System.m_execParam > 2) {
+	if ((unsigned int)System.m_execParam >= 3) {
 		System.Printf(const_cast<char*>(s_ClrCMakeFlg_chan_pctd_cur_pctd_801DC390), channel, current);
 	}
 	m_wm.m_charaModelData[current * 0x34 + 0xC] = 0;

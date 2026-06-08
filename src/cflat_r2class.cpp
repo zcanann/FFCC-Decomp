@@ -931,13 +931,15 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		}
-		case -0x1D: {
-			float* params = reinterpret_cast<float*>(object->m_localBase);
-			engineObject->moveVector(CVector(params[0], params[1], params[2]), params[3], static_cast<int>(object->m_localBase[4]));
+		case -0x1D:
+			engineObject->moveVector(
+			    CVector(reinterpret_cast<float*>(object->m_localBase)[0],
+			            reinterpret_cast<float*>(object->m_localBase)[1],
+			            reinterpret_cast<float*>(object->m_localBase)[2]),
+			    reinterpret_cast<float*>(object->m_localBase)[3], static_cast<int>(object->m_localBase[4]));
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
-		}
 		case -0x1F:
 			engineObject->m_attrFlags = object->m_localBase[0];
 			PushValue(this, object, 0);

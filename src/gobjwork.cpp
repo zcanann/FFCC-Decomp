@@ -1922,6 +1922,7 @@ void CCaravanWork::CalcStatus()
 			m_baseDefense += itemValue;
 		apply_effect:
 			int itemEffect = itemData[4];
+			char effectValue = (char)itemValue;
 			switch (itemEffect) {
 			case 1:
 				m_elementResistances[1]++;
@@ -1951,25 +1952,25 @@ void CCaravanWork::CalcStatus()
 				m_elementResistances[0]++;
 				break;
 			case 9:
-				m_equipEffectParams[0] += (char)itemValue;
+				m_equipEffectParams[0] += effectValue;
 				break;
 			case 10:
-				m_equipEffectParams[1] += (char)itemValue;
+				m_equipEffectParams[1] += effectValue;
 				break;
 			case 0xB:
-				m_equipEffectParams[2] += (char)itemValue;
+				m_equipEffectParams[2] += effectValue;
 				break;
 			case 0xC:
-				m_equipEffectParams[3] += (char)itemValue;
+				m_equipEffectParams[3] += effectValue;
 				break;
 			case 0x10:
-				m_equipEffectParams[4] += (char)itemValue;
+				m_equipEffectParams[4] += effectValue;
 				break;
 			case 0x11:
-				m_equipEffectParams[5] += (char)itemValue;
+				m_equipEffectParams[5] += effectValue;
 				break;
 			case 0x12:
-				m_equipEffectParams[6] += (char)itemValue;
+				m_equipEffectParams[6] += effectValue;
 				break;
 			}
 			m_equipEffectFlags |= 1 << itemEffect;

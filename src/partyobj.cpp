@@ -4775,13 +4775,11 @@ void CGPartyObj::gpmCol()
 	} while (i < 5);
 
 	trailIndex = newIndex;
-	int clamp = activeTrailCount - 1;
-	if (clamp < 0) {
-		clamp = 0;
+#define gpmColClamp ((activeTrailCount - 1) & ~((activeTrailCount - 1) >> 31))
+	if (trailIndex >= gpmColClamp) {
+		trailIndex = gpmColClamp;
 	}
-	if (clamp <= trailIndex) {
-		trailIndex = clamp;
-	}
+#undef gpmColClamp
 }
 
 /*

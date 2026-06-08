@@ -12104,14 +12104,13 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 		const short msgId = *reinterpret_cast<const short*>(entry);
 		const char* text = msgTable[msgId];
 		if (strlen(text) != 0) {
-			const bool noMarker = text[0] != '$';
-			if (noMarker) {
+			if (text[0] != '$') {
 				strcpy(textBuf, text);
 			} else {
 				strcpy(textBuf, text + 1);
 			}
 
-			if (winType == 0 || !noMarker) {
+			if (winType == 0 || text[0] == '$') {
 				const int textWidth = font->GetWidth(textBuf);
 				posX = static_cast<float>(static_cast<double>(m_menuWindowInfo->x) + static_cast<double>(m_menuWindowInfo->width - textWidth) * DOUBLE_803313f8);
 			}

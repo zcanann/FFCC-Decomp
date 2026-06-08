@@ -3075,7 +3075,7 @@ void CPartMng::pppDrawPrioPdtFpno(unsigned char drawMode, short kind, short node
 
     checkCull:
         PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
-        if (PSVECSquareMag(&cameraDelta) >= mng->m_cullRadiusSq) {
+        if (!(PSVECSquareMag(&cameraDelta) < mng->m_cullRadiusSq)) {
             return;
         }
 
@@ -3168,7 +3168,7 @@ drawPart:
 
 checkCull:
     PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
-    if (PSVECSquareMag(&cameraDelta) >= mng->m_cullRadiusSq) {
+    if (!(PSVECSquareMag(&cameraDelta) < mng->m_cullRadiusSq)) {
         return;
     }
 

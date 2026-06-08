@@ -2673,12 +2673,12 @@ unsigned int CMenuPcs::CmdOpen1()
 	}
 
 	animEntry->alpha = static_cast<f32>(kCmdMenuTransitionStepD * static_cast<f64>(GetCmdStateView(this)->transitionTimer));
-	u32 done = static_cast<u32>(static_cast<f64>(GetCmdStateView(this)->transitionTimer) >= kCmdMenuTransitionFramesD);
-	if (done != 0) {
+	if (static_cast<f64>(GetCmdStateView(this)->transitionTimer) >= kCmdMenuTransitionFramesD) {
 		GetCmdStateView(this)->choice = 0;
+		return 1;
 	}
 
-	return done;
+	return 0;
 }
 
 /*

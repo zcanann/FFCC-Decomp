@@ -1090,50 +1090,32 @@ void CCameraPcs::calcChara()
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 
     if (m_viewerOverride == 0) {
-        if (Pad.m_debugPadLock == 0) {
-            padButtons = CameraDebugPadInput().button[0];
-        } else {
+        if (Pad.m_debugPadLock != 0) {
             padButtons = 0;
+        } else {
+            padButtons = CameraDebugPadInput().button[0];
         }
 
-        stick = kCameraZeroF;
-        if ((padButtons & 4) != 0) {
-            stick = kCameraHalfF;
-        }
+        stick = ((padButtons & 4) != 0) ? kCameraHalfF : kCameraZeroF;
         m_viewer.m_position.y += stick;
 
         float rotSpeed = kCameraDebugRotateStep;
-        stick = kCameraZeroF;
-        if ((padButtons & 8) != 0) {
-            stick = kCameraHalfF;
-        }
+        stick = ((padButtons & 8) != 0) ? kCameraHalfF : kCameraZeroF;
         m_viewer.m_position.y -= stick;
 
         float rotSpeed2 = kCameraDebugRotateStep;
-        stick = kCameraZeroF;
-        if (Pad.m_debugPadLock == 0) {
-            stick = CameraDebugPadInput().stickXF;
-        }
+        stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().stickXF;
         m_viewer.m_rotY = rotSpeed * stick + m_viewer.m_rotY;
 
         float zoomSpeed = kCameraDebugZoomStep;
-        stick = kCameraZeroF;
-        if (Pad.m_debugPadLock == 0) {
-            stick = CameraDebugPadInput().stickYF;
-        }
+        stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().stickYF;
         m_viewer.m_rotX = -((rotSpeed2 * stick) - m_viewer.m_rotX);
 
         float zoomSpeed2 = kCameraDebugZoomStep;
-        stick = kCameraZeroF;
-        if (Pad.m_debugPadLock == 0) {
-            stick = CameraDebugPadInput().triggerLeftF;
-        }
+        stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().triggerLeftF;
         m_viewer.m_distance = -((zoomSpeed * stick) - m_viewer.m_distance);
 
-        stick = kCameraZeroF;
-        if (Pad.m_debugPadLock == 0) {
-            stick = CameraDebugPadInput().triggerRightF;
-        }
+        stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().triggerRightF;
         m_viewer.m_distance = zoomSpeed2 * stick + m_viewer.m_distance;
     } else {
         m_viewerOverride = 0;

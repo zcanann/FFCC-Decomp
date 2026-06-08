@@ -1102,10 +1102,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
     MaterialMan.SetManaAlpha(setupBlock->m_color.rgba[3]);
     mana2Work->m_waterAlpha = MaterialMan.GetManaAlpha();
 
-    if (*(s32*)pppMana2 != 0) {
-        return;
-    }
-
+    if (reinterpret_cast<_pppPObject*>(pppMana2)->m_graphId == 0) {
     mana2Work->m_object = gObject;
     SetMana2ModelCallbacks(model, mana2Work, param_2);
     mana2Work->m_sourceTextures[0] = GetTextureFromRSD(param_2->m_sourceTextureIds[0], ppvEnv);
@@ -1260,6 +1257,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
 
     if ((param_2->m_type == 1 || param_2->m_type == 2) && mana2Work->m_waterHeightA != 0) {
         *reinterpret_cast<u32*>(reinterpret_cast<u8*>(mana2Work->m_waterHeightA) + 0x240) = param_2->m_rippleLevel;
+    }
     }
 
     if (param_2->m_type != 0) {

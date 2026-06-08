@@ -361,13 +361,13 @@ int CMenuPcs::EquipCtrlCur()
  */
 void CMenuPcs::EquipDraw()
 {
-	int helpItem = -1;
+	unsigned int helpItem = -1;
 	bool helpFound = false;
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	int mode = static_cast<int>(GetEquipMenuState(this)->mode);
+	unsigned int mode = static_cast<int>(GetEquipMenuState(this)->mode);
 	int listState = static_cast<int>(GetEquipMenuState(this)->listState);
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	EquipOpenAnim* item = GetEquipListStorage(this)->entries;
@@ -792,7 +792,7 @@ void CMenuPcs::EquipCtrl()
 			do {
 				int p2 = byteOff + 8;
 				byteOff = byteOff + -0x40;
-				p2 = *(int*)&this->m_equipList + p2;
+				p2 = *(unsigned int*)&this->m_equipList + p2;
 				*(int*)(p2 + 0x24) = index;
 				index = index + 1;
 				*(int*)(p2 + 0x28) = 3;

@@ -3189,7 +3189,7 @@ void CGMonObj::moveFrame()
 
 	CVector moveDelta;
 	if ((moveFlags & 0x1000) == 0) {
-		if (fabsf(distance) < 0.001f) {
+		if (__fabs(distance) < kMonObjSmallStepF64) {
 			CVector zero(0.0f, 0.0f, 0.0f);
 			moveDelta.x = zero.x;
 			moveDelta.y = zero.y;

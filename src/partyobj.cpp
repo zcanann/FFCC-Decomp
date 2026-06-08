@@ -3134,12 +3134,11 @@ void CGPartyObj::onPush(CGBaseObj* other, int pushType)
 void CGPartyObj::onTalk(CGBaseObj* other, int talkType)
 {
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	CGObject* targetObj = reinterpret_cast<CGObject*>(other);
-	if ((static_cast<unsigned short>(targetObj->GetCID()) & 5) == 5) {
+	if ((static_cast<unsigned short>(reinterpret_cast<CGObject*>(other)->GetCID()) & 5) == 5) {
 		if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(other) + 0x500) == 0x23) {
 			*reinterpret_cast<CGBaseObj**>(self + 0x6E8) = other;
 		} else {
-			float dist = PSVECDistance(&m_worldPosition, &targetObj->m_worldPosition);
+			float dist = PSVECDistance(&m_worldPosition, &reinterpret_cast<CGObject*>(other)->m_worldPosition);
 			if (dist < *reinterpret_cast<float*>(self + 0x6EC)) {
 				*reinterpret_cast<CGBaseObj**>(self + 0x6E4) = other;
 				*reinterpret_cast<float*>(self + 0x6EC) = dist;

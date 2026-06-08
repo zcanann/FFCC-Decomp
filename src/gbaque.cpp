@@ -4434,10 +4434,13 @@ int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
 					scouterEntry[7] = 0xFF;
 				} else {
 					const short scouterValue = *reinterpret_cast<short*>(enemyEntry + 0xB40);
-					if ((scouterValue < 1) || ((scouterValue & 0xC000) == 0x4000)) {
+					if (scouterValue < 1) {
+						*reinterpret_cast<unsigned short*>(scouterEntry + 6) = 0;
+					} else if ((scouterValue & 0xC000) == 0x4000) {
 						*reinterpret_cast<unsigned short*>(scouterEntry + 6) = 0;
 					} else {
-						*reinterpret_cast<unsigned short*>(scouterEntry + 6) = SwapU16(static_cast<unsigned short>(scouterValue));
+						*reinterpret_cast<unsigned short*>(scouterEntry + 6) =
+							__lhbrx(reinterpret_cast<unsigned short*>(enemyEntry + 0xB40), 0);
 					}
 				}
 

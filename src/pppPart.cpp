@@ -729,10 +729,10 @@ void callCon2Prog(_pppPObject* pObject)
 			if (*nextSlot == pObject->m_graphId)
 			{
 				*slotPtr = nextSlot;
-				if (prog != 0 && prog->m_pppFunctionOperation != 0 && prog->m_pppFunctionConstructor2 != 0)
-				{
-					((pppProgOperation2Callback)prog->m_pppFunctionOperation)(pObject, *slotPtr);
-				}
+			}
+			if (prog != 0 && prog->m_pppFunctionOperation != 0 && prog->m_pppFunctionConstructor2 != 0)
+			{
+				((pppProgOperation2Callback)prog->m_pppFunctionOperation)(pObject, *slotPtr);
 			}
 
 			stageSet = (_pppProgSetDef*)(((u8*)stageSet) + sizeof(_pppCtrlTable));

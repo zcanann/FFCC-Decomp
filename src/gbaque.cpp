@@ -2561,11 +2561,12 @@ void GbaQueue::ReplyLetter(int channel)
 		(static_cast<unsigned int>(recvBuffer[5]) << 8) |
 		recvBuffer[6];
 	int itemId = 0;
-	unsigned int gil = value;
+	unsigned int gil = 0;
 
 	if (recvBuffer[2] != 0) {
 		gil = value;
-	} else {
+	}
+	if (recvBuffer[2] == 0) {
 		itemId = value & 0xffff;
 		gil = 0;
 	}

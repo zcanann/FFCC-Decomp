@@ -2676,13 +2676,13 @@ int GbaQueue::GetMapObj(unsigned char* outData)
 		workEntry = &mapObjWork.m_entries[i];
 		outData[outSize++] = workEntry->m_type;
 		outData[outSize++] = static_cast<unsigned char>(workEntry->m_x);
-		outData[outSize++] = static_cast<unsigned char>(workEntry->m_x >> 8);
+		outData[outSize++] = static_cast<unsigned char>((workEntry->m_x >> 8) & 0xFF);
 		outData[outSize++] = static_cast<unsigned char>(workEntry->m_y);
-		outData[outSize++] = static_cast<unsigned char>(workEntry->m_y >> 8);
+		outData[outSize++] = static_cast<unsigned char>((workEntry->m_y >> 8) & 0xFF);
 		outData[outSize++] = static_cast<unsigned char>(workEntry->m_z);
-		outData[outSize++] = static_cast<unsigned char>(workEntry->m_z >> 8);
+		outData[outSize++] = static_cast<unsigned char>((workEntry->m_z >> 8) & 0xFF);
 		outData[outSize++] = static_cast<unsigned char>(workEntry->m_radius);
-		outData[outSize++] = static_cast<unsigned char>(workEntry->m_radius >> 8);
+		outData[outSize++] = static_cast<unsigned char>((workEntry->m_radius >> 8) & 0xFF);
 	}
 
 	m_makeMapObjFlg = 1;

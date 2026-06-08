@@ -2574,7 +2574,7 @@ int CCharaPcs::CHandle::SetAnim(int animIndex, int startFrame, int endFrame, int
     }
 
     if (anim == 0) {
-        if (m_charaKind != 3 && static_cast<unsigned int>(System.m_execParam) > 1) {
+        if (m_charaKind != 3 && static_cast<unsigned int>(System.m_execParam) >= 2) {
             System.Printf(const_cast<char*>(s_charaSetAnimMissingFmt), m_charaKind, m_charaNo, animIndex);
         }
         return 0;

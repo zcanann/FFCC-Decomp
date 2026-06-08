@@ -1084,12 +1084,12 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 			break;
 		case 3:
 			brushColor = CColor(0xF, 0xF, 0xF, 4).color;
-			doPaint = ((System.m_frameCounter & 3U) == 0) ? 1 : 0;
+			doPaint = ((static_cast<int>(System.m_frameCounter) % 4) == 0) ? 1 : 0;
 			break;
 		case 4:
 			brushColor = CColor(0, 0, 0, 2).color;
 			eraseMode = 1;
-			doPaint = ((System.m_frameCounter & 3U) == 0) ? 1 : 0;
+			doPaint = ((static_cast<int>(System.m_frameCounter) % 4) == 0) ? 1 : 0;
 			break;
 		}
 		_GXColor centerBefore = CColor(0xF, 0xF, 0xF, 0).color;
@@ -1169,8 +1169,8 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 					}
 					seId = 0x249f4;
 					particleNo = 0x74;
-					emitParticle = ((System.m_frameCounter & 7) == 0);
-					playGate = ((System.m_frameCounter & 0xF) == 0);
+					emitParticle = ((static_cast<int>(System.m_frameCounter) % 8) == 0);
+					playGate = ((static_cast<int>(System.m_frameCounter) % 16) == 0);
 					break;
 				case 4:
 					MogWork().m_offColorTicks = 0;
@@ -1183,7 +1183,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 						particleColor.a = 0;
 					}
 					seId = 0x249f3;
-					playGate = ((System.m_frameCounter & 7) == 0);
+					playGate = ((static_cast<int>(System.m_frameCounter) % 8) == 0);
 					break;
 				}
 

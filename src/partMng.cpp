@@ -759,23 +759,20 @@ void CPartMng::drawLine3D(Vec*, Vec*, _GXColor&)
  */
 void CPartMng::drawCursor()
 {
-    int cursorX = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x28);
-    if (cursorX == 0x7fff) {
+    if (*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x28) == 0x7fff) {
         return;
     }
-
-    int cursorY = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x2c);
 
     GXSetNumChans(1);
     GXSetChanCtrl((GXChannelID)0, 0, (GXColorSrc)0, (GXColorSrc)0, 0, (GXDiffuseFn)2, (GXAttnFn)2);
     GXSetChanCtrl((GXChannelID)2, 0, (GXColorSrc)0, (GXColorSrc)0, 0, (GXDiffuseFn)2, (GXAttnFn)2);
 
+    Mtx identity;
     Mtx44 orthoProjection;
     C_MTXOrtho(orthoProjection, kPartMngZero, kPartMngOrthoHeight, kPartMngZero, kPartMngOrthoWidth, kPartMngZero,
                kPartMngOrthoFar);
     GXSetProjection(orthoProjection, GX_ORTHOGRAPHIC);
 
-    Mtx identity;
     PSMTXIdentity(identity);
     GXLoadPosMtxImm(identity, 0);
     GXSetZCompLoc(0);
@@ -797,6 +794,9 @@ void CPartMng::drawCursor()
     white.g = 0xff;
     white.b = 0xff;
     white.a = 0xff;
+    int cursorX = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x28);
+    int cursorY = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x2c);
+
     GXSetChanAmbColor((GXChannelID)4, white);
     GXSetChanMatColor((GXChannelID)4, white);
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
@@ -3454,14 +3454,14 @@ void* CPartMng::pppFileRead(char* filePath, unsigned long& fileSize, void* readB
         loadState->m_partAsyncBusy[loadState->m_asyncHandleCount] = fileHandle;
         loadState->m_asyncHandleCount++;
     } else {
-        if (readBuffer == 0) {
+        if (readBuffer != 0) {
+            fileSize = readBufferSize;
+        } else {
             fileSize = File.GetLength(fileHandle);
             File.Read(fileHandle);
             File.SyncCompleted(fileHandle);
             readBuffer = File.m_readBuffer;
             File.Close(fileHandle);
-        } else {
-            fileSize = readBufferSize;
         }
         if (loadState->m_partLoadMode == 2) {
             Memory.CopyToAMemorySync(readBuffer, reinterpret_cast<void*>(loadState->m_partAMemCursor), fileSize);

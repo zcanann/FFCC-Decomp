@@ -4209,7 +4209,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
         unsigned int flag = static_cast<unsigned int>(static_cast<unsigned char>(gameWork.m_eventFlags[byteIndex])) & mask;
         FlatLastResult(this) = (-flag | flag) >> 31;
     } else if (systemValue <= -200) {
-        short* artifact = gameWork.m_eventWork + systemValue + 0x1C7;
+        short* artifact = &gameWork.m_eventWork[systemValue + 0x1C7];
         FlatLastResult(this) = static_cast<unsigned int>(static_cast<int>(*artifact));
     } else {
         switch (systemValue) {
@@ -4296,10 +4296,10 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
         case -0x6D:
         case -0x6C: {
             u8* usbEdit = game + (systemValue + 0x73) * 0xC30;
-            if (*(int*)(usbEdit + 0x1794) == 0) {
-                FlatLastResult(this) = 0;
-            } else {
+            if (*(int*)(usbEdit + 0x1794) != 0) {
                 FlatLastResult(this) = *(unsigned short*)(usbEdit + 0x1404);
+            } else {
+                FlatLastResult(this) = 0;
             }
             break;
         }
@@ -4318,18 +4318,19 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
             case 1:
                 languageValue = 3;
                 break;
+            case 2:
+                languageValue = 5;
+                break;
             case 3:
                 languageValue = 6;
+                break;
+            case 4:
+                languageValue = 4;
                 break;
             case 5:
                 languageValue = 7;
                 break;
             default:
-                if (gameWork.m_languageId < 3) {
-                    languageValue = 5;
-                } else if (gameWork.m_languageId < 5) {
-                    languageValue = 4;
-                }
                 break;
             }
             FlatLastResult(this) = languageValue;
@@ -4358,7 +4359,8 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
     if (systemValue > -0x1000) {
         if (systemValue <= -500) {
             int bitIndex = systemValue + 0x9F3;
-            unsigned char* flagByte = reinterpret_cast<unsigned char*>(gameWork.m_eventFlags) + bitIndex / 8;
+            int byteIndex = bitIndex / 8 + 8;
+            unsigned char* flagByte = reinterpret_cast<unsigned char*>(gameWork.m_eventFlags) + byteIndex;
             unsigned int mask = 1U << (bitIndex % 8);
             unsigned int flag = *flagByte & mask;
             int value = (-flag | flag) >> 31;
@@ -4591,7 +4593,7 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
                 }
                 break;
             case -0x79:
-                stack[-1].m_word = static_cast<int>(static_cast<short>(Game.m_gameWork.m_optionValue));
+                stack[-1].m_word = static_cast<int>(static_cast<unsigned short>(Game.m_gameWork.m_optionValue));
                 if (setMode < 0) {
                     if (setMode >= -1) {
                         Game.m_gameWork.m_optionValue =

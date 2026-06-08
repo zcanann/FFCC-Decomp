@@ -2701,26 +2701,26 @@ int CMenuPcs::CmakeNameCtrl()
         }
 
         if ((repeat & 0x1) != 0) {
-            if (CmakeState(this)->m_row < 5) {
-                if (CmakeState(this)->m_select > 0) {
+            if (CmakeState(this)->m_row >= 5) {
+                Sound.PlaySe(4, 0x40, 0x7F, 0);
+            } else {
+                if (CmakeState(this)->m_select != 0) {
                     CmakeState(this)->m_select = static_cast<short>(CmakeState(this)->m_select - 1);
                 } else {
                     CmakeState(this)->m_select = 0xB;
                 }
                 Sound.PlaySe(1, 0x40, 0x7F, 0);
-            } else {
-                Sound.PlaySe(4, 0x40, 0x7F, 0);
             }
         } else if ((repeat & 0x2) != 0) {
-            if (CmakeState(this)->m_row < 5) {
+            if (CmakeState(this)->m_row >= 5) {
+                Sound.PlaySe(4, 0x40, 0x7F, 0);
+            } else {
                 if (CmakeState(this)->m_select < 0xB) {
                     CmakeState(this)->m_select = static_cast<short>(CmakeState(this)->m_select + 1);
                 } else {
                     CmakeState(this)->m_select = 0;
                 }
                 Sound.PlaySe(1, 0x40, 0x7F, 0);
-            } else {
-                Sound.PlaySe(4, 0x40, 0x7F, 0);
             }
         }
 

@@ -251,8 +251,8 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
 
             const u16 texX = S16At(entry, 0x20);
             const s16 texY = S16At(entry, 0x22);
-            const s16 texW = S16At(entry, 0x24);
-            const s16 texH = S16At(entry, 0x26);
+            const u16 texW = S16At(entry, 0x24);
+            const u16 texH = S16At(entry, 0x26);
             u0 = static_cast<float>(texX) / kFunnyShapeTexCoordDivisor;
             v0 = kFunnyShapeOne - static_cast<float>(texY) / kFunnyShapeTexCoordDivisor;
             u1 = u0 + static_cast<float>(texW) / kFunnyShapeTexCoordDivisor;
@@ -288,7 +288,7 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
                 GXLoadTexObj(reinterpret_cast<GXTexObj*>(m_texObjData[texIndex]), GX_TEXMAP0);
             }
 
-            const u8 blendMode = *reinterpret_cast<const u8*>(entry + 0xC);
+            const s8 blendMode = *reinterpret_cast<const s8*>(entry + 0xC);
             if (blendMode == 0x48) {
                 _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_COPY);
             } else if (blendMode == 0x42) {
@@ -297,7 +297,7 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
                 _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_COPY);
             }
 
-            const s32 x0 = Div16Floor(S16At(entry, 0x10));
+            const u32 x0 = Div16Floor(S16At(entry, 0x10));
             const s32 y0 = Div16Floor(S16At(entry, 0x12));
             const s32 x1 = Div16Floor(S16At(entry, 0x14));
             const s32 y1 = Div16Floor(S16At(entry, 0x16));

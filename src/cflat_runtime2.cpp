@@ -1638,12 +1638,12 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float radius
 		if (((object->m_attrFlags & static_cast<unsigned int>(classMask)) != 0) &&
 		    (((flags & 1) == 0) ||
 		     ((object->m_scriptHandle != 0) &&
-		      (*reinterpret_cast<short*>(reinterpret_cast<u8*>(object->m_scriptHandle) + 0x1C) != 0)))) {
+		      (*reinterpret_cast<unsigned short*>(reinterpret_cast<u8*>(object->m_scriptHandle) + 0x1C) != 0)))) {
 			if ((object->m_worldPosition.x != center->x) || (object->m_worldPosition.z != center->z)) {
 				if ((center->x - radius <= object->m_worldPosition.x) &&
 				    (center->z - radius <= object->m_worldPosition.z) &&
-				    (object->m_worldPosition.x <= center->x + radius) &&
-				    (object->m_worldPosition.z <= center->z + radius)) {
+				    (center->x + radius >= object->m_worldPosition.x) &&
+				    (center->z + radius >= object->m_worldPosition.z)) {
 					Vec offset;
 					PSVECSubtract(&object->m_worldPosition, center, &offset);
 					offset.y = 0.0f;

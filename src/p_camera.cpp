@@ -608,7 +608,8 @@ void CCameraPcs::CalcQuake()
     Vec offset;
     Vec jitter;
 
-    if ((System.m_scenegraphStepMode == 2) || ((m_quake.m_mode == 2) && (m_quake.m_state == 0))) {
+    if ((System.m_scenegraphStepMode == 2) || ((m_quake.m_mode == 2) && (m_quake.m_state == 0)) ||
+        ((m_quake.m_mode == 1) && (m_quake.m_state == 0) && (m_quake.m_endTimer <= 0))) {
         return;
     }
 
@@ -621,6 +622,10 @@ void CCameraPcs::CalcQuake()
     randomValue = static_cast<u32>(rand());
     randomSign = randomValue >> 0x1F;
     m_quake.m_signZ = ((randomValue & 1) ^ randomSign) - randomSign;
+
+    jitter.x = kCameraZeroF;
+    jitter.y = kCameraZeroF;
+    jitter.z = kCameraZeroF;
 
     if (m_quake.m_signX == 0) {
         offset.x = -m_quake.m_positionAmplitude.x;
@@ -639,10 +644,6 @@ void CCameraPcs::CalcQuake()
     } else {
         offset.z = m_quake.m_positionAmplitude.z;
     }
-
-    jitter.x = kCameraZeroF;
-    jitter.y = kCameraZeroF;
-    jitter.z = kCameraZeroF;
 
     u32 randX = static_cast<u32>(rand());
     u16 signX = static_cast<u16>(randX >> 0x1F);
@@ -690,9 +691,9 @@ void CCameraPcs::CalcQuake()
         return;
     }
 
-    if (m_quake.m_startTimer < 1) {
+    if (m_quake.m_startTimer <= 0) {
         if (m_quake.m_state == 0) {
-            if (m_quake.m_endTimer < 1) {
+            if (m_quake.m_endTimer <= 0) {
                 m_quake.m_state = 0;
                 m_quake.m_startTimer = 0;
                 m_quake.m_startDuration = 0;
@@ -761,34 +762,34 @@ void CCameraPcs::calc()
     }
 
     if (m_isAbsolute == 0) {
-        float stickH = ((Pad.m_debugPadLock == 0) && (Pad.m_debugPadPort == -1))
-                           ? CameraRawPadInput().substickYF
-                           : kCameraZeroF;
+        float stickH = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1))
+                           ? kCameraZeroF
+                           : CameraRawPadInput().substickYF;
         m_yaw += kCameraDegToRad * kCameraDefaultNearZ * stickH;
 
-        float stickV = ((Pad.m_debugPadLock == 0) && (Pad.m_debugPadPort == -1))
-                           ? *reinterpret_cast<float*>(&CameraRawPadInput().lockedButton[0])
-                           : kCameraZeroF;
+        float stickV = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1))
+                           ? kCameraZeroF
+                           : *reinterpret_cast<float*>(&CameraRawPadInput().lockedButton[0]);
         m_pitch += kCameraDegToRad * kCameraDebugZoomStep * stickV;
 
-        float triggerL = ((Pad.m_debugPadLock == 0) && (Pad.m_debugPadPort == -1))
-                             ? CameraRawPadInput().stickYF
-                             : kCameraZeroF;
+        float triggerL = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1))
+                             ? kCameraZeroF
+                             : CameraRawPadInput().stickYF;
         m_distance += kCameraDebugZoomStep * triggerL;
 
-        float triggerR = ((Pad.m_debugPadLock == 0) && (Pad.m_debugPadPort == -1))
-                             ? CameraRawPadInput().triggerRightF
-                             : kCameraZeroF;
+        float triggerR = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1))
+                             ? kCameraZeroF
+                             : CameraRawPadInput().triggerRightF;
 
-        float moveInOut = ((Pad.m_debugPadLock == 0) && (Pad.m_debugPadPort == -1))
-                              ? CameraRawPadInput().stickXF
-                              : kCameraZeroF;
+        float moveInOut = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1))
+                              ? kCameraZeroF
+                              : CameraRawPadInput().stickXF;
 
         float lateral = kCameraDebugZoomStep * triggerR - kCameraDebugZoomStep * moveInOut;
 
-        float panStick = ((Pad.m_debugPadLock == 0) && (Pad.m_debugPadPort == -1))
-                             ? CameraRawPadInput().substickXF
-                             : kCameraZeroF;
+        float panStick = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1))
+                             ? kCameraZeroF
+                             : CameraRawPadInput().substickXF;
 
         const float sinXCosY = static_cast<float>(sin(m_yaw)) * static_cast<float>(cos(m_pitch));
         const float sinY = static_cast<float>(sin(m_pitch));
@@ -900,8 +901,6 @@ void CCameraPcs::draw()
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     Mtx shadowMtx;
     Mtx cameraMtx;
-    unsigned int redColor;
-    unsigned int magentaColor;
 
     if ((m_isAbsolute == 0) ||
         ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_Camera) != 0)) {
@@ -924,6 +923,9 @@ void CCameraPcs::draw()
     }
 
     if (g_map_draw_prof != 0) {
+        float posX = g_shadow_pos.x;
+        float posY = g_shadow_pos.y;
+        float posZ = g_shadow_pos.z;
         PSMTXCopy(m_cameraMatrix, cameraMtx);
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         GXSetZCompLoc(0);
@@ -940,15 +942,22 @@ void CCameraPcs::draw()
         GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
         GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
         PSMTXScale(shadowMtx, kCameraTwoF, kCameraTwoF, kCameraTwoF);
-        shadowMtx[0][3] = g_shadow_pos.x;
-        shadowMtx[1][3] = g_shadow_pos.y;
-        shadowMtx[2][3] = g_shadow_pos.z;
+        shadowMtx[0][3] = posX;
+        shadowMtx[1][3] = posY;
+        shadowMtx[2][3] = posZ;
         PSMTXConcat(cameraMtx, shadowMtx, shadowMtx);
         GXLoadPosMtxImm(shadowMtx, 0);
-        redColor = 0xFF0000FF;
-        GXSetChanMatColor(GX_COLOR0A0, *reinterpret_cast<_GXColor*>(&redColor));
+        _GXColor redColor;
+        redColor.r = 0xFF;
+        redColor.g = 0;
+        redColor.b = 0;
+        redColor.a = 0xFF;
+        GXSetChanMatColor(GX_COLOR0A0, redColor);
         Graphic.DrawSphere();
 
+        float refPosX = g_shadow_refpos.x;
+        float refPosY = g_shadow_refpos.y;
+        float refPosZ = g_shadow_refpos.z;
         PSMTXCopy(m_cameraMatrix, cameraMtx);
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         GXSetZCompLoc(0);
@@ -965,13 +974,17 @@ void CCameraPcs::draw()
         GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
         GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
         PSMTXScale(shadowMtx, kCameraTwoF, kCameraTwoF, kCameraTwoF);
-        shadowMtx[0][3] = g_shadow_refpos.x;
-        shadowMtx[1][3] = g_shadow_refpos.y;
-        shadowMtx[2][3] = g_shadow_refpos.z;
+        shadowMtx[0][3] = refPosX;
+        shadowMtx[1][3] = refPosY;
+        shadowMtx[2][3] = refPosZ;
         PSMTXConcat(cameraMtx, shadowMtx, shadowMtx);
         GXLoadPosMtxImm(shadowMtx, 0);
-        magentaColor = 0x00FF00FF;
-        GXSetChanMatColor(GX_COLOR0A0, *reinterpret_cast<_GXColor*>(&magentaColor));
+        _GXColor magentaColor;
+        magentaColor.r = 0;
+        magentaColor.g = 0xFF;
+        magentaColor.b = 0;
+        magentaColor.a = 0xFF;
+        GXSetChanMatColor(GX_COLOR0A0, magentaColor);
         Graphic.DrawSphere();
     }
 }
@@ -1221,13 +1234,12 @@ void CCameraPcs::destroyMap()
  */
 void CCameraPcs::calcMap()
 {
-    bool useDebugPad = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
     u16 buttons;
     float stickH;
     float stickV;
     float triggerL;
-    Mtx rotXMtx;
     Mtx rotYMtx;
+    Mtx rotXMtx;
     Mtx rotMtx;
     Mtx invViewMtx;
     Vec dir;
@@ -1237,24 +1249,24 @@ void CCameraPcs::calcMap()
     int i;
 
     struct HitCylinder {
-        Vec center;
-        Vec delta;
-        float radiusXZ;
-        float radiusY;
-        float height;
-        float unk;
+        Vec m_bottom;  // 0x00
+        Vec m_top;     // 0x0c
+        Vec m_axis;    // 0x18
+        float m_radius; // 0x24
+        Vec m_min;     // 0x28
+        Vec m_max;     // 0x34
     };
     HitCylinder hitCylinder;
 
-    buttons = useDebugPad ? 0 : CameraRawPadInput().button[0];
+    buttons = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? 0 : CameraRawPadInput().button[0];
 
-    stickH = useDebugPad ? kCameraZeroF : CameraRawPadInput().substickYF;
+    stickH = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? kCameraZeroF : CameraRawPadInput().substickYF;
     stickH = kCameraDegToRad * (stickH / kCameraOneEighthF);
 
-    stickV = useDebugPad ? kCameraZeroF : *reinterpret_cast<float*>(&CameraRawPadInput().lockedButton[0]);
+    stickV = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? kCameraZeroF : *reinterpret_cast<float*>(&CameraRawPadInput().lockedButton[0]);
     stickV = kCameraDegToRad * (stickV / kCameraOneEighthF);
 
-    triggerL = useDebugPad ? kCameraZeroF : CameraRawPadInput().stickYF;
+    triggerL = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? kCameraZeroF : CameraRawPadInput().stickYF;
 
     m_fov += triggerL;
     m_mapRotX -= stickV;
@@ -1307,12 +1319,14 @@ void CCameraPcs::calcMap()
 
     if ((moveDelta.x != kCameraZeroF) || (moveDelta.y != kCameraZeroF) || (moveDelta.z != kCameraZeroF)) {
         for (i = 0; i < 4; i++) {
-            hitCylinder.radiusXZ = kCameraBoundsMinInitial;
-            hitCylinder.radiusY = kCameraBoundsMinInitial;
-            hitCylinder.height = kCameraBoundsMinInitial;
-            hitCylinder.unk = kCameraDefaultNearZ;
-            hitCylinder.center = PositionVec();
-            hitCylinder.delta = moveDelta;
+            hitCylinder.m_min.x = kCameraBoundsMinInitial;
+            hitCylinder.m_min.y = kCameraBoundsMinInitial;
+            hitCylinder.m_min.z = kCameraBoundsMinInitial;
+            hitCylinder.m_max.x = kCameraBoundsMaxInitial;
+            hitCylinder.m_max.y = kCameraBoundsMaxInitial;
+            hitCylinder.m_max.z = kCameraBoundsMaxInitial;
+            hitCylinder.m_radius = kCameraDefaultNearZ;
+            hitCylinder.m_bottom = PositionVec();
             if (MapMng.CheckHitCylinder(reinterpret_cast<CMapCylinder*>(&hitCylinder), &moveDelta, 0xFFFFFFFF) == 0) {
                 PositionVec().x += moveDelta.x;
                 PositionVec().y += moveDelta.y;
@@ -1712,8 +1726,11 @@ void CCameraPcs::drawShadowEnd()
         return;
     }
 
-    C_MTXOrtho(proj, kCameraHalfScreenHeight, -kCameraHalfScreenHeight, kCameraHalfScreenHeight, -kCameraHalfScreenHeight,
-               m_shadowCamera.m_nearZ, m_shadowCamera.m_farZ);
+    float nearZ = m_shadowCamera.m_nearZ;
+    float negHalf = -kCameraHalfScreenHeight;
+    float farZ = m_shadowCamera.m_farZ;
+    C_MTXOrtho(proj, kCameraHalfScreenHeight, negHalf, kCameraHalfScreenHeight, negHalf,
+               nearZ, farZ);
     GXSetProjection(proj, GX_ORTHOGRAPHIC);
     GXSetZMode(GX_TRUE, GX_ALWAYS, GX_TRUE);
     PSMTXIdentity(ident);
@@ -1736,12 +1753,16 @@ void CCameraPcs::drawShadowEnd()
     GXSetNumTexGens(0);
 
     {
-        GXColor black = {0, 0, 0, 0};
+        GXColor black;
+        black.r = 0;
+        black.g = 0;
+        black.b = 0;
+        black.a = 0;
         GXSetChanMatColor(GX_COLOR0A0, black);
     }
 
-    z = m_shadowCamera.m_nearZ - m_shadowCamera.m_farZ;
-    x0 = static_cast<int>(-kCameraHalfScreenHeight - kCameraTwoF);
+    z = nearZ - farZ;
+    x0 = static_cast<int>(negHalf - kCameraTwoF);
     y0 = static_cast<int>(kCameraShadowRectRight);
     x1 = static_cast<int>(kCameraShadowRectLeft);
     y1 = static_cast<int>(kCameraShadowRectBottom);

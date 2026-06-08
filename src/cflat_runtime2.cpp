@@ -2252,8 +2252,9 @@ void CFlatRuntime2::IgnoreParticle(int slotNo, CFlatRuntime::CObject* object)
 	u8* ifDt = reinterpret_cast<u8*>(PartMng.pppGetIfDt(static_cast<short>(slotNo)));
 	u8 count = ifDt[6];
 	if (count < 0x10) {
+		short particleId = object->m_particleId;
 		ifDt[6] = static_cast<u8>(count + 1);
-		*reinterpret_cast<short*>(ifDt + 8 + count * 2) = object->m_particleId;
+		*reinterpret_cast<short*>(ifDt + 8 + count * 2) = particleId;
 	}
 }
 

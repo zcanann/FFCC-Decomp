@@ -1099,22 +1099,22 @@ int CCharaPcs::TryReleaseAnimBank(int requiredSize)
         }
     }
 
-    if (releaseAnim == 0) {
-        return 0;
+    if (releaseAnim != 0) {
+        CChara::CAnim* releaseAnimData = releaseAnim->m_anim;
+        void* bankPtr = releaseAnimData->m_bank;
+        if (bankPtr != 0) {
+            operator delete(bankPtr);
+            releaseAnimData->m_bank = 0;
+        }
+
+        if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+            System.Printf(const_cast<char*>(s_charaReleaseAnimBankFmt), releaseSize, releaseAnim->m_name);
+        }
+
+        return 1;
     }
 
-    CChara::CAnim* releaseAnimData = releaseAnim->m_anim;
-    void* bankPtr = releaseAnimData->m_bank;
-    if (bankPtr != 0) {
-        operator delete(bankPtr);
-        releaseAnimData->m_bank = 0;
-    }
-
-    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-        System.Printf(const_cast<char*>(s_charaReleaseAnimBankFmt), releaseSize, releaseAnim->m_name);
-    }
-
-    return 1;
+    return 0;
 }
 
 /*

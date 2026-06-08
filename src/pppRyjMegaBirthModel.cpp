@@ -1152,13 +1152,13 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
         Vec objectPos;
         Vec endPos;
 
-        objectPos.x = pObject->m_localMatrix.value[0][3];
-        objectPos.y = pObject->m_localMatrix.value[1][3];
-        objectPos.z = pObject->m_localMatrix.value[2][3];
-
         endPos.x = mtxB.value[0][3];
         endPos.y = mtxB.value[1][3];
         endPos.z = mtxB.value[2][3];
+
+        objectPos.x = pObject->m_localMatrix.value[0][3];
+        objectPos.y = pObject->m_localMatrix.value[1][3];
+        objectPos.z = pObject->m_localMatrix.value[2][3];
         pppAddVector(endPos, endPos, objectPos);
 
         pppUnitMatrix(mtxB);

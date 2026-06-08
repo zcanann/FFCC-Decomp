@@ -532,7 +532,7 @@ void CMesMenu::onDraw()
         float pulseY = ((m_menuIndex & 2) != 0) ? pulse : -pulse;
         float baseY = (m_baseY + m_offsetY) + pulseY;
 
-        if (stateBlend > FLOAT_803308d8) {
+        if (FLOAT_803308d8 < stateBlend) {
             float width = m_windowWidth * stateBlend;
             float height = m_windowHeight * stateBlend;
             float drawX = baseX + (((m_menuIndex & 1) == 0)

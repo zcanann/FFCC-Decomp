@@ -1088,6 +1088,8 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma peephole off
 void CShopMenu::DrawItemInfo0()
 {
     if (m_selectedIndex == -1) {
@@ -1196,6 +1198,7 @@ void CShopMenu::DrawItemInfo0()
         drawShapeSeqScale(0x12, 0, x, 0xD4, FLOAT_80332d78, FLOAT_80332d78, 0xFF);
     }
 }
+#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x8015173c

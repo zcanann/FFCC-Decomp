@@ -1141,7 +1141,11 @@ void CGMonObj::frameStatFuncDragonZombie()
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
 	int state = prgObj->m_lastStateId;
 
-	if (state == 0x65) {
+	switch (state) {
+	case 100:
+		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+		break;
+	case 0x65:
 		if (prgObj->m_stateFrame == 0) {
 			prgObj->reqAnim(0xF, 0, 0);
 			prgObj->playSe3D(0x987A, 0x32, 0x96, 0, 0);
@@ -1149,8 +1153,7 @@ void CGMonObj::frameStatFuncDragonZombie()
 		if (prgObj->isLoopAnim() != 0) {
 			prgObj->changeStat(0, 0, 0);
 		}
-	} else if (state < 0x65 && state > 99) {
-		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+		break;
 	}
 }
 

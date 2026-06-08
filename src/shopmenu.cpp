@@ -331,14 +331,20 @@ static bool CanTradeShopMenuItem(CShopMenu* shopMenu, int index, int itemNo)
 
     if (listType == 2) {
         unsigned int bit = static_cast<unsigned int>(itemNo - 0x191);
-        return (ShopMenuCaravanWork(shopMenu)->m_shopArgs[(itemNo - 0x191) >> 5] & (1U << (bit & 0x1F))) != 0;
+        if ((ShopMenuCaravanWork(shopMenu)->m_shopArgs[(itemNo - 0x191) >> 5] & (1U << (bit & 0x1F))) != 0) {
+            return true;
+        }
+        return false;
     }
 
     if (MenuPcs.EquipChk(index) != 0) {
         return false;
     }
 
-    return itemNo >= 0x9F;
+    if (itemNo >= 0x9F) {
+        return true;
+    }
+    return false;
 }
 
 

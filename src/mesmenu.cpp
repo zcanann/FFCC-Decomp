@@ -903,7 +903,7 @@ void CMesMenu::onCalc()
                 }
             }
 
-            unsigned int value;
+            int value;
             for (int heartIndex = 0; heartIndex < 8; heartIndex += 4) {
                 value = m_heartGrowTimers[heartIndex] - 1;
                 m_heartGrowTimers[heartIndex] = value & ~((int)value >> 0x1F);
@@ -939,7 +939,7 @@ void CMesMenu::onCalc()
         return;
     }
 
-    unsigned int state = m_state;
+    int state = m_state;
     if (state < 2) {
         if (state == 0) {
             (void)sin(FLOAT_80330980 +

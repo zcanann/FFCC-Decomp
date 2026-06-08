@@ -436,6 +436,12 @@ void CGPartyObj::onChangeStat(int state)
 		}
 		*reinterpret_cast<int*>(self + 0x68C) = castTime;
 		break;
+	case 8:
+		*reinterpret_cast<int*>(self + 0x550) = 0x15;
+		*reinterpret_cast<int*>(self + 0x554) = 0x16;
+		*reinterpret_cast<int*>(self + 0x558) = 0x17;
+		*reinterpret_cast<int*>(self + 0x55C) = 0x18;
+		break;
 	case 6:
 		System.Printf(const_cast<char*>(msgBase + 0x370), *reinterpret_cast<int*>(self + 0x560));
 		*reinterpret_cast<int*>(self + 0x560) =
@@ -469,12 +475,6 @@ void CGPartyObj::onChangeStat(int state)
 				m_comboItemState = cmdListItem;
 			}
 		}
-		break;
-	case 8:
-		*reinterpret_cast<int*>(self + 0x550) = 0x15;
-		*reinterpret_cast<int*>(self + 0x554) = 0x16;
-		*reinterpret_cast<int*>(self + 0x558) = 0x17;
-		*reinterpret_cast<int*>(self + 0x55C) = 0x18;
 		break;
 	default:
 		break;

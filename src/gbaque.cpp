@@ -3148,7 +3148,6 @@ void GbaQueue::ChkCMakeJob(int channel, unsigned int value)
 	unsigned int stackValue = value;
 	unsigned char* valueBytes = reinterpret_cast<unsigned char*>(&stackValue);
 	char* obj = reinterpret_cast<char*>(this);
-	OSSemaphore* semaphore = accessSemaphores + channel;
 
 	if (valueBytes[2] == 0xFF) {
 		OSWaitSemaphore(accessSemaphores + channel);

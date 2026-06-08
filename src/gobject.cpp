@@ -1406,19 +1406,17 @@ void CGObject::update()
 
     Mtx modelMtx;
     if (Game.m_currentMapId == 0x21) {
-        Mtx yawMtx;
-        Mtx pitchMtx;
-        Mtx rotMtx;
+        Mtx tempMtx;
         Vec mapUp = sMap21WorldUpAxis;
         Vec worldNorm;
 
-        PSMTXRotRad(yawMtx, 'y', atan2f(m_worldPosition.x, m_worldPosition.z));
+        PSMTXRotRad(modelMtx, 'y', atan2f(m_worldPosition.x, m_worldPosition.z));
         PSVECNormalize(&m_worldPosition, &worldNorm);
-        PSMTXRotRad(pitchMtx, 'x', acosf(PSVECDotProduct(&mapUp, &worldNorm)));
-        PSMTXConcat(yawMtx, pitchMtx, modelMtx);
+        PSMTXRotRad(tempMtx, 'x', acosf(PSVECDotProduct(&mapUp, &worldNorm)));
+        PSMTXConcat(modelMtx, tempMtx, modelMtx);
 
-        PSMTXRotRad(rotMtx, 'y', m_rotBaseY);
-        PSMTXConcat(modelMtx, rotMtx, modelMtx);
+        PSMTXRotRad(tempMtx, 'y', m_rotBaseY);
+        PSMTXConcat(modelMtx, tempMtx, modelMtx);
         PSMTXScaleApply(modelMtx, modelMtx, m_rotationX, m_rotationY, m_rotationZ);
         modelMtx[0][3] = m_worldPosition.x;
         modelMtx[1][3] = m_worldPosition.y;

@@ -1804,11 +1804,8 @@ void CMenuPcs::drawBattle()
 
             if (screenX < static_cast<float>(halfWidth)) {
                 screenX = static_cast<float>(halfWidth);
-            } else {
-                const float right = static_cast<float>(0x280 - halfWidth);
-                if (screenX > right) {
-                    screenX = right;
-                }
+            } else if (screenX > static_cast<float>(0x280 - halfWidth)) {
+                screenX = static_cast<float>(0x280 - halfWidth);
             }
 
             if (screenY < LoadFloat(kMenuMarkerMinY)) {

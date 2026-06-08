@@ -5304,9 +5304,9 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 {
 	CGCharaObj::onDrawDebug(font, x, y, z);
 
-	if ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(static_cast<unsigned char>(m_weaponNodeFlags)) << 24) & 0xC0000000) >> 31) == 0) ||
+	if ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(reinterpret_cast<unsigned char*>(this)[0x9A]) << 24) & 0xC0000000) >> 31) == 0) ||
 	    (static_cast<int>(CFlatCenterState()) != 0) ||
-	    ((MiniGamePcs.m_flags & 0x80) == 0)) {
+	    ((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&DbgMenuPcs) + 4) & 0x80) == 0)) {
 		return;
 	}
 

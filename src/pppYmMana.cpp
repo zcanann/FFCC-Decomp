@@ -1195,7 +1195,7 @@ static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, u
     rowCount = 0;
     uvStep = LoadFloat(kYmManaWaterUvStep);
     radius = size * LoadFloat(kYmManaHalf);
-    for (z = radius; -radius <= z; z -= size * uvStep) {
+    for (z = radius; z >= -radius; z -= size * uvStep) {
         colCount = 0;
         positions = reinterpret_cast<float*>(positionsInOut);
         normals = reinterpret_cast<float*>(normalsOut);

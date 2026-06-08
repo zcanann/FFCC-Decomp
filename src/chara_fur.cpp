@@ -966,9 +966,9 @@ void CChara::CModel::InitMogFurTex()
 void CChara::CModel::MogFurFrame(CGObject* gObject)
 {
 	MogWorkRaw& work = MogWork();
-	const short heldButtons = MogHeldButtons();
+	const unsigned short heldButtons = MogHeldButtons();
 	const unsigned short triggerButtons = MogTriggerButtons();
-	const unsigned short rotateButtons = (MogPadInt(64) == 0) ? heldButtons : 0;
+	const unsigned short rotateButtons = (MogPadInt(64) == 0) ? MogHeldButtons() : 0;
 	int messageId = -1;
 
 	if (work.m_started == 0) {

@@ -1134,25 +1134,27 @@ void CGMonObj::onFrameStat()
 
 	case 0x1D:
 		SET_DRAW_FLAG();
-		if (prgObj->m_subState == 1) {
+		if (prgObj->m_subState != 1) {
+			if ((prgObj->m_subState < 1) && (-1 < prgObj->m_subState)) {
+				if (prgObj->m_subFrame == 0) {
+					void** scriptHandle = object->m_scriptHandle;
+					int rand = Math.Rand(0x50);
+					float randF = Math.RandF();
+					float speedScale = *reinterpret_cast<float*>(mon + 0x690) *
+						(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle[9]) + 0xD4)) + 0.8f);
+					object->moveVectorRot(kMonObjTwo * (FLOAT_803319C4 * randF), 0.0f, kMonObjQuarter * speedScale, rand + 10);
+				} else {
+					unsigned char weaponFlags1 = object->m_weaponNodeFlagBytes.m_flags1;
+					if ((object->m_weaponNodeFlagAll.m_bits1.m_bit20 == 0) ||
+						(object->m_stateFlags0Bits.unk1 != 0)) {
+						object->CancelMove(1);
+						prgObj->changeSubStat(1);
+					}
+				}
+			}
+		} else {
 			if (Math.Rand(100) == 0) {
 				prgObj->changeSubStat(0);
-			}
-		} else if ((prgObj->m_subState < 1) && (-1 < prgObj->m_subState)) {
-			if (prgObj->m_subFrame == 0) {
-				void** scriptHandle = object->m_scriptHandle;
-				int rand = Math.Rand(0x50);
-				float randF = Math.RandF();
-				float speedScale = *reinterpret_cast<float*>(mon + 0x690) *
-					(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle[9]) + 0xD4)) + 0.8f);
-				object->moveVectorRot(kMonObjTwo * (FLOAT_803319C4 * randF), 0.0f, kMonObjQuarter * speedScale, rand + 10);
-			} else {
-				unsigned char weaponFlags1 = object->m_weaponNodeFlagBytes.m_flags1;
-				if ((object->m_weaponNodeFlagAll.m_bits1.m_bit20 == 0) ||
-					(object->m_stateFlags0Bits.unk1 != 0)) {
-					object->CancelMove(1);
-					prgObj->changeSubStat(1);
-				}
 			}
 		}
 		break;

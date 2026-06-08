@@ -1691,12 +1691,10 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float radius
  */
 void CFlatRuntime2::loadLayer(int layerNo, char* fileName)
 {
-	CFlatLayerResource* layer = &LayerResources(this)[layerNo];
-
-	CTextureSet* textureSet = layer->m_textureSet;
+	CTextureSet* textureSet = LayerResources(this)[layerNo].m_textureSet;
 	if (textureSet != 0) {
 		delete textureSet;
-		layer->m_textureSet = 0;
+		LayerResources(this)[layerNo].m_textureSet = 0;
 	}
 
 	char path[0x104];
@@ -1708,7 +1706,7 @@ void CFlatRuntime2::loadLayer(int layerNo, char* fileName)
 		File.SyncCompleted(fileHandle);
 
 		textureSet = new (getStage(), const_cast<char*>(sCFlatRuntime2FileTag), 0x4F4) CTextureSet;
-		layer->m_textureSet = textureSet;
+		LayerResources(this)[layerNo].m_textureSet = textureSet;
 		if (textureSet != 0) {
 			textureSet->Create(File.m_readBuffer, getStage(), 0, 0, 0, 0);
 		}

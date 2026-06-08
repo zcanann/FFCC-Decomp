@@ -3101,7 +3101,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
 {
     int result = 0;
 
-    switch (threadParam->m_subState)
+    switch ((unsigned char)threadParam->m_subState)
     {
     case 0:
     {
@@ -3755,7 +3755,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
         return 0;
     }
 
-    if ((int)gbaStatus < 0)
+    if ((unsigned int)gbaStatus < 0)
     {
         return -1;
     }
@@ -3819,7 +3819,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
             }
         }
 
-        const int typeVal = static_cast<char>(sendType);
+        const unsigned int typeVal = static_cast<char>(sendType);
         const int respVal = seq;
 
         if (result != 0)

@@ -863,9 +863,11 @@ void CSound::loadWaveFrame()
 
     if (waveFile != 0) {
         if (waveState == 0) {
-            unsigned int readSize = 0x100000;
-            if ((unsigned int)waveRemain < readSize) {
+            unsigned int readSize;
+            if ((unsigned int)waveRemain < 0x100000) {
                 readSize = (unsigned int)waveRemain;
+            } else {
+                readSize = 0x100000;
             }
 
             waveFile->m_chunkSize = readSize;

@@ -3795,15 +3795,12 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
     m_recvQueueEntriesArr[port][m_secCmdCount[port]] = 0;
     m_secCmdCount[port]--;
 
-    localWord = (localWord & 0xFFFF0000u) |
-                static_cast<unsigned short>(static_cast<char>(localWord >> 24));
+    *reinterpret_cast<unsigned short*>(&localWord) =
+        static_cast<unsigned short>(static_cast<short>(localWord >> 24));
 
     OSSignalSemaphore(&m_accessSemaphores[port]);
 
-    const unsigned char cmd = static_cast<unsigned char>(localWord & 0x3F);
-    const unsigned char seq = static_cast<signed char>((localWord >> 8) & 0xFF);
-
-    if (cmd == 7)
+    if ((static_cast<unsigned char>(localWord >> 24) & 0x3F) == 7)
     {
         step = 0;
         phase = 0;
@@ -3835,7 +3832,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
         }
 
         const unsigned int typeVal = static_cast<char>(sendType);
-        const int respVal = seq;
+        const int respVal = static_cast<signed char>((localWord >> 16) & 0xFF);
 
         if (result != 0)
         {
@@ -3847,7 +3844,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
         return diffMask - 1;
     }
 
-    if ((int)seq == (int)static_cast<char>(sendType))
+    if ((int)static_cast<signed char>((localWord >> 16) & 0xFF) == (int)static_cast<char>(sendType))
     {
         step = 0;
         phase = 1;
@@ -8058,7 +8055,11 @@ int JoyBus::SetOpenMenu(int playerIndex, char menuId)
     {
         bool isSingle = GbaQue.IsSingleMode(m_threadParams[playerIndex].m_portIndex);
 
-        if (!isSingle)
+        if (isSingle)
+        {
+            result = 0;
+        }
+        else
         {
             unsigned int cmd = 0;
             unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
@@ -8089,16 +8090,16 @@ int JoyBus::SetOpenMenu(int playerIndex, char menuId)
                 }
             }
         }
-        else
-        {
-            result = 0;
-        }
     }
     else
     {
         bool isSingle = GbaQue.IsSingleMode(m_threadParams[playerIndex].m_portIndex);
 
-        if (!isSingle)
+        if (isSingle)
+        {
+            result = 0;
+        }
+        else
         {
             unsigned int cmd = 0;
             unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
@@ -8127,10 +8128,6 @@ int JoyBus::SetOpenMenu(int playerIndex, char menuId)
                     result = 0;
                 }
             }
-        }
-        else
-        {
-            result = 0;
         }
     }
 

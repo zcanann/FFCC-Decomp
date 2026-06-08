@@ -3816,29 +3816,10 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	const unsigned int flatBase = Game.unkCFlatData0[2];
 
 	char smithCount = 0;
-	char baseIndex = 0;
-	int itemIndex = 0;
-	for (int i = 0; i < 0x10; i++) {
-		if (caravanWork->m_inventoryItems[itemIndex] >= 401) {
-			smithIndices[smithCount++] = baseIndex;
+	for (int i = 0; i < 0x40; i++) {
+		if (reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_inventoryItems[i] >= 401) {
+			smithIndices[smithCount++] = static_cast<unsigned char>(i);
 		}
-		itemIndex++;
-		baseIndex++;
-		if (caravanWork->m_inventoryItems[itemIndex] >= 401) {
-			smithIndices[smithCount++] = baseIndex;
-		}
-		itemIndex++;
-		baseIndex++;
-		if (caravanWork->m_inventoryItems[itemIndex] >= 401) {
-			smithIndices[smithCount++] = baseIndex;
-		}
-		itemIndex++;
-		baseIndex++;
-		if (caravanWork->m_inventoryItems[itemIndex] >= 401) {
-			smithIndices[smithCount++] = baseIndex;
-		}
-		itemIndex++;
-		baseIndex++;
 	}
 
 	*outData = smithCount;

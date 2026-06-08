@@ -58,7 +58,7 @@ void CMenuPcs::FavoDraw()
 			float v = entry->v;
 
 			GXColor colors[4];
-			if (i < 3) {
+			if (static_cast<int>(i) < 3) {
 				MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(entry->tex));
 
@@ -86,9 +86,11 @@ void CMenuPcs::FavoDraw()
 						int yStep = static_cast<int>(y);
 						float end = y + h;
 						while (static_cast<float>(yStep) < end) {
-							int tileH = static_cast<unsigned int>(end - static_cast<float>(yStep));
-							if (static_cast<float>(tileH) > 32.0f) {
+							int tileH;
+							if (end - static_cast<float>(yStep) >= 32.0f) {
 								tileH = 0x20;
+							} else {
+								tileH = static_cast<int>(end - static_cast<float>(yStep));
 							}
 							MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
 							                 fillW, static_cast<float>(tileH), u, v, colors, entry->uvScale,
@@ -119,9 +121,11 @@ void CMenuPcs::FavoDraw()
 						int yStep = static_cast<int>(y);
 						float end = y + h;
 						while (static_cast<float>(yStep) < end) {
-							int tileH = static_cast<unsigned int>(end - static_cast<float>(yStep));
-							if (static_cast<float>(tileH) > 32.0f) {
+							int tileH;
+							if (end - static_cast<float>(yStep) >= 32.0f) {
 								tileH = 0x20;
+							} else {
+								tileH = static_cast<int>(end - static_cast<float>(yStep));
 							}
 							MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
 							                 remainW, static_cast<float>(tileH), u, v, colors, entry->uvScale,
@@ -164,8 +168,8 @@ void CMenuPcs::FavoDraw()
 	FoodRank* rank = s_rank;
 	for (int i = 0; i < 8; i++) {
 		int barX = drawEntry->x + drawEntry->w + 0x18;
-		int barY = static_cast<int>((static_cast<float>(drawEntry->h) - 24.0f) * 0.5 +
-		                            static_cast<float>(drawEntry->y));
+		int barY = static_cast<int>(static_cast<float>((static_cast<float>(drawEntry->h) - 24.0f) * 0.5 +
+		                            static_cast<float>(drawEntry->y)));
 		DrawSingBar(barX, barY, rank->score, drawEntry->alpha);
 		rank++;
 		drawEntry++;
@@ -715,17 +719,15 @@ void CMenuPcs::FavoInit()
 
 	int place = 0;
 	iVar17 = 0;
-	iVar16 = 8;
 	rank = ranks;
 	do {
 		if ((iVar17 != 0) && (rank[-1].score != rank->score)) {
 			place = iVar17;
 		}
-		iVar17++;
 		rank->place = place + 1;
 		rank++;
-		iVar16--;
-	} while (iVar16 != 0);
+		iVar17++;
+	} while (iVar17 < 8);
 
 	m_singMenuState->selectedIndex = 0;
 	m_singMenuState->initialized = 1;

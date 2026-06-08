@@ -1330,17 +1330,13 @@ void CCharaPcs::drawShadow()
     _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
 
-    _GXColor shadowColor = {0x00, 0x00, 0x00, 0xFF};
-    LightPcs.SetAmbient(shadowColor);
+    CColor shadowColor(0x00, 0x00, 0x00, 0xFF);
+    LightPcs.SetAmbient(shadowColor.color);
     LightPcs.SetNumDiffuse(0);
     LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
 
-    if (m_handleList == 0) {
-        return;
-    }
-
     CHandle* handle = m_handleList->m_next;
-    while (handle != m_handleList) {
+    while (m_handleList != handle) {
         if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x8000) != 0) {
             handle->draw(1, 1);
         }

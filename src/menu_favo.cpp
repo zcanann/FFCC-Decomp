@@ -58,7 +58,7 @@ void CMenuPcs::FavoDraw()
 			float v = entry->v;
 
 			GXColor colors[4];
-			if (i < 3) {
+			if (static_cast<int>(i) < 3) {
 				MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(entry->tex));
 

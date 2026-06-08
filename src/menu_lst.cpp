@@ -62,11 +62,11 @@ void CMenuPcs::MLstDraw()
 		int tex = item->tex;
 		if (tex >= 0) {
 			float x = (float)item->x;
+			float zero = kMLstZero;
+			float v = zero;
 			float y = (float)item->y;
 			float w = (float)item->width;
 			float h = (float)item->height;
-			float zero = kMLstZero;
-			float v = zero;
 			float alpha = item->alpha;
 
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));

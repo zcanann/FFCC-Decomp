@@ -67,6 +67,7 @@ extern const float FLOAT_80330B40;
 extern const float FLOAT_80330B44;
 extern const float FLOAT_80330B48;
 extern const float FLOAT_80330B4C;
+extern const float FLOAT_80330B5C;
 extern float kCFlatHalfPi;
 extern float kCFlatPi;
 extern float kCFlatThreeHalfPi;
@@ -1594,55 +1595,63 @@ int CCameraPcs::IsAbsolute()
 int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long* nearestSegment,
                     float* nearestSegmentRatio, Vec* targetPosition, float maxDistance)
 {
-    const int infiniteRange = (kLineSegmentMinT == maxDistance);
-    float bestDistance = infiniteRange ? kLineBoundsInitMin : maxDistance;
+    float bestPosX;
+    float bestPosY;
+    float bestPosZ;
+    float bestT = kCFlatPadStickZero;
+    const int infiniteRange = (kCFlatPadStickZero == maxDistance);
+    float bestDistance = infiniteRange ? FLOAT_80330B5C : maxDistance;
     const float maxDistanceSq = maxDistance * maxDistance;
+    unsigned int bestIndex;
     int found = 0;
-    unsigned int bestIndex = 0;
-    float bestT = kLineSegmentMinT;
-    Vec bestPosition;
+    Vec candidatePosition;
 
-    for (int i = 0; i + 1 < pointCount; i++) {
+    for (unsigned int i = 0; i < pointCount - 1; i++) {
         float distanceSq = PSVECSquareDistance(&points[i], targetPosition);
         if (distanceSq < maxDistanceSq || infiniteRange) {
-            Vec candidatePosition = points[i];
+            candidatePosition = points[i];
             float distance = sqrtf(distanceSq);
             if (distance < bestDistance) {
                 bestDistance = distance;
-                bestPosition = candidatePosition;
+                bestPosX = candidatePosition.x;
+                bestPosY = candidatePosition.y;
+                bestPosZ = candidatePosition.z;
                 bestIndex = i;
-                bestT = kLineSegmentMinT;
+                bestT = kCFlatPadStickZero;
                 found = 1;
             }
         }
 
-        if (i + 1 == pointCount - 1) {
+        if (i == pointCount - 2) {
             distanceSq = PSVECSquareDistance(&points[i + 1], targetPosition);
             if (distanceSq < maxDistanceSq || infiniteRange) {
-                Vec candidatePosition = points[i + 1];
+                candidatePosition = points[i + 1];
                 float distance = sqrtf(distanceSq);
                 if (distance < bestDistance) {
                     bestDistance = distance;
-                    bestPosition = candidatePosition;
+                    bestPosX = candidatePosition.x;
+                    bestPosY = candidatePosition.y;
+                    bestPosZ = candidatePosition.z;
                     bestIndex = i;
-                    bestT = kLineSegmentMaxT;
+                    bestT = kCFlatOneF;
                     found = 1;
                 }
             }
         }
 
-        float dotTarget = PSVECDotProduct(targetPosition, &segments[i].delta);
-        float dotPoint = PSVECDotProduct(&points[i], &segments[i].delta);
-        float segmentT = (-dotPoint + dotTarget) / (segments[i].length * segments[i].length);
-        if (((segmentT >= kLineSegmentMinT) && (segmentT <= kCFlatOneF)) || infiniteRange) {
+        const float dotTarget = PSVECDotProduct(targetPosition, &segments[i].delta);
+        const float dotPoint = PSVECDotProduct(&points[i], &segments[i].delta);
+        const float segmentT = (-dotPoint + dotTarget) / (segments[i].length * segments[i].length);
+        if (((segmentT >= kCFlatPadStickZero) && (segmentT <= kCFlatOneF)) || infiniteRange) {
             Vec scaled;
-            Vec projected;
             PSVECScale(&segments[i].delta, &scaled, segmentT);
-            PSVECAdd(&points[i], &scaled, &projected);
-            float distance = PSVECDistance(targetPosition, &projected);
+            PSVECAdd(&points[i], &scaled, &candidatePosition);
+            const float distance = PSVECDistance(targetPosition, &candidatePosition);
             if (distance < bestDistance) {
                 bestDistance = distance;
-                bestPosition = projected;
+                bestPosX = candidatePosition.x;
+                bestPosY = candidatePosition.y;
+                bestPosZ = candidatePosition.z;
                 bestIndex = i;
                 bestT = segmentT;
                 found = 1;
@@ -1652,7 +1661,9 @@ int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long*
 
     if (found != 0) {
         if (nearestPosition != nullptr) {
-            *nearestPosition = bestPosition;
+            nearestPosition->x = bestPosX;
+            nearestPosition->y = bestPosY;
+            nearestPosition->z = bestPosZ;
         }
         if (nearestDistance != nullptr) {
             *nearestDistance = bestDistance;

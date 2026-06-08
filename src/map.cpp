@@ -1643,13 +1643,13 @@ void CMapMng::SetLightSource()
                 light.m_position.x = MapObjWorldX(mapObj);
                 light.m_position.y = MapObjWorldY(mapObj);
                 light.m_position.z = MapObjWorldZ(mapObj);
-                light.m_direction.x = 0.0f;
-                light.m_direction.y = 0.0f;
-                light.m_direction.z = 1.0f;
+                light.m_direction.x = kMapZero;
+                light.m_direction.y = kMapZero;
+                light.m_direction.z = kMapViewScaleZ;
                 light.m_partMask = 1 << mapLightIndex;
                 light.m_attenRadius = pointAttr->m_radius;
                 light.m_range = pointAttr->m_intensity;
-                light.m_attenFalloff = 1.0f;
+                light.m_attenFalloff = kMapViewScaleZ;
                 light.m_targetColor[0] = pointAttr->m_altColor;
                 light.m_targetColor[1] = pointAttr->m_color;
                 *(u32*)light.m_targetEnable = 0;
@@ -1669,9 +1669,9 @@ void CMapMng::SetLightSource()
                     light->m_position.x = MapObjWorldX(mapObj);
                     light->m_position.y = MapObjWorldY(mapObj);
                     light->m_position.z = MapObjWorldZ(mapObj);
-                    light->m_direction.x = 0.0f;
-                    light->m_direction.y = 0.0f;
-                    light->m_direction.z = 1.0f;
+                    light->m_direction.x = kMapZero;
+                    light->m_direction.y = kMapZero;
+                    light->m_direction.z = kMapViewScaleZ;
 
                     CMapObj* targetObj = spotAttr->m_target;
                     light->m_targetPosition.x = MapObjWorldX(targetObj);
@@ -1688,9 +1688,9 @@ void CMapMng::SetLightSource()
                     light.m_position.y = MapObjWorldY(mapObj);
                     light.m_position.z = MapObjWorldZ(mapObj);
 
-                    light.m_direction.x = 0.0f;
-                    light.m_direction.y = 0.0f;
-                    light.m_direction.z = 1.0f;
+                    light.m_direction.x = kMapZero;
+                    light.m_direction.y = kMapZero;
+                    light.m_direction.z = kMapViewScaleZ;
 
                     CMapObj* targetObj = spotAttr->m_target;
                     light.m_targetPosition.x = MapObjWorldX(targetObj);

@@ -2847,15 +2847,15 @@ int CMenuPcs::CmakeNameCtrl()
                             ret = 0;
                         }
                     }
-                    if (ret == 0) {
+                    if (ret != 0) {
+                        Sound.PlaySe(4, 0x40, 0x7F, 0);
+                    } else {
                         unsigned int finalLen = strlen(s_CmakeInfo.m_name);
                         if (static_cast<int>(finalLen & (static_cast<int>(-finalLen | finalLen) >> 31)) >= 7) {
                             CmakeState(this)->m_select = 0xB;
                             CmakeState(this)->m_row = 5;
                         }
                         Sound.PlaySe(2, 0x40, 0x7F, 0);
-                    } else {
-                        Sound.PlaySe(4, 0x40, 0x7F, 0);
                     }
                     return 0;
                 }

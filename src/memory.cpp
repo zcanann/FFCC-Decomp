@@ -213,7 +213,7 @@ static inline int stageHasUnfreedBlocks(CMemory::CStage* stage)
 
 static inline void stageReleaseMode2Buffer(CMemory::CStage* stage)
 {
-    int ptr = stageGetHeapHead(stage);
+    unsigned int ptr = static_cast<unsigned int>(stageGetHeapHead(stage));
     if (ptr != 0) {
         if (ptr != 0x10) {
             operator delete[](reinterpret_cast<void*>(ptr - 0x10));

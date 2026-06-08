@@ -1824,11 +1824,11 @@ void CGoOutMenu::CalcGoOut()
         }
 
         switch (next) {
-        case 2:
-            SetGoOutMode(0xf);
-            break;
         case 1:
             SetGoOutMode(0x11);
+            break;
+        case 2:
+            SetGoOutMode(0xf);
             break;
         }
         break;
@@ -1869,11 +1869,11 @@ void CGoOutMenu::CalcGoOut()
         }
 
         switch (next) {
-        case 2:
-            SetGoOutMode(0xf);
-            break;
         case 1:
             SetGoOutMode(0x12);
+            break;
+        case 2:
+            SetGoOutMode(0xf);
             break;
         }
         break;
@@ -1935,11 +1935,11 @@ void CGoOutMenu::CalcGoOut()
         }
 
         switch (next) {
-        case 2:
-            SetMainMode(1);
-            break;
         case 1:
             SetGoOutMode(4);
+            break;
+        case 2:
+            SetMainMode(1);
             break;
         }
         break;
@@ -1974,11 +1974,11 @@ void CGoOutMenu::CalcGoOut()
         }
 
         switch (next) {
-        case 2:
-            SetMainMode(1);
-            break;
         case 1:
             SetGoOutMode(5);
+            break;
+        case 2:
+            SetMainMode(1);
             break;
         }
         break;

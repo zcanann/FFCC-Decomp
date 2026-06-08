@@ -1123,7 +1123,7 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
  * JP Size: TODO
  */
 #pragma push
-#pragma peephole off
+#pragma peephole on
 void CShopMenu::DrawItemInfo0()
 {
     if (m_selectedIndex == -1) {

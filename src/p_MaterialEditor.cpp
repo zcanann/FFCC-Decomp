@@ -374,11 +374,13 @@ void CMaterialEditorPcs::drawViewer()
                     vertexIndex[3] = 2;
                 }
 
-                for (u8 i = 0; i < vertexCount; i++) {
+                u8 i = 0;
+                while (i < vertexCount) {
                     GXWGFifo.u16 = static_cast<u16>((&vertexIndex[4])[i]);
                     GXWGFifo.u16 = static_cast<u16>((&vertexIndex[4])[i]);
                     GXWGFifo.u8 = static_cast<u8>(vertexIndex[i]);
                     GXWGFifo.u16 = static_cast<u16>(vertexIndex[i]);
+                    i++;
                 }
 #undef polygon
             }

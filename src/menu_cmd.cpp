@@ -1326,11 +1326,12 @@ void CMenuPcs::CmdDraw()
 			const float pitch = static_cast<float>(
 			    ((static_cast<float>(panel->height) * panel->scale) - kCmdMenuChoicePaddingD) /
 			    choices);
-			choiceFont->SetPosX(static_cast<float>(panel->x + 0x18));
-			choiceFont->SetPosY(
+			const float choicePy =
 			    ((pitch * static_cast<float>(choice)) + static_cast<float>(panel->y + 8)) +
 			    ((pitch - kCmdMenuTextLineHeightD) * kCmdMenuHalfD) -
-			    kCmdMenuTextYOffset);
+			    kCmdMenuTextYOffset;
+			choiceFont->SetPosX(static_cast<float>(panel->x + 0x18));
+			choiceFont->SetPosY(choicePy);
 			choiceFont->Draw(text);
 		}
 		DrawInit();

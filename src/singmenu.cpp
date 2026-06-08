@@ -960,21 +960,17 @@ static inline const char* GetSingWinMessage(int staticText, const char* dynamicT
     }
 
     int languageId = Game.m_gameWork.m_languageId;
-    if (languageId == 3) {
+    switch (languageId) {
+    case 2:
+        return (char*)gSingMenuTextTableDe[staticText];
+    case 3:
         return (char*)gSingMenuTextTableIt[staticText];
-    } else if (languageId < 3) {
-        if ((languageId == 1) || (languageId == 0)) {
-            return (char*)gSingMenuTextTableEn[staticText];
-        } else {
-            return (char*)gSingMenuTextTableDe[staticText];
-        }
-    } else if (languageId == 5) {
-        return (char*)gSingMenuTextTableEs[staticText];
-    } else {
-        if (4 < languageId) {
-            return (char*)gSingMenuTextTableEn[staticText];
-        }
+    case 4:
         return (char*)gSingMenuTextTableFr[staticText];
+    case 5:
+        return (char*)gSingMenuTextTableEs[staticText];
+    default:
+        return (char*)gSingMenuTextTableEn[staticText];
     }
 }
 

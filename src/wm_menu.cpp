@@ -10671,7 +10671,7 @@ void CMenuPcs::DrawMainMenuSub()
 			if (next < 5) {
 				do {
 					float depth = *fp;
-					if (*fpInner < depth) {
+					if (*fp > *fpInner) {
 						unsigned int idx = *op;
 						unsigned int idxInner = *opInner;
 						*fp = *fpInner;

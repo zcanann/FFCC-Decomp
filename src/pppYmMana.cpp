@@ -1675,9 +1675,9 @@ void CalcReflectionVector2(
     Vec nodePos;
     Vec matrixPos;
     Vec worldPos;
+    Vec eyeToPos;
     Vec position;
     Vec normal;
-    Vec eyeToPos;
     Vec2d uv;
     Mtx normalMtx;
     Mtx nodeRotMtx;

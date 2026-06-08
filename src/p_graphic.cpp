@@ -751,13 +751,13 @@ void CGraphicPcs::drawBar()
         if (priority == 0x26) {
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
             const float y0 = drawText ? static_cast<float>(y) : kDebugBarMoveBottom;
-            const float y1 = drawText ? static_cast<float>(y + kDebugBarLineStep) : kDebugBarTop;
             GXPosition3f32(x, y0, kGraphicZero);
             GXColor1u32(*reinterpret_cast<u32*>(&rgb));
             GXTexCoord2u16(0, 0);
             GXPosition3f32(x + width + kGraphicOne, y0, kGraphicZero);
             GXColor1u32(*reinterpret_cast<u32*>(&rgb));
             GXTexCoord2u16(2, 0);
+            const float y1 = drawText ? static_cast<float>(y + kDebugBarLineStep) : kDebugBarTop;
             GXPosition3f32(x + width + kGraphicOne, y1, kGraphicZero);
             GXColor1u32(*reinterpret_cast<u32*>(&rgb));
             GXTexCoord2u16(2, 2);
@@ -768,13 +768,13 @@ void CGraphicPcs::drawBar()
         } else if (priority != 0x27) {
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
             const float y0 = drawText ? static_cast<float>(y) : kDebugBarObjectTop;
-            const float y1 = drawText ? static_cast<float>(y + kDebugBarLineStep) : kDebugBarMoveBottom;
             GXPosition3f32(x, y0, kGraphicZero);
             GXColor1u32(*reinterpret_cast<u32*>(&rgb));
             GXTexCoord2u16(0, 0);
             GXPosition3f32(x + width + kGraphicOne, y0, kGraphicZero);
             GXColor1u32(*reinterpret_cast<u32*>(&rgb));
             GXTexCoord2u16(2, 0);
+            const float y1 = drawText ? static_cast<float>(y + kDebugBarLineStep) : kDebugBarMoveBottom;
             GXPosition3f32(x + width + kGraphicOne, y1, kGraphicZero);
             GXColor1u32(*reinterpret_cast<u32*>(&rgb));
             GXTexCoord2u16(2, 2);
@@ -790,13 +790,13 @@ void CGraphicPcs::drawBar()
 
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
             const float y0 = drawText ? static_cast<float>(y) : kDebugBarMoveBottom;
-            const float y1 = drawText ? static_cast<float>(y + kDebugBarLineStep) : kDebugBarTop;
             GXPosition3f32(x, y0, kGraphicZero);
             GXColor1u32(soundColor);
             GXTexCoord2u16(0, 0);
             GXPosition3f32(x + soundWidth + kGraphicOne, y0, kGraphicZero);
             GXColor1u32(soundColor);
             GXTexCoord2u16(2, 0);
+            const float y1 = drawText ? static_cast<float>(y + kDebugBarLineStep) : kDebugBarTop;
             GXPosition3f32(x + soundWidth + kGraphicOne, y1, kGraphicZero);
             GXColor1u32(soundColor);
             GXTexCoord2u16(2, 2);

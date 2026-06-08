@@ -2879,10 +2879,10 @@ int CGObject::IsLoopAnim(int mode)
     }
 
     float base;
-    if (mode == 0) {
-        base = model.m_time;
-    } else {
+    if (mode != 0) {
         base = m_turnSpeed;
+    } else {
+        base = model.m_time;
     }
 
     double threshold = static_cast<double>(base);

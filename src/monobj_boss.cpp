@@ -665,21 +665,18 @@ void CGMonObj::frameStatFuncOrcKing()
  */
 void CGMonObj::alwaysFuncOrcKing()
 {
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
 	CGObject* object = reinterpret_cast<CGObject*>(this);
-	int& active = *reinterpret_cast<int*>(SoundBuffer + 1260);
-	int& timer = *reinterpret_cast<int*>(SoundBuffer + 1264);
-	if (active == 0) {
+	if (*reinterpret_cast<int*>(CGMonObj::m_boss) == 0) {
 		return;
 	}
 
-	if (timer == 0x3C && object->m_charaModelHandle != 0) {
+	if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x4) == 0x3C) {
 		object->m_charaModelHandle->ChangeTexture(1, 0x39, 1, 0xFFFFFFFF, 0);
 		int pdtNo = object->m_charaModelHandle->GetPdtSlot();
-		prgObj->putParticle(
+		reinterpret_cast<CGPrgObj*>(this)->putParticle(
 			(pdtNo << 8) | 0x1D, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x590), object,
 			kMonObjBossOne, 0);
-	} else if (timer == 300 && Game.m_gameWork.m_gameOverFlag == 0) {
+	} else if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x4) == 300 && Game.m_gameWork.m_gameOverFlag == 0) {
 		CGMonObj* monObj = CFlat.FindGMonObjFirst();
 		while (monObj != 0) {
 			u8* monBytes = reinterpret_cast<u8*>(monObj);
@@ -687,13 +684,13 @@ void CGMonObj::alwaysFuncOrcKing()
 			reinterpret_cast<CGCharaObj*>(monObj)->addHp(-script[0x1A / 2], 0);
 			monObj = CFlat.FindGMonObjNext(monObj);
 		}
-		prgObj->playSe3D(0x8CBF, 0x32, 0x96, 0, 0);
-		active = 0;
+		reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x8CBF, 0x32, 0x96, 0, 0);
+		*reinterpret_cast<int*>(CGMonObj::m_boss) = 0;
 		CFlatBossState() = 1;
 	}
 
-	if (active != 0) {
-		timer += 1;
+	if (*reinterpret_cast<int*>(CGMonObj::m_boss) != 0) {
+		*reinterpret_cast<int*>(CGMonObj::m_boss + 0x4) += 1;
 	}
 }
 

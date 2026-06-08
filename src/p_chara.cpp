@@ -162,6 +162,20 @@ static const char s_charaModelLoadDvdFmt[] =
     "\x1b\x5b\x33\x31\x6d\x4d\x65\x72\x67\x65\x3a\x20\x83\x82\x83\x66\x83\x8b\x82\xf0\x44\x56\x44\x82\xa9\x82\xe7"
     "\x93\xc7\x82\xdd\x8d\x9e\x82\xdd\x82\xdc\x82\xb5\x82\xbd\x81\x42\x74\x79\x70\x65\x20\x3d\x20\x25\x64\x20\x6e"
     "\x75\x6d\x62\x65\x72\x20\x3d\x20\x25\x64\x0a\x1b\x5b\x30\x6d";
+static const char s_charaTexLoadAmemFmt[] =
+    "\x4d\x65\x72\x67\x65\x3a\x20\x1b\x5b\x33\x32\x6d\x83\x65\x83\x4e\x83\x58\x83\x60\x83\x83\x82\xf0\x41\x4d\x45"
+    "\x4d\x82\xa9\x82\xe7\x93\xc7\x82\xdd\x8d\x9e\x82\xdd\x82\xdc\x82\xb5\x82\xbd\x81\x42\x74\x79\x70\x65\x20\x3d"
+    "\x20\x25\x64\x20\x6e\x75\x6d\x62\x65\x72\x20\x3d\x20\x25\x64\x20\x74\x65\x78\x20\x3d\x20\x25\x64\x0a\x1b\x5b"
+    "\x30\x6d";
+static const char s_charaTexLoadDvdFmt[] =
+    "\x1b\x5b\x33\x31\x6d\x4d\x65\x72\x67\x65\x3a\x20\x83\x65\x83\x4e\x83\x58\x83\x60\x83\x83\x82\xf0\x44\x56\x44"
+    "\x82\xa9\x82\xe7\x93\xc7\x82\xdd\x8d\x9e\x82\xdd\x82\xdc\x82\xb5\x82\xbd\x81\x42\x74\x79\x70\x65\x20\x3d\x20"
+    "\x25\x64\x20\x6e\x75\x6d\x62\x65\x72\x20\x3d\x20\x25\x64\x20\x74\x65\x78\x20\x3d\x20\x25\x64\x0a\x1b\x5b\x30"
+    "\x6d";
+static const char s_charaTexMissingFmt[] =
+    "\x83\x65\x83\x4e\x83\x58\x83\x60\x83\x83\x82\xaa\x82\xa0\x82\xe8\x82\xdc\x82\xb9\x82\xf1\x81\x42\x8f\xea\x8d"
+    "\x87\x82\xc9\x82\xe6\x82\xc1\x82\xc4\x82\xcd\x83\x6e\x83\x93\x83\x4f\x82\xb7\x82\xe9\x82\xa9\x82\xe0\x82\xb5"
+    "\x82\xea\x82\xdc\x82\xb9\x82\xf1\x81\x42\x25\x73\x0a";
 static const char s_charaFreeMergeFmt[] = "CCharaPcs.FreeMergeFile: 0x%08x\n";
 static const char s_charaAmemAnimCompactStart[] =
     "\x61\x6d\x65\x6d\x20\x61\x6e\x69\x6d\x20\x83\x4b\x83\x78\x81\x5b\x83\x57"
@@ -2245,7 +2259,17 @@ foundTexture:
             loadTexture->m_textureSet = textureSet;
             File.UnlockBuffer();
         }
+
+        if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+            System.Printf(const_cast<char*>(s_charaTexLoadAmemFmt), charaKind, static_cast<int>(charaNo),
+                          static_cast<int>(textureVariant));
+        }
     } else {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+            System.Printf(const_cast<char*>(s_charaTexLoadDvdFmt), charaKind, static_cast<int>(charaNo),
+                          static_cast<int>(textureVariant));
+        }
+
         if (textureVariant == 0) {
             strcpy(path, basePath);
         } else {
@@ -2256,7 +2280,10 @@ foundTexture:
         CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
         if (fileHandle == 0) {
             m_textureSet = 0;
-            return;
+            if (charaKind != 5 && static_cast<unsigned int>(System.m_execParam) >= 2) {
+                System.Printf(const_cast<char*>(s_charaTexMissingFmt), path);
+            }
+            goto attach;
         }
 
         File.Read(fileHandle);
@@ -2276,18 +2303,13 @@ foundTexture:
         loadTexture->m_textureSet = textureSet;
 
         File.Close(fileHandle);
-        m_texLoadRef = loadTexture;
-        m_texLoadRef->AddRef();
-        m_textureSet = reinterpret_cast<CLoadTexture*>(m_texLoadRef)->m_textureSet;
-        m_textureSet->AddRef();
-        m_model->AttachTextureSet(m_textureSet);
-        return;
     }
 
     m_texLoadRef = loadTexture;
     m_texLoadRef->AddRef();
     m_textureSet = reinterpret_cast<CLoadTexture*>(m_texLoadRef)->m_textureSet;
     m_textureSet->AddRef();
+attach:
     m_model->AttachTextureSet(m_textureSet);
 }
 

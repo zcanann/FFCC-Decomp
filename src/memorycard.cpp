@@ -195,7 +195,7 @@ static inline CChara* GetCharaGlobal()
 
 static inline u8 MakeSaveBool(u8 value)
 {
-    return static_cast<u8>((0U - static_cast<u32>(value)) >> 31);
+    return static_cast<u8>((static_cast<u32>(-value) | static_cast<u32>(value)) >> 31);
 }
 
 static inline u8 MakeLoadBool(s8 value)
@@ -531,32 +531,32 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
         if (artifact >= 0 && artifact < 0x40)
         {
             artifact = artifact * 2 + 0x3C;
-            *reinterpret_cast<u16*>(dstCharData + artifact) = *reinterpret_cast<u16*>(srcCharData + artifact);
-            *reinterpret_cast<s16*>(dstCharData + 0x28) = *reinterpret_cast<s16*>(dstCharData + 0x28) + 1;
+            *reinterpret_cast<u16*>(dstCharData + artifact) = *reinterpret_cast<s16*>(srcCharData + artifact);
+            *reinterpret_cast<u16*>(dstCharData + 0x28) = *reinterpret_cast<u16*>(dstCharData + 0x28) + 1;
         }
 
         artifact = static_cast<int>(*reinterpret_cast<s16*>(dstCharData + 0x36));
         if (artifact >= 0 && artifact < 0x40)
         {
             artifact = artifact * 2 + 0x3C;
-            *reinterpret_cast<u16*>(dstCharData + artifact) = *reinterpret_cast<u16*>(srcCharData + artifact);
-            *reinterpret_cast<s16*>(dstCharData + 0x28) = *reinterpret_cast<s16*>(dstCharData + 0x28) + 1;
+            *reinterpret_cast<u16*>(dstCharData + artifact) = *reinterpret_cast<s16*>(srcCharData + artifact);
+            *reinterpret_cast<u16*>(dstCharData + 0x28) = *reinterpret_cast<u16*>(dstCharData + 0x28) + 1;
         }
 
         artifact = static_cast<int>(*reinterpret_cast<s16*>(dstCharData + 0x38));
         if (artifact >= 0 && artifact < 0x40)
         {
             artifact = artifact * 2 + 0x3C;
-            *reinterpret_cast<u16*>(dstCharData + artifact) = *reinterpret_cast<u16*>(srcCharData + artifact);
-            *reinterpret_cast<s16*>(dstCharData + 0x28) = *reinterpret_cast<s16*>(dstCharData + 0x28) + 1;
+            *reinterpret_cast<u16*>(dstCharData + artifact) = *reinterpret_cast<s16*>(srcCharData + artifact);
+            *reinterpret_cast<u16*>(dstCharData + 0x28) = *reinterpret_cast<u16*>(dstCharData + 0x28) + 1;
         }
 
         artifact = static_cast<int>(*reinterpret_cast<s16*>(dstCharData + 0x3A));
         if (artifact >= 0 && artifact < 0x40)
         {
             artifact = artifact * 2 + 0x3C;
-            *reinterpret_cast<u16*>(dstCharData + artifact) = *reinterpret_cast<u16*>(srcCharData + artifact);
-            *reinterpret_cast<s16*>(dstCharData + 0x28) = *reinterpret_cast<s16*>(dstCharData + 0x28) + 1;
+            *reinterpret_cast<u16*>(dstCharData + artifact) = *reinterpret_cast<s16*>(srcCharData + artifact);
+            *reinterpret_cast<u16*>(dstCharData + 0x28) = *reinterpret_cast<u16*>(dstCharData + 0x28) + 1;
         }
 
         srcCharData[0x8C0] = 1;
@@ -567,7 +567,7 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
     {
         memcpy(dstCharData + 0xBC, srcCharData + 0xBC, 0x0C);
 
-        u8* srcWork = srcSaveData + srcChar * 0x208;
+        u8* srcWork = srcSaveData + (srcChar << 9) + (srcChar << 3);
         for (int i = 0; i < 2; i++)
         {
             srcWork[0xC0] = 0;
@@ -776,7 +776,7 @@ int CMemoryCardMan::DummyLoad()
     m_result = result;
 
     // Busy wait for async completion
-    while ((((u32)(-((int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
+    while ((((u32)(-((unsigned int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
     {
     }
 
@@ -852,7 +852,7 @@ int CMemoryCardMan::DummyLoad()
     m_result = result;
 
     // Wait for read to finish
-    while ((((u32)(-((int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
+    while ((((u32)(-((unsigned int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
     {
     }
 
@@ -950,7 +950,7 @@ int CMemoryCardMan::DummySave()
     m_result = result;
 
     // Busy-wait for async completion
-    while ((((u32)(-((int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
+    while ((((u32)(-((unsigned int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
     {
     }
 
@@ -966,7 +966,7 @@ int CMemoryCardMan::DummySave()
         }
         m_result = result;
 
-        while ((((u32)(-((int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
+        while ((((u32)(-((unsigned int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
         {
         }
 
@@ -1030,7 +1030,7 @@ int CMemoryCardMan::DummySave()
         }
         m_result = result;
 
-        while ((((u32)(-((int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
+        while ((((u32)(-((unsigned int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
         {
         }
 
@@ -1105,7 +1105,7 @@ int CMemoryCardMan::DummySave()
         }
         m_result = result;
 
-        while ((((u32)(-((int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
+        while ((((u32)(-((unsigned int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
         {
         }
 
@@ -1278,7 +1278,6 @@ int CMemoryCardMan::DummySave()
  */
 void CMemoryCardMan::SetLoadData()
 {
-    u8* save = reinterpret_cast<u8*>(m_saveBuffer);
     Mc::SaveDat* saveDat = GetSaveDat(m_saveBuffer);
 
     if (memcmp(saveDat->m_maker, CardConst::MCDAT_MAKER, strlen(CardConst::MCDAT_MAKER)) != 0)
@@ -1322,6 +1321,7 @@ void CMemoryCardMan::SetLoadData()
         return;
     }
 
+    u8* save = reinterpret_cast<u8*>(saveDat);
     *reinterpret_cast<u32*>(&Game.m_gameWork.m_scriptSysVal0) = *reinterpret_cast<u32*>(save + 0x20);
     Game.m_gameWork.m_timerA = *reinterpret_cast<int*>(save + 0x24);
     Game.m_gameWork.m_scriptGlobalTime = *reinterpret_cast<int*>(save + 0x28);
@@ -1407,31 +1407,51 @@ void CMemoryCardMan::SetLoadData()
         caravanWork->m_gil = *reinterpret_cast<int*>(src + 0xEC);
         memcpy(caravanWork->m_name, src + 0xF0, 0x10);
         caravanWork->m_letterCount = *reinterpret_cast<int*>(src + 0x100);
-        memcpy(caravanWork->m_letters, src + kMemoryCardSaveLetterOffset, sizeof(caravanWork->m_letters));
+        u8* letterSrc = src;
+        u8* letterDst = reinterpret_cast<u8*>(caravanWork);
+        for (int letter = 0; letter < 100; letter++)
+        {
+            letterDst[0x3EC] = ((letterSrc[0x104] >> 3 & 1) << 3) | (letterDst[0x3EC] & 0xF7);
+            *reinterpret_cast<u16*>(letterDst + 0x3EC) =
+                (*reinterpret_cast<u16*>(letterSrc + 0x104) & 0x07FC) | (*reinterpret_cast<s16*>(letterDst + 0x3EC) & 0xF803);
+            *reinterpret_cast<u32*>(letterDst + 0x3EC) =
+                (*reinterpret_cast<u32*>(letterSrc + 0x104) & 0x0003FE00) |
+                (*reinterpret_cast<u32*>(letterDst + 0x3EC) & 0xFFFC01FF);
+            *reinterpret_cast<u16*>(letterDst + 0x3EE) =
+                (*reinterpret_cast<u16*>(letterSrc + 0x106) & 0x01FF) |
+                (*reinterpret_cast<u16*>(letterDst + 0x3EE) & 0xFE00);
+            memcpy(letterDst + 0x3F0, letterSrc + 0x108, 8);
+            letterDst[0x3EC] = (letterSrc[0x104] & 0x80) | (letterDst[0x3EC] & 0x7F);
+            letterDst[0x3EC] = (letterSrc[0x104] & 0x40) | (letterDst[0x3EC] & 0xBF);
+            letterDst[0x3EC] = (letterSrc[0x104] & 0x20) | (letterDst[0x3EC] & 0xDF);
+            letterDst[0x3EC] = (letterSrc[0x104] & 0x10) | (letterDst[0x3EC] & 0xEF);
+            letterSrc += 0xC;
+            letterDst += sizeof(CCaravanWork::CLetterWork);
+        }
 
         for (int artifact = 0; artifact < 96; artifact += 2)
         {
             const int slot = artifact >> 5;
-            const u32 bit = 1u << (artifact & 31);
-            if ((*reinterpret_cast<u32*>(src + 0xBC + slot * 4) & bit) == 0)
+            const u32 bit = 1u << (artifact % 32);
+            if ((*reinterpret_cast<u32*>(src + 0xBC + slot * 4) & bit) != 0)
             {
-                caravanWork->m_artifacts[artifact] = 0xFFFF;
+                caravanWork->m_artifacts[artifact] = static_cast<u16>(0x9F + artifact);
             }
             else
             {
-                caravanWork->m_artifacts[artifact] = static_cast<u16>(0x9F + artifact);
+                caravanWork->m_artifacts[artifact] = 0xFFFF;
             }
 
             const int nextArtifact = artifact + 1;
             const int nextSlot = nextArtifact >> 5;
-            const u32 nextBit = 1u << (nextArtifact & 31);
-            if ((*reinterpret_cast<u32*>(src + 0xBC + nextSlot * 4) & nextBit) == 0)
+            const u32 nextBit = 1u << (nextArtifact % 32);
+            if ((*reinterpret_cast<u32*>(src + 0xBC + nextSlot * 4) & nextBit) != 0)
             {
-                caravanWork->m_artifacts[nextArtifact] = 0xFFFF;
+                caravanWork->m_artifacts[nextArtifact] = static_cast<u16>(0x9F + nextArtifact);
             }
             else
             {
-                caravanWork->m_artifacts[nextArtifact] = static_cast<u16>(0x9F + nextArtifact);
+                caravanWork->m_artifacts[nextArtifact] = 0xFFFF;
             }
         }
 
@@ -1459,45 +1479,17 @@ void CMemoryCardMan::SetLoadData()
 
     }
 
-    int wm = gameWork->m_wmBackupParams[0];
-    CCaravanWork* wmWork = &Game.m_caravanWorkArr[wm];
-    if (wmWork->m_shopState == 0)
+    for (unsigned int i = 0; i < 4; i++)
     {
-        gameWork->m_wmBackupParams[0] = -1;
-    }
-    if (wmWork->m_shopBusyFlag != 0)
-    {
-        gameWork->m_wmBackupParams[0] = -1;
-    }
-    wm = gameWork->m_wmBackupParams[1];
-    wmWork = &Game.m_caravanWorkArr[wm];
-    if (wmWork->m_shopState == 0)
-    {
-        gameWork->m_wmBackupParams[1] = -1;
-    }
-    if (wmWork->m_shopBusyFlag != 0)
-    {
-        gameWork->m_wmBackupParams[1] = -1;
-    }
-    wm = gameWork->m_wmBackupParams[2];
-    wmWork = &Game.m_caravanWorkArr[wm];
-    if (wmWork->m_shopState == 0)
-    {
-        gameWork->m_wmBackupParams[2] = -1;
-    }
-    if (wmWork->m_shopBusyFlag != 0)
-    {
-        gameWork->m_wmBackupParams[2] = -1;
-    }
-    wm = gameWork->m_wmBackupParams[3];
-    wmWork = &Game.m_caravanWorkArr[wm];
-    if (wmWork->m_shopState == 0)
-    {
-        gameWork->m_wmBackupParams[3] = -1;
-    }
-    if (wmWork->m_shopBusyFlag != 0)
-    {
-        gameWork->m_wmBackupParams[3] = -1;
+        CCaravanWork* wmWork = &Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[i]];
+        if (wmWork->m_shopState == 0)
+        {
+            Game.m_gameWork.m_wmBackupParams[i] = -1;
+        }
+        if (wmWork->m_shopBusyFlag != 0)
+        {
+            Game.m_gameWork.m_wmBackupParams[i] = -1;
+        }
     }
 
     Game.LoadScript(reinterpret_cast<char*>(save + 0x62D0));
@@ -1524,12 +1516,15 @@ void CMemoryCardMan::MakeSaveData()
         {
             System.Printf(const_cast<char*>(sMemoryAllocationError), const_cast<char*>(sMemoryCardSourceFile), 0x2AD);
         }
+        memset(m_saveBuffer, 0, kMemoryCardSaveBufferSize);
+    }
+    else
+    {
+        memset(m_saveBuffer, 0, kMemoryCardSaveBufferSize);
     }
 
-    memset(m_saveBuffer, 0, kMemoryCardSaveBufferSize);
-
     u8* save = reinterpret_cast<u8*>(m_saveBuffer);
-    Mc::SaveDat* saveDat = GetSaveDat(m_saveBuffer);
+    Mc::SaveDat* saveDat = GetSaveDat(save);
 
     const u64 now = OSGetTime();
     memcpy(save + 0x8AD0, &now, sizeof(now));
@@ -1544,50 +1539,25 @@ void CMemoryCardMan::MakeSaveData()
     saveDat->m_flags = 0;
 
     CGame::CGameWork* gameWork = &Game.m_gameWork;
-    CCaravanWork* caravanWorkArr = Game.m_caravanWorkArr;
-    int* wmBackupParams = gameWork->m_wmBackupParams;
-    int wm0 = wmBackupParams[0];
-    int wm1 = wmBackupParams[1];
-    int wm2 = wmBackupParams[2];
-    int wm3 = wmBackupParams[3];
-    if (caravanWorkArr[wm0].m_shopState == 0)
+    CGame* g = &Game;
+    for (int i = 0; i < 4; i++)
     {
-        wmBackupParams[0] = -1;
-    }
-    if (caravanWorkArr[wm0].m_shopBusyFlag != 0)
-    {
-        wmBackupParams[0] = -1;
-    }
-    if (caravanWorkArr[wm1].m_shopState == 0)
-    {
-        wmBackupParams[1] = -1;
-    }
-    if (caravanWorkArr[wm1].m_shopBusyFlag != 0)
-    {
-        wmBackupParams[1] = -1;
-    }
-    if (caravanWorkArr[wm2].m_shopState == 0)
-    {
-        wmBackupParams[2] = -1;
-    }
-    if (caravanWorkArr[wm2].m_shopBusyFlag != 0)
-    {
-        wmBackupParams[2] = -1;
-    }
-    if (caravanWorkArr[wm3].m_shopState == 0)
-    {
-        wmBackupParams[3] = -1;
-    }
-    if (caravanWorkArr[wm3].m_shopBusyFlag != 0)
-    {
-        wmBackupParams[3] = -1;
+        CCaravanWork* cw = &g->m_caravanWorkArr[g->m_gameWork.m_wmBackupParams[i]];
+        if (cw->m_shopState == 0)
+        {
+            g->m_gameWork.m_wmBackupParams[i] = -1;
+        }
+        if (cw->m_shopBusyFlag != 0)
+        {
+            g->m_gameWork.m_wmBackupParams[i] = -1;
+        }
     }
 
     *reinterpret_cast<u32*>(save + 0x20) = *reinterpret_cast<u32*>(&gameWork->m_scriptSysVal0);
     *reinterpret_cast<int*>(save + 0x24) = gameWork->m_timerA;
     *reinterpret_cast<int*>(save + 0x28) = gameWork->m_scriptGlobalTime;
     *reinterpret_cast<int*>(save + 0x2C) = gameWork->m_frameCounter;
-    memcpy(save + 0x30, gameWork->m_wmBackupParams, 0x10);
+    memcpy(save + 0x30, Game.m_gameWork.m_wmBackupParams, 0x10);
     memcpy(save + 0x40, Game.m_gameWork.m_bossArtifactStageTable, 0x3C);
     memcpy(save + 0x7C, Game.m_gameWork.m_unkStageTable, 0x3C);
     *reinterpret_cast<int*>(save + 0xB8) = Game.m_gameWork.m_chaliceElement;
@@ -1604,27 +1574,31 @@ void CMemoryCardMan::MakeSaveData()
     save[0x13DD] = static_cast<u8>(Sound.GetBgmMasterVolume());
     save[0x13DE] = static_cast<u8>(Sound.GetSeMasterVolume());
     save[0x13DE] = static_cast<u8>(Sound.GetSeMasterVolume());
-    save[0x13DF] = static_cast<u8>((0U - static_cast<u32>(__cntlzw(Sound.GetSoundMode()) >> 5)) >> 31);
+    u32 soundModeBit = static_cast<u32>(__cntlzw(Sound.GetSoundMode())) >> 5;
+    save[0x13DF] = static_cast<u8>((static_cast<u32>(-static_cast<s32>(soundModeBit)) | soundModeBit) >> 31);
     save[0x13E0] = MakeSaveBool(Game.m_gameWork.m_gameInitFlag);
     save[0x13E1] = MakeSaveBool(Game.m_gameWork.m_spModeFlags[0]);
     save[0x13E2] = MakeSaveBool(Game.m_gameWork.m_spModeFlags[1]);
     save[0x13E3] = MakeSaveBool(Game.m_gameWork.m_spModeFlags[2]);
     save[0x13E4] = MakeSaveBool(Game.m_gameWork.m_spModeFlags[3]);
 
-    for (int c = 0; c < 8; c++)
+    for (unsigned int c = 0; c < 8; c++)
     {
         u8* dst = save + 0x14D0 + c * 0x9C0;
         CCaravanWork* caravanWork = &Game.m_caravanWorkArr[c];
 
-        if (caravanWork->m_shopState == 0)
+        if (caravanWork->m_shopState != 0)
+        {
+            if (static_cast<s8>(caravanWork->unk_0xc1e) == 0)
+            {
+                caravanWork->m_shopRandSeed = Math.Rand(0x7FFFFFFF);
+                caravanWork->unk_0xc1e = 1;
+            }
+        }
+        else
         {
             caravanWork->m_shopRandSeed = 0;
             caravanWork->unk_0xc1e = 0;
-        }
-        else if (caravanWork->unk_0xc1e == 0)
-        {
-            caravanWork->m_shopRandSeed = Math.Rand(0x7FFFFFFF);
-            caravanWork->unk_0xc1e = 1;
         }
 
         *reinterpret_cast<u16*>(dst + 0x00) = caravanWork->m_id;
@@ -1658,51 +1632,45 @@ void CMemoryCardMan::MakeSaveData()
         *reinterpret_cast<u32*>(dst + 0xEC) = caravanWork->m_gil;
         memcpy(dst + 0xF0, caravanWork->m_name, 0x10);
         *reinterpret_cast<u32*>(dst + 0x100) = caravanWork->m_letterCount;
-        u8* letterDst = dst + kMemoryCardSaveLetterOffset;
-        u8* letterSrc = reinterpret_cast<u8*>(caravanWork->m_letters);
+        u8* letterDst = dst;
+        u8* letterSrc = reinterpret_cast<u8*>(caravanWork);
         for (int letter = 0; letter < 100; letter++)
         {
-            letterDst[0] = ((letterSrc[0] >> 3 & 1) << 3) | (letterDst[0] & 0xF7);
-            *reinterpret_cast<u16*>(letterDst) =
-                (*reinterpret_cast<u16*>(letterSrc) & 0x07FC) | (*reinterpret_cast<u16*>(letterDst) & 0xF803);
-            *reinterpret_cast<u32*>(letterDst) =
-                (*reinterpret_cast<u32*>(letterSrc) & 0x0003FE00) |
-                (*reinterpret_cast<u32*>(letterDst) & 0xFFFC01FF);
-            *reinterpret_cast<u16*>(letterDst + 2) =
-                (*reinterpret_cast<u16*>(letterSrc + 2) & 0x01FF) |
-                (*reinterpret_cast<u16*>(letterDst + 2) & 0xFE00);
-            memcpy(letterDst + 4, letterSrc + 4, 8);
-            letterDst[0] = (letterSrc[0] & 0x80) | (letterDst[0] & 0x7F);
-            letterDst[0] = (letterSrc[0] & 0x40) | (letterDst[0] & 0xBF);
-            letterDst[0] = (letterSrc[0] & 0x20) | (letterDst[0] & 0xDF);
-            letterDst[0] = (letterSrc[0] & 0x10) | (letterDst[0] & 0xEF);
+            letterDst[0x104] = ((letterSrc[0x3EC] >> 3 & 1) << 3) | (letterDst[0x104] & 0xF7);
+            *reinterpret_cast<u16*>(letterDst + 0x104) =
+                (*reinterpret_cast<s16*>(letterSrc + 0x3EC) & 0x07FC) | (*reinterpret_cast<u16*>(letterDst + 0x104) & 0xF803);
+            *reinterpret_cast<u32*>(letterDst + 0x104) =
+                (*reinterpret_cast<u32*>(letterSrc + 0x3EC) & 0x0003FE00) |
+                (*reinterpret_cast<u32*>(letterDst + 0x104) & 0xFFFC01FF);
+            *reinterpret_cast<u16*>(letterDst + 0x106) =
+                (*reinterpret_cast<u16*>(letterSrc + 0x3EE) & 0x01FF) |
+                (*reinterpret_cast<u16*>(letterDst + 0x106) & 0xFE00);
+            memcpy(letterDst + 0x108, letterSrc + 0x3F0, 8);
+            letterDst[0x104] = (letterSrc[0x3EC] & 0x80) | (letterDst[0x104] & 0x7F);
+            letterDst[0x104] = (letterSrc[0x3EC] & 0x40) | (letterDst[0x104] & 0xBF);
+            letterDst[0x104] = (letterSrc[0x3EC] & 0x20) | (letterDst[0x104] & 0xDF);
+            letterDst[0x104] = (letterSrc[0x3EC] & 0x10) | (letterDst[0x104] & 0xEF);
             letterSrc += sizeof(CCaravanWork::CLetterWork);
             letterDst += 0xC;
         }
 
         for (int artifact = 0; artifact < 96; artifact += 3)
         {
-            const int slot = artifact >> 5;
-            const u32 bit = 1u << (artifact & 31);
-            if (static_cast<s16>(caravanWork->m_artifacts[artifact]) > 0)
+            if (caravanWork->m_artifacts[artifact] > 0)
             {
-                *reinterpret_cast<u32*>(dst + 0xBC + slot * 4) |= bit;
+                *reinterpret_cast<u32*>(dst + 0xBC + (artifact >> 5) * 4) |= 1u << (artifact % 32);
             }
 
             const int artifact1 = artifact + 1;
-            const int slot1 = artifact1 >> 5;
-            const u32 bit1 = 1u << (artifact1 & 31);
-            if (static_cast<s16>(caravanWork->m_artifacts[artifact1]) > 0)
+            if (caravanWork->m_artifacts[artifact1] > 0)
             {
-                *reinterpret_cast<u32*>(dst + 0xBC + slot1 * 4) |= bit1;
+                *reinterpret_cast<u32*>(dst + 0xBC + (artifact1 >> 5) * 4) |= 1u << (artifact1 % 32);
             }
 
             const int artifact2 = artifact + 2;
-            const int slot2 = artifact2 >> 5;
-            const u32 bit2 = 1u << (artifact2 & 31);
-            if (static_cast<s16>(caravanWork->m_artifacts[artifact2]) > 0)
+            if (caravanWork->m_artifacts[artifact2] > 0)
             {
-                *reinterpret_cast<u32*>(dst + 0xBC + slot2 * 4) |= bit2;
+                *reinterpret_cast<u32*>(dst + 0xBC + (artifact2 >> 5) * 4) |= 1u << (artifact2 % 32);
             }
         }
 

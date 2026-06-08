@@ -1458,7 +1458,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 
 	const int posQuant = ModelPosQuant(this) & 0xFF;
 	const int normQuant = ModelNormQuant(this) & 0xFF;
-	unsigned int prevExtraTexture = 0xFFFFFFFF;
+	int prevExtraTexture = -1;
 	int prevExtraTextureFormat = -1;
 
 	CChara::CNode* nodes = ModelNodes(this);
@@ -1520,7 +1520,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 			}
 
 			TextureMan.SetTexture(GX_TEXMAP0, material->GetFurTexture(0));
-			unsigned int hasExtraTexture = 0;
+			int hasExtraTexture = 0;
 			int extraTextureFormat = -1;
 			if (static_cast<short>(material->GetTextureIndex(1)) != -1) {
 				CTexture* extraTexture = material->GetFurTexture(1);

@@ -581,76 +581,79 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
 
     Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x149);
 
-    pppModelSt** modelNames = reinterpret_cast<pppModelSt**>(pdt->m_modelNames);
-    for (int i = 0; i < pdt->m_modelCount; i++) {
-        pppModelSt* model = modelNames[i];
-        model->m_refCount--;
-        if (model->m_refCount < 1) {
-            if (model->m_cacheId != -1) {
-                ppvAmemCacheSet.DestroyCache(model->m_cacheId);
-                *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(model) + 0x24) = 0;
-                *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(model) + 0x28) = 0;
+    pdt = pdtSlot->m_pppDataHead;
+    if (pdt != 0) {
+        pppModelSt** modelNames = reinterpret_cast<pppModelSt**>(pdt->m_modelNames);
+        for (int i = 0; i < pdt->m_modelCount; i++) {
+            pppModelSt* model = modelNames[i];
+            model->m_refCount--;
+            if (model->m_refCount < 1) {
+                if (model->m_cacheId != -1) {
+                    ppvAmemCacheSet.DestroyCache(model->m_cacheId);
+                    *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(model) + 0x24) = 0;
+                    *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(model) + 0x28) = 0;
+                }
+                model->Destroy();
+                model->m_refCount = 0;
+                model->m_isUsed = 0;
             }
-            model->Destroy();
-            model->m_refCount = 0;
-            model->m_isUsed = 0;
         }
-    }
 
-    if (modelNames != 0) {
-        delete[] modelNames;
-        pdt->m_modelNames = 0;
-    }
+        if (modelNames != 0) {
+            delete[] modelNames;
+            pdt->m_modelNames = 0;
+        }
 
-    pppShapeSt** shapeNames = reinterpret_cast<pppShapeSt**>(pdt->m_shapeNames);
-    for (int i = 0; i < pdt->m_shapeCount; i++) {
-        pppShapeSt* shape = shapeNames[i];
-        shape->m_refCount--;
-        if (shape->m_refCount < 1) {
-            if (shape->m_animData != 0) {
-                delete[] reinterpret_cast<u8*>(shape->m_animData);
-                shape->m_animData = 0;
+        pppShapeSt** shapeNames = reinterpret_cast<pppShapeSt**>(pdt->m_shapeNames);
+        for (int i = 0; i < pdt->m_shapeCount; i++) {
+            pppShapeSt* shape = shapeNames[i];
+            shape->m_refCount--;
+            if (shape->m_refCount < 1) {
+                if (shape->m_animData != 0) {
+                    delete[] reinterpret_cast<u8*>(shape->m_animData);
+                    shape->m_animData = 0;
+                }
+                if (shape->m_displayListData != 0) {
+                    delete[] reinterpret_cast<u8*>(shape->m_displayListData);
+                    shape->m_displayListData = 0;
+                }
+                shape->m_refCount = 0;
+                shape->m_inUse = 0;
             }
-            if (shape->m_displayListData != 0) {
-                delete[] reinterpret_cast<u8*>(shape->m_displayListData);
-                shape->m_displayListData = 0;
+        }
+
+        if (shapeNames != 0) {
+            delete[] shapeNames;
+            pdt->m_shapeNames = 0;
+        }
+
+        pppShapeGroupRaw* shapeGroups = reinterpret_cast<pppShapeGroupRaw*>(pdt->m_shapeGroups);
+        for (int i = 0; i < pdt->m_shapeGroupCount; i++) {
+            if (shapeGroups[i].m_shapeList != 0) {
+                delete[] shapeGroups[i].m_shapeList;
+                shapeGroups[i].m_shapeList = 0;
             }
-            shape->m_refCount = 0;
-            shape->m_inUse = 0;
         }
-    }
 
-    if (shapeNames != 0) {
-        delete[] shapeNames;
-        pdt->m_shapeNames = 0;
-    }
-
-    pppShapeGroupRaw* shapeGroups = reinterpret_cast<pppShapeGroupRaw*>(pdt->m_shapeGroups);
-    for (int i = 0; i < pdt->m_shapeGroupCount; i++) {
-        if (shapeGroups[i].m_shapeList != 0) {
-            delete[] shapeGroups[i].m_shapeList;
-            shapeGroups[i].m_shapeList = 0;
+        if (shapeGroups != 0) {
+            delete[] shapeGroups;
+            pdt->m_shapeGroups = 0;
         }
-    }
 
-    if (shapeGroups != 0) {
-        delete[] shapeGroups;
-        pdt->m_shapeGroups = 0;
-    }
+        s16* cacheChunks = reinterpret_cast<s16*>(pdt->m_cacheChunks);
+        for (int i = 0; i < pdt->m_cacheChunkCount; i++) {
+            ppvAmemCacheSet.DestroyCache(cacheChunks[i * 4]);
+        }
 
-    s16* cacheChunks = reinterpret_cast<s16*>(pdt->m_cacheChunks);
-    for (int i = 0; i < pdt->m_cacheChunkCount; i++) {
-        ppvAmemCacheSet.DestroyCache(cacheChunks[i * 4]);
-    }
+        if (pdt->m_cacheChunks != 0) {
+            operator delete(reinterpret_cast<void*>(pdt->m_cacheChunks));
+            pdt->m_cacheChunks = 0;
+        }
 
-    if (pdt->m_cacheChunks != 0) {
-        operator delete(reinterpret_cast<void*>(pdt->m_cacheChunks));
-        pdt->m_cacheChunks = 0;
-    }
-
-    if (pdtSlot->m_pppDataHead != 0) {
-        operator delete(pdtSlot->m_pppDataHead);
-        pdtSlot->m_pppDataHead = 0;
+        if (pdtSlot->m_pppDataHead != 0) {
+            operator delete(pdtSlot->m_pppDataHead);
+            pdtSlot->m_pppDataHead = 0;
+        }
     }
 
     Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x182);

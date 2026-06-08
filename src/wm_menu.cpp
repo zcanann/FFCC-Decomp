@@ -1560,8 +1560,12 @@ void CMenuPcs::destroyWorld()
 	int iVar4 = 4;
 	do {
 		void** piVar2 = reinterpret_cast<void**>(puVar5 + 0x10C);
-		if (*piVar2 != 0) {
-			releaseRefCounted(piVar2);
+		CRef* const obj = reinterpret_cast<CRef*>(*piVar2);
+		if (obj != 0) {
+			if (obj->DecRef() == 0) {
+				delete obj;
+			}
+			*piVar2 = 0;
 		}
 		iVar4 = iVar4 + 1;
 		puVar5 = puVar5 + 4;
@@ -1569,8 +1573,12 @@ void CMenuPcs::destroyWorld()
 
 	{
 		void** piVar2 = reinterpret_cast<void**>(&m_fonts[1]);
-		if (*piVar2 != 0) {
-			releaseRefCounted(piVar2);
+		CRef* const obj = reinterpret_cast<CRef*>(*piVar2);
+		if (obj != 0) {
+			if (obj->DecRef() == 0) {
+				delete obj;
+			}
+			*piVar2 = 0;
 		}
 	}
 
@@ -1912,10 +1920,12 @@ void CMenuPcs::CalcDiaryMenu()
 	case 0:
 		if (m_wmWorldState->m_mainState <= 4) {
 			const short state = m_wmWorldState->m_mainState;
-			int frameStep = 0;
+			int frameStep;
 			if (state == 0) {
 				frameStep = m_wmWorldState->m_frameCounter - 10;
-			} else if (state <= 0 || state >= 4) {
+			} else if (state > 0 && state < 4) {
+				frameStep = 0;
+			} else {
 				frameStep = -m_wmWorldState->m_frameCounter;
 			}
 			CalcWmFrame0Inline(this, frameStep);
@@ -1945,10 +1955,12 @@ void CMenuPcs::CalcDiaryMenu()
 			if (m_wmWorldState->m_mainState <= 4) {
 				CalcCharaSelect();
 				const short state = m_wmWorldState->m_mainState;
-				int frameStep = 0;
+				int frameStep;
 				if (state == 0) {
 					frameStep = m_wmWorldState->m_frameCounter - 10;
-				} else if (state <= 0 || state >= 4) {
+				} else if (state > 0 && state < 4) {
+					frameStep = 0;
+				} else {
 					frameStep = -m_wmWorldState->m_frameCounter;
 				}
 				CalcWmFrame0Inline(this, frameStep);
@@ -2063,10 +2075,10 @@ void CMenuPcs::CalcMCardMenu()
 	unsigned int uVar15;
 	if (sVar7 == 0) {
 		uVar15 = static_cast<int>(m_wmWorldState->m_frameCounter) - 10;
-	} else if (sVar7 <= 0 || sVar7 >= 4) {
-		uVar15 = -static_cast<int>(m_wmWorldState->m_frameCounter);
-	} else {
+	} else if (sVar7 > 0 && sVar7 < 4) {
 		uVar15 = 0;
+	} else {
+		uVar15 = -static_cast<int>(m_wmWorldState->m_frameCounter);
 	}
 
 	*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) = 0x10;
@@ -2888,7 +2900,7 @@ void CMenuPcs::CalcLoadMenu()
 		unsigned char* const frame = m_wm.m_frameInfo;
 		double dVar26;
 		float baseWidth = (float)((int)*reinterpret_cast<short*>(frame + 8) + (int)*reinterpret_cast<short*>(frame + 4));
-		if ((int)uVar15 > -11) {
+		if ((int)uVar15 >= -10) {
 			int s15 = (int)uVar15 >> 31;
 			int absRaw = ((int)uVar15 ^ s15) - s15;
 			float dVar27 = (float)(baseWidth * (DOUBLE_803314E8 * (double)absRaw));
@@ -12213,7 +12225,7 @@ void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
 
 	const char* const* msgTable = GetMcWinMessBuff(messType);
 	const unsigned char* const winMess = reinterpret_cast<unsigned char*>(GetWinMess(winType));
-	const int count = *reinterpret_cast<const int*>(winMess);
+#define count (*reinterpret_cast<const int*>(winMess))
 	int maxWidth = 0;
 
 	const unsigned char* entry = winMess + 4;
@@ -12239,6 +12251,7 @@ void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
 
 	*w = static_cast<short>((cols + 2) * 0x16 + 0x40);
 	*h = static_cast<short>(count * 0x1E + 0x40);
+#undef count
 }
 
 /*
@@ -13218,29 +13231,30 @@ int McCtrl::SaveDat()
 
 	case 0x12: {
 		unsigned long long serial;
-		if (CARDGetSerialNo(m_cardChannel, &serial) != 0) {
+		if (CARDGetSerialNo(m_cardChannel, &serial) == 0) {
+			if (static_cast<signed char>(Game.m_gameWork.m_mcHasSerial) == 0) {
+				Game.m_gameWork.m_mcSerial1 = static_cast<unsigned int>(serial);
+				Game.m_gameWork.m_mcSerial0 = static_cast<unsigned int>(serial >> 32);
+				Game.m_gameWork.m_mcRandom = Math.Rand(0x7FFFFFFF);
+				Game.m_gameWork.m_mcHasSerial = 1;
+			}
+			m_serialLo = static_cast<unsigned int>(serial);
+			m_serialHi = static_cast<unsigned int>(serial >> 32);
+			MemoryCardMan.CreateMcBuff();
+			if (m_userBuffer == 0) {
+				MemoryCardMan.MakeSaveData();
+			} else {
+				memcpy(MemoryCardMan.m_saveBuffer, m_userBuffer, 0x8BD0);
+			}
+			MemoryCardMan.McWrite(0, 0xA000, m_saveIndex * 0xA000 + 0x4000);
+			m_state = 0x13;
+		} else {
 			MemoryCardMan.McClose();
 			MemoryCardMan.McUnmount(m_cardChannel);
 			MemoryCardMan.DestroyMcBuff();
 			m_state = -1;
 			return -1;
 		}
-		if (static_cast<signed char>(Game.m_gameWork.m_mcHasSerial) == 0) {
-			Game.m_gameWork.m_mcSerial1 = static_cast<unsigned int>(serial);
-			Game.m_gameWork.m_mcSerial0 = static_cast<unsigned int>(serial >> 32);
-			Game.m_gameWork.m_mcRandom = Math.Rand(0x7FFFFFFF);
-			Game.m_gameWork.m_mcHasSerial = 1;
-		}
-		m_serialLo = static_cast<unsigned int>(serial);
-		m_serialHi = static_cast<unsigned int>(serial >> 32);
-		MemoryCardMan.CreateMcBuff();
-		if (m_userBuffer == 0) {
-			MemoryCardMan.MakeSaveData();
-		} else {
-			memcpy(MemoryCardMan.m_saveBuffer, m_userBuffer, 0x8BD0);
-		}
-		MemoryCardMan.McWrite(0, 0xA000, m_saveIndex * 0xA000 + 0x4000);
-		m_state = 0x13;
 		break;
 	}
 
@@ -13505,15 +13519,17 @@ int McCtrl::Format(int unmountAfter)
 		break;
 	}
 
+	int result;
 	if (m_state == -1) {
-		m_lastResult = -1;
+		result = -1;
 	} else if (m_state == 4) {
-		m_lastResult = 1;
+		result = 1;
 	} else {
-		m_lastResult = 0;
+		result = 0;
 	}
 
-	return m_lastResult;
+	m_lastResult = result;
+	return result;
 }
 
 /*
@@ -13539,16 +13555,16 @@ int McCtrl::ChkEmpty(int param_2)
 
 	int state = m_state;
 
-	if (state < 2)
+	switch (state)
 	{
-		if (state == 0)
-		{
-			MemoryCardMan.McMount(m_cardChannel);
-			m_lastResult = MemoryCardMan.GetResult();
-			m_state = 1;
-			m_iteration = 0;
-		}
-		else if (state > -1 && MemoryCardMan.AsyncFinished() == 1)
+	case 0:
+		MemoryCardMan.McMount(m_cardChannel);
+		m_lastResult = MemoryCardMan.GetResult();
+		m_state = 1;
+		m_iteration = 0;
+		break;
+	case 1:
+		if (MemoryCardMan.AsyncFinished() == 1)
 		{
 			m_lastResult = MemoryCardMan.GetResult();
 
@@ -13587,8 +13603,8 @@ int McCtrl::ChkEmpty(int param_2)
 				m_state = -1;
 			}
 		}
-	}
-	else if (state == 2)
+		break;
+	case 2:
 	{
 		m_lastResult = MemoryCardMan.McOpen(m_cardChannel);
 
@@ -13596,14 +13612,16 @@ int McCtrl::ChkEmpty(int param_2)
 		{
 			if (m_lastResult == -4)
 			{
-				if (param_2 != 0)
+				if (param_2 == 0)
+				{
+					m_state = 3;
+				}
+				else
 				{
 					MemoryCardMan.McUnmount(m_cardChannel);
 					m_state = -1;
 					return -6;
 				}
-
-				m_state = 3;
 			}
 			else
 			{
@@ -13624,38 +13642,41 @@ int McCtrl::ChkEmpty(int param_2)
 			MemoryCardMan.McUnmount(m_cardChannel);
 			m_state = 4;
 		}
+		break;
 	}
-	else if (state != 4 && state < 4)
-	{
-		m_lastResult = MemoryCardMan.McFreeBlocks(m_cardChannel, bytesFree, &filesFree);
-		MemoryCardMan.McUnmount(m_cardChannel);
-
-		if (m_lastResult < 0)
+	case 3:
 		{
-			if (m_lastResult == -5)
-			{
-				m_state = -1;
-				return -5;
-			}
+			m_lastResult = MemoryCardMan.McFreeBlocks(m_cardChannel, bytesFree, &filesFree);
+			MemoryCardMan.McUnmount(m_cardChannel);
 
-			m_state = -1;
+			if (m_lastResult < 0)
+			{
+				if (m_lastResult == -5)
+				{
+					m_state = -1;
+					return -5;
+				}
+
+				m_state = -1;
+			}
+			else
+			{
+				if (filesFree == 0)
+				{
+					m_state = -1;
+					return -2;
+				}
+
+				if (bytesFree[0] < 0x2C000)
+				{
+					m_state = -1;
+					return -2;
+				}
+
+				m_state = 4;
+			}
 		}
-		else
-		{
-			if (filesFree == 0)
-			{
-				m_state = -1;
-				return -2;
-			}
-
-			if (bytesFree[0] < 0x2C000)
-			{
-				m_state = -1;
-				return -2;
-			}
-
-			m_state = 4;
-		}
+		break;
 	}
 
 	int result;

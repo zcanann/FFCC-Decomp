@@ -1118,10 +1118,7 @@ void CShopMenu::DrawItemInfo0()
 
     if (itemNo > 0) {
         font->SetMargin(FLOAT_80332d28);
-        char* itemName = 0;
-        if (itemNo >= 1) {
-            itemName = reinterpret_cast<char*>(reinterpret_cast<int*>(Game.m_cFlatDataArr[1].TableStrings(0))[itemNo * 5 + 4]);
-        }
+        char* itemName = GetItemName(itemNo);
         font->DrawInit();
         MenuPcs.DrawShadowFont(font, itemName, FLOAT_80332d54, FLOAT_80332d58, 0x18, 0x12);
         MenuPcs.DrawInit();

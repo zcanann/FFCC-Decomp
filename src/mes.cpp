@@ -1584,7 +1584,7 @@ void CMes::Next()
 				}
 				curr = curr + 5;
 			}
-			runLength = (unsigned int)((int)curr - (int)start) / 0x14;
+			runLength = (unsigned int)(j - i);
 			groupWidth = (curr[-5] - *start) + start[1] + *(float*)((char*)this + 0x3d3c);
 			for (; runLength != 0; runLength = runLength - 1)
 			{

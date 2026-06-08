@@ -1439,12 +1439,12 @@ void CMenuPcs::CmakeResultDraw()
         *reinterpret_cast<unsigned short*>(modelBlock + 0x6EA) = 4;
         DrawInit();
 
-        CCharaPcs::CHandle* handle = GetCmakeCharaHandle(this, slot);
-        if (handle->m_charaKind != 3) {
+        int handleIndex = slot + 0x20;
+        if (m_wm.m_handles[handleIndex]->m_charaKind != 3) {
             SetProjection(0x16);
             SetLight(2);
-            *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = 1.0f;
-            handle->Draw(5);
+            *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(m_wm.m_handles[handleIndex]->m_model) + 0x9C) = 1.0f;
+            m_wm.m_handles[handleIndex]->Draw(5);
             RestoreProjection();
         } else {
             MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x32));

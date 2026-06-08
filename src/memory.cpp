@@ -1093,11 +1093,13 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
         node = stageBlockAt(stageGetHeapHead(this))->m_next;
     }
 
+    const char* strBase = reinterpret_cast<const char*>(sHeapBarColors);
+
     if (flag == -1) {
         System.Printf(const_cast<char*>(sHeapWalkerNewline));
-        System.Printf(const_cast<char*>(s_heapWalkerStageNameFmt), stageGetSourceName(this));
-        System.Printf(const_cast<char*>(s_heapWalkerHeaderFmt));
-        System.Printf(const_cast<char*>(s_heapWalkerSeparator));
+        System.Printf(const_cast<char*>(strBase + 0x364), stageGetSourceName(this));
+        System.Printf(const_cast<char*>(strBase + 0x378));
+        System.Printf(const_cast<char*>(strBase + 0x3d4));
     }
 
     int totalSize = 0;
@@ -1115,7 +1117,7 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
             if (size != 0) {
                 if ((flag & 1) != 0) {
                     System.Printf(
-                        const_cast<char*>(sHeapWalkerEntryFmt), freeCount, sHeapWalkerFree, 0, top - blockTail, totalSize, 0, 0, 0,
+                        const_cast<char*>(strBase + 0x430), freeCount, sHeapWalkerFree, 0, top - blockTail, totalSize, 0, 0, 0,
                         sEmptyAllocSourceName, 0);
                 }
                 usedSize += size;
@@ -1127,7 +1129,7 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
                 int used = reinterpret_cast<int>(node->m_next) - reinterpret_cast<int>(node->m_prev);
                 if ((flag & 2) != 0) {
                     System.Printf(
-                        const_cast<char*>(sHeapWalkerEntryFmt), usedCount, sHeapWalkerUsed,
+                        const_cast<char*>(strBase + 0x430), usedCount, sHeapWalkerUsed,
                         node->m_level, used, totalSize, node->m_prev, 0, 0, node->m_source,
                         node->m_line);
                 }
@@ -1152,7 +1154,7 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
                     unsigned short line = isUsed ? node->m_line : 0;
                     int index = isUsed ? usedCount : freeCount;
                     System.Printf(
-                        const_cast<char*>(sHeapWalkerEntryFmt), index, kind, level, node->m_size,
+                        const_cast<char*>(strBase + 0x430), index, kind, level, node->m_size,
                         totalSize, payloadFromBlock(node), node->m_prev, node->m_next,
                         source, line);
                 }
@@ -1174,8 +1176,8 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
     }
 
     if (flag == -1) {
-        System.Printf(const_cast<char*>(s_heapWalkerSeparator));
-        System.Printf(const_cast<char*>(sHeapWalkerUseUnuseFmt), freeSize, usedSize);
+        System.Printf(const_cast<char*>(strBase + 0x45c));
+        System.Printf(const_cast<char*>(strBase + 0x4b0), freeSize, usedSize);
     }
 
     return freeSize;

@@ -1899,6 +1899,8 @@ void CFlatRuntime2::drawLayer(
 		const int pixelHeight = static_cast<int>(scaledHeight * FLOAT_80330154);
 
 		for (int quad = 0; quad < 4; quad++) {
+			CColor texCol0;
+			CColor texCol1;
 			int bx = static_cast<int>(x0);
 			int by = static_cast<int>(y0);
 			int bw = pixelWidth;

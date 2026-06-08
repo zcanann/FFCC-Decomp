@@ -589,8 +589,8 @@ struct CGoOutSaveCaravan
 {
     int m_dataPresent;
     unsigned char unk4[0x308];
-    char m_odekakeOutFlag;
-    char m_odekakeReturnFlag;
+    unsigned char m_odekakeOutFlag;
+    unsigned char m_odekakeReturnFlag;
     unsigned char unk30E[0x6B2];
 };
 

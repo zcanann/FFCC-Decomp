@@ -3292,7 +3292,7 @@ void GbaQueue::ClrCompatibilityFlg(int channel)
 int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 {
 	unsigned char compatibilityData[0x10];
-	unsigned char count = 2;
+	int count = 2;
 	unsigned char* writePtr;
 	int outSize = 2;
 	int selectedCount = 0;

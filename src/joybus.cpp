@@ -6910,7 +6910,13 @@ int JoyBus::SendMemorys(ThreadParam* threadParam)
 int JoyBus::SendChgCmdNum(ThreadParam* threadParam)
 {
     unsigned char cmdNum = GbaQue.GetCmdNum(threadParam->m_portIndex);
-    unsigned int cmd = MakeJoyCmd16(0x1412, cmdNum, 0);
+
+    unsigned int cmd = 0;
+    unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
+    cmdBytes[0] = 0x14;
+    cmdBytes[1] = 0x12;
+    cmdBytes[2] = cmdNum;
+    unsigned int word = cmd;
 
     if (static_cast<signed char>(m_threadRunningMask) == 0)
     {
@@ -6929,7 +6935,7 @@ int JoyBus::SendChgCmdNum(ThreadParam* threadParam)
     }
     else
     {
-        m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
+        m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = word;
         m_cmdCount[threadParam->m_portIndex]++;
         OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
     }

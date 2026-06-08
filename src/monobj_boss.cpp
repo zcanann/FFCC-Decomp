@@ -740,7 +740,7 @@ int CGMonObj::calcBranchFuncOrcKing(int)
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
 	int branch = 0;
-	if (script != 0 && script[7] < (script[0x1A / 2] / 5)) {
+	if (script[0x1C / 2] < (script[0x1A / 2] / 5)) {
 		branch = 2;
 	} else {
 		branch = calcBranchFuncDefault(1);

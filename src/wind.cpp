@@ -208,7 +208,7 @@ inline int CWind::AddGrass(const Vec* pos)
         return -1;
     }
 
-    grass->flags = static_cast<u8>(__rlwimi(grass->flags, 1, 7, 24, 24));
+    grass->flagBits.active = 1;
     grass->pos = *pos;
 
     int id = m_nextGrassId;
@@ -317,7 +317,7 @@ found:
 	obj->type = 2;
 	float centerZ = pos->z;
 	float centerX = pos->x;
-	obj->flags = static_cast<u8>(__rlwimi(obj->flags, 1, 7, 24, 24));
+	obj->flagBits.active = 1;
 
 	int id = m_nextId;
 	m_nextId = id + 1;
@@ -404,7 +404,7 @@ found:
 	float centerZ = pos->z;
 	float minX = centerX - radius;
 	float minZ = centerZ - radius;
-	obj->flags = static_cast<u8>(__rlwimi(obj->flags, 1, 7, 24, 24));
+	obj->flagBits.active = 1;
 	float maxX = centerX + radius;
 	float maxZ = centerZ + radius;
 
@@ -464,7 +464,7 @@ found:
 	}
 
 	obj->type = 0;
-	obj->flags = static_cast<u8>(__rlwimi(obj->flags, 1, 7, 24, 24));
+	obj->flagBits.active = 1;
 
 	int id = m_nextId;
 	m_nextId = id + 1;
@@ -674,7 +674,7 @@ void CWind::Frame()
             if (obj->type == 2) {
                 obj->lifeTimer = obj->lifeTimer + 1;
                 if (obj->life <= obj->lifeTimer) {
-                    obj->flags = static_cast<u8>(__rlwimi(obj->flags, 0, 7, 24, 24));
+                    obj->flagBits.active = 0;
                     goto next;
                 }
 

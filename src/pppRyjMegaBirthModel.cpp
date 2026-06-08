@@ -756,9 +756,10 @@ join_position:
     *f32_at(particleData, 0x80) = params->m_directionVelocityStart;
     *f32_at(particleData, 0x84) = params->m_acceleration;
     if (params->m_directionVelocityRandom != kPppRyjMegaBirthSharedZero) {
-        *f32_at(particleData, 0x80) +=
-            kPppRyjMegaBirthModelTwoF * params->m_directionVelocityRandom * Math.RandF() -
-            params->m_directionVelocityRandom;
+        *f32_at(particleData, 0x80) =
+            *f32_at(particleData, 0x80) +
+            (float)((double)(float)((double)kPppRyjMegaBirthModelTwoF * (double)params->m_directionVelocityRandom) * (double)Math.RandF() -
+                    (double)params->m_directionVelocityRandom);
     }
 
     *f32_at(particleData, 0x88) = *(float*)(payload + 0xD0);

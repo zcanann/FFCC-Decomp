@@ -2855,7 +2855,7 @@ void CPartMng::pppDumpCacheIdx()
                                                           mng->m_partIndex * sizeof(PppPartResourceRaw));
 
                 CAmemCacheSet* cacheSet = &ppvAmemCacheSet;
-                if ((unsigned int)cacheSet->IsEnable(partResource->m_cacheIndex) == 0) {
+                if (cacheSet->IsEnable(partResource->m_cacheIndex) == 0) {
                     partResource->m_pdt = reinterpret_cast<long*>(
                         cacheSet->GetData(
                             partResource->m_cacheIndex, const_cast<char*>(s_partMng_cpp), 0x9A9));

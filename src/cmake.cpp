@@ -3860,7 +3860,7 @@ void CMenuPcs::CalcSingCMake()
                 result = 0;
             }
         } else if (CmakeState(this)->m_mode == 1) {
-            unsigned short down;
+            short down;
             unsigned short repeat;
 
             int padLock = Pad.m_debugPadLock;
@@ -4076,7 +4076,7 @@ void CMenuPcs::CalcSingCMake()
                 result = 0;
             }
         } else if (CmakeState(this)->m_mode == 1) {
-            unsigned short down;
+            short down;
             unsigned short repeat;
 
             int padLock = Pad.m_debugPadLock;

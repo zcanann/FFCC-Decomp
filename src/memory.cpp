@@ -989,7 +989,7 @@ void* CMemory::CStage::alloc(unsigned long size, char* source, unsigned long lin
                     node->m_flags = kMemoryBlockUsedFlag;
                     node->m_flags =
                         (node->m_flags & 0x0F) |
-                        static_cast<unsigned char>(Memory.GetDefaultGroup() << 4);
+                        (Memory.GetDefaultGroup() << 4);
                     node->m_defaultParam = m_defaultParam;
                     m_allocCount += 1;
                     node->m_stage = this;

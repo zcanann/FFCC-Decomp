@@ -5080,38 +5080,10 @@ void CGPartyObj::gpmMove()
 	float nearDist = m_nearColRadius + leader->m_nearColRadius;
 	float clampedDist = (*reinterpret_cast<float*>(self + 0x5BC) < dist) ? *reinterpret_cast<float*>(self + 0x5BC) : dist;
 
-	if (m_lastStateId == 0 && (static_cast<signed char>(m_shieldAttachNodeIndex) < 0)) {
+	if (m_lastStateId == 0 &&
+	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x63C]) << 24) & 0xC0000000) >> 31) != 0)) {
 		int moveKind;
-		if (static_cast<signed char>(PartyData(this).partyFlags) >= 0) {
-			moveKind = 0;
-			if (chalice != nullptr &&
-			    PartyData(this).carryObject == nullptr &&
-			    (static_cast<signed char>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(chalice) + 0x9A)) < 0) &&
-			    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(chalice) + 0x550) == 0) {
-				float pickupRadius = (leader->m_bodyEllipsoidRadius + *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(chalice) + 0x144)) * 1.25f;
-				if (dist < pickupRadius) {
-					CancelMove(1);
-					rotTarget(reinterpret_cast<CGPrgObj*>(chalice));
-					sGhostPartyWork.carrySpeed = 0.0f;
-					carry(0, chalice, 0);
-					return;
-				}
-				moveKind = 1;
-			}
-
-			if (moveKind == 0) {
-				float limit = (sGhostPartyWork.activeTrailCount != 0) ? 0.75f : FLOAT_80331A58;
-				if (pathDist < Game.unkFloat_0xca10 * limit) {
-					return;
-				}
-			}
-			if (moveKind == 1 && chalice != nullptr) {
-				float keepDist = (leader->m_bodyEllipsoidRadius + *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(chalice) + 0x144)) * 0.5f;
-				if (clampedDist < keepDist) {
-					return;
-				}
-			}
-		} else {
+		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(sGhostPartyWork.flags) << 24) & 0xC0000000) >> 31) != 0) {
 			moveKind = 0;
 			if (PartyData(this).carryObject != nullptr) {
 				sGhostPartyWork.carrySpeed = 0.0f;
@@ -5119,7 +5091,7 @@ void CGPartyObj::gpmMove()
 				return;
 			}
 
-			float limit = (sGhostPartyWork.activeTrailCount != 0) ? FLOAT_80331A7C : 0.8f;
+			float limit = (sGhostPartyWork.activeTrailCount != 0) ? FLOAT_80331A7C : FLOAT_80331A80;
 			if (Game.unkFloat_0xca10 * limit > pathDist) {
 				if ((leader->m_lastStateId != 2 && leader->m_lastStateId != 6) ||
 				    leader->m_subState != 1 ||
@@ -5177,6 +5149,35 @@ void CGPartyObj::gpmMove()
 				sGhostPartyWork.gauge = 0;
 				PartyData(this).partyFlags &= 0x9F;
 				return;
+			}
+		} else {
+			moveKind = 0;
+			if (chalice != nullptr &&
+			    PartyData(this).carryObject == nullptr &&
+			    (static_cast<signed char>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(chalice) + 0x9A)) < 0) &&
+			    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(chalice) + 0x550) == 0) {
+				float pickupRadius = (leader->m_bodyEllipsoidRadius + *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(chalice) + 0x144)) * FLOAT_80331A84;
+				if (dist < pickupRadius) {
+					CancelMove(1);
+					rotTarget(reinterpret_cast<CGPrgObj*>(chalice));
+					sGhostPartyWork.carrySpeed = 0.0f;
+					carry(0, chalice, 0);
+					return;
+				}
+				moveKind = 1;
+			}
+
+			if (moveKind == 0) {
+				float limit = (sGhostPartyWork.activeTrailCount != 0) ? FLOAT_80331A7C : FLOAT_80331A58;
+				if (pathDist < Game.unkFloat_0xca10 * limit) {
+					return;
+				}
+			}
+			if (moveKind == 1 && chalice != nullptr) {
+				float keepDist = (leader->m_bodyEllipsoidRadius + *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(chalice) + 0x144)) * FLOAT_80331A58;
+				if (clampedDist < keepDist) {
+					return;
+				}
 			}
 		}
 

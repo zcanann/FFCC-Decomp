@@ -1680,12 +1680,29 @@ void CChara::makeFurTex()
 	s_mogFurMaxY = 0.0f;
 
 	for (int i = 0; i < 0x20; i++) {
-		CVector scaled;
-		PSVECScale(&velRand, scaled, FurRandScale());
-		PSVECAdd(&velBase, scaled, hairSet[i].m_vec0);
+		CVector velScaleOut;
+		PSVECScale(&velRand, velScaleOut, FurRandScale());
+		Vec velScaled;
+		velScaled.x = velScaleOut.x;
+		velScaled.y = velScaleOut.y;
+		velScaled.z = velScaleOut.z;
+		CVector velAddOut;
+		PSVECAdd(&velBase, &velScaled, velAddOut);
+		hairSet[i].m_vec0.x = velAddOut.x;
+		hairSet[i].m_vec0.y = velAddOut.y;
+		hairSet[i].m_vec0.z = velAddOut.z;
 
-		PSVECScale(&accelRand, scaled, FurRandScale());
-		PSVECAdd(&accelBase, scaled, hairSet[i].m_vec1);
+		CVector accelScaleOut;
+		PSVECScale(&accelRand, accelScaleOut, FurRandScale());
+		Vec accelScaled;
+		accelScaled.x = accelScaleOut.x;
+		accelScaled.y = accelScaleOut.y;
+		accelScaled.z = accelScaleOut.z;
+		CVector accelAddOut;
+		PSVECAdd(&accelBase, &accelScaled, accelAddOut);
+		hairSet[i].m_vec1.x = accelAddOut.x;
+		hairSet[i].m_vec1.y = accelAddOut.y;
+		hairSet[i].m_vec1.z = accelAddOut.z;
 
 		hairSet[i].m_colors[0] = FurNoiseColor(furBaseColor, furNoiseBase, FurRandScale());
 		hairSet[i].m_colors[1] = FurNoiseColor(furTipColor, furNoiseRange, FurRandScale());

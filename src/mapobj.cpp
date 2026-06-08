@@ -118,6 +118,7 @@ static inline float LoadFloatVolatile(const volatile float& value)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 template <>
 int CPtrArray<CMapAnimRun*>::Add(CMapAnimRun* item)
 {
@@ -129,6 +130,7 @@ int CPtrArray<CMapAnimRun*>::Add(CMapAnimRun* item)
     m_numItems = m_numItems + 1;
     return 1;
 }
+#pragma dont_inline off
 
 /*
  * --INFO--

@@ -689,7 +689,7 @@ char* CMenuPcs::GetTribeStr(int index)
 void CMenuPcs::GetRaceStr(int itemNo, char* outText)
 {
     unsigned short raceBits;
-    unsigned int raceType;
+    int raceType;
     char* text;
     char* suffix;
 
@@ -3026,7 +3026,7 @@ int CMenuPcs::SingWinMessHeight()
 int CMenuPcs::ChkEquipPossible(int itemNo)
 {
     unsigned int genderMask = 0x10;
-    u16 flags = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 4);
+    s16 flags = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 4);
     unsigned int raceMask = 1 << (SingleCaravanWork()->m_tribeId & 3);
 
     if (SingleCaravanWork()->m_genderFlag != 0) {

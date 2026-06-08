@@ -564,15 +564,21 @@ void CGMonObj::frameStatFuncArmstrong()
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
 	CGCharaObj* charaObj = reinterpret_cast<CGCharaObj*>(this);
 	int state = prgObj->m_lastStateId;
-	if (state == 100) {
+	switch (state) {
+	case 100:
 		if (prgObj->m_stateFrame == 0) {
 			charaObj->enableDamageCol(0);
 		} else if (prgObj->m_stateFrame == 0x29) {
 			charaObj->enableDamageCol(1);
 		}
 		charaObj->statAttack();
-	} else if (state >= 100 && state < 0x69) {
+		break;
+	case 0x65:
+	case 0x66:
+	case 0x67:
+	case 0x68:
 		frameStatFuncGiantCrab();
+		break;
 	}
 }
 

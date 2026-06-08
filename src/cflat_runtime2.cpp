@@ -1587,15 +1587,15 @@ void CFlatRuntime2::AddDebugDrawCC(Vec* from, Vec* to, float radius, int bit7, i
 	int& count = DebugDrawCCCount(runtime);
 
 	if (static_cast<unsigned int>(count) < 0x10U) {
-		DebugDrawCCEntries(runtime)[count].m_from = *from;
-		DebugDrawCCEntries(runtime)[count].m_to = *to;
+		reinterpret_cast<CFlatRuntime2*>(runtime)->m_debugDrawCCEntries[count].m_from = *from;
+		reinterpret_cast<CFlatRuntime2*>(runtime)->m_debugDrawCCEntries[count].m_to = *to;
 
-		DebugDrawCCEntries(runtime)[count].m_flagBits.m_bit7 = bit7;
-		DebugDrawCCEntries(runtime)[count].m_flagBits.m_bit6 = bit6;
+		reinterpret_cast<CFlatRuntime2*>(runtime)->m_debugDrawCCEntries[count].m_flagBits.m_bit7 = bit7;
+		reinterpret_cast<CFlatRuntime2*>(runtime)->m_debugDrawCCEntries[count].m_flagBits.m_bit6 = bit6;
 
 		const int index = count;
 		count = index + 1;
-		DebugDrawCCEntries(runtime)[index].m_radius = radius;
+		reinterpret_cast<CFlatRuntime2*>(runtime)->m_debugDrawCCEntries[index].m_radius = radius;
 		return;
 	}
 

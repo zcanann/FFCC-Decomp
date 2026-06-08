@@ -2264,18 +2264,20 @@ System.Printf(const_cast<char*>(s_subject_max_over), const_cast<char*>(s_gbaque_
 			flags |= GbaQueConst::OPEN_LETTER;
 		}
 
-		const unsigned int value = cur->AttachmentValue();
-		const unsigned char valueIsMoney = cur->AttachmentIsGil();
-		if (valueIsMoney == 0) {
+		if (cur->AttachmentIsGil() == 0) {
+			const int value = static_cast<int>(cur->AttachmentValue());
 			if (value != 0) {
-				if (value < 0x100 || value > 0x124) {
+				if (value >= 0x100 && value <= 0x124) {
+					if ((unsigned int)System.m_execParam >= 1) {
+System.Printf(const_cast<char*>(s_letter_data_error), const_cast<char*>(s_gbaque_cpp), 0x810, channel, i);
+					}
+				} else {
 					flags |= GbaQueConst::MOVE_ATTACH;
 					entryWrite[0] = SwapU32(value);
-				} else if ((unsigned int)System.m_execParam >= 1) {
-System.Printf(const_cast<char*>(s_letter_data_error), const_cast<char*>(s_gbaque_cpp), 0x810, channel, i);
 				}
 			}
 		} else {
+			const unsigned int value = cur->AttachmentValue();
 			if (value != 0) {
 				flags |= GbaQueConst::REPLY_LETTER;
 				entryWrite[0] = SwapU32(value * 100);

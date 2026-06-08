@@ -901,10 +901,11 @@ int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder&
     const f32 axisLen = PSVECMag(&axis);
     PSVECScale(&axis, &axis, kMapHitUnitScale / axisLen);
 
-    const double absAxisX = fabs(axis.x);
+    const f32 axisX = axis.x;
+    const double absAxisX = fabs(axisX);
     if (absAxisX >= fabs(axis.y) && absAxisX >= fabs(axis.z)) {
         orthogonal.x = -axis.y;
-        orthogonal.y = axis.x;
+        orthogonal.y = axisX;
         orthogonal.z = kMapHitZero;
     } else {
         orthogonal.x = kMapHitZero;

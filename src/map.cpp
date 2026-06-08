@@ -2373,7 +2373,7 @@ int CMapMng::ReadMid(char* mapName)
     }
 
     if (filePtr == 0) {
-        if (System.m_execParam != 0) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1) {
             System.Printf(const_cast<char*>(s_mapReadErrorFmt), strTmp);
         }
         return 0;
@@ -2432,7 +2432,7 @@ int CMapMng::ReadMid(char* mapName)
                     octTree->SetMapObject(mapObj);
 
                     if (mapObj->m_mapData == 0) {
-                        if (System.m_execParam != 0) {
+                        if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                             System.Printf(const_cast<char*>(s_read_mid_mapobj_error));
                         }
                     } else if (mapObj->m_meshType == 1 || mapObj->m_meshType == 2) {
@@ -2441,7 +2441,7 @@ int CMapMng::ReadMid(char* mapName)
                         break;
                     }
 
-                    if (System.m_execParam != 0) {
+                    if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                         System.Printf(const_cast<char*>(s_read_mid_octtree_error));
                     }
                     ok = 0;
@@ -2455,7 +2455,7 @@ int CMapMng::ReadMid(char* mapName)
             }
 
             if (mapObjIndex >= m_mapObjCount) {
-                if (System.m_execParam != 0) {
+                if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                     System.Printf(const_cast<char*>(s_error_root_mapobj_not_found));
                     System.Printf(const_cast<char*>(s_read_mid_octtree_error));
                 }
@@ -2472,7 +2472,7 @@ int CMapMng::ReadMid(char* mapName)
         if ((type == 2 || type == 3) && hit != 0) {
             int hitIndex = hit - GetMapHitArray();
             if (hitIndex >= m_mapHitCount) {
-                if (System.m_execParam != 0) {
+                if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                     System.Printf(const_cast<char*>(s_read_mid_hit_error));
                 }
                 obj->m_mapData = 0;
@@ -2484,7 +2484,7 @@ int CMapMng::ReadMid(char* mapName)
         if (static_cast<unsigned int>(System.m_execParam) >= 3) {
             System.Printf(const_cast<char*>(s_read_mid_ok));
         }
-    } else if (System.m_execParam != 0) {
+    } else if (static_cast<unsigned int>(System.m_execParam) >= 1) {
         System.Printf(const_cast<char*>(s_read_mid_error));
     }
 

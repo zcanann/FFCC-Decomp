@@ -3079,17 +3079,6 @@ CCharaPcs::CLoadModel::~CLoadModel()
  * Address:	TODO
  * Size:	TODO
  */
-CCharaPcs::CLoadAnim::CLoadAnim()
-{
-    m_anim = 0;
-    m_unk2C = 0;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 CCharaPcs::CLoadAnim::~CLoadAnim()
 {
     ReleaseShared(m_anim);

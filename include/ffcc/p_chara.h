@@ -115,7 +115,11 @@ public:
         : public CRef
     {
     public:
-        CLoadAnim();
+        CLoadAnim()
+        {
+            m_anim = 0;
+            m_unk2C = 0;
+        }
         ~CLoadAnim();
 
         void* m_keyTag;                 // 0x08

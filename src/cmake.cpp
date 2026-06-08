@@ -180,9 +180,9 @@ static inline float CalcCmakeFadeAlpha(CMenuPcs* menu)
 
 static inline void DrawCmakePreviewCharaAlpha(CMenuPcs* menu, float alpha)
 {
-    int slot = static_cast<int>(CmakeSlot(menu));
+    int handleIndex = static_cast<int>(CmakeSlot(menu)) + 0x20;
     int modelBlock = MenuS32(menu, 0x814);
-    if (*reinterpret_cast<int*>(modelBlock + (slot + 0x20) * 0x50) == 0) {
+    if (*reinterpret_cast<int*>(modelBlock + handleIndex * 0x50) == 0) {
         return;
     }
 
@@ -190,7 +190,6 @@ static inline void DrawCmakePreviewCharaAlpha(CMenuPcs* menu, float alpha)
     *reinterpret_cast<unsigned short*>(modelBlock + 0x6EA) = 4;
     menu->DrawInit();
 
-    int handleIndex = slot + 0x20;
     if (menu->m_wm.m_handles[handleIndex]->m_charaKind != 3) {
         menu->SetProjection(0x16);
         menu->SetLight(2);
@@ -222,9 +221,9 @@ static inline void DrawCmakePreviewChara(CMenuPcs* menu)
 
 static inline void DrawNamePreviewChara(CMenuPcs* menu, float modelAlpha, int gxAlpha)
 {
-    int slot = static_cast<int>(CmakeSlot(menu));
+    int handleIndex = static_cast<int>(CmakeSlot(menu)) + 0x20;
     int modelBlock = MenuS32(menu, 0x814);
-    if (*reinterpret_cast<int*>(modelBlock + (slot + 0x20) * 0x50) == 0) {
+    if (*reinterpret_cast<int*>(modelBlock + handleIndex * 0x50) == 0) {
         return;
     }
 
@@ -232,7 +231,6 @@ static inline void DrawNamePreviewChara(CMenuPcs* menu, float modelAlpha, int gx
     *reinterpret_cast<unsigned short*>(modelBlock + 0x6EA) = 4;
     menu->DrawInit();
 
-    int handleIndex = slot + 0x20;
     if (menu->m_wm.m_handles[handleIndex]->m_charaKind != 3) {
         menu->SetProjection(0x16);
         menu->SetLight(2);
@@ -1432,14 +1430,13 @@ void CMenuPcs::CmakeResultDraw()
         tileX += tileW;
     }
 
-    int slot = static_cast<int>(CmakeSlot(this));
+    int handleIndex = static_cast<int>(CmakeSlot(this)) + 0x20;
     int modelBlock = MenuS32(this, 0x814);
-    if (*reinterpret_cast<int*>(modelBlock + (slot + 0x20) * 0x50) != 0) {
+    if (*reinterpret_cast<int*>(modelBlock + handleIndex * 0x50) != 0) {
         *reinterpret_cast<short*>(modelBlock + 0x6E8) = 0xFF24;
         *reinterpret_cast<unsigned short*>(modelBlock + 0x6EA) = 4;
         DrawInit();
 
-        int handleIndex = slot + 0x20;
         if (m_wm.m_handles[handleIndex]->m_charaKind != 3) {
             SetProjection(0x16);
             SetLight(2);

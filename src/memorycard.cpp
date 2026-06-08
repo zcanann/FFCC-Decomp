@@ -506,21 +506,43 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
         *reinterpret_cast<u32*>(dstCharData + 0x8D0) = *reinterpret_cast<u32*>(srcSaveData + 0x13D8);
 
         u8* dstWork = dstSaveData + dstChar * 0x200;
-        for (int i = 0; i < 8; i++)
+        int i = 0;
+        do
         {
             u8* item = dstWork + dstChar * 8;
             int row = 0;
             for (int j = 0; j < 2; j++)
             {
-                item[0xC0] = ((i == 0) && (row == 0)) ? 0x32 : 0;
-                item[0xC1] = ((i == 0) && (row == -1)) ? 0x32 : 0;
-                item[0xC2] = ((i == 0) && (row == -2)) ? 0x32 : 0;
-                item[0xC3] = ((i == 0) && (row == -3)) ? 0x32 : 0;
+                u8 a = 0;
+                if ((i == 0) && (row == 0))
+                {
+                    a = 1;
+                }
+                u8 b = 0;
+                item[0xC0] = (-a | a) >> 0x1F & 0x32;
+                if ((i == 0) && (row == -1))
+                {
+                    b = 1;
+                }
+                a = 0;
+                item[0xC1] = (-b | b) >> 0x1F & 0x32;
+                if ((i == 0) && (row == -2))
+                {
+                    a = 1;
+                }
+                b = 0;
+                item[0xC2] = (-a | a) >> 0x1F & 0x32;
+                if ((i == 0) && (row == -3))
+                {
+                    b = 1;
+                }
                 row += 4;
+                item[0xC3] = (-b | b) >> 0x1F & 0x32;
                 item += 4;
             }
+            i++;
             dstWork += 0x40;
-        }
+        } while (i < 8);
 
         memset(dstCharData + 0xC8, 0xFF, 0x10);
         memset(dstCharData + 0xD8, 0, 0x10);

@@ -1525,10 +1525,22 @@ void CFlatRuntime2::Draw()
 		((DbgMenuPcs.GetDbgFlagsRaw() & 0x80) != 0);
 	const int debugCount = DebugDrawCCCount(runtime);
 	if (showDebugCC && debugCount != 0) {
-		GXColor greenColor = {0x80, 0xFF, 0x80, 0xFF};
-		GXColor blueColor = {0x80, 0x80, 0xFF, 0xFF};
-		GXColor redColor = {0xFF, 0x00, 0x00, 0xFF};
-		Vec worldUp = {0.0f, 1.0f, 0.0f};
+		GXColor greenColor;
+		greenColor.r = 0x80;
+		greenColor.g = 0xFF;
+		greenColor.b = 0x80;
+		greenColor.a = 0xFF;
+		GXColor blueColor;
+		blueColor.r = 0x80;
+		blueColor.g = 0x80;
+		blueColor.b = 0xFF;
+		blueColor.a = 0xFF;
+		GXColor redColor;
+		redColor.r = 0xFF;
+		redColor.g = 0x00;
+		redColor.b = 0x00;
+		redColor.a = 0xFF;
+		static const Vec worldUp = {0.0f, 1.0f, 0.0f};
 		float ringVerts[8][3];
 
 		CFlatRuntime2::CDebugDrawCC* entry = DebugDrawCCEntries(runtime);

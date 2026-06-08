@@ -890,7 +890,7 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
     short& select = villageWork->m_select;
     short& row = villageWork->m_row;
     short& table = villageWork->m_table;
-    short down;
+    unsigned short down;
     unsigned short repeat;
     char picked[8];
 
@@ -903,7 +903,7 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
     } else {
         int padIndex = 0;
         padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-        down = static_cast<short>(Pad.GetPadInputs()[padIndex].buttonDown[0]);
+        down = static_cast<unsigned short>(Pad.GetPadInputs()[padIndex].buttonDown[0]);
     }
 
     padBusy = false;

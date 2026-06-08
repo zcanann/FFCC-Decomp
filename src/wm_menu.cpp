@@ -8099,7 +8099,13 @@ void CMenuPcs::DrawCharaBase()
 	for (int row = 0; row < 2; row++) {
 		for (int col = 0; col < 4; col++) {
 			const float x = static_cast<float>(0x1C + col * 0x90);
-			const float y = static_cast<float>((row == 0 ? 0x22 : 0xCA) + (row != 0 ? 8 : 0));
+			int yInt;
+			if (row == 0) {
+				yInt = 0x22;
+			} else {
+				yInt = 0xCA + 8;
+			}
+			const float y = static_cast<float>(yInt);
 			MenuPcs.DrawRect(0, x, y, FLOAT_803316C8, FLOAT_803316CC, kZero, kZero, FLOAT_803313e8, FLOAT_803313e8, kZero);
 		}
 	}

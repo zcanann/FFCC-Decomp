@@ -1224,7 +1224,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		case -0x43: {
 			float* params = reinterpret_cast<float*>(object->m_localBase);
-			engineObject->moveVectorRot(params[0], params[1], params[2], static_cast<int>(params[3]));
+			engineObject->moveVectorRot(params[0], params[1], params[2], static_cast<unsigned int>(params[3]));
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1242,7 +1242,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x46: {
-			CGObject* target = static_cast<int>(object->m_localBase[0]) != 0 ? FindRuntimeObject(this, object->m_localBase[0]) : 0;
+			CGObject* target = static_cast<unsigned int>(object->m_localBase[0]) != 0 ? FindRuntimeObject(this, object->m_localBase[0]) : 0;
 			engineObject->LookAt(target, 0);
 			PushValue(this, object, 0);
 			outResult = 0;

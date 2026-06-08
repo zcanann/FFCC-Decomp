@@ -993,6 +993,9 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 			continue;
 		}
 		if (chunk.m_version < 5) {
+			if (2 <= static_cast<u32>(System.m_execParam)) {
+				System.Printf(const_cast<char*>(lbl_801D90D4));
+			}
 			break;
 		}
 

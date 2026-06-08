@@ -1894,7 +1894,7 @@ void CAmemCacheSet::AddRef(short index)
 
         for (int i = 0; i < m_cacheCount; i++) {
             CAmemCache& current = cacheEntryAt(this, i);
-            int data = reinterpret_cast<int>(current.m_cacheData);
+            unsigned int data = reinterpret_cast<int>(current.m_cacheData);
             if ((current.m_inUse != 0) || (data != 0)) {
                 if (static_cast<unsigned int>(System.m_execParam) >= 3) {
                     System.Printf(
@@ -1910,7 +1910,7 @@ void CAmemCacheSet::AddRef(short index)
 
         void (*overflowHook)(int) = reinterpret_cast<void (*)(int)>(m_overflowHook);
         if (overflowHook != 0) {
-            overflowHook(static_cast<int>(index));
+            overflowHook(static_cast<unsigned int>(index));
         }
     }
 

@@ -3351,8 +3351,8 @@ void CGPartyObj::statPut()
 
 		if (m_stateFrame <= 0x0B) {
 			const float phase = sinf((FLOAT_80331AB8 * static_cast<float>(m_stateFrame)) / FLOAT_80331AC0);
-			m_extraMoveVec.x = FLOAT_8032EE80 * phase * sinf(m_rotBaseY);
-			m_extraMoveVec.z = FLOAT_8032EE80 * phase * cosf(m_rotBaseY);
+			m_extraMoveVec.x = FLOAT_8032EE80 * (phase * sinf(m_rotBaseY));
+			m_extraMoveVec.z = FLOAT_8032EE80 * (phase * cosf(m_rotBaseY));
 			m_extraMoveVec.y = FLOAT_8032EE84 * phase + FLOAT_80331A98;
 		}
 	}

@@ -676,17 +676,16 @@ void CGMonObj::frameStatFuncOrcKing()
  */
 void CGMonObj::alwaysFuncOrcKing()
 {
-	CGObject* object = reinterpret_cast<CGObject*>(this);
 	if (*reinterpret_cast<int*>(CGMonObj::m_boss) == 0) {
 		return;
 	}
 
 	if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x4) == 0x3C) {
-		object->m_charaModelHandle->ChangeTexture(1, 0x39, 1, 0xFFFFFFFF, 0);
-		int pdtNo = object->m_charaModelHandle->GetPdtSlot();
+		reinterpret_cast<CGObject*>(this)->m_charaModelHandle->ChangeTexture(1, 0x39, 1, 0xFFFFFFFF, 0);
+		int pdtNo = reinterpret_cast<CGObject*>(this)->m_charaModelHandle->GetPdtSlot();
 		reinterpret_cast<CGPrgObj*>(this)->putParticle(
-			(pdtNo << 8) | 0x1D, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x590), object,
-			kMonObjBossOne, 0);
+			(pdtNo << 8) | 0x1D, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x590),
+			reinterpret_cast<CGObject*>(this), kMonObjBossOne, 0);
 	} else if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x4) == 300 && Game.m_gameWork.m_gameOverFlag == 0) {
 		CGMonObj* monObj = CFlat.FindGMonObjFirst();
 		while (monObj != 0) {

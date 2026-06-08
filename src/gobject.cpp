@@ -240,12 +240,12 @@ void CGObject::onCreate()
     m_groundHitOffset.y = 0.0f;
     m_groundHitOffset.x = 0.0f;
 
-    m_rotBaseX = 0.0f;
-    m_rotBaseY = 0.0f;
     m_rotBaseZ = 0.0f;
-    m_rotTargetX = 0.0f;
-    m_rotTargetY = 0.0f;
+    m_rotBaseY = 0.0f;
+    m_rotBaseX = 0.0f;
     m_rotTargetZ = 0.0f;
+    m_rotTargetY = 0.0f;
+    m_rotTargetX = 0.0f;
 
     m_bodyOffset.x = 0.0f;
     m_bodyOffset.y = sNegativeOne;
@@ -301,8 +301,8 @@ void CGObject::onCreate()
     m_weaponNodeFlagBits.m_unk40 = 0;
     m_animSlotSel = -1;
     m_turnSpeed = 0.0f;
-    m_pushParamA = 0;
     m_pushParamB = 0;
+    m_pushParamA = 0;
 
     m_shieldNodeFlagBits.m_bit40 = 0;
     m_frontHitAngle = sDefaultFrontHitAngle;
@@ -1354,6 +1354,7 @@ void CGObject::update()
     PSVECAdd(&m_worldPosition, &m_groundHitOffset, &m_worldPosition);
 
     float turnDelta = Math.DstRot(m_rotTargetY, m_rotBaseY);
+    float turnFactor;
     if (m_animSlotSel != -1 && m_shieldNodeFlagBits.m_bit40) {
         const double turnLimit = fabs(m_turnBaseSpeed);
         double clampedTurn;
@@ -1365,10 +1366,11 @@ void CGObject::update()
             clampedTurn = turnDelta;
         }
         turnDelta = clampedTurn;
-        m_rotBaseY += turnDelta;
+        turnFactor = sAnimFrameOffset;
     } else {
-        m_rotBaseY += turnDelta * m_hitNormal.x;
+        turnFactor = m_hitNormal.x;
     }
+    m_rotBaseY += turnDelta * turnFactor;
 
     Mtx modelMtx;
     Mtx ecScratch;
@@ -2169,9 +2171,12 @@ CGObject* CGObject::CCClass(int useBodyRadius, int classMask, float yOffset, Vec
         if ((other->m_attrFlags & static_cast<unsigned int>(classMask)) == 0) {
             continue;
         }
-        if (!(other->m_worldPosition.x - maxDist <= origin.x) || !(other->m_worldPosition.y - maxDist <= origin.y)
-            || !(other->m_worldPosition.z - maxDist <= origin.z) || !(other->m_worldPosition.x + maxDist >= origin.x)
-            || !(other->m_worldPosition.y + maxDist >= origin.y) || !(other->m_worldPosition.z + maxDist >= origin.z)) {
+        const float otherX = other->m_worldPosition.x;
+        const float otherY = other->m_worldPosition.y;
+        const float otherZ = other->m_worldPosition.z;
+        if (!(otherX - maxDist <= origin.x) || !(otherY - maxDist <= origin.y)
+            || !(otherZ - maxDist <= origin.z) || !(otherX + maxDist >= origin.x)
+            || !(otherY + maxDist >= origin.y) || !(otherZ + maxDist >= origin.z)) {
             continue;
         }
 
@@ -3312,8 +3317,9 @@ float CGObject::CalcSafePos(int hitMask, CGObject* other, Vec* outSafePos)
     float safeDistance = sZeroFloat;
 
     centerPos.x = other->m_worldPosition.x;
-    centerPos.y = m_worldPosition.y;
-    if (centerPos.y < other->m_worldPosition.y) {
+    if (other->m_worldPosition.y < m_worldPosition.y) {
+        centerPos.y = m_worldPosition.y;
+    } else {
         centerPos.y = other->m_worldPosition.y;
     }
     centerPos.y += m_capsuleHalfHeight;

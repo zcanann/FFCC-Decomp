@@ -643,7 +643,7 @@ void GbaQueue::ExecutQueue()
 
 		for (i = 0; i < queueCount; i++) {
 			unsigned int cmdWord = queueWords[i];
-			unsigned char cmd = static_cast<unsigned char>(cmdWord & 0x3F);
+			int cmd = static_cast<int>(cmdWord & 0x3F);
 
 			if (cmd == 0x17) {
 				if (caravanWork != 0) {

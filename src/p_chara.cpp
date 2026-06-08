@@ -1083,12 +1083,11 @@ int CCharaPcs::TryReleaseAnimBank(int requiredSize)
 
     for (int i = LoadAnimArray(this)->GetSize() - 1; i >= 0; i--) {
         CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
+        CChara::CAnim* anim = loadAnim->m_anim;
 
-        void* bankPtr = loadAnim->m_anim->m_bank;
-        const int bankHistory = loadAnim->m_anim->m_lastFrame;
-        if (bankPtr != 0 && releaseSize < bankHistory) {
+        if (anim->m_bank && releaseSize < anim->m_lastFrame) {
             releaseAnim = loadAnim;
-            releaseSize = bankHistory;
+            releaseSize = anim->m_lastFrame;
         }
     }
 

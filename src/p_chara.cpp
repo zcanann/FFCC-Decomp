@@ -415,8 +415,7 @@ static inline void ReleaseHandleAnimSlot(CCharaPcs::CHandle* handle, int slot)
 {
     CRef* animRef = handle->m_animSlot[slot];
     if (animRef != 0) {
-        ReleaseSharedNonNull(animRef);
-        handle->m_animSlot[slot] = 0;
+        ReleaseShared(handle->m_animSlot[slot]);
     }
 }
 
@@ -2459,8 +2458,8 @@ int CCharaPcs::CHandle::LoadAnim(
     } else {
         CLoadAnim* previousAnim = reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex]);
         if (previousAnim != 0) {
-            ReleaseShared(m_animSlot[animIndex]);
-            PruneUnsharedAnimRefs(&CharaPcs, previousAnim);
+            ReleaseSharedNonNull(m_animSlot[animIndex]);
+            PruneUnsharedAnimRefs(&CharaPcs, reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex]));
             m_animSlot[animIndex] = 0;
         }
     }

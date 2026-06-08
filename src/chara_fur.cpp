@@ -885,17 +885,16 @@ void CChara::InitFurTexBuffer()
 		int byteOffset = row << 1;
 		int count = 8;
 		do {
-			unsigned short* texels = Chara.MogFur().m_texels;
 			int idxBase = inner + row;
-			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(texels) + byteOffset) = 0x7FFF;
+			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Chara.MogFur().m_texels) + byteOffset) = 0x7FFF;
 			byteOffset += 0x10;
-			texels[idxBase + 1] = 0x7FFF;
-			texels[idxBase + 2] = 0x7FFF;
-			texels[idxBase + 3] = 0x7FFF;
-			texels[idxBase + 4] = 0x7FFF;
-			texels[idxBase + 5] = 0x7FFF;
-			texels[idxBase + 6] = 0x7FFF;
-			texels[idxBase + 7] = 0x7FFF;
+			Chara.MogFur().m_texels[idxBase + 1] = 0x7FFF;
+			Chara.MogFur().m_texels[idxBase + 2] = 0x7FFF;
+			Chara.MogFur().m_texels[idxBase + 3] = 0x7FFF;
+			Chara.MogFur().m_texels[idxBase + 4] = 0x7FFF;
+			Chara.MogFur().m_texels[idxBase + 5] = 0x7FFF;
+			Chara.MogFur().m_texels[idxBase + 6] = 0x7FFF;
+			Chara.MogFur().m_texels[idxBase + 7] = 0x7FFF;
 			inner += 8;
 			count--;
 		} while (count != 0);

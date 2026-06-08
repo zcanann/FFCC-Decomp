@@ -40,46 +40,46 @@ static const char sCameraPcsShadowTableName[] = "CCameraPcs(SHADOW)";
 extern float kCameraPi;
 extern float kCameraOneF;
 extern float kCameraHalfF;
-extern const double kCameraS16ToDoubleBias = 4503601774854144.0;
-extern const float kCameraDebugFov = 33.3f;
-extern const float kCameraZeroF = 0.0f;
-extern const float kCameraNegativeOneF = -1.0f;
-extern const float kCameraAspectRatio = 1.3333333730697632f;
-extern const float kCameraOneEighthF = 0.125f;
-extern const float kCameraFarZ3000 = 3000.0f;
-extern const float kCameraDebugRotateStep = 0.2f;
-extern const float kCameraTwoF = 2.0f;
-extern const float kCameraNegativeThirtyF = -30.0f;
-extern const float kCameraViewerFarZ = 375.0f;
-extern const float kCameraOnePointFiveF = 1.5f;
-extern const float kCameraHalfScreenHeight = 240.0f;
-extern const float kCameraShadowRectLeft = -238.0f;
-extern const float kCameraShadowRectRight = 242.0f;
-extern const float kCameraShadowRectBottom = 238.0f;
-extern const float kCameraShadowDepthScaleY = 16.0f;
-extern const float kCameraDegToRad = 0.01745329238474369f;
-extern const float kCameraDebugMoveStep = 4.0f;
-extern const float kCameraBoundsMinInitial = 10000000000.0f;
-extern const float kCameraBoundsMaxInitial = -10000000000.0f;
-extern const float kCameraShadowSpanScale = 1000.0f;
-extern const float kCameraShadowDepthBlend = 0.25f;
-extern const float kCameraHundredF = 100.0f;
-extern const float kCameraDefaultNearZ = 10.0f;
-extern const float kCameraShadowViewportSize = 476.0f;
-extern const float kCameraScreenProjectScaleX = 0.6568732261657715f;
-extern const float kCameraScreenProjectScaleY = 0.6334134340286255f;
-extern const float kCameraLookAtRadiusLimit = 30.0f;
-extern const float kCameraClipMinZ = -400.0f;
-extern const float kCameraQuarterPi = 0.7853981852531433f;
-extern const float kCameraOneThirdApprox = 0.33329999446868896f;
-extern const float kCameraNegativeDebugMoveStep = -4.0f;
-extern const float kCameraDefaultPitch = 0.6108652353286743f;
-extern const float kCameraDefaultFov = 25.0f;
-extern const float kCameraDefaultFarZ = 10000.0f;
-extern const float kCameraDebugZoomStep = 5.0f;
-extern const float kCameraNegativeTenF = -10.0f;
-extern const float kCameraFiftyF = 50.0f;
-extern const float kCameraMinFov = 0.0010000000474974513f;
+extern const double kCameraS16ToDoubleBias;
+extern const float kCameraDebugFov;
+extern const float kCameraZeroF;
+extern const float kCameraNegativeOneF;
+extern const float kCameraAspectRatio;
+extern const float kCameraOneEighthF;
+extern const float kCameraFarZ3000;
+extern const float kCameraDebugRotateStep;
+extern const float kCameraTwoF;
+extern const float kCameraNegativeThirtyF;
+extern const float kCameraViewerFarZ;
+extern const float kCameraOnePointFiveF;
+extern const float kCameraHalfScreenHeight;
+extern const float kCameraShadowRectLeft;
+extern const float kCameraShadowRectRight;
+extern const float kCameraShadowRectBottom;
+extern const float kCameraShadowDepthScaleY;
+extern const float kCameraDegToRad;
+extern const float kCameraDebugMoveStep;
+extern const float kCameraBoundsMinInitial;
+extern const float kCameraBoundsMaxInitial;
+extern const float kCameraShadowSpanScale;
+extern const float kCameraShadowDepthBlend;
+extern const float kCameraHundredF;
+extern const float kCameraDefaultNearZ;
+extern const float kCameraShadowViewportSize;
+extern const float kCameraScreenProjectScaleX;
+extern const float kCameraScreenProjectScaleY;
+extern const float kCameraLookAtRadiusLimit;
+extern const float kCameraClipMinZ;
+extern const float kCameraQuarterPi;
+extern const float kCameraOneThirdApprox;
+extern const float kCameraNegativeDebugMoveStep;
+extern const float kCameraDefaultPitch;
+extern const float kCameraDefaultFov;
+extern const float kCameraDefaultFarZ;
+extern const float kCameraDebugZoomStep;
+extern const float kCameraNegativeTenF;
+extern const float kCameraFiftyF;
+extern const float kCameraMinFov;
 extern const char s_p_camera_cpp[];
 extern const char sCameraInvalidFovFmt[0x40];
 unsigned char g_IsDbgDrawShadowPos;
@@ -91,12 +91,17 @@ inline void* operator new(unsigned long, void* ptr)
 
 static inline CPad::PadInput& CameraDebugPadInput()
 {
-    return Pad.GetPadInputs()[(Pad.m_debugPadPort == 4) ? 4 : 0];
+    return Pad.GetPadInputs()[(Pad.m_debugPadPort == 4) ? 0 : 4];
 }
 
 static inline CPad::PadInput& CameraShadowPadInput()
 {
     return Pad.GetPadInputs()[(Pad.m_debugPadPort == 1) ? 0 : 1];
+}
+
+static inline CPad::PadInput& CameraRawPadInput()
+{
+    return reinterpret_cast<CPad::PadInput*>(&Pad)[(Pad.m_debugPadPort == 0) ? 0 : 0];
 }
 
 extern "C" {
@@ -602,21 +607,20 @@ void CCameraPcs::CalcQuake()
 {
     Vec offset;
     Vec jitter;
-    float zero = kCameraZeroF;
 
     if ((System.m_scenegraphStepMode == 2) || ((m_quake.m_mode == 2) && (m_quake.m_state == 0))) {
         return;
     }
 
-    s32 randomValue = rand();
-    s16 randomSign = static_cast<s16>(randomValue >> 0x1F);
-    m_quake.m_signX = static_cast<u16>((randomValue & 1) ^ -randomSign) + randomSign;
+    u32 randomValue = static_cast<u32>(rand());
+    u32 randomSign = randomValue >> 0x1F;
+    m_quake.m_signX = ((randomValue & 1) ^ randomSign) - randomSign;
 
     m_quake.m_signY = 1 - m_quake.m_signY;
 
-    randomValue = rand();
-    randomSign = static_cast<s16>(randomValue >> 0x1F);
-    m_quake.m_signZ = static_cast<u16>((randomValue & 1) ^ -randomSign) + randomSign;
+    randomValue = static_cast<u32>(rand());
+    randomSign = randomValue >> 0x1F;
+    m_quake.m_signZ = ((randomValue & 1) ^ randomSign) - randomSign;
 
     if (m_quake.m_signX == 0) {
         offset.x = -m_quake.m_positionAmplitude.x;
@@ -642,27 +646,32 @@ void CCameraPcs::CalcQuake()
 
     u32 randX = static_cast<u32>(rand());
     u16 signX = static_cast<u16>(randX >> 0x1F);
+    short jitterSignX = static_cast<short>(((randX & 1) ^ signX) - signX);
+
     u32 randY = static_cast<u32>(rand());
     u16 signY = static_cast<u16>(randY >> 0x1F);
+    short jitterSignY = static_cast<short>(((randY & 1) ^ signY) - signY);
+
     u32 randZ = static_cast<u32>(rand());
     u16 signZ = static_cast<u16>(randZ >> 0x1F);
+    short jitterSignZ = static_cast<short>(((randZ & 1) ^ signZ) - signZ);
 
     float jitterAmount;
-    if (((randX & 1) ^ signX) == signX) {
+    if (jitterSignX == 0) {
         jitterAmount = Math.RandF(m_quake.m_jitterAmplitude.x);
     } else {
         jitterAmount = -Math.RandF(m_quake.m_jitterAmplitude.x);
     }
     jitter.x = jitterAmount;
 
-    if (((randY & 1) ^ signY) == signY) {
+    if (jitterSignY == 0) {
         jitterAmount = Math.RandF(m_quake.m_jitterAmplitude.y);
     } else {
         jitterAmount = -Math.RandF(m_quake.m_jitterAmplitude.y);
     }
     jitter.y = jitterAmount;
 
-    if (((randZ & 1) ^ signZ) == signZ) {
+    if (jitterSignZ == 0) {
         jitterAmount = Math.RandF(m_quake.m_jitterAmplitude.z);
     } else {
         jitterAmount = -Math.RandF(m_quake.m_jitterAmplitude.z);
@@ -689,12 +698,12 @@ void CCameraPcs::CalcQuake()
                 m_quake.m_startDuration = 0;
                 m_quake.m_endTimer = 0;
                 m_quake.m_endDuration = 0;
-                m_quake.m_positionAmplitude.z = zero;
-                m_quake.m_positionAmplitude.y = zero;
-                m_quake.m_positionAmplitude.x = zero;
-                m_quake.m_jitterAmplitude.z = zero;
-                m_quake.m_jitterAmplitude.y = zero;
-                m_quake.m_jitterAmplitude.x = zero;
+                m_quake.m_positionAmplitude.z = kCameraZeroF;
+                m_quake.m_positionAmplitude.y = kCameraZeroF;
+                m_quake.m_positionAmplitude.x = kCameraZeroF;
+                m_quake.m_jitterAmplitude.z = kCameraZeroF;
+                m_quake.m_jitterAmplitude.y = kCameraZeroF;
+                m_quake.m_jitterAmplitude.x = kCameraZeroF;
             } else {
                 float ratio = static_cast<float>(m_quake.m_endTimer) /
                               static_cast<float>(m_quake.m_endDuration);
@@ -735,7 +744,6 @@ void CCameraPcs::CalcQuake()
  */
 void CCameraPcs::calc()
 {
-    unsigned char* pad = reinterpret_cast<unsigned char*>(&Pad);
     Mtx worldMapMtx;
     Mtx tempMtx;
     Mtx invMtx;
@@ -745,8 +753,7 @@ void CCameraPcs::calc()
     bool useDebugPad = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
     unsigned short buttons = 0;
     if (!useDebugPad) {
-        __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
-        buttons = *reinterpret_cast<unsigned short*>(pad + 0x54);
+        buttons = CameraRawPadInput()._pad36;
     }
 
     if ((buttons & 0x20) != 0) {
@@ -754,58 +761,47 @@ void CCameraPcs::calc()
     }
 
     if (m_isAbsolute == 0) {
-        float stickH = kCameraZeroF;
-        if ((Pad.m_debugPadLock == 0) && (Pad.m_debugPadPort == -1)) {
-            __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
-            stickH = *reinterpret_cast<float*>(pad + 0x44);
-        }
+        float stickH = ((Pad.m_debugPadLock == 0) && (Pad.m_debugPadPort == -1))
+                           ? CameraRawPadInput().substickYF
+                           : kCameraZeroF;
         m_yaw += kCameraDegToRad * kCameraDefaultNearZ * stickH;
 
-        float stickV = kCameraZeroF;
-        if ((Pad.m_debugPadLock == 0) && (Pad.m_debugPadPort == -1)) {
-            __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
-            stickV = *reinterpret_cast<float*>(pad + 0x48);
-        }
+        float stickV = ((Pad.m_debugPadLock == 0) && (Pad.m_debugPadPort == -1))
+                           ? *reinterpret_cast<float*>(&CameraRawPadInput().lockedButton[0])
+                           : kCameraZeroF;
         m_pitch += kCameraDegToRad * kCameraDebugZoomStep * stickV;
 
-        float triggerL = kCameraZeroF;
-        if ((Pad.m_debugPadLock == 0) && (Pad.m_debugPadPort == -1)) {
-            __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
-            triggerL = *reinterpret_cast<float*>(pad + 0x36);
-        }
+        float triggerL = ((Pad.m_debugPadLock == 0) && (Pad.m_debugPadPort == -1))
+                             ? CameraRawPadInput().stickYF
+                             : kCameraZeroF;
         m_distance += kCameraDebugZoomStep * triggerL;
 
-        float triggerR = kCameraZeroF;
-        if ((Pad.m_debugPadLock == 0) && (Pad.m_debugPadPort == -1)) {
-            __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
-            triggerR = *reinterpret_cast<float*>(pad + 0x28);
-        }
+        float triggerR = ((Pad.m_debugPadLock == 0) && (Pad.m_debugPadPort == -1))
+                             ? CameraRawPadInput().triggerRightF
+                             : kCameraZeroF;
 
-        float moveInOut = kCameraZeroF;
-        if ((Pad.m_debugPadLock == 0) && (Pad.m_debugPadPort == -1)) {
-            __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
-            moveInOut = *reinterpret_cast<float*>(pad + 0x40);
-        }
+        float moveInOut = ((Pad.m_debugPadLock == 0) && (Pad.m_debugPadPort == -1))
+                              ? CameraRawPadInput().stickXF
+                              : kCameraZeroF;
 
-        const double rotY = static_cast<double>(m_pitch);
-        const double rotX = static_cast<double>(m_yaw);
-        const double camMove = static_cast<double>(kCameraDefaultNearZ * moveInOut);
-        const double lateral = -static_cast<double>(kCameraDebugZoomStep * triggerR - kCameraDebugZoomStep * triggerL);
-        const double sinX = static_cast<double>(sin(rotX));
-        const double cosX = static_cast<double>(cos(rotX));
-        const double sinY = static_cast<double>(sin(rotY));
-        const double cosY = static_cast<double>(cos(rotY));
-        const double sinXCosY = static_cast<double>(static_cast<float>(sinX * cosY));
-        const double cosXCosY = static_cast<double>(static_cast<float>(cosX * cosY));
+        float lateral = kCameraDebugZoomStep * triggerR - kCameraDebugZoomStep * moveInOut;
 
-        m_targetX = static_cast<float>(sinXCosY * camMove + static_cast<double>(m_targetX));
-        m_targetY = static_cast<float>(static_cast<double>(m_targetY) + (sinY * camMove + lateral));
-        m_targetZ = -static_cast<float>(cosXCosY * camMove - static_cast<double>(m_targetZ));
+        float panStick = ((Pad.m_debugPadLock == 0) && (Pad.m_debugPadPort == -1))
+                             ? CameraRawPadInput().substickXF
+                             : kCameraZeroF;
 
-        const double distance = static_cast<double>(m_distance);
-        m_positionX = static_cast<float>(distance * sinXCosY + static_cast<double>(m_targetX));
-        m_positionY = static_cast<float>(distance * sinY + static_cast<double>(m_targetY));
-        m_positionZ = -static_cast<float>(distance * cosXCosY - static_cast<double>(m_targetZ));
+        const float sinXCosY = static_cast<float>(sin(m_yaw)) * static_cast<float>(cos(m_pitch));
+        const float sinY = static_cast<float>(sin(m_pitch));
+        const float cosXCosY = static_cast<float>(cos(m_yaw)) * static_cast<float>(cos(m_pitch));
+        const float camMove = kCameraDefaultNearZ * panStick;
+
+        m_targetX = sinXCosY * camMove + m_targetX;
+        m_targetY = m_targetY + (sinY * camMove + lateral);
+        m_targetZ = m_targetZ - cosXCosY * camMove;
+
+        m_positionX = m_distance * sinXCosY + m_targetX;
+        m_positionY = m_distance * sinY + m_targetY;
+        m_positionZ = m_targetZ - m_distance * cosXCosY;
     } else {
         m_yaw = static_cast<float>(atan2(static_cast<double>(m_positionX - m_targetX),
                                          static_cast<double>(m_targetZ - m_positionZ)));
@@ -913,13 +909,13 @@ void CCameraPcs::draw()
         GXSetZCompLoc(0);
         _GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
         GXSetZMode(1, GX_LEQUAL, 1);
-        GXSetCullMode(GX_CULL_BACK);
+        GXSetCullMode(GX_CULL_FRONT);
         GXSetNumTevStages(1);
         _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
         _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
         GXSetNumChans(1);
-        GXSetChanCtrl(GX_COLOR0A0, 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-        GXSetChanCtrl(GX_ALPHA0, 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+        GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
+        GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
         GXClearVtxDesc();
         GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
         GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
@@ -933,13 +929,13 @@ void CCameraPcs::draw()
         GXSetZCompLoc(0);
         _GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
         GXSetZMode(1, GX_LEQUAL, 1);
-        GXSetCullMode(GX_CULL_BACK);
+        GXSetCullMode(GX_CULL_FRONT);
         GXSetNumTevStages(1);
         _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
         _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
         GXSetNumChans(1);
-        GXSetChanCtrl(GX_COLOR0A0, 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-        GXSetChanCtrl(GX_ALPHA0, 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+        GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
+        GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
         GXClearVtxDesc();
         GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
         GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
@@ -958,13 +954,13 @@ void CCameraPcs::draw()
         GXSetZCompLoc(0);
         _GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
         GXSetZMode(1, GX_LEQUAL, 1);
-        GXSetCullMode(GX_CULL_BACK);
+        GXSetCullMode(GX_CULL_FRONT);
         GXSetNumTevStages(1);
         _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
         _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
         GXSetNumChans(1);
-        GXSetChanCtrl(GX_COLOR0A0, 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-        GXSetChanCtrl(GX_ALPHA0, 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+        GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
+        GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
         GXClearVtxDesc();
         GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
         GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
@@ -1092,54 +1088,36 @@ void CCameraPcs::calcChara()
     C_MTXPerspective(m_screenMatrix, m_fov, kCameraAspectRatio, m_nearZ, m_farZ);
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 
-    if (m_viewerOverride == 0) {
-        if (Pad.m_debugPadLock == 0) {
-            padButtons = CameraDebugPadInput().button[0];
-        } else {
+    if (m_viewerOverride != 0) {
+        m_viewerOverride = 0;
+    } else {
+        if (Pad.m_debugPadLock != 0) {
             padButtons = 0;
+        } else {
+            padButtons = CameraDebugPadInput().button[0];
         }
 
-        stick = kCameraZeroF;
-        if ((padButtons & 4) != 0) {
-            stick = kCameraHalfF;
-        }
+        stick = ((padButtons & 4) != 0) ? kCameraHalfF : kCameraZeroF;
         m_viewer.m_position.y += stick;
 
         float rotSpeed = kCameraDebugRotateStep;
-        stick = kCameraZeroF;
-        if ((padButtons & 8) != 0) {
-            stick = kCameraHalfF;
-        }
+        stick = ((padButtons & 8) != 0) ? kCameraHalfF : kCameraZeroF;
         m_viewer.m_position.y -= stick;
 
         float rotSpeed2 = kCameraDebugRotateStep;
-        stick = kCameraZeroF;
-        if (Pad.m_debugPadLock == 0) {
-            stick = CameraDebugPadInput().stickXF;
-        }
+        stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().stickXF;
         m_viewer.m_rotY = rotSpeed * stick + m_viewer.m_rotY;
 
         float zoomSpeed = kCameraDebugZoomStep;
-        stick = kCameraZeroF;
-        if (Pad.m_debugPadLock == 0) {
-            stick = CameraDebugPadInput().stickYF;
-        }
+        stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().stickYF;
         m_viewer.m_rotX = -((rotSpeed2 * stick) - m_viewer.m_rotX);
 
         float zoomSpeed2 = kCameraDebugZoomStep;
-        stick = kCameraZeroF;
-        if (Pad.m_debugPadLock == 0) {
-            stick = CameraDebugPadInput().triggerLeftF;
-        }
+        stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().triggerLeftF;
         m_viewer.m_distance = -((zoomSpeed * stick) - m_viewer.m_distance);
 
-        stick = kCameraZeroF;
-        if (Pad.m_debugPadLock == 0) {
-            stick = CameraDebugPadInput().triggerRightF;
-        }
+        stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().triggerRightF;
         m_viewer.m_distance = zoomSpeed2 * stick + m_viewer.m_distance;
-    } else {
-        m_viewerOverride = 0;
     }
 
     PSMTXTrans(mtxA, m_viewer.m_position.x, m_viewer.m_position.y, m_viewer.m_position.z);
@@ -1201,20 +1179,20 @@ void CCameraPcs::createMap()
     fVar1 = kCameraZeroF;
     fVar2 = kCameraHalfScreenHeight;
     m_mapRotZ = fVar1;
-    fVar4 = kCameraDefaultPitch;
+    fVar3 = kCameraDefaultPitch;
     m_mapRotY = fVar1;
-    fVar5 = kCameraDefaultFov;
+    fVar4 = kCameraDefaultFov;
     m_mapRotX = fVar1;
-    fVar3 = kCameraDefaultNearZ;
+    fVar5 = kCameraDefaultNearZ;
     m_positionZ = fVar1;
     fVar6 = kCameraDefaultFarZ;
     m_positionY = fVar1;
     m_positionX = fVar1;
     m_yaw = fVar1;
     m_distance = fVar2;
-    m_pitch = fVar4;
-    m_fov = fVar5;
-    m_nearZ = fVar3;
+    m_pitch = fVar3;
+    m_fov = fVar4;
+    m_nearZ = fVar5;
     m_farZ = fVar6;
 }
 
@@ -1268,31 +1246,15 @@ void CCameraPcs::calcMap()
     };
     HitCylinder hitCylinder;
 
-    if (useDebugPad) {
-        buttons = 0;
-    } else {
-        buttons = Pad.GetPadInputs()[0].button[0];
-    }
+    buttons = useDebugPad ? 0 : CameraRawPadInput().button[0];
 
-    stickH = kCameraZeroF;
-    if (!useDebugPad) {
-        __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
-        stickH = *reinterpret_cast<float*>(reinterpret_cast<u8*>(&Pad) + 0x44);
-    }
+    stickH = useDebugPad ? kCameraZeroF : CameraRawPadInput().substickYF;
     stickH = kCameraDegToRad * (stickH / kCameraOneEighthF);
 
-    stickV = kCameraZeroF;
-    if (!useDebugPad) {
-        __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
-        stickV = *reinterpret_cast<float*>(reinterpret_cast<u8*>(&Pad) + 0x48);
-    }
+    stickV = useDebugPad ? kCameraZeroF : *reinterpret_cast<float*>(&CameraRawPadInput().lockedButton[0]);
     stickV = kCameraDegToRad * (stickV / kCameraOneEighthF);
 
-    triggerL = kCameraZeroF;
-    if (!useDebugPad) {
-        __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
-        triggerL = *reinterpret_cast<float*>(reinterpret_cast<u8*>(&Pad) + 0x36);
-    }
+    triggerL = useDebugPad ? kCameraZeroF : CameraRawPadInput().stickYF;
 
     m_fov += triggerL;
     m_mapRotX -= stickV;
@@ -1417,28 +1379,21 @@ void CCameraPcs::createFullShadow()
     m_fullScreenShadow.m_rampTexture = rampTex;
 
     for (i = 0; i < 0x100; i += 8) {
-        unsigned int i1 = i + 1;
-        unsigned int i2 = i + 2;
-        unsigned int i3 = i + 3;
-        unsigned int i4 = i + 4;
-        unsigned int i5 = i + 5;
-        unsigned int i6 = i + 6;
-        unsigned int i7 = i + 7;
-
         rampTex[(i & 0xC) * 0x10 + ((i >> 2) & 0x20) + ((i >> 4) & 7)] = static_cast<unsigned char>(i);
-        rampTex[((i1 * 8) & 0x18) + ((i1 * 0x10) & 0xC0) + ((i1 >> 2) & 0x20) + ((i1 >> 4) & 7)] =
-            static_cast<unsigned char>(i1);
-        rampTex[((i2 * 8) & 0x18) + ((i2 * 0x10) & 0xC0) + ((i2 >> 2) & 0x20) + ((i2 >> 4) & 7)] =
-            static_cast<unsigned char>(i2);
-        rampTex[((i3 * 8) & 0x18) + ((i3 * 0x10) & 0xC0) + ((i3 >> 2) & 0x20) + ((i3 >> 4) & 7)] =
-            static_cast<unsigned char>(i3);
-        rampTex[((i4 * 0x10) & 0xC0) + ((i4 >> 2) & 0x20) + ((i4 >> 4) & 7)] = static_cast<unsigned char>(i4);
-        rampTex[((i5 * 8) & 0x18) + ((i5 * 0x10) & 0xC0) + ((i5 >> 2) & 0x20) + ((i5 >> 4) & 7)] =
-            static_cast<unsigned char>(i5);
-        rampTex[((i6 * 8) & 0x18) + ((i6 * 0x10) & 0xC0) + ((i6 >> 2) & 0x20) + ((i6 >> 4) & 7)] =
-            static_cast<unsigned char>(i6);
-        rampTex[((i7 * 8) & 0x18) + ((i7 * 0x10) & 0xC0) + ((i7 >> 2) & 0x20) + ((i7 >> 4) & 7)] =
-            static_cast<unsigned char>(i7);
+        rampTex[(((i + 1) * 8) & 0x18) + (((i + 1) * 0x10) & 0xC0) + (((i + 1) >> 2) & 0x20) + (((i + 1) >> 4) & 7)] =
+            static_cast<unsigned char>(i + 1);
+        rampTex[(((i + 2) * 8) & 0x18) + (((i + 2) * 0x10) & 0xC0) + (((i + 2) >> 2) & 0x20) + (((i + 2) >> 4) & 7)] =
+            static_cast<unsigned char>(i + 2);
+        rampTex[(((i + 3) * 8) & 0x18) + (((i + 3) * 0x10) & 0xC0) + (((i + 3) >> 2) & 0x20) + (((i + 3) >> 4) & 7)] =
+            static_cast<unsigned char>(i + 3);
+        rampTex[(((i + 4) * 0x10) & 0xC0) + (((i + 4) >> 2) & 0x20) + (((i + 4) >> 4) & 7)] =
+            static_cast<unsigned char>(i + 4);
+        rampTex[(((i + 5) * 8) & 0x18) + (((i + 5) * 0x10) & 0xC0) + (((i + 5) >> 2) & 0x20) + (((i + 5) >> 4) & 7)] =
+            static_cast<unsigned char>(i + 5);
+        rampTex[(((i + 6) * 8) & 0x18) + (((i + 6) * 0x10) & 0xC0) + (((i + 6) >> 2) & 0x20) + (((i + 6) >> 4) & 7)] =
+            static_cast<unsigned char>(i + 6);
+        rampTex[(((i + 7) * 8) & 0x18) + (((i + 7) * 0x10) & 0xC0) + (((i + 7) >> 2) & 0x20) + (((i + 7) >> 4) & 7)] =
+            static_cast<unsigned char>(i + 7);
     }
 
     GXInitTexObj(&m_fullScreenShadow.m_texObjs[1], rampTex, 0x10, 0x10, GX_TF_I8,
@@ -1516,11 +1471,11 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
             unsigned int displayFlags = gObject->m_displayFlags;
             if ((displayFlags & 1) != 0 && (displayFlags & 0x40) == 0) {
                 if (static_cast<signed char>(
-                        static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(
+                        static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<signed char*>(
                                              &gObject->m_weaponNodeFlags)) << 26) &
                                          0xC0000000) >>
                         31) != 0) {
-                    if ((displayFlags & 0x80) != 0 || gObject->m_lookAtTimer == kCameraOneF) {
+                    if ((displayFlags & 0x80) != 0 || kCameraOneF == gObject->m_lookAtTimer) {
                         include = true;
                     }
                 }
@@ -1532,27 +1487,26 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
         }
 
         float radius = gObject->m_nearColRadius;
-        if (kCameraLookAtRadiusLimit < radius) {
+        if (radius > kCameraLookAtRadiusLimit) {
             radius = kCameraLookAtRadiusLimit;
         }
 
-        float clipBoundData[6];
-        CBound* clipBound = reinterpret_cast<CBound*>(clipBoundData);
-        clipBoundData[0] = kCameraBoundsMinInitial;
-        clipBoundData[1] = kCameraBoundsMinInitial;
-        clipBoundData[2] = kCameraBoundsMinInitial;
-        clipBoundData[3] = kCameraBoundsMaxInitial;
-        clipBoundData[4] = kCameraBoundsMaxInitial;
-        clipBoundData[5] = kCameraBoundsMaxInitial;
-
         float worldBoundData[6];
         CBound* worldBound = reinterpret_cast<CBound*>(worldBoundData);
+        float clipBoundData[6];
+        CBound* clipBound = reinterpret_cast<CBound*>(clipBoundData);
         worldBoundData[0] = gObject->m_worldPosition.x - radius;
-        worldBoundData[1] = gObject->m_worldPosition.y;
-        worldBoundData[2] = gObject->m_worldPosition.z - radius;
+        clipBoundData[0] = kCameraBoundsMinInitial;
         worldBoundData[3] = gObject->m_worldPosition.x + radius;
+        clipBoundData[3] = kCameraBoundsMaxInitial;
+        worldBoundData[1] = gObject->m_worldPosition.y;
+        clipBoundData[1] = kCameraBoundsMinInitial;
         worldBoundData[4] = gObject->m_worldPosition.y + radius;
+        clipBoundData[4] = kCameraBoundsMaxInitial;
+        worldBoundData[2] = gObject->m_worldPosition.z - radius;
+        clipBoundData[2] = kCameraBoundsMinInitial;
         worldBoundData[5] = gObject->m_worldPosition.z + radius;
+        clipBoundData[5] = kCameraBoundsMaxInitial;
 
         if (worldBound->CheckFrustum0(*clipBound) == 0) {
             continue;
@@ -1774,8 +1728,8 @@ void CCameraPcs::drawShadowEnd()
     _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
     GXSetNumChans(1);
-    GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPEC);
-    GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
+    GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
+    GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
     GXClearVtxDesc();
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
@@ -1817,7 +1771,7 @@ void CCameraPcs::drawShadowEnd()
     GXSetTexCopySrc(0, 0, 0x1E0, 0x1E0);
     GXSetTexCopyDst(0x1E0, 0x1E0, GX_TF_I8, GX_FALSE);
     GXCopyTex(m_fullScreenShadow.m_shadowTexture, GX_TRUE);
-    GXSetCullMode(GX_CULL_BACK);
+    GXSetCullMode(GX_CULL_FRONT);
 
     {
         float span = m_fullScreenShadow.m_span;
@@ -1866,9 +1820,8 @@ void CCameraPcs::drawShadowChrBegin()
 
     if (m_fullScreenShadowEnabled != 0) {
         float shadowX = m_fullScreenShadow.m_depthScaleMtx[0][3];
-        float scale = kCameraOnePointFiveF;
-        m_fullScreenShadow.m_depthScaleMtx[0][3] = shadowX * scale;
-        m_fullScreenShadow.m_depthScaleMtx[1][3] *= scale;
+        m_fullScreenShadow.m_depthScaleMtx[0][3] = shadowX * kCameraOnePointFiveF;
+        m_fullScreenShadow.m_depthScaleMtx[1][3] *= kCameraOnePointFiveF;
         PSMTXConcat(m_fullScreenShadow.m_depthScaleMtx,
                     m_shadowCamera.m_cameraMatrix,
                     m_fullScreenShadow.m_depthMtx);
@@ -1908,8 +1861,8 @@ void CCameraPcs::drawShadowEndAll()
 
     unsigned int* dstWords = reinterpret_cast<unsigned int*>(&CurrentCameraState());
     unsigned int* srcWords = reinterpret_cast<unsigned int*>(&m_savedCamera);
-    float* dstFloats = &m_fov;
-    float* srcFloats = &m_savedCamera.m_fov;
+    float* dstFloats = &m_yaw;
+    float* srcFloats = &m_savedCamera.m_yaw;
 
 #define COPY_SHADOW_CAMERA_WORD_PAIR(index) \
     do {                                    \
@@ -2017,58 +1970,40 @@ void CCameraPcs::destroyMaterialEditor()
 void CCameraPcs::calcMaterialEditor()
 {
     unsigned short padButtons;
-    Mtx mtxA;
-    Mtx mtxB;
     Mtx mtxInv;
+    Mtx mtxB;
+    Mtx mtxA;
     float stick;
 
     C_MTXPerspective(m_screenMatrix, kCameraDebugFov, kCameraAspectRatio, kCameraOneEighthF, kCameraViewerFarZ);
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 
-    if (Pad.m_debugPadLock == 0) {
-        padButtons = CameraDebugPadInput().button[0];
-    } else {
+    if (Pad.m_debugPadLock != 0) {
         padButtons = 0;
+    } else {
+        padButtons = CameraDebugPadInput().button[0];
     }
 
-    stick = kCameraZeroF;
-    if ((padButtons & 8) != 0) {
-        stick = kCameraHalfF;
-    }
+    stick = ((padButtons & 8) != 0) ? kCameraHalfF : kCameraZeroF;
     m_viewer.m_position.y += stick;
 
     float rotSpeed = kCameraDebugRotateStep;
-    stick = kCameraZeroF;
-    if ((padButtons & 4) != 0) {
-        stick = kCameraHalfF;
-    }
+    stick = ((padButtons & 4) != 0) ? kCameraHalfF : kCameraZeroF;
     m_viewer.m_position.y -= stick;
 
     float rotSpeed2 = kCameraDebugRotateStep;
-    stick = kCameraZeroF;
-    if (Pad.m_debugPadLock == 0) {
-        stick = CameraDebugPadInput().stickXF;
-    }
+    stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().stickXF;
     m_viewer.m_rotY = rotSpeed * stick + m_viewer.m_rotY;
 
     float zoomSpeed = kCameraTwoF;
-    stick = kCameraZeroF;
-    if (Pad.m_debugPadLock == 0) {
-        stick = CameraDebugPadInput().stickYF;
-    }
+    stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().stickYF;
     m_viewer.m_rotX = -((rotSpeed2 * stick) - m_viewer.m_rotX);
 
     float zoomSpeed2 = kCameraTwoF;
-    stick = kCameraZeroF;
-    if (Pad.m_debugPadLock == 0) {
-        stick = CameraDebugPadInput().triggerLeftF;
-    }
+    stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().triggerLeftF;
     m_viewer.m_distance = -((zoomSpeed * stick) - m_viewer.m_distance);
 
-    stick = kCameraZeroF;
-    if (Pad.m_debugPadLock == 0) {
-        stick = CameraDebugPadInput().triggerRightF;
-    }
+    stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().triggerRightF;
     m_viewer.m_distance = zoomSpeed2 * stick + m_viewer.m_distance;
 
     PSMTXTrans(mtxA, m_viewer.m_position.x, m_viewer.m_position.y, m_viewer.m_position.z);
@@ -2143,58 +2078,40 @@ void CCameraPcs::destroyFunnyShape()
 void CCameraPcs::calcFunnyShape()
 {
     unsigned short padButtons;
-    Mtx mtxA;
-    Mtx mtxB;
     Mtx mtxInv;
+    Mtx mtxB;
+    Mtx mtxA;
     float stick;
 
     C_MTXPerspective(m_screenMatrix, kCameraDebugFov, kCameraAspectRatio, kCameraOneEighthF, kCameraFarZ3000);
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 
-    if (Pad.m_debugPadLock == 0) {
-        padButtons = CameraDebugPadInput().button[0];
-    } else {
+    if (Pad.m_debugPadLock != 0) {
         padButtons = 0;
+    } else {
+        padButtons = CameraDebugPadInput().button[0];
     }
 
-    stick = kCameraZeroF;
-    if ((padButtons & 8) != 0) {
-        stick = kCameraHalfF;
-    }
+    stick = ((padButtons & 8) != 0) ? kCameraHalfF : kCameraZeroF;
     m_viewer.m_position.y += stick;
 
     float rotSpeed = kCameraDebugRotateStep;
-    stick = kCameraZeroF;
-    if ((padButtons & 4) != 0) {
-        stick = kCameraHalfF;
-    }
+    stick = ((padButtons & 4) != 0) ? kCameraHalfF : kCameraZeroF;
     m_viewer.m_position.y -= stick;
 
     float rotSpeed2 = kCameraDebugRotateStep;
-    stick = kCameraZeroF;
-    if (Pad.m_debugPadLock == 0) {
-        stick = CameraDebugPadInput().stickXF;
-    }
+    stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().stickXF;
     m_viewer.m_rotY = rotSpeed * stick + m_viewer.m_rotY;
 
     float zoomSpeed = kCameraTwoF;
-    stick = kCameraZeroF;
-    if (Pad.m_debugPadLock == 0) {
-        stick = CameraDebugPadInput().stickYF;
-    }
+    stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().stickYF;
     m_viewer.m_rotX = -((rotSpeed2 * stick) - m_viewer.m_rotX);
 
     float zoomSpeed2 = kCameraTwoF;
-    stick = kCameraZeroF;
-    if (Pad.m_debugPadLock == 0) {
-        stick = CameraDebugPadInput().triggerLeftF;
-    }
+    stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().triggerLeftF;
     m_viewer.m_distance = -((zoomSpeed * stick) - m_viewer.m_distance);
 
-    stick = kCameraZeroF;
-    if (Pad.m_debugPadLock == 0) {
-        stick = CameraDebugPadInput().triggerRightF;
-    }
+    stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().triggerRightF;
     m_viewer.m_distance = zoomSpeed2 * stick + m_viewer.m_distance;
 
     PSMTXTrans(mtxA, m_viewer.m_position.x, m_viewer.m_position.y, m_viewer.m_position.z);

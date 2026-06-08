@@ -456,9 +456,9 @@ public:
     int pppLoadPtx(const char*, int, int, void*, int);
 
     void pppLoadPmd(CChunkFile&);
-    void pppLoadPmd(const char*);
+    int pppLoadPmd(const char*);
     void pppLoadPan(CChunkFile&);
-    void pppLoadPan(const char*);
+    int pppLoadPan(const char*);
     int pppLoadPdt(const char*, int, int, void*, int);
 
     int pppGetFreeDataMng();

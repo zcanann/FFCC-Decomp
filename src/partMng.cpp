@@ -3610,7 +3610,7 @@ void CPartMng::pppLoadPmd(CChunkFile&)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CPartMng::pppLoadPmd(const char* baseName)
+int CPartMng::pppLoadPmd(const char* baseName)
 {
     char* path = g_StrTmp;
     unsigned long fileSize;
@@ -3625,7 +3625,7 @@ void CPartMng::pppLoadPmd(const char* baseName)
         if (static_cast<unsigned int>(System.m_execParam) >= 1U) {
             System.Printf(const_cast<char*>(s_CanNotReadFormat), path);
         }
-        return;
+        return 0;
     }
 
     if (m_pppModelStArr == 0) {
@@ -3710,6 +3710,8 @@ void CPartMng::pppLoadPmd(const char* baseName)
         }
         chunkFile.PopChunk();
     }
+
+    return 1;
 }
 
 /*
@@ -3731,7 +3733,7 @@ void CPartMng::pppLoadPan(CChunkFile&)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CPartMng::pppLoadPan(const char* baseName)
+int CPartMng::pppLoadPan(const char* baseName)
 {
     char* path = g_StrTmp;
     unsigned long fileSize;
@@ -3746,7 +3748,7 @@ void CPartMng::pppLoadPan(const char* baseName)
         if (static_cast<unsigned int>(System.m_execParam) >= 1U) {
             System.Printf(const_cast<char*>(s_CanNotReadFormat), path);
         }
-        return;
+        return 0;
     }
 
     if (m_pppShapeStArr == 0) {
@@ -3786,27 +3788,41 @@ void CPartMng::pppLoadPan(const char* baseName)
                 case kChunkNAME: {
                     char* name = chunkFile.GetString();
 
-                    targetShape = 0;
-                    for (unsigned int i = 0; i < 0x100; i++) {
-                        if (shapeArray[i].m_inUse != 0 && strcmp(shapeArray[i].m_name, name) == 0) {
-                            targetShape = &shapeArray[i];
+                    pppShapeSt* searchShape = shapeArray;
+                    unsigned int i = 0;
+                    do {
+                        if (searchShape->m_inUse != 0 && strcmp(searchShape->m_name, name) == 0) {
                             break;
                         }
+                        i++;
+                        searchShape = reinterpret_cast<pppShapeSt*>(
+                            reinterpret_cast<unsigned char*>(searchShape) + 0x2c);
+                    } while (i < 0x100);
+                    if (i >= 0x100) {
+                        searchShape = 0;
                     }
 
-                    if (targetShape == 0) {
-                        for (int i = 0; i < 0x100; i++) {
-                            if (shapeArray[i].m_inUse == 0) {
-                                targetShape = &shapeArray[i];
-                                break;
+                    if (searchShape == 0) {
+                        int freeIndex = 0;
+                        int remaining = 0x100;
+                        pppShapeSt* freeShape = shapeArray;
+                        do {
+                            if (freeShape->m_inUse == 0) {
+                                targetShape = reinterpret_cast<pppShapeSt*>(
+                                    reinterpret_cast<unsigned char*>(shapeArray) + freeIndex * 0x2c);
+                                goto foundFree;
                             }
-                        }
+                            freeShape = reinterpret_cast<pppShapeSt*>(
+                                reinterpret_cast<unsigned char*>(freeShape) + 0x2c);
+                            freeIndex++;
+                            remaining--;
+                        } while (remaining != 0);
+                        targetShape = 0;
+                    foundFree:
 
-                        if (targetShape != 0) {
-                            targetShape->m_refCount = 0;
-                            targetShape->m_inUse = 1;
-                            strcpy(targetShape->m_name, name);
-                        }
+                        targetShape->m_refCount = 0;
+                        targetShape->m_inUse = 1;
+                        strcpy(targetShape->m_name, name);
                     } else {
                         targetShape = 0;
                     }
@@ -3819,6 +3835,8 @@ void CPartMng::pppLoadPan(const char* baseName)
         }
         chunkFile.PopChunk();
     }
+
+    return 1;
 }
 
 /*

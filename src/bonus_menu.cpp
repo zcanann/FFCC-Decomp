@@ -866,6 +866,8 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 	MenuPcs.DrawRect(0, xCorner, yCorner, innerW, innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
 }
 
+#pragma push
+#pragma optimization_level 3
 /*
  * --INFO--
  * PAL Address: 0x80133ad8
@@ -1082,6 +1084,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 		header->finished = 1;
 	}
 }
+#pragma pop
 
 /*
  * --INFO--

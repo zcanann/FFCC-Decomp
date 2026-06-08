@@ -1231,23 +1231,23 @@ comm_fail:
             }
 
             ret = GBAGetStatus(channel, param + 0xC0);
-            if (ret == 0 && (param[0xC0] & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_PSF0)
+            if (!(ret == 0 && (param[0xC0] & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_PSF0))
             {
-                command = 0x10000000;
-                ret = GBAWrite(channel, reinterpret_cast<u8*>(&command), param + 0xC0);
-                if (ret != 0)
-                {
-                    System.Printf(const_cast<char*>(s_miniGameSourceLineFmt), s_miniGameSourceName, 0x33C);
-                    goto comm_fail;
-                }
-                startTime = OSGetTime();
-                retryLine = 0x341;
-                step = 1;
+                MiniGameThreadSleepTicks(OSMicrosecondsToTicks(100));
+                retryLine = 0x333;
                 goto retry_loop;
             }
 
-            MiniGameThreadSleepTicks(OSMicrosecondsToTicks(100));
-            retryLine = 0x333;
+            command = 0x10000000;
+            ret = GBAWrite(channel, reinterpret_cast<u8*>(&command), param + 0xC0);
+            if (ret != 0)
+            {
+                System.Printf(const_cast<char*>(s_miniGameSourceLineFmt), s_miniGameSourceName, 0x33C);
+                goto comm_fail;
+            }
+            startTime = OSGetTime();
+            retryLine = 0x341;
+            step = 1;
             goto retry_loop;
         }
 

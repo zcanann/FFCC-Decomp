@@ -263,6 +263,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
     int tevStageCount;
     int texGenCount;
     int isCameraInside;
+    CGraphic* graphicPtr;
     GXTexObj backI4Tex;
     GXTexObj backRgba8Tex;
     GXTexObj backRgba8Tex2;
@@ -332,6 +333,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
     scissorHeight = (u32)kPppAlignmentScaleScreenHalfHeight;
     scissorWidth = (u32)kPppAlignmentScaleScreenWidth;
     const float& yStep = kPppAlignmentScaleScreenHalfHeight;
+    graphicPtr = &Graphic;
     do {
         yPos = (float)slice * yStep;
         yOffset = (int)yPos;
@@ -419,7 +421,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
 
         Graphic.SetDrawDoneDebugData(0x34);
         pppDrawMesh(model, pppMiasma->m_drawMatrixPtr, 0);
-        Graphic.SetDrawDoneDebugData(0x35);
+        graphicPtr->SetDrawDoneDebugData(0x35);
 
         Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backRgba8Tex, 0, yOffset, texWidth, texHeight, i4TexSize,
                                    GX_LINEAR, GX_CTF_R8, 0);

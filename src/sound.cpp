@@ -900,11 +900,12 @@ void CSound::loadWaveFrame()
         u32& streamHalf = sound.m_streamHalf;
 
         if (streamState == 0) {
-            int playPoint[2];
-            m_redSound.GetStreamPlayPoint(streamID, &playPoint[0], &playPoint[1]);
-            playPoint[0] = static_cast<int>(static_cast<unsigned int>(playPoint[0]) >> 16);
+            int playPoint0;
+            int playPoint1;
+            m_redSound.GetStreamPlayPoint(streamID, &playPoint0, &playPoint1);
+            playPoint0 = static_cast<int>(static_cast<unsigned int>(playPoint0) >> 16);
 
-            if (streamHalf != static_cast<unsigned int>(playPoint[0])) {
+            if (static_cast<int>(streamHalf) != playPoint0) {
                 int readSize = 0x10000;
                 if (streamRemain < readSize) {
                     readSize = streamRemain;
@@ -917,7 +918,7 @@ void CSound::loadWaveFrame()
 
                     streamOffset += readSize;
                     streamRemain -= readSize;
-                    streamHalf = static_cast<unsigned int>(playPoint[0]);
+                    streamHalf = static_cast<unsigned int>(playPoint0);
                     streamState = 1;
                 }
             }

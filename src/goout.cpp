@@ -2558,7 +2558,7 @@ void CGoOutMenu::Calc()
                 }
 
                 if (nextMode == 2) {
-                    int activeCount = 0;
+                    unsigned int activeCount = 0;
                     for (int i = 0; i < 8; i++) {
                         CCaravanWork& caravanWork = Game.m_caravanWorkArr[i];
                         if (caravanWork.m_shopState != 0) {
@@ -2589,7 +2589,7 @@ void CGoOutMenu::Calc()
                     }
                 } else if (nextMode == 1) {
                     int characterCount = 0;
-                    for (int i = 0; i < 8; i++) {
+                    for (unsigned int i = 0; i < 8; i++) {
                         if (Game.m_caravanWorkArr[i].m_shopState != 0) {
                             characterCount++;
                         }
@@ -2658,7 +2658,7 @@ void CGoOutMenu::Calc()
         if (m_pendingMessage == -1) {
             m_messageState = 1;
         } else {
-            MenuPcs.GetWinSize(static_cast<unsigned short>(m_currentMessage), &x, &y, (m_currentMessage >= 0x1E) ? 2 : 0);
+            MenuPcs.GetWinSize(static_cast<short>(m_currentMessage), &x, &y, (m_currentMessage >= 0x1E) ? 2 : 0);
             MenuPcs.SetMcWinInfo(x, y);
             MenuPcs.m_menuWindowInfo->state = 0;
             MenuGoOutState().m_animFrame = 0;

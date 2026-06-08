@@ -800,7 +800,8 @@ void CMenuPcs::EquipCtrl()
 		if (count1 >= 0) {
 			blockCount = slotCount >> 3;
 			if (blockCount != 0) {
-				do {
+				unsigned int bc;
+				for (bc = 0; bc < blockCount; bc++) {
 					int p;
 					p = *(int*)&this->m_equipList + byteOff;
 					*(int*)(p + 0x2c) = index++;
@@ -827,8 +828,7 @@ void CMenuPcs::EquipCtrl()
 					byteOff = byteOff + -0x200;
 					*(int*)(p + -0x194) = index++;
 					*(int*)(p + -0x190) = 3;
-					blockCount = blockCount - 1;
-				} while (blockCount != 0);
+				}
 				slotCount = slotCount & 7;
 				if (slotCount == 0) {
 					return;

@@ -310,10 +310,10 @@ void CPad::Frame()
 	do
 	{
 		puVar12 = reinterpret_cast<u16*>(iVar6 + 4);
+		u8* p12 = reinterpret_cast<u8*>(iVar6 + 4);
 		puVar7 = puVar10;
 		for (iVar14 = 0; iVar14 < 2; iVar14++)
 		{
-			u8* p12 = reinterpret_cast<u8*>(puVar12);
 			if ((iVar14 != 0) || (*reinterpret_cast<s8*>(puVar13 + 5) != -3))
 			{
 				puVar12[0x26] = static_cast<u16>(*reinterpret_cast<u16*>(p12 + 0x30) | *puVar12);

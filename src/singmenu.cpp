@@ -2234,7 +2234,7 @@ void CMenuPcs::SingleCalcCtrl()
     }
     }
 
-    reinterpret_cast<CMesMenu*>(*reinterpret_cast<void**>(reinterpret_cast<u8*>(&MenuPcs) + 0x268))->CalcHeart();
+    MenuPcs.m_battleMesMenus[0]->CalcHeart();
     m_singMenuState->result = result;
 
     bool hasInput = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
@@ -3436,8 +3436,7 @@ void CMenuPcs::DrawSingLife()
 
     int halfHearts = static_cast<unsigned int>(caravanWork->m_maxHp) >> 1;
     xBase += static_cast<float>(((8 - halfHearts) * 0x18) / 2);
-    reinterpret_cast<CMesMenu*>(*reinterpret_cast<void**>(reinterpret_cast<u8*>(&MenuPcs) + 0x268))
-        ->DrawHeart(xBase, y - 8.0f, 1.0f, 1.0f);
+    MenuPcs.m_battleMesMenus[0]->DrawHeart(xBase, y - 8.0f, 1.0f, 1.0f);
 }
 
 /*

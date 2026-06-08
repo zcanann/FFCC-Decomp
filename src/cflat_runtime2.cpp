@@ -1824,10 +1824,9 @@ void CFlatRuntime2::loadLayerASync(int layerNo, char* fileName)
 	char path[0x104];
 	sprintf(path, sCFlatRuntime2TexturePathFmt, Game.GetLangString(), fileName);
 
-	fileHandle = File.Open(path, 0, CFile::PRI_LOW);
-	LayerResources(this)[layerNo].m_fileHandle = fileHandle;
-	if (fileHandle != 0) {
-		File.ReadASync(fileHandle);
+	LayerResources(this)[layerNo].m_fileHandle = File.Open(path, 0, CFile::PRI_LOW);
+	if (LayerResources(this)[layerNo].m_fileHandle != 0) {
+		File.ReadASync(LayerResources(this)[layerNo].m_fileHandle);
 	}
 
 	LayerResources(this)[layerNo].m_allocStage = CharaPcs.m_charaAllocStage;

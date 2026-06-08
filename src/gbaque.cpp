@@ -4645,13 +4645,14 @@ int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
  */
 unsigned int GbaQueue::GetChgHitFlg(int channel)
 {
+	char* obj = reinterpret_cast<char*>(this);
 	signed char singleModeByte = m_singleMode;
 	int singleMode = singleModeByte;
 	unsigned int actualChannel = static_cast<unsigned int>(channel) &
 	                             ~static_cast<unsigned int>((-singleMode | singleMode) >> 31);
 	OSSemaphore* semaphore = accessSemaphores + actualChannel;
 	OSWaitSemaphore(semaphore);
-	int flag = static_cast<signed char>(m_chgHitFlags);
+	int flag = obj[0x2D54];
 	OSSignalSemaphore(semaphore);
 	unsigned int value = flag & (1U << actualChannel);
 	return (-value | value) >> 31U;

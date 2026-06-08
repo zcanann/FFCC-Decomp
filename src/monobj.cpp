@@ -805,11 +805,13 @@ void CGMonObj::isValidTarget()
 			m_targetPartyIndex = partyIndex;
 			if (*reinterpret_cast<unsigned short*>(script9 + 0x10C) == 1) {
 				m_chaseState = 2;
+				m_chaseTimer = 0;
+				m_chaseDirty = 1;
 			} else {
 				m_chaseState = 1;
+				m_chaseTimer = 0;
+				m_chaseDirty = 1;
 			}
-			m_chaseTimer = 0;
-			m_chaseDirty = 1;
 			return;
 		}
 	}

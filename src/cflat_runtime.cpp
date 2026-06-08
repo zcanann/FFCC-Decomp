@@ -2265,21 +2265,19 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 									case 'd':
 									case 'x':
 										sprintf(rendered, spec, *arg);
-										scan = const_cast<char*>("");
-										break;
+										goto renderedDone;
 									case 'f':
 										sprintf(rendered, spec, static_cast<double>(*reinterpret_cast<float*>(arg)));
-										scan = const_cast<char*>("");
-										break;
+										goto renderedDone;
 									case 's':
 										sprintf(rendered, spec, m_strBlob + m_strOffsets[*arg]);
-										scan = const_cast<char*>("");
-										break;
+										goto renderedDone;
 									default:
 										scan++;
 										break;
 									}
 								}
+							renderedDone:;
 							}
 						}
 

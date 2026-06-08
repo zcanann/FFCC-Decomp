@@ -5292,6 +5292,17 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 	    ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D) && (reinterpret_cast<int*>(m_scriptHandle)[0xED] != 0)) {
 		unsigned int bossKind;
 		switch (Game.m_gameWork.m_bossArtifactStageIndex) {
+		default:
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+			bossKind = 0;
+			break;
+		case 6:
+		case 0x0A:
+			bossKind = 1;
+			break;
 		case 4:
 		case 8:
 		case 9:
@@ -5299,13 +5310,6 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 		case 0x0C:
 		case 0x0D:
 			bossKind = 2;
-			break;
-		case 6:
-		case 0x0A:
-			bossKind = 1;
-			break;
-		default:
-			bossKind = 0;
 			break;
 		}
 

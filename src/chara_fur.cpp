@@ -1876,7 +1876,8 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 			a = (packed >> 12) & 0x07;
 
 			if (distance == 0) {
-				*centerBefore = CColor((unsigned char)r, (unsigned char)g, (unsigned char)b, (unsigned char)a).color;
+				_GXColor beforeColor = CColor((unsigned char)r, (unsigned char)g, (unsigned char)b, (unsigned char)a).color;
+				*centerBefore = beforeColor;
 			}
 
 			if (mode != 0) {
@@ -1916,7 +1917,8 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 			*(unsigned short*)(((char*)pixels) + tileIndex) = (unsigned short)((b & 0x0f) | ((g & 0x0f) << 4) | ((r & 0x0f) << 8) | ((a & 0x07) << 12));
 
 			if (distance == 0) {
-				*centerAfter = CColor((unsigned char)r, (unsigned char)g, (unsigned char)b, (unsigned char)a).color;
+				_GXColor afterColor = CColor((unsigned char)r, (unsigned char)g, (unsigned char)b, (unsigned char)a).color;
+				*centerAfter = afterColor;
 			}
 		}
 	}

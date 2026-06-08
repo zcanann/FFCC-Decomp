@@ -5708,6 +5708,7 @@ int JoyBus::SendMType(ThreadParam* threadParam, int modeType)
             m_cmdQueueData[port][m_cmdCount[port]] = word0;
             m_cmdCount[threadParam->m_portIndex]++;
             OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+            result = 0;
         }
     }
 
@@ -5738,6 +5739,7 @@ int JoyBus::SendMType(ThreadParam* threadParam, int modeType)
             m_cmdQueueData[port][m_cmdCount[port]] = word;
             m_cmdCount[threadParam->m_portIndex]++;
             OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+            result = 0;
         }
     }
 

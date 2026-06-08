@@ -510,14 +510,16 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 					case -0x1A: {
 						int value = 0;
 						*reinterpret_cast<float*>(&stack[-1].m_word) = kCFlatRuntime2Zero;
-						if (setMode == 0) {
+						switch (setMode) {
+						case -1:
+							value = static_cast<int>(kCFlatRuntime2Zero - static_cast<float>(stack->m_word));
+							break;
+						case 0:
 							value = static_cast<int>(static_cast<float>(stack->m_word));
-						} else if (setMode < 0) {
-							if (setMode > -2) {
-								value = static_cast<int>(kCFlatRuntime2Zero - static_cast<float>(stack->m_word));
-							}
-						} else if (setMode < 2) {
+							break;
+						case 1:
 							value = static_cast<int>(kCFlatRuntime2Zero + static_cast<float>(stack->m_word));
+							break;
 						}
 						*(engineObject + 0x56) = static_cast<u8>(static_cast<int>(kCFlatRuntime2SystemValScale * static_cast<float>(value)));
 						break;

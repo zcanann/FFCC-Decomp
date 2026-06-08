@@ -7704,7 +7704,7 @@ void JoyBus::RestartThread()
     // TODO: CreateInit__6JoyBusFv
     int err = 0;
 
-    if (!Joybus.m_binLoaded)
+    if (static_cast<signed char>(Joybus.m_binLoaded) == 0)
     {
         CFile::CHandle* file = File.Open((char*)&Joybus, 0, CFile::PRI_LOW);
 

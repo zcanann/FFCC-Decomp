@@ -160,19 +160,18 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
         float v1;
 
         if ((*reinterpret_cast<const s16*>(shapeData) & 8) != 0) {
-            const u8* entry = shapeData + rotatedStride;
-            const u32 texIndex = entry[0x38];
+            const u8* entry = (shapeData + 0x10) + rotatedStride;
+            const u8 texIndex = entry[0x28];
             const s8 numTex = m_textureCount;
             float minX = kFunnyShapeBoundsMaxInitial;
             float maxX = kFunnyShapeBoundsMinInitial;
             float minY = minX;
             float maxY = maxX;
-            float drawAngle = angle;
             if ((s32)numTex > (s32)texIndex) {
                 GXLoadTexObj(reinterpret_cast<GXTexObj*>(m_texObjData[texIndex]), GX_TEXMAP0);
             }
 
-            const u8 blendMode = *reinterpret_cast<const u8*>(entry + 0x1C);
+            const u8 blendMode = *reinterpret_cast<const u8*>(entry + 0xC);
             if (blendMode == 'H') {
                 _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_COPY);
             } else if (blendMode == 'B') {
@@ -182,17 +181,17 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             }
 
             if ((ShapeFlags(this) & 0x100) == 0) {
-                drawAngle = kFunnyShapeZero;
+                angle = kFunnyShapeZero;
             }
 
-            const float rx0 = RotateShapeX(entry, 0x20, 0x22, drawAngle);
-            const float ry0 = RotateShapeY(entry, 0x20, 0x22, drawAngle);
-            const float rx1 = RotateShapeX(entry, 0x24, 0x26, drawAngle);
-            const float ry1 = RotateShapeY(entry, 0x24, 0x26, drawAngle);
-            const float rx2 = RotateShapeX(entry, 0x28, 0x2A, drawAngle);
-            const float ry2 = RotateShapeY(entry, 0x28, 0x2A, drawAngle);
-            const float rx3 = RotateShapeX(entry, 0x2C, 0x2E, drawAngle);
-            const float ry3 = RotateShapeY(entry, 0x2C, 0x2E, drawAngle);
+            const float rx0 = RotateShapeX(entry, 0x10, 0x12, angle);
+            const float ry0 = RotateShapeY(entry, 0x10, 0x12, angle);
+            const float rx1 = RotateShapeX(entry, 0x14, 0x16, angle);
+            const float ry1 = RotateShapeY(entry, 0x14, 0x16, angle);
+            const float rx2 = RotateShapeX(entry, 0x18, 0x1A, angle);
+            const float ry2 = RotateShapeY(entry, 0x18, 0x1A, angle);
+            const float rx3 = RotateShapeX(entry, 0x1C, 0x1E, angle);
+            const float ry3 = RotateShapeY(entry, 0x1C, 0x1E, angle);
 
             if (minX > rx0) {
                 minX = rx0;
@@ -250,10 +249,10 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             GXSetViewport(viewportScale * minX + offsetXY[0], viewportScale * minY + offsetXY[1], viewportW,
                           viewportH, kFunnyShapeZero, kFunnyShapeOne);
 
-            const s16 texX = S16At(entry, 0x30);
-            const s16 texY = S16At(entry, 0x32);
-            const s16 texW = S16At(entry, 0x34);
-            const s16 texH = S16At(entry, 0x36);
+            const s16 texX = S16At(entry, 0x20);
+            const s16 texY = S16At(entry, 0x22);
+            const s16 texW = S16At(entry, 0x24);
+            const s16 texH = S16At(entry, 0x26);
             u0 = static_cast<float>(texX) / kFunnyShapeTexCoordDivisor;
             v0 = kFunnyShapeOne - static_cast<float>(texY) / kFunnyShapeTexCoordDivisor;
             u1 = u0 + static_cast<float>(texW) / kFunnyShapeTexCoordDivisor;
@@ -279,17 +278,17 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             p3x = invPadW * (rx2 - viewMaxX);
             p3y = invPadH * (ry2 - viewMaxY);
             p3z = kFunnyShapeZero;
-            memcpy(&color, entry + 0x18, sizeof(color));
-            *reinterpret_cast<GXColor*>(&color) = *reinterpret_cast<const GXColor*>(entry + 0x18);
+            memcpy(&color, entry + 0x8, sizeof(color));
+            *reinterpret_cast<GXColor*>(&color) = *reinterpret_cast<const GXColor*>(entry + 0x8);
         } else {
-            const u8* entry = shapeData + packedStride;
-            const u32 texIndex = entry[0x30];
+            const u8* entry = shapeData + 0x10 + packedStride;
+            const u8 texIndex = entry[0x20];
             const s8 numTex = m_textureCount;
             if ((s32)numTex > (s32)texIndex) {
                 GXLoadTexObj(reinterpret_cast<GXTexObj*>(m_texObjData[texIndex]), GX_TEXMAP0);
             }
 
-            const u8 blendMode = *reinterpret_cast<const u8*>(entry + 0x1C);
+            const u8 blendMode = *reinterpret_cast<const u8*>(entry + 0xC);
             if (blendMode == 'H') {
                 _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_COPY);
             } else if (blendMode == 'B') {
@@ -298,18 +297,18 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
                 _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_COPY);
             }
 
-            const s32 x0 = Div16Floor(S16At(entry, 0x20));
-            const s32 y0 = Div16Floor(S16At(entry, 0x22));
-            const s32 x1 = Div16Floor(S16At(entry, 0x24));
-            const s32 y1 = Div16Floor(S16At(entry, 0x26));
+            const s32 x0 = Div16Floor(S16At(entry, 0x10));
+            const s32 y0 = Div16Floor(S16At(entry, 0x12));
+            const s32 x1 = Div16Floor(S16At(entry, 0x14));
+            const s32 y1 = Div16Floor(S16At(entry, 0x16));
             GXSetViewport(offsetXY[0] + static_cast<float>(x0 * 2), offsetXY[1] + static_cast<float>(y0 * 2),
                           static_cast<float>((x1 - x0) * 2), static_cast<float>((y1 - y0) * 2),
                           kFunnyShapeZero, kFunnyShapeOne);
 
-            const s16 texX = S16At(entry, 0x28);
-            const s16 texY = S16At(entry, 0x2A);
-            const s16 texW = S16At(entry, 0x2C);
-            const s16 texH = S16At(entry, 0x2E);
+            const s16 texX = S16At(entry, 0x18);
+            const s16 texY = S16At(entry, 0x1A);
+            const s16 texW = S16At(entry, 0x1C);
+            const s16 texH = S16At(entry, 0x1E);
             u0 = static_cast<float>(texX) / kFunnyShapeTexCoordDivisor;
             v0 = kFunnyShapeOne - static_cast<float>(texY) / kFunnyShapeTexCoordDivisor;
             u1 = u0 + static_cast<float>(texW) / kFunnyShapeTexCoordDivisor;
@@ -327,8 +326,8 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             p3x = kFunnyShapeNegativeOne;
             p3y = kFunnyShapeNegativeOne;
             p3z = kFunnyShapeZero;
-            memcpy(&color, entry + 0x18, sizeof(color));
-            *reinterpret_cast<GXColor*>(&color) = *reinterpret_cast<const GXColor*>(entry + 0x18);
+            memcpy(&color, entry + 0x8, sizeof(color));
+            *reinterpret_cast<GXColor*>(&color) = *reinterpret_cast<const GXColor*>(entry + 0x8);
         }
 
         float tex[4][2];

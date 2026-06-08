@@ -2153,7 +2153,7 @@ void CGPartyObj::statCharge()
 	case 2: {
 		if (m_subFrame == 0) {
 			endPSlotBit(8);
-			enableAttackCol(0x18, 0, 0);
+			bonus(0x18, 0, 0);
 		}
 		if (m_subFrame == 5 && m_comboItemState >= 0) {
 			endPSlotBit(0x20);
@@ -2243,10 +2243,10 @@ void CGPartyObj::statCharge()
 				}
 			}
 			if (phase == p[1]) {
-				ClassControl(1, 1);
+				enableAttackCol(1, 1, p[0]);
 			}
 			if (phase == p[2]) {
-				ClassControl(0, 0);
+				enableAttackCol(0, 0, 0);
 			}
 		}
 

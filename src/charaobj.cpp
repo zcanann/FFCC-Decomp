@@ -846,13 +846,15 @@ float CGCharaObj::onAlphaUpdate()
 	}
 
 	float slope = m_stepSlopeLimit;
+	float clamped;
 	if (alpha < 0.0f) {
-		alpha = 0.0f;
+		clamped = 0.0f;
+	} else if (1.0f < alpha) {
+		clamped = 1.0f;
+	} else {
+		clamped = alpha;
 	}
-	if (1.0f < alpha) {
-		alpha = 1.0f;
-	}
-	return slope * alpha;
+	return slope * clamped;
 }
 
 /*

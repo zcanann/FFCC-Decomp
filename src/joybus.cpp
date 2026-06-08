@@ -3112,7 +3112,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
         // Get initial GBA status
         bool singleMode = GbaQue.IsSingleMode(threadParam->m_portIndex);
 
-        if (singleMode && threadParam->m_portIndex != 1)
+        if (singleMode && (int)threadParam->m_portIndex != 1)
         {
             threadParam->m_gbaStatus = 0;
         }
@@ -3144,7 +3144,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
     {
         bool singleMode = GbaQue.IsSingleMode(threadParam->m_portIndex);
 
-        if (singleMode && threadParam->m_portIndex != 1)
+        if (singleMode && (int)threadParam->m_portIndex != 1)
         {
             threadParam->m_gbaStatus = 0;
         }
@@ -3166,7 +3166,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
                 {
                     bool singleMode2 = GbaQue.IsSingleMode(threadParam->m_portIndex);
 
-                    if (singleMode2 && threadParam->m_portIndex != 1)
+                    if (singleMode2 && (int)threadParam->m_portIndex != 1)
                     {
                         threadParam->m_gbaStatus = 0;
                     }
@@ -3209,7 +3209,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
     {
         bool singleMode = GbaQue.IsSingleMode(threadParam->m_portIndex);
 
-        if (singleMode && threadParam->m_portIndex != 1)
+        if (singleMode && (int)threadParam->m_portIndex != 1)
         {
             threadParam->m_gbaStatus = 0;
         }
@@ -3279,7 +3279,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
     {
         bool singleMode = GbaQue.IsSingleMode(threadParam->m_portIndex);
 
-        if (singleMode && threadParam->m_portIndex != 1)
+        if (singleMode && (int)threadParam->m_portIndex != 1)
         {
             threadParam->m_gbaStatus = 0;
         }
@@ -3331,7 +3331,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
     {
         bool singleMode = GbaQue.IsSingleMode(threadParam->m_portIndex);
 
-        if (singleMode && threadParam->m_portIndex != 1)
+        if (singleMode && (int)threadParam->m_portIndex != 1)
         {
             threadParam->m_gbaStatus = 0;
         }
@@ -3384,7 +3384,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
     {
         bool singleMode = GbaQue.IsSingleMode(threadParam->m_portIndex);
 
-        if (singleMode && threadParam->m_portIndex != 1)
+        if (singleMode && (int)threadParam->m_portIndex != 1)
         {
             threadParam->m_gbaStatus = 0;
         }

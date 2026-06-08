@@ -109,7 +109,7 @@ struct FurTexCoordRaw
 
 struct FurProjectedVertex
 {
-    unsigned char m_valid;
+    unsigned long m_valid;
     Vec m_viewPos;
     float m_clipX;
     float m_clipY;
@@ -1252,6 +1252,23 @@ int CChara::CModel::PickFur(
 	Mtx44 screenMtx;
 	PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
 
+	FurProjectedVertex verts[3];
+	unsigned long curValid = 0;
+	Mtx44 invScreenMtx;
+	CVector ray;
+	CVector planeDelta;
+	CVector hitToA;
+	CVector hitToBStorage;
+	CVector hitToCStorage;
+	CVector areaAB;
+	CVector areaBCStorage;
+	CVector areaCAStorage;
+	CVector weights;
+	CVector* hitToB = &hitToBStorage;
+	CVector* hitToC = &hitToCStorage;
+	CVector* areaBC = &areaBCStorage;
+	CVector* areaCA = &areaCAStorage;
+
 	for (unsigned int meshIndex = 0; meshIndex < meshCount; meshIndex++, mesh++) {
 		if (mesh->m_workPositions == 0) {
 			continue;
@@ -1305,58 +1322,196 @@ int CChara::CModel::PickFur(
 					break;
 				}
 
-				FurProjectedVertex prev2;
-				FurProjectedVertex prev1;
-				prev2.m_valid = false;
-				prev1.m_valid = false;
+				verts[0].m_valid = 0;
+				verts[1].m_valid = 0;
 
-				for (unsigned short vertexIndex = 0; vertexIndex < count; vertexIndex++) {
+				for (unsigned int vertexIndex = 0; vertexIndex < count; vertexIndex++) {
 					const unsigned short* indices = reinterpret_cast<const unsigned short*>(cursor);
-					FurProjectedVertex current;
-					ProjectFurVertex(current, mesh, modelViewMtx, screenMtx, indices[0], indices[3], posGqr);
 
-					const FurProjectedVertex* a = 0;
-					const FurProjectedVertex* b = 0;
-					if (primitive == 0x90) {
-						if ((vertexIndex % 3) == 2 && prev2.m_valid && prev1.m_valid && current.m_valid) {
-							a = &prev2;
-							b = &prev1;
-						}
-					} else if (primitive == 0x98) {
-						if (prev2.m_valid && prev1.m_valid && current.m_valid) {
-							if ((vertexIndex & 1) != 0) {
-								a = &prev1;
-								b = &prev2;
+					const S16Vec& pos = mesh->m_workPositions[indices[0]];
+					Vec localPos;
+					localPos.x = *reinterpret_cast<const float*>(&pos);
+					localPos.y = *reinterpret_cast<const float*>(&pos.z);
+					const short* uvSrc = reinterpret_cast<const short*>(mesh->m_data->m_uvs) +
+					                     static_cast<unsigned int>(indices[3]) * 2;
+					float curU = *reinterpret_cast<const float*>(uvSrc);
+					float curV = *reinterpret_cast<const float*>(uvSrc + 2);
+					localPos.z = *reinterpret_cast<const float*>(&pos.z);
+
+					Vec curViewPos;
+					PSMTXMultVec(modelViewMtx, &localPos, &curViewPos);
+
+					Vec4d curClip;
+					float curScreenX;
+					float curScreenY;
+					if (static_cast<double>(curViewPos.z) < static_cast<double>(kCharaFurDepthZero)) {
+						curValid = curValid & 0x7fffffff | 0x80000000;
+						Math.MTX44MultVec4(screenMtx, &curViewPos, &curClip);
+						curU = curU;
+						const float invW = kCharaFurDepthScaleBase / curClip.w;
+						curV = curV;
+						curScreenX = static_cast<float>(static_cast<double>(kCharaFurScreenCenterX * curClip.x) * invW +
+						                                static_cast<double>(kCharaFurScreenCenterX));
+						curScreenY = -static_cast<float>(static_cast<double>(kCharaFurScreenCenterY * curClip.y) * invW -
+						                                 static_cast<double>(kCharaFurScreenCenterY));
+					} else {
+						curValid = curValid & 0x7fffffff;
+					}
+
+					verts[0] = verts[1];
+					verts[1] = verts[2];
+					verts[2].m_valid = curValid;
+					verts[2].m_viewPos = curViewPos;
+					verts[2].m_clipX = curClip.x;
+					verts[2].m_clipY = curClip.y;
+					verts[2].m_clipZ = curClip.z;
+					verts[2].m_clipW = curClip.w;
+					verts[2].m_screenX = curScreenX;
+					verts[2].m_screenY = curScreenY;
+					verts[2].m_u = curU;
+					verts[2].m_v = curV;
+
+					if ((primitive == 0x90 && static_cast<int>(vertexIndex) % 3 == 2) ||
+					    (primitive == 0x98 && static_cast<int>(vertexIndex) >= 2)) {
+						FurProjectedVertex* vp = &verts[0];
+						int passed = 0;
+						int remainEdges = 3;
+						float depthAccum = kCharaFurDepthZero;
+						do {
+							if (static_cast<int>(static_cast<unsigned char>(vp->m_valid) << 0x18) >= 0) {
+								break;
+							}
+							int next = (passed + 1) % 3;
+							const float edge = (cursorY - vp->m_screenY) * (verts[next].m_screenX - vp->m_screenX) -
+							                   (cursorX - vp->m_screenX) * (verts[next].m_screenY - vp->m_screenY);
+							if (primitive == 0x90 || (vertexIndex & 1) == 0) {
+								vp->m_valid = vp->m_valid & 0xffffffbf;
+								if (kCharaFurDepthZero < edge) {
+									break;
+								}
 							} else {
-								a = &prev2;
-								b = &prev1;
-							}
-						}
-					}
-
-					if (a != 0) {
-						if (FurPointInTriangle(cursorX, cursorY, *a, *b, current)) {
-							const float depth = FurHitDepth(*a, *b, current);
-							if (depth < nearestDepth) {
-								float uvU;
-								float uvV;
-								FurInterpolateHit(hitViewPos, uvU, uvV, screenMtx, cursorX, cursorY, *a, *b, current);
-								hitAny = 1;
-								if (outWorldPos != 0) {
-									*outWorldPos = hitViewPos;
-								}
-								if (furMaterial) {
-									nearestDepth = depth;
-									hitU = uvU;
-									hitV = uvV;
-									hitPaintable = paintableMaterial;
+								vp->m_valid = vp->m_valid & 0xffffffbf | 0x40;
+								if (edge < kCharaFurDepthZero) {
+									break;
 								}
 							}
+							depthAccum = depthAccum + vp->m_clipW;
+							vp++;
+							passed++;
+							remainEdges--;
+						} while (remainEdges != 0);
+
+						float depth;
+						if (passed != 3 || nearestDepth <= (depth = depthAccum / kCharaFurTriangleVertexCount)) {
+							goto nextVertex;
+						}
+
+						hitAny = 1;
+						PSMTX44Copy(screenMtx, invScreenMtx);
+						C_MTX44Inverse(invScreenMtx, invScreenMtx);
+
+						CVector rayStart;
+						CVector rayEnd;
+						CVector rayStartInit((cursorX - kCharaFurScreenCenterX) / kCharaFurScreenCenterX,
+						                     -(cursorY - kCharaFurScreenCenterY) / kCharaFurScreenCenterY, kCharaFurDepthZero);
+						rayStart.x = rayStartInit.x;
+						rayStart.y = rayStartInit.y;
+						rayStart.z = rayStartInit.z;
+						CVector rayEndInit(rayStartInit.x, rayStartInit.y, kCharaFurPickRayFarZ);
+						rayEnd.x = rayEndInit.x;
+						rayEnd.y = rayEndInit.y;
+						rayEnd.z = rayEndInit.z;
+						PSMTX44MultVec(invScreenMtx, rayStart, rayStart);
+						PSMTX44MultVec(invScreenMtx, rayEnd, rayEnd);
+
+						CVector raySub;
+						PSVECSubtract(rayEnd, rayStart, raySub);
+						ray.x = raySub.x;
+						ray.y = raySub.y;
+						ray.z = raySub.z;
+
+						CVector normal;
+						CVector normalA;
+						CVector normalB;
+						PSVECCrossProduct(&verts[1].m_viewPos, &verts[0].m_viewPos, normalA);
+						PSVECCrossProduct(&verts[2].m_viewPos, &verts[0].m_viewPos, normalB);
+						PSVECCrossProduct(normalA, normalB, normal);
+						if (static_cast<int>(static_cast<unsigned int>(static_cast<unsigned char>(verts[2].m_valid)) << 0x19 |
+						                     static_cast<unsigned int>(static_cast<unsigned char>(verts[2].m_valid)) >> 7) < 0) {
+							CVector normalNeg(-normal.x, -normal.y, -normal.z);
+							normal.x = normalNeg.x;
+							normal.y = normalNeg.y;
+							normal.z = normalNeg.z;
+						}
+						normal.Normalize();
+
+						CVector vertA0(verts[0].m_viewPos);
+						CVector planeSub;
+						PSVECSubtract(vertA0, rayStart, planeSub);
+						planeDelta.x = planeSub.x;
+						planeDelta.y = planeSub.y;
+						planeDelta.z = planeSub.z;
+						const float rayDot = PSVECDotProduct(normal, ray);
+						const float planeDot = PSVECDotProduct(normal, planeDelta);
+						CVector scaledRay;
+						PSVECScale(ray, scaledRay, planeDot / rayDot);
+						PSVECAdd(rayStart, scaledRay, hitViewPos);
+
+						CVector hitToA;
+						CVector vertA1(verts[0].m_viewPos);
+						CVector hitToASub;
+						PSVECSubtract(vertA1, hitViewPos, hitToASub);
+						hitToA.x = hitToASub.x;
+						hitToA.y = hitToASub.y;
+						hitToA.z = hitToASub.z;
+						CVector vertB(verts[1].m_viewPos);
+						CVector hitToBSub;
+						PSVECSubtract(vertB, hitViewPos, hitToBSub);
+						hitToB->y = hitToBSub.y;
+						hitToB->x = hitToBSub.x;
+						hitToB->z = hitToBSub.z;
+						CVector vertC(verts[2].m_viewPos);
+						CVector hitToCSub;
+						PSVECSubtract(vertC, hitViewPos, hitToCSub);
+						hitToC->x = hitToCSub.x;
+						hitToC->y = hitToCSub.y;
+						hitToC->z = hitToCSub.z;
+
+						PSVECCrossProduct(hitToA, *hitToB, areaAB);
+						PSVECCrossProduct(*hitToB, *hitToC, *areaBC);
+						PSVECCrossProduct(*hitToC, hitToA, *areaCA);
+						const float magAB = PSVECMag(areaAB);
+						const float magCA = PSVECMag(*areaCA);
+						const float magBC = PSVECMag(*areaBC);
+						CVector weightsInit(magBC, magCA, magAB);
+						CVector weightsScale;
+						PSVECScale(weightsInit, weightsScale, kCharaFurWeightScale);
+						weights.x = weightsScale.x;
+						weights.y = weightsScale.y;
+						weights.z = weightsScale.z;
+						PSVECScale(weights, weights,
+						           kCharaFurDepthScaleBase / (weights.z + weights.x + weights.y));
+
+						const double outU = static_cast<double>(static_cast<float>(
+						    static_cast<double>(verts[2].m_u * weights.z) +
+						    static_cast<double>(verts[0].m_u * weights.x + verts[1].m_u * weights.y)));
+						const double outV = static_cast<double>(static_cast<float>(
+						    static_cast<double>(verts[2].m_v * weights.z) +
+						    static_cast<double>(verts[0].m_v * weights.x + verts[1].m_v * weights.y)));
+
+						if (outWorldPos != 0) {
+							outWorldPos->x = hitViewPos.x;
+							outWorldPos->y = hitViewPos.y;
+							outWorldPos->z = hitViewPos.z;
+						}
+						if (furMaterial) {
+							hitPaintable = paintableMaterial;
+							nearestDepth = depth;
+							hitU = static_cast<float>(outU);
+							hitV = static_cast<float>(outV);
 						}
 					}
-
-					prev2 = prev1;
-					prev1 = current;
+nextVertex:
 					cursor += 8;
 				}
 			}

@@ -1086,7 +1086,7 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
                 material->m_bumpLight->SetTexture(static_cast<_GXTexMapID>(m_bumpTexMapIds[1]), 0);
 
                 Mtx scaleMtx;
-                PSMTXScale(scaleMtx, material->m_scaleV, material->m_scaleU, kTextureOne);
+                PSMTXScale(scaleMtx, material->m_scaleU, material->m_scaleV, kTextureOne);
                 scaleMtx[0][3] = material->m_textureData.m_texScroll[1].m_u0;
                 scaleMtx[1][3] = material->m_textureData.m_texScroll[1].m_v0;
                 GXLoadTexMtxImm(scaleMtx, m_bumpTexMtxIds[0], GX_MTX2x4);
@@ -1253,7 +1253,7 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
                 GXLoadTexObj(m_underWaterTexture, static_cast<GXTexMapID>(m_bumpTexMapIds[2]));
 
                 Mtx scaleMtx;
-                PSMTXScale(scaleMtx, material->m_scaleV, material->m_scaleU, kTextureOne);
+                PSMTXScale(scaleMtx, material->m_scaleU, material->m_scaleV, kTextureOne);
                 scaleMtx[0][3] = material->m_textureData.m_texScroll[1].m_u0;
                 scaleMtx[1][3] = material->m_textureData.m_texScroll[1].m_v0;
                 GXLoadTexMtxImm(scaleMtx, m_bumpTexMtxIds[0], GX_MTX2x4);

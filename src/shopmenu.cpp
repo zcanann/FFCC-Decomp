@@ -1879,6 +1879,16 @@ void CShopMenu::DrawMake()
     SetupShopMenuUnitFont(font);
     float gilUnitWidth = font->GetWidth(gilUnitText);
 
+    SetupShopMenuAmountFont(font);
+    int makeGil = getItemNo(m_selectedIndex) > 0 ? CalcShopMenuMakeGil(this, getItemNo(m_selectedIndex)) : 0;
+    DrawShopMenuAmount(font, makeGil, FLOAT_80332e14 - gilUnitWidth - FLOAT_80332d5c - FLOAT_80332d5c, FLOAT_80332e18, 0x13);
+    SetupShopMenuAmountFont(font);
+    int makeGil2 = getItemNo(m_selectedIndex) > 0 ? CalcShopMenuMakeGil(this, getItemNo(m_selectedIndex)) : 0;
+    DrawShopMenuAmount(font, ShopMenuCaravanWork(this)->m_gil,
+        FLOAT_80332e1c - gilUnitWidth - FLOAT_80332d5c, FLOAT_80332e18,
+        (makeGil2 <= ShopMenuCaravanWork(this)->m_gil) ? 0x14 : 2);
+
+    SetupShopMenuUnitFont(font);
     font->DrawInit();
     MenuPcs.DrawNoShadowFont(font, s_Slash_80332d84, FLOAT_80332e14, FLOAT_80332e20, 0x1B, 0x12);
     MenuPcs.DrawInit();
@@ -1895,15 +1905,6 @@ void CShopMenu::DrawMake()
     font->DrawInit();
     MenuPcs.DrawNoShadowFont(font, const_cast<char*>(gilUnitText), FLOAT_80332e1c - gilUnitWidth, FLOAT_80332e20, 0x19, 0x12);
     MenuPcs.DrawInit();
-
-    SetupShopMenuAmountFont(font);
-    int makeGil = getItemNo(m_selectedIndex) > 0 ? CalcShopMenuMakeGil(this, getItemNo(m_selectedIndex)) : 0;
-    DrawShopMenuAmount(font, makeGil, FLOAT_80332e14 - gilUnitWidth - FLOAT_80332d5c - FLOAT_80332d5c, FLOAT_80332e18, 0x13);
-    SetupShopMenuAmountFont(font);
-    int makeGil2 = getItemNo(m_selectedIndex) > 0 ? CalcShopMenuMakeGil(this, getItemNo(m_selectedIndex)) : 0;
-    DrawShopMenuAmount(font, ShopMenuCaravanWork(this)->m_gil,
-        FLOAT_80332e1c - gilUnitWidth - FLOAT_80332d5c, FLOAT_80332e18,
-        (makeGil2 <= ShopMenuCaravanWork(this)->m_gil) ? 0x14 : 2);
 
     CFont* labelFont = MenuPcs.m_fonts[4];
     SetupShopMenuLabelFont(labelFont);

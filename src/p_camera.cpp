@@ -761,40 +761,34 @@ void CCameraPcs::calc()
     }
 
     if (m_isAbsolute == 0) {
-        float stickH = kCameraZeroF;
-        if ((Pad.m_debugPadLock == 0) && (Pad.m_debugPadPort == -1)) {
-            stickH = CameraRawPadInput().substickYF;
-        }
+        float stickH = ((Pad.m_debugPadLock == 0) && (Pad.m_debugPadPort == -1))
+                           ? CameraRawPadInput().substickYF
+                           : kCameraZeroF;
         m_yaw += kCameraDegToRad * kCameraDefaultNearZ * stickH;
 
-        float stickV = kCameraZeroF;
-        if ((Pad.m_debugPadLock == 0) && (Pad.m_debugPadPort == -1)) {
-            stickV = *reinterpret_cast<float*>(&CameraRawPadInput().lockedButton[0]);
-        }
+        float stickV = ((Pad.m_debugPadLock == 0) && (Pad.m_debugPadPort == -1))
+                           ? *reinterpret_cast<float*>(&CameraRawPadInput().lockedButton[0])
+                           : kCameraZeroF;
         m_pitch += kCameraDegToRad * kCameraDebugZoomStep * stickV;
 
-        float triggerL = kCameraZeroF;
-        if ((Pad.m_debugPadLock == 0) && (Pad.m_debugPadPort == -1)) {
-            triggerL = CameraRawPadInput().stickYF;
-        }
+        float triggerL = ((Pad.m_debugPadLock == 0) && (Pad.m_debugPadPort == -1))
+                             ? CameraRawPadInput().stickYF
+                             : kCameraZeroF;
         m_distance += kCameraDebugZoomStep * triggerL;
 
-        float triggerR = kCameraZeroF;
-        if ((Pad.m_debugPadLock == 0) && (Pad.m_debugPadPort == -1)) {
-            triggerR = CameraRawPadInput().triggerRightF;
-        }
+        float triggerR = ((Pad.m_debugPadLock == 0) && (Pad.m_debugPadPort == -1))
+                             ? CameraRawPadInput().triggerRightF
+                             : kCameraZeroF;
 
-        float moveInOut = kCameraZeroF;
-        if ((Pad.m_debugPadLock == 0) && (Pad.m_debugPadPort == -1)) {
-            moveInOut = CameraRawPadInput().stickXF;
-        }
+        float moveInOut = ((Pad.m_debugPadLock == 0) && (Pad.m_debugPadPort == -1))
+                              ? CameraRawPadInput().stickXF
+                              : kCameraZeroF;
 
         float lateral = kCameraDebugZoomStep * triggerR - kCameraDebugZoomStep * moveInOut;
 
-        float panStick = kCameraZeroF;
-        if ((Pad.m_debugPadLock == 0) && (Pad.m_debugPadPort == -1)) {
-            panStick = CameraRawPadInput().substickXF;
-        }
+        float panStick = ((Pad.m_debugPadLock == 0) && (Pad.m_debugPadPort == -1))
+                             ? CameraRawPadInput().substickXF
+                             : kCameraZeroF;
 
         const float sinXCosY = static_cast<float>(sin(m_yaw)) * static_cast<float>(cos(m_pitch));
         const float sinY = static_cast<float>(sin(m_pitch));

@@ -3340,7 +3340,7 @@ void CMenuPcs::DrawSingLife()
         y = 64.0f * static_cast<float>(sin(0.01745329238474369f * (9.0f * static_cast<float>(phase)))) + yBase;
     } else {
         y = 32.0f;
-        if (lifeTimer > 0x27) {
+        if (lifeTimer >= 0x28) {
             int t = 10 - (lifeTimer - 0x28);
             int phase;
             if (t < 0) {

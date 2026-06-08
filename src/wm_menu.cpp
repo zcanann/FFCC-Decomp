@@ -1226,7 +1226,7 @@ void CMenuPcs::loadData()
 				    reinterpret_cast<unsigned char*>(GetWmCharaHandles(this)[i]->m_model) + 0xC0);
 				float maxWait = static_cast<float>(
 				    static_cast<double>(*reinterpret_cast<unsigned short*>(
-				        reinterpret_cast<unsigned char*>(
+				        reinterpret_cast<signed char*>(
 				            reinterpret_cast<int**>(GetWmCharaHandles(this)[i]->m_model)[(animBase + 6)])[10] + 0x10)) -
 				    DOUBLE_803313F0);
 				if (FLOAT_8032ee18 < maxWait) {
@@ -6079,7 +6079,7 @@ void CMenuPcs::SetWorldParam(int code, int value)
 	case 0x17: {
 		unsigned int clz = __cntlzw(static_cast<unsigned int>(value));
 		CameraPcs.m_worldMapEffect.m_flags =
-		    static_cast<unsigned char>(static_cast<int>(static_cast<signed char>(clz >> 5)) << 7) |
+		    static_cast<unsigned char>(static_cast<int>(static_cast<unsigned char>(clz >> 5)) << 7) |
 		    (CameraPcs.m_worldMapEffect.m_flags & 0x7F);
 		CameraPcs.m_worldMapEffect.m_timer = 0x4B;
 		CameraPcs.m_worldMapEffect.m_duration = 0x4B;
@@ -9620,7 +9620,7 @@ void CMenuPcs::WMChgMenu()
 	*reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0x1C) = 0;
 
 	int frameInfo = reinterpret_cast<int>(m_wm.m_frameInfo);
-	*reinterpret_cast<short*>(frameInfo + 0x20) = *reinterpret_cast<short*>(frameInfo + 4);
+	*reinterpret_cast<short*>(frameInfo + 0x20) = *reinterpret_cast<unsigned short*>(frameInfo + 4);
 	*reinterpret_cast<short*>(frameInfo + 0x22) = *reinterpret_cast<short*>(frameInfo + 6);
 	*reinterpret_cast<short*>(frameInfo + 0x24) = *reinterpret_cast<short*>(frameInfo + 8);
 	*reinterpret_cast<short*>(frameInfo + 0x26) = *reinterpret_cast<short*>(frameInfo + 10);
@@ -10059,7 +10059,7 @@ void CMenuPcs::ChgAllModel()
 
 		if (*reinterpret_cast<int*>(gameData + 0x1794) != 0) {
 			race = *reinterpret_cast<unsigned short*>(caravanData + 0x3E0);
-			variant = *reinterpret_cast<unsigned short*>(caravanData + 0x3E2);
+			variant = *reinterpret_cast<short*>(caravanData + 0x3E2);
 			index = *reinterpret_cast<unsigned short*>(caravanData + 0x3E4);
 			modelId = race * 200 + 100;
 			if (variant != 0) {

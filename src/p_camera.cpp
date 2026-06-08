@@ -1540,24 +1540,18 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
             continue;
         }
 
-        if (worldBoundData[0] < shadowRectBound.m_min.x) {
-            shadowRectBound.m_min.x = worldBoundData[0];
-        }
-        if (worldBoundData[1] < shadowRectBound.m_min.y) {
-            shadowRectBound.m_min.y = worldBoundData[1];
-        }
-        if (worldBoundData[2] < shadowRectBound.m_min.z) {
-            shadowRectBound.m_min.z = worldBoundData[2];
-        }
-        if (shadowRectBound.m_max.x < worldBoundData[3]) {
-            shadowRectBound.m_max.x = worldBoundData[3];
-        }
-        if (shadowRectBound.m_max.y < worldBoundData[4]) {
-            shadowRectBound.m_max.y = worldBoundData[4];
-        }
-        if (shadowRectBound.m_max.z < worldBoundData[5]) {
-            shadowRectBound.m_max.z = worldBoundData[5];
-        }
+        shadowRectBound.m_min.x =
+            (shadowRectBound.m_min.x < worldBoundData[0]) ? shadowRectBound.m_min.x : worldBoundData[0];
+        shadowRectBound.m_min.y =
+            (shadowRectBound.m_min.y < worldBoundData[1]) ? shadowRectBound.m_min.y : worldBoundData[1];
+        shadowRectBound.m_min.z =
+            (shadowRectBound.m_min.z < worldBoundData[2]) ? shadowRectBound.m_min.z : worldBoundData[2];
+        shadowRectBound.m_max.x =
+            (shadowRectBound.m_max.x > worldBoundData[3]) ? shadowRectBound.m_max.x : worldBoundData[3];
+        shadowRectBound.m_max.y =
+            (shadowRectBound.m_max.y > worldBoundData[4]) ? shadowRectBound.m_max.y : worldBoundData[4];
+        shadowRectBound.m_max.z =
+            (shadowRectBound.m_max.z > worldBoundData[5]) ? shadowRectBound.m_max.z : worldBoundData[5];
         count += 1;
     }
 

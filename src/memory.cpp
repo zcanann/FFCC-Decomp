@@ -1108,7 +1108,7 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
     int freeSize = 0;
     int usedSize = 0;
 
-    if (mode == 2) {
+    if (stageGetAllocationMode(this) == 2) {
         int top = m_heapTop;
 
         for (int i = 0; i <= m_blockCount; i++) {

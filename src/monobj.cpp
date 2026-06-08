@@ -3506,6 +3506,7 @@ body:
 					if (((*reinterpret_cast<unsigned short*>(script + 0xFE) & 8) == 0) &&
 						((*reinterpret_cast<unsigned short*>(aiScript + 0x102) & 0x100) == 0)) {
 						actionState = 0x21;
+						CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
 						if (monObj->m_moveWork.m_mode != 1) {
 							memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
 							monObj->m_moveWork.m_flags = 0x205;
@@ -3520,7 +3521,7 @@ body:
 							}
 							monObj->m_moveWork.m_mode = 1;
 						}
-						monObj->m_moveWork.m_target = Game.m_partyObjArr[targetPartyIndex];
+						monObj->m_moveWork.m_target = target;
 						if (((monObj->m_moveWork.m_stateFlags & 1) != 0) ||
 							(static_cast<int>(*reinterpret_cast<unsigned short*>(script + 0x1BA)) <=
 							 monObj->m_moveWork.m_frame)) {

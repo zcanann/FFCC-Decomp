@@ -2215,9 +2215,7 @@ void CCharaPcs::CHandle::ChangeTexture(
     int charaKind, unsigned long charaNo, unsigned long textureVariant, int mergeFileId, int mergeFlags)
 {
     Graphic._WaitDrawDone(const_cast<char*>(s_p_chara_cpp), 0x749);
-    if (m_model != 0) {
-        m_model->AttachTextureSet(0);
-    }
+    m_model->AttachTextureSet(0);
 
     ReleaseShared(m_textureSet);
     ReleaseShared(m_texLoadRef);
@@ -2227,9 +2225,9 @@ void CCharaPcs::CHandle::ChangeTexture(
     BuildCharaBasePath(charaKind, charaNo, basePath);
 
     CLoadTexture* loadTexture = 0;
-    for (int i = 0; i < LoadTextureArray(&CharaPcs)->GetSize(); i++) {
-        CLoadTexture* it = (*LoadTextureArray(&CharaPcs))[static_cast<unsigned long>(i)];
-        if (it != 0 && it->m_keyTag == reinterpret_cast<void*>(charaKind) && it->m_keyId == static_cast<int>(charaNo) &&
+    for (unsigned int i = 0; i < static_cast<unsigned int>(LoadTextureArray(&CharaPcs)->GetSize()); i++) {
+        CLoadTexture* it = (*LoadTextureArray(&CharaPcs))[i];
+        if (it->m_keyTag == reinterpret_cast<void*>(charaKind) && it->m_keyId == static_cast<int>(charaNo) &&
             it->m_variantTag == reinterpret_cast<void*>(textureVariant)) {
             loadTexture = it;
             break;
@@ -2242,7 +2240,7 @@ void CCharaPcs::CHandle::ChangeTexture(
         } else {
             sprintf(path, s_charaTextureVariantFmt, basePath, static_cast<int>(textureVariant) + 0x61);
         }
-        strcpy(path + strlen(path), s_charaTextureSuffix);
+        strcat(path, s_charaTextureSuffix);
 
         CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
         if (fileHandle == 0) {
@@ -2253,46 +2251,47 @@ void CCharaPcs::CHandle::ChangeTexture(
         File.Read(fileHandle);
         File.SyncCompleted(fileHandle);
 
+        void* readBuffer = File.m_readBuffer;
         loadTexture = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x609) CLoadTexture;
-        if (loadTexture != 0) {
-            loadTexture->m_keyTag = reinterpret_cast<void*>(charaKind);
-            loadTexture->m_keyId = static_cast<int>(charaNo);
-            loadTexture->m_mergeFileId = mergeFileId;
-            loadTexture->m_mergeFlags = mergeFlags;
-            loadTexture->m_variantTag = reinterpret_cast<void*>(textureVariant);
-            loadTexture->m_textureSet = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
-            loadTexture->m_streamMode = 0;
-            loadTexture->m_streamOffset = 0;
-            loadTexture->m_streamSize = 0;
+        loadTexture->m_keyTag = reinterpret_cast<void*>(charaKind);
+        loadTexture->m_keyId = static_cast<int>(charaNo);
+        loadTexture->m_variantTag = reinterpret_cast<void*>(textureVariant);
+        loadTexture->m_mergeFileId = mergeFileId;
+        loadTexture->m_mergeFlags = mergeFlags;
+        LoadTextureArray(&CharaPcs)->Add(loadTexture);
 
-            if (loadTexture->m_textureSet != 0) {
-                loadTexture->m_textureSet->Create(File.m_readBuffer, HandleTextureStage(charaKind), 0, 0, 0, 0);
-            }
-            LoadTextureArray(&CharaPcs)->Add(loadTexture);
-        }
+        CTextureSet* textureSet = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
+        textureSet->Create(readBuffer, HandleTextureStage(charaKind), 0, 0, 0, 0);
+        loadTexture->m_textureSet = textureSet;
+
         File.Close(fileHandle);
-    } else if (loadTexture->m_streamOffset != 0 && loadTexture->GetRef() == 1) {
+        m_texLoadRef = loadTexture;
+        m_texLoadRef->AddRef();
+        m_textureSet = reinterpret_cast<CLoadTexture*>(m_texLoadRef)->m_textureSet;
+        m_textureSet->AddRef();
+        m_model->AttachTextureSet(m_textureSet);
+        return;
+    }
+
+    if (loadTexture->m_streamOffset != 0 && loadTexture->GetRef() == 1) {
         File.LockBuffer();
         Memory.CopyFromAMemorySync(
             File.m_readBuffer,
             reinterpret_cast<unsigned char*>(StageBase(CharaPcs.m_amemWorkStage)) +
                 reinterpret_cast<unsigned int>(loadTexture->m_streamOffset),
             static_cast<unsigned long>(loadTexture->m_streamSize));
-        loadTexture->m_textureSet = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
-        if (loadTexture->m_textureSet != 0) {
-            loadTexture->m_textureSet->Create(File.m_readBuffer, HandleTextureStage(charaKind), 0, 0, 0, 0);
-        }
+        void* readBuffer = File.m_readBuffer;
+        CTextureSet* textureSet = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
+        textureSet->Create(readBuffer, HandleTextureStage(charaKind), 0, 0, 0, 0);
+        loadTexture->m_textureSet = textureSet;
         File.UnlockBuffer();
     }
 
     m_texLoadRef = loadTexture;
-    AddSharedRef(m_texLoadRef);
-    m_textureSet = loadTexture != 0 ? loadTexture->m_textureSet : 0;
-    AddSharedRef(m_textureSet);
-
-    if (m_model != 0) {
-        m_model->AttachTextureSet(m_textureSet);
-    }
+    m_texLoadRef->AddRef();
+    m_textureSet = reinterpret_cast<CLoadTexture*>(m_texLoadRef)->m_textureSet;
+    m_textureSet->AddRef();
+    m_model->AttachTextureSet(m_textureSet);
 }
 
 /*

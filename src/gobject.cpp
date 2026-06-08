@@ -1469,9 +1469,7 @@ void CGObject::update()
 
         if ((m_stateFlags0 & 0x10) != 0) {
             Mtx tiltMtx;
-            if (m_groundHitOffset.x == sZeroFloat && m_groundHitOffset.z == sZeroFloat) {
-                PSMTXQuat(tiltMtx, &m_bgCollisionQtrn);
-            } else {
+            if (m_groundHitOffset.x != sZeroFloat || m_groundHitOffset.z != sZeroFloat) {
                 Vec axis;
                 const float slideMagSq =
                     m_groundHitOffset.x * m_groundHitOffset.x + m_groundHitOffset.z * m_groundHitOffset.z;
@@ -1483,6 +1481,8 @@ void CGObject::update()
                 PSMTXQuat(quatMtx, &m_bgCollisionQtrn);
                 PSMTXConcat(tiltMtx, quatMtx, tiltMtx);
                 C_QUATMtx(&m_bgCollisionQtrn, tiltMtx);
+            } else {
+                PSMTXQuat(tiltMtx, &m_bgCollisionQtrn);
             }
 
             const float tx = modelMtx[0][3];

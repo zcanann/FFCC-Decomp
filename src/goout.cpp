@@ -2664,7 +2664,7 @@ void CGoOutMenu::Calc()
         if (m_pendingMessage == -1) {
             m_messageState = 1;
         } else {
-            MenuPcs.GetWinSize(static_cast<short>(m_currentMessage), &x, &y, (m_currentMessage >= 0x1E) ? 2 : 0);
+            MenuPcs.GetWinSize(static_cast<short>(m_currentMessage), &x, &y, (m_currentMessage < 0x1E) ? 0 : 2);
             MenuPcs.SetMcWinInfo(x, y);
             MenuPcs.m_menuWindowInfo->state = 0;
             MenuGoOutState().m_animFrame = 0;

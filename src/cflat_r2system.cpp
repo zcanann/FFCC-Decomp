@@ -4296,10 +4296,10 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
         case -0x6D:
         case -0x6C: {
             u8* usbEdit = game + (systemValue + 0x73) * 0xC30;
-            if (*(int*)(usbEdit + 0x1794) == 0) {
-                FlatLastResult(this) = 0;
-            } else {
+            if (*(int*)(usbEdit + 0x1794) != 0) {
                 FlatLastResult(this) = *(unsigned short*)(usbEdit + 0x1404);
+            } else {
+                FlatLastResult(this) = 0;
             }
             break;
         }

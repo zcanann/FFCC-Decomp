@@ -1836,6 +1836,7 @@ void CShopMenu::DrawSoubi()
     font->DrawInit();
 
     char* itemName = GetItemName(m_resultItem);
+    font->DrawInit();
     MenuPcs.DrawShadowFont(font, itemName, FLOAT_80332d54, FLOAT_80332E04, 0x18, 0x12);
     MenuPcs.DrawInit();
 
@@ -1875,7 +1876,7 @@ void CShopMenu::DrawSoubi()
     labelFont->Draw(cancelText);
     MenuPcs.DrawInit();
 
-    MenuPcs.DrawCursor(static_cast<unsigned int>(cancelTextX) - 0x24, m_yesNo * 0x18 + 0x13C, FLOAT_80332d28);
+    MenuPcs.DrawCursor(static_cast<int>(cancelTextX) - 0x24, m_yesNo * 0x18 + 0x13C, FLOAT_80332d28);
 }
 /*
  * --INFO--

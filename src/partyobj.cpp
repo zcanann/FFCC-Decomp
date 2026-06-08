@@ -41,9 +41,6 @@ extern int __float_huge[];
 static const char s_partyObjGhostFmt[] = "%d/%d %d/%d %d/%d";
 static const char s_partyObjGhostAngleFmt[] = "%d/%d a=%d";
 static const char s_partyObjDebugScriptFmt[] = "%d %d %d %d %d %d";
-static const char s_partyBonusCountFmt[] = "SetBonusCondition num:%d";
-static const char s_partyBonusRandomFmt[] = "SetBonusCondition slot:%d idx:%d bonus:%d";
-static const char s_partyBonusFixedFmt[] = "SetBonusCondition slot:%d bonus:%d";
 static const char s_partyBonusKind0Fmt[] = "bonus kind0:%d";
 static const char s_partyBonusKind1Fmt[] = "bonus kind1:%d";
 static const char s_partyBonusKind4Fmt[] = "bonus kind4:%d";
@@ -4051,12 +4048,13 @@ void CGPartyObj::CheckGameOver()
  */
 void CGPartyObj::SetBonusCondition(int useRandom, int bonus0, int bonus1, int bonus2, int bonus3)
 {
+	const char* msgBase = lbl_801DCA48;
 	int bonusCount = 0x10;
 	if (Game.m_gameWork.m_radarType != 0) {
 		bonusCount = 4;
 	}
 
-	System.Printf(const_cast<char*>(s_partyBonusCountFmt), bonusCount);
+	System.Printf(const_cast<char*>(msgBase + 0x114), bonusCount);
 
 	int chosenBonus[5];
 	int chosenCount = 0;
@@ -4093,7 +4091,7 @@ void CGPartyObj::SetBonusCondition(int useRandom, int bonus0, int bonus1, int bo
 			reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)
 			    ->SetBonusCondition(bossArtifacts->m_bonusConditions[bonusIndex]);
 			if ((unsigned int)System.m_execParam >= 3) {
-				System.Printf(const_cast<char*>(s_partyBonusRandomFmt), slot, bonusIndex,
+				System.Printf(const_cast<char*>(msgBase + 0x134), slot, bonusIndex,
 				    bossArtifacts->m_bonusConditions[bonusIndex]);
 			}
 		} else {
@@ -4115,7 +4113,7 @@ void CGPartyObj::SetBonusCondition(int useRandom, int bonus0, int bonus1, int bo
 
 			reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)->SetBonusCondition(bonus);
 			if ((unsigned int)System.m_execParam >= 3) {
-				System.Printf(const_cast<char*>(s_partyBonusFixedFmt), slot, bonus);
+				System.Printf(const_cast<char*>(msgBase + 0x154), slot, bonus);
 			}
 		}
 

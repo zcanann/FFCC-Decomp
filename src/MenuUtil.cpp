@@ -1418,7 +1418,7 @@ void CMenuPcs::DrawOptionMenu()
 	}
 	case 3: {
 		CTexture* meterTexture = GetTextureSetTexture(GetMenuTextureSet(this, 0xBC), 3);
-		unsigned int meterWidth = static_cast<unsigned int>(static_cast<float>(meterTexture->m_width));
+		unsigned int meterWidth = static_cast<int>(static_cast<float>(meterTexture->m_width));
 		unsigned int meterHeight = static_cast<unsigned int>(static_cast<float>(meterTexture->m_height));
 		float iconWave = kOptionUiTwenty * rowSin;
 		float leftIconX =
@@ -1483,7 +1483,7 @@ void CMenuPcs::DrawOptionMenu()
 	}
 	case 4: {
 		CTextureSet* textureSet = GetMenuTextureSet(this, 0xBC);
-		color.a = static_cast<unsigned char>(static_cast<int>(kOptionMenuAlphaMax * m_optionColumnAnim));
+		color.a = static_cast<unsigned char>(static_cast<unsigned int>(kOptionMenuAlphaMax * m_optionColumnAnim));
 		int rowAnimFrame;
 		if (static_cast<double>(m_optionRowAnim) < kOptionDefaultTextScale) {
 			rowAnimFrame = static_cast<unsigned int>(static_cast<int>(m_optionRowAnim / kOptionSpecialRowFrameStep));
@@ -1520,7 +1520,7 @@ void CMenuPcs::DrawOptionMenu()
 			}
 
 			CTexture* modePanel = GetTextureSetTexture(textureSet, 7);
-			unsigned int modeWidth = static_cast<unsigned int>(static_cast<float>(modePanel->m_width));
+			unsigned int modeWidth = static_cast<int>(static_cast<float>(modePanel->m_width));
 			unsigned int modeHeight = static_cast<int>(static_cast<float>(modePanel->m_height));
 			gUtil.CalcUV(uv0.x, uv0.y, static_cast<unsigned int>(static_cast<float>(modeWidth) - kOptionSelectorHeight),
 			             uvY, modeWidth, modeHeight);

@@ -941,8 +941,9 @@ int CFlatRuntime2::Load(char* fileName)
 	File.Close(fileHandle);
 
 	if (getDebugStage() != 0) {
+		int debugIndex = 0;
 		int debugChunk = 0;
-		for (int debugIndex = 0;; debugIndex++) {
+		for (;; debugIndex++) {
 			sprintf(path, sCFlatRuntime2DebugFileNameFmt, fileName);
 			if (debugIndex != 0) {
 				sprintf(path, "%s%d", path, debugIndex);

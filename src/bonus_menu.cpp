@@ -2982,16 +2982,12 @@ void CMenuPcs::CalcResultOpenAnim()
 		return;
 	}
 
-	int animPtr = this->m_bonusAnimPtr;
-	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
-	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
-
 	*(short*)(this->m_bonusStatePtr + 0x22) = *(short*)(this->m_bonusStatePtr + 0x22) + 1;
 	int frame = (int)*(short*)(this->m_bonusStatePtr + 0x22);
 	int doneCount = 0;
 
-	for (int i = 0; i < (int)header->count; i++) {
-		BonusAnimSprite* sprite = &sprites[i];
+	for (int i = 0; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++) {
+		BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + i * 0x40 + 8);
 		if (sprite->startFrame <= frame) {
 			if (frame < sprite->startFrame + sprite->duration) {
 				sprite->timer++;
@@ -3017,7 +3013,7 @@ void CMenuPcs::CalcResultOpenAnim()
 	Mtx rotXMtx;
 	Mtx rotYMtx;
 	for (int i = 0; i < activePartyCount * 3; i++) {
-		BonusAnimSprite* sprite = &sprites[activePartyCount * 2 + 1 + i];
+		BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + (activePartyCount * 2 + 1 + i) * 0x40 + 8);
 		CCharaPcs::CHandle* handle;
 		int tribeId;
 		if (i < activePartyCount) {
@@ -3090,8 +3086,8 @@ void CMenuPcs::CalcResultOpenAnim()
 		handle->m_model->m_lightAlpha = sprite->alpha;
 	}
 
-	if (doneCount == (int)header->count) {
-		header->finished = 1;
+	if (doneCount == (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count) {
+		((BonusAnimHeader*)this->m_bonusAnimPtr)->finished = 1;
 	}
 }
 

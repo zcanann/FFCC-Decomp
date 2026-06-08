@@ -1828,7 +1828,7 @@ card_connected:;
         m_cursorListY1 = 0xdc;
         m_cursorMode = 0;
         {
-            unsigned char next = 0;
+            unsigned char next;
 
             if (MenuPcs.m_menuWindowInfo->state == 1) {
                 input = GetGoOutInputMask();
@@ -1844,10 +1844,13 @@ card_connected:;
                             Sound.PlaySe(3, 0x40, 0x7f, 0);
                         }
                         next = static_cast<signed char>(m_cursorChoice + 1);
+                        goto do_switch_go10;
                     }
                 }
             }
 
+            next = 0;
+        do_switch_go10:
             switch (next) {
             case 1:
                 SetGoOutMode(0x11);
@@ -1875,7 +1878,7 @@ card_connected:;
         m_cursorListY1 = 0xe9;
         m_cursorMode = 0;
         {
-            unsigned char next = 0;
+            unsigned char next;
 
             if (MenuPcs.m_menuWindowInfo->state == 1) {
                 input = GetGoOutInputMask();
@@ -1891,10 +1894,13 @@ card_connected:;
                             Sound.PlaySe(3, 0x40, 0x7f, 0);
                         }
                         next = static_cast<signed char>(m_cursorChoice + 1);
+                        goto do_switch_go11;
                     }
                 }
             }
 
+            next = 0;
+        do_switch_go11:
             switch (next) {
             case 1:
                 SetGoOutMode(0x12);
@@ -1942,7 +1948,7 @@ card_connected:;
         m_cursorListY1 = 0xe7;
         m_cursorMode = 0;
         {
-            unsigned char next = 0;
+            unsigned char next;
 
             if (MenuPcs.m_menuWindowInfo->state == 1) {
                 input = GetGoOutInputMask();
@@ -1959,10 +1965,13 @@ card_connected:;
                         }
 
                         next = static_cast<signed char>(m_cursorChoice + 1);
+                        goto do_switch_go3;
                     }
                 }
             }
 
+            next = 0;
+        do_switch_go3:
             switch (next) {
             case 1:
                 SetGoOutMode(4);
@@ -1983,7 +1992,7 @@ card_connected:;
         m_cursorListY1 = 0xde;
         m_cursorMode = 0;
         {
-            unsigned char next = 0;
+            unsigned char next;
 
             if (MenuPcs.m_menuWindowInfo->state == 1) {
                 input = GetGoOutInputMask();
@@ -2000,10 +2009,13 @@ card_connected:;
                         }
 
                         next = static_cast<signed char>(m_cursorChoice + 1);
+                        goto do_switch_go4;
                     }
                 }
             }
 
+            next = 0;
+        do_switch_go4:
             switch (next) {
             case 1:
                 SetGoOutMode(5);

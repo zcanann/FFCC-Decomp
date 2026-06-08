@@ -536,7 +536,7 @@ void CMenuPcs::ItemDraw()
     }
     float helpBaseX = LoadFloat(kItemHelpCenterX);
     float helpOffsetX = LoadFloat(kItemHalf);
-    int helpX = (unsigned int)(helpBaseX - (float)(LoadDouble(kItemHalfDouble) * (double)helpOffsetX));
+    int helpX = (int)(helpBaseX - LoadFloat(kItemHalf) * helpOffsetX);
     int helpY = (int)LoadFloat(kItemHelpY);
     DrawHelpMessage(
         selectedItemId,

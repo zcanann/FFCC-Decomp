@@ -3095,7 +3095,7 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
     font->DrawInit();
     font->SetTlut(7);
 
-    CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(255.0f * alpha)));
+    CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha));
     font->SetColor(rgba.color);
 
     const char* yesStr = GetMenuStr(1);

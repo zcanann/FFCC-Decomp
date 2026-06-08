@@ -2834,32 +2834,34 @@ int CGObject::IsLoopAnim(int mode)
     if (model.m_anim != 0) {
         const float span = sAnimFrameOffset + (model.m_animEnd - model.m_animStart);
 
-        if (sAnimFrameOffset != span) {
-            float base;
-            if (mode != 0) {
-                base = m_turnSpeed;
-            } else {
-                base = model.m_time;
-            }
-
-            double threshold = static_cast<double>(base);
-
-            if (mode == 2) {
-                threshold = static_cast<double>(static_cast<float>(threshold + sLoopBias));
-            }
-
-            const float lastAttr = m_lastBgAttr;
-
-            if (static_cast<double>(lastAttr) < static_cast<double>(sZeroFloat)) {
-                return (static_cast<u32>(static_cast<u8>(
-                            (static_cast<double>(sZeroFloat) >= threshold) << 1))
-                        << 0x1C)
-                       >> 0x1D;
-            }
-
-            const double diff = static_cast<double>(span - sAnimFrameOffset);
-            return (static_cast<u32>(static_cast<u8>((diff < threshold) << 3)) << 0x1C) >> 0x1F;
+        if (sAnimFrameOffset == span) {
+            return 1;
         }
+
+        float base;
+        if (mode != 0) {
+            base = m_turnSpeed;
+        } else {
+            base = model.m_time;
+        }
+
+        double threshold = static_cast<double>(base);
+
+        if (mode == 2) {
+            threshold = static_cast<double>(static_cast<float>(threshold + sLoopBias));
+        }
+
+        const float lastAttr = m_lastBgAttr;
+
+        if (static_cast<double>(lastAttr) < static_cast<double>(sZeroFloat)) {
+            return (static_cast<u32>(static_cast<u8>(
+                        (static_cast<double>(sZeroFloat) >= threshold) << 1))
+                    << 0x1C)
+                   >> 0x1D;
+        }
+
+        const double diff = static_cast<double>(span - sAnimFrameOffset);
+        return (static_cast<u32>(static_cast<u8>((diff < threshold) << 3)) << 0x1C) >> 0x1F;
     }
 
     return 1;

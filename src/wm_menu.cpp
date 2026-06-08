@@ -12530,14 +12530,14 @@ int CMenuPcs::GetSameCharaData(Mc::SaveDat* source, Mc::SaveDat* target, int mem
 		result = index;
 	} while (count != 0);
 
-	if (strictMode != 0) {
-		return (static_cast<int>(result) < 8) - 4;
+	if (strictMode == 0) {
+		if (static_cast<int>(result) < 8) {
+			return result;
+		}
+		return -1;
 	}
 
-	if (static_cast<int>(result) < 8) {
-		return result;
-	}
-	return -1;
+	return (static_cast<int>(result) < 8) - 4;
 }
 
 /*

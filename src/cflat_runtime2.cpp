@@ -1290,8 +1290,9 @@ void CFlatRuntime2::Calc()
 {
 	u8* runtime = reinterpret_cast<u8*>(this);
 
-	for (int i = 0; i < 8; i++) {
-		CFlatLayerResource* layer = &LayerResources(this)[i];
+	char* base = reinterpret_cast<char*>(this);
+	for (int i = 0; i < 8; i++, base += sizeof(CFlatLayerResource)) {
+		CFlatLayerResource* layer = reinterpret_cast<CFlatLayerResource*>(base + 0x1770);
 		CFile::CHandle* fileHandle = layer->m_fileHandle;
 		if (fileHandle == 0) {
 			continue;
@@ -1716,9 +1717,11 @@ void CFlatRuntime2::loadLayer(int layerNo, char* fileName)
 
 		textureSet = new (getStage(), const_cast<char*>(sCFlatRuntime2FileTag), 0x4F4) CTextureSet;
 		LayerResources(this)[layerNo].m_textureSet = textureSet;
-		if (textureSet != 0) {
-			textureSet->Create(File.m_readBuffer, getStage(), 0, 0, 0, 0);
-		}
+		void* readBuffer = File.m_readBuffer;
+		textureSet->Create(
+			readBuffer,
+			GET_CHARA_ALLOC_STAGE_S(CharaPcs.m_charaAllocStage, Game.m_mainStage),
+			0, 0, 0, 0);
 
 		File.Close(fileHandle);
 	}

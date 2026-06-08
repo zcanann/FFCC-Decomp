@@ -1815,7 +1815,7 @@ void CMenuPcs::CmakeJobClose()
  */
 unsigned short CMenuPcs::CmakeJobCtrl()
 {
-    unsigned short down;
+    short down;
     unsigned short repeat;
 
     bool padBusy = false;

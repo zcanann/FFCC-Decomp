@@ -876,25 +876,26 @@ int CMes::GetWait()
 void CMes::addString(char** text, int branchMode)
 {
 	int fontSel = mFontIndex;
-	CFont* font;
+	CFont* setupFont;
 	switch (fontSel)
 	{
 	case 0:
-		font = MenuPcs.m_fonts[0];
+		setupFont = MenuPcs.m_fonts[0];
 		break;
 	case 2:
-		font = MenuPcs.m_fonts[2];
+		setupFont = MenuPcs.m_fonts[2];
 		break;
 	case 3:
-		font = MenuPcs.m_fonts[2];
+		setupFont = MenuPcs.m_fonts[2];
 		break;
 	}
 
-	font->SetShadow(mShadow);
-	font->SetMargin(kMesZero);
+	setupFont->SetShadow(mShadow);
+	setupFont->SetMargin(kMesZero);
 	float setupScaleY = mScaleY;
-	font->SetScaleX(mScaleX);
-	font->SetScaleY(setupScaleY);
+	setupFont->SetScaleX(mScaleX);
+	setupFont->SetScaleY(setupScaleY);
+	CFont* font = setupFont;
 
 	bool running = true;
 	unsigned char caseMode = 0;

@@ -2216,7 +2216,7 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
                     }
                     ++slot;
                     entry += 0xC30;
-                    if ((*reinterpret_cast<unsigned int*>(entry + 0x1794) != 0) &&
+                    if ((*reinterpret_cast<int*>(entry + 0x1794) != 0) &&
                         (*(entry + 0x1F96) != 1) &&
                         (*reinterpret_cast<unsigned short*>(entry + 0x17D0) == CmakeState(this)->m_select) &&
                         (*reinterpret_cast<unsigned short*>(entry + 0x17D4) == CmakeState(this)->m_row) &&

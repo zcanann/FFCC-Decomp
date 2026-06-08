@@ -2229,10 +2229,13 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 				setSta(0, calcSta(0, amount, reinterpret_cast<CGObject*>(sourceObj)));
 				setSta(4, 0);
 				Sound.StopSe3DGroup(m_particleId);
-				for (int i = 0; i < 0x16; i++) {
-					if (((1U << i) & 0x3bU) != 0) {
-						CFlatRuntime2Storage().DeleteParticleSlot(
-							*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x564 + i * 4), 1);
+				{
+					int i = 0;
+					unsigned char* slot = reinterpret_cast<unsigned char*>(this);
+					for (; i < 0x16; i++, slot += 4) {
+						if (((1U << i) & 0x3bU) != 0) {
+							CFlatRuntime2Storage().DeleteParticleSlot(*reinterpret_cast<int*>(slot + 0x564), 1);
+						}
 					}
 				}
 				changeStat(0, 0, 0);
@@ -2301,10 +2304,13 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			outValue = 0;
 			putHitParticleFromItem(sourceObj, amount);
 			Sound.StopSe3DGroup(m_particleId);
-			for (int i = 0; i < 0x16; i++) {
-				if (((1U << i) & 0x3bU) != 0) {
-					CFlatRuntime2Storage().DeleteParticleSlot(
-						*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x564 + i * 4), 1);
+			{
+				int i = 0;
+				unsigned char* slot = reinterpret_cast<unsigned char*>(this);
+				for (; i < 0x16; i++, slot += 4) {
+					if (((1U << i) & 0x3bU) != 0) {
+						CFlatRuntime2Storage().DeleteParticleSlot(*reinterpret_cast<int*>(slot + 0x564), 1);
+					}
 				}
 			}
 			changeStat(0, 0, 0);
@@ -2328,10 +2334,13 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			outValue = 0;
 			putHitParticleFromItem(sourceObj, amount);
 			Sound.StopSe3DGroup(m_particleId);
-			for (int i = 0; i < 0x16; i++) {
-				if (((1U << i) & 0x3bU) != 0) {
-					CFlatRuntime2Storage().DeleteParticleSlot(
-						*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x564 + i * 4), 1);
+			{
+				int i = 0;
+				unsigned char* slot = reinterpret_cast<unsigned char*>(this);
+				for (; i < 0x16; i++, slot += 4) {
+					if (((1U << i) & 0x3bU) != 0) {
+						CFlatRuntime2Storage().DeleteParticleSlot(*reinterpret_cast<int*>(slot + 0x564), 1);
+					}
 				}
 			}
 			changeStat(0, 0, 0);

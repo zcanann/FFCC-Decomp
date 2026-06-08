@@ -1227,9 +1227,21 @@ void CChara::CModel::setup()
 
 	AttachAnim(m_anim, -1, -1, 0);
 
-	CMaterialSet* materialSet = ModelMaterialSet(this);
-	if (materialSet != 0) {
-		materialSet->SetTextureSet(m_texSet);
+	CTextureSet* texSet = m_texSet;
+	if (texSet != m_texSet) {
+		if (m_texSet != 0) {
+			if (m_texSet->DecRef() == 0) {
+				delete m_texSet;
+			}
+			m_texSet = 0;
+		}
+		m_texSet = texSet;
+		if (m_texSet != 0) {
+			m_texSet->AddRef();
+		}
+	}
+	if (m_data->m_materialSet != 0) {
+		m_data->m_materialSet->SetTextureSet(m_texSet);
 	}
 }
 
@@ -1250,7 +1262,7 @@ CChara::CModel* CChara::CModel::Duplicate(CMemory::CStage* stage)
 	RetainRefCounted(ModelRef(clone));
 
 	const u16 nodeCount = ModelNodeCount(this);
-	CChara::CNode* cloneNodes = new (stage, const_cast<char*>("chara.cpp"), 0x263) CChara::CNode[nodeCount];
+	CChara::CNode* cloneNodes = new (stage, const_cast<char*>(s_chara_cpp), 0x263) CChara::CNode[nodeCount];
 	clone->m_nodes = cloneNodes;
 	for (u32 i = 0; i < nodeCount; i++) {
 		CChara::CNode* dst = &cloneNodes[i];
@@ -1262,13 +1274,11 @@ CChara::CModel* CChara::CModel::Duplicate(CMemory::CStage* stage)
 		NodePreviousQuat(dst) = NodePreviousQuat(src);
 		NodePreviousPosition(dst) = NodePreviousPosition(src);
 		NodePreviousScale(dst) = NodePreviousScale(src);
-		NodeAnimNode0(dst) = 0;
-		NodeAnimNode1(dst) = 0;
-		NodeRuntimeFlags(dst) = (NodeRuntimeFlags(dst) & 0x7F) | (NodeRuntimeFlags(src) & 0x80);
+		dst->m_flagsBits.m_flag_80 = src->m_flagsBits.m_flag_80;
 	}
 
 	const u16 meshCount = ModelMeshCount(this);
-	CChara::CMesh* cloneMeshes = new (stage, const_cast<char*>("chara.cpp"), 0x26C) CChara::CMesh[meshCount];
+	CChara::CMesh* cloneMeshes = new (stage, const_cast<char*>(s_chara_cpp), 0x26C) CChara::CMesh[meshCount];
 	clone->m_meshes = cloneMeshes;
 	for (u32 i = 0; i < meshCount; i++) {
 		CChara::CMesh* dst = &cloneMeshes[i];
@@ -2398,6 +2408,7 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 
 	if (anim != m_anim) {
 		ReleaseRefCounted(m_anim);
+		m_anim = 0;
 		m_anim = anim;
 		RetainRefCounted(m_anim);
 	}
@@ -2409,7 +2420,7 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 		NodeAnimNode0(node) = 0;
 		NodeAnimNode1(node) = 0;
 
-		MtxPtr localMtx = NodeRefLocalMtx(node);
+		MtxPtr localMtx = NodeLocalRuntimeMtx(node);
 		C_QUATMtx(&NodePreviousQuat(node), localMtx);
 		NodePreviousPosition(node).x = localMtx[0][3];
 		NodePreviousPosition(node).y = localMtx[1][3];

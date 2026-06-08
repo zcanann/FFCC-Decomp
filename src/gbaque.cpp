@@ -2295,16 +2295,15 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 
     unsigned short msgIndex = caravanWork->m_letters[letterIndex].HeaderWord();
     int mesIndex = (msgIndex & 0x7FC) >> 1;
-    char** mesPtr = reinterpret_cast<char**>(Game.m_cFlatDataArr[1].Data(3).m_data);
 
-    strcpy(srcText, mesPtr[mesIndex]);
+    strcpy(srcText, reinterpret_cast<char**>(Game.m_cFlatDataArr[1].Data(3).m_data)[mesIndex]);
     CMes::MakeAgbString(workText, srcText, caravanWork->m_genderFlag, 0);
     int totalSize = static_cast<int>(strlen(workText) + 1);
     memcpy(outData, workText, totalSize);
 
     memset(srcText, 0, kGbaQueueScratchTextSize);
     memset(workText, 0, kGbaQueueScratchTextSize);
-    strcpy(srcText, mesPtr[mesIndex + 1]);
+    strcpy(srcText, reinterpret_cast<char**>(Game.m_cFlatDataArr[1].Data(3).m_data)[mesIndex + 1]);
     CMes::MakeAgbString(workText, srcText, caravanWork->m_genderFlag, 0);
     int line2Size = static_cast<int>(strlen(workText));
     memcpy(outData + totalSize, workText, line2Size + 1);

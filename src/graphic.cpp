@@ -1636,7 +1636,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		          gxViewport, &projX, &projY, &projZ);
 
 		depthAlphaNear = static_cast<unsigned int>(projZ * 16777215.0f) >> 16;
-		if (depthAlphaNear > 0xFF) {
+		if (depthAlphaNear >= 0xFF) {
 			depthAlphaNear = 0xFF;
 		}
 		nearAlpha = (signed char)depthAlphaNear;

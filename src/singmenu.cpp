@@ -3129,7 +3129,7 @@ int CMenuPcs::SingWinMessHeight()
     float scaled = 22.0f * FLOAT_8032ea78;
     int lineHeight = static_cast<int>(scaled);
 
-    if (0.0f < scaled - static_cast<float>(lineHeight)) {
+    if (scaled - static_cast<float>(lineHeight) > 0.0f) {
         lineHeight += 1;
     }
     return lineHeight + 3;

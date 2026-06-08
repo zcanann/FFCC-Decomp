@@ -2673,17 +2673,15 @@ int GbaQueue::GetMapObj(unsigned char* outData)
 	outData[4] = static_cast<unsigned char>(mapObjWork.m_drawFlags >> 24);
 
 	for (i = 0; i < mapObjWork.m_count; i++) {
-		unsigned char* outEntry = outData + outSize;
-		outSize += 9;
-		outEntry[0] = workEntry->m_type;
-		outEntry[1] = static_cast<unsigned char>(workEntry->m_x);
-		outEntry[2] = static_cast<unsigned char>(static_cast<unsigned short>(workEntry->m_x) >> 8);
-		outEntry[3] = static_cast<unsigned char>(workEntry->m_y);
-		outEntry[4] = static_cast<unsigned char>(static_cast<unsigned short>(workEntry->m_y) >> 8);
-		outEntry[5] = static_cast<unsigned char>(workEntry->m_z);
-		outEntry[6] = static_cast<unsigned char>(static_cast<unsigned short>(workEntry->m_z) >> 8);
-		outEntry[7] = static_cast<unsigned char>(workEntry->m_radius);
-		outEntry[8] = static_cast<unsigned char>(static_cast<unsigned short>(workEntry->m_radius) >> 8);
+		outData[outSize++] = workEntry->m_type;
+		outData[outSize++] = static_cast<unsigned char>(workEntry->m_x);
+		outData[outSize++] = static_cast<unsigned char>(workEntry->m_x >> 8);
+		outData[outSize++] = static_cast<unsigned char>(workEntry->m_y);
+		outData[outSize++] = static_cast<unsigned char>(workEntry->m_y >> 8);
+		outData[outSize++] = static_cast<unsigned char>(workEntry->m_z);
+		outData[outSize++] = static_cast<unsigned char>(workEntry->m_z >> 8);
+		outData[outSize++] = static_cast<unsigned char>(workEntry->m_radius);
+		outData[outSize++] = static_cast<unsigned char>(workEntry->m_radius >> 8);
 
 		workEntry++;
 	}

@@ -3428,7 +3428,7 @@ void CGCharaObj::combi2()
 	int fallback = 0;
 	int comboIndex = searchCombi(candidateCount, candidates, fallback);
 	if (comboIndex < 0) {
-		if (fallback == 0 || candidates[0]->m_comboFrame > 0x41) {
+		if (fallback == 0 || candidates[0]->m_comboFrame >= 0x42) {
 			candidates[0]->m_comboState = 0;
 			candidates[0]->m_comboFrame = 0;
 			candidates[0]->addSubStat();
@@ -3456,7 +3456,7 @@ void CGCharaObj::combi2()
 		}
 	}
 
-	const short comboCmd = comboData[0xC];
+#define comboCmd (comboData[0xC])
 	const int isSharedResult = comboData[participantCount * 3 - 3] != 0x1F8;
 	if (isSharedResult) {
 		comboCenter.Identity();
@@ -3521,6 +3521,7 @@ void CGCharaObj::combi2()
 		}
 		CharaObjComboLinkCount(party) = linkCount;
 	}
+#undef comboCmd
 
 	combi2();
 }

@@ -984,7 +984,7 @@ void CGMonObj::frameStatFuncLKShooter()
 	goto resetBranch;
 
 state100:
-	self[0x63C] = (self[0x63C] & 0x7F) | 0x80;
+	reinterpret_cast<CGCharaObj*>(this)->m_unk63CBits.m_bit80 = 1;
 	if (*reinterpret_cast<int*>(self + 0x528) == 0) {
 		memset(&m_moveWork, 0, sizeof(m_moveWork));
 		m_moveWork.m_flags = 0x322;

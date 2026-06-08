@@ -1153,7 +1153,7 @@ void CGMonObj::onFrameStat()
 				}
 			}
 		} else {
-			if (Math.Rand(100) == 0) {
+			if (static_cast<unsigned int>(Math.Rand(100)) == 0) {
 				prgObj->changeSubStat(0);
 			}
 		}

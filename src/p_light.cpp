@@ -977,7 +977,7 @@ void CLightPcs::CBumpLight::MakeLightMap()
 
         GXLoadLightObjImm(&lightObj, (GXLightID)1);
 
-        unsigned int y = 0;
+        int y = 0;
         do {
             unsigned int yBase = y;
             GXBegin((GXPrimitive)0x98, (GXVtxFmt)0, 0x42);

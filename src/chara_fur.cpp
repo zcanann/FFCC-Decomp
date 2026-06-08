@@ -737,7 +737,9 @@ static inline unsigned short MogHeldButtons()
 	if (HasDebugPadOverride()) {
 		return 0;
 	}
-	return static_cast<unsigned short>(Pad.GetPadInputs()[0].button[0]);
+	int padIndex = 0;
+	padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+	return static_cast<unsigned short>(Pad.GetPadInputs()[padIndex].button[0]);
 }
 
 static inline unsigned short MogTriggerButtons()
@@ -745,7 +747,9 @@ static inline unsigned short MogTriggerButtons()
 	if (HasDebugPadOverride()) {
 		return 0;
 	}
-	return static_cast<unsigned short>(Pad.GetPadInputs()[0].buttonDown[0]);
+	int padIndex = 0;
+	padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+	return static_cast<unsigned short>(Pad.GetPadInputs()[padIndex].buttonDown[0]);
 }
 
 static inline int MogPadInt(int offset)
@@ -753,7 +757,9 @@ static inline int MogPadInt(int offset)
 	if (HasDebugPadOverride()) {
 		return 0;
 	}
-	return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Pad) + offset);
+	int padIndex = 0;
+	padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+	return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Pad) + padIndex * sizeof(CPad::PadInput) + offset);
 }
 
 static inline unsigned char MogRadarType()

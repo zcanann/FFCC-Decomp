@@ -1901,57 +1901,49 @@ void CFlatRuntime2::drawLayer(
 		for (int quad = 0; quad < 4; quad++) {
 			CColor texCol0;
 			CColor texCol1;
-			int bx = static_cast<int>(x0);
-			int by = static_cast<int>(y0);
-			int bw = pixelWidth;
-			int bh = pixelHeight;
 
+			float bx = x0;
 			if ((quad & 1) != 0) {
-				bx += pixelWidth;
+				bx = x0 + static_cast<float>(pixelWidth);
 			}
+			int rectX = static_cast<int>(bx);
+			float by = y0;
 			if ((quad & 2) != 0) {
-				by += pixelHeight;
+				by = y0 + static_cast<float>(pixelHeight);
 			}
+			int rectY = static_cast<int>(by);
 
 			short quadU0 = u0;
-			short quadV0 = v0;
-			short quadU1 = static_cast<short>(quadU0 + bw);
-			short quadV1 = static_cast<short>(quadV0 + bh);
 			if ((quad & 1) != 0) {
-				quadU0 = static_cast<short>(quadU0 + pixelWidth);
-				quadU1 = static_cast<short>(quadU0 + bw);
+				quadU0 = static_cast<short>(texU + static_cast<short>(pixelWidth));
 			}
+			short quadV0 = v0;
 			if ((quad & 2) != 0) {
-				quadV0 = static_cast<short>(quadV0 + pixelHeight);
-				quadV1 = static_cast<short>(quadV0 + bh);
+				quadV0 = static_cast<short>(texV + static_cast<short>(pixelHeight));
 			}
 
-			int rectX = bx;
-			int rectY = by;
-			int rectW = bw;
-			int rectH = bh;
+			int rectW = pixelWidth;
+			int rectH = pixelHeight;
 			_GXTexObj* backTex = Graphic.GetBackBufferRect(rectX, rectY, rectW, rectH, 0);
 			GXLoadTexObj(backTex, GX_TEXMAP1);
 
-			const float fx0 = static_cast<float>(rectX);
-			const float fy0 = static_cast<float>(rectY);
-			const float fx1 = static_cast<float>(rectX + rectW);
-			const float fy1 = static_cast<float>(rectY + rectH);
-
 			GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-			GXPosition3f32(fx0, fy0, FLOAT_80330144);
+			short quadU1 = static_cast<short>(quadU0 + static_cast<short>(rectW));
+			short quadV1 = static_cast<short>(quadV0 + static_cast<short>(rectH));
+
+			GXPosition3f32(static_cast<float>(rectX), static_cast<float>(rectY), FLOAT_80330144);
 			GXTexCoord2s16(quadU0, quadV0);
 			GXTexCoord2s16(0, 0);
 
-			GXPosition3f32(fx1, fy0, FLOAT_80330144);
+			GXPosition3f32(static_cast<float>(rectX + rectW), static_cast<float>(rectY), FLOAT_80330144);
 			GXTexCoord2s16(quadU1, quadV0);
 			GXTexCoord2s16(2, 0);
 
-			GXPosition3f32(fx1, fy1, FLOAT_80330144);
+			GXPosition3f32(static_cast<float>(rectX + rectW), static_cast<float>(rectY + rectH), FLOAT_80330144);
 			GXTexCoord2s16(quadU1, quadV1);
 			GXTexCoord2s16(2, 2);
 
-			GXPosition3f32(fx0, fy1, FLOAT_80330144);
+			GXPosition3f32(static_cast<float>(rectX), static_cast<float>(rectY + rectH), FLOAT_80330144);
 			GXTexCoord2s16(quadU0, quadV1);
 			GXTexCoord2s16(0, 2);
 		}

@@ -205,6 +205,9 @@ void CMenuPcs::CompaDraw()
 	int memberIndex = 0;
 	int shown = 0;
 	for (int i = 0; i < 8 && shown < familyCount; i++) {
+		float iconX = static_cast<float>(compaList->entries[0].x + 0x128);
+		float iconY = static_cast<float>(compaList->entries[0].y + 0x40);
+
 		int drawIndex = shown;
 		if (shown > 1) {
 			drawIndex = memberIndex;
@@ -237,8 +240,8 @@ void CMenuPcs::CompaDraw()
 
 		DrawSingleIcon(
 			icon,
-			static_cast<int>(compaList->entries[0].x + 0x128),
-			static_cast<int>(compaList->entries[0].y + 0x40 + shown * 0x28),
+			static_cast<int>(iconX),
+			static_cast<int>(iconY + static_cast<float>(shown * 0x28)),
 			compaList->entries[0].alpha, 1, kCompaOne);
 
 		shown++;

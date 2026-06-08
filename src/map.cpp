@@ -1636,7 +1636,8 @@ void CMapMng::SetLightSource()
         if (attr != 0) {
             const int type = attr->m_type;
 
-            if (type == CMapObjAtr::POINT_LIGHT) {
+            switch (type) {
+            case CMapObjAtr::POINT_LIGHT: {
                 CMapObjAtrPointLight* pointAttr = static_cast<CMapObjAtrPointLight*>(attr);
                 CLightPcs::CLight light;
                 light.m_type = 0;
@@ -1658,7 +1659,9 @@ void CMapMng::SetLightSource()
                 light.m_directionMode = pointAttr->m_unknown20;
                 LightPcs.Add(&light);
                 mapLightIndex += 1;
-            } else if (type == CMapObjAtr::SPOT_LIGHT) {
+                break;
+            }
+            case CMapObjAtr::SPOT_LIGHT: {
                 CMapObjAtrSpotLight* spotAttr = static_cast<CMapObjAtrSpotLight*>(attr);
                 if (*reinterpret_cast<int*>(&spotAttr->m_baseColor) != 0) {
                     CLightPcs::CLight* light = spotAttr->m_light;
@@ -1715,6 +1718,8 @@ void CMapMng::SetLightSource()
                     LightPcs.Add(&light);
                 }
                 mapLightIndex += 1;
+                break;
+            }
             }
         }
 

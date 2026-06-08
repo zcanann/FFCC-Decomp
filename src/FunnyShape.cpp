@@ -165,8 +165,8 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             const s8 numTex = m_textureCount;
             float minX = kFunnyShapeBoundsMaxInitial;
             float maxX = kFunnyShapeBoundsMinInitial;
-            float minY = kFunnyShapeBoundsMaxInitial;
-            float maxY = kFunnyShapeBoundsMinInitial;
+            float minY = minX;
+            float maxY = maxX;
             float drawAngle = angle;
             if ((s32)numTex > (s32)texIndex) {
                 GXLoadTexObj(reinterpret_cast<GXTexObj*>(m_texObjData[texIndex]), GX_TEXMAP0);

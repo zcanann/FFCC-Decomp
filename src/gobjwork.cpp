@@ -980,103 +980,131 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 
 		if ((condBits & 0x7FFF) != 0) {
 			int excludeFlag = condBits & 0x8000;
-			if ((condBits & 0x0001) != 0 && m_tribeId == 0) {
-				if (excludeFlag == 0) {
-					goto PassedPersonalConditions;
+			if ((condBits & 0x0001) != 0) {
+				if (m_tribeId == 0) {
+					if (excludeFlag == 0) {
+						goto PassedPersonalConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0001) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0002) != 0 && m_tribeId == 1) {
-				if (excludeFlag == 0) {
-					goto PassedPersonalConditions;
+			if ((condBits & 0x0002) != 0) {
+				if (m_tribeId == 1) {
+					if (excludeFlag == 0) {
+						goto PassedPersonalConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0002) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0004) != 0 && m_tribeId == 2) {
-				if (excludeFlag == 0) {
-					goto PassedPersonalConditions;
+			if ((condBits & 0x0004) != 0) {
+				if (m_tribeId == 2) {
+					if (excludeFlag == 0) {
+						goto PassedPersonalConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0004) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0008) != 0 && m_tribeId == 3) {
-				if (excludeFlag == 0) {
-					goto PassedPersonalConditions;
+			if ((condBits & 0x0008) != 0) {
+				if (m_tribeId == 3) {
+					if (excludeFlag == 0) {
+						goto PassedPersonalConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0008) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0010) != 0 && m_genderFlag == 0) {
-				if (excludeFlag == 0) {
-					goto PassedPersonalConditions;
+			if ((condBits & 0x0010) != 0) {
+				if (m_genderFlag == 0) {
+					if (excludeFlag == 0) {
+						goto PassedPersonalConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0010) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0020) != 0 && m_genderFlag == 1) {
-				if (excludeFlag == 0) {
-					goto PassedPersonalConditions;
+			if ((condBits & 0x0020) != 0) {
+				if (m_genderFlag == 1) {
+					if (excludeFlag == 0) {
+						goto PassedPersonalConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0020) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0040) != 0 && GetFoodRank(0) == 0) {
-				if (excludeFlag == 0) {
-					goto PassedPersonalConditions;
+			if ((condBits & 0x0040) != 0) {
+				if (GetFoodRank(0) == 0) {
+					if (excludeFlag == 0) {
+						goto PassedPersonalConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0040) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0080) != 0 && GetFoodRank(1) == 0) {
-				if (excludeFlag == 0) {
-					goto PassedPersonalConditions;
+			if ((condBits & 0x0080) != 0) {
+				if (GetFoodRank(1) == 0) {
+					if (excludeFlag == 0) {
+						goto PassedPersonalConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0080) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0100) != 0 && GetFoodRank(2) == 0) {
-				if (excludeFlag == 0) {
-					goto PassedPersonalConditions;
+			if ((condBits & 0x0100) != 0) {
+				if (GetFoodRank(2) == 0) {
+					if (excludeFlag == 0) {
+						goto PassedPersonalConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0100) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0200) != 0 && GetFoodRank(3) == 0) {
-				if (excludeFlag == 0) {
-					goto PassedPersonalConditions;
+			if ((condBits & 0x0200) != 0) {
+				if (GetFoodRank(3) == 0) {
+					if (excludeFlag == 0) {
+						goto PassedPersonalConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0200) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0400) != 0 && GetFoodRank(4) == 0) {
-				if (excludeFlag == 0) {
-					goto PassedPersonalConditions;
+			if ((condBits & 0x0400) != 0) {
+				if (GetFoodRank(4) == 0) {
+					if (excludeFlag == 0) {
+						goto PassedPersonalConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0400) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0800) != 0 && GetFoodRank(5) == 0) {
-				if (excludeFlag == 0) {
-					goto PassedPersonalConditions;
+			if ((condBits & 0x0800) != 0) {
+				if (GetFoodRank(5) == 0) {
+					if (excludeFlag == 0) {
+						goto PassedPersonalConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0800) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x1000) != 0 && GetFoodRank(6) == 0) {
-				if (excludeFlag == 0) {
-					goto PassedPersonalConditions;
+			if ((condBits & 0x1000) != 0) {
+				if (GetFoodRank(6) == 0) {
+					if (excludeFlag == 0) {
+						goto PassedPersonalConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x1000) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x2000) != 0 && GetFoodRank(7) == 0) {
-				if (excludeFlag == 0) {
-					goto PassedPersonalConditions;
+			if ((condBits & 0x2000) != 0) {
+				if (GetFoodRank(7) == 0) {
+					if (excludeFlag == 0) {
+						goto PassedPersonalConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x2000) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
 
 			if (excludeFlag == 0) {
@@ -1088,110 +1116,140 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 		condBits = curLetter->m_linkConditions;
 		if ((condBits & 0x7FFF) != 0) {
 			int excludeFlag = condBits & 0x8000;
-			if ((condBits & 0x0001) != 0 && unk_0x3ac == 0) {
-				if (excludeFlag == 0) {
-					goto PassedLinkConditions;
+			if ((condBits & 0x0001) != 0) {
+				if (unk_0x3ac == 0) {
+					if (excludeFlag == 0) {
+						goto PassedLinkConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0001) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0002) != 0 && unk_0x3ac == 1) {
-				if (excludeFlag == 0) {
-					goto PassedLinkConditions;
+			if ((condBits & 0x0002) != 0) {
+				if (unk_0x3ac == 1) {
+					if (excludeFlag == 0) {
+						goto PassedLinkConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0002) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0004) != 0 && unk_0x3ac == 2) {
-				if (excludeFlag == 0) {
-					goto PassedLinkConditions;
+			if ((condBits & 0x0004) != 0) {
+				if (unk_0x3ac == 2) {
+					if (excludeFlag == 0) {
+						goto PassedLinkConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0004) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0008) != 0 && unk_0x3ac == 3) {
-				if (excludeFlag == 0) {
-					goto PassedLinkConditions;
+			if ((condBits & 0x0008) != 0) {
+				if (unk_0x3ac == 3) {
+					if (excludeFlag == 0) {
+						goto PassedLinkConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0008) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0010) != 0 && unk_0x3ac == 4) {
-				if (excludeFlag == 0) {
-					goto PassedLinkConditions;
+			if ((condBits & 0x0010) != 0) {
+				if (unk_0x3ac == 4) {
+					if (excludeFlag == 0) {
+						goto PassedLinkConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0010) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0020) != 0 && unk_0x3ac == 5) {
-				if (excludeFlag == 0) {
-					goto PassedLinkConditions;
+			if ((condBits & 0x0020) != 0) {
+				if (unk_0x3ac == 5) {
+					if (excludeFlag == 0) {
+						goto PassedLinkConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0020) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0040) != 0 && unk_0x3ac == 6) {
-				if (excludeFlag == 0) {
-					goto PassedLinkConditions;
+			if ((condBits & 0x0040) != 0) {
+				if (unk_0x3ac == 6) {
+					if (excludeFlag == 0) {
+						goto PassedLinkConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0040) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0080) != 0 && unk_0x3ac == 7) {
-				if (excludeFlag == 0) {
-					goto PassedLinkConditions;
+			if ((condBits & 0x0080) != 0) {
+				if (unk_0x3ac == 7) {
+					if (excludeFlag == 0) {
+						goto PassedLinkConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0080) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0100) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][1] != 0) {
-				if (excludeFlag == 0) {
-					goto PassedLinkConditions;
+			if ((condBits & 0x0100) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][1] != 0) {
+					if (excludeFlag == 0) {
+						goto PassedLinkConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0100) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0200) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][2] != 0) {
-				if (excludeFlag == 0) {
-					goto PassedLinkConditions;
+			if ((condBits & 0x0200) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][2] != 0) {
+					if (excludeFlag == 0) {
+						goto PassedLinkConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0200) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0400) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][3] != 0) {
-				if (excludeFlag == 0) {
-					goto PassedLinkConditions;
+			if ((condBits & 0x0400) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][3] != 0) {
+					if (excludeFlag == 0) {
+						goto PassedLinkConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0400) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0800) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][4] != 0) {
-				if (excludeFlag == 0) {
-					goto PassedLinkConditions;
+			if ((condBits & 0x0800) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][4] != 0) {
+					if (excludeFlag == 0) {
+						goto PassedLinkConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0800) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x1000) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][5] != 0) {
-				if (excludeFlag == 0) {
-					goto PassedLinkConditions;
+			if ((condBits & 0x1000) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][5] != 0) {
+					if (excludeFlag == 0) {
+						goto PassedLinkConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x1000) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x2000) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][6] != 0) {
-				if (excludeFlag == 0) {
-					goto PassedLinkConditions;
+			if ((condBits & 0x2000) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][6] != 0) {
+					if (excludeFlag == 0) {
+						goto PassedLinkConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x2000) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x4000) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][7] != 0) {
-				if (excludeFlag == 0) {
-					goto PassedLinkConditions;
+			if ((condBits & 0x4000) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][7] != 0) {
+					if (excludeFlag == 0) {
+						goto PassedLinkConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x4000) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
 
 			if (excludeFlag == 0) {
@@ -1203,103 +1261,131 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 		condBits = curLetter->m_linkValueConditions;
 		if ((condBits & 0x7FFF) != 0) {
 			int excludeFlag = condBits & 0x8000;
-			if ((condBits & 0x0001) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][1] >= 0x3D) {
-				if (excludeFlag == 0) {
-					goto PassedLinkValueConditions;
+			if ((condBits & 0x0001) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][1] >= 0x3D) {
+					if (excludeFlag == 0) {
+						goto PassedLinkValueConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0001) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0002) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][2] >= 0x3D) {
-				if (excludeFlag == 0) {
-					goto PassedLinkValueConditions;
+			if ((condBits & 0x0002) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][2] >= 0x3D) {
+					if (excludeFlag == 0) {
+						goto PassedLinkValueConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0002) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0004) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][3] >= 0x3D) {
-				if (excludeFlag == 0) {
-					goto PassedLinkValueConditions;
+			if ((condBits & 0x0004) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][3] >= 0x3D) {
+					if (excludeFlag == 0) {
+						goto PassedLinkValueConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0004) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0008) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][4] >= 0x3D) {
-				if (excludeFlag == 0) {
-					goto PassedLinkValueConditions;
+			if ((condBits & 0x0008) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][4] >= 0x3D) {
+					if (excludeFlag == 0) {
+						goto PassedLinkValueConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0008) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0010) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][5] >= 0x3D) {
-				if (excludeFlag == 0) {
-					goto PassedLinkValueConditions;
+			if ((condBits & 0x0010) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][5] >= 0x3D) {
+					if (excludeFlag == 0) {
+						goto PassedLinkValueConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0010) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0020) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][6] >= 0x3D) {
-				if (excludeFlag == 0) {
-					goto PassedLinkValueConditions;
+			if ((condBits & 0x0020) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][6] >= 0x3D) {
+					if (excludeFlag == 0) {
+						goto PassedLinkValueConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0020) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0040) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][7] >= 0x3D) {
-				if (excludeFlag == 0) {
-					goto PassedLinkValueConditions;
+			if ((condBits & 0x0040) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][7] >= 0x3D) {
+					if (excludeFlag == 0) {
+						goto PassedLinkValueConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0040) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0100) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][1] > 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][1] <= 0x28) {
-				if (excludeFlag == 0) {
-					goto PassedLinkValueConditions;
+			if ((condBits & 0x0100) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][1] > 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][1] <= 0x28) {
+					if (excludeFlag == 0) {
+						goto PassedLinkValueConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0100) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0200) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][2] > 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][2] <= 0x28) {
-				if (excludeFlag == 0) {
-					goto PassedLinkValueConditions;
+			if ((condBits & 0x0200) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][2] > 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][2] <= 0x28) {
+					if (excludeFlag == 0) {
+						goto PassedLinkValueConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0200) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0400) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][3] > 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][3] <= 0x28) {
-				if (excludeFlag == 0) {
-					goto PassedLinkValueConditions;
+			if ((condBits & 0x0400) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][3] > 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][3] <= 0x28) {
+					if (excludeFlag == 0) {
+						goto PassedLinkValueConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0400) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x0800) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][4] > 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][4] <= 0x28) {
-				if (excludeFlag == 0) {
-					goto PassedLinkValueConditions;
+			if ((condBits & 0x0800) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][4] > 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][4] <= 0x28) {
+					if (excludeFlag == 0) {
+						goto PassedLinkValueConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x0800) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x1000) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][5] > 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][5] <= 0x28) {
-				if (excludeFlag == 0) {
-					goto PassedLinkValueConditions;
+			if ((condBits & 0x1000) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][5] > 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][5] <= 0x28) {
+					if (excludeFlag == 0) {
+						goto PassedLinkValueConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x1000) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x2000) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][6] > 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][6] <= 0x28) {
-				if (excludeFlag == 0) {
-					goto PassedLinkValueConditions;
+			if ((condBits & 0x2000) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][6] > 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][6] <= 0x28) {
+					if (excludeFlag == 0) {
+						goto PassedLinkValueConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x2000) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
-			if ((condBits & 0x4000) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][7] > 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][7] <= 0x28) {
-				if (excludeFlag == 0) {
-					goto PassedLinkValueConditions;
+			if ((condBits & 0x4000) != 0) {
+				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][7] > 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][7] <= 0x28) {
+					if (excludeFlag == 0) {
+						goto PassedLinkValueConditions;
+					}
+				} else if (excludeFlag != 0) {
+					goto NextLetter;
 				}
-			} else if ((condBits & 0x4000) != 0 && excludeFlag != 0) {
-				goto NextLetter;
 			}
 
 			if (excludeFlag == 0) {

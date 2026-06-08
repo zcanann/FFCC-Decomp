@@ -1615,9 +1615,10 @@ void CCharaPcs::LoadCam(int index, char* fileName)
         cameraBuffer = new (m_viewerAnimStage, s_p_chara_cpp, 0x4D4)
             CCameraFrame[static_cast<unsigned long>(m_cameraFrameCount[index])];
 
-        CCameraFrame::Value* values = reinterpret_cast<CCameraFrame::Value*>(cameraBuffer);
-        for (int i = 0; i < m_cameraFrameCount[index] * 8; i++) {
-            values[i].m_float = chunkFile.GetF4();
+        for (int frame = 0; frame < m_cameraFrameCount[index]; frame++) {
+            for (int j = 0; j < 8; j++) {
+                reinterpret_cast<CCameraFrame::Value*>(cameraBuffer)[frame * 8 + j].m_float = chunkFile.GetF4();
+            }
         }
     }
 

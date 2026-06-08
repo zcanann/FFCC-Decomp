@@ -190,7 +190,7 @@ int CMenuPcs::EquipClose0()
 	int result = 0;
 	if (itemCount == doneCount) {
 		EquipOpenAnim* selected = &GetEquipListStorage(this)->entries[GetEquipMenuState(this)->selectedIndex];
-		selected->x = (s16)(int)-(((double)selected->w - kEquipIntToDoubleBias) * kEquipHalfDouble - kEquipWindowCenterX);
+		selected->x = (s16)(int)-((double)selected->w * kEquipHalfDouble - kEquipWindowCenterX);
 		result = 1;
 	}
 
@@ -699,7 +699,8 @@ int CMenuPcs::EquipClose()
 		if (0 < (int)n) {
 			unsigned int blocks = n >> 3;
 			if (blocks != 0) {
-				do {
+				unsigned int b;
+				for (b = 0; b < blocks; b++) {
 					item[0].startFrame = 0;
 					item[0].duration = 1;
 					item[0].alpha = fVar1;
@@ -725,8 +726,7 @@ int CMenuPcs::EquipClose()
 					item[7].duration = 1;
 					item[7].alpha = fVar1;
 					item += 8;
-					blocks = blocks - 1;
-				} while (blocks != 0);
+				}
 				n = n & 7;
 				if (n == 0) {
 					return 1;
@@ -795,11 +795,13 @@ void CMenuPcs::EquipCtrl()
 
 		unsigned int slotCount = (unsigned int)caravanWork->m_numCmdListSlots;
 		index = 0;
-		int byteOff = (slotCount - 1) * 0x40;
-		if (-1 < (int)(slotCount - 1)) {
+		int count1 = slotCount - 1;
+		int byteOff = count1 * 0x40;
+		if (count1 >= 0) {
 			blockCount = slotCount >> 3;
 			if (blockCount != 0) {
-				do {
+				unsigned int bc;
+				for (bc = 0; bc < blockCount; bc++) {
 					int p;
 					p = *(int*)&this->m_equipList + byteOff;
 					*(int*)(p + 0x2c) = index++;
@@ -826,8 +828,7 @@ void CMenuPcs::EquipCtrl()
 					byteOff = byteOff + -0x200;
 					*(int*)(p + -0x194) = index++;
 					*(int*)(p + -0x190) = 3;
-					blockCount = blockCount - 1;
-				} while (blockCount != 0);
+				}
 				slotCount = slotCount & 7;
 				if (slotCount == 0) {
 					return;
@@ -956,31 +957,30 @@ int CMenuPcs::EquipOpen()
 
 		iVar6 = 0;
 		entry = GetEquipListStorage(this)->entries;
-		iVar11 = 2;
-		do {
+		for (iVar11 = 0; iVar11 < 2; iVar11++) {
 			entry[0].tex = 0x34;
 			entry[0].w = 200;
 			entry[0].h = 0x28;
-			entry[0].x = (s16)(int)-(((double)entry[0].w - dVar4) * dVar3 - dVar2);
-			entry[0].y = (s16)iVar6 * (entry[0].h - 8) + 0x60;
+			entry[0].x = (s16)(int)-((double)entry[0].w * dVar3 - dVar2);
+			entry[0].y = iVar6 * (entry[0].h - 8) + 0x60;
 			entry[0].u = fVar1;
 			entry[0].v = fVar1;
 			entry[0].startFrame = iVar6;
+			iVar6++;
 			entry[0].duration = 3;
 
 			entry[1].tex = 0x34;
 			entry[1].w = 200;
 			entry[1].h = 0x28;
-			entry[1].x = (s16)(int)-(((double)entry[1].w - dVar4) * dVar3 - dVar2);
-			entry[1].y = (s16)(iVar6 + 1) * (entry[1].h - 8) + 0x60;
+			entry[1].x = (s16)(int)-((double)entry[1].w * dVar3 - dVar2);
+			entry[1].y = iVar6 * (entry[1].h - 8) + 0x60;
 			entry[1].u = fVar1;
 			entry[1].v = fVar1;
-			entry[1].startFrame = iVar6 + 1;
-			iVar6 += 2;
+			entry[1].startFrame = iVar6;
+			iVar6++;
 			entry[1].duration = 3;
 			entry += 2;
-			iVar11--;
-		} while (iVar11 != 0);
+		}
 
 		GetEquipListStorage(this)->count = 4;
 		EquipInit1();

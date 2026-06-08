@@ -1043,12 +1043,10 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
                 } else if (i < 3) {
                     if (i == 1) {
                         cameraPos.z += kYmManaOne;
-                    } else if (i < 1) {
-                        if (-1 < i) {
-                            cameraPos.x += kYmManaOne;
-                        }
-                    } else {
+                    } else if (i >= 2) {
                         cameraPos.x -= kYmManaOne;
+                    } else if (i >= 0) {
+                        cameraPos.x += kYmManaOne;
                     }
                 } else if (i == 5) {
                     cameraPos.y -= kYmManaOne;

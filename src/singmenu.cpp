@@ -2228,8 +2228,8 @@ void CMenuPcs::SingleDrawCtrl()
                                      0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x28));
-    unsigned int step = 0x20;
-    for (unsigned int y = 0x40; y < 0x180; y += step) {
+    int step = 0x20;
+    for (int y = 0x40; y < 0x180; y += step) {
         if ((0x180 - y) < step) {
             step = 0x180 - y;
         }
@@ -2243,7 +2243,12 @@ void CMenuPcs::SingleDrawCtrl()
         DrawInit();
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-        GXSetChanMatColor(GX_COLOR0A0, white);
+        _GXColor white2;
+        white2.r = 0xFF;
+        white2.g = 0xFF;
+        white2.b = 0xFF;
+        white2.a = 0xFF;
+        GXSetChanMatColor(GX_COLOR0A0, white2);
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x21));
         MenuPcs.DrawRect(0, 32.0f, 24.0f, 176.0f, 288.0f,
                                          0.0f, 0.0f, 1.0f, 1.0f, 0.0f);

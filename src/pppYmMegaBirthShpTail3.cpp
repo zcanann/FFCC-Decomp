@@ -862,7 +862,7 @@ path:
                 particleData->m_matrix[0][2] = vz * pYmMegaBirthShpTail3->m_speedScaleYZ.y;
 
                 if ((paramBytes[0x18] == 8) || (paramBytes[0x18] == 9)) {
-                    Vec velocity = *reinterpret_cast<Vec*>(particleData->m_matrix[1]);
+                    Vec velocity = *reinterpret_cast<Vec*>(particleData->m_matrix[0]);
                     pppNormalize(*reinterpret_cast<Vec*>(particleData->m_matrix[1]), velocity);
                 }
             }

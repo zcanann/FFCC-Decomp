@@ -4399,16 +4399,16 @@ int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
 
 				*reinterpret_cast<unsigned short*>(scouterEntry + 4) = SwapU16(enemyWork->m_maxHp);
 
-				if (*reinterpret_cast<short*>(enemyEntry + 0xE) < 1) {
+				if (*reinterpret_cast<short*>(enemyEntry + 0xE) > 0) {
+					scouterEntry[6] = 0xFF;
+					scouterEntry[7] = 0xFF;
+				} else {
 					const unsigned short scouterValue = *reinterpret_cast<unsigned short*>(enemyEntry + 0xC);
 					if ((static_cast<short>(scouterValue) < 1) || ((scouterValue & 0xC000) == 0x4000)) {
 						*reinterpret_cast<unsigned short*>(scouterEntry + 6) = 0;
 					} else {
 						*reinterpret_cast<unsigned short*>(scouterEntry + 6) = SwapU16(scouterValue);
 					}
-				} else {
-					scouterEntry[6] = 0xFF;
-					scouterEntry[7] = 0xFF;
 				}
 
 				const unsigned short enemyFlags = *reinterpret_cast<unsigned short*>(enemyDataBase + 0x10E);

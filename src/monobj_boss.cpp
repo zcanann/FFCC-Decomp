@@ -2260,9 +2260,9 @@ void CGMonObj::initFinishedFuncDuct()
 void CGMonObj::damagedFuncDuct()
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
-	int pdtNo = object->m_charaModelHandle->GetPdtSlot();
 	void* scriptKind = object->m_scriptHandle[4];
 	int slot = reinterpret_cast<int>(scriptKind) - 0x8E;
+	int pdtNo = object->m_charaModelHandle->GetPdtSlot();
 	reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 2, 0, object, kMonObjBossOne, 0);
 
 	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x1C) == 0) {

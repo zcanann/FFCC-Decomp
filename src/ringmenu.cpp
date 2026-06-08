@@ -949,7 +949,7 @@ void CRingMenu::onCalc()
 			gbaConnected = 0;
 		}
 
-		if (m_gbaConnectedFlag != static_cast<int>(gbaConnected)) {
+		if (m_gbaConnectedFlag != static_cast<unsigned int>(gbaConnected)) {
 			m_gbaConnectedFlag = static_cast<int>(gbaConnected);
 			m_gbaAnimCounter = 0x0C - m_gbaAnimCounter;
 		}

@@ -2725,7 +2725,7 @@ void CMapMng::Draw()
             GXSetZMode(1, GX_LEQUAL, 1);
             LightPcs.SetNumDiffuse(0);
 
-            unsigned int shadowCount = CharaPcs.GetNumTexShadow();
+            int shadowCount = CharaPcs.GetNumTexShadow();
             if (shadowCount != 0) {
                 _GXTexObj texObjs[8];
                 Vec shadowPositions[8];
@@ -2749,7 +2749,7 @@ void CMapMng::Draw()
 
                 int startIndex = 0;
                 do {
-                    unsigned int batchCount = 8;
+                    int batchCount = 8;
                     if (shadowCount < batchCount) {
                         batchCount = shadowCount;
                     }
@@ -2758,7 +2758,7 @@ void CMapMng::Draw()
 
                     int texMtx = 0x1E;
                     int stage = 0;
-                    for (unsigned int i = 0; i < batchCount; i++) {
+                    for (int i = 0; i < batchCount; i++) {
                         GXLoadTexMtxImm(shadowMatrices[i], texMtx, GX_MTX2x4);
                         GXLoadTexObj(&texObjs[i], static_cast<GXTexMapID>(i));
                         GXSetTexCoordGen2(

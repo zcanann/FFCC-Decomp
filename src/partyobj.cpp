@@ -878,13 +878,13 @@ void CGPartyObj::onFrameAlways()
 		} else {
 			shieldItem = 0;
 		}
-		if (shieldItem <= 0) {
-			LoadShield(-1);
-		} else {
+		if (shieldItem > 0) {
 			int shieldModel = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + shieldItem * 0x48 + 2) & 0xFFF;
 			if (m_shieldModelHandle == nullptr || static_cast<unsigned int>(m_shieldModelHandle->m_charaNo) != static_cast<unsigned int>(shieldModel)) {
 				LoadShield(shieldModel);
 			}
+		} else {
+			LoadShield(-1);
 		}
 	} else {
 		LoadWeapon(-1, 0);
@@ -898,7 +898,7 @@ void CGPartyObj::onFrameAlways()
 	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 28) & 0xC0000000) >> 31) != 0) &&
 	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 29) & 0xC0000000) >> 31) != 0) &&
 	    ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) << 24) & 0xC0000000) >> 31) != 0) &&
-	     (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(static_cast<unsigned char>(m_weaponNodeFlags >> 8)) << 24) & 0xC0000000) >> 31) != 0)) &&
+	     (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1)) << 24) & 0xC0000000) >> 31) != 0)) &&
 	    (m_lastStateId != 6 && m_lastStateId != 2)) {
 		if ((Game.m_gameWork.m_menuStageMode == 0) ||
 		    (Game.m_gameWork.m_bossArtifactStageIndex >= 0x0F) ||

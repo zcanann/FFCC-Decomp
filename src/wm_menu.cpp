@@ -10685,21 +10685,18 @@ void CMenuPcs::DrawMainMenuSub()
 			int remaining = 5 - next;
 			float* fpInner = depthValues + next;
 			unsigned int* opInner = drawOrder + next;
-			if (next < 5) {
-				do {
-					float depth = *fp;
-					if (*fp > *fpInner) {
-						unsigned int idx = *op;
-						unsigned int idxInner = *opInner;
-						*fp = *fpInner;
-						*op = idxInner;
-						*fpInner = depth;
-						*opInner = idx;
-					}
-					fpInner++;
-					opInner++;
-					remaining--;
-				} while (remaining != 0);
+			for (int k = 0; k < remaining; k++) {
+				float depth = *fp;
+				if (*fp > *fpInner) {
+					unsigned int idx = *op;
+					unsigned int idxInner = *opInner;
+					*fp = *fpInner;
+					*op = idxInner;
+					*fpInner = depth;
+					*opInner = idx;
+				}
+				fpInner++;
+				opInner++;
 			}
 			op++;
 			fp++;

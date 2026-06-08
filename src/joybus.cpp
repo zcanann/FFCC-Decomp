@@ -3376,8 +3376,8 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
 
     OSSignalSemaphore(&m_accessSemaphores[port]);
 
-    const unsigned char cmd = static_cast<unsigned char>(localWord & 0x3F);
-    const unsigned char seq = static_cast<unsigned char>((localWord >> 8) & 0xFF);
+    const signed char cmd = static_cast<unsigned char>(localWord & 0x3F);
+    const unsigned char seq = static_cast<signed char>((localWord >> 8) & 0xFF);
 
     if (cmd == 7)
     {
@@ -3443,7 +3443,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
     {
         if (step == 0)
         {
-            unsigned char type = sendType;
+            signed char type = sendType;
 
             if (type != 3 && type != 2 && type != 6 && type != 7 && type != 8 && type != 9)
             {
@@ -3796,7 +3796,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
     {
         unsigned char* p = dataBase;
 
-        unsigned char b0 = *p++;
+        signed char b0 = *p++;
         unsigned char b1 = *p++;
         unsigned char b2 = *p++;
 

@@ -6613,7 +6613,7 @@ int JoyBus::SetCtrlMode(int portIndex, int controlMode)
 	}
 
     unsigned char modeFlag =
-        (unsigned char)(((unsigned int)-controlMode >> 24) | ((unsigned int)controlMode >> 24)) >> 7;
+        (unsigned char)(((unsigned int)(controlMode | -controlMode)) >> 31);
     bool isSinglePort = GbaQue.IsSingleMode(m_threadParams[portIndex].m_portIndex);
 
     if (isSinglePort)
@@ -6621,8 +6621,10 @@ int JoyBus::SetCtrlMode(int portIndex, int controlMode)
         modeFlag = 0;
 	}
 
-    const unsigned short opcode = 0x0900;
-    const unsigned int cmd = MakeJoyCmd16(opcode, modeFlag, 0);
+    unsigned int cmd;
+    unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
+    cmdBytes[0] = 0x09;
+    cmdBytes[1] = modeFlag;
 
     int result = 0;
 

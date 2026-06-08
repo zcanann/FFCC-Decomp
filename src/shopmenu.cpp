@@ -3389,7 +3389,7 @@ void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, flo
 
     MaterialMan.SetMaterialMenu(
         ppvEnv->m_materialSetPtr,
-        static_cast<int>(*reinterpret_cast<signed char*>(reinterpret_cast<unsigned char*>(shape) + 10)), 0);
+        static_cast<int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(shape) + 10)), 0);
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
     GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);

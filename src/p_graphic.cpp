@@ -353,14 +353,12 @@ void CGraphicPcs::drawScreenFade()
                 _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
                 GXLoadTexObj(&Graphic.m_smallBackTexObj, GX_TEXMAP0);
 
-                const float phase = slotData->m_phase;
-                const float stretch = slotData->m_stretch;
                 const float amp = slotData->m_amplitude * (kGraphicOne - t);
-                const float size = amp + kGraphicOne;
-                const float offX = stretch * (kGraphicScreenCenterX * amp) * (float)sin((double)phase);
-                const float offY = stretch * (kGraphicScreenCenterY * amp) * (float)cos((double)phase);
+                const float offX = slotData->m_stretch * ((kGraphicScreenCenterX * amp) * (float)sin((double)slotData->m_phase));
+                const float offY = slotData->m_stretch * ((kGraphicScreenCenterY * amp) * (float)cos((double)slotData->m_phase));
                 const float cx = kGraphicScreenCenterX + offX;
                 const float cy = kGraphicScreenCenterY + offY;
+                const float size = amp + kGraphicOne;
                 const float w = kGraphicScreenCenterX * size;
                 const float h = kGraphicScreenCenterY * size;
 

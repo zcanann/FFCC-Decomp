@@ -2306,7 +2306,7 @@ void CGoOutMenu::CalcDel()
         m_cursorListY1 = 0xbc;
         m_cursorMode = 0;
         {
-            unsigned char next = 0;
+            unsigned char next;
 
             if (MenuPcs.m_menuWindowInfo->state == 1) {
                 input = GetGoOutInputMask();
@@ -2322,10 +2322,13 @@ void CGoOutMenu::CalcDel()
                             Sound.PlaySe(3, 0x40, 0x7f, 0);
                         }
                         next = static_cast<signed char>(m_cursorChoice + 1);
+                        goto do_switch_del3;
                     }
                 }
             }
 
+            next = 0;
+        do_switch_del3:
             switch (next) {
             case 1:
                 SetDelMode(4);
@@ -2360,7 +2363,7 @@ void CGoOutMenu::CalcDel()
         m_cursorListY1 = 0xd1;
         m_cursorMode = 0;
         {
-            unsigned char next = 0;
+            unsigned char next;
 
             if (MenuPcs.m_menuWindowInfo->state == 1) {
                 input = GetGoOutInputMask();
@@ -2376,10 +2379,13 @@ void CGoOutMenu::CalcDel()
                             Sound.PlaySe(3, 0x40, 0x7f, 0);
                         }
                         next = static_cast<unsigned char>(m_cursorChoice + 1);
+                        goto do_switch_del4;
                     }
                 }
             }
 
+            next = 0;
+        do_switch_del4:
             switch (next) {
             case 1:
                 SetDelMode(5);
@@ -2427,7 +2433,7 @@ void CGoOutMenu::CalcDel()
         m_cursorListY1 = 0xe9;
         m_cursorMode = 0;
         {
-            unsigned char next = 0;
+            unsigned char next;
 
             if (MenuPcs.m_menuWindowInfo->state == 1) {
                 input = GetGoOutInputMask();
@@ -2443,10 +2449,13 @@ void CGoOutMenu::CalcDel()
                             Sound.PlaySe(3, 0x40, 0x7f, 0);
                         }
                         next = static_cast<signed char>(m_cursorChoice + 1);
+                        goto do_switch_del6;
                     }
                 }
             }
 
+            next = 0;
+        do_switch_del6:
             switch (next) {
             case 1:
                 SetDelMode(7);
@@ -2481,7 +2490,7 @@ void CGoOutMenu::CalcDel()
         m_cursorListY1 = 0xdb;
         m_cursorMode = 0;
         {
-            unsigned char next = 0;
+            unsigned char next;
 
             if (MenuPcs.m_menuWindowInfo->state == 1) {
                 input = GetGoOutInputMask();
@@ -2497,10 +2506,13 @@ void CGoOutMenu::CalcDel()
                             Sound.PlaySe(3, 0x40, 0x7f, 0);
                         }
                         next = static_cast<unsigned char>(m_cursorChoice + 1);
+                        goto do_switch_del7;
                     }
                 }
             }
 
+            next = 0;
+        do_switch_del7:
             switch (next) {
             case 1:
                 Game.m_caravanWorkArr[m_selectedChara].m_shopBusyFlag = 0;

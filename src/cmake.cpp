@@ -2464,7 +2464,7 @@ void CMenuPcs::CmakeNameDraw()
         frame = 0;
     }
 
-    unsigned short mode = CmakeState(this)->m_mode;
+    short mode = CmakeState(this)->m_mode;
     float alpha;
     if (mode == 0) {
         alpha = static_cast<float>(0.1 * static_cast<double>(frame));
@@ -2560,7 +2560,7 @@ void CMenuPcs::CmakeNameDraw()
 
     if ((CmakeState(this)->m_mode == 1) && (CmakeState(this)->m_row < 5)) {
         unsigned short row = CmakeState(this)->m_row;
-        int cellX = static_cast<int>(
+        unsigned int cellX = static_cast<int>(
             26.9f * static_cast<float>(CmakeState(this)->m_select) +
             static_cast<float>(240.0f));
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);

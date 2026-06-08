@@ -650,8 +650,7 @@ void CMenuPcs::FavoInit()
 	setupEntry->duration = 5;
 
 	FavoEntry* firstEntry = m_favoList->entries;
-	iVar17 = 4;
-	do {
+	for (iVar17 = 0; iVar17 < 4; iVar17++) {
 		setupEntry = &m_favoList->entries[entryIndex++];
 		setupEntry->flags = 2;
 		setupEntry->tex = 0x37;
@@ -678,8 +677,7 @@ void CMenuPcs::FavoInit()
 		setupEntry->v = fVar4;
 		setupEntry->startFrame = 7;
 		setupEntry->duration = 5;
-		iVar17 = iVar17 - 1;
-	} while (iVar17 != 0);
+	}
 
 	m_favoList->count = sVar11;
 

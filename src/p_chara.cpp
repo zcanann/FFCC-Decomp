@@ -1144,7 +1144,7 @@ void CCharaPcs::InitEnv(int envMode)
     }
 
     if (envMode == 4) {
-        GXSetProjection(reinterpret_cast<Mtx44Ptr>(Ptr(&Graphic, 0x73A4)), GX_ORTHOGRAPHIC);
+        GXSetProjection(CameraPcs.m_screenMatrix, GX_ORTHOGRAPHIC);
     }
 }
 

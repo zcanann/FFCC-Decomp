@@ -1220,7 +1220,7 @@ void CShopMenu::DrawBuySellInfo()
     char* priceText = ShopMenuMes(languageId, SHOP_MENU_TEXT_PRICE);
     float priceWidth = font->GetWidth(priceText);
     font->DrawInit();
-    MenuPcs.DrawNoShadowFont(font, priceText, FLOAT_80332d7c - priceWidth, FLOAT_80332d80, 0x13, 0x12);
+    MenuPcs.DrawNoShadowFont(font, priceText, static_cast<float>(static_cast<int>(FLOAT_80332d7c - priceWidth)), FLOAT_80332d80, 0x13, 0x12);
     MenuPcs.DrawInit();
 
     font->DrawInit();
@@ -1230,7 +1230,7 @@ void CShopMenu::DrawBuySellInfo()
     char* moneyText = ShopMenuMes(languageId, SHOP_MENU_TEXT_MONEY);
     float separatorWidth = font->GetWidth(s_Slash_80332d84);
     font->DrawInit();
-    MenuPcs.DrawNoShadowFont(font, moneyText, FLOAT_80332d7c + separatorWidth, FLOAT_80332d80, 0x14, 0x12);
+    MenuPcs.DrawNoShadowFont(font, moneyText, static_cast<float>(static_cast<int>(FLOAT_80332d7c + separatorWidth)), FLOAT_80332d80, 0x14, 0x12);
     MenuPcs.DrawInit();
 
     SetupShopMenuUnitFont(font);

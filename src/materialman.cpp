@@ -2511,11 +2511,12 @@ void CMaterialMan::SetPosition(
         }
 
         float maxDist = kMaterialMaxDistance;
+        float candidateDist;
         ShadowCandidate* nearest = 0;
         float nearestDist = kMaterialNearestDistanceInit;
         ShadowCandidate* candidateRead = shadowCandidates;
         for (int i = 0; i < candidateCount; i++) {
-            float candidateDist = candidateRead->distance;
+            candidateDist = candidateRead->distance;
             if (nearestDist > candidateDist) {
                 nearestDist = candidateDist;
                 nearest = candidateRead;

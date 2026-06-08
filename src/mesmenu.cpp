@@ -964,18 +964,19 @@ void CMesMenu::onCalc()
             int wait = m_mes.GetWait();
             if (wait == 3) {
                 int cursor = *(int*)((char*)this + 0x3D34);
+                int cursorMax = *(int*)((char*)this + 0x3D30);
                 int altCursor = *(int*)((char*)this + 0x3D38);
                 if ((repeatMask & 8) != 0) {
                     cursor--;
                     if (cursor < 0) {
-                        cursor = *(int*)((char*)this + 0x3D30) - 1;
+                        cursor = cursorMax - 1;
                     }
                     if ((m_flags & 0x4000) == 0) {
                         Sound.PlaySe(1, 0x40, 0x7F, 0);
                     }
                 } else if ((repeatMask & 4) != 0) {
                     cursor++;
-                    if (*(int*)((char*)this + 0x3D30) <= cursor) {
+                    if (cursorMax <= cursor) {
                         cursor = 0;
                     }
                     if ((m_flags & 0x4000) == 0) {
@@ -1031,8 +1032,9 @@ void CMesMenu::onCalc()
                 }
             }
 
-            if ((*(int*)((char*)this + 0x3CC8) != 0) &&
-                (*(int*)((char*)this + 0x3CD8) == *(int*)((char*)this + 0x3CD4))) {
+            int closeReady = (*(int*)((char*)this + 0x3CC8) != 0) &&
+                (*(int*)((char*)this + 0x3CD8) == *(int*)((char*)this + 0x3CD4));
+            if (closeReady) {
                 if (*(int*)((char*)this + 0x3C90) != 0) {
                     int wait5 = m_mes.GetWait();
                     if (wait5 != 4) {
@@ -1076,17 +1078,18 @@ void CMesMenu::onCalc()
     m_stateTimer = m_stateTimer + 1;
     if (m_stateTimerMax < m_stateTimer) {
         int nextState = m_state;
-        if (nextState == 2) {
+        switch (nextState) {
+        case 0:
+            m_state = 1;
+            m_stateTimer = 0;
+            m_stateTimerMax = 0;
+            break;
+        case 2:
             m_state = 3;
             m_stateTimer = 0;
             m_stateTimerMax = 8;
-        } else if (nextState < 2) {
-            if (nextState == 0) {
-                m_state = 1;
-                m_stateTimer = 0;
-                m_stateTimerMax = 0;
-            }
-        } else if (nextState < 4) {
+            break;
+        case 3: {
             CFlatRuntime::CStack stack[2];
             m_state = 4;
             m_stateTimer = 0;
@@ -1100,6 +1103,8 @@ void CMesMenu::onCalc()
             if (m_menuIndex < 4) {
                 MenuPcs.m_battleRingMenus[m_menuIndex]->SetFade(1);
             }
+            break;
+        }
         }
     }
 }

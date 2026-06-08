@@ -1065,7 +1065,7 @@ void birth(
 		}
 	}
 
-	life = *(s16*)(payload + 0x26);
+	life = *(u16*)(payload + 0x26);
 	if (life == 0) {
 		*(u16*)(particlePayload + 0x22) = 0xFFFF;
 	} else {

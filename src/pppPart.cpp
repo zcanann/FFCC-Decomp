@@ -463,7 +463,7 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 					}
 					else if (owner->m_pppPObjLink == obj)
 					{
-						owner->m_pppPObjLink = next;
+						owner->m_pppPObjLink = obj->m_next;
 					}
 
 					Memory.Free(obj);
@@ -600,7 +600,7 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 					}
 					else if (owner->m_pppPObjLink == obj)
 					{
-						owner->m_pppPObjLink = next;
+						owner->m_pppPObjLink = obj->m_next;
 					}
 
 					Memory.Free(obj);
@@ -997,7 +997,7 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 		}
 		else if (owner->m_pppPObjLink == obj)
 		{
-			owner->m_pppPObjLink = next;
+			owner->m_pppPObjLink = obj->m_next;
 		}
 
 		Memory.Free(obj);
@@ -1689,7 +1689,7 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 						}
 						else if (owner->m_pppPObjLink == obj)
 						{
-							owner->m_pppPObjLink = next;
+							owner->m_pppPObjLink = obj->m_next;
 						}
 
 						Memory.Free(obj);
@@ -2004,8 +2004,8 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
 					pppProgRenderCallback fn = (pppProgRenderCallback)prog->m_pppFunctionRender;
 					if (fn != 0)
 					{
-						u32 count = pDataVal->m_activeCount;
 						_pppPObjLink* obj = pDataVal->m_pppPObjLink;
+						u32 count = pDataVal->m_activeCount;
 
 						do
 						{
@@ -2093,7 +2093,7 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 
 				if (mng->m_loopMode != 0 &&
 					((_pppPObject*)obj)->m_graphId >= progSet->m_loopFrame &&
-					(progSet->m_loopFrame & 0xF0000000) != 0x70000000)
+					progSet->m_loopFrame != 0x70000000)
 				{
 					((_pppPObject*)obj)->m_graphId = progSet->m_endFrame;
 					callCon2Prog((_pppPObject*)obj);
@@ -2121,7 +2121,7 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 						}
 						else if (owner->m_pppPObjLink == obj)
 						{
-							owner->m_pppPObjLink = next;
+							owner->m_pppPObjLink = obj->m_next;
 						}
 
 						Memory.Free(obj);
@@ -2164,7 +2164,7 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 				}
 				else if (owner->m_pppPObjLink == obj)
 				{
-					owner->m_pppPObjLink = next;
+					owner->m_pppPObjLink = obj->m_next;
 				}
 
 				Memory.Free(obj);
@@ -2268,7 +2268,7 @@ void _pppCalcPart(_pppMngSt* pppMngSt)
 	{
 		_pppPDataVal* pDataVals = pppMngSt->m_pppPDataVals;
 		_pppPDataVal* pDataVal = (_pppPDataVal*)((u8*)pDataVals + pDataValOffset);
-		if (pDataVals != 0 && pDataVal != 0 && pDataVal->m_nextSpawnTime <= pppMngSt->m_currentFrame)
+		if (pDataVals != 0 && pDataVal != 0 && pppMngSt->m_currentFrame >= pDataVal->m_nextSpawnTime)
 		{
 			pDataVal->m_nextSpawnTime = 0x7FFFFFFF;
 			_pppPObject* pObject = pppCreatePObject(pppMngSt, pDataVal);

@@ -3704,7 +3704,7 @@ void CGPartyObj::canPlayerGoMenu()
  */
 int CGPartyObj::useItem(int itemId)
 {
-	int canUse = 0;
+	int canUse;
 	int result;
 	const char* msgBase = lbl_801DCA48;
 
@@ -3714,6 +3714,8 @@ int CGPartyObj::useItem(int itemId)
 	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x63C]) << 24) & 0xC0000000) >> 31) != 0) &&
 	    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0)) {
 		canUse = 1;
+	} else {
+		canUse = 0;
 	}
 
 	if (!canUse) {

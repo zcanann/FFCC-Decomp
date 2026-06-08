@@ -3251,7 +3251,7 @@ void CShopMenu::SetMode(int mode)
 
     switch (m_mode) {
     case 0:
-        m_fade = 0.0f;
+        m_fade = FLOAT_80332d9c;
         m_topChoice = 0xFF;
         break;
     case 1:
@@ -3281,7 +3281,7 @@ mode_3_6_common:
         m_figureMode = 0;
         break;
     case 9: {
-        m_fade = 0.0f;
+        m_fade = FLOAT_80332d9c;
         m_topChoice = 0xFF;
         m_listType = 2;
         m_subMode = 0;

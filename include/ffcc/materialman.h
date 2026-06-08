@@ -431,11 +431,7 @@ public:
     void AddTextureIdx(int, int);
     void SetMaterialColor(unsigned int rgba)
     {
-        GXColor& color = m_textureData.m_textureColorView.m_materialColor;
-        color.r = static_cast<unsigned char>((rgba >> 24) & 0xFF);
-        color.g = static_cast<unsigned char>((rgba >> 16) & 0xFF);
-        color.b = static_cast<unsigned char>((rgba >> 8) & 0xFF);
-        color.a = static_cast<unsigned char>(rgba & 0xFF);
+        m_materialColor = *reinterpret_cast<GXColor*>(&rgba);
     }
     unsigned long GetTevBit()
     {
@@ -458,18 +454,18 @@ private:
     short m_textureIndices[5];            // 0x01A
     unsigned long m_tevBit;               // 0x024
     CLightPcs::CBumpLight* m_bumpLight;   // 0x028
-    float m_scaleV;                       // 0x02C
-    float m_scaleU;                       // 0x030
+    float m_scaleU;                       // 0x02C
+    float m_scaleV;                       // 0x030
     char m_texShiftU;                     // 0x034
     char m_texShiftV;                     // 0x035
     unsigned char m_unk36;                // 0x036
-    unsigned char m_pad37[5];             // 0x037
+    unsigned char m_pad37;                // 0x037
+    GXColor m_materialColor;              // 0x038
     struct TextureColorView
     {
         CTexture* m_texture0;             // 0x03C
         CTexture* m_texture1;             // 0x040
         CTexture* m_texture2;             // 0x044
-        GXColor m_materialColor;          // 0x048
     };
     struct {
         union {

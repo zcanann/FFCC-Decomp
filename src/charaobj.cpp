@@ -3260,9 +3260,8 @@ void CGCharaObj::StaticFrame()
 			continue;
 		}
 
-		unsigned char* partyRaw = reinterpret_cast<unsigned char*>(partyObj);
-		if (static_cast<signed char>(partyRaw[0x9A]) < 0 &&
-		    static_cast<signed char>(partyRaw[0x9B]) < 0) {
+		if (partyObj->m_weaponNodeFlagBits.m_prg &&
+		    partyObj->m_weaponNodeFlagAll.m_bits1.m_shield) {
 			unsigned char* script = reinterpret_cast<unsigned char*>(partyObj->m_scriptHandle);
 			unsigned short hp = *reinterpret_cast<unsigned short*>(script + 0x1C);
 			if (hp != 0 && static_cast<int>(hp) <= static_cast<int>(static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(script + 0x1A)) >> 2)) {

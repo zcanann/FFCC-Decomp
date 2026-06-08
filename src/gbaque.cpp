@@ -3814,14 +3814,13 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	char* writePtr = outData + 1 + totalSize;
 	totalSize += 1;
 
-	const unsigned int flatBase = Game.unkCFlatData0[2];
 	for (int i = 0; i < 0x40; i++) {
 		const int itemId = caravanWork->m_inventoryItems[i];
 		if (itemId >= 401) {
 			unsigned int itemBuf[0xE];
 			memset(itemBuf, 0, sizeof(itemBuf));
 
-			const int itemBase = flatBase + itemId * 0x48;
+			const int itemBase = Game.unkCFlatData0[2] + itemId * 0x48;
 			int price = static_cast<int>(
 				static_cast<float>(static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(itemBase + 0x24))) *
 				static_cast<float>(static_cast<double>(caravanWork->m_shopParam) / 100.0));
@@ -3846,7 +3845,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 					reinterpret_cast<unsigned short*>(itemBuf)[13 + j * 8] = 0;
 					reinterpret_cast<unsigned short*>(itemBuf)[14 + j * 8] = 0;
 				} else {
-					const int materialBase = flatBase + materialA * 0x48;
+					const int materialBase = Game.unkCFlatData0[2] + materialA * 0x48;
 					reinterpret_cast<unsigned short*>(itemBuf)[12 + j * 8] =
 						__lhbrx(reinterpret_cast<unsigned short*>(materialBase + 4), 0);
 					reinterpret_cast<unsigned short*>(itemBuf)[13 + j * 8] =
@@ -3863,7 +3862,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 					reinterpret_cast<unsigned short*>(itemBuf)[17 + j * 8] = 0;
 					reinterpret_cast<unsigned short*>(itemBuf)[18 + j * 8] = 0;
 				} else {
-					const int materialBase = flatBase + materialB * 0x48;
+					const int materialBase = Game.unkCFlatData0[2] + materialB * 0x48;
 					reinterpret_cast<unsigned short*>(itemBuf)[16 + j * 8] =
 						__lhbrx(reinterpret_cast<unsigned short*>(materialBase + 4), 0);
 					reinterpret_cast<unsigned short*>(itemBuf)[17 + j * 8] =

@@ -3177,50 +3177,46 @@ void CMapMng::SetIdGrpColor(int mapIdGrpIndex, int channelIndex, _GXColor color)
     switch (channelIndex) {
     case 0:
     {
-        CMapIdGrp* mapIdGrp = GetMapIdGrpArray() + mapIdGrpIndex;
         u8 g = color.g;
         u8 b = color.b;
-        mapIdGrp->m_primaryColor.r = color.r;
+        m_mapIdGrpArray[mapIdGrpIndex].m_primaryColor.r = color.r;
         u8 a = color.a;
-        mapIdGrp->m_primaryColor.g = g;
-        mapIdGrp->m_primaryColor.b = b;
-        mapIdGrp->m_primaryColor.a = a;
+        m_mapIdGrpArray[mapIdGrpIndex].m_primaryColor.g = g;
+        m_mapIdGrpArray[mapIdGrpIndex].m_primaryColor.b = b;
+        m_mapIdGrpArray[mapIdGrpIndex].m_primaryColor.a = a;
         return;
     }
     case 1:
     {
-        CMapIdGrp* mapIdGrp = GetMapIdGrpArray() + mapIdGrpIndex;
         u8 g = color.g;
         u8 b = color.b;
-        mapIdGrp->m_secondaryColor.r = color.r;
+        m_mapIdGrpArray[mapIdGrpIndex].m_secondaryColor.r = color.r;
         u8 a = color.a;
-        mapIdGrp->m_secondaryColor.g = g;
-        mapIdGrp->m_secondaryColor.b = b;
-        mapIdGrp->m_secondaryColor.a = a;
+        m_mapIdGrpArray[mapIdGrpIndex].m_secondaryColor.g = g;
+        m_mapIdGrpArray[mapIdGrpIndex].m_secondaryColor.b = b;
+        m_mapIdGrpArray[mapIdGrpIndex].m_secondaryColor.a = a;
         return;
     }
     case 2:
     {
-        CMapIdGrp* mapIdGrp = GetMapIdGrpArray() + mapIdGrpIndex;
         u8 g = color.g;
         u8 b = color.b;
-        mapIdGrp->m_tertiaryColor.r = color.r;
+        m_mapIdGrpArray[mapIdGrpIndex].m_tertiaryColor.r = color.r;
         u8 a = color.a;
-        mapIdGrp->m_tertiaryColor.g = g;
-        mapIdGrp->m_tertiaryColor.b = b;
-        mapIdGrp->m_tertiaryColor.a = a;
+        m_mapIdGrpArray[mapIdGrpIndex].m_tertiaryColor.g = g;
+        m_mapIdGrpArray[mapIdGrpIndex].m_tertiaryColor.b = b;
+        m_mapIdGrpArray[mapIdGrpIndex].m_tertiaryColor.a = a;
         return;
     }
     case 3:
     {
-        CMapIdGrp* mapIdGrp = GetMapIdGrpArray() + mapIdGrpIndex;
         u8 g = color.g;
         u8 b = color.b;
-        mapIdGrp->m_quaternaryColor.r = color.r;
+        m_mapIdGrpArray[mapIdGrpIndex].m_quaternaryColor.r = color.r;
         u8 a = color.a;
-        mapIdGrp->m_quaternaryColor.g = g;
-        mapIdGrp->m_quaternaryColor.b = b;
-        mapIdGrp->m_quaternaryColor.a = a;
+        m_mapIdGrpArray[mapIdGrpIndex].m_quaternaryColor.g = g;
+        m_mapIdGrpArray[mapIdGrpIndex].m_quaternaryColor.b = b;
+        m_mapIdGrpArray[mapIdGrpIndex].m_quaternaryColor.a = a;
         return;
     }
     }

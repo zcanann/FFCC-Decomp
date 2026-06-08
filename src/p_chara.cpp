@@ -1609,18 +1609,23 @@ void CCharaPcs::LoadCam(int index, char* fileName)
 
     CChunkFile chunkFile(File.m_readBuffer);
     while (chunkFile.GetNextChunk(chunk)) {
-        if (chunk.m_id != 'CAM ') {
-            continue;
-        }
+        if (chunk.m_id == 'CAM ') {
+            m_cameraFrameCount[index] = static_cast<int>(chunk.m_arg0);
 
-        m_cameraFrameCount[index] = static_cast<int>(chunk.m_arg0);
+            cameraBuffer = new (m_viewerAnimStage, s_p_chara_cpp, 0x4D4)
+                CCameraFrame[static_cast<unsigned long>(m_cameraFrameCount[index])];
 
-        cameraBuffer = new (m_viewerAnimStage, s_p_chara_cpp, 0x4D4)
-            CCameraFrame[static_cast<unsigned long>(m_cameraFrameCount[index])];
-
-        for (int frame = 0; frame < m_cameraFrameCount[index]; frame++) {
-            for (int j = 0; j < 8; j++) {
-                reinterpret_cast<CCameraFrame::Value*>(cameraBuffer)[frame * 8 + j].m_float = chunkFile.GetF4();
+            int byteOffset = 0;
+            for (int frame = 0; frame < m_cameraFrameCount[index]; frame++) {
+                *reinterpret_cast<float*>(reinterpret_cast<char*>(cameraBuffer) + byteOffset + 0x00) = chunkFile.GetF4();
+                *reinterpret_cast<float*>(reinterpret_cast<char*>(cameraBuffer) + byteOffset + 0x04) = chunkFile.GetF4();
+                *reinterpret_cast<float*>(reinterpret_cast<char*>(cameraBuffer) + byteOffset + 0x08) = chunkFile.GetF4();
+                *reinterpret_cast<float*>(reinterpret_cast<char*>(cameraBuffer) + byteOffset + 0x0C) = chunkFile.GetF4();
+                *reinterpret_cast<float*>(reinterpret_cast<char*>(cameraBuffer) + byteOffset + 0x10) = chunkFile.GetF4();
+                *reinterpret_cast<float*>(reinterpret_cast<char*>(cameraBuffer) + byteOffset + 0x14) = chunkFile.GetF4();
+                *reinterpret_cast<float*>(reinterpret_cast<char*>(cameraBuffer) + byteOffset + 0x18) = chunkFile.GetF4();
+                *reinterpret_cast<float*>(reinterpret_cast<char*>(cameraBuffer) + byteOffset + 0x1C) = chunkFile.GetF4();
+                byteOffset += 0x20;
             }
         }
     }

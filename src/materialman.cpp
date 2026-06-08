@@ -2510,6 +2510,7 @@ void CMaterialMan::SetPosition(
             }
         }
 
+        float maxDist = kMaterialMaxDistance;
         ShadowCandidate* nearest = 0;
         float nearestDist = kMaterialNearestDistanceInit;
         ShadowCandidate* candidateRead = shadowCandidates;
@@ -2523,7 +2524,7 @@ void CMaterialMan::SetPosition(
         }
 
         if (nearest != 0) {
-            nearest->distance = kMaterialMaxDistance;
+            nearest->distance = maxDist;
             SetShadow(*nearest->shadow, viewMtx, nearest->index, 0xFFFFFFFF);
         }
     } else {

@@ -159,7 +159,7 @@ void CRingMenu::DrawIcon()
 	viewInput.y = worldPos.y;
 	viewInput.z = worldPos.z;
 	PSMTXMultVec(cameraMtx, &viewInput, &viewPos);
-	viewPos.z = (kRingMenuCameraClipZ < viewPos.z) ? kRingMenuCameraClipZ : viewPos.z;
+	viewPos.z = (viewPos.z < kRingMenuCameraClipZ) ? viewPos.z : kRingMenuCameraClipZ;
 
 	Mtx44 screenMtx;
 	PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);

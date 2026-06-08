@@ -630,8 +630,8 @@ commit:
     g_hit_cyl_min = g_hit_cyl;
     g_hit_mvec_min = g_hit_mvec;
     g_hit_hpv_min = g_hit_hpv;
-    gMapHitFaceFlag = 1;
     g_hit_edge_idx_min = edgeIndex;
+    gMapHitFaceFlag = 1;
     return 1;
 
 edge_loop:

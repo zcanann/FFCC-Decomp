@@ -4389,21 +4389,21 @@ int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
 	OSWaitSemaphore(accessSemaphores + channel);
 	{
 		unsigned char* scouterEntry = localScouterInfo;
-		unsigned char* enemyEntry = reinterpret_cast<unsigned char*>(this) + 0xB34;
+		unsigned char* enemyEntry = reinterpret_cast<unsigned char*>(this);
 
 		for (int i = 0; i < 0x40; i++) {
-			scouterEntry[0] = enemyEntry[3];
+			scouterEntry[0] = enemyEntry[0xB37];
 			if (scouterEntry[0] != 0) {
 				CMonWork* enemyWork = reinterpret_cast<CMonWork*>(enemyWorkPtrs[i]);
-				const int enemyDataBase = Game.unkCFlatData0[1] + static_cast<unsigned char>(enemyEntry[3]) * 0x1D0;
+				const int enemyDataBase = Game.unkCFlatData0[1] + static_cast<unsigned char>(enemyEntry[0xB37]) * 0x1D0;
 
 				*reinterpret_cast<unsigned short*>(scouterEntry + 4) = SwapU16(enemyWork->m_maxHp);
 
-				if (*reinterpret_cast<short*>(enemyEntry + 0xE) > 0) {
+				if (*reinterpret_cast<short*>(enemyEntry + 0xB42) > 0) {
 					scouterEntry[6] = 0xFF;
 					scouterEntry[7] = 0xFF;
 				} else {
-					const short scouterValue = *reinterpret_cast<short*>(enemyEntry + 0xC);
+					const short scouterValue = *reinterpret_cast<short*>(enemyEntry + 0xB40);
 					if ((scouterValue < 1) || ((scouterValue & 0xC000) == 0x4000)) {
 						*reinterpret_cast<unsigned short*>(scouterEntry + 6) = 0;
 					} else {

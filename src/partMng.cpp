@@ -4203,15 +4203,13 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     if (initialTime == -0x1000) {
         mng->m_baseTime = 0;
     } else {
-        int scaled = initialTime * 0x19;
-        scaled = scaled / 0x1E + (scaled >> 0x1F);
-        mng->m_baseTime = scaled - (scaled >> 0x1F);
+        mng->m_baseTime = initialTime * 0x19 / 0x1E;
     }
 
     mng->m_pppResSet = slot;
     mng->m_partIndex = *reinterpret_cast<int*>(fpData1 + 0x10);
     mng->m_cullRadiusSq = *reinterpret_cast<float*>(fpData1 + 0x14);
-    if (mng->m_cullRadiusSq > 0.0f) {
+    if (mng->m_cullRadiusSq > 0.0) {
         mng->m_cullRadiusSq *= mng->m_cullRadiusSq;
     }
     mng->m_cullRadius = *reinterpret_cast<float*>(fpData1 + 0x18);

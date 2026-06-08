@@ -611,13 +611,12 @@ void CMenuPcs::CmdOpen()
 		CmdInit();
 	}
 
-	CmdListStorage* list = GetCmdListStorage(this);
-	CmdListEntry* entries = list->entries;
 	s32 finishedCount = 0;
 	GetCmdStateView(this)->transitionTimer = static_cast<s16>(GetCmdStateView(this)->transitionTimer + 1);
 
+	CmdListStorage* list = GetCmdListStorage(this);
 	u32 count = static_cast<u32>(list->count);
-	CmdListEntry* entry = entries;
+	CmdListEntry* entry = list->entries;
 	const s32 timer = static_cast<s32>(GetCmdStateView(this)->transitionTimer);
 	const s32 entryCount = static_cast<s32>(count);
 
@@ -637,9 +636,9 @@ void CMenuPcs::CmdOpen()
 	}
 
 	int done = 0;
-	if (list->count == finishedCount) {
+	if (GetCmdListStorage(this)->count == finishedCount) {
 		float anim = kCmdMenuOne;
-		entry = entries;
+		entry = GetCmdListStorage(this)->entries;
 		if (static_cast<s32>(count) > 0) {
 			u32 batch = count >> 3;
 			if (batch != 0) {

@@ -272,16 +272,20 @@ static int getCarryAnimNo(CGPartyObj* self, int carryType)
 	}
 
 	unsigned char* script = reinterpret_cast<unsigned char*>(self->m_scriptHandle);
-	int offset;
-	if (carryType == 0) {
-		offset = (CFlatItemCarryMode() == 1) ? 0x1C6 : 0x1C2;
-	} else {
-		offset = (CFlatItemCarryMode() == 1) ? 0x1C8 : 0x1C4;
-	}
-
 	int entry = (*reinterpret_cast<unsigned short*>(script + 0x3E2) +
 	             *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2) * 0x1CA;
-	return *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_30_0xc7e0 + entry + offset);
+	unsigned int table = Game.unk_flat3_field_30_0xc7e0 + entry;
+	if (carryType == 0) {
+		if (CFlatItemCarryMode() == 1) {
+			return *reinterpret_cast<unsigned short*>(table + 0x1C6);
+		}
+		return *reinterpret_cast<unsigned short*>(table + 0x1C2);
+	} else {
+		if (CFlatItemCarryMode() == 1) {
+			return *reinterpret_cast<unsigned short*>(table + 0x1C8);
+		}
+		return *reinterpret_cast<unsigned short*>(table + 0x1C4);
+	}
 }
 
 static CMapObj* getMapHitObject()
@@ -773,28 +777,28 @@ void CGPartyObj::menu()
 				bVar3 = true;
 			}
 			int connected = bVar3 ? 0 : Pad.GetPadInputs()[slot & ~((~(Pad.m_debugPadPort - slot | slot - Pad.m_debugPadPort) >> 0x1F))].gbaMode;
-			if (connected == 0) {
+			if (connected != 0) {
 				if ((CFlatEventFlags() & CFlatEventFlagByte_GbaSound) != 0) {
-					Sound.PlaySe(7, 0x40, 0x7F, 0);
+					Sound.PlaySe(8, 0x40, 0x7F, 0);
 				}
 			} else if ((CFlatEventFlags() & CFlatEventFlagByte_GbaSound) != 0) {
-				Sound.PlaySe(8, 0x40, 0x7F, 0);
+				Sound.PlaySe(7, 0x40, 0x7F, 0);
 			}
 
 			Joybus.ChgCtrlMode(reinterpret_cast<int>(portIndex));
 			return;
 		}
 
-		bool bVar3;
+		int bVar3;
 		if ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) << 24) & 0xC0000000) >> 31) != 0) &&
 		    ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)[1]) << 24) & 0xC0000000) >> 31) != 0) ||
 		     ((party.commandMode & 2) != 0) ||
 		     ((party.commandMode & 4) != 0)) &&
 		    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x63C)) << 24) & 0xC0000000) >> 31) != 0) &&
 		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0)) {
-			bVar3 = true;
+			bVar3 = 1;
 		} else {
-			bVar3 = false;
+			bVar3 = 0;
 		}
 
 		if (bVar3) {
@@ -2173,7 +2177,12 @@ void CGPartyObj::statCharge()
 			playSe3D(m_comboItemState + 0x7EB, 0x32, 0x96, 0, 0);
 		}
 
-		int phase = (m_comboItemState == -1) ? m_subFrame : (m_subFrame - 0x10);
+		int phase;
+		if (m_comboItemState != -1) {
+			phase = m_subFrame - 0x10;
+		} else {
+			phase = m_subFrame;
+		}
 		int itemType =
 		    *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 10) & 0xFF;
 
@@ -3459,8 +3468,8 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 	}
 
 	int bonusSlot = reinterpret_cast<unsigned char*>(m_scriptHandle)[0xBA4];
-	unsigned int addValue = 0;
-	unsigned int subValue = 0;
+	int addValue = 0;
+	int subValue = 0;
 	unsigned short currentAdd = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBCA);
 	unsigned short currentSub = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBCC);
 	CGame::CBossArtifactStage* bossArtifacts =
@@ -3573,8 +3582,8 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 		break;
 	case 0x0D:
 		if (kind == 0x12) {
-			unsigned short item = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + value * 0x48 + 8);
-			if (item == 0x24 || item == 0x25 || item == 0x69 || item == 0x6A) {
+			int item = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + value * 0x48 + 8);
+			if ((item >= 0x24 && item < 0x26) || (item >= 0x69 && item < 0x6B)) {
 				addValue = stageAdd;
 			}
 		}
@@ -3615,7 +3624,7 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 		}
 		break;
 	case 0x17:
-		if (kind == 1 && source != nullptr && source->m_scriptHandle != nullptr && source->m_scriptHandle[9] != nullptr &&
+		if (kind == 1 &&
 		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(source->m_scriptHandle[9]) + 0xFE) & 4) != 0) {
 			addValue = stageAdd;
 		}
@@ -3628,9 +3637,11 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 	}
 
 	if (addValue != 0) {
-		unsigned int total = currentAdd + addValue;
-		if (total > 100) {
-			total = 100;
+		int total = static_cast<int>(currentAdd) + addValue;
+		if (total < 0) {
+			total = 0;
+		} else {
+			total = total > 100 ? 100 : total;
 		}
 		if (bonusSlot != 0) {
 			System.Printf(const_cast<char*>(msgBase + 0x230), bonusSlot, total);
@@ -3642,8 +3653,8 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 		int total = static_cast<int>(currentSub) - static_cast<int>(subValue);
 		if (total < 0) {
 			total = 0;
-		} else if (total > 100) {
-			total = 100;
+		} else {
+			total = total > 100 ? 100 : total;
 		}
 		System.Printf(const_cast<char*>(msgBase + 0x24C), bonusSlot, total);
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBCC) = static_cast<unsigned short>(total);
@@ -5172,7 +5183,7 @@ void CGPartyObj::gpmMove()
 			if (chalice != nullptr &&
 			    PartyData(this).carryObject == nullptr &&
 			    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(chalice) + 0x9A)) << 24) & 0xC0000000) >> 31) < 0) &&
-			    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(chalice) + 0x550) == 0) {
+			    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(chalice) + 0x550) == 0) {
 				float pickupRadius = (leader->m_bodyEllipsoidRadius + *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(chalice) + 0x144)) * FLOAT_80331A84;
 				if (dist < pickupRadius) {
 					CancelMove(1);

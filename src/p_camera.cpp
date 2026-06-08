@@ -1589,10 +1589,10 @@ void CCameraPcs::drawShadowBegin()
 
     if (Game.m_currentSceneId == 3) {
         float stickX = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraShadowPadInput().stickXF;
-        m_fullScreenShadow.m_rotY += kCameraDegToRad * kCameraDebugMoveStep * stickX;
+        m_fullScreenShadow.m_rotY += kCameraDegToRad * (kCameraDebugMoveStep * stickX);
 
         float stickY = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraShadowPadInput().stickYF;
-        m_fullScreenShadow.m_rotX += kCameraDegToRad * kCameraTwoF * stickY;
+        m_fullScreenShadow.m_rotX += kCameraDegToRad * (kCameraTwoF * stickY);
     }
 
     PSMTXRotRad(rotX, 'x', -m_fullScreenShadow.m_rotX);

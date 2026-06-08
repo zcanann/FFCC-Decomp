@@ -703,8 +703,7 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
     s32 i;
     u32 meshIndex;
     u32 vertexIndex;
-    s32 setupOffset;
-    u8* workArea;
+    u8* setupArea;
 
     if (ppvUserStopPartF != 0) {
         return;
@@ -712,9 +711,8 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
 
     gObject = ppvMng->m_owner;
     YmManaDataOffsets* serializedOffsets = GetYmManaDataOffsets(param_3);
-    setupOffset = serializedOffsets->m_setupOffset;
-    workArea = reinterpret_cast<_pppPObject*>(pppYmMana)->m_workArea;
-    mana = reinterpret_cast<VYmMana*>(workArea + serializedOffsets->m_workOffset);
+    mana = reinterpret_cast<VYmMana*>(reinterpret_cast<_pppPObject*>(pppYmMana)->m_workArea + serializedOffsets->m_workOffset);
+    setupArea = reinterpret_cast<_pppPObject*>(pppYmMana)->m_workArea + serializedOffsets->m_setupOffset;
     if (gObject == NULL) {
         return;
     }
@@ -732,9 +730,9 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
 
     SetManaModelCallbacks(model, mana, param_2);
 
-    MaterialMan.SetManaAlpha((u8)((float)*(workArea + setupOffset + 0xB) * gObject->m_lookAtTimer));
+    MaterialMan.SetManaAlpha((u8)((float)*(setupArea + 0xB) * gObject->m_lookAtTimer));
     if (Game.m_currentMapId == 0x21) {
-        MaterialMan.SetManaAlpha((u8)(gObject->m_lookAtTimer * (float)*(workArea + setupOffset + 0xB)));
+        MaterialMan.SetManaAlpha((u8)(gObject->m_lookAtTimer * (float)*(setupArea + 0xB)));
     }
     mana->m_manaAlpha = MaterialMan.GetManaAlpha();
 

@@ -1526,10 +1526,12 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
         }
 
         float radius = gObject->m_nearColRadius;
-        if (kCameraLookAtRadiusLimit < radius) {
+        if (radius > kCameraLookAtRadiusLimit) {
             radius = kCameraLookAtRadiusLimit;
         }
 
+        float worldBoundData[6];
+        CBound* worldBound = reinterpret_cast<CBound*>(worldBoundData);
         float clipBoundData[6];
         CBound* clipBound = reinterpret_cast<CBound*>(clipBoundData);
         clipBoundData[0] = kCameraBoundsMinInitial;
@@ -1539,8 +1541,6 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
         clipBoundData[4] = kCameraBoundsMaxInitial;
         clipBoundData[5] = kCameraBoundsMaxInitial;
 
-        float worldBoundData[6];
-        CBound* worldBound = reinterpret_cast<CBound*>(worldBoundData);
         worldBoundData[0] = gObject->m_worldPosition.x - radius;
         worldBoundData[1] = gObject->m_worldPosition.y;
         worldBoundData[2] = gObject->m_worldPosition.z - radius;

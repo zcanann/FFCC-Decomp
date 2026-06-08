@@ -167,13 +167,12 @@ void CMenuPcs::CompaDraw()
 	}
 
 	CompaOpenAnimList* compaList = this->m_compaList;
-	float globalAlpha = compaList->entries[0].alpha;
 
 	GXColor color;
 	color.r = 0xFF;
 	color.g = 0xFF;
 	color.b = 0xFF;
-	color.a = static_cast<signed char>(globalAlpha * kCompaColorMax);
+	color.a = static_cast<signed char>(compaList->entries[0].alpha * kCompaColorMax);
 	GXSetChanMatColor(GX_COLOR0A0, color);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3A));
 
@@ -191,7 +190,7 @@ void CMenuPcs::CompaDraw()
 		familyCount = 4;
 	}
 
-	for (unsigned int i = 0; i < familyCount; i++) {
+	for (int i = 0; i < familyCount; i++) {
 		MenuPcs.DrawRect(
 			0,
 			static_cast<float>(compaList->entries[0].x + 0x10),
@@ -201,10 +200,11 @@ void CMenuPcs::CompaDraw()
 	}
 
 	int memberIndex = 0;
-	unsigned int shown = 0;
+	int shown = 0;
 	for (int i = 0; i < 8 && shown < familyCount; i++) {
-		int drawIndex = memberIndex;
-		if (memberIndex > 1) {
+		int drawIndex = shown;
+		if (shown > 1) {
+			drawIndex = memberIndex;
 			for (; drawIndex < 7; drawIndex++) {
 				if (caravanWork->m_evtWordArr[19 + drawIndex] != 0) {
 					break;
@@ -236,7 +236,7 @@ void CMenuPcs::CompaDraw()
 			icon,
 			static_cast<int>(compaList->entries[0].x + 0x128),
 			static_cast<int>(compaList->entries[0].y + 0x40 + shown * 0x28),
-			globalAlpha, 1, kCompaOne);
+			compaList->entries[0].alpha, 1, kCompaOne);
 
 		shown++;
 		memberIndex = drawIndex + 1;
@@ -249,16 +249,18 @@ void CMenuPcs::CompaDraw()
 	font->SetScaleY(kCompaOne);
 	font->DrawInit();
 
-	GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<signed char>(kCompaColorMax * globalAlpha)).color;
+	GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<signed char>(kCompaColorMax * compaList->entries[0].alpha)).color;
 	font->SetColor(textColor);
 
+	const CCaravanWork* nameWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	memberIndex = 0;
 	shown = 0;
 	for (int i = 0; i < 8 && shown < familyCount; i++) {
-		int drawIndex = memberIndex;
-		if (memberIndex > 1) {
+		int drawIndex = shown;
+		if (shown > 1) {
+			drawIndex = memberIndex;
 			for (; drawIndex < 7; drawIndex++) {
-				if (caravanWork->m_evtWordArr[19 + drawIndex] > 0) {
+				if (nameWork->m_evtWordArr[19 + drawIndex] > 0) {
 					break;
 				}
 			}
@@ -273,7 +275,7 @@ void CMenuPcs::CompaDraw()
 		font->SetPosY(y);
 		font->Draw(name);
 
-		short food = caravanWork->m_evtWordArr[19 + drawIndex];
+		unsigned short food = nameWork->m_evtWordArr[19 + drawIndex];
 		const char* value = Game.m_cFlatDataArr[1].TableStrings(2)[food];
 		font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x90));
 		font->SetPosY(y);
@@ -288,9 +290,10 @@ void CMenuPcs::CompaDraw()
 	font->SetShadow(0);
 	font->SetScale(kCompaJobFontScale);
 	font->DrawInit();
-	font->SetColor(textColor);
+	GXColor jobColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(kCompaColorMax * compaList->entries[0].alpha)).color;
+	font->SetColor(jobColor);
 
-	const char* job = GetJobStr(caravanWork->unk_0x3ac);
+	const char* job = GetJobStr(nameWork->unk_0x3ac);
 	font->GetWidth(job);
 	font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x18));
 	font->SetPosY(static_cast<float>(compaList->entries[0].y + 0x20) - kCompaTextYOffset - kCompaJobYOffset);

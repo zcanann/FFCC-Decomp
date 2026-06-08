@@ -3748,6 +3748,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	for (int i = 0; i < 0x40; i++) {
 		const int itemId = reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_inventoryItems[i];
 		unsigned short sellInfo[4];
+		sellInfo[3] = 0;
 		if ((itemId < 1) || (itemId > 0x9E)) {
 			memset(sellInfo, 0, sizeof(sellInfo));
 		} else {
@@ -3755,7 +3756,6 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 			sellInfo[0] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 4), 0);
 			sellInfo[1] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 6), 0);
 			sellInfo[2] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 8), 0);
-			sellInfo[3] = 0;
 		}
 		memcpy(outData, sellInfo, 8);
 		outData += 8;

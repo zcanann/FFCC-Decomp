@@ -793,13 +793,13 @@ int CMenuPcs::CmdCtrl()
 		float minAnim = static_cast<float>(kCmdMenuHalfD);
 		double timer = static_cast<double>(static_cast<u32>(GetCmdStateView(this)->transitionTimer));
 		double anim = -((kCmdMenuAlphaStepD * timer) - kCmdMenuOneD);
-		for (s32 i = 0; i < static_cast<s32>(list->count); i++) {
+		CmdListEntry* entry = list->entries;
+		for (s32 i = 0; i < static_cast<s32>(list->count); i++, entry++) {
 			if ((i < prev) || (next < i)) {
-				float value = static_cast<float>(anim);
-				if (static_cast<double>(value) < static_cast<double>(minAnim)) {
-					value = kCmdMenuHalf;
+				entry->alpha = static_cast<float>(anim);
+				if (static_cast<double>(entry->alpha) < static_cast<double>(minAnim)) {
+					entry->alpha = kCmdMenuHalf;
 				}
-				list->entries[i].alpha = value;
 			}
 		}
 

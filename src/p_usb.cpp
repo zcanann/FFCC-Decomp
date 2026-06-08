@@ -82,8 +82,7 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
 {
     unsigned int count;
     int result;
-    int connected;
-    unsigned char* packetStorage;
+    unsigned int connected;
     CDataHeader* packet;
     CDataHeader* dstBuffer;
     CMemory::CStage* stage;
@@ -93,8 +92,7 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
     value = (count + 0x5F) & ~0x1F;
     stage = (m_bigStage != (CMemory::CStage*)nullptr) ? m_bigStage : m_smallStage;
 
-    packetStorage = new (stage, const_cast<char*>(s_p_usb_cpp), 0x1ca) unsigned char[value];
-    packet = reinterpret_cast<CDataHeader*>(packetStorage);
+    packet = reinterpret_cast<CDataHeader*>(new (stage, const_cast<char*>(s_p_usb_cpp), 0x1ca) unsigned char[value]);
     packet->m_packetType = 4;
     packet->m_packetSize = value;
     packet->m_payloadSize = Swap32(count);
@@ -133,7 +131,7 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
     }
 
     if (packet != (CDataHeader*)nullptr) {
-        delete[] packetStorage;
+        delete[] packet;
     }
     return result;
 }

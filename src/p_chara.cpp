@@ -1237,7 +1237,7 @@ void CCharaPcs::GetTexShadow(int startIndex, int maxCount, _GXTexObj* texObjs, V
             }
 
             shadowIndex++;
-            if (shadowIndex >= startIndex + maxCount) {
+            if (startIndex + maxCount <= shadowIndex) {
                 return;
             }
         }

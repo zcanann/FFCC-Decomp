@@ -2883,10 +2883,10 @@ unsigned int CMenuPcs::CmdClose2()
 		GetCmdStateView(this)->transitionTimer = 0;
 		if (GetCmdStateView(this)->commandResult < 0) {
 			GetCmdStateView(this)->uniteState = 3;
-		} else if (caravanWork->m_commandListExtra[selected] == 0) {
-			GetCmdStateView(this)->uniteState = 2;
-		} else {
+		} else if (caravanWork->m_commandListExtra[selected] != 0) {
 			GetCmdStateView(this)->uniteState = 1;
+		} else {
+			GetCmdStateView(this)->uniteState = 2;
 		}
 		return 0;
 	} else if (GetCmdStateView(this)->uniteState == 1) {
@@ -2903,9 +2903,9 @@ unsigned int CMenuPcs::CmdClose2()
 
 			s32 comboIdx = 0;
 			if (combo[0][1] < combo[1][1]) {
-				comboIdx = (combo[0][1] == modeSel) ? 0 : 1;
+				comboIdx = (modeSel == static_cast<u32>(combo[0][1])) ? 0 : 1;
 			} else {
-				comboIdx = (combo[1][1] == modeSel) ? 1 : 0;
+				comboIdx = (modeSel == static_cast<u32>(combo[1][1])) ? 1 : 0;
 			}
 
 			s32 ununiteCount = 1;
@@ -2930,9 +2930,9 @@ unsigned int CMenuPcs::CmdClose2()
 
 			s32 comboIdx = 0;
 			if (combo[0][1] < combo[1][1]) {
-				comboIdx = (combo[0][1] == modeSel) ? 0 : 1;
+				comboIdx = (modeSel == static_cast<u32>(combo[0][1])) ? 0 : 1;
 			} else {
-				comboIdx = (combo[1][1] == modeSel) ? 1 : 0;
+				comboIdx = (modeSel == static_cast<u32>(combo[1][1])) ? 1 : 0;
 			}
 
 			caravanWork->UniteComList(

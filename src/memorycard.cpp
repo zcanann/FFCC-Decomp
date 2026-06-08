@@ -1582,7 +1582,7 @@ void CMemoryCardMan::MakeSaveData()
     save[0x13E3] = MakeSaveBool(Game.m_gameWork.m_spModeFlags[2]);
     save[0x13E4] = MakeSaveBool(Game.m_gameWork.m_spModeFlags[3]);
 
-    for (int c = 0; c < 8; c++)
+    for (unsigned int c = 0; c < 8; c++)
     {
         u8* dst = save + 0x14D0 + c * 0x9C0;
         CCaravanWork* caravanWork = &Game.m_caravanWorkArr[c];
@@ -1638,7 +1638,7 @@ void CMemoryCardMan::MakeSaveData()
         {
             letterDst[0x104] = ((letterSrc[0x3EC] >> 3 & 1) << 3) | (letterDst[0x104] & 0xF7);
             *reinterpret_cast<u16*>(letterDst + 0x104) =
-                (*reinterpret_cast<u16*>(letterSrc + 0x3EC) & 0x07FC) | (*reinterpret_cast<u16*>(letterDst + 0x104) & 0xF803);
+                (*reinterpret_cast<s16*>(letterSrc + 0x3EC) & 0x07FC) | (*reinterpret_cast<u16*>(letterDst + 0x104) & 0xF803);
             *reinterpret_cast<u32*>(letterDst + 0x104) =
                 (*reinterpret_cast<u32*>(letterSrc + 0x3EC) & 0x0003FE00) |
                 (*reinterpret_cast<u32*>(letterDst + 0x104) & 0xFFFC01FF);

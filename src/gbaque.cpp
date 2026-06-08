@@ -3765,15 +3765,14 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 		totalSize += 8;
 	}
 
-	const double userRate = static_cast<double>(static_cast<float>(
-		static_cast<float>(caravanWork->m_shopParam) / 100.0f * 0.3f));
+	const float userRate = static_cast<float>(static_cast<double>(caravanWork->m_shopParam) / 100.0) * kGbaQueueQuarter;
 	for (int i = 0; i < 0x40; i++) {
 		const int itemId = caravanWork->m_inventoryItems[i];
 		unsigned int packedPrice;
 		if (itemId > 0) {
 			int itemPrice = static_cast<unsigned short>(
 				*reinterpret_cast<unsigned short*>(flatBase + itemId * 0x48 + 0x20));
-			itemPrice = static_cast<int>(static_cast<double>(static_cast<float>(itemPrice)) * userRate);
+			itemPrice = static_cast<int>(static_cast<float>(itemPrice) * userRate);
 			if (itemPrice < 1) {
 				itemPrice = 1;
 			}

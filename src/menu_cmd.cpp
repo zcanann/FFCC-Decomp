@@ -978,7 +978,7 @@ void CMenuPcs::CmdDraw()
 			const float x = static_cast<float>(entry->x);
 			float y = static_cast<float>(entry->y);
 			const float w = static_cast<float>(entry->width);
-			double h = static_cast<double>(entry->height);
+			float h = static_cast<float>(entry->height);
 			const float u = entry->u;
 			float t = smallOffset;
 
@@ -1471,9 +1471,10 @@ unsigned int CMenuPcs::CmdCtrlCur()
 	s16 hold;
 	s16* list = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 	CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+	const int padLock = Pad.m_debugPadLock;
 
 	bool blocked = false;
-	if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
+	if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
 		blocked = true;
 	}
 	if (blocked) {
@@ -1485,7 +1486,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 	}
 
 	blocked = false;
-	if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
+	if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
 		blocked = true;
 	}
 	if (blocked) {

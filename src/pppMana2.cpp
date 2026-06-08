@@ -1224,8 +1224,10 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
                 for (s32 dlIndex = meshData->m_displayListCount - 1; dlIndex >= 0; dlIndex--) {
                     void* copiedDisplayList =
                         pppMemAlloc(displayList->m_size, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x255);
-                    copiedDisplayList = reinterpret_cast<void*>((reinterpret_cast<u32>(copiedDisplayList) + 0x1F) & 0xFFFFFFE0);
                     mana2Work->m_displayListCopies[dlIndex] = copiedDisplayList;
+                    mana2Work->m_displayListCopies[dlIndex] = reinterpret_cast<void*>(
+                        (reinterpret_cast<u32>(mana2Work->m_displayListCopies[dlIndex]) + 0x1F) & 0xFFFFFFE0);
+                    copiedDisplayList = mana2Work->m_displayListCopies[dlIndex];
                     mana2Work->m_displayListSize = displayList->m_size;
                     memcpy(copiedDisplayList, displayList->m_data, displayList->m_size);
                     DCFlushRange(copiedDisplayList, displayList->m_size);

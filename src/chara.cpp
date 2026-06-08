@@ -2115,11 +2115,10 @@ int CChara::CModel::SearchNodeSk(char* name)
 		}
 	} else {
 		CNode* node = ModelNodes(this);
-		for (u32 i = 0; i < ModelNodeCount(this); i++) {
+		for (u32 i = 0; i < ModelNodeCount(this); i++, node++) {
 			if (strcmp(NodeRefName(node), name) == 0) {
 				return (int)i;
 			}
-			node++;
 		}
 	}
 

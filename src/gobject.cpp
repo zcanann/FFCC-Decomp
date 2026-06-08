@@ -1623,7 +1623,7 @@ void CGObject::update()
 
         if ((m_displayFlags & 1) != 0) {
             model->CalcMatrix();
-            if ((weaponFlagsLo & 0x40) != 0 && miniGameModelPass) {
+            if (m_weaponNodeFlagBits.m_unk40 && miniGameModelPass) {
                 model->CalcSkin();
             }
 

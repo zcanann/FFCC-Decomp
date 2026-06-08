@@ -3784,55 +3784,45 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 			unsigned int itemBuf[0xE];
 			memset(itemBuf, 0, sizeof(itemBuf));
 
-			const int itemBase = Game.unkCFlatData0[2] + itemId * 0x48;
+			const int itemOffset = itemId * 0x48;
+			unsigned short* itemBase = reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemOffset);
 			int price = static_cast<int>(
-				static_cast<float>(static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(itemBase + 0x24))) *
+				static_cast<float>(static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(reinterpret_cast<int>(itemBase) + 0x24))) *
 				static_cast<float>(static_cast<double>(reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_shopParam) / 100.0));
 
 			itemBuf[0] = SwapU32(static_cast<unsigned int>(price));
 
-			reinterpret_cast<unsigned short*>(itemBuf)[2] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 0x26), 0);
-			reinterpret_cast<unsigned short*>(itemBuf)[3] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 0x28), 0);
-			reinterpret_cast<unsigned short*>(itemBuf)[4] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 0x2A), 0);
-			reinterpret_cast<unsigned short*>(itemBuf)[5] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 0x2C), 0);
-			reinterpret_cast<unsigned short*>(itemBuf)[6] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 0x2E), 0);
-			reinterpret_cast<unsigned short*>(itemBuf)[7] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 0x30), 0);
+			for (int k = 3; k < 9; k++) {
+				reinterpret_cast<unsigned short*>(itemBuf)[k - 1] = __lhbrx(itemBase, k * 2 + 0x20);
+			}
 
 			for (int j = 0; j < 2; j++) {
-				const int recipeBase = itemBase + j * 4;
+				const int recipeBase = Game.unkCFlatData0[2] + itemOffset + j * 4;
 
-				const unsigned short materialA = *reinterpret_cast<unsigned short*>(recipeBase + 0x38);
-				reinterpret_cast<unsigned short*>(itemBuf)[8 + j * 2] =
-					__lhbrx(reinterpret_cast<unsigned short*>(recipeBase + 0x38), 0);
+				reinterpret_cast<unsigned short*>(itemBuf)[8 + j * 2] = __lhbrx(reinterpret_cast<unsigned short*>(recipeBase + 0x38), 0);
+				const int materialA = *reinterpret_cast<unsigned short*>(recipeBase + 0x38);
 				if (materialA == 0) {
 					reinterpret_cast<unsigned short*>(itemBuf)[12 + j * 8] = 0;
 					reinterpret_cast<unsigned short*>(itemBuf)[13 + j * 8] = 0;
 					reinterpret_cast<unsigned short*>(itemBuf)[14 + j * 8] = 0;
 				} else {
 					const int materialBase = Game.unkCFlatData0[2] + materialA * 0x48;
-					reinterpret_cast<unsigned short*>(itemBuf)[12 + j * 8] =
-						__lhbrx(reinterpret_cast<unsigned short*>(materialBase + 4), 0);
-					reinterpret_cast<unsigned short*>(itemBuf)[13 + j * 8] =
-						__lhbrx(reinterpret_cast<unsigned short*>(materialBase + 6), 0);
-					reinterpret_cast<unsigned short*>(itemBuf)[14 + j * 8] =
-						__lhbrx(reinterpret_cast<unsigned short*>(materialBase + 8), 0);
+					reinterpret_cast<unsigned short*>(itemBuf)[12 + j * 8] = __lhbrx(reinterpret_cast<unsigned short*>(materialBase + 4), 0);
+					reinterpret_cast<unsigned short*>(itemBuf)[13 + j * 8] = __lhbrx(reinterpret_cast<unsigned short*>(materialBase + 6), 0);
+					reinterpret_cast<unsigned short*>(itemBuf)[14 + j * 8] = __lhbrx(reinterpret_cast<unsigned short*>(materialBase + 8), 0);
 				}
 
-				const unsigned short materialB = *reinterpret_cast<unsigned short*>(recipeBase + 0x3A);
-				reinterpret_cast<unsigned short*>(itemBuf)[9 + j * 2] =
-					__lhbrx(reinterpret_cast<unsigned short*>(recipeBase + 0x3A), 0);
+				reinterpret_cast<unsigned short*>(itemBuf)[9 + j * 2] = __lhbrx(reinterpret_cast<unsigned short*>(recipeBase + 0x3A), 0);
+				const int materialB = *reinterpret_cast<unsigned short*>(recipeBase + 0x3A);
 				if (materialB == 0) {
 					reinterpret_cast<unsigned short*>(itemBuf)[16 + j * 8] = 0;
 					reinterpret_cast<unsigned short*>(itemBuf)[17 + j * 8] = 0;
 					reinterpret_cast<unsigned short*>(itemBuf)[18 + j * 8] = 0;
 				} else {
 					const int materialBase = Game.unkCFlatData0[2] + materialB * 0x48;
-					reinterpret_cast<unsigned short*>(itemBuf)[16 + j * 8] =
-						__lhbrx(reinterpret_cast<unsigned short*>(materialBase + 4), 0);
-					reinterpret_cast<unsigned short*>(itemBuf)[17 + j * 8] =
-						__lhbrx(reinterpret_cast<unsigned short*>(materialBase + 6), 0);
-					reinterpret_cast<unsigned short*>(itemBuf)[18 + j * 8] =
-						__lhbrx(reinterpret_cast<unsigned short*>(materialBase + 8), 0);
+					reinterpret_cast<unsigned short*>(itemBuf)[16 + j * 8] = __lhbrx(reinterpret_cast<unsigned short*>(materialBase + 4), 0);
+					reinterpret_cast<unsigned short*>(itemBuf)[17 + j * 8] = __lhbrx(reinterpret_cast<unsigned short*>(materialBase + 6), 0);
+					reinterpret_cast<unsigned short*>(itemBuf)[18 + j * 8] = __lhbrx(reinterpret_cast<unsigned short*>(materialBase + 8), 0);
 				}
 			}
 

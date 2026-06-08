@@ -12727,7 +12727,7 @@ int McCtrl::LoadMcList()
 
 	switch (m_state) {
 	case 0:
-		memset(MenuPcs.m_wmWorkBuffer, 0, kMcListEntrySize * kMcListCount);
+		memset(MenuPcs.m_wmCharaState, 0, kMcListEntrySize * kMcListCount);
 		MemoryCardMan.McMount(m_cardChannel);
 		m_lastResult = MemoryCardMan.GetResult();
 		m_state = 1;
@@ -12810,7 +12810,7 @@ int McCtrl::LoadMcList()
 				memset(&entry, 0, sizeof(entry));
 				entry.m_byte42 = 1;
 				for (int i = 0; i < kMcListCount; i++) {
-					*reinterpret_cast<McListEntry*>(MenuPcs.m_wmWorkBuffer + i * kMcListEntrySize) = entry;
+					*reinterpret_cast<McListEntry*>(MenuPcs.m_wmCharaState + i * kMcListEntrySize) = entry;
 				}
 				m_state = 7;
 			}
@@ -12971,7 +12971,7 @@ void McCtrl::SetListDat(int slot, int clearPlayTime)
 	}
 
 	entry[0x43] = 0;
-	unsigned char* const dst = MenuPcs.m_wmWorkBuffer + slot * kMcListEntrySize;
+	unsigned char* const dst = MenuPcs.m_wmCharaState + slot * kMcListEntrySize;
 	unsigned int* const dstWords = reinterpret_cast<unsigned int*>(dst);
 	unsigned int* const entryWords = reinterpret_cast<unsigned int*>(entry);
 	dstWords[0] = entryWords[0];
@@ -14253,7 +14253,7 @@ int McCtrl::EraseDat()
 				memset(&entry, 0, sizeof(entry));
 				entry.m_byte42 = 0;
 				for (int i = 0; i < kMcListCount; i++) {
-					*reinterpret_cast<McListEntry*>(MenuPcs.m_wmWorkBuffer + i * kMcListEntrySize) = entry;
+					*reinterpret_cast<McListEntry*>(MenuPcs.m_wmCharaState + i * kMcListEntrySize) = entry;
 				}
 				m_state = 10;
 			}

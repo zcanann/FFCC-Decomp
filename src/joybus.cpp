@@ -934,19 +934,374 @@ timeout_expiry:
 
         case 0x04:
         {
-            threadParam->m_flags[0] = 0;
+            ResetQueue(threadParam);
+
+            int bootRetry = 0;
+            do
+            {
+                threadParam->m_gbaStatus =
+                    GBAJoyBoot(threadParam->m_portIndex, threadParam->m_portIndex << 1, 2,
+                               reinterpret_cast<unsigned char*>(m_gbaBootImage), m_gbaBootImageSize,
+                               &threadParam->m_unk3);
+                if (threadParam->m_gbaStatus == 1)
+                {
+                    break;
+                }
+                bootRetry++;
+            } while (bootRetry < 100);
+
+            if (threadParam->m_gbaStatus == 1)
+            {
+                threadParam->m_state = 0;
+                ThreadSleep(OSMillisecondsToTicks(15));
+                threadParam->m_errorRetry = 0;
+                OSGetTime();
+            }
+            else
+            {
+                threadParam->m_state = (unsigned char)0x86;
+                goto sleep_retry;
+            }
+
             break;
         }
 
         case 0x05:
         {
-            // TODO: main in-game loop logic (SendGBAStart/Stop, SPMode, pause, map, radar, money, etc.)
+            threadParam->m_errorRetry = 0;
+
+            if (GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf)) < 0)
+            {
+                goto sleep_retry;
+            }
+            if (threadParam->m_skipProcessingFlag != 0)
+            {
+                goto recompute_timeout;
+            }
+            if (threadParam->m_sentStartFlag == 0)
+            {
+                if (SendGBAStart(threadParam, &localWord) < 0)
+                {
+                    goto sleep_retry;
+                }
+            }
+
+            if (GbaQue.GetPlayModeFlg(threadParam->m_portIndex))
+            {
+                threadParam->m_state = 2;
+                goto recompute_timeout;
+            }
+
+            unsigned char spMode = (GbaQue.GetSPMode(threadParam->m_portIndex) & 0xFF) != 0;
+            if (threadParam->m_flags[5] == 0 ||
+                GbaQue.GetSPModeFlg(threadParam->m_portIndex) != 0 ||
+                spMode != threadParam->m_flags[6])
+            {
+                if (SendSPMode(threadParam) < 0)
+                {
+                    goto sleep_retry;
+                }
+                threadParam->m_flags[5] = 1;
+                GbaQue.ClrSPModeFlg(threadParam->m_portIndex);
+            }
+
+            if (threadParam->m_flags[4] != GbaQue.GetPauseMode())
+            {
+                char menuId = (char)((threadParam->m_flags[4] != 0) + 0xB);
+                if (SendOpenMenu(threadParam, menuId) < 0)
+                {
+                    goto sleep_retry;
+                }
+                threadParam->m_flags[4] = (threadParam->m_flags[4] == 0);
+            }
+
+            if (GbaQue.GetControllerMode() != 0)
+            {
+                m_ctrlModeArr[threadParam->m_portIndex] = 4;
+            }
+
+            if (m_ctrlModeArr[threadParam->m_portIndex] == 4)
+            {
+                if (SendMType(threadParam, m_ctrlModeArr[threadParam->m_portIndex]) < 0)
+                {
+                    goto sleep_retry;
+                }
+                threadParam->m_state = 6;
+                goto recompute_timeout;
+            }
+
+            if (GbaQue.GetStartBonusFlg(threadParam->m_portIndex))
+            {
+                if (SendStartBonus(threadParam) < 0)
+                {
+                    goto sleep_retry;
+                }
+                GbaQue.ClrStartBonusFlg(threadParam->m_portIndex);
+            }
+
+            int cmdNumFlg = GbaQue.GetCmdNumFlg(threadParam->m_portIndex);
+            if (cmdNumFlg != 0)
+            {
+                if ((cmdNumFlg & 2) != 0)
+                {
+                    threadParam->m_state = 0x17;
+                    goto recompute_timeout;
+                }
+                if (SendChgCmdNum(threadParam) < 0)
+                {
+                    goto sleep_retry;
+                }
+                GbaQue.ClrCmdNumFlg(threadParam->m_portIndex);
+                goto recompute_timeout;
+            }
+
+            if (m_stateCodeArr[threadParam->m_portIndex] == 0xFF)
+            {
+                if (RequestData(threadParam, 0xE, 0) < 0)
+                {
+                    goto sleep_retry;
+                }
+            }
+
+            if (System.GetCounter() % 3 == 0)
+            {
+                if (SendItemUse(threadParam) < 0)
+                {
+                    goto sleep_retry;
+                }
+            }
+
+            char radarType = GbaQue.GetRadarType(threadParam->m_portIndex);
+            if (GbaQue.GetStageFlg(threadParam->m_portIndex) == 0 && radarType == 2)
+            {
+                if (GbaQue.GetChgScouFlg(threadParam->m_portIndex) != 0 ||
+                    (m_stateFlagArr[threadParam->m_portIndex] != 0 &&
+                     m_stateCodeArr[threadParam->m_portIndex] == 0))
+                {
+                    threadParam->m_state = 0x49;
+                    goto recompute_timeout;
+                }
+
+                if (GbaQue.GetChgHitFlg(threadParam->m_portIndex) != 0)
+                {
+                    int hitInfo = GbaQue.GetHitEInfo(threadParam->m_portIndex);
+                    if (SendHitEnemy(threadParam->m_portIndex, (char)(short)(hitInfo >> 16),
+                                     (short)hitInfo) < 0)
+                    {
+                        goto sleep_retry;
+                    }
+                    GbaQue.ClrChgHitFlg(threadParam->m_portIndex);
+                }
+            }
+
+            if (m_stateCodeArr[threadParam->m_portIndex] == 2)
+            {
+                if (GbaQue.GetChgUseItemFlg(threadParam->m_portIndex))
+                {
+                    char useItem = (char)GbaQue.GetUseItemFlg(threadParam->m_portIndex);
+                    if (SendUseItem(threadParam->m_portIndex, useItem) < 0)
+                    {
+                        goto sleep_retry;
+                    }
+                    GbaQue.ClrChgUseItemFlg(threadParam->m_portIndex);
+                }
+            }
+
+            if (m_stateFlagArr[threadParam->m_portIndex] != 0 &&
+                m_stateCodeArr[threadParam->m_portIndex] == 5)
+            {
+                threadParam->m_state = 0x43;
+                goto recompute_timeout;
+            }
+
+            if (GbaQue.GetStrengthFlg(threadParam->m_portIndex))
+            {
+                if (SendStrength(threadParam) < 0)
+                {
+                    goto sleep_retry;
+                }
+                GbaQue.ClrStrengthFlg(threadParam->m_portIndex);
+            }
+
+            if (GbaQue.GetMemorysFlg(threadParam->m_portIndex))
+            {
+                if (SendMemorys(threadParam) < 0)
+                {
+                    goto sleep_retry;
+                }
+                GbaQue.ClrMemorysFlg(threadParam->m_portIndex);
+            }
+
+            if (GbaQue.GetChgRadarMode(threadParam->m_portIndex))
+            {
+                if (SendRaderMode(threadParam) < 0)
+                {
+                    goto sleep_retry;
+                }
+                GbaQue.ClrChgRadarMode(threadParam->m_portIndex);
+            }
+
+            if (SendPlayerHP(threadParam) < 0)
+            {
+                goto sleep_retry;
+            }
+
+            if (GbaQue.GetArtifactFlg(threadParam->m_portIndex))
+            {
+                threadParam->m_state = 0x3e;
+                goto recompute_timeout;
+            }
+
+            if (GbaQue.GetStageFlg(threadParam->m_portIndex) != 0 && GbaQue.GetScrFlg() != 0)
+            {
+                ResetQueue(threadParam);
+                threadParam->m_subState = 0;
+                if (SendMapNo(threadParam) < 0)
+                {
+                    goto sleep_retry;
+                }
+                if (SendRaderType(threadParam) < 0)
+                {
+                    goto sleep_retry;
+                }
+                if (threadParam->m_gbaBootFlag == 0)
+                {
+                    if (SendMBase(threadParam) < 0)
+                    {
+                        goto sleep_retry;
+                    }
+                }
+                GbaQue.ClrStageFlg(threadParam->m_portIndex);
+                threadParam->m_state = 0x3b;
+                goto recompute_timeout;
+            }
+
+            if (m_stateFlagArr[threadParam->m_portIndex] != 0 &&
+                m_stateCodeArr[threadParam->m_portIndex] == 3)
+            {
+                threadParam->m_state = 0x32;
+                goto recompute_timeout;
+            }
+            if (m_stateFlagArr[threadParam->m_portIndex] != 0 &&
+                m_stateCodeArr[threadParam->m_portIndex] == 1)
+            {
+                threadParam->m_state = 0x4c;
+                goto recompute_timeout;
+            }
+            if (m_stateCodeArr[threadParam->m_portIndex] == 0)
+            {
+                if (GbaQue.GetRadarType(threadParam->m_portIndex) == 0)
+                {
+                    if (System.GetCounter() % 5 == 0)
+                    {
+                        if (SendMapObjDrawFlg(threadParam) < 0)
+                        {
+                            goto sleep_retry;
+                        }
+                    }
+                }
+                if (System.GetCounter() % 3 == 0)
+                {
+                    if (SendMBase(threadParam) < 0)
+                    {
+                        goto sleep_retry;
+                    }
+                }
+                if (SendPpos(threadParam) < 0)
+                {
+                    goto sleep_retry;
+                }
+            }
+
+            if (m_stateCodeArr[threadParam->m_portIndex] == 7)
+            {
+                if (GbaQue.GetFavoriteFlg(threadParam->m_portIndex) != 0)
+                {
+                    threadParam->m_state = 0x2c;
+                    goto recompute_timeout;
+                }
+            }
+
+            if (GbaQue.GetMoneyFlg(threadParam->m_portIndex) == 1)
+            {
+                unsigned int money = GbaQue.GetMoney(threadParam->m_portIndex);
+                if (SetMoney(threadParam->m_portIndex, money) == 0)
+                {
+                    GbaQue.ClrMoneyFlg(threadParam->m_portIndex);
+                }
+            }
+
+            if (GbaQue.GetCompatibilityFlg(threadParam->m_portIndex) == 1 &&
+                m_stateCodeArr[threadParam->m_portIndex] != 0)
+            {
+                threadParam->m_state = 0x2f;
+            }
+
             break;
         }
 
         case 0x06:
         {
-            // TODO: controller mode 4 / SP-mode specific loop
+            threadParam->m_errorRetry = 0;
+
+            if (GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf)) < 0)
+            {
+                goto sleep_retry;
+            }
+            if (threadParam->m_skipProcessingFlag != 0)
+            {
+                goto recompute_timeout;
+            }
+            if (threadParam->m_sentStartFlag == 0)
+            {
+                if (SendGBAStart(threadParam, &localWord) < 0)
+                {
+                    goto sleep_retry;
+                }
+            }
+
+            unsigned char spMode = (GbaQue.GetSPMode(threadParam->m_portIndex) & 0xFF) != 0;
+            if (threadParam->m_flags[5] == 0 ||
+                GbaQue.GetSPModeFlg(threadParam->m_portIndex) != 0 ||
+                spMode != threadParam->m_flags[6])
+            {
+                if (SendSPMode(threadParam) < 0)
+                {
+                    goto sleep_retry;
+                }
+                threadParam->m_flags[5] = 1;
+                GbaQue.ClrSPModeFlg(threadParam->m_portIndex);
+            }
+
+            if (threadParam->m_flags[4] != GbaQue.GetPauseMode())
+            {
+                char menuId = (char)((threadParam->m_flags[4] != 0) + 0xB);
+                if (SendOpenMenu(threadParam, menuId) < 0)
+                {
+                    goto sleep_retry;
+                }
+                threadParam->m_flags[4] = (threadParam->m_flags[4] == 0);
+            }
+
+            if (m_nextModeTypeArr[threadParam->m_portIndex] == 0)
+            {
+                if (SendGBAStop(threadParam) < 0)
+                {
+                    goto sleep_retry;
+                }
+                threadParam->m_state = 0x14;
+                goto recompute_timeout;
+            }
+
+            if (GbaQue.GetMoneyFlg(threadParam->m_portIndex) == 1)
+            {
+                unsigned int money = GbaQue.GetMoney(threadParam->m_portIndex);
+                if (SetMoney(threadParam->m_portIndex, money) == 0)
+                {
+                    GbaQue.ClrMoneyFlg(threadParam->m_portIndex);
+                }
+            }
+
             break;
         }
 
@@ -6423,7 +6778,7 @@ int JoyBus::SendItemUse(ThreadParam* threadParam)
  * Address:	TODO
  * Size:	TODO
  */
-void JoyBus::SendSPMode(ThreadParam* threadParam)
+int JoyBus::SendSPMode(ThreadParam* threadParam)
 {
     unsigned int mode = GbaQue.GetSPMode(threadParam->m_portIndex);
     const unsigned char bVar1 = (mode & 0xFF) != 0;
@@ -6457,6 +6812,8 @@ void JoyBus::SendSPMode(ThreadParam* threadParam)
     {
         threadParam->m_flags[6] = bVar1;
     }
+
+    return result;
 }
 
 /*

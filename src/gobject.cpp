@@ -1979,10 +1979,12 @@ void CGObject::onDraw()
         return;
     }
 
+    Mtx& posMtx = CameraPcs.CurrentCameraState().m_cameraMatrix;
+
     if (((CFlat.m_debugFlags & 0x1) != 0) && ((m_bgColMask & 0x1) != 0)) {
         CColor color(0xFF, 0x00, 0x00, 0xFF);
         CVector pos(m_worldPosition.x, m_worldPosition.y + m_capsuleHalfHeight, m_worldPosition.z);
-        Graphic.DrawSphere(FlatPosMtx(), pos, m_capsuleHalfHeight, &color.color);
+        Graphic.DrawSphere(posMtx, pos, m_capsuleHalfHeight, &color.color);
     }
 
     if (((CFlat.m_debugFlags & 0x2) != 0) && ((m_bgColMask & 0x2) != 0)) {
@@ -2010,7 +2012,7 @@ void CGObject::onDraw()
         scaleMtx[0][3] = spherePos.x;
         scaleMtx[1][3] = spherePos.y;
         scaleMtx[2][3] = spherePos.z;
-        PSMTXConcat(FlatPosMtx(), scaleMtx, scaleMtx);
+        PSMTXConcat(posMtx, scaleMtx, scaleMtx);
         GXLoadPosMtxImm(scaleMtx, GX_PNMTX0);
 
         CColor color(0x00, 0xFF, 0x00, 0xFF);
@@ -2021,18 +2023,18 @@ void CGObject::onDraw()
     if (((CFlat.m_debugFlags & 0x4) != 0) && ((m_bgColMask & 0x4) != 0)) {
         CColor color(0x00, 0x00, 0xFF, 0xFF);
         CVector pos(m_worldPosition.x, m_worldPosition.y + m_bodyColRadius, m_worldPosition.z);
-        Graphic.DrawSphere(FlatPosMtx(), pos, m_bodyColRadius, &color.color);
+        Graphic.DrawSphere(posMtx, pos, m_bodyColRadius, &color.color);
     }
 
     if (((CFlat.m_debugFlags & 0x8) != 0) && ((m_bgColMask & 0x8) != 0)) {
         CColor color(0xFF, 0xFF, 0x00, 0xFF);
         CVector pos(m_worldPosition.x, m_worldPosition.y + m_attackColRadius, m_worldPosition.z);
-        Graphic.DrawSphere(FlatPosMtx(), pos, m_attackColRadius, &color.color);
+        Graphic.DrawSphere(posMtx, pos, m_attackColRadius, &color.color);
     }
 
     if (((CFlat.m_debugFlags & 0x10) != 0) && ((m_bgColMask & 0x10) != 0)) {
         CColor color(0x40, 0xFF, 0x40, 0xFF);
-        Graphic.DrawSphere(FlatPosMtx(), &m_worldPosition, m_nearColRadius, &color.color);
+        Graphic.DrawSphere(posMtx, &m_worldPosition, m_nearColRadius, &color.color);
     }
 
     if (((CFlat.m_debugFlags & 0x40000) != 0) && ((m_bgColMask & 0x40000) != 0)) {
@@ -2043,9 +2045,9 @@ void CGObject::onDraw()
             }
 
             CColor color(0xFF, 0x80, 0x80, 0xFF);
-            Graphic.DrawSphere(FlatPosMtx(), &collider->m_worldPosition, collider->m_radius, &color.color);
+            Graphic.DrawSphere(posMtx, &collider->m_worldPosition, collider->m_radius, &color.color);
 
-            GXLoadPosMtxImm(FlatPosMtx(), GX_PNMTX0);
+            GXLoadPosMtxImm(posMtx, GX_PNMTX0);
             GXBegin(GX_LINES, GX_VTXFMT0, 2);
             GXPosition3f32(collider->m_localEnd.y, collider->m_localEnd.z, collider->m_worldPosition.x);
             GXPosition3f32(collider->m_worldPosition.y, collider->m_worldPosition.z, collider->m_radius);
@@ -2061,7 +2063,7 @@ void CGObject::onDraw()
 
             CColor color(0x80, 0x80, 0xFF, 0xFF);
             CVector scale(collider->m_innerRadius, collider->m_outerRadius, collider->m_innerRadius);
-            Graphic.DrawSphere(FlatPosMtx(), &collider->m_worldPosition, scale, &color.color);
+            Graphic.DrawSphere(posMtx, &collider->m_worldPosition, scale, &color.color);
         }
     }
 }

@@ -4229,7 +4229,10 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
         case -0x46:
         case -0x45:
         case -0x44:
-            FlatLastResult(this) = gameWork.m_wmBackupParams[systemValue + 0x47];
+            {
+                int index = systemValue + 0x47;
+                FlatLastResult(this) = gameWork.m_wmBackupParams[index];
+            }
             break;
         case -0x56:
         case -0x55:
@@ -4246,7 +4249,10 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
         case -0x4A:
         case -0x49:
         case -0x48:
-            FlatLastResult(this) = gameWork.m_bossArtifactStageTable[systemValue + 0x56];
+            {
+                int index = systemValue + 0x56;
+                FlatLastResult(this) = gameWork.m_bossArtifactStageTable[index];
+            }
             break;
         case -0x65:
         case -100:
@@ -4263,7 +4269,10 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
         case -0x59:
         case -0x58:
         case -0x57:
-            FlatLastResult(this) = gameWork.m_unkStageTable[systemValue + 0x65];
+            {
+                int index = systemValue + 0x65;
+                FlatLastResult(this) = gameWork.m_unkStageTable[index];
+            }
             break;
         case -0x66:
             FlatLastResult(this) = gameWork.m_chaliceElement;
@@ -4273,7 +4282,10 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
         case -0x69:
         case -0x68:
         case -0x67:
-            FlatLastResult(this) = gameWork.m_eventHeader[systemValue + 0x6B];
+            {
+                int index = systemValue + 0x6B;
+                FlatLastResult(this) = gameWork.m_eventHeader[index];
+            }
             break;
         case -0x73:
         case -0x72:

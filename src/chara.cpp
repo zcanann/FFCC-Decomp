@@ -32,11 +32,12 @@ extern "C" float FLOAT_803301E8;
 extern "C" float FLOAT_803301F8;
 extern const char sCharaStageName[7];
 
-extern const char lbl_80330200[];
-extern const char lbl_80330208[];
-extern const char lbl_80330210[];
-extern const char lbl_80330218[];
+extern const char lbl_80330200[7];
+extern const char lbl_80330208[7];
+extern const char lbl_80330210[5];
+extern const char lbl_80330218[5];
 extern "C" const char lbl_801D90D4[];
+extern const Vec DAT_801D9078;
 
 inline void* operator new(unsigned long, void* ptr)
 {
@@ -1034,7 +1035,7 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 
 				chunkFile.PushChunk();
 				while (chunkFile.GetNextChunk(chunk)) {
-					if (chunk.m_id == 0x4E4F4445 && m_nodes != 0) {
+					if (chunk.m_id == 0x4E4F4445) {
 						CNode* node = &m_nodes[m_data->m_nodeCount];
 						node->Create(chunkFile, this, static_cast<CChara::CNode::TYPE>(chunk.m_arg0), stage);
 						if (strcmp(NodeRefName(node), lbl_80330200) == 0) {
@@ -1061,7 +1062,7 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 
 				chunkFile.PushChunk();
 				while (chunkFile.GetNextChunk(chunk)) {
-					if (chunk.m_id == 0x4D455348 && m_meshes != 0) {
+					if (chunk.m_id == 0x4D455348) {
 						CMesh* mesh = &m_meshes[m_data->m_meshCount];
 						mesh->Create(this, chunkFile, stage);
 						m_data->m_meshCount = m_data->m_meshCount + 1;
@@ -1174,7 +1175,8 @@ void CChara::CModel::CreateDynamics(void* dynData, CMemory::CStage* stage)
 						chunkFile.PushChunk();
 						while (chunkFile.GetNextChunk(chunk)) {
 							if (chunk.m_id == CharaFourCC('P', 'A', 'R', 'M')) {
-								NodeDynParamIndex(&ModelNodes(this)[currentNode]) = static_cast<s8>(chunkFile.Get4());
+								s8 paramIndex = static_cast<s8>(chunkFile.Get4());
+								NodeDynParamIndex(&ModelNodes(this)[currentNode]) = paramIndex;
 							}
 						}
 						chunkFile.PopChunk();
@@ -1623,13 +1625,13 @@ void CChara::CModel::calcMatrix()
 			Mtx scaleMtx;
 
 			Math.MTXGetScale(NodeLocalRuntimeMtx(node), &targetScale);
-			if (FLOAT_803301E4 <= targetScale.x) {
+			if (targetScale.x < FLOAT_803301E4) {
+				targetScale.y = FLOAT_803301E8;
+				targetScale.z = FLOAT_803301E8;
+			} else {
 				PSVECScale(&NodePreviousScale(node), &positionScaleA, FLOAT_803301BC - alpha);
 				PSVECScale(&targetScale, &positionScaleB, alpha);
 				PSVECAdd(&positionScaleA, &positionScaleB, &targetScale);
-			} else {
-				targetScale.y = FLOAT_803301E8;
-				targetScale.z = FLOAT_803301E8;
 			}
 			PSVECScale(&NodePreviousPosition(node), &positionScaleA, FLOAT_803301BC - alpha);
 			PSVECScale(&targetPos, &positionScaleB, alpha);
@@ -1655,10 +1657,7 @@ void CChara::CModel::calcMatrix()
 		}
 
 		if (ref->m_index == ModelHeadIndex(this) && ModelTwistAngle(this) != FLOAT_803301b0) {
-			Vec twistAxis;
-			twistAxis.x = FLOAT_803301b0;
-			twistAxis.y = FLOAT_803301BC;
-			twistAxis.z = FLOAT_803301b0;
+			Vec twistAxis = DAT_801D9078;
 			Mtx twistRotate;
 			Mtx nodeBase;
 			Mtx axisBase;
@@ -1666,12 +1665,12 @@ void CChara::CModel::calcMatrix()
 			PSMTXRotAxisRad(twistRotate, &twistAxis, ModelTwistAngle(this));
 			PSMTXCopy(NodeWorldMtx(node), nodeBase);
 			PSMTXCopy(twistRotate, axisBase);
-			nodeBase[0][3] = FLOAT_803301b0;
-			nodeBase[1][3] = FLOAT_803301b0;
-			nodeBase[2][3] = FLOAT_803301b0;
-			axisBase[0][3] = FLOAT_803301b0;
-			axisBase[1][3] = FLOAT_803301b0;
-			axisBase[2][3] = FLOAT_803301b0;
+			nodeBase[0][3] = CVector(FLOAT_803301b0, FLOAT_803301b0, FLOAT_803301b0).x;
+			nodeBase[1][3] = CVector(FLOAT_803301b0, FLOAT_803301b0, FLOAT_803301b0).y;
+			nodeBase[2][3] = CVector(FLOAT_803301b0, FLOAT_803301b0, FLOAT_803301b0).z;
+			axisBase[0][3] = CVector(FLOAT_803301b0, FLOAT_803301b0, FLOAT_803301b0).x;
+			axisBase[1][3] = CVector(FLOAT_803301b0, FLOAT_803301b0, FLOAT_803301b0).y;
+			axisBase[2][3] = CVector(FLOAT_803301b0, FLOAT_803301b0, FLOAT_803301b0).z;
 			PSMTXConcat(axisBase, nodeBase, twistRotate);
 			NodeWorldMtx(node)[0][0] = twistRotate[0][0];
 			NodeWorldMtx(node)[1][0] = twistRotate[1][0];
@@ -1796,13 +1795,13 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 			Mtx scaleMtx;
 
 			Math.MTXGetScale(localMtx, &targetScale);
-			if (FLOAT_803301E4 <= targetScale.x) {
+			if (targetScale.x < FLOAT_803301E4) {
+				targetScale.y = FLOAT_803301E8;
+				targetScale.z = FLOAT_803301E8;
+			} else {
 				PSVECScale(&NodePreviousScale(node), &positionScaleA, FLOAT_803301BC - alpha);
 				PSVECScale(&targetScale, &positionScaleB, alpha);
 				PSVECAdd(&positionScaleA, &positionScaleB, &targetScale);
-			} else {
-				targetScale.y = FLOAT_803301E8;
-				targetScale.z = FLOAT_803301E8;
 			}
 			PSVECScale(&NodePreviousPosition(node), &positionScaleA, FLOAT_803301BC - alpha);
 			PSVECScale(&targetPos, &positionScaleB, alpha);
@@ -1985,8 +1984,10 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 	reinterpret_cast<CVector&>(direction).Normalize();
 	float align = PSVECDotProduct(&forward, &direction);
 	if (align <= FLOAT_803301D8) {
-		float rotateAngle = FLOAT_803301E0;
-		if (FLOAT_803301DC <= align) {
+		float rotateAngle;
+		if (align < FLOAT_803301DC) {
+			rotateAngle = FLOAT_803301E0;
+		} else {
 			rotateAngle = acosf(align);
 		}
 
@@ -2855,23 +2856,17 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 					m_data->m_oneWeightCountOrSize = chunkInfo.m_size;
 					m_data->m_oneWeightData =
 					    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp), 0x808, 0);
-					if (m_data->m_oneWeightData != 0) {
-						memcpy(m_data->m_oneWeightData, chunk.GetAddress(), chunkInfo.m_size);
-					}
+					memcpy(m_data->m_oneWeightData, chunk.GetAddress(), chunkInfo.m_size);
 				} else if (chunkInfo.m_id == 0x54574F20) {
 					m_data->m_twoWeightCountOrSize = chunkInfo.m_size;
 					m_data->m_twoWeightData =
 					    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp), 0x80E, 0);
-					if (m_data->m_twoWeightData != 0) {
-						memcpy(m_data->m_twoWeightData, chunk.GetAddress(), chunkInfo.m_size);
-					}
+					memcpy(m_data->m_twoWeightData, chunk.GetAddress(), chunkInfo.m_size);
 				} else if (chunkInfo.m_id == 0x524D494E) {
 					m_data->m_threeWeightCountOrSize = chunkInfo.m_size;
 					m_data->m_threeWeightData =
 					    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp), 0x814, 0);
-					if (m_data->m_threeWeightData != 0) {
-						memcpy(m_data->m_threeWeightData, chunk.GetAddress(), chunkInfo.m_size);
-					}
+					memcpy(m_data->m_threeWeightData, chunk.GetAddress(), chunkInfo.m_size);
 				}
 			}
 			chunk.PopChunk();

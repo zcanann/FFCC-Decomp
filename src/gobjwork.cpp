@@ -1836,9 +1836,8 @@ void CCaravanWork::CalcStatus()
 	short strBonus = 0;
 	short magBonus = 0;
 	short defBonus = 0;
-	short* artifact = reinterpret_cast<short*>(m_artifacts);
-	for (int i = 0; i < 100; i++, artifact++) {
-		short artifactId = *artifact;
+	for (int i = 0; i < 100; i++) {
+		int artifactId = m_artifacts[i];
 		if (artifactId > 0) {
 			unsigned short* artifactData = GetItemDataPtr(artifactId);
 			int artifactEffect = artifactData[0];

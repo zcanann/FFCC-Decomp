@@ -2944,10 +2944,10 @@ void CGCharaObj::statAttack()
 	onStatAttack(0);
 
 	if (m_stateFrame == 0) {
-		m_ignoreHit[0].m_flag &= 0x7F;
-		m_ignoreHit[1].m_flag &= 0x7F;
-		m_ignoreHit[2].m_flag &= 0x7F;
-		m_ignoreHit[3].m_flag &= 0x7F;
+		m_ignoreHit[0].m_flagBits.m_flag_80 = 0;
+		m_ignoreHit[1].m_flagBits.m_flag_80 = 0;
+		m_ignoreHit[2].m_flagBits.m_flag_80 = 0;
+		m_ignoreHit[3].m_flagBits.m_flag_80 = 0;
 
 		putParticleFromItem(m_itemId, 0, m_particleSlots[0], 0);
 		putParticleFromItem(m_itemId, 1, m_particleSlots[0], 0);

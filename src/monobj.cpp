@@ -1014,7 +1014,8 @@ void CGMonObj::onFrameStat()
 		unsigned char* script9 = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
 		float range = static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0xCE));
 
-		if (*reinterpret_cast<unsigned short*>(aiData + 0x10A) == 2) {
+		int aiActionKind = *reinterpret_cast<unsigned short*>(aiData + 0x10A);
+		if (aiActionKind == 2) {
 			if (*reinterpret_cast<unsigned short*>(script9 + 0x10C) == 1) {
 				if (prgObj->m_subState == 0) {
 					unsigned int chaseFlag = 0;

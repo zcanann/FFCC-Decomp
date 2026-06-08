@@ -792,7 +792,7 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
     }
 
     CHandle* handle = m_handleList->m_next;
-    while (handle != m_handleList) {
+    while (m_handleList != handle) {
         CHandle* next = handle->m_next;
         delete handle;
         handle = next;

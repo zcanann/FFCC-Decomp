@@ -3474,16 +3474,7 @@ void CGCharaObj::combi2()
 		CGPartyObj* party = candidates[i];
 		unsigned int comboMode = 0xFFFFFFFF;
 
-		if (isSharedResult) {
-			CharaObjComboCenter(party) = comboCenter;
-			if (playedComboSe || CharaObjSkipComboScript(party)) {
-				CharaObjComboScriptArg(party) = 0;
-			} else {
-				CharaObjComboScriptArg(party) = comboCmd;
-				party->playSe3D(0x3F, 0x32, 0x96, 0, 0);
-				playedComboSe = true;
-			}
-		} else {
+		if (!isSharedResult) {
 			if (comboCmd == 0x207) {
 				comboMode = 0;
 			} else if (comboCmd == 0x20B) {
@@ -3498,6 +3489,15 @@ void CGCharaObj::combi2()
 			} else {
 				CharaObjComboCenter(party) = leadParty->m_worldPosition;
 				CharaObjComboScriptArg(party) = 0;
+			}
+		} else {
+			CharaObjComboCenter(party) = comboCenter;
+			if (playedComboSe || CharaObjSkipComboScript(party)) {
+				CharaObjComboScriptArg(party) = 0;
+			} else {
+				CharaObjComboScriptArg(party) = comboCmd;
+				party->playSe3D(0x3F, 0x32, 0x96, 0, 0);
+				playedComboSe = true;
 			}
 		}
 

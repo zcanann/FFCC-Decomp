@@ -151,9 +151,21 @@ void SetEnvMap(PYmMana*, VYmMana* vYmMana)
     GXTexObj* texObjC = &vYmMana->m_envTexture1->m_texObj;
     unsigned char alpha = vYmMana->m_manaAlpha;
 
-    _GXColor white = {0xff, 0xff, 0xff, 0xff};
-    _GXColor alphaOnly = {0x00, 0x00, 0x00, alpha};
-    _GXColor whiteAlpha = {0xff, 0xff, 0xff, alpha};
+    _GXColor white;
+    _GXColor alphaOnly;
+    _GXColor whiteAlpha;
+    white.r = 0xff;
+    white.g = 0xff;
+    alphaOnly.r = 0x00;
+    alphaOnly.g = 0x00;
+    alphaOnly.b = 0x00;
+    alphaOnly.a = alpha;
+    white.b = 0xff;
+    white.a = 0xff;
+    whiteAlpha.r = 0xff;
+    whiteAlpha.g = 0xff;
+    whiteAlpha.b = 0xff;
+    whiteAlpha.a = alpha;
     GXSetChanAmbColor((GXChannelID)4, white);
     GXSetChanMatColor((GXChannelID)4, white);
     GXSetTevKColor((GXTevKColorID)0, alphaOnly);

@@ -766,10 +766,10 @@ CChara::CModel::CRefData::CRefData()
 	m_nodeRefData = 0;
 	m_meshRefData = 0;
 	m_bank = 0;
-	m_chest1NodeIndex = 0xFFFF;
-	m_chest2NodeIndex = 0xFFFF;
-	m_chest3NodeIndex = 0xFFFF;
-	m_headNodeIndex = 0xFFFF;
+	m_chest1NodeIndex = -1;
+	m_chest2NodeIndex = -1;
+	m_chest3NodeIndex = -1;
+	m_headNodeIndex = -1;
 	m_materialSet = 0;
 	m_baseScale = 1.0f;
 	m_posQuant = 7;
@@ -1574,18 +1574,18 @@ void CChara::CModel::calcMatrix()
 				Mtx animMtx;
 				NodeAnimNode0(node)->Interp(m_anim, reinterpret_cast<SRT*>(&srt), frame);
 				u16 nodeIndex = ref->m_index;
-				if (nodeIndex == ModelChest1Index(this) || nodeIndex == ModelChest2Index(this) ||
-				    nodeIndex == ModelChest3Index(this)) {
+				if (nodeIndex == ModelHeadIndex(this) || nodeIndex == ModelChest3Index(this) ||
+				    nodeIndex == ModelChest2Index(this)) {
 					float tiltScale;
-					if (nodeIndex == ModelChest3Index(this)) {
-						srt.m_rotation.y = -(ModelChestAmp(this) * FLOAT_803301D0 - srt.m_rotation.y);
+					if (nodeIndex == ModelChest2Index(this)) {
+						srt.m_rotation.y = -(ModelChestTilt(this) * FLOAT_803301D0 - srt.m_rotation.y);
 						tiltScale = FLOAT_803301D0;
 					} else {
-						srt.m_rotation.x = ModelChestAmp(this) * FLOAT_803301F8 + srt.m_rotation.x;
+						srt.m_rotation.x = ModelChestTilt(this) * FLOAT_803301F8 + srt.m_rotation.x;
 						tiltScale = FLOAT_803301F8;
 					}
-					srt.m_rotation.z = ModelChestTilt(this) * tiltScale + srt.m_rotation.z;
-				} else if (nodeIndex == ModelHeadIndex(this) && ModelTexAnimSet(this) != 0) {
+					srt.m_rotation.z = ModelChestAmp(this) * tiltScale + srt.m_rotation.z;
+				} else if (nodeIndex == ModelChest1Index(this) && ModelTexAnimSet(this) != 0) {
 					srt.m_rotation.z += TexAnimSetChin(ModelTexAnimSet(this));
 				}
 				if (AnimNodeUsesScale(NodeAnimNode0(node))) {
@@ -1657,7 +1657,7 @@ void CChara::CModel::calcMatrix()
 			dynamics(node, parentNode);
 		}
 
-		if (ref->m_index == ModelChest1Index(this) && ModelTwistAngle(this) != FLOAT_803301b0) {
+		if (ref->m_index == ModelHeadIndex(this) && ModelTwistAngle(this) != FLOAT_803301b0) {
 			Vec twistAxis;
 			twistAxis.x = FLOAT_803301b0;
 			twistAxis.y = FLOAT_803301BC;
@@ -1769,27 +1769,10 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 			}
 
 			if (NodeAnimNode0(node) != 0) {
-				u16 nodeIndex;
-
 				if (reuseAnimNode0Srt) {
 					srt = cachedParentScaleSrt;
 				} else {
 					NodeAnimNode0(node)->Interp(m_anim, reinterpret_cast<SRT*>(&srt), frame);
-				}
-				nodeIndex = ref->m_index;
-				if (nodeIndex == ModelChest1Index(this) || nodeIndex == ModelChest2Index(this) ||
-				    nodeIndex == ModelChest3Index(this)) {
-					float tiltScale;
-					if (nodeIndex == ModelChest3Index(this)) {
-						srt.m_rotation.y = -(ModelChestAmp(this) * FLOAT_803301D0 - srt.m_rotation.y);
-						tiltScale = FLOAT_803301D0;
-					} else {
-						srt.m_rotation.x = ModelChestAmp(this) * FLOAT_803301F8 + srt.m_rotation.x;
-						tiltScale = FLOAT_803301F8;
-					}
-					srt.m_rotation.z = ModelChestTilt(this) * tiltScale + srt.m_rotation.z;
-				} else if (nodeIndex == ModelHeadIndex(this) && ModelTexAnimSet(this) != 0) {
-					srt.m_rotation.z += TexAnimSetChin(ModelTexAnimSet(this));
 				}
 				if (AnimNodeUsesScale(NodeAnimNode0(node))) {
 					Math.SRTToMatrix(animMtx, reinterpret_cast<SRT*>(&srt));

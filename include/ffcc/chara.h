@@ -197,10 +197,10 @@ public:
 			void* m_nodeRefData;       // 0x10
 			void* m_meshRefData;       // 0x14
 			void* m_bank;              // 0x18
-			u16 m_headNodeIndex;       // 0x1C
-			u16 m_chest3NodeIndex;     // 0x1E
-			u16 m_chest2NodeIndex;     // 0x20
-			u16 m_chest1NodeIndex;     // 0x22
+			s16 m_headNodeIndex;       // 0x1C
+			s16 m_chest3NodeIndex;     // 0x1E
+			s16 m_chest2NodeIndex;     // 0x20
+			s16 m_chest1NodeIndex;     // 0x22
 			CMaterialSet* m_materialSet; // 0x24
 			float m_baseScale;         // 0x28
 			u8 _pad2C[0x8];            // 0x2C

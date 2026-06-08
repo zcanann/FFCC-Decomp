@@ -56,8 +56,8 @@ static inline char ReadTagByte(char** text)
 {
 	char* p0 = *text;
 	*text = p0 + 1;
+	signed char hi = (signed char)((*p0 & 0x0F) << 4);
 	char* p1 = *text;
-	char hi = (char)((*p0 & 0x0F) << 4);
 	*text = p1 + 1;
 	return (char)(hi | (*p1 & 0x0F));
 }

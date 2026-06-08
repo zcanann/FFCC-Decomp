@@ -6,6 +6,15 @@ class CChunkFile;
 class CMapKeyFrame
 {
 public:
+    CMapKeyFrame()
+    {
+        m_junTable = 0;
+        m_keyFrame = 0;
+        m_keyValue = 0;
+        m_splineTable = 0;
+        m_loop = 1;
+        m_isRun = 0;
+    }
 #ifndef FFCC_MAPKEYFRAME_NO_DESTRUCTOR
     ~CMapKeyFrame()
     {

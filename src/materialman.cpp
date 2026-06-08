@@ -176,16 +176,7 @@ static void AddTextureIndex(CMaterial* material, unsigned short textureIndex)
 
 static CMapKeyFrame* AllocMapKeyFrame(int line)
 {
-    CMapKeyFrame* keyFrame = reinterpret_cast<CMapKeyFrame*>(operator new(
-        0x28,
-        MaterialMan.GetMemoryStage(),
-        const_cast<char*>(s_materialman_cpp),
-        line));
-	if (keyFrame != 0) {
-		memset(keyFrame, 0, 0x28);
-		keyFrame->m_startFrame = 1;
-	}
-	return keyFrame;
+    return new (MaterialMan.GetMemoryStage(), const_cast<char*>(s_materialman_cpp), line) CMapKeyFrame();
 }
 
 static void SetMaterialColor(CMaterial* material, unsigned int rgba)

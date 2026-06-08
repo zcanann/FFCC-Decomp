@@ -7997,20 +7997,22 @@ int JoyBus::SendHitEnemy(int portIndex, char enemyId, short hitValue)
     *reinterpret_cast<unsigned short*>(cmdBytes + 2) = __lhbrx(&hit, 0);
     unsigned int word = cmd;
 
-    if (static_cast<signed char>(m_threadRunningMask) != 0) {
-        OSWaitSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
+    if (static_cast<signed char>(m_threadRunningMask) == 0) {
+        return result;
+    }
 
-        unsigned int port = m_threadParams[portIndex].m_portIndex;
-        if (static_cast<int>(m_cmdCount[port]) >= 0x40) {
-            OSSignalSemaphore(&m_accessSemaphores[port]);
-            result = 0xFFFFFFFF;
-        } else {
-            m_cmdQueueData[port][m_cmdCount[port]] = word;
-            port = m_threadParams[portIndex].m_portIndex;
-            m_cmdCount[port]++;
-            OSSignalSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
-            result = 0;
-        }
+    OSWaitSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
+
+    unsigned int port = m_threadParams[portIndex].m_portIndex;
+    if (static_cast<int>(m_cmdCount[port]) >= 0x40) {
+        OSSignalSemaphore(&m_accessSemaphores[port]);
+        result = 0xFFFFFFFF;
+    } else {
+        m_cmdQueueData[port][m_cmdCount[port]] = word;
+        port = m_threadParams[portIndex].m_portIndex;
+        m_cmdCount[port]++;
+        OSSignalSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
+        result = 0;
     }
 
     return result;

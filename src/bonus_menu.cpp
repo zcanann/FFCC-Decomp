@@ -1483,6 +1483,8 @@ void CMenuPcs::DrawSelectOpenAnim()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_strength_reduction off
 void CMenuPcs::CalcSelectOpenAnim()
 {
 	int activePartyCount = s_Rinfo->m_partyCount;
@@ -2019,6 +2021,7 @@ void CMenuPcs::DrawResultCloseAnim()
 }
 #undef s_BonusModelYPos
 #undef s_BonusModelScale
+#pragma pop
 
 /*
  * --INFO--

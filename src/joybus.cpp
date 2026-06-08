@@ -7558,6 +7558,7 @@ int JoyBus::SetMoney(int portIndex, unsigned int money)
 		cmdBytes[1] = 0;
 		cmdBytes[2] = money >> 24;
 		cmdBytes[3] = money >> 16;
+		unsigned int word = cmd;
 
 		if (static_cast<signed char>(m_threadRunningMask) != 0)
 		{
@@ -7571,7 +7572,7 @@ int JoyBus::SetMoney(int portIndex, unsigned int money)
 			}
 			else
 			{
-				m_cmdQueueData[m_threadParams[portIndex].m_portIndex][m_cmdCount[m_threadParams[portIndex].m_portIndex]] = cmd;
+				m_cmdQueueData[m_threadParams[portIndex].m_portIndex][m_cmdCount[m_threadParams[portIndex].m_portIndex]] = word;
 				m_cmdCount[m_threadParams[portIndex].m_portIndex]++;
 				OSSignalSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
 				result = 0;
@@ -7589,6 +7590,7 @@ int JoyBus::SetMoney(int portIndex, unsigned int money)
 		cmdBytes[0] = 0x5A;
 		cmdBytes[1] = money >> 8;
 		cmdBytes[2] = money;
+		unsigned int word = cmd;
 
 		if (static_cast<signed char>(m_threadRunningMask) != 0)
 		{
@@ -7602,7 +7604,7 @@ int JoyBus::SetMoney(int portIndex, unsigned int money)
 			}
 			else
 			{
-				m_cmdQueueData[m_threadParams[portIndex].m_portIndex][m_cmdCount[m_threadParams[portIndex].m_portIndex]] = cmd;
+				m_cmdQueueData[m_threadParams[portIndex].m_portIndex][m_cmdCount[m_threadParams[portIndex].m_portIndex]] = word;
 				m_cmdCount[m_threadParams[portIndex].m_portIndex]++;
 				OSSignalSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
 				result = 0;

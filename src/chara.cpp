@@ -1737,7 +1737,7 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 			} else {
 				if (parentNode == 0) {
 					float baseScale = ModelBaseScale(this);
-					if (baseScale == FLOAT_803301BC) {
+					if (FLOAT_803301BC == baseScale) {
 						PSMTXIdentity(localMtx);
 					} else {
 						PSMTXScale(localMtx, baseScale, baseScale, baseScale);

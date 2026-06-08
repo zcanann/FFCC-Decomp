@@ -1995,7 +1995,7 @@ int CMapMng::ReadMpl(char* mapName)
                     while (chunkFile.GetNextChunk(meshChunk)) {
                         if (meshChunk.m_id == 0x56534554) {
                             short& meshCount = m_mapMeshCount;
-                            if (meshCount > 0x9F) {
+                            if (meshCount >= 0xA0) {
                                 return 0;
                             }
                             CMapMesh* mesh = GetMapMeshArray() + meshCount;
@@ -2102,7 +2102,7 @@ int CMapMng::ReadOtm(char* mapName)
         while (chunkFile.GetNextChunk(chunk)) {
             if (chunk.m_id == 0x4F43544D) {
                 short& octTreeCount = m_octTreeCount;
-                if (octTreeCount > 0xF) {
+                if (octTreeCount >= 0x10) {
                     return 0;
                 }
 
@@ -2155,7 +2155,7 @@ int CMapMng::ReadOtm(char* mapName)
 
                 case 0x4D455348: {
                     short& meshCount = m_mapMeshCount;
-                    if (meshCount > 0x9F) {
+                    if (meshCount >= 0xA0) {
                         return 0;
                     }
                     CMapMesh* mesh = GetMapMeshArray() + meshCount;
@@ -2166,7 +2166,7 @@ int CMapMng::ReadOtm(char* mapName)
 
                 case 0x48495420: {
                     short& hitCount = m_mapHitCount;
-                    if (hitCount > 0x1F) {
+                    if (hitCount >= 0x20) {
                         return 0;
                     }
                     CMapHit* hit = GetMapHitArray() + hitCount;
@@ -2177,7 +2177,7 @@ int CMapMng::ReadOtm(char* mapName)
 
                 case 0x4E4F4445: {
                     short& mapObjCount = m_mapObjCount;
-                    if (mapObjCount > 0x1FF) {
+                    if (mapObjCount >= 0x200) {
                         return 0;
                     }
                     CMapObj* mapObj = GetMapObjArray() + mapObjCount;
@@ -2384,7 +2384,7 @@ int CMapMng::ReadMid(char* mapName)
                     }
 
                     short& hitCount = m_mapHitCount;
-                    if (hitCount > 0x1F) {
+                    if (hitCount >= 0x20) {
                         return 0;
                     }
                     CMapHit* hit = GetMapHitArray() + hitCount;
@@ -2404,7 +2404,7 @@ int CMapMng::ReadMid(char* mapName)
             while (mapObjIndex < m_mapObjCount) {
                 if (mapObj->m_meshType == 1 || mapObj->m_meshType == 2) {
                     short& octTreeCount = m_octTreeCount;
-                    if (octTreeCount > 0xF) {
+                    if (octTreeCount >= 0x10) {
                         return 0;
                     }
 

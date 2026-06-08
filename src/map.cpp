@@ -2657,16 +2657,12 @@ void CMapMng::Draw()
     m_underWaterTexPending = 1;
 
     if ((s_bitMask.m_fields.m_mode & 8) == 0) {
-        COctTree* octTree = GetOctTreeArray();
         for (int i = 0; i < m_octTreeCount; i++) {
-            octTree->Draw(0);
-            octTree++;
+            m_octTreeArray[i].Draw(0);
         }
 
-        CMapObj* mapObj = MapMng.GetMapObjArray();
         for (int i = 0; i < m_mapObjCount; i++) {
-            mapObj->Draw(0x40);
-            mapObj++;
+            MapMng.m_mapObjArray[i].Draw(0x40);
         }
 
         PartPcs.DrawShoki();
@@ -2677,16 +2673,12 @@ void CMapMng::Draw()
         GXSetZMode(1, GX_LEQUAL, 1);
         LightPcs.SetNumDiffuse(0);
 
-        mapObj = MapMng.GetMapObjArray();
         for (int i = 0; i < m_mapObjCount; i++) {
-            mapObj->Draw(0);
-            mapObj++;
+            MapMng.m_mapObjArray[i].Draw(0);
         }
 
-        octTree = GetOctTreeArray();
         for (int i = 0; i < m_octTreeCount; i++) {
-            octTree->Draw(1);
-            octTree++;
+            m_octTreeArray[i].Draw(1);
         }
 
         if (Game.m_currentSceneId == 4) {
@@ -2821,10 +2813,8 @@ void CMapMng::Draw()
                     shadowCount -= batchCount;
                     startIndex += batchCount;
 
-                    octTree = GetOctTreeArray();
                     for (int i = 0; i < m_octTreeCount; i++) {
-                        octTree->DrawCharaShadow(0);
-                        octTree++;
+                        m_octTreeArray[i].DrawCharaShadow(0);
                     }
                 } while (shadowCount != 0);
             }
@@ -2923,10 +2913,8 @@ void CMapMng::Draw()
         _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
         _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 
-        CMapObj* mapObj = MapMng.GetMapObjArray();
         for (int i = 0; i < m_mapObjCount; i++) {
-            mapObj->DrawHit();
-            mapObj++;
+            MapMng.m_mapObjArray[i].DrawHit();
         }
 
         CameraPcs.SetOffsetZBuff(kMapZero);

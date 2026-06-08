@@ -1229,12 +1229,8 @@ void CCharaPcs::draw()
 {
     SetupBaseCharaLights(this);
 
-    if (m_handleList == 0) {
-        return;
-    }
-
     CHandle* handle = m_handleList->m_next;
-    while (handle != m_handleList) {
+    while (m_handleList != handle) {
         if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x8000) != 0) {
             handle->draw(0, 1);
         }
@@ -1252,12 +1248,8 @@ void CCharaPcs::drawBefore()
     CameraPcs.SetStdProjectionMatrix();
     SetupBaseCharaLights(this);
 
-    if (m_handleList == 0) {
-        return;
-    }
-
     CHandle* handle = m_handleList->m_next;
-    while (handle != m_handleList) {
+    while (m_handleList != handle) {
         if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x8000) != 0) {
             handle->draw(3, 1);
         }
@@ -1303,7 +1295,7 @@ void CCharaPcs::drawMakeTexShadow()
     C_MTXLightPerspective(m_texShadowProjectionMtx, CameraPcs.m_fov, 1.0f, 0.5f, -0.5f, 0.5f, 0.5f);
 
     CHandle* handle = m_handleList->m_next;
-    while (handle != m_handleList) {
+    while (m_handleList != handle) {
         if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x8000) != 0) {
             handle->draw(2, 1);
         }

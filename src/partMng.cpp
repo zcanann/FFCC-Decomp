@@ -2985,11 +2985,11 @@ void CPartMng::pppDrawPrioPdtFpno(unsigned char drawMode, short kind, short node
         short m_nodeIndex;                   // 0x76
         pppFMATRIX m_matrix;                 // 0x78
         unsigned char m_padA8[0xE4 - 0xA8]; // 0xA8
-        unsigned char m_endRequested;        // 0xE4
+        unsigned char m_mode;                // 0xE4
         unsigned char m_stopRequested;       // 0xE5
         unsigned char m_isFinished;          // 0xE6
         unsigned char m_matrixMode;          // 0xE7
-        unsigned char m_hitBgFlag;           // 0xE8
+        unsigned char m_endRequested;        // 0xE8
         unsigned char m_slotVisible;         // 0xE9
         unsigned char m_ownerFacing;         // 0xEA
         unsigned char m_drawVariant;         // 0xEB

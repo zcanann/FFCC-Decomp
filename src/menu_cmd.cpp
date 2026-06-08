@@ -1381,7 +1381,7 @@ void CMenuPcs::CmdDraw()
 			const s32 choices = (kCmdMenuOneD == static_cast<double>(panel->scale)) ? 2 : 3;
 			const float pitch = static_cast<float>(
 			    ((static_cast<float>(panel->height) * panel->scale) - kCmdMenuChoicePaddingD) /
-			    static_cast<float>(choices));
+			    static_cast<double>(choices));
 			cursorX = static_cast<float>(panel->x - 0x14);
 			cursorY = ((pitch - kCmdMenuTextLineHeightD) * kCmdMenuHalfD) +
 			          ((pitch * static_cast<float>(GetCmdStateView(this)->choice)) + static_cast<float>(panel->y + 8));

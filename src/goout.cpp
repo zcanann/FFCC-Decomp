@@ -1627,28 +1627,6 @@ void CGoOutMenu::CalcGoOut()
         }
         SetGoOutMode(0xC);
         break;
-    case 10:
-        if (MenuPcs.GetMcCtrl()->ChkConnect(1) == -1) {
-            return;
-        }
-        m_modeFrame = 0;
-        SetGoOutMode(0xB);
-        break;
-    case 0xB:
-        if (m_modeFrame < 0x14) {
-            return;
-        }
-        if (MenuPcs.GetMcCtrl()->ChkConnect(1) == -3) {
-            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
-            SetMenuStr(0, 2,
-                       GetGoOutMessageLine(languageId, 46),
-                       GetGoOutMessageLine(languageId, 47));
-            m_returnGoOutMode = -1;
-            SetGoOutMode(0);
-            return;
-        }
-        SetGoOutMode(0xE);
-        break;
     case 0xC:
         if (m_memCardResult != 0) {
             if (SetMemCardError() != 0) {
@@ -1674,6 +1652,28 @@ void CGoOutMenu::CalcGoOut()
                 SetGoOutMode(10);
             }
         }
+        break;
+    case 10:
+        if (MenuPcs.GetMcCtrl()->ChkConnect(1) == -1) {
+            return;
+        }
+        m_modeFrame = 0;
+        SetGoOutMode(0xB);
+        break;
+    case 0xB:
+        if (m_modeFrame < 0x14) {
+            return;
+        }
+        if (MenuPcs.GetMcCtrl()->ChkConnect(1) == -3) {
+            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+            SetMenuStr(0, 2,
+                       GetGoOutMessageLine(languageId, 46),
+                       GetGoOutMessageLine(languageId, 47));
+            m_returnGoOutMode = -1;
+            SetGoOutMode(0);
+            return;
+        }
+        SetGoOutMode(0xE);
         break;
     case 0xE:
         if (MenuPcs.m_goOutLoadFinished != 0) {

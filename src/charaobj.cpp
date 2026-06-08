@@ -564,8 +564,8 @@ void CGCharaObj::onCancelStat(int)
 	switch (state) {
 		case 0x12:
 			{
-				unsigned char* self = reinterpret_cast<unsigned char*>(this);
 				int i = 0;
+				unsigned char* self = reinterpret_cast<unsigned char*>(this);
 				for (; i < 0x16; i++, self += 4) {
 					if (((1U << i) & 1U) != 0) {
 						CFlatRuntime2Storage().EndParticleSlot(*reinterpret_cast<int*>(self + 0x564), 1);

@@ -2410,6 +2410,8 @@ void CShopMenu::DrawShop0()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_common_subs off
 void CShopMenu::SelectMake()
 {
     bool canSelect = MenuPcs.ChkEquipPossible(m_resultItem) &&
@@ -2503,6 +2505,7 @@ void CShopMenu::SelectMake()
         SetMode(0xE);
     }
 }
+#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x80155934

@@ -5609,15 +5609,17 @@ void CMenuPcs::DrawLoadMenu()
 			if (m_wmWorldState->m_mcResult < 0) {
 				m_wmWorldState->m_subState = 3;
 			} else if (m_wmWorldState->m_state0E != 0) {
-				if (m_wmWorldState->m_state0E >= 0) {
-					m_wmWorldState->m_subState = 0x16;
-				} else if (m_wmWorldState->m_menuMode == 8 && m_goOutSaveLoadMode != 0) {
-					m_wmWorldState->m_nextMenuMode = 1;
-					m_wmWorldState->m_delay = 1;
-					memset(m_wmCharaState, 0, kWmMenuCharaStateBytes);
-					m_wmTransitionCode = 1;
+				if (m_wmWorldState->m_state0E < 0) {
+					if (m_wmWorldState->m_menuMode == 8 && m_goOutSaveLoadMode != 0) {
+						m_wmWorldState->m_nextMenuMode = 1;
+						m_wmWorldState->m_delay = 1;
+						memset(m_wmCharaState, 0, kWmMenuCharaStateBytes);
+						m_wmTransitionCode = 1;
+					} else {
+						m_wmWorldState->m_subState = 2;
+					}
 				} else {
-					m_wmWorldState->m_subState = 2;
+					m_wmWorldState->m_subState = 0x16;
 				}
 			}
 			break;

@@ -2345,25 +2345,23 @@ CGPrgObj* CGPartyObj::getBestAngleObject(float range, float)
 		}
 
 		float radius = obj->m_bodyEllipsoidRadius + (range + m_bodyEllipsoidRadius);
-		if (obj->m_worldPosition.x < m_worldPosition.x - radius ||
-		    obj->m_worldPosition.z < m_worldPosition.z - radius ||
-		    obj->m_worldPosition.x > m_worldPosition.x + radius ||
-		    obj->m_worldPosition.z > m_worldPosition.z + radius) {
-			continue;
-		}
-
-		float yRange = FLOAT_80331ad4 * obj->m_bodyEllipsoidRadius;
-		if (obj->m_worldPosition.y <= m_worldPosition.y + yRange &&
-		    m_worldPosition.y - yRange <= obj->m_worldPosition.y) {
-			Vec diff;
-			PSVECSubtract(&obj->m_worldPosition, &m_worldPosition, &diff);
-			diff.y = 0.0f;
-			float distSq = PSVECSquareMag(&diff);
-			if (distSq > 0.0f && distSq < radius * radius) {
-				float absAngle = fabsf(getTargetRot(reinterpret_cast<CGPrgObj*>(obj)));
-				if (absAngle > bestAbsAngle) {
-					bestAbsAngle = absAngle;
-					best = reinterpret_cast<CGPrgObj*>(obj);
+		if (m_worldPosition.x - radius <= obj->m_worldPosition.x &&
+		    m_worldPosition.z - radius <= obj->m_worldPosition.z &&
+		    m_worldPosition.x + radius >= obj->m_worldPosition.x &&
+		    m_worldPosition.z + radius >= obj->m_worldPosition.z) {
+			float yRange = FLOAT_80331ad4 * obj->m_bodyEllipsoidRadius;
+			if (m_worldPosition.y + yRange >= obj->m_worldPosition.y &&
+			    m_worldPosition.y - yRange <= obj->m_worldPosition.y) {
+				Vec diff;
+				PSVECSubtract(&obj->m_worldPosition, &m_worldPosition, &diff);
+				diff.y = 0.0f;
+				float distSq = PSVECSquareMag(&diff);
+				if (0.0f < distSq && distSq < radius * radius) {
+					float absAngle = fabsf(getTargetRot(reinterpret_cast<CGPrgObj*>(obj)));
+					if (absAngle > bestAbsAngle) {
+						bestAbsAngle = absAngle;
+						best = reinterpret_cast<CGPrgObj*>(obj);
+					}
 				}
 			}
 		}

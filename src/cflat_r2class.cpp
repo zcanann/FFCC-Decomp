@@ -453,8 +453,25 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 							break;
 						default:
 							if (systemVal <= -0x96 && systemVal >= -0x175) {
-								u8* const itemTable = *reinterpret_cast<u8**>(classData + 0x24);
-								StoreU16(stack, itemTable, (systemVal + 0x175) * 2, setMode);
+								const int itemOffset = (systemVal + 0x175) * 2;
+								stack[-1].m_word =
+								    *reinterpret_cast<unsigned short*>(*reinterpret_cast<u8**>(classData + 0x24) + itemOffset);
+								switch (setMode) {
+								case -1:
+									*reinterpret_cast<unsigned short*>(*reinterpret_cast<u8**>(classData + 0x24) + itemOffset) =
+									    *reinterpret_cast<unsigned short*>(*reinterpret_cast<u8**>(classData + 0x24) + itemOffset) -
+									    stack->m_word;
+									break;
+								case 0:
+									*reinterpret_cast<unsigned short*>(*reinterpret_cast<u8**>(classData + 0x24) + itemOffset) =
+									    stack->m_word;
+									break;
+								case 1:
+									*reinterpret_cast<unsigned short*>(*reinterpret_cast<u8**>(classData + 0x24) + itemOffset) =
+									    *reinterpret_cast<unsigned short*>(*reinterpret_cast<u8**>(classData + 0x24) + itemOffset) +
+									    stack->m_word;
+									break;
+								}
 							} else {
 								switch (systemVal) {
 								case -0x40:

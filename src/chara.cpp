@@ -2460,7 +2460,7 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 	m_time = m_curFrame;
 	m_animStart = m_curFrame;
 
-	if (endFrame < 0) {
+	if (endFrame == -1) {
 		endFrame = static_cast<int>(AnimFrameCount(m_anim)) - 1;
 	}
 

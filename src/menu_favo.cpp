@@ -48,7 +48,7 @@ void CMenuPcs::FavoDraw()
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	FavoEntry* entry = m_favoList->entries;
-	for (int i = 0; i < m_favoList->count; i++) {
+	for (unsigned int i = 0; i < m_favoList->count; i++) {
 		if (entry->tex >= 0) {
 			float x = static_cast<float>(entry->x);
 			float y = static_cast<float>(entry->y);
@@ -57,11 +57,11 @@ void CMenuPcs::FavoDraw()
 			float u = entry->u;
 			float v = entry->v;
 
+			GXColor colors[4];
 			if (i < 3) {
 				MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(entry->tex));
 
-				GXColor colors[4];
 				colors[0].r = 0xFF;
 				colors[0].g = 0xFF;
 				colors[0].b = 0xFF;
@@ -86,7 +86,7 @@ void CMenuPcs::FavoDraw()
 						int yStep = static_cast<int>(y);
 						float end = y + h;
 						while (static_cast<float>(yStep) < end) {
-							int tileH = static_cast<int>(end - static_cast<float>(yStep));
+							int tileH = static_cast<unsigned int>(end - static_cast<float>(yStep));
 							if (static_cast<float>(tileH) > 32.0f) {
 								tileH = 0x20;
 							}
@@ -119,7 +119,7 @@ void CMenuPcs::FavoDraw()
 						int yStep = static_cast<int>(y);
 						float end = y + h;
 						while (static_cast<float>(yStep) < end) {
-							int tileH = static_cast<int>(end - static_cast<float>(yStep));
+							int tileH = static_cast<unsigned int>(end - static_cast<float>(yStep));
 							if (static_cast<float>(tileH) > 32.0f) {
 								tileH = 0x20;
 							}
@@ -137,12 +137,11 @@ void CMenuPcs::FavoDraw()
 				MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 			} else {
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(entry->tex));
-				GXColor color;
-				color.r = 0xFF;
-				color.g = 0xFF;
-				color.b = 0xFF;
-				color.a = static_cast<unsigned char>(entry->alpha * 255.0f);
-				GXSetChanMatColor(GX_COLOR0A0, color);
+				colors[0].r = 0xFF;
+				colors[0].g = 0xFF;
+				colors[0].b = 0xFF;
+				colors[0].a = static_cast<unsigned char>(entry->alpha * 255.0f);
+				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 				MenuPcs.DrawRect(0, x, y, w, h, u, v, entry->uvScale, entry->uvScale, 0.0f);
 			}
 		}
@@ -161,8 +160,8 @@ void CMenuPcs::FavoDraw()
 		remaining--;
 	}
 
-	FoodRank* rank = s_rank;
 	FavoEntry* drawEntry = rankEntry;
+	FoodRank* rank = s_rank;
 	for (int i = 0; i < 8; i++) {
 		int barX = drawEntry->x + drawEntry->w + 0x18;
 		int barY = static_cast<int>((static_cast<float>(drawEntry->h) - 24.0f) * 0.5 +
@@ -174,7 +173,7 @@ void CMenuPcs::FavoDraw()
 
 	rank = s_rank;
 	drawEntry = rankEntry;
-	for (int i = 0; i < 8; i++) {
+	for (unsigned int i = 0; i < 8; i++) {
 		int iconX = drawEntry->x + drawEntry->w - 0x10;
 		int iconY = static_cast<int>((static_cast<float>(drawEntry->h) - 32.0f) * 0.5 +
 		                             static_cast<float>(drawEntry->y));
@@ -196,11 +195,13 @@ void CMenuPcs::FavoDraw()
 		rankFont->SetTlut(6);
 		rankFont->SetColor(
 		    CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * drawEntry->alpha)).color);
+		float posX = static_cast<float>(drawEntry->x - 0xC);
+		float posY = static_cast<float>(drawEntry->y + 0xA) - 4.0f;
 		rankFont->renderFlags = (rankFont->renderFlags & 0xEF) | 0x10;
 		rankFont->SetMargin(1.0f);
 		sprintf(textBuf, sFavoRankFormat, static_cast<int>(rank->place));
-		rankFont->SetPosX(static_cast<float>(drawEntry->x - 0xC));
-		rankFont->SetPosY(static_cast<float>(drawEntry->y + 0xA) - 4.0f);
+		rankFont->SetPosX(posX);
+		rankFont->SetPosY(posY);
 		rankFont->Draw(textBuf);
 		rankFont->SetShadow(0);
 		rank++;
@@ -219,9 +220,11 @@ void CMenuPcs::FavoDraw()
 	for (int i = 0; i < 8; i++) {
 		nameFont->SetColor(
 		    CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * drawEntry->alpha)).color);
+		float posX = static_cast<float>(drawEntry->x + 0x1C);
 		const char* name = Game.m_cFlatDataArr[1].TableStrings(0)[(static_cast<char>(rank->foodId) + 0x17D) * 5 + 4];
-		nameFont->SetPosX(static_cast<float>(drawEntry->x + 0x1C));
-		nameFont->SetPosY(static_cast<float>(drawEntry->y + 0xB) - 4.0f);
+		float posY = static_cast<float>(drawEntry->y + 0xB) - 4.0f;
+		nameFont->SetPosX(posX);
+		nameFont->SetPosY(posY);
 		nameFont->Draw(const_cast<char*>(name));
 		rank++;
 		drawEntry++;
@@ -539,11 +542,10 @@ void CMenuPcs::FavoInit()
 {
 	float fVar4;
 	float fVar5;
-	float fVar7;
-	short sVar9;
-	short sVar10;
-	short sVar11;
-	int iVar16;
+	int sVar9;
+	int sVar10;
+	unsigned short sVar11;
+	unsigned int iVar16;
 	int iVar17;
 
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
@@ -607,7 +609,6 @@ void CMenuPcs::FavoInit()
 	setupEntry->duration = 5;
 
 	sVar9 = 0;
-	fVar7 = kFavoIconUvScale;
 	sVar11 = 6;
 	list = this->m_favoList;
 	setupEntry = &list->entries[entryIndex++];
@@ -631,7 +632,7 @@ void CMenuPcs::FavoInit()
 	setupEntry->y = static_cast<short>(0x150 - setupEntry->h);
 	setupEntry->u = fVar4;
 	setupEntry->v = fVar4;
-	setupEntry->uvScale = fVar7;
+	setupEntry->uvScale = kFavoIconUvScale;
 	setupEntry->startFrame = 0;
 	setupEntry->duration = 5;
 
@@ -649,8 +650,7 @@ void CMenuPcs::FavoInit()
 	setupEntry->duration = 5;
 
 	FavoEntry* firstEntry = m_favoList->entries;
-	iVar17 = 4;
-	do {
+	for (iVar17 = 0; iVar17 < 4; iVar17++) {
 		setupEntry = &m_favoList->entries[entryIndex++];
 		setupEntry->flags = 2;
 		setupEntry->tex = 0x37;
@@ -677,8 +677,7 @@ void CMenuPcs::FavoInit()
 		setupEntry->v = fVar4;
 		setupEntry->startFrame = 7;
 		setupEntry->duration = 5;
-		iVar17 = iVar17 - 1;
-	} while (iVar17 != 0);
+	}
 
 	m_favoList->count = sVar11;
 
@@ -693,26 +692,22 @@ void CMenuPcs::FavoInit()
 	FoodRank* rank = ranks;
 	do {
 		iVar17 = rankIndex + 1;
-		iVar16 = 8 - iVar17;
 		FoodRank* compareRank = ranks + iVar17;
-		if (iVar17 < 8) {
-			do {
-				if (rank->score < compareRank->score) {
-					signed char place = rank->place;
-					unsigned char foodId = rank->foodId;
-					short score = rank->score;
+		for (iVar16 = iVar17; iVar16 < 8; iVar16++) {
+			if (rank->score < compareRank->score) {
+				signed char place = rank->place;
+				signed char foodId = rank->foodId;
+				short score = rank->score;
 
-					rank->place = compareRank->place;
-					rank->foodId = compareRank->foodId;
-					rank->score = compareRank->score;
+				rank->place = compareRank->place;
+				rank->foodId = compareRank->foodId;
+				rank->score = compareRank->score;
 
-					compareRank->place = place;
-					compareRank->foodId = foodId;
-					compareRank->score = score;
-				}
-				compareRank++;
-				iVar16--;
-			} while (iVar16 != 0);
+				compareRank->place = place;
+				compareRank->foodId = foodId;
+				compareRank->score = score;
+			}
+			compareRank++;
 		}
 		rankIndex++;
 		rank++;

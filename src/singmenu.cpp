@@ -3223,7 +3223,7 @@ int CMenuPcs::GetSmithItem(int itemNo)
     int smithItem = *reinterpret_cast<u16*>(itemBase + (race & 3) * 2 + 0x38);
     if (smithItem > 0) {
         unsigned int genderMask = 0x10;
-        u16 flags = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + smithItem * 0x48 + 4);
+        s16 flags = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + smithItem * 0x48 + 4);
         unsigned int raceMask = 1 << (*reinterpret_cast<u16*>(reinterpret_cast<unsigned int>(SingleCaravanWork()) + 0x3e0) & 3);
         if (*reinterpret_cast<u16*>(reinterpret_cast<unsigned int>(SingleCaravanWork()) + 0x3e2) != 0) {
             genderMask = 0x20;
@@ -3231,19 +3231,23 @@ int CMenuPcs::GetSmithItem(int itemNo)
 
         int raceFlags = flags & 0xF;
         int genderFlags = flags & 0x30;
-        unsigned int valid;
-        if ((raceFlags != 0) && (genderFlags != 0)) {
-            if (((raceFlags & raceMask) != 0) && ((genderFlags & genderMask) != 0)) {
-                valid = 1;
-            } else {
-                valid = 0;
+        int valid;
+        if (raceFlags != 0) {
+            if (genderFlags != 0) {
+                if (((raceFlags & raceMask) == 0) || ((genderFlags & genderMask) == 0)) {
+                    valid = 0;
+                } else {
+                    valid = 1;
+                }
+                goto checked;
             }
-        } else if (raceFlags == 0) {
-            valid = static_cast<unsigned int>(-static_cast<int>(genderFlags & genderMask)) >> 0x1f;
-        } else {
-            valid = static_cast<unsigned int>(-static_cast<int>(raceFlags & raceMask)) >> 0x1f;
         }
-
+        if (raceFlags == 0) {
+            valid = (genderFlags & genderMask) != 0;
+        } else {
+            valid = (raceFlags & raceMask) != 0;
+        }
+checked:
         if (valid != 0) {
             return smithItem;
         }

@@ -2025,7 +2025,7 @@ int GbaQueue::GetItemAll(int channel, unsigned char* outData)
 	int i;
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	localPlayerData = *GetPlayerDataView(this, channel);
+	localPlayerData = m_playerData[channel];
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	for (i = 0; i < 0x40; i++) {
@@ -4371,7 +4371,7 @@ int GbaQueue::GetTmpArtifactData(int channel, unsigned char* outData)
 	unsigned short tmpArtifacts[4];
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	localPlayerData = *GetPlayerDataView(this, channel);
+	localPlayerData = m_playerData[channel];
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	for (int i = 0; i < 4; i++) {

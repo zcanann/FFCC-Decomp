@@ -196,14 +196,14 @@ void CFlatRuntime::clear()
 
 	m_objectSentinel.m_previous = &m_objectSentinel;
 	m_objectSentinel.m_next = &m_objectSentinel;
-	m_objectSentinel.m_particleId = 0x10;
+	m_objectSentinel.m_0x32 = 0x10;
 
 	m_freeListPrev = reinterpret_cast<void**>(self + 0x978);
 	m_freeListNext = reinterpret_cast<void**>(self + 0x978);
 	m_freeListCount = 0x5220;
 	m_0x984 = 0;
-	m_objectPoolBase = self + 0x1288;
 	m_objectFreeListHead = reinterpret_cast<void**>(self + 0x998);
+	m_objectPoolBase = self + 0x1288;
 
 	u8* const freeNodes = self + 0x998;
 	for (int block = 0; block < 0x30; block++) {
@@ -261,13 +261,13 @@ void CFlatRuntime::Create(void* filePtr)
 				break;
 
 			case 'VAL ': {
-				const int variableCount = chunk.m_arg0;
-				*reinterpret_cast<int*>(self + 0x24) = variableCount;
+				*reinterpret_cast<int*>(self + 0x24) = chunk.m_arg0;
 				*reinterpret_cast<u8**>(self + 0x28) =
 				    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x96)
-				        u8[variableCount << 2];
+				        u8[*reinterpret_cast<int*>(self + 0x24) << 2];
 
 				u8* variableDef = *reinterpret_cast<u8**>(self + 0x28);
+				const int variableCount = *reinterpret_cast<int*>(self + 0x24);
 				for (int i = 0; i < variableCount; i++) {
 					variableDef[0] = chunkFile.Get1();
 					variableDef[1] = chunkFile.Get1();
@@ -604,7 +604,7 @@ int CFlatRuntime::Frame(int mode, int unused)
 						object->m_0x34 = static_cast<s16>(object->m_0x34 & ~(1U << scriptIndex));
 
 						scriptIndex = 0x1F;
-						scriptMask = static_cast<unsigned int>(static_cast<short>(object->m_0x34));
+						scriptMask = static_cast<unsigned int>(static_cast<unsigned short>(object->m_0x34));
 
 						for (int frameScan2 = 0; frameScan2 < 4; frameScan2++) {
 							for (int bit = 0; bit < 8; bit++) {
@@ -752,7 +752,7 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 	object->m_flagBits.m_callFlag = clearBit;
 	object->m_flagBits.m_constructFlag = setBit;
 	object->m_0x34 = 0;
-	object->m_particleId = 0xF;
+	object->m_0x32 = 0xF;
 	object->m_waitCounter = 0;
 	*reinterpret_cast<int*>(&object->m_reqFlag0) = 0;
 	object->m_classIndex = static_cast<s16>(classIndex);
@@ -1109,7 +1109,8 @@ int CFlatRuntime::request(CFlatRuntime::CObject* object, int systemKind, int sys
 		if (reqFlagIndex <= highestBit) {
 			return 0;
 		}
-		*reinterpret_cast<u16*>(targetObject + 0x34) |= static_cast<u16>(1 << reqFlagIndex);
+		*reinterpret_cast<u16*>(targetObject + 0x34) =
+		    static_cast<u16>(*reinterpret_cast<u16*>(targetObject + 0x34) | (1 << reqFlagIndex));
 	}
 
 	int copiedArgs = 0;

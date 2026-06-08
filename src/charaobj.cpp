@@ -3374,11 +3374,10 @@ void CGCharaObj::combi2()
 		}
 
 		CharaObjComboFlagBits* comboFlags = reinterpret_cast<CharaObjComboFlagBits*>(&CharaObjComboFlags(party));
-		if (hasNearbyPartner) {
-			if (comboFlags->m_nearby == 0) {
-				goto changed;
-			}
-		} else if (comboFlags->m_nearby != 0) {
+		if (hasNearbyPartner && comboFlags->m_nearby == 0) {
+			goto changed;
+		}
+		if (!hasNearbyPartner && comboFlags->m_nearby != 0) {
 			goto changed;
 		}
 		continue;

@@ -1350,19 +1350,17 @@ int CGMonObj::calcBranchFuncLich(int)
  */
 void CGMonObj::changeStatFuncTetsukyojin(int stat)
 {
-	if (stat != 0x65) {
-		if (stat < 0x65) {
-			if (stat != -0xD) {
-				return;
-			}
-		} else if (stat == 0x67) {
-			setActionParam(-12);
-			return;
-		} else {
-			return;
-		}
-	} else {
+	switch (stat) {
+	case 0x67:
+		setActionParam(-12);
+		return;
+	case -0xD:
+		break;
+	case 0x65:
 		setActionParam(-14);
+		break;
+	default:
+		return;
 	}
 
 	reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_lichTeleportIndex++;

@@ -964,15 +964,13 @@ void CLightPcs::CBumpLight::MakeLightMap()
         GXInitLightColor(&lightObj, lightColor);
 
         if (m_target == 1) {
-            double d0 = (double)kLightZero;
-            double d1 = (double)(m_specularScale * kLightHalf);
-            GXInitLightAttn(&lightObj, (float)d0, (float)d0, kLightOne, (float)d1, (float)d0,
-                            (float)((double)kLightOne - d1));
+            float d1 = m_specularScale * kLightHalf;
+            GXInitLightAttn(&lightObj, kLightZero, kLightZero, kLightOne, d1, kLightZero,
+                            kLightOne - d1);
         } else {
-            double d0 = (double)kLightZero;
-            double d1 = (double)(*lightScale * kLightHalf);
-            GXInitLightAttn(&lightObj, (float)d0, (float)d0, kLightOne, (float)d1, (float)d0,
-                            (float)((double)kLightOne - d1));
+            float d1 = *lightScale * kLightHalf;
+            GXInitLightAttn(&lightObj, kLightZero, kLightZero, kLightOne, d1, kLightZero,
+                            kLightOne - d1);
         }
 
         GXLoadLightObjImm(&lightObj, (GXLightID)1);
@@ -982,15 +980,15 @@ void CLightPcs::CBumpLight::MakeLightMap()
             unsigned int yBase = y;
             GXBegin((GXPrimitive)0x98, (GXVtxFmt)0, 0x42);
 
-            float x0 = dFactor * (float)U32ToDouble(yBase) * dScale - dHalf;
+            float x0 = dFactor * (float)yBase * dScale - dHalf;
             float dx0 = x0;
-            float x1 = dFactor * (float)U32ToDouble(yBase + 1) * dScale - dHalf;
+            float x1 = dFactor * (float)(yBase + 1) * dScale - dHalf;
             float dx1 = x1;
 
             int inner = 0x21;
             unsigned int x = 0;
             do {
-                float z0 = dFactor * (float)U32ToDouble(x) * dScale - dHalf;
+                float z0 = dFactor * (float)x * dScale - dHalf;
                 float dz0 = z0;
                 float dist0 = dx0 * dx0 + dz0 * dz0;
                 if (dist0 < dHalf) {
@@ -1112,6 +1110,7 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
 {
     Mtx cam;
     PSMTXCopy(CameraMatrix(), cam);
+    Mtx nrm;
     Mtx out;
 
     if (mode != 0) {
@@ -1132,12 +1131,12 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
             cam[2][1] = kLightZero;
             cam[2][2] = kLightOne;
         } else if (mode == 2) {
+            Vec xAxis;
             Vec yAxis;
             yAxis.x = cam[0][1];
             yAxis.y = cam[1][1];
             yAxis.z = cam[2][1];
             PSVECNormalize(&yAxis, &yAxis);
-            Vec xAxis;
             xAxis.y = -yAxis.x;
             cam[0][1] = yAxis.x;
             cam[1][1] = yAxis.y;
@@ -1161,10 +1160,8 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
         out[1][3] = pos.y;
         out[2][3] = pos.z;
     } else {
-        if (vec == nullptr ||
-            ((kLightZero == vec->x) && (kLightZero == vec->y) && (kLightZero == vec->z))) {
-            PSMTXConcat(cam, mat, out);
-        } else {
+        if (vec != nullptr &&
+            ((kLightZero != vec->x) || (kLightZero != vec->y) || (kLightZero != vec->z))) {
             Mtx tmp;
             PSMTXCopy(mat, tmp);
             Vec camPos;
@@ -1184,12 +1181,13 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
             out[0][3] += camPos.x;
             out[1][3] += camPos.y;
             out[2][3] += camPos.z;
+        } else {
+            PSMTXConcat(cam, mat, out);
         }
     }
 
     GXLoadPosMtxImm(out, 0);
 
-    Mtx nrm;
     nrm[0][0] = out[0][0];
     nrm[1][0] = out[1][0];
     nrm[2][0] = out[2][0];
@@ -1227,8 +1225,8 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
             PSMTXScale(texMtx, kBumpTexMtxScale, kBumpTexMtxScale, kBumpTexMtxScale);
             PSMTXConcat(*bumpMat0, texMtx, *bumpMat0);
 
-            double camX = (double)CameraPosX();
-            double camZ = (double)CameraPosZ();
+            float camX = CameraPosX();
+            float camZ = CameraPosZ();
             PSMTXIdentity(reinterpret_cast<float(*)[4]>(m_bumpTexScratch));
             float* scratch = m_bumpTexScratch;
 
@@ -1242,9 +1240,9 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
             scratch[5] = f1;
             scratch[9] = f1;
             scratch[3] =
-                -(f0 * (float)(camX + (double)bump->m_offsetX) - f2);
+                -(f0 * (camX + bump->m_offsetX) - f2);
             scratch[7] =
-                -(f0 * (float)(camZ + (double)bump->m_offsetZ) - f2);
+                -(f0 * (camZ + bump->m_offsetZ) - f2);
             scratch[11] = f1;
             scratch[16] = f3;
             scratch[12] = f3;

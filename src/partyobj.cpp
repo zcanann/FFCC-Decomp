@@ -3347,8 +3347,8 @@ void CGPartyObj::statPut()
 	}
 
 	if (m_stateFrame == 0) {
-		int anim;
 		int seNo;
+		int anim;
 		switch (m_lastStateId) {
 		case 0x0C:
 			anim = 0x0E;

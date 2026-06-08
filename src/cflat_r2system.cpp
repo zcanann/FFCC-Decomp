@@ -1837,10 +1837,10 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
 
                     if (spec[fmtIndex] == 'b') {
                         char* out = rendered;
-                        unsigned int value = object->m_localBase[argIndex];
+                        int value = object->m_localBase[argIndex];
                         int outLen = 0;
                         for (int bit = 0; bit < width; bit++) {
-                            const unsigned int cur = (value >> ((width - bit) - 1U)) & 1U;
+                            const int cur = (value >> ((width - bit) - 1)) & 1;
                             if (started == 0 && cur != 0) {
                                 started = 1;
                             }

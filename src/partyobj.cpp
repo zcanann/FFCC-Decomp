@@ -822,7 +822,7 @@ void CGPartyObj::menu()
 		}
 	}
 
-	if (System.m_execParam > 2) {
+	if (static_cast<unsigned int>(System.m_execParam) >= 3) {
 		System.Printf(const_cast<char*>("port:%d mode:%d"), portIndex, Joybus.GetCtrlMode(static_cast<char>(m_animStateMisc)));
 	}
 
@@ -2438,7 +2438,7 @@ void CGPartyObj::onStatAttack(int chargeType)
 
 	const unsigned short comboStart = *reinterpret_cast<unsigned short*>(attackEntry + 0x0C);
 	const unsigned short comboEnd = *reinterpret_cast<unsigned short*>(attackEntry + 0x0E);
-	if (comboStart <= m_stateFrame && m_stateFrame <= comboEnd) {
+	if (m_stateFrame >= comboStart && m_stateFrame <= comboEnd) {
 		if ((getPadTrigForSlot(static_cast<signed char>(m_animStateMisc)) & 0x100) != 0) {
 			party.commandFlagBits.commandActive = 1;
 		}

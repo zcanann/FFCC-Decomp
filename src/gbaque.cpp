@@ -3337,7 +3337,7 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 		count++;
 	}
 
-	if ((count > 4) && (static_cast<int>(System.m_execParam) >= 1)) {
+	if ((count > 4) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
 		System.Printf(const_cast<char*>(s_compatibility_data_error));
 	}
 

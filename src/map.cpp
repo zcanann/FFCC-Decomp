@@ -1852,10 +1852,12 @@ int CMapMng::ReadMtx(char* mapName)
             chunkFile.SetBuf(filePtr);
             CChunkFile::CChunk chunk;
 
-            if (m_asyncLoadState.m_mapReadMode == 2) {
+            if (m_asyncLoadState.m_mapReadMode != 2) {
                 while (chunkFile.GetNextChunk(chunk)) {
                     switch (chunk.m_id) {
                     case 0x54534554:
+                        m_textureSet->Create(chunkFile, MapMng.m_stage, append, 0, 0, 0);
+                        append = 1;
                         if (chunk.m_arg0 == 1) {
                             return 1;
                         }
@@ -1866,8 +1868,6 @@ int CMapMng::ReadMtx(char* mapName)
                 while (chunkFile.GetNextChunk(chunk)) {
                     switch (chunk.m_id) {
                     case 0x54534554:
-                        m_textureSet->Create(chunkFile, MapMng.m_stage, append, 0, 0, 0);
-                        append = 1;
                         if (chunk.m_arg0 == 1) {
                             return 1;
                         }

@@ -1209,15 +1209,14 @@ void GbaQueue::SetRadarType()
 	}
 
 	if (m_singleMode != 0) {
-		const unsigned char radarType = Game.m_gameWork.m_mogScoreRadarType;
-		m_radarType[0] = radarType;
-		m_radarType[1] = radarType;
-		m_radarType[2] = radarType;
-		m_radarType[3] = radarType;
+		m_radarType[0] = Game.m_gameWork.m_mogScoreRadarType;
+		m_radarType[1] = Game.m_gameWork.m_mogScoreRadarType;
+		m_radarType[2] = Game.m_gameWork.m_mogScoreRadarType;
+		m_radarType[3] = Game.m_gameWork.m_mogScoreRadarType;
 	}
 
-	obj[0x2D30] = 1;
-	if (Game.m_gameWork.m_bossArtifactStageIndex > 0xE) {
+	obj[0x2D40] = 1;
+	if (Game.m_gameWork.m_bossArtifactStageIndex >= 0xF) {
 		m_radarType[0] = 0;
 		m_radarType[1] = 0;
 		m_radarType[2] = 0;

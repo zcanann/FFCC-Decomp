@@ -491,7 +491,7 @@ void CRingMenu::onDraw()
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x16));
-	sin(static_cast<double>(kRingMenuHalfPi * static_cast<float>(m_gbaAnimCounter)) / static_cast<double>(kRingMenuWobbleDivisor));
+	sin(static_cast<double>((kRingMenuHalfPi * static_cast<float>(m_gbaAnimCounter)) / kRingMenuWobbleDivisor));
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	float cycle = static_cast<float>(fmod(static_cast<double>(kRingMenuCycleStep * static_cast<float>(m_commonFrameCounter)),
@@ -545,19 +545,19 @@ void CRingMenu::onDraw()
 			posY = kRingMenuMainButtonY + sideY;
 		}
 
-		double buttonAlpha = static_cast<double>(static_cast<float>(m_buttonTimers[group * 3 + 2]) * kRingMenuButtonFadeStep);
+		float buttonAlpha = static_cast<float>(m_buttonTimers[group * 3 + 2]) * kRingMenuButtonFadeStep;
 		if (m_battleButtons[group * 2 + 2] >= 0) {
-			buttonAlpha = static_cast<double>(kRingMenuOne) - buttonAlpha;
+			buttonAlpha = kRingMenuOne - buttonAlpha;
 		}
 
 			if (group == 2) {
 				CGPartyObj* partyObj = Game.m_partyObjArr[m_menuIndex];
-				buttonAlpha = static_cast<double>(-static_cast<int>(
+				buttonAlpha = static_cast<float>(-static_cast<int>(
 					static_cast<unsigned short>(partyObj->m_partyData.commandMode) & 9) >>
 				                                  31);
 			}
 
-		if (buttonAlpha == static_cast<double>(kRingMenuZero)) {
+		if (buttonAlpha == kRingMenuZero) {
 			continue;
 		}
 
@@ -569,7 +569,7 @@ void CRingMenu::onDraw()
 		float drawX = posX;
 		float drawY = posY;
 		if (group == 1 || group == 0) {
-			const float wobble = static_cast<float>(sin(static_cast<double>(kRingMenuHalfPi) * buttonAlpha));
+			const float wobble = static_cast<float>(sin(static_cast<double>(kRingMenuHalfPi * buttonAlpha)));
 			drawX = -(kRingMenuButtonInsetX * wobble - ((group == 0) ? (kRingMenuWobbleDivisor + posX) : posX));
 			drawY = posY + ((group == 1) ? kRingMenuIconSize : kRingMenuZero);
 		}

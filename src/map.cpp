@@ -1329,31 +1329,23 @@ void CMapMng::DestroyMapLightHolder()
  */
 void CMapMng::DestroyMap()
 {
-    COctTree* octTree = GetOctTreeArray();
     for (int i = 0; i < m_octTreeCount; i++) {
-        octTree->~COctTree();
-        octTree++;
+        m_octTreeArray[i].~COctTree();
     }
     m_octTreeCount = 0;
 
-    CMapHit* mapHit = GetMapHitArray();
     for (int i = 0; i < m_mapHitCount; i++) {
-        mapHit->~CMapHit();
-        mapHit++;
+        m_mapHitArray[i].~CMapHit();
     }
     m_mapHitCount = 0;
 
-    CMapObj* mapObj = GetMapObjArray();
     for (int i = 0; i < m_mapObjCount; i++) {
-        mapObj->~CMapObj();
-        mapObj++;
+        m_mapObjArray[i].~CMapObj();
     }
     m_mapObjCount = 0;
 
-    CMapMesh* mapMesh = GetMapMeshArray();
     for (int i = 0; i < m_mapMeshCount; i++) {
-        mapMesh->~CMapMesh();
-        mapMesh++;
+        m_mapMeshArray[i].~CMapMesh();
     }
     m_mapMeshCount = 0;
 
@@ -1372,47 +1364,41 @@ void CMapMng::DestroyMap()
         m_mapTexAnimSet = 0;
     }
 
-    CPtrArray<CMapAnim*>* mapAnimArray = &GetMapAnimArray();
-    for (unsigned int i = 0; i < static_cast<unsigned int>(mapAnimArray->GetSize()); i++) {
-        if ((*mapAnimArray)[i] != 0) {
-            delete (*mapAnimArray)[i];
+    for (unsigned int i = 0; i < static_cast<unsigned int>(GetMapAnimArray().GetSize()); i++) {
+        if (GetMapAnimArray()[i] != 0) {
+            delete GetMapAnimArray()[i];
         }
     }
-    mapAnimArray->RemoveAll();
+    GetMapAnimArray().RemoveAll();
 
-    CPtrArray<CMapAnimKeyDt*>* mapAnimKeyDtArray = &GetMapAnimKeyDtArray();
-    for (unsigned int i = 0; i < static_cast<unsigned int>(mapAnimKeyDtArray->GetSize()); i++) {
-        if ((*mapAnimKeyDtArray)[i] != 0) {
-            delete (*mapAnimKeyDtArray)[i];
+    for (unsigned int i = 0; i < static_cast<unsigned int>(GetMapAnimKeyDtArray().GetSize()); i++) {
+        if (GetMapAnimKeyDtArray()[i] != 0) {
+            delete GetMapAnimKeyDtArray()[i];
         }
     }
-    mapAnimKeyDtArray->RemoveAll();
+    GetMapAnimKeyDtArray().RemoveAll();
 
-    CPtrArray<CMapAnimRun*>* mapAnimRunArray = &GetMapAnimRunArray();
-    for (unsigned int i = 0; i < static_cast<unsigned int>(mapAnimRunArray->GetSize()); i++) {
-        if ((*mapAnimRunArray)[i] != 0) {
-            operator delete((*mapAnimRunArray)[i]);
+    for (unsigned int i = 0; i < static_cast<unsigned int>(GetMapAnimRunArray().GetSize()); i++) {
+        if (GetMapAnimRunArray()[i] != 0) {
+            operator delete(GetMapAnimRunArray()[i]);
         }
     }
-    mapAnimRunArray->RemoveAll();
+    GetMapAnimRunArray().RemoveAll();
 
-    CPtrArray<CMapShadow*>* mapShadowArray = &GetMapShadowArray();
-    for (unsigned int i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
-        if ((*mapShadowArray)[i] != 0) {
-            operator delete((*mapShadowArray)[i]);
+    for (unsigned int i = 0; i < static_cast<unsigned int>(GetMapShadowArray().GetSize()); i++) {
+        if (GetMapShadowArray()[i] != 0) {
+            operator delete(GetMapShadowArray()[i]);
         }
     }
-    mapShadowArray->RemoveAll();
+    GetMapShadowArray().RemoveAll();
 
     for (int i = 0; i < 2; i++) {
-        CPtrArray<CMapLightHolder*>* mapLightHolderArray = &GetMapLightHolderArray(i);
-
-        for (unsigned int j = 0; j < static_cast<unsigned int>(mapLightHolderArray->GetSize()); j++) {
-            if ((*mapLightHolderArray)[j] != 0) {
-                operator delete((*mapLightHolderArray)[j]);
+        for (unsigned int j = 0; j < static_cast<unsigned int>(GetMapLightHolderArray(i).GetSize()); j++) {
+            if (GetMapLightHolderArray(i)[j] != 0) {
+                operator delete(GetMapLightHolderArray(i)[j]);
             }
         }
-        mapLightHolderArray->RemoveAll();
+        GetMapLightHolderArray(i).RemoveAll();
     }
 
     LightPcs.DestroyBumpLightAll(static_cast<CLightPcs::TARGET>(1));
@@ -1448,8 +1434,8 @@ void CMapMng::MapFileRead(char*, unsigned long&)
     for (int i = 0; i < 0x10; i++) {
         if (m_asyncLoadState.m_asyncHandles[i] != 0) {
             int completed = File.IsCompleted(reinterpret_cast<CFile::CHandle*>(m_asyncLoadState.m_asyncHandles[i]));
-            void* readBuffer = File.m_readBuffer;
             if (completed != 0) {
+                void* readBuffer = File.m_readBuffer;
                 int len = File.GetLength(reinterpret_cast<CFile::CHandle*>(m_asyncLoadState.m_asyncHandles[i]));
                 void* amemCursor = m_asyncLoadState.m_mapLoadCursor;
 
@@ -1650,7 +1636,8 @@ void CMapMng::SetLightSource()
         if (attr != 0) {
             const int type = attr->m_type;
 
-            if (type == CMapObjAtr::POINT_LIGHT) {
+            switch (type) {
+            case CMapObjAtr::POINT_LIGHT: {
                 CMapObjAtrPointLight* pointAttr = static_cast<CMapObjAtrPointLight*>(attr);
                 CLightPcs::CLight light;
                 light.m_type = 0;
@@ -1672,9 +1659,11 @@ void CMapMng::SetLightSource()
                 light.m_directionMode = pointAttr->m_unknown20;
                 LightPcs.Add(&light);
                 mapLightIndex += 1;
-            } else if (type == CMapObjAtr::SPOT_LIGHT) {
+                break;
+            }
+            case CMapObjAtr::SPOT_LIGHT: {
                 CMapObjAtrSpotLight* spotAttr = static_cast<CMapObjAtrSpotLight*>(attr);
-                if (*reinterpret_cast<int*>(&spotAttr->m_baseColor) != 0) {
+                if (*reinterpret_cast<unsigned int*>(&spotAttr->m_baseColor) != 0) {
                     CLightPcs::CLight* light = spotAttr->m_light;
                     light->m_type = 1;
                     light->m_targetColor[1] = spotAttr->m_color;
@@ -1729,6 +1718,8 @@ void CMapMng::SetLightSource()
                     LightPcs.Add(&light);
                 }
                 mapLightIndex += 1;
+                break;
+            }
             }
         }
 
@@ -1767,89 +1758,89 @@ void CMapMng::InitMapShadow()
  */
 int CMapMng::ReadMtx(char* mapName)
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    CMapMngAsyncLoadState& asyncLoadState = GetMapMngAsyncLoadState(this);
     int append = 0;
 
     MapMng.m_mapReadReady = 1;
 
-    if (asyncLoadState.m_mapReadMode != 2 && asyncLoadState.m_mapReadMode != 3) {
+    if (m_asyncLoadState.m_mapReadMode != 2 && m_asyncLoadState.m_mapReadMode != 3) {
         CMemory::CStage* stage = MapMng.m_stage;
         CTextureSet* textureSet = new (stage, const_cast<char*>(s_map_cpp), 0x3A9) CTextureSet;
         m_textureSet = textureSet;
     }
 
+    char* strTmp = g_StrTmp;
     int loadIndex = 0;
     while (true) {
-        sprintf(g_StrTmp, const_cast<char*>(s_mapMtxPathFmt), mapName, loadIndex);
+        sprintf(strTmp, const_cast<char*>(s_mapMtxPathFmt), mapName, loadIndex);
 
-        bool exists;
-        if (asyncLoadState.m_mapReadMode == 1) {
-            exists = true;
+        int exists;
+        if (m_asyncLoadState.m_mapReadMode == 1) {
+            exists = 1;
         } else {
-            CFile::CHandle* openProbe = File.Open(g_StrTmp, 0, CFile::PRI_LOW);
+            CFile::CHandle* openProbe = File.Open(strTmp, 0, CFile::PRI_LOW);
             if (openProbe != 0) {
                 File.Close(openProbe);
-                exists = true;
+                exists = 1;
             } else {
-                exists = false;
+                exists = 0;
             }
         }
         if (!exists) {
-            if (asyncLoadState.m_mapReadMode == 2) {
+            if (m_asyncLoadState.m_mapReadMode == 2) {
                 return 1;
             }
-            if (asyncLoadState.m_mapReadMode == 3) {
+            if (m_asyncLoadState.m_mapReadMode == 3) {
                 return 1;
             }
             if (loadIndex == 0) {
                 if (System.m_execParam != 0) {
-                    System.Printf(const_cast<char*>(s_mapReadOpenErrorFmt), g_StrTmp);
+                    System.Printf(const_cast<char*>(s_mapReadOpenErrorFmt), strTmp);
                 }
                 return 0;
             }
             return 1;
         }
 
-        if (static_cast<unsigned int>(System.m_execParam) > 2) {
-            System.Printf(const_cast<char*>(s_mapReadMtxFmt), g_StrTmp);
+        if (static_cast<int>(System.m_execParam) >= 3) {
+            System.Printf(const_cast<char*>(s_mapReadMtxFmt), strTmp);
         }
 
-        void* filePtr = File.m_readBuffer;
-        if (asyncLoadState.m_mapReadMode == 1) {
-            int& readIndex = asyncLoadState.m_asyncReadIndex;
-            int size = asyncLoadState.m_fileSizes[readIndex];
-            void* amemCursor = asyncLoadState.m_mapLoadCursor;
-            Memory.CopyFromAMemorySync(File.m_readBuffer, amemCursor, static_cast<unsigned long>((size + 0x1F) & ~0x1F));
-            asyncLoadState.m_mapLoadCursor = reinterpret_cast<unsigned char*>(asyncLoadState.m_mapLoadCursor) + size;
+        void* filePtr;
+        if (m_asyncLoadState.m_mapReadMode == 1) {
+            int& readIndex = m_asyncLoadState.m_asyncReadIndex;
+            int size = m_asyncLoadState.m_fileSizes[readIndex];
+            void* amemCursor = m_asyncLoadState.m_mapLoadCursor;
+            filePtr = File.m_readBuffer;
+            Memory.CopyFromAMemorySync(filePtr, amemCursor, static_cast<unsigned long>((size + 0x1F) & ~0x1F));
+            m_asyncLoadState.m_mapLoadCursor = reinterpret_cast<unsigned char*>(m_asyncLoadState.m_mapLoadCursor) + size;
             CheckSum(filePtr, size);
             readIndex += 1;
         } else {
-            CFile::CHandle* handle = File.Open(g_StrTmp, 0, CFile::PRI_LOW);
+            CFile::CHandle* handle = File.Open(strTmp, 0, CFile::PRI_LOW);
             if (handle == 0) {
                 filePtr = 0;
             } else {
                 int size = File.GetLength(handle);
-                if (asyncLoadState.m_mapReadMode == 3) {
+                if (m_asyncLoadState.m_mapReadMode == 3) {
                     File.ReadASync(handle);
                     filePtr = reinterpret_cast<void*>(1);
-                    int& openIndex = asyncLoadState.m_asyncOpenIndex;
-                    asyncLoadState.m_asyncHandles[openIndex] = handle;
+                    int& openIndex = m_asyncLoadState.m_asyncOpenIndex;
+                    m_asyncLoadState.m_asyncHandles[openIndex] = handle;
                     openIndex += 1;
                 } else {
                     File.Read(handle);
                     File.SyncCompleted(handle);
                     filePtr = File.m_readBuffer;
                     File.Close(handle);
-                    if (asyncLoadState.m_mapReadMode == 2) {
-                        int& readIndex = asyncLoadState.m_asyncReadIndex;
-                        void* amemCursor = asyncLoadState.m_mapLoadCursor;
+                    if (m_asyncLoadState.m_mapReadMode == 2) {
+                        int& readIndex = m_asyncLoadState.m_asyncReadIndex;
+                        void* amemCursor = m_asyncLoadState.m_mapLoadCursor;
                         Memory.CopyToAMemorySync(filePtr, amemCursor, static_cast<unsigned long>(size));
-                        asyncLoadState.m_fileSizes[readIndex] = size;
-                        asyncLoadState.m_fileChecksums[readIndex] = CheckSum(filePtr, size);
+                        m_asyncLoadState.m_fileSizes[readIndex] = size;
+                        m_asyncLoadState.m_fileChecksums[readIndex] = CheckSum(filePtr, size);
                         readIndex += 1;
-                        asyncLoadState.m_mapLoadCursor =
-                            reinterpret_cast<unsigned char*>(asyncLoadState.m_mapLoadCursor) + size;
+                        m_asyncLoadState.m_mapLoadCursor =
+                            reinterpret_cast<unsigned char*>(m_asyncLoadState.m_mapLoadCursor) + size;
                     }
                 }
             }
@@ -1857,17 +1848,17 @@ int CMapMng::ReadMtx(char* mapName)
 
         if (filePtr == 0) {
             if (System.m_execParam != 0) {
-                System.Printf(const_cast<char*>(s_mapReadErrorFmt), g_StrTmp);
+                System.Printf(const_cast<char*>(s_mapReadErrorFmt), strTmp);
             }
             return 0;
         }
 
-        if (asyncLoadState.m_mapReadMode != 3) {
+        if (m_asyncLoadState.m_mapReadMode != 3) {
             CChunkFile chunkFile;
             chunkFile.SetBuf(filePtr);
             CChunkFile::CChunk chunk;
 
-            if (asyncLoadState.m_mapReadMode == 2) {
+            if (m_asyncLoadState.m_mapReadMode == 2) {
                 while (chunkFile.GetNextChunk(chunk)) {
                     if (chunk.m_id == 0x54534554 && chunk.m_arg0 == 1) {
                         return 1;
@@ -1903,99 +1894,99 @@ int CMapMng::ReadMtx(char* mapName)
  */
 int CMapMng::ReadMpl(char* mapName)
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    CMapMngAsyncLoadState& asyncLoadState = GetMapMngAsyncLoadState(this);
     int loadIndex = 0;
 
     MapMng.m_mapReadReady = 1;
 
+    char* strTmp = g_StrTmp;
     while (true) {
-        sprintf(g_StrTmp, const_cast<char*>(s_mapMplPathFmt), mapName, loadIndex);
+        sprintf(strTmp, const_cast<char*>(s_mapMplPathFmt), mapName, loadIndex);
 
-        bool canRead;
-        if (asyncLoadState.m_mapReadMode == 1) {
-            canRead = true;
+        int canRead;
+        if (m_asyncLoadState.m_mapReadMode == 1) {
+            canRead = 1;
         } else {
-            CFile::CHandle* existsHandle = File.Open(g_StrTmp, 0, CFile::PRI_LOW);
+            CFile::CHandle* existsHandle = File.Open(strTmp, 0, CFile::PRI_LOW);
             if (existsHandle != 0) {
                 File.Close(existsHandle);
-                canRead = true;
+                canRead = 1;
             } else {
-                canRead = false;
+                canRead = 0;
             }
         }
 
         if (!canRead) {
-            if (asyncLoadState.m_mapReadMode == 3) {
+            if (m_asyncLoadState.m_mapReadMode == 3) {
                 return 1;
             }
             if (loadIndex == 0) {
-                if (System.m_execParam != 0) {
-                    System.Printf(const_cast<char*>(s_mapReadOpenErrorFmt), g_StrTmp);
+                if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+                    System.Printf(const_cast<char*>(s_mapReadOpenErrorFmt), strTmp);
                 }
                 return 0;
             }
             return 1;
         }
 
-        if (static_cast<unsigned int>(System.m_execParam) > 2) {
-            System.Printf(const_cast<char*>(s_mapReadMplFmt), g_StrTmp);
+        if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+            System.Printf(const_cast<char*>(s_mapReadMplFmt), strTmp);
         }
 
-        void* filePtr = File.m_readBuffer;
-        if (asyncLoadState.m_mapReadMode == 1) {
-            int& readIndex = asyncLoadState.m_asyncReadIndex;
-            const int size = asyncLoadState.m_fileSizes[readIndex];
-            void* amemCursor = asyncLoadState.m_mapLoadCursor;
+        void* filePtr;
+        if (m_asyncLoadState.m_mapReadMode == 1) {
+            int& readIndex = m_asyncLoadState.m_asyncReadIndex;
+            const int size = m_asyncLoadState.m_fileSizes[readIndex];
+            void* amemCursor = m_asyncLoadState.m_mapLoadCursor;
+            filePtr = File.m_readBuffer;
 
-            Memory.CopyFromAMemorySync(File.m_readBuffer, amemCursor, (size + 0x1F) & ~0x1F);
-            asyncLoadState.m_mapLoadCursor = reinterpret_cast<unsigned char*>(asyncLoadState.m_mapLoadCursor) + size;
+            Memory.CopyFromAMemorySync(filePtr, amemCursor, (size + 0x1F) & ~0x1F);
+            m_asyncLoadState.m_mapLoadCursor = reinterpret_cast<unsigned char*>(m_asyncLoadState.m_mapLoadCursor) + size;
             CheckSum(filePtr, size);
             readIndex += 1;
         } else {
-            CFile::CHandle* fileHandle = File.Open(g_StrTmp, 0, CFile::PRI_LOW);
+            CFile::CHandle* fileHandle = File.Open(strTmp, 0, CFile::PRI_LOW);
             if (fileHandle == 0) {
                 filePtr = 0;
             } else {
                 const int size = File.GetLength(fileHandle);
-                if (asyncLoadState.m_mapReadMode == 3) {
+                if (m_asyncLoadState.m_mapReadMode == 3) {
                     File.ReadASync(fileHandle);
                     filePtr = reinterpret_cast<void*>(1);
-                    int& openIndex = asyncLoadState.m_asyncOpenIndex;
-                    asyncLoadState.m_asyncHandles[openIndex] = fileHandle;
+                    int& openIndex = m_asyncLoadState.m_asyncOpenIndex;
+                    m_asyncLoadState.m_asyncHandles[openIndex] = fileHandle;
                     openIndex += 1;
                 } else {
                     File.Read(fileHandle);
                     File.SyncCompleted(fileHandle);
                     filePtr = File.m_readBuffer;
                     File.Close(fileHandle);
-                    if (asyncLoadState.m_mapReadMode == 2) {
-                        int& readIndex = asyncLoadState.m_asyncReadIndex;
-                        void* amemCursor = asyncLoadState.m_mapLoadCursor;
+                    if (m_asyncLoadState.m_mapReadMode == 2) {
+                        int& readIndex = m_asyncLoadState.m_asyncReadIndex;
+                        void* amemCursor = m_asyncLoadState.m_mapLoadCursor;
                         Memory.CopyToAMemorySync(filePtr, amemCursor, static_cast<unsigned long>(size));
-                        asyncLoadState.m_fileSizes[readIndex] = size;
-                        asyncLoadState.m_fileChecksums[readIndex] = CheckSum(filePtr, size);
+                        m_asyncLoadState.m_fileSizes[readIndex] = size;
+                        m_asyncLoadState.m_fileChecksums[readIndex] = CheckSum(filePtr, size);
                         readIndex += 1;
-                        asyncLoadState.m_mapLoadCursor =
-                            reinterpret_cast<unsigned char*>(asyncLoadState.m_mapLoadCursor) + size;
+                        m_asyncLoadState.m_mapLoadCursor =
+                            reinterpret_cast<unsigned char*>(m_asyncLoadState.m_mapLoadCursor) + size;
                     }
                 }
             }
         }
 
         if (filePtr == 0) {
-            if (System.m_execParam != 0) {
-                System.Printf(const_cast<char*>(s_mapReadErrorFmt), g_StrTmp);
+            if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+                System.Printf(const_cast<char*>(s_mapReadErrorFmt), strTmp);
             }
             return 0;
         }
 
-        if (asyncLoadState.m_mapReadMode != 3) {
+        if (m_asyncLoadState.m_mapReadMode != 3) {
             CChunkFile chunkFile;
             chunkFile.SetBuf(filePtr);
             CChunkFile::CChunk chunk;
 
-            if (asyncLoadState.m_mapReadMode == 2) {
+            if (m_asyncLoadState.m_mapReadMode == 2) {
                 while (chunkFile.GetNextChunk(chunk)) {
                     if (chunk.m_id == 0x4D455348 && chunk.m_arg0 == 1) {
                         return 1;
@@ -2048,35 +2039,35 @@ int CMapMng::ReadMpl(char* mapName)
  */
 int CMapMng::ReadOtm(char* mapName)
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    CMapMngAsyncLoadState& asyncLoadState = GetMapMngAsyncLoadState(this);
-    void* filePtr = File.m_readBuffer;
+    void* filePtr;
 
-    m_mapReadReady = 1;
-    sprintf(g_StrTmp, const_cast<char*>(s_mapOtmPathFmt), mapName);
-    if (static_cast<unsigned int>(System.m_execParam) > 2) {
-        System.Printf(const_cast<char*>(s_read_otm_fmt), g_StrTmp);
+    MapMng.m_mapReadReady = 1;
+    char* strTmp = g_StrTmp;
+    sprintf(strTmp, const_cast<char*>(s_mapOtmPathFmt), mapName);
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        System.Printf(const_cast<char*>(s_read_otm_fmt), strTmp);
     }
     m_mapAnimFrame = 0;
 
-    if (asyncLoadState.m_mapReadMode == 1) {
-        int& readIndex = asyncLoadState.m_asyncReadIndex;
-        const int size = asyncLoadState.m_fileSizes[readIndex];
-        void* amemCursor = asyncLoadState.m_mapLoadCursor;
+    if (m_asyncLoadState.m_mapReadMode == 1) {
+        int& readIndex = m_asyncLoadState.m_asyncReadIndex;
+        const int size = m_asyncLoadState.m_fileSizes[readIndex];
+        void* amemCursor = m_asyncLoadState.m_mapLoadCursor;
+        filePtr = File.m_readBuffer;
 
-        Memory.CopyFromAMemorySync(File.m_readBuffer, amemCursor, (size + 0x1F) & ~0x1F);
-        asyncLoadState.m_mapLoadCursor = reinterpret_cast<unsigned char*>(asyncLoadState.m_mapLoadCursor) + size;
+        Memory.CopyFromAMemorySync(filePtr, amemCursor, (size + 0x1F) & ~0x1F);
+        m_asyncLoadState.m_mapLoadCursor = reinterpret_cast<unsigned char*>(m_asyncLoadState.m_mapLoadCursor) + size;
         CheckSum(filePtr, size);
         readIndex += 1;
     } else {
-        CFile::CHandle* fileHandle = File.Open(g_StrTmp, 0, CFile::PRI_LOW);
+        CFile::CHandle* fileHandle = File.Open(strTmp, 0, CFile::PRI_LOW);
         if (fileHandle != 0) {
             const int size = File.GetLength(fileHandle);
-            if (asyncLoadState.m_mapReadMode == 3) {
+            if (m_asyncLoadState.m_mapReadMode == 3) {
                 File.ReadASync(fileHandle);
                 filePtr = reinterpret_cast<void*>(1);
-                int& openIndex = asyncLoadState.m_asyncOpenIndex;
-                asyncLoadState.m_asyncHandles[openIndex] = fileHandle;
+                int& openIndex = m_asyncLoadState.m_asyncOpenIndex;
+                m_asyncLoadState.m_asyncHandles[openIndex] = fileHandle;
                 openIndex += 1;
             } else {
                 File.Read(fileHandle);
@@ -2084,15 +2075,15 @@ int CMapMng::ReadOtm(char* mapName)
                 filePtr = File.m_readBuffer;
                 File.Close(fileHandle);
 
-                if (asyncLoadState.m_mapReadMode == 2) {
-                    int& readIndex = asyncLoadState.m_asyncReadIndex;
-                    void* amemCursor = asyncLoadState.m_mapLoadCursor;
+                if (m_asyncLoadState.m_mapReadMode == 2) {
+                    int& readIndex = m_asyncLoadState.m_asyncReadIndex;
+                    void* amemCursor = m_asyncLoadState.m_mapLoadCursor;
                     Memory.CopyToAMemorySync(filePtr, amemCursor, static_cast<unsigned long>(size));
-                    asyncLoadState.m_fileSizes[readIndex] = size;
-                    asyncLoadState.m_fileChecksums[readIndex] = CheckSum(filePtr, size);
+                    m_asyncLoadState.m_fileSizes[readIndex] = size;
+                    m_asyncLoadState.m_fileChecksums[readIndex] = CheckSum(filePtr, size);
                     readIndex += 1;
-                    asyncLoadState.m_mapLoadCursor =
-                        reinterpret_cast<unsigned char*>(asyncLoadState.m_mapLoadCursor) + size;
+                    m_asyncLoadState.m_mapLoadCursor =
+                        reinterpret_cast<unsigned char*>(m_asyncLoadState.m_mapLoadCursor) + size;
                 }
             }
         } else {
@@ -2102,12 +2093,12 @@ int CMapMng::ReadOtm(char* mapName)
 
     if (filePtr == 0) {
         if (System.m_execParam != 0) {
-            System.Printf(const_cast<char*>(s_mapReadErrorFmt), g_StrTmp);
+            System.Printf(const_cast<char*>(s_mapReadErrorFmt), strTmp);
         }
         return 0;
     }
 
-    if (asyncLoadState.m_mapReadMode == 2 || asyncLoadState.m_mapReadMode == 3) {
+    if (m_asyncLoadState.m_mapReadMode == 2 || m_asyncLoadState.m_mapReadMode == 3) {
         return 1;
     }
 
@@ -2222,19 +2213,15 @@ int CMapMng::ReadOtm(char* mapName)
         chunkFile.PopChunk();
     }
 
-    const short octTreeCount = m_octTreeCount;
-    for (int i = 0; i < octTreeCount; i++) {
-        COctTree* octTree = GetOctTreeArray() + i;
-        CMapObj* mapObj = octTree->GetMapObject();
+    for (int i = 0; i < m_octTreeCount; i++) {
+        CMapObj* mapObj = m_octTreeArray[i].GetMapObject();
         if (mapObj != 0) {
             mapObj->m_octTreeIndex = static_cast<signed char>(i);
         }
     }
 
-    CPtrArray<CMapShadow*>* mapShadowArray = &GetMapShadowArray();
-    for (unsigned int i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
-        CMapShadow* mapShadow = (*mapShadowArray)[i];
-        mapShadow->Init();
+    for (unsigned int i = 0; i < static_cast<unsigned int>(GetMapShadowArray().GetSize()); i++) {
+        GetMapShadowArray()[i]->Init();
     }
 
     CMapObj* mapObj = GetMapObjArray();
@@ -2262,8 +2249,7 @@ int CMapMng::ReadOtm(char* mapName)
     PSMTXIdentity(identity);
     root->CalcMtx(identity, 1);
 
-    const int mapObjCount = m_mapObjCount;
-    for (int i = 0; i < mapObjCount; i++) {
+    for (int i = 0; i < m_mapObjCount; i++) {
         CMapObj* obj = GetMapObjArray() + i;
         CMapObjAtr* attr = obj->m_attribute;
         if (attr == 0) {
@@ -2274,41 +2260,37 @@ int CMapMng::ReadOtm(char* mapName)
         }
 
         CMapObjAtrSpotLight* spotAttr = static_cast<CMapObjAtrSpotLight*>(attr);
-        if (*reinterpret_cast<int*>(&spotAttr->m_baseColor) == 0) {
+        if (*reinterpret_cast<unsigned int*>(&spotAttr->m_baseColor) == 0) {
             continue;
         }
 
-        CLightPcs::CLight light;
-        unsigned char* lightRaw = reinterpret_cast<unsigned char*>(&light);
-        *reinterpret_cast<int*>(lightRaw + 0x8) = 1;
-        *reinterpret_cast<float*>(lightRaw + 0xC) = MapObjWorldX(obj);
-        *reinterpret_cast<float*>(lightRaw + 0x10) = MapObjWorldY(obj);
-        *reinterpret_cast<float*>(lightRaw + 0x14) = MapObjWorldZ(obj);
+        CLightPcs::CBumpLight light;
+        light.m_type = 1;
+        light.m_position.x = MapObjWorldX(obj);
+        light.m_position.y = MapObjWorldY(obj);
+        light.m_position.z = MapObjWorldZ(obj);
 
         CMapObj* targetObj = spotAttr->m_target;
-        Vec source;
-        source.x = MapObjWorldX(targetObj);
-        source.y = MapObjWorldY(targetObj);
-        source.z = MapObjWorldZ(targetObj);
-        Vec target;
-        target.x = MapObjWorldX(obj);
-        target.y = MapObjWorldY(obj);
-        target.z = MapObjWorldZ(obj);
-        Vec dir;
-        PSVECSubtract(&source, &target, &dir);
-        PSVECNormalize(&dir, &dir);
+        light.m_targetPosition.x = MapObjWorldX(targetObj);
+        light.m_targetPosition.y = MapObjWorldY(targetObj);
+        light.m_targetPosition.z = MapObjWorldZ(targetObj);
+        PSVECSubtract(
+            reinterpret_cast<Vec*>(&light.m_targetPosition),
+            reinterpret_cast<Vec*>(&light.m_position),
+            reinterpret_cast<Vec*>(&light.m_direction));
+        PSVECNormalize(
+            reinterpret_cast<Vec*>(&light.m_direction),
+            reinterpret_cast<Vec*>(&light.m_direction));
 
-        *reinterpret_cast<float*>(lightRaw + 0x40) = dir.x;
-        *reinterpret_cast<float*>(lightRaw + 0x44) = dir.y;
-        *reinterpret_cast<float*>(lightRaw + 0x48) = dir.z;
-        *reinterpret_cast<unsigned int*>(lightRaw + 0x4C) = *reinterpret_cast<unsigned int*>(&spotAttr->m_baseColor);
-        *reinterpret_cast<unsigned int*>(lightRaw + 0x20) = *reinterpret_cast<unsigned int*>(&spotAttr->m_intensity);
-        *reinterpret_cast<unsigned int*>(lightRaw + 0x24) = *reinterpret_cast<unsigned int*>(&spotAttr->m_falloff);
-        *reinterpret_cast<unsigned int*>(lightRaw + 0x28) = *reinterpret_cast<unsigned int*>(&spotAttr->m_angle);
-        lightRaw[0x58] = spotAttr->m_color.r;
-        lightRaw[0x59] = spotAttr->m_color.g;
-        lightRaw[0x5A] = spotAttr->m_color.b;
-        lightRaw[0x5B] = spotAttr->m_color.a;
+        *reinterpret_cast<unsigned int*>(&light.m_bumpShade) =
+            *reinterpret_cast<unsigned int*>(&spotAttr->m_baseColor);
+        light.m_offsetX = spotAttr->m_intensity;
+        light.m_offsetZ = spotAttr->m_falloff;
+        light.m_specularScale = spotAttr->m_angle;
+        light.m_targetColor[1].r = spotAttr->m_color.r;
+        light.m_targetColor[1].g = spotAttr->m_color.g;
+        light.m_targetColor[1].b = spotAttr->m_color.b;
+        light.m_targetColor[1].a = spotAttr->m_color.a;
 
         CLightPcs::CBumpLight* bump = LightPcs.AddBump(
             &light,
@@ -2317,10 +2299,10 @@ int CMapMng::ReadOtm(char* mapName)
             1);
         spotAttr->m_light = bump;
 
-        for (int j = 0; j < mapObjCount; j++) {
+        for (int j = 0; j < m_mapObjCount; j++) {
             CMapObj* scan = GetMapObjArray() + j;
             if (scan->m_bumpObjId == i) {
-                scan->m_bumpLight = bump;
+                scan->m_bumpLight = spotAttr->m_light;
             }
         }
 
@@ -2339,37 +2321,36 @@ int CMapMng::ReadOtm(char* mapName)
  */
 int CMapMng::ReadMid(char* mapName)
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    CMapMngAsyncLoadState& asyncLoadState = GetMapMngAsyncLoadState(this);
+    char* strTmp = g_StrTmp;
+    sprintf(strTmp, const_cast<char*>(s_mapMidPathFmt), mapName);
+    int ok = 1;
 
-    sprintf(g_StrTmp, const_cast<char*>(s_mapMidPathFmt), mapName);
-    bool ok = true;
-
-    if (static_cast<unsigned int>(System.m_execParam) > 2) {
-        System.Printf(const_cast<char*>(s_read_mid_fmt), g_StrTmp);
+    if (static_cast<int>(System.m_execParam) >= 3) {
+        System.Printf(const_cast<char*>(s_read_mid_fmt), strTmp);
     }
 
-    void* filePtr = File.m_readBuffer;
-    if (asyncLoadState.m_mapReadMode == 1) {
-        int& readIndex = asyncLoadState.m_asyncReadIndex;
-        const int size = asyncLoadState.m_fileSizes[readIndex];
-        void* amemCursor = asyncLoadState.m_mapLoadCursor;
+    void* filePtr;
+    if (m_asyncLoadState.m_mapReadMode == 1) {
+        int& readIndex = m_asyncLoadState.m_asyncReadIndex;
+        const int size = m_asyncLoadState.m_fileSizes[readIndex];
+        void* amemCursor = m_asyncLoadState.m_mapLoadCursor;
+        filePtr = File.m_readBuffer;
 
-        Memory.CopyFromAMemorySync(File.m_readBuffer, amemCursor, static_cast<unsigned long>((size + 0x1F) & ~0x1F));
-        asyncLoadState.m_mapLoadCursor = reinterpret_cast<unsigned char*>(asyncLoadState.m_mapLoadCursor) + size;
+        Memory.CopyFromAMemorySync(filePtr, amemCursor, static_cast<unsigned long>((size + 0x1F) & ~0x1F));
+        m_asyncLoadState.m_mapLoadCursor = reinterpret_cast<unsigned char*>(m_asyncLoadState.m_mapLoadCursor) + size;
         CheckSum(filePtr, size);
         readIndex += 1;
     } else {
-        CFile::CHandle* fileHandle = File.Open(g_StrTmp, 0, CFile::PRI_LOW);
+        CFile::CHandle* fileHandle = File.Open(strTmp, 0, CFile::PRI_LOW);
         if (fileHandle == 0) {
             filePtr = 0;
         } else {
             const int size = File.GetLength(fileHandle);
-            if (asyncLoadState.m_mapReadMode == 3) {
+            if (m_asyncLoadState.m_mapReadMode == 3) {
                 File.ReadASync(fileHandle);
                 filePtr = reinterpret_cast<void*>(1);
-                int& openIndex = asyncLoadState.m_asyncOpenIndex;
-                asyncLoadState.m_asyncHandles[openIndex] = fileHandle;
+                int& openIndex = m_asyncLoadState.m_asyncOpenIndex;
+                m_asyncLoadState.m_asyncHandles[openIndex] = fileHandle;
                 openIndex += 1;
             } else {
                 File.Read(fileHandle);
@@ -2377,28 +2358,28 @@ int CMapMng::ReadMid(char* mapName)
                 filePtr = File.m_readBuffer;
                 File.Close(fileHandle);
 
-                if (asyncLoadState.m_mapReadMode == 2) {
-                    int& readIndex = asyncLoadState.m_asyncReadIndex;
-                    void* amemCursor = asyncLoadState.m_mapLoadCursor;
+                if (m_asyncLoadState.m_mapReadMode == 2) {
+                    int& readIndex = m_asyncLoadState.m_asyncReadIndex;
+                    void* amemCursor = m_asyncLoadState.m_mapLoadCursor;
                     Memory.CopyToAMemorySync(filePtr, amemCursor, static_cast<unsigned long>(size));
-                    asyncLoadState.m_fileSizes[readIndex] = size;
-                    asyncLoadState.m_fileChecksums[readIndex] = CheckSum(filePtr, size);
+                    m_asyncLoadState.m_fileSizes[readIndex] = size;
+                    m_asyncLoadState.m_fileChecksums[readIndex] = CheckSum(filePtr, size);
                     readIndex += 1;
-                    asyncLoadState.m_mapLoadCursor =
-                        reinterpret_cast<unsigned char*>(asyncLoadState.m_mapLoadCursor) + size;
+                    m_asyncLoadState.m_mapLoadCursor =
+                        reinterpret_cast<unsigned char*>(m_asyncLoadState.m_mapLoadCursor) + size;
                 }
             }
         }
     }
 
     if (filePtr == 0) {
-        if (System.m_execParam != 0) {
-            System.Printf(const_cast<char*>(s_mapReadErrorFmt), g_StrTmp);
+        if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+            System.Printf(const_cast<char*>(s_mapReadErrorFmt), strTmp);
         }
         return 0;
     }
 
-    if (asyncLoadState.m_mapReadMode == 2 || asyncLoadState.m_mapReadMode == 3) {
+    if (m_asyncLoadState.m_mapReadMode == 2 || m_asyncLoadState.m_mapReadMode == 3) {
         return 1;
     }
 
@@ -2451,7 +2432,7 @@ int CMapMng::ReadMid(char* mapName)
                     octTree->SetMapObject(mapObj);
 
                     if (mapObj->m_mapData == 0) {
-                        if (System.m_execParam != 0) {
+                        if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                             System.Printf(const_cast<char*>(s_read_mid_mapobj_error));
                         }
                     } else if (mapObj->m_meshType == 1 || mapObj->m_meshType == 2) {
@@ -2460,10 +2441,10 @@ int CMapMng::ReadMid(char* mapName)
                         break;
                     }
 
-                    if (System.m_execParam != 0) {
+                    if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                         System.Printf(const_cast<char*>(s_read_mid_octtree_error));
                     }
-                    ok = false;
+                    ok = 0;
                     nextMapObj = mapObj + 1;
                     octTreeCount += 1;
                     break;
@@ -2474,45 +2455,41 @@ int CMapMng::ReadMid(char* mapName)
             }
 
             if (mapObjIndex >= m_mapObjCount) {
-                if (System.m_execParam != 0) {
+                if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                     System.Printf(const_cast<char*>(s_error_root_mapobj_not_found));
                     System.Printf(const_cast<char*>(s_read_mid_octtree_error));
                 }
-                ok = false;
+                ok = 0;
             }
         }
         chunkFile.PopChunk();
     }
 
-    const int mapObjCount = m_mapObjCount;
-    CMapObj* obj = MapMng.GetMapObjArray();
-    for (int i = 0; i < mapObjCount; i++) {
-        unsigned char type = obj->m_mapDataType;
+    for (int i = 0; i < m_mapObjCount; i++) {
+        CMapObj* obj = &MapMng.m_mapObjArray[i];
+        signed char type = obj->m_mapDataType;
         CMapHit* hit = static_cast<CMapHit*>(obj->m_mapData);
         if ((type == 2 || type == 3) && hit != 0) {
             int hitIndex = hit - GetMapHitArray();
-            if (m_mapHitCount <= hitIndex) {
-                if (System.m_execParam != 0) {
+            if (hitIndex >= m_mapHitCount) {
+                if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                     System.Printf(const_cast<char*>(s_read_mid_hit_error));
                 }
                 obj->m_mapData = 0;
             }
         }
-        obj++;
     }
 
     if (ok) {
-        if (static_cast<unsigned int>(System.m_execParam) > 2) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 3) {
             System.Printf(const_cast<char*>(s_read_mid_ok));
         }
-    } else if (System.m_execParam != 0) {
+    } else if (static_cast<unsigned int>(System.m_execParam) >= 1) {
         System.Printf(const_cast<char*>(s_read_mid_error));
     }
 
-    const short octTreeCount = m_octTreeCount;
-    for (int i = 0; i < octTreeCount; i++) {
-        COctTree* octTree = GetOctTreeArray() + i;
-        CMapObj* mapObj = octTree->GetMapObject();
+    for (int i = 0; i < m_octTreeCount; i++) {
+        CMapObj* mapObj = m_octTreeArray[i].GetMapObject();
         if (mapObj != 0) {
             mapObj->m_octTreeIndex = static_cast<signed char>(i);
         }
@@ -2555,7 +2532,7 @@ void CMapMng::Calc()
     int& mapLightId = m_mapAnimFrame;
     mapLightId += 1;
     mapLightId += 1;
-    if (mapLightId != 0x1E) {
+    if (static_cast<unsigned char>(mapLightId) != 0x1E) {
         mapLightId = 0x1C;
     }
 
@@ -2567,7 +2544,7 @@ void CMapMng::Calc()
     }
 
     for (int i = 0; i < m_mapObjCount; i++) {
-        MapMng.GetMapObjArray()[i].Calc();
+        MapMng.m_mapObjArray[i].Calc();
     }
 
     CMapTexAnimSet* mapTexAnimSet = m_mapTexAnimSet;
@@ -2579,21 +2556,19 @@ void CMapMng::Calc()
     materialSet->Calc();
 
     for (int i = 0; i < m_octTreeCount; i++) {
-        COctTree* octTree = GetOctTreeArray() + i;
-        LightPcs.InsertOctTree(static_cast<CLightPcs::TARGET>(1), *octTree);
+        LightPcs.InsertOctTree(static_cast<CLightPcs::TARGET>(1), m_octTreeArray[i]);
     }
 
     for (int i = 0; i < m_octTreeCount; i++) {
-        COctTree* octTree = GetOctTreeArray() + i;
-        CMapShadowInsertOctTree(static_cast<CMapShadow::TARGET>(1), *octTree);
+        CMapShadowInsertOctTree(static_cast<CMapShadow::TARGET>(1), m_octTreeArray[i]);
     }
 
     for (int i = 0; i < m_octTreeCount; i++) {
-        GetOctTreeArray()[i].SetDrawFlag();
+        m_octTreeArray[i].SetDrawFlag();
     }
 
     for (int i = 0; i < m_mapObjCount; i++) {
-        MapMng.GetMapObjArray()[i].SetDrawFlag();
+        MapMng.m_mapObjArray[i].SetDrawFlag();
     }
 }
 
@@ -2649,8 +2624,7 @@ void CMapMng::DrawBefore()
             }
 
             for (int i = 0; i < m_octTreeCount; i++) {
-                COctTree* octTree = GetOctTreeArray() + i;
-                octTree->Draw(0xFF);
+                m_octTreeArray[i].Draw(0xFF);
             }
         }
     }
@@ -2683,16 +2657,12 @@ void CMapMng::Draw()
     m_underWaterTexPending = 1;
 
     if ((s_bitMask.m_fields.m_mode & 8) == 0) {
-        COctTree* octTree = GetOctTreeArray();
         for (int i = 0; i < m_octTreeCount; i++) {
-            octTree->Draw(0);
-            octTree++;
+            m_octTreeArray[i].Draw(0);
         }
 
-        CMapObj* mapObj = MapMng.GetMapObjArray();
         for (int i = 0; i < m_mapObjCount; i++) {
-            mapObj->Draw(0x40);
-            mapObj++;
+            MapMng.m_mapObjArray[i].Draw(0x40);
         }
 
         PartPcs.DrawShoki();
@@ -2703,16 +2673,12 @@ void CMapMng::Draw()
         GXSetZMode(1, GX_LEQUAL, 1);
         LightPcs.SetNumDiffuse(0);
 
-        mapObj = MapMng.GetMapObjArray();
         for (int i = 0; i < m_mapObjCount; i++) {
-            mapObj->Draw(0);
-            mapObj++;
+            MapMng.m_mapObjArray[i].Draw(0);
         }
 
-        octTree = GetOctTreeArray();
         for (int i = 0; i < m_octTreeCount; i++) {
-            octTree->Draw(1);
-            octTree++;
+            m_octTreeArray[i].Draw(1);
         }
 
         if (Game.m_currentSceneId == 4) {
@@ -2847,10 +2813,8 @@ void CMapMng::Draw()
                     shadowCount -= batchCount;
                     startIndex += batchCount;
 
-                    octTree = GetOctTreeArray();
                     for (int i = 0; i < m_octTreeCount; i++) {
-                        octTree->DrawCharaShadow(0);
-                        octTree++;
+                        m_octTreeArray[i].DrawCharaShadow(0);
                     }
                 } while (shadowCount != 0);
             }
@@ -2949,10 +2913,8 @@ void CMapMng::Draw()
         _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
         _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 
-        CMapObj* mapObj = MapMng.GetMapObjArray();
         for (int i = 0; i < m_mapObjCount; i++) {
-            mapObj->DrawHit();
-            mapObj++;
+            MapMng.m_mapObjArray[i].DrawHit();
         }
 
         CameraPcs.SetOffsetZBuff(kMapZero);
@@ -3029,8 +2991,7 @@ void CMapMng::DrawAfter()
 
         if (static_cast<signed char>(s_bitMask.m_fields.m_mode) == 0) {
             for (int i = 0; i < m_octTreeCount; i++) {
-                COctTree* octTree = GetOctTreeArray() + i;
-                octTree->Draw(2);
+                m_octTreeArray[i].Draw(2);
             }
 
             for (int i = 0; i < m_mapObjCount; i++) {
@@ -3056,17 +3017,17 @@ int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
         return 0;
     }
 
-    if ((move->x <= kMapHitMoveEpsilon) && (kMapHitMoveNegEpsilon <= move->x) &&
-        (move->y <= kMapHitMoveEpsilon) && (kMapHitMoveNegEpsilon <= move->y) &&
-        (move->z <= kMapHitMoveEpsilon) && (kMapHitMoveNegEpsilon <= move->z)) {
-        if (static_cast<unsigned int>(System.m_execParam) > 1) {
+    if ((move->x <= kMapHitMoveEpsilon) && (move->x >= kMapHitMoveNegEpsilon) &&
+        (move->y <= kMapHitMoveEpsilon) && (move->y >= kMapHitMoveNegEpsilon) &&
+        (move->z <= kMapHitMoveEpsilon) && (move->z >= kMapHitMoveNegEpsilon)) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 2) {
             System.Printf(g_MsgFlashy);
         }
-        if (static_cast<unsigned int>(System.m_execParam) > 1) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 2) {
             System.Printf(const_cast<char*>(s_check_hit_cylinder_small_vec_fmt), static_cast<double>(move->x),
                 static_cast<double>(move->y), static_cast<double>(move->z));
         }
-        if (static_cast<unsigned int>(System.m_execParam) > 1) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 2) {
             System.Printf(g_MsgFlashy);
         }
     }
@@ -3076,17 +3037,15 @@ int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
     PSVECAdd(&cylinder->m_bottom, move, &cylinder->m_top);
 
     for (int i = 0; i < m_octTreeCount; i++) {
-        COctTree* octTree = GetOctTreeArray() + i;
-        if (octTree->CheckHitCylinder(cylinder, move, mask) != 0) {
-            m_hitMapObj = octTree->GetMapObject();
+        if (m_octTreeArray[i].CheckHitCylinder(cylinder, move, mask) != 0) {
+            m_hitMapObj = m_octTreeArray[i].GetMapObject();
             return 1;
         }
     }
 
     for (int i = 0; i < m_mapObjCount; i++) {
-        CMapObj* mapObj = GetMapObjArray() + i;
-        m_hitMapObj = mapObj;
-        if (mapObj->CheckHitCylinder(cylinder, move, mask) != 0) {
+        m_hitMapObj = &m_mapObjArray[i];
+        if (m_hitMapObj->CheckHitCylinder(cylinder, move, mask) != 0) {
             return 1;
         }
     }
@@ -3109,17 +3068,17 @@ int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
         return 0;
     }
 
-    if ((move->x <= kMapHitMoveEpsilon) && (kMapHitMoveNegEpsilon <= move->x) &&
-        (move->y <= kMapHitMoveEpsilon) && (kMapHitMoveNegEpsilon <= move->y) &&
-        (move->z <= kMapHitMoveEpsilon) && (kMapHitMoveNegEpsilon <= move->z)) {
-        if (static_cast<unsigned int>(System.m_execParam) > 1) {
+    if ((move->x <= kMapHitMoveEpsilon) && (move->x >= kMapHitMoveNegEpsilon) &&
+        (move->y <= kMapHitMoveEpsilon) && (move->y >= kMapHitMoveNegEpsilon) &&
+        (move->z <= kMapHitMoveEpsilon) && (move->z >= kMapHitMoveNegEpsilon)) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 2) {
             System.Printf(g_MsgFlashy);
         }
-        if (static_cast<unsigned int>(System.m_execParam) > 1) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 2) {
             System.Printf(const_cast<char*>(s_check_hit_cylinder_near_small_vec_fmt), static_cast<double>(move->x),
                 static_cast<double>(move->y), static_cast<double>(move->z));
         }
-        if (static_cast<unsigned int>(System.m_execParam) > 1) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 2) {
             System.Printf(g_MsgFlashy);
         }
     }
@@ -3130,22 +3089,20 @@ int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
     PSVECAdd(&cylinder->m_bottom, move, &cylinder->m_top);
 
     for (int i = 0; i < m_octTreeCount; i++) {
-        COctTree* octTree = GetOctTreeArray() + i;
         gMapHitFaceFlag = 0;
-        octTree->CheckHitCylinderNear(cylinder, move, mask);
+        m_octTreeArray[i].CheckHitCylinderNear(cylinder, move, mask);
         if (gMapHitFaceFlag != 0) {
             hit = 1;
-            m_hitMapObj = octTree->GetMapObject();
+            m_hitMapObj = m_octTreeArray[i].GetMapObject();
         }
     }
 
     for (int i = 0; i < m_mapObjCount; i++) {
-        CMapObj* mapObj = GetMapObjArray() + i;
         gMapHitFaceFlag = 0;
-        mapObj->CheckHitCylinderNear(cylinder, move, mask);
+        m_mapObjArray[i].CheckHitCylinderNear(cylinder, move, mask);
         if (gMapHitFaceFlag != 0) {
             hit = 1;
-            m_hitMapObj = mapObj;
+            m_hitMapObj = &m_mapObjArray[i];
         }
     }
 
@@ -3222,50 +3179,46 @@ void CMapMng::SetIdGrpColor(int mapIdGrpIndex, int channelIndex, _GXColor color)
     switch (channelIndex) {
     case 0:
     {
-        CMapIdGrp* mapIdGrp = GetMapIdGrpArray() + mapIdGrpIndex;
         u8 g = color.g;
         u8 b = color.b;
-        mapIdGrp->m_primaryColor.r = color.r;
+        m_mapIdGrpArray[mapIdGrpIndex].m_primaryColor.r = color.r;
         u8 a = color.a;
-        mapIdGrp->m_primaryColor.g = g;
-        mapIdGrp->m_primaryColor.b = b;
-        mapIdGrp->m_primaryColor.a = a;
+        m_mapIdGrpArray[mapIdGrpIndex].m_primaryColor.g = g;
+        m_mapIdGrpArray[mapIdGrpIndex].m_primaryColor.b = b;
+        m_mapIdGrpArray[mapIdGrpIndex].m_primaryColor.a = a;
         return;
     }
     case 1:
     {
-        CMapIdGrp* mapIdGrp = GetMapIdGrpArray() + mapIdGrpIndex;
         u8 g = color.g;
         u8 b = color.b;
-        mapIdGrp->m_secondaryColor.r = color.r;
+        m_mapIdGrpArray[mapIdGrpIndex].m_secondaryColor.r = color.r;
         u8 a = color.a;
-        mapIdGrp->m_secondaryColor.g = g;
-        mapIdGrp->m_secondaryColor.b = b;
-        mapIdGrp->m_secondaryColor.a = a;
+        m_mapIdGrpArray[mapIdGrpIndex].m_secondaryColor.g = g;
+        m_mapIdGrpArray[mapIdGrpIndex].m_secondaryColor.b = b;
+        m_mapIdGrpArray[mapIdGrpIndex].m_secondaryColor.a = a;
         return;
     }
     case 2:
     {
-        CMapIdGrp* mapIdGrp = GetMapIdGrpArray() + mapIdGrpIndex;
         u8 g = color.g;
         u8 b = color.b;
-        mapIdGrp->m_tertiaryColor.r = color.r;
+        m_mapIdGrpArray[mapIdGrpIndex].m_tertiaryColor.r = color.r;
         u8 a = color.a;
-        mapIdGrp->m_tertiaryColor.g = g;
-        mapIdGrp->m_tertiaryColor.b = b;
-        mapIdGrp->m_tertiaryColor.a = a;
+        m_mapIdGrpArray[mapIdGrpIndex].m_tertiaryColor.g = g;
+        m_mapIdGrpArray[mapIdGrpIndex].m_tertiaryColor.b = b;
+        m_mapIdGrpArray[mapIdGrpIndex].m_tertiaryColor.a = a;
         return;
     }
     case 3:
     {
-        CMapIdGrp* mapIdGrp = GetMapIdGrpArray() + mapIdGrpIndex;
         u8 g = color.g;
         u8 b = color.b;
-        mapIdGrp->m_quaternaryColor.r = color.r;
+        m_mapIdGrpArray[mapIdGrpIndex].m_quaternaryColor.r = color.r;
         u8 a = color.a;
-        mapIdGrp->m_quaternaryColor.g = g;
-        mapIdGrp->m_quaternaryColor.b = b;
-        mapIdGrp->m_quaternaryColor.a = a;
+        m_mapIdGrpArray[mapIdGrpIndex].m_quaternaryColor.g = g;
+        m_mapIdGrpArray[mapIdGrpIndex].m_quaternaryColor.b = b;
+        m_mapIdGrpArray[mapIdGrpIndex].m_quaternaryColor.a = a;
         return;
     }
     }
@@ -3284,9 +3237,9 @@ void CMapMng::SetMeshCameraSemiTransRange(unsigned short id, float nearRange, fl
                                           float maxAlpha, float fadeRange)
 {
     int found = 0;
-    CMapObj* mapObj = GetMapObjArray();
 
     for (int i = 0; i < m_mapObjCount; i++) {
+        CMapObj* mapObj = &m_mapObjArray[i];
         if (mapObj->m_meshId == id) {
             mapObj->m_cameraSemiTransNear = nearRange;
             mapObj->m_cameraSemiTransFar = farRange;
@@ -3304,20 +3257,19 @@ void CMapMng::SetMeshCameraSemiTransRange(unsigned short id, float nearRange, fl
             mapObj->m_cameraSemiTransAlpha = 0x4000;
             mapObj->m_cameraSemiTransStep = 0;
         }
-        mapObj++;
     }
 
     if (!found) {
-        if (System.m_execParam >= 1) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1) {
             System.Printf(g_MsgFlashy);
         }
-        if (System.m_execParam >= 1) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1) {
             System.Printf(const_cast<char*>(s_set_bg_transparent_missing_fmt), id);
         }
-        if (System.m_execParam >= 1) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1) {
             System.Printf(g_MsgFlashy);
         }
-        if (System.m_execParam >= 1) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1) {
             System.Printf(const_cast<char*>(s_mapNewLine));
         }
     }
@@ -3335,9 +3287,9 @@ void CMapMng::SetMeshCameraSemiTransRange(unsigned short id, float nearRange, fl
 void CMapMng::SetMeshCameraSemiTransAlpha(unsigned short id, int alpha, int frameCount)
 {
     int found = 0;
-    CMapObj* mapObj = GetMapObjArray();
 
     for (int i = 0; i < m_mapObjCount; i++) {
+        CMapObj* mapObj = &m_mapObjArray[i];
         if (mapObj->m_meshId == id) {
             mapObj->m_cameraSemiTransTargetAlpha = static_cast<short>(alpha << 7);
             found = 1;
@@ -3346,20 +3298,19 @@ void CMapMng::SetMeshCameraSemiTransAlpha(unsigned short id, int alpha, int fram
                  static_cast<int>(mapObj->m_cameraSemiTransAlpha)) /
                 frameCount);
         }
-        mapObj++;
     }
 
     if (!found) {
-        if (System.m_execParam >= 1) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1) {
             System.Printf(g_MsgFlashy);
         }
-        if (System.m_execParam >= 1) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1) {
             System.Printf(const_cast<char*>(s_set_bg_camera_semi_trans_missing_fmt), id);
         }
-        if (System.m_execParam >= 1) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1) {
             System.Printf(g_MsgFlashy);
         }
-        if (System.m_execParam >= 1) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1) {
             System.Printf(const_cast<char*>(s_mapNewLine));
         }
     }

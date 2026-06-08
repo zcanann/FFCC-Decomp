@@ -6014,7 +6014,7 @@ void CMenuPcs::SetWorldParam(int code, int value)
 		const unsigned char primaryMask = s_wmWorldParamPrimaryDirtyMask;
 		bytes[5] = bytes[4];
 		bytes[4] = static_cast<unsigned char>(value);
-		bytes[0xA] = bytes[0xA] | primaryMask;
+		bytes[0xA] = primaryMask | bytes[0xA];
 		break;
 	}
 	case 1:
@@ -6042,7 +6042,7 @@ void CMenuPcs::SetWorldParam(int code, int value)
 		const unsigned char secondaryMask = s_wmWorldParamSecondaryDirtyMask;
 		bytes[0xB] = bytes[0xC];
 		bytes[0xC] = static_cast<unsigned char>(value);
-		bytes[0xA] = bytes[0xA] | secondaryMask;
+		bytes[0xA] = secondaryMask | bytes[0xA];
 		break;
 	}
 	case 9:

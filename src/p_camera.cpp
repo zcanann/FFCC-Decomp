@@ -1588,15 +1588,10 @@ void CCameraPcs::drawShadowBegin()
     CopyCameraState(m_shadowCamera, CurrentCameraState());
 
     if (Game.m_currentSceneId == 3) {
-        float stickX = kCameraZeroF;
-        float stickY = kCameraZeroF;
-
-        if (Pad.m_debugPadLock == 0) {
-            stickX = CameraShadowPadInput().stickXF;
-            stickY = CameraShadowPadInput().stickYF;
-        }
-
+        float stickX = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraShadowPadInput().stickXF;
         m_fullScreenShadow.m_rotY += kCameraDegToRad * kCameraDebugMoveStep * stickX;
+
+        float stickY = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraShadowPadInput().stickYF;
         m_fullScreenShadow.m_rotX += kCameraDegToRad * kCameraTwoF * stickY;
     }
 

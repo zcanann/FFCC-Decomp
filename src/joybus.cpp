@@ -4837,8 +4837,8 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
 
             memcpy(&payload[0x8E], &playerData[playerOffset + 0x20], 3);
 
-            payload[0x91] = playerData[playerOffset + 0x14];
-            payload[0x92] = playerData[playerOffset + 0x15];
+            unsigned short statHalf = __lhbrx(&playerData[playerOffset + 0x14], 0);
+            memcpy(&payload[0x91], &statHalf, 2);
 
             unsigned char compatBuf[64];
             memset(compatBuf, 0, sizeof(compatBuf));
@@ -4851,10 +4851,7 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
 
             memcpy(body + compatLen, &playerData[playerOffset + 0x18], 8);
 
-            unsigned int statWord = ((unsigned int)playerData[playerOffset + 0x27] << 24) |
-                                    ((unsigned int)playerData[playerOffset + 0x26] << 16) |
-                                    ((unsigned int)playerData[playerOffset + 0x25] << 8) |
-                                     (unsigned int)playerData[playerOffset + 0x24];
+            unsigned int statWord = __lwbrx(&playerData[playerOffset + 0x24], 0);
             memcpy(body + compatLen + 8, &statWord, sizeof(statWord));
 
             const int byteLen = compatLen + 0xA3;

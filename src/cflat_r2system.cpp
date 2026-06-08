@@ -4591,7 +4591,7 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
                 }
                 break;
             case -0x79:
-                stack[-1].m_word = static_cast<int>(static_cast<short>(Game.m_gameWork.m_optionValue));
+                stack[-1].m_word = static_cast<int>(static_cast<unsigned short>(Game.m_gameWork.m_optionValue));
                 if (setMode < 0) {
                     if (setMode >= -1) {
                         Game.m_gameWork.m_optionValue =

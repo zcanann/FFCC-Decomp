@@ -1377,11 +1377,11 @@ void CMenuPcs::CalcSelectWait()
 		handle->m_model->SetMatrix(scaleMtx);
 		handle->m_model->CalcMatrix();
 		handle->m_model->CalcSkin();
-		handle->m_model->m_lightAlpha = sprites[(int)(signed char)s_PlayerTop + i].alpha;
+		handle->m_model->m_lightAlpha = sprites[(int)(unsigned char)s_PlayerTop + i].alpha;
 	}
 
 	if (currentPartyIndex >= activePartyCount && delay == 0) {
-		if (*(short*)(statePtr + 0x18) >= 10) {
+		if (*(unsigned short*)(statePtr + 0x18) >= 10) {
 			*(short*)(statePtr + 0x18) = 0;
 			for (int i = 0; i < activePartyCount; i++) {
 				BonusPartySummary& summary = s_Rinfo->m_party[i];
@@ -2660,7 +2660,7 @@ void CMenuPcs::CalcResultCountAnim()
 		int padRemap = Pad.m_debugPadPort;
 		int padLock = Pad.m_debugPadLock;
 		for (int i = 0; i < s_Rinfo->m_partyCount; i++) {
-			unsigned int padIndex = s_Rinfo->m_party[i].m_partySlot;
+			int padIndex = s_Rinfo->m_party[i].m_partySlot;
 			unsigned short down;
 			unsigned char padLocked = (padLock != 0 || (padIndex == 0 && padRemap != -1));
 			if (padLocked) {

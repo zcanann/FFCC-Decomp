@@ -1530,9 +1530,8 @@ void GbaQueue::LoadEnemyStat()
 			if (enemyObjPtrs[i] == 0) {
 				enemyEntry[3] = 0;
 			} else {
-				CGObject* enemyObj = reinterpret_cast<CGObject*>(enemyObjPtrs[i]);
-				CMonWork* enemyWork = reinterpret_cast<CMonWork*>(enemyWorkPtrs[i]);
-				const int enemyDataBase = Game.unkCFlatData0[1] + enemyWork->m_baseDataIndex * 0x1D0;
+				const int enemyDataBase = Game.unkCFlatData0[1] +
+				    reinterpret_cast<CMonWork*>(enemyWorkPtrs[i])->m_baseDataIndex * 0x1D0;
 				const unsigned int enemyKind = *reinterpret_cast<unsigned short*>(enemyDataBase + 0x10C);
 
 				if (enemyKind == 10) {
@@ -1543,6 +1542,8 @@ void GbaQueue::LoadEnemyStat()
 					enemyEntry[1] = 2;
 				}
 
+				CMonWork* enemyWork = reinterpret_cast<CMonWork*>(enemyWorkPtrs[i]);
+				CGObject* enemyObj = reinterpret_cast<CGObject*>(enemyObjPtrs[i]);
 				enemyEntry[3] = static_cast<unsigned char>(enemyWork->m_baseDataIndex);
 				*reinterpret_cast<unsigned short*>(enemyEntry + 4) = enemyWork->m_hp;
 				*reinterpret_cast<unsigned short*>(enemyEntry + 6) = enemyWork->m_maxHp;

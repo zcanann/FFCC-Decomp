@@ -1228,10 +1228,11 @@ void CChara::CModel::setup()
 	AttachAnim(m_anim, -1, -1, 0);
 
 	CTextureSet* texSet = m_texSet;
-	if (texSet != m_texSet) {
-		if (m_texSet != 0) {
-			if (m_texSet->DecRef() == 0) {
-				delete m_texSet;
+	CTextureSet* oldTexSet = m_texSet;
+	if (texSet != oldTexSet) {
+		if (oldTexSet != 0) {
+			if (oldTexSet->DecRef() == 0) {
+				delete oldTexSet;
 			}
 			m_texSet = 0;
 		}

@@ -1508,19 +1508,18 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
         CBound* worldBound = reinterpret_cast<CBound*>(worldBoundData);
         float clipBoundData[6];
         CBound* clipBound = reinterpret_cast<CBound*>(clipBoundData);
-        clipBoundData[0] = kCameraBoundsMinInitial;
-        clipBoundData[1] = kCameraBoundsMinInitial;
-        clipBoundData[2] = kCameraBoundsMinInitial;
-        clipBoundData[3] = kCameraBoundsMaxInitial;
-        clipBoundData[4] = kCameraBoundsMaxInitial;
-        clipBoundData[5] = kCameraBoundsMaxInitial;
-
         worldBoundData[0] = gObject->m_worldPosition.x - radius;
-        worldBoundData[1] = gObject->m_worldPosition.y;
-        worldBoundData[2] = gObject->m_worldPosition.z - radius;
+        clipBoundData[0] = kCameraBoundsMinInitial;
         worldBoundData[3] = gObject->m_worldPosition.x + radius;
+        clipBoundData[3] = kCameraBoundsMaxInitial;
+        worldBoundData[1] = gObject->m_worldPosition.y;
+        clipBoundData[1] = kCameraBoundsMinInitial;
         worldBoundData[4] = gObject->m_worldPosition.y + radius;
+        clipBoundData[4] = kCameraBoundsMaxInitial;
+        worldBoundData[2] = gObject->m_worldPosition.z - radius;
+        clipBoundData[2] = kCameraBoundsMinInitial;
         worldBoundData[5] = gObject->m_worldPosition.z + radius;
+        clipBoundData[5] = kCameraBoundsMaxInitial;
 
         if (worldBound->CheckFrustum0(*clipBound) == 0) {
             continue;

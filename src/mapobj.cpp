@@ -558,22 +558,22 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                         break;
                     }
                     case CHUNK_CJUN:
-                        pointLight->m_altColorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
-                        break;
-                    case CHUNK_CFRM:
-                        pointLight->m_altColorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
-                        break;
-                    case CHUNK_CKEY:
-                        pointLight->m_altColorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
-                        break;
-                    case CHUNK_MJUN:
                         pointLight->m_colorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
                         break;
-                    case CHUNK_MFRM:
+                    case CHUNK_CFRM:
                         pointLight->m_colorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
                         break;
-                    case CHUNK_MKEY:
+                    case CHUNK_CKEY:
                         pointLight->m_colorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
+                        break;
+                    case CHUNK_MJUN:
+                        pointLight->m_altColorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
+                        break;
+                    case CHUNK_MFRM:
+                        pointLight->m_altColorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
+                        break;
+                    case CHUNK_MKEY:
+                        pointLight->m_altColorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
                         break;
                     }
                 }
@@ -652,22 +652,22 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                         break;
                     }
                     case CHUNK_CJUN:
-                        spotLight->m_altColorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
-                        break;
-                    case CHUNK_CFRM:
-                        spotLight->m_altColorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
-                        break;
-                    case CHUNK_CKEY:
-                        spotLight->m_altColorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
-                        break;
-                    case CHUNK_MJUN:
                         spotLight->m_colorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
                         break;
-                    case CHUNK_MFRM:
+                    case CHUNK_CFRM:
                         spotLight->m_colorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
                         break;
-                    case CHUNK_MKEY:
+                    case CHUNK_CKEY:
                         spotLight->m_colorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
+                        break;
+                    case CHUNK_MJUN:
+                        spotLight->m_altColorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
+                        break;
+                    case CHUNK_MFRM:
+                        spotLight->m_altColorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
+                        break;
+                    case CHUNK_MKEY:
+                        spotLight->m_altColorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
                         break;
                     }
                 }

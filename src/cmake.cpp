@@ -901,8 +901,9 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
     unsigned short repeat;
     char picked[8];
 
+    int padLock = Pad.m_debugPadLock;
     bool padBusy = false;
-    if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
+    if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
         padBusy = true;
     }
     if (padBusy) {
@@ -914,7 +915,7 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
     }
 
     padBusy = false;
-    if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
+    if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
         padBusy = true;
     }
     if (padBusy) {

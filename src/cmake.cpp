@@ -2610,17 +2610,17 @@ void CMenuPcs::CmakeNameDraw()
 
     char* name = GetCmakeNameBuffer();
     int nameCursor = __cntlzw(static_cast<unsigned int>(1 - CmakeState(this)->m_mode)) >> 5;
-    if (4 < CmakeState(this)->m_row) {
+    if (CmakeState(this)->m_row >= 5) {
         nameCursor = 0;
     }
     unsigned int nameLen = strlen(name);
-    if (6 < static_cast<int>(nameLen & (static_cast<int>(-nameLen | nameLen) >> 31))) {
+    if (static_cast<int>(nameLen & (static_cast<int>(-nameLen | nameLen) >> 31)) >= 7) {
         nameCursor = 0;
     }
     DrawCmakeName(0, nameCursor, name, alpha);
     DrawCmakeDecision(
         (static_cast<int>(CmakeState(this)->m_row) >> 31) +
-            (static_cast<int>(static_cast<int>(CmakeState(this)->m_row)) > 4),
+            (static_cast<int>(static_cast<int>(CmakeState(this)->m_row)) >= 5),
         alpha);
 
     if (CmakeMcState(this) != 3) {

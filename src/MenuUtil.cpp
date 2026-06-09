@@ -1213,7 +1213,7 @@ void CMenuPcs::DrawOptionMenu()
 		unsigned int sideWidth = sideTexture->m_width;
 		unsigned int sideHeight = sideTexture->m_height;
 		const f32* row = &layoutBase[10];
-		unsigned char secondValue = m_gameInitMode;
+		unsigned char secondValue =  (m_gameInitMode - 0);
 		char* firstText = langStrings[12];
 		char* secondText = langStrings[13];
 		float leftX = row[0];
@@ -1465,7 +1465,8 @@ void CMenuPcs::DrawOptionMenu()
 		gUtil.RenderTextureQuad(kOptionMeterRightArrowX, kOptionMeterArrowY, kOptionSmallIconSize, kOptionCursorSize, meterTexture, &uv0,
 		                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
-		gUtil.CalcUV(uv0.x, uv0.y, 0x30, 0x28, meterWidth, meterHeight);
+		int __p20 = meterHeight;
+		gUtil.CalcUV(uv0.x, uv0.y, 0x30, 0x28, meterWidth, __p20);
 		gUtil.CalcUV(uv1.x, uv1.y, 0x40, 0x38, meterWidth, meterHeight);
 		for (int i = 0, x = 0; i < 12; i++, x += 0x10) {
 			float barX = kOptionMeterBarBaseX + static_cast<float>(x);
@@ -1502,7 +1503,7 @@ void CMenuPcs::DrawOptionMenu()
 		int y = 0;
 		unsigned int uvY = 0;
 		int modeU = 0x280;
-		for (int i = 0; i < 4; i++, y += 0x28, uvY += 0x20, modeU += 0x40) {
+		for (int i =  (s32)(0); i < 4; i++, y += 0x28, uvY += 0x20, modeU += 0x40) {
 			if ((m_specialModeEdit != 0) && (m_specialModeCursor == i)) {
 				CTexture* cursorPanel = GetTextureSetTexture(textureSet, 4);
 				int cursorWidth = static_cast<int>(static_cast<float>(cursorPanel->m_width));

@@ -984,8 +984,8 @@ void CGObject::bgNormalCollision()
 
     if ((MapMng.GetMapIdGrpArray()[gMapHitFace->m_groupIndex].m_mask & 0x20) == 0) {
         m_stateFlags0Bits.unk0 = 1;
-        m_radiusCtrl.x =
-            *reinterpret_cast<float*>(&MapMng.GetMapIdGrpArray()[gMapHitFace->m_groupIndex].m_mask);
+        *reinterpret_cast<u32*>(&m_radiusCtrl.x) =
+            MapMng.GetMapIdGrpArray()[gMapHitFace->m_groupIndex].m_mask;
         if (gMapHitFace->m_groupIndex != 0) {
             m_lastBgGroup = static_cast<short>(gMapHitFace->m_groupIndex);
         }

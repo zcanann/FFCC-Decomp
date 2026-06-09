@@ -2903,13 +2903,16 @@ int CGObject::IsAnimFinished(int mode)
     CCharaPcs::CHandle* handle;
     double threshold;
 
+    char slot;
+
     handle = m_charaModelHandle;
     if ((handle != 0) && (handle->m_model != 0)) {
         hasModel = true;
     }
 
     if (hasModel) {
-        if (m_currentAnimSlot == -1) {
+        slot = m_currentAnimSlot;
+        if (slot == -1) {
             return 1;
         }
         {
@@ -2923,7 +2926,7 @@ int CGObject::IsAnimFinished(int mode)
                     hasModel = true;
                 }
 
-                if (hasModel && (m_currentAnimSlot != -1)) {
+                if (hasModel && (slot != -1)) {
                     CModelAnimState& model = ModelAnimState(handle->m_model);
                     if (model.m_anim != 0) {
                         animSpan = sAnimFrameOffset + (model.m_animEnd - model.m_animStart);

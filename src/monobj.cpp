@@ -1387,8 +1387,9 @@ void CGMonObj::onFrameStat()
 			prgObj->reqAnim(0x10, 0, 0);
 			object->SetAnimSlot(0, 0);
 			object->SetAnimSlot(4, 4);
-			object->m_bgColMask = (object->m_bgColMask | 0x50000) & 0xFFFFFFF7;
-			object->m_displayFlags &= 0xFFFFFFEF;
+			object->m_bgColMask = object->m_bgColMask | 0x50000;
+			object->m_bgColMask = object->m_bgColMask & 0xFFFFFFF7;
+			object->m_objectFlags = object->m_objectFlags & 0xFFFFFFEF;
 		}
 		if (prgObj->isLoopAnim() != 0) {
 			prgObj->changeStat(0, 0, 0);

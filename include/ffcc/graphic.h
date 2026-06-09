@@ -129,7 +129,7 @@ public:
     s32 m_drawDoneWaiting;
     char* m_drawDoneFile;
     s32 m_drawDoneLine;
-    s32 m_drawDoneCounter;
+    volatile s32 m_drawDoneCounter;
 };
 
 extern CGraphic Graphic;

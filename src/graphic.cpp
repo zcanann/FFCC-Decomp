@@ -1343,9 +1343,9 @@ _GXTexObj* CGraphic::GetBackBufferRect(int& x, int& y, int& width, int& height, 
     if ((xEnd >= 0) && (yEnd >= 0)) {
         GXRenderModeObj* renderMode = m_renderMode;
         int efbWidth = static_cast<int>(renderMode->fbWidth);
-        int efbHeight = static_cast<int>(renderMode->efbHeight);
 
-        if ((x <= efbWidth) && (yEnd >= 0) && (y <= efbHeight) && (width > 0) && (height > 0)) {
+        if ((x <= efbWidth) && (yEnd >= 0) && (y <= static_cast<int>(renderMode->efbHeight)) &&
+            (width > 0) && (height > 0)) {
             if (xEnd > efbWidth) {
                 width -= (xEnd - efbWidth);
                 xEnd = static_cast<int>(m_renderMode->fbWidth);
@@ -1361,13 +1361,13 @@ _GXTexObj* CGraphic::GetBackBufferRect(int& x, int& y, int& width, int& height, 
                 y = 0;
             }
 
-            efbHeight = static_cast<int>(m_renderMode->efbHeight);
+            int efbHeight = static_cast<int>(m_renderMode->efbHeight);
             if (yEnd > efbHeight) {
                 height -= (yEnd - efbHeight);
                 yEnd = static_cast<int>(m_renderMode->efbHeight);
             }
 
-            if ((xEnd != x) && (yEnd != y)) {
+            if (((xEnd - x) != 0) && ((yEnd - y) != 0)) {
                 int texFormat = 6;
                 int textureSize = width * height * 4;
                 int maxTextureSize =

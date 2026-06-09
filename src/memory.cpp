@@ -1377,12 +1377,14 @@ int CMemory::CStage::GetHeapUnuse()
     } else {
         node = stageBlockAt(stageGetHeapHead(this))->m_next;
     }
+    int totalSize = 0;
     int total = 0;
 
     while ((node->m_flags & 2) == 0) {
         if ((node->m_flags & kMemoryBlockUsedFlag) == 0) {
             total += node->m_size;
         }
+        totalSize += reinterpret_cast<int>(node->m_next) - reinterpret_cast<int>(node);
         node = node->m_next;
     }
 

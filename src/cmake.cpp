@@ -1565,7 +1565,7 @@ void CMenuPcs::CmakeResultDraw()
     valueFont->SetColor(valueColor.color);
     valueFont->SetTlut(6);
 
-    char tribeWithSlash[0x40];
+    char tribeWithSlash[0x20];
     for (int i = 0; i < 4; i++) {
         const char* value = "";
         if (i == 0) {

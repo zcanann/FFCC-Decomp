@@ -1432,15 +1432,15 @@ tmpArtifactBlock:
 			int weaponItem;
 			int weaponRef;
 			caravan->GetCurrentWeaponItem(weaponItem, weaponRef);
-			if (weaponItem == caravan->GetIdxCmdList() && weaponRef == itemId) {
-				m_itemId = itemId;
-				changeStat(7, 0, 0);
+			if (weaponItem != caravan->GetIdxCmdList() || weaponRef != itemId) {
+				*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D4) = caravan->GetIdxCmdList();
+				party.weaponRef = itemId;
+				party.commandFlagBits.flag20 = 1;
+				changeStat(0x0F, 0, 0);
 				return;
 			}
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D4) = caravan->GetIdxCmdList();
-			party.weaponRef = itemId;
-			party.commandFlagBits.flag20 = 1;
-			changeStat(0x0F, 0, 0);
+			m_itemId = itemId;
+			changeStat(7, 0, 0);
 			return;
 		}
 		if (itemKind != 0x100) {

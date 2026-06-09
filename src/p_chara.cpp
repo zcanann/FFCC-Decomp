@@ -1765,7 +1765,7 @@ checkLoaded:
                     }
 
                     void* rawData = chunkFile.GetAddress();
-                    const int rawSize = static_cast<int>(chunk.m_size);
+                    const unsigned int rawSize = static_cast<int>(chunk.m_size);
 
                     if (dataType == 0) {
                         CLoadModel* loadModel = 0;

@@ -686,43 +686,15 @@ void CGCharaObj::onFramePostCalc()
 
 	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x54C) += 1;
 
-	if (m_ignoreHit[0].m_flagBits.m_flag_80) {
-		int t = m_ignoreHit[0].m_timer;
-		if (t != 0) {
-			t -= 1;
-			m_ignoreHit[0].m_timer = static_cast<short>(t);
-			if (static_cast<short>(t) == 0) {
-				m_ignoreHit[0].m_flagBits.m_flag_80 = 0;
-			}
-		}
-	}
-	if (m_ignoreHit[1].m_flagBits.m_flag_80) {
-		int t = m_ignoreHit[1].m_timer;
-		if (t != 0) {
-			t -= 1;
-			m_ignoreHit[1].m_timer = static_cast<short>(t);
-			if (static_cast<short>(t) == 0) {
-				m_ignoreHit[1].m_flagBits.m_flag_80 = 0;
-			}
-		}
-	}
-	if (m_ignoreHit[2].m_flagBits.m_flag_80) {
-		int t = m_ignoreHit[2].m_timer;
-		if (t != 0) {
-			t -= 1;
-			m_ignoreHit[2].m_timer = static_cast<short>(t);
-			if (static_cast<short>(t) == 0) {
-				m_ignoreHit[2].m_flagBits.m_flag_80 = 0;
-			}
-		}
-	}
-	if (m_ignoreHit[3].m_flagBits.m_flag_80) {
-		int t = m_ignoreHit[3].m_timer;
-		if (t != 0) {
-			t -= 1;
-			m_ignoreHit[3].m_timer = static_cast<short>(t);
-			if (static_cast<short>(t) == 0) {
-				m_ignoreHit[3].m_flagBits.m_flag_80 = 0;
+	for (int i = 0; i < 4; i++) {
+		if (m_ignoreHit[i].m_flagBits.m_flag_80) {
+			int t = m_ignoreHit[i].m_timer;
+			if (t != 0) {
+				t -= 1;
+				m_ignoreHit[i].m_timer = static_cast<short>(t);
+				if (static_cast<short>(t) == 0) {
+					m_ignoreHit[i].m_flagBits.m_flag_80 = 0;
+				}
 			}
 		}
 	}

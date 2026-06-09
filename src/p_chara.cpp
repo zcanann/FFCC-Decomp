@@ -1389,7 +1389,8 @@ CTextureSet* CCharaPcs::createTextureSet(void* textureData, int useWeaponStage)
 {
     CTextureSet* textureSet = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
 
-    textureSet->Create(textureData, SelectLoadStage(&CharaPcs, (&CharaPcs.m_viewerModelStage)[useWeaponStage != 0 ? 3 : 1]), 0, 0, 0, 0);
+    int allocStageMode = CharaPcs.m_charaAllocStage;
+    textureSet->Create(textureData, GET_CHARA_ALLOC_STAGE_S(allocStageMode, (&CharaPcs.m_viewerModelStage)[useWeaponStage != 0 ? 3 : 1]), 0, 0, 0, 0);
 
     return textureSet;
 }

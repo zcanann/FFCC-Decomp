@@ -2792,8 +2792,8 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
             viewMtx[0][3] += viewMtx[0][1] * offsetY;
             viewMtx[1][3] += viewMtx[1][1] * offsetY;
             viewMtx[2][3] += viewMtx[2][1] * offsetY;
-            viewMtx[0][1] *= 0.5f;
             viewMtx[1][1] *= 0.5f;
+            viewMtx[0][1] *= 0.5f;
             viewMtx[2][1] *= 0.5f;
         } else if ((m_flags & 8) != 0) {
             PSMTXConcat(viewMtx, CFlatCenterMatrix(), viewMtx);

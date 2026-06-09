@@ -3172,43 +3172,41 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
 
         int status = threadParam->m_gbaStatus;
 
-        if (status == 0)
+        if (status != 0)
+            goto case1_done;
+
+        if (threadParam->m_unk3 != ' ')
         {
-            if (threadParam->m_unk3 == ' ')
-            {
-                threadParam->m_gbaStatus = GBAWrite(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(m_diskId), &threadParam->m_unk3);
-                status = threadParam->m_gbaStatus;
-
-                if (status == 0)
-                {
-                    bool singleMode2 = GbaQue.IsSingleMode(threadParam->m_portIndex);
-
-                    if (singleMode2 && (int)threadParam->m_portIndex != 1)
-                    {
-                        threadParam->m_gbaStatus = 0;
-                    }
-                    else
-                    {
-                        threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
-                    }
-
-                    status = threadParam->m_gbaStatus;
-
-                    if (status == 0)
-                    {
-                        if ((threadParam->m_unk3 & 0x30) != 0x20)
-                            status = 1;
-                        else
-                            status = 0;
-                    }
-                }
-            }
-            else
-            {
-                status = 1;
-            }
+            status = 1;
+            goto case1_done;
         }
 
+        threadParam->m_gbaStatus = GBAWrite(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(m_diskId), &threadParam->m_unk3);
+        status = threadParam->m_gbaStatus;
+
+        if (status != 0)
+            goto case1_done;
+
+        if (GbaQue.IsSingleMode(threadParam->m_portIndex) && (int)threadParam->m_portIndex != 1)
+        {
+            threadParam->m_gbaStatus = 0;
+        }
+        else
+        {
+            threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
+        }
+
+        status = threadParam->m_gbaStatus;
+
+        if (status != 0)
+            goto case1_done;
+
+        if ((threadParam->m_unk3 & 0x30) != 0x20)
+            status = 1;
+        else
+            status = 0;
+
+case1_done:
         if (status == 0)
         {
             threadParam->m_subState = 2;
@@ -3237,47 +3235,40 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
 
         int status = threadParam->m_gbaStatus;
 
-        if (status == 0)
+        struct
         {
-            if (threadParam->m_unk3 == 0x28)
-            {
-                char header;
-                unsigned char flags = 0; // will land in local_1f
+            char          h;
+            unsigned char f;
+        } tmpBuf;
 
-                // GBARead fills header + flag byte (and maybe more); we only care about these two.
-                struct
-                {
-                    char          h;
-                    unsigned char f;
-                } tmpBuf;
+        if (status != 0)
+            goto case2_done;
 
-                threadParam->m_gbaStatus = GBARead(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(&tmpBuf), &threadParam->m_unk3);
-                status = threadParam->m_gbaStatus;
-
-                if (status == 0)
-                {
-                    header = tmpBuf.h;
-
-                    if (header == 1)
-                    {
-                        status = 0;
-
-                        threadParam->m_gbaBootFlag    = (unsigned char)((int)(signed char)tmpBuf.f >> 6);
-                        threadParam->m_unk2           = (unsigned char)((tmpBuf.f >> 4) & 0x03);
-                        threadParam->m_bootRetryCount = (unsigned char)(tmpBuf.f & 0x0F);
-                    }
-                    else
-                    {
-                        status = 1;
-                    }
-                }
-            }
-            else
-            {
-                status = 1;
-            }
+        if (threadParam->m_unk3 != 0x28)
+        {
+            status = 1;
+            goto case2_done;
         }
 
+        threadParam->m_gbaStatus = GBARead(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(&tmpBuf), &threadParam->m_unk3);
+        status = threadParam->m_gbaStatus;
+
+        if (status != 0)
+            goto case2_done;
+
+        if (tmpBuf.h != 1)
+        {
+            status = 1;
+            goto case2_done;
+        }
+
+        status = 0;
+
+        threadParam->m_gbaBootFlag    = (unsigned char)((int)(signed char)tmpBuf.f >> 6);
+        threadParam->m_unk2           = (unsigned char)((tmpBuf.f >> 4) & 0x03);
+        threadParam->m_bootRetryCount = (unsigned char)(tmpBuf.f & 0x0F);
+
+case2_done:
         if (status == 0)
         {
             threadParam->m_subState = 3;
@@ -3306,31 +3297,34 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
 
         int status = threadParam->m_gbaStatus;
 
-        if (status == 0)
+        unsigned int timeValue;
+
+        if (status != 0)
+            goto case3_done;
+
+        if (threadParam->m_unk3 != 0x28)
         {
-            if (threadParam->m_unk3 == 0x28)
-            {
-                unsigned int timeValue;
-                threadParam->m_gbaStatus = GBARead(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(&timeValue), &threadParam->m_unk3);
-                status = threadParam->m_gbaStatus;
-
-                if (status == 0)
-                {
-                    // Bit-twiddly inequality check preserved from decomp
-                    unsigned int a = timeValue - threadParam->m_timestamp;
-                    unsigned int b = threadParam->m_timestamp - timeValue;
-
-                    threadParam->m_timeChangedFlag = (unsigned char)((a | b) >> 31);
-                    threadParam->m_timestamp = timeValue;
-                    status = 0;
-                }
-            }
-            else
-            {
-                status = 1;
-            }
+            status = 1;
+            goto case3_done;
         }
 
+        threadParam->m_gbaStatus = GBARead(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(&timeValue), &threadParam->m_unk3);
+        status = threadParam->m_gbaStatus;
+
+        if (status != 0)
+            goto case3_done;
+
+        {
+            // Bit-twiddly inequality check preserved from decomp
+            unsigned int a = timeValue - threadParam->m_timestamp;
+            unsigned int b = threadParam->m_timestamp - timeValue;
+
+            threadParam->m_timeChangedFlag = (unsigned char)((a | b) >> 31);
+            threadParam->m_timestamp = timeValue;
+            status = 0;
+        }
+
+case3_done:
         if (status == 0)
         {
             threadParam->m_subState = 4;

@@ -8732,7 +8732,7 @@ void CMenuPcs::CalcCharaSelect()
 							System.Printf(const_cast<char*>(s_chan_pctd_cur_pctd_801DC3D8), i,
 							              static_cast<int>(entry.m_currentSlot));
 						}
-						const int loadSlot = static_cast<int>(entry.m_currentSlot);
+						const int loadSlot =  (s32)(static_cast<int>(entry.m_currentSlot));
 						GetWmCharaModelData(this)[loadSlot * 0x34 + 0x0C] = 0;
 						GetWmCharaHandles(this)[loadSlot]->LoadModelASync(3, 0x43, 0);
 					}
@@ -8799,7 +8799,7 @@ void CMenuPcs::CalcCharaSelect()
 
 			int widthCells = maxWidth / 0x16;
 			int winWidth = widthCells - (widthCells >> 0x1F);
-			if (maxWidth != winWidth * 0x16) {
+			if (winWidth != maxWidth * 0x16) {
 				winWidth++;
 			}
 			winWidth = (winWidth + 2) * 0x16 + 0x40;
@@ -8863,7 +8863,8 @@ void CMenuPcs::CalcCharaSelect()
 
 				const int baseDataIndex =
 				    static_cast<int>(caravanWork.m_genderFlag) + static_cast<int>(caravanWork.m_tribeId) * 2;
-				caravanWork.Init(baseDataIndex,
+				int __p20 = baseDataIndex;
+				caravanWork.Init(__p20,
 				                 reinterpret_cast<CRomWork*>(Game.unkCFlatData0[0] + baseDataIndex * 0x1D0),
 				                 static_cast<int>(caravanWork.m_appearanceVariant));
 				caravanWork.LoadFinished();

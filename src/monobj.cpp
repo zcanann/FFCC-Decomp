@@ -1354,16 +1354,17 @@ void CGMonObj::onFrameStat()
 				prgObj->reqAnim(0xF, 1, 0);
 				unsigned int soundId = 0;
 				int classId = reinterpret_cast<int>(object->m_scriptHandle[4]);
-				if (classId == 0xA7) {
+				switch (classId) {
+				case 0x9C:
+				case 0xA7:
 					soundId = 0x12130;
-				} else if (classId < 0xA7) {
-					if (classId == 0x9C) {
-						soundId = 0x12130;
-					}
-				} else if (classId == 0xA9) {
-					soundId = 0x1213A;
-				} else if (classId < 0xA9) {
+					break;
+				case 0xA8:
 					soundId = 0x12126;
+					break;
+				case 0xA9:
+					soundId = 0x1213A;
+					break;
 				}
 				prgObj->playSe3D(soundId, 0x32, 0x96, 0, (Vec*)0);
 			}
@@ -1387,8 +1388,9 @@ void CGMonObj::onFrameStat()
 			prgObj->reqAnim(0x10, 0, 0);
 			object->SetAnimSlot(0, 0);
 			object->SetAnimSlot(4, 4);
-			object->m_bgColMask = (object->m_bgColMask | 0x50000) & 0xFFFFFFF7;
-			object->m_displayFlags &= 0xFFFFFFEF;
+			object->m_bgColMask = object->m_bgColMask | 0x50000;
+			object->m_bgColMask = object->m_bgColMask & 0xFFFFFFF7;
+			object->m_objectFlags = object->m_objectFlags & 0xFFFFFFEF;
 		}
 		if (prgObj->isLoopAnim() != 0) {
 			prgObj->changeStat(0, 0, 0);
@@ -3799,16 +3801,16 @@ void CGMonObj::statWatch()
 		}
 
 		actionState = monObj->mlAttackCheck(selectedTarget);
-		if (actionState == -2) {
-			actionState = 0;
-			memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
-			chaseState = 0;
-			chaseTimer = 0;
-			monObj->m_chaseDirty = 1;
-		} else if (actionState == -1) {
+		if (actionState == -1) {
 			actionState = 0;
 			memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
 			chaseState = 2;
+			chaseTimer = 0;
+			monObj->m_chaseDirty = 1;
+		} else if (actionState == -2) {
+			actionState = 0;
+			memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
+			chaseState = 0;
 			chaseTimer = 0;
 			monObj->m_chaseDirty = 1;
 		} else {

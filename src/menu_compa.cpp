@@ -100,10 +100,8 @@ void CMenuPcs::CompaDraw()
 						int yStep = static_cast<int>(y);
 						float end = y + h;
 						while (static_cast<float>(yStep) < end) {
-							int tileH = static_cast<unsigned int>(end - static_cast<float>(yStep));
-							if (static_cast<float>(tileH) > kCompaTileHeight) {
-								tileH = 0x18;
-							}
+							float diff = end - static_cast<float>(yStep);
+							int tileH = (diff >= kCompaTileHeight) ? 0x18 : static_cast<unsigned int>(diff);
 							MenuPcs.DrawRect(
 								static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
 								fillW, static_cast<float>(tileH), u, v,
@@ -129,7 +127,7 @@ void CMenuPcs::CompaDraw()
 					colors[3].g = 0xFF;
 					colors[3].b = 0xFF;
 					colors[3].a = 0;
-					float remainW = static_cast<float>((1.0 / (double)entry->duration) * (double)static_cast<float>(entry->w));
+					float remainW = static_cast<float>(1.0 / (double)entry->duration) * static_cast<float>(entry->w);
 					if (entry->tex == 0x51) {
 						int yStep = static_cast<int>(y);
 						float end = y + h;

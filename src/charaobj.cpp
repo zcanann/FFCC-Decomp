@@ -2963,7 +2963,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 		} else if (effectId > 0x49C && effectId < 0x4A0 && effectArg0 == 2) {
 			Mtx rotMtx;
 			PSMTXRotRad(rotMtx, 'y', m_rotTargetY);
-			for (int i = 0; i < 2; i++) {
+			for (unsigned int i = 0; i < 2; i++) {
 				int side = (i == 0) ? 76 : -76;
 				CVector sidePos(static_cast<float>(side), 0.0f, kCharaObjForwardParticleOffset);
 				Vec offsetPos;

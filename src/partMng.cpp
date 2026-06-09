@@ -487,6 +487,7 @@ void CPartMng::Destroy()
  * Address:	TODO
  * Size:	TODO
  */
+#pragma optimization_level 2
 void CPartMng::pppDumpMngSt()
 {
     struct PppMngStDumpRaw {
@@ -544,6 +545,7 @@ void CPartMng::pppDumpMngSt()
         System.Printf(const_cast<char*>(sPartMngTripleNewline));
     }
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -719,6 +721,7 @@ void CPartMng::pppGetFreePppMngSt()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_propagation off
 int CPartMng::pppGetNumFreePppMngSt()
 {
     int freeCount = 0;
@@ -756,6 +759,7 @@ int CPartMng::pppGetNumFreePppMngSt()
 
     return freeCount;
 }
+#pragma opt_propagation reset
 
 /*
  * --INFO--
@@ -1403,6 +1407,8 @@ void pppEditGetProjectionMatrix(float (*projectionMatrix)[4])
  * Address:	TODO
  * Size:	TODO
  */
+#pragma opt_lifetimes off
+#pragma opt_strength_reduction off
 void CPartMng::pppEditAllReleaseResource()
 {
     static const int kUsbMapMeshTableOffset = 0x7F4;
@@ -1504,12 +1510,14 @@ void CPartMng::pppEditAllReleaseResource()
         iter = iter + 0x4;
     } while (iVar3 < 0x80);
 
-    if (*reinterpret_cast<int*>(self + 0x7FC) != 0) {
+    if (*reinterpret_cast<void**>(self + 0x7FC) != 0) {
         operator delete(*reinterpret_cast<void**>(self + 0x7FC));
         *reinterpret_cast<int*>(self + 0x7FC) = 0;
     }
 #undef self
 }
+#pragma opt_lifetimes reset
+#pragma opt_strength_reduction reset
 
 /*
  * --INFO--
@@ -1824,14 +1832,13 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             }
 
             modelSlot = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x5FC) pppModelSt;
-            (*modelTablePtr)[slotIndex] = modelSlot;
-#undef slotIndex
             if (modelSlot != 0) {
                 modelSlot->m_refCount = 0;
-                modelSlot->m_cacheId = -1;
                 modelSlot->m_isUsed = 0;
-                pppReadRsd(chunkFile, modelSlot);
             }
+            (*modelTablePtr)[slotIndex] = modelSlot;
+            pppReadRsd(chunkFile, (*modelTablePtr)[slotIndex]);
+#undef slotIndex
             *reinterpret_cast<int*>(self + 0x804) = -1;
         }
         return;
@@ -2323,12 +2330,13 @@ void CPartMng::pppEditBeforeCalc()
                 gPppInSubFrameCalc = 1;
             }
 
-            CCharaPcs::CHandle* handle = (*editorObj)->m_charaModelHandle;
+#define handle ((*editorObj)->m_charaModelHandle)
             if (handle != 0) {
                 handle->LoadAnim(reinterpret_cast<char*>(self + 0x19c), gPppInConstructor, 0, -1, -1, -1, 0);
                 handle->SetAnim(gPppInConstructor, -1, -1, -1, 0);
                 gPppInConstructor++;
             }
+#undef handle
         }
         break;
     case 0x1b:
@@ -2553,11 +2561,11 @@ void CPartMng::pppEditDrawShadow()
                     PppCullBound bound;
                     float radius = mng->m_cullRadius;
                     bound.m_min.x = partPos.x - radius;
-                    bound.m_min.y = partPos.y;
-                    bound.m_min.z = partPos.z - radius;
                     bound.m_max.x = partPos.x + radius;
-                    bound.m_max.y = partPos.y + mng->m_cullYOffset;
+                    bound.m_min.z = partPos.z - radius;
+                    bound.m_min.y = partPos.y;
                     bound.m_max.z = partPos.z + radius;
+                    bound.m_max.y = partPos.y + mng->m_cullYOffset;
                     if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(
                             cameraPos, ppvCameraMatrix, kPartMngFrustumCullLimit) != 0) {
                         goto drawPart;
@@ -2652,11 +2660,11 @@ void CPartMng::pppEditDraw()
                             PppCullBound bound;                                                            \
                             float radius = mng->m_cullRadius;                                              \
                             bound.m_min.x = partPos.x - radius;                                            \
-                            bound.m_min.y = partPos.y;                                                     \
-                            bound.m_min.z = partPos.z - radius;                                            \
                             bound.m_max.x = partPos.x + radius;                                            \
-                            bound.m_max.y = partPos.y + mng->m_cullYOffset;                                \
+                            bound.m_min.z = partPos.z - radius;                                            \
+                            bound.m_min.y = partPos.y;                                                     \
                             bound.m_max.z = partPos.z + radius;                                            \
+                            bound.m_max.y = partPos.y + mng->m_cullYOffset;                                \
                             if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(                           \
                                     cameraPos, ppvCameraMatrix, kPartMngFrustumCullLimit) != 0) {                    \
                                 goto drawPart##drawPass;                                                   \
@@ -2766,11 +2774,11 @@ void CPartMng::pppEditPartDrawAfter()
                             PppCullBound bound;                                                            \
                             float radius = mng->m_cullRadius;                                              \
                             bound.m_min.x = partPos.x - radius;                                            \
-                            bound.m_min.y = partPos.y;                                                     \
-                            bound.m_min.z = partPos.z - radius;                                            \
                             bound.m_max.x = partPos.x + radius;                                            \
-                            bound.m_max.y = partPos.y + mng->m_cullYOffset;                                \
+                            bound.m_min.z = partPos.z - radius;                                            \
+                            bound.m_min.y = partPos.y;                                                     \
                             bound.m_max.z = partPos.z + radius;                                            \
+                            bound.m_max.y = partPos.y + mng->m_cullYOffset;                                \
                             if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(                           \
                                     cameraPos, ppvCameraMatrix, kPartMngFrustumCullLimit) != 0) {                    \
                                 goto drawPart##drawPass;                                                   \
@@ -3027,11 +3035,11 @@ void CPartMng::pppDrawPrio(unsigned char drawMode)
                 PppCullBound bound;
                 float radius = mng->m_cullRadius;
                 bound.m_min.x = partPos.x - radius;
-                bound.m_min.y = partPos.y;
-                bound.m_min.z = partPos.z - radius;
                 bound.m_max.x = partPos.x + radius;
-                bound.m_max.y = partPos.y + mng->m_cullYOffset;
+                bound.m_min.z = partPos.z - radius;
+                bound.m_min.y = partPos.y;
                 bound.m_max.z = partPos.z + radius;
+                bound.m_max.y = partPos.y + mng->m_cullYOffset;
                 if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(
                         cameraPos, ppvCameraMatrix, kPartMngFrustumCullLimit) != 0) {
                     goto drawPart;
@@ -3313,11 +3321,11 @@ void CPartMng::pppDraw()
                     PppCullBound bound;
                     float radius = mng->m_cullRadius;
                     bound.m_min.x = partPos.x - radius;
-                    bound.m_min.y = partPos.y;
-                    bound.m_min.z = partPos.z - radius;
                     bound.m_max.x = partPos.x + radius;
-                    bound.m_max.y = partPos.y + mng->m_cullYOffset;
+                    bound.m_min.z = partPos.z - radius;
+                    bound.m_min.y = partPos.y;
                     bound.m_max.z = partPos.z + radius;
+                    bound.m_max.y = partPos.y + mng->m_cullYOffset;
                     if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(cameraPos, ppvCameraMatrix, kPartMngFrustumCullLimit) == 0) {
                         goto nextPart;
                     }
@@ -3388,11 +3396,11 @@ void CPartMng::pppPartDrawAfter()
                 PppCullBound bound;
                 float radius = mng->m_cullRadius;
                 bound.m_min.x = partPos.x - radius;
-                bound.m_min.y = partPos.y;
-                bound.m_min.z = partPos.z - radius;
                 bound.m_max.x = partPos.x + radius;
-                bound.m_max.y = partPos.y + mng->m_cullYOffset;
+                bound.m_min.z = partPos.z - radius;
+                bound.m_min.y = partPos.y;
                 bound.m_max.z = partPos.z + radius;
+                bound.m_max.y = partPos.y + mng->m_cullYOffset;
                 if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(
                         cameraPos, ppvCameraMatrix, kPartMngFrustumCullLimit) != 0) {
                     goto drawPart;

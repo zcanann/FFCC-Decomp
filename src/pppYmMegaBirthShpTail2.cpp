@@ -546,9 +546,12 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
         baseDir.x = param->m_matrix[2][0];
         baseDir.y = param->m_matrix[2][1];
         baseDir.z = param->m_matrix[2][2];
-        angles[0] = (s32)((float)((s32)(spreadRange * Math.RandF() - spread) << 15) / kPppYmMegaBirthShpTail2HalfTurnDegrees);
-        angles[1] = (s32)((float)((s32)(spreadRange * Math.RandF() - spread) << 15) / kPppYmMegaBirthShpTail2HalfTurnDegrees);
-        angles[2] = (s32)((float)((s32)(spreadRange * Math.RandF() - spread) << 15) / kPppYmMegaBirthShpTail2HalfTurnDegrees);
+        angles[0] = (s32)(spreadRange * Math.RandF() - spread);
+        angles[0] = (s32)((float)(angles[0] << 15) / kPppYmMegaBirthShpTail2HalfTurnDegrees);
+        angles[1] = (s32)(spreadRange * Math.RandF() - spread);
+        angles[1] = (s32)((float)(angles[1] << 15) / kPppYmMegaBirthShpTail2HalfTurnDegrees);
+        angles[2] = (s32)(spreadRange * Math.RandF() - spread);
+        angles[2] = (s32)((float)(angles[2] << 15) / kPppYmMegaBirthShpTail2HalfTurnDegrees);
         angles[3] = 0;
         if ((paramBytes[0x18] == 2) || (paramBytes[0x18] == 3)) {
             angles[0] = 0;
@@ -614,7 +617,7 @@ scalar:
             }
 
             Vec velocity = *reinterpret_cast<Vec*>(particleData->m_matrix[1]);
-            pppScaleVectorXYZ(*reinterpret_cast<Vec*>(particleData->m_matrix[1]), velocity, scale);
+            pppScaleVectorXYZ(*reinterpret_cast<Vec*>(particleData->m_matrix[0]), velocity, scale);
         }
         goto done;
     }

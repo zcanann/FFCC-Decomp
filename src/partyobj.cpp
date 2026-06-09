@@ -1133,8 +1133,8 @@ void CGPartyObj::command()
 #define caravan reinterpret_cast<CCaravanWork*>(m_scriptHandle)
 #define padSlot static_cast<char>(m_animStateMisc)
 	bool primaryAvailable = false;
-	bool secondaryAvailable = false;
 	int primaryCommand = -1;
+	bool secondaryAvailable = false;
 	int secondaryCommand = -1;
 	int ringCommand = -1;
 	int ringCommandArg = -1;
@@ -1156,8 +1156,9 @@ void CGPartyObj::command()
 
 		if (cmdDir != 0) {
 			Sound.PlaySe(0x0C, 0x40, 0x7F, 0);
-			const int curCmd = caravan->GetIdxCmdList();
-			caravan->IsUseCmdList(caravan->GetNextCmdListIdx(curCmd, cmdDir));
+			CCaravanWork* cmdDirCaravan = caravan;
+			const int curCmd = cmdDirCaravan->GetIdxCmdList();
+			cmdDirCaravan->IsUseCmdList(cmdDirCaravan->GetNextCmdListIdx(curCmd, cmdDir));
 		}
 
 		const int cmdIdx = caravan->GetIdxCmdList();
@@ -1166,7 +1167,8 @@ void CGPartyObj::command()
 		} else if (caravan->GetIdxCmdList() == 1) {
 			ringCommand = 9;
 		} else {
-			const int itemId = caravan->DelCmdListAndItem(caravan->GetIdxCmdList());
+			CCaravanWork* delCaravan = caravan;
+			const int itemId = delCaravan->DelCmdListAndItem(delCaravan->GetIdxCmdList());
 			const int itemKind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48);
 			switch (itemKind) {
 			case 1:
@@ -1228,14 +1230,6 @@ tmpArtifactBlock:
 				} else if (targetState < 0x22) {
 					goto tmpArtifactBlock;
 				}
-			} else if (targetState == 0xCA) {
-				if (static_cast<int>(CFlatCenterState()) == 0) {
-					secondaryAvailable = true;
-					secondaryCommand = 0x1C;
-				} else {
-					primaryAvailable = true;
-					primaryCommand = 0x1C;
-				}
 			} else if (targetState < 0xCA) {
 				if (targetState == 0xC8) {
 					if (static_cast<int>(CFlatCenterState()) == 0) {
@@ -1253,6 +1247,14 @@ tmpArtifactBlock:
 						primaryAvailable = true;
 						primaryCommand = 0x0A;
 					}
+				}
+			} else if (targetState == 0xCA) {
+				if (static_cast<int>(CFlatCenterState()) == 0) {
+					secondaryAvailable = true;
+					secondaryCommand = 0x1C;
+				} else {
+					primaryAvailable = true;
+					primaryCommand = 0x1C;
 				}
 			} else if (targetState == 0xCC) {
 				secondaryAvailable = true;
@@ -1362,9 +1364,9 @@ tmpArtifactBlock:
 			int weaponRef;
 			caravan->GetCurrentWeaponItem(weaponItem, weaponRef);
 			if (weaponItem != party.unk6BC ||
-			    weaponRef != (caravan->m_equipment[0] < 0 ? 0 : caravan->m_inventoryItems[caravan->m_equipment[0]])) {
+			    weaponRef != (caravan->m_equipment[0] >= 0 ? caravan->m_inventoryItems[caravan->m_equipment[0]] : 0)) {
 				*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D4) = cmdIdx;
-				party.weaponRef = caravan->m_equipment[0] < 0 ? 0 : caravan->m_inventoryItems[caravan->m_equipment[0]];
+				party.weaponRef = caravan->m_equipment[0] >= 0 ? caravan->m_inventoryItems[caravan->m_equipment[0]] : 0;
 				party.commandFlagBits.flag20 = 1;
 				changeStat(0x0F, 0, 0);
 				return;
@@ -4806,9 +4808,9 @@ void CGPartyObj::gpmCol()
 		cylinder.m_axis.x = halfHeight;
 
 		if (MapMng.CheckHitCylinderNear(&cylinder, &diffVec, flags) != 0) {
-			int capped = i + 1;
-			if (capped > activeTrailCount) {
-				capped = activeTrailCount;
+			int capped = activeTrailCount;
+			if (capped >= i + 1) {
+				capped = i + 1;
 			}
 			i++;
 			activeTrailCount = capped;

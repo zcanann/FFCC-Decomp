@@ -1766,7 +1766,8 @@ checkLoaded:
                         void* rawData = chunkFile.GetAddress();
                         const unsigned int rawSize = static_cast<int>(chunk.m_size);
 
-                        if (dataType == 0) {
+                        switch (dataType) {
+                        case 0: {
                             CLoadModel* loadModel = 0;
                             for (unsigned int i = 0; i < static_cast<unsigned int>(LoadModelArray(pcs)->GetSize()); i++) {
                                 CLoadModel* it = (*LoadModelArray(pcs))[i];
@@ -1806,7 +1807,9 @@ checkLoaded:
                                     loadModel->m_model->CreateDynamics(chunkFile.GetAddress(), dynStage);
                                 }
                             }
-                        } else if (dataType == 1) {
+                            break;
+                        }
+                        case 1: {
                             CLoadTexture* loadTexture = 0;
                             for (unsigned int i = 0; i < static_cast<unsigned int>(LoadTextureArray(pcs)->GetSize()); i++) {
                                 CLoadTexture* it = (*LoadTextureArray(pcs))[i];
@@ -1844,7 +1847,9 @@ checkLoaded:
                                     LoadStreamCursor(this) += static_cast<unsigned int>(rawSize);
                                 }
                             }
-                        } else if (dataType == 2) {
+                            break;
+                        }
+                        case 2: {
                             CLoadAnim* loadAnim = 0;
                             for (unsigned int i = 0; i < static_cast<unsigned int>(LoadAnimArray(pcs)->GetSize()); i++) {
                                 CLoadAnim* it = (*LoadAnimArray(pcs))[i];
@@ -1870,11 +1875,17 @@ checkLoaded:
                                 loadAnim->m_mergeFlags = mergeFlags;
                                 LoadAnimArray(pcs)->Add(loadAnim);
                             }
-                        } else if (dataType == 3) {
+                            break;
+                        }
+                        case 3: {
                             Sound.LoadSe(rawData);
-                        } else if (dataType == 4) {
+                            break;
+                        }
+                        case 4: {
                             Sound.LoadWave(rawData);
-                        } else if (dataType == 5) {
+                            break;
+                        }
+                        case 5: {
                             CLoadPdt* loadPdt = 0;
                             for (unsigned int i = 0; i < static_cast<unsigned int>(LoadPdtArray(pcs)->GetSize()); i++) {
                                 CLoadPdt* it = (*LoadPdtArray(pcs))[i];
@@ -1900,6 +1911,8 @@ checkLoaded:
                                     keyId, reinterpret_cast<int>(variantTag), primaryData, primarySize, secondaryData, secondarySize);
                                 LoadPdtArray(pcs)->Add(loadPdt);
                             }
+                            break;
+                        }
                         }
                     }
                     chunkFile.PopChunk();

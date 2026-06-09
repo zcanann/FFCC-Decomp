@@ -4314,8 +4314,16 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     mng->m_fieldF2 = 1;
     if (allowFpOverride != 0) {
         const int mode = *reinterpret_cast<unsigned char*>(fpData2 + 0x05);
-        if (mode == 4 || mode > 8 || mode < 3) {
+        switch (mode) {
+        case 3:
+        case 5:
+        case 6:
+        case 7:
+        case 8:
+            break;
+        default:
             mng->m_fieldF2 = *reinterpret_cast<unsigned char*>(fpData2 + 0x0F);
+            break;
         }
     }
 

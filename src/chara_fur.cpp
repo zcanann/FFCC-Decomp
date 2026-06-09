@@ -1261,11 +1261,6 @@ int CChara::CModel::PickFur(
 	}
 	register Vec* outWorldPos = worldPos;
 
-	CMaterialSet* materialSet = ModelMaterialSet(this);
-	FurMeshRaw* mesh = ModelMeshes(this);
-	CChara::CNode* nodes = ModelNodes(this);
-
-	const unsigned short meshCount = ModelMeshCount(this);
 	const double cursorXd = static_cast<float>(Chara.MogFur().m_cursorX);
 	const double cursorYd = static_cast<float>(Chara.MogFur().m_cursorY);
 	float hitU = 0.0f;
@@ -1278,6 +1273,11 @@ int CChara::CModel::PickFur(
 	Mtx44 screenMtx;
 	PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
 	const double negCursorY = -static_cast<double>(static_cast<float>(cursorYd) - kCharaFurScreenCenterY);
+
+	CMaterialSet* materialSet = ModelMaterialSet(this);
+	FurMeshRaw* mesh = ModelMeshes(this);
+	CChara::CNode* nodes = ModelNodes(this);
+	const unsigned short meshCount = ModelMeshCount(this);
 
 	FurProjectedVertex verts[3];
 	unsigned long curValid = 0;

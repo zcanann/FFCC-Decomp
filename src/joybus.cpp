@@ -2839,9 +2839,10 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
 
             if ((header >> 6) == 0)
             {
-                OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+                OSSemaphore* sem = &m_accessSemaphores[threadParam->m_portIndex];
+                OSWaitSemaphore(sem);
                 memset(&m_recvBuffer[threadParam->m_portIndex], 0, sizeof(m_recvBuffer[threadParam->m_portIndex]));
-                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+                OSSignalSemaphore(sem);
             }
 
             unsigned int word = *cmdOut;

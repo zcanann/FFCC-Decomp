@@ -3407,7 +3407,8 @@ void CMenuPcs::createBonus()
 	const float depth1000 = FLOAT_80331F6C;
 	const float scale1 = FLOAT_80331EB0;
 	const float zero = kBonusZClearOrigin;
-	int off = 0;
+	int off;
+	off = 0;
 	for (int i = 0; i < 0x18; i++) {
 		float* pos = (float*)(this->m_bonus.m_bonusBoardPtr + off + 0x1c);
 		pos[2] = zero;
@@ -3454,7 +3455,7 @@ void CMenuPcs::createBonus()
 			    *reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(Game.m_partyObjArr[i]) + 0xF8);
 			s_Rinfo->m_party[activeCount].m_partyHandle->m_model->m_lightAlpha = kBonusZClearOrigin;
 			s_Rinfo->m_party[activeCount].m_bonusCondition = (int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_bonusCondition;
-			int foodValue = (int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_artifactRelated[3] + (int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_artifactRelated[4];
+			int foodValue =  (int)(unsigned int)((int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_artifactRelated[3] + (int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_artifactRelated[4]);
 			int foodClamped;
 			if (foodValue < 0) {
 				foodClamped = 0;
@@ -3567,7 +3568,7 @@ void CMenuPcs::createBonus()
 				    (aTotal == bTotal && aArtifact < bArtifact) ||
 				    (aTotal == bTotal && aArtifact == bArtifact && aFood < bFood) ||
 				    (aTotal == bTotal && aArtifact == bArtifact && aFood == bFood && (coin & 1) != 0)) {
-					int temp = leftIndex;
+					int temp =  (leftIndex - 0);
 					order[i] = order[j];
 					order[j] = temp;
 					leftIndex = order[i];
@@ -3588,7 +3589,7 @@ void CMenuPcs::createBonus()
 		}
 
 		CCharaPcs::CHandle** slot = this->m_wm.m_handles;
-		for (int i = 0; i < s_Rinfo->m_partyCount * 2; i++) {
+		for (int i = 0; s_Rinfo->m_partyCount > i * 2; i++) {
 			CCharaPcs::CHandle* handle =
 			    new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0x183) CCharaPcs::CHandle;
 			slot[0] = handle;

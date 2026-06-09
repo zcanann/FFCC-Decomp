@@ -4801,7 +4801,11 @@ void CGPartyObj::gpmCol()
 			slot->x = leader->m_worldPosition.x;
 			slot->y = leader->m_worldPosition.y;
 			slot->z = leader->m_worldPosition.z;
-			newIndex = (i > trailIndex) ? trailIndex : i;
+			if (trailIndex < i) {
+				newIndex = trailIndex;
+			} else {
+				newIndex = i;
+			}
 			break;
 		}
 	} while (static_cast<unsigned int>(i) < 5);

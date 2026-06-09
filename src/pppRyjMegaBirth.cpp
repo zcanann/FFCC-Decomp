@@ -868,6 +868,8 @@ void calc(
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_common_subs off
 void birth(
     _pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* param, VColor* color, _PARTICLE_DATA* particle,
     _PARTICLE_WMAT* worldMat, _PARTICLE_COLOR* colorData)
@@ -1091,3 +1093,4 @@ void birth(
 		colorData->m_colorFrameDeltas[3] = *(float*)(payload + 0x38);
 	}
 }
+#pragma pop

@@ -2419,8 +2419,8 @@ void CPartMng::pppEditPartCalc()
     if (*reinterpret_cast<int*>(self + 0x174) <= 3) {
         for (int i = 0; i < *reinterpret_cast<int*>(self + 0x4); i++) {
             _pppMngSt* mng = &m_pppMng[i];
-            int baseTime = mng->m_baseTime;
             ppvMng = mng;
+            int baseTime = mng->m_baseTime;
             if (baseTime == -0x1000) {
                 continue;
             }
@@ -2732,8 +2732,8 @@ void CPartMng::pppEditPartDrawAfter()
                 struct PppCullBound { Vec m_min; Vec m_max; };                                             \
                 Mtx invCamera;                                                                             \
                 Vec cameraPos;                                                                             \
-                Vec partPos;                                                                               \
                 Vec cameraDelta;                                                                           \
+                Vec partPos;                                                                               \
                 Vec viewPos;                                                                               \
                 PSMTXInverse(ppvCameraMatrix, invCamera);                                                  \
                 cameraPos.x = invCamera[0][3];                                                             \
@@ -2768,12 +2768,12 @@ void CPartMng::pppEditPartDrawAfter()
                         if (PSVECSquareMag(&cameraDelta) < mng->m_cullRadiusSq) {                          \
                             PppCullBound bound;                                                            \
                             float radius = mng->m_cullRadius;                                              \
-                            bound.m_min.x = partPos.x - radius;                                            \
-                            bound.m_max.x = partPos.x + radius;                                            \
-                            bound.m_min.z = partPos.z - radius;                                            \
-                            bound.m_min.y = partPos.y;                                                     \
-                            bound.m_max.z = partPos.z + radius;                                            \
-                            bound.m_max.y = partPos.y + mng->m_cullYOffset;                                \
+                            bound.m_min.x = partPos.x - radius;                                               \
+                            bound.m_max.x = partPos.x + radius;                                               \
+                            bound.m_min.z = partPos.z - radius;                                               \
+                            bound.m_min.y = partPos.y;                                                        \
+                            bound.m_max.z = partPos.z + radius;                                               \
+                            bound.m_max.y = partPos.y + mng->m_cullYOffset;                                   \
                             if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(                           \
                                     cameraPos, ppvCameraMatrix, kPartMngFrustumCullLimit) != 0) {                    \
                                 goto drawPart##drawPass;                                                   \
@@ -2794,7 +2794,7 @@ void CPartMng::pppEditPartDrawAfter()
     {
         int prevInterval = gPppHeapUseRateWords[2];
         gPppHeapUseRateWords[2] = prevInterval - 1;
-        if (prevInterval == 0 || gPppHeapUseRateWords[1] < gPppHeapUseRateWords[0]) {
+        if (prevInterval == 0 || gPppHeapUseRateWords[0] > gPppHeapUseRateWords[1]) {
             gPppHeapUseRateWords[2] = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + kHeapCheckIntervalOffset) << 1;
             gPppHeapUseRateWords[1] = gPppHeapUseRateWords[0];
         }
@@ -2995,9 +2995,9 @@ void CPartMng::pppDrawPrio(unsigned char drawMode)
 
     Mtx invCamera;
     Vec cameraPos;
-    Vec viewPos;
-    Vec partPos;
     Vec cameraDelta;
+    Vec partPos;
+    Vec viewPos;
 
     PSMTXInverse(ppvCameraMatrix, invCamera);
     cameraPos.x = invCamera[0][3];
@@ -3416,7 +3416,7 @@ void CPartMng::pppPartDrawAfter()
     {
         int prevInterval = gPppHeapUseRateWords[2];
         gPppHeapUseRateWords[2] = prevInterval - 1;
-        if (prevInterval == 0 || gPppHeapUseRateWords[1] < gPppHeapUseRateWords[0]) {
+        if (prevInterval == 0 || gPppHeapUseRateWords[0] > gPppHeapUseRateWords[1]) {
             gPppHeapUseRateWords[2] = *(int*)((char*)this + 0x16C) << 1;
             gPppHeapUseRateWords[1] = gPppHeapUseRateWords[0];
         }
@@ -4131,15 +4131,17 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
  */
 int CPartMng::pppGetFreeDataMng()
 {
-    PppPdtSlot* freeSlot = 0;
+    PppPdtSlot* freeSlot;
     int slotIndex = 8;
     for (int count = 0x18; count != 0; count--) {
         if (m_pdtSlots[slotIndex].m_pppDataHead == 0) {
             freeSlot = &m_pdtSlots[slotIndex];
-            break;
+            goto found;
         }
         slotIndex++;
     }
+    freeSlot = 0;
+found:
 
     if (freeSlot == 0) {
         if ((unsigned int)System.m_execParam >= 1) {
@@ -4282,13 +4284,15 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
 
     unsigned char* fpData = reinterpret_cast<unsigned char*>(pdt) + 0x20 + fpNo * 0x60;
 
-    PppMngStCreateRaw* mng = 0;
+    PppMngStCreateRaw* mng;
     for (int i = 0; i < 0x180; i++) {
         if (m_pppMng[i].m_baseTime == -0x1000) {
             mng = reinterpret_cast<PppMngStCreateRaw*>(self + 0x2A18 + i * 0x158);
-            break;
+            goto foundMng;
         }
     }
+    mng = 0;
+foundMng:
     if (mng == 0) {
         return -1;
     }

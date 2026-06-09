@@ -89,7 +89,7 @@ private:
     short m_menuStringSlot;
     int m_pendingMessageTimer;
     int m_messageTimer;
-    char m_messageState;
+    unsigned char m_messageState;
     unsigned char m_messageWindowOpen;
     unsigned char m_cursorChoice;
     unsigned char m_drawCursor;

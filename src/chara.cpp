@@ -1533,6 +1533,7 @@ void CChara::CModel::calcMatrix()
 		}
 
 		SRTView srt;
+		Mtx animMtx;
 
 		if (NodeAnimNode0(node) != 0 || NodeAnimNode1(node) != 0) {
 			if (parentNode != 0 && NodeAnimNode0(parentNode) != 0 && AnimNodeUsesScale(NodeAnimNode0(parentNode))) {
@@ -1557,7 +1558,6 @@ void CChara::CModel::calcMatrix()
 			}
 
 			if (NodeAnimNode1(node) != 0) {
-				Mtx animMtx;
 				NodeAnimNode1(node)->Interp(m_anim, reinterpret_cast<SRT*>(&srt), frame);
 				if (AnimNodeUsesScale(NodeAnimNode1(node))) {
 					Math.SRTToMatrix(animMtx, reinterpret_cast<SRT*>(&srt));
@@ -1573,7 +1573,6 @@ void CChara::CModel::calcMatrix()
 			}
 
 			if (NodeAnimNode0(node) != 0) {
-				Mtx animMtx;
 				NodeAnimNode0(node)->Interp(m_anim, reinterpret_cast<SRT*>(&srt), frame);
 				s16 nodeIndex = ref->m_index;
 				if (nodeIndex == ModelHeadIndex(this) || nodeIndex == ModelChest3Index(this) ||

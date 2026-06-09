@@ -1985,17 +1985,19 @@ void CMenuPcs::CmakeTribeDraw()
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x40));
-    for (int tileX = 0x20; tileX < 0x260; ) {
-        int tileW = 0x20;
-        if (0x260 - tileX < 0x20) {
-            tileW = 0x260 - tileX;
-        }
+    {
+        int tileW;
+        for (int tileX = 0x20; tileX < 0x260; tileX += tileW) {
+            tileW = 0x20;
+            if (0x260 - tileX < 0x20) {
+                tileW = 0x260 - tileX;
+            }
 
-        MenuPcs.DrawRect(
-            0,
-            static_cast<float>(tileX), 24.0f, static_cast<float>(tileW), 336.0f,
-            0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-        tileX += tileW;
+            MenuPcs.DrawRect(
+                0,
+                static_cast<float>(tileX), 24.0f, static_cast<float>(tileW), 336.0f,
+                0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+        }
     }
 
     DrawCmakePreviewChara(this);

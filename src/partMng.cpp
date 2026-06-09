@@ -4389,14 +4389,13 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
         mng->m_scale.z = createParam->m_scalePtr->z * *reinterpret_cast<float*>(fpData1 + 0x08);
     }
 
+    reinterpret_cast<_pppMngSt*>(mng)->m_lookTarget = createParam->m_lookTargetPtr;
     mng->m_ownerScale = kPartMngOne;
     mng->m_scaleFactor = kPartMngOne;
     *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(mng) + 0x3C) = kPartMngOne;
     *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(mng) + 0x38) = kPartMngOne;
     mng->m_useOwnerScaleSign = 0;
     reinterpret_cast<_pppMngSt*>(mng)->m_owner = 0;
-    reinterpret_cast<_pppMngSt*>(mng)->m_lookTarget = createParam->m_lookTargetPtr;
-    reinterpret_cast<_pppMngSt*>(mng)->m_bindNode = 0;
 
     const signed char mode = *reinterpret_cast<signed char*>(fpData2 + 0x05);
     if (mode == 2 || mode == 4) {

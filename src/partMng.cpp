@@ -1925,11 +1925,9 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
                     }
                 }
 
-                if (res->m_textureSet != 0 && res->m_materialSet != 0) {
-                    res->m_textureSet->Create(chunkFile, PartPcs.m_usbStreamState.m_stageLoad, 1, 0, 0, 0);
-                    res->m_materialSet->SetPartFromTextureSet(res->m_textureSet, 0);
-                    res->m_materialSet->SetTextureSet(res->m_textureSet);
-                }
+                res->m_textureSet->Create(chunkFile, PartPcs.m_usbStreamState.m_stageLoad, 1, 0, 0, 0);
+                res->m_materialSet->SetPartFromTextureSet(res->m_textureSet, 0);
+                res->m_materialSet->SetTextureSet(res->m_textureSet);
             }
         }
         return;

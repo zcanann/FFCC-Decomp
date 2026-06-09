@@ -1730,9 +1730,9 @@ void CGMonObj::onStatDie()
 			if (option < 9 && m_repop.delay == 0) {
 				int shift = reinterpret_cast<int>(object->m_scriptHandle[2]);
 				long long bit = 1ULL << shift;
-				CFlatRuntime2::CSpawnBits& spawnBit = CFlatRuntime2Storage().m_spawnBits[option];
-				spawnBit.m_hi |= static_cast<unsigned int>(bit);
-				spawnBit.m_lo |= static_cast<unsigned int>(bit >> 32);
+				unsigned int loVal = CFlatSpawnBitLo(option);
+				CFlatSpawnBitHi(option) |= static_cast<unsigned int>(bit);
+				CFlatSpawnBitLo(option) = loVal | static_cast<unsigned int>(bit >> 32);
 			}
 			return;
 		}

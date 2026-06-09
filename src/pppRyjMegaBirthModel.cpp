@@ -129,28 +129,6 @@ static inline double MegaBirthHalfDouble()
     return kPppRyjMegaBirthModelHalfF64;
 }
 
-static inline int clamp_u8_int(int value)
-{
-    if (value < 0) {
-        return 0;
-    }
-    if (value > 0xFF) {
-        return 0xFF;
-    }
-    return value;
-}
-
-static inline int clamp_alpha_7f(int value)
-{
-    if (value < 0) {
-        return 0;
-    }
-    if (value > 0x7F) {
-        return 0x7F;
-    }
-    return value;
-}
-
 static inline float calc_spawn_speed(PRyjMegaBirthModel* params, u8 speedMode)
 {
     switch (speedMode) {
@@ -937,21 +915,21 @@ void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
  * Address: TODO
  * Size: TODO
  */
-static inline void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBirthModel* params, VRyjMegaBirthModel* work)
+static inline void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBirthModel* params, _PARTICLE_WMAT* worldMatrixBlock)
 {
     pppUnitMatrix(out);
     switch (params->m_spawnMode) {
+    default:
+        if (worldMatrixBlock == NULL) {
+            pppMulMatrix(out, *(pppFMATRIX*)&ppvWorldMatrix, pObject->m_localMatrix);
+        }
+        break;
     case 1:
     case 3:
     case 5:
     case 7:
     case 9:
         pppMulMatrix(out, *(pppFMATRIX*)&ppvWorldMatrix, pObject->m_localMatrix);
-        break;
-    default:
-        if (work->m_worldMatrixBlock == NULL) {
-            pppMulMatrix(out, *(pppFMATRIX*)&ppvWorldMatrix, pObject->m_localMatrix);
-        }
         break;
     }
 }
@@ -972,17 +950,17 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* stepData, _p
     VRyjMegaBirthModel* work =
         (VRyjMegaBirthModel*)(obj->m_workArea + offsets->m_workOffset);
     VColor* baseColor = (VColor*)(obj->m_workArea + offsets->m_colorOffset);
-    _PARTICLE_DATA* particleBlock = work->m_particleBlock;
+    _PARTICLE_DATA* particle = work->m_particleBlock;
     s32 numParticles = work->m_numParticles;
-    _PARTICLE_WMAT* particleWorldMatrixBlock = work->m_worldMatrixBlock;
-    _PARTICLE_COLOR* colorBlock = work->m_colorBlock;
+    _PARTICLE_WMAT* particleWorldMatrix = work->m_worldMatrixBlock;
+    _PARTICLE_COLOR* particleColor = work->m_colorBlock;
     s8 hasRequiredMemory;
 
-    if (particleBlock == NULL) {
+    if (particle == NULL) {
         hasRequiredMemory = 0;
-    } else if ((params->m_enableWorldMatrix != 0) && (particleWorldMatrixBlock == NULL)) {
+    } else if ((params->m_enableWorldMatrix != 0) && (particleWorldMatrix == NULL)) {
         hasRequiredMemory = 0;
-    } else if ((params->m_enableParticleColor != 0) && (colorBlock == NULL)) {
+    } else if ((params->m_enableParticleColor != 0) && (particleColor == NULL)) {
         hasRequiredMemory = 0;
     } else {
         hasRequiredMemory = 1;
@@ -1000,10 +978,7 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* stepData, _p
     pppFMATRIX emitterMatrix;
     pppFMATRIX scratchMatrix;
 
-    init_matrix(obj, emitterMatrix, params, work);
-    pppUnitMatrix(scratchMatrix);
-    pppInitBlendMode();
-    pppSetBlendMode(0);
+    init_matrix(obj, emitterMatrix, params, particleWorldMatrix);
 
     int baseRed = baseColor->m_red;
     int baseGreen = baseColor->m_green;
@@ -1011,23 +986,11 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* stepData, _p
     int baseAlpha = baseColor->m_alpha;
 
     for (int i = 0; i < numParticles; i++) {
-        _PARTICLE_DATA* particle = (_PARTICLE_DATA*)((u8*)particleBlock + i * 0xA0);
-        _PARTICLE_WMAT* particleWorldMatrix = 0;
-        _PARTICLE_COLOR* particleColor = 0;
-
-        if (*u16_at(particle, 0x30) == 0) {
-            continue;
-        }
-
-        if (particleWorldMatrixBlock != NULL) {
-            particleWorldMatrix = particleWorldMatrixBlock + i;
-        }
-        if (colorBlock != NULL) {
-            particleColor = colorBlock + i;
-        }
+        if (*u16_at(particle, 0x30) != 0) {
 
         pppFMATRIX drawMatrix;
 
+        pppUnitMatrix(scratchMatrix);
         set_matrix(obj, emitterMatrix, scratchMatrix, params, particle, particleWorldMatrix, drawMatrix, params->m_useEnvDepth);
 
         int red = baseRed + (int)*(s8*)((u8*)particle + 0x32);
@@ -1042,15 +1005,31 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* stepData, _p
             alpha += (int)particleColor->m_color[3];
         }
 
-        int clampedRed = clamp_u8_int(red);
-        int clampedGreen = clamp_u8_int(green);
-        int clampedBlue = clamp_u8_int(blue);
-        int clampedAlpha = clamp_alpha_7f(alpha);
+        if (red < 0) {
+            red = 0;
+        } else if (red > 0xFF) {
+            red = 0xFF;
+        }
+        if (green < 0) {
+            green = 0;
+        } else if (green > 0xFF) {
+            green = 0xFF;
+        }
+        if (blue < 0) {
+            blue = 0;
+        } else if (blue > 0xFF) {
+            blue = 0xFF;
+        }
+        if (alpha < 0) {
+            alpha = 0;
+        } else if (alpha > 0x7F) {
+            alpha = 0x7F;
+        }
         pppCVECTOR drawColor;
-        drawColor.rgba[0] = (u8)clampedRed;
-        drawColor.rgba[1] = (u8)clampedGreen;
-        drawColor.rgba[2] = (u8)clampedBlue;
-        drawColor.rgba[3] = (u8)clampedAlpha;
+        drawColor.rgba[0] = (u8)red;
+        drawColor.rgba[1] = (u8)green;
+        drawColor.rgba[2] = (u8)blue;
+        drawColor.rgba[3] = (u8)alpha;
 
         GXSetChanAmbColor(GX_COLOR0A0, *(_GXColor*)drawColor.rgba);
 
@@ -1065,8 +1044,18 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* stepData, _p
                                  *f32_at(particle, 0x8C) + *f32_at(particle, 0x94),
                                  kPppRyjMegaBirthSharedZero, kPppRyjMegaBirthSharedZero);
         pppSetBlendMode(params->m_blendMode);
-        pppDrawMesh((pppModelSt*)ppvEnv->m_mapMeshPtr[modelIndex], obj->m_drawMatrixPtr, 1);
+        pppDrawMesh((pppModelSt*)ppvEnv->m_mapMeshPtr[params->m_modelIndex], obj->m_drawMatrixPtr, 1);
         pppCopyMatrix(obj->m_localMatrix, *(pppFMATRIX*)&g_matTmp);
+
+        }
+
+        if (particleWorldMatrix != NULL) {
+            particleWorldMatrix++;
+        }
+        if (particleColor != NULL) {
+            particleColor++;
+        }
+        particle = (_PARTICLE_DATA*)((u8*)particle + 0xA0);
     }
 }
 

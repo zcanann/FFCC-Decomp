@@ -2643,7 +2643,7 @@ void CCharaPcs::CHandle::FreeAnim(int animIndex)
 int CCharaPcs::CHandle::SetAnim(int animIndex, int startFrame, int endFrame, int blendMode, int forceSet)
 {
     if (m_model == 0) {
-        goto fail;
+        return 0;
     }
     if (m_currentAnimIndex == animIndex && forceSet == 0) {
         goto fail;

@@ -1277,7 +1277,7 @@ int CChara::CModel::PickFur(
 	hitViewPos.Identity();
 	Mtx44 screenMtx;
 	PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
-	const double negCursorY = -static_cast<double>(static_cast<float>(cursorYd - static_cast<double>(kCharaFurScreenCenterY)));
+	const double negCursorY = -static_cast<double>(static_cast<float>(cursorYd) - kCharaFurScreenCenterY);
 
 	FurProjectedVertex verts[3];
 	unsigned long curValid = 0;

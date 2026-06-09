@@ -166,7 +166,7 @@ static int HighestSetBit(unsigned int value)
 
 static CMaterial* AllocMaterial()
 {
-    return new (MaterialMan.GetMemoryStage(), const_cast<char*>(s_materialman_cpp), 0xCFF) CMaterial;
+    return new (MaterialMan.GetMemoryStage(), (char*)"materialman.cpp", 0xCFF) CMaterial;
 }
 
 static void AddTextureIndex(CMaterial* material, unsigned short textureIndex)
@@ -176,7 +176,7 @@ static void AddTextureIndex(CMaterial* material, unsigned short textureIndex)
 
 static CMapKeyFrame* AllocMapKeyFrame(int line)
 {
-    return new (MaterialMan.GetMemoryStage(), const_cast<char*>(s_materialman_cpp), line) CMapKeyFrame();
+    return new (MaterialMan.GetMemoryStage(), (char*)"materialman.cpp", line) CMapKeyFrame();
 }
 
 static void SetMaterialColor(CMaterial* material, unsigned int rgba)
@@ -3399,7 +3399,7 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
             }
 
             CMaterial* newMaterial =
-                new (MaterialMan.GetMemoryStage(), const_cast<char*>(s_materialman_cpp), 0xEE4) CMaterial;
+                new (MaterialMan.GetMemoryStage(), (char*)"materialman.cpp", 0xEE4) CMaterial;
 
             float scale = kTextureOne;
             newMaterial->m_tevBit = 0xFFF531F0;

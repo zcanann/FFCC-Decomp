@@ -929,12 +929,12 @@ void CGObject::bgNormalCollision()
     pos.y += sStepProbeHeight + m_capsuleHalfHeight;
 
     unsigned int retry = 4;
-    const float capsuleRadius = m_capsuleHalfHeight;
+    const double epsilon = DOUBLE_80330400;
     while (retry != 0) {
         CMapCylinder bodyCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
         bodyCylinder.m_bottom = pos;
         bodyCylinder.m_axis = move;
-        bodyCylinder.m_radius = capsuleRadius;
+        bodyCylinder.m_radius = m_capsuleHalfHeight;
 
         if (MapMng.CheckHitCylinderNear(&bodyCylinder, &move, m_bgHitMask) == 0) {
             break;
@@ -943,13 +943,13 @@ void CGObject::bgNormalCollision()
         m_stateFlags0Bits.unk1 = 1;
         MapMng.m_hitMapObj->CalcHitSlide(&move, sJumpLift);
 
-        if (fabs(static_cast<double>(move.x)) < DOUBLE_80330400) {
+        if (fabs(static_cast<double>(move.x)) < epsilon) {
             move.x = sZeroFloat;
         }
-        if (fabs(static_cast<double>(move.y)) < DOUBLE_80330400) {
+        if (fabs(static_cast<double>(move.y)) < epsilon) {
             move.y = sZeroFloat;
         }
-        if (fabs(static_cast<double>(move.z)) < DOUBLE_80330400) {
+        if (fabs(static_cast<double>(move.z)) < epsilon) {
             move.z = sZeroFloat;
         }
 
@@ -976,18 +976,15 @@ void CGObject::bgNormalCollision()
     stepCylinder.m_radius = m_capsuleHalfHeight;
 
     if (MapMng.CheckHitCylinderNear(&stepCylinder, &move, m_bgHitMask) == 0) {
-        pos.y -= m_capsuleHalfHeight;
-        PSVECAdd(&pos, &move, &pos);
-        PSVECSubtract(&pos, &m_worldPosition, &m_groundHitOffset);
-        return;
+        goto stepMiss;
     }
 
     if ((MapMng.GetMapIdGrpArray()[gMapHitFace->m_groupIndex].m_mask & 0x20) == 0) {
         m_stateFlags0Bits.unk0 = 1;
-        m_radiusCtrl.x =
-            *reinterpret_cast<float*>(&MapMng.GetMapIdGrpArray()[gMapHitFace->m_groupIndex].m_mask);
+        *reinterpret_cast<u32*>(&m_radiusCtrl.x) =
+            MapMng.GetMapIdGrpArray()[gMapHitFace->m_groupIndex].m_mask;
         if (gMapHitFace->m_groupIndex != 0) {
-            m_lastBgGroup = static_cast<short>(gMapHitFace->m_groupIndex);
+            *reinterpret_cast<char*>(&m_lastBgGroup) = static_cast<char>(gMapHitFace->m_groupIndex);
         }
         MapMng.m_hitMapObj->GetHitFaceNormal(&HitFaceNormal());
     }
@@ -1012,18 +1009,12 @@ void CGObject::bgNormalCollision()
         goto simple;
     }
 
-    float oldY = m_groundHitOffset.y;
-    if (oldY < sMinGroundClamp) {
-        oldY = sMinGroundClamp;
-    }
+    float oldY = (m_groundHitOffset.y < sMinGroundClamp) ? sMinGroundClamp : m_groundHitOffset.y;
+    float clampedY = (m_groundHitOffset.y < sMinGroundClamp) ? sMinGroundClamp : m_groundHitOffset.y;
 
-    float clampedY = m_groundHitOffset.y;
-    if (clampedY < sMinGroundClamp) {
-        clampedY = sMinGroundClamp;
-    }
-
+    float delta = oldY - move.y;
     m_worldPosition.y = pos.y;
-    m_gravityY = m_jumpLandingDampening * -((clampedY - (oldY - move.y)) + (oldY - move.y));
+    m_gravityY = m_jumpLandingDampening * -((clampedY - delta) + delta);
     m_groundHitOffset.y = sZeroFloat;
     m_groundHitOffset.x = pos.x - m_worldPosition.x;
     m_groundHitOffset.z = pos.z - m_worldPosition.z;
@@ -1042,6 +1033,12 @@ simple:
     m_groundHitOffset.x = pos.x - m_worldPosition.x;
     m_groundHitOffset.y = pos.y - m_worldPosition.y;
     m_groundHitOffset.z = pos.z - m_worldPosition.z;
+    return;
+
+stepMiss:
+    pos.y -= m_capsuleHalfHeight;
+    PSVECAdd(&pos, &move, &pos);
+    PSVECSubtract(&pos, &m_worldPosition, &m_groundHitOffset);
 }
 
 /*
@@ -1102,7 +1099,7 @@ void CGObject::bgWorldCollision()
         m_radiusCtrl.x =
             *reinterpret_cast<float*>(&MapMng.GetMapIdGrpArray()[gMapHitFace->m_groupIndex].m_mask);
         if (gMapHitFace->m_groupIndex != 0) {
-            m_lastBgGroup = static_cast<short>(gMapHitFace->m_groupIndex);
+            *reinterpret_cast<char*>(&m_lastBgGroup) = static_cast<char>(gMapHitFace->m_groupIndex);
         }
         MapMng.m_hitMapObj->GetHitFaceNormal(&HitFaceNormal());
     }

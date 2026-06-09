@@ -1538,8 +1538,8 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 	pppMngSt->m_mode = (u8)pdt[1];
 	int* controlPrograms = (int*)((u8*)pdt + pdt[2]);
 	int* programs = (int*)((u8*)pdt + pdt[3]);
-	short* shapeIndices = (short*)((u8*)pdt + pdt[5]);
 	short* modelIndices = (short*)((u8*)pdt + pdt[4]);
+	short* shapeIndices = (short*)((u8*)pdt + pdt[5]);
 
 	if (Game.m_currentSceneId != 7)
 	{

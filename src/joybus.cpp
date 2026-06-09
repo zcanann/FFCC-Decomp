@@ -4474,9 +4474,13 @@ int JoyBus::SendMBase(ThreadParam* threadParam)
     cmdBytes[0] = 0x0F;
     *reinterpret_cast<unsigned short*>(cmdBytes + 2) = __lhbrx(&posX, 0);
     unsigned int word = cmd;
-    int result = 0;
+    int result;
 
-    if (static_cast<signed char>(m_threadRunningMask) != 0)
+    if (static_cast<signed char>(m_threadRunningMask) == 0)
+    {
+        result = 0;
+    }
+    else
     {
         OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
@@ -4505,7 +4509,11 @@ int JoyBus::SendMBase(ThreadParam* threadParam)
     *reinterpret_cast<unsigned short*>(cmdBytes + 2) = __lhbrx(&posY, 0);
     word = cmd;
 
-    if (static_cast<signed char>(m_threadRunningMask) != 0)
+    if (static_cast<signed char>(m_threadRunningMask) == 0)
+    {
+        result = 0;
+    }
+    else
     {
         OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 

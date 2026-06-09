@@ -3500,7 +3500,7 @@ void CGCharaObj::combi2()
 		return;
 	}
 
-	if (fallback != 0 && candidates[0]->m_comboFrame <= 0x41) {
+	if (fallback != 0 && candidates[0]->m_comboFrame < 0x42) {
 		return;
 	}
 

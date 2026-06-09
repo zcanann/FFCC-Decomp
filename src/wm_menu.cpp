@@ -1139,8 +1139,8 @@ void CMenuPcs::loadData()
 		object->m_charaModelHandle = GetWmCharaHandles(this)[i + 8];
 		param.m_paramB = reinterpret_cast<unsigned int>(object);
 		param.m_lookTargetPtr = object;
-		const int group = static_cast<int>(
-		    (static_cast<int>((effectNo ^ 100) >> 1) - ((effectNo ^ 100) & effectNo)) >> 31);
+		const int group =  (s32)(static_cast<int>(
+		    (static_cast<int>((effectNo ^ 100) >> 1) - ((effectNo ^ 100) & effectNo)) >> 31));
 		effect[1] = PartMng.pppCreate(group, i + 5, &param, 1);
 	}
 
@@ -1159,7 +1159,8 @@ void CMenuPcs::loadData()
 		effect[0] = i;
 		effect[2] = i + 0xC;
 		object->Create();
-		object->m_charaModelHandle = GetWmCharaHandles(this)[i + 4];
+		int __p23 = i;
+		object->m_charaModelHandle = GetWmCharaHandles(this)[__p23 + 4];
 		param.m_paramB = reinterpret_cast<unsigned int>(object);
 		param.m_lookTargetPtr = object;
 		const int group = static_cast<int>(

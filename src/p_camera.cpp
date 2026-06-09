@@ -904,6 +904,7 @@ void CCameraPcs::draw()
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     Mtx shadowMtx;
     Mtx cameraMtx;
+    Vec* shadowPos = &g_shadow_pos;
 
     if ((m_isAbsolute == 0) ||
         ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_Camera) != 0)) {
@@ -926,9 +927,9 @@ void CCameraPcs::draw()
     }
 
     if (g_map_draw_prof != 0) {
-        float posX = g_shadow_pos.x;
-        float posY = g_shadow_pos.y;
-        float posZ = g_shadow_pos.z;
+        float posZ = shadowPos->z;
+        float posY = shadowPos->y;
+        float posX = shadowPos->x;
         PSMTXCopy(m_cameraMatrix, cameraMtx);
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         GXSetZCompLoc(0);
@@ -958,9 +959,10 @@ void CCameraPcs::draw()
         GXSetChanMatColor(GX_COLOR0A0, redColor);
         Graphic.DrawSphere();
 
-        float refPosX = g_shadow_refpos.x;
-        float refPosY = g_shadow_refpos.y;
-        float refPosZ = g_shadow_refpos.z;
+        Vec* shadowRefPos = shadowPos + 1;
+        float refPosZ = shadowRefPos->z;
+        float refPosX = shadowRefPos->x;
+        float refPosY = shadowRefPos->y;
         PSMTXCopy(m_cameraMatrix, cameraMtx);
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         GXSetZCompLoc(0);

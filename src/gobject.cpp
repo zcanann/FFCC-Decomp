@@ -1015,8 +1015,9 @@ void CGObject::bgNormalCollision()
     float oldY = (m_groundHitOffset.y < sMinGroundClamp) ? sMinGroundClamp : m_groundHitOffset.y;
     float clampedY = (m_groundHitOffset.y < sMinGroundClamp) ? sMinGroundClamp : m_groundHitOffset.y;
 
+    float delta = oldY - move.y;
     m_worldPosition.y = pos.y;
-    m_gravityY = m_jumpLandingDampening * -((clampedY - (oldY - move.y)) + (oldY - move.y));
+    m_gravityY = m_jumpLandingDampening * -((clampedY - delta) + delta);
     m_groundHitOffset.y = sZeroFloat;
     m_groundHitOffset.x = pos.x - m_worldPosition.x;
     m_groundHitOffset.z = pos.z - m_worldPosition.z;

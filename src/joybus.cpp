@@ -4069,14 +4069,14 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
             }
             else
             {
-                unsigned int remaining = totalSize % 0x2FD;
+                int remaining = totalSize % 0x2FD;
 
                 if (totalSize != 0 && remaining == 0)
                 {
                     remaining = 0x2FD;
                 }
 
-                unsigned int rows = remaining / 3;
+                int rows = remaining / 3;
 
                 if (rows * 3 != remaining)
                 {
@@ -4087,13 +4087,12 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
                 chunkSize = static_cast<unsigned short>(remaining);
             }
 
+            localBytes[0] |= 0x40;
+            localBytes[1] = static_cast<unsigned char>(chunkCount);
             unsigned short len = chunkSize;
-            unsigned char rowCount = static_cast<unsigned char>(chunkCount);
+            *reinterpret_cast<unsigned short*>(localBytes + 2) = __lhbrx(&len, 0);
 
-            unsigned int word = (static_cast<unsigned int>(0x4B) << 24) |
-                                (static_cast<unsigned int>(rowCount) << 16) |
-                                (static_cast<unsigned int>(len & 0x00FF) << 8) |
-                                static_cast<unsigned int>(len >> 8);
+            unsigned int word = localWord;
 
             if (m_threadRunningMask == 0)
             {

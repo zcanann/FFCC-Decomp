@@ -1645,7 +1645,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             mngF[0x54 / 4] = payloadFloats[0x17];
             mngF[0x64 / 4] = payloadFloats[0x18];
         }
-        m_pppMng[0].m_mode = 0;
+        m_pppMng[0].m_hitBgFlag = 0;
         return;
     case 0x1B:
         *reinterpret_cast<int*>(self + kLastEnvCmdOffset) = 0x1B;
@@ -1947,7 +1947,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         m_pppMng[0].m_cylinderAttribute = 0xFFFFFFFF;
         m_pppMng[0].m_paramA = 0;
         m_pppMng[0].m_slotVisible = 1;
-        m_pppMng[0].m_ownerFlagsInitialized = 1;
+        m_pppMng[0].m_ownerFacing = 1;
         m_pppMng[0].m_pppResSet = self + 0x23518;
         m_pppMng[0].m_nodeIndex = 0;
         m_pppMng[0].m_fieldF2 = 1;
@@ -2668,7 +2668,7 @@ void CPartMng::pppEditPartDrawAfter()
 {
     static const int kPppMngCount = 0x180;
     static const int kEditDrawModeOffset = 0x23570;
-    static const int kHeapCheckIntervalOffset = 0x170;
+    static const int kHeapCheckIntervalOffset = 0x16C;
 
     if (ppvSysStopPartF == 0) {
         m_pppEnvSt.m_debugCounter = 0;
@@ -3032,6 +3032,7 @@ void CPartMng::pppDrawPrioPdtFpno(unsigned char drawMode, short kind, short node
         float m_cullRadius;                  // 0x10C
         float m_cullYOffset;                 // 0x110
         float m_sortDepth;                   // 0x114
+        unsigned char m_pad118[0x158 - 0x118]; // 0x118
     };
 
     Mtx invCamera;

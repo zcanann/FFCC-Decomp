@@ -2718,7 +2718,7 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
 		outB = 0;
 		break;
 	}
-	outC = (outA ^ 3) / 2;
+	outC = static_cast<int>(static_cast<unsigned int>(outA ^ 3) >> 1);
 }
 #pragma pop
 

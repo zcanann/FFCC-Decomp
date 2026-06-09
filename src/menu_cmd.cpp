@@ -2313,7 +2313,8 @@ void CMenuPcs::DrawUniteList()
 	const u16 topX = GetCmdListStorage(this)->entries[0].x;
 	for (s32 i = 0; i < caravan->m_numCmdListSlots; i++) {
 		const s16 slotType = caravan->m_commandListExtra[i];
-		if ((i < 8) && (slotType == 0)) {
+		int __p31 = slotType;
+		if ((i < 8) && (__p31 == 0)) {
 			continue;
 		}
 
@@ -2362,7 +2363,8 @@ void CMenuPcs::DrawUniteList()
 			continue;
 		}
 
-		u32 groupSize = 2;
+		u32 groupSize;
+		groupSize = 2;
 		if ((i + 2 < 8) && (caravan->m_commandListExtra[i + 2] == -1)) {
 			groupSize = 3;
 		}

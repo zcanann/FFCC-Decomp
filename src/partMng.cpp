@@ -1711,7 +1711,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         *reinterpret_cast<int*>(self + 0x168) = *reinterpret_cast<int*>(payload + 0x128);
         *reinterpret_cast<int*>(self + 0x16C) = *reinterpret_cast<int*>(payload + 0x12C);
         *reinterpret_cast<int*>(self + 0x170) = *reinterpret_cast<int*>(payload + 0x130);
-        *reinterpret_cast<int*>(self + kEditDrawModeOffset) = *reinterpret_cast<int*>(payload + 0x134);
+        *reinterpret_cast<int*>(self + 0x174) = *reinterpret_cast<int*>(payload + 0x134);
 
         m_pppMng[0].m_ownerScale = kPartMngOne;
         m_pppMng[0].m_scaleFactor = kPartMngOne;
@@ -1757,7 +1757,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         *reinterpret_cast<int*>(self + 0x168) = *reinterpret_cast<int*>(payload + 0x128);
         *reinterpret_cast<int*>(self + 0x16C) = *reinterpret_cast<int*>(payload + 0x12C);
         *reinterpret_cast<int*>(self + 0x170) = *reinterpret_cast<int*>(payload + 0x130);
-        *reinterpret_cast<int*>(self + kEditDrawModeOffset) = *reinterpret_cast<int*>(payload + 0x134);
+        *reinterpret_cast<int*>(self + 0x174) = *reinterpret_cast<int*>(payload + 0x134);
 
         ppvChrScl[2] = kPartMngOne;
         ppvChrScl[1] = kPartMngOne;

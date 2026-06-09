@@ -1710,40 +1710,7 @@ found:
         entry.m_cacheData = 0;
         entry.m_size = static_cast<int>(allocSize);
 
-        int checksum = 0x12345678;
-        unsigned int remainingBytes = static_cast<unsigned int>(entry.m_size);
-        const unsigned char* data = reinterpret_cast<const unsigned char*>(src);
-        if (remainingBytes != 0) {
-            unsigned int chunks = remainingBytes >> 3;
-            if (chunks != 0) {
-                do {
-                    checksum += data[0];
-                    checksum += data[1];
-                    checksum += data[2];
-                    checksum += data[3];
-                    checksum += data[4];
-                    checksum += data[5];
-                    checksum += data[6];
-                    checksum += data[7];
-                    data += 8;
-                    chunks--;
-                } while (chunks != 0);
-
-                remainingBytes &= 7;
-                if (remainingBytes == 0) {
-                    goto checksum_done_dma;
-                }
-            }
-
-            do {
-                checksum += *data;
-                data++;
-                remainingBytes--;
-            } while (remainingBytes != 0);
-        }
-
-    checksum_done_dma:
-        entry.m_checksum = checksum;
+        entry.m_checksum = static_cast<int>(CheckSum(src, entry.m_size));
 
         if (entry.m_dmaCopy == 0) {
             memcpy(entry.m_workData, src, static_cast<unsigned long>(entry.m_size));
@@ -1773,40 +1740,7 @@ found:
     entry.m_cacheData = 0;
     entry.m_size = static_cast<int>(allocSize);
 
-    int checksum = 0x12345678;
-    unsigned int remainingBytes = static_cast<unsigned int>(entry.m_size);
-    const unsigned char* data = reinterpret_cast<const unsigned char*>(src);
-    if (remainingBytes != 0) {
-        unsigned int chunks = remainingBytes >> 3;
-        if (chunks != 0) {
-            do {
-                checksum += data[0];
-                checksum += data[1];
-                checksum += data[2];
-                checksum += data[3];
-                checksum += data[4];
-                checksum += data[5];
-                checksum += data[6];
-                checksum += data[7];
-                data += 8;
-                chunks--;
-            } while (chunks != 0);
-
-            remainingBytes &= 7;
-            if (remainingBytes == 0) {
-                goto checksum_done_copy;
-            }
-        }
-
-        do {
-            checksum += *data;
-            data++;
-            remainingBytes--;
-        } while (remainingBytes != 0);
-    }
-
-checksum_done_copy:
-    entry.m_checksum = checksum;
+    entry.m_checksum = static_cast<int>(CheckSum(src, entry.m_size));
 
     if (entry.m_dmaCopy == 0) {
         memcpy(entry.m_workData, src, static_cast<unsigned long>(entry.m_size));

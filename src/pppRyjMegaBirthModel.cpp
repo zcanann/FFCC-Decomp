@@ -776,10 +776,10 @@ join_position:
         break;
     }
 
-    if (*u16_at(params, 0x26) != 0) {
-        *s16_at(particleData, 0x30) = *u16_at(params, 0x26);
-    } else {
+    if (*u16_at(params, 0x26) == 0) {
         *s16_at(particleData, 0x30) = -1;
+    } else {
+        *s16_at(particleData, 0x30) = *u16_at(params, 0x26);
     }
     *u8_at(particleData, 0x9c) = 0;
 

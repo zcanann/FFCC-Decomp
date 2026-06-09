@@ -1267,12 +1267,12 @@ void CCameraPcs::calcMap()
     stickH = kCameraDegToRad * (stickH / kCameraOneEighthF);
 
     stickV = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? kCameraZeroF : *reinterpret_cast<float*>(&CameraRawPadInput().lockedButton[0]);
-    stickV = kCameraDegToRad * (stickV / kCameraOneEighthF);
+    stickV = -(kCameraDegToRad * (stickV / kCameraOneEighthF));
 
     triggerL = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? kCameraZeroF : CameraRawPadInput().stickYF;
 
     m_fov += triggerL;
-    m_mapRotX -= stickV;
+    m_mapRotX += stickV;
     m_mapRotY -= stickH;
 
     PSMTXRotRad(rotXMtx, 'x', m_mapRotX);

@@ -1623,7 +1623,19 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
             GXSetTevKColor(GX_KCOLOR0, kColor0);
             GXSetTevKColorSel(static_cast<GXTevStageID>(m_numTevStage), GX_TEV_KCSEL_K0);
             GXSetTevKAlphaSel(static_cast<GXTevStageID>(m_numTevStage), GX_TEV_KASEL_K0_A);
-            if (bTest == 0) {
+            if (bTest != 0) {
+                _GXSetTevColorIn(m_numTevStage, 0xF, 0xF, 0xF, 0xB);
+                _GXSetTevColorOp(m_numTevStage, 0, 0, 0, 1, 0);
+                _GXSetTevAlphaIn(m_numTevStage, 7, 7, 7, 5);
+                _GXSetTevAlphaOp(m_numTevStage, 0, 0, 0, 1, 0);
+                if (bTest2 == 2) {
+                    _GXSetTevColorIn(m_numTevStage, 0xF, 0xB, 0xC, 0xC);
+                    _GXSetTevColorOp(m_numTevStage, 1, 0, 0, 1, 0);
+                    _GXSetTevAlphaIn(m_numTevStage, 7, 5, 6, 6);
+                    _GXSetTevAlphaOp(m_numTevStage, 1, 0, 0, 1, 0);
+                }
+                IncNumTevStage();
+            } else {
                 _GXSetTevColorIn(m_numTevStage, 10, 0xE, 8, 0xF);
                 _GXSetTevColorOp(m_numTevStage, 8, 0, 0, 1, 1);
                 _GXSetTevAlphaIn(m_numTevStage, 7, 7, 7, 6);
@@ -1688,18 +1700,6 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
                     _GXSetTevAlphaOp(m_numTevStage, 0, 0, 0, 1, 0);
                     IncNumTevStage();
                 }
-            } else {
-                _GXSetTevColorIn(m_numTevStage, 0xF, 0xF, 0xF, 0xB);
-                _GXSetTevColorOp(m_numTevStage, 0, 0, 0, 1, 0);
-                _GXSetTevAlphaIn(m_numTevStage, 7, 7, 7, 5);
-                _GXSetTevAlphaOp(m_numTevStage, 0, 0, 0, 1, 0);
-                if (bTest2 == 2) {
-                    _GXSetTevColorIn(m_numTevStage, 0xF, 0xB, 0xC, 0xC);
-                    _GXSetTevColorOp(m_numTevStage, 1, 0, 0, 1, 0);
-                    _GXSetTevAlphaIn(m_numTevStage, 7, 5, 6, 6);
-                    _GXSetTevAlphaOp(m_numTevStage, 1, 0, 0, 1, 0);
-                }
-                IncNumTevStage();
             }
         }
         addtev_stdShadow(tevBit);

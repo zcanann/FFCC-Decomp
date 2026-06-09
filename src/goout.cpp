@@ -2702,7 +2702,7 @@ void CGoOutMenu::Calc()
                         }
                     }
 
-                    if (characterCount == 0) {
+                    if (characterCount <= 0) {
                         int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
                         SetMenuStr(0, 7,
                                    GetGoOutMessageLine(languageId, 101),

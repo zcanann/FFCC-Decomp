@@ -985,7 +985,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 				case -0x13:
 				case -0x12:
 				case -0x11: {
-					LastResult(this) = LoadS16(engineObject, (systemVal + 0x14) * 2 + 0x510);
+					LastResult(this) = LoadS16Idx<0x510>(engineObject, (systemVal + 0x14) * 2);
 					break;
 				}
 				case -0x15:

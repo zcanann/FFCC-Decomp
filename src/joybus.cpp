@@ -832,14 +832,14 @@ timeout_expiry:
             {
                 threadParam->m_prevState = threadParam->m_state;
 
-                if ((int)threadParam->m_gbaStatus == 3)
-                {
-                    threadParam->m_state = (unsigned char)0x86;
-                }
-                else
+                if ((int)threadParam->m_gbaStatus != 3)
                 {
                     threadParam->m_gbaStatus = 1;
                     threadParam->m_state = (unsigned char)0x85;
+                }
+                else
+                {
+                    threadParam->m_state = (unsigned char)0x86;
                 }
 
                 goto recompute_timeout;

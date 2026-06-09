@@ -1002,16 +1002,14 @@ void CGItemObj::onFrameStat()
 		}
 
 		if (7 < m_stateFrame) {
-			CGObject* carryObj = m_owner;
-
 			prgObj->m_rotTargetY = prgObj->m_rotTargetY + kItemObjMotionStep;
 			prgObj->m_worldPosition.x =
-			    kItemObjMotionStep * (carryObj->m_worldPosition.x - prgObj->m_worldPosition.x) + prgObj->m_worldPosition.x;
+			    kItemObjMotionStep * (m_owner->m_worldPosition.x - prgObj->m_worldPosition.x) + prgObj->m_worldPosition.x;
 			prgObj->m_worldPosition.y =
-			    kItemObjMotionStep * (kItemObjHalf * carryObj->unk_0x188 + carryObj->m_worldPosition.y - prgObj->m_worldPosition.y) +
+			    kItemObjMotionStep * (kItemObjHalf * m_owner->unk_0x188 + m_owner->m_worldPosition.y - prgObj->m_worldPosition.y) +
 			    prgObj->m_worldPosition.y;
 			prgObj->m_worldPosition.z =
-			    kItemObjMotionStep * (carryObj->m_worldPosition.z - prgObj->m_worldPosition.z) + prgObj->m_worldPosition.z;
+			    kItemObjMotionStep * (m_owner->m_worldPosition.z - prgObj->m_worldPosition.z) + prgObj->m_worldPosition.z;
 			prgObj->m_rotationX = prgObj->m_rotationX * kItemObjRotationDamping;
 			prgObj->m_rotationY = prgObj->m_rotationY * kItemObjRotationDamping;
 			prgObj->m_rotationZ = prgObj->m_rotationZ * kItemObjRotationDamping;

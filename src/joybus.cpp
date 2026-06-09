@@ -3944,15 +3944,15 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
                 totalSize = static_cast<unsigned short>(m_letterSizeArr[port]);
             }
 
-            unsigned short size = totalSize;
-            unsigned char blocks = static_cast<unsigned char>(size / 0x2FD);
+            int size = totalSize;
+            int blocks = size / 0x2FD;
 
-            if (static_cast<unsigned short>(blocks) * 0x2FD != size)
+            if (blocks * 0x2FD != size)
             {
                 blocks++;
             }
 
-            blockCount = blocks;
+            blockCount = static_cast<unsigned char>(blocks);
 
             unsigned short crcAcc = 0xFFFF;
             crc = Crc16(size, dataBase, &crcAcc);

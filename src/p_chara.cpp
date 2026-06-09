@@ -2713,12 +2713,6 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         const unsigned int lightBank = (flags >> 19) & 1;
         const float phase = m_colorPhase * FLOAT_80330290;
         unsigned int phaseIndex = static_cast<int>(phase);
-        if (phaseIndex < 0) {
-            phaseIndex = 0;
-        }
-        if (phaseIndex > 3) {
-            phaseIndex = 3;
-        }
         const float blendT = static_cast<float>(fmod(static_cast<double>(phase), DOUBLE_80330298));
         CColor shade;
         if ((m_flags & 0x20000) != 0 && drawPass != 3) {

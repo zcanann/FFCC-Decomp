@@ -2139,7 +2139,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 			PSVECScale(reinterpret_cast<Vec*>(&move), reinterpret_cast<Vec*>(&move), hitT);
 			distance = distance * hitT;
 		}
-		gCFlatRuntime2.AddDebugDrawCC(reinterpret_cast<Vec*>(&startPos), reinterpret_cast<Vec*>(&move), cylRadius, 1, hit);
+		CFlat.AddDebugDrawCC(reinterpret_cast<Vec*>(&startPos), reinterpret_cast<Vec*>(&move), cylRadius, 1, hit);
 	}
 
 	if ((flags & 2) != 0) {

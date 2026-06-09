@@ -1898,8 +1898,9 @@ void CCaravanWork::CalcStatus()
 	m_maxHp = cappedValue;
 
 	for (int equipIdx = 0; equipIdx < 4; equipIdx++) {
-		if (m_equipment[equipIdx] >= 0) {
-			int itemIdx = (short)m_inventoryItems[m_equipment[equipIdx]];
+		int equipSlot = m_equipment[equipIdx];
+		if (equipSlot >= 0) {
+			int itemIdx = (short)m_inventoryItems[equipSlot];
 			int itemType = GetItemDataPtr(itemIdx)[0];
 
 			if (itemType == 1) {

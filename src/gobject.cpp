@@ -528,7 +528,7 @@ void CGObject::move()
 
         movingWithScript = true;
     } else {
-        const s8 player = m_animStateMisc;
+        const int player = static_cast<s8>(m_animStateMisc);
         if ((player >= 0)
             && (player < 4)
             && m_weaponNodeFlagAll.m_bits1.m_shield

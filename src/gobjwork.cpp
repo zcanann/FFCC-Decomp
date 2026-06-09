@@ -1903,8 +1903,8 @@ void CCaravanWork::CalcStatus()
 			int itemType = GetItemDataPtr(itemIdx)[0];
 
 			if (itemType == 1) {
-				int weaponItem;
 				int weaponRef;
+				int weaponItem;
 				GetCurrentWeaponItem(weaponItem, weaponRef);
 				if (weaponItem > 0) {
 					itemIdx = weaponItem;
@@ -1988,11 +1988,7 @@ void CCaravanWork::CalcStatus()
 	}
 
 	for (int i = 0; i < 11; i++) {
-		unsigned short resistance = 2;
-		if (m_elementResistances[i] < 2) {
-			resistance = m_elementResistances[i];
-		}
-		m_elementResistances[i] = resistance;
+		m_elementResistances[i] = (m_elementResistances[i] < 2) ? m_elementResistances[i] : 2;
 	}
 
 	if (m_hp > m_maxHp) {
@@ -2011,41 +2007,12 @@ void CCaravanWork::CalcStatus()
 		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x44));
 	}
 
-	cappedValue = 99;
-	if (m_strength <= 99) {
-		cappedValue = m_strength;
-	}
-	m_strength = cappedValue;
-
-	cappedValue = 99;
-	if (m_defense <= 99) {
-		cappedValue = m_defense;
-	}
-	m_defense = cappedValue;
-
-	cappedValue = 99;
-	if (m_magic <= 99) {
-		cappedValue = m_magic;
-	}
-	m_magic = cappedValue;
-
-	cappedValue = 99;
-	if (m_baseStrength <= 99) {
-		cappedValue = m_baseStrength;
-	}
-	m_baseStrength = cappedValue;
-
-	cappedValue = 99;
-	if (m_baseDefense <= 99) {
-		cappedValue = m_baseDefense;
-	}
-	m_baseDefense = cappedValue;
-
-	cappedValue = 99;
-	if (m_baseMagic <= 99) {
-		cappedValue = m_baseMagic;
-	}
-	m_baseMagic = cappedValue;
+	m_strength = (m_strength > 99) ? 99 : m_strength;
+	m_defense = (m_defense > 99) ? 99 : m_defense;
+	m_magic = (m_magic > 99) ? 99 : m_magic;
+	m_baseStrength = (m_baseStrength > 99) ? 99 : m_baseStrength;
+	m_baseDefense = (m_baseDefense > 99) ? 99 : m_baseDefense;
+	m_baseMagic = (m_baseMagic > 99) ? 99 : m_baseMagic;
 }
 
 /*

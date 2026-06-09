@@ -2900,7 +2900,8 @@ void CMenuPcs::CalcLoadMenu()
 		float baseWidth = (float)((int)*reinterpret_cast<short*>(frame + 8) + (int)*reinterpret_cast<short*>(frame + 4));
 		if ((int)uVar15 >= -10) {
 			int s15 = (int)uVar15 >> 31;
-			int absRaw = ((int)uVar15 ^ s15) - s15;
+			int __p12 = s15;
+			int absRaw = ((int)uVar15 ^ s15) - __p12;
 			float dVar27 = (float)(baseWidth * (DOUBLE_803314E8 * (double)absRaw));
 			unsigned int absOff = (unsigned int)absRaw;
 			if ((int)absOff < 0) absOff = 0;
@@ -3132,7 +3133,8 @@ void CMenuPcs::CalcLoadMenu()
 			iVar10 = (int)(float)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313f8);
 			m_menuWindowInfo->x = (short)iVar14;
 			m_menuWindowInfo->y = (short)iVar10;
-			m_menuWindowInfo->width = sVar8;
+			int __p13 = sVar8;
+			m_menuWindowInfo->width = __p13;
 			m_menuWindowInfo->height = sVar18;
 			m_menuWindowInfo->frame = 0;
 			m_menuWindowInfo->state = 3;

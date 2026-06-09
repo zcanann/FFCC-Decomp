@@ -2981,7 +2981,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 		}
 		case 0x409:
 			if (effectArg0 == 3) {
-				for (int i = 3; i < 9; i++) {
+				for (int i = 3; i <= 8; i++) {
 					CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | i);
 					CFlatRuntime2Storage().PutParticleWork();
 				}
@@ -2994,7 +2994,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 			if (effectArg0 == 2) {
 				Mtx rotMtx;
 				PSMTXRotRad(rotMtx, 'y', m_rotTargetY);
-				for (unsigned int i = 0; i < 2; i++) {
+				for (int i = 0; i < 2; i++) {
 					int side = (i == 0) ? 76 : -76;
 					CVector sidePos(static_cast<float>(side), 0.0f, kCharaObjForwardParticleOffset);
 					Vec offsetPos;

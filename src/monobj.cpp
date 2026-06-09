@@ -617,6 +617,8 @@ void CGMonObj::onChangeStat(int state)
 			*reinterpret_cast<unsigned int*>(mon + 0x68C) =
 				CGCharaObj::calcCastTime(*reinterpret_cast<int*>(mon + 0x560));
 			break;
+		case 4:
+			break;
 		}
 	}
 

@@ -1217,8 +1217,8 @@ int CGame::GetBossArtifact(int ratioIndex, int amount)
         stage = 2;
     }
 
-    int stageBase = s_top[stage];
     int scaledAmount = (int)((float)amount * s_ratio[ratioIndex - 1]);
+    int stageBase = s_top[stage];
 
     u16 thresholds[4];
     memset(thresholds, 0, 8);

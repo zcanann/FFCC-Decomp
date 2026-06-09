@@ -2456,8 +2456,8 @@ void CGPartyObj::onStatAttack(int chargeType)
 	}
 
 	if (m_stateFrame == *reinterpret_cast<unsigned short*>(attackEntry + 0x10)) {
-		if (party.commandFlagBits.commandActive != 0 && party.commandFlagBits.flag40 == 0 && chain < 2) {
-			party.attackSel = chain + 1;
+		if (party.commandFlagBits.commandActive != 0 && party.commandFlagBits.flag40 == 0 && party.unk6CC < 2) {
+			party.attackSel = party.unk6CC + 1;
 			changeStat(1, 0, 0);
 			return;
 		}

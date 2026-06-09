@@ -1046,7 +1046,8 @@ void CPartMng::SetFp()
 {
     struct PppMngSetFpRaw {
         void* m_pppResSet;                   // 0x00
-        unsigned char m_pad04[0x14 - 0x04];
+        unsigned char m_pad04[0x08 - 0x04];
+        Vec m_position;                      // 0x08
         int m_baseTime;                      // 0x14
         float m_rotationX;                   // 0x18
         float m_rotationZ;                   // 0x1C
@@ -1118,6 +1119,9 @@ void CPartMng::SetFp()
         mng->m_nodeIndex = static_cast<short>(i);
         mng->m_cullRadius = recvBuff[0x0E];
         mng->m_cullYOffset = recvBuff[0x0F];
+        mng->m_position.x = recvBuff[0];
+        mng->m_position.y = recvBuff[1];
+        mng->m_position.z = recvBuff[2];
         *reinterpret_cast<int*>(&mng->m_rotationX) = reinterpret_cast<int*>(recvBuff)[4];
         *reinterpret_cast<int*>(&mng->m_rotationZ) = reinterpret_cast<int*>(recvBuff)[5];
         mng->m_rotationSpeed = reinterpret_cast<int*>(recvBuff)[6];

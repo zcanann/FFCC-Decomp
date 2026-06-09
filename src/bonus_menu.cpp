@@ -2347,7 +2347,8 @@ void CMenuPcs::CalcResultCloseAnim()
 		handle->m_model->SetMatrix(scaleMtx);
 		handle->m_model->CalcMatrix();
 		handle->m_model->CalcSkin();
-		if (i < activePartyCount) {
+		int __p6 = activePartyCount;
+		if (i < __p6) {
 			handle->m_model->m_lightAlpha = 1.0f;
 		} else {
 			int __p9 = alphaOff;

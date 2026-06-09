@@ -3207,14 +3207,14 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
             status = 0;
 
 case1_done:
-        if (status == 0)
+        if (status != 0)
         {
-            threadParam->m_subState = 2;
-            result = 0;
+            result = 1;
         }
         else
         {
-            result = 1;
+            threadParam->m_subState = 2;
+            result = 0;
         }
 
         break;
@@ -3269,14 +3269,14 @@ case1_done:
         threadParam->m_bootRetryCount = (unsigned char)(tmpBuf.f & 0x0F);
 
 case2_done:
-        if (status == 0)
+        if (status != 0)
         {
-            threadParam->m_subState = 3;
-            result = 0;
+            result = 1;
         }
         else
         {
-            result = 1;
+            threadParam->m_subState = 3;
+            result = 0;
         }
 
         break;
@@ -3371,14 +3371,14 @@ case3_done:
         status = threadParam->m_gbaStatus;
 
 case4_done:
-        if (status == 0)
+        if (status != 0)
         {
-            threadParam->m_subState = 5;
-            result = 0;
+            result = 1;
         }
         else
         {
-            result = 1;
+            threadParam->m_subState = 5;
+            result = 0;
         }
 
         break;
@@ -3421,14 +3421,14 @@ case4_done:
         }
 
 case5_done:
-        if (status == 0)
+        if (status != 0)
         {
-            threadParam->m_subState = 6;
-            result = 0;
+            result = 1;
         }
         else
         {
-            result = 1;
+            threadParam->m_subState = 6;
+            result = 0;
         }
 
         break;

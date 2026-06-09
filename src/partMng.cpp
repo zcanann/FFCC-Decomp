@@ -2791,10 +2791,13 @@ void CPartMng::pppEditPartDrawAfter()
     }
 
     gPppHeapUseRateWords[0] = pppHeapCheckLeak__FPQ27CMemory6CStage2(ppvEnv->m_stagePtr);
-    if (gPppHeapUseRateWords[2] == 0
-        || (--gPppHeapUseRateWords[2], gPppHeapUseRateWords[1] < gPppHeapUseRateWords[0])) {
-        gPppHeapUseRateWords[2] = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + kHeapCheckIntervalOffset) << 1;
-        gPppHeapUseRateWords[1] = gPppHeapUseRateWords[0];
+    {
+        int prevInterval = gPppHeapUseRateWords[2];
+        gPppHeapUseRateWords[2] = prevInterval - 1;
+        if (prevInterval == 0 || gPppHeapUseRateWords[1] < gPppHeapUseRateWords[0]) {
+            gPppHeapUseRateWords[2] = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + kHeapCheckIntervalOffset) << 1;
+            gPppHeapUseRateWords[1] = gPppHeapUseRateWords[0];
+        }
     }
 }
 

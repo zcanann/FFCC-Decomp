@@ -6005,10 +6005,12 @@ int JoyBus::SendBonusStr(ThreadParam* threadParam)
                 strcpy((char*)bonusStr, bonusTable[bonusIndex * 2]);
 
                 int firstLen = strlen((char*)bonusStr);
-                strcpy((char*)(bonusStr + 1) + firstLen, bonusTable[bonusIndex * 2 + 1]);
+                byteLen = firstLen + 1;
+                strcpy((char*)(bonusStr + firstLen + 1), bonusTable[bonusIndex * 2 + 1]);
 
-                int secondLen = strlen((char*)(bonusStr + 1) + firstLen);
-                byteLen = firstLen + secondLen + 3;
+                byteLen = byteLen + 1;
+                byteLen = byteLen + strlen((char*)(bonusStr + firstLen + 1));
+                byteLen = byteLen + 1;
             }
             else
             {

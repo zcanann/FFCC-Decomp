@@ -5766,14 +5766,17 @@ int JoyBus::SendFavorite(ThreadParam* threadParam)
                 return wordCount;
             }
 
-            result = 0;
             m_txWordCount[threadParam->m_portIndex] = wordCount;
             m_txWordIndex[threadParam->m_portIndex] = 0;
 
             unsigned int port = threadParam->m_portIndex;
             unsigned int word = *(unsigned int*)&m_joyDataPacketBuffer[port][2 + m_txWordIndex[port] * 4];
 
-            if (static_cast<signed char>(m_threadRunningMask) != 0)
+            if (static_cast<signed char>(m_threadRunningMask) == 0)
+            {
+                result = 0;
+            }
+            else
             {
                 OSWaitSemaphore(&m_accessSemaphores[port]);
 
@@ -5794,7 +5797,7 @@ int JoyBus::SendFavorite(ThreadParam* threadParam)
             }
 
             threadParam->m_subState = (unsigned char)(threadParam->m_subState + 1);
-        
+
         break;
     }
     case 1:
@@ -5936,9 +5939,13 @@ int JoyBus::SendMType(ThreadParam* threadParam, int modeType)
     cmd0Bytes[0] = 0x10;
     unsigned int word0 = cmd0;
 
-    int result = 0;
+    int result;
 
-    if (static_cast<signed char>(m_threadRunningMask) != 0)
+    if (static_cast<signed char>(m_threadRunningMask) == 0)
+    {
+        result = 0;
+    }
+    else
     {
         OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
@@ -5969,7 +5976,11 @@ int JoyBus::SendMType(ThreadParam* threadParam, int modeType)
     cmdBytes[1] = static_cast<unsigned char>(modeType);
     unsigned int word = cmd;
 
-    if (static_cast<signed char>(m_threadRunningMask) != 0)
+    if (static_cast<signed char>(m_threadRunningMask) == 0)
+    {
+        result = 0;
+    }
+    else
     {
         OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
@@ -7309,9 +7320,13 @@ int JoyBus::ChgCtrlMode(int portIndex)
     wordBytes[0] = 0x09;
     wordBytes[1] = mode;
     unsigned int wordCache = word;
-    int ret = 0;
+    int ret;
 
-    if (static_cast<signed char>(m_threadRunningMask) != 0)
+    if (static_cast<signed char>(m_threadRunningMask) == 0)
+    {
+        ret = 0;
+    }
+    else
     {
         OSWaitSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
 

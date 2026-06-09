@@ -689,7 +689,7 @@ loop_body:
             OSExitThread(&gJoyBusThreadExitValue);
         }
 
-        if (GbaQue.IsSingleMode(threadParam->m_portIndex) && threadParam->m_portIndex != 1)
+        if (GbaQue.IsSingleMode(threadParam->m_portIndex) && (int)threadParam->m_portIndex != 1)
         {
             threadParam->m_state = 0;
             stateStartTime = OSGetTime();
@@ -723,7 +723,7 @@ loop_body:
         }
 
         unsigned int statusIndex;
-        if (GbaQue.IsSingleMode(threadParam->m_portIndex) && threadParam->m_portIndex == 1)
+        if (GbaQue.IsSingleMode(threadParam->m_portIndex) && (int)threadParam->m_portIndex == 1)
         {
             statusIndex = 0;
         }
@@ -803,7 +803,7 @@ timeout_expiry:
             {
                 threadParam->m_prevState = threadParam->m_state;
 
-                if (threadParam->m_gbaStatus == 3)
+                if ((int)threadParam->m_gbaStatus == 3)
                 {
                     threadParam->m_state = (unsigned char)0x86;
                 }
@@ -846,7 +846,7 @@ timeout_expiry:
 
             m_ctrlModeArr[threadParam->m_portIndex] = 0;
 
-            char controllerMode = GbaQue.GetControllerMode();
+            unsigned char controllerMode = GbaQue.GetControllerMode();
 
             if (controllerMode == 0)
                 m_nextModeTypeArr[threadParam->m_portIndex] = 0;
@@ -859,14 +859,14 @@ timeout_expiry:
                 GBAJoyBoot(threadParam->m_portIndex, threadParam->m_portIndex << 1, 2, reinterpret_cast<unsigned char*>(m_gbaBootImage), m_gbaBootImageSize,
                            &threadParam->m_unk3);
 
-            if (threadParam->m_gbaStatus == 3 && (threadParam->m_unk3 & 0x10) != 0)
+            if ((int)threadParam->m_gbaStatus == 3 && (threadParam->m_unk3 & 0x10) != 0)
             {
                 threadParam->m_flags[0] = 0;
                 threadParam->m_state    = 4;
             }
-            else if (threadParam->m_gbaStatus == 0)
+            else if ((int)threadParam->m_gbaStatus == 0)
             {
-                char cm = GbaQue.GetControllerMode();
+                unsigned char cm = GbaQue.GetControllerMode();
 
                 if (cm == 0)
                     m_nextModeTypeArr[threadParam->m_portIndex] = 0;
@@ -881,7 +881,7 @@ timeout_expiry:
                 ThreadSleep(OSMillisecondsToTicks(15));
                 stateStartTime = OSGetTime();
             }
-            else if (threadParam->m_gbaStatus == 3)
+            else if ((int)threadParam->m_gbaStatus == 3)
             {
                 int stat = GetGBAStat(threadParam);
                 if (stat == 0)
@@ -930,7 +930,7 @@ timeout_expiry:
 
             threadParam->m_gbaStatus = GBAReset(threadParam->m_portIndex, &threadParam->m_unk3);
 
-            if (threadParam->m_gbaStatus == 0)
+            if ((int)threadParam->m_gbaStatus == 0)
             {
                 threadParam->m_state    = 2;
                 threadParam->m_subState = 0;
@@ -953,14 +953,14 @@ timeout_expiry:
                     GBAJoyBoot(threadParam->m_portIndex, threadParam->m_portIndex << 1, 2,
                                reinterpret_cast<unsigned char*>(m_gbaBootImage), m_gbaBootImageSize,
                                &threadParam->m_unk3);
-                if (threadParam->m_gbaStatus == 1)
+                if ((int)threadParam->m_gbaStatus == 1)
                 {
                     break;
                 }
                 bootRetry++;
             } while (bootRetry < 100);
 
-            if (threadParam->m_gbaStatus == 1)
+            if ((int)threadParam->m_gbaStatus == 1)
             {
                 threadParam->m_state = 0;
                 ThreadSleep(OSMillisecondsToTicks(15));
@@ -996,15 +996,15 @@ timeout_expiry:
                 }
             }
 
-            if (GbaQue.GetPlayModeFlg(threadParam->m_portIndex))
+            if ((GbaQue.GetPlayModeFlg(threadParam->m_portIndex) & 0xFF) != 0)
             {
                 threadParam->m_state = 2;
                 goto recompute_timeout;
             }
 
-            unsigned char spMode = (GbaQue.GetSPMode(threadParam->m_portIndex) & 0xFF) != 0;
+            int spMode = (GbaQue.GetSPMode(threadParam->m_portIndex) & 0xFF) != 0;
             if (threadParam->m_flags[5] == 0 ||
-                GbaQue.GetSPModeFlg(threadParam->m_portIndex) != 0 ||
+                (GbaQue.GetSPModeFlg(threadParam->m_portIndex) & 0xFF) != 0 ||
                 spMode != threadParam->m_flags[6])
             {
                 if (SendSPMode(threadParam) < 0)
@@ -1015,7 +1015,7 @@ timeout_expiry:
                 GbaQue.ClrSPModeFlg(threadParam->m_portIndex);
             }
 
-            if (threadParam->m_flags[4] != GbaQue.GetPauseMode())
+            if (threadParam->m_flags[4] != (int)GbaQue.GetPauseMode())
             {
                 char menuId = (char)((threadParam->m_flags[4] != 0) + 0xB);
                 if (SendOpenMenu(threadParam, menuId) < 0)
@@ -1025,7 +1025,7 @@ timeout_expiry:
                 threadParam->m_flags[4] = (threadParam->m_flags[4] == 0);
             }
 
-            if (GbaQue.GetControllerMode() != 0)
+            if ((GbaQue.GetControllerMode() & 0xFF) != 0)
             {
                 m_ctrlModeArr[threadParam->m_portIndex] = 4;
             }
@@ -1040,7 +1040,7 @@ timeout_expiry:
                 goto recompute_timeout;
             }
 
-            if (GbaQue.GetStartBonusFlg(threadParam->m_portIndex))
+            if ((GbaQue.GetStartBonusFlg(threadParam->m_portIndex) & 0xFF) != 0)
             {
                 if (SendStartBonus(threadParam) < 0)
                 {
@@ -1073,7 +1073,7 @@ timeout_expiry:
                 }
             }
 
-            if (System.GetCounter() % 3 == 0)
+            if ((int)System.GetCounter() % 3 == 0)
             {
                 if (SendItemUse(threadParam) < 0)
                 {
@@ -1082,9 +1082,9 @@ timeout_expiry:
             }
 
             char radarType = GbaQue.GetRadarType(threadParam->m_portIndex);
-            if (GbaQue.GetStageFlg(threadParam->m_portIndex) == 0 && radarType == 2)
+            if ((int)GbaQue.GetStageFlg(threadParam->m_portIndex) == 0 && radarType == 2)
             {
-                if (GbaQue.GetChgScouFlg(threadParam->m_portIndex) != 0 ||
+                if ((char)GbaQue.GetChgScouFlg(threadParam->m_portIndex) != 0 ||
                     (m_stateFlagArr[threadParam->m_portIndex] != 0 &&
                      m_stateCodeArr[threadParam->m_portIndex] == 0))
                 {
@@ -1092,11 +1092,11 @@ timeout_expiry:
                     goto recompute_timeout;
                 }
 
-                if (GbaQue.GetChgHitFlg(threadParam->m_portIndex) != 0)
+                if ((int)GbaQue.GetChgHitFlg(threadParam->m_portIndex) != 0)
                 {
                     unsigned int hitInfo = GbaQue.GetHitEInfo(threadParam->m_portIndex);
-                    if (SendHitEnemy(threadParam->m_portIndex, (char)(unsigned short)(hitInfo >> 16),
-                                     (short)hitInfo) < 0)
+                    if (SendHitEnemy(threadParam->m_portIndex, (char)reinterpret_cast<short*>(&hitInfo)[0],
+                                     reinterpret_cast<short*>(&hitInfo)[1]) < 0)
                     {
                         goto sleep_retry;
                     }
@@ -1106,7 +1106,7 @@ timeout_expiry:
 
             if (m_stateCodeArr[threadParam->m_portIndex] == 2)
             {
-                if (GbaQue.GetChgUseItemFlg(threadParam->m_portIndex))
+                if ((GbaQue.GetChgUseItemFlg(threadParam->m_portIndex) & 0xFF) != 0)
                 {
                     char useItem = (char)GbaQue.GetUseItemFlg(threadParam->m_portIndex);
                     if (SendUseItem(threadParam->m_portIndex, useItem) < 0)
@@ -1124,7 +1124,7 @@ timeout_expiry:
                 goto recompute_timeout;
             }
 
-            if (GbaQue.GetStrengthFlg(threadParam->m_portIndex))
+            if ((GbaQue.GetStrengthFlg(threadParam->m_portIndex) & 0xFF) != 0)
             {
                 if (SendStrength(threadParam) < 0)
                 {
@@ -1133,7 +1133,7 @@ timeout_expiry:
                 GbaQue.ClrStrengthFlg(threadParam->m_portIndex);
             }
 
-            if (GbaQue.GetMemorysFlg(threadParam->m_portIndex))
+            if ((GbaQue.GetMemorysFlg(threadParam->m_portIndex) & 0xFF) != 0)
             {
                 if (SendMemorys(threadParam) < 0)
                 {
@@ -1142,7 +1142,7 @@ timeout_expiry:
                 GbaQue.ClrMemorysFlg(threadParam->m_portIndex);
             }
 
-            if (GbaQue.GetChgRadarMode(threadParam->m_portIndex))
+            if ((int)GbaQue.GetChgRadarMode(threadParam->m_portIndex) != 0)
             {
                 if (SendRaderMode(threadParam) < 0)
                 {
@@ -1156,13 +1156,13 @@ timeout_expiry:
                 goto sleep_retry;
             }
 
-            if (GbaQue.GetArtifactFlg(threadParam->m_portIndex))
+            if ((GbaQue.GetArtifactFlg(threadParam->m_portIndex) & 0xFF) != 0)
             {
                 threadParam->m_state = 0x3e;
                 goto recompute_timeout;
             }
 
-            if (GbaQue.GetStageFlg(threadParam->m_portIndex) != 0 && GbaQue.GetScrFlg() != 0)
+            if ((int)GbaQue.GetStageFlg(threadParam->m_portIndex) != 0 && (int)GbaQue.GetScrFlg() != 0)
             {
                 ResetQueue(threadParam);
                 threadParam->m_subState = 0;
@@ -1202,7 +1202,7 @@ timeout_expiry:
             {
                 if (GbaQue.GetRadarType(threadParam->m_portIndex) == 0)
                 {
-                    if (System.GetCounter() % 5 == 0)
+                    if ((int)System.GetCounter() % 5 == 0)
                     {
                         if (SendMapObjDrawFlg(threadParam) < 0)
                         {
@@ -1210,7 +1210,7 @@ timeout_expiry:
                         }
                     }
                 }
-                if (System.GetCounter() % 3 == 0)
+                if ((int)System.GetCounter() % 3 == 0)
                 {
                     if (SendMBase(threadParam) < 0)
                     {
@@ -1225,14 +1225,14 @@ timeout_expiry:
 
             if (m_stateCodeArr[threadParam->m_portIndex] == 7)
             {
-                if (GbaQue.GetFavoriteFlg(threadParam->m_portIndex) != 0)
+                if ((int)GbaQue.GetFavoriteFlg(threadParam->m_portIndex) != 0)
                 {
                     threadParam->m_state = 0x2c;
                     goto recompute_timeout;
                 }
             }
 
-            if (GbaQue.GetMoneyFlg(threadParam->m_portIndex) == 1)
+            if ((int)GbaQue.GetMoneyFlg(threadParam->m_portIndex) == 1)
             {
                 unsigned int money = GbaQue.GetMoney(threadParam->m_portIndex);
                 if (SetMoney(threadParam->m_portIndex, money) == 0)
@@ -1241,7 +1241,7 @@ timeout_expiry:
                 }
             }
 
-            if (GbaQue.GetCompatibilityFlg(threadParam->m_portIndex) == 1 &&
+            if ((int)GbaQue.GetCompatibilityFlg(threadParam->m_portIndex) == 1 &&
                 m_stateCodeArr[threadParam->m_portIndex] != 0)
             {
                 threadParam->m_state = 0x2f;
@@ -1270,9 +1270,9 @@ timeout_expiry:
                 }
             }
 
-            unsigned char spMode = (GbaQue.GetSPMode(threadParam->m_portIndex) & 0xFF) != 0;
+            int spMode = (GbaQue.GetSPMode(threadParam->m_portIndex) & 0xFF) != 0;
             if (threadParam->m_flags[5] == 0 ||
-                GbaQue.GetSPModeFlg(threadParam->m_portIndex) != 0 ||
+                (GbaQue.GetSPModeFlg(threadParam->m_portIndex) & 0xFF) != 0 ||
                 spMode != threadParam->m_flags[6])
             {
                 if (SendSPMode(threadParam) < 0)
@@ -1283,7 +1283,7 @@ timeout_expiry:
                 GbaQue.ClrSPModeFlg(threadParam->m_portIndex);
             }
 
-            if (threadParam->m_flags[4] != GbaQue.GetPauseMode())
+            if (threadParam->m_flags[4] != (int)GbaQue.GetPauseMode())
             {
                 char menuId = (char)((threadParam->m_flags[4] != 0) + 0xB);
                 if (SendOpenMenu(threadParam, menuId) < 0)
@@ -1303,7 +1303,7 @@ timeout_expiry:
                 goto recompute_timeout;
             }
 
-            if (GbaQue.GetMoneyFlg(threadParam->m_portIndex) == 1)
+            if ((int)GbaQue.GetMoneyFlg(threadParam->m_portIndex) == 1)
             {
                 unsigned int money = GbaQue.GetMoney(threadParam->m_portIndex);
                 if (SetMoney(threadParam->m_portIndex, money) == 0)
@@ -1381,6 +1381,10 @@ timeout_expiry:
         case 0x16:
         {
             int dataRes = SendDataFile(threadParam);
+            if (dataRes == -1)
+            {
+                goto sleep_retry;
+            }
             if (dataRes == -2)
             {
                 threadParam->m_state = 3;
@@ -1411,7 +1415,7 @@ timeout_expiry:
         {
             m_stateFlagArr[threadParam->m_portIndex] = 0;
             int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
-            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetScrFlg() != 0)
+            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && (int)GbaQue.GetScrFlg() != 0)
             {
                 threadParam->m_subState = 0;
                 int sendRes = SendItemAll(threadParam);
@@ -1484,7 +1488,7 @@ timeout_expiry:
         case 0x1A:
         {
             int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
-            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetScrFlg() != 0)
+            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && (int)GbaQue.GetScrFlg() != 0)
             {
                 threadParam->m_subState = 0;
                 int sendRes = SendPlayerStat(threadParam);
@@ -1549,7 +1553,7 @@ timeout_expiry:
                 int sendRes = SendMapNo(threadParam);
                 if (sendRes >= 0)
                 {
-                    if (m_fileBaseB_dup == 0)
+                    if ((int)m_fileBaseB_dup == 0)
                     {
                         GbaQue.ClrStageFlg(threadParam->m_portIndex);
                         threadParam->m_state = 'F';
@@ -1576,7 +1580,7 @@ timeout_expiry:
         case 0x29:
         {
             int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
-            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetScrFlg() != 0)
+            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && (int)GbaQue.GetScrFlg() != 0)
             {
                 threadParam->m_subState = 0;
                 int sendRes = SendMapObj(threadParam);
@@ -1632,7 +1636,7 @@ timeout_expiry:
         case 0x2C:
         {
             int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
-            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetScrFlg() != 0)
+            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && (int)GbaQue.GetScrFlg() != 0)
             {
                 threadParam->m_subState = 0;
                 int sendRes = SendFavorite(threadParam);
@@ -1689,7 +1693,7 @@ timeout_expiry:
         case 0x2F:
         {
             int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
-            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetScrFlg() != 0)
+            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && (int)GbaQue.GetScrFlg() != 0)
             {
                 threadParam->m_subState = 0;
                 int sendRes = SendCompatibility(threadParam);
@@ -1747,7 +1751,7 @@ timeout_expiry:
         {
             m_stateFlagArr[threadParam->m_portIndex] = 0;
             int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
-            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetScrFlg() != 0)
+            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && (int)GbaQue.GetScrFlg() != 0)
             {
                 threadParam->m_subState = 0;
                 int sendRes = SendEquip(threadParam);
@@ -1803,7 +1807,7 @@ timeout_expiry:
         case 0x35:
         {
             int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
-            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetSellFlg(threadParam->m_portIndex) != 0)
+            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && (int)GbaQue.GetSellFlg(threadParam->m_portIndex) != 0)
             {
                 threadParam->m_state = '6';
                 memset(m_perThreadTemp[threadParam->m_portIndex], 0, sizeof(m_perThreadTemp[threadParam->m_portIndex]));
@@ -1823,6 +1827,10 @@ timeout_expiry:
         case 0x36:
         {
             int dataRes = SendDataFile(threadParam);
+            if (dataRes == -1)
+            {
+                goto sleep_retry;
+            }
             if (dataRes == -2)
             {
                 threadParam->m_state = 3;
@@ -1838,7 +1846,7 @@ timeout_expiry:
         case 0x37:
         {
             int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
-            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetBuyFlg(threadParam->m_portIndex) != 0)
+            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && (int)GbaQue.GetBuyFlg(threadParam->m_portIndex) != 0)
             {
                 threadParam->m_state = '8';
                 memset(m_perThreadTemp[threadParam->m_portIndex], 0, sizeof(m_perThreadTemp[threadParam->m_portIndex]));
@@ -1858,6 +1866,10 @@ timeout_expiry:
         case 0x38:
         {
             int dataRes = SendDataFile(threadParam);
+            if (dataRes == -1)
+            {
+                goto sleep_retry;
+            }
             if (dataRes == -2)
             {
                 threadParam->m_state = 3;
@@ -1873,7 +1885,7 @@ timeout_expiry:
         case 0x39:
         {
             int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
-            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetMkSmithFlg(threadParam->m_portIndex) != 0)
+            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && (int)GbaQue.GetMkSmithFlg(threadParam->m_portIndex) != 0)
             {
                 threadParam->m_state = ':';
                 memset(m_perThreadTemp[threadParam->m_portIndex], 0, sizeof(m_perThreadTemp[threadParam->m_portIndex]));
@@ -1893,6 +1905,10 @@ timeout_expiry:
         case 0x3A:
         {
             int dataRes = SendDataFile(threadParam);
+            if (dataRes == -1)
+            {
+                goto sleep_retry;
+            }
             if (dataRes == -2)
             {
                 threadParam->m_state = 3;
@@ -1913,7 +1929,7 @@ timeout_expiry:
             if (res >= 0)
             {
                 int stopRes = SendGBAStop(threadParam);
-                if (stopRes >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetScrFlg() != 0)
+                if (stopRes >= 0 && threadParam->m_skipProcessingFlag == 0 && (int)GbaQue.GetScrFlg() != 0)
                 {
                     threadParam->m_subState = 0;
                     int sendRes = SendBonusStr(threadParam);
@@ -1971,7 +1987,7 @@ timeout_expiry:
         {
             m_stateFlagArr[threadParam->m_portIndex] = 0;
             int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
-            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetScrFlg() != 0)
+            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && (int)GbaQue.GetScrFlg() != 0)
             {
                 threadParam->m_subState = 0;
                 int sendRes = SendArtifact(threadParam);
@@ -2028,7 +2044,7 @@ timeout_expiry:
         case 0x41:
         {
             int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
-            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetArtiDatFlg(threadParam->m_portIndex) != 0)
+            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && (GbaQue.GetArtiDatFlg(threadParam->m_portIndex) & 0xFF) != 0)
             {
                 threadParam->m_state = 'B';
                 memset(m_perThreadTemp[threadParam->m_portIndex], 0, sizeof(m_perThreadTemp[threadParam->m_portIndex]));
@@ -2048,6 +2064,10 @@ timeout_expiry:
         case 0x42:
         {
             int dataRes = SendDataFile(threadParam);
+            if (dataRes == -1)
+            {
+                goto sleep_retry;
+            }
             if (dataRes == -2)
             {
                 threadParam->m_state = 3;
@@ -2065,7 +2085,7 @@ timeout_expiry:
         {
             m_stateFlagArr[threadParam->m_portIndex] = 0;
             int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
-            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetScrFlg() != 0)
+            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && (int)GbaQue.GetScrFlg() != 0)
             {
                 threadParam->m_subState = 0;
                 int sendRes = SendTmpArtifact(threadParam);
@@ -2123,7 +2143,7 @@ timeout_expiry:
         {
             m_stateFlagArr[threadParam->m_portIndex] = 0;
             int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
-            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetScrFlg() != 0)
+            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && (int)GbaQue.GetScrFlg() != 0)
             {
                 int typeRes = SendRaderType(threadParam);
                 if (typeRes >= 0)
@@ -2188,7 +2208,7 @@ timeout_expiry:
         {
             m_stateFlagArr[threadParam->m_portIndex] = 0;
             int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
-            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetScrFlg() != 0)
+            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && (int)GbaQue.GetScrFlg() != 0)
             {
                 ResetQueue(threadParam);
                 threadParam->m_subState = 0;
@@ -2247,7 +2267,7 @@ timeout_expiry:
         {
             m_stateFlagArr[threadParam->m_portIndex] = 0;
             int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
-            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetScrFlg() != 0)
+            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && (int)GbaQue.GetScrFlg() != 0)
             {
                 threadParam->m_subState = 0;
                 int sendRes = SendCmd(threadParam);

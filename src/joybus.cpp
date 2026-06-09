@@ -1241,7 +1241,7 @@ timeout_expiry:
                 }
             }
 
-            if (GbaQue.GetCompatibilityFlg(threadParam->m_portIndex) == 1 &&
+            if ((int)GbaQue.GetCompatibilityFlg(threadParam->m_portIndex) == 1 &&
                 m_stateCodeArr[threadParam->m_portIndex] != 0)
             {
                 threadParam->m_state = 0x2f;
@@ -1838,7 +1838,7 @@ timeout_expiry:
         case 0x37:
         {
             int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
-            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetBuyFlg(threadParam->m_portIndex) != 0)
+            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && (int)GbaQue.GetBuyFlg(threadParam->m_portIndex) != 0)
             {
                 threadParam->m_state = '8';
                 memset(m_perThreadTemp[threadParam->m_portIndex], 0, sizeof(m_perThreadTemp[threadParam->m_portIndex]));
@@ -1873,7 +1873,7 @@ timeout_expiry:
         case 0x39:
         {
             int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
-            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetMkSmithFlg(threadParam->m_portIndex) != 0)
+            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && (int)GbaQue.GetMkSmithFlg(threadParam->m_portIndex) != 0)
             {
                 threadParam->m_state = ':';
                 memset(m_perThreadTemp[threadParam->m_portIndex], 0, sizeof(m_perThreadTemp[threadParam->m_portIndex]));

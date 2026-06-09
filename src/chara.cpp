@@ -1500,7 +1500,7 @@ void CChara::CModel::calcMatrix()
 				if (negTime < clamped) {
 					clamped = negTime;
 				}
-				frame = ((m_animStart + total) - FLOAT_803301BC) - clamped;
+				frame = ((m_animStart + total) - *(volatile float*)&FLOAT_803301BC) - clamped;
 			} else {
 				float clamped = total - FLOAT_803301BC;
 				if (m_time < clamped) {

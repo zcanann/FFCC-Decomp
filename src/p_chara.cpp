@@ -1775,7 +1775,6 @@ checkLoaded:
                             continue;
                         }
 
-                        void* rawData = chunkFile.GetAddress();
                         const unsigned int rawSize = static_cast<int>(chunk.m_size);
 
                         switch (dataType) {
@@ -1894,11 +1893,11 @@ checkLoaded:
                             break;
                         }
                         case 3: {
-                            Sound.LoadSe(rawData);
+                            Sound.LoadSe(chunkFile.GetAddress());
                             break;
                         }
                         case 4: {
-                            Sound.LoadWave(rawData);
+                            Sound.LoadWave(chunkFile.GetAddress());
                             break;
                         }
                         case 5: {
@@ -1913,7 +1912,7 @@ checkLoaded:
                                 }
                             }
 
-                            void* primaryData = rawData;
+                            void* primaryData = chunkFile.GetAddress();
                             const int primarySize = rawSize;
                             if (loadPdt == 0) {
                                 chunkFile.GetNextChunk(chunk);

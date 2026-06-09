@@ -226,15 +226,23 @@ void CGraphicPcs::drawScreenFade()
         _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
         _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 
-        _GXColor baseColor = slotData->m_colorA;
-        _GXColor baseColor2 = slotData->m_colorB;
-
         float t = (float)slotData->m_timer / (float)slotData->m_duration;
         if (slotData->m_invert != 0) {
             t = kGraphicOne - t;
         }
         const float fadeWave = (float)sin((double)(kScreenFadeHalfPi * t));
         const u8 fadeAlpha = (u8)(kGraphicColorMax * fadeWave);
+
+        _GXColor baseColor;
+        baseColor.r = slotData->m_colorA.r;
+        baseColor.g = slotData->m_colorA.g;
+        baseColor.b = slotData->m_colorA.b;
+        baseColor.a = slotData->m_colorA.a;
+        _GXColor baseColor2;
+        baseColor2.r = slotData->m_colorA.r;
+        baseColor2.g = slotData->m_colorA.g;
+        baseColor2.b = slotData->m_colorA.b;
+        baseColor2.a = slotData->m_colorA.a;
         baseColor.a = fadeAlpha;
         baseColor2.a = fadeAlpha;
 

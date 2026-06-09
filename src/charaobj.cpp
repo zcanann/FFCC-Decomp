@@ -2754,6 +2754,8 @@ int CGCharaObj::getItemPdt(int itemId, int level, int& outEffect, int& outArg0, 
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma optimization_level 3
 void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg1, Vec* pos)
 {
 	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + effectId * 0x48;
@@ -2997,6 +2999,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 		}
 	}
 }
+#pragma pop
 
 /*
  * --INFO--

@@ -2189,12 +2189,10 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 				continue;
 			}
 
-			bool targetHidden =
-				(Game.m_gameWork.m_menuStageMode != 0) &&
-				(Game.m_gameWork.m_bossArtifactStageIndex < 0xF) &&
-				((partyObj->GetCID() & 0x6D) == 0x6D) &&
-				(partyObj->m_scriptHandle[0xED] != NULL);
-			if (targetHidden ||
+			if (((Game.m_gameWork.m_menuStageMode != 0) &&
+				 (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) &&
+				 ((partyObj->GetCID() & 0x6D) == 0x6D) &&
+				 (partyObj->m_scriptHandle[0xED] != NULL)) ||
 				(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(partyObj->m_scriptHandle) + 7) == 0) ||
 				(partyObj->m_lastStateId == 9) ||
 				(partyObj->m_lastStateId == 0x22) ||

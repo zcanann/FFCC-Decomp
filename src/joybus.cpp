@@ -114,9 +114,9 @@ static const char s_not_found_error_fmt[] = "Error: %s not found";
 static const char s_map_filename_fmt[] = "m%02d_%d.mcd";
 static const char s_thread_init_end_nl[] = "JoyBus::ThreadInit end\n";
 static const char s_recv_type_mismatch_warn_fmt[] = "(%d):%s(%d): Warning: Recv data type mismatch";
-static const char s_send_ppos_bad_state_fmt[] = "JoyBus::SendPpos: bad state (port=%d, cnt=%d)\n";
 static const char s_load_bin_error[] = "JoyBus::LoadBin() error";
 static const char s_thread_init_end[] = "JoyBus::ThreadInit end";
+extern char s_pctd_Error_m_PposCnt_error_pctd_801DA32C[];
 extern char s_pctd_Error_send_type_error_pct02x_801DA350[];
 
 extern const u32 kPppYmMeltMaskBit0;
@@ -4367,11 +4367,11 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
     case 1:
     {
         int sent = m_pposWordIndex[threadParam->m_portIndex];
-        int totalWord = (int)(signed char)m_cmdBuffer[threadParam->m_portIndex];
+        unsigned int* wordPtr = &posWords[sent];
 
-        while (sent < totalWord)
+        while (sent < (int)(signed char)m_cmdBuffer[threadParam->m_portIndex])
         {
-            unsigned int word = posWords[sent];
+            unsigned int word = *wordPtr;
 
             if (static_cast<signed char>(m_threadRunningMask) != 0)
             {
@@ -4398,6 +4398,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
                 break;
             }
 
+            wordPtr++;
             sent++;
         }
 
@@ -4440,11 +4441,11 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
     case 3:
     {
         int sent = m_pposWordIndex[threadParam->m_portIndex];
-        int totalWord = (int)(unsigned char)m_cmdBuffer[4 + threadParam->m_portIndex];
+        unsigned int* wordPtr = &posWords[sent];
 
-        while (sent < totalWord)
+        while (sent < (int)(unsigned char)m_cmdBuffer[4 + threadParam->m_portIndex])
         {
-            unsigned int word = posWords[sent];
+            unsigned int word = *wordPtr;
 
             if (static_cast<signed char>(m_threadRunningMask) != 0)
             {
@@ -4471,6 +4472,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
                 break;
             }
 
+            wordPtr++;
             sent++;
         }
 
@@ -4513,11 +4515,11 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
     case 5:
     {
         int sent = m_pposWordIndex[threadParam->m_portIndex];
-        int totalWord = (int)(signed char)m_cmdBuffer[4 + threadParam->m_portIndex];
+        unsigned int* wordPtr = &posWords[sent];
 
-        while (sent < totalWord)
+        while (sent < (int)(signed char)m_cmdBuffer[4 + threadParam->m_portIndex])
         {
-            unsigned int word = posWords[sent];
+            unsigned int word = *wordPtr;
 
             if (static_cast<signed char>(m_threadRunningMask) != 0)
             {
@@ -4544,6 +4546,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
                 break;
             }
 
+            wordPtr++;
             sent++;
         }
 
@@ -4565,7 +4568,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
         {
             signed char cnt = (signed char)m_cmdBuffer[threadParam->m_portIndex];
 
-            System.Printf(const_cast<char*>(s_send_ppos_bad_state_fmt), threadParam->m_portIndex, (int)cnt);
+            System.Printf(s_pctd_Error_m_PposCnt_error_pctd_801DA32C, threadParam->m_portIndex, (int)cnt);
         }
 
         m_cmdBuffer[threadParam->m_portIndex] = 0;

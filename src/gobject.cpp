@@ -3105,6 +3105,7 @@ void CGObject::DrawDebug(CFont* font)
  */
 #pragma push
 #pragma optimization_level 1
+#pragma opt_common_subs on
 void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
 {
     m_worldPosition = *position;

@@ -2872,7 +2872,15 @@ void CGMonObj::setRepop(int mode)
 	unsigned char* monsterScript = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
 	unsigned short scriptFlags = *reinterpret_cast<unsigned short*>(monsterScript + 0xFE);
 
-	if ((scriptFlags & 0x80) == 0 && (scriptFlags & 0x20) == 0) {
+	if ((scriptFlags & 0x80) != 0 || (scriptFlags & 0x20) != 0) {
+		if (mode == 0) {
+			object->m_bgColMask |= 0x10002;
+		}
+		m_chaseState = 4;
+		m_chaseTimer = 0;
+		m_chaseDirty = 1;
+		enableDamageCol(0);
+	} else {
 		if ((scriptFlags & 0x40) != 0 || classId == 0x39) {
 			m_chaseState = 4;
 			m_chaseTimer = 0;
@@ -2893,14 +2901,6 @@ void CGMonObj::setRepop(int mode)
 			object->m_bgColMask |= 0x90002;
 			*reinterpret_cast<float*>(mon + 0x694) = 0.0f;
 		}
-	} else {
-		if (mode == 0) {
-			object->m_bgColMask |= 0x10002;
-		}
-		m_chaseState = 4;
-		m_chaseTimer = 0;
-		m_chaseDirty = 1;
-		enableDamageCol(0);
 	}
 
 	if (classId == 0x55) {

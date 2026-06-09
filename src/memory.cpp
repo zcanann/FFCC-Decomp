@@ -1137,13 +1137,12 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
             unsigned char nodeFlags = node->m_flags;
             int nodeGroup = node->m_defaultParam;
             if ((group == static_cast<unsigned long>(-1)) || (static_cast<unsigned long>(nodeGroup) == group)) {
-                bool isUsed = (nodeFlags & 4) != 0;
-                if ((isUsed && ((flag & 2) != 0)) || (!isUsed && ((flag & 1) != 0))) {
-                    const char* kind = isUsed ? sHeapWalkerUsed : sHeapWalkerFree;
-                    unsigned char level = isUsed ? node->m_level : 0;
-                    const char* source = isUsed ? node->m_source : sEmptyAllocSourceName;
-                    unsigned short line = isUsed ? node->m_line : 0;
-                    int index = isUsed ? usedCount : freeCount;
+                if ((((nodeFlags & 4) != 0) && ((flag & 2) != 0)) || (((nodeFlags & 4) == 0) && ((flag & 1) != 0))) {
+                    const char* kind = ((nodeFlags & 4) != 0) ? sHeapWalkerUsed : sHeapWalkerFree;
+                    unsigned char level = ((nodeFlags & 4) != 0) ? node->m_level : 0;
+                    const char* source = ((nodeFlags & 4) != 0) ? node->m_source : sEmptyAllocSourceName;
+                    unsigned short line = ((nodeFlags & 4) != 0) ? node->m_line : 0;
+                    int index = ((nodeFlags & 4) != 0) ? usedCount : freeCount;
                     System.Printf(
                         const_cast<char*>(strBase + 0x430), index, kind, level, node->m_size,
                         totalSize, payloadFromBlock(node), node->m_prev, node->m_next,

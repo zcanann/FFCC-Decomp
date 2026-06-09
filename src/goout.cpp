@@ -1296,8 +1296,9 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         {
         const int cardChannel = m_accessCardChannel;
         MenuPcs.m_mcCtrl.m_cardChannel = cardChannel;
+        const int saveIndex = m_accessSaveIndex;
         m_cardChannel = static_cast<char>(cardChannel);
-        m_saveIndex = static_cast<char>(m_accessSaveIndex);
+        m_saveIndex = static_cast<char>(saveIndex);
         MenuPcs.m_mcCtrl.m_cardChannel = cardChannel;
         }
         m_memCardResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(static_cast<unsigned char>(m_cardChannel));
@@ -1395,9 +1396,10 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         }
 
         {
+        const char saveIndex = static_cast<char>(m_accessSaveIndex);
         const int cardChannel = m_accessCardChannel;
         m_cardChannel = static_cast<char>(cardChannel);
-        m_saveIndex = static_cast<char>(m_accessSaveIndex);
+        m_saveIndex = saveIndex;
         MenuPcs.m_mcCtrl.m_cardChannel = cardChannel;
         }
         m_memCardBuffer = MenuPcs.m_goOutTransferSaveData;
@@ -1426,9 +1428,13 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         break;
     }
     case 0x13:
-        MenuPcs.m_mcCtrl.m_cardChannel = static_cast<unsigned char>(m_odekakeCardChannel);
-        m_cardChannel = m_odekakeCardChannel;
-        m_saveIndex = m_odekakeSaveIndex;
+    {
+        const char odekakeSaveIndex = m_odekakeSaveIndex;
+        const char odekakeCardChannel = m_odekakeCardChannel;
+        m_cardChannel = odekakeCardChannel;
+        m_saveIndex = odekakeSaveIndex;
+        MenuPcs.m_mcCtrl.m_cardChannel = static_cast<unsigned char>(odekakeCardChannel);
+    }
         m_memCardBuffer = MenuPcs.m_goOutTransferWork;
         m_memCardResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(static_cast<unsigned char>(m_cardChannel));
         if (m_memCardResult == 1) {
@@ -1715,7 +1721,7 @@ card_connected:;
         SetGoOutMode(0xE);
         break;
     case 0xE:
-        if (static_cast<unsigned char>(MenuPcs.m_goOutLoadFinished) != 0) {
+        if (static_cast<char>(MenuPcs.m_goOutLoadFinished) != 0) {
             if (MenuPcs.m_goOutLoadResult == 4) {
                 MenuGoOutState().m_resultSelect = 0;
                 MenuPcs.InitSaveLoadMenu();

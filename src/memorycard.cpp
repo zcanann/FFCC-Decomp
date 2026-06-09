@@ -1387,7 +1387,7 @@ void CMemoryCardMan::SetLoadData()
         } while (inventoryCount != 0);
         if (itemCount != *reinterpret_cast<u16*>(src + 0x28))
         {
-            if (static_cast<unsigned int>(System.m_execParam) >= 1)
+            if (static_cast<int>(System.m_execParam) >= 1)
             {
                 System.Printf(const_cast<char*>(sLoadDataItemCountError), c);
             }
@@ -1437,7 +1437,7 @@ void CMemoryCardMan::SetLoadData()
                 (*reinterpret_cast<u32*>(letterDst + 0x3EC) & 0xFFFC01FF);
             *reinterpret_cast<u16*>(letterDst + 0x3EE) =
                 (*reinterpret_cast<u16*>(letterSrc + 0x106) & 0x01FF) |
-                (*reinterpret_cast<u16*>(letterDst + 0x3EE) & 0xFE00);
+                (*reinterpret_cast<s16*>(letterDst + 0x3EE) & 0xFE00);
             memcpy(letterDst + 0x3F0, letterSrc + 0x108, 8);
             letterDst[0x3EC] = (letterSrc[0x104] & 0x80) | (letterDst[0x3EC] & 0x7F);
             letterDst[0x3EC] = (letterSrc[0x104] & 0x40) | (letterDst[0x3EC] & 0xBF);

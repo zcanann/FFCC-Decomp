@@ -1271,12 +1271,16 @@ tmpArtifactBlock:
 			secondaryAvailable = true;
 			primaryAvailable = true;
 			primaryCommand = -1;
-			if (carryState == 0x0D) {
+			switch (carryState) {
+			case 0x0D:
 				secondaryCommand = 7;
-			} else if (carryState == 0x0E) {
+				break;
+			case 0x0E:
 				secondaryCommand = 8;
-			} else {
+				break;
+			default:
 				secondaryCommand = 5;
+				break;
 			}
 		} else if (caravan->m_hp == 0) {
 			primaryAvailable = true;

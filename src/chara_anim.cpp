@@ -153,6 +153,8 @@ CChara::CAnim::~CAnim()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_dead_assignments off
 void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 {
 	CChunkFile chunkFile(data);
@@ -236,6 +238,7 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 		chunkFile.PopChunk();
 	}
 }
+#pragma pop
 
 /*
  * --INFO--

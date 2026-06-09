@@ -2353,7 +2353,7 @@ void JoyBus::ThreadInit()
         m_threadParams[i].m_portIndex = i;
         m_threadParams[i].m_gbaStatus = 1;
 
-        unsigned char* stackBase = m_sendBuffer[i] + sizeof(m_sendBuffer[0]);
+        unsigned char* stackBase = m_sendBuffer[i + 1];
 
         OSCreateThread(
             &m_threads[i],

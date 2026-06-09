@@ -1371,8 +1371,8 @@ tmpArtifactBlock:
 				}
 			}
 
-			party.pendingWeaponItem = cmdIdx;
-			party.weaponItem = caravan->m_equipment[0] < 0 ? 0 : caravan->m_inventoryItems[caravan->m_equipment[0]];
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D4) = cmdIdx;
+			party.weaponRef = caravan->m_equipment[0] < 0 ? 0 : caravan->m_inventoryItems[caravan->m_equipment[0]];
 			party.commandFlagBits.flag20 = 1;
 			changeStat(0x0F, 0, 0);
 			return;
@@ -1440,8 +1440,8 @@ tmpArtifactBlock:
 				changeStat(7, 0, 0);
 				return;
 			}
-			party.pendingWeaponItem = caravan->GetIdxCmdList();
-			party.weaponItem = itemId;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D4) = caravan->GetIdxCmdList();
+			party.weaponRef = itemId;
 			party.commandFlagBits.flag20 = 1;
 			changeStat(0x0F, 0, 0);
 			return;
@@ -2242,13 +2242,13 @@ void CGPartyObj::statCharge()
 							CVector dir(delta);
 							CVector scaled;
 							PSVECScale(reinterpret_cast<Vec*>(&dir), reinterpret_cast<Vec*>(&scaled), mag - static_cast<float>(maxReach));
-							CVector scaledCopy;
+							Vec scaledCopy;
 							scaledCopy.x = scaled.x;
 							scaledCopy.y = scaled.y;
 							scaledCopy.z = scaled.z;
 							CVector unit;
-							PSVECScale(reinterpret_cast<Vec*>(&scaledCopy), reinterpret_cast<Vec*>(&unit), kMonObjOne / mag);
-							CVector unitCopy;
+							PSVECScale(&scaledCopy, reinterpret_cast<Vec*>(&unit), kMonObjOne / mag);
+							Vec unitCopy;
 							unitCopy.x = unit.x;
 							unitCopy.y = unit.y;
 							unitCopy.z = unit.z;
@@ -2919,7 +2919,7 @@ void CGPartyObj::checkTargetParticle()
 	delta.x = deltaResult.x;
 	delta.y = deltaResult.y;
 	delta.z = deltaResult.z;
-	if (PSVECMag(&delta) > FLOAT_80331a78) {
+	if (FLOAT_80331a78 < PSVECMag(&delta)) {
 		m_rotationY = atan2(delta.x, delta.z);
 	}
 }
@@ -4978,11 +4978,11 @@ void CGPartyObj::ghostPartyMog()
 					goto messageMenu;
 				}
 			}
-			if (sGhostPartyWork.flagBits.flag10 < 0 || *reinterpret_cast<unsigned int*>(CGPartyObj::m_ghostWork + 0x3C) < 0x97) {
+			if (sGhostPartyWork.flagBits.flag10 >= 0 && static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x3C)) > 0x96) {
+				bossState = 8;
+			} else {
 				bossState = 0;
 				*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x20) = 0;
-			} else {
-				bossState = 8;
 			}
 		}
 	}

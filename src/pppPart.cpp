@@ -2513,7 +2513,7 @@ void pppSetDrawEnv(pppCVECTOR* pppColor, pppFMATRIX* pppMtx, float depth, unsign
 	if ((s_fog_mode != fogIndex) || (s_fog_blend_mode != fogParam)) {
 		s_fog_mode = fogIndex;
 		s_fog_blend_mode = fogParam;
-		Graphic.SetFog((int)fogIndex, fogParam != 0);
+		Graphic.SetFog((int)fogIndex, fogParam >= 1);
 	}
 
 	if (s_cull_mode != cullMode) {

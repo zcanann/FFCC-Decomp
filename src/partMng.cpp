@@ -3655,7 +3655,7 @@ int CPartMng::pppLoadPtx(const char* baseName, int pdtSlotIndex, int appendMode,
 
         CMaterial* defaultMaterial = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0xC17) CMaterial;
         defaultMaterial->Create(0, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0));
-        if (static_cast<unsigned int>(materialSet->m_materials.GetSize()) == 0U) {
+        if (static_cast<unsigned int>(m_materialSet->m_materials.GetSize()) == 0U) {
             materialSet->m_materials.Add(defaultMaterial);
         } else {
             materialSet->m_materials.SetAt(0, defaultMaterial);

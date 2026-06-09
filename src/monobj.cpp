@@ -3534,8 +3534,8 @@ body:
 					}
 					monObj->m_moveWork.m_target = target;
 					if (((monObj->m_moveWork.m_stateFlags & 1) != 0) ||
-						(static_cast<int>(*reinterpret_cast<unsigned short*>(script + 0x1BA)) <=
-						 monObj->m_moveWork.m_frame)) {
+						(monObj->m_moveWork.m_frame >=
+						 static_cast<int>(*reinterpret_cast<unsigned short*>(script + 0x1BA)))) {
 						actionState = 0;
 						memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
 						monObj->m_chaseState = 3;

@@ -2242,8 +2242,12 @@ void CGPartyObj::statCharge()
 							CVector dir(delta);
 							CVector scaled;
 							PSVECScale(reinterpret_cast<Vec*>(&dir), reinterpret_cast<Vec*>(&scaled), mag - static_cast<float>(maxReach));
+							CVector scaledCopy;
+							scaledCopy.x = scaled.x;
+							scaledCopy.y = scaled.y;
+							scaledCopy.z = scaled.z;
 							CVector unit;
-							PSVECScale(reinterpret_cast<Vec*>(&scaled), reinterpret_cast<Vec*>(&unit), kMonObjOne / mag);
+							PSVECScale(reinterpret_cast<Vec*>(&scaledCopy), reinterpret_cast<Vec*>(&unit), kMonObjOne / mag);
 							CVector origin(m_worldPosition);
 							CVector sum;
 							PSVECAdd(reinterpret_cast<Vec*>(&origin), reinterpret_cast<Vec*>(&unit), reinterpret_cast<Vec*>(&sum));

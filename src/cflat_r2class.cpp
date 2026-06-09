@@ -613,13 +613,13 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 					stack[-1].m_word = static_cast<unsigned int>(static_cast<int>(*value));
 					switch (setMode) {
 					case -1:
-						*value = static_cast<signed char>(*value - static_cast<signed char>(stack->m_word));
+						*value = static_cast<signed char>(*value - static_cast<int>(stack->m_word));
 						break;
 					case 0:
 						*value = static_cast<signed char>(stack->m_word);
 						break;
 					case 1:
-						*value = static_cast<signed char>(*value + static_cast<signed char>(stack->m_word));
+						*value = static_cast<signed char>(*value + static_cast<int>(stack->m_word));
 						break;
 					}
 					break;

@@ -2957,10 +2957,10 @@ void CGMonObj::setRepop(int mode)
 
 	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x1000);
 
-	short countC = (weaponMode == 0) ?
-		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AE) :
-		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AC);
-	int particleBase = (weaponMode == 0) ? 0x3C : 0x46;
+	short countC = (weaponMode != 0) ?
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AC) :
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AE);
+	int particleBase = (weaponMode != 0) ? 0x46 : 0x3C;
 
 	for (int i = 0; i < static_cast<int>(countC); i++) {
 		int dataNo = object->m_charaModelHandle->GetPdtSlot();

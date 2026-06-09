@@ -2668,7 +2668,7 @@ void CPartMng::pppEditPartDrawAfter()
 {
     static const int kPppMngCount = 0x180;
     static const int kEditDrawModeOffset = 0x23570;
-    static const int kHeapCheckIntervalOffset = 0x170;
+    static const int kHeapCheckIntervalOffset = 0x16C;
 
     if (ppvSysStopPartF == 0) {
         m_pppEnvSt.m_debugCounter = 0;

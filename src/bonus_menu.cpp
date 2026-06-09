@@ -1210,15 +1210,15 @@ void CMenuPcs::CalcSelectWait()
 				confirmSel = (short)(confirmSel ^ 1);
 				Sound.PlaySe(1, 0x40, 0x7f, 0);
 			} else {
-				if ((down & 0x100) == 0) {
+				if (!((down & 0x100) == 0)) {
+					promptMode = 2;
+					Sound.PlaySe(2, 0x40, 0x7f, 0);
+				} else {
 					if ((down & 0x200) != 0) {
 						promptMode = 2;
 						confirmSel = 1;
 						Sound.PlaySe(3, 0x40, 0x7f, 0);
 					}
-				} else {
-					promptMode = 2;
-					Sound.PlaySe(2, 0x40, 0x7f, 0);
 				}
 			}
 		} else if (promptMode == 2) {
@@ -1265,12 +1265,12 @@ void CMenuPcs::CalcSelectWait()
 				if ((down & 0x100) != 0) {
 					int bit = 1 << selection;
 					int unavailableMask = GetBonusUnavailableMask(statePtr, currentParty);
-					if ((unavailableMask & bit) == 0) {
+					if (!((unavailableMask & bit) == 0)) {
+						Sound.PlaySe(4, 0x40, 0x7f, 0);
+					} else {
 						*(unsigned char*)(statePtr + 8) = 1;
 						delay = 10;
 						Sound.PlaySe(0x4f, 0x40, 0x7f, 0);
-					} else {
-						Sound.PlaySe(4, 0x40, 0x7f, 0);
 					}
 				} else if ((down & 0x200) != 0) {
 					short winW = 0;
@@ -2927,7 +2927,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			sprite->y = (short)(0x28 + i * 0x60);
 			sprite->w = 0x60;
 			sprite->h = 0x58;
-			int texX = (partySlot & 1) ? (int)sprite->w : 0;
+			int texX =  (int)(long)((partySlot & 1) ? (int)sprite->w : 0);
 			sprite->mulX = (float)texX;
 			int texY = ((int)partySlot >> 1) ? (int)sprite->h : 0;
 			sprite->mulY = (float)texY;
@@ -3053,7 +3053,8 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		for (int i = 0; i < activePartyCount; i++) {
-			MenuBoardEntry& entry = boardEntries[activePartyCount + i];
+			int __p7 = activePartyCount;
+			MenuBoardEntry& entry = boardEntries[__p7 + i];
 			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + ((signed char)s_CntTop + i) * 0x40 + 8);
 			int extent = sprite->w * 3 + 0x20;
 			int centerX =  (int)(long)((int)((double)(float)((double)(sprite->w * 3) * 0.5 + (double)sprite->x) - 320.0));
@@ -3094,12 +3095,12 @@ void CMenuPcs::CalcResultOpenAnim()
 	for (int i = 0; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++) {
 		BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + i * 0x40 + 8);
 		if (sprite->startFrame <= frame) {
-			if (frame < sprite->startFrame + sprite->duration) {
-				sprite->timer++;
-				sprite->alpha = (float)((1.0 / (double)sprite->duration) * (double)sprite->timer);
-			} else {
+			if (!(frame < sprite->startFrame + sprite->duration)) {
 				doneCount++;
 				sprite->alpha = 1.0f;
+			} else {
+				sprite->timer++;
+				sprite->alpha = (float)((1.0 / (double)sprite->duration) * (double)sprite->timer);
 			}
 
 			if (sprite->kind == 0x17) {
@@ -3178,7 +3179,7 @@ void CMenuPcs::CalcResultOpenAnim()
 		handle->m_model->CalcMatrix();
 		handle->m_model->CalcSkin();
 		if (activePartyCount * 2 <= i) {
-			if (sprite->timer >= 0x18) {
+			if (!(!(sprite->timer >= 0x18))) {
 				sprite->alpha = (float)(1.0 - (double)((float)(sprite->timer - 0x18) /
 				                 (float)(sprite->duration - 0x18)));
 				if ((double)sprite->alpha < 0.0) {

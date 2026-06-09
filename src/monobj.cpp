@@ -3363,7 +3363,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 
 			if ((targetDist < maxDist) && (minDist < targetDist)) {
 
-			bool forceAction = false;
+			int forceAction = 0;
 			CGPartyObj* party = Game.m_partyObjArr[partyIndex];
 			int partyState = reinterpret_cast<CGPrgObj*>(party)->m_lastStateId;
 			if (((partyState == 1) || (partyState == 7)) &&
@@ -3376,7 +3376,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 					(monObj->m_forcedAction != actionIndex)) {
 					goto skipForce;
 				}
-				forceAction = true;
+				forceAction = 1;
 			}
 		skipForce:
 

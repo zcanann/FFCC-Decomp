@@ -590,11 +590,11 @@ CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int mode
         unsigned int alignedSize = static_cast<unsigned int>(size);
         CMode& modeData = m_modes[mode];
         CStage* stage = modeData.m_freeList.m_next;
-        CStage* list = &modeData.m_activeList;
 
         if (stage == &modeData.m_freeList) {
             System.Printf(const_cast<char*>(strBase + 0x6d4));
         } else {
+            CStage* list = &modeData.m_activeList;
             do {
                 CStage* next = list->m_next;
                 if (static_cast<unsigned int>(list->m_heapBottom) + alignedSize <=

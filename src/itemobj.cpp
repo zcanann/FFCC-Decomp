@@ -1152,6 +1152,8 @@ void CGItemObj::onFrameStat()
 			int* soundData = *(int**)(*(int*)(*reinterpret_cast<int*>(CGMonObj::m_boss) + 0xF8) + 0x178);
 			if (soundData != 0) {
 				pdtNo = soundData[5];
+			} else {
+				pdtNo = -1;
 			}
 
 			float particleScale =
@@ -1189,6 +1191,8 @@ void CGItemObj::onFrameStat()
 			int* soundData = *(int**)(*(int*)(*reinterpret_cast<int*>(CGMonObj::m_boss) + 0xF8) + 0x178);
 			if (soundData != 0) {
 				pdtNo = soundData[5];
+			} else {
+				pdtNo = -1;
 			}
 
 			float particleScale =

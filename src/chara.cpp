@@ -1603,9 +1603,10 @@ void CChara::CModel::calcMatrix()
 				runtimeScale[2] = srt.m_scale.z;
 			} else {
 				float* runtimeScale = NodeRuntimeScale(node);
-				runtimeScale[2] = FLOAT_803301b0;
-				runtimeScale[1] = FLOAT_803301b0;
-				runtimeScale[0] = FLOAT_803301b0;
+				float zero = FLOAT_803301b0;
+				runtimeScale[2] = zero;
+				runtimeScale[1] = zero;
+				runtimeScale[0] = zero;
 			}
 		} else {
 			if (NodeRuntimeFlag80(node)) {
@@ -1692,7 +1693,7 @@ void CChara::CModel::calcMatrix()
 		}
 	}
 
-	ModelFlags10C(this) &= 0x7F;
+	this->m_flags10CBits.m_flag10C_80 = 0;
 }
 
 #pragma push

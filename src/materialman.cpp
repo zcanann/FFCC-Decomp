@@ -3322,31 +3322,31 @@ void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
             } else {
                 for (int i = 0; i < material->m_textureCount; i++) {
                     ReleaseRef(material->m_textureData.m_textures[i]);
-                    material->m_textureData.m_textures[i] = 0;
 
-                    if (textureSet != 0) {
-                        unsigned long textureIndex = static_cast<unsigned long>(material->m_textureIndices[i]);
-                        if ((static_cast<long>(textureIndex) >= 0) &&
-                            (textureIndex < static_cast<unsigned long>(textureSet->GetNumTexture()))) {
-                            material->m_textureData.m_textures[i] =
-                                textureSet->GetTexture(textureIndex);
-                            if (material->m_textureData.m_textures[i] != 0) {
-                                bool isIntensity = true;
-                                material->m_textureData.m_textures[i]->AddRef();
-                                unsigned int format = material->m_textureData.m_textures[i]->m_format;
-                                if ((format != 9) && (format != 8)) {
-                                    isIntensity = false;
-                                }
-                                if (isIntensity) {
-                                    material->m_tevBit |= 0x200;
-                                } else if (format == 1) {
-                                    material->m_tevBit |= 0x400;
-                                }
-                                if (static_cast<int>(material->m_textureData.m_textures[i]->m_isAlphaLut) != 0) {
-                                    material->m_tevBit |= 0x800;
-                                }
+                    unsigned long textureIndex = static_cast<unsigned long>(material->m_textureIndices[i]);
+                    if ((textureSet != 0) &&
+                        (static_cast<long>(textureIndex) >= 0) &&
+                        (textureIndex < static_cast<unsigned long>(textureSet->GetNumTexture()))) {
+                        material->m_textureData.m_textures[i] =
+                            textureSet->GetTexture(textureIndex);
+                        if (material->m_textureData.m_textures[i] != 0) {
+                            bool isIntensity = true;
+                            material->m_textureData.m_textures[i]->AddRef();
+                            unsigned int format = material->m_textureData.m_textures[i]->m_format;
+                            if ((format != 9) && (format != 8)) {
+                                isIntensity = false;
+                            }
+                            if (isIntensity) {
+                                material->m_tevBit |= 0x200;
+                            } else if (format == 1) {
+                                material->m_tevBit |= 0x400;
+                            }
+                            if (static_cast<int>(material->m_textureData.m_textures[i]->m_isAlphaLut) != 0) {
+                                material->m_tevBit |= 0x800;
                             }
                         }
+                    } else {
+                        material->m_textureData.m_textures[i] = 0;
                     }
                 }
 

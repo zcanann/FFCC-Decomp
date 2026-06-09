@@ -1423,9 +1423,10 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 	calcRegist(static_cast<int>(staType), resolvedItemId, resistType, allowEffect, effectResult, 0);
 
 	if (resistType == 3) {
-		if (CharaObjIsElementalStatus(staType)) {
+		if (staType == 4 || staType == 0x1C || staType < 3 ||
+		    static_cast<unsigned int>(staType - 8) <= 2 || staType == 6 || staType == 3) {
 			putParticle(0x201, 0, hitPos, FLOAT_803319A8 * (FLOAT_803319AC * m_attackColRadius), 0x65);
-		} else if (CharaObjIsBreakStatus(staType)) {
+		} else if (static_cast<unsigned int>(staType - 0x24) <= 1 || staType == 0x69 || staType == 0x6A) {
 			putParticle(0x200, 0, hitPos, FLOAT_803319A8 * (FLOAT_803319AC * m_attackColRadius), 0x1D);
 		}
 	} else if ((resistType > 1 || (resistType == 1 &&
@@ -3548,7 +3549,10 @@ void CGCharaObj::combi2()
 			}
 		} else {
 			CharaObjComboCenter(party) = comboCenter;
-			if (playedComboSe || CharaObjSkipComboScript(party)) {
+			if (playedComboSe || party == 0 ||
+			    (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
+			     (static_cast<unsigned short>(party->GetCID()) & 0x6D) == 0x6D &&
+			     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party->m_scriptHandle) + 0x3B4) != 0)) {
 				CharaObjComboItemId(party) = 0;
 			} else {
 				CharaObjComboItemId(party) = comboCmd;
@@ -3566,16 +3570,14 @@ void CGCharaObj::combi2()
 		CharaObjComboScriptMode(party) = comboMode;
 		CharaObjComboLinkCount(party) = 0;
 
-		int linkCount = 0;
 		CGPrgObj** comboLinks = CharaObjComboLinks(party);
 		for (unsigned int j = 0; j < participantCount; j++) {
 			CGPartyObj* other = candidates[j];
 			if (party == other) {
 				continue;
 			}
-			comboLinks[linkCount++] = other;
+			comboLinks[CharaObjComboLinkCount(party)++] = other;
 		}
-		CharaObjComboLinkCount(party) = linkCount;
 	}
 #undef comboCmd
 
@@ -3702,7 +3704,7 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 						if (itemMatch) {
 							int closeOk;
 							if (partyList[0] == reinterpret_cast<CGPartyObj*>(partyObj) ||
-								reinterpret_cast<CGCharaObj*>(partyList[0])->m_comboFrame <= static_cast<int>(slotCursor[2])) {
+								static_cast<int>(slotCursor[2]) >= reinterpret_cast<CGCharaObj*>(partyList[0])->m_comboFrame) {
 								closeOk = 1;
 							} else {
 								closeOk = 0;
@@ -3740,7 +3742,7 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 			int diff = reinterpret_cast<CGCharaObj*>(partyList[0])->m_comboFrame - partyObj->m_comboFrame;
 			int windowOk;
 			if (partyList[0] == reinterpret_cast<CGPartyObj*>(partyObj) ||
-				(static_cast<int>(slotCursor[1]) <= diff && diff <= static_cast<int>(slotCursor[2]))) {
+				(static_cast<int>(slotCursor[1]) <= diff && static_cast<int>(slotCursor[2]) >= diff)) {
 				windowOk = 1;
 			} else {
 				windowOk = 0;

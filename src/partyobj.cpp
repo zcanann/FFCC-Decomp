@@ -2799,7 +2799,7 @@ void CGPartyObj::checkTargetParticle()
 		fromCenter.x = fromCenterResult.x;
 		fromCenter.y = fromCenterResult.y;
 		fromCenter.z = fromCenterResult.z;
-		if (maxRange < dist) {
+		if (dist > maxRange) {
 			Vec scaled;
 			PSVECScale(&fromCenter, &scaled, maxRange / dist);
 			PSVECAdd(&m_worldPosition, &scaled, targetPos);

@@ -4975,11 +4975,7 @@ messageMenu:
 	    bossState != 0 &&
 	    bossState != *reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x20)) {
 #define mesMenu (*reinterpret_cast<CMesMenu**>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0x120))
-		bool busy = false;
-		if (mesMenu->IsActiveMessage()) {
-			busy = true;
-		}
-		if (!busy) {
+		if (!mesMenu->IsActiveMessage()) {
 			*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x20) = bossState;
 			mesMenu->Open(Game.m_cFlatDataArr[1].Message(bossState - 1), 0x260, 0x20, 0x8E20, 0, 0x65, 0x8B);
 		}

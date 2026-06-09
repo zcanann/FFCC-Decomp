@@ -3363,9 +3363,9 @@ void CPartMng::pppPartDead()
 {
     Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0xb3d);
 
-    char* base = reinterpret_cast<char*>(this);
+#define base (reinterpret_cast<char*>(this))
     for (int i = 0; i < 0x180; i++) {
-        _pppMngSt* pppMngSt = reinterpret_cast<_pppMngSt*>(base + 0x2A18);
+        _pppMngSt* pppMngSt = reinterpret_cast<_pppMngSt*>(base + i * 0x158 + 0x2A18);
         int baseTime = pppMngSt->m_baseTime;
         if (baseTime != -0x1000 && baseTime < 0) {
             unsigned char isFinished = *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0xE6);
@@ -3375,8 +3375,8 @@ void CPartMng::pppPartDead()
                 _pppAllFreePObject(pppMngSt);
             }
         }
-        base += 0x158;
     }
+#undef base
 
     Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0xb5d);
 }

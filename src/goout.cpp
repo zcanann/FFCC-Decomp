@@ -1293,10 +1293,14 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         m_pendingMessageTimer = 0;
         MenuPcs.GetMcAccessPos(&m_accessCardChannel, &m_accessSaveIndex);
         m_accessCardChannel = 0;
-        MenuPcs.m_mcCtrl.m_cardChannel = m_accessCardChannel;
-        m_cardChannel = static_cast<char>(MenuPcs.m_mcCtrl.m_cardChannel);
+        {
+        const int cardChannel = m_accessCardChannel;
+        MenuPcs.m_mcCtrl.m_cardChannel = cardChannel;
+        m_cardChannel = static_cast<char>(cardChannel);
         m_saveIndex = static_cast<char>(m_accessSaveIndex);
-        m_memCardResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(m_cardChannel);
+        MenuPcs.m_mcCtrl.m_cardChannel = cardChannel;
+        }
+        m_memCardResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(static_cast<unsigned char>(m_cardChannel));
         if (m_memCardResult == 1) {
             const unsigned char savedSaveIndex = static_cast<unsigned char>(m_saveIndex);
             const unsigned char savedCardChannel = static_cast<unsigned char>(m_cardChannel);
@@ -1390,9 +1394,12 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
             MemoryCardMan.Odekake(0, *static_cast<Mc::SaveDat*>(MenuPcs.m_goOutTransferWork), m_selectedTransferChara, *MenuPcs.m_goOutTransferSaveData, freeCaravanIdx);
         }
 
-        MenuPcs.m_mcCtrl.m_cardChannel = m_accessCardChannel;
-        m_cardChannel = static_cast<char>(MenuPcs.m_mcCtrl.m_cardChannel);
+        {
+        const int cardChannel = m_accessCardChannel;
+        m_cardChannel = static_cast<char>(cardChannel);
         m_saveIndex = static_cast<char>(m_accessSaveIndex);
+        MenuPcs.m_mcCtrl.m_cardChannel = cardChannel;
+        }
         m_memCardBuffer = MenuPcs.m_goOutTransferSaveData;
         m_memCardResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(static_cast<unsigned char>(m_cardChannel));
         if (m_memCardResult == 1) {
@@ -1990,8 +1997,14 @@ card_connected:;
     case 0x14:
         if (m_messageWindowOpen != 0) {
             input = GetGoOutInputMask();
+            bool pressed;
             if ((input & 0x100) != 0) {
                 Sound.PlaySe(2, 0x40, 0x7f, 0);
+                pressed = true;
+            } else {
+                pressed = false;
+            }
+            if (pressed) {
                 MenuPcs.SetCaravanWork(MenuPcs.m_goOutTransferSaveData);
                 MenuPcs.ChgAllModel();
                 SetGoOutMode(1);
@@ -2055,7 +2068,7 @@ card_connected:;
         m_cursorListY1 = 0xde;
         m_cursorMode = 0;
         {
-            signed char next;
+            unsigned char next;
 
             if (MenuPcs.m_menuWindowInfo->state == 1) {
                 input = GetGoOutInputMask();
@@ -2071,7 +2084,7 @@ card_connected:;
                             Sound.PlaySe(3, 0x40, 0x7f, 0);
                         }
 
-                        next = static_cast<signed char>(m_cursorChoice + 1);
+                        next = static_cast<unsigned char>(m_cursorChoice + 1);
                         goto do_switch_go4;
                     }
                 }
@@ -2105,9 +2118,17 @@ card_connected:;
         }
 
         input = GetGoOutInputMask();
-        if ((input & 0x100) != 0) {
-            Sound.PlaySe(2, 0x40, 0x7f, 0);
-            SetMainMode(1);
+        {
+            bool pressed;
+            if ((input & 0x100) != 0) {
+                Sound.PlaySe(2, 0x40, 0x7f, 0);
+                pressed = true;
+            } else {
+                pressed = false;
+            }
+            if (pressed) {
+                SetMainMode(1);
+            }
         }
         break;
     default:
@@ -2136,15 +2157,17 @@ card_connected:;
             MemoryCardMan.m_currentSlot = static_cast<char>(0xff);
         }
 
+        int result;
         if (formatResult == 0) {
-            m_memCardResult = 0;
+            result = 0;
         } else if (formatResult == 1) {
-            m_memCardResult = 1;
+            result = 1;
         } else if (formatResult == -2) {
-            m_memCardResult = -5;
+            result = -5;
         } else {
-            m_memCardResult = -999;
+            result = -999;
         }
+        m_memCardResult = result;
 
         if (m_memCardResult != 0) {
             m_lastMemCardProc = m_memCardProc;
@@ -2881,8 +2904,8 @@ void CGoOutMenu::Calc()
     }
 
     if (m_messageState != 0 && MenuPcs.m_menuWindowInfo->state == 3) {
-        short x;
         short y;
+        short x;
 
         m_currentMessage = m_pendingMessage;
         if (m_pendingMessage != -1) {

@@ -3086,7 +3086,7 @@ void CGPartyObj::onStatMagic()
 				m_comboFrame++;
 			}
 		} else {
-			unsigned short trig = getPadTrigForSlot(static_cast<unsigned char>(m_animStateMisc));
+			unsigned short trig = getPadHeldForSlot(static_cast<unsigned char>(m_animStateMisc));
 			if ((trig & 0x200) != 0 && magicReady == 0) {
 				changeStat(0, 0, 0);
 			}

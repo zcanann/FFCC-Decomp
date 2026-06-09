@@ -1964,7 +1964,7 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 		direction.z = tmp.z;
 	}
 	for (int axis = 0; axis < 2; axis++, dynParam++) {
-		if (dynParam[3] != 0.0f) {
+		if (*reinterpret_cast<int*>(&dynParam[3]) != 0) {
 			float angle;
 			if (axis == 0) {
 				float dotForward = PSVECDotProduct(&forward, &direction);

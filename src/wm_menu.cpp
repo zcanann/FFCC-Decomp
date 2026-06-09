@@ -11351,7 +11351,8 @@ LAB_draw:
 	}
 	if (worldState->m_subState == 0x11) {
 		unsigned short mode = worldState->m_menuMode;
-		if (mode == 5) {
+		int __p1 = mode;
+		if (__p1 == 5) {
 			CColor color(0xFF, 0xFF, 0xFF, 0xFF);
 			char* text = const_cast<char*>(GetMcStr(2));
 			const int x = static_cast<int>(CalcCenteringPos2(const_cast<char*>(GetMcStr(2)), FLOAT_80331594, FLOAT_803313e8));

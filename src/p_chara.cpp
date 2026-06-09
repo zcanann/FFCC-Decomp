@@ -1614,7 +1614,7 @@ void CCharaPcs::LoadCam(int index, char* fileName)
     char path[0x104];
     CChunkFile::CChunk chunk;
 
-    CCameraFrame*& cameraBuffer = m_cameraData[index];
+#define cameraBuffer m_cameraData[index]
 
     if (cameraBuffer != 0) {
         delete[] cameraBuffer;
@@ -1657,6 +1657,7 @@ void CCharaPcs::LoadCam(int index, char* fileName)
     }
 
     File.Close(fileHandle);
+#undef cameraBuffer
 }
 
 /*

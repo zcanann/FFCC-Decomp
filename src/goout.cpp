@@ -2068,7 +2068,7 @@ card_connected:;
         m_cursorListY1 = 0xde;
         m_cursorMode = 0;
         {
-            signed char next;
+            unsigned char next;
 
             if (MenuPcs.m_menuWindowInfo->state == 1) {
                 input = GetGoOutInputMask();
@@ -2084,7 +2084,7 @@ card_connected:;
                             Sound.PlaySe(3, 0x40, 0x7f, 0);
                         }
 
-                        next = static_cast<signed char>(m_cursorChoice + 1);
+                        next = static_cast<unsigned char>(m_cursorChoice + 1);
                         goto do_switch_go4;
                     }
                 }

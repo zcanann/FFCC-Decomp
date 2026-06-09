@@ -1885,13 +1885,13 @@ void CCaravanWork::CalcStatus()
 	m_numCmdListSlots += cmdBonus;
 	m_maxHp += hpBonus;
 
-	unsigned short cappedValue = 8;
+	short cmdSlotCap = 8;
 	if ((short)m_numCmdListSlots < 8) {
-		cappedValue = m_numCmdListSlots;
+		cmdSlotCap = m_numCmdListSlots;
 	}
-	m_numCmdListSlots = cappedValue;
+	m_numCmdListSlots = cmdSlotCap;
 
-	cappedValue = 0x10;
+	unsigned short cappedValue = 0x10;
 	if (m_maxHp < 0x10) {
 		cappedValue = m_maxHp;
 	}

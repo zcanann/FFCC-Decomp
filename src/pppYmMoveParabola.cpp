@@ -25,6 +25,11 @@ extern const float gPppYmMoveParabolaGravityScale = 0.5f;
 STATIC_ASSERT(sizeof(YmMoveParabolaDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(YmMoveParabolaDataOffsets, m_workOffset) == 0x0);
 
+static inline float LoadFloat(const float& value)
+{
+    return value;
+}
+
 static inline YmMoveParabolaDataOffsets* GetYmMoveParabolaDataOffsets(_pppCtrlTable* ctrl)
 {
     return reinterpret_cast<YmMoveParabolaDataOffsets*>(ctrl->m_serializedDataOffsets);
@@ -125,7 +130,7 @@ extern "C" void pppFrameYmMoveParabola(pppYmMoveParabola* basePtr, pppYmMovePara
  */
 extern "C" void pppConstructYmMoveParabola(pppYmMoveParabola* basePtr, _pppCtrlTable* dataPtr)
 {
-    const f32 zero = gPppYmMoveParabolaZero;
+    const f32 zero = LoadFloat(gPppYmMoveParabolaZero);
     _pppMngSt* pppMngSt = ppvMng;
     pppYmMoveParabolaWork* work = ParabolaWork(basePtr, dataPtr);
 
@@ -145,6 +150,6 @@ extern "C" void pppConstructYmMoveParabola(pppYmMoveParabola* basePtr, _pppCtrlT
 
         pppAddVector(work->m_basePosition, work->m_basePosition, matrixOffset);
         pppCopyVector(pppMngSt->m_paramVec0, work->m_basePosition);
-        pppMngSt->m_paramVec0.x = pppMngSt->m_paramVec0.x + gPppYmMoveParabolaYOffsetStep;
+        pppMngSt->m_paramVec0.x = pppMngSt->m_paramVec0.x + LoadFloat(gPppYmMoveParabolaYOffsetStep);
     }
 }

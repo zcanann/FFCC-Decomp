@@ -129,28 +129,6 @@ static inline double MegaBirthHalfDouble()
     return kPppRyjMegaBirthModelHalfF64;
 }
 
-static inline int clamp_u8_int(int value)
-{
-    if (value < 0) {
-        return 0;
-    }
-    if (value > 0xFF) {
-        return 0xFF;
-    }
-    return value;
-}
-
-static inline int clamp_alpha_7f(int value)
-{
-    if (value < 0) {
-        return 0;
-    }
-    if (value > 0x7F) {
-        return 0x7F;
-    }
-    return value;
-}
-
 static inline float calc_spawn_speed(PRyjMegaBirthModel* params, u8 speedMode)
 {
     switch (speedMode) {

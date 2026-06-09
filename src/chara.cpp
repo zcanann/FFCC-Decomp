@@ -1264,8 +1264,9 @@ CChara::CModel* CChara::CModel::Duplicate(CMemory::CStage* stage)
 
 	clone->m_nodes = new (stage, const_cast<char*>(s_chara_cpp), 0x263) CChara::CNode[ModelNodeCount(this)];
 	{
+		u32 i = 0;
 		u32 byteOff = 0;
-		for (u32 i = 0; i < ModelNodeCount(this); i++, byteOff += 0xc0) {
+		for (; i < ModelNodeCount(this); byteOff += 0xc0, i++) {
 			CChara::CNode* src = reinterpret_cast<CChara::CNode*>(reinterpret_cast<u8*>(ModelNodes(this)) + byteOff);
 			CChara::CNode* dst = reinterpret_cast<CChara::CNode*>(reinterpret_cast<u8*>(clone->m_nodes) + byteOff);
 			dst->m_refData = src->m_refData;

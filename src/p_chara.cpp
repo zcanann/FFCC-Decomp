@@ -2291,31 +2291,31 @@ foundTexture:
         strcat(path, s_charaTextureSuffix);
 
         CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
-        if (fileHandle == 0) {
+        if (fileHandle != 0) {
+            File.Read(fileHandle);
+            File.SyncCompleted(fileHandle);
+
+            void* readBuffer = File.m_readBuffer;
+            loadTexture = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x609) CLoadTexture;
+            loadTexture->m_keyTag = reinterpret_cast<void*>(charaKind);
+            loadTexture->m_keyId = static_cast<int>(charaNo);
+            loadTexture->m_variantTag = reinterpret_cast<void*>(textureVariant);
+            loadTexture->m_mergeFileId = mergeFileId;
+            loadTexture->m_mergeFlags = mergeFlags;
+            LoadTextureArray(&CharaPcs)->Add(loadTexture);
+
+            CTextureSet* textureSet = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
+            textureSet->Create(readBuffer, HandleTextureStage(charaKind), 0, 0, 0, 0);
+            loadTexture->m_textureSet = textureSet;
+
+            File.Close(fileHandle);
+        } else {
             m_textureSet = 0;
             if (charaKind != 5 && static_cast<unsigned int>(System.m_execParam) >= 2) {
                 System.Printf(const_cast<char*>(s_charaTexMissingFmt), path);
             }
             goto attach;
         }
-
-        File.Read(fileHandle);
-        File.SyncCompleted(fileHandle);
-
-        void* readBuffer = File.m_readBuffer;
-        loadTexture = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x609) CLoadTexture;
-        loadTexture->m_keyTag = reinterpret_cast<void*>(charaKind);
-        loadTexture->m_keyId = static_cast<int>(charaNo);
-        loadTexture->m_variantTag = reinterpret_cast<void*>(textureVariant);
-        loadTexture->m_mergeFileId = mergeFileId;
-        loadTexture->m_mergeFlags = mergeFlags;
-        LoadTextureArray(&CharaPcs)->Add(loadTexture);
-
-        CTextureSet* textureSet = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
-        textureSet->Create(readBuffer, HandleTextureStage(charaKind), 0, 0, 0, 0);
-        loadTexture->m_textureSet = textureSet;
-
-        File.Close(fileHandle);
     }
 
     m_texLoadRef = loadTexture;

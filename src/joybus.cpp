@@ -682,9 +682,9 @@ loop_body:
             }
         }
 
-        if (m_threadInitFlag != 0)
+        if (static_cast<signed char>(m_threadInitFlag) != 0)
         {
-            m_threadRunningMask = (unsigned char)(m_threadRunningMask & ~(unsigned char)(1 << threadParam->m_portIndex));
+            m_threadRunningMask = (unsigned char)(m_threadRunningMask & ~(1 << threadParam->m_portIndex));
             m_stageFlags[threadParam->m_portIndex] = 0;
             OSExitThread(&gJoyBusThreadExitValue);
         }

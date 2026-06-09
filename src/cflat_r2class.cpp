@@ -438,11 +438,11 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 						int newValue = oldValue;
 
 						switch (setMode) {
-						case 0:
-							newValue = stack->m_word;
-							break;
 						case -1:
 							newValue -= stack->m_word;
+							break;
+						case 0:
+							newValue = stack->m_word;
 							break;
 						case 1:
 							newValue += stack->m_word;

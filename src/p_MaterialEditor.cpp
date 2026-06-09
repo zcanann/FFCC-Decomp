@@ -203,9 +203,9 @@ void CMaterialEditorPcs::drawViewer()
                     }
 
                     u16 blendMode = polygon->blendMode;
-                    int blend = 1;
                     int srcFactor = 1;
                     int dstFactor = 1;
+                    int blend = 1;
                     int src = blendMode & 3;
                     int dst = (blendMode >> 2) & 3;
 
@@ -237,6 +237,7 @@ void CMaterialEditorPcs::drawViewer()
                 }
 
                 int flags = polygon->flags & 0xf;
+                int vertexCount = 3;
                 switch (polygon->textureMarker) {
                 case 'H':
                 if (static_cast<s16>(m_loadedTextureCount) > polygon->textureIndex) {
@@ -277,17 +278,22 @@ void CMaterialEditorPcs::drawViewer()
                         pp->texCoord[3][0] = scaleU * static_cast<float>(S16ToDouble(u));
                     }
 
-                    if (polygon->v0 < 0) {
-                        polygon->v0 = -polygon->v0;
+                    int v;
+                    v = polygon->v0;
+                    if (v < 0) {
+                        polygon->v0 = v * -1;
                     }
-                    if (polygon->v1 < 0) {
-                        polygon->v1 = -polygon->v1;
+                    v = polygon->v1;
+                    if (v < 0) {
+                        polygon->v1 = v * -1;
                     }
-                    if (polygon->v2 < 0) {
-                        polygon->v2 = -polygon->v2;
+                    v = polygon->v2;
+                    if (v < 0) {
+                        polygon->v2 = v * -1;
                     }
-                    if (polygon->v3 < 0) {
-                        polygon->v3 = -polygon->v3;
+                    v = polygon->v3;
+                    if (v < 0) {
+                        polygon->v3 = v * -1;
                     }
 
                     pp = polygon;
@@ -365,7 +371,6 @@ void CMaterialEditorPcs::drawViewer()
                 GXSetArray(GX_VA_TEX0, polygon->texCoord, 8);
 
                 u32 vertexIndex[8];
-                unsigned int vertexCount = 3;
                 vertexIndex[4] = polygon->index0;
                 vertexIndex[5] = polygon->index1;
                 vertexIndex[6] = polygon->index2;
@@ -385,13 +390,17 @@ void CMaterialEditorPcs::drawViewer()
                     vertexIndex[3] = 2;
                 }
 
-                u8 i = 0;
+                s8 i = 0;
                 while (i < vertexCount) {
-                    GXWGFifo.u16 = static_cast<u16>((&vertexIndex[4])[i]);
-                    GXWGFifo.u16 = static_cast<u16>((&vertexIndex[4])[i]);
-                    GXWGFifo.u8 = static_cast<u8>(vertexIndex[i]);
-                    GXWGFifo.u16 = static_cast<u16>(vertexIndex[i]);
+                    u32* posIndex = &vertexIndex[4];
+                    u32* clrIndex = &vertexIndex[0];
+                    u32 pos = posIndex[i];
+                    u32 clr = clrIndex[i];
                     i++;
+                    GXWGFifo.u16 = static_cast<u16>(pos);
+                    GXWGFifo.u16 = static_cast<u16>(pos);
+                    GXWGFifo.u8 = static_cast<u8>(clr);
+                    GXWGFifo.u16 = static_cast<u16>(clr);
                 }
 #undef polygon
             }

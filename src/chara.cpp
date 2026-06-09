@@ -1572,7 +1572,7 @@ void CChara::CModel::calcMatrix()
 			if (NodeAnimNode0(node) != 0) {
 				Mtx animMtx;
 				NodeAnimNode0(node)->Interp(m_anim, reinterpret_cast<SRT*>(&srt), frame);
-				u16 nodeIndex = ref->m_index;
+				s16 nodeIndex = ref->m_index;
 				if (nodeIndex == ModelHeadIndex(this) || nodeIndex == ModelChest3Index(this) ||
 				    nodeIndex == ModelChest2Index(this)) {
 					float tiltScale;
@@ -1611,7 +1611,7 @@ void CChara::CModel::calcMatrix()
 			}
 		}
 
-		u16 blendCur = ModelBlendCur(this);
+		s16 blendCur = ModelBlendCur(this);
 		if (blendCur != 0) {
 			u16 blendMax = ModelBlendMax(this);
 			float alpha = FLOAT_803301BC - (static_cast<float>(blendCur) * (FLOAT_803301BC / static_cast<float>(blendMax)));
@@ -1687,6 +1687,8 @@ void CChara::CModel::calcMatrix()
 	ModelFlags10C(this) &= 0x7F;
 }
 
+#pragma push
+#pragma opt_common_subs off
 /*
  * --INFO--
  * PAL Address: 0x800716c4
@@ -1826,7 +1828,10 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 
 	PSMTXConcat(reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(this) + 0x08), out, out);
 }
+#pragma pop
 
+#pragma push
+#pragma opt_common_subs off
 /*
  * --INFO--
  * PAL Address: 0x80071078
@@ -2028,6 +2033,7 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 		PSVECAdd(&origin, &dynOffset, &NodeDynPosition(node));
 	}
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -2919,6 +2925,8 @@ void CChara::CMesh::Duplicate(CChara::CMesh* src, CMemory::CStage* stage)
 	CopyDuplicatedMeshState(this, src);
 }
 
+#pragma push
+#pragma scheduling off
 /*
  * --INFO--
  * PAL Address: 0x8006efe8
@@ -3180,6 +3188,7 @@ void CChara::CMesh::skin(int meshIndex, int start, int count, CChara::CSkin* ski
 	_end:
 	}
 }
+#pragma pop
 
 /*
  * --INFO--

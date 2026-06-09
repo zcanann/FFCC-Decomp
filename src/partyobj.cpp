@@ -844,7 +844,7 @@ void CGPartyObj::menu()
 	}
 
 	if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-		System.Printf(const_cast<char*>("port:%d mode:%d"), portIndex, Joybus.GetCtrlMode(static_cast<char>(m_animStateMisc)));
+		System.Printf(const_cast<char*>("port:%d mode:%d"), portIndex, Joybus.GetCtrlMode(static_cast<signed char>(m_animStateMisc)));
 	}
 
 	Joybus.ChgCtrlMode(reinterpret_cast<int>(portIndex));

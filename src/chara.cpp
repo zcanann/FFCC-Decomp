@@ -1737,15 +1737,11 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 				           FLOAT_803301BC / parentScaleSrt.m_scale.y,
 				           FLOAT_803301BC / parentScaleSrt.m_scale.z);
 			} else {
-				if (parentNode == 0) {
-					float baseScale = ModelBaseScale(this);
-					if (FLOAT_803301BC == baseScale) {
-						PSMTXIdentity(localMtx);
-					} else {
-						PSMTXScale(localMtx, baseScale, baseScale, baseScale);
-					}
-				} else {
+				if (parentNode != 0 || FLOAT_803301BC == ModelBaseScale(this)) {
 					PSMTXIdentity(localMtx);
+				} else {
+					float baseScale = ModelBaseScale(this);
+					PSMTXScale(localMtx, baseScale, baseScale, baseScale);
 				}
 			}
 
@@ -1998,7 +1994,7 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 
 	reinterpret_cast<CVector&>(direction).Normalize();
 	float align = PSVECDotProduct(&forward, &direction);
-	if (align <= FLOAT_803301D8) {
+	if (!(FLOAT_803301D8 < align)) {
 		float rotateAngle;
 		if (align < FLOAT_803301DC) {
 			rotateAngle = FLOAT_803301E0;
@@ -2042,9 +2038,11 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 		dynOffset.z = tmp.z;
 		CVector tmp2;
 		PSVECAdd(&origin, &dynOffset, reinterpret_cast<Vec*>(&tmp2));
+		float py = tmp2.y;
+		float pz = tmp2.z;
 		NodeDynPosition(node).x = tmp2.x;
-		NodeDynPosition(node).y = tmp2.y;
-		NodeDynPosition(node).z = tmp2.z;
+		NodeDynPosition(node).y = py;
+		NodeDynPosition(node).z = pz;
 	}
 }
 #pragma pop
@@ -2464,9 +2462,9 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 			startFrame = 0;
 		}
 
-		m_curFrame = static_cast<float>(startFrame);
+		m_animStart = static_cast<float>(startFrame);
+		m_curFrame = m_animStart;
 		m_time = m_curFrame;
-		m_animStart = m_curFrame;
 
 		if (endFrame == -1) {
 			endFrame = static_cast<int>(AnimFrameCount(m_anim)) - 1;

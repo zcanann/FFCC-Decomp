@@ -1783,7 +1783,8 @@ checkLoaded:
                             CLoadModel* loadModel = 0;
                             for (unsigned int i = 0; i < static_cast<unsigned int>(LoadModelArray(pcs)->GetSize()); i++) {
                                 CLoadModel* it = (*LoadModelArray(pcs))[i];
-                                if (it->m_keyTag == keyTag && it->m_keyId == keyId) {
+                                if (reinterpret_cast<int>(it->m_keyTag) == reinterpret_cast<int>(keyTag) &&
+                                    static_cast<unsigned int>(it->m_keyId) == static_cast<unsigned int>(keyId)) {
                                     loadModel = it;
                                     break;
                                 }

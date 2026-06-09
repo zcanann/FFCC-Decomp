@@ -965,8 +965,8 @@ void CGItemObj::onFrameStat()
 
 			float ownerCos = (float)cos((double)m_owner->m_rotTargetY);
 			float ownerSin = (float)sin((double)m_owner->m_rotTargetY);
-			CVector moveVec(ownerSin, kItemObjMotionStep, ownerCos);
-			MoveVector(reinterpret_cast<Vec*>(&moveVec), moveSpeed, 1, 0, 1, 0);
+			const CVector& moveVec = CVector(ownerSin, kItemObjMotionStep, ownerCos);
+			MoveVector(reinterpret_cast<Vec*>(const_cast<CVector*>(&moveVec)), moveSpeed, 1, 0, 1, 0);
 
 			m_owner = 0;
 			m_itemJumpCountdown = 8;
@@ -1046,9 +1046,9 @@ void CGItemObj::onFrameStat()
 			prgObj->m_moveOffset.x = zero;
 			prgObj->m_bgColMask |= 0x80000;
 
-			CVector damageOffset(zero, zero, zero);
+			const CVector& damageOffset = CVector(zero, zero, zero);
 			SetDamageCol(0, itemObjStrings + kItemObjStrF051Root, kItemObjDamageRadius, kItemObjDamageRadius,
-			             reinterpret_cast<Vec*>(&damageOffset));
+			             reinterpret_cast<Vec*>(const_cast<CVector*>(&damageOffset)));
 			*reinterpret_cast<int*>(&prgObj->m_damageColliders[1].m_localPosition.x) = 9;
 			}
 		} else if (m_subFrame == 0x7D) {

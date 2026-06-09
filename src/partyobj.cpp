@@ -1953,7 +1953,7 @@ void CGPartyObj::onFrameStat()
 			enableDamageCol(1);
 			short mapId = *reinterpret_cast<short*>(&m_lastMapIdHit);
 			if (party.carryObject == nullptr) {
-				if (*reinterpret_cast<unsigned short*>(script + 0x1C) == 0) {
+				if (*reinterpret_cast<short*>(script + 0x1C) == 0) {
 					if (mapId == 1) {
 						SetAnimSlot(0x25, 0);
 						SetAnimSlot(0x24, 1);
@@ -5116,7 +5116,7 @@ void CGPartyObj::gpmMove()
 			if (Game.unkFloat_0xca10 * limit > pathDist) {
 				if ((leader->m_lastStateId != 2 && leader->m_lastStateId != 6) ||
 				    leader->m_subState != 1 ||
-				    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(leader) + 0x668) == 0 ||
+				    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(leader) + 0x668) == 0 ||
 				    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(leader) + 0x660) != 0) {
 					return;
 				}
@@ -5251,7 +5251,7 @@ void CGPartyObj::gpmMove()
 	if (m_lastStateId != 2) {
 		return;
 	}
-	if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(sGhostPartyWork.flags) << 24) & 0xC0000000) >> 31) == 0) {
+	if (static_cast<unsigned char>(static_cast<int>((static_cast<unsigned int>(sGhostPartyWork.flags) << 24) & 0xC0000000) >> 31) == 0) {
 		changeStat(0, 0, 0);
 		return;
 	}
@@ -5275,7 +5275,7 @@ void CGPartyObj::gpmMove()
 		if (sGhostPartyWork.gauge <= 0xF) {
 			return;
 		}
-		if (static_cast<unsigned char>(static_cast<int>((static_cast<unsigned int>(PartyData(this).partyFlags) << 25) & 0xC0000000) >> 31) != 0) {
+		if (static_cast<unsigned char>(static_cast<unsigned int>((static_cast<unsigned int>(PartyData(this).partyFlags) << 25) & 0xC0000000) >> 31) != 0) {
 			return;
 		}
 	} else if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(sGhostPartyWork.flags) << 26) & 0xC0000000) >> 31) == 0) {

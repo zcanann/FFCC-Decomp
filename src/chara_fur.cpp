@@ -1340,15 +1340,26 @@ int CChara::CModel::PickFur(
 				for (unsigned int vertexIndex = 0; vertexIndex < count; vertexIndex++) {
 					const unsigned short* indices = reinterpret_cast<const unsigned short*>(cursor);
 
-					const S16Vec& pos = mesh->m_workPositions[indices[0]];
+					register const S16Vec* posPtr = &mesh->m_workPositions[indices[0]];
+					register const unsigned char* uvPtr = mesh->m_data->m_uvs;
+					register int uvOff = static_cast<unsigned int>(indices[3]) << 2;
 					Vec localPos;
-					localPos.x = *reinterpret_cast<const float*>(&pos);
-					localPos.y = *reinterpret_cast<const float*>(&pos.z);
-					const short* uvSrc = reinterpret_cast<const short*>(mesh->m_data->m_uvs) +
-					                     static_cast<unsigned int>(indices[3]) * 2;
-					float curU = *reinterpret_cast<const float*>(uvSrc);
-					float curV = *reinterpret_cast<const float*>(uvSrc + 2);
-					localPos.z = *reinterpret_cast<const float*>(&pos.z);
+					float curUV[2];
+					register Vec* localPosPtr = &localPos;
+					register float* curUVPtr = curUV;
+					register float posXY;
+					register float posZ;
+					register float uvST;
+					asm {
+						psq_l posXY, 0(posPtr), 0, 5
+						psq_lx uvST, uvPtr, uvOff, 0, 7
+						psq_l posZ, 4(posPtr), 1, 5
+						psq_st uvST, 0(curUVPtr), 0, 0
+						psq_st posXY, 0(localPosPtr), 0, 0
+						psq_st posZ, 8(localPosPtr), 1, 0
+					}
+					float curU = curUV[0];
+					float curV = curUV[1];
 
 					Vec curViewPos;
 					PSMTXMultVec(modelViewMtx, &localPos, &curViewPos);
@@ -1427,10 +1438,8 @@ int CChara::CModel::PickFur(
 						CVector rayStart;
 						CVector rayEnd;
 						CVector rayStartInit(
-						    static_cast<float>(static_cast<double>(static_cast<float>(cursorXd -
-						                                                              static_cast<double>(kCharaFurScreenCenterX))) /
-						                       static_cast<double>(kCharaFurScreenCenterX)),
-						    static_cast<float>(negCursorY / static_cast<double>(kCharaFurScreenCenterY)), kCharaFurDepthZero);
+						    (static_cast<float>(cursorXd) - kCharaFurScreenCenterX) / kCharaFurScreenCenterX,
+						    static_cast<float>(negCursorY) / kCharaFurScreenCenterY, kCharaFurDepthZero);
 						rayStart.x = rayStartInit.x;
 						rayStart.y = rayStartInit.y;
 						rayStart.z = rayStartInit.z;
@@ -1517,12 +1526,10 @@ int CChara::CModel::PickFur(
 						PSVECScale(weights, weights,
 						           kCharaFurDepthScaleBase / (weights.z + weights.x + weights.y));
 
-						const double outU = static_cast<double>(static_cast<float>(
-						    static_cast<double>(verts[2].m_u) * static_cast<double>(weights.z) +
-						    static_cast<double>(verts[0].m_u * weights.x + verts[1].m_u * weights.y)));
-						const double outV = static_cast<double>(static_cast<float>(
-						    static_cast<double>(verts[2].m_v) * static_cast<double>(weights.z) +
-						    static_cast<double>(verts[0].m_v * weights.x + verts[1].m_v * weights.y)));
+						const float outU =
+						    verts[2].m_u * weights.z + (verts[0].m_u * weights.x + verts[1].m_u * weights.y);
+						const float outV =
+						    verts[2].m_v * weights.z + (verts[0].m_v * weights.x + verts[1].m_v * weights.y);
 
 						if (outWorldPos != 0) {
 							outWorldPos->x = hitViewPos.x;
@@ -1532,8 +1539,8 @@ int CChara::CModel::PickFur(
 						if (furMaterial) {
 							hitPaintable = paintableMaterial;
 							nearestDepth = depth;
-							hitU = static_cast<float>(outU);
-							hitV = static_cast<float>(outV);
+							hitU = outU;
+							hitV = outV;
 						}
 					}
 nextVertex:

@@ -142,18 +142,8 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
 
     for (s32 i = 0; i < *reinterpret_cast<const s16*>(shapeData + 2); i++) {
         u32 color;
-        float p0x;
-        float p0y;
-        float p0z;
-        float p1x;
-        float p1y;
-        float p1z;
-        float p2x;
-        float p2y;
-        float p2z;
-        float p3x;
-        float p3y;
-        float p3z;
+        float tex[4][2];
+        float pos[4][3];
         float u0;
         float v0;
         float u1;
@@ -266,18 +256,18 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             const float invPadH = kFunnyShapeOne / padH;
             const float invPadW = -(kFunnyShapeOne / padW);
 
-            p0x = invPadW * (rx0 - viewMaxX);
-            p0y = invPadH * (ry0 - viewMaxY);
-            p0z = kFunnyShapeZero;
-            p1x = invPadW * (rx1 - viewMaxX);
-            p1y = invPadH * (ry1 - viewMaxY);
-            p1z = kFunnyShapeZero;
-            p2x = invPadW * (rx3 - viewMaxX);
-            p2y = invPadH * (ry3 - viewMaxY);
-            p2z = kFunnyShapeZero;
-            p3x = invPadW * (rx2 - viewMaxX);
-            p3y = invPadH * (ry2 - viewMaxY);
-            p3z = kFunnyShapeZero;
+            pos[0][0] = invPadW * (rx0 - viewMaxX);
+            pos[0][1] = invPadH * (ry0 - viewMaxY);
+            pos[0][2] = kFunnyShapeZero;
+            pos[1][0] = invPadW * (rx1 - viewMaxX);
+            pos[1][1] = invPadH * (ry1 - viewMaxY);
+            pos[1][2] = kFunnyShapeZero;
+            pos[2][0] = invPadW * (rx3 - viewMaxX);
+            pos[2][1] = invPadH * (ry3 - viewMaxY);
+            pos[2][2] = kFunnyShapeZero;
+            pos[3][0] = invPadW * (rx2 - viewMaxX);
+            pos[3][1] = invPadH * (ry2 - viewMaxY);
+            pos[3][2] = kFunnyShapeZero;
             memcpy(&color, entry + 0x8, sizeof(color));
             *reinterpret_cast<GXColor*>(&color) = *reinterpret_cast<const GXColor*>(entry + 0x8);
         } else {
@@ -314,24 +304,22 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             u1 = u0 + static_cast<float>(texW) / kFunnyShapeTexCoordDivisor;
             v1 = v0 - static_cast<float>(texH) / kFunnyShapeTexCoordDivisor;
 
-            p0x = kFunnyShapeNegativeOne;
-            p0y = kFunnyShapeOne;
-            p0z = kFunnyShapeZero;
-            p1x = kFunnyShapeOne;
-            p1y = kFunnyShapeOne;
-            p1z = kFunnyShapeZero;
-            p2x = kFunnyShapeOne;
-            p2y = kFunnyShapeNegativeOne;
-            p2z = kFunnyShapeZero;
-            p3x = kFunnyShapeNegativeOne;
-            p3y = kFunnyShapeNegativeOne;
-            p3z = kFunnyShapeZero;
+            pos[0][0] = kFunnyShapeNegativeOne;
+            pos[0][1] = kFunnyShapeOne;
+            pos[0][2] = kFunnyShapeZero;
+            pos[1][0] = kFunnyShapeOne;
+            pos[1][1] = kFunnyShapeOne;
+            pos[1][2] = kFunnyShapeZero;
+            pos[2][0] = kFunnyShapeOne;
+            pos[2][1] = kFunnyShapeNegativeOne;
+            pos[2][2] = kFunnyShapeZero;
+            pos[3][0] = kFunnyShapeNegativeOne;
+            pos[3][1] = kFunnyShapeNegativeOne;
+            pos[3][2] = kFunnyShapeZero;
             memcpy(&color, entry + 0x8, sizeof(color));
             *reinterpret_cast<GXColor*>(&color) = *reinterpret_cast<const GXColor*>(entry + 0x8);
         }
 
-        float tex[4][2];
-        float pos[4][3];
         tex[0][0] = u0;
         tex[0][1] = v0;
         tex[1][0] = u1;
@@ -340,18 +328,6 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
         tex[2][1] = v1;
         tex[3][0] = u0;
         tex[3][1] = v1;
-        pos[0][0] = p0x;
-        pos[0][1] = p0y;
-        pos[0][2] = p0z;
-        pos[1][0] = p1x;
-        pos[1][1] = p1y;
-        pos[1][2] = p1z;
-        pos[2][0] = p2x;
-        pos[2][1] = p2y;
-        pos[2][2] = p2z;
-        pos[3][0] = p3x;
-        pos[3][1] = p3y;
-        pos[3][2] = p3z;
 
         DCStoreRange(&color, 4);
         GXBegin((GXPrimitive)0x80, GX_VTXFMT0, 4);

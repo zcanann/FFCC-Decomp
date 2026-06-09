@@ -4088,16 +4088,17 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
             }
         }
 
-        const unsigned int typeVal = static_cast<char>(sendType);
-        const int respVal = static_cast<signed char>(localBytes[1]);
-
         if (result != 0)
         {
+            unsigned int typeVal = static_cast<char>(sendType);
+            int respVal = localBytes[1];
             int diffMask = ((typeVal - respVal) | (respVal - typeVal)) >> 31;
-            return -2 - diffMask;
+            return diffMask - 2;
         }
 
-        int diffMask = ((respVal - typeVal) | (typeVal - respVal)) >> 31;
+        int signedType = static_cast<signed char>(sendType);
+        int respVal = localBytes[1];
+        int diffMask = ((respVal - signedType) | (signedType - respVal)) >> 31;
         return diffMask - 1;
     }
 

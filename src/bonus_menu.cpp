@@ -2310,12 +2310,14 @@ void CMenuPcs::CalcResultCloseAnim()
 	Mtx rotYMtx;
 	int partyByteOff = 0;
 	int alphaOff = (activePartyCount * 2 + 1) * 0x40;
-	for (int i = 0; i < activePartyCount * 2; i++) {
+	int __p10 = activePartyCount;
+	for (int i = 0; i < __p10 * 2; i++) {
 		int animPtr = this->m_bonusAnimPtr;
 		CCharaPcs::CHandle* handle;
 		unsigned int tribeId = 0;
 		if (i < activePartyCount) {
-			handle = *(CCharaPcs::CHandle**)((int)s_Rinfo + partyByteOff + 0x20);
+			int __p8 = partyByteOff;
+			handle = *(CCharaPcs::CHandle**)((int)s_Rinfo + __p8 + 0x20);
 			tribeId = *(unsigned int*)((int)s_Rinfo + partyByteOff + 0x44);
 			float modelScale = s_BonusModelScale[tribeId];
 			PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
@@ -2348,7 +2350,8 @@ void CMenuPcs::CalcResultCloseAnim()
 		if (i < activePartyCount) {
 			handle->m_model->m_lightAlpha = 1.0f;
 		} else {
-			handle->m_model->m_lightAlpha = *(float*)(animPtr + alphaOff + 0x18);
+			int __p9 = alphaOff;
+			handle->m_model->m_lightAlpha = *(float*)(animPtr + __p9 + 0x18);
 		}
 		alphaOff += 0x40;
 		partyByteOff += 0x2c;

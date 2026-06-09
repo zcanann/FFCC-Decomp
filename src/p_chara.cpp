@@ -499,9 +499,9 @@ static inline CMemory::CStage* HandleModelStage(int charaKind, int specialModelS
 
 static inline CMemory::CStage* HandleTextureStage(int charaKind)
 {
+    int allocStageMode = CharaPcs.m_charaAllocStage;
     int index = charaKind == 4 ? 3 : 1;
-    CMemory::CStage* stage = (&CharaPcs.m_viewerModelStage)[index];
-    return SelectLoadStage(&CharaPcs, stage);
+    return GET_CHARA_ALLOC_STAGE_S(allocStageMode, (&CharaPcs.m_viewerModelStage)[index]);
 }
 
 static inline Mtx* ModelLocalMtx(CChara::CModel* model)

@@ -162,7 +162,7 @@ static inline float calc_spawn_speed(PRyjMegaBirthModel* params, u8 speedMode)
     case 2:
         return Math.RandF() * Math.RandF() * params->m_speed - MegaBirthHalf() * params->m_speed;
     case 3:
-        return -(MegaBirthSpeedFalloff() * (Math.RandF() * Math.RandF() * params->m_speed) - params->m_speed) - MegaBirthHalf() * params->m_speed;
+        return -(MegaBirthSpeedFalloff() * (params->m_speed * Math.RandF() * Math.RandF()) - params->m_speed) - MegaBirthHalf() * params->m_speed;
     case 4:
         return Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * params->m_speed - MegaBirthHalf() * params->m_speed;
     case 5:

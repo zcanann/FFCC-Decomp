@@ -425,32 +425,32 @@ static CCharaPcs::CLoadAnim* LoadAnimFromDisk(
     sprintf(path, s_charaAnimPathFmt, pathParts[0], pathParts[1], charaNo, animName);
 
     CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
-    if (fileHandle == 0) {
-        return 0;
+    if (fileHandle != 0) {
+        File.Read(fileHandle);
+        File.SyncCompleted(fileHandle);
+
+        CChara::CAnim* anim = new (self->m_stage, const_cast<char*>(s_p_chara_cpp), 0x62A) CChara::CAnim;
+        anim->Create(File.m_readBuffer, self->m_viewerAnimStage);
+
+        CCharaPcs::CLoadAnim* loadAnim = new (self->m_stage, const_cast<char*>(s_p_chara_cpp), 0x62D) CCharaPcs::CLoadAnim;
+        loadAnim->m_keyId = charaNo;
+        loadAnim->m_keyTag = reinterpret_cast<void*>(charaKind);
+        strcpy(loadAnim->m_name, animName);
+        loadAnim->m_anim = anim;
+        loadAnim->m_mergeFileId = mergeFileId;
+        loadAnim->m_mergeFlags = mergeFlags;
+        LoadAnimArray(self)->Add(loadAnim);
+
+        File.Close(fileHandle);
+
+        if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+            System.Printf(const_cast<char*>(s_charaLoadAnimLogFmt), animName, charaKind, charaNo);
+        }
+
+        return loadAnim;
     }
 
-    File.Read(fileHandle);
-    File.SyncCompleted(fileHandle);
-
-    CChara::CAnim* anim = new (self->m_stage, const_cast<char*>(s_p_chara_cpp), 0x62A) CChara::CAnim;
-    anim->Create(File.m_readBuffer, self->m_viewerAnimStage);
-
-    CCharaPcs::CLoadAnim* loadAnim = new (self->m_stage, const_cast<char*>(s_p_chara_cpp), 0x62D) CCharaPcs::CLoadAnim;
-    loadAnim->m_keyId = charaNo;
-    loadAnim->m_keyTag = reinterpret_cast<void*>(charaKind);
-    strcpy(loadAnim->m_name, animName);
-    loadAnim->m_anim = anim;
-    loadAnim->m_mergeFileId = mergeFileId;
-    loadAnim->m_mergeFlags = mergeFlags;
-    LoadAnimArray(self)->Add(loadAnim);
-
-    File.Close(fileHandle);
-
-    if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-        System.Printf(const_cast<char*>(s_charaLoadAnimLogFmt), animName, charaKind, charaNo);
-    }
-
-    return loadAnim;
+    return 0;
 }
 
 static inline void ReleaseHandleAnimSlot(CCharaPcs::CHandle* handle, int slot)

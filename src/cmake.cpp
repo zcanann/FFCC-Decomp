@@ -3744,9 +3744,7 @@ void CMenuPcs::DrawSingCMake()
 
     if (CmakeState(this)->m_mode < 2) {
         CmakeState(this)->m_mode = static_cast<short>(CmakeState(this)->m_mode + 1);
-        CmakeState(this)->m_frame = 0;
-        CmakeMcState(this) = 3;
-        return;
+        goto resetFrame;
     }
 
     gCmakePreviousStep = static_cast<int>(CmakeState(this)->m_step);
@@ -3772,6 +3770,7 @@ void CMenuPcs::DrawSingCMake()
     }
 
     CmakeState(this)->m_selectionInitialized = 0;
+resetFrame:
     CmakeState(this)->m_frame = 0;
     CmakeMcState(this) = 3;
 }

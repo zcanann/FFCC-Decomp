@@ -2458,8 +2458,14 @@ void CGoOutMenu::CalcDel()
     case 5:
         if (m_messageWindowOpen != 0 && static_cast<int>(MenuPcs.IsMenuCharaAnimIdle(m_selectedChara)) != 0) {
             input = GetGoOutInputMask();
+            bool pressed;
             if ((input & 0x100) != 0) {
                 Sound.PlaySe(2, 0x40, 0x7f, 0);
+                pressed = true;
+            } else {
+                pressed = false;
+            }
+            if (pressed) {
                 CCaravanWork& caravanWork = Game.m_caravanWorkArr[m_selectedChara];
                 caravanWork.m_shopState = 0;
                 memset(reinterpret_cast<unsigned char*>(&caravanWork) + 0x8A4, 0, 0x100);

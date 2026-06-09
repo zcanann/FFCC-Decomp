@@ -943,7 +943,7 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
         }
         Sound.PlaySe(1, 0x40, 0x7f, 0);
     } else if ((repeat & 0x4) != 0) {
-        if (row < (4 + static_cast<int>((static_cast<unsigned long long>(select) - 10) >> 32))) {
+        if (row < (select >= 10 ? 4 : 3)) {
             row = static_cast<short>(row + 1);
         } else {
             row = 0;
@@ -1030,7 +1030,7 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
             const char* rowText = s_NameEntryStr[curRow + curTable * 5];
             int rowLen = strlen(rowText);
             if (rowLen != 0) {
-                unsigned int i = 0;
+                int i = 0;
                 int j = 0;
                 for (; 0 < rowLen; rowLen = rowLen - 1) {
                     if (i == curSelect) {
@@ -1903,8 +1903,8 @@ unsigned short CMenuPcs::CmakeJobCtrl()
 
                 if (slot < 8) {
                     Sound.PlaySe(4, 0x40, 0x7F, 0);
-                    short winX = 0;
-                    short winY = 0;
+                    short winX;
+                    short winY;
                     GetWinSize(0x16, &winX, &winY, 0);
                     SetMcWinInfo((int)winX, (int)winY);
                     CmakeMcState(this) = 0;
@@ -2223,8 +2223,8 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
 
                 if (slot < 8) {
                     Sound.PlaySe(4, 0x40, 0x7F, 0);
-                    short winX = 0;
-                    short winY = 0;
+                    short winX;
+                    short winY;
                     GetWinSize(0x15, &winX, &winY, 0);
                     SetMcWinInfo(static_cast<int>(winX), static_cast<int>(winY));
                     CmakeMcState(this) = 0;
@@ -2788,8 +2788,8 @@ int CMenuPcs::CmakeNameCtrl()
 
                     if (IsDuplicateCmakeName(this, s_CmakeInfo.m_name)) {
                         Sound.PlaySe(4, 0x40, 0x7F, 0);
-                        short winX = 0;
-                        short winY = 0;
+                        short winX;
+                        short winY;
                         GetWinSize(0x14, &winX, &winY, 0);
                         SetMcWinInfo((int)winX, (int)winY);
                         CmakeMcState(this) = 0;

@@ -907,7 +907,7 @@ void CMenuPcs::draw()
         TextureMan.SetTextureTev(texture);
 
         {
-            int alpha = static_cast<int>(LoadFloat(kMenuAlphaMax) * (LoadFloat(kMenuHalf) * (LoadFloat(kMenuOne) + sinf(System.m_frameCounter * LoadFloat(kMenuPulseStep)))));
+            int alpha = static_cast<int>(LoadFloat(kMenuAlphaMax) * (LoadFloat(kMenuHalf) * (LoadFloat(kMenuOne) + sinf(static_cast<int>(System.m_frameCounter) * LoadFloat(kMenuPulseStep)))));
             CColor color(0xFF, 0xFF, 0xFF, static_cast<u8>(alpha));
             GXSetChanMatColor(GX_COLOR0A0, color.color);
             DrawRect(3, LoadFloat(kMenuScreenCenterX), LoadFloat(kMenuScreenCenterY), LoadFloat(kMenuInitRectWidth),

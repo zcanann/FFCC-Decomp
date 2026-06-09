@@ -169,9 +169,9 @@ static CMaterial* AllocMaterial()
     return new (MaterialMan.GetMemoryStage(), (char*)"materialman.cpp", 0xCFF) CMaterial;
 }
 
-static void AddTextureIndex(CMaterial* material, unsigned short textureIndex)
+static void AddTextureIndex(CMaterial* material, CChunkFile& chunkFile)
 {
-    material->AddTextureIdx(material->GetTextureCount(), textureIndex);
+    material->AddTextureIdx(chunkFile);
 }
 
 static CMapKeyFrame* AllocMapKeyFrame(int line)
@@ -3156,10 +3156,10 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 }
 
                 material = m_materials[materialIndex];
-                AddTextureIndex(material, chunkFile.Get2());
-                AddTextureIndex(material, chunkFile.Get2());
+                AddTextureIndex(material, chunkFile);
+                AddTextureIndex(material, chunkFile);
                 short bumpIndex = chunkFile.Get2();
-                AddTextureIndex(material, chunkFile.Get2());
+                AddTextureIndex(material, chunkFile);
                 material->m_scaleU = kTextureOne / chunkFile.GetF4();
                 material->m_scaleV = kTextureOne / chunkFile.GetF4();
                 material->m_unk36 = static_cast<unsigned char>(chunkFile.Get4());
@@ -3184,8 +3184,8 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
             } break;
             case CHUNK_WATR: {
                 material = m_materials[materialIndex];
-                AddTextureIndex(material, chunkFile.Get2());
-                AddTextureIndex(material, chunkFile.Get2());
+                AddTextureIndex(material, chunkFile);
+                AddTextureIndex(material, chunkFile);
                 short bumpIndex = chunkFile.Get2();
                 unsigned char waterMode = chunkFile.Get1();
                 material->m_unkA5 = chunkFile.Get1();
@@ -3208,8 +3208,8 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
             } break;
             case CHUNK_JIME: {
                 material = m_materials[materialIndex];
-                AddTextureIndex(material, chunkFile.Get2());
-                AddTextureIndex(material, chunkFile.Get2());
+                AddTextureIndex(material, chunkFile);
+                AddTextureIndex(material, chunkFile);
                 short bumpIndex = chunkFile.Get2();
                 material->m_unkA5 = chunkFile.Get1();
                 if (chunkFile.Get1() != 0) {
@@ -3229,7 +3229,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
             } break;
             case CHUNK_FUR: {
                 material = m_materials[materialIndex];
-                AddTextureIndex(material, chunkFile.Get2());
+                AddTextureIndex(material, chunkFile);
                 material->m_singleTextureFlag = 1;
             } break;
             case CHUNK_TSCL: {
@@ -3899,10 +3899,11 @@ inline void CMaterial::SetTag(int)
  * Address:	TODO
  * Size:	TODO
  */
-inline void CMaterial::AddTextureIdx(int index, int textureIndex)
+inline void CMaterial::AddTextureIdx(CChunkFile& chunkFile)
 {
+    int index = GetTextureCount();
     m_textureCount = static_cast<unsigned short>(index + 1);
-    m_textureIndices[index] = static_cast<short>(textureIndex);
+    m_textureIndices[index] = static_cast<short>(chunkFile.Get2());
 }
 
 extern const float kMaterialShadowScale = 5.0f;

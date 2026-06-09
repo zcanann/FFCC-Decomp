@@ -2226,7 +2226,7 @@ void CGPartyObj::statCharge()
 		unsigned short* p = table;
 		for (int i = 0; i < 5; i++, p += 6) {
 			if (phase == p[3] && Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
-				int dist = (p[4] - p[3]) + 1;
+				unsigned int dist = (p[4] - p[3]) + 1;
 				if (i == 0 && (itemType == 2 || itemType == 3)) {
 					Vec delta;
 					PSVECSubtract(&m_comboCenter, &m_worldPosition, &delta);

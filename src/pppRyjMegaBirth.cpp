@@ -961,7 +961,7 @@ void birth(
 			}
 
 			if (pathBase != NULL) {
-				u16 sampleIndex;
+				int sampleIndex;
 
 				if ((u16)work->m_meshEmitIndex >= (u16)pathInfo[1]) {
 					work->m_meshEmitIndex = 0;
@@ -971,7 +971,7 @@ void birth(
 					sampleIndex = work->m_meshEmitIndex;
 					work->m_meshEmitIndex = sampleIndex + 1;
 				} else {
-					sampleIndex = (u16)((int)(calc_mesh_sample_t(speedMode) * (float)pathInfo[1]));
+					sampleIndex = (int)(calc_mesh_sample_t(speedMode) * (float)pathInfo[1]);
 				}
 
 				Vec* pathVec = pathBase + ((u16*)*(int*)(pathInfo + 2))[sampleIndex];

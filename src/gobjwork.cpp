@@ -1931,7 +1931,7 @@ void CCaravanWork::CalcStatus()
 			m_baseDefense += itemValue;
 		apply_effect:
 			int itemEffect = GetItemDataPtr(itemIdx)[4];
-			char effectValue = (char)itemValue;
+			unsigned short effectValue = itemValue;
 			switch (itemEffect) {
 			case 1:
 				m_elementResistances[1]++;

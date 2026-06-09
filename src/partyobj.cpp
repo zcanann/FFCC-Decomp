@@ -1364,9 +1364,9 @@ tmpArtifactBlock:
 			int weaponRef;
 			caravan->GetCurrentWeaponItem(weaponItem, weaponRef);
 			if (weaponItem != party.unk6BC ||
-			    weaponRef != (caravan->m_equipment[0] < 0 ? 0 : caravan->m_inventoryItems[caravan->m_equipment[0]])) {
+			    weaponRef != (caravan->m_equipment[0] >= 0 ? caravan->m_inventoryItems[caravan->m_equipment[0]] : 0)) {
 				*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D4) = cmdIdx;
-				party.weaponRef = caravan->m_equipment[0] < 0 ? 0 : caravan->m_inventoryItems[caravan->m_equipment[0]];
+				party.weaponRef = caravan->m_equipment[0] >= 0 ? caravan->m_inventoryItems[caravan->m_equipment[0]] : 0;
 				party.commandFlagBits.flag20 = 1;
 				changeStat(0x0F, 0, 0);
 				return;

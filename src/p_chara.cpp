@@ -1716,7 +1716,7 @@ checkLoaded:
     }
 
     CCharaPcs* pcs = &CharaPcs;
-    unsigned int mergePartCount = 1;
+    int mergePartCount = 1;
     for (int mergePartIndex = 0; mergePartIndex < mergePartCount; mergePartIndex++) {
         char path[0x100];
         sprintf(path, s_charaMergePathFmt, mergeFileId, mergePartIndex);
@@ -1783,7 +1783,8 @@ checkLoaded:
                             CLoadModel* loadModel = 0;
                             for (unsigned int i = 0; i < static_cast<unsigned int>(LoadModelArray(pcs)->GetSize()); i++) {
                                 CLoadModel* it = (*LoadModelArray(pcs))[i];
-                                if (it->m_keyTag == keyTag && it->m_keyId == keyId) {
+                                if (reinterpret_cast<int>(it->m_keyTag) == reinterpret_cast<int>(keyTag) &&
+                                    static_cast<unsigned int>(it->m_keyId) == static_cast<unsigned int>(keyId)) {
                                     loadModel = it;
                                     break;
                                 }
@@ -1825,7 +1826,9 @@ checkLoaded:
                             CLoadTexture* loadTexture = 0;
                             for (unsigned int i = 0; i < static_cast<unsigned int>(LoadTextureArray(pcs)->GetSize()); i++) {
                                 CLoadTexture* it = (*LoadTextureArray(pcs))[i];
-                                if (it->m_keyTag == keyTag && it->m_keyId == keyId && it->m_variantTag == variantTag) {
+                                if (reinterpret_cast<int>(it->m_keyTag) == reinterpret_cast<int>(keyTag) &&
+                                    static_cast<unsigned int>(it->m_keyId) == static_cast<unsigned int>(keyId) &&
+                                    it->m_variantTag == variantTag) {
                                     loadTexture = it;
                                     break;
                                 }
@@ -1865,7 +1868,8 @@ checkLoaded:
                             CLoadAnim* loadAnim = 0;
                             for (unsigned int i = 0; i < static_cast<unsigned int>(LoadAnimArray(pcs)->GetSize()); i++) {
                                 CLoadAnim* it = (*LoadAnimArray(pcs))[i];
-                                if (it->m_keyTag == keyTag && it->m_keyId == keyId &&
+                                if (reinterpret_cast<int>(it->m_keyTag) == reinterpret_cast<int>(keyTag) &&
+                                    static_cast<unsigned int>(it->m_keyId) == static_cast<unsigned int>(keyId) &&
                                     strcmp(animName, it->m_name) == 0) {
                                     loadAnim = it;
                                     break;
@@ -1901,7 +1905,9 @@ checkLoaded:
                             CLoadPdt* loadPdt = 0;
                             for (unsigned int i = 0; i < static_cast<unsigned int>(LoadPdtArray(pcs)->GetSize()); i++) {
                                 CLoadPdt* it = (*LoadPdtArray(pcs))[i];
-                                if (it->m_keyTag == keyTag && it->m_keyId == keyId && it->m_variantTag == variantTag) {
+                                if (reinterpret_cast<int>(it->m_keyTag) == reinterpret_cast<int>(keyTag) &&
+                                    it->m_keyId == keyId &&
+                                    reinterpret_cast<int>(it->m_variantTag) == reinterpret_cast<int>(variantTag)) {
                                     loadPdt = it;
                                     break;
                                 }
@@ -2804,7 +2810,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         _GXColor ambientGX = ambientColor.color;
         LightPcs.SetAmbient(ambientGX);
 
-        for (long i = 0; i < 3; i++) {
+        for (unsigned long i = 0; i < 3; i++) {
             CColor3 diffuseBase(CharaPcs.m_viewerDiffuseColor[lightBank][i]);
             CColor3 diffuseShade;
             diffuseShade.color.r = static_cast<signed char>((static_cast<unsigned int>(diffuseBase.color.r) * shade.color.r) / 255);

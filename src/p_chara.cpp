@@ -2924,7 +2924,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
             const unsigned short shadowSize = static_cast<unsigned short>(CharaPcs.m_texShadowSize);
             GXSetTexCopySrc(0, 0, shadowSize, shadowSize);
             GXSetTexCopyDst(static_cast<unsigned short>(CharaPcs.m_texShadowSize),
-                            static_cast<unsigned short>(CharaPcs.m_texShadowSize), GX_TF_I8, GX_FALSE);
+                            static_cast<unsigned short>(CharaPcs.m_texShadowSize), GX_CTF_R4, GX_FALSE);
             m_shadowTexturePtr = reinterpret_cast<unsigned char*>(CharaPcs.m_texShadowTextureBase) +
                                  CharaPcs.m_texShadowTextureOffset;
             DCInvalidateRange(m_shadowTexturePtr, (shadowSize * shadowSize) / 2);

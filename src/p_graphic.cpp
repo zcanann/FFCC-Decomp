@@ -408,19 +408,20 @@ void CGraphicPcs::drawScreenFade()
                     _GXTexObj backTexObj;
                     const int x = (tile & 1) ? 0x140 : 0;
                     const int y = (tile & 2) ? 0xE0 : 0;
-                    const float t0 = ((tile & 2) ? kGraphicOne : kGraphicZero) * kGraphicHalf;
-                    const float t1 = t0 + kGraphicHalf;
+                    const int row = (tile & 2) ? 1 : 0;
 
                     Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backTexObj, x, y, 0x140, 0xE0, 0,
                                                GX_LINEAR, GX_TF_RGBA8, 0);
                     GXLoadTexObj(&backTexObj, GX_TEXMAP0);
 
+                    const float t0 = (float)((double)row * kGraphicHalf);
                     CColor topColor;
                     topColor.color.r = (u8)(t0 * ((float)baseColor2.r - (float)baseColor.r) + (float)baseColor.r);
                     topColor.color.g = (u8)(t0 * ((float)baseColor2.g - (float)baseColor.g) + (float)baseColor.g);
                     topColor.color.b = (u8)(t0 * ((float)baseColor2.b - (float)baseColor.b) + (float)baseColor.b);
                     topColor.color.a = 0xFF;
 
+                    const float t1 = (float)((double)(row + 1) * kGraphicHalf);
                     CColor bottomColor;
                     bottomColor.color.r = (u8)(t1 * ((float)baseColor2.r - (float)baseColor.r) + (float)baseColor.r);
                     bottomColor.color.g = (u8)(t1 * ((float)baseColor2.g - (float)baseColor.g) + (float)baseColor.g);

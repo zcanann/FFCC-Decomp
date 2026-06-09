@@ -15,6 +15,11 @@ extern const double kPppKeShpTail2XUnsignedIntBias = 4503599627370496.0;
 #include <dolphin/types.h>
 #include <string.h>
 
+static inline float LoadFloat(const float& value)
+{
+    return value;
+}
+
 STATIC_ASSERT(offsetof(struct pppKeShpTail2X, m_object.m_workArea) == 0x80);
 
 struct KeShpTail2XWork {
@@ -103,6 +108,8 @@ void pppKeShpTail2XCon(_pppPObject* obj, _pppCtrlTable* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma optimization_level 3
 void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _pppCtrlTable* param_3)
 {
     KeShpTail2XWork* work;
@@ -110,7 +117,6 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     tagOAN3_SHAPE* shapeEntry;
     s32 count;
     float alphaMul;
-    float zero;
     float colorR;
     float colorG;
     float colorB;
@@ -149,9 +155,9 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     s32 nextIndex;
     s32 lastIndex;
     u8 zEnable;
+    const float zero = LoadFloat(kPppKeShpTail2XZero);
     u32 dataValIndex;
 
-    zero = kPppKeShpTail2XZero;
     dataValIndex = step->m_dataValIndex;
     if (dataValIndex == 0xffff) {
         return;
@@ -326,6 +332,7 @@ move_next_segment:
     segRemain += segLen;
     goto advance_segment;
 }
+#pragma pop
 
 /*
  * --INFO--

@@ -919,6 +919,7 @@ timeout_expiry:
                     threadParam->m_subState = 0;
                     ThreadSleep(OSMillisecondsToTicks(15));
                     stateStartTime = OSGetTime();
+                    goto loop_body;
                 }
                 else
                 {

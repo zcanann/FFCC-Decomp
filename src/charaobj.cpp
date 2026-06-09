@@ -1423,7 +1423,8 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 	calcRegist(static_cast<int>(staType), resolvedItemId, resistType, allowEffect, effectResult, 0);
 
 	if (resistType == 3) {
-		if (CharaObjIsElementalStatus(staType)) {
+		if (staType == 4 || staType == 0x1C || staType < 3 ||
+		    static_cast<unsigned int>(staType - 8) <= 2 || staType == 6 || staType == 3) {
 			putParticle(0x201, 0, hitPos, FLOAT_803319A8 * (FLOAT_803319AC * m_attackColRadius), 0x65);
 		} else if (static_cast<unsigned int>(staType - 0x24) <= 1 || staType == 0x69 || staType == 0x6A) {
 			putParticle(0x200, 0, hitPos, FLOAT_803319A8 * (FLOAT_803319AC * m_attackColRadius), 0x1D);

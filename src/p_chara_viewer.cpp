@@ -101,7 +101,7 @@ static inline void AddSharedRef(T* ptr)
 
 static inline float& ViewerModelTime(CChara::CModel* model)
 {
-    return model->m_curFrame;
+    return model->m_time;
 }
 
 static inline CChara::CAnim*& ViewerModelAnim(CChara::CModel* model)
@@ -326,6 +326,7 @@ void CCharaPcs::calcViewer()
     CCharaPcs* self = this;
     char pathBuf[256];
     CFile::CHandle* fileHandle;
+    (void)kCharaViewerColorCenterBias;
 
     if (self->m_viewerStoreSavedAnim != 0) {
         ReleaseShared(self->m_viewerSavedAnim);
@@ -357,8 +358,7 @@ void CCharaPcs::calcViewer()
                     new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_viewer_cpp), 0xEA) CChara::CModel;
                 self->m_viewerModel[0] = model;
                 self->m_viewerModel[0]->Create(File.m_readBuffer, self->m_viewerModelStage);
-                self->m_viewerModel[0]->m_flags10C =
-                    static_cast<unsigned char>(__rlwimi(self->m_viewerModel[0]->m_flags10C, 1, 6, 25, 25));
+                self->m_viewerModel[0]->m_flags10CBits.m_flag10C_40 = 1;
                 File.Close(fileHandle);
             }
             self->m_viewerLoadModel = 0;

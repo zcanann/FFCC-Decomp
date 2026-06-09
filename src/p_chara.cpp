@@ -1635,7 +1635,7 @@ void CCharaPcs::LoadCam(int index, char* fileName)
         case 'CAM ': {
             m_cameraFrameCount[index] = static_cast<int>(chunk.m_arg0);
 
-            cameraBuffer = new (m_viewerAnimStage, const_cast<char*>(s_p_chara_cpp), 0x4D4)
+            cameraBuffer = new (CharaPcs.m_viewerAnimStage, const_cast<char*>(s_p_chara_cpp), 0x4D4)
                 CCameraFrame[static_cast<unsigned long>(m_cameraFrameCount[index])];
 
             int byteOffset = 0;

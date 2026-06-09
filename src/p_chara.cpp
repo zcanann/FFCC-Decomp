@@ -3115,7 +3115,8 @@ void CCharaPcs::CHandle::loadModelASyncFrame()
         m_charaKind = m_asyncCharaKind;
         m_charaNo = m_asyncCharaNo;
     } else if (m_asyncState == 4) {
-        m_model->CreateDynamics(File.m_readBuffer, HandleModelStage(m_asyncCharaKind, 0));
+        void* readBuffer = File.m_readBuffer;
+        m_model->CreateDynamics(readBuffer, HandleModelStage(m_asyncCharaKind, 0));
     } else {
         void* readBuffer = File.m_readBuffer;
         int keyId = m_asyncCharaNo;

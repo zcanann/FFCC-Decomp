@@ -1405,11 +1405,11 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
     if ((tevBit & 1) == 0) {
         if ((tevBit & 0x200) == 0) {
             GXSetTevDirect(GX_TEVSTAGE0);
-            if ((tevBit & 0x20) == 0) {
+            if ((tevBit & 0x20) != 0) {
+                _GXSetTevOrder(0, m_texScroll0TexCoord, m_texMapIdCurShadow, 4);
+            } else {
                 GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_texCoordIdCurShadow), GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, 0x7D);
                 _GXSetTevOrder(0, m_texCoordIdCurShadow, m_texMapIdCurShadow, 4);
-            } else {
-                _GXSetTevOrder(0, m_texScroll0TexCoord, m_texMapIdCurShadow, 4);
             }
             GXSetTevDirect(GX_TEVSTAGE0);
             _GXSetTevColorIn(0, 0xF, 8, 10, 0xF);

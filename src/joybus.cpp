@@ -1613,24 +1613,24 @@ timeout_expiry:
             {
                 break;
             }
-            if ((localBuf[0] & 0x3F) != 7)
+            if ((localBuf[0] & 0x3F) == 7)
             {
+                threadParam->m_state = 0x1F;
+                memset(m_perThreadTemp[threadParam->m_portIndex], 0, sizeof(m_perThreadTemp[threadParam->m_portIndex]));
+                m_perThreadTemp[threadParam->m_portIndex][0] = 1;
                 DecRecvQueue(threadParam->m_portIndex);
-                threadParam->m_state = 'F';
-                GbaQue.ClrStageFlg(threadParam->m_portIndex);
+                if (SendCancel(threadParam) != 0)
+                {
+                    threadParam->m_altState = threadParam->m_state;
+                    threadParam->m_recvWriteIdx = localWord;
+                    threadParam->m_state = 0x84;
+                    goto sleep_retry;
+                }
                 break;
             }
-            threadParam->m_state = 0x1F;
-            memset(m_perThreadTemp[threadParam->m_portIndex], 0, sizeof(m_perThreadTemp[threadParam->m_portIndex]));
-            m_perThreadTemp[threadParam->m_portIndex][0] = 1;
             DecRecvQueue(threadParam->m_portIndex);
-            if (SendCancel(threadParam) != 0)
-            {
-                threadParam->m_altState = threadParam->m_state;
-                threadParam->m_recvWriteIdx = localWord;
-                threadParam->m_state = 0x84;
-                goto sleep_retry;
-            }
+            threadParam->m_state = 'F';
+            GbaQue.ClrStageFlg(threadParam->m_portIndex);
             break;
         }
 

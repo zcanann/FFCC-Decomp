@@ -3085,12 +3085,14 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
         while (chunkFile.GetNextChunk(chunk) != 0) {
             switch (chunk.m_id) {
             case CHUNK_TIDX: {
-                for (materialIndex = 0;
-                     materialIndex < static_cast<unsigned long>(m_materials.GetSize());
-                     materialIndex++) {
-                    if (m_materials[materialIndex] == 0) {
-                        break;
+                {
+                    unsigned long i;
+                    for (i = 0; i < static_cast<unsigned long>(m_materials.GetSize()); i++) {
+                        if (m_materials[i] == 0) {
+                            break;
+                        }
                     }
+                    materialIndex = i;
                 }
 
                 material = AllocMaterial();

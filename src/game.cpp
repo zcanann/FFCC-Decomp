@@ -937,7 +937,6 @@ void CGame::Calc()
 {
 	Mtx rotMtx;
     int mapObjIdx;
-    float position;
 
     if (m_frameCounterEnable != 0) {
         m_gameWork.m_frameCounter++;
@@ -954,23 +953,12 @@ void CGame::Calc()
         CGPartyObj* partyObj = m_partyObjArr[i];
 
         if (partyObj != 0) {
-            position = partyObj->m_worldPosition.x;
-            m_partyMinX = (m_partyMinX < position) ? m_partyMinX : position;
-
-            position = partyObj->m_worldPosition.y;
-            m_partyMinY = (m_partyMinY < position) ? m_partyMinY : position;
-
-            position = partyObj->m_worldPosition.z;
-            m_partyMinZ = (m_partyMinZ < position) ? m_partyMinZ : position;
-
-            position = partyObj->m_worldPosition.x;
-            m_partyMaxX = (m_partyMaxX > position) ? m_partyMaxX : position;
-
-            position = partyObj->m_worldPosition.y;
-            m_partyMaxY = (m_partyMaxY > position) ? m_partyMaxY : position;
-
-            position = partyObj->m_worldPosition.z;
-            m_partyMaxZ = (m_partyMaxZ > position) ? m_partyMaxZ : position;
+            m_partyMinX = (m_partyMinX < partyObj->m_worldPosition.x) ? m_partyMinX : partyObj->m_worldPosition.x;
+            m_partyMinY = (m_partyMinY < partyObj->m_worldPosition.y) ? m_partyMinY : partyObj->m_worldPosition.y;
+            m_partyMinZ = (m_partyMinZ < partyObj->m_worldPosition.z) ? m_partyMinZ : partyObj->m_worldPosition.z;
+            m_partyMaxX = (m_partyMaxX > partyObj->m_worldPosition.x) ? m_partyMaxX : partyObj->m_worldPosition.x;
+            m_partyMaxY = (m_partyMaxY > partyObj->m_worldPosition.y) ? m_partyMaxY : partyObj->m_worldPosition.y;
+            m_partyMaxZ = (m_partyMaxZ > partyObj->m_worldPosition.z) ? m_partyMaxZ : partyObj->m_worldPosition.z;
         }
     }
 

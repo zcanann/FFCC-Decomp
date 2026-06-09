@@ -1913,16 +1913,19 @@ void CCaravanWork::CalcStatus()
 
 			unsigned short itemValue = (short)GetItemDataPtr(itemIdx)[3];
 			if (itemType != 0x45) {
-				if (itemType >= 0x45) {
-					if (itemType == 0x7F) {
-						goto apply_effect;
+				if (itemType < 0x45) {
+					if (itemType == 1) {
+						goto apply_str;
 					}
 					goto no_effect;
 				}
-				if (itemType == 1) {
-					m_strength += itemValue;
-					m_baseStrength += itemValue;
+				if (itemType == 0x7F) {
+					goto apply_effect;
 				}
+				goto no_effect;
+			apply_str:
+				m_strength += itemValue;
+				m_baseStrength += itemValue;
 				goto no_effect;
 			}
 

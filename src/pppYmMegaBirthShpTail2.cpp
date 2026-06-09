@@ -81,10 +81,10 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
         hasRequiredMemory = false;
     } else if (wmats == 0) {
         hasRequiredMemory = false;
-    } else if ((step[0x69] == 0) || (colors != 0)) {
-        hasRequiredMemory = true;
-    } else {
+    } else if ((step[0x69] != 0) && (colors == 0)) {
         hasRequiredMemory = false;
+    } else {
+        hasRequiredMemory = true;
     }
     if (!hasRequiredMemory || *(u32*)(step + 4) == 0xFFFF) {
         return;

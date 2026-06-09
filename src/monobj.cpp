@@ -27,6 +27,7 @@ u8 CGMonObj::m_aiWork[0xC];
 u8 CGMonObj::m_boss[0x8C];
 
 extern "C" float g_hit_t;
+extern "C" float g_hit_t_slide_min;
 extern float kMonObjDefaultScale;
 extern float FLOAT_803319C4;
 extern "C" const float kMonObjEpsilon = 0.0000001f;
@@ -2131,11 +2132,12 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 
 		int hit = MapMng.CheckHitCylinderNear(&hitCylinder, reinterpret_cast<Vec*>(&move), cylHitArg);
 		if (hit != 0) {
+			float hitT = g_hit_t_slide_min;
 			if (hitScale != NULL) {
-				*hitScale = g_hit_t;
+				*hitScale = hitT;
 			}
-			PSVECScale(reinterpret_cast<Vec*>(&move), reinterpret_cast<Vec*>(&move), g_hit_t);
-			distance = distance * g_hit_t;
+			PSVECScale(reinterpret_cast<Vec*>(&move), reinterpret_cast<Vec*>(&move), hitT);
+			distance = distance * hitT;
 		}
 		gCFlatRuntime2.AddDebugDrawCC(reinterpret_cast<Vec*>(&startPos), reinterpret_cast<Vec*>(&move), cylRadius, 1, hit);
 	}

@@ -1808,7 +1808,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				sourceObj->bonus(1, resolvedItemId, this);
 			}
 			if ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + resolvedItemId * 0x48 + 0x32) & 1) == 0 &&
-			    ((static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) != 0x6D || static_cast<int>(sourceObj->m_capsuleHalfHeight) < 0)) {
+			    ((static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) != 0x6D || static_cast<unsigned int>(sourceObj->m_capsuleHalfHeight) < 0)) {
 				if (itemEffect == 0x1F8 || particleLife != 2) {
 					if (itemEffect == 0x1F8) {
 						bonus(0x13, resolvedItemId, sourceObj);
@@ -1895,7 +1895,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					if (chance != 0 && (DbgMenuPcs.GetDbgFlagsRaw() & 0x20) != 0) {
 						chance = 100;
 					}
-					if (chance != 0 && Math.Rand(100) <= static_cast<unsigned int>(chance)) {
+					if (chance != 0 && Math.Rand(100) <= static_cast<int>(chance)) {
 						if ((m_bgColMask & 0x80000) != 0) {
 							effective(0x69, resolvedItemId, sourceObj, counterEffect);
 						} else {

@@ -1156,7 +1156,7 @@ timeout_expiry:
                 goto sleep_retry;
             }
 
-            if (GbaQue.GetArtifactFlg(threadParam->m_portIndex))
+            if ((GbaQue.GetArtifactFlg(threadParam->m_portIndex) & 0xFF) != 0)
             {
                 threadParam->m_state = 0x3e;
                 goto recompute_timeout;

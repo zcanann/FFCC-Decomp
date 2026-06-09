@@ -1073,7 +1073,7 @@ timeout_expiry:
                 }
             }
 
-            if (System.GetCounter() % 3 == 0)
+            if ((int)System.GetCounter() % 3 == 0)
             {
                 if (SendItemUse(threadParam) < 0)
                 {
@@ -1202,7 +1202,7 @@ timeout_expiry:
             {
                 if (GbaQue.GetRadarType(threadParam->m_portIndex) == 0)
                 {
-                    if (System.GetCounter() % 5 == 0)
+                    if ((int)System.GetCounter() % 5 == 0)
                     {
                         if (SendMapObjDrawFlg(threadParam) < 0)
                         {
@@ -1210,7 +1210,7 @@ timeout_expiry:
                         }
                     }
                 }
-                if (System.GetCounter() % 3 == 0)
+                if ((int)System.GetCounter() % 3 == 0)
                 {
                     if (SendMBase(threadParam) < 0)
                     {

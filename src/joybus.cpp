@@ -7847,7 +7847,11 @@ int JoyBus::SetMoney(int portIndex, unsigned int money)
 		cmdBytes[3] = money >> 16;
 		unsigned int word = cmd;
 
-		if (static_cast<signed char>(m_threadRunningMask) != 0)
+		if (static_cast<signed char>(m_threadRunningMask) == 0)
+		{
+			result = 0;
+		}
+		else
 		{
 
 			OSWaitSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
@@ -7879,7 +7883,11 @@ int JoyBus::SetMoney(int portIndex, unsigned int money)
 		cmdBytes[2] = money;
 		unsigned int word = cmd;
 
-		if (static_cast<signed char>(m_threadRunningMask) != 0)
+		if (static_cast<signed char>(m_threadRunningMask) == 0)
+		{
+			result = 0;
+		}
+		else
 		{
 
 			OSWaitSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);

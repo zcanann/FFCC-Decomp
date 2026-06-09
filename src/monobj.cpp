@@ -3050,13 +3050,16 @@ void CGMonObj::moveAStar(int startGroup, int forbiddenGroup, Vec& targetPos)
 				CVector myVec2(object->m_worldPosition);
 				CVector result;
 				PSVECAdd(myVec2, &dirScaled, result);
-				Vec finalVec;
-				finalVec.x = result.x;
-				targetPos.x = result.x;
-				targetPos.y = result.y;
-				finalVec.y = result.y;
-				finalVec.z = result.z;
-				targetPos.z = result.z;
+				float rx = result.x;
+				float ry = result.y;
+				float rz = result.z;
+				volatile Vec finalVec;
+				finalVec.x = rx;
+				targetPos.x = rx;
+				targetPos.y = ry;
+				finalVec.y = ry;
+				finalVec.z = rz;
+				targetPos.z = rz;
 			}
 		}
 	}

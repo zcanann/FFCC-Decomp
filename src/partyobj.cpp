@@ -1072,7 +1072,7 @@ void CGPartyObj::onFramePreCalc()
 		} else {
 			m_moveBaseSpeed = FLOAT_80331ad4;
 		}
-		m_moveBaseSpeed *= m_extraMoveVec.z;
+		m_moveBaseSpeed *= *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x690);
 	}
 }
 
@@ -4789,7 +4789,7 @@ void CGPartyObj::gpmCol()
 
 		if (MapMng.CheckHitCylinderNear(&cylinder, &diffVec, flags) != 0) {
 			int capped = i + 1;
-			if (activeTrailCount < capped) {
+			if (capped > activeTrailCount) {
 				capped = activeTrailCount;
 			}
 			i++;
@@ -4797,7 +4797,10 @@ void CGPartyObj::gpmCol()
 			newIndex = trailIndex;
 		} else {
 			activeTrailCount = i + 1;
-			*reinterpret_cast<Vec*>(trailBase + i * 0xC) = leader->m_worldPosition;
+			Vec* slot = reinterpret_cast<Vec*>(trailBase + i * 0xC);
+			slot->x = leader->m_worldPosition.x;
+			slot->y = leader->m_worldPosition.y;
+			slot->z = leader->m_worldPosition.z;
 			newIndex = (i > trailIndex) ? trailIndex : i;
 			break;
 		}

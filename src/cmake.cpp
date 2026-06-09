@@ -3753,32 +3753,22 @@ void CMenuPcs::DrawSingCMake()
 
     if (CmakeState(this)->m_step == 6) {
         CmakeState(this)->m_step = static_cast<short>(CmakeState(this)->m_select + 1);
-        if (CmakeState(this)->m_step == 0) {
-            CmakeState(this)->m_mode = 2;
-        } else {
-            CmakeState(this)->m_mode = 0;
-        }
     } else if (CmakeState(this)->m_resultDir < 0) {
         if (CmakeState(this)->m_step == 5) {
             CmakeState(this)->m_step = 6;
         } else {
             CmakeState(this)->m_step = static_cast<short>(CmakeState(this)->m_step - 1);
         }
-        if (CmakeState(this)->m_step == 0) {
-            CmakeState(this)->m_mode = 2;
-        } else {
-            CmakeState(this)->m_mode = 0;
-        }
     } else if (CmakeState(this)->m_step != 5) {
         CmakeState(this)->m_step = static_cast<short>(CmakeState(this)->m_step + 1);
-        if (CmakeState(this)->m_step == 0) {
-            CmakeState(this)->m_mode = 2;
-        } else {
-            CmakeState(this)->m_mode = 0;
-        }
     } else {
         CmakeState(this)->m_step = 0;
+    }
+
+    if (CmakeState(this)->m_step == 0) {
         CmakeState(this)->m_mode = 2;
+    } else {
+        CmakeState(this)->m_mode = 0;
     }
 
     CmakeState(this)->m_selectionInitialized = 0;

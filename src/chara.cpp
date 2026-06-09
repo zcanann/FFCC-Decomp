@@ -1835,6 +1835,7 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 
 #pragma push
 #pragma opt_common_subs off
+#pragma opt_propagation off
 /*
  * --INFO--
  * PAL Address: 0x80071078

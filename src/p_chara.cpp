@@ -2558,7 +2558,7 @@ int CCharaPcs::CHandle::LoadAnim(
     reinterpret_cast<CRef*>(loadAnim)->AddRef();
 
     *reinterpret_cast<unsigned int*>(Ptr(m_animSlot[animIndex], 0x70)) = static_cast<unsigned int>(animFlags);
-    if (reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex])->m_anim != 0) {
+    {
         unsigned char& flags1 = reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex])->m_anim->m_flags;
         flags1 = static_cast<unsigned char>(__rlwimi(flags1, animFlags, 7, 24, 24));
         unsigned char& flags2 = reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex])->m_anim->m_flags;

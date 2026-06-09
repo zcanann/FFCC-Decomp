@@ -505,9 +505,9 @@ static inline u8 AnimFlags(CChara::CAnim* anim)
 	return anim->m_flags;
 }
 
-static inline s32 AnimInterpCount(CChara::CAnim* anim)
+static inline u8 AnimInterpCount(CChara::CAnim* anim)
 {
-	return anim->m_interp;
+	return reinterpret_cast<u8*>(anim)[0x9];
 }
 
 static inline u16 AnimNodeCount(CChara::CAnim* anim)
@@ -1262,18 +1262,21 @@ CChara::CModel* CChara::CModel::Duplicate(CMemory::CStage* stage)
 	clone->m_data = ModelRef(this);
 	RetainRefCounted(ModelRef(clone));
 
-	CChara::CNode* cloneNodes = new (stage, const_cast<char*>(s_chara_cpp), 0x263) CChara::CNode[ModelNodeCount(this)];
-	clone->m_nodes = cloneNodes;
-	for (u32 i = 0; i < ModelNodeCount(this); i++) {
-		CChara::CNode* dst = &cloneNodes[i];
-		CChara::CNode* src = &ModelNodes(this)[i];
-		dst->m_refData = src->m_refData;
-		PSMTXCopy(NodeLocalRuntimeMtx(src), NodeLocalRuntimeMtx(dst));
-		PSMTXCopy(NodeWorldMtx(src), NodeWorldMtx(dst));
-		NodePreviousQuat(dst) = NodePreviousQuat(src);
-		NodePreviousPosition(dst) = NodePreviousPosition(src);
-		NodePreviousScale(dst) = NodePreviousScale(src);
-		dst->m_flagsBits.m_flag_80 = src->m_flagsBits.m_flag_80;
+	clone->m_nodes = new (stage, const_cast<char*>(s_chara_cpp), 0x263) CChara::CNode[ModelNodeCount(this)];
+	{
+		u32 i = 0;
+		u32 byteOff = 0;
+		for (; i < ModelNodeCount(this); byteOff += 0xc0, i++) {
+			CChara::CNode* src = reinterpret_cast<CChara::CNode*>(reinterpret_cast<u8*>(ModelNodes(this)) + byteOff);
+			CChara::CNode* dst = reinterpret_cast<CChara::CNode*>(reinterpret_cast<u8*>(clone->m_nodes) + byteOff);
+			dst->m_refData = src->m_refData;
+			PSMTXCopy(NodeLocalRuntimeMtx(src), NodeLocalRuntimeMtx(dst));
+			PSMTXCopy(NodeWorldMtx(src), NodeWorldMtx(dst));
+			NodePreviousQuat(dst) = NodePreviousQuat(src);
+			NodePreviousPosition(dst) = NodePreviousPosition(src);
+			NodePreviousScale(dst) = NodePreviousScale(src);
+			dst->m_flagsBits.m_flag_80 = src->m_flagsBits.m_flag_80;
+		}
 	}
 
 	CChara::CMesh* cloneMeshes = new (stage, const_cast<char*>(s_chara_cpp), 0x26C) CChara::CMesh[ModelMeshCount(this)];
@@ -2374,16 +2377,16 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 {
 	if (blendMode == -1) {
 		CAnim* currentAnim = m_anim;
-		int interpCount;
+		u8 interpCount;
 		if (currentAnim != 0 && (interpCount = AnimInterpCount(currentAnim)) != 0 && AnimBank(currentAnim) != 0) {
 			blendMode = 4;
 
 			u16* interpTable = reinterpret_cast<u16*>(reinterpret_cast<u8*>(AnimBank(currentAnim)) + AnimInterpOffset(currentAnim));
 			int frame = static_cast<int>(m_curFrame);
 
-			for (int i = 0; i < interpCount; i++) {
+			for (int i = 0; i < static_cast<int>(interpCount); i++) {
 				int start = (i == 0) ? 0 : interpTable[i * 2];
-				int end = (i + 1 < interpCount) ? interpTable[i * 2 + 2] : 10000000;
+				int end = (i + 1 < static_cast<int>(interpCount)) ? interpTable[i * 2 + 2] : 10000000;
 				if (start <= frame && frame < end) {
 					blendMode = interpTable[i * 2 + 1];
 					break;

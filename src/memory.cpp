@@ -1921,8 +1921,9 @@ void CAmemCacheSet::Release(short index)
             System.Printf(const_cast<char*>(sAmemCacheAddRefFmt));
         }
 
-        int offset = 0;
-        for (int i = 0; i < m_cacheCount; i++) {
+        int i = 0;
+        int offset = i;
+        for (; i < m_cacheCount; i++) {
             CAmemCache& cache = *reinterpret_cast<CAmemCache*>(reinterpret_cast<char*>(m_cacheTable) + offset);
             if (((cache.m_inUse != 0) || (cache.m_cacheData != 0)) && (static_cast<unsigned int>(System.m_execParam) >= 3)) {
                 System.Printf(

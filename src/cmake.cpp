@@ -1031,7 +1031,7 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
             const char* rowText = s_NameEntryStr[curRow + curTable * 5];
             int rowLen = strlen(rowText);
             if (rowLen != 0) {
-                int i = 0;
+                unsigned int i = 0;
                 int j = 0;
                 for (; 0 < rowLen; rowLen = rowLen - 1) {
                     if (i == curSelect) {
@@ -1779,7 +1779,7 @@ void CMenuPcs::CmakeJobDraw()
         int sel = CmakeState(this)->m_select;
         int cursorX = (sel < 4) ? 0x110 : 0x1A8;
         int cursorY = 0x70 + ((sel < 4) ? sel : (sel - 4)) * 0x28;
-        int cursorFrame = static_cast<int>(System.m_frameCounter) % 8;
+        unsigned int cursorFrame = static_cast<int>(System.m_frameCounter) % 8;
         DrawCursor(static_cast<int>((static_cast<float>(cursorX) - 36.0f) + static_cast<float>(cursorFrame)),
             cursorY, alpha);
     }

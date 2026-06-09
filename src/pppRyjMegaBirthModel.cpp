@@ -972,17 +972,17 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* stepData, _p
     VRyjMegaBirthModel* work =
         (VRyjMegaBirthModel*)(obj->m_workArea + offsets->m_workOffset);
     VColor* baseColor = (VColor*)(obj->m_workArea + offsets->m_colorOffset);
-    _PARTICLE_DATA* particleBlock = work->m_particleBlock;
+    _PARTICLE_DATA* particle = work->m_particleBlock;
     s32 numParticles = work->m_numParticles;
-    _PARTICLE_WMAT* particleWorldMatrixBlock = work->m_worldMatrixBlock;
-    _PARTICLE_COLOR* colorBlock = work->m_colorBlock;
+    _PARTICLE_WMAT* particleWorldMatrix = work->m_worldMatrixBlock;
+    _PARTICLE_COLOR* particleColor = work->m_colorBlock;
     s8 hasRequiredMemory;
 
-    if (particleBlock == NULL) {
+    if (particle == NULL) {
         hasRequiredMemory = 0;
-    } else if ((params->m_enableWorldMatrix != 0) && (particleWorldMatrixBlock == NULL)) {
+    } else if ((params->m_enableWorldMatrix != 0) && (particleWorldMatrix == NULL)) {
         hasRequiredMemory = 0;
-    } else if ((params->m_enableParticleColor != 0) && (colorBlock == NULL)) {
+    } else if ((params->m_enableParticleColor != 0) && (particleColor == NULL)) {
         hasRequiredMemory = 0;
     } else {
         hasRequiredMemory = 1;
@@ -1006,10 +1006,6 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* stepData, _p
     int baseGreen = baseColor->m_green;
     int baseBlue = baseColor->m_blue;
     int baseAlpha = baseColor->m_alpha;
-
-    _PARTICLE_DATA* particle = particleBlock;
-    _PARTICLE_WMAT* particleWorldMatrix = particleWorldMatrixBlock;
-    _PARTICLE_COLOR* particleColor = colorBlock;
 
     for (int i = 0; i < numParticles; i++) {
         if (*u16_at(particle, 0x30) != 0) {

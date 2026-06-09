@@ -2919,7 +2919,7 @@ void CGPartyObj::checkTargetParticle()
 	delta.x = deltaResult.x;
 	delta.y = deltaResult.y;
 	delta.z = deltaResult.z;
-	if (PSVECMag(&delta) > FLOAT_80331a78) {
+	if (FLOAT_80331a78 < PSVECMag(&delta)) {
 		m_rotationY = atan2(delta.x, delta.z);
 	}
 }

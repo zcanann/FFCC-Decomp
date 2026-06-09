@@ -2491,8 +2491,8 @@ void CGObject::SetDamageCol(int colliderIndex, char* nodeName, float hitMask, fl
  */
 void CGObject::boundCheck()
 {
-    Vec clipCorner;
     Vec4d clipPos;
+    Vec clipCorner;
     Mtx cameraMtx;
     Mtx44 clipMtx;
     Mtx44 screenMtx;
@@ -3212,10 +3212,10 @@ void CGObject::ResetDynamics()
  */
 void CGObject::CalcSphereNearPos(float scale, float angleOffset, Vec& outPos)
 {
-    Vec up;
-    Vec normal;
-    Vec tangent;
     Vec bitangent;
+    Vec tangent;
+    Vec normal;
+    Vec up;
     Vec offset;
     Mtx rotationMtx;
 

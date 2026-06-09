@@ -2459,9 +2459,9 @@ void CPartMng::pppEditDrawShadow()
     if (*reinterpret_cast<long**>(self + 0x5dc) != 0 && *reinterpret_cast<int*>(self + 0x174) <= 3) {
         Mtx invCamera;
         Vec cameraPos;
+        Vec viewPos;
         Vec partPos;
         Vec cameraDelta;
-        Vec viewPos;
 
         PSMTXInverse(ppvCameraMatrix, invCamera);
         cameraPos.x = invCamera[0][3];

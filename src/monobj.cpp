@@ -3015,7 +3015,7 @@ void CGMonObj::moveAStar(int startGroup, int forbiddenGroup, Vec& targetPos)
 			if ((routeFrom != 0) && (forbiddenGroup != 0) &&
 				((escapePos = AStar.getEscapePos(object->m_worldPosition, targetPos, routeFrom, routePrev)) != NULL)) {
 				unsigned int nextGroup = escapePos->m_groupA;
-				if (static_cast<short>(nextGroup) == routeFrom) {
+				if (static_cast<unsigned short>(nextGroup) == routeFrom) {
 					nextGroup = escapePos->m_groupB;
 				}
 				unsigned char* routeStep = AStar.m_routeTable[routeFrom - 1][nextGroup + 0x36];

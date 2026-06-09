@@ -1687,6 +1687,8 @@ void CChara::CModel::calcMatrix()
 	ModelFlags10C(this) &= 0x7F;
 }
 
+#pragma push
+#pragma opt_common_subs off
 /*
  * --INFO--
  * PAL Address: 0x800716c4
@@ -1826,6 +1828,7 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 
 	PSMTXConcat(reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(this) + 0x08), out, out);
 }
+#pragma pop
 
 #pragma push
 #pragma opt_common_subs off

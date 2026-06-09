@@ -3566,16 +3566,14 @@ void CGCharaObj::combi2()
 		CharaObjComboScriptMode(party) = comboMode;
 		CharaObjComboLinkCount(party) = 0;
 
-		int linkCount = 0;
 		CGPrgObj** comboLinks = CharaObjComboLinks(party);
 		for (unsigned int j = 0; j < participantCount; j++) {
 			CGPartyObj* other = candidates[j];
 			if (party == other) {
 				continue;
 			}
-			comboLinks[linkCount++] = other;
+			comboLinks[CharaObjComboLinkCount(party)++] = other;
 		}
-		CharaObjComboLinkCount(party) = linkCount;
 	}
 #undef comboCmd
 

@@ -846,7 +846,7 @@ timeout_expiry:
 
             m_ctrlModeArr[threadParam->m_portIndex] = 0;
 
-            char controllerMode = GbaQue.GetControllerMode();
+            unsigned char controllerMode = GbaQue.GetControllerMode();
 
             if (controllerMode == 0)
                 m_nextModeTypeArr[threadParam->m_portIndex] = 0;
@@ -866,7 +866,7 @@ timeout_expiry:
             }
             else if (threadParam->m_gbaStatus == 0)
             {
-                char cm = GbaQue.GetControllerMode();
+                unsigned char cm = GbaQue.GetControllerMode();
 
                 if (cm == 0)
                     m_nextModeTypeArr[threadParam->m_portIndex] = 0;
@@ -1004,7 +1004,7 @@ timeout_expiry:
 
             unsigned char spMode = (GbaQue.GetSPMode(threadParam->m_portIndex) & 0xFF) != 0;
             if (threadParam->m_flags[5] == 0 ||
-                GbaQue.GetSPModeFlg(threadParam->m_portIndex) != 0 ||
+                (GbaQue.GetSPModeFlg(threadParam->m_portIndex) & 0xFF) != 0 ||
                 spMode != threadParam->m_flags[6])
             {
                 if (SendSPMode(threadParam) < 0)
@@ -1025,7 +1025,7 @@ timeout_expiry:
                 threadParam->m_flags[4] = (threadParam->m_flags[4] == 0);
             }
 
-            if (GbaQue.GetControllerMode() != 0)
+            if ((GbaQue.GetControllerMode() & 0xFF) != 0)
             {
                 m_ctrlModeArr[threadParam->m_portIndex] = 4;
             }
@@ -1040,7 +1040,7 @@ timeout_expiry:
                 goto recompute_timeout;
             }
 
-            if (GbaQue.GetStartBonusFlg(threadParam->m_portIndex))
+            if ((GbaQue.GetStartBonusFlg(threadParam->m_portIndex) & 0xFF) != 0)
             {
                 if (SendStartBonus(threadParam) < 0)
                 {
@@ -1084,7 +1084,7 @@ timeout_expiry:
             char radarType = GbaQue.GetRadarType(threadParam->m_portIndex);
             if ((int)GbaQue.GetStageFlg(threadParam->m_portIndex) == 0 && radarType == 2)
             {
-                if (GbaQue.GetChgScouFlg(threadParam->m_portIndex) != 0 ||
+                if ((char)GbaQue.GetChgScouFlg(threadParam->m_portIndex) != 0 ||
                     (m_stateFlagArr[threadParam->m_portIndex] != 0 &&
                      m_stateCodeArr[threadParam->m_portIndex] == 0))
                 {
@@ -1106,7 +1106,7 @@ timeout_expiry:
 
             if (m_stateCodeArr[threadParam->m_portIndex] == 2)
             {
-                if (GbaQue.GetChgUseItemFlg(threadParam->m_portIndex))
+                if ((GbaQue.GetChgUseItemFlg(threadParam->m_portIndex) & 0xFF) != 0)
                 {
                     char useItem = (char)GbaQue.GetUseItemFlg(threadParam->m_portIndex);
                     if (SendUseItem(threadParam->m_portIndex, useItem) < 0)
@@ -1124,7 +1124,7 @@ timeout_expiry:
                 goto recompute_timeout;
             }
 
-            if (GbaQue.GetStrengthFlg(threadParam->m_portIndex))
+            if ((GbaQue.GetStrengthFlg(threadParam->m_portIndex) & 0xFF) != 0)
             {
                 if (SendStrength(threadParam) < 0)
                 {
@@ -1133,7 +1133,7 @@ timeout_expiry:
                 GbaQue.ClrStrengthFlg(threadParam->m_portIndex);
             }
 
-            if (GbaQue.GetMemorysFlg(threadParam->m_portIndex))
+            if ((GbaQue.GetMemorysFlg(threadParam->m_portIndex) & 0xFF) != 0)
             {
                 if (SendMemorys(threadParam) < 0)
                 {
@@ -1272,7 +1272,7 @@ timeout_expiry:
 
             unsigned char spMode = (GbaQue.GetSPMode(threadParam->m_portIndex) & 0xFF) != 0;
             if (threadParam->m_flags[5] == 0 ||
-                GbaQue.GetSPModeFlg(threadParam->m_portIndex) != 0 ||
+                (GbaQue.GetSPModeFlg(threadParam->m_portIndex) & 0xFF) != 0 ||
                 spMode != threadParam->m_flags[6])
             {
                 if (SendSPMode(threadParam) < 0)

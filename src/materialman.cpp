@@ -1313,21 +1313,21 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
                 unsigned int scrollSel = tevBit & 0x60;
                 m_activeEnvTevBit = tevBit;
                 switch (scrollSel) {
-                case 0x40:
-                    m_bumpTexCoordIds[0] = m_texScroll1TexCoord;
-                    GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_bumpTexCoordIds[0]), GX_TG_MTX2x4, GX_TG_TEX0, m_texScroll1TexMtx, GX_FALSE, 0x7D);
-                    m_texCoordIdCurShadow = IncTexCoordIdCur();
+                case 0:
+                    IncTexCoordIdCur();
                     GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_texCoordIdCurShadow), GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, 0x7D);
+                    m_bumpTexCoordIds[0] = m_texCoordIdCurShadow;
                     break;
                 case 0x20:
                     m_texCoordIdCurShadow = m_texScroll0TexCoord;
                     m_bumpTexCoordIds[0] = IncTexCoordIdCur();
                     GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_bumpTexCoordIds[0]), GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, 0x7D);
                     break;
-                case 0:
-                    IncTexCoordIdCur();
+                case 0x40:
+                    m_bumpTexCoordIds[0] = m_texScroll1TexCoord;
+                    GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_bumpTexCoordIds[0]), GX_TG_MTX2x4, GX_TG_TEX0, m_texScroll1TexMtx, GX_FALSE, 0x7D);
+                    m_texCoordIdCurShadow = IncTexCoordIdCur();
                     GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_texCoordIdCurShadow), GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, 0x7D);
-                    m_bumpTexCoordIds[0] = m_texCoordIdCurShadow;
                     break;
                 case 0x60:
                     m_texCoordIdCurShadow = m_texScroll0TexCoord;
@@ -1359,16 +1359,16 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
             }
             unsigned int scrollSel = tevBit & 0x60;
             switch (scrollSel) {
+            case 0x20:
+                m_texCoordIdCurShadow = m_texScroll0TexCoord;
+                m_bumpTexCoordIds[0] = IncTexCoordIdCur();
+                GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_bumpTexCoordIds[0]), GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, 0x7D);
+                break;
             case 0x40:
                 m_bumpTexCoordIds[0] = m_texScroll1TexCoord;
                 GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_bumpTexCoordIds[0]), GX_TG_MTX2x4, GX_TG_TEX0, m_texScroll1TexMtx, GX_FALSE, 0x7D);
                 m_texCoordIdCurShadow = IncTexCoordIdCur();
                 GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_texCoordIdCurShadow), GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, 0x7D);
-                break;
-            case 0x20:
-                m_texCoordIdCurShadow = m_texScroll0TexCoord;
-                m_bumpTexCoordIds[0] = IncTexCoordIdCur();
-                GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_bumpTexCoordIds[0]), GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, 0x7D);
                 break;
             }
             material->m_bumpLight->SetTexture(static_cast<_GXTexMapID>(m_bumpTexMapIds[1]), material->m_unk36);

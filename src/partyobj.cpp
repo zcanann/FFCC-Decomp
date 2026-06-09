@@ -2781,9 +2781,11 @@ void CGPartyObj::checkTargetParticle()
 		input.Normalize();
 		PSVECScale(reinterpret_cast<Vec*>(&input), reinterpret_cast<Vec*>(&input), FLOAT_80331ad4);
 
-			float angle = CameraPcs.m_yaw;
+			float angle;
 			if (isGhostPartyTargetMode(this)) {
 				angle = FLOAT_80331AB8;
+			} else {
+				angle = CameraPcs.m_yaw;
 			}
 
 		float s = sin(angle);

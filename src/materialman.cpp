@@ -1274,9 +1274,7 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
                 GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_bumpTexCoordIds[5]), GX_TG_MTX3x4, GX_TG_POS, m_bumpTexMtxIds[4], GX_FALSE, 0x7D);
                 m_numTevStage = 0;
 
-                if ((tevBit & 0x80000) == 0) {
-                    addtev_bump_water(tevScale);
-                } else {
+                if ((tevBit & 0x80000) != 0) {
                     if (material->m_unkA5 != 0) {
                         GXColor tevColor = *reinterpret_cast<GXColor*>(reinterpret_cast<char*>(material->m_bumpLight) + 0x54);
                         GXSetTevColor(GX_TEVREG1, tevColor);
@@ -1285,6 +1283,8 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
                         GXSetTevColor(GX_TEVREG1, tevColor);
                     }
                     addtev_bump_spec_col_water(tevScale);
+                } else {
+                    addtev_bump_water(tevScale);
                 }
                 addtev_stdShadow(tevBit);
                 GXSetNumTexGens(m_texCoordIdCur & 0xFF);

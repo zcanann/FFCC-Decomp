@@ -12409,8 +12409,10 @@ void CMenuPcs::BindMcObj()
 			object->m_charaModelHandle = reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x4A8)[i];
 			*reinterpret_cast<void**>(createParam + 0x74) = object;
 			*reinterpret_cast<void**>(createParam + 0x70) = object;
-			const int group = (((static_cast<int>(effectNo) ^ 100) >> 1) - ((static_cast<int>(effectNo) ^ 100) & static_cast<int>(effectNo))) >> 31;
-			effect->m_partNo = PartMng.pppCreate(group, static_cast<int>(effectNo), reinterpret_cast<PPPCREATEPARAM*>(createParam), 1);
+			int __p18 = effectNo;
+			const int group = (((static_cast<int>(effectNo) ^ 100) >> 1) - ((static_cast<int>(__p18) ^ 100) & static_cast<int>(effectNo))) >> 31;
+			int __p21 = group;
+			effect->m_partNo = PartMng.pppCreate(__p21, static_cast<int>(effectNo), reinterpret_cast<PPPCREATEPARAM*>(createParam), 1);
 		}
 
 		const unsigned int flags = charaState[i * 0x12 + 0xA];
@@ -12452,7 +12454,8 @@ void CMenuPcs::BindMcObj()
 		*reinterpret_cast<float*>(createParam + 0x28) = FLOAT_803313e8;
 		createParam[0x2C] = 0;
 
-		const unsigned int effectNo = static_cast<unsigned int>(weaponModel + 0x1A);
+		int __p20 = weaponModel;
+		const unsigned int effectNo = static_cast<unsigned int>(__p20 + 0x1A);
 		EffectInfo* effect = &m_effectWork[slot];
 		if (slot == 5 && static_cast<int>(effectNo) < 0x13) {
 			effect++;
@@ -12468,7 +12471,8 @@ void CMenuPcs::BindMcObj()
 		*reinterpret_cast<void**>(createParam + 0x74) = object;
 		*reinterpret_cast<void**>(createParam + 0x70) = object;
 		const int group = (((static_cast<int>(effectNo) ^ 100) >> 1) - ((static_cast<int>(effectNo) ^ 100) & static_cast<int>(effectNo))) >> 31;
-		effect->m_partNo = PartMng.pppCreate(group, static_cast<int>(effectNo), reinterpret_cast<PPPCREATEPARAM*>(createParam), 1);
+		int __p19 = group;
+		effect->m_partNo = PartMng.pppCreate(__p19, static_cast<int>(effectNo), reinterpret_cast<PPPCREATEPARAM*>(createParam), 1);
 	}
 }
 

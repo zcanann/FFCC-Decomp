@@ -2804,7 +2804,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         _GXColor ambientGX = ambientColor.color;
         LightPcs.SetAmbient(ambientGX);
 
-        for (long i = 0; i < 3; i++) {
+        for (unsigned long i = 0; i < 3; i++) {
             CColor3 diffuseBase(CharaPcs.m_viewerDiffuseColor[lightBank][i]);
             CColor3 diffuseShade;
             diffuseShade.color.r = static_cast<signed char>((static_cast<unsigned int>(diffuseBase.color.r) * shade.color.r) / 255);

@@ -504,7 +504,10 @@ void CPartMng::pppDumpMngSt()
             const_cast<char*>(sPartMngHeapSummaryFmt),
             static_cast<int>(heapTotal >> 10), static_cast<int>(heapUse >> 10),
             static_cast<int>(heapFree >> 10));
-        System.Printf(const_cast<char*>(sPartMngDumpSeparator));
+    }
+
+    if (static_cast<unsigned int>(System.m_execParam) >= 1U) {
+        System.Printf(const_cast<char*>(sPartMngTripleNewline));
     }
 }
 

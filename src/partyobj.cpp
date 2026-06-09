@@ -4775,7 +4775,7 @@ void CGPartyObj::gpmCol()
 {
 	unsigned char* ghostWork = CGPartyObj::m_ghostWork;
 	int& activeTrailCount = *reinterpret_cast<int*>(ghostWork + 0x48);
-	int& trailIndex = *reinterpret_cast<int*>(ghostWork + 0x4C);
+#define trailIndex (*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x4C))
 	CGPartyObj* leader = Game.m_partyObjArr[0];
 
 	unsigned char* trailBase = ghostWork + 0x50;
@@ -4836,6 +4836,7 @@ void CGPartyObj::gpmCol()
 		trailIndex = gpmColClamp;
 	}
 #undef gpmColClamp
+#undef trailIndex
 }
 #pragma pop
 
@@ -5134,9 +5135,9 @@ void CGPartyObj::gpmMove()
 	float clampedDist = (dist > *reinterpret_cast<float*>(self + 0x5BC)) ? *reinterpret_cast<float*>(self + 0x5BC) : dist;
 
 	if (m_lastStateId == 0 &&
-	    (static_cast<unsigned char>(static_cast<int>((static_cast<unsigned int>(self[0x63C]) << 24) & 0xC0000000) >> 31) != 0)) {
+	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x63C]) << 24) & 0xC0000000) >> 31) != 0)) {
 		int moveKind;
-		if (static_cast<unsigned char>(static_cast<int>((static_cast<unsigned int>(sGhostPartyWork.flags) << 24) & 0xC0000000) >> 31) != 0) {
+		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(sGhostPartyWork.flags) << 24) & 0xC0000000) >> 31) != 0) {
 			moveKind = 0;
 			if (PartyData(this).carryObject != nullptr) {
 				sGhostPartyWork.carrySpeed = 0.0f;
@@ -5281,7 +5282,7 @@ void CGPartyObj::gpmMove()
 	if (m_lastStateId != 2) {
 		return;
 	}
-	if (static_cast<unsigned char>(static_cast<int>((static_cast<unsigned int>(sGhostPartyWork.flags) << 24) & 0xC0000000) >> 31) == 0) {
+	if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(sGhostPartyWork.flags) << 24) & 0xC0000000) >> 31) == 0) {
 		changeStat(0, 0, 0);
 		return;
 	}

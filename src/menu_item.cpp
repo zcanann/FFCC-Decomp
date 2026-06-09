@@ -606,15 +606,16 @@ int CMenuPcs::ItemCtrl()
 
     this->m_itemMenuState->prevMode = this->m_itemMenuState->mode;
 
-    if ((this->m_itemMenuState->mode == 0) ||
-        ((this->m_itemMenuState->mode != 0) && (this->m_itemMenuState->optionFrame == 1))) {
+    int mode = this->m_itemMenuState->mode;
+    if ((mode == 0) ||
+        ((mode != 0) && (this->m_itemMenuState->optionFrame == 1))) {
         changed = ItemCtrlCur();
-    } else if ((this->m_itemMenuState->mode == 1) && (this->m_itemMenuState->optionFrame == 0)) {
+    } else if ((mode == 1) && (this->m_itemMenuState->optionFrame == 0)) {
         if (this->m_menuWindowInfo->state == 1) {
             changed = 0;
             this->m_itemMenuState->optionFrame++;
         }
-    } else if (((this->m_itemMenuState->mode == 1) && (this->m_itemMenuState->optionFrame == 2)) &&
+    } else if (((mode == 1) && (this->m_itemMenuState->optionFrame == 2)) &&
                (this->m_menuWindowInfo->state == 3)) {
         changed = 0;
         this->m_itemMenuState->optionFrame = 0;

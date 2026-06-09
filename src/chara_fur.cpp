@@ -424,6 +424,8 @@ static void DrawFurDisplayListShell(const FurMeshRaw* mesh, const FurDisplayList
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_dead_assignments off
 void CChara::TimeMogFur()
 {
 	const int frameCounter = static_cast<int>(System.m_frameCounter);
@@ -481,6 +483,7 @@ void CChara::TimeMogFur()
 
 	CalcMogScore();
 }
+#pragma pop
 
 static int FurColorMatch(CColor src, CColor ref)
 {
@@ -869,6 +872,8 @@ static void OpenMogHintMessage(int messageId)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_propagation off
 void CChara::InitFurTexBuffer()
 {
 	MogFurState& fur = MogFur();
@@ -901,6 +906,7 @@ void CChara::InitFurTexBuffer()
 	memset(fur.m_score, 0, 0x40);
 	CalcMogScore();
 }
+#pragma pop
 
 /*
  * --INFO--

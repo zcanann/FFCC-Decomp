@@ -499,9 +499,9 @@ static inline CMemory::CStage* HandleModelStage(int charaKind, int specialModelS
 
 static inline CMemory::CStage* HandleTextureStage(int charaKind)
 {
+    int allocStageMode = CharaPcs.m_charaAllocStage;
     int index = charaKind == 4 ? 3 : 1;
-    CMemory::CStage* stage = (&CharaPcs.m_viewerModelStage)[index];
-    return SelectLoadStage(&CharaPcs, stage);
+    return GET_CHARA_ALLOC_STAGE_S(allocStageMode, (&CharaPcs.m_viewerModelStage)[index]);
 }
 
 static inline Mtx* ModelLocalMtx(CChara::CModel* model)
@@ -1389,7 +1389,8 @@ CTextureSet* CCharaPcs::createTextureSet(void* textureData, int useWeaponStage)
 {
     CTextureSet* textureSet = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
 
-    textureSet->Create(textureData, SelectLoadStage(&CharaPcs, (&CharaPcs.m_viewerModelStage)[useWeaponStage != 0 ? 3 : 1]), 0, 0, 0, 0);
+    int allocStageMode = CharaPcs.m_charaAllocStage;
+    textureSet->Create(textureData, GET_CHARA_ALLOC_STAGE_S(allocStageMode, (&CharaPcs.m_viewerModelStage)[useWeaponStage != 0 ? 3 : 1]), 0, 0, 0, 0);
 
     return textureSet;
 }
@@ -1635,7 +1636,7 @@ void CCharaPcs::LoadCam(int index, char* fileName)
         case 'CAM ': {
             m_cameraFrameCount[index] = static_cast<int>(chunk.m_arg0);
 
-            cameraBuffer = new (m_viewerAnimStage, const_cast<char*>(s_p_chara_cpp), 0x4D4)
+            cameraBuffer = new (CharaPcs.m_viewerAnimStage, const_cast<char*>(s_p_chara_cpp), 0x4D4)
                 CCameraFrame[static_cast<unsigned long>(m_cameraFrameCount[index])];
 
             int byteOffset = 0;

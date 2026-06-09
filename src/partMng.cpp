@@ -1406,6 +1406,7 @@ void pppEditGetProjectionMatrix(float (*projectionMatrix)[4])
  * Size:	TODO
  */
 #pragma opt_lifetimes off
+#pragma opt_strength_reduction off
 void CPartMng::pppEditAllReleaseResource()
 {
     static const int kUsbMapMeshTableOffset = 0x7F4;
@@ -1514,6 +1515,7 @@ void CPartMng::pppEditAllReleaseResource()
 #undef self
 }
 #pragma opt_lifetimes reset
+#pragma opt_strength_reduction reset
 
 /*
  * --INFO--

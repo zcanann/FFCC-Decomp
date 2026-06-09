@@ -2462,8 +2462,8 @@ void CGoOutMenu::CalcDel()
                 Sound.PlaySe(2, 0x40, 0x7f, 0);
                 CCaravanWork& caravanWork = Game.m_caravanWorkArr[m_selectedChara];
                 caravanWork.m_shopState = 0;
-                memset(reinterpret_cast<unsigned char*>(&caravanWork) + 0x9A4, 0, 0x100);
-                memset(reinterpret_cast<unsigned char*>(&caravanWork) + 0xAA4, 0, 0x200);
+                memset(reinterpret_cast<unsigned char*>(&caravanWork) + 0x8A4, 0, 0x100);
+                memset(reinterpret_cast<unsigned char*>(&caravanWork) + 0x9A4, 0, 0x200);
                 SetDelMode(1);
             }
         }

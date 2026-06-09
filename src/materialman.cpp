@@ -169,9 +169,9 @@ static CMaterial* AllocMaterial()
     return new (MaterialMan.GetMemoryStage(), (char*)"materialman.cpp", 0xCFF) CMaterial;
 }
 
-static void AddTextureIndex(CMaterial* material, unsigned short textureIndex)
+static void AddTextureIndex(CMaterial* material, CChunkFile& chunkFile)
 {
-    material->AddTextureIdx(material->GetTextureCount(), textureIndex);
+    material->AddTextureIdx(chunkFile);
 }
 
 static CMapKeyFrame* AllocMapKeyFrame(int line)
@@ -2595,7 +2595,7 @@ int CMaterialMan::GetCharaShadow(
     ShadowCandidate shadowCandidates[128];
     ShadowCandidate* candidateWrite = shadowCandidates;
     CMaterial** materialWrite = materialsOut;
-    int candidateCount = 0;
+    unsigned int candidateCount = 0;
     int outputCount = 0;
     int outputOffset = 0;
 
@@ -2621,10 +2621,9 @@ int CMaterialMan::GetCharaShadow(
         if (shadow->m_materialMode == 1) {
             if (outputCount < maxShadows) {
                 *materialWrite++ = MapMng.m_materialSet->m_materials[shadow->m_materialIndex];
-                *reinterpret_cast<float(**)[4]>(
-                    reinterpret_cast<char*>(shadowMtxOut) + outputOffset) = shadow->m_shadowMtx;
+                shadowMtxOut[outputOffset] = shadow->m_shadowMtx;
                 outputCount++;
-                outputOffset += 4;
+                outputOffset++;
             }
             continue;
         }
@@ -2674,10 +2673,9 @@ int CMaterialMan::GetCharaShadow(
         nearest->distance = kMaterialMaxDistance;
         CMapShadow* nearestShadow = nearest->shadow;
         materialsOut[outputCount] = MapMng.m_materialSet->m_materials[nearestShadow->m_materialIndex];
-        *reinterpret_cast<float(**)[4]>(
-            reinterpret_cast<char*>(shadowMtxOut) + outputOffset) = nearestShadow->m_shadowMtx;
+        shadowMtxOut[outputOffset] = nearestShadow->m_shadowMtx;
         outputCount++;
-        outputOffset += 4;
+        outputOffset++;
     }
 
     return outputCount;
@@ -3085,12 +3083,14 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
         while (chunkFile.GetNextChunk(chunk) != 0) {
             switch (chunk.m_id) {
             case CHUNK_TIDX: {
-                for (materialIndex = 0;
-                     materialIndex < static_cast<unsigned long>(m_materials.GetSize());
-                     materialIndex++) {
-                    if (m_materials[materialIndex] == 0) {
-                        break;
+                {
+                    unsigned long i;
+                    for (i = 0; i < static_cast<unsigned long>(m_materials.GetSize()); i++) {
+                        if (m_materials[i] == 0) {
+                            break;
+                        }
                     }
+                    materialIndex = i;
                 }
 
                 material = AllocMaterial();
@@ -3156,21 +3156,21 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 }
 
                 material = m_materials[materialIndex];
-                AddTextureIndex(material, chunkFile.Get2());
-                AddTextureIndex(material, chunkFile.Get2());
+                AddTextureIndex(material, chunkFile);
+                AddTextureIndex(material, chunkFile);
                 short bumpIndex = chunkFile.Get2();
-                AddTextureIndex(material, chunkFile.Get2());
+                AddTextureIndex(material, chunkFile);
                 material->m_scaleU = kTextureOne / chunkFile.GetF4();
                 material->m_scaleV = kTextureOne / chunkFile.GetF4();
                 material->m_unk36 = static_cast<unsigned char>(chunkFile.Get4());
                 SetMaterialColor(material, chunkFile.Get4());
                 material->m_materialType = 1;
 
-                CLightPcs::CBumpLight* bumpLight = bumpLights;
-                if (bumpLight != 0) {
+                if (bumpLights != 0) {
+                    material->m_bumpLight = bumpLights;
                     material->m_bumpLightDirect = 1;
                 } else {
-                    bumpLight = GetMapBumpLight(bumpIndex);
+                    material->m_bumpLight = GetMapBumpLight(bumpIndex);
                     if (bumpLightDirect != 0) {
                         material->m_bumpLightDirect = 1;
                     } else {
@@ -3178,14 +3178,13 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     }
                 }
 
-                material->m_bumpLight = bumpLight;
-                bumpLight->m_useViewSpace = material->m_materialType;
+                material->m_bumpLight->m_useViewSpace = material->m_materialType;
                 material->m_tevBit |= 4;
             } break;
             case CHUNK_WATR: {
                 material = m_materials[materialIndex];
-                AddTextureIndex(material, chunkFile.Get2());
-                AddTextureIndex(material, chunkFile.Get2());
+                AddTextureIndex(material, chunkFile);
+                AddTextureIndex(material, chunkFile);
                 short bumpIndex = chunkFile.Get2();
                 unsigned char waterMode = chunkFile.Get1();
                 material->m_unkA5 = chunkFile.Get1();
@@ -3193,23 +3192,22 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 material->m_scaleV = kTextureOne / chunkFile.GetF4();
                 material->m_materialType = 2;
 
-                CLightPcs::CBumpLight* bumpLight = GetMapBumpLight(bumpIndex);
-                material->m_bumpLight = bumpLight;
-                bumpLight->m_useViewSpace = material->m_materialType;
+                material->m_bumpLight = GetMapBumpLight(bumpIndex);
+                material->m_bumpLight->m_useViewSpace = material->m_materialType;
                 material->m_blendMode = 4;
                 chunkFile.Get4();
                 SetMaterialColor(material, chunkFile.Get4());
 
-                if ((waterMode == 0) && (material->m_unkA5 == 0)) {
-                    material->m_tevBit |= 8;
-                } else {
+                if ((waterMode != 0) || (material->m_unkA5 != 0)) {
                     material->m_tevBit |= 0x80000;
+                } else {
+                    material->m_tevBit |= 8;
                 }
             } break;
             case CHUNK_JIME: {
                 material = m_materials[materialIndex];
-                AddTextureIndex(material, chunkFile.Get2());
-                AddTextureIndex(material, chunkFile.Get2());
+                AddTextureIndex(material, chunkFile);
+                AddTextureIndex(material, chunkFile);
                 short bumpIndex = chunkFile.Get2();
                 material->m_unkA5 = chunkFile.Get1();
                 if (chunkFile.Get1() != 0) {
@@ -3219,9 +3217,8 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 material->m_scaleV = kTextureOne / chunkFile.GetF4();
                 material->m_materialType = 3;
 
-                CLightPcs::CBumpLight* bumpLight = GetMapBumpLight(bumpIndex);
-                material->m_bumpLight = bumpLight;
-                bumpLight->m_useViewSpace = material->m_materialType;
+                material->m_bumpLight = GetMapBumpLight(bumpIndex);
+                material->m_bumpLight->m_useViewSpace = material->m_materialType;
                 material->m_tevBit |= 0x4000;
                 chunkFile.Get4();
                 SetMaterialColor(material, chunkFile.Get4());
@@ -3229,7 +3226,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
             } break;
             case CHUNK_FUR: {
                 material = m_materials[materialIndex];
-                AddTextureIndex(material, chunkFile.Get2());
+                AddTextureIndex(material, chunkFile);
                 material->m_singleTextureFlag = 1;
             } break;
             case CHUNK_TSCL: {
@@ -3244,24 +3241,24 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                             unsigned int slot = chunkFile.Get2() & 0xFFFF;
                             chunkFile.Get2();
 
-                            if (keyFrameU == 0) {
-                                material->GetTexScroll(slot)->m_u1 = chunkFile.GetF4();
-                                material->GetTexScroll(slot)->m_type0 =
-                                    (material->GetTexScroll(slot)->m_u1 == kTextureZero) ? 0 : 1;
-                            } else {
+                            if (keyFrameU != 0) {
                                 chunkFile.GetF4();
                                 material->GetTexScroll(slot)->m_uKeyFrame = keyFrameU;
                                 material->GetTexScroll(slot)->m_type0 = 2;
+                            } else {
+                                material->GetTexScroll(slot)->m_u1 = chunkFile.GetF4();
+                                material->GetTexScroll(slot)->m_type0 =
+                                    (material->GetTexScroll(slot)->m_u1 == kTextureZero) ? 0 : 1;
                             }
 
-                            if (keyFrameV == 0) {
-                                material->GetTexScroll(slot)->m_v1 = chunkFile.GetF4();
-                                material->GetTexScroll(slot)->m_type1 =
-                                    (material->GetTexScroll(slot)->m_v1 == kTextureZero) ? 0 : 1;
-                            } else {
+                            if (keyFrameV != 0) {
                                 chunkFile.GetF4();
                                 material->GetTexScroll(slot)->m_vKeyFrame = keyFrameV;
                                 material->GetTexScroll(slot)->m_type1 = 2;
+                            } else {
+                                material->GetTexScroll(slot)->m_v1 = chunkFile.GetF4();
+                                material->GetTexScroll(slot)->m_type1 =
+                                    (material->GetTexScroll(slot)->m_v1 == kTextureZero) ? 0 : 1;
                             }
                         } break;
                         case CHUNK_UFRM:
@@ -3269,14 +3266,14 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                             keyFrameU->ReadFrame(chunkFile, 0);
                             break;
                         case CHUNK_UKEY:
-                            keyFrameU->ReadKey(chunkFile, static_cast<char>(chunk.m_arg0));
+                            keyFrameU->ReadKey(chunkFile, chunk.m_arg0);
                             break;
                         case CHUNK_VFRM:
                             keyFrameV = AllocMapKeyFrame(0xDDD);
                             keyFrameV->ReadFrame(chunkFile, 0);
                             break;
                         case CHUNK_VKEY:
-                            keyFrameV->ReadKey(chunkFile, static_cast<char>(chunk.m_arg0));
+                            keyFrameV->ReadKey(chunkFile, chunk.m_arg0);
                             break;
                         }
                     }
@@ -3899,10 +3896,11 @@ inline void CMaterial::SetTag(int)
  * Address:	TODO
  * Size:	TODO
  */
-inline void CMaterial::AddTextureIdx(int index, int textureIndex)
+inline void CMaterial::AddTextureIdx(CChunkFile& chunkFile)
 {
+    int index = GetTextureCount();
     m_textureCount = static_cast<unsigned short>(index + 1);
-    m_textureIndices[index] = static_cast<short>(textureIndex);
+    m_textureIndices[index] = static_cast<short>(chunkFile.Get2());
 }
 
 extern const float kMaterialShadowScale = 5.0f;

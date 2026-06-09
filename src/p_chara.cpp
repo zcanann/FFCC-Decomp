@@ -2929,7 +2929,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
                             static_cast<unsigned short>(CharaPcs.m_texShadowSize), GX_CTF_R4, GX_FALSE);
             m_shadowTexturePtr = reinterpret_cast<unsigned char*>(CharaPcs.m_texShadowTextureBase) +
                                  CharaPcs.m_texShadowTextureOffset;
-            DCInvalidateRange(m_shadowTexturePtr, (shadowSize * shadowSize) / 2);
+            DCInvalidateRange(m_shadowTexturePtr, (CharaPcs.m_texShadowSize * CharaPcs.m_texShadowSize) / 2);
             GXCopyTex(m_shadowTexturePtr, GX_TRUE);
         }
 
@@ -2937,9 +2937,8 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         m_model->DrawShadow(viewMtx, shadowMode);
 
         if (drawPass == 2) {
-            const unsigned int shadowBytes =
-                (static_cast<unsigned int>(CharaPcs.m_texShadowSize) *
-                 static_cast<unsigned int>(CharaPcs.m_texShadowSize)) / 2;
+            const int shadowBytes =
+                (CharaPcs.m_texShadowSize * CharaPcs.m_texShadowSize) / 2;
             GXCopyTex(m_shadowTexturePtr, GX_TRUE);
             CharaPcs.m_texShadowTextureOffset += shadowBytes;
             GXPixModeSync();

@@ -890,10 +890,10 @@ timeout_expiry:
             {
                 unsigned char cm = GbaQue.GetControllerMode();
 
-                if (cm == 0)
-                    m_nextModeTypeArr[threadParam->m_portIndex] = 0;
-                else
+                if (cm != 0)
                     m_nextModeTypeArr[threadParam->m_portIndex] = 4;
+                else
+                    m_nextModeTypeArr[threadParam->m_portIndex] = 0;
 
                 threadParam->m_state    = 2;
                 threadParam->m_subState = 0;
@@ -2535,10 +2535,10 @@ timeout_expiry:
             threadParam->m_errorRetry++;
             m_ctrlModeArr[threadParam->m_portIndex] = 0;
 
-            if (GbaQue.GetControllerMode() == 0)
-                m_nextModeTypeArr[threadParam->m_portIndex] = 0;
-            else
+            if (GbaQue.GetControllerMode() != 0)
                 m_nextModeTypeArr[threadParam->m_portIndex] = 4;
+            else
+                m_nextModeTypeArr[threadParam->m_portIndex] = 0;
 
             m_stateFlagArr[threadParam->m_portIndex] = 1;
             m_stateCodeArr[threadParam->m_portIndex] = 0xFF;

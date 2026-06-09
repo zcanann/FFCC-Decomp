@@ -290,7 +290,7 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             }
 
             const u32 x0 = Div16Floor(S16At(entry, 0x10));
-            const s32 y0 = Div16Floor(S16At(entry, 0x12));
+            const u32 y0 = Div16Floor(S16At(entry, 0x12));
             const s32 x1 = Div16Floor(S16At(entry, 0x14));
             const s32 y1 = Div16Floor(S16At(entry, 0x16));
             GXSetViewport(offsetXY[0] + static_cast<float>(x0 * 2), offsetXY[1] + static_cast<float>(y0 * 2),

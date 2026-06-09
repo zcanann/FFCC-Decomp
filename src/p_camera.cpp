@@ -1287,9 +1287,9 @@ void CCameraPcs::calcMap()
     PSMTXRotRad(rotYMtx, 'y', m_mapRotY);
     PSMTXConcat(rotYMtx, rotXMtx, rotMtx);
 
-    DirectionVec().x = kCameraZeroF;
-    DirectionVec().y = kCameraZeroF;
     DirectionVec().z = kCameraOneF;
+    DirectionVec().y = kCameraZeroF;
+    DirectionVec().x = kCameraZeroF;
     PSMTXMultVecSR(rotMtx, &DirectionVec(), &DirectionVec());
 
     moveDelta.z = kCameraZeroF;

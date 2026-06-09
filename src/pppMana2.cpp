@@ -1074,6 +1074,8 @@ void pppRenderMana2(pppMana2*, pppMana2Step*, _pppCtrlTable*)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_lifetimes off
 void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* param_3)
 {
     u32 texBufferSize;
@@ -1303,6 +1305,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
         }
     }
 }
+#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x801088a0

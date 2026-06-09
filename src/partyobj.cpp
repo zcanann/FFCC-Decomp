@@ -3501,17 +3501,17 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 	unsigned int stageSub = bossArtifacts->m_entries[bonusSlot + 9].m_values[0];
 
 	if (kind == 0) {
-		unsigned short count = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBC8);
+		int count = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBC8);
 		System.Printf(const_cast<char*>(msgBase + 0x1C0), count + 1);
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBC8) = count + 1;
 	}
 	if (kind == 1) {
-		unsigned short count = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBC4);
+		int count = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBC4);
 		System.Printf(const_cast<char*>(msgBase + 0x1DC), count + 1);
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBC4) = count + 1;
 	}
 	if (kind == 4) {
-		unsigned short count = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBC6);
+		int count = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBC6);
 		System.Printf(const_cast<char*>(msgBase + 0x1F8), count + 1);
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBC6) = count + 1;
 	}

@@ -3175,7 +3175,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
         if (status != 0)
             goto case1_done;
 
-        if (threadParam->m_unk3 != ' ')
+        if (threadParam->m_unk3 != 0x20)
         {
             status = 1;
             goto case1_done;

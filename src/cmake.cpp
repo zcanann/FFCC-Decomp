@@ -513,11 +513,10 @@ void CMenuPcs::DrawSingleCMakeChara(float alpha)
 void CMenuPcs::CalcSingleCMakeChara()
 {
     int slot = static_cast<int>(CmakeSlot(this));
-    CCharaPcs::CHandle* handle = GetCmakeCharaHandle(this, slot);
     unsigned char* modelWork = reinterpret_cast<unsigned char*>(MenuS32(this, 0x814) + slot * 0x50 + 0xA00);
 
-    if (handle->m_model == nullptr ||
-        *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xB0) == 0) {
+    if (GetCmakeCharaHandle(this, slot)->m_model == nullptr ||
+        *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(GetCmakeCharaHandle(this, slot)->m_model) + 0xB0) == 0) {
         *reinterpret_cast<int*>(modelWork + 0x00) = 0;
         return;
     }
@@ -525,12 +524,12 @@ void CMenuPcs::CalcSingleCMakeChara()
     unsigned char* animWork = reinterpret_cast<unsigned char*>(MenuS32(this, 0x824) + slot * 0x34);
     if (animWork[0x0C] == 1) {
         *reinterpret_cast<float*>(modelWork + 0x2C) = 0.2617994f;
-        SetAnim(slot);
+        SetAnim(CmakeSlot(this));
         animWork[0x0C] = 0;
     }
 
     *reinterpret_cast<int*>(modelWork + 0x00) = 1;
-    if (handle->m_charaKind != 3) {
+    if (GetCmakeCharaHandle(this, slot)->m_charaKind != 3) {
         Mtx scaleMtx;
         Mtx rotXMtx;
         Mtx rotYMtx;
@@ -556,9 +555,9 @@ void CMenuPcs::CalcSingleCMakeChara()
         rotXMtx[1][3] = *reinterpret_cast<float*>(modelWork + 0x20);
         rotXMtx[2][3] = *reinterpret_cast<float*>(modelWork + 0x24);
         PSMTXConcat(rotXMtx, scaleMtx, scaleMtx);
-        handle->m_model->SetMatrix(scaleMtx);
-        handle->m_model->CalcMatrix();
-        handle->m_model->CalcSkin();
+        GetCmakeCharaHandle(this, slot)->m_model->SetMatrix(scaleMtx);
+        GetCmakeCharaHandle(this, slot)->m_model->CalcMatrix();
+        GetCmakeCharaHandle(this, slot)->m_model->CalcSkin();
         PCAnimCtrl();
     }
 }

@@ -714,7 +714,7 @@ void CGraphicPcs::drawBar()
     _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 
     const bool useDebugPad = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
-    int padState = 0;
+    unsigned int padState = 0;
     if (!useDebugPad) {
         int padIndex = useDebugPad;
         padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
@@ -746,8 +746,13 @@ void CGraphicPcs::drawBar()
     for (int i = 0; i < orderCount; i++) {
         const int priority = order->m_priority;
         const float lastTime = order->m_lastTime;
+        GXColor colorTmp;
+        *reinterpret_cast<u32*>(&colorTmp) = Math.Hsb2Rgb(hue / orderCount, 100, 100);
         GXColor rgb;
-        *reinterpret_cast<u32*>(&rgb) = Math.Hsb2Rgb(hue / orderCount, 100, 100);
+        rgb.r = colorTmp.r;
+        rgb.g = colorTmp.g;
+        rgb.b = colorTmp.b;
+        rgb.a = colorTmp.a;
         const float width = (kGraphicScreenCenterX * lastTime) / kDebugBarFrameBudget;
 
         if (priority == 0x26) {
@@ -787,7 +792,14 @@ void CGraphicPcs::drawBar()
         }
 
         if (i == lastOrder) {
-            const u32 soundColor = Math.Hsb2Rgb(0, 100, 100);
+            GXColor soundTmp;
+            *reinterpret_cast<u32*>(&soundTmp) = Math.Hsb2Rgb(0, 100, 100);
+            GXColor soundGX;
+            soundGX.r = soundTmp.r;
+            soundGX.g = soundTmp.g;
+            soundGX.b = soundTmp.b;
+            soundGX.a = soundTmp.a;
+            const u32 soundColor = *reinterpret_cast<u32*>(&soundGX);
             const float soundWidth = (kGraphicScreenCenterX * Sound.GetPerformance()) / kDebugBarFrameBudget;
 
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
@@ -810,8 +822,14 @@ void CGraphicPcs::drawBar()
         hue += 0x168;
     }
 
-    CColor frameColor = (Graphic.IsFrameRateOver() == 0) ? CColor(0, 0xFF, 0, 0xFF) : CColor(0xFF, 0, 0, 0xFF);
-    const u32 frameColorWord = *reinterpret_cast<u32*>(&frameColor.color);
+    GXColor frameTmp;
+    *reinterpret_cast<u32*>(&frameTmp) = *reinterpret_cast<u32*>(&((Graphic.IsFrameRateOver() == 0) ? CColor(0, 0xFF, 0, 0xFF) : CColor(0xFF, 0, 0, 0xFF)).color);
+    GXColor frameGX;
+    frameGX.r = frameTmp.r;
+    frameGX.g = frameTmp.g;
+    frameGX.b = frameTmp.b;
+    frameGX.a = frameTmp.a;
+    const u32 frameColorWord = *reinterpret_cast<u32*>(&frameGX);
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
     GXPosition3f32(kDebugBarLeft, kDebugIndicatorTop, kGraphicZero);
     GXColor1u32(frameColorWord);
@@ -826,8 +844,14 @@ void CGraphicPcs::drawBar()
     GXColor1u32(frameColorWord);
     GXTexCoord2u16(0, 2);
 
-    CColor fifoColor = (Graphic.IsFifoOver() == 0) ? CColor(0, 0xFF, 0, 0xFF) : CColor(0xFF, 0, 0, 0xFF);
-    const u32 fifoColorWord = *reinterpret_cast<u32*>(&fifoColor.color);
+    GXColor fifoTmp;
+    *reinterpret_cast<u32*>(&fifoTmp) = *reinterpret_cast<u32*>(&((Graphic.IsFifoOver() == 0) ? CColor(0, 0xFF, 0, 0xFF) : CColor(0xFF, 0, 0, 0xFF)).color);
+    GXColor fifoGX;
+    fifoGX.r = fifoTmp.r;
+    fifoGX.g = fifoTmp.g;
+    fifoGX.b = fifoTmp.b;
+    fifoGX.a = fifoTmp.a;
+    const u32 fifoColorWord = *reinterpret_cast<u32*>(&fifoGX);
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
     GXPosition3f32(kDebugIndicatorFifoLeft, kDebugIndicatorTop, kGraphicZero);
     GXColor1u32(fifoColorWord);

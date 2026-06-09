@@ -1226,9 +1226,7 @@ int CMemoryCardMan::DummySave()
             System.Printf(const_cast<char*>(sMcWriteErrorFmt), 0);
         }
 
-        int chan = m_fileInfo.chan;
-
-        if (chan < 0 || chan > 1)
+        if (m_fileInfo.chan < 0 || m_fileInfo.chan > 1)
         {
             m_opDoneFlag = 1;
             m_state = 4;
@@ -1258,15 +1256,13 @@ int CMemoryCardMan::DummySave()
         return m_result;
     }
 
-    int chan = m_fileInfo.chan;
-
     if (m_saveBuffer != 0)
     {
         delete[] m_saveBuffer;
         m_saveBuffer = 0;
     }
 
-    if (chan < 0 || chan > 1)
+    if (m_fileInfo.chan < 0 || m_fileInfo.chan > 1)
     {
         m_opDoneFlag = 1;
         m_state = 4;

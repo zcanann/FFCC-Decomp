@@ -3506,7 +3506,7 @@ body:
 					short aiState = monObj->m_aiState;
 					if (aiState != 0) {
 						aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-							(static_cast<int>(aiState) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
+							(static_cast<int>(aiState) + *reinterpret_cast<short*>(script + 0x100)) * 0x1D0 + 0x10;
 					}
 					if (((*reinterpret_cast<unsigned short*>(script + 0xFE) & 8) == 0) &&
 						((*reinterpret_cast<unsigned short*>(aiScript + 0x102) & 0x100) == 0)) {
@@ -3575,7 +3575,7 @@ body:
 							if ((*reinterpret_cast<unsigned short*>(script + 0xFE) & 4) != 0) {
 								monObj->m_moveWork.m_flags |= 0x400;
 							}
-							if ((*reinterpret_cast<unsigned short*>(AISCRIPT + 0x102) & 0x80) != 0) {
+							if ((*reinterpret_cast<short*>(AISCRIPT + 0x102) & 0x80) != 0) {
 								monObj->m_moveWork.m_flags |= 0x20000;
 							}
 							monObj->m_moveWork.m_mode = 4;

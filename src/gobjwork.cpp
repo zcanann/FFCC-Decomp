@@ -2141,26 +2141,28 @@ unsigned int CCaravanWork::GetMagicCharge(int cmdListIdx, int&, int&)
 		} else {
 			int topIdx = cmdListIdx;
 			int scanCount = cmdListIdx + 1;
-			if (cmdListIdx >= 0) {
-				for (; scanCount != 0; scanCount--) {
-					if (m_commandListExtra[topIdx] != -1) {
-						break;
-					}
-					topIdx--;
+			for (; scanCount != 0; scanCount--) {
+				if (cmdListIdx < 0) {
+					break;
 				}
+				if (m_commandListExtra[topIdx] != -1) {
+					break;
+				}
+				topIdx--;
 			}
 
 			groupedCountLocal = 1;
 			int nextIdx = topIdx + 1;
-			int remaining = static_cast<short>(m_numCmdListSlots) - nextIdx;
-			if (nextIdx < static_cast<short>(m_numCmdListSlots)) {
-				for (; remaining != 0; remaining--) {
-					if (m_commandListExtra[nextIdx] != -1) {
-						break;
-					}
-					groupedCountLocal++;
-					nextIdx++;
+			int numSlots = static_cast<short>(m_numCmdListSlots);
+			for (int remaining = numSlots - nextIdx; remaining != 0; remaining--) {
+				if (nextIdx >= numSlots) {
+					break;
 				}
+				if (m_commandListExtra[nextIdx] != -1) {
+					break;
+				}
+				groupedCountLocal++;
+				nextIdx++;
 			}
 		}
 	}

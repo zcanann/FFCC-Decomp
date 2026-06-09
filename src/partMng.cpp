@@ -1792,6 +1792,9 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
                 }
             }
 
+            CChunkFile chunkFile;
+            chunkFile.SetBuf(payloadWords + 8);
+
             int slotIndex = static_cast<int>(*reinterpret_cast<short*>(payload));
             pppModelSt*& modelSlot = (*modelTablePtr)[slotIndex];
             if (modelSlot != 0) {
@@ -1813,8 +1816,6 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
                 modelSlot->m_refCount = 0;
                 modelSlot->m_cacheId = -1;
                 modelSlot->m_isUsed = 0;
-                CChunkFile chunkFile;
-                chunkFile.SetBuf(payloadWords + 8);
                 pppReadRsd(chunkFile, modelSlot);
             }
             *reinterpret_cast<int*>(self + 0x804) = -1;

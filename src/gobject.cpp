@@ -703,10 +703,10 @@ void CGObject::move()
             }
         }
 
-        if (movingWithScript && !m_weaponNodeFlagAll.m_bits1.m_bit04) {
-            m_animSlotSel = *(reinterpret_cast<s8*>(&m_shieldNodeFlags) + 1);
-        } else {
+        if (!movingWithScript || m_weaponNodeFlagAll.m_bits1.m_bit04) {
             m_animSlotSel = *reinterpret_cast<s8*>(&m_animStartFrame);
+        } else {
+            m_animSlotSel = *(reinterpret_cast<s8*>(&m_shieldNodeFlags) + 1);
         }
         return;
     }

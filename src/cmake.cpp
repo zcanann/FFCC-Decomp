@@ -934,7 +934,7 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
     }
 
     if ((repeat & 0x8) != 0) {
-        if (row != 0) {
+        if (villageWork->m_row != 0) {
             row = static_cast<short>(row - 1);
         } else if (select >= 10) {
             row = 5;
@@ -955,7 +955,7 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
         if (row >= 5) {
             Sound.PlaySe(4, 0x40, 0x7f, 0);
         } else {
-            if (select != 0) {
+            if (villageWork->m_select != 0) {
                 select = static_cast<short>(select - 1);
             } else {
                 select = 0xB;
@@ -1030,7 +1030,7 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
             const char* rowText = s_NameEntryStr[curRow + curTable * 5];
             int rowLen = strlen(rowText);
             if (rowLen != 0) {
-                unsigned int i = 0;
+                int i = 0;
                 int j = 0;
                 for (; 0 < rowLen; rowLen = rowLen - 1) {
                     if (i == curSelect) {
@@ -1902,9 +1902,9 @@ unsigned short CMenuPcs::CmakeJobCtrl()
             found:
 
                 if (slot < 8) {
+                    Sound.PlaySe(4, 0x40, 0x7F, 0);
                     short winX = 0;
                     short winY = 0;
-                    Sound.PlaySe(4, 0x40, 0x7F, 0);
                     GetWinSize(0x16, &winX, &winY, 0);
                     SetMcWinInfo((int)winX, (int)winY);
                     CmakeMcState(this) = 0;
@@ -2168,7 +2168,7 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
 
         if ((repeat & 0x8) != 0) {
             short* values = &CmakeState(this)->m_select;
-            int idx = CmakeState(this)->m_fieldSelect;
+            int idx = fieldSelect;
             if (values[idx] != 0) {
                 values[idx] = static_cast<short>(values[idx] - 1);
             } else {
@@ -2177,7 +2177,7 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else if ((repeat & 0x4) != 0) {
             short* values = &CmakeState(this)->m_select;
-            int idx = CmakeState(this)->m_fieldSelect;
+            int idx = fieldSelect;
             if (values[idx] < 3) {
                 values[idx] = static_cast<short>(values[idx] + 1);
             } else {
@@ -2190,7 +2190,7 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
             if ((down & 0x100) != 0) {
                 Sound.PlaySe(2, 0x40, 0x7F, 0);
                 if (fieldSelect == 0) {
-                    CmakeState(this)->m_fieldSelect = static_cast<short>(fieldSelect + 1);
+                    CmakeState(this)->m_fieldSelect = static_cast<short>(CmakeState(this)->m_fieldSelect + 1);
                     return 0;
                 }
 
@@ -2721,10 +2721,11 @@ int CMenuPcs::CmakeNameCtrl()
             if (CmakeState(this)->m_row >= 5) {
                 Sound.PlaySe(4, 0x40, 0x7F, 0);
             } else {
-                if (CmakeState(this)->m_select != 0) {
-                    CmakeState(this)->m_select = static_cast<short>(CmakeState(this)->m_select - 1);
+                CmakeMenuState* state = CmakeState(this);
+                if (state->m_select != 0) {
+                    state->m_select = static_cast<short>(state->m_select - 1);
                 } else {
-                    CmakeState(this)->m_select = 0xB;
+                    state->m_select = 0xB;
                 }
                 Sound.PlaySe(1, 0x40, 0x7F, 0);
             }
@@ -2732,10 +2733,11 @@ int CMenuPcs::CmakeNameCtrl()
             if (CmakeState(this)->m_row >= 5) {
                 Sound.PlaySe(4, 0x40, 0x7F, 0);
             } else {
-                if (CmakeState(this)->m_select < 0xB) {
-                    CmakeState(this)->m_select = static_cast<short>(CmakeState(this)->m_select + 1);
+                CmakeMenuState* state = CmakeState(this);
+                if (state->m_select < 0xB) {
+                    state->m_select = static_cast<short>(state->m_select + 1);
                 } else {
-                    CmakeState(this)->m_select = 0;
+                    state->m_select = 0;
                 }
                 Sound.PlaySe(1, 0x40, 0x7F, 0);
             }
@@ -2769,8 +2771,8 @@ int CMenuPcs::CmakeNameCtrl()
                     }
 
                     int nameLen = strlen(s_CmakeInfo.m_name);
-                    int spaceCount = 0;
                     const char* scan = s_CmakeInfo.m_name;
+                    int spaceCount = 0;
                     int remain = nameLen;
                     for (; 0 < remain; remain = remain - 1) {
                         if (*scan != ' ') {
@@ -2785,9 +2787,9 @@ int CMenuPcs::CmakeNameCtrl()
                     }
 
                     if (IsDuplicateCmakeName(this, s_CmakeInfo.m_name)) {
+                        Sound.PlaySe(4, 0x40, 0x7F, 0);
                         short winX = 0;
                         short winY = 0;
-                        Sound.PlaySe(4, 0x40, 0x7F, 0);
                         GetWinSize(0x14, &winX, &winY, 0);
                         SetMcWinInfo((int)winX, (int)winY);
                         CmakeMcState(this) = 0;

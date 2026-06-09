@@ -1646,10 +1646,10 @@ void CCameraPcs::drawShadowBegin()
         }
 
         float currentDepth = m_fullScreenShadowDepth;
-        if (currentDepth >= kCameraZeroF) {
-            m_fullScreenShadowDepth = currentDepth + (depth - currentDepth) * kCameraShadowDepthBlend;
-        } else {
+        if (currentDepth < kCameraZeroF) {
             m_fullScreenShadowDepth = depth;
+        } else {
+            m_fullScreenShadowDepth = currentDepth + (depth - currentDepth) * kCameraShadowDepthBlend;
         }
     } else {
         m_fullScreenShadow.m_span = kCameraHundredF;

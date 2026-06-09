@@ -2944,7 +2944,7 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		base += activePartyCount;
-		for (int i = activePartyCount; i != 0; i--) {
+		for (int i =  (activePartyCount - 0); i != 0; i--) {
 			int idx = base + activePartyCount - i;
 			int __p12 = idx;
 			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + __p12 * 0x40 + 8);
@@ -3073,7 +3073,8 @@ void CMenuPcs::CalcResultOpenAnim()
 			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + (frameBase + i) * 0x40 + 8);
 			int centerY = (int)((double)(float)((double)sprite->h * 0.5 + (double)sprite->y) - 240.0);
 			entry.m_centerX = 0;
-			entry.m_centerY = (short)centerY;
+			int __p1 = centerY;
+			entry.m_centerY = (short)__p1;
 		}
 
 		for (int i = 0; i < 0x18; i++) {
@@ -3130,9 +3131,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
 		} else {
 			handle = GetBonusDisplayHandleSlots(this)[i - activePartyCount];
-			if (activePartyCount > i * 2) {
-				PSMTXScale(scaleMtx, 1.0f, 1.0f, 1.0f);
-			} else {
+			if (!(activePartyCount > i * 2)) {
 				float modelScale = 0.5f;
 				if (sprite->timer == 0x18 && this->m_bonusAlpha == 0) {
 					Sound.PlaySe(0x48, 0x40, 0x7f, 0);
@@ -3143,6 +3142,8 @@ void CMenuPcs::CalcResultOpenAnim()
 					                 (float)(sprite->duration - 0x18)) + (double)modelScale);
 				}
 				PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
+			} else {
+				PSMTXScale(scaleMtx, 1.0f, 1.0f, 1.0f);
 			}
 		}
 

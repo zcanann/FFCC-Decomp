@@ -1743,7 +1743,7 @@ void CGPartyObj::onFrameStat()
 		    Game.m_partyObjArr[1] != nullptr &&
 		    Game.m_partyObjArr[1]->m_lastStateId == 0) {
 			unsigned short held = getPadHeldForSlot(static_cast<signed char>(m_animStateMisc));
-			unsigned short up = getPadButtonUpForSlot(static_cast<signed char>(m_animStateMisc));
+			unsigned short up = getPadButtonUpForSlot(static_cast<char>(m_animStateMisc));
 			if ((up & 0x400) != 0) {
 				if (sGhostMogMenuWork.holdTimer < 10 &&
 				    party.carryObject != reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)) {
@@ -1804,7 +1804,7 @@ void CGPartyObj::onFrameStat()
 		if (isLoopAnim() != 0) {
 			short mapId = *reinterpret_cast<short*>(&m_lastMapIdHit);
 			if (party.carryObject == nullptr) {
-				if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+				if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
 					if (mapId == 1) {
 						SetAnimSlot(0x25, 0);
 						SetAnimSlot(0x24, 1);
@@ -1953,7 +1953,7 @@ void CGPartyObj::onFrameStat()
 			enableDamageCol(1);
 			short mapId = *reinterpret_cast<short*>(&m_lastMapIdHit);
 			if (party.carryObject == nullptr) {
-				if (*reinterpret_cast<unsigned short*>(script + 0x1C) == 0) {
+				if (*reinterpret_cast<short*>(script + 0x1C) == 0) {
 					if (mapId == 1) {
 						SetAnimSlot(0x25, 0);
 						SetAnimSlot(0x24, 1);
@@ -2226,7 +2226,7 @@ void CGPartyObj::statCharge()
 		unsigned short* p = table;
 		for (int i = 0; i < 5; i++, p += 6) {
 			if (phase == p[3] && Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
-				int dist = (p[4] - p[3]) + 1;
+				unsigned int dist = (p[4] - p[3]) + 1;
 				if (i == 0 && (itemType == 2 || itemType == 3)) {
 					Vec delta;
 					PSVECSubtract(&m_comboCenter, &m_worldPosition, &delta);
@@ -2767,7 +2767,7 @@ void CGPartyObj::checkTargetParticle()
 		maxRange = 0.0f;
 		if (Game.unkCFlatData0[2] != 0) {
 			int itemId = *reinterpret_cast<int*>(self + 0x560);
-			maxRange += static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x30));
+			maxRange += static_cast<float>(*reinterpret_cast<short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x30));
 		}
 		if (m_scriptHandle != nullptr) {
 			unsigned char* work = reinterpret_cast<unsigned char*>(m_scriptHandle);
@@ -2777,7 +2777,7 @@ void CGPartyObj::checkTargetParticle()
 					maxRange += static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x0A));
 				}
 			} else {
-				maxRange += static_cast<float>(*reinterpret_cast<unsigned short*>(work + 0x19C));
+				maxRange += static_cast<float>(*reinterpret_cast<short*>(work + 0x19C));
 				if ((*reinterpret_cast<unsigned int*>(work + 0x3B0) & 0x8000) != 0 && Game.unk_flat3_field_8_0xc7dc != 0) {
 					maxRange += static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x0C));
 				}
@@ -2818,7 +2818,7 @@ void CGPartyObj::checkTargetParticle()
 			    (Game.m_gameWork.m_bossArtifactStageIndex < 0x0F)) {
 				loopBossStage = true;
 			}
-			if (loopBossStage && ((__cntlzw(0x6D - (static_cast<unsigned short>(GetCID()) & 0x6D)) >> 5 & 0xFF) != 0)) {
+			if (loopBossStage && ((__cntlzw(0x6D - (static_cast<short>(GetCID()) & 0x6D)) >> 5 & 0xFF) != 0)) {
 				loopBossCid = true;
 			}
 			if (loopBossCid && (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) != 0)) {
@@ -3076,7 +3076,7 @@ void CGPartyObj::onStatMagic()
 				m_comboFrame++;
 			}
 		} else {
-			unsigned short trig = getPadTrigForSlot(static_cast<signed char>(m_animStateMisc));
+			unsigned short trig = getPadTrigForSlot(static_cast<unsigned char>(m_animStateMisc));
 			if ((trig & 0x200) != 0 && magicReady == 0) {
 				changeStat(0, 0, 0);
 			}
@@ -4911,13 +4911,13 @@ void CGPartyObj::ghostPartyMog()
 						innerScale = FLOAT_80331A58 * (kMonObjOne - ramp) + FLOAT_80331A58;
 					}
 				}
-				if (static_cast<int>(FLOAT_80331A5C * innerScale) <= static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x38))) {
+				if (static_cast<unsigned int>(FLOAT_80331A5C * innerScale) <= static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x38))) {
 					flags[0] = (flags[0] & 0xFB) | 4;
 					bossState = 3;
 					goto messageMenu;
 				}
 			}
-			if (sGhostPartyWork.flagBits.flag10 < 0 || *reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x3C) < 0x97) {
+			if (sGhostPartyWork.flagBits.flag10 < 0 || *reinterpret_cast<unsigned int*>(CGPartyObj::m_ghostWork + 0x3C) < 0x97) {
 				bossState = 0;
 				*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x20) = 0;
 			} else {
@@ -5102,9 +5102,9 @@ void CGPartyObj::gpmMove()
 	float clampedDist = (*reinterpret_cast<float*>(self + 0x5BC) < dist) ? *reinterpret_cast<float*>(self + 0x5BC) : dist;
 
 	if (m_lastStateId == 0 &&
-	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x63C]) << 24) & 0xC0000000) >> 31) != 0)) {
+	    (static_cast<unsigned char>(static_cast<int>((static_cast<unsigned int>(self[0x63C]) << 24) & 0xC0000000) >> 31) != 0)) {
 		int moveKind;
-		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(sGhostPartyWork.flags) << 24) & 0xC0000000) >> 31) != 0) {
+		if (static_cast<unsigned char>(static_cast<int>((static_cast<unsigned int>(sGhostPartyWork.flags) << 24) & 0xC0000000) >> 31) != 0) {
 			moveKind = 0;
 			if (PartyData(this).carryObject != nullptr) {
 				sGhostPartyWork.carrySpeed = 0.0f;
@@ -5116,7 +5116,7 @@ void CGPartyObj::gpmMove()
 			if (Game.unkFloat_0xca10 * limit > pathDist) {
 				if ((leader->m_lastStateId != 2 && leader->m_lastStateId != 6) ||
 				    leader->m_subState != 1 ||
-				    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(leader) + 0x668) == 0 ||
+				    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(leader) + 0x668) == 0 ||
 				    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(leader) + 0x660) != 0) {
 					return;
 				}
@@ -5251,7 +5251,7 @@ void CGPartyObj::gpmMove()
 	if (m_lastStateId != 2) {
 		return;
 	}
-	if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(sGhostPartyWork.flags) << 24) & 0xC0000000) >> 31) == 0) {
+	if (static_cast<unsigned char>(static_cast<int>((static_cast<unsigned int>(sGhostPartyWork.flags) << 24) & 0xC0000000) >> 31) == 0) {
 		changeStat(0, 0, 0);
 		return;
 	}
@@ -5275,7 +5275,7 @@ void CGPartyObj::gpmMove()
 		if (sGhostPartyWork.gauge <= 0xF) {
 			return;
 		}
-		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(PartyData(this).partyFlags) << 25) & 0xC0000000) >> 31) != 0) {
+		if (static_cast<unsigned char>(static_cast<unsigned int>((static_cast<unsigned int>(PartyData(this).partyFlags) << 25) & 0xC0000000) >> 31) != 0) {
 			return;
 		}
 	} else if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(sGhostPartyWork.flags) << 26) & 0xC0000000) >> 31) == 0) {
@@ -5396,7 +5396,7 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 		font->Draw(text);
 	} else {
 		unsigned char* work = reinterpret_cast<unsigned char*>(m_scriptHandle);
-		sprintf(text, s_partyObjDebugScriptFmt, work[0xBA4], *reinterpret_cast<unsigned short*>(work + 0xBC4),
+		sprintf(text, s_partyObjDebugScriptFmt, work[0xBA4], *reinterpret_cast<short*>(work + 0xBC4),
 		        *reinterpret_cast<unsigned short*>(work + 0xBC6), *reinterpret_cast<unsigned short*>(work + 0xBC8),
 		        *reinterpret_cast<unsigned short*>(work + 0xBCA), *reinterpret_cast<unsigned short*>(work + 0xBCC));
 

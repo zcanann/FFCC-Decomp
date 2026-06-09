@@ -101,7 +101,7 @@ static inline void AddSharedRef(T* ptr)
 
 static inline float& ViewerModelTime(CChara::CModel* model)
 {
-    return model->m_curFrame;
+    return model->m_time;
 }
 
 static inline CChara::CAnim*& ViewerModelAnim(CChara::CModel* model)

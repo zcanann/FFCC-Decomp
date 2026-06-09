@@ -471,7 +471,7 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
             CharaBreakDisplayListPair* displayListPair = displayListPairs[dl];
             POLYGON_DATA* polygon = displayListPair->m_polygonData;
 
-            for (u32 polyIndex = 0; polyIndex < displayListPair->m_polygonCount; polyIndex++) {
+            for (int polyIndex = 0; polyIndex < (int)displayListPair->m_polygonCount; polyIndex++) {
                 S16Vec transformed[3];
 
                 if (polygon->m_enabled == 0) {
@@ -663,10 +663,14 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
     POLYGON_DATA* polygon = polygonData;
     f32 zero = kPppCharaBreakZero;
 
+    const volatile u32* upSrc = (const volatile u32*)&kPppCharaBreakUpVector.x;
     for (u32 i = 0; i < count; i++) {
         Vec normal;
-        Vec up = kPppCharaBreakUpVector;
+        Vec up;
         Vec tangent;
+        ((u32*)&up)[0] = upSrc[0];
+        ((u32*)&up)[1] = upSrc[1];
+        ((u32*)&up)[2] = upSrc[2];
 
         int alpha = (int)stepData->m_alphaBase + rand() % stepData->m_alphaRange;
         if (alpha > 0xFF) {

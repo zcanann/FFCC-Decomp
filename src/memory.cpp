@@ -1872,10 +1872,8 @@ void CAmemCache::IsEnable()
  */
 void CAmemCacheSet::AddRef(short index)
 {
-    CAmemCache& entry = cacheEntryAt(this, index);
-
-    entry.m_refCount += 1;
-    if (entry.m_refCount >= 0xFFFF) {
+    m_cacheTable[index].m_refCount += 1;
+    if (m_cacheTable[index].m_refCount >= 0xFFFF) {
         if (static_cast<unsigned int>(System.m_execParam) >= 3) {
             System.Printf(const_cast<char*>(sAmemCacheAddRefFmt), static_cast<int>(index));
         }
@@ -1900,7 +1898,7 @@ void CAmemCacheSet::AddRef(short index)
         }
     }
 
-    entry.m_priority = 0x7FFFFFF0;
+    m_cacheTable[index].m_priority = 0x7FFFFFF0;
 }
 
 /*

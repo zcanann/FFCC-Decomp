@@ -667,12 +667,14 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
             pdt->m_shapeNames = 0;
         }
 
+        int shapeGroupByteOffset = 0;
         for (int i = 0; i < pdt->m_shapeGroupCount; i++) {
-            pppShapeGroupRaw* shapeGroups = reinterpret_cast<pppShapeGroupRaw*>(pdt->m_shapeGroups);
-            if (shapeGroups[i].m_shapeList != 0) {
-                delete[] shapeGroups[i].m_shapeList;
-                shapeGroups[i].m_shapeList = 0;
+            unsigned char* shapeGroup = reinterpret_cast<unsigned char*>(pdt->m_shapeGroups) + shapeGroupByteOffset;
+            if (*reinterpret_cast<void**>(shapeGroup + 4) != 0) {
+                operator delete(*reinterpret_cast<void**>(shapeGroup + 4));
+                *reinterpret_cast<void**>(shapeGroup + 4) = 0;
             }
+            shapeGroupByteOffset += 8;
         }
 
         if (reinterpret_cast<pppShapeGroupRaw*>(pdt->m_shapeGroups) != 0) {

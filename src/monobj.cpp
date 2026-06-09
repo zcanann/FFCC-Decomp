@@ -2869,8 +2869,7 @@ void CGMonObj::setRepop(int mode)
 	enableDamageCol(1);
 	prgObj->changeStat(0, 0, 0);
 
-	unsigned char* monsterScript = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
-	unsigned short scriptFlags = *reinterpret_cast<unsigned short*>(monsterScript + 0xFE);
+	unsigned short scriptFlags = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFE);
 
 	if ((scriptFlags & 0x80) != 0 || (scriptFlags & 0x20) != 0) {
 		if (mode == 0) {
@@ -2909,7 +2908,7 @@ void CGMonObj::setRepop(int mode)
 		m_chaseDirty = 1;
 	}
 
-	unsigned short countA = *reinterpret_cast<unsigned short*>(monsterScript + 0x1A8);
+	unsigned short countA = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A8);
 	for (int i = 0; i < static_cast<int>(countA); i++) {
 		int particleBase = 0;
 		if (classId < 0xA7) {
@@ -2928,7 +2927,7 @@ void CGMonObj::setRepop(int mode)
 
 	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x20000);
 
-	unsigned short countB = *reinterpret_cast<short*>(monsterScript + 0x1AA);
+	unsigned short countB = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AA);
 	for (int i = 0; i < static_cast<int>(countB); i++) {
 		int dataNo = object->m_charaModelHandle != nullptr ? object->m_charaModelHandle->GetPdtSlot() : -1;
 		prgObj->putParticleBindTrace((i + 0x5A) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x5A8), object, 0.0f, 0);

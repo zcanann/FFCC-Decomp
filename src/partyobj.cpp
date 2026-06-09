@@ -1750,13 +1750,13 @@ void CGPartyObj::onFrameStat()
 				    party.carryObject != reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)) {
 					sGhostMogMenuWork.flags.carryActive = (party.carryObject != nullptr);
 				}
-			} else if ((held & 0x400) == 0) {
-				sGhostMogMenuWork.holdTimer = 0;
-			} else {
+			} else if ((held & 0x400) != 0) {
 				sGhostMogMenuWork.holdTimer++;
-				if (sGhostMogMenuWork.holdTimer > 9 && sGhostMogMenuWork.mood == 0) {
+				if (sGhostMogMenuWork.holdTimer >= 10 && sGhostMogMenuWork.mood == 0) {
 					sGhostMogMenuWork.mood = 2;
 				}
+			} else {
+				sGhostMogMenuWork.holdTimer = 0;
 			}
 		}
 		break;

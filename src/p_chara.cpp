@@ -2643,30 +2643,35 @@ void CCharaPcs::CHandle::FreeAnim(int animIndex)
 int CCharaPcs::CHandle::SetAnim(int animIndex, int startFrame, int endFrame, int blendMode, int forceSet)
 {
     if (m_model == 0) {
-        return 0;
+        goto fail;
     }
     if (m_currentAnimIndex == animIndex && forceSet == 0) {
-        return 0;
+        goto fail;
     }
 
-    CChara::CAnim* anim;
-    if (animIndex == -1) {
-        anim = 0;
-    } else {
-        CLoadAnim* loadAnim = reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex]);
-        anim = loadAnim != 0 ? loadAnim->m_anim : 0;
-    }
-
-    if (anim == 0) {
-        if (m_charaKind != 3 && static_cast<unsigned int>(System.m_execParam) >= 2) {
-            System.Printf(const_cast<char*>(s_charaSetAnimMissingFmt), m_charaKind, m_charaNo, animIndex);
+    {
+        CChara::CAnim* anim;
+        if (animIndex == -1) {
+            anim = 0;
+        } else {
+            CLoadAnim* loadAnim = reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex]);
+            anim = loadAnim != 0 ? loadAnim->m_anim : 0;
         }
-        return 0;
+
+        if (anim == 0) {
+            if (m_charaKind != 3 && static_cast<unsigned int>(System.m_execParam) >= 2) {
+                System.Printf(const_cast<char*>(s_charaSetAnimMissingFmt), m_charaKind, m_charaNo, animIndex);
+            }
+            goto fail;
+        }
+
+        m_model->AttachAnim(anim, startFrame, endFrame, blendMode);
+        m_currentAnimIndex = animIndex;
+        return 1;
     }
 
-    m_model->AttachAnim(anim, startFrame, endFrame, blendMode);
-    m_currentAnimIndex = animIndex;
-    return 1;
+fail:
+    return 0;
 }
 
 /*

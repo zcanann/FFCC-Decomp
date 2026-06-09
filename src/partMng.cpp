@@ -2406,8 +2406,8 @@ void CPartMng::pppEditPartCalc()
             }
             mng->m_particleEnded = 0;
             *reinterpret_cast<int*>(&mng->m_envColorR) = *reinterpret_cast<int*>(self + 0x168);
-            _pppStartPart(mng, reinterpret_cast<long*>(reinterpret_cast<long*>(self + 0x5dc)[
-                                   (*reinterpret_cast<int**>(self + 0x1C8))[i * 0x18 + 0xC]]), 1);
+            _pppStartPart(mng, reinterpret_cast<long*>(*reinterpret_cast<long*>(self + 0x5dc +
+                                   (*reinterpret_cast<int**>(self + 0x1C8))[i * 0x18 + 0xC] * 4)), 1);
             goto runFrameA;
         }
     } else {

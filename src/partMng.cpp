@@ -4418,7 +4418,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     case 8:
         mng->m_ownerFacing = 0;
         {
-            CGObject* owner = reinterpret_cast<CGObject*>(createParam->m_paramB);
+#define owner (reinterpret_cast<CGObject*>(createParam->m_paramB))
             reinterpret_cast<_pppMngSt*>(mng)->m_owner = owner;
             reinterpret_cast<_pppMngSt*>(mng)->m_lookTarget = createParam->m_lookTargetPtr;
             if (owner != 0) {
@@ -4430,6 +4430,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
                         node * 0xC0;
                 }
             }
+#undef owner
         }
         break;
     }

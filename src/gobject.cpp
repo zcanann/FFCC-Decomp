@@ -333,7 +333,7 @@ void CGObject::onCreate()
     m_shieldNodeFlagBits.m_bit04 = 0;
     m_collisionPushTimerMax = 0x32;
 
-    m_radiusCtrl.x = 0.0f;
+    *reinterpret_cast<u32*>(&m_radiusCtrl.x) = 0;
     *reinterpret_cast<unsigned char*>(&m_lastBgGroup) = 0;
     *reinterpret_cast<u32*>(&m_moveAnimState) = 0;
     m_stateFlags0Bits.unk4 = 0;

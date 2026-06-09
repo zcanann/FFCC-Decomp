@@ -4311,7 +4311,8 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     mng->m_matrixMode = *reinterpret_cast<unsigned char*>(fpData2 + 0x5);
     mng->m_drawVariant = *reinterpret_cast<unsigned char*>(fpData2 + 0x6);
     mng->m_rotationOrder = *reinterpret_cast<unsigned char*>(fpData2 + 0x7);
-    mng->m_slotVisible = *reinterpret_cast<unsigned char*>(fpData2 + 0x4);
+    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(mng) + 0xED) =
+        *reinterpret_cast<unsigned char*>(fpData2 + 0x4);
     mng->m_drawSubType = *reinterpret_cast<signed char*>(fpData2 + 0x0C);
     mng->m_ownerFlagsInitialized = *reinterpret_cast<unsigned char*>(fpData2 + 0x0D);
     mng->m_nodeScaleInitialized = *reinterpret_cast<unsigned char*>(fpData2 + 0x0E);

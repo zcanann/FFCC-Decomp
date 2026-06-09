@@ -663,14 +663,14 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
     POLYGON_DATA* polygon = polygonData;
     f32 zero = kPppCharaBreakZero;
 
-    const volatile float* upSrc = &kPppCharaBreakUpVector.x;
+    const volatile u32* upSrc = (const volatile u32*)&kPppCharaBreakUpVector.x;
     for (u32 i = 0; i < count; i++) {
         Vec normal;
         Vec up;
         Vec tangent;
-        up.x = upSrc[0];
-        up.y = upSrc[1];
-        up.z = upSrc[2];
+        ((u32*)&up)[0] = upSrc[0];
+        ((u32*)&up)[1] = upSrc[1];
+        ((u32*)&up)[2] = upSrc[2];
 
         int alpha = (int)stepData->m_alphaBase + rand() % stepData->m_alphaRange;
         if (alpha > 0xFF) {

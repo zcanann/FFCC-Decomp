@@ -1354,16 +1354,17 @@ void CGMonObj::onFrameStat()
 				prgObj->reqAnim(0xF, 1, 0);
 				unsigned int soundId = 0;
 				int classId = reinterpret_cast<int>(object->m_scriptHandle[4]);
-				if (classId == 0xA7) {
+				switch (classId) {
+				case 0x9C:
+				case 0xA7:
 					soundId = 0x12130;
-				} else if (classId < 0xA7) {
-					if (classId == 0x9C) {
-						soundId = 0x12130;
-					}
-				} else if (classId == 0xA9) {
-					soundId = 0x1213A;
-				} else if (classId < 0xA9) {
+					break;
+				case 0xA8:
 					soundId = 0x12126;
+					break;
+				case 0xA9:
+					soundId = 0x1213A;
+					break;
 				}
 				prgObj->playSe3D(soundId, 0x32, 0x96, 0, (Vec*)0);
 			}

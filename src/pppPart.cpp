@@ -964,6 +964,8 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma optimization_level 2
 void _pppAllFreePObject(_pppMngSt* pppMngSt)
 {
 	Graphic._WaitDrawDone(const_cast<char*>(s_pppPart_cpp), 0x362);
@@ -1064,6 +1066,7 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 	Graphic._WaitDrawDone(const_cast<char*>(s_pppPart_cpp), 0x3A1);
 	ppvMng = oldMngSt;
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -2055,6 +2058,8 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma optimization_level 3
 void _pppDeadPart(_pppMngSt* pppMngSt)
 {
 	struct pppMngStDeadRaw
@@ -2210,6 +2215,7 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 		mng->m_isDead = (mng->m_currentFrame >= mng->m_lifeEndFrame) ? 1 : 0;
 	}
 }
+#pragma pop
 
 /*
  * --INFO--

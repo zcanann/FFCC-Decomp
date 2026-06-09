@@ -3662,7 +3662,7 @@ void CGMonObj::statWatch()
 		}
 
 		int targetMode = *reinterpret_cast<unsigned short*>(aiScript + 0x106);
-		int selectedTarget = -1;
+		unsigned int selectedTarget = -1;
 		if (targetMode == 0xFFFF) {
 			chaseState = 0;
 			chaseTimer = 0;
@@ -3846,7 +3846,7 @@ void CGMonObj::statWatch()
 						aiData3 = script;
 					} else {
 						aiData3 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-							(aiState + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
+							(aiState + *reinterpret_cast<short*>(script + 0x100)) * 0x1D0 + 0x10;
 					}
 					float range = static_cast<float>(
 						*reinterpret_cast<unsigned short*>(aiData3 + actionOff + 0x11C));
@@ -3855,7 +3855,7 @@ void CGMonObj::statWatch()
 						aiData4 = script;
 					} else {
 						aiData4 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-							(aiState + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
+							(aiState + *reinterpret_cast<short*>(script + 0x100)) * 0x1D0 + 0x10;
 					}
 					short changeStat = *reinterpret_cast<short*>(aiData4 + actionOff + 0x11E);
 					actionState = 0x21;

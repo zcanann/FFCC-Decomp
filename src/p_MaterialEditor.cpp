@@ -390,10 +390,10 @@ void CMaterialEditorPcs::drawViewer()
                     vertexIndex[3] = 2;
                 }
 
-                u32* posIndex = &vertexIndex[4];
-                u32* clrIndex = &vertexIndex[0];
                 u8 i = 0;
                 while (i < vertexCount) {
+                    u32* posIndex = &vertexIndex[4];
+                    u32* clrIndex = &vertexIndex[0];
                     u32 pos = posIndex[i];
                     u32 clr = clrIndex[i];
                     i++;

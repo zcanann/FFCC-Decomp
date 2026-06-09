@@ -1830,22 +1830,25 @@ card_connected:;
         {
             unsigned char next;
 
-            if (MenuPcs.m_menuWindowInfo->state == 1) {
+            if (MenuPcs.m_menuWindowInfo->state != 1) {
+                next = 0;
+                goto do_switch_go10;
+            }
+
+            input = GetGoOutInputMask();
+            if ((input & 3) != 0) {
+                m_cursorChoice ^= 1;
+                Sound.PlaySe(1, 0x40, 0x7f, 0);
+            } else {
                 input = GetGoOutInputMask();
-                if ((input & 3) != 0) {
-                    m_cursorChoice ^= 1;
-                    Sound.PlaySe(1, 0x40, 0x7f, 0);
-                } else {
-                    input = GetGoOutInputMask();
-                    if ((input & 0x100) != 0) {
-                        if (m_cursorChoice == 0) {
-                            Sound.PlaySe(2, 0x40, 0x7f, 0);
-                        } else if (m_cursorChoice == 1) {
-                            Sound.PlaySe(3, 0x40, 0x7f, 0);
-                        }
-                        next = static_cast<signed char>(m_cursorChoice + 1);
-                        goto do_switch_go10;
+                if ((input & 0x100) != 0) {
+                    if (m_cursorChoice == 0) {
+                        Sound.PlaySe(2, 0x40, 0x7f, 0);
+                    } else if (m_cursorChoice == 1) {
+                        Sound.PlaySe(3, 0x40, 0x7f, 0);
                     }
+                    next = static_cast<unsigned char>(m_cursorChoice + 1);
+                    goto do_switch_go10;
                 }
             }
 
@@ -1880,22 +1883,25 @@ card_connected:;
         {
             unsigned char next;
 
-            if (MenuPcs.m_menuWindowInfo->state == 1) {
+            if (MenuPcs.m_menuWindowInfo->state != 1) {
+                next = 0;
+                goto do_switch_go11;
+            }
+
+            input = GetGoOutInputMask();
+            if ((input & 3) != 0) {
+                m_cursorChoice ^= 1;
+                Sound.PlaySe(1, 0x40, 0x7f, 0);
+            } else {
                 input = GetGoOutInputMask();
-                if ((input & 3) != 0) {
-                    m_cursorChoice ^= 1;
-                    Sound.PlaySe(1, 0x40, 0x7f, 0);
-                } else {
-                    input = GetGoOutInputMask();
-                    if ((input & 0x100) != 0) {
-                        if (m_cursorChoice == 0) {
-                            Sound.PlaySe(2, 0x40, 0x7f, 0);
-                        } else if (m_cursorChoice == 1) {
-                            Sound.PlaySe(3, 0x40, 0x7f, 0);
-                        }
-                        next = static_cast<signed char>(m_cursorChoice + 1);
-                        goto do_switch_go11;
+                if ((input & 0x100) != 0) {
+                    if (m_cursorChoice == 0) {
+                        Sound.PlaySe(2, 0x40, 0x7f, 0);
+                    } else if (m_cursorChoice == 1) {
+                        Sound.PlaySe(3, 0x40, 0x7f, 0);
                     }
+                    next = static_cast<unsigned char>(m_cursorChoice + 1);
+                    goto do_switch_go11;
                 }
             }
 
@@ -1950,23 +1956,26 @@ card_connected:;
         {
             unsigned char next;
 
-            if (MenuPcs.m_menuWindowInfo->state == 1) {
-                input = GetGoOutInputMask();
-                if ((input & 3) != 0) {
-                    m_cursorChoice ^= 1;
-                    Sound.PlaySe(1, 0x40, 0x7f, 0);
-                } else {
-                    input = GetGoOutInputMask();
-                    if ((input & 0x100) != 0) {
-                        if (m_cursorChoice == 0) {
-                            Sound.PlaySe(2, 0x40, 0x7f, 0);
-                        } else if (m_cursorChoice == 1) {
-                            Sound.PlaySe(3, 0x40, 0x7f, 0);
-                        }
+            if (MenuPcs.m_menuWindowInfo->state != 1) {
+                next = 0;
+                goto do_switch_go3;
+            }
 
-                        next = static_cast<signed char>(m_cursorChoice + 1);
-                        goto do_switch_go3;
+            input = GetGoOutInputMask();
+            if ((input & 3) != 0) {
+                m_cursorChoice ^= 1;
+                Sound.PlaySe(1, 0x40, 0x7f, 0);
+            } else {
+                input = GetGoOutInputMask();
+                if ((input & 0x100) != 0) {
+                    if (m_cursorChoice == 0) {
+                        Sound.PlaySe(2, 0x40, 0x7f, 0);
+                    } else if (m_cursorChoice == 1) {
+                        Sound.PlaySe(3, 0x40, 0x7f, 0);
                     }
+
+                    next = static_cast<unsigned char>(m_cursorChoice + 1);
+                    goto do_switch_go3;
                 }
             }
 

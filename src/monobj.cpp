@@ -3629,6 +3629,8 @@ body:
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_common_subs off
 void CGMonObj::statWatch()
 {
 	CGMonObj* monObj = this;
@@ -3906,6 +3908,7 @@ void CGMonObj::statWatch()
 #undef script
 #undef actionState
 }
+#pragma pop
 
 /*
  * --INFO--

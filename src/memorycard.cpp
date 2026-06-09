@@ -1215,7 +1215,7 @@ int CMemoryCardMan::DummySave()
     }
     m_result = result;
 
-    while ((((u32)(-((int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
+    while ((((u32)(-((unsigned int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
     {
     }
 
@@ -1437,7 +1437,7 @@ void CMemoryCardMan::SetLoadData()
                 (*reinterpret_cast<u32*>(letterDst + 0x3EC) & 0xFFFC01FF);
             *reinterpret_cast<u16*>(letterDst + 0x3EE) =
                 (*reinterpret_cast<u16*>(letterSrc + 0x106) & 0x01FF) |
-                (*reinterpret_cast<u16*>(letterDst + 0x3EE) & 0xFE00);
+                (*reinterpret_cast<s16*>(letterDst + 0x3EE) & 0xFE00);
             memcpy(letterDst + 0x3F0, letterSrc + 0x108, 8);
             letterDst[0x3EC] = (letterSrc[0x104] & 0x80) | (letterDst[0x3EC] & 0x7F);
             letterDst[0x3EC] = (letterSrc[0x104] & 0x40) | (letterDst[0x3EC] & 0xBF);
@@ -1575,7 +1575,7 @@ void CMemoryCardMan::MakeSaveData()
     *reinterpret_cast<int*>(save + 0x24) = gameWork->m_timerA;
     *reinterpret_cast<int*>(save + 0x28) = gameWork->m_scriptGlobalTime;
     *reinterpret_cast<int*>(save + 0x2C) = gameWork->m_frameCounter;
-    memcpy(save + 0x30, Game.m_gameWork.m_wmBackupParams, 0x10);
+    memcpy(save + 0x30, gameWork->m_wmBackupParams, 0x10);
     memcpy(save + 0x40, Game.m_gameWork.m_bossArtifactStageTable, 0x3C);
     memcpy(save + 0x7C, Game.m_gameWork.m_unkStageTable, 0x3C);
     *reinterpret_cast<int*>(save + 0xB8) = Game.m_gameWork.m_chaliceElement;

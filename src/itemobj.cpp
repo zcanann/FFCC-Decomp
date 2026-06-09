@@ -1273,7 +1273,7 @@ void CGItemObj::onFrame()
 			unsigned char* itemTable = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]);
 			float particleValue = static_cast<float>(*reinterpret_cast<unsigned short*>(itemTable + m_worldParamB * 0x48 + 0x10));
 			float particleScale = kItemObjFineStep * (float)particleValue + kItemObjParticleScaleBase;
-			putParticle((soundEntry << 8) | ownerScriptSlot, m_particleSlot, this, particleScale, 0x12909);
+			putParticle(ownerScriptSlot | (soundEntry << 8), m_particleSlot, this, particleScale, 0x12909);
 
 			SetDamageCol(0, const_cast<char*>(s_itemDamageBoneHip), kItemObjMemoryRadius, kItemObjMemoryRadius,
 			             CVector(kItemObjZero, kItemObjZero, kItemObjZero));

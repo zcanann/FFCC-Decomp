@@ -401,6 +401,91 @@ def t_reassoc_add(body, rng, mk):
     return body[:m.start()] + form + body[m.end():]
 
 
+def _scan_match(s, i, open_ch, close_ch):
+    """Given s[i]==open_ch, return index just AFTER the matching close_ch,
+    skipping over string/char literals and // and /* */ comments. -1 if unbalanced."""
+    depth = 0
+    n = len(s)
+    while i < n:
+        c = s[i]
+        if c == '"' or c == "'":
+            q = c
+            i += 1
+            while i < n:
+                if s[i] == '\\':
+                    i += 2
+                    continue
+                if s[i] == q:
+                    i += 1
+                    break
+                i += 1
+            continue
+        if c == '/' and i + 1 < n and s[i + 1] == '/':
+            j = s.find('\n', i)
+            i = n if j < 0 else j
+            continue
+        if c == '/' and i + 1 < n and s[i + 1] == '*':
+            j = s.find('*/', i + 2)
+            i = n if j < 0 else j + 2
+            continue
+        if c == open_ch:
+            depth += 1
+        elif c == close_ch:
+            depth -= 1
+            if depth == 0:
+                return i + 1
+        i += 1
+    return -1
+
+
+def t_invert_if(body, rng, mk):
+    """Invert an if/else: `if(C){A}else{B}` -> `if(!(C)){B}else{A}`.
+
+    Always semantically identical (C is evaluated exactly once either way), so the
+    only risk is brace mis-parsing -- guarded by a string/comment-aware scanner.
+    Only plain `else {`  (NOT `else if`) blocks are handled, to keep the rewrite
+    unambiguous. This discovers compiler block-layout wins (e.g. branch ordering)
+    that pure register permutation cannot reach."""
+    cands = []
+    for m in re.finditer(r"\bif[ \t]*\(", body):
+        po = m.end() - 1  # index of '('
+        pc = _scan_match(body, po, '(', ')')
+        if pc < 0:
+            continue
+        j = pc
+        while j < len(body) and body[j] in " \t\r\n":
+            j += 1
+        if j >= len(body) or body[j] != '{':
+            continue
+        then_end = _scan_match(body, j, '{', '}')
+        if then_end < 0:
+            continue
+        k = then_end
+        while k < len(body) and body[k] in " \t\r\n":
+            k += 1
+        if not body[k:k + 4].startswith("else"):
+            continue
+        e = k + 4
+        # reject `else if` and `else` not followed by a brace block
+        while e < len(body) and body[e] in " \t\r\n":
+            e += 1
+        if e >= len(body) or body[e] != '{':
+            continue
+        else_end = _scan_match(body, e, '{', '}')
+        if else_end < 0:
+            continue
+        cond = body[po + 1:pc - 1]
+        then_blk = body[j:then_end]       # includes braces
+        else_blk = body[e:else_end]       # includes braces
+        cands.append((m.start(), else_end, cond, then_blk, else_blk))
+    if not cands:
+        return None
+    start, end, cond, then_blk, else_blk = rng.choice(cands)
+    cond = cond.strip()
+    rebuilt = f"if (!({cond})) {else_blk} else {then_blk}"
+    return body[:start] + rebuilt + body[end:]
+
+
 def t_reorder_stmts(body, rng, mk):
     """Swap two adjacent simple decl/assign statements that share no identifier."""
     lines = body.split("\n")
@@ -445,6 +530,8 @@ TRANSFORMS = [
     ("split_decl", t_split_decl),
     ("reassoc_add", t_reassoc_add),
     ("reorder_stmts", t_reorder_stmts),
+    ("invert_if", t_invert_if),
+    ("invert_if", t_invert_if),  # weight it -- block-layout lever, low-risk
 ]
 
 

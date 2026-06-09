@@ -977,7 +977,8 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
  * JP Size: TODO
  */
 #pragma push
-#pragma optimization_level 3
+#pragma optimization_level 4
+#pragma opt_lifetimes off
 void _pppAllFreePObject(_pppMngSt* pppMngSt)
 {
 	Graphic._WaitDrawDone(const_cast<char*>(s_pppPart_cpp), 0x362);
@@ -1054,8 +1055,9 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 				s16* mapMeshIndices = (s16*)(mapTexRef + *(u32*)(mapTexRef + 0x10));
 				s16* shapeIndices = (s16*)(mapTexRef + *(u32*)(mapTexRef + 0x14));
 
-				u16 mapMeshCount = *mapMeshIndices;
+				s16 mapMeshCount = *mapMeshIndices;
 				mapMeshIndices++;
+				pppResSet = *reinterpret_cast<u32*>(pppMngSt->m_pppResSet);
 				for (s16 i = 0; i < mapMeshCount; i++)
 				{
 					CMapMesh* mapMesh = *(CMapMesh**)(*(u32*)(pppResSet + 0x14) + *mapMeshIndices * 4);
@@ -1066,6 +1068,7 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 
 				s16 shapeCount = *shapeIndices;
 				shapeIndices++;
+				pppResSet = *reinterpret_cast<u32*>(pppMngSt->m_pppResSet);
 				for (s16 i = 0; i < shapeCount; i++)
 				{
 					pppShapeSt* shape = *(pppShapeSt**)(*(u32*)(pppResSet + 0x18) + *shapeIndices * 4);
@@ -2513,7 +2516,7 @@ void pppSetDrawEnv(pppCVECTOR* pppColor, pppFMATRIX* pppMtx, float depth, unsign
 	if ((s_fog_mode != fogIndex) || (s_fog_blend_mode != fogParam)) {
 		s_fog_mode = fogIndex;
 		s_fog_blend_mode = fogParam;
-		Graphic.SetFog((int)fogIndex, fogParam != 0);
+		Graphic.SetFog((int)fogIndex, fogParam >= 1);
 	}
 
 	if (s_cull_mode != cullMode) {

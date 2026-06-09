@@ -3076,7 +3076,7 @@ void CGPartyObj::onStatMagic()
 				m_comboFrame++;
 			}
 		} else {
-			unsigned short trig = getPadTrigForSlot(static_cast<signed char>(m_animStateMisc));
+			unsigned short trig = getPadTrigForSlot(static_cast<unsigned char>(m_animStateMisc));
 			if ((trig & 0x200) != 0 && magicReady == 0) {
 				changeStat(0, 0, 0);
 			}
@@ -5396,7 +5396,7 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 		font->Draw(text);
 	} else {
 		unsigned char* work = reinterpret_cast<unsigned char*>(m_scriptHandle);
-		sprintf(text, s_partyObjDebugScriptFmt, work[0xBA4], *reinterpret_cast<unsigned short*>(work + 0xBC4),
+		sprintf(text, s_partyObjDebugScriptFmt, work[0xBA4], *reinterpret_cast<short*>(work + 0xBC4),
 		        *reinterpret_cast<unsigned short*>(work + 0xBC6), *reinterpret_cast<unsigned short*>(work + 0xBC8),
 		        *reinterpret_cast<unsigned short*>(work + 0xBCA), *reinterpret_cast<unsigned short*>(work + 0xBCC));
 

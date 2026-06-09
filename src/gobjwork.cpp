@@ -1675,9 +1675,10 @@ void CCaravanWork::SafeDeleteTempItem()
 
 	int totalSlots = 0;
 	int artifactIndex = 0;
-	for (int i = 0; i < 50; i++, artifactIndex += 2) {
+	CCaravanWork* artifactCur = this;
+	for (int i = 50; i != 0; i--) {
 		if (artifactIndex < 96) {
-			int artifactId = m_artifacts[artifactIndex];
+			int artifactId = artifactCur->m_artifacts[0];
 			if (artifactId > 0) {
 				unsigned short* artifactData =
 					(unsigned short*)(Game.unkCFlatData0[2] + artifactId * 0x48);
@@ -1697,11 +1698,12 @@ void CCaravanWork::SafeDeleteTempItem()
 			}
 		}
 
-		if ((artifactIndex + 1) < 96) {
-			int artifactId = m_artifacts[artifactIndex + 1];
+		artifactIndex++;
+		if (artifactIndex < 96) {
+			int artifactId = artifactCur->m_artifacts[1];
 			if (artifactId > 0) {
-				unsigned short* artifactData = (unsigned short*)(Game.unkCFlatData0[2] +
-																 artifactId * 0x48);
+				unsigned short* artifactData =
+					(unsigned short*)(Game.unkCFlatData0[2] + artifactId * 0x48);
 				unsigned short slots = artifactData[3];
 				switch (artifactData[0]) {
 				case 0xDB:
@@ -1717,6 +1719,9 @@ void CCaravanWork::SafeDeleteTempItem()
 				}
 			}
 		}
+
+		artifactCur = (CCaravanWork*)&artifactCur->m_objType;
+		artifactIndex++;
 	}
 
 	totalSlots += (short)m_baseCmdListSlots;

@@ -483,8 +483,8 @@ void CGObject::move()
         m_groundHitOffset.y = sZeroFloat;
     }
 
-    bool movingWithScript = false;
-    bool hasStickInput = false;
+    int movingWithScript = 0;
+    int hasStickInput = 0;
     m_groundHitOffset.y += m_gravityY;
     Vec moveVec;
 
@@ -526,7 +526,7 @@ void CGObject::move()
             gCFlatRuntime().SystemCall(this, 2, 7, 1, &stack, 0);
         }
 
-        movingWithScript = true;
+        movingWithScript = 1;
     } else {
         const int player = static_cast<s8>(m_animStateMisc);
         if ((player >= 0)
@@ -559,7 +559,7 @@ void CGObject::move()
                 moveVec.x = sZeroFloat - stickX;
                 moveVec.z = sZeroFloat + stickY;
                 if ((moveVec.x != sZeroFloat) || (moveVec.z != sZeroFloat)) {
-                    hasStickInput = true;
+                    hasStickInput = 1;
                 }
             }
 

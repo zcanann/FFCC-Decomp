@@ -1417,7 +1417,7 @@ void CMenuPcs::InitCharaInfo()
 		int slotOffset = baseSlot * 0x50;
 		int baseX = 0x68;
 		for (int col = 0; col < 2; col++) {
-			int y = baseY;
+			int y =  (s32)(baseY);
 			if (row != 0) {
 				y = baseY + 8;
 			}
@@ -10212,7 +10212,7 @@ void CMenuPcs::SetAnim(int anim)
 	}
 
 	const unsigned int charaNo = m_wm.m_handles[handleIdx]->m_charaNo;
-	const int modelBase = static_cast<int>(charaNo / 100) * 100;
+	const int modelBase =  (s32)(static_cast<int>(charaNo / 100) * 100);
 	int animBase = (static_cast<int>(charaNo / 100) - 1) * 6;
 
 	m_wm.m_handles[handleIdx]->LoadAnim(s_wmCharaAnimStand, animBase++, 1, 0, modelBase, -1, 0);
@@ -10227,9 +10227,12 @@ void CMenuPcs::SetAnim(int anim)
 	animState[1] = -1;
 	animState[2] = rand() % 250;
 
-	const int currentAnimIndex = m_wm.m_handles[handleIdx]->m_currentAnimIndex;
-	const int blendMode = (static_cast<unsigned int>(currentAnimIndex) >> 31) - 1;
-	m_wm.m_handles[handleIdx]->SetAnim((animBase - 5) + animState[0], -1, -1, blendMode, 1);
+	int __p22 = handleIdx;
+	const int currentAnimIndex = m_wm.m_handles[__p22]->m_currentAnimIndex;
+	int __p23 =  (currentAnimIndex + 0);
+	const int blendMode = (static_cast<unsigned int>(__p23) >> 31) - 1;
+	int __p26 = handleIdx;
+	m_wm.m_handles[__p26]->SetAnim((animBase - 5) + animState[0], -1, -1, blendMode, 1);
 
 	reinterpret_cast<float*>(animState)[3] =
 	    reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(m_wm.m_handles[handleIdx]->m_model) + 0xB4)[0];
@@ -12214,15 +12217,15 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 				if (winType != 0) {
 					slotText = strstr(textBuf, lbl_80210D54[languageIndex]);
 				}
-				if (winType == 0 || slotText == 0) {
+				if (!(winType == 0 || slotText == 0)) {
+					int len = strlen(lbl_80210D54[languageIndex]);
+					slotText[len - 1] += GetMcCtrl()->m_cardChannel;
+				} else {
 					char* marker = strstr(textBuf, lbl_80331400);
 					if (marker != 0) {
 						marker[0] += 2;
 						marker[1] += 2;
 					}
-				} else {
-					int len = strlen(lbl_80210D54[languageIndex]);
-					slotText[len - 1] += GetMcCtrl()->m_cardChannel;
 				}
 			} else {
 				char* dataText = strstr(textBuf, lbl_80210D68[languageIndex]);

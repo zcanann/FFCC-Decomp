@@ -2004,7 +2004,7 @@ void CGPartyObj::onFrameStat()
 			}
 		} else if (isLoopAnim() != 0) {
 			if (*reinterpret_cast<unsigned short*>(script + 0x1C) != 0) {
-				party.partyFlags = (party.partyFlags & 0xFD) | 2;
+				party.flags.flag02 = 1;
 			}
 			changeStat(0, 0, 0);
 		}

@@ -1720,12 +1720,13 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 			parentNode = reinterpret_cast<CNode*>(reinterpret_cast<u8*>(ModelNodes(this)) + parent * 0xC0);
 		}
 
-		Mtx localMtx;
 		int nextReuseAnimNode0Srt = 0;
 		SRTView cachedParentScaleSrt = parentScaleSrt;
+		SRTView srt;
+		Mtx animMtx;
+		Mtx localMtx;
 
 		if (NodeAnimNode0(node) != 0 || NodeAnimNode1(node) != 0) {
-			Mtx animMtx;
 			if (parentNode != 0 && NodeAnimNode0(parentNode) != 0 &&
 			    AnimNodeUsesScale(NodeAnimNode0(parentNode))) {
 				NodeAnimNode0(parentNode)->Interp(m_anim, reinterpret_cast<SRT*>(&parentScaleSrt), frame);
@@ -1751,7 +1752,6 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 				localMtx[0][3] = NodeBoneLen(parentNode);
 			}
 
-			SRTView srt;
 			if (NodeAnimNode1(node) != 0) {
 				NodeAnimNode1(node)->Interp(m_anim, reinterpret_cast<SRT*>(&srt), frame);
 				if (AnimNodeUsesScale(NodeAnimNode1(node))) {
@@ -1807,9 +1807,10 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 				PSVECScale(&targetScale, &positionScaleB, alpha);
 				PSVECAdd(&positionScaleA, &positionScaleB, &targetScale);
 			}
-			PSVECScale(&NodePreviousPosition(node), &positionScaleA, FLOAT_803301BC - alpha);
+			Vec positionScaleA2;
+			PSVECScale(&NodePreviousPosition(node), &positionScaleA2, FLOAT_803301BC - alpha);
 			PSVECScale(&targetPos, &positionScaleB, alpha);
-			PSVECAdd(&positionScaleA, &positionScaleB, &blendedPos);
+			PSVECAdd(&positionScaleA2, &positionScaleB, &blendedPos);
 			C_QUATMtx(&targetQuat, localMtx);
 			C_QUATSlerp(&NodePreviousQuat(node), &targetQuat, &targetQuat, alpha);
 			PSMTXScale(scaleMtx, targetScale.x, targetScale.y, targetScale.z);

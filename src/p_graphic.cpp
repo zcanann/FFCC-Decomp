@@ -837,8 +837,14 @@ void CGraphicPcs::drawBar()
     GXColor1u32(frameColorWord);
     GXTexCoord2u16(0, 2);
 
-    CColor fifoColor = (Graphic.IsFifoOver() == 0) ? CColor(0, 0xFF, 0, 0xFF) : CColor(0xFF, 0, 0, 0xFF);
-    const u32 fifoColorWord = *reinterpret_cast<u32*>(&fifoColor.color);
+    GXColor fifoTmp;
+    *reinterpret_cast<u32*>(&fifoTmp) = *reinterpret_cast<u32*>(&((Graphic.IsFifoOver() == 0) ? CColor(0, 0xFF, 0, 0xFF) : CColor(0xFF, 0, 0, 0xFF)).color);
+    GXColor fifoGX;
+    fifoGX.r = fifoTmp.r;
+    fifoGX.g = fifoTmp.g;
+    fifoGX.b = fifoTmp.b;
+    fifoGX.a = fifoTmp.a;
+    const u32 fifoColorWord = *reinterpret_cast<u32*>(&fifoGX);
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
     GXPosition3f32(kDebugIndicatorFifoLeft, kDebugIndicatorTop, kGraphicZero);
     GXColor1u32(fifoColorWord);

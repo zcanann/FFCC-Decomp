@@ -1720,10 +1720,9 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         m_pppMng[0].m_useOwnerScaleSign = 0;
         m_pppMng[0].m_matrixMode = 0;
 
-        _pppMngSt* mng = m_pppMng;
         for (int i = 0; i < *reinterpret_cast<int*>(self + 0x4); i++) {
-            *reinterpret_cast<unsigned int*>(&mng->m_envColorR) = *reinterpret_cast<unsigned int*>(self + 0x168);
-            mng++;
+            *reinterpret_cast<unsigned int*>(self + i * 0x158 + 0x2ac0) =
+                *reinterpret_cast<unsigned int*>(self + 0x168);
         }
         return;
     }
@@ -1763,10 +1762,9 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         ppvChrScl[1] = kPartMngOne;
         ppvChrScl[0] = kPartMngOne;
 
-        _pppMngSt* mng = m_pppMng;
         for (int i = 0; i < *reinterpret_cast<int*>(self + 0x4); i++) {
-            *reinterpret_cast<unsigned int*>(&mng->m_envColorR) = *reinterpret_cast<unsigned int*>(self + 0x168);
-            mng++;
+            *reinterpret_cast<unsigned int*>(self + i * 0x158 + 0x2ac0) =
+                *reinterpret_cast<unsigned int*>(self + 0x168);
         }
         return;
     }

@@ -111,7 +111,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                 Vec segVec;
                 GXColor amb;
                 const u8 trailReadIndex = *(u8*)(particle + 0x38);
-                const s32 trailMaxIndex = (u8)(*(u8*)(particle + 0x37) - 1);
+                const s32 trailMaxIndex = (s8)(*(u8*)(particle + 0x37) - 1);
                 s32 trailNextIndex = (u8)(trailReadIndex + 1);
                 const float alphaScale = (float)*(s16*)((u8*)colorWork + 6) / LoadFloat(kPppYmMegaBirthShpTail3AlphaDivisor);
                 const float stepDivisor = (float)((s32)frameCountRaw - 1);
@@ -229,7 +229,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                         drawMtx.value[2][3] = cameraPos.z;
                         GXLoadPosMtxImm(drawMtx.value, 0);
 
-                        amb.r = (u8)fadeR;
+                        amb.r = (s8)fadeR;
                         amb.g = (u8)fadeG;
                         amb.b = (u8)fadeB;
                         amb.a = (u8)(fadeA * (kPppYmMegaBirthShpTail3DepthAlphaScale * (kPppYmMegaBirthShpTail3ColorComponentMax - *(float*)(particle + 0x30))));

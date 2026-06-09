@@ -86,7 +86,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
     } else {
         hasRequiredMemory = true;
     }
-    if (!hasRequiredMemory || *(u32*)(step + 4) == 0xFFFF) {
+    if (!hasRequiredMemory || *(s32*)(step + 4) == 0xFFFF) {
         return;
     }
     const u32 dataValIndex = *(u32*)(step + 4);
@@ -115,7 +115,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
             pppShapeAnimFrame* shapeFrame = &shapeAnim->m_frames[shapeFrameIndex];
             tagOAN3_SHAPE* shape =
                 reinterpret_cast<tagOAN3_SHAPE*>(reinterpret_cast<u8*>(shapeAnim) + shapeFrame->m_shapeOffset);
-            const u8 trailReadIndex = *(u8*)(particle + 0x38);
+            const s8 trailReadIndex = *(u8*)(particle + 0x38);
             const s32 trailMaxIndex = (u8)(*(u8*)(particle + 0x37) - 1);
             s32 trailNextIndex = (u8)(trailReadIndex + 1);
             const float alphaScale = (float)*(s16*)((u8*)colorWork + 6) / kPppYmMegaBirthShpTail2AlphaDivisor;
@@ -207,7 +207,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
                     drawMtx.value[2][3] = cameraPos.z;
                     GXLoadPosMtxImm(drawMtx.value, 0);
 
-                    amb.r = (u8)fadeR;
+                    amb.r = (s8)fadeR;
                     amb.g = (u8)fadeG;
                     amb.b = (u8)fadeB;
                     amb.a = (u8)(fadeA * (kPppYmMegaBirthShpTail2DepthAlphaScale * (kPppYmMegaBirthShpTail2ColorComponentMax - *(float*)(particle + 0x30))));

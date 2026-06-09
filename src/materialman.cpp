@@ -3268,14 +3268,14 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                             keyFrameU->ReadFrame(chunkFile, 0);
                             break;
                         case CHUNK_UKEY:
-                            keyFrameU->ReadKey(chunkFile, static_cast<char>(chunk.m_arg0));
+                            keyFrameU->ReadKey(chunkFile, chunk.m_arg0);
                             break;
                         case CHUNK_VFRM:
                             keyFrameV = AllocMapKeyFrame(0xDDD);
                             keyFrameV->ReadFrame(chunkFile, 0);
                             break;
                         case CHUNK_VKEY:
-                            keyFrameV->ReadKey(chunkFile, static_cast<char>(chunk.m_arg0));
+                            keyFrameV->ReadKey(chunkFile, chunk.m_arg0);
                             break;
                         }
                     }

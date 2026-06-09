@@ -41,6 +41,13 @@ extern Mtx ppvUnitMatrix;
 extern Vec ppvZeroVector;
 }
 extern char g_StrTmp[0x400];
+extern "C" int LoadModel__Q29CCharaPcs7CHandleFiUlUlUliii(
+    void* self, int, unsigned long, unsigned long, unsigned long, int, int, int);
+static inline int pppLoadModelRet(
+    CCharaPcs::CHandle* h, int a, unsigned long b, unsigned long c,
+    unsigned long d, int e, int f, int g) {
+    return LoadModel__Q29CCharaPcs7CHandleFiUlUlUliii(h, a, b, c, d, e, f, g);
+}
 extern "C" const double kPartMngZeroDouble = 0.0;
 extern "C" const float kPartMngAngleHalfUnit = 32768.0f;
 extern "C" const float kPartMngHalfTurnDegrees = 180.0f;
@@ -325,11 +332,30 @@ void CPartMng::Create()
         *reinterpret_cast<int*>(mng + 0x128) = 0x1e;
     }
 
+    *reinterpret_cast<void**>(self + 0x1c8) = 0;
+    self[0x7f4] = 0;
+    self[0x7f5] = 0;
+    self[0x7f6] = 0;
+    self[0x7f7] = 0;
+    self[0x7f8] = 0;
+    self[0x7f9] = 0;
+    self[0x7fa] = 0;
+    self[0x7fb] = 0;
+    self[0x7fc] = 0;
+    self[0x7fd] = 0;
+    self[0x7fe] = 0;
+    self[0x7ff] = 0;
+
     m_pppEnvSt.m_envParam = kPartMngZero;
     m_pppEnvSt.m_mngStCount = 0x10;
     m_pppEnvSt.m_isEditMode = 1;
 
-    memset(self + 0x10, 0, 0x108);
+    self[0x80c] = 0;
+    self[0x80d] = 0;
+    self[0x80e] = 0;
+    self[0x80f] = 0;
+
+    memset(self + 0x235a8, 0, 0x108);
 
     m_pppEnvSt.m_boxMinX = kPartMngEnvBoxMinX;
     m_pppEnvSt.m_boxMaxX = kPartMngEnvBoxMaxXz;
@@ -1554,12 +1580,11 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x554);
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3A9);
         {
-            _pppMngSt* mng = m_pppMng;
             for (int i = 0; i < *reinterpret_cast<int*>(self + kEditCountOffset); i++) {
+                _pppMngSt* mng = reinterpret_cast<_pppMngSt*>(self + i * 0x158 + 0x2A18);
                 if (mng->m_baseTime != -0x1000) {
                     _pppAllFreePObject(mng);
                 }
-                mng++;
             }
         }
         *reinterpret_cast<int*>(self + kEditCountOffset) = 0;
@@ -1685,7 +1710,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         *reinterpret_cast<int*>(self + 0x168) = *reinterpret_cast<int*>(payload + 0x128);
         *reinterpret_cast<int*>(self + 0x16C) = *reinterpret_cast<int*>(payload + 0x12C);
         *reinterpret_cast<int*>(self + 0x170) = *reinterpret_cast<int*>(payload + 0x130);
-        *reinterpret_cast<int*>(self + kEditDrawModeOffset) = *reinterpret_cast<int*>(payload + 0x134);
+        *reinterpret_cast<int*>(self + 0x174) = *reinterpret_cast<int*>(payload + 0x134);
 
         m_pppMng[0].m_ownerScale = kPartMngOne;
         m_pppMng[0].m_scaleFactor = kPartMngOne;
@@ -1694,10 +1719,9 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         m_pppMng[0].m_useOwnerScaleSign = 0;
         m_pppMng[0].m_matrixMode = 0;
 
-        _pppMngSt* mng = m_pppMng;
         for (int i = 0; i < *reinterpret_cast<int*>(self + 0x4); i++) {
-            *reinterpret_cast<unsigned int*>(&mng->m_envColorR) = *reinterpret_cast<unsigned int*>(self + 0x168);
-            mng++;
+            *reinterpret_cast<unsigned int*>(self + i * 0x158 + 0x2ac0) =
+                *reinterpret_cast<unsigned int*>(self + 0x168);
         }
         return;
     }
@@ -1731,16 +1755,15 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         *reinterpret_cast<int*>(self + 0x168) = *reinterpret_cast<int*>(payload + 0x128);
         *reinterpret_cast<int*>(self + 0x16C) = *reinterpret_cast<int*>(payload + 0x12C);
         *reinterpret_cast<int*>(self + 0x170) = *reinterpret_cast<int*>(payload + 0x130);
-        *reinterpret_cast<int*>(self + kEditDrawModeOffset) = *reinterpret_cast<int*>(payload + 0x134);
+        *reinterpret_cast<int*>(self + 0x174) = *reinterpret_cast<int*>(payload + 0x134);
 
         ppvChrScl[2] = kPartMngOne;
         ppvChrScl[1] = kPartMngOne;
         ppvChrScl[0] = kPartMngOne;
 
-        _pppMngSt* mng = m_pppMng;
         for (int i = 0; i < *reinterpret_cast<int*>(self + 0x4); i++) {
-            *reinterpret_cast<unsigned int*>(&mng->m_envColorR) = *reinterpret_cast<unsigned int*>(self + 0x168);
-            mng++;
+            *reinterpret_cast<unsigned int*>(self + i * 0x158 + 0x2ac0) =
+                *reinterpret_cast<unsigned int*>(self + 0x168);
         }
         return;
     }
@@ -1904,12 +1927,11 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x646);
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3A9);
         {
-            _pppMngSt* mng = m_pppMng;
             for (int i = 0; i < *reinterpret_cast<int*>(self + kEditCountOffset); i++) {
+                _pppMngSt* mng = reinterpret_cast<_pppMngSt*>(self + i * 0x158 + 0x2A18);
                 if (mng->m_baseTime != -0x1000) {
                     _pppAllFreePObject(mng);
                 }
-                mng++;
             }
         }
         *reinterpret_cast<int*>(self + kEditCountOffset) = 0;
@@ -1988,12 +2010,11 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         }
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3A9);
         {
-            _pppMngSt* mng = m_pppMng;
             for (int i = 0; i < *reinterpret_cast<int*>(self + kEditCountOffset); i++) {
+                _pppMngSt* mng = reinterpret_cast<_pppMngSt*>(self + i * 0x158 + 0x2A18);
                 if (mng->m_baseTime != -0x1000) {
                     _pppAllFreePObject(mng);
                 }
-                mng++;
             }
         }
         *reinterpret_cast<int*>(self + kEditCountOffset) = 0;
@@ -2250,18 +2271,18 @@ void CPartMng::pppEditBeforeCalc()
             if (handle != 0) {
                 handle->Add();
                 handle->m_charaNo = 3;
-                handle->LoadModel(
-                    *reinterpret_cast<int*>(self + 0x190),
-                    *reinterpret_cast<unsigned long*>(self + 0x194),
-                    *reinterpret_cast<unsigned long*>(self + 0x198),
-                    0,
-                    -1,
-                    0,
-                    0
-                );
-
-                if (handle == (*editorObj)->m_charaModelHandle && !handle->IsModelLoaded(1)) {
-                    delete handle;
+                if (pppLoadModelRet(
+                        handle,
+                        *reinterpret_cast<int*>(self + 0x190),
+                        *reinterpret_cast<unsigned long*>(self + 0x194),
+                        *reinterpret_cast<unsigned long*>(self + 0x198),
+                        0,
+                        -1,
+                        0,
+                        0
+                    ) == 0 &&
+                    (*editorObj)->m_charaModelHandle != 0) {
+                    delete (*editorObj)->m_charaModelHandle;
                     (*editorObj)->m_charaModelHandle = 0;
                 }
             }
@@ -4285,7 +4306,8 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     mng->m_matrixMode = *reinterpret_cast<unsigned char*>(fpData2 + 0x5);
     mng->m_drawVariant = *reinterpret_cast<unsigned char*>(fpData2 + 0x6);
     mng->m_rotationOrder = *reinterpret_cast<unsigned char*>(fpData2 + 0x7);
-    mng->m_slotVisible = *reinterpret_cast<unsigned char*>(fpData2 + 0x4);
+    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(mng) + 0xED) =
+        *reinterpret_cast<unsigned char*>(fpData2 + 0x4);
     mng->m_drawSubType = *reinterpret_cast<signed char*>(fpData2 + 0x0C);
     mng->m_ownerFlagsInitialized = *reinterpret_cast<unsigned char*>(fpData2 + 0x0D);
     mng->m_nodeScaleInitialized = *reinterpret_cast<unsigned char*>(fpData2 + 0x0E);
@@ -4315,8 +4337,15 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
         mng->m_position.y = createParam->m_positionOffsetPtr->y + *reinterpret_cast<float*>(fpData + 0x04);
         mng->m_position.z = createParam->m_positionOffsetPtr->z + *reinterpret_cast<float*>(fpData + 0x08);
     }
-    mng->m_savedPosition = mng->m_position;
-    mng->m_previousPosition = mng->m_position;
+    {
+        unsigned char* mngBytes = reinterpret_cast<unsigned char*>(mng);
+        *reinterpret_cast<float*>(mngBytes + 0x58) = mng->m_position.x;
+        *reinterpret_cast<float*>(mngBytes + 0x5c) = mng->m_position.y;
+        *reinterpret_cast<float*>(mngBytes + 0x60) = mng->m_position.z;
+        *reinterpret_cast<float*>(mngBytes + 0x48) = *reinterpret_cast<float*>(mngBytes + 0x58);
+        *reinterpret_cast<float*>(mngBytes + 0x4c) = *reinterpret_cast<float*>(mngBytes + 0x5c);
+        *reinterpret_cast<float*>(mngBytes + 0x50) = *reinterpret_cast<float*>(mngBytes + 0x60);
+    }
 
     if (createParam->m_extraPositionPtr != 0) {
         mng->m_paramVec0.x = createParam->m_extraPositionPtr->x;
@@ -4353,8 +4382,8 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
 
     mng->m_ownerScale = kPartMngOne;
     mng->m_scaleFactor = kPartMngOne;
-    mng->m_userFloat0 = kPartMngOne;
-    mng->m_userFloat1 = kPartMngOne;
+    *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(mng) + 0x3C) = kPartMngOne;
+    *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(mng) + 0x38) = kPartMngOne;
     mng->m_useOwnerScaleSign = 0;
     reinterpret_cast<_pppMngSt*>(mng)->m_owner = 0;
     reinterpret_cast<_pppMngSt*>(mng)->m_lookTarget = createParam->m_lookTargetPtr;

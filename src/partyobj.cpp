@@ -1771,12 +1771,12 @@ void CGPartyObj::onFrameStat()
 			changeStat(1, 0, 0);
 		} else {
 			party.unk6D0++;
-			if (party.unk6D0 < 6) {
+			if (party.unk6D0 >= 6) {
+				changeStat(6, 0, 0);
+			} else {
 				if ((getPadTrigForSlot(static_cast<signed char>(m_animStateMisc)) & 0x200) != 0) {
 					changeStat(0, 0, 0);
 				}
-			} else {
-				changeStat(6, 0, 0);
 			}
 		}
 		break;

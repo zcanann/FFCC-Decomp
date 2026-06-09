@@ -1299,8 +1299,9 @@ void CCharaPcs::drawBefore()
  */
 void CCharaPcs::drawMakeTexShadow()
 {
+    CHandle* handle = m_handleList->m_next;
     int shadowCount = 0;
-    for (CHandle* handle = m_handleList->m_next; m_handleList != handle; handle = handle->m_next) {
+    for (; m_handleList != handle; handle = handle->m_next) {
         if ((handle->m_flags & 0x200) != 0) {
             shadowCount++;
         }
@@ -1328,12 +1329,13 @@ void CCharaPcs::drawMakeTexShadow()
     CColor clearColor(0x00, 0x00, 0x00, 0x00);
     Graphic.SetCopyClear(clearColor.color, 0xFFFFFF);
 
+    m_texShadowTextureOffset = 0;
     m_texShadowTextureBase = Graphic.m_scratchTextureBuffer;
     m_texShadowTextureSize = 0xD2000;
-    m_texShadowTextureOffset = m_texShadowSize * m_texShadowSize * 4;
+    m_texShadowTextureOffset += m_texShadowSize * m_texShadowSize * 4;
     C_MTXLightPerspective(m_texShadowProjectionMtx, CameraPcs.m_fov, 1.3333334f, 0.5f, -0.5f, 0.5f, 0.5f);
 
-    CHandle* handle = m_handleList->m_next;
+    handle = m_handleList->m_next;
     while (m_handleList != handle) {
         if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x8000) != 0) {
             handle->draw(2, 1);
@@ -1386,8 +1388,7 @@ CTextureSet* CCharaPcs::createTextureSet(void* textureData, int useWeaponStage)
 {
     CTextureSet* textureSet = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
 
-    CMemory::CStage* textureStage = (&CharaPcs.m_viewerModelStage)[useWeaponStage != 0 ? 3 : 1];
-    textureSet->Create(textureData, SelectLoadStage(&CharaPcs, textureStage), 0, 0, 0, 0);
+    textureSet->Create(textureData, SelectLoadStage(&CharaPcs, (&CharaPcs.m_viewerModelStage)[useWeaponStage != 0 ? 3 : 1]), 0, 0, 0, 0);
 
     return textureSet;
 }
@@ -2841,8 +2842,12 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
 
         Vec shadowBase;
         {
+            Vec scaledDeltaCopy;
+            scaledDeltaCopy.x = scaledDelta.x;
+            scaledDeltaCopy.y = scaledDelta.y;
+            scaledDeltaCopy.z = scaledDelta.z;
             CVector baseTmp;
-            PSVECAdd(modelPos, scaledDelta, baseTmp);
+            PSVECAdd(modelPos, &scaledDeltaCopy, baseTmp);
             shadowBase.x = baseTmp.x;
             shadowBase.y = baseTmp.y;
             shadowBase.z = baseTmp.z;
@@ -2865,7 +2870,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         const float farZ = CameraPcs.m_farZ;
         CColor shadowFog;
         shadowFog.color.a = 0xFF;
-        shadowFog.color.b = static_cast<unsigned char>(static_cast<unsigned int>(255.0f * shadowFade));
+        shadowFog.color.b = static_cast<unsigned char>(static_cast<int>(255.0f * shadowFade));
         shadowFog.color.g = shadowFog.color.b;
         shadowFog.color.r = shadowFog.color.b;
         _GXColor shadowFogGX = shadowFog.color;

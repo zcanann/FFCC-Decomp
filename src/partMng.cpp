@@ -3954,16 +3954,18 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
 
                             pppModelSt* searchModel = modelArray;
                             unsigned int i = 0;
-                            do {
+                            for (;;) {
                                 if (searchModel->m_isUsed != 0 && strcmp(searchModel->m_name, name) == 0) {
-                                    break;
+                                    goto nameSearchDone;
                                 }
                                 i++;
                                 searchModel++;
-                            } while (i < 0x100);
-                            if (i >= 0x100) {
-                                searchModel = 0;
+                                if (i >= 0x100) {
+                                    searchModel = 0;
+                                    goto nameSearchDone;
+                                }
                             }
+                        nameSearchDone:
 
                             if (searchModel == 0) {
                                 pppModelSt* freeModel = modelArray;

@@ -941,17 +941,17 @@ static inline void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBi
 {
     pppUnitMatrix(out);
     switch (params->m_spawnMode) {
+    default:
+        if (work->m_worldMatrixBlock == NULL) {
+            pppMulMatrix(out, *(pppFMATRIX*)&ppvWorldMatrix, pObject->m_localMatrix);
+        }
+        break;
     case 1:
     case 3:
     case 5:
     case 7:
     case 9:
         pppMulMatrix(out, *(pppFMATRIX*)&ppvWorldMatrix, pObject->m_localMatrix);
-        break;
-    default:
-        if (work->m_worldMatrixBlock == NULL) {
-            pppMulMatrix(out, *(pppFMATRIX*)&ppvWorldMatrix, pObject->m_localMatrix);
-        }
         break;
     }
 }

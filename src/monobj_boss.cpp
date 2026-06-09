@@ -527,7 +527,7 @@ void CGMonObj::frameStatFuncGolem()
 			float turnOffset;
 			if (state != 0x67) {
 				if (state < 0x67) {
-					if (state > 0x65) {
+					if (state >= 0x66) {
 						turnOffset = kMonObjBossZero;
 					}
 				} else if (state < 0x69) {

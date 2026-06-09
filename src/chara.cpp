@@ -1635,9 +1635,10 @@ void CChara::CModel::calcMatrix()
 				PSVECScale(&targetScale, &positionScaleB, alpha);
 				PSVECAdd(&positionScaleA, &positionScaleB, &targetScale);
 			}
-			PSVECScale(&NodePreviousPosition(node), &positionScaleA, FLOAT_803301BC - alpha);
+			Vec positionScaleA2;
+			PSVECScale(&NodePreviousPosition(node), &positionScaleA2, FLOAT_803301BC - alpha);
 			PSVECScale(&targetPos, &positionScaleB, alpha);
-			PSVECAdd(&positionScaleA, &positionScaleB, &blendedPos);
+			PSVECAdd(&positionScaleA2, &positionScaleB, &blendedPos);
 			C_QUATMtx(&targetQuat, NodeLocalRuntimeMtx(node));
 			C_QUATSlerp(&NodePreviousQuat(node), &targetQuat, &targetQuat, alpha);
 			PSMTXScale(scaleMtx, targetScale.x, targetScale.y, targetScale.z);

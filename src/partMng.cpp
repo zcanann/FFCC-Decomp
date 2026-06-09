@@ -1923,23 +1923,25 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
 
                 if (res->m_textureSet == 0) {
                     res->m_textureSet = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x447) CTextureSet;
-                    res->m_textureSet->m_textureArray.SetDefaultSize(0x180);
-                    res->m_textureSet->m_textureArray.SetGrow(0);
+                    CTextureSet* textureSet = res->m_textureSet;
+                    textureSet->m_textureArray.SetDefaultSize(0x180);
+                    textureSet->m_textureArray.SetGrow(0);
                 }
 
                 if (res->m_materialSet == 0) {
                     res->m_materialSet = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x44B) CMaterialSet;
-                    res->m_materialSet->m_materials.SetDefaultSize(0x180);
-                    res->m_materialSet->m_materials.SetGrow(0);
-                    m_pppEnvSt.m_materialSetPtr = res->m_materialSet;
+                    CMaterialSet* materialSet = res->m_materialSet;
+                    materialSet->m_materials.SetDefaultSize(0x180);
+                    materialSet->m_materials.SetGrow(0);
+                    m_pppEnvSt.m_materialSetPtr = materialSet;
 
                     CMaterial* defaultMaterial = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x44E) CMaterial;
                     defaultMaterial->Create(0, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0));
                     *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(defaultMaterial) + 0x24) |= 1;
-                    if (res->m_materialSet->m_materials.GetSize() < 1) {
-                        res->m_materialSet->m_materials.Add(defaultMaterial);
+                    if (materialSet->m_materials.GetSize() < 1) {
+                        materialSet->m_materials.Add(defaultMaterial);
                     } else {
-                        res->m_materialSet->m_materials.SetAt(0, defaultMaterial);
+                        materialSet->m_materials.SetAt(0, defaultMaterial);
                     }
                 }
 

@@ -1807,7 +1807,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
                 }
             }
 
-            int slotIndex = static_cast<int>(*reinterpret_cast<short*>(payload));
+#define slotIndex (static_cast<int>(*reinterpret_cast<short*>(payload)))
             pppModelSt* modelSlot = (*modelTablePtr)[slotIndex];
             if (modelSlot != 0) {
                 if (--modelSlot->m_refCount <= 0) {
@@ -1825,6 +1825,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
 
             modelSlot = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x5FC) pppModelSt;
             (*modelTablePtr)[slotIndex] = modelSlot;
+#undef slotIndex
             if (modelSlot != 0) {
                 modelSlot->m_refCount = 0;
                 modelSlot->m_cacheId = -1;

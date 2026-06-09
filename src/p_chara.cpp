@@ -2947,18 +2947,12 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
             modelDrawFlags |= 1;
         }
         const unsigned int drawFlags = m_flags;
-        if ((drawFlags & 0x400) != 0) {
-            modelDrawFlags |= 2;
-        }
-        if ((drawFlags & 0x2000) != 0) {
-            modelDrawFlags |= 4;
-        }
+        modelDrawFlags |= ((drawFlags & 0x400) != 0) ? 2 : 0;
+        modelDrawFlags |= ((drawFlags & 0x2000) != 0) ? 4 : 0;
         if (drawPass == 3 && (drawFlags & 0x8000) != 0) {
             modelDrawFlags |= 8;
         }
-        if ((drawFlags & 0x100000) != 0) {
-            modelDrawFlags |= 0x10;
-        }
+        modelDrawFlags |= ((drawFlags & 0x100000) != 0) ? 0x10 : 0;
         m_model->Draw(viewMtx, modelDrawFlags, 0);
     }
 

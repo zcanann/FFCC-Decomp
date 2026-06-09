@@ -547,9 +547,9 @@ void CGObject::move()
                 buttons |= buttonsRepeat;
             }
 
-            moveVec.x = sZeroFloat;
-            moveVec.y = sZeroFloat;
             moveVec.z = sZeroFloat;
+            moveVec.y = sZeroFloat;
+            moveVec.x = sZeroFloat;
 
             u32 miniGameFlags = DbgMenuPcs.GetDbgFlagsRaw();
             if ((miniGameFlags & 0x100) != 0) {

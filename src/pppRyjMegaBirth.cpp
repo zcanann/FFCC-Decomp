@@ -961,17 +961,20 @@ void birth(
 			}
 
 			if (pathBase != NULL) {
-				u16 sampleIndex;
-
-				if ((u16)work->m_meshEmitIndex >= (u16)pathInfo[1]) {
-					work->m_meshEmitIndex = 0;
-				}
+				int sampleIndex;
 
 				if ((speedMode == 0) || (speedMode >= 6)) {
+					if ((int)(u16)work->m_meshEmitIndex >= (int)pathInfo[1]) {
+						work->m_meshEmitIndex = 0;
+					}
 					sampleIndex = work->m_meshEmitIndex;
 					work->m_meshEmitIndex = sampleIndex + 1;
 				} else {
-					sampleIndex = (u16)((int)(calc_mesh_sample_t(speedMode) * (float)pathInfo[1]));
+					float sampleT = calc_mesh_sample_t(speedMode);
+					if ((int)(u16)work->m_meshEmitIndex >= (int)pathInfo[1]) {
+						work->m_meshEmitIndex = 0;
+					}
+					sampleIndex = (int)(sampleT * (float)pathInfo[1]);
 				}
 
 				Vec* pathVec = pathBase + ((u16*)*(int*)(pathInfo + 2))[sampleIndex];

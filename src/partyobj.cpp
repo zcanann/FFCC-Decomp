@@ -5154,7 +5154,7 @@ void CGPartyObj::gpmMove()
 			if (pathDist < Game.unkFloat_0xca10 * limit) {
 				if ((leader->m_lastStateId != 2 && leader->m_lastStateId != 6) ||
 				    leader->m_subState != 1 ||
-				    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(leader) + 0x668) == 0 ||
+				    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(leader) + 0x668) == 0 ||
 				    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(leader) + 0x660) != 0) {
 					return;
 				}

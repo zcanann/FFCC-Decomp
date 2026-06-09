@@ -2669,7 +2669,10 @@ void CMapMng::DrawBefore()
  */
 void CMapMng::Draw()
 {
-    if ((m_mapReadReady == 0) || (m_mapObjCount == 0)) {
+    if (m_mapReadReady == 0) {
+        return;
+    }
+    if (m_mapObjCount == 0) {
         return;
     }
 

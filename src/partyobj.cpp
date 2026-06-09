@@ -4808,9 +4808,9 @@ void CGPartyObj::gpmCol()
 		cylinder.m_axis.x = halfHeight;
 
 		if (MapMng.CheckHitCylinderNear(&cylinder, &diffVec, flags) != 0) {
-			int capped = i + 1;
-			if (capped > activeTrailCount) {
-				capped = activeTrailCount;
+			int capped = activeTrailCount;
+			if (capped >= i + 1) {
+				capped = i + 1;
 			}
 			i++;
 			activeTrailCount = capped;

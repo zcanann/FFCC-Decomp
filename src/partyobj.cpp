@@ -1371,8 +1371,8 @@ tmpArtifactBlock:
 				}
 			}
 
-			party.pendingWeaponItem = cmdIdx;
-			party.weaponItem = caravan->m_equipment[0] < 0 ? 0 : caravan->m_inventoryItems[caravan->m_equipment[0]];
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D4) = cmdIdx;
+			party.weaponRef = caravan->m_equipment[0] < 0 ? 0 : caravan->m_inventoryItems[caravan->m_equipment[0]];
 			party.commandFlagBits.flag20 = 1;
 			changeStat(0x0F, 0, 0);
 			return;
@@ -1440,8 +1440,8 @@ tmpArtifactBlock:
 				changeStat(7, 0, 0);
 				return;
 			}
-			party.pendingWeaponItem = caravan->GetIdxCmdList();
-			party.weaponItem = itemId;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D4) = caravan->GetIdxCmdList();
+			party.weaponRef = itemId;
 			party.commandFlagBits.flag20 = 1;
 			changeStat(0x0F, 0, 0);
 			return;

@@ -602,9 +602,11 @@ void CGObject::move()
     }
 
     if ((moveVec.x != sZeroFloat) || (moveVec.y != sZeroFloat) || (moveVec.z != sZeroFloat)) {
-        float cameraYaw = *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x248);
+        float cameraYaw;
         if (movingWithScript) {
             cameraYaw = sZeroFloat;
+        } else {
+            cameraYaw = *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xf8);
         }
 
         const double inputYaw = atan2(static_cast<double>(moveVec.x), static_cast<double>(moveVec.z));

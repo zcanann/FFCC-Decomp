@@ -4610,7 +4610,7 @@ int JoyBus::MakeJoyData(char* src, int length, unsigned int* outBuffer)
     while (--chunkCount >= 0) {
         bVar2 = *pbVar4;
         pbVar4 = pbVar4 + 1;
-        uVar5 = ((uVar5 << 8) ^ static_cast<unsigned int>(JoyBusCrcTable[(uVar5 >> 8) ^ static_cast<unsigned int>(bVar2)])) & 0xFFFF;
+        uVar5 = (((uVar5 & 0xFFFF) << 8) ^ static_cast<unsigned int>(JoyBusCrcTable[((uVar5 >> 8) & 0xFF) ^ static_cast<unsigned int>(bVar2)])) & 0xFFFF;
     }
 
     unsigned short inv = static_cast<unsigned short>(~static_cast<unsigned short>(uVar5));

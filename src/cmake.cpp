@@ -1066,7 +1066,7 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
                 if (nameLen == 0) {
                     strcat(s_CmakeInfo.m_name, picked);
                     ret = 0;
-                } else if (strlen(rowText) != 0 && nameLen > 6) {
+                } else if (strlen(rowText) != 0 && nameLen >= 7) {
                     ret = -1;
                 } else {
                     strcat(s_CmakeInfo.m_name, picked);
@@ -1077,7 +1077,7 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
                 Sound.PlaySe(4, 0x40, 0x7f, 0);
             } else {
                 unsigned int finalLen = strlen(s_CmakeInfo.m_name);
-                if (static_cast<int>(finalLen & (static_cast<int>(-finalLen | finalLen) >> 31)) > 6) {
+                if (static_cast<int>(finalLen & (static_cast<int>(-finalLen | finalLen) >> 31)) >= 7) {
                     select = 0xB;
                     row = 5;
                 }

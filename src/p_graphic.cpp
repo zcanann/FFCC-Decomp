@@ -845,7 +845,7 @@ void CGraphicPcs::drawBar()
     GXTexCoord2u16(0, 2);
 
     GXColor fifoTmp;
-    *reinterpret_cast<u32*>(&fifoTmp) = *reinterpret_cast<u32*>(&((Graphic.IsFifoOver() == 0) ? CColor(0, 0xFF, 0, 0xFF) : CColor(0xFF, 0, 0, 0xFF)).color);
+    *reinterpret_cast<u32*>(&fifoTmp) = *reinterpret_cast<u32*>(&((Graphic.IsFifoOver() != 0) ? CColor(0xFF, 0, 0, 0xFF) : CColor(0, 0xFF, 0, 0xFF)).color);
     GXColor fifoGX;
     fifoGX.r = fifoTmp.r;
     fifoGX.g = fifoTmp.g;

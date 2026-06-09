@@ -1002,7 +1002,7 @@ timeout_expiry:
                 goto recompute_timeout;
             }
 
-            unsigned char spMode = (GbaQue.GetSPMode(threadParam->m_portIndex) & 0xFF) != 0;
+            int spMode = (GbaQue.GetSPMode(threadParam->m_portIndex) & 0xFF) != 0;
             if (threadParam->m_flags[5] == 0 ||
                 (GbaQue.GetSPModeFlg(threadParam->m_portIndex) & 0xFF) != 0 ||
                 spMode != threadParam->m_flags[6])
@@ -1015,7 +1015,7 @@ timeout_expiry:
                 GbaQue.ClrSPModeFlg(threadParam->m_portIndex);
             }
 
-            if (threadParam->m_flags[4] != GbaQue.GetPauseMode())
+            if (threadParam->m_flags[4] != (int)GbaQue.GetPauseMode())
             {
                 char menuId = (char)((threadParam->m_flags[4] != 0) + 0xB);
                 if (SendOpenMenu(threadParam, menuId) < 0)
@@ -1270,7 +1270,7 @@ timeout_expiry:
                 }
             }
 
-            unsigned char spMode = (GbaQue.GetSPMode(threadParam->m_portIndex) & 0xFF) != 0;
+            int spMode = (GbaQue.GetSPMode(threadParam->m_portIndex) & 0xFF) != 0;
             if (threadParam->m_flags[5] == 0 ||
                 (GbaQue.GetSPModeFlg(threadParam->m_portIndex) & 0xFF) != 0 ||
                 spMode != threadParam->m_flags[6])
@@ -1283,7 +1283,7 @@ timeout_expiry:
                 GbaQue.ClrSPModeFlg(threadParam->m_portIndex);
             }
 
-            if (threadParam->m_flags[4] != GbaQue.GetPauseMode())
+            if (threadParam->m_flags[4] != (int)GbaQue.GetPauseMode())
             {
                 char menuId = (char)((threadParam->m_flags[4] != 0) + 0xB);
                 if (SendOpenMenu(threadParam, menuId) < 0)

@@ -2392,12 +2392,12 @@ int CCaravanWork::DelCmdListAndItem(int cmdListIdx)
 void CCaravanWork::GetNumCombi(int cmdListIdx, int updateJoybus)
 {
 	int nextCmdIdx = 0;
-	short* slotRefPtr = &m_commandListInventorySlotRef[cmdListIdx];
+	short* slotRefPtr = (short*)((char*)this + cmdListIdx * 2);
 	if (m_currentCmdListIndex == cmdListIdx) {
 		nextCmdIdx = GetNextCmdListIdx(cmdListIdx, 1);
 	}
 
-	short inventorySlot = *slotRefPtr;
+	short inventorySlot = *(short*)((char*)slotRefPtr + 0x204);
 	if (m_inventoryItems[inventorySlot] != -1) {
 		m_inventoryItems[inventorySlot] = 0xFFFF;
 		m_inventoryItemCount = static_cast<short>(m_inventoryItemCount - 1);
@@ -2406,7 +2406,7 @@ void CCaravanWork::GetNumCombi(int cmdListIdx, int updateJoybus)
 		}
 	}
 
-	*slotRefPtr = 0xFFFF;
+	*(short*)((char*)slotRefPtr + 0x204) = 0xFFFF;
 	if (updateJoybus != 0) {
 		Joybus.SetCmdLst(m_joybusCaravanId, cmdListIdx, -1);
 	}

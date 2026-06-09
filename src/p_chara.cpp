@@ -1724,7 +1724,10 @@ checkLoaded:
             CChunkFile chunkFile(File.m_readBuffer);
             CChunkFile::CChunk chunk;
             while (chunkFile.GetNextChunk(chunk)) {
-                if (chunk.m_id != 'MRG ') {
+                switch (chunk.m_id) {
+                case 'MRG ':
+                    break;
+                default:
                     continue;
                 }
 

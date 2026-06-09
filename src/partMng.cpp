@@ -1784,6 +1784,9 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             return;
         }
         {
+            CChunkFile chunkFile;
+            chunkFile.SetBuf(payloadWords + 8);
+
             pppModelSt*** modelTablePtr = reinterpret_cast<pppModelSt***>(self + kUsbMapMeshTableOffset);
             if (*modelTablePtr == 0) {
                 *modelTablePtr = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x5F8) pppModelSt*[0x88];
@@ -1791,9 +1794,6 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
                     (*modelTablePtr)[slot] = 0;
                 }
             }
-
-            CChunkFile chunkFile;
-            chunkFile.SetBuf(payloadWords + 8);
 
             int slotIndex = static_cast<int>(*reinterpret_cast<short*>(payload));
             pppModelSt*& modelSlot = (*modelTablePtr)[slotIndex];

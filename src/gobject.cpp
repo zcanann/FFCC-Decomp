@@ -3212,10 +3212,10 @@ void CGObject::ResetDynamics()
  */
 void CGObject::CalcSphereNearPos(float scale, float angleOffset, Vec& outPos)
 {
-    Vec up;
-    Vec normal;
-    Vec tangent;
     Vec bitangent;
+    Vec tangent;
+    Vec normal;
+    Vec up;
     Vec offset;
     Mtx rotationMtx;
 

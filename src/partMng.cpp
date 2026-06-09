@@ -1807,8 +1807,8 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
                 }
             }
 
-            int slotIndex = static_cast<int>(*reinterpret_cast<short*>(payload));
-            pppModelSt*& modelSlot = (*modelTablePtr)[slotIndex];
+#define slotIndex (static_cast<int>(*reinterpret_cast<short*>(payload)))
+            pppModelSt* modelSlot = (*modelTablePtr)[slotIndex];
             if (modelSlot != 0) {
                 if (--modelSlot->m_refCount <= 0) {
                     if (modelSlot->m_cacheId != -1) {
@@ -1820,10 +1820,12 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
                     modelSlot->m_refCount = 0;
                     modelSlot->m_isUsed = 0;
                 }
-                modelSlot = 0;
+                (*modelTablePtr)[slotIndex] = 0;
             }
 
             modelSlot = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x5FC) pppModelSt;
+            (*modelTablePtr)[slotIndex] = modelSlot;
+#undef slotIndex
             if (modelSlot != 0) {
                 modelSlot->m_refCount = 0;
                 modelSlot->m_cacheId = -1;
@@ -1848,7 +1850,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             }
 
             int slotIndex = payloadWords[0];
-            pppShapeSt*& shapeSlot = (*shapeSlotTablePtr)[slotIndex];
+            pppShapeSt* shapeSlot = (*shapeSlotTablePtr)[slotIndex];
             if (shapeSlot != 0) {
                 if (--shapeSlot->m_refCount <= 0) {
                     if (shapeSlot->m_animData != 0) {
@@ -1862,10 +1864,11 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
                     shapeSlot->m_refCount = 0;
                     shapeSlot->m_inUse = 0;
                 }
-                shapeSlot = 0;
+                (*shapeSlotTablePtr)[slotIndex] = 0;
             }
 
             shapeSlot = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x610) pppShapeSt;
+            (*shapeSlotTablePtr)[slotIndex] = shapeSlot;
             if (shapeSlot != 0) {
                 CChunkFile chunkFile;
                 chunkFile.SetBuf(payloadWords + 4);
@@ -3706,16 +3709,18 @@ int CPartMng::pppLoadPmd(const char* baseName)
 
                     pppModelSt* searchModel = modelArray;
                     unsigned int i = 0;
-                    do {
+                    for (;;) {
                         if (searchModel->m_isUsed != 0 && strcmp(searchModel->m_name, name) == 0) {
-                            break;
+                            goto pmdNameSearchDone;
                         }
                         i++;
                         searchModel++;
-                    } while (i < 0x100);
-                    if (i >= 0x100) {
-                        searchModel = 0;
+                        if (i >= 0x100) {
+                            searchModel = 0;
+                            goto pmdNameSearchDone;
+                        }
                     }
+                pmdNameSearchDone:
 
                     if (searchModel == 0) {
                         pppModelSt* freeModel = modelArray;
@@ -3836,17 +3841,19 @@ int CPartMng::pppLoadPan(const char* baseName)
 
                     pppShapeSt* searchShape = shapeArray;
                     unsigned int i = 0;
-                    do {
+                    for (;;) {
                         if (searchShape->m_inUse != 0 && strcmp(searchShape->m_name, name) == 0) {
-                            break;
+                            goto panNameSearchDone;
                         }
                         i++;
                         searchShape = reinterpret_cast<pppShapeSt*>(
                             reinterpret_cast<unsigned char*>(searchShape) + 0x2c);
-                    } while (i < 0x100);
-                    if (i >= 0x100) {
-                        searchShape = 0;
+                        if (i >= 0x100) {
+                            searchShape = 0;
+                            goto panNameSearchDone;
+                        }
                     }
+                panNameSearchDone:
 
                     if (searchShape == 0) {
                         pppShapeSt* freeShape = shapeArray;
@@ -3954,16 +3961,18 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
 
                             pppModelSt* searchModel = modelArray;
                             unsigned int i = 0;
-                            do {
+                            for (;;) {
                                 if (searchModel->m_isUsed != 0 && strcmp(searchModel->m_name, name) == 0) {
-                                    break;
+                                    goto nameSearchDone;
                                 }
                                 i++;
                                 searchModel++;
-                            } while (i < 0x100);
-                            if (i >= 0x100) {
-                                searchModel = 0;
+                                if (i >= 0x100) {
+                                    searchModel = 0;
+                                    goto nameSearchDone;
+                                }
                             }
+                        nameSearchDone:
 
                             if (searchModel == 0) {
                                 pppModelSt* freeModel = modelArray;

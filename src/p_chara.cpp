@@ -2560,9 +2560,9 @@ int CCharaPcs::CHandle::LoadAnim(
     *reinterpret_cast<unsigned int*>(Ptr(m_animSlot[animIndex], 0x70)) = static_cast<unsigned int>(animFlags);
     if (reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex])->m_anim != 0) {
         unsigned char& flags1 = reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex])->m_anim->m_flags;
-        flags1 = static_cast<unsigned char>((flags1 & 0x7F) | ((animFlags << 7) & 0x80));
+        flags1 = static_cast<unsigned char>(__rlwimi(flags1, animFlags, 7, 24, 24));
         unsigned char& flags2 = reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex])->m_anim->m_flags;
-        flags2 = static_cast<unsigned char>((flags2 & 0xBF) | ((animFlags << 5) & 0x40));
+        flags2 = static_cast<unsigned char>(__rlwimi(flags2, animFlags, 5, 25, 25));
     }
 
     return 1;

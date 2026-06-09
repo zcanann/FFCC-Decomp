@@ -1355,7 +1355,7 @@ void CCameraPcs::calcMap()
     C_MTXPerspective(m_screenMatrix, m_fov, kCameraAspectRatio, m_nearZ, m_farZ);
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 
-    PSVECAdd(&TargetVec(), &PositionVec(), &DirectionVec());
+    PSVECAdd(&PositionVec(), &DirectionVec(), &TargetVec());
 
     upVec.x = kCameraZeroF;
     upVec.y = kCameraOneF;

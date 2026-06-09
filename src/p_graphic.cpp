@@ -815,8 +815,14 @@ void CGraphicPcs::drawBar()
         hue += 0x168;
     }
 
-    CColor frameColor = (Graphic.IsFrameRateOver() == 0) ? CColor(0, 0xFF, 0, 0xFF) : CColor(0xFF, 0, 0, 0xFF);
-    const u32 frameColorWord = *reinterpret_cast<u32*>(&frameColor.color);
+    GXColor frameTmp;
+    *reinterpret_cast<u32*>(&frameTmp) = *reinterpret_cast<u32*>(&((Graphic.IsFrameRateOver() == 0) ? CColor(0, 0xFF, 0, 0xFF) : CColor(0xFF, 0, 0, 0xFF)).color);
+    GXColor frameGX;
+    frameGX.r = frameTmp.r;
+    frameGX.g = frameTmp.g;
+    frameGX.b = frameTmp.b;
+    frameGX.a = frameTmp.a;
+    const u32 frameColorWord = *reinterpret_cast<u32*>(&frameGX);
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
     GXPosition3f32(kDebugBarLeft, kDebugIndicatorTop, kGraphicZero);
     GXColor1u32(frameColorWord);

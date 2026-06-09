@@ -1060,6 +1060,7 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 				{
 					CMapMesh* mapMesh = *(CMapMesh**)(*(u32*)(pppResSet + 0x14) + *mapMeshIndices * 4);
 					mapMeshIndices++;
+					ppvAmemCacheSet.Release(*(s16*)((u8*)mapMesh + 0x66));
 					mapMesh->pppCacheDumpModelTexture(PartMng.m_materialSet, &ppvAmemCacheSet);
 				}
 

@@ -1914,10 +1914,9 @@ void CAmemCacheSet::AddRef(short index)
  */
 void CAmemCacheSet::Release(short index)
 {
-    CAmemCache& entry = cacheEntryAt(this, index);
-    entry.m_refCount -= 1;
+    m_cacheTable[index].m_refCount -= 1;
 
-    if (entry.m_refCount >= 0xFFFF) {
+    if (m_cacheTable[index].m_refCount >= 0xFFFF) {
         if (static_cast<unsigned int>(System.m_execParam) >= 3) {
             System.Printf(const_cast<char*>(sAmemCacheAddRefFmt));
         }

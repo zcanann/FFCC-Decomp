@@ -873,15 +873,15 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
         System.Printf(const_cast<char*>(s_charaFreeMergeFmt), releaseMask);
         LoadPdtArray(this)->ReleaseAndRemoveAll();
         int charaAmemSize = correctLoadAnimAmem();
-        if (charaAmemSize >= 0) {
-            CharaAmemSize() = static_cast<unsigned int>(charaAmemSize);
-            goto complete;
+        if (charaAmemSize < 0) {
+            if (static_cast<unsigned int>(System.m_execParam) >= 2) {
+                System.Printf(const_cast<char*>(s_charaAmemCompactFailed));
+            }
+            goto releaseAllArrays;
         }
 
-        if (static_cast<unsigned int>(System.m_execParam) >= 2) {
-            System.Printf(const_cast<char*>(s_charaAmemCompactFailed));
-        }
-        goto releaseAllArrays;
+        CharaAmemSize() = static_cast<unsigned int>(charaAmemSize);
+        goto complete;
     }
     }
 

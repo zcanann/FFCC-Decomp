@@ -1072,7 +1072,7 @@ void CGPartyObj::onFramePreCalc()
 		} else {
 			m_moveBaseSpeed = FLOAT_80331ad4;
 		}
-		m_moveBaseSpeed *= m_extraMoveVec.z;
+		m_moveBaseSpeed *= *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x690);
 	}
 }
 

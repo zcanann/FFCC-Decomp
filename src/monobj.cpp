@@ -2953,7 +2953,7 @@ void CGMonObj::setRepop(int mode)
 	int particleBase = (weaponMode == 0) ? 0x3C : 0x46;
 
 	for (int i = 0; i < static_cast<int>(countC); i++) {
-		int dataNo = object->m_charaModelHandle != nullptr ? object->m_charaModelHandle->GetPdtSlot() : -1;
+		int dataNo = object->m_charaModelHandle->GetPdtSlot();
 		prgObj->putParticleBindTrace((particleBase + i) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x594), object, 0.0f, 0);
 	}
 

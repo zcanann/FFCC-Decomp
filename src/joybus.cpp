@@ -307,7 +307,7 @@ void JoyBus::CreateInit()
 
     if (m_fileBaseA == 0)
     {
-        m_fileBaseA = reinterpret_cast<unsigned int*>(new (GbaPcs.m_stage, const_cast<char*>(s_joybus_cpp), 0x137) char[len + 0x20]);
+        m_fileBaseA = reinterpret_cast<unsigned int*>(new (GbaPcs.m_stage, const_cast<char*>(s_joybus_cpp), 0x137) char[m_fileBaseA_dup + 0x20]);
 
         if (m_fileBaseA == (unsigned int*)nullptr && (unsigned int)System.m_execParam >= 1)
         {
@@ -315,8 +315,8 @@ void JoyBus::CreateInit()
         }
     }
 
-    memset((void*)m_fileBaseA, 0, len);
-    memcpy((void*)m_fileBaseA, File.m_readBuffer, len);
+    memset((void*)m_fileBaseA, 0, m_fileBaseA_dup);
+    memcpy((void*)m_fileBaseA, File.m_readBuffer, m_fileBaseA_dup);
 
     File.Close(file);
 
@@ -4427,7 +4427,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
         m_cmdBuffer[4 + threadParam->m_portIndex] = (unsigned char)enemyCount;
 
         // If there are no enemies, skip straight to treasure (state 4)
-        if (m_cmdBuffer[4 + threadParam->m_portIndex] == 0)
+        if (static_cast<signed char>(m_cmdBuffer[4 + threadParam->m_portIndex]) == 0)
         {
             state += 2; // 2 -> 4
         }
@@ -4500,7 +4500,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 
         m_cmdBuffer[4 + threadParam->m_portIndex] = (unsigned char)treasureCount;
 
-        if (m_cmdBuffer[4 + threadParam->m_portIndex] == 0)
+        if (static_cast<signed char>(m_cmdBuffer[4 + threadParam->m_portIndex]) == 0)
         {
             state = 0;
         }

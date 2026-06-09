@@ -2109,7 +2109,8 @@ void CMenuPcs::CalcResultCloseAnim()
 
 		// iconBase block: src = frameBase (back = activePartyCount sprites); dance
 		int base = activePartyCount + 1;
-		for (int i = 0; i < activePartyCount; i++) {
+		int __p13 = activePartyCount;
+		for (int i = 0; i < __p13; i++) {
 			short* sprite = (short*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
 			*(int*)(sprite + 0x12) = *(int*)(sprite - activePartyCount * 0x20 + 0x12) +
 			    *(int*)(sprite - activePartyCount * 0x20 + 0x14);
@@ -2147,7 +2148,7 @@ void CMenuPcs::CalcResultCloseAnim()
 		base += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
 			short* sprite = (short*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
-			int __p16 = activePartyCount;
+			int __p16 =  (activePartyCount | 0);
 			*(int*)(sprite + 0x12) = *(int*)(sprite - (base - __p16 - 1) * 0x20 + 0x12);
 			*(int*)((int)sprite + 0x2c) = 1;
 			*(float*)(sprite + 0x1c) = (float)(int)*sprite;

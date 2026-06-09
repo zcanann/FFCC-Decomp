@@ -1165,8 +1165,12 @@ void CGObject::bgAttribCollision()
                 CVector probeBase(m_worldPosition.x, m_worldPosition.y + sStepProbeHeight, m_worldPosition.z);
 
                 CMapCylinder attrCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
-                attrCylinder.m_bottom = probeBase;
-                attrCylinder.m_axis = probeMove;
+                attrCylinder.m_bottom.x = probeBase.x;
+                attrCylinder.m_bottom.y = probeBase.y;
+                attrCylinder.m_bottom.z = probeBase.z;
+                attrCylinder.m_axis.x = probeMove.x;
+                attrCylinder.m_axis.y = probeMove.y;
+                attrCylinder.m_axis.z = probeMove.z;
                 attrCylinder.m_radius = sZeroFloat;
 
                 if (MapMng.CheckHitCylinderNear(
@@ -3379,8 +3383,9 @@ void CGObject::PutDropItem()
     s32 dropCount = 0;
 
     for (int i = 0; i < 4; i++) {
-        s32 dropCode = *reinterpret_cast<s16*>(&m_dropItemCodes[i]);
-        if (dropCode > 0) {
+        s16 rawDropCode = *reinterpret_cast<s16*>(&m_dropItemCodes[i]);
+        if (rawDropCode > 0) {
+            s32 dropCode = rawDropCode;
             int createMode;
             if ((dropCode & 0xC000) == 0x4000) {
                 dropCode &= ~0xC000;

@@ -2732,8 +2732,8 @@ void CPartMng::pppEditPartDrawAfter()
                 struct PppCullBound { Vec m_min; Vec m_max; };                                             \
                 Mtx invCamera;                                                                             \
                 Vec cameraPos;                                                                             \
-                Vec partPos;                                                                               \
                 Vec cameraDelta;                                                                           \
+                Vec partPos;                                                                               \
                 Vec viewPos;                                                                               \
                 PSMTXInverse(ppvCameraMatrix, invCamera);                                                  \
                 cameraPos.x = invCamera[0][3];                                                             \
@@ -2768,12 +2768,12 @@ void CPartMng::pppEditPartDrawAfter()
                         if (PSVECSquareMag(&cameraDelta) < mng->m_cullRadiusSq) {                          \
                             PppCullBound bound;                                                            \
                             float radius = mng->m_cullRadius;                                              \
-                            bound.m_min.x = partPos.x - radius;                                            \
-                            bound.m_max.x = partPos.x + radius;                                            \
-                            bound.m_min.z = partPos.z - radius;                                            \
-                            bound.m_min.y = partPos.y;                                                     \
-                            bound.m_max.z = partPos.z + radius;                                            \
-                            bound.m_max.y = partPos.y + mng->m_cullYOffset;                                \
+                            bound.m_min.x = partPos.x - radius;                                               \
+                            bound.m_max.x = partPos.x + radius;                                               \
+                            bound.m_min.z = partPos.z - radius;                                               \
+                            bound.m_min.y = partPos.y;                                                        \
+                            bound.m_max.z = partPos.z + radius;                                               \
+                            bound.m_max.y = partPos.y + mng->m_cullYOffset;                                   \
                             if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(                           \
                                     cameraPos, ppvCameraMatrix, kPartMngFrustumCullLimit) != 0) {                    \
                                 goto drawPart##drawPass;                                                   \

@@ -2036,7 +2036,8 @@ void CMenuPcs::CalcMCardMenu()
 	} else {
 		unsigned int padIndex = 0;
 		padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-		uVar3 = Pad.GetPadInputs()[padIndex].buttonDown[0];
+		int __p11 = padIndex;
+		uVar3 = Pad.GetPadInputs()[__p11].buttonDown[0];
 	}
 	unsigned short uVar6 = GetButtonRepeat(0);
 
@@ -2088,9 +2089,11 @@ void CMenuPcs::CalcMCardMenu()
 		float baseWidth = (float)((int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 8) + (int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 4));
 		if ((int)uVar15 >= -10) {
 			int absSign = (int)uVar15 >> 0x1F;
-			int absRaw = ((int)uVar15 ^ absSign) - absSign;
+			int __p10 = absSign;
+			int absRaw = ((int)uVar15 ^ absSign) - __p10;
 			float dVar23 = (float)(baseWidth * (DOUBLE_803314E8 * (double)absRaw));
-			unsigned int absOff = (unsigned int)absRaw;
+			int __p15 = absRaw;
+			unsigned int absOff = (unsigned int)__p15;
 			if ((int)absOff < 0) absOff = 0;
 			if ((int)absOff > 10) absOff = 10;
 			float dVar28 = (float)sin((double)(FLOAT_803314bc * (float)(int)absOff * FLOAT_803316d4));
@@ -2343,7 +2346,8 @@ void CMenuPcs::CalcMCardMenu()
 		} else if (m_menuWindowInfo->state == 1
 		           && m_wmWorldState->m_counter1A == 0) {
 			short chkResult = (short)GetMcCtrl()->ChkEmpty(0);
-			m_wmWorldState->m_mcResult = chkResult;
+			int __p12 = chkResult;
+			m_wmWorldState->m_mcResult = __p12;
 			if (m_wmWorldState->m_mcResult < 0) {
 				MemoryCardMan.m_opDoneFlag = 1;
 				MemoryCardMan.m_currentSlot = 0xFF;
@@ -2366,7 +2370,7 @@ void CMenuPcs::CalcMCardMenu()
 	case 0x12:
 	case 0x19: {
 		if ((signed char)m_wmWorldState->m_flag09 == 0) {
-			int uVar20 = 0;
+			int uVar20 =  (int)(long)(0);
 			int uVar17;
 			if (iVar12 == 8) {
 				m_wmWorldState->m_cardChannel = 0;
@@ -2375,8 +2379,8 @@ void CMenuPcs::CalcMCardMenu()
 				uVar17 = 5;
 				m_wmWorldState->m_cardChannel = 1;
 			} else if (iVar12 == 0x19) {
-				uVar20 = 1;
 				uVar17 = 0x19;
+				uVar20 = 1;
 				m_wmWorldState->m_cardChannel = 1;
 			} else {
 				uVar17 = 0x12;
@@ -2600,38 +2604,38 @@ void CMenuPcs::CalcMCardMenu()
 					m_wmWorldState->m_mcResult = (short)0xFC19;
 				}
 			}
-			if (gWmMenuCursorX[1] >= 0 && (int)gWmMenuCursorX[0] == m_mcCtrl.m_cardChannel) {
-				if ((gWmMenuWorkA ^ (int)m_mcCtrl.m_serialLo) | (gWmMenuWorkB ^ (int)m_mcCtrl.m_serialHi)) goto LAB_saveIdx;
-				m_mcCtrl.m_saveIndex = (int)gWmMenuCursorX[1];
-				m_wmWorldState->m_cardChannel = (short)m_mcCtrl.m_saveIndex;
-			} else {
+			if (!(gWmMenuCursorX[1] >= 0 && (int)gWmMenuCursorX[0] == m_mcCtrl.m_cardChannel)) {
 			LAB_saveIdx:
 				int unk838 = reinterpret_cast<int>(m_wmCharaState);
 				int sel = 0;
-				int __p11 = unk838;
-				if (*reinterpret_cast<char*>(unk838 + 0x42) == 0 && *reinterpret_cast<int*>(__p11 + 8) > 0) {
+				int __p11 =  (unk838 | 0);
+				if (!(*reinterpret_cast<char*>(unk838 + 0x42) == 0 && *reinterpret_cast<int*>(__p11 + 8) > 0)) {
+					m_mcCtrl.m_saveIndex = sel;
+				} else {
 					sel = 1;
 					if (!(*reinterpret_cast<char*>(unk838 + 0x8A) == 0 && *reinterpret_cast<int*>(unk838 + 0x50) > 0)) {
 						m_mcCtrl.m_saveIndex = sel;
 					} else {
 						sel = 2;
-						if (*reinterpret_cast<char*>(unk838 + 0xD2) == 0 && *reinterpret_cast<int*>(unk838 + 0x98) > 0) {
+						if (!(*reinterpret_cast<char*>(unk838 + 0xD2) == 0 && *reinterpret_cast<int*>(unk838 + 0x98) > 0)) {
+							m_mcCtrl.m_saveIndex = sel;
+						} else {
 							sel = 3;
 							if (!(*reinterpret_cast<char*>(unk838 + 0x11A) == 0 && *reinterpret_cast<int*>(unk838 + 0xE0) > 0)) {
 								m_mcCtrl.m_saveIndex = sel;
 							} else {
 								sel = 4;
 							}
-						} else {
-							m_mcCtrl.m_saveIndex = sel;
 						}
 					}
-				} else {
-					m_mcCtrl.m_saveIndex = sel;
 				}
 				if (sel >= 4) {
 					m_mcCtrl.m_saveIndex = 0;
 				}
+				m_wmWorldState->m_cardChannel = (short)m_mcCtrl.m_saveIndex;
+			} else {
+				if ((gWmMenuWorkA ^ (int)m_mcCtrl.m_serialLo) | (gWmMenuWorkB ^ (int)m_mcCtrl.m_serialHi)) goto LAB_saveIdx;
+				m_mcCtrl.m_saveIndex = (int)gWmMenuCursorX[1];
 				m_wmWorldState->m_cardChannel = (short)m_mcCtrl.m_saveIndex;
 			}
 			iVar12 = 0;

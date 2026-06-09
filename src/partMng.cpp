@@ -1323,6 +1323,7 @@ void CPartMng::pppReadShp(CChunkFile& chunkFile, pppShapeSt* shapeSt)
 	while (chunkFile.GetNextChunk(chunk))
 	{
 		chunkFile.PushChunk();
+		char** textureNameWrite = textureNameIt;
 		switch (chunk.m_id)
 		{
 		case 0x46534850: // 'FSHP'
@@ -1332,9 +1333,10 @@ void CPartMng::pppReadShp(CChunkFile& chunkFile, pppShapeSt* shapeSt)
 				{
 				case 0x54584E4D: // 'TXNM'
 					chunkFile.PushChunk();
-					*textureNameIt = chunkFile.GetString();
+					*textureNameWrite = chunkFile.GetString();
 					chunkFile.PopChunk();
 					textureNameIt++;
+					textureNameWrite++;
 					break;
 				case 0x444C5354: // 'DLST'
 					shapeSt->m_displayListData =

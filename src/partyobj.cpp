@@ -1133,8 +1133,8 @@ void CGPartyObj::command()
 #define caravan reinterpret_cast<CCaravanWork*>(m_scriptHandle)
 #define padSlot static_cast<char>(m_animStateMisc)
 	bool primaryAvailable = false;
-	bool secondaryAvailable = false;
 	int primaryCommand = -1;
+	bool secondaryAvailable = false;
 	int secondaryCommand = -1;
 	int ringCommand = -1;
 	int ringCommandArg = -1;

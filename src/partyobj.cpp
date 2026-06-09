@@ -4741,6 +4741,8 @@ void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_common_subs off
 void CGPartyObj::gpmCol()
 {
 	unsigned char* ghostWork = CGPartyObj::m_ghostWork;
@@ -4800,6 +4802,7 @@ void CGPartyObj::gpmCol()
 	}
 #undef gpmColClamp
 }
+#pragma pop
 
 /*
  * --INFO--

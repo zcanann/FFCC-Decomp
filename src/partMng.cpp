@@ -461,11 +461,11 @@ void CPartMng::pppDumpMngSt()
         unsigned char m_pad18[0x74 - 0x18];
         short m_kind;                      // 0x74
         short m_nodeIndex;                 // 0x76
-        unsigned char m_pad78[0xAC - 0x78];
-        int m_prioTime;                    // 0xAC
-        unsigned char m_padB0[0xF8 - 0xB0];
+        unsigned char m_pad78[0xF8 - 0x78];
         unsigned char m_prio;              // 0xF8
-        unsigned char m_padF9[0x12C - 0xF9];
+        unsigned char m_padF9[0xFA - 0xF9];
+        unsigned short m_prioTime;         // 0xFA
+        unsigned char m_padFC[0x12C - 0xFC];
         int m_heapGroupRef;                // 0x12C
     };
 
@@ -473,7 +473,6 @@ void CPartMng::pppDumpMngSt()
     unsigned long heapUse;
     unsigned long heapFree;
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    PppPdtSlot* pdtSlots = m_pdtSlots;
 
     if (static_cast<unsigned int>(System.m_execParam) >= 1U) {
         System.Printf(const_cast<char*>(sPartMngDumpSeparator));
@@ -491,7 +490,7 @@ void CPartMng::pppDumpMngSt()
             System.Printf(
                 const_cast<char*>(sPartMngDumpEntryFmt), mng->m_prioTime,
                 mng->m_prio, heapSize, kind, static_cast<int>(mng->m_nodeIndex), heapGroup,
-                pdtSlots[kind].m_name);
+                m_pdtSlots[kind].m_name);
         }
 
         base += 0x158;
@@ -504,7 +503,10 @@ void CPartMng::pppDumpMngSt()
             const_cast<char*>(sPartMngHeapSummaryFmt),
             static_cast<int>(heapTotal >> 10), static_cast<int>(heapUse >> 10),
             static_cast<int>(heapFree >> 10));
-        System.Printf(const_cast<char*>(sPartMngDumpSeparator));
+    }
+
+    if (static_cast<unsigned int>(System.m_execParam) >= 1U) {
+        System.Printf(const_cast<char*>(sPartMngTripleNewline));
     }
 }
 
@@ -877,7 +879,7 @@ void CPartMng::render3Dcursor()
     GXSetNumTexGens(0);
     GXSetNumTevStages(1);
     GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
-    GXLoadPosMtxImm(ppvCameraMatrix0, 0);
+    GXLoadPosMtxImm(ppvCameraMatrix, 0);
     pppSetBlendMode(3);
 
     float* cursorPos = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x23780);
@@ -1356,25 +1358,23 @@ void CPartMng::pppEditAllReleaseResource()
 {
     static const int kUsbMapMeshTableOffset = 0x7F4;
     static const int kUsbShapeSlotTableOffset = 0x7F8;
-    static const int kRecvBuffOffset = 0x23554;
+    static const int kRecvBuffOffset = 0x1C8;
 
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    CMaterialSet* materialSet = m_materialSet;
-    CTextureSet* textureSet = m_textureSet;
+#define self (reinterpret_cast<unsigned char*>(this))
     int iVar3;
     unsigned char* iter;
 
-    if (materialSet != 0) {
-        delete materialSet;
+    if (m_materialSet != 0) {
+        delete m_materialSet;
         m_materialSet = 0;
     }
-    if (textureSet != 0) {
-        delete textureSet;
+    if (m_textureSet != 0) {
+        delete m_textureSet;
         m_textureSet = 0;
     }
 
-    iVar3 = 0;
     iter = self;
+    iVar3 = 0;
     do {
         if (*reinterpret_cast<void**>(iter + 0x1D4) != 0) {
             operator delete(*reinterpret_cast<void**>(iter + 0x1D4));
@@ -1384,8 +1384,8 @@ void CPartMng::pppEditAllReleaseResource()
         iter = iter + 0x4;
     } while (iVar3 < 0x80);
 
-    iVar3 = 0;
     iter = self;
+    iVar3 = 0;
     do {
         if (*reinterpret_cast<void**>(iter + 0x3D8) != 0) {
             operator delete(*reinterpret_cast<void**>(iter + 0x3D8));
@@ -1395,8 +1395,8 @@ void CPartMng::pppEditAllReleaseResource()
         iter = iter + 0x4;
     } while (iVar3 < 0x80);
 
-    iVar3 = 0;
     iter = self;
+    iVar3 = 0;
     do {
         if (*reinterpret_cast<long**>(iter + 0x5DC) != 0) {
             operator delete(*reinterpret_cast<long**>(iter + 0x5DC));
@@ -1455,6 +1455,7 @@ void CPartMng::pppEditAllReleaseResource()
         operator delete(*reinterpret_cast<void**>(self + 0x7FC));
         *reinterpret_cast<int*>(self + 0x7FC) = 0;
     }
+#undef self
 }
 
 /*
@@ -2147,13 +2148,13 @@ void CPartMng::pppEditBeforeCalc()
         clearColor.a = 0xFF;
         GXSetCopyClear(clearColor, 0x00FFFFFF);
 
-        float fogFar = *reinterpret_cast<float*>(self + 0x164);
         float fogNear = *reinterpret_cast<float*>(self + 0x160);
+        float fogFar = *reinterpret_cast<float*>(self + 0x164);
         _GXColor fogColor;
         if (*reinterpret_cast<unsigned char*>(self + 0x15c) != 0) {
-            fogColor.r = *reinterpret_cast<unsigned char*>(self + 0x15d);
-            fogColor.g = *reinterpret_cast<unsigned char*>(self + 0x15e);
             fogColor.b = *reinterpret_cast<unsigned char*>(self + 0x15f);
+            fogColor.g = *reinterpret_cast<unsigned char*>(self + 0x15e);
+            fogColor.r = *reinterpret_cast<unsigned char*>(self + 0x15d);
             fogColor.a = 0;
             Graphic.SetFogColor(fogColor);
             Graphic.SetFogParam(fogNear, fogFar);
@@ -2192,13 +2193,13 @@ void CPartMng::pppEditBeforeCalc()
         clearColor.a = 0xFF;
         GXSetCopyClear(clearColor, 0x00FFFFFF);
 
-        float fogFar = *reinterpret_cast<float*>(self + 0x164);
         float fogNear = *reinterpret_cast<float*>(self + 0x160);
+        float fogFar = *reinterpret_cast<float*>(self + 0x164);
         _GXColor fogColor;
         if (*reinterpret_cast<unsigned char*>(self + 0x15c) != 0) {
-            fogColor.r = *reinterpret_cast<unsigned char*>(self + 0x15d);
-            fogColor.g = *reinterpret_cast<unsigned char*>(self + 0x15e);
             fogColor.b = *reinterpret_cast<unsigned char*>(self + 0x15f);
+            fogColor.g = *reinterpret_cast<unsigned char*>(self + 0x15e);
+            fogColor.r = *reinterpret_cast<unsigned char*>(self + 0x15d);
             fogColor.a = 0;
             Graphic.SetFogColor(fogColor);
             Graphic.SetFogParam(fogNear, fogFar);
@@ -2458,9 +2459,9 @@ void CPartMng::pppEditDrawShadow()
     if (*reinterpret_cast<long**>(self + 0x5dc) != 0 && *reinterpret_cast<int*>(self + 0x174) <= 3) {
         Mtx invCamera;
         Vec cameraPos;
+        Vec viewPos;
         Vec partPos;
         Vec cameraDelta;
-        Vec viewPos;
 
         PSMTXInverse(ppvCameraMatrix, invCamera);
         cameraPos.x = invCamera[0][3];
@@ -2834,8 +2835,9 @@ void CPartMng::pppDumpCacheIdx()
 
     pppSetRendMatrix();
 
+    int i;
     int gamePaused = Game.m_gameWork.m_gamePaused;
-    for (int i = 0; i < 0x180; i++) {
+    for (i = 0; i < 0x180; i++) {
         PppMngStDumpRaw* mng = reinterpret_cast<PppMngStDumpRaw*>(
             reinterpret_cast<unsigned char*>(this) + 0x2A18 + i * 0x158);
         if ((gamePaused == 0 || (mng->m_drawPass >= 6 && mng->m_drawPass <= 7)) &&
@@ -2930,9 +2932,9 @@ void CPartMng::pppDrawPrio(unsigned char drawMode)
 
     Mtx invCamera;
     Vec cameraPos;
+    Vec viewPos;
     Vec partPos;
     Vec cameraDelta;
-    Vec viewPos;
 
     PSMTXInverse(ppvCameraMatrix, invCamera);
     cameraPos.x = invCamera[0][3];
@@ -3128,9 +3130,9 @@ void CPartMng::pppDrawIdx(int partIndex)
 
     Mtx invCamera;
     Vec cameraPos;
+    Vec viewPos;
     Vec partPos;
     Vec cameraDelta;
-    Vec viewPos;
 
     PSMTXInverse(ppvCameraMatrix, invCamera);
     cameraPos.x = invCamera[0][3];
@@ -3206,9 +3208,9 @@ void CPartMng::pppDraw()
 
     Mtx invCamera;
     Vec cameraPos;
+    Vec viewPos;
     Vec partPos;
     Vec cameraDelta;
-    Vec viewPos;
 
     m_pppEnvSt.m_debugCounter = 0;
     PSMTXInverse(ppvCameraMatrix, invCamera);
@@ -3291,9 +3293,9 @@ void CPartMng::pppPartDrawAfter()
 
     Mtx invCamera;
     Vec cameraPos;
+    Vec viewPos;
     Vec partPos;
     Vec cameraDelta;
-    Vec viewPos;
 
     PSMTXInverse(ppvCameraMatrix, invCamera);
     cameraPos.x = invCamera[0][3];
@@ -3362,9 +3364,9 @@ void CPartMng::pppPartDead()
 {
     Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0xb3d);
 
-    char* base = reinterpret_cast<char*>(this);
+#define base (reinterpret_cast<char*>(this))
     for (int i = 0; i < 0x180; i++) {
-        _pppMngSt* pppMngSt = reinterpret_cast<_pppMngSt*>(base + 0x2A18);
+        _pppMngSt* pppMngSt = reinterpret_cast<_pppMngSt*>(base + i * 0x158 + 0x2A18);
         int baseTime = pppMngSt->m_baseTime;
         if (baseTime != -0x1000 && baseTime < 0) {
             unsigned char isFinished = *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0xE6);
@@ -3374,8 +3376,8 @@ void CPartMng::pppPartDead()
                 _pppAllFreePObject(pppMngSt);
             }
         }
-        base += 0x158;
     }
+#undef base
 
     Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0xb5d);
 }

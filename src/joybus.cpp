@@ -3833,9 +3833,13 @@ int JoyBus::SendGBAStart(ThreadParam* threadParam, unsigned int* outCmd)
     *outCmd = cmd;
     unsigned int word = cmd;
 
-    int result = 0;
+    int result;
 
-    if (static_cast<signed char>(m_threadRunningMask) != 0)
+    if (static_cast<signed char>(m_threadRunningMask) == 0)
+    {
+        result = 0;
+    }
+    else
     {
         OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
@@ -3875,9 +3879,13 @@ int JoyBus::SendGBAStop(ThreadParam* threadParam)
     cmdBytes[1] = 0;
     unsigned int word = cmd;
 
-    int result = 0;
+    int result;
 
-    if (static_cast<signed char>(m_threadRunningMask) != 0)
+    if (static_cast<signed char>(m_threadRunningMask) == 0)
+    {
+        result = 0;
+    }
+    else
     {
         OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 

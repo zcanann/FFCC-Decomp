@@ -3237,7 +3237,7 @@ case1_done:
 
         struct
         {
-            char          h;
+            unsigned char h;
             unsigned char f;
         } tmpBuf;
 

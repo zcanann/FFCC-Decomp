@@ -2314,6 +2314,12 @@ foundTexture:
             System.Printf(const_cast<char*>(s_charaTexLoadAmemFmt), charaKind, static_cast<unsigned int>(charaNo),
                           static_cast<int>(textureVariant));
         }
+
+        m_texLoadRef = loadTexture;
+        loadTexture->AddRef();
+        m_textureSet = loadTexture->m_textureSet;
+        m_textureSet->AddRef();
+        goto attach;
     } else {
         if (static_cast<unsigned int>(System.m_execParam) >= 1) {
             System.Printf(const_cast<char*>(s_charaTexLoadDvdFmt), charaKind, static_cast<unsigned int>(charaNo),
@@ -2438,12 +2444,12 @@ foundModel:
                 System.Printf(const_cast<char*>(s_charaModelLoadAmemFmt), charaKind, static_cast<int>(charaNo));
             }
 
-            m_modelLoadRef->AddRef();
+            loadModel->AddRef();
             m_model = loadModel->m_model;
             m_model->AddRef();
             m_model->Init();
         } else {
-            m_modelLoadRef->AddRef();
+            loadModel->AddRef();
             m_model = loadModel->m_model->Duplicate(SelectLoadStage(&CharaPcs, modelStage));
         }
 #undef modelStage

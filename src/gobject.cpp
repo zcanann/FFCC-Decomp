@@ -836,7 +836,7 @@ void CGObject::objectCollision()
                         float split;
                         if (rawSplit < sZeroFloat) {
                             split = sZeroFloat;
-                        } else if (rawSplit > sAnimFrameOffset) {
+                        } else if (sAnimFrameOffset < rawSplit) {
                             split = sAnimFrameOffset;
                         } else {
                             split = rawSplit;
@@ -2516,19 +2516,19 @@ void CGObject::boundCheck()
     PSMTX44Concat(screenMtx, clipMtx, screenMtx);
 
     if ((m_charaModelHandle != 0) && (m_charaModelHandle->m_model != 0)) {
-        const float clipLimit = 2.0f;
+        const float zero = sZeroFloat;
         const float oneF = sAnimFrameOffset;
-        const double zero = static_cast<double>(sZeroFloat);
-        const double one = static_cast<double>(sAnimFrameOffset);
+        const float clipLimit = 2.0f;
 
         clipMask = 0x1F;
-        for (s32 i = 0; (clipMask != 0) && (i < 8); i++) {
+        s32 i = 0;
+        do {
             clipCorner.x = m_worldPosition.x + (((i & 1) != 0) ? -m_nearColRadius : m_nearColRadius);
             clipCorner.y = m_worldPosition.y + (((i & 4) != 0) ? -m_nearColRadius : m_nearColRadius);
             clipCorner.z = m_worldPosition.z + (((i & 2) != 0) ? -m_nearColRadius : m_nearColRadius);
 
             Math.MTX44MultVec4(screenMtx, &clipCorner, &clipPos);
-            if (static_cast<double>(clipPos.w) > zero) {
+            if (clipPos.w > zero) {
                 clipMask &= 0xFFFFFFEF;
             }
             if (clipMask == 0) {
@@ -2545,13 +2545,13 @@ void CGObject::boundCheck()
             if (clipPos.y > clipLimit) {
                 clipMask &= 0xFFFFFFFD;
             }
-            if (static_cast<double>(clipPos.x) < one) {
+            if (clipPos.x < oneF) {
                 clipMask &= 0xFFFFFFFB;
             }
-            if (static_cast<double>(clipPos.y) < one) {
+            if (clipPos.y < oneF) {
                 clipMask &= 0xFFFFFFF7;
             }
-        }
+        } while ((clipMask != 0) && (++i < 8));
 
         m_weaponNodeFlagBits.m_unk20 = static_cast<signed char>(static_cast<u32>(__cntlzw(clipMask)) >> 5);
     }

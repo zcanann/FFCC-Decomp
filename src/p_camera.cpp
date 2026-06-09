@@ -836,16 +836,15 @@ void CCameraPcs::calc()
             const double t = static_cast<double>(kCameraPi *
                 (kCameraOneF - static_cast<float>(m_worldMapEffect.m_timer) /
                 static_cast<float>(m_worldMapEffect.m_duration)));
-            const double f = static_cast<double>(kCameraHalfF * (kCameraOneF + static_cast<float>(cos(t))));
+            const float f = kCameraHalfF * (kCameraOneF + static_cast<float>(cos(t)));
 
-            PSMTXRotRad(tempMtx, 'x', static_cast<float>(static_cast<double>(m_worldMapEffect.m_rotX) * f));
+            PSMTXRotRad(tempMtx, 'x', m_worldMapEffect.m_rotX * f);
             PSMTXConcat(tempMtx, worldMapMtx, worldMapMtx);
-            PSMTXRotRad(tempMtx, 'y', static_cast<float>(static_cast<double>(m_worldMapEffect.m_rotY) * f));
+            PSMTXRotRad(tempMtx, 'y', m_worldMapEffect.m_rotY * f);
             PSMTXConcat(tempMtx, worldMapMtx, worldMapMtx);
 
-            const float scale = -static_cast<float>(
-                static_cast<double>(m_worldMapEffect.m_scale) * (static_cast<double>(kCameraOneF) - f) -
-                static_cast<double>(kCameraOneF + m_worldMapEffect.m_scale));
+            const float scale = (kCameraOneF + m_worldMapEffect.m_scale) -
+                m_worldMapEffect.m_scale * (kCameraOneF - f);
             PSMTXScale(tempMtx, scale, scale, scale);
             PSMTXConcat(tempMtx, worldMapMtx, worldMapMtx);
 
@@ -1306,15 +1305,17 @@ void CCameraPcs::calcMap()
     }
 
     if ((buttons & 0x1) != 0) {
-        sideVec.y = kCameraZeroF;
+        sideVec.x = kCameraZeroF;
         sideVec.z = kCameraZeroF;
+        sideVec.y = kCameraZeroF;
         sideVec.x = kCameraDebugMoveStep;
         PSMTXMultVecSR(rotMtx, &sideVec, &sideVec);
         sideVec.y = kCameraZeroF;
         PSVECAdd(&sideVec, &moveDelta, &moveDelta);
     } else if ((buttons & 0x2) != 0) {
-        sideVec.y = kCameraZeroF;
+        sideVec.x = kCameraZeroF;
         sideVec.z = kCameraZeroF;
+        sideVec.y = kCameraZeroF;
         sideVec.x = kCameraNegativeDebugMoveStep;
         PSMTXMultVecSR(rotMtx, &sideVec, &sideVec);
         sideVec.y = kCameraZeroF;
@@ -1322,15 +1323,24 @@ void CCameraPcs::calcMap()
     }
 
     if ((kCameraZeroF != moveDelta.x) || (kCameraZeroF != moveDelta.y) || (kCameraZeroF != moveDelta.z)) {
-        for (i = 4; i != 0; i--) {
-            hitCylinder.m_min.x = kCameraBoundsMinInitial;
-            hitCylinder.m_min.y = kCameraBoundsMinInitial;
-            hitCylinder.m_min.z = kCameraBoundsMinInitial;
-            hitCylinder.m_max.x = kCameraBoundsMaxInitial;
-            hitCylinder.m_max.y = kCameraBoundsMaxInitial;
-            hitCylinder.m_max.z = kCameraBoundsMaxInitial;
-            hitCylinder.m_radius = kCameraDefaultNearZ;
-            hitCylinder.m_bottom = PositionVec();
+        i = 4;
+        while (i-- != 0) {
+            double radius = kCameraDefaultNearZ;
+            double boundsMax = kCameraBoundsMaxInitial;
+            double boundsMin = kCameraBoundsMinInitial;
+            hitCylinder.m_min.z = boundsMin;
+            hitCylinder.m_min.y = boundsMin;
+            hitCylinder.m_min.x = boundsMin;
+            hitCylinder.m_max.z = boundsMax;
+            hitCylinder.m_max.y = boundsMax;
+            hitCylinder.m_max.x = boundsMax;
+            hitCylinder.m_bottom.x = PositionVec().x;
+            hitCylinder.m_bottom.y = PositionVec().y;
+            hitCylinder.m_bottom.z = PositionVec().z;
+            hitCylinder.m_axis.x = moveDelta.x;
+            hitCylinder.m_axis.y = moveDelta.y;
+            hitCylinder.m_axis.z = moveDelta.z;
+            hitCylinder.m_radius = radius;
             if (MapMng.CheckHitCylinder(reinterpret_cast<CMapCylinder*>(&hitCylinder), &moveDelta, 0xFFFFFFFF) != 0) {
                 MapMng.m_hitMapObj->CalcHitSlide(&moveDelta, kCameraTwoF);
             } else {
@@ -1345,7 +1355,7 @@ void CCameraPcs::calcMap()
     C_MTXPerspective(m_screenMatrix, m_fov, kCameraAspectRatio, m_nearZ, m_farZ);
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 
-    PSVECAdd(&TargetVec(), &PositionVec(), &DirectionVec());
+    PSVECAdd(&PositionVec(), &DirectionVec(), &TargetVec());
 
     upVec.x = kCameraZeroF;
     upVec.y = kCameraOneF;
@@ -1636,10 +1646,10 @@ void CCameraPcs::drawShadowBegin()
         }
 
         float currentDepth = m_fullScreenShadowDepth;
-        if (currentDepth >= kCameraZeroF) {
-            m_fullScreenShadowDepth = currentDepth + (depth - currentDepth) * kCameraShadowDepthBlend;
-        } else {
+        if (currentDepth < kCameraZeroF) {
             m_fullScreenShadowDepth = depth;
+        } else {
+            m_fullScreenShadowDepth = currentDepth + (depth - currentDepth) * kCameraShadowDepthBlend;
         }
     } else {
         m_fullScreenShadow.m_span = kCameraHundredF;

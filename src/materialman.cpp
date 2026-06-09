@@ -1295,7 +1295,9 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
             GXLoadTexObj(m_underWaterTexture, static_cast<GXTexMapID>(m_bumpTexMapIds[2]));
             return;
         }
-        if ((m_curEnvTevBit & material->m_tevBit & 0x1000) == 0) {
+        if ((m_curEnvTevBit & material->m_tevBit & 0x1000) != 0) {
+            isStd1000 = true;
+        } else {
             if (m_vtxDescMode != 1) {
                 GXClearVtxDesc();
                 GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
@@ -1386,7 +1388,6 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
             TextureMan.SetTexture(static_cast<_GXTexMapID>(m_bumpTexMapIds[3]), g_drawMaterial->m_textureData.m_textures[3]);
             return;
         }
-        isStd1000 = true;
     }
 
     if (isStd1000) {

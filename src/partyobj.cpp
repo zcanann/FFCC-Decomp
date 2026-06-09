@@ -5138,42 +5138,39 @@ void CGPartyObj::gpmMove()
 					return;
 				}
 
-				int threshold0 = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2048);
-				int threshold1 = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x204C);
-				int threshold2 = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2050);
-				if (sGhostPartyWork.thresholdA < threshold0 &&
-				    sGhostPartyWork.thresholdB < threshold1 &&
-				    sGhostPartyWork.thresholdC < threshold2) {
+				if (sGhostPartyWork.thresholdA < CharaGhostValue(0x2048) &&
+				    sGhostPartyWork.thresholdB < CharaGhostValue(0x204C) &&
+				    sGhostPartyWork.thresholdC < CharaGhostValue(0x2050)) {
 					return;
 				}
 
 				int choices = 0;
-				if (sGhostPartyWork.thresholdA >= threshold0) {
+				if (sGhostPartyWork.thresholdA >= CharaGhostValue(0x2048)) {
 					choices++;
 				}
-				if (sGhostPartyWork.thresholdB >= threshold1) {
+				if (sGhostPartyWork.thresholdB >= CharaGhostValue(0x204C)) {
 					choices++;
 				}
-				if (sGhostPartyWork.thresholdC >= threshold2) {
+				if (sGhostPartyWork.thresholdC >= CharaGhostValue(0x2050)) {
 					choices++;
 				}
 
 				int pick = Math.Rand(choices);
 				int cursor = 0;
 				int newSlotSel;
-				if (sGhostPartyWork.thresholdA >= threshold0 && cursor == pick) {
+				if (sGhostPartyWork.thresholdA >= CharaGhostValue(0x2048) && cursor == pick) {
 					newSlotSel = 0;
 				} else {
-					if (sGhostPartyWork.thresholdA >= threshold0) {
+					if (sGhostPartyWork.thresholdA >= CharaGhostValue(0x2048)) {
 						cursor++;
 					}
-					if (sGhostPartyWork.thresholdB >= threshold1 && cursor == pick) {
+					if (sGhostPartyWork.thresholdB >= CharaGhostValue(0x204C) && cursor == pick) {
 						newSlotSel = 1;
 					} else {
-						if (sGhostPartyWork.thresholdB >= threshold1) {
+						if (sGhostPartyWork.thresholdB >= CharaGhostValue(0x204C)) {
 							cursor++;
 						}
-						if (sGhostPartyWork.thresholdC >= threshold2 && cursor == pick) {
+						if (sGhostPartyWork.thresholdC >= CharaGhostValue(0x2050) && cursor == pick) {
 							newSlotSel = 2;
 						} else {
 							newSlotSel = 0;

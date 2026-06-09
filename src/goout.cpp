@@ -1708,7 +1708,7 @@ card_connected:;
         SetGoOutMode(0xE);
         break;
     case 0xE:
-        if (static_cast<signed char>(MenuPcs.m_goOutLoadFinished) != 0) {
+        if (static_cast<unsigned char>(MenuPcs.m_goOutLoadFinished) != 0) {
             if (MenuPcs.m_goOutLoadResult == 4) {
                 MenuGoOutState().m_resultSelect = 0;
                 MenuPcs.InitSaveLoadMenu();
@@ -2030,7 +2030,7 @@ card_connected:;
         m_cursorListY1 = 0xde;
         m_cursorMode = 0;
         {
-            unsigned char next;
+            signed char next;
 
             if (MenuPcs.m_menuWindowInfo->state == 1) {
                 input = GetGoOutInputMask();
@@ -2098,16 +2098,14 @@ card_connected:;
         }
         break;
     case 2:
-        static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->SaveDataBuffer(static_cast<char*>(m_memCardBuffer));
-        m_memCardResult = MenuPcs.m_mcCtrl.m_lastResult;
+        m_memCardResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->SaveDataBuffer(static_cast<char*>(m_memCardBuffer));
         if (m_memCardResult != 0) {
             m_lastMemCardProc = m_memCardProc;
             m_memCardProc = 0;
         }
         break;
     case 3: {
-        static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->Format(1);
-        int formatResult = MenuPcs.m_mcCtrl.m_lastResult;
+        int formatResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->Format(1);
         if (formatResult < 0) {
             MemoryCardMan.m_opDoneFlag = 1;
             MemoryCardMan.m_currentSlot = static_cast<char>(0xff);

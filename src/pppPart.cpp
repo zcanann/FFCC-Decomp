@@ -971,7 +971,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
  * JP Size: TODO
  */
 #pragma push
-#pragma optimization_level 2
+#pragma optimization_level 4
 void _pppAllFreePObject(_pppMngSt* pppMngSt)
 {
 	Graphic._WaitDrawDone(const_cast<char*>(s_pppPart_cpp), 0x362);
@@ -1012,7 +1012,10 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 			owner->m_pppPObjLink = obj->m_next;
 		}
 
-		Memory.Free(obj);
+		if (obj != 0)
+		{
+			Memory.Free(obj);
+		}
 		obj = next;
 	}
 

@@ -227,8 +227,8 @@ void CTextureSet::Create(void* filePtr, CMemory::CStage* stage, int append, CAme
                                 texture->Create(chunkFile, stage, amemCacheSet, cacheTag, useAddress);
 
                                 if (texture->m_name[0] != 0) {
-                                    char* textureName = texture->m_name;
                                     unsigned int duplicateIdx;
+                                    char* textureName = texture->m_name;
                                     for (duplicateIdx = 0; duplicateIdx < (unsigned int)m_textureArray.GetSize(); duplicateIdx++) {
                                         CTexture* existing = m_textureArray[duplicateIdx];
                                         if ((existing != 0)

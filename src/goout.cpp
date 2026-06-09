@@ -1396,10 +1396,10 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         }
 
         {
-        const int saveIndex = m_accessSaveIndex;
+        const char saveIndex = static_cast<char>(m_accessSaveIndex);
         const int cardChannel = m_accessCardChannel;
         m_cardChannel = static_cast<char>(cardChannel);
-        m_saveIndex = static_cast<char>(saveIndex);
+        m_saveIndex = saveIndex;
         MenuPcs.m_mcCtrl.m_cardChannel = cardChannel;
         }
         m_memCardBuffer = MenuPcs.m_goOutTransferSaveData;
@@ -1721,7 +1721,7 @@ card_connected:;
         SetGoOutMode(0xE);
         break;
     case 0xE:
-        if (static_cast<unsigned char>(MenuPcs.m_goOutLoadFinished) != 0) {
+        if (static_cast<char>(MenuPcs.m_goOutLoadFinished) != 0) {
             if (MenuPcs.m_goOutLoadResult == 4) {
                 MenuGoOutState().m_resultSelect = 0;
                 MenuPcs.InitSaveLoadMenu();

@@ -2937,10 +2937,8 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         m_model->DrawShadow(viewMtx, shadowMode);
 
         if (drawPass == 2) {
-            const int shadowBytes =
-                (CharaPcs.m_texShadowSize * CharaPcs.m_texShadowSize) / 2;
             GXCopyTex(m_shadowTexturePtr, GX_TRUE);
-            CharaPcs.m_texShadowTextureOffset += shadowBytes;
+            CharaPcs.m_texShadowTextureOffset += (CharaPcs.m_texShadowSize * CharaPcs.m_texShadowSize) / 2;
             GXPixModeSync();
         }
     } else {

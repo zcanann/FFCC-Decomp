@@ -1463,26 +1463,8 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
         }
     }
 
-    if (tevBit == 0) {
-        if (m_vtxDescMode != 0) {
-            GXClearVtxDesc();
-            GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
-            GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
-            GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
-            GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
-            m_vtxDescMode = 0;
-        }
-    } else {
-        if ((tevBit & 2) == 0) {
-            if (m_vtxDescMode != 0) {
-                GXClearVtxDesc();
-                GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
-                GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
-                GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
-                GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
-                m_vtxDescMode = 0;
-            }
-        } else {
+    if (tevBit != 0) {
+        if ((tevBit & 2) != 0) {
             if (m_vtxDescMode != 2) {
                 GXClearVtxDesc();
                 GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
@@ -1519,6 +1501,15 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
             _GXSetTevAlphaOp(m_numTevStage, 0, 0, 0, 1, 0);
             _GXSetTevSwapMode(m_numTevStage, 0, 0);
             IncNumTevStage();
+        } else {
+            if (m_vtxDescMode != 0) {
+                GXClearVtxDesc();
+                GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
+                GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
+                GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
+                GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
+                m_vtxDescMode = 0;
+            }
         }
         if ((tevBit & 0x8000) != 0) {
             m_activeEnvTevBit = 0xFFFFFFFF;
@@ -1726,6 +1717,15 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
             IncTexCoordIdCur();
             m_fullScreenShadowTexCoordIds1[0] = m_texCoordIdCur;
             addtev_full_shadow(0);
+        }
+    } else {
+        if (m_vtxDescMode != 0) {
+            GXClearVtxDesc();
+            GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
+            GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
+            GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
+            GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
+            m_vtxDescMode = 0;
         }
     }
     GXSetNumTexGens(((m_texCoordIdCur & 0xFF) + 1) & 0xFF);

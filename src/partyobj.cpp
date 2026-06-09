@@ -898,19 +898,22 @@ void CGPartyObj::onFrameAlways()
 
 	reinterpret_cast<CCaravanWork*>(m_scriptHandle)->CalcStatus();
 	int port = reinterpret_cast<int>(m_scriptHandle[0xED]);
-	int showTraceParticle = 0;
-	if ((Game.m_gameWork.m_gameInitFlag != 0) &&
-	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 28) & 0xC0000000) >> 31) != 0) &&
-	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 29) & 0xC0000000) >> 31) != 0) &&
-	    ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) << 24) & 0xC0000000) >> 31) != 0) &&
-	     (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1)) << 24) & 0xC0000000) >> 31) != 0)) &&
-	    (m_lastStateId != 6 && m_lastStateId != 2)) {
-		if ((Game.m_gameWork.m_menuStageMode == 0) ||
-		    (Game.m_gameWork.m_bossArtifactStageIndex >= 0x0F) ||
+	int showTraceParticle;
+	if ((Game.m_gameWork.m_gameInitFlag == 0) ||
+	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 28) & 0xC0000000) >> 31) >= 0) ||
+	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 29) & 0xC0000000) >> 31) >= 0) ||
+	    ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) << 24) & 0xC0000000) >> 31) >= 0) ||
+	     (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1)) << 24) & 0xC0000000) >> 31) >= 0)) ||
+	    (m_lastStateId == 6 || m_lastStateId == 2)) {
+		showTraceParticle = 0;
+	} else if ((Game.m_gameWork.m_menuStageMode == 0) ||
+		    (Game.m_gameWork.m_menuStageMode == 0) ||
+		    (Game.m_gameWork.m_bossArtifactStageIndex > 0x0E) ||
 		    ((static_cast<unsigned short>(GetCID()) & 0x6D) != 0x6D) ||
 		    (reinterpret_cast<int>(m_scriptHandle[0xED]) == 0)) {
-			showTraceParticle = 1;
-		}
+		showTraceParticle = 1;
+	} else {
+		showTraceParticle = 0;
 	}
 
 	int& traceSlot = PartyTraceParticleSlot(port);

@@ -721,6 +721,7 @@ void CGraphicPcs::drawBar()
     }
     const int drawText = (padState != 0) && (Joybus.GetPadType(0) != 0x40000);
 
+    float x = kDebugBarLeft;
     GXColor backColor = s_debug_bar_color;
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
     GXPosition3f32(kDebugBarLeft, kDebugBarTop, kGraphicZero);
@@ -739,7 +740,6 @@ void CGraphicPcs::drawBar()
     CSystem::COrder* order = System.GetFirstOrder();
     const int orderCount = System.m_orderCount;
     const int lastOrder = orderCount - 1;
-    float x = kDebugBarLeft;
     int hue = 0;
     u32 y = 0x10;
     for (int i = 0; i < orderCount; i++) {

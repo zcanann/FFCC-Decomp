@@ -2521,7 +2521,8 @@ void CGObject::boundCheck()
         const float clipLimit = 2.0f;
 
         clipMask = 0x1F;
-        for (s32 i = 0; (clipMask != 0) && (i < 8); i++) {
+        s32 i = 0;
+        do {
             clipCorner.x = m_worldPosition.x + (((i & 1) != 0) ? -m_nearColRadius : m_nearColRadius);
             clipCorner.y = m_worldPosition.y + (((i & 4) != 0) ? -m_nearColRadius : m_nearColRadius);
             clipCorner.z = m_worldPosition.z + (((i & 2) != 0) ? -m_nearColRadius : m_nearColRadius);
@@ -2550,7 +2551,7 @@ void CGObject::boundCheck()
             if (clipPos.y < oneF) {
                 clipMask &= 0xFFFFFFF7;
             }
-        }
+        } while ((clipMask != 0) && (++i < 8));
 
         m_weaponNodeFlagBits.m_unk20 = static_cast<signed char>(static_cast<u32>(__cntlzw(clipMask)) >> 5);
     }

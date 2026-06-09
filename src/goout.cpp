@@ -2008,7 +2008,7 @@ card_connected:;
         m_cursorListY1 = 0xe7;
         m_cursorMode = 0;
         {
-            signed char next;
+            unsigned char next;
 
             if (MenuPcs.m_menuWindowInfo->state != 1) {
                 next = 0;

@@ -746,8 +746,8 @@ void CGraphicPcs::drawBar()
     for (int i = 0; i < orderCount; i++) {
         const int priority = order->m_priority;
         const float lastTime = order->m_lastTime;
-        GXColor rgb;
-        *reinterpret_cast<u32*>(&rgb) = Math.Hsb2Rgb(hue / orderCount, 100, 100);
+        const u32 colorWord = Math.Hsb2Rgb(hue / orderCount, 100, 100);
+        GXColor rgb = *reinterpret_cast<const GXColor*>(&colorWord);
         const float width = (kGraphicScreenCenterX * lastTime) / kDebugBarFrameBudget;
 
         if (priority == 0x26) {

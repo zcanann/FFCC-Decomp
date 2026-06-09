@@ -2048,6 +2048,10 @@ timeout_expiry:
         case 0x42:
         {
             int dataRes = SendDataFile(threadParam);
+            if (dataRes == -1)
+            {
+                goto sleep_retry;
+            }
             if (dataRes == -2)
             {
                 threadParam->m_state = 3;

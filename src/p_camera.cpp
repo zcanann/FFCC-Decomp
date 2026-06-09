@@ -653,7 +653,7 @@ void CCameraPcs::CalcQuake()
 
     u32 randX = static_cast<u32>(rand());
     u16 signX = static_cast<u16>(randX >> 0x1F);
-    short jitterSignX = static_cast<short>(((randX & 1) ^ signX) - signX);
+    unsigned short jitterSignX = static_cast<short>(((randX & 1) ^ signX) - signX);
 
     u32 randY = static_cast<u32>(rand());
     u16 signY = static_cast<u16>(randY >> 0x1F);
@@ -1261,18 +1261,18 @@ void CCameraPcs::calcMap()
     };
     HitCylinder hitCylinder;
 
-    buttons = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? 0 : CameraRawPadInput().button[0];
+    buttons = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? 0 : CameraRawPadInput().buttonDown[0];
 
     stickH = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? kCameraZeroF : CameraRawPadInput().substickYF;
     stickH = kCameraDegToRad * (stickH / kCameraOneEighthF);
 
     stickV = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? kCameraZeroF : *reinterpret_cast<float*>(&CameraRawPadInput().lockedButton[0]);
-    stickV = kCameraDegToRad * (stickV / kCameraOneEighthF);
+    stickV = -(kCameraDegToRad * (stickV / kCameraOneEighthF));
 
     triggerL = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? kCameraZeroF : CameraRawPadInput().stickYF;
 
     m_fov += triggerL;
-    m_mapRotX -= stickV;
+    m_mapRotX += stickV;
     m_mapRotY -= stickH;
 
     PSMTXRotRad(rotXMtx, 'x', m_mapRotX);

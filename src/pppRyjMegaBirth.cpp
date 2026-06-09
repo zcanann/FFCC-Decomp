@@ -155,9 +155,12 @@ static inline void calc_spawn_position(Vec* out, float speed, u8 mode)
 		out->z = out->z - halfSpeed;
 		break;
 	case 2:
-		out->x = speed * Math.RandF() * Math.RandF() - halfSpeed;
-		out->y = speed * Math.RandF() * Math.RandF() - halfSpeed;
-		out->z = speed * Math.RandF() * Math.RandF() - halfSpeed;
+		out->x = speed * Math.RandF() * Math.RandF();
+		out->x = out->x - halfSpeed;
+		out->y = speed * Math.RandF() * Math.RandF();
+		out->y = out->y - halfSpeed;
+		out->z = speed * Math.RandF() * Math.RandF();
+		out->z = out->z - halfSpeed;
 		break;
 	case 3:
 		out->x = -(kPppRyjMegaBirthRandomSpeedScale * (speed * Math.RandF() * Math.RandF()) - speed) - halfSpeed;
@@ -175,9 +178,12 @@ static inline void calc_spawn_position(Vec* out, float speed, u8 mode)
 		out->z = -(kPppRyjMegaBirthHalf * (Math.RandF() * (speed * Math.RandF() * Math.RandF())) - speed) - halfSpeed;
 		break;
 	default:
-		out->x = speed * Math.RandF() - halfSpeed;
-		out->y = speed * Math.RandF() - halfSpeed;
-		out->z = speed * Math.RandF() - halfSpeed;
+		out->x = speed * Math.RandF();
+		out->x = out->x - halfSpeed;
+		out->y = speed * Math.RandF();
+		out->y = out->y - halfSpeed;
+		out->z = speed * Math.RandF();
+		out->z = out->z - halfSpeed;
 		break;
 	}
 }

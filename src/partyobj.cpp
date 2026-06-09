@@ -2764,28 +2764,32 @@ void CGPartyObj::checkTargetParticle()
 		targetPos->x += input.x * c - input.z * s;
 		targetPos->z += input.x * s + input.z * c;
 
-		maxRange = 0.0f;
-		if (Game.unkCFlatData0[2] != 0) {
-			int itemId = *reinterpret_cast<int*>(self + 0x560);
-			maxRange += static_cast<float>(*reinterpret_cast<short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x30));
-		}
-		if (m_scriptHandle != nullptr) {
-			unsigned char* work = reinterpret_cast<unsigned char*>(m_scriptHandle);
-			if (*reinterpret_cast<int*>(self + 0x520) == 2) {
-				maxRange += static_cast<float>(*reinterpret_cast<unsigned short*>(work + 0x19A));
-				if ((*reinterpret_cast<unsigned int*>(work + 0x3B0) & 0x4000) != 0 && Game.unk_flat3_field_8_0xc7dc != 0) {
-					maxRange += static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x0A));
-				}
-			} else {
-				maxRange += static_cast<float>(*reinterpret_cast<short*>(work + 0x19C));
-				if ((*reinterpret_cast<unsigned int*>(work + 0x3B0) & 0x8000) != 0 && Game.unk_flat3_field_8_0xc7dc != 0) {
-					maxRange += static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x0C));
-				}
-			}
-		}
-		maxRange = FLOAT_80331a78 + maxRange;
-
 		float dist = PSVECDistance(&m_worldPosition, targetPos);
+
+		float maxRangeRaw;
+		int scriptPtr = *reinterpret_cast<int*>(self + 0x58);
+		if (*reinterpret_cast<int*>(self + 0x520) == 2) {
+			unsigned int vNode = *reinterpret_cast<unsigned short*>(*reinterpret_cast<int*>(scriptPtr + 0x24) + 0x19A);
+			unsigned int vItem = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<int*>(self + 0x560) * 0x48 + 0x30);
+			int vFlag;
+			if ((*reinterpret_cast<unsigned int*>(scriptPtr + 0x3B0) & 0x4000) == 0) {
+				vFlag = 0;
+			} else {
+				vFlag = *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x0A);
+			}
+			maxRangeRaw = static_cast<float>(vItem) + static_cast<float>(vNode) + static_cast<float>(vFlag);
+		} else {
+			unsigned int vNode = *reinterpret_cast<unsigned short*>(*reinterpret_cast<int*>(scriptPtr + 0x24) + 0x19C);
+			unsigned int vItem = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<int*>(self + 0x560) * 0x48 + 0x30);
+			int vFlag;
+			if ((*reinterpret_cast<unsigned int*>(scriptPtr + 0x3B0) & 0x8000) == 0) {
+				vFlag = 0;
+			} else {
+				vFlag = *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x0C);
+			}
+			maxRangeRaw = static_cast<float>(vItem) + static_cast<float>(vNode) + static_cast<float>(vFlag);
+		}
+		maxRange = FLOAT_80331a78 + maxRangeRaw;
 
 		CVector worldPosV(m_worldPosition);
 		CVector targetCenterV(*targetPos);

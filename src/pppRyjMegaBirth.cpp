@@ -988,10 +988,10 @@ void birth(
 		}
 	}
 
-	*u8_at(particlePayload, 0x24) = random_signed_byte_span(payload[0x58]);
-	*u8_at(particlePayload, 0x25) = random_signed_byte_span(payload[0x59]);
-	*u8_at(particlePayload, 0x26) = random_signed_byte_span(payload[0x5A]);
-	*u8_at(particlePayload, 0x27) = random_signed_byte_span(payload[0x5B]);
+	*u8_at(particlePayload, 0x24) = random_signed_byte_span(payload[0x4C]);
+	*u8_at(particlePayload, 0x25) = random_signed_byte_span(payload[0x4D]);
+	*u8_at(particlePayload, 0x26) = random_signed_byte_span(payload[0x4E]);
+	*u8_at(particlePayload, 0x27) = random_signed_byte_span(payload[0x4F]);
 
 	if (payload[0x22] != 0) {
 		*f32_at(particlePayload, 0x54) = (float)color->m_alpha;

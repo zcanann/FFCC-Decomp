@@ -1676,39 +1676,45 @@ void CCaravanWork::SafeDeleteTempItem()
 	int totalSlots = 0;
 	int artifactIndex = 0;
 	for (int i = 0; i < 50; i++, artifactIndex += 2) {
-		if (artifactIndex < 96 && m_artifacts[artifactIndex] > 0) {
-			unsigned short* artifactData =
-				(unsigned short*)(Game.unkCFlatData0[2] + m_artifacts[artifactIndex] * 0x48);
-			unsigned short slots = artifactData[3];
-			switch (artifactData[0]) {
-			case 0xDB:
-				totalSlots += slots;
-				break;
-			case 0x9F:
-			case 0xB6:
-			case 0xCC:
-			case 0xDF:
-			case 0xE4:
-			default:
-				break;
+		if (artifactIndex < 96) {
+			int artifactId = m_artifacts[artifactIndex];
+			if (artifactId > 0) {
+				unsigned short* artifactData =
+					(unsigned short*)(Game.unkCFlatData0[2] + artifactId * 0x48);
+				unsigned short slots = artifactData[3];
+				switch (artifactData[0]) {
+				case 0xDB:
+					totalSlots += slots;
+					break;
+				case 0x9F:
+				case 0xB6:
+				case 0xCC:
+				case 0xDF:
+				case 0xE4:
+				default:
+					break;
+				}
 			}
 		}
 
-		if ((artifactIndex + 1) < 96 && m_artifacts[artifactIndex + 1] > 0) {
-			unsigned short* artifactData = (unsigned short*)(Game.unkCFlatData0[2] +
-															 m_artifacts[artifactIndex + 1] * 0x48);
-			unsigned short slots = artifactData[3];
-			switch (artifactData[0]) {
-			case 0xDB:
-				totalSlots += slots;
-				break;
-			case 0x9F:
-			case 0xB6:
-			case 0xCC:
-			case 0xDF:
-			case 0xE4:
-			default:
-				break;
+		if ((artifactIndex + 1) < 96) {
+			int artifactId = m_artifacts[artifactIndex + 1];
+			if (artifactId > 0) {
+				unsigned short* artifactData = (unsigned short*)(Game.unkCFlatData0[2] +
+																 artifactId * 0x48);
+				unsigned short slots = artifactData[3];
+				switch (artifactData[0]) {
+				case 0xDB:
+					totalSlots += slots;
+					break;
+				case 0x9F:
+				case 0xB6:
+				case 0xCC:
+				case 0xDF:
+				case 0xE4:
+				default:
+					break;
+				}
 			}
 		}
 	}

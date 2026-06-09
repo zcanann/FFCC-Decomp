@@ -5673,7 +5673,7 @@ int JoyBus::SendMapObjDrawFlg(ThreadParam* threadParam)
 
         if (result == 0)
         {
-            if (m_threadRunningMask == 0)
+            if (static_cast<signed char>(m_threadRunningMask) == 0)
             {
                 result = 0;
             }

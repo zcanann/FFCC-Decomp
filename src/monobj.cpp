@@ -3369,7 +3369,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 			if (((partyState == 1) || (partyState == 7)) &&
 				((float)__fabs(Math.DstRot(object->m_rotBaseY, reinterpret_cast<CGObject*>(party)->m_rotBaseY)) > kMonObjHalfPi)) {
 				if (*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) {
-					if (monObj->m_forcedAction != *reinterpret_cast<short*>(aiScript + actionOffset + 0x11E)) {
+					if (monObj->m_forcedAction != static_cast<short>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x11E))) {
 						goto skipForce;
 					}
 				} else if ((*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) ||

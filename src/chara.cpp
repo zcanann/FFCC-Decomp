@@ -1976,10 +1976,10 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 			float limit = FLOAT_803301D4 * dynParam[5];
 			if (angle <= limit || FLOAT_803301D4 * dynParam[7] <= angle) {
 				float rot;
-				if (limit < angle) {
-					rot = FLOAT_803301D4 * dynParam[7] - angle;
-				} else {
+				if (angle <= limit) {
 					rot = limit - angle;
+				} else {
+					rot = FLOAT_803301D4 * dynParam[7] - angle;
 				}
 
 				Mtx rotate;

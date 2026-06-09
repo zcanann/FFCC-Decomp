@@ -3399,31 +3399,31 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 		int pick = Math.Rand(8);
 		int seen = 0;
 		int i = 0;
-		unsigned int* groupPtr = groupTable;
+		int* groupPtr = reinterpret_cast<int*>(groupTable);
 		int iter = 2;
 		do {
-			if (static_cast<unsigned int>(groupCursor) == groupPtr[0]) {
+			if (groupCursor == groupPtr[0]) {
 				if (seen == pick) {
 					groupCursor += 1;
 					return i;
 				}
 				seen += 1;
 			}
-			if (static_cast<unsigned int>(groupCursor) == groupPtr[1]) {
+			if (groupCursor == groupPtr[1]) {
 				if (seen == pick) {
 					groupCursor += 1;
 					return i + 1;
 				}
 				seen += 1;
 			}
-			if (static_cast<unsigned int>(groupCursor) == groupPtr[2]) {
+			if (groupCursor == groupPtr[2]) {
 				if (seen == pick) {
 					groupCursor += 1;
 					return i + 2;
 				}
 				seen += 1;
 			}
-			if (static_cast<unsigned int>(groupCursor) == groupPtr[3]) {
+			if (groupCursor == groupPtr[3]) {
 				if (seen == pick) {
 					groupCursor += 1;
 					return i + 3;

@@ -1223,6 +1223,8 @@ void CGCharaObj::damageDelete()
 	}
 }
 
+#pragma push
+#pragma opt_common_subs off
 /*
  * --INFO--
  * PAL Address: 0x80111678
@@ -1277,6 +1279,7 @@ int CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos)
 
 	return 1;
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -1394,6 +1397,8 @@ void CGCharaObj::putHitParticleFromItem(CGPrgObj* sourceObj, int itemId)
 	}
 }
 
+#pragma push
+#pragma optimization_level 3
 /*
  * --INFO--
  * PAL Address: 0x8010D700
@@ -1915,6 +1920,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 	}
 
 }
+#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x801105D0
@@ -2398,6 +2404,8 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 	}
 }
 
+#pragma push
+#pragma optimization_level 2
 /*
  * --INFO--
  * PAL Address: 0x8010F8D8
@@ -2510,7 +2518,7 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 		}
 
 		if (stageLevel > 0) {
-			power += *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + (stageLevel * 2) + 0x5C);
+			power += reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x5C)[stageLevel];
 		}
 	}
 
@@ -2529,6 +2537,7 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 	System.Printf(const_cast<char*>(sCharaObjEffectTimeCalcFmt), base, power, affinity, next);
 	return static_cast<int>(next);
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -2624,6 +2633,8 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 	}
 }
 
+#pragma push
+#pragma optimization_level 2
 /*
  * --INFO--
  * PAL Address: 0x8010F248
@@ -2707,8 +2718,9 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
 		outB = 0;
 		break;
 	}
-	outC = (outA ^ 3) / 2;
+	outC = static_cast<int>(static_cast<unsigned int>(outA ^ 3) >> 1);
 }
+#pragma pop
 
 
 /*
@@ -3019,6 +3031,8 @@ void la(CGObject*)
 {
 }
 
+#pragma push
+#pragma optimization_level 3
 /*
  * --INFO--
  * PAL Address: 0x8010C704
@@ -3091,6 +3105,7 @@ void CGCharaObj::statAttack()
 
 	onStatAttack(1);
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -3687,7 +3702,7 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 						int objParticle = partyObj->m_itemId;
 						int itemMatch;
 						if ((slot == lastSlot &&
-							*reinterpret_cast<short*>(Game.unkCFlatData0[2] + (objParticle * 0x48)) == 0x1F8 &&
+							*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (objParticle * 0x48)) == 0x1F8 &&
 							fallbackCursor[0] == 0x1F8) ||
 							objParticle == fallbackCursor[0]) {
 							itemMatch = 1;

@@ -1357,7 +1357,7 @@ void CGCharaObj::putHitParticleFromItem(CGPrgObj* sourceObj, int itemId)
 			if ((particleFlags & 0x200) != 0) {
 				CFlatRuntime2Storage().SetParticleWorkBind(sourceObj);
 			} else {
-				CFlatRuntime2Storage().SetParticleWorkPos(*l_pHitCross, 1.0f);
+				CFlatRuntime2Storage().SetParticleWorkPos(*l_pHitCross, kCharaObjZero);
 			}
 			CFlatRuntime2Storage().PutParticleWork();
 		}

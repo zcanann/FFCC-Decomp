@@ -1517,12 +1517,10 @@ int CChara::CModel::PickFur(
 						PSVECScale(weights, weights,
 						           kCharaFurDepthScaleBase / (weights.z + weights.x + weights.y));
 
-						const double outU = static_cast<double>(static_cast<float>(
-						    static_cast<double>(verts[2].m_u) * static_cast<double>(weights.z) +
-						    static_cast<double>(verts[0].m_u * weights.x + verts[1].m_u * weights.y)));
-						const double outV = static_cast<double>(static_cast<float>(
-						    static_cast<double>(verts[2].m_v) * static_cast<double>(weights.z) +
-						    static_cast<double>(verts[0].m_v * weights.x + verts[1].m_v * weights.y)));
+						const float outU =
+						    verts[2].m_u * weights.z + (verts[0].m_u * weights.x + verts[1].m_u * weights.y);
+						const float outV =
+						    verts[2].m_v * weights.z + (verts[0].m_v * weights.x + verts[1].m_v * weights.y);
 
 						if (outWorldPos != 0) {
 							outWorldPos->x = hitViewPos.x;
@@ -1532,8 +1530,8 @@ int CChara::CModel::PickFur(
 						if (furMaterial) {
 							hitPaintable = paintableMaterial;
 							nearestDepth = depth;
-							hitU = static_cast<float>(outU);
-							hitV = static_cast<float>(outV);
+							hitU = outU;
+							hitV = outV;
 						}
 					}
 nextVertex:

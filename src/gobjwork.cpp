@@ -1988,11 +1988,7 @@ void CCaravanWork::CalcStatus()
 	}
 
 	for (int i = 0; i < 11; i++) {
-		unsigned short resistance = 2;
-		if (m_elementResistances[i] < 2) {
-			resistance = m_elementResistances[i];
-		}
-		m_elementResistances[i] = resistance;
+		m_elementResistances[i] = (m_elementResistances[i] < 2) ? m_elementResistances[i] : 2;
 	}
 
 	if (m_hp > m_maxHp) {

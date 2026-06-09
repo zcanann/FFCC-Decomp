@@ -720,7 +720,7 @@ void CalcReflectionVector2(
     while (dl < dlEnd) {
         u8 drawFmt = *(u8*)dl;
         u16 itemCount = *(u16*)((u8*)dl + 1);
-        int i;
+        unsigned int i;
         u32 fmt = drawFmt & 7;
 
         if (gUtil.IsHasDrawFmtDL(drawFmt) == 0) {
@@ -758,11 +758,11 @@ void CalcReflectionVector2(
 
             axis = 0;
             maxAxis = absX;
-            if (absX < absY) {
+            if (absY > absX) {
                 axis = 1;
                 maxAxis = absY;
             }
-            if (maxAxis < absZ) {
+            if (absZ > maxAxis) {
                 axis = 2;
             }
             CVector reflected(outVec->x, outVec->y, outVec->z);

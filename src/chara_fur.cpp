@@ -1256,16 +1256,11 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 int CChara::CModel::PickFur(
     Mtx param_2, _GXColor brushColor, int doPaint, int mode, _GXColor* centerBefore, _GXColor* centerAfter, Vec* worldPos)
 {
-	if (static_cast<signed char>(m_flags10C << 1) >= 0) {
+	if ((m_flags10C & 0x40) == 0) {
 		return -1;
 	}
 	register Vec* outWorldPos = worldPos;
 
-	CMaterialSet* materialSet = ModelMaterialSet(this);
-	FurMeshRaw* mesh = ModelMeshes(this);
-	CChara::CNode* nodes = ModelNodes(this);
-
-	const unsigned short meshCount = ModelMeshCount(this);
 	const double cursorXd = static_cast<float>(Chara.MogFur().m_cursorX);
 	const double cursorYd = static_cast<float>(Chara.MogFur().m_cursorY);
 	float hitU = 0.0f;
@@ -1277,7 +1272,12 @@ int CChara::CModel::PickFur(
 	hitViewPos.Identity();
 	Mtx44 screenMtx;
 	PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
-	const double negCursorY = -static_cast<double>(static_cast<float>(cursorYd - static_cast<double>(kCharaFurScreenCenterY)));
+	const double negCursorY = -static_cast<double>(static_cast<float>(cursorYd) - kCharaFurScreenCenterY);
+
+	CMaterialSet* materialSet = ModelMaterialSet(this);
+	FurMeshRaw* mesh = ModelMeshes(this);
+	CChara::CNode* nodes = ModelNodes(this);
+	const unsigned short meshCount = ModelMeshCount(this);
 
 	FurProjectedVertex verts[3];
 	unsigned long curValid = 0;
@@ -1292,10 +1292,10 @@ int CChara::CModel::PickFur(
 		}
 
 		Mtx meshMtx;
-		if (mesh->m_data->m_skinCount == 0) {
-			PSMTXConcat(ModelDrawMtx(this), nodes[mesh->m_data->m_nodeIndex].m_mtx, meshMtx);
-		} else {
+		if (mesh->m_data->m_skinCount != 0) {
 			PSMTXCopy(ModelDrawMtx(this), meshMtx);
+		} else {
+			PSMTXConcat(ModelDrawMtx(this), nodes[mesh->m_data->m_nodeIndex].m_mtx, meshMtx);
 		}
 
 		Mtx modelViewMtx;

@@ -333,27 +333,15 @@ void CPartMng::Create()
     }
 
     *reinterpret_cast<void**>(self + 0x1c8) = 0;
-    self[0x7f4] = 0;
-    self[0x7f5] = 0;
-    self[0x7f6] = 0;
-    self[0x7f7] = 0;
-    self[0x7f8] = 0;
-    self[0x7f9] = 0;
-    self[0x7fa] = 0;
-    self[0x7fb] = 0;
-    self[0x7fc] = 0;
-    self[0x7fd] = 0;
-    self[0x7fe] = 0;
-    self[0x7ff] = 0;
+    *reinterpret_cast<int*>(self + 0x7f4) = 0;
+    *reinterpret_cast<int*>(self + 0x7f8) = 0;
+    *reinterpret_cast<int*>(self + 0x7fc) = 0;
 
     m_pppEnvSt.m_envParam = kPartMngZero;
     m_pppEnvSt.m_mngStCount = 0x10;
     m_pppEnvSt.m_isEditMode = 1;
 
-    self[0x80c] = 0;
-    self[0x80d] = 0;
-    self[0x80e] = 0;
-    self[0x80f] = 0;
+    *reinterpret_cast<int*>(self + 0x80c) = 0;
 
     memset(self + 0x235a8, 0, 0x108);
 

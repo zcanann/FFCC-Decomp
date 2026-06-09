@@ -2444,9 +2444,8 @@ void CGPartyObj::onStatAttack(int chargeType)
 		    (*reinterpret_cast<unsigned short*>(attackEntry + 6) - *reinterpret_cast<unsigned short*>(attackEntry + 4)) + 1);
 	}
 
-	const unsigned short comboStart = *reinterpret_cast<unsigned short*>(attackEntry + 0x0C);
-	const unsigned short comboEnd = *reinterpret_cast<unsigned short*>(attackEntry + 0x0E);
-	if (m_stateFrame >= comboStart && m_stateFrame <= comboEnd) {
+	if (m_stateFrame >= *reinterpret_cast<unsigned short*>(attackEntry + 0x0C) &&
+	    m_stateFrame <= *reinterpret_cast<unsigned short*>(attackEntry + 0x0E)) {
 		if ((getPadTrigForSlot(static_cast<signed char>(m_animStateMisc)) & 0x100) != 0) {
 			party.commandFlagBits.commandActive = 1;
 		}

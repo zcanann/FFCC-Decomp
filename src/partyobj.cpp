@@ -958,7 +958,7 @@ void CGPartyObj::onFrameAlways()
 
 		if (reinterpret_cast<int>(m_scriptHandle[0xED]) == 0) {
 			CGItemObj::CreateFromScript(0, 4, itemId, this, FLOAT_80331a78, (CGItemObj::CCFS*)0);
-			if (Math.Rand(10) == 0) {
+			if (static_cast<unsigned int>(Math.Rand(10)) == 0) {
 				CGItemObj::CreateFromScript(2, 4, 0x3039, this, FLOAT_80331a78, (CGItemObj::CCFS*)0);
 			}
 		}

@@ -2125,7 +2125,8 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 				}
 				if (ok == baseLen) {
 					matches[matchCount * 2] = 0;
-					matches[matchCount * 2 + 1] = start;
+					int __p1 = matchCount;
+					matches[__p1 * 2 + 1] = start;
 					matchCount++;
 				}
 			}
@@ -2138,7 +2139,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 				continue;
 			}
 
-			const int len = static_cast<int>(pat[2]);
+			const int len =  (s32)(static_cast<int>(pat[2]));
 			for (int start = 0; start < len; start++) {
 				if ((start == 0) && (static_cast<s32>(selectedNegMask) < 0)) {
 					start = 1;

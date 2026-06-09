@@ -3548,7 +3548,10 @@ void CGCharaObj::combi2()
 			}
 		} else {
 			CharaObjComboCenter(party) = comboCenter;
-			if (playedComboSe || CharaObjSkipComboScript(party)) {
+			if (playedComboSe || party == 0 ||
+			    (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
+			     (static_cast<unsigned short>(party->GetCID()) & 0x6D) == 0x6D &&
+			     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party->m_scriptHandle) + 0x3B4) != 0)) {
 				CharaObjComboItemId(party) = 0;
 			} else {
 				CharaObjComboItemId(party) = comboCmd;

@@ -656,9 +656,9 @@ static inline int FindFreeCaravanIdx(Mc::SaveDat* saveData)
  */
 void DrawGoOutMenu()
 {
-    CGoOutMenu& goOutMenu = g_GoOutMenu;
-    g_pGoOutMenu = &goOutMenu;
-    unsigned char mode = goOutMenu.m_mainMode;
+    g_pGoOutMenu = &g_GoOutMenu;
+    CGoOutMenu& goOutMenu = *g_pGoOutMenu;
+    char mode = goOutMenu.m_mainMode;
 
     switch (mode) {
     case 2:

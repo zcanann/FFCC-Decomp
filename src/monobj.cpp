@@ -1184,8 +1184,9 @@ void CGMonObj::onFrameStat()
 		object->moveVector(&delta, speedScale, 1);
 
 		unsigned char* script9 = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
+		float reachDist = static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0xCE));
 		if ((static_cast<int>(prgObj->m_stateFrame) == *reinterpret_cast<unsigned short*>(script9 + 0x1B6)) ||
-			(static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0xCE)) <= reinterpret_cast<float*>(mon + 0x5D0)[m_targetPartyIndex]) ||
+			(reachDist <= reinterpret_cast<float*>(mon + 0x5D0)[m_targetPartyIndex]) ||
 			(object->m_stateFlags0Bits.unk1 != 0)) {
 			prgObj->changeStat(0, 0, 0);
 			if (m_targetPartyIndex >= 0) {

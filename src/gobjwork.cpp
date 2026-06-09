@@ -1676,39 +1676,45 @@ void CCaravanWork::SafeDeleteTempItem()
 	int totalSlots = 0;
 	int artifactIndex = 0;
 	for (int i = 0; i < 50; i++, artifactIndex += 2) {
-		if (artifactIndex < 96 && m_artifacts[artifactIndex] > 0) {
-			unsigned short* artifactData =
-				(unsigned short*)(Game.unkCFlatData0[2] + m_artifacts[artifactIndex] * 0x48);
-			unsigned short slots = artifactData[3];
-			switch (artifactData[0]) {
-			case 0xDB:
-				totalSlots += slots;
-				break;
-			case 0x9F:
-			case 0xB6:
-			case 0xCC:
-			case 0xDF:
-			case 0xE4:
-			default:
-				break;
+		if (artifactIndex < 96) {
+			int artifactId = m_artifacts[artifactIndex];
+			if (artifactId > 0) {
+				unsigned short* artifactData =
+					(unsigned short*)(Game.unkCFlatData0[2] + artifactId * 0x48);
+				unsigned short slots = artifactData[3];
+				switch (artifactData[0]) {
+				case 0xDB:
+					totalSlots += slots;
+					break;
+				case 0x9F:
+				case 0xB6:
+				case 0xCC:
+				case 0xDF:
+				case 0xE4:
+				default:
+					break;
+				}
 			}
 		}
 
-		if ((artifactIndex + 1) < 96 && m_artifacts[artifactIndex + 1] > 0) {
-			unsigned short* artifactData = (unsigned short*)(Game.unkCFlatData0[2] +
-															 m_artifacts[artifactIndex + 1] * 0x48);
-			unsigned short slots = artifactData[3];
-			switch (artifactData[0]) {
-			case 0xDB:
-				totalSlots += slots;
-				break;
-			case 0x9F:
-			case 0xB6:
-			case 0xCC:
-			case 0xDF:
-			case 0xE4:
-			default:
-				break;
+		if ((artifactIndex + 1) < 96) {
+			int artifactId = m_artifacts[artifactIndex + 1];
+			if (artifactId > 0) {
+				unsigned short* artifactData = (unsigned short*)(Game.unkCFlatData0[2] +
+																 artifactId * 0x48);
+				unsigned short slots = artifactData[3];
+				switch (artifactData[0]) {
+				case 0xDB:
+					totalSlots += slots;
+					break;
+				case 0x9F:
+				case 0xB6:
+				case 0xCC:
+				case 0xDF:
+				case 0xE4:
+				default:
+					break;
+				}
 			}
 		}
 	}
@@ -2141,11 +2147,7 @@ unsigned int CCaravanWork::GetMagicCharge(int cmdListIdx, int&, int&)
 			groupedCountLocal = 1;
 		} else {
 			int topIdx = cmdListIdx;
-			int scanCount = cmdListIdx + 1;
-			for (; scanCount != 0; scanCount--) {
-				if (cmdListIdx < 0) {
-					break;
-				}
+			for (int n = cmdListIdx; n >= 0; n--) {
 				if (m_commandListExtra[topIdx] != -1) {
 					break;
 				}
@@ -2155,10 +2157,7 @@ unsigned int CCaravanWork::GetMagicCharge(int cmdListIdx, int&, int&)
 			groupedCountLocal = 1;
 			int nextIdx = topIdx + 1;
 			int numSlots = static_cast<short>(m_numCmdListSlots);
-			for (int remaining = numSlots - nextIdx; remaining != 0; remaining--) {
-				if (nextIdx >= numSlots) {
-					break;
-				}
+			for (int n = topIdx + 1; n < numSlots; n++) {
 				if (m_commandListExtra[nextIdx] != -1) {
 					break;
 				}
@@ -2171,14 +2170,11 @@ unsigned int CCaravanWork::GetMagicCharge(int cmdListIdx, int&, int&)
 	if (groupedCountLocal == 1) {
 		return (((unsigned int)__cntlzw(cmdListIdx - static_cast<short>(m_currentCmdListIndex))) >> 5) & 0xFF;
 	} else {
-		int scanCount = cmdListIdx + 1;
-		if (cmdListIdx >= 0) {
-			for (; scanCount != 0; scanCount--) {
-				if (m_commandListExtra[cmdListIdx] != -1) {
-					break;
-				}
-				cmdListIdx--;
+		for (int n = cmdListIdx; n >= 0; n--) {
+			if (m_commandListExtra[cmdListIdx] != -1) {
+				break;
 			}
+			cmdListIdx--;
 		}
 
 		unsigned int selected = 0;
@@ -2209,41 +2205,32 @@ int CCaravanWork::GetCmdListItemName(int cmdListIdx, int* firstCmdIdx, int* item
 		if (m_commandListExtra[cmdListIdx] == 0) {
 			groupedCount = 1;
 		} else {
-			int scanCount = cmdListIdx + 1;
 			int topIdx = cmdListIdx;
-			if (topIdx >= 0) {
-				for (; scanCount != 0; scanCount--) {
-					if (m_commandListExtra[topIdx] != -1) {
-						break;
-					}
-					topIdx--;
+			for (int n = cmdListIdx; n >= 0; n--) {
+				if (m_commandListExtra[topIdx] != -1) {
+					break;
 				}
+				topIdx--;
 			}
 
 			groupedCount = 1;
-			scanCount = static_cast<short>(m_numCmdListSlots) - (topIdx + 1);
 			int nextIdx = topIdx + 1;
-			if (nextIdx < static_cast<short>(m_numCmdListSlots)) {
-				for (; scanCount != 0; scanCount--) {
-					if (m_commandListExtra[nextIdx] != -1) {
-						break;
-					}
-					groupedCount++;
-					nextIdx++;
+			for (int n = topIdx + 1; n < static_cast<short>(m_numCmdListSlots); n++) {
+				if (m_commandListExtra[nextIdx] != -1) {
+					break;
 				}
+				groupedCount++;
+				nextIdx++;
 			}
 		}
 	}
 
 	if (groupedCount > 1) {
-		int scanCount = cmdListIdx + 1;
-		if (cmdListIdx >= 0) {
-			for (; scanCount != 0; scanCount--) {
-				if (m_commandListExtra[cmdListIdx] != -1) {
-					break;
-				}
-				cmdListIdx--;
+		for (int n = cmdListIdx; n >= 0; n--) {
+			if (m_commandListExtra[cmdListIdx] != -1) {
+				break;
 			}
+			cmdListIdx--;
 		}
 
 		short cmdId = m_commandListExtra[cmdListIdx];
@@ -2354,43 +2341,31 @@ int CCaravanWork::DelCmdListAndItem(int cmdListIdx)
 		} else if (m_commandListExtra[cmdListIdx] == 0) {
 			numGrouped = 1;
 		} else {
-			int scanCount = cmdListIdx + 1;
 			int topIdx = cmdListIdx;
-			if (cmdListIdx >= 0) {
-				while (scanCount != 0) {
-					if (m_commandListExtra[topIdx] != -1) {
-						break;
-					}
-					topIdx--;
-					scanCount--;
+			for (int n = cmdListIdx; n >= 0; n--) {
+				if (m_commandListExtra[topIdx] != -1) {
+					break;
 				}
+				topIdx--;
 			}
 
 			numGrouped = 1;
-			scanCount = (short)m_numCmdListSlots - (topIdx + 1);
 			int nextIdx = topIdx + 1;
-			if ((topIdx + 1) < (short)m_numCmdListSlots) {
-				while (scanCount != 0) {
-					if (m_commandListExtra[nextIdx] != -1) {
-						break;
-					}
-					numGrouped++;
-					nextIdx++;
-					scanCount--;
+			for (int n = topIdx + 1; n < (short)m_numCmdListSlots; n++) {
+				if (m_commandListExtra[nextIdx] != -1) {
+					break;
 				}
+				numGrouped++;
+				nextIdx++;
 			}
 		}
 
 		if (numGrouped > 1) {
-			int scanCount = cmdListIdx + 1;
-			if (cmdListIdx >= 0) {
-				while (scanCount != 0) {
-					if (m_commandListExtra[cmdListIdx] != -1) {
-						break;
-					}
-					cmdListIdx--;
-					scanCount--;
+			for (int n = cmdListIdx; n >= 0; n--) {
+				if (m_commandListExtra[cmdListIdx] != -1) {
+					break;
 				}
+				cmdListIdx--;
 			}
 
 			int cmdResult = m_commandListExtra[cmdListIdx];
@@ -2755,39 +2730,45 @@ int CCaravanWork::GetArtifactIncludeHpMax()
 	int count = 0x32;
 
 	while (count != 0) {
-		if ((artifactIndex < 0x60) && ((short)m_artifacts[artifactIndex] > 0)) {
-			unsigned short* artifactData = artifactDataBase + ((short)m_artifacts[artifactIndex] * 0x24);
-			unsigned short artifactType = artifactData[0];
-			unsigned short artifactValue = artifactData[3];
+		if (artifactIndex < 0x60) {
+			int artifactId = m_artifacts[artifactIndex];
+			if (artifactId > 0) {
+				unsigned short* artifactData = artifactDataBase + (artifactId * 0x24);
+				unsigned short artifactType = artifactData[0];
+				unsigned short artifactValue = artifactData[3];
 
-			switch (artifactType) {
-			case 0x9F:
-			case 0xB6:
-			case 0xCC:
-			case 0xDB:
-			case 0xDF:
-				break;
-			case 0xE4:
-				hpMax += artifactValue;
-				break;
+				switch (artifactType) {
+				case 0x9F:
+				case 0xB6:
+				case 0xCC:
+				case 0xDB:
+				case 0xDF:
+					break;
+				case 0xE4:
+					hpMax += artifactValue;
+					break;
+				}
 			}
 		}
 
-		if (((artifactIndex + 1) < 0x60) && ((short)m_artifacts[artifactIndex + 1] > 0)) {
-			unsigned short* artifactData = artifactDataBase + ((short)m_artifacts[artifactIndex + 1] * 0x24);
-			unsigned short artifactType = artifactData[0];
-			unsigned short artifactValue = artifactData[3];
+		if ((artifactIndex + 1) < 0x60) {
+			int artifactId = m_artifacts[artifactIndex + 1];
+			if (artifactId > 0) {
+				unsigned short* artifactData = artifactDataBase + (artifactId * 0x24);
+				unsigned short artifactType = artifactData[0];
+				unsigned short artifactValue = artifactData[3];
 
-			switch (artifactType) {
-			case 0x9F:
-			case 0xB6:
-			case 0xCC:
-			case 0xDB:
-			case 0xDF:
-				break;
-			case 0xE4:
-				hpMax += artifactValue;
-				break;
+				switch (artifactType) {
+				case 0x9F:
+				case 0xB6:
+				case 0xCC:
+				case 0xDB:
+				case 0xDF:
+					break;
+				case 0xE4:
+					hpMax += artifactValue;
+					break;
+				}
 			}
 		}
 

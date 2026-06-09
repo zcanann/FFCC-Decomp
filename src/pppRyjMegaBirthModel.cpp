@@ -689,9 +689,12 @@ join_position:
 
             if (((params->m_rotationRandomFlags & 1) != 0) && ((params->m_rotationRandomFlags & 2) != 0)) {
                 if (MegaBirthHalfDouble() < (double)Math.RandF()) {
-                    *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) * kPppRyjMegaBirthModelNegOneZeroPair[0];
-                    *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) * kPppRyjMegaBirthModelNegOneZeroPair[0];
-                    *f32_at(particleData, 0x7C) = *f32_at(particleData, 0x7C) * kPppRyjMegaBirthModelNegOneZeroPair[0];
+                    float v74 = *f32_at(particleData, 0x74);
+                    *f32_at(particleData, 0x74) = v74 * kPppRyjMegaBirthModelNegOneZeroPair[0];
+                    float v78 = *f32_at(particleData, 0x78);
+                    *f32_at(particleData, 0x78) = v78 * kPppRyjMegaBirthModelNegOneZeroPair[0];
+                    float v7C = *f32_at(particleData, 0x7C);
+                    *f32_at(particleData, 0x7C) = v7C * kPppRyjMegaBirthModelNegOneZeroPair[0];
                 }
             } else if ((params->m_rotationRandomFlags & 2) != 0) {
                 float v74 = *f32_at(particleData, 0x74);

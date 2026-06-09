@@ -147,9 +147,12 @@ static inline void calc_spawn_position(Vec* out, float speed, u8 mode)
 	switch (mode) {
 	case 1:
 		(void)Math.RandF();
-		out->x = speed * Math.RandF() - halfSpeed;
-		out->y = speed * Math.RandF() - halfSpeed;
-		out->z = speed * Math.RandF() - halfSpeed;
+		out->x = speed * Math.RandF();
+		out->x = out->x - halfSpeed;
+		out->y = speed * Math.RandF();
+		out->y = out->y - halfSpeed;
+		out->z = speed * Math.RandF();
+		out->z = out->z - halfSpeed;
 		break;
 	case 2:
 		out->x = speed * Math.RandF() * Math.RandF() - halfSpeed;

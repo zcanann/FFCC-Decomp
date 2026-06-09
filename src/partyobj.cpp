@@ -1993,7 +1993,7 @@ void CGPartyObj::onFrameStat()
 				endPSlotBit(0x10000);
 				m_alpha = kMonObjOne;
 				m_bgColMask |= 0x1000E;
-				*reinterpret_cast<unsigned short*>(script + 0x12) = 0x5A;
+				*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x48) = 0x5A;
 			} else {
 				m_alpha = FLOAT_80331A7C;
 				m_bgColMask &= 0xFFFEFFF1;

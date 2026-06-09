@@ -4404,23 +4404,33 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     mng->m_useOwnerScaleSign = 0;
     reinterpret_cast<_pppMngSt*>(mng)->m_owner = 0;
 
-    const signed char mode = *reinterpret_cast<signed char*>(fpData2 + 0x05);
-    if (mode == 2 || mode == 4) {
+    const unsigned char mode = *reinterpret_cast<unsigned char*>(fpData2 + 0x05);
+    switch (mode) {
+    case 2:
+    case 4:
         mng->m_mapObjIndex = static_cast<short>(MapMng.GetMapObjEffectIdx(*reinterpret_cast<short*>(fpData2 + 0x08)));
-    } else if (mode >= 3 && mode <= 8) {
+        break;
+    case 3:
+    case 5:
+    case 6:
+    case 7:
+    case 8:
         mng->m_ownerFacing = 0;
-        CGObject* owner = reinterpret_cast<CGObject*>(createParam->m_paramB);
-        reinterpret_cast<_pppMngSt*>(mng)->m_owner = owner;
-        reinterpret_cast<_pppMngSt*>(mng)->m_lookTarget = createParam->m_lookTargetPtr;
-        if (owner != 0 && owner->m_charaModelHandle != 0 && owner->m_charaModelHandle->m_model != 0) {
-            int node = owner->m_charaModelHandle->m_model->SearchNodeSk(reinterpret_cast<char*>(fpData2 + 0x10));
-            if (node >= 0) {
-                *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(mng) + 0xE0) =
-                    *reinterpret_cast<int*>(
-                        reinterpret_cast<unsigned char*>(owner->m_charaModelHandle->m_model) + 0xA8) +
-                    node * 0xC0;
+        {
+            CGObject* owner = reinterpret_cast<CGObject*>(createParam->m_paramB);
+            reinterpret_cast<_pppMngSt*>(mng)->m_owner = owner;
+            reinterpret_cast<_pppMngSt*>(mng)->m_lookTarget = createParam->m_lookTargetPtr;
+            if (owner != 0 && owner->m_charaModelHandle != 0 && owner->m_charaModelHandle->m_model != 0) {
+                int node = owner->m_charaModelHandle->m_model->SearchNodeSk(reinterpret_cast<char*>(fpData2 + 0x10));
+                if (node >= 0) {
+                    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(mng) + 0xE0) =
+                        *reinterpret_cast<int*>(
+                            reinterpret_cast<unsigned char*>(owner->m_charaModelHandle->m_model) + 0xA8) +
+                        node * 0xC0;
+                }
             }
         }
+        break;
     }
 
     return freeIdx;

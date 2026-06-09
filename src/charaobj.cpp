@@ -3580,12 +3580,16 @@ void CGCharaObj::combi2()
 		unsigned int comboMode = 0xFFFFFFFF;
 
 		if (!isSharedResult) {
-			if (comboCmd == 0x207) {
+			switch (comboCmd) {
+			case 0x207:
 				comboMode = 0;
-			} else if (comboCmd == 0x20B) {
+				break;
+			case 0x20B:
 				comboMode = 1;
-			} else if (comboCmd == 0x20F) {
+				break;
+			case 0x20F:
 				comboMode = 2;
+				break;
 			}
 
 			if (party == leadParty) {

@@ -232,7 +232,7 @@ void CGBaseObj::onFrame()
  * JP Size: TODO
  */
 #pragma push
-#pragma optimization_level 2
+#pragma optimization_level 3
 void CGObject::onCreate()
 {
     m_worldPosition.z = 0.0f;
@@ -263,7 +263,7 @@ void CGObject::onCreate()
     m_weaponModelHandle = 0;
     m_shieldModelHandle = 0;
 
-    m_animStateMisc = 0xFF;
+    *reinterpret_cast<char*>(&m_animStateMisc) = -1;
     m_weaponNodeFlagAll.m_bits1.m_shield = 0;
     m_weaponNodeFlagAll.m_bits1.m_menuReady = 1;
 
@@ -341,10 +341,7 @@ void CGObject::onCreate()
     m_radiusCtrlVel.z = m_radiusCtrl.z;
     m_groundFriction = m_radiusCtrlVel.x;
 
-    m_moveAnimState = 0;
-    m_moveAnimSubState = 0;
-    m_randSeedLo = 0;
-    m_randSeedHi = 0;
+    *reinterpret_cast<u32*>(&m_moveAnimState) = 0;
     m_stateFlags0Bits.unk4 = 0;
     m_ownerSlot = 0;
     m_stateFlags0Bits.unk0 = 0;
@@ -486,8 +483,8 @@ void CGObject::move()
         m_groundHitOffset.y = sZeroFloat;
     }
 
-    bool movingWithScript = false;
-    bool hasStickInput = false;
+    int movingWithScript = 0;
+    int hasStickInput = 0;
     m_groundHitOffset.y += m_gravityY;
     Vec moveVec;
 
@@ -529,9 +526,9 @@ void CGObject::move()
             gCFlatRuntime().SystemCall(this, 2, 7, 1, &stack, 0);
         }
 
-        movingWithScript = true;
+        movingWithScript = 1;
     } else {
-        const s8 player = m_animStateMisc;
+        const int player = static_cast<s8>(m_animStateMisc);
         if ((player >= 0)
             && (player < 4)
             && m_weaponNodeFlagAll.m_bits1.m_shield
@@ -562,7 +559,7 @@ void CGObject::move()
                 moveVec.x = sZeroFloat - stickX;
                 moveVec.z = sZeroFloat + stickY;
                 if ((moveVec.x != sZeroFloat) || (moveVec.z != sZeroFloat)) {
-                    hasStickInput = true;
+                    hasStickInput = 1;
                 }
             }
 
@@ -1649,7 +1646,7 @@ void CGObject::update()
                 m_currentAnimSlot != -1 || m_animSlotSel != static_cast<signed char>(shieldFlagsHi)) {
                 m_charaModelHandle->m_model->CalcMatrix();
             }
-            if (static_cast<s32>(static_cast<u32>(weaponFlagsLo) << 26 | static_cast<u32>(weaponFlagsLo) >> 6) < 0 &&
+            if (m_weaponNodeFlagBits.m_unk04 &&
                 miniGameModelPass == 0) {
                 m_charaModelHandle->m_model->CalcSkin();
             }
@@ -3386,7 +3383,7 @@ void CGObject::PutDropItem()
         if (dropCode > 0) {
             int createMode;
             if ((dropCode & 0xC000) == 0x4000) {
-                dropCode &= 0x3FFF;
+                dropCode &= ~0xC000;
                 createMode = 2;
             } else {
                 createMode = 0;

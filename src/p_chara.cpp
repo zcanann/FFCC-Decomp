@@ -1826,7 +1826,9 @@ checkLoaded:
                             CLoadTexture* loadTexture = 0;
                             for (unsigned int i = 0; i < static_cast<unsigned int>(LoadTextureArray(pcs)->GetSize()); i++) {
                                 CLoadTexture* it = (*LoadTextureArray(pcs))[i];
-                                if (it->m_keyTag == keyTag && it->m_keyId == keyId && it->m_variantTag == variantTag) {
+                                if (reinterpret_cast<int>(it->m_keyTag) == reinterpret_cast<int>(keyTag) &&
+                                    static_cast<unsigned int>(it->m_keyId) == static_cast<unsigned int>(keyId) &&
+                                    it->m_variantTag == variantTag) {
                                     loadTexture = it;
                                     break;
                                 }
@@ -1866,7 +1868,7 @@ checkLoaded:
                             CLoadAnim* loadAnim = 0;
                             for (unsigned int i = 0; i < static_cast<unsigned int>(LoadAnimArray(pcs)->GetSize()); i++) {
                                 CLoadAnim* it = (*LoadAnimArray(pcs))[i];
-                                if (it->m_keyTag == keyTag && it->m_keyId == keyId &&
+                                if (reinterpret_cast<int>(it->m_keyTag) == reinterpret_cast<int>(keyTag) && it->m_keyId == keyId &&
                                     strcmp(animName, it->m_name) == 0) {
                                     loadAnim = it;
                                     break;
@@ -1902,7 +1904,9 @@ checkLoaded:
                             CLoadPdt* loadPdt = 0;
                             for (unsigned int i = 0; i < static_cast<unsigned int>(LoadPdtArray(pcs)->GetSize()); i++) {
                                 CLoadPdt* it = (*LoadPdtArray(pcs))[i];
-                                if (it->m_keyTag == keyTag && it->m_keyId == keyId && it->m_variantTag == variantTag) {
+                                if (reinterpret_cast<int>(it->m_keyTag) == reinterpret_cast<int>(keyTag) &&
+                                    static_cast<unsigned int>(it->m_keyId) == static_cast<unsigned int>(keyId) &&
+                                    it->m_variantTag == variantTag) {
                                     loadPdt = it;
                                     break;
                                 }

@@ -2071,10 +2071,11 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 	};
 
 	pppMngStDeadRaw* mng = (pppMngStDeadRaw*)pppMngSt;
-	u32 maxDeleteFrame = 0;
+	u32 maxDeleteFrame;
 
 	if (ppvUserStopPartF == 0)
 	{
+		maxDeleteFrame = 0;
 		_pppPObjLink* prev = &mng->m_objHead;
 		for (_pppPObjLink* obj = prev->m_next; obj != 0;)
 		{

@@ -756,10 +756,10 @@ void CGraphicPcs::drawBar()
 
         if (priority == 0x26) {
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-            GXPosition3f32(x, drawText ? static_cast<float>(y) : kDebugBarMoveBottom, kGraphicZero);
+            GXPosition3f32(x, drawText ? static_cast<float>(static_cast<int>(y)) : kDebugBarMoveBottom, kGraphicZero);
             GXColor1u32(*reinterpret_cast<u32*>(&rgb));
             GXTexCoord2u16(0, 0);
-            GXPosition3f32(x + width + kGraphicOne, drawText ? static_cast<float>(y) : kDebugBarMoveBottom, kGraphicZero);
+            GXPosition3f32(x + width + kGraphicOne, drawText ? static_cast<float>(static_cast<int>(y)) : kDebugBarMoveBottom, kGraphicZero);
             GXColor1u32(*reinterpret_cast<u32*>(&rgb));
             GXTexCoord2u16(2, 0);
             GXPosition3f32(x + width + kGraphicOne, kDebugBarTop, kGraphicZero);
@@ -771,10 +771,10 @@ void CGraphicPcs::drawBar()
             x += width;
         } else if (priority != 0x27) {
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-            GXPosition3f32(x, drawText ? static_cast<float>(y) : kDebugBarObjectTop, kGraphicZero);
+            GXPosition3f32(x, drawText ? static_cast<float>(static_cast<int>(y)) : kDebugBarObjectTop, kGraphicZero);
             GXColor1u32(*reinterpret_cast<u32*>(&rgb));
             GXTexCoord2u16(0, 0);
-            GXPosition3f32(x + width + kGraphicOne, drawText ? static_cast<float>(y) : kDebugBarObjectTop, kGraphicZero);
+            GXPosition3f32(x + width + kGraphicOne, drawText ? static_cast<float>(static_cast<int>(y)) : kDebugBarObjectTop, kGraphicZero);
             GXColor1u32(*reinterpret_cast<u32*>(&rgb));
             GXTexCoord2u16(2, 0);
             GXPosition3f32(x + width + kGraphicOne, kDebugBarMoveBottom, kGraphicZero);
@@ -798,10 +798,10 @@ void CGraphicPcs::drawBar()
             const float soundWidth = (kGraphicScreenCenterX * Sound.GetPerformance()) / kDebugBarFrameBudget;
 
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-            GXPosition3f32(x, drawText ? static_cast<float>(y) : kDebugBarMoveBottom, kGraphicZero);
+            GXPosition3f32(x, drawText ? static_cast<float>(static_cast<int>(y)) : kDebugBarMoveBottom, kGraphicZero);
             GXColor1u32(soundColor);
             GXTexCoord2u16(0, 0);
-            GXPosition3f32(x + soundWidth + kGraphicOne, drawText ? static_cast<float>(y) : kDebugBarMoveBottom, kGraphicZero);
+            GXPosition3f32(x + soundWidth + kGraphicOne, drawText ? static_cast<float>(static_cast<int>(y)) : kDebugBarMoveBottom, kGraphicZero);
             GXColor1u32(soundColor);
             GXTexCoord2u16(2, 0);
             GXPosition3f32(x + soundWidth + kGraphicOne, kDebugBarTop, kGraphicZero);

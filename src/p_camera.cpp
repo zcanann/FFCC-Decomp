@@ -1306,15 +1306,17 @@ void CCameraPcs::calcMap()
     }
 
     if ((buttons & 0x1) != 0) {
-        sideVec.y = kCameraZeroF;
+        sideVec.x = kCameraZeroF;
         sideVec.z = kCameraZeroF;
+        sideVec.y = kCameraZeroF;
         sideVec.x = kCameraDebugMoveStep;
         PSMTXMultVecSR(rotMtx, &sideVec, &sideVec);
         sideVec.y = kCameraZeroF;
         PSVECAdd(&sideVec, &moveDelta, &moveDelta);
     } else if ((buttons & 0x2) != 0) {
-        sideVec.y = kCameraZeroF;
+        sideVec.x = kCameraZeroF;
         sideVec.z = kCameraZeroF;
+        sideVec.y = kCameraZeroF;
         sideVec.x = kCameraNegativeDebugMoveStep;
         PSMTXMultVecSR(rotMtx, &sideVec, &sideVec);
         sideVec.y = kCameraZeroF;

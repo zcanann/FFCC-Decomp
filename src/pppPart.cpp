@@ -1054,7 +1054,7 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 				s16* mapMeshIndices = (s16*)(mapTexRef + *(u32*)(mapTexRef + 0x10));
 				s16* shapeIndices = (s16*)(mapTexRef + *(u32*)(mapTexRef + 0x14));
 
-				s16 mapMeshCount = *mapMeshIndices;
+				u16 mapMeshCount = *mapMeshIndices;
 				mapMeshIndices++;
 				for (s16 i = 0; i < mapMeshCount; i++)
 				{

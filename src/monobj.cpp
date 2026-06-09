@@ -3200,19 +3200,23 @@ void CGMonObj::moveFrame()
 	}
 
 	CVector moveDelta;
-	if ((moveFlags & 0x1000) == 0) {
+	if ((moveFlags & 0x1000) != 0) {
+		moveDelta.x = local_74.x;
+		moveDelta.y = local_74.y;
+		moveDelta.z = local_74.z;
+	} else {
 		if (__fabs(distance) < kMonObjSmallStepF64) {
 			CVector zero(0.0f, 0.0f, 0.0f);
 			moveDelta.x = zero.x;
 			moveDelta.y = zero.y;
 			moveDelta.z = zero.z;
 		} else {
-			PSVECScale(reinterpret_cast<Vec*>(&local_74), static_cast<Vec*>(moveDelta), (1.0f / distance) * stepDist);
+			CVector scaledStep;
+			PSVECScale(reinterpret_cast<Vec*>(&local_74), static_cast<Vec*>(scaledStep), (1.0f / distance) * stepDist);
+			moveDelta.x = scaledStep.x;
+			moveDelta.y = scaledStep.y;
+			moveDelta.z = scaledStep.z;
 		}
-	} else {
-		moveDelta.x = local_74.x;
-		moveDelta.y = local_74.y;
-		moveDelta.z = local_74.z;
 	}
 
 	if ((moveFlags & 0x4000) != 0) {
@@ -3230,7 +3234,7 @@ void CGMonObj::moveFrame()
 	}
 
 	if (((moveFlags & 0x20) == 0 || !(stepRemaining < moveRange)) &&
-		((moveFlags & 0x40) == 0 || stepRemaining < moveRange)) {
+		((moveFlags & 0x40) == 0 || !(moveRange <= stepRemaining))) {
 		if ((moveFrame == 0) && ((moveFlags & 0x400) == 0)) {
 			reinterpret_cast<CGPrgObj*>(this)->reqAnim(1, 1, 0);
 		}

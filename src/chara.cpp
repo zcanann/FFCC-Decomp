@@ -1572,7 +1572,7 @@ void CChara::CModel::calcMatrix()
 			if (NodeAnimNode0(node) != 0) {
 				Mtx animMtx;
 				NodeAnimNode0(node)->Interp(m_anim, reinterpret_cast<SRT*>(&srt), frame);
-				u16 nodeIndex = ref->m_index;
+				s16 nodeIndex = ref->m_index;
 				if (nodeIndex == ModelHeadIndex(this) || nodeIndex == ModelChest3Index(this) ||
 				    nodeIndex == ModelChest2Index(this)) {
 					float tiltScale;
@@ -1611,7 +1611,7 @@ void CChara::CModel::calcMatrix()
 			}
 		}
 
-		u16 blendCur = ModelBlendCur(this);
+		s16 blendCur = ModelBlendCur(this);
 		if (blendCur != 0) {
 			u16 blendMax = ModelBlendMax(this);
 			float alpha = FLOAT_803301BC - (static_cast<float>(blendCur) * (FLOAT_803301BC / static_cast<float>(blendMax)));

@@ -3206,9 +3206,9 @@ void CPartMng::pppDraw()
 
     Mtx invCamera;
     Vec cameraPos;
+    Vec viewPos;
     Vec partPos;
     Vec cameraDelta;
-    Vec viewPos;
 
     m_pppEnvSt.m_debugCounter = 0;
     PSMTXInverse(ppvCameraMatrix, invCamera);

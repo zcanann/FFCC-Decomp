@@ -3703,7 +3703,7 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 						if (itemMatch) {
 							int closeOk;
 							if (partyList[0] == reinterpret_cast<CGPartyObj*>(partyObj) ||
-								reinterpret_cast<CGCharaObj*>(partyList[0])->m_comboFrame <= static_cast<int>(slotCursor[2])) {
+								static_cast<int>(slotCursor[2]) >= reinterpret_cast<CGCharaObj*>(partyList[0])->m_comboFrame) {
 								closeOk = 1;
 							} else {
 								closeOk = 0;

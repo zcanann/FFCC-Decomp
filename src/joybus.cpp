@@ -689,7 +689,7 @@ loop_body:
             OSExitThread(&gJoyBusThreadExitValue);
         }
 
-        if (GbaQue.IsSingleMode(threadParam->m_portIndex) && threadParam->m_portIndex != 1)
+        if (GbaQue.IsSingleMode(threadParam->m_portIndex) && (int)threadParam->m_portIndex != 1)
         {
             threadParam->m_state = 0;
             stateStartTime = OSGetTime();
@@ -723,7 +723,7 @@ loop_body:
         }
 
         unsigned int statusIndex;
-        if (GbaQue.IsSingleMode(threadParam->m_portIndex) && threadParam->m_portIndex == 1)
+        if (GbaQue.IsSingleMode(threadParam->m_portIndex) && (int)threadParam->m_portIndex == 1)
         {
             statusIndex = 0;
         }
@@ -803,7 +803,7 @@ timeout_expiry:
             {
                 threadParam->m_prevState = threadParam->m_state;
 
-                if (threadParam->m_gbaStatus == 3)
+                if ((int)threadParam->m_gbaStatus == 3)
                 {
                     threadParam->m_state = (unsigned char)0x86;
                 }
@@ -859,12 +859,12 @@ timeout_expiry:
                 GBAJoyBoot(threadParam->m_portIndex, threadParam->m_portIndex << 1, 2, reinterpret_cast<unsigned char*>(m_gbaBootImage), m_gbaBootImageSize,
                            &threadParam->m_unk3);
 
-            if (threadParam->m_gbaStatus == 3 && (threadParam->m_unk3 & 0x10) != 0)
+            if ((int)threadParam->m_gbaStatus == 3 && (threadParam->m_unk3 & 0x10) != 0)
             {
                 threadParam->m_flags[0] = 0;
                 threadParam->m_state    = 4;
             }
-            else if (threadParam->m_gbaStatus == 0)
+            else if ((int)threadParam->m_gbaStatus == 0)
             {
                 unsigned char cm = GbaQue.GetControllerMode();
 
@@ -881,7 +881,7 @@ timeout_expiry:
                 ThreadSleep(OSMillisecondsToTicks(15));
                 stateStartTime = OSGetTime();
             }
-            else if (threadParam->m_gbaStatus == 3)
+            else if ((int)threadParam->m_gbaStatus == 3)
             {
                 int stat = GetGBAStat(threadParam);
                 if (stat == 0)
@@ -930,7 +930,7 @@ timeout_expiry:
 
             threadParam->m_gbaStatus = GBAReset(threadParam->m_portIndex, &threadParam->m_unk3);
 
-            if (threadParam->m_gbaStatus == 0)
+            if ((int)threadParam->m_gbaStatus == 0)
             {
                 threadParam->m_state    = 2;
                 threadParam->m_subState = 0;
@@ -953,14 +953,14 @@ timeout_expiry:
                     GBAJoyBoot(threadParam->m_portIndex, threadParam->m_portIndex << 1, 2,
                                reinterpret_cast<unsigned char*>(m_gbaBootImage), m_gbaBootImageSize,
                                &threadParam->m_unk3);
-                if (threadParam->m_gbaStatus == 1)
+                if ((int)threadParam->m_gbaStatus == 1)
                 {
                     break;
                 }
                 bootRetry++;
             } while (bootRetry < 100);
 
-            if (threadParam->m_gbaStatus == 1)
+            if ((int)threadParam->m_gbaStatus == 1)
             {
                 threadParam->m_state = 0;
                 ThreadSleep(OSMillisecondsToTicks(15));

@@ -3032,6 +3032,7 @@ void CPartMng::pppDrawPrioPdtFpno(unsigned char drawMode, short kind, short node
         float m_cullRadius;                  // 0x10C
         float m_cullYOffset;                 // 0x110
         float m_sortDepth;                   // 0x114
+        unsigned char m_pad118[0x158 - 0x118]; // 0x118
     };
 
     Mtx invCamera;

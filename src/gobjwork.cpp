@@ -2203,6 +2203,8 @@ unsigned int CCaravanWork::GetMagicCharge(int cmdListIdx, int&, int&)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_common_subs off
 int CCaravanWork::GetCmdListItemName(int cmdListIdx, int* firstCmdIdx, int* itemCmdListIdx)
 {
 	int groupedCount;
@@ -2260,6 +2262,7 @@ int CCaravanWork::GetCmdListItemName(int cmdListIdx, int* firstCmdIdx, int* item
 
 	return 0;
 }
+#pragma pop
 
 /*
  * --INFO--

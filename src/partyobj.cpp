@@ -2750,7 +2750,7 @@ void CGPartyObj::checkTargetParticle()
 #define centerPos (&m_comboTarget)
 		float maxRange;
 
-		party.partyFlags |= 0x20;
+		party.flags.flag20 = 1;
 		input.Normalize();
 		PSVECScale(reinterpret_cast<Vec*>(&input), reinterpret_cast<Vec*>(&input), FLOAT_80331ad4);
 

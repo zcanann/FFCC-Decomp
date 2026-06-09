@@ -2737,7 +2737,7 @@ void CGoOutMenu::Calc()
                     break;
                 }
                 case 2: {
-                    unsigned int activeCount = 0;
+                    int activeCount = 0;
                     for (int i = 0; i < 8; i++) {
                         if (Game.m_caravanWorkArr[i].m_shopState != 0) {
                             activeCount++;

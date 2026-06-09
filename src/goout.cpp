@@ -658,7 +658,7 @@ void DrawGoOutMenu()
 {
     CGoOutMenu& goOutMenu = g_GoOutMenu;
     g_pGoOutMenu = &goOutMenu;
-    signed char mode = goOutMenu.m_mainMode;
+    unsigned char mode = goOutMenu.m_mainMode;
 
     switch (mode) {
     case 2:

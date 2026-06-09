@@ -1743,7 +1743,7 @@ void CGPartyObj::onFrameStat()
 		    Game.m_partyObjArr[1] != nullptr &&
 		    Game.m_partyObjArr[1]->m_lastStateId == 0) {
 			unsigned short held = getPadHeldForSlot(static_cast<signed char>(m_animStateMisc));
-			unsigned short up = getPadButtonUpForSlot(static_cast<signed char>(m_animStateMisc));
+			unsigned short up = getPadButtonUpForSlot(static_cast<char>(m_animStateMisc));
 			if ((up & 0x400) != 0) {
 				if (sGhostMogMenuWork.holdTimer < 10 &&
 				    party.carryObject != reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)) {
@@ -1804,7 +1804,7 @@ void CGPartyObj::onFrameStat()
 		if (isLoopAnim() != 0) {
 			short mapId = *reinterpret_cast<short*>(&m_lastMapIdHit);
 			if (party.carryObject == nullptr) {
-				if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+				if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
 					if (mapId == 1) {
 						SetAnimSlot(0x25, 0);
 						SetAnimSlot(0x24, 1);

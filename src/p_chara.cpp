@@ -945,8 +945,11 @@ int CCharaPcs::correctLoadAnimAmem()
             CChara::CAnim* anim = loadAnim->m_anim;
             const unsigned int animOffset = static_cast<unsigned int>(anim->m_bankAddress);
             const int animSize = static_cast<int>(anim->m_bankSize);
+            if (animOffset < static_cast<unsigned int>(scanOffset)) {
+                continue;
+            }
             const unsigned int animEnd = animOffset + static_cast<unsigned int>(animSize);
-            if (animOffset < static_cast<unsigned int>(scanOffset) || animEnd >= scanEnd) {
+            if (animEnd >= scanEnd) {
                 continue;
             }
 

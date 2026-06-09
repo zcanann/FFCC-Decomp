@@ -1776,13 +1776,25 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 
 		if (damageAmount != 0) {
 			addHp(-damageAmount, sourceObj);
-			bool selfHasGuard = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0;
+			int selfHasGuard = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0;
 			if (selfHasGuard) {
 				bonus(0, resolvedItemId, sourceObj);
 				sourceObj->bonus(1, resolvedItemId, this);
 			}
-			if ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + resolvedItemId * 0x48 + 0x32) & 1) == 0 &&
-			    ((static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) != 0x6D || static_cast<unsigned int>(sourceObj->m_capsuleHalfHeight) < 0)) {
+			if ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + resolvedItemId * 0x48 + 0x32) & 1) != 0 ||
+			    ((static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D && sourceChara->m_comboItemState >= 0)) {
+				bonus(0x15, resolvedItemId, sourceObj);
+				sourceObj->bonus(0x11, resolvedItemId, this);
+				if (selfHasGuard) {
+					sourceObj->bonus(0xC, resolvedItemId, this);
+				}
+				for (int i = 0; i < sourceChara->m_comboLinkCount; i++) {
+					sourceChara->m_comboLinks[i]->bonus(0x11, resolvedItemId, this);
+					if (selfHasGuard) {
+						sourceChara->m_comboLinks[i]->bonus(0xC, resolvedItemId, this);
+					}
+				}
+			} else {
 				if (itemEffect == 0x1F8 || particleLife != 2) {
 					if (itemEffect == 0x1F8) {
 						bonus(0x13, resolvedItemId, sourceObj);
@@ -1796,18 +1808,6 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 						if (selfHasGuard) {
 							sourceObj->bonus(9, resolvedItemId, this);
 						}
-					}
-				}
-			} else {
-				bonus(0x15, resolvedItemId, sourceObj);
-				sourceObj->bonus(0x11, resolvedItemId, this);
-				if (selfHasGuard) {
-					sourceObj->bonus(0xC, resolvedItemId, this);
-				}
-				for (int i = 0; i < sourceChara->m_comboLinkCount; i++) {
-					sourceChara->m_comboLinks[i]->bonus(0x11, resolvedItemId, this);
-					if (selfHasGuard) {
-						sourceChara->m_comboLinks[i]->bonus(0xC, resolvedItemId, this);
 					}
 				}
 			}

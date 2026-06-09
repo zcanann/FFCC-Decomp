@@ -3224,8 +3224,9 @@ void CGMonObj::moveFrame()
 		object->m_rotTargetY = rotY;
 	}
 
-	if (((moveFlags & 0x20) == 0 || moveRange <= (in_f29 - stepDist)) &&
-		((moveFlags & 0x40) == 0 || (in_f29 - stepDist) < moveRange)) {
+	float stepRemaining = in_f29 - stepDist;
+	if (((moveFlags & 0x20) == 0 || !(stepRemaining < moveRange)) &&
+		((moveFlags & 0x40) == 0 || stepRemaining < moveRange)) {
 		if ((moveFrame == 0) && ((moveFlags & 0x400) == 0)) {
 			reinterpret_cast<CGPrgObj*>(this)->reqAnim(1, 1, 0);
 		}

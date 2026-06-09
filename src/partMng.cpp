@@ -3706,16 +3706,18 @@ int CPartMng::pppLoadPmd(const char* baseName)
 
                     pppModelSt* searchModel = modelArray;
                     unsigned int i = 0;
-                    do {
+                    for (;;) {
                         if (searchModel->m_isUsed != 0 && strcmp(searchModel->m_name, name) == 0) {
-                            break;
+                            goto pmdNameSearchDone;
                         }
                         i++;
                         searchModel++;
-                    } while (i < 0x100);
-                    if (i >= 0x100) {
-                        searchModel = 0;
+                        if (i >= 0x100) {
+                            searchModel = 0;
+                            goto pmdNameSearchDone;
+                        }
                     }
+                pmdNameSearchDone:
 
                     if (searchModel == 0) {
                         pppModelSt* freeModel = modelArray;
@@ -3836,17 +3838,19 @@ int CPartMng::pppLoadPan(const char* baseName)
 
                     pppShapeSt* searchShape = shapeArray;
                     unsigned int i = 0;
-                    do {
+                    for (;;) {
                         if (searchShape->m_inUse != 0 && strcmp(searchShape->m_name, name) == 0) {
-                            break;
+                            goto panNameSearchDone;
                         }
                         i++;
                         searchShape = reinterpret_cast<pppShapeSt*>(
                             reinterpret_cast<unsigned char*>(searchShape) + 0x2c);
-                    } while (i < 0x100);
-                    if (i >= 0x100) {
-                        searchShape = 0;
+                        if (i >= 0x100) {
+                            searchShape = 0;
+                            goto panNameSearchDone;
+                        }
                     }
+                panNameSearchDone:
 
                     if (searchShape == 0) {
                         pppShapeSt* freeShape = shapeArray;

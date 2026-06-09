@@ -2218,12 +2218,11 @@ int CCaravanWork::GetCmdListItemName(int cmdListIdx, int* firstCmdIdx, int* item
 		if (m_commandListExtra[cmdListIdx] == 0) {
 			groupedCount = 1;
 		} else {
-			int topIdx = cmdListIdx;
-			for (int n = cmdListIdx; n >= 0; n--) {
+			int topIdx;
+			for (topIdx = cmdListIdx; topIdx >= 0; topIdx--) {
 				if (m_commandListExtra[topIdx] != -1) {
 					break;
 				}
-				topIdx--;
 			}
 
 			groupedCount = 1;

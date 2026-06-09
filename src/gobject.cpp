@@ -333,18 +333,18 @@ void CGObject::onCreate()
     m_shieldNodeFlagBits.m_bit04 = 0;
     m_collisionPushTimerMax = 0x32;
 
-    m_radiusCtrl.x = 0.0f;
-    m_radiusCtrl.y = 0.0f;
-    m_radiusCtrl.z = 1.0f;
-    m_radiusCtrlVel.x = 0.0f;
-    m_radiusCtrlVel.y = m_radiusCtrl.y;
-    m_radiusCtrlVel.z = m_radiusCtrl.z;
-    m_groundFriction = m_radiusCtrlVel.x;
-
+    *reinterpret_cast<u32*>(&m_radiusCtrl.x) = 0;
+    *reinterpret_cast<unsigned char*>(&m_lastBgGroup) = 0;
     *reinterpret_cast<u32*>(&m_moveAnimState) = 0;
     m_stateFlags0Bits.unk4 = 0;
     m_ownerSlot = 0;
     m_stateFlags0Bits.unk0 = 0;
+    m_radiusCtrlVel.x = 0.0f;
+    m_radiusCtrl.y = 0.0f;
+    m_radiusCtrl.z = 1.0f;
+    m_radiusCtrlVel.y = m_radiusCtrl.y;
+    m_radiusCtrlVel.z = m_radiusCtrl.z;
+    m_groundFriction = m_radiusCtrlVel.x;
     m_moveMode = 0;
     m_moveModePrevious = 4;
 
@@ -363,8 +363,7 @@ void CGObject::onCreate()
     m_lookAtAccumPitch = 0.0f;
     m_weaponAttachNode = -1;
     m_shieldAttachNodeIndex = -1;
-    m_lastMapIdHit = 0;
-    m_lastMapIdExtra = 0;
+    *reinterpret_cast<u16*>(&m_lastMapIdHit) = 0;
     m_weaponNodeFlagBits.m_prg = 0;
     m_extraMoveVec.z = 0.0f;
     m_extraMoveVec.y = 0.0f;
@@ -548,6 +547,10 @@ void CGObject::move()
                 buttons |= buttonsRepeat;
             }
 
+            moveVec.x = sZeroFloat;
+            moveVec.y = sZeroFloat;
+            moveVec.z = sZeroFloat;
+
             u32 miniGameFlags = DbgMenuPcs.GetDbgFlagsRaw();
             if ((miniGameFlags & 0x100) != 0) {
                 const float stickX = (Pad.m_debugPadLock != 0 || (player == 0 && Pad.m_debugPadPort != -1))
@@ -598,9 +601,11 @@ void CGObject::move()
     }
 
     if ((moveVec.x != sZeroFloat) || (moveVec.y != sZeroFloat) || (moveVec.z != sZeroFloat)) {
-        float cameraYaw = *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x248);
+        float cameraYaw;
         if (movingWithScript) {
             cameraYaw = sZeroFloat;
+        } else {
+            cameraYaw = *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xf8);
         }
 
         const double inputYaw = atan2(static_cast<double>(moveVec.x), static_cast<double>(moveVec.z));
@@ -713,7 +718,7 @@ void CGObject::move()
 
     const double rotDelta = static_cast<double>(Math.DstRot(m_rotTargetY, m_rotBaseY));
     m_animSlotSel = (reinterpret_cast<s8*>(&m_shieldNodeFlags) + 1)
-        [(DOUBLE_803303e8 < fabs(rotDelta)) ? 1 : 0];
+        [(fabs(rotDelta) <= DOUBLE_803303e8) ? 0 : 1];
 }
 
 /*

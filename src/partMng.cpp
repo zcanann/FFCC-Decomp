@@ -1861,19 +1861,20 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             }
 
             int slotIndex = payloadWords[0];
-            void*& textRaw = *reinterpret_cast<void**>(self + kStreamTextRawOffset + slotIndex * 4);
+            unsigned char* slotBase = self + slotIndex * 4;
+#define textRaw (*reinterpret_cast<void**>(slotBase + kStreamTextRawOffset))
             if (textRaw == 0) {
                 textRaw = operator new[](packetSize - 0x20, PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x625);
             }
 
             memcpy(textRaw, payload, packetSize - 0x20);
 
-            unsigned char* textBytes = reinterpret_cast<unsigned char*>(textRaw);
             unsigned short* textEntry = reinterpret_cast<unsigned short*>(
                 reinterpret_cast<unsigned char*>(textTable) + slotIndex * 8);
-            textEntry[0] = static_cast<unsigned short>(*reinterpret_cast<int*>(textBytes + 4));
-            textEntry[1] = static_cast<unsigned short>(*reinterpret_cast<int*>(textBytes + 8));
-            *reinterpret_cast<void**>(textEntry + 2) = textBytes + 0xC;
+            textEntry[0] = static_cast<unsigned short>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(textRaw) + 4));
+            textEntry[1] = static_cast<unsigned short>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(textRaw) + 8));
+            *reinterpret_cast<void**>(textEntry + 2) = reinterpret_cast<unsigned char*>(textRaw) + 0xC;
+#undef textRaw
         }
         return;
     case 0x0B:

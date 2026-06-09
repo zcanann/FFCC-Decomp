@@ -2595,7 +2595,7 @@ int CMaterialMan::GetCharaShadow(
     ShadowCandidate shadowCandidates[128];
     ShadowCandidate* candidateWrite = shadowCandidates;
     CMaterial** materialWrite = materialsOut;
-    int candidateCount = 0;
+    unsigned int candidateCount = 0;
     int outputCount = 0;
     int outputOffset = 0;
 

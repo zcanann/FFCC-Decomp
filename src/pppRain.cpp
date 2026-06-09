@@ -155,6 +155,8 @@ void pppRenderRain(pppRain* pppRain, PRain* param_2, RAIN_DATA* param_3)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_lifetimes off
 void pppFrameRain(pppRain* pppRain, PRain* param_2, RAIN_DATA* param_3)
 {
     VRain* work;
@@ -298,6 +300,7 @@ void pppFrameRain(pppRain* pppRain, PRain* param_2, RAIN_DATA* param_3)
         pppSetFpMatrix(ppvMng);
     }
 }
+#pragma pop
 
 /*
  * --INFO--

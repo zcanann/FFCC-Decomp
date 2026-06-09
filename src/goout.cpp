@@ -1396,10 +1396,10 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         }
 
         {
-        const char saveIndex = static_cast<char>(m_accessSaveIndex);
         const int cardChannel = m_accessCardChannel;
+        const int saveIndex = m_accessSaveIndex;
         m_cardChannel = static_cast<char>(cardChannel);
-        m_saveIndex = saveIndex;
+        m_saveIndex = static_cast<char>(saveIndex);
         MenuPcs.m_mcCtrl.m_cardChannel = cardChannel;
         }
         m_memCardBuffer = MenuPcs.m_goOutTransferSaveData;
@@ -1430,10 +1430,10 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
     case 0x13:
     {
         const char odekakeSaveIndex = m_odekakeSaveIndex;
-        const char odekakeCardChannel = m_odekakeCardChannel;
+        const unsigned char odekakeCardChannel = static_cast<unsigned char>(m_odekakeCardChannel);
         m_cardChannel = odekakeCardChannel;
         m_saveIndex = odekakeSaveIndex;
-        MenuPcs.m_mcCtrl.m_cardChannel = static_cast<unsigned char>(odekakeCardChannel);
+        MenuPcs.m_mcCtrl.m_cardChannel = odekakeCardChannel;
     }
         m_memCardBuffer = MenuPcs.m_goOutTransferWork;
         m_memCardResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(static_cast<unsigned char>(m_cardChannel));

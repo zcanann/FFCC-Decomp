@@ -81,10 +81,10 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
         hasRequiredMemory = false;
     } else if (wmats == 0) {
         hasRequiredMemory = false;
-    } else if ((step[0x69] == 0) || (colors != 0)) {
-        hasRequiredMemory = true;
-    } else {
+    } else if ((step[0x69] != 0) && (colors == 0)) {
         hasRequiredMemory = false;
+    } else {
+        hasRequiredMemory = true;
     }
     if (!hasRequiredMemory || *(u32*)(step + 4) == 0xFFFF) {
         return;
@@ -116,8 +116,8 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
             tagOAN3_SHAPE* shape =
                 reinterpret_cast<tagOAN3_SHAPE*>(reinterpret_cast<u8*>(shapeAnim) + shapeFrame->m_shapeOffset);
             const u8 trailReadIndex = *(u8*)(particle + 0x38);
-            const u8 trailMaxIndex = (u8)(*(u8*)(particle + 0x37) - 1);
-            u8 trailNextIndex = (u8)(trailReadIndex + 1);
+            const s32 trailMaxIndex = (u8)(*(u8*)(particle + 0x37) - 1);
+            s32 trailNextIndex = (u8)(trailReadIndex + 1);
             const float alphaScale = (float)*(s16*)((u8*)colorWork + 6) / kPppYmMegaBirthShpTail2AlphaDivisor;
             const float stepDivisor = (float)((s32)frameCountRaw - 1);
             float drawScale = *(float*)(step + 0x70);
@@ -819,12 +819,15 @@ done:
     } else {
         *(u16*)(particleBytes + 0x22) = *(u16*)(paramBytes + 0x14);
     }
-    *((u8*)&particleData->m_directionTail.y) = 0;
+    particleBytes[0x34] = 0;
 
-    if (param->m_tail2MatrixMode == 0) {
+    switch ((s32)paramBytes[0x8d]) {
+    case 0:
         pppCopyMatrix(*(pppFMATRIX*)particleWMat, work->m_emitterMatrix);
-    } else if (param->m_tail2MatrixMode == 1) {
+        break;
+    case 1:
         pppCopyMatrix(*(pppFMATRIX*)particleWMat, work->m_emitterMatrix);
+        break;
     }
 
     *(u16*)(particleBytes + 0x3a) = 0;

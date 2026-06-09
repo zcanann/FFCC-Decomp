@@ -486,6 +486,86 @@ def t_invert_if(body, rng, mk):
     return body[:start] + rebuilt + body[end:]
 
 
+def _scan_expr_end(s, i, stops):
+    """From index i, scan forward respecting (), [], {} nesting; return index of the
+    first char in `stops` found at depth 0, or -1. Skips strings/chars."""
+    depth = 0
+    n = len(s)
+    while i < n:
+        c = s[i]
+        if c == '"' or c == "'":
+            q = c; i += 1
+            while i < n:
+                if s[i] == '\\': i += 2; continue
+                if s[i] == q: i += 1; break
+                i += 1
+            continue
+        if c in '([{':
+            depth += 1
+        elif c in ')]}':
+            if depth == 0:
+                return i if c in stops else -1
+            depth -= 1
+        elif depth == 0 and c in stops:
+            # treat '::' as not a ternary colon
+            if c == ':' and (s[i:i+2] == '::' or s[i-1:i+1] == '::'):
+                i += 1
+                continue
+            return i
+        i += 1
+    return -1
+
+
+def t_invert_ternary(body, rng, mk):
+    """Invert a ternary with a *parenthesized* condition: `(C) ? A : B` -> `(!(C)) ? B : A`.
+
+    Always a semantic identity. Restricted to conditions that are a single fully
+    parenthesized group immediately before `?`, and A/B that contain no nested
+    `?`/`:`/`;` at depth 0 -- unambiguous to parse, so no risk of mis-splitting.
+    Flips ternary operand order, which can change the compiler's branch/fsel layout."""
+    cands = []
+    n = len(body)
+    for qm in range(1, n):
+        if body[qm] != '?':
+            continue
+        if body[qm + 1:qm + 2] in ('?', '.', ':'):  # ?? ?. ?: not a plain ternary
+            continue
+        # condition must be a parenthesized group immediately to the left
+        j = qm - 1
+        while j >= 0 and body[j] in ' \t\r\n':
+            j -= 1
+        if j < 0 or body[j] != ')':
+            continue
+        # find matching '(' for this ')'
+        depth = 0; k = j
+        while k >= 0:
+            if body[k] == ')': depth += 1
+            elif body[k] == '(':
+                depth -= 1
+                if depth == 0: break
+            k -= 1
+        if k < 0:
+            continue
+        cond = body[k:j + 1]  # includes outer parens
+        # parse A : B
+        colon = _scan_expr_end(body, qm + 1, ':')
+        if colon < 0:
+            continue
+        bend = _scan_expr_end(body, colon + 1, ';,)')
+        if bend < 0:
+            continue
+        a_expr = body[qm + 1:colon].strip()
+        b_expr = body[colon + 1:bend].strip()
+        if not a_expr or not b_expr or '?' in a_expr or '?' in b_expr:
+            continue
+        cands.append((k, bend, cond, a_expr, b_expr))
+    if not cands:
+        return None
+    k, bend, cond, a_expr, b_expr = rng.choice(cands)
+    rebuilt = f"(!{cond}) ? {b_expr} : {a_expr}"
+    return body[:k] + rebuilt + body[bend:]
+
+
 def t_reorder_stmts(body, rng, mk):
     """Swap two adjacent simple decl/assign statements that share no identifier."""
     lines = body.split("\n")
@@ -532,6 +612,8 @@ TRANSFORMS = [
     ("reorder_stmts", t_reorder_stmts),
     ("invert_if", t_invert_if),
     ("invert_if", t_invert_if),  # weight it -- block-layout lever, low-risk
+    ("invert_ternary", t_invert_ternary),
+    ("invert_ternary", t_invert_ternary),  # block-layout lever for float code
 ]
 
 

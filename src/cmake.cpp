@@ -599,7 +599,7 @@ void CMenuPcs::drawVillageMenu()
  */
 void CMenuPcs::calcVillageMenu()
 {
-    if (MenuU8(this, 0x16) != 0) {
+    if (MenuU8(this, 0x16) != 0 && CmakeResult(this) == 0) {
         if (CmakeResult(this) == 0 && MenuU8(this, 0x16) != 0) {
             if (Game.m_gameWork.m_menuStageMode == 0) {
                 char path[128];

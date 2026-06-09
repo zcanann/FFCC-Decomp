@@ -837,18 +837,21 @@ void CGraphicPcs::drawBar()
     frameGX.g = frameTmp.g;
     frameGX.b = frameTmp.b;
     frameGX.a = frameTmp.a;
+    GXColor frameGX1 = frameGX;
+    GXColor frameGX2 = frameGX;
+    GXColor frameGX3 = frameGX;
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
     GXPosition3f32(kDebugBarLeft, kDebugIndicatorTop, kGraphicZero);
     GXColor1u32(*reinterpret_cast<u32*>(&frameGX));
     GXTexCoord2u16(0, 0);
     GXPosition3f32(kDebugIndicatorFrameRight, kDebugIndicatorTop, kGraphicZero);
-    GXColor1u32(*reinterpret_cast<u32*>(&frameGX));
+    GXColor1u32(*reinterpret_cast<u32*>(&frameGX1));
     GXTexCoord2u16(2, 0);
     GXPosition3f32(kDebugIndicatorFrameRight, kDebugIndicatorBottom, kGraphicZero);
-    GXColor1u32(*reinterpret_cast<u32*>(&frameGX));
+    GXColor1u32(*reinterpret_cast<u32*>(&frameGX2));
     GXTexCoord2u16(2, 2);
     GXPosition3f32(kDebugBarLeft, kDebugIndicatorBottom, kGraphicZero);
-    GXColor1u32(*reinterpret_cast<u32*>(&frameGX));
+    GXColor1u32(*reinterpret_cast<u32*>(&frameGX3));
     GXTexCoord2u16(0, 2);
 
     GXColor fifoTmp;
@@ -858,18 +861,21 @@ void CGraphicPcs::drawBar()
     fifoGX.g = fifoTmp.g;
     fifoGX.b = fifoTmp.b;
     fifoGX.a = fifoTmp.a;
+    GXColor fifoGX1 = fifoGX;
+    GXColor fifoGX2 = fifoGX;
+    GXColor fifoGX3 = fifoGX;
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
     GXPosition3f32(kDebugIndicatorFifoLeft, kDebugIndicatorTop, kGraphicZero);
     GXColor1u32(*reinterpret_cast<u32*>(&fifoGX));
     GXTexCoord2u16(0, 0);
     GXPosition3f32(kDebugIndicatorFifoRight, kDebugIndicatorTop, kGraphicZero);
-    GXColor1u32(*reinterpret_cast<u32*>(&fifoGX));
+    GXColor1u32(*reinterpret_cast<u32*>(&fifoGX1));
     GXTexCoord2u16(2, 0);
     GXPosition3f32(kDebugIndicatorFifoRight, kDebugIndicatorBottom, kGraphicZero);
-    GXColor1u32(*reinterpret_cast<u32*>(&fifoGX));
+    GXColor1u32(*reinterpret_cast<u32*>(&fifoGX2));
     GXTexCoord2u16(2, 2);
     GXPosition3f32(kDebugIndicatorFifoLeft, kDebugIndicatorBottom, kGraphicZero);
-    GXColor1u32(*reinterpret_cast<u32*>(&fifoGX));
+    GXColor1u32(*reinterpret_cast<u32*>(&fifoGX3));
     GXTexCoord2u16(0, 2);
 
     if (drawText) {

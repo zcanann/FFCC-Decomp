@@ -612,7 +612,7 @@ void CMenuPcs::calcVillageMenu()
 
             loadTexture(PTR_s_world2, 8, 1, s_cmakeWorldTextureTable, 0x60, 9, 3);
 
-            CMemory::CStage* stage = m_menuStage;
+            CMemory::CStage* stage = MenuPcs.m_menuStage;
             void*& villageWork = CmakeVillageWork(this);
             villageWork = operator new(0x48, stage, const_cast<char*>(s_cmake_cpp), 0xCB3);
             memset(villageWork, 0, 0x48);

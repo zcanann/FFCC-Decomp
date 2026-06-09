@@ -168,11 +168,10 @@ static inline float CalcCmakeFadeAlpha(CMenuPcs* menu)
         frame = 0;
     }
 
-    short mode = state->m_mode;
-    if (mode == 0) {
+    if (state->m_mode == 0) {
         return static_cast<float>(0.1 * static_cast<double>(frame));
     }
-    if (mode == 1) {
+    if (state->m_mode == 1) {
         return 1.0f;
     }
     return static_cast<float>(1.0 - 0.1 * static_cast<double>(frame));

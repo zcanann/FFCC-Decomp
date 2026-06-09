@@ -2787,9 +2787,9 @@ int CMenuPcs::CmakeNameCtrl()
                     }
 
                     if (IsDuplicateCmakeName(this, s_CmakeInfo.m_name)) {
+                        Sound.PlaySe(4, 0x40, 0x7F, 0);
                         short winX = 0;
                         short winY = 0;
-                        Sound.PlaySe(4, 0x40, 0x7F, 0);
                         GetWinSize(0x14, &winX, &winY, 0);
                         SetMcWinInfo((int)winX, (int)winY);
                         CmakeMcState(this) = 0;

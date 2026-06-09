@@ -2699,8 +2699,10 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
     }
 
     if (immediatePass != 0 && drawPass == 0 && (m_model->m_lightAlpha < kCharaOne || (flags & 0x40000) != 0)) {
-        ppvDrawMng.AddPrim(-m_sortZ, this);
-        return;
+        if (immediatePass != 0) {
+            ppvDrawMng.AddPrim(-m_sortZ, this);
+            return;
+        }
     }
 
     if (drawPass == 3 && (flags & 0x81C) == 0) {
@@ -2790,8 +2792,8 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
             viewMtx[0][3] += viewMtx[0][1] * offsetY;
             viewMtx[1][3] += viewMtx[1][1] * offsetY;
             viewMtx[2][3] += viewMtx[2][1] * offsetY;
-            viewMtx[0][1] *= 0.5f;
             viewMtx[1][1] *= 0.5f;
+            viewMtx[0][1] *= 0.5f;
             viewMtx[2][1] *= 0.5f;
         } else if ((m_flags & 8) != 0) {
             PSMTXConcat(viewMtx, CFlatCenterMatrix(), viewMtx);
@@ -2807,7 +2809,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         CVector focusPos(CharaPcs.m_texShadowPos);
         CVector deltaTmp;
         PSVECSubtract(focusPos, modelPos, deltaTmp);
-        CVector delta;
+        Vec delta;
         delta.x = deltaTmp.x;
         delta.y = deltaTmp.y;
         delta.z = deltaTmp.z;
@@ -2815,13 +2817,13 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
             return;
         }
 
-        const float distRatio = PSVECMag(delta) / CharaPcs.m_texShadowRadius;
+        const float distRatio = PSVECMag(&delta) / CharaPcs.m_texShadowRadius;
         if (distRatio > kCharaOne) {
             return;
         }
         const float shadowFade = kCharaOne - distRatio;
 
-        delta.Normalize();
+        reinterpret_cast<CVector*>(&delta)->Normalize();
 
         Vec eye;
         {
@@ -2838,7 +2840,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
 
         const float shadowDistance = static_cast<float>(CharaPcs.m_texShadowDistance);
         CVector scaledDelta;
-        PSVECScale(delta, scaledDelta, shadowDistance);
+        PSVECScale(&delta, scaledDelta, shadowDistance);
 
         Vec shadowBase;
         {

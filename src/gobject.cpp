@@ -2820,6 +2820,8 @@ void CGObject::FreeAnim(int animSlot)
  * Address:	TODO
  * Size:	TODO
  */
+#pragma push
+#pragma opt_common_subs off
 int CGObject::IsLoopAnim(int mode)
 {
     CCharaPcs::CHandle* handle = m_charaModelHandle;
@@ -2869,6 +2871,7 @@ int CGObject::IsLoopAnim(int mode)
 
     return 1;
 }
+#pragma pop
 
 /*
  * --INFO--

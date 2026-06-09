@@ -159,7 +159,8 @@ static unsigned short getPadTrigForSlot(int slot)
 		return 0;
 	}
 
-	int idx = slot & ~((~(Pad.m_debugPadPort - slot | slot - Pad.m_debugPadPort) >> 31));
+	int selectedPort = Pad.m_debugPadPort;
+	unsigned int idx = slot & ~((int)~(selectedPort - slot | slot - selectedPort) >> 31);
 	return Pad.GetPadInputs()[idx].buttonDown[0];
 }
 
@@ -170,7 +171,8 @@ static int getPadConnectedForSlot(int slot)
 		return 0;
 	}
 
-	int idx = slot & ~((~(Pad.m_debugPadPort - slot | slot - Pad.m_debugPadPort) >> 31));
+	int selectedPort = Pad.m_debugPadPort;
+	unsigned int idx = slot & ~((int)~(selectedPort - slot | slot - selectedPort) >> 31);
 	return Pad.GetPadInputs()[idx].gbaMode;
 }
 
@@ -181,7 +183,8 @@ static unsigned short getPadButtonUpForSlot(int slot)
 		return 0;
 	}
 
-	int idx = slot & ~((~(Pad.m_debugPadPort - slot | slot - Pad.m_debugPadPort) >> 31));
+	int selectedPort = Pad.m_debugPadPort;
+	unsigned int idx = slot & ~((int)~(selectedPort - slot | slot - selectedPort) >> 31);
 	return Pad.GetPadInputs()[idx].buttonUp;
 }
 
@@ -216,7 +219,8 @@ static float getPadLeftStickXForSlot(int slot)
 		return 0.0f;
 	}
 
-	int idx = slot & ~((~(Pad.m_debugPadPort - slot | slot - Pad.m_debugPadPort) >> 31));
+	int selectedPort = Pad.m_debugPadPort;
+	unsigned int idx = slot & ~((int)~(selectedPort - slot | slot - selectedPort) >> 31);
 	return Pad.GetPadInputs()[idx].stickXF;
 }
 
@@ -227,7 +231,8 @@ static float getPadLeftStickYForSlot(int slot)
 		return 0.0f;
 	}
 
-	int idx = slot & ~((~(Pad.m_debugPadPort - slot | slot - Pad.m_debugPadPort) >> 31));
+	int selectedPort = Pad.m_debugPadPort;
+	unsigned int idx = slot & ~((int)~(selectedPort - slot | slot - selectedPort) >> 31);
 	return Pad.GetPadInputs()[idx].stickYF;
 }
 
@@ -953,7 +958,7 @@ void CGPartyObj::onFrameAlways()
 
 		if (reinterpret_cast<int>(m_scriptHandle[0xED]) == 0) {
 			CGItemObj::CreateFromScript(0, 4, itemId, this, FLOAT_80331a78, (CGItemObj::CCFS*)0);
-			if (Math.Rand(10) == 0) {
+			if (static_cast<unsigned int>(Math.Rand(10)) == 0) {
 				CGItemObj::CreateFromScript(2, 4, 0x3039, this, FLOAT_80331a78, (CGItemObj::CCFS*)0);
 			}
 		}
@@ -1854,17 +1859,17 @@ void CGPartyObj::onFrameStat()
 			reqAnim(0x29, 0, 0);
 		}
 		if (m_stateFrame == 4) {
-			int weaponItem = party.weaponItem;
-			int weaponRef = party.pendingWeaponItem;
+			int weaponItem = party.weaponRef;
+			int weaponRef = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D4);
 			if (weaponItem <= 0) {
 				LoadWeapon(-1, 0);
 			} else {
 				unsigned short itemKind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + weaponItem * 0x48 + 2);
 				LoadWeapon(itemKind & 0xFFF, itemKind >> 12);
 			}
-			party.pendingWeaponItem = weaponRef;
-			party.weaponItem = weaponItem;
-			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->SetCurrentWeaponIdx(weaponRef);
+			party.weaponItem = weaponRef;
+			party.pendingWeaponItem = weaponItem;
+			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->SetCurrentWeaponIdx(party.weaponItem);
 			party.commandFlagBits.flag20 = 0;
 		}
 		if (isLoopAnim() != 0) {
@@ -1988,7 +1993,7 @@ void CGPartyObj::onFrameStat()
 				endPSlotBit(0x10000);
 				m_alpha = kMonObjOne;
 				m_bgColMask |= 0x1000E;
-				*reinterpret_cast<unsigned short*>(script + 0x12) = 0x5A;
+				*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x48) = 0x5A;
 			} else {
 				m_alpha = FLOAT_80331A7C;
 				m_bgColMask &= 0xFFFEFFF1;
@@ -3086,7 +3091,7 @@ void CGPartyObj::onStatMagic()
 				m_comboFrame++;
 			}
 		} else {
-			unsigned short trig = getPadTrigForSlot(static_cast<unsigned char>(m_animStateMisc));
+			unsigned short trig = getPadHeldForSlot(static_cast<unsigned char>(m_animStateMisc));
 			if ((trig & 0x200) != 0 && magicReady == 0) {
 				changeStat(0, 0, 0);
 			}
@@ -4801,10 +4806,14 @@ void CGPartyObj::gpmCol()
 			slot->x = leader->m_worldPosition.x;
 			slot->y = leader->m_worldPosition.y;
 			slot->z = leader->m_worldPosition.z;
-			newIndex = (i > trailIndex) ? trailIndex : i;
+			if (trailIndex < i) {
+				newIndex = trailIndex;
+			} else {
+				newIndex = i;
+			}
 			break;
 		}
-	} while (i < 5);
+	} while (static_cast<unsigned int>(i) < 5);
 
 	trailIndex = newIndex;
 #define gpmColClamp ((activeTrailCount - 1) & ~((activeTrailCount - 1) >> 31))
@@ -4955,7 +4964,7 @@ void CGPartyObj::ghostPartyMog()
 						innerScale = FLOAT_80331A58 * (kMonObjOne - ramp) + FLOAT_80331A58;
 					}
 				}
-				if (static_cast<unsigned int>(FLOAT_80331A5C * innerScale) <= static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x38))) {
+				if (static_cast<int>(FLOAT_80331A5C * innerScale) <= static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x38))) {
 					flags[0] = (flags[0] & 0xFB) | 4;
 					bossState = 3;
 					goto messageMenu;
@@ -4971,18 +4980,15 @@ void CGPartyObj::ghostPartyMog()
 	}
 
 messageMenu:
-	if (static_cast<signed char>(leader->m_weaponNodeFlags >> 8) < 0 &&
+	if ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(reinterpret_cast<unsigned char*>(&leader->m_weaponNodeFlags)[1]) << 24) & 0xC0000000) >> 31) != 0) &&
 	    bossState != 0 &&
 	    bossState != *reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x20)) {
-		CMesMenu* mesMenu = MenuPcs.GetMesMenu(5);
-		bool busy = false;
-		if (mesMenu->IsActiveMessage()) {
-			busy = true;
-		}
-		if (!busy) {
+#define mesMenu (*reinterpret_cast<CMesMenu**>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0x120))
+		if (!mesMenu->IsActiveMessage()) {
 			*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x20) = bossState;
 			mesMenu->Open(Game.m_cFlatDataArr[1].Message(bossState - 1), 0x260, 0x20, 0x8E20, 0, 0x65, 0x8B);
 		}
+#undef mesMenu
 	}
 
 	int auraSlot = 0;

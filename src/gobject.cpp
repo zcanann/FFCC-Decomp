@@ -983,7 +983,7 @@ void CGObject::bgNormalCollision()
     }
 
     if ((MapMng.GetMapIdGrpArray()[gMapHitFace->m_groupIndex].m_mask & 0x20) == 0) {
-        m_stateFlags0Bits.unk7 = 1;
+        m_stateFlags0Bits.unk0 = 1;
         m_radiusCtrl.x =
             *reinterpret_cast<float*>(&MapMng.GetMapIdGrpArray()[gMapHitFace->m_groupIndex].m_mask);
         if (gMapHitFace->m_groupIndex != 0) {
@@ -1095,7 +1095,7 @@ void CGObject::bgWorldCollision()
     m_groundHitOffset.z = newOffset.z;
 
     if ((MapMng.GetMapIdGrpArray()[gMapHitFace->m_groupIndex].m_mask & 0x20) == 0) {
-        m_stateFlags0Bits.unk7 = 1;
+        m_stateFlags0Bits.unk0 = 1;
         m_radiusCtrl.x =
             *reinterpret_cast<float*>(&MapMng.GetMapIdGrpArray()[gMapHitFace->m_groupIndex].m_mask);
         if (gMapHitFace->m_groupIndex != 0) {

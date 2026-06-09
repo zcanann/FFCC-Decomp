@@ -455,8 +455,8 @@ frame_input_done:
         trigger = 0;
     } else {
         int port = 0;
-        unsigned int clamped = (unsigned int)port & ~-(int)((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) >> 5) & 1);
-        trigger = Pad.GetPadInputs()[clamped].lockedButton[1];
+        port &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+        trigger = Pad.GetPadInputs()[port].lockedButton[1];
     }
 
     if ((trigger & 0x200) != 0) {
@@ -1377,12 +1377,14 @@ int CMemory::CStage::GetHeapUnuse()
     } else {
         node = stageBlockAt(stageGetHeapHead(this))->m_next;
     }
+    int totalSize = 0;
     int total = 0;
 
     while ((node->m_flags & 2) == 0) {
         if ((node->m_flags & kMemoryBlockUsedFlag) == 0) {
             total += node->m_size;
         }
+        totalSize += reinterpret_cast<int>(node->m_next) - reinterpret_cast<int>(node);
         node = node->m_next;
     }
 
@@ -1623,12 +1625,13 @@ int CAmemCacheSet::GetData(short index, char* source, int line)
 {
     while (true) {
         CAmemCache& entry = cacheEntryAt(this, index);
+        CMemory::CStage* rStage = m_rStage;
         unsigned int data;
 
         if (entry.m_cacheData == 0) {
             if (entry.m_dmaCopy != 0) {
                 entry.m_cacheData =
-                    m_rStage->alloc(static_cast<unsigned long>(entry.m_size),
+                    rStage->alloc(static_cast<unsigned long>(entry.m_size),
                                     source != 0 ? source : const_cast<char*>(sEmptyAllocSourceName),
                                     static_cast<unsigned long>(line), 1);
                 if (entry.m_cacheData == 0) {

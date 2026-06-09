@@ -332,11 +332,30 @@ void CPartMng::Create()
         *reinterpret_cast<int*>(mng + 0x128) = 0x1e;
     }
 
+    *reinterpret_cast<void**>(self + 0x1c8) = 0;
+    self[0x7f4] = 0;
+    self[0x7f5] = 0;
+    self[0x7f6] = 0;
+    self[0x7f7] = 0;
+    self[0x7f8] = 0;
+    self[0x7f9] = 0;
+    self[0x7fa] = 0;
+    self[0x7fb] = 0;
+    self[0x7fc] = 0;
+    self[0x7fd] = 0;
+    self[0x7fe] = 0;
+    self[0x7ff] = 0;
+
     m_pppEnvSt.m_envParam = kPartMngZero;
     m_pppEnvSt.m_mngStCount = 0x10;
     m_pppEnvSt.m_isEditMode = 1;
 
-    memset(self + 0x10, 0, 0x108);
+    self[0x80c] = 0;
+    self[0x80d] = 0;
+    self[0x80e] = 0;
+    self[0x80f] = 0;
+
+    memset(self + 0x235a8, 0, 0x108);
 
     m_pppEnvSt.m_boxMinX = kPartMngEnvBoxMinX;
     m_pppEnvSt.m_boxMaxX = kPartMngEnvBoxMaxXz;

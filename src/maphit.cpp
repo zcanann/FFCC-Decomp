@@ -505,6 +505,12 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         PSVECScale(hitDirection, &g_hit_hpv, hitT);
         PSVECAdd(&g_hit_cyl.m_bottom, &g_hit_hpv, &g_hit_hpv);
 
+        Vec point;
+        Vec edgeStart;
+        Vec edgeEnd;
+        Vec edge;
+        Vec toPoint;
+        Vec cross;
         Vec scaledNormal;
         PSVECScale(&g_hit_lpface->m_normal, &scaledNormal, g_hit_cyl.m_radius);
         Vec pushedHit;
@@ -513,12 +519,6 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         unsigned int sideMask = 3;
         Vec previous = m_vertices[g_hit_lpface->m_vertexIndices[g_hit_lpface->m_vertexCount - 1]];
         Vec current;
-        Vec edgeStart;
-        Vec edgeEnd;
-        Vec point;
-        Vec edge;
-        Vec toPoint;
-        Vec cross;
         switch (g_hit_lpface->m_projectionAxis) {
         case 0:
             point.x = pushedHit.y;

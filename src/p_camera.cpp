@@ -321,7 +321,7 @@ STATIC_ASSERT(offsetof(CCameraPcs, m_worldMapMatrix) == 0x34);
 STATIC_ASSERT(offsetof(CCameraPcs, m_zRotate) == 0x108);
 STATIC_ASSERT(sizeof(CCameraPcs::CameraState) == 0x108);
 STATIC_ASSERT(offsetof(CCameraPcs::CameraState, m_screenMatrix) == 0x90);
-STATIC_ASSERT(offsetof(CCameraPcs::CameraState, m_positionX) == 0xDC);
+STATIC_ASSERT(offsetof(CCameraPcs::CameraState, m_position) == 0xDC);
 STATIC_ASSERT(offsetof(CCameraPcs::CameraState, m_nearZ) == 0xFC);
 STATIC_ASSERT(offsetof(CCameraPcs, m_savedCamera) == 0x10C);
 STATIC_ASSERT(offsetof(CCameraPcs, m_shadowCamera) == 0x214);
@@ -1287,9 +1287,9 @@ void CCameraPcs::calcMap()
     PSMTXRotRad(rotYMtx, 'y', m_mapRotY);
     PSMTXConcat(rotYMtx, rotXMtx, rotMtx);
 
-    DirectionVec().x = kCameraZeroF;
-    DirectionVec().y = kCameraZeroF;
     DirectionVec().z = kCameraOneF;
+    DirectionVec().y = kCameraZeroF;
+    DirectionVec().x = kCameraZeroF;
     PSMTXMultVecSR(rotMtx, &DirectionVec(), &DirectionVec());
 
     moveDelta.z = kCameraZeroF;
@@ -1404,15 +1404,15 @@ void CCameraPcs::createFullShadow()
     unsigned int rampTexSize;
     unsigned int i;
     unsigned char* rampTex;
-    CMemory::CStage* stage = MapMng.m_stage;
+    char* fileName = const_cast<char*>(s_p_camera_cpp);
 
     m_fullScreenShadow.m_shadowTexture = 0;
     rampTexSize = GXGetTexBufferSize(0x1E0, 0x1E0, GX_TF_I8, GX_FALSE, 0);
-    m_fullScreenShadow.m_shadowTexture = new (stage, const_cast<char*>(s_p_camera_cpp), 0x3A5) u8[rampTexSize];
+    m_fullScreenShadow.m_shadowTexture = new (MapMng.m_stage, fileName, 0x3A5) u8[rampTexSize];
 
     m_fullScreenShadow.m_rampTexture = 0;
     rampTexSize = GXGetTexBufferSize(0x10, 0x10, GX_TF_I8, GX_FALSE, 0);
-    rampTex = new (stage, const_cast<char*>(s_p_camera_cpp), 0x361) u8[rampTexSize];
+    rampTex = new (MapMng.m_stage, fileName, 0x361) u8[rampTexSize];
     m_fullScreenShadow.m_rampTexture = rampTex;
 
     for (i = 0; i < 0x100; i += 8) {
@@ -1589,8 +1589,8 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
 void CCameraPcs::drawShadowBegin()
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    Mtx rotX;
     Mtx rotY;
+    Mtx rotX;
     Mtx rotXY;
     Mtx tempMtx;
     Vec up;
@@ -1627,8 +1627,11 @@ void CCameraPcs::drawShadowBegin()
         m_shadowRectBound.m_max.x = kCameraBoundsMaxInitial;
 
         if (m_shadowAuto == 1 && GetShadowRect(m_shadowRectBound) != 0) {
-            m_targetX = (m_shadowRectBound.m_min.x + m_shadowRectBound.m_max.x) * kCameraHalfF;
-            m_targetZ = (m_shadowRectBound.m_min.z + m_shadowRectBound.m_max.z) * kCameraHalfF;
+            float sumX = m_shadowRectBound.m_min.x + m_shadowRectBound.m_max.x;
+            float half = kCameraHalfF;
+            float sumZ = m_shadowRectBound.m_min.z + m_shadowRectBound.m_max.z;
+            m_targetX = sumX * half;
+            m_targetZ = sumZ * half;
             m_targetY = m_fullScreenShadowPosition.y;
 
             float w = m_shadowRectBound.m_max.x - m_shadowRectBound.m_min.x;
@@ -1658,7 +1661,8 @@ void CCameraPcs::drawShadowBegin()
         if (currentDepth < kCameraZeroF) {
             m_fullScreenShadowDepth = depth;
         } else {
-            m_fullScreenShadowDepth = currentDepth + (depth - currentDepth) * kCameraShadowDepthBlend;
+            float blended = (depth - currentDepth) * kCameraShadowDepthBlend;
+            m_fullScreenShadowDepth = currentDepth + blended;
         }
     } else {
         m_fullScreenShadow.m_span = kCameraHundredF;
@@ -1670,36 +1674,36 @@ void CCameraPcs::drawShadowBegin()
     up.z = kCameraZeroF;
     PSMTXMultVecSR(rotXY, &up, &up);
 
-    m_shadowCamera.m_positionX = kCameraZeroF;
-    m_shadowCamera.m_positionY = kCameraZeroF;
-    m_shadowCamera.m_positionZ = m_fullScreenShadowDepth;
-    PSMTXMultVecSR(rotXY, reinterpret_cast<Vec*>(&m_shadowCamera.m_positionX), reinterpret_cast<Vec*>(&m_shadowCamera.m_positionX));
+    m_shadowCamera.m_position.x = kCameraZeroF;
+    m_shadowCamera.m_position.y = kCameraZeroF;
+    m_shadowCamera.m_position.z = m_fullScreenShadowDepth;
+    PSMTXMultVecSR(rotXY, reinterpret_cast<Vec*>(&m_shadowCamera.m_position.x), reinterpret_cast<Vec*>(&m_shadowCamera.m_position.x));
 
     if (Game.m_currentMapId == 0x21) {
         PSMTXCopy(CameraPcs.m_cameraWorldMtx, tempMtx);
-        PSMTXMultVecSR(tempMtx, reinterpret_cast<Vec*>(&m_shadowCamera.m_positionX), reinterpret_cast<Vec*>(&m_shadowCamera.m_positionX));
+        PSMTXMultVecSR(tempMtx, reinterpret_cast<Vec*>(&m_shadowCamera.m_position.x), reinterpret_cast<Vec*>(&m_shadowCamera.m_position.x));
     }
 
-    PSVECAdd(reinterpret_cast<Vec*>(&m_shadowCamera.m_positionX), reinterpret_cast<Vec*>(&m_positionX), reinterpret_cast<Vec*>(&m_shadowCamera.m_positionX));
-    m_shadowCamera.m_targetX = m_positionX;
-    m_shadowCamera.m_targetY = m_positionY;
-    m_shadowCamera.m_targetZ = m_positionZ;
+    PSVECAdd(reinterpret_cast<Vec*>(&m_shadowCamera.m_position.x), reinterpret_cast<Vec*>(&m_positionX), reinterpret_cast<Vec*>(&m_shadowCamera.m_position.x));
+    m_shadowCamera.m_target.x = m_positionX;
+    m_shadowCamera.m_target.y = m_positionY;
+    m_shadowCamera.m_target.z = m_positionZ;
     m_shadowCamera.m_nearZ = kCameraDefaultNearZ;
     m_shadowCamera.m_farZ = kCameraTwoF * m_fullScreenShadowDepth;
 
-    C_MTXLookAt(m_shadowCamera.m_cameraMatrix, reinterpret_cast<Vec*>(&m_shadowCamera.m_positionX), &up,
-                reinterpret_cast<Vec*>(&m_shadowCamera.m_targetX));
+    C_MTXLookAt(m_shadowCamera.m_cameraMatrix, reinterpret_cast<Vec*>(&m_shadowCamera.m_position.x), &up,
+                reinterpret_cast<Vec*>(&m_shadowCamera.m_target.x));
     C_MTXOrtho(m_shadowCamera.m_screenMatrix,
                m_fullScreenShadow.m_span, -m_fullScreenShadow.m_span,
                -m_fullScreenShadow.m_span, m_fullScreenShadow.m_span,
                m_shadowCamera.m_nearZ, m_shadowCamera.m_farZ);
 
-    g_shadow_pos.x = m_shadowCamera.m_positionX;
-    g_shadow_pos.y = m_shadowCamera.m_positionY;
-    g_shadow_pos.z = m_shadowCamera.m_positionZ;
-    g_shadow_refpos.x = m_shadowCamera.m_targetX;
-    g_shadow_refpos.y = m_shadowCamera.m_targetY;
-    g_shadow_refpos.z = m_shadowCamera.m_targetZ;
+    g_shadow_pos.x = m_shadowCamera.m_position.x;
+    g_shadow_pos.y = m_shadowCamera.m_position.y;
+    g_shadow_pos.z = m_shadowCamera.m_position.z;
+    g_shadow_refpos.x = m_shadowCamera.m_target.x;
+    g_shadow_refpos.y = m_shadowCamera.m_target.y;
+    g_shadow_refpos.z = m_shadowCamera.m_target.z;
 
     CopyCameraState(CurrentCameraState(), m_shadowCamera);
     GXSetProjection(m_screenMatrix, GX_ORTHOGRAPHIC);
@@ -1894,58 +1898,7 @@ void CCameraPcs::drawShadowEndAll()
         return;
     }
 
-    unsigned int* dstWords = reinterpret_cast<unsigned int*>(&CurrentCameraState());
-    unsigned int* srcWords = reinterpret_cast<unsigned int*>(&m_savedCamera);
-    float* dstFloats = &m_yaw;
-    float* srcFloats = &m_savedCamera.m_yaw;
-
-#define COPY_SHADOW_CAMERA_WORD_PAIR(index) \
-    do {                                    \
-        unsigned int word0 = srcWords[index]; \
-        unsigned int word1 = srcWords[(index) + 1]; \
-        dstWords[index] = word0;            \
-        dstWords[(index) + 1] = word1;      \
-    } while (0)
-
-    COPY_SHADOW_CAMERA_WORD_PAIR(0);
-    COPY_SHADOW_CAMERA_WORD_PAIR(2);
-    COPY_SHADOW_CAMERA_WORD_PAIR(4);
-    COPY_SHADOW_CAMERA_WORD_PAIR(6);
-    COPY_SHADOW_CAMERA_WORD_PAIR(8);
-    COPY_SHADOW_CAMERA_WORD_PAIR(10);
-    COPY_SHADOW_CAMERA_WORD_PAIR(12);
-    COPY_SHADOW_CAMERA_WORD_PAIR(14);
-    COPY_SHADOW_CAMERA_WORD_PAIR(16);
-    COPY_SHADOW_CAMERA_WORD_PAIR(18);
-    COPY_SHADOW_CAMERA_WORD_PAIR(20);
-    COPY_SHADOW_CAMERA_WORD_PAIR(22);
-    COPY_SHADOW_CAMERA_WORD_PAIR(24);
-    COPY_SHADOW_CAMERA_WORD_PAIR(26);
-    COPY_SHADOW_CAMERA_WORD_PAIR(28);
-    COPY_SHADOW_CAMERA_WORD_PAIR(30);
-    COPY_SHADOW_CAMERA_WORD_PAIR(32);
-    COPY_SHADOW_CAMERA_WORD_PAIR(34);
-    COPY_SHADOW_CAMERA_WORD_PAIR(36);
-    COPY_SHADOW_CAMERA_WORD_PAIR(38);
-    COPY_SHADOW_CAMERA_WORD_PAIR(40);
-    COPY_SHADOW_CAMERA_WORD_PAIR(42);
-    COPY_SHADOW_CAMERA_WORD_PAIR(44);
-    COPY_SHADOW_CAMERA_WORD_PAIR(46);
-    COPY_SHADOW_CAMERA_WORD_PAIR(48);
-    COPY_SHADOW_CAMERA_WORD_PAIR(50);
-    COPY_SHADOW_CAMERA_WORD_PAIR(52);
-    COPY_SHADOW_CAMERA_WORD_PAIR(54);
-    COPY_SHADOW_CAMERA_WORD_PAIR(56);
-    COPY_SHADOW_CAMERA_WORD_PAIR(58);
-
-#undef COPY_SHADOW_CAMERA_WORD_PAIR
-
-    dstWords[60] = srcWords[60];
-    dstFloats[0] = srcFloats[0];
-    dstFloats[1] = srcFloats[1];
-    dstFloats[2] = srcFloats[2];
-    dstFloats[3] = srcFloats[3];
-    dstFloats[4] = srcFloats[4];
+    CopyCameraState(CurrentCameraState(), m_savedCamera);
 }
 
 /*

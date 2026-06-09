@@ -2267,7 +2267,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 			if (mapHit != 0) {
 				PSVECScale(&debugDelta, &debugDelta, g_hit_t);
 			}
-			gCFlatRuntime2.AddDebugDrawCC(reinterpret_cast<Vec*>(&startPos), &debugDelta, cylRadius, 1, mapHit == 0);
+			CFlat.AddDebugDrawCC(reinterpret_cast<Vec*>(&startPos), &debugDelta, cylRadius, 1, mapHit == 0);
 
 			if (mapHit == 0) {
 				if (hitPartyIndex != NULL) {
@@ -2280,7 +2280,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 		if (static_cast<double>(kMonObjZero) != static_cast<double>(halfAngle)) {
 			float debugRadius = static_cast<float>(
 				static_cast<double>(coneLength) * static_cast<double>(static_cast<float>(tan(static_cast<double>(halfAngle)))));
-			gCFlatRuntime2.AddDebugDrawCC(&coneStart, reinterpret_cast<Vec*>(&move), debugRadius, 0, didHit);
+			CFlat.AddDebugDrawCC(&coneStart, reinterpret_cast<Vec*>(&move), debugRadius, 0, didHit);
 		}
 	}
 }

@@ -2964,10 +2964,10 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 			Mtx rotMtx;
 			PSMTXRotRad(rotMtx, 'y', m_rotTargetY);
 			for (int i = 0; i < 2; i++) {
-				float side = (i == 0) ? 76.0f : -76.0f;
-				Vec sidePos = { side, 0.0f, kCharaObjForwardParticleOffset };
+				int side = (i == 0) ? 76 : -76;
+				CVector sidePos(static_cast<float>(side), 0.0f, kCharaObjForwardParticleOffset);
 				Vec offsetPos;
-				PSMTXMultVec(rotMtx, &sidePos, &offsetPos);
+				PSMTXMultVec(rotMtx, reinterpret_cast<Vec*>(&sidePos), &offsetPos);
 				CFlatParticleWorkPosition().x = m_worldPosition.x + offsetPos.x;
 				CFlatParticleWorkPosition().y = m_worldPosition.y + offsetPos.y;
 				CFlatParticleWorkPosition().z = m_worldPosition.z + offsetPos.z;

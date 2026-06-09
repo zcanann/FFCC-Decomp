@@ -1730,9 +1730,10 @@ void CalcReflectionVector2(
 
     u16* dlEnd = (u16*)((u8*)displayList + displayListSize);
     while (dl < dlEnd) {
-        s8 drawFmt = *(u8*)dl;
+        u8 drawFmt = *(u8*)dl;
         u16 itemCount = *(u16*)((u8*)dl + 1);
         int i;
+        u32 fmt = drawFmt & 7;
 
         if (gUtil.IsHasDrawFmtDL(drawFmt) == 0) {
             break;
@@ -1745,7 +1746,7 @@ void CalcReflectionVector2(
             float denom;
 
             dl += 4;
-            if ((drawFmt & 7u) == 2) {
+            if (fmt == 2) {
                 dl++;
             }
 

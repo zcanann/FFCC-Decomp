@@ -168,11 +168,10 @@ static inline float CalcCmakeFadeAlpha(CMenuPcs* menu)
         frame = 0;
     }
 
-    short mode = state->m_mode;
-    if (mode == 0) {
+    if (state->m_mode == 0) {
         return static_cast<float>(0.1 * static_cast<double>(frame));
     }
-    if (mode == 1) {
+    if (state->m_mode == 1) {
         return 1.0f;
     }
     return static_cast<float>(1.0 - 0.1 * static_cast<double>(frame));
@@ -767,12 +766,12 @@ void CMenuPcs::CmakeVillageDraw()
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
     float a255 = 255.0f * alpha;
-    GXColor col;
-    col.r = 0xFF;
-    col.g = 0xFF;
-    col.b = 0xFF;
-    col.a = static_cast<unsigned char>(static_cast<int>(a255));
-    GXSetChanMatColor(GX_COLOR0A0, col);
+    GXColor col0;
+    col0.r = 0xFF;
+    col0.g = 0xFF;
+    col0.b = 0xFF;
+    col0.a = static_cast<unsigned char>(static_cast<int>(a255));
+    GXSetChanMatColor(GX_COLOR0A0, col0);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
     MenuPcs.DrawRect(
         0, 192.0f, 56.0f, 416.0f, 264.0f,
@@ -782,11 +781,12 @@ void CMenuPcs::CmakeVillageDraw()
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-    col.r = 0xFF;
-    col.g = 0xFF;
-    col.b = 0xFF;
-    col.a = static_cast<unsigned char>(static_cast<int>(a255));
-    GXSetChanMatColor(GX_COLOR0A0, col);
+    GXColor col1;
+    col1.r = 0xFF;
+    col1.g = 0xFF;
+    col1.b = 0xFF;
+    col1.a = static_cast<unsigned char>(static_cast<int>(a255));
+    GXSetChanMatColor(GX_COLOR0A0, col1);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
     float panelX = static_cast<float>(static_cast<int>(
         -(static_cast<double>(328.0f) * 0.5 - 400.0)));
@@ -796,11 +796,12 @@ void CMenuPcs::CmakeVillageDraw()
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-    col.r = 0xFF;
-    col.g = 0xFF;
-    col.b = 0xFF;
-    col.a = static_cast<unsigned char>(static_cast<int>(a255));
-    GXSetChanMatColor(GX_COLOR0A0, col);
+    GXColor col2;
+    col2.r = 0xFF;
+    col2.g = 0xFF;
+    col2.b = 0xFF;
+    col2.a = static_cast<unsigned char>(static_cast<int>(a255));
+    GXSetChanMatColor(GX_COLOR0A0, col2);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x68 : 0x41));
     MenuPcs.DrawRect(
         0, 184.0f, 216.0f, 48.0f, 48.0f,
@@ -1029,7 +1030,7 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
             const char* rowText = s_NameEntryStr[curRow + curTable * 5];
             int rowLen = strlen(rowText);
             if (rowLen != 0) {
-                int i = 0;
+                unsigned int i = 0;
                 int j = 0;
                 for (; 0 < rowLen; rowLen = rowLen - 1) {
                     if (i == curSelect) {
@@ -1777,7 +1778,7 @@ void CMenuPcs::CmakeJobDraw()
         int sel = CmakeState(this)->m_select;
         int cursorX = (sel < 4) ? 0x110 : 0x1A8;
         int cursorY = 0x70 + ((sel < 4) ? sel : (sel - 4)) * 0x28;
-        int cursorFrame = static_cast<int>(System.m_frameCounter) % 8;
+        unsigned int cursorFrame = static_cast<int>(System.m_frameCounter) % 8;
         DrawCursor(static_cast<int>((static_cast<float>(cursorX) - 36.0f) + static_cast<float>(cursorFrame)),
             cursorY, alpha);
     }
@@ -2708,7 +2709,7 @@ int CMenuPcs::CmakeNameCtrl()
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else if ((repeat & 0x4) != 0) {
-            if (CmakeState(this)->m_row < (4 + static_cast<int>((static_cast<unsigned long long>(CmakeState(this)->m_select) - 10) >> 32))) {
+            if (CmakeState(this)->m_row < (4 + static_cast<unsigned int>((static_cast<unsigned long long>(CmakeState(this)->m_select) - 10) >> 32))) {
                 CmakeState(this)->m_row = static_cast<short>(CmakeState(this)->m_row + 1);
             } else {
                 CmakeState(this)->m_row = 0;

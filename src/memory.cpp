@@ -1872,22 +1872,22 @@ void CAmemCache::IsEnable()
  */
 void CAmemCacheSet::AddRef(short index)
 {
-    CAmemCache& entry = cacheEntryAt(this, index);
-
-    entry.m_refCount += 1;
-    if (entry.m_refCount >= 0xFFFF) {
+    m_cacheTable[index].m_refCount += 1;
+    if (m_cacheTable[index].m_refCount >= 0xFFFF) {
         if (static_cast<unsigned int>(System.m_execParam) >= 3) {
             System.Printf(const_cast<char*>(sAmemCacheAddRefFmt), static_cast<int>(index));
         }
 
+        int offset = 0;
         for (int i = 0; i < m_cacheCount; i++) {
-            CAmemCache& current = cacheEntryAt(this, i);
+            CAmemCache& current = *reinterpret_cast<CAmemCache*>(reinterpret_cast<char*>(m_cacheTable) + offset);
             if (((current.m_inUse != 0) || (current.m_cacheData != 0)) && (static_cast<unsigned int>(System.m_execParam) >= 3)) {
                 System.Printf(
                     const_cast<char*>(sAmemCacheEntryFmt), i, cacheStateName(current),
                     cacheTypeName(current), current.m_refCount, current.m_priority,
                     reinterpret_cast<int>(current.m_cacheData));
             }
+            offset += sizeof(CAmemCache);
         }
 
         if (static_cast<unsigned int>(System.m_execParam) >= 3) {
@@ -1900,7 +1900,7 @@ void CAmemCacheSet::AddRef(short index)
         }
     }
 
-    entry.m_priority = 0x7FFFFFF0;
+    m_cacheTable[index].m_priority = 0x7FFFFFF0;
 }
 
 /*
@@ -1914,16 +1914,16 @@ void CAmemCacheSet::AddRef(short index)
  */
 void CAmemCacheSet::Release(short index)
 {
-    CAmemCache& entry = cacheEntryAt(this, index);
-    entry.m_refCount -= 1;
+    m_cacheTable[index].m_refCount -= 1;
 
-    if (entry.m_refCount >= 0xFFFF) {
+    if (m_cacheTable[index].m_refCount >= 0xFFFF) {
         if (static_cast<unsigned int>(System.m_execParam) >= 3) {
             System.Printf(const_cast<char*>(sAmemCacheAddRefFmt));
         }
 
-        int offset = 0;
-        for (int i = 0; i < m_cacheCount; i++) {
+        int i = 0;
+        int offset = i;
+        for (; i < m_cacheCount; i++) {
             CAmemCache& cache = *reinterpret_cast<CAmemCache*>(reinterpret_cast<char*>(m_cacheTable) + offset);
             if (((cache.m_inUse != 0) || (cache.m_cacheData != 0)) && (static_cast<unsigned int>(System.m_execParam) >= 3)) {
                 System.Printf(

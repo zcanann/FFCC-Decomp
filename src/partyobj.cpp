@@ -2608,8 +2608,10 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 			CMapObj* hitObj = getMapHitObject();
 			hitObj->CalcHitPosition(&m_comboCenter);
 			CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
+			Vec faceNormal;
 			caravanWork->m_targetCursorPosA = m_comboCenter;
-			hitObj->GetHitFaceNormal(&caravanWork->m_targetCursorPosB);
+			hitObj->GetHitFaceNormal(&faceNormal);
+			caravanWork->m_targetCursorPosB = faceNormal;
 		}
 		m_comboTarget = m_comboCenter;
 	}

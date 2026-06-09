@@ -1213,19 +1213,21 @@ void CGPartyObj::command()
 				} else if (targetState < 0x1C) {
 					if (targetState < 0x19) {
 tmpArtifactBlock:
+#define freshTargetBytes (reinterpret_cast<unsigned char*>(party.target))
 						if (*reinterpret_cast<int*>(targetBytes + 0x550) == 0) {
 							secondaryAvailable = true;
 							if ((targetState == 0x24 && caravan->CanAddTmpArtifact(1) != 0) ||
-							    (*reinterpret_cast<int*>(targetBytes + 0x500) == 0x20 &&
-							     caravan->CanAddGil(*reinterpret_cast<int*>(targetBytes + 0x558)) != 0) ||
-							    ((*reinterpret_cast<int*>(targetBytes + 0x500) != 0x24 &&
-							      *reinterpret_cast<int*>(targetBytes + 0x500) != 0x20) &&
+							    (*reinterpret_cast<int*>(freshTargetBytes + 0x500) == 0x20 &&
+							     caravan->CanAddGil(*reinterpret_cast<int*>(freshTargetBytes + 0x558)) != 0) ||
+							    ((*reinterpret_cast<int*>(freshTargetBytes + 0x500) != 0x24 &&
+							      *reinterpret_cast<int*>(freshTargetBytes + 0x500) != 0x20) &&
 							     *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xB4) + 1 <= 0x40)) {
 								secondaryCommand = 0x17;
 							} else {
 								secondaryCommand = 4;
 							}
 						}
+#undef freshTargetBytes
 					}
 				} else if (targetState < 0x22) {
 					goto tmpArtifactBlock;
@@ -4696,7 +4698,6 @@ void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 	unsigned char* countBase = CGPartyObj::m_ghostWork;
 	unsigned char* ghostWork = CGPartyObj::m_ghostWork;
 	int& activeTrailCount = *reinterpret_cast<int*>(countBase + 0x48);
-	int& trailIndex = *reinterpret_cast<int*>(ghostWork + 0x4C);
 
 	if (activeTrailCount == 0) {
 		activeTrailCount = 0;
@@ -4713,13 +4714,15 @@ void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 	CVector unused;
 	float flatLen = 0.0f;
 	int capturedCurrent = 0;
-	unsigned char* leaderPtr = ghostWork;
+	unsigned char* loopBase = CGPartyObj::m_ghostWork;
+	int& loopTrailIndex = *reinterpret_cast<int*>(loopBase + 0x4C);
+	unsigned char* leaderPtr = loopBase;
 
 	outDist = 0.0f;
 	for (int i = 0; i < activeTrailCount; i++) {
-		if (trailIndex <= i) {
+		if (loopTrailIndex <= i) {
 			Vec* nextPos;
-			if (i == trailIndex) {
+			if (i == loopTrailIndex) {
 				nextPos = &m_worldPosition;
 			} else {
 				nextPos = reinterpret_cast<Vec*>(CGPartyObj::m_ghostWork + (i - 1) * 0xC + 0x50);
@@ -4732,13 +4735,13 @@ void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 			float flatStep = PSVECMag(&delta);
 			flatLen += flatStep;
 
-			if (!capturedCurrent && i == trailIndex) {
+			if (!capturedCurrent && i == loopTrailIndex) {
 				capturedCurrent = 1;
 				outVec->x = delta.x;
 				outVec->y = delta.y;
 				outVec->z = delta.z;
 				if (flatStep < m_capsuleHalfHeight) {
-					trailIndex++;
+					loopTrailIndex++;
 				}
 			}
 		}
@@ -5151,7 +5154,7 @@ void CGPartyObj::gpmMove()
 			if (pathDist < Game.unkFloat_0xca10 * limit) {
 				if ((leader->m_lastStateId != 2 && leader->m_lastStateId != 6) ||
 				    leader->m_subState != 1 ||
-				    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(leader) + 0x668) == 0 ||
+				    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(leader) + 0x668) == 0 ||
 				    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(leader) + 0x660) != 0) {
 					return;
 				}

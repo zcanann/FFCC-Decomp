@@ -1725,7 +1725,7 @@ void CalcReflectionVector2(
 
     u16* dlEnd = (u16*)((u8*)displayList + displayListSize);
     while (dl < dlEnd) {
-        u8 drawFmt = *(u8*)dl;
+        s8 drawFmt = *(u8*)dl;
         u16 itemCount = *(u16*)((u8*)dl + 1);
         int i;
 

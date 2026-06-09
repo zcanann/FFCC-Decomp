@@ -4718,10 +4718,7 @@ void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 		leaderPtr += 0xC;
 	}
 
-	if (outDist < flatLen) {
-		flatLen = outDist;
-	}
-	outDist = flatLen;
+	outDist = (outDist < flatLen) ? outDist : flatLen;
 	if (outDist > DOUBLE_80331AA8) {
 		activeTrailCount = 0;
 		outVec->x = m_partyDelta[0].x;

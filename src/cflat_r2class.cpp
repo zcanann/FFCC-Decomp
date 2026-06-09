@@ -1660,7 +1660,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		case -0x70:
 			engineObject->m_stateFlags0 =
-			    static_cast<unsigned char>((static_cast<signed char>(object->m_localBase[0]) << 4) & 0x10) |
+			    static_cast<signed char>((static_cast<signed char>(object->m_localBase[0]) << 4) & 0x10) |
 			    (engineObject->m_stateFlags0 & 0xEF);
 			PushValue(this, object, 0);
 			outResult = 0;
@@ -1809,7 +1809,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			RuntimePartyAssignIndex(this) = partyIndex + 1;
 			if (Game.m_gameWork.m_wmBackupParams[partyIndex] >= 0) {
 				engineObject->SetClassWork(0, static_cast<int>(partyIndex));
-				ScriptCaravan(engineObject)->m_joybusCaravanId = static_cast<int>(partyIndex);
+				ScriptCaravan(engineObject)->m_joybusCaravanId = static_cast<unsigned int>(partyIndex);
 				Game.m_partyObjArr[partyIndex] = reinterpret_cast<CGPartyObj*>(engineObject);
 				Joybus.SendAllStat(static_cast<int>(partyIndex));
 			}

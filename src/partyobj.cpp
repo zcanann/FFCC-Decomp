@@ -1230,14 +1230,6 @@ tmpArtifactBlock:
 				} else if (targetState < 0x22) {
 					goto tmpArtifactBlock;
 				}
-			} else if (targetState == 0xCA) {
-				if (static_cast<int>(CFlatCenterState()) == 0) {
-					secondaryAvailable = true;
-					secondaryCommand = 0x1C;
-				} else {
-					primaryAvailable = true;
-					primaryCommand = 0x1C;
-				}
 			} else if (targetState < 0xCA) {
 				if (targetState == 0xC8) {
 					if (static_cast<int>(CFlatCenterState()) == 0) {
@@ -1255,6 +1247,14 @@ tmpArtifactBlock:
 						primaryAvailable = true;
 						primaryCommand = 0x0A;
 					}
+				}
+			} else if (targetState == 0xCA) {
+				if (static_cast<int>(CFlatCenterState()) == 0) {
+					secondaryAvailable = true;
+					secondaryCommand = 0x1C;
+				} else {
+					primaryAvailable = true;
+					primaryCommand = 0x1C;
 				}
 			} else if (targetState == 0xCC) {
 				secondaryAvailable = true;

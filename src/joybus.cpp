@@ -3782,12 +3782,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
 
     if ((gbaStatus & 1) == 0)
     {
-        if (phase == 2 && chunkCount <= step)
-        {
-            return -1;
-        }
-
-        return 0;
+        goto not_ready;
     }
 
     OSWaitSemaphore(&m_accessSemaphores[port]);
@@ -4202,6 +4197,14 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
     }
 
     return result;
+
+not_ready:
+    if (phase == 2 && chunkCount <= step)
+    {
+        return -1;
+    }
+
+    return 0;
 }
 
 /*

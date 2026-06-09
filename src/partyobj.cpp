@@ -2829,9 +2829,11 @@ void CGPartyObj::checkTargetParticle()
 			if (loopBossCid && (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) != 0)) {
 				loopBossTarget = true;
 			}
-			float radius = FLOAT_80331A88;
+			float radius;
 			if (loopBossTarget) {
 				radius = FLOAT_80331AB0;
+			} else {
+				radius = FLOAT_80331A88;
 			}
 
 			CVector up(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);

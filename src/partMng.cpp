@@ -4379,8 +4379,8 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
 
     mng->m_ownerScale = kPartMngOne;
     mng->m_scaleFactor = kPartMngOne;
-    mng->m_userFloat0 = kPartMngOne;
-    mng->m_userFloat1 = kPartMngOne;
+    *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(mng) + 0x3C) = kPartMngOne;
+    *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(mng) + 0x38) = kPartMngOne;
     mng->m_useOwnerScaleSign = 0;
     reinterpret_cast<_pppMngSt*>(mng)->m_owner = 0;
     reinterpret_cast<_pppMngSt*>(mng)->m_lookTarget = createParam->m_lookTargetPtr;

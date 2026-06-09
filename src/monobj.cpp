@@ -1356,15 +1356,15 @@ void CGMonObj::onFrameStat()
 				unsigned int soundId = 0;
 				int classId = reinterpret_cast<int>(object->m_scriptHandle[4]);
 				switch (classId) {
+				case 0xA9:
+					soundId = 0x1213A;
+					break;
 				case 0x9C:
 				case 0xA7:
 					soundId = 0x12130;
 					break;
 				case 0xA8:
 					soundId = 0x12126;
-					break;
-				case 0xA9:
-					soundId = 0x1213A;
 					break;
 				}
 				prgObj->playSe3D(soundId, 0x32, 0x96, 0, (Vec*)0);
@@ -2957,10 +2957,10 @@ void CGMonObj::setRepop(int mode)
 
 	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x1000);
 
-	short countC = (weaponMode == 0) ?
-		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AE) :
-		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AC);
-	int particleBase = (weaponMode == 0) ? 0x3C : 0x46;
+	short countC = (weaponMode != 0) ?
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AC) :
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AE);
+	int particleBase = (weaponMode != 0) ? 0x46 : 0x3C;
 
 	for (int i = 0; i < static_cast<int>(countC); i++) {
 		int dataNo = object->m_charaModelHandle->GetPdtSlot();

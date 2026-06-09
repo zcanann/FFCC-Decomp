@@ -1898,8 +1898,7 @@ void CCaravanWork::CalcStatus()
 	for (int equipIdx = 0; equipIdx < 4; equipIdx++) {
 		if (m_equipment[equipIdx] >= 0) {
 			int itemIdx = (short)m_inventoryItems[m_equipment[equipIdx]];
-			unsigned short* itemData = GetItemDataPtr(itemIdx);
-			int itemType = itemData[0];
+			int itemType = GetItemDataPtr(itemIdx)[0];
 
 			if (itemType == 1) {
 				int weaponItem;
@@ -1907,11 +1906,10 @@ void CCaravanWork::CalcStatus()
 				GetCurrentWeaponItem(weaponItem, weaponRef);
 				if (weaponItem > 0) {
 					itemIdx = weaponItem;
-					itemData = GetItemDataPtr(itemIdx);
 				}
 			}
 
-			unsigned short itemValue = (short)itemData[3];
+			unsigned short itemValue = (short)GetItemDataPtr(itemIdx)[3];
 			if (itemType != 0x45) {
 				if (itemType >= 0x45) {
 					if (itemType == 0x7F) {
@@ -1929,7 +1927,7 @@ void CCaravanWork::CalcStatus()
 			m_defense += itemValue;
 			m_baseDefense += itemValue;
 		apply_effect:
-			int itemEffect = itemData[4];
+			int itemEffect = GetItemDataPtr(itemIdx)[4];
 			char effectValue = (char)itemValue;
 			switch (itemEffect) {
 			case 1:

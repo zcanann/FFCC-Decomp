@@ -975,9 +975,12 @@ void birth(
 				}
 
 				Vec* pathVec = pathBase + ((u16*)*(int*)(pathInfo + 2))[sampleIndex];
-				*f32_at(particlePayload, 0x00) = pathVec->x * *f32_at(payload, 0xD8);
-				*f32_at(particlePayload, 0x04) = pathVec->y * *f32_at(payload, 0xDC);
-				*f32_at(particlePayload, 0x08) = pathVec->z * *f32_at(payload, 0xE0);
+				float pathX = pathVec->x;
+				float pathY = pathVec->y;
+				float pathZ = pathVec->z;
+				*f32_at(particlePayload, 0x00) = pathX * *f32_at(payload, 0xD8);
+				*f32_at(particlePayload, 0x04) = pathY * *f32_at(payload, 0xDC);
+				*f32_at(particlePayload, 0x08) = pathZ * *f32_at(payload, 0xE0);
 				if ((payload[0x2A] == 8) || (payload[0x2A] == 9)) {
 					PSVECNormalize((Vec*)particlePayload, (Vec*)(particlePayload + 0x10));
 				}

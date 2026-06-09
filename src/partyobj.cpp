@@ -900,10 +900,10 @@ void CGPartyObj::onFrameAlways()
 	int port = reinterpret_cast<int>(m_scriptHandle[0xED]);
 	int showTraceParticle;
 	if ((Game.m_gameWork.m_gameInitFlag == 0) ||
-	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 28) & 0xC0000000) >> 31) >= 0) ||
-	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 29) & 0xC0000000) >> 31) >= 0) ||
-	    ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) << 24) & 0xC0000000) >> 31) >= 0) ||
-	     (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1)) << 24) & 0xC0000000) >> 31) >= 0)) ||
+	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 28) & 0xC0000000) >> 31) == 0) ||
+	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 29) & 0xC0000000) >> 31) == 0) ||
+	    ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) << 24) & 0xC0000000) >> 31) == 0) ||
+	     (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1)) << 24) & 0xC0000000) >> 31) == 0)) ||
 	    (m_lastStateId == 6 || m_lastStateId == 2)) {
 		showTraceParticle = 0;
 	} else if ((Game.m_gameWork.m_menuStageMode == 0) ||

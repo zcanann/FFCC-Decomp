@@ -429,8 +429,9 @@ static CCharaPcs::CLoadAnim* LoadAnimFromDisk(
         File.Read(fileHandle);
         File.SyncCompleted(fileHandle);
 
+        void* animBuffer = File.m_readBuffer;
         CChara::CAnim* anim = new (self->m_stage, const_cast<char*>(s_p_chara_cpp), 0x62A) CChara::CAnim;
-        anim->Create(File.m_readBuffer, self->m_viewerAnimStage);
+        anim->Create(animBuffer, self->m_viewerAnimStage);
 
         CCharaPcs::CLoadAnim* loadAnim = new (self->m_stage, const_cast<char*>(s_p_chara_cpp), 0x62D) CCharaPcs::CLoadAnim;
         loadAnim->m_keyId = charaNo;
@@ -2416,7 +2417,8 @@ foundModel:
                     static_cast<unsigned long>(loadModel->m_streamSize));
                 CChara::CModel* model =
                     new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x7C7) CChara::CModel;
-                model->Create(File.m_readBuffer, SelectLoadStage(&CharaPcs, modelStage));
+                void* amemBuffer = File.m_readBuffer;
+                model->Create(amemBuffer, SelectLoadStage(&CharaPcs, modelStage));
                 loadModel->m_model = model;
                 File.UnlockBuffer();
             }
@@ -2475,7 +2477,8 @@ foundModel:
         if (fileHandle != 0) {
             File.Read(fileHandle);
             File.SyncCompleted(fileHandle);
-            m_model->CreateDynamics(File.m_readBuffer, HandleModelStage(charaKind, 0));
+            void* dynamicsBuffer = File.m_readBuffer;
+            m_model->CreateDynamics(dynamicsBuffer, HandleModelStage(charaKind, 0));
             File.Close(fileHandle);
             if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                 System.Printf(const_cast<char*>(s_charaDynamicsLoadDvdFmt), charaKind, static_cast<int>(charaNo));
@@ -3115,7 +3118,8 @@ void CCharaPcs::CHandle::loadModelASyncFrame()
         m_charaKind = m_asyncCharaKind;
         m_charaNo = m_asyncCharaNo;
     } else if (m_asyncState == 4) {
-        m_model->CreateDynamics(File.m_readBuffer, HandleModelStage(m_asyncCharaKind, 0));
+        void* readBuffer = File.m_readBuffer;
+        m_model->CreateDynamics(readBuffer, HandleModelStage(m_asyncCharaKind, 0));
     } else {
         void* readBuffer = File.m_readBuffer;
         int keyId = m_asyncCharaNo;

@@ -1627,8 +1627,10 @@ void CCameraPcs::drawShadowBegin()
         m_shadowRectBound.m_max.x = kCameraBoundsMaxInitial;
 
         if (m_shadowAuto == 1 && GetShadowRect(m_shadowRectBound) != 0) {
-            m_targetX = (m_shadowRectBound.m_min.x + m_shadowRectBound.m_max.x) * kCameraHalfF;
-            m_targetZ = (m_shadowRectBound.m_min.z + m_shadowRectBound.m_max.z) * kCameraHalfF;
+            float sumX = m_shadowRectBound.m_min.x + m_shadowRectBound.m_max.x;
+            float sumZ = m_shadowRectBound.m_min.z + m_shadowRectBound.m_max.z;
+            m_targetX = sumX * kCameraHalfF;
+            m_targetZ = sumZ * kCameraHalfF;
             m_targetY = m_fullScreenShadowPosition.y;
 
             float w = m_shadowRectBound.m_max.x - m_shadowRectBound.m_min.x;

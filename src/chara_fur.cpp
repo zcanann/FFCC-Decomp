@@ -1364,28 +1364,23 @@ int CChara::CModel::PickFur(
 					Vec curViewPos;
 					PSMTXMultVec(modelViewMtx, &localPos, &curViewPos);
 
-					Vec4d curClip;
-					float curScreenX;
-					float curScreenY;
+					FurProjectedVertex incoming;
 					if (static_cast<double>(curViewPos.z) < static_cast<double>(kCharaFurDepthZero)) {
+						Vec4d curClip;
 						curValid = curValid & 0x7fffffff | 0x80000000;
 						Math.MTX44MultVec4(screenMtx, &curViewPos, &curClip);
 						const float invW = kCharaFurDepthScaleBase / curClip.w;
-						curScreenX = kCharaFurScreenCenterX * curClip.x * invW + kCharaFurScreenCenterX;
-						curScreenY = kCharaFurScreenCenterY - kCharaFurScreenCenterY * curClip.y * invW;
+						incoming.m_clipX = curClip.x;
+						incoming.m_clipY = curClip.y;
+						incoming.m_clipZ = curClip.z;
+						incoming.m_clipW = curClip.w;
+						incoming.m_screenX = kCharaFurScreenCenterX * curClip.x * invW + kCharaFurScreenCenterX;
+						incoming.m_screenY = kCharaFurScreenCenterY - kCharaFurScreenCenterY * curClip.y * invW;
 					} else {
 						curValid = curValid & 0x7fffffff;
 					}
-
-					FurProjectedVertex incoming;
 					incoming.m_valid = curValid;
 					incoming.m_viewPos = curViewPos;
-					incoming.m_clipX = curClip.x;
-					incoming.m_clipY = curClip.y;
-					incoming.m_clipZ = curClip.z;
-					incoming.m_clipW = curClip.w;
-					incoming.m_screenX = curScreenX;
-					incoming.m_screenY = curScreenY;
 					incoming.m_u = curU;
 					incoming.m_v = curV;
 					{

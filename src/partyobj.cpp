@@ -1373,7 +1373,7 @@ tmpArtifactBlock:
 
 			party.pendingWeaponItem = cmdIdx;
 			party.weaponItem = caravan->m_equipment[0] < 0 ? 0 : caravan->m_inventoryItems[caravan->m_equipment[0]];
-			party.commandFlags = (party.commandFlags & 0xDF) | 0x20;
+			party.commandFlagBits.flag20 = 1;
 			changeStat(0x0F, 0, 0);
 			return;
 		}
@@ -1442,7 +1442,7 @@ tmpArtifactBlock:
 			}
 			party.pendingWeaponItem = caravan->GetIdxCmdList();
 			party.weaponItem = itemId;
-			party.commandFlags = (party.commandFlags & 0xDF) | 0x20;
+			party.commandFlagBits.flag20 = 1;
 			changeStat(0x0F, 0, 0);
 			return;
 		}
@@ -2004,7 +2004,7 @@ void CGPartyObj::onFrameStat()
 			}
 		} else if (isLoopAnim() != 0) {
 			if (*reinterpret_cast<unsigned short*>(script + 0x1C) != 0) {
-				party.partyFlags = (party.partyFlags & 0xFD) | 2;
+				party.flags.flag02 = 1;
 			}
 			changeStat(0, 0, 0);
 		}
@@ -2242,11 +2242,19 @@ void CGPartyObj::statCharge()
 							CVector dir(delta);
 							CVector scaled;
 							PSVECScale(reinterpret_cast<Vec*>(&dir), reinterpret_cast<Vec*>(&scaled), mag - static_cast<float>(maxReach));
+							CVector scaledCopy;
+							scaledCopy.x = scaled.x;
+							scaledCopy.y = scaled.y;
+							scaledCopy.z = scaled.z;
 							CVector unit;
-							PSVECScale(reinterpret_cast<Vec*>(&scaled), reinterpret_cast<Vec*>(&unit), kMonObjOne / mag);
+							PSVECScale(reinterpret_cast<Vec*>(&scaledCopy), reinterpret_cast<Vec*>(&unit), kMonObjOne / mag);
+							CVector unitCopy;
+							unitCopy.x = unit.x;
+							unitCopy.y = unit.y;
+							unitCopy.z = unit.z;
 							CVector origin(m_worldPosition);
 							CVector sum;
-							PSVECAdd(reinterpret_cast<Vec*>(&origin), reinterpret_cast<Vec*>(&unit), reinterpret_cast<Vec*>(&sum));
+							PSVECAdd(reinterpret_cast<Vec*>(&origin), reinterpret_cast<Vec*>(&unitCopy), reinterpret_cast<Vec*>(&sum));
 							dest.x = sum.x;
 							dest.y = sum.y;
 							dest.z = sum.z;
@@ -2900,7 +2908,7 @@ void CGPartyObj::checkTargetParticle()
 #undef targetPos
 #undef centerPos
 	} else {
-		party.partyFlags &= 0xDF;
+		party.flags.flag20 = 0;
 	}
 
 	CVector worldPosFinal(m_worldPosition);
@@ -3493,17 +3501,17 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 	unsigned int stageSub = bossArtifacts->m_entries[bonusSlot + 9].m_values[0];
 
 	if (kind == 0) {
-		unsigned short count = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBC8);
+		int count = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBC8);
 		System.Printf(const_cast<char*>(msgBase + 0x1C0), count + 1);
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBC8) = count + 1;
 	}
 	if (kind == 1) {
-		unsigned short count = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBC4);
+		int count = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBC4);
 		System.Printf(const_cast<char*>(msgBase + 0x1DC), count + 1);
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBC4) = count + 1;
 	}
 	if (kind == 4) {
-		unsigned short count = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBC6);
+		int count = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBC6);
 		System.Printf(const_cast<char*>(msgBase + 0x1F8), count + 1);
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBC6) = count + 1;
 	}
@@ -4801,11 +4809,11 @@ void CGPartyObj::gpmCol()
 			activeTrailCount = capped;
 			newIndex = trailIndex;
 		} else {
-			activeTrailCount = i + 1;
+			*reinterpret_cast<float*>(trailBase + i * 0xC) = leader->m_worldPosition.x;
 			Vec* slot = reinterpret_cast<Vec*>(trailBase + i * 0xC);
-			slot->x = leader->m_worldPosition.x;
 			slot->y = leader->m_worldPosition.y;
 			slot->z = leader->m_worldPosition.z;
+			activeTrailCount = i + 1;
 			if (trailIndex < i) {
 				newIndex = trailIndex;
 			} else {
@@ -4930,7 +4938,7 @@ void CGPartyObj::ghostPartyMog()
 			} else if (moodMode != 0 && moodMode < 3 && CharaGhostValue(0x2054) < 0x32) {
 				bossState = 6;
 			}
-			flags[0] = (flags[0] & 0xF7) | 8;
+			sGhostPartyWork.flagBits.flag08 = 1;
 		} else {
 			if (sGhostPartyWork.flagBits.flag10 == 0) {
 				int innerMode;
@@ -4965,7 +4973,7 @@ void CGPartyObj::ghostPartyMog()
 					}
 				}
 				if (static_cast<int>(FLOAT_80331A5C * innerScale) <= static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x38))) {
-					flags[0] = (flags[0] & 0xFB) | 4;
+					sGhostPartyWork.flagBits.flag04 = 1;
 					bossState = 3;
 					goto messageMenu;
 				}
@@ -5116,7 +5124,7 @@ void CGPartyObj::gpmMove()
 	toLeader.y = 0.0f;
 	float dist = PSVECMag(&toLeader);
 	float nearDist = m_nearColRadius + leader->m_nearColRadius;
-	float clampedDist = (*reinterpret_cast<float*>(self + 0x5BC) < dist) ? *reinterpret_cast<float*>(self + 0x5BC) : dist;
+	float clampedDist = (dist > *reinterpret_cast<float*>(self + 0x5BC)) ? *reinterpret_cast<float*>(self + 0x5BC) : dist;
 
 	if (m_lastStateId == 0 &&
 	    (static_cast<unsigned char>(static_cast<int>((static_cast<unsigned int>(self[0x63C]) << 24) & 0xC0000000) >> 31) != 0)) {
@@ -5138,42 +5146,39 @@ void CGPartyObj::gpmMove()
 					return;
 				}
 
-				int threshold0 = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2048);
-				int threshold1 = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x204C);
-				int threshold2 = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2050);
-				if (sGhostPartyWork.thresholdA < threshold0 &&
-				    sGhostPartyWork.thresholdB < threshold1 &&
-				    sGhostPartyWork.thresholdC < threshold2) {
+				if (sGhostPartyWork.thresholdA < CharaGhostValue(0x2048) &&
+				    sGhostPartyWork.thresholdB < CharaGhostValue(0x204C) &&
+				    sGhostPartyWork.thresholdC < CharaGhostValue(0x2050)) {
 					return;
 				}
 
 				int choices = 0;
-				if (sGhostPartyWork.thresholdA >= threshold0) {
+				if (sGhostPartyWork.thresholdA >= CharaGhostValue(0x2048)) {
 					choices++;
 				}
-				if (sGhostPartyWork.thresholdB >= threshold1) {
+				if (sGhostPartyWork.thresholdB >= CharaGhostValue(0x204C)) {
 					choices++;
 				}
-				if (sGhostPartyWork.thresholdC >= threshold2) {
+				if (sGhostPartyWork.thresholdC >= CharaGhostValue(0x2050)) {
 					choices++;
 				}
 
 				int pick = Math.Rand(choices);
 				int cursor = 0;
 				int newSlotSel;
-				if (sGhostPartyWork.thresholdA >= threshold0 && cursor == pick) {
+				if (sGhostPartyWork.thresholdA >= CharaGhostValue(0x2048) && cursor == pick) {
 					newSlotSel = 0;
 				} else {
-					if (sGhostPartyWork.thresholdA >= threshold0) {
+					if (sGhostPartyWork.thresholdA >= CharaGhostValue(0x2048)) {
 						cursor++;
 					}
-					if (sGhostPartyWork.thresholdB >= threshold1 && cursor == pick) {
+					if (sGhostPartyWork.thresholdB >= CharaGhostValue(0x204C) && cursor == pick) {
 						newSlotSel = 1;
 					} else {
-						if (sGhostPartyWork.thresholdB >= threshold1) {
+						if (sGhostPartyWork.thresholdB >= CharaGhostValue(0x204C)) {
 							cursor++;
 						}
-						if (sGhostPartyWork.thresholdC >= threshold2 && cursor == pick) {
+						if (sGhostPartyWork.thresholdC >= CharaGhostValue(0x2050) && cursor == pick) {
 							newSlotSel = 2;
 						} else {
 							newSlotSel = 0;
@@ -5195,7 +5200,8 @@ void CGPartyObj::gpmMove()
 				}
 				changeStat(2, 0, 0);
 				sGhostPartyWork.gauge = 0;
-				PartyData(this).partyFlags &= 0x9F;
+				PartyData(this).flags.flag40 = 0;
+				PartyData(this).flags.flag20 = 0;
 				return;
 			}
 		} else {

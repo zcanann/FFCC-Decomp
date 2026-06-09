@@ -751,13 +751,15 @@ int CCaravanWork::CanAddTmpArtifact(int numItems)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_propagation off
 int CCaravanWork::FindItem(int itemId)
 {
 	CCaravanWork* cur = this;
 	int itemIdx = 0;
 
 	for (int row = 0; row < 8; row++) {
-		unsigned short item = cur->m_inventoryItems[0];
+		short item = cur->m_inventoryItems[0];
 		if (item != -1 && item == itemId) {
 			return itemIdx;
 		}
@@ -803,6 +805,7 @@ int CCaravanWork::FindItem(int itemId)
 
 	return -1;
 }
+#pragma pop
 
 /*
  * --INFO--

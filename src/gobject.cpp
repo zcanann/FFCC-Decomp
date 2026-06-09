@@ -976,10 +976,7 @@ void CGObject::bgNormalCollision()
     stepCylinder.m_radius = m_capsuleHalfHeight;
 
     if (MapMng.CheckHitCylinderNear(&stepCylinder, &move, m_bgHitMask) == 0) {
-        pos.y -= m_capsuleHalfHeight;
-        PSVECAdd(&pos, &move, &pos);
-        PSVECSubtract(&pos, &m_worldPosition, &m_groundHitOffset);
-        return;
+        goto stepMiss;
     }
 
     if ((MapMng.GetMapIdGrpArray()[gMapHitFace->m_groupIndex].m_mask & 0x20) == 0) {
@@ -1036,6 +1033,12 @@ simple:
     m_groundHitOffset.x = pos.x - m_worldPosition.x;
     m_groundHitOffset.y = pos.y - m_worldPosition.y;
     m_groundHitOffset.z = pos.z - m_worldPosition.z;
+    return;
+
+stepMiss:
+    pos.y -= m_capsuleHalfHeight;
+    PSVECAdd(&pos, &move, &pos);
+    PSVECSubtract(&pos, &m_worldPosition, &m_groundHitOffset);
 }
 
 /*

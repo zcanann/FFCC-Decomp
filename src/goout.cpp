@@ -2626,9 +2626,6 @@ void CGoOutMenu::Calc()
     if (m_messageCloseMode == 0) {
         mode = m_mainMode;
         switch (mode) {
-        case 2:
-            CalcGoOut();
-            break;
         case 0:
             if (m_messageWindowOpen != 0) {
                 input = GetGoOutInputMask();
@@ -2772,6 +2769,9 @@ void CGoOutMenu::Calc()
                 }
                 }
             }
+            break;
+        case 2:
+            CalcGoOut();
             break;
         case 3:
             CalcDel();

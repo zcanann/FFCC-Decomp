@@ -601,7 +601,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
         memset(particleColor, 0, sizeof(_PARTICLE_COLOR));
     }
 
-    if ((s32)paramBytes[0x18] < 8 && (s32)paramBytes[0x18] >= 0) {
+    if ((u32)paramBytes[0x18] < 8 && (s32)paramBytes[0x18] >= 0) {
         Vec baseDir;
         s32 angles[4];
         pppFMATRIX rot;

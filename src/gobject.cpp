@@ -341,10 +341,7 @@ void CGObject::onCreate()
     m_radiusCtrlVel.z = m_radiusCtrl.z;
     m_groundFriction = m_radiusCtrlVel.x;
 
-    m_moveAnimState = 0;
-    m_moveAnimSubState = 0;
-    m_randSeedLo = 0;
-    m_randSeedHi = 0;
+    *reinterpret_cast<u32*>(&m_moveAnimState) = 0;
     m_stateFlags0Bits.unk4 = 0;
     m_ownerSlot = 0;
     m_stateFlags0Bits.unk0 = 0;

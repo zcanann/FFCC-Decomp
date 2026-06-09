@@ -627,7 +627,7 @@ void CGObject::move()
             if (m_weaponNodeFlagAll.m_bits1.m_shield
                 && m_weaponNodeFlagAll.m_bits1.m_menuReady
                 && (m_ownerType == 0)) {
-                if ((MiniGamePcs.m_flags & 2) != 0) {
+                if ((DbgMenuPcs.GetDbgFlagsRaw() & 2) != 0) {
                     speed *= sAnalogSpeedScale;
                 }
 

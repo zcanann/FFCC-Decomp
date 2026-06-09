@@ -4750,7 +4750,8 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
 
             payload[0] = 1;
 
-            GbaQue.GetCaravanName((char*)&payload[1]);
+            unsigned char* body = &payload[1];
+            GbaQue.GetCaravanName((char*)body);
 
             signed char* p = (signed char*)&playerInfo;
             unsigned char* cf = classFlags;
@@ -4793,33 +4794,33 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
                 highBits += 1;
             }
 
-            memcpy(&payload[0x81], classFlags, sizeof(classFlags));
+            memcpy(&body[0x80], classFlags, sizeof(classFlags));
 
             unsigned char* playerData = playerInfo.m_data;
 
-            payload[0x85] = playerData[0x16];
-            payload[0x86] = playerData[0x17];
-            payload[0x87] = playerData[0xF2];
-            payload[0x88] = playerData[0xF3];
-            payload[0x89] = playerData[0x1CE];
-            payload[0x8A] = playerData[0x1CF];
-            payload[0x8B] = playerData[0x2AA];
-            payload[0x8C] = playerData[0x2AB];
-            payload[0x8D] = playerData[threadParam->m_portIndex * 0xDC + 2];
+            body[0x84] = playerData[0x16];
+            body[0x85] = playerData[0x17];
+            body[0x86] = playerData[0xF2];
+            body[0x87] = playerData[0xF3];
+            body[0x88] = playerData[0x1CE];
+            body[0x89] = playerData[0x1CF];
+            body[0x8A] = playerData[0x2AA];
+            body[0x8B] = playerData[0x2AB];
+            body[0x8C] = playerData[threadParam->m_portIndex * 0xDC + 2];
 
-            memcpy(&payload[0x8E], &playerData[threadParam->m_portIndex * 0xDC + 0x20], 3);
+            memcpy(&body[0x8D], &playerData[threadParam->m_portIndex * 0xDC + 0x20], 3);
 
             unsigned short statHalf = __lhbrx(&playerData[threadParam->m_portIndex * 0xDC + 0x14], 0);
-            memcpy(&payload[0x91], &statHalf, 2);
+            memcpy(&body[0x90], &statHalf, 2);
 
-            unsigned char* body = &payload[0x93];
+            unsigned char* compatBody = &body[0x92];
 
-            int compatLen = GbaQue.GetCompatibility(threadParam->m_portIndex, body);
+            int compatLen = GbaQue.GetCompatibility(threadParam->m_portIndex, compatBody);
 
-            memcpy(body + compatLen, &playerData[threadParam->m_portIndex * 0xDC + 0x18], 8);
+            memcpy(compatBody + compatLen, &playerData[threadParam->m_portIndex * 0xDC + 0x18], 8);
 
             unsigned int statWord = __lwbrx(&playerData[threadParam->m_portIndex * 0xDC + 0x24], 0);
-            memcpy(body + compatLen + 8, &statWord, sizeof(statWord));
+            memcpy(compatBody + compatLen + 8, &statWord, sizeof(statWord));
 
             const int byteLen = compatLen + 0xA3;
 

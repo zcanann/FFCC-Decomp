@@ -1448,7 +1448,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		frontDelta.y = deltaVec.y;
 		frontDelta.z = deltaVec.z;
 		float frontMag = PSVECMag(&frontDelta);
-		if (kCharaObjZero < frontMag) {
+		if (frontMag > kCharaObjZero) {
 			CVector scaledVec;
 			PSVECScale(&frontDelta, reinterpret_cast<Vec*>(&scaledVec), kOneF32 / frontMag);
 			frontDelta.x = scaledVec.x;
@@ -1458,7 +1458,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			facing.x = sinf(m_rotBaseY);
 			facing.y = kCharaObjZero;
 			facing.z = cosf(m_rotBaseY);
-			if (kCharaObjZero < PSVECDotProduct(&frontDelta, reinterpret_cast<Vec*>(&facing))) {
+			if (PSVECDotProduct(&frontDelta, reinterpret_cast<Vec*>(&facing)) > kCharaObjZero) {
 				playSe3D(0x1D, 0x32, 0x96, 0, 0);
 				putParticle(0x200, 0, hitPos, FLOAT_803319AC * m_attackColRadius, 0);
 				if ((static_cast<short>(sourceObj->GetCID()) & 0x6D) == 0x6D) {

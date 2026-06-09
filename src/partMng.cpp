@@ -2011,8 +2011,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             return;
         }
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x673);
-        int pdtCount = *reinterpret_cast<int*>(self + kPdtCountOffset);
-        void*& pppDataHead = *reinterpret_cast<void**>(self + kPppDataHeadTableOffset + pdtCount * 4);
+#define pppDataHead (*reinterpret_cast<void**>(self + kPppDataHeadTableOffset + (*reinterpret_cast<int*>(self + kPdtCountOffset)) * 4))
         if (pppDataHead != 0) {
             delete[] reinterpret_cast<u8*>(pppDataHead);
             pppDataHead = 0;
@@ -2028,7 +2027,8 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x679) u8[0x3000];
         memcpy(pppDataHead, payload, packetSize - 0x20);
         pppInitPdt(reinterpret_cast<long*>(pppDataHead), pppGetSysProgTable());
-        *reinterpret_cast<int*>(self + kPdtCountOffset) = pdtCount + 1;
+        *reinterpret_cast<int*>(self + kPdtCountOffset) = *reinterpret_cast<int*>(self + kPdtCountOffset) + 1;
+#undef pppDataHead
         return;
     }
     case 0x0F:
@@ -2795,8 +2795,8 @@ void CPartMng::pppEditPartDrawAfter()
         int prevInterval = gPppHeapUseRateWords[2];
         gPppHeapUseRateWords[2] = prevInterval - 1;
         if (prevInterval == 0 || gPppHeapUseRateWords[0] > gPppHeapUseRateWords[1]) {
-            gPppHeapUseRateWords[2] = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + kHeapCheckIntervalOffset) << 1;
             gPppHeapUseRateWords[1] = gPppHeapUseRateWords[0];
+            gPppHeapUseRateWords[2] = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + kHeapCheckIntervalOffset) << 1;
         }
     }
 }
@@ -3417,8 +3417,8 @@ void CPartMng::pppPartDrawAfter()
         int prevInterval = gPppHeapUseRateWords[2];
         gPppHeapUseRateWords[2] = prevInterval - 1;
         if (prevInterval == 0 || gPppHeapUseRateWords[0] > gPppHeapUseRateWords[1]) {
-            gPppHeapUseRateWords[2] = *(int*)((char*)this + 0x16C) << 1;
             gPppHeapUseRateWords[1] = gPppHeapUseRateWords[0];
+            gPppHeapUseRateWords[2] = *(int*)((char*)this + 0x16C) << 1;
         }
     }
 }

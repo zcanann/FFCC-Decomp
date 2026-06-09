@@ -2873,7 +2873,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
     }
 
     bool restoreFog = false;
-    if ((drawPass == 0 || drawPass == 4) && m_fogBlend > 0.0f) {
+    if ((drawPass == 0 || drawPass == 4) && kCharaZero < m_fogBlend) {
         float invBlend = kCharaOne - m_fogBlend;
         float fogBlend = kCharaOne - invBlend * invBlend;
         float fogRemainder = kCharaOne - fogBlend;

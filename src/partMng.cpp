@@ -415,13 +415,14 @@ void CPartMng::Destroy()
                 }
             }
         }
-        delete[] res->m_pppModelStArr;
+        delete[] modelArr;
         res->m_pppModelStArr = 0;
     }
 
     if (res->m_pppShapeStArr != 0) {
+        pppShapeSt* shapeArr = res->m_pppShapeStArr;
         for (unsigned int i = 0; i < 0x100; i++) {
-            pppShapeSt* shape = &res->m_pppShapeStArr[i];
+            pppShapeSt* shape = &shapeArr[i];
             if (shape->m_inUse != 0) {
                 if (--shape->m_refCount <= 0) {
                     if (shape->m_animData != 0) {
@@ -437,7 +438,7 @@ void CPartMng::Destroy()
                 }
             }
         }
-        delete[] res->m_pppShapeStArr;
+        delete[] shapeArr;
         res->m_pppShapeStArr = 0;
     }
 

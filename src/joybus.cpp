@@ -5575,9 +5575,13 @@ int JoyBus::SendCtrlMode(ThreadParam* threadParam, int controlMode)
     cmdBytes[0] = 9;
     cmdBytes[1] = modeByte;
     unsigned int cmdWord = cmd;
-    int result = 0;
+    int result;
 
-    if (static_cast<signed char>(m_threadRunningMask) != 0)
+    if (static_cast<signed char>(m_threadRunningMask) == 0)
+    {
+        result = 0;
+    }
+    else
     {
         OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 

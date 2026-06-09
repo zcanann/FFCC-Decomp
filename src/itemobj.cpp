@@ -364,6 +364,8 @@ void CGItemObj::loadModel()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma optimization_level 2
 void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* hitParam)
 {
 	unsigned char* self = (unsigned char*)this;
@@ -426,6 +428,7 @@ void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* 
 
 	ItemCFlatRuntime()->IgnoreParticle(effectIndex, this);
 }
+#pragma pop
 
 /*
  * --INFO--

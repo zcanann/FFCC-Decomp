@@ -1753,30 +1753,11 @@ void CCaravanWork::SafeDeleteTempItem()
 		}
 	}
 
-	short invalidSlot = -1;
-	int slot = m_commandListInventorySlotRef[2];
-	if (slot >= 0 && m_inventoryItems[slot] < 0) {
-		m_commandListInventorySlotRef[2] = invalidSlot;
-	}
-	slot = m_commandListInventorySlotRef[3];
-	if (slot >= 0 && m_inventoryItems[slot] < 0) {
-		m_commandListInventorySlotRef[3] = invalidSlot;
-	}
-	slot = m_commandListInventorySlotRef[4];
-	if (slot >= 0 && m_inventoryItems[slot] < 0) {
-		m_commandListInventorySlotRef[4] = invalidSlot;
-	}
-	slot = m_commandListInventorySlotRef[5];
-	if (slot >= 0 && m_inventoryItems[slot] < 0) {
-		m_commandListInventorySlotRef[5] = invalidSlot;
-	}
-	slot = m_commandListInventorySlotRef[6];
-	if (slot >= 0 && m_inventoryItems[slot] < 0) {
-		m_commandListInventorySlotRef[6] = invalidSlot;
-	}
-	slot = m_commandListInventorySlotRef[7];
-	if (slot >= 0 && m_inventoryItems[slot] < 0) {
-		m_commandListInventorySlotRef[7] = invalidSlot;
+	for (int slotIndex2 = 2; slotIndex2 < 8; slotIndex2++) {
+		int slot = m_commandListInventorySlotRef[slotIndex2];
+		if (slot >= 0 && m_inventoryItems[slot] < 0) {
+			m_commandListInventorySlotRef[slotIndex2] = -1;
+		}
 	}
 
 	m_currentCmdListIndex = 0;

@@ -1079,7 +1079,9 @@ void CGObject::bgWorldCollision()
 
     CMapCylinder bodyCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
     bodyCylinder.m_bottom = radial;
-    bodyCylinder.m_axis = hitMove;
+    bodyCylinder.m_axis.x = scaledHitMove.x;
+    bodyCylinder.m_axis.y = scaledHitMove.y;
+    bodyCylinder.m_axis.z = scaledHitMove.z;
     bodyCylinder.m_radius = sZeroFloat;
 
     const u32 hitMask = m_bgHitMask;

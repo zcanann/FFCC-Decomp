@@ -113,7 +113,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                 const s8 trailReadIndex = *(u8*)(particle + 0x38);
                 const s32 trailMaxIndex = (s8)(*(u8*)(particle + 0x37) - 1);
                 s32 trailNextIndex = (u8)(trailReadIndex + 1);
-                const float alphaScale = (float)*(s16*)((u8*)colorWork + 6) / LoadFloat(kPppYmMegaBirthShpTail3AlphaDivisor);
+                const float alphaScale = (float)*(u16*)((u8*)colorWork + 6) / LoadFloat(kPppYmMegaBirthShpTail3AlphaDivisor);
                 const float stepDivisor = (float)((u32)frameCountRaw - 1);
                 float fadeA = (float)(*(s16*)(workBytes + 0x56) >> 7) * alphaScale;
                 float fadeR = (float)(*(u16*)(workBytes + 0x50) >> 7);
@@ -140,8 +140,8 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                 Vec* history = (Vec*)(particle + 0x80);
                 float segLen;
                 u16 frameCount = frameCountRaw;
-                u16 particleShapeFrame = *(u16*)(particle + 0x1C);
-                const u16 shapeFrameStep = shapeAnim->m_frames[0].m_duration;
+                s16 particleShapeFrame = *(u16*)(particle + 0x1C);
+                const s16 shapeFrameStep = shapeAnim->m_frames[0].m_duration;
                 const s16 shapeFrameCount = shapeAnim->m_frameCount;
                 float drawX, drawY, drawZ;
                 float camX, camY, camZ;
@@ -188,7 +188,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                                    (kPppYmMegaBirthShpTail3Zero != curHist->y) ||
                                    (kPppYmMegaBirthShpTail3Zero != curHist->z);
                     if (canDraw) {
-                        workRand = (u16)((u32)workRand * 0x80d + 7);
+                        workRand = (s16)((u32)workRand * 0x80d + 7);
                         const u32 shapeFrame = (u32)(particleShapeFrame + workRand) / shapeFrameStep;
                         pppShapeAnimFrame* frame = &shapeAnim->m_frames[shapeFrame % (u32)shapeFrameCount];
                         tagOAN3_SHAPE* shape =

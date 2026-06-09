@@ -754,8 +754,8 @@ void CGraphicPcs::drawBar()
     CSystem::COrder* order = System.GetFirstOrder();
     const int orderCount = System.m_orderCount;
     const int lastOrder = orderCount - 1;
-    int hue = 0;
     u32 y = 0x10;
+    int hue = 0;
     for (int i = 0; i < orderCount; i++) {
         const int priority = order->m_priority;
         const float lastTime = order->m_lastTime;

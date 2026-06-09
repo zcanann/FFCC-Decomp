@@ -1145,7 +1145,7 @@ void CGMonObj::onFrameStat()
 	case 0x1D:
 		SET_DRAW_FLAG();
 		if (prgObj->m_subState != 1) {
-			if ((prgObj->m_subState < 1) && (-1 < prgObj->m_subState)) {
+			if ((prgObj->m_subState < 1) && (0 <= prgObj->m_subState)) {
 				if (prgObj->m_subFrame == 0) {
 					void** scriptHandle = object->m_scriptHandle;
 					int rand = Math.Rand(0x50);

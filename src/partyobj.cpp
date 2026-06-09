@@ -923,14 +923,14 @@ void CGPartyObj::onFrameAlways()
 	     (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1)) << 24) & 0xC0000000) >> 31) == 0)) ||
 	    (m_lastStateId == 6 || m_lastStateId == 2)) {
 		showTraceParticle = 0;
-	} else if ((Game.m_gameWork.m_menuStageMode == 0) ||
-		    (Game.m_gameWork.m_menuStageMode == 0) ||
-		    (Game.m_gameWork.m_bossArtifactStageIndex >= 0x0F) ||
-		    ((static_cast<unsigned short>(GetCID()) & 0x6D) != 0x6D) ||
-		    (reinterpret_cast<int>(m_scriptHandle[0xED]) == 0)) {
-		showTraceParticle = 1;
-	} else {
+	} else if ((Game.m_gameWork.m_menuStageMode != 0) &&
+		    (Game.m_gameWork.m_menuStageMode != 0) &&
+		    (Game.m_gameWork.m_bossArtifactStageIndex < 0x0F) &&
+		    ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D) &&
+		    (reinterpret_cast<int>(m_scriptHandle[0xED]) != 0)) {
 		showTraceParticle = 0;
+	} else {
+		showTraceParticle = 1;
 	}
 
 	int& traceSlot = PartyTraceParticleSlot(port);

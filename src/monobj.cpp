@@ -3211,7 +3211,11 @@ void CGMonObj::moveFrame()
 			moveDelta.y = zero.y;
 			moveDelta.z = zero.z;
 		} else {
-			PSVECScale(reinterpret_cast<Vec*>(&local_74), static_cast<Vec*>(moveDelta), (1.0f / distance) * stepDist);
+			CVector scaledStep;
+			PSVECScale(reinterpret_cast<Vec*>(&local_74), static_cast<Vec*>(scaledStep), (1.0f / distance) * stepDist);
+			moveDelta.x = scaledStep.x;
+			moveDelta.y = scaledStep.y;
+			moveDelta.z = scaledStep.z;
 		}
 	}
 

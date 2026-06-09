@@ -1975,15 +1975,18 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 			}
 			float limit = FLOAT_803301D4 * dynParam[5];
 			if (angle <= limit || FLOAT_803301D4 * dynParam[7] <= angle) {
+				float rot;
 				if (limit < angle) {
-					limit = FLOAT_803301D4 * dynParam[7];
+					rot = FLOAT_803301D4 * dynParam[7] - angle;
+				} else {
+					rot = limit - angle;
 				}
 
 				Mtx rotate;
 				if (axis == 0) {
-					PSMTXRotAxisRad(rotate, &right, limit - angle);
+					PSMTXRotAxisRad(rotate, &right, rot);
 				} else {
-					PSMTXRotAxisRad(rotate, &up, limit - angle);
+					PSMTXRotAxisRad(rotate, &up, rot);
 				}
 				PSMTXMultVecSR(rotate, &direction, &direction);
 			}

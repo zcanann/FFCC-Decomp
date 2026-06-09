@@ -3730,13 +3730,13 @@ int CGPartyObj::useItem(int itemId)
 	const char* msgBase = lbl_801DCA48;
 
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	if ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x9A]) << 24) & 0xC0000000) >> 31) != 0) &&
-	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x9B]) << 24) & 0xC0000000) >> 31) != 0) &&
-	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x63C]) << 24) & 0xC0000000) >> 31) != 0) &&
-	    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0)) {
-		canUse = 1;
-	} else {
+	if ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x9A]) << 24) & 0xC0000000) >> 31) == 0) ||
+	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x9B]) << 24) & 0xC0000000) >> 31) == 0) ||
+	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x63C]) << 24) & 0xC0000000) >> 31) == 0) ||
+	    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0)) {
 		canUse = 0;
+	} else {
+		canUse = 1;
 	}
 
 	if (!canUse) {

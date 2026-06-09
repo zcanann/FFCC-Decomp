@@ -1369,7 +1369,8 @@ void CGObject::update()
             m_currentAnimSlot != -1) {
             float frame = sZeroFloat;
             if (m_lastBgAttr < sZeroFloat) {
-                frame = ModelAnimEnd(m_charaModelHandle->m_model) - ModelAnimStart(m_charaModelHandle->m_model);
+                const float animStart = ModelAnimStart(m_charaModelHandle->m_model);
+                frame = ModelAnimEnd(m_charaModelHandle->m_model) - animStart;
             }
             m_turnSpeed = frame;
             m_charaModelHandle->m_model->SetFrame(m_turnSpeed);
@@ -1384,14 +1385,9 @@ void CGObject::update()
     float turnFactor;
     if (m_animSlotSel != -1 && m_shieldNodeFlagBits.m_bit40) {
         const double turnLimit = fabs(m_turnBaseSpeed);
-        double clampedTurn;
-        if (turnDelta < -turnLimit) {
-            clampedTurn = -turnLimit;
-        } else if (turnLimit < turnDelta) {
-            clampedTurn = turnLimit;
-        } else {
-            clampedTurn = turnDelta;
-        }
+        double clampedTurn = (turnDelta < -turnLimit)
+                                 ? -turnLimit
+                                 : (turnLimit < turnDelta ? turnLimit : turnDelta);
         turnDelta = clampedTurn;
         turnFactor = sAnimFrameOffset;
     } else {

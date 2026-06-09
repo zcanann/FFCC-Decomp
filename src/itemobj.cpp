@@ -723,8 +723,8 @@ CGPrgObj* CGItemObj::CreateFromScript(
 			newItem->m_worldPosition = owner->m_worldPosition;
 			newItem->SetPosBG(&newItem->m_worldPosition, 1);
 
-			CVector moveVec((float)sin((double)launchAngle), kItemObjHeightOffset, (float)cos((double)launchAngle));
-			newItem->MoveVector((Vec*)&moveVec, kItemObjLaunchSpeed, 1, 0, 1, 0);
+			const CVector& moveVec = CVector((float)sin((double)launchAngle), kItemObjHeightOffset, (float)cos((double)launchAngle));
+			newItem->MoveVector((Vec*)const_cast<CVector*>(&moveVec), kItemObjLaunchSpeed, 1, 0, 1, 0);
 		}
 
 		if ((createFlags & 2) != 0) {
@@ -743,9 +743,9 @@ CGPrgObj* CGItemObj::CreateFromScript(
 			CCharaPcs::CHandle* handle =
 			    new (Game.m_mainStage, itemObjStrings + kItemObjStrItemobjCpp, 0x28E) CCharaPcs::CHandle;
 			reinterpret_cast<CGItemObj*>(newItem)->m_pendingModelHandle = handle;
-			handle->Add();
+			reinterpret_cast<CGItemObj*>(newItem)->m_pendingModelHandle->Add();
 
-			handle->LoadModelASync(2, ccfs->m_modelId, ccfs->m_modelParam);
+			reinterpret_cast<CGItemObj*>(newItem)->m_pendingModelHandle->LoadModelASync(2, ccfs->m_modelId, ccfs->m_modelParam);
 
 			if ((unsigned int)System.m_execParam >= 3U) {
 				System.Printf(itemObjStrings + kItemObjStrMemoryCapsuleAsyncStartMsg);
@@ -913,11 +913,12 @@ void CGItemObj::onFrameStat()
 				}
 			}
 
+			CGObject* attachOwner = m_owner;
 			const char* attachName = s_itemAttachLeftItem;
 			if (useBossAttachName) {
 				attachName = s_itemAttachCenterItem3;
 			}
-			Attach(m_owner, const_cast<char*>(attachName), attachOffsetPtr);
+			Attach(attachOwner, const_cast<char*>(attachName), attachOffsetPtr);
 			changeStat(0, 0, 0);
 			m_bodyEllipsoidRadius = kItemObjZero;
 		}
@@ -964,8 +965,8 @@ void CGItemObj::onFrameStat()
 
 			float ownerCos = (float)cos((double)m_owner->m_rotTargetY);
 			float ownerSin = (float)sin((double)m_owner->m_rotTargetY);
-			CVector moveVec(ownerSin, kItemObjMotionStep, ownerCos);
-			MoveVector(reinterpret_cast<Vec*>(&moveVec), moveSpeed, 1, 0, 1, 0);
+			const CVector& moveVec = CVector(ownerSin, kItemObjMotionStep, ownerCos);
+			MoveVector(reinterpret_cast<Vec*>(const_cast<CVector*>(&moveVec)), moveSpeed, 1, 0, 1, 0);
 
 			m_owner = 0;
 			m_itemJumpCountdown = 8;
@@ -1002,16 +1003,14 @@ void CGItemObj::onFrameStat()
 		}
 
 		if (7 < m_stateFrame) {
-			CGObject* carryObj = m_owner;
-
 			prgObj->m_rotTargetY = prgObj->m_rotTargetY + kItemObjMotionStep;
 			prgObj->m_worldPosition.x =
-			    kItemObjMotionStep * (carryObj->m_worldPosition.x - prgObj->m_worldPosition.x) + prgObj->m_worldPosition.x;
+			    kItemObjMotionStep * (m_owner->m_worldPosition.x - prgObj->m_worldPosition.x) + prgObj->m_worldPosition.x;
 			prgObj->m_worldPosition.y =
-			    kItemObjMotionStep * (kItemObjHalf * carryObj->unk_0x188 + carryObj->m_worldPosition.y - prgObj->m_worldPosition.y) +
+			    kItemObjMotionStep * (kItemObjHalf * m_owner->unk_0x188 + m_owner->m_worldPosition.y - prgObj->m_worldPosition.y) +
 			    prgObj->m_worldPosition.y;
 			prgObj->m_worldPosition.z =
-			    kItemObjMotionStep * (carryObj->m_worldPosition.z - prgObj->m_worldPosition.z) + prgObj->m_worldPosition.z;
+			    kItemObjMotionStep * (m_owner->m_worldPosition.z - prgObj->m_worldPosition.z) + prgObj->m_worldPosition.z;
 			prgObj->m_rotationX = prgObj->m_rotationX * kItemObjRotationDamping;
 			prgObj->m_rotationY = prgObj->m_rotationY * kItemObjRotationDamping;
 			prgObj->m_rotationZ = prgObj->m_rotationZ * kItemObjRotationDamping;
@@ -1047,9 +1046,9 @@ void CGItemObj::onFrameStat()
 			prgObj->m_moveOffset.x = zero;
 			prgObj->m_bgColMask |= 0x80000;
 
-			CVector damageOffset(zero, zero, zero);
+			const CVector& damageOffset = CVector(zero, zero, zero);
 			SetDamageCol(0, itemObjStrings + kItemObjStrF051Root, kItemObjDamageRadius, kItemObjDamageRadius,
-			             reinterpret_cast<Vec*>(&damageOffset));
+			             reinterpret_cast<Vec*>(const_cast<CVector*>(&damageOffset)));
 			*reinterpret_cast<int*>(&prgObj->m_damageColliders[1].m_localPosition.x) = 9;
 			}
 		} else if (m_subFrame == 0x7D) {
@@ -1064,7 +1063,7 @@ void CGItemObj::onFrameStat()
 				model[0x10C] = static_cast<unsigned char>(__rlwimi(model[0x10C], 1, 7, 24, 24));
 			}
 
-			if (m_subFrame < 9) {
+			if (m_subFrame <= 8) {
 				float wobble = (float)sin((double)(kItemObjHalfPi * (float)m_subFrame * kItemObjWobblePhaseScale));
 
 				prgObj->m_rotationZ = wobble;
@@ -1106,17 +1105,18 @@ void CGItemObj::onFrameStat()
 
 		prgObj->m_rotTargetY = prgObj->m_rotTargetY + kItemObjFineStep;
 		prgObj->m_groundHitOffset.x =
-		    -kItemObjFineStep * (prgObj->m_worldPosition.x - *(float*)(*(unsigned char**)(self + 0x550) + 0x15C));
+		    kItemObjFineStep * -(prgObj->m_worldPosition.x - *(float*)(*(unsigned char**)(self + 0x550) + 0x15C));
 		prgObj->m_groundHitOffset.z =
-		    -kItemObjFineStep * (prgObj->m_worldPosition.z - *(float*)(*(unsigned char**)(self + 0x550) + 0x164));
+		    kItemObjFineStep * -(prgObj->m_worldPosition.z - *(float*)(*(unsigned char**)(self + 0x550) + 0x164));
 		break;
 	case 0x25: {
+		prgObj->m_moveOffset.y = kItemObjMoveOffsetXZ;
+		prgObj->m_rotTargetY = prgObj->m_rotTargetY + kItemObjMemoryTurnStep;
+
 		CVector monTarget(*reinterpret_cast<Vec*>(CGMonObj::m_aiWork + 4));
 		CVector worldPos(prgObj->m_worldPosition);
 		CVector delta;
 
-		prgObj->m_moveOffset.y = kItemObjMoveOffsetXZ;
-		prgObj->m_rotTargetY = prgObj->m_rotTargetY + kItemObjMemoryTurnStep;
 		PSVECSubtract(reinterpret_cast<Vec*>(&monTarget), reinterpret_cast<Vec*>(&worldPos), reinterpret_cast<Vec*>(&delta));
 		monTarget.x = delta.x;
 		monTarget.y = delta.y;
@@ -1125,7 +1125,7 @@ void CGItemObj::onFrameStat()
 		float distance = PSVECMag(reinterpret_cast<Vec*>(&monTarget));
 		if (distance < kItemObjMemoryRadius) {
 			changeStat(0x27, 0, 0);
-		} else if (zero < distance) {
+		} else if (distance > zero) {
 			float moveScale = kItemObjMemoryChaseAccel * prgObj->m_moveTimer;
 
 			prgObj->m_groundHitOffset.x += kItemObjMemoryChaseScale * monTarget.x * moveScale;
@@ -1152,6 +1152,8 @@ void CGItemObj::onFrameStat()
 			int* soundData = *(int**)(*(int*)(*reinterpret_cast<int*>(CGMonObj::m_boss) + 0xF8) + 0x178);
 			if (soundData != 0) {
 				pdtNo = soundData[5];
+			} else {
+				pdtNo = -1;
 			}
 
 			float particleScale =
@@ -1189,6 +1191,8 @@ void CGItemObj::onFrameStat()
 			int* soundData = *(int**)(*(int*)(*reinterpret_cast<int*>(CGMonObj::m_boss) + 0xF8) + 0x178);
 			if (soundData != 0) {
 				pdtNo = soundData[5];
+			} else {
+				pdtNo = -1;
 			}
 
 			float particleScale =
@@ -1204,11 +1208,7 @@ void CGItemObj::onFrameStat()
 
 			*(int*)(CGMonObj::m_boss + ownerSlot * 4 + 8) = 0;
 			CGPrgObj* newItem = CreateFromScript(0, 0, 0x103, 0, kItemObjZero, 0);
-			if (newItem == 0) {
-				if ((unsigned int)System.m_execParam > 1U) {
-					System.Printf(itemObjStrings + kItemObjStrMemoryMagiciteCreateFailedMsg);
-				}
-			} else {
+			if (newItem != 0) {
 				unsigned char* newItemSelf = reinterpret_cast<unsigned char*>(newItem);
 
 				*reinterpret_cast<float*>(newItemSelf + 0x168) = prgObj->m_worldPosition.x;
@@ -1222,6 +1222,10 @@ void CGItemObj::onFrameStat()
 				stack.m_word = 1;
 				gCFlatRuntime().SystemCall(
 				    *reinterpret_cast<CFlatRuntime::CObject**>(self + 0x550), 2, 0x16, 1, &stack, 0);
+			} else {
+				if ((unsigned int)System.m_execParam > 1U) {
+					System.Printf(itemObjStrings + kItemObjStrMemoryMagiciteCreateFailedMsg);
+				}
 			}
 
 			self[0x38] = static_cast<unsigned char>(__rlwimi(self[0x38], 1, 7, 24, 24));

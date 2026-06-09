@@ -5282,7 +5282,7 @@ void CGPartyObj::gpmMove()
 	if (m_lastStateId != 2) {
 		return;
 	}
-	if (static_cast<unsigned char>(static_cast<int>((static_cast<unsigned int>(sGhostPartyWork.flags) << 24) & 0xC0000000) >> 31) == 0) {
+	if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(sGhostPartyWork.flags) << 24) & 0xC0000000) >> 31) == 0) {
 		changeStat(0, 0, 0);
 		return;
 	}

@@ -1241,11 +1241,11 @@ int CGame::GetBossArtifact(int ratioIndex, int amount)
 
     scaledAmount = rand();
     int divisor = artifactRank + 1;
+    int entriesByteOffset = stageByteOffset + offsetof(CBossArtifactStage, m_entries);
     int quotient = scaledAmount / divisor;
     stageBase += scaledAmount - quotient * divisor;
-    int entriesByteOffset = stageByteOffset + offsetof(CBossArtifactStage, m_entries);
     return reinterpret_cast<int>(reinterpret_cast<char*>(artifactBase) +
-        (entriesByteOffset + stageBase * (int)sizeof(CBossArtifactEntry)));
+        entriesByteOffset + stageBase * (int)sizeof(CBossArtifactEntry));
 }
 
 /*

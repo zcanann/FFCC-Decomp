@@ -1077,16 +1077,16 @@ timeout_expiry:
             int cmdNumFlg = GbaQue.GetCmdNumFlg(threadParam->m_portIndex);
             if (cmdNumFlg != 0)
             {
-                if ((cmdNumFlg & 2) != 0)
+                if ((cmdNumFlg & 2) == 0)
                 {
-                    threadParam->m_state = 0x17;
+                    if (SendChgCmdNum(threadParam) < 0)
+                    {
+                        goto sleep_retry;
+                    }
+                    GbaQue.ClrCmdNumFlg(threadParam->m_portIndex);
                     goto recompute_timeout;
                 }
-                if (SendChgCmdNum(threadParam) < 0)
-                {
-                    goto sleep_retry;
-                }
-                GbaQue.ClrCmdNumFlg(threadParam->m_portIndex);
+                threadParam->m_state = 0x17;
                 goto recompute_timeout;
             }
 

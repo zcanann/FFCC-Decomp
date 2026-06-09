@@ -720,7 +720,7 @@ path:
                 pathBase = (float*)ppvEnv->m_mapMeshPtr[*pathInfo]->m_vertices;
             }
 
-            if (pathBase != 0) {
+            {
                 float vx;
                 float vy;
                 float vz;
@@ -730,13 +730,15 @@ path:
                         work->m_pathIndex = 0;
                     }
 
-                    u16 sampleIndex = (u16)work->m_pathIndex;
-                    work->m_pathIndex = sampleIndex + 1;
+                    if (pathBase != 0) {
+                        u16 sampleIndex = (u16)work->m_pathIndex;
+                        work->m_pathIndex = sampleIndex + 1;
 
-                    float* pathVec = (float*)((u8*)pathBase + *(u16*)(*(int*)(pathInfo + 2) + sampleIndex * 2) * sizeof(Vec));
-                    vx = pathVec[0];
-                    vy = pathVec[1];
-                    vz = pathVec[2];
+                        float* pathVec = (float*)((u8*)pathBase + *(u16*)(*(int*)(pathInfo + 2) + sampleIndex * 2) * sizeof(Vec));
+                        vx = pathVec[0];
+                        vy = pathVec[1];
+                        vz = pathVec[2];
+                    }
                 } else {
                     float sampleT;
 
@@ -778,11 +780,13 @@ path:
                         work->m_pathIndex = 0;
                     }
 
-                    int sampleIndex = (int)(sampleT * (float)pathInfo[1]);
-                    float* pathVec = (float*)((u8*)pathBase + *(u16*)(*(int*)(pathInfo + 2) + sampleIndex * 2) * sizeof(Vec));
-                    vx = pathVec[0];
-                    vy = pathVec[1];
-                    vz = pathVec[2];
+                    if (pathBase != 0) {
+                        int sampleIndex = (int)(sampleT * (float)pathInfo[1]);
+                        float* pathVec = (float*)((u8*)pathBase + *(u16*)(*(int*)(pathInfo + 2) + sampleIndex * 2) * sizeof(Vec));
+                        vx = pathVec[0];
+                        vy = pathVec[1];
+                        vz = pathVec[2];
+                    }
                 }
 
                 particleData->m_matrix[0][0] = vx * param->field_0x58;

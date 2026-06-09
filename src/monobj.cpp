@@ -264,7 +264,7 @@ void CGMonObj::undeadOff()
 
 	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x1000);
 
-	unsigned short count = (weaponMode != 0) ?
+	short count = (weaponMode != 0) ?
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AC) :
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AE);
 	int particleBase = (weaponMode != 0) ? 0x46 : 0x3C;
@@ -303,7 +303,7 @@ void CGMonObj::undeadOn()
 
 	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x1000);
 
-	unsigned short count = (weaponMode != 0) ?
+	short count = (weaponMode != 0) ?
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AC) :
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AE);
 	int particleBase = (weaponMode != 0) ? 0x46 : 0x3C;
@@ -1712,7 +1712,7 @@ void CGMonObj::onStatDie()
 			int option = *reinterpret_cast<short*>(&Game.m_gameWork.m_optionValue);
 			if (option < 9 && m_repop.delay == 0) {
 				int shift = reinterpret_cast<int>(object->m_scriptHandle[2]);
-				unsigned long long bit = 1ULL << shift;
+				long long bit = 1ULL << shift;
 				CFlatRuntime2::CSpawnBits& spawnBit = CFlatRuntime2Storage().m_spawnBits[option];
 				spawnBit.m_hi |= static_cast<unsigned int>(bit);
 				spawnBit.m_lo |= static_cast<unsigned int>(bit >> 32);
@@ -2714,7 +2714,7 @@ void CGMonObj::initFinishedFuncDefault()
 	int forcedAction = 0;
 	for (int slotBase = 0; slotBase < 0x10; slotBase += 8) {
 		for (int slotOff = 0; slotOff < 8; slotOff += 2) {
-			unsigned int attackId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + (slotBase + slotOff + 0xD0));
+			int attackId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + (slotBase + slotOff + 0xD0));
 			if ((attackId != 0xFFFF) &&
 				(static_cast<int>(*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + attackId * 0x48 + 0xE)) == 4)) {
 				m_forcedAction = forcedAction;
@@ -2930,7 +2930,7 @@ void CGMonObj::setRepop(int mode)
 
 	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x20000);
 
-	unsigned short countB = *reinterpret_cast<unsigned short*>(monsterScript + 0x1AA);
+	unsigned short countB = *reinterpret_cast<short*>(monsterScript + 0x1AA);
 	for (int i = 0; i < static_cast<int>(countB); i++) {
 		int dataNo = object->m_charaModelHandle != nullptr ? object->m_charaModelHandle->GetPdtSlot() : -1;
 		prgObj->putParticleBindTrace((i + 0x5A) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x5A8), object, 0.0f, 0);
@@ -2944,13 +2944,13 @@ void CGMonObj::setRepop(int mode)
 	scriptHandle = object->m_scriptHandle;
 	classId = reinterpret_cast<int>(scriptHandle[4]);
 	int weaponMode = object->m_weaponNodeFlagBits.m_prg;
-	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(scriptHandle[9]) + 0xFC) != 0xB) {
+	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle[9]) + 0xFC) != 0xB) {
 		weaponMode = 1;
 	}
 
 	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x1000);
 
-	unsigned short countC = (weaponMode == 0) ?
+	short countC = (weaponMode == 0) ?
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle[9]) + 0x1AE) :
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle[9]) + 0x1AC);
 	int particleBase = (weaponMode == 0) ? 0x3C : 0x46;
@@ -3015,7 +3015,7 @@ void CGMonObj::moveAStar(int startGroup, int forbiddenGroup, Vec& targetPos)
 			if ((routeFrom != 0) && (forbiddenGroup != 0) &&
 				((escapePos = AStar.getEscapePos(object->m_worldPosition, targetPos, routeFrom, routePrev)) != NULL)) {
 				unsigned int nextGroup = escapePos->m_groupA;
-				if (static_cast<short>(nextGroup) == routeFrom) {
+				if (static_cast<unsigned short>(nextGroup) == routeFrom) {
 					nextGroup = escapePos->m_groupB;
 				}
 				unsigned char* routeStep = AStar.m_routeTable[routeFrom - 1][nextGroup + 0x36];
@@ -3312,7 +3312,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 			continue;
 		}
 
-		int artifactLevel;
+		unsigned int artifactLevel;
 		if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
 			int idx = Game.m_gameWork.m_bossArtifactStageIndex;
 			int stage = Game.m_gameWork.m_bossArtifactStageTable[idx];
@@ -3346,7 +3346,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 		if (selectorType == 0) {
 			float maxDist = static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x114));
 			float minDist = static_cast<float>(static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x112)));
-			unsigned short chance = *reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x116);
+			short chance = *reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x116);
 
 			if ((targetDist < maxDist) && (minDist < targetDist)) {
 
@@ -3506,7 +3506,7 @@ body:
 					short aiState = monObj->m_aiState;
 					if (aiState != 0) {
 						aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-							(static_cast<int>(aiState) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
+							(static_cast<int>(aiState) + *reinterpret_cast<short*>(script + 0x100)) * 0x1D0 + 0x10;
 					}
 					if (((*reinterpret_cast<unsigned short*>(script + 0xFE) & 8) == 0) &&
 						((*reinterpret_cast<unsigned short*>(aiScript + 0x102) & 0x100) == 0)) {
@@ -3575,7 +3575,7 @@ body:
 							if ((*reinterpret_cast<unsigned short*>(script + 0xFE) & 4) != 0) {
 								monObj->m_moveWork.m_flags |= 0x400;
 							}
-							if ((*reinterpret_cast<unsigned short*>(AISCRIPT + 0x102) & 0x80) != 0) {
+							if ((*reinterpret_cast<short*>(AISCRIPT + 0x102) & 0x80) != 0) {
 								monObj->m_moveWork.m_flags |= 0x20000;
 							}
 							monObj->m_moveWork.m_mode = 4;
@@ -3662,7 +3662,7 @@ void CGMonObj::statWatch()
 		}
 
 		int targetMode = *reinterpret_cast<unsigned short*>(aiScript + 0x106);
-		int selectedTarget = -1;
+		unsigned int selectedTarget = -1;
 		if (targetMode == 0xFFFF) {
 			chaseState = 0;
 			chaseTimer = 0;
@@ -3846,7 +3846,7 @@ void CGMonObj::statWatch()
 						aiData3 = script;
 					} else {
 						aiData3 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-							(aiState + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
+							(aiState + *reinterpret_cast<short*>(script + 0x100)) * 0x1D0 + 0x10;
 					}
 					float range = static_cast<float>(
 						*reinterpret_cast<unsigned short*>(aiData3 + actionOff + 0x11C));
@@ -3855,7 +3855,7 @@ void CGMonObj::statWatch()
 						aiData4 = script;
 					} else {
 						aiData4 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-							(aiState + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
+							(aiState + *reinterpret_cast<short*>(script + 0x100)) * 0x1D0 + 0x10;
 					}
 					short changeStat = *reinterpret_cast<short*>(aiData4 + actionOff + 0x11E);
 					actionState = 0x21;

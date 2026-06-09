@@ -723,8 +723,8 @@ CGPrgObj* CGItemObj::CreateFromScript(
 			newItem->m_worldPosition = owner->m_worldPosition;
 			newItem->SetPosBG(&newItem->m_worldPosition, 1);
 
-			CVector moveVec((float)sin((double)launchAngle), kItemObjHeightOffset, (float)cos((double)launchAngle));
-			newItem->MoveVector((Vec*)&moveVec, kItemObjLaunchSpeed, 1, 0, 1, 0);
+			const CVector& moveVec = CVector((float)sin((double)launchAngle), kItemObjHeightOffset, (float)cos((double)launchAngle));
+			newItem->MoveVector((Vec*)const_cast<CVector*>(&moveVec), kItemObjLaunchSpeed, 1, 0, 1, 0);
 		}
 
 		if ((createFlags & 2) != 0) {

@@ -734,6 +734,8 @@ void CGMonObj::onCancelStat(int state)
  * Address:	TODO
  * Size:	TODO
  */
+#pragma push
+#pragma opt_common_subs off
 void CGMonObj::isValidTarget()
 {
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
@@ -835,6 +837,7 @@ check_home:
 	}
 #undef script9
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -2808,6 +2811,7 @@ unsigned int CGMonObj::IsDispRader()
  */
 #pragma push
 #pragma opt_lifetimes off
+#pragma optimization_level 3
 void CGMonObj::setRepop(int mode)
 {
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
@@ -3629,6 +3633,8 @@ body:
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_common_subs off
 void CGMonObj::statWatch()
 {
 	CGMonObj* monObj = this;
@@ -3906,6 +3912,7 @@ void CGMonObj::statWatch()
 #undef script
 #undef actionState
 }
+#pragma pop
 
 /*
  * --INFO--

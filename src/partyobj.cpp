@@ -1182,39 +1182,37 @@ void CGPartyObj::command()
 			unsigned char* targetBytes = reinterpret_cast<unsigned char*>(target);
 			const int targetState = *reinterpret_cast<int*>(targetBytes + 0x500);
 
-			bool canAddBlock = false;
-			switch (targetState) {
-			case 0x24:
-				canAddBlock = true;
-				break;
-			case 0x0A:
-			case 0x0C:
-			case 0x0D:
-			case 0x0E:
-			case 0x0F:
-			case 0x10:
-			case 0x11:
-				if (*reinterpret_cast<unsigned int*>(targetBytes + 0x550) == 0) {
-					secondaryAvailable = true;
-					secondaryCommand = 4;
+			if (targetState == 0x24) {
+				goto tmpArtifactBlock;
+			}
+			if (targetState < 0x24) {
+				if (targetState < 0x12) {
+					if (targetState != 0x0B && (targetState > 0x0A || targetState > 0x09) &&
+					    *reinterpret_cast<int*>(targetBytes + 0x550) == 0) {
+						secondaryAvailable = true;
+						secondaryCommand = 4;
+					}
+				} else if (targetState < 0x1C) {
+					if (targetState < 0x19) {
+tmpArtifactBlock:
+						if (*reinterpret_cast<int*>(targetBytes + 0x550) == 0) {
+							secondaryAvailable = true;
+							if ((targetState == 0x24 && caravan->CanAddTmpArtifact(1) != 0) ||
+							    (*reinterpret_cast<int*>(targetBytes + 0x500) == 0x20 &&
+							     caravan->CanAddGil(*reinterpret_cast<int*>(targetBytes + 0x558)) != 0) ||
+							    ((*reinterpret_cast<int*>(targetBytes + 0x500) != 0x24 &&
+							      *reinterpret_cast<int*>(targetBytes + 0x500) != 0x20) &&
+							     *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x5A) + 1 < 0x41)) {
+								secondaryCommand = 0x17;
+							} else {
+								secondaryCommand = 4;
+							}
+						}
+					}
+				} else if (targetState < 0x22) {
+					goto tmpArtifactBlock;
 				}
-				break;
-			case 0x12:
-			case 0x13:
-			case 0x14:
-			case 0x15:
-			case 0x16:
-			case 0x17:
-			case 0x18:
-			case 0x1C:
-			case 0x1D:
-			case 0x1E:
-			case 0x1F:
-			case 0x20:
-			case 0x21:
-				canAddBlock = true;
-				break;
-			case 0xCA:
+			} else if (targetState == 0xCA) {
 				if (static_cast<int>(CFlatCenterState()) == 0) {
 					secondaryAvailable = true;
 					secondaryCommand = 0x1C;
@@ -1222,43 +1220,27 @@ void CGPartyObj::command()
 					primaryAvailable = true;
 					primaryCommand = 0x1C;
 				}
-				break;
-			case 0xCC:
+			} else if (targetState < 0xCA) {
+				if (targetState == 0xC8) {
+					if (static_cast<int>(CFlatCenterState()) == 0) {
+						secondaryAvailable = true;
+						secondaryCommand = 0x0B;
+					} else {
+						primaryAvailable = true;
+						primaryCommand = 0x0B;
+					}
+				} else if (targetState > 0xC7) {
+					if (static_cast<int>(CFlatCenterState()) == 0) {
+						secondaryAvailable = true;
+						secondaryCommand = 0x0A;
+					} else {
+						primaryAvailable = true;
+						primaryCommand = 0x0A;
+					}
+				}
+			} else if (targetState == 0xCC) {
 				secondaryAvailable = true;
 				secondaryCommand = 6;
-				break;
-			case 0xC8:
-				if (static_cast<int>(CFlatCenterState()) == 0) {
-					secondaryAvailable = true;
-					secondaryCommand = 0x0B;
-				} else {
-					primaryAvailable = true;
-					primaryCommand = 0x0B;
-				}
-				break;
-			case 0xC9:
-				if (static_cast<int>(CFlatCenterState()) == 0) {
-					secondaryAvailable = true;
-					secondaryCommand = 0x0A;
-				} else {
-					primaryAvailable = true;
-					primaryCommand = 0x0A;
-				}
-				break;
-			}
-
-			if (canAddBlock && *reinterpret_cast<int*>(targetBytes + 0x550) == 0) {
-				secondaryAvailable = true;
-				if ((targetState == 0x24 && caravan->CanAddTmpArtifact(1) != 0) ||
-				    (*reinterpret_cast<int*>(targetBytes + 0x500) == 0x20 &&
-				     caravan->CanAddGil(*reinterpret_cast<int*>(targetBytes + 0x558)) != 0) ||
-				    ((*reinterpret_cast<int*>(targetBytes + 0x500) != 0x24 &&
-				      *reinterpret_cast<int*>(targetBytes + 0x500) != 0x20) &&
-				     *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x5A) + 1 < 0x41)) {
-					secondaryCommand = 0x17;
-				} else {
-					secondaryCommand = 4;
-				}
 			}
 		}
 

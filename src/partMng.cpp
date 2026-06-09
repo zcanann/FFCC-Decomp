@@ -461,11 +461,11 @@ void CPartMng::pppDumpMngSt()
         unsigned char m_pad18[0x74 - 0x18];
         short m_kind;                      // 0x74
         short m_nodeIndex;                 // 0x76
-        unsigned char m_pad78[0xAC - 0x78];
-        int m_prioTime;                    // 0xAC
-        unsigned char m_padB0[0xF8 - 0xB0];
+        unsigned char m_pad78[0xF8 - 0x78];
         unsigned char m_prio;              // 0xF8
-        unsigned char m_padF9[0x12C - 0xF9];
+        unsigned char m_padF9[0xFA - 0xF9];
+        unsigned short m_prioTime;         // 0xFA
+        unsigned char m_padFC[0x12C - 0xFC];
         int m_heapGroupRef;                // 0x12C
     };
 

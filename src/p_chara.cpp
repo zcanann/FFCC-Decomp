@@ -2395,7 +2395,10 @@ foundModel:
 
         int modelStageIndex;
         if (specialModelStage != 0) {
-            modelStageIndex = m_charaKind == 3 ? 5 : 4;
+            modelStageIndex = 4;
+            if (m_charaKind == 3) {
+                modelStageIndex = 5;
+            }
         } else {
             modelStageIndex = 0;
         }

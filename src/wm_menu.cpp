@@ -9127,7 +9127,7 @@ void CMenuPcs::DrawCharaName()
 		frameCvt.w.lo = static_cast<unsigned int>(worldState->m_frameCounter) ^ 0x80000000;
 		fade = static_cast<float>(-(DOUBLE_803314e8 * (frameCvt.d - DOUBLE_80331408) - DOUBLE_80331420));
 	}
-	unsigned int activeMask = 0;
+	unsigned int activeMask =  (int)(long)(0);
 	unsigned int confirmedMask = 0;
 	unsigned int pendingMask = 0;
 	for (int i = 0; i < 4; i++) {
@@ -9170,7 +9170,8 @@ void CMenuPcs::DrawCharaName()
 		cvt.w.hi = 0x43300000;
 		cvt.w.lo = static_cast<unsigned int>(yCounter) ^ 0x80000000;
 		float y = (yBase1 + static_cast<float>(cvt.d - bias1)) + yExtra1;
-		if (row != 0) {
+		int __p2 = row;
+		if (__p2 != 0) {
 			y += FLOAT_80331548;
 		}
 		int caravanOffset = slotBase * 0xC30;
@@ -9237,7 +9238,8 @@ void CMenuPcs::DrawCharaName()
 		unsigned int xCounter2 = 0;
 		int slot = slotBase2;
 		for (int col = 0; col < 4; col++) {
-			int restoreColor = 0;
+			int restoreColor;
+			restoreColor = 0;
 			const char* text;
 
 			cvt.w.hi = 0x43300000;

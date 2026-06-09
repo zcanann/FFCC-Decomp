@@ -3291,9 +3291,9 @@ void CPartMng::pppPartDrawAfter()
 
     Mtx invCamera;
     Vec cameraPos;
+    Vec viewPos;
     Vec partPos;
     Vec cameraDelta;
-    Vec viewPos;
 
     PSMTXInverse(ppvCameraMatrix, invCamera);
     cameraPos.x = invCamera[0][3];

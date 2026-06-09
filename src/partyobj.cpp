@@ -1182,10 +1182,8 @@ void CGPartyObj::command()
 	     (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(reinterpret_cast<unsigned char*>(this)[0x63C]) << 24) & 0xC0000000) >> 31) != 0) &&
 	     (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(reinterpret_cast<unsigned char*>(this)[0x9B]) << 24) & 0xC0000000) >> 31) != 0)) &&
 	    Joybus.GetCtrlMode(padSlot) != 1) {
-		if (caravan->m_hp == 0) {
-			primaryAvailable = true;
-			primaryCommand = 0x1B;
-		} else if (party.secondaryTarget != nullptr) {
+		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
+		if (party.secondaryTarget != nullptr) {
 			primaryAvailable = true;
 			primaryCommand = 0x0C;
 		}
@@ -1269,19 +1267,23 @@ tmpArtifactBlock:
 			} else {
 				secondaryCommand = 5;
 			}
+		} else if (caravan->m_hp == 0) {
+			primaryAvailable = true;
+			primaryCommand = 0x1B;
 		}
 
-		if ((party.commandFlags & 2) != 0) {
+		if (Joybus.GetCtrlMode(padSlot) != 1) {
+		if ((party.commandMode & 2) != 0) {
 			secondaryAvailable = false;
 			primaryAvailable = true;
 			primaryCommand = 0x1A;
 		}
-		if ((party.commandFlags & 4) != 0) {
+		if ((party.commandMode & 4) != 0) {
 			secondaryAvailable = false;
 			primaryAvailable = true;
 			primaryCommand = 0x1D;
 		}
-		if ((party.commandFlags & 8) != 0) {
+		if ((party.commandMode & 8) != 0) {
 			secondaryAvailable = true;
 			secondaryCommand = 0x1A;
 			primaryAvailable = false;
@@ -1304,6 +1306,8 @@ tmpArtifactBlock:
 			const int charaCommand = Chara.MogFur().m_commandIndex;
 			ringCommand = charaCommand + 0x1E;
 			ringCommandArg = charaCommand;
+		}
+		}
 		}
 	}
 

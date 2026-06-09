@@ -2174,7 +2174,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 
 		unsigned char didHit = 0;
 		for (int rank = 0; rank < 4; rank++) {
-			if (((flags & 4) != 0) && (((*reinterpret_cast<int*>(mon + 0x54C) + rank) & 3) != 0)) {
+			if (((flags & 4) != 0) && (((*reinterpret_cast<int*>(mon + 0x54C) + rank) % 4) != 0)) {
 				continue;
 			}
 

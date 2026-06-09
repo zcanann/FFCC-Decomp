@@ -1730,11 +1730,13 @@ checkLoaded:
 
                 chunkFile.PushChunk();
                 while (chunkFile.GetNextChunk(chunk)) {
-                    if (chunk.m_id == 'INFO') {
+                    switch (chunk.m_id) {
+                    case 'INFO':
                         mergePartCount = static_cast<int>(chunkFile.Get4());
                         continue;
-                    }
-                    if (chunk.m_id != 'DATA') {
+                    case 'DATA':
+                        break;
+                    default:
                         continue;
                     }
 

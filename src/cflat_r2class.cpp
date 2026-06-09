@@ -438,11 +438,11 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 						int newValue = oldValue;
 
 						switch (setMode) {
-						case 0:
-							newValue = stack->m_word;
-							break;
 						case -1:
 							newValue -= stack->m_word;
+							break;
+						case 0:
+							newValue = stack->m_word;
 							break;
 						case 1:
 							newValue += stack->m_word;
@@ -613,13 +613,13 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 					stack[-1].m_word = static_cast<unsigned int>(static_cast<int>(*value));
 					switch (setMode) {
 					case -1:
-						*value = static_cast<signed char>(*value - static_cast<signed char>(stack->m_word));
+						*value = static_cast<signed char>(*value - static_cast<int>(stack->m_word));
 						break;
 					case 0:
 						*value = static_cast<signed char>(stack->m_word);
 						break;
 					case 1:
-						*value = static_cast<signed char>(*value + static_cast<signed char>(stack->m_word));
+						*value = static_cast<signed char>(*value + static_cast<int>(stack->m_word));
 						break;
 					}
 					break;
@@ -985,7 +985,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 				case -0x13:
 				case -0x12:
 				case -0x11: {
-					LastResult(this) = LoadS16(engineObject, (systemVal + 0x14) * 2 + 0x510);
+					LastResult(this) = LoadS16Idx<0x510>(engineObject, (systemVal + 0x14) * 2);
 					break;
 				}
 				case -0x15:
@@ -1219,13 +1219,13 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			Vec hitTarget;
 			Vec hitMove;
 			float* params = reinterpret_cast<float*>(object->m_localBase);
+			float radius = params[5];
 			hitStart.x = engineObject->m_worldPosition.x;
 			hitStart.y = engineObject->m_worldPosition.y + params[1];
 			hitStart.z = engineObject->m_worldPosition.z;
 			hitTarget.x = params[2];
 			hitTarget.y = params[3];
 			hitTarget.z = params[4];
-			float radius = params[5];
 			PSVECSubtract(&hitTarget, &hitStart, &hitMove);
 			int hit = MapPcs.CheckHitCylinderNear(&hitStart, &hitMove, radius, object->m_localBase[0]);
 			AddDebugDrawCC(&hitStart, &hitMove, radius, 1, 0);
@@ -1660,7 +1660,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		case -0x70:
 			engineObject->m_stateFlags0 =
-			    static_cast<unsigned char>((static_cast<signed char>(object->m_localBase[0]) << 4) & 0x10) |
+			    static_cast<signed char>((static_cast<signed char>(object->m_localBase[0]) << 4) & 0x10) |
 			    (engineObject->m_stateFlags0 & 0xEF);
 			PushValue(this, object, 0);
 			outResult = 0;
@@ -1809,7 +1809,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			RuntimePartyAssignIndex(this) = partyIndex + 1;
 			if (Game.m_gameWork.m_wmBackupParams[partyIndex] >= 0) {
 				engineObject->SetClassWork(0, static_cast<int>(partyIndex));
-				ScriptCaravan(engineObject)->m_joybusCaravanId = static_cast<int>(partyIndex);
+				ScriptCaravan(engineObject)->m_joybusCaravanId = static_cast<unsigned int>(partyIndex);
 				Game.m_partyObjArr[partyIndex] = reinterpret_cast<CGPartyObj*>(engineObject);
 				Joybus.SendAllStat(static_cast<int>(partyIndex));
 			}

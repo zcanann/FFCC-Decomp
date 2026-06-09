@@ -913,11 +913,12 @@ void CGItemObj::onFrameStat()
 				}
 			}
 
+			CGObject* attachOwner = m_owner;
 			const char* attachName = s_itemAttachLeftItem;
 			if (useBossAttachName) {
 				attachName = s_itemAttachCenterItem3;
 			}
-			Attach(m_owner, const_cast<char*>(attachName), attachOffsetPtr);
+			Attach(attachOwner, const_cast<char*>(attachName), attachOffsetPtr);
 			changeStat(0, 0, 0);
 			m_bodyEllipsoidRadius = kItemObjZero;
 		}

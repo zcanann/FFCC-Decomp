@@ -548,7 +548,7 @@ void CGObject::move()
                 buttons |= buttonsRepeat;
             }
 
-            u32 miniGameFlags = MiniGamePcs.m_flags;
+            u32 miniGameFlags = DbgMenuPcs.GetDbgFlagsRaw();
             if ((miniGameFlags & 0x100) != 0) {
                 const float stickX = (Pad.m_debugPadLock != 0 || (player == 0 && Pad.m_debugPadPort != -1))
                     ? sZeroFloat
@@ -627,7 +627,7 @@ void CGObject::move()
             if (m_weaponNodeFlagAll.m_bits1.m_shield
                 && m_weaponNodeFlagAll.m_bits1.m_menuReady
                 && (m_ownerType == 0)) {
-                if ((MiniGamePcs.m_flags & 2) != 0) {
+                if ((DbgMenuPcs.GetDbgFlagsRaw() & 2) != 0) {
                     speed *= sAnalogSpeedScale;
                 }
 
@@ -703,18 +703,17 @@ void CGObject::move()
             }
         }
 
-        if (movingWithScript && !m_weaponNodeFlagAll.m_bits1.m_bit04) {
-            m_animSlotSel = *(reinterpret_cast<s8*>(&m_shieldNodeFlags) + 1);
-        } else {
+        if (!movingWithScript || m_weaponNodeFlagAll.m_bits1.m_bit04) {
             m_animSlotSel = *reinterpret_cast<s8*>(&m_animStartFrame);
+        } else {
+            m_animSlotSel = *(reinterpret_cast<s8*>(&m_shieldNodeFlags) + 1);
         }
         return;
     }
 
     const double rotDelta = static_cast<double>(Math.DstRot(m_rotTargetY, m_rotBaseY));
-    m_animSlotSel = (DOUBLE_803303e8 < fabs(rotDelta))
-        ? *reinterpret_cast<s8*>(&m_animStartFrame)
-        : *(reinterpret_cast<s8*>(&m_shieldNodeFlags) + 1);
+    m_animSlotSel = (reinterpret_cast<s8*>(&m_shieldNodeFlags) + 1)
+        [(DOUBLE_803303e8 < fabs(rotDelta)) ? 1 : 0];
 }
 
 /*
@@ -1578,8 +1577,10 @@ void CGObject::update()
             Vec lookDelta;
             PSVECSubtract(&m_worldPosition, &m_lookAtTarget->m_worldPosition, &lookDelta);
 
-            float targetNodeY = m_lookAtTarget->unk_0x184;
-            if (m_lookAtTargetNodeIndex != -1) {
+            float targetNodeY;
+            if (m_lookAtTargetNodeIndex == -1) {
+                targetNodeY = m_lookAtTarget->unk_0x184;
+            } else {
                 targetNodeY = ModelNodeMtx(m_lookAtTarget->m_charaModelHandle->m_model, m_lookAtTargetNodeIndex)[1][3];
             }
             lookDelta.y += unk_0x184 - targetNodeY;
@@ -1748,15 +1749,7 @@ void CGObject::update()
                 if (m_shieldNodeFlagBits.m_bit80) {
                     const unsigned char queuePos = m_animQueuePos++;
                     const char queuedAnim = m_animQueue[queuePos];
-                    if (queuedAnim == -1) {
-                        m_currentAnimSlot = -1;
-                        m_shieldNodeFlagBits.m_bit40 = 0;
-                        m_turnSpeed = sZeroFloat;
-                        m_rotTargetY = m_rotBaseY;
-                        m_shieldNodeFlagBits.m_bit08 = 0;
-                        m_shieldNodeFlagBits.m_bit80 = 0;
-                        gCFlatRuntime().SystemCall(this, 2, 10, 0, 0, 0);
-                    } else {
+                    if (queuedAnim != -1) {
                         m_currentAnimSlot =
                             (queuedAnim >= 'A' && queuedAnim < 'A' + 4) ? m_animQueue[queuedAnim - 'A'] : queuedAnim;
                         m_weaponNodeFlagAll.m_bits1.m_bit01 = 0;
@@ -1766,6 +1759,14 @@ void CGObject::update()
                         m_shieldNodeFlagBits.m_bit80 = 0;
                         m_shieldNodeFlagBits.m_bit08 = 1;
                         m_turnSpeed = sZeroFloat;
+                    } else {
+                        m_currentAnimSlot = -1;
+                        m_shieldNodeFlagBits.m_bit40 = 0;
+                        m_turnSpeed = sZeroFloat;
+                        m_rotTargetY = m_rotBaseY;
+                        m_shieldNodeFlagBits.m_bit08 = 0;
+                        m_shieldNodeFlagBits.m_bit80 = 0;
+                        gCFlatRuntime().SystemCall(this, 2, 10, 0, 0, 0);
                     }
                 } else {
                     m_currentAnimSlot = -1;

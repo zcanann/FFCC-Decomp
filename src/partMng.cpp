@@ -3531,18 +3531,17 @@ void* CPartMng::pppFileRead(char* filePath, unsigned long& fileSize, void* readB
 
     if (loadState->m_partLoadMode == 1) {
         fileSize = loadState->m_partChunkSize[loadState->m_partChunkIndex];
-        readBuffer = File.m_readBuffer;
         if (fileSize == 0) {
-            readBuffer = 0;
-        } else {
-            Memory.CopyFromAMemorySync(
-                File.m_readBuffer, reinterpret_cast<void*>(loadState->m_partAMemCursor), (fileSize + 0x1f) & ~0x1f);
-            loadState->m_partAMemCursor += fileSize;
-            CheckSum(readBuffer, fileSize);
-            loadState->m_partChunkIndex++;
+            return 0;
         }
+        readBuffer = File.m_readBuffer;
+        Memory.CopyFromAMemorySync(
+            readBuffer, reinterpret_cast<void*>(loadState->m_partAMemCursor), (fileSize + 0x1f) & ~0x1f);
+        loadState->m_partAMemCursor += fileSize;
+        CheckSum(readBuffer, fileSize);
+        loadState->m_partChunkIndex++;
     } else if (readBuffer == 0 && (fileHandle = File.Open(filePath, 0, CFile::PRI_LOW), fileHandle == 0)) {
-        readBuffer = 0;
+        goto failReturn;
     } else if (loadState->m_partLoadMode == 3) {
         File.ReadASync(fileHandle);
         readBuffer = reinterpret_cast<void*>(1);
@@ -3568,6 +3567,9 @@ void* CPartMng::pppFileRead(char* filePath, unsigned long& fileSize, void* readB
     }
 
     return readBuffer;
+
+failReturn:
+    return 0;
 }
 
 /*

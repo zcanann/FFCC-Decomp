@@ -2502,7 +2502,7 @@ foundModel:
         if (loadPdt == 0) {
             loadPdt = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x868) CLoadPdt;
             m_pdtLoadRef = loadPdt;
-            reinterpret_cast<CLoadPdt*>(m_pdtLoadRef)->m_keyTag = reinterpret_cast<void*>(1);
+            reinterpret_cast<CLoadPdt*>(m_pdtLoadRef)->m_keyTag = reinterpret_cast<void*>(charaKind);
             reinterpret_cast<CLoadPdt*>(m_pdtLoadRef)->m_keyId = static_cast<unsigned int>(charaNo);
             reinterpret_cast<CLoadPdt*>(m_pdtLoadRef)->m_variantTag = reinterpret_cast<void*>(textureVariant);
             reinterpret_cast<CLoadPdt*>(m_pdtLoadRef)->m_mergeFileId = mergeFileId;

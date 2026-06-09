@@ -2391,7 +2391,10 @@ void CPartMng::pppEditPartCalc()
         _pppStartPart(firstMng, *reinterpret_cast<long**>(self + 0x5dc), 1);
     }
 
-    if (ppvSysStopPartF != 0 || *reinterpret_cast<long**>(self + 0x5dc) == 0) {
+    if (ppvSysStopPartF != 0) {
+        return;
+    }
+    if (*reinterpret_cast<long**>(self + 0x5dc) == 0) {
         return;
     }
 

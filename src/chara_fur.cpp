@@ -1040,29 +1040,33 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		}
 	}
 
-	Chara.MogFur().m_cursorX = static_cast<unsigned int>(kYmEnvTen * MogPadFloat(36) +
-	                                     static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorX)));
+	Chara.MogFur().m_cursorX = static_cast<int>(kYmEnvTen * MogPadFloat(36) +
+	                                     static_cast<float>(static_cast<unsigned int>(Chara.MogFur().m_cursorX)));
 	Chara.MogFur().m_cursorY = static_cast<int>(-(kYmEnvTen * MogPadFloat(40) -
 	                                     static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorY))));
 
 	const int cursorXv = static_cast<int>(Chara.MogFur().m_cursorX);
+	int cursorXc;
 	if (cursorXv < 0) {
-		Chara.MogFur().m_cursorX = 0;
+		cursorXc = 0;
 	} else {
-		Chara.MogFur().m_cursorX = 0x280;
+		cursorXc = 0x280;
 		if (cursorXv <= 0x280) {
-			Chara.MogFur().m_cursorX = cursorXv;
+			cursorXc = cursorXv;
 		}
 	}
+	Chara.MogFur().m_cursorX = cursorXc;
 	const int cursorYv = static_cast<int>(Chara.MogFur().m_cursorY);
+	int cursorYc;
 	if (cursorYv < 0) {
-		Chara.MogFur().m_cursorY = 0;
+		cursorYc = 0;
 	} else {
-		Chara.MogFur().m_cursorY = 0x1C0;
+		cursorYc = 0x1C0;
 		if (cursorYv <= 0x1C0) {
-			Chara.MogFur().m_cursorY = cursorYv;
+			cursorYc = cursorYv;
 		}
 	}
+	Chara.MogFur().m_cursorY = cursorYc;
 
 	Mtx cameraMtx;
 	PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);

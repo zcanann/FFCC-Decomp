@@ -2699,8 +2699,10 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
     }
 
     if (immediatePass != 0 && drawPass == 0 && (m_model->m_lightAlpha < kCharaOne || (flags & 0x40000) != 0)) {
-        ppvDrawMng.AddPrim(-m_sortZ, this);
-        return;
+        if (immediatePass != 0) {
+            ppvDrawMng.AddPrim(-m_sortZ, this);
+            return;
+        }
     }
 
     if (drawPass == 3 && (flags & 0x81C) == 0) {

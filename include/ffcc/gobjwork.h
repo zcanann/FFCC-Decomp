@@ -140,6 +140,19 @@ public:
             unsigned char m_attachmentIsGil : 1;
             unsigned char m_rest : 3;
         };
+        struct HeaderBits {
+            unsigned short m_opened : 1;
+            unsigned short m_attachmentClaimed : 1;
+            unsigned short m_replySent : 1;
+            unsigned short m_hasReply : 1;
+            unsigned short m_attachmentIsGil : 1;
+            unsigned short m_messageType : 9;
+            unsigned short m_pad : 2;
+        };
+        struct AttachmentBits {
+            unsigned short m_pad : 7;
+            unsigned short m_value : 9;
+        };
 
         unsigned int Word0() const { return m_words.m_word0; }
         void SetWord0(unsigned int word)
@@ -172,10 +185,14 @@ public:
         bool HasReply() const { return FlagsBits().m_hasReply != 0; }
         bool AttachmentIsGil() const { return FlagsBits().m_attachmentIsGil != 0; }
         unsigned short HeaderWord() const { return m_half.m_header; }
+        HeaderBits& HeaderBitsRef() { return *reinterpret_cast<HeaderBits*>(&m_half.m_header); }
+        void SetMessageType(unsigned short type) { HeaderBitsRef().m_messageType = type; }
         unsigned short MessageType() const { return (HeaderWord() >> 2) & 0x1FF; }
         unsigned int SenderId() const { return (Word0() >> 9) & 0x1FF; }
         unsigned short AttachmentWord() const { return m_half.m_attachment; }
         unsigned int AttachmentValue() const { return AttachmentWord() & 0x1FF; }
+        AttachmentBits& AttachmentBitsRef() { return *reinterpret_cast<AttachmentBits*>(&m_half.m_attachment); }
+        void SetAttachmentValue(unsigned short value) { AttachmentBitsRef().m_value = value; }
         unsigned short TempVar(int index) const { return m_half.m_tempVars[index]; }
 
         union {

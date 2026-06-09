@@ -400,29 +400,30 @@ void CCaravanWork::AddLetter(int letterType, int senderId, int moneyValue, int h
 							 int itemA, int itemB, int itemC, int itemD)
 {
 	for (int i = 99; i > 0; i--) {
-		m_letters[i].m_words.m_word0 = m_letters[i - 1].m_words.m_word0;
-		m_letters[i].m_words.m_word1 = m_letters[i - 1].m_words.m_word1;
-		m_letters[i].m_words.m_word2 = m_letters[i - 1].m_words.m_word2;
+		m_letters[i] = m_letters[i - 1];
 	}
 
 	memset(&m_letters[0], 0, sizeof(m_letters[0]));
-	m_letters[0].m_half.m_header = (m_letters[0].m_half.m_header & 0xF803) | ((letterType & 0x1FF) << 2);
+	m_letters[0].SetMessageType(letterType);
 	m_letters[0].m_words.m_word0 = (m_letters[0].m_words.m_word0 & 0xFFFC01FF) | ((senderId & 0x1FF) << 9);
 	m_letters[0].SetFlags((m_letters[0].Flags() & ~8) | ((hasMoneyFlag << 3) & 8));
+	int attachmentValue;
 	if (m_letters[0].AttachmentIsGil()) {
-		moneyValue /= 100;
+		attachmentValue = moneyValue / 100;
+	} else {
+		attachmentValue = moneyValue;
 	}
-	m_letters[0].m_half.m_attachment = (m_letters[0].m_half.m_attachment & 0xFE00) | (moneyValue & 0x1FF);
-	m_letters[0].SetFlags(m_letters[0].Flags() & 0x7F);
-	m_letters[0].SetFlags(m_letters[0].Flags() & 0xBF);
-	m_letters[0].SetFlags(m_letters[0].Flags() & 0xDF);
-	m_letters[0].SetFlags((m_letters[0].Flags() & ~0x10) | ((hasReplyFlag << 4) & 0x10));
+	m_letters[0].SetAttachmentValue(attachmentValue);
+	m_letters[0].FlagsBits().m_opened = 0;
+	m_letters[0].FlagsBits().m_attachmentClaimed = 0;
+	m_letters[0].FlagsBits().m_replySent = 0;
+	m_letters[0].FlagsBits().m_hasReply = hasReplyFlag;
 	m_letters[0].m_half.m_tempVars[0] = static_cast<unsigned short>(itemA);
 	m_letters[0].m_half.m_tempVars[1] = static_cast<unsigned short>(itemB);
 	m_letters[0].m_half.m_tempVars[2] = static_cast<unsigned short>(itemC);
 	m_letters[0].m_half.m_tempVars[3] = static_cast<unsigned short>(itemD);
 
-	unsigned int nextCount = m_letterCount + 1;
+	int nextCount = m_letterCount + 1;
 	int letterCount = 100;
 	if (nextCount < 100) {
 		letterCount = nextCount;

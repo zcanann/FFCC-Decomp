@@ -3328,10 +3328,10 @@ float CGObject::CalcSafePos(int hitMask, CGObject* other, Vec* outSafePos)
     float safeDistance = sZeroFloat;
 
     centerPos.x = other->m_worldPosition.x;
-    if (m_worldPosition.y > other->m_worldPosition.y) {
-        centerPos.y = m_worldPosition.y;
-    } else {
+    if (other->m_worldPosition.y > m_worldPosition.y) {
         centerPos.y = other->m_worldPosition.y;
+    } else {
+        centerPos.y = m_worldPosition.y;
     }
     centerPos.y += m_capsuleHalfHeight;
     centerPos.z = other->m_worldPosition.z;

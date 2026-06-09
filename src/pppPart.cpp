@@ -466,7 +466,10 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 						owner->m_pppPObjLink = obj->m_next;
 					}
 
-					Memory.Free(obj);
+					if (obj != 0)
+					{
+						Memory.Free(obj);
+					}
 				}
 				else
 				{
@@ -610,7 +613,10 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 						owner->m_pppPObjLink = obj->m_next;
 					}
 
-					Memory.Free(obj);
+					if (obj != 0)
+					{
+						Memory.Free(obj);
+					}
 				}
 				else
 				{
@@ -971,7 +977,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
  * JP Size: TODO
  */
 #pragma push
-#pragma optimization_level 2
+#pragma optimization_level 4
 void _pppAllFreePObject(_pppMngSt* pppMngSt)
 {
 	Graphic._WaitDrawDone(const_cast<char*>(s_pppPart_cpp), 0x362);
@@ -1012,7 +1018,10 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 			owner->m_pppPObjLink = obj->m_next;
 		}
 
-		Memory.Free(obj);
+		if (obj != 0)
+		{
+			Memory.Free(obj);
+		}
 		obj = next;
 	}
 
@@ -2066,6 +2075,7 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
  */
 #pragma push
 #pragma optimization_level 3
+#pragma opt_lifetimes off
 void _pppDeadPart(_pppMngSt* pppMngSt)
 {
 	struct pppMngStDeadRaw
@@ -2090,8 +2100,9 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 	if (ppvUserStopPartF == 0)
 	{
 		maxDeleteFrame = 0;
+		_pppPObjLink* obj = mng->m_objHead.m_next;
 		_pppPObjLink* prev = &mng->m_objHead;
-		for (_pppPObjLink* obj = prev->m_next; obj != 0;)
+		for (; obj != 0;)
 		{
 			_pppPObjLink* next = obj->m_next;
 			if (((_pppPObject*)obj)->m_field7C == 0)

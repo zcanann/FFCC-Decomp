@@ -182,7 +182,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
             if (step[0x86] == 0) {
                 goto step_advance;
             }
-            for (frameCount = frameCountRaw; (s32)frameCount > 0; frameCount--) {
+            for (frameCount = *(u16*)(step + 0x84); (s32)frameCount > 0; frameCount--) {
                 Vec* testPos = &history[trailNextIndex];
                 bool canDraw = (testPos->x != 0.0f) || (testPos->y != 0.0f) || (testPos->z != 0.0f);
                 if (canDraw) {

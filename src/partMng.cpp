@@ -879,7 +879,7 @@ void CPartMng::render3Dcursor()
     GXSetNumTexGens(0);
     GXSetNumTevStages(1);
     GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
-    GXLoadPosMtxImm(ppvCameraMatrix0, 0);
+    GXLoadPosMtxImm(ppvCameraMatrix, 0);
     pppSetBlendMode(3);
 
     float* cursorPos = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x23780);

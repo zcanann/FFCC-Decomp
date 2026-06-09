@@ -326,6 +326,7 @@ void CCharaPcs::calcViewer()
     CCharaPcs* self = this;
     char pathBuf[256];
     CFile::CHandle* fileHandle;
+    (void)kCharaViewerColorCenterBias;
 
     if (self->m_viewerStoreSavedAnim != 0) {
         ReleaseShared(self->m_viewerSavedAnim);

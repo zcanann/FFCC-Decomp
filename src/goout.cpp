@@ -2675,7 +2675,7 @@ void CGoOutMenu::Calc()
                 m_cursorListY1 = 0xB0;
                 m_cursorMode = 1;
 
-                signed char nextMode;
+                unsigned char nextMode;
                 if (MenuPcs.m_menuWindowInfo->state == 1) {
                     input = GetGoOutInputMask();
                     if ((input & 0xC) != 0) {
@@ -2685,7 +2685,7 @@ void CGoOutMenu::Calc()
                         input = GetGoOutInputMask();
                         if ((input & 0x100) != 0) {
                             Sound.PlaySe(2, 0x40, 0x7f, 0);
-                            nextMode = static_cast<signed char>(m_cursorChoice + 1);
+                            nextMode = static_cast<unsigned char>(m_cursorChoice + 1);
                             goto do_switch_calc;
                         }
                     }

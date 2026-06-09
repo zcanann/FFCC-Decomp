@@ -1165,8 +1165,12 @@ void CGObject::bgAttribCollision()
                 CVector probeBase(m_worldPosition.x, m_worldPosition.y + sStepProbeHeight, m_worldPosition.z);
 
                 CMapCylinder attrCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
-                attrCylinder.m_bottom = probeBase;
-                attrCylinder.m_axis = probeMove;
+                attrCylinder.m_bottom.x = probeBase.x;
+                attrCylinder.m_bottom.y = probeBase.y;
+                attrCylinder.m_bottom.z = probeBase.z;
+                attrCylinder.m_axis.x = probeMove.x;
+                attrCylinder.m_axis.y = probeMove.y;
+                attrCylinder.m_axis.z = probeMove.z;
                 attrCylinder.m_radius = sZeroFloat;
 
                 if (MapMng.CheckHitCylinderNear(

@@ -196,7 +196,14 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     work = GetKeShpTail2XWork(&obj->m_object, param_3);
     shape = ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex];
     pppShapeAnimData* shapeAnim = static_cast<pppShapeAnimData*>(shape->m_animData);
-    shapeEntry = pppShapeFrame(shapeAnim, work->m_shapePrevFrame);
+    {
+        u16 prevFrame = work->m_shapePrevFrame;
+        short shapeOffset = *reinterpret_cast<short*>(
+            reinterpret_cast<int>(shapeAnim) + prevFrame * sizeof(pppShapeAnimFrame) +
+            offsetof(pppShapeAnimData, m_frames));
+        shapeEntry = reinterpret_cast<tagOAN3_SHAPE*>(
+            reinterpret_cast<unsigned char*>(shapeAnim) + shapeOffset);
+    }
 
     pppCopyMatrix(localBase, obj->m_object.m_localMatrix);
     pppUnitMatrix(drawMtx);

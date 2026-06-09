@@ -150,22 +150,22 @@ static int CharaObjIsAttackAnimBoundary(CGCharaObj* charaObj)
 	}
 
 	CharaObjModelAnimState* model = reinterpret_cast<CharaObjModelAnimState*>(charaObj->m_charaModelHandle->m_model);
-	if (model->m_anim == 0) {
-		return 1;
+	if (model->m_anim != 0) {
+		int span = static_cast<int>(kOneF32 + (model->m_animEnd - model->m_animStart));
+		if (span == 1) {
+			return 1;
+		}
+
+		int frame = static_cast<int>(charaObj->m_turnSpeed);
+		int remainder = frame % span;
+		if (charaObj->m_lastBgAttr < kCharaObjZero) {
+			return __rlwnm(1, static_cast<unsigned int>(__cntlzw(remainder)), 31, 31) & 0xFF;
+		}
+
+		return (span <= frame) & 0xFF;
 	}
 
-	int span = static_cast<int>(kOneF32 + (model->m_animEnd - model->m_animStart));
-	if (span == 1) {
-		return 1;
-	}
-
-	int frame = static_cast<int>(charaObj->m_turnSpeed);
-	int remainder = frame % span;
-	if (charaObj->m_lastBgAttr < kCharaObjZero) {
-		return __rlwnm(1, static_cast<unsigned int>(__cntlzw(remainder)), 31, 31) & 0xFF;
-	}
-
-	return (span <= frame) & 0xFF;
+	return 1;
 }
 
 static float CharaObjGetMonsterScale(unsigned char* script9, bool isMon)

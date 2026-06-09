@@ -4363,10 +4363,11 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
         }
     }
 
-    if (createParam->m_extraPositionPtr != 0) {
-        mng->m_paramVec0.x = createParam->m_extraPositionPtr->x;
-        mng->m_paramVec0.y = createParam->m_extraPositionPtr->y;
-        mng->m_paramVec0.z = createParam->m_extraPositionPtr->z;
+    Vec* extraPos = createParam->m_extraPositionPtr;
+    if (extraPos != 0) {
+        mng->m_paramVec0.x = extraPos->x;
+        mng->m_paramVec0.y = extraPos->y;
+        mng->m_paramVec0.z = extraPos->z;
         mng->m_paramVec0.x = mng->m_paramVec0.x + *reinterpret_cast<float*>(fpData + 0x00);
         mng->m_paramVec0.y = mng->m_paramVec0.y + *reinterpret_cast<float*>(fpData + 0x04);
         mng->m_paramVec0.z = mng->m_paramVec0.z + *reinterpret_cast<float*>(fpData + 0x08);

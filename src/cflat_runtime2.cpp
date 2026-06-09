@@ -1346,8 +1346,10 @@ void CFlatRuntime2::Calc()
 		}
 	}
 
-	u16 button = 0;
-	if (Pad.m_debugPadLock == 0) {
+	u16 button;
+	if (Pad.m_debugPadLock != 0) {
+		button = 0;
+	} else {
 		const u32 padIndex = static_cast<u32>((1 - Pad.m_debugPadPort) | (Pad.m_debugPadPort - 1)) >> 31;
 		button = Pad.GetPadInputs()[padIndex].lockedButton[1];
 	}

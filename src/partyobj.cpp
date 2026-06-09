@@ -1069,9 +1069,11 @@ void CGPartyObj::onFramePreCalc()
 	if (Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
 		if (party.carryObject != nullptr ||
 		    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
-			float speedScale = kMonObjOne;
+			float speedScale;
 			if (static_cast<int>(CFlatCenterState()) == 0) {
 				speedScale = FLOAT_80331b08;
+			} else {
+				speedScale = kMonObjOne;
 			}
 			m_moveBaseSpeed = static_cast<float>(static_cast<int>(FLOAT_80331b04 * speedScale));
 		} else {

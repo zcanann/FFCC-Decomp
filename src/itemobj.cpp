@@ -1064,7 +1064,7 @@ void CGItemObj::onFrameStat()
 				model[0x10C] = static_cast<unsigned char>(__rlwimi(model[0x10C], 1, 7, 24, 24));
 			}
 
-			if (m_subFrame < 9) {
+			if (m_subFrame <= 8) {
 				float wobble = (float)sin((double)(kItemObjHalfPi * (float)m_subFrame * kItemObjWobblePhaseScale));
 
 				prgObj->m_rotationZ = wobble;
@@ -1106,17 +1106,18 @@ void CGItemObj::onFrameStat()
 
 		prgObj->m_rotTargetY = prgObj->m_rotTargetY + kItemObjFineStep;
 		prgObj->m_groundHitOffset.x =
-		    -kItemObjFineStep * (prgObj->m_worldPosition.x - *(float*)(*(unsigned char**)(self + 0x550) + 0x15C));
+		    kItemObjFineStep * -(prgObj->m_worldPosition.x - *(float*)(*(unsigned char**)(self + 0x550) + 0x15C));
 		prgObj->m_groundHitOffset.z =
-		    -kItemObjFineStep * (prgObj->m_worldPosition.z - *(float*)(*(unsigned char**)(self + 0x550) + 0x164));
+		    kItemObjFineStep * -(prgObj->m_worldPosition.z - *(float*)(*(unsigned char**)(self + 0x550) + 0x164));
 		break;
 	case 0x25: {
+		prgObj->m_moveOffset.y = kItemObjMoveOffsetXZ;
+		prgObj->m_rotTargetY = prgObj->m_rotTargetY + kItemObjMemoryTurnStep;
+
 		CVector monTarget(*reinterpret_cast<Vec*>(CGMonObj::m_aiWork + 4));
 		CVector worldPos(prgObj->m_worldPosition);
 		CVector delta;
 
-		prgObj->m_moveOffset.y = kItemObjMoveOffsetXZ;
-		prgObj->m_rotTargetY = prgObj->m_rotTargetY + kItemObjMemoryTurnStep;
 		PSVECSubtract(reinterpret_cast<Vec*>(&monTarget), reinterpret_cast<Vec*>(&worldPos), reinterpret_cast<Vec*>(&delta));
 		monTarget.x = delta.x;
 		monTarget.y = delta.y;

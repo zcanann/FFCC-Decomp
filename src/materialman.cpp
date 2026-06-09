@@ -3243,24 +3243,24 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                             unsigned int slot = chunkFile.Get2() & 0xFFFF;
                             chunkFile.Get2();
 
-                            if (keyFrameU == 0) {
-                                material->GetTexScroll(slot)->m_u1 = chunkFile.GetF4();
-                                material->GetTexScroll(slot)->m_type0 =
-                                    (material->GetTexScroll(slot)->m_u1 == kTextureZero) ? 0 : 1;
-                            } else {
+                            if (keyFrameU != 0) {
                                 chunkFile.GetF4();
                                 material->GetTexScroll(slot)->m_uKeyFrame = keyFrameU;
                                 material->GetTexScroll(slot)->m_type0 = 2;
+                            } else {
+                                material->GetTexScroll(slot)->m_u1 = chunkFile.GetF4();
+                                material->GetTexScroll(slot)->m_type0 =
+                                    (material->GetTexScroll(slot)->m_u1 == kTextureZero) ? 0 : 1;
                             }
 
-                            if (keyFrameV == 0) {
-                                material->GetTexScroll(slot)->m_v1 = chunkFile.GetF4();
-                                material->GetTexScroll(slot)->m_type1 =
-                                    (material->GetTexScroll(slot)->m_v1 == kTextureZero) ? 0 : 1;
-                            } else {
+                            if (keyFrameV != 0) {
                                 chunkFile.GetF4();
                                 material->GetTexScroll(slot)->m_vKeyFrame = keyFrameV;
                                 material->GetTexScroll(slot)->m_type1 = 2;
+                            } else {
+                                material->GetTexScroll(slot)->m_v1 = chunkFile.GetF4();
+                                material->GetTexScroll(slot)->m_type1 =
+                                    (material->GetTexScroll(slot)->m_v1 == kTextureZero) ? 0 : 1;
                             }
                         } break;
                         case CHUNK_UFRM:

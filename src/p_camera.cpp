@@ -419,12 +419,12 @@ int CCameraPcs::GetTable(unsigned long tableIndex)
  */
 void CCameraPcs::create()
 {
-    float value18 = kCameraPi;
     float value5c = kCameraHalfScreenHeight;
+    float value18 = kCameraPi;
     float zero = kCameraZeroF;
     float valueb0 = kCameraDefaultPitch;
 
-    m_targetZ = kCameraZeroF;
+    m_targetZ = zero;
     m_targetY = zero;
     m_targetX = zero;
 
@@ -1155,16 +1155,16 @@ void CCameraPcs::calcChara()
     m_targetY = m_viewer.m_position.y;
     m_targetZ = m_viewer.m_position.z;
 
-    CVector eyeDir(DirectionVec());
+    Vec* eyePtr = CVector(DirectionVec());
     CVector scaledVec;
-    PSVECScale(AsVec(eyeDir), AsVec(scaledVec), kCameraHundredF);
+    PSVECScale(eyePtr, AsVec(scaledVec), kCameraHundredF);
     scaledDir.x = scaledVec.x;
     scaledDir.y = scaledVec.y;
     scaledDir.z = scaledVec.z;
 
-    CVector targetBase(TargetVec());
+    Vec* targetBasePtr = CVector(TargetVec());
     CVector targetVec;
-    PSVECAdd(AsVec(targetBase), &scaledDir, AsVec(targetVec));
+    PSVECAdd(targetBasePtr, &scaledDir, AsVec(targetVec));
     targetPos.x = targetVec.x;
     targetPos.y = targetVec.y;
     targetPos.z = targetVec.z;
@@ -1290,12 +1290,12 @@ void CCameraPcs::calcMap()
     moveDelta.x = kCameraZeroF;
 
     if ((buttons & 0x100) != 0) {
-        PSVECScale(&moveDelta, &DirectionVec(), kCameraDebugMoveStep);
+        PSVECScale(&DirectionVec(), &moveDelta, kCameraDebugMoveStep);
     }
 
     moveDelta.y = kCameraZeroF;
     if ((buttons & 0x800) != 0) {
-        PSVECScale(&moveDelta, &DirectionVec(), kCameraNegativeDebugMoveStep);
+        PSVECScale(&DirectionVec(), &moveDelta, kCameraNegativeDebugMoveStep);
         moveDelta.y = kCameraZeroF;
     }
 
@@ -1311,17 +1311,17 @@ void CCameraPcs::calcMap()
         sideVec.x = kCameraDebugMoveStep;
         PSMTXMultVecSR(rotMtx, &sideVec, &sideVec);
         sideVec.y = kCameraZeroF;
-        PSVECAdd(&moveDelta, &moveDelta, &sideVec);
+        PSVECAdd(&sideVec, &moveDelta, &moveDelta);
     } else if ((buttons & 0x2) != 0) {
         sideVec.y = kCameraZeroF;
         sideVec.z = kCameraZeroF;
         sideVec.x = kCameraNegativeDebugMoveStep;
         PSMTXMultVecSR(rotMtx, &sideVec, &sideVec);
         sideVec.y = kCameraZeroF;
-        PSVECAdd(&moveDelta, &moveDelta, &sideVec);
+        PSVECAdd(&sideVec, &moveDelta, &moveDelta);
     }
 
-    if ((moveDelta.x != kCameraZeroF) || (moveDelta.y != kCameraZeroF) || (moveDelta.z != kCameraZeroF)) {
+    if ((kCameraZeroF != moveDelta.x) || (kCameraZeroF != moveDelta.y) || (kCameraZeroF != moveDelta.z)) {
         for (i = 4; i != 0; i--) {
             hitCylinder.m_min.x = kCameraBoundsMinInitial;
             hitCylinder.m_min.y = kCameraBoundsMinInitial;

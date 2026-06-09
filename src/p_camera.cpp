@@ -960,8 +960,8 @@ void CCameraPcs::draw()
         Graphic.DrawSphere();
 
         Vec* shadowRefPos = shadowPos + 1;
-        float refPosZ = shadowRefPos->z;
         float refPosX = shadowRefPos->x;
+        float refPosZ = shadowRefPos->z;
         float refPosY = shadowRefPos->y;
         PSMTXCopy(m_cameraMatrix, cameraMtx);
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);

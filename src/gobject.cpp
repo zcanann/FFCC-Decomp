@@ -685,8 +685,12 @@ void CGObject::move()
 
                     PSMTXRotRad(yawMtx, 'y', static_cast<float>(atan2(static_cast<double>(m_worldPosition.x),
                                                                       static_cast<double>(m_worldPosition.z))));
-                    worldUp = sMap21WorldUpAxis;
-                    tangent = sMap21TangentAxis;
+                    reinterpret_cast<u32*>(&worldUp)[0] = reinterpret_cast<const u32*>(&sMap21WorldUpAxis)[0];
+                    reinterpret_cast<u32*>(&worldUp)[1] = reinterpret_cast<const u32*>(&sMap21WorldUpAxis)[1];
+                    reinterpret_cast<u32*>(&worldUp)[2] = reinterpret_cast<const u32*>(&sMap21WorldUpAxis)[2];
+                    reinterpret_cast<u32*>(&tangent)[0] = reinterpret_cast<const u32*>(&sMap21TangentAxis)[0];
+                    reinterpret_cast<u32*>(&tangent)[1] = reinterpret_cast<const u32*>(&sMap21TangentAxis)[1];
+                    reinterpret_cast<u32*>(&tangent)[2] = reinterpret_cast<const u32*>(&sMap21TangentAxis)[2];
                     PSVECNormalize(&m_worldPosition, &worldPosNorm);
                     float upDot = PSVECDotProduct(&worldUp, &worldPosNorm);
                     PSMTXRotRad(pitchMtx, 'x', acosf(upDot));

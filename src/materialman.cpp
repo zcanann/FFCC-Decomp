@@ -3322,6 +3322,7 @@ void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
             } else {
                 for (int i = 0; i < material->m_textureCount; i++) {
                     ReleaseRef(material->m_textureData.m_textures[i]);
+                    material->m_textureData.m_textures[i] = 0;
 
                     unsigned long textureIndex = static_cast<unsigned long>(material->m_textureIndices[i]);
                     if ((textureSet != 0) &&

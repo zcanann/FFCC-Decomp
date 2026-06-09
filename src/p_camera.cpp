@@ -1321,7 +1321,7 @@ void CCameraPcs::calcMap()
         PSVECAdd(&sideVec, &moveDelta, &moveDelta);
     }
 
-    if ((moveDelta.x != kCameraZeroF) || (moveDelta.y != kCameraZeroF) || (moveDelta.z != kCameraZeroF)) {
+    if ((kCameraZeroF != moveDelta.x) || (kCameraZeroF != moveDelta.y) || (kCameraZeroF != moveDelta.z)) {
         for (i = 4; i != 0; i--) {
             hitCylinder.m_min.x = kCameraBoundsMinInitial;
             hitCylinder.m_min.y = kCameraBoundsMinInitial;

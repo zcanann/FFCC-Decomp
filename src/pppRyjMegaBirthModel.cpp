@@ -937,12 +937,12 @@ void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
  * Address: TODO
  * Size: TODO
  */
-static inline void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBirthModel* params, VRyjMegaBirthModel* work)
+static inline void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBirthModel* params, _PARTICLE_WMAT* worldMatrixBlock)
 {
     pppUnitMatrix(out);
     switch (params->m_spawnMode) {
     default:
-        if (work->m_worldMatrixBlock == NULL) {
+        if (worldMatrixBlock == NULL) {
             pppMulMatrix(out, *(pppFMATRIX*)&ppvWorldMatrix, pObject->m_localMatrix);
         }
         break;
@@ -1000,7 +1000,7 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* stepData, _p
     pppFMATRIX emitterMatrix;
     pppFMATRIX scratchMatrix;
 
-    init_matrix(obj, emitterMatrix, params, work);
+    init_matrix(obj, emitterMatrix, params, particleWorldMatrix);
 
     int baseRed = baseColor->m_red;
     int baseGreen = baseColor->m_green;

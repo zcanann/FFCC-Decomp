@@ -452,12 +452,12 @@ void CChara::TimeMogFur()
 			unsigned short packed = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(texels) + tileIndex);
 
 			unsigned int a = (packed >> 12) & 7;
-			int light = 7 - a;
-			int r = light + ((packed >> 8) & 0xF) + 4;
-			int b = light + (packed & 0xF) + 4;
-			int g = light + ((packed >> 4) & 0xF) + 4;
+			int baseLight = 7 - static_cast<int>(a);
+			int r = ((packed >> 8) & 0xF) + 4 + baseLight;
+			int b = (packed & 0xF) + 4 + baseLight;
+			int g = ((packed >> 4) & 0xF) + 4 + baseLight;
 
-			light = 0xF;
+			int light = 0xF;
 			if (r < 0xF) {
 				light = r;
 			}

@@ -1878,14 +1878,16 @@ void CAmemCacheSet::AddRef(short index)
             System.Printf(const_cast<char*>(sAmemCacheAddRefFmt), static_cast<int>(index));
         }
 
+        int offset = 0;
         for (int i = 0; i < m_cacheCount; i++) {
-            CAmemCache& current = cacheEntryAt(this, i);
+            CAmemCache& current = *reinterpret_cast<CAmemCache*>(reinterpret_cast<char*>(m_cacheTable) + offset);
             if (((current.m_inUse != 0) || (current.m_cacheData != 0)) && (static_cast<unsigned int>(System.m_execParam) >= 3)) {
                 System.Printf(
                     const_cast<char*>(sAmemCacheEntryFmt), i, cacheStateName(current),
                     cacheTypeName(current), current.m_refCount, current.m_priority,
                     reinterpret_cast<int>(current.m_cacheData));
             }
+            offset += sizeof(CAmemCache);
         }
 
         if (static_cast<unsigned int>(System.m_execParam) >= 3) {

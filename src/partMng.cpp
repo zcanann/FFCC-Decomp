@@ -1358,25 +1358,23 @@ void CPartMng::pppEditAllReleaseResource()
 {
     static const int kUsbMapMeshTableOffset = 0x7F4;
     static const int kUsbShapeSlotTableOffset = 0x7F8;
-    static const int kRecvBuffOffset = 0x23554;
+    static const int kRecvBuffOffset = 0x1C8;
 
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    CMaterialSet* materialSet = m_materialSet;
-    CTextureSet* textureSet = m_textureSet;
     int iVar3;
     unsigned char* iter;
 
-    if (materialSet != 0) {
-        delete materialSet;
+    if (m_materialSet != 0) {
+        delete m_materialSet;
         m_materialSet = 0;
     }
-    if (textureSet != 0) {
-        delete textureSet;
+    if (m_textureSet != 0) {
+        delete m_textureSet;
         m_textureSet = 0;
     }
 
-    iVar3 = 0;
     iter = self;
+    iVar3 = 0;
     do {
         if (*reinterpret_cast<void**>(iter + 0x1D4) != 0) {
             operator delete(*reinterpret_cast<void**>(iter + 0x1D4));
@@ -1386,8 +1384,8 @@ void CPartMng::pppEditAllReleaseResource()
         iter = iter + 0x4;
     } while (iVar3 < 0x80);
 
-    iVar3 = 0;
     iter = self;
+    iVar3 = 0;
     do {
         if (*reinterpret_cast<void**>(iter + 0x3D8) != 0) {
             operator delete(*reinterpret_cast<void**>(iter + 0x3D8));
@@ -1397,8 +1395,8 @@ void CPartMng::pppEditAllReleaseResource()
         iter = iter + 0x4;
     } while (iVar3 < 0x80);
 
-    iVar3 = 0;
     iter = self;
+    iVar3 = 0;
     do {
         if (*reinterpret_cast<long**>(iter + 0x5DC) != 0) {
             operator delete(*reinterpret_cast<long**>(iter + 0x5DC));

@@ -2118,23 +2118,15 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 	}
 
 	if ((flags & 1) != 0) {
-		CMapCylinder hitCylinder;
-		hitCylinder.m_axis.x = kMonObjHalf * object->m_bodyEllipsoidRadius;
-		hitCylinder.m_axis.y = kMonObjMaxBound;
-		hitCylinder.m_axis.z = kMonObjMinBound;
-		hitCylinder.m_radius = kMonObjMinBound;
-		hitCylinder.m_bound.m_min.x = kMonObjMinBound;
-		hitCylinder.m_bound.m_min.y = kMonObjMaxBound;
-		hitCylinder.m_bound.m_min.z = kMonObjMaxBound;
-		hitCylinder.m_bound.m_max.x = kMonObjMaxBound;
-		hitCylinder.m_bound.m_max.y = kMonObjMaxBound;
-		hitCylinder.m_bound.m_max.z = kMonObjMinBound;
+		float cylRadius = kMonObjHalf * object->m_bodyEllipsoidRadius;
+		CMapCylinder hitCylinder(kMonObjMaxBound, kMonObjMinBound);
 		hitCylinder.m_bottom.x = startPos.x;
 		hitCylinder.m_bottom.y = startPos.y;
 		hitCylinder.m_bottom.z = startPos.z;
-		hitCylinder.m_top.x = move.x;
-		hitCylinder.m_top.y = move.y;
-		hitCylinder.m_top.z = move.z;
+		hitCylinder.m_axis.x = move.x;
+		hitCylinder.m_axis.y = move.y;
+		hitCylinder.m_axis.z = move.z;
+		hitCylinder.m_radius = cylRadius;
 
 		int hit = MapMng.CheckHitCylinderNear(&hitCylinder, reinterpret_cast<Vec*>(&move), *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1B2));
 		if (hit != 0) {
@@ -2142,9 +2134,9 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 				*hitScale = g_hit_t;
 			}
 			PSVECScale(reinterpret_cast<Vec*>(&move), reinterpret_cast<Vec*>(&move), g_hit_t);
-			distance = static_cast<float>(static_cast<double>(distance) * static_cast<double>(g_hit_t));
+			distance = distance * g_hit_t;
 		}
-		gCFlatRuntime2.AddDebugDrawCC(reinterpret_cast<Vec*>(&startPos), reinterpret_cast<Vec*>(&move), hitCylinder.m_axis.x, 1, hit);
+		gCFlatRuntime2.AddDebugDrawCC(reinterpret_cast<Vec*>(&startPos), reinterpret_cast<Vec*>(&move), cylRadius, 1, hit);
 	}
 
 	if ((flags & 2) != 0) {
@@ -2182,7 +2174,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 
 		unsigned char didHit = 0;
 		for (int rank = 0; rank < 4; rank++) {
-			if (((flags & 4) != 0) && (((*reinterpret_cast<int*>(mon + 0x54C) + rank) & 3) != 0)) {
+			if (((flags & 4) != 0) && (((*reinterpret_cast<int*>(mon + 0x54C) + rank) % 4) != 0)) {
 				continue;
 			}
 
@@ -2255,21 +2247,14 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 				cylTop.y = delta.y;
 				cylTop.z = delta.z;
 			}
-			CMapCylinder hitCylinder;
-			hitCylinder.m_axis.y = kMonObjMaxBound;
-			hitCylinder.m_axis.z = kMonObjMinBound;
-			hitCylinder.m_radius = kMonObjMinBound;
-			hitCylinder.m_bound.m_min.x = kMonObjMinBound;
-			hitCylinder.m_bound.m_min.y = kMonObjMaxBound;
-			hitCylinder.m_bound.m_min.z = kMonObjMaxBound;
-			hitCylinder.m_bound.m_max.x = kMonObjMaxBound;
-			hitCylinder.m_bound.m_max.y = kMonObjMaxBound;
-			hitCylinder.m_bound.m_max.z = kMonObjMinBound;
+			CMapCylinder hitCylinder(kMonObjMaxBound, kMonObjMinBound);
 			hitCylinder.m_bottom.x = startPos.x;
 			hitCylinder.m_bottom.y = startPos.y;
 			hitCylinder.m_bottom.z = startPos.z;
-			hitCylinder.m_top = cylTop;
-			hitCylinder.m_axis.x = cylRadius;
+			hitCylinder.m_axis.x = cylTop.x;
+			hitCylinder.m_axis.y = cylTop.y;
+			hitCylinder.m_axis.z = cylTop.z;
+			hitCylinder.m_radius = cylRadius;
 
 			int mapHit = MapMng.CheckHitCylinderNear(&hitCylinder, &cylTop, hitMask);
 			Vec debugDelta;
@@ -2884,10 +2869,17 @@ void CGMonObj::setRepop(int mode)
 	enableDamageCol(1);
 	prgObj->changeStat(0, 0, 0);
 
-	unsigned char* monsterScript = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
-	unsigned short scriptFlags = *reinterpret_cast<unsigned short*>(monsterScript + 0xFE);
+	unsigned short scriptFlags = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFE);
 
-	if ((scriptFlags & 0x80) == 0 && (scriptFlags & 0x20) == 0) {
+	if ((scriptFlags & 0x80) != 0 || (scriptFlags & 0x20) != 0) {
+		if (mode == 0) {
+			object->m_bgColMask |= 0x10002;
+		}
+		m_chaseState = 4;
+		m_chaseTimer = 0;
+		m_chaseDirty = 1;
+		enableDamageCol(0);
+	} else {
 		if ((scriptFlags & 0x40) != 0 || classId == 0x39) {
 			m_chaseState = 4;
 			m_chaseTimer = 0;
@@ -2908,14 +2900,6 @@ void CGMonObj::setRepop(int mode)
 			object->m_bgColMask |= 0x90002;
 			*reinterpret_cast<float*>(mon + 0x694) = 0.0f;
 		}
-	} else {
-		if (mode == 0) {
-			object->m_bgColMask |= 0x10002;
-		}
-		m_chaseState = 4;
-		m_chaseTimer = 0;
-		m_chaseDirty = 1;
-		enableDamageCol(0);
 	}
 
 	if (classId == 0x55) {
@@ -2924,7 +2908,7 @@ void CGMonObj::setRepop(int mode)
 		m_chaseDirty = 1;
 	}
 
-	unsigned short countA = *reinterpret_cast<unsigned short*>(monsterScript + 0x1A8);
+	unsigned short countA = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A8);
 	for (int i = 0; i < static_cast<int>(countA); i++) {
 		int particleBase = 0;
 		if (classId < 0xA7) {
@@ -2937,19 +2921,19 @@ void CGMonObj::setRepop(int mode)
 			particleBase = 2;
 		}
 
-		int dataNo = object->m_charaModelHandle != nullptr ? object->m_charaModelHandle->GetPdtSlot() : -1;
+		int dataNo = object->m_charaModelHandle->GetPdtSlot();
 		prgObj->putParticleBindTrace((i + particleBase + 0x50) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x5A4), object, 0.0f, 0);
 	}
 
 	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x20000);
 
-	unsigned short countB = *reinterpret_cast<short*>(monsterScript + 0x1AA);
+	unsigned short countB = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AA);
 	for (int i = 0; i < static_cast<int>(countB); i++) {
-		int dataNo = object->m_charaModelHandle != nullptr ? object->m_charaModelHandle->GetPdtSlot() : -1;
+		int dataNo = object->m_charaModelHandle->GetPdtSlot();
 		prgObj->putParticleBindTrace((i + 0x5A) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x5A8), object, 0.0f, 0);
 	}
 
-	if ((scriptFlags & 1) == 0) {
+	if ((*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFE) & 1) == 0) {
 		return;
 	}
 
@@ -2964,16 +2948,16 @@ void CGMonObj::setRepop(int mode)
 	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x1000);
 
 	short countC = (weaponMode == 0) ?
-		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle[9]) + 0x1AE) :
-		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle[9]) + 0x1AC);
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AE) :
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AC);
 	int particleBase = (weaponMode == 0) ? 0x3C : 0x46;
 
 	for (int i = 0; i < static_cast<int>(countC); i++) {
-		int dataNo = object->m_charaModelHandle != nullptr ? object->m_charaModelHandle->GetPdtSlot() : -1;
+		int dataNo = object->m_charaModelHandle->GetPdtSlot();
 		prgObj->putParticleBindTrace((particleBase + i) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x594), object, 0.0f, 0);
 	}
 
-	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(scriptHandle[9]) + 0xFC) == 0xB) {
+	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC) == 0xB) {
 		object->SetTexAnim(const_cast<char*>(s_monObjTexAnimU1));
 	}
 

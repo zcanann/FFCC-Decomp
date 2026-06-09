@@ -803,16 +803,9 @@ loop_body:
 
             m_ctrlModeArr[threadParam->m_portIndex] = 0;
 
-            if (Game.m_scriptFoodBase[statusIndex] != 0)
+            if (Game.m_scriptFoodBase[statusIndex] != 0 && threadParam->m_state == 2)
             {
-                if (threadParam->m_state == 2)
-                {
-                    threadParam->m_state = 1;
-                }
-                else
-                {
-                    threadParam->m_state = 0;
-                }
+                threadParam->m_state = 1;
             }
             else
             {

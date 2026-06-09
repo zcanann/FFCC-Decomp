@@ -758,9 +758,10 @@ void CGCharaObj::onFramePreCalc()
 		m_pushScale *= (static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x40)) * 0.01f) + 1.0e-07f;
 	}
 #undef CHARA_SCRIPT
-	float pushScale = 1.5f;
-	if (m_pushScale < 1.5f) {
-		pushScale = m_pushScale;
+	float pushScale = m_pushScale;
+	if (pushScale < 1.5f) {
+	} else {
+		pushScale = 1.5f;
 	}
 	m_pushScale = pushScale;
 
@@ -2753,6 +2754,8 @@ int CGCharaObj::getItemPdt(int itemId, int level, int& outEffect, int& outArg0, 
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma optimization_level 3
 void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg1, Vec* pos)
 {
 	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + effectId * 0x48;
@@ -2996,6 +2999,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 		}
 	}
 }
+#pragma pop
 
 /*
  * --INFO--

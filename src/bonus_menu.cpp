@@ -2529,12 +2529,12 @@ void CMenuPcs::DrawResultCountAnim()
  */
 void CMenuPcs::CalcResultCountAnim()
 {
-	const int activePartyCount = s_Rinfo->m_partyCount;
+	const int activePartyCount =  (int)(unsigned int)(s_Rinfo->m_partyCount);
 
 	if (*(signed char*)(this->m_bonusStatePtr + 0xb) == 0) {
 		int countTop = ((BonusAnimHeader*)this->m_bonusAnimPtr)->count;
-		short y = 0x28;
 		int partyByteOff = 0;
+		short y = 0x28;
 		for (int i = 0; i < activePartyCount; i++, partyByteOff += sizeof(BonusPartySummary)) {
 			int rank = *(int*)((int)s_Rinfo + partyByteOff + 0x34);
 			BonusAnimSprite* sprite = &((BonusAnimList*)this->m_bonusAnimPtr)->sprites[countTop + i];
@@ -2574,7 +2574,8 @@ void CMenuPcs::CalcResultCountAnim()
 	}
 
 	int countTop = (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count - activePartyCount;
-	int frame = (int)*(short*)(this->m_bonusStatePtr + 0x22) - 8;
+	int frame;
+	frame = (int)*(short*)(this->m_bonusStatePtr + 0x22) - 8;
 
 	for (int i = 0; i < activePartyCount; i++) {
 		BonusAnimSprite* sprite = &((BonusAnimList*)this->m_bonusAnimPtr)->sprites[countTop + i];
@@ -2584,7 +2585,8 @@ void CMenuPcs::CalcResultCountAnim()
 			sprite->alpha = 1.0f;
 		} else {
 			int value = s_Rinfo->m_party[i].m_totalValue;
-			if (frame == value) {
+			int __p27 = value;
+			if (frame == __p27) {
 				Sound.PlaySe(0x4b, 0x40, 0x7f, 0);
 				sprite->startFrame = frame;
 			}
@@ -2611,7 +2613,7 @@ void CMenuPcs::CalcResultCountAnim()
 	Mtx scaleMtx;
 	Mtx rotXMtx;
 	Mtx rotYMtx;
-	for (int i = 0; i < activePartyCount * 2; i++) {
+	for (int i = 0; activePartyCount > i * 2; i++) {
 		CCharaPcs::CHandle* handle;
 		int tribeId;
 		if (i < activePartyCount) {
@@ -2672,7 +2674,8 @@ void CMenuPcs::CalcResultCountAnim()
 				unsigned int resolvedIndex = (padRemap == (int)padIndex) ? 0 : padIndex;
 				down = Pad.m_padInputs[resolvedIndex].buttonDown[0];
 			}
-			buttons = (unsigned short)(buttons | down);
+			int __p28 = buttons;
+			buttons = (unsigned short)(__p28 | down);
 		}
 		if ((buttons & 0x300) != 0) {
 			Sound.PlaySe(2, 0x40, 0x7f, 0);
@@ -3407,7 +3410,8 @@ void CMenuPcs::createBonus()
 	const float depth1000 = FLOAT_80331F6C;
 	const float scale1 = FLOAT_80331EB0;
 	const float zero = kBonusZClearOrigin;
-	int off = 0;
+	int off;
+	off = 0;
 	for (int i = 0; i < 0x18; i++) {
 		float* pos = (float*)(this->m_bonus.m_bonusBoardPtr + off + 0x1c);
 		pos[2] = zero;
@@ -3454,7 +3458,7 @@ void CMenuPcs::createBonus()
 			    *reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(Game.m_partyObjArr[i]) + 0xF8);
 			s_Rinfo->m_party[activeCount].m_partyHandle->m_model->m_lightAlpha = kBonusZClearOrigin;
 			s_Rinfo->m_party[activeCount].m_bonusCondition = (int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_bonusCondition;
-			int foodValue = (int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_artifactRelated[3] + (int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_artifactRelated[4];
+			int foodValue =  (int)(unsigned int)((int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_artifactRelated[3] + (int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_artifactRelated[4]);
 			int foodClamped;
 			if (foodValue < 0) {
 				foodClamped = 0;
@@ -3567,7 +3571,7 @@ void CMenuPcs::createBonus()
 				    (aTotal == bTotal && aArtifact < bArtifact) ||
 				    (aTotal == bTotal && aArtifact == bArtifact && aFood < bFood) ||
 				    (aTotal == bTotal && aArtifact == bArtifact && aFood == bFood && (coin & 1) != 0)) {
-					int temp = leftIndex;
+					int temp =  (leftIndex - 0);
 					order[i] = order[j];
 					order[j] = temp;
 					leftIndex = order[i];
@@ -3588,7 +3592,7 @@ void CMenuPcs::createBonus()
 		}
 
 		CCharaPcs::CHandle** slot = this->m_wm.m_handles;
-		for (int i = 0; i < s_Rinfo->m_partyCount * 2; i++) {
+		for (int i = 0; s_Rinfo->m_partyCount > i * 2; i++) {
 			CCharaPcs::CHandle* handle =
 			    new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0x183) CCharaPcs::CHandle;
 			slot[0] = handle;

@@ -2075,6 +2075,7 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
  */
 #pragma push
 #pragma optimization_level 3
+#pragma opt_lifetimes off
 void _pppDeadPart(_pppMngSt* pppMngSt)
 {
 	struct pppMngStDeadRaw

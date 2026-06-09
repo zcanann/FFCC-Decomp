@@ -2346,7 +2346,7 @@ int CCaravanWork::DelCmdListAndItem(int cmdListIdx)
 		} else if (m_commandListExtra[cmdListIdx] == 0) {
 			numGrouped = 1;
 		} else {
-			int topIdx = cmdListIdx;
+			unsigned int topIdx = cmdListIdx;
 			for (int n = cmdListIdx; n >= 0; n--) {
 				if (m_commandListExtra[topIdx] != -1) {
 					break;

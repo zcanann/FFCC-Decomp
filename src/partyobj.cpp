@@ -4971,7 +4971,7 @@ void CGPartyObj::ghostPartyMog()
 	}
 
 messageMenu:
-	if (static_cast<signed char>(leader->m_weaponNodeFlags >> 8) < 0 &&
+	if ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(reinterpret_cast<unsigned char*>(&leader->m_weaponNodeFlags)[1]) << 24) & 0xC0000000) >> 31) != 0) &&
 	    bossState != 0 &&
 	    bossState != *reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x20)) {
 #define mesMenu (*reinterpret_cast<CMesMenu**>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0x120))

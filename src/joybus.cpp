@@ -7988,39 +7988,40 @@ void JoyBus::RestartThread()
             Joybus.m_gbaBootImage[0xAE] = Joybus.m_diskId[2];
             Joybus.m_gbaBootImage[0xAF] = Joybus.m_diskId[3];
 
-            char* p = Joybus.m_gbaBootImage + 0xBC;
+            unsigned char* img = (unsigned char*)Joybus.m_gbaBootImage;
+            unsigned char* p = img + 0xBC;
 
-            unsigned char sum =
-                (signed char)(
+            int sum =
+                (
                     ((((((((((((((((((((((((((((-0x19
-                    - Joybus.m_gbaBootImage[0xA0])
-                    - Joybus.m_gbaBootImage[0xA1])
-                    - Joybus.m_gbaBootImage[0xA2])
-                    - Joybus.m_gbaBootImage[0xA3])
-                    - Joybus.m_gbaBootImage[0xA4])
-                    - Joybus.m_gbaBootImage[0xA5])
-                    - Joybus.m_gbaBootImage[0xA6])
-                    - Joybus.m_gbaBootImage[0xA7])
-                    - Joybus.m_gbaBootImage[0xA8])
-                    - Joybus.m_gbaBootImage[0xA9])
-                    - Joybus.m_gbaBootImage[0xAA])
-                    - Joybus.m_gbaBootImage[0xAB])
-                    - Joybus.m_gbaBootImage[0xAC])
-                    - Joybus.m_gbaBootImage[0xAD])
-                    - Joybus.m_gbaBootImage[0xAE])
-                    - Joybus.m_gbaBootImage[0xAF])
-                    - Joybus.m_gbaBootImage[0xB0])
-                    - Joybus.m_gbaBootImage[0xB1])
-                    - Joybus.m_gbaBootImage[0xB2])
-                    - Joybus.m_gbaBootImage[0xB3])
-                    - Joybus.m_gbaBootImage[0xB4])
-                    - Joybus.m_gbaBootImage[0xB5])
-                    - Joybus.m_gbaBootImage[0xB6])
-                    - Joybus.m_gbaBootImage[0xB7])
-                    - Joybus.m_gbaBootImage[0xB8])
-                    - Joybus.m_gbaBootImage[0xB9])
-                    - Joybus.m_gbaBootImage[0xBA])
-                    - Joybus.m_gbaBootImage[0xBB])
+                    - img[0xA0])
+                    - img[0xA1])
+                    - img[0xA2])
+                    - img[0xA3])
+                    - img[0xA4])
+                    - img[0xA5])
+                    - img[0xA6])
+                    - img[0xA7])
+                    - img[0xA8])
+                    - img[0xA9])
+                    - img[0xAA])
+                    - img[0xAB])
+                    - img[0xAC])
+                    - img[0xAD])
+                    - img[0xAE])
+                    - img[0xAF])
+                    - img[0xB0])
+                    - img[0xB1])
+                    - img[0xB2])
+                    - img[0xB3])
+                    - img[0xB4])
+                    - img[0xB5])
+                    - img[0xB6])
+                    - img[0xB7])
+                    - img[0xB8])
+                    - img[0xB9])
+                    - img[0xBA])
+                    - img[0xBB])
                 );
 
             for (; idx < 0xBD; idx++)
@@ -8028,7 +8029,7 @@ void JoyBus::RestartThread()
                 sum -= *p++;
             }
 
-            Joybus.m_gbaBootImage[idx] = sum;
+            img[idx] = (unsigned char)sum;
 
             *(unsigned int*)(Joybus.m_gbaBootImage + 200) = OSGetTick();
 

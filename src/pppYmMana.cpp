@@ -794,16 +794,21 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
     }
     dstTexObj = mana->m_baseParaboloidTexObjs;
     for (i = 0; i < 6; i++) {
-        mana->m_sourceTextures[i]->m_format = 0;
-        mana->m_sourceTextures[i]->InitTexObj();
-        memcpy(dstTexObj, &mana->m_sourceTextures[i]->m_texObj, sizeof(GXTexObj));
+        CTexture* srcTex = mana->m_sourceTextures[i];
+        *reinterpret_cast<u32*>(reinterpret_cast<u8*>(srcTex) + 0x6c) = 0;
+        srcTex->InitTexObj();
+        memcpy(dstTexObj, &srcTex->m_texObj, sizeof(GXTexObj));
         dstTexObj++;
     }
 
-    mana->m_envTexture0->m_format = 0;
-    mana->m_envTexture0->InitTexObj();
-    mana->m_envTexture1->m_format = 0;
-    mana->m_envTexture1->InitTexObj();
+    {
+        CTexture* envTex0b = mana->m_envTexture0;
+        CTexture* envTex1b = mana->m_envTexture1;
+        *reinterpret_cast<u32*>(reinterpret_cast<u8*>(envTex0b) + 0x6c) = 0;
+        envTex0b->InitTexObj();
+        *reinterpret_cast<u32*>(reinterpret_cast<u8*>(envTex1b) + 0x6c) = 0;
+        envTex1b->InitTexObj();
+    }
 
     if (mana->m_paraboloidMap == 0) {
         mana->m_paraboloidMap = pppMemAlloc(0xA5E8, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x3CB);

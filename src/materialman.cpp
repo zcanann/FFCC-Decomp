@@ -1056,9 +1056,9 @@ void CMaterialMan::SetUnderWaterTex()
 void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int setVtxDesc, _GXTevScale tevScale)
 {
     static int bTest;
-    static unsigned char init;
+    static char init;
     static int bTest2;
-    static unsigned char init2;
+    static char init2;
 
     int isStd1000 = 0;
     SetStdEnv();

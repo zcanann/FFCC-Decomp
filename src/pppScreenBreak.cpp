@@ -462,7 +462,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         PSVECScale(&piece->m_translation, &piece->m_translation, kScreenBreakMeshCenterScale);
 
         dVar17 = piece->m_translation.x;
-        if (dVar17 > dVar19) {
+        if (piece->m_translation.x > dVar19) {
             dVar17 = Math.RandF(dVar19);
         }
         if (piece->m_translation.x < dVar18) {

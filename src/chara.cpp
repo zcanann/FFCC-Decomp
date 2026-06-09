@@ -2039,7 +2039,11 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 		dynOffset.x = tmp.x;
 		dynOffset.y = tmp.y;
 		dynOffset.z = tmp.z;
-		PSVECAdd(&origin, &dynOffset, &NodeDynPosition(node));
+		CVector tmp2;
+		PSVECAdd(&origin, &dynOffset, reinterpret_cast<Vec*>(&tmp2));
+		NodeDynPosition(node).x = tmp2.x;
+		NodeDynPosition(node).y = tmp2.y;
+		NodeDynPosition(node).z = tmp2.z;
 	}
 }
 #pragma pop

@@ -4060,6 +4060,10 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
 
         ResetQueue(threadParam);
 
+        localWord = 0;
+        localBytes[0] = 0x10;
+        unsigned int restartCmd = localWord;
+
         if (static_cast<signed char>(m_threadRunningMask) == 0)
         {
             result = 0;
@@ -4076,7 +4080,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
             }
             else
             {
-                m_cmdQueueData[qPort][m_cmdCount[qPort]] = 0x10000000;
+                m_cmdQueueData[qPort][m_cmdCount[qPort]] = restartCmd;
                 m_cmdCount[threadParam->m_portIndex]++;
 
                 OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);

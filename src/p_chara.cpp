@@ -34,6 +34,7 @@ extern const float FLOAT_803302A8;
 extern const float FLOAT_803302C8;
 extern const float FLOAT_803302CC;
 extern const float FLOAT_803302D0;
+extern const float FLOAT_803302D4;
 extern const float FLOAT_803302D8;
 extern const float FLOAT_803302DC;
 extern const float FLOAT_803302E0;
@@ -2014,11 +2015,11 @@ void CCharaPcs::drawOverlap()
     GXLoadPosMtxImm(identityMtx, GX_PNMTX0);
     GXSetCullMode(GX_CULL_NONE);
 
-    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-    GXPosition3f32(kCharaZero, kCharaZero, kCharaOne);
-    GXPosition3f32(FLOAT_803302CC, kCharaZero, kCharaOne);
-    GXPosition3f32(kCharaZero, FLOAT_803302C8, kCharaOne);
-    GXPosition3f32(FLOAT_803302CC, FLOAT_803302C8, kCharaOne);
+    GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT0, 4);
+    GXPosition3f32(kCharaZero, kCharaZero, FLOAT_803302D4);
+    GXPosition3f32(FLOAT_803302CC, kCharaZero, FLOAT_803302D4);
+    GXPosition3f32(kCharaZero, FLOAT_803302C8, FLOAT_803302D4);
+    GXPosition3f32(FLOAT_803302CC, FLOAT_803302C8, FLOAT_803302D4);
 
     PSMTX44Copy(CameraPcs.m_screenMatrix, projectionMtx);
     GXSetProjection(projectionMtx, GX_PERSPECTIVE);
@@ -2067,7 +2068,7 @@ void CCharaPcs::drawOverlap()
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
-    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+    GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT0, 4);
     GXPosition3f32(kCharaZero, kCharaZero, kCharaZero);
     GXPosition3f32(FLOAT_803302CC, kCharaZero, kCharaZero);
     GXPosition3f32(kCharaZero, FLOAT_803302C8, kCharaZero);
@@ -2088,7 +2089,7 @@ void CCharaPcs::drawOverlap()
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_U16, 0);
     _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
 
-    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+    GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT0, 4);
     GXPosition3f32(kCharaZero, kCharaZero, kCharaZero);
     GXTexCoord2u16(0, 0);
     GXPosition3f32(FLOAT_803302CC, kCharaZero, kCharaZero);

@@ -150,22 +150,22 @@ static int CharaObjIsAttackAnimBoundary(CGCharaObj* charaObj)
 	}
 
 	CharaObjModelAnimState* model = reinterpret_cast<CharaObjModelAnimState*>(charaObj->m_charaModelHandle->m_model);
-	if (model->m_anim == 0) {
-		return 1;
+	if (model->m_anim != 0) {
+		int span = static_cast<int>(kOneF32 + (model->m_animEnd - model->m_animStart));
+		if (span == 1) {
+			return 1;
+		}
+
+		int frame = static_cast<int>(charaObj->m_turnSpeed);
+		int remainder = frame % span;
+		if (charaObj->m_lastBgAttr < kCharaObjZero) {
+			return __rlwnm(1, static_cast<unsigned int>(__cntlzw(remainder)), 31, 31) & 0xFF;
+		}
+
+		return (span <= frame) & 0xFF;
 	}
 
-	int span = static_cast<int>(kOneF32 + (model->m_animEnd - model->m_animStart));
-	if (span == 1) {
-		return 1;
-	}
-
-	int frame = static_cast<int>(charaObj->m_turnSpeed);
-	int remainder = frame % span;
-	if (charaObj->m_lastBgAttr < kCharaObjZero) {
-		return __rlwnm(1, static_cast<unsigned int>(__cntlzw(remainder)), 31, 31) & 0xFF;
-	}
-
-	return (span <= frame) & 0xFF;
+	return 1;
 }
 
 static float CharaObjGetMonsterScale(unsigned char* script9, bool isMon)
@@ -1828,14 +1828,14 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				int counterType;
 				int counterItem;
 				int counterSe;
-				if (counterState == 1) {
-					counterType = 0;
-					counterItem = 0x20B;
-					counterSe = 0x7E2;
-				} else if (counterState < 1) {
+				if (counterState < 1) {
 					counterType = 1;
 					counterItem = 0x207;
 					counterSe = 0x7E1;
+				} else if (counterState == 1) {
+					counterType = 0;
+					counterItem = 0x20B;
+					counterSe = 0x7E2;
 				} else if (counterState < 3) {
 					counterType = 4;
 					counterItem = 0x20F;
@@ -2454,9 +2454,7 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 
 	CGPrgObj* sourceObj = reinterpret_cast<CGPrgObj*>(source);
 	unsigned short powerValue;
-	if ((((static_cast<unsigned int>(__cntlzw(0x2D - (static_cast<unsigned short>(source->GetCID()) & 0x2D)))) >> 5) & 0xFFU) == 0) {
-		powerValue = *reinterpret_cast<unsigned short*>(itemData + 0x2E);
-	} else {
+	if ((((static_cast<unsigned int>(__cntlzw(0x2D - (static_cast<unsigned short>(source->GetCID()) & 0x2D)))) >> 5) & 0xFFU) != 0) {
 		bool stageModeActive = false;
 		bool usePartySource = false;
 		bool usePartyLeader = false;
@@ -2478,6 +2476,8 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 			powerSource = Game.m_partyObjArr[0];
 		}
 		powerValue = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(powerSource->m_scriptHandle[9]) + 0x198);
+	} else {
+		powerValue = *reinterpret_cast<unsigned short*>(itemData + 0x2E);
 	}
 
 	unsigned int power = powerValue;
@@ -3500,7 +3500,7 @@ void CGCharaObj::combi2()
 		return;
 	}
 
-	if (fallback != 0 && candidates[0]->m_comboFrame <= 0x41) {
+	if (fallback != 0 && candidates[0]->m_comboFrame < 0x42) {
 		return;
 	}
 
@@ -3556,15 +3556,15 @@ void CGCharaObj::combi2()
 			}
 		} else {
 			CharaObjComboCenter(party) = comboCenter;
-			if (playedComboSe || party == 0 ||
-			    (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
-			     (static_cast<unsigned short>(party->GetCID()) & 0x6D) == 0x6D &&
-			     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party->m_scriptHandle) + 0x3B4) != 0)) {
-				CharaObjComboItemId(party) = 0;
-			} else {
+			if (!playedComboSe && party != 0 &&
+			    (Game.m_gameWork.m_menuStageMode == 0 || Game.m_gameWork.m_bossArtifactStageIndex >= 0xF ||
+			     (static_cast<unsigned short>(party->GetCID()) & 0x6D) != 0x6D ||
+			     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party->m_scriptHandle) + 0x3B4) == 0)) {
 				CharaObjComboItemId(party) = comboCmd;
 				party->playSe3D(0x3F, 0x32, 0x96, 0, 0);
 				playedComboSe = true;
+			} else {
+				CharaObjComboItemId(party) = 0;
 			}
 		}
 

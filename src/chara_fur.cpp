@@ -1256,7 +1256,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 int CChara::CModel::PickFur(
     Mtx param_2, _GXColor brushColor, int doPaint, int mode, _GXColor* centerBefore, _GXColor* centerAfter, Vec* worldPos)
 {
-	if (static_cast<signed char>(m_flags10C << 1) >= 0) {
+	if ((m_flags10C & 0x40) == 0) {
 		return -1;
 	}
 	register Vec* outWorldPos = worldPos;

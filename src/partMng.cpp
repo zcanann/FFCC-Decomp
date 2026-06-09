@@ -882,7 +882,7 @@ void CPartMng::render3Dcursor()
     GXLoadPosMtxImm(ppvCameraMatrix, 0);
     pppSetBlendMode(3);
 
-    float* cursorPos = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x23780);
+    float* cursorPos = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x18);
     float x = cursorPos[0];
     float y = cursorPos[1];
     float z = cursorPos[2];

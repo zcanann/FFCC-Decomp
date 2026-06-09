@@ -2147,13 +2147,13 @@ void CPartMng::pppEditBeforeCalc()
         clearColor.a = 0xFF;
         GXSetCopyClear(clearColor, 0x00FFFFFF);
 
-        float fogFar = *reinterpret_cast<float*>(self + 0x164);
         float fogNear = *reinterpret_cast<float*>(self + 0x160);
+        float fogFar = *reinterpret_cast<float*>(self + 0x164);
         _GXColor fogColor;
         if (*reinterpret_cast<unsigned char*>(self + 0x15c) != 0) {
-            fogColor.r = *reinterpret_cast<unsigned char*>(self + 0x15d);
-            fogColor.g = *reinterpret_cast<unsigned char*>(self + 0x15e);
             fogColor.b = *reinterpret_cast<unsigned char*>(self + 0x15f);
+            fogColor.g = *reinterpret_cast<unsigned char*>(self + 0x15e);
+            fogColor.r = *reinterpret_cast<unsigned char*>(self + 0x15d);
             fogColor.a = 0;
             Graphic.SetFogColor(fogColor);
             Graphic.SetFogParam(fogNear, fogFar);
@@ -2192,13 +2192,13 @@ void CPartMng::pppEditBeforeCalc()
         clearColor.a = 0xFF;
         GXSetCopyClear(clearColor, 0x00FFFFFF);
 
-        float fogFar = *reinterpret_cast<float*>(self + 0x164);
         float fogNear = *reinterpret_cast<float*>(self + 0x160);
+        float fogFar = *reinterpret_cast<float*>(self + 0x164);
         _GXColor fogColor;
         if (*reinterpret_cast<unsigned char*>(self + 0x15c) != 0) {
-            fogColor.r = *reinterpret_cast<unsigned char*>(self + 0x15d);
-            fogColor.g = *reinterpret_cast<unsigned char*>(self + 0x15e);
             fogColor.b = *reinterpret_cast<unsigned char*>(self + 0x15f);
+            fogColor.g = *reinterpret_cast<unsigned char*>(self + 0x15e);
+            fogColor.r = *reinterpret_cast<unsigned char*>(self + 0x15d);
             fogColor.a = 0;
             Graphic.SetFogColor(fogColor);
             Graphic.SetFogParam(fogNear, fogFar);

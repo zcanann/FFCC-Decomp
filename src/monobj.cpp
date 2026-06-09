@@ -3218,14 +3218,15 @@ void CGMonObj::moveFrame()
 		object->m_groundHitOffset.z += moveDelta.z;
 	}
 
+	float stepRemaining = in_f29 - stepDist;
 	if ((moveFlags & 0x8000) != 0) {
 		object->m_rotTargetY = 3.1415927f + rotY;
 	} else {
 		object->m_rotTargetY = rotY;
 	}
 
-	if (((moveFlags & 0x20) == 0 || moveRange <= (in_f29 - stepDist)) &&
-		((moveFlags & 0x40) == 0 || (in_f29 - stepDist) < moveRange)) {
+	if (((moveFlags & 0x20) == 0 || !(stepRemaining < moveRange)) &&
+		((moveFlags & 0x40) == 0 || stepRemaining < moveRange)) {
 		if ((moveFrame == 0) && ((moveFlags & 0x400) == 0)) {
 			reinterpret_cast<CGPrgObj*>(this)->reqAnim(1, 1, 0);
 		}

@@ -1587,10 +1587,10 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
             GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, 0, GX_DF_NONE, GX_AF_SPEC);
             GXSetTevDirect(static_cast<GXTevStageID>(m_numTevStage));
             _GXSetTevOrder(m_numTevStage, *reinterpret_cast<int*>(&m_pad0D4), *reinterpret_cast<int*>(&m_pad0CC), 4);
-            if (m_manaParaboloidTexObj0 == 0) {
-                _GXSetTevColorIn(m_numTevStage, 0xF, 0xF, 0xF, 0);
-            } else {
+            if (m_manaParaboloidTexObj0 != 0) {
                 _GXSetTevColorIn(m_numTevStage, 8, 8, 0, 0xF);
+            } else {
+                _GXSetTevColorIn(m_numTevStage, 0xF, 0xF, 0xF, 0);
             }
             _GXSetTevColorOp(m_numTevStage, 0, 0, 0, 1, 0);
             _GXSetTevAlphaIn(m_numTevStage, 7, 5, 0, 7);

@@ -1773,6 +1773,8 @@ DataValsAllocated:
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_loop_invariants off
 void pppInitPdt(long* progOffsetReconstructionTable, pppProg* pppProg)
 {
 	int* table = (int*)(progOffsetReconstructionTable + 6);
@@ -1811,6 +1813,7 @@ void pppInitPdt(long* progOffsetReconstructionTable, pppProg* pppProg)
 		pdtRelocs[i] += (int)progOffsetReconstructionTable;
 	}
 }
+#pragma pop
 
 /*
  * --INFO--

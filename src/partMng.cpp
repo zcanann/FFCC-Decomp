@@ -404,45 +404,49 @@ void CPartMng::Destroy()
 
     if (res->m_pppModelStArr != 0) {
         pppModelSt* modelArr = res->m_pppModelStArr;
-        for (unsigned int i = 0; i < 0x100; i++) {
-            pppModelSt* model = &modelArr[i];
-            if (model->m_isUsed != 0) {
-                if (--model->m_refCount <= 0) {
-                    if (model->m_cacheId != -1) {
-                        ppvAmemCacheSet.DestroyCache(model->m_cacheId);
-                        *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(model) + 0x24) = 0;
-                        *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(model) + 0x28) = 0;
+        if (modelArr != 0) {
+            for (unsigned int i = 0; i < 0x100; i++) {
+                pppModelSt* model = &modelArr[i];
+                if (model->m_isUsed != 0) {
+                    if (--model->m_refCount <= 0) {
+                        if (model->m_cacheId != -1) {
+                            ppvAmemCacheSet.DestroyCache(model->m_cacheId);
+                            *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(model) + 0x24) = 0;
+                            *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(model) + 0x28) = 0;
+                        }
+                        model->Destroy();
+                        model->m_refCount = 0;
+                        model->m_isUsed = 0;
                     }
-                    model->Destroy();
-                    model->m_refCount = 0;
-                    model->m_isUsed = 0;
                 }
             }
+            delete[] modelArr;
         }
-        delete[] modelArr;
         res->m_pppModelStArr = 0;
     }
 
     if (res->m_pppShapeStArr != 0) {
         pppShapeSt* shapeArr = res->m_pppShapeStArr;
-        for (unsigned int i = 0; i < 0x100; i++) {
-            pppShapeSt* shape = &shapeArr[i];
-            if (shape->m_inUse != 0) {
-                if (--shape->m_refCount <= 0) {
-                    if (shape->m_animData != 0) {
-                        delete[] reinterpret_cast<u8*>(shape->m_animData);
-                        shape->m_animData = 0;
+        if (shapeArr != 0) {
+            for (unsigned int i = 0; i < 0x100; i++) {
+                pppShapeSt* shape = &shapeArr[i];
+                if (shape->m_inUse != 0) {
+                    if (--shape->m_refCount <= 0) {
+                        if (shape->m_animData != 0) {
+                            delete[] reinterpret_cast<u8*>(shape->m_animData);
+                            shape->m_animData = 0;
+                        }
+                        if (shape->m_displayListData != 0) {
+                            delete[] reinterpret_cast<u8*>(shape->m_displayListData);
+                            shape->m_displayListData = 0;
+                        }
+                        shape->m_refCount = 0;
+                        shape->m_inUse = 0;
                     }
-                    if (shape->m_displayListData != 0) {
-                        delete[] reinterpret_cast<u8*>(shape->m_displayListData);
-                        shape->m_displayListData = 0;
-                    }
-                    shape->m_refCount = 0;
-                    shape->m_inUse = 0;
                 }
             }
+            delete[] shapeArr;
         }
-        delete[] shapeArr;
         res->m_pppShapeStArr = 0;
     }
 
@@ -469,8 +473,10 @@ void CPartMng::Destroy()
             delete handle;
             *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(res->m_editorObj) + 0xf8) = 0;
         }
-        operator delete(res->m_editorObj);
-        res->m_editorObj = 0;
+        if (res->m_editorObj != 0) {
+            operator delete(res->m_editorObj);
+            res->m_editorObj = 0;
+        }
     }
 
     pppDestroyHeap(&m_pppEnvSt);

@@ -453,16 +453,16 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
 {
     CMemory::CStage* stage = 0;
 
-    if (type != 1) {
-        if (type < 1) {
-            if (type >= 0) {
-                stage = m_menuStage;
-            }
-        } else if (type < 3) {
-            stage = PartMng.m_pppEnvSt.m_stagePtr;
-        }
-    } else {
+    switch (type) {
+    case 0:
+        stage = m_menuStage;
+        break;
+    case 2:
+        stage = PartMng.m_pppEnvSt.m_stagePtr;
+        break;
+    case 1:
         stage = m_stageF0;
+        break;
     }
 
     if ((slot == 0) && FontMan.m_font) {
@@ -907,7 +907,7 @@ void CMenuPcs::draw()
         TextureMan.SetTextureTev(texture);
 
         {
-            int alpha = static_cast<int>(LoadFloat(kMenuAlphaMax) * (LoadFloat(kMenuHalf) * (LoadFloat(kMenuOne) + sinf(System.m_frameCounter * LoadFloat(kMenuPulseStep)))));
+            int alpha = static_cast<int>(LoadFloat(kMenuAlphaMax) * (LoadFloat(kMenuHalf) * (LoadFloat(kMenuOne) + sinf(static_cast<int>(System.m_frameCounter) * LoadFloat(kMenuPulseStep)))));
             CColor color(0xFF, 0xFF, 0xFF, static_cast<u8>(alpha));
             GXSetChanMatColor(GX_COLOR0A0, color.color);
             DrawRect(3, LoadFloat(kMenuScreenCenterX), LoadFloat(kMenuScreenCenterY), LoadFloat(kMenuInitRectWidth),

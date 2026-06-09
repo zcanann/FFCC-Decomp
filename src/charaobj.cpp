@@ -2792,27 +2792,44 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 		CFlatRuntime2Storage().SetParticleWorkSpeed(*reinterpret_cast<short*>(itemData + 0x26) * 0.01f);
 
 		switch (effectArg0) {
-		case 0:
-			seNo = CharaObjDecodeSe(*reinterpret_cast<unsigned short*>(itemData + 0x38));
-			if (seNo != 0 && (*reinterpret_cast<unsigned short*>(itemData + 0x3A) & 0x8000) != 0) {
-				CFlatRuntime2Storage().SetParticleWorkSe(seNo, 2, *reinterpret_cast<unsigned short*>(itemData + 0x3A) & 0xFF);
-				seNo = 0;
+		case 0: {
+			unsigned char* seData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + effectId * 0x48;
+			int decoded = CharaObjDecodeSe(*reinterpret_cast<unsigned short*>(seData + 0x38));
+			if (decoded != 0) {
+				unsigned short seFlag = *reinterpret_cast<unsigned short*>(seData + 0x3A);
+				if ((seFlag & 0x8000) != 0) {
+					CFlatRuntime2Storage().SetParticleWorkSe(decoded, 2, seFlag & 0xFF);
+				} else {
+					seNo = decoded;
+				}
 			}
 			break;
-		case 1:
-			seNo = CharaObjDecodeSe(*reinterpret_cast<unsigned short*>(itemData + 0x3C));
-			if (seNo != 0 && (*reinterpret_cast<unsigned short*>(itemData + 0x3E) & 0x8000) != 0) {
-				CFlatRuntime2Storage().SetParticleWorkSe(seNo, 2, *reinterpret_cast<unsigned short*>(itemData + 0x3E) & 0xFF);
-				seNo = 0;
+		}
+		case 1: {
+			unsigned char* seData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + effectId * 0x48;
+			int decoded = CharaObjDecodeSe(*reinterpret_cast<unsigned short*>(seData + 0x3C));
+			if (decoded != 0) {
+				unsigned short seFlag = *reinterpret_cast<unsigned short*>(seData + 0x3E);
+				if ((seFlag & 0x8000) != 0) {
+					CFlatRuntime2Storage().SetParticleWorkSe(decoded, 2, seFlag & 0xFF);
+				} else {
+					seNo = decoded;
+				}
 			}
 			break;
-		case 2:
-			seNo = CharaObjDecodeSe(*reinterpret_cast<unsigned short*>(itemData + 0x40));
-			if (seNo != 0 && (*reinterpret_cast<unsigned short*>(itemData + 0x0C) & 0x400) != 0) {
-				CFlatRuntime2Storage().SetParticleWorkSe(seNo, 2, 0);
-				seNo = 0;
+		}
+		case 2: {
+			unsigned char* seData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + effectId * 0x48;
+			int decoded = CharaObjDecodeSe(*reinterpret_cast<unsigned short*>(seData + 0x40));
+			if (decoded != 0) {
+				if ((*reinterpret_cast<unsigned short*>(seData + 0x0C) & 0x400) != 0) {
+					CFlatRuntime2Storage().SetParticleWorkSe(decoded, 2, 0);
+				} else {
+					seNo = decoded;
+				}
 			}
 			break;
+		}
 		default:
 			break;
 		}

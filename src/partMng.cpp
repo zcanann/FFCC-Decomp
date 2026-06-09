@@ -1469,8 +1469,10 @@ void CPartMng::pppEditAllReleaseResource()
             }
         }
 
-        delete[] modelSlots;
-        modelSlots = 0;
+        if (modelSlots != 0) {
+            operator delete(modelSlots);
+            modelSlots = 0;
+        }
     }
 
     pppShapeSt**& shapeSlots = *reinterpret_cast<pppShapeSt***>(self + kUsbShapeSlotTableOffset);
@@ -1483,8 +1485,10 @@ void CPartMng::pppEditAllReleaseResource()
             }
         }
 
-        delete[] shapeSlots;
-        shapeSlots = 0;
+        if (shapeSlots != 0) {
+            operator delete(shapeSlots);
+            shapeSlots = 0;
+        }
     }
 
     iVar3 = 0;

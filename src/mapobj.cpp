@@ -471,7 +471,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 m_drawPriority = 0;
             } else if ((m_mapDataType == 2) || (m_mapDataType == 3)) {
                 if (meshOrHitIdx != -2) {
-                    m_mapData = MapMng.GetMapHitArray() + meshOrHitIdx;
+                    m_mapData = &MapMng.m_mapHitArray[meshOrHitIdx];
                 } else {
                     CMapObjAtrMeshName* meshName =
                         new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x84) CMapObjAtrMeshName();

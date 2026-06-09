@@ -370,7 +370,7 @@ void CMaterialEditorPcs::drawViewer()
                 GXSetArray(GX_VA_TEX0, polygon->texCoord, 8);
 
                 u32 vertexIndex[8];
-                unsigned int vertexCount = 3;
+                int vertexCount = 3;
                 vertexIndex[4] = polygon->index0;
                 vertexIndex[5] = polygon->index1;
                 vertexIndex[6] = polygon->index2;
@@ -390,13 +390,17 @@ void CMaterialEditorPcs::drawViewer()
                     vertexIndex[3] = 2;
                 }
 
+                u32* posIndex = &vertexIndex[4];
+                u32* clrIndex = &vertexIndex[0];
                 u8 i = 0;
                 while (i < vertexCount) {
-                    GXWGFifo.u16 = static_cast<u16>((&vertexIndex[4])[i]);
-                    GXWGFifo.u16 = static_cast<u16>((&vertexIndex[4])[i]);
-                    GXWGFifo.u8 = static_cast<u8>(vertexIndex[i]);
-                    GXWGFifo.u16 = static_cast<u16>(vertexIndex[i]);
+                    u32 pos = posIndex[i];
+                    u32 clr = clrIndex[i];
                     i++;
+                    GXWGFifo.u16 = static_cast<u16>(pos);
+                    GXWGFifo.u16 = static_cast<u16>(pos);
+                    GXWGFifo.u8 = static_cast<u8>(clr);
+                    GXWGFifo.u16 = static_cast<u16>(clr);
                 }
 #undef polygon
             }

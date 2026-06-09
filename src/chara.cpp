@@ -1994,7 +1994,7 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 
 	reinterpret_cast<CVector&>(direction).Normalize();
 	float align = PSVECDotProduct(&forward, &direction);
-	if (align <= FLOAT_803301D8) {
+	if (!(FLOAT_803301D8 < align)) {
 		float rotateAngle;
 		if (align < FLOAT_803301DC) {
 			rotateAngle = FLOAT_803301E0;

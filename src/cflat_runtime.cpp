@@ -1544,7 +1544,8 @@ frameLoop:
 				} else {
 					value = object->m_localBase + index;
 				}
-				*object->m_sp++ = *value;
+				*object->m_sp = *value;
+				object->m_sp++;
 			} else if ((arg & 2) != 0) {
 				if (index < 0) {
 					--object->m_sp;
@@ -1563,7 +1564,8 @@ frameLoop:
 					--object->m_sp;
 					value = object->m_localBase + index + static_cast<int>(*object->m_sp);
 				}
-				*object->m_sp++ = *value;
+				*object->m_sp = *value;
+				object->m_sp++;
 			} else if ((arg & 4) != 0) {
 				if (index < 0) {
 					value = reinterpret_cast<unsigned int*>(
@@ -1600,7 +1602,8 @@ frameLoop:
 				} else {
 					value = object->m_localBase + index;
 				}
-				*object->m_sp++ = reinterpret_cast<u32>(value);
+				*object->m_sp = reinterpret_cast<u32>(value);
+				object->m_sp++;
 			} else if ((arg & 2) != 0) {
 				if (index < 0) {
 					--object->m_sp;
@@ -1619,7 +1622,8 @@ frameLoop:
 					--object->m_sp;
 					value = object->m_localBase + index + static_cast<int>(*object->m_sp);
 				}
-				*object->m_sp++ = reinterpret_cast<u32>(value);
+				*object->m_sp = reinterpret_cast<u32>(value);
+				object->m_sp++;
 			} else if ((arg & 4) != 0) {
 				if (index < 0) {
 					value = reinterpret_cast<unsigned int*>(

@@ -237,6 +237,7 @@ void CMaterialEditorPcs::drawViewer()
                 }
 
                 int flags = polygon->flags & 0xf;
+                int vertexCount = 3;
                 switch (polygon->textureMarker) {
                 case 'H':
                 if (static_cast<s16>(m_loadedTextureCount) > polygon->textureIndex) {
@@ -370,7 +371,6 @@ void CMaterialEditorPcs::drawViewer()
                 GXSetArray(GX_VA_TEX0, polygon->texCoord, 8);
 
                 u32 vertexIndex[8];
-                int vertexCount = 3;
                 vertexIndex[4] = polygon->index0;
                 vertexIndex[5] = polygon->index1;
                 vertexIndex[6] = polygon->index2;

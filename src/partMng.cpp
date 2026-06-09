@@ -882,7 +882,7 @@ void CPartMng::render3Dcursor()
     GXLoadPosMtxImm(ppvCameraMatrix, 0);
     pppSetBlendMode(3);
 
-    float* cursorPos = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x23780);
+    float* cursorPos = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x18);
     float x = cursorPos[0];
     float y = cursorPos[1];
     float z = cursorPos[2];
@@ -1046,7 +1046,8 @@ void CPartMng::SetFp()
 {
     struct PppMngSetFpRaw {
         void* m_pppResSet;                   // 0x00
-        unsigned char m_pad04[0x14 - 0x04];
+        unsigned char m_pad04[0x08 - 0x04];
+        Vec m_position;                      // 0x08
         int m_baseTime;                      // 0x14
         float m_rotationX;                   // 0x18
         float m_rotationZ;                   // 0x1C
@@ -1118,6 +1119,9 @@ void CPartMng::SetFp()
         mng->m_nodeIndex = static_cast<short>(i);
         mng->m_cullRadius = recvBuff[0x0E];
         mng->m_cullYOffset = recvBuff[0x0F];
+        mng->m_position.x = recvBuff[0];
+        mng->m_position.y = recvBuff[1];
+        mng->m_position.z = recvBuff[2];
         *reinterpret_cast<int*>(&mng->m_rotationX) = reinterpret_cast<int*>(recvBuff)[4];
         *reinterpret_cast<int*>(&mng->m_rotationZ) = reinterpret_cast<int*>(recvBuff)[5];
         mng->m_rotationSpeed = reinterpret_cast<int*>(recvBuff)[6];
@@ -1627,17 +1631,20 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         m_pppMng[0].m_scale.x = payloadFloats[8];
         m_pppMng[0].m_scale.y = payloadFloats[9];
         m_pppMng[0].m_scale.z = payloadFloats[0xA];
-        m_pppMng[0].m_savedPosition.x = payloadFloats[0x10];
-        m_pppMng[0].m_savedPosition.y = payloadFloats[0x11];
-        m_pppMng[0].m_savedPosition.z = payloadFloats[0x12];
-        m_pppMng[0].m_paramVec0.x = payloadFloats[0x14];
-        m_pppMng[0].m_paramVec0.y = payloadFloats[0x15];
-        m_pppMng[0].m_paramVec0.z = payloadFloats[0x16];
-        ppvChrScl[0] = payloadFloats[0xC];
-        ppvChrScl[1] = payloadFloats[0xD];
-        ppvChrScl[2] = payloadFloats[0xE];
-        m_pppMng[0].m_previousPosition.x = payloadFloats[0x17];
-        m_pppMng[0].m_previousPosition.y = payloadFloats[0x18];
+        {
+            float* mngF = reinterpret_cast<float*>(m_pppMng);
+            mngF[0x58 / 4] = payloadFloats[0x10];
+            mngF[0x5C / 4] = payloadFloats[0x11];
+            mngF[0x60 / 4] = payloadFloats[0x12];
+            mngF[0x68 / 4] = payloadFloats[0x14];
+            mngF[0x6C / 4] = payloadFloats[0x15];
+            mngF[0x70 / 4] = payloadFloats[0x16];
+            ppvChrScl[0] = payloadFloats[0xC];
+            ppvChrScl[1] = payloadFloats[0xD];
+            ppvChrScl[2] = payloadFloats[0xE];
+            mngF[0x54 / 4] = payloadFloats[0x17];
+            mngF[0x64 / 4] = payloadFloats[0x18];
+        }
         m_pppMng[0].m_mode = 0;
         return;
     case 0x1B:
@@ -2399,8 +2406,8 @@ void CPartMng::pppEditPartCalc()
             }
             mng->m_particleEnded = 0;
             *reinterpret_cast<int*>(&mng->m_envColorR) = *reinterpret_cast<int*>(self + 0x168);
-            _pppStartPart(mng, reinterpret_cast<long*>(reinterpret_cast<long*>(self + 0x5dc)[
-                                   (*reinterpret_cast<int**>(self + 0x1C8))[i * 0x18 + 0xC]]), 1);
+            _pppStartPart(mng, reinterpret_cast<long*>(*reinterpret_cast<long*>(self + 0x5dc +
+                                   (*reinterpret_cast<int**>(self + 0x1C8))[i * 0x18 + 0xC] * 4)), 1);
             goto runFrameA;
         }
     } else {

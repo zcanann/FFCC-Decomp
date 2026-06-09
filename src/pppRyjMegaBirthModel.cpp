@@ -1010,21 +1010,12 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* stepData, _p
     int baseBlue = baseColor->m_blue;
     int baseAlpha = baseColor->m_alpha;
 
+    _PARTICLE_DATA* particle = particleBlock;
+    _PARTICLE_WMAT* particleWorldMatrix = particleWorldMatrixBlock;
+    _PARTICLE_COLOR* particleColor = colorBlock;
+
     for (int i = 0; i < numParticles; i++) {
-        _PARTICLE_DATA* particle = (_PARTICLE_DATA*)((u8*)particleBlock + i * 0xA0);
-        _PARTICLE_WMAT* particleWorldMatrix = 0;
-        _PARTICLE_COLOR* particleColor = 0;
-
-        if (*u16_at(particle, 0x30) == 0) {
-            continue;
-        }
-
-        if (particleWorldMatrixBlock != NULL) {
-            particleWorldMatrix = particleWorldMatrixBlock + i;
-        }
-        if (colorBlock != NULL) {
-            particleColor = colorBlock + i;
-        }
+        if (*u16_at(particle, 0x30) != 0) {
 
         pppFMATRIX drawMatrix;
 
@@ -1083,6 +1074,16 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* stepData, _p
         pppSetBlendMode(params->m_blendMode);
         pppDrawMesh((pppModelSt*)ppvEnv->m_mapMeshPtr[modelIndex], obj->m_drawMatrixPtr, 1);
         pppCopyMatrix(obj->m_localMatrix, *(pppFMATRIX*)&g_matTmp);
+
+        }
+
+        if (particleWorldMatrix != NULL) {
+            particleWorldMatrix++;
+        }
+        if (particleColor != NULL) {
+            particleColor++;
+        }
+        particle = (_PARTICLE_DATA*)((u8*)particle + 0xA0);
     }
 }
 

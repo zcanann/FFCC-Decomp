@@ -429,8 +429,9 @@ static CCharaPcs::CLoadAnim* LoadAnimFromDisk(
         File.Read(fileHandle);
         File.SyncCompleted(fileHandle);
 
+        void* animBuffer = File.m_readBuffer;
         CChara::CAnim* anim = new (self->m_stage, const_cast<char*>(s_p_chara_cpp), 0x62A) CChara::CAnim;
-        anim->Create(File.m_readBuffer, self->m_viewerAnimStage);
+        anim->Create(animBuffer, self->m_viewerAnimStage);
 
         CCharaPcs::CLoadAnim* loadAnim = new (self->m_stage, const_cast<char*>(s_p_chara_cpp), 0x62D) CCharaPcs::CLoadAnim;
         loadAnim->m_keyId = charaNo;

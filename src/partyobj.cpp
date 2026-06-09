@@ -3548,7 +3548,6 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 				case 0x100:
 				case 0x125:
 				case 0x126:
-				case 0x127:
 				case 0x12A:
 				case 0x17D:
 				case 0x186:

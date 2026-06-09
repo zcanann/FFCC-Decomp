@@ -977,7 +977,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
  * JP Size: TODO
  */
 #pragma push
-#pragma optimization_level 4
+#pragma optimization_level 3
 void _pppAllFreePObject(_pppMngSt* pppMngSt)
 {
 	Graphic._WaitDrawDone(const_cast<char*>(s_pppPart_cpp), 0x362);
@@ -1060,7 +1060,7 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 				{
 					CMapMesh* mapMesh = *(CMapMesh**)(*(u32*)(pppResSet + 0x14) + *mapMeshIndices * 4);
 					mapMeshIndices++;
-					mapMesh->pppCacheDumpModelTexture(ppvEnv->m_materialSetPtr, &ppvAmemCacheSet);
+					mapMesh->pppCacheDumpModelTexture(PartMng.m_materialSet, &ppvAmemCacheSet);
 				}
 
 				s16 shapeCount = *shapeIndices;
@@ -1069,7 +1069,7 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 				{
 					pppShapeSt* shape = *(pppShapeSt**)(*(u32*)(pppResSet + 0x18) + *shapeIndices * 4);
 					shapeIndices++;
-					pppCacheDumpShapeTexture(shape, ppvEnv->m_materialSetPtr);
+					pppCacheDumpShapeTexture(shape, PartMng.m_materialSet);
 				}
 			}
 		}
@@ -1960,10 +1960,10 @@ void pppCalcPartStd(_pppMngSt* pppMngSt)
 					if (prog != 0)
 					{
 						pppProgOperationCallback fn = (pppProgOperationCallback)prog->m_pppFunctionOperation;
+						_pppPObjLink* obj = pDataVal->m_pppPObjLink;
 						if (fn != 0)
 						{
 							u32 count = pDataVal->m_activeCount;
-							_pppPObjLink* obj = pDataVal->m_pppPObjLink;
 
 							do
 							{
@@ -2031,9 +2031,9 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
 				if (prog != 0)
 				{
 					pppProgRenderCallback fn = (pppProgRenderCallback)prog->m_pppFunctionRender;
+					_pppPObjLink* obj = pDataVal->m_pppPObjLink;
 					if (fn != 0)
 					{
-						_pppPObjLink* obj = pDataVal->m_pppPObjLink;
 						u32 count = pDataVal->m_activeCount;
 
 						do
@@ -2158,7 +2158,10 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 							owner->m_pppPObjLink = obj->m_next;
 						}
 
-						Memory.Free(obj);
+						if (obj != 0)
+						{
+							Memory.Free(obj);
+						}
 					}
 					else
 					{
@@ -2201,7 +2204,10 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 					owner->m_pppPObjLink = obj->m_next;
 				}
 
-				Memory.Free(obj);
+				if (obj != 0)
+				{
+					Memory.Free(obj);
+				}
 				obj = next;
 			}
 

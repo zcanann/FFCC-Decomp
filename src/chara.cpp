@@ -505,9 +505,9 @@ static inline u8 AnimFlags(CChara::CAnim* anim)
 	return anim->m_flags;
 }
 
-static inline u8 AnimInterpCount(CChara::CAnim* anim)
+static inline s32 AnimInterpCount(CChara::CAnim* anim)
 {
-	return static_cast<u8>(anim->m_interp);
+	return anim->m_interp;
 }
 
 static inline u16 AnimNodeCount(CChara::CAnim* anim)

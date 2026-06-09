@@ -2530,8 +2530,9 @@ int CCharaPcs::CHandle::LoadAnim(
     char* animName, int animIndex, int animFlags, int charaKind, int charaNo, int mergeFileId, int mergeFlags)
 {
     if (animIndex == -1) {
-        for (unsigned int i = 0; i < 64; i++) {
-            ReleaseHandleAnimSlot(this, i);
+        CRef** slotPtr = &m_animSlot[0];
+        for (int i = 0; i < 64; i++, slotPtr++) {
+            ReleaseShared(*slotPtr);
         }
         PruneUnsharedAnimRefs(&CharaPcs, 0);
     } else {

@@ -2157,15 +2157,17 @@ card_connected:;
             MemoryCardMan.m_currentSlot = static_cast<char>(0xff);
         }
 
+        int result;
         if (formatResult == 0) {
-            m_memCardResult = 0;
+            result = 0;
         } else if (formatResult == 1) {
-            m_memCardResult = 1;
+            result = 1;
         } else if (formatResult == -2) {
-            m_memCardResult = -5;
+            result = -5;
         } else {
-            m_memCardResult = -999;
+            result = -999;
         }
+        m_memCardResult = result;
 
         if (m_memCardResult != 0) {
             m_lastMemCardProc = m_memCardProc;

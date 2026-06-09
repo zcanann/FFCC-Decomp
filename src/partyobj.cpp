@@ -923,14 +923,14 @@ void CGPartyObj::onFrameAlways()
 	     (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1)) << 24) & 0xC0000000) >> 31) == 0)) ||
 	    (m_lastStateId == 6 || m_lastStateId == 2)) {
 		showTraceParticle = 0;
-	} else if ((Game.m_gameWork.m_menuStageMode == 0) ||
-		    (Game.m_gameWork.m_menuStageMode == 0) ||
-		    (Game.m_gameWork.m_bossArtifactStageIndex >= 0x0F) ||
-		    ((static_cast<unsigned short>(GetCID()) & 0x6D) != 0x6D) ||
-		    (reinterpret_cast<int>(m_scriptHandle[0xED]) == 0)) {
-		showTraceParticle = 1;
-	} else {
+	} else if ((Game.m_gameWork.m_menuStageMode != 0) &&
+		    (Game.m_gameWork.m_menuStageMode != 0) &&
+		    (Game.m_gameWork.m_bossArtifactStageIndex < 0x0F) &&
+		    ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D) &&
+		    (reinterpret_cast<int>(m_scriptHandle[0xED]) != 0)) {
 		showTraceParticle = 0;
+	} else {
+		showTraceParticle = 1;
 	}
 
 	int& traceSlot = PartyTraceParticleSlot(port);
@@ -1351,7 +1351,7 @@ tmpArtifactBlock:
 		    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x63C)) << 24) & 0xC0000000) >> 31) == 0) ||
 		    caravan->m_hp == 0 ||
 		    ringCommand == -1 ||
-		    ((*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(this) + 0x6F4) & 8) != 0)) {
+		    ((*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(this) + 0x6F4) & 8) != 0)) {
 			return;
 		}
 
@@ -1771,12 +1771,12 @@ void CGPartyObj::onFrameStat()
 			changeStat(1, 0, 0);
 		} else {
 			party.unk6D0++;
-			if (party.unk6D0 < 6) {
+			if (party.unk6D0 >= 6) {
+				changeStat(6, 0, 0);
+			} else {
 				if ((getPadTrigForSlot(static_cast<signed char>(m_animStateMisc)) & 0x200) != 0) {
 					changeStat(0, 0, 0);
 				}
-			} else {
-				changeStat(6, 0, 0);
 			}
 		}
 		break;
@@ -4973,13 +4973,13 @@ void CGPartyObj::ghostPartyMog()
 						innerScale = FLOAT_80331A58 * (kMonObjOne - ramp) + FLOAT_80331A58;
 					}
 				}
-				if (static_cast<int>(FLOAT_80331A5C * innerScale) <= static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x38))) {
-					sGhostPartyWork.flagBits.flag04 = 1;
+				if (static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x38)) >= static_cast<int>(FLOAT_80331A5C * innerScale)) {
 					bossState = 3;
+					sGhostPartyWork.flagBits.flag04 = 1;
 					goto messageMenu;
 				}
 			}
-			if (sGhostPartyWork.flagBits.flag10 >= 0 && static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x3C)) > 0x96) {
+			if (sGhostPartyWork.flagBits.flag10 == 0 && static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x3C)) > 0x96) {
 				bossState = 8;
 			} else {
 				bossState = 0;

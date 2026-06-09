@@ -959,14 +959,17 @@ timeout_expiry:
 
             threadParam->m_gbaStatus = GBAReset(threadParam->m_portIndex, &threadParam->m_unk3);
 
-            if ((int)threadParam->m_gbaStatus == 0)
+            if ((int)threadParam->m_gbaStatus != 0)
             {
-                threadParam->m_state    = 2;
-                threadParam->m_subState = 0;
-
-                ThreadSleep(OSMillisecondsToTicks(15));
-                stateStartTime = OSGetTime();
+                goto sleep_retry;
             }
+
+            threadParam->m_state    = 2;
+            threadParam->m_subState = 0;
+
+            ThreadSleep(OSMillisecondsToTicks(15));
+            OSGetTime();
+            threadParam->m_errorRetry = 0;
 
             break;
         }

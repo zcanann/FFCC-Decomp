@@ -332,6 +332,22 @@ void CPartMng::Create()
         *reinterpret_cast<int*>(mng + 0x128) = 0x1e;
     }
 
+    {
+        unsigned char* walk = self;
+        for (int k = 0; k < 4; k++) {
+            int* e = reinterpret_cast<int*>(walk + 0x22e18);
+            e[0x00 / 4] = 0;
+            e[0x38 / 4] = 0;
+            e[0x70 / 4] = 0;
+            e[0xa8 / 4] = 0;
+            e[0xe0 / 4] = 0;
+            e[0x118 / 4] = 0;
+            e[0x150 / 4] = 0;
+            e[0x188 / 4] = 0;
+            walk += 0x1c0;
+        }
+    }
+
     *reinterpret_cast<void**>(self + 0x1c8) = 0;
     *reinterpret_cast<int*>(self + 0x7f4) = 0;
     *reinterpret_cast<int*>(self + 0x7f8) = 0;
@@ -1768,6 +1784,9 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             return;
         }
         {
+            CChunkFile chunkFile;
+            chunkFile.SetBuf(payloadWords + 8);
+
             pppModelSt*** modelTablePtr = reinterpret_cast<pppModelSt***>(self + kUsbMapMeshTableOffset);
             if (*modelTablePtr == 0) {
                 *modelTablePtr = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x5F8) pppModelSt*[0x88];
@@ -1797,8 +1816,6 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
                 modelSlot->m_refCount = 0;
                 modelSlot->m_cacheId = -1;
                 modelSlot->m_isUsed = 0;
-                CChunkFile chunkFile;
-                chunkFile.SetBuf(payloadWords + 8);
                 pppReadRsd(chunkFile, modelSlot);
             }
             *reinterpret_cast<int*>(self + 0x804) = -1;
@@ -1908,11 +1925,9 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
                     }
                 }
 
-                if (res->m_textureSet != 0 && res->m_materialSet != 0) {
-                    res->m_textureSet->Create(chunkFile, PartPcs.m_usbStreamState.m_stageLoad, 1, 0, 0, 0);
-                    res->m_materialSet->SetPartFromTextureSet(res->m_textureSet, 0);
-                    res->m_materialSet->SetTextureSet(res->m_textureSet);
-                }
+                res->m_textureSet->Create(chunkFile, PartPcs.m_usbStreamState.m_stageLoad, 1, 0, 0, 0);
+                res->m_materialSet->SetPartFromTextureSet(res->m_textureSet, 0);
+                res->m_materialSet->SetTextureSet(res->m_textureSet);
             }
         }
         return;

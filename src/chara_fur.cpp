@@ -1438,10 +1438,8 @@ int CChara::CModel::PickFur(
 						CVector rayStart;
 						CVector rayEnd;
 						CVector rayStartInit(
-						    static_cast<float>(static_cast<double>(static_cast<float>(cursorXd -
-						                                                              static_cast<double>(kCharaFurScreenCenterX))) /
-						                       static_cast<double>(kCharaFurScreenCenterX)),
-						    static_cast<float>(negCursorY / static_cast<double>(kCharaFurScreenCenterY)), kCharaFurDepthZero);
+						    (static_cast<float>(cursorXd) - kCharaFurScreenCenterX) / kCharaFurScreenCenterX,
+						    static_cast<float>(negCursorY) / kCharaFurScreenCenterY, kCharaFurDepthZero);
 						rayStart.x = rayStartInit.x;
 						rayStart.y = rayStartInit.y;
 						rayStart.z = rayStartInit.z;

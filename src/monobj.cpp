@@ -2921,7 +2921,7 @@ void CGMonObj::setRepop(int mode)
 			particleBase = 2;
 		}
 
-		int dataNo = object->m_charaModelHandle != nullptr ? object->m_charaModelHandle->GetPdtSlot() : -1;
+		int dataNo = object->m_charaModelHandle->GetPdtSlot();
 		prgObj->putParticleBindTrace((i + particleBase + 0x50) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x5A4), object, 0.0f, 0);
 	}
 
@@ -2929,7 +2929,7 @@ void CGMonObj::setRepop(int mode)
 
 	unsigned short countB = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AA);
 	for (int i = 0; i < static_cast<int>(countB); i++) {
-		int dataNo = object->m_charaModelHandle != nullptr ? object->m_charaModelHandle->GetPdtSlot() : -1;
+		int dataNo = object->m_charaModelHandle->GetPdtSlot();
 		prgObj->putParticleBindTrace((i + 0x5A) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x5A8), object, 0.0f, 0);
 	}
 

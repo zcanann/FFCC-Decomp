@@ -2099,8 +2099,9 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 	if (ppvUserStopPartF == 0)
 	{
 		maxDeleteFrame = 0;
+		_pppPObjLink* obj = mng->m_objHead.m_next;
 		_pppPObjLink* prev = &mng->m_objHead;
-		for (_pppPObjLink* obj = prev->m_next; obj != 0;)
+		for (; obj != 0;)
 		{
 			_pppPObjLink* next = obj->m_next;
 			if (((_pppPObject*)obj)->m_field7C == 0)

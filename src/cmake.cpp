@@ -2168,7 +2168,7 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
 
         if ((repeat & 0x8) != 0) {
             short* values = &CmakeState(this)->m_select;
-            int idx = CmakeState(this)->m_fieldSelect;
+            int idx = fieldSelect;
             if (values[idx] != 0) {
                 values[idx] = static_cast<short>(values[idx] - 1);
             } else {
@@ -2177,7 +2177,7 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else if ((repeat & 0x4) != 0) {
             short* values = &CmakeState(this)->m_select;
-            int idx = CmakeState(this)->m_fieldSelect;
+            int idx = fieldSelect;
             if (values[idx] < 3) {
                 values[idx] = static_cast<short>(values[idx] + 1);
             } else {

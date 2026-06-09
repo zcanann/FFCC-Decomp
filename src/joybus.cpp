@@ -2744,8 +2744,8 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
         unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(cmdOut);
         int op = cmdBytes[0] & 0x3F;
 
-        if (op == 0x14 || op == 0x17 || op == 0x1A ||
-            op == 0x1C || op == 0x1D || op == 0x1E ||
+        if (op == 0x14 || op == 0x1C || op == 0x17 ||
+            op == 0x1D || op == 0x1A || op == 0x1E ||
             op == 0x1F || (op == 0x06 && cmdBytes[1] == 0x18))
         {
             OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
@@ -4427,7 +4427,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
         m_cmdBuffer[4 + threadParam->m_portIndex] = (unsigned char)enemyCount;
 
         // If there are no enemies, skip straight to treasure (state 4)
-        if (m_cmdBuffer[4 + threadParam->m_portIndex] == 0)
+        if (static_cast<signed char>(m_cmdBuffer[4 + threadParam->m_portIndex]) == 0)
         {
             state += 2; // 2 -> 4
         }
@@ -4500,7 +4500,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 
         m_cmdBuffer[4 + threadParam->m_portIndex] = (unsigned char)treasureCount;
 
-        if (m_cmdBuffer[4 + threadParam->m_portIndex] == 0)
+        if (static_cast<signed char>(m_cmdBuffer[4 + threadParam->m_portIndex]) == 0)
         {
             state = 0;
         }

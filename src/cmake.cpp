@@ -1066,7 +1066,7 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
                 if (nameLen == 0) {
                     strcat(s_CmakeInfo.m_name, picked);
                     ret = 0;
-                } else if (strlen(rowText) != 0 && nameLen >= 7) {
+                } else if ((__cntlzw(static_cast<unsigned int>(strlen(rowText))) >> 5 & 1) == 0 && nameLen >= 7) {
                     ret = -1;
                 } else {
                     strcat(s_CmakeInfo.m_name, picked);
@@ -3744,44 +3744,33 @@ void CMenuPcs::DrawSingCMake()
 
     if (CmakeState(this)->m_mode < 2) {
         CmakeState(this)->m_mode = static_cast<short>(CmakeState(this)->m_mode + 1);
-        CmakeState(this)->m_frame = 0;
-        CmakeMcState(this) = 3;
-        return;
+        goto resetFrame;
     }
 
     gCmakePreviousStep = static_cast<int>(CmakeState(this)->m_step);
 
     if (CmakeState(this)->m_step == 6) {
         CmakeState(this)->m_step = static_cast<short>(CmakeState(this)->m_select + 1);
-        if (CmakeState(this)->m_step == 0) {
-            CmakeState(this)->m_mode = 2;
-        } else {
-            CmakeState(this)->m_mode = 0;
-        }
     } else if (CmakeState(this)->m_resultDir < 0) {
         if (CmakeState(this)->m_step == 5) {
             CmakeState(this)->m_step = 6;
         } else {
             CmakeState(this)->m_step = static_cast<short>(CmakeState(this)->m_step - 1);
         }
-        if (CmakeState(this)->m_step == 0) {
-            CmakeState(this)->m_mode = 2;
-        } else {
-            CmakeState(this)->m_mode = 0;
-        }
     } else if (CmakeState(this)->m_step != 5) {
         CmakeState(this)->m_step = static_cast<short>(CmakeState(this)->m_step + 1);
-        if (CmakeState(this)->m_step == 0) {
-            CmakeState(this)->m_mode = 2;
-        } else {
-            CmakeState(this)->m_mode = 0;
-        }
     } else {
         CmakeState(this)->m_step = 0;
+    }
+
+    if (CmakeState(this)->m_step == 0) {
         CmakeState(this)->m_mode = 2;
+    } else {
+        CmakeState(this)->m_mode = 0;
     }
 
     CmakeState(this)->m_selectionInitialized = 0;
+resetFrame:
     CmakeState(this)->m_frame = 0;
     CmakeMcState(this) = 3;
 }

@@ -2000,10 +2000,9 @@ void CCaravanWork::CalcStatus()
 	}
 
 	if (m_statusTimers[9] != 0) {
-		float mul = GetStatusMultiplier(0x38);
-		m_strength = (unsigned short)((float)m_strength * mul);
-		m_magic = (unsigned short)((float)m_magic * mul);
-		m_defense = (unsigned short)((float)m_defense * mul);
+		m_strength = (unsigned short)((float)m_strength * GetStatusMultiplier(0x38));
+		m_magic = (unsigned short)((float)m_magic * GetStatusMultiplier(0x38));
+		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x38));
 	}
 	if (m_statusTimers[4] != 0) {
 		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x3E));

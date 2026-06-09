@@ -1000,10 +1000,10 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* stepData, _p
     pppFMATRIX emitterMatrix;
     pppFMATRIX scratchMatrix;
 
-    init_matrix(obj, emitterMatrix, params, work);
     pppUnitMatrix(scratchMatrix);
     pppInitBlendMode();
     pppSetBlendMode(0);
+    init_matrix(obj, emitterMatrix, params, work);
 
     int baseRed = baseColor->m_red;
     int baseGreen = baseColor->m_green;

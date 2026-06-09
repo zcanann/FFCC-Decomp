@@ -147,6 +147,9 @@ public:
     }
     void SetDefaultStdDrawEnv(unsigned int tevBit)
     {
+        m_stdTexMapId = 0;
+        m_stdTexMtx = 0x1E;
+        m_stdTexCoordId = 0;
         m_curEnvTevBit = tevBit;
         m_activeEnvTevBit = 0xFFFFFFFF;
         m_vtxDescMode = 0xFF;

@@ -40,13 +40,13 @@ static inline CChara::CModel* GetPppOwnerModel(_pppMngSt* pppMngSt)
 }
 
 static const float kPppLocalZero = 0.0f;
-extern "C" const unsigned int gPppFixedWhite = 0xffffffff;
+extern "C" const unsigned int gPppFixedWhite;
 extern "C" const float kPppPartZero = 0.0f;
 extern "C" const float kPppPartHugePositive = 10000000000.0f;
 extern "C" const float kPppPartHugeNegative = -10000000000.0f;
 extern "C" const float kPppPartZOffsetMin = -1000000000000.0f;
 extern "C" const double kPppPartZeroDouble = 0.0;
-extern "C" const float kPppPartDepthScale = 5000.0f;
+extern "C" const float kPppPartDepthScale;
 extern "C" const float kPppPartOne = 1.0f;
 extern "C" const double kPppPartOneDouble = 1.0;
 
@@ -2498,7 +2498,7 @@ void pppSetDrawEnv(pppCVECTOR* pppColor, pppFMATRIX* pppMtx, float depth, unsign
 
 	_GXColor fixedColor;
 	*(u32*)&fixedColor = gPppFixedWhite;
-	if (lightTarget < 2) {
+	if (lightTarget <= 1) {
 		if (pppColor != 0) {
 			GXSetChanAmbColor(GX_COLOR0A0, *(_GXColor*)pppColor->rgba);
 		}
@@ -2718,3 +2718,6 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 		return;
 	}
 }
+
+extern "C" const unsigned int gPppFixedWhite = 0xffffffff;
+extern "C" const float kPppPartDepthScale = 5000.0f;

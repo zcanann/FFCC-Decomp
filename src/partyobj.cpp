@@ -1854,17 +1854,17 @@ void CGPartyObj::onFrameStat()
 			reqAnim(0x29, 0, 0);
 		}
 		if (m_stateFrame == 4) {
-			int weaponItem = party.weaponItem;
-			int weaponRef = party.pendingWeaponItem;
+			int weaponItem = party.weaponRef;
+			int weaponRef = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D4);
 			if (weaponItem <= 0) {
 				LoadWeapon(-1, 0);
 			} else {
 				unsigned short itemKind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + weaponItem * 0x48 + 2);
 				LoadWeapon(itemKind & 0xFFF, itemKind >> 12);
 			}
-			party.pendingWeaponItem = weaponRef;
-			party.weaponItem = weaponItem;
-			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->SetCurrentWeaponIdx(weaponRef);
+			party.weaponItem = weaponRef;
+			party.pendingWeaponItem = weaponItem;
+			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->SetCurrentWeaponIdx(party.weaponItem);
 			party.commandFlagBits.flag20 = 0;
 		}
 		if (isLoopAnim() != 0) {

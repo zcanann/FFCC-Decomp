@@ -4957,7 +4957,7 @@ void CGPartyObj::ghostPartyMog()
 				} else if (CharaGhostValue(0x2054) >= 0x5F) {
 					bossState = 4;
 				}
-			} else if (moodMode != 0 && moodMode < 3 && CharaGhostValue(0x2054) < 0x32) {
+			} else if (moodMode > 1 && moodMode < 3 && CharaGhostValue(0x2054) < 0x32) {
 				bossState = 6;
 			}
 			sGhostPartyWork.flagBits.flag08 = 1;

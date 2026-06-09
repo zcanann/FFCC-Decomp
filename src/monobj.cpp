@@ -3545,8 +3545,8 @@ body:
 					return;
 				}
 
-				if (static_cast<int>(*reinterpret_cast<unsigned short*>(script + 0x1BA)) <=
-					monObj->m_chaseTimer) {
+				if (monObj->m_chaseTimer >=
+					static_cast<int>(*reinterpret_cast<unsigned short*>(script + 0x1BA))) {
 					monObj->m_chaseState = 3;
 					monObj->m_chaseTimer = 0;
 					monObj->m_chaseDirty = 1;

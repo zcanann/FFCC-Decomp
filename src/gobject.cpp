@@ -231,6 +231,8 @@ void CGBaseObj::onFrame()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma optimization_level 2
 void CGObject::onCreate()
 {
     m_worldPosition.z = 0.0f;
@@ -417,6 +419,7 @@ void CGObject::onCreate()
     memset(&m_damageColliders[0].m_localPosition.y, 0, 0x140);
     memset(m_dropItemCodes, 0, sizeof(m_dropItemCodes));
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -871,6 +874,8 @@ void CGObject::objectCollision()
  * Address:	TODO
  * Size:	TODO
  */
+#pragma push
+#pragma opt_common_subs off
 void CGObject::bgCollision()
 {
     m_stateFlags0Bits.unk0 = 0;
@@ -897,6 +902,7 @@ void CGObject::bgCollision()
         s_bitMask.m_fields.m_drawFlags = 0;
     }
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -1118,6 +1124,8 @@ void CGObject::bgWorldCollision()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_common_subs off
 void CGObject::bgAttribCollision()
 {
     if (!HasLoadedModel(m_charaModelHandle)) {
@@ -1190,6 +1198,7 @@ void CGObject::bgAttribCollision()
         }
     }
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -2681,6 +2690,8 @@ void CGObject::LookAt(CGObject* target, char* nodeName)
  * Address:	TODO
  * Size:	TODO
  */
+#pragma push
+#pragma opt_propagation off
 void CGObject::InitWork(int index)
 {
     typedef void (*InitWorkFn)(void**, int, unsigned int, int);
@@ -2700,6 +2711,7 @@ void CGObject::InitWork(int index)
     }
     }
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -2867,6 +2879,8 @@ int CGObject::IsLoopAnim(int mode)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_common_subs off
 int CGObject::IsAnimFinished(int mode)
 {
     float frame;
@@ -2948,6 +2962,7 @@ int CGObject::IsAnimFinished(int mode)
 
     return 1;
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -3084,6 +3099,8 @@ void CGObject::DrawDebug(CFont* font)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma optimization_level 1
 void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
 {
     m_worldPosition = *position;
@@ -3149,6 +3166,7 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
         m_animBlend = m_bgAttrValue;
     }
 }
+#pragma pop
 
 /*
  * --INFO--

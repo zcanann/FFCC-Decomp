@@ -7402,7 +7402,7 @@ int JoyBus::SetCtrlMode(int portIndex, int controlMode)
     unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
 
     unsigned char modeFlag =
-        (unsigned char)(((unsigned int)(-controlMode | controlMode)) >> 31);
+        (signed char)(((unsigned int)(-controlMode | controlMode)) >> 31);
 
     if (GbaQue.IsSingleMode(m_threadParams[portIndex].m_portIndex))
 	{

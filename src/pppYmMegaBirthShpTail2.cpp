@@ -821,10 +821,13 @@ done:
     }
     *((u8*)&particleData->m_directionTail.y) = 0;
 
-    if (param->m_tail2MatrixMode == 0) {
+    switch ((s32)paramBytes[0x8d]) {
+    case 0:
         pppCopyMatrix(*(pppFMATRIX*)particleWMat, work->m_emitterMatrix);
-    } else if (param->m_tail2MatrixMode == 1) {
+        break;
+    case 1:
         pppCopyMatrix(*(pppFMATRIX*)particleWMat, work->m_emitterMatrix);
+        break;
     }
 
     *(u16*)(particleBytes + 0x3a) = 0;

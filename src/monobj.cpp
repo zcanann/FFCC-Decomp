@@ -2247,21 +2247,14 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 				cylTop.y = delta.y;
 				cylTop.z = delta.z;
 			}
-			CMapCylinder hitCylinder;
-			hitCylinder.m_axis.y = kMonObjMaxBound;
-			hitCylinder.m_axis.z = kMonObjMinBound;
-			hitCylinder.m_radius = kMonObjMinBound;
-			hitCylinder.m_bound.m_min.x = kMonObjMinBound;
-			hitCylinder.m_bound.m_min.y = kMonObjMaxBound;
-			hitCylinder.m_bound.m_min.z = kMonObjMaxBound;
-			hitCylinder.m_bound.m_max.x = kMonObjMaxBound;
-			hitCylinder.m_bound.m_max.y = kMonObjMaxBound;
-			hitCylinder.m_bound.m_max.z = kMonObjMinBound;
+			CMapCylinder hitCylinder(kMonObjMaxBound, kMonObjMinBound);
 			hitCylinder.m_bottom.x = startPos.x;
 			hitCylinder.m_bottom.y = startPos.y;
 			hitCylinder.m_bottom.z = startPos.z;
-			hitCylinder.m_top = cylTop;
-			hitCylinder.m_axis.x = cylRadius;
+			hitCylinder.m_axis.x = cylTop.x;
+			hitCylinder.m_axis.y = cylTop.y;
+			hitCylinder.m_axis.z = cylTop.z;
+			hitCylinder.m_radius = cylRadius;
 
 			int mapHit = MapMng.CheckHitCylinderNear(&hitCylinder, &cylTop, hitMask);
 			Vec debugDelta;

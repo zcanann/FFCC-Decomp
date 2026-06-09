@@ -4201,7 +4201,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
             localBytes[1] = sendType;
             *reinterpret_cast<unsigned short*>(localBytes + 2) = __lhbrx(&blockHalf, 0);
 
-            if (m_threadRunningMask == 0)
+            if (static_cast<signed char>(m_threadRunningMask) == 0)
             {
                 result = 0;
             }
@@ -4236,7 +4236,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
             unsigned short len = totalSize;
             *reinterpret_cast<unsigned short*>(localBytes + 2) = __lhbrx(&len, 0);
 
-            if (m_threadRunningMask != 0)
+            if (static_cast<signed char>(m_threadRunningMask) != 0)
             {
                 OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
@@ -4269,7 +4269,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
 
             *reinterpret_cast<unsigned short*>(localBytes + 2) = crcChunk;
 
-            if (m_threadRunningMask != 0)
+            if (static_cast<signed char>(m_threadRunningMask) != 0)
             {
                 OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
@@ -4333,7 +4333,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
 
             unsigned int word = localWord;
 
-            if (m_threadRunningMask == 0)
+            if (static_cast<signed char>(m_threadRunningMask) == 0)
             {
                 result = 0;
             }
@@ -4375,7 +4375,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
                 (static_cast<unsigned int>(blockIndex) << 16) |
                 static_cast<unsigned int>(crcChunk);
 
-            if (m_threadRunningMask == 0)
+            if (static_cast<signed char>(m_threadRunningMask) == 0)
             {
                 result = 0;
             }
@@ -4418,7 +4418,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
 
         unsigned int word = localWord;
 
-        if (m_threadRunningMask != 0)
+        if (static_cast<signed char>(m_threadRunningMask) != 0)
         {
             localWord = word;
 
@@ -5673,7 +5673,7 @@ int JoyBus::SendMapObjDrawFlg(ThreadParam* threadParam)
 
         if (result == 0)
         {
-            if (m_threadRunningMask == 0)
+            if (static_cast<signed char>(m_threadRunningMask) == 0)
             {
                 result = 0;
             }
@@ -7954,7 +7954,11 @@ void JoyBus::RestartThread()
     CreateInit();
     int err;
 
-    if (static_cast<signed char>(Joybus.m_binLoaded) == 0)
+    if (static_cast<signed char>(Joybus.m_binLoaded) != 0)
+    {
+        err = 0;
+    }
+    else
     {
         CFile::CHandle* file = File.Open((char*)&Joybus, 0, CFile::PRI_LOW);
 
@@ -7984,52 +7988,48 @@ void JoyBus::RestartThread()
             Joybus.m_gbaBootImage[0xAE] = Joybus.m_diskId[2];
             Joybus.m_gbaBootImage[0xAF] = Joybus.m_diskId[3];
 
-            char* p = Joybus.m_gbaBootImage + 0xBC;
-            int left = 1;
+            unsigned char* img = (unsigned char*)Joybus.m_gbaBootImage;
+            unsigned char* p = img + 0xBC;
 
-            unsigned char sum =
-                (signed char)(
+            int sum =
+                (
                     ((((((((((((((((((((((((((((-0x19
-                    - Joybus.m_gbaBootImage[0xA0])
-                    - Joybus.m_gbaBootImage[0xA1])
-                    - Joybus.m_gbaBootImage[0xA2])
-                    - Joybus.m_gbaBootImage[0xA3])
-                    - Joybus.m_gbaBootImage[0xA4])
-                    - Joybus.m_gbaBootImage[0xA5])
-                    - Joybus.m_gbaBootImage[0xA6])
-                    - Joybus.m_gbaBootImage[0xA7])
-                    - Joybus.m_gbaBootImage[0xA8])
-                    - Joybus.m_gbaBootImage[0xA9])
-                    - Joybus.m_gbaBootImage[0xAA])
-                    - Joybus.m_gbaBootImage[0xAB])
-                    - Joybus.m_gbaBootImage[0xAC])
-                    - Joybus.m_gbaBootImage[0xAD])
-                    - Joybus.m_gbaBootImage[0xAE])
-                    - Joybus.m_gbaBootImage[0xAF])
-                    - Joybus.m_gbaBootImage[0xB0])
-                    - Joybus.m_gbaBootImage[0xB1])
-                    - Joybus.m_gbaBootImage[0xB2])
-                    - Joybus.m_gbaBootImage[0xB3])
-                    - Joybus.m_gbaBootImage[0xB4])
-                    - Joybus.m_gbaBootImage[0xB5])
-                    - Joybus.m_gbaBootImage[0xB6])
-                    - Joybus.m_gbaBootImage[0xB7])
-                    - Joybus.m_gbaBootImage[0xB8])
-                    - Joybus.m_gbaBootImage[0xB9])
-                    - Joybus.m_gbaBootImage[0xBA])
-                    - Joybus.m_gbaBootImage[0xBB])
+                    - img[0xA0])
+                    - img[0xA1])
+                    - img[0xA2])
+                    - img[0xA3])
+                    - img[0xA4])
+                    - img[0xA5])
+                    - img[0xA6])
+                    - img[0xA7])
+                    - img[0xA8])
+                    - img[0xA9])
+                    - img[0xAA])
+                    - img[0xAB])
+                    - img[0xAC])
+                    - img[0xAD])
+                    - img[0xAE])
+                    - img[0xAF])
+                    - img[0xB0])
+                    - img[0xB1])
+                    - img[0xB2])
+                    - img[0xB3])
+                    - img[0xB4])
+                    - img[0xB5])
+                    - img[0xB6])
+                    - img[0xB7])
+                    - img[0xB8])
+                    - img[0xB9])
+                    - img[0xBA])
+                    - img[0xBB])
                 );
 
-            do
+            for (; idx < 0xBD; idx++)
             {
-                unsigned char v = *p++;
-                idx++;
-                sum -= v;
-                left--;
+                sum -= *p++;
             }
-            while (left != 0);
 
-            Joybus.m_gbaBootImage[idx] = sum;
+            img[idx] = (unsigned char)sum;
 
             *(unsigned int*)(Joybus.m_gbaBootImage + 200) = OSGetTick();
 
@@ -8037,12 +8037,8 @@ void JoyBus::RestartThread()
             err = 0;
         }
     }
-    else
-    {
-        err = 0;
-    }
 
-    if (err != 0 && (unsigned int)System.m_execParam > 1)
+    if (err != 0 && (unsigned int)System.m_execParam >= 2)
 	{
         System.Printf(const_cast<char*>(s_load_bin_error));
 	}
@@ -8052,36 +8048,27 @@ void JoyBus::RestartThread()
     Joybus.m_threadInitFlag = 0;
     Joybus.m_threadRunningMask = 0;
 
-    JoyBus* jbA = &Joybus;
-    JoyBus* jbB = &Joybus;
-
     for (int i = 0; i < 4; i++)
     {
-        jbB->m_threadParams[i].m_portIndex = i;
-        jbB->m_threadParams[i].m_gbaStatus = 1;
-
-        unsigned char* stackBase = (unsigned char*)m_sendBuffer;
+        Joybus.m_threadParams[i].m_portIndex = i;
+        Joybus.m_threadParams[i].m_gbaStatus = 1;
 
         OSCreateThread(
-            &jbA->m_threads[i],
+            &Joybus.m_threads[i],
             (void* (*)(void*))JoyBus::_ThreadMain,
-            &jbB->m_threadParams[i],
-            stackBase,
-            sizeof(jbA->m_sendBuffer[0]),
+            &Joybus.m_threadParams[i],
+            &Joybus.m_sendBuffer[i + 1],
+            sizeof(Joybus.m_sendBuffer[0]),
             8,
             1
         );
 
-        OSResumeThread(&jbA->m_threads[0]);
+        OSResumeThread(&Joybus.m_threads[i]);
 
-        Joybus.m_threadRunningMask |= (unsigned char)(1 << i);
-
-        jbA = (JoyBus*)(jbA->m_recvBuffer[0].m_payload + 0x290);
-        jbB = (JoyBus*)(jbB->m_pathBuf + 0x3C);
-
+        Joybus.m_threadRunningMask |= (1 << i);
     }
 
-    if ((unsigned int)System.m_execParam > 1)
+    if ((unsigned int)System.m_execParam >= 2)
         System.Printf(const_cast<char*>(s_thread_init_end));
 }
 

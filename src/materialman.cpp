@@ -1263,10 +1263,10 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
                 GXLoadTexMtxImm(reinterpret_cast<float(*)[4]>(LightPcs.m_bumpTexScratch), m_bumpTexMtxIds[3], GX_MTX2x4);
                 GXLoadTexMtxImm(m_underWaterTexMtx, m_bumpTexMtxIds[4], GX_MTX3x4);
 
-                if ((tevBit & 0x20) == 0) {
-                    GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_texCoordIdCurShadow), GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, 0x7D);
-                } else {
+                if ((tevBit & 0x20) != 0) {
                     GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_texCoordIdCurShadow), GX_TG_MTX2x4, GX_TG_TEX0, m_texScroll0TexMtx, GX_FALSE, 0x7D);
+                } else {
+                    GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_texCoordIdCurShadow), GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, 0x7D);
                 }
                 GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_bumpTexCoordIds[0]), GX_TG_MTX2x4, GX_TG_TEX0, m_bumpTexMtxIds[0], GX_FALSE, 0x7D);
                 GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_bumpTexCoordIds[4]), GX_TG_MTX2x4, GX_TG_POS, m_bumpTexMtxIds[3], GX_FALSE, 0x7D);

@@ -5986,7 +5986,6 @@ int JoyBus::SendBonusStr(ThreadParam* threadParam)
             payload[0] = 7;
 
             unsigned char* bonusStr = &payload[1];
-            unsigned char* extraBuf = &payload[2];
 
             int byteLen;
             if (Game.m_gameWork.m_bossArtifactStageIndex < 0xE)
@@ -6006,16 +6005,16 @@ int JoyBus::SendBonusStr(ThreadParam* threadParam)
                 strcpy((char*)bonusStr, bonusTable[bonusIndex * 2]);
 
                 int firstLen = strlen((char*)bonusStr);
-                strcpy((char*)extraBuf + firstLen, bonusTable[bonusIndex * 2 + 1]);
+                strcpy((char*)(bonusStr + 1) + firstLen, bonusTable[bonusIndex * 2 + 1]);
 
-                int secondLen = strlen((char*)extraBuf + firstLen);
+                int secondLen = strlen((char*)(bonusStr + 1) + firstLen);
                 byteLen = firstLen + secondLen + 3;
             }
             else
             {
                 byteLen = 3;
                 bonusStr[0] = 0;
-                extraBuf[0] = 0;
+                bonusStr[1] = 0;
             }
 
             int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2));

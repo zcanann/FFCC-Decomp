@@ -1645,13 +1645,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 
 	if (mode != 1) {
 		float targetMag = PSVECMag(&cameraToTarget);
-		if (targetMag > 0.0f) {
-			PSVECScale(&cameraToTarget, &scaledDir, farDist / targetMag);
-		} else {
-			scaledDir.x = 0.0f;
-			scaledDir.y = 0.0f;
-			scaledDir.z = 0.0f;
-		}
+		PSVECScale(&cameraToTarget, &scaledDir, farDist / targetMag);
 
 		GXProject(targetPos.x + scaledDir.x, targetPos.y, targetPos.z + scaledDir.z, cameraMtx, gxProjection,
 		          gxViewport, &projX, &projY, &projZ);

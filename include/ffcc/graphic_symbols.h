@@ -17,7 +17,7 @@ extern _GXColor gGraphicDefaultClearColor;
 extern const char sGraphicInitData[];
 extern const char sGraphicStageName[];
 extern const char sGraphicSourceStrings[];
-extern char sGraphicUnknownOrderName[];
+extern const char sGraphicUnknownOrderName[4];
 extern u8 gGraphicNoiseTextureI8_64x96[];
 extern const float kGraphicZeroF;
 extern const float kGraphicOneF;

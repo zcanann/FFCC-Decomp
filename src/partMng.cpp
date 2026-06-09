@@ -1876,11 +1876,9 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
 
             shapeSlot = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x610) pppShapeSt;
             (*shapeSlotTablePtr)[slotIndex] = shapeSlot;
-            if (shapeSlot != 0) {
-                CChunkFile chunkFile;
-                chunkFile.SetBuf(payloadWords + 4);
-                pppReadShp(chunkFile, shapeSlot);
-            }
+            CChunkFile chunkFile;
+            chunkFile.SetBuf(payloadWords + 4);
+            pppReadShp(chunkFile, (*shapeSlotTablePtr)[slotIndex]);
         }
         return;
     case 8:

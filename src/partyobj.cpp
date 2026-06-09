@@ -1156,8 +1156,9 @@ void CGPartyObj::command()
 
 		if (cmdDir != 0) {
 			Sound.PlaySe(0x0C, 0x40, 0x7F, 0);
-			const int curCmd = caravan->GetIdxCmdList();
-			caravan->IsUseCmdList(caravan->GetNextCmdListIdx(curCmd, cmdDir));
+			CCaravanWork* cmdDirCaravan = caravan;
+			const int curCmd = cmdDirCaravan->GetIdxCmdList();
+			cmdDirCaravan->IsUseCmdList(cmdDirCaravan->GetNextCmdListIdx(curCmd, cmdDir));
 		}
 
 		const int cmdIdx = caravan->GetIdxCmdList();
@@ -1166,7 +1167,8 @@ void CGPartyObj::command()
 		} else if (caravan->GetIdxCmdList() == 1) {
 			ringCommand = 9;
 		} else {
-			const int itemId = caravan->DelCmdListAndItem(caravan->GetIdxCmdList());
+			CCaravanWork* delCaravan = caravan;
+			const int itemId = delCaravan->DelCmdListAndItem(delCaravan->GetIdxCmdList());
 			const int itemKind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48);
 			switch (itemKind) {
 			case 1:

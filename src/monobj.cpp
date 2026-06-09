@@ -3035,13 +3035,13 @@ void CGMonObj::moveAStar(int startGroup, int forbiddenGroup, Vec& targetPos)
 				CVector myVec(object->m_worldPosition);
 				CVector dirRaw;
 				PSVECSubtract(myVec, portalVec, dirRaw);
-				CVector dir;
+				Vec dir;
 				dir.x = dirRaw.x;
 				dir.y = dirRaw.y;
 				dir.z = dirRaw.z;
-				dir.Normalize();
+				reinterpret_cast<CVector*>(&dir)->Normalize();
 				CVector scaled;
-				PSVECScale(dir, scaled, targetDist);
+				PSVECScale(reinterpret_cast<CVector&>(dir), scaled, targetDist);
 				Vec dirScaled;
 				dirScaled.x = scaled.x;
 				dirScaled.y = scaled.y;
@@ -3049,8 +3049,12 @@ void CGMonObj::moveAStar(int startGroup, int forbiddenGroup, Vec& targetPos)
 				CVector myVec2(object->m_worldPosition);
 				CVector result;
 				PSVECAdd(myVec2, &dirScaled, result);
+				Vec finalVec;
+				finalVec.x = result.x;
 				targetPos.x = result.x;
 				targetPos.y = result.y;
+				finalVec.y = result.y;
+				finalVec.z = result.z;
 				targetPos.z = result.z;
 			}
 		}

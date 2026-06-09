@@ -4447,7 +4447,7 @@ void CMenuPcs::DrawMCardMenu()
 		int charaOff = 0;
 		unsigned int* serial = &m_mcCtrl.m_serialHi;
 		int viewBase = 0x550;
-		int i = 0;
+		int i =  (int)(unsigned int)(0);
 		do {
 			if (*piVar12 != 0) {
 				int slot = reinterpret_cast<int>(m_wm.m_worldObjData) + viewBase;
@@ -4775,7 +4775,8 @@ void CMenuPcs::DrawMCardMenu()
 					    (idx = 2, cs[0xd2] == 0) && (idx = 3, cs[0x11a] == 0)) {
 						idx = 4;
 					}
-					if (idx < 4) {
+					int __p7 = idx;
+					if (__p7 < 4) {
 						m_wmWorldState->m_subState = 0x19;
 					} else {
 						m_wmWorldState->m_subState = 0x11;

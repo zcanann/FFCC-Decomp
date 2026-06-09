@@ -4269,7 +4269,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     mng->m_mapTexLoaded = 0;
     mng->m_hasMapRef = 0;
     *reinterpret_cast<unsigned int*>(&mng->m_envColorR) = 0x1333;
-    if (reinterpret_cast<unsigned char*>(&PartPcs)[0x5b145] != 0 && pdtSlotIndex == 7 && fpNo == 0) {
+    if (reinterpret_cast<unsigned char*>(&PartPcs)[0x2f] != 0 && pdtSlotIndex == 7 && fpNo == 0) {
         *reinterpret_cast<unsigned int*>(&mng->m_envColorR) = 0x1000;
     }
 

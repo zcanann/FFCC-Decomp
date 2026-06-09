@@ -1396,9 +1396,10 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         }
 
         {
+        const int saveIndex = m_accessSaveIndex;
         const int cardChannel = m_accessCardChannel;
         m_cardChannel = static_cast<char>(cardChannel);
-        m_saveIndex = static_cast<char>(m_accessSaveIndex);
+        m_saveIndex = static_cast<char>(saveIndex);
         MenuPcs.m_mcCtrl.m_cardChannel = cardChannel;
         }
         m_memCardBuffer = MenuPcs.m_goOutTransferSaveData;

@@ -1204,11 +1204,7 @@ void CGItemObj::onFrameStat()
 
 			*(int*)(CGMonObj::m_boss + ownerSlot * 4 + 8) = 0;
 			CGPrgObj* newItem = CreateFromScript(0, 0, 0x103, 0, kItemObjZero, 0);
-			if (newItem == 0) {
-				if ((unsigned int)System.m_execParam > 1U) {
-					System.Printf(itemObjStrings + kItemObjStrMemoryMagiciteCreateFailedMsg);
-				}
-			} else {
+			if (newItem != 0) {
 				unsigned char* newItemSelf = reinterpret_cast<unsigned char*>(newItem);
 
 				*reinterpret_cast<float*>(newItemSelf + 0x168) = prgObj->m_worldPosition.x;
@@ -1222,6 +1218,10 @@ void CGItemObj::onFrameStat()
 				stack.m_word = 1;
 				gCFlatRuntime().SystemCall(
 				    *reinterpret_cast<CFlatRuntime::CObject**>(self + 0x550), 2, 0x16, 1, &stack, 0);
+			} else {
+				if ((unsigned int)System.m_execParam > 1U) {
+					System.Printf(itemObjStrings + kItemObjStrMemoryMagiciteCreateFailedMsg);
+				}
 			}
 
 			self[0x38] = static_cast<unsigned char>(__rlwimi(self[0x38], 1, 7, 24, 24));

@@ -1293,10 +1293,13 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         m_pendingMessageTimer = 0;
         MenuPcs.GetMcAccessPos(&m_accessCardChannel, &m_accessSaveIndex);
         m_accessCardChannel = 0;
-        MenuPcs.m_mcCtrl.m_cardChannel = m_accessCardChannel;
-        m_cardChannel = static_cast<char>(m_accessCardChannel);
+        {
+        const int cardChannel = m_accessCardChannel;
+        MenuPcs.m_mcCtrl.m_cardChannel = cardChannel;
+        m_cardChannel = static_cast<char>(cardChannel);
         m_saveIndex = static_cast<char>(m_accessSaveIndex);
-        MenuPcs.m_mcCtrl.m_cardChannel = m_accessCardChannel;
+        MenuPcs.m_mcCtrl.m_cardChannel = cardChannel;
+        }
         m_memCardResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(static_cast<unsigned char>(m_cardChannel));
         if (m_memCardResult == 1) {
             const unsigned char savedSaveIndex = static_cast<unsigned char>(m_saveIndex);

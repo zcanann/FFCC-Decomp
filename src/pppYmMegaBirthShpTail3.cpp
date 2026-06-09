@@ -109,8 +109,8 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                 Vec segVec;
                 GXColor amb;
                 const u8 trailReadIndex = *(u8*)(particle + 0x38);
-                const u8 trailMaxIndex = (u8)(*(u8*)(particle + 0x37) - 1);
-                u8 trailNextIndex = (u8)(trailReadIndex + 1);
+                const s32 trailMaxIndex = (u8)(*(u8*)(particle + 0x37) - 1);
+                s32 trailNextIndex = (u8)(trailReadIndex + 1);
                 const float alphaScale = (float)*(s16*)((u8*)colorWork + 6) / LoadFloat(kPppYmMegaBirthShpTail3AlphaDivisor);
                 const float stepDivisor = (float)((s32)frameCountRaw - 1);
                 float fadeA = (float)(*(s16*)(workBytes + 0x56) >> 7) * alphaScale;

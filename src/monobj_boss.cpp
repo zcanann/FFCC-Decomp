@@ -2127,6 +2127,8 @@ void CGMonObj::alwaysFuncMeteoParasite()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma peephole off
 void CGMonObj::frameStatFuncMeteoParasite()
 {
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
@@ -2176,6 +2178,7 @@ void CGMonObj::frameStatFuncMeteoParasite()
 		reinterpret_cast<CGCharaObj*>(this)->statAttack();
 	}
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -2290,6 +2293,8 @@ void CGMonObj::initFinishedFuncDuct()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma peephole off
 void CGMonObj::damagedFuncDuct()
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
@@ -2306,6 +2311,7 @@ void CGMonObj::damagedFuncDuct()
 		model->m_meshVisibleMask &= ~(1 << dispIndex);
 	}
 }
+#pragma pop
 
 /*
  * --INFO--

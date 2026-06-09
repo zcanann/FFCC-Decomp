@@ -3383,7 +3383,7 @@ void CGObject::PutDropItem()
         if (dropCode > 0) {
             int createMode;
             if ((dropCode & 0xC000) == 0x4000) {
-                dropCode &= 0x3FFF;
+                dropCode &= ~0xC000;
                 createMode = 2;
             } else {
                 createMode = 0;

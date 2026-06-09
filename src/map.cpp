@@ -2446,25 +2446,32 @@ int CMapMng::ReadMid(char* mapName)
                         return 0;
                     }
 
-                    COctTree* octTree = GetOctTreeArray() + octTreeCount;
-                    octTree->ReadOtmOctTree(chunkFile);
-                    octTree->SetMapObject(mapObj);
+                    GetOctTreeArray()[octTreeCount].ReadOtmOctTree(chunkFile);
+                    GetOctTreeArray()[octTreeCount].SetMapObject(mapObj);
+                    nextMapObj = mapObj + 1;
 
-                    if (mapObj->m_mapData == 0) {
-                        if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-                            System.Printf(const_cast<char*>(s_read_mid_mapobj_error));
-                        }
-                    } else if (mapObj->m_meshType == 1 || mapObj->m_meshType == 2) {
-                        nextMapObj = mapObj + 1;
-                        octTreeCount += 1;
-                        break;
+                    CMapObj* check = GetOctTreeArray()[octTreeCount].GetMapObject();
+                    if (check->m_mapData != 0) {
+                        goto octtreeMeshCheck;
                     }
-
+                    if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+                        System.Printf(const_cast<char*>(s_read_mid_mapobj_error));
+                    }
+                octtreeError:
                     if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                         System.Printf(const_cast<char*>(s_read_mid_octtree_error));
                     }
                     ok = 0;
-                    nextMapObj = mapObj + 1;
+                    goto octtreeDone;
+
+                octtreeMeshCheck:
+                    if (check->m_meshType == 1) {
+                        goto octtreeDone;
+                    }
+                    if (check->m_meshType != 2) {
+                        goto octtreeError;
+                    }
+                octtreeDone:
                     octTreeCount += 1;
                     break;
                 }

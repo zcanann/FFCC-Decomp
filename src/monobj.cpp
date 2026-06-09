@@ -2196,8 +2196,8 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 				(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(partyObj->m_scriptHandle) + 7) == 0) ||
 				(partyObj->m_lastStateId == 9) ||
 				(partyObj->m_lastStateId == 0x22) ||
-				(static_cast<double>(*reinterpret_cast<float*>(mon + partyIndex * 4 + 0x5D0)) >=
-				 static_cast<double>(static_cast<float>(static_cast<double>(coneLength) - static_cast<double>(sideDist))))) {
+				(*reinterpret_cast<float*>(mon + partyIndex * 4 + 0x5D0) >=
+				 (coneLength - sideDist))) {
 				continue;
 			}
 

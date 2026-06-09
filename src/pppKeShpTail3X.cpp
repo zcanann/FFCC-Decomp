@@ -15,6 +15,11 @@ static const float kPppKeShpTail3XRandomMax = 65535.0f;
 static const float kPppKeShpTail3XOne = 1.0f;
 static const float kPppKeShpTail3XDegToRad = 0.017453292f;
 
+static inline float LoadFloat(const float& value)
+{
+    return value;
+}
+
 STATIC_ASSERT(offsetof(struct pppKeShpTail3X, m_object.m_workArea) == 0x80);
 
 struct KeShpTail3XWork {
@@ -138,6 +143,8 @@ void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, _pppCtrlTable* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma optimization_level 3
 void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* step, _pppCtrlTable* param_3)
 {
     KeShpTail3XWork* work;
@@ -182,7 +189,7 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     s32 currentIndex;
     s32 nextIndex;
     u8 zEnable;
-    const float zero = kPppKeShpTail3XZero;
+    const float zero = LoadFloat(kPppKeShpTail3XZero);
     s32 dataValIndex;
 
     work = GetKeShpTail3XWork(obj, param_3);
@@ -380,6 +387,7 @@ advance_segment:
     segRemain += segLen;
     goto advance_segment;
 }
+#pragma pop
 
 /*
  * --INFO--

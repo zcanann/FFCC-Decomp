@@ -41,6 +41,13 @@ extern Mtx ppvUnitMatrix;
 extern Vec ppvZeroVector;
 }
 extern char g_StrTmp[0x400];
+extern "C" int LoadModel__Q29CCharaPcs7CHandleFiUlUlUliii(
+    void* self, int, unsigned long, unsigned long, unsigned long, int, int, int);
+static inline int pppLoadModelRet(
+    CCharaPcs::CHandle* h, int a, unsigned long b, unsigned long c,
+    unsigned long d, int e, int f, int g) {
+    return LoadModel__Q29CCharaPcs7CHandleFiUlUlUliii(h, a, b, c, d, e, f, g);
+}
 extern "C" const double kPartMngZeroDouble = 0.0;
 extern "C" const float kPartMngAngleHalfUnit = 32768.0f;
 extern "C" const float kPartMngHalfTurnDegrees = 180.0f;
@@ -2250,18 +2257,18 @@ void CPartMng::pppEditBeforeCalc()
             if (handle != 0) {
                 handle->Add();
                 handle->m_charaNo = 3;
-                handle->LoadModel(
-                    *reinterpret_cast<int*>(self + 0x190),
-                    *reinterpret_cast<unsigned long*>(self + 0x194),
-                    *reinterpret_cast<unsigned long*>(self + 0x198),
-                    0,
-                    -1,
-                    0,
-                    0
-                );
-
-                if (handle == (*editorObj)->m_charaModelHandle && !handle->IsModelLoaded(1)) {
-                    delete handle;
+                if (pppLoadModelRet(
+                        handle,
+                        *reinterpret_cast<int*>(self + 0x190),
+                        *reinterpret_cast<unsigned long*>(self + 0x194),
+                        *reinterpret_cast<unsigned long*>(self + 0x198),
+                        0,
+                        -1,
+                        0,
+                        0
+                    ) == 0 &&
+                    (*editorObj)->m_charaModelHandle != 0) {
+                    delete (*editorObj)->m_charaModelHandle;
                     (*editorObj)->m_charaModelHandle = 0;
                 }
             }

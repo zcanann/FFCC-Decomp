@@ -3120,10 +3120,10 @@ void CPartMng::pppDrawPrioPdtFpno(unsigned char drawMode, short kind, short node
         return;
     }
 
+    ppvMng = reinterpret_cast<_pppMngSt*>(mng);
     partPos.x = mng->m_matrix.value[0][3];
     partPos.y = mng->m_matrix.value[1][3];
     partPos.z = mng->m_matrix.value[2][3];
-    ppvMng = reinterpret_cast<_pppMngSt*>(mng);
 
     {
         struct PppCullBound { Vec m_min; Vec m_max; };

@@ -2948,8 +2948,8 @@ void CGMonObj::setRepop(int mode)
 	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x1000);
 
 	short countC = (weaponMode == 0) ?
-		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle[9]) + 0x1AE) :
-		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle[9]) + 0x1AC);
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AE) :
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AC);
 	int particleBase = (weaponMode == 0) ? 0x3C : 0x46;
 
 	for (int i = 0; i < static_cast<int>(countC); i++) {
@@ -2957,7 +2957,7 @@ void CGMonObj::setRepop(int mode)
 		prgObj->putParticleBindTrace((particleBase + i) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x594), object, 0.0f, 0);
 	}
 
-	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(scriptHandle[9]) + 0xFC) == 0xB) {
+	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC) == 0xB) {
 		object->SetTexAnim(const_cast<char*>(s_monObjTexAnimU1));
 	}
 

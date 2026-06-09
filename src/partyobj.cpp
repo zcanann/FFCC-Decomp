@@ -271,19 +271,31 @@ static int getCarryAnimNo(CGPartyObj* self, int carryType)
 		return 5;
 	}
 
-	unsigned char* script = reinterpret_cast<unsigned char*>(self->m_scriptHandle);
-	int entry = (*reinterpret_cast<unsigned short*>(script + 0x3E2) +
-	             *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2) * 0x1CA;
-	unsigned int table = Game.unk_flat3_field_30_0xc7e0 + entry;
 	if (carryType == 0) {
 		if (CFlatItemCarryMode() == 1) {
+			unsigned char* script = reinterpret_cast<unsigned char*>(self->m_scriptHandle);
+			unsigned int table = Game.unk_flat3_field_30_0xc7e0 +
+			    (*reinterpret_cast<unsigned short*>(script + 0x3E2) +
+			     *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2) * 0x1CA;
 			return *reinterpret_cast<unsigned short*>(table + 0x1C6);
 		}
+		unsigned char* script = reinterpret_cast<unsigned char*>(self->m_scriptHandle);
+		unsigned int table = Game.unk_flat3_field_30_0xc7e0 +
+		    (*reinterpret_cast<unsigned short*>(script + 0x3E2) +
+		     *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2) * 0x1CA;
 		return *reinterpret_cast<unsigned short*>(table + 0x1C2);
 	} else {
 		if (CFlatItemCarryMode() == 1) {
+			unsigned char* script = reinterpret_cast<unsigned char*>(self->m_scriptHandle);
+			unsigned int table = Game.unk_flat3_field_30_0xc7e0 +
+			    (*reinterpret_cast<unsigned short*>(script + 0x3E2) +
+			     *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2) * 0x1CA;
 			return *reinterpret_cast<unsigned short*>(table + 0x1C8);
 		}
+		unsigned char* script = reinterpret_cast<unsigned char*>(self->m_scriptHandle);
+		unsigned int table = Game.unk_flat3_field_30_0xc7e0 +
+		    (*reinterpret_cast<unsigned short*>(script + 0x3E2) +
+		     *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2) * 0x1CA;
 		return *reinterpret_cast<unsigned short*>(table + 0x1C4);
 	}
 }

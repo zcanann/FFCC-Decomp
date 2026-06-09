@@ -1841,17 +1841,17 @@ void CCaravanWork::CalcStatus()
 		break;
 	}
 
-	unsigned short hpBonus = 0;
-	short cmdBonus = 0;
-	short strBonus = 0;
-	short magBonus = 0;
-	short defBonus = 0;
+	int hpBonus = 0;
+	int cmdBonus = 0;
+	int strBonus = 0;
+	int magBonus = 0;
+	int defBonus = 0;
 	for (int i = 0; i < 100; i++) {
 		int artifactId = m_artifacts[i];
 		if (artifactId > 0) {
 			unsigned short* artifactData = GetItemDataPtr(artifactId);
 			int artifactEffect = artifactData[0];
-			short value = artifactData[3];
+			int value = artifactData[3];
 
 			switch (artifactEffect) {
 			case 0x9F:

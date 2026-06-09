@@ -2959,9 +2959,9 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 			}
 			break;
 		case 0x206: {
-			int a = m_unk68C;
-			int b = m_comboFramePrev;
 			if (effectArg0 == 2) {
+				int a = m_unk68C;
+				int b = m_comboFramePrev;
 				if (b < a * 3) {
 					if (a * 2 <= b) {
 						CFlatRuntime2Storage().SetParticleWorkSe(0x871, 2, 0);
@@ -2971,6 +2971,8 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 				}
 			}
 			if (effectArg0 == 3) {
+				int a = m_unk68C;
+				int b = m_comboFramePrev;
 				if (b < a * 3) {
 					if (a * 2 <= b) {
 						CFlatRuntime2Storage().SetParticleWorkNo(particleNo | (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) + 0x73));

@@ -758,11 +758,11 @@ void CalcReflectionVector2(
 
             axis = 0;
             maxAxis = absX;
-            if (absX < absY) {
+            if (absY > absX) {
                 axis = 1;
                 maxAxis = absY;
             }
-            if (maxAxis < absZ) {
+            if (absZ > maxAxis) {
                 axis = 2;
             }
             CVector reflected(outVec->x, outVec->y, outVec->z);

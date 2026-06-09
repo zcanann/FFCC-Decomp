@@ -367,10 +367,8 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 	do
 	{
 		_pppPObjLink* allocation = (_pppPObjLink*)Memory._Alloc(allocSize, stage, file, line, 1);
-		if (allocation != 0)
+		if (allocation == 0)
 		{
-			return allocation;
-		}
 
 		if (firstAllocFailure)
 		{
@@ -474,6 +472,12 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 				}
 				obj = next;
 			}
+		}
+
+		}
+		else
+		{
+			return allocation;
 		}
 	}
 	while (canRetry);

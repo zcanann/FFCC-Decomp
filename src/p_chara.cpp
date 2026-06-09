@@ -2772,10 +2772,11 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         }
 
         Vec lightPos;
-        Mtx* modelMtx = ModelLocalMtx(m_model);
-        lightPos.x = (*modelMtx)[0][3];
-        lightPos.y = (*modelMtx)[1][3];
-        lightPos.z = (*modelMtx)[2][3];
+        Mtx modelMtx;
+        PSMTXCopy(*ModelLocalMtx(m_model), modelMtx);
+        lightPos.x = modelMtx[0][3];
+        lightPos.y = modelMtx[1][3];
+        lightPos.z = modelMtx[2][3];
         LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), &lightPos, 0xFFFFFFFF);
     }
 
@@ -2796,10 +2797,11 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         }
     } else if (drawPass == 2) {
         CVector modelPos;
-        Mtx* modelMtx = ModelLocalMtx(m_model);
-        modelPos.x = (*modelMtx)[0][3];
-        modelPos.y = (*modelMtx)[1][3];
-        modelPos.z = (*modelMtx)[2][3];
+        Mtx modelMtx;
+        PSMTXCopy(*ModelLocalMtx(m_model), modelMtx);
+        modelPos.x = modelMtx[0][3];
+        modelPos.y = modelMtx[1][3];
+        modelPos.z = modelMtx[2][3];
 
         CVector focusPos(CharaPcs.m_texShadowPos);
         CVector delta;

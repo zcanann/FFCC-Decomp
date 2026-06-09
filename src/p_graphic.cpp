@@ -358,8 +358,8 @@ void CGraphicPcs::drawScreenFade()
                 const float phase = slotData->m_phase;
                 const float stretch = slotData->m_stretch;
                 const float amp = slotData->m_amplitude * (kGraphicOne - t);
-                const float size = amp + kGraphicOne;
                 const float offX = stretch * (kGraphicScreenCenterX * amp) * (float)sin((double)phase);
+                const float size = amp + kGraphicOne;
                 const float offY = stretch * (kGraphicScreenCenterY * amp) * (float)cos((double)phase);
 
                 GXBegin(GX_QUADS, GX_VTXFMT0, 4);

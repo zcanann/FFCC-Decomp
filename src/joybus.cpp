@@ -1549,7 +1549,7 @@ timeout_expiry:
                 int sendRes = SendMapNo(threadParam);
                 if (sendRes >= 0)
                 {
-                    if (m_fileBaseB_dup == 0)
+                    if ((int)m_fileBaseB_dup == 0)
                     {
                         GbaQue.ClrStageFlg(threadParam->m_portIndex);
                         threadParam->m_state = 'F';

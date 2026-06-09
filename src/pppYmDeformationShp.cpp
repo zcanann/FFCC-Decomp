@@ -315,7 +315,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 		} else {
 			short size = param_2->m_size;
 			short split = param_2->m_splitSize;
-			float uvSplit = (kPppYmDeformationShpOne / (float)(size + size)) * (float)(size - split);
+			float uvSplit = (kPppYmDeformationShpOne / (float)((u8)param_2->m_size + (u8)param_2->m_size)) * (float)(size - split);
 			float uvRemainder;
 
 			setVertexPos(vertices, (s8)param_2->m_orientation, -size, -split, -split, split);

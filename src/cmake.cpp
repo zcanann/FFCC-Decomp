@@ -3406,11 +3406,12 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
     if (yesNoSel != 0) {
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-        col.r = 0xFF;
-        col.g = 0xFF;
-        col.b = 0xFF;
-        col.a = static_cast<unsigned char>(static_cast<int>(alpha255));
-        GXSetChanMatColor(GX_COLOR0A0, col);
+        GXColor col2;
+        col2.r = 0xFF;
+        col2.g = 0xFF;
+        col2.b = 0xFF;
+        col2.a = static_cast<unsigned char>(static_cast<int>(alpha255));
+        GXSetChanMatColor(GX_COLOR0A0, col2);
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x64 : 0x3D));
         MenuPcs.DrawRect(
             0, 516.0f, 360.0f, 48.0f, 48.0f,

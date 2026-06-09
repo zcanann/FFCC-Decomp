@@ -1256,7 +1256,6 @@ void CGObject::hit()
         return;
     }
 
-    const float zero = sZeroFloat;
     for (CGObject* other = CFlat.FindGObjFirst(); other != 0;
          other = CFlat.FindGObjNext(other)) {
         if (((other->m_bgColMask & 0x80000) == 0) || (other == this)) {
@@ -1270,6 +1269,8 @@ void CGObject::hit()
         if ((nearRadius * nearRadius) < distSq) {
             continue;
         }
+
+        const float zero = sZeroFloat;
 
         for (int attackIndex = 0; attackIndex < 8; attackIndex++) {
             AttackCol* attack = &m_attackColliders[attackIndex];
@@ -1882,7 +1883,7 @@ void CGObject::copy()
         m_shieldModelHandle->m_fogBlend = m_worldParam;
     }
 
-    if (static_cast<s8>(static_cast<s32>(*reinterpret_cast<u8*>(&m_weaponNodeFlags) << 26) >> 31) == 0) {
+    if (m_weaponNodeFlagBits.m_unk20 == 0) {
         hasModel = false;
         m_charaModelHandle->m_flags &= 0xFFFFFFFE;
 
@@ -1904,7 +1905,7 @@ void CGObject::copy()
         }
     }
 
-    if (static_cast<s8>(static_cast<s32>(*reinterpret_cast<u8*>(&m_shieldNodeFlags) << 26) >> 31) == 0) {
+    if (m_shieldNodeFlagBits.m_bit20 == 0) {
         hasModel = false;
         m_charaModelHandle->m_flags &= 0xFFFFFFFB;
 
@@ -2509,10 +2510,10 @@ void CGObject::boundCheck()
     PSMTX44Concat(screenMtx, clipMtx, screenMtx);
 
     if ((m_charaModelHandle != 0) && (m_charaModelHandle->m_model != 0)) {
+        const float clipLimit = 2.0f;
+        const float oneF = sAnimFrameOffset;
         const double zero = static_cast<double>(sZeroFloat);
         const double one = static_cast<double>(sAnimFrameOffset);
-        const float oneF = sAnimFrameOffset;
-        const float clipLimit = 2.0f;
 
         clipMask = 0x1F;
         for (s32 i = 0; (clipMask != 0) && (i < 8); i++) {
@@ -3328,10 +3329,10 @@ float CGObject::CalcSafePos(int hitMask, CGObject* other, Vec* outSafePos)
     float safeDistance = sZeroFloat;
 
     centerPos.x = other->m_worldPosition.x;
-    if (m_worldPosition.y > other->m_worldPosition.y) {
-        centerPos.y = m_worldPosition.y;
-    } else {
+    if (other->m_worldPosition.y > m_worldPosition.y) {
         centerPos.y = other->m_worldPosition.y;
+    } else {
+        centerPos.y = m_worldPosition.y;
     }
     centerPos.y += m_capsuleHalfHeight;
     centerPos.z = other->m_worldPosition.z;

@@ -948,7 +948,7 @@ void birth(
 			*f32_at(particlePayload, 0x04) = *f32_at(particlePayload, 0x04) * *f32_at(payload, 0xDC);
 			*f32_at(particlePayload, 0x08) = *f32_at(particlePayload, 0x08) * *f32_at(payload, 0xE0);
 		}
-	} else if ((s32)payload[0x2A] < 10) {
+	} else {
 		s8 speedMode = payload[0xE8];
 		s16 pathIndex = *s16_at(payload, 0xF0);
 		Vec* pathBase = reinterpret_cast<Vec*>(pObject->m_drawMatrixPtr);

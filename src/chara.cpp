@@ -1835,6 +1835,7 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 
 #pragma push
 #pragma opt_common_subs off
+#pragma opt_propagation off
 /*
  * --INFO--
  * PAL Address: 0x80071078
@@ -1907,6 +1908,7 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 	float randomScale = FLOAT_803301D0 * Math.RandF() + FLOAT_803301D0;
 	Vec windImpulse;
 	{
+		float windScale = dynParam[2];
 		CVector tmp;
 		PSVECScale(&ModelDynJitter(this), reinterpret_cast<Vec*>(&tmp), randomScale);
 		Vec windForce;
@@ -1914,7 +1916,7 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 		windForce.y = tmp.y;
 		windForce.z = tmp.z;
 		CVector tmp2;
-		PSVECScale(&windForce, reinterpret_cast<Vec*>(&tmp2), dynParam[2]);
+		PSVECScale(&windForce, reinterpret_cast<Vec*>(&tmp2), windScale);
 		windImpulse.x = tmp2.x;
 		windImpulse.y = tmp2.y;
 		windImpulse.z = tmp2.z;
@@ -1938,8 +1940,9 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 
 	Vec predicted;
 	{
+		float velScale = dynParam[0];
 		CVector tmp;
-		PSVECScale(&NodeDynVelocity(node), reinterpret_cast<Vec*>(&tmp), dynParam[0]);
+		PSVECScale(&NodeDynVelocity(node), reinterpret_cast<Vec*>(&tmp), velScale);
 		Vec step;
 		step.x = tmp.x;
 		step.y = tmp.y;
@@ -1961,7 +1964,7 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 		direction.z = tmp.z;
 	}
 	for (int axis = 0; axis < 2; axis++, dynParam++) {
-		if (dynParam[3] != 0.0f) {
+		if (*reinterpret_cast<int*>(&dynParam[3]) != 0) {
 			float angle;
 			if (axis == 0) {
 				float dotForward = PSVECDotProduct(&forward, &direction);
@@ -1974,15 +1977,18 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 			}
 			float limit = FLOAT_803301D4 * dynParam[5];
 			if (angle <= limit || FLOAT_803301D4 * dynParam[7] <= angle) {
-				if (limit < angle) {
-					limit = FLOAT_803301D4 * dynParam[7];
+				float rot;
+				if (angle <= limit) {
+					rot = limit - angle;
+				} else {
+					rot = FLOAT_803301D4 * dynParam[7] - angle;
 				}
 
 				Mtx rotate;
 				if (axis == 0) {
-					PSMTXRotAxisRad(rotate, &right, limit - angle);
+					PSMTXRotAxisRad(rotate, &right, rot);
 				} else {
-					PSMTXRotAxisRad(rotate, &up, limit - angle);
+					PSMTXRotAxisRad(rotate, &up, rot);
 				}
 				PSMTXMultVecSR(rotate, &direction, &direction);
 			}
@@ -2033,7 +2039,11 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 		dynOffset.x = tmp.x;
 		dynOffset.y = tmp.y;
 		dynOffset.z = tmp.z;
-		PSVECAdd(&origin, &dynOffset, &NodeDynPosition(node));
+		CVector tmp2;
+		PSVECAdd(&origin, &dynOffset, reinterpret_cast<Vec*>(&tmp2));
+		NodeDynPosition(node).x = tmp2.x;
+		NodeDynPosition(node).y = tmp2.y;
+		NodeDynPosition(node).z = tmp2.z;
 	}
 }
 #pragma pop

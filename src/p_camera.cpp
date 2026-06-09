@@ -921,7 +921,7 @@ void CCameraPcs::draw()
         GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
         GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
         CColor drawColor(0xFF, 0xFF, 0xFF, 0xFF);
-        Graphic.DrawSphere(m_cameraMatrix, reinterpret_cast<Vec*>(&m_targetX), kCameraDebugZoomStep, &drawColor.color);
+        Graphic.DrawSphere(m_cameraMatrix, reinterpret_cast<Vec*>(&m_targetX), kCameraDebugZoomStep, drawColor);
     }
 
     if (g_map_draw_prof != 0) {

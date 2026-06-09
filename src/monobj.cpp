@@ -2118,23 +2118,15 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 	}
 
 	if ((flags & 1) != 0) {
-		CMapCylinder hitCylinder;
-		hitCylinder.m_axis.x = kMonObjHalf * object->m_bodyEllipsoidRadius;
-		hitCylinder.m_axis.y = kMonObjMaxBound;
-		hitCylinder.m_axis.z = kMonObjMinBound;
-		hitCylinder.m_radius = kMonObjMinBound;
-		hitCylinder.m_bound.m_min.x = kMonObjMinBound;
-		hitCylinder.m_bound.m_min.y = kMonObjMaxBound;
-		hitCylinder.m_bound.m_min.z = kMonObjMaxBound;
-		hitCylinder.m_bound.m_max.x = kMonObjMaxBound;
-		hitCylinder.m_bound.m_max.y = kMonObjMaxBound;
-		hitCylinder.m_bound.m_max.z = kMonObjMinBound;
+		float cylRadius = kMonObjHalf * object->m_bodyEllipsoidRadius;
+		CMapCylinder hitCylinder(kMonObjMaxBound, kMonObjMinBound);
 		hitCylinder.m_bottom.x = startPos.x;
 		hitCylinder.m_bottom.y = startPos.y;
 		hitCylinder.m_bottom.z = startPos.z;
-		hitCylinder.m_top.x = move.x;
-		hitCylinder.m_top.y = move.y;
-		hitCylinder.m_top.z = move.z;
+		hitCylinder.m_axis.x = move.x;
+		hitCylinder.m_axis.y = move.y;
+		hitCylinder.m_axis.z = move.z;
+		hitCylinder.m_radius = cylRadius;
 
 		int hit = MapMng.CheckHitCylinderNear(&hitCylinder, reinterpret_cast<Vec*>(&move), *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1B2));
 		if (hit != 0) {
@@ -2144,7 +2136,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 			PSVECScale(reinterpret_cast<Vec*>(&move), reinterpret_cast<Vec*>(&move), g_hit_t);
 			distance = static_cast<float>(static_cast<double>(distance) * static_cast<double>(g_hit_t));
 		}
-		gCFlatRuntime2.AddDebugDrawCC(reinterpret_cast<Vec*>(&startPos), reinterpret_cast<Vec*>(&move), hitCylinder.m_axis.x, 1, hit);
+		gCFlatRuntime2.AddDebugDrawCC(reinterpret_cast<Vec*>(&startPos), reinterpret_cast<Vec*>(&move), cylRadius, 1, hit);
 	}
 
 	if ((flags & 2) != 0) {

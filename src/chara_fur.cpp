@@ -946,6 +946,8 @@ void CChara::LoadFurTexBuffer(unsigned short* inTexels)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_common_subs off
 void CChara::CModel::InitMogFurTex()
 {
 	CTextureSet* textureSet = m_texSet;
@@ -973,6 +975,7 @@ void CChara::CModel::InitMogFurTex()
 		m_flagsA0 = static_cast<unsigned char>(__rlwimi(m_flagsA0, 1, 6, 25, 25));
 	}
 }
+#pragma pop
 
 /*
  * --INFO--

@@ -143,6 +143,8 @@ void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, _pppCtrlTable* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma optimization_level 3
 void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* step, _pppCtrlTable* param_3)
 {
     KeShpTail3XWork* work;
@@ -385,6 +387,7 @@ advance_segment:
     segRemain += segLen;
     goto advance_segment;
 }
+#pragma pop
 
 /*
  * --INFO--

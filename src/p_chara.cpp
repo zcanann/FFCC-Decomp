@@ -2272,12 +2272,12 @@ foundTexture:
         }
 
         if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-            System.Printf(const_cast<char*>(s_charaTexLoadAmemFmt), charaKind, static_cast<int>(charaNo),
+            System.Printf(const_cast<char*>(s_charaTexLoadAmemFmt), charaKind, static_cast<unsigned int>(charaNo),
                           static_cast<int>(textureVariant));
         }
     } else {
         if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-            System.Printf(const_cast<char*>(s_charaTexLoadDvdFmt), charaKind, static_cast<int>(charaNo),
+            System.Printf(const_cast<char*>(s_charaTexLoadDvdFmt), charaKind, static_cast<unsigned int>(charaNo),
                           static_cast<int>(textureVariant));
         }
 

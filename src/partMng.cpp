@@ -415,13 +415,14 @@ void CPartMng::Destroy()
                 }
             }
         }
-        delete[] res->m_pppModelStArr;
+        delete[] modelArr;
         res->m_pppModelStArr = 0;
     }
 
     if (res->m_pppShapeStArr != 0) {
+        pppShapeSt* shapeArr = res->m_pppShapeStArr;
         for (unsigned int i = 0; i < 0x100; i++) {
-            pppShapeSt* shape = &res->m_pppShapeStArr[i];
+            pppShapeSt* shape = &shapeArr[i];
             if (shape->m_inUse != 0) {
                 if (--shape->m_refCount <= 0) {
                     if (shape->m_animData != 0) {
@@ -437,7 +438,7 @@ void CPartMng::Destroy()
                 }
             }
         }
-        delete[] res->m_pppShapeStArr;
+        delete[] shapeArr;
         res->m_pppShapeStArr = 0;
     }
 
@@ -2390,7 +2391,10 @@ void CPartMng::pppEditPartCalc()
         _pppStartPart(firstMng, *reinterpret_cast<long**>(self + 0x5dc), 1);
     }
 
-    if (ppvSysStopPartF != 0 || *reinterpret_cast<long**>(self + 0x5dc) == 0) {
+    if (ppvSysStopPartF != 0) {
+        return;
+    }
+    if (*reinterpret_cast<long**>(self + 0x5dc) == 0) {
         return;
     }
 
@@ -3273,16 +3277,16 @@ void CPartMng::pppDraw()
             PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
             mng->m_sortDepth = viewPos.z;
 
-            if ((signed char)mng->m_drawPass != 1) {
-                if ((unsigned char)mng->m_drawPass < 1) {
-                    if ((signed char)mng->m_drawPass >= 0) {
-                        ppvDrawMng.AddPrim(viewPos.z, reinterpret_cast<_pppMngSt*>(mng), mng->m_drawSubType);
-                    }
-                } else if ((signed char)mng->m_drawPass < 3) {
-                    ppvDrawMng.AddPrimOt(0, reinterpret_cast<_pppMngSt*>(mng));
-                }
-            } else {
+            switch ((signed char)mng->m_drawPass) {
+            case 0:
+                ppvDrawMng.AddPrim(viewPos.z, reinterpret_cast<_pppMngSt*>(mng), mng->m_drawSubType);
+                break;
+            case 1:
                 ppvDrawMng.AddPrimOt(0x3FF, reinterpret_cast<_pppMngSt*>(mng));
+                break;
+            case 2:
+                ppvDrawMng.AddPrimOt(0, reinterpret_cast<_pppMngSt*>(mng));
+                break;
             }
             goto nextPart;
 

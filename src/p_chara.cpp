@@ -2444,12 +2444,12 @@ foundModel:
                 System.Printf(const_cast<char*>(s_charaModelLoadAmemFmt), charaKind, static_cast<int>(charaNo));
             }
 
-            m_modelLoadRef->AddRef();
+            loadModel->AddRef();
             m_model = loadModel->m_model;
             m_model->AddRef();
             m_model->Init();
         } else {
-            m_modelLoadRef->AddRef();
+            loadModel->AddRef();
             m_model = loadModel->m_model->Duplicate(SelectLoadStage(&CharaPcs, modelStage));
         }
 #undef modelStage

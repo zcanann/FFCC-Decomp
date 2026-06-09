@@ -4324,10 +4324,12 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     mng->m_prio = *reinterpret_cast<unsigned char*>(fpData2 + 0x0B);
     mng->m_mapObjIndex = *reinterpret_cast<short*>(fpData2 + 0x08);
 
+    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(mng) + 0xE0) = 0;
     mng->m_objHitMask = createParam->m_objectHitMask;
     mng->m_cylinderAttribute = createParam->m_cylinderAttribute;
     mng->m_paramA = createParam->m_paramA;
-    mng->m_paramB = createParam->m_paramB;
+    *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(mng) + 0x54) = createParam->m_paramC;
+    *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(mng) + 0x64) = createParam->m_paramD;
 
     if (createParam->m_positionOffsetPtr == 0) {
         mng->m_position.x = *reinterpret_cast<float*>(fpData + 0x00);

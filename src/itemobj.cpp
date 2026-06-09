@@ -439,6 +439,8 @@ void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* 
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_propagation off
 void CGItemObj::onFrameAlways()
 {
 	unsigned char* self = (unsigned char*)this;
@@ -477,6 +479,7 @@ void CGItemObj::onFrameAlways()
 		}
 	}
 }
+#pragma pop
 
 /*
  * --INFO--

@@ -5310,11 +5310,10 @@ void CGPartyObj::gpmMove()
 		unsigned char* base = CGPartyObj::m_ghostWork;
 		const int slotSel = sGhostPartyWork.slotSel;
 		for (int slot = 0; slot < 3; slot++) {
-			int* threshold = reinterpret_cast<int*>(base + 0x24);
 			if (slot == slotSel) {
-				*threshold = 0;
+				*reinterpret_cast<int*>(base + 0x24) = 0;
 			} else {
-				*threshold = *threshold / 2;
+				*reinterpret_cast<int*>(base + 0x24) = *reinterpret_cast<int*>(base + 0x24) / 2;
 			}
 			base += 4;
 		}

@@ -4298,11 +4298,10 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     mng->m_cullRadius = *reinterpret_cast<float*>(fpData1 + 0x18);
     mng->m_cullYOffset = *reinterpret_cast<float*>(fpData1 + 0x1C);
     mng->m_pppPObjLinkHead.m_next = 0;
-    mng->m_pppPObjLinkHead.m_owner = 0;
     mng->m_pppPDataVals = 0;
 
     *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(mng) + 0xFC) =
-        *reinterpret_cast<short*>(fpData2 + 0x0);
+        *reinterpret_cast<unsigned short*>(fpData2 + 0x0);
     mng->m_field118 = *reinterpret_cast<unsigned short*>(fpData2 + 0x2);
     mng->m_matrixMode = *reinterpret_cast<unsigned char*>(fpData2 + 0x5);
     mng->m_drawVariant = *reinterpret_cast<unsigned char*>(fpData2 + 0x6);

@@ -2457,9 +2457,9 @@ void CMaterialMan::SetPosition(
     searchBound.m_max.y = position->y + rangeY;
 
     if (target == static_cast<CMapShadow::TARGET>(0)) {
-        CPtrArray<CMapShadow*>* mapShadowArray = &MapMng.GetMapShadowArray();
         ShadowCandidate shadowCandidates[128];
         ShadowCandidate* candidateWrite = shadowCandidates;
+        CPtrArray<CMapShadow*>* mapShadowArray = &MapMng.GetMapShadowArray();
         int candidateCount = 0;
 
         for (unsigned int i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {

@@ -3218,13 +3218,13 @@ void CGMonObj::moveFrame()
 		object->m_groundHitOffset.z += moveDelta.z;
 	}
 
+	float stepRemaining = in_f29 - stepDist;
 	if ((moveFlags & 0x8000) != 0) {
 		object->m_rotTargetY = 3.1415927f + rotY;
 	} else {
 		object->m_rotTargetY = rotY;
 	}
 
-	float stepRemaining = in_f29 - stepDist;
 	if (((moveFlags & 0x20) == 0 || !(stepRemaining < moveRange)) &&
 		((moveFlags & 0x40) == 0 || stepRemaining < moveRange)) {
 		if ((moveFrame == 0) && ((moveFlags & 0x400) == 0)) {

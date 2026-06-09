@@ -1593,14 +1593,15 @@ search:
             (reinterpret_cast<unsigned int>(mapObjEnd) + (stride - 1) - reinterpret_cast<unsigned int>(mapObj)) /
             stride;
 
-        if (mapObj < mapObjEnd) {
-            for (unsigned int i = 0; i < remaining; i++) {
-                CMapObjAtr* mapObjAtr = mapObj->m_attribute;
-                if (mapObjAtr != 0 && mapObjAtr->m_type == CMapObjAtr::PLAY_STA) {
-                    goto found;
-                }
-                mapObj++;
+        for (unsigned int i = 0; i < remaining; i++) {
+            if (mapObj >= mapObjEnd) {
+                break;
             }
+            CMapObjAtr* mapObjAtr = mapObj->m_attribute;
+            if (mapObjAtr != 0 && mapObjAtr->m_type == CMapObjAtr::PLAY_STA) {
+                goto found;
+            }
+            mapObj++;
         }
 
         mapObj = 0;

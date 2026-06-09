@@ -745,7 +745,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 			reinterpret_cast<CGItemObj*>(newItem)->m_pendingModelHandle = handle;
 			handle->Add();
 
-			handle->LoadModelASync(2, ccfs->m_modelId, ccfs->m_modelParam);
+			reinterpret_cast<CGItemObj*>(newItem)->m_pendingModelHandle->LoadModelASync(2, ccfs->m_modelId, ccfs->m_modelParam);
 
 			if ((unsigned int)System.m_execParam >= 3U) {
 				System.Printf(itemObjStrings + kItemObjStrMemoryCapsuleAsyncStartMsg);

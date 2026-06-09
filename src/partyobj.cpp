@@ -1202,7 +1202,7 @@ tmpArtifactBlock:
 							     caravan->CanAddGil(*reinterpret_cast<int*>(targetBytes + 0x558)) != 0) ||
 							    ((*reinterpret_cast<int*>(targetBytes + 0x500) != 0x24 &&
 							      *reinterpret_cast<int*>(targetBytes + 0x500) != 0x20) &&
-							     *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x5A) + 1 < 0x41)) {
+							     *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xB4) + 1 <= 0x40)) {
 								secondaryCommand = 0x17;
 							} else {
 								secondaryCommand = 4;

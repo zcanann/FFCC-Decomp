@@ -1416,7 +1416,8 @@ void CCameraPcs::createFullShadow()
     m_fullScreenShadow.m_rampTexture = rampTex;
 
     for (i = 0; i < 0x100; i += 8) {
-        rampTex[(i & 0xC) * 0x10 + ((i >> 2) & 0x20) + ((i >> 4) & 7)] = static_cast<unsigned char>(i);
+        rampTex[((i & 3) << 3) + ((i << 4) & 0xC0) + ((i >> 2) & 0x20) + ((i >> 4) & 7)] =
+            static_cast<unsigned char>(i);
         rampTex[(((i + 1) * 8) & 0x18) + (((i + 1) * 0x10) & 0xC0) + (((i + 1) >> 2) & 0x20) + (((i + 1) >> 4) & 7)] =
             static_cast<unsigned char>(i + 1);
         rampTex[(((i + 2) * 8) & 0x18) + (((i + 2) * 0x10) & 0xC0) + (((i + 2) >> 2) & 0x20) + (((i + 2) >> 4) & 7)] =

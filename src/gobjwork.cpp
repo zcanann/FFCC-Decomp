@@ -1668,13 +1668,12 @@ void CCaravanWork::CallShop(int requestType, int arg0, int arg1, int arg2, int a
  */
 void CCaravanWork::SafeDeleteTempItem()
 {
-	int totalSlots = 0;
-	int artifactIndex = 0;
-
 	if ((unsigned int)System.m_execParam >= 3U) {
 		System.Printf(const_cast<char*>(sNoWorldReturnItemWarning));
 	}
 
+	int totalSlots = 0;
+	int artifactIndex = 0;
 	for (int i = 0; i < 50; i++, artifactIndex += 2) {
 		if (artifactIndex < 96 && m_artifacts[artifactIndex] > 0) {
 			unsigned short* artifactData =

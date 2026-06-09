@@ -1647,10 +1647,10 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             CMaterial* defaultMaterial = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x44E) CMaterial;
             defaultMaterial->Create(0, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0));
             *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(defaultMaterial) + 0x24) |= 1;
-            if (materialSet->m_materials.GetSize() == 0) {
-                materialSet->m_materials.Add(defaultMaterial);
-            } else {
+            if (res->m_materialSet->m_materials.GetSize() > 0) {
                 materialSet->m_materials.SetAt(0, defaultMaterial);
+            } else {
+                materialSet->m_materials.Add(defaultMaterial);
             }
         }
         return;
@@ -1923,23 +1923,25 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
 
                 if (res->m_textureSet == 0) {
                     res->m_textureSet = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x447) CTextureSet;
-                    res->m_textureSet->m_textureArray.SetDefaultSize(0x180);
-                    res->m_textureSet->m_textureArray.SetGrow(0);
+                    CTextureSet* textureSet = res->m_textureSet;
+                    textureSet->m_textureArray.SetDefaultSize(0x180);
+                    textureSet->m_textureArray.SetGrow(0);
                 }
 
                 if (res->m_materialSet == 0) {
                     res->m_materialSet = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x44B) CMaterialSet;
-                    res->m_materialSet->m_materials.SetDefaultSize(0x180);
-                    res->m_materialSet->m_materials.SetGrow(0);
+                    CMaterialSet* materialSet = res->m_materialSet;
+                    materialSet->m_materials.SetDefaultSize(0x180);
+                    materialSet->m_materials.SetGrow(0);
                     m_pppEnvSt.m_materialSetPtr = res->m_materialSet;
 
                     CMaterial* defaultMaterial = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x44E) CMaterial;
                     defaultMaterial->Create(0, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0));
                     *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(defaultMaterial) + 0x24) |= 1;
-                    if (res->m_materialSet->m_materials.GetSize() < 1) {
-                        res->m_materialSet->m_materials.Add(defaultMaterial);
+                    if (res->m_materialSet->m_materials.GetSize() > 0) {
+                        materialSet->m_materials.SetAt(0, defaultMaterial);
                     } else {
-                        res->m_materialSet->m_materials.SetAt(0, defaultMaterial);
+                        materialSet->m_materials.Add(defaultMaterial);
                     }
                 }
 
@@ -3531,18 +3533,17 @@ void* CPartMng::pppFileRead(char* filePath, unsigned long& fileSize, void* readB
 
     if (loadState->m_partLoadMode == 1) {
         fileSize = loadState->m_partChunkSize[loadState->m_partChunkIndex];
-        readBuffer = File.m_readBuffer;
         if (fileSize == 0) {
-            readBuffer = 0;
-        } else {
-            Memory.CopyFromAMemorySync(
-                File.m_readBuffer, reinterpret_cast<void*>(loadState->m_partAMemCursor), (fileSize + 0x1f) & ~0x1f);
-            loadState->m_partAMemCursor += fileSize;
-            CheckSum(readBuffer, fileSize);
-            loadState->m_partChunkIndex++;
+            return 0;
         }
+        readBuffer = File.m_readBuffer;
+        Memory.CopyFromAMemorySync(
+            readBuffer, reinterpret_cast<void*>(loadState->m_partAMemCursor), (fileSize + 0x1f) & ~0x1f);
+        loadState->m_partAMemCursor += fileSize;
+        CheckSum(readBuffer, fileSize);
+        loadState->m_partChunkIndex++;
     } else if (readBuffer == 0 && (fileHandle = File.Open(filePath, 0, CFile::PRI_LOW), fileHandle == 0)) {
-        readBuffer = 0;
+        goto failReturn;
     } else if (loadState->m_partLoadMode == 3) {
         File.ReadASync(fileHandle);
         readBuffer = reinterpret_cast<void*>(1);
@@ -3568,6 +3569,9 @@ void* CPartMng::pppFileRead(char* filePath, unsigned long& fileSize, void* readB
     }
 
     return readBuffer;
+
+failReturn:
+    return 0;
 }
 
 /*

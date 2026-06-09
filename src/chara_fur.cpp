@@ -1337,7 +1337,7 @@ int CChara::CModel::PickFur(
 				verts[0].m_valid = 0;
 				verts[1].m_valid = 0;
 
-				for (unsigned int vertexIndex = 0; vertexIndex < count; vertexIndex++) {
+				for (int vertexIndex = 0; vertexIndex < count; vertexIndex++) {
 					const unsigned short* indices = reinterpret_cast<const unsigned short*>(cursor);
 
 					register const S16Vec* posPtr = &mesh->m_workPositions[indices[0]];
@@ -1463,7 +1463,7 @@ int CChara::CModel::PickFur(
 						PSVECCrossProduct(&verts[1].m_viewPos, &verts[0].m_viewPos, normalA);
 						PSVECCrossProduct(&verts[2].m_viewPos, &verts[0].m_viewPos, normalB);
 						PSVECCrossProduct(normalA, normalB, normal);
-						if (static_cast<int>(static_cast<unsigned int>(static_cast<unsigned char>(verts[2].m_valid)) << 0x19 |
+						if (static_cast<int>(static_cast<unsigned int>(static_cast<signed char>(verts[2].m_valid)) << 0x19 |
 						                     static_cast<unsigned int>(static_cast<unsigned char>(verts[2].m_valid)) >> 7) < 0) {
 							CVector normalNeg(-normal.x, -normal.y, -normal.z);
 							normal.x = normalNeg.x;

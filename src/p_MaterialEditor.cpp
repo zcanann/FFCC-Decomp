@@ -203,9 +203,9 @@ void CMaterialEditorPcs::drawViewer()
                     }
 
                     u16 blendMode = polygon->blendMode;
-                    int blend = 1;
                     int srcFactor = 1;
                     int dstFactor = 1;
+                    int blend = 1;
                     int src = blendMode & 3;
                     int dst = (blendMode >> 2) & 3;
 

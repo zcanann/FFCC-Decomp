@@ -1066,7 +1066,7 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* stepData, _p
                                  *f32_at(particle, 0x8C) + *f32_at(particle, 0x94),
                                  kPppRyjMegaBirthSharedZero, kPppRyjMegaBirthSharedZero);
         pppSetBlendMode(params->m_blendMode);
-        pppDrawMesh((pppModelSt*)ppvEnv->m_mapMeshPtr[modelIndex], obj->m_drawMatrixPtr, 1);
+        pppDrawMesh((pppModelSt*)ppvEnv->m_mapMeshPtr[params->m_modelIndex], obj->m_drawMatrixPtr, 1);
         pppCopyMatrix(obj->m_localMatrix, *(pppFMATRIX*)&g_matTmp);
 
         }

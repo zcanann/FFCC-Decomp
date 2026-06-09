@@ -3863,23 +3863,30 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
         blockIndex++;
         dataPtr += chunkSize;
 
-        if (blockCount <= blockIndex)
+        if (blockIndex >= blockCount)
         {
             return 1;
         }
+    }
+    else if (phase == 2 && step >= chunkCount)
+    {
+        return -1;
     }
 
     result = 0;
     localWord = 0;
     localBytes[0] = 0x0B;
 
-    if (phase == 0)
+    if ((signed char)phase == 0)
     {
         if (step == 0)
         {
             if ((signed char)sendType != 3 && (signed char)sendType != 2 && (signed char)sendType != 6 && (signed char)sendType != 7 && (signed char)sendType != 8 && (signed char)sendType != 9)
             {
+                unsigned int singleWord = 0;
                 GbaQue.IsSingleMode(threadParam->m_portIndex);
+                reinterpret_cast<unsigned char*>(&singleWord)[0] = 0x09;
+                reinterpret_cast<unsigned char*>(&singleWord)[1] = 0;
 
                 if (static_cast<signed char>(m_threadRunningMask) == 0)
                 {
@@ -3897,7 +3904,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
                     }
                     else
                     {
-                        m_cmdQueueData[qPort][m_cmdCount[qPort]] = 0x09000000;
+                        m_cmdQueueData[qPort][m_cmdCount[qPort]] = singleWord;
                         m_cmdCount[threadParam->m_portIndex]++;
 
                         OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
@@ -3913,14 +3920,15 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
                 }
             }
 
-            if ((signed char)sendType == 0)
+            signed char st = sendType;
+            if (st == 0)
             {
                 unsigned char* baseA = reinterpret_cast<unsigned char*>(m_fileBaseA);
                 dataPtr = baseA;
                 dataBase = baseA;
                 totalSize = static_cast<unsigned short>(m_fileBaseA_dup);
             }
-            else if ((signed char)sendType == 1)
+            else if (st == 1)
             {
                 unsigned char* baseB = reinterpret_cast<unsigned char*>(m_fileBaseB);
                 dataPtr = baseB;
@@ -3929,7 +3937,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
             }
             else
             {
-                if ((signed char)sendType != 3 && (signed char)sendType != 2 && (signed char)sendType != 6 && (signed char)sendType != 7 && (signed char)sendType != 8 && (signed char)sendType != 9)
+                if (st != 3 && st != 2 && st != 6 && st != 7 && st != 8 && st != 9)
                 {
                     if (System.m_execParam != 0)
                     {
@@ -3944,15 +3952,15 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
                 totalSize = static_cast<unsigned short>(m_letterSizeArr[port]);
             }
 
-            unsigned short size = totalSize;
-            unsigned char blocks = static_cast<unsigned char>(size / 0x2FD);
+            int size = totalSize;
+            int blocks = size / 0x2FD;
 
-            if (static_cast<unsigned short>(blocks) * 0x2FD != size)
+            if (blocks * 0x2FD != size)
             {
                 blocks++;
             }
 
-            blockCount = blocks;
+            blockCount = static_cast<unsigned char>(blocks);
 
             unsigned short crcAcc = 0xFFFF;
             crc = Crc16(size, dataBase, &crcAcc);
@@ -4069,14 +4077,14 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
             }
             else
             {
-                unsigned int remaining = totalSize % 0x2FD;
+                int remaining = totalSize % 0x2FD;
 
                 if (totalSize != 0 && remaining == 0)
                 {
                     remaining = 0x2FD;
                 }
 
-                unsigned int rows = remaining / 3;
+                int rows = remaining / 3;
 
                 if (rows * 3 != remaining)
                 {
@@ -4087,13 +4095,12 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
                 chunkSize = static_cast<unsigned short>(remaining);
             }
 
+            localBytes[0] |= 0x40;
+            localBytes[1] = static_cast<unsigned char>(chunkCount);
             unsigned short len = chunkSize;
-            unsigned char rowCount = static_cast<unsigned char>(chunkCount);
+            *reinterpret_cast<unsigned short*>(localBytes + 2) = __lhbrx(&len, 0);
 
-            unsigned int word = (static_cast<unsigned int>(0x4B) << 24) |
-                                (static_cast<unsigned int>(rowCount) << 16) |
-                                (static_cast<unsigned int>(len & 0x00FF) << 8) |
-                                static_cast<unsigned int>(len >> 8);
+            unsigned int word = localWord;
 
             if (m_threadRunningMask == 0)
             {
@@ -4173,19 +4180,12 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
     }
     else
     {
-        unsigned char* p = dataBase;
+        localBytes[0] |= 0x80;
+        localBytes[1] = *dataBase++;
+        localBytes[2] = *dataBase++;
+        localBytes[3] = *dataBase++;
 
-        signed char b0 = *p++;
-        unsigned char b1 = *p++;
-        unsigned char b2 = *p++;
-
-        dataBase = p;
-
-        unsigned int word =
-            (static_cast<unsigned int>(0x8B) << 24) |
-            (static_cast<unsigned int>(b0) << 16) |
-            (static_cast<unsigned int>(b1) << 8) |
-            static_cast<unsigned int>(b2);
+        unsigned int word = localWord;
 
         if (m_threadRunningMask != 0)
         {
@@ -8125,7 +8125,7 @@ unsigned short JoyBus::Crc16(int len, unsigned char* data, unsigned short* crc)
 loop:
     idx = *crc;
     hi = idx << 8;
-    idx = (unsigned int)((int)(short)idx >> 8);
+    idx = (unsigned int)((int)idx >> 8);
     idx = (unsigned char)idx;
     idx = idx ^ (unsigned int)*data;
     data = data + 1;

@@ -1827,6 +1827,8 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 	PSMTXConcat(reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(this) + 0x08), out, out);
 }
 
+#pragma push
+#pragma opt_common_subs off
 /*
  * --INFO--
  * PAL Address: 0x80071078
@@ -2028,6 +2030,7 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 		PSVECAdd(&origin, &dynOffset, &NodeDynPosition(node));
 	}
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -2919,6 +2922,8 @@ void CChara::CMesh::Duplicate(CChara::CMesh* src, CMemory::CStage* stage)
 	CopyDuplicatedMeshState(this, src);
 }
 
+#pragma push
+#pragma scheduling off
 /*
  * --INFO--
  * PAL Address: 0x8006efe8
@@ -3180,6 +3185,7 @@ void CChara::CMesh::skin(int meshIndex, int start, int count, CChara::CSkin* ski
 	_end:
 	}
 }
+#pragma pop
 
 /*
  * --INFO--

@@ -1000,9 +1000,6 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* stepData, _p
     pppFMATRIX emitterMatrix;
     pppFMATRIX scratchMatrix;
 
-    pppUnitMatrix(scratchMatrix);
-    pppInitBlendMode();
-    pppSetBlendMode(0);
     init_matrix(obj, emitterMatrix, params, work);
 
     int baseRed = baseColor->m_red;
@@ -1019,6 +1016,7 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* stepData, _p
 
         pppFMATRIX drawMatrix;
 
+        pppUnitMatrix(scratchMatrix);
         set_matrix(obj, emitterMatrix, scratchMatrix, params, particle, particleWorldMatrix, drawMatrix, params->m_useEnvDepth);
 
         int red = baseRed + (int)*(s8*)((u8*)particle + 0x32);

@@ -357,8 +357,7 @@ void CCharaPcs::calcViewer()
                     new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_viewer_cpp), 0xEA) CChara::CModel;
                 self->m_viewerModel[0] = model;
                 self->m_viewerModel[0]->Create(File.m_readBuffer, self->m_viewerModelStage);
-                self->m_viewerModel[0]->m_flags10C =
-                    static_cast<unsigned char>(__rlwimi(self->m_viewerModel[0]->m_flags10C, 1, 6, 25, 25));
+                self->m_viewerModel[0]->m_flags10CBits.m_flag10C_40 = 1;
                 File.Close(fileHandle);
             }
             self->m_viewerLoadModel = 0;

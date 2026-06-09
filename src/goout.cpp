@@ -2193,7 +2193,7 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
         if (Game.m_caravanWorkArr[m_selectedChara].m_caravanLocalFlags == 0) {
             int activeMainCharacterCount = 0;
             for (int i = 0; i < 8; i++) {
-                if (Game.m_caravanWorkArr[i].m_objType != 0 && Game.m_caravanWorkArr[i].m_caravanLocalFlags == 0) {
+                if (Game.m_caravanWorkArr[i].m_shopState != 0 && Game.m_caravanWorkArr[i].m_caravanLocalFlags == 0) {
                     activeMainCharacterCount++;
                 }
             }

@@ -1823,8 +1823,8 @@ unsigned short CMenuPcs::CmakeJobCtrl()
     unsigned short down;
     unsigned short repeat;
 
-    int padLock = Pad.m_debugPadLock;
     bool padBusy = false;
+    int padLock = Pad.m_debugPadLock;
     if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
         padBusy = true;
     }

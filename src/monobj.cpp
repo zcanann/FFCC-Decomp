@@ -3312,7 +3312,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 			continue;
 		}
 
-		int artifactLevel;
+		unsigned int artifactLevel;
 		if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
 			int idx = Game.m_gameWork.m_bossArtifactStageIndex;
 			int stage = Game.m_gameWork.m_bossArtifactStageTable[idx];
@@ -3346,7 +3346,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 		if (selectorType == 0) {
 			float maxDist = static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x114));
 			float minDist = static_cast<float>(static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x112)));
-			unsigned short chance = *reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x116);
+			short chance = *reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x116);
 
 			if ((targetDist < maxDist) && (minDist < targetDist)) {
 

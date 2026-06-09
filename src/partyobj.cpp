@@ -1351,7 +1351,7 @@ tmpArtifactBlock:
 		    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x63C)) << 24) & 0xC0000000) >> 31) == 0) ||
 		    caravan->m_hp == 0 ||
 		    ringCommand == -1 ||
-		    ((*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(this) + 0x6F4) & 8) != 0)) {
+		    ((*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(this) + 0x6F4) & 8) != 0)) {
 			return;
 		}
 

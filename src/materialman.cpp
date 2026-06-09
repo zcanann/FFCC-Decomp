@@ -1560,7 +1560,7 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
             GXLoadTexMtxImm(m_objTextureMtx, 0x1E, GX_MTX3x4);
             GXSetTexCoordGen2(static_cast<GXTexCoordID>(0), GX_TG_MTX3x4, GX_TG_POS, 0x1E, GX_FALSE, 0x7D);
             GXLoadTexObj(m_manaParaboloidTexObj0, static_cast<GXTexMapID>(0));
-            GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, 0, GX_DF_NONE, GX_AF_SPEC);
+            GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, 0, GX_DF_NONE, GX_AF_NONE);
             GXSetTevDirect(GX_TEVSTAGE0);
             _GXSetTevOp(0, 0);
             GXSetNumTexGens(1);
@@ -1615,7 +1615,7 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
                 bTest2 = 0;
             }
             GXSetNumChans(1);
-            GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, 0, GX_DF_NONE, GX_AF_SPEC);
+            GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, 0, GX_DF_NONE, GX_AF_NONE);
             _GXSetBlendMode(1, 4, 5, 0xF);
             m_numTevStage = 0;
             unsigned int alpha = m_manaAlpha;

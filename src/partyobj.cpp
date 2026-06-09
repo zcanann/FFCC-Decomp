@@ -2758,8 +2758,10 @@ void CGPartyObj::checkTargetParticle()
 
 		float s = sin(angle);
 		float c = cos(angle);
-		targetPos->x += input.x * c - input.z * s;
-		targetPos->z += input.x * s + input.z * c;
+		float inX = input.x;
+		float inZ = input.z;
+		targetPos->x += inX * c - inZ * s;
+		targetPos->z += inX * s + inZ * c;
 
 		float dist = PSVECDistance(&m_worldPosition, targetPos);
 

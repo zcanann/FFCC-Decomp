@@ -1646,7 +1646,7 @@ void CGObject::update()
                 m_currentAnimSlot != -1 || m_animSlotSel != static_cast<signed char>(shieldFlagsHi)) {
                 m_charaModelHandle->m_model->CalcMatrix();
             }
-            if (static_cast<s32>(static_cast<u32>(weaponFlagsLo) << 26 | static_cast<u32>(weaponFlagsLo) >> 6) < 0 &&
+            if (m_weaponNodeFlagBits.m_unk04 &&
                 miniGameModelPass == 0) {
                 m_charaModelHandle->m_model->CalcSkin();
             }

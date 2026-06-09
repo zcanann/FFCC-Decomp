@@ -1919,7 +1919,6 @@ void CGCharaObj::setSta(int staIndex, int value)
 	int current = *reinterpret_cast<unsigned short*>(staSlot + 0x3E);
 	value &= ~(value >> 31);
 
-	if (current == 0 || value != 0) {
 	if (current == 0 && value != 0) {
 		switch (staIndex) {
 			case 0x1B:
@@ -2052,7 +2051,6 @@ void CGCharaObj::setSta(int staIndex, int value)
 			default:
 				break;
 		}
-	}
 	} else {
 		switch (staIndex) {
 			case 0x1B:

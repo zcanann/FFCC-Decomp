@@ -159,7 +159,8 @@ static unsigned short getPadTrigForSlot(int slot)
 		return 0;
 	}
 
-	int idx = slot & ~((~(Pad.m_debugPadPort - slot | slot - Pad.m_debugPadPort) >> 31));
+	int selectedPort = Pad.m_debugPadPort;
+	unsigned int idx = slot & ~((int)~(selectedPort - slot | slot - selectedPort) >> 31);
 	return Pad.GetPadInputs()[idx].buttonDown[0];
 }
 

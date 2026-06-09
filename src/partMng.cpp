@@ -4420,7 +4420,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
             CGObject* owner = reinterpret_cast<CGObject*>(createParam->m_paramB);
             reinterpret_cast<_pppMngSt*>(mng)->m_owner = owner;
             reinterpret_cast<_pppMngSt*>(mng)->m_lookTarget = createParam->m_lookTargetPtr;
-            if (owner != 0 && owner->m_charaModelHandle != 0 && owner->m_charaModelHandle->m_model != 0) {
+            if (owner != 0) {
                 int node = owner->m_charaModelHandle->m_model->SearchNodeSk(reinterpret_cast<char*>(fpData2 + 0x10));
                 if (node >= 0) {
                     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(mng) + 0xE0) =

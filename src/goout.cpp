@@ -1997,8 +1997,14 @@ card_connected:;
     case 0x14:
         if (m_messageWindowOpen != 0) {
             input = GetGoOutInputMask();
+            bool pressed;
             if ((input & 0x100) != 0) {
                 Sound.PlaySe(2, 0x40, 0x7f, 0);
+                pressed = true;
+            } else {
+                pressed = false;
+            }
+            if (pressed) {
                 MenuPcs.SetCaravanWork(MenuPcs.m_goOutTransferSaveData);
                 MenuPcs.ChgAllModel();
                 SetGoOutMode(1);

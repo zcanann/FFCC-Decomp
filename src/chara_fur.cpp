@@ -1309,7 +1309,7 @@ int CChara::CModel::PickFur(
 		int displayCount = mesh->m_data->m_displayListCount;
 		while (--displayCount >= 0) {
 			CMaterial* material = materialSet->m_materials[displayList->m_material];
-			int paintableMaterial = 0;
+			unsigned int paintableMaterial = 0;
 			CTexture* pickTexture = material->GetFurPickTexture();
 			if (pickTexture != 0 && pickTexture->m_format == 5) {
 				paintableMaterial = 1;

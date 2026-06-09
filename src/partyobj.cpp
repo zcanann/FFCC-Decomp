@@ -4974,7 +4974,7 @@ messageMenu:
 	if (static_cast<signed char>(leader->m_weaponNodeFlags >> 8) < 0 &&
 	    bossState != 0 &&
 	    bossState != *reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x20)) {
-		CMesMenu* mesMenu = MenuPcs.GetMesMenu(5);
+#define mesMenu (*reinterpret_cast<CMesMenu**>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0x120))
 		bool busy = false;
 		if (mesMenu->IsActiveMessage()) {
 			busy = true;
@@ -4983,6 +4983,7 @@ messageMenu:
 			*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x20) = bossState;
 			mesMenu->Open(Game.m_cFlatDataArr[1].Message(bossState - 1), 0x260, 0x20, 0x8E20, 0, 0x65, 0x8B);
 		}
+#undef mesMenu
 	}
 
 	int auraSlot = 0;

@@ -758,9 +758,10 @@ void CGCharaObj::onFramePreCalc()
 		m_pushScale *= (static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x40)) * 0.01f) + 1.0e-07f;
 	}
 #undef CHARA_SCRIPT
-	float pushScale = 1.5f;
-	if (m_pushScale < 1.5f) {
-		pushScale = m_pushScale;
+	float pushScale = m_pushScale;
+	if (pushScale < 1.5f) {
+	} else {
+		pushScale = 1.5f;
 	}
 	m_pushScale = pushScale;
 

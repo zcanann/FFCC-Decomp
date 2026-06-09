@@ -288,7 +288,7 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
                 GXLoadTexObj(reinterpret_cast<GXTexObj*>(m_texObjData[texIndex]), GX_TEXMAP0);
             }
 
-            const s8 blendMode = *reinterpret_cast<const s8*>(entry + 0xC);
+            const u8 blendMode = *reinterpret_cast<const u8*>(entry + 0xC);
             if (blendMode == 0x48) {
                 _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_COPY);
             } else if (blendMode == 0x42) {

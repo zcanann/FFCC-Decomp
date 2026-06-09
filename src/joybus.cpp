@@ -7201,11 +7201,7 @@ int JoyBus::IsInitSend(int portIndex)
     unsigned int result;
 
     // Determine desired "init send" state
-    if (m_threadParams[portIndex].m_sentStartFlag != 0)
-    {
-        result = 0;
-    }
-    else if (state > 0x384)
+    if (m_threadParams[portIndex].m_sentStartFlag != 0 || state > 0x384)
     {
         result = 0;
     }

@@ -1775,7 +1775,6 @@ checkLoaded:
                             continue;
                         }
 
-                        void* rawData = chunkFile.GetAddress();
                         const unsigned int rawSize = static_cast<int>(chunk.m_size);
 
                         switch (dataType) {
@@ -1791,7 +1790,7 @@ checkLoaded:
                             }
 
                             if (loadModel == 0) {
-                                void* rawAddr = rawData;
+                                void* rawAddr = chunkFile.GetAddress();
                                 loadModel = new (pcs->m_stage, const_cast<char*>(s_p_chara_cpp), 0x5E8) CLoadModel;
                                 loadModel->m_keyTag = keyTag;
                                 loadModel->m_keyId = keyId;
@@ -1835,7 +1834,7 @@ checkLoaded:
                             }
 
                             if (loadTexture == 0) {
-                                void* rawAddr = rawData;
+                                void* rawAddr = chunkFile.GetAddress();
                                 loadTexture = new (pcs->m_stage, const_cast<char*>(s_p_chara_cpp), 0x609) CLoadTexture;
                                 loadTexture->m_keyTag = keyTag;
                                 loadTexture->m_keyId = keyId;
@@ -1877,7 +1876,7 @@ checkLoaded:
                             }
 
                             if (loadAnim == 0) {
-                                void* rawAddr = rawData;
+                                void* rawAddr = chunkFile.GetAddress();
                                 CChara::CAnim* anim =
                                     new (pcs->m_stage, const_cast<char*>(s_p_chara_cpp), 0x62A) CChara::CAnim;
                                 anim->Create(rawAddr, pcs->m_viewerAnimStage);
@@ -1894,11 +1893,11 @@ checkLoaded:
                             break;
                         }
                         case 3: {
-                            Sound.LoadSe(rawData);
+                            Sound.LoadSe(chunkFile.GetAddress());
                             break;
                         }
                         case 4: {
-                            Sound.LoadWave(rawData);
+                            Sound.LoadWave(chunkFile.GetAddress());
                             break;
                         }
                         case 5: {
@@ -1913,7 +1912,7 @@ checkLoaded:
                                 }
                             }
 
-                            void* primaryData = rawData;
+                            void* primaryData = chunkFile.GetAddress();
                             const int primarySize = rawSize;
                             if (loadPdt == 0) {
                                 chunkFile.GetNextChunk(chunk);
@@ -2228,8 +2227,11 @@ CCharaPcs::CHandle::~CHandle()
     ReleaseShared(m_pdtLoadRef);
 
     CharaPcs.releaseUnuseLoadModel(0);
-    for (int i = 0; i < 64; i++) {
-        ReleaseHandleAnimSlot(this, i);
+    {
+        CRef** slotPtr = &m_animSlot[0];
+        for (int i = 0; i < 64; i++, slotPtr++) {
+            ReleaseShared(*slotPtr);
+        }
     }
     PruneUnsharedAnimRefs(&CharaPcs, 0);
 }
@@ -2604,10 +2606,9 @@ int CCharaPcs::LoadAnim(int charaKind, int charaNo, char* animName, int unusedAr
     CLoadAnim* loadAnim = FindLoadedAnim(&CharaPcs, charaKind, charaNo, animName);
     if (loadAnim == 0) {
         loadAnim = LoadAnimFromDisk(&CharaPcs, charaKind, charaNo, animName, mergeFileId, mergeFlags);
-    }
-
-    if (loadAnim == 0) {
-        return 0;
+        if (loadAnim == 0) {
+            return 0;
+        }
     }
     return 1;
 }
@@ -3128,8 +3129,9 @@ void CCharaPcs::CHandle::loadModelASyncFrame()
         m_model->CreateDynamics(readBuffer, HandleModelStage(m_asyncCharaKind, 0));
     } else {
         void* readBuffer = File.m_readBuffer;
+        int charaKind = m_asyncCharaKind;
         int keyId = m_asyncCharaNo;
-        void* keyTag = reinterpret_cast<void*>(m_asyncCharaKind);
+        void* keyTag = reinterpret_cast<void*>(charaKind);
         CLoadTexture* loadTexture = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x609) CLoadTexture;
         loadTexture->m_keyTag = keyTag;
         loadTexture->m_keyId = keyId;
@@ -3138,7 +3140,7 @@ void CCharaPcs::CHandle::loadModelASyncFrame()
         loadTexture->m_mergeFlags = 0;
         LoadTextureArray(&CharaPcs)->Add(loadTexture);
         CTextureSet* textureSet = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
-        textureSet->Create(readBuffer, HandleTextureStage(m_asyncCharaKind), 0, 0, 0, 0);
+        textureSet->Create(readBuffer, HandleTextureStage(charaKind), 0, 0, 0, 0);
         loadTexture->m_textureSet = textureSet;
         m_texLoadRef = loadTexture;
         m_texLoadRef->AddRef();

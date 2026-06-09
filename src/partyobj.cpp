@@ -4789,7 +4789,7 @@ void CGPartyObj::gpmCol()
 
 		if (MapMng.CheckHitCylinderNear(&cylinder, &diffVec, flags) != 0) {
 			int capped = i + 1;
-			if (activeTrailCount < capped) {
+			if (capped > activeTrailCount) {
 				capped = activeTrailCount;
 			}
 			i++;

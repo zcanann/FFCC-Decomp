@@ -2283,7 +2283,7 @@ foundTexture:
                           static_cast<int>(textureVariant));
         }
 
-        if (textureVariant != 0) {
+        if (textureVariant >= 1) {
             sprintf(path, s_charaTextureVariantFmt, basePath, static_cast<int>(textureVariant) + 0x61);
         } else {
             strcpy(path, basePath);

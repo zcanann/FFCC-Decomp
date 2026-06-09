@@ -3556,15 +3556,15 @@ void CGCharaObj::combi2()
 			}
 		} else {
 			CharaObjComboCenter(party) = comboCenter;
-			if (playedComboSe || party == 0 ||
-			    (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
-			     (static_cast<unsigned short>(party->GetCID()) & 0x6D) == 0x6D &&
-			     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party->m_scriptHandle) + 0x3B4) != 0)) {
-				CharaObjComboItemId(party) = 0;
-			} else {
+			if (!playedComboSe && party != 0 &&
+			    (Game.m_gameWork.m_menuStageMode == 0 || Game.m_gameWork.m_bossArtifactStageIndex >= 0xF ||
+			     (static_cast<unsigned short>(party->GetCID()) & 0x6D) != 0x6D ||
+			     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party->m_scriptHandle) + 0x3B4) == 0)) {
 				CharaObjComboItemId(party) = comboCmd;
 				party->playSe3D(0x3F, 0x32, 0x96, 0, 0);
 				playedComboSe = true;
+			} else {
+				CharaObjComboItemId(party) = 0;
 			}
 		}
 

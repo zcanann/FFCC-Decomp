@@ -4284,13 +4284,15 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
 
     unsigned char* fpData = reinterpret_cast<unsigned char*>(pdt) + 0x20 + fpNo * 0x60;
 
-    PppMngStCreateRaw* mng = 0;
+    PppMngStCreateRaw* mng;
     for (int i = 0; i < 0x180; i++) {
         if (m_pppMng[i].m_baseTime == -0x1000) {
             mng = reinterpret_cast<PppMngStCreateRaw*>(self + 0x2A18 + i * 0x158);
-            break;
+            goto foundMng;
         }
     }
+    mng = 0;
+foundMng:
     if (mng == 0) {
         return -1;
     }

@@ -487,6 +487,7 @@ void CPartMng::Destroy()
  * Address:	TODO
  * Size:	TODO
  */
+#pragma optimization_level 2
 void CPartMng::pppDumpMngSt()
 {
     struct PppMngStDumpRaw {
@@ -544,6 +545,7 @@ void CPartMng::pppDumpMngSt()
         System.Printf(const_cast<char*>(sPartMngTripleNewline));
     }
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -1403,6 +1405,7 @@ void pppEditGetProjectionMatrix(float (*projectionMatrix)[4])
  * Address:	TODO
  * Size:	TODO
  */
+#pragma opt_lifetimes off
 void CPartMng::pppEditAllReleaseResource()
 {
     static const int kUsbMapMeshTableOffset = 0x7F4;
@@ -1510,6 +1513,7 @@ void CPartMng::pppEditAllReleaseResource()
     }
 #undef self
 }
+#pragma opt_lifetimes reset
 
 /*
  * --INFO--

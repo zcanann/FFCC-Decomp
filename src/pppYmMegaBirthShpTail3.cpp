@@ -92,7 +92,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
 
     pppShapeAnimData* shapeAnim =
         static_cast<pppShapeAnimData*>(ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex]->m_animData);
-    u16 workRand = *(u16*)(workBytes + 0x78);
+    s16 workRand = *(u16*)(workBytes + 0x78);
     const u8 zEnable = (u8)(((u32)__cntlzw((u32)payload[0x55])) >> 5);
     pppSetDrawEnv(
         0, &object->m_drawMatrix, *(float*)(payload + 0xA0), payload[0xA4], step[0x0C],
@@ -116,7 +116,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                 const float alphaScale = (float)*(s16*)((u8*)colorWork + 6) / LoadFloat(kPppYmMegaBirthShpTail3AlphaDivisor);
                 const float stepDivisor = (float)((s32)frameCountRaw - 1);
                 float fadeA = (float)(*(s16*)(workBytes + 0x56) >> 7) * alphaScale;
-                float fadeR = (float)(*(s16*)(workBytes + 0x50) >> 7);
+                float fadeR = (float)(*(u16*)(workBytes + 0x50) >> 7);
                 float fadeG = (float)(*(s16*)(workBytes + 0x52) >> 7);
                 float fadeB = (float)(*(s16*)(workBytes + 0x54) >> 7);
                 float fadeRStep = kPppYmMegaBirthShpTail3Zero;
@@ -302,7 +302,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
         if (colors != 0) {
             colors = colors + 1;
         }
-        *(s16*)(particle + 0x1C) += *(s16*)(step + 0xA);
+        *(u16*)(particle + 0x1C) += *(s16*)(step + 0xA);
     }
 }
 #pragma pop

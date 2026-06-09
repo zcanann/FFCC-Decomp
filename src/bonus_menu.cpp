@@ -1182,7 +1182,7 @@ void CMenuPcs::CalcSelectWait()
 	short& promptMode = window->state;
 	int currentPartySlot = 0;
 	for (; currentPartySlot < activePartyCount; currentPartySlot++) {
-		if (s_Rinfo->m_party[currentPartySlot].m_rank == currentPartyIndex) {
+		if (currentPartyIndex == s_Rinfo->m_party[currentPartySlot].m_rank) {
 			break;
 		}
 	}
@@ -1243,7 +1243,7 @@ void CMenuPcs::CalcSelectWait()
 		if (padLocked) {
 			down = 0;
 		} else {
-			int resolvedPadSlot = (Pad.m_debugPadPort == padSlot) ? 0 : padSlot;
+			int resolvedPadSlot = (padSlot == Pad.m_debugPadPort) ? 0 : padSlot;
 			down = Pad.m_padInputs[resolvedPadSlot].buttonDown[0];
 		}
 		if (delay == 0 && currentPartyIndex < activePartyCount) {
@@ -1277,8 +1277,8 @@ void CMenuPcs::CalcSelectWait()
 					short winH = 0;
 					GetWinSize(0x18, &winW, &winH, 1);
 					SetMcWinInfo((int)winW, (int)winH);
-					promptMode = 0;
 					confirmSel = 1;
+					promptMode = 0;
 					Sound.PlaySe(3, 0x40, 0x7f, 0);
 				}
 			}
@@ -2109,7 +2109,8 @@ void CMenuPcs::CalcResultCloseAnim()
 
 		// iconBase block: src = frameBase (back = activePartyCount sprites); dance
 		int base = activePartyCount + 1;
-		for (int i = 0; i < activePartyCount; i++) {
+		int __p13 = activePartyCount;
+		for (int i = 0; i < __p13; i++) {
 			short* sprite = (short*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
 			*(int*)(sprite + 0x12) = *(int*)(sprite - activePartyCount * 0x20 + 0x12) +
 			    *(int*)(sprite - activePartyCount * 0x20 + 0x14);
@@ -2147,7 +2148,7 @@ void CMenuPcs::CalcResultCloseAnim()
 		base += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
 			short* sprite = (short*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
-			int __p16 = activePartyCount;
+			int __p16 =  (activePartyCount | 0);
 			*(int*)(sprite + 0x12) = *(int*)(sprite - (base - __p16 - 1) * 0x20 + 0x12);
 			*(int*)((int)sprite + 0x2c) = 1;
 			*(float*)(sprite + 0x1c) = (float)(int)*sprite;

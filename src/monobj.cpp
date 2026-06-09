@@ -2999,12 +2999,13 @@ void CGMonObj::moveAStar(int startGroup, int forbiddenGroup, Vec& targetPos)
 		if (((m_moveWork.m_flags & 0x10000) != 0) && ((m_moveWork.m_flags & 0x40) == 0)) {
 			short currentRoute = routeFrom;
 			if ((currentRoute != 0) && (forbiddenGroup != 0) && (currentRoute != forbiddenGroup)) {
-				unsigned char* routeStep = AStar.m_routeTable[currentRoute - 1][forbiddenGroup + 0x36];
+				int forbiddenIdx = forbiddenGroup + 0x36;
+				unsigned char* routeStep = AStar.m_routeTable[currentRoute - 1][forbiddenIdx];
 				CAStar::CAPos* portalPos = &AStar.m_portals[routeStep[1]];
 				float portalDist = PSVECDistance(&object->m_worldPosition, &portalPos->m_position);
 				if ((portalDist < object->m_capsuleHalfHeight) || (startGroup == routeStep[0])) {
 					routeFrom = routeStep[0];
-					portalPos = &AStar.m_portals[AStar.m_routeTable[routeStep[0] - 1][forbiddenGroup + 0x36][1]];
+					portalPos = &AStar.m_portals[AStar.m_routeTable[routeStep[0] - 1][forbiddenIdx][1]];
 				}
 				targetPos.x = portalPos->m_position.x;
 				targetPos.y = portalPos->m_position.y;

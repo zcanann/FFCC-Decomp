@@ -2899,8 +2899,10 @@ void CGPartyObj::checkTargetParticle()
 			getMapHitObject()->CalcHitPosition(targetPos);
 			if (m_scriptHandle != nullptr) {
 				CCaravanWork* work = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
+				Vec faceNormal;
 				work->m_targetCursorPosA = *targetPos;
-				getMapHitObject()->GetHitFaceNormal(&work->m_targetCursorPosB);
+				getMapHitObject()->GetHitFaceNormal(&faceNormal);
+				work->m_targetCursorPosB = faceNormal;
 			}
 		}
 

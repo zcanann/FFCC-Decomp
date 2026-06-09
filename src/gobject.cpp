@@ -1099,7 +1099,7 @@ void CGObject::bgWorldCollision()
         m_radiusCtrl.x =
             *reinterpret_cast<float*>(&MapMng.GetMapIdGrpArray()[gMapHitFace->m_groupIndex].m_mask);
         if (gMapHitFace->m_groupIndex != 0) {
-            m_lastBgGroup = static_cast<short>(gMapHitFace->m_groupIndex);
+            *reinterpret_cast<char*>(&m_lastBgGroup) = static_cast<char>(gMapHitFace->m_groupIndex);
         }
         MapMng.m_hitMapObj->GetHitFaceNormal(&HitFaceNormal());
     }

@@ -3548,7 +3548,6 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 				case 0x100:
 				case 0x125:
 				case 0x126:
-				case 0x127:
 				case 0x12A:
 				case 0x17D:
 				case 0x186:
@@ -3607,9 +3606,14 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 	case 0x0D:
 		if (kind == 0x12) {
 			int item = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + value * 0x48 + 8);
-			if ((item >= 0x24 && item < 0x26) || (item >= 0x69 && item < 0x6B)) {
-				addValue = stageAdd;
+			if (item < 0x69) {
+				if (item >= 0x26 || item < 0x24) {
+					break;
+				}
+			} else if (item >= 0x6B) {
+				break;
 			}
+			addValue = stageAdd;
 		}
 		break;
 	case 0x0F:

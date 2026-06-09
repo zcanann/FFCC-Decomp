@@ -471,7 +471,7 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
             CharaBreakDisplayListPair* displayListPair = displayListPairs[dl];
             POLYGON_DATA* polygon = displayListPair->m_polygonData;
 
-            for (u32 polyIndex = 0; polyIndex < displayListPair->m_polygonCount; polyIndex++) {
+            for (int polyIndex = 0; polyIndex < (int)displayListPair->m_polygonCount; polyIndex++) {
                 S16Vec transformed[3];
 
                 if (polygon->m_enabled == 0) {

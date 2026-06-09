@@ -2906,8 +2906,8 @@ void CMapMng::Draw()
 
         GXSetNumChans(1);
         GXSetChanCtrl(GX_COLOR0, 1, GX_SRC_REG, GX_SRC_VTX, static_cast<GXLightID>(GX_LIGHT0 | GX_LIGHT1),
-                      GX_DF_CLAMP, GX_AF_SPEC);
-        GXSetChanCtrl(GX_ALPHA0, 0, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPOT);
+                      GX_DF_CLAMP, GX_AF_SPOT);
+        GXSetChanCtrl(GX_ALPHA0, 0, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
 
         _GXColor materialColor;
         *reinterpret_cast<u32*>(&materialColor) = 0xFFFFFFFF;
@@ -2917,22 +2917,22 @@ void CMapMng::Draw()
         *reinterpret_cast<u32*>(&ambientColor) = 0x404040FF;
         GXSetChanAmbColor(GX_COLOR0A0, ambientColor);
 
-        if ((s_bitMask.m_fields.m_mode & 2) == 0) {
-            _GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_INVSRCALPHA, GX_LO_COPY);
-            _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0xFF);
-            GXSetZCompLoc(1);
-            GXSetZMode(1, GX_LEQUAL, 1);
-            GXSetCullMode(GX_CULL_FRONT);
-        } else {
-            _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_COPY);
+        if ((s_bitMask.m_fields.m_mode & 2) != 0) {
+            _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_NOOP);
             _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0xFF);
             GXSetZCompLoc(1);
             GXSetZMode(0, GX_ALWAYS, 0);
             GXSetCullMode(GX_CULL_FRONT);
+        } else {
+            _GXSetBlendMode(GX_BM_NONE, GX_BL_DSTALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
+            _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0xFF);
+            GXSetZCompLoc(1);
+            GXSetZMode(1, GX_LEQUAL, 1);
+            GXSetCullMode(GX_CULL_FRONT);
         }
 
         GXSetNumTexGens(1);
-        GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX3x4, GX_TG_NRM, GX_TEXMTX0, 0, GX_PTIDENTITY);
+        GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, 0, GX_PTIDENTITY);
         GXSetNumTevStages(1);
         _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
         _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
@@ -2954,8 +2954,8 @@ void CMapMng::Draw()
         _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
         _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
         GXSetNumChans(1);
-        GXSetChanCtrl(GX_COLOR0A0, 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
-        GXSetChanCtrl(GX_ALPHA0, 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+        GXSetChanCtrl(GX_COLOR0, 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
+        GXSetChanCtrl(GX_ALPHA0, 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
         _GXColor wireColor;
         wireColor.r = 0xFF;
         wireColor.g = 0xFF;

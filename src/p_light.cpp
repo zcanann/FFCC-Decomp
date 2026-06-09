@@ -1229,12 +1229,12 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
             PSMTXIdentity(reinterpret_cast<float(*)[4]>(m_bumpTexScratch));
             float* scratch = m_bumpTexScratch;
 
+            float mtxScale = kBumpTexMtxScale;
             float scrollScale = kBumpTexScrollScale;
             float zero = kLightZero;
             scratch[0] = kBumpTexScrollScale;
             float half = kLightHalf;
             scratch[6] = scrollScale;
-            float mtxScale = kBumpTexMtxScale;
             scratch[10] = zero;
             scratch[5] = zero;
             scratch[9] = zero;

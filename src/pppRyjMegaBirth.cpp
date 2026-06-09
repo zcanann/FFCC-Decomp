@@ -147,14 +147,20 @@ static inline void calc_spawn_position(Vec* out, float speed, u8 mode)
 	switch (mode) {
 	case 1:
 		(void)Math.RandF();
-		out->x = speed * Math.RandF() - halfSpeed;
-		out->y = speed * Math.RandF() - halfSpeed;
-		out->z = speed * Math.RandF() - halfSpeed;
+		out->x = speed * Math.RandF();
+		out->x = out->x - halfSpeed;
+		out->y = speed * Math.RandF();
+		out->y = out->y - halfSpeed;
+		out->z = speed * Math.RandF();
+		out->z = out->z - halfSpeed;
 		break;
 	case 2:
-		out->x = speed * Math.RandF() * Math.RandF() - halfSpeed;
-		out->y = speed * Math.RandF() * Math.RandF() - halfSpeed;
-		out->z = speed * Math.RandF() * Math.RandF() - halfSpeed;
+		out->x = speed * Math.RandF() * Math.RandF();
+		out->x = out->x - halfSpeed;
+		out->y = speed * Math.RandF() * Math.RandF();
+		out->y = out->y - halfSpeed;
+		out->z = speed * Math.RandF() * Math.RandF();
+		out->z = out->z - halfSpeed;
 		break;
 	case 3:
 		out->x = -(kPppRyjMegaBirthRandomSpeedScale * (speed * Math.RandF() * Math.RandF()) - speed) - halfSpeed;
@@ -172,9 +178,12 @@ static inline void calc_spawn_position(Vec* out, float speed, u8 mode)
 		out->z = -(kPppRyjMegaBirthHalf * (Math.RandF() * (speed * Math.RandF() * Math.RandF())) - speed) - halfSpeed;
 		break;
 	default:
-		out->x = speed * Math.RandF() - halfSpeed;
-		out->y = speed * Math.RandF() - halfSpeed;
-		out->z = speed * Math.RandF() - halfSpeed;
+		out->x = speed * Math.RandF();
+		out->x = out->x - halfSpeed;
+		out->y = speed * Math.RandF();
+		out->y = out->y - halfSpeed;
+		out->z = speed * Math.RandF();
+		out->z = out->z - halfSpeed;
 		break;
 	}
 }
@@ -868,6 +877,8 @@ void calc(
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_common_subs off
 void birth(
     _pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* param, VColor* color, _PARTICLE_DATA* particle,
     _PARTICLE_WMAT* worldMat, _PARTICLE_COLOR* colorData)
@@ -937,7 +948,7 @@ void birth(
 			*f32_at(particlePayload, 0x04) = *f32_at(particlePayload, 0x04) * *f32_at(payload, 0xDC);
 			*f32_at(particlePayload, 0x08) = *f32_at(particlePayload, 0x08) * *f32_at(payload, 0xE0);
 		}
-	} else if ((s32)payload[0x2A] < 10) {
+	} else {
 		s8 speedMode = payload[0xE8];
 		s16 pathIndex = *s16_at(payload, 0xF0);
 		Vec* pathBase = reinterpret_cast<Vec*>(pObject->m_drawMatrixPtr);
@@ -964,9 +975,12 @@ void birth(
 				}
 
 				Vec* pathVec = pathBase + ((u16*)*(int*)(pathInfo + 2))[sampleIndex];
-				*f32_at(particlePayload, 0x00) = pathVec->x * *f32_at(payload, 0xD8);
-				*f32_at(particlePayload, 0x04) = pathVec->y * *f32_at(payload, 0xDC);
-				*f32_at(particlePayload, 0x08) = pathVec->z * *f32_at(payload, 0xE0);
+				float pathX = pathVec->x;
+				float pathY = pathVec->y;
+				float pathZ = pathVec->z;
+				*f32_at(particlePayload, 0x00) = pathX * *f32_at(payload, 0xD8);
+				*f32_at(particlePayload, 0x04) = pathY * *f32_at(payload, 0xDC);
+				*f32_at(particlePayload, 0x08) = pathZ * *f32_at(payload, 0xE0);
 				if ((payload[0x2A] == 8) || (payload[0x2A] == 9)) {
 					PSVECNormalize((Vec*)particlePayload, (Vec*)(particlePayload + 0x10));
 				}
@@ -974,14 +988,14 @@ void birth(
 		}
 	}
 
-	*u8_at(particlePayload, 0x24) = random_signed_byte_span(payload[0x58]);
-	*u8_at(particlePayload, 0x25) = random_signed_byte_span(payload[0x59]);
-	*u8_at(particlePayload, 0x26) = random_signed_byte_span(payload[0x5A]);
-	*u8_at(particlePayload, 0x27) = random_signed_byte_span(payload[0x5B]);
+	*u8_at(particlePayload, 0x24) = random_signed_byte_span(payload[0x4C]);
+	*u8_at(particlePayload, 0x25) = random_signed_byte_span(payload[0x4D]);
+	*u8_at(particlePayload, 0x26) = random_signed_byte_span(payload[0x4E]);
+	*u8_at(particlePayload, 0x27) = random_signed_byte_span(payload[0x4F]);
 
-	if (payload[0x22] != 0) {
+	if (payload[0x28] != 0) {
 		*f32_at(particlePayload, 0x54) = (float)color->m_alpha;
-		*u8_at(particlePayload, 0x59) = payload[0x22];
+		*u8_at(particlePayload, 0x59) = payload[0x28];
 	}
 	if (payload[0x29] != 0) {
 		*u8_at(particlePayload, 0x5A) = payload[0x29];
@@ -1091,3 +1105,4 @@ void birth(
 		colorData->m_colorFrameDeltas[3] = *(float*)(payload + 0x38);
 	}
 }
+#pragma pop

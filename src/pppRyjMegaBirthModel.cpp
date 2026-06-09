@@ -1046,12 +1046,11 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* stepData, _p
         int clampedGreen = clamp_u8_int(green);
         int clampedBlue = clamp_u8_int(blue);
         int clampedAlpha = clamp_alpha_7f(alpha);
-        pppCVECTOR drawColor = {{
-            (u8)clampedRed,
-            (u8)clampedGreen,
-            (u8)clampedBlue,
-            (u8)clampedAlpha,
-        }};
+        pppCVECTOR drawColor;
+        drawColor.rgba[0] = (u8)clampedRed;
+        drawColor.rgba[1] = (u8)clampedGreen;
+        drawColor.rgba[2] = (u8)clampedBlue;
+        drawColor.rgba[3] = (u8)clampedAlpha;
 
         GXSetChanAmbColor(GX_COLOR0A0, *(_GXColor*)drawColor.rgba);
 

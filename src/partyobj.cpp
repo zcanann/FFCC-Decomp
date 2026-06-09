@@ -844,7 +844,7 @@ void CGPartyObj::menu()
 	}
 
 	if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-		System.Printf(const_cast<char*>("port:%d mode:%d"), portIndex, Joybus.GetCtrlMode(static_cast<char>(m_animStateMisc)));
+		System.Printf(const_cast<char*>("port:%d mode:%d"), portIndex, Joybus.GetCtrlMode(static_cast<signed char>(m_animStateMisc)));
 	}
 
 	Joybus.ChgCtrlMode(reinterpret_cast<int>(portIndex));
@@ -1361,20 +1361,17 @@ tmpArtifactBlock:
 			int weaponItem;
 			int weaponRef;
 			caravan->GetCurrentWeaponItem(weaponItem, weaponRef);
-			if (weaponItem == party.unk6BC) {
-				const int equippedWeapon =
-					caravan->m_equipment[0] < 0 ? 0 : caravan->m_inventoryItems[caravan->m_equipment[0]];
-				if (weaponRef == equippedWeapon) {
-					m_itemId = weaponRef;
-					changeStat(7, 0, 0);
-					return;
-				}
+			if (weaponItem != party.unk6BC ||
+			    weaponRef != (caravan->m_equipment[0] < 0 ? 0 : caravan->m_inventoryItems[caravan->m_equipment[0]])) {
+				*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D4) = cmdIdx;
+				party.weaponRef = caravan->m_equipment[0] < 0 ? 0 : caravan->m_inventoryItems[caravan->m_equipment[0]];
+				party.commandFlagBits.flag20 = 1;
+				changeStat(0x0F, 0, 0);
+				return;
 			}
 
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D4) = cmdIdx;
-			party.weaponRef = caravan->m_equipment[0] < 0 ? 0 : caravan->m_inventoryItems[caravan->m_equipment[0]];
-			party.commandFlagBits.flag20 = 1;
-			changeStat(0x0F, 0, 0);
+			m_itemId = weaponRef;
+			changeStat(7, 0, 0);
 			return;
 		}
 
@@ -1435,15 +1432,15 @@ tmpArtifactBlock:
 			int weaponItem;
 			int weaponRef;
 			caravan->GetCurrentWeaponItem(weaponItem, weaponRef);
-			if (weaponItem == caravan->GetIdxCmdList() && weaponRef == itemId) {
-				m_itemId = itemId;
-				changeStat(7, 0, 0);
+			if (weaponItem != caravan->GetIdxCmdList() || weaponRef != itemId) {
+				*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D4) = caravan->GetIdxCmdList();
+				party.weaponRef = itemId;
+				party.commandFlagBits.flag20 = 1;
+				changeStat(0x0F, 0, 0);
 				return;
 			}
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D4) = caravan->GetIdxCmdList();
-			party.weaponRef = itemId;
-			party.commandFlagBits.flag20 = 1;
-			changeStat(0x0F, 0, 0);
+			m_itemId = itemId;
+			changeStat(7, 0, 0);
 			return;
 		}
 		if (itemKind != 0x100) {
@@ -1753,13 +1750,13 @@ void CGPartyObj::onFrameStat()
 				    party.carryObject != reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)) {
 					sGhostMogMenuWork.flags.carryActive = (party.carryObject != nullptr);
 				}
-			} else if ((held & 0x400) == 0) {
-				sGhostMogMenuWork.holdTimer = 0;
-			} else {
+			} else if ((held & 0x400) != 0) {
 				sGhostMogMenuWork.holdTimer++;
-				if (sGhostMogMenuWork.holdTimer > 9 && sGhostMogMenuWork.mood == 0) {
+				if (sGhostMogMenuWork.holdTimer >= 10 && sGhostMogMenuWork.mood == 0) {
 					sGhostMogMenuWork.mood = 2;
 				}
+			} else {
+				sGhostMogMenuWork.holdTimer = 0;
 			}
 		}
 		break;
@@ -5212,7 +5209,7 @@ void CGPartyObj::gpmMove()
 			moveKind = 0;
 			if (chalice != nullptr &&
 			    PartyData(this).carryObject == nullptr &&
-			    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(chalice) + 0x9A)) << 24) & 0xC0000000) >> 31) < 0) &&
+			    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(chalice) + 0x9A)) << 24) & 0xC0000000) >> 31) != 0) &&
 			    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(chalice) + 0x550) == 0) {
 				float pickupRadius = (leader->m_bodyEllipsoidRadius + *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(chalice) + 0x144)) * FLOAT_80331A84;
 				if (dist < pickupRadius) {

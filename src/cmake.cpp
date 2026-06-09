@@ -423,7 +423,7 @@ static void LoadCmakeVillageName()
 
 static void StoreCmakeVillageName()
 {
-    memset(Game.m_gameWork.m_townName, 0, sizeof(Game.m_gameWork.m_townName));
+    memset(Game.m_gameWork.m_townName, 0, 17);
     strcpy(Game.m_gameWork.m_townName, s_CmakeInfo.m_name);
 }
 
@@ -865,7 +865,7 @@ void CMenuPcs::CmakeVillageDraw()
     }
     DrawCmakeName(1, showNameCursor, s_CmakeInfo.m_name, alpha);
     DrawCmakeDecision((static_cast<unsigned int>(villageWork->m_row) >> 31) +
-        (static_cast<int>(villageWork->m_row) > 4), alpha);
+        (static_cast<int>(villageWork->m_row) >= 5), alpha);
 }
 
 /*
@@ -1066,7 +1066,7 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
                 if (nameLen == 0) {
                     strcat(s_CmakeInfo.m_name, picked);
                     ret = 0;
-                } else if (strlen(rowText) != 0 && nameLen > 6) {
+                } else if (strlen(rowText) != 0 && nameLen >= 7) {
                     ret = -1;
                 } else {
                     strcat(s_CmakeInfo.m_name, picked);
@@ -1077,7 +1077,7 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
                 Sound.PlaySe(4, 0x40, 0x7f, 0);
             } else {
                 unsigned int finalLen = strlen(s_CmakeInfo.m_name);
-                if (static_cast<int>(finalLen & (static_cast<int>(-finalLen | finalLen) >> 31)) > 6) {
+                if (static_cast<int>(finalLen & (static_cast<int>(-finalLen | finalLen) >> 31)) >= 7) {
                     select = 0xB;
                     row = 5;
                 }
@@ -1269,22 +1269,21 @@ void CMenuPcs::CmakeResultDraw1()
     valueFont->SetColor(valueColor.color);
     valueFont->SetTlut(6);
 
+    char tribeWithSlash[0x40];
     for (int i = 0; i < 4; i++) {
         const char* txt = "";
 
-        switch (i) {
-        case 0:
+        if (i == 0) {
             txt = s_CmakeInfo.m_name;
-            break;
-        case 1:
+        } else if (i == 1) {
             txt = GetMenuStr(s_CmakeInfo.m_gender + 0x11);
-            break;
-        case 2:
+        } else if (i == 2) {
             txt = GetTribeStr(s_CmakeInfo.m_tribe);
-            break;
-        default:
+            strcpy(tribeWithSlash, txt);
+            strcat(tribeWithSlash, "/");
+            txt = tribeWithSlash;
+        } else {
             txt = GetJobStr(s_CmakeInfo.m_job);
-            break;
         }
 
         float x = 8.0f + labelWidths[i];
@@ -2058,7 +2057,7 @@ void CMenuPcs::CmakeTribeDraw()
     hairFont->SetColor(hairRgba.color);
     hairFont->SetTlut(6);
 
-    int hairBase = MenuS16(this, 0x862) * 8;
+    int hairBase = CmakeState(this)->m_select * 8;
     if (s_CmakeInfo.m_gender != 0) {
         hairBase += 4;
     }
@@ -2610,17 +2609,17 @@ void CMenuPcs::CmakeNameDraw()
 
     char* name = GetCmakeNameBuffer();
     int nameCursor = __cntlzw(static_cast<unsigned int>(1 - CmakeState(this)->m_mode)) >> 5;
-    if (4 < CmakeState(this)->m_row) {
+    if (CmakeState(this)->m_row >= 5) {
         nameCursor = 0;
     }
     unsigned int nameLen = strlen(name);
-    if (6 < static_cast<int>(nameLen & (static_cast<int>(-nameLen | nameLen) >> 31))) {
+    if (static_cast<int>(nameLen & (static_cast<int>(-nameLen | nameLen) >> 31)) >= 7) {
         nameCursor = 0;
     }
     DrawCmakeName(0, nameCursor, name, alpha);
     DrawCmakeDecision(
         (static_cast<int>(CmakeState(this)->m_row) >> 31) +
-            (static_cast<int>(static_cast<int>(CmakeState(this)->m_row)) > 4),
+            (static_cast<int>(static_cast<int>(CmakeState(this)->m_row)) >= 5),
         alpha);
 
     if (CmakeMcState(this) != 3) {

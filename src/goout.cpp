@@ -2719,9 +2719,7 @@ void CGoOutMenu::Calc()
                             }
                         }
 
-                        if (transferableCount < 8) {
-                            SetMainMode(2);
-                        } else {
+                        if (transferableCount >= 8) {
                             int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
                             SetMenuStr(0, 6,
                                        GetGoOutMessageLine(languageId, 62),
@@ -2732,6 +2730,8 @@ void CGoOutMenu::Calc()
                                        GetGoOutMessageLine(languageId, 67));
                             m_nextMainMode = 1;
                             SetMainMode(0);
+                        } else {
+                            SetMainMode(2);
                         }
                     }
                     break;
@@ -2747,14 +2747,7 @@ void CGoOutMenu::Calc()
                         }
                     }
 
-                    if (activeCount < 2) {
-                        int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
-                        SetMenuStr(0, 2,
-                                   GetGoOutMessageLine(languageId, 108),
-                                   GetGoOutMessageLine(languageId, 109));
-                        m_nextMainMode = 1;
-                        SetMainMode(0);
-                    } else {
+                    if (activeCount >= 2) {
                         SetMainMode(3);
                         if (m_currentMessage >= 0) {
                             MenuPcs.m_menuWindowInfo->state = 2;
@@ -2764,6 +2757,13 @@ void CGoOutMenu::Calc()
                         m_pendingMessage = -1;
                         m_messageCloseMode = 0;
                         m_pendingMessageTimer = 0;
+                    } else {
+                        int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+                        SetMenuStr(0, 2,
+                                   GetGoOutMessageLine(languageId, 108),
+                                   GetGoOutMessageLine(languageId, 109));
+                        m_nextMainMode = 1;
+                        SetMainMode(0);
                     }
                     break;
                 }

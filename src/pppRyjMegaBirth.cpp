@@ -993,9 +993,9 @@ void birth(
 	*u8_at(particlePayload, 0x26) = random_signed_byte_span(payload[0x4E]);
 	*u8_at(particlePayload, 0x27) = random_signed_byte_span(payload[0x4F]);
 
-	if (payload[0x22] != 0) {
+	if (payload[0x28] != 0) {
 		*f32_at(particlePayload, 0x54) = (float)color->m_alpha;
-		*u8_at(particlePayload, 0x59) = payload[0x22];
+		*u8_at(particlePayload, 0x59) = payload[0x28];
 	}
 	if (payload[0x29] != 0) {
 		*u8_at(particlePayload, 0x5A) = payload[0x29];

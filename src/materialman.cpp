@@ -3168,11 +3168,11 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 SetMaterialColor(material, chunkFile.Get4());
                 material->m_materialType = 1;
 
-                CLightPcs::CBumpLight* bumpLight = bumpLights;
-                if (bumpLight != 0) {
+                if (bumpLights != 0) {
+                    material->m_bumpLight = bumpLights;
                     material->m_bumpLightDirect = 1;
                 } else {
-                    bumpLight = GetMapBumpLight(bumpIndex);
+                    material->m_bumpLight = GetMapBumpLight(bumpIndex);
                     if (bumpLightDirect != 0) {
                         material->m_bumpLightDirect = 1;
                     } else {
@@ -3180,8 +3180,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     }
                 }
 
-                material->m_bumpLight = bumpLight;
-                bumpLight->m_useViewSpace = material->m_materialType;
+                material->m_bumpLight->m_useViewSpace = material->m_materialType;
                 material->m_tevBit |= 4;
             } break;
             case CHUNK_WATR: {
@@ -3195,9 +3194,8 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 material->m_scaleV = kTextureOne / chunkFile.GetF4();
                 material->m_materialType = 2;
 
-                CLightPcs::CBumpLight* bumpLight = GetMapBumpLight(bumpIndex);
-                material->m_bumpLight = bumpLight;
-                bumpLight->m_useViewSpace = material->m_materialType;
+                material->m_bumpLight = GetMapBumpLight(bumpIndex);
+                material->m_bumpLight->m_useViewSpace = material->m_materialType;
                 material->m_blendMode = 4;
                 chunkFile.Get4();
                 SetMaterialColor(material, chunkFile.Get4());
@@ -3221,9 +3219,8 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 material->m_scaleV = kTextureOne / chunkFile.GetF4();
                 material->m_materialType = 3;
 
-                CLightPcs::CBumpLight* bumpLight = GetMapBumpLight(bumpIndex);
-                material->m_bumpLight = bumpLight;
-                bumpLight->m_useViewSpace = material->m_materialType;
+                material->m_bumpLight = GetMapBumpLight(bumpIndex);
+                material->m_bumpLight->m_useViewSpace = material->m_materialType;
                 material->m_tevBit |= 0x4000;
                 chunkFile.Get4();
                 SetMaterialColor(material, chunkFile.Get4());

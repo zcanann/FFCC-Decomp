@@ -3085,7 +3085,7 @@ void CGPartyObj::onStatMagic()
 	}
 
 	if (m_subState == 1 && m_comboState != 0 &&
-	    sGhostMogMenuWork.flags.flag40 < 0) {
+	    sGhostMogMenuWork.flags.flag40 != 0) {
 		if (m_comboFrame == 1) {
 			putParticleTrace(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) + 0x4FU | 0x100,
 			    m_particleSlots[8], this, kMonObjOne, 0);

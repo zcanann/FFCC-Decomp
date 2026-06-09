@@ -3664,7 +3664,7 @@ case4_done:
 
             unsigned char portVal = singleMode2 ? 0 : (unsigned char)threadParam->m_portIndex;
             unsigned char header = 1;
-            signed char flags = (unsigned char)(portVal | (threadParam->m_gbaBootFlag << 6) | (threadParam->m_unk2 << 4));
+            unsigned char flags = (unsigned char)(portVal | (threadParam->m_gbaBootFlag << 6) | (threadParam->m_unk2 << 4));
             unsigned int word = (1u << 24) | ((unsigned int)flags << 16);
 
             threadParam->m_gbaStatus = GBAWrite(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(&word), &threadParam->m_unk3);
@@ -3700,7 +3700,7 @@ case5_done:
         GbaQue.GetStageNo(threadParam->m_portIndex, &stageMajor, &stageMinor);
 
         unsigned int cmdStage = MakeJoyCmd32(0x0E, 1, ((unsigned char*)&stageMajor)[3], ((unsigned char*)&stageMinor)[3]);
-        int stageResult = 0;
+        unsigned int stageResult = 0;
 
         if (static_cast<signed char>(m_threadRunningMask) == 0)
         {
@@ -4060,6 +4060,10 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
 
         ResetQueue(threadParam);
 
+        localWord = 0;
+        localBytes[0] = 0x10;
+        unsigned int restartCmd = localWord;
+
         if (static_cast<signed char>(m_threadRunningMask) == 0)
         {
             result = 0;
@@ -4076,7 +4080,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
             }
             else
             {
-                m_cmdQueueData[qPort][m_cmdCount[qPort]] = 0x10000000;
+                m_cmdQueueData[qPort][m_cmdCount[qPort]] = restartCmd;
                 m_cmdCount[threadParam->m_portIndex]++;
 
                 OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
@@ -4084,20 +4088,21 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
             }
         }
 
-        const unsigned int typeVal = static_cast<char>(sendType);
-        const int respVal = static_cast<signed char>(localBytes[1]);
-
         if (result != 0)
         {
+            unsigned int typeVal = static_cast<char>(sendType);
+            int respVal = localBytes[1];
             int diffMask = ((typeVal - respVal) | (respVal - typeVal)) >> 31;
-            return -2 - diffMask;
+            return diffMask - 2;
         }
 
+        int typeVal = static_cast<unsigned char>(sendType);
+        int respVal = localBytes[1];
         int diffMask = ((respVal - typeVal) | (typeVal - respVal)) >> 31;
         return diffMask - 1;
     }
 
-    if ((int)static_cast<signed char>(localBytes[1]) == (int)static_cast<char>(sendType))
+    if ((int)localBytes[1] == (int)static_cast<signed char>(sendType))
     {
         step = 0;
         phase = 1;
@@ -5003,7 +5008,7 @@ int JoyBus::MakeJoyData(char* src, int length, unsigned int* outBuffer)
  */
 int JoyBus::SendPlayerStat(ThreadParam* threadParam)
 {
-    unsigned int result;
+    int result;
     unsigned char subState = threadParam->m_subState;
 
     switch (subState)
@@ -7397,7 +7402,7 @@ int JoyBus::SetCtrlMode(int portIndex, int controlMode)
     unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
 
     unsigned char modeFlag =
-        (unsigned char)(((unsigned int)(-controlMode | controlMode)) >> 31);
+        (signed char)(((unsigned int)(-controlMode | controlMode)) >> 31);
 
     if (GbaQue.IsSingleMode(m_threadParams[portIndex].m_portIndex))
 	{
@@ -7648,7 +7653,7 @@ int JoyBus::SendResult(int portIndex, int param3, int param4, int param5)
 {
     unsigned char a = static_cast<signed char>(param4);
     unsigned char b = static_cast<unsigned char>(param5);
-    unsigned char firstByte = static_cast<unsigned char>(7 - (param3 == 0));
+    signed char firstByte = static_cast<unsigned char>(7 - (param3 == 0));
 
     unsigned int cmd = 0;
     unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);

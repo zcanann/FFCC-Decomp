@@ -15,6 +15,11 @@ static const float kPppKeShpTail3XRandomMax = 65535.0f;
 static const float kPppKeShpTail3XOne = 1.0f;
 static const float kPppKeShpTail3XDegToRad = 0.017453292f;
 
+static inline float LoadFloat(const float& value)
+{
+    return value;
+}
+
 STATIC_ASSERT(offsetof(struct pppKeShpTail3X, m_object.m_workArea) == 0x80);
 
 struct KeShpTail3XWork {
@@ -182,7 +187,7 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     s32 currentIndex;
     s32 nextIndex;
     u8 zEnable;
-    const float zero = kPppKeShpTail3XZero;
+    const float zero = LoadFloat(kPppKeShpTail3XZero);
     s32 dataValIndex;
 
     work = GetKeShpTail3XWork(obj, param_3);

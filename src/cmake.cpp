@@ -934,7 +934,7 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
     }
 
     if ((repeat & 0x8) != 0) {
-        if (row != 0) {
+        if (villageWork->m_row != 0) {
             row = static_cast<short>(row - 1);
         } else if (select >= 10) {
             row = 5;
@@ -955,7 +955,7 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
         if (row >= 5) {
             Sound.PlaySe(4, 0x40, 0x7f, 0);
         } else {
-            if (select != 0) {
+            if (villageWork->m_select != 0) {
                 select = static_cast<short>(select - 1);
             } else {
                 select = 0xB;

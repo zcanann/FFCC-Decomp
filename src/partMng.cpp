@@ -1196,9 +1196,9 @@ void CPartMng::SetFp()
                 int node = owner->m_charaModelHandle->m_model->SearchNodeSk(reinterpret_cast<char*>(fpBytes + 0x50));
                 if (node >= 0) {
                     mng->m_bindNode = reinterpret_cast<void*>(
-                        *reinterpret_cast<int*>(*reinterpret_cast<int*>(
+                        *reinterpret_cast<int*>(
                             reinterpret_cast<unsigned char*>(owner->m_charaModelHandle->m_model) + 0xA8) +
-                                                node * 0xC0));
+                        node * 0xC0);
                 }
             }
 #undef owner

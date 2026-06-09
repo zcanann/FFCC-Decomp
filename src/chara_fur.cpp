@@ -1364,31 +1364,40 @@ int CChara::CModel::PickFur(
 					Vec curViewPos;
 					PSMTXMultVec(modelViewMtx, &localPos, &curViewPos);
 
-					Vec4d curClip;
-					float curScreenX;
-					float curScreenY;
+					FurProjectedVertex incoming;
 					if (static_cast<double>(curViewPos.z) < static_cast<double>(kCharaFurDepthZero)) {
+						Vec4d curClip;
 						curValid = curValid & 0x7fffffff | 0x80000000;
 						Math.MTX44MultVec4(screenMtx, &curViewPos, &curClip);
 						const float invW = kCharaFurDepthScaleBase / curClip.w;
-						curScreenX = kCharaFurScreenCenterX * curClip.x * invW + kCharaFurScreenCenterX;
-						curScreenY = kCharaFurScreenCenterY - kCharaFurScreenCenterY * curClip.y * invW;
+						incoming.m_clipX = curClip.x;
+						incoming.m_clipY = curClip.y;
+						incoming.m_clipZ = curClip.z;
+						incoming.m_clipW = curClip.w;
+						incoming.m_screenX = kCharaFurScreenCenterX * curClip.x * invW + kCharaFurScreenCenterX;
+						incoming.m_screenY = kCharaFurScreenCenterY - kCharaFurScreenCenterY * curClip.y * invW;
 					} else {
 						curValid = curValid & 0x7fffffff;
 					}
-
-					verts[0] = verts[1];
-					verts[1] = verts[2];
-					verts[2].m_valid = curValid;
-					verts[2].m_viewPos = curViewPos;
-					verts[2].m_clipX = curClip.x;
-					verts[2].m_clipY = curClip.y;
-					verts[2].m_clipZ = curClip.z;
-					verts[2].m_clipW = curClip.w;
-					verts[2].m_screenX = curScreenX;
-					verts[2].m_screenY = curScreenY;
-					verts[2].m_u = curU;
-					verts[2].m_v = curV;
+					incoming.m_valid = curValid;
+					incoming.m_viewPos = curViewPos;
+					incoming.m_u = curU;
+					incoming.m_v = curV;
+					{
+						int* d0 = reinterpret_cast<int*>(&verts[0]);
+						int* s0 = reinterpret_cast<int*>(&verts[1]);
+						int* s1 = reinterpret_cast<int*>(&verts[2]);
+						int* si = reinterpret_cast<int*>(&incoming);
+						d0[0] = s0[0]; d0[1] = s0[1]; d0[2] = s0[2]; d0[3] = s0[3];
+						d0[4] = s0[4]; d0[5] = s0[5]; d0[6] = s0[6]; d0[7] = s0[7];
+						d0[8] = s0[8]; d0[9] = s0[9]; d0[10] = s0[10];
+						s0[0] = s1[0]; s0[1] = s1[1]; s0[2] = s1[2]; s0[3] = s1[3];
+						s0[4] = s1[4]; s0[5] = s1[5]; s0[6] = s1[6]; s0[7] = s1[7];
+						s0[8] = s1[8]; s0[9] = s1[9]; s0[10] = s1[10];
+						s1[0] = si[0]; s1[1] = si[1]; s1[2] = si[2]; s1[3] = si[3];
+						s1[4] = si[4]; s1[5] = si[5]; s1[6] = si[6]; s1[7] = si[7];
+						s1[8] = si[8]; s1[9] = si[9]; s1[10] = si[10];
+					}
 
 					if ((primitive == 0x90 && static_cast<int>(vertexIndex) % 3 == 2) ||
 					    (primitive == 0x98 && static_cast<int>(vertexIndex) >= 2)) {
@@ -1397,7 +1406,7 @@ int CChara::CModel::PickFur(
 						int remainEdges = 3;
 						float depthAccum = kCharaFurDepthZero;
 						do {
-							if (static_cast<int>(static_cast<unsigned char>(vp->m_valid) << 0x18) >= 0) {
+							if (static_cast<int>(static_cast<signed char>(vp->m_valid) << 0x18) >= 0) {
 								break;
 							}
 							int next = (passed + 1) % 3;

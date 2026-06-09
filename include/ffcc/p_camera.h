@@ -59,15 +59,9 @@ public:
         Mtx m_worldMapMatrix;
         Mtx m_cameraWorldMtx;
         Mtx44 m_screenMatrix;
-        float m_targetX;
-        float m_targetY;
-        float m_targetZ;
-        float m_positionX;
-        float m_positionY;
-        float m_positionZ;
-        float m_directionX;
-        float m_directionY;
-        float m_directionZ;
+        Vec m_target;
+        Vec m_position;
+        Vec m_direction;
         float m_yaw;
         float m_fov;
         float m_nearZ;

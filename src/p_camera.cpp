@@ -321,7 +321,7 @@ STATIC_ASSERT(offsetof(CCameraPcs, m_worldMapMatrix) == 0x34);
 STATIC_ASSERT(offsetof(CCameraPcs, m_zRotate) == 0x108);
 STATIC_ASSERT(sizeof(CCameraPcs::CameraState) == 0x108);
 STATIC_ASSERT(offsetof(CCameraPcs::CameraState, m_screenMatrix) == 0x90);
-STATIC_ASSERT(offsetof(CCameraPcs::CameraState, m_positionX) == 0xDC);
+STATIC_ASSERT(offsetof(CCameraPcs::CameraState, m_position) == 0xDC);
 STATIC_ASSERT(offsetof(CCameraPcs::CameraState, m_nearZ) == 0xFC);
 STATIC_ASSERT(offsetof(CCameraPcs, m_savedCamera) == 0x10C);
 STATIC_ASSERT(offsetof(CCameraPcs, m_shadowCamera) == 0x214);
@@ -1670,36 +1670,36 @@ void CCameraPcs::drawShadowBegin()
     up.z = kCameraZeroF;
     PSMTXMultVecSR(rotXY, &up, &up);
 
-    m_shadowCamera.m_positionX = kCameraZeroF;
-    m_shadowCamera.m_positionY = kCameraZeroF;
-    m_shadowCamera.m_positionZ = m_fullScreenShadowDepth;
-    PSMTXMultVecSR(rotXY, reinterpret_cast<Vec*>(&m_shadowCamera.m_positionX), reinterpret_cast<Vec*>(&m_shadowCamera.m_positionX));
+    m_shadowCamera.m_position.x = kCameraZeroF;
+    m_shadowCamera.m_position.y = kCameraZeroF;
+    m_shadowCamera.m_position.z = m_fullScreenShadowDepth;
+    PSMTXMultVecSR(rotXY, reinterpret_cast<Vec*>(&m_shadowCamera.m_position.x), reinterpret_cast<Vec*>(&m_shadowCamera.m_position.x));
 
     if (Game.m_currentMapId == 0x21) {
         PSMTXCopy(CameraPcs.m_cameraWorldMtx, tempMtx);
-        PSMTXMultVecSR(tempMtx, reinterpret_cast<Vec*>(&m_shadowCamera.m_positionX), reinterpret_cast<Vec*>(&m_shadowCamera.m_positionX));
+        PSMTXMultVecSR(tempMtx, reinterpret_cast<Vec*>(&m_shadowCamera.m_position.x), reinterpret_cast<Vec*>(&m_shadowCamera.m_position.x));
     }
 
-    PSVECAdd(reinterpret_cast<Vec*>(&m_shadowCamera.m_positionX), reinterpret_cast<Vec*>(&m_positionX), reinterpret_cast<Vec*>(&m_shadowCamera.m_positionX));
-    m_shadowCamera.m_targetX = m_positionX;
-    m_shadowCamera.m_targetY = m_positionY;
-    m_shadowCamera.m_targetZ = m_positionZ;
+    PSVECAdd(reinterpret_cast<Vec*>(&m_shadowCamera.m_position.x), reinterpret_cast<Vec*>(&m_positionX), reinterpret_cast<Vec*>(&m_shadowCamera.m_position.x));
+    m_shadowCamera.m_target.x = m_positionX;
+    m_shadowCamera.m_target.y = m_positionY;
+    m_shadowCamera.m_target.z = m_positionZ;
     m_shadowCamera.m_nearZ = kCameraDefaultNearZ;
     m_shadowCamera.m_farZ = kCameraTwoF * m_fullScreenShadowDepth;
 
-    C_MTXLookAt(m_shadowCamera.m_cameraMatrix, reinterpret_cast<Vec*>(&m_shadowCamera.m_positionX), &up,
-                reinterpret_cast<Vec*>(&m_shadowCamera.m_targetX));
+    C_MTXLookAt(m_shadowCamera.m_cameraMatrix, reinterpret_cast<Vec*>(&m_shadowCamera.m_position.x), &up,
+                reinterpret_cast<Vec*>(&m_shadowCamera.m_target.x));
     C_MTXOrtho(m_shadowCamera.m_screenMatrix,
                m_fullScreenShadow.m_span, -m_fullScreenShadow.m_span,
                -m_fullScreenShadow.m_span, m_fullScreenShadow.m_span,
                m_shadowCamera.m_nearZ, m_shadowCamera.m_farZ);
 
-    g_shadow_pos.x = m_shadowCamera.m_positionX;
-    g_shadow_pos.y = m_shadowCamera.m_positionY;
-    g_shadow_pos.z = m_shadowCamera.m_positionZ;
-    g_shadow_refpos.x = m_shadowCamera.m_targetX;
-    g_shadow_refpos.y = m_shadowCamera.m_targetY;
-    g_shadow_refpos.z = m_shadowCamera.m_targetZ;
+    g_shadow_pos.x = m_shadowCamera.m_position.x;
+    g_shadow_pos.y = m_shadowCamera.m_position.y;
+    g_shadow_pos.z = m_shadowCamera.m_position.z;
+    g_shadow_refpos.x = m_shadowCamera.m_target.x;
+    g_shadow_refpos.y = m_shadowCamera.m_target.y;
+    g_shadow_refpos.z = m_shadowCamera.m_target.z;
 
     CopyCameraState(CurrentCameraState(), m_shadowCamera);
     GXSetProjection(m_screenMatrix, GX_ORTHOGRAPHIC);

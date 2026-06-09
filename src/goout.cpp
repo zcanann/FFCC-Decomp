@@ -658,7 +658,7 @@ void DrawGoOutMenu()
 {
     CGoOutMenu& goOutMenu = g_GoOutMenu;
     g_pGoOutMenu = &goOutMenu;
-    signed char mode = goOutMenu.m_mainMode;
+    unsigned char mode = goOutMenu.m_mainMode;
 
     switch (mode) {
     case 2:
@@ -1298,14 +1298,16 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         m_saveIndex = static_cast<char>(m_accessSaveIndex);
         m_memCardResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(static_cast<signed char>(m_cardChannel));
         if (m_memCardResult == 1) {
-            MenuPcs.m_mcCtrl.m_saveIndex = static_cast<unsigned char>(m_saveIndex);
-            MenuPcs.m_mcCtrl.m_cardChannel = static_cast<unsigned char>(m_cardChannel);
+            const unsigned char savedSaveIndex = static_cast<unsigned char>(m_saveIndex);
+            const unsigned char savedCardChannel = static_cast<unsigned char>(m_cardChannel);
             MenuPcs.m_mcCtrl.m_previousState = 0;
             MenuPcs.m_mcCtrl.m_state = 0;
             MenuPcs.m_mcCtrl.m_lastResult = 0;
             MenuPcs.m_mcCtrl.m_iteration = 0;
             MenuPcs.m_mcCtrl.m_userBuffer = 0;
             MenuPcs.m_mcCtrl.m_createFlag = 0;
+            MenuPcs.m_mcCtrl.m_cardChannel = savedCardChannel;
+            MenuPcs.m_mcCtrl.m_saveIndex = savedSaveIndex;
             m_memCardProc = 1;
         }
         break;
@@ -1394,14 +1396,16 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         m_memCardBuffer = MenuPcs.m_goOutTransferSaveData;
         m_memCardResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(static_cast<unsigned char>(m_cardChannel));
         if (m_memCardResult == 1) {
-            MenuPcs.m_mcCtrl.m_saveIndex = static_cast<unsigned char>(m_saveIndex);
-            MenuPcs.m_mcCtrl.m_cardChannel = static_cast<unsigned char>(m_cardChannel);
+            const unsigned char savedSaveIndex = static_cast<unsigned char>(m_saveIndex);
+            const unsigned char savedCardChannel = static_cast<unsigned char>(m_cardChannel);
             MenuPcs.m_mcCtrl.m_previousState = 0;
             MenuPcs.m_mcCtrl.m_state = 0;
             MenuPcs.m_mcCtrl.m_lastResult = 0;
             MenuPcs.m_mcCtrl.m_iteration = 0;
             MenuPcs.m_mcCtrl.m_userBuffer = 0;
             MenuPcs.m_mcCtrl.m_createFlag = 0;
+            MenuPcs.m_mcCtrl.m_cardChannel = savedCardChannel;
+            MenuPcs.m_mcCtrl.m_saveIndex = savedSaveIndex;
             m_memCardProc = 2;
         }
         {
@@ -1421,14 +1425,16 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         m_memCardBuffer = MenuPcs.m_goOutTransferWork;
         m_memCardResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(static_cast<unsigned char>(m_cardChannel));
         if (m_memCardResult == 1) {
-            MenuPcs.m_mcCtrl.m_saveIndex = static_cast<unsigned char>(m_saveIndex);
-            MenuPcs.m_mcCtrl.m_cardChannel = static_cast<unsigned char>(m_cardChannel);
+            const unsigned char savedSaveIndex = static_cast<unsigned char>(m_saveIndex);
+            const unsigned char savedCardChannel = static_cast<unsigned char>(m_cardChannel);
             MenuPcs.m_mcCtrl.m_previousState = 0;
             MenuPcs.m_mcCtrl.m_state = 0;
             MenuPcs.m_mcCtrl.m_lastResult = 0;
             MenuPcs.m_mcCtrl.m_iteration = 0;
             MenuPcs.m_mcCtrl.m_userBuffer = 0;
             MenuPcs.m_mcCtrl.m_createFlag = 0;
+            MenuPcs.m_mcCtrl.m_cardChannel = savedCardChannel;
+            MenuPcs.m_mcCtrl.m_saveIndex = savedSaveIndex;
             m_memCardProc = 2;
         }
         {
@@ -1475,14 +1481,16 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
     case 5:
         m_memCardResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(static_cast<unsigned char>(m_cardChannel));
         if (m_memCardResult == 1) {
-            MenuPcs.m_mcCtrl.m_saveIndex = static_cast<unsigned char>(m_saveIndex);
-            MenuPcs.m_mcCtrl.m_cardChannel = static_cast<unsigned char>(m_cardChannel);
+            const unsigned char savedSaveIndex = static_cast<unsigned char>(m_saveIndex);
+            const unsigned char savedCardChannel = static_cast<unsigned char>(m_cardChannel);
             MenuPcs.m_mcCtrl.m_previousState = 0;
             MenuPcs.m_mcCtrl.m_state = 0;
             MenuPcs.m_mcCtrl.m_lastResult = 0;
             MenuPcs.m_mcCtrl.m_iteration = 0;
             MenuPcs.m_mcCtrl.m_userBuffer = 0;
             MenuPcs.m_mcCtrl.m_createFlag = 0;
+            MenuPcs.m_mcCtrl.m_cardChannel = savedCardChannel;
+            MenuPcs.m_mcCtrl.m_saveIndex = savedSaveIndex;
             m_memCardProc = 3;
         }
         if (m_currentMessage >= 0) {
@@ -1975,7 +1983,7 @@ card_connected:;
         m_cursorListY1 = 0xe7;
         m_cursorMode = 0;
         {
-            unsigned char next;
+            signed char next;
 
             if (MenuPcs.m_menuWindowInfo->state != 1) {
                 next = 0;
@@ -2454,8 +2462,8 @@ void CGoOutMenu::CalcDel()
                 Sound.PlaySe(2, 0x40, 0x7f, 0);
                 CCaravanWork& caravanWork = Game.m_caravanWorkArr[m_selectedChara];
                 caravanWork.m_shopState = 0;
-                memset(reinterpret_cast<unsigned char*>(&caravanWork) + 0x9A4, 0, 0x100);
-                memset(reinterpret_cast<unsigned char*>(&caravanWork) + 0xAA4, 0, 0x200);
+                memset(reinterpret_cast<unsigned char*>(&caravanWork) + 0x8A4, 0, 0x100);
+                memset(reinterpret_cast<unsigned char*>(&caravanWork) + 0x9A4, 0, 0x200);
                 SetDelMode(1);
             }
         }
@@ -2544,7 +2552,7 @@ void CGoOutMenu::CalcDel()
         m_cursorListY1 = 0xdb;
         m_cursorMode = 0;
         {
-            unsigned char next;
+            signed char next;
 
             if (MenuPcs.m_menuWindowInfo->state != 1) {
                 next = 0;
@@ -2741,7 +2749,7 @@ void CGoOutMenu::Calc()
                 switch (nextMode) {
                 case 1: {
                     int characterCount = 0;
-                    for (unsigned int i = 0; i < 8; i++) {
+                    for (int i = 0; i < 8; i++) {
                         if (Game.m_caravanWorkArr[i].m_shopState != 0) {
                             characterCount++;
                         }

@@ -2419,8 +2419,8 @@ void CPartMng::pppEditPartCalc()
     if (*reinterpret_cast<int*>(self + 0x174) <= 3) {
         for (int i = 0; i < *reinterpret_cast<int*>(self + 0x4); i++) {
             _pppMngSt* mng = &m_pppMng[i];
-            int baseTime = mng->m_baseTime;
             ppvMng = mng;
+            int baseTime = mng->m_baseTime;
             if (baseTime == -0x1000) {
                 continue;
             }

@@ -738,32 +738,61 @@ loop_body:
         {
             int s = (unsigned int)threadParam->m_state;
 
-            if ((s >= 0x1D && s <= 0x20))
+            if (s >= 0x17)
             {
-                if (SendCancel(threadParam) < 0)
+                if (s >= 0x384)
                 {
-                    goto sleep_retry;
+                    if (s >= 0x387)
+                        goto do_recvsend;
+                    goto timeout_expiry;
                 }
-                threadParam->m_state = ';';
+                if (s >= 0x21)
+                    goto do_recvsend;
+                if (s >= 0x1D)
+                    goto do_cancel;
+                goto do_recvsend;
+            }
+            else if (s == 6)
+            {
                 goto timeout_expiry;
             }
-            else if (s == 5 || (s >= 7 && s <= 0x13) || (s >= 0x17 && s <= 0x1C) ||
-                     (s >= 0x21 && s <= 0x383) || s >= 0x387)
+            else if (s >= 7)
             {
-                if (GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf)) < 0)
-                {
-                    goto sleep_retry;
-                }
-                if (m_ctrlModeArr[threadParam->m_portIndex] == 0)
-                {
-                    goto recompute_timeout;
-                }
-                if (SendCtrlMode(threadParam, 0) < 0)
-                {
-                    goto sleep_retry;
-                }
+                if (s >= 0x14)
+                    goto timeout_expiry;
+                goto do_recvsend;
+            }
+            else if (s >= 5)
+            {
+                goto do_recvsend;
+            }
+            else
+            {
+                goto timeout_expiry;
+            }
+
+        do_cancel:
+            if (SendCancel(threadParam) < 0)
+            {
+                goto sleep_retry;
+            }
+            threadParam->m_state = ';';
+            goto timeout_expiry;
+
+        do_recvsend:
+            if (GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf)) < 0)
+            {
+                goto sleep_retry;
+            }
+            if (m_ctrlModeArr[threadParam->m_portIndex] == 0)
+            {
                 goto recompute_timeout;
             }
+            if (SendCtrlMode(threadParam, 0) < 0)
+            {
+                goto sleep_retry;
+            }
+            goto recompute_timeout;
         }
         else
         {
@@ -774,16 +803,9 @@ loop_body:
 
             m_ctrlModeArr[threadParam->m_portIndex] = 0;
 
-            if (Game.m_scriptFoodBase[statusIndex] != 0)
+            if (Game.m_scriptFoodBase[statusIndex] != 0 && threadParam->m_state == 2)
             {
-                if (threadParam->m_state == 2)
-                {
-                    threadParam->m_state = 1;
-                }
-                else
-                {
-                    threadParam->m_state = 0;
-                }
+                threadParam->m_state = 1;
             }
             else
             {
@@ -803,14 +825,14 @@ timeout_expiry:
             {
                 threadParam->m_prevState = threadParam->m_state;
 
-                if ((int)threadParam->m_gbaStatus == 3)
-                {
-                    threadParam->m_state = (unsigned char)0x86;
-                }
-                else
+                if ((int)threadParam->m_gbaStatus != 3)
                 {
                     threadParam->m_gbaStatus = 1;
                     threadParam->m_state = (unsigned char)0x85;
+                }
+                else
+                {
+                    threadParam->m_state = (unsigned char)0x86;
                 }
 
                 goto recompute_timeout;
@@ -868,10 +890,10 @@ timeout_expiry:
             {
                 unsigned char cm = GbaQue.GetControllerMode();
 
-                if (cm == 0)
-                    m_nextModeTypeArr[threadParam->m_portIndex] = 0;
-                else
+                if (cm != 0)
                     m_nextModeTypeArr[threadParam->m_portIndex] = 4;
+                else
+                    m_nextModeTypeArr[threadParam->m_portIndex] = 0;
 
                 threadParam->m_state    = 2;
                 threadParam->m_subState = 0;
@@ -890,6 +912,7 @@ timeout_expiry:
                     threadParam->m_subState = 0;
                     ThreadSleep(OSMillisecondsToTicks(15));
                     stateStartTime = OSGetTime();
+                    goto loop_body;
                 }
                 else
                 {
@@ -910,16 +933,15 @@ timeout_expiry:
         {
             int result = InitialCode(threadParam);
 
-            if (result == 1)
+            if (result != 1)
             {
-                stateStartTime = OSGetTime();
+                if (result == 2)
+                {
+                    goto sleep_retry;
+                }
+                break;
             }
-            else if (result == 2)
-            {
-                ThreadSleep(OSMillisecondsToTicks(15));
-            }
-
-            break;
+            goto loop_body;
         }
 
         case 0x03:
@@ -930,14 +952,17 @@ timeout_expiry:
 
             threadParam->m_gbaStatus = GBAReset(threadParam->m_portIndex, &threadParam->m_unk3);
 
-            if ((int)threadParam->m_gbaStatus == 0)
+            if ((int)threadParam->m_gbaStatus != 0)
             {
-                threadParam->m_state    = 2;
-                threadParam->m_subState = 0;
-
-                ThreadSleep(OSMillisecondsToTicks(15));
-                stateStartTime = OSGetTime();
+                goto sleep_retry;
             }
+
+            threadParam->m_state    = 2;
+            threadParam->m_subState = 0;
+
+            ThreadSleep(OSMillisecondsToTicks(15));
+            OSGetTime();
+            threadParam->m_errorRetry = 0;
 
             break;
         }
@@ -1052,16 +1077,16 @@ timeout_expiry:
             int cmdNumFlg = GbaQue.GetCmdNumFlg(threadParam->m_portIndex);
             if (cmdNumFlg != 0)
             {
-                if ((cmdNumFlg & 2) != 0)
+                if ((cmdNumFlg & 2) == 0)
                 {
-                    threadParam->m_state = 0x17;
+                    if (SendChgCmdNum(threadParam) < 0)
+                    {
+                        goto sleep_retry;
+                    }
+                    GbaQue.ClrCmdNumFlg(threadParam->m_portIndex);
                     goto recompute_timeout;
                 }
-                if (SendChgCmdNum(threadParam) < 0)
-                {
-                    goto sleep_retry;
-                }
-                GbaQue.ClrCmdNumFlg(threadParam->m_portIndex);
+                threadParam->m_state = 0x17;
                 goto recompute_timeout;
             }
 
@@ -1572,6 +1597,172 @@ timeout_expiry:
                         }
                     }
                 }
+            }
+
+            break;
+        }
+
+        case 0x1E:
+        {
+            unsigned int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            if ((int)res < 0)
+            {
+                goto sleep_retry;
+            }
+            if (threadParam->m_skipProcessingFlag != 0 || (res & 1) == 0)
+            {
+                break;
+            }
+            if ((localBuf[0] & 0x3F) == 7)
+            {
+                threadParam->m_state = 0x1F;
+                memset(m_perThreadTemp[threadParam->m_portIndex], 0, sizeof(m_perThreadTemp[threadParam->m_portIndex]));
+                m_perThreadTemp[threadParam->m_portIndex][0] = 1;
+                DecRecvQueue(threadParam->m_portIndex);
+                if (SendCancel(threadParam) != 0)
+                {
+                    threadParam->m_altState = threadParam->m_state;
+                    threadParam->m_recvWriteIdx = localWord;
+                    threadParam->m_state = 0x84;
+                    goto sleep_retry;
+                }
+                break;
+            }
+            DecRecvQueue(threadParam->m_portIndex);
+            threadParam->m_state = 'F';
+            GbaQue.ClrStageFlg(threadParam->m_portIndex);
+            break;
+        }
+
+        case 0x1F:
+        {
+            int dataRes = SendDataFile(threadParam);
+            if (dataRes == -1)
+            {
+                goto sleep_retry;
+            }
+            if (dataRes == -2)
+            {
+                threadParam->m_state = 3;
+            }
+            if (threadParam->m_skipProcessingFlag == 0 && dataRes == 1)
+            {
+                GbaQue.ClrStageFlg(threadParam->m_portIndex);
+                threadParam->m_state = 'F';
+            }
+
+            break;
+        }
+
+        case 0x21:
+        {
+            int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 &&
+                (int)GbaQue.GetLetterLstFlg(threadParam->m_portIndex) != 0)
+            {
+                threadParam->m_state = 0x22;
+            }
+
+            break;
+        }
+
+        case 0x22:
+        {
+            int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            if (res >= 0 && threadParam->m_skipProcessingFlag == 0)
+            {
+                threadParam->m_state = 0x23;
+            }
+
+            break;
+        }
+
+        case 0x23:
+        {
+            int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            if (res >= 0 && threadParam->m_skipProcessingFlag == 0)
+            {
+                threadParam->m_state = 0x24;
+                memset(m_perThreadTemp[threadParam->m_portIndex], 0, sizeof(m_perThreadTemp[threadParam->m_portIndex]));
+                m_perThreadTemp[threadParam->m_portIndex][0] = 3;
+                DecRecvQueue(threadParam->m_portIndex);
+                if (SendCancel(threadParam) != 0)
+                {
+                    threadParam->m_altState = threadParam->m_state;
+                    threadParam->m_recvWriteIdx = localWord;
+                    threadParam->m_state = 0x84;
+                    goto sleep_retry;
+                }
+            }
+
+            break;
+        }
+
+        case 0x24:
+        {
+            int dataRes = SendDataFile(threadParam);
+            if (dataRes == -1)
+            {
+                goto sleep_retry;
+            }
+            if (dataRes == -2)
+            {
+                threadParam->m_state = 3;
+            }
+            if (threadParam->m_skipProcessingFlag == 0 && dataRes == 1)
+            {
+                threadParam->m_state = 5;
+            }
+
+            break;
+        }
+
+        case 0x25:
+        {
+            int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 &&
+                (int)GbaQue.GetLetterDatFlg(threadParam->m_portIndex) != 0)
+            {
+                threadParam->m_state = 0x26;
+            }
+
+            break;
+        }
+
+        case 0x26:
+        {
+            int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            if (res >= 0 && threadParam->m_skipProcessingFlag == 0)
+            {
+                threadParam->m_state = '\'';
+                memset(m_perThreadTemp[threadParam->m_portIndex], 0, sizeof(m_perThreadTemp[threadParam->m_portIndex]));
+                m_perThreadTemp[threadParam->m_portIndex][0] = 2;
+                if (SendCancel(threadParam) != 0)
+                {
+                    threadParam->m_altState = threadParam->m_state;
+                    threadParam->m_recvWriteIdx = localWord;
+                    threadParam->m_state = 0x84;
+                    goto sleep_retry;
+                }
+            }
+
+            break;
+        }
+
+        case 0x27:
+        {
+            int dataRes = SendDataFile(threadParam);
+            if (dataRes == -1)
+            {
+                goto sleep_retry;
+            }
+            if (dataRes == -2)
+            {
+                threadParam->m_state = 3;
+            }
+            if (threadParam->m_skipProcessingFlag == 0 && dataRes == 1)
+            {
+                threadParam->m_state = 5;
             }
 
             break;
@@ -2336,7 +2527,47 @@ timeout_expiry:
 
         default:
         {
-            // TODO: add remaining state handling as you decompile them
+            threadParam->m_flags[4] = 0;
+            GbaQue.SetChgUseItemFlg(threadParam->m_portIndex);
+            threadParam->m_sentStartFlag = 0;
+            threadParam->m_flags[1] = 0;
+            threadParam->m_flags[5] = 0;
+            threadParam->m_errorRetry++;
+            m_ctrlModeArr[threadParam->m_portIndex] = 0;
+
+            if (GbaQue.GetControllerMode() != 0)
+                m_nextModeTypeArr[threadParam->m_portIndex] = 4;
+            else
+                m_nextModeTypeArr[threadParam->m_portIndex] = 0;
+
+            m_stateFlagArr[threadParam->m_portIndex] = 1;
+            m_stateCodeArr[threadParam->m_portIndex] = 0xFF;
+
+            if (threadParam->m_errorRetry >= 0xA)
+            {
+                threadParam->m_state = 4;
+                break;
+            }
+
+            if (GetGBAStat(threadParam) != 0)
+            {
+                stateStartTime = OSGetTime();
+                goto sleep_retry;
+            }
+
+            ResetQueue(threadParam);
+
+            if (threadParam->m_prevState > 2)
+            {
+                threadParam->m_state = 3;
+            }
+            else
+            {
+                threadParam->m_subState  = 0;
+                threadParam->m_state     = 1;
+                threadParam->m_prevState = 0;
+            }
+
             break;
         }
         }
@@ -7721,7 +7952,7 @@ void JoyBus::RestartThread()
 {
     m_threadInitFlag = 0;
     CreateInit();
-    int err = 0;
+    int err;
 
     if (static_cast<signed char>(Joybus.m_binLoaded) == 0)
     {
@@ -7803,7 +8034,12 @@ void JoyBus::RestartThread()
             *(unsigned int*)(Joybus.m_gbaBootImage + 200) = OSGetTick();
 
             Joybus.m_binLoaded = 1;
+            err = 0;
         }
+    }
+    else
+    {
+        err = 0;
     }
 
     if (err != 0 && (unsigned int)System.m_execParam > 1)

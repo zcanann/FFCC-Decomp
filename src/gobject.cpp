@@ -957,9 +957,9 @@ void CGObject::bgNormalCollision()
     }
 
     if (retry == 0) {
-        m_groundHitOffset.x = sZeroFloat;
-        m_groundHitOffset.y = sZeroFloat;
         m_groundHitOffset.z = sZeroFloat;
+        m_groundHitOffset.y = sZeroFloat;
+        m_groundHitOffset.x = sZeroFloat;
         return;
     }
 
@@ -1009,10 +1009,7 @@ void CGObject::bgNormalCollision()
     PSVECAdd(&pos, &move, &pos);
 
     if (!(m_jumpLandingDampening > sZeroFloat) || !(m_groundHitOffset.y < sLandingDampenCutoff)) {
-        m_groundHitOffset.x = pos.x - m_worldPosition.x;
-        m_groundHitOffset.y = pos.y - m_worldPosition.y;
-        m_groundHitOffset.z = pos.z - m_worldPosition.z;
-        return;
+        goto simple;
     }
 
     float oldY = m_groundHitOffset.y;
@@ -1039,6 +1036,12 @@ void CGObject::bgNormalCollision()
             sHitProbeHeight + (sHitProbeHeight * m_gravityY) / sStepProbeHeight,
             0);
     }
+    return;
+
+simple:
+    m_groundHitOffset.x = pos.x - m_worldPosition.x;
+    m_groundHitOffset.y = pos.y - m_worldPosition.y;
+    m_groundHitOffset.z = pos.z - m_worldPosition.z;
 }
 
 /*

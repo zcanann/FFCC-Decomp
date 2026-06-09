@@ -751,10 +751,14 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
     mana->m_envTexture0 = GetTextureFromRSD(param_2->m_envTextureId0, ppvEnv);
     mana->m_envTexture1 = GetTextureFromRSD(param_2->m_envTextureId1, ppvEnv);
 
-    mana->m_envTexture0->m_format = 0;
-    mana->m_envTexture0->InitTexObj();
-    mana->m_envTexture1->m_format = 0;
-    mana->m_envTexture1->InitTexObj();
+    {
+        CTexture* envTex0 = mana->m_envTexture0;
+        CTexture* envTex1 = mana->m_envTexture1;
+        *reinterpret_cast<u32*>(reinterpret_cast<u8*>(envTex0) + 0x6c) = 0;
+        envTex0->InitTexObj();
+        *reinterpret_cast<u32*>(reinterpret_cast<u8*>(envTex1) + 0x6c) = 0;
+        envTex1->InitTexObj();
+    }
 
     if (mana->m_captureTexObjs == 0) {
         mana->m_captureTexObjs =

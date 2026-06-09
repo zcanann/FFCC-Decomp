@@ -2242,13 +2242,13 @@ void CGPartyObj::statCharge()
 							CVector dir(delta);
 							CVector scaled;
 							PSVECScale(reinterpret_cast<Vec*>(&dir), reinterpret_cast<Vec*>(&scaled), mag - static_cast<float>(maxReach));
-							CVector scaledCopy;
+							Vec scaledCopy;
 							scaledCopy.x = scaled.x;
 							scaledCopy.y = scaled.y;
 							scaledCopy.z = scaled.z;
 							CVector unit;
-							PSVECScale(reinterpret_cast<Vec*>(&scaledCopy), reinterpret_cast<Vec*>(&unit), kMonObjOne / mag);
-							CVector unitCopy;
+							PSVECScale(&scaledCopy, reinterpret_cast<Vec*>(&unit), kMonObjOne / mag);
+							Vec unitCopy;
 							unitCopy.x = unit.x;
 							unitCopy.y = unit.y;
 							unitCopy.z = unit.z;

@@ -7952,7 +7952,7 @@ void JoyBus::RestartThread()
 {
     m_threadInitFlag = 0;
     CreateInit();
-    int err = 0;
+    int err;
 
     if (static_cast<signed char>(Joybus.m_binLoaded) == 0)
     {
@@ -8034,7 +8034,12 @@ void JoyBus::RestartThread()
             *(unsigned int*)(Joybus.m_gbaBootImage + 200) = OSGetTick();
 
             Joybus.m_binLoaded = 1;
+            err = 0;
         }
+    }
+    else
+    {
+        err = 0;
     }
 
     if (err != 0 && (unsigned int)System.m_execParam > 1)

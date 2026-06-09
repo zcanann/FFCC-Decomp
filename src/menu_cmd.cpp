@@ -1031,17 +1031,17 @@ void CMenuPcs::CmdDraw()
 				text = GetMenuStr(i + 9);
 			} else {
 				const int cmdId =  (int)(long)(caravan->m_commandListInventorySlotRef[i]);
-				if (cmdId >= 0) {
+				if (!(cmdId >= 0)) {
+					entry++;
+					continue;
+				} else {
 					const u16 skillId = caravan->m_inventoryItems[cmdId];
 					char** flatText = Game.m_cFlatDataArr[1].TableStrings(0);
 					text = flatText[skillId * 5 + 4];
 					if ((cmdMode == 0) && (i == GetCmdStateView(this)->selected)) {
-						hasItemHelp = true;
 						helpId = skillId;
+						hasItemHelp = true;
 					}
-				} else {
-					entry++;
-					continue;
 				}
 			}
 
@@ -1484,7 +1484,8 @@ unsigned int CMenuPcs::CmdCtrlCur()
 	} else {
 		int padIndex = 0;
 		padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
-		press = Pad.GetPadInputs()[padIndex].buttonDown[0];
+		int __p18 = padIndex;
+		press = Pad.GetPadInputs()[__p18].buttonDown[0];
 	}
 
 	blocked = false;
@@ -1512,20 +1513,20 @@ unsigned int CMenuPcs::CmdCtrlCur()
 		u16 cmdCount = caravanWork->m_numCmdListSlots;
 
 		if ((hold & 8) != 0) {
-			if (GetCmdStateView(this)->selected < 3) {
-				GetCmdStateView(this)->selected = static_cast<s16>(cmdCount - 1);
-			} else {
+			if (!(GetCmdStateView(this)->selected < 3)) {
 				GetCmdStateView(this)->selected--;
+			} else {
+				GetCmdStateView(this)->selected = static_cast<s16>(cmdCount - 1);
 			}
 
 			int cursor = GetCmdStateView(this)->selected;
 			if (caravanWork->m_commandListExtra[cursor] < 0) {
-				if (caravanWork->m_commandListExtra[cursor - 1] < 0) {
+				if (!(caravanWork->m_commandListExtra[cursor - 1] < 0)) {
+					GetCmdStateView(this)->selected = static_cast<s16>(cursor - 1);
+				} else {
 					if (caravanWork->m_commandListExtra[cursor - 2] >= 0) {
 						GetCmdStateView(this)->selected = static_cast<s16>(cursor - 2);
 					}
-				} else {
-					GetCmdStateView(this)->selected = static_cast<s16>(cursor - 1);
 				}
 			}
 			Sound.PlaySe(1, 0x40, 0x7F, 0);
@@ -1538,7 +1539,8 @@ unsigned int CMenuPcs::CmdCtrlCur()
 				}
 
 				int cursor = GetCmdStateView(this)->selected;
-				if (caravanWork->m_commandListExtra[cursor] < 0) {
+				int __p14 = cursor;
+				if (caravanWork->m_commandListExtra[__p14] < 0) {
 					if (caravanWork->m_commandListExtra[cursor + 1] < 0) {
 						if (caravanWork->m_commandListExtra[cursor + 2] >= 0) {
 							GetCmdStateView(this)->selected = static_cast<s16>(cursor + 2);
@@ -1604,8 +1606,10 @@ unsigned int CMenuPcs::CmdCtrlCur()
 			}
 		} else {
 			if ((hold & 4) != 0) {
-				if (((itemCount < 9) || (GetCmdStateView(this)->itemSelected < 7)) &&
-				    ((itemCount <= 8) || ((itemCount - 1) > GetCmdStateView(this)->itemSelected))) {
+				if (!(((itemCount < 9) || (GetCmdStateView(this)->itemSelected < 7)) &&
+				    ((itemCount <= 8) || ((itemCount - 1) > GetCmdStateView(this)->itemSelected)))) {
+					GetCmdStateView(this)->itemSelected++;
+				} else {
 					if (itemCount < 9) {
 						GetCmdStateView(this)->itemSelected = 0;
 					} else if (GetCmdStateView(this)->scrollTop < itemCount - 1) {
@@ -1613,8 +1617,6 @@ unsigned int CMenuPcs::CmdCtrlCur()
 					} else {
 						GetCmdStateView(this)->scrollTop = 0;
 					}
-				} else {
-					GetCmdStateView(this)->itemSelected++;
 				}
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			}
@@ -1623,13 +1625,13 @@ unsigned int CMenuPcs::CmdCtrlCur()
 		if ((hold & 0xC) == 0) {
 			if (!((press & 0x100) == 0)) {
 				int selected = static_cast<int>(GetCmdStateView(this)->scrollTop) + static_cast<int>(GetCmdStateView(this)->itemSelected);
-				int __p4 = itemCount;
+				int __p4 =  (itemCount | 0);
 				if (selected >= __p4) {
 					selected -= itemCount;
 				}
 
 				u32 canUse = 0;
-				if (selected < 0 || list[0] <= selected) {
+				if (selected < 0 || selected >= list[0]) {
 					canUse = 0;
 				} else if (selected == 0) {
 					canUse = static_cast<u32>(caravanWork->m_commandListInventorySlotRef[GetCmdStateView(this)->selected] >= 0);
@@ -1640,20 +1642,22 @@ unsigned int CMenuPcs::CmdCtrlCur()
 					canUse = static_cast<u32>(EquipChk(static_cast<int>(list[selected - 1])) != 0);
 				}
 
-				if ((canUse & 0xFF) == 0) {
-					Sound.PlaySe(4, 0x40, 0x7F, 0);
-				} else {
+				int __p2 = canUse;
+				if (!((__p2 & 0xFF) == 0)) {
 					if (selected == 0) {
 						caravanWork->ChgCmdLst(GetCmdStateView(this)->selected, -1);
 					} else if (selected != 1) {
-						int __p3 = selected;
+						int __p3;
+						__p3 = selected;
 						caravanWork->ChgCmdLst(GetCmdStateView(this)->selected, list[__p3 - 1]);
 					}
 
 					GetCmdStateView(this)->commandResult = 0;
-					if (selected != 0) {
+					int __p16 = selected;
+					if (__p16 != 0) {
 						int comboChoice[2][2];
-						int comboCount = ChkUnite(GetCmdStateView(this)->selected, comboChoice);
+						int comboCount;
+						comboCount = ChkUnite(GetCmdStateView(this)->selected, comboChoice);
 						if (comboCount == 1) {
 							const int recipe = comboChoice[0][0];
 							caravanWork->UniteComList(
@@ -1673,6 +1677,8 @@ unsigned int CMenuPcs::CmdCtrlCur()
 					GetCmdStateView(this)->transitionTimer = 0;
 					CmdInit2();
 					Sound.PlaySe(2, 0x40, 0x7F, 0);
+				} else {
+					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				}
 			} else {
 				if ((press & 0x200) != 0) {
@@ -1745,7 +1751,8 @@ unsigned int CMenuPcs::CmdCtrlCur()
 			if (next < caravanWork->m_numCmdListSlots) {
 				int __p9 = remaining;
 				for (; __p9 != 0; remaining--) {
-					if (caravanWork->m_commandListExtra[next] >= 0) {
+					int __p15 = next;
+					if (caravanWork->m_commandListExtra[__p15] >= 0) {
 						break;
 					}
 					next++;
@@ -1753,7 +1760,8 @@ unsigned int CMenuPcs::CmdCtrlCur()
 			}
 
 			s16* modeCursor = GetCmdStateSelections(GetCmdStateView(this)) + mode;
-			if (*modeCursor == prev) {
+			int __p3 = prev;
+			if (*modeCursor == __p3) {
 				*modeCursor = static_cast<s16>(next);
 			} else {
 				*modeCursor = static_cast<s16>(prev);
@@ -1764,17 +1772,17 @@ unsigned int CMenuPcs::CmdCtrlCur()
 		if ((hold & 0xC) == 0) {
 			GetCmdStateView(this)->commandResult = 0;
 			GetCmdStateView(this)->uniteState = 0;
-			if ((press & 0x100) == 0) {
+			if (!((press & 0x100) == 0)) {
+				GetCmdStateView(this)->phase++;
+				GetCmdStateView(this)->transitionTimer = 0;
+				Sound.PlaySe(2, 0x40, 0x7F, 0);
+			} else {
 				if ((press & 0x200) != 0) {
 					GetCmdStateView(this)->commandResult = -1;
 					GetCmdStateView(this)->phase++;
 					GetCmdStateView(this)->transitionTimer = 0;
 					Sound.PlaySe(3, 0x40, 0x7F, 0);
 				}
-			} else {
-				GetCmdStateView(this)->phase++;
-				GetCmdStateView(this)->transitionTimer = 0;
-				Sound.PlaySe(2, 0x40, 0x7F, 0);
 			}
 		}
 	}

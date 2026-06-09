@@ -2158,7 +2158,10 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 							owner->m_pppPObjLink = obj->m_next;
 						}
 
-						Memory.Free(obj);
+						if (obj != 0)
+						{
+							Memory.Free(obj);
+						}
 					}
 					else
 					{
@@ -2201,7 +2204,10 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 					owner->m_pppPObjLink = obj->m_next;
 				}
 
-				Memory.Free(obj);
+				if (obj != 0)
+				{
+					Memory.Free(obj);
+				}
 				obj = next;
 			}
 

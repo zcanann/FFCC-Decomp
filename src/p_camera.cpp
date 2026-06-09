@@ -1261,7 +1261,7 @@ void CCameraPcs::calcMap()
     };
     HitCylinder hitCylinder;
 
-    buttons = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? 0 : CameraRawPadInput().button[0];
+    buttons = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? 0 : CameraRawPadInput().buttonDown[0];
 
     stickH = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? kCameraZeroF : CameraRawPadInput().substickYF;
     stickH = kCameraDegToRad * (stickH / kCameraOneEighthF);

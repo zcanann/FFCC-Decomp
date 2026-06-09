@@ -4965,7 +4965,7 @@ void CGPartyObj::ghostPartyMog()
 					}
 				}
 				if (static_cast<int>(FLOAT_80331A5C * innerScale) <= static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x38))) {
-					flags[0] = (flags[0] & 0xFB) | 4;
+					sGhostPartyWork.flagBits.flag04 = 1;
 					bossState = 3;
 					goto messageMenu;
 				}

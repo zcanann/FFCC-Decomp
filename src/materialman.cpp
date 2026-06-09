@@ -2621,10 +2621,9 @@ int CMaterialMan::GetCharaShadow(
         if (shadow->m_materialMode == 1) {
             if (outputCount < maxShadows) {
                 *materialWrite++ = MapMng.m_materialSet->m_materials[shadow->m_materialIndex];
-                *reinterpret_cast<float(**)[4]>(
-                    reinterpret_cast<char*>(shadowMtxOut) + outputOffset) = shadow->m_shadowMtx;
+                shadowMtxOut[outputOffset] = shadow->m_shadowMtx;
                 outputCount++;
-                outputOffset += 4;
+                outputOffset++;
             }
             continue;
         }
@@ -2674,10 +2673,9 @@ int CMaterialMan::GetCharaShadow(
         nearest->distance = kMaterialMaxDistance;
         CMapShadow* nearestShadow = nearest->shadow;
         materialsOut[outputCount] = MapMng.m_materialSet->m_materials[nearestShadow->m_materialIndex];
-        *reinterpret_cast<float(**)[4]>(
-            reinterpret_cast<char*>(shadowMtxOut) + outputOffset) = nearestShadow->m_shadowMtx;
+        shadowMtxOut[outputOffset] = nearestShadow->m_shadowMtx;
         outputCount++;
-        outputOffset += 4;
+        outputOffset++;
     }
 
     return outputCount;

@@ -920,7 +920,7 @@ void CGPartyObj::onFrameAlways()
 		showTraceParticle = 0;
 	} else if ((Game.m_gameWork.m_menuStageMode == 0) ||
 		    (Game.m_gameWork.m_menuStageMode == 0) ||
-		    (Game.m_gameWork.m_bossArtifactStageIndex > 0x0E) ||
+		    (Game.m_gameWork.m_bossArtifactStageIndex >= 0x0F) ||
 		    ((static_cast<unsigned short>(GetCID()) & 0x6D) != 0x6D) ||
 		    (reinterpret_cast<int>(m_scriptHandle[0xED]) == 0)) {
 		showTraceParticle = 1;

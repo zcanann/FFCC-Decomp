@@ -2890,87 +2890,126 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 			CFlatRuntime2Storage().SetParticleWorkPos(m_worldPosition, m_rotTargetY);
 		}
 
-		if (effectId == 0x410) {
+		switch (effectId) {
+		case 0x410:
 			if (effectArg0 == 2 || effectArg0 == 3) {
+				float baseAngle = m_rotTargetY;
 				float angleOffset = kCharaObjNegativeHalfPi;
 				if (effectArg0 == 2) {
 					angleOffset = kCharaObjHalfPi;
 				}
-				float angle = m_rotTargetY + angleOffset;
+				float angle = baseAngle + angleOffset;
 				CFlatParticleWorkPosition().x = kCharaObjSideParticleRadius * sinf(angle) + m_worldPosition.x;
 				CFlatParticleWorkPosition().z = kCharaObjSideParticleRadius * cosf(angle) + m_worldPosition.z;
 				CFlatRuntime2Storage().SetParticleWorkVector(m_rotTargetY, 0.0f);
 				CFlatRuntime2Storage().PutParticleWork();
 				emittedCustom = 1;
 			}
-		} else if (effectId < 0x410) {
-			if (effectId == 0x3B4) {
-				if (effectArg0 == 3) {
-					if (pos == 0) {
-						return;
-					}
-					CFlatRuntime2Storage().SetParticleWorkPos(*pos, m_rotTargetY);
-					CFlatRuntime2Storage().PutParticleWork();
-					emittedCustom = 1;
+			break;
+		case 0x3B4:
+			if (effectArg0 == 3) {
+				if (pos == 0) {
+					return;
 				}
-			} else if (effectId == 0x409 && effectArg0 == 3) {
-				for (int i = 3; i < 9; i++) {
-					CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | i);
-					CFlatRuntime2Storage().PutParticleWork();
-				}
+				CFlatRuntime2Storage().SetParticleWorkPos(*pos, m_rotTargetY);
+				CFlatRuntime2Storage().PutParticleWork();
 				emittedCustom = 1;
 			}
-		} else if (effectId < 0x479) {
-			if (effectId < 0x46F) {
-				if (effectId > 0x46C) {
-					if (effectArg0 == 2) {
-						if (m_stateFrame >= 0x10) {
-							CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | 0x1D);
-							float rand0 = Math.RandFPM(kCharaObjForwardParticleOffset);
-							float rand1 = Math.RandFPM(kCharaObjForwardParticleOffset);
-							CVector randomOffset(rand1, kCharaObjZero, rand0);
-							CVector randomBase(kCharaObjZero, FLOAT_8033199C, FLOAT_803319A0);
-							CVector randomResult;
-							PSVECAdd(reinterpret_cast<Vec*>(&randomBase), reinterpret_cast<Vec*>(&randomOffset), reinterpret_cast<Vec*>(&randomResult));
-							Vec randomPos;
-							randomPos.x = randomResult.x;
-							randomPos.y = randomResult.y;
-							randomPos.z = randomResult.z;
-							CFlatRuntime2Storage().SetParticleWorkPos(randomPos, m_rotTargetY);
-							CFlatRuntime2Storage().PutParticleWork();
-						}
-						emittedCustom = 1;
-					}
-					if (effectArg0 == 3) {
-						for (int i = 0x0D; i < 0x1D; i++) {
-							CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | i);
-							CFlatRuntime2Storage().PutParticleWork();
-						}
-						emittedCustom = 1;
-					}
-				}
-			} else if (effectId > 0x472 && effectArg0 == 3) {
+			break;
+		case 0x473:
+		case 0x474:
+		case 0x475:
+		case 0x476:
+		case 0x477:
+		case 0x478:
+			if (effectArg0 == 3) {
 				for (int i = 7; i < 0x0C; i++) {
 					CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | i);
 					CFlatRuntime2Storage().PutParticleWork();
 				}
 				emittedCustom = 1;
 			}
-		} else if (effectId > 0x49C && effectId < 0x4A0 && effectArg0 == 2) {
-			Mtx rotMtx;
-			PSMTXRotRad(rotMtx, 'y', m_rotTargetY);
-			for (unsigned int i = 0; i < 2; i++) {
-				int side = (i == 0) ? 76 : -76;
-				CVector sidePos(static_cast<float>(side), 0.0f, kCharaObjForwardParticleOffset);
-				Vec offsetPos;
-				PSMTXMultVec(rotMtx, reinterpret_cast<Vec*>(&sidePos), &offsetPos);
-				CFlatParticleWorkPosition().x = m_worldPosition.x + offsetPos.x;
-				CFlatParticleWorkPosition().y = m_worldPosition.y + offsetPos.y;
-				CFlatParticleWorkPosition().z = m_worldPosition.z + offsetPos.z;
-				CFlatRuntime2Storage().SetParticleWorkVector(m_rotTargetY, 0.0f);
-				CFlatRuntime2Storage().PutParticleWork();
+			break;
+		case 0x46D:
+		case 0x46E:
+			if (effectArg0 == 2) {
+				if (m_stateFrame >= 0x10) {
+					CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | 0x1D);
+					float rand0 = Math.RandFPM(kCharaObjForwardParticleOffset);
+					float rand1 = Math.RandFPM(kCharaObjForwardParticleOffset);
+					CVector randomOffset(rand1, kCharaObjZero, rand0);
+					CVector randomBase(kCharaObjZero, FLOAT_8033199C, FLOAT_803319A0);
+					CVector randomResult;
+					PSVECAdd(reinterpret_cast<Vec*>(&randomBase), reinterpret_cast<Vec*>(&randomOffset), reinterpret_cast<Vec*>(&randomResult));
+					Vec randomPos;
+					randomPos.x = randomResult.x;
+					randomPos.y = randomResult.y;
+					randomPos.z = randomResult.z;
+					CFlatRuntime2Storage().SetParticleWorkPos(randomPos, m_rotTargetY);
+					CFlatRuntime2Storage().PutParticleWork();
+				}
+				emittedCustom = 1;
 			}
-			emittedCustom = 1;
+			if (effectArg0 == 3) {
+				for (int i = 0x0D; i < 0x1D; i++) {
+					CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | i);
+					CFlatRuntime2Storage().PutParticleWork();
+				}
+				emittedCustom = 1;
+			}
+			break;
+		case 0x206: {
+			if (effectArg0 == 2) {
+				int a = m_unk68C;
+				int b = m_comboFramePrev;
+				if (a * 3 > b) {
+					CFlatRuntime2Storage().SetParticleWorkSe(0x872, 2, 0);
+				} else if (a * 2 <= b) {
+					CFlatRuntime2Storage().SetParticleWorkSe(0x871, 2, 0);
+				}
+			}
+			if (effectArg0 == 3) {
+				int a = m_unk68C;
+				int b = m_comboFramePrev;
+				if (a * 3 > b) {
+					CFlatRuntime2Storage().SetParticleWorkNo(particleNo | (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) + 0x75));
+				} else if (a * 2 <= b) {
+					CFlatRuntime2Storage().SetParticleWorkNo(particleNo | (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) + 0x73));
+				}
+			}
+			break;
+		}
+		case 0x409:
+			if (effectArg0 == 3) {
+				for (int i = 3; i <= 8; i++) {
+					CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | i);
+					CFlatRuntime2Storage().PutParticleWork();
+				}
+				emittedCustom = 1;
+			}
+			break;
+		case 0x49D:
+		case 0x49E:
+		case 0x49F:
+			if (effectArg0 == 2) {
+				Mtx rotMtx;
+				PSMTXRotRad(rotMtx, 'y', m_rotTargetY);
+				for (int i = 0; i < 2; i++) {
+					int side = (i == 0) ? 76 : -76;
+					CVector sidePos(static_cast<float>(side), 0.0f, kCharaObjForwardParticleOffset);
+					Vec offsetPos;
+					PSMTXMultVec(rotMtx, reinterpret_cast<Vec*>(&sidePos), &offsetPos);
+					CFlatParticleWorkPosition().x = m_worldPosition.x + offsetPos.x;
+					CFlatParticleWorkPosition().y = m_worldPosition.y + offsetPos.y;
+					CFlatParticleWorkPosition().z = m_worldPosition.z + offsetPos.z;
+					CFlatRuntime2Storage().SetParticleWorkVector(m_rotTargetY, 0.0f);
+					CFlatRuntime2Storage().PutParticleWork();
+				}
+				emittedCustom = 1;
+			}
+			break;
+		default:
+			break;
 		}
 
 		if (seNo != 0) {

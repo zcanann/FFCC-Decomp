@@ -721,6 +721,7 @@ void CPartMng::pppGetFreePppMngSt()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_propagation off
 int CPartMng::pppGetNumFreePppMngSt()
 {
     int freeCount = 0;
@@ -758,6 +759,7 @@ int CPartMng::pppGetNumFreePppMngSt()
 
     return freeCount;
 }
+#pragma opt_propagation reset
 
 /*
  * --INFO--

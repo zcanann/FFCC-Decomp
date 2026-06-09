@@ -1003,8 +1003,8 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
             }
 
             int nameLen = strlen(s_CmakeInfo.m_name);
-            int spaceCount = 0;
             const char* scan = s_CmakeInfo.m_name;
+            int spaceCount = 0;
             int remain = nameLen;
             for (; 0 < remain; remain = remain - 1) {
                 if (*scan != ' ') {

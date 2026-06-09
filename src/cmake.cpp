@@ -612,7 +612,7 @@ void CMenuPcs::calcVillageMenu()
 
             loadTexture(PTR_s_world2, 8, 1, s_cmakeWorldTextureTable, 0x60, 9, 3);
 
-            CMemory::CStage* stage = m_menuStage;
+            CMemory::CStage* stage = MenuPcs.m_menuStage;
             void*& villageWork = CmakeVillageWork(this);
             villageWork = operator new(0x48, stage, const_cast<char*>(s_cmake_cpp), 0xCB3);
             memset(villageWork, 0, 0x48);
@@ -3753,17 +3753,29 @@ void CMenuPcs::DrawSingCMake()
 
     if (CmakeState(this)->m_step == 6) {
         CmakeState(this)->m_step = static_cast<short>(CmakeState(this)->m_select + 1);
-        CmakeState(this)->m_mode = (CmakeState(this)->m_step == 0) ? 2 : 0;
+        if (CmakeState(this)->m_step == 0) {
+            CmakeState(this)->m_mode = 2;
+        } else {
+            CmakeState(this)->m_mode = 0;
+        }
     } else if (CmakeState(this)->m_resultDir < 0) {
         if (CmakeState(this)->m_step == 5) {
             CmakeState(this)->m_step = 6;
         } else {
             CmakeState(this)->m_step = static_cast<short>(CmakeState(this)->m_step - 1);
         }
-        CmakeState(this)->m_mode = (CmakeState(this)->m_step == 0) ? 2 : 0;
+        if (CmakeState(this)->m_step == 0) {
+            CmakeState(this)->m_mode = 2;
+        } else {
+            CmakeState(this)->m_mode = 0;
+        }
     } else if (CmakeState(this)->m_step != 5) {
         CmakeState(this)->m_step = static_cast<short>(CmakeState(this)->m_step + 1);
-        CmakeState(this)->m_mode = (CmakeState(this)->m_step == 0) ? 2 : 0;
+        if (CmakeState(this)->m_step == 0) {
+            CmakeState(this)->m_mode = 2;
+        } else {
+            CmakeState(this)->m_mode = 0;
+        }
     } else {
         CmakeState(this)->m_step = 0;
         CmakeState(this)->m_mode = 2;

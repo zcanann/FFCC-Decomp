@@ -3863,7 +3863,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
         blockIndex++;
         dataPtr += chunkSize;
 
-        if (blockCount <= blockIndex)
+        if (blockIndex >= blockCount)
         {
             return 1;
         }
@@ -3873,7 +3873,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
     localWord = 0;
     localBytes[0] = 0x0B;
 
-    if (phase == 0)
+    if ((signed char)phase == 0)
     {
         if (step == 0)
         {

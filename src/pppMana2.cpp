@@ -1312,6 +1312,8 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_lifetimes off
 void pppDestructMana2(pppMana2* pppMana2, _pppCtrlTable* param_2)
 {
     VMana2* work;
@@ -1453,6 +1455,7 @@ void pppDestructMana2(pppMana2* pppMana2, _pppCtrlTable* param_2)
         }
     }
 }
+#pragma pop
 
 /*
  * --INFO--

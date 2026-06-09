@@ -1829,14 +1829,17 @@ card_connected:;
             }
         }
 
-        m_drawCursor = 1;
         if (m_returnTransfer == 0) {
+            m_drawCursor = 1;
             m_cursorListY0 = 0xb1;
+            m_cursorListY1 = 0xdc;
+            m_cursorMode = 0;
         } else {
+            m_drawCursor = 1;
             m_cursorListY0 = 0x8b;
+            m_cursorListY1 = 0xdc;
+            m_cursorMode = 0;
         }
-        m_cursorListY1 = 0xdc;
-        m_cursorMode = 0;
         {
             unsigned char next;
 

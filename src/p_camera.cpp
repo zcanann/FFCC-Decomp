@@ -1894,58 +1894,7 @@ void CCameraPcs::drawShadowEndAll()
         return;
     }
 
-    unsigned int* dstWords = reinterpret_cast<unsigned int*>(&CurrentCameraState());
-    unsigned int* srcWords = reinterpret_cast<unsigned int*>(&m_savedCamera);
-    float* dstFloats = &m_yaw;
-    float* srcFloats = &m_savedCamera.m_yaw;
-
-#define COPY_SHADOW_CAMERA_WORD_PAIR(index) \
-    do {                                    \
-        unsigned int word0 = srcWords[index]; \
-        unsigned int word1 = srcWords[(index) + 1]; \
-        dstWords[index] = word0;            \
-        dstWords[(index) + 1] = word1;      \
-    } while (0)
-
-    COPY_SHADOW_CAMERA_WORD_PAIR(0);
-    COPY_SHADOW_CAMERA_WORD_PAIR(2);
-    COPY_SHADOW_CAMERA_WORD_PAIR(4);
-    COPY_SHADOW_CAMERA_WORD_PAIR(6);
-    COPY_SHADOW_CAMERA_WORD_PAIR(8);
-    COPY_SHADOW_CAMERA_WORD_PAIR(10);
-    COPY_SHADOW_CAMERA_WORD_PAIR(12);
-    COPY_SHADOW_CAMERA_WORD_PAIR(14);
-    COPY_SHADOW_CAMERA_WORD_PAIR(16);
-    COPY_SHADOW_CAMERA_WORD_PAIR(18);
-    COPY_SHADOW_CAMERA_WORD_PAIR(20);
-    COPY_SHADOW_CAMERA_WORD_PAIR(22);
-    COPY_SHADOW_CAMERA_WORD_PAIR(24);
-    COPY_SHADOW_CAMERA_WORD_PAIR(26);
-    COPY_SHADOW_CAMERA_WORD_PAIR(28);
-    COPY_SHADOW_CAMERA_WORD_PAIR(30);
-    COPY_SHADOW_CAMERA_WORD_PAIR(32);
-    COPY_SHADOW_CAMERA_WORD_PAIR(34);
-    COPY_SHADOW_CAMERA_WORD_PAIR(36);
-    COPY_SHADOW_CAMERA_WORD_PAIR(38);
-    COPY_SHADOW_CAMERA_WORD_PAIR(40);
-    COPY_SHADOW_CAMERA_WORD_PAIR(42);
-    COPY_SHADOW_CAMERA_WORD_PAIR(44);
-    COPY_SHADOW_CAMERA_WORD_PAIR(46);
-    COPY_SHADOW_CAMERA_WORD_PAIR(48);
-    COPY_SHADOW_CAMERA_WORD_PAIR(50);
-    COPY_SHADOW_CAMERA_WORD_PAIR(52);
-    COPY_SHADOW_CAMERA_WORD_PAIR(54);
-    COPY_SHADOW_CAMERA_WORD_PAIR(56);
-    COPY_SHADOW_CAMERA_WORD_PAIR(58);
-
-#undef COPY_SHADOW_CAMERA_WORD_PAIR
-
-    dstWords[60] = srcWords[60];
-    dstFloats[0] = srcFloats[0];
-    dstFloats[1] = srcFloats[1];
-    dstFloats[2] = srcFloats[2];
-    dstFloats[3] = srcFloats[3];
-    dstFloats[4] = srcFloats[4];
+    CopyCameraState(CurrentCameraState(), m_savedCamera);
 }
 
 /*

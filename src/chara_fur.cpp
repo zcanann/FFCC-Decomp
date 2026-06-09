@@ -948,6 +948,7 @@ void CChara::LoadFurTexBuffer(unsigned short* inTexels)
  */
 #pragma push
 #pragma opt_common_subs off
+#pragma opt_propagation off
 void CChara::CModel::InitMogFurTex()
 {
 	CTextureSet* textureSet = m_texSet;

@@ -419,12 +419,12 @@ int CCameraPcs::GetTable(unsigned long tableIndex)
  */
 void CCameraPcs::create()
 {
-    float value18 = kCameraPi;
     float value5c = kCameraHalfScreenHeight;
+    float value18 = kCameraPi;
     float zero = kCameraZeroF;
     float valueb0 = kCameraDefaultPitch;
 
-    m_targetZ = kCameraZeroF;
+    m_targetZ = zero;
     m_targetY = zero;
     m_targetX = zero;
 

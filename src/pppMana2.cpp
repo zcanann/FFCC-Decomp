@@ -854,6 +854,8 @@ void CalcReflectionVector2(
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_propagation off
 void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, float (*) [4], int)
 {
     VMana2* work;
@@ -1042,6 +1044,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     model->m_afterMeshDrawCallback = (CChara::CModel::AfterMeshDrawCallback)Mana2_BeforeDrawCallback;
     model->SetDrawMeshDLCallback(Mana2_DrawMeshDLCallback);
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -1071,6 +1074,8 @@ void pppRenderMana2(pppMana2*, pppMana2Step*, _pppCtrlTable*)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_lifetimes off
 void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* param_3)
 {
     u32 texBufferSize;
@@ -1300,6 +1305,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
         }
     }
 }
+#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x801088a0
@@ -1309,6 +1315,8 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_lifetimes off
 void pppDestructMana2(pppMana2* pppMana2, _pppCtrlTable* param_2)
 {
     VMana2* work;
@@ -1450,6 +1458,7 @@ void pppDestructMana2(pppMana2* pppMana2, _pppCtrlTable* param_2)
         }
     }
 }
+#pragma pop
 
 /*
  * --INFO--

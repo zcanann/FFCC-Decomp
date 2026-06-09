@@ -1741,7 +1741,14 @@ found:
             unsigned int chunks = remainingBytes >> 3;
             if (chunks != 0) {
                 do {
-                    checksum += data[0] + data[1] + data[2] + data[3] + data[4] + data[5] + data[6] + data[7];
+                    checksum += data[0];
+                    checksum += data[1];
+                    checksum += data[2];
+                    checksum += data[3];
+                    checksum += data[4];
+                    checksum += data[5];
+                    checksum += data[6];
+                    checksum += data[7];
                     data += 8;
                     chunks--;
                 } while (chunks != 0);
@@ -1797,7 +1804,14 @@ found:
         unsigned int chunks = remainingBytes >> 3;
         if (chunks != 0) {
             do {
-                checksum += data[0] + data[1] + data[2] + data[3] + data[4] + data[5] + data[6] + data[7];
+                checksum += data[0];
+                checksum += data[1];
+                checksum += data[2];
+                checksum += data[3];
+                checksum += data[4];
+                checksum += data[5];
+                checksum += data[6];
+                checksum += data[7];
                 data += 8;
                 chunks--;
             } while (chunks != 0);

@@ -2057,7 +2057,7 @@ void CMenuPcs::CmakeTribeDraw()
     hairFont->SetColor(hairRgba.color);
     hairFont->SetTlut(6);
 
-    int hairBase = MenuS16(this, 0x862) * 8;
+    int hairBase = CmakeState(this)->m_select * 8;
     if (s_CmakeInfo.m_gender != 0) {
         hairBase += 4;
     }

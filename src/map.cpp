@@ -2768,10 +2768,10 @@ void CMapMng::Draw()
                     int texMtx = 0x1E;
                     int stage = 0;
                     for (int i = 0; i < batchCount; i++) {
-                        GXLoadTexMtxImm(shadowMatrices[i], texMtx, GX_MTX2x4);
+                        GXLoadTexMtxImm(shadowMatrices[i], texMtx, GX_MTX3x4);
                         GXLoadTexObj(&texObjs[i], static_cast<GXTexMapID>(i));
                         GXSetTexCoordGen2(
-                            static_cast<GXTexCoordID>(i), GX_TG_MTX2x4, GX_TG_TEX0,
+                            static_cast<GXTexCoordID>(i), GX_TG_MTX3x4, GX_TG_POS,
                             static_cast<GXTexMtx>(texMtx), 0, GX_PTIDENTITY);
                         GXSetTevDirect(static_cast<GXTevStageID>(stage));
                         _GXSetTevOrder(
@@ -2780,7 +2780,7 @@ void CMapMng::Draw()
                         _GXSetTevSwapMode(static_cast<GXTevStageID>(stage), GX_TEV_SWAP0, GX_TEV_SWAP1);
                         if (i == 0) {
                             _GXSetTevColorIn(
-                                static_cast<GXTevStageID>(stage), GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASC,
+                                static_cast<GXTevStageID>(stage), GX_CC_ZERO, GX_CC_RASC, GX_CC_ONE,
                                 GX_CC_ZERO);
                             _GXSetTevColorOp(
                                 static_cast<GXTevStageID>(stage), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, 1,
@@ -2816,9 +2816,9 @@ void CMapMng::Draw()
                     _GXSetTevColorOp(
                         static_cast<GXTevStageID>(stage), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, 1, GX_TEVPREV);
                     _GXSetTevAlphaIn(
-                        static_cast<GXTevStageID>(stage), GX_CA_ZERO, GX_CA_RASA, GX_CA_APREV, GX_CA_TEXA);
+                        static_cast<GXTevStageID>(stage), GX_CA_ZERO, GX_CA_KONST, GX_CA_APREV, GX_CA_RASA);
                     _GXSetTevAlphaOp(
-                        static_cast<GXTevStageID>(stage), GX_TEV_SUB, GX_TB_ZERO, GX_CS_SCALE_1, 0, GX_TEVREG2);
+                        static_cast<GXTevStageID>(stage), GX_TEV_SUB, GX_TB_ZERO, GX_CS_SCALE_1, 0, GX_TEVREG1);
 
                     int finalStage = stage + 1;
                     GXSetTevDirect(static_cast<GXTevStageID>(finalStage));
@@ -2830,9 +2830,9 @@ void CMapMng::Draw()
                         static_cast<GXTevStageID>(finalStage), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, 1,
                         GX_TEVPREV);
                     _GXSetTevAlphaIn(
-                        static_cast<GXTevStageID>(finalStage), GX_CA_A2, GX_CA_TEXA, GX_CA_A2, GX_CA_APREV);
+                        static_cast<GXTevStageID>(finalStage), GX_CA_A1, GX_CA_RASA, GX_CA_A1, GX_CA_APREV);
                     _GXSetTevAlphaOp(
-                        static_cast<GXTevStageID>(finalStage), GX_TEV_COMP_R8_GT, GX_TB_ZERO, GX_CS_SCALE_1, 0,
+                        static_cast<GXTevStageID>(finalStage), GX_TEV_COMP_A8_GT, GX_TB_ZERO, GX_CS_SCALE_1, 0,
                         GX_TEVPREV);
 
                     GXSetNumTexGens(static_cast<unsigned char>(batchCount));

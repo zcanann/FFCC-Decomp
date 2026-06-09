@@ -948,7 +948,7 @@ void CGPartyObj::onFrameAlways()
 			itemId = Math.Rand(0x155) + 0x9F;
 			unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2] + itemId * 0x48);
 			itemModel = *reinterpret_cast<unsigned short*>(itemData + 2);
-		} while ((*reinterpret_cast<short*>(Game.unkCFlatData0[2] + itemId * 0x48) == 0) ||
+		} while ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48) == 0) ||
 		         ((itemModel & 0x0FFF) == 0) ||
 		         ((itemModel & 0x0FFF) == 0x0FFF) ||
 		         (itemId == 400));

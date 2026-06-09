@@ -1256,7 +1256,6 @@ void CGObject::hit()
         return;
     }
 
-    const float zero = sZeroFloat;
     for (CGObject* other = CFlat.FindGObjFirst(); other != 0;
          other = CFlat.FindGObjNext(other)) {
         if (((other->m_bgColMask & 0x80000) == 0) || (other == this)) {
@@ -1270,6 +1269,8 @@ void CGObject::hit()
         if ((nearRadius * nearRadius) < distSq) {
             continue;
         }
+
+        const float zero = sZeroFloat;
 
         for (int attackIndex = 0; attackIndex < 8; attackIndex++) {
             AttackCol* attack = &m_attackColliders[attackIndex];

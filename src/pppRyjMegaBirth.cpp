@@ -963,7 +963,7 @@ void birth(
 			if (pathBase != NULL) {
 				int sampleIndex;
 
-				if ((u16)work->m_meshEmitIndex >= (u16)pathInfo[1]) {
+				if ((int)(u16)work->m_meshEmitIndex >= (int)pathInfo[1]) {
 					work->m_meshEmitIndex = 0;
 				}
 

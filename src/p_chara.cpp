@@ -2316,8 +2316,8 @@ foundTexture:
         }
 
         m_texLoadRef = loadTexture;
-        m_texLoadRef->AddRef();
-        m_textureSet = reinterpret_cast<CLoadTexture*>(m_texLoadRef)->m_textureSet;
+        loadTexture->AddRef();
+        m_textureSet = loadTexture->m_textureSet;
         m_textureSet->AddRef();
         goto attach;
     } else {

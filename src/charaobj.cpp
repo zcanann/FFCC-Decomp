@@ -1424,7 +1424,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 	calcRegist(static_cast<int>(staType), resolvedItemId, resistType, allowEffect, effectResult, 0);
 
 	if (resistType == 3) {
-		if (staType == 4 || staType == 0x1C || staType < 3 ||
+		if (staType == 4 || staType == 0x1C || static_cast<unsigned int>(staType) <= 2 ||
 		    static_cast<unsigned int>(staType - 8) <= 2 || staType == 6 || staType == 3) {
 			putParticle(0x201, 0, hitPos, FLOAT_803319A8 * (FLOAT_803319AC * m_attackColRadius), 0x65);
 		} else if (static_cast<unsigned int>(staType - 0x24) <= 1 || staType == 0x69 || staType == 0x6A) {
@@ -1448,7 +1448,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		frontDelta.y = deltaVec.y;
 		frontDelta.z = deltaVec.z;
 		float frontMag = PSVECMag(&frontDelta);
-		if (kCharaObjZero < frontMag) {
+		if (frontMag > kCharaObjZero) {
 			CVector scaledVec;
 			PSVECScale(&frontDelta, reinterpret_cast<Vec*>(&scaledVec), kOneF32 / frontMag);
 			frontDelta.x = scaledVec.x;
@@ -1458,7 +1458,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			facing.x = sinf(m_rotBaseY);
 			facing.y = kCharaObjZero;
 			facing.z = cosf(m_rotBaseY);
-			if (kCharaObjZero < PSVECDotProduct(&frontDelta, reinterpret_cast<Vec*>(&facing))) {
+			if (PSVECDotProduct(&frontDelta, reinterpret_cast<Vec*>(&facing)) > kCharaObjZero) {
 				playSe3D(0x1D, 0x32, 0x96, 0, 0);
 				putParticle(0x200, 0, hitPos, FLOAT_803319AC * m_attackColRadius, 0);
 				if ((static_cast<short>(sourceObj->GetCID()) & 0x6D) == 0x6D) {
@@ -1828,18 +1828,22 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				int counterType;
 				int counterItem;
 				int counterSe;
-				if (counterState < 1) {
+				switch (counterState) {
+				case 0:
 					counterType = 1;
 					counterItem = 0x207;
 					counterSe = 0x7E1;
-				} else if (counterState == 1) {
+					break;
+				case 1:
 					counterType = 0;
 					counterItem = 0x20B;
 					counterSe = 0x7E2;
-				} else if (counterState < 3) {
+					break;
+				case 2:
 					counterType = 4;
 					counterItem = 0x20F;
 					counterSe = 0x7E3;
+					break;
 				}
 				int counterResist;
 				int counterAllow;
@@ -1919,7 +1923,6 @@ void CGCharaObj::setSta(int staIndex, int value)
 	int current = *reinterpret_cast<unsigned short*>(staSlot + 0x3E);
 	value &= ~(value >> 31);
 
-	if (current == 0 || value != 0) {
 	if (current == 0 && value != 0) {
 		switch (staIndex) {
 			case 0x1B:
@@ -2052,7 +2055,6 @@ void CGCharaObj::setSta(int staIndex, int value)
 			default:
 				break;
 		}
-	}
 	} else {
 		switch (staIndex) {
 			case 0x1B:
@@ -3578,12 +3580,16 @@ void CGCharaObj::combi2()
 		unsigned int comboMode = 0xFFFFFFFF;
 
 		if (!isSharedResult) {
-			if (comboCmd == 0x207) {
+			switch (comboCmd) {
+			case 0x207:
 				comboMode = 0;
-			} else if (comboCmd == 0x20B) {
+				break;
+			case 0x20B:
 				comboMode = 1;
-			} else if (comboCmd == 0x20F) {
+				break;
+			case 0x20F:
 				comboMode = 2;
+				break;
 			}
 
 			if (party == leadParty) {

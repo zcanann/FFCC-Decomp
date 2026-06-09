@@ -1325,7 +1325,7 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
                     break;
                 case 0x40:
                     m_bumpTexCoordIds[0] = m_texScroll1TexCoord;
-                    GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_bumpTexCoordIds[0]), GX_TG_MTX2x4, GX_TG_TEX0, m_texScroll1TexMtx, GX_FALSE, 0x7D);
+                    GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_bumpTexCoordIds[0]), GX_TG_MTX2x4, GX_TG_TEX0, MaterialMan.m_texScroll1TexMtx, GX_FALSE, 0x7D);
                     m_texCoordIdCurShadow = IncTexCoordIdCur();
                     GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_texCoordIdCurShadow), GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, 0x7D);
                     break;
@@ -1366,7 +1366,7 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
                 break;
             case 0x40:
                 m_bumpTexCoordIds[0] = m_texScroll1TexCoord;
-                GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_bumpTexCoordIds[0]), GX_TG_MTX2x4, GX_TG_TEX0, m_texScroll1TexMtx, GX_FALSE, 0x7D);
+                GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_bumpTexCoordIds[0]), GX_TG_MTX2x4, GX_TG_TEX0, MaterialMan.m_texScroll1TexMtx, GX_FALSE, 0x7D);
                 m_texCoordIdCurShadow = IncTexCoordIdCur();
                 GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_texCoordIdCurShadow), GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, 0x7D);
                 break;

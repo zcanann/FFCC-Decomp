@@ -1219,13 +1219,13 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			Vec hitTarget;
 			Vec hitMove;
 			float* params = reinterpret_cast<float*>(object->m_localBase);
+			float radius = params[5];
 			hitStart.x = engineObject->m_worldPosition.x;
 			hitStart.y = engineObject->m_worldPosition.y + params[1];
 			hitStart.z = engineObject->m_worldPosition.z;
 			hitTarget.x = params[2];
 			hitTarget.y = params[3];
 			hitTarget.z = params[4];
-			float radius = params[5];
 			PSVECSubtract(&hitTarget, &hitStart, &hitMove);
 			int hit = MapPcs.CheckHitCylinderNear(&hitStart, &hitMove, radius, object->m_localBase[0]);
 			AddDebugDrawCC(&hitStart, &hitMove, radius, 1, 0);

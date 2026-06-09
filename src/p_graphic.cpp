@@ -792,7 +792,14 @@ void CGraphicPcs::drawBar()
         }
 
         if (i == lastOrder) {
-            const u32 soundColor = Math.Hsb2Rgb(0, 100, 100);
+            GXColor soundTmp;
+            *reinterpret_cast<u32*>(&soundTmp) = Math.Hsb2Rgb(0, 100, 100);
+            GXColor soundGX;
+            soundGX.r = soundTmp.r;
+            soundGX.g = soundTmp.g;
+            soundGX.b = soundTmp.b;
+            soundGX.a = soundTmp.a;
+            const u32 soundColor = *reinterpret_cast<u32*>(&soundGX);
             const float soundWidth = (kGraphicScreenCenterX * Sound.GetPerformance()) / kDebugBarFrameBudget;
 
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);

@@ -1360,7 +1360,7 @@ void CPartMng::pppEditAllReleaseResource()
     static const int kUsbShapeSlotTableOffset = 0x7F8;
     static const int kRecvBuffOffset = 0x1C8;
 
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+#define self (reinterpret_cast<unsigned char*>(this))
     int iVar3;
     unsigned char* iter;
 
@@ -1455,6 +1455,7 @@ void CPartMng::pppEditAllReleaseResource()
         operator delete(*reinterpret_cast<void**>(self + 0x7FC));
         *reinterpret_cast<int*>(self + 0x7FC) = 0;
     }
+#undef self
 }
 
 /*

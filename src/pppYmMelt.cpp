@@ -12,9 +12,12 @@
 #include "dolphin/mtx.h"
 #include "dolphin/os/OSCache.h"
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
+#pragma exceptions on
 extern "C" {
 extern const float kPppYmMeltZero = 0.0f;
 extern const float kPppYmMeltPhaseOne = 1.0f;
+extern const double kPppYmMeltUnsignedToDoubleBias = 4503599627370496.0;
+extern const double kPppYmMeltUnsignedToDoubleAdjust = 4503601774854144.0;
 extern const float kPppYmMeltHalf = 0.5f;
 extern const float kPppYmMeltDegToRad = 0.017453292f;
 extern const float kPppYmMeltRayLength = -2000.0f;
@@ -119,7 +122,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
 
     shape = ppvEnv->m_resourceTables.m_shapeTablePtr[ctrl->m_dataValIndex];
 
-    pppSetDrawEnv(&colorWork->m_color, (pppFMATRIX*)&ppvCameraMatrix, kPppYmMeltZero,
+    pppSetDrawEnv(&colorWork->m_color, (pppFMATRIX*)&ppvCameraMatrix, LoadFloat(kPppYmMeltZero),
                   ctrl->m_melt.m_drawEnvColor1, ctrl->m_melt.m_drawEnvColor0, ctrl->m_blendMode, 2, 1, 1, 0);
     pppSetBlendMode(ctrl->m_blendMode);
 
@@ -150,7 +153,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
         SetUpPaletteEnv(texture);
     }
 
-    phaseLerp = kPppYmMeltPhaseOne - work->m_phase;
+    phaseLerp = LoadFloat(kPppYmMeltPhaseOne) - work->m_phase;
     drawColor = g_ymMelt;
     drawColorBytes = reinterpret_cast<u8*>(&drawColor);
     drawColorBytes[0] = colorWork->m_color.rgba[0];
@@ -426,7 +429,7 @@ extern "C" void CalcPolygonHeight(
     pointCount = vertexData->m_gridSize + 1;
     pointCount *= pointCount;
     previousY = ppvMng->m_previousPosition.x;
-    zero = kPppYmMeltZero;
+    zero = LoadFloat(kPppYmMeltZero);
     for (i = 0; i < pointCount; i++) {
         vertex = &vertexBuffer[i];
 

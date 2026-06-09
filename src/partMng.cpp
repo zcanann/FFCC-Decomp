@@ -1933,7 +1933,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
                     CMaterialSet* materialSet = res->m_materialSet;
                     materialSet->m_materials.SetDefaultSize(0x180);
                     materialSet->m_materials.SetGrow(0);
-                    m_pppEnvSt.m_materialSetPtr = materialSet;
+                    m_pppEnvSt.m_materialSetPtr = res->m_materialSet;
 
                     CMaterial* defaultMaterial = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x44E) CMaterial;
                     defaultMaterial->Create(0, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0));

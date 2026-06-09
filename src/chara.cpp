@@ -2461,7 +2461,9 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 	if (m_anim != 0) {
 		int blendFrames = 0;
 		if (ModelAttachMode(this) == 0) {
-			blendFrames = (AnimFlags(m_anim) & 0x80) != 0 ? blendMode : 0;
+			int flagBit = (AnimFlags(m_anim) >> 7) & 1;
+			int flagMask = ((-flagBit) | flagBit) >> 31;
+			blendFrames = blendMode & flagMask;
 		} else if (ModelAttachMode(this) == 1) {
 			blendFrames = blendMode;
 		}

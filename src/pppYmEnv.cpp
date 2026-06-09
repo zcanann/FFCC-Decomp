@@ -186,10 +186,10 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
         _GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD0, GX_TEXMAP1, GX_COLOR0A0);
         _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
         _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
-        color.a = 0xFF;
-        color.b = 0xFF;
-        color.g = 0xFF;
         color.r = 0xFF;
+        color.g = 0xFF;
+        color.b = 0xFF;
+        color.a = 0xFF;
         GXSetChanMatColor(GX_COLOR0A0, color);
         GXLoadTexObj(blendTexObj, GX_TEXMAP0);
     }

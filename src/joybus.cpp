@@ -315,8 +315,8 @@ void JoyBus::CreateInit()
         }
     }
 
-    memset((void*)m_fileBaseA, 0, len);
-    memcpy((void*)m_fileBaseA, File.m_readBuffer, len);
+    memset((void*)m_fileBaseA, 0, m_fileBaseA_dup);
+    memcpy((void*)m_fileBaseA, File.m_readBuffer, m_fileBaseA_dup);
 
     File.Close(file);
 

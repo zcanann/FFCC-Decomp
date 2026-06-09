@@ -1575,7 +1575,7 @@ void CMemoryCardMan::MakeSaveData()
     *reinterpret_cast<int*>(save + 0x24) = gameWork->m_timerA;
     *reinterpret_cast<int*>(save + 0x28) = gameWork->m_scriptGlobalTime;
     *reinterpret_cast<int*>(save + 0x2C) = gameWork->m_frameCounter;
-    memcpy(save + 0x30, Game.m_gameWork.m_wmBackupParams, 0x10);
+    memcpy(save + 0x30, gameWork->m_wmBackupParams, 0x10);
     memcpy(save + 0x40, Game.m_gameWork.m_bossArtifactStageTable, 0x3C);
     memcpy(save + 0x7C, Game.m_gameWork.m_unkStageTable, 0x3C);
     *reinterpret_cast<int*>(save + 0xB8) = Game.m_gameWork.m_chaliceElement;

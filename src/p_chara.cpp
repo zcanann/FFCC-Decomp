@@ -1747,19 +1747,20 @@ checkLoaded:
 
                     chunkFile.PushChunk();
                     while (chunkFile.GetNextChunk(chunk)) {
-                        if (chunk.m_id == 'NAME') {
+                        switch (chunk.m_id) {
+                        case 'NAME':
                             animName = chunkFile.GetString();
                             continue;
-                        }
-                        if (chunk.m_id == 'INFO') {
+                        case 'INFO':
                             dataType = static_cast<int>(chunkFile.Get4());
                             keyTag = reinterpret_cast<void*>(chunkFile.Get4());
                             keyId = static_cast<int>(chunkFile.Get4());
                             variantTag = reinterpret_cast<void*>(chunkFile.Get4());
                             hasDynamics = static_cast<int>(chunkFile.Get4());
                             continue;
-                        }
-                        if (chunk.m_id != 'RAW ') {
+                        case 'RAW ':
+                            break;
+                        default:
                             continue;
                         }
 

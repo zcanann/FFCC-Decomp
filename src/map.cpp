@@ -2711,7 +2711,7 @@ void CMapMng::Draw()
 
         if (Game.m_currentSceneId == 4) {
             CharaPcs.drawMakeTexShadow();
-            MaterialMan.InitVtxFmt(-1, GX_RGB565, 0, GX_U16, 0xE, GX_U16, 10);
+            MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_S16, 0xE, GX_S16, 10);
             MaterialMan.SetDefaultDrawEnv(0x000ACE0F);
             Graphic.SetFog(MapMng.m_fogEnable, 0);
 
@@ -2747,8 +2747,8 @@ void CMapMng::Draw()
                 GXSetAlphaUpdate(0);
                 GXSetCullMode(GX_CULL_NONE);
                 GXSetZMode(1, GX_LEQUAL, 0);
-                _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_COPY);
-                GXSetChanCtrl(GX_COLOR0A0, 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
+                _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
+                GXSetChanCtrl(GX_COLOR0A0, 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
                 GXSetChanMatColor(GX_COLOR0A0, CharaPcs.m_texShadowColor);
                 _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
                 _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_RED, GX_CH_RED, GX_CH_RED);

@@ -2690,6 +2690,8 @@ void CGObject::LookAt(CGObject* target, char* nodeName)
  * Address:	TODO
  * Size:	TODO
  */
+#pragma push
+#pragma opt_propagation off
 void CGObject::InitWork(int index)
 {
     typedef void (*InitWorkFn)(void**, int, unsigned int, int);
@@ -2709,6 +2711,7 @@ void CGObject::InitWork(int index)
     }
     }
 }
+#pragma pop
 
 /*
  * --INFO--

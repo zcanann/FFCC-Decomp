@@ -4337,8 +4337,15 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
         mng->m_position.y = createParam->m_positionOffsetPtr->y + *reinterpret_cast<float*>(fpData + 0x04);
         mng->m_position.z = createParam->m_positionOffsetPtr->z + *reinterpret_cast<float*>(fpData + 0x08);
     }
-    mng->m_savedPosition = mng->m_position;
-    mng->m_previousPosition = mng->m_position;
+    {
+        unsigned char* mngBytes = reinterpret_cast<unsigned char*>(mng);
+        *reinterpret_cast<float*>(mngBytes + 0x58) = mng->m_position.x;
+        *reinterpret_cast<float*>(mngBytes + 0x5c) = mng->m_position.y;
+        *reinterpret_cast<float*>(mngBytes + 0x60) = mng->m_position.z;
+        *reinterpret_cast<float*>(mngBytes + 0x48) = *reinterpret_cast<float*>(mngBytes + 0x58);
+        *reinterpret_cast<float*>(mngBytes + 0x4c) = *reinterpret_cast<float*>(mngBytes + 0x5c);
+        *reinterpret_cast<float*>(mngBytes + 0x50) = *reinterpret_cast<float*>(mngBytes + 0x60);
+    }
 
     if (createParam->m_extraPositionPtr != 0) {
         mng->m_paramVec0.x = createParam->m_extraPositionPtr->x;

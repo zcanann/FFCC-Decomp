@@ -1737,15 +1737,11 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 				           FLOAT_803301BC / parentScaleSrt.m_scale.y,
 				           FLOAT_803301BC / parentScaleSrt.m_scale.z);
 			} else {
-				if (parentNode == 0) {
-					float baseScale = ModelBaseScale(this);
-					if (FLOAT_803301BC == baseScale) {
-						PSMTXIdentity(localMtx);
-					} else {
-						PSMTXScale(localMtx, baseScale, baseScale, baseScale);
-					}
-				} else {
+				if (parentNode != 0 || FLOAT_803301BC == ModelBaseScale(this)) {
 					PSMTXIdentity(localMtx);
+				} else {
+					float baseScale = ModelBaseScale(this);
+					PSMTXScale(localMtx, baseScale, baseScale, baseScale);
 				}
 			}
 

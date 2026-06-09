@@ -1299,8 +1299,9 @@ void CCharaPcs::drawBefore()
  */
 void CCharaPcs::drawMakeTexShadow()
 {
+    CHandle* handle = m_handleList->m_next;
     int shadowCount = 0;
-    for (CHandle* handle = m_handleList->m_next; m_handleList != handle; handle = handle->m_next) {
+    for (; m_handleList != handle; handle = handle->m_next) {
         if ((handle->m_flags & 0x200) != 0) {
             shadowCount++;
         }
@@ -1334,7 +1335,7 @@ void CCharaPcs::drawMakeTexShadow()
     m_texShadowTextureOffset += m_texShadowSize * m_texShadowSize * 4;
     C_MTXLightPerspective(m_texShadowProjectionMtx, CameraPcs.m_fov, 1.3333334f, 0.5f, -0.5f, 0.5f, 0.5f);
 
-    CHandle* handle = m_handleList->m_next;
+    handle = m_handleList->m_next;
     while (m_handleList != handle) {
         if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x8000) != 0) {
             handle->draw(2, 1);

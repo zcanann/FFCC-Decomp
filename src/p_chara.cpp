@@ -2314,6 +2314,12 @@ foundTexture:
             System.Printf(const_cast<char*>(s_charaTexLoadAmemFmt), charaKind, static_cast<unsigned int>(charaNo),
                           static_cast<int>(textureVariant));
         }
+
+        m_texLoadRef = loadTexture;
+        m_texLoadRef->AddRef();
+        m_textureSet = reinterpret_cast<CLoadTexture*>(m_texLoadRef)->m_textureSet;
+        m_textureSet->AddRef();
+        goto attach;
     } else {
         if (static_cast<unsigned int>(System.m_execParam) >= 1) {
             System.Printf(const_cast<char*>(s_charaTexLoadDvdFmt), charaKind, static_cast<unsigned int>(charaNo),

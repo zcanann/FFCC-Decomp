@@ -4469,11 +4469,11 @@ int JoyBus::SendMBase(ThreadParam* threadParam)
 
     GbaQue.GetMBasePos(threadParam->m_portIndex, &posX, &posY);
 
-    unsigned int cmdX = 0;
-    unsigned char* cmdXBytes = reinterpret_cast<unsigned char*>(&cmdX);
-    cmdXBytes[0] = 0x0F;
-    *reinterpret_cast<unsigned short*>(cmdXBytes + 2) = __lhbrx(&posX, 0);
-    unsigned int wordX = cmdX;
+    unsigned int cmd = 0;
+    unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
+    cmdBytes[0] = 0x0F;
+    *reinterpret_cast<unsigned short*>(cmdBytes + 2) = __lhbrx(&posX, 0);
+    unsigned int word = cmd;
     int result = 0;
 
     if (static_cast<signed char>(m_threadRunningMask) != 0)
@@ -4488,7 +4488,7 @@ int JoyBus::SendMBase(ThreadParam* threadParam)
         }
         else
         {
-            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = wordX;
+            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = word;
             m_cmdCount[threadParam->m_portIndex]++;
             OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
             result = 0;
@@ -4500,11 +4500,10 @@ int JoyBus::SendMBase(ThreadParam* threadParam)
         return -1;
 	}
 
-    unsigned int cmdY = 0;
-    unsigned char* cmdYBytes = reinterpret_cast<unsigned char*>(&cmdY);
-    cmdYBytes[0] = 0x4F;
-    *reinterpret_cast<unsigned short*>(cmdYBytes + 2) = __lhbrx(&posY, 0);
-    unsigned int wordY = cmdY;
+    cmd = 0;
+    cmdBytes[0] = 0x4F;
+    *reinterpret_cast<unsigned short*>(cmdBytes + 2) = __lhbrx(&posY, 0);
+    word = cmd;
 
     if (static_cast<signed char>(m_threadRunningMask) != 0)
     {
@@ -4518,7 +4517,7 @@ int JoyBus::SendMBase(ThreadParam* threadParam)
         }
         else
         {
-            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = wordY;
+            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = word;
             m_cmdCount[threadParam->m_portIndex]++;
             OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
             result = 0;

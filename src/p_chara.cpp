@@ -873,15 +873,15 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
         System.Printf(const_cast<char*>(s_charaFreeMergeFmt), releaseMask);
         LoadPdtArray(this)->ReleaseAndRemoveAll();
         int charaAmemSize = correctLoadAnimAmem();
-        if (charaAmemSize >= 0) {
-            CharaAmemSize() = static_cast<unsigned int>(charaAmemSize);
-            goto complete;
+        if (charaAmemSize < 0) {
+            if (static_cast<unsigned int>(System.m_execParam) >= 2) {
+                System.Printf(const_cast<char*>(s_charaAmemCompactFailed));
+            }
+            goto releaseAllArrays;
         }
 
-        if (static_cast<unsigned int>(System.m_execParam) >= 2) {
-            System.Printf(const_cast<char*>(s_charaAmemCompactFailed));
-        }
-        goto releaseAllArrays;
+        CharaAmemSize() = static_cast<unsigned int>(charaAmemSize);
+        goto complete;
     }
     }
 
@@ -1132,8 +1132,8 @@ int CCharaPcs::TryReleaseAnimBank(int requiredSize)
         CChara::CAnim* anim = loadAnim->m_anim;
 
         if (anim->m_bank && releaseSize < anim->m_lastFrame) {
-            releaseAnim = loadAnim;
             releaseSize = anim->m_lastFrame;
+            releaseAnim = loadAnim;
         }
     }
 
@@ -2530,8 +2530,9 @@ int CCharaPcs::CHandle::LoadAnim(
     char* animName, int animIndex, int animFlags, int charaKind, int charaNo, int mergeFileId, int mergeFlags)
 {
     if (animIndex == -1) {
-        for (unsigned int i = 0; i < 64; i++) {
-            ReleaseHandleAnimSlot(this, i);
+        CRef** slotPtr = &m_animSlot[0];
+        for (int i = 0; i < 64; i++, slotPtr++) {
+            ReleaseShared(*slotPtr);
         }
         PruneUnsharedAnimRefs(&CharaPcs, 0);
     } else {
@@ -2558,11 +2559,11 @@ int CCharaPcs::CHandle::LoadAnim(
     reinterpret_cast<CRef*>(loadAnim)->AddRef();
 
     *reinterpret_cast<unsigned int*>(Ptr(m_animSlot[animIndex], 0x70)) = static_cast<unsigned int>(animFlags);
-    if (reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex])->m_anim != 0) {
+    {
         unsigned char& flags1 = reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex])->m_anim->m_flags;
-        flags1 = static_cast<unsigned char>((flags1 & 0x7F) | ((animFlags << 7) & 0x80));
+        flags1 = static_cast<unsigned char>(__rlwimi(flags1, animFlags, 7, 24, 24));
         unsigned char& flags2 = reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex])->m_anim->m_flags;
-        flags2 = static_cast<unsigned char>((flags2 & 0xBF) | ((animFlags << 5) & 0x40));
+        flags2 = static_cast<unsigned char>(__rlwimi(flags2, animFlags, 5, 25, 25));
     }
 
     return 1;
@@ -2646,27 +2647,32 @@ int CCharaPcs::CHandle::SetAnim(int animIndex, int startFrame, int endFrame, int
         return 0;
     }
     if (m_currentAnimIndex == animIndex && forceSet == 0) {
-        return 0;
+        goto fail;
     }
 
-    CChara::CAnim* anim;
-    if (animIndex == -1) {
-        anim = 0;
-    } else {
-        CLoadAnim* loadAnim = reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex]);
-        anim = loadAnim != 0 ? loadAnim->m_anim : 0;
-    }
-
-    if (anim == 0) {
-        if (m_charaKind != 3 && static_cast<unsigned int>(System.m_execParam) >= 2) {
-            System.Printf(const_cast<char*>(s_charaSetAnimMissingFmt), m_charaKind, m_charaNo, animIndex);
+    {
+        CChara::CAnim* anim;
+        if (animIndex == -1) {
+            anim = 0;
+        } else {
+            CLoadAnim* loadAnim = reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex]);
+            anim = loadAnim != 0 ? loadAnim->m_anim : 0;
         }
-        return 0;
+
+        if (anim == 0) {
+            if (m_charaKind != 3 && static_cast<unsigned int>(System.m_execParam) >= 2) {
+                System.Printf(const_cast<char*>(s_charaSetAnimMissingFmt), m_charaKind, m_charaNo, animIndex);
+            }
+            goto fail;
+        }
+
+        m_model->AttachAnim(anim, startFrame, endFrame, blendMode);
+        m_currentAnimIndex = animIndex;
+        return 1;
     }
 
-    m_model->AttachAnim(anim, startFrame, endFrame, blendMode);
-    m_currentAnimIndex = animIndex;
-    return 1;
+fail:
+    return 0;
 }
 
 /*

@@ -2835,8 +2835,9 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         CVector lookAtUp(kCharaZero, kCharaOne, kCharaZero);
         CVector shadowUp(kCharaZero, 10.0f, kCharaZero);
 
+        const float shadowDistance = static_cast<float>(CharaPcs.m_texShadowDistance);
         CVector scaledDelta;
-        PSVECScale(delta, scaledDelta, static_cast<float>(CharaPcs.m_texShadowDistance));
+        PSVECScale(delta, scaledDelta, shadowDistance);
 
         Vec shadowBase;
         {

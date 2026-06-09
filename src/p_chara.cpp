@@ -1791,7 +1791,7 @@ checkLoaded:
                             }
 
                             if (loadModel == 0) {
-                                void* rawAddr = rawData;
+                                void* rawAddr = chunkFile.GetAddress();
                                 loadModel = new (pcs->m_stage, const_cast<char*>(s_p_chara_cpp), 0x5E8) CLoadModel;
                                 loadModel->m_keyTag = keyTag;
                                 loadModel->m_keyId = keyId;
@@ -1835,7 +1835,7 @@ checkLoaded:
                             }
 
                             if (loadTexture == 0) {
-                                void* rawAddr = rawData;
+                                void* rawAddr = chunkFile.GetAddress();
                                 loadTexture = new (pcs->m_stage, const_cast<char*>(s_p_chara_cpp), 0x609) CLoadTexture;
                                 loadTexture->m_keyTag = keyTag;
                                 loadTexture->m_keyId = keyId;
@@ -1877,7 +1877,7 @@ checkLoaded:
                             }
 
                             if (loadAnim == 0) {
-                                void* rawAddr = rawData;
+                                void* rawAddr = chunkFile.GetAddress();
                                 CChara::CAnim* anim =
                                     new (pcs->m_stage, const_cast<char*>(s_p_chara_cpp), 0x62A) CChara::CAnim;
                                 anim->Create(rawAddr, pcs->m_viewerAnimStage);

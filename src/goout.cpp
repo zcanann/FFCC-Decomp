@@ -1878,10 +1878,18 @@ card_connected:;
         }
 
         input = GetGoOutInputMask();
-        if ((input & 0x200) != 0) {
-            Sound.PlaySe(3, 0x40, 0x7f, 0);
-            SetGoOutMode(0xf);
-            break;
+        {
+            bool pressed;
+            if ((input & 0x200) != 0) {
+                Sound.PlaySe(3, 0x40, 0x7f, 0);
+                pressed = true;
+            } else {
+                pressed = false;
+            }
+            if (pressed) {
+                SetGoOutMode(0xf);
+                break;
+            }
         }
 
         m_drawCursor = 1;

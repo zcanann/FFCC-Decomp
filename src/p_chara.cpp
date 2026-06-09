@@ -1328,9 +1328,10 @@ void CCharaPcs::drawMakeTexShadow()
     CColor clearColor(0x00, 0x00, 0x00, 0x00);
     Graphic.SetCopyClear(clearColor.color, 0xFFFFFF);
 
+    m_texShadowTextureOffset = 0;
     m_texShadowTextureBase = Graphic.m_scratchTextureBuffer;
     m_texShadowTextureSize = 0xD2000;
-    m_texShadowTextureOffset = m_texShadowSize * m_texShadowSize * 4;
+    m_texShadowTextureOffset += m_texShadowSize * m_texShadowSize * 4;
     C_MTXLightPerspective(m_texShadowProjectionMtx, CameraPcs.m_fov, 1.3333334f, 0.5f, -0.5f, 0.5f, 0.5f);
 
     CHandle* handle = m_handleList->m_next;

@@ -546,8 +546,9 @@ void CGame::InitNewGame()
 
     CGame* game = &Game;
 
-    memset(&game->m_gameWork.m_gameDataStartMarker, 0, kGameWorkDataClearSize);
-    memset(game->m_gameWork.m_wmBackupParams, 0xFF, sizeof(game->m_gameWork.m_wmBackupParams));
+    CGameWork* work = &game->m_gameWork;
+    memset(&work->m_gameDataStartMarker, 0, kGameWorkDataClearSize);
+    memset(work->m_wmBackupParams, 0xFF, sizeof(work->m_wmBackupParams));
 
     *reinterpret_cast<unsigned int*>(&game->m_gameWork.m_scriptSysVal0) = 1;
     game->m_gameWork.m_chaliceElement = 1;

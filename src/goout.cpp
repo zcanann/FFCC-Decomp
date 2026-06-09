@@ -1394,9 +1394,12 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
             MemoryCardMan.Odekake(0, *static_cast<Mc::SaveDat*>(MenuPcs.m_goOutTransferWork), m_selectedTransferChara, *MenuPcs.m_goOutTransferSaveData, freeCaravanIdx);
         }
 
-        MenuPcs.m_mcCtrl.m_cardChannel = m_accessCardChannel;
-        m_cardChannel = static_cast<char>(MenuPcs.m_mcCtrl.m_cardChannel);
+        {
+        const int cardChannel = m_accessCardChannel;
+        m_cardChannel = static_cast<char>(cardChannel);
         m_saveIndex = static_cast<char>(m_accessSaveIndex);
+        MenuPcs.m_mcCtrl.m_cardChannel = cardChannel;
+        }
         m_memCardBuffer = MenuPcs.m_goOutTransferSaveData;
         m_memCardResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(static_cast<unsigned char>(m_cardChannel));
         if (m_memCardResult == 1) {

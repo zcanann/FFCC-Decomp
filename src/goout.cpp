@@ -2888,8 +2888,8 @@ void CGoOutMenu::Calc()
     }
 
     if (m_messageState != 0 && MenuPcs.m_menuWindowInfo->state == 3) {
-        short x;
         short y;
+        short x;
 
         m_currentMessage = m_pendingMessage;
         if (m_pendingMessage != -1) {

@@ -1508,7 +1508,7 @@ void CPartMng::pppEditAllReleaseResource()
         iter = iter + 0x4;
     } while (iVar3 < 0x80);
 
-    if (*reinterpret_cast<int*>(self + 0x7FC) != 0) {
+    if (*reinterpret_cast<void**>(self + 0x7FC) != 0) {
         operator delete(*reinterpret_cast<void**>(self + 0x7FC));
         *reinterpret_cast<int*>(self + 0x7FC) = 0;
     }

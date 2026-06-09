@@ -2146,9 +2146,11 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 					{
 						prev->m_next = next;
 
-						for (stageIdx = 0; stageIdx < progSet->m_numStages; stageIdx++)
+						_pppPDataVal* deadOwner = (_pppPDataVal*)obj->m_owner;
+						_pppProgSetDef* deadProgSet = deadOwner->m_programSetDef;
+						for (stageIdx = 0; stageIdx < deadProgSet->m_numStages; stageIdx++)
 						{
-							_pppCtrlTable* stage = &progSet->m_stages[stageIdx];
+							_pppCtrlTable* stage = &deadProgSet->m_stages[stageIdx];
 							pppProg* prog = stage->m_prog;
 							if (prog != 0 && prog->m_pppFunctionDestructor != 0)
 							{
@@ -2156,13 +2158,13 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 							}
 						}
 
-						if (--owner->m_activeCount == 0)
+						if (--deadOwner->m_activeCount == 0)
 						{
-							owner->m_pppPObjLink = 0;
+							deadOwner->m_pppPObjLink = 0;
 						}
-						else if (owner->m_pppPObjLink == obj)
+						else if (deadOwner->m_pppPObjLink == obj)
 						{
-							owner->m_pppPObjLink = obj->m_next;
+							deadOwner->m_pppPObjLink = obj->m_next;
 						}
 
 						if (obj != 0)

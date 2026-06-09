@@ -1631,7 +1631,8 @@ void CCharaPcs::LoadCam(int index, char* fileName)
 
     CChunkFile chunkFile(File.m_readBuffer);
     while (chunkFile.GetNextChunk(chunk)) {
-        if (chunk.m_id == 'CAM ') {
+        switch (chunk.m_id) {
+        case 'CAM ': {
             m_cameraFrameCount[index] = static_cast<int>(chunk.m_arg0);
 
             cameraBuffer = new (m_viewerAnimStage, const_cast<char*>(s_p_chara_cpp), 0x4D4)
@@ -1649,6 +1650,8 @@ void CCharaPcs::LoadCam(int index, char* fileName)
                 *reinterpret_cast<float*>(reinterpret_cast<char*>(cameraBuffer) + byteOffset + 0x1C) = chunkFile.GetF4();
                 byteOffset += 0x20;
             }
+            break;
+        }
         }
     }
 

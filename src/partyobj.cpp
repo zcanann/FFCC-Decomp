@@ -2900,7 +2900,7 @@ void CGPartyObj::checkTargetParticle()
 #undef targetPos
 #undef centerPos
 	} else {
-		party.partyFlags &= 0xDF;
+		party.flags.flag20 = 0;
 	}
 
 	CVector worldPosFinal(m_worldPosition);

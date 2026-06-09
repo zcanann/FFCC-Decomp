@@ -1271,12 +1271,16 @@ tmpArtifactBlock:
 			secondaryAvailable = true;
 			primaryAvailable = true;
 			primaryCommand = -1;
-			if (carryState == 0x0D) {
+			switch (carryState) {
+			case 0x0D:
 				secondaryCommand = 7;
-			} else if (carryState == 0x0E) {
+				break;
+			case 0x0E:
 				secondaryCommand = 8;
-			} else {
+				break;
+			default:
 				secondaryCommand = 5;
+				break;
 			}
 		} else if (caravan->m_hp == 0) {
 			primaryAvailable = true;
@@ -2208,10 +2212,13 @@ void CGPartyObj::statCharge()
 			int item = m_itemId;
 			if (item == 0x1FC || item == 0x23D) {
 				int base;
-				if (item == 0x23D) {
+				switch (item) {
+				case 0x23D:
 					base = 0x6F;
-				} else if (item < 0x23D && item == 0x1FC) {
+					break;
+				case 0x1FC:
 					base = 0x1B;
+					break;
 				}
 				if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) > 1) {
 					addHp(-1, static_cast<CGPrgObj*>(0));
@@ -4950,7 +4957,7 @@ void CGPartyObj::ghostPartyMog()
 				} else if (CharaGhostValue(0x2054) >= 0x5F) {
 					bossState = 4;
 				}
-			} else if (moodMode != 0 && moodMode < 3 && CharaGhostValue(0x2054) < 0x32) {
+			} else if (moodMode > 1 && moodMode < 3 && CharaGhostValue(0x2054) < 0x32) {
 				bossState = 6;
 			}
 			sGhostPartyWork.flagBits.flag08 = 1;

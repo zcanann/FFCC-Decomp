@@ -2767,7 +2767,7 @@ void CGPartyObj::checkTargetParticle()
 		maxRange = 0.0f;
 		if (Game.unkCFlatData0[2] != 0) {
 			int itemId = *reinterpret_cast<int*>(self + 0x560);
-			maxRange += static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x30));
+			maxRange += static_cast<float>(*reinterpret_cast<short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x30));
 		}
 		if (m_scriptHandle != nullptr) {
 			unsigned char* work = reinterpret_cast<unsigned char*>(m_scriptHandle);
@@ -2777,7 +2777,7 @@ void CGPartyObj::checkTargetParticle()
 					maxRange += static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x0A));
 				}
 			} else {
-				maxRange += static_cast<float>(*reinterpret_cast<unsigned short*>(work + 0x19C));
+				maxRange += static_cast<float>(*reinterpret_cast<short*>(work + 0x19C));
 				if ((*reinterpret_cast<unsigned int*>(work + 0x3B0) & 0x8000) != 0 && Game.unk_flat3_field_8_0xc7dc != 0) {
 					maxRange += static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x0C));
 				}
@@ -2818,7 +2818,7 @@ void CGPartyObj::checkTargetParticle()
 			    (Game.m_gameWork.m_bossArtifactStageIndex < 0x0F)) {
 				loopBossStage = true;
 			}
-			if (loopBossStage && ((__cntlzw(0x6D - (static_cast<unsigned short>(GetCID()) & 0x6D)) >> 5 & 0xFF) != 0)) {
+			if (loopBossStage && ((__cntlzw(0x6D - (static_cast<short>(GetCID()) & 0x6D)) >> 5 & 0xFF) != 0)) {
 				loopBossCid = true;
 			}
 			if (loopBossCid && (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) != 0)) {
@@ -4911,13 +4911,13 @@ void CGPartyObj::ghostPartyMog()
 						innerScale = FLOAT_80331A58 * (kMonObjOne - ramp) + FLOAT_80331A58;
 					}
 				}
-				if (static_cast<int>(FLOAT_80331A5C * innerScale) <= static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x38))) {
+				if (static_cast<unsigned int>(FLOAT_80331A5C * innerScale) <= static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x38))) {
 					flags[0] = (flags[0] & 0xFB) | 4;
 					bossState = 3;
 					goto messageMenu;
 				}
 			}
-			if (sGhostPartyWork.flagBits.flag10 < 0 || *reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x3C) < 0x97) {
+			if (sGhostPartyWork.flagBits.flag10 < 0 || *reinterpret_cast<unsigned int*>(CGPartyObj::m_ghostWork + 0x3C) < 0x97) {
 				bossState = 0;
 				*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x20) = 0;
 			} else {

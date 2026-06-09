@@ -1589,8 +1589,8 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
 void CCameraPcs::drawShadowBegin()
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    Mtx rotX;
     Mtx rotY;
+    Mtx rotX;
     Mtx rotXY;
     Mtx tempMtx;
     Vec up;
@@ -1660,7 +1660,8 @@ void CCameraPcs::drawShadowBegin()
         if (currentDepth < kCameraZeroF) {
             m_fullScreenShadowDepth = depth;
         } else {
-            m_fullScreenShadowDepth = currentDepth + (depth - currentDepth) * kCameraShadowDepthBlend;
+            float blended = (depth - currentDepth) * kCameraShadowDepthBlend;
+            m_fullScreenShadowDepth = currentDepth + blended;
         }
     } else {
         m_fullScreenShadow.m_span = kCameraHundredF;

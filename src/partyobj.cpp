@@ -5192,7 +5192,8 @@ void CGPartyObj::gpmMove()
 				}
 				changeStat(2, 0, 0);
 				sGhostPartyWork.gauge = 0;
-				PartyData(this).partyFlags &= 0x9F;
+				PartyData(this).flags.flag40 = 0;
+				PartyData(this).flags.flag20 = 0;
 				return;
 			}
 		} else {

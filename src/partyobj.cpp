@@ -1049,15 +1049,15 @@ void CGPartyObj::onFramePreCalc()
 	bonus(2, 0, 0);
 
 	if (Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
-		if (party.carryObject == nullptr &&
-		    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
-			m_moveBaseSpeed = FLOAT_80331ad4;
-		} else {
+		if (party.carryObject != nullptr ||
+		    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
 			float speedScale = kMonObjOne;
 			if (static_cast<int>(CFlatCenterState()) == 0) {
 				speedScale = FLOAT_80331b08;
 			}
 			m_moveBaseSpeed = static_cast<float>(static_cast<int>(FLOAT_80331b04 * speedScale));
+		} else {
+			m_moveBaseSpeed = FLOAT_80331ad4;
 		}
 		m_moveBaseSpeed *= m_extraMoveVec.z;
 	}
@@ -3047,7 +3047,7 @@ void CGPartyObj::onStatMagic()
 	bool canTargetMagic = false;
 	bool ghostTargetActive = false;
 	bool menuStageGhost = false;
-	const unsigned int magicReady = __cntlzw(0x103 - m_itemId) >> 5;
+	const int magicReady = static_cast<int>(static_cast<unsigned int>(__cntlzw(0x103 - m_itemId)) >> 5);
 	if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0x0F) {
 		menuStageGhost = true;
 	}
@@ -3085,7 +3085,7 @@ void CGPartyObj::onStatMagic()
 	}
 
 	if (m_subState == 1 && m_comboState != 0 &&
-	    sGhostMogMenuWork.flags.flag40 < 0) {
+	    sGhostMogMenuWork.flags.flag40 != 0) {
 		if (m_comboFrame == 1) {
 			putParticleTrace(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) + 0x4FU | 0x100,
 			    m_particleSlots[8], this, kMonObjOne, 0);

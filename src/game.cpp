@@ -591,12 +591,12 @@ void CGame::clearWork()
 
     unk_flat3_0xc7d0 = 0;
 
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < 4; i++) {
         for (j = 0; j < 4; j++) {
             m_scriptWork[i][j][0] = 0;
+            m_scriptWork[i + 4][j][0] = 0;
             m_scriptWork[i][j][1] = 0;
-            m_scriptWork[i][j + 4][0] = 0;
-            m_scriptWork[i][j + 4][1] = 0;
+            m_scriptWork[i + 4][j][1] = 0;
         }
     }
 

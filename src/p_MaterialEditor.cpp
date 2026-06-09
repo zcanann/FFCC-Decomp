@@ -88,6 +88,18 @@ static inline double S16ToDouble(s16 value)
     return conv.value - kMaterialEditorS16ToDoubleBias;
 }
 
+static inline float S16ToFloat(s16 value)
+{
+    union {
+        u32 words[2];
+        double value;
+    } conv;
+
+    conv.words[0] = 0x43300000;
+    conv.words[1] = static_cast<unsigned int>(value ^ 0x80000000U);
+    return conv.value - kMaterialEditorS16ToDoubleBias;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8004b21c
@@ -248,34 +260,30 @@ void CMaterialEditorPcs::drawViewer()
                     s16 u = pp->u0;
 
                     if (u < 0) {
-                        pp->texCoord[0][0] =
-                            (scaleU * static_cast<float>(S16ToDouble(u))) + LoadFloat(kMaterialEditorOneF);
+                        pp->texCoord[0][0] = (scaleU * S16ToFloat(u)) + LoadFloat(kMaterialEditorOneF);
                     } else {
-                        pp->texCoord[0][0] = scaleU * static_cast<float>(S16ToDouble(u));
+                        pp->texCoord[0][0] = scaleU * S16ToFloat(u);
                     }
                     pp = polygon;
                     u = pp->u1;
                     if (u < 0) {
-                        pp->texCoord[1][0] =
-                            (scaleU * static_cast<float>(S16ToDouble(u))) + LoadFloat(kMaterialEditorOneF);
+                        pp->texCoord[1][0] = (scaleU * S16ToFloat(u)) + LoadFloat(kMaterialEditorOneF);
                     } else {
-                        pp->texCoord[1][0] = scaleU * static_cast<float>(S16ToDouble(u));
+                        pp->texCoord[1][0] = scaleU * S16ToFloat(u);
                     }
                     pp = polygon;
                     u = pp->u2;
                     if (u < 0) {
-                        pp->texCoord[2][0] =
-                            (scaleU * static_cast<float>(S16ToDouble(u))) + LoadFloat(kMaterialEditorOneF);
+                        pp->texCoord[2][0] = (scaleU * S16ToFloat(u)) + LoadFloat(kMaterialEditorOneF);
                     } else {
-                        pp->texCoord[2][0] = scaleU * static_cast<float>(S16ToDouble(u));
+                        pp->texCoord[2][0] = scaleU * S16ToFloat(u);
                     }
                     pp = polygon;
                     u = pp->u3;
                     if (u < 0) {
-                        pp->texCoord[3][0] =
-                            (scaleU * static_cast<float>(S16ToDouble(u))) + LoadFloat(kMaterialEditorOneF);
+                        pp->texCoord[3][0] = (scaleU * S16ToFloat(u)) + LoadFloat(kMaterialEditorOneF);
                     } else {
-                        pp->texCoord[3][0] = scaleU * static_cast<float>(S16ToDouble(u));
+                        pp->texCoord[3][0] = scaleU * S16ToFloat(u);
                     }
 
                     int v;
@@ -297,13 +305,13 @@ void CMaterialEditorPcs::drawViewer()
                     }
 
                     pp = polygon;
-                    pp->texCoord[0][1] = -(scaleV * static_cast<float>(S16ToDouble(pp->v0)) - LoadFloat(kMaterialEditorOneF));
+                    pp->texCoord[0][1] = -(scaleV * S16ToFloat(pp->v0) - LoadFloat(kMaterialEditorOneF));
                     pp = polygon;
-                    pp->texCoord[1][1] = -(scaleV * static_cast<float>(S16ToDouble(pp->v1)) - LoadFloat(kMaterialEditorOneF));
+                    pp->texCoord[1][1] = -(scaleV * S16ToFloat(pp->v1) - LoadFloat(kMaterialEditorOneF));
                     pp = polygon;
-                    pp->texCoord[2][1] = -(scaleV * static_cast<float>(S16ToDouble(pp->v2)) - LoadFloat(kMaterialEditorOneF));
+                    pp->texCoord[2][1] = -(scaleV * S16ToFloat(pp->v2) - LoadFloat(kMaterialEditorOneF));
                     pp = polygon;
-                    pp->texCoord[3][1] = -(scaleV * static_cast<float>(S16ToDouble(pp->v3)) - LoadFloat(kMaterialEditorOneF));
+                    pp->texCoord[3][1] = -(scaleV * S16ToFloat(pp->v3) - LoadFloat(kMaterialEditorOneF));
                     DCStoreRange(polygon, sizeof(MaterialEditorPolygon));
 
                     if (textureHeader[1] == 0x20) {
@@ -331,8 +339,8 @@ void CMaterialEditorPcs::drawViewer()
                         blue.b = 0xff;
                         blue.a = 0xff;
 
-                        GXSetTevColor(GX_TEVREG2, red);
-                        GXSetTevColor(GX_TEVPREV, blue);
+                        GXSetTevColor(GX_TEVREG1, red);
+                        GXSetTevColor(GX_TEVREG2, blue);
                         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
                         _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_ALPHA, GX_CH_ALPHA, GX_CH_ALPHA);
                         _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_BLUE, GX_CH_BLUE, GX_CH_BLUE, GX_CH_ALPHA);

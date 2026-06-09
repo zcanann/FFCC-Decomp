@@ -4973,7 +4973,7 @@ void CGPartyObj::ghostPartyMog()
 						innerScale = FLOAT_80331A58 * (kMonObjOne - ramp) + FLOAT_80331A58;
 					}
 				}
-				if (static_cast<int>(FLOAT_80331A5C * innerScale) <= static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x38))) {
+				if (static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x38)) >= static_cast<int>(FLOAT_80331A5C * innerScale)) {
 					sGhostPartyWork.flagBits.flag04 = 1;
 					bossState = 3;
 					goto messageMenu;

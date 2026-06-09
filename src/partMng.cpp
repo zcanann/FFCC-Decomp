@@ -2794,7 +2794,7 @@ void CPartMng::pppEditPartDrawAfter()
     {
         int prevInterval = gPppHeapUseRateWords[2];
         gPppHeapUseRateWords[2] = prevInterval - 1;
-        if (prevInterval == 0 || gPppHeapUseRateWords[1] < gPppHeapUseRateWords[0]) {
+        if (prevInterval == 0 || gPppHeapUseRateWords[0] > gPppHeapUseRateWords[1]) {
             gPppHeapUseRateWords[2] = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + kHeapCheckIntervalOffset) << 1;
             gPppHeapUseRateWords[1] = gPppHeapUseRateWords[0];
         }
@@ -3416,7 +3416,7 @@ void CPartMng::pppPartDrawAfter()
     {
         int prevInterval = gPppHeapUseRateWords[2];
         gPppHeapUseRateWords[2] = prevInterval - 1;
-        if (prevInterval == 0 || gPppHeapUseRateWords[1] < gPppHeapUseRateWords[0]) {
+        if (prevInterval == 0 || gPppHeapUseRateWords[0] > gPppHeapUseRateWords[1]) {
             gPppHeapUseRateWords[2] = *(int*)((char*)this + 0x16C) << 1;
             gPppHeapUseRateWords[1] = gPppHeapUseRateWords[0];
         }

@@ -2100,7 +2100,7 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 					}
 				}
 
-				if (mng->m_loopMode != 0 &&
+				if (mng->m_loopMode == 0 &&
 					((_pppPObject*)obj)->m_graphId >= progSet->m_loopFrame &&
 					progSet->m_loopFrame != 0x70000000)
 				{

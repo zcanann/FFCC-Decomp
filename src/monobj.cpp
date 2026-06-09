@@ -2108,8 +2108,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 		bindMtx[1][3] = startPos.y;
 		bindMtx[2][3] = startPos.z;
 
-		CVector localForward(kMonObjDefaultScale, kMonObjZero, kMonObjZero);
-		PSMTXMultVecSR(bindMtx, reinterpret_cast<Vec*>(&localForward), reinterpret_cast<Vec*>(&forward));
+		PSMTXMultVecSR(bindMtx, CVector(kMonObjDefaultScale, kMonObjZero, kMonObjZero), reinterpret_cast<Vec*>(&forward));
 		forward.y = kMonObjZero;
 		forward.Normalize();
 		{
@@ -2812,6 +2811,7 @@ unsigned int CGMonObj::IsDispRader()
 #pragma push
 #pragma opt_lifetimes off
 #pragma optimization_level 3
+#pragma optimization_level 4
 void CGMonObj::setRepop(int mode)
 {
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);

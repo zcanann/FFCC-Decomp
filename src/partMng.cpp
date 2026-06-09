@@ -1832,10 +1832,6 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             }
 
             modelSlot = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x5FC) pppModelSt;
-            if (modelSlot != 0) {
-                modelSlot->m_refCount = 0;
-                modelSlot->m_isUsed = 0;
-            }
             (*modelTablePtr)[slotIndex] = modelSlot;
             pppReadRsd(chunkFile, (*modelTablePtr)[slotIndex]);
 #undef slotIndex
@@ -2795,10 +2791,13 @@ void CPartMng::pppEditPartDrawAfter()
     }
 
     gPppHeapUseRateWords[0] = pppHeapCheckLeak__FPQ27CMemory6CStage2(ppvEnv->m_stagePtr);
-    if (gPppHeapUseRateWords[2] == 0
-        || (--gPppHeapUseRateWords[2], gPppHeapUseRateWords[1] < gPppHeapUseRateWords[0])) {
-        gPppHeapUseRateWords[2] = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + kHeapCheckIntervalOffset) << 1;
-        gPppHeapUseRateWords[1] = gPppHeapUseRateWords[0];
+    {
+        int prevInterval = gPppHeapUseRateWords[2];
+        gPppHeapUseRateWords[2] = prevInterval - 1;
+        if (prevInterval == 0 || gPppHeapUseRateWords[1] < gPppHeapUseRateWords[0]) {
+            gPppHeapUseRateWords[2] = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + kHeapCheckIntervalOffset) << 1;
+            gPppHeapUseRateWords[1] = gPppHeapUseRateWords[0];
+        }
     }
 }
 
@@ -3414,10 +3413,13 @@ void CPartMng::pppPartDrawAfter()
     }
 
     gPppHeapUseRateWords[0] = pppHeapCheckLeak__FPQ27CMemory6CStage2(ppvEnv->m_stagePtr);
-    if ((gPppHeapUseRateWords[2] == 0)
-        || ((gPppHeapUseRateWords[2] = gPppHeapUseRateWords[2] - 1), gPppHeapUseRateWords[1] < gPppHeapUseRateWords[0])) {
-        gPppHeapUseRateWords[2] = *(int*)((char*)this + 0x16C) << 1;
-        gPppHeapUseRateWords[1] = gPppHeapUseRateWords[0];
+    {
+        int prevInterval = gPppHeapUseRateWords[2];
+        gPppHeapUseRateWords[2] = prevInterval - 1;
+        if (prevInterval == 0 || gPppHeapUseRateWords[1] < gPppHeapUseRateWords[0]) {
+            gPppHeapUseRateWords[2] = *(int*)((char*)this + 0x16C) << 1;
+            gPppHeapUseRateWords[1] = gPppHeapUseRateWords[0];
+        }
     }
 }
 

@@ -1298,14 +1298,16 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         m_saveIndex = static_cast<char>(m_accessSaveIndex);
         m_memCardResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(static_cast<signed char>(m_cardChannel));
         if (m_memCardResult == 1) {
-            MenuPcs.m_mcCtrl.m_saveIndex = static_cast<unsigned char>(m_saveIndex);
-            MenuPcs.m_mcCtrl.m_cardChannel = static_cast<unsigned char>(m_cardChannel);
+            const unsigned char savedSaveIndex = static_cast<unsigned char>(m_saveIndex);
+            const unsigned char savedCardChannel = static_cast<unsigned char>(m_cardChannel);
             MenuPcs.m_mcCtrl.m_previousState = 0;
             MenuPcs.m_mcCtrl.m_state = 0;
             MenuPcs.m_mcCtrl.m_lastResult = 0;
             MenuPcs.m_mcCtrl.m_iteration = 0;
             MenuPcs.m_mcCtrl.m_userBuffer = 0;
             MenuPcs.m_mcCtrl.m_createFlag = 0;
+            MenuPcs.m_mcCtrl.m_cardChannel = savedCardChannel;
+            MenuPcs.m_mcCtrl.m_saveIndex = savedSaveIndex;
             m_memCardProc = 1;
         }
         break;
@@ -1394,14 +1396,16 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         m_memCardBuffer = MenuPcs.m_goOutTransferSaveData;
         m_memCardResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(static_cast<unsigned char>(m_cardChannel));
         if (m_memCardResult == 1) {
-            MenuPcs.m_mcCtrl.m_saveIndex = static_cast<unsigned char>(m_saveIndex);
-            MenuPcs.m_mcCtrl.m_cardChannel = static_cast<unsigned char>(m_cardChannel);
+            const unsigned char savedSaveIndex = static_cast<unsigned char>(m_saveIndex);
+            const unsigned char savedCardChannel = static_cast<unsigned char>(m_cardChannel);
             MenuPcs.m_mcCtrl.m_previousState = 0;
             MenuPcs.m_mcCtrl.m_state = 0;
             MenuPcs.m_mcCtrl.m_lastResult = 0;
             MenuPcs.m_mcCtrl.m_iteration = 0;
             MenuPcs.m_mcCtrl.m_userBuffer = 0;
             MenuPcs.m_mcCtrl.m_createFlag = 0;
+            MenuPcs.m_mcCtrl.m_cardChannel = savedCardChannel;
+            MenuPcs.m_mcCtrl.m_saveIndex = savedSaveIndex;
             m_memCardProc = 2;
         }
         {
@@ -1421,14 +1425,16 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         m_memCardBuffer = MenuPcs.m_goOutTransferWork;
         m_memCardResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(static_cast<unsigned char>(m_cardChannel));
         if (m_memCardResult == 1) {
-            MenuPcs.m_mcCtrl.m_saveIndex = static_cast<unsigned char>(m_saveIndex);
-            MenuPcs.m_mcCtrl.m_cardChannel = static_cast<unsigned char>(m_cardChannel);
+            const unsigned char savedSaveIndex = static_cast<unsigned char>(m_saveIndex);
+            const unsigned char savedCardChannel = static_cast<unsigned char>(m_cardChannel);
             MenuPcs.m_mcCtrl.m_previousState = 0;
             MenuPcs.m_mcCtrl.m_state = 0;
             MenuPcs.m_mcCtrl.m_lastResult = 0;
             MenuPcs.m_mcCtrl.m_iteration = 0;
             MenuPcs.m_mcCtrl.m_userBuffer = 0;
             MenuPcs.m_mcCtrl.m_createFlag = 0;
+            MenuPcs.m_mcCtrl.m_cardChannel = savedCardChannel;
+            MenuPcs.m_mcCtrl.m_saveIndex = savedSaveIndex;
             m_memCardProc = 2;
         }
         {
@@ -1475,14 +1481,16 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
     case 5:
         m_memCardResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(static_cast<unsigned char>(m_cardChannel));
         if (m_memCardResult == 1) {
-            MenuPcs.m_mcCtrl.m_saveIndex = static_cast<unsigned char>(m_saveIndex);
-            MenuPcs.m_mcCtrl.m_cardChannel = static_cast<unsigned char>(m_cardChannel);
+            const unsigned char savedSaveIndex = static_cast<unsigned char>(m_saveIndex);
+            const unsigned char savedCardChannel = static_cast<unsigned char>(m_cardChannel);
             MenuPcs.m_mcCtrl.m_previousState = 0;
             MenuPcs.m_mcCtrl.m_state = 0;
             MenuPcs.m_mcCtrl.m_lastResult = 0;
             MenuPcs.m_mcCtrl.m_iteration = 0;
             MenuPcs.m_mcCtrl.m_userBuffer = 0;
             MenuPcs.m_mcCtrl.m_createFlag = 0;
+            MenuPcs.m_mcCtrl.m_cardChannel = savedCardChannel;
+            MenuPcs.m_mcCtrl.m_saveIndex = savedSaveIndex;
             m_memCardProc = 3;
         }
         if (m_currentMessage >= 0) {

@@ -325,7 +325,7 @@ void CGraphicPcs::drawScreenFade()
 
                     const unsigned int ix = (unsigned int)sx;
                     const unsigned int iy = (unsigned int)sy;
-                    drawSFCircle(static_cast<unsigned int>(kScreenFadeCircleRadius), radius, ix, iy, baseColor, baseColor);
+                    drawSFCircle(0x500, radius, ix, iy, baseColor, baseColor);
                     drawSFCircle(radius, radius - static_cast<unsigned int>(kScreenFadeRingWidth), ix, iy, baseColor, baseColor2);
                     continue;
                 }
@@ -355,24 +355,30 @@ void CGraphicPcs::drawScreenFade()
                 _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
                 GXLoadTexObj(&Graphic.m_smallBackTexObj, GX_TEXMAP0);
 
-                const float phase = slotData->m_phase;
-                const float stretch = slotData->m_stretch;
                 const float amp = slotData->m_amplitude * (kGraphicOne - t);
-                const float offX = stretch * (kGraphicScreenCenterX * amp) * (float)sin((double)phase);
+                const float offX = slotData->m_stretch * (kGraphicScreenCenterX * amp) * (float)sin((double)slotData->m_phase);
                 const float size = amp + kGraphicOne;
-                const float offY = stretch * (kGraphicScreenCenterY * amp) * (float)cos((double)phase);
+                const float offY = slotData->m_stretch * (kGraphicScreenCenterY * amp) * (float)cos((double)slotData->m_phase);
 
                 GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-                GXPosition3f32((kGraphicScreenCenterX + offX) - kGraphicScreenCenterX * size, (kGraphicScreenCenterY + offY) - kGraphicScreenCenterY * size, kGraphicZero);
+                const float centerX = kGraphicScreenCenterX + offX;
+                const float halfWidth = kGraphicScreenCenterX * size;
+                const float centerY = kGraphicScreenCenterY + offY;
+                const float halfHeight = kGraphicScreenCenterY * size;
+                const float left = centerX - halfWidth;
+                const float right = centerX + halfWidth;
+                const float top = centerY - halfHeight;
+                const float bottom = centerY + halfHeight;
+                GXPosition3f32(left, top, kGraphicZero);
                 GXColor1u32(*(u32*)&baseColor);
                 GXTexCoord2u16(0, 0);
-                GXPosition3f32((kGraphicScreenCenterX + offX) + kGraphicScreenCenterX * size, (kGraphicScreenCenterY + offY) - kGraphicScreenCenterY * size, kGraphicZero);
+                GXPosition3f32(right, top, kGraphicZero);
                 GXColor1u32(*(u32*)&baseColor);
                 GXTexCoord2u16(2, 0);
-                GXPosition3f32((kGraphicScreenCenterX + offX) + kGraphicScreenCenterX * size, (kGraphicScreenCenterY + offY) + kGraphicScreenCenterY * size, kGraphicZero);
+                GXPosition3f32(right, bottom, kGraphicZero);
                 GXColor1u32(*(u32*)&baseColor);
                 GXTexCoord2u16(2, 2);
-                GXPosition3f32((kGraphicScreenCenterX + offX) - kGraphicScreenCenterX * size, (kGraphicScreenCenterY + offY) + kGraphicScreenCenterY * size, kGraphicZero);
+                GXPosition3f32(left, bottom, kGraphicZero);
                 GXColor1u32(*(u32*)&baseColor);
                 GXTexCoord2u16(0, 2);
                 continue;
@@ -711,14 +717,17 @@ void CGraphicPcs::drawBar()
     _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 
     const bool useDebugPad = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
-    unsigned int padState = 0;
-    if (!useDebugPad) {
-        int padIndex = useDebugPad;
+    int padState;
+    if (useDebugPad) {
+        padState = 0;
+    } else {
+        int padIndex = 0;
         padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
         padState = Pad.GetPadInputs()[padIndex].holdOverride;
     }
     const int drawText = (padState != 0) && (Joybus.GetPadType(0) != 0x40000);
 
+    float x = kDebugBarLeft;
     GXColor backColor = s_debug_bar_color;
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
     GXPosition3f32(kDebugBarLeft, kDebugBarTop, kGraphicZero);
@@ -737,7 +746,6 @@ void CGraphicPcs::drawBar()
     CSystem::COrder* order = System.GetFirstOrder();
     const int orderCount = System.m_orderCount;
     const int lastOrder = orderCount - 1;
-    float x = kDebugBarLeft;
     int hue = 0;
     u32 y = 0x10;
     for (int i = 0; i < orderCount; i++) {
@@ -754,35 +762,31 @@ void CGraphicPcs::drawBar()
 
         if (priority == 0x26) {
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-            const float y0 = drawText ? static_cast<float>(y) : kDebugBarMoveBottom;
-            const float y1 = drawText ? static_cast<float>(y + kDebugBarLineStep) : kDebugBarTop;
-            GXPosition3f32(x, y0, kGraphicZero);
+            GXPosition3f32(x, drawText ? static_cast<float>(static_cast<int>(y)) : kDebugBarMoveBottom, kGraphicZero);
             GXColor1u32(*reinterpret_cast<u32*>(&rgb));
             GXTexCoord2u16(0, 0);
-            GXPosition3f32(x + width + kGraphicOne, y0, kGraphicZero);
+            GXPosition3f32(x + width + kGraphicOne, drawText ? static_cast<float>(static_cast<int>(y)) : kDebugBarMoveBottom, kGraphicZero);
             GXColor1u32(*reinterpret_cast<u32*>(&rgb));
             GXTexCoord2u16(2, 0);
-            GXPosition3f32(x + width + kGraphicOne, y1, kGraphicZero);
+            GXPosition3f32(x + width + kGraphicOne, kDebugBarTop, kGraphicZero);
             GXColor1u32(*reinterpret_cast<u32*>(&rgb));
             GXTexCoord2u16(2, 2);
-            GXPosition3f32(x, y1, kGraphicZero);
+            GXPosition3f32(x, kDebugBarTop, kGraphicZero);
             GXColor1u32(*reinterpret_cast<u32*>(&rgb));
             GXTexCoord2u16(0, 2);
             x += width;
         } else if (priority != 0x27) {
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-            const float y0 = drawText ? static_cast<float>(y) : kDebugBarObjectTop;
-            const float y1 = drawText ? static_cast<float>(y + kDebugBarLineStep) : kDebugBarMoveBottom;
-            GXPosition3f32(x, y0, kGraphicZero);
+            GXPosition3f32(x, drawText ? static_cast<float>(static_cast<int>(y)) : kDebugBarObjectTop, kGraphicZero);
             GXColor1u32(*reinterpret_cast<u32*>(&rgb));
             GXTexCoord2u16(0, 0);
-            GXPosition3f32(x + width + kGraphicOne, y0, kGraphicZero);
+            GXPosition3f32(x + width + kGraphicOne, drawText ? static_cast<float>(static_cast<int>(y)) : kDebugBarObjectTop, kGraphicZero);
             GXColor1u32(*reinterpret_cast<u32*>(&rgb));
             GXTexCoord2u16(2, 0);
-            GXPosition3f32(x + width + kGraphicOne, y1, kGraphicZero);
+            GXPosition3f32(x + width + kGraphicOne, kDebugBarMoveBottom, kGraphicZero);
             GXColor1u32(*reinterpret_cast<u32*>(&rgb));
             GXTexCoord2u16(2, 2);
-            GXPosition3f32(x, y1, kGraphicZero);
+            GXPosition3f32(x, kDebugBarMoveBottom, kGraphicZero);
             GXColor1u32(*reinterpret_cast<u32*>(&rgb));
             GXTexCoord2u16(0, 2);
             x += width;
@@ -800,16 +804,16 @@ void CGraphicPcs::drawBar()
             const float soundWidth = (kGraphicScreenCenterX * Sound.GetPerformance()) / kDebugBarFrameBudget;
 
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-            GXPosition3f32(x, drawText ? static_cast<float>(y) : kDebugBarMoveBottom, kGraphicZero);
+            GXPosition3f32(x, drawText ? static_cast<float>(static_cast<int>(y)) : kDebugBarMoveBottom, kGraphicZero);
             GXColor1u32(soundColor);
             GXTexCoord2u16(0, 0);
-            GXPosition3f32(x + soundWidth + kGraphicOne, drawText ? static_cast<float>(y) : kDebugBarMoveBottom, kGraphicZero);
+            GXPosition3f32(x + soundWidth + kGraphicOne, drawText ? static_cast<float>(static_cast<int>(y)) : kDebugBarMoveBottom, kGraphicZero);
             GXColor1u32(soundColor);
             GXTexCoord2u16(2, 0);
-            GXPosition3f32(x + soundWidth + kGraphicOne, drawText ? static_cast<float>(y + kDebugBarLineStep) : kDebugBarTop, kGraphicZero);
+            GXPosition3f32(x + soundWidth + kGraphicOne, kDebugBarTop, kGraphicZero);
             GXColor1u32(soundColor);
             GXTexCoord2u16(2, 2);
-            GXPosition3f32(x, drawText ? static_cast<float>(y + kDebugBarLineStep) : kDebugBarTop, kGraphicZero);
+            GXPosition3f32(x, kDebugBarTop, kGraphicZero);
             GXColor1u32(soundColor);
             GXTexCoord2u16(0, 2);
         }
@@ -867,7 +871,7 @@ void CGraphicPcs::drawBar()
         Graphic.InitDebugString();
 
         order = System.GetFirstOrder();
-        x = kGraphicZero;
+        x = kDebugBarLeft;
         y = 0x10;
         for (int i = 0; i < orderCount; i++) {
             const int priority = order->m_priority;
@@ -886,7 +890,7 @@ void CGraphicPcs::drawBar()
                     strcat(debugString, extraString);
                 }
 
-                Graphic.DrawDebugStringDirect(static_cast<u32>(x + kGraphicOne), y, debugString, kDebugBarLineStep);
+                Graphic.DrawDebugStringDirect(static_cast<u32>(kGraphicOne + x), y, debugString, kDebugBarLineStep);
                 x += width;
             }
 

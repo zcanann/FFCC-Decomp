@@ -1782,8 +1782,8 @@ checkLoaded:
                         switch (dataType) {
                         case 0: {
                             CLoadModel* loadModel = 0;
-                            for (unsigned int i = 0; i < static_cast<unsigned int>(LoadModelArray(pcs)->GetSize()); i++) {
-                                CLoadModel* it = (*LoadModelArray(pcs))[i];
+                            for (unsigned int i = 0; i < static_cast<unsigned int>(LoadModelArray(&CharaPcs)->GetSize()); i++) {
+                                CLoadModel* it = (*LoadModelArray(&CharaPcs))[i];
                                 if (reinterpret_cast<int>(it->m_keyTag) == reinterpret_cast<int>(keyTag) &&
                                     static_cast<unsigned int>(it->m_keyId) == static_cast<unsigned int>(keyId)) {
                                     loadModel = it;
@@ -1798,7 +1798,7 @@ checkLoaded:
                                 loadModel->m_keyId = keyId;
                                 loadModel->m_mergeFileId = mergeFileId;
                                 loadModel->m_mergeFlags = mergeFlags;
-                                LoadModelArray(pcs)->Add(loadModel);
+                                LoadModelArray(&CharaPcs)->Add(loadModel);
 
                                 if (streamToAmem == 0) {
                                     CChara::CModel* model =
@@ -1825,8 +1825,8 @@ checkLoaded:
                         }
                         case 1: {
                             CLoadTexture* loadTexture = 0;
-                            for (unsigned int i = 0; i < static_cast<unsigned int>(LoadTextureArray(pcs)->GetSize()); i++) {
-                                CLoadTexture* it = (*LoadTextureArray(pcs))[i];
+                            for (unsigned int i = 0; i < static_cast<unsigned int>(LoadTextureArray(&CharaPcs)->GetSize()); i++) {
+                                CLoadTexture* it = (*LoadTextureArray(&CharaPcs))[i];
                                 if (reinterpret_cast<int>(it->m_keyTag) == reinterpret_cast<int>(keyTag) &&
                                     static_cast<unsigned int>(it->m_keyId) == static_cast<unsigned int>(keyId) &&
                                     it->m_variantTag == variantTag) {
@@ -1843,7 +1843,7 @@ checkLoaded:
                                 loadTexture->m_variantTag = variantTag;
                                 loadTexture->m_mergeFileId = mergeFileId;
                                 loadTexture->m_mergeFlags = mergeFlags;
-                                LoadTextureArray(pcs)->Add(loadTexture);
+                                LoadTextureArray(&CharaPcs)->Add(loadTexture);
 
                                 if (streamToAmem == 0) {
                                     CTextureSet* textureSet =
@@ -1869,8 +1869,8 @@ checkLoaded:
                         }
                         case 2: {
                             CLoadAnim* loadAnim = 0;
-                            for (unsigned int i = 0; i < static_cast<unsigned int>(LoadAnimArray(pcs)->GetSize()); i++) {
-                                CLoadAnim* it = (*LoadAnimArray(pcs))[i];
+                            for (unsigned int i = 0; i < static_cast<unsigned int>(LoadAnimArray(&CharaPcs)->GetSize()); i++) {
+                                CLoadAnim* it = (*LoadAnimArray(&CharaPcs))[i];
                                 if (reinterpret_cast<int>(it->m_keyTag) == reinterpret_cast<int>(keyTag) &&
                                     static_cast<unsigned int>(it->m_keyId) == static_cast<unsigned int>(keyId) &&
                                     strcmp(animName, it->m_name) == 0) {
@@ -1892,7 +1892,7 @@ checkLoaded:
                                 loadAnim->m_anim = anim;
                                 loadAnim->m_mergeFileId = mergeFileId;
                                 loadAnim->m_mergeFlags = mergeFlags;
-                                LoadAnimArray(pcs)->Add(loadAnim);
+                                LoadAnimArray(&CharaPcs)->Add(loadAnim);
                             }
                             break;
                         }
@@ -1906,8 +1906,8 @@ checkLoaded:
                         }
                         case 5: {
                             CLoadPdt* loadPdt = 0;
-                            for (unsigned int i = 0; i < static_cast<unsigned int>(LoadPdtArray(pcs)->GetSize()); i++) {
-                                CLoadPdt* it = (*LoadPdtArray(pcs))[i];
+                            for (unsigned int i = 0; i < static_cast<unsigned int>(LoadPdtArray(&CharaPcs)->GetSize()); i++) {
+                                CLoadPdt* it = (*LoadPdtArray(&CharaPcs))[i];
                                 if (reinterpret_cast<int>(it->m_keyTag) == reinterpret_cast<int>(keyTag) &&
                                     it->m_keyId == keyId &&
                                     reinterpret_cast<int>(it->m_variantTag) == reinterpret_cast<int>(variantTag)) {
@@ -1930,7 +1930,7 @@ checkLoaded:
                                 loadPdt->m_mergeFlags = mergeFlags;
                                 loadPdt->m_pdtSlot = PartPcs.LoadMonsterPdt(
                                     keyId, reinterpret_cast<int>(variantTag), primaryData, primarySize, secondaryData, secondarySize);
-                                LoadPdtArray(pcs)->Add(loadPdt);
+                                LoadPdtArray(&CharaPcs)->Add(loadPdt);
                             }
                             break;
                         }

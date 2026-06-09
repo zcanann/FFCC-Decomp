@@ -1793,7 +1793,7 @@ checkLoaded:
 
                             if (loadModel == 0) {
                                 void* rawAddr = chunkFile.GetAddress();
-                                loadModel = new (pcs->m_stage, const_cast<char*>(s_p_chara_cpp), 0x5E8) CLoadModel;
+                                loadModel = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x5E8) CLoadModel;
                                 loadModel->m_keyTag = keyTag;
                                 loadModel->m_keyId = keyId;
                                 loadModel->m_mergeFileId = mergeFileId;
@@ -1802,7 +1802,7 @@ checkLoaded:
 
                                 if (streamToAmem == 0) {
                                     CChara::CModel* model =
-                                        new (pcs->m_stage, const_cast<char*>(s_p_chara_cpp), 0x5F1) CChara::CModel;
+                                        new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x5F1) CChara::CModel;
                                     model->Create(rawAddr, SelectLoadStage(pcs, CharaPcs.m_viewerModelStage));
                                     loadModel->m_model = model;
                                 } else {
@@ -1837,7 +1837,7 @@ checkLoaded:
 
                             if (loadTexture == 0) {
                                 void* rawAddr = chunkFile.GetAddress();
-                                loadTexture = new (pcs->m_stage, const_cast<char*>(s_p_chara_cpp), 0x609) CLoadTexture;
+                                loadTexture = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x609) CLoadTexture;
                                 loadTexture->m_keyTag = keyTag;
                                 loadTexture->m_keyId = keyId;
                                 loadTexture->m_variantTag = variantTag;
@@ -1847,7 +1847,7 @@ checkLoaded:
 
                                 if (streamToAmem == 0) {
                                     CTextureSet* textureSet =
-                                        new (pcs->m_stage, const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
+                                        new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
                                     int textureStageIndex = 1;
                                     if (reinterpret_cast<int>(keyTag) == 4) {
                                         textureStageIndex = 3;
@@ -1882,10 +1882,10 @@ checkLoaded:
                             if (loadAnim == 0) {
                                 void* rawAddr = chunkFile.GetAddress();
                                 CChara::CAnim* anim =
-                                    new (pcs->m_stage, const_cast<char*>(s_p_chara_cpp), 0x62A) CChara::CAnim;
+                                    new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x62A) CChara::CAnim;
                                 anim->Create(rawAddr, CharaPcs.m_viewerAnimStage);
 
-                                loadAnim = new (pcs->m_stage, const_cast<char*>(s_p_chara_cpp), 0x62D) CLoadAnim;
+                                loadAnim = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x62D) CLoadAnim;
                                 loadAnim->m_keyId = keyId;
                                 loadAnim->m_keyTag = keyTag;
                                 strcpy(loadAnim->m_name, animName);
@@ -1922,7 +1922,7 @@ checkLoaded:
                                 chunkFile.GetNextChunk(chunk);
                                 void* secondaryData = chunkFile.GetAddress();
                                 const int secondarySize = static_cast<int>(chunk.m_size);
-                                loadPdt = new (pcs->m_stage, const_cast<char*>(s_p_chara_cpp), 0x572) CLoadPdt;
+                                loadPdt = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x572) CLoadPdt;
                                 loadPdt->m_keyTag = keyTag;
                                 loadPdt->m_keyId = keyId;
                                 loadPdt->m_variantTag = variantTag;

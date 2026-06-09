@@ -93,8 +93,10 @@ found_glyph:
 
 found_fallback:
 	int drawWidth;
-	float localMargin = margin;
-	float localScaleX = scaleX;
+	float localMargin;
+	float localScaleX;
+	localScaleX = scaleX;
+	localMargin = margin;
 	CFontRenderFlagBits& renderFlagBits = GetRenderFlagBits(renderFlags);
 
 	if (renderFlagBits.fixedWidth != 0) {
@@ -174,8 +176,10 @@ found_glyph:
 use_glyph:
 		CFontRenderFlagBits& renderFlagBits = GetRenderFlagBits(renderFlags);
 		int drawWidth;
-		float localMargin = margin;
-		float localScaleX = scaleX;
+		float localMargin;
+		float localScaleX;
+		localScaleX = scaleX;
+		localMargin = margin;
 
 		if (renderFlagBits.fixedWidth != 0) {
 			drawWidth = static_cast<int>(m_glyphWidth);

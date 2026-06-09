@@ -2871,15 +2871,19 @@ void CMapMng::Draw()
         Mtx cameraMtx0;
         PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx0);
 
+        float dirY0 = lightDir0.y;
+        float dirZ0 = lightDir0.z;
         Vec lightPos0;
         lightPos0.x = kMapLargeDistance * -lightDir0.x;
-        lightPos0.y = kMapLargeDistance * -lightDir0.y;
-        lightPos0.z = kMapLargeDistance * -lightDir0.z;
+        lightPos0.y = kMapLargeDistance * -dirY0;
+        lightPos0.z = kMapLargeDistance * -dirZ0;
 
         GXLightObj lightObj0;
         GXInitLightColor(&lightObj0, lightColor);
         PSMTXMultVec(cameraMtx0, &lightPos0, &lightPos0);
         GXInitLightPos(&lightObj0, lightPos0.x, lightPos0.y, lightPos0.z);
+        lightDir0.y = dirY0;
+        lightDir0.z = dirZ0;
         PSMTXMultVecSR(cameraMtx0, &lightDir0, &lightDir0);
         GXInitLightDir(&lightObj0, lightDir0.x, lightDir0.y, lightDir0.z);
         GXInitLightSpot(&lightObj0, kMapFullTurnDegrees, GX_SP_SHARP);

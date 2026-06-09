@@ -1903,8 +1903,8 @@ void CCaravanWork::CalcStatus()
 			int itemType = GetItemDataPtr(itemIdx)[0];
 
 			if (itemType == 1) {
-				int weaponItem;
 				int weaponRef;
+				int weaponItem;
 				GetCurrentWeaponItem(weaponItem, weaponRef);
 				if (weaponItem > 0) {
 					itemIdx = weaponItem;

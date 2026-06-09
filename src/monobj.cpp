@@ -2933,7 +2933,7 @@ void CGMonObj::setRepop(int mode)
 		prgObj->putParticleBindTrace((i + 0x5A) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x5A8), object, 0.0f, 0);
 	}
 
-	if ((scriptFlags & 1) == 0) {
+	if ((*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFE) & 1) == 0) {
 		return;
 	}
 

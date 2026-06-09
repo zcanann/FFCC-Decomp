@@ -1377,8 +1377,17 @@ int CChara::CModel::PickFur(
 						curValid = curValid & 0x7fffffff;
 					}
 
-					verts[0] = verts[1];
-					verts[1] = verts[2];
+					{
+						int* d0 = reinterpret_cast<int*>(&verts[0]);
+						int* s0 = reinterpret_cast<int*>(&verts[1]);
+						int* s1 = reinterpret_cast<int*>(&verts[2]);
+						for (int wi = 0; wi < 11; wi++) {
+							d0[wi] = s0[wi];
+						}
+						for (int wi = 0; wi < 11; wi++) {
+							s0[wi] = s1[wi];
+						}
+					}
 					verts[2].m_valid = curValid;
 					verts[2].m_viewPos = curViewPos;
 					verts[2].m_clipX = curClip.x;

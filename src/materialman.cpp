@@ -3401,10 +3401,12 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
             CMaterial* newMaterial =
                 new (MaterialMan.GetMemoryStage(), const_cast<char*>(s_materialman_cpp), 0xEE4) CMaterial;
 
+            float scale = kTextureOne;
             newMaterial->m_tevBit = 0xFFF531F0;
             newMaterial->m_bumpLight = 0;
-            newMaterial->m_scaleU = kTextureOne;
-            newMaterial->m_scaleV = kTextureOne;
+            newMaterial->m_textureCount = 0;
+            newMaterial->m_scaleV = scale;
+            newMaterial->m_scaleU = scale;
             newMaterial->m_singleTextureFlag = 0;
             newMaterial->m_textureCount = 1;
             newMaterial->m_textureIndices[0] = static_cast<short>(textureIndex);

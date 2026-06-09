@@ -2108,8 +2108,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 		bindMtx[1][3] = startPos.y;
 		bindMtx[2][3] = startPos.z;
 
-		CVector localForward(kMonObjDefaultScale, kMonObjZero, kMonObjZero);
-		PSMTXMultVecSR(bindMtx, reinterpret_cast<Vec*>(&localForward), reinterpret_cast<Vec*>(&forward));
+		PSMTXMultVecSR(bindMtx, CVector(kMonObjDefaultScale, kMonObjZero, kMonObjZero), reinterpret_cast<Vec*>(&forward));
 		forward.y = kMonObjZero;
 		forward.Normalize();
 		{
@@ -2146,8 +2145,8 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 	}
 
 	if ((flags & 2) != 0) {
-		float halfAngle = kMonObjHalf * kMonObjDegToRad *
-			static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xCA));
+		float halfAngle = kMonObjHalf * (kMonObjDegToRad *
+			static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xCA)));
 		float sideDist = kMonObjZero;
 		if (kMonObjZero != halfAngle) {
 			sideDist = kMonObjConeSideRadius / static_cast<float>(tan(static_cast<double>(halfAngle)));
@@ -2178,7 +2177,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 			PSVECAdd(reinterpret_cast<Vec*>(&move), &sideOffset, reinterpret_cast<Vec*>(&move));
 		}
 
-		unsigned char didHit = 0;
+		int didHit = 0;
 		for (int rank = 0; rank < 4; rank++) {
 			if (((flags & 4) != 0) && (((*reinterpret_cast<int*>(mon + 0x54C) + rank) % 4) != 0)) {
 				continue;
@@ -2190,18 +2189,15 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 				continue;
 			}
 
-			unsigned int partyFlags = partyObj->GetCID();
-			bool targetHidden =
-				(Game.m_gameWork.m_menuStageMode != 0) &&
-				(Game.m_gameWork.m_bossArtifactStageIndex < 0xF) &&
-				((partyFlags & 0x6D) == 0x6D) &&
-				(partyObj->m_scriptHandle[0xED] != NULL);
-			if (targetHidden ||
+			if (((Game.m_gameWork.m_menuStageMode != 0) &&
+				 (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) &&
+				 ((partyObj->GetCID() & 0x6D) == 0x6D) &&
+				 (partyObj->m_scriptHandle[0xED] != NULL)) ||
 				(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(partyObj->m_scriptHandle) + 7) == 0) ||
 				(partyObj->m_lastStateId == 9) ||
 				(partyObj->m_lastStateId == 0x22) ||
-				(static_cast<double>(*reinterpret_cast<float*>(mon + partyIndex * 4 + 0x5D0)) >=
-				 static_cast<double>(static_cast<float>(static_cast<double>(coneLength) - static_cast<double>(sideDist))))) {
+				(*reinterpret_cast<float*>(mon + partyIndex * 4 + 0x5D0) >=
+				 (coneLength - sideDist))) {
 				continue;
 			}
 
@@ -2281,8 +2277,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 		}
 
 		if (static_cast<double>(kMonObjZero) != static_cast<double>(halfAngle)) {
-			float debugRadius = static_cast<float>(
-				static_cast<double>(coneLength) * static_cast<double>(static_cast<float>(tan(static_cast<double>(halfAngle)))));
+			float debugRadius = coneLength * static_cast<float>(tan(static_cast<double>(halfAngle)));
 			CFlat.AddDebugDrawCC(&coneStart, reinterpret_cast<Vec*>(&move), debugRadius, 0, didHit);
 		}
 	}
@@ -2812,6 +2807,7 @@ unsigned int CGMonObj::IsDispRader()
 #pragma push
 #pragma opt_lifetimes off
 #pragma optimization_level 3
+#pragma optimization_level 4
 void CGMonObj::setRepop(int mode)
 {
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);

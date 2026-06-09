@@ -1960,10 +1960,10 @@ void pppCalcPartStd(_pppMngSt* pppMngSt)
 					if (prog != 0)
 					{
 						pppProgOperationCallback fn = (pppProgOperationCallback)prog->m_pppFunctionOperation;
+						_pppPObjLink* obj = pDataVal->m_pppPObjLink;
 						if (fn != 0)
 						{
 							u32 count = pDataVal->m_activeCount;
-							_pppPObjLink* obj = pDataVal->m_pppPObjLink;
 
 							do
 							{

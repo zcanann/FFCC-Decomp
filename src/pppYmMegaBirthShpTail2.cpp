@@ -819,7 +819,7 @@ done:
     } else {
         *(u16*)(particleBytes + 0x22) = *(u16*)(paramBytes + 0x14);
     }
-    *((u8*)&particleData->m_directionTail.y) = 0;
+    particleBytes[0x34] = 0;
 
     switch ((s32)paramBytes[0x8d]) {
     case 0:

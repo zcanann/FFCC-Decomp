@@ -1038,8 +1038,8 @@ void CGObject::bgNormalCollision()
     return;
 
 simple:
-    m_groundHitOffset.x = pos.x - m_worldPosition.x;
     m_groundHitOffset.y = pos.y - m_worldPosition.y;
+    m_groundHitOffset.x = pos.x - m_worldPosition.x;
     m_groundHitOffset.z = pos.z - m_worldPosition.z;
     return;
 

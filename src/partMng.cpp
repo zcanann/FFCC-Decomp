@@ -1631,17 +1631,20 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         m_pppMng[0].m_scale.x = payloadFloats[8];
         m_pppMng[0].m_scale.y = payloadFloats[9];
         m_pppMng[0].m_scale.z = payloadFloats[0xA];
-        m_pppMng[0].m_savedPosition.x = payloadFloats[0x10];
-        m_pppMng[0].m_savedPosition.y = payloadFloats[0x11];
-        m_pppMng[0].m_savedPosition.z = payloadFloats[0x12];
-        m_pppMng[0].m_paramVec0.x = payloadFloats[0x14];
-        m_pppMng[0].m_paramVec0.y = payloadFloats[0x15];
-        m_pppMng[0].m_paramVec0.z = payloadFloats[0x16];
-        ppvChrScl[0] = payloadFloats[0xC];
-        ppvChrScl[1] = payloadFloats[0xD];
-        ppvChrScl[2] = payloadFloats[0xE];
-        m_pppMng[0].m_previousPosition.x = payloadFloats[0x17];
-        m_pppMng[0].m_previousPosition.y = payloadFloats[0x18];
+        {
+            float* mngF = reinterpret_cast<float*>(m_pppMng);
+            mngF[0x58 / 4] = payloadFloats[0x10];
+            mngF[0x5C / 4] = payloadFloats[0x11];
+            mngF[0x60 / 4] = payloadFloats[0x12];
+            mngF[0x68 / 4] = payloadFloats[0x14];
+            mngF[0x6C / 4] = payloadFloats[0x15];
+            mngF[0x70 / 4] = payloadFloats[0x16];
+            ppvChrScl[0] = payloadFloats[0xC];
+            ppvChrScl[1] = payloadFloats[0xD];
+            ppvChrScl[2] = payloadFloats[0xE];
+            mngF[0x54 / 4] = payloadFloats[0x17];
+            mngF[0x64 / 4] = payloadFloats[0x18];
+        }
         m_pppMng[0].m_mode = 0;
         return;
     case 0x1B:

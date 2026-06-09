@@ -1882,7 +1882,7 @@ void CGObject::copy()
         m_shieldModelHandle->m_fogBlend = m_worldParam;
     }
 
-    if (static_cast<s8>(static_cast<s32>(*reinterpret_cast<u8*>(&m_weaponNodeFlags) << 26) >> 31) == 0) {
+    if (m_weaponNodeFlagBits.m_unk20 == 0) {
         hasModel = false;
         m_charaModelHandle->m_flags &= 0xFFFFFFFE;
 
@@ -1904,7 +1904,7 @@ void CGObject::copy()
         }
     }
 
-    if (static_cast<s8>(static_cast<s32>(*reinterpret_cast<u8*>(&m_shieldNodeFlags) << 26) >> 31) == 0) {
+    if (m_shieldNodeFlagBits.m_bit20 == 0) {
         hasModel = false;
         m_charaModelHandle->m_flags &= 0xFFFFFFFB;
 

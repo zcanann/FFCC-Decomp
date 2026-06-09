@@ -1445,7 +1445,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		return;
 	}
 
-	unsigned int particleLife = particleLife;
+	int particleLife = particleLife;
 	short itemEffect = *reinterpret_cast<unsigned short*>(itemData);
 	short scriptDefense = scriptDefense;
 	calcRegist(static_cast<int>(staType), resolvedItemId, resistType, allowEffect, effectResult, 0);
@@ -1487,7 +1487,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			if (kCharaObjZero < PSVECDotProduct(&frontDelta, reinterpret_cast<Vec*>(&facing))) {
 				playSe3D(0x1D, 0x32, 0x96, 0, 0);
 				putParticle(0x200, 0, hitPos, FLOAT_803319AC * m_attackColRadius, 0);
-				if ((static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D) {
+				if ((static_cast<short>(sourceObj->GetCID()) & 0x6D) == 0x6D) {
 					sourceObj->changeStat(0x13, 0, 0);
 				}
 				if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D) {
@@ -1506,7 +1506,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 	}
 
 	if (m_lastStateId == 6 &&
-	    static_cast<signed char>(static_cast<int>(static_cast<unsigned int>(*(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1)) << 26 >> 30) << 30 >> 31) != 0) {
+	    static_cast<unsigned char>(static_cast<int>(static_cast<unsigned int>(*(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1)) << 26 >> 30) << 30 >> 31) != 0) {
 		int currentKind =
 			*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 0x0A) & 0xFF;
 		if (currentKind == 2) {
@@ -1612,7 +1612,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				if (rawDamage < 1) {
 					rawDamage = 1;
 				}
-				unsigned int bonus = ((static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D && itemEffect == 0x1F8) ?
+				int bonus = ((static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D && itemEffect == 0x1F8) ?
 					static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(
 						reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0xBDD)) :
 					0;
@@ -1670,7 +1670,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					recoilDamage = 1;
 				} else {
 					float recoilRate = (static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x26 + resistType * 2)) * 0.01f) + 1.0e-07f;
-					int raw = static_cast<int>(static_cast<float>(static_cast<int>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C))) * recoilRate);
+					int raw = static_cast<int>(static_cast<float>(static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C))) * recoilRate);
 					recoilDamage = (raw < 1) ? 1 : raw;
 					if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
 						*selfReactive = 1;
@@ -1685,14 +1685,14 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				System.Printf(dbg + 0x230, staType);
 				break;
 			}
-		} else if (itemKind == 8 || (itemKind == 9 && (static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D && (static_cast<unsigned short>(sourceObj->GetCID()) & 0xAD) == 0xAD)) {
+		} else if (itemKind == 8 || (itemKind == 9 && (static_cast<short>(GetCID()) & 0x6D) == 0x6D && (static_cast<unsigned short>(sourceObj->GetCID()) & 0xAD) == 0xAD)) {
 			switch (staType) {
 			case 0x24:
 			case 0x25:
 			case 100:
 			case 0x69:
 			case 0x6A: {
-				unsigned int defense = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x22);
+				int defense = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x22);
 				unsigned int basePower = *reinterpret_cast<unsigned short*>(itemData + 6);
 				unsigned int sourcePower = *reinterpret_cast<unsigned short*>(
 					reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0x1E);
@@ -1728,7 +1728,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			}
 			case 10: {
 				float recoilRate = (static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x26 + resistType * 2)) * 0.01f) + 1.0e-07f;
-				int raw = static_cast<int>(static_cast<float>(static_cast<int>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0x1C))) * recoilRate);
+				int raw = static_cast<int>(static_cast<float>(static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0x1C))) * recoilRate);
 				damageAmount = (raw < 1) ? 1 : raw;
 				System.Printf(dbg + 0x2A4, damageAmount);
 				break;

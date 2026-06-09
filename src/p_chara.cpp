@@ -1849,8 +1849,8 @@ checkLoaded:
                                     CTextureSet* textureSet =
                                         new (pcs->m_stage, const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
                                     CMemory::CStage* textureStage =
-                                        keyTag == reinterpret_cast<void*>(4) ? pcs->m_weaponTextureStage
-                                                                            : pcs->m_viewerTextureStage;
+                                        reinterpret_cast<int>(keyTag) == 4 ? pcs->m_weaponTextureStage
+                                                                           : pcs->m_viewerTextureStage;
                                     textureSet->Create(rawAddr, SelectLoadStage(pcs, textureStage), 0, 0, 0, 0);
                                     loadTexture->m_textureSet = textureSet;
                                 } else {

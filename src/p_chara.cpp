@@ -918,6 +918,8 @@ int CCharaPcs::correctLoadAnimAmem()
     int loadAnimCount = LoadAnimArray(this)->GetSize();
     int validAnimCount = 0;
     int maxEnd = 0;
+    int compactedSize = 0;
+    int scanOffset = 0;
     for (int i = 0; i < loadAnimCount; i++) {
         CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
         CChara::CAnim* anim = loadAnim->m_anim;
@@ -932,8 +934,6 @@ int CCharaPcs::correctLoadAnimAmem()
         System.Printf(const_cast<char*>(s_charaAmemAnimCompactCountFmt), validAnimCount);
     }
 
-    int compactedSize = 0;
-    int scanOffset = 0;
     do {
         int chunkLoadCount = 0;
         int chunkSize = 0;
@@ -1327,6 +1327,7 @@ void CCharaPcs::drawMakeTexShadow()
     LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
 
     GXSetPixelFmt((GXPixelFmt)1, GX_ZC_LINEAR);
+    _GXColor savedCopyClearColor = Graphic.m_defaultCopyClearColor;
     GXSetAlphaUpdate(GX_TRUE);
     GXSetViewport(kCharaZero, kCharaZero, static_cast<float>(m_texShadowSize), static_cast<float>(m_texShadowSize), kCharaZero, kCharaOne);
     GXSetScissor(0, 0, static_cast<unsigned int>(m_texShadowSize), static_cast<unsigned int>(m_texShadowSize));
@@ -1349,7 +1350,7 @@ void CCharaPcs::drawMakeTexShadow()
 
     Graphic.SetViewport();
     Graphic.SetStdPixelFmt();
-    Graphic.SetCopyClear(clearColor.color, 0xFFFFFF);
+    Graphic.SetCopyClear(savedCopyClearColor, 0xFFFFFF);
     gUtil.RenderTextureQuad(
         0.0f, 0.0f, static_cast<float>(m_texShadowSize), static_cast<float>(m_texShadowSize), &backBufferTexObj, 0, 0, 0,
         GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);

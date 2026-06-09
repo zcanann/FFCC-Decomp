@@ -74,6 +74,7 @@ extern const char sMogFurTextureName[] = "n915m_2";
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_common_subs off
 void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displayList, unsigned long displayListSize,
                        _GXTexObj* blendTexObj, unsigned char mode)
 {
@@ -134,16 +135,16 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
 
     GXSetChanCtrl(GX_COLOR0A0, GX_ENABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT0, GX_DF_NONE, GX_AF_SPEC);
 
-    color.r = 0xFF;
-    color.g = 0xFF;
-    color.b = 0xFF;
     color.a = 0xFF;
+    color.b = 0xFF;
+    color.g = 0xFF;
+    color.r = 0xFF;
     GXInitLightColor(&lightObj, color);
     GXSetChanMatColor(GX_COLOR0A0, color);
-    color.r = 0;
-    color.g = 0;
-    color.b = 0;
     color.a = 0;
+    color.b = 0;
+    color.g = 0;
+    color.r = 0;
     GXSetChanAmbColor(GX_COLOR0A0, color);
     GXInitLightAttnA(&lightObj, kYmEnvRenderZero, kYmEnvTwo, kYmEnvRenderZero);
     GXInitLightAttnK(&lightObj, kYmEnvRenderZero, kYmEnvRenderOne, kYmEnvRenderZero);
@@ -185,10 +186,10 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
         _GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD0, GX_TEXMAP1, GX_COLOR0A0);
         _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
         _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
-        color.r = 0xFF;
-        color.g = 0xFF;
-        color.b = 0xFF;
         color.a = 0xFF;
+        color.b = 0xFF;
+        color.g = 0xFF;
+        color.r = 0xFF;
         GXSetChanMatColor(GX_COLOR0A0, color);
         GXLoadTexObj(blendTexObj, GX_TEXMAP0);
     }
@@ -257,6 +258,7 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_common_subs on
 void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize, unsigned short detail, _GXVtxFmt vtxFmt)
 {
     static const char s_display_list_alloc_error[] = "Error allocating display list (%d, %d)\n";

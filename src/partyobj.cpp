@@ -920,7 +920,7 @@ void CGPartyObj::onFrameAlways()
 		showTraceParticle = 0;
 	} else if ((Game.m_gameWork.m_menuStageMode == 0) ||
 		    (Game.m_gameWork.m_menuStageMode == 0) ||
-		    (Game.m_gameWork.m_bossArtifactStageIndex > 0x0E) ||
+		    (Game.m_gameWork.m_bossArtifactStageIndex >= 0x0F) ||
 		    ((static_cast<unsigned short>(GetCID()) & 0x6D) != 0x6D) ||
 		    (reinterpret_cast<int>(m_scriptHandle[0xED]) == 0)) {
 		showTraceParticle = 1;
@@ -2444,9 +2444,8 @@ void CGPartyObj::onStatAttack(int chargeType)
 		    (*reinterpret_cast<unsigned short*>(attackEntry + 6) - *reinterpret_cast<unsigned short*>(attackEntry + 4)) + 1);
 	}
 
-	const unsigned short comboStart = *reinterpret_cast<unsigned short*>(attackEntry + 0x0C);
-	const unsigned short comboEnd = *reinterpret_cast<unsigned short*>(attackEntry + 0x0E);
-	if (m_stateFrame >= comboStart && m_stateFrame <= comboEnd) {
+	if (m_stateFrame >= *reinterpret_cast<unsigned short*>(attackEntry + 0x0C) &&
+	    m_stateFrame <= *reinterpret_cast<unsigned short*>(attackEntry + 0x0E)) {
 		if ((getPadTrigForSlot(static_cast<signed char>(m_animStateMisc)) & 0x100) != 0) {
 			party.commandFlagBits.commandActive = 1;
 		}
@@ -2457,8 +2456,8 @@ void CGPartyObj::onStatAttack(int chargeType)
 	}
 
 	if (m_stateFrame == *reinterpret_cast<unsigned short*>(attackEntry + 0x10)) {
-		if (party.commandFlagBits.commandActive != 0 && party.commandFlagBits.flag40 == 0 && chain < 2) {
-			party.attackSel = chain + 1;
+		if (party.commandFlagBits.commandActive != 0 && party.commandFlagBits.flag40 == 0 && party.unk6CC < 2) {
+			party.attackSel = party.unk6CC + 1;
 			changeStat(1, 0, 0);
 			return;
 		}
@@ -2552,9 +2551,11 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 		if (bossCid && (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) != 0)) {
 			bossTarget = true;
 		}
-		float radius = FLOAT_80331A88;
+		float radius;
 		if (bossTarget) {
 			radius = FLOAT_80331AB0;
+		} else {
+			radius = FLOAT_80331A88;
 		}
 
 		CVector startOffset(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
@@ -2827,9 +2828,11 @@ void CGPartyObj::checkTargetParticle()
 			if (loopBossCid && (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) != 0)) {
 				loopBossTarget = true;
 			}
-			float radius = FLOAT_80331A88;
+			float radius;
 			if (loopBossTarget) {
 				radius = FLOAT_80331AB0;
+			} else {
+				radius = FLOAT_80331A88;
 			}
 
 			CVector up(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
@@ -3727,13 +3730,13 @@ int CGPartyObj::useItem(int itemId)
 	const char* msgBase = lbl_801DCA48;
 
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	if ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x9A]) << 24) & 0xC0000000) >> 31) != 0) &&
-	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x9B]) << 24) & 0xC0000000) >> 31) != 0) &&
-	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x63C]) << 24) & 0xC0000000) >> 31) != 0) &&
-	    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0)) {
-		canUse = 1;
-	} else {
+	if ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x9A]) << 24) & 0xC0000000) >> 31) == 0) ||
+	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x9B]) << 24) & 0xC0000000) >> 31) == 0) ||
+	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x63C]) << 24) & 0xC0000000) >> 31) == 0) ||
+	    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0)) {
 		canUse = 0;
+	} else {
+		canUse = 1;
 	}
 
 	if (!canUse) {
@@ -4909,7 +4912,7 @@ void CGPartyObj::ghostPartyMog()
 			if (moodMode == 1) {
 				if (CharaGhostValue(0x2054) < 0x32) {
 					bossState = 5;
-				} else if (CharaGhostValue(0x2054) > 0x5E) {
+				} else if (CharaGhostValue(0x2054) >= 0x5F) {
 					bossState = 4;
 				}
 			} else if (moodMode != 0 && moodMode < 3 && CharaGhostValue(0x2054) < 0x32) {
@@ -5118,7 +5121,7 @@ void CGPartyObj::gpmMove()
 			}
 
 			float limit = (sGhostPartyWork.activeTrailCount != 0) ? FLOAT_80331A7C : FLOAT_80331A80;
-			if (Game.unkFloat_0xca10 * limit > pathDist) {
+			if (pathDist < Game.unkFloat_0xca10 * limit) {
 				if ((leader->m_lastStateId != 2 && leader->m_lastStateId != 6) ||
 				    leader->m_subState != 1 ||
 				    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(leader) + 0x668) == 0 ||

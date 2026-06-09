@@ -767,12 +767,12 @@ void CMenuPcs::CmakeVillageDraw()
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
     float a255 = 255.0f * alpha;
-    GXColor col;
-    col.r = 0xFF;
-    col.g = 0xFF;
-    col.b = 0xFF;
-    col.a = static_cast<unsigned char>(static_cast<int>(a255));
-    GXSetChanMatColor(GX_COLOR0A0, col);
+    GXColor col0;
+    col0.r = 0xFF;
+    col0.g = 0xFF;
+    col0.b = 0xFF;
+    col0.a = static_cast<unsigned char>(static_cast<int>(a255));
+    GXSetChanMatColor(GX_COLOR0A0, col0);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
     MenuPcs.DrawRect(
         0, 192.0f, 56.0f, 416.0f, 264.0f,
@@ -782,11 +782,12 @@ void CMenuPcs::CmakeVillageDraw()
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-    col.r = 0xFF;
-    col.g = 0xFF;
-    col.b = 0xFF;
-    col.a = static_cast<unsigned char>(static_cast<int>(a255));
-    GXSetChanMatColor(GX_COLOR0A0, col);
+    GXColor col1;
+    col1.r = 0xFF;
+    col1.g = 0xFF;
+    col1.b = 0xFF;
+    col1.a = static_cast<unsigned char>(static_cast<int>(a255));
+    GXSetChanMatColor(GX_COLOR0A0, col1);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
     float panelX = static_cast<float>(static_cast<int>(
         -(static_cast<double>(328.0f) * 0.5 - 400.0)));
@@ -796,11 +797,12 @@ void CMenuPcs::CmakeVillageDraw()
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-    col.r = 0xFF;
-    col.g = 0xFF;
-    col.b = 0xFF;
-    col.a = static_cast<unsigned char>(static_cast<int>(a255));
-    GXSetChanMatColor(GX_COLOR0A0, col);
+    GXColor col2;
+    col2.r = 0xFF;
+    col2.g = 0xFF;
+    col2.b = 0xFF;
+    col2.a = static_cast<unsigned char>(static_cast<int>(a255));
+    GXSetChanMatColor(GX_COLOR0A0, col2);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x68 : 0x41));
     MenuPcs.DrawRect(
         0, 184.0f, 216.0f, 48.0f, 48.0f,

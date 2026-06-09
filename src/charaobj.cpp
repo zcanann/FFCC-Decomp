@@ -3524,7 +3524,8 @@ void CGCharaObj::combi2()
 	if (isSharedResult) {
 		comboCenter.Identity();
 		for (int i = 0; i < participantCount; i++) {
-			PSVECAdd(reinterpret_cast<Vec*>(&comboCenter), &CharaObjComboCenter(candidates[i]), reinterpret_cast<Vec*>(&comboCenter));
+			CVector candidateCenter(CharaObjComboCenter(candidates[i]));
+			PSVECAdd(reinterpret_cast<Vec*>(&comboCenter), reinterpret_cast<Vec*>(&candidateCenter), reinterpret_cast<Vec*>(&comboCenter));
 		}
 		PSVECScale(reinterpret_cast<Vec*>(&comboCenter), reinterpret_cast<Vec*>(&comboCenter), 1.0f / static_cast<float>(participantCount));
 	}

@@ -1693,7 +1693,7 @@ void CChara::CModel::calcMatrix()
 		}
 	}
 
-	ModelFlags10C(this) &= 0x7F;
+	this->m_flags10CBits.m_flag10C_80 = 0;
 }
 
 #pragma push

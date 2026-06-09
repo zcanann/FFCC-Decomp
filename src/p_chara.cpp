@@ -1803,7 +1803,7 @@ checkLoaded:
                                 if (streamToAmem == 0) {
                                     CChara::CModel* model =
                                         new (pcs->m_stage, const_cast<char*>(s_p_chara_cpp), 0x5F1) CChara::CModel;
-                                    model->Create(rawAddr, SelectLoadStage(pcs, pcs->m_viewerModelStage));
+                                    model->Create(rawAddr, SelectLoadStage(pcs, CharaPcs.m_viewerModelStage));
                                     loadModel->m_model = model;
                                 } else {
                                     loadModel->m_streamOffset = reinterpret_cast<void*>(LoadStreamCursor(this));
@@ -1817,7 +1817,7 @@ checkLoaded:
 
                                 if (hasDynamics != 0) {
                                     chunkFile.GetNextChunk(chunk);
-                                    CMemory::CStage* dynStage = SelectLoadStage(pcs, pcs->m_viewerModelStage);
+                                    CMemory::CStage* dynStage = SelectLoadStage(pcs, CharaPcs.m_viewerModelStage);
                                     loadModel->m_model->CreateDynamics(chunkFile.GetAddress(), dynStage);
                                 }
                             }

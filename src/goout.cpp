@@ -1708,7 +1708,7 @@ card_connected:;
         SetGoOutMode(0xE);
         break;
     case 0xE:
-        if (static_cast<signed char>(MenuPcs.m_goOutLoadFinished) != 0) {
+        if (static_cast<unsigned char>(MenuPcs.m_goOutLoadFinished) != 0) {
             if (MenuPcs.m_goOutLoadResult == 4) {
                 MenuGoOutState().m_resultSelect = 0;
                 MenuPcs.InitSaveLoadMenu();
@@ -2030,7 +2030,7 @@ card_connected:;
         m_cursorListY1 = 0xde;
         m_cursorMode = 0;
         {
-            unsigned char next;
+            signed char next;
 
             if (MenuPcs.m_menuWindowInfo->state == 1) {
                 input = GetGoOutInputMask();

@@ -2604,10 +2604,9 @@ int CCharaPcs::LoadAnim(int charaKind, int charaNo, char* animName, int unusedAr
     CLoadAnim* loadAnim = FindLoadedAnim(&CharaPcs, charaKind, charaNo, animName);
     if (loadAnim == 0) {
         loadAnim = LoadAnimFromDisk(&CharaPcs, charaKind, charaNo, animName, mergeFileId, mergeFlags);
-    }
-
-    if (loadAnim == 0) {
-        return 0;
+        if (loadAnim == 0) {
+            return 0;
+        }
     }
     return 1;
 }

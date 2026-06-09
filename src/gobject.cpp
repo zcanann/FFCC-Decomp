@@ -983,8 +983,9 @@ void CGObject::bgNormalCollision()
         m_stateFlags0Bits.unk0 = 1;
         *reinterpret_cast<u32*>(&m_radiusCtrl.x) =
             MapMng.GetMapIdGrpArray()[gMapHitFace->m_groupIndex].m_mask;
-        if (gMapHitFace->m_groupIndex != 0) {
-            *reinterpret_cast<char*>(&m_lastBgGroup) = static_cast<char>(gMapHitFace->m_groupIndex);
+        const int groupIndex = gMapHitFace->m_groupIndex;
+        if (groupIndex != 0) {
+            *reinterpret_cast<char*>(&m_lastBgGroup) = static_cast<char>(groupIndex);
         }
         MapMng.m_hitMapObj->GetHitFaceNormal(&HitFaceNormal());
     }
@@ -1096,10 +1097,11 @@ void CGObject::bgWorldCollision()
 
     if ((MapMng.GetMapIdGrpArray()[gMapHitFace->m_groupIndex].m_mask & 0x20) == 0) {
         m_stateFlags0Bits.unk0 = 1;
-        m_radiusCtrl.x =
-            *reinterpret_cast<float*>(&MapMng.GetMapIdGrpArray()[gMapHitFace->m_groupIndex].m_mask);
-        if (gMapHitFace->m_groupIndex != 0) {
-            *reinterpret_cast<char*>(&m_lastBgGroup) = static_cast<char>(gMapHitFace->m_groupIndex);
+        *reinterpret_cast<u32*>(&m_radiusCtrl.x) =
+            MapMng.GetMapIdGrpArray()[gMapHitFace->m_groupIndex].m_mask;
+        const int groupIndex = gMapHitFace->m_groupIndex;
+        if (groupIndex != 0) {
+            *reinterpret_cast<char*>(&m_lastBgGroup) = static_cast<char>(groupIndex);
         }
         MapMng.m_hitMapObj->GetHitFaceNormal(&HitFaceNormal());
     }

@@ -1848,9 +1848,11 @@ checkLoaded:
                                 if (streamToAmem == 0) {
                                     CTextureSet* textureSet =
                                         new (pcs->m_stage, const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
-                                    CMemory::CStage* textureStage =
-                                        reinterpret_cast<int>(keyTag) == 4 ? pcs->m_weaponTextureStage
-                                                                           : pcs->m_viewerTextureStage;
+                                    int textureStageIndex = 1;
+                                    if (reinterpret_cast<int>(keyTag) == 4) {
+                                        textureStageIndex = 3;
+                                    }
+                                    CMemory::CStage* textureStage = (&pcs->m_viewerModelStage)[textureStageIndex];
                                     textureSet->Create(rawAddr, SelectLoadStage(pcs, textureStage), 0, 0, 0, 0);
                                     loadTexture->m_textureSet = textureSet;
                                 } else {

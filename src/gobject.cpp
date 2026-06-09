@@ -929,12 +929,12 @@ void CGObject::bgNormalCollision()
     pos.y += sStepProbeHeight + m_capsuleHalfHeight;
 
     unsigned int retry = 4;
-    const float capsuleRadius = m_capsuleHalfHeight;
+    const double epsilon = DOUBLE_80330400;
     while (retry != 0) {
         CMapCylinder bodyCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
         bodyCylinder.m_bottom = pos;
         bodyCylinder.m_axis = move;
-        bodyCylinder.m_radius = capsuleRadius;
+        bodyCylinder.m_radius = m_capsuleHalfHeight;
 
         if (MapMng.CheckHitCylinderNear(&bodyCylinder, &move, m_bgHitMask) == 0) {
             break;
@@ -943,13 +943,13 @@ void CGObject::bgNormalCollision()
         m_stateFlags0Bits.unk1 = 1;
         MapMng.m_hitMapObj->CalcHitSlide(&move, sJumpLift);
 
-        if (fabs(static_cast<double>(move.x)) < DOUBLE_80330400) {
+        if (fabs(static_cast<double>(move.x)) < epsilon) {
             move.x = sZeroFloat;
         }
-        if (fabs(static_cast<double>(move.y)) < DOUBLE_80330400) {
+        if (fabs(static_cast<double>(move.y)) < epsilon) {
             move.y = sZeroFloat;
         }
-        if (fabs(static_cast<double>(move.z)) < DOUBLE_80330400) {
+        if (fabs(static_cast<double>(move.z)) < epsilon) {
             move.z = sZeroFloat;
         }
 

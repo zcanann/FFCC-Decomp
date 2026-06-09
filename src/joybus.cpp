@@ -3664,7 +3664,7 @@ case4_done:
 
             unsigned char portVal = singleMode2 ? 0 : (unsigned char)threadParam->m_portIndex;
             unsigned char header = 1;
-            signed char flags = (unsigned char)(portVal | (threadParam->m_gbaBootFlag << 6) | (threadParam->m_unk2 << 4));
+            unsigned char flags = (unsigned char)(portVal | (threadParam->m_gbaBootFlag << 6) | (threadParam->m_unk2 << 4));
             unsigned int word = (1u << 24) | ((unsigned int)flags << 16);
 
             threadParam->m_gbaStatus = GBAWrite(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(&word), &threadParam->m_unk3);
@@ -3700,7 +3700,7 @@ case5_done:
         GbaQue.GetStageNo(threadParam->m_portIndex, &stageMajor, &stageMinor);
 
         unsigned int cmdStage = MakeJoyCmd32(0x0E, 1, ((unsigned char*)&stageMajor)[3], ((unsigned char*)&stageMinor)[3]);
-        int stageResult = 0;
+        unsigned int stageResult = 0;
 
         if (static_cast<signed char>(m_threadRunningMask) == 0)
         {

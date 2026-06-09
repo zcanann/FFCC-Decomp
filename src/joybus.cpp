@@ -4978,7 +4978,7 @@ int JoyBus::SendPlayerHP(ThreadParam* threadParam)
 int JoyBus::SendItemAll(ThreadParam* threadParam)
 {
     unsigned int port;
-    int result = 0;
+    int result;
     unsigned char subState = threadParam->m_subState;
 
     switch (subState)
@@ -5207,7 +5207,7 @@ int JoyBus::SendMapObj(ThreadParam* threadParam)
 int JoyBus::SendCompatibility(ThreadParam* threadParam)
 {
     unsigned int port;
-    int result = 0;
+    int result;
     unsigned char subState = threadParam->m_subState;
 
     switch (subState)
@@ -5294,9 +5294,12 @@ int JoyBus::SendCompatibility(ThreadParam* threadParam)
                 result = 0;
             }
         }
-    
+
         break;
     }
+    default:
+        result = 0;
+        break;
     }
 
     if (result == 0)
@@ -5566,9 +5569,12 @@ int JoyBus::SendFavorite(ThreadParam* threadParam)
                 result = 0;
             }
         }
-    
+
         break;
     }
+    default:
+        result = 0;
+        break;
     }
 
     if (result == 0)
@@ -5754,7 +5760,7 @@ int JoyBus::SendMType(ThreadParam* threadParam, int modeType)
 int JoyBus::SendEquip(ThreadParam* threadParam)
 {
     unsigned int port;
-    int result = 0;
+    int result;
     unsigned char subState = threadParam->m_subState;
 
     switch (subState)
@@ -5842,9 +5848,12 @@ int JoyBus::SendEquip(ThreadParam* threadParam)
                 result = 0;
             }
         }
-    
+
         break;
     }
+    default:
+        result = 0;
+        break;
     }
 
     if (result == 0)
@@ -5868,7 +5877,7 @@ int JoyBus::SendEquip(ThreadParam* threadParam)
 int JoyBus::SendCmd(ThreadParam* threadParam)
 {
     unsigned int port;
-    int result = 0;
+    int result;
     unsigned char subState = threadParam->m_subState;
 
     switch (subState)
@@ -5956,9 +5965,12 @@ int JoyBus::SendCmd(ThreadParam* threadParam)
                 result = 0;
             }
         }
-    
+
         break;
     }
+    default:
+        result = 0;
+        break;
     }
 
     if (result == 0)
@@ -6129,7 +6141,7 @@ int JoyBus::SendBonusStr(ThreadParam* threadParam)
 int JoyBus::SendArtifact(ThreadParam* threadParam)
 {
     unsigned int port;
-    int result = 0;
+    int result;
     unsigned char subState = threadParam->m_subState;
 
     switch (subState)
@@ -6216,9 +6228,12 @@ int JoyBus::SendArtifact(ThreadParam* threadParam)
                 result = 0;
             }
         }
-    
+
         break;
     }
+    default:
+        result = 0;
+        break;
     }
 
     if (result == 0)
@@ -6242,7 +6257,7 @@ int JoyBus::SendArtifact(ThreadParam* threadParam)
 int JoyBus::SendTmpArtifact(ThreadParam* threadParam)
 {
     unsigned int port;
-    int result = 0;
+    int result;
     unsigned char subState = threadParam->m_subState;
 
     switch (subState)
@@ -6329,9 +6344,12 @@ int JoyBus::SendTmpArtifact(ThreadParam* threadParam)
                 result = 0;
             }
         }
-    
+
         break;
     }
+    default:
+        result = 0;
+        break;
     }
 
     if (result == 0)
@@ -6355,7 +6373,7 @@ int JoyBus::SendTmpArtifact(ThreadParam* threadParam)
 int JoyBus::SendMapObjInfo(ThreadParam* threadParam)
 {
     unsigned int port;
-    int result = 0;
+    int result;
     unsigned char subState = threadParam->m_subState;
 
     switch (subState)
@@ -6446,9 +6464,12 @@ int JoyBus::SendMapObjInfo(ThreadParam* threadParam)
                 result = 0;
             }
         }
-    
+
         break;
     }
+    default:
+        result = 0;
+        break;
     }
 
     if (result == 0)
@@ -6598,7 +6619,7 @@ int JoyBus::SendRaderMode(ThreadParam* threadParam)
 int JoyBus::SendScouInfo(ThreadParam* threadParam)
 {
     unsigned int port;
-    int result = 0;
+    int result;
     unsigned char subState = threadParam->m_subState;
 
     switch (subState)
@@ -6685,9 +6706,12 @@ int JoyBus::SendScouInfo(ThreadParam* threadParam)
                 result = 0;
             }
         }
-    
+
         break;
     }
+    default:
+        result = 0;
+        break;
     }
 
     if (result == 0)

@@ -305,8 +305,10 @@ found_fallback:
 	float x0 = posX;
 	float y0 = posY;
 	if (renderFlagBits.snapPosition != 0) {
-		x0 = static_cast<float>(floor(x0));
-		y0 = static_cast<float>(floor(y0));
+		double flooredX = floor(x0);
+		double flooredY = floor(y0);
+		x0 = static_cast<float>(flooredX);
+		y0 = static_cast<float>(flooredY);
 	}
 
 	float advance = scaleX * (margin + static_cast<float>(drawWidth));
@@ -316,7 +318,8 @@ found_fallback:
 	float y1 = y0 + static_cast<float>(m_glyphHeight) * scaleY;
 
 	if (renderFlagBits.snapPosition != 0) {
-		advance = static_cast<float>(floor(advance));
+		double flooredAdvance = floor(advance);
+		advance = static_cast<float>(flooredAdvance);
 	}
 	posX += advance;
 

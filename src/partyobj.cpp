@@ -1384,14 +1384,16 @@ tmpArtifactBlock:
 				changeStat(0x14, 0, 0);
 				return;
 			}
-			if (element < 2) {
+			if (element > 2) {
+				if (element >= 4) {
+					return;
+				}
+				changeStat(0x15, 0, 0);
+				return;
+			}
+			if (element >= 0) {
 				changeStat(8, 0, 0);
-				return;
 			}
-			if (element > 3) {
-				return;
-			}
-			changeStat(0x15, 0, 0);
 			return;
 		}
 

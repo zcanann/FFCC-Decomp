@@ -2566,8 +2566,8 @@ void CMapMng::Calc()
 
     int& mapLightId = m_mapAnimFrame;
     mapLightId += 1;
-    mapLightId += 1;
-    if (static_cast<unsigned char>(mapLightId) != 0x1E) {
+    int v = (mapLightId += 1);
+    if (static_cast<unsigned char>(static_cast<long long>(v) - 2) != 0x1E) {
         mapLightId = 0x1C;
     }
 

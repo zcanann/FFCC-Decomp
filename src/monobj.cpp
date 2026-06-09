@@ -1746,39 +1746,36 @@ void CGMonObj::onStatDie()
 		unsigned char* aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
 #define subFrame (*reinterpret_cast<int*>(mon + 0x530))
 
-		if ((*reinterpret_cast<unsigned short*>(aiData + 0xFE) & 2) != 0) {
-			if (subFrame == 0) {
-				int particleId = *reinterpret_cast<int*>(mon + 0x560);
-				int classId = reinterpret_cast<int>(object->m_scriptHandle[4]);
-				switch (classId) {
-				case 4:
-					particleId = 0x253;
-					break;
-				case 5:
-					particleId = 599;
-					break;
-				case 6:
-					particleId = 0x25B;
-					break;
-				}
-
-				*reinterpret_cast<int*>(mon + 0x560) = particleId;
-				CGCharaObj::putParticleFromItem(*reinterpret_cast<int*>(mon + 0x560), 0, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
-				CGCharaObj::putParticleFromItem(*reinterpret_cast<int*>(mon + 0x560), 1, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
-				CGCharaObj::putParticleFromItem(*reinterpret_cast<int*>(mon + 0x560), 2, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
-				CGCharaObj::putParticleFromItem(*reinterpret_cast<int*>(mon + 0x560), 3, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
-				return;
-			}
-			if (subFrame != 0x19) {
-				return;
-			}
-		} else {
-			if (subFrame != 0) {
-				return;
-			}
+		if ((*reinterpret_cast<unsigned short*>(aiData + 0xFE) & 2) == 0) {
+			goto deathElse;
 		}
-#undef subFrame
+		if (subFrame == 0) {
+			int particleId = *reinterpret_cast<int*>(mon + 0x560);
+			int classId = reinterpret_cast<int>(object->m_scriptHandle[4]);
+			switch (classId) {
+			case 4:
+				particleId = 0x253;
+				break;
+			case 5:
+				particleId = 599;
+				break;
+			case 6:
+				particleId = 0x25B;
+				break;
+			}
 
+			*reinterpret_cast<int*>(mon + 0x560) = particleId;
+			CGCharaObj::putParticleFromItem(*reinterpret_cast<int*>(mon + 0x560), 0, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
+			CGCharaObj::putParticleFromItem(*reinterpret_cast<int*>(mon + 0x560), 1, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
+			CGCharaObj::putParticleFromItem(*reinterpret_cast<int*>(mon + 0x560), 2, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
+			CGCharaObj::putParticleFromItem(*reinterpret_cast<int*>(mon + 0x560), 3, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
+			return;
+		}
+		if (subFrame != 0x19) {
+			return;
+		}
+
+	deathCleanup:
 		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x231000);
 		*reinterpret_cast<float*>(mon + 0x694) = kMonObjZero;
 		enableAttackCol(0, 0, 0);
@@ -1789,6 +1786,13 @@ void CGMonObj::onStatDie()
 		object->PutDropItem();
 		reinterpret_cast<CGPrgObj*>(this)->changeSubStat(2);
 		return;
+
+	deathElse:
+		if (subFrame == 0) {
+			goto deathCleanup;
+		}
+		return;
+#undef subFrame
 	}
 
 	case 2: {

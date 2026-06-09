@@ -1060,7 +1060,7 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
     static int bTest2;
     static unsigned char init2;
 
-    bool isStd1000 = false;
+    int isStd1000 = 0;
     SetStdEnv();
 
     CMaterial* material = materialSet->m_materials[materialIndex];
@@ -1296,7 +1296,7 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
             return;
         }
         if ((m_curEnvTevBit & material->m_tevBit & 0x1000) != 0) {
-            isStd1000 = true;
+            isStd1000 = 1;
         } else {
             if (m_vtxDescMode != 1) {
                 GXClearVtxDesc();
@@ -1584,7 +1584,7 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
             if (m_manaParaboloidTexObj0 != 0) {
                 GXLoadTexObj(m_manaParaboloidTexObj0, static_cast<GXTexMapID>(*reinterpret_cast<int*>(&m_pad0CC)));
             }
-            GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, 0, GX_DF_NONE, GX_AF_SPEC);
+            GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, 0, GX_DF_NONE, GX_AF_NONE);
             GXSetTevDirect(static_cast<GXTevStageID>(m_numTevStage));
             _GXSetTevOrder(m_numTevStage, *reinterpret_cast<int*>(&m_pad0D4), *reinterpret_cast<int*>(&m_pad0CC), 4);
             if (m_manaParaboloidTexObj0 != 0) {

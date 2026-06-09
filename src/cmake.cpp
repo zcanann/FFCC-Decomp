@@ -1777,7 +1777,7 @@ void CMenuPcs::CmakeJobDraw()
     if (CmakeState(this)->m_mode == 1) {
         int sel = CmakeState(this)->m_select;
         int cursorX = (sel < 4) ? 0x110 : 0x1A8;
-        int cursorY = 0x70 + ((sel < 4) ? sel : (sel - 4)) * 0x28;
+        int cursorY = 0x70 + (sel % 4) * 0x28;
         unsigned int cursorFrame = static_cast<int>(System.m_frameCounter) % 8;
         DrawCursor(static_cast<int>((static_cast<float>(cursorX) - 36.0f) + static_cast<float>(cursorFrame)),
             cursorY, alpha);
@@ -2620,7 +2620,7 @@ void CMenuPcs::CmakeNameDraw()
     }
     DrawCmakeName(0, nameCursor, name, alpha);
     DrawCmakeDecision(
-        (static_cast<int>(CmakeState(this)->m_row) >> 31) +
+        (static_cast<unsigned int>(CmakeState(this)->m_row) >> 31) +
             (static_cast<int>(static_cast<int>(CmakeState(this)->m_row)) >= 5),
         alpha);
 
@@ -2709,7 +2709,7 @@ int CMenuPcs::CmakeNameCtrl()
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else if ((repeat & 0x4) != 0) {
-            if (CmakeState(this)->m_row < (4 + static_cast<unsigned int>((static_cast<unsigned long long>(CmakeState(this)->m_select) - 10) >> 32))) {
+            if (CmakeState(this)->m_row < (CmakeState(this)->m_select >= 10 ? 4 : 3)) {
                 CmakeState(this)->m_row = static_cast<short>(CmakeState(this)->m_row + 1);
             } else {
                 CmakeState(this)->m_row = 0;
@@ -2765,7 +2765,7 @@ int CMenuPcs::CmakeNameCtrl()
                 short curRow = CmakeState(this)->m_row;
                 if (curRow >= 5) {
                     unsigned int emptyLen = strlen(s_CmakeInfo.m_name);
-                    if ((emptyLen & (static_cast<int>(-emptyLen | emptyLen) >> 31)) == 0) {
+                    if ((emptyLen & (static_cast<unsigned int>(-emptyLen | emptyLen) >> 31)) == 0) {
                         Sound.PlaySe(4, 0x40, 0x7F, 0);
                         return 0;
                     }

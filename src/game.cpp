@@ -488,8 +488,8 @@ void CGame::Create()
 
     if (strlen(m_startScriptName) != 0) {
         strcpy(scriptName, m_startScriptName);
-        u32* src = reinterpret_cast<u32*>(scriptName) - 1;
         u32* dst = reinterpret_cast<u32*>(&m_nextScript);
+        u32* src = reinterpret_cast<u32*>(scriptName) - 1;
         int count = sizeof(scriptName) / (sizeof(u32) * 2);
         do {
             u32 a = src[1];

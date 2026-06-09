@@ -1578,8 +1578,10 @@ void CGObject::update()
             Vec lookDelta;
             PSVECSubtract(&m_worldPosition, &m_lookAtTarget->m_worldPosition, &lookDelta);
 
-            float targetNodeY = m_lookAtTarget->unk_0x184;
-            if (m_lookAtTargetNodeIndex != -1) {
+            float targetNodeY;
+            if (m_lookAtTargetNodeIndex == -1) {
+                targetNodeY = m_lookAtTarget->unk_0x184;
+            } else {
                 targetNodeY = ModelNodeMtx(m_lookAtTarget->m_charaModelHandle->m_model, m_lookAtTargetNodeIndex)[1][3];
             }
             lookDelta.y += unk_0x184 - targetNodeY;

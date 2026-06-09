@@ -423,7 +423,7 @@ static void LoadCmakeVillageName()
 
 static void StoreCmakeVillageName()
 {
-    memset(Game.m_gameWork.m_townName, 0, sizeof(Game.m_gameWork.m_townName));
+    memset(Game.m_gameWork.m_townName, 0, 17);
     strcpy(Game.m_gameWork.m_townName, s_CmakeInfo.m_name);
 }
 

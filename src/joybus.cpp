@@ -1381,6 +1381,10 @@ timeout_expiry:
         case 0x16:
         {
             int dataRes = SendDataFile(threadParam);
+            if (dataRes == -1)
+            {
+                goto sleep_retry;
+            }
             if (dataRes == -2)
             {
                 threadParam->m_state = 3;
@@ -1823,6 +1827,10 @@ timeout_expiry:
         case 0x36:
         {
             int dataRes = SendDataFile(threadParam);
+            if (dataRes == -1)
+            {
+                goto sleep_retry;
+            }
             if (dataRes == -2)
             {
                 threadParam->m_state = 3;
@@ -1858,6 +1866,10 @@ timeout_expiry:
         case 0x38:
         {
             int dataRes = SendDataFile(threadParam);
+            if (dataRes == -1)
+            {
+                goto sleep_retry;
+            }
             if (dataRes == -2)
             {
                 threadParam->m_state = 3;
@@ -1893,6 +1905,10 @@ timeout_expiry:
         case 0x3A:
         {
             int dataRes = SendDataFile(threadParam);
+            if (dataRes == -1)
+            {
+                goto sleep_retry;
+            }
             if (dataRes == -2)
             {
                 threadParam->m_state = 3;

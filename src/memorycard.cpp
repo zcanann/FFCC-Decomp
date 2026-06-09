@@ -1387,7 +1387,7 @@ void CMemoryCardMan::SetLoadData()
         } while (inventoryCount != 0);
         if (itemCount != *reinterpret_cast<u16*>(src + 0x28))
         {
-            if (static_cast<int>(System.m_execParam) >= 1)
+            if (static_cast<unsigned int>(System.m_execParam) >= 1)
             {
                 System.Printf(const_cast<char*>(sLoadDataItemCountError), c);
             }

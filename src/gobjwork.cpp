@@ -1858,7 +1858,6 @@ void CCaravanWork::CalcStatus()
 				strBonus += value;
 				break;
 			case 0xB6:
-			case 0xDF:
 				magBonus += value;
 				break;
 			case 0xCC:
@@ -1869,6 +1868,9 @@ void CCaravanWork::CalcStatus()
 				break;
 			case 0xE4:
 				hpBonus += value;
+				break;
+			case 0xDF:
+				magBonus += value;
 				break;
 			}
 		}

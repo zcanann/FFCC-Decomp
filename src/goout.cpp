@@ -2749,7 +2749,7 @@ void CGoOutMenu::Calc()
                 switch (nextMode) {
                 case 1: {
                     int characterCount = 0;
-                    for (unsigned int i = 0; i < 8; i++) {
+                    for (int i = 0; i < 8; i++) {
                         if (Game.m_caravanWorkArr[i].m_shopState != 0) {
                             characterCount++;
                         }

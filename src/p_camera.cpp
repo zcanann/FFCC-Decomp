@@ -902,8 +902,6 @@ void CCameraPcs::SetStdProjectionMatrix()
 void CCameraPcs::draw()
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    Mtx shadowMtx;
-    Mtx cameraMtx;
     Vec* shadowPos = &g_shadow_pos;
 
     if ((m_isAbsolute == 0) ||
@@ -927,6 +925,9 @@ void CCameraPcs::draw()
     }
 
     if (g_map_draw_prof != 0) {
+        {
+        Mtx cameraMtx;
+        Mtx shadowMtx;
         float posZ = shadowPos->z;
         float posY = shadowPos->y;
         float posX = shadowPos->x;
@@ -958,7 +959,11 @@ void CCameraPcs::draw()
         redColor.a = 0xFF;
         GXSetChanMatColor(GX_COLOR0A0, redColor);
         Graphic.DrawSphere();
+        }
 
+        {
+        Mtx cameraMtx;
+        Mtx shadowMtx;
         Vec* shadowRefPos = shadowPos + 1;
         float refPosX = shadowRefPos->x;
         float refPosZ = shadowRefPos->z;
@@ -991,6 +996,7 @@ void CCameraPcs::draw()
         magentaColor.a = 0xFF;
         GXSetChanMatColor(GX_COLOR0A0, magentaColor);
         Graphic.DrawSphere();
+        }
     }
 }
 

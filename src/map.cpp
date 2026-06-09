@@ -2669,7 +2669,10 @@ void CMapMng::DrawBefore()
  */
 void CMapMng::Draw()
 {
-    if ((m_mapReadReady == 0) || (m_mapObjCount == 0)) {
+    if (m_mapReadReady == 0) {
+        return;
+    }
+    if (m_mapObjCount == 0) {
         return;
     }
 
@@ -2711,7 +2714,7 @@ void CMapMng::Draw()
 
         if (Game.m_currentSceneId == 4) {
             CharaPcs.drawMakeTexShadow();
-            MaterialMan.InitVtxFmt(-1, GX_RGB565, 0, GX_U16, 0xE, GX_U16, 10);
+            MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_S16, 0xE, GX_S16, 10);
             MaterialMan.SetDefaultDrawEnv(0x000ACE0F);
             Graphic.SetFog(MapMng.m_fogEnable, 0);
 
@@ -2747,8 +2750,8 @@ void CMapMng::Draw()
                 GXSetAlphaUpdate(0);
                 GXSetCullMode(GX_CULL_NONE);
                 GXSetZMode(1, GX_LEQUAL, 0);
-                _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_COPY);
-                GXSetChanCtrl(GX_COLOR0A0, 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
+                _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
+                GXSetChanCtrl(GX_COLOR0A0, 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
                 GXSetChanMatColor(GX_COLOR0A0, CharaPcs.m_texShadowColor);
                 _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
                 _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_RED, GX_CH_RED, GX_CH_RED);
@@ -2768,10 +2771,10 @@ void CMapMng::Draw()
                     int texMtx = 0x1E;
                     int stage = 0;
                     for (int i = 0; i < batchCount; i++) {
-                        GXLoadTexMtxImm(shadowMatrices[i], texMtx, GX_MTX2x4);
+                        GXLoadTexMtxImm(shadowMatrices[i], texMtx, GX_MTX3x4);
                         GXLoadTexObj(&texObjs[i], static_cast<GXTexMapID>(i));
                         GXSetTexCoordGen2(
-                            static_cast<GXTexCoordID>(i), GX_TG_MTX2x4, GX_TG_TEX0,
+                            static_cast<GXTexCoordID>(i), GX_TG_MTX3x4, GX_TG_POS,
                             static_cast<GXTexMtx>(texMtx), 0, GX_PTIDENTITY);
                         GXSetTevDirect(static_cast<GXTevStageID>(stage));
                         _GXSetTevOrder(
@@ -2780,7 +2783,7 @@ void CMapMng::Draw()
                         _GXSetTevSwapMode(static_cast<GXTevStageID>(stage), GX_TEV_SWAP0, GX_TEV_SWAP1);
                         if (i == 0) {
                             _GXSetTevColorIn(
-                                static_cast<GXTevStageID>(stage), GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASC,
+                                static_cast<GXTevStageID>(stage), GX_CC_ZERO, GX_CC_RASC, GX_CC_ONE,
                                 GX_CC_ZERO);
                             _GXSetTevColorOp(
                                 static_cast<GXTevStageID>(stage), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, 1,
@@ -2816,9 +2819,9 @@ void CMapMng::Draw()
                     _GXSetTevColorOp(
                         static_cast<GXTevStageID>(stage), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, 1, GX_TEVPREV);
                     _GXSetTevAlphaIn(
-                        static_cast<GXTevStageID>(stage), GX_CA_ZERO, GX_CA_RASA, GX_CA_APREV, GX_CA_TEXA);
+                        static_cast<GXTevStageID>(stage), GX_CA_ZERO, GX_CA_KONST, GX_CA_APREV, GX_CA_RASA);
                     _GXSetTevAlphaOp(
-                        static_cast<GXTevStageID>(stage), GX_TEV_SUB, GX_TB_ZERO, GX_CS_SCALE_1, 0, GX_TEVREG2);
+                        static_cast<GXTevStageID>(stage), GX_TEV_SUB, GX_TB_ZERO, GX_CS_SCALE_1, 0, GX_TEVREG1);
 
                     int finalStage = stage + 1;
                     GXSetTevDirect(static_cast<GXTevStageID>(finalStage));
@@ -2830,9 +2833,9 @@ void CMapMng::Draw()
                         static_cast<GXTevStageID>(finalStage), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, 1,
                         GX_TEVPREV);
                     _GXSetTevAlphaIn(
-                        static_cast<GXTevStageID>(finalStage), GX_CA_A2, GX_CA_TEXA, GX_CA_A2, GX_CA_APREV);
+                        static_cast<GXTevStageID>(finalStage), GX_CA_A1, GX_CA_RASA, GX_CA_A1, GX_CA_APREV);
                     _GXSetTevAlphaOp(
-                        static_cast<GXTevStageID>(finalStage), GX_TEV_COMP_R8_GT, GX_TB_ZERO, GX_CS_SCALE_1, 0,
+                        static_cast<GXTevStageID>(finalStage), GX_TEV_COMP_A8_GT, GX_TB_ZERO, GX_CS_SCALE_1, 0,
                         GX_TEVPREV);
 
                     GXSetNumTexGens(static_cast<unsigned char>(batchCount));
@@ -2868,15 +2871,19 @@ void CMapMng::Draw()
         Mtx cameraMtx0;
         PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx0);
 
+        float dirY0 = lightDir0.y;
+        float dirZ0 = lightDir0.z;
         Vec lightPos0;
         lightPos0.x = kMapLargeDistance * -lightDir0.x;
-        lightPos0.y = kMapLargeDistance * -lightDir0.y;
-        lightPos0.z = kMapLargeDistance * -lightDir0.z;
+        lightPos0.y = kMapLargeDistance * -dirY0;
+        lightPos0.z = kMapLargeDistance * -dirZ0;
 
         GXLightObj lightObj0;
         GXInitLightColor(&lightObj0, lightColor);
         PSMTXMultVec(cameraMtx0, &lightPos0, &lightPos0);
         GXInitLightPos(&lightObj0, lightPos0.x, lightPos0.y, lightPos0.z);
+        lightDir0.y = dirY0;
+        lightDir0.z = dirZ0;
         PSMTXMultVecSR(cameraMtx0, &lightDir0, &lightDir0);
         GXInitLightDir(&lightObj0, lightDir0.x, lightDir0.y, lightDir0.z);
         GXInitLightSpot(&lightObj0, kMapFullTurnDegrees, GX_SP_SHARP);
@@ -2889,15 +2896,19 @@ void CMapMng::Draw()
         Mtx cameraMtx1;
         PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx1);
 
+        float dirY1 = lightDir1.y;
+        float dirZ1 = lightDir1.z;
         Vec lightPos1;
         lightPos1.x = kMapLargeDistance * -lightDir1.x;
-        lightPos1.y = kMapLargeDistance * -lightDir1.y;
-        lightPos1.z = kMapLargeDistance * -lightDir1.z;
+        lightPos1.y = kMapLargeDistance * -dirY1;
+        lightPos1.z = kMapLargeDistance * -dirZ1;
 
         GXLightObj lightObj1;
         GXInitLightColor(&lightObj1, lightColor);
         PSMTXMultVec(cameraMtx1, &lightPos1, &lightPos1);
         GXInitLightPos(&lightObj1, lightPos1.x, lightPos1.y, lightPos1.z);
+        lightDir1.y = dirY1;
+        lightDir1.z = dirZ1;
         PSMTXMultVecSR(cameraMtx1, &lightDir1, &lightDir1);
         GXInitLightDir(&lightObj1, lightDir1.x, lightDir1.y, lightDir1.z);
         GXInitLightSpot(&lightObj1, kMapFullTurnDegrees, GX_SP_SHARP);
@@ -2906,8 +2917,8 @@ void CMapMng::Draw()
 
         GXSetNumChans(1);
         GXSetChanCtrl(GX_COLOR0, 1, GX_SRC_REG, GX_SRC_VTX, static_cast<GXLightID>(GX_LIGHT0 | GX_LIGHT1),
-                      GX_DF_CLAMP, GX_AF_SPEC);
-        GXSetChanCtrl(GX_ALPHA0, 0, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPOT);
+                      GX_DF_CLAMP, GX_AF_SPOT);
+        GXSetChanCtrl(GX_ALPHA0, 0, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
 
         _GXColor materialColor;
         *reinterpret_cast<u32*>(&materialColor) = 0xFFFFFFFF;
@@ -2917,22 +2928,22 @@ void CMapMng::Draw()
         *reinterpret_cast<u32*>(&ambientColor) = 0x404040FF;
         GXSetChanAmbColor(GX_COLOR0A0, ambientColor);
 
-        if ((s_bitMask.m_fields.m_mode & 2) == 0) {
-            _GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_INVSRCALPHA, GX_LO_COPY);
-            _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0xFF);
-            GXSetZCompLoc(1);
-            GXSetZMode(1, GX_LEQUAL, 1);
-            GXSetCullMode(GX_CULL_FRONT);
-        } else {
-            _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_COPY);
+        if ((s_bitMask.m_fields.m_mode & 2) != 0) {
+            _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_NOOP);
             _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0xFF);
             GXSetZCompLoc(1);
             GXSetZMode(0, GX_ALWAYS, 0);
             GXSetCullMode(GX_CULL_FRONT);
+        } else {
+            _GXSetBlendMode(GX_BM_NONE, GX_BL_DSTALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
+            _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0xFF);
+            GXSetZCompLoc(1);
+            GXSetZMode(1, GX_LEQUAL, 1);
+            GXSetCullMode(GX_CULL_FRONT);
         }
 
         GXSetNumTexGens(1);
-        GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX3x4, GX_TG_NRM, GX_TEXMTX0, 0, GX_PTIDENTITY);
+        GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, 0, GX_PTIDENTITY);
         GXSetNumTevStages(1);
         _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
         _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
@@ -2954,8 +2965,8 @@ void CMapMng::Draw()
         _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
         _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
         GXSetNumChans(1);
-        GXSetChanCtrl(GX_COLOR0A0, 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
-        GXSetChanCtrl(GX_ALPHA0, 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+        GXSetChanCtrl(GX_COLOR0, 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
+        GXSetChanCtrl(GX_ALPHA0, 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
         _GXColor wireColor;
         wireColor.r = 0xFF;
         wireColor.g = 0xFF;

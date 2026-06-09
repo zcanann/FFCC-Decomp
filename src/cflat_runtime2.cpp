@@ -201,9 +201,12 @@ void CLine<64>::Draw()
 		GXWGFifo.f32 = x;
 		GXWGFifo.f32 = y;
 		GXWGFifo.f32 = z;
-		GXWGFifo.f32 = x;
-		GXWGFifo.f32 = yOffset + y;
-		GXWGFifo.f32 = z;
+		const float x2 = points[i].x;
+		const float y2 = points[i].y;
+		const float z2 = points[i].z;
+		GXWGFifo.f32 = x2;
+		GXWGFifo.f32 = yOffset + y2;
+		GXWGFifo.f32 = z2;
 		i++;
 	}
 }

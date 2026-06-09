@@ -1095,8 +1095,8 @@ timeout_expiry:
                 if ((int)GbaQue.GetChgHitFlg(threadParam->m_portIndex) != 0)
                 {
                     unsigned int hitInfo = GbaQue.GetHitEInfo(threadParam->m_portIndex);
-                    if (SendHitEnemy(threadParam->m_portIndex, (char)(unsigned short)(hitInfo >> 16),
-                                     (short)hitInfo) < 0)
+                    if (SendHitEnemy(threadParam->m_portIndex, (char)reinterpret_cast<short*>(&hitInfo)[0],
+                                     reinterpret_cast<short*>(&hitInfo)[1]) < 0)
                     {
                         goto sleep_retry;
                     }

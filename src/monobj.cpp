@@ -2118,6 +2118,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 	}
 
 	if ((flags & 1) != 0) {
+		unsigned short cylHitArg = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1B2);
 		float cylRadius = kMonObjHalf * object->m_bodyEllipsoidRadius;
 		CMapCylinder hitCylinder(kMonObjMaxBound, kMonObjMinBound);
 		hitCylinder.m_bottom.x = startPos.x;
@@ -2128,7 +2129,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 		hitCylinder.m_axis.z = move.z;
 		hitCylinder.m_radius = cylRadius;
 
-		int hit = MapMng.CheckHitCylinderNear(&hitCylinder, reinterpret_cast<Vec*>(&move), *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1B2));
+		int hit = MapMng.CheckHitCylinderNear(&hitCylinder, reinterpret_cast<Vec*>(&move), cylHitArg);
 		if (hit != 0) {
 			if (hitScale != NULL) {
 				*hitScale = g_hit_t;

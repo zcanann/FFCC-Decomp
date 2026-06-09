@@ -1830,14 +1830,13 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             }
 
             modelSlot = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x5FC) pppModelSt;
-            (*modelTablePtr)[slotIndex] = modelSlot;
-#undef slotIndex
             if (modelSlot != 0) {
                 modelSlot->m_refCount = 0;
-                modelSlot->m_cacheId = -1;
                 modelSlot->m_isUsed = 0;
-                pppReadRsd(chunkFile, modelSlot);
             }
+            (*modelTablePtr)[slotIndex] = modelSlot;
+            pppReadRsd(chunkFile, (*modelTablePtr)[slotIndex]);
+#undef slotIndex
             *reinterpret_cast<int*>(self + 0x804) = -1;
         }
         return;

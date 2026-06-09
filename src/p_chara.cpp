@@ -2859,10 +2859,10 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         const float nearZ = CameraPcs.m_nearZ;
         const float farZ = CameraPcs.m_farZ;
         CColor shadowFog;
-        shadowFog.color.r = static_cast<unsigned char>(static_cast<unsigned int>(255.0f * shadowFade));
-        shadowFog.color.g = shadowFog.color.r;
-        shadowFog.color.b = shadowFog.color.r;
         shadowFog.color.a = 0xFF;
+        shadowFog.color.b = static_cast<unsigned char>(static_cast<unsigned int>(255.0f * shadowFade));
+        shadowFog.color.g = shadowFog.color.b;
+        shadowFog.color.r = shadowFog.color.b;
         _GXColor shadowFogGX = shadowFog.color;
         GXSetFog(GX_FOG_PERSP_LIN, nearZ, nearZ + kCharaOne, nearZ, farZ, shadowFogGX);
     }

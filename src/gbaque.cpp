@@ -1343,8 +1343,8 @@ void GbaQueue::LoadPlayerStat()
 
 				*reinterpret_cast<int*>(entry + 0x24) = caravanWork->m_gil;
 				{
-					short progress = 0xFF;
-					if (caravanWork->m_progressValue <= 0xFF) {
+					unsigned short progress = 0xFF;
+					if (caravanWork->m_progressValue < 0x100) {
 						progress = caravanWork->m_progressValue;
 					}
 					*reinterpret_cast<unsigned short*>(entry + 0x14) = progress;
@@ -1360,15 +1360,33 @@ void GbaQueue::LoadPlayerStat()
 				entry[0x1F] = static_cast<unsigned char>(caravanWork->m_letterMeta[7]);
 
 				entry[0] = static_cast<unsigned char>(caravanWork->m_saveSlot);
-				entry[4] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x12]);
-				entry[5] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x13]);
-				entry[6] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x14]);
-				entry[7] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x15]);
-				entry[8] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x16]);
-				entry[9] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x17]);
-				entry[0xA] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x18]);
-				entry[0xB] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x19]);
-				memcpy(entry + 0xC, &Game.m_gameWork.m_linkTable[caravanWork->m_saveSlot][0][0][0], 8);
+				{
+					unsigned char* link = &Game.m_gameWork.m_linkTable[caravanWork->m_saveSlot][0][caravanWork->m_saveSlot][0];
+					unsigned char l0 = link[0];
+					entry[4] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x12]);
+					unsigned char l1 = link[1];
+					unsigned char l2 = link[2];
+					entry[5] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x13]);
+					unsigned char l3 = link[3];
+					unsigned char l4 = link[4];
+					entry[6] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x14]);
+					unsigned char l5 = link[5];
+					unsigned char l6 = link[6];
+					entry[7] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x15]);
+					unsigned char l7 = link[7];
+					entry[8] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x16]);
+					entry[9] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x17]);
+					entry[0xA] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x18]);
+					entry[0xB] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x19]);
+					entry[0xC] = l0;
+					entry[0xD] = l1;
+					entry[0xE] = l2;
+					entry[0xF] = l3;
+					entry[0x10] = l4;
+					entry[0x11] = l5;
+					entry[0x12] = l6;
+					entry[0x13] = l7;
+				}
 
 				entry[0x20] = static_cast<unsigned char>(caravanWork->m_strength > 99 ? 99 : caravanWork->m_strength);
 				entry[0x21] = static_cast<unsigned char>(caravanWork->m_defense > 99 ? 99 : caravanWork->m_defense);

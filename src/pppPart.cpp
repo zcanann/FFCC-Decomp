@@ -1060,7 +1060,7 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 				{
 					CMapMesh* mapMesh = *(CMapMesh**)(*(u32*)(pppResSet + 0x14) + *mapMeshIndices * 4);
 					mapMeshIndices++;
-					mapMesh->pppCacheDumpModelTexture(ppvEnv->m_materialSetPtr, &ppvAmemCacheSet);
+					mapMesh->pppCacheDumpModelTexture(PartMng.m_materialSet, &ppvAmemCacheSet);
 				}
 
 				s16 shapeCount = *shapeIndices;
@@ -1069,7 +1069,7 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 				{
 					pppShapeSt* shape = *(pppShapeSt**)(*(u32*)(pppResSet + 0x18) + *shapeIndices * 4);
 					shapeIndices++;
-					pppCacheDumpShapeTexture(shape, ppvEnv->m_materialSetPtr);
+					pppCacheDumpShapeTexture(shape, PartMng.m_materialSet);
 				}
 			}
 		}

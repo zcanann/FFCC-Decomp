@@ -1883,7 +1883,7 @@ checkLoaded:
                                 void* rawAddr = chunkFile.GetAddress();
                                 CChara::CAnim* anim =
                                     new (pcs->m_stage, const_cast<char*>(s_p_chara_cpp), 0x62A) CChara::CAnim;
-                                anim->Create(rawAddr, pcs->m_viewerAnimStage);
+                                anim->Create(rawAddr, CharaPcs.m_viewerAnimStage);
 
                                 loadAnim = new (pcs->m_stage, const_cast<char*>(s_p_chara_cpp), 0x62D) CLoadAnim;
                                 loadAnim->m_keyId = keyId;

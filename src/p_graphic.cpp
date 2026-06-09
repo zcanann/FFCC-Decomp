@@ -865,7 +865,7 @@ void CGraphicPcs::drawBar()
         Graphic.InitDebugString();
 
         order = System.GetFirstOrder();
-        x = kGraphicZero;
+        x = kDebugBarLeft;
         y = 0x10;
         for (int i = 0; i < orderCount; i++) {
             const int priority = order->m_priority;
@@ -884,7 +884,7 @@ void CGraphicPcs::drawBar()
                     strcat(debugString, extraString);
                 }
 
-                Graphic.DrawDebugStringDirect(static_cast<u32>(x + kGraphicOne), y, debugString, kDebugBarLineStep);
+                Graphic.DrawDebugStringDirect(static_cast<u32>(kGraphicOne + x), y, debugString, kDebugBarLineStep);
                 x += width;
             }
 

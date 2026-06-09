@@ -2499,7 +2499,10 @@ foundModel:
         loadPdt = 0;
     foundPdt:
 
-        if (loadPdt == 0) {
+        if (loadPdt != 0) {
+            m_pdtLoadRef = loadPdt;
+            m_pdtLoadRef->AddRef();
+        } else {
             loadPdt = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x868) CLoadPdt;
             m_pdtLoadRef = loadPdt;
             reinterpret_cast<CLoadPdt*>(m_pdtLoadRef)->m_keyTag = reinterpret_cast<void*>(charaKind);
@@ -2513,9 +2516,6 @@ foundModel:
                 System.Printf(const_cast<char*>(s_charaLoadPdtLogFmt), charaKind, static_cast<int>(charaNo), static_cast<int>(textureVariant));
             }
             LoadPdtArray(&CharaPcs)->Add(reinterpret_cast<CLoadPdt*>(m_pdtLoadRef));
-            m_pdtLoadRef->AddRef();
-        } else {
-            m_pdtLoadRef = loadPdt;
             m_pdtLoadRef->AddRef();
         }
     }

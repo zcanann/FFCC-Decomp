@@ -2744,8 +2744,8 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
         unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(cmdOut);
         int op = cmdBytes[0] & 0x3F;
 
-        if (op == 0x14 || op == 0x1C || op == 0x17 ||
-            op == 0x1D || op == 0x1A || op == 0x1E ||
+        if (op == 0x14 || op == 0x17 || op == 0x1A ||
+            op == 0x1C || op == 0x1D || op == 0x1E ||
             op == 0x1F || (op == 0x06 && cmdBytes[1] == 0x18))
         {
             OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);

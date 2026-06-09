@@ -1849,7 +1849,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             }
 
             int slotIndex = payloadWords[0];
-            pppShapeSt*& shapeSlot = (*shapeSlotTablePtr)[slotIndex];
+            pppShapeSt* shapeSlot = (*shapeSlotTablePtr)[slotIndex];
             if (shapeSlot != 0) {
                 if (--shapeSlot->m_refCount <= 0) {
                     if (shapeSlot->m_animData != 0) {
@@ -1863,10 +1863,11 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
                     shapeSlot->m_refCount = 0;
                     shapeSlot->m_inUse = 0;
                 }
-                shapeSlot = 0;
+                (*shapeSlotTablePtr)[slotIndex] = 0;
             }
 
             shapeSlot = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x610) pppShapeSt;
+            (*shapeSlotTablePtr)[slotIndex] = shapeSlot;
             if (shapeSlot != 0) {
                 CChunkFile chunkFile;
                 chunkFile.SetBuf(payloadWords + 4);

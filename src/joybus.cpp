@@ -3352,31 +3352,25 @@ case3_done:
 
         int status = threadParam->m_gbaStatus;
 
-        if (status == 0)
+        if (status != 0)
+            goto case4_done;
+
+        if (threadParam->m_unk3 != ' ')
         {
-            if (threadParam->m_unk3 == ' ')
-            {
-                if (threadParam->m_timeChangedFlag != 0 ||
-                    (threadParam->m_gbaBootFlag == 0 && threadParam->m_timestamp == 0))
-                {
-                    threadParam->m_timestamp = OSGetTick();
-                }
-
-                threadParam->m_gbaStatus = GBAWrite(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(&threadParam->m_timestamp), &threadParam->m_unk3);
-
-                status = threadParam->m_gbaStatus;
-
-                if (status == 0)
-                {
-                    status = 0;
-                }
-            }
-            else
-            {
-                status = 1;
-            }
+            status = 1;
+            goto case4_done;
         }
 
+        if (threadParam->m_timeChangedFlag != 0 ||
+            (threadParam->m_gbaBootFlag == 0 && threadParam->m_timestamp == 0))
+        {
+            threadParam->m_timestamp = OSGetTick();
+        }
+
+        threadParam->m_gbaStatus = GBAWrite(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(&threadParam->m_timestamp), &threadParam->m_unk3);
+        status = threadParam->m_gbaStatus;
+
+case4_done:
         if (status == 0)
         {
             threadParam->m_subState = 5;
@@ -3405,31 +3399,28 @@ case3_done:
 
         int status = threadParam->m_gbaStatus;
 
-        if (status == 0)
+        if (status != 0)
+            goto case5_done;
+
+        if (threadParam->m_unk3 != ' ')
         {
-            if (threadParam->m_unk3 == ' ')
-            {
-                bool singleMode2 = GbaQue.IsSingleMode(threadParam->m_portIndex);
-
-                unsigned char portVal = singleMode2 ? 0 : (unsigned char)threadParam->m_portIndex;
-                unsigned char header = 1;
-                signed char flags = (unsigned char)(portVal | (threadParam->m_gbaBootFlag << 6) | (threadParam->m_unk2 << 4));
-                unsigned int word = (1u << 24) | ((unsigned int)flags << 16);
-
-                threadParam->m_gbaStatus = GBAWrite(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(&word), &threadParam->m_unk3);
-                status = threadParam->m_gbaStatus;
-
-                if (status == 0)
-                {
-                    status = 0;
-                }
-            }
-            else
-            {
-                status = 1;
-            }
+            status = 1;
+            goto case5_done;
         }
 
+        {
+            bool singleMode2 = GbaQue.IsSingleMode(threadParam->m_portIndex);
+
+            unsigned char portVal = singleMode2 ? 0 : (unsigned char)threadParam->m_portIndex;
+            unsigned char header = 1;
+            signed char flags = (unsigned char)(portVal | (threadParam->m_gbaBootFlag << 6) | (threadParam->m_unk2 << 4));
+            unsigned int word = (1u << 24) | ((unsigned int)flags << 16);
+
+            threadParam->m_gbaStatus = GBAWrite(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(&word), &threadParam->m_unk3);
+            status = threadParam->m_gbaStatus;
+        }
+
+case5_done:
         if (status == 0)
         {
             threadParam->m_subState = 6;

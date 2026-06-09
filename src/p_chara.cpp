@@ -2772,10 +2772,11 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         }
 
         Vec lightPos;
-        Mtx* modelMtx = ModelLocalMtx(m_model);
-        lightPos.x = (*modelMtx)[0][3];
-        lightPos.y = (*modelMtx)[1][3];
-        lightPos.z = (*modelMtx)[2][3];
+        Mtx modelMtx;
+        PSMTXCopy(*ModelLocalMtx(m_model), modelMtx);
+        lightPos.x = modelMtx[0][3];
+        lightPos.y = modelMtx[1][3];
+        lightPos.z = modelMtx[2][3];
         LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), &lightPos, 0xFFFFFFFF);
     }
 
@@ -2796,14 +2797,19 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         }
     } else if (drawPass == 2) {
         CVector modelPos;
-        Mtx* modelMtx = ModelLocalMtx(m_model);
-        modelPos.x = (*modelMtx)[0][3];
-        modelPos.y = (*modelMtx)[1][3];
-        modelPos.z = (*modelMtx)[2][3];
+        Mtx modelMtx;
+        PSMTXCopy(*ModelLocalMtx(m_model), modelMtx);
+        modelPos.x = modelMtx[0][3];
+        modelPos.y = modelMtx[1][3];
+        modelPos.z = modelMtx[2][3];
 
         CVector focusPos(CharaPcs.m_texShadowPos);
+        CVector deltaTmp;
+        PSVECSubtract(focusPos, modelPos, deltaTmp);
         CVector delta;
-        PSVECSubtract(focusPos, modelPos, delta);
+        delta.x = deltaTmp.x;
+        delta.y = deltaTmp.y;
+        delta.z = deltaTmp.z;
         if (delta.x == kCharaZero && delta.z == kCharaZero) {
             return;
         }
@@ -2829,8 +2835,9 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         CVector lookAtUp(kCharaZero, kCharaOne, kCharaZero);
         CVector shadowUp(kCharaZero, 10.0f, kCharaZero);
 
+        const float shadowDistance = static_cast<float>(CharaPcs.m_texShadowDistance);
         CVector scaledDelta;
-        PSVECScale(delta, scaledDelta, static_cast<float>(CharaPcs.m_texShadowDistance));
+        PSVECScale(delta, scaledDelta, shadowDistance);
 
         Vec shadowBase;
         {
@@ -2857,16 +2864,16 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         const float nearZ = CameraPcs.m_nearZ;
         const float farZ = CameraPcs.m_farZ;
         CColor shadowFog;
-        shadowFog.color.r = static_cast<unsigned char>(static_cast<unsigned int>(255.0f * shadowFade));
-        shadowFog.color.g = shadowFog.color.r;
-        shadowFog.color.b = shadowFog.color.r;
         shadowFog.color.a = 0xFF;
+        shadowFog.color.b = static_cast<unsigned char>(static_cast<unsigned int>(255.0f * shadowFade));
+        shadowFog.color.g = shadowFog.color.b;
+        shadowFog.color.r = shadowFog.color.b;
         _GXColor shadowFogGX = shadowFog.color;
         GXSetFog(GX_FOG_PERSP_LIN, nearZ, nearZ + kCharaOne, nearZ, farZ, shadowFogGX);
     }
 
     bool restoreFog = false;
-    if ((drawPass == 0 || drawPass == 4) && m_fogBlend > 0.0f) {
+    if ((drawPass == 0 || drawPass == 4) && kCharaZero < m_fogBlend) {
         float invBlend = kCharaOne - m_fogBlend;
         float fogBlend = kCharaOne - invBlend * invBlend;
         float fogRemainder = kCharaOne - fogBlend;

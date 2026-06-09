@@ -4883,8 +4883,41 @@ void CGPartyObj::ghostPartyMog()
 			sGhostPartyWork.flagBits.flag10 = 1;
 			bossState = 2;
 			putParticle(299, 0, this, kMonObjOne, 0);
-		} else if (sGhostPartyWork.flagBits.flag08 != 0 ||
-		           static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x38)) < 10) {
+		} else if (sGhostPartyWork.flagBits.flag08 == 0 &&
+		           static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x38)) >= 10) {
+			int moodMode;
+			switch (Game.m_gameWork.m_bossArtifactStageIndex) {
+			default:
+			case 0:
+			case 1:
+			case 2:
+			case 3:
+				moodMode = 0;
+				break;
+			case 6:
+			case 10:
+				moodMode = 1;
+				break;
+			case 4:
+			case 8:
+			case 9:
+			case 0x0B:
+			case 0x0C:
+			case 0x0D:
+				moodMode = 2;
+				break;
+			}
+			if (moodMode == 1) {
+				if (CharaGhostValue(0x2054) < 0x32) {
+					bossState = 5;
+				} else if (CharaGhostValue(0x2054) > 0x5E) {
+					bossState = 4;
+				}
+			} else if (moodMode != 0 && moodMode < 3 && CharaGhostValue(0x2054) < 0x32) {
+				bossState = 6;
+			}
+			flags[0] = (flags[0] & 0xF7) | 8;
+		} else {
 			if (sGhostPartyWork.flagBits.flag10 == 0) {
 				int innerMode;
 				switch (Game.m_gameWork.m_bossArtifactStageIndex) {
@@ -4929,39 +4962,6 @@ void CGPartyObj::ghostPartyMog()
 			} else {
 				bossState = 8;
 			}
-		} else {
-			int moodMode;
-			switch (Game.m_gameWork.m_bossArtifactStageIndex) {
-			default:
-			case 0:
-			case 1:
-			case 2:
-			case 3:
-				moodMode = 0;
-				break;
-			case 6:
-			case 10:
-				moodMode = 1;
-				break;
-			case 4:
-			case 8:
-			case 9:
-			case 0x0B:
-			case 0x0C:
-			case 0x0D:
-				moodMode = 2;
-				break;
-			}
-			if (moodMode == 1) {
-				if (CharaGhostValue(0x2054) < 0x32) {
-					bossState = 5;
-				} else if (CharaGhostValue(0x2054) > 0x5E) {
-					bossState = 4;
-				}
-			} else if (moodMode != 0 && moodMode < 3 && CharaGhostValue(0x2054) < 0x32) {
-				bossState = 6;
-			}
-			flags[0] = (flags[0] & 0xF7) | 8;
 		}
 	}
 

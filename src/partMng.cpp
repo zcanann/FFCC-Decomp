@@ -2930,9 +2930,9 @@ void CPartMng::pppDrawPrio(unsigned char drawMode)
 
     Mtx invCamera;
     Vec cameraPos;
+    Vec viewPos;
     Vec partPos;
     Vec cameraDelta;
-    Vec viewPos;
 
     PSMTXInverse(ppvCameraMatrix, invCamera);
     cameraPos.x = invCamera[0][3];
@@ -3128,9 +3128,9 @@ void CPartMng::pppDrawIdx(int partIndex)
 
     Mtx invCamera;
     Vec cameraPos;
+    Vec viewPos;
     Vec partPos;
     Vec cameraDelta;
-    Vec viewPos;
 
     PSMTXInverse(ppvCameraMatrix, invCamera);
     cameraPos.x = invCamera[0][3];

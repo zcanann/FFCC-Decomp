@@ -2527,7 +2527,47 @@ timeout_expiry:
 
         default:
         {
-            // TODO: add remaining state handling as you decompile them
+            threadParam->m_flags[4] = 0;
+            GbaQue.SetChgUseItemFlg(threadParam->m_portIndex);
+            threadParam->m_sentStartFlag = 0;
+            threadParam->m_flags[1] = 0;
+            threadParam->m_flags[5] = 0;
+            threadParam->m_errorRetry++;
+            m_ctrlModeArr[threadParam->m_portIndex] = 0;
+
+            if (GbaQue.GetControllerMode() == 0)
+                m_nextModeTypeArr[threadParam->m_portIndex] = 0;
+            else
+                m_nextModeTypeArr[threadParam->m_portIndex] = 4;
+
+            m_stateFlagArr[threadParam->m_portIndex] = 1;
+            m_stateCodeArr[threadParam->m_portIndex] = 0xFF;
+
+            if (threadParam->m_errorRetry >= 0xA)
+            {
+                threadParam->m_state = 4;
+                break;
+            }
+
+            if (GetGBAStat(threadParam) != 0)
+            {
+                stateStartTime = OSGetTime();
+                goto sleep_retry;
+            }
+
+            ResetQueue(threadParam);
+
+            if (threadParam->m_prevState > 2)
+            {
+                threadParam->m_state = 3;
+            }
+            else
+            {
+                threadParam->m_subState  = 0;
+                threadParam->m_state     = 1;
+                threadParam->m_prevState = 0;
+            }
+
             break;
         }
         }

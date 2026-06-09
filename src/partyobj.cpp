@@ -5280,7 +5280,12 @@ void CGPartyObj::gpmMove()
 		return;
 	}
 
-	if (leader->m_lastStateId == 2 || leader->m_lastStateId == 6) {
+	if (leader->m_lastStateId != 2 && leader->m_lastStateId != 6) {
+		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(sGhostPartyWork.flags) << 26) & 0xC0000000) >> 31) == 0) {
+			changeStat(0, 0, 0);
+			return;
+		}
+	} else {
 		if (m_subState != 1) {
 			return;
 		}
@@ -5302,9 +5307,6 @@ void CGPartyObj::gpmMove()
 		if (static_cast<unsigned char>(static_cast<unsigned int>((static_cast<unsigned int>(PartyData(this).partyFlags) << 25) & 0xC0000000) >> 31) != 0) {
 			return;
 		}
-	} else if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(sGhostPartyWork.flags) << 26) & 0xC0000000) >> 31) == 0) {
-		changeStat(0, 0, 0);
-		return;
 	}
 
 	{

@@ -321,6 +321,8 @@ void CCharaPcs::drawViewer()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_common_subs off
 void CCharaPcs::calcViewer()
 {
     CCharaPcs* self = this;
@@ -691,6 +693,7 @@ void CCharaPcs::calcViewer()
         }
     }
 }
+#pragma pop
 
 /*
  * --INFO--

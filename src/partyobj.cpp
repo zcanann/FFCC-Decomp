@@ -3784,10 +3784,11 @@ int CGPartyObj::useItem(int itemId)
 			}
 
 			CFlatRuntime::CStack stack[2];
-			stack[1].m_word = 0;
+			unsigned char pausedFlag = 0;
 			if ((Game.m_gameWork.m_menuStageMode != 0) && (Game.m_gameWork.m_gamePaused != 0)) {
-				stack[1].m_word = 1;
+				pausedFlag = 1;
 			}
+			stack[1].m_word = pausedFlag;
 			stack[0].m_word = itemId;
 			gCFlatRuntime().SystemCall(this, 2, 0x15, 2, stack, 0);
 			result = 1;

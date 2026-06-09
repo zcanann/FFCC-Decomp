@@ -2140,6 +2140,7 @@ int CChara::CModel::SearchNodeSk(char* name)
 				return (int)i;
 			}
 		}
+		return -1;
 	}
 
 	return -1;

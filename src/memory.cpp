@@ -311,33 +311,10 @@ unsigned int CheckSum(void* data, int size)
 {
     unsigned int checksum = 0x12345678;
     unsigned char* bytes = reinterpret_cast<unsigned char*>(data);
+    int i;
 
-    if (size != 0) {
-        unsigned int blockCount = static_cast<unsigned int>(size) >> 3;
-        if (blockCount != 0) {
-            do {
-                checksum += bytes[0];
-                checksum += bytes[1];
-                checksum += bytes[2];
-                checksum += bytes[3];
-                checksum += bytes[4];
-                checksum += bytes[5];
-                checksum += bytes[6];
-                checksum += bytes[7];
-                bytes += 8;
-                blockCount--;
-            } while (blockCount != 0);
-
-            size &= 7;
-        }
-
-        if (size != 0) {
-            do {
-                checksum += *bytes;
-                bytes++;
-                size--;
-            } while (size != 0);
-        }
+    for (i = size; i != 0; i--) {
+        checksum += *bytes++;
     }
 
     return checksum;

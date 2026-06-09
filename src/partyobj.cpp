@@ -2746,8 +2746,8 @@ void CGPartyObj::checkTargetParticle()
 	}
 
 	if (input.x != 0.0f || input.z != 0.0f) {
-		Vec* targetPos = &m_comboCenter;
-		Vec* centerPos = &m_comboTarget;
+#define targetPos (&m_comboCenter)
+#define centerPos (&m_comboTarget)
 		float maxRange;
 
 		party.partyFlags |= 0x20;
@@ -2888,6 +2888,8 @@ void CGPartyObj::checkTargetParticle()
 		}
 
 		*centerPos = *targetPos;
+#undef targetPos
+#undef centerPos
 	} else {
 		party.partyFlags &= 0xDF;
 	}

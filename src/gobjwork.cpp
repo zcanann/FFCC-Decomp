@@ -1913,16 +1913,19 @@ void CCaravanWork::CalcStatus()
 
 			unsigned short itemValue = (short)GetItemDataPtr(itemIdx)[3];
 			if (itemType != 0x45) {
-				if (itemType >= 0x45) {
-					if (itemType == 0x7F) {
-						goto apply_effect;
+				if (itemType < 0x45) {
+					if (itemType == 1) {
+						goto apply_str;
 					}
 					goto no_effect;
 				}
-				if (itemType == 1) {
-					m_strength += itemValue;
-					m_baseStrength += itemValue;
+				if (itemType == 0x7F) {
+					goto apply_effect;
 				}
+				goto no_effect;
+			apply_str:
+				m_strength += itemValue;
+				m_baseStrength += itemValue;
 				goto no_effect;
 			}
 
@@ -2528,9 +2531,9 @@ void CCaravanWork::SortBeforeReturnWorldMap()
 	for (int i = 0; i < 0x3F; i++) {
 		for (int j = i + 1; j < 0x40; j++) {
 			short lhs = m_inventoryItems[i];
-			short rhs = m_inventoryItems[j];
 
-			if (lhs < 1) {
+			if (lhs <= 0) {
+				short rhs = m_inventoryItems[j];
 				if (rhs > 0) {
 					m_inventoryItems[i] = rhs;
 					m_inventoryItems[j] = 0xFFFF;
@@ -2547,7 +2550,9 @@ void CCaravanWork::SortBeforeReturnWorldMap()
 						}
 					}
 				}
-			} else if ((rhs > 0) && (rhs < lhs)) {
+			} else {
+				short rhs = m_inventoryItems[j];
+				if ((rhs > 0) && (rhs < lhs)) {
 				m_inventoryItems[i] = rhs;
 				m_inventoryItems[j] = lhs;
 
@@ -2566,6 +2571,7 @@ void CCaravanWork::SortBeforeReturnWorldMap()
 					} else if (m_equipment[equip] == j) {
 						m_equipment[equip] = static_cast<short>(i);
 					}
+				}
 				}
 			}
 		}

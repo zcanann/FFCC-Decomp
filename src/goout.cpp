@@ -1428,9 +1428,13 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         break;
     }
     case 0x13:
-        MenuPcs.m_mcCtrl.m_cardChannel = static_cast<unsigned char>(m_odekakeCardChannel);
-        m_cardChannel = m_odekakeCardChannel;
-        m_saveIndex = m_odekakeSaveIndex;
+    {
+        const char odekakeSaveIndex = m_odekakeSaveIndex;
+        const char odekakeCardChannel = m_odekakeCardChannel;
+        m_cardChannel = odekakeCardChannel;
+        m_saveIndex = odekakeSaveIndex;
+        MenuPcs.m_mcCtrl.m_cardChannel = static_cast<unsigned char>(odekakeCardChannel);
+    }
         m_memCardBuffer = MenuPcs.m_goOutTransferWork;
         m_memCardResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(static_cast<unsigned char>(m_cardChannel));
         if (m_memCardResult == 1) {

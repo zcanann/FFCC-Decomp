@@ -4804,7 +4804,7 @@ void CGPartyObj::gpmCol()
 			newIndex = (i > trailIndex) ? trailIndex : i;
 			break;
 		}
-	} while (i < 5);
+	} while (static_cast<unsigned int>(i) < 5);
 
 	trailIndex = newIndex;
 #define gpmColClamp ((activeTrailCount - 1) & ~((activeTrailCount - 1) >> 31))

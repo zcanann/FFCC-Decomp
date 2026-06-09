@@ -4173,19 +4173,12 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
     }
     else
     {
-        unsigned char* p = dataBase;
+        localBytes[0] |= 0x80;
+        localBytes[1] = *dataBase++;
+        localBytes[2] = *dataBase++;
+        localBytes[3] = *dataBase++;
 
-        signed char b0 = *p++;
-        unsigned char b1 = *p++;
-        unsigned char b2 = *p++;
-
-        dataBase = p;
-
-        unsigned int word =
-            (static_cast<unsigned int>(0x8B) << 24) |
-            (static_cast<unsigned int>(b0) << 16) |
-            (static_cast<unsigned int>(b1) << 8) |
-            static_cast<unsigned int>(b2);
+        unsigned int word = localWord;
 
         if (m_threadRunningMask != 0)
         {

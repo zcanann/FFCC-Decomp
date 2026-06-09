@@ -1263,10 +1263,10 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
                 GXLoadTexMtxImm(reinterpret_cast<float(*)[4]>(LightPcs.m_bumpTexScratch), m_bumpTexMtxIds[3], GX_MTX2x4);
                 GXLoadTexMtxImm(m_underWaterTexMtx, m_bumpTexMtxIds[4], GX_MTX3x4);
 
-                if ((tevBit & 0x20) == 0) {
-                    GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_texCoordIdCurShadow), GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, 0x7D);
-                } else {
+                if ((tevBit & 0x20) != 0) {
                     GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_texCoordIdCurShadow), GX_TG_MTX2x4, GX_TG_TEX0, m_texScroll0TexMtx, GX_FALSE, 0x7D);
+                } else {
+                    GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_texCoordIdCurShadow), GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, 0x7D);
                 }
                 GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_bumpTexCoordIds[0]), GX_TG_MTX2x4, GX_TG_TEX0, m_bumpTexMtxIds[0], GX_FALSE, 0x7D);
                 GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_bumpTexCoordIds[4]), GX_TG_MTX2x4, GX_TG_POS, m_bumpTexMtxIds[3], GX_FALSE, 0x7D);
@@ -1274,9 +1274,7 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
                 GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_bumpTexCoordIds[5]), GX_TG_MTX3x4, GX_TG_POS, m_bumpTexMtxIds[4], GX_FALSE, 0x7D);
                 m_numTevStage = 0;
 
-                if ((tevBit & 0x80000) == 0) {
-                    addtev_bump_water(tevScale);
-                } else {
+                if ((tevBit & 0x80000) != 0) {
                     if (material->m_unkA5 != 0) {
                         GXColor tevColor = *reinterpret_cast<GXColor*>(reinterpret_cast<char*>(material->m_bumpLight) + 0x54);
                         GXSetTevColor(GX_TEVREG1, tevColor);
@@ -1285,6 +1283,8 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
                         GXSetTevColor(GX_TEVREG1, tevColor);
                     }
                     addtev_bump_spec_col_water(tevScale);
+                } else {
+                    addtev_bump_water(tevScale);
                 }
                 addtev_stdShadow(tevBit);
                 GXSetNumTexGens(m_texCoordIdCur & 0xFF);
@@ -1295,7 +1295,9 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
             GXLoadTexObj(m_underWaterTexture, static_cast<GXTexMapID>(m_bumpTexMapIds[2]));
             return;
         }
-        if ((m_curEnvTevBit & material->m_tevBit & 0x1000) == 0) {
+        if ((m_curEnvTevBit & material->m_tevBit & 0x1000) != 0) {
+            isStd1000 = true;
+        } else {
             if (m_vtxDescMode != 1) {
                 GXClearVtxDesc();
                 GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
@@ -1386,7 +1388,6 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
             TextureMan.SetTexture(static_cast<_GXTexMapID>(m_bumpTexMapIds[3]), g_drawMaterial->m_textureData.m_textures[3]);
             return;
         }
-        isStd1000 = true;
     }
 
     if (isStd1000) {
@@ -1404,11 +1405,11 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
     if ((tevBit & 1) == 0) {
         if ((tevBit & 0x200) == 0) {
             GXSetTevDirect(GX_TEVSTAGE0);
-            if ((tevBit & 0x20) == 0) {
+            if ((tevBit & 0x20) != 0) {
+                _GXSetTevOrder(0, m_texScroll0TexCoord, m_texMapIdCurShadow, 4);
+            } else {
                 GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_texCoordIdCurShadow), GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, 0x7D);
                 _GXSetTevOrder(0, m_texCoordIdCurShadow, m_texMapIdCurShadow, 4);
-            } else {
-                _GXSetTevOrder(0, m_texScroll0TexCoord, m_texMapIdCurShadow, 4);
             }
             GXSetTevDirect(GX_TEVSTAGE0);
             _GXSetTevColorIn(0, 0xF, 8, 10, 0xF);
@@ -1586,10 +1587,10 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
             GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, 0, GX_DF_NONE, GX_AF_SPEC);
             GXSetTevDirect(static_cast<GXTevStageID>(m_numTevStage));
             _GXSetTevOrder(m_numTevStage, *reinterpret_cast<int*>(&m_pad0D4), *reinterpret_cast<int*>(&m_pad0CC), 4);
-            if (m_manaParaboloidTexObj0 == 0) {
-                _GXSetTevColorIn(m_numTevStage, 0xF, 0xF, 0xF, 0);
-            } else {
+            if (m_manaParaboloidTexObj0 != 0) {
                 _GXSetTevColorIn(m_numTevStage, 8, 8, 0, 0xF);
+            } else {
+                _GXSetTevColorIn(m_numTevStage, 0xF, 0xF, 0xF, 0);
             }
             _GXSetTevColorOp(m_numTevStage, 0, 0, 0, 1, 0);
             _GXSetTevAlphaIn(m_numTevStage, 7, 5, 0, 7);
@@ -2593,8 +2594,10 @@ int CMaterialMan::GetCharaShadow(
 
     ShadowCandidate shadowCandidates[128];
     ShadowCandidate* candidateWrite = shadowCandidates;
+    CMaterial** materialWrite = materialsOut;
     int candidateCount = 0;
     int outputCount = 0;
+    int outputOffset = 0;
 
     for (unsigned int i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
         CMapShadow* shadow = (*mapShadowArray)[i];
@@ -2617,9 +2620,11 @@ int CMaterialMan::GetCharaShadow(
 
         if (shadow->m_materialMode == 1) {
             if (outputCount < maxShadows) {
-                materialsOut[outputCount] = MapMng.m_materialSet->m_materials[shadow->m_materialIndex];
-                shadowMtxOut[outputCount] = shadow->m_shadowMtx;
+                *materialWrite++ = MapMng.m_materialSet->m_materials[shadow->m_materialIndex];
+                *reinterpret_cast<float(**)[4]>(
+                    reinterpret_cast<char*>(shadowMtxOut) + outputOffset) = shadow->m_shadowMtx;
                 outputCount++;
+                outputOffset += 4;
             }
             continue;
         }
@@ -2669,8 +2674,10 @@ int CMaterialMan::GetCharaShadow(
         nearest->distance = kMaterialMaxDistance;
         CMapShadow* nearestShadow = nearest->shadow;
         materialsOut[outputCount] = MapMng.m_materialSet->m_materials[nearestShadow->m_materialIndex];
-        shadowMtxOut[outputCount] = nearestShadow->m_shadowMtx;
+        *reinterpret_cast<float(**)[4]>(
+            reinterpret_cast<char*>(shadowMtxOut) + outputOffset) = nearestShadow->m_shadowMtx;
         outputCount++;
+        outputOffset += 4;
     }
 
     return outputCount;
@@ -3095,7 +3102,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 material->m_singleTextureFlag = 0;
                 material->m_textureCount = static_cast<unsigned short>(chunk.m_arg0);
 
-                if (material->m_textureCount == 0) {
+                if (static_cast<int>(material->m_textureCount) == 0) {
                     material->m_tevBit |= 1;
                 } else {
                     for (int i = 0; i < static_cast<int>(material->m_textureCount); i++) {

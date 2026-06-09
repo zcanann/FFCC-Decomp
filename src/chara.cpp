@@ -1908,6 +1908,7 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 	float randomScale = FLOAT_803301D0 * Math.RandF() + FLOAT_803301D0;
 	Vec windImpulse;
 	{
+		float windScale = dynParam[2];
 		CVector tmp;
 		PSVECScale(&ModelDynJitter(this), reinterpret_cast<Vec*>(&tmp), randomScale);
 		Vec windForce;
@@ -1915,7 +1916,7 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 		windForce.y = tmp.y;
 		windForce.z = tmp.z;
 		CVector tmp2;
-		PSVECScale(&windForce, reinterpret_cast<Vec*>(&tmp2), dynParam[2]);
+		PSVECScale(&windForce, reinterpret_cast<Vec*>(&tmp2), windScale);
 		windImpulse.x = tmp2.x;
 		windImpulse.y = tmp2.y;
 		windImpulse.z = tmp2.z;
@@ -1939,8 +1940,9 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 
 	Vec predicted;
 	{
+		float velScale = dynParam[0];
 		CVector tmp;
-		PSVECScale(&NodeDynVelocity(node), reinterpret_cast<Vec*>(&tmp), dynParam[0]);
+		PSVECScale(&NodeDynVelocity(node), reinterpret_cast<Vec*>(&tmp), velScale);
 		Vec step;
 		step.x = tmp.x;
 		step.y = tmp.y;

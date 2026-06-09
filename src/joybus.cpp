@@ -3868,6 +3868,10 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
             return 1;
         }
     }
+    else if (phase == 2 && step >= chunkCount)
+    {
+        return -1;
+    }
 
     result = 0;
     localWord = 0;

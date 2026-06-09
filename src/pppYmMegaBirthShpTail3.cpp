@@ -61,6 +61,8 @@ static inline float LoadFloat(const float& value)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_dead_assignments off
 void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirthShpTail3RenderStep* stepData, pppYmMegaBirthShpTail3Offsets* offsets)
 {
     u8* step = (u8*)stepData;
@@ -82,7 +84,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
     } else {
         hasRequiredMemory = true;
     }
-    if (!hasRequiredMemory || *(u32*)(step + 4) == 0xFFFF) {
+    if (!hasRequiredMemory || *(s32*)(step + 4) == 0xFFFF) {
         return;
     }
     const u32 dataValIndex = *(u32*)(step + 4);
@@ -90,7 +92,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
 
     pppShapeAnimData* shapeAnim =
         static_cast<pppShapeAnimData*>(ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex]->m_animData);
-    u16 workRand = *(u16*)(workBytes + 0x78);
+    s16 workRand = *(u16*)(workBytes + 0x78);
     const u8 zEnable = (u8)(((u32)__cntlzw((u32)payload[0x55])) >> 5);
     pppSetDrawEnv(
         0, &object->m_drawMatrix, *(float*)(payload + 0xA0), payload[0xA4], step[0x0C],
@@ -100,7 +102,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
     for (u32 i = 0; i < maxParticles; i++) {
         u8* particle = (u8*)particles + i * 0x1F8;
         if (*(s16*)(particle + 0x22) != 0) {
-            const u16 frameCountRaw = *(u16*)(payload + 0x9C);
+            const s16 frameCountRaw = *(u16*)(payload + 0x9C);
                 pppFMATRIX drawMtx;
                 Vec trailPos;
                 Vec cameraPos;
@@ -108,13 +110,13 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                 Vec zeroVec;
                 Vec segVec;
                 GXColor amb;
-                const u8 trailReadIndex = *(u8*)(particle + 0x38);
-                const u8 trailMaxIndex = (u8)(*(u8*)(particle + 0x37) - 1);
-                u8 trailNextIndex = (u8)(trailReadIndex + 1);
-                const float alphaScale = (float)*(s16*)((u8*)colorWork + 6) / LoadFloat(kPppYmMegaBirthShpTail3AlphaDivisor);
-                const float stepDivisor = (float)((s32)frameCountRaw - 1);
+                const s8 trailReadIndex = *(u8*)(particle + 0x38);
+                const s32 trailMaxIndex = (s8)(*(u8*)(particle + 0x37) - 1);
+                s32 trailNextIndex = (u8)(trailReadIndex + 1);
+                const float alphaScale = (float)*(u16*)((u8*)colorWork + 6) / LoadFloat(kPppYmMegaBirthShpTail3AlphaDivisor);
+                const float stepDivisor = (float)((u32)frameCountRaw - 1);
                 float fadeA = (float)(*(s16*)(workBytes + 0x56) >> 7) * alphaScale;
-                float fadeR = (float)(*(s16*)(workBytes + 0x50) >> 7);
+                float fadeR = (float)(*(u16*)(workBytes + 0x50) >> 7);
                 float fadeG = (float)(*(s16*)(workBytes + 0x52) >> 7);
                 float fadeB = (float)(*(s16*)(workBytes + 0x54) >> 7);
                 float fadeRStep = kPppYmMegaBirthShpTail3Zero;
@@ -138,8 +140,8 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                 Vec* history = (Vec*)(particle + 0x80);
                 float segLen;
                 u16 frameCount = frameCountRaw;
-                u16 particleShapeFrame = *(u16*)(particle + 0x1C);
-                const u16 shapeFrameStep = shapeAnim->m_frames[0].m_duration;
+                s16 particleShapeFrame = *(u16*)(particle + 0x1C);
+                const s16 shapeFrameStep = shapeAnim->m_frames[0].m_duration;
                 const s16 shapeFrameCount = shapeAnim->m_frameCount;
                 float drawX, drawY, drawZ;
                 float camX, camY, camZ;
@@ -186,7 +188,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                                    (kPppYmMegaBirthShpTail3Zero != curHist->y) ||
                                    (kPppYmMegaBirthShpTail3Zero != curHist->z);
                     if (canDraw) {
-                        workRand = (u16)((u32)workRand * 0x80d + 7);
+                        workRand = (s16)((u32)workRand * 0x80d + 7);
                         const u32 shapeFrame = (u32)(particleShapeFrame + workRand) / shapeFrameStep;
                         pppShapeAnimFrame* frame = &shapeAnim->m_frames[shapeFrame % (u32)shapeFrameCount];
                         tagOAN3_SHAPE* shape =
@@ -227,7 +229,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                         drawMtx.value[2][3] = cameraPos.z;
                         GXLoadPosMtxImm(drawMtx.value, 0);
 
-                        amb.r = (u8)fadeR;
+                        amb.r = (s8)fadeR;
                         amb.g = (u8)fadeG;
                         amb.b = (u8)fadeB;
                         amb.a = (u8)(fadeA * (kPppYmMegaBirthShpTail3DepthAlphaScale * (kPppYmMegaBirthShpTail3ColorComponentMax - *(float*)(particle + 0x30))));
@@ -300,9 +302,10 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
         if (colors != 0) {
             colors = colors + 1;
         }
-        *(s16*)(particle + 0x1C) += *(s16*)(step + 0xA);
+        *(u16*)(particle + 0x1C) += *(s16*)(step + 0xA);
     }
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -598,7 +601,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
         memset(particleColor, 0, sizeof(_PARTICLE_COLOR));
     }
 
-    if ((s32)paramBytes[0x18] < 8 && (s32)paramBytes[0x18] >= 0) {
+    if ((u32)paramBytes[0x18] < 8 && (s32)paramBytes[0x18] >= 0) {
         Vec baseDir;
         s32 angles[4];
         pppFMATRIX rot;
@@ -776,8 +779,8 @@ path:
     {
         float* pathBase = reinterpret_cast<float*>(pppPObject->m_drawMatrixPtr);
 
-        if (pYmMegaBirthShpTail3->m_pathIndex >= 0) {
-            short* pathInfo = (short*)(*(int*)&ppvEnv->m_particleColors[1] + pYmMegaBirthShpTail3->m_pathIndex * 8);
+        if (*(s16*)(paramBytes + 0x6a) >= 0) {
+            short* pathInfo = (short*)(*(int*)&ppvEnv->m_particleColors[1] + *(s16*)(paramBytes + 0x6a) * 8);
 
             if (pathBase == 0) {
                 pathBase = (float*)((u8*)ppvEnv->m_mapMeshPtr[*pathInfo] + 0x2C);

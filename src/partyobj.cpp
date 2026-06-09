@@ -5116,7 +5116,7 @@ void CGPartyObj::gpmMove()
 	toLeader.y = 0.0f;
 	float dist = PSVECMag(&toLeader);
 	float nearDist = m_nearColRadius + leader->m_nearColRadius;
-	float clampedDist = (*reinterpret_cast<float*>(self + 0x5BC) < dist) ? *reinterpret_cast<float*>(self + 0x5BC) : dist;
+	float clampedDist = (dist > *reinterpret_cast<float*>(self + 0x5BC)) ? *reinterpret_cast<float*>(self + 0x5BC) : dist;
 
 	if (m_lastStateId == 0 &&
 	    (static_cast<unsigned char>(static_cast<int>((static_cast<unsigned int>(self[0x63C]) << 24) & 0xC0000000) >> 31) != 0)) {

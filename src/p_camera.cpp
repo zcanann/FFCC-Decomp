@@ -1155,16 +1155,16 @@ void CCameraPcs::calcChara()
     m_targetY = m_viewer.m_position.y;
     m_targetZ = m_viewer.m_position.z;
 
-    CVector eyeDir(DirectionVec());
+    Vec* eyePtr = CVector(DirectionVec());
     CVector scaledVec;
-    PSVECScale(AsVec(eyeDir), AsVec(scaledVec), kCameraHundredF);
+    PSVECScale(eyePtr, AsVec(scaledVec), kCameraHundredF);
     scaledDir.x = scaledVec.x;
     scaledDir.y = scaledVec.y;
     scaledDir.z = scaledVec.z;
 
-    CVector targetBase(TargetVec());
+    Vec* targetBasePtr = CVector(TargetVec());
     CVector targetVec;
-    PSVECAdd(AsVec(targetBase), &scaledDir, AsVec(targetVec));
+    PSVECAdd(targetBasePtr, &scaledDir, AsVec(targetVec));
     targetPos.x = targetVec.x;
     targetPos.y = targetVec.y;
     targetPos.z = targetVec.z;

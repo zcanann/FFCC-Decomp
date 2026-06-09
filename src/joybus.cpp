@@ -4557,9 +4557,13 @@ int JoyBus::SendMapNo(ThreadParam* threadParam)
     cmdBytes[3] = stageMinor[3];
     unsigned int queueCmd = cmd;
 
-    unsigned int result = 0;
+    unsigned int result;
 
-    if (static_cast<signed char>(m_threadRunningMask) != 0)
+    if (static_cast<signed char>(m_threadRunningMask) == 0)
+    {
+        result = 0;
+    }
+    else
     {
         OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 

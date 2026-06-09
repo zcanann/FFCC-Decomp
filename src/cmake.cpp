@@ -2765,7 +2765,7 @@ int CMenuPcs::CmakeNameCtrl()
                 short curRow = CmakeState(this)->m_row;
                 if (curRow >= 5) {
                     unsigned int emptyLen = strlen(s_CmakeInfo.m_name);
-                    if ((emptyLen & (static_cast<int>(-emptyLen | emptyLen) >> 31)) == 0) {
+                    if ((emptyLen & (static_cast<unsigned int>(-emptyLen | emptyLen) >> 31)) == 0) {
                         Sound.PlaySe(4, 0x40, 0x7F, 0);
                         return 0;
                     }

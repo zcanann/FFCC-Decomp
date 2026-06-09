@@ -1716,7 +1716,7 @@ checkLoaded:
     }
 
     CCharaPcs* pcs = &CharaPcs;
-    unsigned int mergePartCount = 1;
+    int mergePartCount = 1;
     for (int mergePartIndex = 0; mergePartIndex < mergePartCount; mergePartIndex++) {
         char path[0x100];
         sprintf(path, s_charaMergePathFmt, mergeFileId, mergePartIndex);

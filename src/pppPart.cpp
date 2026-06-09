@@ -1060,6 +1060,7 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 				{
 					CMapMesh* mapMesh = *(CMapMesh**)(*(u32*)(pppResSet + 0x14) + *mapMeshIndices * 4);
 					mapMeshIndices++;
+					ppvAmemCacheSet.Release(*(s16*)((u8*)mapMesh + 0x66));
 					mapMesh->pppCacheDumpModelTexture(PartMng.m_materialSet, &ppvAmemCacheSet);
 				}
 
@@ -2655,13 +2656,13 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 					CGObject::DamageCol* damageCol = &gObject->m_damageColliders[colliderIndex];
 
 					if ((gObject->m_bgColMask & 0x80000) == 0 ||
-						(damageCol->m_hitMask & hitRaw->m_objHitMask) == 0)
+						(*(u32*)&damageCol[1].m_localPosition.x & hitRaw->m_objHitMask) == 0)
 					{
 						continue;
 					}
 
-					if ((kPppPartZero == damageCol->m_innerRadius) &&
-						(kPppPartZero == damageCol->m_outerRadius))
+					if ((kPppPartZero == damageCol->m_hitInnerRadius) &&
+						(kPppPartZero == damageCol->m_hitOuterRadius))
 					{
 						continue;
 					}
@@ -2669,7 +2670,7 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 					Vec hitPos;
 					if (CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
 					        &Math, &hitPos, 0, origin, vector, (Vec*)&damageCol->m_worldPosition.y,
-					        radius, damageCol->m_innerRadius, damageCol->m_outerRadius) == 0)
+					        radius, damageCol->m_hitInnerRadius, damageCol->m_hitOuterRadius) == 0)
 					{
 						continue;
 					}

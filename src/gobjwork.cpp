@@ -1668,13 +1668,12 @@ void CCaravanWork::CallShop(int requestType, int arg0, int arg1, int arg2, int a
  */
 void CCaravanWork::SafeDeleteTempItem()
 {
-	int totalSlots = 0;
-	int artifactIndex = 0;
-
 	if ((unsigned int)System.m_execParam >= 3U) {
 		System.Printf(const_cast<char*>(sNoWorldReturnItemWarning));
 	}
 
+	int totalSlots = 0;
+	int artifactIndex = 0;
 	for (int i = 0; i < 50; i++, artifactIndex += 2) {
 		if (artifactIndex < 96 && m_artifacts[artifactIndex] > 0) {
 			unsigned short* artifactData =
@@ -1842,24 +1841,23 @@ void CCaravanWork::CalcStatus()
 		break;
 	}
 
-	unsigned short hpBonus = 0;
-	short cmdBonus = 0;
-	short strBonus = 0;
-	short magBonus = 0;
-	short defBonus = 0;
+	int hpBonus = 0;
+	int cmdBonus = 0;
+	int strBonus = 0;
+	int magBonus = 0;
+	int defBonus = 0;
 	for (int i = 0; i < 100; i++) {
 		int artifactId = m_artifacts[i];
 		if (artifactId > 0) {
 			unsigned short* artifactData = GetItemDataPtr(artifactId);
 			int artifactEffect = artifactData[0];
-			short value = artifactData[3];
+			int value = artifactData[3];
 
 			switch (artifactEffect) {
 			case 0x9F:
 				strBonus += value;
 				break;
 			case 0xB6:
-			case 0xDF:
 				magBonus += value;
 				break;
 			case 0xCC:
@@ -1870,6 +1868,9 @@ void CCaravanWork::CalcStatus()
 				break;
 			case 0xE4:
 				hpBonus += value;
+				break;
+			case 0xDF:
+				magBonus += value;
 				break;
 			}
 		}
@@ -1884,23 +1885,23 @@ void CCaravanWork::CalcStatus()
 	m_numCmdListSlots += cmdBonus;
 	m_maxHp += hpBonus;
 
-	unsigned short cappedValue = 8;
+	short cmdSlotCap = 8;
 	if ((short)m_numCmdListSlots < 8) {
-		cappedValue = m_numCmdListSlots;
+		cmdSlotCap = m_numCmdListSlots;
 	}
-	m_numCmdListSlots = cappedValue;
+	m_numCmdListSlots = cmdSlotCap;
 
-	cappedValue = 0x10;
+	unsigned short cappedValue = 0x10;
 	if (m_maxHp < 0x10) {
 		cappedValue = m_maxHp;
 	}
 	m_maxHp = cappedValue;
 
 	for (int equipIdx = 0; equipIdx < 4; equipIdx++) {
-		if (m_equipment[equipIdx] >= 0) {
-			int itemIdx = (short)m_inventoryItems[m_equipment[equipIdx]];
-			unsigned short* itemData = GetItemDataPtr(itemIdx);
-			int itemType = itemData[0];
+		int equipSlot = m_equipment[equipIdx];
+		if (equipSlot >= 0) {
+			int itemIdx = m_inventoryItems[equipSlot];
+			int itemType = GetItemDataPtr(itemIdx)[0];
 
 			if (itemType == 1) {
 				int weaponItem;
@@ -1908,11 +1909,10 @@ void CCaravanWork::CalcStatus()
 				GetCurrentWeaponItem(weaponItem, weaponRef);
 				if (weaponItem > 0) {
 					itemIdx = weaponItem;
-					itemData = GetItemDataPtr(itemIdx);
 				}
 			}
 
-			unsigned short itemValue = (short)itemData[3];
+			unsigned short itemValue = (short)GetItemDataPtr(itemIdx)[3];
 			if (itemType != 0x45) {
 				if (itemType >= 0x45) {
 					if (itemType == 0x7F) {
@@ -1930,8 +1930,8 @@ void CCaravanWork::CalcStatus()
 			m_defense += itemValue;
 			m_baseDefense += itemValue;
 		apply_effect:
-			int itemEffect = itemData[4];
-			char effectValue = (char)itemValue;
+			int itemEffect = GetItemDataPtr(itemIdx)[4];
+			unsigned short effectValue = itemValue;
 			switch (itemEffect) {
 			case 1:
 				m_elementResistances[1]++;
@@ -2001,10 +2001,9 @@ void CCaravanWork::CalcStatus()
 	}
 
 	if (m_statusTimers[9] != 0) {
-		float mul = GetStatusMultiplier(0x38);
-		m_strength = (unsigned short)((float)m_strength * mul);
-		m_magic = (unsigned short)((float)m_magic * mul);
-		m_defense = (unsigned short)((float)m_defense * mul);
+		m_strength = (unsigned short)((float)m_strength * GetStatusMultiplier(0x38));
+		m_magic = (unsigned short)((float)m_magic * GetStatusMultiplier(0x38));
+		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x38));
 	}
 	if (m_statusTimers[4] != 0) {
 		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x3E));

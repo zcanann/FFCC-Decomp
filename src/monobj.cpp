@@ -2189,11 +2189,10 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 				continue;
 			}
 
-			unsigned int partyFlags = partyObj->GetCID();
 			bool targetHidden =
 				(Game.m_gameWork.m_menuStageMode != 0) &&
 				(Game.m_gameWork.m_bossArtifactStageIndex < 0xF) &&
-				((partyFlags & 0x6D) == 0x6D) &&
+				((partyObj->GetCID() & 0x6D) == 0x6D) &&
 				(partyObj->m_scriptHandle[0xED] != NULL);
 			if (targetHidden ||
 				(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(partyObj->m_scriptHandle) + 7) == 0) ||

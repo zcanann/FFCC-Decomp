@@ -776,8 +776,8 @@ path:
     {
         float* pathBase = reinterpret_cast<float*>(pppPObject->m_drawMatrixPtr);
 
-        if (pYmMegaBirthShpTail3->m_pathIndex >= 0) {
-            short* pathInfo = (short*)(*(int*)&ppvEnv->m_particleColors[1] + pYmMegaBirthShpTail3->m_pathIndex * 8);
+        if (*(s16*)(paramBytes + 0x6a) >= 0) {
+            short* pathInfo = (short*)(*(int*)&ppvEnv->m_particleColors[1] + *(s16*)(paramBytes + 0x6a) * 8);
 
             if (pathBase == 0) {
                 pathBase = (float*)((u8*)ppvEnv->m_mapMeshPtr[*pathInfo] + 0x2C);

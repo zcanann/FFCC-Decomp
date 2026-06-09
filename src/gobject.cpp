@@ -836,7 +836,7 @@ void CGObject::objectCollision()
                         float split;
                         if (rawSplit < sZeroFloat) {
                             split = sZeroFloat;
-                        } else if (rawSplit > sAnimFrameOffset) {
+                        } else if (sAnimFrameOffset < rawSplit) {
                             split = sAnimFrameOffset;
                         } else {
                             split = rawSplit;

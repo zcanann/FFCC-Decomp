@@ -823,7 +823,7 @@ void CGraphicPcs::drawBar()
     }
 
     GXColor frameTmp;
-    *reinterpret_cast<u32*>(&frameTmp) = *reinterpret_cast<u32*>(&((Graphic.IsFrameRateOver() == 0) ? CColor(0, 0xFF, 0, 0xFF) : CColor(0xFF, 0, 0, 0xFF)).color);
+    *reinterpret_cast<u32*>(&frameTmp) = *reinterpret_cast<u32*>(&((Graphic.IsFrameRateOver() != 0) ? CColor(0xFF, 0, 0, 0xFF) : CColor(0, 0xFF, 0, 0xFF)).color);
     GXColor frameGX;
     frameGX.r = frameTmp.r;
     frameGX.g = frameTmp.g;
@@ -845,7 +845,7 @@ void CGraphicPcs::drawBar()
     GXTexCoord2u16(0, 2);
 
     GXColor fifoTmp;
-    *reinterpret_cast<u32*>(&fifoTmp) = *reinterpret_cast<u32*>(&((Graphic.IsFifoOver() == 0) ? CColor(0, 0xFF, 0, 0xFF) : CColor(0xFF, 0, 0, 0xFF)).color);
+    *reinterpret_cast<u32*>(&fifoTmp) = *reinterpret_cast<u32*>(&((Graphic.IsFifoOver() != 0) ? CColor(0xFF, 0, 0, 0xFF) : CColor(0, 0xFF, 0, 0xFF)).color);
     GXColor fifoGX;
     fifoGX.r = fifoTmp.r;
     fifoGX.g = fifoTmp.g;
@@ -873,13 +873,14 @@ void CGraphicPcs::drawBar()
         x = kGraphicZero;
         y = 0x10;
         for (int i = 0; i < orderCount; i++) {
+            const int priority = order->m_priority;
             const float width = (kGraphicScreenCenterX * order->m_lastTime) / kDebugBarFrameBudget;
 
-            if (order->m_priority != 0x27) {
+            if (priority != 0x27) {
                 char debugString[260];
                 sprintf(debugString, const_cast<char*>(s_graphic_order_debug_fmt), order->m_debugName, order->m_insertIndex, order->m_lastTime);
 
-                if (order->m_priority == 0x17) {
+                if (priority == 0x17) {
                     char extraString[256];
                     sprintf(extraString, const_cast<char*>(s_graphic_move_debug_fmt),
                             CFlatMoveTime(), CFlatBgCollisionTime(),

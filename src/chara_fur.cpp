@@ -1281,7 +1281,7 @@ int CChara::CModel::PickFur(
 	float hitV = 0.0f;
 	double nearestDepth = static_cast<double>(kCharaFurNoHitDepth);
 	int hitAny = 0;
-	int hitPaintable = 0;
+	unsigned int hitPaintable = 0;
 	CVector hitViewPos;
 	hitViewPos.Identity();
 	Mtx44 screenMtx;
@@ -1340,7 +1340,7 @@ int CChara::CModel::PickFur(
 					goto displayDone;
 				}
 				command = cursor[0];
-				const unsigned short count = *reinterpret_cast<const unsigned short*>(cursor + 1);
+				const short count = *reinterpret_cast<const unsigned short*>(cursor + 1);
 				cursor += 3;
 				const unsigned char primitive = command & 0xF8;
 				remaining -= static_cast<int>(count) * 8 + 3;

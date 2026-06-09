@@ -3155,6 +3155,7 @@ void CGMonObj::moveFrame()
 
 	if ((((moveFlags & 0x20) != 0) && !(in_f29 < moveRange)) ||
 		(((moveFlags & 0x40) != 0) && !(moveRange <= in_f29))) {
+	moveCancelExit:
 		moveStateFlags |= 1;
 		(this->*m_funcs->moveCancel)();
 		moveStateFlags |= 2;
@@ -3187,13 +3188,7 @@ void CGMonObj::moveFrame()
 	}
 
 	if (((moveFlags & 0x80) != 0) && (((int)((unsigned int)object->m_stateFlags0 << 0x19) | ((unsigned int)object->m_stateFlags0 >> 7)) < 0)) {
-		moveStateFlags |= 1;
-		(this->*m_funcs->moveCancel)();
-		moveStateFlags |= 2;
-		if ((moveFlags & 0x100) != 0) {
-			reinterpret_cast<CGPrgObj*>(this)->changeStat(moveChangeStat, 0, 0);
-		}
-		return;
+		goto moveCancelExit;
 	}
 
 	float stepDist;
@@ -3253,12 +3248,7 @@ void CGMonObj::moveFrame()
 		}
 	}
 
-	moveStateFlags |= 1;
-	(this->*m_funcs->moveCancel)();
-	moveStateFlags |= 2;
-	if ((moveFlags & 0x100) != 0) {
-		reinterpret_cast<CGPrgObj*>(this)->changeStat(moveChangeStat, 0, 0);
-	}
+	goto moveCancelExit;
 }
 
 /*

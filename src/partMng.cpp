@@ -333,27 +333,15 @@ void CPartMng::Create()
     }
 
     *reinterpret_cast<void**>(self + 0x1c8) = 0;
-    self[0x7f4] = 0;
-    self[0x7f5] = 0;
-    self[0x7f6] = 0;
-    self[0x7f7] = 0;
-    self[0x7f8] = 0;
-    self[0x7f9] = 0;
-    self[0x7fa] = 0;
-    self[0x7fb] = 0;
-    self[0x7fc] = 0;
-    self[0x7fd] = 0;
-    self[0x7fe] = 0;
-    self[0x7ff] = 0;
+    *reinterpret_cast<int*>(self + 0x7f4) = 0;
+    *reinterpret_cast<int*>(self + 0x7f8) = 0;
+    *reinterpret_cast<int*>(self + 0x7fc) = 0;
 
     m_pppEnvSt.m_envParam = kPartMngZero;
     m_pppEnvSt.m_mngStCount = 0x10;
     m_pppEnvSt.m_isEditMode = 1;
 
-    self[0x80c] = 0;
-    self[0x80d] = 0;
-    self[0x80e] = 0;
-    self[0x80f] = 0;
+    *reinterpret_cast<int*>(self + 0x80c) = 0;
 
     memset(self + 0x235a8, 0, 0x108);
 
@@ -443,19 +431,17 @@ void CPartMng::Destroy()
     }
 
     if (res->m_textureSet != 0) {
-        CRefRaw* textureSet = reinterpret_cast<CRefRaw*>(res->m_textureSet);
-        textureSet->m_refCount--;
-        if (textureSet->m_refCount == 0) {
-            delete res->m_textureSet;
+        CTextureSet* textureSet = res->m_textureSet;
+        if (--reinterpret_cast<CRefRaw*>(textureSet)->m_refCount == 0) {
+            delete textureSet;
         }
         res->m_textureSet = 0;
     }
 
     if (res->m_materialSet != 0) {
-        CRefRaw* materialSet = reinterpret_cast<CRefRaw*>(res->m_materialSet);
-        materialSet->m_refCount--;
-        if (materialSet->m_refCount == 0) {
-            delete res->m_materialSet;
+        CMaterialSet* materialSet = res->m_materialSet;
+        if (--reinterpret_cast<CRefRaw*>(materialSet)->m_refCount == 0) {
+            delete materialSet;
         }
         res->m_materialSet = 0;
     }
@@ -1482,12 +1468,12 @@ void CPartMng::pppEditAllReleaseResource()
     iVar3 = 0;
     iter = self;
     do {
-        if (*reinterpret_cast<void**>(iter + 0x1D8) != 0) {
-            operator delete(*reinterpret_cast<void**>(iter + 0x1D8));
-            *reinterpret_cast<void**>(iter + 0x1D8) = 0;
+        if (*reinterpret_cast<void**>(iter + 0x3D8) != 0) {
+            operator delete(*reinterpret_cast<void**>(iter + 0x3D8));
+            *reinterpret_cast<void**>(iter + 0x3D8) = 0;
         }
         iVar3 = iVar3 + 1;
-        iter = iter + 0xC;
+        iter = iter + 0x4;
     } while (iVar3 < 0x80);
 
     if (*reinterpret_cast<int*>(self + 0x7FC) != 0) {

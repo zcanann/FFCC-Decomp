@@ -2781,7 +2781,7 @@ int CGCharaObj::getItemPdt(int itemId, int level, int& outEffect, int& outArg0, 
 void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg1, Vec* pos)
 {
 	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + effectId * 0x48;
-	int particleClass = *reinterpret_cast<unsigned short*>(itemData + 0x12);
+	unsigned int particleClass = *reinterpret_cast<unsigned short*>(itemData + 0x12);
 	int particleBank = CharaObjResolveParticleBank(this, particleClass);
 	short particleEntry = 0xFFFF;
 	unsigned short particleFlags = 0;
@@ -2815,9 +2815,9 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 
 	if (hasParticle) {
 		CFlatRuntime2Storage().ResetParticleWork((particleBank << 8) | particleNo, effectArg1);
-		CFlatRuntime2Storage().SetParticleWorkScale(*reinterpret_cast<unsigned short*>(itemData + 0x10) * 0.01f);
+		CFlatRuntime2Storage().SetParticleWorkScale(*reinterpret_cast<short*>(itemData + 0x10) * 0.01f);
 		CFlatRuntime2Storage().SetParticleWorkParam(effectId, this);
-		CFlatRuntime2Storage().SetParticleWorkSpeed(*reinterpret_cast<unsigned short*>(itemData + 0x26) * 0.01f);
+		CFlatRuntime2Storage().SetParticleWorkSpeed(*reinterpret_cast<short*>(itemData + 0x26) * 0.01f);
 
 		switch (effectArg0) {
 		case 0:
@@ -2868,7 +2868,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 		if ((particleFlags & 0x100) != 0) {
 			CFlatRuntime2Storage().SetParticleWorkBind(this);
 		} else if ((particleFlags & 0x200) != 0) {
-			float distance = *reinterpret_cast<unsigned short*>(itemData + 0x2A) * 1.0f;
+			float distance = *reinterpret_cast<short*>(itemData + 0x2A) * 1.0f;
 			Vec offsetPos;
 			offsetPos.x = m_worldPosition.x + sinf(m_rotTargetY) * distance;
 			offsetPos.y = m_worldPosition.y;
@@ -2876,7 +2876,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 			CFlatRuntime2Storage().SetParticleWorkPos(offsetPos, m_rotTargetY);
 			CFlatRuntime2Storage().SetParticleWorkVector(m_rotTargetY, 0.0f);
 			if ((*reinterpret_cast<unsigned short*>(itemData + 0x0C) & 0x2000) != 0) {
-				int partyIndex = static_cast<int>(m_rotationX);
+				int partyIndex = static_cast<unsigned int>(m_rotationX);
 				if (partyIndex >= 0 && partyIndex < 4) {
 					CFlatRuntime2Storage().SetParticleWorkTrace(Game.m_partyObjArr[partyIndex]);
 				}

@@ -1406,7 +1406,7 @@ int CChara::CModel::PickFur(
 						int remainEdges = 3;
 						float depthAccum = kCharaFurDepthZero;
 						do {
-							if (static_cast<int>(static_cast<unsigned char>(vp->m_valid) << 0x18) >= 0) {
+							if (static_cast<int>(static_cast<signed char>(vp->m_valid) << 0x18) >= 0) {
 								break;
 							}
 							int next = (passed + 1) % 3;

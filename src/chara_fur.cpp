@@ -1340,15 +1340,26 @@ int CChara::CModel::PickFur(
 				for (unsigned int vertexIndex = 0; vertexIndex < count; vertexIndex++) {
 					const unsigned short* indices = reinterpret_cast<const unsigned short*>(cursor);
 
-					const S16Vec& pos = mesh->m_workPositions[indices[0]];
+					register const S16Vec* posPtr = &mesh->m_workPositions[indices[0]];
+					register const unsigned char* uvPtr = mesh->m_data->m_uvs;
+					register int uvOff = static_cast<unsigned int>(indices[3]) << 2;
 					Vec localPos;
-					localPos.x = *reinterpret_cast<const float*>(&pos);
-					localPos.y = *reinterpret_cast<const float*>(&pos.z);
-					const short* uvSrc = reinterpret_cast<const short*>(mesh->m_data->m_uvs) +
-					                     static_cast<unsigned int>(indices[3]) * 2;
-					float curU = *reinterpret_cast<const float*>(uvSrc);
-					float curV = *reinterpret_cast<const float*>(uvSrc + 2);
-					localPos.z = *reinterpret_cast<const float*>(&pos.z);
+					float curUV[2];
+					register Vec* localPosPtr = &localPos;
+					register float* curUVPtr = curUV;
+					register float posXY;
+					register float posZ;
+					register float uvST;
+					asm {
+						psq_l posXY, 0(posPtr), 0, 5
+						psq_lx uvST, uvPtr, uvOff, 0, 7
+						psq_l posZ, 4(posPtr), 1, 5
+						psq_st uvST, 0(curUVPtr), 0, 0
+						psq_st posXY, 0(localPosPtr), 0, 0
+						psq_st posZ, 8(localPosPtr), 1, 0
+					}
+					float curU = curUV[0];
+					float curV = curUV[1];
 
 					Vec curViewPos;
 					PSMTXMultVec(modelViewMtx, &localPos, &curViewPos);

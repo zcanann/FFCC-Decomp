@@ -1357,7 +1357,7 @@ void CGCharaObj::putHitParticleFromItem(CGPrgObj* sourceObj, int itemId)
 			if ((particleFlags & 0x200) != 0) {
 				CFlatRuntime2Storage().SetParticleWorkBind(sourceObj);
 			} else {
-				CFlatRuntime2Storage().SetParticleWorkPos(*l_pHitCross, 1.0f);
+				CFlatRuntime2Storage().SetParticleWorkPos(*l_pHitCross, kCharaObjZero);
 			}
 			CFlatRuntime2Storage().PutParticleWork();
 		}
@@ -3524,7 +3524,8 @@ void CGCharaObj::combi2()
 	if (isSharedResult) {
 		comboCenter.Identity();
 		for (int i = 0; i < participantCount; i++) {
-			PSVECAdd(reinterpret_cast<Vec*>(&comboCenter), &CharaObjComboCenter(candidates[i]), reinterpret_cast<Vec*>(&comboCenter));
+			CVector candidateCenter(CharaObjComboCenter(candidates[i]));
+			PSVECAdd(reinterpret_cast<Vec*>(&comboCenter), reinterpret_cast<Vec*>(&candidateCenter), reinterpret_cast<Vec*>(&comboCenter));
 		}
 		PSVECScale(reinterpret_cast<Vec*>(&comboCenter), reinterpret_cast<Vec*>(&comboCenter), 1.0f / static_cast<float>(participantCount));
 	}

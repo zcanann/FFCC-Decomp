@@ -2930,7 +2930,7 @@ void CGMonObj::setRepop(int mode)
 
 	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x20000);
 
-	unsigned short countB = *reinterpret_cast<unsigned short*>(monsterScript + 0x1AA);
+	unsigned short countB = *reinterpret_cast<short*>(monsterScript + 0x1AA);
 	for (int i = 0; i < static_cast<int>(countB); i++) {
 		int dataNo = object->m_charaModelHandle != nullptr ? object->m_charaModelHandle->GetPdtSlot() : -1;
 		prgObj->putParticleBindTrace((i + 0x5A) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x5A8), object, 0.0f, 0);
@@ -2944,13 +2944,13 @@ void CGMonObj::setRepop(int mode)
 	scriptHandle = object->m_scriptHandle;
 	classId = reinterpret_cast<int>(scriptHandle[4]);
 	int weaponMode = object->m_weaponNodeFlagBits.m_prg;
-	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(scriptHandle[9]) + 0xFC) != 0xB) {
+	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle[9]) + 0xFC) != 0xB) {
 		weaponMode = 1;
 	}
 
 	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x1000);
 
-	unsigned short countC = (weaponMode == 0) ?
+	short countC = (weaponMode == 0) ?
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle[9]) + 0x1AE) :
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle[9]) + 0x1AC);
 	int particleBase = (weaponMode == 0) ? 0x3C : 0x46;

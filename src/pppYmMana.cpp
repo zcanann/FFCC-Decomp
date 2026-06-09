@@ -1067,24 +1067,29 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
             }
 
             if (nameCompare != 0 || i == 4 || i == 5) {
-                if (i == 3) {
+                switch (i) {
+                case 0:
+                    cameraPos.x += LoadFloat(kYmManaOne);
+                    break;
+                case 1:
+                    cameraPos.z += LoadFloat(kYmManaOne);
+                    break;
+                case 2:
+                    cameraPos.x -= LoadFloat(kYmManaOne);
+                    break;
+                case 3:
                     cameraPos.z -= LoadFloat(kYmManaOne);
-                } else if (i < 3) {
-                    if (i == 1) {
-                        cameraPos.z += LoadFloat(kYmManaOne);
-                    } else if (i >= 2) {
-                        cameraPos.x -= LoadFloat(kYmManaOne);
-                    } else if (i >= 0) {
-                        cameraPos.x += LoadFloat(kYmManaOne);
-                    }
-                } else if (i == 5) {
+                    break;
+                case 5:
                     cameraPos.y -= LoadFloat(kYmManaOne);
                     cameraUp.y = LoadFloat(kPppYmMoveParabolaZero);
                     cameraUp.z = LoadFloat(kPppYmMoveParabolaZero);
-                } else if (i < 5) {
+                    break;
+                case 4:
                     cameraPos.y += LoadFloat(kYmManaOne);
                     cameraUp.y = LoadFloat(kPppYmMoveParabolaZero);
                     cameraUp.z = LoadFloat(kYmManaNegOne);
+                    break;
                 }
             }
 
@@ -1725,7 +1730,7 @@ void CalcReflectionVector2(
 
     u16* dlEnd = (u16*)((u8*)displayList + displayListSize);
     while (dl < dlEnd) {
-        u8 drawFmt = *(u8*)dl;
+        s8 drawFmt = *(u8*)dl;
         u16 itemCount = *(u16*)((u8*)dl + 1);
         int i;
 

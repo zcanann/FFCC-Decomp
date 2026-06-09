@@ -2212,25 +2212,22 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 				targetDelta.z = delta.z;
 			}
 			float targetDist = PSVECMag(&targetDelta);
-			if (static_cast<double>(kMonObjZero) >= static_cast<double>(targetDist)) {
+			if (kMonObjZero >= targetDist) {
 				continue;
 			}
 
 			CVector targetDir;
 			PSVECNormalize(&targetDelta, reinterpret_cast<Vec*>(&targetDir));
 			float dot = PSVECDotProduct(reinterpret_cast<Vec*>(&forward), reinterpret_cast<Vec*>(&targetDir));
-			if ((static_cast<double>(
-			         static_cast<float>(static_cast<double>(sideDist) -
-			                            static_cast<double>(object->m_bodyEllipsoidRadius))) >
-			     static_cast<double>(targetDist)) ||
+			if (((sideDist - object->m_bodyEllipsoidRadius) > targetDist) ||
 				((static_cast<double>(kMonObjZero) != static_cast<double>(halfAngle)) &&
-				 (static_cast<double>(kMonObjZero) >= static_cast<double>(dot)))) {
+				 (kMonObjZero >= dot))) {
 				continue;
 			}
 
 			float angle = static_cast<float>(acos(static_cast<double>(dot)));
 			if ((static_cast<double>(kMonObjZero) != static_cast<double>(halfAngle)) &&
-				(static_cast<double>(angle) >= static_cast<double>(halfAngle))) {
+				(angle >= halfAngle)) {
 				continue;
 			}
 

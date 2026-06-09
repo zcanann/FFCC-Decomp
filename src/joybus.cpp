@@ -738,32 +738,61 @@ loop_body:
         {
             int s = (unsigned int)threadParam->m_state;
 
-            if ((s >= 0x1D && s <= 0x20))
+            if (s >= 0x17)
             {
-                if (SendCancel(threadParam) < 0)
+                if (s >= 0x384)
                 {
-                    goto sleep_retry;
+                    if (s >= 0x387)
+                        goto do_recvsend;
+                    goto timeout_expiry;
                 }
-                threadParam->m_state = ';';
+                if (s >= 0x21)
+                    goto do_recvsend;
+                if (s >= 0x1D)
+                    goto do_cancel;
+                goto do_recvsend;
+            }
+            else if (s == 6)
+            {
                 goto timeout_expiry;
             }
-            else if (s == 5 || (s >= 7 && s <= 0x13) || (s >= 0x17 && s <= 0x1C) ||
-                     (s >= 0x21 && s <= 0x383) || s >= 0x387)
+            else if (s >= 7)
             {
-                if (GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf)) < 0)
-                {
-                    goto sleep_retry;
-                }
-                if (m_ctrlModeArr[threadParam->m_portIndex] == 0)
-                {
-                    goto recompute_timeout;
-                }
-                if (SendCtrlMode(threadParam, 0) < 0)
-                {
-                    goto sleep_retry;
-                }
+                if (s >= 0x14)
+                    goto timeout_expiry;
+                goto do_recvsend;
+            }
+            else if (s >= 5)
+            {
+                goto do_recvsend;
+            }
+            else
+            {
+                goto timeout_expiry;
+            }
+
+        do_cancel:
+            if (SendCancel(threadParam) < 0)
+            {
+                goto sleep_retry;
+            }
+            threadParam->m_state = ';';
+            goto timeout_expiry;
+
+        do_recvsend:
+            if (GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf)) < 0)
+            {
+                goto sleep_retry;
+            }
+            if (m_ctrlModeArr[threadParam->m_portIndex] == 0)
+            {
                 goto recompute_timeout;
             }
+            if (SendCtrlMode(threadParam, 0) < 0)
+            {
+                goto sleep_retry;
+            }
+            goto recompute_timeout;
         }
         else
         {

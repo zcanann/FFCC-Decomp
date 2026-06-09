@@ -2393,10 +2393,16 @@ foundModel:
     if (loadModel != 0) {
         m_modelLoadRef = loadModel;
 
-        CMemory::CStage* modelStage = CharaPcs.m_viewerModelStage;
+        int modelStageIndex;
         if (specialModelStage != 0) {
-            modelStage = m_charaKind == 3 ? CharaPcs.m_familyModelStage : CharaPcs.m_weaponModelStage;
+            modelStageIndex = 4;
+            if (m_charaKind == 3) {
+                modelStageIndex = 5;
+            }
+        } else {
+            modelStageIndex = 0;
         }
+#define modelStage ((&CharaPcs.m_viewerModelStage)[modelStageIndex])
 
         if (loadModel->GetRef() == 1) {
             if (loadModel->m_streamMode != 0) {
@@ -2425,6 +2431,7 @@ foundModel:
             m_modelLoadRef->AddRef();
             m_model = loadModel->m_model->Duplicate(SelectLoadStage(&CharaPcs, modelStage));
         }
+#undef modelStage
     } else {
         if (static_cast<unsigned int>(System.m_execParam) >= 1) {
             System.Printf(const_cast<char*>(s_charaModelLoadDvdFmt), charaKind, static_cast<int>(charaNo));
@@ -2492,10 +2499,13 @@ foundModel:
         loadPdt = 0;
     foundPdt:
 
-        if (loadPdt == 0) {
+        if (loadPdt != 0) {
+            m_pdtLoadRef = loadPdt;
+            m_pdtLoadRef->AddRef();
+        } else {
             loadPdt = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x868) CLoadPdt;
             m_pdtLoadRef = loadPdt;
-            reinterpret_cast<CLoadPdt*>(m_pdtLoadRef)->m_keyTag = reinterpret_cast<void*>(1);
+            reinterpret_cast<CLoadPdt*>(m_pdtLoadRef)->m_keyTag = reinterpret_cast<void*>(charaKind);
             reinterpret_cast<CLoadPdt*>(m_pdtLoadRef)->m_keyId = static_cast<unsigned int>(charaNo);
             reinterpret_cast<CLoadPdt*>(m_pdtLoadRef)->m_variantTag = reinterpret_cast<void*>(textureVariant);
             reinterpret_cast<CLoadPdt*>(m_pdtLoadRef)->m_mergeFileId = mergeFileId;
@@ -2506,9 +2516,6 @@ foundModel:
                 System.Printf(const_cast<char*>(s_charaLoadPdtLogFmt), charaKind, static_cast<int>(charaNo), static_cast<int>(textureVariant));
             }
             LoadPdtArray(&CharaPcs)->Add(reinterpret_cast<CLoadPdt*>(m_pdtLoadRef));
-            m_pdtLoadRef->AddRef();
-        } else {
-            m_pdtLoadRef = loadPdt;
             m_pdtLoadRef->AddRef();
         }
     }

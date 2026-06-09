@@ -4201,7 +4201,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
             localBytes[1] = sendType;
             *reinterpret_cast<unsigned short*>(localBytes + 2) = __lhbrx(&blockHalf, 0);
 
-            if (m_threadRunningMask == 0)
+            if (static_cast<signed char>(m_threadRunningMask) == 0)
             {
                 result = 0;
             }
@@ -4236,7 +4236,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
             unsigned short len = totalSize;
             *reinterpret_cast<unsigned short*>(localBytes + 2) = __lhbrx(&len, 0);
 
-            if (m_threadRunningMask != 0)
+            if (static_cast<signed char>(m_threadRunningMask) != 0)
             {
                 OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
@@ -4269,7 +4269,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
 
             *reinterpret_cast<unsigned short*>(localBytes + 2) = crcChunk;
 
-            if (m_threadRunningMask != 0)
+            if (static_cast<signed char>(m_threadRunningMask) != 0)
             {
                 OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
@@ -4333,7 +4333,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
 
             unsigned int word = localWord;
 
-            if (m_threadRunningMask == 0)
+            if (static_cast<signed char>(m_threadRunningMask) == 0)
             {
                 result = 0;
             }
@@ -4375,7 +4375,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
                 (static_cast<unsigned int>(blockIndex) << 16) |
                 static_cast<unsigned int>(crcChunk);
 
-            if (m_threadRunningMask == 0)
+            if (static_cast<signed char>(m_threadRunningMask) == 0)
             {
                 result = 0;
             }
@@ -4418,7 +4418,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
 
         unsigned int word = localWord;
 
-        if (m_threadRunningMask != 0)
+        if (static_cast<signed char>(m_threadRunningMask) != 0)
         {
             localWord = word;
 

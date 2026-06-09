@@ -1034,7 +1034,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		}
 	}
 
-	Chara.MogFur().m_cursorX = static_cast<int>(kYmEnvTen * MogPadFloat(36) +
+	Chara.MogFur().m_cursorX = static_cast<unsigned int>(kYmEnvTen * MogPadFloat(36) +
 	                                     static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorX)));
 	Chara.MogFur().m_cursorY = static_cast<int>(-(kYmEnvTen * MogPadFloat(40) -
 	                                     static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorY))));
@@ -1139,7 +1139,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 
 			if (doPaint != 0) {
 				int particleNo = 0;
-				int seId = 0;
+				unsigned int seId = 0;
 				int emitParticle = ((static_cast<int>(System.m_frameCounter) % 2) == 0);
 				int playGate = ((static_cast<int>(System.m_frameCounter) % 4) == 0);
 				_GXColor particleColor = CColor(centerBefore).color;
@@ -1309,7 +1309,7 @@ int CChara::CModel::PickFur(
 		int displayCount = mesh->m_data->m_displayListCount;
 		while (--displayCount >= 0) {
 			CMaterial* material = materialSet->m_materials[displayList->m_material];
-			int paintableMaterial = 0;
+			unsigned int paintableMaterial = 0;
 			CTexture* pickTexture = material->GetFurPickTexture();
 			if (pickTexture != 0 && pickTexture->m_format == 5) {
 				paintableMaterial = 1;
@@ -1337,7 +1337,7 @@ int CChara::CModel::PickFur(
 				verts[0].m_valid = 0;
 				verts[1].m_valid = 0;
 
-				for (unsigned int vertexIndex = 0; vertexIndex < count; vertexIndex++) {
+				for (int vertexIndex = 0; vertexIndex < count; vertexIndex++) {
 					const unsigned short* indices = reinterpret_cast<const unsigned short*>(cursor);
 
 					register const S16Vec* posPtr = &mesh->m_workPositions[indices[0]];
@@ -1463,7 +1463,7 @@ int CChara::CModel::PickFur(
 						PSVECCrossProduct(&verts[1].m_viewPos, &verts[0].m_viewPos, normalA);
 						PSVECCrossProduct(&verts[2].m_viewPos, &verts[0].m_viewPos, normalB);
 						PSVECCrossProduct(normalA, normalB, normal);
-						if (static_cast<int>(static_cast<unsigned int>(static_cast<unsigned char>(verts[2].m_valid)) << 0x19 |
+						if (static_cast<int>(static_cast<unsigned int>(static_cast<signed char>(verts[2].m_valid)) << 0x19 |
 						                     static_cast<unsigned int>(static_cast<unsigned char>(verts[2].m_valid)) >> 7) < 0) {
 							CVector normalNeg(-normal.x, -normal.y, -normal.z);
 							normal.x = normalNeg.x;
@@ -2125,7 +2125,7 @@ void CChara::makeFurTex()
 		GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 
 		s_mogFurRand = 0;
-		for (int hair = 0; hair < 0x4000; hair++) {
+		for (unsigned int hair = 0; hair < 0x4000; hair++) {
 			GXBegin(GX_LINESTRIP, GX_VTXFMT0, 5);
 
 			float rootX = kCharaFurDepthScaleBase * (FLOAT_80331164 * static_cast<float>(FurRandNext()) + kCharaFurViewDepthThreshold);

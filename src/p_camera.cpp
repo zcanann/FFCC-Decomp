@@ -1290,12 +1290,12 @@ void CCameraPcs::calcMap()
     moveDelta.x = kCameraZeroF;
 
     if ((buttons & 0x100) != 0) {
-        PSVECScale(&moveDelta, &DirectionVec(), kCameraDebugMoveStep);
+        PSVECScale(&DirectionVec(), &moveDelta, kCameraDebugMoveStep);
     }
 
     moveDelta.y = kCameraZeroF;
     if ((buttons & 0x800) != 0) {
-        PSVECScale(&moveDelta, &DirectionVec(), kCameraNegativeDebugMoveStep);
+        PSVECScale(&DirectionVec(), &moveDelta, kCameraNegativeDebugMoveStep);
         moveDelta.y = kCameraZeroF;
     }
 
@@ -1311,14 +1311,14 @@ void CCameraPcs::calcMap()
         sideVec.x = kCameraDebugMoveStep;
         PSMTXMultVecSR(rotMtx, &sideVec, &sideVec);
         sideVec.y = kCameraZeroF;
-        PSVECAdd(&moveDelta, &moveDelta, &sideVec);
+        PSVECAdd(&sideVec, &moveDelta, &moveDelta);
     } else if ((buttons & 0x2) != 0) {
         sideVec.y = kCameraZeroF;
         sideVec.z = kCameraZeroF;
         sideVec.x = kCameraNegativeDebugMoveStep;
         PSMTXMultVecSR(rotMtx, &sideVec, &sideVec);
         sideVec.y = kCameraZeroF;
-        PSVECAdd(&moveDelta, &moveDelta, &sideVec);
+        PSVECAdd(&sideVec, &moveDelta, &moveDelta);
     }
 
     if ((moveDelta.x != kCameraZeroF) || (moveDelta.y != kCameraZeroF) || (moveDelta.z != kCameraZeroF)) {

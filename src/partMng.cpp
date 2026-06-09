@@ -1580,12 +1580,11 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x554);
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3A9);
         {
-            _pppMngSt* mng = m_pppMng;
             for (int i = 0; i < *reinterpret_cast<int*>(self + kEditCountOffset); i++) {
+                _pppMngSt* mng = reinterpret_cast<_pppMngSt*>(self + i * 0x158 + 0x2A18);
                 if (mng->m_baseTime != -0x1000) {
                     _pppAllFreePObject(mng);
                 }
-                mng++;
             }
         }
         *reinterpret_cast<int*>(self + kEditCountOffset) = 0;
@@ -1928,12 +1927,11 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x646);
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3A9);
         {
-            _pppMngSt* mng = m_pppMng;
             for (int i = 0; i < *reinterpret_cast<int*>(self + kEditCountOffset); i++) {
+                _pppMngSt* mng = reinterpret_cast<_pppMngSt*>(self + i * 0x158 + 0x2A18);
                 if (mng->m_baseTime != -0x1000) {
                     _pppAllFreePObject(mng);
                 }
-                mng++;
             }
         }
         *reinterpret_cast<int*>(self + kEditCountOffset) = 0;
@@ -2012,12 +2010,11 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         }
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3A9);
         {
-            _pppMngSt* mng = m_pppMng;
             for (int i = 0; i < *reinterpret_cast<int*>(self + kEditCountOffset); i++) {
+                _pppMngSt* mng = reinterpret_cast<_pppMngSt*>(self + i * 0x158 + 0x2A18);
                 if (mng->m_baseTime != -0x1000) {
                     _pppAllFreePObject(mng);
                 }
-                mng++;
             }
         }
         *reinterpret_cast<int*>(self + kEditCountOffset) = 0;

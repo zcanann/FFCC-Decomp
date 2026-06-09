@@ -2730,39 +2730,45 @@ int CCaravanWork::GetArtifactIncludeHpMax()
 	int count = 0x32;
 
 	while (count != 0) {
-		if ((artifactIndex < 0x60) && ((short)m_artifacts[artifactIndex] > 0)) {
-			unsigned short* artifactData = artifactDataBase + ((short)m_artifacts[artifactIndex] * 0x24);
-			unsigned short artifactType = artifactData[0];
-			unsigned short artifactValue = artifactData[3];
+		if (artifactIndex < 0x60) {
+			int artifactId = m_artifacts[artifactIndex];
+			if (artifactId > 0) {
+				unsigned short* artifactData = artifactDataBase + (artifactId * 0x24);
+				unsigned short artifactType = artifactData[0];
+				unsigned short artifactValue = artifactData[3];
 
-			switch (artifactType) {
-			case 0x9F:
-			case 0xB6:
-			case 0xCC:
-			case 0xDB:
-			case 0xDF:
-				break;
-			case 0xE4:
-				hpMax += artifactValue;
-				break;
+				switch (artifactType) {
+				case 0x9F:
+				case 0xB6:
+				case 0xCC:
+				case 0xDB:
+				case 0xDF:
+					break;
+				case 0xE4:
+					hpMax += artifactValue;
+					break;
+				}
 			}
 		}
 
-		if (((artifactIndex + 1) < 0x60) && ((short)m_artifacts[artifactIndex + 1] > 0)) {
-			unsigned short* artifactData = artifactDataBase + ((short)m_artifacts[artifactIndex + 1] * 0x24);
-			unsigned short artifactType = artifactData[0];
-			unsigned short artifactValue = artifactData[3];
+		if ((artifactIndex + 1) < 0x60) {
+			int artifactId = m_artifacts[artifactIndex + 1];
+			if (artifactId > 0) {
+				unsigned short* artifactData = artifactDataBase + (artifactId * 0x24);
+				unsigned short artifactType = artifactData[0];
+				unsigned short artifactValue = artifactData[3];
 
-			switch (artifactType) {
-			case 0x9F:
-			case 0xB6:
-			case 0xCC:
-			case 0xDB:
-			case 0xDF:
-				break;
-			case 0xE4:
-				hpMax += artifactValue;
-				break;
+				switch (artifactType) {
+				case 0x9F:
+				case 0xB6:
+				case 0xCC:
+				case 0xDB:
+				case 0xDF:
+					break;
+				case 0xE4:
+					hpMax += artifactValue;
+					break;
+				}
 			}
 		}
 

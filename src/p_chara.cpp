@@ -2456,12 +2456,12 @@ foundModel:
         m_model->InitMogFurTex();
     }
 
-    if (CurrentSceneId() != 7 && charaKind == 1) {
+    if (static_cast<s32>(CurrentSceneId()) != 7 && charaKind == 1) {
         CLoadPdt* loadPdt;
         for (unsigned int i = 0; i < static_cast<unsigned int>(LoadPdtArray(&CharaPcs)->GetSize()); i++) {
             CLoadPdt* it = (*LoadPdtArray(&CharaPcs))[i];
-            if (it->m_keyTag == reinterpret_cast<void*>(1) && it->m_keyId == static_cast<int>(charaNo) &&
-                it->m_variantTag == reinterpret_cast<void*>(textureVariant)) {
+            if (reinterpret_cast<int>(it->m_keyTag) == charaKind && it->m_keyId == static_cast<int>(charaNo) &&
+                reinterpret_cast<int>(it->m_variantTag) == static_cast<int>(textureVariant)) {
                 loadPdt = it;
                 goto foundPdt;
             }
@@ -2479,7 +2479,7 @@ foundModel:
             reinterpret_cast<CLoadPdt*>(m_pdtLoadRef)->m_mergeFlags = mergeFlags;
             reinterpret_cast<CLoadPdt*>(m_pdtLoadRef)->m_pdtSlot =
                 PartPcs.LoadMonsterPdt(static_cast<int>(charaNo), static_cast<int>(textureVariant), 0, 0, 0, 0);
-            if (System.m_execParam != 0) {
+            if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                 System.Printf(const_cast<char*>(s_charaLoadPdtLogFmt), charaKind, static_cast<int>(charaNo), static_cast<int>(textureVariant));
             }
             LoadPdtArray(&CharaPcs)->Add(reinterpret_cast<CLoadPdt*>(m_pdtLoadRef));

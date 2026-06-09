@@ -2804,8 +2804,12 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         modelPos.z = modelMtx[2][3];
 
         CVector focusPos(CharaPcs.m_texShadowPos);
+        CVector deltaTmp;
+        PSVECSubtract(focusPos, modelPos, deltaTmp);
         CVector delta;
-        PSVECSubtract(focusPos, modelPos, delta);
+        delta.x = deltaTmp.x;
+        delta.y = deltaTmp.y;
+        delta.z = deltaTmp.z;
         if (delta.x == kCharaZero && delta.z == kCharaZero) {
             return;
         }

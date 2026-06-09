@@ -3234,7 +3234,7 @@ void CGMonObj::moveFrame()
 	}
 
 	if (((moveFlags & 0x20) == 0 || !(stepRemaining < moveRange)) &&
-		((moveFlags & 0x40) == 0 || stepRemaining < moveRange)) {
+		((moveFlags & 0x40) == 0 || !(moveRange <= stepRemaining))) {
 		if ((moveFrame == 0) && ((moveFlags & 0x400) == 0)) {
 			reinterpret_cast<CGPrgObj*>(this)->reqAnim(1, 1, 0);
 		}

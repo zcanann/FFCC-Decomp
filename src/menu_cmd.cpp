@@ -1244,10 +1244,7 @@ void CMenuPcs::CmdDraw()
 			const char* text;
 			if (displayIdx < 2) {
 				text = GetMenuStr(displayIdx + 0x0B);
-			} else if (displayIdx >= itemCount) {
-				textRow++;
-				continue;
-			} else {
+			} else if (!(displayIdx >= itemCount)) {
 				const s16 slot = letterBuf[displayIdx - 1];
 				const s16 skillId = caravan->m_inventoryItems[slot];
 				char** flatText = Game.m_cFlatDataArr[1].TableStrings(0);
@@ -1262,6 +1259,9 @@ void CMenuPcs::CmdDraw()
 					helpId = __p21;
 					hasItemHelp = true;
 				}
+			} else {
+				textRow++;
+				continue;
 			}
 
 			listFont->GetWidth(text);
@@ -1378,14 +1378,14 @@ void CMenuPcs::CmdDraw()
 			}
 			cursorX = static_cast<float>(cursorEntry->x - 0x14);
 			int __p9 = cursorOnUnite;
-			if (__p9) {
-				cursorY = static_cast<float>(cursorEntry->y) +
-				          (static_cast<float>(cursorEntry->height - 0x20) * static_cast<float>(kCmdMenuHalfD));
-			} else {
+			if (!(__p9)) {
 				cursorY = static_cast<float>(cursorEntry->y);
 				if (cmdMode != 0) {
 					cursorY += kCmdMenuSmallOffset;
 				}
+			} else {
+				cursorY = static_cast<float>(cursorEntry->y) +
+				          (static_cast<float>(cursorEntry->height - 0x20) * static_cast<float>(kCmdMenuHalfD));
 			}
 		} else if (!(cmdMode == 1)) {
 			CmdListEntry* panel = &GetCmdListStorage(this)->entries[GetCmdListStorage(this)->listEnd + 3];
@@ -1477,7 +1477,8 @@ unsigned int CMenuPcs::CmdCtrlCur()
 	const int padLock = Pad.m_debugPadLock;
 
 	bool blocked = false;
-	if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
+	int __p12 = padLock;
+	if ((__p12 != 0) || (Pad.m_debugPadPort != -1)) {
 		blocked = true;
 	}
 	if (blocked) {
@@ -1692,7 +1693,8 @@ unsigned int CMenuPcs::CmdCtrlCur()
 				}
 			}
 		}
-	} else if (mode == 2) {
+	int __p13 = mode;
+	} else if (__p13 == 2) {
 		int maxPos;
 		if (kCmdMenuOneD == static_cast<double>(cmdList->entries[cmdList->listEnd + 3].scale)) {
 			maxPos = 2;
@@ -1763,7 +1765,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 			}
 
 			s16* modeCursor = GetCmdStateSelections(GetCmdStateView(this)) + mode;
-			int __p3 = prev;
+			int __p3 =  (prev | 0);
 			if (*modeCursor == __p3) {
 				*modeCursor = static_cast<s16>(next);
 			} else {

@@ -836,16 +836,15 @@ void CCameraPcs::calc()
             const double t = static_cast<double>(kCameraPi *
                 (kCameraOneF - static_cast<float>(m_worldMapEffect.m_timer) /
                 static_cast<float>(m_worldMapEffect.m_duration)));
-            const double f = static_cast<double>(kCameraHalfF * (kCameraOneF + static_cast<float>(cos(t))));
+            const float f = kCameraHalfF * (kCameraOneF + static_cast<float>(cos(t)));
 
-            PSMTXRotRad(tempMtx, 'x', static_cast<float>(static_cast<double>(m_worldMapEffect.m_rotX) * f));
+            PSMTXRotRad(tempMtx, 'x', m_worldMapEffect.m_rotX * f);
             PSMTXConcat(tempMtx, worldMapMtx, worldMapMtx);
-            PSMTXRotRad(tempMtx, 'y', static_cast<float>(static_cast<double>(m_worldMapEffect.m_rotY) * f));
+            PSMTXRotRad(tempMtx, 'y', m_worldMapEffect.m_rotY * f);
             PSMTXConcat(tempMtx, worldMapMtx, worldMapMtx);
 
-            const float scale = -static_cast<float>(
-                static_cast<double>(m_worldMapEffect.m_scale) * (static_cast<double>(kCameraOneF) - f) -
-                static_cast<double>(kCameraOneF + m_worldMapEffect.m_scale));
+            const float scale = (kCameraOneF + m_worldMapEffect.m_scale) -
+                m_worldMapEffect.m_scale * (kCameraOneF - f);
             PSMTXScale(tempMtx, scale, scale, scale);
             PSMTXConcat(tempMtx, worldMapMtx, worldMapMtx);
 

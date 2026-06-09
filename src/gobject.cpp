@@ -719,7 +719,7 @@ void CGObject::move()
 
     const double rotDelta = static_cast<double>(Math.DstRot(m_rotTargetY, m_rotBaseY));
     m_animSlotSel = (reinterpret_cast<s8*>(&m_shieldNodeFlags) + 1)
-        [(DOUBLE_803303e8 < fabs(rotDelta)) ? 1 : 0];
+        [(fabs(rotDelta) <= DOUBLE_803303e8) ? 0 : 1];
 }
 
 /*

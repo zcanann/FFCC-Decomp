@@ -1868,7 +1868,8 @@ checkLoaded:
                             CLoadAnim* loadAnim = 0;
                             for (unsigned int i = 0; i < static_cast<unsigned int>(LoadAnimArray(pcs)->GetSize()); i++) {
                                 CLoadAnim* it = (*LoadAnimArray(pcs))[i];
-                                if (reinterpret_cast<int>(it->m_keyTag) == reinterpret_cast<int>(keyTag) && it->m_keyId == keyId &&
+                                if (reinterpret_cast<int>(it->m_keyTag) == reinterpret_cast<int>(keyTag) &&
+                                    static_cast<unsigned int>(it->m_keyId) == static_cast<unsigned int>(keyId) &&
                                     strcmp(animName, it->m_name) == 0) {
                                     loadAnim = it;
                                     break;
@@ -1905,8 +1906,8 @@ checkLoaded:
                             for (unsigned int i = 0; i < static_cast<unsigned int>(LoadPdtArray(pcs)->GetSize()); i++) {
                                 CLoadPdt* it = (*LoadPdtArray(pcs))[i];
                                 if (reinterpret_cast<int>(it->m_keyTag) == reinterpret_cast<int>(keyTag) &&
-                                    static_cast<unsigned int>(it->m_keyId) == static_cast<unsigned int>(keyId) &&
-                                    it->m_variantTag == variantTag) {
+                                    it->m_keyId == keyId &&
+                                    reinterpret_cast<int>(it->m_variantTag) == reinterpret_cast<int>(variantTag)) {
                                     loadPdt = it;
                                     break;
                                 }

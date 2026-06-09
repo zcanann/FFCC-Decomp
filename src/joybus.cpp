@@ -5982,7 +5982,7 @@ int JoyBus::SendCmd(ThreadParam* threadParam)
 int JoyBus::SendBonusStr(ThreadParam* threadParam)
 {
     unsigned int port;
-    int result = 0;
+    int result;
     unsigned char subState = threadParam->m_subState;
 
     switch (subState)
@@ -6100,9 +6100,12 @@ int JoyBus::SendBonusStr(ThreadParam* threadParam)
                 result = 0;
             }
         }
-    
+
         break;
     }
+    default:
+        result = 0;
+        break;
     }
 
     if (result == 0)

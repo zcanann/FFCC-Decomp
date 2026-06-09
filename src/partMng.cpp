@@ -473,7 +473,6 @@ void CPartMng::pppDumpMngSt()
     unsigned long heapUse;
     unsigned long heapFree;
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    PppPdtSlot* pdtSlots = m_pdtSlots;
 
     if (static_cast<unsigned int>(System.m_execParam) >= 1U) {
         System.Printf(const_cast<char*>(sPartMngDumpSeparator));
@@ -491,7 +490,7 @@ void CPartMng::pppDumpMngSt()
             System.Printf(
                 const_cast<char*>(sPartMngDumpEntryFmt), mng->m_prioTime,
                 mng->m_prio, heapSize, kind, static_cast<int>(mng->m_nodeIndex), heapGroup,
-                pdtSlots[kind].m_name);
+                m_pdtSlots[kind].m_name);
         }
 
         base += 0x158;

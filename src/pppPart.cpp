@@ -357,6 +357,8 @@ void pppDestroyHeap(_pppEnvSt* pppEnvSt)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_propagation off
 void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, int line)
 {
 	int firstAllocFailure = 1;
@@ -487,6 +489,7 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 	ppvMemAllocErrorF = 1;
 	return 0;
 }
+#pragma pop
 
 /*
  * --INFO--

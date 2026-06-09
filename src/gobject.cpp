@@ -1998,7 +1998,7 @@ void CGObject::onDraw()
         capsuleOffset.x = sZeroFloat;
         capsuleOffset.y = sZeroFloat;
         capsuleOffset.z = sZeroFloat;
-        if (m_bodyEllipsoidOffset == sZeroFloat) {
+        if (*reinterpret_cast<int*>(&m_bodyEllipsoidOffset) == 0) {
         } else {
             capsuleOffset.y = sZeroFloat;
             capsuleOffset.x = m_bodyEllipsoidOffset * -sinf(m_rotBaseY);

@@ -1374,8 +1374,7 @@ void CMiniGamePcs::OpenCallback(MgGbaThreadParam* param, void* context)
             if (compareResult == 0)
             {
                 unsigned int savedTick = *reinterpret_cast<unsigned int*>(self + (static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16B4));
-                unsigned int currentTick = *reinterpret_cast<unsigned int*>(paramBytes + 0x88);
-                if (baseTick == savedTick || baseTick == currentTick)
+                if (baseTick == savedTick || baseTick == *reinterpret_cast<unsigned int*>(paramBytes + 0x88))
                 {
                     *reinterpret_cast<int*>(self + (static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16B4)) = baseTick;
                     *reinterpret_cast<int*>(paramBytes + 0x88) = baseTick;
@@ -1392,17 +1391,16 @@ void CMiniGamePcs::OpenCallback(MgGbaThreadParam* param, void* context)
     else
     {
         unsigned char swapByte = paramBytes[0x2A];
-        int swapWord = *reinterpret_cast<int*>(paramBytes + 0x34);
 
         paramBytes[0x2A] = self[static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16AE];
+        int swapWord = *reinterpret_cast<int*>(paramBytes + 0x34);
         *reinterpret_cast<int*>(paramBytes + 0x34) = *reinterpret_cast<int*>(self + (static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16B8));
 
         int compareResult = memcmp(paramBytes + 0x28, self + (static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16AC), 0x60);
         if (compareResult == 0)
         {
             unsigned int savedTick = *reinterpret_cast<unsigned int*>(self + (static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16B4));
-            unsigned int currentTick = *reinterpret_cast<unsigned int*>(paramBytes + 0x88);
-            if (baseTick == savedTick || baseTick == currentTick)
+            if (baseTick == savedTick || baseTick == *reinterpret_cast<unsigned int*>(paramBytes + 0x88))
             {
                 *reinterpret_cast<int*>(self + (static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16B4)) = baseTick;
                 *reinterpret_cast<int*>(paramBytes + 0x88) = baseTick;

@@ -943,14 +943,12 @@ void CGPartyObj::onFrameAlways()
 
 	if ((MiniGamePcs.m_flags & 0x2000) != 0) {
 		int itemId;
-		unsigned short itemModel;
 		do {
 			itemId = Math.Rand(0x155) + 0x9F;
 			unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2] + itemId * 0x48);
-			itemModel = *reinterpret_cast<unsigned short*>(itemData + 2);
-		} while ((*reinterpret_cast<short*>(Game.unkCFlatData0[2] + itemId * 0x48) == 0) ||
-		         ((itemModel & 0x0FFF) == 0) ||
-		         ((itemModel & 0x0FFF) == 0x0FFF) ||
+		} while ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48) == 0) ||
+		         ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 2) & 0x0FFF) == 0) ||
+		         ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 2) & 0x0FFF) == 0x0FFF) ||
 		         (itemId == 400));
 
 		if (reinterpret_cast<int>(m_scriptHandle[0xED]) == 0) {
@@ -4720,10 +4718,7 @@ void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 		leaderPtr += 0xC;
 	}
 
-	if (outDist < flatLen) {
-		flatLen = outDist;
-	}
-	outDist = flatLen;
+	outDist = (outDist < flatLen) ? outDist : flatLen;
 	if (outDist > DOUBLE_80331AA8) {
 		activeTrailCount = 0;
 		outVec->x = m_partyDelta[0].x;

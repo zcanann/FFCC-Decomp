@@ -1092,7 +1092,7 @@ timeout_expiry:
                     goto recompute_timeout;
                 }
 
-                if (GbaQue.GetChgHitFlg(threadParam->m_portIndex) != 0)
+                if ((int)GbaQue.GetChgHitFlg(threadParam->m_portIndex) != 0)
                 {
                     unsigned int hitInfo = GbaQue.GetHitEInfo(threadParam->m_portIndex);
                     if (SendHitEnemy(threadParam->m_portIndex, (char)(unsigned short)(hitInfo >> 16),
@@ -1142,7 +1142,7 @@ timeout_expiry:
                 GbaQue.ClrMemorysFlg(threadParam->m_portIndex);
             }
 
-            if (GbaQue.GetChgRadarMode(threadParam->m_portIndex))
+            if ((int)GbaQue.GetChgRadarMode(threadParam->m_portIndex) != 0)
             {
                 if (SendRaderMode(threadParam) < 0)
                 {
@@ -1225,14 +1225,14 @@ timeout_expiry:
 
             if (m_stateCodeArr[threadParam->m_portIndex] == 7)
             {
-                if (GbaQue.GetFavoriteFlg(threadParam->m_portIndex) != 0)
+                if ((int)GbaQue.GetFavoriteFlg(threadParam->m_portIndex) != 0)
                 {
                     threadParam->m_state = 0x2c;
                     goto recompute_timeout;
                 }
             }
 
-            if (GbaQue.GetMoneyFlg(threadParam->m_portIndex) == 1)
+            if ((int)GbaQue.GetMoneyFlg(threadParam->m_portIndex) == 1)
             {
                 unsigned int money = GbaQue.GetMoney(threadParam->m_portIndex);
                 if (SetMoney(threadParam->m_portIndex, money) == 0)
@@ -1303,7 +1303,7 @@ timeout_expiry:
                 goto recompute_timeout;
             }
 
-            if (GbaQue.GetMoneyFlg(threadParam->m_portIndex) == 1)
+            if ((int)GbaQue.GetMoneyFlg(threadParam->m_portIndex) == 1)
             {
                 unsigned int money = GbaQue.GetMoney(threadParam->m_portIndex);
                 if (SetMoney(threadParam->m_portIndex, money) == 0)
@@ -1803,7 +1803,7 @@ timeout_expiry:
         case 0x35:
         {
             int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
-            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetSellFlg(threadParam->m_portIndex) != 0)
+            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && (int)GbaQue.GetSellFlg(threadParam->m_portIndex) != 0)
             {
                 threadParam->m_state = '6';
                 memset(m_perThreadTemp[threadParam->m_portIndex], 0, sizeof(m_perThreadTemp[threadParam->m_portIndex]));

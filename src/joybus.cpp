@@ -7985,7 +7985,6 @@ void JoyBus::RestartThread()
             Joybus.m_gbaBootImage[0xAF] = Joybus.m_diskId[3];
 
             char* p = Joybus.m_gbaBootImage + 0xBC;
-            int left = 1;
 
             unsigned char sum =
                 (signed char)(
@@ -8020,14 +8019,10 @@ void JoyBus::RestartThread()
                     - Joybus.m_gbaBootImage[0xBB])
                 );
 
-            do
+            for (; idx < 0xBD; idx++)
             {
-                unsigned char v = *p++;
-                idx++;
-                sum -= v;
-                left--;
+                sum -= *p++;
             }
-            while (left != 0);
 
             Joybus.m_gbaBootImage[idx] = sum;
 
@@ -8042,7 +8037,7 @@ void JoyBus::RestartThread()
         err = 0;
     }
 
-    if (err != 0 && (unsigned int)System.m_execParam > 1)
+    if (err != 0 && (unsigned int)System.m_execParam >= 2)
 	{
         System.Printf(const_cast<char*>(s_load_bin_error));
 	}
@@ -8052,36 +8047,27 @@ void JoyBus::RestartThread()
     Joybus.m_threadInitFlag = 0;
     Joybus.m_threadRunningMask = 0;
 
-    JoyBus* jbA = &Joybus;
-    JoyBus* jbB = &Joybus;
-
     for (int i = 0; i < 4; i++)
     {
-        jbB->m_threadParams[i].m_portIndex = i;
-        jbB->m_threadParams[i].m_gbaStatus = 1;
-
-        unsigned char* stackBase = (unsigned char*)m_sendBuffer;
+        Joybus.m_threadParams[i].m_portIndex = i;
+        Joybus.m_threadParams[i].m_gbaStatus = 1;
 
         OSCreateThread(
-            &jbA->m_threads[i],
+            &Joybus.m_threads[i],
             (void* (*)(void*))JoyBus::_ThreadMain,
-            &jbB->m_threadParams[i],
-            stackBase,
-            sizeof(jbA->m_sendBuffer[0]),
+            &Joybus.m_threadParams[i],
+            &Joybus.m_sendBuffer[i + 1],
+            sizeof(Joybus.m_sendBuffer[0]),
             8,
             1
         );
 
-        OSResumeThread(&jbA->m_threads[0]);
+        OSResumeThread(&Joybus.m_threads[i]);
 
-        Joybus.m_threadRunningMask |= (unsigned char)(1 << i);
-
-        jbA = (JoyBus*)(jbA->m_recvBuffer[0].m_payload + 0x290);
-        jbB = (JoyBus*)(jbB->m_pathBuf + 0x3C);
-
+        Joybus.m_threadRunningMask |= (1 << i);
     }
 
-    if ((unsigned int)System.m_execParam > 1)
+    if ((unsigned int)System.m_execParam >= 2)
         System.Printf(const_cast<char*>(s_thread_init_end));
 }
 

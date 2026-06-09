@@ -2323,12 +2323,13 @@ void CPartMng::pppEditBeforeCalc()
                 gPppInSubFrameCalc = 1;
             }
 
-            CCharaPcs::CHandle* handle = (*editorObj)->m_charaModelHandle;
+#define handle ((*editorObj)->m_charaModelHandle)
             if (handle != 0) {
                 handle->LoadAnim(reinterpret_cast<char*>(self + 0x19c), gPppInConstructor, 0, -1, -1, -1, 0);
                 handle->SetAnim(gPppInConstructor, -1, -1, -1, 0);
                 gPppInConstructor++;
             }
+#undef handle
         }
         break;
     case 0x1b:

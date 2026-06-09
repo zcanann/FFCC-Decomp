@@ -2393,10 +2393,13 @@ foundModel:
     if (loadModel != 0) {
         m_modelLoadRef = loadModel;
 
-        CMemory::CStage* modelStage = CharaPcs.m_viewerModelStage;
+        int modelStageIndex;
         if (specialModelStage != 0) {
-            modelStage = m_charaKind == 3 ? CharaPcs.m_familyModelStage : CharaPcs.m_weaponModelStage;
+            modelStageIndex = m_charaKind == 3 ? 5 : 4;
+        } else {
+            modelStageIndex = 0;
         }
+#define modelStage ((&CharaPcs.m_viewerModelStage)[modelStageIndex])
 
         if (loadModel->GetRef() == 1) {
             if (loadModel->m_streamMode != 0) {
@@ -2425,6 +2428,7 @@ foundModel:
             m_modelLoadRef->AddRef();
             m_model = loadModel->m_model->Duplicate(SelectLoadStage(&CharaPcs, modelStage));
         }
+#undef modelStage
     } else {
         if (static_cast<unsigned int>(System.m_execParam) >= 1) {
             System.Printf(const_cast<char*>(s_charaModelLoadDvdFmt), charaKind, static_cast<int>(charaNo));

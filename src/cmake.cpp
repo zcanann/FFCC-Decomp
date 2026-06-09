@@ -3106,8 +3106,7 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
     const char* yesStr = GetMenuStr(1);
     float yesW = static_cast<float>(font->GetWidth(yesStr));
     int yesX = static_cast<int>(
-        (static_cast<float>(static_cast<double>(48.0f) - static_cast<double>(yesW)) * 0.5f) +
-        0x1D0);
+        (48.0f - yesW) * 0.5f + static_cast<float>(0x1D0));
     font->SetPosX(static_cast<float>(yesX));
     font->SetPosY(369.0f);
     font->Draw(yesStr);
@@ -3115,8 +3114,7 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
     const char* noStr = GetMenuStr(2);
     float noW = static_cast<float>(font->GetWidth(noStr));
     int noX = static_cast<int>(
-        (static_cast<float>(static_cast<double>(48.0f) - static_cast<double>(noW)) * 0.5f) +
-        0x218);
+        (48.0f - noW) * 0.5f + static_cast<float>(0x218));
     font->SetPosX(static_cast<float>(noX));
     font->SetPosY(369.0f);
     font->Draw(noStr);

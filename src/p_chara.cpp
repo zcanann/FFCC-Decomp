@@ -2416,7 +2416,8 @@ foundModel:
                     static_cast<unsigned long>(loadModel->m_streamSize));
                 CChara::CModel* model =
                     new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x7C7) CChara::CModel;
-                model->Create(File.m_readBuffer, SelectLoadStage(&CharaPcs, modelStage));
+                void* amemBuffer = File.m_readBuffer;
+                model->Create(amemBuffer, SelectLoadStage(&CharaPcs, modelStage));
                 loadModel->m_model = model;
                 File.UnlockBuffer();
             }
@@ -2475,7 +2476,8 @@ foundModel:
         if (fileHandle != 0) {
             File.Read(fileHandle);
             File.SyncCompleted(fileHandle);
-            m_model->CreateDynamics(File.m_readBuffer, HandleModelStage(charaKind, 0));
+            void* dynamicsBuffer = File.m_readBuffer;
+            m_model->CreateDynamics(dynamicsBuffer, HandleModelStage(charaKind, 0));
             File.Close(fileHandle);
             if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                 System.Printf(const_cast<char*>(s_charaDynamicsLoadDvdFmt), charaKind, static_cast<int>(charaNo));

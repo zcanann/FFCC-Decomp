@@ -3883,7 +3883,10 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
         {
             if ((signed char)sendType != 3 && (signed char)sendType != 2 && (signed char)sendType != 6 && (signed char)sendType != 7 && (signed char)sendType != 8 && (signed char)sendType != 9)
             {
+                unsigned int singleWord = 0;
                 GbaQue.IsSingleMode(threadParam->m_portIndex);
+                reinterpret_cast<unsigned char*>(&singleWord)[0] = 0x09;
+                reinterpret_cast<unsigned char*>(&singleWord)[1] = 0;
 
                 if (static_cast<signed char>(m_threadRunningMask) == 0)
                 {
@@ -3901,7 +3904,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
                     }
                     else
                     {
-                        m_cmdQueueData[qPort][m_cmdCount[qPort]] = 0x09000000;
+                        m_cmdQueueData[qPort][m_cmdCount[qPort]] = singleWord;
                         m_cmdCount[threadParam->m_portIndex]++;
 
                         OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
@@ -3917,14 +3920,15 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
                 }
             }
 
-            if ((signed char)sendType == 0)
+            signed char st = sendType;
+            if (st == 0)
             {
                 unsigned char* baseA = reinterpret_cast<unsigned char*>(m_fileBaseA);
                 dataPtr = baseA;
                 dataBase = baseA;
                 totalSize = static_cast<unsigned short>(m_fileBaseA_dup);
             }
-            else if ((signed char)sendType == 1)
+            else if (st == 1)
             {
                 unsigned char* baseB = reinterpret_cast<unsigned char*>(m_fileBaseB);
                 dataPtr = baseB;
@@ -3933,7 +3937,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
             }
             else
             {
-                if ((signed char)sendType != 3 && (signed char)sendType != 2 && (signed char)sendType != 6 && (signed char)sendType != 7 && (signed char)sendType != 8 && (signed char)sendType != 9)
+                if (st != 3 && st != 2 && st != 6 && st != 7 && st != 8 && st != 9)
                 {
                     if (System.m_execParam != 0)
                     {

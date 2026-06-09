@@ -2454,9 +2454,7 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 
 	CGPrgObj* sourceObj = reinterpret_cast<CGPrgObj*>(source);
 	unsigned short powerValue;
-	if ((((static_cast<unsigned int>(__cntlzw(0x2D - (static_cast<unsigned short>(source->GetCID()) & 0x2D)))) >> 5) & 0xFFU) == 0) {
-		powerValue = *reinterpret_cast<unsigned short*>(itemData + 0x2E);
-	} else {
+	if ((((static_cast<unsigned int>(__cntlzw(0x2D - (static_cast<unsigned short>(source->GetCID()) & 0x2D)))) >> 5) & 0xFFU) != 0) {
 		bool stageModeActive = false;
 		bool usePartySource = false;
 		bool usePartyLeader = false;
@@ -2478,6 +2476,8 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 			powerSource = Game.m_partyObjArr[0];
 		}
 		powerValue = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(powerSource->m_scriptHandle[9]) + 0x198);
+	} else {
+		powerValue = *reinterpret_cast<unsigned short*>(itemData + 0x2E);
 	}
 
 	unsigned int power = powerValue;

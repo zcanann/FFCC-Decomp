@@ -865,7 +865,7 @@ void CMenuPcs::CmakeVillageDraw()
     }
     DrawCmakeName(1, showNameCursor, s_CmakeInfo.m_name, alpha);
     DrawCmakeDecision((static_cast<unsigned int>(villageWork->m_row) >> 31) +
-        (static_cast<int>(villageWork->m_row) > 4), alpha);
+        (static_cast<int>(villageWork->m_row) >= 5), alpha);
 }
 
 /*
@@ -1269,22 +1269,21 @@ void CMenuPcs::CmakeResultDraw1()
     valueFont->SetColor(valueColor.color);
     valueFont->SetTlut(6);
 
+    char tribeWithSlash[0x40];
     for (int i = 0; i < 4; i++) {
         const char* txt = "";
 
-        switch (i) {
-        case 0:
+        if (i == 0) {
             txt = s_CmakeInfo.m_name;
-            break;
-        case 1:
+        } else if (i == 1) {
             txt = GetMenuStr(s_CmakeInfo.m_gender + 0x11);
-            break;
-        case 2:
+        } else if (i == 2) {
             txt = GetTribeStr(s_CmakeInfo.m_tribe);
-            break;
-        default:
+            strcpy(tribeWithSlash, txt);
+            strcat(tribeWithSlash, "/");
+            txt = tribeWithSlash;
+        } else {
             txt = GetJobStr(s_CmakeInfo.m_job);
-            break;
         }
 
         float x = 8.0f + labelWidths[i];

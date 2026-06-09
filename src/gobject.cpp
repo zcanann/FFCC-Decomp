@@ -231,6 +231,8 @@ void CGBaseObj::onFrame()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma optimization_level 2
 void CGObject::onCreate()
 {
     m_worldPosition.z = 0.0f;
@@ -417,6 +419,7 @@ void CGObject::onCreate()
     memset(&m_damageColliders[0].m_localPosition.y, 0, 0x140);
     memset(m_dropItemCodes, 0, sizeof(m_dropItemCodes));
 }
+#pragma pop
 
 /*
  * --INFO--

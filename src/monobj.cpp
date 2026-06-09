@@ -3021,7 +3021,8 @@ void CGMonObj::moveAStar(int startGroup, int forbiddenGroup, Vec& targetPos)
 				if (static_cast<unsigned short>(nextGroup) == routeFrom) {
 					nextGroup = escapePos->m_groupB;
 				}
-				unsigned char* routeStep = AStar.m_routeTable[routeFrom - 1][static_cast<unsigned char>(nextGroup + 0x36)];
+				unsigned char* routeStep = reinterpret_cast<unsigned char*>(&AStar) +
+					routeFrom * 0x80 + static_cast<unsigned char>(nextGroup + 0x36) * 2 + 0x40c;
 				float portalDist = PSVECDistance(&object->m_worldPosition, &escapePos->m_position);
 				if ((portalDist < object->m_capsuleHalfHeight) || (startGroup == routeStep[0])) {
 					routePrev = routeFrom;
@@ -3359,24 +3360,24 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 		if (selectorType == 0) {
 			float maxDist = static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x114));
 			float minDist = static_cast<float>(static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x112)));
-			short chance = *reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x116);
+			unsigned int chance = *reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x116);
 
 			if ((targetDist < maxDist) && (minDist < targetDist)) {
 
-			bool forceAction = false;
+			int forceAction = 0;
 			CGPartyObj* party = Game.m_partyObjArr[partyIndex];
 			int partyState = reinterpret_cast<CGPrgObj*>(party)->m_lastStateId;
 			if (((partyState == 1) || (partyState == 7)) &&
 				((float)__fabs(Math.DstRot(object->m_rotBaseY, reinterpret_cast<CGObject*>(party)->m_rotBaseY)) > kMonObjHalfPi)) {
 				if (*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) {
-					if (monObj->m_forcedAction != *reinterpret_cast<short*>(aiScript + actionOffset + 0x11E)) {
+					if (monObj->m_forcedAction != static_cast<short>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x11E))) {
 						goto skipForce;
 					}
 				} else if ((*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) ||
 					(monObj->m_forcedAction != actionIndex)) {
 					goto skipForce;
 				}
-				forceAction = true;
+				forceAction = 1;
 			}
 		skipForce:
 

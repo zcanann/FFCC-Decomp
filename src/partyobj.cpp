@@ -171,7 +171,8 @@ static int getPadConnectedForSlot(int slot)
 		return 0;
 	}
 
-	int idx = slot & ~((~(Pad.m_debugPadPort - slot | slot - Pad.m_debugPadPort) >> 31));
+	int selectedPort = Pad.m_debugPadPort;
+	unsigned int idx = slot & ~((int)~(selectedPort - slot | slot - selectedPort) >> 31);
 	return Pad.GetPadInputs()[idx].gbaMode;
 }
 
@@ -182,7 +183,8 @@ static unsigned short getPadButtonUpForSlot(int slot)
 		return 0;
 	}
 
-	int idx = slot & ~((~(Pad.m_debugPadPort - slot | slot - Pad.m_debugPadPort) >> 31));
+	int selectedPort = Pad.m_debugPadPort;
+	unsigned int idx = slot & ~((int)~(selectedPort - slot | slot - selectedPort) >> 31);
 	return Pad.GetPadInputs()[idx].buttonUp;
 }
 
@@ -217,7 +219,8 @@ static float getPadLeftStickXForSlot(int slot)
 		return 0.0f;
 	}
 
-	int idx = slot & ~((~(Pad.m_debugPadPort - slot | slot - Pad.m_debugPadPort) >> 31));
+	int selectedPort = Pad.m_debugPadPort;
+	unsigned int idx = slot & ~((int)~(selectedPort - slot | slot - selectedPort) >> 31);
 	return Pad.GetPadInputs()[idx].stickXF;
 }
 
@@ -228,7 +231,8 @@ static float getPadLeftStickYForSlot(int slot)
 		return 0.0f;
 	}
 
-	int idx = slot & ~((~(Pad.m_debugPadPort - slot | slot - Pad.m_debugPadPort) >> 31));
+	int selectedPort = Pad.m_debugPadPort;
+	unsigned int idx = slot & ~((int)~(selectedPort - slot | slot - selectedPort) >> 31);
 	return Pad.GetPadInputs()[idx].stickYF;
 }
 

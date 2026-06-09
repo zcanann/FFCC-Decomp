@@ -1837,43 +1837,68 @@ card_connected:;
             }
         }
 
-        if (m_returnTransfer == 0) {
-            m_drawCursor = 1;
-            m_cursorListY0 = 0xb1;
-            m_cursorListY1 = 0xdc;
-            m_cursorMode = 0;
-        } else {
-            m_drawCursor = 1;
-            m_cursorListY0 = 0x8b;
-            m_cursorListY1 = 0xdc;
-            m_cursorMode = 0;
-        }
         {
             unsigned char next;
 
-            if (MenuPcs.m_menuWindowInfo->state != 1) {
-                next = 0;
-                goto do_switch_go10;
-            }
+            if (m_returnTransfer == 0) {
+                m_drawCursor = 1;
+                m_cursorListY0 = 0xb1;
+                m_cursorListY1 = 0xdc;
+                m_cursorMode = 0;
 
-            input = GetGoOutInputMask();
-            if ((input & 3) != 0) {
-                m_cursorChoice ^= 1;
-                Sound.PlaySe(1, 0x40, 0x7f, 0);
-            } else {
-                input = GetGoOutInputMask();
-                if ((input & 0x100) != 0) {
-                    if (m_cursorChoice == 0) {
-                        Sound.PlaySe(2, 0x40, 0x7f, 0);
-                    } else if (m_cursorChoice == 1) {
-                        Sound.PlaySe(3, 0x40, 0x7f, 0);
-                    }
-                    next = static_cast<unsigned char>(m_cursorChoice + 1);
+                if (MenuPcs.m_menuWindowInfo->state != 1) {
+                    next = 0;
                     goto do_switch_go10;
                 }
-            }
 
-            next = 0;
+                input = GetGoOutInputMask();
+                if ((input & 3) != 0) {
+                    m_cursorChoice ^= 1;
+                    Sound.PlaySe(1, 0x40, 0x7f, 0);
+                } else {
+                    input = GetGoOutInputMask();
+                    if ((input & 0x100) != 0) {
+                        if (m_cursorChoice == 0) {
+                            Sound.PlaySe(2, 0x40, 0x7f, 0);
+                        } else if (m_cursorChoice == 1) {
+                            Sound.PlaySe(3, 0x40, 0x7f, 0);
+                        }
+                        next = static_cast<unsigned char>(m_cursorChoice + 1);
+                        goto do_switch_go10;
+                    }
+                }
+
+                next = 0;
+            } else {
+                m_drawCursor = 1;
+                m_cursorListY0 = 0x8b;
+                m_cursorListY1 = 0xdc;
+                m_cursorMode = 0;
+
+                if (MenuPcs.m_menuWindowInfo->state != 1) {
+                    next = 0;
+                    goto do_switch_go10;
+                }
+
+                input = GetGoOutInputMask();
+                if ((input & 3) != 0) {
+                    m_cursorChoice ^= 1;
+                    Sound.PlaySe(1, 0x40, 0x7f, 0);
+                } else {
+                    input = GetGoOutInputMask();
+                    if ((input & 0x100) != 0) {
+                        if (m_cursorChoice == 0) {
+                            Sound.PlaySe(2, 0x40, 0x7f, 0);
+                        } else if (m_cursorChoice == 1) {
+                            Sound.PlaySe(3, 0x40, 0x7f, 0);
+                        }
+                        next = static_cast<unsigned char>(m_cursorChoice + 1);
+                        goto do_switch_go10;
+                    }
+                }
+
+                next = 0;
+            }
         do_switch_go10:
             switch (next) {
             case 1:
@@ -1983,7 +2008,7 @@ card_connected:;
         m_cursorListY1 = 0xe7;
         m_cursorMode = 0;
         {
-            signed char next;
+            unsigned char next;
 
             if (MenuPcs.m_menuWindowInfo->state != 1) {
                 next = 0;

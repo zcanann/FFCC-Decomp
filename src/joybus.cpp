@@ -307,7 +307,7 @@ void JoyBus::CreateInit()
 
     if (m_fileBaseA == 0)
     {
-        m_fileBaseA = reinterpret_cast<unsigned int*>(new (GbaPcs.m_stage, const_cast<char*>(s_joybus_cpp), 0x137) char[len + 0x20]);
+        m_fileBaseA = reinterpret_cast<unsigned int*>(new (GbaPcs.m_stage, const_cast<char*>(s_joybus_cpp), 0x137) char[m_fileBaseA_dup + 0x20]);
 
         if (m_fileBaseA == (unsigned int*)nullptr && (unsigned int)System.m_execParam >= 1)
         {

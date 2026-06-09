@@ -2101,12 +2101,12 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 			reinterpret_cast<unsigned char*>(object->m_charaModelHandle) + 0x168);
 		Mtx bindMtx;
 		PSMTXCopy(*reinterpret_cast<Mtx*>(bind + 0x6C), bindMtx);
-		startPos.x = bindMtx[0][3] + *reinterpret_cast<float*>(modelData + 0x74);
-		startPos.y = bindMtx[1][3] + *reinterpret_cast<float*>(modelData + 0x84);
-		startPos.z = bindMtx[2][3] + *reinterpret_cast<float*>(modelData + 0x94);
-		bindMtx[0][3] = startPos.x;
-		bindMtx[1][3] = startPos.y;
-		bindMtx[2][3] = startPos.z;
+		bindMtx[0][3] = bindMtx[0][3] + *reinterpret_cast<float*>(modelData + 0x74);
+		bindMtx[1][3] = bindMtx[1][3] + *reinterpret_cast<float*>(modelData + 0x84);
+		bindMtx[2][3] = bindMtx[2][3] + *reinterpret_cast<float*>(modelData + 0x94);
+		startPos.x = bindMtx[0][3];
+		startPos.y = bindMtx[1][3];
+		startPos.z = bindMtx[2][3];
 
 		PSMTXMultVecSR(bindMtx, CVector(kMonObjDefaultScale, kMonObjZero, kMonObjZero), reinterpret_cast<Vec*>(&forward));
 		forward.y = kMonObjZero;

@@ -3492,7 +3492,7 @@ void CGCharaObj::combi2()
 	}
 
 	int fallback = 0;
-	int comboIndex = searchCombi(candidateCount, candidates, fallback);
+	unsigned int comboIndex = searchCombi(candidateCount, candidates, fallback);
 	if (comboIndex < 0) {
 		if (fallback == 0 || candidates[0]->m_comboFrame >= 0x42) {
 			candidates[0]->m_comboState = 0;
@@ -3578,7 +3578,7 @@ void CGCharaObj::combi2()
 
 		int linkCount = 0;
 		CGPrgObj** comboLinks = CharaObjComboLinks(party);
-		for (int j = 0; j < participantCount; j++) {
+		for (unsigned int j = 0; j < participantCount; j++) {
 			CGPartyObj* other = candidates[j];
 			if (party == other) {
 				continue;

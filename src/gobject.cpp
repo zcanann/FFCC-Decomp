@@ -263,7 +263,7 @@ void CGObject::onCreate()
     m_weaponModelHandle = 0;
     m_shieldModelHandle = 0;
 
-    m_animStateMisc = 0xFF;
+    *reinterpret_cast<char*>(&m_animStateMisc) = -1;
     m_weaponNodeFlagAll.m_bits1.m_shield = 0;
     m_weaponNodeFlagAll.m_bits1.m_menuReady = 1;
 

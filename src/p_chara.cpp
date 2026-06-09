@@ -995,14 +995,14 @@ int CCharaPcs::correctLoadAnimAmem()
  */
 void CCharaPcs::onScriptChanging(char*)
 {
-    for (unsigned int i = 0; i < 5; i++) {
+    for (int i = 0; i < 5; i++) {
         CColor white(0xFF, 0xFF, 0xFF, 0xFF);
         CColor shade;
 
         float scale = static_cast<float>(i) * 0.25f;
         shade.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.r) * scale));
         shade.color.g = static_cast<unsigned char>(static_cast<unsigned int>(static_cast<float>(white.color.g) * scale));
-        shade.color.b = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.b) * scale));
+        shade.color.b = static_cast<unsigned char>(static_cast<unsigned int>(static_cast<float>(white.color.b) * scale));
         shade.color.a = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.a) * scale));
         CColor shadeCopy(shade);
 
@@ -1765,7 +1765,7 @@ checkLoaded:
                     }
 
                     void* rawData = chunkFile.GetAddress();
-                    const int rawSize = static_cast<int>(chunk.m_size);
+                    const unsigned int rawSize = static_cast<int>(chunk.m_size);
 
                     if (dataType == 0) {
                         CLoadModel* loadModel = 0;
@@ -2272,12 +2272,12 @@ foundTexture:
         }
 
         if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-            System.Printf(const_cast<char*>(s_charaTexLoadAmemFmt), charaKind, static_cast<int>(charaNo),
+            System.Printf(const_cast<char*>(s_charaTexLoadAmemFmt), charaKind, static_cast<unsigned int>(charaNo),
                           static_cast<int>(textureVariant));
         }
     } else {
         if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-            System.Printf(const_cast<char*>(s_charaTexLoadDvdFmt), charaKind, static_cast<int>(charaNo),
+            System.Printf(const_cast<char*>(s_charaTexLoadDvdFmt), charaKind, static_cast<unsigned int>(charaNo),
                           static_cast<int>(textureVariant));
         }
 
@@ -2709,7 +2709,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
     if (drawPass != 1 && drawPass != 2 && (flags & 0x200000) == 0) {
         const unsigned int lightBank = (flags >> 19) & 1;
         const float phase = m_colorPhase * FLOAT_80330290;
-        int phaseIndex = static_cast<int>(phase);
+        unsigned int phaseIndex = static_cast<int>(phase);
         if (phaseIndex < 0) {
             phaseIndex = 0;
         }
@@ -2754,20 +2754,20 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
 
         CColor3 ambientBase(CharaPcs.m_viewerAmbientColor[lightBank]);
         CColor3 ambientShade;
-        ambientShade.color.r = static_cast<unsigned char>((static_cast<unsigned int>(ambientBase.color.r) * shade.color.r) / 255);
-        ambientShade.color.g = static_cast<unsigned char>((static_cast<unsigned int>(ambientBase.color.g) * shade.color.g) / 255);
+        ambientShade.color.r = static_cast<signed char>((static_cast<unsigned int>(ambientBase.color.r) * shade.color.r) / 255);
+        ambientShade.color.g = static_cast<signed char>((static_cast<unsigned int>(ambientBase.color.g) * shade.color.g) / 255);
         ambientShade.color.b = static_cast<unsigned char>((static_cast<unsigned int>(ambientBase.color.b) * shade.color.b) / 255);
         ambientShade.color.a = ambientBase.color.a;
         CColor3 ambientColor(ambientShade);
         _GXColor ambientGX = ambientColor.color;
         LightPcs.SetAmbient(ambientGX);
 
-        for (unsigned long i = 0; i < 3; i++) {
+        for (long i = 0; i < 3; i++) {
             CColor3 diffuseBase(CharaPcs.m_viewerDiffuseColor[lightBank][i]);
             CColor3 diffuseShade;
-            diffuseShade.color.r = static_cast<unsigned char>((static_cast<unsigned int>(diffuseBase.color.r) * shade.color.r) / 255);
-            diffuseShade.color.g = static_cast<unsigned char>((static_cast<unsigned int>(diffuseBase.color.g) * shade.color.g) / 255);
-            diffuseShade.color.b = static_cast<unsigned char>((static_cast<unsigned int>(diffuseBase.color.b) * shade.color.b) / 255);
+            diffuseShade.color.r = static_cast<signed char>((static_cast<unsigned int>(diffuseBase.color.r) * shade.color.r) / 255);
+            diffuseShade.color.g = static_cast<unsigned char>((static_cast<int>(diffuseBase.color.g) * shade.color.g) / 255);
+            diffuseShade.color.b = static_cast<unsigned char>((static_cast<int>(diffuseBase.color.b) * shade.color.b) / 255);
             diffuseShade.color.a = diffuseBase.color.a;
             CColor3 diffuseColor(diffuseShade);
             _GXColor diffuseGX = diffuseColor.color;
@@ -2860,7 +2860,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         const float nearZ = CameraPcs.m_nearZ;
         const float farZ = CameraPcs.m_farZ;
         CColor shadowFog;
-        shadowFog.color.r = static_cast<unsigned char>(static_cast<int>(255.0f * shadowFade));
+        shadowFog.color.r = static_cast<unsigned char>(static_cast<unsigned int>(255.0f * shadowFade));
         shadowFog.color.g = shadowFog.color.r;
         shadowFog.color.b = shadowFog.color.r;
         shadowFog.color.a = 0xFF;
@@ -2912,7 +2912,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
 
     if (drawPass == 1 || drawPass == 2) {
         if (drawPass == 2) {
-            const unsigned short shadowSize = static_cast<unsigned short>(CharaPcs.m_texShadowSize);
+            const short shadowSize = static_cast<short>(CharaPcs.m_texShadowSize);
             GXSetTexCopySrc(0, 0, shadowSize, shadowSize);
             GXSetTexCopyDst(shadowSize, shadowSize, GX_TF_I8, GX_FALSE);
             m_shadowTexturePtr = reinterpret_cast<unsigned char*>(CharaPcs.m_texShadowTextureBase) +

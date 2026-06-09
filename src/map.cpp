@@ -2338,7 +2338,7 @@ int CMapMng::ReadMid(char* mapName)
     sprintf(strTmp, const_cast<char*>(s_mapMidPathFmt), mapName);
     int ok = 1;
 
-    if (static_cast<int>(System.m_execParam) >= 3) {
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
         System.Printf(const_cast<char*>(s_read_mid_fmt), strTmp);
     }
 
@@ -2491,17 +2491,19 @@ int CMapMng::ReadMid(char* mapName)
         chunkFile.PopChunk();
     }
 
-    for (int i = 0; i < m_mapObjCount; i++) {
-        CMapObj* obj = &MapMng.m_mapObjArray[i];
+    CMapObj* obj = MapMng.m_mapObjArray;
+    for (int i = 0; i < m_mapObjCount; i++, obj++) {
         unsigned char type = obj->m_mapDataType;
-        CMapHit* hit = static_cast<CMapHit*>(obj->m_mapData);
-        if ((type == 2 || type == 3) && hit != 0) {
-            int hitIndex = hit - GetMapHitArray();
-            if (hitIndex >= m_mapHitCount) {
-                if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-                    System.Printf(const_cast<char*>(s_read_mid_hit_error));
+        if (type == 2 || type == 3) {
+            CMapHit* hit = static_cast<CMapHit*>(obj->m_mapData);
+            if (hit != 0) {
+                int hitIndex = hit - GetMapHitArray();
+                if (hitIndex >= m_mapHitCount) {
+                    if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+                        System.Printf(const_cast<char*>(s_read_mid_hit_error));
+                    }
+                    obj->m_mapData = 0;
                 }
-                obj->m_mapData = 0;
             }
         }
     }

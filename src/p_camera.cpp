@@ -653,7 +653,7 @@ void CCameraPcs::CalcQuake()
 
     u32 randX = static_cast<u32>(rand());
     u16 signX = static_cast<u16>(randX >> 0x1F);
-    short jitterSignX = static_cast<short>(((randX & 1) ^ signX) - signX);
+    unsigned short jitterSignX = static_cast<short>(((randX & 1) ^ signX) - signX);
 
     u32 randY = static_cast<u32>(rand());
     u16 signY = static_cast<u16>(randY >> 0x1F);

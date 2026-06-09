@@ -1417,7 +1417,7 @@ void CMenuPcs::InitCharaInfo()
 		int slotOffset = baseSlot * 0x50;
 		int baseX = 0x68;
 		for (int col = 0; col < 2; col++) {
-			int y = baseY;
+			int y =  (s32)(baseY);
 			if (row != 0) {
 				y = baseY + 8;
 			}

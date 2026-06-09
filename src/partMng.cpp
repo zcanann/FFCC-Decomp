@@ -1177,15 +1177,22 @@ void CPartMng::SetFp()
         mng->m_ownerFlagsInitialized = 1;
         mng->m_ownerFlagA = 1;
 
-        signed char mode = mng->m_matrixMode;
-        if (mode == 2 || mode == 4) {
+        unsigned char mode = mng->m_matrixMode;
+        switch (mode) {
+        case 2:
+        case 4:
             mng->m_mapObjIndex = static_cast<short>(MapMng.GetMapObjEffectIdx(*reinterpret_cast<short*>(fpBytes + 0x48)));
-        } else if (mode >= 3 && mode <= 8) {
+            break;
+        case 3:
+        case 5:
+        case 6:
+        case 7:
+        case 8:
 #define owner (*reinterpret_cast<CGObject**>(self + kUsbEditOffset + 0x1C))
             mng->m_ownerFlagA = 0;
             mng->m_owner = owner;
             mng->m_lookTarget = owner;
-            if (owner != 0 && owner->m_charaModelHandle != 0 && owner->m_charaModelHandle->m_model != 0) {
+            if (owner != 0) {
                 int node = owner->m_charaModelHandle->m_model->SearchNodeSk(reinterpret_cast<char*>(fpBytes + 0x50));
                 if (node >= 0) {
                     mng->m_bindNode = reinterpret_cast<void*>(
@@ -1195,6 +1202,7 @@ void CPartMng::SetFp()
                 }
             }
 #undef owner
+            break;
         }
 
         mng = reinterpret_cast<PppMngSetFpRaw*>(reinterpret_cast<unsigned char*>(mng) + sizeof(_pppMngSt));

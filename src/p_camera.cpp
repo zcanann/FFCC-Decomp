@@ -1324,15 +1324,23 @@ void CCameraPcs::calcMap()
     }
 
     if ((kCameraZeroF != moveDelta.x) || (kCameraZeroF != moveDelta.y) || (kCameraZeroF != moveDelta.z)) {
+        double boundsMin = kCameraBoundsMinInitial;
+        double boundsMax = kCameraBoundsMaxInitial;
+        double radius = kCameraDefaultNearZ;
         for (i = 4; i != 0; i--) {
-            hitCylinder.m_min.x = kCameraBoundsMinInitial;
-            hitCylinder.m_min.y = kCameraBoundsMinInitial;
-            hitCylinder.m_min.z = kCameraBoundsMinInitial;
-            hitCylinder.m_max.x = kCameraBoundsMaxInitial;
-            hitCylinder.m_max.y = kCameraBoundsMaxInitial;
-            hitCylinder.m_max.z = kCameraBoundsMaxInitial;
-            hitCylinder.m_radius = kCameraDefaultNearZ;
-            hitCylinder.m_bottom = PositionVec();
+            hitCylinder.m_min.z = boundsMin;
+            hitCylinder.m_min.y = boundsMin;
+            hitCylinder.m_min.x = boundsMin;
+            hitCylinder.m_max.z = boundsMax;
+            hitCylinder.m_max.y = boundsMax;
+            hitCylinder.m_max.x = boundsMax;
+            hitCylinder.m_bottom.x = PositionVec().x;
+            hitCylinder.m_bottom.y = PositionVec().y;
+            hitCylinder.m_bottom.z = PositionVec().z;
+            hitCylinder.m_axis.x = moveDelta.x;
+            hitCylinder.m_axis.y = moveDelta.y;
+            hitCylinder.m_axis.z = moveDelta.z;
+            hitCylinder.m_radius = radius;
             if (MapMng.CheckHitCylinder(reinterpret_cast<CMapCylinder*>(&hitCylinder), &moveDelta, 0xFFFFFFFF) != 0) {
                 MapMng.m_hitMapObj->CalcHitSlide(&moveDelta, kCameraTwoF);
             } else {

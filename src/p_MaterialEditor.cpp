@@ -277,17 +277,22 @@ void CMaterialEditorPcs::drawViewer()
                         pp->texCoord[3][0] = scaleU * static_cast<float>(S16ToDouble(u));
                     }
 
-                    if (polygon->v0 < 0) {
-                        polygon->v0 = -polygon->v0;
+                    s16 v;
+                    v = polygon->v0;
+                    if (v < 0) {
+                        polygon->v0 = -v;
                     }
-                    if (polygon->v1 < 0) {
-                        polygon->v1 = -polygon->v1;
+                    v = polygon->v1;
+                    if (v < 0) {
+                        polygon->v1 = -v;
                     }
-                    if (polygon->v2 < 0) {
-                        polygon->v2 = -polygon->v2;
+                    v = polygon->v2;
+                    if (v < 0) {
+                        polygon->v2 = -v;
                     }
-                    if (polygon->v3 < 0) {
-                        polygon->v3 = -polygon->v3;
+                    v = polygon->v3;
+                    if (v < 0) {
+                        polygon->v3 = -v;
                     }
 
                     pp = polygon;

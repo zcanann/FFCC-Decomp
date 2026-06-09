@@ -271,19 +271,31 @@ static int getCarryAnimNo(CGPartyObj* self, int carryType)
 		return 5;
 	}
 
-	unsigned char* script = reinterpret_cast<unsigned char*>(self->m_scriptHandle);
-	int entry = (*reinterpret_cast<unsigned short*>(script + 0x3E2) +
-	             *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2) * 0x1CA;
-	unsigned int table = Game.unk_flat3_field_30_0xc7e0 + entry;
 	if (carryType == 0) {
 		if (CFlatItemCarryMode() == 1) {
+			unsigned char* script = reinterpret_cast<unsigned char*>(self->m_scriptHandle);
+			unsigned int table = Game.unk_flat3_field_30_0xc7e0 +
+			    (*reinterpret_cast<unsigned short*>(script + 0x3E2) +
+			     *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2) * 0x1CA;
 			return *reinterpret_cast<unsigned short*>(table + 0x1C6);
 		}
+		unsigned char* script = reinterpret_cast<unsigned char*>(self->m_scriptHandle);
+		unsigned int table = Game.unk_flat3_field_30_0xc7e0 +
+		    (*reinterpret_cast<unsigned short*>(script + 0x3E2) +
+		     *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2) * 0x1CA;
 		return *reinterpret_cast<unsigned short*>(table + 0x1C2);
 	} else {
 		if (CFlatItemCarryMode() == 1) {
+			unsigned char* script = reinterpret_cast<unsigned char*>(self->m_scriptHandle);
+			unsigned int table = Game.unk_flat3_field_30_0xc7e0 +
+			    (*reinterpret_cast<unsigned short*>(script + 0x3E2) +
+			     *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2) * 0x1CA;
 			return *reinterpret_cast<unsigned short*>(table + 0x1C8);
 		}
+		unsigned char* script = reinterpret_cast<unsigned char*>(self->m_scriptHandle);
+		unsigned int table = Game.unk_flat3_field_30_0xc7e0 +
+		    (*reinterpret_cast<unsigned short*>(script + 0x3E2) +
+		     *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2) * 0x1CA;
 		return *reinterpret_cast<unsigned short*>(table + 0x1C4);
 	}
 }
@@ -898,19 +910,22 @@ void CGPartyObj::onFrameAlways()
 
 	reinterpret_cast<CCaravanWork*>(m_scriptHandle)->CalcStatus();
 	int port = reinterpret_cast<int>(m_scriptHandle[0xED]);
-	int showTraceParticle = 0;
-	if ((Game.m_gameWork.m_gameInitFlag != 0) &&
-	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 28) & 0xC0000000) >> 31) != 0) &&
-	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 29) & 0xC0000000) >> 31) != 0) &&
-	    ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) << 24) & 0xC0000000) >> 31) != 0) &&
-	     (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1)) << 24) & 0xC0000000) >> 31) != 0)) &&
-	    (m_lastStateId != 6 && m_lastStateId != 2)) {
-		if ((Game.m_gameWork.m_menuStageMode == 0) ||
-		    (Game.m_gameWork.m_bossArtifactStageIndex >= 0x0F) ||
+	int showTraceParticle;
+	if ((static_cast<int>(Game.m_gameWork.m_gameInitFlag) == 0) ||
+	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 28) & 0xC0000000) >> 31) == 0) ||
+	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 29) & 0xC0000000) >> 31) == 0) ||
+	    ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) << 24) & 0xC0000000) >> 31) == 0) ||
+	     (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1)) << 24) & 0xC0000000) >> 31) == 0)) ||
+	    (m_lastStateId == 6 || m_lastStateId == 2)) {
+		showTraceParticle = 0;
+	} else if ((Game.m_gameWork.m_menuStageMode == 0) ||
+		    (Game.m_gameWork.m_menuStageMode == 0) ||
+		    (Game.m_gameWork.m_bossArtifactStageIndex > 0x0E) ||
 		    ((static_cast<unsigned short>(GetCID()) & 0x6D) != 0x6D) ||
 		    (reinterpret_cast<int>(m_scriptHandle[0xED]) == 0)) {
-			showTraceParticle = 1;
-		}
+		showTraceParticle = 1;
+	} else {
+		showTraceParticle = 0;
 	}
 
 	int& traceSlot = PartyTraceParticleSlot(port);
@@ -1182,39 +1197,37 @@ void CGPartyObj::command()
 			unsigned char* targetBytes = reinterpret_cast<unsigned char*>(target);
 			const int targetState = *reinterpret_cast<int*>(targetBytes + 0x500);
 
-			bool canAddBlock = false;
-			switch (targetState) {
-			case 0x24:
-				canAddBlock = true;
-				break;
-			case 0x0A:
-			case 0x0C:
-			case 0x0D:
-			case 0x0E:
-			case 0x0F:
-			case 0x10:
-			case 0x11:
-				if (*reinterpret_cast<unsigned int*>(targetBytes + 0x550) == 0) {
-					secondaryAvailable = true;
-					secondaryCommand = 4;
+			if (targetState == 0x24) {
+				goto tmpArtifactBlock;
+			}
+			if (targetState < 0x24) {
+				if (targetState < 0x12) {
+					if (targetState != 0x0B && (targetState > 0x0A || targetState > 0x09) &&
+					    *reinterpret_cast<int*>(targetBytes + 0x550) == 0) {
+						secondaryAvailable = true;
+						secondaryCommand = 4;
+					}
+				} else if (targetState < 0x1C) {
+					if (targetState < 0x19) {
+tmpArtifactBlock:
+						if (*reinterpret_cast<int*>(targetBytes + 0x550) == 0) {
+							secondaryAvailable = true;
+							if ((targetState == 0x24 && caravan->CanAddTmpArtifact(1) != 0) ||
+							    (*reinterpret_cast<int*>(targetBytes + 0x500) == 0x20 &&
+							     caravan->CanAddGil(*reinterpret_cast<int*>(targetBytes + 0x558)) != 0) ||
+							    ((*reinterpret_cast<int*>(targetBytes + 0x500) != 0x24 &&
+							      *reinterpret_cast<int*>(targetBytes + 0x500) != 0x20) &&
+							     *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xB4) + 1 <= 0x40)) {
+								secondaryCommand = 0x17;
+							} else {
+								secondaryCommand = 4;
+							}
+						}
+					}
+				} else if (targetState < 0x22) {
+					goto tmpArtifactBlock;
 				}
-				break;
-			case 0x12:
-			case 0x13:
-			case 0x14:
-			case 0x15:
-			case 0x16:
-			case 0x17:
-			case 0x18:
-			case 0x1C:
-			case 0x1D:
-			case 0x1E:
-			case 0x1F:
-			case 0x20:
-			case 0x21:
-				canAddBlock = true;
-				break;
-			case 0xCA:
+			} else if (targetState == 0xCA) {
 				if (static_cast<int>(CFlatCenterState()) == 0) {
 					secondaryAvailable = true;
 					secondaryCommand = 0x1C;
@@ -1222,43 +1235,27 @@ void CGPartyObj::command()
 					primaryAvailable = true;
 					primaryCommand = 0x1C;
 				}
-				break;
-			case 0xCC:
+			} else if (targetState < 0xCA) {
+				if (targetState == 0xC8) {
+					if (static_cast<int>(CFlatCenterState()) == 0) {
+						secondaryAvailable = true;
+						secondaryCommand = 0x0B;
+					} else {
+						primaryAvailable = true;
+						primaryCommand = 0x0B;
+					}
+				} else if (targetState > 0xC7) {
+					if (static_cast<int>(CFlatCenterState()) == 0) {
+						secondaryAvailable = true;
+						secondaryCommand = 0x0A;
+					} else {
+						primaryAvailable = true;
+						primaryCommand = 0x0A;
+					}
+				}
+			} else if (targetState == 0xCC) {
 				secondaryAvailable = true;
 				secondaryCommand = 6;
-				break;
-			case 0xC8:
-				if (static_cast<int>(CFlatCenterState()) == 0) {
-					secondaryAvailable = true;
-					secondaryCommand = 0x0B;
-				} else {
-					primaryAvailable = true;
-					primaryCommand = 0x0B;
-				}
-				break;
-			case 0xC9:
-				if (static_cast<int>(CFlatCenterState()) == 0) {
-					secondaryAvailable = true;
-					secondaryCommand = 0x0A;
-				} else {
-					primaryAvailable = true;
-					primaryCommand = 0x0A;
-				}
-				break;
-			}
-
-			if (canAddBlock && *reinterpret_cast<int*>(targetBytes + 0x550) == 0) {
-				secondaryAvailable = true;
-				if ((targetState == 0x24 && caravan->CanAddTmpArtifact(1) != 0) ||
-				    (*reinterpret_cast<int*>(targetBytes + 0x500) == 0x20 &&
-				     caravan->CanAddGil(*reinterpret_cast<int*>(targetBytes + 0x558)) != 0) ||
-				    ((*reinterpret_cast<int*>(targetBytes + 0x500) != 0x24 &&
-				      *reinterpret_cast<int*>(targetBytes + 0x500) != 0x20) &&
-				     *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x5A) + 1 < 0x41)) {
-					secondaryCommand = 0x17;
-				} else {
-					secondaryCommand = 4;
-				}
 			}
 		}
 
@@ -2761,8 +2758,10 @@ void CGPartyObj::checkTargetParticle()
 
 		float s = sin(angle);
 		float c = cos(angle);
-		targetPos->x += input.x * c - input.z * s;
-		targetPos->z += input.x * s + input.z * c;
+		float inX = input.x;
+		float inZ = input.z;
+		targetPos->x += inX * c - inZ * s;
+		targetPos->z += inX * s + inZ * c;
 
 		float dist = PSVECDistance(&m_worldPosition, targetPos);
 
@@ -4883,8 +4882,41 @@ void CGPartyObj::ghostPartyMog()
 			sGhostPartyWork.flagBits.flag10 = 1;
 			bossState = 2;
 			putParticle(299, 0, this, kMonObjOne, 0);
-		} else if (sGhostPartyWork.flagBits.flag08 != 0 ||
-		           static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x38)) < 10) {
+		} else if (sGhostPartyWork.flagBits.flag08 == 0 &&
+		           static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x38)) >= 10) {
+			int moodMode;
+			switch (Game.m_gameWork.m_bossArtifactStageIndex) {
+			default:
+			case 0:
+			case 1:
+			case 2:
+			case 3:
+				moodMode = 0;
+				break;
+			case 6:
+			case 10:
+				moodMode = 1;
+				break;
+			case 4:
+			case 8:
+			case 9:
+			case 0x0B:
+			case 0x0C:
+			case 0x0D:
+				moodMode = 2;
+				break;
+			}
+			if (moodMode == 1) {
+				if (CharaGhostValue(0x2054) < 0x32) {
+					bossState = 5;
+				} else if (CharaGhostValue(0x2054) > 0x5E) {
+					bossState = 4;
+				}
+			} else if (moodMode != 0 && moodMode < 3 && CharaGhostValue(0x2054) < 0x32) {
+				bossState = 6;
+			}
+			flags[0] = (flags[0] & 0xF7) | 8;
+		} else {
 			if (sGhostPartyWork.flagBits.flag10 == 0) {
 				int innerMode;
 				switch (Game.m_gameWork.m_bossArtifactStageIndex) {
@@ -4929,39 +4961,6 @@ void CGPartyObj::ghostPartyMog()
 			} else {
 				bossState = 8;
 			}
-		} else {
-			int moodMode;
-			switch (Game.m_gameWork.m_bossArtifactStageIndex) {
-			default:
-			case 0:
-			case 1:
-			case 2:
-			case 3:
-				moodMode = 0;
-				break;
-			case 6:
-			case 10:
-				moodMode = 1;
-				break;
-			case 4:
-			case 8:
-			case 9:
-			case 0x0B:
-			case 0x0C:
-			case 0x0D:
-				moodMode = 2;
-				break;
-			}
-			if (moodMode == 1) {
-				if (CharaGhostValue(0x2054) < 0x32) {
-					bossState = 5;
-				} else if (CharaGhostValue(0x2054) > 0x5E) {
-					bossState = 4;
-				}
-			} else if (moodMode != 0 && moodMode < 3 && CharaGhostValue(0x2054) < 0x32) {
-				bossState = 6;
-			}
-			flags[0] = (flags[0] & 0xF7) | 8;
 		}
 	}
 

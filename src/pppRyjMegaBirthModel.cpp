@@ -408,6 +408,8 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirthModel* work, PRyjMegaBirth
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma optimization_level 3
 void birth(
     _pppPObject* pObject, VRyjMegaBirthModel* work, PRyjMegaBirthModel* params, VColor* color,
     _PARTICLE_DATA* particleData, _PARTICLE_WMAT* particleWMat, _PARTICLE_COLOR* particleColor)
@@ -802,6 +804,7 @@ join_position:
         particleColor->m_colorFrameDeltas[3] = *(float*)(payload + 0x38);
     }
 }
+#pragma pop
 
 /*
  * --INFO--

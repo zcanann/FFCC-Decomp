@@ -2926,7 +2926,9 @@ int CGObject::IsAnimFinished(int mode)
                     hasModel = true;
                 }
 
-                if (hasModel && (slot != -1)) {
+                if (!hasModel || (slot == -1)) {
+                    result = 1;
+                } else {
                     CModelAnimState& model = ModelAnimState(handle->m_model);
                     if (model.m_anim != 0) {
                         animSpan = sAnimFrameOffset + (model.m_animEnd - model.m_animStart);
@@ -2963,8 +2965,6 @@ int CGObject::IsAnimFinished(int mode)
                     } else {
                         result = 1;
                     }
-                } else {
-                    result = 1;
                 }
 
                 result = static_cast<u32>(-static_cast<int>(result)) >> 0x1F;

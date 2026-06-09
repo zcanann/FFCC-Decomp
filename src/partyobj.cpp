@@ -2208,10 +2208,13 @@ void CGPartyObj::statCharge()
 			int item = m_itemId;
 			if (item == 0x1FC || item == 0x23D) {
 				int base;
-				if (item == 0x23D) {
+				switch (item) {
+				case 0x23D:
 					base = 0x6F;
-				} else if (item < 0x23D && item == 0x1FC) {
+					break;
+				case 0x1FC:
 					base = 0x1B;
+					break;
 				}
 				if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) > 1) {
 					addHp(-1, static_cast<CGPrgObj*>(0));

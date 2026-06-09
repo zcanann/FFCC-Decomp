@@ -4775,7 +4775,7 @@ void CGPartyObj::gpmCol()
 {
 	unsigned char* ghostWork = CGPartyObj::m_ghostWork;
 	int& activeTrailCount = *reinterpret_cast<int*>(ghostWork + 0x48);
-	int& trailIndex = *reinterpret_cast<int*>(ghostWork + 0x4C);
+#define trailIndex (*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x4C))
 	CGPartyObj* leader = Game.m_partyObjArr[0];
 
 	unsigned char* trailBase = ghostWork + 0x50;
@@ -4836,6 +4836,7 @@ void CGPartyObj::gpmCol()
 		trailIndex = gpmColClamp;
 	}
 #undef gpmColClamp
+#undef trailIndex
 }
 #pragma pop
 

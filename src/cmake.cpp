@@ -623,6 +623,7 @@ void CMenuPcs::calcVillageMenu()
     if (active != 0) {
         if (MenuU8(this, 0x16) == 0) {
             if (active != 0) {
+              if (active != 0) {
                 if (Game.m_gameWork.m_menuStageMode == 0) {
                     CFont*& font = m_fonts[CMAKE_FONT_VILLAGE];
                     if (font != 0) {
@@ -638,6 +639,7 @@ void CMenuPcs::calcVillageMenu()
                     villageWork = nullptr;
                 }
                 CmakeResult(this) = 0;
+              }
             }
         } else {
             CmakeMenuState* villageWork = CmakeVillageState(this);

@@ -7954,7 +7954,11 @@ void JoyBus::RestartThread()
     CreateInit();
     int err;
 
-    if (static_cast<signed char>(Joybus.m_binLoaded) == 0)
+    if (static_cast<signed char>(Joybus.m_binLoaded) != 0)
+    {
+        err = 0;
+    }
+    else
     {
         CFile::CHandle* file = File.Open((char*)&Joybus, 0, CFile::PRI_LOW);
 
@@ -8031,10 +8035,6 @@ void JoyBus::RestartThread()
             Joybus.m_binLoaded = 1;
             err = 0;
         }
-    }
-    else
-    {
-        err = 0;
     }
 
     if (err != 0 && (unsigned int)System.m_execParam >= 2)

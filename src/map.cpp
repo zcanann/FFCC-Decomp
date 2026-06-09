@@ -2021,7 +2021,13 @@ int CMapMng::ReadMpl(char* mapName)
                 }
             } else {
                 while (chunkFile.GetNextChunk(chunk)) {
-                    if (chunk.m_id == 0x4D455348 && chunk.m_arg0 == 1) {
+                    switch (chunk.m_id) {
+                    case 0x4D455348:
+                        break;
+                    default:
+                        continue;
+                    }
+                    if (chunk.m_arg0 == 1) {
                         return 1;
                     }
                 }
@@ -2762,10 +2768,7 @@ void CMapMng::Draw()
 
                 int startIndex = 0;
                 do {
-                    int batchCount = 8;
-                    if (shadowCount < batchCount) {
-                        batchCount = shadowCount;
-                    }
+                    int batchCount = (shadowCount > 8) ? 8 : shadowCount;
 
                     CharaPcs.GetTexShadow(startIndex, batchCount, texObjs, shadowPositions, shadowMatrices);
 

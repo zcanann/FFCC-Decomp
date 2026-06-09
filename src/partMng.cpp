@@ -2558,7 +2558,7 @@ void CPartMng::pppEditDraw()
     static const int kPppMngStride = 0x158;
     static const int kEditCountOffset = 0x2355C;
     static const int kEditDrawModeOffset = 0x23570;
-    static const int kCursorEnableOffset = 0x10;
+    static const int kCursorEnableOffset = 0xC;
     static const int kBaseTimeOffset = 0x14;
     static const int kLifeEndOffset = 0x24;
     static const int kCurrentFrameOffset = 0x34;

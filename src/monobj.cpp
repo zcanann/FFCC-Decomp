@@ -3000,12 +3000,14 @@ void CGMonObj::moveAStar(int startGroup, int forbiddenGroup, Vec& targetPos)
 			short currentRoute = routeFrom;
 			if ((currentRoute != 0) && (forbiddenGroup != 0) && (currentRoute != forbiddenGroup)) {
 				int forbiddenIdx = forbiddenGroup + 0x36;
-				unsigned char* routeStep = AStar.m_routeTable[currentRoute - 1][forbiddenIdx];
+				unsigned char* routeStep = reinterpret_cast<unsigned char*>(&AStar) +
+					currentRoute * 0x80 + forbiddenGroup * 2 + 0x40c;
 				CAStar::CAPos* portalPos = &AStar.m_portals[routeStep[1]];
 				float portalDist = PSVECDistance(&object->m_worldPosition, &portalPos->m_position);
 				if ((portalDist < object->m_capsuleHalfHeight) || (startGroup == routeStep[0])) {
 					routeFrom = routeStep[0];
-					portalPos = &AStar.m_portals[AStar.m_routeTable[routeStep[0] - 1][forbiddenIdx][1]];
+					portalPos = &AStar.m_portals[*(reinterpret_cast<unsigned char*>(&AStar) +
+						routeStep[0] * 0x80 + forbiddenGroup * 2 + 0x40d)];
 				}
 				targetPos.x = portalPos->m_position.x;
 				targetPos.y = portalPos->m_position.y;
@@ -3019,12 +3021,13 @@ void CGMonObj::moveAStar(int startGroup, int forbiddenGroup, Vec& targetPos)
 				if (static_cast<unsigned short>(nextGroup) == routeFrom) {
 					nextGroup = escapePos->m_groupB;
 				}
-				unsigned char* routeStep = AStar.m_routeTable[routeFrom - 1][nextGroup + 0x36];
+				unsigned char* routeStep = AStar.m_routeTable[routeFrom - 1][static_cast<unsigned char>(nextGroup + 0x36)];
 				float portalDist = PSVECDistance(&object->m_worldPosition, &escapePos->m_position);
 				if ((portalDist < object->m_capsuleHalfHeight) || (startGroup == routeStep[0])) {
 					routePrev = routeFrom;
 					routeFrom = routeStep[0];
-					escapePos = &AStar.m_portals[AStar.m_routeTable[routeStep[0] - 1][forbiddenGroup + 0x36][1]];
+					escapePos = &AStar.m_portals[*(reinterpret_cast<unsigned char*>(&AStar) +
+						routeStep[0] * 0x80 + forbiddenGroup * 2 + 0x40d)];
 				}
 
 				float targetDist = PSVECDistance(&targetPos, &object->m_worldPosition);

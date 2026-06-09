@@ -548,7 +548,7 @@ void CGObject::move()
                 buttons |= buttonsRepeat;
             }
 
-            u32 miniGameFlags = MiniGamePcs.m_flags;
+            u32 miniGameFlags = DbgMenuPcs.GetDbgFlagsRaw();
             if ((miniGameFlags & 0x100) != 0) {
                 const float stickX = (Pad.m_debugPadLock != 0 || (player == 0 && Pad.m_debugPadPort != -1))
                     ? sZeroFloat

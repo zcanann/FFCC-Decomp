@@ -260,14 +260,14 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             pos[1][2] = kFunnyShapeZero;
             pos[2][2] = kFunnyShapeZero;
             pos[3][2] = kFunnyShapeZero;
-            pos[0][1] = invPadH * (ry0 - viewMaxY);
-            pos[1][1] = invPadH * (ry1 - viewMaxY);
-            pos[2][1] = invPadH * (ry3 - viewMaxY);
-            pos[3][1] = invPadH * (ry2 - viewMaxY);
             pos[0][0] = invPadW * (rx0 - viewMaxX);
             pos[1][0] = invPadW * (rx1 - viewMaxX);
             pos[2][0] = invPadW * (rx3 - viewMaxX);
             pos[3][0] = invPadW * (rx2 - viewMaxX);
+            pos[0][1] = invPadH * (ry0 - viewMaxY);
+            pos[1][1] = invPadH * (ry1 - viewMaxY);
+            pos[2][1] = invPadH * (ry3 - viewMaxY);
+            pos[3][1] = invPadH * (ry2 - viewMaxY);
             memcpy(&color, entry + 0x8, sizeof(color));
             *reinterpret_cast<GXColor*>(&color) = *reinterpret_cast<const GXColor*>(entry + 0x8);
         } else {

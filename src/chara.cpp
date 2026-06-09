@@ -505,9 +505,9 @@ static inline u8 AnimFlags(CChara::CAnim* anim)
 	return anim->m_flags;
 }
 
-static inline s32 AnimInterpCount(CChara::CAnim* anim)
+static inline u8 AnimInterpCount(CChara::CAnim* anim)
 {
-	return anim->m_interp;
+	return reinterpret_cast<u8*>(anim)[0x9];
 }
 
 static inline u16 AnimNodeCount(CChara::CAnim* anim)
@@ -2377,16 +2377,16 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 {
 	if (blendMode == -1) {
 		CAnim* currentAnim = m_anim;
-		int interpCount;
+		u8 interpCount;
 		if (currentAnim != 0 && (interpCount = AnimInterpCount(currentAnim)) != 0 && AnimBank(currentAnim) != 0) {
 			blendMode = 4;
 
 			u16* interpTable = reinterpret_cast<u16*>(reinterpret_cast<u8*>(AnimBank(currentAnim)) + AnimInterpOffset(currentAnim));
 			int frame = static_cast<int>(m_curFrame);
 
-			for (int i = 0; i < interpCount; i++) {
+			for (int i = 0; i < static_cast<int>(interpCount); i++) {
 				int start = (i == 0) ? 0 : interpTable[i * 2];
-				int end = (i + 1 < interpCount) ? interpTable[i * 2 + 2] : 10000000;
+				int end = (i + 1 < static_cast<int>(interpCount)) ? interpTable[i * 2 + 2] : 10000000;
 				if (start <= frame && frame < end) {
 					blendMode = interpTable[i * 2 + 1];
 					break;

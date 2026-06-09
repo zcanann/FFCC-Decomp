@@ -1213,19 +1213,21 @@ void CGPartyObj::command()
 				} else if (targetState < 0x1C) {
 					if (targetState < 0x19) {
 tmpArtifactBlock:
+#define freshTargetBytes (reinterpret_cast<unsigned char*>(party.target))
 						if (*reinterpret_cast<int*>(targetBytes + 0x550) == 0) {
 							secondaryAvailable = true;
 							if ((targetState == 0x24 && caravan->CanAddTmpArtifact(1) != 0) ||
-							    (*reinterpret_cast<int*>(targetBytes + 0x500) == 0x20 &&
-							     caravan->CanAddGil(*reinterpret_cast<int*>(targetBytes + 0x558)) != 0) ||
-							    ((*reinterpret_cast<int*>(targetBytes + 0x500) != 0x24 &&
-							      *reinterpret_cast<int*>(targetBytes + 0x500) != 0x20) &&
+							    (*reinterpret_cast<int*>(freshTargetBytes + 0x500) == 0x20 &&
+							     caravan->CanAddGil(*reinterpret_cast<int*>(freshTargetBytes + 0x558)) != 0) ||
+							    ((*reinterpret_cast<int*>(freshTargetBytes + 0x500) != 0x24 &&
+							      *reinterpret_cast<int*>(freshTargetBytes + 0x500) != 0x20) &&
 							     *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xB4) + 1 <= 0x40)) {
 								secondaryCommand = 0x17;
 							} else {
 								secondaryCommand = 4;
 							}
 						}
+#undef freshTargetBytes
 					}
 				} else if (targetState < 0x22) {
 					goto tmpArtifactBlock;

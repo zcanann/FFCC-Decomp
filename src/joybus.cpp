@@ -4659,7 +4659,11 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
         {
             unsigned int word = *wordPtr;
 
-            if (static_cast<signed char>(m_threadRunningMask) != 0)
+            if (static_cast<signed char>(m_threadRunningMask) == 0)
+            {
+                result = 0;
+            }
+            else
             {
                 OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
@@ -4733,7 +4737,11 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
         {
             unsigned int word = *wordPtr;
 
-            if (static_cast<signed char>(m_threadRunningMask) != 0)
+            if (static_cast<signed char>(m_threadRunningMask) == 0)
+            {
+                result = 0;
+            }
+            else
             {
                 OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
@@ -4807,7 +4815,11 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
         {
             unsigned int word = *wordPtr;
 
-            if (static_cast<signed char>(m_threadRunningMask) != 0)
+            if (static_cast<signed char>(m_threadRunningMask) == 0)
+            {
+                result = 0;
+            }
+            else
             {
                 OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 

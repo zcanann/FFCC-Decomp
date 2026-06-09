@@ -2805,6 +2805,8 @@ unsigned int CGMonObj::IsDispRader()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_lifetimes off
 void CGMonObj::setRepop(int mode)
 {
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
@@ -2972,6 +2974,7 @@ void CGMonObj::setRepop(int mode)
 
 	m_unk6BA = 0;
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -3449,6 +3452,8 @@ int CGMonObj::mlAttackCheck(int partyIndex)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_common_subs off
 void CGMonObj::statAround()
 {
 	CGMonObj* monObj = this;
@@ -3612,6 +3617,7 @@ body:
 #undef script
 #undef actionState
 }
+#pragma pop
 
 /*
  * --INFO--

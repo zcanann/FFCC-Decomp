@@ -4978,11 +4978,11 @@ void CGPartyObj::ghostPartyMog()
 					goto messageMenu;
 				}
 			}
-			if (sGhostPartyWork.flagBits.flag10 < 0 || *reinterpret_cast<unsigned int*>(CGPartyObj::m_ghostWork + 0x3C) < 0x97) {
+			if (sGhostPartyWork.flagBits.flag10 >= 0 && static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x3C)) > 0x96) {
+				bossState = 8;
+			} else {
 				bossState = 0;
 				*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x20) = 0;
-			} else {
-				bossState = 8;
 			}
 		}
 	}

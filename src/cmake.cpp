@@ -2165,21 +2165,23 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
         return 0;
     } else {
         int fieldSelect = CmakeState(this)->m_fieldSelect;
-        short& currentValue = *reinterpret_cast<short*>(
-            reinterpret_cast<char*>(CmakeState(this)) + fieldSelect * 2 + offsetof(CmakeMenuState, m_select));
 
         if ((repeat & 0x8) != 0) {
-            if (currentValue != 0) {
-                currentValue = static_cast<short>(currentValue - 1);
+            short* values = &CmakeState(this)->m_select;
+            int idx = CmakeState(this)->m_fieldSelect;
+            if (values[idx] != 0) {
+                values[idx] = static_cast<short>(values[idx] - 1);
             } else {
-                currentValue = 3;
+                values[idx] = 3;
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else if ((repeat & 0x4) != 0) {
-            if (currentValue < 3) {
-                currentValue = static_cast<short>(currentValue + 1);
+            short* values = &CmakeState(this)->m_select;
+            int idx = CmakeState(this)->m_fieldSelect;
+            if (values[idx] < 3) {
+                values[idx] = static_cast<short>(values[idx] + 1);
             } else {
-                currentValue = 0;
+                values[idx] = 0;
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }

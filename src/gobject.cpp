@@ -232,7 +232,7 @@ void CGBaseObj::onFrame()
  * JP Size: TODO
  */
 #pragma push
-#pragma optimization_level 2
+#pragma optimization_level 3
 void CGObject::onCreate()
 {
     m_worldPosition.z = 0.0f;

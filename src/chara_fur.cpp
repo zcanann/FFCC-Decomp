@@ -1034,7 +1034,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		}
 	}
 
-	Chara.MogFur().m_cursorX = static_cast<int>(kYmEnvTen * MogPadFloat(36) +
+	Chara.MogFur().m_cursorX = static_cast<unsigned int>(kYmEnvTen * MogPadFloat(36) +
 	                                     static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorX)));
 	Chara.MogFur().m_cursorY = static_cast<int>(-(kYmEnvTen * MogPadFloat(40) -
 	                                     static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorY))));
@@ -1139,7 +1139,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 
 			if (doPaint != 0) {
 				int particleNo = 0;
-				int seId = 0;
+				unsigned int seId = 0;
 				int emitParticle = ((static_cast<int>(System.m_frameCounter) % 2) == 0);
 				int playGate = ((static_cast<int>(System.m_frameCounter) % 4) == 0);
 				_GXColor particleColor = CColor(centerBefore).color;

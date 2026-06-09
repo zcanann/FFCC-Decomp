@@ -1132,8 +1132,8 @@ int CCharaPcs::TryReleaseAnimBank(int requiredSize)
         CChara::CAnim* anim = loadAnim->m_anim;
 
         if (anim->m_bank && releaseSize < anim->m_lastFrame) {
-            releaseAnim = loadAnim;
             releaseSize = anim->m_lastFrame;
+            releaseAnim = loadAnim;
         }
     }
 

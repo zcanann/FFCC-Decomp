@@ -2491,8 +2491,8 @@ void CGObject::SetDamageCol(int colliderIndex, char* nodeName, float hitMask, fl
  */
 void CGObject::boundCheck()
 {
-    Vec clipCorner;
     Vec4d clipPos;
+    Vec clipCorner;
     Mtx cameraMtx;
     Mtx44 clipMtx;
     Mtx44 screenMtx;

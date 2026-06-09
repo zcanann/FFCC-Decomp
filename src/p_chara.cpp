@@ -942,9 +942,8 @@ int CCharaPcs::correctLoadAnimAmem()
 
         for (int i = 0; i < loadAnimCount; i++) {
             CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
-            CChara::CAnim* anim = loadAnim->m_anim;
-            const unsigned int animOffset = static_cast<unsigned int>(anim->m_bankAddress);
-            const int animSize = static_cast<int>(anim->m_bankSize);
+            const unsigned int animOffset = static_cast<unsigned int>(loadAnim->m_anim->m_bankAddress);
+            const int animSize = static_cast<int>(loadAnim->m_anim->m_bankSize);
             if (animOffset < static_cast<unsigned int>(scanOffset)) {
                 continue;
             }
@@ -963,7 +962,7 @@ int CCharaPcs::correctLoadAnimAmem()
                 reinterpret_cast<void*>(m_amemStage->m_heapTop + static_cast<int>(animOffset)),
                 static_cast<unsigned long>(animSize));
 
-            anim->m_bankAddress = compactedSize + chunkSize;
+            loadAnim->m_anim->m_bankAddress = compactedSize + chunkSize;
             chunkSize += animSize;
         }
 

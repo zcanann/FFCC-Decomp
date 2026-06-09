@@ -2234,8 +2234,8 @@ void CMenuPcs::CalcMCardMenu()
 			int iLines = iVar14 / 0x16;
 			if (iVar14 - iLines * 0x16 != 0) iLines = iLines + 1;
 			sVar7 = (iLines + 2) * 0x16 + 0x40;
-			short sVar16 = (short)*piVar4 * 0x1E + 0x40;
 			iVar14 = (int)(float)((float)(0x280 - sVar7) * DOUBLE_803313f8);
+			short sVar16 = (short)*piVar4 * 0x1E + 0x40;
 			iVar12 = (int)(float)((double)(FLOAT_80331430 - (float)sVar16) * DOUBLE_803313f8);
 			m_menuWindowInfo->x = (short)iVar14;
 			m_menuWindowInfo->y = (short)iVar12;
@@ -2608,22 +2608,23 @@ void CMenuPcs::CalcMCardMenu()
 			LAB_saveIdx:
 				int unk838 = reinterpret_cast<int>(m_wmCharaState);
 				int sel = 0;
-				if (*reinterpret_cast<char*>(unk838 + 0x42) == 0 && *reinterpret_cast<int*>(unk838 + 8) > 0) {
+				int __p11 = unk838;
+				if (*reinterpret_cast<char*>(unk838 + 0x42) == 0 && *reinterpret_cast<int*>(__p11 + 8) > 0) {
 					sel = 1;
-					if (*reinterpret_cast<char*>(unk838 + 0x8A) == 0 && *reinterpret_cast<int*>(unk838 + 0x50) > 0) {
+					if (!(*reinterpret_cast<char*>(unk838 + 0x8A) == 0 && *reinterpret_cast<int*>(unk838 + 0x50) > 0)) {
+						m_mcCtrl.m_saveIndex = sel;
+					} else {
 						sel = 2;
 						if (*reinterpret_cast<char*>(unk838 + 0xD2) == 0 && *reinterpret_cast<int*>(unk838 + 0x98) > 0) {
 							sel = 3;
-							if (*reinterpret_cast<char*>(unk838 + 0x11A) == 0 && *reinterpret_cast<int*>(unk838 + 0xE0) > 0) {
-								sel = 4;
-							} else {
+							if (!(*reinterpret_cast<char*>(unk838 + 0x11A) == 0 && *reinterpret_cast<int*>(unk838 + 0xE0) > 0)) {
 								m_mcCtrl.m_saveIndex = sel;
+							} else {
+								sel = 4;
 							}
 						} else {
 							m_mcCtrl.m_saveIndex = sel;
 						}
-					} else {
-						m_mcCtrl.m_saveIndex = sel;
 					}
 				} else {
 					m_mcCtrl.m_saveIndex = sel;
@@ -3051,7 +3052,8 @@ void CMenuPcs::CalcLoadMenu()
 			iVar10 = (int)(float)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313f8);
 			m_menuWindowInfo->x = (short)iVar14;
 			m_menuWindowInfo->y = (short)iVar10;
-			m_menuWindowInfo->width = sVar8;
+			int __p14 =  (sVar8 - 0);
+			m_menuWindowInfo->width = __p14;
 			m_menuWindowInfo->height = sVar18;
 			m_menuWindowInfo->frame = 0;
 			m_menuWindowInfo->state = 3;

@@ -4979,7 +4979,7 @@ void CGPartyObj::ghostPartyMog()
 					goto messageMenu;
 				}
 			}
-			if (sGhostPartyWork.flagBits.flag10 >= 0 && static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x3C)) > 0x96) {
+			if (sGhostPartyWork.flagBits.flag10 == 0 && static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x3C)) > 0x96) {
 				bossState = 8;
 			} else {
 				bossState = 0;

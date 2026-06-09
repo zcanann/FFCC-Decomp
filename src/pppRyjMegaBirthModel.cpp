@@ -704,15 +704,14 @@ join_position:
             *f32_at(particleData, 0x7C) = *(float*)(payload + 0xC8) * Math.RandF();
 
             if (((params->m_rotationRandomFlags & 1) != 0) && ((params->m_rotationRandomFlags & 2) != 0)) {
-                s32 count = 3;
-                float* value = f32_at(particleData, 0x74);
-                do {
+                u8* base = (u8*)particleData;
+                s32 i;
+                for (i = 0; i < 3; i++) {
                     if (MegaBirthHalfDouble() < (double)Math.RandF()) {
-                        *value = *value * kPppRyjMegaBirthModelNegOneZeroPair[0];
+                        *(float*)(base + 0x74) = *(float*)(base + 0x74) * kPppRyjMegaBirthModelNegOneZeroPair[0];
                     }
-                    value++;
-                    count--;
-                } while (count != 0);
+                    base += 4;
+                }
             } else if ((params->m_rotationRandomFlags & 2) != 0) {
                 *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) * kPppRyjMegaBirthModelNegOneZeroPair[0];
                 *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) * kPppRyjMegaBirthModelNegOneZeroPair[0];

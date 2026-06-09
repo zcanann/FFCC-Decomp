@@ -2841,8 +2841,12 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
 
         Vec shadowBase;
         {
+            Vec scaledDeltaCopy;
+            scaledDeltaCopy.x = scaledDelta.x;
+            scaledDeltaCopy.y = scaledDelta.y;
+            scaledDeltaCopy.z = scaledDelta.z;
             CVector baseTmp;
-            PSVECAdd(modelPos, scaledDelta, baseTmp);
+            PSVECAdd(modelPos, &scaledDeltaCopy, baseTmp);
             shadowBase.x = baseTmp.x;
             shadowBase.y = baseTmp.y;
             shadowBase.z = baseTmp.z;

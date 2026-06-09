@@ -1115,10 +1115,10 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
             int nodeGroup = node->m_defaultParam;
             if ((group == static_cast<unsigned long>(-1)) || (static_cast<unsigned long>(nodeGroup) == group)) {
                 if ((((nodeFlags & 4) != 0) && ((flag & 2) != 0)) || (((nodeFlags & 4) == 0) && ((flag & 1) != 0))) {
-                    const char* kind = ((nodeFlags & 4) != 0) ? sHeapWalkerUsed : sHeapWalkerFree;
-                    unsigned char level = ((nodeFlags & 4) != 0) ? node->m_level : 0;
-                    const char* source = ((nodeFlags & 4) != 0) ? node->m_source : sEmptyAllocSourceName;
                     unsigned short line = ((nodeFlags & 4) != 0) ? node->m_line : 0;
+                    const char* source = ((nodeFlags & 4) != 0) ? node->m_source : sEmptyAllocSourceName;
+                    unsigned char level = ((nodeFlags & 4) != 0) ? node->m_level : 0;
+                    const char* kind = ((nodeFlags & 4) != 0) ? sHeapWalkerUsed : sHeapWalkerFree;
                     int index = ((nodeFlags & 4) != 0) ? usedCount : freeCount;
                     System.Printf(
                         const_cast<char*>(strBase + 0x430), index, kind, level, node->m_size,

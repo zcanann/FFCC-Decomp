@@ -2620,7 +2620,7 @@ void CMenuPcs::CmakeNameDraw()
     }
     DrawCmakeName(0, nameCursor, name, alpha);
     DrawCmakeDecision(
-        (static_cast<int>(CmakeState(this)->m_row) >> 31) +
+        (static_cast<unsigned int>(CmakeState(this)->m_row) >> 31) +
             (static_cast<int>(static_cast<int>(CmakeState(this)->m_row)) >= 5),
         alpha);
 

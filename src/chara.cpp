@@ -1787,13 +1787,18 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 		if (blendCur != 0) {
 			u16 blendMax = ModelBlendMax(this);
 			float alpha = FLOAT_803301BC - (static_cast<float>(blendCur) * (FLOAT_803301BC / static_cast<float>(blendMax)));
-			Vec targetPos = {localMtx[0][3], localMtx[1][3], localMtx[2][3]};
 			Vec targetScale;
 			Quaternion targetQuat;
 			Vec positionScaleA;
 			Vec positionScaleB;
 			Vec blendedPos;
 			Mtx scaleMtx;
+			float tpY = localMtx[1][3];
+			float tpZ = localMtx[2][3];
+			Vec targetPos;
+			targetPos.x = localMtx[0][3];
+			targetPos.y = tpY;
+			targetPos.z = tpZ;
 
 			Math.MTXGetScale(localMtx, &targetScale);
 			if (targetScale.x < FLOAT_803301E4) {

@@ -3187,7 +3187,7 @@ void CGMonObj::moveFrame()
 		distance = PSVECMag(reinterpret_cast<Vec*>(&local_74));
 	}
 
-	if (((moveFlags & 0x80) != 0) && (((int)((unsigned int)object->m_stateFlags0 << 0x19) | ((unsigned int)object->m_stateFlags0 >> 7)) < 0)) {
+	if (((moveFlags & 0x80) != 0) && (object->m_stateFlags0Bits.unk1 < 0)) {
 		goto moveCancelExit;
 	}
 

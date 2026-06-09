@@ -3200,10 +3200,10 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 chunkFile.Get4();
                 SetMaterialColor(material, chunkFile.Get4());
 
-                if ((waterMode == 0) && (material->m_unkA5 == 0)) {
-                    material->m_tevBit |= 8;
-                } else {
+                if ((waterMode != 0) || (material->m_unkA5 != 0)) {
                     material->m_tevBit |= 0x80000;
+                } else {
+                    material->m_tevBit |= 8;
                 }
             } break;
             case CHUNK_JIME: {

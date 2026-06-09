@@ -2809,7 +2809,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         CVector focusPos(CharaPcs.m_texShadowPos);
         CVector deltaTmp;
         PSVECSubtract(focusPos, modelPos, deltaTmp);
-        CVector delta;
+        Vec delta;
         delta.x = deltaTmp.x;
         delta.y = deltaTmp.y;
         delta.z = deltaTmp.z;
@@ -2817,13 +2817,13 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
             return;
         }
 
-        const float distRatio = PSVECMag(delta) / CharaPcs.m_texShadowRadius;
+        const float distRatio = PSVECMag(&delta) / CharaPcs.m_texShadowRadius;
         if (distRatio > kCharaOne) {
             return;
         }
         const float shadowFade = kCharaOne - distRatio;
 
-        delta.Normalize();
+        reinterpret_cast<CVector*>(&delta)->Normalize();
 
         Vec eye;
         {
@@ -2840,7 +2840,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
 
         const float shadowDistance = static_cast<float>(CharaPcs.m_texShadowDistance);
         CVector scaledDelta;
-        PSVECScale(delta, scaledDelta, shadowDistance);
+        PSVECScale(&delta, scaledDelta, shadowDistance);
 
         Vec shadowBase;
         {

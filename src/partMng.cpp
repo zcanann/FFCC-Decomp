@@ -432,8 +432,7 @@ void CPartMng::Destroy()
 
     if (res->m_textureSet != 0) {
         CRefRaw* textureSet = reinterpret_cast<CRefRaw*>(res->m_textureSet);
-        textureSet->m_refCount--;
-        if (textureSet->m_refCount == 0) {
+        if (--textureSet->m_refCount == 0) {
             delete res->m_textureSet;
         }
         res->m_textureSet = 0;
@@ -441,8 +440,7 @@ void CPartMng::Destroy()
 
     if (res->m_materialSet != 0) {
         CRefRaw* materialSet = reinterpret_cast<CRefRaw*>(res->m_materialSet);
-        materialSet->m_refCount--;
-        if (materialSet->m_refCount == 0) {
+        if (--materialSet->m_refCount == 0) {
             delete res->m_materialSet;
         }
         res->m_materialSet = 0;

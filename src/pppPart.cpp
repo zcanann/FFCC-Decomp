@@ -357,6 +357,8 @@ void pppDestroyHeap(_pppEnvSt* pppEnvSt)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_propagation off
 void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, int line)
 {
 	int firstAllocFailure = 1;
@@ -367,10 +369,8 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 	do
 	{
 		_pppPObjLink* allocation = (_pppPObjLink*)Memory._Alloc(allocSize, stage, file, line, 1);
-		if (allocation != 0)
+		if (allocation == 0)
 		{
-			return allocation;
-		}
 
 		if (firstAllocFailure)
 		{
@@ -475,6 +475,12 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 				obj = next;
 			}
 		}
+
+		}
+		else
+		{
+			return allocation;
+		}
 	}
 	while (canRetry);
 
@@ -483,6 +489,7 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 	ppvMemAllocErrorF = 1;
 	return 0;
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -493,6 +500,8 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_propagation off
 extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage, char* file, int line)
 {
 	int firstAllocFailure = 1;
@@ -503,10 +512,8 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 	do
 	{
 		_pppPObjLink* allocation = (_pppPObjLink*)Memory._Alloc(allocSize, stage, file, line, 1);
-		if (allocation != 0)
+		if (allocation == 0)
 		{
-			return allocation;
-		}
 
 		if (firstAllocFailure)
 		{
@@ -612,12 +619,19 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 				obj = next;
 			}
 		}
+
+		}
+		else
+		{
+			return allocation;
+		}
 	}
 	while (canRetry);
 
 	ppvMemAllocErrorF = 1;
 	return 0;
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -956,6 +970,8 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma optimization_level 2
 void _pppAllFreePObject(_pppMngSt* pppMngSt)
 {
 	Graphic._WaitDrawDone(const_cast<char*>(s_pppPart_cpp), 0x362);
@@ -1056,6 +1072,7 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 	Graphic._WaitDrawDone(const_cast<char*>(s_pppPart_cpp), 0x3A1);
 	ppvMng = oldMngSt;
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -1530,8 +1547,8 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 	pppMngSt->m_mode = (u8)pdt[1];
 	int* controlPrograms = (int*)((u8*)pdt + pdt[2]);
 	int* programs = (int*)((u8*)pdt + pdt[3]);
-	short* shapeIndices = (short*)((u8*)pdt + pdt[5]);
 	short* modelIndices = (short*)((u8*)pdt + pdt[4]);
+	short* shapeIndices = (short*)((u8*)pdt + pdt[5]);
 
 	if (Game.m_currentSceneId != 7)
 	{
@@ -1765,6 +1782,8 @@ DataValsAllocated:
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_loop_invariants off
 void pppInitPdt(long* progOffsetReconstructionTable, pppProg* pppProg)
 {
 	int* table = (int*)(progOffsetReconstructionTable + 6);
@@ -1803,6 +1822,7 @@ void pppInitPdt(long* progOffsetReconstructionTable, pppProg* pppProg)
 		pdtRelocs[i] += (int)progOffsetReconstructionTable;
 	}
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -2044,6 +2064,8 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma optimization_level 3
 void _pppDeadPart(_pppMngSt* pppMngSt)
 {
 	struct pppMngStDeadRaw
@@ -2063,10 +2085,11 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 	};
 
 	pppMngStDeadRaw* mng = (pppMngStDeadRaw*)pppMngSt;
-	u32 maxDeleteFrame = 0;
+	u32 maxDeleteFrame;
 
 	if (ppvUserStopPartF == 0)
 	{
+		maxDeleteFrame = 0;
 		_pppPObjLink* prev = &mng->m_objHead;
 		for (_pppPObjLink* obj = prev->m_next; obj != 0;)
 		{
@@ -2091,7 +2114,7 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 					}
 				}
 
-				if (mng->m_loopMode != 0 &&
+				if (mng->m_loopMode == 0 &&
 					((_pppPObject*)obj)->m_graphId >= progSet->m_loopFrame &&
 					progSet->m_loopFrame != 0x70000000)
 				{
@@ -2198,6 +2221,7 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 		mng->m_isDead = (mng->m_currentFrame >= mng->m_lifeEndFrame) ? 1 : 0;
 	}
 }
+#pragma pop
 
 /*
  * --INFO--

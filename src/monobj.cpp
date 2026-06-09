@@ -3200,7 +3200,11 @@ void CGMonObj::moveFrame()
 	}
 
 	CVector moveDelta;
-	if ((moveFlags & 0x1000) == 0) {
+	if ((moveFlags & 0x1000) != 0) {
+		moveDelta.x = local_74.x;
+		moveDelta.y = local_74.y;
+		moveDelta.z = local_74.z;
+	} else {
 		if (__fabs(distance) < kMonObjSmallStepF64) {
 			CVector zero(0.0f, 0.0f, 0.0f);
 			moveDelta.x = zero.x;
@@ -3209,10 +3213,6 @@ void CGMonObj::moveFrame()
 		} else {
 			PSVECScale(reinterpret_cast<Vec*>(&local_74), static_cast<Vec*>(moveDelta), (1.0f / distance) * stepDist);
 		}
-	} else {
-		moveDelta.x = local_74.x;
-		moveDelta.y = local_74.y;
-		moveDelta.z = local_74.z;
 	}
 
 	if ((moveFlags & 0x4000) != 0) {

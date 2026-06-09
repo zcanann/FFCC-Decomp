@@ -4912,7 +4912,7 @@ void CGPartyObj::ghostPartyMog()
 			if (moodMode == 1) {
 				if (CharaGhostValue(0x2054) < 0x32) {
 					bossState = 5;
-				} else if (CharaGhostValue(0x2054) > 0x5E) {
+				} else if (CharaGhostValue(0x2054) >= 0x5F) {
 					bossState = 4;
 				}
 			} else if (moodMode != 0 && moodMode < 3 && CharaGhostValue(0x2054) < 0x32) {

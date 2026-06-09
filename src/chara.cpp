@@ -1614,7 +1614,7 @@ void CChara::CModel::calcMatrix()
 			}
 		}
 
-		s16 blendCur = ModelBlendCur(this);
+		u16 blendCur = ModelBlendCur(this);
 		if (blendCur != 0) {
 			u16 blendMax = ModelBlendMax(this);
 			float alpha = FLOAT_803301BC - (static_cast<float>(blendCur) * (FLOAT_803301BC / static_cast<float>(blendMax)));

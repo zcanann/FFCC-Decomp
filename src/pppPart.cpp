@@ -466,7 +466,10 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 						owner->m_pppPObjLink = obj->m_next;
 					}
 
-					Memory.Free(obj);
+					if (obj != 0)
+					{
+						Memory.Free(obj);
+					}
 				}
 				else
 				{
@@ -610,7 +613,10 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 						owner->m_pppPObjLink = obj->m_next;
 					}
 
-					Memory.Free(obj);
+					if (obj != 0)
+					{
+						Memory.Free(obj);
+					}
 				}
 				else
 				{

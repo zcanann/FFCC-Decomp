@@ -2190,7 +2190,7 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
             if ((down & 0x100) != 0) {
                 Sound.PlaySe(2, 0x40, 0x7F, 0);
                 if (fieldSelect == 0) {
-                    CmakeState(this)->m_fieldSelect = static_cast<short>(fieldSelect + 1);
+                    CmakeState(this)->m_fieldSelect = static_cast<short>(CmakeState(this)->m_fieldSelect + 1);
                     return 0;
                 }
 

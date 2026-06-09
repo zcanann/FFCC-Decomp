@@ -12210,15 +12210,15 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 				if (winType != 0) {
 					slotText = strstr(textBuf, lbl_80210D54[languageIndex]);
 				}
-				if (winType == 0 || slotText == 0) {
+				if (!(winType == 0 || slotText == 0)) {
+					int len = strlen(lbl_80210D54[languageIndex]);
+					slotText[len - 1] += GetMcCtrl()->m_cardChannel;
+				} else {
 					char* marker = strstr(textBuf, lbl_80331400);
 					if (marker != 0) {
 						marker[0] += 2;
 						marker[1] += 2;
 					}
-				} else {
-					int len = strlen(lbl_80210D54[languageIndex]);
-					slotText[len - 1] += GetMcCtrl()->m_cardChannel;
 				}
 			} else {
 				char* dataText = strstr(textBuf, lbl_80210D68[languageIndex]);

@@ -48,7 +48,7 @@ void CMenuPcs::FavoDraw()
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	FavoEntry* entry = m_favoList->entries;
-	for (unsigned int i = 0; i < m_favoList->count; i++) {
+	for (int i = 0; i < m_favoList->count; i++) {
 		if (entry->tex >= 0) {
 			float x = static_cast<float>(entry->x);
 			float y = static_cast<float>(entry->y);
@@ -197,7 +197,7 @@ void CMenuPcs::FavoDraw()
 	memset(textBuf, 0, sizeof(textBuf));
 	rank = s_rank;
 	drawEntry = rankEntry;
-	for (int i = 0; i < 8; i++) {
+	for (unsigned int i = 0; i < 8; i++) {
 		rankFont->SetTlut(6);
 		rankFont->SetColor(
 		    CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * drawEntry->alpha)).color);

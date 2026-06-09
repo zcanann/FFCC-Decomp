@@ -1748,15 +1748,7 @@ void CGObject::update()
                 if (m_shieldNodeFlagBits.m_bit80) {
                     const unsigned char queuePos = m_animQueuePos++;
                     const char queuedAnim = m_animQueue[queuePos];
-                    if (queuedAnim == -1) {
-                        m_currentAnimSlot = -1;
-                        m_shieldNodeFlagBits.m_bit40 = 0;
-                        m_turnSpeed = sZeroFloat;
-                        m_rotTargetY = m_rotBaseY;
-                        m_shieldNodeFlagBits.m_bit08 = 0;
-                        m_shieldNodeFlagBits.m_bit80 = 0;
-                        gCFlatRuntime().SystemCall(this, 2, 10, 0, 0, 0);
-                    } else {
+                    if (queuedAnim != -1) {
                         m_currentAnimSlot =
                             (queuedAnim >= 'A' && queuedAnim < 'A' + 4) ? m_animQueue[queuedAnim - 'A'] : queuedAnim;
                         m_weaponNodeFlagAll.m_bits1.m_bit01 = 0;
@@ -1766,6 +1758,14 @@ void CGObject::update()
                         m_shieldNodeFlagBits.m_bit80 = 0;
                         m_shieldNodeFlagBits.m_bit08 = 1;
                         m_turnSpeed = sZeroFloat;
+                    } else {
+                        m_currentAnimSlot = -1;
+                        m_shieldNodeFlagBits.m_bit40 = 0;
+                        m_turnSpeed = sZeroFloat;
+                        m_rotTargetY = m_rotBaseY;
+                        m_shieldNodeFlagBits.m_bit08 = 0;
+                        m_shieldNodeFlagBits.m_bit80 = 0;
+                        gCFlatRuntime().SystemCall(this, 2, 10, 0, 0, 0);
                     }
                 } else {
                     m_currentAnimSlot = -1;

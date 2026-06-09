@@ -2927,7 +2927,7 @@ void CGMonObj::setRepop(int mode)
 
 	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x20000);
 
-	unsigned short countB = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AA);
+	unsigned short countB = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AA);
 	for (int i = 0; i < static_cast<int>(countB); i++) {
 		int dataNo = object->m_charaModelHandle->GetPdtSlot();
 		prgObj->putParticleBindTrace((i + 0x5A) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x5A8), object, 0.0f, 0);

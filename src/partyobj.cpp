@@ -4810,8 +4810,8 @@ void CGPartyObj::gpmCol()
 			newIndex = trailIndex;
 		} else {
 			activeTrailCount = i + 1;
+			*reinterpret_cast<float*>(trailBase + i * 0xC) = leader->m_worldPosition.x;
 			Vec* slot = reinterpret_cast<Vec*>(trailBase + i * 0xC);
-			slot->x = leader->m_worldPosition.x;
 			slot->y = leader->m_worldPosition.y;
 			slot->z = leader->m_worldPosition.z;
 			if (trailIndex < i) {

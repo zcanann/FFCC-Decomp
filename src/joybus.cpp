@@ -939,16 +939,15 @@ timeout_expiry:
         {
             int result = InitialCode(threadParam);
 
-            if (result == 1)
+            if (result != 1)
             {
-                stateStartTime = OSGetTime();
+                if (result == 2)
+                {
+                    goto sleep_retry;
+                }
+                break;
             }
-            else if (result == 2)
-            {
-                ThreadSleep(OSMillisecondsToTicks(15));
-            }
-
-            break;
+            goto loop_body;
         }
 
         case 0x03:

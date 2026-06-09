@@ -1903,8 +1903,8 @@ unsigned short CMenuPcs::CmakeJobCtrl()
 
                 if (slot < 8) {
                     Sound.PlaySe(4, 0x40, 0x7F, 0);
-                    short winX = 0;
-                    short winY = 0;
+                    short winX;
+                    short winY;
                     GetWinSize(0x16, &winX, &winY, 0);
                     SetMcWinInfo((int)winX, (int)winY);
                     CmakeMcState(this) = 0;
@@ -2223,8 +2223,8 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
 
                 if (slot < 8) {
                     Sound.PlaySe(4, 0x40, 0x7F, 0);
-                    short winX = 0;
-                    short winY = 0;
+                    short winX;
+                    short winY;
                     GetWinSize(0x15, &winX, &winY, 0);
                     SetMcWinInfo(static_cast<int>(winX), static_cast<int>(winY));
                     CmakeMcState(this) = 0;
@@ -2788,8 +2788,8 @@ int CMenuPcs::CmakeNameCtrl()
 
                     if (IsDuplicateCmakeName(this, s_CmakeInfo.m_name)) {
                         Sound.PlaySe(4, 0x40, 0x7F, 0);
-                        short winX = 0;
-                        short winY = 0;
+                        short winX;
+                        short winY;
                         GetWinSize(0x14, &winX, &winY, 0);
                         SetMcWinInfo((int)winX, (int)winY);
                         CmakeMcState(this) = 0;

@@ -497,6 +497,8 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_propagation off
 extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage, char* file, int line)
 {
 	int firstAllocFailure = 1;
@@ -626,6 +628,7 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 	ppvMemAllocErrorF = 1;
 	return 0;
 }
+#pragma pop
 
 /*
  * --INFO--

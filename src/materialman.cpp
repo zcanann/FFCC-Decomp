@@ -1402,7 +1402,12 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
     }
     m_activeEnvTevBit = tevBit;
     GXSetNumIndStages(0);
-    if ((tevBit & 1) == 0) {
+    if ((tevBit & 1) != 0) {
+        GXSetTevDirect(GX_TEVSTAGE0);
+        _GXSetTevOrder(0, 0xFF, 0xFF, 4);
+        _GXSetTevOp(0, 4);
+        m_numTevStage = 1;
+    } else {
         if ((tevBit & 0x200) == 0) {
             GXSetTevDirect(GX_TEVSTAGE0);
             if ((tevBit & 0x20) != 0) {
@@ -1456,11 +1461,6 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
             _GXSetTevOrder(2, 0xFF, 0xFF, 4);
             m_numTevStage = 3;
         }
-    } else {
-        GXSetTevDirect(GX_TEVSTAGE0);
-        _GXSetTevOrder(0, 0xFF, 0xFF, 4);
-        _GXSetTevOp(0, 4);
-        m_numTevStage = 1;
     }
 
     if (tevBit == 0) {

@@ -1623,12 +1623,13 @@ int CAmemCacheSet::GetData(short index, char* source, int line)
 {
     while (true) {
         CAmemCache& entry = cacheEntryAt(this, index);
+        CMemory::CStage* rStage = m_rStage;
         unsigned int data;
 
         if (entry.m_cacheData == 0) {
             if (entry.m_dmaCopy != 0) {
                 entry.m_cacheData =
-                    m_rStage->alloc(static_cast<unsigned long>(entry.m_size),
+                    rStage->alloc(static_cast<unsigned long>(entry.m_size),
                                     source != 0 ? source : const_cast<char*>(sEmptyAllocSourceName),
                                     static_cast<unsigned long>(line), 1);
                 if (entry.m_cacheData == 0) {

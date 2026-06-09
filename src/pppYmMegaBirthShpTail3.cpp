@@ -84,7 +84,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
     } else {
         hasRequiredMemory = true;
     }
-    if (!hasRequiredMemory || *(u32*)(step + 4) == 0xFFFF) {
+    if (!hasRequiredMemory || *(s32*)(step + 4) == 0xFFFF) {
         return;
     }
     const u32 dataValIndex = *(u32*)(step + 4);
@@ -102,7 +102,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
     for (u32 i = 0; i < maxParticles; i++) {
         u8* particle = (u8*)particles + i * 0x1F8;
         if (*(s16*)(particle + 0x22) != 0) {
-            const u16 frameCountRaw = *(u16*)(payload + 0x9C);
+            const s16 frameCountRaw = *(u16*)(payload + 0x9C);
                 pppFMATRIX drawMtx;
                 Vec trailPos;
                 Vec cameraPos;
@@ -110,11 +110,11 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                 Vec zeroVec;
                 Vec segVec;
                 GXColor amb;
-                const u8 trailReadIndex = *(u8*)(particle + 0x38);
+                const s8 trailReadIndex = *(u8*)(particle + 0x38);
                 const s32 trailMaxIndex = (s8)(*(u8*)(particle + 0x37) - 1);
                 s32 trailNextIndex = (u8)(trailReadIndex + 1);
                 const float alphaScale = (float)*(s16*)((u8*)colorWork + 6) / LoadFloat(kPppYmMegaBirthShpTail3AlphaDivisor);
-                const float stepDivisor = (float)((s32)frameCountRaw - 1);
+                const float stepDivisor = (float)((u32)frameCountRaw - 1);
                 float fadeA = (float)(*(s16*)(workBytes + 0x56) >> 7) * alphaScale;
                 float fadeR = (float)(*(u16*)(workBytes + 0x50) >> 7);
                 float fadeG = (float)(*(s16*)(workBytes + 0x52) >> 7);

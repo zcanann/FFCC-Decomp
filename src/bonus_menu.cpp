@@ -2529,12 +2529,12 @@ void CMenuPcs::DrawResultCountAnim()
  */
 void CMenuPcs::CalcResultCountAnim()
 {
-	const int activePartyCount = s_Rinfo->m_partyCount;
+	const int activePartyCount =  (int)(unsigned int)(s_Rinfo->m_partyCount);
 
 	if (*(signed char*)(this->m_bonusStatePtr + 0xb) == 0) {
 		int countTop = ((BonusAnimHeader*)this->m_bonusAnimPtr)->count;
-		short y = 0x28;
 		int partyByteOff = 0;
+		short y = 0x28;
 		for (int i = 0; i < activePartyCount; i++, partyByteOff += sizeof(BonusPartySummary)) {
 			int rank = *(int*)((int)s_Rinfo + partyByteOff + 0x34);
 			BonusAnimSprite* sprite = &((BonusAnimList*)this->m_bonusAnimPtr)->sprites[countTop + i];
@@ -2574,7 +2574,8 @@ void CMenuPcs::CalcResultCountAnim()
 	}
 
 	int countTop = (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count - activePartyCount;
-	int frame = (int)*(short*)(this->m_bonusStatePtr + 0x22) - 8;
+	int frame;
+	frame = (int)*(short*)(this->m_bonusStatePtr + 0x22) - 8;
 
 	for (int i = 0; i < activePartyCount; i++) {
 		BonusAnimSprite* sprite = &((BonusAnimList*)this->m_bonusAnimPtr)->sprites[countTop + i];
@@ -2584,7 +2585,8 @@ void CMenuPcs::CalcResultCountAnim()
 			sprite->alpha = 1.0f;
 		} else {
 			int value = s_Rinfo->m_party[i].m_totalValue;
-			if (frame == value) {
+			int __p27 = value;
+			if (frame == __p27) {
 				Sound.PlaySe(0x4b, 0x40, 0x7f, 0);
 				sprite->startFrame = frame;
 			}
@@ -2611,7 +2613,7 @@ void CMenuPcs::CalcResultCountAnim()
 	Mtx scaleMtx;
 	Mtx rotXMtx;
 	Mtx rotYMtx;
-	for (int i = 0; i < activePartyCount * 2; i++) {
+	for (int i = 0; activePartyCount > i * 2; i++) {
 		CCharaPcs::CHandle* handle;
 		int tribeId;
 		if (i < activePartyCount) {
@@ -2672,7 +2674,8 @@ void CMenuPcs::CalcResultCountAnim()
 				unsigned int resolvedIndex = (padRemap == (int)padIndex) ? 0 : padIndex;
 				down = Pad.m_padInputs[resolvedIndex].buttonDown[0];
 			}
-			buttons = (unsigned short)(buttons | down);
+			int __p28 = buttons;
+			buttons = (unsigned short)(__p28 | down);
 		}
 		if ((buttons & 0x300) != 0) {
 			Sound.PlaySe(2, 0x40, 0x7f, 0);

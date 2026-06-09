@@ -4367,11 +4367,11 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
     case 1:
     {
         int sent = m_pposWordIndex[threadParam->m_portIndex];
-        int totalWord = (int)(signed char)m_cmdBuffer[threadParam->m_portIndex];
+        unsigned int* wordPtr = &posWords[sent];
 
-        while (sent < totalWord)
+        while (sent < (int)(signed char)m_cmdBuffer[threadParam->m_portIndex])
         {
-            unsigned int word = posWords[sent];
+            unsigned int word = *wordPtr;
 
             if (static_cast<signed char>(m_threadRunningMask) != 0)
             {
@@ -4398,6 +4398,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
                 break;
             }
 
+            wordPtr++;
             sent++;
         }
 
@@ -4440,11 +4441,11 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
     case 3:
     {
         int sent = m_pposWordIndex[threadParam->m_portIndex];
-        int totalWord = (int)(unsigned char)m_cmdBuffer[4 + threadParam->m_portIndex];
+        unsigned int* wordPtr = &posWords[sent];
 
-        while (sent < totalWord)
+        while (sent < (int)(unsigned char)m_cmdBuffer[4 + threadParam->m_portIndex])
         {
-            unsigned int word = posWords[sent];
+            unsigned int word = *wordPtr;
 
             if (static_cast<signed char>(m_threadRunningMask) != 0)
             {
@@ -4471,6 +4472,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
                 break;
             }
 
+            wordPtr++;
             sent++;
         }
 
@@ -4513,11 +4515,11 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
     case 5:
     {
         int sent = m_pposWordIndex[threadParam->m_portIndex];
-        int totalWord = (int)(signed char)m_cmdBuffer[4 + threadParam->m_portIndex];
+        unsigned int* wordPtr = &posWords[sent];
 
-        while (sent < totalWord)
+        while (sent < (int)(signed char)m_cmdBuffer[4 + threadParam->m_portIndex])
         {
-            unsigned int word = posWords[sent];
+            unsigned int word = *wordPtr;
 
             if (static_cast<signed char>(m_threadRunningMask) != 0)
             {
@@ -4544,6 +4546,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
                 break;
             }
 
+            wordPtr++;
             sent++;
         }
 

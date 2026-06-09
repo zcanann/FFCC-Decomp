@@ -1296,7 +1296,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         MenuPcs.m_mcCtrl.m_cardChannel = m_accessCardChannel;
         m_cardChannel = static_cast<char>(MenuPcs.m_mcCtrl.m_cardChannel);
         m_saveIndex = static_cast<char>(m_accessSaveIndex);
-        m_memCardResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(static_cast<signed char>(m_cardChannel));
+        m_memCardResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(m_cardChannel);
         if (m_memCardResult == 1) {
             const unsigned char savedSaveIndex = static_cast<unsigned char>(m_saveIndex);
             const unsigned char savedCardChannel = static_cast<unsigned char>(m_cardChannel);
@@ -2193,7 +2193,7 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
         if (Game.m_caravanWorkArr[m_selectedChara].m_caravanLocalFlags == 0) {
             int activeMainCharacterCount = 0;
             for (int i = 0; i < 8; i++) {
-                if (Game.m_caravanWorkArr[i].m_objType != 0 && Game.m_caravanWorkArr[i].m_caravanLocalFlags == 0) {
+                if (Game.m_caravanWorkArr[i].m_shopState != 0 && Game.m_caravanWorkArr[i].m_caravanLocalFlags == 0) {
                     activeMainCharacterCount++;
                 }
             }
@@ -2458,8 +2458,14 @@ void CGoOutMenu::CalcDel()
     case 5:
         if (m_messageWindowOpen != 0 && static_cast<int>(MenuPcs.IsMenuCharaAnimIdle(m_selectedChara)) != 0) {
             input = GetGoOutInputMask();
+            bool pressed;
             if ((input & 0x100) != 0) {
                 Sound.PlaySe(2, 0x40, 0x7f, 0);
+                pressed = true;
+            } else {
+                pressed = false;
+            }
+            if (pressed) {
                 CCaravanWork& caravanWork = Game.m_caravanWorkArr[m_selectedChara];
                 caravanWork.m_shopState = 0;
                 memset(reinterpret_cast<unsigned char*>(&caravanWork) + 0x8A4, 0, 0x100);
@@ -2592,8 +2598,14 @@ void CGoOutMenu::CalcDel()
     case 8:
         if (m_messageWindowOpen != 0 && static_cast<int>(MenuPcs.IsMenuCharaAnimIdle(m_selectedChara)) != 0) {
             input = GetGoOutInputMask();
+            bool pressed;
             if ((input & 0x100) != 0) {
                 Sound.PlaySe(2, 0x40, 0x7f, 0);
+                pressed = true;
+            } else {
+                pressed = false;
+            }
+            if (pressed) {
                 SetDelMode(1);
             }
         }

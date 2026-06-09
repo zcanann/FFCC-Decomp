@@ -3799,16 +3799,16 @@ void CGMonObj::statWatch()
 		}
 
 		actionState = monObj->mlAttackCheck(selectedTarget);
-		if (actionState == -2) {
-			actionState = 0;
-			memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
-			chaseState = 0;
-			chaseTimer = 0;
-			monObj->m_chaseDirty = 1;
-		} else if (actionState == -1) {
+		if (actionState == -1) {
 			actionState = 0;
 			memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
 			chaseState = 2;
+			chaseTimer = 0;
+			monObj->m_chaseDirty = 1;
+		} else if (actionState == -2) {
+			actionState = 0;
+			memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
+			chaseState = 0;
 			chaseTimer = 0;
 			monObj->m_chaseDirty = 1;
 		} else {

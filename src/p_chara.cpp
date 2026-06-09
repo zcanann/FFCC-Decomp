@@ -1852,7 +1852,7 @@ checkLoaded:
                                     if (reinterpret_cast<int>(keyTag) == 4) {
                                         textureStageIndex = 3;
                                     }
-                                    CMemory::CStage* textureStage = (&pcs->m_viewerModelStage)[textureStageIndex];
+                                    CMemory::CStage* textureStage = (&CharaPcs.m_viewerModelStage)[textureStageIndex];
                                     textureSet->Create(rawAddr, SelectLoadStage(pcs, textureStage), 0, 0, 0, 0);
                                     loadTexture->m_textureSet = textureSet;
                                 } else {

@@ -2125,7 +2125,7 @@ void CChara::makeFurTex()
 		GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 
 		s_mogFurRand = 0;
-		for (int hair = 0; hair < 0x4000; hair++) {
+		for (unsigned int hair = 0; hair < 0x4000; hair++) {
 			GXBegin(GX_LINESTRIP, GX_VTXFMT0, 5);
 
 			float rootX = kCharaFurDepthScaleBase * (FLOAT_80331164 * static_cast<float>(FurRandNext()) + kCharaFurViewDepthThreshold);

@@ -899,7 +899,7 @@ void CGPartyObj::onFrameAlways()
 	reinterpret_cast<CCaravanWork*>(m_scriptHandle)->CalcStatus();
 	int port = reinterpret_cast<int>(m_scriptHandle[0xED]);
 	int showTraceParticle;
-	if ((Game.m_gameWork.m_gameInitFlag == 0) ||
+	if ((static_cast<int>(Game.m_gameWork.m_gameInitFlag) == 0) ||
 	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 28) & 0xC0000000) >> 31) == 0) ||
 	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 29) & 0xC0000000) >> 31) == 0) ||
 	    ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) << 24) & 0xC0000000) >> 31) == 0) ||

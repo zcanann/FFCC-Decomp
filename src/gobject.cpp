@@ -548,6 +548,10 @@ void CGObject::move()
                 buttons |= buttonsRepeat;
             }
 
+            moveVec.x = sZeroFloat;
+            moveVec.y = sZeroFloat;
+            moveVec.z = sZeroFloat;
+
             u32 miniGameFlags = DbgMenuPcs.GetDbgFlagsRaw();
             if ((miniGameFlags & 0x100) != 0) {
                 const float stickX = (Pad.m_debugPadLock != 0 || (player == 0 && Pad.m_debugPadPort != -1))

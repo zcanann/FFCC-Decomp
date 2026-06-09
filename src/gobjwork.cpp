@@ -751,13 +751,15 @@ int CCaravanWork::CanAddTmpArtifact(int numItems)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_propagation off
 int CCaravanWork::FindItem(int itemId)
 {
 	CCaravanWork* cur = this;
 	int itemIdx = 0;
 
 	for (int row = 0; row < 8; row++) {
-		unsigned short item = cur->m_inventoryItems[0];
+		short item = cur->m_inventoryItems[0];
 		if (item != -1 && item == itemId) {
 			return itemIdx;
 		}
@@ -803,6 +805,7 @@ int CCaravanWork::FindItem(int itemId)
 
 	return -1;
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -1667,6 +1670,8 @@ void CCaravanWork::CallShop(int requestType, int arg0, int arg1, int arg2, int a
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_propagation off
 void CCaravanWork::SafeDeleteTempItem()
 {
 	if ((unsigned int)System.m_execParam >= 3U) {
@@ -1778,6 +1783,7 @@ void CCaravanWork::SafeDeleteTempItem()
 	m_weaponIdx = 0;
 	memset(m_commandListExtra, 0, sizeof(m_commandListExtra));
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -2200,6 +2206,8 @@ unsigned int CCaravanWork::GetMagicCharge(int cmdListIdx, int&, int&)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_common_subs off
 int CCaravanWork::GetCmdListItemName(int cmdListIdx, int* firstCmdIdx, int* itemCmdListIdx)
 {
 	int groupedCount;
@@ -2257,6 +2265,7 @@ int CCaravanWork::GetCmdListItemName(int cmdListIdx, int* firstCmdIdx, int* item
 
 	return 0;
 }
+#pragma pop
 
 /*
  * --INFO--

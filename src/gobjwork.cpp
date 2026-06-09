@@ -2354,20 +2354,16 @@ int CCaravanWork::DelCmdListAndItem(int cmdListIdx)
 		} else if (m_commandListExtra[cmdListIdx] == 0) {
 			numGrouped = 1;
 		} else {
-			int scanCount = cmdListIdx + 1;
 			int topIdx = cmdListIdx;
-			if (cmdListIdx >= 0) {
-				while (scanCount != 0) {
-					if (m_commandListExtra[topIdx] != -1) {
-						break;
-					}
-					topIdx--;
-					scanCount--;
+			for (int n = cmdListIdx; n >= 0; n--) {
+				if (m_commandListExtra[topIdx] != -1) {
+					break;
 				}
+				topIdx--;
 			}
 
 			numGrouped = 1;
-			scanCount = (short)m_numCmdListSlots - (topIdx + 1);
+			int scanCount = (short)m_numCmdListSlots - (topIdx + 1);
 			int nextIdx = topIdx + 1;
 			if ((topIdx + 1) < (short)m_numCmdListSlots) {
 				while (scanCount != 0) {
@@ -2382,15 +2378,11 @@ int CCaravanWork::DelCmdListAndItem(int cmdListIdx)
 		}
 
 		if (numGrouped > 1) {
-			int scanCount = cmdListIdx + 1;
-			if (cmdListIdx >= 0) {
-				while (scanCount != 0) {
-					if (m_commandListExtra[cmdListIdx] != -1) {
-						break;
-					}
-					cmdListIdx--;
-					scanCount--;
+			for (int n = cmdListIdx; n >= 0; n--) {
+				if (m_commandListExtra[cmdListIdx] != -1) {
+					break;
 				}
+				cmdListIdx--;
 			}
 
 			int cmdResult = m_commandListExtra[cmdListIdx];

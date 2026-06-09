@@ -2552,7 +2552,7 @@ void CGoOutMenu::CalcDel()
         m_cursorListY1 = 0xdb;
         m_cursorMode = 0;
         {
-            unsigned char next;
+            signed char next;
 
             if (MenuPcs.m_menuWindowInfo->state != 1) {
                 next = 0;

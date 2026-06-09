@@ -2552,9 +2552,11 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 		if (bossCid && (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) != 0)) {
 			bossTarget = true;
 		}
-		float radius = FLOAT_80331A88;
+		float radius;
 		if (bossTarget) {
 			radius = FLOAT_80331AB0;
+		} else {
+			radius = FLOAT_80331A88;
 		}
 
 		CVector startOffset(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);

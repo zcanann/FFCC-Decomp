@@ -2933,7 +2933,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
             GXCopyTex(m_shadowTexturePtr, GX_TRUE);
         }
 
-        const int shadowMode = __cntlzw(static_cast<unsigned int>(1 - drawPass)) >> 5;
+        const int shadowMode = static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(1 - drawPass))) >> 5;
         m_model->DrawShadow(viewMtx, shadowMode);
 
         if (drawPass == 2) {

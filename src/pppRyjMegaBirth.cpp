@@ -879,6 +879,7 @@ void calc(
  */
 #pragma push
 #pragma opt_common_subs off
+#pragma opt_dead_assignments off
 void birth(
     _pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* param, VColor* color, _PARTICLE_DATA* particle,
     _PARTICLE_WMAT* worldMat, _PARTICLE_COLOR* colorData)

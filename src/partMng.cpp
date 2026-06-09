@@ -2471,27 +2471,45 @@ void CPartMng::pppEditPartCalc()
             if (mng->m_baseTime == -0x1000) {
                 mng->m_baseTime = 0;
             }
-            if (mng->m_baseTime < 0) {
-                pppSetMatrix(mng);
-                pppSetFpMatrix(mng);
-                _pppCalcPart(mng);
-                if (mng->m_mode != 0 && mng->m_currentFrame == mng->m_lifeEnd) {
-                    gPppHeapUseRateWords[1] = 0;
+            if (mng->m_baseTime >= 0) {
+                goto decrementTimerB;
+            }
+
+        runFrameB:
+            pppSetMatrix(mng);
+            pppSetFpMatrix(mng);
+            _pppCalcPart(mng);
+            if (mng->m_mode != 0 && mng->m_currentFrame == mng->m_lifeEnd) {
+                gPppHeapUseRateWords[1] = 0;
+            }
+            _pppDeadPart(mng);
+            if (mng->m_isFinished != 0 || mng->m_hitBgFlag != 0) {
+                Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x861);
+                _pppAllFreePObject(mng);
+                Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x865);
+                if (*reinterpret_cast<int*>(self + 0x174) > 3) {
+                    pppHeapCheckLeak(ppvEnv->m_stagePtr);
                 }
-                _pppDeadPart(mng);
-                if (mng->m_isFinished != 0 || mng->m_hitBgFlag != 0) {
-                    Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x861);
-                    _pppAllFreePObject(mng);
-                    Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x865);
-                    if (*reinterpret_cast<int*>(self + 0x174) > 3) {
-                        pppHeapCheckLeak(ppvEnv->m_stagePtr);
-                    }
-                    if (i == 0) {
-                        usbEdit[0x1A] = 1;
-                    }
-                    gPppHeapUseRateWords[1] = 0;
+                if (i == 0) {
+                    usbEdit[0x1A] = 1;
+                }
+                gPppHeapUseRateWords[1] = 0;
+            }
+            continue;
+
+        decrementTimerB:
+            {
+                int newBaseTime = mng->m_baseTime - 1;
+                mng->m_baseTime = newBaseTime;
+                if (newBaseTime >= 0) {
+                    continue;
                 }
             }
+            mng->m_particleEnded = 0;
+            *reinterpret_cast<int*>(&mng->m_envColorR) = *reinterpret_cast<int*>(self + 0x168);
+            _pppStartPart(mng, reinterpret_cast<long*>(*reinterpret_cast<long*>(self + 0x5dc +
+                                   (*reinterpret_cast<int**>(self + 0x1C8))[i * 0x18 + 0xC] * 4)), 1);
+            goto runFrameB;
         }
     }
 }

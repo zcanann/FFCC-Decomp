@@ -2675,7 +2675,10 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
     }
 
     const unsigned int flags = m_flags;
-    if ((flags & 1) == 0 || (flags & 0x400000) != 0) {
+    if ((flags & 1) == 0) {
+        return;
+    }
+    if ((flags & 0x400000) != 0) {
         return;
     }
     if (kCharaZero == m_model->m_lightAlpha && (flags & 0x80) == 0) {

@@ -2921,9 +2921,10 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
 
     if (drawPass == 1 || drawPass == 2) {
         if (drawPass == 2) {
-            const short shadowSize = static_cast<short>(CharaPcs.m_texShadowSize);
+            const unsigned short shadowSize = static_cast<unsigned short>(CharaPcs.m_texShadowSize);
             GXSetTexCopySrc(0, 0, shadowSize, shadowSize);
-            GXSetTexCopyDst(shadowSize, shadowSize, GX_TF_I8, GX_FALSE);
+            GXSetTexCopyDst(static_cast<unsigned short>(CharaPcs.m_texShadowSize),
+                            static_cast<unsigned short>(CharaPcs.m_texShadowSize), GX_CTF_R4, GX_FALSE);
             m_shadowTexturePtr = reinterpret_cast<unsigned char*>(CharaPcs.m_texShadowTextureBase) +
                                  CharaPcs.m_texShadowTextureOffset;
             DCInvalidateRange(m_shadowTexturePtr, (shadowSize * shadowSize) / 2);
@@ -2947,18 +2948,12 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
             modelDrawFlags |= 1;
         }
         const unsigned int drawFlags = m_flags;
-        if ((drawFlags & 0x400) != 0) {
-            modelDrawFlags |= 2;
-        }
-        if ((drawFlags & 0x2000) != 0) {
-            modelDrawFlags |= 4;
-        }
+        modelDrawFlags |= ((drawFlags & 0x400) != 0) ? 2 : 0;
+        modelDrawFlags |= ((drawFlags & 0x2000) != 0) ? 4 : 0;
         if (drawPass == 3 && (drawFlags & 0x8000) != 0) {
             modelDrawFlags |= 8;
         }
-        if ((drawFlags & 0x100000) != 0) {
-            modelDrawFlags |= 0x10;
-        }
+        modelDrawFlags |= ((drawFlags & 0x100000) != 0) ? 0x10 : 0;
         m_model->Draw(viewMtx, modelDrawFlags, 0);
     }
 

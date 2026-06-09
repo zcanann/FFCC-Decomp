@@ -714,7 +714,7 @@ void CGraphicPcs::drawBar()
     _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 
     const bool useDebugPad = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
-    int padState = 0;
+    unsigned int padState = 0;
     if (!useDebugPad) {
         int padIndex = useDebugPad;
         padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);

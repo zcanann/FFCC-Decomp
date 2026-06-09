@@ -4370,13 +4370,13 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
         *reinterpret_cast<int*>(&mng->m_rotation.z) = *reinterpret_cast<int*>(fpData + 0x14);
         mng->m_rotationSpeed = *reinterpret_cast<int*>(fpData + 0x18);
     } else {
-        int rotX = static_cast<unsigned int>(createParam->m_rotationPtr->x * 65536.0f / 360.0f);
-        int rotY = static_cast<int>(createParam->m_rotationPtr->y * 65536.0f / 360.0f);
-        mng->m_rotation.x = static_cast<short>(rotX >> 16);
-        mng->m_rotation.y = static_cast<short>(rotX);
-        mng->m_rotation.z = static_cast<short>(rotY >> 16);
-        mng->m_rotation.w = static_cast<short>(rotY);
-        mng->m_rotationSpeed = static_cast<int>(createParam->m_rotationPtr->z * 65536.0f / 360.0f);
+        unsigned char* mngB = reinterpret_cast<unsigned char*>(mng);
+        *reinterpret_cast<int*>(mngB + 0x18) =
+            static_cast<int>(createParam->m_rotationPtr->x * 65536.0f / 360.0f);
+        *reinterpret_cast<int*>(mngB + 0x1C) =
+            static_cast<int>(createParam->m_rotationPtr->y * 65536.0f / 360.0f);
+        *reinterpret_cast<int*>(mngB + 0x20) =
+            static_cast<int>(createParam->m_rotationPtr->z * 65536.0f / 360.0f);
     }
 
     if (createParam->m_scalePtr == 0) {

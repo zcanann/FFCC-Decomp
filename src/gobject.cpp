@@ -672,9 +672,9 @@ void CGObject::move()
                 if (sSlideThreshold < slideSq) {
                     Mtx yawMtx;
                     Mtx pitchMtx;
+                    Vec worldPosNorm;
                     Vec worldUp;
                     Vec tangent;
-                    Vec worldPosNorm;
                     Vec moveNorm;
                     Vec cross;
 

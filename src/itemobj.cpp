@@ -743,7 +743,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 			CCharaPcs::CHandle* handle =
 			    new (Game.m_mainStage, itemObjStrings + kItemObjStrItemobjCpp, 0x28E) CCharaPcs::CHandle;
 			reinterpret_cast<CGItemObj*>(newItem)->m_pendingModelHandle = handle;
-			handle->Add();
+			reinterpret_cast<CGItemObj*>(newItem)->m_pendingModelHandle->Add();
 
 			reinterpret_cast<CGItemObj*>(newItem)->m_pendingModelHandle->LoadModelASync(2, ccfs->m_modelId, ccfs->m_modelParam);
 

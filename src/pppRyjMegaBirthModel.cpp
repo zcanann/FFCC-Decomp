@@ -247,13 +247,13 @@ static inline void wrap_particle_rotation_triplet_s32(u8* particleBytes, s32 off
     } while (count != 0);
 }
 
-static inline void wrap_birth_angle(s32* value)
+static inline void wrap_birth_angle(s32* value, s32 limit)
 {
     s32 v = *value;
-    if ((v >= 0x8000) || (v < -0x8000)) {
+    if ((v >= limit) || (v < -0x8000)) {
         u32 sign = (u32)v >> 0x1F;
         u32 y = (u32)(v << 0x11) - sign;
-        *value = (s32)(((y << 0xF) | (y >> 0x11)) + sign);
+        *value = (s32)(__rlwinm(y, 0xF, 0, 0x1F) + sign);
     }
 }
 
@@ -888,9 +888,12 @@ join_position:
         }
     }
 
-    wrap_birth_angle(s32_at(particleData, 0x38));
-    wrap_birth_angle(s32_at(particleData, 0x3C));
-    wrap_birth_angle(s32_at(particleData, 0x40));
+    {
+        s32 wrapLimit = 0x8000;
+        wrap_birth_angle(s32_at(particleData, 0x38), wrapLimit);
+        wrap_birth_angle(s32_at(particleData, 0x3C), wrapLimit);
+        wrap_birth_angle(s32_at(particleData, 0x40), wrapLimit);
+    }
 
     *f32_at(particleData, 0x5C) = *(float*)(payload + 0x90);
     *f32_at(particleData, 0x60) = *(float*)(payload + 0x94);

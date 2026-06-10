@@ -105,9 +105,9 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                 pppFMATRIX drawMtx;
                 Vec zeroVec;
                 Vec segVec;
-                Vec cameraPos;
-                Vec trailPos;
-                Vec managerPos;
+                union { Vec cameraPos; double _cameraPosAlign; };
+                union { Vec trailPos; double _trailPosAlign; };
+                union { Vec managerPos; double _managerPosAlign; };
                 GXColor amb;
                 u8* curHist;
                 tagOAN3_SHAPE* shape;

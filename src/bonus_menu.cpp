@@ -2373,41 +2373,36 @@ void CMenuPcs::CalcResultCloseAnim()
 
 	int off = 0;
 	for (int i = 0; i < *(short*)this->m_bonusAnimPtr; i++) {
-		short* sprite = (short*)((int)this->m_bonusAnimPtr + off + 8);
+		int sprOff = off + 8;
+		BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + sprOff);
 
-		if ((*(unsigned int*)(sprite + 0x16) & 1) != 0) {
-			*(float*)(sprite + 8) = 0.0f;
+		if ((BonusSpriteFlags(sprite) & 1) != 0) {
+			sprite->alpha = FLOAT_80331EB0;
 		} else {
-			if (frame < *(int*)(sprite + 0x12)) {
-				*(float*)(sprite + 8) = 0.0f;
+			if (sprite->startFrame > frame) {
+				sprite->alpha = FLOAT_80331EB0;
 			}
-			if (frame < (int)(*(int*)(sprite + 0x12) + *(unsigned int*)(sprite + 0x14))) {
-				*(float*)(sprite + 8) =
-				    1.0f - ((float)*(int*)(sprite + 0x10) / (float)*(int*)(sprite + 0x14));
+			if (sprite->startFrame + sprite->duration <= frame) {
+				sprite->alpha = kBonusZClearOrigin;
 			} else {
-				*(float*)(sprite + 8) = 0.0f;
+				sprite->alpha = (float)(1.0 - (1.0 / (double)sprite->duration) * (double)sprite->timer);
 			}
 		}
 
-		if ((int)(*(int*)(sprite + 0x12) + *(unsigned int*)(sprite + 0x14)) <= frame ||
-		    0x270e < *(int*)(sprite + 0x12)) {
+		if (sprite->startFrame + sprite->duration <= frame || sprite->startFrame >= 9999) {
 			doneCount++;
 		}
 
-		if ((*(unsigned int*)(sprite + 0x16) & 2) == 0 &&
-		    (*(float*)(sprite + 0x18) != 0.0f || *(float*)(sprite + 0x1a) != 0.0f)) {
-			float fy = (float)(int)sprite[1];
-			float ty = *(float*)(sprite + 0x1e);
-			float progress =
-			    1.0f - ((float)*(int*)(sprite + 0x10) / (float)*(int*)(sprite + 0x14));
-			*(float*)(sprite + 0x18) =
-			    (*(float*)(sprite + 0x1c) - (float)(int)*sprite) * progress;
-			*(float*)(sprite + 0x1a) = (ty - fy) * progress;
+		if ((BonusSpriteFlags(sprite) & 2) == 0 && (sprite->motionX != kBonusZClearOrigin || sprite->motionY != kBonusZClearOrigin)) {
+			float fy = (float)sprite->y;
+			float ty = sprite->targetY;
+			float progress = (float)(1.0 - (1.0 / (double)sprite->duration) * (double)sprite->timer);
+			sprite->motionX = (sprite->targetX - (float)sprite->x) * progress;
+			sprite->motionY = (ty - fy) * progress;
 		}
 
-		if (*(int*)(sprite + 0x12) < frame &&
-		    frame <= *(int*)(sprite + 0x12) + *(int*)(sprite + 0x14)) {
-			*(int*)(sprite + 0x10) = *(int*)(sprite + 0x10) + 1;
+		if (sprite->startFrame < frame && frame <= sprite->startFrame + sprite->duration) {
+			sprite->timer++;
 		}
 
 		off += 0x40;

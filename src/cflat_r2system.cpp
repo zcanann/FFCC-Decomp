@@ -2280,9 +2280,9 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
                 continue;
             }
 
-            unsigned long segment = 0;
-            float segmentRatio = 0.0f;
-            float nearestDistance = 0.0f;
+            unsigned long segment;
+            float segmentRatio;
+            float nearestDistance;
             if (line.Calc((Vec*)0, &nearestDistance, &segment, &segmentRatio, &target, margin) != 0 &&
                 nearestDistance < bestDistance) {
                 found = 1;
@@ -2380,11 +2380,11 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         target.y = localFloats[2];
         target.z = localFloats[3];
         CLine<64>* line = &m_debugLines[*object->m_localBase];
-        unsigned long segment = 0;
-        float segmentRatio = 0.0f;
-        float distance = 0.0f;
+        unsigned long segment;
+        float segmentRatio;
+        float distance = kCFlatPadStickZero;
 
-        if (line->Calc((Vec*)0, (float*)0, &segment, &segmentRatio, &target, 0.0f) != 0) {
+        if (line->Calc((Vec*)0, (float*)0, &segment, &segmentRatio, &target, kCFlatPadStickZero) != 0) {
             distance = line->segments[segment].length * segmentRatio + line->segments[segment].startLength;
         }
 

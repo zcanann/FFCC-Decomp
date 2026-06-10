@@ -969,7 +969,7 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
         }
         Sound.PlaySe(1, 0x40, 0x7f, 0);
     } else if ((repeat & 0x4) != 0) {
-        if (row < (select >= 10 ? 4 : 3)) {
+        if (row < (select >= 10 ? 5 : 4)) {
             row = static_cast<short>(row + 1);
         } else {
             row = 0;

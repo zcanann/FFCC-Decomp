@@ -2522,7 +2522,7 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 		SCharaStaBlock* staBlock = reinterpret_cast<SCharaStaBlock*>(m_scriptHandle);
 		if (staBlock->m_sta[staIndex] != 0) {
 			System.Printf(const_cast<char*>(sCharaObjEffectTimeNoOverwriteMsg));
-			return static_cast<int>(staBlock->m_sta[staIndex]);
+			return static_cast<int>(reinterpret_cast<SCharaStaBlock*>(m_scriptHandle)->m_sta[staIndex]);
 		}
 	}
 
@@ -2591,7 +2591,7 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 				usePartySource = 1;
 			}
 		}
-		if (usePartySource != 0 && sourceObj->m_scriptHandle[0xED] != 0) {
+		if (usePartySource != 0 && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0x3B4) != 0) {
 			usePartyLeader = 1;
 		}
 

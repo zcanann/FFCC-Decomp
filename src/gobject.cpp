@@ -1559,7 +1559,7 @@ void CGObject::update()
 
             const float swayDx = m_radiusCtrlVel.x - m_groundFriction;
             const float swayDz = m_radiusCtrl.y - m_radiusCtrlVel.y;
-            const float swayMag = GObjSqrtf(swayDx * swayDx + swayDz * swayDz);
+            const float swayMag = GObjSqrtf(swayDz * swayDz + swayDx * swayDx);
             m_radiusCtrlVel.y += sBgAttrNormal * swayDz;
             m_groundFriction += sBgAttrNormal * swayDx;
 

@@ -406,7 +406,7 @@ void CCaravanWork::AddLetter(int letterType, int senderId, int moneyValue, int h
 	memset(&m_letters[0], 0, sizeof(m_letters[0]));
 	m_letters[0].SetMessageType(letterType);
 	m_letters[0].m_words.m_word0 = (m_letters[0].m_words.m_word0 & 0xFFFC01FF) | ((senderId & 0x1FF) << 9);
-	m_letters[0].SetFlags((m_letters[0].Flags() & ~8) | ((hasMoneyFlag << 3) & 8));
+	m_letters[0].FlagsBits().m_attachmentIsGil = hasMoneyFlag;
 	int attachmentValue;
 	if (m_letters[0].AttachmentIsGil()) {
 		attachmentValue = moneyValue / 100;

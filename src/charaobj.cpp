@@ -2839,30 +2839,28 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + effectId * 0x48;
 	unsigned int particleClass = *reinterpret_cast<unsigned short*>(itemData + 0x12);
 	int particleBank = CharaObjResolveParticleBank(this, particleClass);
-	short particleEntry = 0xFFFF;
-	unsigned short particleFlags = 0;
+	unsigned short particleEntry = 0xFFFF;
 	int particleNo = effectId;
 	int seNo = 0;
 	int emittedCustom = 0;
 	int hasParticle = 0;
 
 	if (particleBank != -1) {
-		particleEntry = *reinterpret_cast<short*>(itemData + 0x14 + effectArg0 * 2);
+		particleEntry = *reinterpret_cast<unsigned short*>(itemData + 0x14 + effectArg0 * 2);
 		if (particleEntry != 0xFFFF) {
-			particleFlags = particleEntry;
 			particleNo = particleEntry & 0xFF;
 
-			if ((particleFlags & 0x1000) != 0) {
+			if ((particleEntry & 0x1000) != 0) {
 				particleBank = 1;
-			} else if ((particleFlags & 0x2000) != 0) {
+			} else if ((particleEntry & 0x2000) != 0) {
 				particleBank = 2;
-			} else if ((particleFlags & 0x4000) != 0) {
+			} else if ((particleEntry & 0x4000) != 0) {
 				particleBank = 3;
 			} else if (particleBank == 1 && particleNo < 8) {
 				particleNo += *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0);
 			}
 
-			if ((particleFlags & 0x800) != 0) {
+			if ((particleEntry & 0x800) != 0) {
 				particleNo += *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2);
 			}
 			hasParticle = 1;
@@ -2948,9 +2946,9 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 			CFlatRuntime2Storage().SetParticleWorkCol(colType, -1, *reinterpret_cast<unsigned short*>(colData + 4) * 0.01f);
 		}
 
-		if ((particleFlags & 0x100) != 0) {
+		if ((particleEntry & 0x100) != 0) {
 			CFlatRuntime2Storage().SetParticleWorkBind(this);
-		} else if ((particleFlags & 0x200) != 0) {
+		} else if ((particleEntry & 0x200) != 0) {
 			float distance = *reinterpret_cast<short*>(itemData + 0x2A) * 1.0f;
 			Vec offsetPos;
 			offsetPos.x = m_worldPosition.x + sinf(m_rotTargetY) * distance;
@@ -2971,7 +2969,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 			}
 		} else if (pos != 0) {
 			CFlatRuntime2Storage().SetParticleWorkPos(*pos, m_rotTargetY);
-		} else if ((particleFlags & 0x400) != 0) {
+		} else if ((particleEntry & 0x400) != 0) {
 			CFlatRuntime2Storage().SetParticleWorkPos(m_jumpOffset, kCharaObjZero);
 		} else {
 			CFlatRuntime2Storage().SetParticleWorkPos(m_worldPosition, m_rotTargetY);

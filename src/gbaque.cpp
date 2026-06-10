@@ -94,6 +94,11 @@ static inline unsigned short SwapU16(unsigned short value)
 	return __lhbrx(&value, 0);
 }
 
+static inline short SwapS16(short value)
+{
+	return __lhbrx(&value, 0);
+}
+
 static inline unsigned int SwapU32(unsigned int value)
 {
 	return __lwbrx(&value, 0);
@@ -611,10 +616,11 @@ inline void GbaQueue::ChgItemData(int channel, unsigned int data)
 inline void GbaQueue::ChgMoneyData(int channel, unsigned int data)
 {
 	unsigned char* dataBytes = reinterpret_cast<unsigned char*>(&data);
+	const int moneyCmd = dataBytes[0] >> 6;
 
 	if (Game.m_scriptFoodBase[channel] == 0) {
 		Joybus.SendResult(channel, 1, dataBytes[0], dataBytes[1]);
-	} else if ((dataBytes[0] >> 6) == 0) {
+	} else if (moneyCmd == 0) {
 		m_moneyState[channel] = dataBytes[1] | 0x80;
 		m_pendingMoney[channel] = dataBytes[2] << 24;
 		m_pendingMoney[channel] |= dataBytes[3] << 16;
@@ -655,7 +661,7 @@ inline void GbaQueue::ChgCmdLstData(int channel, unsigned int data)
 	unsigned char* dataBytes = reinterpret_cast<unsigned char*>(&data);
 
 	reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])
-		->ChgCmdLst(dataBytes[1], static_cast<short>(SwapU16(*reinterpret_cast<short*>(dataBytes + 2))));
+		->ChgCmdLst(dataBytes[1], SwapS16(*reinterpret_cast<short*>(dataBytes + 2)));
 }
 
 /*
@@ -807,7 +813,7 @@ void GbaQueue::ExecutQueue()
 						if (Game.m_scriptFoodBase[channel] != 0) {
 							unsigned int cmdWord = queueWords[i];
 							unsigned char* bytes = reinterpret_cast<unsigned char*>(&cmdWord);
-							const short itemId =
+							const int itemId =
 								reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_inventoryItems[bytes[2]];
 							reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->DeleteItemIdx(bytes[2], 1);
 							const unsigned short baseGil =
@@ -830,7 +836,7 @@ void GbaQueue::ExecutQueue()
 							const int quantity = bytes[3];
 							int shopItem = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_shopList[bytes[2]];
 							for (n = 0; n < quantity; n++) {
-								if (!reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->AddItem(shopItem, 0)) {
+								if (reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->AddItem(shopItem, 0) == false) {
 									Joybus.SendResult(channel, 1, bytes[0], bytes[1]);
 								}
 							}

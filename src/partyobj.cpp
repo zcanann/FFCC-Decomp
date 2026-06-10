@@ -1415,39 +1415,27 @@ tmpArtifactBlock:
 		const int itemId = caravan->DelCmdListAndItem(cmdIdx);
 		const int kindOffset = itemId * 0x48;
 		const unsigned short itemKind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + kindOffset);
-		if (itemKind == 0x125) {
-			m_itemId = 0x220;
-			changeStat(2, 0, 2);
-			return;
-		}
-		if (itemKind > 0x124) {
-			if (itemKind != 0x186) {
-				if (itemKind > 0x185) {
-					if (itemKind != 0x1F5) {
-						return;
-					}
-					m_itemId = itemId;
-					changeStat(2, 0, 0);
+		switch (itemKind) {
+		case 0x100:
+			if (itemId == 0x103) {
+				if (Math.Rand(3) == 0) {
+					ClearAllSta();
+					setSta(0x1B, 900);
+					caravan->GetNumCombi(party.unk6BC, 1);
 					return;
 				}
-				if (itemKind != 0x17D) {
-					return;
-				}
+				m_itemId = 0x103;
+				changeStat(2, 0, 2);
+				return;
 			}
-			if (useItem(itemId) != 0) {
-				caravan->GetNumCombi(party.unk6BC, 1);
-			}
-			return;
-		}
-		if (itemKind == 0xDF) {
 			m_itemId = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + kindOffset + 10);
 			changeStat(2, 0, 0);
 			return;
-		}
-		if (itemKind < 0xDF) {
-			if (itemKind != 1) {
-				return;
-			}
+		case 0x1F5:
+			m_itemId = itemId;
+			changeStat(2, 0, 0);
+			return;
+		case 1: {
 			int weaponItem;
 			int weaponRef;
 			caravan->GetCurrentWeaponItem(weaponItem, weaponRef);
@@ -1462,23 +1450,23 @@ tmpArtifactBlock:
 			changeStat(7, 0, 0);
 			return;
 		}
-		if (itemKind != 0x100) {
-			return;
-		}
-		if (itemId == 0x103) {
-			if (Math.Rand(3) == 0) {
-				ClearAllSta();
-				setSta(0x1B, 900);
-				caravan->GetNumCombi(party.unk6BC, 1);
-				return;
-			}
-			m_itemId = 0x103;
+		case 0x125:
+			m_itemId = 0x220;
 			changeStat(2, 0, 2);
 			return;
+		case 0x186:
+		case 0x17D:
+			if (useItem(itemId) != 0) {
+				caravan->GetNumCombi(party.unk6BC, 1);
+			}
+			return;
+		case 0xDF:
+			m_itemId = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + kindOffset + 10);
+			changeStat(2, 0, 0);
+			return;
+		default:
+			return;
 		}
-		m_itemId = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + kindOffset + 10);
-		changeStat(2, 0, 0);
-		return;
 	}
 
 	if ((getPadTrigForSlot(padSlot) & 0x200) == 0) {

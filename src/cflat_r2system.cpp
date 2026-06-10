@@ -4169,8 +4169,8 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
  */
 CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int systemValue)
 {
-    u8* game = reinterpret_cast<u8*>(&Game);
     CGame::CGameWork& gameWork = Game.m_gameWork;
+    u8* game = reinterpret_cast<u8*>(&Game);
 
     if (systemValue <= -0x1000) {
         int valueIndex = -0x1000 - systemValue;
@@ -4222,13 +4222,13 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
         FlatLastResult(this) = result;
     } else if (systemValue <= -500) {
         int bitIndex = systemValue + 0x9F3;
-        int byteIndex = bitIndex / 8 + 8;
+        int byteIndex = bitIndex / 8;
         unsigned int mask = 1U << (bitIndex % 8);
-        unsigned int flag = static_cast<unsigned int>(static_cast<unsigned char>(gameWork.m_eventFlags[byteIndex])) & mask;
+        unsigned int flag = static_cast<unsigned int>(static_cast<unsigned char>(Game.m_gameWork.m_eventFlags[byteIndex])) & mask;
         FlatLastResult(this) = (-flag | flag) >> 31;
     } else if (systemValue <= -200) {
-        short* artifact = &Game.m_gameWork.m_eventWork[systemValue + 0x1C7];
-        FlatLastResult(this) = static_cast<unsigned int>(static_cast<int>(*artifact));
+        int workIndex = systemValue + 0x1C7;
+        FlatLastResult(this) = static_cast<unsigned int>(static_cast<int>(gameWork.m_eventWork[workIndex]));
     } else {
         switch (systemValue) {
         case -0x40:
@@ -4313,12 +4313,14 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
         case -0x6E:
         case -0x6D:
         case -0x6C: {
-            u8* usbEdit = game + (systemValue + 0x73) * 0xC30;
+            u8* usbEdit = reinterpret_cast<u8*>(&Game) + (systemValue + 0x73) * 0xC30;
+            unsigned int charaValue;
             if (*(int*)(usbEdit + 0x1794) != 0) {
-                FlatLastResult(this) = *(unsigned short*)(usbEdit + 0x1404);
+                charaValue = *(unsigned short*)(usbEdit + 0x1404);
             } else {
-                FlatLastResult(this) = 0;
+                charaValue = 0;
             }
+            FlatLastResult(this) = charaValue;
             break;
         }
         case -0x76:
@@ -4329,7 +4331,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
             break;
         case -0x7A: {
             unsigned int languageValue = 1;
-            switch (gameWork.m_languageId) {
+            switch (Game.m_gameWork.m_languageId) {
             case 0:
                 languageValue = 1;
                 break;

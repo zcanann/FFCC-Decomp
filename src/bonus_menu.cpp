@@ -1623,7 +1623,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 		for (int i = 0; i < activePartyCount; i++) {
 			int partySlot;
 			BonusSummaryData* p = s_Rinfo;
-			for (int j = 0; j < activePartyCount; j++) {
+			for (int j = 0; activePartyCount > j; j++) {
 				if (i == p->m_party[0].m_rank) {
 					partySlot = s_Rinfo->m_party[j].m_partySlot;
 					break;
@@ -1700,7 +1700,8 @@ void CMenuPcs::CalcSelectOpenAnim()
 		for (int i = 0; i < activePartyCount; i++) {
 			int off = ((top + i) << 6) + 8;
 			BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + off);
-			*spr = *(spr - copyDelta);
+			int __p21 = copyDelta;
+			*spr = *(spr - __p21);
 			spr->y = (short)(spr->y + 0x20);
 			spr->w = 0xA8;
 			spr->h = 0x38;

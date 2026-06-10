@@ -869,13 +869,7 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 	fVar1 = static_cast<float>(-(kRingMenuSpinAlphaSlopeD * fabs(static_cast<double>(angle)) - kRingMenuOneD));
 	textHeight = static_cast<float>(font->m_glyphHeight) * font->scaleY;
 
-	if (fVar1 < kRingMenuZero) {
-		clampedAlpha = kRingMenuZero;
-	} else if (kRingMenuOne < fVar1) {
-		clampedAlpha = kRingMenuOne;
-	} else {
-		clampedAlpha = fVar1;
-	}
+	clampedAlpha = (fVar1 < kRingMenuZero) ? kRingMenuZero : ((kRingMenuOne < fVar1) ? kRingMenuOne : fVar1);
 
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF,
 		static_cast<unsigned char>((kRingMenuAlphaMax * alphaScale) * clampedAlpha)).color);

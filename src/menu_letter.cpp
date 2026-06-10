@@ -1154,7 +1154,7 @@ int CMenuPcs::LetterClose()
 				if ((*reinterpret_cast<unsigned int*>(entry + 0x16) & 2) == 0) {
 					f = static_cast<float>(DOUBLE_803330e8 -
 					                       (DOUBLE_803330e8 / static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(entry + 0x14)))) *
-					                           static_cast<double>(static_cast<float>(*reinterpret_cast<unsigned int*>(entry + 0x10))));
+					                           static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(entry + 0x10))));
 					float dx = (*reinterpret_cast<float*>(entry + 0x1C) - static_cast<float>(entry[0])) * f;
 					float dy = (*reinterpret_cast<float*>(entry + 0x1E) - static_cast<float>(entry[1])) * f;
 					*reinterpret_cast<float*>(entry + 0x18) = dx;

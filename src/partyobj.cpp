@@ -1140,9 +1140,9 @@ void CGPartyObj::command()
 	PartyObjOverlay& party = PartyData(this);
 #define caravan reinterpret_cast<CCaravanWork*>(m_scriptHandle)
 #define padSlot static_cast<char>(m_animStateMisc)
-	bool primaryAvailable = false;
+	int primaryAvailable = false;
 	int primaryCommand = -1;
-	bool secondaryAvailable = false;
+	int secondaryAvailable = false;
 	int secondaryCommand = -1;
 	int ringCommand = -1;
 	int ringCommandArg = -1;
@@ -1216,10 +1216,10 @@ void CGPartyObj::command()
 					if (targetState == 0x0B) {
 						goto targetJoin;
 					}
-					if (targetState > 0x0B) {
+					if (targetState >= 0x0B) {
 						goto cmdFourBlock;
 					}
-					if (targetState > 0x09) {
+					if (targetState >= 0x0A) {
 						goto cmdFourBlock;
 					}
 					goto targetJoin;
@@ -1242,7 +1242,7 @@ void CGPartyObj::command()
 				if (targetState == 0xC8) {
 					goto stateC8Block;
 				}
-				if (targetState > 0xC7) {
+				if (targetState >= 0xC8) {
 					goto stateC9Block;
 				}
 				goto targetJoin;
@@ -1254,7 +1254,7 @@ void CGPartyObj::command()
 			goto targetJoin;
 
 cmdFourBlock:
-			if (*reinterpret_cast<int*>(targetBytes + 0x550) == 0) {
+			if (*reinterpret_cast<unsigned int*>(targetBytes + 0x550) == 0) {
 				secondaryAvailable = true;
 				secondaryCommand = 4;
 			}
@@ -1262,7 +1262,7 @@ cmdFourBlock:
 
 tmpArtifactBlock:
 #define freshTargetBytes (reinterpret_cast<unsigned char*>(party.target))
-			if (*reinterpret_cast<int*>(targetBytes + 0x550) == 0) {
+			if (*reinterpret_cast<unsigned int*>(targetBytes + 0x550) == 0) {
 				secondaryAvailable = true;
 				if ((targetState == 0x24 && caravan->CanAddTmpArtifact(1) != 0) ||
 				    (*reinterpret_cast<int*>(freshTargetBytes + 0x500) == 0x20 &&
@@ -1312,19 +1312,15 @@ targetJoin: ;
 		if (party.carryObject != nullptr) {
 			const int carryState = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.carryObject) + 0x500);
 			secondaryAvailable = true;
+			if (carryState == 0x0D) {
+				secondaryCommand = 7;
+			} else if (carryState == 0x0E) {
+				secondaryCommand = 8;
+			} else {
+				secondaryCommand = 5;
+			}
 			primaryAvailable = true;
 			primaryCommand = -1;
-			switch (carryState) {
-			case 0x0D:
-				secondaryCommand = 7;
-				break;
-			case 0x0E:
-				secondaryCommand = 8;
-				break;
-			default:
-				secondaryCommand = 5;
-				break;
-			}
 		} else if (caravan->m_hp == 0) {
 			primaryAvailable = true;
 			primaryCommand = 0x1B;

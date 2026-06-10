@@ -553,6 +553,27 @@ void CFlatRuntime::createVal(CChunkFile&, int, CFlatRuntime::CVal*)
 
 /*
  * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+inline int CFlatRuntime::getTopBit(unsigned int value)
+{
+	int bit = 0x1F;
+
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 8; j++) {
+			if ((value & 0x80000000) != 0) {
+				return bit;
+			}
+			value <<= 1;
+			bit--;
+		}
+	}
+
+	return -1;
+}
+/*
+ * --INFO--
  * PAL Address: 0x80068910
  * PAL Size: 756b
  * EN Address: TODO
@@ -570,49 +591,16 @@ int CFlatRuntime::Frame(int mode, int unused)
 		if ((object->m_flagBits.m_deleteFlag == 0) && (mode != 0)) {
 			object->m_flagBits.m_activeFlag = 0;
 			if (objectFrame(object) != 0) {
-				int scriptIndex;
-
 				if (object->m_0x34 != 0) {
-					int bitBase = 0x1F;
-					unsigned int scriptMask;
-
 					object->m_sp--;
-					scriptMask = static_cast<unsigned int>(static_cast<unsigned short>(object->m_0x34));
-					scriptIndex = bitBase;
-
-					for (int frameScan = 0; frameScan < 4; frameScan++) {
-						for (int bit = 0; bit < 8; bit++) {
-							if ((scriptMask & 0x80000000) != 0) {
-								goto frameFoundBit;
-							}
-							scriptMask <<= 1;
-							scriptIndex--;
-						}
-					}
-
-					scriptIndex = -1;
-				frameFoundBit:
+					int scriptIndex = getTopBit(object->m_0x34);
 
 					do {
 						reqFinished(scriptIndex, object);
 
 						object->m_0x34 = static_cast<s16>(object->m_0x34 & ~(1U << scriptIndex));
 
-						scriptIndex = 0x1F;
-						scriptMask = static_cast<unsigned int>(static_cast<unsigned short>(object->m_0x34));
-
-						for (int frameScan2 = 0; frameScan2 < 4; frameScan2++) {
-							for (int bit = 0; bit < 8; bit++) {
-								if ((scriptMask & 0x80000000) != 0) {
-									goto frameFoundBit2;
-								}
-								scriptMask <<= 1;
-								scriptIndex--;
-							}
-						}
-
-						scriptIndex = -1;
-					frameFoundBit2:;
+						scriptIndex = getTopBit(object->m_0x34);
 					} while (scriptIndex >= 0);
 				}
 
@@ -635,7 +623,7 @@ int CFlatRuntime::Frame(int mode, int unused)
 			object->m_freeListNode[1] = m_objectFreeListHead;
 			m_objectFreeListHead = object->m_freeListNode;
 
-			object->m_flags = static_cast<u8>(__rlwimi(object->m_flags, 0, 4, 27, 27));
+			object->m_flagBits.m_constructFlag = 0;
 
 			onDeleteObject(object);
 		}
@@ -832,27 +820,6 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 	return object;
 }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-inline int CFlatRuntime::getTopBit(unsigned int value)
-{
-	int bit = 0x1F;
-
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 8; j++) {
-			if ((value & 0x80000000) != 0) {
-				return bit;
-			}
-			value <<= 1;
-			bit--;
-		}
-	}
-
-	return -1;
-}
 
 /*
  * --INFO--

@@ -1558,6 +1558,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
 void CGoOutMenu::CalcGoOut()
 {
     unsigned short input;
+    unsigned char next;
 
     if (m_watchCardDisconnect != 0 && m_modeFrame >= 0x14 && (m_modeFrame & 0xF) == 0) {
         if ((m_modeFrame & 0x10) != 0) {
@@ -1861,8 +1862,6 @@ card_connected:;
         }
 
         {
-            unsigned char next;
-
             if (m_returnTransfer == 0) {
                 m_drawCursor = 1;
                 m_cursorListY0 = 0xb1;
@@ -1958,8 +1957,6 @@ card_connected:;
         m_cursorListY1 = 0xe9;
         m_cursorMode = 0;
         {
-            unsigned char next;
-
             if (MenuPcs.m_menuWindowInfo->state != 1) {
                 next = 0;
                 goto do_switch_go11;
@@ -2037,8 +2034,6 @@ card_connected:;
         m_cursorListY1 = 0xe7;
         m_cursorMode = 0;
         {
-            unsigned char next;
-
             if (MenuPcs.m_menuWindowInfo->state != 1) {
                 next = 0;
                 goto do_switch_go3;
@@ -2084,8 +2079,6 @@ card_connected:;
         m_cursorListY1 = 0xde;
         m_cursorMode = 0;
         {
-            unsigned char next;
-
             if (MenuPcs.m_menuWindowInfo->state == 1) {
                 input = GetGoOutInputMask();
                 if ((input & 3) != 0) {
@@ -2701,6 +2694,7 @@ void CGoOutMenu::DrawDel()
 void CGoOutMenu::Calc()
 {
     unsigned short input;
+    unsigned char nextMode;
     char mode;
 
     m_drawCursor = 0;
@@ -2794,7 +2788,6 @@ void CGoOutMenu::Calc()
                 m_cursorListY1 = 0xB0;
                 m_cursorMode = 1;
 
-                unsigned char nextMode;
                 if (MenuPcs.m_menuWindowInfo->state != 1) {
                     nextMode = 0;
                     goto do_switch_calc;

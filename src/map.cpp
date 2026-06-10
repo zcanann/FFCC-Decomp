@@ -1605,13 +1605,14 @@ void CMapMng::SetLightSource()
 {
     extern const float kMapZero;
     extern const float kMapViewScaleZ;
-    int mapLightIndex = 0;
+    CMapObjAtr* attr;
     const short mapObjCount = m_mapObjCount;
     CMapObj* mapObj = GetMapObjArray();
     CMapObj* mapObjEnd = m_mapObjArray + mapObjCount;
+    int mapLightIndex = 0;
 
     while (mapObj < mapObjEnd) {
-        CMapObjAtr* attr = mapObj->m_attribute;
+        attr = mapObj->m_attribute;
         if (attr != 0) {
             const int type = attr->m_type;
 
@@ -1653,10 +1654,9 @@ void CMapMng::SetLightSource()
                     light->m_direction.y = kMapZero;
                     light->m_direction.z = kMapViewScaleZ;
 
-                    CMapObj* targetObj = spotAttr->m_target;
-                    light->m_targetPosition.x = MapObjWorldX(targetObj);
-                    light->m_targetPosition.y = MapObjWorldY(targetObj);
-                    light->m_targetPosition.z = MapObjWorldZ(targetObj);
+                    light->m_targetPosition.x = MapObjWorldX(spotAttr->m_target);
+                    light->m_targetPosition.y = MapObjWorldY(spotAttr->m_target);
+                    light->m_targetPosition.z = MapObjWorldZ(spotAttr->m_target);
                     PSVECSubtract(reinterpret_cast<Vec*>(&light->m_targetPosition),
                                   reinterpret_cast<Vec*>(&light->m_position),
                                   reinterpret_cast<Vec*>(&light->m_direction));
@@ -1691,7 +1691,10 @@ void CMapMng::SetLightSource()
                     *(u32*)light.m_bumpShade = 0;
 
                     light.m_spotFn = spotAttr->m_colorMode;
-                    light.m_unk4D = (spotAttr->m_useAltColor == 0) ? 4 : 2;
+                    light.m_unk4D = 2;
+                    if (spotAttr->m_useAltColor == 0) {
+                        light.m_unk4D = 4;
+                    }
                     light.m_directionMode = spotAttr->m_keyFrameCount;
                     light.m_partMask = 1 << mapLightIndex;
                     LightPcs.Add(&light);

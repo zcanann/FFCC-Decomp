@@ -117,6 +117,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                 const float stepDivisor = (float)(s32)(frameCountRaw - 1);
                 s32 trailNextIndex;
                 const s32 trailMaxIndex = *(u8*)(particle + 0x37) - 1;
+                float drawScale;
                 float fadeR = (float)(*(s16*)(workBytes + 0x50) >> 7);
                 float fadeG = (float)(*(s16*)(workBytes + 0x52) >> 7);
                 float fadeB = (float)(*(s16*)(workBytes + 0x54) >> 7);
@@ -127,7 +128,6 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                 const float fadeRNum = fadeR - (float)(*(s16*)(workBytes + 0x58) >> 7);
                 const float fadeGNum = fadeG - (float)(*(s16*)(workBytes + 0x5a) >> 7);
                 const float fadeBNum = fadeB - (float)(*(s16*)(workBytes + 0x5c) >> 7);
-                float spacingAccum = *(float*)(payload + 0x98);
                 float fadeRStep;
                 float fadeGStep;
                 float fadeBStep;
@@ -138,7 +138,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                     fadeBStep = fadeBNum / stepDivisor;
                     fadeAStep = fadeANum / stepDivisor;
                 }
-                float drawScale = *(float*)(payload + 0x5C);
+                drawScale = *(float*)(payload + 0x5C);
                 trailNextIndex = trailReadIndex + 1;
                 const float drawScaleStep =
                     (drawScale - *(float*)(payload + 0x60)) / stepDivisor;
@@ -151,8 +151,10 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                 float camY, camZ;
                 float segLen;
                 float startX, startY, startZ;
+                float spacingAccum;
                 float segProgress;
 
+                spacingAccum = *(float*)(payload + 0x98);
                 {
                     Vec* p = &history[trailReadIndex];
                     trailX = p->x;
@@ -292,10 +294,10 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                                 camY = p->y;
                                 camZ = p->z;
                                 camX = p->x;
+                                segY = camY - startY;
+                                segZ = camZ - startZ;
+                                segX = camX - startX;
                             }
-                            segY = camY - startY;
-                            segZ = camZ - startZ;
-                            segX = camX - startX;
                             innerZero.z = kPppYmMegaBirthShpTail3Zero;
                             innerZero.y = kPppYmMegaBirthShpTail3Zero;
                             innerZero.x = kPppYmMegaBirthShpTail3Zero;

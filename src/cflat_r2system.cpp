@@ -1904,10 +1904,10 @@ renderedDone:
     }
     case -0x0B: {
         short buttons;
-        if (((1 << *object->m_localBase) & m_padInputDisableMask) == 0) {
-            buttons = Pad.GetButtonDown(*object->m_localBase);
-        } else {
+        if (((1 << *object->m_localBase) & m_padInputDisableMask) != 0) {
             buttons = 0;
+        } else {
+            buttons = Pad.GetButtonDown(*object->m_localBase);
         }
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
             buttons &= ~0xC00;
@@ -1918,10 +1918,10 @@ renderedDone:
     }
     case -0x0C: {
         short buttons;
-        if (((1 << *object->m_localBase) & m_padInputDisableMask) == 0) {
-            buttons = Pad.GetButtonRepeat(*object->m_localBase);
-        } else {
+        if (((1 << *object->m_localBase) & m_padInputDisableMask) != 0) {
             buttons = 0;
+        } else {
+            buttons = Pad.GetButtonRepeat(*object->m_localBase);
         }
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
             buttons &= ~0xC00;
@@ -1970,14 +1970,14 @@ renderedDone:
         break;
     }
     case -0x12:
-        if ((DbgMenuPcs.GetDbgFlag() & 0x100) == 0) {
-            *reinterpret_cast<float*>(object->m_localBase[1]) =
-                static_cast<float>(Pad.GetLeftStickX(*object->m_localBase));
-            *reinterpret_cast<float*>(object->m_localBase[2]) =
-                static_cast<float>(Pad.GetLeftStickY(*object->m_localBase));
-        } else {
+        if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
             *reinterpret_cast<float*>(object->m_localBase[1]) = kCFlatPadStickZero;
             *reinterpret_cast<float*>(object->m_localBase[2]) = kCFlatPadStickZero;
+        } else {
+            const float stickX = Pad.GetLeftStickX(*object->m_localBase);
+            const float stickY = Pad.GetLeftStickY(*object->m_localBase);
+            *reinterpret_cast<float*>(object->m_localBase[1]) = stickX;
+            *reinterpret_cast<float*>(object->m_localBase[2]) = stickY;
         }
         this->push(object, 0);
         outResult = 0;
@@ -1992,14 +1992,14 @@ renderedDone:
         break;
     }
     case -0x13:
-        if ((DbgMenuPcs.GetDbgFlag() & 0x100) == 0) {
-            *reinterpret_cast<float*>(object->m_localBase[1]) =
-                static_cast<float>(Pad.GetRightStickX(*object->m_localBase));
-            *reinterpret_cast<float*>(object->m_localBase[2]) =
-                static_cast<float>(Pad.GetRightStickY(*object->m_localBase));
-        } else {
+        if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
             *reinterpret_cast<float*>(object->m_localBase[1]) = kCFlatPadStickZero;
             *reinterpret_cast<float*>(object->m_localBase[2]) = kCFlatPadStickZero;
+        } else {
+            const float stickX = Pad.GetRightStickX(*object->m_localBase);
+            const float stickY = Pad.GetRightStickY(*object->m_localBase);
+            *reinterpret_cast<float*>(object->m_localBase[1]) = stickX;
+            *reinterpret_cast<float*>(object->m_localBase[2]) = stickY;
         }
         this->push(object, 0);
         outResult = 0;

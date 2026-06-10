@@ -1118,12 +1118,12 @@ void CChara::CModel::CreateDynamics(void* dynData, CMemory::CStage* stage)
 		chunkFile.PushChunk();
 		while (chunkFile.GetNextChunk(chunk)) {
 			if (chunk.m_id == CharaFourCC('D', 'G', 'R', 'P')) {
-				if (chunk.m_size == 0) {
+				if (chunk.m_arg0 == 0) {
 					continue;
 				}
 
 				ModelDynCount(this) = 0;
-				void* dynParams = static_cast<void*>(new (stage, const_cast<char*>(s_chara_cpp), 0x1E7) u8[chunk.m_size * 0x24]);
+				void* dynParams = static_cast<void*>(new (stage, const_cast<char*>(s_chara_cpp), 0x1E7) u8[chunk.m_arg0 * 0x24]);
 				ModelDynParams(this) = dynParams;
 
 				chunkFile.PushChunk();

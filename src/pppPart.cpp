@@ -427,19 +427,23 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 		{
 			s32 deniedIdx = selectedMngSt - PartMng.m_pppMng;
 			denied[deniedIdx] = 1;
+			_pppPObjLink* next;
 			_pppPObjLink* prev = &selectedMngSt->m_pppPObjLinkHead;
 			_pppPObjLink* obj = selectedMngSt->m_pppPObjLinkHead.m_next;
 			while (obj != 0)
 			{
-				_pppPObjLink* next = obj->m_next;
+				next = obj->m_next;
 				if ((s8)((s32)((u32)obj->m_owner->m_programSetDef->m_drawFlags << 30) >> 31) == 0)
 				{
 					prev->m_next = next;
 
+					s32 stageIndex;
+					_pppProgSetDef* ownerSet;
 					_pppPDataVal* owner = obj->m_owner;
-					_pppProgSetDef* ownerSet = owner->m_programSetDef;
-					_pppProgSetDef* stageSet = ownerSet;
-					for (s32 stageIndex = 0; stageIndex < ownerSet->m_numStages; stageIndex++)
+					_pppProgSetDef* stageSet;
+					ownerSet = owner->m_programSetDef;
+					stageSet = ownerSet;
+					for (stageIndex = 0; stageIndex < ownerSet->m_numStages; stageIndex++)
 					{
 						_pppCtrlTable* entry = stageSet->m_stages;
 						if (entry->m_prog != 0 && entry->m_prog->m_pppFunctionDestructor != 0)

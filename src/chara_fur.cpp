@@ -1386,7 +1386,7 @@ int CChara::CModel::PickFur(
 				verts[0].m_valid = 0;
 				verts[1].m_valid = 0;
 
-				for (int vertexIndex = 0; vertexIndex < count; vertexIndex++) {
+				for (unsigned int vertexIndex = 0; vertexIndex < count; vertexIndex++) {
 					const unsigned short* indices = reinterpret_cast<const unsigned short*>(cursor);
 
 					register const S16Vec* posPtr = &mesh->m_workPositions[indices[0]];

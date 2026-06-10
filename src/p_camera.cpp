@@ -611,11 +611,13 @@ void CCameraPcs::CalcQuake()
     if (System.m_scenegraphStepMode == 2) {
         return;
     }
-    if (m_quake.m_mode == 2 && m_quake.m_state == 0) {
-        return;
-    }
-    if (m_quake.m_mode == 1 && m_quake.m_state == 0 && m_quake.m_endTimer <= 0) {
-        return;
+    if (m_quake.m_mode == 2) {
+        if (m_quake.m_state == 0) {
+            return;
+        }
+        if (m_quake.m_mode == 1 && m_quake.m_state == 0 && m_quake.m_endTimer <= 0) {
+            return;
+        }
     }
 
     u32 randomValue = static_cast<u32>(rand());

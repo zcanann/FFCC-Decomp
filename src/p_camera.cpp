@@ -37,9 +37,9 @@ static const char sCameraPcsFunnyShapeTableName[] = "CCameraPcs(FUNNYSHAPE)";
 static const char sCameraPcsPartTableName[] = "CCameraPcs(PART)";
 static const char sCameraPcsShadowTableName[] = "CCameraPcs(SHADOW)";
 
-extern float kCameraPi;
+extern const float kCameraPi;
 extern const float kCameraOneF;
-extern float kCameraHalfF;
+extern const float kCameraHalfF;
 extern const double kCameraS16ToDoubleBias;
 extern const float kCameraDebugFov;
 extern const float kCameraZeroF;
@@ -1919,24 +1919,21 @@ void CCameraPcs::drawShadowEndAll()
  */
 void CCameraPcs::createMaterialEditor()
 {
-    float fVar3;
-    float fVar1;
-    float fVar2;
-    fVar2 = 0.0f;
+    float negThirty = kCameraNegativeThirtyF;
+    float one = kCameraOneF;
+    float zero = kCameraZeroF;
     m_viewerOverride = 0;
-    fVar1 = 1.0f;
-    m_viewer.m_position.z = fVar2;
-    fVar3 = -30.0f;
-    m_viewer.m_position.y = fVar2;
-    m_viewer.m_position.x = fVar2;
-    m_viewer.m_distance = fVar2;
-    m_viewer.m_rotY = fVar2;
-    m_viewer.m_rotX = fVar2;
-    m_viewer.m_scale.z = fVar1;
-    m_viewer.m_scale.y = fVar1;
-    m_viewer.m_scale.x = fVar1;
-    m_viewer.m_position.y = fVar2;
-    m_viewer.m_position.z = fVar3;
+    m_viewer.m_position.z = zero;
+    m_viewer.m_position.y = zero;
+    m_viewer.m_position.x = zero;
+    m_viewer.m_distance = zero;
+    m_viewer.m_rotY = zero;
+    m_viewer.m_rotX = zero;
+    m_viewer.m_scale.z = one;
+    m_viewer.m_scale.y = one;
+    m_viewer.m_scale.x = one;
+    m_viewer.m_position.y = zero;
+    m_viewer.m_position.z = negThirty;
 }
 
 /*
@@ -2023,24 +2020,21 @@ void CCameraPcs::calcMaterialEditor()
  */
 void CCameraPcs::createFunnyShape()
 {
-    float fVar3;
-    float fVar1;
-    float fVar2;
-    fVar2 = 0.0f;
+    float negThirty = kCameraNegativeThirtyF;
+    float one = kCameraOneF;
+    float zero = kCameraZeroF;
     m_viewerOverride = 0;
-    fVar1 = 1.0f;
-    m_viewer.m_position.z = fVar2;
-    fVar3 = -30.0f;
-    m_viewer.m_position.y = fVar2;
-    m_viewer.m_position.x = fVar2;
-    m_viewer.m_distance = fVar2;
-    m_viewer.m_rotY = fVar2;
-    m_viewer.m_rotX = fVar2;
-    m_viewer.m_scale.z = fVar1;
-    m_viewer.m_scale.y = fVar1;
-    m_viewer.m_scale.x = fVar1;
-    m_viewer.m_position.y = fVar2;
-    m_viewer.m_position.z = fVar3;
+    m_viewer.m_position.z = zero;
+    m_viewer.m_position.y = zero;
+    m_viewer.m_position.x = zero;
+    m_viewer.m_distance = zero;
+    m_viewer.m_rotY = zero;
+    m_viewer.m_rotX = zero;
+    m_viewer.m_scale.z = one;
+    m_viewer.m_scale.y = one;
+    m_viewer.m_scale.x = one;
+    m_viewer.m_position.y = zero;
+    m_viewer.m_position.z = negThirty;
 }
 
 /*

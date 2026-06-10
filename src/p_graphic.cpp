@@ -391,7 +391,7 @@ void CGraphicPcs::drawScreenFade()
                 GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
                 _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
                 _GXSetTevColorIn(GX_TEVSTAGE0, (_GXTevColorArg)0xF, (_GXTevColorArg)8, (_GXTevColorArg)10, (_GXTevColorArg)0xF);
-                _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_DIVIDE_2, GX_TRUE, GX_TEVPREV);
+                _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_4, GX_TRUE, GX_TEVPREV);
                 _GXSetTevAlphaIn(GX_TEVSTAGE0, (_GXTevAlphaArg)7, (_GXTevAlphaArg)4, (_GXTevAlphaArg)5, (_GXTevAlphaArg)7);
                 _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
 
@@ -710,12 +710,14 @@ void CGraphicPcs::drawBar()
     GXColor barColor = {0x80, 0x80, 0x80, 0xFF};
     drawSFRect(kDebugBarLeft, kDebugBarTop, kDebugBarRight, kDebugBarBottom, barColor, barColor);
 
+    int hue;
+    u32 y;
     CSystem::COrder* order = System.GetFirstOrder();
     const int orderCount = System.m_orderCount;
-    const int lastOrder = orderCount - 1;
-    int hue = 0;
-    u32 y = 0x10;
-    for (int i = 0; i < orderCount; i++) {
+    int i = 0;
+    hue = 0;
+    y = 0x10;
+    for (; i < orderCount; i++) {
         const int priority = order->m_priority;
         const float lastTime = order->m_lastTime;
         GXColor colorTmp;
@@ -736,7 +738,7 @@ void CGraphicPcs::drawBar()
             x += width;
         }
 
-        if (i == lastOrder) {
+        if (i == orderCount - 1) {
             GXColor soundGX;
             *reinterpret_cast<u32*>(&soundGX) = Math.Hsb2Rgb(0, 100, 100);
             barColor.r = soundGX.r;
@@ -846,14 +848,15 @@ void CGraphicPcs::drawEnd()
 		for (; port < 4; port++) {
 			bool suppress = (Pad.m_debugPadLock != 0) || ((port == 0) && (Pad.m_debugPadPort != -1));
 
-			u16 buttons;
+			u16 held;
 			if (suppress) {
-				buttons = 0;
+				held = 0;
 			} else {
 				int selectedPort = Pad.m_debugPadPort;
 				u32 portIndex = port & ~((int)~((selectedPort - port) | (port - selectedPort)) >> 31);
-				buttons = Pad.GetPadInputs()[portIndex].button[0];
+				held = Pad.GetPadInputs()[portIndex].button[0];
 			}
+			const u16 buttons = held;
 
 			const char c = ((buttons & 0x20) != 0) ? 'r' : ' ';
 			const char z = ((buttons & 0x40) != 0) ? 'l' : ' ';

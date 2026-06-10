@@ -79,6 +79,11 @@ static inline float CameraWorldX()
     return CameraPcs.m_positionX;
 }
 
+static inline float CameraWorldY()
+{
+    return CameraPcs.m_positionY;
+}
+
 static inline float CameraWorldZ()
 {
     return CameraPcs.m_positionZ;
@@ -1605,9 +1610,9 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 	float projX;
 	float projY;
 	float projZ;
-	unsigned int texBufferSize;
 	int nearAlpha;
 	int farAlpha;
+	unsigned int texBufferSize;
 	float xOffset;
 	float yOffset;
 	int hasNearAlpha;
@@ -1635,6 +1640,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 	texBufferSize = GXGetTexBufferSize(0x140, 0xE0, GX_TF_RGBA8, GX_FALSE, GX_FALSE);
 
 	cameraPos.x = CameraWorldX();
+	cameraPos.y = CameraWorldY();
 	cameraPos.z = CameraWorldZ();
 	hasNearAlpha = 0;
 	cameraPos.y = kGraphicZeroF;

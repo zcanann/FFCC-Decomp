@@ -422,7 +422,7 @@ void CMaterialEditorPcs::SetUSBData()
             }
             heightFactor >>= 1;
         }
-        if ((heightFactor != 1) || (widthFactor != 1)) {
+        if ((heightFactor != 1) || (heightFactor != 1)) {
             isPowerOfTwo = 0;
         }
 

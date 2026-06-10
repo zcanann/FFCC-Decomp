@@ -2502,6 +2502,7 @@ void CMenuPcs::CmakeNameDraw()
     }
 
     short mode = CmakeState(this)->m_mode;
+    float a255;
     float alpha;
     if (mode == 0) {
         alpha = static_cast<float>(0.1 * static_cast<double>(frame));
@@ -2543,7 +2544,7 @@ void CMenuPcs::CmakeNameDraw()
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-    float a255 = 255.0f * alpha;
+    a255 = 255.0f * alpha;
     GXColor col;
     col.r = 0xFF;
     col.g = 0xFF;
@@ -2598,10 +2599,11 @@ void CMenuPcs::CmakeNameDraw()
         48.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     if ((CmakeState(this)->m_mode == 1) && (CmakeState(this)->m_row < 5)) {
-        unsigned short row = CmakeState(this)->m_row;
-        unsigned int cellX = static_cast<int>(
+        int cursorBase = (CmakeState(this)->m_row < 5) ? 0xE5 : 0xE5;
+        int cursorY = CmakeState(this)->m_row * 0x20 + 0x63;
+        int cellX = static_cast<int>(
             26.9f * static_cast<float>(CmakeState(this)->m_select) +
-            static_cast<float>(240.0f));
+            static_cast<float>(cursorBase));
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
         GXColor selCol;
@@ -2612,7 +2614,7 @@ void CMenuPcs::CmakeNameDraw()
         GXSetChanMatColor(GX_COLOR0A0, selCol);
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x64 : 0x3D));
         MenuPcs.DrawRect(
-            0, static_cast<float>(cellX), static_cast<float>(row * 0x20 + 0x63), 48.0f, 48.0f,
+            0, static_cast<float>(cellX), static_cast<float>(cursorY), 48.0f, 48.0f,
             128.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     }
 
@@ -2625,23 +2627,23 @@ void CMenuPcs::CmakeNameDraw()
     font->SetMargin(4.9f);
     font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)).color);
 
-    int y = 0x6C;
-    for (unsigned int i = 0; i < 5; i++) {
-        const char* rowText = s_NameEntryStr[table * 5 + i];
+    int tableBase = table * 5;
+    for (int i = 0; i < 5; i++) {
+        const char* rowText = s_NameEntryStr[tableBase + i];
         font->SetPosX(240.0f);
-        font->SetPosY(static_cast<float>(y));
+        font->SetPosY(static_cast<float>(0x6C + i * 0x20));
         font->Draw(rowText);
-        y += 0x20;
     }
 
     GetRenderFlagBits(font->renderFlags).fixedWidth = 0;
     DrawInit();
 
     if ((CmakeState(this)->m_mode == 1) && (CmakeState(this)->m_row < 5)) {
-        int cursorX = static_cast<int>(
-            26.9f * static_cast<float>(CmakeState(this)->m_select) +
-            static_cast<float>(240.0f));
-        DrawCursor(cursorX + (static_cast<int>(System.m_frameCounter) % 8),
+        int cursorLeft = 0xC8;
+        int wobble = static_cast<int>(System.m_frameCounter) % 8;
+        DrawCursor(
+            static_cast<int>(26.9f * static_cast<float>(CmakeState(this)->m_select) +
+                static_cast<float>(cursorLeft)) + wobble,
             CmakeState(this)->m_row * 0x20 + 0x70, 1.0f);
     }
 

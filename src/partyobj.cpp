@@ -5449,7 +5449,7 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 		}
 
 		float rate = static_cast<float>(CharaGhostValue(0x2054)) / kMonObjPercentMax;
-		double angleScale;
+		float angleScale;
 		switch (bossKind) {
 		default:
 			angleScale = kMonObjOne;

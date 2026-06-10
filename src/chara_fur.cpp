@@ -1182,7 +1182,8 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 				unsigned int seId = 0;
 				int emitParticle = ((static_cast<int>(System.m_frameCounter) % 2) == 0);
 				int playGate = ((static_cast<int>(System.m_frameCounter) % 4) == 0);
-				_GXColor particleColor = CColor(centerBefore).color;
+				CColor particleColorObj(centerBefore);
+				_GXColor& particleColor = particleColorObj.color;
 				switch (Chara.MogFur().m_commandIndex) {
 				case 0:
 					MogWork().m_offColorTicks = 0;

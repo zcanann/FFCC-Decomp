@@ -3447,13 +3447,13 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         }
 
         CCharaPcs::CCameraFrame*& cameraSlotRef = CharaPcs.m_cameraData[cameraSlot];
-        *reinterpret_cast<int*>(object->m_localBase[2]) = cameraSlotRef[cameraFrame].m_values[0].m_int;
+        *reinterpret_cast<float*>(object->m_localBase[2]) = cameraSlotRef[cameraFrame].m_values[0].m_float;
         *reinterpret_cast<float*>(object->m_localBase[3]) = -cameraSlotRef[cameraFrame].m_values[1].m_float;
         *reinterpret_cast<float*>(object->m_localBase[4]) = -cameraSlotRef[cameraFrame].m_values[2].m_float;
-        *reinterpret_cast<int*>(object->m_localBase[5]) = cameraSlotRef[cameraFrame].m_values[3].m_int;
+        *reinterpret_cast<float*>(object->m_localBase[5]) = cameraSlotRef[cameraFrame].m_values[3].m_float;
         *reinterpret_cast<float*>(object->m_localBase[6]) = -cameraSlotRef[cameraFrame].m_values[4].m_float;
         *reinterpret_cast<float*>(object->m_localBase[7]) = -cameraSlotRef[cameraFrame].m_values[5].m_float;
-        *reinterpret_cast<int*>(object->m_localBase[8]) = cameraSlotRef[cameraFrame].m_values[6].m_int;
+        *reinterpret_cast<float*>(object->m_localBase[8]) = cameraSlotRef[cameraFrame].m_values[6].m_float;
         *reinterpret_cast<float*>(object->m_localBase[9]) =
             -((kCFlatPi * cameraSlotRef[cameraFrame].m_values[7].m_float) / kCFlatDegrees180);
         this->push(object, 1);
@@ -3835,19 +3835,16 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     case -0xD6: {
-        const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        _GXColor color = {
-            static_cast<u8>(255.0f * localFloats[10]),
-            static_cast<u8>(255.0f * localFloats[10]),
-            static_cast<u8>(255.0f * localFloats[10]),
-            static_cast<u8>(255.0f * localFloats[11]),
-        };
+        const unsigned int* localBase = object->m_localBase;
+        const float* localFloats = reinterpret_cast<const float*>(localBase);
+        unsigned char value = static_cast<u8>(kCFlatAlphaMax * localFloats[10]);
+        unsigned char alpha = static_cast<u8>(kCFlatAlphaMax * localFloats[11]);
+        _GXColor color = {value, value, value, alpha};
         this->drawLayer(
-            *object->m_localBase, this->m_strBlob + this->m_strOffsets[object->m_localBase[1]], object->m_localBase[2],
-            object->m_localBase[3], object->m_localBase[4], object->m_localBase[5],
-            static_cast<short>(object->m_localBase[6]), static_cast<short>(object->m_localBase[7]),
+            *object->m_localBase, this->m_strBlob + this->m_strOffsets[localBase[1]], localBase[2],
+            localBase[3], localBase[4], localBase[5], localBase[6], localBase[7],
             localFloats[8], localFloats[9], &color,
-            object->m_localBase[12]);
+            localBase[12]);
         this->push(object, 0);
         outResult = 0;
         break;

@@ -40,6 +40,8 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
+extern "C" char* strcat(char*, const char*);
+
 extern "C" void CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
     float scaleA, float scaleB, float scaleC, float radius, float scale, CMath* math, float* outResult,
     Vec* p0, Vec* p1, Vec* p2, Vec* p3);
@@ -1804,35 +1806,42 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
 
             for (int i = 0; i < object->m_argCount - 3; i++) {
                 while (true) {
+                    char* dst = spec;
+                    char c;
                     int specLen = 0;
-                    while ((format[specLen] != '\0') && ((specLen == 0) || (format[specLen] != '%'))) {
-                        spec[specLen] = format[specLen];
+                    while (((c = *format) != '\0') && ((specLen == 0) || ((specLen != 0) && (c != '%')))) {
+                        *dst = c;
+                        format++;
                         specLen++;
+                        dst++;
                     }
                     spec[specLen] = '\0';
-                    format += specLen;
 
                     if (spec[0] == '%') {
                         break;
                     }
-                    strcat(line, spec, sizeof(line));
+                    strcat(line, spec);
                 }
 
-                rendered[0] = '\0';
                 const int argIndex = i + 3;
+                unsigned int* localArgs = object->m_localBase;
                 char* scan = spec + 1;
                 if (spec[0] == '%') {
                     int fmtIndex = 1;
                     int width = 0;
                     int started = spec[1] == '0';
-                    for (; (*scan >= '0') && (*scan <= '9'); scan++) {
+                    for (char* digits = scan; (*digits >= '0') && (*digits <= '9'); digits++) {
                         fmtIndex++;
-                        width = width * 10 + (*scan - '0');
+                        width = (*digits - '0') + width * 10;
                     }
 
-                    if (spec[fmtIndex] == 'b') {
+                    if (spec[fmtIndex] != 'b') {
+                        goto formatScan;
+                    }
+
+                    {
                         char* out = rendered;
-                        int value = object->m_localBase[argIndex];
+                        int value = static_cast<int>(localArgs[argIndex]);
                         int outLen = 0;
                         for (int bit = 0; bit < width; bit++) {
                             const int cur = (value >> ((width - bit) - 1)) & 1;
@@ -1845,38 +1854,32 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
                             }
                         }
                         rendered[outLen] = '\0';
-                        strcat(rendered, spec + fmtIndex + 1, sizeof(rendered));
-                    } else {
-                        while (*scan != '\0') {
-                            switch (*scan) {
-                            case 'd':
-                            case 'x':
-                                sprintf(rendered, spec, object->m_localBase[argIndex]);
-                                scan = const_cast<char*>("");
-                                break;
-                            case 'f': {
-                                union {
-                                    unsigned int word;
-                                    float value;
-                                } arg;
-                                arg.word = object->m_localBase[argIndex];
-                                sprintf(rendered, spec, static_cast<double>(arg.value));
-                                scan = const_cast<char*>("");
-                                break;
-                            }
-                            case 's':
-                                sprintf(rendered, spec, this->m_strBlob + this->m_strOffsets[object->m_localBase[argIndex]]);
-                                scan = const_cast<char*>("");
-                                break;
-                            default:
-                                scan++;
-                                break;
-                            }
+                        strcat(rendered, scan + fmtIndex);
+                    }
+                } else {
+formatScan:
+                    while (*scan != '\0') {
+                        switch (*scan) {
+                        case 'd':
+                        case 'x':
+                            sprintf(rendered, spec, localArgs[argIndex]);
+                            goto renderedDone;
+                        case 'f':
+                            sprintf(rendered, spec,
+                                    static_cast<double>(reinterpret_cast<float*>(localArgs)[argIndex]));
+                            goto renderedDone;
+                        case 's':
+                            sprintf(rendered, spec, this->m_strBlob + this->m_strOffsets[localArgs[argIndex]]);
+                            goto renderedDone;
+                        default:
+                            scan++;
+                            break;
                         }
                     }
                 }
 
-                strcat(line, rendered, sizeof(line));
+renderedDone:
+                strcat(line, rendered);
             }
 
             Graphic.Printf(x, y, line);

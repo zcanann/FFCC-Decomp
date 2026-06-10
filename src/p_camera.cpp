@@ -634,23 +634,9 @@ void CCameraPcs::CalcQuake()
     offset.y = kCameraZeroF;
     offset.x = kCameraZeroF;
 
-    if (m_quake.m_signX == 0) {
-        offset.x = -m_quake.m_positionAmplitude.x;
-    } else {
-        offset.x = m_quake.m_positionAmplitude.x;
-    }
-
-    if (m_quake.m_signY == 0) {
-        offset.y = -m_quake.m_positionAmplitude.y;
-    } else {
-        offset.y = m_quake.m_positionAmplitude.y;
-    }
-
-    if (m_quake.m_signZ == 0) {
-        offset.z = -m_quake.m_positionAmplitude.z;
-    } else {
-        offset.z = m_quake.m_positionAmplitude.z;
-    }
+    offset.x = (m_quake.m_signX == 0) ? -m_quake.m_positionAmplitude.x : m_quake.m_positionAmplitude.x;
+    offset.y = (m_quake.m_signY == 0) ? -m_quake.m_positionAmplitude.y : m_quake.m_positionAmplitude.y;
+    offset.z = (m_quake.m_signZ == 0) ? -m_quake.m_positionAmplitude.z : m_quake.m_positionAmplitude.z;
 
     jitter.z = kCameraZeroF;
     jitter.y = kCameraZeroF;

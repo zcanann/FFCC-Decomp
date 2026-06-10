@@ -791,7 +791,7 @@ void CMesMenu::onDraw()
                 if (iconAnchor != 0) {
                     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x14));
                     MenuPcs.SetColor(MesMenuColorRef(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF))));
-                    unsigned int anchorX = (iconAnchor - 1) & 1;
+                    int anchorX = (iconAnchor - 1) & 1;
                     float iconEdgeX;
                     if (anchorX != 0) {
                         iconEdgeX = FLOAT_80330938;

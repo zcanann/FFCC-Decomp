@@ -1704,10 +1704,10 @@ void GbaQueue::GetPlayerPos(int channel, unsigned int* outData)
 	packet[4] = 0x51;
 	packet[8] = 0x91;
 
-	const GbaQueuePlayerPosView* basePlayer = &localPlayerData[channel];
+	const GbaQueuePlayerPosView* player = localPlayerData;
+	const GbaQueuePlayerPosView* basePlayer = &player[channel];
 
 	nearbyMask = 0;
-	const GbaQueuePlayerPosView* player = localPlayerData;
 	for (i = 0; i < 4;) {
 		if (i == channel) {
 			nearbyMask = (nearbyMask | (1 << i)) & 0xFF;
@@ -1868,6 +1868,7 @@ void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 	char* obj;
 	char* localEntry;
 	char* prevEntry;
+	char* prevWalk;
 	unsigned char* outPtr;
 	short baseX;
 	short baseZ;
@@ -1886,6 +1887,8 @@ void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 	baseZ = *reinterpret_cast<short*>(obj + channel * 0xDC + 0x48C);
 	memcpy(localMapItems, obj + 0x2434, sizeof(localMapItems));
 
+	count = 0;
+	prevEntry = obj + channel * kGbaQueueMapItemDataBytes + 0x2574;
 	localEntry = localMapItems;
 	i = 0;
 	while (i < m_mapItemCount) {
@@ -1895,9 +1898,10 @@ void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 			static_cast<short>(*reinterpret_cast<short*>(localEntry + 10) - baseZ);
 
 		int localX = *reinterpret_cast<short*>(localEntry + 8);
-		int localZ = *reinterpret_cast<short*>(localEntry + 10);
+		int localZ;
 
-		if ((localX < 0 ? -localX : localX) >= 0x50 || (localZ < 0 ? -localZ : localZ) >= 0x40) {
+		if ((localX < 0 ? -localX : localX) >= 0x50 ||
+		    ((localZ = *reinterpret_cast<short*>(localEntry + 10)), (localZ < 0 ? -localZ : localZ) >= 0x40)) {
 			*reinterpret_cast<short*>(localEntry + 8) = -1;
 			*reinterpret_cast<short*>(localEntry + 10) = -1;
 			localEntry[0] = 0;
@@ -1916,28 +1920,27 @@ void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 		i++;
 	}
 
-	count = 0;
-	localEntry = localMapItems;
-	prevEntry = obj + channel * kGbaQueueMapItemDataBytes + 0x2574;
+	localEntry = localMapItems + count * 0x14;
+	prevWalk = prevEntry + count * 0x14;
 	outPtr = reinterpret_cast<unsigned char*>(outData);
-	i = 0;
+	i = count;
 	while (i < m_mapItemCount) {
-		if ((localEntry[0] != 0 || prevEntry[0] != 0) && memcmp(localEntry, prevEntry, 0x14) != 0) {
+		if ((localEntry[0] != 0 || prevWalk[0] != localEntry[0]) && memcmp(localEntry, prevWalk, 0x14) != 0) {
 			count++;
 			outPtr[0] = 0x21;
-			outPtr[1] = static_cast<unsigned char>(i + 0x40) | (static_cast<signed char>(localEntry[0]) << 7);
+			outPtr[1] = (i + 0x40) | (localEntry[0] << 7);
 			outPtr[2] = static_cast<unsigned char>(*reinterpret_cast<short*>(localEntry + 8));
 			outPtr[3] = static_cast<unsigned char>(*reinterpret_cast<short*>(localEntry + 10));
 			outPtr += 4;
 		}
 
 		localEntry += 0x14;
-		prevEntry += 0x14;
+		prevWalk += 0x14;
 		i++;
 	}
 
 	*outCount = count;
-	memcpy(obj + channel * kGbaQueueMapItemDataBytes + 0x2574, localMapItems, sizeof(localMapItems));
+	memcpy(prevEntry, localMapItems, sizeof(localMapItems));
 	OSSignalSemaphore(accessSemaphores + channel);
 }
 

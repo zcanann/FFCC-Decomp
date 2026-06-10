@@ -147,16 +147,7 @@ void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int appe
             texture->Create(chunkFile, stage, amemCacheSet, cacheTag, useAddress);
 
             if (texture->m_name[0] != 0) {
-                unsigned int duplicateIdx;
-                for (duplicateIdx = 0; duplicateIdx < (unsigned int)m_textureArray.GetSize(); duplicateIdx++) {
-                    CTexture* existing = m_textureArray[duplicateIdx];
-                    if ((existing != 0) && (strcmp(existing->m_name, texture->m_name) == 0)) {
-                        goto found_duplicate;
-                    }
-                }
-                duplicateIdx = 0xFFFFFFFF;
-
-            found_duplicate:
+                unsigned int duplicateIdx = static_cast<unsigned int>(Find(texture->m_name));
                 if ((int)duplicateIdx >= 0) {
                     if (amemCacheSet != 0) {
                         amemCacheSet->DestroyCache(static_cast<int>(texture->m_cacheId));

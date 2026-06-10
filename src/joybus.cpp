@@ -6774,7 +6774,7 @@ bool JoyBus::IsThreadRunning()
 void JoyBus::RestartThread()
 {
     m_threadInitFlag = 0;
-    CreateInit();
+    Joybus.CreateInit();
     int err;
 
     if (static_cast<signed char>(Joybus.m_binLoaded) != 0)
@@ -6797,8 +6797,10 @@ void JoyBus::RestartThread()
             File.Read(file);
             File.SyncCompleted(file);
 
-            Joybus.m_gbaBootImageSize = File.GetLength(file);
-            memcpy(Joybus.m_gbaBootImage, File.m_readBuffer, Joybus.m_gbaBootImageSize);
+            unsigned int binLen = File.GetLength(file);
+
+            Joybus.m_gbaBootImageSize = binLen;
+            memcpy(Joybus.m_gbaBootImage, File.m_readBuffer, binLen);
 
             File.Close(file);
 
@@ -6816,7 +6818,7 @@ void JoyBus::RestartThread()
 
             int sum =
                 (
-                    ((((((((((((((((((((((((((((-0x19
+                    ((((((((((((((((((((((((((((0xE7
                     - img[0xA0])
                     - img[0xA1])
                     - img[0xA2])
@@ -6847,9 +6849,13 @@ void JoyBus::RestartThread()
                     - img[0xBB])
                 );
 
-            for (; idx < 0xBD; idx++)
+            if (idx < 0xBD)
             {
-                sum -= *p++;
+                do
+                {
+                    sum -= *p++;
+                    idx++;
+                } while (idx < 0xBD);
             }
 
             img[idx] = (unsigned char)sum;
@@ -6868,28 +6874,38 @@ void JoyBus::RestartThread()
 
     memset(Joybus.m_threadParams, 0, sizeof(Joybus.m_threadParams));
 
+    unsigned int i = 0;
+    JoyBus* paramCursor = &Joybus;
+
     Joybus.m_threadInitFlag = 0;
     Joybus.m_threadRunningMask = 0;
 
-    for (int i = 0; i < 4; i++)
+    JoyBus* threadCursor = paramCursor;
+
+    do
     {
-        Joybus.m_threadParams[i].m_portIndex = i;
-        Joybus.m_threadParams[i].m_gbaStatus = 1;
+        paramCursor->m_threadParams[0].m_portIndex = i;
+        paramCursor->m_threadParams[0].m_gbaStatus = 1;
 
         OSCreateThread(
-            &Joybus.m_threads[i],
+            threadCursor->m_threads,
             (void* (*)(void*))JoyBus::_ThreadMain,
-            &Joybus.m_threadParams[i],
+            paramCursor->m_threadParams,
             &Joybus.m_sendBuffer[i + 1],
             sizeof(Joybus.m_sendBuffer[0]),
             8,
             1
         );
 
-        OSResumeThread(&Joybus.m_threads[i]);
+        OSResumeThread(threadCursor->m_threads);
 
-        Joybus.m_threadRunningMask |= (1 << i);
-    }
+        int bit = 1 << i;
+        i = i + 1;
+        Joybus.m_threadRunningMask |= bit;
+
+        threadCursor = (JoyBus*)((char*)threadCursor + sizeof(Joybus.m_threads[0]));
+        paramCursor = (JoyBus*)((char*)paramCursor + sizeof(Joybus.m_threadParams[0]));
+    } while ((int)i < 4);
 
     if ((unsigned int)System.m_execParam >= 2)
         System.Printf(const_cast<char*>(s_thread_init_end));

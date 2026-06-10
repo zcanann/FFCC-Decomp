@@ -1299,6 +1299,8 @@ inline void COctTree::SetShadow(long bitIndex)
  */
 void InsertShadow_r(COctNode* node)
 {
+	int j;
+	COctNode* child;
 	float boundMinX = node->m_bound.m_min.x;
 	bool overlap = false;
 	bool xyOverlap = false;
@@ -1363,7 +1365,7 @@ void InsertShadow_r(COctNode* node)
 		}
 
 		s_light_no++;
-		COctNode* child = nodeIter->m_children[0];
+		child = nodeIter->m_children[0];
 
 		float childBoundMinX = child->m_bound.m_min.x;
 		bool childOverlap = false;
@@ -1418,7 +1420,7 @@ void InsertShadow_r(COctNode* node)
 				bits[0x48 / sizeof(unsigned long)] |= 1UL << (s_insertShadowBitIndex & 0x1f);
 			}
 
-			for (int j = 0; j < 8; j++) {
+			for (j = 0; j < 8; j++) {
 				if (child->m_children[0] == 0) {
 					break;
 				}

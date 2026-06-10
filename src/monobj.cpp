@@ -60,8 +60,8 @@ extern "C" const float kMonObjTwoThirdsPi = 2.0943952f;
 static const char s_monObjTexAnimU0[3] = "u0";
 extern "C" const float kMonObjPercentMax = 100.0f;
 extern "C" const float kMonObjOne = 1.0f;
-static const char s_monObjAiStateFmt[] = "%d %c %d %c";
-static const char s_monObjDistanceFmt[] = "%d %d/%d";
+static const char s_pctd_pctc_pctd_pctc_801DCA2C[] = "%d %c %d %c";
+static const char s_pctd_pctd_pctd_801DCA38[] = "%d %d/%d";
 
 /*
  * --INFO--
@@ -1503,13 +1503,19 @@ void CGMonObj::onAnimPoint(int param2, int param3)
 	int particleId = 0xFFFF;
 	int soundId = 0xFFFF;
 
-	if ((param3 < 0xC) && (param3 >= 0xA)) {
+	if (param3 >= 0xC) goto animSkip;
+	if (param3 >= 0xA) goto animEnter;
+	goto animSkip;
+animEnter:
+	{
 		particleId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A4);
 		if ((particleId != 0xFFFF) && (param3 == 10)) {
 			particleId += 1;
 		}
-		soundId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A6);
+		soundId = *reinterpret_cast<unsigned short*>(
+			reinterpret_cast<unsigned char*>(*reinterpret_cast<void* volatile*>(&object->m_scriptHandle[9])) + 0x1A6);
 	}
+animSkip:
 
 	if (particleId != 0xFFFF) {
 		int dataNo = object->m_charaModelHandle->GetPdtSlot();
@@ -1839,11 +1845,12 @@ void CGMonObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 		if (targetIndex >= 0) {
 			targetChar = targetIndex + '0';
 		}
-		if ((aiState & 0x7FFF) != 0) {
-			aiChar = (aiState & 0x7FFF) + 0x40;
+		int aiMasked = aiState & 0x7FFF;
+		if (aiMasked != 0) {
+			aiChar = aiMasked + 0x40;
 		}
 
-		sprintf(text, s_monObjAiStateFmt, (int)object->m_scriptHandle[2], aiChar,
+		sprintf(text, s_pctd_pctc_pctd_pctc_801DCA2C, (int)object->m_scriptHandle[2], aiChar,
 		        m_chaseState, targetChar);
 		float curPosY = posY;
 		font->SetPosX(posX - static_cast<float>(font->GetWidth(text)) * 0.5f);
@@ -1862,7 +1869,7 @@ void CGMonObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 
 		int chaseRange = static_cast<int>(static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xCC)));
 		int spawnDist = static_cast<int>(PSVECDistance(&m_homePosition, &object->m_worldPosition));
-		sprintf(text, s_monObjDistanceFmt, targetDist, spawnDist, chaseRange);
+		sprintf(text, s_pctd_pctd_pctd_801DCA38, targetDist, spawnDist, chaseRange);
 		float curPosY2 = posY;
 		font->SetPosX(posX - static_cast<float>(font->GetWidth(text)) * 0.5f);
 		font->SetPosY(curPosY2);

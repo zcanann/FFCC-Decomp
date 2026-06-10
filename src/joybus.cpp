@@ -3163,21 +3163,21 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
         if (m_stateFlagArr[threadParam->m_portIndex] != 0 &&
             m_stateCodeArr[threadParam->m_portIndex] != 0x09 &&
             state != 0x05 &&
-            state > 0x20 && state < 0x29)
+            state >= 0x21 && state <= 0x28)
         {
             OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
-            unsigned int newCount = 0;
+            extern const unsigned int kJoyBusCmdOpMask;
+            int newCount = 0;
 
-            for (unsigned int i = 0; i < m_cmdCount[threadParam->m_portIndex]; ++i)
+            for (int i = 0; i < (int)m_cmdCount[threadParam->m_portIndex]; ++i)
             {
-                int cmd = m_cmdQueueData[threadParam->m_portIndex][i];
-                unsigned char op = static_cast<signed char>(cmd >> 24) & 0x3F;
+                unsigned char op = (unsigned char)(*(unsigned char*)&m_cmdQueueData[threadParam->m_portIndex][i] & kJoyBusCmdOpMask);
 
                 if (op == 0x0A || op == 0x10 || op == 0x14 ||
                     op == 0x1B || op == 0x13 || op == 0x09)
                 {
-                    m_recvQueueEntriesArr[threadParam->m_portIndex][newCount++] = cmd;
+                    m_recvQueueEntriesArr[threadParam->m_portIndex][newCount++] = m_cmdQueueData[threadParam->m_portIndex][i];
                 }
             }
 

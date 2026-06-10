@@ -4219,7 +4219,7 @@ int JoyBus::SendMBase(ThreadParam* threadParam)
  */
 int JoyBus::SendPpos(ThreadParam* threadParam)
 {
-    int result = 0;
+    int result;
     int cnt;
 
     unsigned char& state = threadParam->m_pposCounter;
@@ -4242,9 +4242,8 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
         m_cmdBuffer[threadParam->m_portIndex] = 3;
         m_pposWordIndex[threadParam->m_portIndex] = 0;
         state += 1;
-
-        break;
     }
+    // fall through
 
     case 1:
     {

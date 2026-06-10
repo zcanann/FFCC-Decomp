@@ -482,7 +482,7 @@ CFlatRuntime2::CFlatRuntime2()
 	resetChangeScript();
 	memset(m_spawnBits, 0, sizeof(m_spawnBits));
 
-	CGBaseObj* baseObj = reinterpret_cast<CGBaseObj*>(m_objBase);
+	CGBaseObj* baseObj = m_objBase;
 	for (int i = 0; i < 0x28; i++) {
 		InitFlatObjectSlot(baseObj, static_cast<u16>(i + 1));
 		baseObj++;
@@ -506,8 +506,9 @@ CFlatRuntime2::CFlatRuntime2()
 	InitFlatObjectSlot(&m_objParty[3], 0x304);
 
 	CGMonObj* monObj = reinterpret_cast<CGMonObj*>(m_objMon);
-	for (int i = 0; i < kFlatMonObjCount; i++, monObj++) {
+	for (int i = 0; i < kFlatMonObjCount; i++) {
 		InitFlatObjectSlot(monObj, static_cast<u16>((i + 1) | 0x400));
+		monObj++;
 	}
 
 	u8* itemObjBytes = reinterpret_cast<u8*>(m_objItem);
@@ -865,8 +866,7 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 		CGPartyObj::CheckGameOver();
 		reinterpret_cast<CFlatRuntime*>(this)->CFlatRuntime::Frame(arg0, mode);
 
-		CFlatRuntime::CObject* const root = FlatObjectRoot(&CFlat);
-		for (CGBaseObj* obj = FindNextGBaseObjByCidMask(&CFlat, root->m_next->m_next, 5); obj != 0;
+		for (CGBaseObj* obj = FindNextGBaseObjByCidMask(&CFlat, CFlat.m_objectSentinel.m_next->m_next, 5); obj != 0;
 			 obj = FindNextGBaseObjByCidMask(&CFlat, reinterpret_cast<CFlatRuntime::CObject*>(obj)->m_next, 5)) {
 			obj->Frame();
 		}
@@ -937,8 +937,7 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
 	AStar.drawAStar();
 
-	CFlatRuntime::CObject* const root = FlatObjectRoot(&CFlat);
-	for (CGBaseObj* obj = FindNextGBaseObjByCidMask(&CFlat, root->m_next->m_next, 1); obj != 0;
+	for (CGBaseObj* obj = FindNextGBaseObjByCidMask(&CFlat, CFlat.m_objectSentinel.m_next->m_next, 1); obj != 0;
 		 obj = FindNextGBaseObjByCidMask(&CFlat, reinterpret_cast<CFlatRuntime::CObject*>(obj)->m_next, 1)) {
 		obj->Draw();
 	}
@@ -961,38 +960,36 @@ int CFlatRuntime2::Load(char* fileName)
 	sprintf(path, sCFlatRuntime2FileNameFmt, fileName);
 
 	CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
-	if (fileHandle == 0) {
+	if (fileHandle != 0) {
+		File.Read(fileHandle);
+		File.SyncCompleted(fileHandle);
+		reinterpret_cast<CFlatRuntime*>(this)->Create(File.m_readBuffer);
+		File.Close(fileHandle);
+	} else {
 		return 0;
 	}
-
-	File.Read(fileHandle);
-	File.SyncCompleted(fileHandle);
-	reinterpret_cast<CFlatRuntime*>(this)->Create(File.m_readBuffer);
-	File.Close(fileHandle);
 
 	if (getDebugStage() != 0) {
 		int debugIndex = 0;
 		int debugChunk = 0;
-		for (;; debugIndex++) {
+		do {
 			sprintf(path, sCFlatRuntime2DebugFileNameFmt, fileName);
 			if (debugIndex != 0) {
 				sprintf(path, "%s%d", path, debugIndex);
 			}
 
 			fileHandle = File.Open(path, 0, CFile::PRI_LOW);
-			if (fileHandle == 0) {
+			if (fileHandle != 0) {
+				File.Read(fileHandle);
+				File.SyncCompleted(fileHandle);
+				debugChunk = reinterpret_cast<CFlatRuntime*>(this)->CreateDebug(File.m_readBuffer, debugChunk);
+				File.Close(fileHandle);
+			} else {
 				return 0;
 			}
 
-			File.Read(fileHandle);
-			File.SyncCompleted(fileHandle);
-			debugChunk = reinterpret_cast<CFlatRuntime*>(this)->CreateDebug(File.m_readBuffer, debugChunk);
-			File.Close(fileHandle);
-
-			if (debugChunk == -1) {
-				break;
-			}
-		}
+			debugIndex++;
+		} while (debugChunk != -1);
 	}
 
 	resetChangeScript();
@@ -1294,16 +1291,17 @@ void CFlatRuntime2::Destroy()
 
 	int zero = 0;
 	for (int i = 0; i < 8; i++) {
-		CFile::CHandle* fileHandle = LayerResources(this)[i].m_fileHandle;
+		CFlatLayerResource* layer = &LayerResources(this)[i];
+		CFile::CHandle* fileHandle = layer->m_fileHandle;
 		if (fileHandle != 0) {
 			File.Close(fileHandle);
-			LayerResources(this)[i].m_fileHandle = reinterpret_cast<CFile::CHandle*>(zero);
+			layer->m_fileHandle = reinterpret_cast<CFile::CHandle*>(zero);
 		}
 
-		CTextureSet* textureSet = LayerResources(this)[i].m_textureSet;
+		CTextureSet* textureSet = layer->m_textureSet;
 		if (textureSet != 0) {
 			delete textureSet;
-			LayerResources(this)[i].m_textureSet = reinterpret_cast<CTextureSet*>(zero);
+			layer->m_textureSet = reinterpret_cast<CTextureSet*>(zero);
 		}
 	}
 }
@@ -1453,9 +1451,8 @@ void CFlatRuntime2::Draw()
 	font->SetTlut(7);
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 
-	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
 	for (CGObject* object = reinterpret_cast<CGObject*>(
-			 FindNextGBaseObjByCidMask(this, root->m_next->m_next, 5));
+			 FindNextGBaseObjByCidMask(this, m_objectSentinel.m_next->m_next, 5));
 		 object != 0;
 		 object = reinterpret_cast<CGObject*>(FindNextGBaseObjByCidMask(
 			 this, reinterpret_cast<CFlatRuntime::CObject*>(object)->m_next, 5))) {
@@ -1476,7 +1473,7 @@ void CFlatRuntime2::Draw()
 	font->DrawInit();
 
 	for (CGItemObj* item = reinterpret_cast<CGItemObj*>(
-			 FindNextGBaseObjByCidMask(this, root->m_next->m_next, 0x1D));
+			 FindNextGBaseObjByCidMask(this, m_objectSentinel.m_next->m_next, 0x1D));
 		 item != 0;
 		 item = reinterpret_cast<CGItemObj*>(FindNextGBaseObjByCidMask(
 			 this, reinterpret_cast<CFlatRuntime::CObject*>(item)->m_next, 0x1D))) {
@@ -1490,7 +1487,7 @@ void CFlatRuntime2::Draw()
 	GXSetProjection(projection2, GX_PERSPECTIVE);
 
 	Mtx cameraMtx;
-	PSMTXCopy(*reinterpret_cast<Mtx*>(CameraPcsRaw() + 0x10), cameraMtx);
+	PSMTXCopy(*reinterpret_cast<Mtx*>(CameraPcsRaw() + 0x4), cameraMtx);
 
 	_GXSetBlendMode((_GXBlendMode)1, (_GXBlendFactor)4, (_GXBlendFactor)5, (_GXLogicOp)1);
 	GXSetZCompLoc(GX_FALSE);
@@ -1518,18 +1515,14 @@ void CFlatRuntime2::Draw()
 		GXSetChanMatColor(GX_COLOR0A0, lineColor);
 		GXLoadPosMtxImm(cameraMtx, GX_PNMTX0);
 
-		CLine<64>* line = m_debugLines;
-		for (int i = 0; i < 0x10; i++) {
-			line->Draw();
-			line++;
+		for (u32 i = 0; i < 0x10; i++) {
+			m_debugLines[i].Draw();
 		}
 	}
 
-	const bool showDebugCC =
-		((RuntimeDebugFlags(runtime) & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) ||
-		((DbgMenuPcs.GetDbgFlagsRaw() & 0x80) != 0);
-	const int debugCount = DebugDrawCCCount(runtime);
-	if (showDebugCC && debugCount != 0) {
+	if ((((RuntimeDebugFlags(runtime) & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0)
+			|| ((DbgMenuPcs.GetDbgFlagsRaw() & 0x80) != 0))
+		&& DebugDrawCCCount(runtime) != 0) {
 		GXColor greenColor;
 		greenColor.r = 0x80;
 		greenColor.g = 0xFF;
@@ -1545,53 +1538,56 @@ void CFlatRuntime2::Draw()
 		redColor.g = 0x00;
 		redColor.b = 0x00;
 		redColor.a = 0xFF;
-		static const Vec worldUp = {0.0f, 1.0f, 0.0f};
-		float ringVerts[8][3];
+		static Vec worldUp = {0.0f, 1.0f, 0.0f};
+		float ringVerts[24];
+		float* verts = ringVerts;
 
 		CFlatRuntime2::CDebugDrawCC* entry = DebugDrawCCEntries(runtime);
-		for (int i = 0; i < debugCount; i++) {
-			GXColor* drawColor = &greenColor;
-			if (entry->m_flagBits.m_bit7 != 0) {
+		for (int i = 0; i < DebugDrawCCCount(runtime); i++, entry++) {
+			GXColor* drawColor;
+			if (entry->m_flagBits.m_bit6 != 0) {
 				drawColor = &redColor;
-			} else if (entry->m_flagBits.m_bit6 != 0) {
-				drawColor = &blueColor;
+			} else {
+				drawColor = &greenColor;
+				if (entry->m_flagBits.m_bit7 != 0) {
+					drawColor = &blueColor;
+				}
 			}
 			GXSetChanMatColor(GX_COLOR0A0, *drawColor);
 
-			Vec* start = &entry->m_from;
-			Vec* end = &entry->m_to;
-			float length = PSVECMag(end);
+			float length = PSVECMag(&entry->m_to);
 
 			Mtx orientMtx;
 			PSMTXIdentity(orientMtx);
-			Vec dir = *end;
-			PSVECNormalize(&dir, &dir);
+			Vec up = worldUp;
+			PSVECNormalize(&entry->m_to, &entry->m_to);
 
-			const float dot = PSVECDotProduct(&worldUp, &dir);
+			const float dot = PSVECDotProduct(&up, &entry->m_to);
 			if (dot < FLOAT_80330188) {
-				if (dot >= FLOAT_8033018C) {
-					Vec axis;
-					PSVECCrossProduct(&dir, &worldUp, &axis);
-					PSMTXRotAxisRad(orientMtx, &axis, -acosf(dot));
-				} else {
+				if (dot < FLOAT_8033018C) {
 					length = -length;
+				} else {
+					float angle = acosf(dot);
+					Vec axis;
+					PSVECCrossProduct(&entry->m_to, &up, &axis);
+					PSMTXRotAxisRad(orientMtx, &axis, -angle);
 				}
 			}
 
-			orientMtx[0][3] = start->x;
-			orientMtx[1][3] = start->y;
-			orientMtx[2][3] = start->z;
+			orientMtx[0][3] = entry->m_from.x;
+			orientMtx[1][3] = entry->m_from.y;
+			orientMtx[2][3] = entry->m_from.z;
 			PSMTXConcat(cameraMtx, orientMtx, orientMtx);
 			GXLoadPosMtxImm(orientMtx, GX_PNMTX0);
 
 			GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, 0x20);
-			float* vtx = ringVerts[0];
+			float* vtx = verts;
 			for (int j = 0; j < 8; j++) {
-				const float angle = static_cast<float>(j) * FLOAT_80330190;
+				const float angle = FLOAT_80330190 * static_cast<float>(j);
 				vtx[0] = entry->m_radius * sinf(angle);
 				vtx[1] = entry->m_radius * cosf(angle);
 				vtx[2] = length;
-				if ((entry->m_flags & 0x40) != 0) {
+				if (entry->m_flagBits.m_bit7 != 0) {
 					GXWGFifo.f32 = vtx[0];
 					GXWGFifo.f32 = vtx[1];
 					GXWGFifo.f32 = FLOAT_80330144;
@@ -1606,9 +1602,9 @@ void CFlatRuntime2::Draw()
 				vtx += 3;
 			}
 
-			vtx = ringVerts[0];
+			vtx = verts;
 			for (int j = 0; j < 8; j++) {
-				const float angle = static_cast<float>(j) * FLOAT_80330190;
+				const float angle = FLOAT_80330190 * static_cast<float>(j);
 				vtx[0] = entry->m_radius * sinf(angle);
 				vtx[1] = entry->m_radius * cosf(angle);
 				vtx[2] = length;
@@ -1616,13 +1612,11 @@ void CFlatRuntime2::Draw()
 				GXWGFifo.f32 = vtx[1];
 				GXWGFifo.f32 = vtx[2];
 				const int next = (j + 1) & 7;
-				GXWGFifo.f32 = ringVerts[next][0];
-				GXWGFifo.f32 = ringVerts[next][1];
-				GXWGFifo.f32 = ringVerts[next][2];
+				GXWGFifo.f32 = ringVerts[next * 3];
+				GXWGFifo.f32 = ringVerts[next * 3 + 1];
+				GXWGFifo.f32 = ringVerts[next * 3 + 2];
 				vtx += 3;
 			}
-
-			entry++;
 		}
 	}
 }
@@ -1650,7 +1644,8 @@ void CFlatRuntime2::AddDebugDrawCC(Vec* from, Vec* to, float radius, int bit7, i
 
 		const int index = count;
 		count = index + 1;
-		reinterpret_cast<CFlatRuntime2*>(runtime)->m_debugDrawCCEntries[index].m_radius = radius;
+		CFlatRuntime2::CDebugDrawCC* entry = reinterpret_cast<CFlatRuntime2::CDebugDrawCC*>(&count + 1) + index;
+		entry->m_radius = radius;
 		return;
 	}
 
@@ -1677,17 +1672,12 @@ void CFlatRuntime2::AddDebugDrawCC(Vec* from, Vec* to, float radius, int bit7, i
 int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float radius, float angle, int maxCount, CGObject** objects)
 {
 	const float radiusSq = radius * radius;
-	CFlatRuntime::CObject* root = FlatObjectRoot(&CFlat);
-
-	CGBaseObj* baseObj = FindNextGBaseObjByCidMask(&CFlat, root->m_next->m_next, 5);
 	int count = 0;
 
-	do {
-		if (baseObj == 0) {
-			return count;
-		}
+	CGObject* object = reinterpret_cast<CGObject*>(
+		FindNextGBaseObjByCidMask(&CFlat, CFlat.m_objectSentinel.m_next->m_next, 5));
 
-		CGObject* object = reinterpret_cast<CGObject*>(baseObj);
+	while (object != 0) {
 		int newCount = count;
 
 		if (((object->m_attrFlags & static_cast<unsigned int>(classMask)) != 0) &&
@@ -1718,7 +1708,13 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float radius
 								}
 							}
 
-							if ((flags & 4) == 0) {
+							if ((flags & 4) != 0) {
+								newCount = count + 1;
+								objects[count] = object;
+								if (newCount == maxCount) {
+									return newCount;
+								}
+							} else {
 								int insertIndex = 0;
 								for (; insertIndex < count; insertIndex++) {
 									if (distance < *reinterpret_cast<float*>(&objects[insertIndex]->m_0x44)) {
@@ -1737,12 +1733,6 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float radius
 								if (count + 1 < maxCount) {
 									newCount = count + 1;
 								}
-							} else {
-								newCount = count + 1;
-								objects[count] = object;
-								if (newCount == maxCount) {
-									return newCount;
-								}
 							}
 						}
 					}
@@ -1751,9 +1741,12 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float radius
 		}
 
 	advance:
-		baseObj = FindNextGBaseObjByCidMask(&CFlat, reinterpret_cast<CFlatRuntime::CObject*>(object)->m_next, 5);
+		object = reinterpret_cast<CGObject*>(FindNextGBaseObjByCidMask(
+			&CFlat, reinterpret_cast<CFlatRuntime::CObject*>(object)->m_next, 5));
 		count = newCount;
-	} while (true);
+	}
+
+	return count;
 }
 
 /*
@@ -1866,11 +1859,12 @@ void CFlatRuntime2::drawLayer(
 	GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
 	GXSetChanMatColor(GX_COLOR0A0, *color);
 
+	Mtx texMtx;
 	Mtx44 ortho;
+	Mtx identity;
 	C_MTXOrtho(ortho, FLOAT_80330144, FLOAT_80330148, FLOAT_80330144, FLOAT_8033014C, FLOAT_80330144, FLOAT_80330150);
 	GXSetProjection(ortho, GX_ORTHOGRAPHIC);
 
-	Mtx identity;
 	PSMTXIdentity(identity);
 	GXLoadPosMtxImm(identity, GX_PNMTX0);
 	GXSetCurrentMtx(GX_PNMTX0);
@@ -1891,7 +1885,6 @@ void CFlatRuntime2::drawLayer(
 
 	TextureMan.SetTexture(GX_TEXMAP0, texture);
 
-	Mtx texMtx;
 	const float texW = static_cast<float>(static_cast<unsigned int>(texture->m_width));
 	const float texH = static_cast<float>(static_cast<unsigned int>(texture->m_height));
 	PSMTXScale(texMtx, FLOAT_80330140 / texW, FLOAT_80330140 / texH, FLOAT_80330140);
@@ -1907,38 +1900,40 @@ void CFlatRuntime2::drawLayer(
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 0);
 	int tevStage = TextureMan.SetTextureTev(texture);
 
-	const float scaledWidth = static_cast<float>(width) * scaleX;
-	const float scaledHeight = static_cast<float>(height) * scaleY;
-	unsigned short u1 = static_cast<short>(texU + width);
-	short v1 = static_cast<unsigned short>(texV + height);
-	float xAnchor = FLOAT_80330144;
+	scaleX = static_cast<float>(width) * scaleX;
+	scaleY = static_cast<float>(height) * scaleY;
+	int u1 = texU + width;
+	int v1 = texV + height;
+	float xAnchor;
 	if ((flags & 1) != 0) {
-		xAnchor = FLOAT_80330154 * scaledWidth;
+		xAnchor = FLOAT_80330154 * scaleX;
+	} else {
+		xAnchor = FLOAT_80330144;
 	}
 	const float x0 = static_cast<float>(x) - xAnchor;
-	float yAnchor = FLOAT_80330144;
+	float yAnchor;
 	if ((flags & 1) != 0) {
-		yAnchor = FLOAT_80330154 * scaledHeight;
+		yAnchor = FLOAT_80330154 * scaleY;
+	} else {
+		yAnchor = FLOAT_80330144;
 	}
 	const float y0 = static_cast<float>(y) - yAnchor;
-	const float x1 = x0 + scaledWidth;
-	const float y1 = y0 + scaledHeight;
-	unsigned short u0 = static_cast<unsigned short>(texU);
-	short v0 = static_cast<short>(texV);
+	const float x1 = x0 + scaleX;
+	const float y1 = y0 + scaleY;
 
 	if (blendMode != 3) {
 		GXBegin(GX_QUADS, GX_VTXFMT0, 4);
 		GXPosition3f32(x0, y0, FLOAT_80330144);
-		GXTexCoord2s16(u0, v0);
+		GXTexCoord2s16(texU, texV);
 
 		GXPosition3f32(x1, y0, FLOAT_80330144);
-		GXTexCoord2s16(u1, v0);
+		GXTexCoord2s16(u1, texV);
 
 		GXPosition3f32(x1, y1, FLOAT_80330144);
 		GXTexCoord2s16(u1, v1);
 
 		GXPosition3f32(x0, y1, FLOAT_80330144);
-		GXTexCoord2s16(u0, v1);
+		GXTexCoord2s16(texU, v1);
 	} else {
 		GXSetNumTexGens(2);
 		GXSetTexCoordGen2(
@@ -1958,56 +1953,59 @@ void CFlatRuntime2::drawLayer(
 		_GXSetTevAlphaIn((_GXTevStageID)tevStage, (_GXTevAlphaArg)7, (_GXTevAlphaArg)4, (_GXTevAlphaArg)0, (_GXTevAlphaArg)7);
 		_GXSetTevAlphaOp((_GXTevStageID)tevStage, (_GXTevOp)0, (_GXTevBias)0, (_GXTevScale)0, 1, (_GXTevRegID)0);
 
-		const int pixelWidth = static_cast<int>(scaledWidth * FLOAT_80330154);
-		const int pixelHeight = static_cast<int>(scaledHeight * FLOAT_80330154);
+		CColor texCol0, texCol1;
 
 		for (int quad = 0; quad < 4; quad++) {
-			CColor texCol0;
-			CColor texCol1;
+			int rectW = static_cast<int>(scaleX * FLOAT_80330154);
+			int rectH = static_cast<int>(scaleY * FLOAT_80330154);
 
-			float bx = x0;
+			float bx;
 			if ((quad & 1) != 0) {
-				bx = x0 + static_cast<float>(pixelWidth);
+				bx = x0 + static_cast<float>(rectW);
+			} else {
+				bx = x0;
 			}
 			int rectX = static_cast<int>(bx);
-			float by = y0;
+			float by;
 			if ((quad & 2) != 0) {
-				by = y0 + static_cast<float>(pixelHeight);
+				by = y0 + static_cast<float>(rectH);
+			} else {
+				by = y0;
 			}
 			int rectY = static_cast<int>(by);
 
-			unsigned short quadU0 = static_cast<short>(texU);
+			unsigned int quadU0;
 			if ((quad & 1) != 0) {
-				quadU0 = static_cast<short>(texU + static_cast<short>(pixelWidth));
+				quadU0 = texU + rectW;
+			} else {
+				quadU0 = texU;
 			}
-			short quadV0 = static_cast<short>(texV);
+			int quadV0;
 			if ((quad & 2) != 0) {
-				quadV0 = static_cast<short>(texV + static_cast<short>(pixelHeight));
+				quadV0 = texV + rectH;
+			} else {
+				quadV0 = texV;
 			}
 
-			int rectW = pixelWidth;
-			int rectH = pixelHeight;
 			_GXTexObj* backTex = Graphic.GetBackBufferRect(rectX, rectY, rectW, rectH, 0);
 			GXLoadTexObj(backTex, GX_TEXMAP1);
 
 			GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-			short quadU1 = static_cast<short>(quadU0 + static_cast<short>(rectW));
-			short quadV1 = static_cast<short>(quadV0 + static_cast<short>(rectH));
 
 			GXPosition3f32(static_cast<float>(rectX), static_cast<float>(rectY), FLOAT_80330144);
 			GXTexCoord2s16(quadU0, quadV0);
 			GXTexCoord2s16(0, 0);
 
 			GXPosition3f32(static_cast<float>(rectX + rectW), static_cast<float>(rectY), FLOAT_80330144);
-			GXTexCoord2s16(quadU1, quadV0);
+			GXTexCoord2s16(quadU0 + rectW, quadV0);
 			GXTexCoord2s16(2, 0);
 
 			GXPosition3f32(static_cast<float>(rectX + rectW), static_cast<float>(rectY + rectH), FLOAT_80330144);
-			GXTexCoord2s16(quadU1, quadV1);
+			GXTexCoord2s16(quadU0 + rectW, quadV0 + rectH);
 			GXTexCoord2s16(2, 2);
 
 			GXPosition3f32(static_cast<float>(rectX), static_cast<float>(rectY + rectH), FLOAT_80330144);
-			GXTexCoord2s16(quadU0, quadV1);
+			GXTexCoord2s16(quadU0, quadV0 + rectH);
 			GXTexCoord2s16(0, 2);
 		}
 	}
@@ -2326,7 +2324,8 @@ void CFlatRuntime2::IgnoreParticle(int slotNo, CFlatRuntime::CObject* object)
 	if (count < 0x10) {
 		short particleId = object->m_particleId;
 		ifDt[6] = static_cast<u8>(count + 1);
-		*reinterpret_cast<short*>(ifDt + 8 + count * 2) = particleId;
+		ifDt += count * 2;
+		*reinterpret_cast<short*>(ifDt + 8) = particleId;
 	}
 }
 

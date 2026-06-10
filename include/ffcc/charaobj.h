@@ -41,7 +41,6 @@ public:
 	};
 
 	CGCharaObj() {}
-	~CGCharaObj();
 	
 	void onCreate();
 	void onDestroy();

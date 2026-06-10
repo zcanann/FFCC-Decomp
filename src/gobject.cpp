@@ -1386,11 +1386,8 @@ void CGObject::update()
     if (m_animSlotSel != -1 && m_shieldNodeFlagBits.m_bit40) {
         const double turnLimit = fabs(m_turnBaseSpeed);
         double clampedTurn = -turnLimit;
-        if (clampedTurn <= turnDelta) {
-            clampedTurn = turnDelta;
-            if (turnLimit < turnDelta) {
-                clampedTurn = turnLimit;
-            }
+        if (turnDelta >= clampedTurn) {
+            clampedTurn = turnLimit < turnDelta ? turnLimit : turnDelta;
         }
         turnDelta = clampedTurn;
         turnFactor = sAnimFrameOffset;
@@ -1403,11 +1400,10 @@ void CGObject::update()
     Mtx ecScratch;
     if (Game.m_currentMapId == 0x21) {
         Mtx tempMtx;
-        Vec mapUp;
-        Vec worldNorm;
 
         PSMTXRotRad(modelMtx, 'y', atan2f(m_worldPosition.x, m_worldPosition.z));
-        mapUp = DAT_801D9B88;
+        Vec mapUp = DAT_801D9B88;
+        Vec worldNorm;
         PSVECNormalize(&m_worldPosition, &worldNorm);
         PSMTXRotRad(tempMtx, 'x', acosf(PSVECDotProduct(&mapUp, &worldNorm)));
         PSMTXConcat(modelMtx, tempMtx, modelMtx);

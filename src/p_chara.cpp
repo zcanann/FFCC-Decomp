@@ -434,7 +434,7 @@ static inline CCharaPcs::CLoadAnim* FindLoadedAnim(CCharaPcs* self, int charaKin
     return 0;
 }
 
-static CCharaPcs::CLoadAnim* LoadAnimFromDisk(
+static int LoadAnimFromDisk(
     CCharaPcs* self, int charaKind, int charaNo, const char* animName, int mergeFileId, int mergeFlags)
 {
     char path[0x100];
@@ -465,7 +465,7 @@ static CCharaPcs::CLoadAnim* LoadAnimFromDisk(
             System.Printf(const_cast<char*>(s_charaLoadAnimLogFmt), animName, charaKind, charaNo);
         }
 
-        return loadAnim;
+        return 1;
     }
 
     return 0;
@@ -647,13 +647,13 @@ void CCharaPcs::Init()
     }
 
     for (int i = 0; i < 5; i++) {
-        CColor white(0xFF, 0xFF, 0xFF, 0xFF);
+        const CColor& white = CColor(0xFF, 0xFF, 0xFF, 0xFF);
         CColor shade;
 
         float scale = static_cast<float>(i) * 0.25f;
         shade.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.r) * scale));
-        shade.color.g = static_cast<unsigned char>(static_cast<unsigned int>(static_cast<float>(white.color.g) * scale));
-        shade.color.b = static_cast<unsigned char>(static_cast<unsigned int>(static_cast<float>(white.color.b) * scale));
+        shade.color.g = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.g) * scale));
+        shade.color.b = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.b) * scale));
         shade.color.a = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.a) * scale));
         CColor shadeCopy(shade);
 
@@ -954,7 +954,7 @@ int CCharaPcs::correctLoadAnimAmem()
     do {
         int chunkLoadCount = 0;
         int chunkSize = 0;
-        unsigned int nextOffset = scanOffset;
+        unsigned int nextOffset = 0;
         const unsigned int scanEnd = static_cast<unsigned int>(scanOffset + 0x80000);
 
         for (int i = 0; i < loadAnimCount; i++) {
@@ -1017,13 +1017,14 @@ int CCharaPcs::correctLoadAnimAmem()
 void CCharaPcs::onScriptChanging(char*)
 {
     for (int i = 0; i < 5; i++) {
-        CColor white(0xFF, 0xFF, 0xFF, 0xFF);
+        const CColor& white = CColor(0xFF, 0xFF, 0xFF, 0xFF);
         CColor shade;
 
-        float scale = static_cast<float>(i) * 0.25f;
+        float scale = static_cast<float>(i);
+        scale *= 0.25f;
         shade.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.r) * scale));
-        shade.color.g = static_cast<unsigned char>(static_cast<unsigned int>(static_cast<float>(white.color.g) * scale));
-        shade.color.b = static_cast<unsigned char>(static_cast<unsigned int>(static_cast<float>(white.color.b) * scale));
+        shade.color.g = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.g) * scale));
+        shade.color.b = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.b) * scale));
         shade.color.a = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.a) * scale));
         CColor shadeCopy(shade);
 
@@ -2251,7 +2252,10 @@ CCharaPcs::CHandle::~CHandle()
     {
         CRef** slotPtr = &m_animSlot[0];
         for (int i = 0; i < 64; i++, slotPtr++) {
-            ReleaseShared(*slotPtr);
+            CRef* animRef = *slotPtr;
+            if (animRef != 0) {
+                ReleaseShared(*slotPtr);
+            }
         }
     }
     PruneUnsharedAnimRefs(&CharaPcs, 0);
@@ -2572,7 +2576,10 @@ int CCharaPcs::CHandle::LoadAnim(
     if (animIndex == -1) {
         CRef** slotPtr = &m_animSlot[0];
         for (int i = 0; i < 64; i++, slotPtr++) {
-            ReleaseShared(*slotPtr);
+            CRef* animRef = *slotPtr;
+            if (animRef != 0) {
+                ReleaseShared(*slotPtr);
+            }
         }
         PruneUnsharedAnimRefs(&CharaPcs, 0);
     } else {
@@ -2584,16 +2591,29 @@ int CCharaPcs::CHandle::LoadAnim(
         }
     }
 
-    const int resolvedKind = charaKind == -1 ? m_charaKind : charaKind;
-    const int resolvedNo = charaNo == -1 ? m_charaNo : charaNo;
+    int resolvedKind = charaKind;
+    if (resolvedKind == -1) {
+        resolvedKind = m_charaKind;
+    }
+    int resolvedNo = charaNo;
+    if (resolvedNo == -1) {
+        resolvedNo = m_charaNo;
+    }
 
     CLoadAnim* loadAnim = FindLoadedAnim(&CharaPcs, resolvedKind, resolvedNo, animName);
     if (loadAnim == 0) {
-        loadAnim = LoadAnimFromDisk(&CharaPcs, resolvedKind, resolvedNo, animName, mergeFileId, mergeFlags);
+        if (LoadAnimFromDisk(&CharaPcs, resolvedKind, resolvedNo, animName, mergeFileId, mergeFlags) == 0) {
+            return 0;
+        }
     }
-    if (loadAnim == 0) {
-        return 0;
+
+    if (charaKind == -1) {
+        charaKind = m_charaKind;
     }
+    if (charaNo == -1) {
+        charaNo = m_charaNo;
+    }
+    loadAnim = FindLoadedAnim(&CharaPcs, charaKind, charaNo, animName);
 
     m_animSlot[animIndex] = loadAnim;
     reinterpret_cast<CRef*>(loadAnim)->AddRef();
@@ -2632,10 +2652,7 @@ int CCharaPcs::LoadAnim(int charaKind, int charaNo, char* animName, int unusedAr
 
     CLoadAnim* loadAnim = FindLoadedAnim(&CharaPcs, charaKind, charaNo, animName);
     if (loadAnim == 0) {
-        loadAnim = LoadAnimFromDisk(&CharaPcs, charaKind, charaNo, animName, mergeFileId, mergeFlags);
-        if (loadAnim == 0) {
-            return 0;
-        }
+        return LoadAnimFromDisk(&CharaPcs, charaKind, charaNo, animName, mergeFileId, mergeFlags);
     }
     return 1;
 }
@@ -2745,6 +2762,16 @@ void CCharaPcs::CHandle::Draw(int drawPass)
  * Address:	TODO
  * Size:	TODO
  */
+static inline void GetCameraClipPlanes(float* nearOut, float* farOut)
+{
+    if (nearOut) {
+        *nearOut = CameraPcs.m_nearZ;
+    }
+    if (farOut) {
+        *farOut = CameraPcs.m_farZ;
+    }
+}
+
 void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
 {
     if (m_model == 0) {
@@ -2808,8 +2835,8 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
             next.color.a = static_cast<unsigned char>(static_cast<int>(static_cast<float>(CharaPcs.m_viewerChoiceColor[phaseIndex + 1].color.a) * blendT));
             CColor nextCopy(next);
 
-            const float inv = kCharaOne - blendT;
             CColor cur;
+            const float inv = kCharaOne - blendT;
             cur.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(CharaPcs.m_viewerChoiceColor[phaseIndex].color.r) * inv));
             cur.color.g = static_cast<unsigned char>(static_cast<int>(static_cast<float>(CharaPcs.m_viewerChoiceColor[phaseIndex].color.g) * inv));
             cur.color.b = static_cast<unsigned char>(static_cast<int>(static_cast<float>(CharaPcs.m_viewerChoiceColor[phaseIndex].color.b) * inv));
@@ -2828,20 +2855,20 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
             shade.color.a = blendedCopy.color.a;
         }
 
-        CColor3 ambientBase(CharaPcs.m_viewerAmbientColor[lightBank]);
+        const CColor3& ambientBase = CColor3(CharaPcs.m_viewerAmbientColor[lightBank]);
         CColor3 ambientShade;
-        ambientShade.color.r = static_cast<signed char>((static_cast<unsigned int>(ambientBase.color.r) * shade.color.r) / 255);
-        ambientShade.color.g = static_cast<signed char>((static_cast<unsigned int>(ambientBase.color.g) * shade.color.g) / 255);
-        ambientShade.color.b = static_cast<unsigned char>((static_cast<unsigned int>(ambientBase.color.b) * shade.color.b) / 255);
+        ambientShade.color.r = static_cast<signed char>((static_cast<int>(ambientBase.color.r) * shade.color.r) / 255);
+        ambientShade.color.g = static_cast<signed char>((static_cast<int>(ambientBase.color.g) * shade.color.g) / 255);
+        ambientShade.color.b = static_cast<unsigned char>((static_cast<int>(ambientBase.color.b) * shade.color.b) / 255);
         ambientShade.color.a = ambientBase.color.a;
         CColor3 ambientColor(ambientShade);
         _GXColor ambientGX = ambientColor.color;
         LightPcs.SetAmbient(ambientGX);
 
         for (unsigned long i = 0; i < 3; i++) {
-            CColor3 diffuseBase(CharaPcs.m_viewerDiffuseColor[lightBank][i]);
+            const CColor3& diffuseBase = CColor3(CharaPcs.m_viewerDiffuseColor[lightBank][i]);
             CColor3 diffuseShade;
-            diffuseShade.color.r = static_cast<signed char>((static_cast<unsigned int>(diffuseBase.color.r) * shade.color.r) / 255);
+            diffuseShade.color.r = static_cast<signed char>((static_cast<int>(diffuseBase.color.r) * shade.color.r) / 255);
             diffuseShade.color.g = static_cast<unsigned char>((static_cast<int>(diffuseBase.color.g) * shade.color.g) / 255);
             diffuseShade.color.b = static_cast<unsigned char>((static_cast<int>(diffuseBase.color.b) * shade.color.b) / 255);
             diffuseShade.color.a = diffuseBase.color.a;
@@ -2882,9 +2909,9 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         modelPos.y = modelMtx[1][3];
         modelPos.z = modelMtx[2][3];
 
-        CVector focusPos(CharaPcs.m_texShadowPos);
+        const CVector& focusPos = CVector(CharaPcs.m_texShadowPos);
         CVector deltaTmp;
-        PSVECSubtract(focusPos, modelPos, deltaTmp);
+        PSVECSubtract((Vec*)&focusPos, modelPos, deltaTmp);
         Vec delta;
         delta.x = deltaTmp.x;
         delta.y = deltaTmp.y;
@@ -2944,8 +2971,9 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
                     static_cast<Vec*>(lookAtUp), reinterpret_cast<Point3d*>(&eye));
         PSMTXCopy(m_shadowViewMtx, viewMtx);
 
-        const float nearZ = CameraPcs.m_nearZ;
-        const float farZ = CameraPcs.m_farZ;
+        float nearZ;
+        float farZ;
+        GetCameraClipPlanes(&nearZ, &farZ);
         CColor shadowFog;
         shadowFog.color.a = 0xFF;
         shadowFog.color.b = static_cast<unsigned char>(static_cast<int>(255.0f * shadowFade));
@@ -2956,12 +2984,24 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
     }
 
     bool restoreFog = false;
-    if ((drawPass == 0 || drawPass == 4) && kCharaZero < m_fogBlend) {
+    if (kCharaZero < m_fogBlend && (drawPass == 0 || drawPass == 4)) {
         float invBlend = kCharaOne - m_fogBlend;
         float fogBlend = kCharaOne - invBlend * invBlend;
-        float fogRemainder = kCharaOne - fogBlend;
 
-        CColor white(0xFF, 0xFF, 0xFF, 0xFF);
+        float nearZ;
+        float farZ;
+        GetCameraClipPlanes(&nearZ, &farZ);
+        const float fogStart = Graphic.m_fogStart;
+        const unsigned int fogColorWord = *reinterpret_cast<unsigned int*>(&Graphic.m_fogColor);
+        const float fogEnd = Graphic.m_fogEnd;
+        const unsigned char* fogColorBytes = reinterpret_cast<const unsigned char*>(&fogColorWord);
+        _GXColor graphicFogColor;
+        graphicFogColor.r = fogColorBytes[0];
+        graphicFogColor.g = fogColorBytes[1];
+        graphicFogColor.b = fogColorBytes[2];
+        graphicFogColor.a = fogColorBytes[3];
+
+        const CColor& white = CColor(0xFF, 0xFF, 0xFF, 0xFF);
         CColor whitePart;
         whitePart.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.r) * fogBlend));
         whitePart.color.g = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.g) * fogBlend));
@@ -2969,9 +3009,9 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         whitePart.color.a = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.a) * fogBlend));
         CColor whitePartCopy(whitePart);
 
-        _GXColor graphicFogColor = Graphic.m_fogColor;
-        CColor fogBase(graphicFogColor);
+        const CColor& fogBase = CColor(graphicFogColor);
         CColor fogPart;
+        const float fogRemainder = kCharaOne - fogBlend;
         fogPart.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(fogBase.color.r) * fogRemainder));
         fogPart.color.g = static_cast<unsigned char>(static_cast<int>(static_cast<float>(fogBase.color.g) * fogRemainder));
         fogPart.color.b = static_cast<unsigned char>(static_cast<int>(static_cast<float>(fogBase.color.b) * fogRemainder));
@@ -2985,12 +3025,10 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         blendedFog.color.a = fogPartCopy.color.a + whitePartCopy.color.a;
         CColor blendedFogCopy(blendedFog);
 
-        float nearZ = CameraPcs.m_nearZ;
-        float farZ = CameraPcs.m_farZ;
         _GXColor fogColor = blendedFogCopy.color;
         GXSetFog(GX_FOG_PERSP_LIN,
-                 Graphic.m_fogStart * fogRemainder + nearZ * fogBlend,
-                 (Graphic.m_fogEnd + kCharaOne) * fogRemainder + (nearZ + kCharaOne) * fogBlend,
+                 fogStart * fogRemainder + nearZ * fogBlend,
+                 (fogEnd + kCharaOne) * fogRemainder + (nearZ + kCharaOne) * fogBlend,
                  nearZ,
                  farZ,
                  fogColor);

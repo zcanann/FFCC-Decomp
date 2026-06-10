@@ -634,23 +634,9 @@ void CCameraPcs::CalcQuake()
     offset.y = kCameraZeroF;
     offset.x = kCameraZeroF;
 
-    if (m_quake.m_signX == 0) {
-        offset.x = -m_quake.m_positionAmplitude.x;
-    } else {
-        offset.x = m_quake.m_positionAmplitude.x;
-    }
-
-    if (m_quake.m_signY == 0) {
-        offset.y = -m_quake.m_positionAmplitude.y;
-    } else {
-        offset.y = m_quake.m_positionAmplitude.y;
-    }
-
-    if (m_quake.m_signZ == 0) {
-        offset.z = -m_quake.m_positionAmplitude.z;
-    } else {
-        offset.z = m_quake.m_positionAmplitude.z;
-    }
+    offset.x = (m_quake.m_signX == 0) ? -m_quake.m_positionAmplitude.x : m_quake.m_positionAmplitude.x;
+    offset.y = (m_quake.m_signY == 0) ? -m_quake.m_positionAmplitude.y : m_quake.m_positionAmplitude.y;
+    offset.z = (m_quake.m_signZ == 0) ? -m_quake.m_positionAmplitude.z : m_quake.m_positionAmplitude.z;
 
     jitter.z = kCameraZeroF;
     jitter.y = kCameraZeroF;
@@ -975,7 +961,7 @@ void CCameraPcs::draw()
         {
         Mtx cameraMtx;
         Mtx shadowMtx;
-        Vec* shadowRefPos = shadowPos + 1;
+        Vec* shadowRefPos = &g_shadow_refpos;
         float refPosX = shadowRefPos->x;
         float refPosY = shadowRefPos->y;
         float refPosZ = shadowRefPos->z;
@@ -1110,7 +1096,6 @@ void CCameraPcs::calcChara()
     Mtx mtxA;
     Vec targetPos;
     float stick;
-    Vec scaledDir;
 
     C_MTXPerspective(m_screenMatrix, m_fov, kCameraAspectRatio, m_nearZ, m_farZ);
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
@@ -1164,6 +1149,7 @@ void CCameraPcs::calcChara()
     Vec* eyePtr = CVector(DirectionVec());
     CVector scaledVec;
     PSVECScale(eyePtr, AsVec(scaledVec), kCameraHundredF);
+    Vec scaledDir;
     scaledDir.x = scaledVec.x;
     scaledDir.y = scaledVec.y;
     scaledDir.z = scaledVec.z;
@@ -1399,44 +1385,48 @@ void CCameraPcs::createRampTex8()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_propagation off
 void CCameraPcs::createFullShadow()
 {
     unsigned int rampTexSize;
     unsigned int i;
     unsigned char* rampTex;
+    CMapMng* map;
+    char* fileName;
 
-    CMapMng& map = MapMng;
-    char* fileName = const_cast<char*>(s_p_camera_cpp);
+    fileName = const_cast<char*>(s_p_camera_cpp);
+    map = &MapMng;
     m_fullScreenShadow.m_shadowTexture = 0;
     m_fullScreenShadow.m_shadowTexture =
-        new (map.m_stage, fileName, 0x3A5)
+        new (map->m_stage, fileName, 0x3A5)
             u8[GXGetTexBufferSize(0x1E0, 0x1E0, GX_TF_I8, GX_FALSE, 0)];
-
+    fileName = const_cast<char*>(s_p_camera_cpp);
+    map = &MapMng;
     m_fullScreenShadow.m_rampTexture = 0;
-    rampTex = new (map.m_stage, fileName, 0x361)
+    rampTex = new (map->m_stage, fileName, 0x361)
         u8[rampTexSize = GXGetTexBufferSize(0x10, 0x10, GX_TF_I8, GX_FALSE, 0)];
     m_fullScreenShadow.m_rampTexture = rampTex;
 
     for (i = 0; i < 0x100; i += 8) {
-        u32 v1 = i + 1;
+        u32 v7 = i + 7;
+        u32 v6 = i + 6;
+        u32 v5 = i + 5;
+        u32 v3 = i + 3;
+        u32 v4 = i + 4;
         u32 v2 = i + 2;
+        u32 v1 = i + 1;
         rampTex[((i & 0x80) >> 2) + ((i >> 4) & 7) + ((i & 0xC) << 4) + ((i & 3) << 3)] =
             static_cast<unsigned char>(i);
-        u32 v3 = i + 3;
         rampTex[((v1 & 0x80) >> 2) + ((v1 >> 4) & 7) + ((v1 & 0xC) << 4) + ((v1 & 3) << 3)] =
             static_cast<unsigned char>(v1);
-        u32 v4 = i + 4;
         rampTex[((v2 & 0x80) >> 2) + ((v2 >> 4) & 7) + ((v2 & 0xC) << 4) + ((v2 & 3) << 3)] =
             static_cast<unsigned char>(v2);
-        u32 v5 = i + 5;
         rampTex[((v3 & 0x80) >> 2) + ((v3 >> 4) & 7) + ((v3 & 0xC) << 4) + ((v3 & 3) << 3)] =
             static_cast<unsigned char>(v3);
         rampTex[((v4 & 0x80) >> 2) + ((v4 >> 4) & 7) + ((v4 & 0xC) << 4) + ((v4 & 3) << 3)] =
             static_cast<unsigned char>(v4);
-        u32 v6 = i + 6;
         rampTex[((v5 & 0x80) >> 2) + ((v5 >> 4) & 7) + ((v5 & 0xC) << 4) + ((v5 & 3) << 3)] =
             static_cast<unsigned char>(v5);
-        u32 v7 = i + 7;
         rampTex[((v6 & 0x80) >> 2) + ((v6 >> 4) & 7) + ((v6 & 0xC) << 4) + ((v6 & 3) << 3)] =
             static_cast<unsigned char>(v6);
         rampTex[((v7 & 0x80) >> 2) + ((v7 >> 4) & 7) + ((v7 & 0xC) << 4) + ((v7 & 3) << 3)] =
@@ -1458,6 +1448,7 @@ void CCameraPcs::createFullShadow()
     m_fullScreenShadow.m_rotY = zero;
     m_fullScreenShadow.m_scale = shadowAlpha;
 }
+#pragma opt_propagation on
 
 /*
  * --INFO--
@@ -1468,18 +1459,24 @@ void CCameraPcs::createFullShadow()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_propagation off
 void CCameraPcs::destroyFullShadow()
 {
+    u8* zero;
+
+    zero = 0;
     if (m_fullScreenShadow.m_shadowTexture != 0) {
         delete static_cast<u8*>(m_fullScreenShadow.m_shadowTexture);
-        m_fullScreenShadow.m_shadowTexture = 0;
+        m_fullScreenShadow.m_shadowTexture = zero;
     }
 
+    zero = 0;
     if (m_fullScreenShadow.m_rampTexture != 0) {
         delete m_fullScreenShadow.m_rampTexture;
-        m_fullScreenShadow.m_rampTexture = 0;
+        m_fullScreenShadow.m_rampTexture = zero;
     }
 }
+#pragma opt_propagation on
 
 /*
  * --INFO--
@@ -1511,9 +1508,10 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
     for (CGObject* gObject = CFlatRuntime2Storage().FindGObjFirst(); gObject != 0;
          gObject = CFlatRuntime2Storage().FindGObjNext(gObject))
     {
+        unsigned int displayFlags;
         bool include = false;
         if (gObject->m_charaModelHandle != 0) {
-            unsigned int displayFlags = gObject->m_displayFlags;
+            displayFlags = gObject->m_displayFlags;
             if ((displayFlags & 1) != 0 && (displayFlags & 0x40) == 0) {
                 if (static_cast<signed char>(
                         static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<signed char*>(
@@ -1643,12 +1641,11 @@ void CCameraPcs::drawShadowBegin()
             m_targetZ = sumZ * half;
             m_targetY = m_fullScreenShadowPosition.y;
 
-            float w = m_shadowRectBound.m_max.x - m_shadowRectBound.m_min.x;
+            depth = m_shadowRectBound.m_max.x - m_shadowRectBound.m_min.x;
             float h = m_shadowRectBound.m_max.z - m_shadowRectBound.m_min.z;
-            if (w < h) {
-                w = h;
+            if (depth < h) {
+                depth = h;
             }
-            depth = w;
             m_fullScreenShadow.m_span = kCameraHalfF * depth;
         } else if (m_shadowAuto == 2) {
             m_targetX = m_fullScreenShadowPosition.x;

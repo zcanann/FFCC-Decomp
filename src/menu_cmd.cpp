@@ -606,14 +606,14 @@ void CMenuPcs::CmdOpen()
 		CmdInit();
 	}
 
+	CmdListEntry* entry;
 	s32 finishedCount = 0;
 	GetCmdStateView(this)->transitionTimer = static_cast<s16>(GetCmdStateView(this)->transitionTimer + 1);
 
 	CmdListStorage* list = GetCmdListStorage(this);
-	u32 count = static_cast<u32>(list->count);
-	CmdListEntry* entry = list->entries;
+	const s32 entryCount = list->count;
+	entry = list->entries;
 	const s32 timer = static_cast<s32>(GetCmdStateView(this)->transitionTimer);
-	const s32 entryCount = static_cast<s32>(count);
 
 	for (s32 i = 0; i < entryCount; i++) {
 		if (entry->startFrame <= timer) {
@@ -622,63 +622,24 @@ void CMenuPcs::CmdOpen()
 				entry->alpha = kCmdMenuOne;
 			} else {
 				entry->timer++;
-				entry->alpha = static_cast<float>(
-				    (kCmdMenuOneD / static_cast<double>(entry->duration)) *
-				    static_cast<double>(entry->timer));
+				f64 durationD = static_cast<double>(entry->duration);
+				f64 timerD = static_cast<double>(entry->timer);
+				entry->alpha = static_cast<float>((kCmdMenuOneD / durationD) * timerD);
 			}
 		}
 		entry++;
 	}
 
 	int done = 0;
-	if (GetCmdListStorage(this)->count == finishedCount) {
+	CmdListStorage* const list2 = GetCmdListStorage(this);
+	if (list2->count == finishedCount) {
 		float anim = kCmdMenuOne;
-		entry = GetCmdListStorage(this)->entries;
-		if (static_cast<s32>(count) > 0) {
-			u32 batch = count >> 3;
-			if (batch != 0) {
-				for (; batch != 0; batch--) {
-					entry[0].startFrame = 0;
-					entry[0].duration = 1;
-					entry[0].alpha = anim;
-					entry[1].startFrame = 0;
-					entry[1].duration = 1;
-					entry[1].alpha = anim;
-					entry[2].startFrame = 0;
-					entry[2].duration = 1;
-					entry[2].alpha = anim;
-					entry[3].startFrame = 0;
-					entry[3].duration = 1;
-					entry[3].alpha = anim;
-					entry[4].startFrame = 0;
-					entry[4].duration = 1;
-					entry[4].alpha = anim;
-					entry[5].startFrame = 0;
-					entry[5].duration = 1;
-					entry[5].alpha = anim;
-					entry[6].startFrame = 0;
-					entry[6].duration = 1;
-					entry[6].alpha = anim;
-					entry[7].startFrame = 0;
-					entry[7].duration = 1;
-					entry[7].alpha = anim;
-					entry += 8;
-				}
-				count &= 7;
-				if (count == 0) {
-					done = 1;
-				}
-			}
-
-			if (count != 0) {
-				do {
-					entry->startFrame = 0;
-					entry->duration = 1;
-					entry->alpha = anim;
-					entry++;
-					count -= 1;
-				} while (count != 0);
-			}
+		entry = list2->entries;
+		for (s32 k = entryCount; k > 0; k--) {
+			entry->startFrame = 0;
+			entry->duration = 1;
+			entry->alpha = anim;
+			entry++;
 		}
 		done = 1;
 	}
@@ -2608,37 +2569,30 @@ int CMenuPcs::UniteCloseAnim(int topIdx)
  */
 unsigned int CMenuPcs::CmdOpen1()
 {
-	u8* self = reinterpret_cast<u8*>(this);
 	const CCaravanWork* const caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
+	s32 i;
+	s32 slot;
 
 	GetCmdStateView(this)->transitionTimer = static_cast<s16>(GetCmdStateView(this)->transitionTimer + 1);
 
-	const s32 selected =  (int)(long)(static_cast<s32>(GetCmdStateView(this)->selected));
+	const s32 selected = static_cast<s32>(GetCmdStateView(this)->selected);
 
-	*reinterpret_cast<f32*>(reinterpret_cast<u8*>(GetCmdList(this)) + selected * 0x40 + 0x18) = static_cast<f32>(
-		-((kCmdMenuTransitionStepD * static_cast<f64>(GetCmdStateView(this)->transitionTimer)) - kCmdMenuOneD)
-	);
-
-	s32 chainCount = 1;
-	if (caravanWork->m_commandListExtra[selected + 1] == -1) {
-		chainCount = 2;
-		*reinterpret_cast<f32*>(reinterpret_cast<u8*>(GetCmdList(this)) + (selected + 1) * 0x40 + 0x18) = static_cast<f32>(
+	for (i = 0; i < 3; i++) {
+		if ((i != 0) && (caravanWork->m_commandListExtra[selected + i] != -1)) {
+			break;
+		}
+		*reinterpret_cast<f32*>(reinterpret_cast<u8*>(GetCmdList(this)) + (selected + i) * 0x40 + 0x18) = static_cast<f32>(
 			-((kCmdMenuTransitionStepD * static_cast<f64>(GetCmdStateView(this)->transitionTimer)) - kCmdMenuOneD)
 		);
-		if (caravanWork->m_commandListExtra[selected + 2] == -1) {
-			chainCount = 3;
-			*reinterpret_cast<f32*>(reinterpret_cast<u8*>(GetCmdList(this)) + (selected + 2) * 0x40 + 0x18) = static_cast<f32>(
-				-((kCmdMenuTransitionStepD * static_cast<f64>(GetCmdStateView(this)->transitionTimer)) - kCmdMenuOneD)
-			);
-		}
 	}
+	s32 chainCount = i;
 
 	CmdListEntry* const animEntry = &GetCmdListStorage(this)->entries[GetCmdListStorage(this)->listEnd + 3];
 
-	s32 slot = 0;
-	if ((s_UniteTop[0] != selected) && ((slot = 1), s_UniteTop[1] != selected) &&
-	    ((slot = 2), s_UniteTop[2] != selected)) {
-		slot = 3;
+	for (slot = 0; slot < 3; slot++) {
+		if (selected == s_UniteTop[slot]) {
+			break;
+		}
 	}
 
 	CmdListEntry* const baseEntry = &GetCmdListStorage(this)->entries[GetCmdListStorage(this)->listEnd + slot];
@@ -2698,16 +2652,13 @@ unsigned int CMenuPcs::CmdClose1()
 
 	if (state == 0) {
 		const s32 selected = GetCmdStateView(this)->selected;
-		*reinterpret_cast<f32*>(reinterpret_cast<u8*>(GetCmdList(this)) + selected * 0x40 + 0x18) =
-			static_cast<float>(kCmdMenuTransitionStepD * static_cast<f64>(GetCmdStateView(this)->transitionTimer));
-
-		if (caravanWork->m_commandListExtra[selected + 1] == -1) {
-			*reinterpret_cast<f32*>(reinterpret_cast<u8*>(GetCmdList(this)) + (selected + 1) * 0x40 + 0x18) =
-				static_cast<float>(kCmdMenuTransitionStepD * static_cast<f64>(GetCmdStateView(this)->transitionTimer));
-			if (caravanWork->m_commandListExtra[selected + 2] == -1) {
-				*reinterpret_cast<f32*>(reinterpret_cast<u8*>(GetCmdList(this)) + (selected + 2) * 0x40 + 0x18) =
-					static_cast<float>(kCmdMenuTransitionStepD * static_cast<f64>(GetCmdStateView(this)->transitionTimer));
+		s32 i;
+		for (i = 0; i < 3; i++) {
+			if ((i != 0) && (caravanWork->m_commandListExtra[selected + i] != -1)) {
+				break;
 			}
+			*reinterpret_cast<f32*>(reinterpret_cast<u8*>(GetCmdList(this)) + (selected + i) * 0x40 + 0x18) =
+				static_cast<float>(kCmdMenuTransitionStepD * static_cast<f64>(GetCmdStateView(this)->transitionTimer));
 		}
 
 		CmdListEntry* const animEntry = &GetCmdListStorage(this)->entries[GetCmdListStorage(this)->listEnd + 3];
@@ -2731,7 +2682,7 @@ unsigned int CMenuPcs::CmdClose1()
 			GetCmdStateView(this)->commandResult = 0;
 		}
 	} else if (state == 1) {
-		const s16 selected = GetCmdStateView(this)->selected;
+		const s32 selected = GetCmdStateView(this)->selected;
 		s32 uniteIdx = 0;
 		s32 topCount = s_unitePanelCount;
 		for (; uniteIdx < topCount; uniteIdx++) {
@@ -2743,14 +2694,10 @@ unsigned int CMenuPcs::CmdClose1()
 		done = static_cast<u32>(UniteCloseAnim(uniteIdx));
 		if (done != 0) {
 			CCaravanWork* const cw = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
-			s32 ununiteCount = 0;
-			if (ununiteCount == 0 || cw->m_commandListExtra[selected + ununiteCount] == -1) {
-				ununiteCount = 1;
-				if (ununiteCount == 0 || cw->m_commandListExtra[selected + ununiteCount] == -1) {
-					ununiteCount = 2;
-					if (ununiteCount == 0 || cw->m_commandListExtra[selected + ununiteCount] == -1) {
-						ununiteCount = 3;
-					}
+			s32 ununiteCount;
+			for (ununiteCount = 0; ununiteCount < 3; ununiteCount++) {
+				if ((ununiteCount != 0) && (cw->m_commandListExtra[selected + ununiteCount] != -1)) {
+					break;
 				}
 			}
 			cw->UnuniteComList(selected, ununiteCount);
@@ -2780,19 +2727,17 @@ unsigned int CMenuPcs::CmdClose1()
 			ChkUnite(static_cast<int>(selected), combo);
 
 			CCaravanWork* const cw = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
-			s32 ununiteCount = 0;
-			if (ununiteCount == 0 || cw->m_commandListExtra[selected + ununiteCount] == -1) {
-				ununiteCount = 1;
-				if (ununiteCount == 0 || cw->m_commandListExtra[selected + ununiteCount] == -1) {
-					ununiteCount = 2;
-					if (ununiteCount == 0 || cw->m_commandListExtra[selected + ununiteCount] == -1) {
-						ununiteCount = 3;
-					}
+			const s32 sel = GetCmdStateView(this)->selected;
+			s32 ununiteCount;
+			for (ununiteCount = 0; ununiteCount < 3; ununiteCount++) {
+				if ((ununiteCount != 0) && (cw->m_commandListExtra[sel + ununiteCount] != -1)) {
+					break;
 				}
 			}
 
-			cw->UnuniteComList(selected, ununiteCount);
-			cw->UniteComList(combo[0][1], GetUniteRecipeCount(combo[0][0]), GetUniteRecipeCmd(combo[0][0]));
+			cw->UnuniteComList(sel, ununiteCount);
+			reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0])
+			    ->UniteComList(combo[0][1], GetUniteRecipeCount(combo[0][0]), GetUniteRecipeCmd(combo[0][0]));
 
 			done = 0;
 			GetCmdStateView(this)->selected = static_cast<s16>(combo[0][1]);

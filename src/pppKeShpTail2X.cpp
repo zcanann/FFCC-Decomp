@@ -20,16 +20,6 @@ static inline float LoadFloat(const float& value)
     return value;
 }
 
-static inline float LoadFloatFresh(const volatile float& value)
-{
-    return value;
-}
-
-static inline double LoadFloatWide(const float& value)
-{
-    return value;
-}
-
 STATIC_ASSERT(offsetof(struct pppKeShpTail2X, m_object.m_workArea) == 0x80);
 
 struct KeShpTail2XWork {

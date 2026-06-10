@@ -221,7 +221,9 @@ public:
 
 private:
     OSSemaphore accessSemaphores[4];  // 0x0000
-    unsigned char _pad30[0x414];      // 0x0030
+    unsigned int m_queue[4][0x40];    // 0x0030
+    int m_queueCount[4];              // 0x0430
+    char m_queueFull[4];              // 0x0440
     int m_stageNo;                    // 0x0444
     int m_mapNo;                      // 0x0448
     unsigned char m_stageFlags;       // 0x044C
@@ -235,14 +237,13 @@ private:
     unsigned char _pad2AFD[0x3];      // 0x2AFD
     GbaQueueMapObjWork m_mapObjWork;  // 0x2B00
     unsigned char m_makeMapObjFlg;    // 0x2C88
-    unsigned char m_letterFlags;      // 0x2C89
+    signed char m_letterFlags;        // 0x2C89
     unsigned char m_compatibilityFlg[4]; // 0x2C8A
-    unsigned short m_sendMask;        // 0x2C8E
-    unsigned char _pad2C90[0x6];      // 0x2C90
+    unsigned short m_sendMask[4];     // 0x2C8E
     signed char m_maskSendState[4];   // 0x2C96
     unsigned char _pad2C9A[0x2];      // 0x2C9A
     unsigned int m_pendingMoney[4];   // 0x2C9C
-    unsigned char m_moneyState[4];    // 0x2CAC
+    signed char m_moneyState[4];      // 0x2CAC
     unsigned char m_moneyFlags;       // 0x2CB0
     unsigned char m_favoriteFlags;    // 0x2CB1
     GbaCMakeInfo cmakeInfo[4];        // 0x2CB2

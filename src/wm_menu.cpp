@@ -800,7 +800,7 @@ void CMenuPcs::loadData()
 		const float oneF = FLOAT_803313e8;
 		const float zeroF = FLOAT_803313dc;
 		for (int i = 0; i < 0x28; i++) {
-			unsigned char* const entry = m_wm.m_worldObjData + i * 0x50;
+			unsigned char* const entry = m_wm.m_worldObjData + i * 0x50 + 0x1C;
 			*reinterpret_cast<float*>(entry + 0x08) = zeroF;
 			*reinterpret_cast<float*>(entry + 0x04) = zeroF;
 			*reinterpret_cast<float*>(entry + 0x00) = zeroF;
@@ -834,20 +834,19 @@ void CMenuPcs::loadData()
 	    static_cast<unsigned char*>(operator new(0xEC, MenuPcs.m_menuStage, srcFile, 0x22B));
 	memset(m_wm.m_frameData, 0, 0xEC);
 	{
-		const float oneF = FLOAT_803313e8;
 		int frameSrc[20];
 		unsigned int* dst = reinterpret_cast<unsigned int*>(frameSrc) - 1;
 		unsigned int* src = reinterpret_cast<unsigned int*>(rodataBase + 0x9BC);
-		int n = 10;
-		do {
-			unsigned int* const lo = src + 1;
+		unsigned int* const srcEnd = src + 20;
+		while (src != srcEnd) {
+			unsigned int lo = src[1];
 			src += 2;
 			unsigned int hi = *src;
-			dst[1] = *lo;
+			dst[1] = lo;
 			dst += 2;
 			*dst = hi;
-			n--;
-		} while (n != 0);
+		}
+		const float oneF = FLOAT_803313e8;
 
 		int wordSrc[10];
 		wordSrc[0] = *reinterpret_cast<int*>(rodataBase + 0xA10);
@@ -916,9 +915,9 @@ void CMenuPcs::loadData()
 	m_wm.m_charaModelData =
 	    static_cast<unsigned char*>(operator new[](0x1A0, MenuPcs.m_menuStage, srcFile, 0x237));
 	{
-		const float oneF = FLOAT_803313e8;
 		const float zeroF = FLOAT_803313dc;
-		for (int i = 0, count = 4; count != 0; count--, i += 0x68) {
+		const float oneF = FLOAT_803313e8;
+		for (int i = 0, count = 8; count != 0; count--, i += 0x34) {
 			*reinterpret_cast<int*>(m_wm.m_charaModelData + i + 0x00) = 0;
 			*reinterpret_cast<int*>(m_wm.m_charaModelData + i + 0x04) = 0;
 			*reinterpret_cast<int*>(m_wm.m_charaModelData + i + 0x08) = 0;
@@ -933,20 +932,6 @@ void CMenuPcs::loadData()
 			a[8] = oneF;
 			a[7] = oneF;
 			a[6] = oneF;
-			*reinterpret_cast<int*>(m_wm.m_charaModelData + i + 0x34) = 0;
-			*reinterpret_cast<int*>(m_wm.m_charaModelData + i + 0x38) = 0;
-			*reinterpret_cast<int*>(m_wm.m_charaModelData + i + 0x3C) = 0;
-			*reinterpret_cast<unsigned char*>(m_wm.m_charaModelData + i + 0x40) = 0;
-			float* const b = reinterpret_cast<float*>(m_wm.m_charaModelData + i + 0x44);
-			b[2] = zeroF;
-			b[1] = zeroF;
-			b[0] = zeroF;
-			b[5] = zeroF;
-			b[4] = zeroF;
-			b[3] = zeroF;
-			b[8] = oneF;
-			b[7] = oneF;
-			b[6] = oneF;
 		}
 	}
 
@@ -1066,30 +1051,10 @@ void CMenuPcs::loadData()
 		}
 		for (int i = 0, count = 4; count != 0; count--, i += 0x10) {
 			if (*reinterpret_cast<short*>(m_wm.m_charaSelectData + i + 4) < 0) {
-				int freeSlot = 0;
-				signed char mask = usedMask;
-				if ((mask & (1 << freeSlot)) != 0) {
-					freeSlot = 1;
-					if ((mask & (1 << freeSlot)) != 0) {
-						freeSlot = 2;
-						if ((mask & (1 << freeSlot)) != 0) {
-							freeSlot = 3;
-							if ((mask & (1 << freeSlot)) != 0) {
-								freeSlot = 4;
-								if ((mask & (1 << freeSlot)) != 0) {
-									freeSlot = 5;
-									if ((mask & (1 << freeSlot)) != 0) {
-										freeSlot = 6;
-										if ((mask & (1 << freeSlot)) != 0) {
-											freeSlot = 7;
-											if ((mask & (1 << freeSlot)) != 0) {
-												freeSlot = 8;
-											}
-										}
-									}
-								}
-							}
-						}
+				int freeSlot;
+				for (freeSlot = 0; freeSlot < 8; freeSlot++) {
+					if ((usedMask & (1 << freeSlot)) == 0) {
+						break;
 					}
 				}
 				*reinterpret_cast<short*>(m_wm.m_charaSelectData + i + 4) = static_cast<short>(freeSlot);
@@ -1108,7 +1073,6 @@ void CMenuPcs::loadData()
 	// Crystal cage effect (effect slot 7, effect no 9).
 	{
 		PPPCREATEPARAM titleParam;
-		titleParam.m_paramA = -1;
 		unsigned char* const effectBase = reinterpret_cast<unsigned char*>(m_effectWork);
 		*reinterpret_cast<int*>(effectBase + 0x23FC) = 9;
 		CGObject* const titleObject = reinterpret_cast<CGObject*>(effectBase + 0x2408);
@@ -1124,71 +1088,61 @@ void CMenuPcs::loadData()
 
 	for (int i = 0; i < 4; i++) {
 		PPPCREATEPARAM param;
-		param.m_paramA = -1;
+		const int slot = i + 8;
 		unsigned int* effect =
-		    reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(m_effectWork) + (i + 8) * 0x524);
-		if (i + 8 == 5 && i + 5 < 0x13) {
+		    reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(m_effectWork) + slot * 0x524);
+		if (slot == 5 && i + 5 < 0x13) {
 			effect += 0x149;
 		} else if (i + 8 >= 0x11 && i + 8 <= 0x14 && i + 5 > 0x19) {
-			effect += 0x149;
+			effect += 0x149 * 4;
 		}
-		unsigned int effectNo = i + 5;
-		effect[0] = effectNo;
+		const int group = static_cast<int>(effect[0] = i + 5) > 100;
 		CGObject* const object = reinterpret_cast<CGObject*>(effect + 3);
 		effect[2] = i + 8;
 		object->Create();
-		object->m_charaModelHandle = GetWmCharaHandles(this)[i + 8];
+		object->m_charaModelHandle = m_wm.m_handles[slot];
 		param.m_paramB = reinterpret_cast<unsigned int>(object);
 		param.m_lookTargetPtr = object;
-		const int group =  (s32)(static_cast<int>(
-		    (static_cast<int>((effectNo ^ 100) >> 1) - ((effectNo ^ 100) & effectNo)) >> 31));
 		effect[1] = PartMng.pppCreate(group, i + 5, &param, 1);
 	}
 
-	for (unsigned int i = 0; static_cast<int>(i) < 5; i++) {
+	for (int i = 0; i < 5; i++) {
 		PPPCREATEPARAM param;
-		param.m_paramA = -1;
+		const int slot = i + 0xC;
 		unsigned int* effect =
-		    reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(m_effectWork) + (i + 0xC) * 0x524);
-		if (i + 0xC == 5 && static_cast<int>(i) < 0x13) {
+		    reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(m_effectWork) + slot * 0x524);
+		if (slot == 5 && i < 0x13) {
 			effect += 0x149;
-		} else if (static_cast<int>(i + 0xC) >= 0x11 && static_cast<int>(i + 0xC) <= 0x14 &&
-		           static_cast<int>(i) > 0x19) {
-			effect += 0x149;
+		} else if (i + 0xC >= 0x11 && i + 0xC <= 0x14 && i > 0x19) {
+			effect += 0x149 * 4;
 		}
+		const int group = static_cast<int>(effect[0] = i) > 100;
 		CGObject* const object = reinterpret_cast<CGObject*>(effect + 3);
-		effect[0] = i;
 		effect[2] = i + 0xC;
 		object->Create();
-		int __p23 = i;
-		object->m_charaModelHandle = GetWmCharaHandles(this)[__p23 + 4];
+		object->m_charaModelHandle = m_wm.m_handles[slot];
 		param.m_paramB = reinterpret_cast<unsigned int>(object);
 		param.m_lookTargetPtr = object;
-		const int group = static_cast<int>(
-		    (static_cast<int>((i ^ 100) >> 1) - ((i ^ 100) & i)) >> 31);
 		effect[1] = PartMng.pppCreate(group, i, &param, 1);
 	}
 
 	for (int i = 0; i < 4; i++) {
 		PPPCREATEPARAM param;
-		param.m_paramA = -1;
+		const int slot = i + 0x20;
 		unsigned int* effect =
-		    reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(m_effectWork) + (i + 0x20) * 0x524);
-		if (i + 0x20 == 5 && i + 0xA < 0x13) {
+		    reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(m_effectWork) + slot * 0x524);
+		if (slot == 5 && i + 0xA < 0x13) {
 			effect += 0x149;
 		} else if (i + 0x20 >= 0x11 && i + 0x20 <= 0x14 && i + 0xA > 0x19) {
-			effect += 0x149;
+			effect += 0x149 * 4;
 		}
-		unsigned int effectNo = i + 0xA;
-		effect[0] = effectNo;
+		const int group = static_cast<int>(effect[0] = i + 0xA) > 100;
 		CGObject* const object = reinterpret_cast<CGObject*>(effect + 3);
 		effect[2] = i + 0x20;
 		object->Create();
-		object->m_charaModelHandle = GetWmCharaHandles(this)[i];
+		object->m_charaModelHandle = m_wm.m_handles[slot];
 		param.m_paramB = reinterpret_cast<unsigned int>(object);
 		param.m_lookTargetPtr = object;
-		const int group = static_cast<int>(
-		    (static_cast<int>((effectNo ^ 100) >> 1) - ((effectNo ^ 100) & effectNo)) >> 31);
 		effect[1] = PartMng.pppCreate(group, i + 0xA, &param, 1);
 		if (i == 0) {
 			PartPcs.GetParLocIdx(effect[1], s_RingOrgPos);
@@ -1207,30 +1161,52 @@ void CMenuPcs::loadData()
 
 	{
 		for (int i = 0; i < 8; i++) {
-			CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[i];
-			if (handle->m_charaKind != 3) {
-				const unsigned int charaBase = static_cast<unsigned int>(handle->m_charaNo) / 100;
+			if ((*reinterpret_cast<CCharaPcs::CHandle**>(
+			        reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->m_charaKind != 3) {
+				const unsigned int charaBase =
+				    static_cast<unsigned int>((*reinterpret_cast<CCharaPcs::CHandle**>(
+				        reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->m_charaNo) /
+				    100;
 				const int modelNo = charaBase * 100;
-				const int animBase = (charaBase - 1) * 6;
-				handle->LoadAnim(s_wmCharaAnimStand, animBase, 1, 0, modelNo, -1, 0);
-				GetWmCharaHandles(this)[i]->LoadAnim(s_wmCharaAnimWalk, animBase + 1, 1, 0, modelNo, -1, 0);
-				GetWmCharaHandles(this)[i]->LoadAnim(s_wmCharaAnimRun, animBase + 2, 1, 0, modelNo, -1, 0);
-				GetWmCharaHandles(this)[i]->LoadAnim(s_wmCharaAnimGlad, animBase + 3, 3, 0, modelNo, -1, 0);
-				GetWmCharaHandles(this)[i]->LoadAnim(s_wmCharaAnimSleep, animBase + 4, 1, 0, modelNo, -1, 0);
-				GetWmCharaHandles(this)[i]->LoadAnim(s_wmCharaAnimAngry, animBase + 5, 1, 0, modelNo, -1, 0);
+				int anim = (charaBase - 1) * 6;
+				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))
+				    ->LoadAnim(s_wmCharaAnimStand, anim++, 1, 0, modelNo, -1, 0);
+				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))
+				    ->LoadAnim(s_wmCharaAnimWalk, anim++, 1, 0, modelNo, -1, 0);
+				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))
+				    ->LoadAnim(s_wmCharaAnimRun, anim++, 1, 0, modelNo, -1, 0);
+				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))
+				    ->LoadAnim(s_wmCharaAnimGlad, anim++, 3, 0, modelNo, -1, 0);
+				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))
+				    ->LoadAnim(s_wmCharaAnimSleep, anim++, 1, 0, modelNo, -1, 0);
+				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))
+				    ->LoadAnim(s_wmCharaAnimAngry, anim++, 1, 0, modelNo, -1, 0);
 				(m_wmCharaAnimState + i * 5)[0] = 0;
 				(m_wmCharaAnimState + i * 5)[1] = -1;
 				(m_wmCharaAnimState + i * 5)[2] = rand() % 250;
-				GetWmCharaHandles(this)[i]->SetAnim(animBase, -1, -1, 0, 0);
-				(m_wmCharaAnimState + i * 5)[3] = *reinterpret_cast<int*>(
-				    reinterpret_cast<unsigned char*>(GetWmCharaHandles(this)[i]->m_model) + 0xB4);
-				(m_wmCharaAnimState + i * 5)[4] = *reinterpret_cast<int*>(
-				    reinterpret_cast<unsigned char*>(GetWmCharaHandles(this)[i]->m_model) + 0xC0);
-				float maxWait = static_cast<float>(
-				    static_cast<double>(*reinterpret_cast<unsigned short*>(
-				        reinterpret_cast<signed char*>(
-				            reinterpret_cast<int**>(GetWmCharaHandles(this)[i]->m_model)[(animBase + 6)])[10] + 0x10)) -
-				    DOUBLE_803313F0);
+				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))
+				    ->SetAnim(anim - 6, -1, -1, 0, 0);
+				reinterpret_cast<float*>(m_wmCharaAnimState)[i * 5 + 3] = *reinterpret_cast<float*>(
+				    reinterpret_cast<unsigned char*>(
+				        (*reinterpret_cast<CCharaPcs::CHandle**>(
+				             reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))
+				            ->m_model) +
+				    0xB4);
+				reinterpret_cast<float*>(m_wmCharaAnimState)[i * 5 + 4] = *reinterpret_cast<float*>(
+				    reinterpret_cast<unsigned char*>(
+				        (*reinterpret_cast<CCharaPcs::CHandle**>(
+				             reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))
+				            ->m_model) +
+				    0xC0);
+				float maxWait = static_cast<float>(*reinterpret_cast<unsigned short*>(
+				    *reinterpret_cast<int*>(
+				        *reinterpret_cast<int*>(
+				            reinterpret_cast<unsigned char*>(
+				                *reinterpret_cast<CCharaPcs::CHandle**>(
+				                    reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774)) +
+				            anim * 4 + 0xC) +
+				        0x28) +
+				    0x10));
 				if (FLOAT_8032ee18 < maxWait) {
 					FLOAT_8032ee18 = maxWait;
 				}
@@ -1280,11 +1256,10 @@ void CMenuPcs::loadData()
 	lbl_8032EE1C = 1;
 	lbl_8032E8AC = 1;
 
+	CMesMenu** const mesMenus = reinterpret_cast<CMesMenu**>(bytes + 0x11C);
 	for (int i = 4; i < 6; i++) {
-		CMesMenu* mesMenu =
-		    new (MenuPcs.m_menuStage, srcFile, 0x2EA) CMesMenu;
-		*reinterpret_cast<CMesMenu**>(bytes + (i - 4) * 4 + 0x11C) = mesMenu;
-		CMesMenu* const cur = *reinterpret_cast<CMesMenu**>(bytes + (i - 4) * 4 + 0x11C);
+		mesMenus[i - 4] = new (MenuPcs.m_menuStage, srcFile, 0x2EA) CMesMenu;
+		CMesMenu* const cur = mesMenus[i - 4];
 		*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(cur) + 0x18) = i;
 		*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(cur) + 0x1C) = i;
 		(*reinterpret_cast<void (***)(CMesMenu*)>(cur))[3](cur);
@@ -6323,42 +6298,36 @@ double CMenuPcs::GetFcvValue(CMenuPcs::FCV fcv, float value)
 	int keyCount = fcv.keyCount;
 	float t = value / FLOAT_803314c0;
 	float* keys = fcv.keys;
-	float def = FLOAT_803313dc;
+	float result = FLOAT_803313dc;
 
 	if (t >= keys[keyCount * 4 - 4]) {
 		return static_cast<double>(keys[keyCount * 4 - 3]);
 	}
 
 	float* cur = keys;
-	int idx = 0;
-	for (int rem = keyCount; rem > 0; rem--) {
+	int idx;
+	for (idx = 0; idx < keyCount; cur += 4, idx++) {
 		if (t <= *cur) {
+			if (idx == 0) {
+				result = (keys + idx * 4)[1];
+			} else {
+				float* next = keys + idx * 4;
+				float* prev = keys + (idx - 1) * 4;
+				float span = *next - *prev;
+				float u = (t - *prev) / span;
+				float u2 = u * u;
+				float u3 = u2 * u;
+				float c4u2 = FLOAT_803314c4 * u2;
+				float negTerm = -(FLOAT_803314c8 * u2 - u3);
+
+				result = span * (prev[3] * (u + negTerm) + next[2] * (u3 - u2)) +
+				         (prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - c4u2)) +
+				             next[1] * (FLOAT_803314cc * u3 + c4u2));
+			}
 			break;
 		}
-		cur = cur + 4;
-		idx = idx + 1;
 	}
-	if (keyCount <= 0) {
-		return static_cast<double>(def);
-	}
-
-	if (idx == 0) {
-		return static_cast<double>((keys + idx * 4)[1]);
-	}
-
-	float* next = keys + idx * 4;
-	float* prev = keys + (idx - 1) * 4;
-	float span = *next - *prev;
-	float u = (t - *prev) / span;
-	float u2 = u * u;
-	float u3 = u2 * u;
-	float c4u2 = FLOAT_803314c4 * u2;
-	float negTerm = -(FLOAT_803314c8 * u2 - u3);
-
-	return static_cast<double>(
-	    prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - c4u2)) +
-	    next[1] * (FLOAT_803314cc * u3 + c4u2) +
-	    span * (prev[3] * (u + negTerm) + next[2] * (u3 - u2)));
+	return static_cast<double>(result);
 }
 
 /*
@@ -7956,7 +7925,7 @@ void CMenuPcs::CalcChara()
 	unsigned int selectedMask = 0;
 
 	if (m_wm.m_charaSelectData[0x0D] == 1) {
-		selectedMask = 1u << static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(m_wm.m_charaSelectData + 0x04));
+		selectedMask = 1u << static_cast<unsigned int>(*reinterpret_cast<short*>(m_wm.m_charaSelectData + 0x04));
 	}
 	if (m_wm.m_charaSelectData[0x1D] == 1) {
 		selectedMask |= 1u << static_cast<unsigned int>(*reinterpret_cast<short*>(m_wm.m_charaSelectData + 0x14));
@@ -7996,10 +7965,12 @@ void CMenuPcs::CalcChara()
 			for (int player = 0; player < 4; player++) {
 				if ((effectMask & (1u << player)) != 0) {
 					Vec loc;
+					const int partNo = m_effectWork[player + 32].m_partNo;
 					loc.x = s_RingOrgPos.x;
-					loc.y = static_cast<float>((double)s_RingOrgPos.y + (DOUBLE_80331420 + (double)offset));
+					loc.y = s_RingOrgPos.y;
 					loc.z = s_RingOrgPos.z;
-					PartPcs.SetParLocIdx(m_effectWork[player + 32].m_partNo, loc);
+					loc.y = static_cast<float>((double)s_RingOrgPos.y + (DOUBLE_80331420 + (double)offset));
+					PartPcs.SetParLocIdx(partNo, loc);
 					offset = offset - FLOAT_8033169C;
 				}
 			}
@@ -8016,41 +7987,38 @@ void CMenuPcs::CalcChara()
 
 		unsigned char* const modelData = m_wm.m_charaModelData + modelIndex;
 		if (modelData[0x0C] == 1) {
-			CCharaPcs::CHandle* const loadHandle = GetWmCharaHandles(this)[i];
 			reinterpret_cast<float*>(charaWork)[0x0B] = FLOAT_80331664;
-			if (loadHandle->m_charaKind != 3) {
-				const unsigned int charaBase = static_cast<unsigned int>(loadHandle->m_charaNo) / 100;
+			if ((*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->m_charaKind != 3) {
+				const unsigned int charaBase = static_cast<unsigned int>((*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->m_charaNo) / 100;
 				const int modelNo = charaBase * 100;
-				const int baseAnim = (charaBase - 1) * 6;
-				loadHandle->LoadAnim(s_wmCharaAnimStand, baseAnim, 1, 0, modelNo, -1, 0);
-				loadHandle->LoadAnim(s_wmCharaAnimWalk, baseAnim + 1, 1, 0, modelNo, -1, 0);
-				loadHandle->LoadAnim(s_wmCharaAnimRun, baseAnim + 2, 1, 0, modelNo, -1, 0);
-				loadHandle->LoadAnim(s_wmCharaAnimGlad, baseAnim + 3, 3, 0, modelNo, -1, 0);
-				loadHandle->LoadAnim(s_wmCharaAnimSleep, baseAnim + 4, 1, 0, modelNo, -1, 0);
-				loadHandle->LoadAnim(s_wmCharaAnimAngry, baseAnim + 5, 1, 0, modelNo, -1, 0);
+				int anim = (charaBase - 1) * 6;
+				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->LoadAnim(s_wmCharaAnimStand, anim++, 1, 0, modelNo, -1, 0);
+				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->LoadAnim(s_wmCharaAnimWalk, anim++, 1, 0, modelNo, -1, 0);
+				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->LoadAnim(s_wmCharaAnimRun, anim++, 1, 0, modelNo, -1, 0);
+				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->LoadAnim(s_wmCharaAnimGlad, anim++, 3, 0, modelNo, -1, 0);
+				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->LoadAnim(s_wmCharaAnimSleep, anim++, 1, 0, modelNo, -1, 0);
+				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->LoadAnim(s_wmCharaAnimAngry, anim, 1, 0, modelNo, -1, 0);
 				GetWmCharaAnimState(this)[i * 5 + 0] = 0;
 				GetWmCharaAnimState(this)[i * 5 + 1] = -1;
 				GetWmCharaAnimState(this)[i * 5 + 2] = rand() % 250;
-				loadHandle->SetAnim(baseAnim, -1, -1, static_cast<int>(static_cast<unsigned int>(loadHandle->m_currentAnimIndex) >> 31) - 1, 1);
+				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->SetAnim(anim - 5, -1, -1,
+				    static_cast<int>(static_cast<unsigned int>((*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->m_currentAnimIndex) >> 31) - 1, 1);
 				reinterpret_cast<float*>(GetWmCharaAnimState(this))[i * 5 + 3] =
-				    reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(loadHandle->m_model) + 0xB4)[0];
+				    reinterpret_cast<float*>(reinterpret_cast<unsigned char*>((*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->m_model) + 0xB4)[0];
 				reinterpret_cast<float*>(GetWmCharaAnimState(this))[i * 5 + 4] =
-				    reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(loadHandle->m_model) + 0xC0)[0];
+				    reinterpret_cast<float*>(reinterpret_cast<unsigned char*>((*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->m_model) + 0xC0)[0];
 			}
 			modelData[0x0C] = 0;
 		}
 
 		charaWork[0] = 1;
-		float zScale = FLOAT_803316BC;
-		float selectedX = FLOAT_803316B0;
-		float normalX = FLOAT_803316A4;
-		float scale = FLOAT_803313e8;
-		const float zero = FLOAT_803313dc;
 		CCharaPcs::CHandle* const charaHandle = GetWmCharaHandles(this)[i];
 		if (charaHandle->m_charaKind == 3) {
 			if ((selectedMask & (1u << i)) != 0) {
+				const float zero = FLOAT_803313dc;
+				float normalX = FLOAT_803316A4;
 				reinterpret_cast<float*>(charaWork)[7] = zero;
-				scale = FLOAT_803316A8;
+				const float scale = FLOAT_803316A8;
 				reinterpret_cast<float*>(charaWork)[8] = normalX;
 				normalX = FLOAT_803316AC;
 				reinterpret_cast<float*>(charaWork)[9] = zero;
@@ -8060,6 +8028,8 @@ void CMenuPcs::CalcChara()
 				reinterpret_cast<float*>(charaWork)[10] = normalX;
 				reinterpret_cast<float*>(charaWork)[0x0B] = zero;
 			} else {
+				const float zero = FLOAT_803313dc;
+				const float scale = FLOAT_803313e8;
 				reinterpret_cast<float*>(charaWork)[7] = zero;
 				reinterpret_cast<float*>(charaWork)[8] = zero;
 				reinterpret_cast<float*>(charaWork)[9] = zero;
@@ -8070,9 +8040,11 @@ void CMenuPcs::CalcChara()
 				reinterpret_cast<float*>(charaWork)[0x0B] = zero;
 			}
 		} else if ((selectedMask & (1u << i)) != 0) {
+			const float zero = FLOAT_803313dc;
+			float normalX = FLOAT_803316B0;
 			reinterpret_cast<float*>(charaWork)[7] = zero;
-			scale = FLOAT_803316B4;
-			reinterpret_cast<float*>(charaWork)[8] = selectedX;
+			const float scale = FLOAT_803316B4;
+			reinterpret_cast<float*>(charaWork)[8] = normalX;
 			normalX = FLOAT_803316B8;
 			reinterpret_cast<float*>(charaWork)[9] = zero;
 			reinterpret_cast<float*>(charaWork)[0x0D] = scale;
@@ -8080,9 +8052,11 @@ void CMenuPcs::CalcChara()
 			reinterpret_cast<float*>(charaWork)[0x0F] = scale;
 			reinterpret_cast<float*>(charaWork)[10] = normalX;
 		} else {
+			const float zero = FLOAT_803313dc;
+			float normalX = FLOAT_803316BC;
 			reinterpret_cast<float*>(charaWork)[7] = zero;
-			scale = FLOAT_80331434;
-			reinterpret_cast<float*>(charaWork)[8] = zScale;
+			const float scale = FLOAT_80331434;
+			reinterpret_cast<float*>(charaWork)[8] = normalX;
 			normalX = FLOAT_803315d0;
 			reinterpret_cast<float*>(charaWork)[9] = zero;
 			reinterpret_cast<float*>(charaWork)[0x0D] = scale;
@@ -8101,15 +8075,14 @@ void CMenuPcs::CalcChara()
 		} frameConv;
 		frameConv.u.hi = 0x43300000;
 		frameConv.u.lo = static_cast<unsigned int>(static_cast<int>(ws->m_frameCounter)) ^ 0x80000000;
-		double alpha = static_cast<double>(static_cast<float>(
-		    DOUBLE_803314e8 * (frameConv.d - DOUBLE_80331408)));
+		float alpha = static_cast<float>(DOUBLE_803314e8 * (frameConv.d - DOUBLE_80331408));
 		if (alpha > DOUBLE_80331420) {
-			alpha = (double)FLOAT_803313e8;
+			alpha = FLOAT_803313e8;
 		}
 
 		const int state = ws->m_mainState;
 		if (state == 1) {
-			GetWmCharaHandles(this)[i]->m_model->m_lightAlpha = static_cast<float>(alpha);
+			GetWmCharaHandles(this)[i]->m_model->m_lightAlpha = alpha;
 		} else if (state == 2) {
 			GetWmCharaHandles(this)[i]->m_model->m_lightAlpha = FLOAT_803313e8;
 		} else {
@@ -11879,16 +11852,16 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	color.a = 0xFF;
 	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
 
-	const float border = FLOAT_80331410;
+	unsigned long flags;
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? 0x24 : 0x2C));
-	const float right = (sx + sw) - border;
-	const float bottom = (sy + sh) - border;
+	const float right = (sx + sw) - FLOAT_80331410;
+	const float bottom = (sy + sh) - FLOAT_80331410;
 	const float uv0 = FLOAT_803313dc;
 	for (int i = 0; i < 4; i++) {
 		float x;
 		float y;
-		unsigned long flags = 0;
+		flags = 0;
 		if (i & 1) {
 			x = right;
 			flags |= 8;
@@ -11901,41 +11874,40 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 		} else {
 			y = sy;
 		}
-		MenuPcs.DrawRect(flags, x, y, border, border, uv0, uv0, FLOAT_803313e8, FLOAT_803313e8, uv0);
+		MenuPcs.DrawRect(flags, x, y, FLOAT_80331410, FLOAT_80331410, uv0, uv0, FLOAT_803313e8, FLOAT_803313e8, uv0);
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? 0x26 : 0x2D));
 	const float innerWidth = static_cast<float>(static_cast<double>(sw) - DOUBLE_80331428);
-	const float innerX = static_cast<float>(static_cast<double>(sx) + static_cast<double>(border));
+	const float innerX = FLOAT_80331410 + sx;
 	const float uv1 = FLOAT_803313dc;
+	float y = sy;
 	for (int i = 0; i < 2; i++) {
-		float y = sy;
-		unsigned long flags = 0;
+		flags = 0;
 		if (i != 0) {
 			y = bottom;
 			flags |= 4;
 		}
-		MenuPcs.DrawRect(flags, innerX, y, innerWidth, border, uv1, uv1, FLOAT_803313e8, FLOAT_803313e8, uv1);
+		MenuPcs.DrawRect(flags, innerX, y, innerWidth, FLOAT_80331410, uv1, uv1, FLOAT_803313e8, FLOAT_803313e8, uv1);
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? 0x25 : 0x2E));
 	const float innerHeight = static_cast<float>(static_cast<double>(sh) - DOUBLE_80331428);
-	const float innerY = static_cast<float>(static_cast<double>(sy) + static_cast<double>(border));
+	const float innerY = FLOAT_80331410 + sy;
 	const float uv2 = FLOAT_803313dc;
-	unsigned long lastFlags = 0;
+	float x = sx;
 	for (int i = 0; i < 2; i++) {
-		float x = sx;
-		lastFlags = 0;
+		flags = 0;
 		if (i != 0) {
 			x = right;
-			lastFlags |= 8;
+			flags |= 8;
 		}
-		MenuPcs.DrawRect(lastFlags, x, innerY, border, innerHeight, uv2, uv2, FLOAT_803313e8, FLOAT_803313e8, uv2);
+		MenuPcs.DrawRect(flags, x, innerY, FLOAT_80331410, innerHeight, uv2, uv2, FLOAT_803313e8, FLOAT_803313e8, uv2);
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? 0x27 : 0x2F));
 	const float uv3 = FLOAT_803313dc;
-	MenuPcs.DrawRect(lastFlags, innerX, innerY, innerWidth, innerHeight, uv3, uv3, FLOAT_803313e8, FLOAT_803313e8, uv3);
+	MenuPcs.DrawRect(flags, innerX, innerY, innerWidth, innerHeight, uv3, uv3, FLOAT_803313e8, FLOAT_803313e8, uv3);
 
 	if (m_menuWindowInfo->state == 0) {
 		m_menuWindowInfo->frame++;
@@ -12187,60 +12159,57 @@ void CMenuPcs::BindMcObj()
 	}
 
 	const float kOne = FLOAT_803313e8;
-	unsigned int* charaState = reinterpret_cast<unsigned int*>(m_wmCharaState);
 	for (int i = 0; i < 4; i++) {
-		const int modelNo = static_cast<int>(charaState[i * 0x12 + 3]);
-		const int slot = i + 0x11;
+		unsigned int* charaState = reinterpret_cast<unsigned int*>(m_wmCharaState) + i * 0x12;
+		const int modelNo = static_cast<int>(charaState[3]);
 
 		if (modelNo != 0) {
-			unsigned char createParam[0x88];
-			*reinterpret_cast<unsigned int*>(createParam + 0x48) = 0xFFFFFFFF;
-			*reinterpret_cast<unsigned int*>(createParam + 0x58) = 0xFFFFFFFF;
-			createParam[0x54] = 0;
-			createParam[0x53] = 1;
-			*reinterpret_cast<unsigned int*>(createParam + 0x50) = 0;
-			createParam[0x52] = 0;
-			*reinterpret_cast<unsigned int*>(createParam + 0x4C) = 0x1E;
-			*reinterpret_cast<unsigned int*>(createParam + 0x44) = 0;
-			*reinterpret_cast<unsigned short*>(createParam + 0x40) = 0;
-			createParam[0x3E] = 0;
-			createParam[0x3D] = 0;
-			*reinterpret_cast<unsigned int*>(createParam + 0x0) = 0;
-			*reinterpret_cast<unsigned int*>(createParam + 0x4) = 0;
-			*reinterpret_cast<unsigned int*>(createParam + 0x8) = 0;
-			*reinterpret_cast<unsigned int*>(createParam + 0xC) = 0;
+			unsigned char createParam[0x6C];
+			*reinterpret_cast<int*>(createParam + 0x40) = -1;
+			*reinterpret_cast<int*>(createParam + 0x30) = -1;
+			createParam[0x34] = 0;
+			createParam[0x35] = 1;
+			*reinterpret_cast<int*>(createParam + 0x38) = 0;
+			createParam[0x36] = 0;
+			*reinterpret_cast<int*>(createParam + 0x3C) = 30;
+			*reinterpret_cast<int*>(createParam + 0x44) = 0;
+			*reinterpret_cast<short*>(createParam + 0x48) = 0;
+			createParam[0x4A] = 0;
+			createParam[0x4B] = 0;
+			*reinterpret_cast<unsigned int*>(createParam + 0x00) = 0;
+			*reinterpret_cast<unsigned int*>(createParam + 0x04) = 0;
+			*reinterpret_cast<unsigned int*>(createParam + 0x08) = 0;
+			*reinterpret_cast<unsigned int*>(createParam + 0x0C) = 0;
 			*reinterpret_cast<unsigned int*>(createParam + 0x10) = 0;
-			*reinterpret_cast<void**>(createParam + 0x14) = 0;
-			*reinterpret_cast<void**>(createParam + 0x18) = 0;
+			*reinterpret_cast<unsigned int*>(createParam + 0x14) = 0;
+			*reinterpret_cast<unsigned int*>(createParam + 0x18) = 0;
 			*reinterpret_cast<unsigned int*>(createParam + 0x1C) = 0;
 			*reinterpret_cast<unsigned int*>(createParam + 0x20) = 0;
-			*reinterpret_cast<float*>(createParam + 0x24) = kOne;
-			*reinterpret_cast<float*>(createParam + 0x28) = kOne;
+			*reinterpret_cast<float*>(createParam + 0x24) = FLOAT_803313e8;
+			*reinterpret_cast<float*>(createParam + 0x28) = FLOAT_803313e8;
 			createParam[0x2C] = 0;
 
-			const unsigned int effectNo = static_cast<unsigned int>(modelNo + 0x16);
+			const int slot = i + 0x11;
 			EffectInfo* effect = &m_effectWork[slot];
-			if (slot == 5 && static_cast<int>(effectNo) < 0x13) {
+			if (slot == 5 && modelNo + 0x16 < 0x13) {
 				effect++;
-			} else if (slot >= 0x11 && slot <= 0x14 && static_cast<int>(effectNo) > 0x19) {
+			} else if (i + 0x11 >= 0x11 && i + 0x11 <= 0x14 && modelNo + 0x16 > 0x19) {
 				effect += 4;
 			}
 
-			effect->m_effectNo = effectNo;
+			const int group = (effect->m_effectNo = modelNo + 0x16) > 100;
 			CGObject* const object = &effect->m_object;
-			effect->m_slotNo = slot;
+			effect->m_slotNo = i + 0x11;
 			object->Create();
-			object->m_charaModelHandle = reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x4A8)[i];
-			*reinterpret_cast<void**>(createParam + 0x74) = object;
-			*reinterpret_cast<void**>(createParam + 0x70) = object;
-			int __p18 = effectNo;
-			const int group = (((static_cast<int>(effectNo) ^ 100) >> 1) - ((static_cast<int>(__p18) ^ 100) & static_cast<int>(effectNo))) >> 31;
-			int __p21 = group;
-			effect->m_partNo = PartMng.pppCreate(__p21, static_cast<int>(effectNo), reinterpret_cast<PPPCREATEPARAM*>(createParam), 1);
+			object->m_charaModelHandle = m_wm.m_handles[slot];
+			*reinterpret_cast<void**>(createParam + 0x18) = object;
+			*reinterpret_cast<void**>(createParam + 0x14) = object;
+			effect->m_partNo =
+			    PartMng.pppCreate(group, modelNo + 0x16, reinterpret_cast<PPPCREATEPARAM*>(createParam), 1);
 		}
 
-		const unsigned int flags = charaState[i * 0x12 + 0xA];
-		int weaponModel = 0;
+		const unsigned int flags = charaState[0xA];
+		int weaponModel;
 		if ((flags & 1) != 0) {
 			weaponModel = 0;
 		} else if ((flags & 2) != 0) {
@@ -12253,50 +12222,48 @@ void CMenuPcs::BindMcObj()
 			weaponModel = 4;
 		}
 
-		unsigned char createParam[0x88];
-		*reinterpret_cast<unsigned int*>(createParam + 0x48) = 0xFFFFFFFF;
-		*reinterpret_cast<unsigned int*>(createParam + 0x58) = 0xFFFFFFFF;
-		createParam[0x54] = 0;
-		createParam[0x53] = 1;
-		*reinterpret_cast<unsigned int*>(createParam + 0x50) = 0;
-		createParam[0x52] = 0;
-		*reinterpret_cast<unsigned int*>(createParam + 0x4C) = 0x1E;
-		*reinterpret_cast<unsigned int*>(createParam + 0x44) = 0;
-		*reinterpret_cast<unsigned short*>(createParam + 0x40) = 0;
-		createParam[0x3E] = 0;
-		createParam[0x3D] = 0;
-		*reinterpret_cast<unsigned int*>(createParam + 0x0) = 0;
-		*reinterpret_cast<unsigned int*>(createParam + 0x4) = 0;
-		*reinterpret_cast<unsigned int*>(createParam + 0x8) = 0;
-		*reinterpret_cast<unsigned int*>(createParam + 0xC) = 0;
+		unsigned char createParam[0x6C];
+		*reinterpret_cast<int*>(createParam + 0x40) = -1;
+		*reinterpret_cast<int*>(createParam + 0x30) = -1;
+		createParam[0x34] = 0;
+		createParam[0x35] = 1;
+		*reinterpret_cast<int*>(createParam + 0x38) = 0;
+		createParam[0x36] = 0;
+		*reinterpret_cast<int*>(createParam + 0x3C) = 30;
+		*reinterpret_cast<int*>(createParam + 0x44) = 0;
+		*reinterpret_cast<short*>(createParam + 0x48) = 0;
+		createParam[0x4A] = 0;
+		createParam[0x4B] = 0;
+		*reinterpret_cast<unsigned int*>(createParam + 0x00) = 0;
+		*reinterpret_cast<unsigned int*>(createParam + 0x04) = 0;
+		*reinterpret_cast<unsigned int*>(createParam + 0x08) = 0;
+		*reinterpret_cast<unsigned int*>(createParam + 0x0C) = 0;
 		*reinterpret_cast<unsigned int*>(createParam + 0x10) = 0;
-		*reinterpret_cast<void**>(createParam + 0x14) = 0;
-		*reinterpret_cast<void**>(createParam + 0x18) = 0;
+		*reinterpret_cast<unsigned int*>(createParam + 0x14) = 0;
+		*reinterpret_cast<unsigned int*>(createParam + 0x18) = 0;
 		*reinterpret_cast<unsigned int*>(createParam + 0x1C) = 0;
 		*reinterpret_cast<unsigned int*>(createParam + 0x20) = 0;
-		*reinterpret_cast<float*>(createParam + 0x24) = FLOAT_803313e8;
-		*reinterpret_cast<float*>(createParam + 0x28) = FLOAT_803313e8;
+		*reinterpret_cast<float*>(createParam + 0x24) = kOne;
+		*reinterpret_cast<float*>(createParam + 0x28) = kOne;
 		createParam[0x2C] = 0;
 
-		int __p20 = weaponModel;
-		const unsigned int effectNo = static_cast<unsigned int>(__p20 + 0x1A);
+		const int slot = i + 0x11;
 		EffectInfo* effect = &m_effectWork[slot];
-		if (slot == 5 && static_cast<int>(effectNo) < 0x13) {
+		if (slot == 5 && weaponModel + 0x1A < 0x13) {
 			effect++;
-		} else if (slot >= 0x11 && slot <= 0x14 && static_cast<int>(effectNo) > 0x19) {
+		} else if (i + 0x11 >= 0x11 && i + 0x11 <= 0x14 && weaponModel + 0x1A > 0x19) {
 			effect += 4;
 		}
 
-		effect->m_effectNo = effectNo;
+		const int group = (effect->m_effectNo = weaponModel + 0x1A) > 100;
 		CGObject* const object = &effect->m_object;
-		effect->m_slotNo = slot;
+		effect->m_slotNo = i + 0x11;
 		object->Create();
-		object->m_charaModelHandle = reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x4A8)[i];
-		*reinterpret_cast<void**>(createParam + 0x74) = object;
-		*reinterpret_cast<void**>(createParam + 0x70) = object;
-		const int group = (((static_cast<int>(effectNo) ^ 100) >> 1) - ((static_cast<int>(effectNo) ^ 100) & static_cast<int>(effectNo))) >> 31;
-		int __p19 = group;
-		effect->m_partNo = PartMng.pppCreate(__p19, static_cast<int>(effectNo), reinterpret_cast<PPPCREATEPARAM*>(createParam), 1);
+		object->m_charaModelHandle = m_wm.m_handles[slot];
+		*reinterpret_cast<void**>(createParam + 0x18) = object;
+		*reinterpret_cast<void**>(createParam + 0x14) = object;
+		effect->m_partNo =
+		    PartMng.pppCreate(group, weaponModel + 0x1A, reinterpret_cast<PPPCREATEPARAM*>(createParam), 1);
 	}
 }
 

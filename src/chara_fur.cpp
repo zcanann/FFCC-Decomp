@@ -1808,20 +1808,24 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 		FurDisplayListRaw* displayList = mesh->m_data->m_displayLists;
 		Chara.gqrInit(posGqr << 0x18 | 0x70000 | posGqr << 8 | 7, normGqr << 0x18 | 0x70000 | normGqr << 8 | 7,
 		              0xC070C07);
-		for (unsigned int displayIndex = 0; displayIndex < mesh->m_data->m_displayListCount; displayIndex++, displayList++) {
+		int displayCount = mesh->m_data->m_displayListCount - 1;
+		for (; displayCount >= 0; displayCount--, displayList++) {
 			CMaterial* material = ModelMaterialSet(this)->m_materials[displayList->m_material];
 			if (!material->IsFurEnabled()) {
 				continue;
 			}
 
-			TextureMan.SetTexture(GX_TEXMAP0, material->GetFurTexture(0));
-			int hasExtraTexture = 0;
-			int extraTextureFormat = -1;
+			TextureMan.SetTexture(GX_TEXMAP0, material->GetTexture(0));
+			int hasExtraTexture;
+			int extraTextureFormat;
 			if (static_cast<short>(material->GetTextureIndex(1)) != -1) {
-				CTexture* extraTexture = material->GetFurTexture(1);
-				TextureMan.SetTexture(GX_TEXMAP2, extraTexture);
+				CTexture* extraTexture = material->GetTexture(1);
 				hasExtraTexture = 1;
+				TextureMan.SetTexture(GX_TEXMAP2, extraTexture);
 				extraTextureFormat = extraTexture->m_format;
+			} else {
+				hasExtraTexture = 0;
+				extraTextureFormat = -1;
 			}
 
 			if (prevExtraTexture != hasExtraTexture || prevExtraTextureFormat != extraTextureFormat) {

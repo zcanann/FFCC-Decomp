@@ -74,9 +74,11 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
     u8* workBytes = object->m_workArea + particleDataOffset;
     VColor* colorWork = (VColor*)(object->m_workArea + colorOffset);
     u8* particle = *(u8**)(workBytes + 0x3c);
-    _PARTICLE_WMAT* wmats = *(_PARTICLE_WMAT**)(workBytes + 0x40);
+    _PARTICLE_WMAT* wmats;
     _PARTICLE_COLOR* colors = *(_PARTICLE_COLOR**)(workBytes + 0x44);
     s8 hasRequiredMemory;
+
+    wmats = *(_PARTICLE_WMAT**)(workBytes + 0x40);
 
     if (particle == 0) {
         hasRequiredMemory = false;
@@ -97,7 +99,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
         static_cast<pppShapeAnimData*>(ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex]->m_animData);
     pppSetDrawEnv(
         0, &object->m_drawMatrix, *(float*)(payload + 0xA0), payload[0xA4], step[0x0C],
-        payload[0x58], 0, ((u32)__cntlzw((u32)payload[0x55])) >> 5, 1, 0);
+        payload[0x58], 0, (u8)(((u32)__cntlzw((u32)payload[0x55])) >> 5), 1, 0);
     pppSetBlendMode(payload[0x58]);
 
     for (u32 i = 0; i < *(u32*)(workBytes + 0x48); i++) {

@@ -1733,6 +1733,7 @@ void CLine<64>::CalcBound()
  */
 int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFunc, int& outResult)
 {
+    char* gbaPath = const_cast<char*>("dvd/gba/");
 
     switch (systemFunc) {
     case -3:

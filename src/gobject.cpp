@@ -1338,27 +1338,28 @@ void CGObject::hit()
 
         const float zero = sZeroFloat;
 
-        for (int attackIndex = 0; attackIndex < 8; attackIndex++) {
-            AttackCol* attack = &m_attackColliders[attackIndex];
-            if (attack->m_hitMask == 0) {
+        float* attackCur = &m_attackColliders[0].m_localStart.y;
+        for (int attackIndex = 0; attackIndex < 8; attackIndex++, attackCur += 0xC) {
+            if (zero == attackCur[10]) {
                 continue;
             }
 
-            for (int damageIndex = 0; damageIndex < 8; damageIndex++) {
-                DamageCol* damage = &other->m_damageColliders[damageIndex];
-                if (((attack->m_hitMask & damage->m_hitMask) == 0) ||
-                    (zero == damage->m_innerRadius) ||
-                    (zero == damage->m_outerRadius)) {
+            float* damageCur = &other->m_damageColliders[0].m_localPosition.y;
+            for (int damageIndex = 0; damageIndex < 8; damageIndex++, damageCur += 0xA) {
+                if (((*reinterpret_cast<u32*>(&attackCur[11]) & *reinterpret_cast<u32*>(&damageCur[9])) == 0) ||
+                    (sZeroFloat == damageCur[7]) ||
+                    (sZeroFloat == damageCur[8])) {
                     continue;
                 }
 
-                Vec attackVec;
                 Vec hitPos;
-                PSVECSubtract(&attack->m_worldPosition, &attack->m_localEnd, &attackVec);
+                Vec attackVec;
+                PSVECSubtract(reinterpret_cast<Vec*>(attackCur + 6),
+                              reinterpret_cast<Vec*>(attackCur + 3), &attackVec);
                 if (CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
-                        &Math, &hitPos, 0, &attack->m_localEnd, &attackVec,
-                        reinterpret_cast<Vec*>(&damage->m_worldPosition.y),
-                        attack->m_radius2, damage->m_innerRadius, damage->m_outerRadius) == 0) {
+                        &Math, &hitPos, 0, reinterpret_cast<Vec*>(attackCur + 3), &attackVec,
+                        reinterpret_cast<Vec*>(damageCur + 3),
+                        attackCur[10], damageCur[7], damageCur[8]) == 0) {
                     continue;
                 }
 
@@ -1370,19 +1371,20 @@ void CGObject::hit()
                     *reinterpret_cast<float*>(&stackIn[3].m_word) = hitPos.x;
                     *reinterpret_cast<float*>(&stackIn[4].m_word) = hitPos.y;
                     *reinterpret_cast<float*>(&stackIn[5].m_word) = hitPos.z;
-                    stackIn[6].m_word = reinterpret_cast<u32>(m_scriptHandle);
+                    stackIn[6].m_word = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0x560);
                     CFlatRuntime::CStack stackOut;
                     gCFlatRuntime().SystemCall(this, 2, 0x13, 7, stackIn, &stackOut);
                     const int hitResult = onHit(attackIndex, other, damageIndex, &hitPos);
                     if (hitResult == 1) {
-                        continue;
+                        goto nextObject;
                     }
                     if (hitResult == 2) {
-                        break;
+                        return;
                     }
                 }
             }
         }
+nextObject:;
     }
 }
 

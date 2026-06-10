@@ -1808,7 +1808,7 @@ void pppInitPdt(long* progOffsetReconstructionTable, pppProg* pppProg)
 	int* pppProgRelocs = (int*)((int)progOffsetReconstructionTable + progOffsetReconstructionTable[2]) + 1;
 	int* pdtRelocs = (int*)((int)progOffsetReconstructionTable + progOffsetReconstructionTable[3]) + 1;
 
-	if (table[0] == 0) {
+	if ((u32)table[0] == 0) {
 		return;
 	}
 

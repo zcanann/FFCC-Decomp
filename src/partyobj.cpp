@@ -952,7 +952,7 @@ traceJoin:
 		traceSlot = CFlat.GetFreeParticleSlot();
 		putParticleTrace((port + 0x42U) | 0x100, traceSlot, this, kMonObjOne, 0);
 	} else if (!showTraceParticle && traceSlot != 0) {
-		CFlat.EndParticleSlot(traceSlot, 1);
+		CFlat.EndParticleSlot(traceSlot, 0);
 		traceSlot = 0;
 	}
 #undef traceSlot

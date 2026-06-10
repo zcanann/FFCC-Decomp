@@ -844,7 +844,10 @@ void CCameraPcs::calc()
             PSMTXScale(tempMtx, scale, scale, scale);
             PSMTXConcat(tempMtx, worldMapMtx, worldMapMtx);
 
-            if (static_cast<int>(static_cast<unsigned int>(m_worldMapEffect.m_flags) << 0x18) >= 0) {
+            if (static_cast<signed char>(
+                    static_cast<int>((static_cast<unsigned int>(m_worldMapEffect.m_flags) << 26) &
+                                     0xC0000000) >>
+                    31) == 0) {
                 m_worldMapEffect.m_timer -= 1;
             }
         }

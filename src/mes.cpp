@@ -90,34 +90,32 @@ static inline int ReadTagS16(char** text)
 	return (int)acc;
 }
 
-static inline void ApplyCaseMode(char* text, unsigned char& caseMode)
-{
-	if (caseMode != 0)
-	{
-		if (caseMode == 1)
-		{
-			if (text[0] != '\0')
-			{
-				toupper(text);
-			}
-		}
-		else if (caseMode == 2)
-		{
-			if (text[0] != '\0')
-			{
-				text[0] = (char)toupperLatin1((unsigned char)text[0]);
-			}
-		}
-		else
-		{
-			if (text[0] != '\0')
-			{
-				tolower_name_conflict(text);
-			}
-		}
-		caseMode = 0;
+#define ApplyCaseMode(text, caseMode)                                     \
+	if (caseMode != 0)                                                    \
+	{                                                                     \
+		if (caseMode == 1)                                                \
+		{                                                                 \
+			if ((text)[0] != '\0')                                        \
+			{                                                             \
+				toupper(text);                                            \
+			}                                                             \
+		}                                                                 \
+		else if (caseMode == 2)                                           \
+		{                                                                 \
+			if ((text)[0] != '\0')                                        \
+			{                                                             \
+				(text)[0] = (char)toupperLatin1((unsigned char)(text)[0]); \
+			}                                                             \
+		}                                                                 \
+		else                                                              \
+		{                                                                 \
+			if ((text)[0] != '\0')                                        \
+			{                                                             \
+				tolower_name_conflict(text);                              \
+			}                                                             \
+		}                                                                 \
+		caseMode = 0;                                                     \
 	}
-}
 
 static inline char* FlatNameDirect(int tableIndex, int entryIndex)
 {
@@ -502,16 +500,16 @@ int CMes::useFlag(int maxCount, int stopOnClear)
 		switch (type)
 		{
 		case 2:
-			mFlagVars[flagEntry->m_index] = flagEntry->m_value;
+			mFlagVars[flagEntry->m_param.m_index] = flagEntry->m_param.m_value;
 			break;
 		case 1:
 		{
-			int* slot = &mFlagVars[flagEntry->m_index];
+			int* slot = &mFlagVars[flagEntry->m_param.m_index];
 			*slot = *slot + 1;
 			break;
 		}
 		case 4:
-			if ((mFlagVars[flagEntry->m_index] == 0) && (stopOnClear == 0))
+			if ((mFlagVars[flagEntry->m_param.m_index] == 0) && (stopOnClear == 0))
 			{
 				return 0;
 			}
@@ -902,18 +900,18 @@ void CMes::addString(char** text, int branchMode)
 
 	bool running = true;
 	unsigned char caseMode = 0;
-	signed char flowMode = 0;
-	char nameTag2D[32];
-	char nameTag2C[32];
-	char nameTag2B[32];
-	char nameMon[32];
+	unsigned char flowMode = 0;
 	char nameItem[32];
+	char nameMon[32];
+	char nameTag2B[32];
+	char nameTag2C[32];
+	char nameTag2D[32];
 
 	while (running)
 	{
 		unsigned char* p = (unsigned char*)*text;
 		*text = (char*)(p + 1);
-		unsigned int uch = (unsigned int)*p;
+		unsigned int uch = *p & 0xFFFF;
 
 		if (uch == 0)
 		{
@@ -936,14 +934,17 @@ void CMes::addString(char** text, int branchMode)
 		{
 		case 0:
 		advanceLine:
+		{
 			mCurrentX = kMesZero;
-			mCurrentY = mCurrentY + (kMesLineHeightAdjust + (float)font->m_glyphHeight * font->scaleY);
+			float lineAdvance = (float)font->m_glyphHeight * font->scaleY;
+			mCurrentY = mCurrentY + (kMesLineHeightAdjust + lineAdvance);
 			if (mRubyEnabled != 0)
 			{
 				mRubyLine = mRubyLine + 1;
 				mCurrentX = mCurrentX + (kMesRubyLineIndent + mLineSpacing);
 			}
 			break;
+		}
 		case 1:
 		{
 			int wait = 2;
@@ -997,7 +998,7 @@ void CMes::addString(char** text, int branchMode)
 			{
 				mColor = 6;
 			}
-			char* flatText = FlatNameDirect(5, mFlagVars[ReadTagS8(text)] & 0xFFFF);
+			char* flatText = (char*)Game.m_caravanWorkArr[mFlagVars[ReadTagS8(text)] & 0xFFFF].m_name;
 			addString(&flatText, branchMode);
 			mColor = oldColor;
 			break;
@@ -1166,8 +1167,8 @@ void CMes::addString(char** text, int branchMode)
 			if (branchMode == 0)
 			{
 				CFlag flag;
-				flag.m_index = idx;
-				flag.m_value = value;
+				flag.m_param.m_index = idx;
+				flag.m_param.m_value = value;
 				flag.m_type = 2;
 				mFlagEntries[mFlagCount++] = flag;
 			}
@@ -1180,7 +1181,7 @@ void CMes::addString(char** text, int branchMode)
 			if (branchMode == 0)
 			{
 				CFlag flag;
-				flag.m_index = idx;
+				flag.m_param.m_index = idx;
 				flag.m_type = 1;
 				mFlagEntries[mFlagCount++] = flag;
 			}
@@ -1301,63 +1302,76 @@ void CMes::addString(char** text, int branchMode)
 			unsigned char idx = (unsigned char)ReadTagU8(text);
 			if (branchMode == 0)
 			{
-				int count = mFlagCount;
-				mFlagCount = count + 1;
-				CFlag* entry = &mFlagEntries[count];
-				entry->m_type = 4;
-				entry->m_index = idx;
+				CFlag flag;
+				flag.m_param.m_index = idx;
+				flag.m_type = 4;
+				mFlagEntries[mFlagCount++] = flag;
 			}
 			break;
 		}
 		case 0x41:
 		{
-			unsigned char mode = (unsigned char)ReadTagU8(text);
+			int mode = ReadTagS8(text);
+			int newCaseMode;
 			if (mode == 1)
 			{
-				caseMode = 1;
+				newCaseMode = 1;
 			}
 			else
 			{
-				caseMode = 2;
+				newCaseMode = 2;
 				if (mode == 0)
 				{
-					caseMode = 3;
+					newCaseMode = 3;
 				}
 			}
+			caseMode = newCaseMode;
 			break;
 		}
 		case 0x43:
-			flowMode = 2;
+		{
+			int newFlowMode = 2;
 			if (Game.m_gameWork.m_menuStageMode != 0)
 			{
-				flowMode = 1;
+				newFlowMode = 1;
 			}
+			flowMode = newFlowMode;
 			break;
+		}
 		case 0x44:
-			flowMode = 2;
+		{
+			int newFlowMode = 2;
 			if (Game.m_caravanWorkArr[mFlagVars[0x13]].m_genderFlag == 0)
 			{
-				flowMode = 1;
+				newFlowMode = 1;
 			}
+			flowMode = newFlowMode;
 			break;
+		}
 		case 0x42:
-			flowMode = 2;
+		{
+			int newFlowMode = 2;
 			if (mFlagVars[ReadTagS8(text)] == 1)
 			{
-				flowMode = 1;
+				newFlowMode = 1;
 			}
+			flowMode = newFlowMode;
 			break;
+		}
 		case 0x45:
-			flowMode = 2;
+		{
+			int newFlowMode = 2;
 			if (Game.m_caravanWorkArr[mFlagVars[ReadTagS8(text)]].m_genderFlag == 0)
 			{
-				flowMode = 1;
+				newFlowMode = 1;
 			}
+			flowMode = newFlowMode;
 			break;
+		}
 		case 0x20:
 		{
 			signed char vowel =
-			    (unsigned char)Game.m_caravanWorkArr[mFlagVars[ReadTagS8(text)]].m_name[0];
+			    (signed char)Game.m_caravanWorkArr[mFlagVars[ReadTagS8(text)]].m_name[0];
 			if ((vowel == 'A') || (vowel == 'I') || (vowel == 'U') ||
 			    (vowel == 'E') || (vowel == 'O') || (vowel == 'Y'))
 			{
@@ -1395,20 +1409,22 @@ void CMes::addString(char** text, int branchMode)
 			break;
 		case 0x1B:
 		{
-			flowMode = 2;
+			int newFlowMode = 2;
 			if ((mFlagVars[ReadTagS8(text)] & 1) == 0)
 			{
-				flowMode = 1;
+				newFlowMode = 1;
 			}
+			flowMode = newFlowMode;
 			break;
 		}
 		case 0x1C:
 		{
-			flowMode = 2;
+			int newFlowMode = 2;
 			if ((mFlagVars[ReadTagS8(text)] & 1) == 1)
 			{
-				flowMode = 1;
+				newFlowMode = 1;
 			}
+			flowMode = newFlowMode;
 			break;
 		}
 		case 0x47:
@@ -1447,18 +1463,18 @@ void CMes::addString(char** text, int branchMode)
 			*(float*)glyph = mCurrentX;
 			*(short*)(glyph + 2) = (short)(int)mCurrentY;
 
-			GetRenderFlagBits(font->renderFlags).fixedWidth = 1;
+			GetRenderFlagBits(font->renderFlags).snapPosition = 1;
 			float width;
-			if (uch < 0x20)
+			if ((unsigned short)uch < 0x20)
 			{
 				width = kMesIconDefaultWidth;
 			}
 			else
 			{
-				width = font->GetWidth((unsigned short)uch);
+				width = font->GetWidth(uch);
 			}
 			*(float*)(glyph + 1) = width;
-			GetRenderFlagBits(font->renderFlags).fixedWidth = 0;
+			GetRenderFlagBits(font->renderFlags).snapPosition = 0;
 
 			*(short*)(glyph + 3) = (short)mRevealCursor;
 			*(char*)((int)glyph + 0xF) = (mTextAlign << 4) | *(char*)((int)glyph + 0xF) & 0xF;

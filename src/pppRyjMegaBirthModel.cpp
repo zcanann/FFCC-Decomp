@@ -250,10 +250,10 @@ static inline void wrap_particle_rotation_triplet_s32(u8* particleBytes, s32 off
 static inline void wrap_birth_angle(s32* value)
 {
     s32 v = *value;
-    if ((0x7FFF < v) || (v < -0x8000)) {
+    if ((v >= 0x8000) || (v < -0x8000)) {
         u32 sign = (u32)v >> 0x1F;
         u32 y = (u32)(v << 0x11) - sign;
-        *value = (s32)(((y >> 0x11) | (y << 0xF)) + sign);
+        *value = (s32)(((y << 0xF) | (y >> 0x11)) + sign);
     }
 }
 
@@ -835,41 +835,43 @@ join_position:
 
     if (params->m_scaleRandomFlags != 0) {
         if ((params->m_scaleRandomFlags & 0x20) != 0) {
-            s32 randomized = (s32)((float)*(u32*)(payload + 0x80) * Math.RandF());
+            s32 randomized = (s32)((float)*(s32*)(payload + 0x80) * Math.RandF());
             *s32_at(particleData, 0x58) = randomized;
             *s32_at(particleData, 0x54) = randomized;
             *s32_at(particleData, 0x50) = randomized;
 
-            if (((params->m_scaleRandomFlags & 1) != 0) && ((params->m_scaleRandomFlags & 2) != 0)) {
+            u8 scaleBits = params->m_scaleRandomFlags;
+            if (((scaleBits & 1) != 0) && ((scaleBits & 2) != 0)) {
                 if (MegaBirthHalfDouble() < (double)Math.RandF()) {
-                    *s32_at(particleData, 0x50) = -*s32_at(particleData, 0x50);
-                    *s32_at(particleData, 0x54) = -*s32_at(particleData, 0x54);
-                    *s32_at(particleData, 0x58) = -*s32_at(particleData, 0x58);
+                    *s32_at(particleData, 0x50) = *s32_at(particleData, 0x50) * -1;
+                    *s32_at(particleData, 0x54) = *s32_at(particleData, 0x54) * -1;
+                    *s32_at(particleData, 0x58) = *s32_at(particleData, 0x58) * -1;
                 }
-            } else if ((params->m_scaleRandomFlags & 2) != 0) {
-                *s32_at(particleData, 0x50) = -*s32_at(particleData, 0x50);
-                *s32_at(particleData, 0x54) = -*s32_at(particleData, 0x54);
-                *s32_at(particleData, 0x58) = -*s32_at(particleData, 0x58);
+            } else if ((scaleBits & 2) != 0) {
+                *s32_at(particleData, 0x50) = *s32_at(particleData, 0x50) * -1;
+                *s32_at(particleData, 0x54) = *s32_at(particleData, 0x54) * -1;
+                *s32_at(particleData, 0x58) = *s32_at(particleData, 0x58) * -1;
             }
         } else {
             *s32_at(particleData, 0x50) = (s32)((float)*(s32*)(payload + 0x80) * Math.RandF());
             *s32_at(particleData, 0x54) = (s32)((float)*(s32*)(payload + 0x84) * Math.RandF());
             *s32_at(particleData, 0x58) = (s32)((float)*(s32*)(payload + 0x88) * Math.RandF());
 
-            if (((params->m_scaleRandomFlags & 1) != 0) && ((params->m_scaleRandomFlags & 2) != 0)) {
-                s32 count = 3;
-                s32* value = s32_at(particleData, 0x50);
-                do {
-                    if (MegaBirthHalfDouble() < (double)Math.RandF()) {
-                        *value = -*value;
+            u8 scaleBits = params->m_scaleRandomFlags;
+            if (((scaleBits & 1) != 0) && ((scaleBits & 2) != 0)) {
+                double h = MegaBirthHalfDouble();
+                u8* base = (u8*)particleData;
+                s32 i;
+                for (i = 0; i < 3; i++) {
+                    if (h < (double)Math.RandF()) {
+                        *(s32*)(base + 0x50) = *(s32*)(base + 0x50) * -1;
                     }
-                    value++;
-                    count--;
-                } while (count != 0);
-            } else if ((params->m_scaleRandomFlags & 2) != 0) {
-                *s32_at(particleData, 0x50) = -*s32_at(particleData, 0x50);
-                *s32_at(particleData, 0x54) = -*s32_at(particleData, 0x54);
-                *s32_at(particleData, 0x58) = -*s32_at(particleData, 0x58);
+                    base += 4;
+                }
+            } else if ((scaleBits & 2) != 0) {
+                *s32_at(particleData, 0x50) = *s32_at(particleData, 0x50) * -1;
+                *s32_at(particleData, 0x54) = *s32_at(particleData, 0x54) * -1;
+                *s32_at(particleData, 0x58) = *s32_at(particleData, 0x58) * -1;
             }
         }
 
@@ -904,7 +906,8 @@ join_position:
             *f32_at(particleData, 0x78) = randomizedScale;
             *f32_at(particleData, 0x74) = randomizedScale;
 
-            if (((params->m_rotationRandomFlags & 1) != 0) && ((params->m_rotationRandomFlags & 2) != 0)) {
+            u8 rotBits = params->m_rotationRandomFlags;
+            if (((rotBits & 1) != 0) && ((rotBits & 2) != 0)) {
                 if (MegaBirthHalfDouble() < (double)Math.RandF()) {
                     float v74 = *f32_at(particleData, 0x74);
                     *f32_at(particleData, 0x74) = v74 * kPppRyjMegaBirthModelNegOneZeroPair[0];
@@ -913,7 +916,7 @@ join_position:
                     float v7C = *f32_at(particleData, 0x7C);
                     *f32_at(particleData, 0x7C) = v7C * kPppRyjMegaBirthModelNegOneZeroPair[0];
                 }
-            } else if ((params->m_rotationRandomFlags & 2) != 0) {
+            } else if ((rotBits & 2) != 0) {
                 float v74 = *f32_at(particleData, 0x74);
                 *f32_at(particleData, 0x74) = v74 * kPppRyjMegaBirthModelNegOneZeroPair[0];
                 float v78 = *f32_at(particleData, 0x78);
@@ -926,16 +929,18 @@ join_position:
             *f32_at(particleData, 0x78) = *(float*)(payload + 0xC4) * Math.RandF();
             *f32_at(particleData, 0x7C) = *(float*)(payload + 0xC8) * Math.RandF();
 
-            if (((params->m_rotationRandomFlags & 1) != 0) && ((params->m_rotationRandomFlags & 2) != 0)) {
+            u8 rotBits = params->m_rotationRandomFlags;
+            if (((rotBits & 1) != 0) && ((rotBits & 2) != 0)) {
+                double h = MegaBirthHalfDouble();
                 u8* base = (u8*)particleData;
                 s32 i;
                 for (i = 0; i < 3; i++) {
-                    if (MegaBirthHalfDouble() < (double)Math.RandF()) {
+                    if (h < (double)Math.RandF()) {
                         *(float*)(base + 0x74) = *(float*)(base + 0x74) * kPppRyjMegaBirthModelNegOneZeroPair[0];
                     }
                     base += 4;
                 }
-            } else if ((params->m_rotationRandomFlags & 2) != 0) {
+            } else if ((rotBits & 2) != 0) {
                 float v74 = *f32_at(particleData, 0x74);
                 *f32_at(particleData, 0x74) = v74 * kPppRyjMegaBirthModelNegOneZeroPair[0];
                 float v78 = *f32_at(particleData, 0x78);

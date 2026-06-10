@@ -2475,8 +2475,9 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 		int frameStart = (startFrame == -1) ? 0 : startFrame;
 
 		m_animStart = static_cast<float>(frameStart);
-		m_curFrame = m_animStart;
-		m_time = m_curFrame;
+		float startF = m_animStart;
+		m_curFrame = startF;
+		m_time = startF;
 
 		int frameEnd;
 		if (endFrame == -1) {

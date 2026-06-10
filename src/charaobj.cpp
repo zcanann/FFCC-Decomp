@@ -3000,7 +3000,8 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 		if ((particleEntry & 0x100) != 0) {
 			CFlatRuntime2Storage().SetParticleWorkBind(this);
 		} else if ((particleEntry & 0x200) != 0) {
-			float distance = *reinterpret_cast<short*>(itemData + 0x2A) * 1.0f;
+			SCharaItemRow* distRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
+			float distance = static_cast<float>(distRows[effectId].m_distance) * 1.0f;
 			Vec offsetPos;
 			offsetPos.x = m_worldPosition.x + sinf(m_rotTargetY) * distance;
 			offsetPos.y = m_worldPosition.y;

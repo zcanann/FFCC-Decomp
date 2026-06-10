@@ -5415,14 +5415,16 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 
 		float rate = static_cast<float>(CharaGhostValue(0x2054)) / kMonObjPercentMax;
 		double angleScale;
-		if (bossKind == 2) {
-			angleScale = FLOAT_80331A58 * rate + FLOAT_80331A58;
-		} else if (bossKind > 2) {
+		switch (bossKind) {
+		default:
 			angleScale = kMonObjOne;
-		} else if (bossKind == 1) {
+			break;
+		case 1:
 			angleScale = FLOAT_80331A58 * (kMonObjOne - rate) + FLOAT_80331A58;
-		} else {
-			angleScale = kMonObjOne;
+			break;
+		case 2:
+			angleScale = FLOAT_80331A58 * rate + FLOAT_80331A58;
+			break;
 		}
 
 		sprintf(text, s_partyObjGhostFmt, sGhostPartyWork.thresholdA, CharaGhostValue(0x2048),

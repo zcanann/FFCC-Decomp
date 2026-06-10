@@ -608,15 +608,15 @@ void CGObject::move()
             moveVec.x = sZeroFloat;
 
             u32 miniGameFlags = DbgMenuPcs.GetDbgFlagsRaw();
-            if ((miniGameFlags & 0x100) != 0) {
+            if ((miniGameFlags & 0x100) != 0 && moveVec.x == sZeroFloat) {
                 const float stickX = (Pad.m_debugPadLock != 0 || (player == 0 && Pad.m_debugPadPort != -1))
                     ? sZeroFloat
                     : Pad.GetPadInputs()[RemapPadSlot(&Pad, player)].stickXF;
                 const float stickY = (Pad.m_debugPadLock != 0 || (player == 0 && Pad.m_debugPadPort != -1))
                     ? sZeroFloat
                     : Pad.GetPadInputs()[RemapPadSlot(&Pad, player)].stickYF;
-                moveVec.x = sZeroFloat - stickX;
-                moveVec.z = sZeroFloat + stickY;
+                moveVec.x = moveVec.x - stickX;
+                moveVec.z = moveVec.z + stickY;
                 if ((moveVec.x != sZeroFloat) || (moveVec.z != sZeroFloat)) {
                     hasStickInput = 1;
                 }

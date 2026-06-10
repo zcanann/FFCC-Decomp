@@ -2198,11 +2198,15 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 
 			if (((Game.m_gameWork.m_menuStageMode != 0) &&
 				 (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) &&
-				 ((partyObj->GetCID() & 0x6D) == 0x6D) &&
-				 (partyObj->m_scriptHandle[0xED] != NULL)) ||
-				(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(partyObj->m_scriptHandle) + 7) == 0) ||
+				 ((static_cast<unsigned short>(partyObj->GetCID()) & 0x6D) == 0x6D) &&
+				 (reinterpret_cast<int>(partyObj->m_scriptHandle[0xED]) != 0)) ||
+				(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(partyObj->m_scriptHandle) + 0x1C) == 0) ||
 				(partyObj->m_lastStateId == 9) ||
 				(partyObj->m_lastStateId == 0x22) ||
+				((Game.m_gameWork.m_menuStageMode != 0) &&
+				 (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) &&
+				 ((static_cast<unsigned short>(partyObj->GetCID()) & 0x6D) == 0x6D) &&
+				 (reinterpret_cast<int>(partyObj->m_scriptHandle[0xED]) != 0)) ||
 				(*reinterpret_cast<float*>(mon + partyIndex * 4 + 0x5D0) >=
 				 (coneLength - sideDist))) {
 				continue;
@@ -2234,13 +2238,13 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 			PSVECNormalize(&targetDelta, reinterpret_cast<Vec*>(&targetDir));
 			float dot = PSVECDotProduct(reinterpret_cast<Vec*>(&forward), reinterpret_cast<Vec*>(&targetDir));
 			if (((sideDist - object->m_bodyEllipsoidRadius) > targetDist) ||
-				((static_cast<double>(kMonObjZero) != static_cast<double>(halfAngle)) &&
+				((halfAngle != kMonObjZero) &&
 				 (kMonObjZero >= dot))) {
 				continue;
 			}
 
 			float angle = static_cast<float>(acos(static_cast<double>(dot)));
-			if ((static_cast<double>(kMonObjZero) != static_cast<double>(halfAngle)) &&
+			if ((halfAngle != kMonObjZero) &&
 				(angle >= halfAngle)) {
 				continue;
 			}
@@ -2283,7 +2287,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 			}
 		}
 
-		if (static_cast<double>(kMonObjZero) != static_cast<double>(halfAngle)) {
+		if (halfAngle != kMonObjZero) {
 			float debugRadius = coneLength * static_cast<float>(tan(static_cast<double>(halfAngle)));
 			CFlat.AddDebugDrawCC(&coneStart, reinterpret_cast<Vec*>(&move), debugRadius, 0, didHit);
 		}

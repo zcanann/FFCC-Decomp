@@ -615,8 +615,8 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
     }
 
 commit:
-    if (static_cast<signed char>(s_bitMask.m_fields.m_mode) != 0) {
-        g_hit_lpface->m_drawFlags = s_bitMask.m_fields.m_drawFlags;
+    if (static_cast<signed char>(s_bitMask) != 0) {
+        g_hit_lpface->m_drawFlags = s_bitMaskDrawFlags;
     }
     g_hit_t_slide_min = g_hit_t;
     g_hit_t_min = g_hit_t;
@@ -629,8 +629,8 @@ commit:
     return 1;
 
 edge_loop:
-    if (static_cast<signed char>(s_bitMask.m_fields.m_mode) != 0) {
-        g_hit_lpface->m_drawFlags = s_bitMask.m_fields.m_drawFlags;
+    if (static_cast<signed char>(s_bitMask) != 0) {
+        g_hit_lpface->m_drawFlags = s_bitMaskDrawFlags;
     }
 
     if (g_hit_lpface->m_edgeFlags == 0) {

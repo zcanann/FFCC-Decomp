@@ -121,22 +121,13 @@ public:
     CMapHitFace* m_faces;         // 0x20
 };
 
-union UMapHitDrawMode
-{
-    unsigned long m_word;
-    struct {
-        unsigned char m_mode;
-        unsigned char m_drawFlags;
-        unsigned char m_pad[2];
-    } m_fields;
-};
-
 struct CMapHitDrawMode
 {
     unsigned char m_byte;
 };
 
-extern UMapHitDrawMode s_bitMask;
+extern unsigned char s_bitMask;
+extern unsigned char s_bitMaskDrawFlags;
 extern CMapHitDrawMode g_MapHitDrawMode;
 extern int g_hit_edge_idx_min;
 extern float g_hit_t;

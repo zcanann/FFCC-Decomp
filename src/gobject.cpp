@@ -192,6 +192,41 @@ static inline int RemapPadSlot(CPad* pad, int padIndex)
     return static_cast<int>(padIndex & ~(static_cast<int>(~((activePad - padIndex) | (padIndex - activePad))) >> 31));
 }
 
+static inline unsigned short GetMovePadButton(int player)
+{
+    return (Pad.m_debugPadLock != 0 || (player == 0 && Pad.m_debugPadPort != -1))
+        ? 0
+        : Pad.GetPadInputs()[RemapPadSlot(&Pad, player)].button[0];
+}
+
+static inline unsigned short GetMovePadButtonDown(int player)
+{
+    return (Pad.m_debugPadLock != 0 || (player == 0 && Pad.m_debugPadPort != -1))
+        ? 0
+        : Pad.GetPadInputs()[RemapPadSlot(&Pad, player)].buttonDown[0];
+}
+
+static inline unsigned short GetMovePadButtonUp(int player)
+{
+    return (Pad.m_debugPadLock != 0 || (player == 0 && Pad.m_debugPadPort != -1))
+        ? 0
+        : Pad.GetPadInputs()[RemapPadSlot(&Pad, player)].buttonUp;
+}
+
+static inline float GetMovePadStickX(int player)
+{
+    return (Pad.m_debugPadLock != 0 || (player == 0 && Pad.m_debugPadPort != -1))
+        ? 0.0f
+        : Pad.GetPadInputs()[RemapPadSlot(&Pad, player)].stickXF;
+}
+
+static inline float GetMovePadStickY(int player)
+{
+    return (Pad.m_debugPadLock != 0 || (player == 0 && Pad.m_debugPadPort != -1))
+        ? 0.0f
+        : Pad.GetPadInputs()[RemapPadSlot(&Pad, player)].stickYF;
+}
+
 static inline float& ModelChestAmp(CChara::CModel* model)
 {
     return *reinterpret_cast<float*>(ModelBytes(model) + 0xDC);
@@ -212,7 +247,26 @@ static inline Vec& ModelWindVector(CChara::CModel* model)
     return *reinterpret_cast<Vec*>(ModelBytes(model) + 0xC4);
 }
 
+static inline void SetModelWindVector(CChara::CModel* model, const Vec& wind)
+{
+    CVector windCopy(wind);
+    ModelWindVector(model).x = windCopy.x;
+    ModelWindVector(model).y = windCopy.y;
+    ModelWindVector(model).z = windCopy.z;
+}
+
 static inline float ClampFloat(float value, float minValue, float maxValue)
+{
+    if (value < minValue) {
+        return minValue;
+    }
+    if (maxValue < value) {
+        return maxValue;
+    }
+    return value;
+}
+
+static inline double ClampDouble(double value, double minValue, double maxValue)
 {
     if (value < minValue) {
         return minValue;
@@ -589,15 +643,9 @@ void CGObject::move()
             && m_weaponNodeFlagAll.m_bits1.m_shield
             && m_weaponNodeFlagAll.m_bits1.m_menuReady
             && ((Game.m_gameWork.m_menuStageMode == 0) || (animMisc == 0))) {
-            u16 buttons = (Pad.m_debugPadLock != 0 || (player == 0 && Pad.m_debugPadPort != -1))
-                ? 0
-                : Pad.GetPadInputs()[RemapPadSlot(&Pad, player)].button[0];
-            const u16 buttonsDown = (Pad.m_debugPadLock != 0 || (player == 0 && Pad.m_debugPadPort != -1))
-                ? 0
-                : Pad.GetPadInputs()[RemapPadSlot(&Pad, player)].buttonDown[0];
-            const u16 buttonsRepeat = (Pad.m_debugPadLock != 0 || (player == 0 && Pad.m_debugPadPort != -1))
-                ? 0
-                : Pad.GetPadInputs()[RemapPadSlot(&Pad, player)].buttonUp;
+            u16 buttons = GetMovePadButton(player);
+            const u16 buttonsDown = GetMovePadButtonDown(player);
+            const u16 buttonsRepeat = GetMovePadButtonUp(player);
 
             if ((buttons != 0) && (buttonsRepeat != 0)) {
                 buttons |= buttonsRepeat;
@@ -609,15 +657,11 @@ void CGObject::move()
 
             u32 miniGameFlags = DbgMenuPcs.GetDbgFlagsRaw();
             if ((miniGameFlags & 0x100) != 0 && moveVec.x == sZeroFloat) {
-                const float stickX = (Pad.m_debugPadLock != 0 || (player == 0 && Pad.m_debugPadPort != -1))
-                    ? sZeroFloat
-                    : Pad.GetPadInputs()[RemapPadSlot(&Pad, player)].stickXF;
+                const float stickX = GetMovePadStickX(static_cast<s8>(m_animStateMisc));
                 moveVec.x = moveVec.x - stickX;
-                const float stickY = (Pad.m_debugPadLock != 0 || (player == 0 && Pad.m_debugPadPort != -1))
-                    ? sZeroFloat
-                    : Pad.GetPadInputs()[RemapPadSlot(&Pad, player)].stickYF;
+                const float stickY = GetMovePadStickY(static_cast<s8>(m_animStateMisc));
                 moveVec.z = moveVec.z + stickY;
-                if ((moveVec.x != sZeroFloat) || (moveVec.z != sZeroFloat)) {
+                if ((moveVec.x != 0.0f) || (moveVec.z != 0.0f)) {
                     hasStickInput = 1;
                 }
             }
@@ -656,10 +700,10 @@ void CGObject::move()
         }
     }
 
-    if ((moveVec.x != sZeroFloat) || (moveVec.y != sZeroFloat) || (moveVec.z != sZeroFloat)) {
+    if ((moveVec.x != sZeroFloat) || (moveVec.z != sZeroFloat) || (moveVec.y != sZeroFloat)) {
         float cameraYaw;
         if (movingWithScript) {
-            cameraYaw = sZeroFloat;
+            cameraYaw = 0.0f;
         } else {
             cameraYaw = *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xf8);
         }
@@ -833,7 +877,7 @@ void CGObject::objectCollision()
         info.capsuleOffset.z = other->m_bodyEllipsoidOffset * -cosf(other->m_rotBaseY);
         PSVECAdd(&info.basePos, &info.capsuleOffset, &info.capsulePos);
 
-        const float capsuleDistance = PSVECDistance(&self.capsulePos, &info.capsulePos);
+        const float capsuleDistance = PSVECDistance(&info.capsulePos, &self.capsulePos);
         if ((sZeroFloat == capsuleDistance)
             || ((m_nearColRadius + other->m_nearColRadius) < capsuleDistance)) {
             continue;
@@ -875,8 +919,8 @@ void CGObject::objectCollision()
         }
 
         if (((m_bgColMask & 2) != 0) && ((other->m_bgColMask & 2) != 0)
-            && (sZeroFloat < m_bodyEllipsoidRadius)
-            && (sZeroFloat < other->m_bodyEllipsoidRadius)) {
+            && (0.0f < m_bodyEllipsoidRadius)
+            && (0.0f < other->m_bodyEllipsoidRadius)) {
             if (((m_weaponNodeFlagBits.m_attached == 0) || (m_attachOwner != other))
                 && ((other->m_weaponNodeFlagBits.m_attached == 0) || (other->m_attachOwner != this))) {
                 const int usePushTimers = ((m_objectFlags & 0x40) != 0) && ((other->m_objectFlags & 0x40) != 0);
@@ -949,7 +993,7 @@ void CGObject::bgCollision()
 
     if (m_bgColMask & 0x01)
     {
-        s_bitMask.m_fields.m_drawFlags = 1;
+        s_bitMaskDrawFlags = 1;
 
         if (Game.m_currentMapId == 0x21)
         {
@@ -960,7 +1004,7 @@ void CGObject::bgCollision()
             bgNormalCollision();
         }
 
-        s_bitMask.m_fields.m_drawFlags = 0;
+        s_bitMaskDrawFlags = 0;
     }
 }
 #pragma pop
@@ -1469,12 +1513,8 @@ void CGObject::update()
     float turnFactor;
     if (m_animSlotSel != -1 && m_shieldNodeFlagBits.m_bit40) {
         const double turnLimit = fabs(m_turnBaseSpeed);
-        double clampedTurn = -turnLimit;
-        if (turnDelta < clampedTurn) {
-        } else {
-            clampedTurn = turnLimit < turnDelta ? turnLimit : turnDelta;
-        }
-        turnDelta = clampedTurn;
+        const double negLimit = -turnLimit;
+        turnDelta = ClampDouble(turnDelta, negLimit, turnLimit);
         turnFactor = sAnimFrameOffset;
     } else {
         turnFactor = m_hitNormal.x;
@@ -1570,6 +1610,9 @@ void CGObject::update()
             m_radiusCtrlVel.y += sBgAttrNormal * swayDz;
             m_groundFriction += sBgAttrNormal * swayDx;
 
+            float mtx2;
+            float mtx1;
+            float mtx0;
             Vec swayDir;
             PSVECNormalize(reinterpret_cast<Vec*>(&m_radiusCtrlVel.y), &swayDir);
             const float swayDot = PSVECDotProduct(&swayDir, CVector(sZeroFloat, sAnimFrameOffset, sZeroFloat));
@@ -1579,9 +1622,9 @@ void CGObject::update()
                 PSVECCrossProduct(&swayDir, CVector(sZeroFloat, sAnimFrameOffset, sZeroFloat), &swayAxis);
                 PSMTXRotAxisRad(rotScratch, &swayAxis, negSwayAngle);
 
-                const float mtx2 = modelMtx[2][3];
-                const float mtx1 = modelMtx[1][3];
-                const float mtx0 = modelMtx[0][3];
+                mtx2 = modelMtx[2][3];
+                mtx1 = modelMtx[1][3];
+                mtx0 = modelMtx[0][3];
                 modelMtx[0][3] = CVector(sZeroFloat, sZeroFloat, sZeroFloat).x;
                 modelMtx[1][3] = CVector(sZeroFloat, sZeroFloat, sZeroFloat).y;
                 modelMtx[2][3] = CVector(sZeroFloat, sZeroFloat, sZeroFloat).z;
@@ -1665,26 +1708,27 @@ void CGObject::update()
                 const float targetYaw = atan2f(-lookDelta.x, -lookDelta.z);
                 const float yawDelta = Math.DstRot(targetYaw, m_rotBaseY);
                 if (fabs(yawDelta) < sYawLookCutoff) {
-                    const double pitchDelta = atan2(lookDelta.y, lookDistance);
-                    if (fabs((float)pitchDelta) < sPitchLookCutoff) {
+                    const float pitchDelta = (float)atan2(lookDelta.y, lookDistance);
+                    if (fabs(pitchDelta) < sPitchLookCutoff) {
                         lookYaw += yawDelta;
-                        lookPitch += (float)pitchDelta;
+                        lookPitch += pitchDelta;
                     }
                 }
             }
         }
 
-        const float twistRate = sBgAttrFast;
         const unsigned char lookBlendByte = *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x56);
         CChara::CModel* chestModel = m_charaModelHandle->m_model;
         float lookBlend = sLookBlendScale * static_cast<float>(lookBlendByte);
-        const float chestAmp = ModelChestAmp(chestModel);
-        const float chestTilt = ModelChestTilt(chestModel);
-        ModelChestAmp(chestModel) = lookBlend * (lookYaw - chestAmp) + chestAmp;
-        ModelChestTilt(chestModel) = lookBlend * (lookPitch - chestTilt) + chestTilt;
+        float chestAmp = ModelChestAmp(chestModel);
+        float chestTilt = ModelChestTilt(chestModel);
+        chestAmp = lookBlend * (lookYaw - chestAmp) + chestAmp;
+        chestTilt = lookBlend * (lookPitch - chestTilt) + chestTilt;
+        ModelChestAmp(chestModel) = chestAmp;
+        ModelChestTilt(chestModel) = chestTilt;
         CChara::CModel* twistModel = m_charaModelHandle->m_model;
         const float twistAngle = ModelTwistAngle(twistModel);
-        ModelTwistAngle(twistModel) = twistRate * (*reinterpret_cast<float*>(m_worldMode) - twistAngle) + twistAngle;
+        ModelTwistAngle(twistModel) = sBgAttrFast * (*reinterpret_cast<float*>(m_worldMode) - twistAngle) + twistAngle;
 
         m_charaModelHandle->m_model->SetMatrix(modelMtx);
 
@@ -1693,10 +1737,7 @@ void CGObject::update()
         windVec.x = -(m_groundHitOffset.x * Math.RandF() - windVec.x);
         windVec.z = -(m_groundHitOffset.z * Math.RandF() - windVec.z);
         CChara::CModel* windModel = m_charaModelHandle->m_model;
-        CVector windCopy(windVec);
-        ModelWindVector(windModel).x = windCopy.x;
-        ModelWindVector(windModel).y = windCopy.y;
-        ModelWindVector(windModel).z = windCopy.z;
+        SetModelWindVector(windModel, windVec);
 
         boundCheck();
 
@@ -1720,7 +1761,7 @@ void CGObject::update()
         if (sZeroFloat == m_lookAtTimer) {
             m_weaponNodeFlagBits.m_unk20 = 0;
         }
-        m_weaponNodeFlagBits.m_unk40 = m_weaponNodeFlagBits.m_unk40 | m_weaponNodeFlagBits.m_unk20;
+        m_weaponNodeFlagBits.m_unk40 |= m_weaponNodeFlagBits.m_unk20;
 
         if ((m_displayFlags & 1) != 0) {
             if ((m_weaponNodeFlagBits.m_unk20 &&
@@ -3178,9 +3219,6 @@ void CGObject::DrawDebug(CFont* font)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma optimization_level 1
-#pragma opt_common_subs on
 void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
 {
     m_worldPosition = *position;
@@ -3255,7 +3293,6 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
         m_animBlend = m_bgAttrValue;
     }
 }
-#pragma pop
 
 /*
  * --INFO--

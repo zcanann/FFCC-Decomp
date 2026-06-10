@@ -60,6 +60,8 @@ extern "C" unsigned char Vec_80245758[];
 static const char s_mapMidPathFmt[] = "%s.mid";
 static const char s_mapOtmPathFmt[] = "%s.otm";
 extern "C" const char s_map_cpp[] = "map.cpp";
+static const Vec kMapHitLightDir0 = { 1.0f, 1.0f, 1.0f };
+static const Vec kMapHitLightDir1 = { -1.0f, 1.0f, -1.0f };
 static const char s_set_bg_camera_semi_trans_missing_fmt[] =
     "SET_BG_CAMERA_SEMI_TRANS  mesh_id=%d  "
     "\x82\xaa\x94\xad\x8c\xa9\x82\xc5\x82\xab\x82\xc8\x82\xa2\x81\x42\n";
@@ -75,20 +77,34 @@ static const char s_check_hit_cylinder_small_vec_fmt[] =
     "\x93\x96\x82\xe8\x82\xc5\x83\x78\x83\x4e\x83\x67\x83\x8b\x82\xaa\x8f\xac\x82\xb3\x82\xb7\x82\xac\x82\xe9 "
     "vec=(%f,%f,%f)\n";
 static const char s_read_mid_fmt[] = "ReadMid fn=%s\n";
-static const char s_read_otm_fmt[] = "ReadOtm fn=%s\n";
 static const char s_mapReadErrorFmt[] = "CAN NOT READ %s !!!!!!\n";
-static const char s_error_root_mapobj_not_found[] = "Error root mapobj not found\n";
-static const char s_read_mid_mapobj_error[] = "Error CMapMng::ReadMid m_mapobj\n";
-static const char s_read_mid_octtree_error[] = "Error CMapMng::ReadMid octtree\n";
-static const char s_read_mid_hit_error[] = "Error CMapMng::ReadMid hit\n";
+static const char s_read_mid_ground_error[] =
+    "Error CMapMng::ReadMid GROUND_A, GROUND_C "
+    "\x82\xaa\x94\xad\x8c\xa9\x82\xc5\x82\xab\x82\xc8\x82\xa2\x81\x49\x81\x49\x81\x49\n";
+static const char s_read_mid_hit_null_error[] = "Error CMapMng::ReadMid m_mapobj->m_hit = NULL\n";
+static const char s_read_mid_node_order_warning[] =
+    "  \x83\x7d\x83\x62\x83\x76\x94\xc7\x82\xc6\x81\x41\x8a\xe9\x89\xe6\x94\xc7\x82\xcc"
+    " .mb "
+    "\x83\x74\x83\x40\x83\x43\x83\x8b\x82\xcc\x83\x6d\x81\x5b\x83\x68\x94\x7a\x97\xf1\x82\xaa\x88\xe1\x82\xa4\x81\x41\n"
+    "  \x82\xdc\x82\xbd\x82\xcd\x81\x41\x83\x41\x83\x67\x83\x8a\x83\x72\x83\x85\x81\x5b\x83\x67"
+    "\x82\xcc\x90\xdd\x92\xe8\x82\xaa\x82\xa8\x82\xa9\x82\xb5\x82\xa2\x81\x41"
+    "\x89\xc2\x94\x90\xab\x82\xaa\x82\xa0\x82\xe8\x82\xdc\x82\xb7\n";
+static const char s_read_mid_mesh_count_error[] =
+    "Error MID "
+    "\x82\xcc\x93\x96\x82\xbd\x82\xe8\x83\x81\x83\x62\x83\x56\x83\x85\x82\xaa"
+    " OTM "
+    "\x82\xc5\x8e\x77\x92\xe8\x82\xb5\x82\xc4\x82\xa2\x82\xe9\x82\xe6\x82\xe8\x8f\xad\x82\xc8\x82\xa2\x81\x49\x81\x49\x81\x49\n";
 static const char s_read_mid_ok[] = "ReadMid OK\n";
 static const char s_read_mid_error[] = "ReadMid Error\n";
+static const char s_read_otm_fmt[] = "ReadOtm fn=%s\n";
+static const char s_error_root_mapobj_not_found[] = "Error root mapobj not found\n";
 static const char s_mapMplPathFmt[] = "%s_%d.mpl";
 static const char s_mapReadOpenErrorFmt[] = "CAN NOT READ OPEN %s !!!!!!\n";
 static const char s_mapReadMplFmt[] = "ReadMpl fn=%s\n";
 static const char s_mapMtxPathFmt[] = "%s_%d.mtx";
 static const char s_mapReadMtxFmt[] = "ReadMtx fn=%s\n";
-static const char s_map_manager_label_block[] = "CMapMng.mapmng\0\0CMapObjAtr\0";
+static const char s_map_manager_label[] = "CMapMng.mapmng";
+extern const char s_CMapObjAtrName[] = "CMapObjAtr";
 extern const char s_CMapTexAnimSet[] = "CMapTexAnimSet";
 static const char s_map_ptrarray_grow_error[] =
     "\x83\x6f\x83\x62\x83\x74\x83\x40\x90\xac\x92\xb7\x82\xaa\x95\x73\x8b\x96\x89\xc2\x82\xc5\x82\xb7\x81\x42\n";
@@ -1203,7 +1219,7 @@ void CMapMng::Create()
     m_mapAnimFrame = 0;
     m_rootMapObj = 0;
 
-    CMemory::CStage* stage = Memory.CreateStage(0x540000, const_cast<char*>(s_map_manager_label_block), 0);
+    CMemory::CStage* stage = Memory.CreateStage(0x540000, const_cast<char*>(s_map_manager_label), 0);
     m_stage = stage;
 
     GetMapAnimRunArray().SetStage(m_stage);
@@ -2462,11 +2478,11 @@ int CMapMng::ReadMid(char* mapName)
                         goto octtreeMeshCheck;
                     }
                     if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-                        System.Printf(const_cast<char*>(s_read_mid_mapobj_error));
+                        System.Printf(const_cast<char*>(s_read_mid_hit_null_error));
                     }
                 octtreeError:
                     if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-                        System.Printf(const_cast<char*>(s_read_mid_octtree_error));
+                        System.Printf(const_cast<char*>(s_read_mid_node_order_warning));
                     }
                     ok = 0;
                     goto octtreeDone;
@@ -2489,10 +2505,8 @@ int CMapMng::ReadMid(char* mapName)
 
             if (mapObjIndex >= m_mapObjCount) {
                 if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-                    System.Printf(const_cast<char*>(s_error_root_mapobj_not_found));
-                    System.Printf(const_cast<char*>(s_read_mid_octtree_error));
+                    System.Printf(const_cast<char*>(s_read_mid_ground_error));
                 }
-                ok = 0;
             }
         }
         chunkFile.PopChunk();
@@ -2507,7 +2521,7 @@ int CMapMng::ReadMid(char* mapName)
                 int hitIndex = hit - GetMapHitArray();
                 if (hitIndex >= m_mapHitCount) {
                     if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-                        System.Printf(const_cast<char*>(s_read_mid_hit_error));
+                        System.Printf(const_cast<char*>(s_read_mid_mesh_count_error));
                     }
                     obj->m_mapData = 0;
                 }
@@ -2869,7 +2883,6 @@ void CMapMng::Draw()
         _GXColor lightColor;
         *reinterpret_cast<u32*>(&lightColor) = 0xFFFFFFFF;
 
-        static const Vec kMapHitLightDir0 = { 1.0f, 1.0f, 1.0f };
         Vec lightDir0 = kMapHitLightDir0;
 
         Mtx cameraMtx0;
@@ -2894,7 +2907,6 @@ void CMapMng::Draw()
         GXInitLightAttnK(&lightObj0, kMapZero, kMapTinyEpsilon, kMapZero);
         GXLoadLightObjImm(&lightObj0, GX_LIGHT0);
 
-        static const Vec kMapHitLightDir1 = { -1.0f, 1.0f, -1.0f };
         Vec lightDir1 = kMapHitLightDir1;
 
         Mtx cameraMtx1;

@@ -2942,10 +2942,23 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
         unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(cmdOut);
         int op = cmdBytes[0] & 0x3F;
 
-        if (op == 0x14 || op == 0x17 || op == 0x1A ||
-            op == 0x1C || op == 0x1D || op == 0x1E ||
-            op == 0x1F || (op == 0x06 && cmdBytes[1] == 0x18))
+        if (op == 0x14)
+            goto consume_ack;
+        if (op == 0x17)
+            goto consume_ack;
+        if (op == 0x1A)
+            goto consume_ack;
+        if (op == 0x1C)
+            goto consume_ack;
+        if (op == 0x1D)
+            goto consume_ack;
+        if (op == 0x1E)
+            goto consume_ack;
+        if (op == 0x1F)
+            goto consume_ack;
+        if (op == 0x06 && cmdBytes[1] == 0x18)
         {
+        consume_ack:
             OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
             unsigned int prevCmd = m_recvQueueEntriesArr[threadParam->m_portIndex][m_secCmdCount[threadParam->m_portIndex] - 1];
@@ -3122,22 +3135,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
                 }
                 else
                 {
-                    if (m_threadRunningMask != 0)
-                    {
-                        const unsigned int tPort = m_threadParams[threadParam->m_portIndex].m_portIndex;
-                        OSWaitSemaphore(&m_accessSemaphores[tPort]);
-
-                        if (static_cast<int>(m_cmdCount[tPort]) >= 0x40)
-                        {
-                            m_cmdQueueData[tPort][m_cmdCount[tPort]] = 0x07150000;
-                            m_cmdCount[tPort]++;
-                            OSSignalSemaphore(&m_accessSemaphores[tPort]);
-                        }
-                        else
-                        {
-                            OSSignalSemaphore(&m_accessSemaphores[tPort]);
-                        }
-                    }
+                    SetSendQueue(&m_threadParams[threadParam->m_portIndex], 0x07150000);
 
                     OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
                     memset(&m_recvBuffer[threadParam->m_portIndex], 0, sizeof(m_recvBuffer[threadParam->m_portIndex]));

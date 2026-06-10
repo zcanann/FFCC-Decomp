@@ -1905,11 +1905,7 @@ void CCaravanWork::CalcStatus()
 	}
 	m_numCmdListSlots = cmdSlotCap;
 
-	unsigned short cappedValue = 0x10;
-	if (m_maxHp < 0x10) {
-		cappedValue = m_maxHp;
-	}
-	m_maxHp = cappedValue;
+	m_maxHp = (m_maxHp < 0x10) ? m_maxHp : 0x10;
 
 	for (int equipIdx = 0; equipIdx < 4; equipIdx++) {
 		int equipSlot = m_equipment[equipIdx];

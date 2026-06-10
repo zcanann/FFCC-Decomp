@@ -617,8 +617,8 @@ static void CopyDuplicatedMeshState(CChara::CMesh* dst, CChara::CMesh* src)
 }
 
 static const char s_charaMeshWorkOverflow[] = "chara mesh work buffer overflow\n";
-static int s_charaMeshWorkWarnArmed = 1;
-static char s_charaMeshWorkOverflowSeen = 0;
+static int s_charaMeshWorkWarnArmed;
+static char s_charaMeshWorkOverflowSeen;
 
 } // namespace
 
@@ -3491,4 +3491,3 @@ void CChara::CModel::CalcNodeWorldMatrix(float (*outMtx)[4], CChara::CNode* node
 }
 
 CChara Chara;
-CChara& gChara = Chara;

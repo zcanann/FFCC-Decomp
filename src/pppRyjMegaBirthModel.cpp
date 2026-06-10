@@ -698,38 +698,86 @@ void birth(
         }
         goto join_position;
     } else if (mode < 10) {
-        s8 speedMode = params->m_speedMode;
         s16 pathIndex = *(s16*)(payload + 0x138);
         Vec* pathBase = pObject->m_drawMatrixPtr;
 
         if (pathIndex >= 0) {
             s16* pathInfo = (s16*)(*(int*)&ppvEnv->m_particleColors[1] + pathIndex * 8);
+            Vec spawnPoint;
+            float t;
+            float vx;
+            float vy;
+            float vz;
+            float m1;
+            float m2;
+            float m3;
+            float m4;
 
-            if (pathBase == NULL) {
+            if (!pathBase) {
                 pathBase = (Vec*)ppvEnv->m_mapMeshPtr[pathInfo[0]]->m_vertices;
             }
 
-            Vec spawnPoint;
-            s16 sampleIndex;
-
-            if ((speedMode == 0) || (speedMode >= 6)) {
-                if ((u32)pathInfo[1] <= (s32)(u32)work->m_unused1E) {
+            switch (params->m_speedMode) {
+            default: {
+                if ((s32)work->m_unused1E >= (s32)pathInfo[1]) {
                     work->m_unused1E = 0;
                 }
-                sampleIndex = work->m_unused1E;
+                u16 sampleIndex = work->m_unused1E;
                 work->m_unused1E = sampleIndex + 1;
-            } else {
-                float t = calc_mesh_sample_t(speedMode);
-                if ((u32)pathInfo[1] <= (s32)(u32)work->m_unused1E) {
+                Vec* pathVec = pathBase + ((u16*)*(int*)(pathInfo + 2))[sampleIndex];
+                vx = pathVec->x;
+                vy = pathVec->y;
+                vz = pathVec->z;
+                goto have_vec;
+            }
+            case 1:
+                (void)Math.RandF();
+                t = Math.RandF();
+                break;
+            case 2:
+                m2 = Math.RandF();
+                m3 = Math.RandF();
+                t = Math.RandF() * (m3 * m2);
+                break;
+            case 3:
+                m2 = Math.RandF();
+                m3 = Math.RandF();
+                t = (float)(kPppRyjMegaBirthModelOneF64 - (double)(Math.RandF() * (m3 * m2)));
+                break;
+            case 4:
+                m1 = Math.RandF();
+                m2 = Math.RandF();
+                m3 = Math.RandF();
+                t = Math.RandF() * (m3 * (m2 * m1));
+                break;
+            case 5:
+                m1 = Math.RandF();
+                m2 = Math.RandF();
+                m3 = Math.RandF();
+                m4 = Math.RandF();
+                t = (float)(kPppRyjMegaBirthModelOneF64 - (double)(Math.RandF() * (m4 * (m3 * (m2 * m1)))));
+                break;
+            }
+            {
+                if ((s32)work->m_unused1E >= (s32)pathInfo[1]) {
                     work->m_unused1E = 0;
                 }
-                sampleIndex = (u16)((s32)(t * (float)pathInfo[1]));
+                s32 sampleIndex = (s32)(t * (float)pathInfo[1]);
+                Vec* pathVec = pathBase + ((u16*)*(int*)(pathInfo + 2))[sampleIndex];
+                vx = pathVec->x;
+                vy = pathVec->y;
+                vz = pathVec->z;
             }
-
-            Vec* pathVec = pathBase + ((u16*)*(int*)(pathInfo + 2))[sampleIndex];
-            spawnPoint.x = pathVec->x * params->m_directionScale.x;
-            spawnPoint.y = pathVec->y * params->m_directionScale.y;
-            spawnPoint.z = pathVec->z * params->m_directionScale.z;
+        have_vec:
+            t = particleData->m_matrix[0][3];
+            spawnPoint.x = t;
+            t = particleData->m_matrix[1][3];
+            spawnPoint.y = t;
+            t = particleData->m_matrix[2][3];
+            spawnPoint.z = t;
+            spawnPoint.x = vx * params->m_directionScale.x;
+            spawnPoint.y = vy * params->m_directionScale.y;
+            spawnPoint.z = vz * params->m_directionScale.z;
             particleData->m_matrix[0][3] = spawnPoint.x;
             particleData->m_matrix[1][3] = spawnPoint.y;
             particleData->m_matrix[2][3] = spawnPoint.z;

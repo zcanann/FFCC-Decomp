@@ -1333,10 +1333,9 @@ tmpArtifactBlock:
 		}
 	}
 
-	CRingMenu* ring = getBattleRingMenuForPort(getPartyJoybusPort(this));
-	ring->SetBattleCommand(0, primaryCommand, -1);
-	ring->SetBattleCommand(1, secondaryCommand, -1);
-	ring->SetBattleCommand(2, ringCommand, ringCommandArg);
+	getBattleRingMenuForPort(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4))->SetBattleCommand(0, primaryCommand, -1);
+	getBattleRingMenuForPort(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4))->SetBattleCommand(1, secondaryCommand, -1);
+	getBattleRingMenuForPort(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4))->SetBattleCommand(2, ringCommand, ringCommandArg);
 
 	}
 

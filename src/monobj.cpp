@@ -3521,15 +3521,18 @@ body:
 				return;
 			}
 			if (nextAction == -1) {
-				if (*reinterpret_cast<unsigned short*>(script + 0x10C) == 1) {
-					unsigned char* aiScript = script;
+				void** handle = object->m_scriptHandle;
+				unsigned char* scriptB = reinterpret_cast<unsigned char*>(handle[9]);
+				if (*reinterpret_cast<unsigned short*>(scriptB + 0x10C) == 1) {
+					unsigned char* aiScript = scriptB;
 					short aiState = monObj->m_aiState;
 					if (aiState != 0) {
 						aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-							(static_cast<int>(aiState) + *reinterpret_cast<short*>(script + 0x100)) * 0x1D0 + 0x10;
+							(static_cast<int>(aiState) + *reinterpret_cast<unsigned short*>(scriptB + 0x100)) * 0x1D0 + 0x10;
 					}
-					if (((*reinterpret_cast<unsigned short*>(script + 0xFE) & 8) != 0) ||
-						((*reinterpret_cast<unsigned short*>(aiScript + 0x102) & 0x100) != 0)) {
+					unsigned short aiFlags = *reinterpret_cast<unsigned short*>(aiScript + 0x102);
+					if (((*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(handle[9]) + 0xFE) & 8) != 0) ||
+						((aiFlags & 0x100) != 0)) {
 						actionState = 0;
 						memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
 						monObj->m_chaseState = 2;
@@ -3538,16 +3541,16 @@ body:
 						return;
 					}
 
-					actionState = 0x21;
 					CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
+					actionState = 0x21;
 					if (monObj->m_moveWork.m_mode != 1) {
 						memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
 						monObj->m_moveWork.m_flags = 0x205;
-						if (aiState == 0) {
+						if (monObj->m_aiState == 0) {
 							aiScript = script;
 						} else {
 							aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-								(static_cast<int>(aiState) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
+								(static_cast<int>(monObj->m_aiState) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
 						}
 						if ((*reinterpret_cast<unsigned short*>(aiScript + 0x102) & 0x40) != 0) {
 							monObj->m_moveWork.m_flags |= 0x10000;

@@ -788,20 +788,22 @@ void CMes::Calc()
 		return;
 	}
 
+	int fadeCurr;
+	int fadeMax;
 	int textEntry = (int)((char*)this + 0xC);
 	unsigned int maxAdvance = 0;
 	for (int i = 0; i < *(int*)((char*)this + 8); i++, textEntry += 0x14)
 	{
 		if ((int)(unsigned int)*(unsigned short*)(textEntry + 0xC) <= *(int*)((char*)this + 0x3C80))
 		{
-			int fadeMax = (*(signed char*)(textEntry + 0xF) >> 4) & 0xF;
-			int fadeCurr = (*(unsigned char*)(textEntry + 0xF) & 0xF) + 1;
+			CMesCharCell* cell = (CMesCharCell*)textEntry;
+			fadeCurr = cell->m_pad0F + 1;
+			fadeMax = cell->m_textAlign;
 			if (fadeCurr < fadeMax)
 			{
 				fadeMax = fadeCurr;
 			}
-			*(unsigned char*)(textEntry + 0xF) =
-			    (unsigned char)((fadeMax & 0xF) | (*(unsigned char*)(textEntry + 0xF) & 0xF0));
+			cell->m_pad0F = fadeMax;
 			maxAdvance = (unsigned int)*(unsigned char*)(textEntry + 0x13);
 		}
 	}
@@ -1581,7 +1583,6 @@ void CMes::Next()
 				*slot = *slot + 1;
 				break;
 			}
-			case 3:
 			case 4:
 				break;
 			}

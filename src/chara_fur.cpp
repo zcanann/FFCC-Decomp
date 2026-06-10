@@ -707,6 +707,11 @@ static inline float FurRandScale()
 	return kCharaFurDepthScaleBase * (FLOAT_80331164 * static_cast<float>(static_cast<int>(FurRandNext())) + kCharaFurViewDepthThreshold);
 }
 
+static inline float FurRandScaleL(float scaleBase, float randScale, float depthThreshold)
+{
+	return scaleBase * (randScale * static_cast<float>(static_cast<int>(FurRandNext())) + depthThreshold);
+}
+
 static inline CColor FurNoiseColor(const CColor& base, const CColor& noise, float scale)
 {
 	CColor scaledNoiseTmp;
@@ -2036,8 +2041,13 @@ void CChara::makeFurTex()
 	s_mogFurRand = 0;
 	s_mogFurMaxY = 0.0f;
 
+	float scaleBase = kCharaFurDepthScaleBase;
+	float randScale = FLOAT_80331164;
+	float depthThreshold = kCharaFurViewDepthThreshold;
+	float weightScale = kCharaFurWeightScale;
+
 	for (int i = 0; i < 0x20; i++) {
-		float velRandScale = FurRandScale();
+		float velRandScale = FurRandScaleL(scaleBase, randScale, depthThreshold);
 		CVector velScaleOut;
 		PSVECScale(&velRand, velScaleOut, velRandScale);
 		Vec velScaled;
@@ -2050,7 +2060,7 @@ void CChara::makeFurTex()
 		hairSet[i].m_vec0.y = velAddOut.y;
 		hairSet[i].m_vec0.z = velAddOut.z;
 
-		float accelRandScale = FurRandScale();
+		float accelRandScale = FurRandScaleL(scaleBase, randScale, depthThreshold);
 		CVector accelScaleOut;
 		PSVECScale(&accelRand, accelScaleOut, accelRandScale);
 		Vec accelScaled;
@@ -2063,10 +2073,10 @@ void CChara::makeFurTex()
 		hairSet[i].m_vec1.y = accelAddOut.y;
 		hairSet[i].m_vec1.z = accelAddOut.z;
 
-		hairSet[i].m_colors[0] = FurNoiseColor(furBaseColor, furNoiseBase, FurRandScale());
-		hairSet[i].m_colors[1] = FurNoiseColor(furTipColor, furNoiseRange, FurRandScale());
+		hairSet[i].m_colors[0] = FurNoiseColor(furBaseColor, furNoiseBase, FurRandScaleL(scaleBase, randScale, depthThreshold));
+		hairSet[i].m_colors[1] = FurNoiseColor(furTipColor, furNoiseRange, FurRandScaleL(scaleBase, randScale, depthThreshold));
 
-		float endY = hairSet[i].m_vec0.y + kCharaFurWeightScale * hairSet[i].m_vec1.y;
+		float endY = hairSet[i].m_vec0.y + weightScale * hairSet[i].m_vec1.y;
 		if (s_mogFurMaxY < endY) {
 			s_mogFurMaxY = endY;
 		}

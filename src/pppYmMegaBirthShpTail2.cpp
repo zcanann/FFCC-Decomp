@@ -136,16 +136,16 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
             float fadeGStep;
             float fadeBStep;
             float fadeAStep;
-            if (stepDivisor == kPppYmMegaBirthShpTail2Zero) {
-                fadeRStep = kPppYmMegaBirthShpTail2Half;
-                fadeGStep = kPppYmMegaBirthShpTail2Half;
-                fadeBStep = kPppYmMegaBirthShpTail2Half;
-                fadeAStep = kPppYmMegaBirthShpTail2Half;
-            } else {
+            if (stepDivisor != kPppYmMegaBirthShpTail2Zero) {
                 fadeGStep = fadeGNum / stepDivisor;
                 fadeBStep = fadeBNum / stepDivisor;
                 fadeAStep = fadeANum / stepDivisor;
                 fadeRStep = fadeRNum / stepDivisor;
+            } else {
+                fadeRStep = kPppYmMegaBirthShpTail2Half;
+                fadeGStep = kPppYmMegaBirthShpTail2Half;
+                fadeBStep = kPppYmMegaBirthShpTail2Half;
+                fadeAStep = kPppYmMegaBirthShpTail2Half;
             }
             Vec* history = (Vec*)(particle + 0x40);
             float drawScale;

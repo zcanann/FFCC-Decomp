@@ -1096,7 +1096,6 @@ void CCameraPcs::calcChara()
     Mtx mtxA;
     Vec targetPos;
     float stick;
-    Vec scaledDir;
 
     C_MTXPerspective(m_screenMatrix, m_fov, kCameraAspectRatio, m_nearZ, m_farZ);
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
@@ -1150,6 +1149,7 @@ void CCameraPcs::calcChara()
     Vec* eyePtr = CVector(DirectionVec());
     CVector scaledVec;
     PSVECScale(eyePtr, AsVec(scaledVec), kCameraHundredF);
+    Vec scaledDir;
     scaledDir.x = scaledVec.x;
     scaledDir.y = scaledVec.y;
     scaledDir.z = scaledVec.z;

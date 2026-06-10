@@ -677,14 +677,14 @@ void CMesMenu::onDraw()
                     heartOffset = 0x30;
                 }
 
-                float pulseSinScale = FLOAT_80330910;
                 float heartBaseX = frameX + (float)heartOffset;
                 float heartBaseY = FLOAT_8033090c + frameY;
-                float heartZero = FLOAT_803308d8;
-                float pulseBase = FLOAT_80330920;
-                float pulseAmp = FLOAT_8033091c;
-                float pulseOne = FLOAT_80330914;
+                float pulseSinScale = FLOAT_80330910;
                 float pulseTimerScale = FLOAT_80330918;
+                float pulseOne = FLOAT_80330914;
+                float pulseAmp = FLOAT_8033091c;
+                float pulseBase = FLOAT_80330920;
+                float heartZero = FLOAT_803308d8;
                 int heartValueOffset = 0;
 
                 for (int heartIndex = 0; heartIndex < (int)((unsigned int)heartFood->m_maxHp >> 1);

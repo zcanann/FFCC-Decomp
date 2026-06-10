@@ -1304,15 +1304,13 @@ int CChara::CModel::PickFur(
 	PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
 	const double negCursorY = -static_cast<double>(static_cast<float>(cursorYd) - kCharaFurScreenCenterY);
 
-	CMaterialSet* materialSet = ModelMaterialSet(this);
 	FurMeshRaw* mesh = ModelMeshes(this);
-	const unsigned short meshCount = ModelMeshCount(this);
 
 	FurProjectedVertex verts[3];
 	unsigned long curValid = 0;
 	Mtx44 invScreenMtx;
 
-	for (unsigned int meshIndex = 0; meshIndex < meshCount; meshIndex++, mesh++) {
+	for (unsigned int meshIndex = 0; meshIndex < ModelMeshCount(this); meshIndex++, mesh++) {
 		if (mesh->m_workPositions == 0) {
 			continue;
 		}
@@ -1337,7 +1335,7 @@ int CChara::CModel::PickFur(
 		FurDisplayListRaw* displayList = mesh->m_data->m_displayLists;
 		int displayCount = mesh->m_data->m_displayListCount;
 		while (--displayCount >= 0) {
-			CMaterial* material = materialSet->m_materials[displayList->m_material];
+			CMaterial* material = ModelMaterialSet(this)->m_materials[displayList->m_material];
 			unsigned int paintableMaterial = 0;
 			CTexture* pickTexture = material->GetFurPickTexture();
 			if (pickTexture != 0 && pickTexture->m_format == 5) {

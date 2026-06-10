@@ -1830,13 +1830,13 @@ void CCameraPcs::drawShadowEnd()
         C_MTXLightOrtho(m_fullScreenShadow.m_shadowTexMtx, -span, span, -span, span,
                         kCameraHalfF, kCameraHalfF, kCameraHalfF, kCameraHalfF);
         PSMTXScale(m_fullScreenShadow.m_depthScaleMtx, kCameraZeroF, kCameraZeroF, kCameraZeroF);
-        float one = kCameraOneF;
+        float scaleY = kCameraShadowDepthScaleY;
         float depthSpan = m_shadowCamera.m_farZ - m_shadowCamera.m_nearZ;
         m_fullScreenShadow.m_depthScaleMtx[0][2] = kCameraNegativeOneF / depthSpan;
         m_fullScreenShadow.m_depthScaleMtx[0][3] = -(m_shadowCamera.m_nearZ / depthSpan);
-        m_fullScreenShadow.m_depthScaleMtx[1][2] = m_fullScreenShadow.m_depthScaleMtx[0][2] * kCameraShadowDepthScaleY;
-        m_fullScreenShadow.m_depthScaleMtx[1][3] = m_fullScreenShadow.m_depthScaleMtx[0][3] * kCameraShadowDepthScaleY;
-        m_fullScreenShadow.m_depthScaleMtx[2][3] = one;
+        m_fullScreenShadow.m_depthScaleMtx[1][2] = m_fullScreenShadow.m_depthScaleMtx[0][2] * scaleY;
+        m_fullScreenShadow.m_depthScaleMtx[1][3] = m_fullScreenShadow.m_depthScaleMtx[0][3] * scaleY;
+        m_fullScreenShadow.m_depthScaleMtx[2][3] = kCameraOneF;
         PSMTXConcat(m_fullScreenShadow.m_shadowTexMtx,
                     m_shadowCamera.m_cameraMatrix,
                     m_fullScreenShadow.m_shadowTexMtx);

@@ -1995,7 +1995,7 @@ void CGPartyObj::onFrameStat()
 		statKorobi();
 		break;
 	case 0x22: {
-		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
+#define script (reinterpret_cast<unsigned char*>(m_scriptHandle))
 		if (m_stateFrame == 0) {
 			if (party.flags.flag04) {
 				if (*reinterpret_cast<unsigned short*>(script + 0x1C) == 0) {
@@ -2056,6 +2056,7 @@ void CGPartyObj::onFrameStat()
 			}
 			changeStat(0, 0, 0);
 		}
+#undef script
 		break;
 	}
 	default:

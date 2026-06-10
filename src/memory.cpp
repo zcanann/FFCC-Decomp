@@ -1190,13 +1190,15 @@ void CMemory::CStage::drawHeapBar(int y)
 
     CBlock* prevNode;
     CBlock* node;
+    CBlock* head;
     if (m_allocationMode == 2) {
-        node = stageBlockAt(stageGetHeapHead(this));
+        head = stageBlockAt(stageGetHeapHead(this));
     } else {
-        node = stageBlockAt(stageGetHeapHead(this))->m_next;
+        head = stageBlockAt(stageGetHeapHead(this))->m_next;
     }
 
-    prevNode = node->m_prev;
+    prevNode = head->m_prev;
+    node = head;
     unsigned char heapBar[0x17D];
     memset(heapBar, 0xFF, 0x17D);
 
@@ -1214,40 +1216,12 @@ void CMemory::CStage::drawHeapBar(int y)
         if (isUsed) {
             int fillEnd = ((reinterpret_cast<int>(curNode->m_next) - heapTop) * 0x17C) / heapSpan;
             int fillStart = ((reinterpret_cast<int>(payloadFromBlock(curNode)) - heapTop) * 0x17C) / heapSpan;
-            unsigned char* dst = heapBar + fillStart;
-            unsigned int fillCount = static_cast<unsigned int>(fillEnd + 1) - static_cast<unsigned int>(fillStart);
 
-            if (fillStart <= fillEnd) {
-                unsigned int loop = fillCount >> 3;
-                if (loop != 0) {
-                    do {
-                        dst[0] = static_cast<unsigned char>(curNode->m_flags >> 4);
-                        dst[1] = static_cast<unsigned char>(curNode->m_flags >> 4);
-                        dst[2] = static_cast<unsigned char>(curNode->m_flags >> 4);
-                        dst[3] = static_cast<unsigned char>(curNode->m_flags >> 4);
-                        dst[4] = static_cast<unsigned char>(curNode->m_flags >> 4);
-                        dst[5] = static_cast<unsigned char>(curNode->m_flags >> 4);
-                        dst[6] = static_cast<unsigned char>(curNode->m_flags >> 4);
-                        dst[7] = static_cast<unsigned char>(curNode->m_flags >> 4);
-                        dst += 8;
-                        loop--;
-                    } while (loop != 0);
-
-                    fillCount &= 7;
-                    if (fillCount == 0) {
-                        goto checkHeapNode;
-                    }
-                }
-
-                do {
-                    *dst = static_cast<unsigned char>(curNode->m_flags >> 4);
-                    dst++;
-                    fillCount--;
-                } while (fillCount != 0);
+            for (int i = fillStart; i <= fillEnd; i++) {
+                heapBar[i] = static_cast<unsigned char>(curNode->m_flags >> 4);
             }
         }
 
-checkHeapNode:
         if ((static_cast<unsigned int>(curNode->m_size) !=
              static_cast<unsigned int>(reinterpret_cast<int>(curNode->m_next) - reinterpret_cast<int>(payloadFromBlock(curNode)))) ||
             (static_cast<unsigned int>(reinterpret_cast<int>(curNode->m_prev)) !=

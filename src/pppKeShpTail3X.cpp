@@ -162,7 +162,6 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     float zDiff;
     float wDiff;
     float shapeScale;
-    float posZ;
     pppFVECTOR4 colorStart;
     pppFVECTOR4 colorEnd;
     float segRemain;
@@ -191,6 +190,7 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     float segDy;
     float invCountMinusOne;
     float drawScale;
+    float posZ;
     int life;
     s32 shapeFrameDuration;
     float nextBaseZ;

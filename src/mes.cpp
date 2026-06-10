@@ -181,7 +181,8 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
 				if (breakOnLineTag != 0)
 				{
 					font->SetPosX((float)(int)lineStartX);
-					font->SetPosY((float)lineBaseY + (font->posY + (float)font->m_glyphHeight * font->scaleY));
+					float lineAdvance = (float)font->m_glyphHeight * font->scaleY;
+					font->SetPosY((float)lineBaseY + (font->posY + lineAdvance));
 				}
 				break;
 			case 1:

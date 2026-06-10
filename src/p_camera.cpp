@@ -1405,22 +1405,20 @@ void CCameraPcs::createFullShadow()
     unsigned int rampTexSize;
     unsigned int i;
     unsigned char* rampTex;
+    CMapMng* map;
+    char* fileName;
 
+    fileName = const_cast<char*>(s_p_camera_cpp);
+    map = &MapMng;
     m_fullScreenShadow.m_shadowTexture = 0;
-    {
-        char* fileName = const_cast<char*>(s_p_camera_cpp);
-        CMapMng& map = MapMng;
-        m_fullScreenShadow.m_shadowTexture =
-            new (map.m_stage, fileName, 0x3A5)
-                u8[GXGetTexBufferSize(0x1E0, 0x1E0, GX_TF_I8, GX_FALSE, 0)];
-    }
+    m_fullScreenShadow.m_shadowTexture =
+        new (map->m_stage, fileName, 0x3A5)
+            u8[GXGetTexBufferSize(0x1E0, 0x1E0, GX_TF_I8, GX_FALSE, 0)];
+    fileName = const_cast<char*>(s_p_camera_cpp);
+    map = &MapMng;
     m_fullScreenShadow.m_rampTexture = 0;
-    {
-        char* fileName = const_cast<char*>(s_p_camera_cpp);
-        CMapMng& map = MapMng;
-        rampTex = new (map.m_stage, fileName, 0x361)
-            u8[rampTexSize = GXGetTexBufferSize(0x10, 0x10, GX_TF_I8, GX_FALSE, 0)];
-    }
+    rampTex = new (map->m_stage, fileName, 0x361)
+        u8[rampTexSize = GXGetTexBufferSize(0x10, 0x10, GX_TF_I8, GX_FALSE, 0)];
     m_fullScreenShadow.m_rampTexture = rampTex;
 
     for (i = 0; i < 0x100; i += 8) {

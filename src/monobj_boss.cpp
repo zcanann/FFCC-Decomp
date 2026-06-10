@@ -78,7 +78,7 @@ extern "C" Vec gLichTeleportPoints[] = {
 
 static const char sLichTeleportNodeA[] = "to_a_obj";
 static const char sLichTeleportNodeB[] = "to_b_obj";
-static const char sLichTeleportNodeFormat[] = "to_%02d_obj";
+static const char sLichTeleportNodeFormat[] = "to%02d_obj";
 
 struct MeteoParasiteCBossWork {
     int m_lichTeleportIndex;
@@ -2539,7 +2539,7 @@ void CGMonObj::frameStatFuncLastBoss()
 			prgObj->putParticle((object->m_charaModelHandle->GetPdtSlot() << 8) | 0x10, 0, object, 1.0f, 0);
 			prgObj->playSe3D(0x12912, 0x32, 0x96, 0, 0);
 		} else if (prgObj->m_stateFrame == 0x7D) {
-			object->m_bodyEllipsoidRadius = kMonObjBossQuarter;
+			object->m_bodyEllipsoidRadius = kMonObjBossRightAngleDeg;
 		} else if (prgObj->isLoopAnim() != 0) {
 			object->m_bgColMask |= 0x80000;
 			object->SetAnimSlot(0x12, 0);
@@ -2558,7 +2558,7 @@ void CGMonObj::frameStatFuncLastBoss()
 			prgObj->putParticle((object->m_charaModelHandle->GetPdtSlot() << 8) | 0x12, 0, object, 1.0f, 0);
 			prgObj->playSe3D(0x12913, 0x32, 0x96, 0, 0);
 		} else if (prgObj->m_stateFrame == 0x29) {
-			object->m_bodyEllipsoidRadius = kMonObjBossLargeBodyRadius;
+			object->m_bodyEllipsoidRadius = kMonObjBossLichTeleportHeight;
 		} else if (prgObj->isLoopAnim() != 0) {
 			object->m_bgColMask |= 0x80000;
 			prgObj->changeStat(0, 0, 0);
@@ -2578,7 +2578,7 @@ void CGMonObj::frameStatFuncLastBoss()
 				if (party != 0) {
 					CGPrgObj* partyPrg = reinterpret_cast<CGPrgObj*>(party);
 					if (partyPrg->m_lastStateId == 0x24) {
-						if (fabs(prgObj->getTargetRot(partyPrg)) < 0.5235987755982988) {
+						if (fabs(prgObj->getTargetRot(partyPrg)) < kMonObjBossQuarterPiF64) {
 							partyPrg->changeStat(0x25, 0, 0);
 						}
 					}

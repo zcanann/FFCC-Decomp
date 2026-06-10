@@ -2719,10 +2719,16 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 		CVector startPos;
 		PSVECAdd((Vec*)&worldPos, reinterpret_cast<Vec*>(&startOffset), reinterpret_cast<Vec*>(&startPos));
 
+		Vec startPosCopy;
+		Vec* copyPtr = &startPosCopy;
+		startPosCopy.x = startPos.x;
+		startPosCopy.y = startPos.y;
+		startPosCopy.z = startPos.z;
+
 		CMapCylinder hitCylinder(FLOAT_80331a9c, FLOAT_80331aa0);
-		hitCylinder.m_bottom.x = startPos.x;
-		hitCylinder.m_bottom.y = startPos.y;
-		hitCylinder.m_bottom.z = startPos.z;
+		hitCylinder.m_bottom.x = copyPtr->x;
+		hitCylinder.m_bottom.y = copyPtr->y;
+		hitCylinder.m_bottom.z = copyPtr->z;
 		hitCylinder.m_axis = rayDir;
 		hitCylinder.m_radius = radius;
 

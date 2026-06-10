@@ -28,8 +28,6 @@
 
 extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
     CMath*, Vec*, float*, Vec*, Vec*, Vec*, float, float, float);
-extern double DOUBLE_803303e8;
-extern double DOUBLE_80330400;
 extern const Vec DAT_801D9B88;
 extern const Vec DAT_801D9B94;
 
@@ -187,7 +185,7 @@ static const float sQuarterTurn = 1.5707964f;         // FLOAT_80330344
 extern "C" const double sLoopBias;                    // DOUBLE_80330378
 extern "C" const float sZeroFloat;                    // FLOAT_80330350
 static const float sPushDistance = 1000.0f;           // FLOAT_80330354
-extern const float sDownUnitY = -1.0f;                // FLOAT_80330358
+extern const float sDownUnitY = -2000.0f;             // FLOAT_80330358 = c4fa0000 (binary-verified)
 static const float sDownProbeDistance = -10000.0f;    // FLOAT_8033035c
 static const float sStepProbeHeight = 5.0f;           // FLOAT_80330360
 static const float sBgAttrSlow = 0.75f;               // FLOAT_80330364
@@ -222,11 +220,12 @@ extern "C" const float sSwayImpulse;               // FLOAT_803303cc (0.2)
 extern "C" const float sSwayDotLimit;              // FLOAT_803303d0 (0.9999)
 extern "C" const float sSwayDamping;               // FLOAT_803303d8 (0.9)
 extern "C" const float sNegWobbleBiasSmall;        // FLOAT_803303dc (-0.05)
-extern "C" const double sYawLookCutoff;            // DOUBLE_803303e0 (pi/2)
-extern "C" const double sPitchLookCutoff;          // DOUBLE_803303e8 (pi/4)
+extern "C" const double sYawLookCutoff = 1.5707963705062866;   // DOUBLE_803303e0 = 3ff921fb60000000 = (double)(pi/2 f)
+extern "C" const double sPitchLookCutoff = 0.7853981852531433; // DOUBLE_803303e8 = 3fe921fb60000000 = (double)(pi/4 f)
 extern "C" const float sLookBlendScale;            // FLOAT_803303f0 (0.001)
 extern "C" const float sFarVisibleDepth;           // FLOAT_803303f4 (10000)
 extern "C" const float sNearVisibleDepth;          // FLOAT_803303f8 (750)
+extern const double DOUBLE_80330400 = 0.0010000000474974513;   // 3f50624de0000000 = (double)0.001f
 
 /*
  * --INFO--
@@ -655,7 +654,7 @@ void CGObject::move()
             }
 
             if ((*reinterpret_cast<u32*>(&m_radiusCtrl.x) & 0x400000) != 0) {
-                speed *= sQuarterTurn;
+                speed *= sBgAttrSlow;
             }
 
             PSVECScale(&moveVec, &moveVec, speed);
@@ -714,7 +713,7 @@ void CGObject::move()
 
     const double rotDelta = static_cast<double>(Math.DstRot(m_rotTargetY, m_rotBaseY));
     m_animSlotSel = (reinterpret_cast<s8*>(&m_shieldNodeFlags) + 1)
-        [(fabs(rotDelta) <= DOUBLE_803303e8) ? 0 : 1];
+        [(fabs(rotDelta) <= sPitchLookCutoff) ? 0 : 1];
 }
 
 /*
@@ -828,7 +827,7 @@ void CGObject::objectCollision()
                     if (!usePushTimers || (m_collisionPushTimerMax != 0) || (other->m_collisionPushTimerMax == 0)) {
                         const float thisPush = static_cast<float>(m_pushParamA + m_pushParamB);
                         const float otherPush = static_cast<float>(other->m_pushParamA + other->m_pushParamB);
-                        const float rawSplit = 0.5f + (thisPush - otherPush) / 510.0f;
+                        const float rawSplit = sBgAttrNormal + (thisPush - otherPush) / sCrossCheckOuterRadius;
                         float split;
                         if (rawSplit < sZeroFloat) {
                             split = sZeroFloat;
@@ -2516,7 +2515,7 @@ void CGObject::boundCheck()
     if ((m_charaModelHandle != 0) && (m_charaModelHandle->m_model != 0)) {
         const float zero = sZeroFloat;
         const float oneF = sAnimFrameOffset;
-        const float clipLimit = 2.0f;
+        const float clipLimit = sNegativeOne;
 
         clipMask = 0x1F;
         s32 i = 0;

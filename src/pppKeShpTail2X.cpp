@@ -136,6 +136,7 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     Vec zeroVec;
     Vec initialSeg;
     Vec pos;
+    Vec zeroVecB;
     Vec seg;
     float segLen;
     float segRemain;
@@ -330,10 +331,10 @@ move_next_segment:
     seg.x = segDx;
     seg.y = segDy;
     seg.z = segDz;
-    zeroVec.x = kPppKeShpTail2XZero;
-    zeroVec.y = kPppKeShpTail2XZero;
-    zeroVec.z = kPppKeShpTail2XZero;
-    segLen = PSVECDistance(&zeroVec, &seg);
+    zeroVecB.x = kPppKeShpTail2XZero;
+    zeroVecB.y = kPppKeShpTail2XZero;
+    zeroVecB.z = kPppKeShpTail2XZero;
+    segLen = PSVECDistance(&zeroVecB, &seg);
     segRemain += segLen;
     goto advance_segment;
 }

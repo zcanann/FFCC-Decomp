@@ -590,7 +590,7 @@ void CGObject::move()
                 : Pad.GetPadInputs()[RemapPadSlot(&Pad, player)].buttonDown[0];
             const u16 buttonsRepeat = (Pad.m_debugPadLock != 0 || (player == 0 && Pad.m_debugPadPort != -1))
                 ? 0
-                : Pad.GetPadInputs()[RemapPadSlot(&Pad, player)].repeatButton;
+                : Pad.GetPadInputs()[RemapPadSlot(&Pad, player)].buttonUp;
 
             if ((buttons != 0) && (buttonsRepeat != 0)) {
                 buttons |= buttonsRepeat;

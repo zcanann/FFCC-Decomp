@@ -1835,16 +1835,17 @@ void CGPartyObj::onFrameStat()
 		    Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
 		    (static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
 		    reinterpret_cast<int*>(m_scriptHandle)[0xED] != 0) {
+			unsigned int chalice = Game.unk_flat3_0xc7d0;
 			if (m_stateFrame == 0) {
 				CancelMove(1);
 				FLOAT_8032EE78 = m_targetDist - FLOAT_80331ac4;
-				FLOAT_8032EE7C = *reinterpret_cast<float*>(Game.unk_flat3_0xc7d0 + 0x160) - m_worldPosition.y;
+				FLOAT_8032EE7C = *reinterpret_cast<float*>(chalice + 0x160) - m_worldPosition.y;
 			}
 
 			if (m_stateFrame <= 0x0B) {
 				const float phase = sinf((FLOAT_80331AB8 * static_cast<float>(m_stateFrame)) / FLOAT_80331AC0);
-				m_extraMoveVec.x = FLOAT_8032EE78 * phase * sinf(m_rotBaseY);
-				m_extraMoveVec.z = FLOAT_8032EE78 * phase * cosf(m_rotBaseY);
+				m_extraMoveVec.x = FLOAT_8032EE78 * (phase * sinf(m_rotBaseY));
+				m_extraMoveVec.z = FLOAT_8032EE78 * (phase * cosf(m_rotBaseY));
 				m_extraMoveVec.y = FLOAT_8032EE7C * phase + FLOAT_80331A98;
 			}
 		}

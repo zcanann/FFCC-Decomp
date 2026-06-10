@@ -1585,9 +1585,9 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 		short* modelList = modelIndices + 1;
 		u32 pppResSet = *reinterpret_cast<u32*>(pppMngSt->m_pppResSet);
 
-		for (short i = 0; i < modelCount; i++, modelList++)
+		for (short i = 0; i < modelCount; i++)
 		{
-			pppModelSt* mapMesh = *(pppModelSt**)(*(u32*)(pppResSet + 0x14) + *modelList * 4);
+			pppModelSt* mapMesh = *(pppModelSt**)(*(u32*)(pppResSet + 0x14) + *modelList++ * 4);
 
 			if (ppvAmemCacheSet.IsEnable(mapMesh->m_cacheId) == 0)
 			{
@@ -1604,11 +1604,10 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 		short shapeCount = *shapeIndices;
 		short* shapeList = shapeIndices + 1;
 		pppResSet = *reinterpret_cast<u32*>(pppMngSt->m_pppResSet);
-		u32 shapeNames = *(u32*)(pppResSet + 0x18);
 
-		for (short i = 0; i < shapeCount; i++, shapeList++)
+		for (short i = 0; i < shapeCount; i++)
 		{
-			pppCacheLoadShapeTexture(*(pppShapeSt**)(shapeNames + *shapeList * 4), PartMng.m_materialSet);
+			pppCacheLoadShapeTexture(*(pppShapeSt**)(*(u32*)(pppResSet + 0x18) + *shapeList++ * 4), PartMng.m_materialSet);
 		}
 
 		pppMngSt->m_mapTexLoaded = 1;

@@ -114,6 +114,24 @@ static inline unsigned int SwapU32Value(unsigned int value)
 	return (value << 24) | ((value >> 8) & 0xFF00) | ((value << 8) & 0xFF0000) | (value >> 24);
 }
 
+// First objects in gbaque.o's .rodata (0x801DB2E0).  They anchor the rodata
+// pool base used by MakeLetterList and friends; the letter item tables are the
+// FFFF-terminated {type,variant} pair lists shipped to the GBA client.
+__declspec(section ".rodata") static const char s_gba_dvd_dir[] = "dvd/gba/";
+__declspec(section ".rodata") static const char s_gba_ffcc_cli_bin[] = "ffcc_cli.bin";
+__declspec(section ".rodata") static const char s_gba_objdat_spt[] = "objdat.spt";
+__declspec(section ".rodata") static const char s_gba_icon_dat[] = "icon.dat";
+__declspec(section ".rodata") static const char s_gba_game_title[] = "FF Crystal Chronicles";
+__declspec(section ".rodata") static const unsigned short sGbaLetterItemTable0[] = {
+	0x0100, 0x0101, 0x0102, 0x0400, 0x0500, 0x0600, 0x0700, 0x0800,
+	0x0900, 0x0A00, 0x0B00, 0x0B01, 0x0C00, 0x0D00, 0x2000, 0x2001,
+	0x2002, 0x2003, 0x2004, 0x2100, 0xFFFF,
+};
+__declspec(section ".rodata") static const unsigned short sGbaLetterItemTable1[] = {
+	0x0100, 0x0102, 0x0C00, 0x0D00, 0x2000, 0x2001, 0x2002, 0x2003,
+	0x2004, 0x2100, 0xFFFF,
+};
+
 extern "C" const char s_gbaque_cpp[] = "gbaque.cpp";
 static const char sGbaQueueMemoryAllocationErrorFmt[] = "%s(%d): Error: memory allocation error\n";
 static const char s_compatibility_data_error[] = "compatibility data error!!\n";
@@ -361,7 +379,7 @@ void GbaQueue::LoadAll()
 		OSWaitSemaphore(&accessSemaphores[i]);
 	}
 	{
-		signed char resetMask = static_cast<unsigned char>(obj[0x2D30]);
+		unsigned char resetMask = static_cast<unsigned char>(obj[0x2D30]);
 		obj[0x2D30] = 0;
 		for (i = 0; i < 4; i++) {
 			OSSignalSemaphore(&accessSemaphores[i]);
@@ -834,7 +852,7 @@ void GbaQueue::ExecutQueue()
 							unsigned char* bytes = reinterpret_cast<unsigned char*>(&cmdWord);
 							int n;
 							const int quantity = bytes[3];
-							int shopItem = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_shopList[bytes[2]];
+							unsigned int shopItem = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_shopList[bytes[2]];
 							for (n = 0; n < quantity; n++) {
 								bool added = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->AddItem(shopItem, 0);
 								if (added == false) {
@@ -1331,7 +1349,7 @@ void GbaQueue::LoadPlayerStat()
 				*reinterpret_cast<int*>(entry + 0x24) = caravanWork->m_gil;
 				{
 					unsigned short progress = 0xFF;
-					if (caravanWork->m_progressValue < 0x100) {
+					if (caravanWork->m_progressValue <= 0xFF) {
 						progress = caravanWork->m_progressValue;
 					}
 					*reinterpret_cast<unsigned short*>(entry + 0x14) = progress;
@@ -1350,7 +1368,7 @@ void GbaQueue::LoadPlayerStat()
 					const int saveSlot = caravanWork->m_saveSlot;
 					entry[0] = static_cast<unsigned char>(saveSlot);
 					entry[4] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x12]);
-					unsigned char l0 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][0];
+					signed char l0 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][0];
 					unsigned char l1 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][1];
 					entry[5] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x13]);
 					unsigned char l2 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][2];
@@ -1359,7 +1377,7 @@ void GbaQueue::LoadPlayerStat()
 					unsigned char l4 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][4];
 					unsigned char l5 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][5];
 					entry[7] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x15]);
-					unsigned char l6 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][6];
+					signed char l6 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][6];
 					unsigned char l7 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][7];
 					entry[8] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x16]);
 					entry[9] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x17]);
@@ -2176,6 +2194,9 @@ int GbaQueue::GetPlayerHP(int channel, unsigned char* outData)
 	int channelMask = 1 << channel;
 	char curShouki = static_cast<char>(m_outOfShoukiFlags & channelMask);
 	char prevShouki = static_cast<char>(m_prevOutOfShoukiFlags & channelMask);
+	if (hp != prevHp) {
+		changed = 1;
+	}
 	if (curShouki != prevShouki) {
 		changed = 1;
 	}
@@ -2185,7 +2206,7 @@ int GbaQueue::GetPlayerHP(int channel, unsigned char* outData)
 	outData[2] = static_cast<unsigned char>(hp);
 	outData[3] = ((m_outOfShoukiFlags & channelMask) != 0);
 
-	return changed;
+	return static_cast<unsigned char>(changed);
 }
 
 /*
@@ -4839,7 +4860,7 @@ unsigned int GbaQueue::GetControllerMode()
 	} while (i < 4);
 
 	mode = m_controllerMode;
-	result = static_cast<unsigned int>(-static_cast<int>(mode) | static_cast<int>(mode)) >> 31;
+	result = static_cast<unsigned int>(-static_cast<unsigned int>(mode) | static_cast<int>(mode)) >> 31;
 
 	i = 0;
 	do {
@@ -4905,9 +4926,9 @@ void GbaQueue::OpenMenu(int channel, int menuId, int controlMode)
 		retries++;
 	} while (retries < 10);
 
-	OSSemaphore* semaphore = accessSemaphores + channel;
+	OSSemaphore* semaphore = GbaQue.accessSemaphores + channel;
 	OSWaitSemaphore(semaphore);
-	char menuStageMode = m_singleMode;
+	char menuStageMode = GbaQue.m_singleMode;
 	isSingleMode =
 		(static_cast<unsigned int>(__cntlzw(1 - static_cast<int>(menuStageMode))) >>
 		 5) &
@@ -4926,7 +4947,7 @@ void GbaQueue::OpenMenu(int channel, int menuId, int controlMode)
 	}
 
 	OSWaitSemaphore(semaphore);
-	menuStageMode = m_singleMode;
+	menuStageMode = GbaQue.m_singleMode;
 	isSingleMode =
 		(static_cast<unsigned int>(__cntlzw(1 - static_cast<int>(menuStageMode))) >>
 		 5) &
@@ -4999,7 +5020,7 @@ unsigned int GbaQueue::GetPauseMode()
 	} while (i < 4);
 
 	mode = m_pauseMode;
-	result = static_cast<unsigned int>(-static_cast<int>(mode) | static_cast<int>(mode)) >> 31;
+	result = static_cast<unsigned int>(-static_cast<unsigned int>(mode) | static_cast<int>(mode)) >> 31;
 
 	i = 0;
 	do {

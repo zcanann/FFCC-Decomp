@@ -1215,7 +1215,7 @@ gbaque.cpp:
 	extabindex  start:0x8000EEFC end:0x8000F460
 	.text       start:0x800C8A8C end:0x800D160C
 	.ctors      start:0x801D5430 end:0x801D5434
-	.rodata     start:0x801DB370 end:0x801DB4AF
+	.rodata     start:0x801DB2E0 end:0x801DB4AF
 	.bss        start:0x802F49B0 end:0x802F7720
 	.sdata2     start:0x80330D50 end:0x80330D78
 

@@ -3078,7 +3078,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
 
             OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
-            unsigned int length = buf.m_length;
+            int length = buf.m_length;
 
             if (length == 0)
             {

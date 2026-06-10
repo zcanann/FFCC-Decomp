@@ -2751,67 +2751,32 @@ void CShopMenu::SelectFigure()
 
     if ((GetShopMenuListButtons() & 8) != 0) {
         switch (m_figureMode) {
-        case 1: {
-            m_quantity += 10;
-            CCaravanWork* caravanWork = m_caravanWork;
-            if (m_quantity <= (0x40 - static_cast<short>(caravanWork->m_inventoryItemCount))) {
-                int totalGil = 0;
-                if (m_selectedIndex != -1) {
-                    int itemId = getItemNo(m_selectedIndex);
-                    int unitGil;
-                    if (m_listType == 0) {
-                        if (itemId <= 0) {
-                            unitGil = 0;
-                        } else {
-                            int gil = caravanWork->m_shopParam *
-                                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x20);
-                            unitGil = gil / 100;
-                        }
-                    } else if (m_listType == 1) {
-                        if (itemId <= 0) {
-                            unitGil = 0;
-                        } else {
-                            int gil = caravanWork->m_shopParam *
-                                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x20);
-                            unitGil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil / 100));
-                        }
-                    } else {
-                        unitGil = -1;
-                    }
-                    totalGil = m_quantity * unitGil;
-                }
-                if (caravanWork->CanAddGil(-totalGil) != 0) {
-                    Sound.PlaySe(1, 0x40, 0x7F, 0);
-                    return;
-                }
-            }
-
-            m_quantity -= 10;
-            Sound.PlaySe(4, 0x40, 0x7F, 0);
-            break;
-        }
         case 0: {
             ++m_quantity;
             CCaravanWork* caravanWork = m_caravanWork;
-            if (m_quantity <= (0x40 - static_cast<unsigned short>(caravanWork->m_inventoryItemCount))) {
-                int totalGil = 0;
-                if (m_selectedIndex != -1) {
+            if (m_quantity <= (0x40 - caravanWork->m_inventoryItemCount)) {
+                int totalGil;
+                if (m_selectedIndex == -1) {
+                    totalGil = 0;
+                } else {
                     int itemId = getItemNo(m_selectedIndex);
                     int unitGil;
                     if (m_listType == 0) {
                         if (itemId <= 0) {
                             unitGil = 0;
                         } else {
+                            int costBase = itemId * 0x48;
                             int gil = caravanWork->m_shopParam *
-                                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x20);
+                                      *reinterpret_cast<unsigned short*>(costBase + Game.unkCFlatData0[2] + 0x20);
                             unitGil = gil / 100;
                         }
                     } else if (m_listType == 1) {
                         if (itemId <= 0) {
                             unitGil = 0;
                         } else {
+                            int costBase = itemId * 0x48;
                             int gil = caravanWork->m_shopParam *
-                                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x20);
+                                      *reinterpret_cast<unsigned short*>(costBase + Game.unkCFlatData0[2] + 0x20);
                             unitGil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil / 100));
                         }
                     } else {
@@ -2820,14 +2785,61 @@ void CShopMenu::SelectFigure()
                     totalGil = m_quantity * unitGil;
                 }
                 if (caravanWork->CanAddGil(-totalGil) != 0) {
-                    Sound.PlaySe(1, 0x40, 0x7F, 0);
-                    return;
+                    goto cancelInc1;
                 }
             }
 
             gShopMenuInputLatch = 8;
             --m_quantity;
             Sound.PlaySe(4, 0x40, 0x7F, 0);
+            break;
+        cancelInc1:
+            Sound.PlaySe(1, 0x40, 0x7F, 0);
+            break;
+        }
+        case 1: {
+            m_quantity += 10;
+            CCaravanWork* caravanWork = m_caravanWork;
+            if (m_quantity <= (0x40 - caravanWork->m_inventoryItemCount)) {
+                int totalGil;
+                if (m_selectedIndex == -1) {
+                    totalGil = 0;
+                } else {
+                    int itemId = getItemNo(m_selectedIndex);
+                    int unitGil;
+                    if (m_listType == 0) {
+                        if (itemId <= 0) {
+                            unitGil = 0;
+                        } else {
+                            int costBase = itemId * 0x48;
+                            int gil = caravanWork->m_shopParam *
+                                      *reinterpret_cast<unsigned short*>(costBase + Game.unkCFlatData0[2] + 0x20);
+                            unitGil = gil / 100;
+                        }
+                    } else if (m_listType == 1) {
+                        if (itemId <= 0) {
+                            unitGil = 0;
+                        } else {
+                            int costBase = itemId * 0x48;
+                            int gil = caravanWork->m_shopParam *
+                                      *reinterpret_cast<unsigned short*>(costBase + Game.unkCFlatData0[2] + 0x20);
+                            unitGil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil / 100));
+                        }
+                    } else {
+                        unitGil = -1;
+                    }
+                    totalGil = m_quantity * unitGil;
+                }
+                if (caravanWork->CanAddGil(-totalGil) != 0) {
+                    goto cancelInc10;
+                }
+            }
+
+            m_quantity -= 10;
+            Sound.PlaySe(4, 0x40, 0x7F, 0);
+            break;
+        cancelInc10:
+            Sound.PlaySe(1, 0x40, 0x7F, 0);
             break;
         }
         }
@@ -2839,20 +2851,20 @@ void CShopMenu::SelectFigure()
     }
 
     switch (m_figureMode) {
-    case 1:
-        m_quantity -= 10;
-        if (m_quantity < 1) {
-            m_quantity += 10;
-            Sound.PlaySe(4, 0x40, 0x7F, 0);
-        } else {
-            Sound.PlaySe(1, 0x40, 0x7F, 0);
-        }
-        break;
     case 0:
         --m_quantity;
         if (m_quantity < 1) {
             gShopMenuInputLatch = 4;
             m_quantity = 1;
+            Sound.PlaySe(4, 0x40, 0x7F, 0);
+        } else {
+            Sound.PlaySe(1, 0x40, 0x7F, 0);
+        }
+        break;
+    case 1:
+        m_quantity -= 10;
+        if (m_quantity < 1) {
+            m_quantity += 10;
             Sound.PlaySe(4, 0x40, 0x7F, 0);
         } else {
             Sound.PlaySe(1, 0x40, 0x7F, 0);
@@ -2915,7 +2927,7 @@ void CShopMenu::SelectItemIdx()
                             unitGil = 0;
                         } else {
                             int gil = caravanWork->m_shopParam *
-                                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x20);
+                                      reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48)[0x10];
                             unitGil = gil / 100;
                         }
                     } else if (m_listType == 1) {
@@ -2923,7 +2935,7 @@ void CShopMenu::SelectItemIdx()
                             unitGil = 0;
                         } else {
                             int gil = caravanWork->m_shopParam *
-                                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x20);
+                                      reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48)[0x10];
                             unitGil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil / 100));
                         }
                     } else {

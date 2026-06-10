@@ -171,6 +171,11 @@ static inline float (*ModelDrawMtx(CChara::CModel* model))[4]
     return model->m_matrix;
 }
 
+static inline float (*ModelWorldDrawMtx(CChara::CModel* model))[4]
+{
+    return model->m_drawMtx;
+}
+
 static inline int ModelPosQuant(CChara::CModel* model)
 {
     return model->m_data->m_posQuant;
@@ -1312,9 +1317,9 @@ int CChara::CModel::PickFur(
 
 		Mtx meshMtx;
 		if (mesh->m_data->m_skinCount != 0) {
-			PSMTXCopy(ModelDrawMtx(this), meshMtx);
+			PSMTXCopy(ModelWorldDrawMtx(this), meshMtx);
 		} else {
-			PSMTXConcat(ModelDrawMtx(this), nodes[mesh->m_data->m_nodeIndex].m_mtx, meshMtx);
+			PSMTXConcat(ModelWorldDrawMtx(this), nodes[mesh->m_data->m_nodeIndex].m_mtx, meshMtx);
 		}
 
 		Mtx modelViewMtx;
@@ -1717,9 +1722,9 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 
 		Mtx meshMtx;
 		if (mesh->m_data->m_skinCount != 0) {
-			PSMTXCopy(ModelDrawMtx(this), meshMtx);
+			PSMTXCopy(ModelWorldDrawMtx(this), meshMtx);
 		} else {
-			PSMTXConcat(ModelDrawMtx(this), nodes[mesh->m_data->m_nodeIndex].m_mtx, meshMtx);
+			PSMTXConcat(ModelWorldDrawMtx(this), nodes[mesh->m_data->m_nodeIndex].m_mtx, meshMtx);
 		}
 
 		int shadowCount = 0;

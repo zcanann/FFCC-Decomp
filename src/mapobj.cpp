@@ -1788,7 +1788,7 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
         PSMTXMultVec(inverseMtx, &cylinder->m_top, &localCylinder.m_top);
 
         localCylinder.m_radius = cylinder->m_radius;
-        float marginX = LoadFloat(kMapObjZero) + localCylinder.m_radius;
+        float marginX = kMapObjZero + localCylinder.m_radius;
 
         if (localCylinder.m_bottom.x < localCylinder.m_top.x) {
             localCylinder.m_bound.m_min.x = localCylinder.m_bottom.x - marginX;
@@ -1823,6 +1823,7 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
         unsigned char xyOverlap = 0;
         {
             int xOverlap = 0;
+            int yOverlap = 0;
             float positionMinX = mapHit->m_positionMin.x;
             if (positionMinX < localCylinder.m_bound.m_min.x) {
                 xOverlap = localCylinder.m_bound.m_min.x <= mapHit->m_positionMax.x;
@@ -1833,7 +1834,6 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
             }
 
             if (xOverlap) {
-                int yOverlap = 0;
                 float positionMinY = mapHit->m_positionMin.y;
                 if (positionMinY < localCylinder.m_bound.m_min.y) {
                     yOverlap = localCylinder.m_bound.m_min.y <= mapHit->m_positionMax.y;
@@ -1900,7 +1900,7 @@ void CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned l
         PSMTXMultVec(inverseMtx, &cylinder->m_top, &localCylinder.m_top);
 
         localCylinder.m_radius = cylinder->m_radius;
-        float marginX = LoadFloat(kMapObjZero) + localCylinder.m_radius;
+        float marginX = kMapObjZero + localCylinder.m_radius;
 
         if (localCylinder.m_bottom.x < localCylinder.m_top.x) {
             localCylinder.m_bound.m_min.x = localCylinder.m_bottom.x - marginX;
@@ -1935,6 +1935,7 @@ void CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned l
         unsigned char xyOverlap = 0;
         {
             int xOverlap = 0;
+            int yOverlap = 0;
             float positionMinX = mapHit->m_positionMin.x;
             if (positionMinX < localCylinder.m_bound.m_min.x) {
                 xOverlap = localCylinder.m_bound.m_min.x <= mapHit->m_positionMax.x;
@@ -1945,7 +1946,6 @@ void CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned l
             }
 
             if (xOverlap) {
-                int yOverlap = 0;
                 float positionMinY = mapHit->m_positionMin.y;
                 if (positionMinY < localCylinder.m_bound.m_min.y) {
                     yOverlap = localCylinder.m_bound.m_min.y <= mapHit->m_positionMax.y;

@@ -545,7 +545,7 @@ inline void CMenuPcs::LetterInit4()
 bool CMenuPcs::LetterOpen()
 {
 	int iVar4;
-	unsigned int iVar5;
+	int iVar5;
 	int iVar6;
 	int iVar8;
 	float fVar1;
@@ -556,6 +556,7 @@ bool CMenuPcs::LetterOpen()
 		memset(GetLetterAnimStorage(this), 0, sizeof(*GetLetterAnimStorage(this)));
 		fVar1 = FLOAT_803330f8;
 		iVar4 = GetLetterAnimBase(this) + 8;
+		int dur = 10;
 		iVar8 = 8;
 		do {
 			*reinterpret_cast<float*>(iVar4 + 0x14) = fVar1;
@@ -569,19 +570,20 @@ bool CMenuPcs::LetterOpen()
 			iVar4 += 0x200;
 			--iVar8;
 		} while (iVar8 != 0);
-		iVar4 = GetLetterAnimBase(this);
-		*reinterpret_cast<int*>(iVar4 + 0x24) = 0;
-		*reinterpret_cast<int*>(iVar4 + 0x2C) = 0;
-		*reinterpret_cast<int*>(iVar4 + 0x30) = 10;
-		iVar4 = GetLetterAnimBase(this);
-		*reinterpret_cast<int*>(iVar4 + 0x64) = 0;
-		*reinterpret_cast<unsigned int*>(iVar4 + 0x6C) =
-			~(((-static_cast<int>(static_cast<char>(m_singleMenuCtrlResetFlag)) |
-				static_cast<int>(static_cast<char>(m_singleMenuCtrlResetFlag))) >>
-			   31)) &
-			10;
-		*reinterpret_cast<int*>(iVar4 + 0x70) = 10;
-		GetLetterAnimStorage(this)->count = 2;
+		int n = 0;
+		s16* p = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n++]);
+		*reinterpret_cast<int*>(p + 0xE) = 0;
+		*reinterpret_cast<int*>(p + 0x12) = 0;
+		*reinterpret_cast<int*>(p + 0x14) = dur;
+		p = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n++]);
+		*reinterpret_cast<int*>(p + 0xE) = 0;
+		*reinterpret_cast<unsigned int*>(p + 0x12) =
+			dur &
+			~((-static_cast<int>(static_cast<char>(m_singleMenuCtrlResetFlag)) |
+			   static_cast<int>(static_cast<char>(m_singleMenuCtrlResetFlag))) >>
+			  31);
+		*reinterpret_cast<int*>(p + 0x14) = dur;
+		GetLetterAnimStorage(this)->count = static_cast<s16>(n);
 		m_singMenuState->frame = 0;
 		m_singMenuState->initialized = 1;
 		iVar4 = SingGetLetterAttachflg();
@@ -602,11 +604,12 @@ bool CMenuPcs::LetterOpen()
 				iVar4 += 0x200;
 				--iVar8;
 			} while (iVar8 != 0);
-			iVar4 = GetLetterAnimBase(this);
-			*reinterpret_cast<int*>(iVar4 + 0x24) = 0;
-			*reinterpret_cast<int*>(iVar4 + 0x2C) = 0;
-			*reinterpret_cast<int*>(iVar4 + 0x30) = 10;
-			GetLetterAnimStorage(this)->count = 1;
+			int n2 = 0;
+			s16* p2 = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n2++]);
+			*reinterpret_cast<int*>(p2 + 0xE) = 0;
+			*reinterpret_cast<int*>(p2 + 0x12) = 0;
+			*reinterpret_cast<int*>(p2 + 0x14) = 10;
+			GetLetterAnimStorage(this)->count = static_cast<s16>(n2);
 			m_singMenuState->frame = 0;
 			m_singMenuState->selectedIndex = static_cast<s16>(s_BackUpCur[0]);
 			m_singMenuState->scrollIndex = static_cast<s16>(s_BackUpCur[1]);
@@ -632,9 +635,8 @@ bool CMenuPcs::LetterOpen()
 	iVar5 = static_cast<int>(GetLetterAnimStorage(this)->count);
 	psVar7 = GetLetterPanelBase(this);
 	iVar8 = static_cast<int>(m_singMenuState->frame);
-	iVar4 = iVar5;
-	if (0 < iVar5) {
-		do {
+	for (iVar4 = 0; iVar4 < iVar5; ++iVar4) {
+		{
 			fVar1 = FLOAT_803330bc;
 			if (iVar8 >= *reinterpret_cast<int*>(psVar7 + 0x12)) {
 				if (*reinterpret_cast<int*>(psVar7 + 0x12) + *reinterpret_cast<int*>(psVar7 + 0x14) <= iVar8) {
@@ -657,9 +659,8 @@ bool CMenuPcs::LetterOpen()
 					}
 				}
 			}
-			psVar7 += 0x20;
-			iVar4 = iVar4 + -1;
-		} while (iVar4 != 0);
+		}
+		psVar7 += 0x20;
 	}
 	bool allFinished = iVar5 == iVar6;
 	if (allFinished) {

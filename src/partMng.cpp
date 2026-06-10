@@ -409,6 +409,14 @@ void CPartMng::Destroy()
         int m_refCount;
     };
 
+    struct PartMngModelStBlock {
+        pppModelSt m_entries[0x100];
+    };
+
+    struct PartMngShapeStBlock {
+        pppShapeSt m_entries[0x100];
+    };
+
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     PartMngResRaw* res = reinterpret_cast<PartMngResRaw*>(self);
 
@@ -434,7 +442,7 @@ void CPartMng::Destroy()
                     }
                 }
             }
-            delete[] modelArr;
+            delete reinterpret_cast<PartMngModelStBlock*>(modelArr);
         }
         res->m_pppModelStArr = 0;
     }
@@ -447,11 +455,11 @@ void CPartMng::Destroy()
                 if (shape->m_inUse != 0) {
                     if (--shape->m_refCount <= 0) {
                         if (shape->m_animData != 0) {
-                            delete[] reinterpret_cast<u8*>(shape->m_animData);
+                            delete reinterpret_cast<u8*>(shape->m_animData);
                             shape->m_animData = 0;
                         }
                         if (shape->m_displayListData != 0) {
-                            delete[] reinterpret_cast<u8*>(shape->m_displayListData);
+                            delete reinterpret_cast<u8*>(shape->m_displayListData);
                             shape->m_displayListData = 0;
                         }
                         shape->m_refCount = 0;
@@ -459,7 +467,7 @@ void CPartMng::Destroy()
                     }
                 }
             }
-            delete[] shapeArr;
+            delete reinterpret_cast<PartMngShapeStBlock*>(shapeArr);
         }
         res->m_pppShapeStArr = 0;
     }

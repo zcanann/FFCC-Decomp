@@ -2057,7 +2057,6 @@ static inline CColor& FurColorLval(const CColor& c)
 
 #pragma push
 #pragma opt_common_subs off
-#pragma optimization_level 3
 void CChara::makeFurTex()
 {
 	CHairSet hairSet[0x20];

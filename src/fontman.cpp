@@ -257,11 +257,11 @@ void CFont::Draw(unsigned short ch)
 		y0 = FloorF(y0);
 	}
 
-	float advance = scaleX * (margin + static_cast<float>(drawWidth));
 	float u1 = u0 + static_cast<float>(drawWidth * 2);
 	float v1 = v0 + static_cast<float>(m_glyphHeight * 2);
 	float x1 = x0 + static_cast<float>(drawWidth) * scaleX;
 	float y1 = y0 + static_cast<float>(m_glyphHeight) * scaleY;
+	float advance = scaleX * (static_cast<float>(drawWidth) + margin);
 
 	if (renderFlagBits.snapPosition != 0) {
 		advance = FloorF(advance);

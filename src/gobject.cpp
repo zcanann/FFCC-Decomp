@@ -1572,9 +1572,9 @@ void CGObject::update()
                 PSVECCrossProduct(&swayDir, CVector(sZeroFloat, sAnimFrameOffset, sZeroFloat), &swayAxis);
                 PSMTXRotAxisRad(rotScratch, &swayAxis, negSwayAngle);
 
-                const float mtx0 = modelMtx[0][3];
-                const float mtx1 = modelMtx[1][3];
                 const float mtx2 = modelMtx[2][3];
+                const float mtx1 = modelMtx[1][3];
+                const float mtx0 = modelMtx[0][3];
                 modelMtx[0][3] = CVector(sZeroFloat, sZeroFloat, sZeroFloat).x;
                 modelMtx[1][3] = CVector(sZeroFloat, sZeroFloat, sZeroFloat).y;
                 modelMtx[2][3] = CVector(sZeroFloat, sZeroFloat, sZeroFloat).z;

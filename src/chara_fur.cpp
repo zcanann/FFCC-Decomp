@@ -704,7 +704,7 @@ static inline unsigned int FurRandNext()
 
 static inline float FurRandScale()
 {
-	return kCharaFurDepthScaleBase * (FLOAT_80331164 * static_cast<float>(FurRandNext()) + kCharaFurViewDepthThreshold);
+	return kCharaFurDepthScaleBase * (FLOAT_80331164 * static_cast<float>(static_cast<int>(FurRandNext())) + kCharaFurViewDepthThreshold);
 }
 
 static inline CColor FurNoiseColor(const CColor& base, const CColor& noise, float scale)

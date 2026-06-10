@@ -268,7 +268,7 @@ static inline void WriteGameWorkEventFlag(CGame::CGameWork& gameWork, int system
  */
 void CGame::SetNextScriptNewGame()
 {
-    m_nextScript.m_flags = 1;
+    m_nextScriptFlags = 1;
 }
 
 /*
@@ -1358,9 +1358,7 @@ void CVector::operator=(const CVector& other)
  */
 CVector::CVector(const CVector& other)
 {
-    this->x = other.x;
-    this->y = other.y;
-    this->z = other.z;
+    *this = other;
 }
 
 /*
@@ -1433,20 +1431,7 @@ void CCameraPcs::SetZRotate(float zRotate)
  */
 void CGame::SetNextScript(CGame::CNextScript* nextScript)
 {
-    int count = 0x20;
-    unsigned int* src = (unsigned int*)((char*)nextScript - 4);
-    unsigned int* dst = (unsigned int*)&m_nextScript;
-
-    do {
-        unsigned int a = src[1];
-        src += 2;
-        unsigned int b = src[0];
-        dst[1] = a;
-        dst += 2;
-        dst[0] = b;
-        count--;
-    } while (count != 0);
-
+    m_nextScript = *nextScript;
     m_newGameFlag = 1;
 }
 
@@ -2023,7 +2008,6 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     }
     case -0x16: {
         CGame::CNextScript nextScript;
-        nextScript.m_flags = 0;
         strcpy(nextScript.m_name, this->m_strBlob + this->m_strOffsets[*object->m_localBase]);
         Game.SetNextScript(&nextScript);
         this->push(object, 0);
@@ -3808,7 +3792,6 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     case -0xD2: {
         if (*object->m_localBase == 0) {
             CGame::CNextScript nextScript;
-            nextScript.m_flags = 0;
             strcpy(nextScript.m_name, m_savedNextScript);
             Game.SetNextScript(&nextScript);
         } else {

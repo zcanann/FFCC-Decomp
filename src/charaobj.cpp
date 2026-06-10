@@ -2892,31 +2892,38 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 	int particleNo;
 	int seNo;
 	int emittedCustom;
-	int hasParticle = 0;
+	int hasParticle;
 
-	if (particleBank != -1) {
+	if (particleBank == -1) {
+		hasParticle = 0;
+		goto checkParticle;
+	}
+	{
 		SCharaItemRow* entryRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
 		particleEntry = entryRows[effectId].m_particleEntries[effectArg0];
-		if (particleEntry != 0xFFFF) {
-			particleNo = particleEntry & 0xFF;
+	}
+	if (particleEntry == 0xFFFF) {
+		hasParticle = 0;
+		goto checkParticle;
+	}
+	particleNo = particleEntry & 0xFF;
 
-			if ((particleEntry & 0x1000) != 0) {
-				particleBank = 1;
-			} else if ((particleEntry & 0x2000) != 0) {
-				particleBank = 2;
-			} else if ((particleEntry & 0x4000) != 0) {
-				particleBank = 3;
-			} else if (particleBank == 1 && particleNo < 8) {
-				particleNo += *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0);
-			}
-
-			if ((particleEntry & 0x800) != 0) {
-				particleNo += *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2);
-			}
-			hasParticle = 1;
-		}
+	if ((particleEntry & 0x1000) != 0) {
+		particleBank = 1;
+	} else if ((particleEntry & 0x2000) != 0) {
+		particleBank = 2;
+	} else if ((particleEntry & 0x4000) != 0) {
+		particleBank = 3;
+	} else if (particleBank == 1 && particleNo < 8) {
+		particleNo += *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0);
 	}
 
+	if ((particleEntry & 0x800) != 0) {
+		particleNo += *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2);
+	}
+	hasParticle = 1;
+
+checkParticle:
 	if (hasParticle == 0) {
 		if (effectArg0 == 2) {
 			unsigned short seSpec = *reinterpret_cast<unsigned short*>(itemData + 0x40);

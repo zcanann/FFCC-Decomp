@@ -2132,7 +2132,7 @@ int CMapMng::ReadOtm(char* mapName)
                     CMaterialSet* materialSet = m_materialSet;
                     materialSet->m_materials.SetDefaultSize(0x180);
                     materialSet->m_materials.SetGrow(0);
-                    materialSet->Create(chunkFile, m_textureSet, static_cast<CMaterialMan::TEV_BIT>(0xFFF53060), 0);
+                    m_materialSet->Create(chunkFile, m_textureSet, static_cast<CMaterialMan::TEV_BIT>(0xFFF53060), 0);
                     break;
                 }
 
@@ -2227,7 +2227,7 @@ int CMapMng::ReadOtm(char* mapName)
     }
 
     CMapObj* mapObj = GetMapObjArray();
-    CMapObj* mapObjEnd = GetMapObjArray() + m_mapObjCount;
+    CMapObj* mapObjEnd = m_mapObjArray + m_mapObjCount;
     CMapObj* root = 0;
     while (mapObj < mapObjEnd) {
         if (mapObj->m_parent == 0) {

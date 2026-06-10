@@ -3132,18 +3132,24 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         this->push(object, 0);
         outResult = 0;
         break;
-    case -0x6C:
-        this->push(object, Sound.PlaySe(*object->m_localBase, 0x40, 0x7F, 0));
+    case -0x6C: {
+        int result = Sound.PlaySe(*object->m_localBase, 0x40, 0x7F, 0);
+        this->push(object, result);
         outResult = 0;
         break;
-    case -0x6D:
-        Game.m_gameWork.m_linkTable[object->m_localBase[2]][object->m_localBase[3]][object->m_localBase[0]]
-                                   [object->m_localBase[1]] = static_cast<unsigned char>(object->m_localBase[4]);
-        Game.m_gameWork.m_linkTable[object->m_localBase[0]][object->m_localBase[1]][object->m_localBase[2]]
-                                   [object->m_localBase[3]] = static_cast<unsigned char>(object->m_localBase[4]);
+    }
+    case -0x6D: {
+        unsigned int c = object->m_localBase[2];
+        unsigned int d = object->m_localBase[3];
+        unsigned int a = object->m_localBase[0];
+        unsigned int b = object->m_localBase[1];
+        unsigned char value = static_cast<unsigned char>(object->m_localBase[4]);
+        Game.m_gameWork.m_linkTable[c][d][a][b] = value;
+        Game.m_gameWork.m_linkTable[a][b][c][d] = value;
         this->push(object, 0);
         outResult = 0;
         break;
+    }
     case -0x6E:
         this->push(
             object, Game.m_gameWork.m_linkTable[object->m_localBase[0]][object->m_localBase[1]][object->m_localBase[2]]
@@ -3215,20 +3221,20 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     }
-    case -0x7B:
-        this->push(
-            object, Sound.PlaySe3DLine(*object->m_localBase, static_cast<char>(object->m_localBase[1]),
-                        *reinterpret_cast<float*>(object->m_localBase + 2),
-                        *reinterpret_cast<float*>(object->m_localBase + 3), 0));
+    case -0x7B: {
+        int result = Sound.PlaySe3DLine(*object->m_localBase, static_cast<char>(object->m_localBase[1]),
+                         *reinterpret_cast<float*>(object->m_localBase + 2),
+                         *reinterpret_cast<float*>(object->m_localBase + 3), 0);
+        this->push(object, result);
         outResult = 0;
         break;
+    }
     case -0x7A: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        this->push(
-            object,
-            Sound.PlaySe3D(
-                *object->m_localBase, CVector(localFloats[1], localFloats[2], localFloats[3]),
-                localFloats[4], localFloats[5], 0));
+        int result = Sound.PlaySe3D(
+            *object->m_localBase, CVector(localFloats[1], localFloats[2], localFloats[3]),
+            localFloats[4], localFloats[5], 0);
+        this->push(object, result);
         outResult = 0;
         break;
     }
@@ -3268,25 +3274,24 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         this->push(object, 0);
         outResult = 0;
         break;
-    case -0x85:
-        this->push(
-            object, Wind.AddAmbient(reinterpret_cast<float*>(object->m_localBase)[0],
-                                    reinterpret_cast<float*>(object->m_localBase)[1]));
+    case -0x85: {
+        int result = Wind.AddAmbient(reinterpret_cast<float*>(object->m_localBase)[0],
+                                     reinterpret_cast<float*>(object->m_localBase)[1]);
+        this->push(object, result);
         outResult = 0;
         break;
+    }
     case -0x86: {
         const float* f = reinterpret_cast<float*>(object->m_localBase);
-        this->push(
-            object,
-            Wind.AddDiffuse(CVector(f[0], f[1], f[2]), f[3], f[4], f[5]));
+        int result = Wind.AddDiffuse(CVector(f[0], f[1], f[2]), f[3], f[4], f[5]);
+        this->push(object, result);
         outResult = 0;
         break;
     }
     case -0x87: {
         const float* f = reinterpret_cast<float*>(object->m_localBase);
-        this->push(
-            object,
-            Wind.AddSphere(CVector(f[0], f[1], f[2]), f[3], f[4], object->m_localBase[5]));
+        int result = Wind.AddSphere(CVector(f[0], f[1], f[2]), f[3], f[4], object->m_localBase[5]);
+        this->push(object, result);
         outResult = 0;
         break;
     }
@@ -3471,14 +3476,18 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     }
-    case -0x9D:
-        this->push(object, (static_cast<unsigned int>(__cntlzw(MemoryCardMan.DummyLoad())) >> 5) & 0xFF);
+    case -0x9D: {
+        int result = MemoryCardMan.DummyLoad();
+        this->push(object, (static_cast<unsigned int>(__cntlzw(result)) >> 5) & 0xFF);
         outResult = 0;
         break;
-    case -0x9E:
-        this->push(object, (static_cast<unsigned int>(__cntlzw(MemoryCardMan.DummySave())) >> 5) & 0xFF);
+    }
+    case -0x9E: {
+        int result = MemoryCardMan.DummySave();
+        this->push(object, (static_cast<unsigned int>(__cntlzw(result)) >> 5) & 0xFF);
         outResult = 0;
         break;
+    }
     case -0x9F:
         if (object->m_localBase[1] < 0) {
             Game.m_caravanWorkArr[*object->m_localBase].m_shopState = 0;
@@ -3579,13 +3588,13 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     }
-    case -0xB3:
-        this->push(
-            object,
-            CGItemObj::DeleteOld(*object->m_localBase, object->m_localBase[1], object,
-                                 reinterpret_cast<CFlatRuntime::CObject*>(object->m_engineObject)));
+    case -0xB3: {
+        int result = CGItemObj::DeleteOld(*object->m_localBase, object->m_localBase[1], object,
+                                          reinterpret_cast<CFlatRuntime::CObject*>(object->m_engineObject));
+        this->push(object, result);
         outResult = 0;
         break;
+    }
     case -0xB7:
         this->push(object, Game.m_caravanWorkArr[*object->m_localBase].unk_0x3ac);
         outResult = 0;
@@ -3739,14 +3748,10 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     }
     case -0xCA: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        Vec position;
-        position.x = localFloats[1];
-        position.y = localFloats[2];
-        position.z = localFloats[3];
-        this->push(
-            object,
-            Sound.PlaySe3D(
-                *object->m_localBase, &position, localFloats[4], localFloats[5], object->m_localBase[6]));
+        int result = Sound.PlaySe3D(
+            *object->m_localBase, CVector(localFloats[1], localFloats[2], localFloats[3]),
+            localFloats[4], localFloats[5], object->m_localBase[6]);
+        this->push(object, result);
         outResult = 0;
         break;
     }
@@ -4060,10 +4065,12 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         this->push(object, 0);
         outResult = 0;
         break;
-    case -0xF3:
-        this->push(object, this->GetSysControl(*object->m_localBase));
+    case -0xF3: {
+        int result = this->GetSysControl(*object->m_localBase);
+        this->push(object, result);
         outResult = 0;
         break;
+    }
     case -0xF4:
         PartPcs.pppSetDebugHide(static_cast<unsigned char>(*object->m_localBase));
         this->push(object, 0);

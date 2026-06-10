@@ -2925,7 +2925,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 			CFlatRuntime2Storage().SetParticleWorkPos(offsetPos, m_rotTargetY);
 			CFlatRuntime2Storage().SetParticleWorkVector(m_rotTargetY, kCharaObjZero);
 			if ((*reinterpret_cast<unsigned short*>(itemData + 0x0C) & 0x2000) != 0) {
-				int partyIndex = static_cast<unsigned int>(m_rotationX);
+				int partyIndex = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6C4);
 				if (partyIndex >= 0 && partyIndex < 4) {
 					CFlatRuntime2Storage().SetParticleWorkTrace(Game.m_partyObjArr[partyIndex]);
 				}

@@ -153,6 +153,11 @@ public:
             unsigned short m_pad : 7;
             unsigned short m_value : 9;
         };
+        struct WordBits {
+            unsigned int m_pad : 14;
+            unsigned int m_senderId : 9;
+            unsigned int m_attachValue : 9;
+        };
 
         unsigned int Word0() const { return m_words.m_word0; }
         void SetWord0(unsigned int word)
@@ -192,6 +197,7 @@ public:
         unsigned short AttachmentWord() const { return m_half.m_attachment; }
         unsigned int AttachmentValue() const { return AttachmentWord() & 0x1FF; }
         AttachmentBits& AttachmentBitsRef() { return *reinterpret_cast<AttachmentBits*>(&m_half.m_attachment); }
+        WordBits& WordBitsRef() { return *reinterpret_cast<WordBits*>(&m_words.m_word0); }
         void SetAttachmentValue(unsigned short value) { AttachmentBitsRef().m_value = value; }
         unsigned short TempVar(int index) const { return m_half.m_tempVars[index]; }
 
@@ -295,7 +301,8 @@ public:
     int m_joybusCaravanId;                      // 0x03B4
     unsigned short m_letterMeta[8];             // 0x03B8
     unsigned short unk_0x3c8;                   // 0x03C8
-    unsigned char m_name[20];                   // 0x03CA
+    unsigned char m_name[18];                   // 0x03CA
+    unsigned short unk_0x3dc;                   // 0x03DC
     unsigned short m_progressValue;             // 0x03DE
     unsigned short m_tribeId;                   // 0x03E0
     unsigned short m_genderFlag;                // 0x03E2

@@ -110,7 +110,15 @@ struct FurTexCoordRaw
 
 struct FurProjectedVertex
 {
-    unsigned long m_valid;
+    union
+    {
+        unsigned long m_valid;
+        struct
+        {
+            signed char m_projValid : 1;
+            signed char m_edgeFlag : 1;
+        } m_flagBits;
+    };
     Vec m_viewPos;
     float m_clipX;
     float m_clipY;
@@ -1322,7 +1330,7 @@ int CChara::CModel::PickFur(
 	FurMeshRaw* mesh = ModelMeshes(this);
 
 	FurProjectedVertex verts[3];
-	unsigned long curValid = 0;
+	FurProjectedVertex incoming;
 	Mtx44 invScreenMtx;
 
 	for (unsigned int meshIndex = 0; meshIndex < ModelMeshCount(this); meshIndex++, mesh++) {
@@ -1406,10 +1414,9 @@ int CChara::CModel::PickFur(
 					Vec curViewPos;
 					PSMTXMultVec(modelViewMtx, &localPos, &curViewPos);
 
-					FurProjectedVertex incoming;
 					if (static_cast<double>(curViewPos.z) < static_cast<double>(kCharaFurDepthZero)) {
 						Vec4d curClip;
-						curValid = curValid & 0x7fffffff | 0x80000000;
+						incoming.m_flagBits.m_projValid = 1;
 						Math.MTX44MultVec4(screenMtx, &curViewPos, &curClip);
 						const float invW = kCharaFurDepthScaleBase / curClip.w;
 						incoming.m_clipX = curClip.x;
@@ -1419,9 +1426,8 @@ int CChara::CModel::PickFur(
 						incoming.m_screenX = kCharaFurScreenCenterX * curClip.x * invW + kCharaFurScreenCenterX;
 						incoming.m_screenY = kCharaFurScreenCenterY - kCharaFurScreenCenterY * curClip.y * invW;
 					} else {
-						curValid = curValid & 0x7fffffff;
+						incoming.m_flagBits.m_projValid = 0;
 					}
-					incoming.m_valid = curValid;
 					incoming.m_viewPos = curViewPos;
 					incoming.m_u = curU;
 					incoming.m_v = curV;
@@ -1448,25 +1454,21 @@ int CChara::CModel::PickFur(
 						int remainEdges = 3;
 						float depthAccum = kCharaFurDepthZero;
 						do {
-							if (static_cast<int>(static_cast<signed char>(vp->m_valid) << 0x18) >= 0) {
+							if (vp->m_flagBits.m_projValid == 0) {
 								break;
 							}
 							int next = (passed + 1) % 3;
-							const double edge = static_cast<double>(
-							    static_cast<float>(cursorYd - static_cast<double>(vp->m_screenY)) *
-							        static_cast<float>(static_cast<double>(verts[next].m_screenX) -
-							                           static_cast<double>(vp->m_screenX)) -
-							    static_cast<float>(cursorXd - static_cast<double>(vp->m_screenX)) *
-							        static_cast<float>(static_cast<double>(verts[next].m_screenY) -
-							                           static_cast<double>(vp->m_screenY)));
+							const float edge =
+							    (static_cast<float>(cursorYd) - vp->m_screenY) * (verts[next].m_screenX - vp->m_screenX) -
+							    (static_cast<float>(cursorXd) - vp->m_screenX) * (verts[next].m_screenY - vp->m_screenY);
 							if (primitive == 0x90 || (vertexIndex & 1) == 0) {
-								vp->m_valid = vp->m_valid & 0xffffffbf;
-								if (static_cast<double>(kCharaFurDepthZero) < edge) {
+								vp->m_flagBits.m_edgeFlag = 0;
+								if (edge > kCharaFurDepthZero) {
 									break;
 								}
 							} else {
-								vp->m_valid = vp->m_valid & 0xffffffbf | 0x40;
-								if (edge < static_cast<double>(kCharaFurDepthZero)) {
+								vp->m_flagBits.m_edgeFlag = 1;
+								if (edge < kCharaFurDepthZero) {
 									break;
 								}
 							}

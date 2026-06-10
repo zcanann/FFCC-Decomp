@@ -2835,7 +2835,16 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 		}
 	}
 
-	if (hasParticle) {
+	if (hasParticle == 0) {
+		if (effectArg0 == 2) {
+			unsigned short seSpec = *reinterpret_cast<unsigned short*>(itemData + 0x40);
+			seNo = (seSpec == 0xFFFF) ? 0 : ((seSpec & 0xFF) + ((seSpec >> 8) * 1000));
+			if (seNo != 0) {
+				int seHandle = playSe3D(seNo, 0x32, 0x96, 0, pos);
+				Sound.SetSe3DGroup(seHandle, m_particleId);
+			}
+	}
+	} else {
 		CFlatRuntime2Storage().ResetParticleWork((particleBank << 8) | particleNo, effectArg1);
 		CFlatRuntime2Storage().SetParticleWorkScale(*reinterpret_cast<short*>(itemData + 0x10) * 0.01f);
 		CFlatRuntime2Storage().SetParticleWorkParam(effectId, this);
@@ -3073,14 +3082,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 				CFlatRuntime2Storage().PutParticleWork();
 			}
 		}
-	} else if (effectArg0 == 2) {
-		unsigned short seSpec = *reinterpret_cast<unsigned short*>(itemData + 0x40);
-		seNo = (seSpec == 0xFFFF) ? 0 : ((seSpec & 0xFF) + ((seSpec >> 8) * 1000));
-		if (seNo != 0) {
-			int seHandle = playSe3D(seNo, 0x32, 0x96, 0, pos);
-			Sound.SetSe3DGroup(seHandle, m_particleId);
 		}
-	}
 }
 #pragma pop
 

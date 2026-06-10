@@ -3563,7 +3563,7 @@ inline void CMenuPcs::SingLifeResetWait()
  * JP Address: TODO
  * JP Size: TODO
  */
-u8 CMenuPcs::GetItemIcon(int index)
+int CMenuPcs::GetItemIcon(int index)
 {
     return gSingMenuItemIconByType[index];
 }

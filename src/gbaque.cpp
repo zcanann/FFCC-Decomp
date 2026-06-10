@@ -114,6 +114,24 @@ static inline unsigned int SwapU32Value(unsigned int value)
 	return (value << 24) | ((value >> 8) & 0xFF00) | ((value << 8) & 0xFF0000) | (value >> 24);
 }
 
+// First objects in gbaque.o's .rodata (0x801DB2E0).  They anchor the rodata
+// pool base used by MakeLetterList and friends; the letter item tables are the
+// FFFF-terminated {type,variant} pair lists shipped to the GBA client.
+__declspec(section ".rodata") static const char s_gba_dvd_dir[] = "dvd/gba/";
+__declspec(section ".rodata") static const char s_gba_ffcc_cli_bin[] = "ffcc_cli.bin";
+__declspec(section ".rodata") static const char s_gba_objdat_spt[] = "objdat.spt";
+__declspec(section ".rodata") static const char s_gba_icon_dat[] = "icon.dat";
+__declspec(section ".rodata") static const char s_gba_game_title[] = "FF Crystal Chronicles";
+__declspec(section ".rodata") static const unsigned short sGbaLetterItemTable0[] = {
+	0x0100, 0x0101, 0x0102, 0x0400, 0x0500, 0x0600, 0x0700, 0x0800,
+	0x0900, 0x0A00, 0x0B00, 0x0B01, 0x0C00, 0x0D00, 0x2000, 0x2001,
+	0x2002, 0x2003, 0x2004, 0x2100, 0xFFFF,
+};
+__declspec(section ".rodata") static const unsigned short sGbaLetterItemTable1[] = {
+	0x0100, 0x0102, 0x0C00, 0x0D00, 0x2000, 0x2001, 0x2002, 0x2003,
+	0x2004, 0x2100, 0xFFFF,
+};
+
 extern "C" const char s_gbaque_cpp[] = "gbaque.cpp";
 static const char sGbaQueueMemoryAllocationErrorFmt[] = "%s(%d): Error: memory allocation error\n";
 static const char s_compatibility_data_error[] = "compatibility data error!!\n";
@@ -361,7 +379,7 @@ void GbaQueue::LoadAll()
 		OSWaitSemaphore(&accessSemaphores[i]);
 	}
 	{
-		signed char resetMask = static_cast<unsigned char>(obj[0x2D30]);
+		unsigned char resetMask = static_cast<unsigned char>(obj[0x2D30]);
 		obj[0x2D30] = 0;
 		for (i = 0; i < 4; i++) {
 			OSSignalSemaphore(&accessSemaphores[i]);
@@ -834,7 +852,7 @@ void GbaQueue::ExecutQueue()
 							unsigned char* bytes = reinterpret_cast<unsigned char*>(&cmdWord);
 							int n;
 							const int quantity = bytes[3];
-							int shopItem = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_shopList[bytes[2]];
+							unsigned int shopItem = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_shopList[bytes[2]];
 							for (n = 0; n < quantity; n++) {
 								bool added = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->AddItem(shopItem, 0);
 								if (added == false) {
@@ -1331,7 +1349,7 @@ void GbaQueue::LoadPlayerStat()
 				*reinterpret_cast<int*>(entry + 0x24) = caravanWork->m_gil;
 				{
 					unsigned short progress = 0xFF;
-					if (caravanWork->m_progressValue < 0x100) {
+					if (caravanWork->m_progressValue <= 0xFF) {
 						progress = caravanWork->m_progressValue;
 					}
 					*reinterpret_cast<unsigned short*>(entry + 0x14) = progress;
@@ -1350,7 +1368,7 @@ void GbaQueue::LoadPlayerStat()
 					const int saveSlot = caravanWork->m_saveSlot;
 					entry[0] = static_cast<unsigned char>(saveSlot);
 					entry[4] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x12]);
-					unsigned char l0 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][0];
+					signed char l0 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][0];
 					unsigned char l1 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][1];
 					entry[5] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x13]);
 					unsigned char l2 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][2];
@@ -1359,7 +1377,7 @@ void GbaQueue::LoadPlayerStat()
 					unsigned char l4 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][4];
 					unsigned char l5 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][5];
 					entry[7] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x15]);
-					unsigned char l6 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][6];
+					signed char l6 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][6];
 					unsigned char l7 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][7];
 					entry[8] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x16]);
 					entry[9] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x17]);
@@ -2176,6 +2194,9 @@ int GbaQueue::GetPlayerHP(int channel, unsigned char* outData)
 	int channelMask = 1 << channel;
 	char curShouki = static_cast<char>(m_outOfShoukiFlags & channelMask);
 	char prevShouki = static_cast<char>(m_prevOutOfShoukiFlags & channelMask);
+	if (hp != prevHp) {
+		changed = 1;
+	}
 	if (curShouki != prevShouki) {
 		changed = 1;
 	}
@@ -2185,7 +2206,7 @@ int GbaQueue::GetPlayerHP(int channel, unsigned char* outData)
 	outData[2] = static_cast<unsigned char>(hp);
 	outData[3] = ((m_outOfShoukiFlags & channelMask) != 0);
 
-	return changed;
+	return static_cast<unsigned char>(changed);
 }
 
 /*
@@ -3684,16 +3705,22 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	}
 	memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
-	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
-	const int itemCount = static_cast<short>(caravanWork->m_shopListCount);
+	unsigned int* foodBasePtr = &Game.m_scriptFoodBase[channel];
+	const int itemCount = static_cast<short>(
+		reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_shopListCount);
 
 	int totalSize = 4;
+	int work;
+	unsigned int packed;
+	unsigned short itemId;
+	unsigned short swapped;
+	int i;
 	outData[0] = static_cast<char>(itemCount);
 	char* writePtr = outData + 4;
 
-	for (int i = 0; i < itemCount; i++) {
-		const unsigned short itemId = static_cast<unsigned short>(reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_shopList[i]);
-		const unsigned short swapped = SwapU16(itemId);
+	for (i = 0; i < itemCount; i++) {
+		itemId = reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_shopList[i];
+		swapped = __lhbrx(&itemId, 0);
 		memcpy(writePtr, &swapped, 2);
 		writePtr += 2;
 		totalSize += 2;
@@ -3704,30 +3731,31 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 		totalSize += 2;
 	}
 
-	const float userRate = static_cast<float>(static_cast<double>(caravanWork->m_shopParam) / 100.0);
+	const float userRate = static_cast<float>(
+		static_cast<double>(reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_shopParam) / 100.0);
 
-	for (int i = 0; i < itemCount; i++) {
-		const int itemId = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_shopList[i];
-		unsigned int itemPrice = static_cast<unsigned short>(
-			*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x20));
-		itemPrice = static_cast<int>(static_cast<float>(itemPrice) * userRate);
-		if (itemPrice < 1) {
-			itemPrice = 1;
+	for (i = 0; i < itemCount; i++) {
+		work = reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_shopList[i];
+		work = static_cast<int>(
+			static_cast<float>(static_cast<unsigned short>(
+				*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + work * 0x48 + 0x20))) *
+			userRate);
+		if (work < 1) {
+			work = 1;
 		}
 
-		const unsigned int packedPrice = SwapU32(static_cast<unsigned int>(itemPrice));
-		memcpy(writePtr, &packedPrice, 4);
+		packed = __lwbrx(&work, 0);
+		memcpy(writePtr, &packed, 4);
 		writePtr += 4;
 		totalSize += 4;
 	}
 
-	char** itemNameTable = Game.m_cFlatDataArr[1].TableStrings(6);
-	for (int i = 0; i < itemCount; i++) {
+	for (i = 0; i < itemCount; i++) {
 		memset(itemNameScratch, 0, kGbaQueueScratchTextSize);
 		memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
-		const int itemId = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_shopList[i];
-		strcpy(itemNameScratch, itemNameTable[itemId]);
+		work = reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_shopList[i];
+		strcpy(itemNameScratch, Game.m_cFlatDataArr[1].TableStrings(6)[work]);
 		CMes::MakeAgbString(agbStringScratch, itemNameScratch, 0, 0);
 
 		const int strSize = static_cast<int>(strlen(agbStringScratch) + 1);
@@ -3760,7 +3788,7 @@ int GbaQueue::MakeSellData(int channel, char* outData)
 {
 char* itemNameScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0xDD5) char[kGbaQueueScratchTextSize];
 	if (itemNameScratch == 0) {
-		if ((int)System.m_execParam >= 1) {
+		if ((unsigned int)System.m_execParam >= 1) {
 System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0xDD7);
 		}
 		return -1;
@@ -3780,8 +3808,10 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	int totalSize = 0;
 	int work;
 	unsigned int packed;
+	char* writePtr = outData;
+	int i;
 
-	for (int i = 0; i < 0x40; i++) {
+	for (i = 0; i < 0x40; i++) {
 		unsigned short sellInfo[4];
 		work = reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_inventoryItems[i];
 		if ((work < 1) || (work > 0x9E)) {
@@ -3792,23 +3822,23 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 			sellInfo[1] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 6), 0);
 			sellInfo[2] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 8), 0);
 		}
-		memcpy(outData, sellInfo, 8);
-		outData += 8;
+		memcpy(writePtr, sellInfo, 8);
+		writePtr += 8;
 	}
 	totalSize += 0x200;
 
 	const float userRate =
+		kGbaQueueQuarter *
 		static_cast<float>(
-			static_cast<double>(reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_shopParam) / 100.0) *
-		kGbaQueueQuarter;
-	for (int i = 0; i < 0x40; i++) {
+			static_cast<double>(reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_shopParam) / 100.0);
+	for (i = 0; i < 0x40; i++) {
 		work = reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_inventoryItems[i];
 		if (work > 0) {
 			work = static_cast<int>(
 				static_cast<float>(static_cast<unsigned short>(
 					*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + work * 0x48 + 0x20))) *
 				userRate);
-			if (work < 1U) {
+			if (work < 1) {
 				work = 1;
 			}
 			packed = __lwbrx(&work, 0);
@@ -3816,12 +3846,12 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 			packed = 0;
 		}
 
-		memcpy(outData, &packed, 4);
-		outData += 4;
+		memcpy(writePtr, &packed, 4);
+		writePtr += 4;
 		totalSize += 4;
 	}
 
-	for (int i = 0; i < 0x40; i++) {
+	for (i = 0; i < 0x40; i++) {
 		memset(itemNameScratch, 0, kGbaQueueScratchTextSize);
 		memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
@@ -3830,12 +3860,12 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 			strcpy(itemNameScratch, Game.m_cFlatDataArr[1].TableStrings(6)[work]);
 			CMes::MakeAgbString(agbStringScratch, itemNameScratch, 0, 0);
 			packed = strlen(agbStringScratch) + 1;
-			memcpy(outData, agbStringScratch, packed);
-			outData += packed;
+			memcpy(writePtr, agbStringScratch, packed);
+			writePtr += packed;
 			totalSize += packed;
 		} else {
-			outData[0] = 0;
-			outData += 1;
+			writePtr[0] = 0;
+			writePtr += 1;
 			totalSize += 1;
 		}
 	}
@@ -3913,9 +3943,18 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 			work = price;
 			itemBuf[0] = __lwbrx(&work, 0);
 
-			for (k = 3; k < 9; k++) {
-				reinterpret_cast<unsigned short*>(itemBuf)[k - 1] = __lhbrx(itemBase, k * 2 + 0x20);
-			}
+			k = 3;
+			reinterpret_cast<unsigned short*>(itemBuf)[k - 1] = __lhbrx(itemBase, k * 2 + 0x20);
+			k++;
+			reinterpret_cast<unsigned short*>(itemBuf)[k - 1] = __lhbrx(itemBase, k * 2 + 0x20);
+			k++;
+			reinterpret_cast<unsigned short*>(itemBuf)[k - 1] = __lhbrx(itemBase, k * 2 + 0x20);
+			k++;
+			reinterpret_cast<unsigned short*>(itemBuf)[k - 1] = __lhbrx(itemBase, k * 2 + 0x20);
+			k++;
+			reinterpret_cast<unsigned short*>(itemBuf)[k - 1] = __lhbrx(itemBase, k * 2 + 0x20);
+			k++;
+			reinterpret_cast<unsigned short*>(itemBuf)[k - 1] = __lhbrx(itemBase, k * 2 + 0x20);
 
 			int pos = 0;
 			for (int j = 0; j < 2; j++) {
@@ -4821,7 +4860,7 @@ unsigned int GbaQueue::GetControllerMode()
 	} while (i < 4);
 
 	mode = m_controllerMode;
-	result = static_cast<unsigned int>(-static_cast<int>(mode) | static_cast<int>(mode)) >> 31;
+	result = static_cast<unsigned int>(-static_cast<unsigned int>(mode) | static_cast<int>(mode)) >> 31;
 
 	i = 0;
 	do {
@@ -4887,9 +4926,9 @@ void GbaQueue::OpenMenu(int channel, int menuId, int controlMode)
 		retries++;
 	} while (retries < 10);
 
-	OSSemaphore* semaphore = accessSemaphores + channel;
+	OSSemaphore* semaphore = GbaQue.accessSemaphores + channel;
 	OSWaitSemaphore(semaphore);
-	char menuStageMode = m_singleMode;
+	char menuStageMode = GbaQue.m_singleMode;
 	isSingleMode =
 		(static_cast<unsigned int>(__cntlzw(1 - static_cast<int>(menuStageMode))) >>
 		 5) &
@@ -4908,7 +4947,7 @@ void GbaQueue::OpenMenu(int channel, int menuId, int controlMode)
 	}
 
 	OSWaitSemaphore(semaphore);
-	menuStageMode = m_singleMode;
+	menuStageMode = GbaQue.m_singleMode;
 	isSingleMode =
 		(static_cast<unsigned int>(__cntlzw(1 - static_cast<int>(menuStageMode))) >>
 		 5) &
@@ -4981,7 +5020,7 @@ unsigned int GbaQueue::GetPauseMode()
 	} while (i < 4);
 
 	mode = m_pauseMode;
-	result = static_cast<unsigned int>(-static_cast<int>(mode) | static_cast<int>(mode)) >> 31;
+	result = static_cast<unsigned int>(-static_cast<unsigned int>(mode) | static_cast<int>(mode)) >> 31;
 
 	i = 0;
 	do {

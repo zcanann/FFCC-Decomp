@@ -655,7 +655,7 @@ void CGObject::move()
             }
 
             if ((*reinterpret_cast<u32*>(&m_radiusCtrl.x) & 0x400000) != 0) {
-                speed *= sQuarterTurn;
+                speed *= sBgAttrSlow;
             }
 
             PSVECScale(&moveVec, &moveVec, speed);

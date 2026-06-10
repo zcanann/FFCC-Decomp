@@ -546,23 +546,8 @@ bool CMenuPcs::LetterOpen()
 
 	s_OpenClose = 1;
 	if (m_singMenuState->initialized == '\0') {
-		memset(GetLetterAnimStorage(this), 0, sizeof(*GetLetterAnimStorage(this)));
-		fVar1 = FLOAT_803330f8;
-		iVar4 = GetLetterAnimBase(this) + 8;
+		ClearLetterAnimStorage(this);
 		int dur = 10;
-		iVar8 = 8;
-		do {
-			*reinterpret_cast<float*>(iVar4 + 0x14) = fVar1;
-			*reinterpret_cast<float*>(iVar4 + 0x54) = fVar1;
-			*reinterpret_cast<float*>(iVar4 + 0x94) = fVar1;
-			*reinterpret_cast<float*>(iVar4 + 0xD4) = fVar1;
-			*reinterpret_cast<float*>(iVar4 + 0x114) = fVar1;
-			*reinterpret_cast<float*>(iVar4 + 0x154) = fVar1;
-			*reinterpret_cast<float*>(iVar4 + 0x194) = fVar1;
-			*reinterpret_cast<float*>(iVar4 + 0x1D4) = fVar1;
-			iVar4 += 0x200;
-			--iVar8;
-		} while (iVar8 != 0);
 		int n = 0;
 		s16* p = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n++]);
 		*reinterpret_cast<int*>(p + 0xE) = 0;
@@ -581,22 +566,7 @@ bool CMenuPcs::LetterOpen()
 		m_singMenuState->initialized = 1;
 		iVar4 = SingGetLetterAttachflg();
 		if (iVar4 >= 0) {
-			memset(GetLetterAnimStorage(this), 0, sizeof(*GetLetterAnimStorage(this)));
-			fVar1 = FLOAT_803330f8;
-			iVar4 = GetLetterAnimBase(this) + 8;
-			iVar8 = 8;
-			do {
-				*reinterpret_cast<float*>(iVar4 + 0x14) = fVar1;
-				*reinterpret_cast<float*>(iVar4 + 0x54) = fVar1;
-				*reinterpret_cast<float*>(iVar4 + 0x94) = fVar1;
-				*reinterpret_cast<float*>(iVar4 + 0xD4) = fVar1;
-				*reinterpret_cast<float*>(iVar4 + 0x114) = fVar1;
-				*reinterpret_cast<float*>(iVar4 + 0x154) = fVar1;
-				*reinterpret_cast<float*>(iVar4 + 0x194) = fVar1;
-				*reinterpret_cast<float*>(iVar4 + 0x1D4) = fVar1;
-				iVar4 += 0x200;
-				--iVar8;
-			} while (iVar8 != 0);
+			ClearLetterAnimStorage(this);
 			int n2 = 0;
 			s16* p2 = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n2++]);
 			*reinterpret_cast<int*>(p2 + 0xE) = 0;

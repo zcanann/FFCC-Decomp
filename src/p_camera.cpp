@@ -1111,12 +1111,12 @@ void CCameraPcs::destroyChara()
 void CCameraPcs::calcChara()
 {
     unsigned short padButtons;
-    Mtx mtxA;
-    Mtx mtxB;
     Mtx mtxInv;
+    Mtx mtxB;
+    Mtx mtxA;
+    Vec targetPos;
     float stick;
     Vec scaledDir;
-    Vec targetPos;
 
     C_MTXPerspective(m_screenMatrix, m_fov, kCameraAspectRatio, m_nearZ, m_farZ);
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
@@ -1133,24 +1133,20 @@ void CCameraPcs::calcChara()
         stick = ((padButtons & 4) != 0) ? kCameraHalfF : kCameraZeroF;
         m_viewer.m_position.y += stick;
 
-        float rotSpeed = kCameraDebugRotateStep;
         stick = ((padButtons & 8) != 0) ? kCameraHalfF : kCameraZeroF;
         m_viewer.m_position.y -= stick;
 
-        float rotSpeed2 = kCameraDebugRotateStep;
         stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().stickXF;
-        m_viewer.m_rotY = rotSpeed * stick + m_viewer.m_rotY;
+        m_viewer.m_rotY = kCameraDebugRotateStep * stick + m_viewer.m_rotY;
 
-        float zoomSpeed = kCameraDebugZoomStep;
         stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().stickYF;
-        m_viewer.m_rotX = -((rotSpeed2 * stick) - m_viewer.m_rotX);
+        m_viewer.m_rotX = -((kCameraDebugRotateStep * stick) - m_viewer.m_rotX);
 
-        float zoomSpeed2 = kCameraDebugZoomStep;
         stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().triggerLeftF;
-        m_viewer.m_distance = -((zoomSpeed * stick) - m_viewer.m_distance);
+        m_viewer.m_distance = -((kCameraDebugZoomStep * stick) - m_viewer.m_distance);
 
         stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().triggerRightF;
-        m_viewer.m_distance = zoomSpeed2 * stick + m_viewer.m_distance;
+        m_viewer.m_distance = kCameraDebugZoomStep * stick + m_viewer.m_distance;
     }
 
     PSMTXTrans(mtxA, m_viewer.m_position.x, m_viewer.m_position.y, m_viewer.m_position.z);
@@ -1181,13 +1177,14 @@ void CCameraPcs::calcChara()
     Vec* targetBasePtr = CVector(TargetVec());
     CVector targetVec;
     PSVECAdd(targetBasePtr, &scaledDir, AsVec(targetVec));
-    targetPos.x = targetVec.x;
-    targetPos.y = targetVec.y;
-    targetPos.z = targetVec.z;
+    Vec* tp = &targetPos;
+    tp->x = targetVec.x;
+    tp->y = targetVec.y;
+    tp->z = targetVec.z;
 
-    m_positionX = targetPos.x;
-    m_positionY = targetPos.y;
-    m_positionZ = targetPos.z;
+    m_positionX = tp->x;
+    m_positionY = tp->y;
+    m_positionZ = tp->z;
 }
 
 /*

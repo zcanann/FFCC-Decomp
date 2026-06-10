@@ -1759,7 +1759,7 @@ int CMapMng::ReadMtx(char* mapName)
     char* strTmp = g_StrTmp;
     int loadIndex = 0;
     while (true) {
-        sprintf(strTmp, const_cast<char*>(s_mapMtxPathFmt), mapName, loadIndex);
+        sprintf(g_StrTmp, const_cast<char*>(s_mapMtxPathFmt), mapName, loadIndex);
 
         int exists;
         if (m_asyncLoadState.m_mapReadMode == 1) {

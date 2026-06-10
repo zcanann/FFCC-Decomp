@@ -210,8 +210,8 @@ int CLightPcs::GetTable(unsigned long index)
 void CLightPcs::create()
 {
     for (int i = 0; i < 0x20; i++) {
-        m_bumpLights[i].m_hasTexture = 0;
-        m_bumpLights[i].m_textureData = 0;
+        m_bumpLights[0][i].m_hasTexture = 0;
+        m_bumpLights[0][i].m_textureData = 0;
     }
 }
 
@@ -241,18 +241,16 @@ void CLightPcs::destroy()
  */
 void CLightPcs::DestroyBumpLightAll(CLightPcs::TARGET target)
 {
-    u32 idx = static_cast<u32>(target) * 8;
-
-    for (u32 i = 0; i < 8; i++, idx++) {
-        if (m_bumpLights[idx].m_textureData != 0) {
-            bool hasTexture = m_bumpLights[idx].m_textureData != 0;
+    for (u32 i = 0; i < 8; i++) {
+        if (m_bumpLights[target][i].m_textureData != 0) {
+            bool hasTexture = m_bumpLights[target][i].m_textureData != 0;
             if (hasTexture) {
-                Memory.Free(m_bumpLights[idx].m_textureData);
-                m_bumpLights[idx].m_textureData = 0;
+                Memory.Free(m_bumpLights[target][i].m_textureData);
+                m_bumpLights[target][i].m_textureData = 0;
             }
 
-            m_bumpLights[idx].m_hasTexture = 0;
-            m_bumpLights[idx].m_useViewSpace = 0;
+            m_bumpLights[target][i].m_hasTexture = 0;
+            m_bumpLights[target][i].m_useViewSpace = 0;
         }
     }
 }
@@ -389,7 +387,7 @@ CLightPcs::CBumpLight* CLightPcs::AddBump(CLightPcs::CLight* srcLight, CLightPcs
  */
 inline CLightPcs::CBumpLight* CLightPcs::GetFreeBumpLight(CLightPcs::TARGET target)
 {
-    CBumpLight* bumpLights = &m_bumpLights[target * 8];
+    CBumpLight* bumpLights = m_bumpLights[target];
 
     for (int i = 0; i < 8; i++) {
         if (bumpLights[i].m_hasTexture == 0) {
@@ -1052,13 +1050,11 @@ void CLightPcs::MakeLightMap()
 
     for (u32 target = 0; target < 4; target++) {
         u32 i = 0;
-        CBumpLight* bumpLight = &m_bumpLights[target * 8];
         do {
-            if (bumpLight->m_hasTexture != 0) {
-                bumpLight->MakeLightMap();
+            if (m_bumpLights[target][i].m_hasTexture != 0) {
+                m_bumpLights[target][i].MakeLightMap();
             }
             i++;
-            bumpLight++;
         } while (i < 8);
     }
 

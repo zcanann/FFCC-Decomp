@@ -1646,7 +1646,7 @@ inline void CMenuPcs::SingCalcChara(float frameStep)
 {
     CChara::CModel* model = m_wm.m_handles[0]->m_model;
 
-    if (model->m_animEnd < model->m_curFrame) {
+    if (model->m_time < model->m_animEnd) {
         model->AddFrame(frameStep);
     } else {
         model->SetFrame(0.0f);
@@ -2158,10 +2158,10 @@ void CMenuPcs::SingleCalcCtrl()
     }
 
     int result = 0;
-    if (m_wm.m_handles[0]->m_model->m_animEnd < m_wm.m_handles[0]->m_model->m_time) {
-        m_wm.m_handles[0]->m_model->SetFrame(0.0f);
-    } else {
+    if (m_wm.m_handles[0]->m_model->m_time < m_wm.m_handles[0]->m_model->m_animEnd) {
         m_wm.m_handles[0]->m_model->AddFrame(1.0f);
+    } else {
+        m_wm.m_handles[0]->m_model->SetFrame(0.0f);
     }
 
     unsigned short modelScaleIndex = SingleCaravanWork()->m_tribeId;
@@ -2633,37 +2633,42 @@ void CMenuPcs::DrawListPosMark(float x, float y, float z)
  */
 int CMenuPcs::EquipChk(int itemNo)
 {
-    CCaravanWork* caravanWork = SingleCaravanWork();
-    int commandItem;
-
-    if (2 < caravanWork->m_numCmdListSlots) {
-        commandItem = caravanWork->m_commandListInventorySlotRef[2];
-        if ((commandItem >= 0) && (commandItem == itemNo)) {
+    CCaravanWork* w = SingleCaravanWork();
+    int item;
+    int slot = 2;
+        if (slot < w->m_numCmdListSlots) {
+        item = w->m_commandListInventorySlotRef[2];
+        if ((item >= 0) && (item == itemNo)) {
             return 1;
         }
-        if (3 < caravanWork->m_numCmdListSlots) {
-            commandItem = caravanWork->m_commandListInventorySlotRef[3];
-            if ((commandItem >= 0) && (commandItem == itemNo)) {
+        slot++;
+        if (slot < w->m_numCmdListSlots) {
+            item = w->m_commandListInventorySlotRef[3];
+            if ((item >= 0) && (item == itemNo)) {
                 return 1;
             }
-            if (4 < caravanWork->m_numCmdListSlots) {
-                commandItem = caravanWork->m_commandListInventorySlotRef[4];
-                if ((commandItem >= 0) && (commandItem == itemNo)) {
+            slot++;
+            if (slot < w->m_numCmdListSlots) {
+                item = w->m_commandListInventorySlotRef[4];
+                if ((item >= 0) && (item == itemNo)) {
                     return 1;
                 }
-                if (5 < caravanWork->m_numCmdListSlots) {
-                    commandItem = caravanWork->m_commandListInventorySlotRef[5];
-                    if ((commandItem >= 0) && (commandItem == itemNo)) {
+                slot++;
+                if (slot < w->m_numCmdListSlots) {
+                    item = w->m_commandListInventorySlotRef[5];
+                    if ((item >= 0) && (item == itemNo)) {
                         return 1;
                     }
-                    if (6 < caravanWork->m_numCmdListSlots) {
-                        commandItem = caravanWork->m_commandListInventorySlotRef[6];
-                        if ((commandItem >= 0) && (commandItem == itemNo)) {
+                    slot++;
+                    if (slot < w->m_numCmdListSlots) {
+                        item = w->m_commandListInventorySlotRef[6];
+                        if ((item >= 0) && (item == itemNo)) {
                             return 1;
                         }
-                        if (7 < caravanWork->m_numCmdListSlots) {
-                            commandItem = caravanWork->m_commandListInventorySlotRef[7];
-                            if ((commandItem >= 0) && (commandItem == itemNo)) {
+                        slot++;
+                        if (slot < w->m_numCmdListSlots) {
+                            item = w->m_commandListInventorySlotRef[7];
+                            if ((item >= 0) && (item == itemNo)) {
                                 return 1;
                             }
                         }
@@ -2673,20 +2678,20 @@ int CMenuPcs::EquipChk(int itemNo)
         }
     }
 
-    int equipment = caravanWork->m_equipment[0];
-    if ((equipment >= 0) && (equipment == itemNo)) {
+    item = w->m_equipment[0];
+    if ((item >= 0) && (item == itemNo)) {
         return 1;
     }
-    equipment = caravanWork->m_equipment[1];
-    if ((equipment >= 0) && (equipment == itemNo)) {
+    item = w->m_equipment[1];
+    if ((item >= 0) && (item == itemNo)) {
         return 1;
     }
-    equipment = caravanWork->m_equipment[2];
-    if ((equipment >= 0) && (equipment == itemNo)) {
+    item = w->m_equipment[2];
+    if ((item >= 0) && (item == itemNo)) {
         return 1;
     }
-    equipment = caravanWork->m_equipment[3];
-    if ((equipment >= 0) && (equipment == itemNo)) {
+    item = w->m_equipment[3];
+    if ((item >= 0) && (item == itemNo)) {
         return 1;
     }
 

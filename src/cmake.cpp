@@ -180,25 +180,27 @@ static inline float CalcCmakeFadeAlpha(CMenuPcs* menu)
 static unsigned short GetCmakePadDown()
 {
     unsigned char noPad = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
+    int held;
     if (noPad) {
-        return 0;
+        held = 0;
+    } else {
+        int padIndex = (Pad.m_debugPadPort == 0) ? 0 : 0;
+        held = Pad.GetPadInputs()[padIndex].buttonDown[0];
     }
-
-    int padIndex = 0;
-    padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-    return Pad.GetPadInputs()[padIndex].buttonDown[0];
+    return static_cast<unsigned short>(held);
 }
 
 static unsigned short GetCmakePadRepeat()
 {
     unsigned char noPad = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
+    int held;
     if (noPad) {
-        return 0;
+        held = 0;
+    } else {
+        int padIndex = (Pad.m_debugPadPort == 0) ? 0 : 0;
+        held = Pad.GetPadInputs()[padIndex].repeatButton;
     }
-
-    int padIndex = 0;
-    padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-    return Pad.GetPadInputs()[padIndex].repeatButton;
+    return static_cast<unsigned short>(held);
 }
 
 static inline void DrawCmakePreviewCharaAlpha(CMenuPcs* menu, float alpha)
@@ -276,6 +278,24 @@ static inline void DrawNamePreviewChara(CMenuPcs* menu, float modelAlpha, int gx
     }
 
     menu->DrawInit();
+}
+
+static inline void SetCmakeBlendMatColor(float alpha)
+{
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
+    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+
+    GXColor col;
+    col.r = 0xFF;
+    col.g = 0xFF;
+    col.b = 0xFF;
+    col.a = static_cast<unsigned char>(255.0f * alpha);
+    GXSetChanMatColor(GX_COLOR0A0, col);
+}
+
+static inline void SetCmakeFontColor(CFont* font, float alpha)
+{
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)).color);
 }
 
 static inline void DrawCmakeSelectionBackdrop(CMenuPcs* menu)
@@ -769,7 +789,6 @@ void CMenuPcs::CmakeVillageDraw()
 {
     CmakeMenuState* villageWork = CmakeVillageState(this);
     int frame = static_cast<int>(villageWork->m_frame) - 1;
-    float a255;
     float alpha;
 
     if (frame < 0) {
@@ -784,16 +803,7 @@ void CMenuPcs::CmakeVillageDraw()
         alpha = static_cast<float>(-(0.1 * static_cast<double>(frame) - 1.0));
     }
 
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-    a255 = 255.0f * alpha;
-    GXColor col0;
-    col0.r = 0xFF;
-    col0.g = 0xFF;
-    col0.b = 0xFF;
-    col0.a = static_cast<unsigned char>(a255);
-    GXSetChanMatColor(GX_COLOR0A0, col0);
+    SetCmakeBlendMatColor(alpha);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
     MenuPcs.DrawRect(
         0, 192.0f, 56.0f, 416.0f, 264.0f,
@@ -801,28 +811,14 @@ void CMenuPcs::CmakeVillageDraw()
 
     DrawCmakeTitle(0, 1.0f, alpha);
 
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-    GXColor col1;
-    col1.r = 0xFF;
-    col1.g = 0xFF;
-    col1.b = 0xFF;
-    col1.a = static_cast<unsigned char>(a255);
-    GXSetChanMatColor(GX_COLOR0A0, col1);
+    SetCmakeBlendMatColor(alpha);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
     float panelW = 328.0f;
     MenuPcs.DrawRect(
         0, static_cast<float>(static_cast<int>(-(panelW / 2.0 - 400.0))), 288.0f, panelW, 56.0f,
         0.0f, 368.0f, 1.0f, 1.0f, 0.0f);
 
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-    GXColor col2;
-    col2.r = 0xFF;
-    col2.g = 0xFF;
-    col2.b = 0xFF;
-    col2.a = static_cast<unsigned char>(a255);
-    GXSetChanMatColor(GX_COLOR0A0, col2);
+    SetCmakeBlendMatColor(alpha);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x68 : 0x41));
     MenuPcs.DrawRect(
         0, 184.0f, 216.0f, 48.0f, 48.0f,
@@ -833,18 +829,12 @@ void CMenuPcs::CmakeVillageDraw()
         48.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     if (villageWork->m_mode == 1 && villageWork->m_row < 5) {
+        short sel = villageWork->m_select;
         int cursorBase = (villageWork->m_row < 5) ? 0xE5 : 0xE5;
         int cursorY = villageWork->m_row * 0x20 + 0x63;
         int cursorX = static_cast<int>(
-            26.9f * static_cast<float>(villageWork->m_select) + static_cast<float>(cursorBase));
-        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-        GXColor cursorColor;
-        cursorColor.r = 0xFF;
-        cursorColor.g = 0xFF;
-        cursorColor.b = 0xFF;
-        cursorColor.a = 0xFF;
-        GXSetChanMatColor(GX_COLOR0A0, cursorColor);
+            26.9f * static_cast<float>(sel) + static_cast<float>(cursorBase));
+        SetCmakeBlendMatColor(1.0f);
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 100 : 0x3D));
         MenuPcs.DrawRect(
             0,
@@ -859,7 +849,7 @@ void CMenuPcs::CmakeVillageDraw()
     font->DrawInit();
     GetRenderFlagBits(font->renderFlags).fixedWidth = 1;
     font->SetMargin(4.9f);
-    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)).color);
+    SetCmakeFontColor(font, alpha);
 
     int tableBase = table * 5;
     for (int i = 0; i < 5; i++) {
@@ -936,15 +926,14 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
         padBusy = true;
     }
     {
-        unsigned short held;
+        int held;
         if (padBusy) {
             held = 0;
         } else {
-            int padIndex = 0;
-            padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+            int padIndex = (Pad.m_debugPadPort == 0) ? 0 : 0;
             held = Pad.GetPadInputs()[padIndex].buttonDown[0];
         }
-        down = static_cast<short>(held);
+        down = static_cast<short>(static_cast<unsigned short>(held));
     }
 
     padBusy = false;
@@ -952,15 +941,14 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
         padBusy = true;
     }
     {
-        unsigned short held;
+        int held;
         if (padBusy) {
             held = 0;
         } else {
-            int padIndex = 0;
-            padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+            int padIndex = (Pad.m_debugPadPort == 0) ? 0 : 0;
             held = Pad.GetPadInputs()[padIndex].repeatButton;
         }
-        repeat = static_cast<short>(held);
+        repeat = static_cast<short>(static_cast<unsigned short>(held));
     }
 
     if (repeat == 0) {
@@ -977,7 +965,7 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
         }
         Sound.PlaySe(1, 0x40, 0x7f, 0);
     } else if ((repeat & 0x4) != 0) {
-        if (row < (select >= 10 ? 4 : 3)) {
+        if (row < (select >= 10 ? 5 : 4)) {
             row = static_cast<short>(row + 1);
         } else {
             row = 0;
@@ -1181,15 +1169,7 @@ void CMenuPcs::CmakeResultDraw1()
 
     DrawWMFrame0(1, 1.0f);
 
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-    GXColor backdropColor;
-    backdropColor.r = 0xFF;
-    backdropColor.g = 0xFF;
-    backdropColor.b = 0xFF;
-    backdropColor.a = 0xFF;
-    GXSetChanMatColor(GX_COLOR0A0, backdropColor);
+    SetCmakeBlendMatColor(1.0f);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3F));
     MenuPcs.DrawRect(
@@ -1215,37 +1195,22 @@ void CMenuPcs::CmakeResultDraw1()
         tileX += tileW;
     }
 
-    DrawCmakePreviewChara(this);
+    DrawCmakePreviewCharaAlpha(this, 1.0f);
 
     if (CmakeState(this)->m_mode == 0) {
-        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-        GXColor panelCol;
-        panelCol.r = 0xFF;
-        panelCol.g = 0xFF;
-        panelCol.b = 0xFF;
-        panelCol.a = 0xFF;
-        GXSetChanMatColor(GX_COLOR0A0, panelCol);
+        SetCmakeBlendMatColor(1.0f);
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
         MenuPcs.DrawRect(
             0, 192.0f, 56.0f, 416.0f, 264.0f,
             0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     } else {
-        int panelA = static_cast<int>(255.0f * alpha);
-        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-        GXColor panelCol;
-        panelCol.r = 0xFF;
-        panelCol.g = 0xFF;
-        panelCol.b = 0xFF;
-        panelCol.a = static_cast<unsigned char>(panelA);
-        GXSetChanMatColor(GX_COLOR0A0, panelCol);
+        SetCmakeBlendMatColor(alpha);
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
         MenuPcs.DrawRect(
             0, 192.0f, 56.0f, 416.0f, 264.0f,
             0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     }
-    DrawCmakeTitle(7, 1.0f, alpha);
+    DrawCmakeTitle(7, alpha, 1.0f);
 
     float textAlpha = alpha;
     if (CmakeState(this)->m_mode == 0) {
@@ -1253,16 +1218,7 @@ void CMenuPcs::CmakeResultDraw1()
     }
     {
         int tribe = static_cast<int>(s_CmakeInfo.m_tribe);
-        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-        int crestA = static_cast<int>(255.0f * textAlpha);
-        GXColor crestCol;
-        crestCol.r = 0xFF;
-        crestCol.g = 0xFF;
-        crestCol.b = 0xFF;
-        crestCol.a = static_cast<unsigned char>(crestA);
-        GXSetChanMatColor(GX_COLOR0A0, crestCol);
+        SetCmakeBlendMatColor(textAlpha);
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x31));
         MenuPcs.DrawRect(
             0,
@@ -1430,15 +1386,7 @@ void CMenuPcs::CmakeResultDraw()
 
     DrawWMFrame0(1, 1.0f);
 
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-    GXColor backdropColor;
-    backdropColor.r = 0xFF;
-    backdropColor.g = 0xFF;
-    backdropColor.b = 0xFF;
-    backdropColor.a = 0xFF;
-    GXSetChanMatColor(GX_COLOR0A0, backdropColor);
+    SetCmakeBlendMatColor(1.0f);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3F));
     MenuPcs.DrawRect(
@@ -1748,15 +1696,7 @@ void CMenuPcs::CmakeJobDraw()
 
     DrawWMFrame0(1, 1.0f);
 
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-    GXColor backdropColor;
-    backdropColor.r = 0xFF;
-    backdropColor.g = 0xFF;
-    backdropColor.b = 0xFF;
-    backdropColor.a = 0xFF;
-    GXSetChanMatColor(GX_COLOR0A0, backdropColor);
+    SetCmakeBlendMatColor(1.0f);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3F));
     MenuPcs.DrawRect(
@@ -1875,15 +1815,14 @@ int CMenuPcs::CmakeJobCtrl()
         padBusy = true;
     }
     {
-        unsigned short held;
+        int held;
         if (padBusy) {
             held = 0;
         } else {
-            int padIndex = 0;
-            padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+            int padIndex = (Pad.m_debugPadPort == 0) ? 0 : 0;
             held = Pad.GetPadInputs()[padIndex].buttonDown[0];
         }
-        down = static_cast<short>(held);
+        down = static_cast<short>(static_cast<unsigned short>(held));
     }
 
     padBusy = false;
@@ -1891,15 +1830,14 @@ int CMenuPcs::CmakeJobCtrl()
         padBusy = true;
     }
     {
-        unsigned short held;
+        int held;
         if (padBusy) {
             held = 0;
         } else {
-            int padIndex = 0;
-            padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+            int padIndex = (Pad.m_debugPadPort == 0) ? 0 : 0;
             held = Pad.GetPadInputs()[padIndex].repeatButton;
         }
-        repeat = static_cast<short>(held);
+        repeat = static_cast<short>(static_cast<unsigned short>(held));
     }
 
     if (repeat == 0) {
@@ -2015,15 +1953,7 @@ void CMenuPcs::CmakeTribeDraw()
 
     DrawWMFrame0(1, 1.0f);
 
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-    GXColor backdropColor;
-    backdropColor.r = 0xFF;
-    backdropColor.g = 0xFF;
-    backdropColor.b = 0xFF;
-    backdropColor.a = 0xFF;
-    GXSetChanMatColor(GX_COLOR0A0, backdropColor);
+    SetCmakeBlendMatColor(1.0f);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3F));
     MenuPcs.DrawRect(
@@ -2196,15 +2126,14 @@ int CMenuPcs::CmakeTribeCtrl()
         padBusy = true;
     }
     {
-        unsigned short held;
+        int held;
         if (padBusy) {
             held = 0;
         } else {
-            int padIndex = 0;
-            padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+            int padIndex = (Pad.m_debugPadPort == 0) ? 0 : 0;
             held = Pad.GetPadInputs()[padIndex].buttonDown[0];
         }
-        down = static_cast<short>(held);
+        down = static_cast<short>(static_cast<unsigned short>(held));
     }
 
     padBusy = false;
@@ -2212,15 +2141,14 @@ int CMenuPcs::CmakeTribeCtrl()
         padBusy = true;
     }
     {
-        unsigned short held;
+        int held;
         if (padBusy) {
             held = 0;
         } else {
-            int padIndex = 0;
-            padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+            int padIndex = (Pad.m_debugPadPort == 0) ? 0 : 0;
             held = Pad.GetPadInputs()[padIndex].repeatButton;
         }
-        repeat = static_cast<short>(held);
+        repeat = static_cast<short>(static_cast<unsigned short>(held));
     }
 
     if (repeat == 0) {
@@ -2234,8 +2162,8 @@ int CMenuPcs::CmakeTribeCtrl()
         }
         return 0;
     } else {
-        int tribeCount = 4;
         int fieldSelect = CmakeState(this)->m_fieldSelect;
+        int tribeCount = (fieldSelect != 0) ? 4 : 4;
 
         if ((repeat & 0x8) != 0) {
             short* values = &CmakeState(this)->m_select;
@@ -2555,15 +2483,7 @@ void CMenuPcs::CmakeNameDraw()
     }
 
     DrawWMFrame0(1, 1.0f);
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-    GXColor backdropColor;
-    backdropColor.r = 0xFF;
-    backdropColor.g = 0xFF;
-    backdropColor.b = 0xFF;
-    backdropColor.a = 0xFF;
-    GXSetChanMatColor(GX_COLOR0A0, backdropColor);
+    SetCmakeBlendMatColor(1.0f);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3F));
     MenuPcs.DrawRect(
         0, 0.0f, 24.0f, 32.0f, 336.0f,
@@ -2584,15 +2504,7 @@ void CMenuPcs::CmakeNameDraw()
         x += span;
     }
 
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-    a255 = 255.0f * alpha;
-    GXColor col;
-    col.r = 0xFF;
-    col.g = 0xFF;
-    col.b = 0xFF;
-    col.a = static_cast<unsigned char>(a255);
-    GXSetChanMatColor(GX_COLOR0A0, col);
+    SetCmakeBlendMatColor(alpha);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
     MenuPcs.DrawRect(
         0, 192.0f, 56.0f, 416.0f, 264.0f,
@@ -2602,35 +2514,21 @@ void CMenuPcs::CmakeNameDraw()
         DrawNamePreviewChara(this, 1.0f, 0xFF);
         DrawCmakeTitle(1, alpha, 1.0f);
     } else if ((CmakeState(this)->m_mode != 2) || (CmakeState(this)->m_resultDir == -1)) {
-        DrawNamePreviewChara(this, alpha, static_cast<int>(a255));
+        DrawNamePreviewChara(this, alpha, static_cast<int>(255.0f * alpha));
         DrawCmakeTitle(1, 1.0f, alpha);
     } else {
         DrawNamePreviewChara(this, 1.0f, 0xFF);
         DrawCmakeTitle(1, alpha, 1.0f);
     }
 
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-    GXColor col2;
-    col2.r = 0xFF;
-    col2.g = 0xFF;
-    col2.b = 0xFF;
-    col2.a = static_cast<unsigned char>(a255);
-    GXSetChanMatColor(GX_COLOR0A0, col2);
+    SetCmakeBlendMatColor(alpha);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
     float titleW = 280.0f;
     MenuPcs.DrawRect(
         0, static_cast<float>(static_cast<int>(-(titleW / 2.0 - 400.0))), 268.0f, titleW, 64.0f,
         0.0f, 304.0f, 1.0f, 1.0f, 0.0f);
 
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-    GXColor col3;
-    col3.r = 0xFF;
-    col3.g = 0xFF;
-    col3.b = 0xFF;
-    col3.a = static_cast<unsigned char>(a255);
-    GXSetChanMatColor(GX_COLOR0A0, col3);
+    SetCmakeBlendMatColor(alpha);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x68 : 0x41));
     MenuPcs.DrawRect(
         0, 184.0f, 216.0f, 48.0f, 48.0f,
@@ -2646,14 +2544,7 @@ void CMenuPcs::CmakeNameDraw()
         int cellX = static_cast<int>(
             26.9f * static_cast<float>(CmakeState(this)->m_select) +
             static_cast<float>(cursorBase));
-        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-        GXColor selCol;
-        selCol.r = 0xFF;
-        selCol.g = 0xFF;
-        selCol.b = 0xFF;
-        selCol.a = 0xFF;
-        GXSetChanMatColor(GX_COLOR0A0, selCol);
+        SetCmakeBlendMatColor(1.0f);
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x64 : 0x3D));
         MenuPcs.DrawRect(
             0, static_cast<float>(cellX), static_cast<float>(cursorY), 48.0f, 48.0f,
@@ -2667,7 +2558,7 @@ void CMenuPcs::CmakeNameDraw()
     font->DrawInit();
     GetRenderFlagBits(font->renderFlags).fixedWidth = 1;
     font->SetMargin(4.9f);
-    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)).color);
+    SetCmakeFontColor(font, alpha);
 
     int tableBase = table * 5;
     for (int i = 0; i < 5; i++) {
@@ -2748,15 +2639,14 @@ int CMenuPcs::CmakeNameCtrl()
         padBusy = true;
     }
     {
-        unsigned short held;
+        int held;
         if (padBusy) {
             held = 0;
         } else {
-            int padIndex = 0;
-            padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+            int padIndex = (Pad.m_debugPadPort == 0) ? 0 : 0;
             held = Pad.GetPadInputs()[padIndex].buttonDown[0];
         }
-        down = static_cast<short>(held);
+        down = static_cast<short>(static_cast<unsigned short>(held));
     }
 
     padBusy = false;
@@ -2764,15 +2654,14 @@ int CMenuPcs::CmakeNameCtrl()
         padBusy = true;
     }
     {
-        unsigned short held;
+        int held;
         if (padBusy) {
             held = 0;
         } else {
-            int padIndex = 0;
-            padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+            int padIndex = (Pad.m_debugPadPort == 0) ? 0 : 0;
             held = Pad.GetPadInputs()[padIndex].repeatButton;
         }
-        repeat = static_cast<short>(held);
+        repeat = static_cast<short>(static_cast<unsigned short>(held));
     }
 
     if (repeat == 0) {
@@ -3467,17 +3356,9 @@ void CMenuPcs::DrawCmakeBallCursor(int kind, int frame, float alpha)
  */
 void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
 {
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+    SetCmakeBlendMatColor(alpha);
 
     float alpha255 = 255.0f * alpha;
-    GXColor col;
-    col.r = 0xFF;
-    col.g = 0xFF;
-    col.b = 0xFF;
-    col.a = static_cast<unsigned char>(alpha255);
-    GXSetChanMatColor(GX_COLOR0A0, col);
-
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
     MenuPcs.DrawRect(
         0, 480.0f, 368.0f, 48.0f, 32.0f,
@@ -3487,14 +3368,7 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
         296.0f, 264.0f, 1.0f, 1.0f, 0.0f);
 
     if (yesNoSel != 0) {
-        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-        GXColor col2;
-        col2.r = 0xFF;
-        col2.g = 0xFF;
-        col2.b = 0xFF;
-        col2.a = static_cast<unsigned char>(alpha255);
-        GXSetChanMatColor(GX_COLOR0A0, col2);
+        SetCmakeBlendMatColor(alpha);
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x64 : 0x3D));
         MenuPcs.DrawRect(
             0, 516.0f, 360.0f, 48.0f, 48.0f,
@@ -3630,7 +3504,7 @@ void CMenuPcs::DrawCmakeTitle(int page, float x, float alpha)
     float offs = static_cast<float>(offsU);
     MenuPcs.DrawRect(
         0, 278.0f, offs, 248.0f, 40.0f,
-        0.0f, 264.0f, 1.0f, alpha, 0.0f);
+        0.0f, 264.0f, 1.0f, x, 0.0f);
 
     if (x < 1.0) {
         return;
@@ -3966,12 +3840,11 @@ void CMenuPcs::CalcSingCMake()
             if (repeat == 0) {
                 done = 0;
             } else {
-                int dirMask = repeat & 0xC;
-                if (dirMask != 0) {
+                if ((repeat & 0xC) != 0) {
                     CmakeState(this)->m_select ^= 1;
                     Sound.PlaySe(1, 0x40, 0x7F, 0);
                 }
-                if (dirMask == 0) {
+                if ((repeat & 0xC) == 0) {
                     if ((down & 0x100) != 0) {
                         s_CmakeInfo.m_gender = static_cast<signed char>(CmakeState(this)->m_select);
                         CmakeState(this)->m_resultDir = 1;
@@ -4080,12 +3953,11 @@ void CMenuPcs::CalcSingCMake()
             if (repeat == 0) {
                 done = 0;
             } else {
-                int dirMask = repeat & 3;
-                if (dirMask != 0) {
+                if ((repeat & 3) != 0) {
                     CmakeState(this)->m_select ^= 1;
                     Sound.PlaySe(1, 0x40, 0x7F, 0);
                 }
-                if (dirMask == 0) {
+                if ((repeat & 3) == 0) {
                     if ((down & 0x100) != 0) {
                         if (CmakeState(this)->m_select == 0) {
                             CmakeState(this)->m_resultDir = 1;
@@ -4176,7 +4048,6 @@ void CMenuPcs::CalcSingCMake()
             if (repeat == 0) {
                 done = 0;
             } else {
-                int dirMask = repeat & 0xC;
                 if ((repeat & 0x8) != 0) {
                     if (CmakeState(this)->m_select == 0) {
                         CmakeState(this)->m_select = 3;
@@ -4195,7 +4066,7 @@ void CMenuPcs::CalcSingCMake()
                     Sound.PlaySe(1, 0x40, 0x7F, 0);
                 }
 
-                if (dirMask == 0) {
+                if ((repeat & 0xC) == 0) {
                     if ((down & 0x100) != 0) {
                         if (CmakeState(this)->m_select < 3) {
                             ChgModel(static_cast<int>(CmakeSlot(this)), -1, -1, -1);

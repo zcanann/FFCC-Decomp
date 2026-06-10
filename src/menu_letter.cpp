@@ -2184,12 +2184,15 @@ int CMenuPcs::LetterCtrlCur()
 
 	if (menuMode == 1) {
 		if ((press & 0x100) != 0) {
-			if ((caravanWork->m_letters[s_SelLetter].AttachmentValue() != 0) && !caravanWork->m_letters[s_SelLetter].IsAttachmentClaimed()) {
+			char* letterBytes = reinterpret_cast<char*>(caravanWork) + s_SelLetter * 0xC;
+			if ((reinterpret_cast<CCaravanWork::CLetterWork*>(letterBytes + 0x3EC)->AttachmentValue() != 0) &&
+			    !reinterpret_cast<CCaravanWork::CLetterWork*>(letterBytes + 0x3EC)->IsAttachmentClaimed()) {
 				*reinterpret_cast<u8*>(GetLetterStateBase(this) + 8) = 1;
 				*reinterpret_cast<u8*>(GetLetterStateBase(this) + 9) = 5;
-				if (caravanWork->m_letters[s_SelLetter].AttachmentIsGil()) {
-					int canAdd = caravanWork->CanAddGil(caravanWork->m_letters[s_SelLetter].AttachmentValue() * 100);
-					if (canAdd != 0) {
+				letterBytes = reinterpret_cast<char*>(caravanWork) + s_SelLetter * 0xC;
+				int value = reinterpret_cast<CCaravanWork::CLetterWork*>(letterBytes + 0x3EC)->AttachmentValue();
+				if (reinterpret_cast<CCaravanWork::CLetterWork*>(letterBytes + 0x3EC)->AttachmentIsGil()) {
+					if (caravanWork->CanAddGil(value * 100) != 0) {
 						*reinterpret_cast<u8*>(GetLetterStateBase(this) + 9) |= 2;
 					}
 				} else {

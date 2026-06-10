@@ -126,7 +126,8 @@ inline void CLightPcs::CLight::Set(CLightPcs::CLight* light)
     if (m_range < kLightZero) {
         m_range = -m_range;
     }
-    m_range = m_range * kLightHalf * m_radius;
+    float range = m_range * kLightHalf;
+    m_range = range * m_radius;
 
     m_targetEnable[3] = 1;
     m_targetEnable[2] = 1;
@@ -387,11 +388,9 @@ CLightPcs::CBumpLight* CLightPcs::AddBump(CLightPcs::CLight* srcLight, CLightPcs
  */
 inline CLightPcs::CBumpLight* CLightPcs::GetFreeBumpLight(CLightPcs::TARGET target)
 {
-    CBumpLight* bumpLights = m_bumpLights[target];
-
     for (int i = 0; i < 8; i++) {
-        if (bumpLights[i].m_hasTexture == 0) {
-            return &bumpLights[i];
+        if (m_bumpLights[target][i].m_hasTexture == 0) {
+            return &m_bumpLights[target][i];
         }
     }
 

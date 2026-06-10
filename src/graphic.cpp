@@ -917,14 +917,12 @@ void CGraphic::DrawDebugStringDirect(unsigned long x, unsigned long y, char* tex
             GXBegin((GXPrimitive)0x80, (GXVtxFmt)0, (u16)((count & 0x3FFF) << 2));
             for (int i = 0; i < count; i++) {
                 int px = x + i * charSize;
-                int glyph = *lineStart - 0x20;
+                int glyph = lineStart[i] - 0x20;
                 int tx = (glyph % 8) * 16;
                 int ty = (glyph / 8) * 16;
 
-                lineStart++;
-
                 GXWGFifo.s16 = px;
-                GXWGFifo.u16 = (s16)y;
+                GXWGFifo.u16 = y;
                 GXWGFifo.s16 = 0;
                 GXWGFifo.s16 = tx;
                 GXWGFifo.s16 = ty;
@@ -1088,11 +1086,10 @@ void CGraphic::makeSphere()
         float radius = kGraphicSphereNegativeX * (float)sin(pitch);
 
         for (int seg = 0; seg < 8; seg++) {
-            float yaw = kGraphicSphereSegmentAngle * (float)seg;
             int vertexIndex = vertexCount * 3;
             vertex[0] = x;
-            vertex[1] = radius * (float)sin(yaw);
-            vertices[vertexIndex + 2] = radius * (float)cos(yaw);
+            vertex[1] = radius * (float)sin(kGraphicSphereSegmentAngle * (float)seg);
+            vertices[vertexIndex + 2] = radius * (float)cos(kGraphicSphereSegmentAngle * (float)seg);
             vertex += 3;
             vertexCount++;
         }
@@ -1351,61 +1348,59 @@ _GXTexObj* CGraphic::GetBackBufferRect(int& x, int& y, int& width, int& height, 
         height += 1;
     }
 
-    if ((xEnd >= 0) && (yEnd >= 0)) {
-        GXRenderModeObj* renderMode = m_renderMode;
-        int efbWidth = static_cast<int>(renderMode->fbWidth);
-
-        if ((x <= efbWidth) && (yEnd >= 0) && (y <= static_cast<int>(renderMode->efbHeight)) &&
-            (width > 0) && (height > 0)) {
-            if (xEnd > efbWidth) {
-                width -= (xEnd - efbWidth);
-                xEnd = static_cast<int>(m_renderMode->fbWidth);
-            }
-
-            if (x < 0) {
-                width += x;
-                x = 0;
-            }
-
-            if (y < 0) {
-                height += y;
-                y = 0;
-            }
-
-            int efbHeight = static_cast<int>(m_renderMode->efbHeight);
-            if (yEnd > efbHeight) {
-                height -= (yEnd - efbHeight);
-                yEnd = static_cast<int>(m_renderMode->efbHeight);
-            }
-
-            if (((xEnd - x) != 0) && ((yEnd - y) != 0)) {
-                int texFormat = 6;
-                int textureSize = width * height * 4;
-                int maxTextureSize =
-                    (((static_cast<int>(m_renderMode->fbWidth) + 0xF) & 0xFFF0) *
-                         static_cast<int>(m_renderMode->efbHeight) * 2) +
-                    0x46000;
-                if (maxTextureSize < textureSize) {
-                    texFormat = 4;
-                    textureSize /= 2;
-                }
-
-                GXSetTexCopySrc(x & 0xFFFF, y & 0xFFFF, width & 0xFFFF, height & 0xFFFF);
-                GXSetTexCopyDst(width & 0xFFFF, height & 0xFFFF, static_cast<_GXTexFmt>(texFormat), GX_FALSE);
-                DCInvalidateRange(m_scratchTextureBuffer, textureSize);
-                GXCopyTex(m_scratchTextureBuffer, doClear);
-                GXPixModeSync();
-                GXInvalidateTexAll();
-                GXInitTexObj(&m_backBufferTexObj, m_scratchTextureBuffer, width & 0xFFFF, height & 0xFFFF,
-                             static_cast<_GXTexFmt>(texFormat), GX_CLAMP, GX_CLAMP, GX_FALSE);
-                GXInitTexObjLOD(&m_backBufferTexObj, GX_LINEAR, GX_LINEAR, kGraphicZeroF, kGraphicZeroF,
-                                kGraphicZeroF, GX_FALSE, GX_FALSE, GX_ANISO_1);
-                return &m_backBufferTexObj;
-            }
-        }
+    if ((xEnd < 0) || (yEnd < 0) || (x > static_cast<int>(m_renderMode->fbWidth)) || (yEnd < 0) ||
+        (y > static_cast<int>(m_renderMode->efbHeight)) || (width <= 0) || (height <= 0)) {
+        return 0;
     }
 
-    return 0;
+    int efbWidth = static_cast<int>(m_renderMode->fbWidth);
+    if (xEnd > efbWidth) {
+        width -= (xEnd - efbWidth);
+        xEnd = static_cast<int>(m_renderMode->fbWidth);
+    }
+
+    if (x < 0) {
+        width += x;
+        x = 0;
+    }
+
+    if (y < 0) {
+        height += y;
+        y = 0;
+    }
+
+    int efbHeight = static_cast<int>(m_renderMode->efbHeight);
+    if (yEnd > efbHeight) {
+        height -= (yEnd - efbHeight);
+        yEnd = static_cast<int>(m_renderMode->efbHeight);
+    }
+
+    if (((xEnd - x) != 0) && ((yEnd - y) != 0)) {
+        int texFormat = 6;
+        int textureSize = width * height * 4;
+        int maxTextureSize =
+            (((static_cast<int>(m_renderMode->fbWidth) + 0xF) & 0xFFF0) *
+                 static_cast<int>(m_renderMode->efbHeight) * 2) +
+            0x46000;
+        if (maxTextureSize < textureSize) {
+            texFormat = 4;
+            textureSize /= 2;
+        }
+
+        GXSetTexCopySrc(x & 0xFFFF, y & 0xFFFF, width & 0xFFFF, height & 0xFFFF);
+        GXSetTexCopyDst(width & 0xFFFF, height & 0xFFFF, static_cast<_GXTexFmt>(texFormat), GX_FALSE);
+        DCInvalidateRange(m_scratchTextureBuffer, textureSize);
+        GXCopyTex(m_scratchTextureBuffer, doClear);
+        GXPixModeSync();
+        GXInvalidateTexAll();
+        GXInitTexObj(&m_backBufferTexObj, m_scratchTextureBuffer, width & 0xFFFF, height & 0xFFFF,
+                     static_cast<_GXTexFmt>(texFormat), GX_CLAMP, GX_CLAMP, GX_FALSE);
+        GXInitTexObjLOD(&m_backBufferTexObj, GX_LINEAR, GX_LINEAR, kGraphicZeroF, kGraphicZeroF,
+                        kGraphicZeroF, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    } else {
+        return 0;
+    }
+    return &m_backBufferTexObj;
 }
 
 /*
@@ -1422,9 +1417,17 @@ void CGraphic::GetBackBufferRect2(void* dstBuffer, _GXTexObj* texObj, int x, int
 {
     int xEnd = x + width;
     int yEnd = y + height;
-    if ((xEnd >= 0) && (yEnd >= 0) && (x <= m_renderMode->fbWidth) &&
-        ((yEnd >= 0) && (y <= m_renderMode->efbHeight)) &&
-        ((width > 0) && ((height > 0) && (xEnd != x))) && (yEnd != y)) {
+    if ((xEnd < 0) || (yEnd < 0) || (x > m_renderMode->fbWidth) || (yEnd < 0) || (y > m_renderMode->efbHeight) ||
+        (width <= 0) || (height <= 0)) {
+        return;
+    }
+    if (xEnd - x == 0) {
+        return;
+    }
+    if (yEnd - y == 0) {
+        return;
+    }
+    {
         void* textureBase;
         int textureSize = GXGetTexBufferSize((u16)width, (u16)height, format, GX_FALSE, GX_FALSE);
         textureBase =
@@ -1489,9 +1492,9 @@ void CGraphic::RenderTexQuadGrouad(Vec pos1, Vec pos2, _GXColor color1, _GXColor
 	float z1;
 	float y2;
 	u32 rgba1;
-	u32 rgba4;
-	u32 rgba2;
 	u32 rgba3;
+	u32 rgba2;
+	u32 rgba4;
 
 	x1 = pos1.x;
 	y1 = pos1.y;

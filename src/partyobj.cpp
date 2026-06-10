@@ -1120,7 +1120,8 @@ void CGPartyObj::onFramePreCalc()
 			if (weaponItem <= 0) {
 				LoadWeapon(-1, 0);
 			} else {
-				unsigned short packedItem = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + weaponItem * 0x48 + 2);
+				SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
+				unsigned short packedItem = rows[weaponItem].m_model;
 				LoadWeapon(packedItem & 0x0FFF, packedItem >> 12);
 			}
 			party.weaponItem = weaponItem;

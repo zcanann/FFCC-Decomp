@@ -2177,7 +2177,7 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 	const int skipShadowPosition = ((flags >> 4) & 1) ^ 1;
 	BeforeDrawModelCallback beforeDrawModel = ModelBeforeDrawCallback(this);
 	if (beforeDrawModel != 0 && pass == 0) {
-		beforeDrawModel(this, ModelCbUser0(this), ModelCbUser1(this), view, cullFlag);
+		beforeDrawModel(this, m_callbackContext, m_callbackParam, view, cullFlag);
 	}
 
 	ModelMaterialSet(this)->SetTextureSet(m_texSet);
@@ -2245,7 +2245,7 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 		}
 
 		if (ModelBeforeMeshCallback(this) != 0) {
-			ModelBeforeMeshCallback(this)(this, ModelCbUser0(this), ModelCbUser1(this), meshIndex);
+			ModelBeforeMeshCallback(this)(this, m_callbackContext, m_callbackParam, meshIndex);
 		}
 
 		CopyCharaMaterialEnv();
@@ -2262,7 +2262,7 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 		CCharaDisplayListRaw* displayList = mesh->m_data->m_displayLists;
 		for (int displayListIndex = static_cast<int>(mesh->m_data->m_displayListCount) - 1; displayListIndex >= 0; displayListIndex--, displayList++) {
 			if (ModelAfterMeshDrawCallback(this) != 0) {
-				ModelAfterMeshDrawCallback(this)(this, ModelCbUser0(this), ModelCbUser1(this), meshIndex, static_cast<unsigned int>(displayListIndex), meshMtx);
+				ModelAfterMeshDrawCallback(this)(this, m_callbackContext, m_callbackParam, meshIndex, static_cast<unsigned int>(displayListIndex), meshMtx);
 			} else {
 				MaterialMan.SetMaterial(ModelMaterialSet(this), displayList->m_material, materialAlpha, (_GXTevScale)0);
 				GXCallDisplayList(displayList->m_data, displayList->m_size);
@@ -2270,13 +2270,13 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 		}
 
 		if (ModelAfterMeshEnvCallback(this) != 0) {
-			ModelAfterMeshEnvCallback(this)(this, ModelCbUser0(this), ModelCbUser1(this), meshIndex, meshMtx);
+			ModelAfterMeshEnvCallback(this)(this, m_callbackContext, m_callbackParam, meshIndex, meshMtx);
 		}
 	}
 
 	AfterDrawModelCallback afterDrawModel = ModelAfterDrawCallback(this);
 	if (afterDrawModel != 0) {
-		afterDrawModel(this, ModelCbUser0(this), ModelCbUser1(this));
+		afterDrawModel(this, m_callbackContext, m_callbackParam);
 	}
 }
 

@@ -1568,7 +1568,7 @@ void CMes::Next()
 	{
 		entryCount = *(int*)((char*)this + 0x3c0c);
 		flagEntry = (unsigned char*)((char*)this + *(int*)((char*)this + 0x3c10) * 6 + 0x3c14);
-		while ((halfVal = kMesZero, *(int*)((char*)this + 0x3c10) < entryCount))
+		while (*(int*)((char*)this + 0x3c10) < entryCount)
 		{
 			type = *flagEntry;
 			switch (type)
@@ -1590,6 +1590,7 @@ void CMes::Next()
 			*(int*)((char*)this + 0x3c10) = *(int*)((char*)this + 0x3c10) + 1;
 		}
 		mCounter = 0;
+		halfVal = kMesZero;
 		mFlagCursor = 0;
 		mFlagCount = 0;
 		mCurrentY = halfVal;

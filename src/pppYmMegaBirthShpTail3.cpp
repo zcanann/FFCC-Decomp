@@ -784,72 +784,74 @@ path:
             short* pathInfo = (short*)(*(int*)&ppvEnv->m_particleColors[1] + *(s16*)(paramBytes + 0x6a) * 8);
 
             if (pathBase == 0) {
-                pathBase = (float*)((u8*)ppvEnv->m_mapMeshPtr[*pathInfo] + 0x2C);
+                pathBase = *(float**)((u8*)ppvEnv->m_mapMeshPtr[*pathInfo] + 0x2C);
             }
 
-            if (pathBase != 0) {
+            {
                 float vx;
                 float vy;
                 float vz;
+                float sampleT;
 
-                if ((pYmMegaBirthShpTail3->m_randType == 0) || (pYmMegaBirthShpTail3->m_randType > 5)) {
+                switch (pYmMegaBirthShpTail3->m_randType) {
+                default:
+                {
                     if ((u16)vYmMegaBirthShpTail3->m_pathIndex >= (s16)pathInfo[1]) {
                         vYmMegaBirthShpTail3->m_pathIndex = 0;
                     }
 
-                    s16 sampleIndex = (u16)vYmMegaBirthShpTail3->m_pathIndex;
+                    u16 sampleIndex = vYmMegaBirthShpTail3->m_pathIndex;
+                    u16* indices = (u16*)*(int*)(pathInfo + 2);
                     vYmMegaBirthShpTail3->m_pathIndex = sampleIndex + 1;
 
-                    float* pathVec = (float*)((u8*)pathBase + *(u16*)(*(int*)(pathInfo + 2) + sampleIndex * 2) * sizeof(Vec));
+                    float* pathVec = (float*)((u8*)pathBase + indices[sampleIndex] * sizeof(Vec));
                     vx = pathVec[0];
                     vy = pathVec[1];
                     vz = pathVec[2];
-                } else {
-                    float sampleT;
+                    goto path_store;
+                }
+                case 1:
+                    Math.RandF();
+                    sampleT = Math.RandF();
+                    break;
+                case 2:
+                {
+                    float r0 = Math.RandF();
+                    float r1 = Math.RandF();
+                    float r2 = Math.RandF();
+                    sampleT = r2 * (r1 * r0);
+                    break;
+                }
+                case 3:
+                {
+                    float r0 = Math.RandF();
+                    float r1 = Math.RandF();
+                    float r2 = Math.RandF();
+                    sampleT = static_cast<float>(kPppYmMegaBirthShpTail3OneDouble - (r2 * (r1 * r0)));
+                    break;
+                }
+                case 4:
+                {
+                    float r0 = Math.RandF();
+                    float r1 = Math.RandF();
+                    float r2 = Math.RandF();
+                    float r3 = Math.RandF();
+                    sampleT = r3 * (r2 * (r1 * r0));
+                    break;
+                }
+                case 5:
+                {
+                    float r0 = Math.RandF();
+                    float r1 = Math.RandF();
+                    float r2 = Math.RandF();
+                    float r3 = Math.RandF();
+                    float r4 = Math.RandF();
+                    sampleT = static_cast<float>(kPppYmMegaBirthShpTail3OneDouble - (r4 * (r3 * (r2 * (r1 * r0)))));
+                    break;
+                }
+                }
 
-                    switch (pYmMegaBirthShpTail3->m_randType) {
-                    case 1:
-                        Math.RandF();
-                        sampleT = Math.RandF();
-                        break;
-                    case 2:
-                    {
-                        float r0 = Math.RandF();
-                        float r1 = Math.RandF();
-                        float r2 = Math.RandF();
-                        sampleT = r2 * (r1 * r0);
-                        break;
-                    }
-                    case 3:
-                    {
-                        float r0 = Math.RandF();
-                        float r1 = Math.RandF();
-                        float r2 = Math.RandF();
-                        sampleT = static_cast<float>(kPppYmMegaBirthShpTail3OneDouble - (r2 * (r1 * r0)));
-                        break;
-                    }
-                    case 5:
-                    {
-                        float r0 = Math.RandF();
-                        float r1 = Math.RandF();
-                        float r2 = Math.RandF();
-                        float r3 = Math.RandF();
-                        float r4 = Math.RandF();
-                        sampleT = static_cast<float>(kPppYmMegaBirthShpTail3OneDouble - (r4 * (r3 * (r2 * (r1 * r0)))));
-                        break;
-                    }
-                    case 4:
-                    default:
-                    {
-                        float r0 = Math.RandF();
-                        float r1 = Math.RandF();
-                        float r2 = Math.RandF();
-                        float r3 = Math.RandF();
-                        sampleT = r3 * (r2 * (r1 * r0));
-                        break;
-                    }
-                    }
-
+                {
                     if ((u16)vYmMegaBirthShpTail3->m_pathIndex >= (s16)pathInfo[1]) {
                         vYmMegaBirthShpTail3->m_pathIndex = 0;
                     }
@@ -860,6 +862,7 @@ path:
                     vy = pathVec[1];
                     vz = pathVec[2];
                 }
+                path_store:
 
                 particleData->m_matrix[0][0] = vx * pYmMegaBirthShpTail3->m_speedScaleX;
                 particleData->m_matrix[0][1] = vy * pYmMegaBirthShpTail3->m_speedScaleYZ.x;

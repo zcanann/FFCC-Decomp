@@ -124,13 +124,14 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
             s32 trailNextIndex = (u8)(trailReadIndex + 1);
             const float alphaScale = (float)*(s16*)((u8*)colorWork + 6) / kPppYmMegaBirthShpTail2AlphaDivisor;
             const float stepDivisor = (float)((s32)frameCountRaw - 1);
-            float drawScale = *(float*)(step + 0x70);
-            const float drawScaleStep =
-                (drawScale - *(float*)(step + 0x74)) / stepDivisor;
+            float fadeA = (float)step[0x7B] * alphaScale;
+            const float fadeANum = fadeA - (float)step[0x7F] * alphaScale;
             float fadeR = (float)step[0x78];
             float fadeG = (float)step[0x79];
             float fadeB = (float)step[0x7A];
-            float fadeA = (float)step[0x7B] * alphaScale;
+            const float fadeRNum = fadeR - (float)step[0x7C];
+            const float fadeGNum = fadeG - (float)step[0x7D];
+            const float fadeBNum = fadeB - (float)step[0x7E];
             float fadeRStep;
             float fadeGStep;
             float fadeBStep;
@@ -141,13 +142,15 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
                 fadeBStep = kPppYmMegaBirthShpTail2Half;
                 fadeAStep = kPppYmMegaBirthShpTail2Half;
             } else {
-                fadeRStep = (fadeR - (float)step[0x7C]) / stepDivisor;
-                fadeGStep = (fadeG - (float)step[0x7D]) / stepDivisor;
-                fadeBStep = (fadeB - (float)step[0x7E]) / stepDivisor;
-                fadeAStep = (fadeA - (float)step[0x7F] * alphaScale) / stepDivisor;
+                fadeGStep = fadeGNum / stepDivisor;
+                fadeBStep = fadeBNum / stepDivisor;
+                fadeAStep = fadeANum / stepDivisor;
+                fadeRStep = fadeRNum / stepDivisor;
             }
             const float spacing = *(float*)(step + 0x80);
             Vec* history = (Vec*)(particle + 0x40);
+            float drawScale;
+            float drawScaleStep;
             float segLen;
             float segProgress = 0.0f;
             float segRemaining;
@@ -160,6 +163,8 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
             }
 
             pppUnitMatrix(drawMtx);
+            drawScale = *(float*)(step + 0x70);
+            drawScaleStep = (drawScale - *(float*)(step + 0x74)) / stepDivisor;
             {
                 Vec* p = &history[trailReadIndex];
                 drawX = p->x;

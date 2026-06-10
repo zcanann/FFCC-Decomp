@@ -1213,63 +1213,100 @@ void CGPartyObj::command()
 			}
 			if (targetState < 0x24) {
 				if (targetState < 0x12) {
-					if (targetState != 0x0B && (targetState > 0x0A || targetState > 0x09) &&
-					    *reinterpret_cast<int*>(targetBytes + 0x550) == 0) {
-						secondaryAvailable = true;
-						secondaryCommand = 4;
+					if (targetState == 0x0B) {
+						goto targetJoin;
 					}
-				} else if (targetState < 0x1C) {
-					if (targetState < 0x19) {
-tmpArtifactBlock:
-#define freshTargetBytes (reinterpret_cast<unsigned char*>(party.target))
-						if (*reinterpret_cast<int*>(targetBytes + 0x550) == 0) {
-							secondaryAvailable = true;
-							if ((targetState == 0x24 && caravan->CanAddTmpArtifact(1) != 0) ||
-							    (*reinterpret_cast<int*>(freshTargetBytes + 0x500) == 0x20 &&
-							     caravan->CanAddGil(*reinterpret_cast<int*>(freshTargetBytes + 0x558)) != 0) ||
-							    ((*reinterpret_cast<int*>(freshTargetBytes + 0x500) != 0x24 &&
-							      *reinterpret_cast<int*>(freshTargetBytes + 0x500) != 0x20) &&
-							     *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xB4) + 1 <= 0x40)) {
-								secondaryCommand = 0x17;
-							} else {
-								secondaryCommand = 4;
-							}
-						}
-#undef freshTargetBytes
+					if (targetState > 0x0B) {
+						goto cmdFourBlock;
 					}
-				} else if (targetState < 0x22) {
+					if (targetState > 0x09) {
+						goto cmdFourBlock;
+					}
+					goto targetJoin;
+				}
+				if (targetState < 0x1C) {
+					if (targetState >= 0x19) {
+						goto targetJoin;
+					}
 					goto tmpArtifactBlock;
 				}
-			} else if (targetState < 0xCA) {
+				if (targetState >= 0x22) {
+					goto targetJoin;
+				}
+				goto tmpArtifactBlock;
+			}
+			if (targetState == 0xCA) {
+				goto stateCABlock;
+			}
+			if (targetState < 0xCA) {
 				if (targetState == 0xC8) {
-					if (static_cast<int>(CFlatCenterState()) == 0) {
-						secondaryAvailable = true;
-						secondaryCommand = 0x0B;
-					} else {
-						primaryAvailable = true;
-						primaryCommand = 0x0B;
-					}
-				} else if (targetState > 0xC7) {
-					if (static_cast<int>(CFlatCenterState()) == 0) {
-						secondaryAvailable = true;
-						secondaryCommand = 0x0A;
-					} else {
-						primaryAvailable = true;
-						primaryCommand = 0x0A;
-					}
+					goto stateC8Block;
 				}
-			} else if (targetState == 0xCA) {
-				if (static_cast<int>(CFlatCenterState()) == 0) {
-					secondaryAvailable = true;
-					secondaryCommand = 0x1C;
-				} else {
-					primaryAvailable = true;
-					primaryCommand = 0x1C;
+				if (targetState > 0xC7) {
+					goto stateC9Block;
 				}
-			} else if (targetState == 0xCC) {
+				goto targetJoin;
+			}
+			if (targetState == 0xCC) {
 				secondaryAvailable = true;
 				secondaryCommand = 6;
 			}
+			goto targetJoin;
+
+cmdFourBlock:
+			if (*reinterpret_cast<int*>(targetBytes + 0x550) == 0) {
+				secondaryAvailable = true;
+				secondaryCommand = 4;
+			}
+			goto targetJoin;
+
+tmpArtifactBlock:
+#define freshTargetBytes (reinterpret_cast<unsigned char*>(party.target))
+			if (*reinterpret_cast<int*>(targetBytes + 0x550) == 0) {
+				secondaryAvailable = true;
+				if ((targetState == 0x24 && caravan->CanAddTmpArtifact(1) != 0) ||
+				    (*reinterpret_cast<int*>(freshTargetBytes + 0x500) == 0x20 &&
+				     caravan->CanAddGil(*reinterpret_cast<int*>(freshTargetBytes + 0x558)) != 0) ||
+				    ((*reinterpret_cast<int*>(freshTargetBytes + 0x500) != 0x24 &&
+				      *reinterpret_cast<int*>(freshTargetBytes + 0x500) != 0x20) &&
+				     *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xB4) + 1 <= 0x40)) {
+					secondaryCommand = 0x17;
+				} else {
+					secondaryCommand = 4;
+				}
+			}
+#undef freshTargetBytes
+			goto targetJoin;
+
+stateC8Block:
+			if (static_cast<int>(CFlatCenterState()) == 0) {
+				secondaryAvailable = true;
+				secondaryCommand = 0x0B;
+			} else {
+				primaryAvailable = true;
+				primaryCommand = 0x0B;
+			}
+			goto targetJoin;
+
+stateC9Block:
+			if (static_cast<int>(CFlatCenterState()) == 0) {
+				secondaryAvailable = true;
+				secondaryCommand = 0x0A;
+			} else {
+				primaryAvailable = true;
+				primaryCommand = 0x0A;
+			}
+			goto targetJoin;
+
+stateCABlock:
+			if (static_cast<int>(CFlatCenterState()) == 0) {
+				secondaryAvailable = true;
+				secondaryCommand = 0x1C;
+			} else {
+				primaryAvailable = true;
+				primaryCommand = 0x1C;
+			}
+targetJoin: ;
 		}
 
 		if (party.carryObject != nullptr) {

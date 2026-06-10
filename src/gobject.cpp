@@ -1386,7 +1386,8 @@ void CGObject::update()
     if (m_animSlotSel != -1 && m_shieldNodeFlagBits.m_bit40) {
         const double turnLimit = fabs(m_turnBaseSpeed);
         double clampedTurn = -turnLimit;
-        if (turnDelta >= clampedTurn) {
+        if (turnDelta < clampedTurn) {
+        } else {
             clampedTurn = turnLimit < turnDelta ? turnLimit : turnDelta;
         }
         turnDelta = clampedTurn;

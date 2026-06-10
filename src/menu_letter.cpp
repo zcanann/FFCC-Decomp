@@ -1797,7 +1797,7 @@ void CMenuPcs::LetterListDraw()
 	const int topRow = static_cast<int>(m_singMenuState->topIndex);
 
 	unsigned int y = 0x60;
-	unsigned int letterIndex;
+	int letterIndex;
 	for (int row = 0; row < 9 && (letterIndex = topRow + row) < caravanWork->m_letterCount; ++row) {
 		CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[letterIndex];
 
@@ -1988,14 +1988,16 @@ void CMenuPcs::LetterMessDraw()
 
 	DrawInit();
 
+	float cursorX;
+	float cursorY;
 	char* letterBytes = reinterpret_cast<char*>(caravanWork) + s_SelLetter * 0xC;
 	if ((*reinterpret_cast<u16*>(letterBytes + 0x3EE) & 0x1FF) != 0) {
-		float iconX = FLOAT_8033314c;
-		float iconY = FLOAT_80333150;
+		cursorX = FLOAT_8033314c;
+		cursorY = FLOAT_80333150;
 		int icon = 0x26 +
 		           (reinterpret_cast<CCaravanWork::CLetterWork*>(letterBytes + 0x3EC)->IsAttachmentClaimed() ? 1 : 0);
 		DrawSingleIcon(
-		    icon, static_cast<int>(iconX), static_cast<int>(iconY),
+		    icon, static_cast<int>(cursorX), static_cast<int>(cursorY),
 		    *reinterpret_cast<float*>(animBase + 0xC), 1, FLOAT_80333154);
 	}
 
@@ -2013,8 +2015,6 @@ void CMenuPcs::LetterMessDraw()
 			DrawSingWinMess(0, msgType, 1);
 		}
 
-		float cursorX;
-		float cursorY;
 		if ((mode == 2) || (mode == 5)) {
 			cursorX = static_cast<float>(m_menuWindowInfo->x + 0x14);
 			int itemSel = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28);

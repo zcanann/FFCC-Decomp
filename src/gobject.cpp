@@ -345,20 +345,18 @@ void CGObject::onCreate()
     m_radiusCtrlVel.y = m_radiusCtrl.y;
     m_radiusCtrlVel.z = m_radiusCtrl.z;
     m_groundFriction = m_radiusCtrlVel.x;
-    m_moveMode = 0;
-    m_moveModePrevious = 4;
 
     m_hitNormal.x = sBgAttrFast;
-    m_hitNormal.y = 0.0f;
-    m_hitNormal.z = 0.0f;
     m_bgDownDist = sDefaultBgDownDist;
+    m_moveMode = 0;
+    m_moveModePrevious = 4;
     m_groundSlide = 0.0f;
+    m_hitNormal.z = 0.0f;
+    m_hitNormal.y = 0.0f;
     m_worldParam = 0.0f;
-    m_worldParamA = 0;
-    m_field_0x56 = 0x7D;
-    *reinterpret_cast<float*>(m_worldMode) = 0.0f;
 
     m_lookAtTargetNodeIndex = -1;
+    m_worldParamA = 0;
     m_lookAtAccumYaw = 0.0f;
     m_lookAtAccumPitch = 0.0f;
     m_weaponAttachNode = -1;
@@ -369,46 +367,49 @@ void CGObject::onCreate()
     m_extraMoveVec.y = 0.0f;
     m_extraMoveVec.x = 0.0f;
     m_shieldNodeFlagBits.m_bit01 = 0;
+    m_field_0x56 = 0x7D;
+    *reinterpret_cast<float*>(m_worldMode) = 0.0f;
 
     int animStateOffset = 0;
     for (int i = 0; i < 2; i++) {
-        s8* animState = reinterpret_cast<s8*>(m_animQueue) + animStateOffset - 0x41;
+        s8* animState;
+        animState = reinterpret_cast<s8*>(this) + (animStateOffset + 0x9D);
         animState[0] = -1;
         animState[1] = -1;
         animState[2] = -1;
         animState[3] = -1;
-        animState[4] = 0xFF;
+        animState[4] = -1;
         animState[5] = -1;
         animState[6] = -1;
-        animState[7] = 0xFF;
-        animState = reinterpret_cast<s8*>(m_animQueue) + animStateOffset - 0x39;
+        animState[7] = -1;
+        animState = reinterpret_cast<s8*>(this) + (animStateOffset + 0xA5);
         animState[0] = -1;
         animState[1] = -1;
         animState[2] = -1;
         animState[3] = -1;
-        animState[4] = 0xFF;
+        animState[4] = -1;
         animState[5] = -1;
         animState[6] = -1;
-        animState[7] = 0xFF;
-        animState = reinterpret_cast<s8*>(m_animQueue) + animStateOffset - 0x31;
+        animState[7] = -1;
+        animState = reinterpret_cast<s8*>(this) + (animStateOffset + 0xAD);
         animState[0] = -1;
         animState[1] = -1;
         animState[2] = -1;
         animState[3] = -1;
-        animState[4] = 0xFF;
+        animState[4] = -1;
         animState[5] = -1;
         animState[6] = -1;
-        animState[7] = 0xFF;
-        animState = reinterpret_cast<s8*>(m_animQueue) + animStateOffset - 0x29;
+        animState[7] = -1;
+        animState = reinterpret_cast<s8*>(this) + (animStateOffset + 0xB5);
         animStateOffset += 0x20;
         animState[0] = -1;
         animState[1] = -1;
         animState[2] = -1;
         animState[3] = -1;
-        animState[4] = 0xFF;
+        animState[4] = -1;
         animState[5] = -1;
         animState[6] = -1;
-        animState[7] = 0xFF;
+        animState[7] = -1;
     }
 
     memset(&m_attackColliders[0].m_localStart.y, 0, 0x180);

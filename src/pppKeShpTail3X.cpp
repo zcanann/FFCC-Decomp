@@ -160,7 +160,10 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     float wDiff;
     pppFVECTOR4 colorStart;
     pppFVECTOR4 colorEnd;
-    pppFVECTOR4 colorStep;
+    float colorStepX;
+    float colorStepY;
+    float colorStepZ;
+    float colorStepW;
     pppFMATRIX localBase;
     pppFMATRIX drawMtx;
     pppFMATRIX unitScratch;
@@ -220,15 +223,15 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     yDiff = colorStart.y - colorEnd.y;
     zDiff = colorStart.z - colorEnd.z;
     if (invCountMinusOne != kPppKeShpTail3XZero) {
-        colorStep.y = yDiff / invCountMinusOne;
-        colorStep.z = zDiff / invCountMinusOne;
-        colorStep.w = wDiff / invCountMinusOne;
-        colorStep.x = xDiff / invCountMinusOne;
+        colorStepY = yDiff / invCountMinusOne;
+        colorStepZ = zDiff / invCountMinusOne;
+        colorStepW = wDiff / invCountMinusOne;
+        colorStepX = xDiff / invCountMinusOne;
     } else {
-        colorStep.y = kPppKeShpTail3XHalf;
-        colorStep.z = kPppKeShpTail3XHalf;
-        colorStep.w = kPppKeShpTail3XHalf;
-        colorStep.x = kPppKeShpTail3XHalf;
+        colorStepX = kPppKeShpTail3XHalf;
+        colorStepY = colorStepX;
+        colorStepZ = colorStepX;
+        colorStepW = colorStepX;
     }
 
     shapeAnim = static_cast<pppShapeAnimData*>(ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex]->m_animData);
@@ -349,10 +352,10 @@ update_step:
         return;
     }
 
-    colorStart.x -= colorStep.x;
-    colorStart.y -= colorStep.y;
-    colorStart.z -= colorStep.z;
-    colorStart.w -= colorStep.w;
+    colorStart.x -= colorStepX;
+    colorStart.y -= colorStepY;
+    colorStart.z -= colorStepZ;
+    colorStart.w -= colorStepW;
     shapeScale -= shapeScaleStep;
     trailStep -= trailStepDelta;
     if (trailStep <= kPppKeShpTail3XZero) {

@@ -589,12 +589,12 @@ void CMes::Draw()
 
 		float* glyph = (float*)((char*)this + 0x0C);
 		CFont* font = 0;
+		CFont* nextFont;
 		int activeTlut = 0xFFFFFFFF;
 		int activeFontId = 0xFFFFFFFF;
 
 		for (int i = 0; i < *(int*)((char*)this + 8); i++)
 		{
-			CFont* nextFont = font;
 			if (*(int*)((char*)this + 0x3C80) >= (int)(unsigned int)*(unsigned short*)((char*)glyph + 0x0C))
 			{
 				if ((unsigned int)*(unsigned char*)(glyph + 4) < 0x20)
@@ -770,7 +770,6 @@ void CMes::Draw()
 			}
 
 			glyph += 5;
-			font = nextFont;
 		}
 
 		font->DrawQuit();

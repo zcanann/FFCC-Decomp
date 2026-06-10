@@ -148,10 +148,14 @@ void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, _pppCtrlTable* param_2)
 void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* step, _pppCtrlTable* param_3)
 {
     KeShpTail3XWork* work;
+    s32 currentIndex;
     Vec* history;
-    tagOAN3_SHAPE* shapeEntry;
     pppShapeAnimData* shapeAnim;
     int count;
+    s32 nextIndex;
+    u16 rng;
+    s32 shapeFrameCount;
+    tagOAN3_SHAPE* shapeEntry;
     float alphaMul;
     float invCountMinusOne;
     float xDiff;
@@ -178,10 +182,8 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     float segDx;
     float segDy;
     float segDz;
-    u16 rng;
     int life;
     s32 shapeFrameDuration;
-    s32 shapeFrameCount;
     float shapeScale;
     float shapeScaleStep;
     float trailStep;
@@ -197,8 +199,6 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     float nextBaseX;
     float nextBaseY;
     float nextBaseZ;
-    s32 currentIndex;
-    s32 nextIndex;
     u8 zEnable;
     float segCursor = kPppKeShpTail3XZero;
     s32 dataValIndex;

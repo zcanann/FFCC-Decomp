@@ -3079,9 +3079,9 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 				PSMTXRotRad(rotMtx, 'y', m_rotTargetY);
 				for (int i = 0; i < 2; i++) {
 					int side = (i == 0) ? 76 : -76;
-					CVector sidePos(static_cast<float>(side), kCharaObjZero, kCharaObjForwardParticleOffset);
+					const CVector& sidePos = CVector(static_cast<float>(side), kCharaObjZero, kCharaObjForwardParticleOffset);
 					Vec offsetPos;
-					PSMTXMultVec(rotMtx, reinterpret_cast<Vec*>(&sidePos), &offsetPos);
+					PSMTXMultVec(rotMtx, (Vec*)&sidePos, &offsetPos);
 					CFlatParticleWorkPosition().x = m_worldPosition.x + offsetPos.x;
 					CFlatParticleWorkPosition().y = m_worldPosition.y + offsetPos.y;
 					CFlatParticleWorkPosition().z = m_worldPosition.z + offsetPos.z;
@@ -3096,8 +3096,8 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 		}
 
 		if (seNo != 0) {
-			Vec* sePos = (effectArg0 == 2) ? pos : 0;
-			int seHandle = playSe3D(seNo, 0x32, 0x96, 0, sePos);
+			unsigned char useArgPos = (effectArg0 == 2);
+			int seHandle = playSe3D(seNo, 0x32, 0x96, 0, (useArgPos != 0) ? pos : 0);
 			Sound.SetSe3DGroup(seHandle, m_particleId);
 		}
 

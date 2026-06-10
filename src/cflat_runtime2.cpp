@@ -1907,26 +1907,26 @@ void CFlatRuntime2::drawLayer(
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 0);
 	int tevStage = TextureMan.SetTextureTev(texture);
 
-	const float scaledWidth = static_cast<float>(width) * scaleX;
-	const float scaledHeight = static_cast<float>(height) * scaleY;
+	scaleX = static_cast<float>(width) * scaleX;
+	scaleY = static_cast<float>(height) * scaleY;
 	int u1 = texU + width;
 	int v1 = texV + height;
 	float xAnchor;
 	if ((flags & 1) != 0) {
-		xAnchor = FLOAT_80330154 * scaledWidth;
+		xAnchor = FLOAT_80330154 * scaleX;
 	} else {
 		xAnchor = FLOAT_80330144;
 	}
 	const float x0 = static_cast<float>(x) - xAnchor;
 	float yAnchor;
 	if ((flags & 1) != 0) {
-		yAnchor = FLOAT_80330154 * scaledHeight;
+		yAnchor = FLOAT_80330154 * scaleY;
 	} else {
 		yAnchor = FLOAT_80330144;
 	}
 	const float y0 = static_cast<float>(y) - yAnchor;
-	const float x1 = x0 + scaledWidth;
-	const float y1 = y0 + scaledHeight;
+	const float x1 = x0 + scaleX;
+	const float y1 = y0 + scaleY;
 
 	if (blendMode != 3) {
 		GXBegin(GX_QUADS, GX_VTXFMT0, 4);
@@ -1960,12 +1960,11 @@ void CFlatRuntime2::drawLayer(
 		_GXSetTevAlphaIn((_GXTevStageID)tevStage, (_GXTevAlphaArg)7, (_GXTevAlphaArg)4, (_GXTevAlphaArg)0, (_GXTevAlphaArg)7);
 		_GXSetTevAlphaOp((_GXTevStageID)tevStage, (_GXTevOp)0, (_GXTevBias)0, (_GXTevScale)0, 1, (_GXTevRegID)0);
 
-		CColor texCol0;
-		CColor texCol1;
+		CColor texCol0, texCol1;
 
 		for (int quad = 0; quad < 4; quad++) {
-			int rectW = static_cast<int>(scaledWidth * FLOAT_80330154);
-			int rectH = static_cast<int>(scaledHeight * FLOAT_80330154);
+			int rectW = static_cast<int>(scaleX * FLOAT_80330154);
+			int rectH = static_cast<int>(scaleY * FLOAT_80330154);
 
 			float bx;
 			if ((quad & 1) != 0) {

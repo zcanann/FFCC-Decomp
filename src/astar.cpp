@@ -46,6 +46,15 @@ struct CABlock
 	unsigned int m_words[16];
 };
 
+static inline CVector& SubVector(Vec* a, Vec* b)
+{
+	CVector result;
+
+	PSVECSubtract(a, b, reinterpret_cast<Vec*>(&result));
+
+	return result;
+}
+
 static inline float LoadFloat(const float& value)
 {
 	return value;
@@ -174,10 +183,8 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 	Vec escapeDir;
 	Vec portalVec;
 	CVector baseVec(base);
-	Vec* fromVec = reinterpret_cast<Vec*>(&CVector(from));
-	CVector escapeDirSource;
-
-	PSVECSubtract(fromVec, reinterpret_cast<Vec*>(&baseVec), reinterpret_cast<Vec*>(&escapeDirSource));
+	const CVector& escapeDirSource =
+	    SubVector(reinterpret_cast<Vec*>(&CVector(from)), reinterpret_cast<Vec*>(&baseVec));
 
 	escapeDir.x = escapeDirSource.x;
 	escapeDir.y = escapeDirSource.y;
@@ -219,11 +226,9 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 				if (forbiddenGroup != otherGroup)
 				{
 					CVector portalDirBase(base);
-					Vec* portalDirPos = reinterpret_cast<Vec*>(&CVector(m_portals[i].m_position));
-					CVector dirToPortalSource;
-
-					PSVECSubtract(portalDirPos, reinterpret_cast<Vec*>(&portalDirBase),
-					              reinterpret_cast<Vec*>(&dirToPortalSource));
+					const CVector& dirToPortalSource =
+					    SubVector(reinterpret_cast<Vec*>(&CVector(m_portals[i].m_position)),
+					              reinterpret_cast<Vec*>(&portalDirBase));
 
 					portalVec.x = dirToPortalSource.x;
 					portalVec.y = dirToPortalSource.y;
@@ -234,11 +239,9 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 					                            reinterpret_cast<Vec*>(&portalVec));
 
 					CVector distBase(base);
-					Vec* distPortal = reinterpret_cast<Vec*>(&CVector(m_portals[i].m_position));
-					CVector distVecSource;
-
-					PSVECSubtract(distPortal, reinterpret_cast<Vec*>(&distBase),
-					              reinterpret_cast<Vec*>(&distVecSource));
+					const CVector& distVecSource =
+					    SubVector(reinterpret_cast<Vec*>(&CVector(m_portals[i].m_position)),
+					              reinterpret_cast<Vec*>(&distBase));
 
 					portalVec.x = distVecSource.x;
 					portalVec.y = distVecSource.y;

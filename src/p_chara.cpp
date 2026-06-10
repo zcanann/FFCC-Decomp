@@ -2908,15 +2908,19 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
     } else if (drawPass == 2) {
         CVector modelPos;
         Mtx modelMtx;
+        Vec delta;
         PSMTXCopy(*ModelLocalMtx(m_model), modelMtx);
         modelPos.x = modelMtx[0][3];
         modelPos.y = modelMtx[1][3];
         modelPos.z = modelMtx[2][3];
 
         const CVector& focusPos = CVector(CharaPcs.m_texShadowPos);
+        Vec shadowPos;
+        Vec shadowBase;
+        Vec scaledDeltaCopy;
+        Vec eye;
         CVector deltaTmp;
         PSVECSubtract((Vec*)&focusPos, modelPos, deltaTmp);
-        Vec delta;
         delta.x = deltaTmp.x;
         delta.y = deltaTmp.y;
         delta.z = deltaTmp.z;
@@ -2932,7 +2936,6 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
 
         reinterpret_cast<CVector*>(&delta)->Normalize();
 
-        Vec eye;
         {
             CVector up(kCharaZero, 10.0f, kCharaZero);
             CVector eyeTmp;
@@ -2949,9 +2952,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         CVector scaledDelta;
         PSVECScale(&delta, scaledDelta, shadowDistance);
 
-        Vec shadowBase;
         {
-            Vec scaledDeltaCopy;
             scaledDeltaCopy.x = scaledDelta.x;
             scaledDeltaCopy.y = scaledDelta.y;
             scaledDeltaCopy.z = scaledDelta.z;
@@ -2962,7 +2963,6 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
             shadowBase.z = baseTmp.z;
         }
 
-        Vec shadowPos;
         {
             CVector posTmp;
             PSVECAdd(&shadowBase, shadowUp, posTmp);

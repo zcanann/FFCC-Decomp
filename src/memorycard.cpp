@@ -263,6 +263,32 @@ static inline void EncodeSaveData(char* saveBuffer)
     }
 }
 
+static inline void DecodeSaveData(char* saveBuffer)
+{
+    Mc::SaveDat* const save = GetSaveDat(saveBuffer);
+    u32* ptr = GetSaveEncodedWords(save);
+    const int rotAmount = 0x20 - (save->m_rotateKey % 0x20);
+
+    for (int count = 0; count < 0x5B6; count++)
+    {
+        u32 word = ptr[0];
+        ptr[0] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
+        word = ptr[1];
+        ptr[1] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
+        word = ptr[2];
+        ptr[2] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
+        word = ptr[3];
+        ptr[3] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
+        word = ptr[4];
+        ptr[4] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
+        word = ptr[5];
+        ptr[5] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
+        word = ptr[6];
+        ptr[6] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
+        ptr += 7;
+    }
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800c17b8
@@ -453,10 +479,8 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
         System.Printf(const_cast<char*>(sMcOdekakeFmt), srcChar, dstChar, mode != 0 ? sMcOdekakeOut : sMcOdekakeReturn);
     }
 
-    u8* srcSaveData = reinterpret_cast<u8*>(&srcSave);
-    u8* dstSaveData = reinterpret_cast<u8*>(&dstSave);
-    u8* srcCharData = srcSaveData + srcChar * 0x9C0 + 0x14D0;
-    u8* dstCharData = dstSaveData + dstChar * 0x9C0 + 0x14D0;
+    u8* srcCharData = reinterpret_cast<u8*>(&srcSave) + srcChar * 0x9C0 + 0x14D0;
+    u8* dstCharData = reinterpret_cast<u8*>(&dstSave) + dstChar * 0x9C0 + 0x14D0;
 
     if (mode != 0)
     {
@@ -490,12 +514,12 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
         *reinterpret_cast<u32*>(dstCharData + 0x8BC) = *reinterpret_cast<u32*>(srcCharData + 0x8BC);
         dstCharData[0x8C2] = srcCharData[0x8C2];
         *reinterpret_cast<u32*>(dstCharData + 0x8C4) = *reinterpret_cast<u32*>(srcCharData + 0x8C4);
-        u32 serial0 = *reinterpret_cast<u32*>(srcSaveData + 0x13D0);
-        *reinterpret_cast<u32*>(dstCharData + 0x8CC) = *reinterpret_cast<u32*>(srcSaveData + 0x13D4);
+        u32 serial0 = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(&srcSave) + 0x13D0);
+        *reinterpret_cast<u32*>(dstCharData + 0x8CC) = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(&srcSave) + 0x13D4);
         *reinterpret_cast<u32*>(dstCharData + 0x8C8) = serial0;
-        *reinterpret_cast<u32*>(dstCharData + 0x8D0) = *reinterpret_cast<u32*>(srcSaveData + 0x13D8);
+        *reinterpret_cast<u32*>(dstCharData + 0x8D0) = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(&srcSave) + 0x13D8);
 
-        u8* dstWork = dstSaveData + dstChar * 0x200;
+        u8* dstWork = reinterpret_cast<u8*>(&dstSave) + dstChar * 0x200;
         int i = 0;
         do
         {
@@ -507,7 +531,8 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
                 {
                     flag = 1;
                 }
-                item[0xC0 + j] = (-flag | flag) >> 0x1F & 0x32;
+                item[0xC0] = flag != 0 ? 0x32 : 0;
+                item++;
             }
             i++;
             dstWork += 0x40;
@@ -558,7 +583,7 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
     {
         memcpy(dstCharData + 0xBC, srcCharData + 0xBC, 0x0C);
 
-        u8* srcWork = srcSaveData + (srcChar << 9) + (srcChar << 3);
+        u8* srcWork = reinterpret_cast<u8*>(&srcSave) + (srcChar << 9) + (srcChar << 3);
         for (int i = 0; i < 2; i++)
         {
             srcWork[0xC0] = 0;
@@ -602,11 +627,11 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
         *reinterpret_cast<u16*>(dstCharData + 0x6C2) = 0x0C;
     }
 
-    GetSaveDat(srcSaveData)->m_random = Math.Rand(0x7FFFFFFF);
-    GetSaveDat(srcSaveData)->m_crc = CalcCrc(GetSaveDat(srcSaveData));
+    srcSave.m_random = Math.Rand(0x7FFFFFFF);
+    srcSave.m_crc = CalcCrc(&srcSave);
 
-    GetSaveDat(dstSaveData)->m_random = Math.Rand(0x7FFFFFFF);
-    GetSaveDat(dstSaveData)->m_crc = CalcCrc(GetSaveDat(dstSaveData));
+    dstSave.m_random = Math.Rand(0x7FFFFFFF);
+    dstSave.m_crc = CalcCrc(&dstSave);
 }
 
 /*
@@ -620,28 +645,7 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
  */
 void CMemoryCardMan::DecodeData()
 {
-    Mc::SaveDat* const save = GetSaveDat(m_saveBuffer);
-    u32* ptr = GetSaveEncodedWords(save);
-    const int rotAmount = 0x20 - (save->m_rotateKey % 0x20);
-
-    for (int count = 0; count < 0x5B6; count++)
-    {
-        u32 word = ptr[0];
-        ptr[0] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
-        word = ptr[1];
-        ptr[1] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
-        word = ptr[2];
-        ptr[2] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
-        word = ptr[3];
-        ptr[3] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
-        word = ptr[4];
-        ptr[4] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
-        word = ptr[5];
-        ptr[5] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
-        word = ptr[6];
-        ptr[6] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
-        ptr += 7;
-    }
+    DecodeSaveData(m_saveBuffer);
 }
 
 /*
@@ -655,28 +659,7 @@ void CMemoryCardMan::DecodeData()
  */
 void CMemoryCardMan::EncodeData()
 {
-    Mc::SaveDat* const save = GetSaveDat(m_saveBuffer);
-    const int rotAmount = save->m_rotateKey % 0x20;
-    u32* ptr = GetSaveEncodedWords(save);
-
-    for (int count = 0; count < 0x5B6; count++)
-    {
-        u32 rotated = __rlwnm(ptr[0], rotAmount, 0, 31);
-        ptr[0] = __lwbrx(&rotated, 0);
-        rotated = __rlwnm(ptr[1], rotAmount, 0, 31);
-        ptr[1] = __lwbrx(&rotated, 0);
-        rotated = __rlwnm(ptr[2], rotAmount, 0, 31);
-        ptr[2] = __lwbrx(&rotated, 0);
-        rotated = __rlwnm(ptr[3], rotAmount, 0, 31);
-        ptr[3] = __lwbrx(&rotated, 0);
-        rotated = __rlwnm(ptr[4], rotAmount, 0, 31);
-        ptr[4] = __lwbrx(&rotated, 0);
-        rotated = __rlwnm(ptr[5], rotAmount, 0, 31);
-        ptr[5] = __lwbrx(&rotated, 0);
-        rotated = __rlwnm(ptr[6], rotAmount, 0, 31);
-        ptr[6] = __lwbrx(&rotated, 0);
-        ptr += 7;
-    }
+    EncodeSaveData(m_saveBuffer);
 }
 
 /*
@@ -1265,7 +1248,8 @@ int CMemoryCardMan::DummySave()
  */
 void CMemoryCardMan::SetLoadData()
 {
-    Mc::SaveDat* saveDat = GetSaveDat(m_saveBuffer);
+    u8* save = reinterpret_cast<u8*>(m_saveBuffer);
+    Mc::SaveDat* saveDat = GetSaveDat(save);
 
     if (memcmp(saveDat->m_maker, CardConst::MCDAT_MAKER, strlen(CardConst::MCDAT_MAKER)) != 0)
     {
@@ -1308,7 +1292,6 @@ void CMemoryCardMan::SetLoadData()
         return;
     }
 
-    u8* save = reinterpret_cast<u8*>(saveDat);
     *reinterpret_cast<u32*>(&Game.m_gameWork.m_scriptSysVal0) = *reinterpret_cast<u32*>(save + 0x20);
     Game.m_gameWork.m_timerA = *reinterpret_cast<int*>(save + 0x24);
     Game.m_gameWork.m_scriptGlobalTime = *reinterpret_cast<int*>(save + 0x28);
@@ -1328,7 +1311,8 @@ void CMemoryCardMan::SetLoadData()
     Game.m_gameWork.m_mcHasSerial = save[0x13DC];
     Sound.SetBgmMasterVolume(static_cast<s8>(save[0x13DD]));
     Sound.SetSeMasterVolume(static_cast<s8>(save[0x13DE]));
-    Sound.SetStereo(static_cast<u32>(__cntlzw(Sound.GetSoundMode())) >> 5);
+    u32 soundMode = static_cast<u32>(__cntlzw(Sound.GetSoundMode())) >> 5;
+    Sound.SetStereo(soundMode);
 
     CGame::CGameWork* gameWork = &Game.m_gameWork;
     gameWork->m_gameInitFlag = MakeLoadBool(static_cast<s8>(save[0x13E0]));
@@ -1337,30 +1321,36 @@ void CMemoryCardMan::SetLoadData()
     gameWork->m_spModeFlags[2] = MakeLoadBool(static_cast<s8>(save[0x13E3]));
     gameWork->m_spModeFlags[3] = MakeLoadBool(static_cast<s8>(save[0x13E4]));
 
+    u8* letterSrc;
+    u8* letterDst;
+    int count;
+    int i;
     for (int c = 0; c < 8; c++)
     {
         u8* src = save + 0x14D0 + c * 0x9C0;
         CCaravanWork* caravanWork = &Game.m_caravanWorkArr[c];
 
-        int itemCount = 0;
-        int inventoryCount = 64;
-        u8* inventorySrc = src;
-        do
+        count = 0;
+        i = count;
+        if (i < 64)
         {
-            if (*reinterpret_cast<s16*>(inventorySrc + 0x3C) != -1)
+            int trip = 64 - i;
+            do
             {
-                itemCount++;
-            }
-            inventorySrc += 2;
-            inventoryCount--;
-        } while (inventoryCount != 0);
-        if (itemCount != *reinterpret_cast<u16*>(src + 0x28))
+                if (*reinterpret_cast<s16*>(src + 0x3C + i * 2) != -1)
+                {
+                    count++;
+                }
+                i++;
+            } while (--trip != 0);
+        }
+        if (count != *reinterpret_cast<u16*>(src + 0x28))
         {
             if (static_cast<unsigned int>(System.m_execParam) >= 1)
             {
                 System.Printf(const_cast<char*>(sLoadDataItemCountError), c);
             }
-            *reinterpret_cast<u16*>(src + 0x28) = static_cast<u16>(itemCount);
+            *reinterpret_cast<u16*>(src + 0x28) = static_cast<u16>(count);
         }
 
         caravanWork->m_id = *reinterpret_cast<u16*>(src + 0x00);
@@ -1377,11 +1367,11 @@ void CMemoryCardMan::SetLoadData()
         }
         caravanWork->unk_0x3c8 = *reinterpret_cast<u16*>(src + 0x24);
         caravanWork->m_inventoryItemCount = *reinterpret_cast<u16*>(src + 0x28);
-        caravanWork->m_progressValue = *reinterpret_cast<u16*>(src + 0x2A);
-        caravanWork->m_tribeId = *reinterpret_cast<u16*>(src + 0x2C);
-        caravanWork->m_genderFlag = *reinterpret_cast<u16*>(src + 0x2E);
-        caravanWork->m_appearanceVariant = *reinterpret_cast<u16*>(src + 0x30);
-        caravanWork->unk_0x3e6 = *reinterpret_cast<u16*>(src + 0x32);
+        caravanWork->unk_0x3dc = *reinterpret_cast<u16*>(src + 0x2A);
+        caravanWork->m_progressValue = *reinterpret_cast<u16*>(src + 0x2C);
+        caravanWork->m_tribeId = *reinterpret_cast<u16*>(src + 0x2E);
+        caravanWork->m_genderFlag = *reinterpret_cast<u16*>(src + 0x30);
+        caravanWork->m_appearanceVariant = *reinterpret_cast<u16*>(src + 0x32);
         caravanWork->m_equipment[0] = *reinterpret_cast<s16*>(src + 0x34);
         caravanWork->m_equipment[1] = *reinterpret_cast<s16*>(src + 0x36);
         caravanWork->m_equipment[2] = *reinterpret_cast<s16*>(src + 0x38);
@@ -1394,51 +1384,41 @@ void CMemoryCardMan::SetLoadData()
         caravanWork->m_gil = *reinterpret_cast<int*>(src + 0xEC);
         memcpy(caravanWork->m_name, src + 0xF0, 0x10);
         caravanWork->m_letterCount = *reinterpret_cast<int*>(src + 0x100);
-        u8* letterSrc = src;
-        u8* letterDst = reinterpret_cast<u8*>(caravanWork);
-        for (int letter = 0; letter < 100; letter++)
+        letterSrc = src;
+        letterDst = reinterpret_cast<u8*>(caravanWork);
+        for (count = 0; count < 100; count++)
         {
-            letterDst[0x3EC] = ((letterSrc[0x104] >> 3 & 1) << 3) | (letterDst[0x3EC] & 0xF7);
-            *reinterpret_cast<u16*>(letterDst + 0x3EC) =
-                (*reinterpret_cast<u16*>(letterSrc + 0x104) & 0x07FC) | (*reinterpret_cast<s16*>(letterDst + 0x3EC) & 0xF803);
-            *reinterpret_cast<u32*>(letterDst + 0x3EC) =
-                (*reinterpret_cast<u32*>(letterSrc + 0x104) & 0x0003FE00) |
-                (*reinterpret_cast<u32*>(letterDst + 0x3EC) & 0xFFFC01FF);
-            *reinterpret_cast<u16*>(letterDst + 0x3EE) =
-                (*reinterpret_cast<u16*>(letterSrc + 0x106) & 0x01FF) |
-                (*reinterpret_cast<s16*>(letterDst + 0x3EE) & 0xFE00);
+            reinterpret_cast<CCaravanWork::CLetterWork*>(letterDst + 0x3EC)->FlagsBits().m_attachmentIsGil =
+                reinterpret_cast<CCaravanWork::CLetterWork*>(letterSrc + 0x104)->FlagsBits().m_attachmentIsGil;
+            reinterpret_cast<CCaravanWork::CLetterWork*>(letterDst + 0x3EC)->HeaderBitsRef().m_messageType =
+                reinterpret_cast<CCaravanWork::CLetterWork*>(letterSrc + 0x104)->HeaderBitsRef().m_messageType;
+            reinterpret_cast<CCaravanWork::CLetterWork*>(letterDst + 0x3EC)->WordBitsRef().m_senderId =
+                reinterpret_cast<CCaravanWork::CLetterWork*>(letterSrc + 0x104)->WordBitsRef().m_senderId;
+            reinterpret_cast<CCaravanWork::CLetterWork*>(letterDst + 0x3EC)->AttachmentBitsRef().m_value =
+                reinterpret_cast<CCaravanWork::CLetterWork*>(letterSrc + 0x104)->AttachmentBitsRef().m_value;
             memcpy(letterDst + 0x3F0, letterSrc + 0x108, 8);
-            letterDst[0x3EC] = (letterSrc[0x104] & 0x80) | (letterDst[0x3EC] & 0x7F);
-            letterDst[0x3EC] = (letterSrc[0x104] & 0x40) | (letterDst[0x3EC] & 0xBF);
-            letterDst[0x3EC] = (letterSrc[0x104] & 0x20) | (letterDst[0x3EC] & 0xDF);
-            letterDst[0x3EC] = (letterSrc[0x104] & 0x10) | (letterDst[0x3EC] & 0xEF);
+            reinterpret_cast<CCaravanWork::CLetterWork*>(letterDst + 0x3EC)->FlagsBits().m_opened =
+                reinterpret_cast<CCaravanWork::CLetterWork*>(letterSrc + 0x104)->FlagsBits().m_opened;
+            reinterpret_cast<CCaravanWork::CLetterWork*>(letterDst + 0x3EC)->FlagsBits().m_attachmentClaimed =
+                reinterpret_cast<CCaravanWork::CLetterWork*>(letterSrc + 0x104)->FlagsBits().m_attachmentClaimed;
+            reinterpret_cast<CCaravanWork::CLetterWork*>(letterDst + 0x3EC)->FlagsBits().m_replySent =
+                reinterpret_cast<CCaravanWork::CLetterWork*>(letterSrc + 0x104)->FlagsBits().m_replySent;
+            reinterpret_cast<CCaravanWork::CLetterWork*>(letterDst + 0x3EC)->FlagsBits().m_hasReply =
+                reinterpret_cast<CCaravanWork::CLetterWork*>(letterSrc + 0x104)->FlagsBits().m_hasReply;
             letterSrc += 0xC;
             letterDst += sizeof(CCaravanWork::CLetterWork);
         }
 
-        for (int artifact = 0; artifact < 96; artifact += 2)
+        for (int artifact = 0; artifact < 96; artifact++)
         {
-            const int slot = artifact >> 5;
-            const u32 bit = 1u << (artifact % 32);
-            if ((*reinterpret_cast<u32*>(src + 0xBC + slot * 4) & bit) != 0)
+            const int slot = artifact + 64;
+            if ((*reinterpret_cast<u32*>(src + 0xBC + (artifact >> 5) * 4) & (1u << (artifact % 32))) != 0)
             {
-                caravanWork->m_artifacts[artifact] = static_cast<u16>(0x9F + artifact);
+                caravanWork->m_inventoryItems[slot] = static_cast<u16>(0x9F + artifact);
             }
             else
             {
-                caravanWork->m_artifacts[artifact] = 0xFFFF;
-            }
-
-            const int nextArtifact = artifact + 1;
-            const int nextSlot = nextArtifact >> 5;
-            const u32 nextBit = 1u << (nextArtifact % 32);
-            if ((*reinterpret_cast<u32*>(src + 0xBC + nextSlot * 4) & nextBit) != 0)
-            {
-                caravanWork->m_artifacts[nextArtifact] = static_cast<u16>(0x9F + nextArtifact);
-            }
-            else
-            {
-                caravanWork->m_artifacts[nextArtifact] = 0xFFFF;
+                caravanWork->m_inventoryItems[slot] = 0xFFFF;
             }
         }
 
@@ -1468,14 +1448,14 @@ void CMemoryCardMan::SetLoadData()
 
     for (unsigned int i = 0; i < 4; i++)
     {
-        int idx = Game.m_gameWork.m_wmBackupParams[i];
+        int idx = gameWork->m_wmBackupParams[i];
         if (Game.m_caravanWorkArr[idx].m_shopState == 0)
         {
-            Game.m_gameWork.m_wmBackupParams[i] = -1;
+            gameWork->m_wmBackupParams[i] = -1;
         }
         if (Game.m_caravanWorkArr[idx].m_shopBusyFlag != 0)
         {
-            Game.m_gameWork.m_wmBackupParams[i] = -1;
+            gameWork->m_wmBackupParams[i] = -1;
         }
     }
 
@@ -1528,6 +1508,8 @@ void CMemoryCardMan::MakeSaveData()
     saveDat->m_rotateKey = static_cast<u8>(Math.Rand(0xFF));
     saveDat->m_flags = 0;
 
+    u8* letterSrc;
+    u8* letterDst;
     CGame::CGameWork* gameWork = &Game.m_gameWork;
     CGame* g = &Game;
     for (int i = 0; i < 4; i++)
@@ -1543,11 +1525,11 @@ void CMemoryCardMan::MakeSaveData()
         }
     }
 
-    *reinterpret_cast<u32*>(save + 0x20) = *reinterpret_cast<u32*>(&gameWork->m_scriptSysVal0);
-    *reinterpret_cast<int*>(save + 0x24) = gameWork->m_timerA;
-    *reinterpret_cast<int*>(save + 0x28) = gameWork->m_scriptGlobalTime;
-    *reinterpret_cast<int*>(save + 0x2C) = gameWork->m_frameCounter;
-    memcpy(save + 0x30, gameWork->m_wmBackupParams, 0x10);
+    *reinterpret_cast<u32*>(save + 0x20) = *reinterpret_cast<u32*>(&Game.m_gameWork.m_scriptSysVal0);
+    *reinterpret_cast<int*>(save + 0x24) = Game.m_gameWork.m_timerA;
+    *reinterpret_cast<int*>(save + 0x28) = Game.m_gameWork.m_scriptGlobalTime;
+    *reinterpret_cast<int*>(save + 0x2C) = Game.m_gameWork.m_frameCounter;
+    memcpy(save + 0x30, Game.m_gameWork.m_wmBackupParams, 0x10);
     memcpy(save + 0x40, Game.m_gameWork.m_bossArtifactStageTable, 0x3C);
     memcpy(save + 0x7C, Game.m_gameWork.m_unkStageTable, 0x3C);
     *reinterpret_cast<int*>(save + 0xB8) = Game.m_gameWork.m_chaliceElement;
@@ -1572,20 +1554,18 @@ void CMemoryCardMan::MakeSaveData()
     save[0x13E3] = MakeSaveBool(Game.m_gameWork.m_spModeFlags[2]);
     save[0x13E4] = MakeSaveBool(Game.m_gameWork.m_spModeFlags[3]);
 
-    for (unsigned int c = 0; c < 8; c++)
+    for (int c = 0; c < 8; c++)
     {
         u8* dst = save + 0x14D0 + c * 0x9C0;
         CCaravanWork* caravanWork = &Game.m_caravanWorkArr[c];
 
-        if (caravanWork->m_shopState != 0)
+        int shopState = caravanWork->m_shopState;
+        if (shopState != 0 && static_cast<s8>(caravanWork->unk_0xc1e) == 0)
         {
-            if (static_cast<s8>(caravanWork->unk_0xc1e) == 0)
-            {
-                caravanWork->m_shopRandSeed = Math.Rand(0x7FFFFFFF);
-                caravanWork->unk_0xc1e = 1;
-            }
+            caravanWork->m_shopRandSeed = Math.Rand(0x7FFFFFFF);
+            caravanWork->unk_0xc1e = 1;
         }
-        if (caravanWork->m_shopState == 0)
+        else if (shopState == 0)
         {
             caravanWork->m_shopRandSeed = 0;
             caravanWork->unk_0xc1e = 0;
@@ -1605,11 +1585,11 @@ void CMemoryCardMan::MakeSaveData()
         }
         *reinterpret_cast<u16*>(dst + 0x24) = caravanWork->unk_0x3c8;
         *reinterpret_cast<u16*>(dst + 0x28) = caravanWork->m_inventoryItemCount;
-        *reinterpret_cast<u16*>(dst + 0x2A) = caravanWork->m_progressValue;
-        *reinterpret_cast<u16*>(dst + 0x2C) = caravanWork->m_tribeId;
-        *reinterpret_cast<u16*>(dst + 0x2E) = caravanWork->m_genderFlag;
-        *reinterpret_cast<u16*>(dst + 0x30) = caravanWork->m_appearanceVariant;
-        *reinterpret_cast<u16*>(dst + 0x32) = caravanWork->unk_0x3e6;
+        *reinterpret_cast<u16*>(dst + 0x2A) = caravanWork->unk_0x3dc;
+        *reinterpret_cast<u16*>(dst + 0x2C) = caravanWork->m_progressValue;
+        *reinterpret_cast<u16*>(dst + 0x2E) = caravanWork->m_tribeId;
+        *reinterpret_cast<u16*>(dst + 0x30) = caravanWork->m_genderFlag;
+        *reinterpret_cast<u16*>(dst + 0x32) = caravanWork->m_appearanceVariant;
         *reinterpret_cast<s16*>(dst + 0x34) = caravanWork->m_equipment[0];
         *reinterpret_cast<s16*>(dst + 0x36) = caravanWork->m_equipment[1];
         *reinterpret_cast<s16*>(dst + 0x38) = caravanWork->m_equipment[2];
@@ -1622,45 +1602,37 @@ void CMemoryCardMan::MakeSaveData()
         *reinterpret_cast<u32*>(dst + 0xEC) = caravanWork->m_gil;
         memcpy(dst + 0xF0, caravanWork->m_name, 0x10);
         *reinterpret_cast<u32*>(dst + 0x100) = caravanWork->m_letterCount;
-        u8* letterDst = dst;
-        u8* letterSrc = reinterpret_cast<u8*>(caravanWork);
+        letterSrc = reinterpret_cast<u8*>(caravanWork);
+        letterDst = dst;
         for (int letter = 0; letter < 100; letter++)
         {
-            letterDst[0x104] = ((letterSrc[0x3EC] >> 3 & 1) << 3) | (letterDst[0x104] & 0xF7);
-            *reinterpret_cast<u16*>(letterDst + 0x104) =
-                (*reinterpret_cast<s16*>(letterSrc + 0x3EC) & 0x07FC) | (*reinterpret_cast<u16*>(letterDst + 0x104) & 0xF803);
-            *reinterpret_cast<u32*>(letterDst + 0x104) =
-                (*reinterpret_cast<u32*>(letterSrc + 0x3EC) & 0x0003FE00) |
-                (*reinterpret_cast<u32*>(letterDst + 0x104) & 0xFFFC01FF);
-            *reinterpret_cast<u16*>(letterDst + 0x106) =
-                (*reinterpret_cast<u16*>(letterSrc + 0x3EE) & 0x01FF) |
-                (*reinterpret_cast<u16*>(letterDst + 0x106) & 0xFE00);
+            reinterpret_cast<CCaravanWork::CLetterWork*>(letterDst + 0x104)->FlagsBits().m_attachmentIsGil =
+                reinterpret_cast<CCaravanWork::CLetterWork*>(letterSrc + 0x3EC)->FlagsBits().m_attachmentIsGil;
+            reinterpret_cast<CCaravanWork::CLetterWork*>(letterDst + 0x104)->HeaderBitsRef().m_messageType =
+                reinterpret_cast<CCaravanWork::CLetterWork*>(letterSrc + 0x3EC)->HeaderBitsRef().m_messageType;
+            reinterpret_cast<CCaravanWork::CLetterWork*>(letterDst + 0x104)->WordBitsRef().m_senderId =
+                reinterpret_cast<CCaravanWork::CLetterWork*>(letterSrc + 0x3EC)->WordBitsRef().m_senderId;
+            reinterpret_cast<CCaravanWork::CLetterWork*>(letterDst + 0x104)->AttachmentBitsRef().m_value =
+                reinterpret_cast<CCaravanWork::CLetterWork*>(letterSrc + 0x3EC)->AttachmentBitsRef().m_value;
             memcpy(letterDst + 0x108, letterSrc + 0x3F0, 8);
-            letterDst[0x104] = (letterSrc[0x3EC] & 0x80) | (letterDst[0x104] & 0x7F);
-            letterDst[0x104] = (letterSrc[0x3EC] & 0x40) | (letterDst[0x104] & 0xBF);
-            letterDst[0x104] = (letterSrc[0x3EC] & 0x20) | (letterDst[0x104] & 0xDF);
-            letterDst[0x104] = (letterSrc[0x3EC] & 0x10) | (letterDst[0x104] & 0xEF);
+            reinterpret_cast<CCaravanWork::CLetterWork*>(letterDst + 0x104)->FlagsBits().m_opened =
+                reinterpret_cast<CCaravanWork::CLetterWork*>(letterSrc + 0x3EC)->FlagsBits().m_opened;
+            reinterpret_cast<CCaravanWork::CLetterWork*>(letterDst + 0x104)->FlagsBits().m_attachmentClaimed =
+                reinterpret_cast<CCaravanWork::CLetterWork*>(letterSrc + 0x3EC)->FlagsBits().m_attachmentClaimed;
+            reinterpret_cast<CCaravanWork::CLetterWork*>(letterDst + 0x104)->FlagsBits().m_replySent =
+                reinterpret_cast<CCaravanWork::CLetterWork*>(letterSrc + 0x3EC)->FlagsBits().m_replySent;
+            reinterpret_cast<CCaravanWork::CLetterWork*>(letterDst + 0x104)->FlagsBits().m_hasReply =
+                reinterpret_cast<CCaravanWork::CLetterWork*>(letterSrc + 0x3EC)->FlagsBits().m_hasReply;
             letterSrc += sizeof(CCaravanWork::CLetterWork);
             letterDst += 0xC;
         }
 
-        for (int artifact = 0; artifact < 96; artifact += 3)
+        for (int artifact = 0; artifact < 96; artifact++)
         {
-            if (caravanWork->m_artifacts[artifact] > 0)
+            const int slot = artifact + 64;
+            if (caravanWork->m_inventoryItems[slot] > 0)
             {
                 *reinterpret_cast<u32*>(dst + 0xBC + (artifact >> 5) * 4) |= 1u << (artifact % 32);
-            }
-
-            const int artifact1 = artifact + 1;
-            if (caravanWork->m_artifacts[artifact1] > 0)
-            {
-                *reinterpret_cast<u32*>(dst + 0xBC + (artifact1 >> 5) * 4) |= 1u << (artifact1 % 32);
-            }
-
-            const int artifact2 = artifact + 2;
-            if (caravanWork->m_artifacts[artifact2] > 0)
-            {
-                *reinterpret_cast<u32*>(dst + 0xBC + (artifact2 >> 5) * 4) |= 1u << (artifact2 % 32);
             }
         }
 

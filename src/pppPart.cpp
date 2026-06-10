@@ -958,9 +958,10 @@ allocated:
 
 	done_insert:
 		dataVal->m_activeCount++;
-		u32* initWork = (u32*)(((u8*)newObj) + programSet->m_workBaseOffset);
-		_pppProgSetDef* stageSet = programSet;
-		for (s32 stageIndex = 0; stageIndex < programSet->m_numStages; stageIndex++)
+		_pppProgSetDef* freshSet = newObj->m_owner->m_programSetDef;
+		u32* initWork = (u32*)(((u8*)newObj) + freshSet->m_workBaseOffset);
+		_pppProgSetDef* stageSet = freshSet;
+		for (s32 stageIndex = 0; stageIndex < freshSet->m_numStages; stageIndex++)
 		{
 			_pppCtrlTable* entry = stageSet->m_stages;
 			*initWork++ = entry->m_unk8;

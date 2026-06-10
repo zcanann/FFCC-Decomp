@@ -12,6 +12,11 @@
 #include "dolphin/os/OSMemory.h"
 #include <string.h>
 #include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
+inline void* operator new[](unsigned long size, CMemory::CStage* stage, const char* file, int line)
+{
+    return stage->alloc(size, const_cast<char*>(file), line, 0);
+}
+
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 CMemory Memory;
@@ -1461,7 +1466,7 @@ void CAmemCacheSet::Init(char* sourceName, CMemory::CStage* rStage, CMemory::CSt
         m_amemEnd = stage->m_heapBottom;
         m_amemLock = 0;
 
-        m_cacheTable = new (rStage, const_cast<char*>(s_memory_cpp), 0x787) CAmemCache[m_cacheCount];
+        m_cacheTable = new (rStage, s_memory_cpp, 0x787) CAmemCache[m_cacheCount];
     }
 }
 

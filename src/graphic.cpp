@@ -1712,12 +1712,11 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		dofColor.g = passAlpha;
 		dofColor.b = passAlpha;
 		dofColor.a = passAlpha;
-		GXSetTevKColor((GXTevKColorID)pass, dofColor);
-
 		chanColor.r = passAlpha;
 		chanColor.g = passAlpha;
 		chanColor.b = passAlpha;
 		chanColor.a = 0x80;
+		GXSetTevKColor((GXTevKColorID)pass, dofColor);
 		GXSetChanAmbColor(GX_COLOR0A0, chanColor);
 		GXSetChanMatColor(GX_COLOR0A0, chanColor);
 
@@ -1759,7 +1758,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		quadMax.x = FLOAT_8032F6C8;
 		quadMax.y = FLOAT_8032F6CC;
 		quadMax.z = kGraphicZeroF;
-		gUtil.RenderQuadTex2(quadMin, quadMax, dofColor, 0, 0);
+		gUtil.RenderQuadTex2(quadMin, quadMax, chanColor, 0, 0);
 
 		quadMin.x = -xOffset;
 		quadMin.y = kGraphicZeroF;
@@ -1767,7 +1766,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		quadMax.x = FLOAT_8032F6C8 - xOffset;
 		quadMax.y = FLOAT_8032F6CC;
 		quadMax.z = kGraphicZeroF;
-		gUtil.RenderQuadTex2(quadMin, quadMax, dofColor, 0, 0);
+		gUtil.RenderQuadTex2(quadMin, quadMax, chanColor, 0, 0);
 
 		quadMin.x = xOffset;
 		quadMin.y = kGraphicZeroF;
@@ -1775,7 +1774,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		quadMax.x = FLOAT_8032F6C8 + xOffset;
 		quadMax.y = FLOAT_8032F6CC;
 		quadMax.z = kGraphicZeroF;
-		gUtil.RenderQuadTex2(quadMin, quadMax, dofColor, 0, 0);
+		gUtil.RenderQuadTex2(quadMin, quadMax, chanColor, 0, 0);
 
 		quadMin.x = kGraphicZeroF;
 		quadMin.y = -yOffset;
@@ -1783,7 +1782,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		quadMax.x = FLOAT_8032F6C8;
 		quadMax.y = FLOAT_8032F6CC - yOffset;
 		quadMax.z = kGraphicZeroF;
-		gUtil.RenderQuadTex2(quadMin, quadMax, dofColor, 0, 0);
+		gUtil.RenderQuadTex2(quadMin, quadMax, chanColor, 0, 0);
 
 		quadMin.x = kGraphicZeroF;
 		quadMin.y = yOffset;
@@ -1791,7 +1790,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		quadMax.x = FLOAT_8032F6C8;
 		quadMax.y = FLOAT_8032F6CC + yOffset;
 		quadMax.z = kGraphicZeroF;
-		gUtil.RenderQuadTex2(quadMin, quadMax, dofColor, 0, 0);
+		gUtil.RenderQuadTex2(quadMin, quadMax, chanColor, 0, 0);
 	}
 }
 

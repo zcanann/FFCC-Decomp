@@ -1606,12 +1606,11 @@ void CGObject::update()
 
         const unsigned char lookBlendByte = *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x56);
         float lookBlend = 0.015625f * static_cast<float>(lookBlendByte);
-        if (lookBlend == sZeroFloat) {
-            lookBlend = sBgAttrFast;
-        }
         CChara::CModel* chestModel = m_charaModelHandle->m_model;
-        ModelChestAmp(chestModel) += lookBlend * (lookYaw - ModelChestAmp(chestModel));
-        ModelChestTilt(chestModel) += lookBlend * (lookPitch - ModelChestTilt(chestModel));
+        const float chestAmp = ModelChestAmp(chestModel);
+        const float chestTilt = ModelChestTilt(chestModel);
+        ModelChestAmp(chestModel) = lookBlend * (lookYaw - chestAmp) + chestAmp;
+        ModelChestTilt(chestModel) = lookBlend * (lookPitch - chestTilt) + chestTilt;
         ModelTwistAngle(m_charaModelHandle->m_model) +=
             sBgAttrFast * (*reinterpret_cast<float*>(m_worldMode) - ModelTwistAngle(m_charaModelHandle->m_model));
 

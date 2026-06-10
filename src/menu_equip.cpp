@@ -575,10 +575,14 @@ void CMenuPcs::EquipDraw()
 			if (idx == 0) {
 				str = GetMenuStr(0xb);
 			} else {
-				if ((idx >= letterCount) || ((int)letter[idx] < 0)) {
+				if (idx >= letterCount) {
 					continue;
 				}
-				int itemIdx = caravanWork->m_inventoryItems[letter[idx]];
+				int entry = letter[idx];
+				if (entry < 0) {
+					continue;
+				}
+				int itemIdx = caravanWork->m_inventoryItems[entry];
 				str = Game.m_cFlatDataArr[1].TableStrings(0)[itemIdx * 5 + 4];
 				if (idx == static_cast<int>(GetEquipMenuState(this)->subSelectedIndex) + static_cast<int>(GetEquipMenuState(this)->scroll)) {
 					helpItem = itemIdx;
@@ -599,11 +603,14 @@ void CMenuPcs::EquipDraw()
 		EquipOpenAnim* iconItem = listStart;
 		int iconIdx;
 		for (int i = 0; (i < 8) && ((iconIdx = i + GetEquipMenuState(this)->scroll) < letterCount); i++) {
-			if ((iconIdx >= 1) && ((int)letter[iconIdx] >= 0)) {
-				int iconY = (int)((float)(iconItem->y + 6) - kEquipOne);
-				int iconX = (int)(float)(iconItem->x + iconItem->w - 0x10);
-				DrawSingleIcon(caravanWork->m_inventoryItems[letter[iconIdx]], iconX, iconY,
-				               listStart->alpha, 0, kEquipOne);
+			if (iconIdx >= 1) {
+				int entry = letter[iconIdx];
+				if (entry >= 0) {
+					int iconY = (int)((float)(iconItem->y + 6) - kEquipOne);
+					int iconX = (int)(float)(iconItem->x + iconItem->w - 0x10);
+					DrawSingleIcon(caravanWork->m_inventoryItems[entry], iconX, iconY,
+					               listStart->alpha, 0, kEquipOne);
+				}
 			}
 			iconItem++;
 		}
@@ -627,14 +634,14 @@ void CMenuPcs::EquipDraw()
 			cx = (float)(cursorItem->x - 0x14);
 		} else {
 			EquipOpenAnimList* list = GetEquipListStorage(this);
-			EquipOpenAnim* cursorItem;
+			EquipOpenAnim* found;
 			for (int i = list->count; i < list->listEnd; i++) {
-				cursorItem = &list->entries[i];
-				if (cursorItem->tex == 0x37) {
+				found = &list->entries[i];
+				if (found->tex == 0x37) {
 					break;
 				}
 			}
-			cursorItem += GetEquipMenuState(this)->subSelectedIndex;
+			EquipOpenAnim* cursorItem = &found[GetEquipMenuState(this)->subSelectedIndex];
 			cy = (float)((double)(cursorItem->h - 0x20) * kEquipHalfDouble + (double)cursorItem->y);
 			cx = (float)(cursorItem->x - 0x14);
 		}

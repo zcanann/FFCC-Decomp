@@ -4411,7 +4411,7 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
                 *flagByte &= ~mask;
             }
         } else if (systemValue <= -200) {
-            short* artifact = &Game.m_gameWork.m_eventWork[systemValue + 0x1C7];
+            short* artifact = &gameWork.m_eventWork[systemValue + 0x1C7];
             stack[-1].m_word = *artifact;
             switch (setMode) {
             case -1:
@@ -4499,7 +4499,7 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
             case -0x4A:
             case -0x49:
             case -0x48: {
-                int* value = &Game.m_gameWork.m_bossArtifactStageTable[systemValue + 0x56];
+                int* value = &gameWork.m_bossArtifactStageTable[systemValue + 0x56];
                 stack[-1].m_word = *value;
                 switch (setMode) {
                 case -1:
@@ -4529,7 +4529,7 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
             case -0x59:
             case -0x58:
             case -0x57: {
-                int* value = &Game.m_gameWork.m_unkStageTable[systemValue + 0x65];
+                int* value = &gameWork.m_unkStageTable[systemValue + 0x65];
                 stack[-1].m_word = *value;
                 switch (setMode) {
                 case -1:
@@ -4563,7 +4563,7 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
             case -0x69:
             case -0x68:
             case -0x67: {
-                int* value = &Game.m_gameWork.m_eventHeader[systemValue + 0x6B];
+                int* value = &gameWork.m_eventHeader[systemValue + 0x6B];
                 stack[-1].m_word = *value;
                 switch (setMode) {
                 case -1:

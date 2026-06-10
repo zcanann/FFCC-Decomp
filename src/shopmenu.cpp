@@ -543,7 +543,7 @@ static int CountShopMenuOwnedItems(CCaravanWork* caravanWork, int itemNo)
 
 static bool CanTradeShopMenuItem(CShopMenu* shopMenu, int index, int itemNo)
 {
-    if ((index < 0) || (itemNo <= 0)) {
+    if (itemNo <= 0) {
         return false;
     }
 

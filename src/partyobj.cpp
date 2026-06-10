@@ -2763,9 +2763,9 @@ void CGPartyObj::checkTargetParticle()
 		if ((leader->m_lastStateId == 2 || leader->m_lastStateId == 6) &&
 		    leader->m_comboState != 0) {
 			CVector leaderCenter(leader->m_comboCenter);
-			CVector selfCenter(m_comboCenter);
+			const CVector& selfCenter = CVector(m_comboCenter);
 			CVector subResult;
-			PSVECSubtract(reinterpret_cast<Vec*>(&selfCenter), reinterpret_cast<Vec*>(&leaderCenter), reinterpret_cast<Vec*>(&subResult));
+			PSVECSubtract((Vec*)&selfCenter, reinterpret_cast<Vec*>(&leaderCenter), reinterpret_cast<Vec*>(&subResult));
 			Vec toLeaderTarget;
 			toLeaderTarget.x = subResult.x;
 			toLeaderTarget.y = subResult.y;
@@ -2827,9 +2827,9 @@ void CGPartyObj::checkTargetParticle()
 		}
 
 		CVector worldPosV(m_worldPosition);
-		CVector targetCenterV(*targetPos);
+		const CVector& targetCenterV = CVector(*targetPos);
 		CVector fromCenterResult;
-		PSVECSubtract(reinterpret_cast<Vec*>(&targetCenterV), reinterpret_cast<Vec*>(&worldPosV), reinterpret_cast<Vec*>(&fromCenterResult));
+		PSVECSubtract((Vec*)&targetCenterV, reinterpret_cast<Vec*>(&worldPosV), reinterpret_cast<Vec*>(&fromCenterResult));
 		Vec fromCenter;
 		fromCenter.x = fromCenterResult.x;
 		fromCenter.y = fromCenterResult.y;
@@ -2841,9 +2841,9 @@ void CGPartyObj::checkTargetParticle()
 		}
 
 		CVector targetCenterV2(*targetPos);
-		CVector centerTargetV(*centerPos);
+		const CVector& centerTargetV = CVector(*centerPos);
 		CVector moveResult;
-		PSVECSubtract(reinterpret_cast<Vec*>(&targetCenterV2), reinterpret_cast<Vec*>(&centerTargetV), reinterpret_cast<Vec*>(&moveResult));
+		PSVECSubtract(reinterpret_cast<Vec*>(&targetCenterV2), (Vec*)&centerTargetV, reinterpret_cast<Vec*>(&moveResult));
 		Vec move;
 		move.x = moveResult.x;
 		move.y = moveResult.y;
@@ -2871,9 +2871,9 @@ void CGPartyObj::checkTargetParticle()
 			}
 
 			CVector up(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
-			CVector centerForBottom(*centerPos);
+			const CVector& centerForBottom = CVector(*centerPos);
 			CVector bottomResult;
-			PSVECAdd(reinterpret_cast<Vec*>(&centerForBottom), reinterpret_cast<Vec*>(&up), reinterpret_cast<Vec*>(&bottomResult));
+			PSVECAdd((Vec*)&centerForBottom, reinterpret_cast<Vec*>(&up), reinterpret_cast<Vec*>(&bottomResult));
 			Vec bottom;
 			bottom.x = bottomResult.x;
 			bottom.y = bottomResult.y;
@@ -2898,24 +2898,24 @@ void CGPartyObj::checkTargetParticle()
 		} while (iter > 0);
 
 		CVector upFinal(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
-		CVector centerFinal(*centerPos);
+		const CVector& centerFinal = CVector(*centerPos);
 		CVector addUpResult;
-		PSVECAdd(reinterpret_cast<Vec*>(&centerFinal), reinterpret_cast<Vec*>(&upFinal), reinterpret_cast<Vec*>(&addUpResult));
+		PSVECAdd((Vec*)&centerFinal, reinterpret_cast<Vec*>(&upFinal), reinterpret_cast<Vec*>(&addUpResult));
 		Vec centerPlusUp;
 		centerPlusUp.x = addUpResult.x;
 		centerPlusUp.y = addUpResult.y;
 		centerPlusUp.z = addUpResult.z;
 		PSVECAdd(&centerPlusUp, &move, targetPos);
 
-		CVector down(FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78);
+		const CVector& down = CVector(FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78);
 		CMapCylinder floorCylinder(FLOAT_80331a9c, FLOAT_80331aa0);
 		floorCylinder.m_bottom.x = targetPos->x;
 		floorCylinder.m_bottom.y = targetPos->y;
 		floorCylinder.m_bottom.z = targetPos->z;
-		floorCylinder.m_top = *reinterpret_cast<Vec*>(&down);
+		floorCylinder.m_top = *(Vec*)&down;
 		floorCylinder.m_radius = FLOAT_80331a78;
 
-		if (MapMng.CheckHitCylinderNear(&floorCylinder, reinterpret_cast<Vec*>(&down), 0x30) != 0) {
+		if (MapMng.CheckHitCylinderNear(&floorCylinder, (Vec*)&down, 0x30) != 0) {
 			getMapHitObject()->CalcHitPosition(targetPos);
 			if (m_scriptHandle != nullptr) {
 				CCaravanWork* work = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
@@ -2934,9 +2934,9 @@ void CGPartyObj::checkTargetParticle()
 	}
 
 	CVector worldPosFinal(m_worldPosition);
-	CVector comboCenterFinal(m_comboCenter);
+	const CVector& comboCenterFinal = CVector(m_comboCenter);
 	CVector deltaResult;
-	PSVECSubtract(reinterpret_cast<Vec*>(&comboCenterFinal), reinterpret_cast<Vec*>(&worldPosFinal), reinterpret_cast<Vec*>(&deltaResult));
+	PSVECSubtract((Vec*)&comboCenterFinal, reinterpret_cast<Vec*>(&worldPosFinal), reinterpret_cast<Vec*>(&deltaResult));
 	Vec delta;
 	delta.x = deltaResult.x;
 	delta.y = deltaResult.y;

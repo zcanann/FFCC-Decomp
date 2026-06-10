@@ -716,10 +716,7 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 		classBase = &m_classes[classIndex];
 	}
 
-	int varCount = 0;
-	if (classBase != 0) {
-		varCount = classBase->m_variableCount;
-	}
+	const int varCount = (classBase != 0) ? classBase->m_variableCount : 0;
 
 	CObject* object = getFreeObject(varCount);
 
@@ -742,15 +739,11 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 	object->m_activeClassIndex = object->m_classIndex;
 	object->m_flagBits.m_activeFlag = setBit;
 
-	int classLocalCount = 0;
-	if (classIndex != -1) {
-		classLocalCount = classBase->m_localCount;
-	}
+	const int classLocalCount = (classIndex == -1) ? 0 : classBase->m_localCount;
 
 	const int requiredWords = classLocalCount + 0x60;
 	u8* scanNode = reinterpret_cast<u8*>(m_freeListNext);
-	const s32 scanDelta = static_cast<s32>((self + 0x978) - scanNode);
-	int noScan = static_cast<u32>(__cntlzw(static_cast<u32>(scanDelta))) >> 5 & 0xFF;
+	const int noScan = static_cast<u8>(scanNode == self + 0x978);
 	if (noScan == 0) {
 		u8* next;
 		while (((*reinterpret_cast<int*>(scanNode + 0xC) + requiredWords) + *reinterpret_cast<int*>(scanNode + 8))
@@ -795,11 +788,11 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 
 	int allowKeep = 1;
 	if (classIndex == -1) {
-		allowKeep = static_cast<u32>(__cntlzw(*reinterpret_cast<u32*>(self + 0x970))) >> 5 & 0xFF;
+		allowKeep = static_cast<u8>(m_0x970 == 0);
 	}
 
-	u8* defs = (classIndex == -1) ? *reinterpret_cast<u8**>(self + 0x28) : 0;
-	int clearCount = (classIndex == -1) ? *reinterpret_cast<int*>(self + 0x24) : classBase->m_localCount;
+	u8* defs = (classIndex == -1) ? m_permanentVarDefs : 0;
+	int clearCount = (classIndex == -1) ? m_permanentVarCount : classBase->m_localCount;
 
 	unsigned int* write = object->m_thisBase;
 	while (clearCount > 0) {

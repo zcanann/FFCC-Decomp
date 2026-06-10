@@ -116,6 +116,37 @@ struct GhostMogMenuWork {
 
 #define sGhostMogMenuWork (*reinterpret_cast<GhostMogMenuWork*>(CGPartyObj::m_ghostWork))
 
+// Padded row views over the CFlatData item table (stride 0x48).
+struct SCfdItemRow {
+	unsigned short m_kind;     // 0x00
+	unsigned short m_model;    // 0x02
+	unsigned char pad4[4];     // 0x04
+	unsigned short m_field8;   // 0x08
+	unsigned short m_fieldA;   // 0x0A
+	unsigned char padC[0x14];  // 0x0C
+	unsigned short m_field20;  // 0x20
+	unsigned char pad22[0xE];  // 0x22
+	unsigned short m_field30;  // 0x30
+	unsigned short m_field32;  // 0x32
+	unsigned char pad34[0x14]; // 0x34
+};
+
+// Sub-record views inside a flat3 row (row stride 0x1CA).
+struct SAtkRec { // stride 0x12, indexed by attackSel
+	unsigned short m_f0;     // 0x00
+	unsigned short m_f2;     // 0x02
+	unsigned char pad4[6];   // 0x04
+	unsigned short m_fA;     // 0x0A
+	unsigned char padC[6];   // 0x0C
+};
+
+struct SFoodRec { // stride 0x42, indexed by item low byte
+	unsigned char pad0[0x38]; // 0x00
+	unsigned short m_f38;     // 0x38
+	unsigned short m_f3A;     // 0x3A
+	unsigned char pad3C[6];   // 0x3C
+};
+
 static inline PartyObjOverlay& PartyData(CGPartyObj* self)
 {
 	return self->m_partyData;
@@ -438,14 +469,18 @@ void CGPartyObj::onChangeStat(int state)
 		    *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_30_0xc7e0 +
 		        (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
 		         *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2) * 0x1CA + row);
-		*reinterpret_cast<int*>(self + 0x634) =
-		    *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_30_0xc7e0 +
-		        (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
-		         *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2) * 0x1CA + row + 2);
-		*reinterpret_cast<int*>(self + 0x638) =
-		    *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_30_0xc7e0 +
-		        (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
-		         *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2) * 0x1CA + row + 10);
+		{
+			SAtkRec* recs = reinterpret_cast<SAtkRec*>(Game.unk_flat3_field_30_0xc7e0 +
+			    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
+			     *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2) * 0x1CA);
+			*reinterpret_cast<int*>(self + 0x634) = recs[attackSel].m_f2;
+		}
+		{
+			SAtkRec* recs = reinterpret_cast<SAtkRec*>(Game.unk_flat3_field_30_0xc7e0 +
+			    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
+			     *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2) * 0x1CA);
+			*reinterpret_cast<int*>(self + 0x638) = recs[attackSel].m_fA;
+		}
 		break;
 	}
 	case 2:
@@ -468,28 +503,31 @@ void CGPartyObj::onChangeStat(int state)
 		break;
 	case 6:
 		System.Printf(const_cast<char*>(msgBase + 0x370), *reinterpret_cast<int*>(self + 0x560));
-		*reinterpret_cast<int*>(self + 0x560) =
-		    *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<int*>(self + 0x560) * 0x48 + 10);
+		{
+			SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
+			*reinterpret_cast<int*>(self + 0x560) = rows[*reinterpret_cast<int*>(self + 0x560)].m_fieldA;
+		}
 		System.Printf(const_cast<char*>(lbl_80331B0C), *reinterpret_cast<int*>(self + 0x560));
 		*reinterpret_cast<int*>(self + 0x550) = 0x12;
 		*reinterpret_cast<int*>(self + 0x554) = 0x13;
-		unsigned short itemKind =
-		    *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<int*>(self + 0x560) * 0x48 + 10);
+		SCfdItemRow* kindRows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
+		unsigned short itemKind = kindRows[*reinterpret_cast<int*>(self + 0x560)].m_fieldA;
 		int itemHigh = itemKind >> 8;
 		int itemLow = itemKind & 0xFF;
 		System.Printf(const_cast<char*>(msgBase + 0x390), itemHigh);
 		System.Printf(const_cast<char*>(msgBase + 0x3AC), itemLow);
 		*reinterpret_cast<int*>(self + 0x558) = itemHigh + 0x2A;
 		{
-			int row = itemLow * 0x42;
-			*reinterpret_cast<int*>(self + 0x630) =
-			    *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_30_0xc7e0 +
-			        (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
-			         *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2) * 0x1CA + row + 0x38);
-			*reinterpret_cast<int*>(self + 0x634) =
-			    *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_30_0xc7e0 +
-			        (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
-			         *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2) * 0x1CA + row + 0x3A);
+			SFoodRec* recs = reinterpret_cast<SFoodRec*>(Game.unk_flat3_field_30_0xc7e0 +
+			    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
+			     *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2) * 0x1CA);
+			*reinterpret_cast<int*>(self + 0x630) = recs[itemLow].m_f38;
+		}
+		{
+			SFoodRec* recs = reinterpret_cast<SFoodRec*>(Game.unk_flat3_field_30_0xc7e0 +
+			    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
+			     *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2) * 0x1CA);
+			*reinterpret_cast<int*>(self + 0x634) = recs[itemLow].m_f3A;
 		}
 		*reinterpret_cast<int*>(self + 0x68C) = calcCastTime(*reinterpret_cast<int*>(self + 0x560));
 		if (Game.m_gameWork.m_menuStageMode != 0) {

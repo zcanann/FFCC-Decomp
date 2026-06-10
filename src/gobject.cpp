@@ -201,9 +201,9 @@ extern "C" const float sDefaultMoveBaseSpeed;      // FLOAT_803303d4
 extern "C" const float sHitProbeHeight;          // FLOAT_80330410
 extern "C" const float sHitMoveScale;       // FLOAT_80330414
 extern "C" const float sJumpLift;                 // FLOAT_80330418
-static const float sLandingDampenCutoff = -1.5f;      // FLOAT_8033041c
+extern "C" const float sLandingDampenCutoff;      // FLOAT_8033041c
 static const float sMinGroundClamp = -4.0f;           // FLOAT_80330420
-static const float sCrossCheckOuterRadius = 50.0f;    // FLOAT_80330424
+extern "C" const float sCrossCheckOuterRadius;    // FLOAT_80330424
 static const float sGroundOffsetFloor = -5.0f;        // FLOAT_80330428
 static const float sAnalogSpeedScale = 4.0f;          // FLOAT_8033042c
 static const float sSlideThreshold = 0.01f;           // FLOAT_80330430

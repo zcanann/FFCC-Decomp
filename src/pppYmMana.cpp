@@ -756,11 +756,12 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
 
     SetManaModelCallbacks(model, mana, param_2);
 
-    MaterialMan.SetManaAlpha((u8)((float)*(setupArea + 0xB) * gObject->m_lookAtTimer));
+    u8 manaAlpha = (u8)((float)*(setupArea + 0xB) * gObject->m_lookAtTimer);
     if (Game.m_currentMapId == 0x21) {
-        MaterialMan.SetManaAlpha((u8)(gObject->m_lookAtTimer * (float)*(setupArea + 0xB)));
+        manaAlpha = (u8)(gObject->m_lookAtTimer * (float)*(setupArea + 0xB));
     }
-    mana->m_manaAlpha = MaterialMan.GetManaAlpha();
+    MaterialMan.SetManaAlpha(manaAlpha);
+    mana->m_manaAlpha = manaAlpha;
 
     if (reinterpret_cast<_pppPObject*>(pppYmMana)->m_graphId != 0) {
         return;

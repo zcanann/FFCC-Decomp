@@ -50,6 +50,7 @@ static inline CCaravanWork* SingleCaravanWork()
     return reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 }
 
+extern const double kSingHalf;
 extern const float kSingStatBaseX;
 extern const float kSingStatPanelPad;
 extern const float kSingStatPanelW;
@@ -2738,8 +2739,8 @@ void CMenuPcs::DrawSingWin(short mode)
         return;
     }
 
-    float left = static_cast<float>(m_menuWindowInfo->x) + static_cast<float>(static_cast<double>(m_menuWindowInfo->width) * 0.5);
-    float top = static_cast<float>(m_menuWindowInfo->y) + static_cast<float>(static_cast<double>(m_menuWindowInfo->height) * 0.5);
+    float left = static_cast<float>(m_menuWindowInfo->x) + static_cast<float>(static_cast<double>(m_menuWindowInfo->width) * kSingHalf);
+    float top = static_cast<float>(m_menuWindowInfo->y) + static_cast<float>(static_cast<double>(m_menuWindowInfo->height) * kSingHalf);
     float width;
     float height;
 
@@ -2766,8 +2767,6 @@ void CMenuPcs::DrawSingWin(short mode)
     float y0 = static_cast<float>(topPx);
     float w = static_cast<float>(widthPx);
     float h = static_cast<float>(heightPx);
-    float x1 = x0 + w - 32.0f;
-    float y1 = y0 + h - 32.0f;
 
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
     _GXColor white;
@@ -2777,14 +2776,16 @@ void CMenuPcs::DrawSingWin(short mode)
     white.a = 0xFF;
     GXSetChanMatColor(GX_COLOR0A0, white);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3F));
-    for (unsigned long i = 0; i < 4; i++) {
+    float x1 = x0 + w - 32.0f;
+    float y1 = y0 + h - 32.0f;
+    for (int i = 0; i < 4; i++) {
         unsigned long uvFlag = 0;
         float x = x0;
-        float y = y0;
         if ((i & 1) != 0) {
             uvFlag = 8;
             x = x1;
         }
+        float y = y0;
         if ((i & 2) != 0) {
             uvFlag |= 4;
             y = y1;
@@ -2793,41 +2794,42 @@ void CMenuPcs::DrawSingWin(short mode)
     }
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x41));
-    float innerW = w - static_cast<float>(64.0);
+    double innerW = static_cast<double>(w) - 64.0;
     float innerX = 32.0f + x0;
+    unsigned long uvFlag;
+    float yy = y0;
     for (int i = 0; i < 2; i++) {
-        unsigned long uvFlag = 0;
-        float y = y0;
+        uvFlag = 0;
         if (i != 0) {
             uvFlag = 4;
-            y = y1;
+            yy = y1;
         }
-        MenuPcs.DrawRect(uvFlag, innerX, y, innerW, 32.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+        MenuPcs.DrawRect(uvFlag, innerX, yy, static_cast<float>(innerW), 32.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     }
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x40));
-    float innerH = h - static_cast<float>(64.0);
+    double innerH = static_cast<double>(h) - 64.0;
     float innerY = 32.0f + y0;
+    float xx = x0;
     for (int i = 0; i < 2; i++) {
-        unsigned long uvFlag = 0;
-        float x = x0;
+        uvFlag = 0;
         if (i != 0) {
             uvFlag = 8;
-            x = x1;
+            xx = x1;
         }
-        MenuPcs.DrawRect(uvFlag, x, innerY, 32.0f, innerH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+        MenuPcs.DrawRect(uvFlag, xx, innerY, 32.0f, static_cast<float>(innerH), 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     }
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x42));
-    MenuPcs.DrawRect(0, innerX, innerY, innerW, innerH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+    MenuPcs.DrawRect(uvFlag, innerX, innerY, static_cast<float>(innerW), static_cast<float>(innerH), 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     MenuWindowInfo* win = m_menuWindowInfo;
     s16 state = win->state;
     if (state == 0) {
         win->frame = win->frame + 1;
-        if (win->frame > 5) {
-            win->frame = 6;
-            win->state = 1;
+        if (m_menuWindowInfo->frame > 5) {
+            m_menuWindowInfo->frame = 6;
+            m_menuWindowInfo->state = 1;
         }
     } else if (state == 1) {
         if (win->frame != 6) {
@@ -2835,9 +2837,9 @@ void CMenuPcs::DrawSingWin(short mode)
         }
     } else if (state == 2) {
         win->frame = win->frame - 1;
-        if (win->frame < 1) {
-            win->frame = 0;
-            win->state = 3;
+        if (m_menuWindowInfo->frame < 1) {
+            m_menuWindowInfo->frame = 0;
+            m_menuWindowInfo->state = 3;
         }
     }
 }
@@ -3600,6 +3602,7 @@ int CMenuPcs::GetItemType(int itemId, int useRawItemId)
     return 9;
 }
 
+const double kSingHalf = 0.5;
 const float kSingStatBaseX = 440.0f;
 const float kSingStatPanelPad = 28.0f;
 const float kSingStatPanelW = 96.0f;

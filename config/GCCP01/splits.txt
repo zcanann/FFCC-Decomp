@@ -196,7 +196,7 @@ map.cpp:
 	.bss        start:0x80245758 end:0x802685E0
 	.sdata      start:0x8032E4D0 end:0x8032E508
 	.sbss       start:0x8032ECC0 end:0x8032ECC8
-	.sdata2     start:0x8032F984 end:0x8032FA00
+	.sdata2     start:0x8032F978 end:0x8032FA00
 
 p_map.cpp:
 	extab       start:0x80006304 end:0x80006374

@@ -2230,7 +2230,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 				targetDelta.z = delta.z;
 			}
 			float targetDist = PSVECMag(&targetDelta);
-			if (kMonObjZero >= targetDist) {
+			if (!(kMonObjZero < targetDist)) {
 				continue;
 			}
 

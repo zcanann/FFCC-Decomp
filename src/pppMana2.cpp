@@ -740,12 +740,12 @@ void CalcReflectionVector2(
 
         dl = (u16*)((u8*)dl + 3);
         for (i = 0; i < itemCount; i++) {
+            Vec* outVec;
             u16 posIndex = dl[0];
             u16 normalIndex = dl[1];
             int axis = 0;
             float maxAxis;
             float invAxis;
-            Vec* outVec;
             u8* clr;
 
             dl += 4;

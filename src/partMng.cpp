@@ -1117,12 +1117,12 @@ void CPartMng::SetFp()
         int m_rotationSpeed;                 // 0x20
         unsigned char m_pad24[0x28 - 0x24];
         Vec m_scale;                         // 0x28
-        unsigned char m_pad34[0x40 - 0x34];
+        unsigned char m_pad34[0x38 - 0x34];
+        float m_userFloat0;                  // 0x38
+        float m_userFloat1;                  // 0x3C
         float m_scaleFactor;                 // 0x40
         float m_ownerScale;                  // 0x44
-        float m_userFloat0;                  // 0x48
-        float m_userFloat1;                  // 0x4C
-        unsigned char m_pad50[0x76 - 0x50];
+        unsigned char m_pad48[0x76 - 0x48];
         short m_nodeIndex;                   // 0x76
         unsigned char m_pad78[0xBC - 0x78];
         unsigned int m_objHitMask;           // 0xBC
@@ -1131,21 +1131,23 @@ void CPartMng::SetFp()
         CGObject* m_owner;                   // 0xD8
         CGObject* m_lookTarget;              // 0xDC
         void* m_bindNode;                    // 0xE0
-        unsigned char m_padE4[0xEB - 0xE4];
-        unsigned char m_matrixMode;          // 0xEB
+        unsigned char m_padE4[0xE7 - 0xE4];
+        unsigned char m_matrixMode;          // 0xE7
+        unsigned char m_fieldE8;             // 0xE8
+        unsigned char m_ownerFlagsInitialized; // 0xE9
+        unsigned char m_ownerFlagA;          // 0xEA
+        unsigned char m_drawVariant;         // 0xEB
+        unsigned char m_rotationOrder;       // 0xEC
         unsigned char m_drawPass;            // 0xED
-        signed char m_drawSubType;           // 0xEE
-        unsigned char m_drawVariant;         // 0xEF
-        unsigned char m_rotationOrder;       // 0xF0
-        unsigned char m_ownerFlagsInitialized; // 0xF1
+        unsigned char m_drawSubType;         // 0xEE
+        unsigned char m_useOwnerScaleSign;   // 0xEF
+        unsigned char m_ownerFlagB;          // 0xF0
+        unsigned char m_ownerFlagC;          // 0xF1
         unsigned char m_fieldF2;             // 0xF2
-        unsigned char m_useOwnerScaleSign;   // 0xF3
-        unsigned char m_ownerFlagA;          // 0xF4
-        unsigned char m_ownerFlagB;          // 0xF5
-        unsigned char m_padF6[0xF9 - 0xF6];
-        unsigned char m_fpBillboard;         // 0xF9
-        unsigned char m_prio;                // 0xFA
-        unsigned char m_padFB[0x100 - 0xFB];
+        unsigned char m_padF3[0xF7 - 0xF3];
+        unsigned char m_fpBillboard;         // 0xF7
+        unsigned char m_prio;                // 0xF8
+        unsigned char m_padF9[0x100 - 0xF9];
         int m_paramA;                        // 0x100
         unsigned int m_paramB;               // 0x104
         float m_cullRadiusSq;                // 0x108
@@ -1155,16 +1157,24 @@ void CPartMng::SetFp()
         short m_mapObjIndex;                 // 0x11A
     };
 
+    // Overlay view: pins the element fields at baked 0x2A18+field displacements
+    // off a base register that starts at `this` and walks by sizeof(_pppMngSt).
+    struct PppMngSetFpView {
+        unsigned char m_head[0x2A18];
+        PppMngSetFpRaw m_mng;                // 0x2A18
+    };
+
     static const int kUsbEditOffset = 0x7F0;
     static const int kResSetOffset = 0x23518;
     static const int kRecvBuffOffset = 0x1C8;
     static const int kEditCountOffset = 0x4;
-    static const int kPppMngOffset = 0x2A18;
     static const int kPacketStride = 0x60;
 
+    PppMngSetFpView* view = reinterpret_cast<PppMngSetFpView*>(this);
+    int i;
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    PppMngSetFpRaw* mng = reinterpret_cast<PppMngSetFpRaw*>(self + kPppMngOffset);
-    for (int i = 0; i < *reinterpret_cast<int*>(self + kEditCountOffset); i++) {
+#define mng (&view->m_mng)
+    for (i = 0; i < *reinterpret_cast<int*>(self + kEditCountOffset); i++) {
         unsigned char* fpBytes = *reinterpret_cast<unsigned char**>(self + kRecvBuffOffset) + i * kPacketStride;
         float* recvBuff = reinterpret_cast<float*>(fpBytes);
         mng->m_pppResSet = self + kResSetOffset;
@@ -1200,19 +1210,21 @@ void CPartMng::SetFp()
         mng->m_drawVariant = *reinterpret_cast<unsigned char*>(fpBytes + 0x46);
         mng->m_rotationOrder = *reinterpret_cast<unsigned char*>(fpBytes + 0x47);
         mng->m_drawPass = *reinterpret_cast<unsigned char*>(fpBytes + 0x44);
-        mng->m_drawSubType = *reinterpret_cast<signed char*>(fpBytes + 0x4C);
-        mng->m_ownerFlagA = *reinterpret_cast<unsigned char*>(fpBytes + 0x4D);
-        mng->m_ownerFlagB = *reinterpret_cast<unsigned char*>(fpBytes + 0x4E);
+        mng->m_drawSubType = *reinterpret_cast<unsigned char*>(fpBytes + 0x4C);
+        mng->m_ownerFlagB = *reinterpret_cast<unsigned char*>(fpBytes + 0x4D);
+        mng->m_ownerFlagC = *reinterpret_cast<unsigned char*>(fpBytes + 0x4E);
         mng->m_fieldF2 = 1;
         mng->m_fpBillboard = *reinterpret_cast<unsigned char*>(fpBytes + 0x4A);
         mng->m_prio = *reinterpret_cast<unsigned char*>(fpBytes + 0x4B);
         mng->m_mapObjIndex = *reinterpret_cast<short*>(fpBytes + 0x48);
-        mng->m_owner = 0;
+        mng->m_bindNode = 0;
         mng->m_objHitMask = 0xFFFFFFFF;
         mng->m_cylinderAttribute = 0xFFFFFFFF;
         mng->m_paramA = 0;
+        mng->m_fieldE8 = 0;
         mng->m_ownerFlagsInitialized = 1;
         mng->m_ownerFlagA = 1;
+        mng->m_owner = 0;
 
         unsigned char mode = mng->m_matrixMode;
         switch (mode) {
@@ -1242,8 +1254,9 @@ void CPartMng::SetFp()
             break;
         }
 
-        mng = reinterpret_cast<PppMngSetFpRaw*>(reinterpret_cast<unsigned char*>(mng) + sizeof(_pppMngSt));
+        view = reinterpret_cast<PppMngSetFpView*>(reinterpret_cast<unsigned char*>(view) + sizeof(_pppMngSt));
     }
+#undef mng
 }
 
 /*

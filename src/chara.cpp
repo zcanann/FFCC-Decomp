@@ -2461,16 +2461,15 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 	}
 
 	if (m_anim != 0) {
-		int blendFrames = 0;
 		if (ModelAttachMode(this) == 0) {
 			int flagBit = (AnimFlags(m_anim) >> 7) & 1;
 			int flagMask = ((-flagBit) | flagBit) >> 31;
-			blendFrames = blendMode & flagMask;
+			m_blendCur = static_cast<u16>(blendMode & flagMask);
 		} else if (ModelAttachMode(this) == 1) {
-			blendFrames = blendMode;
+			m_blendCur = static_cast<u16>(blendMode);
+		} else {
+			m_blendCur = 0;
 		}
-
-		m_blendCur = static_cast<u16>(blendFrames);
 		m_blendMax = m_blendCur;
 
 		if (startFrame < 0) {

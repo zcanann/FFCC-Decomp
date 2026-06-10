@@ -1260,23 +1260,20 @@ void VECLerp(Vec* a, Vec* b, Vec* out, float t)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void SetDiffuse__9CCharaPcsFiUlP8_GXColorP3Vec(
-    CCharaPcs* chara, int lightIndex, unsigned long lightSet, _GXColor* color, Vec* direction)
+void CCharaPcs::SetDiffuse(int lightIndex, unsigned long lightSet, _GXColor* color, Vec* direction)
 {
-    char* colorBase = (char*)chara + lightSet * 4 + lightIndex * 0xC;
-    colorBase[0xF0] = color->r;
-    colorBase[0xF1] = color->g;
-    colorBase[0xF2] = color->b;
-    colorBase[0xF3] = color->a;
+    m_viewerDiffuseColor[lightIndex][lightSet].r = color->r;
+    m_viewerDiffuseColor[lightIndex][lightSet].g = color->g;
+    m_viewerDiffuseColor[lightIndex][lightSet].b = color->b;
+    m_viewerDiffuseColor[lightIndex][lightSet].a = color->a;
 
     if (lightIndex != 0) {
         return;
     }
 
-    char* dirBase = (char*)chara + lightSet * 0xC;
-    *(float*)(dirBase + 0x108) = direction->x;
-    *(float*)(dirBase + 0x10C) = direction->y;
-    *(float*)(dirBase + 0x110) = direction->z;
+    m_viewerDiffusePos[lightSet].x = direction->x;
+    m_viewerDiffusePos[lightSet].y = direction->y;
+    m_viewerDiffusePos[lightSet].z = direction->z;
 }
 
 /*
@@ -1288,13 +1285,12 @@ extern "C" void SetDiffuse__9CCharaPcsFiUlP8_GXColorP3Vec(
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void SetAmbient__9CCharaPcsFiP8_GXColor(CCharaPcs* chara, int index, _GXColor* color)
+void CCharaPcs::SetAmbient(int index, _GXColor* color)
 {
-    char* base = (char*)chara + index * 4;
-    base[0xE8] = color->r;
-    base[0xE9] = color->g;
-    base[0xEA] = color->b;
-    base[0xEB] = color->a;
+    m_viewerAmbientColor[index].r = color->r;
+    m_viewerAmbientColor[index].g = color->g;
+    m_viewerAmbientColor[index].b = color->b;
+    m_viewerAmbientColor[index].a = color->a;
 }
 
 /*
@@ -2240,7 +2236,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             static_cast<u8>(object->m_localBase[2]),
             static_cast<u8>(object->m_localBase[3]),
             0xFF);
-        SetAmbient__9CCharaPcsFiP8_GXColor(&CharaPcs, *object->m_localBase, color);
+        CharaPcs.SetAmbient(*object->m_localBase, color);
         this->push(object, 0);
         outResult = 0;
         break;
@@ -2260,8 +2256,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             static_cast<u8>(object->m_localBase[4]),
             0xFF);
 
-        SetDiffuse__9CCharaPcsFiUlP8_GXColorP3Vec(
-            &CharaPcs, *object->m_localBase, object->m_localBase[1], color, direction);
+        CharaPcs.SetDiffuse(*object->m_localBase, object->m_localBase[1], color, direction);
         this->push(object, 0);
         outResult = 0;
         break;

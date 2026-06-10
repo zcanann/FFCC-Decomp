@@ -192,6 +192,8 @@ public:
     void SetTexShadowColor(_GXColor);
     void SetTexShadowPos(Vec*);
     void SetMapShadeColor(int, CColor);
+    void SetAmbient(int, _GXColor*);
+    void SetDiffuse(int, unsigned long, _GXColor*, Vec*);
     void SetNoFreeMergeMask(int);
     void SetCharaAllocStage(int);
     int GetNumTexShadow();

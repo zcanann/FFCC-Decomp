@@ -2835,7 +2835,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + effectId * 0x48;
 	unsigned int particleClass = *reinterpret_cast<unsigned short*>(itemData + 0x12);
 	int particleBank = CharaObjResolveParticleBank(this, particleClass);
-	unsigned short particleEntry = 0xFFFF;
+	unsigned short particleEntry;
 	int particleNo = effectId;
 	int seNo = 0;
 	int emittedCustom = 0;
@@ -3096,7 +3096,10 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 		}
 
 		if (seNo != 0) {
-			unsigned char useArgPos = (effectArg0 == 2);
+			unsigned char useArgPos = 1;
+			if (effectArg0 != 2) {
+				useArgPos = 0;
+			}
 			int seHandle = playSe3D(seNo, 0x32, 0x96, 0, (useArgPos != 0) ? pos : 0);
 			Sound.SetSe3DGroup(seHandle, m_particleId);
 		}

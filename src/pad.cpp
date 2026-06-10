@@ -104,6 +104,7 @@ void CPad::Frame()
 	u16* puVar12;
 	u16* puVar13;
 	int iVar14;
+	u32 port;
 	u32 uVar15;
 	u32 uVar16;
 	u32 uVar17;
@@ -117,23 +118,22 @@ void CPad::Frame()
 	PADClamp(local_88);
 	memcpy(g_pad, local_88, sizeof(g_pad));
 	*reinterpret_cast<u32*>(self + 0x1C4) = 0;
-	uVar17 = 0;
+	port = 0;
 	puVar18 = reinterpret_cast<u16*>(local_98);
 	do
 	{
-		CPad::Gba* gba = &local_98[uVar17];
-		iVar6 = SIProbe(uVar17);
-		int padIndex = uVar17;
+		CPad::Gba* gba = &local_98[port];
+		iVar6 = SIProbe(port);
 		gba->connected = (0x40000 - iVar6) == 0;
-		gba->ctrlMode = Joybus.GetCtrlMode(uVar17);
+		gba->ctrlMode = Joybus.GetCtrlMode(port);
 		gba->noController = gba->connected && (gba->ctrlMode == 0);
 		gba->button = 0;
 		if (gba->connected)
 		{
-			gba->button = Joybus.GetPadData(padIndex);
+			gba->button = Joybus.GetPadData(port);
 		}
-		uVar17 = uVar17 + 1;
-	} while (uVar17 < 4);
+		port = port + 1;
+	} while (port < 4);
 
 	if ((_1b0_4_ != 0) && ((iVar14 = _1bc_4_), iVar14 >= 0))
 	{

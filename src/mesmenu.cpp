@@ -186,10 +186,7 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int unk1, int unk2, i
         }
     } else if ((flags & 0x100) == 0) {
         fVar1 = m_windowWidth;
-        if (fVar1 < FLOAT_803308f0) {
-            fVar1 = FLOAT_803308f0;
-        }
-        m_windowWidth = fVar1;
+        m_windowWidth = (fVar1 < FLOAT_803308f0) ? FLOAT_803308f0 : fVar1;
     }
 
     uVar2 = (unsigned int)m_menuIndex;
@@ -290,70 +287,71 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
         return;
     }
 
-    if (FLOAT_803308d8 >= alpha) {
-        return;
-    }
+    if (FLOAT_803308d8 < alpha) {
+        CColor heartColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(FLOAT_80330908 * alpha));
+        MenuPcs.SetColor(heartColor);
+        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x17));
 
-    CColor colorStorage(0xFF, 0xFF, 0xFF, (int)(FLOAT_80330908 * alpha));
-    MenuPcs.SetColor(colorStorage);
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x17));
-
-    int offset = 0x4C;
-    if ((m_menuIndex & 1) != 0) {
-        offset = 0x30;
-    }
-
-    float stepScale = FLOAT_80330910;
-    float baseY = FLOAT_8033090c + y;
-    int valueOffset = 0;
-    float baseX = x + (float)offset;
-    float pulseMul = FLOAT_80330920;
-    float pulseScale = FLOAT_8033091c;
-    float one = FLOAT_80330914;
-    float timerScale = FLOAT_80330918;
-
-    for (unsigned int i = 0; i < (scriptFood->m_maxHp >> 1); i++) {
-        int heartValue = m_heartValue - valueOffset;
-        float timer = (float)(unsigned int)m_heartGrowTimers[i];
-        float pulse = (pulseScale * (float)sin(stepScale * -(timer * timerScale - one)) + one) * pulseMul;
-
-        unsigned int subTimer = m_heartDropTimers[i];
-        int shakeX;
-        if (subTimer == 0) {
-            shakeX = 0;
-        } else {
-            shakeX = ((int)subTimer >> 2) * s_mesMenuShakePattern[((subTimer + 1) * 4 & 0xC) / 4];
+        int heartOffset = 0x4C;
+        if ((m_menuIndex & 1) != 0) {
+            heartOffset = 0x30;
         }
 
-        float drawX = baseX + (float)shakeX;
-        int shakeY;
-        if (subTimer == 0) {
-            shakeY = 0;
-        } else {
-            shakeY = ((int)subTimer >> 2) * s_mesMenuShakePattern[subTimer & 3];
-        }
+        float pulseSinScale = FLOAT_80330910;
+        float heartBaseX = x + (float)heartOffset;
+        float heartBaseY = FLOAT_8033090c + y;
+        float heartZero = FLOAT_803308d8;
+        float pulseBase = FLOAT_80330920;
+        float pulseAmp = FLOAT_8033091c;
+        float pulseOne = FLOAT_80330914;
+        float pulseTimerScale = FLOAT_80330918;
+        int heartValueOffset = 0;
 
-        float drawY = baseY + (float)shakeY;
+        for (int heartIndex = 0; heartIndex < (int)((unsigned int)scriptFood->m_maxHp >> 1); heartIndex++) {
+            int heartValue = m_heartValue - heartValueOffset;
+            float heartTimer = (float)m_heartGrowTimers[heartIndex];
+            float heartPulse =
+                pulseAmp * (float)sin(pulseSinScale * -(heartTimer * pulseTimerScale - pulseOne)) + pulseOne;
+            heartPulse *= pulseBase;
 
-        MenuPcs.DrawRect(
-            3, drawX, drawY, FLOAT_803308dc, FLOAT_803308dc, FLOAT_803308d8, FLOAT_803308d8, pulse, pulse,
-            FLOAT_803308d8);
-
-        if (heartValue > 0) {
-            int fillAmount = 0x0B;
-            if (heartValue < 0x0B) {
-                fillAmount = heartValue;
+            int heartSubTimer = m_heartDropTimers[heartIndex];
+            int heartShakeX;
+            if (heartSubTimer == 0) {
+                heartShakeX = 0;
+            } else {
+                heartShakeX = (heartSubTimer >> 2) * s_mesMenuShakePattern[(heartSubTimer + 1) & 3];
             }
 
-            float u = (float)((scriptFood->m_statusTimers[5] != 0) * 0x18);
-            float v = (float)((0x0C - fillAmount) * 0x18);
-            MenuPcs.DrawRect(
-                3, drawX, drawY, FLOAT_803308dc, FLOAT_803308dc, u, v, pulse, pulse,
-                FLOAT_803308d8);
-        }
+            float heartX = heartBaseX + (float)heartShakeX;
+            int heartShakeY;
+            if (heartSubTimer == 0) {
+                heartShakeY = 0;
+            } else {
+                heartShakeY = (heartSubTimer >> 2) * s_mesMenuShakePattern[heartSubTimer & 3];
+            }
 
-        baseX += ((m_menuIndex & 1) != 0) ? FLOAT_80330924 : FLOAT_80330928;
-        valueOffset += 0x0C;
+            float heartY = heartBaseY + (float)heartShakeY;
+
+            MenuPcs.DrawRect(
+                3, heartX, heartY, FLOAT_803308dc, FLOAT_803308dc, heartZero, heartZero,
+                heartPulse, heartPulse, heartZero);
+
+            if (heartValue > 0) {
+                int fillAmount = 0x0B;
+                if (heartValue < 0x0B) {
+                    fillAmount = heartValue;
+                }
+
+                float u = (float)((scriptFood->m_statusTimers[5] != 0) ? 0 : 0x18);
+                float v = (float)((0x0C - fillAmount) * 0x18);
+                MenuPcs.DrawRect(
+                    3, heartX, heartY, FLOAT_803308dc, FLOAT_803308dc, u, v, heartPulse, heartPulse,
+                    FLOAT_803308d8);
+            }
+
+            heartBaseX += ((m_menuIndex & 1) != 0) ? FLOAT_80330924 : FLOAT_80330928;
+            heartValueOffset += 0x0C;
+        }
     }
 }
 
@@ -462,9 +460,20 @@ void CMesMenu::onDraw()
             iconFrame = 2;
             break;
         case 4: {
-            unsigned short buttons = ((Pad.m_debugPadLock == 0) && (Pad.m_debugPadPort != -1))
-                ? Pad.GetPadInputs()[__cntlzw((unsigned int)Pad.m_debugPadPort) >> 5].button[0]
-                : 0;
+            bool activeInput = false;
+            unsigned short buttons;
+
+            if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
+                activeInput = true;
+            }
+
+            if (activeInput) {
+                buttons = 0;
+            } else {
+                int padIndex = 0;
+                padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+                buttons = Pad.GetPadInputs()[padIndex].button[0];
+            }
 
             if ((buttons & 0x100) != 0) {
                 iconFrame = s_mesMenuIconFrames[(System.m_frameCounter & 6) >> 1];
@@ -475,19 +484,20 @@ void CMesMenu::onDraw()
         }
         }
 
-        CColor colorStorage(0xFF, 0xFF, 0xFF, 0xFF);
-        MenuPcs.SetColor(colorStorage);
+        CColor cursorColor(0xFF, 0xFF, 0xFF, 0xFF);
+        MenuPcs.SetColor(cursorColor);
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0));
         MenuPcs.DrawRect(
-            0, (float)(*(unsigned int*)((char*)&Chara + 0x200C) - 0x20), (float)*(unsigned int*)((char*)&Chara + 0x2010),
+            0, (float)(int)(Chara.MogFur().m_cursorX - 0x20), (float)(int)Chara.MogFur().m_cursorY,
             FLOAT_8033092c, FLOAT_8033092c, FLOAT_803308d8, (float)(iconFrame << 5), FLOAT_80330914, FLOAT_80330914,
             FLOAT_803308d8);
     }
 
-    if (!((m_menuIndex < 4) || (m_active != 0))) {
+    int menuIndex = m_menuIndex;
+    if ((menuIndex >= 4) && (m_active == 0)) {
         return;
     }
-    if ((Game.m_gameWork.m_menuStageMode != 0) && (m_menuIndex >= 1) && (m_menuIndex < 4)) {
+    if ((Game.m_gameWork.m_menuStageMode != 0) && (menuIndex >= 1) && (menuIndex < 4)) {
         return;
     }
 
@@ -500,13 +510,13 @@ void CMesMenu::onDraw()
     if (m_stageFadeOut != 0) {
         stageBlend = FLOAT_80330914 - stageBlend;
     }
-    if (stageBlend == FLOAT_803308d8) {
+    if (FLOAT_803308d8 == stageBlend) {
         return;
     }
 
-    float stateBlend = FLOAT_803308d8;
+    float stateBlend;
     int state = m_state;
-    if ((state == 0) || (state == 1) || (state == 3)) {
+    if ((state == 0) || ((unsigned int)(state - 1) <= 1) || (state == 3)) {
         if (state == 0) {
             stateBlend = (float)m_stateTimer / (float)m_stateTimerMax;
         } else if (state == 3) {
@@ -514,9 +524,8 @@ void CMesMenu::onDraw()
         } else {
             stateBlend = FLOAT_80330914;
         }
-    }
-    if (stateBlend <= FLOAT_803308d8) {
-        return;
+    } else {
+        stateBlend = FLOAT_803308d8;
     }
 
     if (m_menuIndex < 4) {
@@ -526,252 +535,326 @@ void CMesMenu::onDraw()
         }
 
         float pulse = FLOAT_8033092c * (FLOAT_80330914 - sinf(FLOAT_80330930 * stageBlend));
-        (void)MenuPcs.m_battleRingMenus[m_menuIndex]->GetDispCounter();
-        float pulseX = ((m_menuIndex & 1) != 0) ? pulse : -pulse;
-        float baseX = (m_baseX + m_offsetX) + pulseX;
-        float pulseY = ((m_menuIndex & 2) != 0) ? pulse : -pulse;
-        float baseY = (m_baseY + m_offsetY) + pulseY;
+        MenuPcs.m_battleRingMenus[m_menuIndex]->GetDispCounter();
+        int maskX = m_menuIndex & 1;
+        float pulseX;
+        if (maskX != 0) {
+            pulseX = pulse;
+        } else {
+            pulseX = -pulse;
+        }
+        float baseX = m_baseX + m_offsetX;
+        int maskY = m_menuIndex & 2;
+        baseX += pulseX;
+        float pulseY;
+        if (maskY != 0) {
+            pulseY = pulse;
+        } else {
+            pulseY = -pulse;
+        }
+        float baseY = m_baseY + m_offsetY;
+        baseY += pulseY;
 
         if (FLOAT_803308d8 < stateBlend) {
             float width = m_windowWidth * stateBlend;
             float height = m_windowHeight * stateBlend;
-            float drawX = baseX + (((m_menuIndex & 1) != 0)
-                ? -m_windowWidth
-                : (m_windowWidth - width));
+            float edgeX;
+            if (maskX != 0) {
+                edgeX = -m_windowWidth;
+            } else {
+                edgeX = m_windowWidth - width;
+            }
+            float drawX = baseX + edgeX;
 
             float edgeY;
-            if ((m_menuIndex & 2) != 0) {
+            if (maskY != 0) {
                 edgeY = (FLOAT_80330934 - m_windowHeight) + (m_windowHeight - height);
             } else {
                 edgeY = FLOAT_803308f8;
             }
             float drawY = baseY + edgeY;
 
-            float alphaF = FLOAT_80330908 * stateBlend * stageBlend;
-            CColor colorStorage(0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF);
-            MenuPcs.SetColor(colorStorage);
+            float stateAlpha = FLOAT_80330908 * stateBlend;
+            float alphaF = stateAlpha * stageBlend;
+            CColor windowColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF));
+            MenuPcs.SetColor(windowColor);
             MenuPcs.DrawWindow(drawX, drawY, width, height, static_cast<CMenuPcs::TEX>(2), FLOAT_8033092c);
 
-            if ((m_state == 1) && (stageBlend == FLOAT_80330914)) {
+            if ((m_state == 1) && (FLOAT_80330914 == stageBlend)) {
                 m_mes.Draw();
                 MenuPcs.DrawInit();
             }
 
             if ((m_itemIndex >= 0) || (m_nameIndex >= 0)) {
                 MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x14));
-                colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF);
-                MenuPcs.SetColor(colorStorage);
+                CColor iconColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF));
+                MenuPcs.SetColor(iconColor);
 
                 float cursorWave = sinf(FLOAT_80330930 * (FLOAT_80330914 - stateBlend) + FLOAT_80330930);
-                int signX = ((m_menuIndex & 1) != 0) ? 32 : -32;
-                float iconX = drawX + (float)signX * (FLOAT_80330914 - cursorWave);
-                iconX += ((m_menuIndex & 1) != 0) ? FLOAT_80330938 : (width - FLOAT_8033093C) - FLOAT_80330938;
-                float iconY = drawY + (((m_menuIndex & 2) != 0) ? FLOAT_80330940 + height : FLOAT_80330944);
+                int iconMenuIndex = m_menuIndex;
+                int signX = -32;
+                if ((iconMenuIndex & 1) != 0) {
+                    signX = 32;
+                }
+                float wobble = (float)signX * (FLOAT_80330914 - cursorWave);
+                float iconX = (drawX + wobble) +
+                              (((iconMenuIndex & 1) != 0) ? FLOAT_80330938 : (width - FLOAT_8033093C) - FLOAT_80330938);
+                float iconY = drawY + (((iconMenuIndex & 2) != 0) ? FLOAT_80330940 + height : FLOAT_80330944);
                 MenuPcs.DrawRect(
-                    ((m_menuIndex & 1) != 0) ? 8 : 0, iconX, iconY, FLOAT_8033093C, FLOAT_80330948,
-                    (float)(((m_menuIndex & 2) != 0) ? 144 : 0), FLOAT_803308d8, FLOAT_80330914, FLOAT_80330914,
+                    ((iconMenuIndex & 1) != 0) ? 8 : 0, iconX, iconY, FLOAT_8033093C, FLOAT_80330948,
+                    (float)(((iconMenuIndex & 2) != 0) ? 144 : 0), FLOAT_803308d8, FLOAT_80330914, FLOAT_80330914,
                     FLOAT_803308d8);
 
                 if (m_nameIndex >= 0) {
                     font->SetScale(FLOAT_8033094C);
                     font->SetShadow(1);
                     font->SetMargin(FLOAT_803308d8);
-                    char* actionName = Game.m_cFlatDataArr[1].TableStrings(2)[m_nameIndex];
-                    float textWidth = font->GetWidth(actionName);
+                    float textWidth = font->GetWidth(Game.m_cFlatDataArr[1].TableStrings(2)[m_nameIndex]);
                     font->DrawInit();
                     font->SetTlut(0xF);
-                    colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF);
-                    font->SetColor(colorStorage.color);
+                    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF)).color);
                     font->SetPosX(iconX + (((m_menuIndex & 1) != 0) ? FLOAT_80330950 : FLOAT_80330954 - textWidth));
                     font->SetPosY(iconY + (float)(((m_menuIndex & 2) != 0) ? 8 : 31));
-                    font->Draw(actionName);
-                    MenuPcs.DrawInit();
-                }
-
-                if (m_itemIndex >= 0) {
-                    unsigned int itemIndex = m_itemIndex;
-                    colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(unsigned int)alphaF);
-                    MenuPcs.SetColor(colorStorage);
-                    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x18));
-                    MenuPcs.m_textures[0x18]->SetExternalTlut(nullptr, 1);
-                    float itemX = iconX + (float)(((m_menuIndex & 1) != 0) ? 13 : 83);
-                    int iconColumn = itemIndex % 8;
-                    int iconRow = itemIndex / 8;
-                    MenuPcs.DrawRect(
-                        (((m_menuIndex & 1) != 0) && ((m_flags & 4) == 0)) ? 8 : 0,
-                        itemX, iconY + FLOAT_80330958, FLOAT_8033095C, FLOAT_80330960, (float)(iconColumn * 0x30),
-                        (float)(iconRow * 0x30), FLOAT_80330914, FLOAT_80330914, FLOAT_803308d8);
-                }
-            }
-
-            MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x16));
-            colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80330908 * stageBlend));
-            MenuPcs.SetColor(colorStorage);
-            float frameX = baseX - (float)(((m_menuIndex & 1) != 0) ? 128 : 0);
-            float frameY = baseY - (float)(((m_menuIndex & 2) != 0) ? 56 : 0);
-            MenuPcs.DrawRect(
-                0, frameX, frameY, FLOAT_80330964, FLOAT_80330948,
-                (float)(((m_menuIndex & 2) != 0) ? 128 : 0),
-                (float)(((m_menuIndex & 1) != 0) ? 56 : 0), FLOAT_80330914, FLOAT_80330914, FLOAT_803308d8);
-
-            font->SetScale(FLOAT_8033094C);
-            float titleWidth = font->GetWidth(reinterpret_cast<char*>(scriptFood->m_name));
-            font->DrawInit();
-            font->SetTlut(0xF);
-            colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80330908 * stageBlend));
-            font->SetColor(colorStorage.color);
-            font->SetPosX(frameX + (((m_menuIndex & 1) != 0) ? FLOAT_80330968 - titleWidth : FLOAT_80330950));
-            font->SetPosY(frameY + FLOAT_8033096C);
-            font->Draw(reinterpret_cast<char*>(scriptFood->m_name));
-            MenuPcs.DrawInit();
-
-            {
-                CCaravanWork* heartFood =
-                    reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[m_menuIndex]);
-                if ((heartFood != 0) && (FLOAT_803308d8 < stageBlend)) {
-                    colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80330908 * stageBlend));
-                    MenuPcs.SetColor(colorStorage);
-                    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x17));
-
-                    int heartOffset = 0x4C;
-                    if ((m_menuIndex & 1) != 0) {
-                        heartOffset = 0x30;
-                    }
-
-                    float heartBaseY = FLOAT_8033090c + frameY;
-                    float heartBaseX = frameX + (float)heartOffset;
-                    int heartValueOffset = 0;
-
-                    float pulseSinScale = FLOAT_80330910;
-                    float pulseTimerScale = FLOAT_80330918;
-                    float pulseOne = FLOAT_80330914;
-                    float pulseAmp = FLOAT_8033091c;
-                    float pulseBase = FLOAT_80330920;
-                    float heartZero = FLOAT_803308d8;
-
-                    for (int heartIndex = 0; heartIndex < (int)((int)heartFood->m_maxHp >> 1);
-                         heartIndex++) {
-                        int heartValue = m_heartValue - heartValueOffset;
-                        float heartTimer = (float)(unsigned int)m_heartGrowTimers[heartIndex];
-                        float heartPulse =
-                            (pulseAmp * (float)sin(pulseSinScale * -(heartTimer * pulseTimerScale - pulseOne)) +
-                             pulseOne) *
-                            pulseBase;
-
-                        unsigned int heartSubTimer = (unsigned int)m_heartDropTimers[heartIndex];
-                        int heartShakeX = 0;
-                        if (heartSubTimer != 0) {
-                            heartShakeX = ((int)heartSubTimer >> 2) * s_mesMenuShakePattern[((heartSubTimer + 1) * 4 & 0xC) / 4];
-                        }
-
-                        int heartShakeY = 0;
-                        if (heartSubTimer != 0) {
-                            heartShakeY = ((int)heartSubTimer >> 2) * s_mesMenuShakePattern[heartSubTimer & 3];
-                        }
-
-                        float heartX = heartBaseX + (float)heartShakeX;
-                        float heartY = heartBaseY + (float)heartShakeY;
-
-                        MenuPcs.DrawRect(
-                            3, heartX, heartY, FLOAT_803308dc, FLOAT_803308dc, heartZero, heartZero,
-                            heartPulse, heartPulse, heartZero);
-
-                        if (heartValue > 0) {
-                            int fillAmount = 0x0B;
-                            if (heartValue < 0x0B) {
-                                fillAmount = heartValue;
-                            }
-
-                            float u = (float)((heartFood->m_statusTimers[5] != 0) * 0x18);
-                            float v = (float)((0x0C - fillAmount) * 0x18);
-                            MenuPcs.DrawRect(
-                                3, heartX, heartY, FLOAT_803308dc, FLOAT_803308dc, u, v, heartPulse, heartPulse,
-                                heartZero);
-                        }
-
-                        heartBaseX += ((m_menuIndex & 1) != 0) ? FLOAT_80330924 : FLOAT_80330928;
-                        heartValueOffset += 0x0C;
-                    }
-                }
-            }
-
-            int foodTimer = m_foodShakeTimer;
-            unsigned int foodAmount = (unsigned int)scriptFood->m_id;
-            int foodTier = (int)foodAmount - 100;
-            foodTier = foodTier / 100 + (foodTier >> 31);
-            unsigned int foodIcon = (foodAmount % 100) + (foodTier - (foodTier >> 31)) * 4;
-            float shakeX = (foodTimer != 0) ? (float)(((int)foodTimer >> 2) * s_mesMenuShakePattern[(3 - ((foodTimer + 1) & 3)) & 3]) : FLOAT_803308d8;
-            float shakeY = (foodTimer != 0) ? (float)(((int)foodTimer >> 2) * s_mesMenuShakePattern[(3 - (foodTimer & 3)) & 3]) : FLOAT_803308d8;
-            colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80330908 * stageBlend));
-            MenuPcs.SetColor(colorStorage);
-            MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x18));
-            MenuPcs.m_textures[0x18]->SetExternalTlut(
-                (scriptFood->m_hp == 0) ? MenuPcs.m_externalFontTlut : nullptr, 1);
-            MenuPcs.DrawRect(
-                ((m_menuIndex & 1) == 0) ? 8 : 0, frameX + shakeX + (float)(((m_menuIndex & 1) != 0) ? 75 : 5),
-                frameY + shakeY + FLOAT_80330958, FLOAT_8033095C, FLOAT_80330960,
-                (float)((foodIcon % 8) * 0x30), (float)((foodIcon / 8) * 0x30), FLOAT_80330914, FLOAT_80330914,
-                FLOAT_803308d8);
-        }
-    } else {
-        float sizeX = m_windowWidth * stateBlend;
-        float sizeY = m_windowHeight * stateBlend;
-        float baseX = m_baseX + m_offsetX;
-        float baseY = m_baseY + m_offsetY;
-        float drawX = -(FLOAT_803308ec * sizeX - (FLOAT_803308ec * m_windowWidth + baseX));
-        float drawY = -(FLOAT_803308ec * sizeY - (FLOAT_803308ec * m_windowHeight + baseY));
-        CColor colorStorage(0xFF, 0xFF, 0xFF, 0xFF);
-
-        if ((m_flags & 1) == 0) {
-            float alphaF = FLOAT_80330908 * stateBlend * stageBlend;
-            colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF);
-            MenuPcs.SetColor(colorStorage);
-
-            int tex = ((m_flags & 0x200) != 0) ? 2 : 0xB;
-            MenuPcs.DrawWindow(drawX, drawY, sizeX, sizeY, static_cast<CMenuPcs::TEX>(tex), FLOAT_8033092c);
-
-            if (((m_itemIndex >= 0) || (m_nameIndex >= 0)) &&
-                (((m_flags >> 10) & 7) != 0)) {
-                unsigned int iconAnchor = ((m_flags >> 10) & 7) - 1;
-                unsigned int anchorX = iconAnchor & 1;
-                unsigned int anchorY = iconAnchor & 2;
-                MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x14));
-                colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF);
-                MenuPcs.SetColor(colorStorage);
-                float iconX = drawX + FLOAT_80330938 + ((anchorX == 0) ? sizeX - FLOAT_8033093C : FLOAT_803308d8);
-                float iconY = drawY + ((anchorY != 0) ? FLOAT_80330940 + sizeY : FLOAT_80330944);
-                MenuPcs.DrawRect(
-                    anchorX != 0 ? 8 : 0, iconX, iconY, FLOAT_8033093C, FLOAT_80330948,
-                    (float)(anchorY != 0 ? 144 : 0), FLOAT_803308d8, FLOAT_80330914, FLOAT_80330914,
-                    FLOAT_803308d8);
-
-                if (m_nameIndex >= 0) {
-                    font->SetScale(FLOAT_8033094C);
-                    font->SetShadow(1);
-                    font->SetMargin(FLOAT_803308d8);
-                    char* actionName = Game.m_cFlatDataArr[1].TableStrings(2)[m_nameIndex];
-                    float textWidth = font->GetWidth(actionName);
-                    font->DrawInit();
-                    font->SetTlut(0xF);
-                    colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF);
-                    font->SetColor(colorStorage.color);
-                    font->SetPosX(iconX + ((anchorX == 0) ? FLOAT_80330954 - textWidth : FLOAT_80330950));
-                    font->SetPosY(iconY + (float)(anchorY != 0 ? 8 : 31));
-                    font->Draw(actionName);
+                    font->Draw(Game.m_cFlatDataArr[1].TableStrings(2)[m_nameIndex]);
                     MenuPcs.DrawInit();
                 }
 
                 if (m_itemIndex >= 0) {
                     int itemIndex = m_itemIndex;
-                    colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF);
-                    MenuPcs.SetColor(colorStorage);
+                    int itemU = (itemIndex % 8) * 0x30;
+                    int itemV = (itemIndex / 8) * 0x30;
+                    CColor itemColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF));
+                    MenuPcs.SetColor(itemColor);
                     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x18));
-                    MenuPcs.m_textures[0x18]->SetExternalTlut(nullptr, 1);
+                    MenuPcs.m_textures[0x18]->SetExternalTlut(0, 1);
+                    int itemMaskX = m_menuIndex & 1;
+                    int itemOffsetX = 83;
+                    if (itemMaskX != 0) {
+                        itemOffsetX = 13;
+                    }
+                    bool itemFlip = false;
+                    if ((itemMaskX != 0) && ((m_flags & 4) == 0)) {
+                        itemFlip = true;
+                    }
                     MenuPcs.DrawRect(
-                        (anchorX != 0 && ((m_flags & 4) == 0)) ? 8 : 0,
-                        iconX + (float)(anchorX != 0 ? 13 : 83), iconY + FLOAT_80330958, FLOAT_8033095C, FLOAT_80330960,
-                        (float)((itemIndex % 8) * 0x30), (float)((itemIndex / 8) * 0x30), FLOAT_80330914, FLOAT_80330914,
+                        itemFlip ? 8 : 0,
+                        iconX + (float)itemOffsetX, FLOAT_80330958 + iconY, FLOAT_8033095C, FLOAT_80330960,
+                        (float)itemU, (float)itemV, FLOAT_80330914, FLOAT_80330914, FLOAT_803308d8);
+                }
+            }
+        }
+
+        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x16));
+        float titleAlpha = FLOAT_80330908 * stageBlend;
+        CColor frameColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(titleAlpha));
+        MenuPcs.SetColor(frameColor);
+        unsigned int frameMask = m_menuIndex;
+        int frameNegX = -(int)(frameMask & 1);
+        float frameX = baseX - (float)(frameNegX & 0x80);
+        float frameY = baseY - (float)(-(int)(frameMask >> 1 & 1) & 0x38);
+        MenuPcs.DrawRect(
+            0, frameX, frameY, FLOAT_80330964, FLOAT_80330948,
+            (float)(((int)(-(int)(frameMask & 2) | (int)(frameMask & 2)) >> 31) & 0x80),
+            (float)(((int)(frameNegX | (int)(frameMask & 1)) >> 31) & 0x38), FLOAT_80330914, FLOAT_80330914,
+            FLOAT_803308d8);
+
+        font->SetScale(FLOAT_8033094C);
+        float titleWidth = font->GetWidth(reinterpret_cast<char*>(scriptFood->m_name));
+        font->DrawInit();
+        font->SetTlut(0xF);
+        font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(titleAlpha)).color);
+        font->SetPosX(baseX + (((m_menuIndex & 1) != 0) ? FLOAT_80330968 - titleWidth : FLOAT_80330950));
+        font->SetPosY(FLOAT_8033096C + frameY);
+        font->Draw(reinterpret_cast<char*>(scriptFood->m_name));
+        MenuPcs.DrawInit();
+
+        {
+            CCaravanWork* heartFood =
+                reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[m_menuIndex]);
+            if ((heartFood != 0) && (FLOAT_803308d8 < stageBlend)) {
+                CColor heartColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(titleAlpha));
+                MenuPcs.SetColor(heartColor);
+                MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x17));
+
+                int heartOffset = 0x4C;
+                if ((m_menuIndex & 1) != 0) {
+                    heartOffset = 0x30;
+                }
+
+                float pulseSinScale = FLOAT_80330910;
+                float heartBaseX = frameX + (float)heartOffset;
+                float heartBaseY = FLOAT_8033090c + frameY;
+                float heartZero = FLOAT_803308d8;
+                float pulseBase = FLOAT_80330920;
+                float pulseAmp = FLOAT_8033091c;
+                float pulseOne = FLOAT_80330914;
+                float pulseTimerScale = FLOAT_80330918;
+                int heartValueOffset = 0;
+
+                for (int heartIndex = 0; heartIndex < (int)((unsigned int)heartFood->m_maxHp >> 1);
+                     heartIndex++) {
+                    int heartValue = m_heartValue - heartValueOffset;
+                    float heartTimer = (float)m_heartGrowTimers[heartIndex];
+                    float heartPulse =
+                        pulseAmp * (float)sin(pulseSinScale * -(heartTimer * pulseTimerScale - pulseOne)) + pulseOne;
+                    heartPulse *= pulseBase;
+
+                    int heartSubTimer = m_heartDropTimers[heartIndex];
+                    int heartShakeX;
+                    if (heartSubTimer == 0) {
+                        heartShakeX = 0;
+                    } else {
+                        heartShakeX = (heartSubTimer >> 2) * s_mesMenuShakePattern[(heartSubTimer + 1) & 3];
+                    }
+
+                    float heartX = heartBaseX + (float)heartShakeX;
+                    int heartShakeY;
+                    if (heartSubTimer == 0) {
+                        heartShakeY = 0;
+                    } else {
+                        heartShakeY = (heartSubTimer >> 2) * s_mesMenuShakePattern[heartSubTimer & 3];
+                    }
+
+                    float heartY = heartBaseY + (float)heartShakeY;
+
+                    MenuPcs.DrawRect(
+                        3, heartX, heartY, FLOAT_803308dc, FLOAT_803308dc, heartZero, heartZero,
+                        heartPulse, heartPulse, heartZero);
+
+                    if (heartValue > 0) {
+                        int fillAmount = 0x0B;
+                        if (heartValue < 0x0B) {
+                            fillAmount = heartValue;
+                        }
+
+                        float u = (float)((heartFood->m_statusTimers[5] != 0) ? 0 : 0x18);
+                        float v = (float)((0x0C - fillAmount) * 0x18);
+                        MenuPcs.DrawRect(
+                            3, heartX, heartY, FLOAT_803308dc, FLOAT_803308dc, u, v, heartPulse, heartPulse,
+                            FLOAT_803308d8);
+                    }
+
+                    heartBaseX += ((m_menuIndex & 1) != 0) ? FLOAT_80330924 : FLOAT_80330928;
+                    heartValueOffset += 0x0C;
+                }
+            }
+        }
+
+        int foodTimer = m_foodShakeTimer;
+        int foodId = scriptFood->m_id;
+        int foodIcon = foodId % 100 + ((foodId - 100) / 100) * 4;
+        int foodU = (foodIcon % 8) * 0x30;
+        int foodV = (foodIcon / 8) * 0x30;
+        int foodShakeX;
+        if (foodTimer == 0) {
+            foodShakeX = 0;
+        } else {
+            foodShakeX = (foodTimer >> 2) * s_mesMenuShakePattern[3 - ((foodTimer + 1) & 3)];
+        }
+        float shakeX = (float)foodShakeX;
+        int foodShakeY;
+        if (foodTimer == 0) {
+            foodShakeY = 0;
+        } else {
+            foodShakeY = (foodTimer >> 2) * s_mesMenuShakePattern[3 - (foodTimer & 3)];
+        }
+        float shakeY = (float)foodShakeY;
+        CColor foodColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(titleAlpha));
+        MenuPcs.SetColor(foodColor);
+        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x18));
+        MenuPcs.m_textures[0x18]->SetExternalTlut(
+            (scriptFood->m_hp != 0) ? 0 : (void*)MenuPcs.m_externalFontTlut, 1);
+        int foodMaskX = m_menuIndex & 1;
+        int foodOffsetX = 5;
+        if (foodMaskX != 0) {
+            foodOffsetX = 75;
+        }
+        MenuPcs.DrawRect(
+            (foodMaskX != 0) ? 0 : 8, (frameX + shakeX) + (float)foodOffsetX,
+            FLOAT_80330958 + (frameY + shakeY), FLOAT_8033095C, FLOAT_80330960,
+            (float)foodU, (float)foodV, FLOAT_80330914, FLOAT_80330914,
+            FLOAT_803308d8);
+    } else {
+        float sizeX = m_windowWidth * stateBlend;
+        float sizeY = m_windowHeight * stateBlend;
+        float drawX = (FLOAT_803308ec * m_windowWidth + (m_baseX + m_offsetX)) - FLOAT_803308ec * sizeX;
+        float drawY = (FLOAT_803308ec * m_windowHeight + (m_baseY + m_offsetY)) - FLOAT_803308ec * sizeY;
+
+        if ((m_flags & 1) == 0) {
+            float stateAlpha = FLOAT_80330908 * stateBlend;
+            float alphaF = stateAlpha * stageBlend;
+            CColor windowColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF));
+            MenuPcs.SetColor(windowColor);
+
+            int tex = 0xB;
+            if ((m_flags & 0x200) != 0) {
+                tex = 2;
+            }
+            MenuPcs.DrawWindow(drawX, drawY, sizeX, sizeY, static_cast<CMenuPcs::TEX>(tex), FLOAT_8033092c);
+
+            if ((m_itemIndex >= 0) || (m_nameIndex >= 0)) {
+                unsigned int iconAnchor = (m_flags >> 10) & 7;
+                if (iconAnchor != 0) {
+                    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x14));
+                    CColor iconColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF));
+                    MenuPcs.SetColor(iconColor);
+                    unsigned int anchorX = (iconAnchor - 1) & 1;
+                    float iconEdgeX;
+                    if (anchorX != 0) {
+                        iconEdgeX = FLOAT_80330938;
+                    } else {
+                        iconEdgeX = (sizeX - FLOAT_8033093C) - FLOAT_80330938;
+                    }
+                    unsigned int anchorY = (iconAnchor - 1) & 2;
+                    float iconX = (drawX + FLOAT_803308d8) + iconEdgeX;
+                    float iconEdgeY;
+                    if (anchorY != 0) {
+                        iconEdgeY = FLOAT_80330940 + sizeY;
+                    } else {
+                        iconEdgeY = FLOAT_80330944;
+                    }
+                    float iconY = drawY + iconEdgeY;
+                    MenuPcs.DrawRect(
+                        (anchorX != 0) ? 8 : 0, iconX, iconY, FLOAT_8033093C, FLOAT_80330948,
+                        (float)((anchorY != 0) ? 144 : 0), FLOAT_803308d8, FLOAT_80330914, FLOAT_80330914,
                         FLOAT_803308d8);
+
+                    if (m_nameIndex >= 0) {
+                        font->SetScale(FLOAT_8033094C);
+                        font->SetShadow(1);
+                        font->SetMargin(FLOAT_803308d8);
+                        float textWidth = font->GetWidth(Game.m_cFlatDataArr[1].TableStrings(2)[m_nameIndex]);
+                        font->DrawInit();
+                        font->SetTlut(0xF);
+                        font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF)).color);
+                        font->SetPosX(iconX + ((anchorX != 0) ? FLOAT_80330950 : FLOAT_80330954 - textWidth));
+                        font->SetPosY(iconY + (float)((anchorY != 0) ? 8 : 31));
+                        font->Draw(Game.m_cFlatDataArr[1].TableStrings(2)[m_nameIndex]);
+                        MenuPcs.DrawInit();
+                    }
+
+                    if (m_itemIndex >= 0) {
+                        int itemIndex = m_itemIndex;
+                        int itemU = (itemIndex % 8) * 0x30;
+                        int itemV = (itemIndex / 8) * 0x30;
+                        CColor itemColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF));
+                        MenuPcs.SetColor(itemColor);
+                        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x18));
+                        MenuPcs.m_textures[0x18]->SetExternalTlut(0, 1);
+                        int itemOffsetX = 83;
+                        if (anchorX != 0) {
+                            itemOffsetX = 13;
+                        }
+                        bool itemFlip = false;
+                        if ((anchorX != 0) && ((m_flags & 4) == 0)) {
+                            itemFlip = true;
+                        }
+                        MenuPcs.DrawRect(
+                            itemFlip ? 8 : 0,
+                            iconX + (float)itemOffsetX, FLOAT_80330958 + iconY, FLOAT_8033095C, FLOAT_80330960,
+                            (float)itemU, (float)itemV, FLOAT_80330914, FLOAT_80330914,
+                            FLOAT_803308d8);
+                    }
                 }
             }
         }
@@ -779,32 +862,33 @@ void CMesMenu::onDraw()
         if ((m_state == 1) && ((m_flags & 0x2000) != 0)) {
             float windowScale = stateBlend * stageBlend;
             float pulseScale = FLOAT_80330970 * (FLOAT_80330914 - windowScale) + FLOAT_80330914;
-            float time = fmod(FLOAT_80330974 * (float)m_stateTimer, (float)DOUBLE_80330978);
+            float time = fmod(FLOAT_80330974 * (float)m_stateTimer, DOUBLE_80330978);
             if (time > FLOAT_80330914) {
                 time = FLOAT_803308e8 - time;
             }
 
             float angle = FLOAT_80330910 * time;
-            float sinX = sinf(FLOAT_80330980 + angle);
             float sinY = sinf(angle);
+            float sinX = sinf(FLOAT_80330980 + angle);
             MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
-            int shadowAlpha = (int)((FLOAT_803308ec * (FLOAT_80330908 * windowScale)) * stageBlend);
-            colorStorage = CColor(0, 0, 0, shadowAlpha);
-            MenuPcs.SetColor(colorStorage);
-            float promptX = FLOAT_803308f8 + drawX;
-            float promptY = FLOAT_8033092c + drawY;
+            float alpha255 = FLOAT_80330908 * windowScale;
+            CColor shadowColor(0, 0, 0, static_cast<unsigned char>((FLOAT_803308ec * alpha255) * stageBlend));
+            MenuPcs.SetColor(shadowColor);
+            float promptX = (float)(int)(FLOAT_803308f8 + drawX);
+            float promptY = (float)(int)(FLOAT_8033092c + drawY);
             float waveX = promptX + FLOAT_80330984 * (pulseScale * sinX);
             float waveY = promptY - FLOAT_80330988 * (pulseScale * sinY);
             float fadeScale = FLOAT_80330914 - pulseScale;
+            float rotation = FLOAT_8033091c * (FLOAT_803308e8 * (time - FLOAT_803308ec));
             MenuPcs.DrawRect(
                 3, FLOAT_803308e4 + waveX, FLOAT_803308e4 + waveY, FLOAT_8033098C, FLOAT_8033095C, FLOAT_803308d8,
                 FLOAT_803308d8, FLOAT_80330990 * (FLOAT_80330914 + fadeScale), FLOAT_80330990 * (pulseScale + fadeScale),
-                FLOAT_803308d8);
-            colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)((FLOAT_80330908 * windowScale) * stageBlend));
-            MenuPcs.SetColor(colorStorage);
+                rotation);
+            CColor promptColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha255 * stageBlend));
+            MenuPcs.SetColor(promptColor);
             MenuPcs.DrawRect(
                 3, waveX, waveY, FLOAT_8033098C, FLOAT_8033095C, FLOAT_803308d8, FLOAT_803308d8,
-                FLOAT_80330990 * pulseScale, FLOAT_80330990 * pulseScale, FLOAT_803308d8);
+                FLOAT_80330990 * pulseScale, FLOAT_80330990 * pulseScale, rotation);
         }
 
         if (m_state == 1) {
@@ -815,14 +899,13 @@ void CMesMenu::onDraw()
 
     if ((m_state == 1) && (m_mes.GetWait() == 3)) {
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0));
-        float alphaF = FLOAT_80330908 * stageBlend;
-        CColor colorStorage(0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF);
-        MenuPcs.SetColor(colorStorage);
+        CColor waitColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(FLOAT_80330908 * stageBlend));
+        MenuPcs.SetColor(waitColor);
 
         MenuPcs.DrawRect(
             0, FLOAT_80330994 + *(float*)((char*)this + 0x3CB8),
-            (float)*(int*)((char*)this + 0x3D34) * *(float*)((char*)this + 0x3D40) + FLOAT_803308e8 +
-                *(float*)((char*)this + 0x3CBC) + *(float*)((char*)this + 0x3D3C),
+            (float)*(int*)((char*)this + 0x3D34) * *(float*)((char*)this + 0x3D40) +
+                (FLOAT_803308e8 + *(float*)((char*)this + 0x3CBC) + *(float*)((char*)this + 0x3D3C)),
             FLOAT_8033092c, FLOAT_8033092c, FLOAT_803308d8, FLOAT_803308d8, FLOAT_80330914, FLOAT_80330914, FLOAT_803308d8);
     }
 }

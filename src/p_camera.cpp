@@ -642,17 +642,17 @@ void CCameraPcs::CalcQuake()
     jitter.y = kCameraZeroF;
     jitter.x = kCameraZeroF;
 
-    u32 randX = static_cast<u32>(rand());
-    u16 signX = static_cast<u16>(randX >> 0x1F);
-    unsigned short jitterSignX = static_cast<short>(((randX & 1) ^ signX) - signX);
+    randomValue = static_cast<u32>(rand());
+    randomSign = randomValue >> 0x1F;
+    short jitterSignX = static_cast<short>(((randomValue & 1) ^ randomSign) - randomSign);
 
-    u32 randY = static_cast<u32>(rand());
-    u16 signY = static_cast<u16>(randY >> 0x1F);
-    short jitterSignY = static_cast<short>(((randY & 1) ^ signY) - signY);
+    randomValue = static_cast<u32>(rand());
+    randomSign = randomValue >> 0x1F;
+    short jitterSignY = static_cast<short>(((randomValue & 1) ^ randomSign) - randomSign);
 
-    u32 randZ = static_cast<u32>(rand());
-    u16 signZ = static_cast<u16>(randZ >> 0x1F);
-    short jitterSignZ = static_cast<short>(((randZ & 1) ^ signZ) - signZ);
+    randomValue = static_cast<u32>(rand());
+    randomSign = randomValue >> 0x1F;
+    short jitterSignZ = static_cast<short>(((randomValue & 1) ^ randomSign) - randomSign);
 
     float jitterAmount;
     if (jitterSignX == 0) {

@@ -98,8 +98,8 @@ public:
 		u16 m_returnValue;   // 0x2E
 		s32 m_codeSize;      // 0x30
 		u8* m_code;          // 0x34
-		s32 m_codeOffset;    // 0x38
-		s32 m_codePos;       // 0x3C
+		s32 m_debugCodeSize; // 0x38
+		u8* m_debugCode;     // 0x3C
 		s32 m_systemKind;    // 0x40
 		s32 m_systemIndex;   // 0x44
 		s32 m_reqFlagIndex;  // 0x48

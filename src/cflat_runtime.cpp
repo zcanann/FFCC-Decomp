@@ -287,37 +287,38 @@ void CFlatRuntime::Create(void* filePtr)
 				int classOffset = 0;
 				chunkFile.PushChunk();
 				while (chunkFile.GetNextChunk(chunk)) {
-					if (chunk.m_id != 'BLCK') {
-						continue;
-					}
-
-					CClass* classBase = reinterpret_cast<CClass*>(reinterpret_cast<u8*>(m_classes) + classOffset);
-					classBase->m_index = classIndex;
-					chunkFile.PushChunk();
-					while (chunkFile.GetNextChunk(chunk)) {
-						switch (chunk.m_id) {
-						case 'NAME':
-							strcpy(classBase->m_name, chunkFile.GetString());
-							break;
-						case 'INFO':
-							classBase->m_variableCount = chunkFile.Get4();
-							break;
-						case 'VTBL':
-							for (int i = 0; i < 0x80; i++) {
-								classBase->m_functionTable[i] = chunkFile.Get4();
+					switch (chunk.m_id) {
+					case 'BLCK': {
+						CClass* classBase = reinterpret_cast<CClass*>(reinterpret_cast<u8*>(m_classes) + classOffset);
+						classBase->m_index = classIndex;
+						chunkFile.PushChunk();
+						while (chunkFile.GetNextChunk(chunk)) {
+							switch (chunk.m_id) {
+							case 'NAME':
+								strcpy(classBase->m_name, chunkFile.GetString());
+								break;
+							case 'INFO':
+								classBase->m_variableCount = chunkFile.Get4();
+								break;
+							case 'VTBL':
+								for (int i = 0; i < 0x80; i++) {
+									classBase->m_functionTable[i] = chunkFile.Get4();
+								}
+								break;
+							case 'VAL ':
+								classBase->m_localCount = chunk.m_arg0;
+								break;
+							default:
+								break;
 							}
-							break;
-						case 'VAL ':
-							classBase->m_localCount = chunk.m_arg0;
-							break;
-						default:
-							break;
 						}
-					}
-					chunkFile.PopChunk();
+						chunkFile.PopChunk();
 
-					classOffset += 0x22C;
-					classIndex++;
+						classOffset += 0x22C;
+						classIndex++;
+						break;
+					}
+					}
 				}
 				chunkFile.PopChunk();
 				break;
@@ -333,54 +334,55 @@ void CFlatRuntime::Create(void* filePtr)
 				int funcOffset = 0;
 				chunkFile.PushChunk();
 				while (chunkFile.GetNextChunk(chunk)) {
-					if (chunk.m_id != 'BLCK') {
-						continue;
-					}
-
-					CFunc* funcBase = reinterpret_cast<CFunc*>(m_funcs + funcOffset);
-					funcBase->m_index = funcIndex;
-					chunkFile.PushChunk();
-					while (chunkFile.GetNextChunk(chunk)) {
-						switch (chunk.m_id) {
-						case 'NAME':
-							strcpy(funcBase->m_name, chunkFile.GetString());
-							break;
-						case 'INFO':
-							funcBase->m_argCount = chunkFile.Get4();
-							funcBase->m_systemKind = chunkFile.Get4();
-							funcBase->m_systemIndex = chunkFile.Get4();
-							funcBase->m_reqFlagIndex = chunkFile.Get4();
-							funcBase->m_useCallerArgs = chunkFile.Get4();
-							break;
-						case 'VAL ':
-							funcBase->m_localCount = chunk.m_arg0;
-							break;
-						case 'RET ':
-							funcBase->m_returnType = chunkFile.Get1();
-							funcBase->m_returnFlags = chunkFile.Get1();
-							funcBase->m_returnValue = chunkFile.Get2();
-							break;
-						case 'CODE':
-							funcBase->m_codeSize = chunk.m_size;
-							funcBase->m_codePos = 0;
-							funcBase->m_codeOffset = 0;
-							if (funcBase->m_codeSize == 0) {
-								funcBase->m_code = 0;
-							} else {
-								funcBase->m_code = reinterpret_cast<u8*>(
-								    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x109)
-								        u8[chunk.m_size]);
-								memcpy(funcBase->m_code, chunkFile.GetAddress(), chunk.m_size);
+					switch (chunk.m_id) {
+					case 'BLCK': {
+						CFunc* funcBase = reinterpret_cast<CFunc*>(m_funcs + funcOffset);
+						funcBase->m_index = funcIndex;
+						chunkFile.PushChunk();
+						while (chunkFile.GetNextChunk(chunk)) {
+							switch (chunk.m_id) {
+							case 'NAME':
+								strcpy(funcBase->m_name, chunkFile.GetString());
+								break;
+							case 'INFO':
+								funcBase->m_argCount = chunkFile.Get4();
+								funcBase->m_systemKind = chunkFile.Get4();
+								funcBase->m_systemIndex = chunkFile.Get4();
+								funcBase->m_reqFlagIndex = chunkFile.Get4();
+								funcBase->m_useCallerArgs = chunkFile.Get4();
+								break;
+							case 'VAL ':
+								funcBase->m_localCount = chunk.m_arg0;
+								break;
+							case 'RET ':
+								funcBase->m_returnType = chunkFile.Get1();
+								funcBase->m_returnFlags = chunkFile.Get1();
+								funcBase->m_returnValue = chunkFile.Get2();
+								break;
+							case 'CODE':
+								funcBase->m_codeSize = chunk.m_size;
+								funcBase->m_debugCode = 0;
+								funcBase->m_debugCodeSize = 0;
+								if (funcBase->m_codeSize == 0) {
+									funcBase->m_code = 0;
+								} else {
+									funcBase->m_code = reinterpret_cast<u8*>(
+									    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x109)
+									        u8[chunk.m_size]);
+									memcpy(funcBase->m_code, chunkFile.GetAddress(), chunk.m_size);
+								}
+								break;
+							default:
+								break;
 							}
-							break;
-						default:
-							break;
 						}
-					}
-					chunkFile.PopChunk();
+						chunkFile.PopChunk();
 
-					funcOffset += 0x50;
-					funcIndex++;
+						funcOffset += 0x50;
+						funcIndex++;
+						break;
+					}
+					}
 				}
 				chunkFile.PopChunk();
 				break;
@@ -474,71 +476,76 @@ int CFlatRuntime::CreateDebug(void* filePtr, int debugChunkIndex)
 {
 	CChunkFile chunkFile(filePtr);
 	CChunkFile::CChunk chunk;
-	u8* const self = reinterpret_cast<u8*>(this);
 	int debugOffset = debugChunkIndex * 0x50;
-	int hasChunk = 0;
 
-	while ((hasChunk = chunkFile.GetNextChunk(chunk), hasChunk != 0)) {
-		if (chunk.m_id == 'CFLT') {
-			chunkFile.PushChunk();
-			int funcOffset = debugOffset;
-
-			while ((hasChunk = chunkFile.GetNextChunk(chunk), hasChunk != 0)) {
-				if ((static_cast<int>(chunk.m_id) < static_cast<int>('NAME'))
-				    && (static_cast<int>(chunk.m_id) == static_cast<int>('FUNC'))) {
-					chunkFile.PushChunk();
-					int blockOffset = funcOffset;
-
-					while ((hasChunk = chunkFile.GetNextChunk(chunk), hasChunk != 0)) {
-						void* funcs = *reinterpret_cast<void**>(self + 0x20);
-						if (chunk.m_id == 'BLCK') {
-							chunkFile.PushChunk();
-
-							while ((hasChunk = chunkFile.GetNextChunk(chunk), hasChunk != 0)) {
-								if ((static_cast<int>(chunk.m_id) < static_cast<int>('NAME'))
-								    && (chunk.m_id == 'CODE')) {
-									if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(funcs) + blockOffset + 0x30)
-									    != 0) {
-										*reinterpret_cast<unsigned int*>(
-											reinterpret_cast<u8*>(funcs) + blockOffset + 0x38) = chunk.m_size >> 3;
-										*reinterpret_cast<u8**>(reinterpret_cast<u8*>(funcs) + blockOffset + 0x3C)
-										    = new (getDebugStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x181)
-										        u8[*reinterpret_cast<int*>(reinterpret_cast<u8*>(funcs) + blockOffset + 0x38)
-										           << 3];
-										memcpy(
-											*reinterpret_cast<void**>(reinterpret_cast<u8*>(funcs) + blockOffset + 0x3C),
-											chunkFile.GetAddress(), chunk.m_size);
-									} else {
-										*reinterpret_cast<void**>(reinterpret_cast<u8*>(funcs) + blockOffset + 0x3C)
-										    = 0;
-										*reinterpret_cast<void**>(reinterpret_cast<u8*>(funcs) + blockOffset + 0x38)
-										    = 0;
-									}
-								}
-							}
-
-							chunkFile.PopChunk();
-							blockOffset += 0x50;
-							funcOffset += 0x50;
-							debugOffset += 0x50;
-							debugChunkIndex++;
-						}
-					}
-
-					chunkFile.PopChunk();
-				}
-			}
-
-			chunkFile.PopChunk();
+	while (chunkFile.GetNextChunk(chunk)) {
+		if (chunk.m_id != 'CFLT') {
+			continue;
 		}
+
+		chunkFile.PushChunk();
+		int funcOffset = debugOffset;
+
+		while (chunkFile.GetNextChunk(chunk)) {
+			switch (chunk.m_id) {
+			case 'NAME':
+				break;
+
+			case 'FUNC': {
+				chunkFile.PushChunk();
+				int blockOffset = funcOffset;
+
+				while (chunkFile.GetNextChunk(chunk)) {
+					CFunc* funcBase = reinterpret_cast<CFunc*>(m_funcs + blockOffset);
+					switch (chunk.m_id) {
+					case 'BLCK':
+						chunkFile.PushChunk();
+
+						while (chunkFile.GetNextChunk(chunk)) {
+							switch (chunk.m_id) {
+							case 'NAME':
+								break;
+
+							case 'CODE':
+								if (funcBase->m_codeSize != 0) {
+									funcBase->m_debugCodeSize = chunk.m_size >> 3;
+									funcBase->m_debugCode =
+									    new (getDebugStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x181)
+									        u8[funcBase->m_debugCodeSize << 3];
+									memcpy(funcBase->m_debugCode, chunkFile.GetAddress(), chunk.m_size);
+								} else {
+									funcBase->m_debugCode = 0;
+									funcBase->m_debugCodeSize = 0;
+								}
+								break;
+							}
+						}
+
+						chunkFile.PopChunk();
+						blockOffset += 0x50;
+						funcOffset += 0x50;
+						debugOffset += 0x50;
+						debugChunkIndex++;
+						break;
+					}
+				}
+
+				chunkFile.PopChunk();
+				break;
+			}
+			}
+		}
+
+		chunkFile.PopChunk();
 	}
 
-	hasChunk = -1;
-	if (debugChunkIndex < *reinterpret_cast<int*>(self + 0x1C)) {
-		hasChunk = debugChunkIndex;
+	int result = -1;
+	if (debugChunkIndex < m_funcCount) {
+		result = debugChunkIndex;
 	}
-	return hasChunk;
+	return result;
 }
+
 
 /*
  * --INFO--

@@ -1321,9 +1321,10 @@ void CCameraPcs::calcMap()
     if ((kCameraZeroF != moveDelta.x) || (kCameraZeroF != moveDelta.y) || (kCameraZeroF != moveDelta.z)) {
         i = 4;
         while (i-- != 0) {
-            double radius = kCameraDefaultNearZ;
-            double boundsMax = kCameraBoundsMaxInitial;
-            double boundsMin = kCameraBoundsMinInitial;
+            double radius, boundsMax, boundsMin;
+            boundsMin = kCameraBoundsMinInitial;
+            boundsMax = kCameraBoundsMaxInitial;
+            radius = kCameraDefaultNearZ;
             hitCylinder.m_min.z = boundsMin;
             hitCylinder.m_min.y = boundsMin;
             hitCylinder.m_min.x = boundsMin;

@@ -24,8 +24,8 @@ int CMes::m_tempVar[0x14];
 
 extern char lbl_801D9E58[];
 
-static const char s_mesTagUnknown[] = "Not corresponding TAG is used. %02x\n";
-static const char s_mesTagMissing[] = "This TAG is not created. %02x\n";
+static const char s_Not_corresponding_TAG_is_used_pct02x_801D9E30[] = "Not corresponding TAG is used. %02x\n";
+static const char s_This_TAG_is_not_created_pct02x_801D9E10[] = "This TAG is not created. %02x\n";
 static const char s_mesNumFmt[] = "%d";
 static const char s_mesFallback[] = "---";
 static const char s_mesEmpty[] = "";
@@ -225,10 +225,9 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 	unsigned char branchMode = 0;
 
 	const unsigned char* op;
-	signed char c;
-	while ((c = in[0]) != 0)
+	while ((signed char)*in != 0)
 	{
-		if (c == 0xFF)
+		if (*in == 0xFF)
 		{
 		unsigned int tag = ((unsigned int)in[1] - 0xA0U) & 0xFFU;
 		op = in + 2;
@@ -460,7 +459,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x14:
 			if ((unsigned int)System.m_execParam >= 2U)
 			{
-				System.Printf(const_cast<char*>(s_mesTagMissing), tag + 0xA0);
+				System.Printf(const_cast<char*>(s_This_TAG_is_not_created_pct02x_801D9E10), tag + 0xA0);
 			}
 			break;
 		case 2:
@@ -487,7 +486,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x55:
 			if ((unsigned int)System.m_execParam >= 1U)
 			{
-				System.Printf(const_cast<char*>(s_mesTagUnknown), tag + 0xA0);
+				System.Printf(const_cast<char*>(s_Not_corresponding_TAG_is_used_pct02x_801D9E30), tag + 0xA0);
 			}
 			break;
 		default:
@@ -499,7 +498,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 
 		if (branchMode != 2)
 		{
-			*dst = (char)c;
+			*dst = (char)*in;
 			dst++;
 		}
 		in++;

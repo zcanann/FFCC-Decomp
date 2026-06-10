@@ -4518,7 +4518,7 @@ void GbaQueue::ClrChgRadarMode(int channel)
 int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
 {
 	unsigned char localScouterInfo[0x200];
-	unsigned int* enemyWorkPtrs = &Game.m_scriptWork[4][0][0];
+	short work;
 
 	memset(localScouterInfo, 0xFF, sizeof(localScouterInfo));
 
@@ -4530,17 +4530,18 @@ int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
 		for (int i = 0; i < 0x40; i++) {
 			scouterEntry[0] = enemyEntry[0xB37];
 			if (scouterEntry[0] != 0) {
-				CMonWork* enemyWork = reinterpret_cast<CMonWork*>(enemyWorkPtrs[i]);
-				const int enemyDataBase = Game.unkCFlatData0[1] + static_cast<signed char>(enemyEntry[0xB37]) * 0x1D0;
+				CMonWork* enemyWork = reinterpret_cast<CMonWork*>(Game.m_scriptWork[4][0][i]);
+				const int enemyDataBase = Game.unkCFlatData0[1] + enemyEntry[0xB37] * 0x1D0;
 
-				*reinterpret_cast<unsigned short*>(scouterEntry + 4) = SwapU16(enemyWork->m_maxHp);
+				work = enemyWork->m_maxHp;
+				*reinterpret_cast<unsigned short*>(scouterEntry + 4) = __lhbrx(reinterpret_cast<unsigned short*>(&work), 0);
 
 				if (*reinterpret_cast<short*>(enemyEntry + 0xB42) > 0) {
-					scouterEntry[6] = 0xFF;
-					scouterEntry[7] = 0xFF;
+					work = -1;
+					*reinterpret_cast<unsigned short*>(scouterEntry + 6) = __lhbrx(reinterpret_cast<unsigned short*>(&work), 0);
 				} else {
 					const short scouterValue = *reinterpret_cast<short*>(enemyEntry + 0xB40);
-					if (scouterValue < 1) {
+					if (scouterValue <= 0) {
 						*reinterpret_cast<unsigned short*>(scouterEntry + 6) = 0;
 					} else if ((scouterValue & 0xC000) == 0x4000) {
 						*reinterpret_cast<unsigned short*>(scouterEntry + 6) = 0;
@@ -4553,9 +4554,13 @@ int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
 				const unsigned short enemyFlags = *reinterpret_cast<unsigned short*>(enemyDataBase + 0x10E);
 				if ((enemyFlags & 5) == 5) {
 					scouterEntry[1] = 0;
-				} else if ((enemyFlags & 4) == 0) {
-					if ((enemyFlags & 1) == 0) {
-						const unsigned short form0 = *reinterpret_cast<short*>(enemyDataBase + 0xF0);
+				} else if ((enemyFlags & 4) != 0) {
+					scouterEntry[1] = 1;
+				} else if ((enemyFlags & 1) != 0) {
+					scouterEntry[1] = 2;
+				} else {
+					{
+						const unsigned short form0 = *reinterpret_cast<unsigned short*>(enemyDataBase + 0xF0);
 						if ((form0 == 0) && (*reinterpret_cast<unsigned short*>(enemyDataBase + 0xF2) == 0) &&
 						    (*reinterpret_cast<unsigned short*>(enemyDataBase + 0xF4) == 0)) {
 							scouterEntry[1] = 3;
@@ -4605,11 +4610,7 @@ int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
 								scouterEntry[statusCount + 1] = 13;
 							}
 						}
-					} else {
-						scouterEntry[1] = 2;
 					}
-				} else {
-					scouterEntry[1] = 1;
 				}
 			}
 

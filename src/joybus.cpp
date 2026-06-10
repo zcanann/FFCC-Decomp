@@ -4521,7 +4521,7 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
             unsigned char lowBits = 0;
             unsigned char highBits = 0;
 
-            for (int count = 0; count < 2; count++)
+            for (int count = 0; count < 4; count++)
             {
                 if (p[0x16] != 0)
                 {
@@ -4536,23 +4536,7 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
                     cf[idx] = v;
                 }
 
-                lowBits  += 0x10;
-                highBits += 1;
-
-                if (p[0xF2] != 0)
-                {
-                    int idx = (int)p[0xDC] >> 1;
-                    signed char v = (cf[idx] & 0x0F) | lowBits;
-
-                    if ((p[0xDC] & 1) != 0)
-                    {
-                        v = (cf[idx] & 0xF0) | highBits;
-                    }
-
-                    cf[idx] = v;
-                }
-
-                p        += 0x1B8;
+                p        += 0xDC;
                 lowBits  += 0x10;
                 highBits += 1;
             }

@@ -487,7 +487,7 @@ static int CalcShopMenuMakeGil(CShopMenu* shopMenu, int itemId)
 
     const CCaravanWork* const caravanWork = ShopMenuCaravanWork(shopMenu);
     int gilValue = caravanWork->m_shopParam *
-                   *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x24);
+                   reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48)[0x12];
     return gilValue / 100;
 }
 
@@ -2151,7 +2151,7 @@ void CShopMenu::DrawMake()
     int makeGil2 = CalcShopMenuMakeGil(this, getItemNo(m_selectedIndex));
     CCaravanWork* caravanWork = ShopMenuCaravanWork(this);
     int gilTlut = 2;
-    if (makeGil2 <= caravanWork->m_gil) {
+    if (caravanWork->m_gil >= makeGil2) {
         gilTlut = 0x14;
     }
     int caravanGil = caravanWork->m_gil;
@@ -2163,11 +2163,11 @@ void CShopMenu::DrawMake()
     SetupShopMenuUnitFont(font);
     char* gilUnitText = ShopMenuMes(languageId, SHOP_MENU_TEXT_GIL);
     float gilUnitWidth2 = font->GetWidth(gilUnitText);
+    x = 312;
     font->DrawInit();
     MenuPcs.DrawNoShadowFont(font, s_Slash_80332d84, FLOAT_80332e14, FLOAT_80332e20, 0x1B, 0x12);
     MenuPcs.DrawInit();
 
-    x = 312;
     x = static_cast<int>(x - (FLOAT_80332d5c + gilUnitWidth2));
     font->DrawInit();
     MenuPcs.DrawNoShadowFont(font, gilUnitText, x, FLOAT_80332e20, 0x19, 0x12);
@@ -2262,8 +2262,9 @@ void CShopMenu::DrawMake()
         MenuPcs.DrawInit();
 
         int ownedCount = 0;
+        short materialItem = *material;
         for (int slot = 0; slot < 0x40; slot++) {
-            if (ShopMenuCaravanWork(this)->m_inventoryItems[slot] == *material) {
+            if (ShopMenuCaravanWork(this)->m_inventoryItems[slot] == materialItem) {
                 ++ownedCount;
             }
         }

@@ -551,7 +551,7 @@ void CRingMenu::onDraw()
 
 		if (group == 2) {
 			CGPartyObj* partyObj = Game.m_partyObjArr[m_menuIndex];
-			buttonAlpha = static_cast<float>((partyObj->m_partyData.commandMode & 9) != 0);
+			buttonAlpha = static_cast<float>(static_cast<int>((partyObj->m_partyData.commandMode & 9) != 0));
 		}
 
 		if (kRingMenuZero == buttonAlpha) {
@@ -559,8 +559,7 @@ void CRingMenu::onDraw()
 		}
 
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1F));
-		CColor buttonColor(
-			0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(buttonAlpha * alphaScaleBase)));
+		CColor buttonColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(buttonAlpha * alphaScaleBase));
 		MenuPcs.SetColor(buttonColor);
 
 		float drawX;
@@ -602,7 +601,7 @@ void CRingMenu::onDraw()
 				                   ? Chara.MogFur().m_commandIndex
 				                   : caravanWork->GetIdxCmdList();
 
-				CFont* font = MenuPcs.m_fonts[0];
+				CFont* font = MenuPcs.m_fonts[1];
 				font->DrawInit();
 				font->SetMargin(kRingMenuFontMargin);
 				font->SetShadow(1);
@@ -667,7 +666,7 @@ void CRingMenu::onDraw()
 		const float textY0 = (kRingMenuSmallOffset + drawY) - kRingMenuShadowOffset;
 		const float textX1 = (kRingMenuCommandCellSize + drawX) + kRingMenuTextOffsetX;
 		const float textY2 = kRingMenuCommandTextOffsetY + drawY;
-		CFont* font = MenuPcs.m_fonts[0];
+		CFont* font = MenuPcs.m_fonts[1];
 		for (int button = 1; button >= 0; button--) {
 			const int buttonValue = m_battleButtons[group * 2 + 2 + button];
 			if (buttonValue < 0) {
@@ -713,14 +712,11 @@ void CRingMenu::onDraw()
 
 			const float width = font->GetWidth(label);
 			if ((group == 2) && (m_battleButtons[2] >= 0)) {
-				int alpha = static_cast<int>(kRingMenuDimAlphaScale *
-				                             (showScale * (kRingMenuAlphaMax * fade * transitionScale)));
-				CColor textColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha));
-				font->SetColor(textColor);
+				font->SetColor(CColor(0xFF, 0xFF, 0xFF,
+					static_cast<unsigned char>(kRingMenuDimAlphaScale * (showScale * (kRingMenuAlphaMax * fade * transitionScale)))).color);
 			} else {
-				int alpha = static_cast<int>(showScale * (kRingMenuAlphaMax * fade * transitionScale));
-				CColor textColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha));
-				font->SetColor(textColor);
+				font->SetColor(CColor(0xFF, 0xFF, 0xFF,
+					static_cast<unsigned char>(showScale * (kRingMenuAlphaMax * fade * transitionScale))).color);
 			}
 
 			float textX;
@@ -761,19 +757,19 @@ void CRingMenu::onDraw()
 						for (int i = 0; i < caravanWork->m_numCmdListSlots; i++) {
 							int maxCharge;
 							int curCharge;
-							unsigned int charge = caravanWork->GetMagicCharge(i, maxCharge, curCharge);
+							int charge = caravanWork->GetMagicCharge(i, maxCharge, curCharge);
 
 							float blink;
 							if (charge != 0) {
-								CColor color(0x00, 0xFF, 0x00, static_cast<unsigned char>(static_cast<int>(fullAlpha)));
+								CColor color(0x00, 0xFF, 0x00, static_cast<int>(fullAlpha));
 								MenuPcs.SetColor(color);
 								blink = static_cast<float>(static_cast<int>((System.m_frameCounter >> 2) & 1));
 							} else if (caravanWork->IsSelectedCmdList(i)) {
-								CColor color(0x20, 0xFF, 0x20, static_cast<unsigned char>(static_cast<int>(fullAlpha)));
+								CColor color(0x20, 0xFF, 0x20, static_cast<int>(fullAlpha));
 								MenuPcs.SetColor(color);
 								blink = kRingMenuZero;
 							} else {
-								CColor color(0x80, 0x80, 0x80, static_cast<unsigned char>(static_cast<int>(dimAlpha)));
+								CColor color(0x80, 0x80, 0x80, static_cast<int>(dimAlpha));
 								MenuPcs.SetColor(color);
 								blink = kRingMenuZero;
 							}

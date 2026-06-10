@@ -40,6 +40,9 @@ static inline CMapMngAsyncLoadState& GetMapMngAsyncLoadState(CMapMng* mapMng)
 {
     return mapMng->m_asyncLoadState;
 }
+static const _GXColor s_mapDbgLightColor = { 0xFF, 0xFF, 0xFF, 0xFF };
+static const _GXColor s_mapDbgMaterialColor = { 0xFF, 0xFF, 0xFF, 0xFF };
+static const _GXColor s_mapDbgAmbientColor = { 0x40, 0x40, 0x40, 0xFF };
 static const char s_mapNewLine[] = "\n";
 extern "C" unsigned char Vec_80245758[];
 
@@ -2592,9 +2595,36 @@ void CMapMng::DrawMapShadow()
  * Address:	TODO
  * Size:	TODO
  */
-void setDbgLight(int, Vec&, _GXColor&)
+inline void setDbgLight(int lightId, Vec& lightDir, _GXColor& lightColor)
 {
-	// TODO
+    extern const float kMapLargeDistance;
+    extern const float kMapFullTurnDegrees;
+    extern const float kMapZero;
+    extern const float kMapTinyEpsilon;
+
+    Mtx cameraMtx;
+    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+
+    float dirY = lightDir.y;
+    float dirZ = lightDir.z;
+
+    GXLightObj lightObj;
+    Vec v;
+    v.x = kMapLargeDistance * -lightDir.x;
+    v.y = kMapLargeDistance * -dirY;
+    v.z = kMapLargeDistance * -dirZ;
+
+    GXInitLightColor(&lightObj, lightColor);
+    PSMTXMultVec(cameraMtx, &v, &v);
+    GXInitLightPos(&lightObj, v.x, v.y, v.z);
+    v.x = lightDir.x;
+    v.y = dirY;
+    v.z = dirZ;
+    PSMTXMultVecSR(cameraMtx, &v, &v);
+    GXInitLightDir(&lightObj, v.x, v.y, v.z);
+    GXInitLightSpot(&lightObj, kMapFullTurnDegrees, GX_SP_SHARP);
+    GXInitLightAttnK(&lightObj, kMapZero, kMapTinyEpsilon, kMapZero);
+    GXLoadLightObjImm(&lightObj, static_cast<GXLightID>(lightId));
 }
 
 /*
@@ -2834,69 +2864,19 @@ void CMapMng::Draw()
     }
 
     if ((s_bitMask.m_fields.m_mode & 1) != 0) {
-        _GXColor lightColor;
-        *reinterpret_cast<u32*>(&lightColor) = 0xFFFFFFFF;
-
+        _GXColor lightColor = s_mapDbgLightColor;
         Vec lightDir0 = kMapHitLightDir0;
-
-        Mtx cameraMtx0;
-        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx0);
-
-        float dirY0 = lightDir0.y;
-        float dirZ0 = lightDir0.z;
-        Vec lightPos0;
-        lightPos0.x = kMapLargeDistance * -lightDir0.x;
-        lightPos0.y = kMapLargeDistance * -dirY0;
-        lightPos0.z = kMapLargeDistance * -dirZ0;
-
-        GXLightObj lightObj0;
-        GXInitLightColor(&lightObj0, lightColor);
-        PSMTXMultVec(cameraMtx0, &lightPos0, &lightPos0);
-        GXInitLightPos(&lightObj0, lightPos0.x, lightPos0.y, lightPos0.z);
-        lightDir0.y = dirY0;
-        lightDir0.z = dirZ0;
-        PSMTXMultVecSR(cameraMtx0, &lightDir0, &lightDir0);
-        GXInitLightDir(&lightObj0, lightDir0.x, lightDir0.y, lightDir0.z);
-        GXInitLightSpot(&lightObj0, kMapFullTurnDegrees, GX_SP_SHARP);
-        GXInitLightAttnK(&lightObj0, kMapZero, kMapTinyEpsilon, kMapZero);
-        GXLoadLightObjImm(&lightObj0, GX_LIGHT0);
-
+        setDbgLight(GX_LIGHT0, lightDir0, lightColor);
         Vec lightDir1 = kMapHitLightDir1;
-
-        Mtx cameraMtx1;
-        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx1);
-
-        float dirY1 = lightDir1.y;
-        float dirZ1 = lightDir1.z;
-        Vec lightPos1;
-        lightPos1.x = kMapLargeDistance * -lightDir1.x;
-        lightPos1.y = kMapLargeDistance * -dirY1;
-        lightPos1.z = kMapLargeDistance * -dirZ1;
-
-        GXLightObj lightObj1;
-        GXInitLightColor(&lightObj1, lightColor);
-        PSMTXMultVec(cameraMtx1, &lightPos1, &lightPos1);
-        GXInitLightPos(&lightObj1, lightPos1.x, lightPos1.y, lightPos1.z);
-        lightDir1.y = dirY1;
-        lightDir1.z = dirZ1;
-        PSMTXMultVecSR(cameraMtx1, &lightDir1, &lightDir1);
-        GXInitLightDir(&lightObj1, lightDir1.x, lightDir1.y, lightDir1.z);
-        GXInitLightSpot(&lightObj1, kMapFullTurnDegrees, GX_SP_SHARP);
-        GXInitLightAttnK(&lightObj1, kMapZero, kMapTinyEpsilon, kMapZero);
-        GXLoadLightObjImm(&lightObj1, GX_LIGHT1);
+        setDbgLight(GX_LIGHT1, lightDir1, lightColor);
 
         GXSetNumChans(1);
         GXSetChanCtrl(GX_COLOR0, 1, GX_SRC_REG, GX_SRC_VTX, static_cast<GXLightID>(GX_LIGHT0 | GX_LIGHT1),
                       GX_DF_CLAMP, GX_AF_SPOT);
         GXSetChanCtrl(GX_ALPHA0, 0, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
 
-        _GXColor materialColor;
-        *reinterpret_cast<u32*>(&materialColor) = 0xFFFFFFFF;
-        GXSetChanMatColor(GX_COLOR0A0, materialColor);
-
-        _GXColor ambientColor;
-        *reinterpret_cast<u32*>(&ambientColor) = 0x404040FF;
-        GXSetChanAmbColor(GX_COLOR0A0, ambientColor);
+        GXSetChanMatColor(GX_COLOR0A0, s_mapDbgMaterialColor);
+        GXSetChanAmbColor(GX_COLOR0A0, s_mapDbgAmbientColor);
 
         if ((s_bitMask.m_fields.m_mode & 2) != 0) {
             _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_NOOP);

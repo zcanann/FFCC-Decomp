@@ -80,6 +80,12 @@ static inline CFlatRuntime2* ItemCFlatRuntime()
 	return &CFlat;
 }
 
+struct SItemFlatRow {
+	unsigned char m_pad[0x10];
+	unsigned short m_fineValue;
+	unsigned char m_pad2[0x36];
+};
+
 /*
  * --INFO--
  * PAL Address: 0x80124b78
@@ -1161,9 +1167,9 @@ void CGItemObj::onFrameStat()
 				pdtNo = -1;
 			}
 
+			SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
 			float particleScale =
-			    kItemObjFineStep * (float)*(unsigned short*)(Game.unkCFlatData0[2] + prgObj->m_worldParamB * 0x48 + 0x10) +
-			    kItemObjParticleScaleBase;
+			    kItemObjFineStep * (float)itemRows[prgObj->m_worldParamB].m_fineValue + kItemObjParticleScaleBase;
 			putParticle((pdtNo << 8) | 0x13, m_particleSlot, this, particleScale, 0x12903);
 		} else if (m_stateFrame == 0xD) {
 			int ownerSlot = *(int*)(*(unsigned char**)(*(unsigned char**)(self + 0x550) + 0x58) + 0x3B4);
@@ -1200,9 +1206,9 @@ void CGItemObj::onFrameStat()
 				pdtNo = -1;
 			}
 
+			SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
 			float particleScale =
-			    kItemObjFineStep * (float)*(unsigned short*)(Game.unkCFlatData0[2] + prgObj->m_worldParamB * 0x48 + 0x10) +
-			    kItemObjParticleScaleBase;
+			    kItemObjFineStep * (float)itemRows[prgObj->m_worldParamB].m_fineValue + kItemObjParticleScaleBase;
 			putParticle((pdtNo << 8) | 4, m_particleSlot, this, particleScale, 0x12908);
 		} else if (m_stateFrame == 0xD) {
 			int ownerSlot = *(int*)(*(unsigned char**)(*(unsigned char**)(self + 0x550) + 0x58) + 0x3B4);
@@ -1279,8 +1285,8 @@ void CGItemObj::onFrame()
 				soundEntry = -1;
 			}
 
-			unsigned char* itemTable = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]);
-			float particleValue = static_cast<float>(*reinterpret_cast<unsigned short*>(itemTable + m_worldParamB * 0x48 + 0x10));
+			SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
+			float particleValue = static_cast<float>(itemRows[m_worldParamB].m_fineValue);
 			float particleScale = kItemObjFineStep * (float)particleValue + kItemObjParticleScaleBase;
 			putParticle(ownerScriptSlot | (soundEntry << 8), m_particleSlot, this, particleScale, 0x12909);
 

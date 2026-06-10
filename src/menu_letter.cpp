@@ -2469,14 +2469,19 @@ int CMenuPcs::LetterCtrlCur()
  */
 void CMenuPcs::LetterLstBaseDraw(float param_1)
 {
+	unsigned long flip;
+	int i;
+
 	if (param_1 <= FLOAT_803330bc) {
 		return;
 	}
 
-	float h = static_cast<float>(static_cast<int>(FLOAT_803330f0 - DOUBLE_803330e8));
-	float w = static_cast<float>(static_cast<int>(FLOAT_803330e0 - DOUBLE_803330a8));
-	float y0 = static_cast<float>(static_cast<int>(static_cast<double>(static_cast<float>(DOUBLE_803330d8 + FLOAT_803330d0 * param_1)) - DOUBLE_803330e8));
-	float x0 = static_cast<float>(static_cast<int>(static_cast<double>(FLOAT_803330d4 - static_cast<float>(static_cast<float>(FLOAT_803330d0 * param_1) * DOUBLE_803330a8)) - DOUBLE_803330a8));
+	float x0 = static_cast<float>(static_cast<int>(static_cast<double>(FLOAT_803330d4 - static_cast<float>((FLOAT_803330d0 * param_1) * DOUBLE_803330a8)) - DOUBLE_803330a8));
+	float fy = FLOAT_803330e0;
+	float y0 = static_cast<float>(static_cast<int>(fy - DOUBLE_803330a8));
+	float w = static_cast<float>(static_cast<int>(static_cast<double>(static_cast<float>(DOUBLE_803330d8 + FLOAT_803330d0 * param_1)) - DOUBLE_803330e8));
+	float fh = FLOAT_803330f0;
+	float h = static_cast<float>(static_cast<int>(fh - DOUBLE_803330e8));
 
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	GXColor white;
@@ -2486,14 +2491,14 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 	white.a = 0xFF;
 	GXSetChanMatColor(GX_COLOR0A0, white);
 
-	float xw = static_cast<float>(x0 + w);
-	float yh = static_cast<float>(y0 + h);
-	float x1 = static_cast<float>(xw - FLOAT_803330f4);
-	float y1 = static_cast<float>(yh - FLOAT_803330f4);
+	float xw = x0 + w;
+	float yh = y0 + h;
+	float x1 = xw - FLOAT_803330f4;
+	float y1 = yh - FLOAT_803330f4;
 
-	for (unsigned int i = 0; i < 4; ++i) {
+	for (i = 0; i < 4; ++i) {
 		int tex;
-		int flip = 0;
+		flip = 0;
 		if (i == 0) {
 			tex = 0x3C;
 		} else if (i == 1) {
@@ -2504,111 +2509,122 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 			tex = 0x4D;
 		}
 
-		double x = x0;
-		double y = y0;
+		float x;
+		float y;
 		if ((i & 1) != 0) {
 			x = x1;
 			if (i == 1) {
 				flip |= 8;
 			}
+		} else {
+			x = x0;
 		}
 		if ((i & 2) != 0) {
 			y = y1;
+		} else {
+			y = y0;
 		}
 
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
 		MenuPcs.DrawRect(
-		    flip, static_cast<float>(x), static_cast<float>(y), FLOAT_803330f4, FLOAT_803330f4,
-		    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
+		    flip, x, y, FLOAT_803330f4, FLOAT_803330f4,
+		    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, FLOAT_803330bc);
 	}
 
-	float innerW = static_cast<float>(w - DOUBLE_803330d8);
-	float innerH = static_cast<float>(h - DOUBLE_803330d8);
-	float innerX = static_cast<float>(x0 + FLOAT_803330f4);
-	float innerY = static_cast<float>(y0 + FLOAT_803330f4);
-
-	for (int i = 0; i < 2; ++i) {
-		unsigned int tex = (i == 0) ? 0x49 : 0x4C;
-		float y = (i == 0) ? y0 : y1;
+	double innerW = w - DOUBLE_803330d8;
+	float innerX = FLOAT_803330f4 + x0;
+	float y = y0;
+	float innerWf = static_cast<float>(innerW);
+	for (i = 0; i < 2; ++i) {
+		int tex = 0x49;
+		if (i != 0) {
+			tex = 0x4C;
+		}
+		if (i != 0) {
+			y = y1;
+		}
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
 		MenuPcs.DrawRect(
-		    0, static_cast<float>(innerX), static_cast<float>(y), static_cast<float>(innerW), FLOAT_803330f4,
-		    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
+		    0, innerX, y, innerWf, FLOAT_803330f4,
+		    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, FLOAT_803330bc);
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x4A));
-	for (int i = 0; i < 2; ++i) {
-		int flip = 0;
-		double x = x0;
+	double innerH = h - DOUBLE_803330d8;
+	float innerY = FLOAT_803330f4 + y0;
+	float x = x0;
+	float innerHf = static_cast<float>(innerH);
+	for (i = 0; i < 2; ++i) {
+		flip = 0;
 		if (i != 0) {
 			x = x1;
 			flip |= 8;
 		}
 		MenuPcs.DrawRect(
-		    flip, static_cast<float>(x), static_cast<float>(innerY), FLOAT_803330f4, static_cast<float>(innerH),
-		    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
+		    flip, x, innerY, FLOAT_803330f4, innerHf,
+		    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, FLOAT_803330bc);
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x4E));
 	MenuPcs.DrawRect(
-	    0, static_cast<float>(innerX), static_cast<float>(innerY), static_cast<float>(innerW), static_cast<float>(innerH),
-	    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
+	    flip, innerX, innerY, static_cast<float>(innerW), static_cast<float>(innerH),
+	    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, FLOAT_803330bc);
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x4F));
-	double decoX0 = static_cast<double>(static_cast<float>(xw - static_cast<double>(FLOAT_80333108)));
+	float decoX = xw - FLOAT_80333108;
 	double decoY0 = y0 - DOUBLE_80333100;
-	double decoX1 = DOUBLE_80333100 + decoX0;
-	double decoY1 = DOUBLE_80333100 + static_cast<double>(static_cast<float>(yh - static_cast<double>(FLOAT_8033310c)));
-	for (unsigned int i = 0; i < 4; ++i) {
-		double x;
-		if ((i & 1) == 0) {
-			x = x0 - static_cast<double>(FLOAT_80333110);
+	double decoX1 = DOUBLE_80333100 + decoX;
+	double decoY1 = DOUBLE_80333100 + (yh - FLOAT_8033310c);
+	for (i = 0; i < 4; ++i) {
+		flip = 0;
+		float dx;
+		float dy;
+		if ((i & 1) != 0) {
+			dx = static_cast<float>(decoX1);
 		} else {
-			x = decoX1;
+			dx = x0 - FLOAT_80333110;
 		}
-		double y;
-		int flip = 0;
-		if ((i & 2) == 0) {
-			y = decoY0;
-		} else {
-			y = decoY1;
+		if ((i & 2) != 0) {
+			dy = static_cast<float>(decoY1);
 			flip |= 4;
+		} else {
+			dy = static_cast<float>(decoY0);
 		}
 		MenuPcs.DrawRect(
-		    flip, static_cast<float>(x), static_cast<float>(y), FLOAT_80333108, FLOAT_8033310c,
-		    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
+		    flip, dx, dy, FLOAT_80333108, FLOAT_8033310c,
+		    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, FLOAT_803330bc);
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x50));
-	double barX0 = static_cast<double>(static_cast<float>(x0 - static_cast<double>(FLOAT_80333110)));
-	double barX1 = static_cast<double>(static_cast<float>(static_cast<double>(FLOAT_80333110) + decoX0));
-	double barY0 = static_cast<double>(static_cast<float>((DOUBLE_80333118 + y0) - DOUBLE_80333100));
-	double barY1 = static_cast<double>(static_cast<float>(barY0 + static_cast<double>(static_cast<float>(h - DOUBLE_80333120))));
-	for (int side = 0; side < 2; ++side) {
-		double x = (side == 0) ? barX0 : barX1;
-		float y = static_cast<float>(barY0);
-		while (y < barY1) {
-			float seg = static_cast<float>(barY1 - y);
+	float barX = x0 - FLOAT_80333110;
+	float barX1 = FLOAT_80333110 + decoX;
+	float barY0 = static_cast<float>((DOUBLE_80333118 + y0) - DOUBLE_80333100);
+	float barY1 = barY0 + static_cast<float>(h - DOUBLE_80333120);
+	for (i = 0; i < 2; ++i) {
+		if (i != 0) {
+			barX = barX1;
+		}
+		float by = barY0;
+		while (by < barY1) {
+			float seg = barY1 - by;
 			if (seg >= DOUBLE_80333118) {
 				seg = FLOAT_8033310c;
 			}
 			MenuPcs.DrawRect(
-			    0, static_cast<float>(x), y, FLOAT_80333108, seg,
-			    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
-			y = y + seg;
+			    0, barX, by, FLOAT_80333108, seg,
+			    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, FLOAT_803330bc);
+			by = by + seg;
 		}
 	}
 
 	if (param_1 >= DOUBLE_803330e8) {
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3D));
 		MenuPcs.DrawRect(
-		    0, static_cast<float>(x0 - static_cast<double>(FLOAT_803330f4)),
-		    static_cast<float>(y0 - static_cast<double>(FLOAT_80333108)),
-		    FLOAT_80333128, FLOAT_8033312c, FLOAT_80333130, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
+		    0, x0 - FLOAT_803330f4, y0 - FLOAT_80333108,
+		    FLOAT_80333128, FLOAT_8033312c, FLOAT_80333130, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, FLOAT_803330bc);
 		MenuPcs.DrawRect(
-		    0, static_cast<float>(xw - static_cast<double>(FLOAT_80333134)),
-		    static_cast<float>(yh - static_cast<double>(FLOAT_803330c0)),
-		    FLOAT_80333130, FLOAT_80333138, FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
+		    0, xw - FLOAT_80333134, yh - FLOAT_803330c0,
+		    FLOAT_80333130, FLOAT_80333138, FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, FLOAT_803330bc);
 	}
 }
 

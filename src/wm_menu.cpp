@@ -14299,7 +14299,8 @@ int McCtrl::EraseDat()
 				memset(&entry, 0, 0x48);
 				entry.m_byte42 = 0;
 				for (int i = 0; i < kMcListCount; i++) {
-					*reinterpret_cast<McListEntry*>(MenuPcs.m_wmCharaState + i * kMcListEntrySize) = entry;
+					int __p8 =   (int)(unsigned int)((0 + i));
+					*reinterpret_cast<McListEntry*>(MenuPcs.m_wmCharaState + __p8 * kMcListEntrySize) = entry;
 				}
 				m_state = 10;
 			}

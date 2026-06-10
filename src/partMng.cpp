@@ -48,6 +48,14 @@ static inline int pppLoadModelRet(
     unsigned long d, int e, int f, int g) {
     return LoadModel__Q29CCharaPcs7CHandleFiUlUlUliii(h, a, b, c, d, e, f, g);
 }
+
+inline CGBaseObj::CGBaseObj()
+{
+}
+
+inline CGObject::CGObject()
+{
+}
 extern "C" const double kPartMngZeroDouble = 0.0;
 extern "C" const float kPartMngAngleHalfUnit = 32768.0f;
 extern "C" const float kPartMngHalfTurnDegrees = 180.0f;
@@ -320,16 +328,22 @@ void CPartMng::Create()
         }
     }
 
-    for (int i = 0; i < kPppMngCount; i++) {
-        unsigned char* mng = self + 0x2A18 + (i * kPppMngStride);
-        *reinterpret_cast<int*>(mng + 0x14) = -0x1000;
-        *reinterpret_cast<int*>(mng + 0x12c) = -1;
-        *reinterpret_cast<int*>(mng + 0x11c) = -1;
-        *reinterpret_cast<unsigned char*>(mng + 0x120) = 0;
-        *reinterpret_cast<unsigned char*>(mng + 0x121) = 1;
-        *reinterpret_cast<int*>(mng + 0x124) = 0;
-        *reinterpret_cast<unsigned char*>(mng + 0x122) = 0;
-        *reinterpret_cast<int*>(mng + 0x128) = 0x1e;
+    {
+        unsigned char* mng = self;
+        for (int i = 0; i < kPppMngCount / 6; i++) {
+            for (int k = 0; k < 6; k++) {
+                unsigned char* e = mng + (k * kPppMngStride);
+                *reinterpret_cast<int*>(e + 0x2A18 + 0x14) = -0x1000;
+                *reinterpret_cast<int*>(e + 0x2A18 + 0x12c) = -1;
+                *reinterpret_cast<int*>(e + 0x2A18 + 0x11c) = -1;
+                *reinterpret_cast<unsigned char*>(e + 0x2A18 + 0x120) = 0;
+                *reinterpret_cast<unsigned char*>(e + 0x2A18 + 0x121) = 1;
+                *reinterpret_cast<int*>(e + 0x2A18 + 0x124) = 0;
+                *reinterpret_cast<unsigned char*>(e + 0x2A18 + 0x122) = 0;
+                *reinterpret_cast<int*>(e + 0x2A18 + 0x128) = 0x1e;
+            }
+            mng += 6 * kPppMngStride;
+        }
     }
 
     {
@@ -832,54 +846,54 @@ void CPartMng::drawCursor()
     GXSetNumTevStages(1);
     pppSetBlendMode(3);
 
-    _GXColor white;
-    white.r = 0xff;
-    white.g = 0xff;
-    white.b = 0xff;
-    white.a = 0xff;
+    _GXColor color;
+    color.r = 0xff;
+    color.g = 0xff;
+    color.b = 0xff;
+    color.a = 0xff;
     int cursorX = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x28);
     int cursorY = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x2c);
+    float zero = kPartMngZero;
 
-    GXSetChanAmbColor((GXChannelID)4, white);
-    GXSetChanMatColor((GXChannelID)4, white);
+    GXSetChanAmbColor((GXChannelID)4, color);
+    GXSetChanMatColor((GXChannelID)4, color);
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
-    GXPosition3f32((float)(cursorX + 0x140), (float)(cursorY + 0xd6), kPartMngZero);
-    GXPosition3f32((float)(cursorX + 0x140), (float)(cursorY + 0xea), kPartMngZero);
+    GXPosition3f32((float)(cursorX + 0x140), (float)(cursorY + 0xd6), zero);
+    GXPosition3f32((float)(cursorX + 0x140), (float)(cursorY + 0xea), zero);
 
-    GXSetChanAmbColor((GXChannelID)4, white);
-    GXSetChanMatColor((GXChannelID)4, white);
+    GXSetChanAmbColor((GXChannelID)4, color);
+    GXSetChanMatColor((GXChannelID)4, color);
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
-    GXPosition3f32((float)(cursorX + 0x13f), (float)(cursorY + 0xd6), kPartMngZero);
-    GXPosition3f32((float)(cursorX + 0x13f), (float)(cursorY + 0xea), kPartMngZero);
+    GXPosition3f32((float)(cursorX + 0x13f), (float)(cursorY + 0xd6), zero);
+    GXPosition3f32((float)(cursorX + 0x13f), (float)(cursorY + 0xea), zero);
 
-    _GXColor yellow;
-    yellow.r = 0x00;
-    yellow.g = 0x00;
-    yellow.b = 0x00;
-    yellow.a = 0xff;
-    GXSetChanAmbColor((GXChannelID)4, yellow);
-    GXSetChanMatColor((GXChannelID)4, yellow);
+    GXSetChanAmbColor((GXChannelID)4, color);
+    GXSetChanMatColor((GXChannelID)4, color);
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
-    GXPosition3f32((float)(cursorX + 0x12c), (float)(cursorY + 0xe0), kPartMngZero);
-    GXPosition3f32((float)(cursorX + 0x154), (float)(cursorY + 0xe0), kPartMngZero);
+    GXPosition3f32((float)(cursorX + 0x12c), (float)(cursorY + 0xe0), zero);
+    GXPosition3f32((float)(cursorX + 0x154), (float)(cursorY + 0xe0), zero);
 
-    GXSetChanAmbColor((GXChannelID)4, white);
-    GXSetChanMatColor((GXChannelID)4, white);
+    color.r = 0x00;
+    color.g = 0x00;
+    color.b = 0x00;
+    color.a = 0xff;
+    GXSetChanAmbColor((GXChannelID)4, color);
+    GXSetChanMatColor((GXChannelID)4, color);
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
-    GXPosition3f32((float)(cursorX + 0x141), (float)(cursorY + 0xd7), kPartMngZero);
-    GXPosition3f32((float)(cursorX + 0x141), (float)(cursorY + 0xeb), kPartMngZero);
+    GXPosition3f32((float)(cursorX + 0x141), (float)(cursorY + 0xd7), zero);
+    GXPosition3f32((float)(cursorX + 0x141), (float)(cursorY + 0xeb), zero);
 
-    GXSetChanAmbColor((GXChannelID)4, white);
-    GXSetChanMatColor((GXChannelID)4, white);
+    GXSetChanAmbColor((GXChannelID)4, color);
+    GXSetChanMatColor((GXChannelID)4, color);
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
-    GXPosition3f32((float)(cursorX + 0x142), (float)(cursorY + 0xd7), kPartMngZero);
-    GXPosition3f32((float)(cursorX + 0x142), (float)(cursorY + 0xeb), kPartMngZero);
+    GXPosition3f32((float)(cursorX + 0x142), (float)(cursorY + 0xd7), zero);
+    GXPosition3f32((float)(cursorX + 0x142), (float)(cursorY + 0xeb), zero);
 
-    GXSetChanAmbColor((GXChannelID)4, white);
-    GXSetChanMatColor((GXChannelID)4, white);
+    GXSetChanAmbColor((GXChannelID)4, color);
+    GXSetChanMatColor((GXChannelID)4, color);
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
-    GXPosition3f32((float)(cursorX + 0x12d), (float)(cursorY + 0xe1), kPartMngZero);
-    GXPosition3f32((float)(cursorX + 0x155), (float)(cursorY + 0xe1), kPartMngZero);
+    GXPosition3f32((float)(cursorX + 0x12d), (float)(cursorY + 0xe1), zero);
+    GXPosition3f32((float)(cursorX + 0x155), (float)(cursorY + 0xe1), zero);
 
     GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
 }
@@ -899,12 +913,12 @@ void CPartMng::render3Dcursor()
     GXSetChanCtrl((GXChannelID)0, 0, (GXColorSrc)0, (GXColorSrc)0, 0, (GXDiffuseFn)2, (GXAttnFn)2);
     GXSetChanCtrl((GXChannelID)2, 0, (GXColorSrc)0, (GXColorSrc)0, 0, (GXDiffuseFn)2, (GXAttnFn)2);
 
+    Mtx identity;
     Mtx44 orthoProjection;
     C_MTXOrtho(orthoProjection, kPartMngZero, kPartMngOrthoHeight, kPartMngZero, kPartMngOrthoWidth, kPartMngZero,
                kPartMngOrthoFar);
     GXSetProjection(orthoProjection, GX_ORTHOGRAPHIC);
 
-    Mtx identity;
     PSMTXIdentity(identity);
     GXLoadPosMtxImm(identity, 0);
     GXSetZCompLoc(0);
@@ -928,35 +942,33 @@ void CPartMng::render3Dcursor()
     float y = cursorPos[1];
     float z = cursorPos[2];
 
-    _GXColor colorX;
-    colorX.r = 0xff;
-    colorX.g = 0x80;
-    colorX.b = 0x80;
-    colorX.a = 0xff;
-    GXSetChanAmbColor((GXChannelID)4, colorX);
-    GXSetChanMatColor((GXChannelID)4, colorX);
+    _GXColor color;
+    color.r = 0xff;
+    color.g = 0x80;
+    color.b = 0x80;
+    color.a = 0xff;
+    GXSetChanAmbColor((GXChannelID)4, color);
+    GXSetChanMatColor((GXChannelID)4, color);
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
     GXPosition3f32(x - kPartMngCullRadius, y, z);
     GXPosition3f32(x + kPartMngCullRadius, y, z);
 
-    _GXColor colorY;
-    colorY.r = 0x80;
-    colorY.g = 0xff;
-    colorY.b = 0x80;
-    colorY.a = 0xff;
-    GXSetChanAmbColor((GXChannelID)4, colorY);
-    GXSetChanMatColor((GXChannelID)4, colorY);
+    color.r = 0x80;
+    color.g = 0xff;
+    color.b = 0x80;
+    color.a = 0xff;
+    GXSetChanAmbColor((GXChannelID)4, color);
+    GXSetChanMatColor((GXChannelID)4, color);
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
     GXPosition3f32(x, y - kPartMngCullRadius, z);
     GXPosition3f32(x, y + kPartMngCullRadius, z);
 
-    _GXColor colorZ;
-    colorZ.r = 0xff;
-    colorZ.g = 0xff;
-    colorZ.b = 0x80;
-    colorZ.a = 0xff;
-    GXSetChanAmbColor((GXChannelID)4, colorZ);
-    GXSetChanMatColor((GXChannelID)4, colorZ);
+    color.r = 0xff;
+    color.g = 0xff;
+    color.b = 0x80;
+    color.a = 0xff;
+    GXSetChanAmbColor((GXChannelID)4, color);
+    GXSetChanMatColor((GXChannelID)4, color);
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
     GXPosition3f32(x, y, z - kPartMngCullRadius);
     GXPosition3f32(x, y, z + kPartMngCullRadius);
@@ -2291,32 +2303,27 @@ void CPartMng::pppEditBeforeCalc()
             *editorObj = 0;
         }
 
-        *editorObj = static_cast<CGObject*>(
-            operator new(0x518, PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x7b5));
-        if (*editorObj != 0) {
-            (*editorObj)->Create();
+        *editorObj =
+            new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x7b5) CGObject;
+        (*editorObj)->Create();
 
-            CCharaPcs::CHandle* handle =
-                new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x7b7) CCharaPcs::CHandle;
-            (*editorObj)->m_charaModelHandle = handle;
-            if (handle != 0) {
-                handle->Add();
-                handle->m_charaNo = 3;
-                if (pppLoadModelRet(
-                        handle,
-                        *reinterpret_cast<int*>(self + 0x190),
-                        *reinterpret_cast<unsigned long*>(self + 0x194),
-                        *reinterpret_cast<unsigned long*>(self + 0x198),
-                        0,
-                        -1,
-                        0,
-                        0
-                    ) == 0 &&
-                    (*editorObj)->m_charaModelHandle != 0) {
-                    delete (*editorObj)->m_charaModelHandle;
-                    (*editorObj)->m_charaModelHandle = 0;
-                }
-            }
+        (*editorObj)->m_charaModelHandle =
+            new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x7b7) CCharaPcs::CHandle;
+        (*editorObj)->m_charaModelHandle->Add();
+        (*editorObj)->m_charaModelHandle->m_charaNo = 3;
+        if (pppLoadModelRet(
+                (*editorObj)->m_charaModelHandle,
+                *reinterpret_cast<int*>(self + 0x190),
+                *reinterpret_cast<unsigned long*>(self + 0x194),
+                *reinterpret_cast<unsigned long*>(self + 0x198),
+                0,
+                -1,
+                0,
+                0
+            ) == 0 &&
+            (*editorObj)->m_charaModelHandle != 0) {
+            delete (*editorObj)->m_charaModelHandle;
+            (*editorObj)->m_charaModelHandle = 0;
         }
         break;
     }
@@ -2558,7 +2565,7 @@ void CPartMng::pppEditDrawShadow()
                 partPos.y = mng->m_matrix.value[1][3];
                 partPos.z = mng->m_matrix.value[2][3];
 
-                if ((double)mng->m_cullRadiusSq != 0.0) {
+                if ((double)mng->m_cullRadiusSq != -1.0) {
                     goto checkCull;
                 }
 
@@ -2632,9 +2639,6 @@ void CPartMng::pppEditDraw()
 
     m_pppEnvSt.m_debugCounter = 0;
 
-    Vec partPos;
-    Vec viewPos;
-
     if (*reinterpret_cast<long**>(reinterpret_cast<unsigned char*>(this) + 0x5dc) != 0) {
         if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x174) <= 3) {
 #define PPP_EDIT_DRAW_PASS(drawPass)                                                                       \
@@ -2643,6 +2647,8 @@ void CPartMng::pppEditDraw()
                 Mtx invCamera;                                                                             \
                 Vec cameraPos;                                                                             \
                 Vec cameraDelta;                                                                           \
+                Vec partPos;                                                                               \
+                Vec viewPos;                                                                               \
                 PSMTXInverse(ppvCameraMatrix, invCamera);                                                  \
                 cameraPos.x = invCamera[0][3];                                                             \
                 cameraPos.y = invCamera[1][3];                                                             \
@@ -2658,7 +2664,7 @@ void CPartMng::pppEditDraw()
                         partPos.y = mng->m_matrix.value[1][3];                                             \
                         partPos.z = mng->m_matrix.value[2][3];                                             \
                                                                                                            \
-                        if ((double)mng->m_cullRadiusSq != 0.0) {                                          \
+                        if ((double)mng->m_cullRadiusSq != -1.0) {                                          \
                             goto checkCull##drawPass;                                                      \
                         }                                                                                  \
                                                                                                            \
@@ -2698,6 +2704,8 @@ void CPartMng::pppEditDraw()
             PPP_EDIT_DRAW_PASS(7)
 #undef PPP_EDIT_DRAW_PASS
         } else {
+            Vec partPos;
+            Vec viewPos;
             char* mng = reinterpret_cast<char*>(m_pppMng);
             int editCount = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + kEditCountOffset);
             for (int i = 0; i < editCount; i++) {
@@ -2772,7 +2780,7 @@ void CPartMng::pppEditPartDrawAfter()
                         partPos.y = mng->m_matrix.value[1][3];                                             \
                         partPos.z = mng->m_matrix.value[2][3];                                             \
                                                                                                            \
-                        if ((double)mng->m_cullRadiusSq != 0.0) {                                          \
+                        if ((double)mng->m_cullRadiusSq != -1.0) {                                          \
                             goto checkCull##drawPass;                                                      \
                         }                                                                                  \
                                                                                                            \
@@ -3036,7 +3044,7 @@ void CPartMng::pppDrawPrio(unsigned char drawMode)
             partPos.y = mng->m_matrix.value[1][3];
             partPos.z = mng->m_matrix.value[2][3];
 
-            if ((double)mng->m_cullRadiusSq != 0.0) {
+            if ((double)mng->m_cullRadiusSq != -1.0) {
                 goto checkCull;
             }
 
@@ -3150,7 +3158,7 @@ void CPartMng::pppDrawPrioPdtFpno(unsigned char drawMode, short kind, short node
     {
         struct PppCullBound { Vec m_min; Vec m_max; };
 
-        if ((double)mng->m_cullRadiusSq != 0.0) {
+        if ((double)mng->m_cullRadiusSq != -1.0) {
             goto checkCull;
         }
 
@@ -3244,7 +3252,7 @@ void CPartMng::pppDrawIdx(int partIndex)
     partPos.y = mng->m_matrix.value[1][3];
     partPos.z = mng->m_matrix.value[2][3];
 
-    if ((double)mng->m_cullRadiusSq != 0.0) {
+    if ((double)mng->m_cullRadiusSq != -1.0) {
         goto checkCull;
     }
 
@@ -3316,7 +3324,7 @@ void CPartMng::pppDraw()
             partPos.y = mng->m_matrix.value[1][3];
             partPos.z = mng->m_matrix.value[2][3];
 
-            if ((double)mng->m_cullRadiusSq != 0.0) {
+            if ((double)mng->m_cullRadiusSq != -1.0) {
                 goto checkCull;
             }
 
@@ -3401,7 +3409,7 @@ void CPartMng::pppPartDrawAfter()
             partPos.y = mng->m_matrix.value[1][3];
             partPos.z = mng->m_matrix.value[2][3];
 
-            if ((double)mng->m_cullRadiusSq != 0.0) {
+            if ((double)mng->m_cullRadiusSq != -1.0) {
                 goto checkCull;
             }
 
@@ -4171,7 +4179,7 @@ found:
         if ((unsigned int)System.m_execParam >= 1) {
             System.Printf(const_cast<char*>(sPppFreeDataMngAllocError));
         }
-        OSPanic(const_cast<char*>(s_partMng_cpp), 0xD74, "");
+        OSPanic(const_cast<char*>(s_partMng_cpp), 0xD74, const_cast<char*>(sPartMngEmptyString));
         return -1;
     }
 
@@ -4456,11 +4464,11 @@ foundMng:
     } else {
         unsigned char* mngB = reinterpret_cast<unsigned char*>(mng);
         *reinterpret_cast<int*>(mngB + 0x18) =
-            static_cast<int>(createParam->m_rotationPtr->x * 65536.0f / 360.0f);
+            static_cast<int>(32768.0f * createParam->m_rotationPtr->x / 180.0f);
         *reinterpret_cast<int*>(mngB + 0x1C) =
-            static_cast<int>(createParam->m_rotationPtr->y * 65536.0f / 360.0f);
+            static_cast<int>(32768.0f * createParam->m_rotationPtr->y / 180.0f);
         *reinterpret_cast<int*>(mngB + 0x20) =
-            static_cast<int>(createParam->m_rotationPtr->z * 65536.0f / 360.0f);
+            static_cast<int>(32768.0f * createParam->m_rotationPtr->z / 180.0f);
     }
 
     if (createParam->m_scalePtr == 0) {

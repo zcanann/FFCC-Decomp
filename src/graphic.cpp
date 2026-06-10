@@ -1263,8 +1263,8 @@ void CGraphic::SetFogParam(float startZ, float endZ)
  */
 void CGraphic::SetFog(int useFog, int useGlobalColor)
 {
-    float farZ;
     float nearZ;
+    float farZ;
 
     if (&nearZ != 0) {
         nearZ = CameraNearZ();

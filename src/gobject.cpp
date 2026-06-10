@@ -297,10 +297,10 @@ void CGObject::onCreate()
 
     unk_0x184 = 0.0f;
     unk_0x188 = 0.0f;
-    m_bgHitMask = -1;
     m_weaponNodeFlagBits.m_attached = 0;
     m_weaponNodeFlagBits.m_unk20 = 1;
     m_weaponNodeFlagBits.m_unk40 = 0;
+    m_bgHitMask = -1;
     m_animSlotSel = -1;
     m_turnSpeed = 0.0f;
     m_pushParamB = 0;
@@ -1559,7 +1559,6 @@ void CGObject::update()
             m_worldPosition = attachPos;
         } else {
             float interp = static_cast<float>(m_moveMode) / static_cast<float>(m_moveModePrevious);
-            interp = ClampFloat(interp, sZeroFloat, sAnimFrameOffset);
             Vec fromOwner;
             Vec fromSelf;
             PSVECScale(&attachPos, &fromOwner, sAnimFrameOffset - interp);
@@ -1606,12 +1605,11 @@ void CGObject::update()
 
         const unsigned char lookBlendByte = *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x56);
         float lookBlend = 0.015625f * static_cast<float>(lookBlendByte);
-        if (lookBlend == sZeroFloat) {
-            lookBlend = sBgAttrFast;
-        }
         CChara::CModel* chestModel = m_charaModelHandle->m_model;
-        ModelChestAmp(chestModel) += lookBlend * (lookYaw - ModelChestAmp(chestModel));
-        ModelChestTilt(chestModel) += lookBlend * (lookPitch - ModelChestTilt(chestModel));
+        const float chestAmp = ModelChestAmp(chestModel);
+        const float chestTilt = ModelChestTilt(chestModel);
+        ModelChestAmp(chestModel) = lookBlend * (lookYaw - chestAmp) + chestAmp;
+        ModelChestTilt(chestModel) = lookBlend * (lookPitch - chestTilt) + chestTilt;
         ModelTwistAngle(m_charaModelHandle->m_model) +=
             sBgAttrFast * (*reinterpret_cast<float*>(m_worldMode) - ModelTwistAngle(m_charaModelHandle->m_model));
 
@@ -1631,9 +1629,9 @@ void CGObject::update()
 
         float visibleScale = sAnimFrameOffset;
         if (Game.m_currentMapId == 0x21) {
-            visibleScale = m_screenDepth <= 60.0f ? sAnimFrameOffset : sZeroFloat;
+            visibleScale = m_screenDepth > 60.0f ? sZeroFloat : sAnimFrameOffset;
         } else {
-            visibleScale = m_screenDepth <= 30.0f ? sAnimFrameOffset : sZeroFloat;
+            visibleScale = m_screenDepth > 30.0f ? sZeroFloat : sAnimFrameOffset;
         }
 
         const float alphaTarget = m_stepSlopeLimit * onAlphaUpdate() * visibleScale;

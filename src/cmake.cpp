@@ -180,25 +180,29 @@ static inline float CalcCmakeFadeAlpha(CMenuPcs* menu)
 static unsigned short GetCmakePadDown()
 {
     unsigned char noPad = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
+    int held;
     if (noPad) {
-        return 0;
+        held = 0;
+    } else {
+        int padIndex = 0;
+        padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+        held = Pad.GetPadInputs()[padIndex].buttonDown[0];
     }
-
-    int padIndex = 0;
-    padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-    return Pad.GetPadInputs()[padIndex].buttonDown[0];
+    return static_cast<unsigned short>(held);
 }
 
 static unsigned short GetCmakePadRepeat()
 {
     unsigned char noPad = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
+    int held;
     if (noPad) {
-        return 0;
+        held = 0;
+    } else {
+        int padIndex = 0;
+        padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+        held = Pad.GetPadInputs()[padIndex].repeatButton;
     }
-
-    int padIndex = 0;
-    padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-    return Pad.GetPadInputs()[padIndex].repeatButton;
+    return static_cast<unsigned short>(held);
 }
 
 static inline void DrawCmakePreviewCharaAlpha(CMenuPcs* menu, float alpha)

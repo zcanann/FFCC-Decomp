@@ -3290,10 +3290,6 @@ void CShopMenu::Calc()
     }
 
     ++timer;
-
-    if ((shopMode == 0) || (shopMode == 1)) {
-        gShopMenuInputLatch = 0;
-    }
 }
 #pragma pop
 /*

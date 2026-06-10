@@ -570,11 +570,12 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 				}
 			}
 
+			CGObject* attachSelf = this;
 			const char* attachName = s_itemAttachLeftItem;
 			if (useBossAttachName) {
 				attachName = s_itemAttachCenterItem3;
 			}
-			Attach(partyObj, const_cast<char*>(attachName), attachOffsetPtr);
+			attachSelf->Attach(partyObj, const_cast<char*>(attachName), attachOffsetPtr);
 			changeStat(0, 0, 0);
 			*(float*)(self + 0x144) = kItemObjZero;
 		} else {
@@ -930,11 +931,12 @@ void CGItemObj::onFrameStat()
 			}
 
 			CGObject* attachOwner = m_owner;
+			CGObject* attachSelf = this;
 			const char* attachName = s_itemAttachLeftItem;
 			if (useBossAttachName) {
 				attachName = s_itemAttachCenterItem3;
 			}
-			Attach(attachOwner, const_cast<char*>(attachName), attachOffsetPtr);
+			attachSelf->Attach(attachOwner, const_cast<char*>(attachName), attachOffsetPtr);
 			changeStat(0, 0, 0);
 			m_bodyEllipsoidRadius = kItemObjZero;
 		}

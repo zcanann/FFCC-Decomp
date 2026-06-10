@@ -284,7 +284,11 @@ void CMenuPcs::LetterInit1()
 	int iVar5;
 	float fVar1;
 
-	ClearLetterAnimStorage(this);
+	memset(GetLetterAnimStorage(this), 0, sizeof(*GetLetterAnimStorage(this)));
+	iVar4 = GetLetterAnimBase(this) + 8;
+	for (iVar5 = 0; iVar5 < 64; ++iVar5, iVar4 += 0x40) {
+		*reinterpret_cast<float*>(iVar4 + 0x14) = FLOAT_803330f8;
+	}
 
 	int n = 0;
 	s16* p = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n++]);

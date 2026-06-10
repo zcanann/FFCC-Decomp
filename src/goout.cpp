@@ -617,8 +617,7 @@ static inline unsigned short GetGoOutInputMask()
         return 0;
     }
 
-    int padIndex = 0;
-    padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+    int padIndex = (Pad.m_debugPadPort == 0) ? 0 : 0;
     return static_cast<unsigned short>(Pad.GetPadInputs()[padIndex].buttonDown[0]);
 }
 
@@ -666,8 +665,12 @@ void DrawGoOutMenu()
             MenuPcs.DrawInit();
             MenuPcs.DrawCMakeMenu();
         }
-        if (goOutMenu.m_goOutMode != 0xF && goOutMenu.m_goOutMode < 0xF && goOutMenu.m_goOutMode >= 0xE) {
+        switch (goOutMenu.m_goOutMode) {
+        case 0xE:
             MenuPcs.DrawLoadMenu();
+            break;
+        case 0xF:
+            break;
         }
         if (goOutMenu.m_goOutMode == 1 &&
             MenuGoOutState().m_resultSelect != 0) {
@@ -799,6 +802,104 @@ void CGoOutMenu::CalcMemCardProc()
 unsigned char CGoOutMenu::SetMemCardError()
 {
     switch (m_memCardResult) {
+    case 1:
+        return 0;
+    case -2:
+        MenuPcs.m_menuWindowInfo->state = 3;
+        MenuGoOutState().m_animFrame = 0;
+        m_currentMessage = -1;
+        m_messageTimer = 0;
+        m_messageState = 1;
+        if (m_currentMessage >= 0) {
+            MenuPcs.m_menuWindowInfo->state = 2;
+            MenuGoOutState().m_animFrame = 0;
+        }
+        m_messageWindowOpen = 0;
+        m_pendingMessage = 2;
+        m_messageCloseMode = 0;
+        m_pendingMessageTimer = 0;
+        break;
+    case -999:
+        if (m_lastMemCardProc == 1) {
+            MenuPcs.m_menuWindowInfo->state = 3;
+            MenuGoOutState().m_animFrame = 0;
+            m_currentMessage = -1;
+            m_messageTimer = 0;
+            m_messageState = 1;
+            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+            SetMenuStr(0, 5,
+                       GetGoOutMessageLine(languageId, 0),
+                       GetGoOutMessageLine(languageId, 1),
+                       GetGoOutMessageLine(languageId, 2),
+                       GetGoOutMessageLine(languageId, 3),
+                       GetGoOutMessageLine(languageId, 4));
+            break;
+        } else if (m_lastMemCardProc == 3) {
+            MenuPcs.m_menuWindowInfo->state = 3;
+            MenuGoOutState().m_animFrame = 0;
+            m_currentMessage = -1;
+            m_messageTimer = 0;
+            m_messageState = 1;
+            if (m_currentMessage >= 0) {
+                MenuPcs.m_menuWindowInfo->state = 2;
+                MenuGoOutState().m_animFrame = 0;
+            }
+            m_messageWindowOpen = 0;
+            m_pendingMessage = 0xd;
+            m_messageCloseMode = 0;
+            m_pendingMessageTimer = 0;
+            break;
+        } else if (m_lastMemCardProc == 2) {
+            MenuPcs.m_menuWindowInfo->state = 3;
+            MenuGoOutState().m_animFrame = 0;
+            m_currentMessage = -1;
+            m_messageTimer = 0;
+            m_messageState = 1;
+            if (m_currentMessage >= 0) {
+                MenuPcs.m_menuWindowInfo->state = 2;
+                MenuGoOutState().m_animFrame = 0;
+            }
+            m_messageWindowOpen = 0;
+            m_pendingMessage = 0xf;
+            m_messageCloseMode = 0;
+            m_pendingMessageTimer = 0;
+            break;
+        }
+        // fall through
+    case -1:
+    case -3:
+        MenuPcs.m_menuWindowInfo->state = 3;
+        MenuGoOutState().m_animFrame = 0;
+        m_currentMessage = -1;
+        m_messageTimer = 0;
+        m_messageState = 1;
+        if (m_currentMessage >= 0) {
+            MenuPcs.m_menuWindowInfo->state = 2;
+            MenuGoOutState().m_animFrame = 0;
+        }
+        m_messageWindowOpen = 0;
+        m_pendingMessage = 1;
+        m_messageCloseMode = 0;
+        m_pendingMessageTimer = 0;
+        break;
+    case -4:
+        if (m_lastMemCardProc == 1) {
+            goto setLoadFailedMessage;
+        }
+        MenuPcs.m_menuWindowInfo->state = 3;
+        MenuGoOutState().m_animFrame = 0;
+        m_currentMessage = -1;
+        m_messageTimer = 0;
+        m_messageState = 1;
+        if (m_currentMessage >= 0) {
+            MenuPcs.m_menuWindowInfo->state = 2;
+            MenuGoOutState().m_animFrame = 0;
+        }
+        m_messageWindowOpen = 0;
+        m_pendingMessage = 0x13;
+        m_messageCloseMode = 0;
+        m_pendingMessageTimer = 0;
+        break;
     case -5:
         MenuPcs.m_menuWindowInfo->state = 3;
         MenuGoOutState().m_animFrame = 0;
@@ -818,98 +919,9 @@ unsigned char CGoOutMenu::SetMemCardError()
     case -6:
         SetGoOutMode(3);
         return 1;
-    case -999:
     case -1000:
         if (m_lastMemCardProc == 1) {
-            MenuPcs.m_menuWindowInfo->state = 3;
-            MenuGoOutState().m_animFrame = 0;
-            m_currentMessage = -1;
-            m_messageTimer = 0;
-            m_messageState = 1;
-            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
-            SetMenuStr(0, 5,
-                       GetGoOutMessageLine(languageId, 0),
-                       GetGoOutMessageLine(languageId, 1),
-                       GetGoOutMessageLine(languageId, 2),
-                       GetGoOutMessageLine(languageId, 3),
-                       GetGoOutMessageLine(languageId, 4));
-        } else if (m_lastMemCardProc == 3) {
-            MenuPcs.m_menuWindowInfo->state = 3;
-            MenuGoOutState().m_animFrame = 0;
-            m_currentMessage = -1;
-            m_messageTimer = 0;
-            m_messageState = 1;
-            if (m_currentMessage >= 0) {
-                MenuPcs.m_menuWindowInfo->state = 2;
-                MenuGoOutState().m_animFrame = 0;
-            }
-            m_messageWindowOpen = 0;
-            m_pendingMessage = 0xd;
-            m_messageCloseMode = 0;
-            m_pendingMessageTimer = 0;
-        } else if (m_lastMemCardProc == 2) {
-            MenuPcs.m_menuWindowInfo->state = 3;
-            MenuGoOutState().m_animFrame = 0;
-            m_currentMessage = -1;
-            m_messageTimer = 0;
-            m_messageState = 1;
-            if (m_currentMessage >= 0) {
-                MenuPcs.m_menuWindowInfo->state = 2;
-                MenuGoOutState().m_animFrame = 0;
-            }
-            m_messageWindowOpen = 0;
-            m_pendingMessage = 0xf;
-            m_messageCloseMode = 0;
-            m_pendingMessageTimer = 0;
-        }
-        break;
-    case -1:
-    case -3:
-        MenuPcs.m_menuWindowInfo->state = 3;
-        MenuGoOutState().m_animFrame = 0;
-        m_currentMessage = -1;
-        m_messageTimer = 0;
-        m_messageState = 1;
-        if (m_currentMessage >= 0) {
-            MenuPcs.m_menuWindowInfo->state = 2;
-            MenuGoOutState().m_animFrame = 0;
-        }
-        m_messageWindowOpen = 0;
-        m_pendingMessage = 1;
-        m_messageCloseMode = 0;
-        m_pendingMessageTimer = 0;
-        break;
-    case -2:
-        MenuPcs.m_menuWindowInfo->state = 3;
-        MenuGoOutState().m_animFrame = 0;
-        m_currentMessage = -1;
-        m_messageTimer = 0;
-        m_messageState = 1;
-        if (m_currentMessage >= 0) {
-            MenuPcs.m_menuWindowInfo->state = 2;
-            MenuGoOutState().m_animFrame = 0;
-        }
-        m_messageWindowOpen = 0;
-        m_pendingMessage = 2;
-        m_messageCloseMode = 0;
-        m_pendingMessageTimer = 0;
-        break;
-    case -4:
-        if (m_lastMemCardProc != 1) {
-            MenuPcs.m_menuWindowInfo->state = 3;
-            MenuGoOutState().m_animFrame = 0;
-            m_currentMessage = -1;
-            m_messageTimer = 0;
-            m_messageState = 1;
-            if (m_currentMessage >= 0) {
-                MenuPcs.m_menuWindowInfo->state = 2;
-                MenuGoOutState().m_animFrame = 0;
-            }
-            m_messageWindowOpen = 0;
-            m_pendingMessage = 0x13;
-            m_messageCloseMode = 0;
-            m_pendingMessageTimer = 0;
-        } else {
+        setLoadFailedMessage:
             MenuPcs.m_menuWindowInfo->state = 3;
             MenuGoOutState().m_animFrame = 0;
             m_currentMessage = -1;
@@ -924,8 +936,6 @@ unsigned char CGoOutMenu::SetMemCardError()
                        GetGoOutMessageLine(languageId, 4));
         }
         break;
-    case 1:
-        return 0;
     }
 
     m_goOutMode = 2;
@@ -1548,6 +1558,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
 void CGoOutMenu::CalcGoOut()
 {
     unsigned short input;
+    unsigned char next;
 
     if (m_watchCardDisconnect != 0 && m_modeFrame >= 0x14 && (m_modeFrame & 0xF) == 0) {
         if ((m_modeFrame & 0x10) != 0) {
@@ -1851,8 +1862,7 @@ card_connected:;
         }
 
         {
-            unsigned char next;
-
+            unsigned char sel;
             if (m_returnTransfer == 0) {
                 m_drawCursor = 1;
                 m_cursorListY0 = 0xb1;
@@ -1861,7 +1871,7 @@ card_connected:;
 
                 if (MenuPcs.m_menuWindowInfo->state != 1) {
                     next = 0;
-                    goto do_switch_go10;
+                    goto go10_done1;
                 }
 
                 input = GetGoOutInputMask();
@@ -1877,11 +1887,13 @@ card_connected:;
                             Sound.PlaySe(3, 0x40, 0x7f, 0);
                         }
                         next = static_cast<unsigned char>(m_cursorChoice + 1);
-                        goto do_switch_go10;
+                        goto go10_done1;
                     }
                 }
 
                 next = 0;
+            go10_done1:
+                sel = next;
             } else {
                 m_drawCursor = 1;
                 m_cursorListY0 = 0x8b;
@@ -1890,7 +1902,7 @@ card_connected:;
 
                 if (MenuPcs.m_menuWindowInfo->state != 1) {
                     next = 0;
-                    goto do_switch_go10;
+                    goto go10_done2;
                 }
 
                 input = GetGoOutInputMask();
@@ -1906,14 +1918,15 @@ card_connected:;
                             Sound.PlaySe(3, 0x40, 0x7f, 0);
                         }
                         next = static_cast<unsigned char>(m_cursorChoice + 1);
-                        goto do_switch_go10;
+                        goto go10_done2;
                     }
                 }
 
                 next = 0;
+            go10_done2:
+                sel = next;
             }
-        do_switch_go10:
-            switch (next) {
+            switch (sel) {
             case 1:
                 SetGoOutMode(0x11);
                 break;
@@ -1948,8 +1961,6 @@ card_connected:;
         m_cursorListY1 = 0xe9;
         m_cursorMode = 0;
         {
-            unsigned char next;
-
             if (MenuPcs.m_menuWindowInfo->state != 1) {
                 next = 0;
                 goto do_switch_go11;
@@ -2027,8 +2038,6 @@ card_connected:;
         m_cursorListY1 = 0xe7;
         m_cursorMode = 0;
         {
-            unsigned char next;
-
             if (MenuPcs.m_menuWindowInfo->state != 1) {
                 next = 0;
                 goto do_switch_go3;
@@ -2074,25 +2083,26 @@ card_connected:;
         m_cursorListY1 = 0xde;
         m_cursorMode = 0;
         {
-            unsigned char next;
+            if (MenuPcs.m_menuWindowInfo->state != 1) {
+                next = 0;
+                goto do_switch_go4;
+            }
 
-            if (MenuPcs.m_menuWindowInfo->state == 1) {
+            input = GetGoOutInputMask();
+            if ((input & 3) != 0) {
+                m_cursorChoice ^= 1;
+                Sound.PlaySe(1, 0x40, 0x7f, 0);
+            } else {
                 input = GetGoOutInputMask();
-                if ((input & 3) != 0) {
-                    m_cursorChoice ^= 1;
-                    Sound.PlaySe(1, 0x40, 0x7f, 0);
-                } else {
-                    input = GetGoOutInputMask();
-                    if ((input & 0x100) != 0) {
-                        if (m_cursorChoice == 0) {
-                            Sound.PlaySe(2, 0x40, 0x7f, 0);
-                        } else if (m_cursorChoice == 1) {
-                            Sound.PlaySe(3, 0x40, 0x7f, 0);
-                        }
-
-                        next = static_cast<unsigned char>(m_cursorChoice + 1);
-                        goto do_switch_go4;
+                if ((input & 0x100) != 0) {
+                    if (m_cursorChoice == 0) {
+                        Sound.PlaySe(2, 0x40, 0x7f, 0);
+                    } else if (m_cursorChoice == 1) {
+                        Sound.PlaySe(3, 0x40, 0x7f, 0);
                     }
+
+                    next = static_cast<unsigned char>(m_cursorChoice + 1);
+                    goto do_switch_go4;
                 }
             }
 
@@ -2354,6 +2364,7 @@ void CGoOutMenu::CalcDel()
     const unsigned char selInit = static_cast<unsigned char>(__cntlzw(2 - static_cast<int>(m_deleteMode)) >> 5 & 0xFF);
     const int selResult = MenuPcs.CalcGoOutSelChar(selInit, 0);
     unsigned short input;
+    unsigned char next;
 
     switch (m_deleteMode) {
     case 0:
@@ -2411,8 +2422,6 @@ void CGoOutMenu::CalcDel()
         m_cursorListY1 = 0xbc;
         m_cursorMode = 0;
         {
-            unsigned char next;
-
             if (MenuPcs.m_menuWindowInfo->state != 1) {
                 next = 0;
                 goto do_switch_del3;
@@ -2471,8 +2480,6 @@ void CGoOutMenu::CalcDel()
         m_cursorListY1 = 0xd1;
         m_cursorMode = 0;
         {
-            unsigned char next;
-
             if (MenuPcs.m_menuWindowInfo->state != 1) {
                 next = 0;
                 goto do_switch_del4;
@@ -2550,8 +2557,6 @@ void CGoOutMenu::CalcDel()
         m_cursorListY1 = 0xe9;
         m_cursorMode = 0;
         {
-            unsigned char next;
-
             if (MenuPcs.m_menuWindowInfo->state != 1) {
                 next = 0;
                 goto do_switch_del6;
@@ -2610,8 +2615,6 @@ void CGoOutMenu::CalcDel()
         m_cursorListY1 = 0xdb;
         m_cursorMode = 0;
         {
-            signed char next;
-
             if (MenuPcs.m_menuWindowInfo->state != 1) {
                 next = 0;
                 goto do_switch_del7;
@@ -2696,6 +2699,7 @@ void CGoOutMenu::DrawDel()
 void CGoOutMenu::Calc()
 {
     unsigned short input;
+    unsigned char nextMode;
     char mode;
 
     m_drawCursor = 0;
@@ -2789,7 +2793,6 @@ void CGoOutMenu::Calc()
                 m_cursorListY1 = 0xB0;
                 m_cursorMode = 1;
 
-                unsigned char nextMode;
                 if (MenuPcs.m_menuWindowInfo->state != 1) {
                     nextMode = 0;
                     goto do_switch_calc;

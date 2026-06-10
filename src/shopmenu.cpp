@@ -489,7 +489,7 @@ static int CalcShopMenuMakeGil(CShopMenu* shopMenu, int itemId)
 
     const CCaravanWork* const caravanWork = ShopMenuCaravanWork(shopMenu);
     int gilValue = caravanWork->m_shopParam *
-                   reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48)[0x12];
+                   *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x24 + itemId * 0x48);
     return gilValue / 100;
 }
 
@@ -1383,7 +1383,7 @@ void CShopMenu::DrawItemInfo0()
                 totalGil = 0;
             } else {
                 totalGil = static_cast<int>(ShopMenuCaravanWork(this)->m_shopParam) *
-                           *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 0x20);
+                           *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + itemNo * 0x48);
                 totalGil = totalGil / 100;
             }
         } else if (m_listType == 1) {
@@ -1391,7 +1391,7 @@ void CShopMenu::DrawItemInfo0()
                 totalGil = 0;
             } else {
                 int gil = static_cast<int>(ShopMenuCaravanWork(this)->m_shopParam) *
-                          *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 0x20);
+                          *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + itemNo * 0x48);
                 gil = gil / 100;
                 totalGil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil));
             }
@@ -1503,7 +1503,7 @@ void CShopMenu::DrawBuySellInfo()
                     gil = 0;
                 } else {
                     int value = ShopMenuCaravanWork(this)->m_shopParam *
-                                *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + gilItemNo * 0x48 + 0x20);
+                                *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + gilItemNo * 0x48);
                     gil = value / 100;
                 }
             } else if (m_listType == 1) {
@@ -1511,7 +1511,7 @@ void CShopMenu::DrawBuySellInfo()
                     gil = 0;
                 } else {
                     int value = ShopMenuCaravanWork(this)->m_shopParam *
-                                *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + gilItemNo * 0x48 + 0x20);
+                                *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + gilItemNo * 0x48);
                     gil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(value / 100));
                 }
             } else {
@@ -2517,7 +2517,7 @@ void CShopMenu::SelectMake()
                 makeGil = 0;
             } else {
                 int gil = m_caravanWork->m_shopParam *
-                          *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x24);
+                          *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x24 + itemId * 0x48);
                 makeGil = gil / 100;
             }
             if (m_caravanWork->CanAddGil(-makeGil) != 0) {
@@ -2662,7 +2662,7 @@ sellBlock:
                 gilValue = 0;
             } else {
                 int gil = m_caravanWork->m_shopParam *
-                          reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + sellId * 0x48)[0x10];
+                          *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + sellId * 0x48);
                 gilValue = gil / 100;
             }
         } else if (m_listType == 1) {
@@ -2670,7 +2670,7 @@ sellBlock:
                 gilValue = 0;
             } else {
                 int gil = m_caravanWork->m_shopParam *
-                          reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + sellId * 0x48)[0x10];
+                          *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + sellId * 0x48);
                 gilValue = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil / 100));
             }
         } else {
@@ -2685,7 +2685,7 @@ sellBlock:
                     gilValue2 = 0;
                 } else {
                     int gil = m_caravanWork->m_shopParam *
-                              reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + sellId * 0x48)[0x10];
+                              *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + sellId * 0x48);
                     gilValue2 = gil / 100;
                 }
             } else if (m_listType == 1) {
@@ -2693,7 +2693,7 @@ sellBlock:
                     gilValue2 = 0;
                 } else {
                     int gil = m_caravanWork->m_shopParam *
-                              reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + sellId * 0x48)[0x10];
+                              *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + sellId * 0x48);
                     gilValue2 = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil / 100));
                 }
             } else {
@@ -2765,7 +2765,7 @@ void CShopMenu::SelectFigure()
                         } else {
                             int costBase = itemId * 0x48;
                             int gil = caravanWork->m_shopParam *
-                                      *reinterpret_cast<unsigned short*>(costBase + Game.unkCFlatData0[2] + 0x20);
+                                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + costBase);
                             unitGil = gil / 100;
                         }
                     } else if (m_listType == 1) {
@@ -2774,7 +2774,7 @@ void CShopMenu::SelectFigure()
                         } else {
                             int costBase = itemId * 0x48;
                             int gil = caravanWork->m_shopParam *
-                                      *reinterpret_cast<unsigned short*>(costBase + Game.unkCFlatData0[2] + 0x20);
+                                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + costBase);
                             unitGil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil / 100));
                         }
                     } else {
@@ -2811,7 +2811,7 @@ void CShopMenu::SelectFigure()
                         } else {
                             int costBase = itemId * 0x48;
                             int gil = caravanWork->m_shopParam *
-                                      *reinterpret_cast<unsigned short*>(costBase + Game.unkCFlatData0[2] + 0x20);
+                                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + costBase);
                             unitGil = gil / 100;
                         }
                     } else if (m_listType == 1) {
@@ -2820,7 +2820,7 @@ void CShopMenu::SelectFigure()
                         } else {
                             int costBase = itemId * 0x48;
                             int gil = caravanWork->m_shopParam *
-                                      *reinterpret_cast<unsigned short*>(costBase + Game.unkCFlatData0[2] + 0x20);
+                                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + costBase);
                             unitGil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil / 100));
                         }
                     } else {
@@ -2925,7 +2925,7 @@ void CShopMenu::SelectItemIdx()
                             unitGil = 0;
                         } else {
                             int gil = caravanWork->m_shopParam *
-                                      reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48)[0x10];
+                                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + itemId * 0x48);
                             unitGil = gil / 100;
                         }
                     } else if (m_listType == 1) {
@@ -2933,7 +2933,7 @@ void CShopMenu::SelectItemIdx()
                             unitGil = 0;
                         } else {
                             int gil = caravanWork->m_shopParam *
-                                      reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48)[0x10];
+                                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + itemId * 0x48);
                             unitGil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil / 100));
                         }
                     } else {

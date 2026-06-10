@@ -139,7 +139,6 @@ struct CMapHitDrawMode
 extern UMapHitDrawMode s_bitMask;
 extern CMapHitDrawMode g_MapHitDrawMode;
 extern int g_hit_edge_idx_min;
-extern float g_hit_edge_t;
 extern float g_hit_t;
 extern float g_hit_t_min;
 extern float g_hit_t_slide_min;

@@ -45,7 +45,7 @@ int g_hit_edge_idx_min;
 float g_hit_t;
 float g_hit_t_min;
 float g_hit_t_slide_min;
-float g_hit_edge_t;
+unsigned char g_MapHitFaceFlag;
 CMapHitFace* g_hit_lpface;
 CMapHitFace* g_hit_f;
 CMapHitFace* g_hit_lpface_min;
@@ -130,7 +130,7 @@ void CMapHit::Draw()
 
             GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
             int i = 0;
-            while (i < static_cast<unsigned int>(face->m_vertexCount)) {
+            while (i < static_cast<int>(face->m_vertexCount)) {
                 Vec* vertex = m_vertices + face->m_vertexIndices[i];
                 GXPosition3f32(vertex->x, vertex->y, vertex->z);
                 GXNormal3f32(face->m_normal.x, face->m_normal.y, face->m_normal.z);
@@ -149,8 +149,8 @@ void CMapHit::Draw()
             }
         }
 
-        face++;
         faceIndex++;
+        face++;
     }
 
     GXClearVtxDesc();
@@ -160,35 +160,33 @@ void CMapHit::Draw()
     GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
 
     face = m_faces;
-    faceIndex = 0;
-    while (faceIndex < static_cast<int>(m_faceCount)) {
-        if ((face->m_drawFlags & 1) == 0) {
+    for (faceIndex = 0; faceIndex < static_cast<int>(m_faceCount); faceIndex++, face++) {
+        if ((face->m_drawFlags & 1) != 0) {
             face->m_drawFlags = 0;
         } else {
             face->m_drawFlags = 0;
-            face->m_drawFlags = 0;
-
-            GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
-            int i = 0;
-            while (i < static_cast<int>(face->m_vertexCount)) {
-                Vec* vertex = m_vertices + face->m_vertexIndices[i];
-                GXPosition3f32(vertex->x, vertex->y, vertex->z);
-                GXColor4u8(0x40, 0xFF, 0x40, 0xFF);
-                i++;
-            }
-
-            GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
-            i = static_cast<int>(face->m_vertexCount) - 1;
-            while (i >= 0) {
-                Vec* vertex = m_vertices + face->m_vertexIndices[i];
-                GXPosition3f32(vertex->x, vertex->y, vertex->z);
-                GXColor4u8(0x40, 0xFF, 0x40, 0xFF);
-                i--;
-            }
+            continue;
         }
 
-        face++;
-        faceIndex++;
+        face->m_drawFlags = 0;
+
+        GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
+        int i = 0;
+        while (i < static_cast<int>(face->m_vertexCount)) {
+            Vec* vertex = m_vertices + face->m_vertexIndices[i];
+            GXPosition3f32(vertex->x, vertex->y, vertex->z);
+            GXColor4u8(0x40, 0xFF, 0x40, 0xFF);
+            i++;
+        }
+
+        GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
+        i = static_cast<int>(face->m_vertexCount) - 1;
+        while (i >= 0) {
+            Vec* vertex = m_vertices + face->m_vertexIndices[i];
+            GXPosition3f32(vertex->x, vertex->y, vertex->z);
+            GXColor4u8(0x40, 0xFF, 0x40, 0xFF);
+            i--;
+        }
     }
 }
 
@@ -492,6 +490,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
     g_hit_t = -((hitDot - (g_hit_lpface->m_planeD + g_hit_cyl.m_radius)) / dot);
     float hitT = g_hit_t;
     int edgeIndex = -1;
+    int i;
 
     if (hitT > kMapHitEdgeMaxT) {
         return 0;
@@ -505,27 +504,26 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         PSVECScale(hitDirection, &g_hit_hpv, hitT);
         PSVECAdd(&g_hit_cyl.m_bottom, &g_hit_hpv, &g_hit_hpv);
 
-        Vec point;
+        Vec pushedHit;
+        Vec scaledNormal;
         Vec edgeStart;
         Vec edgeEnd;
-        Vec edge;
-        Vec toPoint;
-        Vec cross;
-        Vec scaledNormal;
         PSVECScale(&g_hit_lpface->m_normal, &scaledNormal, g_hit_cyl.m_radius);
-        Vec pushedHit;
         PSVECSubtract(&g_hit_hpv, &scaledNormal, &pushedHit);
 
         unsigned int sideMask = 3;
         Vec previous = m_vertices[g_hit_lpface->m_vertexIndices[g_hit_lpface->m_vertexCount - 1]];
+        Vec edge;
+        Vec toPoint;
+        Vec cross;
         Vec current;
         switch (g_hit_lpface->m_projectionAxis) {
         case 0:
-            point.x = pushedHit.y;
-            point.y = pushedHit.z;
-            point.z = kMapHitZero;
+            pushedHit.x = pushedHit.y;
+            pushedHit.y = pushedHit.z;
+            pushedHit.z = kMapHitZero;
 
-            for (int i = 0; i < static_cast<int>(g_hit_lpface->m_vertexCount); i++) {
+            for (i = 0; i < static_cast<int>(g_hit_lpface->m_vertexCount); i++) {
                 current = m_vertices[g_hit_lpface->m_vertexIndices[i]];
                 edgeStart.x = previous.y + g_hit_lpface->m_vertexOffsets[i][0];
                 edgeStart.y = previous.z + g_hit_lpface->m_vertexOffsets[i][1];
@@ -535,7 +533,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
                 edgeEnd.z = kMapHitZero;
 
                 PSVECSubtract(&edgeEnd, &edgeStart, &edge);
-                PSVECSubtract(&point, &edgeEnd, &toPoint);
+                PSVECSubtract(&pushedHit, &edgeEnd, &toPoint);
                 PSVECCrossProduct(&edge, &toPoint, &cross);
                 if (cross.z >= kMapHitZero) {
                     sideMask &= 1;
@@ -553,11 +551,10 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
             }
             break;
         case 1:
-            point.x = pushedHit.x;
-            point.y = pushedHit.z;
-            point.z = kMapHitZero;
+            pushedHit.y = pushedHit.z;
+            pushedHit.z = kMapHitZero;
 
-            for (int i = 0; i < static_cast<int>(g_hit_lpface->m_vertexCount); i++) {
+            for (i = 0; i < static_cast<int>(g_hit_lpface->m_vertexCount); i++) {
                 current = m_vertices[g_hit_lpface->m_vertexIndices[i]];
                 edgeStart.x = previous.x + g_hit_lpface->m_vertexOffsets[i][0];
                 edgeStart.y = previous.z + g_hit_lpface->m_vertexOffsets[i][1];
@@ -567,7 +564,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
                 edgeEnd.z = kMapHitZero;
 
                 PSVECSubtract(&edgeEnd, &edgeStart, &edge);
-                PSVECSubtract(&point, &edgeEnd, &toPoint);
+                PSVECSubtract(&pushedHit, &edgeEnd, &toPoint);
                 PSVECCrossProduct(&edge, &toPoint, &cross);
                 if (cross.z >= kMapHitZero) {
                     sideMask &= 1;
@@ -585,11 +582,9 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
             }
             break;
         case 2:
-            point.x = pushedHit.x;
-            point.y = pushedHit.y;
-            point.z = kMapHitZero;
+            pushedHit.z = kMapHitZero;
 
-            for (int i = 0; i < static_cast<int>(g_hit_lpface->m_vertexCount); i++) {
+            for (i = 0; i < static_cast<int>(g_hit_lpface->m_vertexCount); i++) {
                 current = m_vertices[g_hit_lpface->m_vertexIndices[i]];
                 edgeStart.x = previous.x + g_hit_lpface->m_vertexOffsets[i][0];
                 edgeStart.y = previous.y + g_hit_lpface->m_vertexOffsets[i][1];
@@ -599,7 +594,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
                 edgeEnd.z = kMapHitZero;
 
                 PSVECSubtract(&edgeEnd, &edgeStart, &edge);
-                PSVECSubtract(&point, &edgeEnd, &toPoint);
+                PSVECSubtract(&pushedHit, &edgeEnd, &toPoint);
                 PSVECCrossProduct(&edge, &toPoint, &cross);
                 if (cross.z >= kMapHitZero) {
                     sideMask &= 1;
@@ -620,7 +615,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
     }
 
 commit:
-    if (s_bitMask.m_fields.m_mode != 0) {
+    if (static_cast<signed char>(s_bitMask.m_fields.m_mode) != 0) {
         g_hit_lpface->m_drawFlags = s_bitMask.m_fields.m_drawFlags;
     }
     g_hit_t_slide_min = g_hit_t;
@@ -634,7 +629,7 @@ commit:
     return 1;
 
 edge_loop:
-    if (s_bitMask.m_fields.m_mode != 0) {
+    if (static_cast<signed char>(s_bitMask.m_fields.m_mode) != 0) {
         g_hit_lpface->m_drawFlags = s_bitMask.m_fields.m_drawFlags;
     }
 
@@ -645,10 +640,18 @@ edge_loop:
     {
         Vec previous = m_vertices[g_hit_lpface->m_vertexIndices[g_hit_lpface->m_vertexCount - 1]];
         for (int i = 0; i < static_cast<int>(g_hit_lpface->m_vertexCount); i++) {
-            Vec current = m_vertices[g_hit_lpface->m_vertexIndices[i]];
+            Vec current;
+            Vec* vertex = &m_vertices[g_hit_lpface->m_vertexIndices[i]];
+            current.x = vertex->x;
+            current.y = vertex->y;
+            current.z = vertex->z;
             if ((g_hit_lpface->m_edgeFlags & (1 << i)) != 0) {
                 Vec edge;
                 PSVECSubtract(&current, &previous, &edge);
+
+                Vec rayDirection;
+                Vec rayStart = g_hit_cyl.m_bottom;
+                rayDirection = *hitDirection;
 
                 CMapCylinder edgeCylinder;
                 edgeCylinder.m_bottom = previous;
@@ -656,12 +659,10 @@ edge_loop:
                 edgeCylinder.m_radius = g_hit_cyl.m_radius;
 
                 float edgeT;
-                if (FindIntersection(g_hit_cyl.m_bottom, *hitDirection, edgeCylinder, edgeT) != 0 &&
+                if (FindIntersection(rayStart, rayDirection, edgeCylinder, edgeT) != 0 &&
                     edgeT < g_hit_t_min) {
                     g_hit_t = edgeT;
                     edgeIndex = i;
-                    PSVECScale(hitDirection, &g_hit_hpv, g_hit_t);
-                    PSVECAdd(&g_hit_cyl.m_bottom, &g_hit_hpv, &g_hit_hpv);
                     goto commit;
                 }
             }

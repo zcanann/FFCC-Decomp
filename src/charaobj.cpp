@@ -2027,7 +2027,6 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 void CGCharaObj::setSta(int staIndex, int value)
 {
 	int clampedValue;
-	int slotOff;
 	int isIceJ = 0;
 	int isMon = 0;
 	if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
@@ -2037,7 +2036,6 @@ void CGCharaObj::setSta(int staIndex, int value)
 		}
 	}
 
-	slotOff = staIndex * 2;
 	SCharaStaBlock* staBlock = reinterpret_cast<SCharaStaBlock*>(m_scriptHandle);
 	int current = staBlock->m_sta[staIndex];
 	clampedValue = value & ~(value >> 31);

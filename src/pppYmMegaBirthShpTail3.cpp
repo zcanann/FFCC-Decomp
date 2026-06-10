@@ -61,8 +61,6 @@ static inline float LoadFloat(const float& value)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma global_optimizer off
 void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirthShpTail3RenderStep* stepData, pppYmMegaBirthShpTail3Offsets* offsets)
 {
     u8* step = (u8*)stepData;
@@ -305,7 +303,6 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
         *(u16*)(particle + 0x1C) += *(s32*)(step + 0x8);
     }
 }
-#pragma pop
 
 /*
  * --INFO--

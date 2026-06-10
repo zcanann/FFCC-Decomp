@@ -2895,7 +2895,8 @@ void CGPartyObj::checkTargetParticle()
 		if (*reinterpret_cast<int*>(self + 0x520) == 2) {
 			int scriptPtr = *reinterpret_cast<int*>(self + 0x58);
 			unsigned int vNode = *reinterpret_cast<unsigned short*>(*reinterpret_cast<int*>(scriptPtr + 0x24) + 0x19A);
-			unsigned int vItem = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<int*>(self + 0x560) * 0x48 + 0x30);
+			SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
+			unsigned int vItem = rows[*reinterpret_cast<int*>(self + 0x560)].m_field30;
 			float base = static_cast<float>(vItem) + static_cast<float>(vNode);
 			int vFlag;
 			if ((*reinterpret_cast<unsigned int*>(scriptPtr + 0x3B0) & 0x4000) != 0) {
@@ -2907,7 +2908,8 @@ void CGPartyObj::checkTargetParticle()
 		} else {
 			int scriptPtr = *reinterpret_cast<int*>(self + 0x58);
 			unsigned int vNode = *reinterpret_cast<unsigned short*>(*reinterpret_cast<int*>(scriptPtr + 0x24) + 0x19C);
-			unsigned int vItem = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<int*>(self + 0x560) * 0x48 + 0x30);
+			SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
+			unsigned int vItem = rows[*reinterpret_cast<int*>(self + 0x560)].m_field30;
 			float base = static_cast<float>(vItem) + static_cast<float>(vNode);
 			int vFlag;
 			if ((*reinterpret_cast<unsigned int*>(scriptPtr + 0x3B0) & 0x8000) != 0) {

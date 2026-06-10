@@ -519,8 +519,8 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 			denied[currentIdx] = 1;
 		}
 
-		_pppMngSt* selectedMngSt = 0;
 		_pppMngSt* candidate;
+		_pppMngSt* selectedMngSt = 0;
 		int selectedPrio = 1;
 		s32 i;
 		s8* deniedPtr = (s8*)denied;

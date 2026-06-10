@@ -2994,11 +2994,12 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         const float fogStart = Graphic.m_fogStart;
         const unsigned int fogColorWord = *reinterpret_cast<unsigned int*>(&Graphic.m_fogColor);
         const float fogEnd = Graphic.m_fogEnd;
+        const unsigned char* fogColorBytes = reinterpret_cast<const unsigned char*>(&fogColorWord);
         _GXColor graphicFogColor;
-        graphicFogColor.r = static_cast<unsigned char>(fogColorWord >> 24);
-        graphicFogColor.g = static_cast<unsigned char>(fogColorWord >> 16);
-        graphicFogColor.b = static_cast<unsigned char>(fogColorWord >> 8);
-        graphicFogColor.a = static_cast<unsigned char>(fogColorWord);
+        graphicFogColor.r = fogColorBytes[0];
+        graphicFogColor.g = fogColorBytes[1];
+        graphicFogColor.b = fogColorBytes[2];
+        graphicFogColor.a = fogColorBytes[3];
 
         const CColor& white = CColor(0xFF, 0xFF, 0xFF, 0xFF);
         CColor whitePart;

@@ -798,7 +798,7 @@ int CMemoryCardMan::DummyLoad()
         if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
             // "McMount(%d) error(%d)"
-            System.Printf(const_cast<char*>(sMcMountErrorFmt), 0);
+            System.Printf(const_cast<char*>(sMcMountErrorFmt), 0, m_result);
         }
 
         result = CARDUnmount(0);
@@ -821,7 +821,7 @@ int CMemoryCardMan::DummyLoad()
         if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
             // "McOpen(%d) error(%d)"
-            System.Printf(const_cast<char*>(sMcOpenErrorFmt), 0);
+            System.Printf(const_cast<char*>(sMcOpenErrorFmt), 0, m_result);
         }
 
         result = CARDUnmount(0);
@@ -873,7 +873,7 @@ int CMemoryCardMan::DummyLoad()
         if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
             // "McRead(%d) error(%d)"
-            System.Printf(const_cast<char*>(sMcReadErrorFmt), 0);
+            System.Printf(const_cast<char*>(sMcReadErrorFmt), 0, m_result);
         }
 
         int chan = m_fileInfo.chan;
@@ -987,7 +987,7 @@ int CMemoryCardMan::DummySave()
             if (static_cast<unsigned int>(System.m_execParam) >= 1)
             {
                 // "%s(%d) McFormat(%d) error(%d)"
-                System.Printf(const_cast<char*>(sMcFormatErrorFmt), 0);
+                System.Printf(const_cast<char*>(sMcFormatErrorFmt), 0, m_result);
             }
 
             result = CARDUnmount(0);
@@ -1006,7 +1006,7 @@ int CMemoryCardMan::DummySave()
         if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
             // "%s(%d) McMount(%d) error(%d)"
-            System.Printf(const_cast<char*>(sMcMountErrorFmt), 0);
+            System.Printf(const_cast<char*>(sMcMountErrorFmt), 0, m_result);
         }
 
         result = CARDUnmount(0);
@@ -1051,7 +1051,7 @@ int CMemoryCardMan::DummySave()
             if (static_cast<unsigned int>(System.m_execParam) >= 1)
             {
                 // "McCreate(%d) error(%d)"
-                System.Printf(const_cast<char*>(sMcCreateErrorFmt), 0);
+                System.Printf(const_cast<char*>(sMcCreateErrorFmt), 0, m_result);
             }
 
             result = CARDUnmount(0);
@@ -1073,7 +1073,7 @@ int CMemoryCardMan::DummySave()
             if (static_cast<unsigned int>(System.m_execParam) >= 1)
             {
                 // "McGetStat(%d) error(%d)"
-                System.Printf(const_cast<char*>(sMcGetStatErrorFmt), 0);
+                System.Printf(const_cast<char*>(sMcGetStatErrorFmt), 0, m_result);
             }
 
             result = CARDUnmount(0);
@@ -1125,7 +1125,7 @@ int CMemoryCardMan::DummySave()
         {
             if (static_cast<unsigned int>(System.m_execParam) >= 1)
             {
-                System.Printf(const_cast<char*>(sMcWriteErrorFmt), 0);
+                System.Printf(const_cast<char*>(sMcWriteErrorFmt), 0, m_result);
             }
 
             result = CARDUnmount(0);
@@ -1152,7 +1152,7 @@ int CMemoryCardMan::DummySave()
         {
             if (static_cast<unsigned int>(System.m_execParam) >= 1)
             {
-                System.Printf(const_cast<char*>(sMcSetStatErrorFmt), 0);
+                System.Printf(const_cast<char*>(sMcSetStatErrorFmt), 0, m_result);
             }
 
             result = CARDUnmount(0);
@@ -1213,7 +1213,7 @@ int CMemoryCardMan::DummySave()
     {
         if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
-            System.Printf(const_cast<char*>(sMcWriteErrorFmt), 0);
+            System.Printf(const_cast<char*>(sMcWriteErrorFmt), 0, m_result);
         }
 
         if (m_fileInfo.chan < 0 || m_fileInfo.chan > 1)

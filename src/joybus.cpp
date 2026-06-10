@@ -3284,431 +3284,6 @@ void JoyBus::ResetQueue(ThreadParam* threadParam)
  * Address:	TODO
  * Size:	TODO
  */
-int JoyBus::InitialCode(ThreadParam* threadParam)
-{
-    int result = 0;
-
-    switch ((unsigned char)threadParam->m_subState)
-    {
-    case 0:
-    {
-        // Clear per-threadParam->m_portIndex state
-        m_stateFlagArr[threadParam->m_portIndex] = 0;
-
-        ResetQueue(threadParam);
-
-        // Get initial GBA status
-        bool singleMode = GbaQue.IsSingleMode(threadParam->m_portIndex);
-
-        if (singleMode && (int)threadParam->m_portIndex != 1)
-        {
-            threadParam->m_gbaStatus = 0;
-        }
-        else
-        {
-            threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
-        }
-
-        if ((int)threadParam->m_gbaStatus == 0 && threadParam->m_unk3 == 0x28)
-        {
-            unsigned int readBuf[4];
-
-            threadParam->m_gbaStatus = GBARead(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(readBuf), &threadParam->m_unk3);
-
-            if ((int)threadParam->m_gbaStatus == 0)
-            {
-                threadParam->m_recvReadIdx = readBuf[0];
-
-                *reinterpret_cast<unsigned int*>(&threadParam->m_deviceType) = 1;
-            }
-        }
-
-        threadParam->m_subState = 1;
-        result = 0;
-        break;
-    }
-
-    case 1:
-    {
-        bool singleMode = GbaQue.IsSingleMode(threadParam->m_portIndex);
-
-        if (singleMode && (int)threadParam->m_portIndex != 1)
-        {
-            threadParam->m_gbaStatus = 0;
-        }
-        else
-        {
-            threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
-        }
-
-        int status = threadParam->m_gbaStatus;
-
-        if (status != 0)
-            goto case1_done;
-
-        if (threadParam->m_unk3 != 0x20)
-        {
-            status = 1;
-            goto case1_done;
-        }
-
-        threadParam->m_gbaStatus = GBAWrite(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(m_diskId), &threadParam->m_unk3);
-        status = threadParam->m_gbaStatus;
-
-        if (status != 0)
-            goto case1_done;
-
-        if (GbaQue.IsSingleMode(threadParam->m_portIndex) && (int)threadParam->m_portIndex != 1)
-        {
-            threadParam->m_gbaStatus = 0;
-        }
-        else
-        {
-            threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
-        }
-
-        status = threadParam->m_gbaStatus;
-
-        if (status != 0)
-            goto case1_done;
-
-        if ((threadParam->m_unk3 & 0x30) != 0x20)
-            status = 1;
-        else
-            status = 0;
-
-case1_done:
-        if (status != 0)
-        {
-            result = 1;
-        }
-        else
-        {
-            threadParam->m_subState = 2;
-            result = 0;
-        }
-
-        break;
-    }
-
-    case 2:
-    {
-        bool singleMode = GbaQue.IsSingleMode(threadParam->m_portIndex);
-
-        if (singleMode && (int)threadParam->m_portIndex != 1)
-        {
-            threadParam->m_gbaStatus = 0;
-        }
-        else
-        {
-            threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
-        }
-
-        int status = threadParam->m_gbaStatus;
-
-        struct
-        {
-            unsigned char h;
-            unsigned char f;
-        } tmpBuf;
-
-        if (status != 0)
-            goto case2_done;
-
-        if (threadParam->m_unk3 != 0x28)
-        {
-            status = 1;
-            goto case2_done;
-        }
-
-        threadParam->m_gbaStatus = GBARead(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(&tmpBuf), &threadParam->m_unk3);
-        status = threadParam->m_gbaStatus;
-
-        if (status != 0)
-            goto case2_done;
-
-        if (tmpBuf.h != 1)
-        {
-            status = 1;
-            goto case2_done;
-        }
-
-        status = 0;
-
-        threadParam->m_gbaBootFlag    = (unsigned char)((int)(signed char)tmpBuf.f >> 6);
-        threadParam->m_unk2           = (unsigned char)((tmpBuf.f >> 4) & 0x03);
-        threadParam->m_bootRetryCount = (unsigned char)(tmpBuf.f & 0x0F);
-
-case2_done:
-        if (status != 0)
-        {
-            result = 1;
-        }
-        else
-        {
-            threadParam->m_subState = 3;
-            result = 0;
-        }
-
-        break;
-    }
-
-    case 3:
-    {
-        bool singleMode = GbaQue.IsSingleMode(threadParam->m_portIndex);
-
-        if (singleMode && (int)threadParam->m_portIndex != 1)
-        {
-            threadParam->m_gbaStatus = 0;
-        }
-        else
-        {
-            threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
-        }
-
-        int status = threadParam->m_gbaStatus;
-
-        unsigned int timeValue;
-
-        if (status != 0)
-            goto case3_done;
-
-        if (threadParam->m_unk3 != 0x28)
-        {
-            status = 1;
-            goto case3_done;
-        }
-
-        threadParam->m_gbaStatus = GBARead(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(&timeValue), &threadParam->m_unk3);
-        status = threadParam->m_gbaStatus;
-
-        if (status != 0)
-            goto case3_done;
-
-        {
-            // Bit-twiddly inequality check preserved from decomp
-            unsigned int a = timeValue - threadParam->m_timestamp;
-            unsigned int b = threadParam->m_timestamp - timeValue;
-
-            threadParam->m_timeChangedFlag = (unsigned char)((a | b) >> 31);
-            threadParam->m_timestamp = timeValue;
-            status = 0;
-        }
-
-case3_done:
-        if (status == 0)
-        {
-            threadParam->m_subState = 4;
-            // fall through into case 4
-        }
-        else
-        {
-            result = 1;
-            break;
-        }
-    }
-
-    case 4:
-    {
-        bool singleMode = GbaQue.IsSingleMode(threadParam->m_portIndex);
-
-        if (singleMode && (int)threadParam->m_portIndex != 1)
-        {
-            threadParam->m_gbaStatus = 0;
-        }
-        else
-        {
-            threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
-        }
-
-        int status = threadParam->m_gbaStatus;
-
-        if (status != 0)
-            goto case4_done;
-
-        if (threadParam->m_unk3 != ' ')
-        {
-            status = 1;
-            goto case4_done;
-        }
-
-        if (threadParam->m_timeChangedFlag != 0 ||
-            (threadParam->m_gbaBootFlag == 0 && threadParam->m_timestamp == 0))
-        {
-            threadParam->m_timestamp = OSGetTick();
-        }
-
-        threadParam->m_gbaStatus = GBAWrite(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(&threadParam->m_timestamp), &threadParam->m_unk3);
-        status = threadParam->m_gbaStatus;
-
-case4_done:
-        if (status != 0)
-        {
-            result = 1;
-        }
-        else
-        {
-            threadParam->m_subState = 5;
-            result = 0;
-        }
-
-        break;
-    }
-
-    case 5:
-    {
-        bool singleMode = GbaQue.IsSingleMode(threadParam->m_portIndex);
-
-        if (singleMode && (int)threadParam->m_portIndex != 1)
-        {
-            threadParam->m_gbaStatus = 0;
-        }
-        else
-        {
-            threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
-        }
-
-        int status = threadParam->m_gbaStatus;
-
-        if (status != 0)
-            goto case5_done;
-
-        if (threadParam->m_unk3 != ' ')
-        {
-            status = 1;
-            goto case5_done;
-        }
-
-        {
-            bool singleMode2 = GbaQue.IsSingleMode(threadParam->m_portIndex);
-
-            unsigned char portVal = singleMode2 ? 0 : (unsigned char)threadParam->m_portIndex;
-            unsigned char header = 1;
-            unsigned char flags = (unsigned char)(portVal | (threadParam->m_gbaBootFlag << 6) | (threadParam->m_unk2 << 4));
-            unsigned int word = (1u << 24) | ((unsigned int)flags << 16);
-
-            threadParam->m_gbaStatus = GBAWrite(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(&word), &threadParam->m_unk3);
-            status = threadParam->m_gbaStatus;
-        }
-
-case5_done:
-        if (status != 0)
-        {
-            result = 1;
-        }
-        else
-        {
-            threadParam->m_subState = 6;
-            result = 0;
-        }
-
-        break;
-    }
-
-    case 6:
-    {
-        int err = SendMType(threadParam, (int)m_nextModeTypeArr[threadParam->m_portIndex]);
-        if (err < 0)
-        {
-            result = 1;
-            break;
-        }
-
-        int stageMajor;
-        int stageMinor;
-
-        GbaQue.GetStageNo(threadParam->m_portIndex, &stageMajor, &stageMinor);
-
-        unsigned int cmdStage = MakeJoyCmd32(0x0E, 1, ((unsigned char*)&stageMajor)[3], ((unsigned char*)&stageMinor)[3]);
-        unsigned int stageResult = 0;
-
-        if (static_cast<signed char>(m_threadRunningMask) == 0)
-        {
-            stageResult = 0;
-        }
-        else
-        {
-            OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-
-            unsigned int qPort = threadParam->m_portIndex;
-            if ((int)m_cmdCount[qPort] >= 0x40)
-            {
-                OSSignalSemaphore(&m_accessSemaphores[qPort]);
-                stageResult = 0xFFFFFFFF;
-            }
-            else
-            {
-                m_cmdQueueData[qPort][m_cmdCount[qPort]] = cmdStage;
-                m_cmdCount[threadParam->m_portIndex]++;
-
-                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-                stageResult = 0;
-            }
-        }
-
-        if (((-stageResult | stageResult) >> 31) != 0)
-        {
-            result = 1;
-            break;
-        }
-
-        unsigned char gameFlags =
-            (unsigned char)((Game.m_gameWork.m_languageId - 1) | kPppYmMeltMaskBit4);
-        unsigned int cmdGame = MakeJoyCmd32(0x14, 0x16, gameFlags, 0);
-
-        if (static_cast<signed char>(m_threadRunningMask) == 0)
-        {
-            err = 0;
-        }
-        else
-        {
-            OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-
-            if ((int)m_cmdCount[threadParam->m_portIndex] >= 0x40)
-            {
-                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-                err = -1;
-            }
-            else
-            {
-                m_cmdQueueData[threadParam->m_portIndex][m_cmdCount[threadParam->m_portIndex]] = cmdGame;
-                m_cmdCount[threadParam->m_portIndex]++;
-
-                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-                err = 0;
-            }
-        }
-
-        if (err < 0)
-        {
-            result = 1;
-            break;
-        }
-
-        threadParam->m_subState  = 0;
-        threadParam->m_state     = 0x14;
-        threadParam->m_flags[0]  = 1;
-
-        GbaQue.ClrPlayModeFlg(threadParam->m_portIndex);
-
-        result = 0;
-        break;
-    }
-
-    default:
-        // Unknown state, treat as error / busy
-        result = 1;
-        break;
-    }
-
-    return result;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 int JoyBus::SetSendQueue(ThreadParam* threadParam, unsigned int command)
 {
     if (static_cast<signed char>(m_threadRunningMask) == 0)
@@ -3737,6 +3312,485 @@ int JoyBus::SetSendQueue(ThreadParam* threadParam, unsigned int command)
     return result;
 }
 
+/*
+ * --INFO--
+ * Address:	........
+ * Size:	........
+ */
+inline void JoyBus::ReadInitialCode(ThreadParam* threadParam)
+{
+    unsigned int readBuf[4];
+
+    bool singleMode = GbaQue.IsSingleMode(threadParam->m_portIndex);
+
+    if (singleMode && (int)threadParam->m_portIndex != 1)
+    {
+        threadParam->m_gbaStatus = 0;
+    }
+    else
+    {
+        threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
+    }
+
+    if ((int)threadParam->m_gbaStatus == 0 && threadParam->m_unk3 == 0x28)
+    {
+        threadParam->m_gbaStatus = GBARead(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(readBuf), &threadParam->m_unk3);
+
+        if ((int)threadParam->m_gbaStatus == 0)
+        {
+            threadParam->m_recvReadIdx = readBuf[0];
+
+            *reinterpret_cast<unsigned int*>(&threadParam->m_deviceType) = 1;
+        }
+    }
+}
+
+/*
+ * --INFO--
+ * Address:	........
+ * Size:	........
+ */
+inline int JoyBus::WriteInitialCode(ThreadParam* threadParam)
+{
+    bool singleMode = GbaQue.IsSingleMode(threadParam->m_portIndex);
+
+    if (singleMode && (int)threadParam->m_portIndex != 1)
+    {
+        threadParam->m_gbaStatus = 0;
+    }
+    else
+    {
+        threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
+    }
+
+    {
+        int chk = threadParam->m_gbaStatus;
+
+        if (chk != 0)
+        {
+            return chk;
+        }
+    }
+
+    if (threadParam->m_unk3 != 0x20)
+    {
+        return 1;
+    }
+
+    threadParam->m_gbaStatus = GBAWrite(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(m_diskId), &threadParam->m_unk3);
+
+    {
+        int chk = threadParam->m_gbaStatus;
+
+        if (chk != 0)
+        {
+            return chk;
+        }
+    }
+
+    singleMode = GbaQue.IsSingleMode(threadParam->m_portIndex);
+
+    if (singleMode && (int)threadParam->m_portIndex != 1)
+    {
+        threadParam->m_gbaStatus = 0;
+    }
+    else
+    {
+        threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
+    }
+
+    {
+        int chk = threadParam->m_gbaStatus;
+
+        if (chk != 0)
+        {
+            return chk;
+        }
+    }
+
+    if ((threadParam->m_unk3 & 0x30) != 0x20)
+    {
+        return 1;
+    }
+
+    return 0;
+}
+
+/*
+ * --INFO--
+ * Address:	........
+ * Size:	........
+ */
+inline int JoyBus::ReadContext(ThreadParam* threadParam)
+{
+    struct
+    {
+        unsigned char h;
+        unsigned char f;
+    } tmpBuf;
+
+    bool singleMode = GbaQue.IsSingleMode(threadParam->m_portIndex);
+
+    if (singleMode && (int)threadParam->m_portIndex != 1)
+    {
+        threadParam->m_gbaStatus = 0;
+    }
+    else
+    {
+        threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
+    }
+
+    {
+        int chk = threadParam->m_gbaStatus;
+
+        if (chk != 0)
+        {
+            return chk;
+        }
+    }
+
+    if (threadParam->m_unk3 != 0x28)
+    {
+        return 1;
+    }
+
+    threadParam->m_gbaStatus = GBARead(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(&tmpBuf), &threadParam->m_unk3);
+
+    {
+        int chk = threadParam->m_gbaStatus;
+
+        if (chk != 0)
+        {
+            return chk;
+        }
+    }
+
+    if (tmpBuf.h != 1)
+    {
+        return 1;
+    }
+
+    threadParam->m_gbaBootFlag    = (unsigned char)((int)tmpBuf.f >> 6);
+    threadParam->m_unk2           = (unsigned char)((tmpBuf.f >> 4) & 0x03);
+    threadParam->m_bootRetryCount = (unsigned char)(tmpBuf.f & 0x0F);
+
+    return 0;
+}
+
+/*
+ * --INFO--
+ * Address:	........
+ * Size:	........
+ */
+inline int JoyBus::ReadHostId(ThreadParam* threadParam)
+{
+    unsigned int timeValue;
+
+    bool singleMode = GbaQue.IsSingleMode(threadParam->m_portIndex);
+
+    if (singleMode && (int)threadParam->m_portIndex != 1)
+    {
+        threadParam->m_gbaStatus = 0;
+    }
+    else
+    {
+        threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
+    }
+
+    {
+        int chk = threadParam->m_gbaStatus;
+
+        if (chk != 0)
+        {
+            return chk;
+        }
+    }
+
+    if (threadParam->m_unk3 != 0x28)
+    {
+        return 1;
+    }
+
+    threadParam->m_gbaStatus = GBARead(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(&timeValue), &threadParam->m_unk3);
+
+    {
+        int chk = threadParam->m_gbaStatus;
+
+        if (chk != 0)
+        {
+            return chk;
+        }
+    }
+
+    threadParam->m_timeChangedFlag = (unsigned char)(((timeValue - threadParam->m_timestamp) | (threadParam->m_timestamp - timeValue)) >> 31);
+    threadParam->m_timestamp = timeValue;
+
+    return 0;
+}
+
+/*
+ * --INFO--
+ * Address:	........
+ * Size:	........
+ */
+inline int JoyBus::WriteHostId(ThreadParam* threadParam)
+{
+    bool singleMode = GbaQue.IsSingleMode(threadParam->m_portIndex);
+
+    if (singleMode && (int)threadParam->m_portIndex != 1)
+    {
+        threadParam->m_gbaStatus = 0;
+    }
+    else
+    {
+        threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
+    }
+
+    {
+        int chk = threadParam->m_gbaStatus;
+
+        if (chk != 0)
+        {
+            return chk;
+        }
+    }
+
+    if (threadParam->m_unk3 != 0x20)
+    {
+        return 1;
+    }
+
+    if (threadParam->m_timeChangedFlag != 0 ||
+        (threadParam->m_gbaBootFlag == 0 && threadParam->m_timestamp == 0))
+    {
+        threadParam->m_timestamp = OSGetTick();
+    }
+
+    threadParam->m_gbaStatus = GBAWrite(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(&threadParam->m_timestamp), &threadParam->m_unk3);
+
+    {
+        int chk = threadParam->m_gbaStatus;
+
+        if (chk != 0)
+        {
+            return chk;
+        }
+    }
+
+    return 0;
+}
+
+/*
+ * --INFO--
+ * Address:	........
+ * Size:	........
+ */
+inline int JoyBus::WriteContext(ThreadParam* threadParam)
+{
+    unsigned int word;
+
+    bool singleMode = GbaQue.IsSingleMode(threadParam->m_portIndex);
+
+    if (singleMode && (int)threadParam->m_portIndex != 1)
+    {
+        threadParam->m_gbaStatus = 0;
+    }
+    else
+    {
+        threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
+    }
+
+    {
+        int chk = threadParam->m_gbaStatus;
+
+        if (chk != 0)
+        {
+            return chk;
+        }
+    }
+
+    if (threadParam->m_unk3 != 0x20)
+    {
+        return 1;
+    }
+
+    unsigned int portVal;
+
+    if (GbaQue.IsSingleMode(threadParam->m_portIndex))
+    {
+        portVal = 0;
+    }
+    else
+    {
+        portVal = threadParam->m_portIndex;
+    }
+
+    word = 0;
+    ((unsigned char*)&word)[0] = 1;
+    ((unsigned char*)&word)[1] = (unsigned char)(portVal | ((threadParam->m_gbaBootFlag << 6) | (threadParam->m_unk2 << 4)));
+
+    threadParam->m_gbaStatus = GBAWrite(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(&word), &threadParam->m_unk3);
+
+    {
+        int chk = threadParam->m_gbaStatus;
+
+        if (chk != 0)
+        {
+            return chk;
+        }
+    }
+
+    return 0;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+int JoyBus::InitialCode(ThreadParam* threadParam)
+{
+    int result;
+    int status;
+
+    switch ((unsigned char)threadParam->m_subState)
+    {
+    case 0:
+        m_stateFlagArr[threadParam->m_portIndex] = 0;
+
+        ResetQueue(threadParam);
+
+        ReadInitialCode(threadParam);
+
+        threadParam->m_subState = 1;
+        result = 0;
+        break;
+
+    case 1:
+        status = WriteInitialCode(threadParam);
+
+        if (status != 0)
+        {
+            result = 1;
+        }
+        else
+        {
+            threadParam->m_subState = 2;
+            result = 0;
+        }
+        break;
+
+    case 2:
+        status = ReadContext(threadParam);
+
+        if (status != 0)
+        {
+            result = 1;
+        }
+        else
+        {
+            threadParam->m_subState = 3;
+            result = 0;
+        }
+        break;
+
+    case 3:
+        status = ReadHostId(threadParam);
+
+        if (status == 0)
+        {
+            threadParam->m_subState = 4;
+        }
+        // fall through
+
+    case 4:
+        status = WriteHostId(threadParam);
+
+        if (status != 0)
+        {
+            result = 1;
+        }
+        else
+        {
+            threadParam->m_subState = 5;
+            result = 0;
+        }
+        break;
+
+    case 5:
+        status = WriteContext(threadParam);
+
+        if (status != 0)
+        {
+            result = 1;
+        }
+        else
+        {
+            threadParam->m_subState = 6;
+            result = 0;
+        }
+        break;
+
+    case 6:
+    {
+        int err = SendMType(threadParam, (int)m_nextModeTypeArr[threadParam->m_portIndex]);
+
+        if (err < 0)
+        {
+            result = 1;
+        }
+        else
+        {
+            int stageNoSub;
+            int stageNo;
+            unsigned int cmdStage;
+            unsigned int cmdGame;
+
+            GbaQue.GetStageNo(threadParam->m_portIndex, &stageNo, &stageNoSub);
+
+            cmdStage = 0;
+            ((unsigned char*)&cmdStage)[0] = 0x0E;
+            ((unsigned char*)&cmdStage)[1] = 1;
+            ((unsigned char*)&cmdStage)[2] = (unsigned char)stageNo;
+            ((unsigned char*)&cmdStage)[3] = (unsigned char)stageNoSub;
+
+            unsigned int stageResult = SetSendQueue(threadParam, cmdStage);
+
+            if ((int)(-stageResult | stageResult) >> 31 < 0)
+            {
+                result = 1;
+            }
+            else
+            {
+                cmdGame = 0;
+                ((unsigned char*)&cmdGame)[0] = 0x14;
+                ((unsigned char*)&cmdGame)[1] = 0x16;
+                ((unsigned char*)&cmdGame)[2] = (unsigned char)(Game.m_gameWork.m_languageId - 1) | kPppYmMeltMaskBit4;
+
+                err = SetSendQueue(threadParam, cmdGame);
+
+                if (err < 0)
+                {
+                    result = 1;
+                }
+                else
+                {
+                    threadParam->m_subState  = 0;
+                    threadParam->m_state     = 0x14;
+                    threadParam->m_flags[0]  = 1;
+
+                    GbaQue.ClrPlayModeFlg(threadParam->m_portIndex);
+
+                    result = 0;
+                }
+            }
+        }
+        break;
+    }
+    }
+
+    return result;
+}
 
 /*
  * --INFO--

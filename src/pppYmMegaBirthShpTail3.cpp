@@ -618,8 +618,6 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
         if ((paramBytes[0x18] == 2) || (paramBytes[0x18] == 3)) {
             angles[0] = 0;
             angles[1] = 0;
-            angles[2] = 0;
-            angles[3] = 0;
         }
 
         pppGetRotMatrixXYZ(rot, (pppIVECTOR4*)angles);

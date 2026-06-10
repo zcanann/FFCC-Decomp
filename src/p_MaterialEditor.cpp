@@ -378,13 +378,14 @@ void CMaterialEditorPcs::drawViewer()
                 GXSetArray(GX_VA_CLR0, polygon->_30, 4);
                 GXSetArray(GX_VA_TEX0, polygon->texCoord, 8);
 
-                u32 vertexIndex[8];
-                vertexIndex[4] = polygon->index0;
-                vertexIndex[5] = polygon->index1;
-                vertexIndex[6] = polygon->index2;
-                vertexIndex[0] = 0;
-                vertexIndex[1] = 1;
-                vertexIndex[2] = 2;
+                u32 posIndex[4];
+                u32 clrIndex[4];
+                posIndex[0] = polygon->index0;
+                posIndex[1] = polygon->index1;
+                posIndex[2] = polygon->index2;
+                clrIndex[0] = 0;
+                clrIndex[1] = 1;
+                clrIndex[2] = 2;
 
                 if (flags == 0) {
                     GXBegin(GX_TRIANGLES, GX_VTXFMT0, 3);
@@ -392,16 +393,14 @@ void CMaterialEditorPcs::drawViewer()
                 if (flags == 1) {
                     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
                     vertexCount = 4;
-                    vertexIndex[6] = polygon->index3;
-                    vertexIndex[7] = polygon->index2;
-                    vertexIndex[2] = 3;
-                    vertexIndex[3] = 2;
+                    posIndex[2] = polygon->index3;
+                    posIndex[3] = polygon->index2;
+                    clrIndex[2] = 3;
+                    clrIndex[3] = 2;
                 }
 
-                s8 i = 0;
+                u8 i = 0;
                 while (i < vertexCount) {
-                    u32* posIndex = &vertexIndex[4];
-                    u32* clrIndex = &vertexIndex[0];
                     u32 pos = posIndex[i];
                     u32 clr = clrIndex[i];
                     i++;

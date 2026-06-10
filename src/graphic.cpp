@@ -1350,61 +1350,59 @@ _GXTexObj* CGraphic::GetBackBufferRect(int& x, int& y, int& width, int& height, 
         height += 1;
     }
 
-    if ((xEnd >= 0) && (yEnd >= 0)) {
-        GXRenderModeObj* renderMode = m_renderMode;
-        int efbWidth = static_cast<int>(renderMode->fbWidth);
-
-        if ((x <= efbWidth) && (yEnd >= 0) && (y <= static_cast<int>(renderMode->efbHeight)) &&
-            (width > 0) && (height > 0)) {
-            if (xEnd > efbWidth) {
-                width -= (xEnd - efbWidth);
-                xEnd = static_cast<int>(m_renderMode->fbWidth);
-            }
-
-            if (x < 0) {
-                width += x;
-                x = 0;
-            }
-
-            if (y < 0) {
-                height += y;
-                y = 0;
-            }
-
-            int efbHeight = static_cast<int>(m_renderMode->efbHeight);
-            if (yEnd > efbHeight) {
-                height -= (yEnd - efbHeight);
-                yEnd = static_cast<int>(m_renderMode->efbHeight);
-            }
-
-            if (((xEnd - x) != 0) && ((yEnd - y) != 0)) {
-                int texFormat = 6;
-                int textureSize = width * height * 4;
-                int maxTextureSize =
-                    (((static_cast<int>(m_renderMode->fbWidth) + 0xF) & 0xFFF0) *
-                         static_cast<int>(m_renderMode->efbHeight) * 2) +
-                    0x46000;
-                if (maxTextureSize < textureSize) {
-                    texFormat = 4;
-                    textureSize /= 2;
-                }
-
-                GXSetTexCopySrc(x & 0xFFFF, y & 0xFFFF, width & 0xFFFF, height & 0xFFFF);
-                GXSetTexCopyDst(width & 0xFFFF, height & 0xFFFF, static_cast<_GXTexFmt>(texFormat), GX_FALSE);
-                DCInvalidateRange(m_scratchTextureBuffer, textureSize);
-                GXCopyTex(m_scratchTextureBuffer, doClear);
-                GXPixModeSync();
-                GXInvalidateTexAll();
-                GXInitTexObj(&m_backBufferTexObj, m_scratchTextureBuffer, width & 0xFFFF, height & 0xFFFF,
-                             static_cast<_GXTexFmt>(texFormat), GX_CLAMP, GX_CLAMP, GX_FALSE);
-                GXInitTexObjLOD(&m_backBufferTexObj, GX_LINEAR, GX_LINEAR, kGraphicZeroF, kGraphicZeroF,
-                                kGraphicZeroF, GX_FALSE, GX_FALSE, GX_ANISO_1);
-                return &m_backBufferTexObj;
-            }
-        }
+    if ((xEnd < 0) || (yEnd < 0) || (x > static_cast<int>(m_renderMode->fbWidth)) || (yEnd < 0) ||
+        (y > static_cast<int>(m_renderMode->efbHeight)) || (width <= 0) || (height <= 0)) {
+        return 0;
     }
 
-    return 0;
+    int efbWidth = static_cast<int>(m_renderMode->fbWidth);
+    if (xEnd > efbWidth) {
+        width -= (xEnd - efbWidth);
+        xEnd = static_cast<int>(m_renderMode->fbWidth);
+    }
+
+    if (x < 0) {
+        width += x;
+        x = 0;
+    }
+
+    if (y < 0) {
+        height += y;
+        y = 0;
+    }
+
+    int efbHeight = static_cast<int>(m_renderMode->efbHeight);
+    if (yEnd > efbHeight) {
+        height -= (yEnd - efbHeight);
+        yEnd = static_cast<int>(m_renderMode->efbHeight);
+    }
+
+    if (((xEnd - x) != 0) && ((yEnd - y) != 0)) {
+        int texFormat = 6;
+        int textureSize = width * height * 4;
+        int maxTextureSize =
+            (((static_cast<int>(m_renderMode->fbWidth) + 0xF) & 0xFFF0) *
+                 static_cast<int>(m_renderMode->efbHeight) * 2) +
+            0x46000;
+        if (maxTextureSize < textureSize) {
+            texFormat = 4;
+            textureSize /= 2;
+        }
+
+        GXSetTexCopySrc(x & 0xFFFF, y & 0xFFFF, width & 0xFFFF, height & 0xFFFF);
+        GXSetTexCopyDst(width & 0xFFFF, height & 0xFFFF, static_cast<_GXTexFmt>(texFormat), GX_FALSE);
+        DCInvalidateRange(m_scratchTextureBuffer, textureSize);
+        GXCopyTex(m_scratchTextureBuffer, doClear);
+        GXPixModeSync();
+        GXInvalidateTexAll();
+        GXInitTexObj(&m_backBufferTexObj, m_scratchTextureBuffer, width & 0xFFFF, height & 0xFFFF,
+                     static_cast<_GXTexFmt>(texFormat), GX_CLAMP, GX_CLAMP, GX_FALSE);
+        GXInitTexObjLOD(&m_backBufferTexObj, GX_LINEAR, GX_LINEAR, kGraphicZeroF, kGraphicZeroF,
+                        kGraphicZeroF, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    } else {
+        return 0;
+    }
+    return &m_backBufferTexObj;
 }
 
 /*

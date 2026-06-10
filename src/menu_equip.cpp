@@ -778,93 +778,42 @@ int CMenuPcs::EquipClose()
  */
 void CMenuPcs::EquipCtrl()
 {
-	int state;
-	int index;
-	int itemCount;
-	unsigned int blockCount;
-
-	EquipMenuState* es = this->m_equipState;
-	es->prevMode = es->mode;
-	es = this->m_equipState;
-	int mode = es->mode;
-	state = 0;
-	if ((mode == 0) || ((mode != 0) && (es->step == 1))) {
+	GetEquipMenuState(this)->prevMode = GetEquipMenuState(this)->mode;
+	int mode = GetEquipMenuState(this)->mode;
+	int state = 0;
+	if ((mode == 0) || ((mode != 0) && (GetEquipMenuState(this)->step == 1))) {
 		state = EquipCtrlCur();
-	} else if ((mode == 1) && (es->step == 0)) {
+	} else if ((mode == 1) && (GetEquipMenuState(this)->step == 0)) {
 		state = EquipOpen0();
 		if (state != 0) {
 			state = 0;
-			this->m_equipState->step = this->m_equipState->step + 1;
+			GetEquipMenuState(this)->step = GetEquipMenuState(this)->step + 1;
 		}
-	} else if ((mode == 1) && ((es->step == 2) && (state = EquipClose0(), state != 0))) {
-		this->m_equipState->step = 0;
-		this->m_equipState->mode = 0;
-		this->m_equipState->frame = 0;
+	} else if ((mode == 1) && ((GetEquipMenuState(this)->step == 2) && ((state = EquipClose0()) != 0))) {
+		GetEquipMenuState(this)->step = 0;
+		GetEquipMenuState(this)->mode = 0;
+		GetEquipMenuState(this)->frame = 0;
 		CmdInit1();
 		state = 0;
 	}
 
 	if (state) {
-		float fVar2 = kEquipOne;
+		float one = kEquipOne;
 		CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 
-		EquipOpenAnim* entry = this->m_equipList->entries;
-		for (index = 0; index < this->m_equipList->count; index = index + 1) {
-			entry->alpha = fVar2;
-			entry->scale = fVar2;
+		EquipOpenAnim* entry = GetEquipListStorage(this)->entries;
+		for (int i = 0; i < GetEquipListStorage(this)->count; i++) {
+			entry->alpha = one;
+			entry->scale = one;
 			entry++;
 		}
 
-		unsigned int slotCount = (unsigned int)caravanWork->m_numCmdListSlots;
-		index = 0;
-		int count1 = slotCount - 1;
-		int byteOff = count1 * 0x40;
-		if (count1 >= 0) {
-			blockCount = slotCount >> 3;
-			if (blockCount != 0) {
-				unsigned int bc;
-				for (bc = 0; bc < blockCount; bc++) {
-					int p;
-					p = *(int*)&this->m_equipList + byteOff;
-					*(int*)(p + 0x2c) = index++;
-					*(int*)(p + 0x30) = 3;
-					p = *(int*)&this->m_equipList + byteOff;
-					*(int*)(p + -0x14) = index++;
-					*(int*)(p + -0x10) = 3;
-					p = *(int*)&this->m_equipList + byteOff;
-					*(int*)(p + -0x54) = index++;
-					*(int*)(p + -0x50) = 3;
-					p = *(int*)&this->m_equipList + byteOff;
-					*(int*)(p + -0x94) = index++;
-					*(int*)(p + -0x90) = 3;
-					p = *(int*)&this->m_equipList + byteOff;
-					*(int*)(p + -0xd4) = index++;
-					*(int*)(p + -0xd0) = 3;
-					p = *(int*)&this->m_equipList + byteOff;
-					*(int*)(p + -0x114) = index++;
-					*(int*)(p + -0x110) = 3;
-					p = *(int*)&this->m_equipList + byteOff;
-					*(int*)(p + -0x154) = index++;
-					*(int*)(p + -0x150) = 3;
-					p = *(int*)&this->m_equipList + byteOff;
-					byteOff = byteOff + -0x200;
-					*(int*)(p + -0x194) = index++;
-					*(int*)(p + -0x190) = 3;
-				}
-				slotCount = slotCount & 7;
-				if (slotCount == 0) {
-					return;
-				}
-			}
-			do {
-				int p2 = byteOff + 8;
-				byteOff = byteOff + -0x40;
-				p2 = *(unsigned int*)&this->m_equipList + p2;
-				*(int*)(p2 + 0x24) = index;
-				index = index + 1;
-				*(int*)(p2 + 0x28) = 3;
-				slotCount = slotCount - 1;
-			} while (slotCount != 0);
+		int idx = 0;
+		for (int k = caravanWork->m_numCmdListSlots - 1; k >= 0; k--) {
+			EquipOpenAnim* e = &GetEquipListStorage(this)->entries[k];
+			e->startFrame = idx;
+			idx++;
+			e->duration = 3;
 		}
 	}
 }

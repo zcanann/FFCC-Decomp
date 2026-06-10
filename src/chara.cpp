@@ -2232,16 +2232,16 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 			                        static_cast<int>(static_cast<u32>(ModelFlagsA0(this)) << 24) >> 31);
 		}
 
-		const int lightEnable = (mesh->m_data->m_flags & 0x80) == 0;
+		const int lightEnable = static_cast<int>(static_cast<u32>(mesh->m_data->m_flags & 0xC0) << 24) >> 31;
 		if (lastLightEnable != lightEnable) {
-			LightPcs.EnableLight(lightEnable, 0);
 			lastLightEnable = lightEnable;
+			LightPcs.EnableLight(lightEnable == 0, 0);
 		}
 
-		const int zWriteEnable = (mesh->m_data->m_flags & 0x40) == 0;
+		const int zWriteEnable = static_cast<int>(static_cast<u32>(mesh->m_data->m_flags & 0x60) << 25) >> 31;
 		if (lastZWrite != zWriteEnable) {
-			GXSetZMode((u8)1, (GXCompare)3, (u8)zWriteEnable);
 			lastZWrite = zWriteEnable;
+			GXSetZMode((u8)1, (GXCompare)3, zWriteEnable == 0);
 		}
 
 		if (ModelBeforeMeshCallback(this) != 0) {

@@ -1909,36 +1909,38 @@ void CFlatRuntime2::drawLayer(
 
 	const float scaledWidth = static_cast<float>(width) * scaleX;
 	const float scaledHeight = static_cast<float>(height) * scaleY;
-	unsigned short u1 = static_cast<short>(texU + width);
-	short v1 = static_cast<unsigned short>(texV + height);
-	float xAnchor = FLOAT_80330144;
+	int u1 = texU + width;
+	int v1 = texV + height;
+	float xAnchor;
 	if ((flags & 1) != 0) {
 		xAnchor = FLOAT_80330154 * scaledWidth;
+	} else {
+		xAnchor = FLOAT_80330144;
 	}
 	const float x0 = static_cast<float>(x) - xAnchor;
-	float yAnchor = FLOAT_80330144;
+	float yAnchor;
 	if ((flags & 1) != 0) {
 		yAnchor = FLOAT_80330154 * scaledHeight;
+	} else {
+		yAnchor = FLOAT_80330144;
 	}
 	const float y0 = static_cast<float>(y) - yAnchor;
 	const float x1 = x0 + scaledWidth;
 	const float y1 = y0 + scaledHeight;
-	unsigned short u0 = static_cast<unsigned short>(texU);
-	short v0 = static_cast<short>(texV);
 
 	if (blendMode != 3) {
 		GXBegin(GX_QUADS, GX_VTXFMT0, 4);
 		GXPosition3f32(x0, y0, FLOAT_80330144);
-		GXTexCoord2s16(u0, v0);
+		GXTexCoord2s16(texU, texV);
 
 		GXPosition3f32(x1, y0, FLOAT_80330144);
-		GXTexCoord2s16(u1, v0);
+		GXTexCoord2s16(u1, texV);
 
 		GXPosition3f32(x1, y1, FLOAT_80330144);
 		GXTexCoord2s16(u1, v1);
 
 		GXPosition3f32(x0, y1, FLOAT_80330144);
-		GXTexCoord2s16(u0, v1);
+		GXTexCoord2s16(texU, v1);
 	} else {
 		GXSetNumTexGens(2);
 		GXSetTexCoordGen2(
@@ -1960,54 +1962,60 @@ void CFlatRuntime2::drawLayer(
 
 		const int pixelWidth = static_cast<int>(scaledWidth * FLOAT_80330154);
 		const int pixelHeight = static_cast<int>(scaledHeight * FLOAT_80330154);
+		CColor texCol0;
+		CColor texCol1;
 
 		for (int quad = 0; quad < 4; quad++) {
-			CColor texCol0;
-			CColor texCol1;
+			int rectW = pixelWidth;
+			int rectH = pixelHeight;
 
-			float bx = x0;
+			float bx;
 			if ((quad & 1) != 0) {
 				bx = x0 + static_cast<float>(pixelWidth);
+			} else {
+				bx = x0;
 			}
 			int rectX = static_cast<int>(bx);
-			float by = y0;
+			float by;
 			if ((quad & 2) != 0) {
 				by = y0 + static_cast<float>(pixelHeight);
+			} else {
+				by = y0;
 			}
 			int rectY = static_cast<int>(by);
 
-			unsigned short quadU0 = static_cast<short>(texU);
+			int quadU0;
 			if ((quad & 1) != 0) {
-				quadU0 = static_cast<short>(texU + static_cast<short>(pixelWidth));
+				quadU0 = texU + rectW;
+			} else {
+				quadU0 = texU;
 			}
-			short quadV0 = static_cast<short>(texV);
+			int quadV0;
 			if ((quad & 2) != 0) {
-				quadV0 = static_cast<short>(texV + static_cast<short>(pixelHeight));
+				quadV0 = texV + rectH;
+			} else {
+				quadV0 = texV;
 			}
 
-			int rectW = pixelWidth;
-			int rectH = pixelHeight;
 			_GXTexObj* backTex = Graphic.GetBackBufferRect(rectX, rectY, rectW, rectH, 0);
 			GXLoadTexObj(backTex, GX_TEXMAP1);
 
 			GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-			short quadU1 = static_cast<short>(quadU0 + static_cast<short>(rectW));
-			short quadV1 = static_cast<short>(quadV0 + static_cast<short>(rectH));
 
 			GXPosition3f32(static_cast<float>(rectX), static_cast<float>(rectY), FLOAT_80330144);
 			GXTexCoord2s16(quadU0, quadV0);
 			GXTexCoord2s16(0, 0);
 
 			GXPosition3f32(static_cast<float>(rectX + rectW), static_cast<float>(rectY), FLOAT_80330144);
-			GXTexCoord2s16(quadU1, quadV0);
+			GXTexCoord2s16(quadU0 + rectW, quadV0);
 			GXTexCoord2s16(2, 0);
 
 			GXPosition3f32(static_cast<float>(rectX + rectW), static_cast<float>(rectY + rectH), FLOAT_80330144);
-			GXTexCoord2s16(quadU1, quadV1);
+			GXTexCoord2s16(quadU0 + rectW, quadV0 + rectH);
 			GXTexCoord2s16(2, 2);
 
 			GXPosition3f32(static_cast<float>(rectX), static_cast<float>(rectY + rectH), FLOAT_80330144);
-			GXTexCoord2s16(quadU0, quadV1);
+			GXTexCoord2s16(quadU0, quadV0 + rectH);
 			GXTexCoord2s16(0, 2);
 		}
 	}

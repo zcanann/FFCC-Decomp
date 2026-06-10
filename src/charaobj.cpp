@@ -1254,14 +1254,12 @@ int CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos)
 		}
 	}
 
-	int slot = 4;
 	for (int i = 0; i < 4; i++) {
 		if (m_ignoreHit[i].m_flagBits.m_flag_80 != 0) {
 			if (m_ignoreHit[i].m_source == sourceObj) {
 				return 2;
 			}
 		} else {
-			slot = i;
 			m_ignoreHit[i].m_flagBits.m_flag_80 = 1;
 			m_ignoreHit[i].m_source = sourceObj;
 
@@ -1269,14 +1267,12 @@ int CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos)
 			unsigned short particleLife =
 				*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (particleIndex * 0x48) + 0xE);
 			m_ignoreHit[i].m_timer = (particleLife == 3) ? 0x1E : 0;
-			break;
+			goto foundSlot;
 		}
 	}
+	return 2;
 
-	if (slot == 4) {
-		return 2;
-	}
-
+foundSlot:
 	if ((sourceObj->m_objectFlags & 0x100) != 0) {
 		changeStat(3, 0, 0);
 	}

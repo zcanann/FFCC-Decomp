@@ -3370,9 +3370,8 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 
 	selectedCount = 0;
 	for (int slot = 1; (selectedCount < count) && (slot < 8); slot++) {
-		unsigned char slotValue = compatibilityData[slot];
-		if ((selectedCount < 2) || (slotValue != 0)) {
-			char* src = Game.m_cFlatDataArr[1].TableStrings(2)[slotValue];
+		if ((selectedCount < 2) || (compatibilityData[slot] != 0)) {
+			char* src = Game.m_cFlatDataArr[1].TableStrings(2)[compatibilityData[slot]];
 			int len = strlen(src);
 			memcpy(writePtr, src, len + 1);
 			writePtr += len + 1;

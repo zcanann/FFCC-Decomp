@@ -3161,7 +3161,7 @@ void GbaQueue::ChkCMakeJob(int channel, unsigned int value)
 		OSWaitSemaphore(accessSemaphores + i);
 	}
 
-	unsigned char playerSlot = cmakeInfo[channel].m_playerSlot;
+	signed char playerSlot = cmakeInfo[channel].m_playerSlot;
 	for (int i = 0; i < 4; i++) {
 		if ((channel != i) && (cmakeInfo[i].m_active != 0) &&
 		    (cmakeInfo[i].m_jobType == valueBytes[2])) {

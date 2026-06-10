@@ -22,7 +22,7 @@
 #pragma readonly_strings on
 extern char s_shopmenu_cpp[];
 extern char s_pcts_pctd_Error_memory_allocation_error_801DED9C[];
-extern char s_shop_80332e54[];
+extern char s_shop_80332e54[5];
 unsigned short gShopMenuInputLatch;
 extern CShopMenu* g_shopMenu;
 extern float FLOAT_80332D10;
@@ -606,24 +606,14 @@ static void SetupShopMenuAmountFont(CFont* font)
     font->SetMargin(FLOAT_80332d64);
 }
 
-static void SetupShopMenuMakeAmountFont(CFont* font)
+static void SetupShopMenuMakeFont(CFont* font, float margin)
 {
     font->SetShadow(1);
     font->SetScale(FLOAT_80332d28);
     font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
     font->DrawInit();
     SetShopMenuFontRenderBit(font);
-    font->SetMargin(FLOAT_80332E10 * FLOAT_80332d28 + FLOAT_80332D10);
-}
-
-static void SetupShopMenuMakeOwnedFont(CFont* font)
-{
-    font->SetShadow(1);
-    font->SetScale(FLOAT_80332d28);
-    font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
-    font->DrawInit();
-    SetShopMenuFontRenderBit(font);
-    font->SetMargin(FLOAT_80332d64);
+    font->SetMargin(margin);
 }
 
 static void DrawShopMenuAmount(CFont* font, int value, float rightEdge, float y, int tlut)
@@ -1337,6 +1327,7 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
  */
 #pragma push
 #pragma peephole on
+#pragma opt_propagation off
 void CShopMenu::DrawItemInfo0()
 {
     if (m_selectedIndex == -1) {
@@ -1428,17 +1419,19 @@ void CShopMenu::DrawItemInfo0()
     }
 
     if ((m_subMode == 1) && (m_listType == 0)) {
+        CFont* countFont = MenuPcs.m_fonts[0];
+        int countEdge = 0x108;
         int amount = m_quantity;
-        font->SetShadow(1);
-        font->SetScale(FLOAT_80332d28);
-        font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
-        font->DrawInit();
-        SetShopMenuFontRenderBit(font);
-        font->SetMargin(FLOAT_80332d34);
+        countFont->SetShadow(1);
+        countFont->SetScale(FLOAT_80332d28);
+        countFont->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
+        countFont->DrawInit();
+        SetShopMenuFontRenderBit(countFont);
+        countFont->SetMargin(FLOAT_80332d34);
         char countBuffer[64];
         sprintf(countBuffer, s_TwoDigitFormat_80332d18, amount);
-        int countRightX = static_cast<int>(FLOAT_80332d70 - font->GetWidth(countBuffer));
-        MenuPcs.DrawNoShadowFont(font, countBuffer, static_cast<float>(countRightX), FLOAT_80332d6c, 4, 0x12);
+        int countRightX = static_cast<int>(countEdge - countFont->GetWidth(countBuffer));
+        MenuPcs.DrawNoShadowFont(countFont, countBuffer, static_cast<float>(countRightX), FLOAT_80332d6c, 4, 0x12);
         MenuPcs.DrawInit();
 
         font->DrawInit();
@@ -1447,12 +1440,14 @@ void CShopMenu::DrawItemInfo0()
         const char* quantityText = ShopMenuMes(languageId, SHOP_MENU_TEXT_QUANTITY);
         float quantityWidth = font->GetWidth(quantityText);
         font->DrawInit();
-        int quantityX = static_cast<int>(static_cast<float>(countRightX) - FLOAT_80332d5c - quantityWidth);
+        int quantityX = static_cast<int>(static_cast<float>(countRightX) - quantityWidth - FLOAT_80332d5c);
         MenuPcs.DrawNoShadowFont(font, const_cast<char*>(quantityText), static_cast<float>(quantityX), FLOAT_80332d6c, 0x18, 0x12);
         MenuPcs.DrawInit();
 
-        int x = static_cast<int>(-(static_cast<float>(m_figureMode) * FLOAT_80332d74 - FLOAT_80332d70));
-        drawShapeSeqScale(0x12, 0, x, 0xD4, FLOAT_80332d78, FLOAT_80332d78, 0xFF);
+        if (m_subMode == 1) {
+            int x = static_cast<int>(-(static_cast<float>(m_figureMode) * FLOAT_80332d74 - FLOAT_80332d70));
+            drawShapeSeqScale(0x12, 0, x, 0xD4, FLOAT_80332d78, FLOAT_80332d78, 0xFF);
+        }
     }
 }
 #pragma pop
@@ -1536,14 +1531,16 @@ void CShopMenu::DrawBuySellInfo()
 
     float rightPrice = FLOAT_80332d88 - unitWidth;
     int amountRightPrice = static_cast<int>(rightPrice - FLOAT_80332d5c);
-    SetupShopMenuAmountFont(font);
-    DrawShopMenuAmountTrunc(font, totalGil, amountRightPrice, FLOAT_80332d90, 0x13);
+    CFont* amountFont = MenuPcs.m_fonts[0];
+    SetupShopMenuAmountFont(amountFont);
+    DrawShopMenuAmountTrunc(amountFont, totalGil, amountRightPrice, FLOAT_80332d90, 0x13);
 
     float rightMoney = FLOAT_80332d94 - unitWidth;
     int amountRightMoney = static_cast<int>(rightMoney - FLOAT_80332d5c);
     int currentMoney = ShopMenuCaravanWork(this)->m_gil;
-    SetupShopMenuAmountFont(font);
-    DrawShopMenuAmountTrunc(font, currentMoney, amountRightMoney, FLOAT_80332d90, 0x14);
+    CFont* amountFont2 = MenuPcs.m_fonts[0];
+    SetupShopMenuAmountFont(amountFont2);
+    DrawShopMenuAmountTrunc(amountFont2, currentMoney, amountRightMoney, FLOAT_80332d90, 0x14);
 
     SetupShopMenuUnitFont(font);
     font->DrawInit();
@@ -1810,6 +1807,8 @@ void CShopMenu::DrawMakeBase()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_propagation off
 void CShopMenu::DrawShopBase()
 {
     Graphic.SetDrawDoneDebugData(1);
@@ -1838,58 +1837,60 @@ void CShopMenu::DrawShopBase()
     }
 
     Graphic.SetDrawDoneDebugData(3);
-    _GXColor fadeA;
-    fadeA.r = 0xFF; fadeA.g = 0xFF; fadeA.b = 0xFF; fadeA.a = 0x00;
-    _GXColor fadeB;
-    fadeB.r = 0xFF; fadeB.g = 0xFF; fadeB.b = 0xFF; fadeB.a = 0xFF;
-    _GXColor fadeC;
-    fadeC.r = 0xFF; fadeC.g = 0xFF; fadeC.b = 0xFF; fadeC.a = 0x00;
-    _GXColor fadeD;
-    fadeD.r = 0xFF; fadeD.g = 0xFF; fadeD.b = 0xFF; fadeD.a = 0xFF;
-    drawShapeSeqGrouad(9, 0, 0x1C, panelY + 0x22, FLOAT_80332d78, FLOAT_80332DC8, fadeA, fadeB, fadeC, fadeD);
+    _GXColor colorA;
+    _GXColor colorB;
+    _GXColor colorC;
+    _GXColor colorD;
+    colorA.r = 0xFF; colorA.g = 0xFF; colorA.b = 0xFF; colorA.a = 0x00;
+    colorC.r = 0xFF; colorC.g = 0xFF; colorC.b = 0xFF; colorC.a = 0x00;
+    colorB.r = 0xFF; colorB.g = 0xFF; colorB.b = 0xFF; colorB.a = 0xFF;
+    colorD.r = 0xFF; colorD.g = 0xFF; colorD.b = 0xFF; colorD.a = 0xFF;
+    drawShapeSeqGrouad(9, 0, 0x1C, panelY + 0x22, FLOAT_80332d78, FLOAT_80332DC8, colorA, colorB, colorC, colorD);
 
-    _GXColor whiteA;
-    whiteA.r = 0xFF; whiteA.g = 0xFF; whiteA.b = 0xFF; whiteA.a = 0xFF;
-    _GXColor whiteB;
-    whiteB.r = 0xFF; whiteB.g = 0xFF; whiteB.b = 0xFF; whiteB.a = 0xFF;
-    _GXColor whiteC;
-    whiteC.r = 0xFF; whiteC.g = 0xFF; whiteC.b = 0xFF; whiteC.a = 0xFF;
-    _GXColor whiteD;
-    whiteD.r = 0xFF; whiteD.g = 0xFF; whiteD.b = 0xFF; whiteD.a = 0xFF;
-    unsigned int x = 0x3C;
+    colorA.r = 0xFF; colorA.g = 0xFF; colorA.b = 0xFF; colorA.a = 0xFF;
+    colorC.r = 0xFF; colorC.g = 0xFF; colorC.b = 0xFF; colorC.a = 0xFF;
+    colorB.r = 0xFF; colorB.g = 0xFF; colorB.b = 0xFF; colorB.a = 0xFF;
+    colorD.r = 0xFF; colorD.g = 0xFF; colorD.b = 0xFF; colorD.a = 0xFF;
+    int x = 0x3C;
     while (x < 0x25C) {
-        drawShapeSeqGrouad(9, 0, x, panelY + 0x22, FLOAT_80332d78, FLOAT_80332DC8, whiteA, whiteB, whiteC, whiteD);
+        drawShapeSeqGrouad(9, 0, x, panelY + 0x22, FLOAT_80332d78, FLOAT_80332DC8, colorA, colorB, colorC, colorD);
         x += 0x20;
     }
 
-    _GXColor endA;
-    endA.r = 0xFF; endA.g = 0xFF; endA.b = 0xFF; endA.a = 0xFF;
-    _GXColor endB;
-    endB.r = 0xFF; endB.g = 0xFF; endB.b = 0xFF; endB.a = 0x00;
-    _GXColor endC;
-    endC.r = 0xFF; endC.g = 0xFF; endC.b = 0xFF; endC.a = 0xFF;
-    _GXColor endD;
-    endD.r = 0xFF; endD.g = 0xFF; endD.b = 0xFF; endD.a = 0x00;
-    drawShapeSeqGrouad(9, 0, x, panelY + 0x22, FLOAT_80332d78, FLOAT_80332DC8, endA, endB, endC, endD);
+    colorA.r = 0xFF; colorA.g = 0xFF; colorA.b = 0xFF; colorA.a = 0xFF;
+    colorC.r = 0xFF; colorC.g = 0xFF; colorC.b = 0xFF; colorC.a = 0xFF;
+    colorB.r = 0xFF; colorB.g = 0xFF; colorB.b = 0xFF; colorB.a = 0x00;
+    colorD.r = 0xFF; colorD.g = 0xFF; colorD.b = 0xFF; colorD.a = 0x00;
+    drawShapeSeqGrouad(9, 0, x, panelY + 0x22, FLOAT_80332d78, FLOAT_80332DC8, colorA, colorB, colorC, colorD);
     Graphic.SetDrawDoneDebugData(4);
 
     if (m_mode >= 3) {
-        int listX = (m_mode <= 8) ? 0x64 : 0x118;
-        for (int barX = listX + 0x48; barX < 0x244; barX += 8) {
+        int listX;
+        int listY;
+        if (m_mode >= 9) {
+            listX = 0x118;
+            listY = 0xAA;
+        } else {
+            listX = 0x64;
+            listY = 0xAA;
+        }
+        int barX;
+        for (barX = listX + 0x48; barX < 0x244; barX += 8) {
             Graphic.SetDrawDoneDebugData(5);
-            drawShapeSeq(0x10, 0, barX, 0x11E, 0xFF, 0, 0, FLOAT_80332D9C, 0);
+            drawShapeSeq(0x10, 0, barX, listY + 0x74, 0xFF, 0, 0, FLOAT_80332D9C, 0);
             Graphic.SetDrawDoneDebugData(6);
         }
         Graphic.SetDrawDoneDebugData(7);
-        drawShapeSeq(0xD, 0, listX + 0x46, 0xA7, 0xFF, 0, 0, FLOAT_80332D9C, 0);
+        drawShapeSeq(0xD, 0, listX + 0x46, listY - 3, 0xFF, 0, 0, FLOAT_80332D9C, 0);
         Graphic.SetDrawDoneDebugData(8);
         Graphic.SetDrawDoneDebugData(9);
-        drawShapeSeq(8, 0, 0x244, 0x11E, 0xFF, 0, 0, FLOAT_80332D9C, 0);
+        drawShapeSeq(8, 0, barX, listY + 0x74, 0xFF, 0, 0, FLOAT_80332D9C, 0);
         Graphic.SetDrawDoneDebugData(10);
     }
 
     if (m_mode <= 8) {
-        for (int sideX = 0x4E; sideX > 0x32; sideX -= 0x10) {
+        int sideX;
+        for (sideX = 0x4E; sideX > 0x32; sideX -= 0x10) {
             Graphic.SetDrawDoneDebugData(0xB);
             drawShapeSeq(0xC, 0, sideX, 0x174, 0xFF, 0, 0, FLOAT_80332D9C, 0);
             Graphic.SetDrawDoneDebugData(0xC);
@@ -1897,7 +1898,7 @@ void CShopMenu::DrawShopBase()
         Graphic.SetDrawDoneDebugData(0xD);
         drawShapeSeq(0xB, 0, 0x7E, 0x150, 0xFF, 0, 0, FLOAT_80332D9C, 0);
         Graphic.SetDrawDoneDebugData(0xE);
-        drawShapeSeq(8, 0, 0x2E, 0x170, 0xFF, 0, 0, FLOAT_80332D9C, 0);
+        drawShapeSeq(8, 0, sideX, 0x170, 0xFF, 0, 0, FLOAT_80332D9C, 0);
         Graphic.SetDrawDoneDebugData(0xF);
         CFont* font = MenuPcs.m_fonts[4];
         font->SetMargin(FLOAT_80332d28);
@@ -1910,13 +1911,17 @@ void CShopMenu::DrawShopBase()
         Graphic.SetDrawDoneDebugData(0x10);
         char* confirmText = (m_listType == 0) ? ShopMenuMes(languageId, SHOP_MENU_TEXT_BUY) :
                                                 ShopMenuMes(languageId, SHOP_MENU_TEXT_SELL);
-        font->SetPosX(CalcCenteredShopMenuX(font, confirmText, 0x50));
+        int confirmCenterX = 0x50;
+        float confirmTextX = CalcCenteredShopMenuX(font, confirmText, confirmCenterX);
+        font->SetPosX(confirmTextX);
         font->SetPosY(FLOAT_80332DD8);
         font->Draw(confirmText);
         Graphic.SetDrawDoneDebugData(0x11);
 
         char* cancelText = ShopMenuMes(languageId, SHOP_MENU_TEXT_CANCEL);
-        font->SetPosX(CalcCenteredShopMenuX(font, cancelText, 0x50));
+        int cancelCenterX = 0x50;
+        float cancelTextX = CalcCenteredShopMenuX(font, cancelText, cancelCenterX);
+        font->SetPosX(cancelTextX);
         font->SetPosY(FLOAT_80332DDC);
         font->Draw(cancelText);
         Graphic.SetDrawDoneDebugData(0x12);
@@ -1930,6 +1935,7 @@ void CShopMenu::DrawShopBase()
         }
     }
 }
+#pragma pop
 /*
  * --INFO--
  * Address:	TODO
@@ -2160,6 +2166,7 @@ void CShopMenu::DrawMake()
     SetupShopMenuUnitFont(font);
     float gilUnitWidth = font->GetWidth(ShopMenuMes(languageId, SHOP_MENU_TEXT_GIL));
 
+    float makeMarginW = FLOAT_80332E10;
     int makeAmountX = static_cast<int>(FLOAT_80332E14 - gilUnitWidth - FLOAT_80332d5c - FLOAT_80332d5c);
     CFont* amountFont = MenuPcs.m_fonts[0];
     SetupShopMenuAmountFont(amountFont);
@@ -2236,9 +2243,10 @@ void CShopMenu::DrawMake()
     MenuPcs.DrawInit();
 
     int rowY = 300;
-    float scaleOne = FLOAT_80332d28;
     short recipeMaterial[6];
     MenuPcs.GetRecipeMaterial(getItemNo(m_selectedIndex), reinterpret_cast<CMenuPcs::MaterialInfo*>(recipeMaterial));
+    float makeMarginScale = FLOAT_80332d28;
+    float makeMarginBase = FLOAT_80332D10;
     short* material = recipeMaterial;
     for (int i = 0; i < 3; i++, material++, rowY += 0x1E) {
         if (*material <= 0) {
@@ -2246,9 +2254,9 @@ void CShopMenu::DrawMake()
         }
 
         headerFont->DrawInit();
-        headerFont->SetMargin(scaleOne);
+        headerFont->SetMargin(FLOAT_80332d28);
         headerFont->SetShadow(1);
-        headerFont->SetScale(scaleOne);
+        headerFont->SetScale(FLOAT_80332d28);
         headerFont->DrawInit();
         MenuPcs.DrawNoShadowFont(headerFont, s_Slash_80332d84, FLOAT_80332E3C, rowY, 0x1B, 0x12);
         MenuPcs.DrawInit();
@@ -2256,7 +2264,7 @@ void CShopMenu::DrawMake()
         CFont* makeAmountFont = MenuPcs.m_fonts[0];
         x = 372;
         int neededCount = material[3];
-        SetupShopMenuMakeAmountFont(makeAmountFont);
+        SetupShopMenuMakeFont(makeAmountFont, makeMarginW * makeMarginScale + makeMarginBase);
         char neededBuffer[64];
         sprintf(neededBuffer, s_DecimalFormat_80332d14, neededCount);
         x = static_cast<int>(x - makeAmountFont->GetWidth(neededBuffer));
@@ -2264,9 +2272,9 @@ void CShopMenu::DrawMake()
         MenuPcs.DrawInit();
 
         headerFont->DrawInit();
-        headerFont->SetMargin(scaleOne);
+        headerFont->SetMargin(FLOAT_80332d28);
         headerFont->SetShadow(1);
-        headerFont->SetScale(scaleOne);
+        headerFont->SetScale(FLOAT_80332d28);
         x -= 8;
         x = static_cast<int>(x - headerFont->GetWidth("/"));
         headerFont->DrawInit();
@@ -2289,12 +2297,13 @@ void CShopMenu::DrawMake()
         }
 
         int ownedTlut = 2;
+        makeMarginW = FLOAT_80332E10;
         if (ownedCount >= material[3]) {
             ownedTlut = 0x1B;
         }
         CFont* ownedFont = MenuPcs.m_fonts[0];
         x = 452;
-        SetupShopMenuMakeOwnedFont(ownedFont);
+        SetupShopMenuMakeFont(ownedFont, FLOAT_80332d64);
         char ownedBuffer[64];
         sprintf(ownedBuffer, s_TwoDigitFormat_80332d18, ownedCount);
         x = static_cast<int>(x - ownedFont->GetWidth(ownedBuffer));
@@ -3073,7 +3082,6 @@ void CShopMenu::Calc()
     int mode = m_mode;
     int& timer = m_timer;
     int& subMode = m_subMode;
-    int& shopMode = m_listType;
     unsigned char& choice = m_topChoice;
 
     switch (mode) {
@@ -3140,26 +3148,28 @@ void CShopMenu::Calc()
         }
         break;
     case 4:
-        if (subMode < 1) {
-            if (subMode >= 0) {
-                this->SelectItemIdx();
-                if ((GetPadButtons() & 0x200) != 0) {
-                    Sound.PlaySe(3, 0x40, 0x7F, 0);
-                    this->SetMode(5);
-                }
+        switch (subMode) {
+        case 0:
+            this->SelectItemIdx();
+            if ((GetPadButtons() & 0x200) != 0) {
+                Sound.PlaySe(3, 0x40, 0x7F, 0);
+                this->SetMode(5);
             }
-        } else if (subMode == 1) {
+            break;
+        case 1:
             this->SelectFigure();
             if ((GetPadButtons() & 0x200) != 0) {
                 Sound.PlaySe(3, 0x40, 0x7F, 0);
                 subMode = 0;
             }
-        } else if (subMode < 3) {
+            break;
+        case 2:
             this->SelectYesNo();
             if ((GetPadButtons() & 0x200) != 0) {
                 Sound.PlaySe(3, 0x40, 0x7F, 0);
                 subMode = 1;
             }
+            break;
         }
         break;
     case 5:
@@ -3179,22 +3189,23 @@ void CShopMenu::Calc()
         }
         break;
     case 7:
-        if (subMode != 1) {
-            if (subMode < 1) {
-                if (subMode >= 0) {
-                    this->SelectItemIdx();
-                    if ((GetPadButtons() & 0x200) != 0) {
-                        Sound.PlaySe(3, 0x40, 0x7F, 0);
-                        this->SetMode(8);
-                    }
-                }
-            } else if (subMode < 3) {
-                this->SelectYesNo();
-                if ((GetPadButtons() & 0x200) != 0) {
-                    Sound.PlaySe(3, 0x40, 0x7F, 0);
-                    subMode = 0;
-                }
+        switch (subMode) {
+        case 0:
+            this->SelectItemIdx();
+            if ((GetPadButtons() & 0x200) != 0) {
+                Sound.PlaySe(3, 0x40, 0x7F, 0);
+                this->SetMode(8);
             }
+            break;
+        case 1:
+            break;
+        case 2:
+            this->SelectYesNo();
+            if ((GetPadButtons() & 0x200) != 0) {
+                Sound.PlaySe(3, 0x40, 0x7F, 0);
+                subMode = 0;
+            }
+            break;
         }
         break;
     case 9:
@@ -3288,10 +3299,6 @@ void CShopMenu::Calc()
     }
 
     ++timer;
-
-    if ((shopMode == 0) || (shopMode == 1)) {
-        gShopMenuInputLatch = 0;
-    }
 }
 #pragma pop
 /*
@@ -3305,6 +3312,7 @@ void CShopMenu::Calc()
  */
 void CMenuPcs::CreateSmithMenu()
 {
+    short* cacheChunks;
     CShopMenu* shopMenu = reinterpret_cast<CShopMenu*>(
         operator new(0x158, (Game.m_gameWork.m_menuStageMode != 0) ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage,
             s_shopmenu_cpp, 0x2E9));
@@ -3317,14 +3325,13 @@ void CMenuPcs::CreateSmithMenu()
     shopMenu->SetMode(9);
     shopMenu->m_pdtSlot = PartPcs.LoadMenuPdt(s_shop_80332e54);
 
-    int slotIndex = shopMenu->m_pdtSlot;
-    _pppDataHead* pppDataHead = PartMng.m_pdtSlots[slotIndex].m_pppDataHead;
-    short* cacheChunks = reinterpret_cast<short*>(pppDataHead->m_cacheChunks);
+    CPartMng::PppPdtSlot* slot = &PartMng.m_pdtSlots[shopMenu->m_pdtSlot];
+    cacheChunks = reinterpret_cast<short*>(slot->m_pppDataHead->m_cacheChunks);
     *reinterpret_cast<int*>(cacheChunks + 2) =
         ppvAmemCacheSet.GetData(*cacheChunks, s_shopmenu_cpp, 0x32A);
     int cacheData = *reinterpret_cast<int*>(cacheChunks + 2);
-    pppCacheLoadShape(
-        reinterpret_cast<short*>(cacheData + *reinterpret_cast<int*>(cacheData + 0x14)), pppDataHead);
+    pppCacheLoadShape(reinterpret_cast<short*>(cacheData + *reinterpret_cast<int*>(cacheData + 0x14)),
+        slot->m_pppDataHead);
 }
 /*
  * --INFO--
@@ -3337,6 +3344,7 @@ void CMenuPcs::CreateSmithMenu()
  */
 void CMenuPcs::CreateShopMenu()
 {
+    short* cacheChunks;
     CShopMenu* shopMenu = reinterpret_cast<CShopMenu*>(
         operator new(0x158, (Game.m_gameWork.m_menuStageMode != 0) ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage,
             s_shopmenu_cpp, 0x2E2));
@@ -3349,14 +3357,13 @@ void CMenuPcs::CreateShopMenu()
     shopMenu->SetMode(0);
     shopMenu->m_pdtSlot = PartPcs.LoadMenuPdt(s_shop_80332e54);
 
-    int slotIndex = shopMenu->m_pdtSlot;
-    _pppDataHead* pppDataHead = PartMng.m_pdtSlots[slotIndex].m_pppDataHead;
-    short* cacheChunks = reinterpret_cast<short*>(pppDataHead->m_cacheChunks);
+    CPartMng::PppPdtSlot* slot = &PartMng.m_pdtSlots[shopMenu->m_pdtSlot];
+    cacheChunks = reinterpret_cast<short*>(slot->m_pppDataHead->m_cacheChunks);
     *reinterpret_cast<int*>(cacheChunks + 2) =
         ppvAmemCacheSet.GetData(*cacheChunks, s_shopmenu_cpp, 0x32A);
     int cacheData = *reinterpret_cast<int*>(cacheChunks + 2);
-    pppCacheLoadShape(
-        reinterpret_cast<short*>(cacheData + *reinterpret_cast<int*>(cacheData + 0x14)), pppDataHead);
+    pppCacheLoadShape(reinterpret_cast<short*>(cacheData + *reinterpret_cast<int*>(cacheData + 0x14)),
+        slot->m_pppDataHead);
 }
 /*
  * --INFO--

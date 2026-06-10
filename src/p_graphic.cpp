@@ -708,7 +708,7 @@ void CGraphicPcs::drawBar()
 
     float x = kDebugBarLeft;
     GXColor barColor = {0x80, 0x80, 0x80, 0xFF};
-    drawSFRect(kDebugBarLeft, kDebugBarTop, kDebugBarRight, kDebugBarBottom, barColor);
+    drawSFRect(kDebugBarLeft, kDebugBarTop, kDebugBarRight, kDebugBarBottom, barColor, barColor);
 
     CSystem::COrder* order = System.GetFirstOrder();
     const int orderCount = System.m_orderCount;
@@ -728,11 +728,11 @@ void CGraphicPcs::drawBar()
 
         if (priority == 0x26) {
             drawSFRect(x, textFlag ? static_cast<float>(static_cast<int>(y)) : kDebugBarMoveBottom,
-                       kGraphicOne + (x + width), kDebugBarTop, barColor);
+                       kGraphicOne + (x + width), kDebugBarTop, barColor, barColor);
             x += width;
         } else if (priority != 0x27) {
             drawSFRect(x, textFlag ? static_cast<float>(static_cast<int>(y)) : kDebugBarObjectTop,
-                       kGraphicOne + (x + width), kDebugBarMoveBottom, barColor);
+                       kGraphicOne + (x + width), kDebugBarMoveBottom, barColor, barColor);
             x += width;
         }
 
@@ -746,7 +746,7 @@ void CGraphicPcs::drawBar()
             const float soundWidth = (kGraphicScreenCenterX * Sound.GetPerformance()) / kDebugBarFrameBudget;
 
             drawSFRect(x, textFlag ? static_cast<float>(static_cast<int>(y)) : kDebugBarMoveBottom,
-                       kGraphicOne + (x + soundWidth), kDebugBarTop, barColor);
+                       kGraphicOne + (x + soundWidth), kDebugBarTop, barColor, barColor);
         }
 
         order = System.GetNextOrder(order);
@@ -760,7 +760,7 @@ void CGraphicPcs::drawBar()
     barColor.g = frameTmp.g;
     barColor.b = frameTmp.b;
     barColor.a = frameTmp.a;
-    drawSFRect(kDebugBarLeft, kDebugIndicatorTop, kDebugIndicatorFrameRight, kDebugIndicatorBottom, barColor);
+    drawSFRect(kDebugBarLeft, kDebugIndicatorTop, kDebugIndicatorFrameRight, kDebugIndicatorBottom, barColor, barColor);
 
     GXColor fifoTmp;
     *reinterpret_cast<u32*>(&fifoTmp) = *reinterpret_cast<u32*>(&((Graphic.IsFifoOver() != 0) ? CColor(0xFF, 0, 0, 0xFF) : CColor(0, 0xFF, 0, 0xFF)).color);
@@ -768,7 +768,7 @@ void CGraphicPcs::drawBar()
     barColor.g = fifoTmp.g;
     barColor.b = fifoTmp.b;
     barColor.a = fifoTmp.a;
-    drawSFRect(kDebugIndicatorFifoLeft, kDebugIndicatorTop, kDebugIndicatorFifoRight, kDebugIndicatorBottom, barColor);
+    drawSFRect(kDebugIndicatorFifoLeft, kDebugIndicatorTop, kDebugIndicatorFifoRight, kDebugIndicatorBottom, barColor, barColor);
 
     if (textFlag) {
         Graphic.InitDebugString();

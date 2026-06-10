@@ -1989,6 +1989,7 @@ void CMenuPcs::CmakeJobOpen()
  */
 void CMenuPcs::CmakeTribeDraw()
 {
+    float a255;
     float alpha = CalcCmakeFadeAlpha(this);
 
     DrawWMFrame0(1, 1.0f);
@@ -2034,16 +2035,21 @@ void CMenuPcs::CmakeTribeDraw()
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-    int a = static_cast<int>(255.0f * alpha);
+    a255 = 255.0f * alpha;
     GXColor col;
     col.r = 0xFF;
     col.g = 0xFF;
     col.b = 0xFF;
-    col.a = static_cast<unsigned char>(a);
+    col.a = static_cast<unsigned char>(a255);
     GXSetChanMatColor(GX_COLOR0A0, col);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
+    float boxW = 416.0f;
+    float boxH = 240.0f;
     MenuPcs.DrawRect(
-        0, 192.0f, 56.0f, 368.0f, 264.0f,
+        0,
+        static_cast<float>(static_cast<int>(-(boxW * 0.5 - 400.0))),
+        static_cast<float>(static_cast<int>(-(boxH * 0.5 - 188.0))),
+        boxW, 264.0f,
         0.0f, 0.0f, 1.0f, 0.90909094f, 0.0f);
 
     DrawCmakeTitle(3, 1.0f, alpha);
@@ -2052,12 +2058,11 @@ void CMenuPcs::CmakeTribeDraw()
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-        int crestA = static_cast<int>(255.0f * alpha);
         GXColor crestCol;
         crestCol.r = 0xFF;
         crestCol.g = 0xFF;
         crestCol.b = 0xFF;
-        crestCol.a = static_cast<unsigned char>(crestA);
+        crestCol.a = static_cast<unsigned char>(a255);
         GXSetChanMatColor(GX_COLOR0A0, crestCol);
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x31));
         MenuPcs.DrawRect(
@@ -2073,8 +2078,7 @@ void CMenuPcs::CmakeTribeDraw()
     tribeFont->SetShadow(0);
     tribeFont->SetScale(1.0f);
     tribeFont->DrawInit();
-    CColor tribeRgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha));
-    tribeFont->SetColor(tribeRgba.color);
+    tribeFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)).color);
 
     for (int i = 0; i < 4; i++) {
         const char* txt = GetTribeStr(i);
@@ -2088,8 +2092,7 @@ void CMenuPcs::CmakeTribeDraw()
     hairFont->SetShadow(1);
     hairFont->SetScale(1.0f);
     hairFont->DrawInit();
-    CColor hairRgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha));
-    hairFont->SetColor(hairRgba.color);
+    hairFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)).color);
     hairFont->SetTlut(6);
 
     int hairBase = CmakeState(this)->m_select * 8;

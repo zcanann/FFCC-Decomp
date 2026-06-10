@@ -1107,142 +1107,81 @@ int CMenuPcs::EquipOpen()
  */
 void CMenuPcs::EquipInit1()
 {
-	int iVar11;
-	float fVar2;
-	float fVar3;
-	float fVar4;
-	float fVar5;
-	unsigned int uVar6;
-	int iVar8;
-	int iVar9;
-	EquipOpenAnim* psVar10;
-	EquipOpenAnim* puVar12;
-	EquipOpenAnim* psVar13;
-	unsigned int uVar15;
+	int yOff = 0;
+	int i = (int)GetEquipListStorage(this)->count;
 
-	fVar5 = kEquipInitV;
-	fVar4 = kEquipInitU;
-	fVar3 = kEquipOne;
-	fVar2 = kEquipZero;
-	iVar11 = 0;
-	iVar8 = (int)GetEquipListStorage(this)->count;
-	psVar10 = &GetEquipListStorage(this)->entries[iVar8];
-	psVar10->tex = 0x2e;
-	psVar10->x = 0xb8;
-	psVar10->y = 0x28;
-	iVar9 = iVar8 + 4;
-	psVar10->w = 0x78;
-	psVar10->h = 0x108;
-	psVar10->u = fVar4;
-	fVar4 = kEquipSmallScale;
-	psVar10->v = fVar5;
-	psVar10->scale = fVar3;
-	psVar10->startFrame = 5;
-	psVar10->duration = 5;
+	EquipOpenAnim* e = &GetEquipListStorage(this)->entries[i++];
+	e->tex = 0x2e;
+	e->x = 0xb8;
+	e->y = 0x28;
+	e->w = 0x78;
+	e->h = 0x108;
+	e->u = kEquipInitU;
+	e->v = kEquipInitV;
+	e->scale = kEquipOne;
+	e->startFrame = 5;
+	e->duration = 5;
 
-	puVar12 = &GetEquipListStorage(this)->entries[iVar8 + 1];
-	puVar12->tex = 0x2f;
-	puVar12->x = 0xa0;
-	puVar12->y = 0xe;
-	puVar12->w = 0x30;
-	puVar12->h = 0x30;
-	puVar12->u = fVar2;
-	puVar12->v = fVar2;
-	puVar12->scale = fVar3;
-	puVar12->startFrame = 0;
-	puVar12->duration = 5;
+	e = &GetEquipListStorage(this)->entries[i++];
+	e->tex = 0x2f;
+	e->x = 0xa0;
+	e->y = 0xe;
+	e->w = 0x30;
+	e->h = 0x30;
+	e->u = kEquipZero;
+	e->v = kEquipZero;
+	e->scale = kEquipOne;
+	e->startFrame = 0;
+	e->duration = 5;
 
-	puVar12 = &GetEquipListStorage(this)->entries[iVar8 + 2];
-	puVar12->tex = 0x2f;
-	puVar12->w = 0x30;
-	puVar12->h = 0x30;
-	puVar12->x = 0xa5;
-	puVar12->y = 0x150 - puVar12->h;
-	puVar12->u = fVar2;
-	puVar12->v = fVar2;
-	puVar12->scale = fVar4;
-	puVar12->startFrame = 0;
-	puVar12->duration = 5;
+	e = &GetEquipListStorage(this)->entries[i++];
+	e->tex = 0x2f;
+	e->w = 0x30;
+	e->h = 0x30;
+	e->x = 0xa5;
+	e->y = 0x150 - e->h;
+	e->u = kEquipZero;
+	e->v = kEquipZero;
+	e->scale = kEquipSmallScale;
+	e->startFrame = 0;
+	e->duration = 5;
 
-	puVar12 = &GetEquipListStorage(this)->entries[iVar8 + 3];
-	puVar12->flags = 2;
-	puVar12->tex = 0x2e;
-	puVar12->x = 0xa0;
-	puVar12->y = 8;
-	puVar12->w = 0x48;
-	puVar12->h = 0x140;
-	puVar12->u = fVar2;
-	puVar12->v = fVar2;
-	puVar12->startFrame = 0;
-	puVar12->duration = 5;
+	e = &GetEquipListStorage(this)->entries[i++];
+	e->flags = 2;
+	e->tex = 0x2e;
+	e->x = 0xa0;
+	e->y = 8;
+	e->w = 0x48;
+	e->h = 0x140;
+	e->u = kEquipZero;
+	e->v = kEquipZero;
+	e->startFrame = 0;
+	e->duration = 5;
 
-	psVar10 = &GetEquipListStorage(this)->entries[GetEquipListStorage(this)->count];
-	for (iVar8 = 0; iVar8 < 4; iVar8++) {
-		psVar13 = &GetEquipListStorage(this)->entries[iVar9];
-		psVar13[0].flags = 2;
-		psVar13[0].tex = 0x37;
-		iVar9 = iVar9 + 2;
-		psVar13[0].x = psVar10->x + 0x24;
-		psVar13[0].y = psVar10->y + iVar11;
-		iVar11 = iVar11 + 0x20;
-		psVar13[0].w = 200;
-		psVar13[0].h = 0x28;
-		psVar13[0].u = fVar2;
-		psVar13[0].v = fVar2;
-		psVar13[0].startFrame = 7;
-		psVar13[0].duration = 5;
-
-		psVar13[1].flags = 2;
-		psVar13[1].tex = 0x37;
-		psVar13[1].x = psVar10->x + 0x24;
-		psVar13[1].y = psVar10->y + iVar11;
-		iVar11 = iVar11 + 0x20;
-		psVar13[1].w = 200;
-		psVar13[1].h = 0x28;
-		psVar13[1].u = fVar2;
-		psVar13[1].v = fVar2;
-		psVar13[1].startFrame = 7;
-		fVar3 = kEquipZero;
-		psVar13[1].duration = 5;
+	EquipOpenAnim* anchor = &GetEquipListStorage(this)->entries[GetEquipListStorage(this)->count];
+	for (int n = 0; n < 8; n++) {
+		e = &GetEquipListStorage(this)->entries[i];
+		e->flags = 2;
+		e->tex = 0x37;
+		e->x = anchor->x + 0x24;
+		e->y = anchor->y + yOff;
+		yOff += 0x20;
+		e->w = 200;
+		e->h = 0x28;
+		e->u = kEquipZero;
+		e->v = kEquipZero;
+		e->startFrame = 7;
+		e->duration = 5;
+		i++;
 	}
 
-	GetEquipListStorage(this)->listEnd = (short)iVar9;
-	uVar6 = (unsigned int)((int)GetEquipListStorage(this)->listEnd - (int)GetEquipListStorage(this)->count);
-	psVar10 = &GetEquipListStorage(this)->entries[GetEquipListStorage(this)->count];
-	fVar2 = kEquipZero;
-	if (0 < (int)uVar6) {
-		uVar15 = uVar6 >> 3;
-		if (uVar15 != 0) {
-			do {
-				psVar10[0].step = 0;
-				psVar10[0].alpha = fVar2;
-				psVar10[1].step = 0;
-				psVar10[1].alpha = fVar2;
-				psVar10[2].step = 0;
-				psVar10[2].alpha = fVar2;
-				psVar10[3].step = 0;
-				psVar10[3].alpha = fVar2;
-				psVar10[4].step = 0;
-				psVar10[4].alpha = fVar2;
-				psVar10[5].step = 0;
-				psVar10[5].alpha = fVar2;
-				psVar10[6].step = 0;
-				psVar10[6].alpha = fVar2;
-				psVar10[7].step = 0;
-				psVar10[7].alpha = fVar2;
-				psVar10 += 8;
-				uVar15 = uVar15 - 1;
-			} while (uVar15 != 0);
-			uVar6 = uVar6 & 7;
-			if (uVar6 == 0) {
-				return;
-			}
-		}
-		do {
-			psVar10->step = 0;
-			psVar10->alpha = fVar2;
-			psVar10++;
-			uVar6 = uVar6 - 1;
-		} while (uVar6 != 0);
+	GetEquipListStorage(this)->listEnd = i;
+	float fVar2 = kEquipZero;
+	int n = (int)GetEquipListStorage(this)->listEnd - (int)GetEquipListStorage(this)->count;
+	EquipOpenAnim* psVar10 = &GetEquipListStorage(this)->entries[GetEquipListStorage(this)->count];
+	for (int k = 0; k < n; k++) {
+		psVar10->step = 0;
+		psVar10->alpha = fVar2;
+		psVar10++;
 	}
 }

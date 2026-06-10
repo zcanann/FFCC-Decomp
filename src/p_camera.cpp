@@ -1508,9 +1508,10 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
     for (CGObject* gObject = CFlatRuntime2Storage().FindGObjFirst(); gObject != 0;
          gObject = CFlatRuntime2Storage().FindGObjNext(gObject))
     {
+        unsigned int displayFlags;
         bool include = false;
         if (gObject->m_charaModelHandle != 0) {
-            unsigned int displayFlags = gObject->m_displayFlags;
+            displayFlags = gObject->m_displayFlags;
             if ((displayFlags & 1) != 0 && (displayFlags & 0x40) == 0) {
                 if (static_cast<signed char>(
                         static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<signed char*>(

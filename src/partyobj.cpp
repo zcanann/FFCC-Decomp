@@ -4730,13 +4730,13 @@ void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 	}
 
 	CVector unused;
-	float flatLen = 0.0f;
 	int capturedCurrent = 0;
 	unsigned char* loopBase = CGPartyObj::m_ghostWork;
 	int& loopTrailIndex = *reinterpret_cast<int*>(loopBase + 0x4C);
 	unsigned char* leaderPtr = loopBase;
 
 	outDist = 0.0f;
+	float flatLen = 0.0f;
 	for (int i = 0; i < activeTrailCount; i++) {
 		if (loopTrailIndex <= i) {
 			Vec* nextPos;

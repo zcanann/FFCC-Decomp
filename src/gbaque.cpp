@@ -2644,7 +2644,6 @@ void GbaQueue::LoadMapObj()
 					float x = mapObj->m_x;
 					const float scale = kGbaQueueMapCoordScale;
 					unsigned int mask = 1U << count;
-					unsigned int clearMask = ~mask;
 					float y = mapObj->m_y;
 					float z = mapObj->m_z;
 					float r = mapObj->m_radius;
@@ -2656,7 +2655,7 @@ void GbaQueue::LoadMapObj()
 					mapObjWork.m_entries[count].m_radius = static_cast<short>((int)(r / scale));
 
 					unsigned int drawMask = mapObjWork.m_drawFlags;
-					drawMask = (drawMask & clearMask) | (mask & ((-drawFlag | drawFlag) >> 31));
+					drawMask = (drawMask & ~mask) | (mask & ((-drawFlag | drawFlag) >> 31));
 					mapObjWork.m_drawFlags = drawMask;
 					mapObjWork.m_count = static_cast<unsigned char>(count + 1);
 				}

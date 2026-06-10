@@ -912,7 +912,7 @@ void CMes::addString(char** text, int branchMode)
 	{
 		unsigned char* p = (unsigned char*)*text;
 		*text = (char*)(p + 1);
-		unsigned int uch = *p & 0xFFFF;
+		unsigned short uch = *p;
 
 		if (uch == 0)
 		{
@@ -928,7 +928,7 @@ void CMes::addString(char** text, int branchMode)
 		{
 			unsigned char* q = (unsigned char*)*text;
 			*text = (char*)(q + 1);
-			uch = (*q - 0xA0) & 0xFFFF;
+			uch = *q - 0xA0;
 		}
 
 		switch (uch)
@@ -1436,7 +1436,7 @@ void CMes::addString(char** text, int branchMode)
 		case 0x50:
 		case 0x52:
 		case 0x53:
-			uch = (uch - 0x48) & 0xFFFF;
+			uch = uch - 0x48;
 			goto renderTag;
 		case 0x54:
 		{
@@ -1460,7 +1460,7 @@ void CMes::addString(char** text, int branchMode)
 
 			GetRenderFlagBits(font->renderFlags).snapPosition = 1;
 			float width;
-			if ((unsigned short)uch < 0x20)
+			if (uch < 0x20)
 			{
 				width = kMesIconDefaultWidth;
 			}

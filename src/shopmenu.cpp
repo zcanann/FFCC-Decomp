@@ -3487,14 +3487,13 @@ void drawShapeSeq(int shapeNo, int groupNo, int x, int y, unsigned char alpha, u
     tagOAN3_SHAPE* shape =
         reinterpret_cast<tagOAN3_SHAPE*>(shapeData + *reinterpret_cast<short*>(shapeData + groupNo * 8 + 0x10));
 
+    _GXColor mat;
+    *reinterpret_cast<unsigned int*>(&mat) = gShopMenuMaterialWhiteBase;
+    mat.a = alpha;
+
     MaterialMan.SetDefaultStdDrawEnv(0xACE0F);
 
-    _GXColor amb;
-    *reinterpret_cast<unsigned int*>(&amb) = gShopMenuAmbientWhite;
-    GXSetChanAmbColor(GX_COLOR0A0, amb);
-
-    _GXColor mat;
-    *reinterpret_cast<unsigned int*>(&mat) = (gShopMenuMaterialWhiteBase & 0xFFFFFF00) | alpha;
+    GXSetChanAmbColor(GX_COLOR0A0, *reinterpret_cast<_GXColor*>(&gShopMenuAmbientWhite));
     GXSetChanMatColor(GX_COLOR0A0, mat);
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);

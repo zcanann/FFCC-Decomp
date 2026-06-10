@@ -874,6 +874,7 @@ static void OpenMogHintMessage(int messageId)
  */
 #pragma push
 #pragma opt_propagation off
+#pragma global_optimizer off
 void CChara::InitFurTexBuffer()
 {
 	MogFurState& fur = MogFur();

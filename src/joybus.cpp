@@ -2813,6 +2813,8 @@ int JoyBus::RecvGBA(ThreadParam* threadParam, unsigned int* recvBuffer)
     return 2;
 }
 
+extern const unsigned int kJoyBusCmdOpMask = 0x0000003F;
+
 /*
  * --INFO--
  * Address:	TODO
@@ -3095,9 +3097,13 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
 
                     SetSendQueue(&m_threadParams[threadParam->m_portIndex], resendCmd);
 
-                    OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-                    memset(&m_recvBuffer[threadParam->m_portIndex], 0, sizeof(m_recvBuffer[threadParam->m_portIndex]));
-                    OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+                    {
+                        const int port = threadParam->m_portIndex;
+                        OSSemaphore* sem = &m_accessSemaphores[port];
+                        OSWaitSemaphore(sem);
+                        memset(&m_recvBuffer[port], 0, sizeof(m_recvBuffer[port]));
+                        OSSignalSemaphore(sem);
+                    }
                 }
             }
         }
@@ -3117,17 +3123,17 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
         {
             OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
-            unsigned int newCount = 0;
+            extern const unsigned int kJoyBusCmdOpMask;
+            int newCount = 0;
 
             for (int i = 0; i < (int)m_cmdCount[threadParam->m_portIndex]; ++i)
             {
-                unsigned int cmd = m_cmdQueueData[threadParam->m_portIndex][i];
-                unsigned char op = static_cast<unsigned char>(cmd >> 24) & 0x3F;
+                unsigned char op = (unsigned char)(*(unsigned char*)&m_cmdQueueData[threadParam->m_portIndex][i] & kJoyBusCmdOpMask);
 
                 if (op == 0x0A || op == 0x10 || op == 0x14 ||
                     op == 0x1B || op == 0x13 || op == 0x09)
                 {
-                    m_recvQueueEntriesArr[threadParam->m_portIndex][newCount++] = cmd;
+                    m_recvQueueEntriesArr[threadParam->m_portIndex][newCount++] = m_cmdQueueData[threadParam->m_portIndex][i];
                 }
             }
 

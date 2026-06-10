@@ -3637,12 +3637,13 @@ void CMenuPcs::DrawDiaryBase(int page, float alpha)
     const bool widePage = (page == 0);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(widePage ? 0x35 : 0x3F));
 
+    int y0 = widePage ? 24 : 24;
     int frameH = widePage ? 0x180 : 0x150;
     MenuPcs.DrawRect(
-        0, 0.0f, 32.0f, 32.0f, static_cast<float>(frameH),
+        0, 0.0f, static_cast<float>(y0), 32.0f, static_cast<float>(frameH),
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     MenuPcs.DrawRect(
-        8, 608.0f, 32.0f, 32.0f, static_cast<float>(frameH),
+        8, 608.0f, static_cast<float>(y0), 32.0f, static_cast<float>(frameH),
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(widePage ? 0x36 : 0x40));
@@ -3653,7 +3654,7 @@ void CMenuPcs::DrawDiaryBase(int page, float alpha)
         }
 
         MenuPcs.DrawRect(
-            0, static_cast<float>(x), 32.0f, static_cast<float>(span), static_cast<float>(frameH),
+            0, static_cast<float>(x), static_cast<float>(y0), static_cast<float>(span), static_cast<float>(frameH),
             0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
         x += span;
     }

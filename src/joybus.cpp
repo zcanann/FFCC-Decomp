@@ -4196,6 +4196,7 @@ int JoyBus::SendMBase(ThreadParam* threadParam)
 int JoyBus::SendPpos(ThreadParam* threadParam)
 {
     int result = 0;
+    int cnt;
 
     unsigned char& state = threadParam->m_pposCounter;
     unsigned char* posBytes = m_playerPosPacketBuffer[threadParam->m_portIndex] + 2;
@@ -4223,7 +4224,8 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 
     case 1:
     {
-        int sent = m_pposWordIndex[threadParam->m_portIndex];
+        cnt = m_pposWordIndex[threadParam->m_portIndex];
+        int sent = cnt;
         unsigned int* wordPtr = &posWords[sent];
 
         while (sent < (int)(signed char)m_cmdBuffer[threadParam->m_portIndex])
@@ -4259,11 +4261,9 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
         m_pposWordIndex[threadParam->m_portIndex] = 0;
         m_cmdBuffer[4 + threadParam->m_portIndex] = 0;
 
-        int enemyCount;
+        GbaQue.GetEnemyPos(threadParam->m_portIndex, posWords, &cnt);
 
-        GbaQue.GetEnemyPos(threadParam->m_portIndex, posWords, &enemyCount);
-
-        m_cmdBuffer[4 + threadParam->m_portIndex] = (unsigned char)enemyCount;
+        m_cmdBuffer[4 + threadParam->m_portIndex] = (unsigned char)cnt;
 
         // If there are no enemies, skip straight to treasure (state 4)
         if (static_cast<signed char>(m_cmdBuffer[4 + threadParam->m_portIndex]) == 0)

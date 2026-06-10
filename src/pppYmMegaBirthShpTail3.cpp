@@ -70,12 +70,12 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
     const s32 particleDataOffset = serializedOffsets->m_workOffset;
     u8* workBytes = object->m_workArea + particleDataOffset;
     VColor* colorWork = (VColor*)(object->m_workArea + colorOffset);
-    _PARTICLE_DATA* particles = *(_PARTICLE_DATA**)(workBytes + 0x3c);
+    u8* particle = *(u8**)(workBytes + 0x3c);
     _PARTICLE_COLOR* colors = *(_PARTICLE_COLOR**)(workBytes + 0x44);
     _PARTICLE_WMAT* wmats = *(_PARTICLE_WMAT**)(workBytes + 0x40);
     s8 hasRequiredMemory;
 
-    if (particles == 0) {
+    if (particle == 0) {
         hasRequiredMemory = false;
     } else if (wmats == 0) {
         hasRequiredMemory = false;
@@ -94,11 +94,10 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
         static_cast<pppShapeAnimData*>(ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex]->m_animData);
     pppSetDrawEnv(
         0, &object->m_drawMatrix, *(float*)(payload + 0xA0), payload[0xA4], step[0x0C],
-        payload[0x58], 0, (u8)(((u32)__cntlzw((u32)payload[0x55])) >> 5), 1, 0);
+        payload[0x58], 0, ((u32)__cntlzw((u32)payload[0x55])) >> 5, 1, 0);
     pppSetBlendMode(payload[0x58]);
 
     for (u32 i = 0; i < *(u32*)(workBytes + 0x48); i++) {
-        u8* particle = (u8*)particles + i * 0x1F8;
         if (*(u16*)(particle + 0x22) != 0) {
             const u32 frameCountRaw = *(u16*)(payload + 0x9C);
                 u32 frameCount = frameCountRaw;
@@ -122,7 +121,8 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                 float fadeG = (float)(*(s16*)(workBytes + 0x52) >> 7);
                 float fadeB = (float)(*(s16*)(workBytes + 0x54) >> 7);
                 float fadeA = (float)(*(s16*)(workBytes + 0x56) >> 7) * alphaScale;
-                const float fadeANum = fadeA - (float)(*(s16*)(workBytes + 0x5e) >> 7) * alphaScale;
+                const float fadeAEnd = (float)(*(s16*)(workBytes + 0x5e) >> 7) * alphaScale;
+                const float fadeANum = fadeA - fadeAEnd;
                 const s32 trailReadIndex = *(u8*)(particle + 0x38);
                 const float fadeRNum = fadeR - (float)(*(s16*)(workBytes + 0x58) >> 7);
                 const float fadeGNum = fadeG - (float)(*(s16*)(workBytes + 0x5a) >> 7);
@@ -314,6 +314,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
             colors = colors + 1;
         }
         *(u16*)(particle + 0x1C) += *(s32*)(step + 0x8);
+        particle += 0x1F8;
     }
 }
 

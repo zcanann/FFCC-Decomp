@@ -165,16 +165,14 @@ static inline void freeStageBlock(void* ptr)
         block->m_flags = static_cast<unsigned char>(block->m_flags & ~kMemoryBlockUsedFlag);
 
         if ((block->m_next->m_flags & kMemoryBlockUsedFlag) == 0) {
-            block->m_size =
-                block->m_size + sizeof(CMemory::CStage::CBlock) + block->m_next->m_size;
+            block->m_size += block->m_next->m_size + sizeof(CMemory::CStage::CBlock);
             block->m_next->m_next->m_prev = block;
             block->m_next = block->m_next->m_next;
         }
 
         CMemory::CStage::CBlock* prevBlock = block->m_prev;
         if ((prevBlock->m_flags & kMemoryBlockUsedFlag) == 0) {
-            prevBlock->m_size =
-                prevBlock->m_size + sizeof(CMemory::CStage::CBlock) + block->m_size;
+            prevBlock->m_size += block->m_size + sizeof(CMemory::CStage::CBlock);
             block->m_prev->m_next = block->m_next;
             block->m_next->m_prev = block->m_prev;
         }
@@ -216,13 +214,18 @@ static inline int stageHasUnfreedBlocks(CMemory::CStage* stage)
     return found;
 }
 
+static inline void releaseStageBuffer(unsigned int ptr)
+{
+    if (ptr != 0) {
+        operator delete[](reinterpret_cast<void*>(ptr - 0x10));
+    }
+}
+
 static inline void stageReleaseMode2Buffer(CMemory::CStage* stage)
 {
     unsigned int ptr = static_cast<unsigned int>(stageGetHeapHead(stage));
     if (ptr != 0) {
-        if (ptr != 0x10) {
-            operator delete[](reinterpret_cast<void*>(ptr - 0x10));
-        }
+        releaseStageBuffer(ptr);
         stageSetHeapHead(stage, 0);
     }
 }

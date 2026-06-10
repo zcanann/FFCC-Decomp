@@ -1792,18 +1792,22 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		}
 
 		if (damageClamp != 0) {
-			damageAmount = (damageAmount < 2) ? 0 : 1;
+			if (damageAmount <= 1) {
+				damageAmount = 0;
+			} else {
+				damageAmount = 1;
+			}
 		}
 
 		if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD &&
 		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 4) != 0 &&
-		    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x52) == 0 && damageAmount < 1) {
-			damageAmount = 1;
+		    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x52) == 0) {
+			damageAmount = (damageAmount >= 1) ? 1 : damageAmount;
 		}
 		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x76) == 0 && (static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD &&
 		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 1) != 0 &&
-		    staType != 0x1C && damageAmount < 1) {
-			damageAmount = 1;
+		    staType != 0x1C) {
+			damageAmount = (damageAmount >= 1) ? 1 : damageAmount;
 		}
 		CGCharaObj* sourceChara = reinterpret_cast<CGCharaObj*>(sourceObj);
 		if ((static_cast<unsigned short>(sourceObj->GetCID()) & 0x2D) == 0x2D && sourceChara->m_comboItemState >= 0 &&

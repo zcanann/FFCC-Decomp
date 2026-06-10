@@ -460,13 +460,13 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             if (parentIdx == -1) {
                 m_parent = 0;
             } else {
-                m_parent = MapMng.GetMapObjArray() + parentIdx;
+                m_parent = &MapMng.m_mapObjArray[parentIdx];
             }
 
             if (meshOrHitIdx == -1) {
                 m_mapData = 0;
             } else if (m_mapDataType == 1) {
-                m_mapData = MapMng.GetMapMeshArray() + meshOrHitIdx;
+                m_mapData = &MapMng.m_mapMeshArray[meshOrHitIdx];
                 m_baseDrawPriority = 0;
                 m_drawPriority = 0;
             } else if ((m_mapDataType == 2) || (m_mapDataType == 3)) {
@@ -631,7 +631,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                         chunkFile.GetF4();
                         spotLight->m_falloff = chunkFile.GetF4();
                         unsigned short targetIndex = chunkFile.Get2();
-                        spotLight->m_target = MapMng.m_mapObjArray + targetIndex;
+                        spotLight->m_target = &MapMng.m_mapObjArray[targetIndex];
                         spotLight->m_colorMode = chunkFile.Get1();
                         spotLight->m_useAltColor = chunkFile.Get1();
                         spotLight->m_angle = chunkFile.GetF4();
@@ -705,7 +705,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 chunkFile.GetF4();
                 spotLight->m_falloff = chunkFile.GetF4();
                 unsigned short targetIndex = chunkFile.Get2();
-                spotLight->m_target = MapMng.m_mapObjArray + targetIndex;
+                spotLight->m_target = &MapMng.m_mapObjArray[targetIndex];
                 spotLight->m_colorMode = chunkFile.Get1();
                 spotLight->m_useAltColor = chunkFile.Get1();
                 spotLight->m_angle = chunkFile.GetF4();
@@ -730,7 +730,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 chunkFile.GetF4();
                 spotLight->m_falloff = chunkFile.GetF4();
                 unsigned short targetIndex = chunkFile.Get2();
-                spotLight->m_target = MapMng.m_mapObjArray + targetIndex;
+                spotLight->m_target = &MapMng.m_mapObjArray[targetIndex];
                 spotLight->m_colorMode = chunkFile.Get1();
                 spotLight->m_useAltColor = chunkFile.Get1();
                 spotLight->m_angle = kMapObjDefaultAngle;
@@ -773,9 +773,9 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
 
             if (chunk.m_version == 4) {
                 shadow->m_materialIndex = static_cast<unsigned short>(chunkFile.Get4());
-                shadow->m_modelA = MapMng.m_mapObjArray + chunkFile.Get2();
-                shadow->m_modelB = MapMng.m_mapObjArray + chunkFile.Get2();
-                shadow->m_modelC = MapMng.m_mapObjArray + chunkFile.Get2();
+                shadow->m_modelA = &MapMng.m_mapObjArray[chunkFile.Get2()];
+                shadow->m_modelB = &MapMng.m_mapObjArray[chunkFile.Get2()];
+                shadow->m_modelC = &MapMng.m_mapObjArray[chunkFile.Get2()];
                 shadow->m_useFrustum = chunkFile.Get1();
                 shadow->m_shadowMaterialType = chunkFile.Get1();
                 shadow->m_targetEnabled[1] = (chunkFile.Get1() == 0);
@@ -796,9 +796,9 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 shadow->m_targetBounds[0].m_max.z = chunkFile.GetF4();
             } else if (chunk.m_version == 3) {
                 shadow->m_materialIndex = static_cast<unsigned short>(chunkFile.Get4());
-                shadow->m_modelA = MapMng.m_mapObjArray + chunkFile.Get2();
-                shadow->m_modelB = MapMng.m_mapObjArray + chunkFile.Get2();
-                shadow->m_modelC = MapMng.m_mapObjArray + chunkFile.Get2();
+                shadow->m_modelA = &MapMng.m_mapObjArray[chunkFile.Get2()];
+                shadow->m_modelB = &MapMng.m_mapObjArray[chunkFile.Get2()];
+                shadow->m_modelC = &MapMng.m_mapObjArray[chunkFile.Get2()];
                 shadow->m_useFrustum = chunkFile.Get1();
                 shadow->m_shadowMaterialType = chunkFile.Get1();
                 chunkFile.Get1();

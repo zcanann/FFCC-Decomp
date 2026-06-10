@@ -165,11 +165,10 @@ void GbaQueue::Init()
 {
 	int i;
 	char* obj = reinterpret_cast<char*>(this);
-	GbaQueueSetQueueView* queue = GetSetQueueView(this);
 
-	memset(queue->m_queue, 0, sizeof(queue->m_queue));
-	memset(queue->m_queueCount, 0, sizeof(queue->m_queueCount));
-	memset(queue->m_queueFull, 0, sizeof(queue->m_queueFull));
+	memset(m_queue, 0, sizeof(m_queue));
+	memset(m_queueCount, 0, sizeof(m_queueCount));
+	memset(m_queueFull, 0, sizeof(m_queueFull));
 	memset(GetPlayerDataBlock(this), 0, kGbaQueuePlayerDataBlockBytes);
 	memset(obj + 0x7C4, 0, kGbaQueuePlayerDataBlockBytes);
 	memset(obj + 0xB34, 0, kGbaQueueEnemyDataBytes);
@@ -178,7 +177,7 @@ void GbaQueue::Init()
 	memset(obj + 0x2574, 0, kGbaQueueMapItemHistoryBlockBytes);
 	memset(obj + 0x2A74, 0, kGbaQueueCaravanNameBlockBytes);
 	memset(&m_mapObjWork, 0, sizeof(GbaQueueMapObjWork));
-	memset(&m_sendMask, 0, 8);
+	memset(m_sendMask, 0, 8);
 	memset(cmakeInfo, 0, sizeof(cmakeInfo));
 	memset(m_hitInfo, 0xFF, sizeof(m_hitInfo));
 
@@ -343,9 +342,9 @@ void GbaQueue::LoadAll()
 		} else {
 			OSWaitSemaphore(accessSemaphores + i);
 			{
-				unsigned short maskValue = *reinterpret_cast<short*>(Game.m_scriptFoodBase[i] + 0x89C);
-				if ((maskValue != m_sendMask) && (Joybus.SendMask(i, maskValue) == 0)) {
-					m_sendMask = maskValue;
+				unsigned short maskValue = *reinterpret_cast<int*>(Game.m_scriptFoodBase[i] + 0x89C);
+				if ((maskValue != m_sendMask[i]) && (Joybus.SendMask(i, maskValue) == 0)) {
+					m_sendMask[i] = maskValue;
 					m_maskSendState[i] = 6;
 				}
 			}
@@ -526,8 +525,8 @@ void GbaQueue::LoadMask()
 		OSWaitSemaphore(accessSemaphores + i);
 		{
 			unsigned short maskValue = *reinterpret_cast<unsigned short*>(scriptFoodBase[i] + 0x89C);
-			if ((maskValue != m_sendMask) && (Joybus.SendMask(i, maskValue) == 0)) {
-				m_sendMask = maskValue;
+			if ((maskValue != m_sendMask[i]) && (Joybus.SendMask(i, maskValue) == 0)) {
+				m_sendMask[i] = maskValue;
 				m_maskSendState[i] = 6;
 			}
 		}
@@ -587,6 +586,80 @@ void GbaQueue::ResetQueue()
 
 /*
  * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+inline void GbaQueue::ChgItemData(int channel, unsigned int data)
+{
+	unsigned char* dataBytes = reinterpret_cast<unsigned char*>(&data);
+	const int action = dataBytes[1];
+
+	if (action == 1) {
+		reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->FGUseItem(dataBytes[2], 1);
+	} else if (action == 2) {
+		reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->FGPutItem(dataBytes[2], 1);
+	} else if (action == 3) {
+		reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->DeleteItemIdx(dataBytes[2], 1);
+	}
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+inline void GbaQueue::ChgMoneyData(int channel, unsigned int data)
+{
+	unsigned char* dataBytes = reinterpret_cast<unsigned char*>(&data);
+
+	if (Game.m_scriptFoodBase[channel] == 0) {
+		Joybus.SendResult(channel, 1, dataBytes[0], dataBytes[1]);
+	} else if ((dataBytes[0] >> 6) == 0) {
+		m_moneyState[channel] = dataBytes[1] | 0x80;
+		m_pendingMoney[channel] = dataBytes[2] << 24;
+		m_pendingMoney[channel] |= dataBytes[3] << 16;
+	} else if (m_moneyState[channel] == 0) {
+		Joybus.SendResult(channel, 1, dataBytes[0], dataBytes[1]);
+	} else {
+		m_pendingMoney[channel] |= dataBytes[1] << 8;
+		m_pendingMoney[channel] |= dataBytes[2];
+		Joybus.SendResult(channel, 0, dataBytes[0], m_moneyState[channel] & 7);
+		if ((m_moneyState[channel] & 7) == 1) {
+			reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->FGPutGil(m_pendingMoney[channel]);
+		}
+		m_pendingMoney[channel] = 0;
+		m_moneyState[channel] = 0;
+	}
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+inline void GbaQueue::ChgEquipPosData(int channel, unsigned int data)
+{
+	unsigned char* dataBytes = reinterpret_cast<unsigned char*>(&data);
+
+	reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])
+		->ChgEquipPos(static_cast<signed char>(dataBytes[1]), static_cast<signed char>(dataBytes[2]));
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+inline void GbaQueue::ChgCmdLstData(int channel, unsigned int data)
+{
+	unsigned char* dataBytes = reinterpret_cast<unsigned char*>(&data);
+
+	reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])
+		->ChgCmdLst(dataBytes[1], static_cast<short>(SwapU16(*reinterpret_cast<short*>(dataBytes + 2))));
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800CFF38
  * PAL Size: 2972b
  * EN Address: TODO
@@ -596,324 +669,238 @@ void GbaQueue::ResetQueue()
  */
 void GbaQueue::ExecutQueue()
 {
-	unsigned int localQueueData[4][64];
+	unsigned int localQueueData[4][0x40];
 	int localQueueCount[4];
-	GbaQueueSetQueueView* queue = GetSetQueueView(this);
-	char* obj;
-
 	int channel;
 
 	for (channel = 0; channel < 4; channel++) {
 		OSWaitSemaphore(accessSemaphores + channel);
 	}
 
-	memcpy(localQueueData, queue->m_queue, sizeof(localQueueData));
-	memcpy(localQueueCount, queue->m_queueCount, sizeof(localQueueCount));
-	memset(queue->m_queue, 0, sizeof(localQueueData));
-	memset(queue->m_queueCount, 0, sizeof(localQueueCount));
+	memcpy(localQueueData, m_queue, sizeof(localQueueData));
+	memcpy(localQueueCount, m_queueCount, sizeof(localQueueCount));
+	memset(m_queue, 0, sizeof(localQueueData));
+	memset(m_queueCount, 0, sizeof(localQueueCount));
 
 	for (channel = 0; channel < 4; channel++) {
 		OSSignalSemaphore(accessSemaphores + channel);
 	}
 
-	obj = reinterpret_cast<char*>(this);
-
 	for (channel = 0; channel < 4; channel++) {
-		if (queue->m_queueFull[channel] != 0) {
+		if (m_queueFull[channel] != 0) {
 			continue;
 		}
 
 		{
-		const unsigned int playerBit = (1U << channel);
-		const unsigned int shopBit = (0x10U << channel);
-		unsigned int* queueWords = localQueueData[channel];
-		int queueCount = localQueueCount[channel];
-		CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
-		int i;
+			const int playerBit = 1 << channel;
+			const int shopBit = 0x10 << channel;
+			unsigned int* queueWords = localQueueData[channel];
+			int i;
 
-		for (i = 0; i < queueCount; i++) {
-			int cmd = static_cast<int>(reinterpret_cast<const unsigned char*>(&queueWords[i])[0] & 0x3F);
+			for (i = 0; i < localQueueCount[channel]; i++) {
+				unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&queueWords[i]);
+				int cmd = cmdBytes[0] & 0x3F;
 
-			if (cmd == 0x17) {
-				if (caravanWork != 0) {
-					unsigned int cmdWord = queueWords[i];
-					const unsigned char* cmdBytes = reinterpret_cast<const unsigned char*>(&cmdWord);
-					const int action = cmdBytes[1];
-					const int itemIdx = cmdBytes[2];
-					if (action == 1) {
-						caravanWork->FGUseItem(itemIdx, 1);
-					} else if (action == 2) {
-						caravanWork->FGPutItem(itemIdx, 1);
-					} else if (action == 3) {
-						caravanWork->DeleteItemIdx(itemIdx, 1);
+				if (cmd == 0x17) {
+					if (Game.m_scriptFoodBase[channel] != 0) {
+						ChgItemData(channel, queueWords[i]);
 					}
-				}
-			} else if (cmd == 0x1A) {
-				if (caravanWork != 0) {
-					unsigned int cmdWord = queueWords[i];
-					const signed char p0 = static_cast<signed char>(cmdWord >> 24);
-					const signed char p1 = static_cast<unsigned char>(cmdWord >> 16);
-					const signed char p2 = static_cast<unsigned char>(cmdWord >> 8);
-					const signed char p3 = static_cast<unsigned char>(cmdWord);
-
-					if ((static_cast<int>(p0) >> 6) == 0) {
-						m_moneyState[channel] = static_cast<unsigned char>(p1 | 0x80);
-						m_pendingMoney[channel] = static_cast<unsigned int>(p2) << 24;
-						m_pendingMoney[channel] |= static_cast<unsigned int>(p3) << 16;
-					} else if (m_moneyState[channel] == 0) {
-						Joybus.SendResult(channel, 1, p0, p1);
-					} else {
-						m_pendingMoney[channel] |= static_cast<unsigned int>(p1) << 8;
-						m_pendingMoney[channel] |= p2;
-						Joybus.SendResult(channel, 0, p0, m_moneyState[channel] & 7);
-						if ((m_moneyState[channel] & 7) == 1) {
-							caravanWork->FGPutGil(m_pendingMoney[channel]);
-						}
-						m_pendingMoney[channel] = 0;
-						m_moneyState[channel] = 0;
+				} else if (cmd == 0x1A) {
+					if (Game.m_scriptFoodBase[channel] != 0) {
+						ChgMoneyData(channel, queueWords[i]);
 					}
-				}
-			} else if (cmd == 0x1E) {
-				if (caravanWork != 0) {
-					unsigned int cmdWord = queueWords[i];
-					const int equipType = static_cast<signed char>(cmdWord >> 16);
-					const int equipItem = static_cast<signed char>(cmdWord >> 8);
-					caravanWork->ChgEquipPos(equipType, equipItem);
-				}
-			} else if (cmd == 0x1F) {
-				if (caravanWork != 0) {
-					unsigned int cmdWord = queueWords[i];
-					unsigned short cmdListData = static_cast<unsigned short>((cmdWord << 8) | ((cmdWord >> 8) & 0xFF));
-					caravanWork->ChgCmdLst(static_cast<unsigned char>(cmdWord >> 16), static_cast<short>(cmdListData));
-				}
-			} else if (cmd == 0x0C) {
-				unsigned int cmdWord = queueWords[i];
-				const unsigned char* cmdBytes = reinterpret_cast<const unsigned char*>(&cmdWord);
-				const unsigned char request = cmdBytes[2];
-				if (caravanWork != 0) {
-					if (request == 3) {
-						OSWaitSemaphore(accessSemaphores + channel);
-						obj[0x2CCA] = static_cast<char>(obj[0x2CCA] & ~static_cast<unsigned char>(playerBit));
-						OSSignalSemaphore(accessSemaphores + channel);
-						Joybus.SetLetterSize(channel, 0);
-						char* letterBuf = Joybus.GetLetterBuffer(channel);
-						MakeLetterList(channel, letterBuf);
-					} else if (request == 2) {
-						OSWaitSemaphore(accessSemaphores + channel);
-						obj[0x2CCA] = static_cast<char>(obj[0x2CCA] & ~static_cast<unsigned char>(playerBit));
-						OSSignalSemaphore(accessSemaphores + channel);
-						Joybus.SetLetterSize(channel, 0);
-						caravanWork->FGLetterOpen(cmdBytes[3]);
-						char* letterBuf = Joybus.GetLetterBuffer(channel);
-						MakeLetterData(channel, letterBuf, cmdBytes[3]);
-					} else if (request == 6) {
-						OSWaitSemaphore(accessSemaphores + channel);
-						obj[0x2CCA] = static_cast<char>(obj[0x2CCA] & ~static_cast<unsigned char>(playerBit));
-						OSSignalSemaphore(accessSemaphores + channel);
-						Joybus.SetLetterSize(channel, 0);
-						char* letterBuf = Joybus.GetLetterBuffer(channel);
-						MakeSellData(channel, letterBuf);
-					} else if (request == 7) {
-						OSWaitSemaphore(accessSemaphores + channel);
-						obj[0x2CCA] = static_cast<char>(obj[0x2CCA] & ~static_cast<unsigned char>(playerBit));
-						OSSignalSemaphore(accessSemaphores + channel);
-						Joybus.SetLetterSize(channel, 0);
-						char* letterBuf = Joybus.GetLetterBuffer(channel);
-						MakeBuyData(channel, letterBuf);
-					} else if (request == 8) {
-						OSWaitSemaphore(accessSemaphores + channel);
-						obj[0x2CCA] = static_cast<char>(obj[0x2CCA] & ~static_cast<unsigned char>(playerBit));
-						OSSignalSemaphore(accessSemaphores + channel);
-						Joybus.SetLetterSize(channel, 0);
-						char* letterBuf = Joybus.GetLetterBuffer(channel);
-						MakeSmithData(channel, letterBuf);
-					} else if (request == 9) {
-						OSWaitSemaphore(accessSemaphores + channel);
-						obj[0x2CCA] = static_cast<char>(obj[0x2CCA] & ~static_cast<unsigned char>(playerBit));
-						OSSignalSemaphore(accessSemaphores + channel);
-						Joybus.SetLetterSize(channel, 0);
-						char* letterBuf = Joybus.GetLetterBuffer(channel);
-						MakeArtiData(channel, letterBuf);
+				} else if (cmd == 0x1E) {
+					if (Game.m_scriptFoodBase[channel] != 0) {
+						ChgEquipPosData(channel, queueWords[i]);
 					}
-				}
-			} else if (cmd == 0x14) {
-				unsigned int cmdWord = queueWords[i];
-				const unsigned char* cmdBytes = reinterpret_cast<const unsigned char*>(&cmdWord);
-				const unsigned char request = cmdBytes[2];
-				if (request == 0 || request == 1) {
-					if (caravanWork != 0) {
-						MoveLetterItem(channel, cmdWord);
+				} else if (cmd == 0x1F) {
+					if (Game.m_scriptFoodBase[channel] != 0) {
+						ChgCmdLstData(channel, queueWords[i]);
 					}
-				} else if (request == 2) {
-					ChkCMakeCharaType(channel, cmdWord);
-				} else if (request == 3) {
-					ChkCMakeJob(channel, cmdWord);
-				} else if (request == 4 || request == 5) {
-					signed char status = cmdBytes[1];
-					int retry;
-					for (retry = 0; retry < 10; retry++) {
-						if (Joybus.SetMType(channel, 4) == 0) {
-							break;
+				} else if (cmd == 0x0C) {
+					if (Game.m_scriptFoodBase[channel] != 0) {
+						if (cmdBytes[1] == 3) {
+							OSWaitSemaphore(accessSemaphores + channel);
+							m_letterDatFlg &= ~playerBit;
+							OSSignalSemaphore(accessSemaphores + channel);
+							Joybus.SetLetterSize(channel, 0);
+							MakeLetterList(channel, Joybus.GetLetterBuffer(channel));
+						} else if (cmdBytes[1] == 2) {
+							OSWaitSemaphore(accessSemaphores + channel);
+							m_letterDatFlg &= ~playerBit;
+							OSSignalSemaphore(accessSemaphores + channel);
+							Joybus.SetLetterSize(channel, 0);
+							reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->FGLetterOpen(cmdBytes[2]);
+							MakeLetterData(channel, Joybus.GetLetterBuffer(channel), cmdBytes[2]);
+						} else if (cmdBytes[1] == 6) {
+							OSWaitSemaphore(accessSemaphores + channel);
+							m_letterDatFlg &= ~playerBit;
+							OSSignalSemaphore(accessSemaphores + channel);
+							Joybus.SetLetterSize(channel, 0);
+							MakeSellData(channel, Joybus.GetLetterBuffer(channel));
+						} else if (cmdBytes[1] == 7) {
+							OSWaitSemaphore(accessSemaphores + channel);
+							m_letterDatFlg &= ~playerBit;
+							OSSignalSemaphore(accessSemaphores + channel);
+							Joybus.SetLetterSize(channel, 0);
+							MakeBuyData(channel, Joybus.GetLetterBuffer(channel));
+						} else if (cmdBytes[1] == 8) {
+							OSWaitSemaphore(accessSemaphores + channel);
+							m_letterDatFlg &= ~playerBit;
+							OSSignalSemaphore(accessSemaphores + channel);
+							Joybus.SetLetterSize(channel, 0);
+							MakeSmithData(channel, Joybus.GetLetterBuffer(channel));
+						} else if (cmdBytes[1] == 9) {
+							OSWaitSemaphore(accessSemaphores + channel);
+							m_letterDatFlg &= ~playerBit;
+							OSSignalSemaphore(accessSemaphores + channel);
+							Joybus.SetLetterSize(channel, 0);
+							MakeArtiData(channel, Joybus.GetLetterBuffer(channel));
 						}
 					}
-					if (retry >= 10) {
-						status = 4;
-					}
-					if (status == 4) {
-						MenuPcs.ClrCMakeFlg(channel);
-					} else if (status == 5) {
-						MenuPcs.SetCMakeEnd(channel);
-					}
-				} else if (request == 6) {
-					OSWaitSemaphore(accessSemaphores + channel);
-					unsigned int cmakeOffset = channel * sizeof(GbaCMakeInfo);
-					obj[0x2CCB + cmakeOffset] = static_cast<char>(cmdBytes[2]);
-					obj[0x2CCC + cmakeOffset] = static_cast<char>(cmdBytes[3]);
-					OSSignalSemaphore(accessSemaphores + channel);
-					Joybus.SendResult(channel, 0, cmdBytes[1], 0);
-				} else if (request == 7) {
-					OSWaitSemaphore(accessSemaphores + channel);
-					m_shopFlags = static_cast<unsigned char>(m_shopFlags & ~static_cast<unsigned char>(playerBit));
-					m_shopStatusFlags = static_cast<unsigned char>(m_shopStatusFlags & ~static_cast<unsigned char>(playerBit));
-					OSSignalSemaphore(accessSemaphores + channel);
-					for (int retry = 0; retry < 10; retry++) {
-						if (Joybus.SetMType(channel, 0) == 0) {
-							break;
+				} else if (cmd == 0x14) {
+					if (cmdBytes[1] == 0 || cmdBytes[1] == 1) {
+						if (Game.m_scriptFoodBase[channel] != 0) {
+							MoveLetterItem(channel, queueWords[i]);
 						}
-					}
-					if (caravanWork != 0) {
-						caravanWork->CallShop(0, 0, 0, 0, 0);
-					}
-				} else if (request == 8) {
-					if (caravanWork != 0) {
-						const int itemIdx = cmdBytes[2];
-						const short itemId = caravanWork->m_inventoryItems[itemIdx];
-						caravanWork->DeleteItemIdx(itemIdx, 1);
-						const unsigned short baseGil =
-							*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + static_cast<int>(itemId) * 0x48 + 0x20);
-						int gil = static_cast<int>(
-							static_cast<float>(static_cast<double>(caravanWork->m_shopParam) / 100.0) * 0.25f * static_cast<float>(baseGil));
-						if (gil < 1) {
-							gil = 1;
-						}
-						caravanWork->AddGil(gil);
-						Joybus.SendResult(channel, 0, cmdBytes[0], cmdBytes[1]);
-					}
-				} else if (request == 9) {
-					if (caravanWork != 0) {
-						const unsigned int quantity = cmdBytes[3];
-						const int shopIndex = cmdBytes[2];
-						int shopItem = caravanWork->m_shopList[shopIndex];
-						for (unsigned int n = 0; n < quantity; n++) {
-							if (caravanWork->AddItem(shopItem, 0) == 0) {
-								Joybus.SendResult(channel, 1, cmdBytes[0], cmdBytes[1]);
+					} else if (cmdBytes[1] == 2) {
+						ChkCMakeCharaType(channel, queueWords[i]);
+					} else if (cmdBytes[1] == 3) {
+						ChkCMakeJob(channel, queueWords[i]);
+					} else if (cmdBytes[1] == 4 || cmdBytes[1] == 5) {
+						unsigned int cmdWord = queueWords[i];
+						unsigned char* bytes = reinterpret_cast<unsigned char*>(&cmdWord);
+						int retry;
+						for (retry = 0; retry < 10; retry++) {
+							if (Joybus.SetMType(channel, 4) == 0) {
+								break;
 							}
 						}
-						const unsigned short baseGil =
-							*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + static_cast<short>(shopItem) * 0x48 + 0x20);
-						const int gil =
-							static_cast<int>(static_cast<float>(static_cast<double>(caravanWork->m_shopParam) / 100.0) * static_cast<float>(baseGil));
-						caravanWork->AddGil(-static_cast<int>(gil * quantity));
-						Joybus.SendResult(channel, 0, cmdBytes[0], cmdBytes[1]);
-					}
-				} else if (request == 10) {
-					if (caravanWork != 0) {
-						SetSmithData(channel, cmdWord);
-					}
-				} else if (request == 0x0B) {
-					OSWaitSemaphore(accessSemaphores + channel);
-					m_shopFlags = static_cast<unsigned char>(m_shopFlags & ~static_cast<unsigned char>(shopBit));
-					m_shopStatusFlags = static_cast<unsigned char>(m_shopStatusFlags & ~static_cast<unsigned char>(shopBit));
-					OSSignalSemaphore(accessSemaphores + channel);
-					for (int retry = 0; retry < 10; retry++) {
-						if (Joybus.SetMType(channel, 0) == 0) {
-							break;
+						if (retry >= 10) {
+							bytes[1] = 4;
+						}
+						if (bytes[1] == 4) {
+							MenuPcs.ClrCMakeFlg(channel);
+						} else if (bytes[1] == 5) {
+							MenuPcs.SetCMakeEnd(channel);
+						}
+					} else if (cmdBytes[1] == 6) {
+						unsigned int cmdWord = queueWords[i];
+						unsigned char* bytes = reinterpret_cast<unsigned char*>(&cmdWord);
+						OSWaitSemaphore(accessSemaphores + channel);
+						cmakeInfo[channel].m_favoriteLead[0] = bytes[2];
+						cmakeInfo[channel].m_favoriteLead[1] = bytes[3];
+						OSSignalSemaphore(accessSemaphores + channel);
+						Joybus.SendResult(channel, 0, bytes[1], 0);
+					} else if (cmdBytes[1] == 7) {
+						OSWaitSemaphore(accessSemaphores + channel);
+						m_shopFlags &= ~playerBit;
+						m_shopStatusFlags &= ~playerBit;
+						OSSignalSemaphore(accessSemaphores + channel);
+						for (int retry = 0; retry < 10; retry++) {
+							if (Joybus.SetMType(channel, 0) == 0) {
+								break;
+							}
+						}
+						reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->CallShop(0, 0, 0, 0, 0);
+					} else if (cmdBytes[1] == 8) {
+						if (Game.m_scriptFoodBase[channel] != 0) {
+							unsigned int cmdWord = queueWords[i];
+							unsigned char* bytes = reinterpret_cast<unsigned char*>(&cmdWord);
+							const short itemId =
+								reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_inventoryItems[bytes[2]];
+							reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->DeleteItemIdx(bytes[2], 1);
+							const unsigned short baseGil =
+								*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x20);
+							int gil = static_cast<int>(
+								static_cast<float>(
+									static_cast<double>(reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_shopParam) / 100.0)
+								* 0.25f * static_cast<float>(baseGil));
+							if (gil < 1) {
+								gil = 1;
+							}
+							reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->AddGil(gil);
+							Joybus.SendResult(channel, 0, bytes[0], bytes[1]);
+						}
+					} else if (cmdBytes[1] == 9) {
+						if (Game.m_scriptFoodBase[channel] != 0) {
+							unsigned int cmdWord = queueWords[i];
+							unsigned char* bytes = reinterpret_cast<unsigned char*>(&cmdWord);
+							int n;
+							const int quantity = bytes[3];
+							int shopItem = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_shopList[bytes[2]];
+							for (n = 0; n < quantity; n++) {
+								if (!reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->AddItem(shopItem, 0)) {
+									Joybus.SendResult(channel, 1, bytes[0], bytes[1]);
+								}
+							}
+							const unsigned short baseGil =
+								*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + shopItem * 0x48 + 0x20);
+							const int gil = static_cast<int>(
+								static_cast<float>(
+									static_cast<double>(reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_shopParam) / 100.0)
+								* static_cast<float>(baseGil));
+							reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->AddGil(-(gil * quantity));
+							Joybus.SendResult(channel, 0, bytes[0], bytes[1]);
+						}
+					} else if (cmdBytes[1] == 10) {
+						if (Game.m_scriptFoodBase[channel] != 0) {
+							SetSmithData(channel, queueWords[i]);
+						}
+					} else if (cmdBytes[1] == 0x0B) {
+						OSWaitSemaphore(accessSemaphores + channel);
+						m_shopFlags &= ~shopBit;
+						m_shopStatusFlags &= ~shopBit;
+						OSSignalSemaphore(accessSemaphores + channel);
+						for (int retry = 0; retry < 10; retry++) {
+							if (Joybus.SetMType(channel, 0) == 0) {
+								break;
+							}
+						}
+						reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->CallShop(1, 0, 0, 0, 0);
+					} else if (cmdBytes[1] == 0x15) {
+						for (int s = 0; s < 4; s++) {
+							OSWaitSemaphore(accessSemaphores + s);
+						}
+						m_moneyFlags |= playerBit;
+						for (int s = 0; s < 4; s++) {
+							OSSignalSemaphore(accessSemaphores + s);
 						}
 					}
-					if (caravanWork != 0) {
-						caravanWork->CallShop(1, 0, 0, 0, 0);
+				} else if (cmd == 0x15) {
+					if (Game.m_scriptFoodBase[channel] != 0) {
+						ReplyLetter(channel);
 					}
-				} else if (request == 0x15) {
-					for (int s = 0; s < 4; s++) {
-						OSWaitSemaphore(accessSemaphores + s);
+				} else if ((cmd == 6) && (cmdBytes[1] == 0x18)) {
+					if (Game.m_scriptFoodBase[channel] != 0) {
+						reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_evtState1 = 1;
 					}
-					obj[0x2D14] = static_cast<char>(obj[0x2D14] | static_cast<unsigned char>(playerBit));
-					for (int s = 0; s < 4; s++) {
-						OSSignalSemaphore(accessSemaphores + s);
-					}
+					m_maskSendState[channel] = static_cast<signed char>(0xFF);
+				} else if (cmd == 0x1C) {
+					ChkCMakeName(channel, queueWords[i]);
+				} else if (cmd == 0x1D) {
+					CMakeFavorite(channel, queueWords[i]);
 				}
-			} else if (cmd == 0x15) {
-				if (caravanWork != 0) {
-					ReplyLetter(channel);
-				}
-			} else if ((cmd == 6) && (static_cast<unsigned char>(queueWords[i] >> 8) == 0x18)) {
-				if (caravanWork != 0) {
-					caravanWork->m_evtState1 = 1;
-				}
-				m_maskSendState[channel] = static_cast<signed char>(0xFF);
-			} else if (cmd == 0x1C) {
-				ChkCMakeName(channel, queueWords[i]);
-			} else if (cmd == 0x1D) {
-				CMakeFavorite(channel, queueWords[i]);
 			}
-		}
 
-		if (m_maskSendState[channel] >= 0) {
-			if ((m_maskSendState[channel] == 0) && (Joybus.SendMask(channel, m_sendMask) == 0)) {
-				m_maskSendState[channel] = 6;
+			if (m_maskSendState[channel] >= 0) {
+				if ((m_maskSendState[channel] == 0) && (Joybus.SendMask(channel, m_sendMask[channel]) == 0)) {
+					m_maskSendState[channel] = 6;
+				}
+				m_maskSendState[channel] = static_cast<signed char>(m_maskSendState[channel] - 1);
 			}
-			m_maskSendState[channel] = static_cast<signed char>(m_maskSendState[channel] - 1);
-		}
 
-		if ((m_letterFlags & playerBit) != 0) {
-			if (!Joybus.IsLetterMenu(channel)) {
-				m_letterFlags = static_cast<unsigned char>(m_letterFlags & ~static_cast<unsigned char>(playerBit));
-			} else if (Joybus.SendAddLetter(channel) == 0) {
-				m_letterFlags = static_cast<unsigned char>(m_letterFlags & ~static_cast<unsigned char>(playerBit));
+			if ((m_letterFlags & playerBit) != 0) {
+				if (Joybus.IsLetterMenu(channel)) {
+					if (Joybus.SendAddLetter(channel) == 0) {
+						m_letterFlags &= ~playerBit;
+					}
+				} else {
+					m_letterFlags &= ~playerBit;
+				}
 			}
-		}
 		}
 	}
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void GbaQueue::ChgItemData(int, unsigned int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void GbaQueue::ChgMoneyData(int, unsigned int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void GbaQueue::ChgEquipPosData(int, unsigned int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void GbaQueue::ChgCmdLstData(int, unsigned int)
-{
-	// TODO
 }
 
 /*

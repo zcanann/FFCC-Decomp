@@ -2975,9 +2975,11 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 		case 0x410:
 			if (effectArg0 == 2 || effectArg0 == 3) {
 				float baseAngle = m_rotTargetY;
-				float angleOffset = kCharaObjNegativeHalfPi;
+				float angleOffset;
 				if (effectArg0 == 2) {
 					angleOffset = kCharaObjHalfPi;
+				} else {
+					angleOffset = kCharaObjNegativeHalfPi;
 				}
 				float angle = baseAngle + angleOffset;
 				CFlatParticleWorkPosition().x = kCharaObjSideParticleRadius * sinf(angle) + m_worldPosition.x;
@@ -3019,9 +3021,9 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 					float rand0 = Math.RandFPM(kCharaObjForwardParticleOffset);
 					float rand1 = Math.RandFPM(kCharaObjForwardParticleOffset);
 					CVector randomOffset(rand1, kCharaObjZero, rand0);
-					CVector randomBase(kCharaObjZero, FLOAT_8033199C, FLOAT_803319A0);
+					const CVector& randomBase = CVector(kCharaObjZero, FLOAT_8033199C, FLOAT_803319A0);
 					CVector randomResult;
-					PSVECAdd(reinterpret_cast<Vec*>(&randomBase), reinterpret_cast<Vec*>(&randomOffset), reinterpret_cast<Vec*>(&randomResult));
+					PSVECAdd((Vec*)&randomBase, reinterpret_cast<Vec*>(&randomOffset), reinterpret_cast<Vec*>(&randomResult));
 					Vec randomPos;
 					randomPos.x = randomResult.x;
 					randomPos.y = randomResult.y;

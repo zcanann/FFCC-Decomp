@@ -246,7 +246,7 @@ static bool isFrameInterval(int frame, int interval)
 	return frame % interval == 0;
 }
 
-static bool isGhostPartyTargetMode(CGPartyObj* self)
+static inline bool isGhostPartyTargetMode(CGPartyObj* self)
 {
 	bool result = false;
 	bool cidMatch = false;
@@ -270,7 +270,7 @@ static bool isGhostPartyTargetMode(CGPartyObj* self)
 	return result;
 }
 
-static int getCarryAnimNo(CGPartyObj* self, int carryType)
+static inline int getCarryAnimNo(CGPartyObj* self, int carryType)
 {
 	if (isGhostPartyTargetMode(self)) {
 		return 5;
@@ -1559,7 +1559,7 @@ tmpArtifactBlock:
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::callCommandScript(int mode, CGObject* target)
+inline void CGPartyObj::callCommandScript(int mode, CGObject* target)
 {
 	PartyData(this).target = target;
 
@@ -2346,7 +2346,7 @@ void CGPartyObj::statCharge()
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::statAttackSel()
+inline void CGPartyObj::statAttackSel()
 {
 	if (m_subState == 0 && m_subFrame == 0) {
 		putTargetParticle(0, 1);
@@ -3185,7 +3185,7 @@ void CGPartyObj::onStatDie()
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::statAlive()
+inline void CGPartyObj::statAlive()
 {
 	setAlive(1, 0);
 	canPlayerGoMenu();
@@ -3365,7 +3365,7 @@ void CGPartyObj::carry(int carryType, CGObject* object, int forceMode)
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::statCarry()
+inline void CGPartyObj::statCarry()
 {
 	if (m_subState == 0 && m_subFrame == 0) {
 		reqAnim(0x1D, 0, 0);
@@ -3474,7 +3474,7 @@ void CGPartyObj::statPut()
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::statPickup()
+inline void CGPartyObj::statPickup()
 {
 	if (m_subState == 0 && m_subFrame == 0) {
 		reqAnim(0x21, 0, 0);
@@ -3924,7 +3924,7 @@ int CGPartyObj::putGil(int amount)
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::statRebound()
+inline void CGPartyObj::statRebound()
 {
 	if ((m_subState == 0) && (m_subFrame == 0)) {
 		reqAnim(0x1C, 0, 0);
@@ -3987,7 +3987,7 @@ void CGPartyObj::statKorobi()
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::statHide()
+inline void CGPartyObj::statHide()
 {
 	if (m_subFrame == 0) {
 		enableDamageCol(0);
@@ -4009,7 +4009,7 @@ void CGPartyObj::statHide()
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::statJump()
+inline void CGPartyObj::statJump()
 {
 	if ((m_subState == 0) && (m_subFrame == 0)) {
 		reqAnim(0x22, 0, 0);
@@ -4031,7 +4031,7 @@ void CGPartyObj::statJump()
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::statWeaponChange()
+inline void CGPartyObj::statWeaponChange()
 {
 	PartyObjOverlay& party = PartyData(this);
 	changeWeapon(party.weaponItem, party.pendingWeaponItem, 0);
@@ -4046,7 +4046,7 @@ void CGPartyObj::statWeaponChange()
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::changeWeapon(int weaponRef, int weaponItem, int forceIdle)
+inline void CGPartyObj::changeWeapon(int weaponRef, int weaponItem, int forceIdle)
 {
 	PartyObjOverlay& party = PartyData(this);
 	party.weaponItem = weaponRef;
@@ -4287,7 +4287,7 @@ void CGPartyObj::ChangeCommandMode(int mode)
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::checkAndSetWeapon()
+inline void CGPartyObj::checkAndSetWeapon()
 {
 	if (m_scriptHandle == nullptr) {
 		return;
@@ -4630,7 +4630,7 @@ void stageWeather()
  * JP Address: TODO
  * JP Size: TODO
  */
-void magicReady()
+inline void magicReady()
 {
 	for (int i = 0; i < 4; i++) {
 		CGPartyObj* party = Game.m_partyObjArr[i];
@@ -4649,7 +4649,7 @@ void magicReady()
  * JP Address: TODO
  * JP Size: TODO
  */
-void chooseMagic()
+inline void chooseMagic()
 {
 	for (int i = 0; i < 4; i++) {
 		CGPartyObj* party = Game.m_partyObjArr[i];
@@ -4668,7 +4668,7 @@ void chooseMagic()
  * JP Address: TODO
  * JP Size: TODO
  */
-void decMagic(int amount)
+inline void decMagic(int amount)
 {
 	for (int i = 0; i < 4; i++) {
 		CGPartyObj* party = Game.m_partyObjArr[i];
@@ -4687,7 +4687,7 @@ void decMagic(int amount)
  * JP Address: TODO
  * JP Size: TODO
  */
-void calcWeightMax()
+inline void calcWeightMax()
 {
 	for (int i = 0; i < 4; i++) {
 		CGPartyObj* party = Game.m_partyObjArr[i];

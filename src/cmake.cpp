@@ -863,7 +863,7 @@ void CMenuPcs::CmakeVillageDraw()
 
     DrawInit();
     if (villageWork->m_mode == 1 && villageWork->m_row < 5) {
-        int cursorLeft = 0xC8;
+        int cursorLeft = (villageWork->m_select == 0) ? 0xC8 : 0xC8;
         int wobble = static_cast<int>(System.m_frameCounter) % 8;
         DrawCursor(
             static_cast<int>(26.9f * static_cast<float>(villageWork->m_select) +
@@ -2558,7 +2558,7 @@ void CMenuPcs::CmakeNameDraw()
     DrawInit();
 
     if ((CmakeState(this)->m_mode == 1) && (CmakeState(this)->m_row < 5)) {
-        int cursorLeft = 0xC8;
+        int cursorLeft = (CmakeState(this)->m_select == 0) ? 0xC8 : 0xC8;
         int wobble = static_cast<int>(System.m_frameCounter) % 8;
         DrawCursor(
             static_cast<int>(26.9f * static_cast<float>(CmakeState(this)->m_select) +

@@ -624,7 +624,7 @@ void CCharaPcs::Init()
             if (i == 0) {
                 m_viewerDiffusePos[lightIndex].x = 0.0f;
                 m_viewerDiffusePos[lightIndex].y = 0.0f;
-                m_viewerDiffusePos[lightIndex].z = 1.0f;
+                m_viewerDiffusePos[lightIndex].z = -1.0f;
             }
         }
     }
@@ -651,12 +651,12 @@ void CCharaPcs::Init()
     CColor baseColor(0x00, 0x00, 0x40, 0x40);
     m_texShadowColor = baseColor.color;
 
-    CVector baseVec(0.0f, 10.0f, 0.0f);
+    CVector baseVec(0.0f, 100.0f, 0.0f);
     Vec* constructedVec = reinterpret_cast<Vec*>(&baseVec);
     m_texShadowPos.x = constructedVec->x;
     m_texShadowPos.y = constructedVec->y;
     m_texShadowPos.z = constructedVec->z;
-    m_texShadowRadius = 120.0f;
+    m_texShadowRadius = 500.0f;
     m_texShadowSize = 0x80;
     m_texShadowDistance = 100;
 }
@@ -2847,13 +2847,13 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
 
     if (drawPass == 3) {
         if ((m_flags & 4) != 0) {
-            const float offsetY = 0.25f * (m_worldPosY - m_bgCharmPlaneY);
+            const float offsetY = 2.0f * (m_worldPosY - m_bgCharmPlaneY);
             viewMtx[0][3] += viewMtx[0][1] * offsetY;
             viewMtx[1][3] += viewMtx[1][1] * offsetY;
             viewMtx[2][3] += viewMtx[2][1] * offsetY;
-            viewMtx[1][1] *= 0.5f;
-            viewMtx[0][1] *= 0.5f;
-            viewMtx[2][1] *= 0.5f;
+            viewMtx[1][1] *= -1.0f;
+            viewMtx[0][1] *= -1.0f;
+            viewMtx[2][1] *= -1.0f;
         } else if ((m_flags & 8) != 0) {
             PSMTXConcat(viewMtx, CFlatCenterMatrix(), viewMtx);
         }

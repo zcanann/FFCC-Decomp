@@ -115,7 +115,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
             Vec zeroVec;
             Vec segVec;
             GXColor amb;
-            const u16 shapeFrameIndex = *(u16*)(particle + 0x20);
+            const s32 shapeFrameIndex = *(u16*)(particle + 0x20);
             pppShapeAnimFrame* shapeFrame = &shapeAnim->m_frames[shapeFrameIndex];
             tagOAN3_SHAPE* shape =
                 reinterpret_cast<tagOAN3_SHAPE*>(reinterpret_cast<u8*>(shapeAnim) + shapeFrame->m_shapeOffset);

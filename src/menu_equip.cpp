@@ -479,7 +479,7 @@ void CMenuPcs::EquipDraw()
 	font->DrawInit();
 
 	item = GetEquipListStorage(this)->entries;
-	for (int i = 0; i < 4; i++) {
+	for (unsigned int i = 0; i < 4; i++) {
 		if (caravanWork->m_equipment[i] >= 0) {
 			CColor color(0xff, 0xff, 0xff, (u8)(kEquipColorMax * item->alpha));
 			font->SetColor(color.color);
@@ -778,50 +778,11 @@ int CMenuPcs::EquipClose()
 	int result = 0;
 	if (**(short**)&this->m_equipList == doneCount) {
 		item = GetEquipListStorage(this)->entries;
-		unsigned int n = (unsigned int)itemCount;
-		if (0 < (int)n) {
-			unsigned int blocks = n >> 3;
-			if (blocks != 0) {
-				unsigned int b;
-				for (b = 0; b < blocks; b++) {
-					item[0].startFrame = 0;
-					item[0].duration = 1;
-					item[0].alpha = fVar1;
-					item[1].startFrame = 0;
-					item[1].duration = 1;
-					item[1].alpha = fVar1;
-					item[2].startFrame = 0;
-					item[2].duration = 1;
-					item[2].alpha = fVar1;
-					item[3].startFrame = 0;
-					item[3].duration = 1;
-					item[3].alpha = fVar1;
-					item[4].startFrame = 0;
-					item[4].duration = 1;
-					item[4].alpha = fVar1;
-					item[5].startFrame = 0;
-					item[5].duration = 1;
-					item[5].alpha = fVar1;
-					item[6].startFrame = 0;
-					item[6].duration = 1;
-					item[6].alpha = fVar1;
-					item[7].startFrame = 0;
-					item[7].duration = 1;
-					item[7].alpha = fVar1;
-					item += 8;
-				}
-				n = n & 7;
-				if (n == 0) {
-					return 1;
-				}
-			}
-			do {
-				item->startFrame = 0;
-				item->duration = 1;
-				item->alpha = fVar1;
-				item++;
-				n = n - 1;
-			} while (n != 0);
+		for (int k = itemCount; k > 0; k--) {
+			item->startFrame = 0;
+			item->duration = 1;
+			item->alpha = fVar1;
+			item++;
 		}
 		result = 1;
 	}

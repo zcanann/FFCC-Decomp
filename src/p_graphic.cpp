@@ -382,7 +382,8 @@ void CGraphicPcs::drawScreenFade()
                 _GXSetTevAlphaIn(GX_TEVSTAGE0, (_GXTevAlphaArg)7, (_GXTevAlphaArg)4, (_GXTevAlphaArg)5, (_GXTevAlphaArg)7);
                 _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
 
-                for (int tile = 0; tile < 4; tile++) {
+                int tile = 0;
+                do {
                     CColor topColor;
                     CColor bottomColor;
                     _GXTexObj backTexObj;
@@ -428,7 +429,8 @@ void CGraphicPcs::drawScreenFade()
                     GXPosition3f32((float)x, (float)(y + 0xE0), kGraphicZero);
                     GXColor1u32(*(u32*)&bottomColor.color);
                     GXTexCoord2u16(0, 2);
-                }
+                    tile++;
+                } while (tile < 4);
                 continue;
             } else {
                 if (mode == 2) {

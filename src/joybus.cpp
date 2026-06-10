@@ -2823,6 +2823,7 @@ int JoyBus::RecvGBA(ThreadParam* threadParam, unsigned int* recvBuffer)
     if ((int)op == 4)
     {
         SetPadData(threadParam, (unsigned char*)&data);
+ret_one:
         return 1;
     }
     else if ((int)op == 0x0E)
@@ -2833,7 +2834,7 @@ int JoyBus::RecvGBA(ThreadParam* threadParam, unsigned int* recvBuffer)
         {
             m_stateCodeArr[threadParam->m_portIndex] = dataBytes[2];
             m_stateFlagArr[threadParam->m_portIndex] = 1;
-            return 1;
+            goto ret_one;
         }
         else
         {

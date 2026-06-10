@@ -511,6 +511,9 @@ void birth(
             float halfSpeed = MegaBirthHalf() * params->m_speed;
             u8 speedMode = params->m_speedMode;
             Vec speed;
+            float r1;
+            float r2;
+            float r3;
 
             switch (speedMode) {
             default:
@@ -540,44 +543,65 @@ void birth(
                 speed.x = particleData->m_matrix[0][3];
                 speed.y = particleData->m_matrix[1][3];
                 speed.z = particleData->m_matrix[2][3];
-                speed.x = (params->m_speed * Math.RandF()) * Math.RandF();
+                r3 = Math.RandF();
+                speed.x = (params->m_speed * Math.RandF()) * r3;
                 speed.x -= halfSpeed;
-                speed.y = (params->m_speed * Math.RandF()) * Math.RandF();
+                r3 = Math.RandF();
+                speed.y = (params->m_speed * Math.RandF()) * r3;
                 speed.y -= halfSpeed;
-                speed.z = (params->m_speed * Math.RandF()) * Math.RandF();
+                r3 = Math.RandF();
+                speed.z = (params->m_speed * Math.RandF()) * r3;
                 speed.z -= halfSpeed;
                 break;
             case 3:
                 speed.x = particleData->m_matrix[0][3];
                 speed.y = particleData->m_matrix[1][3];
                 speed.z = particleData->m_matrix[2][3];
-                speed.x = -(MegaBirthSpeedFalloff() * ((params->m_speed * Math.RandF()) * Math.RandF()) - params->m_speed);
+                r3 = Math.RandF();
+                speed.x = -(MegaBirthSpeedFalloff() * ((params->m_speed * Math.RandF()) * r3) - params->m_speed);
                 speed.x -= halfSpeed;
-                speed.y = -(MegaBirthSpeedFalloff() * ((params->m_speed * Math.RandF()) * Math.RandF()) - params->m_speed);
+                r3 = Math.RandF();
+                speed.y = -(MegaBirthSpeedFalloff() * ((params->m_speed * Math.RandF()) * r3) - params->m_speed);
                 speed.y -= halfSpeed;
-                speed.z = -(MegaBirthSpeedFalloff() * ((params->m_speed * Math.RandF()) * Math.RandF()) - params->m_speed);
+                r3 = Math.RandF();
+                speed.z = -(MegaBirthSpeedFalloff() * ((params->m_speed * Math.RandF()) * r3) - params->m_speed);
                 speed.z -= halfSpeed;
                 break;
             case 4:
                 speed.x = particleData->m_matrix[0][3];
                 speed.y = particleData->m_matrix[1][3];
                 speed.z = particleData->m_matrix[2][3];
-                speed.x = Math.RandF() * (Math.RandF() * ((params->m_speed * Math.RandF()) * Math.RandF()));
+                r1 = Math.RandF();
+                r2 = Math.RandF();
+                r3 = Math.RandF();
+                speed.x = Math.RandF() * (r3 * ((params->m_speed * r2) * r1));
                 speed.x -= halfSpeed;
-                speed.y = Math.RandF() * (Math.RandF() * ((params->m_speed * Math.RandF()) * Math.RandF()));
+                r1 = Math.RandF();
+                r2 = Math.RandF();
+                r3 = Math.RandF();
+                speed.y = Math.RandF() * (r3 * ((params->m_speed * r2) * r1));
                 speed.y -= halfSpeed;
-                speed.z = Math.RandF() * (Math.RandF() * ((params->m_speed * Math.RandF()) * Math.RandF()));
+                r1 = Math.RandF();
+                r2 = Math.RandF();
+                r3 = Math.RandF();
+                speed.z = Math.RandF() * (r3 * ((params->m_speed * r2) * r1));
                 speed.z -= halfSpeed;
                 break;
             case 5:
                 speed.x = particleData->m_matrix[0][3];
                 speed.y = particleData->m_matrix[1][3];
                 speed.z = particleData->m_matrix[2][3];
-                speed.x = -(MegaBirthHalf() * (Math.RandF() * ((params->m_speed * Math.RandF()) * Math.RandF())) - params->m_speed);
+                r2 = Math.RandF();
+                r3 = Math.RandF();
+                speed.x = -(MegaBirthHalf() * (Math.RandF() * ((params->m_speed * r3) * r2)) - params->m_speed);
                 speed.x -= halfSpeed;
-                speed.y = -(MegaBirthHalf() * (Math.RandF() * ((params->m_speed * Math.RandF()) * Math.RandF())) - params->m_speed);
+                r2 = Math.RandF();
+                r3 = Math.RandF();
+                speed.y = -(MegaBirthHalf() * (Math.RandF() * ((params->m_speed * r3) * r2)) - params->m_speed);
                 speed.y -= halfSpeed;
-                speed.z = -(MegaBirthHalf() * (Math.RandF() * ((params->m_speed * Math.RandF()) * Math.RandF())) - params->m_speed);
+                r2 = Math.RandF();
+                r3 = Math.RandF();
+                speed.z = -(MegaBirthHalf() * (Math.RandF() * ((params->m_speed * r3) * r2)) - params->m_speed);
                 speed.z -= halfSpeed;
                 break;
             }

@@ -3605,19 +3605,8 @@ void CMapMng::SetDrawRangeOctTree(float drawRange)
  */
 void CMapMng::SetMapObjWorldMapLightID(int id, _GXColor color, Vec position)
 {
-    int objIndex = 0;
-    int numMapObj = m_mapObjCount;
+    int objIndex = GetMapObjIdx(static_cast<unsigned short>(id));
 
-    while (0 < numMapObj) {
-        if (m_mapObjArray[objIndex].m_objId == static_cast<unsigned short>(id)) {
-            goto found;
-        }
-        objIndex++;
-        numMapObj--;
-    }
-    objIndex = -1;
-
-found:
     const Vec spotPosition = position;
     const _GXColor spotColor = color;
     CMapObj* mapObj = m_mapObjArray + objIndex;

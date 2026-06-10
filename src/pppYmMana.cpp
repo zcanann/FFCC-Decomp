@@ -985,12 +985,15 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
 {
     VYmMana* mana = static_cast<VYmMana*>(workPtr);
     pppYmManaStep* stepData = static_cast<pppYmManaStep*>(step);
-    Mtx identityMtx;
-    Mtx savedCameraMtx;
-    Mtx lookAtMtx;
     Mtx44 savedScreenMtx;
+    Mtx savedCameraMtx;
+    Mtx identityMtx;
+    Mtx lookAtMtx;
     Mtx44 projectionMtx;
-    _GXTexObj sceneTexObj;
+    union {
+        _GXTexObj sceneTexObj;
+        double sceneTexObjAlign;
+    };
     Vec centerPos;
     Vec cameraPos;
     Vec cameraUp;

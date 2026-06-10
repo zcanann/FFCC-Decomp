@@ -4961,11 +4961,12 @@ void CGPartyObj::gpmCol()
 			slot->y = leader->m_worldPosition.y;
 			slot->z = leader->m_worldPosition.z;
 			int idx = i;
+			int* trailIdxPtr = reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x4C);
 			activeTrailCount = i + 1;
-			if (trailIndex < idx) {
-				idx = trailIndex;
+			if (*trailIdxPtr < idx) {
+				idx = *trailIdxPtr;
 			}
-			trailIndex = idx;
+			*trailIdxPtr = idx;
 			break;
 		}
 		i++;

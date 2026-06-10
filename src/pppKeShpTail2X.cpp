@@ -139,7 +139,6 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     Vec zeroVecB;
     Vec seg;
     float segLen;
-    float segCursor;
     float segRemain;
     float segDx;
     float segDy;
@@ -161,7 +160,7 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     s32 lastIndex;
     Vec* history;
     u32 zEnable;
-    const float zero = LoadFloat(kPppKeShpTail2XZero);
+    float segCursor = LoadFloat(kPppKeShpTail2XZero);
     s32 dataValIndex;
 
     dataValIndex = step->m_dataValIndex;
@@ -182,7 +181,7 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     colorEndR = step->m_colorEndR;
     colorEndG = step->m_colorEndG;
     colorEndB = step->m_colorEndB;
-    if (invCountMinusOne != zero) {
+    if (invCountMinusOne != segCursor) {
         colorStepR = (colorStartR - colorEndR) / invCountMinusOne;
         colorStepG = (colorStartG - colorEndG) / invCountMinusOne;
         colorStepB = (colorStartB - colorEndB) / invCountMinusOne;
@@ -240,7 +239,6 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     zeroVec.z = kPppKeShpTail2XZero;
     segLen = PSVECDistance(&zeroVec, &initialSeg);
     segRemain = segLen;
-    segCursor = zero;
 
     if (step->m_drawFirst == 0) {
         goto update_step;

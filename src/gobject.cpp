@@ -1141,7 +1141,7 @@ void CGObject::bgAttribCollision()
 
     if ((m_displayFlags & 4) != 0) {
         CVector* probeMove = &CVector(sZeroFloat, sDownProbeDistance, sZeroFloat);
-        CVector* probeBase = &CVector(m_worldPosition.x, m_worldPosition.y + sHitProbeHeight, m_worldPosition.z);
+        CVector* probeBase = &CVector(m_worldPosition.x, sHitProbeHeight + m_worldPosition.y, m_worldPosition.z);
 
         CMapCylinder charmCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
         charmCylinder.m_bottom.x = probeBase->x;
@@ -1169,12 +1169,9 @@ void CGObject::bgAttribCollision()
 
     {
         if ((sZeroFloat != m_groundHitOffset.x) || (sZeroFloat != m_groundHitOffset.z)) {
-            const bool hasModel =
-                (m_charaModelHandle != (CCharaPcs::CHandle*)0) &&
-                (m_charaModelHandle->m_model != (CChara::CModel*)0);
-            if (hasModel) {
+            if (HasLoadedModel(m_charaModelHandle)) {
                 CVector* probeMove = &CVector(sZeroFloat, sDownProbeDistance, sZeroFloat);
-                CVector* probeBase = &CVector(m_worldPosition.x, m_worldPosition.y + sStepProbeHeight, m_worldPosition.z);
+                CVector* probeBase = &CVector(m_worldPosition.x, sStepProbeHeight + m_worldPosition.y, m_worldPosition.z);
 
                 CMapCylinder attrCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
                 attrCylinder.m_bottom.x = probeBase->x;

@@ -872,10 +872,10 @@ void CUtil::RenderColorQuad(float x, float y, float width, float height, _GXColo
  */
 void CUtil::ClearZBufferRect(float x, float y, float width, float height)
 {
-    Mtx modelMtx;
+    Mtx44 screenMtx;
     Mtx cameraMtx;
     Mtx44 orthoMtx;
-    Mtx44 screenMtx;
+    Mtx modelMtx;
     GXColor white;
     float indMtx[2][3];
 
@@ -934,6 +934,7 @@ void CUtil::ClearZBufferRect(float x, float y, float width, float height)
     GXSetColorUpdate(GX_FALSE);
     GXSetAlphaUpdate(GX_FALSE);
 
+    GXColor quadColor = white;
     Vec v0 = pos1;
     Vec v1 = pos0;
 
@@ -941,19 +942,19 @@ void CUtil::ClearZBufferRect(float x, float y, float width, float height)
     GXWGFifo.f32 = v1.x;
     GXWGFifo.f32 = v1.y;
     GXWGFifo.f32 = v1.z;
-    GXWGFifo.u32 = *reinterpret_cast<u32*>(&white);
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
     GXWGFifo.f32 = v0.x;
     GXWGFifo.f32 = v1.y;
     GXWGFifo.f32 = v1.z;
-    GXWGFifo.u32 = *reinterpret_cast<u32*>(&white);
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
     GXWGFifo.f32 = v0.x;
     GXWGFifo.f32 = v0.y;
     GXWGFifo.f32 = v1.z;
-    GXWGFifo.u32 = *reinterpret_cast<u32*>(&white);
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
     GXWGFifo.f32 = v1.x;
     GXWGFifo.f32 = v0.y;
     GXWGFifo.f32 = v1.z;
-    GXWGFifo.u32 = *reinterpret_cast<u32*>(&white);
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
 
     PSMTXCopy(GetCameraMatrix(), cameraMtx);
     PSMTX44Copy(GetScreenMatrix(), screenMtx);

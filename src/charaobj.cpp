@@ -1362,8 +1362,7 @@ void CGCharaObj::putHitParticleFromItem(CGPrgObj* sourceObj, int itemId)
 		particleOffset = l_idxAttackCol;
 	}
 
-	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + itemId * 0x48;
-	particleBank = static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(itemData + 0x12));
+	particleBank = static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + itemId * 0x48 + 0x12));
 	if (particleBank != 0xFFFF && particleBank != 0xFF) {
 		if (particleBank == 0xFE) {
 			int sourceData = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0xF8);
@@ -1374,7 +1373,7 @@ void CGCharaObj::putHitParticleFromItem(CGPrgObj* sourceObj, int itemId)
 		if (particleBank == 0xFD) {
 			particleBank = 0xFFFFFFFF;
 		}
-		particleSpec = *reinterpret_cast<unsigned short*>(itemData + 0x1C);
+		particleSpec = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + itemId * 0x48 + 0x1C);
 		if (particleSpec != 0xFFFF) {
 			if ((particleSpec & 0x1000) != 0) {
 				particleBank = 1;
@@ -1385,9 +1384,9 @@ void CGCharaObj::putHitParticleFromItem(CGPrgObj* sourceObj, int itemId)
 			}
 
 			CFlatRuntime2Storage().ResetParticleWork((particleBank << 8) | ((particleSpec & 0xFF) + particleOffset), 0);
-			particleFlags = *reinterpret_cast<unsigned short*>(itemData + 0x0C);
+			particleFlags = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + itemId * 0x48 + 0x0C);
 			if ((particleFlags & 0x200) != 0) {
-				CFlatRuntime2Storage().SetParticleWorkBind(sourceObj);
+				CFlatRuntime2Storage().SetParticleWorkBind(this);
 			} else {
 				CFlatRuntime2Storage().SetParticleWorkPos(*l_pHitCross, kCharaObjZero);
 			}
@@ -1395,7 +1394,7 @@ void CGCharaObj::putHitParticleFromItem(CGPrgObj* sourceObj, int itemId)
 		}
 	}
 
-	seSpec = *reinterpret_cast<unsigned short*>(itemData + 0x42);
+	seSpec = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + itemId * 0x48 + 0x42);
 	int seNo = CharaObjDecodeHitParticleSe(seSpec);
 	if (seNo != 0) {
 		playSe3D(seNo + particleOffset, 0x32, 0x96, 0, 0);

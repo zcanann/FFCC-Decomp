@@ -1743,7 +1743,7 @@ void CGObject::update()
 
         if ((m_displayFlags & 2) != 0) {
             float frameStep;
-            if (m_animSlotSel != -1 && (shieldFlagsLo & 0x40) != 0) {
+            if (m_animSlotSel != -1 && m_shieldNodeFlagBits.m_bit40) {
                 if (ModelAnim(m_charaModelHandle->m_model) != 0) {
                     const unsigned short frameCount = *reinterpret_cast<unsigned short*>(
                         reinterpret_cast<unsigned char*>(ModelAnim(m_charaModelHandle->m_model)) + 0x10);

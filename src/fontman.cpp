@@ -24,17 +24,6 @@ static const char sFontManClassName[] = "CFontMan";
 
 CFontMan FontMan;
 
-namespace {
-struct CFontRenderFlagBits
-{
-	signed char shadow : 1;
-	signed char zCompare : 1;
-	signed char zUpdate : 1;
-	signed char fixedWidth : 1;
-	signed char snapPosition : 1;
-	signed char pad : 3;
-};
-
 struct CFontGlyphEntry
 {
 	u16 m_textureIndex;
@@ -44,6 +33,17 @@ struct CFontGlyphEntry
 	u8 m_shadowLeft;
 	u8 m_shadowWidth;
 	u8 m_pad;
+};
+
+namespace {
+struct CFontRenderFlagBits
+{
+	signed char shadow : 1;
+	signed char zCompare : 1;
+	signed char zUpdate : 1;
+	signed char fixedWidth : 1;
+	signed char snapPosition : 1;
+	signed char pad : 3;
 };
 
 inline CFontRenderFlagBits& GetRenderFlagBits(unsigned char& flags)
@@ -62,6 +62,22 @@ static inline float LoadFloat(const float& value)
 }
 }
 
+inline CFontGlyphEntry* CFont::searchChar(unsigned short ch)
+{
+	unsigned short* glyphBucket = m_glyphBuckets[ch & 0xFF];
+	CFontGlyphEntry* glyph = FirstGlyph(glyphBucket);
+	int count = static_cast<int>(*glyphBucket);
+	unsigned int code = (ch >> 8) & 0xFF;
+
+	for (; count > 0; count--) {
+		if (static_cast<unsigned int>(glyph->m_codeHigh) == code) {
+			return glyph;
+		}
+		glyph++;
+	}
+	return 0;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80091e58
@@ -73,21 +89,8 @@ static inline float LoadFloat(const float& value)
  */
 float CFont::GetWidth(unsigned short ch)
 {
-	unsigned short* glyphBucket = m_glyphBuckets[ch & 0xFF];
-	CFontGlyphEntry* entry = FirstGlyph(glyphBucket);
-	int count = static_cast<int>(*glyphBucket);
-	CFontGlyphEntry* glyph;
+	CFontGlyphEntry* glyph = searchChar(ch);
 
-	for (; count > 0; count--) {
-		if (static_cast<unsigned int>(entry->m_codeHigh) == ((ch >> 8) & 0xFF)) {
-			glyph = entry;
-			goto found_glyph;
-		}
-		entry++;
-	}
-	glyph = 0;
-
-found_glyph:
 	if (glyph == 0) {
 		goto find_fallback;
 	}
@@ -118,17 +121,7 @@ found_fallback:
 	return width;
 
 find_fallback:
-	glyphBucket = m_glyphBuckets[63];
-	CFontGlyphEntry* fallbackGlyph = FirstGlyph(glyphBucket);
-	for (count = static_cast<int>(*glyphBucket); count > 0; count--) {
-		if (static_cast<unsigned int>(fallbackGlyph->m_codeHigh) == 0) {
-			glyph = fallbackGlyph;
-			goto found_fallback_glyph;
-		}
-		fallbackGlyph++;
-	}
-	glyph = 0;
-found_fallback_glyph:
+	glyph = searchChar('?');
 	if (glyph != 0) {
 		goto found_fallback;
 	}

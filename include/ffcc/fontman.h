@@ -8,6 +8,7 @@
 #include <dolphin/gx.h>
 
 class CFont;
+struct CFontGlyphEntry;
 
 class CFontMan : public CManager
 {
@@ -60,7 +61,7 @@ public:
 	float GetWidth(const char* text) { return GetWidth(const_cast<char*>(text)); }
 	float GetWidth(unsigned short);
 
-	void searchChar(unsigned short);
+	CFontGlyphEntry* searchChar(unsigned short);
 	void getNextChar(char**, unsigned short*);
 
 	unsigned short m_glyphWidth;

@@ -462,7 +462,7 @@ struct GbaCMakeInfoRaw
 	unsigned char m_commandType;   // 0x01
 	unsigned short m_packetCount;  // 0x02
 	short m_crc;                   // 0x04
-	unsigned char m_channelSlot;   // 0x06
+	signed char m_channelSlot;     // 0x06
 	char m_name[17];               // 0x07
 	unsigned char m_charaType;     // 0x18
 	unsigned char m_birthMonth;    // 0x19
@@ -1406,18 +1406,25 @@ void CMenuPcs::Sprt::operator= (const CMenuPcs::Sprt& src)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_propagation off
 void CMenuPcs::InitCharaInfo()
 {
 	float z = FLOAT_803314a4;
 	float zero = FLOAT_803313dc;
-	int row = 0;
-	int baseSlot = 0x20;
-	int baseY = 0x66;
+	int baseX;
+	int baseY;
+	int baseSlot;
+	int row;
+
+	row = 0;
+	baseSlot = 0x20;
+	baseY = 0x66;
 	while (row < 2) {
-		int slotOffset = baseSlot * 0x50;
-		int baseX = 0x68;
+		int slot = baseSlot;
+		baseX = 0x68;
 		for (int col = 0; col < 2; col++) {
-			int y =  (s32)(baseY);
+			int slotOffset = slot * 0x50;
+			int y = (s32)(baseY);
 			if (row != 0) {
 				y = baseY + 8;
 			}
@@ -1443,20 +1450,20 @@ void CMenuPcs::InitCharaInfo()
 			*reinterpret_cast<float*>(m_wm.m_worldObjData + slotOffset + 0x64) = zero;
 			*reinterpret_cast<float*>(m_wm.m_worldObjData + slotOffset + 0x68) = z;
 
-			slotOffset += 0xA0;
+			slot += 2;
 			baseX = baseX + 0x120;
 		}
 		row++;
-		baseY = baseY + 0xB8;
 		baseSlot += 4;
+		baseY = baseY + 0xB8;
 	}
 
 	unsigned char* gameData = reinterpret_cast<unsigned char*>(&Game);
 	int modelOffset = 0;
-	const unsigned int invalidModel = 0xFFFFFFFF;
-	for (int i = 4; i != 0; i--) {
-		unsigned char* entry0 = m_wm.m_charaModelData + modelOffset;
+	unsigned int invalidModel = 0xFFFFFFFF;
+	for (int i = 0; i < 4; i++) {
 		unsigned char* src0 = gameData + 0x13F0;
+		unsigned char* entry0 = m_wm.m_charaModelData + modelOffset;
 		if (*reinterpret_cast<int*>(gameData + 0x1794) != 0) {
 			int modelNo = *reinterpret_cast<unsigned short*>(src0 + 0x3E0) * 200 + 100;
 			int flag0 = *reinterpret_cast<unsigned short*>(src0 + 0x3E2);
@@ -1469,9 +1476,10 @@ void CMenuPcs::InitCharaInfo()
 			*reinterpret_cast<unsigned int*>(entry0 + 8) = invalidModel;
 		}
 
-		unsigned char* entry1 = entry0 + 0x34;
 		gameData += 0xC30;
+		modelOffset += 0x34;
 		unsigned char* src1 = gameData + 0x13F0;
+		unsigned char* entry1 = m_wm.m_charaModelData + modelOffset;
 		if (*reinterpret_cast<int*>(gameData + 0x1794) != 0) {
 			int modelNo = *reinterpret_cast<unsigned short*>(src1 + 0x3E0) * 200 + 100;
 			int flag1 = *reinterpret_cast<unsigned short*>(src1 + 0x3E2);
@@ -1485,9 +1493,10 @@ void CMenuPcs::InitCharaInfo()
 		}
 
 		gameData += 0xC30;
-		modelOffset += 0x68;
+		modelOffset += 0x34;
 	}
 }
+#pragma opt_propagation on
 
 /*
  * --INFO--
@@ -2036,7 +2045,7 @@ void CMenuPcs::CalcMCardMenu()
 	} else {
 		unsigned int padIndex = 0;
 		padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-		int __p11 =  (0 + padIndex);
+		int __p11 = padIndex;
 		uVar3 = Pad.GetPadInputs()[__p11].buttonDown[0];
 	}
 	unsigned short uVar6 = GetButtonRepeat(0);
@@ -2235,8 +2244,7 @@ void CMenuPcs::CalcMCardMenu()
 				piVar18 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar18) + 2);
 			}
 			int iLines = iVar14 / 0x16;
-			int __p28 = iLines;
-			if (iVar14 - iLines * 0x16 != 0) iLines = __p28 + 1;
+			if (iVar14 - iLines * 0x16 != 0) iLines = iLines + 1;
 			sVar7 = (iLines + 2) * 0x16 + 0x40;
 			iVar14 = (int)(float)((float)(0x280 - sVar7) * DOUBLE_803313f8);
 			short sVar16 = (short)*piVar4 * 0x1E + 0x40;
@@ -2270,7 +2278,7 @@ void CMenuPcs::CalcMCardMenu()
 				else if (sVar7 == 7) { sVar16 = -4; }
 				else { sVar16 = 0; }
 				if (sVar7 != 7) {
-					if (sVar16 != m_wmWorldState->m_mcResult && m_wmWorldState->m_mcResult != 1) {
+					if (m_wmWorldState->m_mcResult != sVar16 && m_wmWorldState->m_mcResult != 1) {
 						m_wmWorldState->m_state0E = -1;
 						m_wmWorldState->m_counter1A = 1;
 						break;
@@ -2472,8 +2480,7 @@ void CMenuPcs::CalcMCardMenu()
 	case 0x13:
 	case 0x1A: {
 		if ((signed char)m_wmWorldState->m_flag09 == 0) {
-			int uVar20;
-			uVar20 = 0;
+			int uVar20 = 0;
 			int uVar17;
 			if (iVar12 == 0xD) { uVar17 = 7; }
 			else if (iVar12 == 0x1A) { uVar17 = 0x1A; uVar20 = 1; }
@@ -2582,8 +2589,7 @@ void CMenuPcs::CalcMCardMenu()
 		if (m_menuWindowInfo->state == 1
 		    && m_wmWorldState->m_counter1A == 0) {
 			short listRes = (short)GetMcCtrl()->LoadMcList();
-			int __p9 = listRes;
-			m_wmWorldState->m_mcResult = __p9;
+			m_wmWorldState->m_mcResult = listRes;
 			if (m_wmWorldState->m_mcResult == 0) {
 				if (m_wmWorldState->m_mcResult < 0) {
 					MemoryCardMan.m_opDoneFlag = 1;
@@ -2678,10 +2684,10 @@ void CMenuPcs::CalcMCardMenu()
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			} else {
 				if ((uVar6 & 4) != 0) {
-					if (!(m_wmWorldState->m_cardChannel < 3)) {
-						m_wmWorldState->m_cardChannel = 0;
-					} else {
+					if (m_wmWorldState->m_cardChannel < 3) {
 						m_wmWorldState->m_cardChannel++;
+					} else {
+						m_wmWorldState->m_cardChannel = 0;
 					}
 					Sound.PlaySe(1, 0x40, 0x7F, 0);
 				}
@@ -5047,8 +5053,7 @@ void CMenuPcs::DrawMoveMenu()
 	int __p16 = state;
 	if (__p16 == 1) {
 		moveAlpha = static_cast<float>((static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408) / DOUBLE_803316e8);
-	int __p16 = state;
-	} else if (__p16 == 2 && bytes[0x13] != 0) {
+	} else if (state == 2 && bytes[0x13] != 0) {
 		moveAlpha = static_cast<float>(DOUBLE_80331420 - (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408) / DOUBLE_803316e8);
 	} else {
 		moveAlpha = FLOAT_803313e8;
@@ -5119,7 +5124,7 @@ void CMenuPcs::DrawMoveMenu()
 			PartPcs.GetParColIdx(partColorIndex, color);
 			color.w = handle->m_model->m_lightAlpha;
 			PartPcs.SetParColIdx(partColorIndex, color);
-			if (!(!(m_effectTimer == 0))) {
+			if (m_effectTimer == 0) {
 				m_effectTimer = 1;
 			} else {
 				PartPcs.DrawMenu(m_crystalAttr);
@@ -8640,12 +8645,16 @@ int CMenuPcs::GetModelNo(int modelNo, int offset, int baseType)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_propagation off
 void CMenuPcs::CalcCharaSelect()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
+	unsigned short padRepeat[4];
 	unsigned short padTrig[4];
-	short padRepeat[4];
+	int requestCancel = 0;
+	int requestFinalize = 0;
 
 	*reinterpret_cast<short*>(bytes + 0x74) = static_cast<short>(*reinterpret_cast<short*>(bytes + 0x74) + 1);
 	const unsigned int clz = __cntlzw(static_cast<unsigned int>(Game.m_gameWork.m_menuStageMode));
@@ -8657,8 +8666,8 @@ void CMenuPcs::CalcCharaSelect()
 		WmCharaSelectEntry& entry = GetWmCharaSelectEntries(this)[i];
 
 		if ((i != 0) && (Game.m_gameWork.m_menuStageMode != 0)) {
-			padTrig[i] = 0;
 			padRepeat[i] = 0;
+			padTrig[i] = 0;
 			entry.m_connected = 0;
 			continue;
 		}
@@ -8676,19 +8685,17 @@ void CMenuPcs::CalcCharaSelect()
 		}
 
 		if (entry.m_connected == 1 && entry.m_cmakePending == 0) {
-			if (Pad.m_debugPadLock != 0 || (i == 0 && Pad.m_debugPadPort != -1)) {
-				padRepeat[i] = 0;
-			} else {
-				padRepeat[i] = Pad.GetPadInputs()[(Pad.m_debugPadPort == i) ? 0 : static_cast<unsigned int>(i)].repeatButton;
-			}
-			if (Pad.m_debugPadLock != 0 || (i == 0 && Pad.m_debugPadPort != -1)) {
-				padTrig[i] = 0;
-			} else {
-				padTrig[i] = Pad.GetPadInputs()[(Pad.m_debugPadPort == i) ? 0 : static_cast<unsigned int>(i)].buttonDown[0];
-			}
+			const bool lockedRepeat = Pad.m_debugPadLock != 0 || (i == 0 && Pad.m_debugPadPort != -1);
+			padRepeat[i] = lockedRepeat
+			                   ? 0
+			                   : Pad.GetPadInputs()[(Pad.m_debugPadPort == i) ? 0 : static_cast<unsigned int>(i)].repeatButton;
+			const bool lockedTrig = Pad.m_debugPadLock != 0 || (i == 0 && Pad.m_debugPadPort != -1);
+			padTrig[i] = lockedTrig
+			                 ? 0
+			                 : Pad.GetPadInputs()[(Pad.m_debugPadPort == i) ? 0 : static_cast<unsigned int>(i)].buttonDown[0];
 		} else {
-			padTrig[i] = 0;
 			padRepeat[i] = 0;
+			padTrig[i] = 0;
 		}
 	}
 
@@ -8699,8 +8706,8 @@ void CMenuPcs::CalcCharaSelect()
 	const short winState = m_menuWindowInfo->state;
 	if (winState != 3) {
 		unsigned short anyTrig = 0;
-		for (int i = 0; i < 4; i++) {
-			anyTrig = static_cast<short>(anyTrig | padTrig[i]);
+		for (int i = anyTrig; i < 4; i++) {
+			anyTrig |= padTrig[i];
 		}
 		if (winState == 1 && (anyTrig & 0x0300) != 0) {
 			m_menuWindowInfo->state = 2;
@@ -8719,19 +8726,20 @@ void CMenuPcs::CalcCharaSelect()
 	}
 	{
 		unsigned int pendingMask = 0;
-		if (Game.m_gameWork.m_menuStageMode == 0) {
-			for (int i = 0; i < 4; i++) {
-				if (GetWmCharaSelectEntries(this)[i].m_cmakePending != 0) {
-					pendingMask |= 1u << static_cast<unsigned int>(GetWmCharaSelectEntries(this)[i].m_currentSlot);
-				}
+		for (int i = 0; i < 4; i++) {
+			if (Game.m_gameWork.m_menuStageMode != 0) {
+				break;
+			}
+			if (GetWmCharaSelectEntries(this)[i].m_cmakePending != 0) {
+				pendingMask |= 1u << static_cast<unsigned int>(GetWmCharaSelectEntries(this)[i].m_currentSlot);
 			}
 		}
 
 		for (int i = 0; i < 4; i++) {
-			WmCharaSelectEntry& entry = GetWmCharaSelectEntries(this)[i];
 			if (Game.m_gameWork.m_menuStageMode != 0) {
 				break;
 			}
+			WmCharaSelectEntry& entry = GetWmCharaSelectEntries(this)[i];
 
 			if (entry.m_connected == 0) {
 				GbaQue.ClrCmakeInfo(i);
@@ -8742,17 +8750,16 @@ void CMenuPcs::CalcCharaSelect()
 				}
 
 				if (Game.m_caravanWorkArr[entry.m_currentSlot].m_shopState == 0 &&
-				    entry.m_cmakeReady == 0) {
-					CCharaPcs::CHandle* const handle = GetWmWorldHandles(this)[entry.m_currentSlot];
-					if (handle->IsModelLoaded(1) && handle->m_charaKind != 3) {
-						if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-							System.Printf(const_cast<char*>(s_chan_pctd_cur_pctd_801DC3D8), i,
-							              static_cast<int>(entry.m_currentSlot));
-						}
-						const int loadSlot =  (s32)(static_cast<int>(entry.m_currentSlot));
-						GetWmCharaModelData(this)[loadSlot * 0x34 + 0x0C] = 0;
-						GetWmCharaHandles(this)[loadSlot]->LoadModelASync(3, 0x43, 0);
+				    GetWmCharaHandles(this)[entry.m_currentSlot]->IsModelLoaded(1) &&
+				    GetWmCharaHandles(this)[entry.m_currentSlot]->m_charaKind != 3 &&
+				    entry.m_cmakeReady != 1) {
+					if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+						System.Printf(const_cast<char*>(s_chan_pctd_cur_pctd_801DC3D8), i,
+						              static_cast<int>(entry.m_currentSlot));
 					}
+					const int loadSlot =  (s32)(static_cast<int>(entry.m_currentSlot));
+					GetWmCharaModelData(this)[loadSlot * 0x34 + 0x0C] = 0;
+					GetWmCharaHandles(this)[loadSlot]->LoadModelASync(3, 0x43, 0);
 				}
 			} else if (entry.m_cmakePending == 0 && Joybus.GetMType(i) == 1) {
 				Joybus.SetMType(i, 4);
@@ -8769,23 +8776,24 @@ void CMenuPcs::CalcCharaSelect()
 		for (int slot = 0; slot < 8; slot++) {
 			if (((confirmedSlotMask & (1u << static_cast<unsigned int>(slot))) == 0) &&
 			    ((pendingMask & (1u << static_cast<unsigned int>(slot))) == 0) &&
-			    Game.m_caravanWorkArr[slot].m_shopState == 0) {
-				CCharaPcs::CHandle* const handle = GetWmWorldHandles(this)[slot];
-				if (handle->IsModelLoaded(1) && handle->m_charaKind != 3) {
-					GetWmCharaModelData(this)[slot * 0x34 + 0x0C] = 0;
-					GetWmCharaHandles(this)[slot]->LoadModelASync(3, 0x43, 0);
-				}
+			    Game.m_caravanWorkArr[slot].m_shopState == 0 &&
+			    GetWmCharaHandles(this)[slot]->IsModelLoaded(1) &&
+			    GetWmCharaHandles(this)[slot]->m_charaKind != 3) {
+				GetWmCharaModelData(this)[slot * 0x34 + 0x0C] = 0;
+				GetWmCharaHandles(this)[slot]->LoadModelASync(3, 0x43, 0);
 			}
 		}
 
 		int connectedCount = 0;
 		int locallyConfirmedCount = 0;
-		for (int i = 0; i < 4; i++) {
+		int readyMask = 0;
+		for (int i = readyMask; i < 4; i++) {
 			WmCharaSelectEntry& entry = GetWmCharaSelectEntries(this)[i];
 			if (entry.m_connected != 0) {
+				CCaravanWork& work = Game.m_caravanWorkArr[entry.m_currentSlot];
+				readyMask |= 1 << i;
 				connectedCount++;
-				if (entry.m_confirmed != 0 &&
-				    Game.m_caravanWorkArr[entry.m_currentSlot].m_caravanLocalFlags != 0) {
+				if (entry.m_confirmed != 0 && work.m_caravanLocalFlags != 0) {
 					locallyConfirmedCount++;
 				}
 			}
@@ -8815,17 +8823,15 @@ void CMenuPcs::CalcCharaSelect()
 			}
 
 			int widthCells = maxWidth / 0x16;
-			int winWidth = widthCells - (widthCells >> 0x1F);
-			if (winWidth != maxWidth * 0x16) {
-				winWidth++;
+			if ((maxWidth % 0x16) != 0) {
+				widthCells++;
 			}
-			winWidth = (winWidth + 2) * 0x16 + 0x40;
-			const int winHeight = *winMess * 0x1E + 0x40;
+			const short winWidth = (widthCells + 2) * 0x16 + 0x40;
+			const short winHeight = *winMess * 0x1E + 0x40;
 			m_menuWindowInfo->x = static_cast<short>(static_cast<int>(static_cast<float>(
-			    static_cast<double>(0x280 - winWidth) * DOUBLE_803313F8)));
-			m_menuWindowInfo->y = static_cast<short>(static_cast<int>((static_cast<double>(FLOAT_80331430 -
-			                                                                  static_cast<float>(winHeight))) *
-			                                             DOUBLE_803313f8));
+			    static_cast<float>(0x280 - winWidth) * DOUBLE_803313F8)));
+			m_menuWindowInfo->y = static_cast<short>(static_cast<int>(static_cast<float>(
+			    (FLOAT_80331430 - static_cast<float>(winHeight)) * DOUBLE_803313F8)));
 			m_menuWindowInfo->width = winWidth;
 			m_menuWindowInfo->height = winHeight;
 			m_menuWindowInfo->frame = 0;
@@ -8834,8 +8840,6 @@ void CMenuPcs::CalcCharaSelect()
 			return;
 		}
 
-		bool requestCancel = false;
-		bool requestFinalize = false;
 		for (int i = 3; i >= 0; i--) {
 			WmCharaSelectEntry& entry = GetWmCharaSelectEntries(this)[i];
 			if (entry.m_cmakeReady == 1) {
@@ -8846,12 +8850,12 @@ void CMenuPcs::CalcCharaSelect()
 				GbaQue.GetCMakeInfo(i, reinterpret_cast<GbaCMakeInfo*>(&info));
 
 				const int caravanSlot = static_cast<int>(info.m_channelSlot);
-				const int appearance = static_cast<int>((info.m_charaType >> 2) & 3);
+				const int gender = (info.m_charaType >> 7) != 0;
 				int modelNo = static_cast<int>(info.m_charaType & 3) * 200 + 100;
-				if ((info.m_charaType >> 7) != 0) {
+				if (gender) {
 					modelNo += 100;
 				}
-				modelNo += appearance;
+				modelNo += (info.m_charaType >> 2) & 3;
 
 				*reinterpret_cast<int*>(GetWmCharaModelData(this) + caravanSlot * 0x34 + 8) = modelNo;
 
@@ -8864,9 +8868,15 @@ void CMenuPcs::CalcCharaSelect()
 				memset(caravanWork.m_name, 0, 0x11);
 				strcpy(reinterpret_cast<char*>(caravanWork.m_name), info.m_name);
 				caravanWork.m_tribeId = static_cast<unsigned short>(info.m_charaType & 3);
-				caravanWork.m_appearanceVariant = static_cast<unsigned short>(appearance);
+				caravanWork.m_appearanceVariant = static_cast<unsigned short>((info.m_charaType >> 2) & 3);
 				caravanWork.m_genderFlag = static_cast<unsigned short>((info.m_charaType >> 7) != 0);
-				caravanWork.m_id = static_cast<unsigned short>(modelNo);
+				{
+					int modelNo2 = static_cast<int>(info.m_charaType & 3) * 200 + 100;
+					if ((info.m_charaType >> 7) != 0) {
+						modelNo2 += 100;
+					}
+					caravanWork.m_id = static_cast<unsigned short>(modelNo2 + ((info.m_charaType >> 2) & 3));
+				}
 				for (int favorite = 0; favorite < 8; favorite++) {
 					unsigned char nibble = info.m_favoriteBits[favorite >> 1];
 					int v;
@@ -8892,7 +8902,7 @@ void CMenuPcs::CalcCharaSelect()
 				stackArgs[2].m_word = 0;
 				gCFlatRuntime().SystemCall(0, 1, 4, 3, stackArgs, 0);
 				Sound.PlaySe(0x33, 0x40, 0x7F, 0);
-				GetWmCharaAnimState(this)[caravanSlot * 5 + 1] = 3;
+				GetWmCharaAnimState(this)[entry.m_currentSlot * 5 + 1] = 3;
 			}
 
 			if (entry.m_connected == 0) {
@@ -8916,7 +8926,11 @@ void CMenuPcs::CalcCharaSelect()
 				if (entry.m_confirmed != 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else {
-					currentSlot = (currentSlot < 4) ? currentSlot + 4 : currentSlot - 4;
+					if (currentSlot < 4) {
+						currentSlot += 4;
+					} else {
+						currentSlot -= 4;
+					}
 					Sound.PlaySe(1, 0x40, 0x7F, 0);
 				}
 			}
@@ -8924,91 +8938,98 @@ void CMenuPcs::CalcCharaSelect()
 				if (entry.m_confirmed != 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else {
-					currentSlot = (currentSlot > ((currentSlot >> 2) != 0 ? 4 : 0)) ? currentSlot - 1
-					                                                             : currentSlot + 3;
+					if (currentSlot > ((currentSlot >> 2) != 0 ? 4 : 0)) {
+						currentSlot -= 1;
+					} else {
+						currentSlot += 3;
+					}
 					Sound.PlaySe(1, 0x40, 0x7F, 0);
 				}
 			} else if ((padRepeat[i] & 0x0002) != 0) {
 				if (entry.m_confirmed != 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else {
-					const int maxSlot = (currentSlot >> 2) == 0 ? 3 : 7;
-					currentSlot = (currentSlot < maxSlot) ? currentSlot + 1 : currentSlot - 3;
+					const int maxSlot = (currentSlot >> 2) != 0 ? 7 : 3;
+					if (currentSlot < maxSlot) {
+						currentSlot += 1;
+					} else {
+						currentSlot -= 3;
+					}
 					Sound.PlaySe(1, 0x40, 0x7F, 0);
 				}
 			}
 			entry.m_currentSlot = static_cast<short>(currentSlot);
 
 			if ((padRepeat[i] & 0x006F) == 0) {
-				if ((padTrig[i] & 0x0100) != 0) {
-					if (Game.m_caravanWorkArr[currentSlot].m_shopBusyFlag != 0) {
-						Sound.PlaySe(4, 0x40, 0x7F, 0);
-					} else if (entry.m_confirmed == 0) {
-						const int charaId = *reinterpret_cast<int*>(GetWmCharaModelData(this) + currentSlot * 0x34 + 8);
-						if (charaId < 0) {
-							if (Game.m_gameWork.m_menuStageMode == 0 &&
-							    (entry.m_padType == 0x09000000 || entry.m_padType == -0x74F00000)) {
-								Sound.PlaySe(4, 0x40, 0x7F, 0);
-							} else {
-								int other;
-								for (other = 0; other < 4; other++) {
-									if (i != other && GetWmCharaSelectEntries(this)[other].m_cmakePending != 0 &&
-									    GetWmCharaSelectEntries(this)[other].m_currentSlot == currentSlot) {
-										Sound.PlaySe(4, 0x40, 0x7F, 0);
-										break;
-									}
-								}
-								if (other >= 4) {
-									if (Game.m_gameWork.m_menuStageMode == 0) {
-										GbaQue.InitCmakeInfo(i, currentSlot);
-										entry.m_cmakePending = 1;
-									} else {
-										m_singleCmakeSlot = static_cast<short>(currentSlot);
-									}
-									Sound.PlaySe(2, 0x40, 0x7F, 0);
-								}
-							}
+				const unsigned short trig = padTrig[i];
+				CCaravanWork& work = Game.m_caravanWorkArr[entry.m_currentSlot];
+				if ((trig & 0x0100) != 0 && work.m_shopBusyFlag != 0) {
+					Sound.PlaySe(4, 0x40, 0x7F, 0);
+				} else if ((trig & 0x0100) != 0 && entry.m_confirmed == 0) {
+					const int charaId = *reinterpret_cast<int*>(GetWmCharaModelData(this) + currentSlot * 0x34 + 8);
+					if (charaId < 0) {
+						if (Game.m_gameWork.m_menuStageMode == 0 &&
+						    (entry.m_padType == 0x09000000 || entry.m_padType == -0x74F00000)) {
+							Sound.PlaySe(4, 0x40, 0x7F, 0);
 						} else {
 							int other;
 							for (other = 0; other < 4; other++) {
-								if (i != other && GetWmCharaSelectEntries(this)[other].m_confirmed != 0 &&
+								if (i != other && GetWmCharaSelectEntries(this)[other].m_cmakePending != 0 &&
 								    GetWmCharaSelectEntries(this)[other].m_currentSlot == currentSlot) {
 									Sound.PlaySe(4, 0x40, 0x7F, 0);
 									break;
 								}
 							}
 							if (other >= 4) {
-								if (Game.m_caravanWorkArr[currentSlot].m_caravanLocalFlags == 0) {
-									entry.m_confirmed = 1;
-									Sound.PlaySe(0x33, 0x40, 0x7F, 0);
-									GetWmCharaAnimState(this)[currentSlot * 5 + 1] = 3;
-								} else if (Game.m_gameWork.m_menuStageMode == 0) {
-									if (connectedCount == locallyConfirmedCount + 1) {
-										Sound.PlaySe(4, 0x40, 0x7F, 0);
-									} else {
-										entry.m_confirmed = 1;
-										locallyConfirmedCount++;
-										Sound.PlaySe(0x33, 0x40, 0x7F, 0);
-										GetWmCharaAnimState(this)[currentSlot * 5 + 1] = 3;
-									}
+								if (Game.m_gameWork.m_menuStageMode != 0) {
+									m_singleCmakeSlot = entry.m_currentSlot;
 								} else {
-									Sound.PlaySe(4, 0x40, 0x7F, 0);
+									GbaQue.InitCmakeInfo(i, entry.m_currentSlot);
+									entry.m_cmakePending = 1;
 								}
+								Sound.PlaySe(2, 0x40, 0x7F, 0);
 							}
 						}
 					} else {
-						Sound.PlaySe(4, 0x40, 0x7F, 0);
+						int other;
+						for (other = 0; other < 4; other++) {
+							if (i != other && GetWmCharaSelectEntries(this)[other].m_confirmed != 0 &&
+							    GetWmCharaSelectEntries(this)[other].m_currentSlot == currentSlot) {
+								Sound.PlaySe(4, 0x40, 0x7F, 0);
+								break;
+							}
+						}
+						if (other >= 4) {
+							if (work.m_caravanLocalFlags != 0) {
+								if (Game.m_gameWork.m_menuStageMode != 0) {
+									Sound.PlaySe(4, 0x40, 0x7F, 0);
+								} else if (connectedCount == locallyConfirmedCount + 1) {
+									Sound.PlaySe(4, 0x40, 0x7F, 0);
+								} else {
+									entry.m_confirmed = 1;
+									locallyConfirmedCount++;
+									Sound.PlaySe(0x33, 0x40, 0x7F, 0);
+									GetWmCharaAnimState(this)[currentSlot * 5 + 1] = 3;
+								}
+							} else {
+								entry.m_confirmed = 1;
+								Sound.PlaySe(0x33, 0x40, 0x7F, 0);
+								GetWmCharaAnimState(this)[currentSlot * 5 + 1] = 3;
+							}
+						}
 					}
-				} else if ((padTrig[i] & 0x0200) != 0) {
-					if (entry.m_confirmed == 0) {
-						requestCancel = true;
-					} else {
+				} else if ((trig & 0x0100) != 0 && entry.m_confirmed != 0) {
+					Sound.PlaySe(4, 0x40, 0x7F, 0);
+				} else if ((trig & 0x0200) != 0) {
+					if (entry.m_confirmed != 0) {
 						entry.m_confirmed = 0;
 						GetWmCharaAnimState(this)[currentSlot * 5 + 1] = 0;
 						Sound.PlaySe(0x34, 0x40, 0x7F, 0);
+					} else {
+						requestCancel = 1;
 					}
-				} else if ((padTrig[i] & 0x1000) != 0) {
-					requestFinalize = true;
+				} else if ((trig & 0x1000) != 0) {
+					requestFinalize = 1;
 				}
 			}
 		}
@@ -9031,7 +9052,7 @@ void CMenuPcs::CalcCharaSelect()
 		}
 
 		if (requestFinalize) {
-			unsigned int activeCount = 0;
+			int activeCount = 0;
 			for (int i = 0; i < 4; i++) {
 				if (GetWmCharaSelectEntries(this)[i].m_confirmed != 0) {
 					activeCount++;
@@ -9043,7 +9064,10 @@ void CMenuPcs::CalcCharaSelect()
 					break;
 				}
 			}
-			if (activeCount > static_cast<unsigned int>(locallyConfirmedCount)) {
+			if (locallyConfirmedCount >= activeCount) {
+				activeCount = 0;
+			}
+			if (activeCount != 0) {
 				Sound.PlaySe(2, 0x40, 0x7F, 0);
 				GetWmWorldState(this)->m_nextMenuMode = 1;
 				GetWmWorldState(this)->m_delay = 10;
@@ -9058,8 +9082,10 @@ void CMenuPcs::CalcCharaSelect()
 				finishedMask |= 1 << i;
 			}
 		}
-		if (Game.m_gameWork.m_menuStageMode == 0 || m_singleCmakeSlot < 0) {
-			int readyMask = 0;
+		if (Game.m_gameWork.m_menuStageMode != 0 && m_singleCmakeSlot >= 0) {
+			GetWmWorldState(this)->m_nextMenuMode = 1;
+			GetWmWorldState(this)->m_delay = 10;
+		} else {
 			for (int i = 0; i < 4; i++) {
 				if (GetWmCharaSelectEntries(this)[i].m_connected == 0 && GetWmCharaSelectEntries(this)[i].m_disconnectTime < 0x1E) {
 					readyMask |= 1 << i;
@@ -9069,9 +9095,6 @@ void CMenuPcs::CalcCharaSelect()
 				GetWmWorldState(this)->m_nextMenuMode = 1;
 				GetWmWorldState(this)->m_delay = static_cast<short>(FLOAT_8032ee18);
 			}
-		} else if (Game.m_gameWork.m_menuStageMode != 0 && m_singleCmakeSlot >= 0) {
-			GetWmWorldState(this)->m_nextMenuMode = 1;
-			GetWmWorldState(this)->m_delay = 10;
 		}
 
 		if (GetWmWorldState(this)->m_nextMenuMode != 0) {
@@ -9087,6 +9110,7 @@ void CMenuPcs::CalcCharaSelect()
 		}
 	}
 }
+#pragma pop
 
 /*
  * --INFO--

@@ -802,7 +802,7 @@ int CMenuPcs::EquipClose()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::EquipCtrl()
+int CMenuPcs::EquipCtrl()
 {
 	GetEquipMenuState(this)->prevMode = GetEquipMenuState(this)->mode;
 	int mode = GetEquipMenuState(this)->mode;
@@ -842,6 +842,7 @@ void CMenuPcs::EquipCtrl()
 			e->duration = 3;
 		}
 	}
+	return state;
 }
 
 

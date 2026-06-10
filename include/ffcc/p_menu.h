@@ -450,7 +450,7 @@ public:
     int ArtiCtrlCur();
     void EquipInit1();
     int EquipOpen();
-    void EquipCtrl();
+    int EquipCtrl();
     int EquipClose();
     void EquipDraw();
     int EquipCtrlCur();

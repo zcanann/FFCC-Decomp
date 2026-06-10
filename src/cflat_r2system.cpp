@@ -2446,13 +2446,12 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     case -0x29: {
-        _GXColor color = {
-            static_cast<u8>(object->m_localBase[0]),
-            static_cast<u8>(object->m_localBase[1]),
-            static_cast<u8>(object->m_localBase[2]),
-            0xFF,
-        };
-        Graphic.SetCopyClear(color, 0);
+        _GXColor color;
+        color.r = static_cast<u8>(object->m_localBase[0]);
+        color.g = static_cast<u8>(object->m_localBase[1]);
+        color.b = static_cast<u8>(object->m_localBase[2]);
+        color.a = 0xFF;
+        Graphic.SetCopyClear(color, 0xFFFFFF);
         this->push(object, 0);
         outResult = 0;
         break;
@@ -2879,12 +2878,11 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     }
     case -0x4C: {
-        _GXColor color = {
-            static_cast<u8>(object->m_localBase[2]),
-            static_cast<u8>(object->m_localBase[3]),
-            static_cast<u8>(object->m_localBase[4]),
-            0x80,
-        };
+        _GXColor color;
+        color.a = 0x80;
+        color.r = static_cast<u8>(object->m_localBase[2]);
+        color.g = static_cast<u8>(object->m_localBase[3]);
+        color.b = static_cast<u8>(object->m_localBase[4]);
         MapMng.SetIdGrpColor(*object->m_localBase, object->m_localBase[1], color);
         this->push(object, 0);
         outResult = 0;

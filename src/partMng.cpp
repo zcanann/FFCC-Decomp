@@ -2213,6 +2213,27 @@ void pppSetFog(unsigned char, unsigned char, unsigned char, unsigned char, float
  * JP Address: TODO
  * JP Size: TODO
  */
+static void pppEditApplyFog(unsigned char fogEnable, unsigned char fogR, unsigned char fogG, unsigned char fogB,
+                            float fogNear, float fogFar)
+{
+    _GXColor fogColor;
+    if (fogEnable != 0) {
+        fogColor.r = fogR;
+        fogColor.g = fogG;
+        fogColor.b = fogB;
+        fogColor.a = 0;
+        Graphic.SetFogColor(fogColor);
+        Graphic.SetFogParam(fogNear, fogFar);
+    } else {
+        fogColor.r = 0;
+        fogColor.g = 0;
+        fogColor.b = 0;
+        fogColor.a = 0;
+        Graphic.SetFogColor(fogColor);
+        Graphic.SetFogParam(kPartMngZero, kPartMngZero);
+    }
+}
+
 void CPartMng::pppEditBeforeCalc()
 {
     char* self = reinterpret_cast<char*>(this);
@@ -2251,22 +2272,7 @@ void CPartMng::pppEditBeforeCalc()
         unsigned char fogB = *reinterpret_cast<unsigned char*>(self + 0x15f);
         fogG = *reinterpret_cast<unsigned char*>(self + 0x15e);
         unsigned char fogR = *reinterpret_cast<unsigned char*>(self + 0x15d);
-        _GXColor fogColor;
-        if (fogEnable != 0) {
-            fogColor.r = fogR;
-            fogColor.g = fogG;
-            fogColor.b = fogB;
-            fogColor.a = 0;
-            Graphic.SetFogColor(fogColor);
-            Graphic.SetFogParam(fogNear, fogFar);
-        } else {
-            fogColor.r = 0;
-            fogColor.g = 0;
-            fogColor.b = 0;
-            fogColor.a = 0;
-            Graphic.SetFogColor(fogColor);
-            Graphic.SetFogParam(kPartMngZero, kPartMngZero);
-        }
+        pppEditApplyFog(fogEnable, fogR, fogG, fogB, fogNear, fogFar);
 
         ppvSysGoPartF = 1;
         break;
@@ -2302,22 +2308,7 @@ void CPartMng::pppEditBeforeCalc()
         unsigned char fogB = *reinterpret_cast<unsigned char*>(self + 0x15f);
         fogG = *reinterpret_cast<unsigned char*>(self + 0x15e);
         unsigned char fogR = *reinterpret_cast<unsigned char*>(self + 0x15d);
-        _GXColor fogColor;
-        if (fogEnable != 0) {
-            fogColor.r = fogR;
-            fogColor.g = fogG;
-            fogColor.b = fogB;
-            fogColor.a = 0;
-            Graphic.SetFogColor(fogColor);
-            Graphic.SetFogParam(fogNear, fogFar);
-        } else {
-            fogColor.r = 0;
-            fogColor.g = 0;
-            fogColor.b = 0;
-            fogColor.a = 0;
-            Graphic.SetFogColor(fogColor);
-            Graphic.SetFogParam(kPartMngZero, kPartMngZero);
-        }
+        pppEditApplyFog(fogEnable, fogR, fogG, fogB, fogNear, fogFar);
 
         ppvSysGoPartF = 1;
         break;
@@ -2335,7 +2326,7 @@ void CPartMng::pppEditBeforeCalc()
                 delete (*editorObj)->m_charaModelHandle;
                 (*editorObj)->m_charaModelHandle = 0;
             }
-            operator delete(*editorObj);
+            delete *editorObj;
             *editorObj = 0;
         }
 
@@ -2346,7 +2337,7 @@ void CPartMng::pppEditBeforeCalc()
         (*editorObj)->m_charaModelHandle =
             new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x7b7) CCharaPcs::CHandle;
         (*editorObj)->m_charaModelHandle->Add();
-        (*editorObj)->m_charaModelHandle->m_charaNo = 3;
+        *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>((*editorObj)->m_charaModelHandle) + 0x8) = 3;
         if (pppLoadModelRet(
                 (*editorObj)->m_charaModelHandle,
                 *reinterpret_cast<int*>(self + 0x190),
@@ -2372,11 +2363,9 @@ void CPartMng::pppEditBeforeCalc()
             }
 
 #define handle ((*editorObj)->m_charaModelHandle)
-            if (handle != 0) {
-                handle->LoadAnim(reinterpret_cast<char*>(self + 0x19c), gPppInConstructor, 0, -1, -1, -1, 0);
-                handle->SetAnim(gPppInConstructor, -1, -1, -1, 0);
-                gPppInConstructor++;
-            }
+            handle->LoadAnim(reinterpret_cast<char*>(self + 0x19c), gPppInConstructor, 0, -1, -1, -1, 0);
+            handle->SetAnim(gPppInConstructor, -1, -1, -1, 0);
+            gPppInConstructor++;
 #undef handle
         }
         break;
@@ -2385,8 +2374,8 @@ void CPartMng::pppEditBeforeCalc()
             *reinterpret_cast<unsigned int*>(self + 0x1bc);
         break;
     case 0x1c:
-        if (*editorObj != 0 && (*editorObj)->m_charaModelHandle != 0) {
-            if (*reinterpret_cast<unsigned int*>(self + 0x1c0) != 0) {
+        if (*editorObj != 0) {
+            if (*reinterpret_cast<int*>(self + 0x1c0) != 0) {
                 (*editorObj)->m_charaModelHandle->m_flags |= 1;
             } else {
                 (*editorObj)->m_charaModelHandle->m_flags &= ~1;

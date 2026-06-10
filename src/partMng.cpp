@@ -4751,7 +4751,8 @@ void CPartMng::pppFieldShowFpNo(short fieldNo, unsigned char visible)
     CPartMng* partMng = this;
     int fieldNoInt = fieldNo;
 
-    for (int i = 0; i < 0x120; i += 3) {
+    int i;
+    for (i = 0; i < 0x120; i += 3) {
         if ((partMng->m_pppMng[0].m_baseTime != -0x1000) &&
             (partMng->m_pppMng[0].m_kind == 0) &&
             (partMng->m_pppMng[0].m_nodeIndex == fieldNoInt)) {
@@ -4774,6 +4775,9 @@ void CPartMng::pppFieldShowFpNo(short fieldNo, unsigned char visible)
         }
 
         partMng = reinterpret_cast<CPartMng*>(reinterpret_cast<char*>(partMng) + 0x560);
+    }
+    if (i < 0x120) {
+        return;
     }
 }
 
@@ -4822,7 +4826,8 @@ void CPartMng::pppSetDeltaSlot(int slot, long color)
 {
     CPartMng* partMng = this;
 
-    for (int i = 0; i < 0x140; i += 5) {
+    int i;
+    for (i = 0; i < 0x140; i += 5) {
         if ((partMng->m_pppMng[0].m_baseTime != -0x1000) &&
             (partMng->m_pppMng[0].m_paramA == slot)) {
             *reinterpret_cast<long*>(&partMng->m_pppMng[0].m_envColorR) = color;
@@ -4850,6 +4855,9 @@ void CPartMng::pppSetDeltaSlot(int slot, long color)
 
         partMng = reinterpret_cast<CPartMng*>(reinterpret_cast<char*>(partMng) + 0x810);
     }
+    if (i < 0x140) {
+        return;
+    }
 }
 
 /*
@@ -4865,7 +4873,8 @@ void CPartMng::pppSetLocSlot(int slot, Vec* position)
 {
     CPartMng* partMng = this;
 
-    for (int i = 0; i < 0x120; i += 3) {
+    int i;
+    for (i = 0; i < 0x120; i += 3) {
         if ((partMng->m_pppMng[0].m_baseTime != -0x1000) &&
             (partMng->m_pppMng[0].m_paramA == slot)) {
             partMng->m_pppMng[0].m_position.x = position->x;
@@ -4892,6 +4901,9 @@ void CPartMng::pppSetLocSlot(int slot, Vec* position)
         }
 
         partMng = reinterpret_cast<CPartMng*>(reinterpret_cast<char*>(partMng) + 0x560);
+    }
+    if (i < 0x120) {
+        return;
     }
 }
 

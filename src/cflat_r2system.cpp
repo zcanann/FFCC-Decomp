@@ -2248,9 +2248,8 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         const float pitch = localFloats[6];
         const float sinYaw = std::sinf(yaw);
         const float cosYaw = std::cosf(yaw);
-        const float sinPitch = std::sinf(pitch);
-        const float cosPitch = std::cosf(pitch);
-        CVector direction(-sinYaw * cosPitch, -sinPitch, -cosYaw * cosPitch);
+        CVector direction(
+            -(sinYaw * std::cosf(pitch)), -std::sinf(pitch), -(cosYaw * std::cosf(pitch)));
         CColor color(
             static_cast<u8>(object->m_localBase[2]),
             static_cast<u8>(object->m_localBase[3]),
@@ -2459,15 +2458,14 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     }
     case -0x2A: {
-        const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        _GXColor color = {
-            static_cast<u8>(object->m_localBase[0]),
-            static_cast<u8>(object->m_localBase[1]),
-            static_cast<u8>(object->m_localBase[2]),
-            0xFF,
-        };
+        _GXColor color;
+        color.a = 0xFF;
+        color.r = static_cast<u8>(object->m_localBase[0]);
+        color.g = static_cast<u8>(object->m_localBase[1]);
+        color.b = static_cast<u8>(object->m_localBase[2]);
         Graphic.SetFogColor(color);
-        Graphic.SetFogParam(localFloats[3], localFloats[4]);
+        Graphic.SetFogParam(reinterpret_cast<float*>(object->m_localBase)[3],
+                            reinterpret_cast<float*>(object->m_localBase)[4]);
         this->push(object, 0);
         outResult = 0;
         break;

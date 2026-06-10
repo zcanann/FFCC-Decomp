@@ -1606,8 +1606,6 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 	float projY;
 	float projZ;
 	unsigned int texBufferSize;
-	unsigned int depthAlphaNear;
-	unsigned int depthAlphaFar;
 	int nearAlpha;
 	int farAlpha;
 	float xOffset;
@@ -1654,11 +1652,10 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		GXProject(cameraPos.x + scaledDir.x, targetPos.y, cameraPos.z + scaledDir.z, cameraMtx, gxProjection,
 		          gxViewport, &projX, &projY, &projZ);
 
-		depthAlphaNear = static_cast<unsigned int>(projZ * FLOAT_8032F6F8) >> 16;
-		if (depthAlphaNear >= 0xFF) {
-			depthAlphaNear = 0xFF;
+		nearAlpha = static_cast<unsigned int>(projZ * FLOAT_8032F6F8) >> 16;
+		if (nearAlpha >= 0xFF) {
+			nearAlpha = 0xFF;
 		}
-		nearAlpha = depthAlphaNear;
 		hasNearAlpha = 1;
 	}
 
@@ -1669,14 +1666,13 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		GXProject(targetPos.x + scaledDir.x, targetPos.y, targetPos.z + scaledDir.z, cameraMtx, gxProjection,
 		          gxViewport, &projX, &projY, &projZ);
 
-		depthAlphaFar = static_cast<unsigned int>(projZ * FLOAT_8032F6F8) >> 16;
-		if (depthAlphaFar == 0) {
-			depthAlphaFar = 0xFF;
+		farAlpha = static_cast<unsigned int>(projZ * FLOAT_8032F6F8) >> 16;
+		if (farAlpha == 0) {
+			farAlpha = 0xFF;
 		}
-		if (depthAlphaFar >= 0xFF) {
-			depthAlphaFar = 0xFF;
+		if (farAlpha >= 0xFF) {
+			farAlpha = 0xFF;
 		}
-		farAlpha = depthAlphaFar;
 		hasFarAlpha = 1;
 	}
 

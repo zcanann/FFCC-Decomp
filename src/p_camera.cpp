@@ -637,9 +637,9 @@ void CCameraPcs::CalcQuake()
     offset.y = (m_quake.m_signY == 0) ? -m_quake.m_positionAmplitude.y : m_quake.m_positionAmplitude.y;
     offset.z = (m_quake.m_signZ == 0) ? -m_quake.m_positionAmplitude.z : m_quake.m_positionAmplitude.z;
 
-    jitter.z = kCameraZeroF;
-    jitter.y = kCameraZeroF;
-    jitter.x = kCameraZeroF;
+    jitter.z = 0.0f;
+    jitter.y = 0.0f;
+    jitter.x = 0.0f;
 
     randomValue = static_cast<u32>(rand());
     randomSign = randomValue >> 0x1F;

@@ -20,6 +20,16 @@ static inline float LoadFloat(const float& value)
     return value;
 }
 
+static inline float LoadFloatFresh(const volatile float& value)
+{
+    return value;
+}
+
+static inline double LoadFloatWide(const float& value)
+{
+    return value;
+}
+
 STATIC_ASSERT(offsetof(struct pppKeShpTail2X, m_object.m_workArea) == 0x80);
 
 struct KeShpTail2XWork {
@@ -187,11 +197,10 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
         colorStepB = (colorStartB - colorEndB) / invCountMinusOne;
         colorStepA = (colorStartA - colorEndA) / invCountMinusOne;
     } else {
-        float halfStep = LoadFloat(kPppKeShpTail2XHalf);
-        colorStepR = halfStep;
-        colorStepG = halfStep;
-        colorStepB = halfStep;
-        colorStepA = halfStep;
+        colorStepR = *(const volatile float*)&kPppKeShpTail2XHalf;
+        colorStepG = LoadFloat(kPppKeShpTail2XHalf);
+        colorStepB = colorStepR;
+        colorStepA = colorStepR;
     }
 
     work = GetKeShpTail2XWork(&obj->m_object, param_3);

@@ -409,14 +409,14 @@ void CGraphicPcs::drawScreenFade()
 
                     const float t0 = (float)row * kGraphicHalf;
                     const float t1 = (float)(row + 1) * kGraphicHalf;
-                    topColor.color.r = (u8)(t0 * ((float)slotData->m_colorB.r - (float)slotData->m_colorA.r) + (float)slotData->m_colorA.r);
-                    topColor.color.g = (u8)(t0 * ((float)slotData->m_colorB.g - (float)slotData->m_colorA.g) + (float)slotData->m_colorA.g);
-                    topColor.color.b = (u8)(t0 * ((float)slotData->m_colorB.b - (float)slotData->m_colorA.b) + (float)slotData->m_colorA.b);
+                    topColor.color.r = (u8)(t0 * ((float)slotData->m_colorB.r - (float)baseColor.r) + (float)baseColor.r);
+                    topColor.color.g = (u8)(t0 * ((float)slotData->m_colorB.g - (float)baseColor.g) + (float)baseColor.g);
+                    topColor.color.b = (u8)(t0 * ((float)slotData->m_colorB.b - (float)baseColor.b) + (float)baseColor.b);
                     topColor.color.a = 0xFF;
 
-                    bottomColor.color.r = (u8)(t1 * ((float)slotData->m_colorB.r - (float)slotData->m_colorA.r) + (float)slotData->m_colorA.r);
-                    bottomColor.color.g = (u8)(t1 * ((float)slotData->m_colorB.g - (float)slotData->m_colorA.g) + (float)slotData->m_colorA.g);
-                    bottomColor.color.b = (u8)(t1 * ((float)slotData->m_colorB.b - (float)slotData->m_colorA.b) + (float)slotData->m_colorA.b);
+                    bottomColor.color.r = (u8)(t1 * ((float)slotData->m_colorB.r - (float)baseColor.r) + (float)baseColor.r);
+                    bottomColor.color.g = (u8)(t1 * ((float)slotData->m_colorB.g - (float)baseColor.g) + (float)baseColor.g);
+                    bottomColor.color.b = (u8)(t1 * ((float)slotData->m_colorB.b - (float)baseColor.b) + (float)baseColor.b);
                     bottomColor.color.a = 0xFF;
 
                     GXBegin(GX_QUADS, GX_VTXFMT0, 4);

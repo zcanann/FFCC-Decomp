@@ -938,7 +938,7 @@ void CGPartyObj::onFrameAlways()
 		showTraceParticle = 1;
 	}
 
-	int& traceSlot = PartyTraceParticleSlot(port);
+#define traceSlot PartyTraceParticleSlot(port)
 	if (showTraceParticle && traceSlot == 0) {
 		traceSlot = CFlat.GetFreeParticleSlot();
 		putParticleTrace((port + 0x42U) | 0x100, traceSlot, this, kMonObjOne, 0);
@@ -946,6 +946,7 @@ void CGPartyObj::onFrameAlways()
 		CFlat.EndParticleSlot(traceSlot, 1);
 		traceSlot = 0;
 	}
+#undef traceSlot
 
 	if (reinterpret_cast<int>(m_scriptHandle[0xED]) == 0 && (MiniGamePcs.m_flags & 0x400) != 0) {
 		reinterpret_cast<CAStar*>(reinterpret_cast<unsigned char*>(&DbgMenuPcs) + 0x2A5C)->addRealTime(this);

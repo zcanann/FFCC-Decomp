@@ -4422,8 +4422,8 @@ int JoyBus::MakeJoyData(char* src, int length, unsigned int* outBuffer)
     }
 
     unsigned short inv = static_cast<unsigned short>(~static_cast<unsigned short>(uVar5));
-    chunkCount = (length - 1) / 3;
     param_4[0] = 5;
+    chunkCount = (length - 1) / 3;
 
     if ((length - 1) - (chunkCount * 3) != 0) {
         chunkCount = chunkCount + 1;

@@ -48,6 +48,14 @@ static inline int pppLoadModelRet(
     unsigned long d, int e, int f, int g) {
     return LoadModel__Q29CCharaPcs7CHandleFiUlUlUliii(h, a, b, c, d, e, f, g);
 }
+
+inline CGBaseObj::CGBaseObj()
+{
+}
+
+inline CGObject::CGObject()
+{
+}
 extern "C" const double kPartMngZeroDouble = 0.0;
 extern "C" const float kPartMngAngleHalfUnit = 32768.0f;
 extern "C" const float kPartMngHalfTurnDegrees = 180.0f;
@@ -2291,32 +2299,27 @@ void CPartMng::pppEditBeforeCalc()
             *editorObj = 0;
         }
 
-        *editorObj = static_cast<CGObject*>(
-            operator new(0x518, PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x7b5));
-        if (*editorObj != 0) {
-            (*editorObj)->Create();
+        *editorObj =
+            new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x7b5) CGObject;
+        (*editorObj)->Create();
 
-            CCharaPcs::CHandle* handle =
-                new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x7b7) CCharaPcs::CHandle;
-            (*editorObj)->m_charaModelHandle = handle;
-            if (handle != 0) {
-                handle->Add();
-                handle->m_charaNo = 3;
-                if (pppLoadModelRet(
-                        handle,
-                        *reinterpret_cast<int*>(self + 0x190),
-                        *reinterpret_cast<unsigned long*>(self + 0x194),
-                        *reinterpret_cast<unsigned long*>(self + 0x198),
-                        0,
-                        -1,
-                        0,
-                        0
-                    ) == 0 &&
-                    (*editorObj)->m_charaModelHandle != 0) {
-                    delete (*editorObj)->m_charaModelHandle;
-                    (*editorObj)->m_charaModelHandle = 0;
-                }
-            }
+        (*editorObj)->m_charaModelHandle =
+            new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x7b7) CCharaPcs::CHandle;
+        (*editorObj)->m_charaModelHandle->Add();
+        (*editorObj)->m_charaModelHandle->m_charaNo = 3;
+        if (pppLoadModelRet(
+                (*editorObj)->m_charaModelHandle,
+                *reinterpret_cast<int*>(self + 0x190),
+                *reinterpret_cast<unsigned long*>(self + 0x194),
+                *reinterpret_cast<unsigned long*>(self + 0x198),
+                0,
+                -1,
+                0,
+                0
+            ) == 0 &&
+            (*editorObj)->m_charaModelHandle != 0) {
+            delete (*editorObj)->m_charaModelHandle;
+            (*editorObj)->m_charaModelHandle = 0;
         }
         break;
     }

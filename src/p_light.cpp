@@ -328,7 +328,8 @@ void CLightPcs::draw()
 void CLightPcs::Add(CLightPcs::CLight* light)
 {
     CLight sceneLight;
-    sceneLight.Set(light);
+    CLight* sp = &sceneLight;
+    sp->Set(light);
 
     u32 idx = m_sceneLightCount;
     m_sceneLightCount = idx + 1;

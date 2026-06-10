@@ -1088,11 +1088,10 @@ void CGraphic::makeSphere()
         float radius = kGraphicSphereNegativeX * (float)sin(pitch);
 
         for (int seg = 0; seg < 8; seg++) {
-            float yaw = kGraphicSphereSegmentAngle * (float)seg;
             int vertexIndex = vertexCount * 3;
             vertex[0] = x;
-            vertex[1] = radius * (float)sin(yaw);
-            vertices[vertexIndex + 2] = radius * (float)cos(yaw);
+            vertex[1] = radius * (float)sin(kGraphicSphereSegmentAngle * (float)seg);
+            vertices[vertexIndex + 2] = radius * (float)cos(kGraphicSphereSegmentAngle * (float)seg);
             vertex += 3;
             vertexCount++;
         }

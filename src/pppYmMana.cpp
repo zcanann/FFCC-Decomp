@@ -1232,10 +1232,10 @@ static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, u
 {
     float zero;
     float normalY;
-    float radius;
-    float uvStep;
     float x;
     float z;
+    float radius;
+    float uvStep;
     int indexOffset;
     int quadIndex;
     int rowBase;

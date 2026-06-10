@@ -2182,18 +2182,21 @@ int CCaravanWork::GetCmdListItemName(int cmdListIdx, int* firstCmdIdx, int* item
 {
 	short numSlots;
 	int groupedCount;
+	int topIdx;
+	int extraOff = cmdListIdx * 2;
 
 	if (Game.m_gameWork.m_menuStageMode == 0) {
 		groupedCount = 1;
 	} else {
-		if (m_commandListExtra[cmdListIdx] == 0) {
+		short* cur = (short*)((char*)this + extraOff);
+		if (*(short*)((char*)cur + 0x214) == 0) {
 			groupedCount = 1;
 		} else {
-			int topIdx;
 			for (topIdx = cmdListIdx; topIdx >= 0; topIdx--) {
-				if (m_commandListExtra[topIdx] != -1) {
+				if (*(short*)((char*)cur + 0x214) != -1) {
 					break;
 				}
+				cur--;
 			}
 
 			groupedCount = 1;
@@ -2210,10 +2213,12 @@ int CCaravanWork::GetCmdListItemName(int cmdListIdx, int* firstCmdIdx, int* item
 	}
 
 	if (groupedCount > 1) {
+		short* cur2 = (short*)((char*)this + extraOff);
 		for (int n = cmdListIdx; n >= 0; n--) {
-			if (m_commandListExtra[cmdListIdx] != -1) {
+			if (*(short*)((char*)cur2 + 0x214) != -1) {
 				break;
 			}
+			cur2--;
 			cmdListIdx--;
 		}
 

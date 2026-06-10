@@ -75,16 +75,19 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
     VYmMegaBirthShpTail2* work =
         (VYmMegaBirthShpTail2*)(object->m_workArea + particleDataOffset);
     VColor* colorWork = (VColor*)(object->m_workArea + colorOffset);
-    _PARTICLE_DATA* particles = work->m_particles;
-    _PARTICLE_WMAT* wmats = work->m_wmats;
-    _PARTICLE_COLOR* colors = work->m_colors;
+    _PARTICLE_DATA* const particlesBase = work->m_particles;
+    _PARTICLE_WMAT* const wmatsBase = work->m_wmats;
+    _PARTICLE_COLOR* const colorsBase = work->m_colors;
+    _PARTICLE_DATA* particles = particlesBase;
+    _PARTICLE_WMAT* wmats = wmatsBase;
+    _PARTICLE_COLOR* colors = colorsBase;
     s8 hasRequiredMemory;
 
-    if (particles == 0) {
+    if (particlesBase == 0) {
         hasRequiredMemory = false;
-    } else if (wmats == 0) {
+    } else if (wmatsBase == 0) {
         hasRequiredMemory = false;
-    } else if ((step[0x69] != 0) && (colors == 0)) {
+    } else if ((step[0x69] != 0) && (colorsBase == 0)) {
         hasRequiredMemory = false;
     } else {
         hasRequiredMemory = true;
@@ -101,7 +104,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
         static_cast<pppShapeAnimData*>(ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex]->m_animData);
     pppSetDrawEnv(
         0, &object->m_drawMatrix, *(float*)(step + 0x88), step[0x8C], step[0x0C],
-        step[0x6E], 0, (u8)(((u32)__cntlzw((u32)step[0x6B])) >> 5), 1, 0);
+        step[0x6E], 0, step[0x6B] == 0, 1, 0);
     pppSetBlendMode(step[0x6E]);
 
     for (u32 i = 0; i < work->m_maxParticles; i++) {
@@ -109,11 +112,11 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
         if (*(u16*)(particle + 0x22) != 0) {
             const u16 frameCountRaw = *(u16*)(step + 0x84);
             pppFMATRIX drawMtx;
-            Vec trailPos;
-            Vec cameraPos;
-            Vec managerPos;
             Vec zeroVec;
             Vec segVec;
+            union { Vec cameraPos; double _camAlign[2]; };
+            union { Vec trailPos; double _trailAlign[2]; };
+            union { Vec managerPos; double _mgrAlign[2]; };
             GXColor amb;
             const s32 shapeFrameIndex = *(u16*)(particle + 0x20);
             pppShapeAnimFrame* shapeFrame = &shapeAnim->m_frames[shapeFrameIndex];
@@ -127,12 +130,13 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
             float fadeA = (float)step[0x7B] * alphaScale;
             const float fadeAEnd = (float)step[0x7F] * alphaScale;
             const float fadeANum = fadeA - fadeAEnd;
-            float fadeR = (float)step[0x78];
-            float fadeG = (float)step[0x79];
-            float fadeB = (float)step[0x7A];
-            const float fadeRNum = fadeR - (float)step[0x7C];
-            const float fadeGNum = fadeG - (float)step[0x7D];
-            const float fadeBNum = fadeB - (float)step[0x7E];
+            float fadeRGB[3];
+            fadeRGB[2] = (float)step[0x78];
+            fadeRGB[1] = (float)step[0x79];
+            fadeRGB[0] = (float)step[0x7A];
+            const float fadeRNum = fadeRGB[2] - (float)step[0x7C];
+            const float fadeGNum = fadeRGB[1] - (float)step[0x7D];
+            const float fadeBNum = fadeRGB[0] - (float)step[0x7E];
             float fadeRStep;
             float fadeGStep;
             float fadeBStep;
@@ -224,17 +228,17 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
                     drawMtx.value[2][3] = cameraPos.z;
                     GXLoadPosMtxImm(drawMtx.value, 0);
 
-                    amb.r = (s8)fadeR;
-                    amb.g = (u8)fadeG;
-                    amb.b = (u8)fadeB;
+                    amb.r = (s8)fadeRGB[2];
+                    amb.g = (u8)fadeRGB[1];
+                    amb.b = (u8)fadeRGB[0];
                     amb.a = (u8)(fadeA * (kPppYmMegaBirthShpTail2DepthAlphaScale * (kPppYmMegaBirthShpTail2ColorComponentMax - *(float*)(particle + 0x30))));
                     GXSetChanAmbColor(GX_COLOR0A0, amb);
                     pppDrawShp(shape, ppvEnv->m_materialSetPtr, step[0x6E]);
                 }
             step_advance:
-                fadeR -= fadeRStep;
-                fadeG -= fadeGStep;
-                fadeB -= fadeBStep;
+                fadeRGB[2] -= fadeRStep;
+                fadeRGB[1] -= fadeGStep;
+                fadeRGB[0] -= fadeBStep;
                 fadeA -= fadeAStep;
                 drawScale -= drawScaleStep;
 
@@ -244,6 +248,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
 
                 for (;;) {
                     Vec innerZero;
+                    Vec innerSeg;
                     s32 prevNext;
 
                     if (segRemaining >= *(float*)(step + 0x80)) {
@@ -277,13 +282,13 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
                     segX = camX - drawX;
                     segY = camY - drawY;
                     segZ = camZ - drawZ;
-                    segVec.x = segX;
-                    segVec.y = segY;
-                    segVec.z = segZ;
+                    innerSeg.x = segX;
+                    innerSeg.y = segY;
+                    innerSeg.z = segZ;
                     innerZero.x = 0.0f;
                     innerZero.y = 0.0f;
                     innerZero.z = 0.0f;
-                    segLen = PSVECDistance(&innerZero, &segVec);
+                    segLen = PSVECDistance(&innerZero, &innerSeg);
                     segRemaining += segLen;
                 }
             }

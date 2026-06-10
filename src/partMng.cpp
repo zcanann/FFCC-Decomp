@@ -1000,8 +1000,8 @@ void CPartMng::pppGet2Dpos()
     };
 
     int zAtPixel;
-    Vec viewPos;
     Vec worldPos;
+    Vec viewPos;
     Mtx invCamera;
     PartMngMouseRaw* raw = reinterpret_cast<PartMngMouseRaw*>(this);
 
@@ -1012,11 +1012,13 @@ void CPartMng::pppGet2Dpos()
             Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x2A2);
             GXPeekZ(static_cast<u16>(x & 0xFFFF), static_cast<u16>(y & 0xFFFF), reinterpret_cast<u32*>(&zAtPixel));
 
-            viewPos.z = ppvScreenMatrix0[2][3]
-                        / ((float)(zAtPixel - 0xFFFFFF) / kPartMngDepthUnit + ppvScreenMatrix0[2][2]);
-            viewPos.x = viewPos.z * ((float)raw->cursorX / kPartMngScreenHalfWidth / ppvScreenMatrix0[0][0]);
-            viewPos.y = viewPos.z * (-((float)raw->cursorY / kPartMngScreenHalfHeight) / ppvScreenMatrix0[1][1]);
-            viewPos.z = -viewPos.z;
+            float normY = -(float)(int)raw->cursorY / kPartMngScreenHalfHeight / ppvScreenMatrix0[1][1];
+            float viewZ = ppvScreenMatrix0[2][3]
+                          / ((float)(zAtPixel - 0xFFFFFF) / kPartMngDepthUnit + ppvScreenMatrix0[2][2]);
+            float normX = (float)(int)raw->cursorX / kPartMngScreenHalfWidth / ppvScreenMatrix0[0][0];
+            viewPos.x = viewZ * normX;
+            viewPos.y = viewZ * normY;
+            viewPos.z = -viewZ;
 
             PSMTXInverse(ppvCameraMatrix0, invCamera);
             PSMTXMultVec(invCamera, &viewPos, &worldPos);

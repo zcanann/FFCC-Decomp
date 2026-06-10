@@ -241,6 +241,8 @@ JoyBus::~JoyBus()
  * Address:	TODO
  * Size:	TODO
  */
+#pragma push
+#pragma opt_propagation off
 void JoyBus::CreateInit()
 {
     memset(m_sendBuffer, 0, sizeof(m_sendBuffer));
@@ -254,21 +256,27 @@ void JoyBus::CreateInit()
     m_mapId = 0xFF;
     m_stageId = 0xFF;
 
-    for (int i = 0; i < 4; i++)
     {
-        m_threadParams[i].m_gbaStatus = 1;
-        m_threadParams[i].m_padType = 0x40;
+        int i = 0;
+        unsigned char zeroB = (unsigned char)i;
+        unsigned int zeroW = (unsigned int)i;
 
-        m_cmdCount[i] = 0;
-        m_secCmdCount[i] = 0;
+        for (; i < 4; i++)
+        {
+            m_threadParams[i].m_gbaStatus = 1;
+            m_threadParams[i].m_padType = 0x40;
 
-        OSInitSemaphore(&m_accessSemaphores[i], 1);
+            m_cmdCount[i] = zeroW;
+            m_secCmdCount[i] = zeroW;
 
-        m_ctrlModeArr[i] = 0;
-        m_nextModeTypeArr[i] = 0;
-        m_modeXArr[i] = 0;
-        m_stateCodeArr[i] = 0xFF;
-        m_stateFlagArr[i] = 0;
+            OSInitSemaphore(&m_accessSemaphores[i], 1);
+
+            m_ctrlModeArr[i] = zeroB;
+            m_nextModeTypeArr[i] = zeroB;
+            m_modeXArr[i] = zeroB;
+            m_stateCodeArr[i] = 0xFF;
+            m_stateFlagArr[i] = zeroB;
+        }
     }
 
     if (m_gbaBootImage == 0)
@@ -344,6 +352,7 @@ void JoyBus::CreateInit()
         }
     }
 }
+#pragma pop
 
 
 /*
@@ -402,21 +411,27 @@ void JoyBus::Destroy()
     m_mapId = 0xFF;
     m_stageId = 0xFF;
 
-    for (int i = 0; i < 4; i++)
     {
-        m_threadParams[i].m_gbaStatus = 1;
-        m_threadParams[i].m_padType = 0x40;
+        int i = 0;
+        unsigned char zeroB = (unsigned char)i;
+        unsigned int zeroW = (unsigned int)i;
 
-        m_cmdCount[i] = 0;
-        m_secCmdCount[i] = 0;
+        for (; i < 4; i++)
+        {
+            m_threadParams[i].m_gbaStatus = 1;
+            m_threadParams[i].m_padType = 0x40;
 
-        OSInitSemaphore(&m_accessSemaphores[i], 1);
+            m_cmdCount[i] = zeroW;
+            m_secCmdCount[i] = zeroW;
 
-        m_ctrlModeArr[i] = 0;
-        m_nextModeTypeArr[i] = 0;
-        m_modeXArr[i] = 0;
-        m_stateCodeArr[i] = 0xFF;
-        m_stateFlagArr[i] = 0;
+            OSInitSemaphore(&m_accessSemaphores[i], 1);
+
+            m_ctrlModeArr[i] = zeroB;
+            m_nextModeTypeArr[i] = zeroB;
+            m_modeXArr[i] = zeroB;
+            m_stateCodeArr[i] = 0xFF;
+            m_stateFlagArr[i] = zeroB;
+        }
     }
 
     m_fileBaseA_dup = 0;

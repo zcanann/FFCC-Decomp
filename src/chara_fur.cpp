@@ -2163,12 +2163,19 @@ void CChara::makeFurTex()
 	gMogFurTexBuffer = Memory._Alloc(0x20000, CharaPcs.m_viewerAnimStage, const_cast<char*>(s_chara_fur_cpp), 0xE9, 0);
 	DCInvalidateRange(gMogFurTexBuffer, 0x20000);
 
+	float weightScale2 = kCharaFurWeightScale;
+	float scaleBase2 = kCharaFurDepthScaleBase;
+	float quarterStep = kYmEnvQuarter;
+	float randScale2 = FLOAT_80331164;
+	float depthThr2 = kCharaFurViewDepthThreshold;
+	float layerStep = FLOAT_8033115C;
+
 	for (int layer = 0; layer < 8; layer++) {
-		posMtx[2][3] -= s_mogFurMaxY * FLOAT_8033115C;
+		posMtx[2][3] -= s_mogFurMaxY * layerStep;
 		GXLoadPosMtxImm(posMtx, GX_PNMTX0);
 		GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 
-		float layerFactor = static_cast<float>(layer) * FLOAT_8033115C;
+		float layerFactor = static_cast<float>(layer) * layerStep;
 		layerFactor = layerFactor * layerFactor;
 
 		CColor tipPartTmp;
@@ -2180,13 +2187,13 @@ void CChara::makeFurTex()
 
 		CColor basePartTmp;
 		basePartTmp.color.r =
-		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.r * (kCharaFurDepthScaleBase - layerFactor)));
+		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.r * (scaleBase2 - layerFactor)));
 		basePartTmp.color.g =
-		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.g * (kCharaFurDepthScaleBase - layerFactor)));
+		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.g * (scaleBase2 - layerFactor)));
 		basePartTmp.color.b =
-		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.b * (kCharaFurDepthScaleBase - layerFactor)));
+		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.b * (scaleBase2 - layerFactor)));
 		basePartTmp.color.a =
-		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.a * (kCharaFurDepthScaleBase - layerFactor)));
+		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.a * (scaleBase2 - layerFactor)));
 		CColor basePart = basePartTmp;
 
 		CColor layerColorTmp;
@@ -2203,8 +2210,8 @@ void CChara::makeFurTex()
 		for (int hair = 0; hair < 0x4000; hair++) {
 			GXBegin(GX_LINESTRIP, GX_VTXFMT0, 5);
 
-			float rootX = kCharaFurDepthScaleBase * (FLOAT_80331164 * static_cast<float>(static_cast<int>(FurRandNext())) + kCharaFurViewDepthThreshold);
-			float rootZ = kCharaFurDepthScaleBase * (FLOAT_80331164 * static_cast<float>(static_cast<int>(FurRandNext())) + kCharaFurViewDepthThreshold);
+			float rootX = scaleBase2 * (randScale2 * static_cast<float>(static_cast<int>(FurRandNext())) + depthThr2);
+			float rootZ = scaleBase2 * (randScale2 * static_cast<float>(static_cast<int>(FurRandNext())) + depthThr2);
 			CVector root(rootX, kCharaFurDepthZero, rootZ);
 
 			s_mogFurRand = s_mogFurRand * 0x41C64E6D + 0x3039;
@@ -2214,7 +2221,7 @@ void CChara::makeFurTex()
 			for (int v = 0; v < 5; v++) {
 				float t2 = t * t;
 				CVector accelScaleOut;
-				PSVECScale(src.m_vec1, accelScaleOut, kCharaFurWeightScale * t2);
+				PSVECScale(src.m_vec1, accelScaleOut, weightScale2 * t2);
 				Vec accelTerm;
 				accelTerm.x = accelScaleOut.x;
 				accelTerm.y = accelScaleOut.y;
@@ -2246,13 +2253,13 @@ void CChara::makeFurTex()
 
 				CColor basePartTmp;
 				basePartTmp.color.r =
-				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.r * (kCharaFurDepthScaleBase - t2)));
+				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.r * (scaleBase2 - t2)));
 				basePartTmp.color.g =
-				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.g * (kCharaFurDepthScaleBase - t2)));
+				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.g * (scaleBase2 - t2)));
 				basePartTmp.color.b =
-				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.b * (kCharaFurDepthScaleBase - t2)));
+				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.b * (scaleBase2 - t2)));
 				basePartTmp.color.a =
-				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.a * (kCharaFurDepthScaleBase - t2)));
+				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.a * (scaleBase2 - t2)));
 				CColor basePart = basePartTmp;
 
 				CColor colorTmp;
@@ -2266,7 +2273,7 @@ void CChara::makeFurTex()
 				GXWGFifo.f32 = py;
 				GXWGFifo.f32 = pz;
 				GXWGFifo.u32 = *reinterpret_cast<unsigned int*>(&color.color);
-				t += kYmEnvQuarter;
+				t += quarterStep;
 			}
 
 			GXBegin(GX_POINTS, GX_VTXFMT0, 5);
@@ -2274,7 +2281,7 @@ void CChara::makeFurTex()
 			for (int v = 0; v < 5; v++) {
 				float t2 = t * t;
 				CVector accelScaleOut;
-				PSVECScale(src.m_vec1, accelScaleOut, kCharaFurWeightScale * t2);
+				PSVECScale(src.m_vec1, accelScaleOut, weightScale2 * t2);
 				Vec accelTerm;
 				accelTerm.x = accelScaleOut.x;
 				accelTerm.y = accelScaleOut.y;
@@ -2306,13 +2313,13 @@ void CChara::makeFurTex()
 
 				CColor basePartTmp;
 				basePartTmp.color.r =
-				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.r * (kCharaFurDepthScaleBase - t2)));
+				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.r * (scaleBase2 - t2)));
 				basePartTmp.color.g =
-				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.g * (kCharaFurDepthScaleBase - t2)));
+				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.g * (scaleBase2 - t2)));
 				basePartTmp.color.b =
-				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.b * (kCharaFurDepthScaleBase - t2)));
+				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.b * (scaleBase2 - t2)));
 				basePartTmp.color.a =
-				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.a * (kCharaFurDepthScaleBase - t2)));
+				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.a * (scaleBase2 - t2)));
 				CColor basePart = basePartTmp;
 
 				CColor colorTmp;
@@ -2326,7 +2333,7 @@ void CChara::makeFurTex()
 				GXWGFifo.f32 = py;
 				GXWGFifo.f32 = px;
 				GXWGFifo.u32 = *reinterpret_cast<unsigned int*>(&color.color);
-				t += kYmEnvQuarter;
+				t += quarterStep;
 			}
 		}
 

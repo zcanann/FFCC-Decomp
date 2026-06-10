@@ -2516,8 +2516,9 @@ void pppSetDrawEnv(pppCVECTOR* pppColor, pppFMATRIX* pppMtx, float depth, unsign
 	}
 
 	if ((s_fog_mode != fogIndex) || (s_fog_blend_mode != fogParam)) {
+		u8 fogTest = (u8)(fogParam - 1) <= 1;
 		u8 fogEnable = 1;
-		if ((u8)(fogParam - 1) > 1) {
+		if (!fogTest) {
 			fogEnable = 0;
 		}
 		s_fog_mode = fogIndex;
@@ -2533,12 +2534,12 @@ void pppSetDrawEnv(pppCVECTOR* pppColor, pppFMATRIX* pppMtx, float depth, unsign
 	if ((s_ztest != zEnable) || (s_zwrite != zWrite)) {
 		s_ztest = zEnable;
 		s_zwrite = zWrite;
-		GXSetZMode((GXBool)zEnable, GX_LEQUAL, (GXBool)zWrite);
+		GXSetZMode(zEnable, GX_LEQUAL, zWrite);
 	}
 
 	if (s_rgbwrite != colorUpdate) {
 		s_rgbwrite = colorUpdate;
-		GXSetColorUpdate((GXBool)colorUpdate);
+		GXSetColorUpdate(colorUpdate);
 	}
 }
 

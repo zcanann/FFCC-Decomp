@@ -1884,11 +1884,11 @@ void CCaravanWork::CalcStatus()
 			case 0xDB:
 				cmdBonus += value;
 				break;
-			case 0xE4:
-				hpBonus += value;
-				break;
 			case 0xDF:
 				magBonus += value;
+				break;
+			case 0xE4:
+				hpBonus += value;
 				break;
 			}
 		}

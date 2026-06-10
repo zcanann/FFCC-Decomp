@@ -3352,6 +3352,7 @@ int CGCharaObj::calcCastTime(int itemId)
 
 	int itemNo = *reinterpret_cast<short*>(itemData + 0x0);
 	int itemType = *reinterpret_cast<unsigned short*>(itemData + 0xE);
+	int result;
 
 	if (itemNo != 0x1F8 && itemType == 2) {
 		unsigned int castBonus = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0x194);
@@ -3376,31 +3377,27 @@ int CGCharaObj::calcCastTime(int itemId)
 		unsigned int castReduction = playerCid != 0 ? static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBD8)) : 0;
 		int totalCast = static_cast<int>(baseCast + castBonus) - static_cast<int>(castReduction);
 		int cast = static_cast<int>(castScale * static_cast<float>(totalCast));
-		cast = cast & ~(cast >> 31);
+		result = cast & ~(cast >> 31);
 		System.Printf(fmt + 0x74, baseCast, castBonus, castScale);
-		return cast;
-	}
-
-	if (itemType == 3) {
+	} else if (itemType == 3) {
+		result = static_cast<int>(baseCast);
 		System.Printf(fmt + 0x9C, baseCast);
-		return static_cast<int>(baseCast);
-	}
-	if (itemType == 4) {
+	} else if (itemType == 4) {
+		result = static_cast<int>(baseCast);
 		System.Printf(fmt + 0xB0, baseCast);
-		return static_cast<int>(baseCast);
-	}
-	if (itemNo == 0x1F8) {
+	} else if (itemNo == 0x1F8) {
 		unsigned int castBonus = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0x196);
 		unsigned int playerCid = (static_cast<unsigned int>(__cntlzw(0x6D - static_cast<int>(static_cast<unsigned short>(GetCID()) & 0x6D))) >> 5) & 0xFFU;
 		unsigned int castReduction = playerCid != 0 ? static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBD9)) : 0;
 		int totalCast = static_cast<int>(baseCast + castBonus) - static_cast<int>(castReduction);
 		int cast = static_cast<int>(castScale * static_cast<float>(totalCast));
-		cast = cast & ~(cast >> 31);
+		result = cast & ~(cast >> 31);
 		System.Printf(fmt + 0xC4, baseCast, castBonus, castScale);
-		return cast;
+	} else {
+		result = static_cast<int>(baseCast);
 	}
 
-	return static_cast<int>(baseCast);
+	return result;
 }
 
 /*

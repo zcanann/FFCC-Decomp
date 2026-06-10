@@ -2558,7 +2558,7 @@ void CPartMng::pppEditDrawShadow()
                 partPos.y = mng->m_matrix.value[1][3];
                 partPos.z = mng->m_matrix.value[2][3];
 
-                if ((double)mng->m_cullRadiusSq != 0.0) {
+                if ((double)mng->m_cullRadiusSq != -1.0) {
                     goto checkCull;
                 }
 
@@ -2658,7 +2658,7 @@ void CPartMng::pppEditDraw()
                         partPos.y = mng->m_matrix.value[1][3];                                             \
                         partPos.z = mng->m_matrix.value[2][3];                                             \
                                                                                                            \
-                        if ((double)mng->m_cullRadiusSq != 0.0) {                                          \
+                        if ((double)mng->m_cullRadiusSq != -1.0) {                                          \
                             goto checkCull##drawPass;                                                      \
                         }                                                                                  \
                                                                                                            \
@@ -2772,7 +2772,7 @@ void CPartMng::pppEditPartDrawAfter()
                         partPos.y = mng->m_matrix.value[1][3];                                             \
                         partPos.z = mng->m_matrix.value[2][3];                                             \
                                                                                                            \
-                        if ((double)mng->m_cullRadiusSq != 0.0) {                                          \
+                        if ((double)mng->m_cullRadiusSq != -1.0) {                                          \
                             goto checkCull##drawPass;                                                      \
                         }                                                                                  \
                                                                                                            \
@@ -3036,7 +3036,7 @@ void CPartMng::pppDrawPrio(unsigned char drawMode)
             partPos.y = mng->m_matrix.value[1][3];
             partPos.z = mng->m_matrix.value[2][3];
 
-            if ((double)mng->m_cullRadiusSq != 0.0) {
+            if ((double)mng->m_cullRadiusSq != -1.0) {
                 goto checkCull;
             }
 
@@ -3150,7 +3150,7 @@ void CPartMng::pppDrawPrioPdtFpno(unsigned char drawMode, short kind, short node
     {
         struct PppCullBound { Vec m_min; Vec m_max; };
 
-        if ((double)mng->m_cullRadiusSq != 0.0) {
+        if ((double)mng->m_cullRadiusSq != -1.0) {
             goto checkCull;
         }
 
@@ -3244,7 +3244,7 @@ void CPartMng::pppDrawIdx(int partIndex)
     partPos.y = mng->m_matrix.value[1][3];
     partPos.z = mng->m_matrix.value[2][3];
 
-    if ((double)mng->m_cullRadiusSq != 0.0) {
+    if ((double)mng->m_cullRadiusSq != -1.0) {
         goto checkCull;
     }
 
@@ -3316,7 +3316,7 @@ void CPartMng::pppDraw()
             partPos.y = mng->m_matrix.value[1][3];
             partPos.z = mng->m_matrix.value[2][3];
 
-            if ((double)mng->m_cullRadiusSq != 0.0) {
+            if ((double)mng->m_cullRadiusSq != -1.0) {
                 goto checkCull;
             }
 
@@ -3401,7 +3401,7 @@ void CPartMng::pppPartDrawAfter()
             partPos.y = mng->m_matrix.value[1][3];
             partPos.z = mng->m_matrix.value[2][3];
 
-            if ((double)mng->m_cullRadiusSq != 0.0) {
+            if ((double)mng->m_cullRadiusSq != -1.0) {
                 goto checkCull;
             }
 

@@ -72,8 +72,8 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
     u8* workBytes = object->m_workArea + particleDataOffset;
     VColor* colorWork = (VColor*)(object->m_workArea + colorOffset);
     u8* particle = *(u8**)(workBytes + 0x3c);
-    _PARTICLE_COLOR* colors = *(_PARTICLE_COLOR**)(workBytes + 0x44);
     _PARTICLE_WMAT* wmats = *(_PARTICLE_WMAT**)(workBytes + 0x40);
+    _PARTICLE_COLOR* colors = *(_PARTICLE_COLOR**)(workBytes + 0x44);
     s8 hasRequiredMemory;
 
     if (particle == 0) {
@@ -146,10 +146,11 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                 u32 workRand;
                 u32 shapeFrameCount;
                 float trailX, trailY, trailZ;
-                float startX, startY, startZ;
-                float camX, camY, camZ;
+                float camX;
                 float segX, segY, segZ;
+                float camY, camZ;
                 float segLen;
+                float startX, startY, startZ;
                 float segProgress;
 
                 {

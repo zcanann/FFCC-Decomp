@@ -779,7 +779,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 	CMemory::CStage* stage = ppvEnv->m_stagePtr;
 	_pppPObjLink* newObj = 0;
 	int firstFailure = 1;
-	int canRetry = 1;
+	int canRetry;
 	s8 denied[0x180];
 
 	ppvMemAllocErrorF = 0;
@@ -789,7 +789,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 		                                      const_cast<char*>(s_pppPart_cpp), 0x305, 1);
 		if (newObj != 0)
 		{
-			break;
+			goto allocated;
 		}
 
 		if (firstFailure)
@@ -887,7 +887,10 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 						owner->m_pppPObjLink = obj->m_next;
 					}
 
-					Memory.Free(obj);
+					if (obj != 0)
+					{
+						Memory.Free(obj);
+					}
 				}
 				else
 				{
@@ -895,15 +898,19 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 				}
 				obj = next;
 			}
+			canRetry = 1;
 		}
 	}
 	while (canRetry);
 
+	ppvEnv->m_stagePtr->heapWalker(2, 0, 0xFFFFFFFF);
+	PartMng.pppDumpMngSt();
+	ppvMemAllocErrorF = 1;
+
+allocated:
 	if (newObj == 0)
 	{
-		ppvEnv->m_stagePtr->heapWalker(2, 0, 0xFFFFFFFF);
-		PartMng.pppDumpMngSt();
-		ppvMemAllocErrorF = 1;
+		return 0;
 	}
 	else
 	{

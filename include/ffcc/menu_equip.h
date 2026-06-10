@@ -17,8 +17,7 @@ struct EquipMenuState
     unsigned char pad_20[2];
     short frame;
     unsigned char pad_24[2];
-    short selectedIndex;
-    short subSelectedIndex;
+    short selected[2];
     unsigned char pad_2A[2];
     short emptySlotHelpState;
     unsigned char pad_2E[2];

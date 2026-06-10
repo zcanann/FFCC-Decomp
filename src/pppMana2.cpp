@@ -935,7 +935,8 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
                                    (_GXTexFmt)0x16, 1);
         GXSetViewport(LoadFloat(kMana2Zero), LoadFloat(kMana2Zero), LoadFloat(kMana2ParaboloidTexSize),
                       LoadFloat(kMana2ParaboloidTexSize), LoadFloat(kMana2Zero), LoadFloat(kMana2One));
-        C_MTXPerspective(projectionMtx, LoadFloat(kMana2ParaboloidFov), LoadFloat(kMana2One),
+        float fov = LoadFloat(kMana2ParaboloidFov);
+        C_MTXPerspective(projectionMtx, fov, LoadFloat(kMana2One),
                          LoadFloat(kMana2One), LoadFloat(kMana2ParaboloidFar));
         GXSetProjection(projectionMtx, (_GXProjectionType)0);
         float one = LoadFloat(kMana2One);

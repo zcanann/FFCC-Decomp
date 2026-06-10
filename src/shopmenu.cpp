@@ -1572,35 +1572,41 @@ void CShopMenu::DrawItemList()
 
     for (int row = 0; row < m_visibleRows; ++row) {
         int listType = m_listType;
-        int itemCount = ResolveShopMenuItemCount(this);
+        int itemCount = getItemCnt();
 
-        if (itemCount <= itemIndex) {
+        if (itemIndex >= itemCount) {
             break;
         }
 
         int itemNo = getItemNo(itemIndex);
 
-        bool canTrade = false;
-        if (itemIndex != -1) {
+        int canTrade;
+        if (itemIndex == -1) {
+            canTrade = 0;
+        } else {
             int tradeItemNo = getItemNo(itemIndex);
-
-            if (tradeItemNo > 0) {
-                if (listType == 0) {
-                    canTrade = true;
-                } else if (listType == 2) {
-                    unsigned int bit = static_cast<unsigned int>(tradeItemNo - 0x191);
-                    if ((ShopMenuCaravanWork(this)->m_shopArgs[(tradeItemNo - 0x191) >> 5] &
-                         (1U << (bit & 0x1F))) != 0) {
-                        canTrade = true;
-                    }
-                } else if (MenuPcs.EquipChk(itemIndex) == 0 && tradeItemNo > 0x9E) {
-                    canTrade = true;
+            if (tradeItemNo <= 0) {
+                canTrade = 0;
+            } else if (listType == 0) {
+                canTrade = 1;
+            } else if (listType == 2) {
+                canTrade = 1;
+                if ((m_caravanWork->m_shopArgs[((int)(tradeItemNo - 0x191U) >> 5)] &
+                     (1 << ((tradeItemNo - 0x191U) & 0x1F))) != 0) {
+                } else {
+                    canTrade = 0;
                 }
+            } else if (static_cast<unsigned char>(MenuPcs.EquipChk(itemIndex)) != 0) {
+                canTrade = 0;
+            } else if (tradeItemNo > 0x9E) {
+                canTrade = 1;
+            } else {
+                canTrade = 0;
             }
         }
 
         int frame = 0xE;
-        if (canTrade) {
+        if (canTrade != 0) {
             frame = selectableFrame;
         }
 
@@ -1643,7 +1649,7 @@ void CShopMenu::DrawItemList()
     if (pulse < 0) {
         pulse = -pulse;
     }
-    int alpha = static_cast<int>(DOUBLE_80332DA0 * (DOUBLE_80332DB0 * static_cast<double>(pulse) + DOUBLE_80332DA8));
+    unsigned char alpha = static_cast<int>(DOUBLE_80332DA0 * (DOUBLE_80332DB0 * static_cast<double>(pulse) + DOUBLE_80332DA8));
     float scale = static_cast<float>(DOUBLE_80332DA8 * (DOUBLE_80332DC0 * static_cast<double>(pulse) + DOUBLE_80332DB8));
 
     if (m_canScrollUp != 0) {

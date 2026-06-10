@@ -49,8 +49,9 @@ public:
 	
 	struct JoyBusRecvBuffer
 	{
-		unsigned int   m_length;         // 0x00
-		unsigned short m_cmdFlags;       // 0x04
+		int            m_length;         // 0x00
+		unsigned char  m_cmdFlags;       // 0x04
+		unsigned char  m_unk05;          // 0x05
 		unsigned short m_crc;            // 0x06
 		unsigned char  m_payload[0x400]; // 0x08
 	};

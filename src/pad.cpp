@@ -106,6 +106,7 @@ void CPad::Frame()
 	int iVar14;
 	u32 port;
 	u32 uVar15;
+	u32 gbaIdx;
 	u32 uVar16;
 	u32 uVar17;
 	u16* puVar18;
@@ -223,12 +224,12 @@ void CPad::Frame()
 	puVar13 = reinterpret_cast<u16*>(local_88);
 	puVar10 = reinterpret_cast<u16*>(self + 0x154);
 	uVar16 = 0;
-	uVar17 = 0;
+	gbaIdx = 0;
 	puVar7 = puVar13;
 	do
 	{
 		cVar9 = *reinterpret_cast<s8*>(puVar7 + 5);
-		uVar15 = 0x80000000 >> uVar17;
+		uVar15 = 0x80000000 >> gbaIdx;
 		if (cVar9 == -1)
 		{
 			goto gba_ready;
@@ -256,7 +257,7 @@ void CPad::Frame()
 		_1a8_4_ = _1a8_4_ | uVar15;
 		goto flag_done;
 	gba_ready:
-		if (static_cast<u8>(Joybus.GBAReady(uVar17)) == 0)
+		if (static_cast<u8>(Joybus.GBAReady(gbaIdx)) == 0)
 		{
 			uVar16 = uVar16 | uVar15;
 		}
@@ -265,9 +266,9 @@ void CPad::Frame()
 	flag_clear:
 		_1a8_4_ = _1a8_4_ & ~uVar15;
 	flag_done:
-		uVar17 = uVar17 + 1;
+		gbaIdx = gbaIdx + 1;
 		puVar7 = puVar7 + 6;
-	} while (uVar17 < 4);
+	} while (gbaIdx < 4);
 
 	if ((uVar16 & 0xF0000000) != 0)
 	{

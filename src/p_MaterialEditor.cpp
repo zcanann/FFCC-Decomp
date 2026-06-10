@@ -319,7 +319,7 @@ void CMaterialEditorPcs::drawViewer()
                     if (textureHeader[1] == 0x20) {
                         GXSetNumTevStages(1);
                         GXSetNumTexGens(1);
-                        GXLoadTexObj(m_texObj[polygon->textureIndex], GX_TEXMAP0);
+                        GXLoadTexObj(m_texObj[polygon->textureIndex], static_cast<_GXTexMapID>(polygon->textureIndex));
                         _GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASC, GX_CC_ZERO);
                         _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
                         _GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_TEXA, GX_CA_RASA, GX_CA_ZERO);
@@ -399,15 +399,13 @@ void CMaterialEditorPcs::drawViewer()
                     clrIndex[3] = 2;
                 }
 
-                u32 pos;
                 u32 clr;
                 u8 i = 0;
                 while (i < vertexCount) {
-                    pos = posIndex[i];
+                    GXWGFifo.u16 = static_cast<u16>(posIndex[i]);
+                    GXWGFifo.u16 = static_cast<u16>(posIndex[i]);
                     clr = clrIndex[i];
                     i++;
-                    GXWGFifo.u16 = static_cast<u16>(pos);
-                    GXWGFifo.u16 = static_cast<u16>(pos);
                     GXWGFifo.u8 = static_cast<u8>(clr);
                     GXWGFifo.u16 = static_cast<u16>(clr);
                 }

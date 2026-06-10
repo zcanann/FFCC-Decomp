@@ -752,8 +752,10 @@ path:
                 float vx;
                 float vy;
                 float vz;
+                float sampleT;
 
-                if (param->m_randType == 0 || (s32)param->m_randType > 5) {
+                switch (param->m_randType) {
+                default:
                     if ((int)work->m_pathIndex >= pathInfo[1]) {
                         work->m_pathIndex = 0;
                     }
@@ -767,56 +769,53 @@ path:
                         vy = pathVec[1];
                         vz = pathVec[2];
                     }
-                } else {
-                    float sampleT;
-
-                    switch (param->m_randType) {
-                    case 1:
-                        Math.RandF();
-                        sampleT = Math.RandF();
-                        break;
-                    case 2: {
-                        float a = Math.RandF();
-                        float b = Math.RandF();
-                        sampleT = a * b * Math.RandF();
-                        break;
-                    }
-                    case 3: {
-                        float a = Math.RandF();
-                        float b = Math.RandF();
-                        sampleT = static_cast<float>(kPppYmMegaBirthShpTail2OneDouble - (a * b * Math.RandF()));
-                        break;
-                    }
-                    case 4: {
-                        float a = Math.RandF();
-                        float b = Math.RandF();
-                        float c = Math.RandF();
-                        sampleT = a * (b * (c * Math.RandF()));
-                        break;
-                    }
-                    case 5: {
-                        float a = Math.RandF();
-                        float b = Math.RandF();
-                        float c = Math.RandF();
-                        float d = Math.RandF();
-                        sampleT = static_cast<float>(kPppYmMegaBirthShpTail2OneDouble - (a * (b * (c * (d * Math.RandF())))));
-                        break;
-                    }
-                    }
-
-                    if ((int)work->m_pathIndex >= pathInfo[1]) {
-                        work->m_pathIndex = 0;
-                    }
-
-                    if (pathBase != 0) {
-                        int sampleIndex = (int)(sampleT * (float)pathInfo[1]);
-                        float* pathVec = (float*)((u8*)pathBase + *(u16*)(*(int*)(pathInfo + 2) + sampleIndex * 2) * sizeof(Vec));
-                        vx = pathVec[0];
-                        vy = pathVec[1];
-                        vz = pathVec[2];
-                    }
+                    goto path_apply;
+                case 1:
+                    Math.RandF();
+                    sampleT = Math.RandF();
+                    break;
+                case 2: {
+                    float a = Math.RandF();
+                    float b = Math.RandF();
+                    sampleT = a * b * Math.RandF();
+                    break;
+                }
+                case 3: {
+                    float a = Math.RandF();
+                    float b = Math.RandF();
+                    sampleT = static_cast<float>(kPppYmMegaBirthShpTail2OneDouble - (a * b * Math.RandF()));
+                    break;
+                }
+                case 4: {
+                    float a = Math.RandF();
+                    float b = Math.RandF();
+                    float c = Math.RandF();
+                    sampleT = a * (b * (c * Math.RandF()));
+                    break;
+                }
+                case 5: {
+                    float a = Math.RandF();
+                    float b = Math.RandF();
+                    float c = Math.RandF();
+                    float d = Math.RandF();
+                    sampleT = static_cast<float>(kPppYmMegaBirthShpTail2OneDouble - (a * (b * (c * (d * Math.RandF())))));
+                    break;
+                }
                 }
 
+                if ((int)work->m_pathIndex >= pathInfo[1]) {
+                    work->m_pathIndex = 0;
+                }
+
+                if (pathBase != 0) {
+                    int sampleIndex = (int)(sampleT * (float)pathInfo[1]);
+                    float* pathVec = (float*)((u8*)pathBase + *(u16*)(*(int*)(pathInfo + 2) + sampleIndex * 2) * sizeof(Vec));
+                    vx = pathVec[0];
+                    vy = pathVec[1];
+                    vz = pathVec[2];
+                }
+
+            path_apply:
                 particleData->m_matrix[0][0] = vx * param->field_0x58;
                 particleData->m_matrix[0][1] = vy * param->m_speedScale.x;
                 particleData->m_matrix[0][2] = vz * param->m_speedScale.y;

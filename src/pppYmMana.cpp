@@ -897,15 +897,14 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
                                 const_cast<char*>(s_pppYmMana_cpp), 0x407));
                 CChara::CMesh::CDisplayList* displayList = meshShape->m_displayLists;
                 for (s32 dlIndex = meshShape->m_displayListCount - 1; dlIndex >= 0; dlIndex--) {
-                    void* copiedDisplayList =
+                    mana->m_displayListCopies[dlIndex] =
                         pppMemAlloc(displayList->m_size, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x411);
-                    copiedDisplayList =
-                        reinterpret_cast<void*>((reinterpret_cast<u32>(copiedDisplayList) + 0x1F) & 0xFFFFFFE0);
-                    mana->m_displayListCopies[dlIndex] = copiedDisplayList;
+                    mana->m_displayListCopies[dlIndex] = reinterpret_cast<void*>(
+                        (reinterpret_cast<u32>(mana->m_displayListCopies[dlIndex]) + 0x1F) & 0xFFFFFFE0);
                     mana->m_displayListSize = displayList->m_size;
-                    memcpy(copiedDisplayList, displayList->m_data, displayList->m_size);
-                    DCFlushRange(copiedDisplayList, displayList->m_size);
-                    gUtil.ReWriteDisplayList(copiedDisplayList, displayList->m_size, 3);
+                    memcpy(mana->m_displayListCopies[dlIndex], displayList->m_data, displayList->m_size);
+                    DCFlushRange(mana->m_displayListCopies[dlIndex], displayList->m_size);
+                    gUtil.ReWriteDisplayList(mana->m_displayListCopies[dlIndex], displayList->m_size, 3);
                     displayList++;
                 }
             }

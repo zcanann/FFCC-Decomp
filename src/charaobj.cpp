@@ -2927,9 +2927,11 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 	}
 	} else {
 		CFlatRuntime2Storage().ResetParticleWork((particleBank << 8) | particleNo, effectArg1);
-		CFlatRuntime2Storage().SetParticleWorkScale(*reinterpret_cast<short*>(itemData + 0x10) * 0.01f);
+		SCharaItemRow* scaleRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
+		CFlatRuntime2Storage().SetParticleWorkScale((static_cast<float>(scaleRows[effectId].m_scale) * 0.01f) + 1.0e-07f);
 		CFlatRuntime2Storage().SetParticleWorkParam(effectId, this);
-		CFlatRuntime2Storage().SetParticleWorkSpeed(*reinterpret_cast<short*>(itemData + 0x26) * 0.01f);
+		SCharaItemRow* speedRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
+		CFlatRuntime2Storage().SetParticleWorkSpeed((static_cast<float>(speedRows[effectId].m_speed) * 0.01f) + 1.0e-07f);
 
 		switch (effectArg0) {
 		case 0: {

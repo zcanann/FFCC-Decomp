@@ -1606,7 +1606,7 @@ void CMemoryCardMan::MakeSaveData()
                 caravanWork->unk_0xc1e = 1;
             }
         }
-        else
+        if (caravanWork->m_shopState == 0)
         {
             caravanWork->m_shopRandSeed = 0;
             caravanWork->unk_0xc1e = 0;

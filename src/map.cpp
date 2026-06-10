@@ -1337,22 +1337,23 @@ void CMapMng::DestroyMapLightHolder()
  */
 void CMapMng::DestroyMap()
 {
-    for (int i = 0; i < m_octTreeCount; i++) {
+    int i;
+    for (i = 0; i < m_octTreeCount; i++) {
         m_octTreeArray[i].~COctTree();
     }
     m_octTreeCount = 0;
 
-    for (int i = 0; i < m_mapHitCount; i++) {
+    for (i = 0; i < m_mapHitCount; i++) {
         m_mapHitArray[i].~CMapHit();
     }
     m_mapHitCount = 0;
 
-    for (int i = 0; i < m_mapObjCount; i++) {
+    for (i = 0; i < m_mapObjCount; i++) {
         m_mapObjArray[i].~CMapObj();
     }
     m_mapObjCount = 0;
 
-    for (int i = 0; i < m_mapMeshCount; i++) {
+    for (i = 0; i < m_mapMeshCount; i++) {
         m_mapMeshArray[i].~CMapMesh();
     }
     m_mapMeshCount = 0;

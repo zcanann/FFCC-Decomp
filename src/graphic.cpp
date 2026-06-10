@@ -1419,9 +1419,17 @@ void CGraphic::GetBackBufferRect2(void* dstBuffer, _GXTexObj* texObj, int x, int
 {
     int xEnd = x + width;
     int yEnd = y + height;
-    if ((xEnd >= 0) && (yEnd >= 0) && (x <= m_renderMode->fbWidth) &&
-        ((yEnd >= 0) && (y <= m_renderMode->efbHeight)) &&
-        ((width > 0) && ((height > 0) && (xEnd != x))) && (yEnd != y)) {
+    if ((xEnd < 0) || (yEnd < 0) || (x > m_renderMode->fbWidth) || (yEnd < 0) || (y > m_renderMode->efbHeight) ||
+        (width <= 0) || (height <= 0)) {
+        return;
+    }
+    if (xEnd - x == 0) {
+        return;
+    }
+    if (yEnd - y == 0) {
+        return;
+    }
+    {
         void* textureBase;
         int textureSize = GXGetTexBufferSize((u16)width, (u16)height, format, GX_FALSE, GX_FALSE);
         textureBase =

@@ -936,7 +936,8 @@ void CMenuPcs::CalcSelectCloseAnim()
 			int t0 = off;
 			int t1 = off;
 			int i = 0;
-			for (; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++, off += 0x40) {
+			int __p3 = i;
+			for (; __p3 < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++, off += 0x40) {
 				int sprOff = off + 8;
 				BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + sprOff);
 				spr->alpha = FLOAT_80331EB0;
@@ -993,7 +994,8 @@ void CMenuPcs::CalcSelectCloseAnim()
 			spr->targetY = (float)spr->y + spr->motionY;
 		}
 
-		int base = activePartyCount + 4;
+		int base;
+		base = activePartyCount + 4;
 		s_PlayerTop = (unsigned char)base;
 		for (int i = 0; i < activePartyCount; i++) {
 			int off = ((base + i) << 6) + 8;

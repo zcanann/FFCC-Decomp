@@ -741,9 +741,10 @@ void callCon2Prog(_pppPObject* pObject)
 		u32 stageSlotOffset = 0;
 		for (; stageCount < progSet->m_numStages; stageCount++)
 		{
+			_pppCtrlTable* stage = stageSet->m_stages;
 			s32** slotPtr = (s32**)(((u8*)pObject) + progSet->m_workBaseOffset + stageSlotOffset);
-			s32* nextSlot = (s32*)(((u8*)*slotPtr) + stageSet->m_stages[0].m_workOffset);
-			pppProg* prog = stageSet->m_stages[0].m_prog;
+			s32* nextSlot = (s32*)(((u8*)*slotPtr) + stage->m_workOffset);
+			pppProg* prog = stage->m_prog;
 
 			if (*nextSlot == pObject->m_graphId)
 			{
@@ -751,7 +752,7 @@ void callCon2Prog(_pppPObject* pObject)
 			}
 			if (prog != 0 && prog->m_pppFunctionOperation != 0 && prog->m_pppFunctionConstructor2 != 0)
 			{
-				((pppProgOperation2Callback)prog->m_pppFunctionOperation)(pObject, *slotPtr);
+				((pppProgOperationCallback)prog->m_pppFunctionOperation)(pObject, *slotPtr, stage);
 			}
 
 			stageSet = (_pppProgSetDef*)(((u8*)stageSet) + sizeof(_pppCtrlTable));
@@ -1029,7 +1030,10 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 	pppMngSt->m_pppPObjLinkHead.m_next = 0;
 	if (pppMngSt->m_pppPDataVals != 0)
 	{
-		Memory.Free(pppMngSt->m_pppPDataVals);
+		if (pppMngSt->m_pppPDataVals != 0)
+		{
+			Memory.Free(pppMngSt->m_pppPDataVals);
+		}
 		pppMngSt->m_pppPDataVals = 0;
 	}
 
@@ -1067,12 +1071,12 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 				}
 
 				s16 shapeCount = *shapeIndices;
-				shapeIndices++;
+				s16* shapeIter = shapeIndices + 1;
 				pppResSet = *reinterpret_cast<u32*>(pppMngSt->m_pppResSet);
 				for (s16 i = 0; i < shapeCount; i++)
 				{
-					pppShapeSt* shape = *(pppShapeSt**)(*(u32*)(pppResSet + 0x18) + *shapeIndices * 4);
-					shapeIndices++;
+					pppShapeSt* shape = *(pppShapeSt**)(*(u32*)(pppResSet + 0x18) + *shapeIter * 4);
+					shapeIter++;
 					pppCacheDumpShapeTexture(shape, PartMng.m_materialSet);
 				}
 			}
@@ -1808,7 +1812,7 @@ void pppInitPdt(long* progOffsetReconstructionTable, pppProg* pppProg)
 	int* pppProgRelocs = (int*)((int)progOffsetReconstructionTable + progOffsetReconstructionTable[2]) + 1;
 	int* pdtRelocs = (int*)((int)progOffsetReconstructionTable + progOffsetReconstructionTable[3]) + 1;
 
-	if (table[0] == 0) {
+	if ((u32)table[0] == 0) {
 		return;
 	}
 
@@ -2025,7 +2029,7 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
 	{
 		_pppPDataVal* pDataVal = (_pppPDataVal*)((u8*)pppMngSt->m_pppPDataVals + pDataValOffset);
 		if (pDataVal != 0 && pDataVal->m_programSetDef != 0 &&
-		    (s8)((s32)((u32)pDataVal->m_programSetDef->m_drawFlags << 24) >> 31) == 0 && pDataVal->m_activeCount > 0)
+		    (s8)((s32)(((u32)pDataVal->m_programSetDef->m_drawFlags << 24) & 0xC0000000) >> 31) == 0 && pDataVal->m_activeCount > 0)
 		{
 			s32 workOffsetStep = 0;
 			_pppProgSetDef* progSet = pDataVal->m_programSetDef;
@@ -2288,7 +2292,7 @@ void _pppCalcPart(_pppMngSt* pppMngSt)
 	ppvMng = pppMngSt;
 	if (se->m_soundEffectSlot >= 0 &&
 		pppMngSt->m_currentFrame >= se->m_soundEffectStartFrame &&
-		se->m_soundEffectStopFlag == 0)
+		(s32)se->m_soundEffectStopFlag == 0)
 	{
 		Vec soundPos;
 		soundPos.x = mtx->value[0][3];
@@ -2516,9 +2520,14 @@ void pppSetDrawEnv(pppCVECTOR* pppColor, pppFMATRIX* pppMtx, float depth, unsign
 	}
 
 	if ((s_fog_mode != fogIndex) || (s_fog_blend_mode != fogParam)) {
+		u8 fogTest = (u8)(fogParam - 1) <= 1;
+		u8 fogEnable = 1;
 		s_fog_mode = fogIndex;
 		s_fog_blend_mode = fogParam;
-		Graphic.SetFog((int)fogIndex, fogParam >= 1);
+		if (!fogTest) {
+			fogEnable = 0;
+		}
+		Graphic.SetFog((int)fogIndex, fogEnable);
 	}
 
 	if (s_cull_mode != cullMode) {
@@ -2529,12 +2538,12 @@ void pppSetDrawEnv(pppCVECTOR* pppColor, pppFMATRIX* pppMtx, float depth, unsign
 	if ((s_ztest != zEnable) || (s_zwrite != zWrite)) {
 		s_ztest = zEnable;
 		s_zwrite = zWrite;
-		GXSetZMode((GXBool)zEnable, GX_LEQUAL, (GXBool)zWrite);
+		GXSetZMode(zEnable, GX_LEQUAL, zWrite);
 	}
 
 	if (s_rgbwrite != colorUpdate) {
 		s_rgbwrite = colorUpdate;
-		GXSetColorUpdate((GXBool)colorUpdate);
+		GXSetColorUpdate(colorUpdate);
 	}
 }
 
@@ -2588,7 +2597,7 @@ void pppInitDrawEnv(unsigned char useZeroDepth)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, float radius, float cylScale)
+int pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, float radius, float cylScale)
 {
 	struct PppMngStHitRaw
 	{
@@ -2607,16 +2616,17 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 	};
 
 	PppMngStHitRaw* hitRaw = (PppMngStHitRaw*)pppMngSt;
-	bool hadHit = false;
+	int hadHit = 0;
 
 	if (kPppPartZero != cylScale)
 	{
+		u32 cylinderAttribute = hitRaw->m_cylinderAttribute;
 		CMapCylinder cylinder(kMapHitBoundsMinInit, kMapHitBoundsMaxInit);
 		cylinder.m_bottom = *origin;
 		cylinder.m_axis = *vector;
-		cylinder.m_radius = radius;
+		cylinder.m_radius = cylScale;
 
-		if (MapMng.CheckHitCylinder(&cylinder, vector, hitRaw->m_cylinderAttribute) != 0)
+		if (MapMng.CheckHitCylinder(&cylinder, vector, cylinderAttribute) != 0)
 		{
 			if (Game.m_currentSceneId == 7)
 			{
@@ -2636,7 +2646,7 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 				s32 partIndex = ((s32)((u8*)pppMngSt - ((u8*)&PartMng + 0x2A18))) / 0x158;
 				Game.HitParticleBG(partIndex, hitRaw->m_kind, hitRaw->m_nodeIndex, &hitPos, &hitRaw->m_hitParams);
 			}
-			hadHit = true;
+			hadHit = 1;
 		}
 	}
 
@@ -2683,7 +2693,7 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 						continue;
 					}
 
-					hadHit = true;
+					hadHit = 1;
 
 					if (Game.m_currentSceneId == 7)
 					{
@@ -2698,6 +2708,7 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 						int newCount = hitRaw->m_hitParams.m_hitObjectCount;
 						if (previousCount != newCount)
 						{
+							previousCount = newCount;
 							int updatedSlot;
 							for (updatedSlot = 0; updatedSlot < newCount; updatedSlot++)
 							{
@@ -2706,7 +2717,6 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 									break;
 								}
 							}
-							previousCount = newCount;
 							if (updatedSlot < newCount)
 							{
 								break;
@@ -2718,10 +2728,7 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 		}
 	}
 
-	if (hadHit)
-	{
-		return;
-	}
+	return hadHit;
 }
 
 extern "C" const unsigned int gPppFixedWhite = 0xffffffff;

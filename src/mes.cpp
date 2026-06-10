@@ -258,7 +258,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 8:
 		{
 			signed char varIndex = (signed char)GetMesNibbleValue((const char*)(op + 2));
-			strcpy(dst, FlatNameDirect(5, CMes::m_tempVar[varIndex]));
+			strcpy(dst, (char*)Game.m_caravanWorkArr[CMes::m_tempVar[varIndex]].m_name);
 			dst += strlen(dst);
 			in += 4;
 			break;
@@ -278,9 +278,6 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			case 9:
 			case 0x37:
 				strcpy(dst, FlatNameDirect(0, value * 5 + 1));
-				break;
-			case 0x1D:
-				strcpy(dst, FlatNameDirect(0, value * 5));
 				break;
 			case 0x39:
 				strcpy(dst, FlatNameDirect(0, value * 5 + 3));
@@ -302,6 +299,9 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 				Game.MakeNumItemName(dst, value, count);
 				break;
 			}
+			case 0x1D:
+				strcpy(dst, FlatNameDirect(0, value * 5));
+				break;
 			}
 			ApplyCaseMode(dst, caseMode);
 			dst += strlen(dst);
@@ -320,9 +320,6 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			int value = CMes::m_tempVar[varIndex];
 			switch (tag)
 			{
-			case 0x1E:
-				strcpy(dst, FlatNameDirect(1, value * 5));
-				break;
 			case 0x2A:
 			case 0x38:
 				strcpy(dst, FlatNameDirect(1, value * 5 + 1));
@@ -347,6 +344,9 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 				Game.MakeNumMonName(dst, value, count);
 				break;
 			}
+			case 0x1E:
+				strcpy(dst, FlatNameDirect(1, value * 5));
+				break;
 			}
 			ApplyCaseMode(dst, caseMode);
 			dst += strlen(dst);

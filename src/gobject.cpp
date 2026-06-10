@@ -1709,7 +1709,7 @@ void CGObject::update()
 
         const float alphaTarget = m_stepSlopeLimit * onAlphaUpdate();
         const float alphaStep = ClampFloat(alphaTarget * visibleScale - m_lookAtTimer, -m_bgDownDist, m_bgDownDist);
-        m_lookAtTimer = m_lookAtTimer + alphaStep;
+        m_lookAtTimer += alphaStep;
         m_lookAtTimer = ClampFloat(m_lookAtTimer, sZeroFloat, sAnimFrameOffset);
         const float worldParamStep = m_worldParam - sWobbleBiasSmall;
         m_worldParam = worldParamStep < sZeroFloat ? sZeroFloat : worldParamStep;

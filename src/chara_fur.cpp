@@ -2473,7 +2473,7 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 				a = a < 0 ? 0 : a;
 			} else {
 				float k = (float)(7 - targetColor.a) / kCharaFurAlphaComponentScale + (float)(distance / 4);
-				k = (k > 1.0f) ? 1.0f : k;
+				k = (1.0f < k) ? 1.0f : k;
 				{
 					float inv = 1.0f - k;
 					r = (int)((float)r * k + (float)targetColor.r * inv);

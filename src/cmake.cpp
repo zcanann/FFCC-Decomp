@@ -3078,16 +3078,19 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
 
     const char* yesStr = GetMenuStr(1);
     float yesW = static_cast<float>(font->GetWidth(yesStr));
-    int yesX = static_cast<int>(
-        (48.0f - yesW) / 2.0f + static_cast<float>(0x1D0));
+    int packed = (yesNoSel == 0) ? 0x01D00218 : 0x01D00218;
+    int yesX = packed >> 16;
+    yesX = static_cast<int>(
+        (48.0f - yesW) / 2.0f + static_cast<float>(yesX));
     font->SetPosX(static_cast<float>(yesX));
     font->SetPosY(369.0f);
     font->Draw(yesStr);
 
     const char* noStr = GetMenuStr(2);
     float noW = static_cast<float>(font->GetWidth(noStr));
-    int noX = static_cast<int>(
-        (48.0f - noW) / 2.0f + static_cast<float>(0x218));
+    int noX = packed & 0xFFFF;
+    noX = static_cast<int>(
+        (48.0f - noW) / 2.0f + static_cast<float>(noX));
     font->SetPosX(static_cast<float>(noX));
     font->SetPosY(369.0f);
     font->Draw(noStr);

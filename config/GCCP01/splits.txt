@@ -52,7 +52,7 @@ graphic.cpp:
 	.bss        start:0x80230E48 end:0x8023C4D8
 	.sdata      start:0x8032E3E8 end:0x8032E400
 	.sbss       start:0x8032EC48 end:0x8032EC55
-	.sdata2     start:0x8032F6E8 end:0x8032F718
+	.sdata2     start:0x8032F6C0 end:0x8032F718
 
 main.cpp:
 	extab       start:0x80005920 end:0x80005930

@@ -1567,10 +1567,10 @@ int CChara::CModel::PickFur(
 						const float magAB = PSVECMag(areaAB);
 						const float magCA = PSVECMag(areaCA);
 						const float magBC = PSVECMag(areaBC);
-						CVector weightsInit(magBC, magCA, magAB);
+						const CVector& weightsInit = CVector(magBC, magCA, magAB);
 						CVector weightsScale;
 						CVector weights;
-						PSVECScale(weightsInit, weightsScale, kCharaFurWeightScale);
+						PSVECScale(const_cast<CVector&>(weightsInit), weightsScale, kCharaFurWeightScale);
 						weights.x = weightsScale.x;
 						weights.y = weightsScale.y;
 						weights.z = weightsScale.z;

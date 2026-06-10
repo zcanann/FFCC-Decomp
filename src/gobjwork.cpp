@@ -1929,8 +1929,8 @@ void CCaravanWork::CalcStatus()
 				int weaponRef;
 				int weaponItem;
 				GetCurrentWeaponItem(weaponItem, weaponRef);
-				if (weaponItem > 0) {
-					itemIdx = weaponItem;
+				if (weaponRef > 0) {
+					itemIdx = weaponRef;
 				}
 			}
 

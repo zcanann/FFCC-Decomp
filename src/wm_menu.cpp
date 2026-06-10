@@ -2036,7 +2036,7 @@ void CMenuPcs::CalcMCardMenu()
 	} else {
 		unsigned int padIndex = 0;
 		padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-		int __p11 = padIndex;
+		int __p11 =  (0 + padIndex);
 		uVar3 = Pad.GetPadInputs()[__p11].buttonDown[0];
 	}
 	unsigned short uVar6 = GetButtonRepeat(0);
@@ -2235,7 +2235,8 @@ void CMenuPcs::CalcMCardMenu()
 				piVar18 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar18) + 2);
 			}
 			int iLines = iVar14 / 0x16;
-			if (iVar14 - iLines * 0x16 != 0) iLines = iLines + 1;
+			int __p28 = iLines;
+			if (iVar14 - iLines * 0x16 != 0) iLines = __p28 + 1;
 			sVar7 = (iLines + 2) * 0x16 + 0x40;
 			iVar14 = (int)(float)((float)(0x280 - sVar7) * DOUBLE_803313f8);
 			short sVar16 = (short)*piVar4 * 0x1E + 0x40;
@@ -2269,7 +2270,7 @@ void CMenuPcs::CalcMCardMenu()
 				else if (sVar7 == 7) { sVar16 = -4; }
 				else { sVar16 = 0; }
 				if (sVar7 != 7) {
-					if (m_wmWorldState->m_mcResult != sVar16 && m_wmWorldState->m_mcResult != 1) {
+					if (sVar16 != m_wmWorldState->m_mcResult && m_wmWorldState->m_mcResult != 1) {
 						m_wmWorldState->m_state0E = -1;
 						m_wmWorldState->m_counter1A = 1;
 						break;
@@ -2471,7 +2472,8 @@ void CMenuPcs::CalcMCardMenu()
 	case 0x13:
 	case 0x1A: {
 		if ((signed char)m_wmWorldState->m_flag09 == 0) {
-			int uVar20 = 0;
+			int uVar20;
+			uVar20 = 0;
 			int uVar17;
 			if (iVar12 == 0xD) { uVar17 = 7; }
 			else if (iVar12 == 0x1A) { uVar17 = 0x1A; uVar20 = 1; }
@@ -2580,7 +2582,8 @@ void CMenuPcs::CalcMCardMenu()
 		if (m_menuWindowInfo->state == 1
 		    && m_wmWorldState->m_counter1A == 0) {
 			short listRes = (short)GetMcCtrl()->LoadMcList();
-			m_wmWorldState->m_mcResult = listRes;
+			int __p9 = listRes;
+			m_wmWorldState->m_mcResult = __p9;
 			if (m_wmWorldState->m_mcResult == 0) {
 				if (m_wmWorldState->m_mcResult < 0) {
 					MemoryCardMan.m_opDoneFlag = 1;
@@ -2675,10 +2678,10 @@ void CMenuPcs::CalcMCardMenu()
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			} else {
 				if ((uVar6 & 4) != 0) {
-					if (m_wmWorldState->m_cardChannel < 3) {
-						m_wmWorldState->m_cardChannel++;
-					} else {
+					if (!(m_wmWorldState->m_cardChannel < 3)) {
 						m_wmWorldState->m_cardChannel = 0;
+					} else {
+						m_wmWorldState->m_cardChannel++;
 					}
 					Sound.PlaySe(1, 0x40, 0x7F, 0);
 				}

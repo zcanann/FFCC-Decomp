@@ -3954,14 +3954,15 @@ int CMenuPcs::CalcGoOutSelChar(unsigned char state, unsigned char slot)
 		float shift = static_cast<float>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 8) + *reinterpret_cast<short*>(m_wm.m_frameInfo + 4));
 		if (offset >= -10) {
 			shift = static_cast<float>(static_cast<double>(shift) * (DOUBLE_803314e8 * static_cast<double>(offset < 0 ? -offset : offset)));
-			int absOffset = offset < 0 ? -offset : offset;
+			int absOffset =  (s32)(offset < 0 ? -offset : offset);
 			if (absOffset < 0) {
 				absOffset = 0;
 			}
 			if (absOffset > 10) {
 				absOffset = 10;
 			}
-			const float t = static_cast<float>(absOffset);
+			int __p1 = absOffset;
+			const float t = static_cast<float>(__p1);
 			shift *= static_cast<float>(sin(FLOAT_803314bc * (t * FLOAT_803316d4)));
 		}
 
@@ -14132,12 +14133,12 @@ int McCtrl::SaveDataBuffer(char* buffer)
 			}
 
 			const int closeResult = MemoryCardMan.McClose();
-			if (closeResult == 0) {
-				MemoryCardMan.McUnmount(m_cardChannel);
-				MemoryCardMan.DestroyMcBuff();
-			} else {
+			if (!(closeResult == 0)) {
 				m_lastResult = closeResult;
 				m_state = -1;
+			} else {
+				MemoryCardMan.McUnmount(m_cardChannel);
+				MemoryCardMan.DestroyMcBuff();
 			}
 		}
 		break;
@@ -14149,7 +14150,8 @@ int McCtrl::SaveDataBuffer(char* buffer)
 	if (m_state == -1) {
 		return -999;
 	}
-	int result = 0;
+	int result;
+	result = 0;
 	if (m_state == 0x12) {
 		result = 1;
 	}

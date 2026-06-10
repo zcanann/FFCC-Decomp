@@ -66,9 +66,9 @@ extern "C" void destroyViewer__9CCharaPcsFv(CCharaPcs*);
 extern "C" void calcViewer__9CCharaPcsFv(CCharaPcs*);
 extern "C" void drawViewer__9CCharaPcsFv(CCharaPcs*);
 
-static const char s_CCharaPcs_GAME[] = "CCharaPcs GAME";
-static const char s_CCharaPcs_VIEWER[] = "CCharaPcs VIEWER";
-static const char s_CCharaPcs_PART[] = "CCharaPcs PART";
+static const char s_CCharaPcs_GAME[] = "CCharaPcs(GAME)";
+static const char s_CCharaPcs_VIEWER[] = "CCharaPcs(VIEWER)";
+static const char s_CCharaPcs_PART[] = "CCharaPcs(PART)";
 
 static CProcessTableCallback s_charaTableDescCreate = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__9CCharaPcsFv)};
 static CProcessTableCallback s_charaTableDescDestroy = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__9CCharaPcsFv)};
@@ -145,8 +145,8 @@ inline void* operator new(unsigned long, void* ptr)
 
 static const char s_p_chara_cpp[] = "p_chara.cpp";
 static const char s_CCharaPcs_stage[] = "CCharaPcs";
-static const char s_CCharaPcs_amem[] = "CCharaPcs amem";
-static const char s_CCharaPcs_amemw[] = "CCharaPcs amemw";
+static const char s_CCharaPcs_amem[] = "CCharaPcs.amem";
+static const char s_CCharaPcs_amemw[] = "CCharaPcs.amemw";
 static const char s_CCharaPcs_loadModel[] = "CCharaPcs LoadModel";
 static const char s_CCharaPcs_loadTex[] = "CCharaPcs LoadTex";
 static const char s_CCharaPcs_loadWepTex[] = "CCharaPcs LoadWepTex";
@@ -218,16 +218,24 @@ static const char s_charaAmemCompactFailed[] =
     "\x91\x53\x82\xc4\x8f\xc1\x8b\x8e\x82\xb5\x82\xdc\x82\xb7\x81\x42\n";
 static const char s_charaBasePathFmt[] = "dvd/char/%s/%s%03d/%s%03d%s";
 static const char s_charaAnimPathFmt[] = "dvd/char/%s/%s%03d/%s.cha";
-static const char s_charaModelSuffix[] = ".mdl";
-static const char s_charaDynamicsSuffix[] = ".dyn";
+static const char s_charaModelSuffix[] = ".chm";
+static const char s_charaDynamicsSuffix[] = ".chd";
 static const char s_charaTextureSuffix[] = ".tex";
 static const char s_charaTextureVariantFmt[] = "%s_%c";
-static const char s_mogFurTextureName[] = "mog_hair";
-static const char s_charaSetAnimMissingFmt[] = "CCharaPcs missing anim %d %d %d\n";
-static const char s_charaLoadAnimLogFmt[] = "CCharaPcs LoadAnim %s %d %d\n";
+static const char s_mogFurTextureName[] = "n915m_2";
+static const char s_charaSetAnimMissingFmt[] =
+    "\x83\x41\x83\x6a\x83\x81\x81\x5b\x83\x56\x83\x87\x83\x93\x82\xaa\x82\xa0\x82\xe8\x82\xdc\x82\xb9\x82\xf1\x81\x42"
+    "\x74\x79\x70\x65\x3d\x25\x64\x20\x6e\x75\x6d\x62\x65\x72\x3d\x25\x64\x20\x61\x6e\x69\x6d\x6e\x6f\x3d\x25\x64\x0a";
+static const char s_charaLoadAnimLogFmt[] =
+    "\x1b\x5b\x33\x31\x6d\x4d\x65\x72\x67\x65\x3a\x20\x83\x41\x83\x6a\x83\x81\x81\x5b\x83\x56\x83\x87\x83\x93\x82\xf0"
+    "\x44\x56\x44\x82\xa9\x82\xe7\x93\xc7\x82\xdd\x8d\x9e\x82\xdd\x82\xdc\x82\xb5\x82\xbd\x81\x42\x6e\x61\x6d\x65\x20"
+    "\x3d\x20\x25\x73\x20\x74\x79\x70\x65\x20\x3d\x20\x25\x64\x20\x6e\x75\x6d\x62\x65\x72\x20\x3d\x20\x25\x64\x0a\x1b"
+    "\x5b\x30\x6d";
 static const char s_charaLoadPdtLogFmt[] =
     "\x1b[31mMerge: \x83\x82\x83\x93\x83X\x83^\x81[PDT\x82\xf0" "DVD\x82\xa9\x82\xe7\x93\xc7\x82\xdd\x8d\x9e\x82\xdd\x82\xdc\x82\xb5\x82\xbd\x81" "Btype = %d number = %d idxTexture = %d\n\x1b[0m";
-static const char s_charaReleaseAnimBankFmt[] = "bank release %d %s\n";
+static const char s_charaReleaseAnimBankFmt[] =
+    "\x83\x71\x83\x58\x83\x67\x83\x8a\x81\x5b\x25\x64\x82\xcc\x83\x41\x83\x6a\x83\x81\x81\x5b\x83\x56\x83\x87\x83\x93"
+    "\x25\x73\x82\xf0\x8a\x4a\x95\xfa\x82\xb5\x82\xdc\x82\xb5\x82\xbd\x81\x42\x0a";
 static const char s_charaAsyncCancelFmt[] =
     "\x83\x82\x83\x66\x83\x8b\x94\xf1\x93\xaf\x8a\xfa\x93\xc7\x82\xdd"
     "\x8d\x9e\x82\xdd\x92\x86\x82\xc9\x83\x4c\x83\x83\x83\x93\x83\x5a"
@@ -238,34 +246,42 @@ static const char s_charaAsyncCompleteFmt[] =
 static const char s_charaAsyncEntryFmt[] =
     "\x94\xf1\x93\xaf\x8a\xfa\x93\xc7\x82\xdd\x8d\x9e\x82\xdd\x83\x47"
     "\x83\x93\x83\x67\x83\x8a\x81\x5b\n";
-static const char s_charaDumpModelHdr1[] = "MODEL\n";
-static const char s_charaDumpModelHdr2[] = " no t num lv mask addr a? a_addr a_size\n";
-static const char s_charaDumpLineSep[] = "----------------------------------------\n";
-static const char s_charaDumpModelFmt[] = "%3d %1d %3d %3d %08x %08x %d %08x %08x\n";
-static const char s_charaDumpTextureHdr1[] = "TEXTURE\n";
-static const char s_charaDumpTextureHdr2[] = " no t num t lv mask addr a? a_addr a_size\n";
-static const char s_charaDumpTextureFmt[] = "%3d %1d %3d %1d %3d %08x %08x %d %08x %08x\n";
-static const char s_charaDumpPdtHdr1[] = "PDT\n";
-static const char s_charaDumpPdtHdr2[] = " no t num t pdt hdl lv mask\n";
+static const char s_charaDumpModelHdr1[] = "model\n";
+static const char s_charaDumpModelHdr2[] = "no  t num lv  mask     addr     a a-addr   a-size\n";
+static const char s_charaDumpModelSep[] = "--- - --- --- -------- -------- - -------- --------\n";
+static const char s_charaDumpModelFmt[] = "%3d %1d %3d %3d %08x %08x %d %08x %8d\n";
+static const char s_charaDumpTextureHdr1[] = "texture\n";
+static const char s_charaDumpTextureHdr2[] = "no  t num t lv  mask     addr     a a-addr   a-size\n";
+static const char s_charaDumpTextureSep[] = "--- - --- - --- -------- -------- - -------- --------\n";
+static const char s_charaDumpTextureFmt[] = "%3d %1d %3d %1d %3d %08x %08x %d %08x %8d\n";
+static const char s_charaDumpPdtHdr1[] = "pdt\n";
+static const char s_charaDumpPdtHdr2[] = "no  t num t pdt hdl  lv  mask    \n";
+static const char s_charaDumpPdtSep[] = "--- - --- - -------- --- --------\n";
 static const char s_charaDumpPdtFmt[] = "%3d %1d %3d %1d %8d %3d %08x\n";
-static const char s_charaDumpAnimHdr1[] = "ANIM\n";
-static const char s_charaDumpAnimHdr2[] = " no t num name lv mask addr banksz sum bankaddr\n";
-static const char s_charaDumpAnimFmt[] = "%3d %1d %3d %-14s %3d %08x %08x %d %08x\n";
-static const char s_charaKindPath0[] = "k00";
-static const char s_charaKindPath1[] = "k01";
-static const char s_charaKindPath2[] = "k02";
-static const char s_charaKindPath3[] = "k03";
-static const char s_charaKindPath4[] = "k04";
-static const char s_charaKindPath5[] = "k05";
-static const char s_charaKindFile[] = "chara";
-static const char s_charaKindSuffix[] = "";
+static const char s_charaDumpAnimHdr1[] = "anim\n";
+static const char s_charaDumpAnimHdr2[] = "no  t num name           lv  mask     addr     banksize banksum  histroy\n";
+static const char s_charaDumpAnimSep[] = "--- - --- -------------- --- -------- -------- -------- -------- --------\n";
+static const char s_charaDumpAnimFmt[] = "%3d %1d %3d %14s %3d %08x %08x %8d %8d %8d\n";
+static const char s_charaKindPath0[] = "pc";
+static const char s_charaKindFile0[] = "c";
+static const char s_charaKindSuffix[] = "_root";
+static const char s_charaKindPath1[] = "mon";
+static const char s_charaKindFile1[] = "m";
+static const char s_charaKindPath2[] = "npc";
+static const char s_charaKindFile2[] = "n";
+static const char s_charaKindPath3[] = "fa";
+static const char s_charaKindFile3[] = "f";
+static const char s_charaKindPath4[] = "wep";
+static const char s_charaKindFile4[] = "w";
+static const char s_charaKindPath5[] = "loc";
+static const char s_charaKindFile5[] = "l";
 static const char* s_charaKindPathParts[][3] = {
-    {s_charaKindPath0, s_charaKindFile, s_charaKindSuffix},
-    {s_charaKindPath1, s_charaKindFile, s_charaKindSuffix},
-    {s_charaKindPath2, s_charaKindFile, s_charaKindSuffix},
-    {s_charaKindPath3, s_charaKindFile, s_charaKindSuffix},
-    {s_charaKindPath4, s_charaKindFile, s_charaKindSuffix},
-    {s_charaKindPath5, s_charaKindFile, s_charaKindSuffix},
+    {s_charaKindPath0, s_charaKindFile0, s_charaKindSuffix},
+    {s_charaKindPath1, s_charaKindFile1, s_charaKindSuffix},
+    {s_charaKindPath2, s_charaKindFile2, s_charaKindSuffix},
+    {s_charaKindPath3, s_charaKindFile3, s_charaKindSuffix},
+    {s_charaKindPath4, s_charaKindFile4, s_charaKindSuffix},
+    {s_charaKindPath5, s_charaKindFile5, s_charaKindSuffix},
 };
 
 #pragma dont_inline on
@@ -1479,7 +1495,7 @@ void CCharaPcs::DumpLoad()
         System.Printf(const_cast<char*>(s_charaDumpModelHdr2));
     }
     if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-        System.Printf(const_cast<char*>(s_charaDumpLineSep));
+        System.Printf(const_cast<char*>(s_charaDumpModelSep));
     }
     int modelCount = LoadModelArray(this)->GetSize();
     for (int i = 0; i < modelCount; i++) {
@@ -1503,7 +1519,7 @@ void CCharaPcs::DumpLoad()
         System.Printf(const_cast<char*>(s_charaDumpTextureHdr2));
     }
     if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-        System.Printf(const_cast<char*>(s_charaDumpLineSep));
+        System.Printf(const_cast<char*>(s_charaDumpTextureSep));
     }
     int textureCount = LoadTextureArray(this)->GetSize();
     for (int i = 0; i < textureCount; i++) {
@@ -1527,7 +1543,7 @@ void CCharaPcs::DumpLoad()
         System.Printf(const_cast<char*>(s_charaDumpPdtHdr2));
     }
     if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-        System.Printf(const_cast<char*>(s_charaDumpLineSep));
+        System.Printf(const_cast<char*>(s_charaDumpPdtSep));
     }
     int pdtCount = LoadPdtArray(this)->GetSize();
     for (int i = 0; i < pdtCount; i++) {
@@ -1547,7 +1563,7 @@ void CCharaPcs::DumpLoad()
         System.Printf(const_cast<char*>(s_charaDumpAnimHdr2));
     }
     if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-        System.Printf(const_cast<char*>(s_charaDumpLineSep));
+        System.Printf(const_cast<char*>(s_charaDumpAnimSep));
     }
     int animCount = LoadAnimArray(this)->GetSize();
     int totalBankSize = 0;

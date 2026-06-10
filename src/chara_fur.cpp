@@ -2108,8 +2108,16 @@ void CChara::makeFurTex()
 		hairSet[i].m_vec1.y = accelAddOut.y;
 		hairSet[i].m_vec1.z = accelAddOut.z;
 
-		hairSet[i].m_colors[0] = FurNoiseColor(furBaseColor, furNoiseBase, FurRandScaleL(scaleBase, randScale, depthThreshold));
-		hairSet[i].m_colors[1] = FurNoiseColor(furTipColor, furNoiseRange, FurRandScaleL(scaleBase, randScale, depthThreshold));
+		const CColor& noise0 = FurNoiseColor(furBaseColor, furNoiseBase, FurRandScaleL(scaleBase, randScale, depthThreshold));
+		hairSet[i].m_colors[0].color.r = noise0.color.r;
+		hairSet[i].m_colors[0].color.g = noise0.color.g;
+		hairSet[i].m_colors[0].color.b = noise0.color.b;
+		hairSet[i].m_colors[0].color.a = noise0.color.a;
+		const CColor& noise1 = FurNoiseColor(furTipColor, furNoiseRange, FurRandScaleL(scaleBase, randScale, depthThreshold));
+		hairSet[i].m_colors[1].color.r = noise1.color.r;
+		hairSet[i].m_colors[1].color.g = noise1.color.g;
+		hairSet[i].m_colors[1].color.b = noise1.color.b;
+		hairSet[i].m_colors[1].color.a = noise1.color.a;
 
 		float endY = hairSet[i].m_vec0.y + weightScale * hairSet[i].m_vec1.y;
 		if (s_mogFurMaxY < endY) {

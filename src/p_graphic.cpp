@@ -736,8 +736,8 @@ void CGraphicPcs::drawBar()
         }
 
         order = System.GetNextOrder(order);
-        y += kDebugBarLineStep;
         hue += 0x168;
+        y += kDebugBarLineStep;
     }
 
     GXColor frameTmp;

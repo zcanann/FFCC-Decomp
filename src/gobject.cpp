@@ -199,7 +199,7 @@ static const float sNegativeOne = -1.0f;              // FLOAT_80330390
 static const float sLargeDistance = 10000000.0f;      // FLOAT_80330394
 static const float sDefaultMoveBaseSpeed = 2.0f;      // FLOAT_803303d4
 extern "C" const float sHitProbeHeight;          // FLOAT_80330410
-static const float sHitMoveScale = 0.16000001f;       // FLOAT_80330414
+extern "C" const float sHitMoveScale;       // FLOAT_80330414
 static const float sJumpLift = 10.0f;                 // FLOAT_80330418
 static const float sLandingDampenCutoff = -1.5f;      // FLOAT_8033041c
 static const float sMinGroundClamp = -4.0f;           // FLOAT_80330420
@@ -1065,9 +1065,9 @@ stepMiss:
 void CGObject::bgWorldCollision()
 {
     CVector groundOffset(m_groundHitOffset);
-    CVector worldPosition(m_worldPosition);
+    CVector* worldPosition = &CVector(m_worldPosition);
     CVector radialSum;
-    PSVECAdd(reinterpret_cast<Vec*>(&worldPosition), reinterpret_cast<Vec*>(&groundOffset),
+    PSVECAdd(reinterpret_cast<Vec*>(worldPosition), reinterpret_cast<Vec*>(&groundOffset),
              reinterpret_cast<Vec*>(&radialSum));
 
     Vec radial;

@@ -68,8 +68,7 @@ struct SCharaItemRow {
 	unsigned short m_particleLife;  // 0x0E
 	unsigned short m_scale;         // 0x10
 	unsigned short m_particleBank;  // 0x12
-	unsigned short m_particleEntry; // 0x14
-	unsigned char m_pad16[0x6];     // 0x16
+	unsigned short m_particleEntries[4]; // 0x14
 	unsigned short m_particleSpec;  // 0x1C
 	unsigned char m_pad1E[0x8];     // 0x1E
 	unsigned short m_speed;         // 0x26
@@ -81,7 +80,10 @@ struct SCharaItemRow {
 	unsigned short m_flags32;       // 0x32
 	unsigned char m_pad34[0x4];     // 0x34
 	unsigned short m_se;            // 0x38
-	unsigned char m_pad3A[0x8];     // 0x3A
+	unsigned short m_seFlag;        // 0x3A
+	unsigned short m_se1;           // 0x3C
+	unsigned short m_seFlag1;       // 0x3E
+	unsigned short m_se2;           // 0x40
 	unsigned short m_seSpec;        // 0x42
 	unsigned char m_pad44[0x4];     // 0x44
 };
@@ -2892,7 +2894,8 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 	int hasParticle = 0;
 
 	if (particleBank != -1) {
-		particleEntry = *reinterpret_cast<unsigned short*>(itemData + 0x14 + effectArg0 * 2);
+		SCharaItemRow* entryRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
+		particleEntry = entryRows[effectId].m_particleEntries[effectArg0];
 		if (particleEntry != 0xFFFF) {
 			particleNo = particleEntry & 0xFF;
 

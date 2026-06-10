@@ -29,6 +29,7 @@
 extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
     CMath*, Vec*, float*, Vec*, Vec*, Vec*, float, float, float);
 // Defined in this unit's .sdata2 (the target object owns these named doubles)
+extern const double DOUBLE_803303E0 = 1.5707963705062866;    // 3ff921fb60000000 = (double)(pi/2 f)
 extern const double DOUBLE_803303e8 = 0.7853981852531433;    // 3fe921fb60000000 = (double)(pi/4 f)
 extern const double DOUBLE_80330400 = 0.0010000000474974513; // 3f50624de0000000 = (double)0.001f
 extern const Vec DAT_801D9B88;
@@ -1594,7 +1595,7 @@ void CGObject::update()
             if (lookDistance > sZeroFloat) {
                 const float targetYaw = atan2f(-lookDelta.x, -lookDelta.z);
                 const float yawDelta = Math.DstRot(targetYaw, m_rotBaseY);
-                if (fabs(yawDelta) < 1.5707964f) {
+                if (fabs(yawDelta) < DOUBLE_803303E0) {
                     const float pitchDelta = atan2f(lookDelta.y, lookDistance);
                     if (fabs(pitchDelta) < DOUBLE_803303e8) {
                         lookYaw += yawDelta;

@@ -421,7 +421,7 @@ void CGraphic::BeginFrame()
     if (useDebugPad) {
         buttons = 0;
     } else {
-        int padIndex = (Pad.m_debugPadPort == 0) ? Pad.m_debugPadPort : 0;
+        int padIndex = (Pad.m_debugPadPort == 0) ? 0 : 0;
         buttons = Pad.GetPadInputs()[padIndex].lockedButton[1];
     }
 

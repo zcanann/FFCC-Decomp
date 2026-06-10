@@ -1541,7 +1541,7 @@ void CFlatRuntime2::Draw()
 		redColor.g = 0x00;
 		redColor.b = 0x00;
 		redColor.a = 0xFF;
-		static const Vec worldUp = {0.0f, 1.0f, 0.0f};
+		static Vec worldUp = {0.0f, 1.0f, 0.0f};
 		float ringVerts[8][3];
 
 		CFlatRuntime2::CDebugDrawCC* entry = DebugDrawCCEntries(runtime);
@@ -1554,29 +1554,28 @@ void CFlatRuntime2::Draw()
 			}
 			GXSetChanMatColor(GX_COLOR0A0, *drawColor);
 
-			Vec* start = &entry->m_from;
-			Vec* end = &entry->m_to;
-			float length = PSVECMag(end);
+			float length = PSVECMag(&entry->m_to);
 
 			Mtx orientMtx;
 			PSMTXIdentity(orientMtx);
-			Vec dir = *end;
-			PSVECNormalize(&dir, &dir);
+			Vec up = worldUp;
+			PSVECNormalize(&entry->m_to, &entry->m_to);
 
-			const float dot = PSVECDotProduct(&worldUp, &dir);
+			const float dot = PSVECDotProduct(&up, &entry->m_to);
 			if (dot < FLOAT_80330188) {
-				if (dot >= FLOAT_8033018C) {
-					Vec axis;
-					PSVECCrossProduct(&dir, &worldUp, &axis);
-					PSMTXRotAxisRad(orientMtx, &axis, -acosf(dot));
-				} else {
+				if (dot < FLOAT_8033018C) {
 					length = -length;
+				} else {
+					float angle = acosf(dot);
+					Vec axis;
+					PSVECCrossProduct(&entry->m_to, &up, &axis);
+					PSMTXRotAxisRad(orientMtx, &axis, -angle);
 				}
 			}
 
-			orientMtx[0][3] = start->x;
-			orientMtx[1][3] = start->y;
-			orientMtx[2][3] = start->z;
+			orientMtx[0][3] = entry->m_from.x;
+			orientMtx[1][3] = entry->m_from.y;
+			orientMtx[2][3] = entry->m_from.z;
 			PSMTXConcat(cameraMtx, orientMtx, orientMtx);
 			GXLoadPosMtxImm(orientMtx, GX_PNMTX0);
 

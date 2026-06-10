@@ -746,25 +746,26 @@ void callCon2Prog(_pppPObject* pObject)
  */
 _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 {
-	_pppPDataVal* dataVal = pppPDataVal;
 	struct {
 		s8 m_denied[0x180];
 		_pppProgSetDef* volatile m_programSet;
 	} loc;
 #define denied     loc.m_denied
 #define programSet loc.m_programSet
-	programSet = dataVal->m_programSetDef;
-	s16 numStages = dataVal->m_programSetDef->m_numStages;
-	u32 allocSize = programSet->m_workBaseOffset;
-	CMemory::CStage* stage = ppvEnv->m_stagePtr;
 	_pppPObjLink* newObj = 0;
 	int firstFailure = 1;
+	u32 totalSize;
+	CMemory::CStage* stage;
 	int canRetry;
+	_pppPDataVal* dataVal = pppPDataVal;
 
+	programSet = dataVal->m_programSetDef;
+	stage = ppvEnv->m_stagePtr;
+	totalSize = programSet->m_workBaseOffset + ((u32)dataVal->m_programSetDef->m_numStages * sizeof(u32));
 	ppvMemAllocErrorF = 0;
 	do
 	{
-		newObj = (_pppPObjLink*)Memory._Alloc(allocSize + ((u32)numStages * sizeof(u32)), stage,
+		newObj = (_pppPObjLink*)Memory._Alloc(totalSize, stage,
 		                                      const_cast<char*>(s_pppPart_cpp), 0x305, 1);
 		if (newObj != 0)
 		{

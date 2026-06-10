@@ -2110,19 +2110,22 @@ void CMenuPcs::CmakeTribeDraw()
     DrawInit();
 
     if (CmakeState(this)->m_mode == 1) {
-        int select = CmakeState(this)->m_select;
-        unsigned int frame = System.m_frameCounter & 7;
-        int tribeCursorY = 0x88 + select * 0x1C;
+        float tribeX = 228.0f;
+        float cursorY = static_cast<float>(0x88 + CmakeState(this)->m_select * 0x1C);
 
         if (CmakeState(this)->m_fieldSelect == 0) {
-            DrawCursor(static_cast<int>(228.0f + static_cast<float>(frame)), tribeCursorY, alpha);
+            DrawCursor(
+                static_cast<int>(tribeX + static_cast<float>(static_cast<int>(System.m_frameCounter) % 8)),
+                static_cast<int>(cursorY), alpha);
         } else {
             if ((System.m_frameCounter & 1) != 0) {
-                DrawCursor(static_cast<int>(228.0f), tribeCursorY, alpha);
+                DrawCursor(static_cast<int>(tribeX), static_cast<int>(cursorY), alpha);
             }
 
-            int hairCursorY = 0x88 + CmakeState(this)->m_row * 0x1C;
-            DrawCursor(static_cast<int>(348.0f + static_cast<float>(frame)), hairCursorY, alpha);
+            float hairX = 348.0f;
+            DrawCursor(
+                static_cast<int>(hairX + static_cast<float>(static_cast<int>(System.m_frameCounter) % 8)),
+                static_cast<int>(static_cast<float>(0x88 + CmakeState(this)->m_row * 0x1C)), alpha);
         }
     }
 

@@ -890,6 +890,9 @@ void birth(
 	u8* payload;
 	u8* particlePayload;
 	u16 life;
+	float vx;
+	float vy;
+	float vz;
 
 	payload = (u8*)param;
 	particlePayload = (u8*)particle;
@@ -1091,9 +1094,6 @@ mesh_block:
 		if (pathIndex >= 0) {
 			s16* pathInfo = (s16*)(*(int*)&ppvEnv->m_particleColors[1] + pathIndex * 8);
 			float sampleT;
-			float vx;
-			float vy;
-			float vz;
 			float m1;
 			float m2;
 			float m3;

@@ -424,11 +424,7 @@ void CCaravanWork::AddLetter(int letterType, int senderId, int moneyValue, int h
 	m_letters[0].m_half.m_tempVars[3] = static_cast<unsigned short>(itemD);
 
 	int nextCount = m_letterCount + 1;
-	int letterCount = 100;
-	if (nextCount < 100) {
-		letterCount = nextCount;
-	}
-	m_letterCount = letterCount;
+	m_letterCount = (nextCount < 100) ? nextCount : 100;
 
 	GbaQue.SetAddLetter(m_joybusCaravanId);
 }
@@ -1698,9 +1694,9 @@ void CCaravanWork::SafeDeleteTempItem()
 		System.Printf(const_cast<char*>(sNoWorldReturnItemWarning));
 	}
 
-	int totalSlots = 0;
 	int artifactIndex = 0;
 	CCaravanWork* artifactCur = this;
+	int totalSlots = 0;
 	for (int i = 50; i != 0; i--) {
 		if (artifactIndex < 96) {
 			int artifactId = artifactCur->m_artifacts[0];

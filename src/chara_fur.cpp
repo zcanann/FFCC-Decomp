@@ -2047,14 +2047,21 @@ void CChara::freeFurTex()
  * JP Address: TODO
  * JP Size: TODO
  */
+static inline CColor& FurColorLval(const CColor& c)
+{
+	return const_cast<CColor&>(c);
+}
+
 #pragma push
 #pragma opt_common_subs off
 void CChara::makeFurTex()
 {
 	CHairSet hairSet[0x20];
 
-	static CColor furBaseColor(0x80, 0x80, 0x80, 0xFF);
-	static CColor furTipColor(0xF0, 0xF0, 0xF0, 0);
+	static CColor furColors[2] = { FurColorLval(CColor(0x80, 0x80, 0x80, 0xFF)),
+		                           FurColorLval(CColor(0xF0, 0xF0, 0xF0, 0)) };
+#define furBaseColor (furColors[0])
+#define furTipColor (furColors[1])
 	static CColor furNoiseBase(0, 0, 0, 0);
 	static CColor furNoiseRange(8, 8, 8, 0);
 	static Vec velBase = CVector(kCharaFurDepthZero, FLOAT_80331160, kCharaFurDepthZero);
@@ -2335,6 +2342,8 @@ void CChara::makeFurTex()
 	Graphic.SetStdPixelFmt();
 	GXSetAlphaUpdate(GX_FALSE);
 }
+#undef furBaseColor
+#undef furTipColor
 #pragma pop
 
 /*

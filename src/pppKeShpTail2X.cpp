@@ -125,10 +125,10 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     float colorEndG;
     float colorEndB;
     float colorEndA;
-    volatile float colorStepR;
-    volatile float colorStepG;
-    volatile float colorStepB;
-    volatile float colorStepA;
+    float colorStepR;
+    float colorStepG;
+    float colorStepB;
+    float colorStepA;
     float invCountMinusOne;
     pppFMATRIX localBase;
     pppFMATRIX initMtx;
@@ -143,9 +143,9 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     float segDx;
     float segDy;
     float segDz;
-    float curX;
-    float curY;
-    float curZ;
+    register float curX;
+    register float curY;
+    register float curZ;
     float segBaseX;
     float segBaseY;
     float segBaseZ;

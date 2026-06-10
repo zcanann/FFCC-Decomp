@@ -177,6 +177,30 @@ static inline float CalcCmakeFadeAlpha(CMenuPcs* menu)
     return static_cast<float>(1.0 - 0.1 * static_cast<double>(frame));
 }
 
+static unsigned short GetCmakePadDown()
+{
+    unsigned char noPad = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
+    if (noPad) {
+        return 0;
+    }
+
+    int padIndex = 0;
+    padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+    return Pad.GetPadInputs()[padIndex].buttonDown[0];
+}
+
+static unsigned short GetCmakePadRepeat()
+{
+    unsigned char noPad = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
+    if (noPad) {
+        return 0;
+    }
+
+    int padIndex = 0;
+    padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+    return Pad.GetPadInputs()[padIndex].repeatButton;
+}
+
 static inline void DrawCmakePreviewCharaAlpha(CMenuPcs* menu, float alpha)
 {
     int handleIndex = static_cast<int>(CmakeSlot(menu)) + 0x20;
@@ -3885,52 +3909,36 @@ void CMenuPcs::CalcSingCMake()
             }
             result = done;
         } else if (CmakeState(this)->m_mode == 1) {
-            short down;
-            unsigned short repeat;
+            short down = GetCmakePadDown();
+            short repeat = GetCmakePadRepeat();
 
-            int padLock = Pad.m_debugPadLock;
-            unsigned char noPad = (padLock != 0) || (Pad.m_debugPadPort != -1);
-            if (noPad) {
-                down = 0;
-            } else {
-                int padIndex = 0;
-                padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-                down = Pad.GetPadInputs()[padIndex].buttonDown[0];
-            }
-
-            noPad = (padLock != 0) || (Pad.m_debugPadPort != -1);
-            if (noPad) {
-                repeat = 0;
-            } else {
-                int padIndex = 0;
-                padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-                repeat = Pad.GetPadInputs()[padIndex].repeatButton;
-            }
-
+            int done;
             if (repeat == 0) {
-                result = 0;
+                done = 0;
             } else {
-                if ((repeat & 0xC) != 0) {
+                int dirMask = repeat & 0xC;
+                if (dirMask != 0) {
                     CmakeState(this)->m_select ^= 1;
                     Sound.PlaySe(1, 0x40, 0x7F, 0);
                 }
-                if ((repeat & 0xC) == 0) {
+                if (dirMask == 0) {
                     if ((down & 0x100) != 0) {
                         s_CmakeInfo.m_gender = static_cast<signed char>(CmakeState(this)->m_select);
                         CmakeState(this)->m_resultDir = 1;
                         Sound.PlaySe(2, 0x40, 0x7F, 0);
-                        result = 1;
-                        break;
-                    }
-                    if ((down & 0x200) != 0) {
+                        done = 1;
+                    } else if ((down & 0x200) != 0) {
                         CmakeState(this)->m_resultDir = -1;
                         Sound.PlaySe(3, 0x40, 0x7F, 0);
-                        result = 1;
-                        break;
+                        done = 1;
+                    } else {
+                        done = 0;
                     }
+                } else {
+                    done = 0;
                 }
-                result = 0;
             }
+            result = done;
         } else {
             int done;
             if (CmakeState(this)->m_frame >= 10) {
@@ -4014,27 +4022,8 @@ void CMenuPcs::CalcSingCMake()
             }
             result = done;
         } else if (CmakeState(this)->m_mode == 1) {
-            unsigned short down;
-            unsigned short repeat;
-
-            int padLock = Pad.m_debugPadLock;
-            unsigned char noPad = (padLock != 0) || (Pad.m_debugPadPort != -1);
-            if (noPad) {
-                down = 0;
-            } else {
-                int padIndex = 0;
-                padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-                down = Pad.GetPadInputs()[padIndex].buttonDown[0];
-            }
-
-            noPad = (padLock != 0) || (Pad.m_debugPadPort != -1);
-            if (noPad) {
-                repeat = 0;
-            } else {
-                int padIndex = 0;
-                padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-                repeat = Pad.GetPadInputs()[padIndex].repeatButton;
-            }
+            short down = GetCmakePadDown();
+            short repeat = GetCmakePadRepeat();
 
             if (repeat == 0) {
                 result = 0;
@@ -4125,27 +4114,8 @@ void CMenuPcs::CalcSingCMake()
             }
             result = done;
         } else if (CmakeState(this)->m_mode == 1) {
-            short down;
-            unsigned short repeat;
-
-            int padLock = Pad.m_debugPadLock;
-            unsigned char noPad = (padLock != 0) || (Pad.m_debugPadPort != -1);
-            if (noPad) {
-                down = 0;
-            } else {
-                int padIndex = 0;
-                padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-                down = Pad.GetPadInputs()[padIndex].buttonDown[0];
-            }
-
-            noPad = (padLock != 0) || (Pad.m_debugPadPort != -1);
-            if (noPad) {
-                repeat = 0;
-            } else {
-                int padIndex = 0;
-                padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-                repeat = Pad.GetPadInputs()[padIndex].repeatButton;
-            }
+            short down = GetCmakePadDown();
+            short repeat = GetCmakePadRepeat();
 
             if (repeat == 0) {
                 result = 0;

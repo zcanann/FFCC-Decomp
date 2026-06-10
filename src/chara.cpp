@@ -988,6 +988,7 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 
 	CChunkFile chunkFile(fileData);
 	CChunkFile::CChunk chunk;
+	CChara* charaPtr = &Chara;
 
 	while (chunkFile.GetNextChunk(chunk)) {
 		if (chunk.m_id != CharaFourCC('C', 'H', 'M', ' ')) {
@@ -1011,7 +1012,7 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 				m_data->m_normQuant = chunkFile.Get4();
 			} else if (chunk.m_id == 0x4D534554) {
 				CMaterialSet* materialSet =
-				    new(Chara.GetMemoryStage(), const_cast<char*>(s_chara_cpp), 0x132) CMaterialSet();
+				    new(charaPtr->GetMemoryStage(), const_cast<char*>(s_chara_cpp), 0x132) CMaterialSet();
 				m_data->m_materialSet = materialSet;
 				CMaterialSet* createdSet = m_data->m_materialSet;
 				createdSet->m_materials.SetDefaultSize(0x20);
@@ -1020,7 +1021,7 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 			} else if (chunk.m_id == 0x54415354) {
 				if (chunk.m_arg0 != 0) {
 					CTexAnimSet* texAnimSet =
-					    new(Chara.GetMemoryStage(), const_cast<char*>(s_chara_cpp), 0x13A) CTexAnimSet();
+					    new(charaPtr->GetMemoryStage(), const_cast<char*>(s_chara_cpp), 0x13A) CTexAnimSet();
 					m_texAnimSet = texAnimSet;
 					m_texAnimSet->Create(chunkFile, stage);
 				}

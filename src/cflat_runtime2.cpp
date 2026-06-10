@@ -1672,17 +1672,12 @@ void CFlatRuntime2::AddDebugDrawCC(Vec* from, Vec* to, float radius, int bit7, i
 int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float radius, float angle, int maxCount, CGObject** objects)
 {
 	const float radiusSq = radius * radius;
-	CFlatRuntime::CObject* root = FlatObjectRoot(&CFlat);
-
-	CGBaseObj* baseObj = FindNextGBaseObjByCidMask(&CFlat, root->m_next->m_next, 5);
 	int count = 0;
 
-	do {
-		if (baseObj == 0) {
-			return count;
-		}
+	CGObject* object = reinterpret_cast<CGObject*>(
+		FindNextGBaseObjByCidMask(&CFlat, CFlat.m_objectSentinel.m_next->m_next, 5));
 
-		CGObject* object = reinterpret_cast<CGObject*>(baseObj);
+	while (object != 0) {
 		int newCount = count;
 
 		if (((object->m_attrFlags & static_cast<unsigned int>(classMask)) != 0) &&
@@ -1713,7 +1708,13 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float radius
 								}
 							}
 
-							if ((flags & 4) == 0) {
+							if ((flags & 4) != 0) {
+								newCount = count + 1;
+								objects[count] = object;
+								if (newCount == maxCount) {
+									return newCount;
+								}
+							} else {
 								int insertIndex = 0;
 								for (; insertIndex < count; insertIndex++) {
 									if (distance < *reinterpret_cast<float*>(&objects[insertIndex]->m_0x44)) {
@@ -1732,12 +1733,6 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float radius
 								if (count + 1 < maxCount) {
 									newCount = count + 1;
 								}
-							} else {
-								newCount = count + 1;
-								objects[count] = object;
-								if (newCount == maxCount) {
-									return newCount;
-								}
 							}
 						}
 					}
@@ -1746,9 +1741,12 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float radius
 		}
 
 	advance:
-		baseObj = FindNextGBaseObjByCidMask(&CFlat, reinterpret_cast<CFlatRuntime::CObject*>(object)->m_next, 5);
+		object = reinterpret_cast<CGObject*>(FindNextGBaseObjByCidMask(
+			&CFlat, reinterpret_cast<CFlatRuntime::CObject*>(object)->m_next, 5));
 		count = newCount;
-	} while (true);
+	}
+
+	return count;
 }
 
 /*

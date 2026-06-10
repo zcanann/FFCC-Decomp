@@ -1444,8 +1444,9 @@ void CMapMng::MapFileRead(char*, unsigned long&)
         if (m_asyncLoadState.m_asyncHandles[i] != 0) {
             int completed = File.IsCompleted(reinterpret_cast<CFile::CHandle*>(m_asyncLoadState.m_asyncHandles[i]));
             if (completed != 0) {
+                int len;
                 void* readBuffer = File.m_readBuffer;
-                int len = File.GetLength(reinterpret_cast<CFile::CHandle*>(m_asyncLoadState.m_asyncHandles[i]));
+                len = File.GetLength(reinterpret_cast<CFile::CHandle*>(m_asyncLoadState.m_asyncHandles[i]));
                 void* amemCursor = m_asyncLoadState.m_mapLoadCursor;
 
                 Memory.CopyToAMemorySync(readBuffer, amemCursor, (len + 0x1F) & ~0x1F);

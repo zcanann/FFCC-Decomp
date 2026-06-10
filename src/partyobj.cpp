@@ -116,6 +116,11 @@ struct GhostMogMenuWork {
 
 #define sGhostMogMenuWork (*reinterpret_cast<GhostMogMenuWork*>(CGPartyObj::m_ghostWork))
 
+struct SScriptFoodView { // script overlay: food table at +0x3B8
+	unsigned char pad[0x3B8];
+	unsigned short m_foods[8];
+};
+
 // Padded row views over the CFlatData item table (stride 0x48).
 struct SCfdItemRow {
 	unsigned short m_kind;     // 0x00
@@ -3893,7 +3898,8 @@ int CGPartyObj::useItem(int itemId)
 				int foodIndex = itemId - 0x17D;
 				if ((foodIndex >= 0) && (foodIndex < 8)) {
 					unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
-					int value = *reinterpret_cast<unsigned short*>(script + foodIndex * 2 + 0x3B8) / 10;
+					SScriptFoodView* foods = reinterpret_cast<SScriptFoodView*>(script);
+					int value = foods->m_foods[foodIndex] / 10;
 					heal = 1;
 					if (value >= 1) {
 						heal = value;

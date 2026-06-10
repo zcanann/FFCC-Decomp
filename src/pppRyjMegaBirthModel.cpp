@@ -728,8 +728,9 @@ void birth(
                     work->m_unused1E = 0;
                 }
                 u16 sampleIndex = work->m_unused1E;
+                u16* indices = (u16*)*(int*)(pathInfo + 2);
                 work->m_unused1E = sampleIndex + 1;
-                Vec* pathVec = pathBase + ((u16*)*(int*)(pathInfo + 2))[sampleIndex];
+                Vec* pathVec = pathBase + indices[sampleIndex];
                 vx = pathVec->x;
                 vy = pathVec->y;
                 vz = pathVec->z;

@@ -872,7 +872,6 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     VMana2* work;
     CChara::CModel* model;
     CCharaPcs::CHandle* handle;
-    CGObject* gObject;
     Mtx identityMtx;
     Mtx savedCameraMtx;
     Mtx lookAtMtx;
@@ -888,6 +887,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     GXColor quadColor;
     u32 depthTexSize;
     GXTexObj* baseParaboloidTexObjs;
+    CGObject* gObject;
     GXTexObj* sourceTexObjs;
     CTexture* envTexture0;
     s32 i;

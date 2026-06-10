@@ -147,6 +147,16 @@ struct SFoodRec { // stride 0x42, indexed by item low byte
 	unsigned char pad3C[6];   // 0x3C
 };
 
+struct SAtkTblRow { // stride 0x1CA flat3 row, viewed as SAtkRec records
+	SAtkRec recs[25];
+	unsigned char tail[8];
+};
+
+struct SFoodTblRow { // stride 0x1CA flat3 row, viewed as SFoodRec records
+	SFoodRec recs[6];
+	unsigned char tail[62];
+};
+
 static inline PartyObjOverlay& PartyData(CGPartyObj* self)
 {
 	return self->m_partyData;
@@ -470,16 +480,18 @@ void CGPartyObj::onChangeStat(int state)
 		        (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
 		         *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2) * 0x1CA + row);
 		{
-			SAtkRec* recs = reinterpret_cast<SAtkRec*>(Game.unk_flat3_field_30_0xc7e0 +
-			    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
-			     *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2) * 0x1CA);
-			*reinterpret_cast<int*>(self + 0x634) = recs[attackSel].m_f2;
+			SAtkTblRow* rows = reinterpret_cast<SAtkTblRow*>(Game.unk_flat3_field_30_0xc7e0);
+			*reinterpret_cast<int*>(self + 0x634) =
+			    rows[*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
+			        *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2]
+			        .recs[attackSel].m_f2;
 		}
 		{
-			SAtkRec* recs = reinterpret_cast<SAtkRec*>(Game.unk_flat3_field_30_0xc7e0 +
-			    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
-			     *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2) * 0x1CA);
-			*reinterpret_cast<int*>(self + 0x638) = recs[attackSel].m_fA;
+			SAtkTblRow* rows = reinterpret_cast<SAtkTblRow*>(Game.unk_flat3_field_30_0xc7e0);
+			*reinterpret_cast<int*>(self + 0x638) =
+			    rows[*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
+			        *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2]
+			        .recs[attackSel].m_fA;
 		}
 		break;
 	}
@@ -518,16 +530,18 @@ void CGPartyObj::onChangeStat(int state)
 		System.Printf(const_cast<char*>(msgBase + 0x3AC), itemLow);
 		*reinterpret_cast<int*>(self + 0x558) = itemHigh + 0x2A;
 		{
-			SFoodRec* recs = reinterpret_cast<SFoodRec*>(Game.unk_flat3_field_30_0xc7e0 +
-			    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
-			     *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2) * 0x1CA);
-			*reinterpret_cast<int*>(self + 0x630) = recs[itemLow].m_f38;
+			SFoodTblRow* rows = reinterpret_cast<SFoodTblRow*>(Game.unk_flat3_field_30_0xc7e0);
+			*reinterpret_cast<int*>(self + 0x630) =
+			    rows[*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
+			        *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2]
+			        .recs[itemLow].m_f38;
 		}
 		{
-			SFoodRec* recs = reinterpret_cast<SFoodRec*>(Game.unk_flat3_field_30_0xc7e0 +
-			    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
-			     *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2) * 0x1CA);
-			*reinterpret_cast<int*>(self + 0x634) = recs[itemLow].m_f3A;
+			SFoodTblRow* rows = reinterpret_cast<SFoodTblRow*>(Game.unk_flat3_field_30_0xc7e0);
+			*reinterpret_cast<int*>(self + 0x634) =
+			    rows[*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
+			        *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2]
+			        .recs[itemLow].m_f3A;
 		}
 		*reinterpret_cast<int*>(self + 0x68C) = calcCastTime(*reinterpret_cast<int*>(self + 0x560));
 		if (Game.m_gameWork.m_menuStageMode != 0) {

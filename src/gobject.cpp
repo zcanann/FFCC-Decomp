@@ -1369,8 +1369,8 @@ void CGObject::update()
             m_currentAnimSlot != -1) {
             float frame = sZeroFloat;
             if (m_lastBgAttr < sZeroFloat) {
-                const float animStart = ModelAnimStart(m_charaModelHandle->m_model);
-                frame = ModelAnimEnd(m_charaModelHandle->m_model) - animStart;
+                frame = ModelAnimStart(m_charaModelHandle->m_model);
+                frame = ModelAnimEnd(m_charaModelHandle->m_model) - frame;
             }
             m_turnSpeed = frame;
             m_charaModelHandle->m_model->SetFrame(m_turnSpeed);
@@ -1385,9 +1385,13 @@ void CGObject::update()
     float turnFactor;
     if (m_animSlotSel != -1 && m_shieldNodeFlagBits.m_bit40) {
         const double turnLimit = fabs(m_turnBaseSpeed);
-        double clampedTurn = (turnDelta < -turnLimit)
-                                 ? -turnLimit
-                                 : (turnLimit < turnDelta ? turnLimit : turnDelta);
+        double clampedTurn = -turnLimit;
+        if (clampedTurn <= turnDelta) {
+            clampedTurn = turnDelta;
+            if (turnLimit < turnDelta) {
+                clampedTurn = turnLimit;
+            }
+        }
         turnDelta = clampedTurn;
         turnFactor = sAnimFrameOffset;
     } else {
@@ -1399,12 +1403,13 @@ void CGObject::update()
     Mtx ecScratch;
     if (Game.m_currentMapId == 0x21) {
         Mtx tempMtx;
+        Vec mapUp;
         Vec worldNorm;
 
         PSMTXRotRad(modelMtx, 'y', atan2f(m_worldPosition.x, m_worldPosition.z));
-        Vec mapUp = DAT_801D9B88;
+        mapUp = DAT_801D9B88;
         PSVECNormalize(&m_worldPosition, &worldNorm);
-        PSMTXRotRad(tempMtx, 'x', acosf(PSVECDotProduct(&worldNorm, &mapUp)));
+        PSMTXRotRad(tempMtx, 'x', acosf(PSVECDotProduct(&mapUp, &worldNorm)));
         PSMTXConcat(modelMtx, tempMtx, modelMtx);
 
         PSMTXRotRad(tempMtx, 'y', m_rotBaseY);
@@ -1415,15 +1420,15 @@ void CGObject::update()
         modelMtx[2][3] = m_worldPosition.z;
     } else {
         GObjectSRT srt;
-        srt.m_scale.x = sAnimFrameOffset;
-        srt.m_scale.y = sAnimFrameOffset;
-        srt.m_scale.z = sAnimFrameOffset;
-        srt.m_trans.x = sZeroFloat;
-        srt.m_trans.y = sZeroFloat;
         srt.m_trans.z = sZeroFloat;
-        srt.m_rot.x = sZeroFloat;
-        srt.m_rot.y = sZeroFloat;
+        srt.m_trans.y = sZeroFloat;
+        srt.m_trans.x = sZeroFloat;
         srt.m_rot.z = sZeroFloat;
+        srt.m_rot.y = sZeroFloat;
+        srt.m_rot.x = sZeroFloat;
+        srt.m_scale.z = sAnimFrameOffset;
+        srt.m_scale.y = sAnimFrameOffset;
+        srt.m_scale.x = sAnimFrameOffset;
         srt.m_trans = m_worldPosition;
         PSVECAdd(&srt.m_trans, &m_extraMoveVec, &srt.m_trans);
 
@@ -1458,8 +1463,7 @@ void CGObject::update()
                 const float slideMagSq =
                     m_groundHitOffset.x * m_groundHitOffset.x + m_groundHitOffset.z * m_groundHitOffset.z;
                 const float slideMag = sqrtf(slideMagSq);
-                CVector worldUp(sZeroFloat, sAnimFrameOffset, sZeroFloat);
-                PSVECCrossProduct(&m_groundHitOffset, worldUp, &axis);
+                PSVECCrossProduct(&m_groundHitOffset, CVector(sZeroFloat, sAnimFrameOffset, sZeroFloat), &axis);
                 PSMTXRotAxisRad(rotScratch, &axis, -slideMag / 3.0f);
                 PSMTXQuat(tiltMtx, &m_bgCollisionQtrn);
                 PSMTXConcat(rotScratch, tiltMtx, tiltMtx);
@@ -1471,12 +1475,9 @@ void CGObject::update()
             const float tx = modelMtx[0][3];
             const float ty = modelMtx[1][3];
             const float tz = modelMtx[2][3];
-            CVector tiltZero0(sZeroFloat, sZeroFloat, sZeroFloat);
-            modelMtx[0][3] = tiltZero0.x;
-            CVector tiltZero1(sZeroFloat, sZeroFloat, sZeroFloat);
-            modelMtx[1][3] = tiltZero1.y;
-            CVector tiltZero2(sZeroFloat, sZeroFloat, sZeroFloat);
-            modelMtx[2][3] = tiltZero2.z;
+            modelMtx[0][3] = CVector(sZeroFloat, sZeroFloat, sZeroFloat).x;
+            modelMtx[1][3] = CVector(sZeroFloat, sZeroFloat, sZeroFloat).y;
+            modelMtx[2][3] = CVector(sZeroFloat, sZeroFloat, sZeroFloat).z;
             PSMTXConcat(tiltMtx, modelMtx, modelMtx);
             modelMtx[0][3] = tx;
             modelMtx[1][3] = ty;
@@ -1489,43 +1490,39 @@ void CGObject::update()
 
             const float swayDx = m_radiusCtrlVel.x - m_groundFriction;
             const float swayDz = m_radiusCtrl.y - m_radiusCtrlVel.y;
+            const float swayMag = sqrtf(swayDx * swayDx + swayDz * swayDz);
             m_radiusCtrlVel.y += sBgAttrNormal * swayDz;
             m_groundFriction += sBgAttrNormal * swayDx;
 
             Vec swayDir;
             PSVECNormalize(reinterpret_cast<Vec*>(&m_radiusCtrlVel.y), &swayDir);
-            CVector swayUp(sZeroFloat, sAnimFrameOffset, sZeroFloat);
-            const float swayDot = PSVECDotProduct(&swayDir, swayUp);
+            const float swayDot = PSVECDotProduct(&swayDir, CVector(sZeroFloat, sAnimFrameOffset, sZeroFloat));
             if (swayDot < 0.9999f) {
-                const float swayAngle = acosf(swayDot);
-                CVector swayAxisUp(sZeroFloat, sAnimFrameOffset, sZeroFloat);
+                const float negSwayAngle = -acosf(swayDot);
                 Vec swayAxis;
-                PSVECCrossProduct(&swayDir, swayAxisUp, &swayAxis);
-                PSMTXRotAxisRad(rotScratch, &swayAxis, -swayAngle);
+                PSVECCrossProduct(&swayDir, CVector(sZeroFloat, sAnimFrameOffset, sZeroFloat), &swayAxis);
+                PSMTXRotAxisRad(rotScratch, &swayAxis, negSwayAngle);
 
                 const float mtx0 = modelMtx[0][3];
                 const float mtx1 = modelMtx[1][3];
                 const float mtx2 = modelMtx[2][3];
-                CVector swayZero0(sZeroFloat, sZeroFloat, sZeroFloat);
-                modelMtx[0][3] = swayZero0.x;
-                CVector swayZero1(sZeroFloat, sZeroFloat, sZeroFloat);
-                modelMtx[1][3] = swayZero1.y;
-                CVector swayZero2(sZeroFloat, sZeroFloat, sZeroFloat);
-                modelMtx[2][3] = swayZero2.z;
+                modelMtx[0][3] = CVector(sZeroFloat, sZeroFloat, sZeroFloat).x;
+                modelMtx[1][3] = CVector(sZeroFloat, sZeroFloat, sZeroFloat).y;
+                modelMtx[2][3] = CVector(sZeroFloat, sZeroFloat, sZeroFloat).z;
                 PSMTXConcat(rotScratch, modelMtx, modelMtx);
-                const float swayTan = tan(-swayAngle);
+                const float swayTan = tan(negSwayAngle);
                 const float swayTanScaled = 2.0f * swayTan;
                 modelMtx[0][3] = mtx0;
                 modelMtx[2][3] = mtx2;
                 modelMtx[1][3] = mtx1 - swayTanScaled;
             }
 
+            const float swayRy = m_radiusCtrl.y;
+            const float swayRx = m_radiusCtrlVel.x;
             float swayClamp = swayDot < sAnimFrameOffset ? swayDot : sAnimFrameOffset;
             swayClamp = swayClamp < sZeroFloat ? sZeroFloat : swayClamp;
             const float swaySin = sinf(swayClamp);
             const float swayCos = cosf(swayClamp);
-            const float swayRy = m_radiusCtrl.y;
-            const float swayRx = m_radiusCtrlVel.x;
             m_radiusCtrl.y = swayCos * swayRy - swaySin * swayRx;
             m_radiusCtrlVel.x = swaySin * swayRy + swayCos * swayRx;
             m_radiusCtrl.y *= 0.9f;
@@ -1590,7 +1587,7 @@ void CGObject::update()
             lookDelta.y += unk_0x184 - targetNodeY;
 
             const float lookDistance = PSVECMag(&lookDelta);
-            if (lookDistance > sZeroFloat) {
+            if (sZeroFloat != lookDistance) {
                 const float targetYaw = atan2f(-lookDelta.x, -lookDelta.z);
                 const float yawDelta = Math.DstRot(targetYaw, m_rotBaseY);
                 if (fabs(yawDelta) < 0.75f) {

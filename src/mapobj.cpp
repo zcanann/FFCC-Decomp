@@ -1,12 +1,6 @@
 #include "ffcc/mapobj.h"
 
-extern const char s_CPtrArrayGrowError[];
-extern const char s_CPtrArrayFile[];
-#define FFCC_PTRARRAY_GROW_ERROR s_CPtrArrayGrowError
-#define FFCC_PTRARRAY_FILE s_CPtrArrayFile
 #include "ffcc/ptrarray.h"
-#undef FFCC_PTRARRAY_GROW_ERROR
-#undef FFCC_PTRARRAY_FILE
 
 #include "ffcc/map.h"
 #include "ffcc/mapanim.h"
@@ -135,6 +129,8 @@ int CPtrArray<CMapAnimRun*>::Add(CMapAnimRun* item)
 template <>
 int CPtrArray<CMapAnimRun*>::setSize(unsigned long newSize)
 {
+    extern const char s_CPtrArrayGrowError[];
+    extern const char s_CPtrArrayFile[];
     CMapAnimRun** newItems;
 
     if (m_size < newSize) {
@@ -203,6 +199,8 @@ int CPtrArray<CMapShadow*>::Add(CMapShadow* item)
 template <>
 int CPtrArray<CMapShadow*>::setSize(unsigned long newSize)
 {
+    extern const char s_CPtrArrayGrowError[];
+    extern const char s_CPtrArrayFile[];
     CMapShadow** newItems;
 
     if (m_size < newSize) {
@@ -2162,3 +2160,11 @@ extern const float kMapObjColorBlendScale = 255.0f;
 extern const float kMapObjDegToRad = 0.017453292f;
 extern const float kMapObjDefaultAngle = 48.0f;
 extern const float kMapObjInitValue50 = -1.0f;
+
+extern const char s_CPtrArrayGrowError[0x1C] = {
+    (char)0x83, (char)0x6F, (char)0x83, (char)0x62, (char)0x83, (char)0x74, (char)0x83, (char)0x40,
+    (char)0x90, (char)0xAC, (char)0x92, (char)0xB7, (char)0x82, (char)0xAA, (char)0x95, (char)0x73,
+    (char)0x8B, (char)0x96, (char)0x89, (char)0xC2, (char)0x82, (char)0xC5, (char)0x82, (char)0xB7,
+    (char)0x81, (char)0x42, (char)0x0A, (char)0x00,
+};
+extern const char s_CPtrArrayFile[] = "collection_ptrarray.h";

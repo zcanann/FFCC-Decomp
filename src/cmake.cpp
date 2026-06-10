@@ -2369,7 +2369,7 @@ void CMenuPcs::CmakeSexDraw()
                                 static_cast<float>(wobble)) -
             maxWidth / 2.0);
         int cursorY = static_cast<int>(156.0f + static_cast<float>(sel * 0x28));
-        DrawCursor(cursorX, cursorY, alpha);
+        DrawCursor(cursorX, cursorY, 1.0f);
     }
 
 }

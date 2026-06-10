@@ -881,14 +881,16 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 	fVar1 = static_cast<float>(-(kRingMenuSpinAlphaSlopeD * fabs(static_cast<double>(angle)) - kRingMenuOneD));
 	textHeight = static_cast<float>(font->m_glyphHeight) * font->scaleY;
 
-	clampedAlpha = kRingMenuZero;
-	if ((kRingMenuZero <= fVar1) && ((clampedAlpha = fVar1), (kRingMenuOne < fVar1))) {
+	if (fVar1 < kRingMenuZero) {
+		clampedAlpha = kRingMenuZero;
+	} else if (kRingMenuOne < fVar1) {
 		clampedAlpha = kRingMenuOne;
+	} else {
+		clampedAlpha = fVar1;
 	}
 
-	int alpha = static_cast<int>((kRingMenuAlphaMax * alphaScale) * clampedAlpha);
-	CColor color(0xFF, 0xFF, 0xFF, alpha);
-	font->SetColor(color.color);
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF,
+		static_cast<unsigned char>((kRingMenuAlphaMax * alphaScale) * clampedAlpha)).color);
 	font->SetPosX(static_cast<float>(waveX) +
 		((kRingMenuTextBaseX + posX) - textWidth * kRingMenuHalf));
 	font->SetPosY(kRingMenuGbaOrbitYScale +

@@ -1488,9 +1488,9 @@ void CGraphic::RenderTexQuadGrouad(Vec pos1, Vec pos2, _GXColor color1, _GXColor
 	float z1;
 	float y2;
 	u32 rgba1;
-	u32 rgba4;
-	u32 rgba2;
 	u32 rgba3;
+	u32 rgba2;
+	u32 rgba4;
 
 	x1 = pos1.x;
 	y1 = pos1.y;

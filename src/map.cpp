@@ -2410,8 +2410,7 @@ int CMapMng::ReadMid(char* mapName)
                     if (hitCount >= 0x20) {
                         return 0;
                     }
-                    CMapHit* hit = GetMapHitArray() + hitCount;
-                    hit->ReadOtmHit(chunkFile);
+                    m_mapHitArray[hitCount].ReadOtmHit(chunkFile);
                     hitCount += 1;
                 }
                 chunkFile.PopChunk();
@@ -2420,58 +2419,55 @@ int CMapMng::ReadMid(char* mapName)
             case 0x4F43544D:
                 break;
             default:
-                continue;
+                goto midChunkDone;
             }
 
             CMapObj* mapObj = nextMapObj;
-            int mapObjIndex = 0;
-            while (mapObjIndex < m_mapObjCount) {
-                if (mapObj->m_meshType == 1 || mapObj->m_meshType == 2) {
-                    short& octTreeCount = m_octTreeCount;
-                    if (octTreeCount >= 0x10) {
-                        return 0;
-                    }
+            while (true) {
+                signed char meshType = mapObj->m_meshType;
+                if (meshType == 1 || meshType == 2) {
+                    goto octtreeFound;
+                }
+                nextMapObj = mapObj + 1;
+                if (nextMapObj - MapMng.m_mapObjArray >= m_mapObjCount) {
+                    break;
+                }
+                mapObj = nextMapObj;
+            }
+            if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+                System.Printf(const_cast<char*>(s_read_mid_ground_error));
+            }
+            goto octtreeError;
 
-                    GetOctTreeArray()[octTreeCount].ReadOtmOctTree(chunkFile);
-                    GetOctTreeArray()[octTreeCount].SetMapObject(mapObj);
-                    nextMapObj = mapObj + 1;
-
-                    CMapObj* check = GetOctTreeArray()[octTreeCount].GetMapObject();
-                    if (check->m_mapData != 0) {
-                        goto octtreeMeshCheck;
-                    }
+        octtreeFound:
+            if (m_octTreeCount >= 0x10) {
+                return 0;
+            }
+            m_octTreeArray[m_octTreeCount].ReadOtmOctTree(chunkFile);
+            m_octTreeArray[m_octTreeCount].SetMapObject(mapObj);
+            {
+                CMapObj* check = m_octTreeArray[m_octTreeCount].GetMapObject();
+                if (check->m_mapData == 0) {
                     if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                         System.Printf(const_cast<char*>(s_read_mid_hit_null_error));
                     }
-                octtreeError:
-                    if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-                        System.Printf(const_cast<char*>(s_read_mid_node_order_warning));
-                    }
-                    ok = 0;
-                    goto octtreeDone;
-
-                octtreeMeshCheck:
-                    if (check->m_meshType == 1) {
+                } else {
+                    signed char checkType = check->m_meshType;
+                    if (checkType == 1 || checkType == 2) {
                         goto octtreeDone;
                     }
-                    if (check->m_meshType != 2) {
-                        goto octtreeError;
-                    }
-                octtreeDone:
-                    octTreeCount += 1;
-                    break;
-                }
-
-                mapObj++;
-                mapObjIndex += 1;
-            }
-
-            if (mapObjIndex >= m_mapObjCount) {
-                if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-                    System.Printf(const_cast<char*>(s_read_mid_ground_error));
                 }
             }
+        octtreeError:
+            if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+                System.Printf(const_cast<char*>(s_read_mid_node_order_warning));
+            }
+            ok = 0;
+        octtreeDone:
+            nextMapObj = mapObj + 1;
+            m_octTreeCount += 1;
         }
+    midChunkDone:
         chunkFile.PopChunk();
     }
 

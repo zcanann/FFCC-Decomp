@@ -141,8 +141,8 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
 {
     const u8* shapeData = reinterpret_cast<const u8*>(shape);
     const float* offsetXY = reinterpret_cast<const float*>(&offset);
-    s32 packedStride = 0;
     s32 rotatedStride = 0;
+    s32 packedStride = 0;
 
     for (s32 i = 0; i < *reinterpret_cast<const s16*>(shapeData + 2); i++) {
         u32 color;
@@ -154,7 +154,8 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
         float v1;
 
         if ((*reinterpret_cast<const s16*>(shapeData) & 8) != 0) {
-            const u8* entry = (shapeData + 0x10) + rotatedStride;
+            const u8* entry = shapeData + 0x10;
+            entry = entry + rotatedStride;
             const u8 texIndex = entry[0x28];
             const s8 numTex = m_textureCount;
             float minX = LoadFloat(kFunnyShapeBoundsMaxInitial);
@@ -283,7 +284,8 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             memcpy(&color, entry + 0x8, sizeof(color));
             *reinterpret_cast<GXColor*>(&color) = *reinterpret_cast<const GXColor*>(entry + 0x8);
         } else {
-            const u8* entry = shapeData + 0x10 + packedStride;
+            const u8* entry = shapeData + 0x10;
+            entry = entry + packedStride;
             const u8 texIndex = entry[0x20];
             const s8 numTex = m_textureCount;
             if ((s32)numTex > (s32)texIndex) {
@@ -347,8 +349,8 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
         WriteVertex(pos[2], color, tex[2]);
         WriteVertex(pos[3], color, tex[3]);
 
-        packedStride += 0x24;
         rotatedStride += 0x2C;
+        packedStride += 0x24;
     }
 }
 #pragma pop

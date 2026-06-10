@@ -4003,11 +4003,11 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
     CChunkFile::CChunk parentChunk;
     while (pdtFile.GetNextChunk(parentChunk)) {
         pdtFile.PushChunk();
-        if (parentChunk.m_id == kChunkPDT) {
-            CChunkFile::CChunk childChunk;
-            while (pdtFile.GetNextChunk(childChunk)) {
+        switch (parentChunk.m_id) {
+        case kChunkPDT: {
+            while (pdtFile.GetNextChunk(parentChunk)) {
                 pdtFile.PushChunk();
-                switch (childChunk.m_id) {
+                switch (parentChunk.m_id) {
                 case kChunkRSET: {
                     pppModelSt* modelArray = m_pppModelStArr;
                     pppModelSt* targetModel = 0;
@@ -4157,6 +4157,7 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
                 }
                 pdtFile.PopChunk();
             }
+                } break;
         }
         pdtFile.PopChunk();
     }

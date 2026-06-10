@@ -1945,7 +1945,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
  * JP Size: TODO
  */
 #pragma push
-#pragma opt_strength_reduction off
+#pragma switch_tables off
 void CGCharaObj::setSta(int staIndex, int value)
 {
 	unsigned int isIceJ = 0;

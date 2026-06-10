@@ -171,18 +171,29 @@ static inline float calc_mesh_sample_t(u8 mode)
 
 static inline float calc_direction_speed(PRyjMegaBirthModel* params, u8 speedMode)
 {
+    float r1;
+    float r2;
+    float r3;
+
     switch (speedMode) {
     case 1:
         (void)Math.RandF();
         return params->m_speed * Math.RandF();
     case 2:
-        return params->m_speed * Math.RandF() * Math.RandF();
+        r3 = Math.RandF();
+        return (params->m_speed * Math.RandF()) * r3;
     case 3:
-        return -(MegaBirthSpeedFalloff() * (params->m_speed * Math.RandF() * Math.RandF()) - params->m_speed);
+        r3 = Math.RandF();
+        return -(MegaBirthSpeedFalloff() * ((params->m_speed * Math.RandF()) * r3) - params->m_speed);
     case 4:
-        return Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * params->m_speed;
+        r1 = Math.RandF();
+        r2 = Math.RandF();
+        r3 = Math.RandF();
+        return Math.RandF() * (r3 * ((params->m_speed * r2) * r1));
     case 5:
-        return -(MegaBirthHalf() * (Math.RandF() * (params->m_speed * Math.RandF() * Math.RandF())) - params->m_speed);
+        r2 = Math.RandF();
+        r3 = Math.RandF();
+        return -(MegaBirthHalf() * (Math.RandF() * ((params->m_speed * r3) * r2)) - params->m_speed);
     default:
         return params->m_speed;
     }

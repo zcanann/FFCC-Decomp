@@ -1990,24 +1990,20 @@ void CCameraPcs::calcMaterialEditor()
     stick = ((padButtons & 8) != 0) ? kCameraHalfF : kCameraZeroF;
     m_viewer.m_position.y += stick;
 
-    float rotSpeed = kCameraDebugRotateStep;
     stick = ((padButtons & 4) != 0) ? kCameraHalfF : kCameraZeroF;
     m_viewer.m_position.y -= stick;
 
-    float rotSpeed2 = kCameraDebugRotateStep;
     stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().stickXF;
-    m_viewer.m_rotY = rotSpeed * stick + m_viewer.m_rotY;
+    m_viewer.m_rotY = kCameraDebugRotateStep * stick + m_viewer.m_rotY;
 
-    float zoomSpeed = kCameraTwoF;
     stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().stickYF;
-    m_viewer.m_rotX = -((rotSpeed2 * stick) - m_viewer.m_rotX);
+    m_viewer.m_rotX = -((kCameraDebugRotateStep * stick) - m_viewer.m_rotX);
 
-    float zoomSpeed2 = kCameraTwoF;
     stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().triggerLeftF;
-    m_viewer.m_distance = -((zoomSpeed * stick) - m_viewer.m_distance);
+    m_viewer.m_distance = -((kCameraTwoF * stick) - m_viewer.m_distance);
 
     stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().triggerRightF;
-    m_viewer.m_distance = zoomSpeed2 * stick + m_viewer.m_distance;
+    m_viewer.m_distance = kCameraTwoF * stick + m_viewer.m_distance;
 
     PSMTXTrans(mtxA, m_viewer.m_position.x, m_viewer.m_position.y, m_viewer.m_position.z);
     PSMTXRotRad(mtxB, 'y', m_viewer.m_rotY);
@@ -2098,24 +2094,20 @@ void CCameraPcs::calcFunnyShape()
     stick = ((padButtons & 8) != 0) ? kCameraHalfF : kCameraZeroF;
     m_viewer.m_position.y += stick;
 
-    float rotSpeed = kCameraDebugRotateStep;
     stick = ((padButtons & 4) != 0) ? kCameraHalfF : kCameraZeroF;
     m_viewer.m_position.y -= stick;
 
-    float rotSpeed2 = kCameraDebugRotateStep;
     stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().stickXF;
-    m_viewer.m_rotY = rotSpeed * stick + m_viewer.m_rotY;
+    m_viewer.m_rotY = kCameraDebugRotateStep * stick + m_viewer.m_rotY;
 
-    float zoomSpeed = kCameraTwoF;
     stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().stickYF;
-    m_viewer.m_rotX = -((rotSpeed2 * stick) - m_viewer.m_rotX);
+    m_viewer.m_rotX = -((kCameraDebugRotateStep * stick) - m_viewer.m_rotX);
 
-    float zoomSpeed2 = kCameraTwoF;
     stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().triggerLeftF;
-    m_viewer.m_distance = -((zoomSpeed * stick) - m_viewer.m_distance);
+    m_viewer.m_distance = -((kCameraTwoF * stick) - m_viewer.m_distance);
 
     stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().triggerRightF;
-    m_viewer.m_distance = zoomSpeed2 * stick + m_viewer.m_distance;
+    m_viewer.m_distance = kCameraTwoF * stick + m_viewer.m_distance;
 
     PSMTXTrans(mtxA, m_viewer.m_position.x, m_viewer.m_position.y, m_viewer.m_position.z);
     PSMTXRotRad(mtxB, 'y', m_viewer.m_rotY);

@@ -123,7 +123,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
                 reinterpret_cast<tagOAN3_SHAPE*>(reinterpret_cast<u8*>(shapeAnim) + shapeFrame->m_shapeOffset);
             const s32 trailReadIndex = *(u8*)(particle + 0x38);
             const s32 trailMaxIndex = *(u8*)(particle + 0x37) - 1;
-            s32 trailNextIndex = trailReadIndex + 1;
+            s32 trailNextIndex;
             const float stepDivisor = (float)((s32)frameCountRaw - 1);
             const float alphaScale = (float)*(s16*)((u8*)colorWork + 6) / kPppYmMegaBirthShpTail2AlphaDivisor;
             float fadeA = (float)step[0x7B] * alphaScale;
@@ -150,7 +150,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
                 fadeBStep = kPppYmMegaBirthShpTail2Half;
                 fadeAStep = kPppYmMegaBirthShpTail2Half;
             }
-            Vec* history = (Vec*)(particle + 0x40);
+            Vec* history;
             float drawScale;
             float drawScaleStep;
             s32 trailStartIndex;
@@ -164,6 +164,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
             s32 frameCount = frameCountRaw;
 
             pppUnitMatrix(drawMtx);
+            history = (Vec*)(particle + 0x40);
             trailStartIndex = *(u8*)(particle + 0x38);
             drawScale = *(float*)(step + 0x70);
             drawScaleStep = (drawScale - *(float*)(step + 0x74)) / stepDivisor;
@@ -176,6 +177,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
             drawX = trailX;
             drawY = trailY;
             drawZ = trailZ;
+            trailNextIndex = trailReadIndex + 1;
             if (trailReadIndex == trailMaxIndex) {
                 trailNextIndex = 0;
             }

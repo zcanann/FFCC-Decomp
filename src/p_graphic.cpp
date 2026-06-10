@@ -390,12 +390,15 @@ void CGraphicPcs::drawScreenFade()
                 GXPosition3f32(left, bottom, kGraphicZero);
                 GXColor1u32(*(u32*)&baseColor);
                 GXTexCoord2u16(0, 2);
-                continue;
             }
+            continue;
         }
 
         if (slot == 1) {
             const int mode = slotData->m_mode;
+            if (mode == 0) {
+                continue;
+            }
             if (mode == 4) {
                 GXSetNumTexGens(1);
                 GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
@@ -444,26 +447,28 @@ void CGraphicPcs::drawScreenFade()
                     GXTexCoord2u16(0, 2);
                 }
                 continue;
-            } else if (mode == 2) {
-                _GXSetBlendMode((GXBlendMode)1, (GXBlendFactor)4, (GXBlendFactor)1, (GXLogicOp)5);
-            } else if (mode == 3) {
-                _GXSetBlendMode((GXBlendMode)3, (GXBlendFactor)4, (GXBlendFactor)1, (GXLogicOp)5);
+            } else {
+                if (mode == 2) {
+                    _GXSetBlendMode((GXBlendMode)1, (GXBlendFactor)4, (GXBlendFactor)1, (GXLogicOp)5);
+                } else if (mode == 3) {
+                    _GXSetBlendMode((GXBlendMode)3, (GXBlendFactor)4, (GXBlendFactor)1, (GXLogicOp)5);
+                }
+
+                GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+                GXPosition3f32(kGraphicZero, kGraphicZero, kGraphicZero);
+                GXColor1u32(*(u32*)&baseColor);
+                GXTexCoord2u16(0, 0);
+                GXPosition3f32(kGraphicScreenWidth, kGraphicZero, kGraphicZero);
+                GXColor1u32(*(u32*)&baseColor);
+                GXTexCoord2u16(2, 0);
+                GXPosition3f32(kGraphicScreenWidth, kGraphicScreenHeight, kGraphicZero);
+                GXColor1u32(*(u32*)&baseColor2);
+                GXTexCoord2u16(2, 2);
+                GXPosition3f32(kGraphicZero, kGraphicScreenHeight, kGraphicZero);
+                GXColor1u32(*(u32*)&baseColor2);
+                GXTexCoord2u16(0, 2);
             }
         }
-
-        GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-        GXPosition3f32(kGraphicZero, kGraphicZero, kGraphicZero);
-        GXColor1u32(*(u32*)&baseColor);
-        GXTexCoord2u16(0, 0);
-        GXPosition3f32(kGraphicScreenWidth, kGraphicZero, kGraphicZero);
-        GXColor1u32(*(u32*)&baseColor);
-        GXTexCoord2u16(2, 0);
-        GXPosition3f32(kGraphicScreenWidth, kGraphicScreenHeight, kGraphicZero);
-        GXColor1u32(*(u32*)&baseColor2);
-        GXTexCoord2u16(2, 2);
-        GXPosition3f32(kGraphicZero, kGraphicScreenHeight, kGraphicZero);
-        GXColor1u32(*(u32*)&baseColor2);
-        GXTexCoord2u16(0, 2);
     }
 
     PSMTX44Copy(CameraPcs.m_screenMatrix, orthoMtx);

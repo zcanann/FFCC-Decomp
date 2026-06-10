@@ -1405,9 +1405,9 @@ targetJoin: ;
 			return;
 		}
 
-		const int cmdIdx = caravan->GetIdxCmdList();
-		party.unk6BC = cmdIdx;
-		if (party.unk6BC == 0) {
+		party.unk6BC = caravan->GetIdxCmdList();
+		const int cmdIdx = party.unk6BC;
+		if (cmdIdx == 0) {
 			int weaponItem;
 			int weaponRef;
 			caravan->GetCurrentWeaponItem(weaponItem, weaponRef);

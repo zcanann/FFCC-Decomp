@@ -155,10 +155,10 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     float drawScale;
     float trailStep;
     float scaleStepDelta;
+    Vec* history;
     s32 curIndex;
     s32 nextIndex;
     s32 lastIndex;
-    Vec* history;
     int zEnable;
     float segCursor = kPppKeShpTail2XZero;
     s32 dataValIndex;

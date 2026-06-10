@@ -1946,6 +1946,8 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
  */
 void CGCharaObj::setSta(int staIndex, int value)
 {
+	int clampedValue;
+	int slotOff;
 	int isIceJ = 0;
 	int isMon = 0;
 	if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
@@ -1955,11 +1957,11 @@ void CGCharaObj::setSta(int staIndex, int value)
 		}
 	}
 
-	unsigned char* staSlot = reinterpret_cast<unsigned char*>(m_scriptHandle) + (staIndex * 2);
-	int current = *reinterpret_cast<unsigned short*>(staSlot + 0x3E);
-	value &= ~(value >> 31);
+	slotOff = staIndex * 2;
+	int current = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + slotOff + 0x3E);
+	clampedValue = value & ~(value >> 31);
 
-	if (current != 0 || value == 0) {
+	if (current != 0 || clampedValue == 0) {
 		switch (staIndex) {
 			case 0x1B:
 				for (int i = 0; i < 0x16; i++) {
@@ -2218,7 +2220,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 		}
 	}
 
-	*reinterpret_cast<short*>(staSlot + 0x3E) = static_cast<short>(value);
+	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + slotOff + 0x3E) = static_cast<short>(clampedValue);
 }
 
 /*

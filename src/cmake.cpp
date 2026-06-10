@@ -4026,14 +4026,16 @@ void CMenuPcs::CalcSingCMake()
             short down = GetCmakePadDown();
             short repeat = GetCmakePadRepeat();
 
+            int done;
             if (repeat == 0) {
-                result = 0;
+                done = 0;
             } else {
-                if ((repeat & 3) != 0) {
+                int dirMask = repeat & 3;
+                if (dirMask != 0) {
                     CmakeState(this)->m_select ^= 1;
                     Sound.PlaySe(1, 0x40, 0x7F, 0);
                 }
-                if ((repeat & 3) == 0) {
+                if (dirMask == 0) {
                     if ((down & 0x100) != 0) {
                         if (CmakeState(this)->m_select == 0) {
                             CmakeState(this)->m_resultDir = 1;
@@ -4071,18 +4073,20 @@ void CMenuPcs::CalcSingCMake()
                             CmakeState(this)->m_resultDir = -1;
                         }
                         Sound.PlaySe(0x33, 0x40, 0x7F, 0);
-                        result = 1;
-                        break;
+                        done = 1;
+                        goto case5_out;
                     }
                     if ((down & 0x200) != 0) {
                         CmakeState(this)->m_resultDir = -1;
                         Sound.PlaySe(3, 0x40, 0x7F, 0);
-                        result = 1;
-                        break;
+                        done = 1;
+                        goto case5_out;
                     }
                 }
-                result = 0;
+                done = 0;
             }
+        case5_out:
+            result = done;
         } else {
             if (CmakeState(this)->m_stepTimer == 0) {
                 int done;
@@ -4118,9 +4122,11 @@ void CMenuPcs::CalcSingCMake()
             short down = GetCmakePadDown();
             short repeat = GetCmakePadRepeat();
 
+            int done;
             if (repeat == 0) {
-                result = 0;
+                done = 0;
             } else {
+                int dirMask = repeat & 0xC;
                 if ((repeat & 0x8) != 0) {
                     if (CmakeState(this)->m_select == 0) {
                         CmakeState(this)->m_select = 3;
@@ -4139,22 +4145,24 @@ void CMenuPcs::CalcSingCMake()
                     Sound.PlaySe(1, 0x40, 0x7F, 0);
                 }
 
-                if ((repeat & 0xC) == 0) {
+                if (dirMask == 0) {
                     if ((down & 0x100) != 0) {
                         if (CmakeState(this)->m_select < 3) {
                             ChgModel(static_cast<int>(CmakeSlot(this)), -1, -1, -1);
                         }
                         CmakeState(this)->m_resultDir = 1;
                         Sound.PlaySe(2, 0x40, 0x7F, 0);
-                        result = 1;
-                        break;
+                        done = 1;
+                        goto case6_out;
                     }
                     if ((down & 0x200) != 0) {
                         Sound.PlaySe(4, 0x40, 0x7F, 0);
                     }
                 }
-                result = 0;
+                done = 0;
             }
+        case6_out:
+            result = done;
         } else {
             int done;
             if (CmakeState(this)->m_frame >= 10) {

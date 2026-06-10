@@ -1860,20 +1860,26 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 	float* dynParam = reinterpret_cast<float*>(reinterpret_cast<u8*>(ModelDynParams(this)) + NodeDynParamIndex(node) * 0x24);
 
 	Vec forward;
+	Vec right;
+	Vec up;
+	Vec origin;
+	Vec target;
+	Vec windImpulse;
+	Vec accel;
+	Vec predicted;
+	Vec direction;
 	{
 		CVector tmp(NodeWorldMtx(node)[0][0], NodeWorldMtx(node)[1][0], NodeWorldMtx(node)[2][0]);
 		forward.x = tmp.x;
 		forward.y = tmp.y;
 		forward.z = tmp.z;
 	}
-	Vec right;
 	{
 		CVector tmp(NodeWorldMtx(node)[0][1], NodeWorldMtx(node)[1][1], NodeWorldMtx(node)[2][1]);
 		right.x = tmp.x;
 		right.y = tmp.y;
 		right.z = tmp.z;
 	}
-	Vec up;
 	{
 		CVector tmp(NodeWorldMtx(node)[0][2], NodeWorldMtx(node)[1][2], NodeWorldMtx(node)[2][2]);
 		up.x = tmp.x;
@@ -1881,7 +1887,6 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 		up.z = tmp.z;
 	}
 	reinterpret_cast<CVector&>(forward).Normalize();
-	Vec origin;
 	{
 		CVector tmp(NodeWorldMtx(node)[0][3], NodeWorldMtx(node)[1][3], NodeWorldMtx(node)[2][3]);
 		origin.x = tmp.x;
@@ -1890,7 +1895,6 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 	}
 	float boneLen = NodeBoneLen(node);
 
-	Vec target;
 	{
 		CVector tmp;
 		PSVECScale(&forward, reinterpret_cast<Vec*>(&tmp), boneLen);
@@ -1914,7 +1918,6 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 	}
 
 	float randomScale = FLOAT_803301D0 * Math.RandF() + FLOAT_803301D0;
-	Vec windImpulse;
 	{
 		float windScale = dynParam[2];
 		CVector tmp;
@@ -1930,7 +1933,6 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 		windImpulse.z = tmp2.z;
 	}
 
-	Vec accel;
 	{
 		CVector tmp;
 		PSVECSubtract(&target, &NodeDynPosition(node), reinterpret_cast<Vec*>(&tmp));
@@ -1946,7 +1948,6 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 	}
 	PSVECAdd(&NodeDynVelocity(node), &accel, &NodeDynVelocity(node));
 
-	Vec predicted;
 	{
 		float velScale = dynParam[0];
 		CVector tmp;
@@ -1963,7 +1964,6 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 	}
 	PSVECScale(&NodeDynVelocity(node), &NodeDynVelocity(node), dynParam[1]);
 
-	Vec direction;
 	{
 		CVector tmp;
 		PSVECSubtract(&predicted, &origin, reinterpret_cast<Vec*>(&tmp));

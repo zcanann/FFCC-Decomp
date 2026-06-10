@@ -1197,10 +1197,10 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
             float* scratch = m_bumpTexScratch;
 
             float mtxScale = kBumpTexMtxScale;
-            float scrollScale = kBumpTexScrollScale;
-            float zero = kLightZero;
-            scratch[0] = kBumpTexScrollScale;
             float half = kLightHalf;
+            float zero = kLightZero;
+            float scrollScale = kBumpTexScrollScale;
+            scratch[0] = scrollScale;
             scratch[6] = scrollScale;
             scratch[10] = zero;
             scratch[5] = zero;

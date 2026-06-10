@@ -187,7 +187,7 @@ static const float sQuarterTurn = 1.5707964f;         // FLOAT_80330344
 extern "C" const double sLoopBias;                    // DOUBLE_80330378
 extern "C" const float sZeroFloat;                    // FLOAT_80330350
 static const float sPushDistance = 1000.0f;           // FLOAT_80330354
-extern const float sDownUnitY = -1.0f;                // FLOAT_80330358
+extern const float sDownUnitY = -2000.0f;             // FLOAT_80330358 = c4fa0000 (binary-verified)
 static const float sDownProbeDistance = -10000.0f;    // FLOAT_8033035c
 static const float sStepProbeHeight = 5.0f;           // FLOAT_80330360
 static const float sBgAttrSlow = 0.75f;               // FLOAT_80330364

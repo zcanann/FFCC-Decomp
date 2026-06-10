@@ -2889,11 +2889,8 @@ void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
 
 	if ((*reinterpret_cast<int*>(&Game.m_gameWork.m_scriptSysVal0) == 1) &&
 		(Game.m_gameWork.m_bossArtifactStageIndex < 0xF)) {
-		CGame::CBossArtifactStage* bossArtifacts =
-			&Game.m_bossArtifactBase[Game.m_gameWork.m_bossArtifactStageIndex];
-		short artifactScale = bossArtifacts->m_entries[8].m_values[0];
 		m_maxHp = (unsigned short)((float)m_maxHp *
-								   ((((float)artifactScale) * kGObjWorkStatusScaleStep) + kGObjWorkStatusScaleBase));
+								   ((((float)Game.m_bossArtifactBase[Game.m_gameWork.m_bossArtifactStageIndex].m_entries[8].m_values[0]) * kGObjWorkStatusScaleStep) + kGObjWorkStatusScaleBase));
 	}
 
 	m_hp = m_maxHp;

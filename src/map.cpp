@@ -2252,8 +2252,7 @@ int CMapMng::ReadOtm(char* mapName)
     root->CalcMtx(identity, 1);
 
     for (int i = 0; i < m_mapObjCount; i++) {
-        CMapObj* obj = GetMapObjArray() + i;
-        CMapObjAtr* attr = obj->m_attribute;
+        CMapObjAtr* attr = m_mapObjArray[i].m_attribute;
         if (attr == 0) {
             continue;
         }
@@ -2268,9 +2267,9 @@ int CMapMng::ReadOtm(char* mapName)
 
         CLightPcs::CBumpLight light;
         light.m_type = 1;
-        light.m_position.x = MapObjWorldX(obj);
-        light.m_position.y = MapObjWorldY(obj);
-        light.m_position.z = MapObjWorldZ(obj);
+        light.m_position.x = MapObjWorldX(&m_mapObjArray[i]);
+        light.m_position.y = MapObjWorldY(&m_mapObjArray[i]);
+        light.m_position.z = MapObjWorldZ(&m_mapObjArray[i]);
 
         CMapObj* targetObj = spotAttr->m_target;
         light.m_targetPosition.x = MapObjWorldX(targetObj);
@@ -2302,9 +2301,8 @@ int CMapMng::ReadOtm(char* mapName)
         spotAttr->m_light = bump;
 
         for (int j = 0; j < m_mapObjCount; j++) {
-            CMapObj* scan = GetMapObjArray() + j;
-            if (scan->m_bumpObjId == i) {
-                scan->m_bumpLight = spotAttr->m_light;
+            if (m_mapObjArray[j].m_bumpObjId == i) {
+                m_mapObjArray[j].m_bumpLight = spotAttr->m_light;
             }
         }
 

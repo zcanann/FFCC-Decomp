@@ -1420,56 +1420,49 @@ _GXTexObj* CGraphic::GetBackBufferRect(int& x, int& y, int& width, int& height, 
 void CGraphic::GetBackBufferRect2(void* dstBuffer, _GXTexObj* texObj, int x, int y, int width, int height, int dstOffset,
                                   _GXTexFilter filter, _GXTexFmt format, int doClear)
 {
-    int copyX = x;
-    int copyY = y;
-    int copyWidth = width;
-    int copyHeight = height;
-    _GXTexFmt copyFormat = format;
-    _GXTexFilter copyFilter = filter;
-    int copyClear = doClear;
-    int xEnd = copyX + copyWidth;
-    int yEnd = copyY + copyHeight;
-    if ((xEnd >= 0) && (yEnd >= 0) && (copyX <= m_renderMode->fbWidth) &&
-        ((yEnd >= 0) && (copyY <= m_renderMode->efbHeight)) &&
-        ((copyWidth > 0) && ((copyHeight > 0) && (xEnd != copyX))) && (yEnd != copyY)) {
+    int xEnd = x + width;
+    int yEnd = y + height;
+    if ((xEnd >= 0) && (yEnd >= 0) && (x <= m_renderMode->fbWidth) &&
+        ((yEnd >= 0) && (y <= m_renderMode->efbHeight)) &&
+        ((width > 0) && ((height > 0) && (xEnd != x))) && (yEnd != y)) {
         void* textureBase;
-        int textureSize = GXGetTexBufferSize((u16)copyWidth, (u16)copyHeight, copyFormat, GX_FALSE, GX_FALSE);
+        int textureSize = GXGetTexBufferSize((u16)width, (u16)height, format, GX_FALSE, GX_FALSE);
         textureBase =
             reinterpret_cast<void*>((reinterpret_cast<u32>(dstBuffer) + ((dstOffset + 0x1F) & 0xFFFFFFE0) + 0x1F) &
                                     0xFFFFFFE0);
 
-        GXSetTexCopySrc(copyX & 0xFFFF, copyY & 0xFFFF, (u16)copyWidth, (u16)copyHeight);
-        GXSetTexCopyDst((u16)copyWidth, (u16)copyHeight, copyFormat, GX_FALSE);
+        GXSetTexCopySrc(x & 0xFFFF, y & 0xFFFF, (u16)width, (u16)height);
+        GXSetTexCopyDst((u16)width, (u16)height, format, GX_FALSE);
         DCInvalidateRange(textureBase, textureSize);
-        GXCopyTex(textureBase, copyClear);
+        GXCopyTex(textureBase, doClear);
         GXPixModeSync();
         GXInvalidateTexAll();
 
-        switch (copyFormat) {
+        switch (format) {
         case GX_CTF_R4:
         case GX_CTF_RA4:
-            copyFormat = GX_TF_I4;
+            format = GX_TF_I4;
             break;
         case GX_CTF_RA8:
         case GX_CTF_A8:
         case GX_CTF_R8:
         case GX_CTF_G8:
         case GX_CTF_B8:
-            copyFormat = GX_TF_I8;
+            format = GX_TF_I8;
             break;
         case GX_CTF_RG8:
         case GX_CTF_GB8:
-            copyFormat = GX_TF_IA8;
+            format = GX_TF_IA8;
             break;
         default:
             break;
         }
 
         if (texObj != nullptr) {
-            GXInitTexObj(texObj, textureBase, (u16)copyWidth, (u16)copyHeight, copyFormat, GX_CLAMP, GX_CLAMP,
+            GXInitTexObj(texObj, textureBase, (u16)width, (u16)height, format, GX_CLAMP, GX_CLAMP,
                          GX_FALSE);
             float zero = LoadFloat(kGraphicZeroF);
-            GXInitTexObjLOD(texObj, copyFilter, copyFilter, zero, zero, zero, GX_FALSE, GX_FALSE,
+            GXInitTexObjLOD(texObj, filter, filter, zero, zero, zero, GX_FALSE, GX_FALSE,
                             GX_ANISO_1);
         }
     }

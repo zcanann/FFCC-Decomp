@@ -190,12 +190,12 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
             segX = camX - trailX;
             segY = camY - trailY;
             segZ = camZ - trailZ;
+            zeroVec.z = 0.0f;
+            zeroVec.y = 0.0f;
+            zeroVec.x = 0.0f;
             segVec.x = segX;
             segVec.y = segY;
             segVec.z = segZ;
-            zeroVec.x = 0.0f;
-            zeroVec.y = 0.0f;
-            zeroVec.z = 0.0f;
             segLen = PSVECDistance(&zeroVec, &segVec);
             segRemaining = segLen;
 
@@ -282,12 +282,12 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
                     segX = camX - drawX;
                     segY = camY - drawY;
                     segZ = camZ - drawZ;
+                    innerZero.z = 0.0f;
+                    innerZero.y = 0.0f;
+                    innerZero.x = 0.0f;
                     innerSeg.x = segX;
                     innerSeg.y = segY;
                     innerSeg.z = segZ;
-                    innerZero.x = 0.0f;
-                    innerZero.y = 0.0f;
-                    innerZero.z = 0.0f;
                     segLen = PSVECDistance(&innerZero, &innerSeg);
                     segRemaining += segLen;
                 }

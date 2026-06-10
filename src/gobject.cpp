@@ -1139,6 +1139,14 @@ static inline const Vec& vecScale(const CVector& v, float scale)
     return reinterpret_cast<Vec&>(out);
 }
 
+static inline const Vec& vecScaleV(const Vec& v, float scale)
+{
+    Vec out;
+
+    PSVECScale(&v, &out, scale);
+    return out;
+}
+
 static inline const Vec& vecSub(const CVector& a, const CVector& b)
 {
     CVector out;
@@ -1616,10 +1624,8 @@ void CGObject::update()
             m_worldPosition = attachPos;
         } else {
             float interp = static_cast<float>(m_moveMode) / static_cast<float>(m_moveModePrevious);
-            Vec fromSelf;
-            Vec fromOwner;
-            PSVECScale(&attachPos, &fromOwner, sAnimFrameOffset - interp);
-            PSVECScale(&m_worldPosition, &fromSelf, interp);
+            const Vec& fromOwner = vecScaleV(attachPos, sAnimFrameOffset - interp);
+            const Vec& fromSelf = vecScaleV(m_worldPosition, interp);
             PSVECAdd(&fromOwner, &fromSelf, &m_worldPosition);
             m_moveMode--;
         }

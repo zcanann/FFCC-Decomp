@@ -27,6 +27,8 @@
 #include <dolphin/mtx.h>
 #include <dolphin/os/OSCache.h>
 
+Vec g_shadow_pos;
+Vec g_shadow_refpos;
 CCameraPcs CameraPcs;
 
 static const char sCameraPcsGameTableName[] = "CCameraPcs(GAME)";
@@ -305,9 +307,6 @@ CProcessTable CCameraPcs::m_table[7] = {
         0x1,
     }
 };
-Vec g_shadow_pos;
-Vec g_shadow_refpos;
-
 extern "C" {
 void pppEditGetViewPos__FP3Vec(Vec*);
 void pppEditGetViewMatrix__FPA4_f(float (*)[4]);
@@ -638,21 +637,21 @@ void CCameraPcs::CalcQuake()
     offset.y = (m_quake.m_signY == 0) ? -m_quake.m_positionAmplitude.y : m_quake.m_positionAmplitude.y;
     offset.z = (m_quake.m_signZ == 0) ? -m_quake.m_positionAmplitude.z : m_quake.m_positionAmplitude.z;
 
-    jitter.z = kCameraZeroF;
-    jitter.y = kCameraZeroF;
-    jitter.x = kCameraZeroF;
+    jitter.z = 0.0f;
+    jitter.y = 0.0f;
+    jitter.x = 0.0f;
 
-    u32 randX = static_cast<u32>(rand());
-    u16 signX = static_cast<u16>(randX >> 0x1F);
-    unsigned short jitterSignX = static_cast<short>(((randX & 1) ^ signX) - signX);
+    randomValue = static_cast<u32>(rand());
+    randomSign = randomValue >> 0x1F;
+    short jitterSignX = static_cast<short>(((randomValue & 1) ^ randomSign) - randomSign);
 
-    u32 randY = static_cast<u32>(rand());
-    u16 signY = static_cast<u16>(randY >> 0x1F);
-    short jitterSignY = static_cast<short>(((randY & 1) ^ signY) - signY);
+    randomValue = static_cast<u32>(rand());
+    randomSign = randomValue >> 0x1F;
+    short jitterSignY = static_cast<short>(((randomValue & 1) ^ randomSign) - randomSign);
 
-    u32 randZ = static_cast<u32>(rand());
-    u16 signZ = static_cast<u16>(randZ >> 0x1F);
-    short jitterSignZ = static_cast<short>(((randZ & 1) ^ signZ) - signZ);
+    randomValue = static_cast<u32>(rand());
+    randomSign = randomValue >> 0x1F;
+    short jitterSignZ = static_cast<short>(((randomValue & 1) ^ randomSign) - randomSign);
 
     float jitterAmount;
     if (jitterSignX == 0) {
@@ -845,7 +844,10 @@ void CCameraPcs::calc()
             PSMTXScale(tempMtx, scale, scale, scale);
             PSMTXConcat(tempMtx, worldMapMtx, worldMapMtx);
 
-            if (static_cast<int>(static_cast<unsigned int>(m_worldMapEffect.m_flags) << 0x18) >= 0) {
+            if (static_cast<signed char>(
+                    static_cast<int>((static_cast<unsigned int>(m_worldMapEffect.m_flags) << 26) &
+                                     0xC0000000) >>
+                    31) == 0) {
                 m_worldMapEffect.m_timer -= 1;
             }
         }
@@ -896,10 +898,19 @@ void CCameraPcs::SetStdProjectionMatrix()
  * JP Address: TODO
  * JP Size: TODO
  */
+static inline void sCameraSetMatColor(u8 r, u8 g, u8 b, u8 a)
+{
+    _GXColor c;
+    c.r = r;
+    c.g = g;
+    c.b = b;
+    c.a = a;
+    GXSetChanMatColor(GX_COLOR0A0, c);
+}
+
 void CCameraPcs::draw()
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    Vec* shadowPos = &g_shadow_pos;
 
     if ((m_isAbsolute == 0) ||
         ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_Camera) != 0)) {
@@ -925,9 +936,11 @@ void CCameraPcs::draw()
         {
         Mtx cameraMtx;
         Mtx shadowMtx;
-        float posX = shadowPos->x;
-        float posY = shadowPos->y;
-        float posZ = shadowPos->z;
+        Vec* shadowPos = &g_shadow_pos;
+        float posX, posY, posZ;
+        posZ = shadowPos->z;
+        posY = shadowPos->y;
+        posX = shadowPos->x;
         PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         GXSetZCompLoc(0);
@@ -949,12 +962,7 @@ void CCameraPcs::draw()
         shadowMtx[2][3] = posZ;
         PSMTXConcat(cameraMtx, shadowMtx, shadowMtx);
         GXLoadPosMtxImm(shadowMtx, 0);
-        _GXColor redColor;
-        redColor.r = 0xFF;
-        redColor.g = 0;
-        redColor.b = 0;
-        redColor.a = 0xFF;
-        GXSetChanMatColor(GX_COLOR0A0, redColor);
+        sCameraSetMatColor(0xFF, 0, 0, 0xFF);
         Graphic.DrawSphere();
         }
 
@@ -962,9 +970,10 @@ void CCameraPcs::draw()
         Mtx cameraMtx;
         Mtx shadowMtx;
         Vec* shadowRefPos = &g_shadow_refpos;
-        float refPosX = shadowRefPos->x;
-        float refPosY = shadowRefPos->y;
-        float refPosZ = shadowRefPos->z;
+        float refPosX, refPosY, refPosZ;
+        refPosX = shadowRefPos->x;
+        refPosZ = shadowRefPos->z;
+        refPosY = shadowRefPos->y;
         PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         GXSetZCompLoc(0);
@@ -986,12 +995,7 @@ void CCameraPcs::draw()
         shadowMtx[2][3] = refPosZ;
         PSMTXConcat(cameraMtx, shadowMtx, shadowMtx);
         GXLoadPosMtxImm(shadowMtx, 0);
-        _GXColor magentaColor;
-        magentaColor.r = 0;
-        magentaColor.g = 0xFF;
-        magentaColor.b = 0;
-        magentaColor.a = 0xFF;
-        GXSetChanMatColor(GX_COLOR0A0, magentaColor);
+        sCameraSetMatColor(0, 0xFF, 0, 0xFF);
         Graphic.DrawSphere();
         }
     }
@@ -1258,10 +1262,10 @@ void CCameraPcs::calcMap()
     buttons = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? 0 : CameraRawPadInput().buttonDown[0];
 
     stickH = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? kCameraZeroF : CameraRawPadInput().substickYF;
-    stickH = kCameraDegToRad * (stickH / kCameraOneEighthF);
+    stickH = 0.017453292519943295f * (stickH / 0.125f);
 
     stickV = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? kCameraZeroF : *reinterpret_cast<float*>(&CameraRawPadInput().lockedButton[0]);
-    stickV = -(kCameraDegToRad * (stickV / kCameraOneEighthF));
+    stickV = -(0.017453292519943295f * (stickV / 0.125f));
 
     triggerL = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? kCameraZeroF : CameraRawPadInput().stickYF;
 
@@ -1320,9 +1324,10 @@ void CCameraPcs::calcMap()
     if ((kCameraZeroF != moveDelta.x) || (kCameraZeroF != moveDelta.y) || (kCameraZeroF != moveDelta.z)) {
         i = 4;
         while (i-- != 0) {
-            double radius = kCameraDefaultNearZ;
-            double boundsMax = kCameraBoundsMaxInitial;
-            double boundsMin = kCameraBoundsMinInitial;
+            double radius, boundsMax, boundsMin;
+            boundsMin = kCameraBoundsMinInitial;
+            boundsMax = kCameraBoundsMaxInitial;
+            radius = kCameraDefaultNearZ;
             hitCylinder.m_min.z = boundsMin;
             hitCylinder.m_min.y = boundsMin;
             hitCylinder.m_min.x = boundsMin;
@@ -1408,11 +1413,11 @@ void CCameraPcs::createFullShadow()
     m_fullScreenShadow.m_rampTexture = rampTex;
 
     for (i = 0; i < 0x100; i += 8) {
-        u32 v7 = i + 7;
         u32 v6 = i + 6;
-        u32 v5 = i + 5;
+        u32 v7 = i + 7;
         u32 v3 = i + 3;
         u32 v4 = i + 4;
+        u32 v5 = i + 5;
         u32 v2 = i + 2;
         u32 v1 = i + 1;
         rampTex[((i & 0x80) >> 2) + ((i >> 4) & 7) + ((i & 0xC) << 4) + ((i & 3) << 3)] =
@@ -1560,9 +1565,9 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
         float negMinZ = -clipBoundData[2];
         float ratioX = (clipBoundData[3] - clipBoundData[0]) / negMinZ;
         float ratioY = (clipBoundData[4] - clipBoundData[1]) / negMinZ;
-        if (ratioX > kCameraDebugRotateStep) {
+        if (ratioX > 0.2f) {
             // proceed
-        } else if (!(ratioY > kCameraDebugRotateStep)) {
+        } else if (!(ratioY > 0.2f)) {
             continue;
         }
 
@@ -1667,7 +1672,8 @@ void CCameraPcs::drawShadowBegin()
         if (currentDepth < kCameraZeroF) {
             m_fullScreenShadowDepth = depth;
         } else {
-            float blended = (depth - currentDepth) * kCameraShadowDepthBlend;
+            depth -= currentDepth;
+            float blended = depth * kCameraShadowDepthBlend;
             m_fullScreenShadowDepth = currentDepth + blended;
         }
     } else {
@@ -1715,7 +1721,11 @@ void CCameraPcs::drawShadowBegin()
     GXSetProjection(m_screenMatrix, GX_ORTHOGRAPHIC);
     GXSetColorUpdate(GX_FALSE);
     GXSetCullMode(GX_CULL_BACK);
-    GXSetViewport(kCameraTwoF, kCameraTwoF, kCameraShadowViewportSize, kCameraShadowViewportSize, kCameraZeroF, kCameraOneF);
+    {
+        float vpXY = kCameraTwoF;
+        float vpWH = kCameraShadowViewportSize;
+        GXSetViewport(vpXY, vpXY, vpWH, vpWH, kCameraZeroF, kCameraOneF);
+    }
     GXSetScissor(2, 2, 0x1DC, 0x1DC);
     _GXSetBlendMode(GX_BM_NONE, GX_BL_ZERO, GX_BL_ZERO, GX_LO_NOOP);
     _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0xFF);
@@ -1740,10 +1750,10 @@ void CCameraPcs::drawShadowEnd()
     Mtx44 proj;
     Mtx ident;
     float z;
-    int x0;
     int y0;
-    int x1;
     int y1;
+    int x0;
+    int x1;
     int x2;
 
     if (m_fullScreenShadowEnabled == 0) {
@@ -1823,13 +1833,13 @@ void CCameraPcs::drawShadowEnd()
         C_MTXLightOrtho(m_fullScreenShadow.m_shadowTexMtx, -span, span, -span, span,
                         kCameraHalfF, kCameraHalfF, kCameraHalfF, kCameraHalfF);
         PSMTXScale(m_fullScreenShadow.m_depthScaleMtx, kCameraZeroF, kCameraZeroF, kCameraZeroF);
-        float one = kCameraOneF;
+        float scaleY = kCameraShadowDepthScaleY;
         float depthSpan = m_shadowCamera.m_farZ - m_shadowCamera.m_nearZ;
         m_fullScreenShadow.m_depthScaleMtx[0][2] = kCameraNegativeOneF / depthSpan;
         m_fullScreenShadow.m_depthScaleMtx[0][3] = -(m_shadowCamera.m_nearZ / depthSpan);
-        m_fullScreenShadow.m_depthScaleMtx[1][2] = m_fullScreenShadow.m_depthScaleMtx[0][2] * kCameraShadowDepthScaleY;
-        m_fullScreenShadow.m_depthScaleMtx[1][3] = m_fullScreenShadow.m_depthScaleMtx[0][3] * kCameraShadowDepthScaleY;
-        m_fullScreenShadow.m_depthScaleMtx[2][3] = one;
+        m_fullScreenShadow.m_depthScaleMtx[1][2] = m_fullScreenShadow.m_depthScaleMtx[0][2] * scaleY;
+        m_fullScreenShadow.m_depthScaleMtx[1][3] = m_fullScreenShadow.m_depthScaleMtx[0][3] * scaleY;
+        m_fullScreenShadow.m_depthScaleMtx[2][3] = kCameraOneF;
         PSMTXConcat(m_fullScreenShadow.m_shadowTexMtx,
                     m_shadowCamera.m_cameraMatrix,
                     m_fullScreenShadow.m_shadowTexMtx);

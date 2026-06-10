@@ -367,29 +367,34 @@ unsigned int CMemoryCardMan::CalcCrc(Mc::SaveDat* saveData)
 {
     int count;
     unsigned char* ptr;
+    unsigned char* ptr2;
     unsigned int crc;
-    Mc::SaveDat* save = saveData;
+    unsigned char* crcData;
 
-    if (save == nullptr)
+    if (saveData == nullptr)
     {
-        save = GetSaveDat(m_saveBuffer);
+        crcData = (unsigned char*)m_saveBuffer;
+    }
+    else
+    {
+        crcData = reinterpret_cast<unsigned char*>(saveData);
     }
 
     crc = 0xFFFFFFFF;
+    ptr = crcData;
     count = 0x1C;
-    ptr = reinterpret_cast<unsigned char*>(save);
     while (--count >= 0)
     {
         crc = (crc << 8) ^ s_CrcTable[(crc >> 24) ^ *ptr];
         ptr += 1;
     }
 
-    ptr = reinterpret_cast<unsigned char*>(save->m_body);
+    ptr2 = crcData + 0x20;
     count = 0x8BB0;
     while (--count >= 0)
     {
-        crc = (crc << 8) ^ s_CrcTable[(crc >> 24) ^ *ptr];
-        ptr += 1;
+        crc = (crc << 8) ^ s_CrcTable[(crc >> 24) ^ *ptr2];
+        ptr2 += 1;
     }
 
     return ~crc;

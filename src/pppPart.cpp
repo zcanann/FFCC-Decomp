@@ -1761,6 +1761,7 @@ DataValsAllocated:
 		pppMngSt->m_pppPDataVals = 0;
 	}
 
+	_pppProgSetDef* programSetIt = programSet;
 	if (programSet->m_next != 0)
 	{
 		pppMngSt->m_pppPObjLinkHead.m_previous = 0;
@@ -1773,7 +1774,7 @@ DataValsAllocated:
 	}
 	else
 	{
-		pppMngSt->m_pppPObjLinkHead.m_previous = (_pppPObjLink*)programSet;
+		pppMngSt->m_pppPObjLinkHead.m_previous = (_pppPObjLink*)programSetIt;
 	}
 
 	pppMngSt->m_pppPObjLinkHead.m_next = 0;
@@ -1781,7 +1782,7 @@ DataValsAllocated:
 
 	u8 index = 0;
 	_pppPDataVal* pDataVals = pppMngSt->m_pppPDataVals;
-	for (_pppProgSetDef* programSetIt = programSet; programSetIt != 0; programSetIt = programSetIt->m_next)
+	for (; programSetIt != 0; programSetIt = programSetIt->m_next)
 	{
 		pDataVals->m_programSetDef = programSetIt;
 		pDataVals->m_nextSpawnTime = programSetIt->m_startFrame;

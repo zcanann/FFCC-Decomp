@@ -2867,7 +2867,7 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     float x = static_cast<float>(static_cast<double>(win->width - maxWidth) * 0.5
             + static_cast<double>(win->x));
     float y = static_cast<float>(win->y + 0x20);
-    if (0.0f < 22.0f * FLOAT_8032ea78 - static_cast<float>(lineHeight)) {
+    if (22.0f * FLOAT_8032ea78 - static_cast<float>(lineHeight) > 0.0f) {
         lineHeight++;
     }
     int lineStep = lineHeight + 3;
@@ -2913,20 +2913,22 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
     font->SetShadow(1);
     font->SetScale(FLOAT_8032ea78);
 
+    int maxWidth = 0;
     int lineCount;
     if (useDynamic != 0) {
         lineCount = s_DynamicMess[0];
     } else {
         lineCount = s_singleMenuStaticMessages[messageNo].lineCount;
     }
+    char* dynamicText = s_DynamicMessStr;
     const SingMenuStaticMessageInfo& staticMessage = s_singleMenuStaticMessages[messageNo];
 
-    int maxWidth = 0;
-    char* dynamicText = s_DynamicMessStr;
     for (int i = 0; i < lineCount; i++) {
-        const char* text = dynamicText;
+        const char* text;
         if (useDynamic == 0) {
             text = GetSingWinMessage(staticMessage.textIds[i], dynamicText, 0);
+        } else {
+            text = dynamicText;
         }
         int textWidth = font->GetWidth(text);
         if (textWidth > maxWidth) {
@@ -2942,12 +2944,12 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
     }
 
     int lineHeight = static_cast<int>(22.0f * FLOAT_8032ea78);
-    if (0.0f < 22.0f * FLOAT_8032ea78 - static_cast<float>(lineHeight)) {
+    if (22.0f * FLOAT_8032ea78 - static_cast<float>(lineHeight) > 0.0f) {
         lineHeight++;
     }
 
     int widthLines = maxWidth / lineHeight;
-    if (maxWidth != widthLines * lineHeight) {
+    if (maxWidth - widthLines * lineHeight != 0) {
         widthLines++;
     }
 

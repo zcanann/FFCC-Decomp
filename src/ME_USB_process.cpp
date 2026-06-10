@@ -316,13 +316,13 @@ void CMaterialEditorPcs::SetUSBData()
     }
     case 0x20: {
         u32 allocSize = usb.m_sizeBytes;
-        s16* headerBuffer = static_cast<s16*>(
-            Memory._Alloc(allocSize, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0));
+        void* mem = Memory._Alloc(allocSize, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0);
 
-        if (headerBuffer == 0) {
+        if (mem == 0) {
             System.Printf(const_cast<char*>(sMemAllocErrorSizeFmt), allocSize);
         }
 
+        s16* headerBuffer = static_cast<s16*>(mem);
         void* headerDst =
             Memory._Alloc(0x10, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0);
         if (headerDst == 0) {

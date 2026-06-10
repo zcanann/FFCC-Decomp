@@ -2591,9 +2591,9 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 		}
 
 		CVector startOffset(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
-		CVector worldPos(m_worldPosition);
+		const CVector& worldPos = CVector(m_worldPosition);
 		CVector startPos;
-		PSVECAdd(reinterpret_cast<Vec*>(&worldPos), reinterpret_cast<Vec*>(&startOffset), reinterpret_cast<Vec*>(&startPos));
+		PSVECAdd((Vec*)&worldPos, reinterpret_cast<Vec*>(&startOffset), reinterpret_cast<Vec*>(&startPos));
 
 		CMapCylinder hitCylinder(FLOAT_80331a9c, FLOAT_80331aa0);
 		hitCylinder.m_bottom.x = startPos.x;
@@ -2607,9 +2607,9 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 			hitObj->CalcHitPosition(&m_comboCenter);
 		} else {
 			CVector startOffset2(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
-			CVector worldPos2(m_worldPosition);
+			const CVector& worldPos2 = CVector(m_worldPosition);
 			CVector startPos2;
-			PSVECAdd(reinterpret_cast<Vec*>(&worldPos2), reinterpret_cast<Vec*>(&startOffset2), reinterpret_cast<Vec*>(&startPos2));
+			PSVECAdd((Vec*)&worldPos2, reinterpret_cast<Vec*>(&startOffset2), reinterpret_cast<Vec*>(&startPos2));
 			Vec startPosVec;
 			startPosVec.x = startPos2.x;
 			startPosVec.y = startPos2.y;

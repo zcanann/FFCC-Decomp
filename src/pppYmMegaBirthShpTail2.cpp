@@ -275,13 +275,13 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
                     drawZ = camZ;
                     {
                         Vec* p = &history[trailNextIndex];
-                        camX = p->x;
                         camY = p->y;
                         camZ = p->z;
+                        camX = p->x;
                     }
-                    segX = camX - drawX;
                     segY = camY - drawY;
                     segZ = camZ - drawZ;
+                    segX = camX - drawX;
                     innerZero.z = 0.0f;
                     innerZero.y = 0.0f;
                     innerZero.x = 0.0f;

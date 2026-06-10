@@ -60,6 +60,11 @@ static inline float LoadFloat(const float& value)
 {
 	return value;
 }
+
+static inline float FloorF(float value)
+{
+	return static_cast<float>(floor(value));
+}
 }
 
 inline CFontGlyphEntry* CFont::searchChar(unsigned short ch)
@@ -226,8 +231,8 @@ void CFont::Draw(unsigned short ch)
 	int drawWidth;
 	unsigned int glyphOffset = static_cast<unsigned int>(-static_cast<int>(sign) | static_cast<int>(sign)) >> 30 & 2;
 	unsigned char* glyphInfo = reinterpret_cast<unsigned char*>(drawGlyph) + glyphOffset + 3;
-	int glyphIndex;
 	int row;
+	int glyphIndex;
 	float u0;
 	float v0;
 
@@ -248,10 +253,8 @@ void CFont::Draw(unsigned short ch)
 	float x0 = posX;
 	float y0 = posY;
 	if (renderFlagBits.snapPosition != 0) {
-		double flooredX = floor(x0);
-		double flooredY = floor(y0);
-		x0 = static_cast<float>(flooredX);
-		y0 = static_cast<float>(flooredY);
+		x0 = FloorF(x0);
+		y0 = FloorF(y0);
 	}
 
 	float advance = scaleX * (margin + static_cast<float>(drawWidth));
@@ -261,8 +264,7 @@ void CFont::Draw(unsigned short ch)
 	float y1 = y0 + static_cast<float>(m_glyphHeight) * scaleY;
 
 	if (renderFlagBits.snapPosition != 0) {
-		double flooredAdvance = floor(advance);
-		advance = static_cast<float>(flooredAdvance);
+		advance = FloorF(advance);
 	}
 	posX += advance;
 

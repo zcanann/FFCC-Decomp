@@ -366,7 +366,7 @@ int CMenuPcs::EquipCtrlCur()
  */
 void CMenuPcs::EquipDraw()
 {
-	bool helpFound = false;
+	int helpFound = 0;
 	int helpItem;
 	float w;
 	float h;
@@ -428,13 +428,13 @@ void CMenuPcs::EquipDraw()
 	item = GetEquipListStorage(this)->entries;
 	for (int i = 0; i < 4; i++) {
 		if (caravanWork->m_equipment[i] >= 0) {
-			CColor color(0xff, 0xff, 0xff, (u8)(int)(kEquipColorMax * item->alpha));
+			CColor color(0xff, 0xff, 0xff, (u8)(kEquipColorMax * item->alpha));
 			font->SetColor(color.color);
 			int itemIdx = caravanWork->m_inventoryItems[caravanWork->m_equipment[i]];
 			char* str = Game.m_cFlatDataArr[1].TableStrings(0)[itemIdx * 5 + 4];
 			if ((GetEquipMenuState(this)->mode == 0) && (i == static_cast<int>(GetEquipMenuState(this)->selectedIndex))) {
 				helpItem = itemIdx;
-				helpFound = true;
+				helpFound = 1;
 			}
 			float width = font->GetWidth(str);
 			float textY = (float)(item->y + 0xb);
@@ -513,9 +513,10 @@ void CMenuPcs::EquipDraw()
 								alpha = (float)(kEquipHalfDouble * (double)listItem->alpha);
 							}
 						} else {
-							int equipped = EquipChk((int)letter[idx]);
-							if ((idx >= letterCount) || (equipped != 0) || (ChkEquipActive(idx) == 0)) {
-								if (equipped != 0) {
+							int chk = idx - 1;
+							int equipped = EquipChk((int)letter[chk + 1]);
+							if (((chk + 1) >= letterCount) || ((equipped & 0xff) != 0) || ((ChkEquipActive(chk + 1) & 0xff) == 0)) {
+								if ((equipped & 0xff) != 0) {
 									int markX = (int)(x - kEquipMarkXOffset);
 									int markY = (int)((double)(h - kEquipMarkHeight) * kEquipHalfDouble + (double)y);
 									DrawEquipMark(markX, markY, listItem->alpha);
@@ -554,9 +555,10 @@ void CMenuPcs::EquipDraw()
 
 		s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 		int letterCount = letter[0];
+		EquipOpenAnimList* list = GetEquipListStorage(this);
 		EquipOpenAnim* listStart;
-		for (int i = GetEquipListStorage(this)->count; i < GetEquipListStorage(this)->listEnd; i++) {
-			listStart = &GetEquipListStorage(this)->entries[i];
+		for (int i = list->count; i < list->listEnd; i++) {
+			listStart = &list->entries[i];
 			if (listStart->tex == 0x37) {
 				break;
 			}
@@ -566,21 +568,21 @@ void CMenuPcs::EquipDraw()
 		EquipOpenAnim* textItem = listStart;
 		int idx;
 		for (int i = 0; (i < 8) && ((idx = i + GetEquipMenuState(this)->scroll) < letterCount); i++) {
-			CColor color(0xff, 0xff, 0xff, (u8)(int)(colorMax * listStart->alpha));
+			CColor color(0xff, 0xff, 0xff, (u8)(colorMax * listStart->alpha));
 			font->SetColor(color.color);
 
 			char* str;
 			if (idx == 0) {
 				str = GetMenuStr(0xb);
 			} else {
-				if ((idx >= letterCount) || (letter[idx] < 0)) {
+				if ((idx >= letterCount) || ((int)letter[idx] < 0)) {
 					continue;
 				}
 				int itemIdx = caravanWork->m_inventoryItems[letter[idx]];
 				str = Game.m_cFlatDataArr[1].TableStrings(0)[itemIdx * 5 + 4];
 				if (idx == static_cast<int>(GetEquipMenuState(this)->subSelectedIndex) + static_cast<int>(GetEquipMenuState(this)->scroll)) {
 					helpItem = itemIdx;
-					helpFound = true;
+					helpFound = 1;
 				}
 			}
 
@@ -595,11 +597,12 @@ void CMenuPcs::EquipDraw()
 		DrawInit();
 
 		EquipOpenAnim* iconItem = listStart;
-		for (int i = 0; (i < 8) && ((idx = i + GetEquipMenuState(this)->scroll) < letterCount); i++) {
-			if ((idx >= 1) && (letter[idx] >= 0)) {
+		int iconIdx;
+		for (int i = 0; (i < 8) && ((iconIdx = i + GetEquipMenuState(this)->scroll) < letterCount); i++) {
+			if ((iconIdx >= 1) && ((int)letter[iconIdx] >= 0)) {
 				int iconY = (int)((float)(iconItem->y + 6) - kEquipOne);
 				int iconX = (int)(float)(iconItem->x + (iconItem->w - 0x10));
-				DrawSingleIcon(caravanWork->m_inventoryItems[letter[idx]], iconX, iconY,
+				DrawSingleIcon(caravanWork->m_inventoryItems[letter[iconIdx]], iconX, iconY,
 				               listStart->alpha, 0, kEquipOne);
 			}
 			iconItem++;
@@ -623,9 +626,10 @@ void CMenuPcs::EquipDraw()
 			cy = (float)((double)(cursorItem->h - 0x20) * kEquipHalfDouble + (double)cursorItem->y);
 			cx = (float)(cursorItem->x - 0x14);
 		} else {
+			EquipOpenAnimList* list = GetEquipListStorage(this);
 			EquipOpenAnim* cursorItem;
-			for (int i = GetEquipListStorage(this)->count; i < GetEquipListStorage(this)->listEnd; i++) {
-				cursorItem = &GetEquipListStorage(this)->entries[i];
+			for (int i = list->count; i < list->listEnd; i++) {
+				cursorItem = &list->entries[i];
 				if (cursorItem->tex == 0x37) {
 					break;
 				}
@@ -641,8 +645,13 @@ void CMenuPcs::EquipDraw()
 
 	EquipMenuState* state = GetEquipMenuState(this);
 	s16 endMode = state->mode;
-	int listIndex = static_cast<int>(GetEquipModeSelected(state, endMode)) + static_cast<int>(state->scroll);
-	int helpEntryIndex = (endMode == 1) ? GetEquipListStorage(this)->count : 0;
+	int listIndex = static_cast<int>((&state->selectedIndex)[endMode]) + static_cast<int>(state->scroll);
+	int helpEntryIndex;
+	if (endMode == 1) {
+		helpEntryIndex = GetEquipListStorage(this)->count;
+	} else {
+		helpEntryIndex = 0;
+	}
 	int helpAlpha = (int)(kEquipColorMax * GetEquipListStorage(this)->entries[helpEntryIndex].alpha);
 	CFont* helpFont = m_fonts[0];
 	if (!helpFound) {

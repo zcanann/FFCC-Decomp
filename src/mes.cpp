@@ -161,12 +161,12 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
 {
 	int width = 0;
 	bool continueDraw = true;
+	unsigned short ch;
 	float lineStartX = font->posX;
-	unsigned char* src = (unsigned char*)text;
 
 	while (continueDraw)
 	{
-		unsigned short ch = *src++;
+		ch = (unsigned char)*text++;
 
 		if (ch == 0)
 		{
@@ -174,7 +174,7 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
 		}
 		else if (ch == 0xFF)
 		{
-			int tag = ((int)*src++ - 0xA0) & 0xFFFF;
+			int tag = ((int)(unsigned char)*text++ - 0xA0) & 0xFFFF;
 			switch (tag)
 			{
 			case 0:
@@ -921,11 +921,12 @@ void CMes::addString(char** text, int branchMode)
 	char nameTag2C[32];
 	char nameTag2D[32];
 
+	unsigned short uch;
 	while (running)
 	{
 		unsigned char* p = (unsigned char*)*text;
 		*text = (char*)(p + 1);
-		unsigned short uch = *p;
+		uch = *p;
 
 		if (uch == 0)
 		{

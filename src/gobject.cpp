@@ -949,7 +949,7 @@ void CGObject::bgCollision()
 
     if (m_bgColMask & 0x01)
     {
-        s_bitMask.m_fields.m_drawFlags = 1;
+        s_bitMaskDrawFlags = 1;
 
         if (Game.m_currentMapId == 0x21)
         {
@@ -960,7 +960,7 @@ void CGObject::bgCollision()
             bgNormalCollision();
         }
 
-        s_bitMask.m_fields.m_drawFlags = 0;
+        s_bitMaskDrawFlags = 0;
     }
 }
 #pragma pop

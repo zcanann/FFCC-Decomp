@@ -1171,7 +1171,7 @@ void CCameraPcs::GetWorldMapMatrix(float (*matrix)[4])
  */
 void CMapPcs::IsHitDrawMode(char drawMode)
 {
-    s_bitMask.m_fields.m_mode = drawMode;
+    s_bitMask = drawMode;
 }
 
 /*

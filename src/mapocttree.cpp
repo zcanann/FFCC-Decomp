@@ -23,7 +23,8 @@ static int s_light_no = 0;
 static unsigned long s_shadow_no = 0;
 static unsigned long InsertShadow_level = 0;
 static unsigned long clear_flag_mask = 0;
-UMapHitDrawMode s_bitMask;
+unsigned char s_bitMask;
+unsigned char s_bitMaskDrawFlags;
 static unsigned long octtree_draw_node_ct = 0;
 
 static const char sMapOctTreeNodeMeshTypeFmt[] =

@@ -2244,10 +2244,12 @@ void CPartMng::pppEditBeforeCalc()
         GXSetCopyClear(clearColor, 0x00FFFFFF);
 
         unsigned char fogEnable = *reinterpret_cast<unsigned char*>(self + 0x15c);
+        float fogNear;
         float fogFar = *reinterpret_cast<float*>(self + 0x164);
-        float fogNear = *reinterpret_cast<float*>(self + 0x160);
+        fogNear = *reinterpret_cast<float*>(self + 0x160);
+        unsigned char fogG;
         unsigned char fogB = *reinterpret_cast<unsigned char*>(self + 0x15f);
-        unsigned char fogG = *reinterpret_cast<unsigned char*>(self + 0x15e);
+        fogG = *reinterpret_cast<unsigned char*>(self + 0x15e);
         unsigned char fogR = *reinterpret_cast<unsigned char*>(self + 0x15d);
         _GXColor fogColor;
         if (fogEnable != 0) {
@@ -2293,10 +2295,12 @@ void CPartMng::pppEditBeforeCalc()
         GXSetCopyClear(clearColor, 0x00FFFFFF);
 
         unsigned char fogEnable = *reinterpret_cast<unsigned char*>(self + 0x15c);
+        float fogNear;
         float fogFar = *reinterpret_cast<float*>(self + 0x164);
-        float fogNear = *reinterpret_cast<float*>(self + 0x160);
+        fogNear = *reinterpret_cast<float*>(self + 0x160);
+        unsigned char fogG;
         unsigned char fogB = *reinterpret_cast<unsigned char*>(self + 0x15f);
-        unsigned char fogG = *reinterpret_cast<unsigned char*>(self + 0x15e);
+        fogG = *reinterpret_cast<unsigned char*>(self + 0x15e);
         unsigned char fogR = *reinterpret_cast<unsigned char*>(self + 0x15d);
         _GXColor fogColor;
         if (fogEnable != 0) {

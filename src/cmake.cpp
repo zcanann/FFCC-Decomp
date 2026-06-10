@@ -3966,12 +3966,11 @@ void CMenuPcs::CalcSingCMake()
             if (repeat == 0) {
                 done = 0;
             } else {
-                int dirMask = repeat & 0xC;
-                if (dirMask != 0) {
+                if ((repeat & 0xC) != 0) {
                     CmakeState(this)->m_select ^= 1;
                     Sound.PlaySe(1, 0x40, 0x7F, 0);
                 }
-                if (dirMask == 0) {
+                if ((repeat & 0xC) == 0) {
                     if ((down & 0x100) != 0) {
                         s_CmakeInfo.m_gender = static_cast<signed char>(CmakeState(this)->m_select);
                         CmakeState(this)->m_resultDir = 1;
@@ -4080,12 +4079,11 @@ void CMenuPcs::CalcSingCMake()
             if (repeat == 0) {
                 done = 0;
             } else {
-                int dirMask = repeat & 3;
-                if (dirMask != 0) {
+                if ((repeat & 3) != 0) {
                     CmakeState(this)->m_select ^= 1;
                     Sound.PlaySe(1, 0x40, 0x7F, 0);
                 }
-                if (dirMask == 0) {
+                if ((repeat & 3) == 0) {
                     if ((down & 0x100) != 0) {
                         if (CmakeState(this)->m_select == 0) {
                             CmakeState(this)->m_resultDir = 1;
@@ -4176,7 +4174,6 @@ void CMenuPcs::CalcSingCMake()
             if (repeat == 0) {
                 done = 0;
             } else {
-                int dirMask = repeat & 0xC;
                 if ((repeat & 0x8) != 0) {
                     if (CmakeState(this)->m_select == 0) {
                         CmakeState(this)->m_select = 3;
@@ -4195,7 +4192,7 @@ void CMenuPcs::CalcSingCMake()
                     Sound.PlaySe(1, 0x40, 0x7F, 0);
                 }
 
-                if (dirMask == 0) {
+                if ((repeat & 0xC) == 0) {
                     if ((down & 0x100) != 0) {
                         if (CmakeState(this)->m_select < 3) {
                             ChgModel(static_cast<int>(CmakeSlot(this)), -1, -1, -1);

@@ -2399,8 +2399,9 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 	if (blendMode == -1) {
 		CAnim* currentAnim = m_anim;
 		u8 interpCount;
+		int resolvedBlend;
 		if (currentAnim != 0 && (interpCount = AnimInterpCount(currentAnim)) != 0 && AnimBank(currentAnim) != 0) {
-			blendMode = 4;
+			resolvedBlend = 4;
 
 			u16* interpTable = reinterpret_cast<u16*>(reinterpret_cast<u8*>(AnimBank(currentAnim)) + AnimInterpOffset(currentAnim));
 			int frame = static_cast<int>(m_curFrame);
@@ -2409,15 +2410,16 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 				int start = (i == 0) ? 0 : interpTable[i * 2];
 				int end = (i + 1 < static_cast<int>(interpCount)) ? interpTable[i * 2 + 2] : 10000000;
 				if (start <= frame && frame < end) {
-					blendMode = interpTable[i * 2 + 1];
+					resolvedBlend = interpTable[i * 2 + 1];
 					break;
 				}
 			}
 		} else if (currentAnim != 0) {
-			blendMode = 4;
+			resolvedBlend = 4;
 		} else {
-			blendMode = 0;
+			resolvedBlend = 0;
 		}
+		blendMode = resolvedBlend;
 	}
 
 	if (anim != m_anim) {

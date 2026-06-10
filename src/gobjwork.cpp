@@ -1584,8 +1584,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 				romLetterWork[replaceIndex] = curLetter;
 			}
 		} else {
-			romLetterWork[foundCount] = curLetter;
-			foundCount++;
+			romLetterWork[foundCount++] = curLetter;
 		}
 
 	NextLetter:;
@@ -1693,8 +1692,6 @@ void CCaravanWork::CallShop(int requestType, int arg0, int arg1, int arg2, int a
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_propagation off
 void CCaravanWork::SafeDeleteTempItem()
 {
 	if ((unsigned int)System.m_execParam >= 3U) {
@@ -1787,7 +1784,6 @@ void CCaravanWork::SafeDeleteTempItem()
 	m_weaponIdx = 0;
 	memset(m_commandListExtra, 0, sizeof(m_commandListExtra));
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -2184,6 +2180,7 @@ unsigned int CCaravanWork::GetMagicCharge(int cmdListIdx, int&, int&)
 #pragma opt_common_subs off
 int CCaravanWork::GetCmdListItemName(int cmdListIdx, int* firstCmdIdx, int* itemCmdListIdx)
 {
+	short numSlots;
 	int groupedCount;
 
 	if (Game.m_gameWork.m_menuStageMode == 0) {
@@ -2201,7 +2198,8 @@ int CCaravanWork::GetCmdListItemName(int cmdListIdx, int* firstCmdIdx, int* item
 
 			groupedCount = 1;
 			int nextIdx = topIdx + 1;
-			for (int n = topIdx + 1; n < static_cast<short>(m_numCmdListSlots); n++) {
+			numSlots = m_numCmdListSlots;
+			for (int n = topIdx + 1; n < numSlots; n++) {
 				if (m_commandListExtra[nextIdx] != -1) {
 					break;
 				}
@@ -2337,7 +2335,8 @@ int CCaravanWork::DelCmdListAndItem(int cmdListIdx)
 
 			numGrouped = 1;
 			int nextIdx = topIdx + 1;
-			for (int n = topIdx + 1; n < (short)m_numCmdListSlots; n++) {
+			short numSlots = m_numCmdListSlots;
+			for (int n = topIdx + 1; n < numSlots; n++) {
 				if (m_commandListExtra[nextIdx] != -1) {
 					break;
 				}

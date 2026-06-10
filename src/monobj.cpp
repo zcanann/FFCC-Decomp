@@ -3619,6 +3619,7 @@ body:
 						if ((*reinterpret_cast<unsigned short*>(aiScript + 0x102) & 0x40) != 0) {
 							monObj->m_moveWork.m_flags |= 0x10000;
 						}
+						monObj->m_moveWork.m_flags = *reinterpret_cast<volatile int*>(&monObj->m_moveWork.m_flags);
 						monObj->m_moveWork.m_mode = 1;
 					}
 					monObj->m_moveWork.m_target = target;
@@ -3675,6 +3676,7 @@ body:
 							if ((*reinterpret_cast<unsigned short*>(AISCRIPT + 0x102) & 0x80) != 0) {
 								monObj->m_moveWork.m_flags |= 0x20000;
 							}
+							monObj->m_moveWork.m_flags = *reinterpret_cast<volatile int*>(&monObj->m_moveWork.m_flags);
 							monObj->m_moveWork.m_mode = 4;
 							monObj->m_moveWork.m_range = static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xD6));
 							monObj->m_moveWork.m_limitFrame = *reinterpret_cast<unsigned short*>(script + 0x1B6);
@@ -3938,7 +3940,7 @@ void CGMonObj::statWatch()
 							if ((*reinterpret_cast<unsigned short*>(aiData2 + 0x102) & 0x80) != 0) {
 								monObj->m_moveWork.m_flags |= 0x20000;
 							}
-							monObj->m_moveWork.m_flags = monObj->m_moveWork.m_flags;
+							monObj->m_moveWork.m_flags = *reinterpret_cast<volatile int*>(&monObj->m_moveWork.m_flags);
 							monObj->m_moveWork.m_mode = 4;
 							monObj->m_moveWork.m_range =
 								static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xD6));
@@ -3983,7 +3985,7 @@ void CGMonObj::statWatch()
 						if ((*reinterpret_cast<unsigned short*>(aiData5 + 0x102) & 0x40) != 0) {
 							monObj->m_moveWork.m_flags |= 0x10000;
 						}
-						monObj->m_moveWork.m_flags = monObj->m_moveWork.m_flags;
+						monObj->m_moveWork.m_flags = *reinterpret_cast<volatile int*>(&monObj->m_moveWork.m_flags);
 						monObj->m_moveWork.m_mode = 2;
 					}
 					monObj->m_moveWork.m_target = reinterpret_cast<CGCharaObj*>(party);
@@ -4162,6 +4164,7 @@ void CGMonObj::statMove(int* targetIndex)
 					if ((*reinterpret_cast<unsigned short*>(aiData + 0x102) & 0x80) != 0) {
 						monObj->m_moveWork.m_flags |= 0x20000;
 					}
+					monObj->m_moveWork.m_flags = *reinterpret_cast<volatile int*>(&monObj->m_moveWork.m_flags);
 					monObj->m_moveWork.m_mode = 4;
 					monObj->m_moveWork.m_range =
 						static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xCE));

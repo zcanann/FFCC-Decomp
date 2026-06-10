@@ -1779,8 +1779,7 @@ void CMenuPcs::LetterListDraw()
 	font->SetScale(FLOAT_803330f8);
 	font->DrawInit();
 
-	CColor titleColor(0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_803330a0 * *reinterpret_cast<float*>(menuDataBase + 0x58)));
-	font->SetColor(titleColor.color);
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_803330a0 * *reinterpret_cast<float*>(menuDataBase + 0x58))).color);
 
 	char* menuTitle = GetMenuStr(0x1D);
 	float titleX = static_cast<float>((FLOAT_80333158 - font->GetWidth(menuTitle)) *
@@ -1791,8 +1790,7 @@ void CMenuPcs::LetterListDraw()
 		return;
 	}
 
-	CColor textColor(0xFF, 0xFF, 0xFF, 0xFF);
-	font->SetColor(textColor.color);
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 
 	CCaravanWork* caravanWork = GetLetterCaravanWork();
 	const int topRow = static_cast<int>(m_singMenuState->topIndex);
@@ -1813,15 +1811,15 @@ void CMenuPcs::LetterListDraw()
 
 		font->SetTlut(tlut);
 
-		float rowY = static_cast<float>(y) - FLOAT_80333148;
-		const char* from = Game.m_cFlatDataArr[1].TableStrings(5)[(letter->Word0() & 0x7FC) >> 2];
+		float yf = static_cast<float>(y);
+		const char* from = Game.m_cFlatDataArr[1].TableStrings(5)[(letter->HeaderWord() & 0x7FC) >> 2];
 		font->SetPosX(FLOAT_80333160);
-		font->SetPosY(rowY);
+		font->SetPosY(yf - FLOAT_80333148);
 		font->Draw(from);
 
 		const char* subject = Game.m_cFlatDataArr[1].TableStrings(2)[(letter->Word0() >> 9) & 0x1FF];
 		font->SetPosX(FLOAT_80333164);
-		font->SetPosY(rowY);
+		font->SetPosY(yf - FLOAT_80333148);
 		font->Draw(subject);
 
 		y += 0x20;
@@ -1946,11 +1944,7 @@ void CMenuPcs::LetterMessDraw()
 	font->DrawInit();
 	font->SetTlut(0x1C);
 
-	{
-		u8 alpha = static_cast<u8>(FLOAT_803330a0 * *reinterpret_cast<float*>(animBase + 0xC));
-		CColor color(0xFF, 0xFF, 0xFF, alpha);
-		font->SetColor(color.color);
-	}
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_803330a0 * *reinterpret_cast<float*>(animBase + 0xC))).color);
 
 	CMemory::CStage* stage = GetLetterMenuStage(this);
 	char* srcText = new (stage, const_cast<char*>(s_menu_letter_cpp), 0x535) char[kLetterTextScratchSize];

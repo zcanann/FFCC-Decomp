@@ -599,10 +599,10 @@ void JoyBus::ThreadMain(void* arg)
     long long stateTimeoutTicks = 0;
     long long stateStartTime = 0;
 
-    unsigned short localCrc[2];
+    unsigned int localBuf;
     unsigned int localWord;
     unsigned int localCmd;
-    unsigned char localBuf[4];
+    unsigned short localCrc[2];
 
     threadParam->m_gbaStatus = GBAReset(threadParam->m_portIndex, &threadParam->m_unk3);
 
@@ -761,7 +761,7 @@ loop_body:
             goto timeout_expiry;
 
         do_recvsend:
-            if (GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf)) < 0)
+            if (GBARecvSend(threadParam, &localBuf) < 0)
             {
                 goto sleep_retry;
             }
@@ -983,7 +983,7 @@ timeout_expiry:
         {
             threadParam->m_errorRetry = 0;
 
-            if (GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf)) < 0)
+            if (GBARecvSend(threadParam, &localBuf) < 0)
             {
                 goto sleep_retry;
             }
@@ -1257,7 +1257,7 @@ timeout_expiry:
         {
             threadParam->m_errorRetry = 0;
 
-            if (GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf)) < 0)
+            if (GBARecvSend(threadParam, &localBuf) < 0)
             {
                 goto sleep_retry;
             }
@@ -1320,7 +1320,7 @@ timeout_expiry:
 
         case 0x14:
         {
-            int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            int res = GBARecvSend(threadParam, &localBuf);
             if (res < 0 || threadParam->m_skipProcessingFlag != 0)
             {
                 break;
@@ -1343,10 +1343,10 @@ timeout_expiry:
 
         case 0x15:
         {
-            unsigned int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            unsigned int res = GBARecvSend(threadParam, &localBuf);
             if ((int)res >= 0 && threadParam->m_skipProcessingFlag == 0 && (res & 1) != 0)
             {
-                if ((localBuf[0] & 0x3F) == 7)
+                if ((reinterpret_cast<unsigned char*>(&localBuf)[0] & 0x3F) == 7)
                 {
                     threadParam->m_state = 0x16;
                     memset(m_perThreadTemp[threadParam->m_portIndex], 0, sizeof(m_perThreadTemp[threadParam->m_portIndex]));
@@ -1417,7 +1417,7 @@ timeout_expiry:
         case 0x17:
         {
             m_stateFlagArr[threadParam->m_portIndex] = 0;
-            int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            int res = GBARecvSend(threadParam, &localBuf);
             if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && (int)GbaQue.GetScrFlg() != 0)
             {
                 threadParam->m_subState = 0;
@@ -1433,10 +1433,10 @@ timeout_expiry:
 
         case 0x18:
         {
-            unsigned int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            unsigned int res = GBARecvSend(threadParam, &localBuf);
             if ((int)res > 0 && threadParam->m_skipProcessingFlag == 0 && (res & 2) != 0)
             {
-                if ((res & 1) != 0 && (localBuf[0] & 0x3F) == 7)
+                if ((res & 1) != 0 && (reinterpret_cast<unsigned char*>(&localBuf)[0] & 0x3F) == 7)
                 {
                     threadParam->m_state = 0x17;
                 }
@@ -1455,10 +1455,10 @@ timeout_expiry:
 
         case 0x19:
         {
-            unsigned int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            unsigned int res = GBARecvSend(threadParam, &localBuf);
             if ((int)res > 0 && threadParam->m_skipProcessingFlag == 0 && (res & 1) != 0)
             {
-                if ((localBuf[0] & 0x3F) == 7)
+                if ((reinterpret_cast<unsigned char*>(&localBuf)[0] & 0x3F) == 7)
                 {
                     threadParam->m_state = 0x17;
                 }
@@ -1490,7 +1490,7 @@ timeout_expiry:
 
         case 0x1A:
         {
-            int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            int res = GBARecvSend(threadParam, &localBuf);
             if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && (int)GbaQue.GetScrFlg() != 0)
             {
                 threadParam->m_subState = 0;
@@ -1506,10 +1506,10 @@ timeout_expiry:
 
         case 0x1B:
         {
-            unsigned int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            unsigned int res = GBARecvSend(threadParam, &localBuf);
             if ((int)res > 0 && threadParam->m_skipProcessingFlag == 0 && (res & 2) != 0)
             {
-                if ((res & 1) != 0 && (localBuf[0] & 0x3F) == 7)
+                if ((res & 1) != 0 && (reinterpret_cast<unsigned char*>(&localBuf)[0] & 0x3F) == 7)
                 {
                     threadParam->m_state = 0x1A;
                 }
@@ -1528,10 +1528,10 @@ timeout_expiry:
 
         case 0x1C:
         {
-            unsigned int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            unsigned int res = GBARecvSend(threadParam, &localBuf);
             if ((int)res > 0 && threadParam->m_skipProcessingFlag == 0 && (res & 1) != 0)
             {
-                if ((localBuf[0] & 0x3F) == 7)
+                if ((reinterpret_cast<unsigned char*>(&localBuf)[0] & 0x3F) == 7)
                 {
                     threadParam->m_state = 0x1A;
                 }
@@ -1549,7 +1549,7 @@ timeout_expiry:
 
         case 0x1D:
         {
-            int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            int res = GBARecvSend(threadParam, &localBuf);
 
             if (res >= 0 && threadParam->m_skipProcessingFlag == 0)
             {
@@ -1582,7 +1582,7 @@ timeout_expiry:
 
         case 0x1E:
         {
-            unsigned int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            unsigned int res = GBARecvSend(threadParam, &localBuf);
             if ((int)res < 0)
             {
                 goto sleep_retry;
@@ -1591,7 +1591,7 @@ timeout_expiry:
             {
                 break;
             }
-            if ((localBuf[0] & 0x3F) == 7)
+            if ((reinterpret_cast<unsigned char*>(&localBuf)[0] & 0x3F) == 7)
             {
                 threadParam->m_state = 0x1F;
                 memset(m_perThreadTemp[threadParam->m_portIndex], 0, sizeof(m_perThreadTemp[threadParam->m_portIndex]));
@@ -1634,7 +1634,7 @@ timeout_expiry:
 
         case 0x21:
         {
-            int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            int res = GBARecvSend(threadParam, &localBuf);
             if (res >= 0 && threadParam->m_skipProcessingFlag == 0 &&
                 (int)GbaQue.GetLetterLstFlg(threadParam->m_portIndex) != 0)
             {
@@ -1646,7 +1646,7 @@ timeout_expiry:
 
         case 0x22:
         {
-            int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            int res = GBARecvSend(threadParam, &localBuf);
             if (res >= 0 && threadParam->m_skipProcessingFlag == 0)
             {
                 threadParam->m_state = 0x23;
@@ -1657,7 +1657,7 @@ timeout_expiry:
 
         case 0x23:
         {
-            int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            int res = GBARecvSend(threadParam, &localBuf);
             if (res >= 0 && threadParam->m_skipProcessingFlag == 0)
             {
                 threadParam->m_state = 0x24;
@@ -1697,7 +1697,7 @@ timeout_expiry:
 
         case 0x25:
         {
-            int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            int res = GBARecvSend(threadParam, &localBuf);
             if (res >= 0 && threadParam->m_skipProcessingFlag == 0 &&
                 (int)GbaQue.GetLetterDatFlg(threadParam->m_portIndex) != 0)
             {
@@ -1709,7 +1709,7 @@ timeout_expiry:
 
         case 0x26:
         {
-            int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            int res = GBARecvSend(threadParam, &localBuf);
             if (res >= 0 && threadParam->m_skipProcessingFlag == 0)
             {
                 threadParam->m_state = '\'';
@@ -1748,7 +1748,7 @@ timeout_expiry:
 
         case 0x29:
         {
-            int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            int res = GBARecvSend(threadParam, &localBuf);
             if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && (int)GbaQue.GetScrFlg() != 0)
             {
                 threadParam->m_subState = 0;
@@ -1764,10 +1764,10 @@ timeout_expiry:
 
         case 0x2A:
         {
-            unsigned int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            unsigned int res = GBARecvSend(threadParam, &localBuf);
             if ((int)res > 0 && threadParam->m_skipProcessingFlag == 0 && (res & 2) != 0)
             {
-                if ((res & 1) != 0 && (localBuf[0] & 0x3F) == 7)
+                if ((res & 1) != 0 && (reinterpret_cast<unsigned char*>(&localBuf)[0] & 0x3F) == 7)
                 {
                     threadParam->m_state = ')';
                 }
@@ -1786,10 +1786,10 @@ timeout_expiry:
 
         case 0x2B:
         {
-            unsigned int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            unsigned int res = GBARecvSend(threadParam, &localBuf);
             if ((int)res > 0 && threadParam->m_skipProcessingFlag == 0 && (res & 1) != 0)
             {
-                if ((localBuf[0] & 0x3F) == 7)
+                if ((reinterpret_cast<unsigned char*>(&localBuf)[0] & 0x3F) == 7)
                 {
                     threadParam->m_state = ')';
                 }
@@ -1804,7 +1804,7 @@ timeout_expiry:
 
         case 0x2C:
         {
-            int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            int res = GBARecvSend(threadParam, &localBuf);
             if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && (int)GbaQue.GetScrFlg() != 0)
             {
                 threadParam->m_subState = 0;
@@ -1820,10 +1820,10 @@ timeout_expiry:
 
         case 0x2D:
         {
-            unsigned int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            unsigned int res = GBARecvSend(threadParam, &localBuf);
             if ((int)res > 0 && threadParam->m_skipProcessingFlag == 0 && (res & 2) != 0)
             {
-                if ((res & 1) != 0 && (localBuf[0] & 0x3F) == 7)
+                if ((res & 1) != 0 && (reinterpret_cast<unsigned char*>(&localBuf)[0] & 0x3F) == 7)
                 {
                     threadParam->m_state = ',';
                 }
@@ -1842,10 +1842,10 @@ timeout_expiry:
 
         case 0x2E:
         {
-            unsigned int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            unsigned int res = GBARecvSend(threadParam, &localBuf);
             if ((int)res > 0 && threadParam->m_skipProcessingFlag == 0 && (res & 1) != 0)
             {
-                if ((localBuf[0] & 0x3F) == 7)
+                if ((reinterpret_cast<unsigned char*>(&localBuf)[0] & 0x3F) == 7)
                 {
                     threadParam->m_state = ',';
                 }
@@ -1861,7 +1861,7 @@ timeout_expiry:
 
         case 0x2F:
         {
-            int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            int res = GBARecvSend(threadParam, &localBuf);
             if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && (int)GbaQue.GetScrFlg() != 0)
             {
                 threadParam->m_subState = 0;
@@ -1877,10 +1877,10 @@ timeout_expiry:
 
         case 0x30:
         {
-            unsigned int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            unsigned int res = GBARecvSend(threadParam, &localBuf);
             if ((int)res > 0 && threadParam->m_skipProcessingFlag == 0 && (res & 2) != 0)
             {
-                if ((res & 1) != 0 && (localBuf[0] & 0x3F) == 7)
+                if ((res & 1) != 0 && (reinterpret_cast<unsigned char*>(&localBuf)[0] & 0x3F) == 7)
                 {
                     threadParam->m_state = '/';
                 }
@@ -1899,10 +1899,10 @@ timeout_expiry:
 
         case 0x31:
         {
-            unsigned int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            unsigned int res = GBARecvSend(threadParam, &localBuf);
             if ((int)res > 0 && threadParam->m_skipProcessingFlag == 0 && (res & 1) != 0)
             {
-                if ((localBuf[0] & 0x3F) == 7)
+                if ((reinterpret_cast<unsigned char*>(&localBuf)[0] & 0x3F) == 7)
                 {
                     threadParam->m_state = '/';
                 }
@@ -1919,7 +1919,7 @@ timeout_expiry:
         case 0x32:
         {
             m_stateFlagArr[threadParam->m_portIndex] = 0;
-            int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            int res = GBARecvSend(threadParam, &localBuf);
             if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && (int)GbaQue.GetScrFlg() != 0)
             {
                 threadParam->m_subState = 0;
@@ -1935,10 +1935,10 @@ timeout_expiry:
 
         case 0x33:
         {
-            unsigned int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            unsigned int res = GBARecvSend(threadParam, &localBuf);
             if ((int)res > 0 && threadParam->m_skipProcessingFlag == 0 && (res & 2) != 0)
             {
-                if ((res & 1) != 0 && (localBuf[0] & 0x3F) == 7)
+                if ((res & 1) != 0 && (reinterpret_cast<unsigned char*>(&localBuf)[0] & 0x3F) == 7)
                 {
                     threadParam->m_state = '2';
                 }
@@ -1957,10 +1957,10 @@ timeout_expiry:
 
         case 0x34:
         {
-            unsigned int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            unsigned int res = GBARecvSend(threadParam, &localBuf);
             if ((int)res > 0 && threadParam->m_skipProcessingFlag == 0 && (res & 1) != 0)
             {
-                if ((localBuf[0] & 0x3F) == 7)
+                if ((reinterpret_cast<unsigned char*>(&localBuf)[0] & 0x3F) == 7)
                 {
                     threadParam->m_state = '2';
                 }
@@ -1975,7 +1975,7 @@ timeout_expiry:
 
         case 0x35:
         {
-            int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            int res = GBARecvSend(threadParam, &localBuf);
             if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && (int)GbaQue.GetSellFlg(threadParam->m_portIndex) != 0)
             {
                 threadParam->m_state = '6';
@@ -2014,7 +2014,7 @@ timeout_expiry:
 
         case 0x37:
         {
-            int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            int res = GBARecvSend(threadParam, &localBuf);
             if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && (int)GbaQue.GetBuyFlg(threadParam->m_portIndex) != 0)
             {
                 threadParam->m_state = '8';
@@ -2053,7 +2053,7 @@ timeout_expiry:
 
         case 0x39:
         {
-            int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            int res = GBARecvSend(threadParam, &localBuf);
             if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && (int)GbaQue.GetMkSmithFlg(threadParam->m_portIndex) != 0)
             {
                 threadParam->m_state = ':';
@@ -2094,7 +2094,7 @@ timeout_expiry:
 
         case 0x3B:
         {
-            int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            int res = GBARecvSend(threadParam, &localBuf);
             if (res >= 0)
             {
                 int stopRes = SendGBAStop(threadParam);
@@ -2114,10 +2114,10 @@ timeout_expiry:
 
         case 0x3C:
         {
-            unsigned int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            unsigned int res = GBARecvSend(threadParam, &localBuf);
             if ((int)res > 0 && threadParam->m_skipProcessingFlag == 0 && (res & 2) != 0)
             {
-                if ((res & 1) != 0 && (localBuf[0] & 0x3F) == 7)
+                if ((res & 1) != 0 && (reinterpret_cast<unsigned char*>(&localBuf)[0] & 0x3F) == 7)
                 {
                     threadParam->m_state = ';';
                 }
@@ -2136,10 +2136,10 @@ timeout_expiry:
 
         case 0x3D:
         {
-            unsigned int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            unsigned int res = GBARecvSend(threadParam, &localBuf);
             if ((int)res > 0 && threadParam->m_skipProcessingFlag == 0 && (res & 1) != 0)
             {
-                if ((localBuf[0] & 0x3F) == 7)
+                if ((reinterpret_cast<unsigned char*>(&localBuf)[0] & 0x3F) == 7)
                 {
                     threadParam->m_state = ';';
                 }
@@ -2155,7 +2155,7 @@ timeout_expiry:
         case 0x3E:
         {
             m_stateFlagArr[threadParam->m_portIndex] = 0;
-            int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            int res = GBARecvSend(threadParam, &localBuf);
             if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && (int)GbaQue.GetScrFlg() != 0)
             {
                 threadParam->m_subState = 0;
@@ -2171,10 +2171,10 @@ timeout_expiry:
 
         case 0x3F:
         {
-            unsigned int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            unsigned int res = GBARecvSend(threadParam, &localBuf);
             if ((int)res > 0 && threadParam->m_skipProcessingFlag == 0 && (res & 2) != 0)
             {
-                if ((res & 1) != 0 && (localBuf[0] & 0x3F) == 7)
+                if ((res & 1) != 0 && (reinterpret_cast<unsigned char*>(&localBuf)[0] & 0x3F) == 7)
                 {
                     threadParam->m_state = '>';
                 }
@@ -2193,10 +2193,10 @@ timeout_expiry:
 
         case 0x40:
         {
-            unsigned int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            unsigned int res = GBARecvSend(threadParam, &localBuf);
             if ((int)res > 0 && threadParam->m_skipProcessingFlag == 0 && (res & 1) != 0)
             {
-                if ((localBuf[0] & 0x3F) == 7)
+                if ((reinterpret_cast<unsigned char*>(&localBuf)[0] & 0x3F) == 7)
                 {
                     threadParam->m_state = '>';
                 }
@@ -2212,7 +2212,7 @@ timeout_expiry:
 
         case 0x41:
         {
-            int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            int res = GBARecvSend(threadParam, &localBuf);
             if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && (GbaQue.GetArtiDatFlg(threadParam->m_portIndex) & 0xFF) != 0)
             {
                 threadParam->m_state = 'B';
@@ -2253,7 +2253,7 @@ timeout_expiry:
         case 0x43:
         {
             m_stateFlagArr[threadParam->m_portIndex] = 0;
-            int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            int res = GBARecvSend(threadParam, &localBuf);
             if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && (int)GbaQue.GetScrFlg() != 0)
             {
                 threadParam->m_subState = 0;
@@ -2269,10 +2269,10 @@ timeout_expiry:
 
         case 0x44:
         {
-            unsigned int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            unsigned int res = GBARecvSend(threadParam, &localBuf);
             if ((int)res > 0 && threadParam->m_skipProcessingFlag == 0 && (res & 2) != 0)
             {
-                if ((res & 1) != 0 && (localBuf[0] & 0x3F) == 7)
+                if ((res & 1) != 0 && (reinterpret_cast<unsigned char*>(&localBuf)[0] & 0x3F) == 7)
                 {
                     threadParam->m_state = 'C';
                 }
@@ -2291,10 +2291,10 @@ timeout_expiry:
 
         case 0x45:
         {
-            unsigned int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            unsigned int res = GBARecvSend(threadParam, &localBuf);
             if ((int)res > 0 && threadParam->m_skipProcessingFlag == 0 && (res & 1) != 0)
             {
-                if ((localBuf[0] & 0x3F) == 7)
+                if ((reinterpret_cast<unsigned char*>(&localBuf)[0] & 0x3F) == 7)
                 {
                     threadParam->m_state = 'C';
                 }
@@ -2311,7 +2311,7 @@ timeout_expiry:
         case 0x46:
         {
             m_stateFlagArr[threadParam->m_portIndex] = 0;
-            int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            int res = GBARecvSend(threadParam, &localBuf);
             if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && (int)GbaQue.GetScrFlg() != 0)
             {
                 int typeRes = SendRaderType(threadParam);
@@ -2335,10 +2335,10 @@ timeout_expiry:
 
         case 0x47:
         {
-            unsigned int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            unsigned int res = GBARecvSend(threadParam, &localBuf);
             if ((int)res > 0 && threadParam->m_skipProcessingFlag == 0 && (res & 2) != 0)
             {
-                if ((res & 1) != 0 && (localBuf[0] & 0x3F) == 7)
+                if ((res & 1) != 0 && (reinterpret_cast<unsigned char*>(&localBuf)[0] & 0x3F) == 7)
                 {
                     threadParam->m_state = 'F';
                 }
@@ -2357,10 +2357,10 @@ timeout_expiry:
 
         case 0x48:
         {
-            unsigned int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            unsigned int res = GBARecvSend(threadParam, &localBuf);
             if ((int)res > 0 && threadParam->m_skipProcessingFlag == 0 && (res & 1) != 0)
             {
-                if ((localBuf[0] & 0x3F) == 7)
+                if ((reinterpret_cast<unsigned char*>(&localBuf)[0] & 0x3F) == 7)
                 {
                     threadParam->m_state = 'F';
                 }
@@ -2376,7 +2376,7 @@ timeout_expiry:
         case 0x49:
         {
             m_stateFlagArr[threadParam->m_portIndex] = 0;
-            int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            int res = GBARecvSend(threadParam, &localBuf);
             if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && (int)GbaQue.GetScrFlg() != 0)
             {
                 ResetQueue(threadParam);
@@ -2393,10 +2393,10 @@ timeout_expiry:
 
         case 0x4A:
         {
-            unsigned int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            unsigned int res = GBARecvSend(threadParam, &localBuf);
             if ((int)res > 0 && threadParam->m_skipProcessingFlag == 0 && (res & 2) != 0)
             {
-                if ((res & 1) != 0 && (localBuf[0] & 0x3F) == 7)
+                if ((res & 1) != 0 && (reinterpret_cast<unsigned char*>(&localBuf)[0] & 0x3F) == 7)
                 {
                     threadParam->m_state = 'I';
                 }
@@ -2415,10 +2415,10 @@ timeout_expiry:
 
         case 0x4B:
         {
-            unsigned int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            unsigned int res = GBARecvSend(threadParam, &localBuf);
             if ((int)res > 0 && threadParam->m_skipProcessingFlag == 0 && (res & 1) != 0)
             {
-                if ((localBuf[0] & 0x3F) == 7)
+                if ((reinterpret_cast<unsigned char*>(&localBuf)[0] & 0x3F) == 7)
                 {
                     threadParam->m_state = 'I';
                 }
@@ -2435,7 +2435,7 @@ timeout_expiry:
         case 0x4C:
         {
             m_stateFlagArr[threadParam->m_portIndex] = 0;
-            int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            int res = GBARecvSend(threadParam, &localBuf);
             if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && (int)GbaQue.GetScrFlg() != 0)
             {
                 threadParam->m_subState = 0;
@@ -2451,10 +2451,10 @@ timeout_expiry:
 
         case 0x4D:
         {
-            unsigned int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            unsigned int res = GBARecvSend(threadParam, &localBuf);
             if ((int)res > 0 && threadParam->m_skipProcessingFlag == 0 && (res & 2) != 0)
             {
-                if ((res & 1) != 0 && (localBuf[0] & 0x3F) == 7)
+                if ((res & 1) != 0 && (reinterpret_cast<unsigned char*>(&localBuf)[0] & 0x3F) == 7)
                 {
                     threadParam->m_state = 'L';
                 }
@@ -2473,11 +2473,11 @@ timeout_expiry:
 
         case 0x4E:
         {
-            unsigned int r = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            unsigned int r = GBARecvSend(threadParam, &localBuf);
 
             if ((int)r > 0 && threadParam->m_skipProcessingFlag == 0 && (r & 1) != 0)
             {
-                if ((localBuf[0] & 0x3F) == 7)
+                if ((reinterpret_cast<unsigned char*>(&localBuf)[0] & 0x3F) == 7)
                     threadParam->m_state = 'L';
                 else
                     threadParam->m_state = 5;
@@ -2488,7 +2488,7 @@ timeout_expiry:
 
         case 900:
         {
-            int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            int res = GBARecvSend(threadParam, &localBuf);
 
             if (res >= 0 && threadParam->m_skipProcessingFlag == 0)
             {

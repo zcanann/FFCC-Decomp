@@ -125,8 +125,10 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     float colorEndG;
     float colorEndB;
     float colorEndA;
-    float colorStep[4];
-    float* stepPtr;
+    volatile float colorStepR;
+    volatile float colorStepG;
+    volatile float colorStepB;
+    volatile float colorStepA;
     float invCountMinusOne;
     pppFMATRIX localBase;
     pppFMATRIX initMtx;
@@ -180,17 +182,16 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     colorEndR = step->m_colorEndR;
     colorEndG = step->m_colorEndG;
     colorEndB = step->m_colorEndB;
-    stepPtr = colorStep;
     if (invCountMinusOne != zero) {
-        stepPtr[3] = (colorStartR - colorEndR) / invCountMinusOne;
-        stepPtr[2] = (colorStartG - colorEndG) / invCountMinusOne;
-        stepPtr[1] = (colorStartB - colorEndB) / invCountMinusOne;
-        stepPtr[0] = (colorStartA - colorEndA) / invCountMinusOne;
+        colorStepR = (colorStartR - colorEndR) / invCountMinusOne;
+        colorStepG = (colorStartG - colorEndG) / invCountMinusOne;
+        colorStepB = (colorStartB - colorEndB) / invCountMinusOne;
+        colorStepA = (colorStartA - colorEndA) / invCountMinusOne;
     } else {
-        stepPtr[3] = kPppKeShpTail2XHalf;
-        stepPtr[2] = stepPtr[3];
-        stepPtr[1] = stepPtr[3];
-        stepPtr[0] = stepPtr[3];
+        colorStepR = kPppKeShpTail2XHalf;
+        colorStepG = kPppKeShpTail2XHalf;
+        colorStepB = kPppKeShpTail2XHalf;
+        colorStepA = kPppKeShpTail2XHalf;
     }
 
     work = GetKeShpTail2XWork(&obj->m_object, param_3);
@@ -291,10 +292,10 @@ update_step:
         return;
     }
 
-    colorStartR -= stepPtr[3];
-    colorStartG -= stepPtr[2];
-    colorStartB -= stepPtr[1];
-    colorStartA -= stepPtr[0];
+    colorStartR -= colorStepR;
+    colorStartG -= colorStepG;
+    colorStartB -= colorStepB;
+    colorStartA -= colorStepA;
     drawScale -= scaleStepDelta;
     if (trailStep <= kPppKeShpTail2XZero) {
         return;

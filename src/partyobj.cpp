@@ -3360,7 +3360,7 @@ void CGPartyObj::carry(int carryType, CGObject* object, int forceMode)
 				}
 		} else {
 			changeStat((carryType == 1) ? 0x0C : 0x0D, 0, 0);
-			reinterpret_cast<CGItemObj*>(PartyData(this).carryObject)->carry(this, carryType, getCarryAnimNo(this, carryType));
+			reinterpret_cast<CGItemObj*>(PartyData(this).carryObject)->carry(this, carryType, getCarryAnimNo(this, 1));
 			PartyData(this).carryObject = (CGObject*)0;
 		}
 	}

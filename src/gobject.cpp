@@ -212,6 +212,14 @@ static inline Vec& ModelWindVector(CChara::CModel* model)
     return *reinterpret_cast<Vec*>(ModelBytes(model) + 0xC4);
 }
 
+static inline void SetModelWindVector(CChara::CModel* model, const Vec& wind)
+{
+    CVector windCopy(wind);
+    ModelWindVector(model).x = windCopy.x;
+    ModelWindVector(model).y = windCopy.y;
+    ModelWindVector(model).z = windCopy.z;
+}
+
 static inline float ClampFloat(float value, float minValue, float maxValue)
 {
     if (value < minValue) {
@@ -1665,10 +1673,10 @@ void CGObject::update()
                 const float targetYaw = atan2f(-lookDelta.x, -lookDelta.z);
                 const float yawDelta = Math.DstRot(targetYaw, m_rotBaseY);
                 if (fabs(yawDelta) < sYawLookCutoff) {
-                    const double pitchDelta = atan2(lookDelta.y, lookDistance);
-                    if (fabs((float)pitchDelta) < sPitchLookCutoff) {
+                    const float pitchDelta = (float)atan2(lookDelta.y, lookDistance);
+                    if (fabs(pitchDelta) < sPitchLookCutoff) {
                         lookYaw += yawDelta;
-                        lookPitch += (float)pitchDelta;
+                        lookPitch += pitchDelta;
                     }
                 }
             }
@@ -1693,10 +1701,7 @@ void CGObject::update()
         windVec.x = -(m_groundHitOffset.x * Math.RandF() - windVec.x);
         windVec.z = -(m_groundHitOffset.z * Math.RandF() - windVec.z);
         CChara::CModel* windModel = m_charaModelHandle->m_model;
-        CVector windCopy(windVec);
-        ModelWindVector(windModel).x = windCopy.x;
-        ModelWindVector(windModel).y = windCopy.y;
-        ModelWindVector(windModel).z = windCopy.z;
+        SetModelWindVector(windModel, windVec);
 
         boundCheck();
 

@@ -1816,10 +1816,9 @@ void CMenuPcs::CmakeJobDraw()
     if (CmakeState(this)->m_mode == 1) {
         int sel = CmakeState(this)->m_select;
         int cursorX = (sel < 4) ? 0x110 : 0x1A8;
-        int cursorY = 0x70 + (sel % 4) * 0x28;
-        unsigned int cursorFrame = static_cast<int>(System.m_frameCounter) % 8;
+        int cursorFrame = static_cast<int>(System.m_frameCounter) % 8;
         DrawCursor(static_cast<int>((static_cast<float>(cursorX) - 36.0f) + static_cast<float>(cursorFrame)),
-            cursorY, alpha);
+            static_cast<int>(static_cast<float>(sel % 4 * 0x28 + 0x70)), alpha);
     }
 
     if (CmakeMcState(this) != 3) {

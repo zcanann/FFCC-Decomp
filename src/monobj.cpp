@@ -3684,7 +3684,7 @@ void CGMonObj::statWatch()
 		}
 
 		int targetMode = *reinterpret_cast<unsigned short*>(aiScript + 0x106);
-		unsigned int selectedTarget = -1;
+		int selectedTarget = -1;
 		if (targetMode == 0xFFFF) {
 			chaseState = 0;
 			chaseTimer = 0;
@@ -3770,14 +3770,7 @@ void CGMonObj::statWatch()
 			selectedTarget = result;
 		}
 
-		if (selectedTarget < 0) {
-			actionState = 0;
-			memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
-			chaseState = 3;
-			chaseTimer = 0;
-			monObj->m_chaseDirty = 1;
-			return;
-		}
+		if (selectedTarget >= 0) {
 
 		targetPartyIndex = selectedTarget;
 		if (monObj->m_aiState == 0) {
@@ -3906,6 +3899,13 @@ void CGMonObj::statWatch()
 				actionState = actionState - 0xE;
 			}
 			chaseState = 1;
+			chaseTimer = 0;
+			monObj->m_chaseDirty = 1;
+		}
+		} else {
+			actionState = 0;
+			memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
+			chaseState = 3;
 			chaseTimer = 0;
 			monObj->m_chaseDirty = 1;
 		}

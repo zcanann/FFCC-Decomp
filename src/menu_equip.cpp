@@ -126,7 +126,7 @@ int CMenuPcs::ChkEquipActive(int index)
 	int item = caravanWork->m_inventoryItems[itemEntries[index - 1]];
 	unsigned int active = ChkEquipPossible(item);
 
-	if (((active & 0xff) != 0) && (GetEquipType(item) != equipIndex)) {
+	if (((active & 0xff) != 0) && (equipIndex != GetEquipType(item))) {
 		active = 0;
 	}
 

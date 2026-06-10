@@ -3000,31 +3000,28 @@ inline void CShopMenu::SelectSOUBI()
     if ((GetPadButtons() & 0xC) != 0) {
         m_yesNo ^= 1;
         Sound.PlaySe(1, 0x40, 0x7F, 0);
-        return;
+    } else if ((GetPadButtons() & 0x100) != 0) {
+        m_nextMode = 9;
+        SetMode(0x11);
+
+        switch (m_yesNo) {
+        case 0: {
+            int equipType = MenuPcs.GetEquipType(m_resultItem);
+            ShopMenuCaravanWork(this)->ChgEquipPos(equipType, m_resultParam);
+            Sound.PlaySe(0x51, 0x40, 0x7F, 0);
+            break;
+        }
+        case 1:
+            Sound.PlaySe(4, 0x40, 0x7F, 0);
+            break;
+        }
     }
 
     if ((GetPadButtons() & 0x200) != 0) {
-        Sound.PlaySe(3, 0x40, 0x7F, 0);
         m_nextMode = 9;
+        Sound.PlaySe(3, 0x40, 0x7F, 0);
         SetMode(0x11);
-        return;
     }
-
-    if ((GetPadButtons() & 0x100) == 0) {
-        return;
-    }
-
-    m_nextMode = 9;
-    SetMode(0x11);
-
-    if (m_yesNo != 0) {
-        Sound.PlaySe(4, 0x40, 0x7F, 0);
-        return;
-    }
-
-    int equipType = MenuPcs.GetEquipType(m_resultItem);
-    ShopMenuCaravanWork(this)->ChgEquipPos(equipType, static_cast<short>(m_resultParam));
-    Sound.PlaySe(0x51, 0x40, 0x7F, 0);
 }
 /*
  * --INFO--

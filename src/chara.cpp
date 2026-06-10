@@ -1894,16 +1894,15 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 	{
 		CVector tmp;
 		PSVECScale(&forward, reinterpret_cast<Vec*>(&tmp), boneLen);
-		target.x = tmp.x;
-		target.y = tmp.y;
-		target.z = tmp.z;
-	}
-	{
-		CVector tmp;
-		PSVECAdd(&origin, &target, reinterpret_cast<Vec*>(&tmp));
-		target.x = tmp.x;
-		target.y = tmp.y;
-		target.z = tmp.z;
+		Vec scaled;
+		scaled.x = tmp.x;
+		scaled.y = tmp.y;
+		scaled.z = tmp.z;
+		CVector tmp2;
+		PSVECAdd(&origin, &scaled, reinterpret_cast<Vec*>(&tmp2));
+		target.x = tmp2.x;
+		target.y = tmp2.y;
+		target.z = tmp2.z;
 	}
 
 	if (ModelFlag10C_80(this)) {

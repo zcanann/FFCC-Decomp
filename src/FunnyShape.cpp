@@ -76,12 +76,13 @@ static inline float RotateShapeY(const u8* entry, u32 xOffset, u32 yOffset, floa
 static inline void WriteVertex(const float* pos, u32 color, const float* tex)
 {
     const volatile float* vpos = pos;
+    const volatile float* vtex = tex;
     GXWGFifo.f32 = vpos[0];
     GXWGFifo.f32 = vpos[1];
     GXWGFifo.f32 = vpos[2];
     GXWGFifo.u32 = color;
-    GXWGFifo.f32 = tex[0];
-    GXWGFifo.f32 = tex[1];
+    GXWGFifo.f32 = vtex[0];
+    GXWGFifo.f32 = vtex[1];
 }
 
 static inline GXColor ToGXColor(u32 color)
@@ -152,12 +153,12 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
         float u1;
         float v1;
 
-        if ((*reinterpret_cast<const u16*>(shapeData) & 8) != 0) {
+        if ((*reinterpret_cast<const s16*>(shapeData) & 8) != 0) {
             const u8* entry = (shapeData + 0x10) + rotatedStride;
             const u8 texIndex = entry[0x28];
             const s8 numTex = m_textureCount;
-            float minX = kFunnyShapeBoundsMaxInitial;
-            float maxX = kFunnyShapeBoundsMinInitial;
+            float minX = LoadFloat(kFunnyShapeBoundsMaxInitial);
+            float maxX = LoadFloat(kFunnyShapeBoundsMinInitial);
             float minY = minX;
             float maxY = maxX;
             if ((s32)numTex > (s32)texIndex) {
@@ -242,14 +243,22 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             GXSetViewport(viewportScale * minX + offsetXY[0], viewportScale * minY + offsetXY[1], viewportW,
                           viewportH, kFunnyShapeZero, kFunnyShapeOne);
 
-            const u16 texX = S16At(entry, 0x20);
+            const s16 texX = S16At(entry, 0x20);
             const s16 texY = S16At(entry, 0x22);
-            const u16 texW = S16At(entry, 0x24);
-            const u16 texH = S16At(entry, 0x26);
+            const s16 texW = S16At(entry, 0x24);
+            const s16 texH = S16At(entry, 0x26);
             u0 = static_cast<float>(texX) / kFunnyShapeTexCoordDivisor;
             v0 = kFunnyShapeOne - static_cast<float>(texY) / kFunnyShapeTexCoordDivisor;
             u1 = u0 + static_cast<float>(texW) / kFunnyShapeTexCoordDivisor;
             v1 = v0 - static_cast<float>(texH) / kFunnyShapeTexCoordDivisor;
+            tex[0][0] = u0;
+            tex[0][1] = v0;
+            tex[1][0] = u1;
+            tex[1][1] = v0;
+            tex[2][0] = u1;
+            tex[2][1] = v1;
+            tex[3][0] = u0;
+            tex[3][1] = v1;
 
             const float padScale = kFunnyShapePaddingScale;
             const float padW = viewportW * padScale * padScale;
@@ -290,8 +299,8 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
                 _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_COPY);
             }
 
-            const u32 x0 = Div16Floor(S16At(entry, 0x10));
-            const u32 y0 = Div16Floor(S16At(entry, 0x12));
+            const s32 x0 = Div16Floor(S16At(entry, 0x10));
+            const s32 y0 = Div16Floor(S16At(entry, 0x12));
             const s32 x1 = Div16Floor(S16At(entry, 0x14));
             const s32 y1 = Div16Floor(S16At(entry, 0x16));
             GXSetViewport(offsetXY[0] + static_cast<float>(x0 * 2), offsetXY[1] + static_cast<float>(y0 * 2),
@@ -306,6 +315,14 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             v0 = kFunnyShapeOne - static_cast<float>(texY) / kFunnyShapeTexCoordDivisor;
             u1 = u0 + static_cast<float>(texW) / kFunnyShapeTexCoordDivisor;
             v1 = v0 - static_cast<float>(texH) / kFunnyShapeTexCoordDivisor;
+            tex[0][0] = u0;
+            tex[0][1] = v0;
+            tex[1][0] = u1;
+            tex[1][1] = v0;
+            tex[2][0] = u1;
+            tex[2][1] = v1;
+            tex[3][0] = u0;
+            tex[3][1] = v1;
 
             pos[0][0] = kFunnyShapeNegativeOne;
             pos[0][1] = kFunnyShapeOne;
@@ -322,15 +339,6 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             memcpy(&color, entry + 0x8, sizeof(color));
             *reinterpret_cast<GXColor*>(&color) = *reinterpret_cast<const GXColor*>(entry + 0x8);
         }
-
-        tex[0][0] = u0;
-        tex[0][1] = v0;
-        tex[1][0] = u1;
-        tex[1][1] = v0;
-        tex[2][0] = u1;
-        tex[2][1] = v1;
-        tex[3][0] = u0;
-        tex[3][1] = v1;
 
         DCStoreRange(&color, 4);
         GXBegin((GXPrimitive)0x80, GX_VTXFMT0, 4);

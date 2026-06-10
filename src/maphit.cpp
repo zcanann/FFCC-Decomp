@@ -490,6 +490,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
     g_hit_t = -((hitDot - (g_hit_lpface->m_planeD + g_hit_cyl.m_radius)) / dot);
     float hitT = g_hit_t;
     int edgeIndex = -1;
+    int i;
 
     if (hitT > kMapHitEdgeMaxT) {
         return 0;
@@ -522,7 +523,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
             pushedHit.y = pushedHit.z;
             pushedHit.z = kMapHitZero;
 
-            for (int i = 0; i < static_cast<int>(g_hit_lpface->m_vertexCount); i++) {
+            for (i = 0; i < static_cast<int>(g_hit_lpface->m_vertexCount); i++) {
                 current = m_vertices[g_hit_lpface->m_vertexIndices[i]];
                 edgeStart.x = previous.y + g_hit_lpface->m_vertexOffsets[i][0];
                 edgeStart.y = previous.z + g_hit_lpface->m_vertexOffsets[i][1];
@@ -553,7 +554,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
             pushedHit.y = pushedHit.z;
             pushedHit.z = kMapHitZero;
 
-            for (int i = 0; i < static_cast<int>(g_hit_lpface->m_vertexCount); i++) {
+            for (i = 0; i < static_cast<int>(g_hit_lpface->m_vertexCount); i++) {
                 current = m_vertices[g_hit_lpface->m_vertexIndices[i]];
                 edgeStart.x = previous.x + g_hit_lpface->m_vertexOffsets[i][0];
                 edgeStart.y = previous.z + g_hit_lpface->m_vertexOffsets[i][1];
@@ -583,7 +584,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         case 2:
             pushedHit.z = kMapHitZero;
 
-            for (int i = 0; i < static_cast<int>(g_hit_lpface->m_vertexCount); i++) {
+            for (i = 0; i < static_cast<int>(g_hit_lpface->m_vertexCount); i++) {
                 current = m_vertices[g_hit_lpface->m_vertexIndices[i]];
                 edgeStart.x = previous.x + g_hit_lpface->m_vertexOffsets[i][0];
                 edgeStart.y = previous.y + g_hit_lpface->m_vertexOffsets[i][1];

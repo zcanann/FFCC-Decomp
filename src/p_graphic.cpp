@@ -302,9 +302,9 @@ void CGraphicPcs::drawScreenFade()
             const int barHeight = (int)(kScreenFadeBarEdge * fadeWave);
             const int barEdge = (int)(kScreenFadeRingWidth * fadeWave);
 
-            drawSFRect(kGraphicZero, kGraphicZero, kGraphicScreenWidth, (float)barHeight, baseColor);
+            drawSFRect(kGraphicZero, kGraphicZero, kGraphicScreenWidth, (float)barHeight, baseColor, baseColor);
             drawSFRect(kGraphicZero, (float)barHeight, kGraphicScreenWidth, (float)(barHeight + barEdge), baseColor, baseColor2);
-            drawSFRect(kGraphicZero, kGraphicScreenHeight, kGraphicScreenWidth, (float)(448 - barHeight), baseColor);
+            drawSFRect(kGraphicZero, kGraphicScreenHeight, kGraphicScreenWidth, (float)(448 - barHeight), baseColor, baseColor);
             drawSFRect(kGraphicZero, (float)(448 - barHeight), kGraphicScreenWidth, (float)((448 - barHeight) - barEdge), baseColor, baseColor2);
             continue;
         }
@@ -313,7 +313,7 @@ void CGraphicPcs::drawScreenFade()
             const int mode = slotData->m_mode;
             if (mode == 0) {
             drawSlot2Fullscreen:
-                drawSFRect(kGraphicZero, kGraphicZero, kGraphicScreenWidth, kGraphicScreenHeight, baseColor);
+                drawSFRect(kGraphicZero, kGraphicZero, kGraphicScreenWidth, kGraphicScreenHeight, baseColor, baseColor);
             } else if (mode == 1) {
                 CGObject* obj = static_cast<CGObject*>(slotData->m_targetObj);
                 if (obj == NULL) {
@@ -327,23 +327,33 @@ void CGraphicPcs::drawScreenFade()
                 const float sy = kGraphicScreenCenterY - kGraphicScreenCenterY * pos.y;
                 pos.x = sx;
                 pos.y = sy;
-                float clamped = kGraphicZero;
-                if (sx < kGraphicZero) goto storeX;
-                clamped = kGraphicScreenWidth;
-                if (kGraphicScreenWidth < sx) goto storeX;
-                clamped = sx;
+                float clampedX = kGraphicZero;
+                if (!(sx < clampedX)) goto checkMaxX;
+                goto storeX;
+            checkMaxX:
+                clampedX = kGraphicScreenWidth;
+                if (!(clampedX < sx)) goto useX;
+                goto storeX;
+            useX:
+                clampedX = sx;
             storeX:
-                pos.x = clamped;
-                clamped = kGraphicZero;
-                if (pos.y < kGraphicZero) goto storeY;
-                clamped = kGraphicScreenHeight;
-                if (kGraphicScreenHeight < pos.y) goto storeY;
-                clamped = pos.y;
-            storeY:
-                pos.y = clamped;
+                pos.x = clampedX;
+                {
+                    float clampedY = kGraphicZero;
+                    if (!(pos.y < clampedY)) goto checkMaxY;
+                    goto storeY;
+                checkMaxY:
+                    clampedY = kGraphicScreenHeight;
+                    if (!(clampedY < pos.y)) goto useY;
+                    goto storeY;
+                useY:
+                    clampedY = pos.y;
+                storeY:
+                    pos.y = clampedY;
+                }
 
                 const int radius = (int)(kScreenFadeCircleRadius * (kGraphicOne - fadeWave));
-                drawSFCircle(0x500, radius, (int)pos.x, (int)pos.y, baseColor);
+                drawSFCircle(0x500, radius, (int)pos.x, (int)pos.y, baseColor, baseColor);
                 drawSFCircle(radius, radius - 8, (int)pos.x, (int)pos.y, baseColor, baseColor2);
             }
             continue;
@@ -366,7 +376,7 @@ void CGraphicPcs::drawScreenFade()
                            (kGraphicScreenCenterY + offY) - kGraphicScreenCenterY * t,
                            (kGraphicScreenCenterX + offX) + kGraphicScreenCenterX * t,
                            (kGraphicScreenCenterY + offY) + kGraphicScreenCenterY * t,
-                           baseColor);
+                           baseColor, baseColor);
             }
             continue;
         }
@@ -387,8 +397,7 @@ void CGraphicPcs::drawScreenFade()
 
                 int tile = 0;
                 do {
-                    CColor topColor;
-                    CColor bottomColor;
+                    CColor gradColor[2];
                     _GXTexObj backTexObj;
                     const int x = (tile & 1) ? 0x140 : 0;
                     const int y = (tile & 2) ? 0xE0 : 0;
@@ -409,28 +418,28 @@ void CGraphicPcs::drawScreenFade()
 
                     const float t0 = (float)row * kGraphicHalf;
                     const float t1 = (float)(row + 1) * kGraphicHalf;
-                    topColor.color.r = (u8)(t0 * ((float)slotData->m_colorB.r - (float)slotData->m_colorA.r) + (float)slotData->m_colorA.r);
-                    topColor.color.g = (u8)(t0 * ((float)slotData->m_colorB.g - (float)slotData->m_colorA.g) + (float)slotData->m_colorA.g);
-                    topColor.color.b = (u8)(t0 * ((float)slotData->m_colorB.b - (float)slotData->m_colorA.b) + (float)slotData->m_colorA.b);
-                    topColor.color.a = 0xFF;
+                    gradColor[0].color.r = (u8)(t0 * ((float)slotData->m_colorB.r - (float)baseColor.r) + (float)baseColor.r);
+                    gradColor[0].color.g = (u8)(t0 * ((float)slotData->m_colorB.g - (float)baseColor.g) + (float)baseColor.g);
+                    gradColor[0].color.b = (u8)(t0 * ((float)slotData->m_colorB.b - (float)baseColor.b) + (float)baseColor.b);
+                    gradColor[0].color.a = 0xFF;
 
-                    bottomColor.color.r = (u8)(t1 * ((float)slotData->m_colorB.r - (float)slotData->m_colorA.r) + (float)slotData->m_colorA.r);
-                    bottomColor.color.g = (u8)(t1 * ((float)slotData->m_colorB.g - (float)slotData->m_colorA.g) + (float)slotData->m_colorA.g);
-                    bottomColor.color.b = (u8)(t1 * ((float)slotData->m_colorB.b - (float)slotData->m_colorA.b) + (float)slotData->m_colorA.b);
-                    bottomColor.color.a = 0xFF;
+                    gradColor[1].color.r = (u8)(t1 * ((float)slotData->m_colorB.r - (float)baseColor.r) + (float)baseColor.r);
+                    gradColor[1].color.g = (u8)(t1 * ((float)slotData->m_colorB.g - (float)baseColor.g) + (float)baseColor.g);
+                    gradColor[1].color.b = (u8)(t1 * ((float)slotData->m_colorB.b - (float)baseColor.b) + (float)baseColor.b);
+                    gradColor[1].color.a = 0xFF;
 
                     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
                     GXPosition3f32((float)x, (float)y, kGraphicZero);
-                    GXColor1u32(*(u32*)&topColor.color);
+                    GXColor1u32(*(u32*)&gradColor[0].color);
                     GXTexCoord2u16(0, 0);
                     GXPosition3f32((float)(x + 0x140), (float)y, kGraphicZero);
-                    GXColor1u32(*(u32*)&topColor.color);
+                    GXColor1u32(*(u32*)&gradColor[0].color);
                     GXTexCoord2u16(2, 0);
                     GXPosition3f32((float)(x + 0x140), (float)(y + 0xE0), kGraphicZero);
-                    GXColor1u32(*(u32*)&bottomColor.color);
+                    GXColor1u32(*(u32*)&gradColor[1].color);
                     GXTexCoord2u16(2, 2);
                     GXPosition3f32((float)x, (float)(y + 0xE0), kGraphicZero);
-                    GXColor1u32(*(u32*)&bottomColor.color);
+                    GXColor1u32(*(u32*)&gradColor[1].color);
                     GXTexCoord2u16(0, 2);
                     tile++;
                 } while (tile < 4);
@@ -695,10 +704,11 @@ void CGraphicPcs::drawBar()
     if ((padState != 0) && (Joybus.GetPadType(0) != 0x40000)) {
         drawText = 1;
     }
+    const int textFlag = (u8)drawText;
 
     float x = kDebugBarLeft;
     GXColor barColor = {0x80, 0x80, 0x80, 0xFF};
-    drawSFRect(kDebugBarLeft, kDebugBarTop, kDebugBarRight, kDebugBarBottom, barColor);
+    drawSFRect(kDebugBarLeft, kDebugBarTop, kDebugBarRight, kDebugBarBottom, barColor, barColor);
 
     CSystem::COrder* order = System.GetFirstOrder();
     const int orderCount = System.m_orderCount;
@@ -717,12 +727,12 @@ void CGraphicPcs::drawBar()
         barColor.a = colorTmp.a;
 
         if (priority == 0x26) {
-            drawSFRect(x, drawText ? static_cast<float>(static_cast<int>(y)) : kDebugBarMoveBottom,
-                       kGraphicOne + (x + width), kDebugBarTop, barColor);
+            drawSFRect(x, textFlag ? static_cast<float>(static_cast<int>(y)) : kDebugBarMoveBottom,
+                       kGraphicOne + (x + width), kDebugBarTop, barColor, barColor);
             x += width;
         } else if (priority != 0x27) {
-            drawSFRect(x, drawText ? static_cast<float>(static_cast<int>(y)) : kDebugBarObjectTop,
-                       kGraphicOne + (x + width), kDebugBarMoveBottom, barColor);
+            drawSFRect(x, textFlag ? static_cast<float>(static_cast<int>(y)) : kDebugBarObjectTop,
+                       kGraphicOne + (x + width), kDebugBarMoveBottom, barColor, barColor);
             x += width;
         }
 
@@ -735,8 +745,8 @@ void CGraphicPcs::drawBar()
             barColor.a = soundGX.a;
             const float soundWidth = (kGraphicScreenCenterX * Sound.GetPerformance()) / kDebugBarFrameBudget;
 
-            drawSFRect(x, drawText ? static_cast<float>(static_cast<int>(y)) : kDebugBarMoveBottom,
-                       kGraphicOne + (x + soundWidth), kDebugBarTop, barColor);
+            drawSFRect(x, textFlag ? static_cast<float>(static_cast<int>(y)) : kDebugBarMoveBottom,
+                       kGraphicOne + (x + soundWidth), kDebugBarTop, barColor, barColor);
         }
 
         order = System.GetNextOrder(order);
@@ -750,7 +760,7 @@ void CGraphicPcs::drawBar()
     barColor.g = frameTmp.g;
     barColor.b = frameTmp.b;
     barColor.a = frameTmp.a;
-    drawSFRect(kDebugBarLeft, kDebugIndicatorTop, kDebugIndicatorFrameRight, kDebugIndicatorBottom, barColor);
+    drawSFRect(kDebugBarLeft, kDebugIndicatorTop, kDebugIndicatorFrameRight, kDebugIndicatorBottom, barColor, barColor);
 
     GXColor fifoTmp;
     *reinterpret_cast<u32*>(&fifoTmp) = *reinterpret_cast<u32*>(&((Graphic.IsFifoOver() != 0) ? CColor(0xFF, 0, 0, 0xFF) : CColor(0, 0xFF, 0, 0xFF)).color);
@@ -758,9 +768,9 @@ void CGraphicPcs::drawBar()
     barColor.g = fifoTmp.g;
     barColor.b = fifoTmp.b;
     barColor.a = fifoTmp.a;
-    drawSFRect(kDebugIndicatorFifoLeft, kDebugIndicatorTop, kDebugIndicatorFifoRight, kDebugIndicatorBottom, barColor);
+    drawSFRect(kDebugIndicatorFifoLeft, kDebugIndicatorTop, kDebugIndicatorFifoRight, kDebugIndicatorBottom, barColor, barColor);
 
-    if (drawText) {
+    if (textFlag) {
         Graphic.InitDebugString();
 
         order = System.GetFirstOrder();

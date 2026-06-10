@@ -2209,7 +2209,9 @@ void CChara::makeFurTex()
 		layerColorTmp.color.b = static_cast<unsigned char>(basePart.color.b + tipPart.color.b);
 		layerColorTmp.color.a = static_cast<unsigned char>(basePart.color.a + tipPart.color.a);
 		CColor layerColor = layerColorTmp;
-		Graphic.SetCopyClear(layerColor, 0xFFFFFF);
+		CColor clearColor(layerColor);
+		clearColor.color.a = 0;
+		Graphic.SetCopyClear(clearColor.color, 0xFFFFFF);
 		GXCopyTex(static_cast<unsigned char*>(gMogFurTexBuffer) + layer * 0x4000, GX_TRUE);
 		GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 
@@ -2219,7 +2221,8 @@ void CChara::makeFurTex()
 
 			float rootX = scaleBase2 * (randScale2 * static_cast<float>(static_cast<int>(FurRandNext())) + depthThr2);
 			float rootZ = scaleBase2 * (randScale2 * static_cast<float>(static_cast<int>(FurRandNext())) + depthThr2);
-			CVector root(rootX, kCharaFurDepthZero, rootZ);
+			CVector rootTmp(rootX, kCharaFurDepthZero, rootZ);
+			CVector root = rootTmp;
 
 			s_mogFurRand = s_mogFurRand * 0x41C64E6D + 0x3039;
 			CHairSet& src = hairSet[(s_mogFurRand >> 16) & 0x1F];

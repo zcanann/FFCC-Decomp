@@ -78,7 +78,7 @@ extern "C" Vec gLichTeleportPoints[] = {
 
 static const char sLichTeleportNodeA[] = "to_a_obj";
 static const char sLichTeleportNodeB[] = "to_b_obj";
-static const char sLichTeleportNodeFormat[] = "to_%02d_obj";
+static const char sLichTeleportNodeFormat[] = "to%02d_obj";
 
 struct MeteoParasiteCBossWork {
     int m_lichTeleportIndex;

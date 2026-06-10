@@ -487,10 +487,13 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             }
             goto checkScaleScene7;
         checkScaleMeshType:
-            if ((m_meshType < 10) && (m_meshType >= 8)) {
+            switch (m_meshType) {
+            case 8:
+            case 9:
                 m_transRateX = kMapObjZero;
                 m_transRateY = kMapObjOne;
                 m_transRateZ = kMapObjZero;
+                break;
             }
             break;
         checkScaleScene7:

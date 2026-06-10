@@ -945,13 +945,13 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(*scriptFoodBase);
 	unsigned char* valueBytes = reinterpret_cast<unsigned char*>(&value);
 	const unsigned int itemSlot = valueBytes[2];
-	const unsigned char recipeIndex = valueBytes[3];
-	const short baseItem = caravanWork->m_inventoryItems[itemSlot];
+	const int recipeIndex = valueBytes[3];
+	const int baseItem = caravanWork->m_inventoryItems[itemSlot];
 
 	caravanWork->DeleteItemIdx(itemSlot, 1);
 
-	const unsigned int itemTableBase = Game.unkCFlatData0[2] + static_cast<int>(baseItem) * 0x48;
-	const short smithItem = *reinterpret_cast<unsigned short*>(itemTableBase + recipeIndex * 2 + 0x38);
+	const unsigned int itemTableBase = Game.unkCFlatData0[2] + baseItem * 0x48;
+	const int smithItem = *reinterpret_cast<unsigned short*>(itemTableBase + recipeIndex * 2 + 0x38);
 
 	unsigned int materialTable = itemTableBase;
 	for (int i = 0; i < 3; i++, materialTable += 2) {
@@ -966,45 +966,43 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
 		}
 
 		for (int materialIdx = 0; materialIdx < static_cast<int>(materialCount); materialIdx++) {
-			int byteOffset = 0;
 			int foundSlot = 0;
 			int groups;
 
 			for (groups = 0; groups < 8; groups++) {
 				char* invBase = static_cast<char*>(reinterpret_cast<void*>(*scriptFoodBase));
-				if (static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xB6)) == materialId) {
+				if (static_cast<int>(*reinterpret_cast<short*>(invBase + foundSlot * 2 + 0xB6)) == materialId) {
 					break;
 				}
 				foundSlot++;
-				if (static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xB8)) == materialId) {
+				if (static_cast<int>(*reinterpret_cast<short*>(invBase + foundSlot * 2 + 0xB6)) == materialId) {
 					break;
 				}
 				foundSlot++;
-				if (static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xBA)) == materialId) {
+				if (static_cast<int>(*reinterpret_cast<short*>(invBase + foundSlot * 2 + 0xB6)) == materialId) {
 					break;
 				}
 				foundSlot++;
-				if (static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xBC)) == materialId) {
+				if (static_cast<int>(*reinterpret_cast<short*>(invBase + foundSlot * 2 + 0xB6)) == materialId) {
 					break;
 				}
 				foundSlot++;
-				if (static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xBE)) == materialId) {
+				if (static_cast<int>(*reinterpret_cast<short*>(invBase + foundSlot * 2 + 0xB6)) == materialId) {
 					break;
 				}
 				foundSlot++;
-				if (static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xC0)) == materialId) {
+				if (static_cast<int>(*reinterpret_cast<short*>(invBase + foundSlot * 2 + 0xB6)) == materialId) {
 					break;
 				}
 				foundSlot++;
-				if (static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xC2)) == materialId) {
+				if (static_cast<int>(*reinterpret_cast<short*>(invBase + foundSlot * 2 + 0xB6)) == materialId) {
 					break;
 				}
 				foundSlot++;
-				if (static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xC4)) == materialId) {
+				if (static_cast<int>(*reinterpret_cast<short*>(invBase + foundSlot * 2 + 0xB6)) == materialId) {
 					break;
 				}
 				foundSlot++;
-				byteOffset += 0x10;
 			}
 
 			reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->DeleteItemIdx(foundSlot, 1);
@@ -1159,22 +1157,20 @@ void GbaQueue::SetRadarType()
 {
 	char* obj = reinterpret_cast<char*>(this);
 	unsigned int validMemberCount;
+	int assignedCount;
 	unsigned int activeMask;
-	unsigned int assignedCount;
-	int prevAssignedType;
 	int i;
 
-	if (static_cast<unsigned char>(m_radarTypeFlags) != 0) {
+	if (static_cast<signed char>(m_radarTypeFlags) != 0) {
 		return;
 	}
 	if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
 		return;
 	}
 
-	const int* wmParams = Game.m_gameWork.m_wmBackupParams;
 	validMemberCount = 0;
 	for (i = 0; i < 4; i++) {
-		if (wmParams[i] >= 0) {
+		if (Game.m_gameWork.m_wmBackupParams[i] >= 0) {
 			validMemberCount++;
 		}
 	}
@@ -1188,18 +1184,17 @@ void GbaQueue::SetRadarType()
 		}
 	}
 
+	int assignedType;
 	assignedCount = 0;
-	prevAssignedType = 0;
 	while (assignedCount < static_cast<int>(validMemberCount)) {
-		const int slot = rand() & 3;
+		const int slot = rand() % 4;
 		if ((activeMask & (1 << slot)) != 0) {
-			int assignedType = assignedCount;
-			if (assignedCount >= 2) {
-				if (assignedCount == 2) {
-					assignedType = assignedCount + (rand() & 1);
-				} else {
-					assignedType = (prevAssignedType == 2) ? 3 : 2;
-				}
+			if (assignedCount < 2) {
+				assignedType = assignedCount;
+			} else if (assignedCount == 2) {
+				assignedType = assignedCount + (rand() & 1);
+			} else {
+				assignedType = (assignedType == 2) ? 3 : 2;
 			}
 
 			OSWaitSemaphore(accessSemaphores + slot);
@@ -1208,7 +1203,6 @@ void GbaQueue::SetRadarType()
 
 			activeMask &= static_cast<unsigned int>(~(1 << slot));
 			assignedCount++;
-			prevAssignedType = assignedType;
 		}
 	}
 
@@ -1228,13 +1222,12 @@ void GbaQueue::SetRadarType()
 	}
 
 	for (i = 0; i < 4; i++) {
-		const unsigned char mask = static_cast<unsigned char>(1 << i);
-		const unsigned char oldMode = m_radarMode;
-
 		OSWaitSemaphore(accessSemaphores + i);
-		m_radarMode = static_cast<unsigned char>((oldMode & ~mask) | mask);
+		const int oldMode = m_radarMode;
+		const int mask = 1 << i;
+		m_radarMode = static_cast<char>((oldMode & ~mask) | mask);
 		if (oldMode != m_radarMode) {
-			m_chgRadarMode = static_cast<unsigned char>(m_chgRadarMode | mask);
+			m_chgRadarMode = static_cast<char>(m_chgRadarMode | mask);
 		}
 		OSSignalSemaphore(accessSemaphores + i);
 	}
@@ -1711,10 +1704,10 @@ void GbaQueue::GetPlayerPos(int channel, unsigned int* outData)
 	packet[4] = 0x51;
 	packet[8] = 0x91;
 
-	const GbaQueuePlayerPosView* basePlayer = &localPlayerData[channel];
+	const GbaQueuePlayerPosView* player = localPlayerData;
+	const GbaQueuePlayerPosView* basePlayer = &player[channel];
 
 	nearbyMask = 0;
-	const GbaQueuePlayerPosView* player = localPlayerData;
 	for (i = 0; i < 4;) {
 		if (i == channel) {
 			nearbyMask = (nearbyMask | (1 << i)) & 0xFF;
@@ -1785,8 +1778,10 @@ void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
     short baseZ;
     int count;
     unsigned int i;
+    int j;
     char* localEntry;
     char* prevEntry;
+    char* prevWalk;
     unsigned char* outPtr;
 
     obj = reinterpret_cast<char*>(this);
@@ -1804,27 +1799,23 @@ void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
     baseZ = *reinterpret_cast<short*>(obj + channel * 0xDC + 0x48C);
     memcpy(localEnemyData, obj + 0xB34, kGbaQueueEnemyDataBytes);
 
+    count = 0;
     prevEntry = obj + channel * kGbaQueueEnemyDataBytes + 0x1034;
     radarMode = m_radarType[channel];
     localEntry = localEnemyData;
     for (i = 0; i < 0x40; i++) {
-        *reinterpret_cast<short*>(localEntry + 8) = *reinterpret_cast<unsigned short*>(localEntry + 8) - baseX;
+        *reinterpret_cast<short*>(localEntry + 8) = *reinterpret_cast<short*>(localEntry + 8) - baseX;
         *reinterpret_cast<short*>(localEntry + 10) = *reinterpret_cast<short*>(localEntry + 10) - baseZ;
 
         int enemyX = *reinterpret_cast<short*>(localEntry + 8);
-        if ((enemyX < 0 ? -enemyX : enemyX) < 0x50) {
-            int enemyZ = *reinterpret_cast<short*>(localEntry + 10);
-            if ((enemyZ < 0 ? -enemyZ : enemyZ) >= 0x40) {
-                *reinterpret_cast<short*>(localEntry + 8) = -1;
-                *reinterpret_cast<short*>(localEntry + 10) = -1;
-                localEntry[0] = 0;
-            } else {
-                localEntry[0] = 1;
-            }
-        } else {
+        int enemyZ;
+        if ((enemyX < 0 ? -enemyX : enemyX) >= 0x50 ||
+            ((enemyZ = *reinterpret_cast<short*>(localEntry + 10)), (enemyZ < 0 ? -enemyZ : enemyZ) >= 0x40)) {
             *reinterpret_cast<short*>(localEntry + 8) = -1;
             *reinterpret_cast<short*>(localEntry + 10) = -1;
             localEntry[0] = 0;
+        } else {
+            localEntry[0] = 1;
         }
 
         if (*reinterpret_cast<unsigned short*>(localEntry + 4) == 0 || localEntry[2] == 0) {
@@ -1840,25 +1831,25 @@ void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
         localEntry += 0x14;
     }
 
-    count = 0;
-    localEntry = localEnemyData;
+    localEntry = localEnemyData + count * 0x14;
+    prevWalk = prevEntry + count * 0x14;
     outPtr = reinterpret_cast<unsigned char*>(outData);
-    for (i = 0; i < 0x40; i++) {
-        if ((localEntry[0] != 0 || prevEntry[0] != 0) && memcmp(localEntry, prevEntry, 0x14) != 0) {
+    for (j = count; j < 0x40; j++) {
+        if ((localEntry[0] != 0 || prevWalk[0] != localEntry[0]) && memcmp(localEntry, prevWalk, 0x14) != 0) {
             count++;
             outPtr[0] = 0x12;
-            outPtr[1] = static_cast<unsigned char>(i) | (static_cast<signed char>(localEntry[0]) << 7);
+            outPtr[1] = j | (localEntry[0] << 7);
             outPtr[2] = static_cast<unsigned char>(*reinterpret_cast<short*>(localEntry + 8));
             outPtr[3] = static_cast<unsigned char>(*reinterpret_cast<short*>(localEntry + 10));
             outPtr += 4;
         }
 
         localEntry += 0x14;
-        prevEntry += 0x14;
+        prevWalk += 0x14;
     }
 
     *outCount = count;
-    memcpy(obj + channel * kGbaQueueEnemyDataBytes + 0x1034, localEnemyData, kGbaQueueEnemyDataBytes);
+    memcpy(prevEntry, localEnemyData, kGbaQueueEnemyDataBytes);
     OSSignalSemaphore(accessSemaphores + channel);
 }
 
@@ -1877,6 +1868,7 @@ void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 	char* obj;
 	char* localEntry;
 	char* prevEntry;
+	char* prevWalk;
 	unsigned char* outPtr;
 	short baseX;
 	short baseZ;
@@ -1895,6 +1887,8 @@ void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 	baseZ = *reinterpret_cast<short*>(obj + channel * 0xDC + 0x48C);
 	memcpy(localMapItems, obj + 0x2434, sizeof(localMapItems));
 
+	count = 0;
+	prevEntry = obj + channel * kGbaQueueMapItemDataBytes + 0x2574;
 	localEntry = localMapItems;
 	i = 0;
 	while (i < m_mapItemCount) {
@@ -1904,9 +1898,10 @@ void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 			static_cast<short>(*reinterpret_cast<short*>(localEntry + 10) - baseZ);
 
 		int localX = *reinterpret_cast<short*>(localEntry + 8);
-		int localZ = *reinterpret_cast<short*>(localEntry + 10);
+		int localZ;
 
-		if ((localX < 0 ? -localX : localX) >= 0x50 || (localZ < 0 ? -localZ : localZ) >= 0x40) {
+		if ((localX < 0 ? -localX : localX) >= 0x50 ||
+		    ((localZ = *reinterpret_cast<short*>(localEntry + 10)), (localZ < 0 ? -localZ : localZ) >= 0x40)) {
 			*reinterpret_cast<short*>(localEntry + 8) = -1;
 			*reinterpret_cast<short*>(localEntry + 10) = -1;
 			localEntry[0] = 0;
@@ -1925,28 +1920,27 @@ void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 		i++;
 	}
 
-	count = 0;
-	localEntry = localMapItems;
-	prevEntry = obj + channel * kGbaQueueMapItemDataBytes + 0x2574;
+	localEntry = localMapItems + count * 0x14;
+	prevWalk = prevEntry + count * 0x14;
 	outPtr = reinterpret_cast<unsigned char*>(outData);
-	i = 0;
+	i = count;
 	while (i < m_mapItemCount) {
-		if ((localEntry[0] != 0 || prevEntry[0] != 0) && memcmp(localEntry, prevEntry, 0x14) != 0) {
+		if ((localEntry[0] != 0 || prevWalk[0] != localEntry[0]) && memcmp(localEntry, prevWalk, 0x14) != 0) {
 			count++;
 			outPtr[0] = 0x21;
-			outPtr[1] = static_cast<unsigned char>(i + 0x40) | (static_cast<signed char>(localEntry[0]) << 7);
+			outPtr[1] = (i + 0x40) | (localEntry[0] << 7);
 			outPtr[2] = static_cast<unsigned char>(*reinterpret_cast<short*>(localEntry + 8));
 			outPtr[3] = static_cast<unsigned char>(*reinterpret_cast<short*>(localEntry + 10));
 			outPtr += 4;
 		}
 
 		localEntry += 0x14;
-		prevEntry += 0x14;
+		prevWalk += 0x14;
 		i++;
 	}
 
 	*outCount = count;
-	memcpy(obj + channel * kGbaQueueMapItemDataBytes + 0x2574, localMapItems, sizeof(localMapItems));
+	memcpy(prevEntry, localMapItems, sizeof(localMapItems));
 	OSSignalSemaphore(accessSemaphores + channel);
 }
 
@@ -2407,24 +2401,26 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
     }
     memset(workText, 0, kGbaQueueScratchTextSize);
 
-    CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
+    unsigned int* foodBasePtr = &Game.m_scriptFoodBase[channel];
+    CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(*foodBasePtr);
     CMes::m_tempVar[0] = caravanWork->m_letters[letterIndex].TempVar(0);
     CMes::m_tempVar[1] = caravanWork->m_letters[letterIndex].TempVar(1);
     CMes::m_tempVar[2] = caravanWork->m_letters[letterIndex].TempVar(2);
     CMes::m_tempVar[3] = caravanWork->m_letters[letterIndex].TempVar(3);
 
-    unsigned short msgIndex = caravanWork->m_letters[letterIndex].HeaderWord();
+    unsigned short msgIndex = *reinterpret_cast<unsigned short*>(
+        reinterpret_cast<char*>(caravanWork) + letterIndex * 0xC + 0x3EC);
     int mesIndex = (msgIndex & 0x7FC) >> 1;
 
-    strcpy(srcText, reinterpret_cast<char**>(Game.m_cFlatDataArr[1].Data(3).m_data)[mesIndex]);
-    CMes::MakeAgbString(workText, srcText, caravanWork->m_genderFlag, 0);
+    strcpy(srcText, Game.m_cFlatDataArr[1].Message(mesIndex + 0x10));
+    CMes::MakeAgbString(workText, srcText, reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_genderFlag, 0);
     int totalSize = static_cast<int>(strlen(workText) + 1);
     memcpy(outData, workText, totalSize);
 
     memset(srcText, 0, kGbaQueueScratchTextSize);
     memset(workText, 0, kGbaQueueScratchTextSize);
-    strcpy(srcText, reinterpret_cast<char**>(Game.m_cFlatDataArr[1].Data(3).m_data)[mesIndex + 1]);
-    CMes::MakeAgbString(workText, srcText, caravanWork->m_genderFlag, 0);
+    strcpy(srcText, Game.m_cFlatDataArr[1].Message(mesIndex + 0x11));
+    CMes::MakeAgbString(workText, srcText, reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_genderFlag, 0);
     int line2Size = static_cast<int>(strlen(workText));
     memcpy(outData + totalSize, workText, line2Size + 1);
     totalSize += line2Size + 1;
@@ -2578,20 +2574,18 @@ void GbaQueue::ReplyLetter(int channel)
 
 	unsigned char arg0 = recvBuffer[0];
 	unsigned char arg1 = recvBuffer[1];
-	unsigned int value =
-		(static_cast<unsigned int>(recvBuffer[3]) << 24) |
-		(static_cast<unsigned int>(recvBuffer[4]) << 16) |
-		(static_cast<unsigned int>(recvBuffer[5]) << 8) |
-		recvBuffer[6];
 	int itemId = 0;
 	unsigned int gil = 0;
+	unsigned int value = (static_cast<unsigned int>(recvBuffer[3]) << 24) |
+	                     (static_cast<unsigned int>(recvBuffer[4]) << 16);
+	value |= static_cast<unsigned int>(recvBuffer[5]) << 8;
+	value |= recvBuffer[6];
 
 	if (recvBuffer[2] != 0) {
 		gil = value;
 	}
 	if (recvBuffer[2] == 0) {
 		itemId = value & 0xffff;
-		gil = 0;
 	}
 
 	unsigned int* scriptFoodBase = Game.m_scriptFoodBase + channel;
@@ -2650,21 +2644,18 @@ void GbaQueue::LoadMapObj()
 					float x = mapObj->m_x;
 					const float scale = kGbaQueueMapCoordScale;
 					unsigned int mask = 1U << count;
-					unsigned int clearMask = ~mask;
 					float y = mapObj->m_y;
 					float z = mapObj->m_z;
 					float r = mapObj->m_radius;
 					int drawFlag = static_cast<int>(mapObj->m_drawFlag);
-					GbaQueueMapObjEntry* entry = &mapObjWork.m_entries[count];
-
-					entry->m_type = static_cast<unsigned char>(objType);
-					entry->m_x = static_cast<short>((int)(x / scale));
-					entry->m_y = static_cast<short>((int)(y / scale));
-					entry->m_z = static_cast<short>((int)(z / scale));
-					entry->m_radius = static_cast<short>((int)(r / scale));
+					mapObjWork.m_entries[count].m_type = static_cast<unsigned char>(objType);
+					mapObjWork.m_entries[count].m_x = static_cast<short>((int)(x / scale));
+					mapObjWork.m_entries[count].m_y = static_cast<short>((int)(y / scale));
+					mapObjWork.m_entries[count].m_z = static_cast<short>((int)(z / scale));
+					mapObjWork.m_entries[count].m_radius = static_cast<short>((int)(r / scale));
 
 					unsigned int drawMask = mapObjWork.m_drawFlags;
-					drawMask = (drawMask & clearMask) | (mask & ((-drawFlag | drawFlag) >> 31));
+					drawMask = (drawMask & ~mask) | (mask & ((-drawFlag | drawFlag) >> 31));
 					mapObjWork.m_drawFlags = drawMask;
 					mapObjWork.m_count = static_cast<unsigned char>(count + 1);
 				}
@@ -3086,12 +3077,11 @@ void GbaQueue::ChkCMakeCharaType(int channel, unsigned int value)
 	unsigned int stackValue = value;
 	unsigned char* valueBytes = reinterpret_cast<unsigned char*>(&stackValue);
 	char* obj = reinterpret_cast<char*>(this);
-	unsigned char charaType = valueBytes[2];
 
-	if (charaType == 0xFF) {
+	if (valueBytes[2] == 0xFF) {
 		OSWaitSemaphore(accessSemaphores + channel);
-		reinterpret_cast<unsigned char*>(obj)[0x2CCA + channel * 0x20] = 0xFF;
-		reinterpret_cast<unsigned char*>(obj)[0x2CD1 + channel * 0x20] = 0xFF;
+		cmakeInfo[channel].m_charaType = valueBytes[2];
+		cmakeInfo[channel].m_jobType = 0xFF;
 		OSSignalSemaphore(accessSemaphores + channel);
 		return;
 	}
@@ -3101,11 +3091,10 @@ void GbaQueue::ChkCMakeCharaType(int channel, unsigned int value)
 		OSWaitSemaphore(accessSemaphores + i);
 	}
 
-	signed char playerSlot = static_cast<unsigned char>(obj[0x2CB8 + channel * 0x20]);
+	signed char playerSlot = cmakeInfo[channel].m_playerSlot;
 	for (int i = 0; i < 4; i++) {
-		int otherOffset = i * 0x20;
 		if ((channel != i) && (cmakeInfo[i].m_active != 0) &&
-		    (static_cast<unsigned char>(obj[0x2CCA + otherOffset]) == charaType)) {
+		    (cmakeInfo[i].m_charaType == valueBytes[2])) {
 			Joybus.SendResult(channel, 1, valueBytes[1], 0);
 			foundDuplicate = true;
 			break;
@@ -3121,18 +3110,16 @@ void GbaQueue::ChkCMakeCharaType(int channel, unsigned int value)
 	}
 
 	for (int i = 0; i < 8; i++) {
-		CCaravanWork* caravanWork = &Game.m_caravanWorkArr[i];
-		char* caravanObj = reinterpret_cast<char*>(caravanWork);
-		if ((i != playerSlot) && (*reinterpret_cast<int*>(caravanObj + 0x3A4) != 0) &&
-		    (static_cast<unsigned char>(caravanObj[0xBA6]) == 0)) {
-			short existingCharaType = *reinterpret_cast<unsigned short*>(caravanObj + 0x3E0) & 0xFF;
-			existingCharaType |= static_cast<unsigned short>(
-			    static_cast<unsigned char>(static_cast<char>(*reinterpret_cast<unsigned short*>(caravanObj + 0x3E4)) << 2));
-			if (*reinterpret_cast<short*>(caravanObj + 0x3E2) != 0) {
-				existingCharaType = static_cast<unsigned short>(existingCharaType | 0x80);
+		if ((i != playerSlot) && (Game.m_caravanWorkArr[i].m_shopState != 0) &&
+		    (Game.m_caravanWorkArr[i].m_caravanLocalFlags == 0)) {
+			unsigned char existingCharaType =
+			    (Game.m_caravanWorkArr[i].m_tribeId & 0xFF) |
+			    static_cast<signed char>(Game.m_caravanWorkArr[i].m_appearanceVariant << 2);
+			if (Game.m_caravanWorkArr[i].m_genderFlag != 0) {
+				existingCharaType |= 0x80;
 			}
 
-			if (existingCharaType == charaType) {
+			if (existingCharaType == valueBytes[2]) {
 				Joybus.SendResult(channel, 1, valueBytes[1], 0);
 				return;
 			}
@@ -3141,9 +3128,10 @@ void GbaQueue::ChkCMakeCharaType(int channel, unsigned int value)
 
 	Joybus.SendResult(channel, 0, valueBytes[1], 0);
 	OSWaitSemaphore(accessSemaphores + channel);
-	obj[0x2CCA + channel * 0x20] = static_cast<char>(charaType);
+	cmakeInfo[channel].m_charaType = valueBytes[2];
 	OSSignalSemaphore(accessSemaphores + channel);
-	MenuPcs.ChgModel(static_cast<int>(playerSlot), charaType & 3, (charaType >> 2) & 3, static_cast<int>(charaType >> 7));
+	MenuPcs.ChgModel(static_cast<int>(playerSlot), valueBytes[2] & 3, (valueBytes[2] >> 2) & 3,
+	                 static_cast<int>(valueBytes[2] >> 7));
 }
 
 /*
@@ -3163,7 +3151,7 @@ void GbaQueue::ChkCMakeJob(int channel, unsigned int value)
 
 	if (valueBytes[2] == 0xFF) {
 		OSWaitSemaphore(accessSemaphores + channel);
-		obj[0x2CD1 + channel * 0x20] = static_cast<char>(valueBytes[2]);
+		cmakeInfo[channel].m_jobType = valueBytes[2];
 		OSSignalSemaphore(accessSemaphores + channel);
 		return;
 	}
@@ -3173,11 +3161,10 @@ void GbaQueue::ChkCMakeJob(int channel, unsigned int value)
 		OSWaitSemaphore(accessSemaphores + i);
 	}
 
-	unsigned char playerSlot = static_cast<unsigned char>(obj[0x2CB8 + channel * 0x20]);
+	signed char playerSlot = cmakeInfo[channel].m_playerSlot;
 	for (int i = 0; i < 4; i++) {
-		int otherOffset = i * 0x20;
 		if ((channel != i) && (cmakeInfo[i].m_active != 0) &&
-		    (static_cast<unsigned char>(obj[0x2CD1 + otherOffset]) == valueBytes[2])) {
+		    (cmakeInfo[i].m_jobType == valueBytes[2])) {
 			Joybus.SendResult(channel, 1, valueBytes[1], 0);
 			foundDuplicate = true;
 			break;
@@ -3203,7 +3190,7 @@ void GbaQueue::ChkCMakeJob(int channel, unsigned int value)
 
 	Joybus.SendResult(channel, 0, valueBytes[1], 0);
 	OSWaitSemaphore(accessSemaphores + channel);
-	obj[0x2CD1 + channel * 0x20] = static_cast<char>(valueBytes[2]);
+	cmakeInfo[channel].m_jobType = valueBytes[2];
 	OSSignalSemaphore(accessSemaphores + channel);
 }
 
@@ -3383,9 +3370,8 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 
 	selectedCount = 0;
 	for (int slot = 1; (selectedCount < count) && (slot < 8); slot++) {
-		unsigned char slotValue = compatibilityData[slot];
-		if ((selectedCount < 2) || (slotValue != 0)) {
-			char* src = Game.m_cFlatDataArr[1].TableStrings(2)[slotValue];
+		if ((selectedCount < 2) || (compatibilityData[slot] != 0)) {
+			char* src = Game.m_cFlatDataArr[1].TableStrings(2)[compatibilityData[slot]];
 			int len = strlen(src);
 			memcpy(writePtr, src, len + 1);
 			writePtr += len + 1;
@@ -3535,14 +3521,13 @@ void GbaQueue::SetShopFlg(int channel)
 int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 {
 	unsigned char localPlayerData[0xDC];
-	unsigned char equipIndices[0x40];
+	char equipIndices[0x40];
 	unsigned int indexBytes;
 	int equipCount;
-	unsigned char* writePtr;
 	unsigned short equipData[4];
 	int dataSize;
 	unsigned char* itemPtr;
-	unsigned char* indexPtr;
+	char* indexPtr;
 	char itemIndex;
 	int remaining;
 	int i;
@@ -3577,10 +3562,12 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 	indexBytes = static_cast<unsigned int>(indexBytesS);
 
 	outData[4] = equipCount;
-	memcpy(outData + 5, equipIndices, indexBytes - 1);
+	outData += 5;
+	memcpy(outData, equipIndices, indexBytes - 1);
 
 	dataSize = indexBytes + 4;
-	writePtr = outData + 4 + indexBytes;
+	outData += indexBytes;
+	outData -= 1;
 	for (i = 0; i < equipCount; i++) {
 		int itemId = *reinterpret_cast<short*>(localPlayerData + 0x3A + equipIndices[i] * 2);
 		int itemBase = Game.unkCFlatData0[2] + itemId * 0x48;
@@ -3588,8 +3575,8 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 		equipData[0] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 4), 0);
 		equipData[1] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 6), 0);
 		equipData[2] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 8), 0);
-		memcpy(writePtr, equipData, sizeof(equipData));
-		writePtr += 8;
+		memcpy(outData, equipData, sizeof(equipData));
+		outData += 8;
 		dataSize += 8;
 	}
 
@@ -3914,7 +3901,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 		const int itemId = reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_inventoryItems[i];
 		if (itemId >= 401) {
 			unsigned int itemBuf[0xE];
-			const int itemOffset = itemId * 0x48;
+			const unsigned int itemOffset = itemId * 0x48;
 			unsigned short* itemBase = reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemOffset);
 
 			memset(itemBuf, 0, sizeof(itemBuf));
@@ -4520,7 +4507,7 @@ void GbaQueue::ClrChgRadarMode(int channel)
 int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
 {
 	unsigned char localScouterInfo[0x200];
-	unsigned int* enemyWorkPtrs = &Game.m_scriptWork[4][0][0];
+	short work;
 
 	memset(localScouterInfo, 0xFF, sizeof(localScouterInfo));
 
@@ -4532,17 +4519,18 @@ int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
 		for (int i = 0; i < 0x40; i++) {
 			scouterEntry[0] = enemyEntry[0xB37];
 			if (scouterEntry[0] != 0) {
-				CMonWork* enemyWork = reinterpret_cast<CMonWork*>(enemyWorkPtrs[i]);
-				const int enemyDataBase = Game.unkCFlatData0[1] + static_cast<signed char>(enemyEntry[0xB37]) * 0x1D0;
+				CMonWork* enemyWork = reinterpret_cast<CMonWork*>(Game.m_scriptWork[4][0][i]);
+				const int enemyDataBase = Game.unkCFlatData0[1] + enemyEntry[0xB37] * 0x1D0;
 
-				*reinterpret_cast<unsigned short*>(scouterEntry + 4) = SwapU16(enemyWork->m_maxHp);
+				work = enemyWork->m_maxHp;
+				*reinterpret_cast<unsigned short*>(scouterEntry + 4) = __lhbrx(reinterpret_cast<unsigned short*>(&work), 0);
 
 				if (*reinterpret_cast<short*>(enemyEntry + 0xB42) > 0) {
-					scouterEntry[6] = 0xFF;
-					scouterEntry[7] = 0xFF;
+					work = -1;
+					*reinterpret_cast<unsigned short*>(scouterEntry + 6) = __lhbrx(reinterpret_cast<unsigned short*>(&work), 0);
 				} else {
 					const short scouterValue = *reinterpret_cast<short*>(enemyEntry + 0xB40);
-					if (scouterValue < 1) {
+					if (scouterValue <= 0) {
 						*reinterpret_cast<unsigned short*>(scouterEntry + 6) = 0;
 					} else if ((scouterValue & 0xC000) == 0x4000) {
 						*reinterpret_cast<unsigned short*>(scouterEntry + 6) = 0;
@@ -4555,9 +4543,13 @@ int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
 				const unsigned short enemyFlags = *reinterpret_cast<unsigned short*>(enemyDataBase + 0x10E);
 				if ((enemyFlags & 5) == 5) {
 					scouterEntry[1] = 0;
-				} else if ((enemyFlags & 4) == 0) {
-					if ((enemyFlags & 1) == 0) {
-						const unsigned short form0 = *reinterpret_cast<short*>(enemyDataBase + 0xF0);
+				} else if ((enemyFlags & 4) != 0) {
+					scouterEntry[1] = 1;
+				} else if ((enemyFlags & 1) != 0) {
+					scouterEntry[1] = 2;
+				} else {
+					{
+						const unsigned short form0 = *reinterpret_cast<unsigned short*>(enemyDataBase + 0xF0);
 						if ((form0 == 0) && (*reinterpret_cast<unsigned short*>(enemyDataBase + 0xF2) == 0) &&
 						    (*reinterpret_cast<unsigned short*>(enemyDataBase + 0xF4) == 0)) {
 							scouterEntry[1] = 3;
@@ -4607,11 +4599,7 @@ int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
 								scouterEntry[statusCount + 1] = 13;
 							}
 						}
-					} else {
-						scouterEntry[1] = 2;
 					}
-				} else {
-					scouterEntry[1] = 1;
 				}
 			}
 

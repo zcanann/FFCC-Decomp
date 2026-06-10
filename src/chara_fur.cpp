@@ -519,7 +519,7 @@ static int FurColorMatch(CColor src, CColor ref)
 	}
 	db += 7 - static_cast<int>(src.color.a);
 
-	int hits = (dr < 5) + (dg < 5) + (db < 5);
+	int hits = (dr < 6) + (dg < 6) + (db < 6);
 	return static_cast<unsigned int>(__cntlzw(3 - hits)) >> 5;
 }
 
@@ -745,22 +745,21 @@ static inline CColor FurNoiseColor(const CColor& base, const CColor& noise, floa
 	resultTmp.color.g = static_cast<unsigned char>(base.color.g + scaledNoise.color.g);
 	resultTmp.color.b = static_cast<unsigned char>(base.color.b + scaledNoise.color.b);
 	resultTmp.color.a = static_cast<unsigned char>(base.color.a + scaledNoise.color.a);
-	CColor result = resultTmp;
-	return result;
+	return resultTmp;
 }
 
 void brush(unsigned short*, int, int, float, float, int, _GXColor, _GXColor*, _GXColor*);
 
 namespace {
 
-static inline bool HasDebugPadOverride()
+static inline bool HasDebugPadOverride(int debugPadLock)
 {
-	return (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
+	return (debugPadLock != 0) || (Pad.m_debugPadPort != -1);
 }
 
-static inline unsigned short MogHeldButtons()
+static inline unsigned short MogHeldButtons(int debugPadLock)
 {
-	if (HasDebugPadOverride()) {
+	if (HasDebugPadOverride(debugPadLock)) {
 		return 0;
 	}
 	int padIndex = 0;
@@ -768,9 +767,9 @@ static inline unsigned short MogHeldButtons()
 	return static_cast<unsigned short>(Pad.GetPadInputs()[padIndex].button[0]);
 }
 
-static inline unsigned short MogTriggerButtons()
+static inline unsigned short MogTriggerButtons(int debugPadLock)
 {
-	if (HasDebugPadOverride()) {
+	if (HasDebugPadOverride(debugPadLock)) {
 		return 0;
 	}
 	int padIndex = 0;
@@ -778,9 +777,9 @@ static inline unsigned short MogTriggerButtons()
 	return static_cast<unsigned short>(Pad.GetPadInputs()[padIndex].buttonDown[0]);
 }
 
-static inline int MogPadInt(int offset)
+static inline int MogPadInt(int debugPadLock, int offset)
 {
-	if (HasDebugPadOverride()) {
+	if (HasDebugPadOverride(debugPadLock)) {
 		return 0;
 	}
 	int padIndex = 0;
@@ -788,10 +787,10 @@ static inline int MogPadInt(int offset)
 	return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Pad) + padIndex * sizeof(CPad::PadInput) + offset);
 }
 
-static inline float MogPadFloat(int offset)
+static inline float MogPadFloat(int debugPadLock, int offset)
 {
-	if (HasDebugPadOverride()) {
-		return 0.0f;
+	if (HasDebugPadOverride(debugPadLock)) {
+		return kCharaFurDepthZero;
 	}
 	int padIndex = 0;
 	padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
@@ -839,6 +838,7 @@ static inline CTexture* FindMogFurTexture(CChara::CModel* model)
 
 static inline void CopyMogTextureFromChara(CChara::CModel* model)
 {
+	Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp), 0x506);
 	CTexture* texture = FindMogFurTexture(model);
 	if (texture == 0) {
 		return;
@@ -847,7 +847,6 @@ static inline void CopyMogTextureFromChara(CChara::CModel* model)
 	void* dstBuffer = texture->m_imageData;
 	const int texelCountBytes = texture->m_width * texture->m_height * 2;
 
-	Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp), 0x506);
 	DCInvalidateRange(dstBuffer, texelCountBytes);
 	memcpy(dstBuffer, Chara.MogFur().m_texels, 0x2000);
 	DCFlushRange(dstBuffer, texelCountBytes);
@@ -856,6 +855,7 @@ static inline void CopyMogTextureFromChara(CChara::CModel* model)
 
 static void CopyMogTextureToChara(CChara::CModel* model)
 {
+	Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp), 0x506);
 	CTexture* texture = FindMogFurTexture(model);
 	if (texture == 0) {
 		return;
@@ -864,7 +864,6 @@ static void CopyMogTextureToChara(CChara::CModel* model)
 	void* srcBuffer = texture->m_imageData;
 	const int texelCountBytes = texture->m_width * texture->m_height * 2;
 
-	Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp), 0x506);
 	memcpy(Chara.MogFur().m_texels, srcBuffer, 0x2000);
 	DCFlushRange(srcBuffer, texelCountBytes);
 	GXInvalidateTexAll();
@@ -1015,10 +1014,11 @@ void CChara::CModel::InitMogFurTex()
 #pragma opt_dead_assignments off
 void CChara::CModel::MogFurFrame(CGObject* gObject)
 {
-	const short heldButtons = MogHeldButtons();
-	const unsigned short triggerButtons = MogTriggerButtons();
-	const unsigned short rotateButtons = (MogPadInt(64) == 0) ? MogHeldButtons() : 0;
 	int messageId = -1;
+	const int debugPadLock = Pad.m_debugPadLock;
+	const short heldButtons = MogHeldButtons(debugPadLock);
+	const short triggerButtons = MogTriggerButtons(debugPadLock);
+	const unsigned short rotateButtons = (MogPadInt(debugPadLock, 64) == 0) ? MogHeldButtons(debugPadLock) : 0;
 
 	if (MogWork().m_started == 0) {
 		if ((heldButtons & 0x100) != 0) {
@@ -1070,9 +1070,9 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		}
 	}
 
-	Chara.MogFur().m_cursorX = static_cast<int>(kYmEnvTen * MogPadFloat(36) +
-	                                     static_cast<float>(static_cast<unsigned int>(Chara.MogFur().m_cursorX)));
-	Chara.MogFur().m_cursorY = static_cast<int>(-(kYmEnvTen * MogPadFloat(40) -
+	Chara.MogFur().m_cursorX = static_cast<int>(kYmEnvTen * MogPadFloat(debugPadLock, 36) +
+	                                     static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorX)));
+	Chara.MogFur().m_cursorY = static_cast<int>(-(kYmEnvTen * MogPadFloat(debugPadLock, 40) -
 	                                     static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorY))));
 
 	const int cursorXv = static_cast<int>(Chara.MogFur().m_cursorX);
@@ -1142,11 +1142,20 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 			doPaint = ((static_cast<int>(System.m_frameCounter) % 4) == 0) ? 1 : 0;
 			break;
 		}
-		_GXColor centerBefore = CColor(0xF, 0xF, 0xF, 0).color;
-		_GXColor centerAfter = centerBefore;
+		_GXColor centerBefore;
+		_GXColor centerAfter;
 		Vec worldPos;
 
 		CopyMogTextureFromChara(this);
+		const _GXColor initColor = CColor(0xF, 0xF, 0xF, 0).color;
+		centerAfter.r = initColor.r;
+		centerAfter.g = initColor.g;
+		centerAfter.b = initColor.b;
+		centerAfter.a = initColor.a;
+		centerBefore.r = initColor.r;
+		centerBefore.g = initColor.g;
+		centerBefore.b = initColor.b;
+		centerBefore.a = initColor.a;
 		int pickResult = PickFur(cameraMtx, brushColor, doPaint, eraseMode, &centerBefore, &centerAfter, &worldPos);
 		CopyMogTextureToChara(this);
 		Chara.CalcMogScore();
@@ -1154,25 +1163,31 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		if (pickResult >= 0) {
 			MogWork().m_pickTicks++;
 
-			if (MogWork().m_prevScoreA + 5 <= Chara.MogFur().m_score[0]) {
-				MogWork().m_prevScoreA = Chara.MogFur().m_score[0];
+			int* prevScoreP = &MogWork().m_prevScoreA;
+			int* scoreP = &Chara.MogFur().m_score[0];
+			if (prevScoreP[0] + 5 <= scoreP[0]) {
+				prevScoreP[0] = scoreP[0];
 				messageId = 1;
-			} else if (MogWork().m_prevScoreA - 5 > Chara.MogFur().m_score[0]) {
-				MogWork().m_prevScoreA = Chara.MogFur().m_score[0];
+			} else if (prevScoreP[0] - 5 > scoreP[0]) {
+				prevScoreP[0] = scoreP[0];
 				messageId = 6;
 			}
-			if (MogWork().m_prevScoreB + 5 <= Chara.MogFur().m_score[1]) {
-				MogWork().m_prevScoreB = Chara.MogFur().m_score[1];
+			prevScoreP++;
+			scoreP++;
+			if (prevScoreP[0] + 5 <= scoreP[0]) {
+				prevScoreP[0] = scoreP[0];
 				messageId = 1;
-			} else if (MogWork().m_prevScoreB - 5 > Chara.MogFur().m_score[1]) {
-				MogWork().m_prevScoreB = Chara.MogFur().m_score[1];
+			} else if (prevScoreP[0] - 5 > scoreP[0]) {
+				prevScoreP[0] = scoreP[0];
 				messageId = 6;
 			}
-			if (MogWork().m_prevScoreC + 5 <= Chara.MogFur().m_score[2]) {
-				MogWork().m_prevScoreC = Chara.MogFur().m_score[2];
+			prevScoreP++;
+			scoreP++;
+			if (prevScoreP[0] + 5 <= scoreP[0]) {
+				prevScoreP[0] = scoreP[0];
 				messageId = 1;
-			} else if (MogWork().m_prevScoreC - 5 > Chara.MogFur().m_score[2]) {
-				MogWork().m_prevScoreC = Chara.MogFur().m_score[2];
+			} else if (prevScoreP[0] - 5 > scoreP[0]) {
+				prevScoreP[0] = scoreP[0];
 				messageId = 6;
 			}
 
@@ -1242,7 +1257,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 					CFlatRuntime2Storage().ResetParticleWork(particleNo | 0x100, 0);
 					CFlatRuntime2Storage().SetParticleWorkPos(worldPos, kCharaFurDepthZero);
 					const int particleIndex = CFlatRuntime2Storage().PutParticleWork();
-					pppFVECTOR4 color;
+					pppFVECTOR4 color = *reinterpret_cast<const pppFVECTOR4*>(sMogRadarTypeLabels);
 					color.x = static_cast<float>(particleColor.r) / kCharaFurColorComponentScale;
 					color.y = static_cast<float>(particleColor.g) / kCharaFurColorComponentScale;
 					color.z = static_cast<float>(particleColor.b) / kCharaFurColorComponentScale;
@@ -1257,19 +1272,19 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 					if (messageId == -1) {
 						messageId = 2;
 					}
-					MogWork().m_offColorTicks = 0x0B;
+					MogWork().m_offColorTicks++;
 				}
 				if (MogWork().m_eraseTicks == 10) {
 					if (messageId == -1) {
 						messageId = 5;
 					}
-					MogWork().m_eraseTicks = 0x0B;
+					MogWork().m_eraseTicks++;
 				}
 				if (MogWork().m_eraseTicks == 0x32) {
 					if (messageId == -1) {
 						messageId = 6;
 					}
-					MogWork().m_eraseTicks = 0x33;
+					MogWork().m_eraseTicks++;
 				}
 
 				if (Chara.MogFur().m_commandIndex < 3 && Chara.MogFur().m_commandIndex >= 0 && doPaint != 0
@@ -1754,15 +1769,24 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 		CMaterial* shadowMaterials[2];
 		MtxPtr shadowMatrices[2];
 		if (shadowPass != 0) {
+			*reinterpret_cast<unsigned long long*>(shadowMaterials) = g_chara_fur_1;
+			*reinterpret_cast<unsigned long long*>(shadowMatrices) = g_chara_fur_2;
 			shadowCount = MaterialMan.GetCharaShadow(2, shadowMaterials, shadowMatrices, reinterpret_cast<Vec*>(&modelPos), kCharaFurShadowRange, kCharaFurShadowFade, 0);
+			CMaterial** shadowMatP = shadowMaterials;
+			MtxPtr* shadowMtxP = shadowMatrices;
+			int shadowTexMtxId = 0x21;
 			for (int shadowIndex = 0; shadowIndex < shadowCount; shadowIndex++) {
-				TextureMan.SetTexture(static_cast<GXTexMapID>(shadowIndex + 3), shadowMaterials[shadowIndex]->GetFurTexture(0));
+				const int shadowTexMap = shadowIndex + 3;
+				TextureMan.SetTexture(static_cast<GXTexMapID>(shadowTexMap), (*shadowMatP)->GetTexture(0));
 
 				Mtx shadowTexMtx;
-				PSMTXConcat(shadowMatrices[shadowIndex], meshMtx, shadowTexMtx);
-				GXLoadTexMtxImm(shadowTexMtx, 0x21 + shadowIndex * 3, GX_MTX3x4);
-				GXSetTexCoordGen2(static_cast<GXTexCoordID>(shadowIndex + 3), GX_TG_MTX3x4, GX_TG_POS,
-				                  0x21 + shadowIndex * 3, GX_FALSE, GX_PTIDENTITY);
+				PSMTXConcat(*shadowMtxP, meshMtx, shadowTexMtx);
+				GXLoadTexMtxImm(shadowTexMtx, shadowTexMtxId, GX_MTX3x4);
+				GXSetTexCoordGen2(static_cast<GXTexCoordID>(shadowTexMap), GX_TG_MTX3x4, GX_TG_POS,
+				                  shadowTexMtxId, GX_FALSE, GX_PTIDENTITY);
+				shadowTexMtxId += 3;
+				shadowMatP++;
+				shadowMtxP++;
 			}
 		}
 
@@ -1784,23 +1808,29 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 		FurDisplayListRaw* displayList = mesh->m_data->m_displayLists;
 		Chara.gqrInit(posGqr << 0x18 | 0x70000 | posGqr << 8 | 7, normGqr << 0x18 | 0x70000 | normGqr << 8 | 7,
 		              0xC070C07);
-		for (unsigned int displayIndex = 0; displayIndex < mesh->m_data->m_displayListCount; displayIndex++, displayList++) {
+		int displayCount = mesh->m_data->m_displayListCount - 1;
+		for (; displayCount >= 0; displayCount--, displayList++) {
 			CMaterial* material = ModelMaterialSet(this)->m_materials[displayList->m_material];
 			if (!material->IsFurEnabled()) {
 				continue;
 			}
 
-			TextureMan.SetTexture(GX_TEXMAP0, material->GetFurTexture(0));
-			int hasExtraTexture = 0;
-			int extraTextureFormat = -1;
+			TextureMan.SetTexture(GX_TEXMAP0, material->GetTexture(0));
+			int hasExtraTexture;
+			int extraTextureFormat;
 			if (static_cast<short>(material->GetTextureIndex(1)) != -1) {
-				CTexture* extraTexture = material->GetFurTexture(1);
-				TextureMan.SetTexture(GX_TEXMAP2, extraTexture);
+				CTexture* extraTexture = material->GetTexture(1);
 				hasExtraTexture = 1;
+				TextureMan.SetTexture(GX_TEXMAP2, extraTexture);
 				extraTextureFormat = extraTexture->m_format;
+			} else {
+				hasExtraTexture = 0;
+				extraTextureFormat = -1;
 			}
 
 			if (prevExtraTexture != hasExtraTexture || prevExtraTextureFormat != extraTextureFormat) {
+				prevExtraTexture = hasExtraTexture;
+				prevExtraTextureFormat = extraTextureFormat;
 				GXSetTevDirect(GX_TEVSTAGE0);
 				_GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 				_GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASC, GX_CC_ZERO);
@@ -1868,8 +1898,10 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 					GXSetTexCoordGen2(GX_TEXCOORD2, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, GX_PTIDENTITY);
 				}
 				GXSetNumTevStages(static_cast<u8>(tevStageCount));
-				prevExtraTexture = hasExtraTexture;
-				prevExtraTextureFormat = extraTextureFormat;
+			}
+
+			if ((reinterpret_cast<const unsigned char*>(displayList->m_data)[0] & 7) != 0) {
+				continue;
 			}
 
 			for (unsigned int layer = 0; layer < 8; layer++) {
@@ -2058,7 +2090,6 @@ static inline CColor& FurColorLval(const CColor& c)
 
 #pragma push
 #pragma opt_common_subs off
-#pragma optimization_level 3
 void CChara::makeFurTex()
 {
 	CHairSet hairSet[0x20];
@@ -2067,15 +2098,15 @@ void CChara::makeFurTex()
 		                           FurColorLval(CColor(0xF0, 0xF0, 0xF0, 0)) };
 #define furBaseColor (furColors[0])
 #define furTipColor (furColors[1])
-	static CColor furNoiseBase(0, 0, 0, 0);
-	static CColor furNoiseRange(8, 8, 8, 0);
-	static Vec velBase = CVector(kCharaFurDepthZero, FLOAT_80331160, kCharaFurDepthZero);
-	static Vec velRand = CVector(kCharaFurDepthZero, kYmEnvQuarter, kCharaFurDepthZero);
-	static Vec accelBase = CVector(kCharaFurDepthZero, kCharaFurDepthZero, kCharaFurDepthZero);
-	static Vec accelRand = CVector(kCharaFurDepthZero, kCharaFurDepthZero, kCharaFurDepthZero);
+	static CColor furNoise[2] = { FurColorLval(CColor(0, 0, 0, 0)), FurColorLval(CColor(8, 8, 8, 0)) };
+#define furNoiseBase (furNoise[0])
+#define furNoiseRange (furNoise[1])
+	static CVector velBase = CVector(kCharaFurDepthZero, FLOAT_80331160, kCharaFurDepthZero);
+	static CVector velRand = CVector(kCharaFurDepthZero, kYmEnvQuarter, kCharaFurDepthZero);
+	static CVector accelBase = CVector(kCharaFurDepthZero, kCharaFurDepthZero, kCharaFurDepthZero);
+	static CVector accelRand = CVector(kCharaFurDepthZero, kCharaFurDepthZero, kCharaFurDepthZero);
 
 	s_mogFurRand = 0;
-	s_mogFurMaxY = 0.0f;
 
 	float scaleBase = kCharaFurDepthScaleBase;
 	float randScale = FLOAT_80331164;
@@ -2085,32 +2116,40 @@ void CChara::makeFurTex()
 	for (int i = 0; i < 0x20; i++) {
 		float velRandScale = FurRandScaleL(scaleBase, randScale, depthThreshold);
 		CVector velScaleOut;
-		PSVECScale(&velRand, velScaleOut, velRandScale);
+		PSVECScale(velRand, velScaleOut, velRandScale);
 		Vec velScaled;
 		velScaled.x = velScaleOut.x;
 		velScaled.y = velScaleOut.y;
 		velScaled.z = velScaleOut.z;
 		CVector velAddOut;
-		PSVECAdd(&velBase, &velScaled, velAddOut);
+		PSVECAdd(velBase, &velScaled, velAddOut);
 		hairSet[i].m_vec0.x = velAddOut.x;
 		hairSet[i].m_vec0.y = velAddOut.y;
 		hairSet[i].m_vec0.z = velAddOut.z;
 
 		float accelRandScale = FurRandScaleL(scaleBase, randScale, depthThreshold);
 		CVector accelScaleOut;
-		PSVECScale(&accelRand, accelScaleOut, accelRandScale);
+		PSVECScale(accelRand, accelScaleOut, accelRandScale);
 		Vec accelScaled;
 		accelScaled.x = accelScaleOut.x;
 		accelScaled.y = accelScaleOut.y;
 		accelScaled.z = accelScaleOut.z;
 		CVector accelAddOut;
-		PSVECAdd(&accelBase, &accelScaled, accelAddOut);
+		PSVECAdd(accelBase, &accelScaled, accelAddOut);
 		hairSet[i].m_vec1.x = accelAddOut.x;
 		hairSet[i].m_vec1.y = accelAddOut.y;
 		hairSet[i].m_vec1.z = accelAddOut.z;
 
-		hairSet[i].m_colors[0] = FurNoiseColor(furBaseColor, furNoiseBase, FurRandScaleL(scaleBase, randScale, depthThreshold));
-		hairSet[i].m_colors[1] = FurNoiseColor(furTipColor, furNoiseRange, FurRandScaleL(scaleBase, randScale, depthThreshold));
+		const CColor& noise0 = FurNoiseColor(furBaseColor, furNoiseBase, FurRandScaleL(scaleBase, randScale, depthThreshold));
+		hairSet[i].m_colors[0].color.r = noise0.color.r;
+		hairSet[i].m_colors[0].color.g = noise0.color.g;
+		hairSet[i].m_colors[0].color.b = noise0.color.b;
+		hairSet[i].m_colors[0].color.a = noise0.color.a;
+		const CColor& noise1 = FurNoiseColor(furTipColor, furNoiseRange, FurRandScaleL(scaleBase, randScale, depthThreshold));
+		hairSet[i].m_colors[1].color.r = noise1.color.r;
+		hairSet[i].m_colors[1].color.g = noise1.color.g;
+		hairSet[i].m_colors[1].color.b = noise1.color.b;
+		hairSet[i].m_colors[1].color.a = noise1.color.a;
 
 		float endY = hairSet[i].m_vec0.y + weightScale * hairSet[i].m_vec1.y;
 		if (s_mogFurMaxY < endY) {
@@ -2163,12 +2202,19 @@ void CChara::makeFurTex()
 	gMogFurTexBuffer = Memory._Alloc(0x20000, CharaPcs.m_viewerAnimStage, const_cast<char*>(s_chara_fur_cpp), 0xE9, 0);
 	DCInvalidateRange(gMogFurTexBuffer, 0x20000);
 
+	float weightScale2 = kCharaFurWeightScale;
+	float scaleBase2 = kCharaFurDepthScaleBase;
+	float quarterStep = kYmEnvQuarter;
+	float randScale2 = FLOAT_80331164;
+	float depthThr2 = kCharaFurViewDepthThreshold;
+	float layerStep = FLOAT_8033115C;
+
 	for (int layer = 0; layer < 8; layer++) {
-		posMtx[2][3] -= s_mogFurMaxY * FLOAT_8033115C;
+		posMtx[2][3] -= s_mogFurMaxY * layerStep;
 		GXLoadPosMtxImm(posMtx, GX_PNMTX0);
 		GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 
-		float layerFactor = static_cast<float>(layer) * FLOAT_8033115C;
+		float layerFactor = static_cast<float>(layer) * layerStep;
 		layerFactor = layerFactor * layerFactor;
 
 		CColor tipPartTmp;
@@ -2180,13 +2226,13 @@ void CChara::makeFurTex()
 
 		CColor basePartTmp;
 		basePartTmp.color.r =
-		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.r * (kCharaFurDepthScaleBase - layerFactor)));
+		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.r * (scaleBase2 - layerFactor)));
 		basePartTmp.color.g =
-		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.g * (kCharaFurDepthScaleBase - layerFactor)));
+		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.g * (scaleBase2 - layerFactor)));
 		basePartTmp.color.b =
-		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.b * (kCharaFurDepthScaleBase - layerFactor)));
+		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.b * (scaleBase2 - layerFactor)));
 		basePartTmp.color.a =
-		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.a * (kCharaFurDepthScaleBase - layerFactor)));
+		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.a * (scaleBase2 - layerFactor)));
 		CColor basePart = basePartTmp;
 
 		CColor layerColorTmp;
@@ -2195,7 +2241,9 @@ void CChara::makeFurTex()
 		layerColorTmp.color.b = static_cast<unsigned char>(basePart.color.b + tipPart.color.b);
 		layerColorTmp.color.a = static_cast<unsigned char>(basePart.color.a + tipPart.color.a);
 		CColor layerColor = layerColorTmp;
-		Graphic.SetCopyClear(layerColor, 0xFFFFFF);
+		CColor clearColor(layerColor);
+		clearColor.color.a = 0;
+		Graphic.SetCopyClear(clearColor.color, 0xFFFFFF);
 		GXCopyTex(static_cast<unsigned char*>(gMogFurTexBuffer) + layer * 0x4000, GX_TRUE);
 		GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 
@@ -2203,9 +2251,10 @@ void CChara::makeFurTex()
 		for (int hair = 0; hair < 0x4000; hair++) {
 			GXBegin(GX_LINESTRIP, GX_VTXFMT0, 5);
 
-			float rootX = kCharaFurDepthScaleBase * (FLOAT_80331164 * static_cast<float>(static_cast<int>(FurRandNext())) + kCharaFurViewDepthThreshold);
-			float rootZ = kCharaFurDepthScaleBase * (FLOAT_80331164 * static_cast<float>(static_cast<int>(FurRandNext())) + kCharaFurViewDepthThreshold);
-			CVector root(rootX, kCharaFurDepthZero, rootZ);
+			float rootX = scaleBase2 * (randScale2 * static_cast<float>(static_cast<int>(FurRandNext())) + depthThr2);
+			float rootZ = scaleBase2 * (randScale2 * static_cast<float>(static_cast<int>(FurRandNext())) + depthThr2);
+			CVector rootTmp(rootX, kCharaFurDepthZero, rootZ);
+			CVector root = rootTmp;
 
 			s_mogFurRand = s_mogFurRand * 0x41C64E6D + 0x3039;
 			CHairSet& src = hairSet[(s_mogFurRand >> 16) & 0x1F];
@@ -2214,7 +2263,7 @@ void CChara::makeFurTex()
 			for (int v = 0; v < 5; v++) {
 				float t2 = t * t;
 				CVector accelScaleOut;
-				PSVECScale(src.m_vec1, accelScaleOut, kCharaFurWeightScale * t2);
+				PSVECScale(src.m_vec1, accelScaleOut, weightScale2 * t2);
 				Vec accelTerm;
 				accelTerm.x = accelScaleOut.x;
 				accelTerm.y = accelScaleOut.y;
@@ -2246,13 +2295,13 @@ void CChara::makeFurTex()
 
 				CColor basePartTmp;
 				basePartTmp.color.r =
-				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.r * (kCharaFurDepthScaleBase - t2)));
+				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.r * (scaleBase2 - t2)));
 				basePartTmp.color.g =
-				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.g * (kCharaFurDepthScaleBase - t2)));
+				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.g * (scaleBase2 - t2)));
 				basePartTmp.color.b =
-				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.b * (kCharaFurDepthScaleBase - t2)));
+				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.b * (scaleBase2 - t2)));
 				basePartTmp.color.a =
-				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.a * (kCharaFurDepthScaleBase - t2)));
+				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.a * (scaleBase2 - t2)));
 				CColor basePart = basePartTmp;
 
 				CColor colorTmp;
@@ -2266,7 +2315,7 @@ void CChara::makeFurTex()
 				GXWGFifo.f32 = py;
 				GXWGFifo.f32 = pz;
 				GXWGFifo.u32 = *reinterpret_cast<unsigned int*>(&color.color);
-				t += kYmEnvQuarter;
+				t += quarterStep;
 			}
 
 			GXBegin(GX_POINTS, GX_VTXFMT0, 5);
@@ -2274,7 +2323,7 @@ void CChara::makeFurTex()
 			for (int v = 0; v < 5; v++) {
 				float t2 = t * t;
 				CVector accelScaleOut;
-				PSVECScale(src.m_vec1, accelScaleOut, kCharaFurWeightScale * t2);
+				PSVECScale(src.m_vec1, accelScaleOut, weightScale2 * t2);
 				Vec accelTerm;
 				accelTerm.x = accelScaleOut.x;
 				accelTerm.y = accelScaleOut.y;
@@ -2306,13 +2355,13 @@ void CChara::makeFurTex()
 
 				CColor basePartTmp;
 				basePartTmp.color.r =
-				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.r * (kCharaFurDepthScaleBase - t2)));
+				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.r * (scaleBase2 - t2)));
 				basePartTmp.color.g =
-				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.g * (kCharaFurDepthScaleBase - t2)));
+				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.g * (scaleBase2 - t2)));
 				basePartTmp.color.b =
-				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.b * (kCharaFurDepthScaleBase - t2)));
+				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.b * (scaleBase2 - t2)));
 				basePartTmp.color.a =
-				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.a * (kCharaFurDepthScaleBase - t2)));
+				    static_cast<unsigned char>(static_cast<int>(src.m_colors[0].color.a * (scaleBase2 - t2)));
 				CColor basePart = basePartTmp;
 
 				CColor colorTmp;
@@ -2326,7 +2375,7 @@ void CChara::makeFurTex()
 				GXWGFifo.f32 = py;
 				GXWGFifo.f32 = px;
 				GXWGFifo.u32 = *reinterpret_cast<unsigned int*>(&color.color);
-				t += kYmEnvQuarter;
+				t += quarterStep;
 			}
 		}
 
@@ -2337,7 +2386,7 @@ void CChara::makeFurTex()
 	Graphic.SetViewport();
 	Graphic.SetCopyClear(savedCopyClear, 0xFFFFFF);
 	GXSetTexCopySrc(0, 0, 0x280, 0x1C0);
-	GXCopyTex(gRenderScratchTextureBuffer, GX_TRUE);
+	GXCopyTex(Graphic.m_scratchTextureBuffer, GX_TRUE);
 	Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp), 0x138);
 	if (DAT_8032EDEC != 0) {
 		Memory.Free(DAT_8032EDEC);
@@ -2349,6 +2398,8 @@ void CChara::makeFurTex()
 }
 #undef furBaseColor
 #undef furTipColor
+#undef furNoiseBase
+#undef furNoiseRange
 #pragma pop
 
 /*

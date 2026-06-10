@@ -733,18 +733,16 @@ void CMemory::HeapWalker()
             stage = listHead->m_next;
             int useTotal = 0;
             int unuseTotal = 0;
+            unsigned int kb;
             do {
-                unsigned int useKB = static_cast<unsigned int>(stage->m_heapBottom - stage->m_heapTop)
-                    >> 10;
-                System.Printf(const_cast<char*>(strBase + 0x764), useKB, stage->m_allocationSourceStr);
-                useTotal += useKB;
+                kb = static_cast<unsigned int>(stage->m_heapBottom - stage->m_heapTop) >> 10;
+                System.Printf(const_cast<char*>(strBase + 0x764), kb, stage->m_allocationSourceStr);
+                useTotal += kb;
 
-                unsigned int unuseKB = static_cast<unsigned int>(
-                    stage->m_next->m_heapTop - stage->m_heapBottom)
-                    >> 10;
-                System.Printf(const_cast<char*>(strBase + 0x778), unuseKB);
+                kb = static_cast<unsigned int>(stage->m_next->m_heapTop - stage->m_heapBottom) >> 10;
+                System.Printf(const_cast<char*>(strBase + 0x778), kb);
                 stage = stage->m_next;
-                unuseTotal += unuseKB;
+                unuseTotal += kb;
             } while (stage != listHead);
 
             System.Printf(

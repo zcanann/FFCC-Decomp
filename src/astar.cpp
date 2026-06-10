@@ -339,8 +339,11 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 		return;
 	}
 
-	int groupLow = m_currentGroup;
-	int groupHigh = m_previousGroup;
+	int groupLow;
+	int groupHigh;
+
+	groupHigh = m_previousGroup;
+	groupLow = m_currentGroup;
 
 	if (groupHigh < groupLow)
 	{

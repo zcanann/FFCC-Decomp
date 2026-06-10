@@ -2229,7 +2229,7 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 			position.y = ModelDrawMtx(this)[1][3];
 			position.z = ModelDrawMtx(this)[2][3];
 			MaterialMan.SetPosition(static_cast<CMapShadow::TARGET>(0), &position, FLOAT_803301C8, FLOAT_803301CC, meshMtx,
-			                        static_cast<int>(static_cast<u32>(ModelFlagsA0(this)) << 24) >> 31);
+			                        static_cast<int>(static_cast<u32>(ModelFlagsA0(this) & 0xC0) << 24) >> 31);
 		}
 
 		const int lightEnable = static_cast<int>(static_cast<u32>(mesh->m_data->m_flags & 0xC0) << 24) >> 31;

@@ -2616,12 +2616,12 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 			startPosVec.z = startPos2.z;
 			PSVECAdd(&startPosVec, &rayDir, &m_comboCenter);
 		}
-		CVector down(FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78);
+		const CVector& down = CVector(FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78);
 		CMapCylinder floorCylinder(FLOAT_80331a9c, FLOAT_80331aa0);
 		floorCylinder.m_bottom = m_comboCenter;
-		floorCylinder.m_axis = *reinterpret_cast<Vec*>(&down);
+		floorCylinder.m_axis = *(Vec*)&down;
 		floorCylinder.m_radius = FLOAT_80331a78;
-		if (MapMng.CheckHitCylinderNear(&floorCylinder, reinterpret_cast<Vec*>(&down), 0x30) != 0) {
+		if (MapMng.CheckHitCylinderNear(&floorCylinder, (Vec*)&down, 0x30) != 0) {
 			CMapObj* hitObj = getMapHitObject();
 			hitObj->CalcHitPosition(&m_comboCenter);
 			CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(m_scriptHandle);

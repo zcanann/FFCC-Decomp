@@ -745,8 +745,7 @@ static inline CColor FurNoiseColor(const CColor& base, const CColor& noise, floa
 	resultTmp.color.g = static_cast<unsigned char>(base.color.g + scaledNoise.color.g);
 	resultTmp.color.b = static_cast<unsigned char>(base.color.b + scaledNoise.color.b);
 	resultTmp.color.a = static_cast<unsigned char>(base.color.a + scaledNoise.color.a);
-	CColor result = resultTmp;
-	return result;
+	return resultTmp;
 }
 
 void brush(unsigned short*, int, int, float, float, int, _GXColor, _GXColor*, _GXColor*);

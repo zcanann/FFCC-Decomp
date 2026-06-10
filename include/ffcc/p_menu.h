@@ -529,11 +529,11 @@ public:
     void CmakeSexClose();
     void CmakeSexDraw();
     void CmakeTribeOpen();
-    unsigned short CmakeTribeCtrl();
+    int CmakeTribeCtrl();
     void CmakeTribeClose();
     void CmakeTribeDraw();
     void CmakeJobOpen();
-    unsigned short CmakeJobCtrl();
+    int CmakeJobCtrl();
     void CmakeJobClose();
     void CmakeJobDraw();
     void CmakeResultOpen();

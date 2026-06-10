@@ -1073,9 +1073,11 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
                 } else if (i == 3) {
                     cameraPos.x -= LoadFloat(kYmManaOne);
                 }
-            }
-
-            if (nameCompare != 0 || i == 4 || i == 5) {
+                if (i == 4 || i == 5) {
+                    goto runCaptureSwitch;
+                }
+            } else {
+            runCaptureSwitch:
                 switch (i) {
                 case 0:
                     cameraPos.x += LoadFloat(kYmManaOne);

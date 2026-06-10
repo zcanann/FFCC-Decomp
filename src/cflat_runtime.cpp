@@ -858,13 +858,9 @@ int CFlatRuntime::SystemCall(CFlatRuntime::CObject* objectParam, int systemKind,
 		func = reinterpret_cast<CFunc*>(m_funcs);
 
 		for (int i = 0; i < funcCount; i++, func++) {
-			if (func->m_systemKind != systemKind) {
-				continue;
+			if ((func->m_systemKind == systemKind) && (func->m_systemIndex == systemIndex)) {
+				goto haveFunc;
 			}
-			if (func->m_systemIndex != systemIndex) {
-				continue;
-			}
-			goto haveFunc;
 		}
 	}
 	func = 0;
@@ -1015,13 +1011,9 @@ int CFlatRuntime::request(CFlatRuntime::CObject* object, int systemKind, int sys
 		func = reinterpret_cast<CFunc*>(m_funcs);
 
 		for (int i = 0; i < funcCount; i++, func++) {
-			if (func->m_systemKind != systemKind) {
-				continue;
+			if ((func->m_systemKind == systemKind) && (func->m_systemIndex == systemIndex)) {
+				goto haveFunc;
 			}
-			if (func->m_systemIndex != systemIndex) {
-				continue;
-			}
-			goto haveFunc;
 		}
 	}
 	func = 0;
@@ -1039,50 +1031,9 @@ haveFunc:
 		engineObject->m_0x34 |= 1 << reqFlagIndex;
 	}
 
-	int copiedArgs = 0;
-	if (argCount > 0) {
-		if (argCount > 8) {
-			CStack* batchArgs = args;
-			int byteOffset = 0;
-
-			for (; argCount - copiedArgs > 8; copiedArgs += 8) {
-				const int offset1 = byteOffset + 4;
-				const int offset2 = byteOffset + 8;
-				const int offset3 = byteOffset + 0xC;
-				const int offset4 = byteOffset + 0x10;
-				*reinterpret_cast<u32*>(reinterpret_cast<u32>(engineObject->m_sp) + byteOffset) =
-				    batchArgs[0].m_word;
-				const int offset5 = byteOffset + 0x14;
-				const int offset6 = byteOffset + 0x18;
-				const int offset7 = byteOffset + 0x1C;
-				byteOffset += 0x20;
-				*reinterpret_cast<u32*>(reinterpret_cast<u32>(engineObject->m_sp) + offset1) =
-				    batchArgs[1].m_word;
-				*reinterpret_cast<u32*>(reinterpret_cast<u32>(engineObject->m_sp) + offset2) =
-				    batchArgs[2].m_word;
-				*reinterpret_cast<u32*>(reinterpret_cast<u32>(engineObject->m_sp) + offset3) =
-				    batchArgs[3].m_word;
-				*reinterpret_cast<u32*>(reinterpret_cast<u32>(engineObject->m_sp) + offset4) =
-				    batchArgs[4].m_word;
-				*reinterpret_cast<u32*>(reinterpret_cast<u32>(engineObject->m_sp) + offset5) =
-				    batchArgs[5].m_word;
-				*reinterpret_cast<u32*>(reinterpret_cast<u32>(engineObject->m_sp) + offset6) =
-				    batchArgs[6].m_word;
-				CStack* finalArg = batchArgs + 7;
-				batchArgs += 8;
-				*reinterpret_cast<u32*>(reinterpret_cast<u32>(engineObject->m_sp) + offset7) =
-				    finalArg->m_word;
-			}
-		}
-
-		int byteOffset = copiedArgs * 4;
-		CStack* tailArgs = args + copiedArgs;
-		for (; argCount - copiedArgs > 0; copiedArgs++) {
-			*reinterpret_cast<u32*>(reinterpret_cast<u32>(engineObject->m_sp) + byteOffset) =
-			    tailArgs->m_word;
-			tailArgs++;
-			byteOffset += 4;
-		}
+	int copiedArgs;
+	for (copiedArgs = 0; copiedArgs < argCount; copiedArgs++) {
+		engineObject->m_sp[copiedArgs] = args[copiedArgs].m_word;
 	}
 	engineObject->m_sp += copiedArgs;
 

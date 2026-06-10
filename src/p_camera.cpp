@@ -749,15 +749,17 @@ void CCameraPcs::CalcQuake()
  */
 void CCameraPcs::calc()
 {
-    Mtx worldMapMtx;
-    Mtx tempMtx;
-    Mtx invMtx;
     Mtx zRotMtx;
+    Mtx invMtx;
+    Mtx tempMtx;
+    Mtx worldMapMtx;
     Vec up;
 
     bool useDebugPad = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
-    unsigned short buttons = 0;
-    if (!useDebugPad) {
+    unsigned short buttons;
+    if (useDebugPad) {
+        buttons = 0;
+    } else {
         buttons = CameraRawPadInput()._pad36;
     }
 
@@ -769,12 +771,12 @@ void CCameraPcs::calc()
         float stickH = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1))
                            ? kCameraZeroF
                            : CameraRawPadInput().substickYF;
-        m_yaw += kCameraDegToRad * kCameraDefaultNearZ * stickH;
+        m_yaw += kCameraDegToRad * (kCameraDefaultNearZ * stickH);
 
         float stickV = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1))
                            ? kCameraZeroF
                            : *reinterpret_cast<float*>(&CameraRawPadInput().lockedButton[0]);
-        m_pitch += kCameraDegToRad * kCameraDebugZoomStep * stickV;
+        m_pitch += kCameraDegToRad * (kCameraDebugZoomStep * stickV);
 
         float triggerL = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1))
                              ? kCameraZeroF
@@ -784,16 +786,19 @@ void CCameraPcs::calc()
         float triggerR = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1))
                              ? kCameraZeroF
                              : CameraRawPadInput().triggerRightF;
+        float lateral = kCameraDebugZoomStep * triggerR;
 
         float moveInOut = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1))
                               ? kCameraZeroF
                               : CameraRawPadInput().stickXF;
+        lateral -= kCameraDebugZoomStep * moveInOut;
 
-        float lateral = kCameraDebugZoomStep * triggerR - kCameraDebugZoomStep * moveInOut;
-
-        const float sinXCosY = static_cast<float>(sin(m_yaw)) * static_cast<float>(cos(m_pitch));
-        const float sinY = static_cast<float>(sin(m_pitch));
-        const float cosXCosY = static_cast<float>(cos(m_yaw)) * static_cast<float>(cos(m_pitch));
+        float pitch = m_pitch;
+        float yaw = m_yaw;
+        float sinY = static_cast<float>(cos(pitch));
+        const float sinXCosY = static_cast<float>(sin(yaw)) * sinY;
+        sinY = static_cast<float>(sin(pitch));
+        const float cosXCosY = static_cast<float>(cos(yaw)) * static_cast<float>(cos(pitch));
 
         float panStick = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1))
                              ? kCameraZeroF

@@ -302,9 +302,9 @@ void CGraphicPcs::drawScreenFade()
             const int barHeight = (int)(kScreenFadeBarEdge * fadeWave);
             const int barEdge = (int)(kScreenFadeRingWidth * fadeWave);
 
-            drawSFRect(kGraphicZero, kGraphicZero, kGraphicScreenWidth, (float)barHeight, baseColor);
+            drawSFRect(kGraphicZero, kGraphicZero, kGraphicScreenWidth, (float)barHeight, baseColor, baseColor);
             drawSFRect(kGraphicZero, (float)barHeight, kGraphicScreenWidth, (float)(barHeight + barEdge), baseColor, baseColor2);
-            drawSFRect(kGraphicZero, kGraphicScreenHeight, kGraphicScreenWidth, (float)(448 - barHeight), baseColor);
+            drawSFRect(kGraphicZero, kGraphicScreenHeight, kGraphicScreenWidth, (float)(448 - barHeight), baseColor, baseColor);
             drawSFRect(kGraphicZero, (float)(448 - barHeight), kGraphicScreenWidth, (float)((448 - barHeight) - barEdge), baseColor, baseColor2);
             continue;
         }
@@ -313,7 +313,7 @@ void CGraphicPcs::drawScreenFade()
             const int mode = slotData->m_mode;
             if (mode == 0) {
             drawSlot2Fullscreen:
-                drawSFRect(kGraphicZero, kGraphicZero, kGraphicScreenWidth, kGraphicScreenHeight, baseColor);
+                drawSFRect(kGraphicZero, kGraphicZero, kGraphicScreenWidth, kGraphicScreenHeight, baseColor, baseColor);
             } else if (mode == 1) {
                 CGObject* obj = static_cast<CGObject*>(slotData->m_targetObj);
                 if (obj == NULL) {
@@ -343,7 +343,7 @@ void CGraphicPcs::drawScreenFade()
                 pos.y = clamped;
 
                 const int radius = (int)(kScreenFadeCircleRadius * (kGraphicOne - fadeWave));
-                drawSFCircle(0x500, radius, (int)pos.x, (int)pos.y, baseColor);
+                drawSFCircle(0x500, radius, (int)pos.x, (int)pos.y, baseColor, baseColor);
                 drawSFCircle(radius, radius - 8, (int)pos.x, (int)pos.y, baseColor, baseColor2);
             }
             continue;
@@ -366,7 +366,7 @@ void CGraphicPcs::drawScreenFade()
                            (kGraphicScreenCenterY + offY) - kGraphicScreenCenterY * t,
                            (kGraphicScreenCenterX + offX) + kGraphicScreenCenterX * t,
                            (kGraphicScreenCenterY + offY) + kGraphicScreenCenterY * t,
-                           baseColor);
+                           baseColor, baseColor);
             }
             continue;
         }

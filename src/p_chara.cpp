@@ -937,6 +937,7 @@ int CCharaPcs::correctLoadAnimAmem()
     int maxEnd = 0;
     int compactedSize = 0;
     int scanOffset = 0;
+    int chunkSize = 0;
     for (int i = 0; i < loadAnimCount; i++) {
         CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
         CChara::CAnim* anim = loadAnim->m_anim;
@@ -953,7 +954,6 @@ int CCharaPcs::correctLoadAnimAmem()
 
     do {
         int chunkLoadCount = 0;
-        int chunkSize = 0;
         unsigned int nextOffset = 0;
         const unsigned int scanEnd = static_cast<unsigned int>(scanOffset + 0x80000);
 
@@ -996,6 +996,7 @@ int CCharaPcs::correctLoadAnimAmem()
 
         compactedSize += chunkSize;
         scanOffset = nextOffset;
+        chunkSize = 0;
     } while (scanOffset < maxEnd);
 
     delete tempBuffer;

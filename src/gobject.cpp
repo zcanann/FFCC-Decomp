@@ -877,7 +877,7 @@ void CGObject::objectCollision()
         info.capsuleOffset.z = other->m_bodyEllipsoidOffset * -cosf(other->m_rotBaseY);
         PSVECAdd(&info.basePos, &info.capsuleOffset, &info.capsulePos);
 
-        const float capsuleDistance = PSVECDistance(&self.capsulePos, &info.capsulePos);
+        const float capsuleDistance = PSVECDistance(&info.capsulePos, &self.capsulePos);
         if ((sZeroFloat == capsuleDistance)
             || ((m_nearColRadius + other->m_nearColRadius) < capsuleDistance)) {
             continue;
@@ -919,8 +919,8 @@ void CGObject::objectCollision()
         }
 
         if (((m_bgColMask & 2) != 0) && ((other->m_bgColMask & 2) != 0)
-            && (sZeroFloat < m_bodyEllipsoidRadius)
-            && (sZeroFloat < other->m_bodyEllipsoidRadius)) {
+            && (0.0f < m_bodyEllipsoidRadius)
+            && (0.0f < other->m_bodyEllipsoidRadius)) {
             if (((m_weaponNodeFlagBits.m_attached == 0) || (m_attachOwner != other))
                 && ((other->m_weaponNodeFlagBits.m_attached == 0) || (other->m_attachOwner != this))) {
                 const int usePushTimers = ((m_objectFlags & 0x40) != 0) && ((other->m_objectFlags & 0x40) != 0);

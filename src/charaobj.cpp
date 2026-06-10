@@ -2935,10 +2935,10 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 
 		switch (effectArg0) {
 		case 0: {
-			unsigned char* seData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + effectId * 0x48;
-			int decoded = CharaObjDecodeSe(*reinterpret_cast<unsigned short*>(seData + 0x38));
+			SCharaItemRow* seRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
+			int decoded = CharaObjDecodeSe(seRows[effectId].m_se);
 			if (decoded != 0) {
-				unsigned short seFlag = *reinterpret_cast<unsigned short*>(seData + 0x3A);
+				unsigned short seFlag = seRows[effectId].m_seFlag;
 				if ((seFlag & 0x8000) != 0) {
 					CFlatRuntime2Storage().SetParticleWorkSe(decoded, 2, seFlag & 0xFF);
 				} else {
@@ -2948,10 +2948,10 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 			break;
 		}
 		case 1: {
-			unsigned char* seData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + effectId * 0x48;
-			int decoded = CharaObjDecodeSe(*reinterpret_cast<unsigned short*>(seData + 0x3C));
+			SCharaItemRow* seRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
+			int decoded = CharaObjDecodeSe(seRows[effectId].m_se1);
 			if (decoded != 0) {
-				unsigned short seFlag = *reinterpret_cast<unsigned short*>(seData + 0x3E);
+				unsigned short seFlag = seRows[effectId].m_seFlag1;
 				if ((seFlag & 0x8000) != 0) {
 					CFlatRuntime2Storage().SetParticleWorkSe(decoded, 2, seFlag & 0xFF);
 				} else {
@@ -2961,10 +2961,10 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 			break;
 		}
 		case 2: {
-			unsigned char* seData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + effectId * 0x48;
-			int decoded = CharaObjDecodeSe(*reinterpret_cast<unsigned short*>(seData + 0x40));
+			SCharaItemRow* seRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
+			int decoded = CharaObjDecodeSe(seRows[effectId].m_se2);
 			if (decoded != 0) {
-				if ((*reinterpret_cast<unsigned short*>(seData + 0x0C) & 0x400) != 0) {
+				if ((seRows[effectId].m_particleFlags & 0x400) != 0) {
 					CFlatRuntime2Storage().SetParticleWorkSe(decoded, 2, 0);
 				} else {
 					seNo = decoded;

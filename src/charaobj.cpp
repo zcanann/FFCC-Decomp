@@ -2038,7 +2038,8 @@ void CGCharaObj::setSta(int staIndex, int value)
 	}
 
 	slotOff = staIndex * 2;
-	int current = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + slotOff + 0x3E);
+	SCharaStaBlock* staBlock = reinterpret_cast<SCharaStaBlock*>(m_scriptHandle);
+	int current = staBlock->m_sta[staIndex];
 	clampedValue = value & ~(value >> 31);
 
 	if (current != 0 || clampedValue == 0) {
@@ -2301,7 +2302,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 		}
 	}
 
-	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + slotOff + 0x3E) = static_cast<short>(clampedValue);
+	reinterpret_cast<SCharaStaBlock*>(m_scriptHandle)->m_sta[staIndex] = static_cast<short>(clampedValue);
 }
 
 /*

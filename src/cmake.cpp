@@ -2868,8 +2868,8 @@ int CMenuPcs::CmakeNameCtrl()
                         return 0;
                     }
 
-                    CmakeState(this)->m_resultDir = 1;
                     Sound.PlaySe(2, 0x40, 0x7F, 0);
+                    CmakeState(this)->m_resultDir = 1;
                     return 1;
                 } else {
                     short curTable = CmakeState(this)->m_table;
@@ -2881,7 +2881,7 @@ int CMenuPcs::CmakeNameCtrl()
                     int rowLen = strlen(rowText);
                     if (rowLen != 0) {
                         int i = 0;
-                        int j = 0;
+                        int j = i;
                         for (; 0 < rowLen; rowLen = rowLen - 1) {
                             if (i == curSelect) {
                                 picked[0] = rowText[j];
@@ -2902,7 +2902,7 @@ int CMenuPcs::CmakeNameCtrl()
                         rowLen = strlen(rowText);
                         if (rowLen != 0) {
                             int i = 0;
-                            int j = 0;
+                            int j = i;
                             for (; 0 < rowLen; rowLen = rowLen - 1) {
                                 if (i == curSelect) {
                                     picked[0] = rowText[j];

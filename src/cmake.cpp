@@ -2325,6 +2325,7 @@ void CMenuPcs::CmakeTribeOpen()
  */
 void CMenuPcs::CmakeSexDraw()
 {
+    float a255;
     float alpha = CalcCmakeFadeAlpha(this);
     DrawWMFrame0(1, 1.0f);
 
@@ -2364,12 +2365,18 @@ void CMenuPcs::CmakeSexDraw()
     panelColor.r = 0xFF;
     panelColor.g = 0xFF;
     panelColor.b = 0xFF;
-    panelColor.a = static_cast<unsigned char>(static_cast<int>(255.0f * alpha));
+    a255 = 255.0f * alpha;
+    panelColor.a = static_cast<unsigned char>(a255);
     GXSetChanMatColor(GX_COLOR0A0, panelColor);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
+    float sexW = 256.0f;
+    float sexH = 162.4615478515625f;
     MenuPcs.DrawRect(
-        0, 192.0f, 56.0f, 416.0f, 264.0f,
-        0.0f, 0.0f, 0.85f, 0.85f, 0.0f);
+        0,
+        static_cast<float>(static_cast<int>(-(sexW / 2.0 - 400.0))),
+        static_cast<float>(static_cast<int>(-(sexH / 2.0 - 188.0))),
+        416.0f, 264.0f,
+        0.0f, 0.0f, 0.6153846383094788f, 0.6153846383094788f, 0.0f);
     DrawCmakeTitle(2, 1.0f, alpha);
 
     CFont* font = m_fonts[CMAKE_FONT_LABEL];
@@ -2378,8 +2385,7 @@ void CMenuPcs::CmakeSexDraw()
     font->SetScale(1.0f);
     font->DrawInit();
 
-    CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha));
-    font->SetColor(rgba.color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)).color);
 
     float maxWidth = 0.0f;
     int y = 0x9C;
@@ -2389,7 +2395,7 @@ void CMenuPcs::CmakeSexDraw()
         if (maxWidth < width) {
             maxWidth = width;
         }
-        float x = static_cast<float>(-(static_cast<double>(width) * 0.5 - 400.0));
+        float x = static_cast<float>(-(width / 2.0 - 400.0));
         font->SetPosX(x);
         font->SetPosY(static_cast<float>(y) - 4.0f);
         font->Draw(txt);
@@ -2399,11 +2405,11 @@ void CMenuPcs::CmakeSexDraw()
 
     if (CmakeState(this)->m_mode == 1) {
         int sel = CmakeState(this)->m_select;
-        unsigned int frame = System.m_frameCounter & 7;
+        int wobble = static_cast<int>(System.m_frameCounter) % 8;
         int cursorX = static_cast<int>(
-            static_cast<double>(static_cast<float>(400.0 - static_cast<double>(maxWidth) * 0.5) +
-                                static_cast<float>(frame)) -
-            static_cast<double>(maxWidth) * 0.5);
+            static_cast<double>(static_cast<float>(400.0 - maxWidth / 2.0) +
+                                static_cast<float>(wobble)) -
+            maxWidth / 2.0);
         int cursorY = static_cast<int>(156.0f + static_cast<float>(sel * 0x28));
         DrawCursor(cursorX, cursorY, alpha);
     }

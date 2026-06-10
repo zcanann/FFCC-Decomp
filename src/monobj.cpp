@@ -60,8 +60,8 @@ extern "C" const float kMonObjTwoThirdsPi = 2.0943952f;
 static const char s_monObjTexAnimU0[3] = "u0";
 extern "C" const float kMonObjPercentMax = 100.0f;
 extern "C" const float kMonObjOne = 1.0f;
-static const char s_monObjAiStateFmt[] = "%d:%c %d:%c";
-static const char s_monObjDistanceFmt[] = "%d %d %d";
+static const char s_pctd_pctc_pctd_pctc_801DCA2C[] = "%d %c %d %c";
+static const char s_pctd_pctd_pctd_801DCA38[] = "%d %d/%d";
 
 /*
  * --INFO--
@@ -267,7 +267,7 @@ void CGMonObj::undeadOff()
 
 	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x1000);
 
-	short count = (weaponMode != 0) ?
+	int count = (weaponMode != 0) ?
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AC) :
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AE);
 	int particleBase = (weaponMode != 0) ? 0x46 : 0x3C;
@@ -306,12 +306,12 @@ void CGMonObj::undeadOn()
 
 	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x1000);
 
-	short count = (weaponMode != 0) ?
+	int count = (weaponMode != 0) ?
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AC) :
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AE);
 	int particleBase = (weaponMode != 0) ? 0x46 : 0x3C;
 
-	for (int i = 0; i < static_cast<int>(count); i++) {
+	for (int i = 0; i < static_cast<int>(static_cast<unsigned short>(count)); i++) {
 		int dataNo = object->m_charaModelHandle->GetPdtSlot();
 		reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace((particleBase + i) | (dataNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x594), object, kMonObjDefaultScale, 0);
 	}
@@ -1503,13 +1503,19 @@ void CGMonObj::onAnimPoint(int param2, int param3)
 	int particleId = 0xFFFF;
 	int soundId = 0xFFFF;
 
-	if ((param3 < 0xC) && (param3 >= 0xA)) {
+	if (param3 >= 0xC) goto animSkip;
+	if (param3 >= 0xA) goto animEnter;
+	goto animSkip;
+animEnter:
+	{
 		particleId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A4);
 		if ((particleId != 0xFFFF) && (param3 == 10)) {
 			particleId += 1;
 		}
-		soundId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A6);
+		soundId = *reinterpret_cast<unsigned short*>(
+			reinterpret_cast<unsigned char*>(*reinterpret_cast<void* volatile*>(&object->m_scriptHandle[9])) + 0x1A6);
 	}
+animSkip:
 
 	if (particleId != 0xFFFF) {
 		int dataNo = object->m_charaModelHandle->GetPdtSlot();
@@ -1839,11 +1845,12 @@ void CGMonObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 		if (targetIndex >= 0) {
 			targetChar = targetIndex + '0';
 		}
-		if ((aiState & 0x7FFF) != 0) {
-			aiChar = (aiState & 0x7FFF) + 0x40;
+		int aiMasked = aiState & 0x7FFF;
+		if (aiMasked != 0) {
+			aiChar = aiMasked + 0x40;
 		}
 
-		sprintf(text, s_monObjAiStateFmt, (int)object->m_scriptHandle[2], aiChar,
+		sprintf(text, s_pctd_pctc_pctd_pctc_801DCA2C, (int)object->m_scriptHandle[2], aiChar,
 		        m_chaseState, targetChar);
 		float curPosY = posY;
 		font->SetPosX(posX - static_cast<float>(font->GetWidth(text)) * 0.5f);
@@ -1862,7 +1869,7 @@ void CGMonObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 
 		int chaseRange = static_cast<int>(static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xCC)));
 		int spawnDist = static_cast<int>(PSVECDistance(&m_homePosition, &object->m_worldPosition));
-		sprintf(text, s_monObjDistanceFmt, targetDist, spawnDist, chaseRange);
+		sprintf(text, s_pctd_pctd_pctd_801DCA38, targetDist, spawnDist, chaseRange);
 		float curPosY2 = posY;
 		font->SetPosX(posX - static_cast<float>(font->GetWidth(text)) * 0.5f);
 		font->SetPosY(curPosY2);
@@ -2758,7 +2765,7 @@ void CGMonObj::setIceJEffect(int enabled)
 
 	if (enabled != 0) {
 		unsigned short count = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AA);
-		for (int i = 0; i < static_cast<int>(count); i++) {
+		for (int i = 0; i < static_cast<int>(static_cast<unsigned short>(count)); i++) {
 			int dataNo = object->m_charaModelHandle->GetPdtSlot();
 			reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace((i + 0x5A) | (dataNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x5A8), object, kMonObjDefaultScale, 0);
 		}
@@ -2930,14 +2937,23 @@ void CGMonObj::setRepop(int mode)
 	for (int i = 0; i < static_cast<int>(countA); i++) {
 		int particleBase = 0;
 		if (classId < 0xA7) {
-			if (classId == 0x9C) {
-				particleBase = 1;
-			}
+			if (classId == 0x9C) goto pbSet1;
+			goto pbDone;
 		} else if (classId == 0xA9) {
-			particleBase = 0;
+			goto pbSetA9;
 		} else if (classId < 0xA9) {
-			particleBase = 2;
+			goto pbSet2;
 		}
+		goto pbDone;
+	pbSetA9:
+		particleBase = 0;
+		goto pbDone;
+	pbSet1:
+		particleBase = 1;
+		goto pbDone;
+	pbSet2:
+		particleBase = 2;
+	pbDone:
 
 		int dataNo = object->m_charaModelHandle->GetPdtSlot();
 		prgObj->putParticleBindTrace((i + particleBase + 0x50) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x5A4), object, 1.0f, 0);
@@ -3281,6 +3297,25 @@ void CGMonObj::moveFrame()
  * JP Address: TODO
  * JP Size: TODO
  */
+typedef struct MonObjWords8 { unsigned int w[8]; } MonObjWords8;
+typedef struct MonObjMlAttackPool {
+	char gbaDir[12];
+	char gbaClient[16];
+	char gbaObjdat[12];
+	MonObjWords8 groupTableInit;
+	MonObjWords8 groupCountInit;
+	char classNames[0x54];
+	char actFlagFmt[0x20];
+} MonObjMlAttackPool;
+static const MonObjMlAttackPool lbl_801DC950 = {
+	"dvd/gba/", "ffcc_cli.bin", "objdat.spt",
+	{ { 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+		0xFFFFFFFF } },
+	{ { 0, 0, 0, 0, 0, 0, 0, 0 } },
+	"CGMonObj\0\0\0\0CFlatRuntime::CObject\0\0\0CGBaseObj\0\0\0CGObject\0\0\0\0CGPrgObj\0\0\0\0CGCharaObj\0",
+	"ACT_FLAG_ROT_CHECK \x8d\xb7\x95\xaa=%f\x93x\x81\x42\n"
+};
+
 int CGMonObj::mlAttackCheck(int partyIndex)
 {
 	CGMonObj* monObj = this;
@@ -3291,6 +3326,8 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 		? baseScript \
 		: reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) + \
 			(monObj->m_aiState + *reinterpret_cast<unsigned short*>(baseScript + 0x100)) * 0x1D0 + 0x10)
+	const MonObjMlAttackPool* mlPool = &lbl_801DC950;
+	int selectedAction = -1;
 	if (monObj->m_funcs->attackCheck != 0) {
 		int result = (monObj->*monObj->m_funcs->attackCheck)(partyIndex);
 		if (result == -2) {
@@ -3308,14 +3345,30 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 		return -1;
 	}
 
-	unsigned int groupTable[8] = { 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-		0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF };
-	int groupCount[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-	int selectedAction = -1;
+	unsigned int groupTable[8];
+	int groupCount[8];
+	groupTable[0] = mlPool->groupTableInit.w[0];
+	groupTable[1] = mlPool->groupTableInit.w[1];
+	groupTable[2] = mlPool->groupTableInit.w[2];
+	groupTable[3] = mlPool->groupTableInit.w[3];
+	groupTable[4] = mlPool->groupTableInit.w[4];
+	groupTable[5] = mlPool->groupTableInit.w[5];
+	groupTable[6] = mlPool->groupTableInit.w[6];
+	groupTable[7] = mlPool->groupTableInit.w[7];
+	groupCount[0] = static_cast<int>(mlPool->groupCountInit.w[0]);
+	groupCount[1] = static_cast<int>(mlPool->groupCountInit.w[1]);
+	groupCount[2] = static_cast<int>(mlPool->groupCountInit.w[2]);
+	groupCount[3] = static_cast<int>(mlPool->groupCountInit.w[3]);
+	groupCount[4] = static_cast<int>(mlPool->groupCountInit.w[4]);
+	groupCount[5] = static_cast<int>(mlPool->groupCountInit.w[5]);
+	groupCount[6] = static_cast<int>(mlPool->groupCountInit.w[6]);
+	groupCount[7] = static_cast<int>(mlPool->groupCountInit.w[7]);
+	int rotOffset = partyIndex * 4 + 0x610;
+	int* groupPtr = reinterpret_cast<int*>(groupTable);
 
 	for (int actionIndex = 0; actionIndex < 8; actionIndex++) {
 		int actionOffset = actionIndex * 0x10;
-		unsigned short actionFlags = *reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x110);
+		int actionFlags = *reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x110);
 		if (actionFlags == 0xFFFF) {
 			if (actionIndex == 0) {
 				return -2;
@@ -3334,7 +3387,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 			continue;
 		}
 
-		unsigned int artifactLevel;
+		int artifactLevel;
 		if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
 			int idx = Game.m_gameWork.m_bossArtifactStageIndex;
 			int stage = Game.m_gameWork.m_bossArtifactStageTable[idx];
@@ -3349,14 +3402,12 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 		}
 
 		if ((actionFlags & 0x40) != 0) {
-			float targetRot = *reinterpret_cast<float*>(mon + partyIndex * 4 + 0x610);
+			float targetRot = *reinterpret_cast<float*>(mon + rotOffset);
 			float baseRot =
 				kMonObjDegToRad * static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x118)) +
 				object->m_rotBaseY;
 			float angleDelta = (float)__fabs(Math.DstRot(targetRot, baseRot));
-			System.Printf(
-				const_cast<char*>("ACT_FLAG_ROT_CHECK \x8d\xb7\x95\xaa=%f\x93x\x81\x42\n"),
-				kMonObjRadToDeg * angleDelta);
+			System.Printf(const_cast<char*>(mlPool->actFlagFmt), kMonObjRadToDeg * angleDelta);
 			float angleLimit =
 				kMonObjDegToRad * static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x11A));
 			if (!(angleDelta < angleLimit)) {
@@ -3377,21 +3428,23 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 			int partyState = reinterpret_cast<CGPrgObj*>(party)->m_lastStateId;
 			if (((partyState == 1) || (partyState == 7)) &&
 				((float)__fabs(Math.DstRot(object->m_rotBaseY, reinterpret_cast<CGObject*>(party)->m_rotBaseY)) > kMonObjHalfPi)) {
-				if (*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) {
-					if (monObj->m_forcedAction != static_cast<short>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x11E))) {
-						goto skipForce;
-					}
-				} else if ((*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) ||
-					(monObj->m_forcedAction != actionIndex)) {
-					goto skipForce;
+				if (((*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) &&
+						(monObj->m_forcedAction ==
+							static_cast<short>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x11E)))) ||
+					((*reinterpret_cast<unsigned short*>(
+							reinterpret_cast<unsigned char*>(*reinterpret_cast<void* volatile*>(&object->m_scriptHandle[9])) +
+							0x10C) != 1) &&
+						(monObj->m_forcedAction == actionIndex))) {
+					forceAction = 1;
 				}
-				forceAction = 1;
 			}
-		skipForce:
 
 			if (forceAction || (Math.Rand(100) <= chance)) {
 				selectedAction = actionIndex;
-				if ((*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) || forceAction) {
+				if (*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) {
+					break;
+				}
+				if (forceAction) {
 					break;
 				}
 			}
@@ -3410,10 +3463,10 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 	}
 
 	if (selectorType == 1) {
-		int& groupCursor = monObj->m_unk6CC;
+#define groupCursor (*reinterpret_cast<volatile int*>(&monObj->m_unk6CC))
 	wloop:
 		if (groupCount[groupCursor] == 0) {
-			groupCursor += 1;
+			groupCursor = groupCursor + 1;
 			if (groupCursor >= 8) {
 				groupCursor = 0;
 			}
@@ -3423,50 +3476,58 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 		int pick = Rand__5CMathFUl(&Math);
 		int seen = 0;
 		int i = 0;
-		int* groupPtr = reinterpret_cast<int*>(groupTable);
-		do {
-			int cursor0 = groupCursor;
-			if (cursor0 == groupPtr[0]) {
-				if (seen == pick) {
-					selectedAction = i;
-					groupCursor = cursor0 + 1;
-					goto mlDone;
+		for (int pass = 0; pass < 2; pass++) {
+			{
+				int cursor0 = groupCursor;
+				if (cursor0 == groupPtr[0]) {
+					if (seen == pick) {
+						selectedAction = i;
+						groupCursor = cursor0 + 1;
+						goto mlDone;
+					}
+					seen += 1;
 				}
-				seen += 1;
 			}
 			i += 1;
-			int cursor1 = groupCursor;
-			if (cursor1 == groupPtr[1]) {
-				if (seen == pick) {
-					selectedAction = i;
-					groupCursor = cursor1 + 1;
-					goto mlDone;
+			{
+				int cursor1 = groupCursor;
+				if (cursor1 == groupPtr[1]) {
+					if (seen == pick) {
+						selectedAction = i;
+						groupCursor = cursor1 + 1;
+						goto mlDone;
+					}
+					seen += 1;
 				}
-				seen += 1;
 			}
 			i += 1;
-			int cursor2 = groupCursor;
-			if (cursor2 == groupPtr[2]) {
-				if (seen == pick) {
-					selectedAction = i;
-					groupCursor = cursor2 + 1;
-					goto mlDone;
+			{
+				int cursor2 = groupCursor;
+				if (cursor2 == groupPtr[2]) {
+					if (seen == pick) {
+						selectedAction = i;
+						groupCursor = cursor2 + 1;
+						goto mlDone;
+					}
+					seen += 1;
 				}
-				seen += 1;
 			}
 			i += 1;
-			int cursor3 = groupCursor;
-			if (cursor3 == groupPtr[3]) {
-				if (seen == pick) {
-					selectedAction = i;
-					groupCursor = cursor3 + 1;
-					goto mlDone;
+			{
+				int cursor3 = groupCursor;
+				if (cursor3 == groupPtr[3]) {
+					if (seen == pick) {
+						selectedAction = i;
+						groupCursor = cursor3 + 1;
+						goto mlDone;
+					}
+					seen += 1;
 				}
-				seen += 1;
 			}
 			i += 1;
 			groupPtr += 4;
-		} while (i < 8);
+		}
+#undef groupCursor
 	}
 
 mlDone:
@@ -3623,6 +3684,7 @@ body:
 							if ((*reinterpret_cast<unsigned short*>(AISCRIPT + 0x102) & 0x80) != 0) {
 								monObj->m_moveWork.m_flags |= 0x20000;
 							}
+							monObj->m_moveWork.m_flags = *reinterpret_cast<volatile int*>(&monObj->m_moveWork.m_flags);
 							monObj->m_moveWork.m_mode = 4;
 							monObj->m_moveWork.m_range = static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xD6));
 							monObj->m_moveWork.m_limitFrame = *reinterpret_cast<unsigned short*>(script + 0x1B6);
@@ -3715,11 +3777,12 @@ void CGMonObj::statWatch()
 		}
 
 		unsigned char* aiScript;
-		if (monObj->m_aiState == 0) {
+		short aiState0 = monObj->m_aiState;
+		if (aiState0 == 0) {
 			aiScript = script;
 		} else {
 			aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-				(static_cast<int>(monObj->m_aiState) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
+				(aiState0 + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
 		}
 
 		int targetMode = *reinterpret_cast<unsigned short*>(aiScript + 0x106);
@@ -3752,10 +3815,10 @@ void CGMonObj::statWatch()
 
 			int pick = Math.Rand(validCount);
 			int minHp = 10000000;
+			int accum = -1;
 			int validIndex = 0;
 			float homeRange2 = static_cast<float>(
 				*reinterpret_cast<unsigned short*>(script + 0xCC));
-			int accum = -1;
 
 			// Pass 2: select target.
 			int result = -1;
@@ -3865,7 +3928,8 @@ void CGMonObj::statWatch()
 							(aiState + *reinterpret_cast<unsigned short*>(scriptBase + 0x100)) * 0x1D0 + 0x10;
 					}
 					int actionOff = attackResult * 0x10;
-					if ((*reinterpret_cast<unsigned short*>(aiData + actionOff + 0x110) & 0x20) != 0) {
+					unsigned char* actionData = aiData + actionOff;
+					if ((*reinterpret_cast<unsigned short*>(actionData + 0x110) & 0x20) != 0) {
 						actionState = 0x21;
 						CGPartyObj* party = Game.m_partyObjArr[selectedTarget];
 						if (monObj->m_moveWork.m_mode != 4) {
@@ -3884,7 +3948,7 @@ void CGMonObj::statWatch()
 							if ((*reinterpret_cast<unsigned short*>(aiData2 + 0x102) & 0x80) != 0) {
 								monObj->m_moveWork.m_flags |= 0x20000;
 							}
-							monObj->m_moveWork.m_flags = monObj->m_moveWork.m_flags;
+							monObj->m_moveWork.m_flags = *reinterpret_cast<volatile int*>(&monObj->m_moveWork.m_flags);
 							monObj->m_moveWork.m_mode = 4;
 							monObj->m_moveWork.m_range =
 								static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xD6));
@@ -3929,7 +3993,7 @@ void CGMonObj::statWatch()
 						if ((*reinterpret_cast<unsigned short*>(aiData5 + 0x102) & 0x40) != 0) {
 							monObj->m_moveWork.m_flags |= 0x10000;
 						}
-						monObj->m_moveWork.m_flags = monObj->m_moveWork.m_flags;
+						monObj->m_moveWork.m_flags = *reinterpret_cast<volatile int*>(&monObj->m_moveWork.m_flags);
 						monObj->m_moveWork.m_mode = 2;
 					}
 					monObj->m_moveWork.m_target = reinterpret_cast<CGCharaObj*>(party);
@@ -4108,6 +4172,7 @@ void CGMonObj::statMove(int* targetIndex)
 					if ((*reinterpret_cast<unsigned short*>(aiData + 0x102) & 0x80) != 0) {
 						monObj->m_moveWork.m_flags |= 0x20000;
 					}
+					monObj->m_moveWork.m_flags = *reinterpret_cast<volatile int*>(&monObj->m_moveWork.m_flags);
 					monObj->m_moveWork.m_mode = 4;
 					monObj->m_moveWork.m_range =
 						static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xCE));
@@ -4297,7 +4362,7 @@ void CGMonObj::onChangePrg(int value)
 		}
 
 		if (isNormal != 0) {
-			for (int i = 0; i < static_cast<int>(count); i++) {
+			for (int i = 0; i < static_cast<int>(static_cast<unsigned short>(count)); i++) {
 				int dataNo = object->m_charaModelHandle->GetPdtSlot();
 				reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace(
 					(particleBase + i) | (dataNo << 8),

@@ -1622,10 +1622,11 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				if (rawDamage < 1) {
 					rawDamage = 1;
 				}
-				int bonus = ((static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D && itemEffect == 0x1F8) ?
-					static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(
-						reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0xBDD)) :
-					0;
+				int bonus = 0;
+				if ((((static_cast<unsigned int>(__cntlzw(0x6D - (static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D))) >> 5) & 0xFFU) != 0) && itemEffect == 0x1F8) {
+					bonus = static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(
+						reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0xBDD));
+				}
 				damageAmount = rawDamage + bonus;
 				if (scriptDefense != 0) {
 					damageAmount = static_cast<int>(static_cast<float>(damageAmount) * CharaObjGetStatusMultiplier(0x42));
@@ -1665,10 +1666,11 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				if (rawDamage < 1) {
 					rawDamage = 1;
 				}
-				unsigned int bonus = (static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D ?
-					static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(
-						reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0xBDE)) :
-					0;
+				unsigned int bonus = 0;
+				if ((((static_cast<unsigned int>(__cntlzw(0x6D - (static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D))) >> 5) & 0xFFU) != 0)) {
+					bonus = static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(
+						reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0xBDE));
+				}
 				damageAmount = rawDamage + bonus;
 				System.Printf(dbg + 0x1DC, basePower, sourcePower, multiplier, defense, bonus, damageAmount);
 				break;
@@ -1818,8 +1820,9 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 
 		if (damageAmount != 0) {
 			addHp(-damageAmount, sourceObj);
-			int selfHasGuard = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0;
-			if (selfHasGuard) {
+			int selfNoGuard = (static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(
+				*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C)))) >> 5) & 0xFF;
+			if (selfNoGuard == 0) {
 				bonus(0, resolvedItemId, sourceObj);
 				sourceObj->bonus(1, resolvedItemId, this);
 			}
@@ -1827,12 +1830,12 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			    ((static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D && sourceChara->m_comboItemState >= 0)) {
 				bonus(0x15, resolvedItemId, sourceObj);
 				sourceObj->bonus(0x11, resolvedItemId, this);
-				if (selfHasGuard) {
+				if (selfNoGuard == 0) {
 					sourceObj->bonus(0xC, resolvedItemId, this);
 				}
 				for (int i = 0; i < sourceChara->m_comboLinkCount; i++) {
 					sourceChara->m_comboLinks[i]->bonus(0x11, resolvedItemId, this);
-					if (selfHasGuard) {
+					if (selfNoGuard == 0) {
 						sourceChara->m_comboLinks[i]->bonus(0xC, resolvedItemId, this);
 					}
 				}
@@ -1841,13 +1844,13 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					if (itemEffect == 0x1F8) {
 						bonus(0x13, resolvedItemId, sourceObj);
 						sourceObj->bonus(0xF, resolvedItemId, this);
-						if (selfHasGuard) {
+						if (selfNoGuard == 0) {
 							sourceObj->bonus(10, resolvedItemId, this);
 						}
 					} else {
 						bonus(0x12, resolvedItemId, sourceObj);
 						sourceObj->bonus(0xE, resolvedItemId, this);
-						if (selfHasGuard) {
+						if (selfNoGuard == 0) {
 							sourceObj->bonus(9, resolvedItemId, this);
 						}
 					}
@@ -1907,7 +1910,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0x6CC) == 2) &&
 				    (calcRegist(0x69, resolvedItemId, counterResist, counterAllow, counterEffect, 0), counterAllow != 0)) {
 					int chance;
-					if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
+					if ((((static_cast<unsigned int>(__cntlzw(0xAD - (static_cast<unsigned short>(GetCID()) & 0xAD))) >> 5) & 0xFFU) != 0)) {
 						chance = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0x19A);
 					} else {
 						chance = 0x32;
@@ -1915,7 +1918,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					if (chance != 0 && (DbgMenuPcs.GetDbgFlagsRaw() & 0x20) != 0) {
 						chance = 100;
 					}
-					if (chance != 0 && Math.Rand(100) <= static_cast<int>(chance)) {
+					if (chance != 0 && static_cast<unsigned int>(Math.Rand(100)) <= static_cast<unsigned int>(chance)) {
 						if ((m_bgColMask & 0x80000) != 0) {
 							effective(0x69, resolvedItemId, sourceObj, counterEffect);
 						} else {
@@ -1932,9 +1935,11 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 	if (itemEffect != 0x1F8 && particleLife == 2 &&
 	    (allowEffect != 0 || damageAmount != 0) &&
 	    staType != 0x66 && staType != 0x67 && staType != 0x65) {
+		int tailNoGuard = (static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(
+			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C)))) >> 5) & 0xFF;
 		bonus(0x14, resolvedItemId, sourceObj);
 		sourceObj->bonus(0x10, resolvedItemId, this);
-		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
+		if (tailNoGuard == 0) {
 			sourceObj->bonus(0x0B, resolvedItemId, this);
 		}
 	}

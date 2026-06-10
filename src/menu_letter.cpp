@@ -694,7 +694,6 @@ int CMenuPcs::LetterCtrl()
 			int panelCount = GetLetterAnimStorage(this)->count;
 			s16* panel = GetLetterPanelBase(this);
 			int frame = static_cast<int>(*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x22));
-			done = 0;
 			for (int i = 0; i < panelCount; ++i, panel += 0x20) {
 				float f = FLOAT_803330bc;
 				if (frame >= *reinterpret_cast<int*>(panel + 0x12)) {
@@ -729,8 +728,8 @@ int CMenuPcs::LetterCtrl()
 			}
 		} else if (mode == 1) {
 			CCaravanWork::CLetterWork* letter = &GetLetterCaravanWork()->m_letters[s_SelLetter];
-			if (!letter->IsOpened()) {
-				letter->SetOpened();
+			if (!letter->FlagsBits().m_opened) {
+				letter->FlagsBits().m_opened = 1;
 			}
 
 			*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x22) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x22) + 1;
@@ -863,7 +862,6 @@ int CMenuPcs::LetterCtrl()
 			int panelCount = static_cast<int>(GetLetterAnimStorage(this)->count);
 			s16* panel = GetLetterPanelBase(this);
 			int frame = static_cast<int>(*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x22));
-			done = 0;
 			for (int i = 0; i < panelCount; ++i, panel += 0x20) {
 				float f = FLOAT_803330bc;
 				if (frame >= *reinterpret_cast<int*>(panel + 0x12)) {
@@ -901,7 +899,17 @@ int CMenuPcs::LetterCtrl()
 			}
 		} else if (mode == 1) {
 			signed char action = *reinterpret_cast<signed char*>(state + 8);
-			if (action < 1) {
+			if (action > 0) {
+				if (action == 1) {
+					*reinterpret_cast<s16*>(state + 0x30) = 2;
+				} else if (action == 2) {
+					*reinterpret_cast<s16*>(state + 0x28) = static_cast<s16>(done);
+					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x30) = 3;
+				}
+				*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = 0;
+				*reinterpret_cast<unsigned char*>(GetLetterStateBase(this) + 8) = 0;
+				*reinterpret_cast<unsigned char*>(GetLetterStateBase(this) + 0xC) = 0;
+			} else {
 				*reinterpret_cast<s16*>(state + 0x22) = *reinterpret_cast<s16*>(state + 0x22) + 1;
 				int panelCount = static_cast<int>(GetLetterAnimStorage(this)->count);
 				s16* panel = GetLetterPanelBase(this);
@@ -923,7 +931,7 @@ int CMenuPcs::LetterCtrl()
 							if ((*reinterpret_cast<unsigned int*>(panel + 0x16) & 2) == 0) {
 								f = static_cast<float>(DOUBLE_803330e8 -
 								                       (DOUBLE_803330e8 / static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(panel + 0x14)))) *
-								                           static_cast<double>(static_cast<float>(*reinterpret_cast<unsigned int*>(panel + 0x10))));
+								                           static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(panel + 0x10))));
 								float dx = (*reinterpret_cast<float*>(panel + 0x1C) - static_cast<float>(panel[0])) * f;
 								float dy = (*reinterpret_cast<float*>(panel + 0x1E) - static_cast<float>(panel[1])) * f;
 								*reinterpret_cast<float*>(panel + 0x18) = dx;
@@ -967,25 +975,19 @@ int CMenuPcs::LetterCtrl()
 					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = 0;
 					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x30) = 0;
 				}
-			} else {
-				if (action == 1) {
-					*reinterpret_cast<s16*>(state + 0x30) = 2;
-				} else if (action == 2) {
-					*reinterpret_cast<s16*>(state + 0x28) = 0;
-					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x30) = 3;
-				}
-				*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = 0;
-				*reinterpret_cast<unsigned char*>(GetLetterStateBase(this) + 8) = 0;
-				*reinterpret_cast<unsigned char*>(GetLetterStateBase(this) + 0xC) = 0;
 			}
 			*reinterpret_cast<unsigned char*>(GetLetterStateBase(this) + 8) = 0;
 		} else if (mode == 2) {
 			if (m_menuWindowInfo->state == 3) {
-				*reinterpret_cast<char*>(GetLetterStateBase(this) + 0xC) = 0;
-				if (*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 8) <= 0) {
-					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x30) = 1;
+				*reinterpret_cast<char*>(state + 0xC) = static_cast<char>(done);
+				done = 1;
+			}
+			if (done != 0) {
+				int st = GetLetterStateBase(this);
+				if (*reinterpret_cast<signed char*>(st + 8) > 0) {
+					*reinterpret_cast<s16*>(st + 0x30) = 3;
 				} else {
-					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x30) = 3;
+					*reinterpret_cast<s16*>(st + 0x30) = 1;
 				}
 				*reinterpret_cast<unsigned char*>(GetLetterStateBase(this) + 8) = 0;
 				*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = 0;
@@ -994,21 +996,29 @@ int CMenuPcs::LetterCtrl()
 			}
 		} else if (mode == 3) {
 			if (m_menuWindowInfo->state == 3) {
-				*reinterpret_cast<char*>(GetLetterStateBase(this) + 0xC) = 0;
-				if (*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 8) <= 0) {
-					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x30) = 1;
+				*reinterpret_cast<char*>(state + 0xC) = static_cast<char>(done);
+				done = 1;
+			}
+			if (done != 0) {
+				int st = GetLetterStateBase(this);
+				if (*reinterpret_cast<signed char*>(st + 8) < 1) {
+					*reinterpret_cast<s16*>(st + 0x30) = 1;
 					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = 1;
 				} else {
-					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x30) = 4;
+					*reinterpret_cast<s16*>(st + 0x30) = 4;
 					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = 0;
 				}
 				*reinterpret_cast<char*>(GetLetterStateBase(this) + 0xC) = 0;
 			}
 		} else if (mode == 4) {
 			if (m_menuWindowInfo->state == 3) {
-				*reinterpret_cast<char*>(GetLetterStateBase(this) + 0xC) = 0;
-				if (*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 8) <= 0) {
-					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x30) = 3;
+				*reinterpret_cast<char*>(state + 0xC) = static_cast<char>(done);
+				done = 1;
+			}
+			if (done != 0) {
+				int st = GetLetterStateBase(this);
+				if (*reinterpret_cast<signed char*>(st + 8) < 1) {
+					*reinterpret_cast<s16*>(st + 0x30) = 3;
 					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = 0;
 					*reinterpret_cast<char*>(GetLetterStateBase(this) + 0xC) = 0;
 					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28) = static_cast<s16>(s_ReplyPos);
@@ -1038,7 +1048,7 @@ int CMenuPcs::LetterCtrl()
 						}
 						*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x22) = 0;
 					} else {
-						*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x30) = 5;
+						*reinterpret_cast<s16*>(st + 0x30) = 5;
 						*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = 0;
 					}
 					*reinterpret_cast<char*>(GetLetterStateBase(this) + 0xC) = 0;
@@ -1046,9 +1056,13 @@ int CMenuPcs::LetterCtrl()
 			}
 		} else if (mode == 5) {
 			if (m_menuWindowInfo->state == 3) {
-				*reinterpret_cast<char*>(GetLetterStateBase(this) + 0xC) = 0;
-				if (*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 8) <= 0) {
-					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x30) = 3;
+				*reinterpret_cast<char*>(state + 0xC) = static_cast<char>(done);
+				done = 1;
+			}
+			if (done != 0) {
+				int st = GetLetterStateBase(this);
+				if (*reinterpret_cast<signed char*>(st + 8) < 1) {
+					*reinterpret_cast<s16*>(st + 0x30) = 3;
 					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = 0;
 					*reinterpret_cast<char*>(GetLetterStateBase(this) + 0xC) = 0;
 					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28) = static_cast<s16>(s_ReplyPos);
@@ -2253,7 +2267,7 @@ int CMenuPcs::LetterCtrlCur()
 		}
 		if ((press & 0x100) != 0) {
 			s16 sel = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28);
-			if ((static_cast<int>(*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 9)) & (1 << (sel + 1))) != 0) {
+			if ((static_cast<int>(*reinterpret_cast<unsigned char*>(GetLetterStateBase(this) + 9)) & (1 << (sel + 1))) != 0) {
 				if (sel == 0) {
 					char* letterBytes = reinterpret_cast<char*>(caravanWork) + s_SelLetter * 0xC;
 					int value = reinterpret_cast<CCaravanWork::CLetterWork*>(letterBytes + 0x3EC)->AttachmentValue();
@@ -2430,7 +2444,7 @@ int CMenuPcs::LetterCtrlCur()
 	}
 
 	if ((hold & 0xC) != 0) {
-		*reinterpret_cast<u16*>(GetLetterStateBase(this) + 0x28) ^= 1;
+		*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28) ^= 1;
 		Sound.PlaySe(1, 0x40, 0x7F, 0);
 		return 0;
 	}

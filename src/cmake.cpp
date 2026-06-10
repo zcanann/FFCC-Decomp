@@ -1866,32 +1866,40 @@ void CMenuPcs::CmakeJobClose()
  */
 int CMenuPcs::CmakeJobCtrl()
 {
-    unsigned short down;
-    unsigned short repeat;
+    short repeat;
+    short down;
 
     bool padBusy = false;
     int padLock = Pad.m_debugPadLock;
     if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
         padBusy = true;
     }
-    if (padBusy) {
-        down = 0;
-    } else {
-        int padIndex = 0;
-        padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-        down = Pad.GetPadInputs()[padIndex].buttonDown[0];
+    {
+        unsigned short held;
+        if (padBusy) {
+            held = 0;
+        } else {
+            int padIndex = 0;
+            padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+            held = Pad.GetPadInputs()[padIndex].buttonDown[0];
+        }
+        down = static_cast<short>(held);
     }
 
     padBusy = false;
     if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
         padBusy = true;
     }
-    if (padBusy) {
-        repeat = 0;
-    } else {
-        int padIndex = 0;
-        padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-        repeat = Pad.GetPadInputs()[padIndex].repeatButton;
+    {
+        unsigned short held;
+        if (padBusy) {
+            held = 0;
+        } else {
+            int padIndex = 0;
+            padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+            held = Pad.GetPadInputs()[padIndex].repeatButton;
+        }
+        repeat = static_cast<short>(held);
     }
 
     if (repeat == 0) {

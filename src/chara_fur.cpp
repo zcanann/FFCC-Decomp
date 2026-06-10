@@ -2377,7 +2377,15 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 				continue;
 			}
 
-			distance = (dx < 0 ? -dx : dx) + (dy < 0 ? -dy : dy);
+			int adx = dx;
+			if (adx < 0) {
+				adx = -adx;
+			}
+			int ady = dy;
+			if (ady < 0) {
+				ady = -ady;
+			}
+			distance = adx + ady;
 			unsigned int ux = px;
 			unsigned int uy = py;
 			tileIndex = ((ux & 3) + ((uy & 3) * 4) + (ux >> 2) * 0x10 + (uy >> 2) * width * 4) * 2;

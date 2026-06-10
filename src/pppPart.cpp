@@ -2617,12 +2617,13 @@ int pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, floa
 
 	if (kPppPartZero != cylScale)
 	{
+		u32 cylinderAttribute = hitRaw->m_cylinderAttribute;
 		CMapCylinder cylinder(kMapHitBoundsMinInit, kMapHitBoundsMaxInit);
 		cylinder.m_bottom = *origin;
 		cylinder.m_axis = *vector;
-		cylinder.m_radius = radius;
+		cylinder.m_radius = cylScale;
 
-		if (MapMng.CheckHitCylinder(&cylinder, vector, hitRaw->m_cylinderAttribute) != 0)
+		if (MapMng.CheckHitCylinder(&cylinder, vector, cylinderAttribute) != 0)
 		{
 			if (Game.m_currentSceneId == 7)
 			{
@@ -2704,6 +2705,7 @@ int pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, floa
 						int newCount = hitRaw->m_hitParams.m_hitObjectCount;
 						if (previousCount != newCount)
 						{
+							previousCount = newCount;
 							int updatedSlot;
 							for (updatedSlot = 0; updatedSlot < newCount; updatedSlot++)
 							{
@@ -2712,7 +2714,6 @@ int pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, floa
 									break;
 								}
 							}
-							previousCount = newCount;
 							if (updatedSlot < newCount)
 							{
 								break;

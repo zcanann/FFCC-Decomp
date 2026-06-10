@@ -2155,8 +2155,8 @@ void CChara::makeFurTex()
 		for (unsigned int hair = 0; hair < 0x4000; hair++) {
 			GXBegin(GX_LINESTRIP, GX_VTXFMT0, 5);
 
-			float rootX = kCharaFurDepthScaleBase * (FLOAT_80331164 * static_cast<float>(FurRandNext()) + kCharaFurViewDepthThreshold);
-			float rootZ = kCharaFurDepthScaleBase * (FLOAT_80331164 * static_cast<float>(FurRandNext()) + kCharaFurViewDepthThreshold);
+			float rootX = kCharaFurDepthScaleBase * (FLOAT_80331164 * static_cast<float>(static_cast<int>(FurRandNext())) + kCharaFurViewDepthThreshold);
+			float rootZ = kCharaFurDepthScaleBase * (FLOAT_80331164 * static_cast<float>(static_cast<int>(FurRandNext())) + kCharaFurViewDepthThreshold);
 			CVector root(rootX, kCharaFurDepthZero, rootZ);
 
 			s_mogFurRand = s_mogFurRand * 0x41C64E6D + 0x3039;

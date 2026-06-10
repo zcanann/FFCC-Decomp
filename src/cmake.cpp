@@ -3927,17 +3927,18 @@ void CMenuPcs::CalcSingCMake()
                         CmakeState(this)->m_resultDir = 1;
                         Sound.PlaySe(2, 0x40, 0x7F, 0);
                         done = 1;
-                    } else if ((down & 0x200) != 0) {
+                        goto case2_out;
+                    }
+                    if ((down & 0x200) != 0) {
                         CmakeState(this)->m_resultDir = -1;
                         Sound.PlaySe(3, 0x40, 0x7F, 0);
                         done = 1;
-                    } else {
-                        done = 0;
+                        goto case2_out;
                     }
-                } else {
-                    done = 0;
                 }
+                done = 0;
             }
+        case2_out:
             result = done;
         } else {
             int done;

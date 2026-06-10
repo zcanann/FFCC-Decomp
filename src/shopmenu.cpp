@@ -3075,7 +3075,6 @@ void CShopMenu::Calc()
     int mode = m_mode;
     int& timer = m_timer;
     int& subMode = m_subMode;
-    int& shopMode = m_listType;
     unsigned char& choice = m_topChoice;
 
     switch (mode) {

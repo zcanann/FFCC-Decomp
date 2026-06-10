@@ -27,15 +27,6 @@ extern const char s_CPtrArrayFile[];
 #include <string.h>
 #include <PowerPC_EABI_Support/Runtime/New.h>
 
-static const float kMapObjBoundMinInit = 10000000000.0f;
-static const float kMapObjBoundMaxInit = -10000000000.0f;
-static const float kMapObjZero = 1.0f;
-static const float kMapObjOne = 0.0f;
-static const float kMapObjInitNegOne = 1000000000000000.0f;
-static const float kMapObjColorBlendScale = 255.0f;
-static const float kMapObjDegToRad = 0.017453292f;
-static const float kMapObjInitValue50 = -1.0f;
-static const float kMapObjDefaultAngle = 48.0f;
 extern const char s_mapobj_cpp[] = "mapobj.cpp";
 extern const char sMapObjScaleWithoutNameWarn[0x78] = {
     (char)0x83, (char)0x47, (char)0x83, (char)0x89, (char)0x81, (char)0x5b, (char)0x81, (char)0x49,
@@ -256,6 +247,8 @@ int CPtrArray<CMapShadow*>::setSize(unsigned long newSize)
  */
 CBound::CBound()
 {
+    extern const float kMapObjBoundMinInit;
+    extern const float kMapObjBoundMaxInit;
     float max = kMapObjBoundMaxInit;
     float min = kMapObjBoundMinInit;
 
@@ -311,6 +304,9 @@ CMapObj::~CMapObj()
  */
 void CMapObj::Init()
 {
+    extern const float kMapObjOne;
+    extern const float kMapObjInitNegOne;
+    extern const float kMapObjInitValue50;
     m_calcMtxPending = 1;
     m_localMtxDirty = 1;
     m_parent = 0;
@@ -407,6 +403,9 @@ inline CMapObjAtrMeshName::CMapObjAtrMeshName()
  */
 int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
 {
+    extern const float kMapObjZero;
+    extern const float kMapObjOne;
+    extern const float kMapObjDefaultAngle;
     enum {
         CHUNK_AMBI = 0x414D4249,
         CHUNK_ANIM = 0x414E494D,
@@ -1003,6 +1002,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
  */
 void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
 {
+    extern const float kMapObjDegToRad;
     Mtx mtx2;
     Mtx mtx1;
     Mtx mtx0;
@@ -1373,6 +1373,7 @@ void CMapObj::SetLink()
 
 static inline void calcRunningColorKeyFrame(CMapKeyFrame* keyFrame, _GXColor& out, _GXColor* colors)
 {
+    extern const float kMapObjColorBlendScale;
     float blend;
     int key0;
     int key1;
@@ -1399,6 +1400,7 @@ static inline void calcRunningColorKeyFrame(CMapKeyFrame* keyFrame, _GXColor& ou
 
 static inline void calcColorKeyFrame(CMapKeyFrame* keyFrame, _GXColor& out, _GXColor* colors)
 {
+    extern const float kMapObjColorBlendScale;
     if (keyFrame->IsRun() == 0) {
         return;
     }
@@ -1438,6 +1440,8 @@ static inline void calcColorKeyFrame(CMapKeyFrame* keyFrame, _GXColor& out, _GXC
  */
 void CMapObj::Calc()
 {
+    extern const float kMapObjOne;
+    extern const float kMapObjInitNegOne;
     Vec delta;
     Vec posCam;
     Vec pos;
@@ -1608,6 +1612,7 @@ void CMapObj::SetDrawEnv()
  */
 void CMapObj::Draw(unsigned char priority)
 {
+    extern const float kMapObjOne;
     if (m_drawPriority != priority) {
         return;
     }
@@ -1770,6 +1775,9 @@ void CMapObj::DrawHitNormal()
  */
 int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long mask)
 {
+    extern const float kMapObjBoundMinInit;
+    extern const float kMapObjBoundMaxInit;
+    extern const float kMapObjZero;
     if ((m_mapDataType == 2) && (m_mapData != 0) && (m_octTreeIndex == -1)) {
         Mtx inverseMtx;
 
@@ -1878,6 +1886,9 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
  */
 void CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned long mask)
 {
+    extern const float kMapObjBoundMinInit;
+    extern const float kMapObjBoundMaxInit;
+    extern const float kMapObjZero;
     if ((m_mapDataType == 2) && (m_mapData != 0) && (m_octTreeIndex == -1)) {
         Mtx inverseMtx;
         Vec localMove;
@@ -2138,3 +2149,13 @@ CMapObjAtrPointLight::~CMapObjAtrPointLight()
 CMapObjAtrMeshName::~CMapObjAtrMeshName()
 {
 }
+
+extern const float kMapObjBoundMinInit = 10000000000.0f;
+extern const float kMapObjBoundMaxInit = -10000000000.0f;
+extern const float kMapObjZero = 1.0f;
+extern const float kMapObjOne = 0.0f;
+extern const float kMapObjInitNegOne = 1000000000000000.0f;
+extern const float kMapObjColorBlendScale = 255.0f;
+extern const float kMapObjDegToRad = 0.017453292f;
+extern const float kMapObjDefaultAngle = 48.0f;
+extern const float kMapObjInitValue50 = -1.0f;

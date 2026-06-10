@@ -67,10 +67,11 @@ class CMapObjAtrSpotLight : public CMapObjAtr
 public:
     CMapObjAtrSpotLight()
     {
+        extern const float kMapObjOne;
         m_type = SPOT_LIGHT;
         m_light = 0;
-        m_falloff = 1.0f;
-        m_intensity = 1.0f;
+        m_falloff = kMapObjOne;
+        m_intensity = kMapObjOne;
         m_colorMode = 0;
         m_useAltColor = 0;
         m_keyFrameCount = 0;

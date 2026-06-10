@@ -4456,11 +4456,11 @@ foundMng:
     } else {
         unsigned char* mngB = reinterpret_cast<unsigned char*>(mng);
         *reinterpret_cast<int*>(mngB + 0x18) =
-            static_cast<int>(createParam->m_rotationPtr->x * 65536.0f / 360.0f);
+            static_cast<int>(32768.0f * createParam->m_rotationPtr->x / 180.0f);
         *reinterpret_cast<int*>(mngB + 0x1C) =
-            static_cast<int>(createParam->m_rotationPtr->y * 65536.0f / 360.0f);
+            static_cast<int>(32768.0f * createParam->m_rotationPtr->y / 180.0f);
         *reinterpret_cast<int*>(mngB + 0x20) =
-            static_cast<int>(createParam->m_rotationPtr->z * 65536.0f / 360.0f);
+            static_cast<int>(32768.0f * createParam->m_rotationPtr->z / 180.0f);
     }
 
     if (createParam->m_scalePtr == 0) {

@@ -1321,6 +1321,8 @@ void CMemoryCardMan::SetLoadData()
     gameWork->m_spModeFlags[2] = MakeLoadBool(static_cast<s8>(save[0x13E3]));
     gameWork->m_spModeFlags[3] = MakeLoadBool(static_cast<s8>(save[0x13E4]));
 
+    u8* letterSrc;
+    u8* letterDst;
     int count;
     int i;
     for (int c = 0; c < 8; c++)
@@ -1382,8 +1384,8 @@ void CMemoryCardMan::SetLoadData()
         caravanWork->m_gil = *reinterpret_cast<int*>(src + 0xEC);
         memcpy(caravanWork->m_name, src + 0xF0, 0x10);
         caravanWork->m_letterCount = *reinterpret_cast<int*>(src + 0x100);
-        u8* letterSrc = src;
-        u8* letterDst = reinterpret_cast<u8*>(caravanWork);
+        letterSrc = src;
+        letterDst = reinterpret_cast<u8*>(caravanWork);
         for (count = 0; count < 100; count++)
         {
             reinterpret_cast<CCaravanWork::CLetterWork*>(letterDst + 0x3EC)->FlagsBits().m_attachmentIsGil =
@@ -1506,6 +1508,8 @@ void CMemoryCardMan::MakeSaveData()
     saveDat->m_rotateKey = static_cast<u8>(Math.Rand(0xFF));
     saveDat->m_flags = 0;
 
+    u8* letterSrc;
+    u8* letterDst;
     CGame::CGameWork* gameWork = &Game.m_gameWork;
     CGame* g = &Game;
     for (int i = 0; i < 4; i++)
@@ -1600,8 +1604,8 @@ void CMemoryCardMan::MakeSaveData()
         *reinterpret_cast<u32*>(dst + 0xEC) = caravanWork->m_gil;
         memcpy(dst + 0xF0, caravanWork->m_name, 0x10);
         *reinterpret_cast<u32*>(dst + 0x100) = caravanWork->m_letterCount;
-        u8* letterSrc = reinterpret_cast<u8*>(caravanWork);
-        u8* letterDst = dst;
+        letterSrc = reinterpret_cast<u8*>(caravanWork);
+        letterDst = dst;
         for (int letter = 0; letter < 100; letter++)
         {
             reinterpret_cast<CCaravanWork::CLetterWork*>(letterDst + 0x104)->FlagsBits().m_attachmentIsGil =

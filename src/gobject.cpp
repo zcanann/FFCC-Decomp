@@ -1225,6 +1225,7 @@ static inline int checkProbeHit(CMapCylinder* cylinder, CVector* base, CVector* 
 #pragma push
 #pragma optimization_level 1
 #pragma opt_common_subs off
+#pragma global_optimizer off
 void CGObject::bgAttribCollision()
 {
     if (!HasLoadedModel(m_charaModelHandle)) {

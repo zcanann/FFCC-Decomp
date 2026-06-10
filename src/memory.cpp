@@ -1703,8 +1703,8 @@ found:
         return -1;
     }
 
-    CAmemCache& entry = cacheEntryAt(this, index);
     int allocSize = (static_cast<unsigned int>(size) + 0x1F) & ~0x1F;
+    CAmemCache& entry = *reinterpret_cast<CAmemCache*>(reinterpret_cast<char*>(m_cacheTable) + index * sizeof(CAmemCache));
     entry.m_inUse = 1;
     entry.m_type = static_cast<unsigned char>(type);
     entry.m_dmaCopy = static_cast<unsigned char>(dmaCopy);

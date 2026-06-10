@@ -1713,6 +1713,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 				object->m_sp += 2;
 			} else {
 				unsigned int* frameBase = object->m_sp + (-3 - static_cast<int>(arg & 0xFFFF));
+				u8* classData = reinterpret_cast<u8*>(intToClass(static_cast<int>(*frameBase)));
 				frameBase[1] = reinterpret_cast<u32>(object->m_thisBase);
 				u32 classIndex = 0xFFFF;
 				if (object->m_classIndex >= 0) {
@@ -1720,7 +1721,6 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 				}
 				frameBase[2] = (static_cast<u32>(*reinterpret_cast<s16*>(reinterpret_cast<u8*>(object->m_engineObject) + 0x30)) << 16)
 				               | classIndex;
-				u8* classData = reinterpret_cast<u8*>(intToClass(static_cast<int>(*frameBase)));
 				object->m_thisBase = reinterpret_cast<unsigned int*>(*reinterpret_cast<unsigned int*>(classData));
 				object->m_classIndex = *reinterpret_cast<s16*>(classData + 0x14);
 				object->m_engineObject = classData;
@@ -1780,9 +1780,9 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			CodeWord argCount;
 			CodeWord prevCodePos;
 			prevCodePos.u = object->m_codePos;
-			const int prevActive = object->m_flagBits.m_callFlag;
 			unsigned int* const prevLocalBase = object->m_localBase;
 			const int prevWaitCounter = object->m_waitCounter;
+			const int prevActive = object->m_flagBits.m_callFlag;
 			const int prevReqFlags = *reinterpret_cast<int*>(&object->m_reqFlag0);
 			const int prevArgCount = object->m_argCount;
 
@@ -1866,9 +1866,9 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			CodeWord argCount;
 			CodeWord prevCodePos;
 			prevCodePos.u = newObject->m_codePos;
-			const int prevActive = newObject->m_flagBits.m_callFlag;
 			unsigned int* const prevLocalBase = newObject->m_localBase;
 			const int prevWaitCounter = newObject->m_waitCounter;
+			const int prevActive = newObject->m_flagBits.m_callFlag;
 			const int prevReqFlags = *reinterpret_cast<int*>(&newObject->m_reqFlag0);
 			const int prevArgCount = newObject->m_argCount;
 

@@ -609,10 +609,12 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
         baseDir.x = pYmMegaBirthShpTail3->m_matrix[2][0];
         baseDir.y = pYmMegaBirthShpTail3->m_matrix[2][1];
         baseDir.z = pYmMegaBirthShpTail3->m_matrix[2][2];
-        angles[0] = (s32)((float)((s32)(spreadRange * Math.RandF() - spread) << 15) / kPppYmMegaBirthShpTail3HalfTurnDegrees);
-        angles[1] = (s32)((float)((s32)(spreadRange * Math.RandF() - spread) << 15) / kPppYmMegaBirthShpTail3HalfTurnDegrees);
-        angles[2] = (s32)((float)((s32)(spreadRange * Math.RandF() - spread) << 15) / kPppYmMegaBirthShpTail3HalfTurnDegrees);
-        angles[3] = 0;
+        angles[0] = (s32)(spreadRange * Math.RandF() - spread);
+        angles[0] = (s32)((float)(angles[0] << 15) / kPppYmMegaBirthShpTail3HalfTurnDegrees);
+        angles[1] = (s32)(spreadRange * Math.RandF() - spread);
+        angles[1] = (s32)((float)(angles[1] << 15) / kPppYmMegaBirthShpTail3HalfTurnDegrees);
+        angles[2] = (s32)(spreadRange * Math.RandF() - spread);
+        angles[2] = (s32)((float)(angles[2] << 15) / kPppYmMegaBirthShpTail3HalfTurnDegrees);
         if ((paramBytes[0x18] == 2) || (paramBytes[0x18] == 3)) {
             angles[0] = 0;
             angles[1] = 0;

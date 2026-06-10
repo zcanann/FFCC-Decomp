@@ -2037,8 +2037,9 @@ void CChara::makeFurTex()
 	s_mogFurMaxY = 0.0f;
 
 	for (int i = 0; i < 0x20; i++) {
+		float velRandScale = FurRandScale();
 		CVector velScaleOut;
-		PSVECScale(&velRand, velScaleOut, FurRandScale());
+		PSVECScale(&velRand, velScaleOut, velRandScale);
 		Vec velScaled;
 		velScaled.x = velScaleOut.x;
 		velScaled.y = velScaleOut.y;
@@ -2049,8 +2050,9 @@ void CChara::makeFurTex()
 		hairSet[i].m_vec0.y = velAddOut.y;
 		hairSet[i].m_vec0.z = velAddOut.z;
 
+		float accelRandScale = FurRandScale();
 		CVector accelScaleOut;
-		PSVECScale(&accelRand, accelScaleOut, FurRandScale());
+		PSVECScale(&accelRand, accelScaleOut, accelRandScale);
 		Vec accelScaled;
 		accelScaled.x = accelScaleOut.x;
 		accelScaled.y = accelScaleOut.y;

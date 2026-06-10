@@ -915,7 +915,7 @@ void CGObject::bgNormalCollision()
     Vec pos = m_worldPosition;
     pos.y += sStepProbeHeight + m_capsuleHalfHeight;
 
-    int retry = 4;
+    unsigned int retry = 4;
     const double epsilon = DOUBLE_80330400;
     do {
         const unsigned long hitMask = m_bgHitMask;
@@ -953,19 +953,23 @@ void CGObject::bgNormalCollision()
     }
 
     PSVECAdd(&pos, &move, &pos);
-    move.x = sZeroFloat;
     move.y = m_groundHitOffset.y - sStepProbeHeight;
+    move.x = sZeroFloat;
     move.z = sZeroFloat;
 
-    CMapCylinder stepCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
-    stepCylinder.m_bottom = pos;
-    stepCylinder.m_axis.x = sZeroFloat;
-    stepCylinder.m_axis.z = sZeroFloat;
-    stepCylinder.m_axis.y = move.y;
-    stepCylinder.m_radius = m_capsuleHalfHeight;
+    {
+        const unsigned long stepHitMask = m_bgHitMask;
+        const float stepRadius = m_capsuleHalfHeight;
+        CMapCylinder stepCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
+        stepCylinder.m_bottom = pos;
+        stepCylinder.m_axis.x = sZeroFloat;
+        stepCylinder.m_axis.y = move.y;
+        stepCylinder.m_axis.z = sZeroFloat;
+        stepCylinder.m_radius = stepRadius;
 
-    if (MapMng.CheckHitCylinderNear(&stepCylinder, &move, m_bgHitMask) == 0) {
-        goto stepMiss;
+        if (MapMng.CheckHitCylinderNear(&stepCylinder, &move, stepHitMask) == 0) {
+            goto stepMiss;
+        }
     }
 
     if ((MapMng.GetMapIdGrpArray()[gMapHitFace->m_groupIndex].m_mask & 0x20) == 0) {
@@ -980,12 +984,14 @@ void CGObject::bgNormalCollision()
     }
 
     if (MapMng.m_hitMapObj->CalcHitSlide(&move, sBgAttrNormal) != 0) {
+        const unsigned long slideHitMask = m_bgHitMask;
+        const float slideRadius = m_capsuleHalfHeight;
         CMapCylinder hitCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
         hitCylinder.m_bottom = pos;
         hitCylinder.m_axis = move;
-        hitCylinder.m_radius = m_capsuleHalfHeight;
+        hitCylinder.m_radius = slideRadius;
 
-        if (MapMng.CheckHitCylinderNear(&hitCylinder, &move, m_bgHitMask) != 0) {
+        if (MapMng.CheckHitCylinderNear(&hitCylinder, &move, slideHitMask) != 0) {
             Vec hitPos;
             MapMng.m_hitMapObj->CalcHitPosition(&hitPos);
             PSVECSubtract(&hitPos, &pos, &move);

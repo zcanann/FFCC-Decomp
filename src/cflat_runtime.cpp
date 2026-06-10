@@ -172,7 +172,6 @@ void CFlatRuntime::Destroy()
 void CFlatRuntime::clear()
 {
 	u8* const self = reinterpret_cast<u8*>(this);
-	const u32 clearMaskBits = static_cast<u32>(-1);
 
 	*reinterpret_cast<void**>(self + 0x08) = 0;
 	m_funcs = 0;
@@ -189,10 +188,8 @@ void CFlatRuntime::clear()
 	m_vstrBlob = 0;
 	m_vstrCount = 0;
 
-	*reinterpret_cast<short*>(self + 0x964) =
-	    static_cast<short>(__rlwimi(*reinterpret_cast<short*>(self + 0x964), clearMaskBits, 4, 16, 27));
-	*reinterpret_cast<short*>(self + 0x968) =
-	    static_cast<short>(__rlwimi(*reinterpret_cast<short*>(self + 0x968), clearMaskBits, 4, 16, 27));
+	m_currentCodeIndex.m_codeFunc = -1;
+	m_previousCodeIndex.m_codeFunc = -1;
 
 	m_objectSentinel.m_previous = &m_objectSentinel;
 	m_objectSentinel.m_next = &m_objectSentinel;
@@ -205,31 +202,28 @@ void CFlatRuntime::clear()
 	m_objectFreeListHead = reinterpret_cast<void**>(self + 0x998);
 	m_objectPoolBase = self + 0x1288;
 
-	u8* const freeNodes = self + 0x998;
+	u8* node = self;
+	int idx = 0;
 	for (int block = 0; block < 0x30; block++) {
-		const int baseIndex = block * 3;
-		u8* const node = freeNodes + block * 0x30;
+		*reinterpret_cast<void**>(node + 0x998) =
+		    (idx == 0) ? (self + 0x988) : (self + ((idx - 1) * 0x10) + 0x998);
+		*reinterpret_cast<void**>(node + 0x99C) =
+		    (idx == 0x8F) ? (self + 0x988) : (self + ((idx + 1) * 0x10) + 0x998);
+		idx++;
 
-		*reinterpret_cast<void**>(node + 0x00) =
-		    (baseIndex == 0) ? static_cast<void*>(&m_objectPoolBase)
-		                     : static_cast<void*>(freeNodes + (baseIndex - 1) * 0x10);
-		*reinterpret_cast<void**>(node + 0x04) =
-		    (baseIndex == 0x8F) ? static_cast<void*>(&m_objectPoolBase)
-		                        : static_cast<void*>(freeNodes + (baseIndex + 1) * 0x10);
+		*reinterpret_cast<void**>(node + 0x9A8) =
+		    (idx == 0) ? (self + 0x988) : (self + ((idx - 1) * 0x10) + 0x998);
+		*reinterpret_cast<void**>(node + 0x9AC) =
+		    (idx == 0x8F) ? (self + 0x988) : (self + ((idx + 1) * 0x10) + 0x998);
+		idx++;
 
-		*reinterpret_cast<void**>(node + 0x10) =
-		    ((baseIndex + 1) == 0) ? static_cast<void*>(&m_objectPoolBase)
-		                           : static_cast<void*>(freeNodes + baseIndex * 0x10);
-		*reinterpret_cast<void**>(node + 0x14) =
-		    ((baseIndex + 1) == 0x8F) ? static_cast<void*>(&m_objectPoolBase)
-		                              : static_cast<void*>(freeNodes + (baseIndex + 2) * 0x10);
+		*reinterpret_cast<void**>(node + 0x9B8) =
+		    (idx == 0) ? (self + 0x988) : (self + ((idx - 1) * 0x10) + 0x998);
+		*reinterpret_cast<void**>(node + 0x9BC) =
+		    (idx == 0x8F) ? (self + 0x988) : (self + ((idx + 1) * 0x10) + 0x998);
+		idx++;
 
-		*reinterpret_cast<void**>(node + 0x20) =
-		    ((baseIndex + 2) == 0) ? static_cast<void*>(&m_objectPoolBase)
-		                           : static_cast<void*>(freeNodes + (baseIndex + 1) * 0x10);
-		*reinterpret_cast<void**>(node + 0x24) =
-		    ((baseIndex + 2) == 0x8F) ? static_cast<void*>(&m_objectPoolBase)
-		                              : static_cast<void*>(freeNodes + (baseIndex + 3) * 0x10);
+		node += 0x30;
 	}
 
 	memset(&m_performanceTotalTime, 0, sizeof(m_performanceTotalTime) + sizeof(m_performanceBlock));

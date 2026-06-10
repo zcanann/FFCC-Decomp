@@ -198,8 +198,20 @@ public:
     char m_name[0x80];              // 0x084C
     CObject m_objectSentinel;       // 0x08CC
     CObject m_freeObjectSentinel;   // 0x0918
-    u32 m_currentCodePos;           // 0x0964
-    u32 m_previousCodePos;          // 0x0968
+    union {
+        u32 m_currentCodePos;       // 0x0964
+        struct {
+            short m_codeFunc : 12;
+            int m_codeOffset : 20;
+        } m_currentCodeIndex;
+    };
+    union {
+        u32 m_previousCodePos;      // 0x0968
+        struct {
+            short m_codeFunc : 12;
+            int m_codeOffset : 20;
+        } m_previousCodeIndex;
+    };
     u8 m_pad_096C[4];               // 0x096C
     int m_0x970;                    // 0x0970
     int m_0x974;                    // 0x0974

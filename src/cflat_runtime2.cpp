@@ -1454,9 +1454,8 @@ void CFlatRuntime2::Draw()
 	font->SetTlut(7);
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 
-	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
 	for (CGObject* object = reinterpret_cast<CGObject*>(
-			 FindNextGBaseObjByCidMask(this, root->m_next->m_next, 5));
+			 FindNextGBaseObjByCidMask(this, m_objectSentinel.m_next->m_next, 5));
 		 object != 0;
 		 object = reinterpret_cast<CGObject*>(FindNextGBaseObjByCidMask(
 			 this, reinterpret_cast<CFlatRuntime::CObject*>(object)->m_next, 5))) {
@@ -1477,7 +1476,7 @@ void CFlatRuntime2::Draw()
 	font->DrawInit();
 
 	for (CGItemObj* item = reinterpret_cast<CGItemObj*>(
-			 FindNextGBaseObjByCidMask(this, root->m_next->m_next, 0x1D));
+			 FindNextGBaseObjByCidMask(this, m_objectSentinel.m_next->m_next, 0x1D));
 		 item != 0;
 		 item = reinterpret_cast<CGItemObj*>(FindNextGBaseObjByCidMask(
 			 this, reinterpret_cast<CFlatRuntime::CObject*>(item)->m_next, 0x1D))) {
@@ -1491,7 +1490,7 @@ void CFlatRuntime2::Draw()
 	GXSetProjection(projection2, GX_PERSPECTIVE);
 
 	Mtx cameraMtx;
-	PSMTXCopy(*reinterpret_cast<Mtx*>(CameraPcsRaw() + 0x10), cameraMtx);
+	PSMTXCopy(*reinterpret_cast<Mtx*>(CameraPcsRaw() + 0x4), cameraMtx);
 
 	_GXSetBlendMode((_GXBlendMode)1, (_GXBlendFactor)4, (_GXBlendFactor)5, (_GXLogicOp)1);
 	GXSetZCompLoc(GX_FALSE);
@@ -1519,18 +1518,14 @@ void CFlatRuntime2::Draw()
 		GXSetChanMatColor(GX_COLOR0A0, lineColor);
 		GXLoadPosMtxImm(cameraMtx, GX_PNMTX0);
 
-		CLine<64>* line = m_debugLines;
-		for (int i = 0; i < 0x10; i++) {
-			line->Draw();
-			line++;
+		for (u32 i = 0; i < 0x10; i++) {
+			m_debugLines[i].Draw();
 		}
 	}
 
-	const bool showDebugCC =
-		((RuntimeDebugFlags(runtime) & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) ||
-		((DbgMenuPcs.GetDbgFlagsRaw() & 0x80) != 0);
-	const int debugCount = DebugDrawCCCount(runtime);
-	if (showDebugCC && debugCount != 0) {
+	if ((((RuntimeDebugFlags(runtime) & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0)
+			|| ((DbgMenuPcs.GetDbgFlagsRaw() & 0x80) != 0))
+		&& DebugDrawCCCount(runtime) != 0) {
 		GXColor greenColor;
 		greenColor.r = 0x80;
 		greenColor.g = 0xFF;
@@ -1550,11 +1545,11 @@ void CFlatRuntime2::Draw()
 		float ringVerts[8][3];
 
 		CFlatRuntime2::CDebugDrawCC* entry = DebugDrawCCEntries(runtime);
-		for (int i = 0; i < debugCount; i++) {
+		for (int i = 0; i < DebugDrawCCCount(runtime); i++) {
 			GXColor* drawColor = &greenColor;
-			if (entry->m_flagBits.m_bit7 != 0) {
+			if (entry->m_flagBits.m_bit6 != 0) {
 				drawColor = &redColor;
-			} else if (entry->m_flagBits.m_bit6 != 0) {
+			} else if (entry->m_flagBits.m_bit7 != 0) {
 				drawColor = &blueColor;
 			}
 			GXSetChanMatColor(GX_COLOR0A0, *drawColor);

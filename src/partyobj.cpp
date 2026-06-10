@@ -2694,9 +2694,9 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 		rayDir.x = sinf(m_rotTargetY) * FLOAT_80331A98;
 		rayDir.y = FLOAT_80331a78;
 		rayDir.z = cosf(m_rotTargetY) * FLOAT_80331A98;
-		bool bossStage = false;
-		bool bossCid = false;
 		bool bossTarget = false;
+		bool bossStage = bossTarget;
+		bool bossCid = bossTarget;
 		if ((Game.m_gameWork.m_menuStageMode != 0) &&
 		    (Game.m_gameWork.m_bossArtifactStageIndex < 0x0F)) {
 			bossStage = true;

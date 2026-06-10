@@ -481,7 +481,7 @@ static int ResolveShopMenuItemNo(CShopMenu* shopMenu, int index)
 
 static int CalcShopMenuMakeGil(CShopMenu* shopMenu, int itemId)
 {
-    if (itemId < 1) {
+    if (itemId <= 0) {
         return 0;
     }
 
@@ -637,14 +637,15 @@ static void DrawShopMenuAmount(CFont* font, int value, float rightEdge, float y,
     MenuPcs.DrawInit();
 }
 
-static void DrawShopMenuAmountTrunc(CFont* font, int value, int rightEdge, float y, int tlut)
-{
-    char amountBuffer[64];
-    sprintf(amountBuffer, s_DecimalFormat_80332d14, value);
-    float amountWidth = font->GetWidth(amountBuffer);
-    MenuPcs.DrawNoShadowFont(font, amountBuffer, static_cast<float>(static_cast<int>(static_cast<float>(rightEdge) - amountWidth)), y, tlut, 0x12);
-    MenuPcs.DrawInit();
-}
+#define DrawShopMenuAmountTrunc(font, value, rightEdge, y, tlut)                                                       \
+    do {                                                                                                               \
+        char amountBuffer[64];                                                                                         \
+        sprintf(amountBuffer, s_DecimalFormat_80332d14, (value));                                                      \
+        float amountWidth = (font)->GetWidth(amountBuffer);                                                            \
+        MenuPcs.DrawNoShadowFont((font), amountBuffer,                                                                 \
+            static_cast<float>(static_cast<int>(static_cast<float>(rightEdge) - amountWidth)), (y), (tlut), 0x12);     \
+        MenuPcs.DrawInit();                                                                                            \
+    } while (0)
 
 static void DrawShopMenuRightAlignedText(CFont* font, const char* text, float rightEdge, float y, int tlut)
 {
@@ -1718,8 +1719,8 @@ void CShopMenu::DrawSoubiBase()
  */
 inline void CShopMenu::DrawObi(int)
 {
-    drawShapeSeq(5, 0, 0x32, 0x104, 0xFF, 0, 0, FLOAT_80332d9c, 0);
     int x = 0x32;
+    drawShapeSeq(5, 0, 0x32, 0x104, 0xFF, 0, 0, FLOAT_80332d9c, 0);
     do {
         x += 0x20;
         drawShapeSeq(6, 0, x, 0x104, 0xFF, 0, 0, FLOAT_80332d9c, 0);
@@ -2099,6 +2100,8 @@ void CShopMenu::DrawSoubi()
  * Address:	TODO
  * Size:	TODO
  */
+#pragma push
+#pragma opt_propagation off
 void CShopMenu::DrawMake()
 {
     DrawMakeBase();
@@ -2135,8 +2138,7 @@ void CShopMenu::DrawMake()
     MenuPcs.DrawInit();
 
     font->SetMargin(FLOAT_80332d28);
-    int makeItemNo = getItemNo(m_selectedIndex);
-    int makeGil = makeItemNo > 0 ? CalcShopMenuMakeGil(this, makeItemNo) : 0;
+    int makeGil = CalcShopMenuMakeGil(this, getItemNo(m_selectedIndex));
     SetupShopMenuUnitFont(font);
     float gilUnitWidth = font->GetWidth(ShopMenuMes(languageId, SHOP_MENU_TEXT_GIL));
 
@@ -2146,8 +2148,7 @@ void CShopMenu::DrawMake()
     DrawShopMenuAmountTrunc(amountFont, makeGil, makeAmountX, FLOAT_80332e18, 0x13);
 
     int gilAmountX = static_cast<int>(FLOAT_80332e1c - gilUnitWidth - FLOAT_80332d5c);
-    int makeItemNo2 = getItemNo(m_selectedIndex);
-    int makeGil2 = makeItemNo2 > 0 ? CalcShopMenuMakeGil(this, makeItemNo2) : 0;
+    int makeGil2 = CalcShopMenuMakeGil(this, getItemNo(m_selectedIndex));
     CCaravanWork* caravanWork = ShopMenuCaravanWork(this);
     int gilTlut = 2;
     if (makeGil2 <= caravanWork->m_gil) {
@@ -2314,6 +2315,7 @@ void CShopMenu::DrawMake()
 
     MenuPcs.DrawCursor(x - 0x24, m_yesNo * 0x18 + 0x14C, FLOAT_80332d28);
 }
+#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x80154E98

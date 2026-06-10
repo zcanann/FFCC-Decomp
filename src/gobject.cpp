@@ -915,15 +915,17 @@ void CGObject::bgNormalCollision()
     Vec pos = m_worldPosition;
     pos.y += sStepProbeHeight + m_capsuleHalfHeight;
 
-    unsigned int retry = 4;
+    int retry = 4;
     const double epsilon = DOUBLE_80330400;
-    while (retry != 0) {
+    do {
+        const unsigned long hitMask = m_bgHitMask;
+        const float radius = m_capsuleHalfHeight;
         CMapCylinder bodyCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
         bodyCylinder.m_bottom = pos;
         bodyCylinder.m_axis = move;
-        bodyCylinder.m_radius = m_capsuleHalfHeight;
+        bodyCylinder.m_radius = radius;
 
-        if (MapMng.CheckHitCylinderNear(&bodyCylinder, &move, m_bgHitMask) == 0) {
+        if (MapMng.CheckHitCylinderNear(&bodyCylinder, &move, hitMask) == 0) {
             break;
         }
 
@@ -941,7 +943,7 @@ void CGObject::bgNormalCollision()
         }
 
         --retry;
-    }
+    } while (retry != 0);
 
     if (retry == 0) {
         m_groundHitOffset.z = sZeroFloat;

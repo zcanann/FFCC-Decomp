@@ -1921,6 +1921,8 @@ void CMenuPcs::LetterMessDraw()
 		float y0 = static_cast<float>(panel[1]);
 		float x1 = static_cast<float>(panel[2]);
 		float y1 = static_cast<float>(panel[3]);
+		float u = *reinterpret_cast<float*>(panel + 4);
+		float v = *reinterpret_cast<float*>(panel + 6);
 		u8 alpha = static_cast<u8>(FLOAT_803330a0 * *reinterpret_cast<float*>(panel + 8));
 		GXColor color;
 		color.r = 0xFF;
@@ -1931,7 +1933,7 @@ void CMenuPcs::LetterMessDraw()
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(*reinterpret_cast<int*>(panel + 0xE)));
 		MenuPcs.DrawRect(
 		    0, x0, y0, x1,
-		    y1, *reinterpret_cast<float*>(panel + 4), *reinterpret_cast<float*>(panel + 6),
+		    y1, u, v,
 		    *reinterpret_cast<float*>(panel + 10), *reinterpret_cast<float*>(panel + 10), 0.0f);
 	}
 
@@ -1951,8 +1953,7 @@ void CMenuPcs::LetterMessDraw()
 
 	CMemory::CStage* stage = GetLetterMenuStage(this);
 	char* srcText = new (stage, const_cast<char*>(s_menu_letter_cpp), 0x535) char[kLetterTextScratchSize];
-	stage = GetLetterMenuStage(this);
-	char* workText = new (stage, const_cast<char*>(s_menu_letter_cpp), 0x537) char[kLetterTextScratchSize];
+	char* workText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x537) char[kLetterTextScratchSize];
 
 	memset(srcText, 0, kLetterTextScratchSize);
 	memset(workText, 0, kLetterTextScratchSize);
@@ -1962,9 +1963,10 @@ void CMenuPcs::LetterMessDraw()
 	strcpy(srcText, Game.m_cFlatDataArr[1].Message(((msgIndex & 0x7FC) >> 1) + 0x10));
 	CMes::MakeAgbString(workText, srcText, caravanWork->m_genderFlag, 0);
 
-	char* curLine = workText;
 	int y = 0x58;
-	for (int i = 0; i < 7; ++i) {
+	int i = 0;
+	char* curLine = workText;
+	for (; i < 7; ++i) {
 		char* newline = strchr(curLine, '\n');
 		const float yf = static_cast<float>(y);
 		if (newline != 0) {
@@ -1990,10 +1992,14 @@ void CMenuPcs::LetterMessDraw()
 
 	DrawInit();
 
-	if (caravanWork->m_letters[s_SelLetter].AttachmentValue() != 0) {
-		int icon = 0x26 + (caravanWork->m_letters[s_SelLetter].IsAttachmentClaimed() ? 1 : 0);
+	char* letterBytes = reinterpret_cast<char*>(caravanWork) + s_SelLetter * 0xC;
+	if ((*reinterpret_cast<u16*>(letterBytes + 0x3EE) & 0x1FF) != 0) {
+		float iconX = FLOAT_8033314c;
+		float iconY = FLOAT_80333150;
+		int icon = 0x26 +
+		           (reinterpret_cast<CCaravanWork::CLetterWork*>(letterBytes + 0x3EC)->IsAttachmentClaimed() ? 1 : 0);
 		DrawSingleIcon(
-		    icon, static_cast<int>(FLOAT_8033314c), static_cast<int>(FLOAT_80333150),
+		    icon, static_cast<int>(iconX), static_cast<int>(iconY),
 		    *reinterpret_cast<float*>(animBase + 0xC), 1, FLOAT_80333154);
 	}
 
@@ -2002,10 +2008,9 @@ void CMenuPcs::LetterMessDraw()
 	}
 
 	DrawSingWin(-1);
-	unsigned int state = GetLetterStateBase(this);
-	if ((*reinterpret_cast<s16*>(state + 0x12) == 1) &&
+	if ((*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) == 1) &&
 	    (m_menuWindowInfo->state == 1)) {
-		int msgType = static_cast<int>(*reinterpret_cast<signed char*>(state + 9));
+		int msgType = static_cast<int>(*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 9));
 		if (mode == 4) {
 			DrawSingWinMess(2, msgType, 0);
 		} else {
@@ -2014,23 +2019,22 @@ void CMenuPcs::LetterMessDraw()
 
 		float cursorX;
 		float cursorY;
-		MenuWindowInfo* window = m_menuWindowInfo;
-		int itemSel = *reinterpret_cast<s16*>(state + 0x28);
 		if ((mode == 2) || (mode == 5)) {
+			cursorX = static_cast<float>(m_menuWindowInfo->x + 0x14);
+			int itemSel = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28);
 			if (mode == 2) {
 				itemSel += 1;
 			} else {
 				int attach = static_cast<int>(s_Attach);
 				itemSel += (~((attach - 2) | (2 - attach)) >> 31) + 4;
 			}
-			cursorX = static_cast<float>(window->x + 0x14);
-			cursorY = static_cast<float>(window->y + itemSel * SingWinMessHeight() + 0x20);
+			cursorY = static_cast<float>(m_menuWindowInfo->y + itemSel * SingWinMessHeight() + 0x20);
 		} else if ((mode == 3) || (mode == 4)) {
-			cursorX = static_cast<float>(window->x - 8);
+			cursorX = static_cast<float>(m_menuWindowInfo->x - 8);
 			if (mode == 4) {
 				cursorX += FLOAT_80333110;
 			}
-			cursorY = static_cast<float>(window->y + *reinterpret_cast<s16*>(state + 0x28) * SingWinMessHeight() + 0x20);
+			cursorY = static_cast<float>(m_menuWindowInfo->y + *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28) * SingWinMessHeight() + 0x20);
 		}
 
 		int frameAnim = static_cast<int>(System.m_frameCounter) % 8;

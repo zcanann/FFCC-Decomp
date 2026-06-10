@@ -183,8 +183,7 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 	Vec escapeDir;
 	Vec portalVec;
 	CVector baseVec(base);
-	const CVector& escapeDirSource =
-	    SubVector(reinterpret_cast<Vec*>(&CVector(from)), reinterpret_cast<Vec*>(&baseVec));
+	const CVector& escapeDirSource = SubVector(CVector(from), baseVec);
 
 	escapeDir.x = escapeDirSource.x;
 	escapeDir.y = escapeDirSource.y;
@@ -226,9 +225,7 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 				if (forbiddenGroup != otherGroup)
 				{
 					CVector portalDirBase(base);
-					const CVector& dirToPortalSource =
-					    SubVector(reinterpret_cast<Vec*>(&CVector(m_portals[i].m_position)),
-					              reinterpret_cast<Vec*>(&portalDirBase));
+					const CVector& dirToPortalSource = SubVector(CVector(m_portals[i].m_position), portalDirBase);
 
 					portalVec.x = dirToPortalSource.x;
 					portalVec.y = dirToPortalSource.y;
@@ -239,9 +236,7 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 					                            reinterpret_cast<Vec*>(&portalVec));
 
 					CVector distBase(base);
-					const CVector& distVecSource =
-					    SubVector(reinterpret_cast<Vec*>(&CVector(m_portals[i].m_position)),
-					              reinterpret_cast<Vec*>(&distBase));
+					const CVector& distVecSource = SubVector(CVector(m_portals[i].m_position), distBase);
 
 					portalVec.x = distVecSource.x;
 					portalVec.y = distVecSource.y;
@@ -445,9 +440,9 @@ void CAStar::drawAStar()
 
 			do
 			{
-				unsigned char b = static_cast<unsigned char>(Math.Rand(0xff));
-				unsigned char g = static_cast<unsigned char>(Math.Rand(0xff));
-				unsigned char r = static_cast<unsigned char>(Math.Rand(0xff));
+				int b = static_cast<unsigned char>(Math.Rand(0xff));
+				int g = static_cast<unsigned char>(Math.Rand(0xff));
+				int r = static_cast<unsigned char>(Math.Rand(0xff));
 				MapMng.SetIdGrpColor(group, 0, CColor(r, g, b, 0xFF).color);
 				++group;
 			} while (group < 64);

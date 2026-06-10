@@ -2890,8 +2890,8 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 	int particleBank = CharaObjResolveParticleBank(this, particleClass);
 	unsigned short particleEntry;
 	int particleNo;
-	int seNo = 0;
-	int emittedCustom = 0;
+	int seNo;
+	int emittedCustom;
 	int hasParticle = 0;
 
 	if (particleBank != -1) {
@@ -2927,6 +2927,8 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 			}
 	}
 	} else {
+		seNo = 0;
+		emittedCustom = 0;
 		CFlatRuntime2Storage().ResetParticleWork((particleBank << 8) | particleNo, effectArg1);
 		SCharaItemRow* scaleRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
 		CFlatRuntime2Storage().SetParticleWorkScale((static_cast<float>(scaleRows[effectId].m_scale) * 0.01f) + 1.0e-07f);

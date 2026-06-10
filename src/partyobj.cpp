@@ -1540,7 +1540,7 @@ targetJoin: ;
 					caravan->GetNumCombi(party.unk6BC, 1);
 					return;
 				}
-				m_itemId = 0x103;
+				m_itemId = itemId;
 				changeStat(2, 0, 2);
 				return;
 			}
@@ -1602,8 +1602,8 @@ targetJoin: ;
 	    caravan->m_hp != 0 &&
 	    ringCommand != -1 &&
 	    secondaryCommand == 6) {
-		int weaponItem = 0;
-		int weaponRef = 0;
+		int weaponItem;
+		int weaponRef;
 		caravan->GetCurrentWeaponItem(weaponItem, weaponRef);
 		m_itemId = weaponRef;
 		changeStat(1, 0, 0);
@@ -1638,12 +1638,12 @@ targetJoin: ;
 				caravan->AddTmpArtifact(itemIdx, &addedItem);
 				System.Printf(const_cast<char*>(msgBase + 0x2C0), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504));
 			} else {
-				caravan->AddItem(static_cast<short>(itemIdx), &addedItem);
+				caravan->AddItem(itemIdx, &addedItem);
 				System.Printf(const_cast<char*>(msgBase + 0x2E0), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504));
 			}
 			if (kindClass == 0 && caravan->CanAddComList(1) != 0) {
 				int addedSlot;
-				caravan->AddComList(static_cast<short>(addedItem), &addedSlot);
+				caravan->AddComList(addedItem, &addedSlot);
 				System.Printf(const_cast<char*>(msgBase + 0x2F8), addedItem, addedSlot);
 			}
 			if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(party.target) + 0x560) != 1) {

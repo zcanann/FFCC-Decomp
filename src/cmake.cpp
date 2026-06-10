@@ -830,16 +830,16 @@ void CMenuPcs::CmakeVillageDraw()
             128.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     }
 
+    short table = villageWork->m_table;
     CFont* font = GetCmakeKeyboardFont(this);
     font->SetShadow(0);
     font->SetScale(1.0f);
     font->DrawInit();
     GetRenderFlagBits(font->renderFlags).fixedWidth = 1;
     font->SetMargin(4.9f);
-    CColor textColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha));
-    font->SetColor(textColor.color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(255.0f * alpha))).color);
 
-    int tableBase = villageWork->m_table * 5;
+    int tableBase = table * 5;
     for (int i = 0; i < 5; i++) {
         const char* rowText = s_NameEntryStr[tableBase + i];
         font->SetPosX(240.0f);

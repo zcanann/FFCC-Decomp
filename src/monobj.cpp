@@ -3798,10 +3798,10 @@ void CGMonObj::statWatch()
 
 			int pick = Math.Rand(validCount);
 			int minHp = 10000000;
+			int accum = -1;
 			int validIndex = 0;
 			float homeRange2 = static_cast<float>(
 				*reinterpret_cast<unsigned short*>(script + 0xCC));
-			int accum = -1;
 
 			// Pass 2: select target.
 			int result = -1;
@@ -3911,7 +3911,8 @@ void CGMonObj::statWatch()
 							(aiState + *reinterpret_cast<unsigned short*>(scriptBase + 0x100)) * 0x1D0 + 0x10;
 					}
 					int actionOff = attackResult * 0x10;
-					if ((*reinterpret_cast<unsigned short*>(aiData + actionOff + 0x110) & 0x20) != 0) {
+					unsigned char* actionData = aiData + actionOff;
+					if ((*reinterpret_cast<unsigned short*>(actionData + 0x110) & 0x20) != 0) {
 						actionState = 0x21;
 						CGPartyObj* party = Game.m_partyObjArr[selectedTarget];
 						if (monObj->m_moveWork.m_mode != 4) {

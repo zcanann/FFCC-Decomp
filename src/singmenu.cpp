@@ -90,7 +90,7 @@ struct SingMenuSoloNameTable
 };
 
 extern char s_singmenu_cpp[];
-extern "C" char* s_singMenuTexturePathFmt;
+extern "C" char s_singMenuTexturePathFmt[];
 extern "C" char s_singMenuSubfontPathFmt[];
 extern "C" char* PTR_s_Tutti_802143ec;
 extern "C" char* PTR_s_Alle_Rassen_8021430c;
@@ -1547,27 +1547,26 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
     }
 
     if (SingleCaravanWork()->m_shopRequestState == 0) {
+        int loadCompleted;
         int loadIndex = m_singleMenuTextureLoadIndex;
         if (loadIndex >= 2) {
-            gSingMenuAsyncLoadCompleted = 1;
+            loadCompleted = 1;
         } else {
             if (m_singleMenuTextureLoadState == 0) {
                 char path[260];
-                const char* language = Game.GetLangString();
-                sprintf(path, s_singMenuTexturePathFmt, language, PTR_s_solo1.entries[loadIndex]);
+                sprintf(path, s_singMenuTexturePathFmt, Game.GetLangString(), PTR_s_solo1.entries[loadIndex]);
                 gSingMenuAsyncFileHandle = File.Open(path, 0, CFile::PRI_LOW);
                 File.ReadASync(gSingMenuAsyncFileHandle);
                 m_singleMenuTextureLoadState = m_singleMenuTextureLoadState + 1;
             } else if (m_singleMenuTextureLoadState == 1) {
                 if (!File.IsCompleted(gSingMenuAsyncFileHandle)) {
-                    gSingMenuAsyncLoadCompleted = 0;
-                    goto post_texture_load;
+                    loadCompleted = 0;
+                    goto store_load_completed;
                 }
 
-                CTextureSet* textureSet = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x748) CTextureSet;
-                m_textureSets[loadIndex + 5] = textureSet;
+                m_textureSets[loadIndex + 5] = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x748) CTextureSet;
 
-                textureSet->Create(File.m_readBuffer, Game.m_gameWork.m_menuStageMode != 0 ? m_stageF4 : m_menuStage, 0, 0, 0, 0);
+                m_textureSets[loadIndex + 5]->Create(File.m_readBuffer, Game.m_gameWork.m_menuStageMode != 0 ? m_stageF4 : m_menuStage, 0, 0, 0, 0);
                 File.Close(gSingMenuAsyncFileHandle);
                 gSingMenuAsyncFileHandle = 0;
                 m_singleMenuTextureLoadState = 0;
@@ -1575,20 +1574,25 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
             }
 
             if (m_singleMenuTextureLoadIndex < 2) {
-                gSingMenuAsyncLoadCompleted = 0;
+                loadCompleted = 0;
             } else {
                 SingMenuTextureRef* mapping = s_singleMenuModelTextureTable;
-                for (int i = 0; i < 0x33; i++) {
-                    CTextureSet* set = m_textureSets[mapping->textureSetIndex];
-                    int texIdx = set->Find(mapping->textureName);
-                    CTexture* tex = set->GetTexture(static_cast<unsigned long>(texIdx));
-                    m_textures[i + 45] = tex;
+                int i = 0;
+                u8* texSlot = reinterpret_cast<u8*>(this);
+                do {
+                    int texIdx = m_textureSets[mapping->textureSetIndex]->Find(mapping->textureName);
+                    CTexture* tex = m_textureSets[mapping->textureSetIndex]->GetTexture(static_cast<unsigned long>(texIdx));
+                    i++;
+                    mapping++;
                     tex->AddRef();
-                    ++mapping;
-                }
-                gSingMenuAsyncLoadCompleted = 1;
+                    *reinterpret_cast<CTexture**>(texSlot + offsetof(CMenuPcs, m_textures[45])) = tex;
+                    texSlot += sizeof(CTexture*);
+                } while (i < 0x33);
+                loadCompleted = 1;
             }
         }
+store_load_completed:
+        gSingMenuAsyncLoadCompleted = loadCompleted;
     }
 
 post_texture_load:
@@ -1618,15 +1622,16 @@ post_texture_load:
     }
 
     if (gSingMenuHasScriptFoodBase == 0) {
-        s16 state = m_singleMenuPhase;
-        if (state == 1) {
-            SingleCalcCtrl();
-        } else if (state < 1) {
-            if (state >= 0) {
+        switch (m_singleMenuPhase) {
+            case 0:
                 SingleCalcFadeIn();
-            }
-        } else if (state < 3) {
-            SingleCalcFadeOut();
+                break;
+            case 1:
+                SingleCalcCtrl();
+                break;
+            case 2:
+                SingleCalcFadeOut();
+                break;
         }
     }
 }

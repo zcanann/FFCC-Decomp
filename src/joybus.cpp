@@ -5194,6 +5194,7 @@ int JoyBus::SendMType(ThreadParam* threadParam, int modeType)
     ResetQueue(threadParam);
 
     unsigned int cmd0 = 0;
+    unsigned int cmd = 0;
     unsigned char* cmd0Bytes = reinterpret_cast<unsigned char*>(&cmd0);
     cmd0Bytes[0] = 0x10;
     unsigned int word0 = cmd0;
@@ -5208,7 +5209,6 @@ int JoyBus::SendMType(ThreadParam* threadParam, int modeType)
 	}
 
 
-    unsigned int cmd = 0;
     unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
     cmdBytes[0] = 0x1B;
     cmdBytes[1] = static_cast<unsigned char>(modeType);

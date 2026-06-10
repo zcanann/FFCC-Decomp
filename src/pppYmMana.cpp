@@ -318,6 +318,8 @@ void Chara_DrawShadowMeshDLCallback(CChara::CModel* model, void* work, void* vYm
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_propagation off
 void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int partIndex, int dlIndex, float (*mtx)[4])
 {
     CChara::CMesh::CRefData* mesh = model->m_meshes[partIndex].m_data;
@@ -464,6 +466,7 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
     _GXSetBlendMode(GX_BM_NONE, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_SET);
     GXCallDisplayList(displayList->m_data, displayList->m_size);
 }
+#pragma pop
 
 /*
  * --INFO--

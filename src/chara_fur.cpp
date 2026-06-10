@@ -537,11 +537,12 @@ void CChara::CalcMogScore()
 	char* fmtBase = lbl_801DB648;
 	#define fur m_sharedState.m_mogFur
 	unsigned short* texels = fur.m_texels;
-	int bitCount = 0;
-	int lineCount = 0;
-	int circleCount = 0;
 
 	memset(fur.m_score, 0, 0x40);
+
+	int bitCount = 0;
+	int circleCount = 0;
+	int lineCount = 0;
 
 	for (int y = 0; y < 0x40; y++) {
 		for (int x = 0; x < 0x40; x++) {

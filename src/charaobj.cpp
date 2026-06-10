@@ -1496,7 +1496,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			if (PSVECDotProduct(&frontDelta, reinterpret_cast<Vec*>(&facing)) > kCharaObjZero) {
 				playSe3D(0x1D, 0x32, 0x96, 0, 0);
 				putParticle(0x200, 0, hitPos, FLOAT_803319AC * m_attackColRadius, 0);
-				if ((static_cast<short>(sourceObj->GetCID()) & 0x6D) == 0x6D) {
+				if ((static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D) {
 					sourceObj->changeStat(0x13, 0, 0);
 				}
 				if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D) {

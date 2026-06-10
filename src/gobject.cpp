@@ -297,10 +297,10 @@ void CGObject::onCreate()
 
     unk_0x184 = 0.0f;
     unk_0x188 = 0.0f;
-    m_bgHitMask = -1;
     m_weaponNodeFlagBits.m_attached = 0;
     m_weaponNodeFlagBits.m_unk20 = 1;
     m_weaponNodeFlagBits.m_unk40 = 0;
+    m_bgHitMask = -1;
     m_animSlotSel = -1;
     m_turnSpeed = 0.0f;
     m_pushParamB = 0;

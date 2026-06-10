@@ -704,7 +704,12 @@ static inline unsigned int FurRandNext()
 
 static inline float FurRandScale()
 {
-	return kCharaFurDepthScaleBase * (FLOAT_80331164 * static_cast<float>(FurRandNext()) + kCharaFurViewDepthThreshold);
+	return kCharaFurDepthScaleBase * (FLOAT_80331164 * static_cast<float>(static_cast<int>(FurRandNext())) + kCharaFurViewDepthThreshold);
+}
+
+static inline float FurRandScaleL(float scaleBase, float randScale, float depthThreshold)
+{
+	return scaleBase * (randScale * static_cast<float>(static_cast<int>(FurRandNext())) + depthThreshold);
 }
 
 static inline CColor FurNoiseColor(const CColor& base, const CColor& noise, float scale)
@@ -874,6 +879,7 @@ static void OpenMogHintMessage(int messageId)
  */
 #pragma push
 #pragma opt_propagation off
+#pragma global_optimizer off
 void CChara::InitFurTexBuffer()
 {
 	MogFurState& fur = MogFur();
@@ -882,8 +888,8 @@ void CChara::InitFurTexBuffer()
 	do {
 		unsigned int inner = 0;
 		int byteOffset = row << 1;
-		int count = 8;
-		do {
+		int idx;
+		for (idx = row; idx < row + 0x40; idx += 8) {
 			int idxBase = inner + row;
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Chara.MogFur().m_texels) + byteOffset) = 0x7FFF;
 			byteOffset += 0x10;
@@ -895,8 +901,7 @@ void CChara::InitFurTexBuffer()
 			Chara.MogFur().m_texels[idxBase + 6] = 0x7FFF;
 			Chara.MogFur().m_texels[idxBase + 7] = 0x7FFF;
 			inner += 8;
-			count--;
-		} while (count != 0);
+		}
 		rowCount++;
 		row += 0x40;
 	} while (rowCount < 0x40);
@@ -2036,9 +2041,15 @@ void CChara::makeFurTex()
 	s_mogFurRand = 0;
 	s_mogFurMaxY = 0.0f;
 
+	float scaleBase = kCharaFurDepthScaleBase;
+	float randScale = FLOAT_80331164;
+	float depthThreshold = kCharaFurViewDepthThreshold;
+	float weightScale = kCharaFurWeightScale;
+
 	for (int i = 0; i < 0x20; i++) {
+		float velRandScale = FurRandScaleL(scaleBase, randScale, depthThreshold);
 		CVector velScaleOut;
-		PSVECScale(&velRand, velScaleOut, FurRandScale());
+		PSVECScale(&velRand, velScaleOut, velRandScale);
 		Vec velScaled;
 		velScaled.x = velScaleOut.x;
 		velScaled.y = velScaleOut.y;
@@ -2049,8 +2060,9 @@ void CChara::makeFurTex()
 		hairSet[i].m_vec0.y = velAddOut.y;
 		hairSet[i].m_vec0.z = velAddOut.z;
 
+		float accelRandScale = FurRandScaleL(scaleBase, randScale, depthThreshold);
 		CVector accelScaleOut;
-		PSVECScale(&accelRand, accelScaleOut, FurRandScale());
+		PSVECScale(&accelRand, accelScaleOut, accelRandScale);
 		Vec accelScaled;
 		accelScaled.x = accelScaleOut.x;
 		accelScaled.y = accelScaleOut.y;
@@ -2061,10 +2073,10 @@ void CChara::makeFurTex()
 		hairSet[i].m_vec1.y = accelAddOut.y;
 		hairSet[i].m_vec1.z = accelAddOut.z;
 
-		hairSet[i].m_colors[0] = FurNoiseColor(furBaseColor, furNoiseBase, FurRandScale());
-		hairSet[i].m_colors[1] = FurNoiseColor(furTipColor, furNoiseRange, FurRandScale());
+		hairSet[i].m_colors[0] = FurNoiseColor(furBaseColor, furNoiseBase, FurRandScaleL(scaleBase, randScale, depthThreshold));
+		hairSet[i].m_colors[1] = FurNoiseColor(furTipColor, furNoiseRange, FurRandScaleL(scaleBase, randScale, depthThreshold));
 
-		float endY = hairSet[i].m_vec0.y + kCharaFurWeightScale * hairSet[i].m_vec1.y;
+		float endY = hairSet[i].m_vec0.y + weightScale * hairSet[i].m_vec1.y;
 		if (s_mogFurMaxY < endY) {
 			s_mogFurMaxY = endY;
 		}

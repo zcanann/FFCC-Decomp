@@ -1792,8 +1792,7 @@ void CMenuPcs::DrawSingleStat(float alpha)
     font->SetShadow(1);
     font->SetScale(0.8999999761581421f);
 
-    CColor fontColor(0xFF, 0xFF, 0xFF, static_cast<u8>(a255));
-    font->SetColor(fontColor.color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(a255)).color);
     font->DrawInit();
 
     char* charaName = reinterpret_cast<char*>(SingleCaravanWork()->m_name);
@@ -2837,9 +2836,9 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     font->SetScale(FLOAT_8032ea78);
     font->DrawInit();
 
-    CColor color(0xFF, 0xFF, 0xFF, 0xFF);
-    font->SetColor(color.color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 
+    int maxWidth = 0;
     int lineCount;
     if (useDynamic != 0) {
         lineCount = s_DynamicMess[0];
@@ -2849,11 +2848,12 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     char* dynamicText = s_DynamicMessStr;
     const SingMenuStaticMessageInfo& staticMessage = s_singleMenuStaticMessages[messageNo];
 
-    int maxWidth = 0;
     for (int i = 0; i < lineCount; i++) {
-        const char* text = dynamicText;
+        const char* text;
         if (useDynamic == 0) {
             text = GetSingWinMessage(staticMessage.textIds[i], dynamicText, 0);
+        } else {
+            text = dynamicText;
         }
         int textWidth = font->GetWidth(text);
         if (textWidth > maxWidth) {
@@ -2863,22 +2863,24 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     }
 
     MenuWindowInfo* win = m_menuWindowInfo;
-    unsigned int lineHeight = static_cast<int>(22.0f * FLOAT_8032ea78);
+    int lineHeight = static_cast<int>(22.0f * FLOAT_8032ea78);
+    float x = static_cast<float>(static_cast<double>(win->width - maxWidth) * 0.5
+            + static_cast<double>(win->x));
+    float y = static_cast<float>(win->y + 0x20);
     if (0.0f < 22.0f * FLOAT_8032ea78 - static_cast<float>(lineHeight)) {
         lineHeight++;
     }
-
-    float x = static_cast<float>(win->x) + static_cast<float>(win->width - maxWidth) * static_cast<float>(0.5);
-    float y = static_cast<float>(win->y + 0x20);
-    unsigned int lineStep = lineHeight + 3;
+    int lineStep = lineHeight + 3;
 
     dynamicText = s_DynamicMessStr;
     for (int i = 0; i < lineCount; i++) {
-        font->SetTlut(((activeMask & (1 << i)) != 0) + 8);
+        font->SetTlut(8 - ((activeMask & (1 << i)) != 0));
 
-        const char* text = dynamicText;
+        const char* text;
         if (useDynamic == 0) {
             text = GetSingWinMessage(staticMessage.textIds[i], dynamicText, 0);
+        } else {
+            text = dynamicText;
         }
         if (static_cast<int>(strlen(text)) != 0) {
             char lineBuffer[128];

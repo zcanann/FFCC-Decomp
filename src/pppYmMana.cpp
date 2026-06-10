@@ -976,6 +976,11 @@ void pppRenderYmMana(PYmMana*, pppYmManaStep*, _pppCtrlTable*)
  * JP Address: TODO
  * JP Size: TODO
  */
+struct YmManaWeaponFlagByte {
+    s8 m_pad : 7;
+    s8 m_lockFlag : 1;
+};
+
 void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (*)[4], int pass)
 {
     VYmMana* mana = static_cast<VYmMana*>(workPtr);
@@ -996,7 +1001,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     u32 texBufferStride;
     GXTexObj* sourceTexObjs;
     GXTexObj* captureTexObjs;
-    GXTexObj* targetTexObj;
+    CTexture* targetTexObj;
     s32 i;
     f32 savedViewport[6];
 
@@ -1017,8 +1022,9 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     PSMTXIdentity(identityMtx);
     PSMTXCopy(CameraMatrix(), savedCameraMtx);
     PSMTX44Copy(CameraScreenMatrix(), savedScreenMtx);
-    Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &sceneTexObj, (int)LoadFloat(kPppYmMoveParabolaZero),
-                               (int)LoadFloat(kPppYmMoveParabolaZero), 0x80, 0x80, 0, GX_NEAR, GX_TF_RGBA8, 0);
+    int zeroInt = (int)LoadFloat(kPppYmMoveParabolaZero);
+    Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &sceneTexObj, zeroInt,
+                               zeroInt, 0x80, 0x80, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
     gObject = mana->m_object;
     if (gObject == NULL) {
@@ -1046,6 +1052,9 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
         C_MTXPerspective(projectionMtx, LoadFloat(kYmManaCaptureFovY), LoadFloat(kYmManaOne), LoadFloat(kYmManaOne),
                          LoadFloat(kYmManaCaptureFarClip));
         GXSetProjection(projectionMtx, (_GXProjectionType)0);
+        u32 scissorZero = (u32)LoadFloat(kPppYmMoveParabolaZero);
+        GXTexObj* sourceIter = sourceTexObjs;
+        GXTexObj* captureIter = captureTexObjs;
 
         for (i = 0; i < 6; i++) {
             cameraPos = centerPos;
@@ -1080,31 +1089,33 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
                 case 3:
                     cameraPos.z -= LoadFloat(kYmManaOne);
                     break;
-                case 5:
-                    cameraPos.y -= LoadFloat(kYmManaOne);
-                    cameraUp.y = LoadFloat(kPppYmMoveParabolaZero);
-                    cameraUp.z = LoadFloat(kPppYmMoveParabolaZero);
-                    break;
                 case 4:
                     cameraPos.y += LoadFloat(kYmManaOne);
+                    cameraUp.x = LoadFloat(kPppYmMoveParabolaZero);
                     cameraUp.y = LoadFloat(kPppYmMoveParabolaZero);
                     cameraUp.z = LoadFloat(kYmManaNegOne);
+                    break;
+                case 5:
+                    cameraPos.y -= LoadFloat(kYmManaOne);
+                    cameraUp.z = LoadFloat(kYmManaOne);
+                    cameraUp.x = LoadFloat(kPppYmMoveParabolaZero);
+                    cameraUp.y = LoadFloat(kPppYmMoveParabolaZero);
                     break;
                 }
             }
 
             C_MTXLookAt(lookAtMtx, (Point3d*)&centerPos, &cameraUp, (Point3d*)&cameraPos);
             Graphic.SetViewport();
-            GXSetScissor((u32)LoadFloat(kPppYmMoveParabolaZero), (u32)LoadFloat(kPppYmMoveParabolaZero), 0x80, 0x80);
+            GXSetScissor(scissorZero, scissorZero, 0x80, 0x80);
             gUtil.RenderTextureQuad(kPppYmMoveParabolaZero, kPppYmMoveParabolaZero, kYmManaCaptureTextureSize, kYmManaCaptureTextureSize,
-                                    sourceTexObjs, 0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
+                                    sourceIter, 0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
 
             GXSetViewport(kPppYmMoveParabolaZero, kPppYmMoveParabolaZero, kYmManaCaptureTextureSize, kYmManaCaptureTextureSize, kPppYmMoveParabolaZero, kYmManaOne);
-            GXSetScissor((u32)LoadFloat(kPppYmMoveParabolaZero), (u32)LoadFloat(kPppYmMoveParabolaZero), 0x80, 0x80);
+            GXSetScissor(scissorZero, scissorZero, 0x80, 0x80);
             PSMTXCopy(lookAtMtx, CameraMatrix());
             GXSetProjection(projectionMtx, (_GXProjectionType)0);
 
-            if (((gObject->m_weaponNodeFlags & 1) != 0 || gObject->m_attachOwner != NULL) &&
+            if ((reinterpret_cast<YmManaWeaponFlagByte*>(&gObject->m_weaponNodeFlags)->m_lockFlag != 0 || gObject->m_attachOwner != NULL) &&
                 gObject->m_attachOwner->m_charaModelHandle != NULL) {
                 CCharaPcs::CHandle* owner = gObject->m_attachOwner->m_charaModelHandle;
                 CChara::CModel* ownerModel = owner->m_model;
@@ -1119,11 +1130,11 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
                 owner->m_model->m_drawShadowMeshDLCallback = 0;
             }
 
-            Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, captureTexObjs, 0, 0, 0x80, 0x80,
+            Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, captureIter, zeroInt, zeroInt, 0x80, 0x80,
                                        depthTexSize, GX_LINEAR, GX_TF_RGB565, 0);
             depthTexSize += texBufferStride;
-            sourceTexObjs++;
-            captureTexObjs++;
+            sourceIter++;
+            captureIter++;
         }
 
         PSMTXCopy(savedCameraMtx, CameraMatrix());
@@ -1137,16 +1148,16 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
         mana->m_paraboloidReady = 1;
     }
 
-    targetTexObj = &mana->m_envTexture0->m_texObj;
+    targetTexObj = mana->m_envTexture0;
     if (stepData->m_map21Flag != 0) {
         GXInitTexObj(mana->m_generatedTexObj0, mana->m_generatedTexture0, 0x80, 0x80, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
         GXInitTexObjLOD(mana->m_generatedTexObj0, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
         GXInitTexObj(mana->m_generatedTexObj1, mana->m_generatedTexture1, 0x80, 0x80, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
         GXInitTexObjLOD(mana->m_generatedTexObj1, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
-        drawParaboloidMap(mana->m_captureTexObjs, mana->m_generatedTexObj1, mana->m_paraboloidMap, mana->m_paraboloidMapSize,
-                          targetTexObj, 1);
-        drawParaboloidMap(mana->m_captureTexObjs, mana->m_generatedTexObj0, mana->m_paraboloidMap, mana->m_paraboloidMapSize,
-                          targetTexObj, 0);
+        drawParaboloidMap(captureTexObjs, mana->m_generatedTexObj1, mana->m_paraboloidMap, mana->m_paraboloidMapSize,
+                          &targetTexObj->m_texObj, 1);
+        drawParaboloidMap(captureTexObjs, mana->m_generatedTexObj0, mana->m_paraboloidMap, mana->m_paraboloidMapSize,
+                          &targetTexObj->m_texObj, 0);
         Graphic.SetViewport();
         GXSetProjection(savedScreenMtx, (_GXProjectionType)0);
         PSMTXCopy(savedCameraMtx, CameraMatrix());
@@ -1156,10 +1167,10 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
         if (mana->m_paraboloidReady == 0) {
             GXInitTexObj(mana->m_generatedTexObj0, mana->m_generatedTexture0, 0x80, 0x80, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
             GXInitTexObj(mana->m_generatedTexObj1, mana->m_generatedTexture1, 0x80, 0x80, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
-            drawParaboloidMap(mana->m_baseParaboloidTexObjs, mana->m_generatedTexObj1, mana->m_paraboloidMap,
-                              mana->m_paraboloidMapSize, targetTexObj, 1);
-            drawParaboloidMap(mana->m_baseParaboloidTexObjs, mana->m_generatedTexObj0, mana->m_paraboloidMap,
-                              mana->m_paraboloidMapSize, targetTexObj, 0);
+            drawParaboloidMap(sourceTexObjs, mana->m_generatedTexObj1, mana->m_paraboloidMap,
+                              mana->m_paraboloidMapSize, &targetTexObj->m_texObj, 1);
+            drawParaboloidMap(sourceTexObjs, mana->m_generatedTexObj0, mana->m_paraboloidMap,
+                              mana->m_paraboloidMapSize, &targetTexObj->m_texObj, 0);
             gUtil.RenderTextureQuad(kPppYmMoveParabolaZero, kPppYmMoveParabolaZero, kYmManaCaptureTextureSize, kYmManaCaptureTextureSize, &sceneTexObj,
                                     0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
             mana->m_paraboloidReady = 1;

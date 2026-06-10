@@ -3522,14 +3522,13 @@ void GbaQueue::SetShopFlg(int channel)
 int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 {
 	unsigned char localPlayerData[0xDC];
-	unsigned char equipIndices[0x40];
+	char equipIndices[0x40];
 	unsigned int indexBytes;
 	int equipCount;
-	unsigned char* writePtr;
 	unsigned short equipData[4];
 	int dataSize;
 	unsigned char* itemPtr;
-	unsigned char* indexPtr;
+	char* indexPtr;
 	char itemIndex;
 	int remaining;
 	int i;
@@ -3564,10 +3563,12 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 	indexBytes = static_cast<unsigned int>(indexBytesS);
 
 	outData[4] = equipCount;
-	memcpy(outData + 5, equipIndices, indexBytes - 1);
+	outData += 5;
+	memcpy(outData, equipIndices, indexBytes - 1);
 
 	dataSize = indexBytes + 4;
-	writePtr = outData + 4 + indexBytes;
+	outData += indexBytes;
+	outData -= 1;
 	for (i = 0; i < equipCount; i++) {
 		int itemId = *reinterpret_cast<short*>(localPlayerData + 0x3A + equipIndices[i] * 2);
 		int itemBase = Game.unkCFlatData0[2] + itemId * 0x48;
@@ -3575,8 +3576,8 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 		equipData[0] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 4), 0);
 		equipData[1] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 6), 0);
 		equipData[2] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 8), 0);
-		memcpy(writePtr, equipData, sizeof(equipData));
-		writePtr += 8;
+		memcpy(outData, equipData, sizeof(equipData));
+		outData += 8;
 		dataSize += 8;
 	}
 

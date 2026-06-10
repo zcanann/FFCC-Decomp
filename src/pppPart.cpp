@@ -752,6 +752,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 	} loc;
 #define denied     loc.m_denied
 #define programSet loc.m_programSet
+	char* fmt = const_cast<char*>(s_pppPart_cpp);
 	_pppPObjLink* newObj = 0;
 	int firstFailure = 1;
 	CMemory::CStage* stage;
@@ -765,8 +766,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 	ppvMemAllocErrorF = 0;
 	do
 	{
-		newObj = (_pppPObjLink*)Memory._Alloc(totalSize, stage,
-		                                      const_cast<char*>(s_pppPart_cpp), 0x305, 1);
+		newObj = (_pppPObjLink*)Memory._Alloc(totalSize, stage, fmt, 0x305, 1);
 		if (newObj != 0)
 		{
 			goto allocated;

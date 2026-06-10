@@ -82,80 +82,82 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
     } else {
         hasRequiredMemory = true;
     }
-    if (!hasRequiredMemory || *(s32*)(step + 4) == 0xFFFF) {
+    if (!hasRequiredMemory) {
+        return;
+    }
+    if (*(s32*)(step + 4) == 0xFFFF) {
         return;
     }
     const u32 dataValIndex = *(u32*)(step + 4);
-    const u32 maxParticles = *(u32*)(workBytes + 0x48);
 
     pppShapeAnimData* shapeAnim =
         static_cast<pppShapeAnimData*>(ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex]->m_animData);
-    s16 workRand = *(u16*)(workBytes + 0x80);
-    const u8 zEnable = (u8)(((u32)__cntlzw((u32)payload[0x55])) >> 5);
     pppSetDrawEnv(
         0, &object->m_drawMatrix, *(float*)(payload + 0xA0), payload[0xA4], step[0x0C],
-        payload[0x58], 0, zEnable, 1, 0);
+        payload[0x58], 0, (u8)(((u32)__cntlzw((u32)payload[0x55])) >> 5), 1, 0);
     pppSetBlendMode(payload[0x58]);
 
-    for (u32 i = 0; i < maxParticles; i++) {
+    for (u32 i = 0; i < *(u32*)(workBytes + 0x48); i++) {
         u8* particle = (u8*)particles + i * 0x1F8;
-        if (*(s16*)(particle + 0x22) != 0) {
-            const s16 frameCountRaw = *(u16*)(payload + 0x9C);
+        if (*(u16*)(particle + 0x22) != 0) {
+            const u32 frameCountRaw = *(u16*)(payload + 0x9C);
+                u32 frameCount = frameCountRaw;
                 pppFMATRIX drawMtx;
-                Vec trailPos;
-                Vec cameraPos;
-                Vec managerPos;
                 Vec zeroVec;
                 Vec segVec;
+                Vec cameraPos;
+                Vec trailPos;
+                Vec managerPos;
                 GXColor amb;
-                const s8 trailReadIndex = *(u8*)(particle + 0x38);
-                const s32 trailMaxIndex = (s8)(*(u8*)(particle + 0x37) - 1);
-                s32 trailNextIndex = (u8)(trailReadIndex + 1);
-                const float alphaScale = (float)*(u16*)((u8*)colorWork + 6) / LoadFloat(kPppYmMegaBirthShpTail3AlphaDivisor);
-                const float stepDivisor = (float)((u32)frameCountRaw - 1);
-                float fadeA = (float)(*(s16*)(workBytes + 0x56) >> 7) * alphaScale;
+                u8* curHist;
+                tagOAN3_SHAPE* shape;
+                u32 particleShapeFrame;
+                u32 shapeFrameStep;
+                u32 workRand;
+                u32 shapeFrameCount;
+                const float alphaScale = (float)*(s16*)((u8*)colorWork + 6) / LoadFloat(kPppYmMegaBirthShpTail3AlphaDivisor);
+                const float stepDivisor = (float)(s32)(frameCountRaw - 1);
+                const s32 trailMaxIndex = *(u8*)(particle + 0x37) - 1;
                 float fadeR = (float)(*(s16*)(workBytes + 0x50) >> 7);
                 float fadeG = (float)(*(s16*)(workBytes + 0x52) >> 7);
                 float fadeB = (float)(*(s16*)(workBytes + 0x54) >> 7);
-                float fadeRStep = kPppYmMegaBirthShpTail3Zero;
-                float fadeGStep = kPppYmMegaBirthShpTail3Zero;
-                float fadeBStep = kPppYmMegaBirthShpTail3Zero;
-                float fadeAStep = kPppYmMegaBirthShpTail3Zero;
+                float fadeA = (float)(*(s16*)(workBytes + 0x56) >> 7) * alphaScale;
+                const float fadeANum = fadeA - (float)(*(s16*)(workBytes + 0x5e) >> 7) * alphaScale;
+                const s32 trailReadIndex = *(u8*)(particle + 0x38);
+                const float fadeRNum = fadeR - (float)(*(s16*)(workBytes + 0x58) >> 7);
+                const float fadeGNum = fadeG - (float)(*(s16*)(workBytes + 0x5a) >> 7);
+                const float fadeBNum = fadeB - (float)(*(s16*)(workBytes + 0x5c) >> 7);
+                float spacingAccum = *(float*)(payload + 0x98);
+                float fadeRStep;
+                float fadeGStep;
+                float fadeBStep;
+                float fadeAStep;
                 if (stepDivisor != LoadFloat(kPppYmMegaBirthShpTail3Zero)) {
-                    fadeRStep =
-                        (fadeR - (float)(*(s16*)(workBytes + 0x58) >> 7)) / stepDivisor;
-                    fadeGStep =
-                        (fadeG - (float)(*(s16*)(workBytes + 0x5a) >> 7)) / stepDivisor;
-                    fadeBStep =
-                        (fadeB - (float)(*(s16*)(workBytes + 0x5c) >> 7)) / stepDivisor;
-                    fadeAStep =
-                        (fadeA - (float)(*(s16*)(workBytes + 0x5e) >> 7) * alphaScale) /
-                        stepDivisor;
+                    fadeRStep = fadeRNum / stepDivisor;
+                    fadeGStep = fadeGNum / stepDivisor;
+                    fadeBStep = fadeBNum / stepDivisor;
+                    fadeAStep = fadeANum / stepDivisor;
                 }
                 float drawScale = *(float*)(payload + 0x5C);
+                s32 trailNextIndex = trailReadIndex + 1;
                 const float drawScaleStep =
                     (drawScale - *(float*)(payload + 0x60)) / stepDivisor;
                 Vec* history = (Vec*)(particle + 0x80);
-                float segLen;
-                u16 frameCount = frameCountRaw;
-                s16 particleShapeFrame = *(u16*)(particle + 0x1C);
-                const s16 shapeFrameStep = shapeAnim->m_frames[0].m_duration;
-                const s16 shapeFrameCount = shapeAnim->m_frameCount;
-                float drawX, drawY, drawZ;
-                float camX, camY, camZ;
+                float trailX, trailY, trailZ;
                 float startX, startY, startZ;
-                float segLenD;
-                float spacingAccum = *(float*)(payload + 0x98);
-
-                if (trailReadIndex == trailMaxIndex) {
-                    trailNextIndex = 0;
-                }
+                float camX, camY, camZ;
+                float segX, segY, segZ;
+                float segLen;
+                float segProgress;
 
                 {
                     Vec* p = &history[trailReadIndex];
-                    drawX = p->x;
-                    drawY = p->y;
-                    drawZ = p->z;
+                    trailX = p->x;
+                    trailY = p->y;
+                    trailZ = p->z;
+                }
+                if (trailReadIndex == trailMaxIndex) {
+                    trailNextIndex = 0;
                 }
                 {
                     Vec* p = &history[trailNextIndex];
@@ -163,132 +165,143 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                     camY = p->y;
                     camZ = p->z;
                 }
-                segVec.x = camX - drawX;
-                segVec.y = camY - drawY;
-                segVec.z = camZ - drawZ;
+                segX = camX - trailX;
+                segY = camY - trailY;
+                segZ = camZ - trailZ;
                 zeroVec.z = kPppYmMegaBirthShpTail3Zero;
                 zeroVec.y = kPppYmMegaBirthShpTail3Zero;
                 zeroVec.x = kPppYmMegaBirthShpTail3Zero;
-                startZ = drawZ;
-                startY = drawY;
-                startX = drawX;
+                segVec.x = segX;
+                segVec.y = segY;
+                segVec.z = segZ;
+                startZ = trailZ;
+                startY = trailY;
+                startX = trailX;
                 segLen = PSVECDistance(&zeroVec, &segVec);
-                segLenD = segLen;
-                float segProgress = segLenD;
+                segProgress = segLen;
 
                 if (payload[0x9E] == 0) {
-                    continue;
+                    goto fade_dec;
                 }
+                particleShapeFrame = *(u16*)(particle + 0x1C);
+                workRand = *(u16*)(workBytes + 0x80);
+                shapeFrameStep = (u32)shapeAnim->m_frames[0].m_duration;
+                shapeFrameCount = (u32)shapeAnim->m_frameCount;
 
-                while ((s32)frameCount > 0) {
-                    u8* curHist = particle + trailNextIndex * 0xc;
-                    bool canDraw = (kPppYmMegaBirthShpTail3Zero != *(float*)(curHist + 0x80)) ||
-                                   (kPppYmMegaBirthShpTail3Zero != *(float*)(curHist + 0x84)) ||
-                                   (kPppYmMegaBirthShpTail3Zero != *(float*)(curHist + 0x88));
-                    if (canDraw) {
-                        workRand = (s16)((u32)workRand * 0x80d + 7);
-                        const u32 shapeFrame = (u32)(particleShapeFrame + workRand) / shapeFrameStep;
-                        pppShapeAnimFrame* frame = &shapeAnim->m_frames[shapeFrame % (u32)shapeFrameCount];
-                        tagOAN3_SHAPE* shape =
-                            reinterpret_cast<tagOAN3_SHAPE*>(reinterpret_cast<u8*>(shapeAnim) + frame->m_shapeOffset);
-
-                        pppUnitMatrix(drawMtx);
-                        drawMtx.value[0][0] = drawScale * ppvMng->m_scale.x;
-                        drawMtx.value[1][1] = drawScale * ppvMng->m_scale.y;
-                        drawMtx.value[2][2] = drawScale * ppvMng->m_scale.z;
-
-                        if (*(u16*)(payload + 0x94) != 0) {
-                            pppFMATRIX rotMtx;
-                            pppFMATRIX tmpMtx;
-                            PSMTXRotRad(rotMtx.value, 'z',
-                                        kPppYmMegaBirthShpTail3DegToRad *
-                                            (float)*(u16*)(particle + frameCount * sizeof(u16) + 0x40));
-                            tmpMtx = drawMtx;
-                            pppMulMatrix(drawMtx, rotMtx, tmpMtx);
-                        }
-
-                        trailPos.x = drawX;
-                        trailPos.y = drawY;
-                        trailPos.z = drawZ;
-                        if (payload[0xA5] == 0) {
-                            PSMTXMultVec(ppvWorldMatrix, &trailPos, &cameraPos);
-                        } else if (payload[0xA5] == 1) {
-                            managerPos.x = ppvMng->m_matrix.value[0][3];
-                            managerPos.y = ppvMng->m_matrix.value[1][3];
-                            managerPos.z = ppvMng->m_matrix.value[2][3];
-                            PSVECAdd(&managerPos, &trailPos, &trailPos);
-                            PSMTXMultVec(ppvCameraMatrix, &trailPos, &cameraPos);
-                        } else {
-                            cameraPos = trailPos;
-                        }
-
-                        drawMtx.value[0][3] = cameraPos.x;
-                        drawMtx.value[1][3] = cameraPos.y;
-                        drawMtx.value[2][3] = cameraPos.z;
-                        GXLoadPosMtxImm(drawMtx.value, 0);
-
-                        amb.r = (s8)fadeR;
-                        amb.g = (u8)fadeG;
-                        amb.b = (u8)fadeB;
-                        amb.a = (u8)(fadeA * (kPppYmMegaBirthShpTail3DepthAlphaScale * (kPppYmMegaBirthShpTail3ColorComponentMax - *(float*)(particle + 0x30))));
-                        if (amb.a > 0x7F) {
-                            amb.a = 0x7F;
-                        }
-                        GXSetChanAmbColor(GX_COLOR0A0, amb);
-                        pppDrawShp(shape, ppvEnv->m_materialSetPtr, payload[0x58]);
-                    }
-
-                    frameCount--;
-                    fadeR -= fadeRStep;
-                    fadeG -= fadeGStep;
-                    fadeB -= fadeBStep;
-                    fadeA -= fadeAStep;
-                    drawScale -= drawScaleStep;
-                    if (*(float*)(payload + 0x98) <= kPppYmMegaBirthShpTail3Zero) {
-                        break;
-                    }
-
-                    while (segProgress < *(float*)(payload + 0x98)) {
-                        bool wrap = (trailNextIndex == trailMaxIndex);
-                        trailNextIndex++;
-                        if (wrap) {
-                            trailNextIndex = 0;
-                        }
-                        if (trailNextIndex == trailReadIndex) {
-                            goto next_particle;
-                        }
-
+                for (frameCount = *(u16*)(payload + 0x9C); 0 < (s32)frameCount; frameCount--) {
+                    curHist = particle + trailNextIndex * 0xc;
+                    if ((kPppYmMegaBirthShpTail3Zero != *(float*)(curHist + 0x80)) ||
+                        (kPppYmMegaBirthShpTail3Zero != *(float*)(curHist + 0x84)) ||
+                        (kPppYmMegaBirthShpTail3Zero != *(float*)(curHist + 0x88))) {
                         {
-                            Vec* p = &history[trailNextIndex];
-                            spacingAccum = spacingAccum - segLenD;
-                            float newY = p->y;
-                            float newZ = p->z;
-                            float newX = p->x;
-                            segVec.y = newY - camY;
-                            segVec.z = newZ - camZ;
-                            segVec.x = newX - camX;
-                            zeroVec.z = kPppYmMegaBirthShpTail3Zero;
-                            zeroVec.y = kPppYmMegaBirthShpTail3Zero;
-                            zeroVec.x = kPppYmMegaBirthShpTail3Zero;
-                            segLen = PSVECDistance(&zeroVec, &segVec);
-                            segLenD = segLen;
-                            startZ = camZ;
-                            startY = camY;
-                            startX = camX;
-                            camZ = newZ;
-                            camY = newY;
-                            camX = newX;
-                        }
-                        segProgress = segProgress + segLenD;
-                    }
+                            workRand = (workRand * 0x80d + 7) & 0xFFFF;
+                            const u32 shapeFrame = (particleShapeFrame + workRand) / shapeFrameStep;
+                            shape = reinterpret_cast<tagOAN3_SHAPE*>(
+                                (u8*)shapeAnim +
+                                *(s16*)((u8*)shapeAnim + (shapeFrame % shapeFrameCount) * 8 + 0x10));
 
-                    {
-                        float t = spacingAccum / segLenD;
-                        drawX = segVec.x * t + startX;
-                        drawY = segVec.y * t + startY;
-                        drawZ = segVec.z * t + startZ;
-                        spacingAccum = spacingAccum + *(float*)(payload + 0x98);
-                        segProgress = segProgress - *(float*)(payload + 0x98);
+                            pppUnitMatrix(drawMtx);
+                            drawMtx.value[0][0] = drawScale * ppvMng->m_scale.x;
+                            drawMtx.value[1][1] = drawScale * ppvMng->m_scale.y;
+                            drawMtx.value[2][2] = drawScale * ppvMng->m_scale.z;
+
+                            if (*(u16*)(payload + 0x94) != 0) {
+                                pppFMATRIX rotMtx;
+                                PSMTXRotRad(rotMtx.value, 'z',
+                                            kPppYmMegaBirthShpTail3DegToRad *
+                                                (float)*(u16*)(particle + frameCount * sizeof(u16) + 0x40));
+                                pppMulMatrix(drawMtx, rotMtx, drawMtx);
+                            }
+
+                            trailPos.x = trailX;
+                            trailPos.y = trailY;
+                            trailPos.z = trailZ;
+                            if (payload[0xA5] == 0) {
+                                PSMTXMultVec(ppvWorldMatrix, &trailPos, &cameraPos);
+                            } else if (payload[0xA5] == 1) {
+                                managerPos.x = ppvMng->m_matrix.value[0][3];
+                                managerPos.y = ppvMng->m_matrix.value[1][3];
+                                managerPos.z = ppvMng->m_matrix.value[2][3];
+                                PSVECAdd(&managerPos, &trailPos, &trailPos);
+                                PSMTXMultVec(ppvCameraMatrix, &trailPos, &cameraPos);
+                            }
+
+                            drawMtx.value[0][3] = cameraPos.x;
+                            drawMtx.value[1][3] = cameraPos.y;
+                            drawMtx.value[2][3] = cameraPos.z;
+                            GXLoadPosMtxImm(drawMtx.value, 0);
+
+                            amb.r = (s8)fadeR;
+                            amb.g = (u8)fadeG;
+                            amb.b = (u8)fadeB;
+                            amb.a = (u8)(fadeA * (kPppYmMegaBirthShpTail3DepthAlphaScale * (kPppYmMegaBirthShpTail3ColorComponentMax - *(float*)(particle + 0x30))));
+                            if (amb.a > 0x7F) {
+                                amb.a = 0x7F;
+                            }
+                            GXSetChanAmbColor(GX_COLOR0A0, amb);
+                            pppDrawShp(shape, ppvEnv->m_materialSetPtr, payload[0x58]);
+                        }
+
+                    fade_dec:
+                        fadeR -= fadeRStep;
+                        fadeG -= fadeGStep;
+                        fadeB -= fadeBStep;
+                        fadeA -= fadeAStep;
+                        drawScale -= drawScaleStep;
+                        if (*(float*)(payload + 0x98) <= kPppYmMegaBirthShpTail3Zero) {
+                            break;
+                        }
+
+                        for (;;) {
+                            Vec innerZero;
+                            Vec innerSeg;
+                            const float spacing = *(float*)(payload + 0x98);
+                            if (segProgress >= spacing) {
+                                const float t = spacingAccum / segLen;
+                                float mx = segX * t;
+                                float my = segY * t;
+                                float mz = segZ * t;
+                                trailX = mx + startX;
+                                trailY = my + startY;
+                                trailZ = mz + startZ;
+                                spacingAccum = spacingAccum + spacing;
+                                segProgress = segProgress - spacing;
+                                break;
+                            }
+
+                            {
+                                s32 prevNext = trailNextIndex;
+                                trailNextIndex++;
+                                if (prevNext == trailMaxIndex) {
+                                    trailNextIndex = 0;
+                                }
+                            }
+                            if (trailNextIndex == trailReadIndex) {
+                                goto next_particle;
+                            }
+
+                            startX = camX;
+                            startY = camY;
+                            startZ = camZ;
+                            spacingAccum = spacingAccum - segLen;
+                            {
+                                Vec* p = &history[trailNextIndex];
+                                camY = p->y;
+                                camZ = p->z;
+                                camX = p->x;
+                            }
+                            segY = camY - startY;
+                            segZ = camZ - startZ;
+                            segX = camX - startX;
+                            innerZero.z = kPppYmMegaBirthShpTail3Zero;
+                            innerZero.y = kPppYmMegaBirthShpTail3Zero;
+                            innerZero.x = kPppYmMegaBirthShpTail3Zero;
+                            innerSeg.x = segX;
+                            innerSeg.y = segY;
+                            innerSeg.z = segZ;
+                            segLen = PSVECDistance(&innerZero, &innerSeg);
+                            segProgress = segProgress + segLen;
+                        }
                     }
                 }
                 next_particle:;

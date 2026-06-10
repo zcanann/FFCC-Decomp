@@ -51,7 +51,7 @@ public:
 		union {
 			unsigned int m_codePos; // 0x1C
 			struct {
-				int m_codeFunc : 12;
+				short m_codeFunc : 12;
 				int m_codeOffset : 20;
 			} m_codeIndex;
 		};
@@ -98,8 +98,8 @@ public:
 		u16 m_returnValue;   // 0x2E
 		s32 m_codeSize;      // 0x30
 		u8* m_code;          // 0x34
-		s32 m_codeOffset;    // 0x38
-		s32 m_codePos;       // 0x3C
+		s32 m_debugCodeSize; // 0x38
+		u8* m_debugCode;     // 0x3C
 		s32 m_systemKind;    // 0x40
 		s32 m_systemIndex;   // 0x44
 		s32 m_reqFlagIndex;  // 0x48
@@ -180,7 +180,7 @@ public:
     u8* m_permanentVarDefs;         // 0x0008
     u8* m_permanentVarValues;       // 0x000C
     void* m_initScratchA;           // 0x0010
-    void* m_initScratchB;           // 0x0014
+    int m_classCount;              // 0x0014
     CClass* m_classes;              // 0x0018
     int m_funcCount;                // 0x001C
     u8* m_funcs;                    // 0x0020
@@ -195,14 +195,26 @@ public:
     u16* m_vstrOffsets;             // 0x0044
     float m_performanceTotalTime;   // 0x0048
     u8 m_performanceBlock[0x800];   // 0x004C
-    u8 m_pad_084C[0x80];            // 0x084C
+    char m_name[0x80];              // 0x084C
     CObject m_objectSentinel;       // 0x08CC
     CObject m_freeObjectSentinel;   // 0x0918
-    u32 m_currentCodePos;           // 0x0964
-    u32 m_previousCodePos;          // 0x0968
+    union {
+        u32 m_currentCodePos;       // 0x0964
+        struct {
+            short m_codeFunc : 12;
+            int m_codeOffset : 20;
+        } m_currentCodeIndex;
+    };
+    union {
+        u32 m_previousCodePos;      // 0x0968
+        struct {
+            short m_codeFunc : 12;
+            int m_codeOffset : 20;
+        } m_previousCodeIndex;
+    };
     u8 m_pad_096C[4];               // 0x096C
     int m_0x970;                    // 0x0970
-    u8 m_pad_0974[4];               // 0x0974
+    int m_0x974;                    // 0x0974
     void** m_freeListPrev;          // 0x0978
     void** m_freeListNext;          // 0x097C
     int m_freeListCount;            // 0x0980

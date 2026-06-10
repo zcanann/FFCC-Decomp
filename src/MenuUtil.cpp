@@ -1573,10 +1573,11 @@ void CMenuPcs::DrawOptionMenu()
 
 		int k = 0;
 		int y = k;
-		int uvY = k;
+		int uvY =  (k | 0);
 		int uvY2 = 0x18;
 		int modeU = 0x280;
-		for (int i = 0; i < 4; i++, y += 0x28, uvY += 0x20, uvY2 += 0x20, modeU += 0x40, k = 0) {
+		int __p1 = i;
+		for (int i = 0; __p1 < 4; i++, y += 0x28, uvY += 0x20, uvY2 += 0x20, modeU += 0x40, k = 0) {
 			CTexture* cursorPanel = GetTextureSetTexture(GetMenuTextureSet(this, 0xBC), 4);
 			float cursorWidth = static_cast<float>(cursorPanel->m_width);
 			float cursorHeight = static_cast<float>(cursorPanel->m_height);

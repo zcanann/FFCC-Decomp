@@ -5466,9 +5466,10 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 		        sGhostPartyWork.thresholdB, CharaGhostValue(0x204C),
 		        sGhostPartyWork.thresholdC, CharaGhostValue(0x2050));
 
+		float curY = y;
 		float width = static_cast<float>(font->GetWidth(text));
 		font->SetPosX(x - width * 0.5f);
-		font->SetPosY(y);
+		font->SetPosY(curY);
 		font->SetPosZ(z);
 		font->Draw(text);
 		y -= static_cast<float>(font->m_glyphHeight) * font->scaleY;
@@ -5476,9 +5477,10 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 		sprintf(text, s_partyObjGhostAngleFmt, sGhostPartyWork.pressure,
 		        static_cast<int>(FLOAT_80331A5C * angleScale), CharaGhostValue(0x2054));
 
+		float curY2 = y;
 		width = static_cast<float>(font->GetWidth(text));
 		font->SetPosX(x - width * 0.5f);
-		font->SetPosY(y);
+		font->SetPosY(curY2);
 		font->SetPosZ(z);
 		font->Draw(text);
 	} else {

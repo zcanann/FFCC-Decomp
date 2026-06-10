@@ -1640,12 +1640,11 @@ void CCameraPcs::drawShadowBegin()
             m_targetZ = sumZ * half;
             m_targetY = m_fullScreenShadowPosition.y;
 
-            float w = m_shadowRectBound.m_max.x - m_shadowRectBound.m_min.x;
+            depth = m_shadowRectBound.m_max.x - m_shadowRectBound.m_min.x;
             float h = m_shadowRectBound.m_max.z - m_shadowRectBound.m_min.z;
-            if (w < h) {
-                w = h;
+            if (depth < h) {
+                depth = h;
             }
-            depth = w;
             m_fullScreenShadow.m_span = kCameraHalfF * depth;
         } else if (m_shadowAuto == 2) {
             m_targetX = m_fullScreenShadowPosition.x;

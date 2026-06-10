@@ -970,6 +970,9 @@ int CCaravanWork::GetFoodRank(int playerIdx)
 void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxResults)
 {
 	int foundCount = 0;
+	int bit0;
+	int bit1;
+	int bit2;
 
 	for (int i = 0; i < maxResults; i++) {
 		romLetterWork[i] = 0;
@@ -1469,10 +1472,6 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 		}
 
 		{
-			int bit0;
-			int bit1;
-			int bit2;
-
 			for (int i = 0; i < 8; i++) {
 				const unsigned short evtRule = curLetter->m_eventRules[i];
 				const int sourceType = (evtRule >> 11) & 3;

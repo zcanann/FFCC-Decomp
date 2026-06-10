@@ -116,6 +116,11 @@ static inline float LoadFloat(const float& value)
     return value;
 }
 
+static inline float LoadFloatFresh(const volatile float& value)
+{
+    return value;
+}
+
 static inline void ClearMana2ModelCallbacks(CChara::CModel* model)
 {
     model->SetCallbackContext(0, 0);
@@ -456,6 +461,8 @@ static int RenderWaterMesh(VMana2* mana2)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_dead_assignments off
 static int UpdateWaterMesh(VMana2* mana2)
 {
     float* waterHeightA;
@@ -477,8 +484,9 @@ static int UpdateWaterMesh(VMana2* mana2)
     do {
         currentScale = kMana2Zero;
         neighborScale = kMana2Half;
+        int col = 1;
         int index = rowBase + 1;
-        for (int col = 1; col < 0x10; col += 5, index += 5) {
+        while (col < 0x10) {
             int above0 = index - 0x11;
             int below0 = index + 0x11;
             float* center0 = &waterHeightA[index];
@@ -488,34 +496,34 @@ static int UpdateWaterMesh(VMana2* mana2)
                                                    center0[-1] + center0[1]) -
                                   waterHeightB[index];
 
-            int index1 = index + 1;
-            int above1 = index1 - 0x11;
-            int below1 = index1 + 0x11;
+            int index1 = col + rowBase + 1;
+            int above1 = col + rowBase + 1 - 0x11;
+            int below1 = col + rowBase + 1 + 0x11;
             float* center1 = &waterHeightA[index1];
             waterHeightB[index1] = currentScale * center1[0] +
                                    neighborScale * (waterHeightA[above1] + waterHeightA[below1] +
                                                     center1[-1] + center1[1]) -
                                    waterHeightB[index1];
 
-            int index2 = index + 2;
-            int above2 = index2 - 0x11;
-            int below2 = index2 + 0x11;
+            int index2 = col + rowBase + 2;
+            int above2 = col + rowBase + 2 - 0x11;
+            int below2 = col + rowBase + 2 + 0x11;
             float* center2 = &waterHeightA[index2];
             waterHeightB[index2] = currentScale * center2[0] +
                                    neighborScale * (waterHeightA[above2] + waterHeightA[below2] +
                                                     center2[-1] + center2[1]) -
                                    waterHeightB[index2];
 
-            int index3 = index + 3;
-            int above3 = index3 - 0x11;
-            int below3 = index3 + 0x11;
+            int index3 = col + rowBase + 3;
+            int above3 = col + rowBase + 3 - 0x11;
+            int below3 = col + rowBase + 3 + 0x11;
             float* center3 = &waterHeightA[index3];
             waterHeightB[index3] = currentScale * center3[0] +
                                    neighborScale * (waterHeightA[above3] + waterHeightA[below3] +
                                                     center3[-1] + center3[1]) -
                                    waterHeightB[index3];
 
-            int index4 = index + 4;
+            int index4 = col + rowBase + 4;
             int above4 = index4 - 0x11;
             int below4 = index4 + 0x11;
             float* center4 = &waterHeightA[index4];
@@ -523,6 +531,8 @@ static int UpdateWaterMesh(VMana2* mana2)
                                    neighborScale * (waterHeightA[above4] + waterHeightA[below4] +
                                                     center4[-1] + center4[1]) -
                                    waterHeightB[index4];
+            col += 5;
+            index += 5;
         }
         row++;
         rowBase += 0x11;
@@ -545,6 +555,7 @@ static int UpdateWaterMesh(VMana2* mana2)
                               mana2->m_waterMtx, mana2->m_colors, mana2->m_texCoord1);
     return 1;
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -678,10 +689,10 @@ void CalcReflectionVector2(
     Vec objSpacePos;
     Vec objSpaceNormal;
     Vec2d uv;
-    Mtx nodeMtx;
-    Mtx nodeRotMtx;
-    Mtx cameraMtx;
     Mtx cameraModelMtx;
+    Mtx cameraMtx;
+    Mtx nodeRotMtx;
+    Mtx nodeMtx;
     float (*nodeMatrix)[4];
     u16* dl = (u16*)displayList;
     u16* dlEnd;
@@ -729,12 +740,12 @@ void CalcReflectionVector2(
 
         dl = (u16*)((u8*)dl + 3);
         for (i = 0; i < itemCount; i++) {
+            Vec* outVec;
             u16 posIndex = dl[0];
             u16 normalIndex = dl[1];
             int axis = 0;
             float maxAxis;
             float invAxis;
-            Vec* outVec;
             u8* clr;
 
             dl += 4;
@@ -752,17 +763,19 @@ void CalcReflectionVector2(
             outVec = &reflectionVec[posIndex];
             C_VECReflect(&cameraVector, &objSpaceNormal, outVec);
 
-            float absY = fabsf(outVec->y);
-            float absX = fabsf(outVec->x);
-            float absZ = fabsf(outVec->z);
+            float absVals[3];
+            float* absPtr = absVals;
+            absPtr[1] = fabsf(outVec->y);
+            absPtr[0] = fabsf(outVec->x);
+            absPtr[2] = fabsf(outVec->z);
 
             axis = 0;
-            maxAxis = absX;
-            if (absY > absX) {
+            maxAxis = absPtr[0];
+            if (absPtr[1] > absPtr[0]) {
                 axis = 1;
-                maxAxis = absY;
+                maxAxis = absPtr[1];
             }
-            if (absZ > maxAxis) {
+            if (absPtr[2] > maxAxis) {
                 axis = 2;
             }
             CVector reflected(outVec->x, outVec->y, outVec->z);
@@ -861,7 +874,6 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     VMana2* work;
     CChara::CModel* model;
     CCharaPcs::CHandle* handle;
-    CGObject* gObject;
     Mtx identityMtx;
     Mtx savedCameraMtx;
     Mtx lookAtMtx;
@@ -877,8 +889,9 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     GXColor quadColor;
     u32 depthTexSize;
     GXTexObj* baseParaboloidTexObjs;
+    CGObject* gObject;
     GXTexObj* sourceTexObjs;
-    GXTexObj* envTexObj0;
+    CTexture* envTexture0;
     s32 i;
 
     work = static_cast<VMana2*>(param_2);
@@ -913,6 +926,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
         centerPos.z = gObject->m_worldPosition.z;
     }
     centerPos.y = LoadFloat(kMana2ParaboloidCenterYOffset) + centerPos.y;
+    centerPos.z = centerPos.z;
 
     depthTexSize = GXGetTexBufferSize(0x80, 0x80, (_GXTexFmt)6, GX_FALSE, 0);
     GXGetTexBufferSize(0x80, 0x80, (_GXTexFmt)4, GX_FALSE, 0);
@@ -923,50 +937,55 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
                                    (_GXTexFmt)0x16, 1);
         GXSetViewport(LoadFloat(kMana2Zero), LoadFloat(kMana2Zero), LoadFloat(kMana2ParaboloidTexSize),
                       LoadFloat(kMana2ParaboloidTexSize), LoadFloat(kMana2Zero), LoadFloat(kMana2One));
-        C_MTXPerspective(projectionMtx, LoadFloat(kMana2ParaboloidFov), LoadFloat(kMana2One),
+        float fov = LoadFloat(kMana2ParaboloidFov);
+        C_MTXPerspective(projectionMtx, fov, LoadFloat(kMana2One),
                          LoadFloat(kMana2One), LoadFloat(kMana2ParaboloidFar));
         GXSetProjection(projectionMtx, (_GXProjectionType)0);
+        float one = LoadFloat(kMana2One);
+        float zero = LoadFloat(kMana2Zero);
 
         for (i = 0; i < 6; i++) {
             cameraPos.x = centerPos.x;
             cameraPos.y = centerPos.y;
             cameraPos.z = centerPos.z;
-            cameraUp.x = LoadFloat(kMana2Zero);
-            cameraUp.y = LoadFloat(kMana2One);
-            cameraUp.z = LoadFloat(kMana2Zero);
+            cameraUp.x = zero;
+            cameraUp.y = one;
+            cameraUp.z = zero;
 
             switch (i) {
             case 0:
-                cameraPos.x = centerPos.x + LoadFloat(kMana2One);
+                cameraPos.x = centerPos.x + one;
                 break;
             case 4:
-                cameraPos.z = centerPos.z + LoadFloat(kMana2One);
+                cameraPos.z = centerPos.z + one;
                 break;
             case 1:
-                cameraPos.x = centerPos.x - LoadFloat(kMana2One);
+                cameraPos.x = centerPos.x - one;
                 break;
             case 5:
-                cameraPos.z = centerPos.z - LoadFloat(kMana2One);
+                cameraPos.z = centerPos.z - one;
                 break;
             case 2:
-                cameraPos.y = centerPos.y + LoadFloat(kMana2One);
-                cameraUp.x = LoadFloat(kMana2Zero);
-                cameraUp.y = LoadFloat(kMana2Zero);
+                cameraPos.y = centerPos.y + one;
+                cameraUp.x = zero;
+                cameraUp.y = zero;
                 cameraUp.z = LoadFloat(kMana2NegativeOne);
                 break;
             case 3:
-                cameraPos.y = centerPos.y - LoadFloat(kMana2One);
-                cameraUp.x = LoadFloat(kMana2Zero);
-                cameraUp.y = LoadFloat(kMana2Zero);
-                cameraUp.z = LoadFloat(kMana2One);
+                cameraPos.y = centerPos.y - one;
+                cameraUp.x = zero;
+                cameraUp.y = zero;
+                cameraUp.z = one;
                 break;
             }
 
             C_MTXLookAt(lookAtMtx, (Point3d*)&centerPos, &cameraUp, (Point3d*)&cameraPos);
             Graphic.SetViewport();
             GXSetScissor(0, 0, 0x280, 0x1C0);
-            gUtil.RenderTextureQuad(LoadFloat(kMana2Zero), LoadFloat(kMana2Zero), LoadFloat(kMana2ParaboloidTexSize),
-                                    LoadFloat(kMana2ParaboloidTexSize), baseParaboloidTexObjs, 0, 0, 0,
+            float texQuadZero = LoadFloatFresh(kMana2Zero);
+            float texQuadSize = LoadFloatFresh(kMana2ParaboloidTexSize);
+            gUtil.RenderTextureQuad(texQuadZero, texQuadZero, texQuadSize,
+                                    texQuadSize, baseParaboloidTexObjs, 0, 0, 0,
                                     (_GXBlendFactor)4, (_GXBlendFactor)5);
             baseParaboloidTexObjs++;
         }
@@ -1005,22 +1024,25 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
         GXSetColorUpdate(GX_TRUE);
         GXSetAlphaUpdate(GX_TRUE);
         GXSetZCompLoc(GX_TRUE);
+        quadMin.x = LoadFloat(kMana2Zero);
+        quadMin.y = LoadFloat(kMana2Zero);
+        quadMin.z = LoadFloat(kMana2Zero);
         gUtil.RenderTextureQuad(LoadFloat(kMana2Zero), LoadFloat(kMana2Zero), LoadFloat(kMana2ParaboloidTexSize),
                                 LoadFloat(kMana2ParaboloidTexSize), &sceneTexObj, 0, 0, 0, (_GXBlendFactor)4,
                                 (_GXBlendFactor)5);
         work->m_paraboloidReady = 1;
     }
 
-    envTexObj0 = &work->m_envTexture0->m_texObj;
+    envTexture0 = work->m_envTexture0;
     if (step->m_rippleLevel != 0) {
         GXInitTexObj(work->m_generatedTexObj0, work->m_generatedTexture0, 0x80, 0x80, (_GXTexFmt)4, (_GXTexWrapMode)0,
                      (_GXTexWrapMode)0, GX_FALSE);
         GXInitTexObj(work->m_generatedTexObj1, work->m_generatedTexture1, 0x80, 0x80, (_GXTexFmt)4, (_GXTexWrapMode)0,
                      (_GXTexWrapMode)0, GX_FALSE);
         drawParaboloidMap(sourceTexObjs, work->m_generatedTexObj1, work->m_paraboloidMap, work->m_paraboloidMapSize,
-                          envTexObj0, 1);
+                          &envTexture0->m_texObj, 1);
         drawParaboloidMap(sourceTexObjs, work->m_generatedTexObj0, work->m_paraboloidMap, work->m_paraboloidMapSize,
-                          envTexObj0, 0);
+                          &envTexture0->m_texObj, 0);
         Graphic.SetViewport();
         GXSetProjection(savedScreenMtx, (_GXProjectionType)0);
         PSMTXCopy(savedCameraMtx, CameraMatrix());
@@ -1031,9 +1053,9 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
             GXInitTexObj(work->m_generatedTexObj1, work->m_generatedTexture1, 0x80, 0x80, (_GXTexFmt)4, (_GXTexWrapMode)1,
                          (_GXTexWrapMode)1, GX_FALSE);
             drawParaboloidMap(work->m_baseParaboloidTexObjs, work->m_generatedTexObj1, work->m_paraboloidMap,
-                              work->m_paraboloidMapSize, envTexObj0, 1);
+                              work->m_paraboloidMapSize, &envTexture0->m_texObj, 1);
             drawParaboloidMap(work->m_baseParaboloidTexObjs, work->m_generatedTexObj0, work->m_paraboloidMap,
-                              work->m_paraboloidMapSize, envTexObj0, 0);
+                              work->m_paraboloidMapSize, &envTexture0->m_texObj, 0);
             work->m_paraboloidReady = 1;
         }
     }
@@ -1541,11 +1563,11 @@ void pppConstructMana2(pppMana2* pppMana2, _pppCtrlTable* param_2)
 void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int partIndex, int dlIndex, float (*mtx)[4])
 {
     CChara::CMesh::CRefData* meshData = model->m_meshes[partIndex].m_data;
-    CChara::CMesh::CDisplayList* displayList = &meshData->m_displayLists[dlIndex];
     VMana2* mana2 = (VMana2*)work;
+    CChara::CMesh::CDisplayList* displayList = &meshData->m_displayLists[dlIndex];
+    int draw = 0;
     pppMana2Step* stepData = static_cast<pppMana2Step*>(step);
     int type = stepData->m_type;
-    int draw = 0;
 
     switch (type) {
     case 0:
@@ -1593,9 +1615,9 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
         offset.y = stepData->m_waterScale;
         PSMTXMultVec(mtx, &offset, &offset);
 
-        float newY = y - offset.y;
+        y = y - offset.y;
         mtx[0][3] = x;
-        mtx[1][3] = newY;
+        mtx[1][3] = y;
         mtx[2][3] = z;
 
         PSMTXConcat(cameraMtx, mtx, posMtx);

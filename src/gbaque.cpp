@@ -3785,64 +3785,66 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 
 	unsigned int* foodBasePtr = &Game.m_scriptFoodBase[channel];
 	int totalSize = 0;
+	int work;
+	unsigned int packed;
 
 	for (int i = 0; i < 0x40; i++) {
-		const int itemId = reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_inventoryItems[i];
 		unsigned short sellInfo[4];
-		sellInfo[3] = 0;
-		if ((itemId < 1) || (itemId > 0x9E)) {
+		work = reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_inventoryItems[i];
+		if ((work < 1) || (work > 0x9E)) {
 			memset(sellInfo, 0, sizeof(sellInfo));
 		} else {
-			const int itemBase = Game.unkCFlatData0[2] + itemId * 0x48;
+			const int itemBase = Game.unkCFlatData0[2] + work * 0x48;
 			sellInfo[0] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 4), 0);
 			sellInfo[1] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 6), 0);
 			sellInfo[2] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 8), 0);
 		}
 		memcpy(outData, sellInfo, 8);
 		outData += 8;
-		totalSize += 8;
 	}
+	totalSize += 0x200;
 
-	const float userRate = static_cast<float>(static_cast<double>(reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_shopParam) / 100.0) * kGbaQueueQuarter;
+	const float userRate =
+		static_cast<float>(
+			static_cast<double>(reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_shopParam) / 100.0) *
+		kGbaQueueQuarter;
 	for (int i = 0; i < 0x40; i++) {
-		const int itemId = reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_inventoryItems[i];
-		unsigned int packedPrice;
-		if (itemId > 0) {
-			unsigned int itemPrice = static_cast<unsigned short>(
-				*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x20));
-			itemPrice = static_cast<int>(static_cast<float>(itemPrice) * userRate);
-			if (itemPrice < 1) {
-				itemPrice = 1;
+		work = reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_inventoryItems[i];
+		if (work > 0) {
+			work = static_cast<int>(
+				static_cast<float>(static_cast<unsigned short>(
+					*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + work * 0x48 + 0x20))) *
+				userRate);
+			if (work < 1U) {
+				work = 1;
 			}
-			packedPrice = SwapU32(static_cast<unsigned int>(itemPrice));
+			packed = __lwbrx(&work, 0);
 		} else {
-			packedPrice = 0;
+			packed = 0;
 		}
 
-		memcpy(outData, &packedPrice, 4);
+		memcpy(outData, &packed, 4);
 		outData += 4;
 		totalSize += 4;
 	}
 
-	char** itemNameTable = Game.m_cFlatDataArr[1].TableStrings(6);
 	for (int i = 0; i < 0x40; i++) {
 		memset(itemNameScratch, 0, kGbaQueueScratchTextSize);
 		memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
-		const int itemId = reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_inventoryItems[i];
-		if (itemId < 1) {
+		work = reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_inventoryItems[i];
+		if (work > 0) {
+			strcpy(itemNameScratch, Game.m_cFlatDataArr[1].TableStrings(6)[work]);
+			CMes::MakeAgbString(agbStringScratch, itemNameScratch, 0, 0);
+			packed = strlen(agbStringScratch) + 1;
+			memcpy(outData, agbStringScratch, packed);
+			outData += packed;
+			totalSize += packed;
+		} else {
 			outData[0] = 0;
 			outData += 1;
 			totalSize += 1;
-			continue;
 		}
-
-		strcpy(itemNameScratch, itemNameTable[itemId]);
-		CMes::MakeAgbString(agbStringScratch, itemNameScratch, 0, 0);
-		const int strSize = static_cast<int>(strlen(agbStringScratch) + 1);
-		memcpy(outData, agbStringScratch, strSize);
-		outData += strSize;
-		totalSize += strSize;
 	}
 
 	delete[] agbStringScratch;

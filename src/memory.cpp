@@ -1079,10 +1079,10 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
     }
 
     int totalSize = 0;
-    int freeCount = 0;
-    int usedCount = 0;
     int freeSize = 0;
     int usedSize = 0;
+    int usedCount = 0;
+    int freeCount = 0;
 
     if (stageGetAllocationMode(this) == 2) {
         int top = m_heapTop;
@@ -1134,12 +1134,12 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
             }
 
             if ((group == static_cast<unsigned long>(-1)) || (group == node->m_defaultParam)) {
-                if ((node->m_flags & 4) == 0) {
-                    freeCount++;
-                    usedSize += node->m_size;
-                } else {
+                if ((node->m_flags & 4) != 0) {
                     usedCount++;
                     freeSize += node->m_size;
+                } else {
+                    freeCount++;
+                    usedSize += node->m_size;
                 }
             }
 

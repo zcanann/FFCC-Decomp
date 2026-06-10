@@ -392,10 +392,13 @@ void CRingMenu::drawGBA()
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	const float sizePulse = kRingMenuPulseScale * (kRingMenuOne - gbaAnim) + kRingMenuOne;
-	float cycle = static_cast<float>(fmod(static_cast<double>(kRingMenuCycleStep * static_cast<float>(m_commonFrameCounter)),
-	                                      kRingMenuCycleWrapD));
-	if (cycle > kRingMenuOne) {
-		cycle = kRingMenuTwo - cycle;
+	float cycleRaw = static_cast<float>(fmod(static_cast<double>(kRingMenuCycleStep * static_cast<float>(m_commonFrameCounter)),
+	                                         kRingMenuCycleWrapD));
+	float cycle;
+	if (cycleRaw > kRingMenuOne) {
+		cycle = kRingMenuTwo - cycleRaw;
+	} else {
+		cycle = cycleRaw;
 	}
 
 	const float angle = kRingMenuPi * cycle;
@@ -405,26 +408,24 @@ void CRingMenu::drawGBA()
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 
 	const float alphaBase = kRingMenuAlphaMax * gbaAnim;
-	const unsigned int alphaShadow =
-	    static_cast<unsigned int>(static_cast<int>(kRingMenuHalf * alphaBase * showScale));
-	CColor shadowColor(0, 0, 0, static_cast<unsigned char>(alphaShadow));
+	CColor shadowColor(0, 0, 0, static_cast<unsigned char>(kRingMenuHalf * alphaBase * showScale));
 	MenuPcs.SetColor(shadowColor);
 
 	const float drawAngle = kRingMenuDrawAngleScale * (kRingMenuTwo * (cycle - kRingMenuHalf));
 	const float invSize = kRingMenuOne - sizePulse;
-	const float drawX = posX + kRingMenuSmallOffset * (sizePulse * sinB);
-	const float drawY = posY - kRingMenuGbaOrbitYScale * (sizePulse * sinA);
-	const float menuV = static_cast<float>(m_menuIndex * 0x30);
+	const float orbitX = kRingMenuSmallOffset * (sizePulse * sinB);
+	const float orbitY = kRingMenuGbaOrbitYScale * (sizePulse * sinA);
+	const float drawX = posX + orbitX;
+	const float drawY = posY - orbitY;
 	MenuPcs.DrawRect(3, kRingMenuSmallIconSize + drawX, kRingMenuSmallIconSize + drawY, kRingMenuPanelWidth80, kRingMenuGbaIconSize,
-	                                 kRingMenuZero, menuV, kRingMenuThreeQuarter * (kRingMenuOne + invSize),
+	                                 kRingMenuZero, static_cast<float>(m_menuIndex * 0x30), kRingMenuThreeQuarter * (kRingMenuOne + invSize),
 	                                 kRingMenuThreeQuarter * (sizePulse + invSize), drawAngle);
 
 	const float alphaLit = alphaBase * showScale;
-	const unsigned int alphaIcon = static_cast<unsigned int>(static_cast<int>(alphaLit));
-	CColor iconColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaIcon));
+	CColor iconColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaLit));
 	MenuPcs.SetColor(iconColor);
-	MenuPcs.DrawRect(3, drawX, drawY, kRingMenuPanelWidth80, kRingMenuGbaIconSize, kRingMenuZero, menuV,
-	                                 kRingMenuThreeQuarter * static_cast<float>(sizePulse), kRingMenuThreeQuarter * static_cast<float>(sizePulse), drawAngle);
+	MenuPcs.DrawRect(3, drawX, drawY, kRingMenuPanelWidth80, kRingMenuGbaIconSize, kRingMenuZero, static_cast<float>(m_menuIndex * 0x30),
+	                                 kRingMenuThreeQuarter * sizePulse, kRingMenuThreeQuarter * sizePulse, drawAngle);
 
 	const unsigned int flatFlags = CFlatEnabledEventFlags();
 	if (((flatFlags & 8) != 0) && (Joybus.GetGBAStart(m_menuIndex) == 0)) {
@@ -438,10 +439,7 @@ void CRingMenu::drawGBA()
 			MenuPcs.DrawRect(3, drawX, drawY, kRingMenuGbaIconSize, kRingMenuGbaIconSize, kRingMenuZero, kRingMenuCommandIconV,
 			                                 kRingMenuOne, kRingMenuOne, 0.0f);
 		} else {
-			unsigned int frameHalf = static_cast<int>(System.m_frameCounter) >> 1;
-			int frameSign = frameHalf >> 31;
-			int frameTex = static_cast<unsigned int>(
-			    (frameSign * 0x10 | (frameHalf * 0x10000000 + frameSign) >> 28) - frameSign);
+			int frameTex = (static_cast<int>(System.m_frameCounter) >> 1) % 16;
 			if (frameTex > 3) {
 				frameTex &= 1;
 			}

@@ -576,12 +576,13 @@ void CGObject::move()
 
         movingWithScript = 1;
     } else {
-        const int player = static_cast<s8>(m_animStateMisc);
-        if ((static_cast<s8>(m_animStateMisc) >= 0)
-            && (static_cast<s8>(m_animStateMisc) < 4)
+        const signed char animMisc = static_cast<s8>(m_animStateMisc);
+        const int player = animMisc;
+        if ((animMisc >= 0)
+            && (animMisc < 4)
             && m_weaponNodeFlagAll.m_bits1.m_shield
             && m_weaponNodeFlagAll.m_bits1.m_menuReady
-            && ((Game.m_gameWork.m_menuStageMode == 0) || (static_cast<s8>(m_animStateMisc) == 0))) {
+            && ((Game.m_gameWork.m_menuStageMode == 0) || (animMisc == 0))) {
             u16 buttons = (Pad.m_debugPadLock != 0 || (player == 0 && Pad.m_debugPadPort != -1))
                 ? 0
                 : Pad.GetPadInputs()[RemapPadSlot(&Pad, player)].button[0];

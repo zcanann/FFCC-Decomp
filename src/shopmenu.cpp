@@ -3141,26 +3141,28 @@ void CShopMenu::Calc()
         }
         break;
     case 4:
-        if (subMode < 1) {
-            if (subMode >= 0) {
-                this->SelectItemIdx();
-                if ((GetPadButtons() & 0x200) != 0) {
-                    Sound.PlaySe(3, 0x40, 0x7F, 0);
-                    this->SetMode(5);
-                }
+        switch (subMode) {
+        case 0:
+            this->SelectItemIdx();
+            if ((GetPadButtons() & 0x200) != 0) {
+                Sound.PlaySe(3, 0x40, 0x7F, 0);
+                this->SetMode(5);
             }
-        } else if (subMode == 1) {
+            break;
+        case 1:
             this->SelectFigure();
             if ((GetPadButtons() & 0x200) != 0) {
                 Sound.PlaySe(3, 0x40, 0x7F, 0);
                 subMode = 0;
             }
-        } else if (subMode < 3) {
+            break;
+        case 2:
             this->SelectYesNo();
             if ((GetPadButtons() & 0x200) != 0) {
                 Sound.PlaySe(3, 0x40, 0x7F, 0);
                 subMode = 1;
             }
+            break;
         }
         break;
     case 5:
@@ -3180,22 +3182,23 @@ void CShopMenu::Calc()
         }
         break;
     case 7:
-        if (subMode != 1) {
-            if (subMode < 1) {
-                if (subMode >= 0) {
-                    this->SelectItemIdx();
-                    if ((GetPadButtons() & 0x200) != 0) {
-                        Sound.PlaySe(3, 0x40, 0x7F, 0);
-                        this->SetMode(8);
-                    }
-                }
-            } else if (subMode < 3) {
-                this->SelectYesNo();
-                if ((GetPadButtons() & 0x200) != 0) {
-                    Sound.PlaySe(3, 0x40, 0x7F, 0);
-                    subMode = 0;
-                }
+        switch (subMode) {
+        case 0:
+            this->SelectItemIdx();
+            if ((GetPadButtons() & 0x200) != 0) {
+                Sound.PlaySe(3, 0x40, 0x7F, 0);
+                this->SetMode(8);
             }
+            break;
+        case 1:
+            break;
+        case 2:
+            this->SelectYesNo();
+            if ((GetPadButtons() & 0x200) != 0) {
+                Sound.PlaySe(3, 0x40, 0x7F, 0);
+                subMode = 0;
+            }
+            break;
         }
         break;
     case 9:

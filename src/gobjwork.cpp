@@ -2184,6 +2184,7 @@ unsigned int CCaravanWork::GetMagicCharge(int cmdListIdx, int&, int&)
 #pragma opt_common_subs off
 int CCaravanWork::GetCmdListItemName(int cmdListIdx, int* firstCmdIdx, int* itemCmdListIdx)
 {
+	short numSlots;
 	int groupedCount;
 
 	if (Game.m_gameWork.m_menuStageMode == 0) {
@@ -2201,7 +2202,8 @@ int CCaravanWork::GetCmdListItemName(int cmdListIdx, int* firstCmdIdx, int* item
 
 			groupedCount = 1;
 			int nextIdx = topIdx + 1;
-			for (int n = topIdx + 1; n < static_cast<short>(m_numCmdListSlots); n++) {
+			numSlots = m_numCmdListSlots;
+			for (int n = topIdx + 1; n < numSlots; n++) {
 				if (m_commandListExtra[nextIdx] != -1) {
 					break;
 				}

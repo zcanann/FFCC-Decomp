@@ -81,9 +81,6 @@ extern const char* amem_stateName[2] = {
     sAmemCacheStateUse,
     sAmemCacheStateNoUse,
 };
-extern const float kMemoryDmaTimeout = 9000.0f;
-extern const float kMemoryDrawZero = 0.0f;
-extern const double kMemorySignedDoubleMagic = 4503601774854144.0;
 extern const char sHeapWalkerNewline[] = "\n";
 static const char sHeapWalkerFree[] = "FREE";
 static const char sHeapWalkerUsed[] = "USED";
@@ -488,6 +485,8 @@ void CMemory::Draw()
         return;
     }
 
+    extern const float kMemoryDrawZero;
+
     Mtx orthoMtx;
     Mtx modelMtx;
     char line[0x104];
@@ -876,6 +875,7 @@ void CMemory::CopyFromAMemorySync(void* source, void* dest, unsigned long size)
                            static_cast<int>(size), 0, 0);
     CStopWatch watch(const_cast<char*>(sMemoryNoNameStopwatchName));
     watch.Start();
+    extern const float kMemoryDmaTimeout;
     float timeout = kMemoryDmaTimeout;
     while (Sound.DMACheck(dmaId) != 0) {
         watch.Stop();
@@ -1169,6 +1169,7 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
  */
 void CMemory::CStage::drawHeapBar(int y)
 {
+    extern const float kMemoryDrawZero;
     _GXColor color;
     unsigned int colors[16];
     colors[0] = sHeapBarColors[0];
@@ -1237,8 +1238,8 @@ void CMemory::CStage::drawHeapBar(int y)
     }
 
     int drawColor = heapBar[0];
-    unsigned char* colorPtr = heapBar;
     int segmentStart = 0;
+    unsigned char* colorPtr = heapBar;
     int x = 0;
 
     do {
@@ -1270,13 +1271,13 @@ void CMemory::CStage::drawHeapBar(int y)
             }
 
             GXBegin(static_cast<GXPrimitive>(0x98), GX_VTXFMT0, 4);
-            GXPosition3f32(static_cast<float>(segmentStart + 0x80), static_cast<float>(y), 0.0f);
+            GXPosition3f32(static_cast<float>(segmentStart + 0x80), static_cast<float>(y), kMemoryDrawZero);
             GXColor1u32(*reinterpret_cast<u32*>(&color));
-            GXPosition3f32(static_cast<float>(x + 0x80), static_cast<float>(y), 0.0f);
+            GXPosition3f32(static_cast<float>(x + 0x80), static_cast<float>(y), kMemoryDrawZero);
             GXColor1u32(*reinterpret_cast<u32*>(&color));
-            GXPosition3f32(static_cast<float>(segmentStart + 0x80), static_cast<float>(y + 8), 0.0f);
+            GXPosition3f32(static_cast<float>(segmentStart + 0x80), static_cast<float>(y + 8), kMemoryDrawZero);
             GXColor1u32(*reinterpret_cast<u32*>(&color));
-            GXPosition3f32(static_cast<float>(x + 0x80), static_cast<float>(y + 8), 0.0f);
+            GXPosition3f32(static_cast<float>(x + 0x80), static_cast<float>(y + 8), kMemoryDrawZero);
             GXColor1u32(*reinterpret_cast<u32*>(&color));
 
             drawColor = *colorPtr;
@@ -1623,6 +1624,7 @@ int CAmemCacheSet::GetData(short index, char* source, int line)
                                                reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
                     CStopWatch watch(const_cast<char*>(sMemoryNoNameStopwatchName));
                     watch.Start();
+                    extern const float kMemoryDmaTimeout;
                     float timeout = kMemoryDmaTimeout;
                     while (Sound.DMACheck(dmaId) != 0) {
                         watch.Stop();
@@ -2227,3 +2229,7 @@ void CMemory::CStage::GetTop()
 {
 	// TODO
 }
+
+extern const float kMemoryDmaTimeout = 9000.0f;
+extern const float kMemoryDrawZero = 0.0f;
+extern const double kMemorySignedDoubleMagic = 4503601774854144.0;

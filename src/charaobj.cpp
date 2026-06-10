@@ -53,6 +53,45 @@ extern const float FLOAT_803319B8[2];
 
 extern const float kQuadObjDebugHeight;
 
+// Padded row view of the CFlat item/particle table (stride 0x48). Real array
+// indexing through this struct keeps the field offset as a load displacement
+// (target `mulli; add; lhz off(r)`), where raw pointer arithmetic re-associates
+// the offset into the index (`addi; lhzx`).
+struct SCharaItemRow {
+	unsigned short m_effect;        // 0x00
+	unsigned short m_kind;          // 0x02
+	unsigned short m_field04;       // 0x04
+	unsigned short m_basePower;     // 0x06
+	unsigned short m_staType;       // 0x08
+	unsigned short m_status;        // 0x0A
+	unsigned short m_particleFlags; // 0x0C
+	unsigned short m_particleLife;  // 0x0E
+	unsigned short m_scale;         // 0x10
+	unsigned short m_particleBank;  // 0x12
+	unsigned short m_particleEntry; // 0x14
+	unsigned char m_pad16[0x6];     // 0x16
+	unsigned short m_particleSpec;  // 0x1C
+	unsigned char m_pad1E[0x8];     // 0x1E
+	unsigned short m_speed;         // 0x26
+	unsigned char m_pad28[0x2];     // 0x28
+	unsigned short m_distance;      // 0x2A
+	unsigned short m_flags2C;       // 0x2C
+	unsigned short m_power;         // 0x2E
+	unsigned short m_sourcePower;   // 0x30
+	unsigned short m_flags32;       // 0x32
+	unsigned char m_pad34[0x4];     // 0x34
+	unsigned short m_se;            // 0x38
+	unsigned char m_pad3A[0x8];     // 0x3A
+	unsigned short m_seSpec;        // 0x42
+	unsigned char m_pad44[0x4];     // 0x44
+};
+
+// Padded view of the script handle's status block (u16 slots from 0x3E).
+struct SCharaStaBlock {
+	unsigned char m_pad00[0x3E];
+	unsigned short m_sta[0x20];
+};
+
 static float& CharaObjTargetAngle(CGCharaObj* charaObj)
 {
 	return charaObj->m_targetAngle;
@@ -1264,8 +1303,8 @@ int CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos)
 			m_ignoreHit[i].m_source = sourceObj;
 
 			unsigned int particleIndex = static_cast<unsigned int>(m_itemId);
-			unsigned short particleLife =
-				*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (particleIndex * 0x48) + 0xE);
+			SCharaItemRow* lifeRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
+			unsigned short particleLife = lifeRows[particleIndex].m_particleLife;
 			m_ignoreHit[i].m_timer = (particleLife == 3) ? 0x1E : 0;
 			goto foundSlot;
 		}
@@ -1384,7 +1423,8 @@ void CGCharaObj::putHitParticleFromItem(CGPrgObj* sourceObj, int itemId)
 			}
 
 			CFlatRuntime2Storage().ResetParticleWork((particleBank << 8) | ((particleSpec & 0xFF) + particleOffset), 0);
-			particleFlags = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + itemId * 0x48 + 0x0C);
+			SCharaItemRow* flagRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
+			particleFlags = flagRows[itemId].m_particleFlags;
 			if ((particleFlags & 0x200) != 0) {
 				CFlatRuntime2Storage().SetParticleWorkBind(this);
 			} else {
@@ -1394,7 +1434,8 @@ void CGCharaObj::putHitParticleFromItem(CGPrgObj* sourceObj, int itemId)
 		}
 	}
 
-	seSpec = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + itemId * 0x48 + 0x42);
+	SCharaItemRow* seRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
+	seSpec = seRows[itemId].m_seSpec;
 	int seNo = CharaObjDecodeHitParticleSe(seSpec);
 	if (seNo != 0) {
 		playSe3D(seNo + particleOffset, 0x32, 0x96, 0, 0);

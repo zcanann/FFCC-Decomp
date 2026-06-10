@@ -2594,7 +2594,7 @@ void pppInitDrawEnv(unsigned char useZeroDepth)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, float radius, float cylScale)
+int pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, float radius, float cylScale)
 {
 	struct PppMngStHitRaw
 	{
@@ -2613,7 +2613,7 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 	};
 
 	PppMngStHitRaw* hitRaw = (PppMngStHitRaw*)pppMngSt;
-	bool hadHit = false;
+	int hadHit = 0;
 
 	if (kPppPartZero != cylScale)
 	{
@@ -2642,7 +2642,7 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 				s32 partIndex = ((s32)((u8*)pppMngSt - ((u8*)&PartMng + 0x2A18))) / 0x158;
 				Game.HitParticleBG(partIndex, hitRaw->m_kind, hitRaw->m_nodeIndex, &hitPos, &hitRaw->m_hitParams);
 			}
-			hadHit = true;
+			hadHit = 1;
 		}
 	}
 
@@ -2689,7 +2689,7 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 						continue;
 					}
 
-					hadHit = true;
+					hadHit = 1;
 
 					if (Game.m_currentSceneId == 7)
 					{
@@ -2724,10 +2724,7 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 		}
 	}
 
-	if (hadHit)
-	{
-		return;
-	}
+	return hadHit;
 }
 
 extern "C" const unsigned int gPppFixedWhite = 0xffffffff;

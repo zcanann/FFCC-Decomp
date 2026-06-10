@@ -2354,7 +2354,7 @@ void CChara::makeFurTex()
 	Graphic.SetViewport();
 	Graphic.SetCopyClear(savedCopyClear, 0xFFFFFF);
 	GXSetTexCopySrc(0, 0, 0x280, 0x1C0);
-	GXCopyTex(gRenderScratchTextureBuffer, GX_TRUE);
+	GXCopyTex(Graphic.m_scratchTextureBuffer, GX_TRUE);
 	Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp), 0x138);
 	if (DAT_8032EDEC != 0) {
 		Memory.Free(DAT_8032EDEC);

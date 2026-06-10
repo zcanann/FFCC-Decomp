@@ -1844,34 +1844,33 @@ void CGPartyObj::onFrameStat()
 			playSe3D(0x22, 0x32, 0x96, 0, 0);
 		}
 		if (isLoopAnim() != 0) {
-			short mapId = *reinterpret_cast<short*>(&m_lastMapIdHit);
-			if (party.carryObject == nullptr) {
-				if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
-					if (mapId == 1) {
-						SetAnimSlot(0x25, 0);
-						SetAnimSlot(0x24, 1);
+			if (party.carryObject != nullptr) {
+				if (CFlatItemCarryMode() == 0) {
+					if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+						SetAnimSlot(0x0B, 0);
+						SetAnimSlot(0x0C, 1);
 					} else {
-						SetAnimSlot(0x25, 0);
-						SetAnimSlot(0x24, 1);
+						SetAnimSlot(0x0B, 0);
+						SetAnimSlot(2, 1);
 					}
-				} else if (mapId == 1) {
+				} else {
+					SetAnimSlot(0x0B, 0);
+					SetAnimSlot(0x0C, 1);
+				}
+			} else if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
+				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
 					SetAnimSlot(0, 0);
 					SetAnimSlot(1, 1);
 				} else {
 					SetAnimSlot(0x25, 0);
 					SetAnimSlot(0x30, 1);
 				}
-			} else if (CFlatItemCarryMode() == 0) {
-				if (mapId == 1) {
-					SetAnimSlot(0x0B, 0);
-					SetAnimSlot(0x0C, 1);
-				} else {
-					SetAnimSlot(0x0B, 0);
-					SetAnimSlot(2, 1);
-				}
+			} else if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+				SetAnimSlot(0x25, 0);
+				SetAnimSlot(0x24, 1);
 			} else {
-				SetAnimSlot(0x0B, 0);
-				SetAnimSlot(0x0C, 1);
+				SetAnimSlot(0x25, 0);
+				SetAnimSlot(0x24, 1);
 			}
 			changeStat(0, 0, 0);
 			m_extraMoveVec.x = FLOAT_80331a78;

@@ -11,11 +11,15 @@ public:
     class CFlag
     {
     public:
+        class CParam
+        {
+        public:
+            unsigned char m_index;  // 0x00
+            short m_value;          // 0x02
+        };
+
         unsigned char m_type;   // 0x00
-        unsigned char m_pad01;  // 0x01
-        unsigned char m_index;  // 0x02
-        unsigned char m_pad03;  // 0x03
-        short m_value;          // 0x04
+        CParam m_param;         // 0x02
     };
 	
     CMes();

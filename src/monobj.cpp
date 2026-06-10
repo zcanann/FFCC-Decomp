@@ -3712,7 +3712,7 @@ void CGMonObj::statWatch()
 			}
 
 			int pick = Math.Rand(validCount);
-			unsigned int minHp = 10000000;
+			int minHp = 10000000;
 			int validIndex = 0;
 			float homeRange2 = static_cast<float>(
 				*reinterpret_cast<unsigned short*>(script + 0xCC));
@@ -3742,7 +3742,7 @@ void CGMonObj::statWatch()
 						 (reinterpret_cast<CGPrgObj*>(party)->m_lastStateId == 2))) {
 						accum = partyIndex;
 					} else if (targetMode == 2) {
-						unsigned int hp = *reinterpret_cast<unsigned short*>(
+						int hp = *reinterpret_cast<unsigned short*>(
 							reinterpret_cast<CGObject*>(party)->m_scriptHandle + 7);
 						if (hp < minHp) {
 							minHp = hp;
@@ -3780,7 +3780,7 @@ void CGMonObj::statWatch()
 				(static_cast<int>(monObj->m_aiState) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
 		}
 
-		if (*reinterpret_cast<short*>(aiScript + 0x10A) == 1) {
+		if (static_cast<int>(*reinterpret_cast<unsigned short*>(aiScript + 0x10A)) == 1) {
 			if (monObj->m_unk6BC == 0) {
 				unsigned char* scriptBase = script;
 				if (*reinterpret_cast<float*>(mon + targetPartyIndex * 4 + 0x5D0) <
@@ -3861,7 +3861,7 @@ void CGMonObj::statWatch()
 						aiData3 = script;
 					} else {
 						aiData3 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-							(aiState + *reinterpret_cast<short*>(script + 0x100)) * 0x1D0 + 0x10;
+							(aiState + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
 					}
 					float range = static_cast<float>(
 						*reinterpret_cast<unsigned short*>(aiData3 + actionOff + 0x11C));
@@ -3870,7 +3870,7 @@ void CGMonObj::statWatch()
 						aiData4 = script;
 					} else {
 						aiData4 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-							(aiState + *reinterpret_cast<short*>(script + 0x100)) * 0x1D0 + 0x10;
+							(aiState + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
 					}
 					short changeStat = *reinterpret_cast<short*>(aiData4 + actionOff + 0x11E);
 					actionState = 0x21;

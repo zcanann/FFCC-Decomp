@@ -1006,14 +1006,14 @@ void CGObject::bgNormalCollision()
     }
 
     float oldY = (m_groundHitOffset.y < sMinGroundClamp) ? sMinGroundClamp : m_groundHitOffset.y;
+    float delta = oldY - move.y;
     float clampedY = (m_groundHitOffset.y < sMinGroundClamp) ? sMinGroundClamp : m_groundHitOffset.y;
 
-    float delta = oldY - move.y;
     m_worldPosition.y = pos.y;
-    m_gravityY = m_jumpLandingDampening * -((clampedY - delta) + delta);
     m_groundHitOffset.y = sZeroFloat;
     m_groundHitOffset.x = pos.x - m_worldPosition.x;
     m_groundHitOffset.z = pos.z - m_worldPosition.z;
+    m_gravityY = m_jumpLandingDampening * -((clampedY - delta) + delta);
 
     if (((m_displayFlags & 1) != 0) && (m_weaponNodeFlagBits.m_attached == 0)) {
         Sound.PlaySe3D(

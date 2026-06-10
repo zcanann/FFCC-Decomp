@@ -2556,45 +2556,48 @@ void CCaravanWork::SortBeforeReturnWorldMap()
 			short lhs = m_inventoryItems[i];
 
 			if (lhs <= 0) {
+				if (m_inventoryItems[j] <= 0) {
+					continue;
+				}
+			}
+
+			if (lhs <= 0) {
+				m_inventoryItems[i] = m_inventoryItems[j];
+				m_inventoryItems[j] = 0xFFFF;
+
+				for (int slot = 2; slot < 8; slot++) {
+					if (static_cast<short>(m_commandListInventorySlotRef[slot]) == j) {
+						m_commandListInventorySlotRef[slot] = static_cast<short>(i);
+					}
+				}
+
+				for (int equip = 0; equip < 4; equip++) {
+					if (m_equipment[equip] == j) {
+						m_equipment[equip] = static_cast<short>(i);
+					}
+				}
+			} else {
 				short rhs = m_inventoryItems[j];
-				if (rhs > 0) {
+				if ((rhs > 0) && (lhs > rhs)) {
 					m_inventoryItems[i] = rhs;
-					m_inventoryItems[j] = 0xFFFF;
+					m_inventoryItems[j] = lhs;
 
 					for (int slot = 2; slot < 8; slot++) {
-						if (static_cast<short>(m_commandListInventorySlotRef[slot]) == j) {
+						short cur = static_cast<short>(m_commandListInventorySlotRef[slot]);
+						if (cur == i) {
+							m_commandListInventorySlotRef[slot] = static_cast<short>(j);
+						} else if (cur == j) {
 							m_commandListInventorySlotRef[slot] = static_cast<short>(i);
 						}
 					}
 
 					for (int equip = 0; equip < 4; equip++) {
-						if (m_equipment[equip] == j) {
+						if (m_equipment[equip] == i) {
+							m_equipment[equip] = static_cast<short>(j);
+						} else if (m_equipment[equip] == j) {
 							m_equipment[equip] = static_cast<short>(i);
 						}
 					}
-				}
-			} else {
-				short rhs = m_inventoryItems[j];
-				if ((rhs > 0) && (rhs < lhs)) {
-				m_inventoryItems[i] = rhs;
-				m_inventoryItems[j] = lhs;
-
-				for (int slot = 2; slot < 8; slot++) {
-					short cur = static_cast<short>(m_commandListInventorySlotRef[slot]);
-					if (cur == i) {
-						m_commandListInventorySlotRef[slot] = static_cast<short>(j);
-					} else if (cur == j) {
-						m_commandListInventorySlotRef[slot] = static_cast<unsigned short>(i);
-					}
-				}
-
-				for (int equip = 0; equip < 4; equip++) {
-					if (m_equipment[equip] == i) {
-						m_equipment[equip] = static_cast<short>(j);
-					} else if (m_equipment[equip] == j) {
-						m_equipment[equip] = static_cast<short>(i);
-					}
-				}
 				}
 			}
 		}

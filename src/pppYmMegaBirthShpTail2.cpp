@@ -96,7 +96,6 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
         return;
     }
     const u32 dataValIndex = *(u32*)(step + 4);
-    const u32 maxParticles = work->m_maxParticles;
 
     pppShapeAnimData* shapeAnim =
         static_cast<pppShapeAnimData*>(ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex]->m_animData);

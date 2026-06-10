@@ -65,7 +65,6 @@ static inline float LoadFloat(const float& value)
  */
 #pragma push
 #pragma opt_common_subs off
-#pragma opt_dead_assignments off
 void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirthShpTail2RenderStep* stepData, _pppCtrlTable* offsets)
 {
     u8* step = (u8*)stepData;

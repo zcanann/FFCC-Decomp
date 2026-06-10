@@ -2709,8 +2709,8 @@ void CMenuPcs::CmakeNameClose()
  */
 int CMenuPcs::CmakeNameCtrl()
 {
-    short down;
     short repeat;
+    short down;
 
     bool padBusy = false;
     int padLock = Pad.m_debugPadLock;

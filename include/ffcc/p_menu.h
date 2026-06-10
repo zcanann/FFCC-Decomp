@@ -599,11 +599,11 @@ public:
     inline void LetterMessOpen();
     inline void LetterItemWinOpen();
     inline void LetterItemWinClose();
-    bool LetterReplyWinOpen();
+    int LetterReplyWinOpen();
     inline void LetterReplyWinClose();
     inline void LetterAttachWinOpen();
     inline void LetterAttachWinClose();
-    bool LetterConfirmOpen();
+    int LetterConfirmOpen();
     inline void LetterConfirmClose();
     void LetterDraw();
     void LetterListDraw();

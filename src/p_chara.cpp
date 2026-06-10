@@ -434,7 +434,7 @@ static inline CCharaPcs::CLoadAnim* FindLoadedAnim(CCharaPcs* self, int charaKin
     return 0;
 }
 
-static CCharaPcs::CLoadAnim* LoadAnimFromDisk(
+static int LoadAnimFromDisk(
     CCharaPcs* self, int charaKind, int charaNo, const char* animName, int mergeFileId, int mergeFlags)
 {
     char path[0x100];
@@ -465,7 +465,7 @@ static CCharaPcs::CLoadAnim* LoadAnimFromDisk(
             System.Printf(const_cast<char*>(s_charaLoadAnimLogFmt), animName, charaKind, charaNo);
         }
 
-        return loadAnim;
+        return 1;
     }
 
     return 0;
@@ -2648,10 +2648,7 @@ int CCharaPcs::LoadAnim(int charaKind, int charaNo, char* animName, int unusedAr
 
     CLoadAnim* loadAnim = FindLoadedAnim(&CharaPcs, charaKind, charaNo, animName);
     if (loadAnim == 0) {
-        loadAnim = LoadAnimFromDisk(&CharaPcs, charaKind, charaNo, animName, mergeFileId, mergeFlags);
-        if (loadAnim == 0) {
-            return 0;
-        }
+        return LoadAnimFromDisk(&CharaPcs, charaKind, charaNo, animName, mergeFileId, mergeFlags);
     }
     return 1;
 }

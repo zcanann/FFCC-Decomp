@@ -1605,6 +1605,8 @@ void CMapMng::SetLightSource()
 {
     extern const float kMapZero;
     extern const float kMapViewScaleZ;
+    extern const float kMapSpotAngleDefault;
+    extern const float kMapDegToRadScale;
     CMapObjAtr* attr;
     const short mapObjCount = m_mapObjCount;
     CMapObj* mapObj = GetMapObjArray();
@@ -1628,7 +1630,7 @@ void CMapMng::SetLightSource()
                 light.m_direction.y = kMapZero;
                 light.m_direction.z = kMapViewScaleZ;
                 light.m_attenRadius = pointAttr->m_radius;
-                light.m_spotScale = 0.78539816339744828f;
+                light.m_spotScale = kMapSpotAngleDefault;
                 light.m_radius = pointAttr->m_intensity;
                 light.m_targetColor[0] = pointAttr->m_altColor;
                 light.m_targetColor[1] = pointAttr->m_color;
@@ -1683,7 +1685,7 @@ void CMapMng::SetLightSource()
                     PSVECNormalize(reinterpret_cast<Vec*>(&light.m_direction), reinterpret_cast<Vec*>(&light.m_direction));
 
                     light.m_attenRadius = spotAttr->m_radius;
-                    light.m_spotScale = 0.017453292519943295f * spotAttr->m_nearRange;
+                    light.m_spotScale = kMapDegToRadScale * spotAttr->m_nearRange;
                     light.m_radius = spotAttr->m_farRange;
 
                     light.m_targetColor[0] = spotAttr->m_altColor;
@@ -3764,3 +3766,5 @@ extern const float kMapLargeDistance = 100000.0f;
 extern const float kMapFullTurnDegrees = 360.0f;
 extern const float kMapTinyEpsilon = 5.0e-6f;
 extern const float kMapHitWireZOffset = -0.1f;
+extern const float kMapSpotAngleDefault = 0.78539816339744828f;
+extern const float kMapDegToRadScale = 0.017453292519943295f;

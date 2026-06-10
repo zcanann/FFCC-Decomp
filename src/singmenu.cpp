@@ -1935,16 +1935,25 @@ void CMenuPcs::SingleCalcFadeIn()
         Sound.PlaySe(0xE, 0x40, 0x7F, 0);
         memset(m_singleFadeState, 0, sizeof(SingleFadeState));
 
-        m_singleFadeState->entries[0].startFrame = 0;
-        m_singleFadeState->entries[0].duration = 10;
-        m_singleFadeState->entries[1].startFrame = (m_singleMenuMode == 8) ? 0 : 10;
-        m_singleFadeState->entries[1].duration = 10;
-        m_singleFadeState->entries[2].startFrame = (m_singleMenuMode == 8) ? 0 : 10;
-        m_singleFadeState->entries[2].duration = 10;
-        m_singleFadeState->entries[3].startFrame = (m_singleMenuMode == 8) ? 0 : 10;
-        m_singleFadeState->entries[3].duration = 10;
+        int idx = 0;
+        SingleFadeEntry* e = &m_singleFadeState->entries[idx];
+        e->startFrame = 0;
+        e->duration = 10;
+        idx++;
+        e = &m_singleFadeState->entries[idx];
+        e->startFrame = (m_singleMenuMode == 8) ? 0 : 10;
+        e->duration = 10;
+        idx++;
+        e = &m_singleFadeState->entries[idx];
+        e->startFrame = (m_singleMenuMode == 8) ? 0 : 10;
+        e->duration = 10;
+        idx++;
+        e = &m_singleFadeState->entries[idx];
+        e->startFrame = (m_singleMenuMode == 8) ? 0 : 10;
+        e->duration = 10;
+        idx++;
 
-        m_singleFadeState->count = 4;
+        m_singleFadeState->count = static_cast<s16>(idx);
         m_singleFadeState->done = 0;
         m_singleFadeState->active = 1;
     }
@@ -1969,7 +1978,7 @@ void CMenuPcs::SingleCalcFadeIn()
         entry = entry + 1;
     }
 
-    if (m_wm.m_handles[0]->m_model->m_animEnd < m_wm.m_handles[0]->m_model->m_time) {
+    if (m_wm.m_handles[0]->m_model->m_time < m_wm.m_handles[0]->m_model->m_animEnd) {
         m_wm.m_handles[0]->m_model->AddFrame(1.0f);
     } else {
         m_wm.m_handles[0]->m_model->SetFrame(0.0f);
@@ -2030,16 +2039,25 @@ void CMenuPcs::SingleCalcFadeOut()
         Sound.PlaySe(0xF, 0x40, 0x7F, 0);
         memset(m_singleFadeState, 0, sizeof(SingleFadeState));
 
-        m_singleFadeState->entries[0].startFrame = (m_singleMenuMode == 8) ? 0 : 10;
-        m_singleFadeState->entries[0].duration = 10;
-        m_singleFadeState->entries[1].startFrame = 0;
-        m_singleFadeState->entries[1].duration = 10;
-        m_singleFadeState->entries[2].startFrame = 0;
-        m_singleFadeState->entries[2].duration = 10;
-        m_singleFadeState->entries[3].startFrame = 0;
-        m_singleFadeState->entries[3].duration = 10;
+        int idx = 0;
+        SingleFadeEntry* e = &m_singleFadeState->entries[idx];
+        e->startFrame = (m_singleMenuMode == 8) ? 0 : 10;
+        e->duration = 10;
+        idx++;
+        e = &m_singleFadeState->entries[idx];
+        e->startFrame = 0;
+        e->duration = 10;
+        idx++;
+        e = &m_singleFadeState->entries[idx];
+        e->startFrame = 0;
+        e->duration = 10;
+        idx++;
+        e = &m_singleFadeState->entries[idx];
+        e->startFrame = 0;
+        e->duration = 10;
+        idx++;
 
-        m_singleFadeState->count = 4;
+        m_singleFadeState->count = static_cast<s16>(idx);
         m_singleFadeState->done = 0;
         m_singleFadeState->active = 1;
     }
@@ -2065,7 +2083,7 @@ void CMenuPcs::SingleCalcFadeOut()
         entry = entry + 1;
     }
 
-    if (m_wm.m_handles[0]->m_model->m_animEnd < m_wm.m_handles[0]->m_model->m_time) {
+    if (m_wm.m_handles[0]->m_model->m_time < m_wm.m_handles[0]->m_model->m_animEnd) {
         m_wm.m_handles[0]->m_model->AddFrame(1.0f);
     } else {
         m_wm.m_handles[0]->m_model->SetFrame(0.0f);

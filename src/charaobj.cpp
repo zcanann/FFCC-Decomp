@@ -3006,7 +3006,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 		case 0x477:
 		case 0x478:
 			if (effectArg0 == 3) {
-				for (int i = 7; i < 0x0C; i++) {
+				for (int i = 7; i <= 0x0B; i++) {
 					CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | i);
 					CFlatRuntime2Storage().PutParticleWork();
 				}
@@ -3034,7 +3034,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 				emittedCustom = 1;
 			}
 			if (effectArg0 == 3) {
-				for (int i = 0x0D; i < 0x1D; i++) {
+				for (int i = 0x0D; i <= 0x1C; i++) {
 					CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | i);
 					CFlatRuntime2Storage().PutParticleWork();
 				}

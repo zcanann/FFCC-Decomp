@@ -109,7 +109,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
     for (u32 i = 0; i < work->m_maxParticles; i++) {
         u8* particle = (u8*)particles + i * 0x1B8;
         if (*(u16*)(particle + 0x22) != 0) {
-            const u16 frameCountRaw = *(u16*)(step + 0x84);
+            const s32 frameCountRaw = *(u16*)(step + 0x84);
             pppFMATRIX drawMtx;
             Vec zeroVec;
             Vec segVec;
@@ -226,7 +226,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
                     drawMtx.value[2][3] = cameraPos.z;
                     GXLoadPosMtxImm(drawMtx.value, 0);
 
-                    amb.r = (s8)fadeRGB[2];
+                    amb.r = (u8)fadeRGB[2];
                     amb.g = (u8)fadeRGB[1];
                     amb.b = (u8)fadeRGB[0];
                     amb.a = (u8)(fadeA * (kPppYmMegaBirthShpTail2DepthAlphaScale * (kPppYmMegaBirthShpTail2ColorComponentMax - *(float*)(particle + 0x30))));

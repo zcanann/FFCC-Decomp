@@ -2129,9 +2129,10 @@ int CMapMng::ReadOtm(char* mapName)
                 case 0x4D534554: {
                     m_materialSet =
                         new (MapMng.m_stage, const_cast<char*>(s_map_cpp), 0x482) CMaterialSet();
-                    m_materialSet->m_materials.SetDefaultSize(0x180);
-                    m_materialSet->m_materials.SetGrow(0);
-                    m_materialSet->Create(chunkFile, m_textureSet, static_cast<CMaterialMan::TEV_BIT>(0xFFF53060), 0);
+                    CMaterialSet* materialSet = m_materialSet;
+                    materialSet->m_materials.SetDefaultSize(0x180);
+                    materialSet->m_materials.SetGrow(0);
+                    materialSet->Create(chunkFile, m_textureSet, static_cast<CMaterialMan::TEV_BIT>(0xFFF53060), 0);
                     break;
                 }
 
@@ -2147,8 +2148,7 @@ int CMapMng::ReadOtm(char* mapName)
                     if (meshCount >= 0xA0) {
                         return 0;
                     }
-                    CMapMesh* mesh = GetMapMeshArray() + meshCount;
-                    mesh->ReadOtmMesh(chunkFile, MapMng.m_stage, 0, 1);
+                    m_mapMeshArray[meshCount].ReadOtmMesh(chunkFile, MapMng.m_stage, 0, 1);
                     meshCount += 1;
                     break;
                 }
@@ -2158,8 +2158,7 @@ int CMapMng::ReadOtm(char* mapName)
                     if (hitCount >= 0x20) {
                         return 0;
                     }
-                    CMapHit* hit = GetMapHitArray() + hitCount;
-                    hit->ReadOtmHit(chunkFile);
+                    m_mapHitArray[hitCount].ReadOtmHit(chunkFile);
                     hitCount += 1;
                     break;
                 }
@@ -2169,8 +2168,7 @@ int CMapMng::ReadOtm(char* mapName)
                     if (mapObjCount >= 0x200) {
                         return 0;
                     }
-                    CMapObj* mapObj = GetMapObjArray() + mapObjCount;
-                    mapObj->ReadOtmObj(chunkFile);
+                    m_mapObjArray[mapObjCount].ReadOtmObj(chunkFile);
                     mapObjCount += 1;
                     break;
                 }
@@ -2192,8 +2190,7 @@ int CMapMng::ReadOtm(char* mapName)
                 return 0;
             }
 
-            COctTree* octTree = GetOctTreeArray() + octTreeCount;
-            octTree->ReadOtmOctTree(chunkFile);
+            m_octTreeArray[octTreeCount].ReadOtmOctTree(chunkFile);
             octTreeCount += 1;
             continue;
         }

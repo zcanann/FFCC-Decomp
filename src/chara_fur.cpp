@@ -1071,7 +1071,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 	}
 
 	Chara.MogFur().m_cursorX = static_cast<int>(kYmEnvTen * MogPadFloat(debugPadLock, 36) +
-	                                     static_cast<float>(static_cast<unsigned int>(Chara.MogFur().m_cursorX)));
+	                                     static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorX)));
 	Chara.MogFur().m_cursorY = static_cast<int>(-(kYmEnvTen * MogPadFloat(debugPadLock, 40) -
 	                                     static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorY))));
 

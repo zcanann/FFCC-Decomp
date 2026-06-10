@@ -483,7 +483,7 @@ void CMenuPcs::EquipDraw()
 	font->DrawInit();
 
 	item = GetEquipListStorage(this)->entries;
-	for (unsigned int i = 0; i < 4; i++) {
+	for (int i = 0; i < 4; i++) {
 		if (caravanWork->m_equipment[i] >= 0) {
 			CColor color(0xff, 0xff, 0xff, (u8)(kEquipColorMax * item->alpha));
 			font->SetColor(color.color);

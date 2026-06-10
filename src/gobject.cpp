@@ -216,14 +216,14 @@ static inline unsigned short GetMovePadButtonUp(int player)
 static inline float GetMovePadStickX(int player)
 {
     return (Pad.m_debugPadLock != 0 || (player == 0 && Pad.m_debugPadPort != -1))
-        ? sZeroFloat
+        ? 0.0f
         : Pad.GetPadInputs()[RemapPadSlot(&Pad, player)].stickXF;
 }
 
 static inline float GetMovePadStickY(int player)
 {
     return (Pad.m_debugPadLock != 0 || (player == 0 && Pad.m_debugPadPort != -1))
-        ? sZeroFloat
+        ? 0.0f
         : Pad.GetPadInputs()[RemapPadSlot(&Pad, player)].stickYF;
 }
 
@@ -661,7 +661,7 @@ void CGObject::move()
                 moveVec.x = moveVec.x - stickX;
                 const float stickY = GetMovePadStickY(static_cast<s8>(m_animStateMisc));
                 moveVec.z = moveVec.z + stickY;
-                if ((moveVec.x != sZeroFloat) || (moveVec.z != sZeroFloat)) {
+                if ((moveVec.x != 0.0f) || (moveVec.z != 0.0f)) {
                     hasStickInput = 1;
                 }
             }
@@ -700,10 +700,10 @@ void CGObject::move()
         }
     }
 
-    if ((moveVec.x != sZeroFloat) || (moveVec.y != sZeroFloat) || (moveVec.z != sZeroFloat)) {
+    if ((moveVec.x != sZeroFloat) || (moveVec.z != sZeroFloat) || (moveVec.y != sZeroFloat)) {
         float cameraYaw;
         if (movingWithScript) {
-            cameraYaw = sZeroFloat;
+            cameraYaw = 0.0f;
         } else {
             cameraYaw = *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xf8);
         }

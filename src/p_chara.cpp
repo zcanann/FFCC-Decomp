@@ -2572,7 +2572,10 @@ int CCharaPcs::CHandle::LoadAnim(
     if (animIndex == -1) {
         CRef** slotPtr = &m_animSlot[0];
         for (int i = 0; i < 64; i++, slotPtr++) {
-            ReleaseShared(*slotPtr);
+            CRef* animRef = *slotPtr;
+            if (animRef != 0) {
+                ReleaseShared(*slotPtr);
+            }
         }
         PruneUnsharedAnimRefs(&CharaPcs, 0);
     } else {

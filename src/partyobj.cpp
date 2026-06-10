@@ -4807,11 +4807,11 @@ void CGPartyObj::gpmCol()
 		Vec* pos = (i == 0) ? &m_worldPosition
 		                    : reinterpret_cast<Vec*>(trailBase + (i - 1) * 0xC);
 
-		CVector posV(*pos);
-		CVector leaderV(leader->m_worldPosition);
-		CVector diff;
-		PSVECSubtract(reinterpret_cast<Vec*>(&leaderV), reinterpret_cast<Vec*>(&posV), reinterpret_cast<Vec*>(&diff));
 		Vec diffVec;
+		CVector posV(*pos);
+		const CVector& leaderV = CVector(leader->m_worldPosition);
+		CVector diff;
+		PSVECSubtract((Vec*)&leaderV, reinterpret_cast<Vec*>(&posV), reinterpret_cast<Vec*>(&diff));
 		diffVec.x = diff.x;
 		diffVec.y = diff.y;
 		diffVec.z = diff.z;

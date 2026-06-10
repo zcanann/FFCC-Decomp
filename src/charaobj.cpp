@@ -3744,7 +3744,7 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 		int slot = 0;
 		unsigned short* slotCursor = combiCursor;
 		CGPartyObj** slotPtr = partyList;
-		for (int remaining = reqCount; remaining != 0; remaining--) {
+		for (int remaining = reqCount; remaining > 0; remaining--) {
 			CGCharaObj* partyObj = reinterpret_cast<CGCharaObj*>(*slotPtr);
 			if (partyObj->m_comboFrame == 0) {
 				int scanSlot = remaining;

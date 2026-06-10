@@ -6758,17 +6758,20 @@ void JoyBus::RestartThread()
 
             Joybus.m_diskId = (char*)File.GetCurrentDiskID();
 
+            unsigned char* img;
+            unsigned char* p;
             int idx = 0xBC;
+            int sum;
 
             Joybus.m_gbaBootImage[0xAC] = Joybus.m_diskId[0];
             Joybus.m_gbaBootImage[0xAD] = Joybus.m_diskId[1];
             Joybus.m_gbaBootImage[0xAE] = Joybus.m_diskId[2];
             Joybus.m_gbaBootImage[0xAF] = Joybus.m_diskId[3];
 
-            unsigned char* img = (unsigned char*)Joybus.m_gbaBootImage;
-            unsigned char* p = img + 0xBC;
+            img = (unsigned char*)Joybus.m_gbaBootImage;
+            p = img + 0xBC;
 
-            int sum =
+            sum =
                 (
                     ((((((((((((((((((((((((((((0xE7
                     - img[0xA0])

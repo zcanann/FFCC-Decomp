@@ -936,7 +936,7 @@ context_proc:
             }
             else
             {
-                writeSrc = self + (channel * 0x60 + (step - 1) * 4 + 0x16AC);
+                writeSrc = channel * 0x60 + (step - 1) * 4 + 0x16AC + self;
             }
             ret = GBAWrite(channel, writeSrc, param + 0xC0);
             if (!(ret == 0 && (param[0xC0] & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_FLAGS_MASK))
@@ -945,8 +945,7 @@ context_proc:
                 goto comm_fail;
             }
             step++;
-            retryLine = 0x2BF;
-            goto retry_loop;
+            goto recv_next;
         }
         else
         {
@@ -970,6 +969,7 @@ context_proc:
                 param[0xBF] = 0;
                 goto receive_message;
             }
+recv_next:
             retryLine = 0x2BF;
             goto retry_loop;
         }
@@ -1059,8 +1059,11 @@ context_proc:
                 int failed;
 
                 status = GBAGetStatus(channel, param + 0xC0);
-                if (status != 0)
+                switch (status)
                 {
+                case 0:
+                    break;
+                default:
                     goto identity_done7;
                 }
                 if (param[0xC0] != 0x28)
@@ -1069,8 +1072,11 @@ context_proc:
                     goto identity_done7;
                 }
                 status = GBARead(channel, reinterpret_cast<u8*>(&identity7), param + 0xC0);
-                if (status != 0)
+                switch (status)
                 {
+                case 0:
+                    break;
+                default:
                     goto identity_done7;
                 }
                 status = 0;
@@ -1086,8 +1092,11 @@ identity_done7:;
                     }
 
                     status = GBAGetStatus(channel, param + 0xC0);
-                    if (status != 0)
+                    switch (status)
                     {
+                    case 0:
+                        break;
+                    default:
                         goto write_done7;
                     }
                     if (param[0xC0] != 0x20)
@@ -1096,13 +1105,19 @@ identity_done7:;
                         goto write_done7;
                     }
                     status = GBAWrite(channel, self + 0x1344, param + 0xC0);
-                    if (status != 0)
+                    switch (status)
                     {
+                    case 0:
+                        break;
+                    default:
                         goto write_done7;
                     }
                     status = GBAGetStatus(channel, param + 0xC0);
-                    if (status != 0)
+                    switch (status)
                     {
+                    case 0:
+                        break;
+                    default:
                         goto write_done7;
                     }
                     if (param[0xC0] != 0x30)
@@ -1179,8 +1194,11 @@ ctx_done7:
             int failed;
 
             status = GBAGetStatus(channel, param + 0xC0);
-            if (status != 0)
+            switch (status)
             {
+            case 0:
+                break;
+            default:
                 goto identity_done8;
             }
             if (param[0xC0] != 0x28)
@@ -1189,8 +1207,11 @@ ctx_done7:
                 goto identity_done8;
             }
             status = GBARead(channel, reinterpret_cast<u8*>(&identity8), param + 0xC0);
-            if (status != 0)
+            switch (status)
             {
+            case 0:
+                break;
+            default:
                 goto identity_done8;
             }
             status = 0;
@@ -1205,8 +1226,11 @@ identity_done8:;
                     *reinterpret_cast<int*>(param + 0x9C) = 0;
                 }
                 status = GBAGetStatus(channel, param + 0xC0);
-                if (status != 0)
+                switch (status)
                 {
+                case 0:
+                    break;
+                default:
                     goto write_done8;
                 }
                 if (param[0xC0] != 0x20)
@@ -1215,13 +1239,19 @@ identity_done8:;
                     goto write_done8;
                 }
                 status = GBAWrite(channel, self + 0x1344, param + 0xC0);
-                if (status != 0)
+                switch (status)
                 {
+                case 0:
+                    break;
+                default:
                     goto write_done8;
                 }
                 status = GBAGetStatus(channel, param + 0xC0);
-                if (status != 0)
+                switch (status)
                 {
+                case 0:
+                    break;
+                default:
                     goto write_done8;
                 }
                 if (param[0xC0] != 0x30)

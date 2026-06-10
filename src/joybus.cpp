@@ -234,15 +234,7 @@ JoyBus::~JoyBus()
 	// TODO
 }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void JoyBus::Init()
-{
-	// TODO
-}
+
 
 /*
  * --INFO--
@@ -2630,25 +2622,9 @@ void JoyBus::ThreadInit()
     }
 }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void JoyBus::ReadInitialCode(ThreadParam* threadParam)
-{
-	// TODO
-}
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void JoyBus::WriteInitialCode(ThreadParam* threadParam)
-{
-	// TODO
-}
+
+
 
 struct ThreadSleepAlarm {
     OSAlarm alarm;
@@ -2689,45 +2665,13 @@ void JoyBus::ThreadSleep(long long ticks)
     OSRestoreInterrupts(level);
 }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void JoyBus::ReadContext(ThreadParam* threadParam)
-{
-	// TODO
-}
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void JoyBus::ReadHostId(ThreadParam* threadParam)
-{
-	// TODO
-}
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void JoyBus::WriteHostId(ThreadParam* threadParam)
-{
-	// TODO
-}
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void JoyBus::WriteContext(ThreadParam* threadParam)
-{
-	// TODO
-}
+
+
+
+
 
 /*
  * --INFO--
@@ -3089,9 +3033,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
 
             OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
-            unsigned char header = cmdBytes[0];
-
-            if ((header >> 6) == 0)
+            if ((cmdBytes[0] >> 6) == 0)
             {
                 OSSemaphore* sem = &m_accessSemaphores[threadParam->m_portIndex];
                 OSWaitSemaphore(sem);
@@ -3100,56 +3042,55 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
             }
 
             unsigned int word = *cmdOut;
+            unsigned char* wordBytes = reinterpret_cast<unsigned char*>(&word);
             JoyBusRecvBuffer& buf = m_recvBuffer[threadParam->m_portIndex];
 
             if (buf.m_cmdFlags != 0)
             {
-                unsigned char cmdId = static_cast<unsigned char>(word >> 24);
-
-                if (buf.m_cmdFlags != (cmdId & 0x3F))
+                if (buf.m_cmdFlags != (wordBytes[0] & 0x3F))
                 {
                     if (static_cast<unsigned int>(System.m_execParam) >= 2u)
                     {
                         System.Printf(const_cast<char*>(s_recv_type_differ_warn_fmt), threadParam->m_portIndex, const_cast<char*>(s_joybus_cpp), 0x1079);
                     }
 
-                    OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-                    memset(&m_recvBuffer[threadParam->m_portIndex], 0, sizeof(m_recvBuffer[threadParam->m_portIndex]));
-                    OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+                    const int memsetPort = threadParam->m_portIndex;
+                    OSSemaphore* memsetSem = &m_accessSemaphores[memsetPort];
+
+                    OSWaitSemaphore(memsetSem);
+                    memset(&m_recvBuffer[memsetPort], 0, sizeof(m_recvBuffer[memsetPort]));
+                    OSSignalSemaphore(memsetSem);
                 }
             }
 
             OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
             unsigned int length = buf.m_length;
-            unsigned char b0 = static_cast<unsigned char>(word);
-            unsigned char b1 = static_cast<unsigned char>(word >> 8);
-            unsigned char b2 = static_cast<unsigned char>(word >> 16);
 
             if (length == 0)
             {
-                buf.m_crc = static_cast<unsigned short>(word >> 8);
+                buf.m_crc = static_cast<unsigned short>((wordBytes[1] << 8) | wordBytes[2]);
                 unsigned int idx0 = buf.m_length;
                 buf.m_length = idx0 + 1;
-                buf.m_payload[idx0] = b0;
+                buf.m_payload[idx0] = wordBytes[3];
             }
             else
             {
                 buf.m_length = length + 1;
-                buf.m_payload[length] = b2;
+                buf.m_payload[length] = wordBytes[1];
 
                 unsigned int idx1 = buf.m_length;
                 buf.m_length = idx1 + 1;
-                buf.m_payload[idx1] = b1;
+                buf.m_payload[idx1] = wordBytes[2];
 
                 unsigned int idx2 = buf.m_length;
                 buf.m_length = idx2 + 1;
-                buf.m_payload[idx2] = b0;
+                buf.m_payload[idx2] = wordBytes[3];
             }
 
             OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
-            if ((header >> 6) == 2)
+            if ((cmdBytes[0] >> 6) == 2)
             {
                 unsigned short crc = 0xFFFF;
                 int len = buf.m_length;
@@ -3352,15 +3293,7 @@ void JoyBus::ResetQueue(ThreadParam* threadParam)
     OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void JoyBus::CleanQueue(ThreadParam* threadParam)
-{
-	// TODO
-}
+
 
 /*
  * --INFO--
@@ -4277,15 +4210,7 @@ int JoyBus::SendMapNo(ThreadParam* threadParam)
     return result != 0 ? -1 : 0;
 }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void JoyBus::InitPpos()
-{
-	// TODO
-}
+
 
 /*
  * --INFO--
@@ -5292,15 +5217,7 @@ unsigned int JoyBus::RequestData(ThreadParam* threadParam, int a, int b)
 }
 
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void JoyBus::SetRecvBuffer(ThreadParam*, unsigned int)
-{
-	// TODO
-}
+
 
 /*
  * --INFO--
@@ -7161,15 +7078,7 @@ int JoyBus::SetOpenMenu(int playerIndex, char menuId)
     return result;
 }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void DEBPRINT(char*, ...)
-{
-	// TODO
-}
+
 
 /*
  * --INFO--

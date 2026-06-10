@@ -1488,47 +1488,40 @@ void CShopMenu::DrawBuySellInfo()
     char* unitText = ShopMenuMes(languageId, SHOP_MENU_TEXT_GIL);
     float unitWidth = font->GetWidth(unitText);
 
-    int itemNo = -1;
-    bool canTrade = false;
-    if (m_selectedIndex != -1) {
-        itemNo = getItemNo(m_selectedIndex);
+    bool canTrade = CanTradeShopMenuItem(this, m_selectedIndex, getItemNo(m_selectedIndex));
 
-        if (itemNo > 0) {
-            if (m_listType == 0) {
-                canTrade = true;
-            } else if (m_listType == 2) {
-                unsigned int bit = static_cast<unsigned int>(itemNo - 0x191);
-                canTrade = (ShopMenuCaravanWork(this)->m_shopArgs[(itemNo - 0x191) >> 5] &
-                            (1U << (bit & 0x1F))) != 0;
-            } else if ((m_listType == 1) && MenuPcs.EquipChk(m_selectedIndex) == 0 && itemNo > 0x9E) {
-                canTrade = true;
-            }
-        }
-    }
-
-    int totalGil = 0;
+    int totalGil;
     if (canTrade) {
-        int gilItemNo = getItemNo(m_selectedIndex);
-        if (m_listType == 0) {
-            int gil = 0;
-            if (gilItemNo > 0) {
-                const CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
-                gil = static_cast<int>(caravanWork->m_shopParam) *
-                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + gilItemNo * 0x48 + 0x20);
-                gil = gil / 100;
+        int saleGil;
+        if (m_selectedIndex == -1) {
+            saleGil = 0;
+        } else {
+            int gilItemNo = getItemNo(m_selectedIndex);
+            int gil;
+            if (m_listType == 0) {
+                if (gilItemNo <= 0) {
+                    gil = 0;
+                } else {
+                    int value = ShopMenuCaravanWork(this)->m_shopParam *
+                                *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + gilItemNo * 0x48 + 0x20);
+                    gil = value / 100;
+                }
+            } else if (m_listType == 1) {
+                if (gilItemNo <= 0) {
+                    gil = 0;
+                } else {
+                    int value = ShopMenuCaravanWork(this)->m_shopParam *
+                                *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + gilItemNo * 0x48 + 0x20);
+                    gil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(value / 100));
+                }
+            } else {
+                gil = -1;
             }
-            totalGil = m_quantity * gil;
-        } else if (m_listType == 1) {
-            int sellGil = 0;
-            if (gilItemNo > 0) {
-                const CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
-                sellGil = static_cast<int>(caravanWork->m_shopParam) *
-                          *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + gilItemNo * 0x48 + 0x20);
-                sellGil = sellGil / 100;
-            }
-            sellGil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(sellGil));
-            totalGil = m_quantity * sellGil;
+            saleGil = m_quantity * gil;
         }
+        totalGil = saleGil;
+    } else {
+        totalGil = 0;
     }
 
     float rightPrice = FLOAT_80332d88 - unitWidth;

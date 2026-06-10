@@ -617,8 +617,7 @@ static inline unsigned short GetGoOutInputMask()
         return 0;
     }
 
-    int padIndex = 0;
-    padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+    int padIndex = (Pad.m_debugPadPort == 0) ? 0 : 0;
     return static_cast<unsigned short>(Pad.GetPadInputs()[padIndex].buttonDown[0]);
 }
 

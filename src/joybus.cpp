@@ -465,51 +465,46 @@ int JoyBus::LoadBin()
             m_gbaBootImage[0xAF] = (unsigned char)m_diskId[3];
 
             int idx = 0xBC;
-            unsigned char* p = (unsigned char*)m_gbaBootImage + 0xBC;
-            int left = 1;
 
-            unsigned char sum = (unsigned char)(
-                ((((((((((((((((((((((((((((-0x19
-                - (unsigned char)m_gbaBootImage[0xA0])
-                - (unsigned char)m_gbaBootImage[0xA1])
-                - (unsigned char)m_gbaBootImage[0xA2])
-                - (unsigned char)m_gbaBootImage[0xA3])
-                - (unsigned char)m_gbaBootImage[0xA4])
-                - (unsigned char)m_gbaBootImage[0xA5])
-                - (unsigned char)m_gbaBootImage[0xA6])
-                - (unsigned char)m_gbaBootImage[0xA7])
-                - (unsigned char)m_gbaBootImage[0xA8])
-                - (unsigned char)m_gbaBootImage[0xA9])
-                - (unsigned char)m_gbaBootImage[0xAA])
-                - (unsigned char)m_gbaBootImage[0xAB])
-                - (unsigned char)m_gbaBootImage[0xAC])
-                - (unsigned char)m_gbaBootImage[0xAD])
-                - (unsigned char)m_gbaBootImage[0xAE])
-                - (unsigned char)m_gbaBootImage[0xAF])
-                - (unsigned char)m_gbaBootImage[0xB0])
-                - (unsigned char)m_gbaBootImage[0xB1])
-                - (unsigned char)m_gbaBootImage[0xB2])
-                - (unsigned char)m_gbaBootImage[0xB3])
-                - (unsigned char)m_gbaBootImage[0xB4])
-                - (unsigned char)m_gbaBootImage[0xB5])
-                - (unsigned char)m_gbaBootImage[0xB6])
-                - (unsigned char)m_gbaBootImage[0xB7])
-                - (unsigned char)m_gbaBootImage[0xB8])
-                - (unsigned char)m_gbaBootImage[0xB9])
-                - (unsigned char)m_gbaBootImage[0xBA])
-                - (unsigned char)m_gbaBootImage[0xBB])
-            );
+            int sum = 0xE7 - (unsigned char)m_gbaBootImage[0xA0];
+            sum -= (unsigned char)m_gbaBootImage[0xA1];
+            sum -= (unsigned char)m_gbaBootImage[0xA2];
+            sum -= (unsigned char)m_gbaBootImage[0xA3];
+            sum -= (unsigned char)m_gbaBootImage[0xA4];
+            sum -= (unsigned char)m_gbaBootImage[0xA5];
+            sum -= (unsigned char)m_gbaBootImage[0xA6];
+            sum -= (unsigned char)m_gbaBootImage[0xA7];
+            sum -= (unsigned char)m_gbaBootImage[0xA8];
+            sum -= (unsigned char)m_gbaBootImage[0xA9];
+            sum -= (unsigned char)m_gbaBootImage[0xAA];
+            sum -= (unsigned char)m_gbaBootImage[0xAB];
+            sum -= (unsigned char)m_gbaBootImage[0xAC];
+            sum -= (unsigned char)m_gbaBootImage[0xAD];
+            sum -= (unsigned char)m_gbaBootImage[0xAE];
+            sum -= (unsigned char)m_gbaBootImage[0xAF];
+            sum -= (unsigned char)m_gbaBootImage[0xB0];
+            sum -= (unsigned char)m_gbaBootImage[0xB1];
+            sum -= (unsigned char)m_gbaBootImage[0xB2];
+            sum -= (unsigned char)m_gbaBootImage[0xB3];
+            sum -= (unsigned char)m_gbaBootImage[0xB4];
+            sum -= (unsigned char)m_gbaBootImage[0xB5];
+            sum -= (unsigned char)m_gbaBootImage[0xB6];
+            sum -= (unsigned char)m_gbaBootImage[0xB7];
+            sum -= (unsigned char)m_gbaBootImage[0xB8];
+            sum -= (unsigned char)m_gbaBootImage[0xB9];
+            sum -= (unsigned char)m_gbaBootImage[0xBA];
+            sum -= (unsigned char)m_gbaBootImage[0xBB];
 
-            do
+            if (idx < 0xBD)
             {
-                unsigned char v = *p++;
-                idx++;
-                sum = (unsigned char)(sum - v);
-                left--;
+                do
+                {
+                    sum -= (unsigned char)m_gbaBootImage[idx];
+                    idx++;
+                } while (idx < 0xBD);
             }
-            while (left != 0);
 
-            m_gbaBootImage[idx] = sum;
+            m_gbaBootImage[idx] = (unsigned char)sum;
 
             *(unsigned int*)(m_gbaBootImage + 200) = OSGetTick();
 

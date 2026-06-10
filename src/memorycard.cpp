@@ -531,7 +531,8 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
                 {
                     flag = 1;
                 }
-                item[0xC0 + j] = (-flag | flag) >> 0x1F & 0x32;
+                item[0xC0] = flag != 0 ? 0x32 : 0;
+                item++;
             }
             i++;
             dstWork += 0x40;

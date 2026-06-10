@@ -1263,8 +1263,6 @@ void CGraphic::SetFogParam(float startZ, float endZ)
  */
 void CGraphic::SetFog(int useFog, int useGlobalColor)
 {
-    _GXColor* colorPtr;
-    GXFogType fogType;
     float farZ;
     float nearZ;
 
@@ -1275,19 +1273,7 @@ void CGraphic::SetFog(int useFog, int useGlobalColor)
         farZ = CameraFarZ();
     }
 
-    if (useGlobalColor != 0) {
-        colorPtr = &gGraphicDefaultClearColor;
-    } else {
-        colorPtr = &m_fogColor;
-    }
-
-    _GXColor fogColor = *colorPtr;
-    fogType = GX_FOG_NONE;
-    if (useFog != 0) {
-        fogType = GX_FOG_LIN;
-    }
-
-    GXSetFog(fogType, m_fogStart, m_fogEnd, nearZ, farZ, fogColor);
+    GXSetFog(useFog != 0 ? GX_FOG_LIN : GX_FOG_NONE, m_fogStart, m_fogEnd, nearZ, farZ, useGlobalColor != 0 ? gGraphicDefaultClearColor : m_fogColor);
 }
 
 /*

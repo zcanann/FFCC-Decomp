@@ -2574,11 +2574,10 @@ void GbaQueue::ReplyLetter(int channel)
 
 	unsigned char arg0 = recvBuffer[0];
 	unsigned char arg1 = recvBuffer[1];
-	unsigned int value =
-		(static_cast<unsigned int>(recvBuffer[3]) << 24) |
-		(static_cast<unsigned int>(recvBuffer[4]) << 16) |
-		(static_cast<unsigned int>(recvBuffer[5]) << 8) |
-		recvBuffer[6];
+	unsigned int value = (static_cast<unsigned int>(recvBuffer[3]) << 24) |
+	                     (static_cast<unsigned int>(recvBuffer[4]) << 16);
+	value |= static_cast<unsigned int>(recvBuffer[5]) << 8;
+	value |= recvBuffer[6];
 	int itemId = 0;
 	unsigned int gil = 0;
 
@@ -2587,7 +2586,6 @@ void GbaQueue::ReplyLetter(int channel)
 	}
 	if (recvBuffer[2] == 0) {
 		itemId = value & 0xffff;
-		gil = 0;
 	}
 
 	unsigned int* scriptFoodBase = Game.m_scriptFoodBase + channel;

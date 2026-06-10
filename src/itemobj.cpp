@@ -514,9 +514,10 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 {
 	unsigned char* self = (unsigned char*)this;
 	CFlatRuntime::CStack stack[3];
-	int canSystemCall = 0;
+	int canSystemCall;
 
 	if (carryState == 0) {
+		canSystemCall = 0;
 		bool isStageCarry = false;
 		bool isMenuBossStage = false;
 
@@ -578,6 +579,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 			changeStat(0xB, 0, 0);
 		}
 	} else if (carryState == 1 || carryState == 2) {
+		canSystemCall = 0;
 		bool isStageCarry = false;
 		bool isMenuBossStage = false;
 

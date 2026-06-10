@@ -1515,7 +1515,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 	}
 
 	if (m_lastStateId == 6 &&
-	    static_cast<unsigned char>(static_cast<int>(static_cast<unsigned int>(*(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1)) << 26 >> 30) << 30 >> 31) != 0) {
+	    static_cast<signed char>(static_cast<int>(static_cast<unsigned int>(*(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1)) << 26 >> 30) << 30 >> 31) != 0) {
 		int currentKind =
 			*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 0x0A) & 0xFF;
 		if (currentKind == 2) {
@@ -1538,7 +1538,8 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		}
 	}
 
-	if (itemEffect == 0x1F8 && (sourceObj->m_weaponNodeFlags & 0x20) != 0 &&
+	if (itemEffect == 0x1F8 &&
+	    static_cast<signed char>(static_cast<int>(static_cast<unsigned int>(*(reinterpret_cast<unsigned char*>(&sourceObj->m_weaponNodeFlags) + 1)) << 26 >> 30) << 30 >> 31) != 0 &&
 	    ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 0x0A) & 0xFF) == 3)) {
 		CVector sourcePos(sourceObj->m_worldPosition);
 		const CVector& selfPos = CVector(m_worldPosition);
@@ -1636,8 +1637,9 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 0x100) != 0 &&
 				    (Game.m_gameWork.m_chaliceElement & 4U) == 0 &&
 				    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0x2E) == 0) {
-					if (sourceObj->m_lastStateId == 6 &&
-					    (*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0x560) * 0x48 + 10) & 0xFF) <= 1) {
+					unsigned int srcEntryKind =
+						*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0x560) * 0x48 + 10) & 0xFF;
+					if (sourceObj->m_lastStateId == 6 && srcEntryKind <= 1) {
 						break;
 					}
 					reinterpret_cast<CGCharaObj*>(sourceObj)->setSta(4, 0x19);
@@ -1713,7 +1715,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				System.Printf(dbg + 0x230, staType);
 				break;
 			}
-		} else if (itemKind == 8 || (itemKind == 9 && (static_cast<short>(GetCID()) & 0x6D) == 0x6D && (static_cast<unsigned short>(sourceObj->GetCID()) & 0xAD) == 0xAD)) {
+		} else if (itemKind == 8 || (itemKind == 9 && (static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D && (static_cast<unsigned short>(sourceObj->GetCID()) & 0xAD) == 0xAD)) {
 			switch (staType) {
 			case 0x24:
 			case 0x25:

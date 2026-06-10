@@ -1778,8 +1778,10 @@ void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
     short baseZ;
     int count;
     unsigned int i;
+    int j;
     char* localEntry;
     char* prevEntry;
+    char* prevWalk;
     unsigned char* outPtr;
 
     obj = reinterpret_cast<char*>(this);
@@ -1797,27 +1799,23 @@ void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
     baseZ = *reinterpret_cast<short*>(obj + channel * 0xDC + 0x48C);
     memcpy(localEnemyData, obj + 0xB34, kGbaQueueEnemyDataBytes);
 
+    count = 0;
     prevEntry = obj + channel * kGbaQueueEnemyDataBytes + 0x1034;
     radarMode = m_radarType[channel];
     localEntry = localEnemyData;
     for (i = 0; i < 0x40; i++) {
-        *reinterpret_cast<short*>(localEntry + 8) = *reinterpret_cast<unsigned short*>(localEntry + 8) - baseX;
+        *reinterpret_cast<short*>(localEntry + 8) = *reinterpret_cast<short*>(localEntry + 8) - baseX;
         *reinterpret_cast<short*>(localEntry + 10) = *reinterpret_cast<short*>(localEntry + 10) - baseZ;
 
         int enemyX = *reinterpret_cast<short*>(localEntry + 8);
-        if ((enemyX < 0 ? -enemyX : enemyX) < 0x50) {
-            int enemyZ = *reinterpret_cast<short*>(localEntry + 10);
-            if ((enemyZ < 0 ? -enemyZ : enemyZ) >= 0x40) {
-                *reinterpret_cast<short*>(localEntry + 8) = -1;
-                *reinterpret_cast<short*>(localEntry + 10) = -1;
-                localEntry[0] = 0;
-            } else {
-                localEntry[0] = 1;
-            }
-        } else {
+        int enemyZ;
+        if ((enemyX < 0 ? -enemyX : enemyX) >= 0x50 ||
+            ((enemyZ = *reinterpret_cast<short*>(localEntry + 10)), (enemyZ < 0 ? -enemyZ : enemyZ) >= 0x40)) {
             *reinterpret_cast<short*>(localEntry + 8) = -1;
             *reinterpret_cast<short*>(localEntry + 10) = -1;
             localEntry[0] = 0;
+        } else {
+            localEntry[0] = 1;
         }
 
         if (*reinterpret_cast<unsigned short*>(localEntry + 4) == 0 || localEntry[2] == 0) {
@@ -1833,25 +1831,25 @@ void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
         localEntry += 0x14;
     }
 
-    count = 0;
-    localEntry = localEnemyData;
+    localEntry = localEnemyData + count * 0x14;
+    prevWalk = prevEntry + count * 0x14;
     outPtr = reinterpret_cast<unsigned char*>(outData);
-    for (i = 0; i < 0x40; i++) {
-        if ((localEntry[0] != 0 || prevEntry[0] != 0) && memcmp(localEntry, prevEntry, 0x14) != 0) {
+    for (j = count; j < 0x40; j++) {
+        if ((localEntry[0] != 0 || prevWalk[0] != localEntry[0]) && memcmp(localEntry, prevWalk, 0x14) != 0) {
             count++;
             outPtr[0] = 0x12;
-            outPtr[1] = static_cast<unsigned char>(i) | (static_cast<signed char>(localEntry[0]) << 7);
+            outPtr[1] = j | (localEntry[0] << 7);
             outPtr[2] = static_cast<unsigned char>(*reinterpret_cast<short*>(localEntry + 8));
             outPtr[3] = static_cast<unsigned char>(*reinterpret_cast<short*>(localEntry + 10));
             outPtr += 4;
         }
 
         localEntry += 0x14;
-        prevEntry += 0x14;
+        prevWalk += 0x14;
     }
 
     *outCount = count;
-    memcpy(obj + channel * kGbaQueueEnemyDataBytes + 0x1034, localEnemyData, kGbaQueueEnemyDataBytes);
+    memcpy(prevEntry, localEnemyData, kGbaQueueEnemyDataBytes);
     OSSignalSemaphore(accessSemaphores + channel);
 }
 

@@ -241,12 +241,17 @@ static bool isBossArtifactStage()
 	return Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0x0F;
 }
 
+static inline float LoadFloat(const float& value)
+{
+	return value;
+}
+
 static bool isFrameInterval(int frame, int interval)
 {
 	return frame % interval == 0;
 }
 
-static bool isGhostPartyTargetMode(CGPartyObj* self)
+static inline bool isGhostPartyTargetMode(CGPartyObj* self)
 {
 	bool result = false;
 	bool cidMatch = false;
@@ -270,7 +275,7 @@ static bool isGhostPartyTargetMode(CGPartyObj* self)
 	return result;
 }
 
-static int getCarryAnimNo(CGPartyObj* self, int carryType)
+static inline int getCarryAnimNo(CGPartyObj* self, int carryType)
 {
 	if (isGhostPartyTargetMode(self)) {
 		return 5;
@@ -1559,7 +1564,7 @@ tmpArtifactBlock:
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::callCommandScript(int mode, CGObject* target)
+inline void CGPartyObj::callCommandScript(int mode, CGObject* target)
 {
 	PartyData(this).target = target;
 
@@ -2276,7 +2281,7 @@ void CGPartyObj::statCharge()
 						}
 					}
 					if (FLOAT_80331a78 != mag) {
-						Move(reinterpret_cast<Vec*>(&dest), mag / static_cast<float>(-dist), dist, 1, 1, 0, 1);
+						Move(reinterpret_cast<Vec*>(&dest), mag / static_cast<float>(static_cast<int>(dist)), dist, 1, 1, 0, 1);
 					}
 				} else {
 					moveVectorRot(m_rotTargetY, FLOAT_80331a78, FLOAT_80331ADC * static_cast<float>(p[5]),
@@ -2346,7 +2351,7 @@ void CGPartyObj::statCharge()
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::statAttackSel()
+inline void CGPartyObj::statAttackSel()
 {
 	if (m_subState == 0 && m_subFrame == 0) {
 		putTargetParticle(0, 1);
@@ -2797,7 +2802,7 @@ void CGPartyObj::checkTargetParticle()
 
 		float dist = PSVECDistance(&m_worldPosition, targetPos);
 
-		float maxRangeRaw;
+		float zero = LoadFloat(FLOAT_80331a78);
 		int scriptPtr = *reinterpret_cast<int*>(self + 0x58);
 		if (*reinterpret_cast<int*>(self + 0x520) == 2) {
 			unsigned int vNode = *reinterpret_cast<unsigned short*>(*reinterpret_cast<int*>(scriptPtr + 0x24) + 0x19A);
@@ -2808,7 +2813,7 @@ void CGPartyObj::checkTargetParticle()
 			} else {
 				vFlag = *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x0A);
 			}
-			maxRangeRaw = static_cast<float>(vItem) + static_cast<float>(vNode) + static_cast<float>(vFlag);
+			maxRange = zero + (static_cast<float>(vItem) + static_cast<float>(vNode) + static_cast<float>(vFlag));
 		} else {
 			unsigned int vNode = *reinterpret_cast<unsigned short*>(*reinterpret_cast<int*>(scriptPtr + 0x24) + 0x19C);
 			unsigned int vItem = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<int*>(self + 0x560) * 0x48 + 0x30);
@@ -2818,9 +2823,8 @@ void CGPartyObj::checkTargetParticle()
 			} else {
 				vFlag = *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x0C);
 			}
-			maxRangeRaw = static_cast<float>(vItem) + static_cast<float>(vNode) + static_cast<float>(vFlag);
+			maxRange = zero + (static_cast<float>(vItem) + static_cast<float>(vNode) + static_cast<float>(vFlag));
 		}
-		maxRange = FLOAT_80331a78 + maxRangeRaw;
 
 		CVector worldPosV(m_worldPosition);
 		CVector targetCenterV(*targetPos);
@@ -3185,7 +3189,7 @@ void CGPartyObj::onStatDie()
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::statAlive()
+inline void CGPartyObj::statAlive()
 {
 	setAlive(1, 0);
 	canPlayerGoMenu();
@@ -3365,7 +3369,7 @@ void CGPartyObj::carry(int carryType, CGObject* object, int forceMode)
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::statCarry()
+inline void CGPartyObj::statCarry()
 {
 	if (m_subState == 0 && m_subFrame == 0) {
 		reqAnim(0x1D, 0, 0);
@@ -3474,7 +3478,7 @@ void CGPartyObj::statPut()
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::statPickup()
+inline void CGPartyObj::statPickup()
 {
 	if (m_subState == 0 && m_subFrame == 0) {
 		reqAnim(0x21, 0, 0);
@@ -3924,7 +3928,7 @@ int CGPartyObj::putGil(int amount)
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::statRebound()
+inline void CGPartyObj::statRebound()
 {
 	if ((m_subState == 0) && (m_subFrame == 0)) {
 		reqAnim(0x1C, 0, 0);
@@ -3987,7 +3991,7 @@ void CGPartyObj::statKorobi()
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::statHide()
+inline void CGPartyObj::statHide()
 {
 	if (m_subFrame == 0) {
 		enableDamageCol(0);
@@ -4009,7 +4013,7 @@ void CGPartyObj::statHide()
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::statJump()
+inline void CGPartyObj::statJump()
 {
 	if ((m_subState == 0) && (m_subFrame == 0)) {
 		reqAnim(0x22, 0, 0);
@@ -4031,7 +4035,7 @@ void CGPartyObj::statJump()
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::statWeaponChange()
+inline void CGPartyObj::statWeaponChange()
 {
 	PartyObjOverlay& party = PartyData(this);
 	changeWeapon(party.weaponItem, party.pendingWeaponItem, 0);
@@ -4046,7 +4050,7 @@ void CGPartyObj::statWeaponChange()
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::changeWeapon(int weaponRef, int weaponItem, int forceIdle)
+inline void CGPartyObj::changeWeapon(int weaponRef, int weaponItem, int forceIdle)
 {
 	PartyObjOverlay& party = PartyData(this);
 	party.weaponItem = weaponRef;
@@ -4287,7 +4291,7 @@ void CGPartyObj::ChangeCommandMode(int mode)
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::checkAndSetWeapon()
+inline void CGPartyObj::checkAndSetWeapon()
 {
 	if (m_scriptHandle == nullptr) {
 		return;
@@ -4630,7 +4634,7 @@ void stageWeather()
  * JP Address: TODO
  * JP Size: TODO
  */
-void magicReady()
+inline void magicReady()
 {
 	for (int i = 0; i < 4; i++) {
 		CGPartyObj* party = Game.m_partyObjArr[i];
@@ -4649,7 +4653,7 @@ void magicReady()
  * JP Address: TODO
  * JP Size: TODO
  */
-void chooseMagic()
+inline void chooseMagic()
 {
 	for (int i = 0; i < 4; i++) {
 		CGPartyObj* party = Game.m_partyObjArr[i];
@@ -4668,7 +4672,7 @@ void chooseMagic()
  * JP Address: TODO
  * JP Size: TODO
  */
-void decMagic(int amount)
+inline void decMagic(int amount)
 {
 	for (int i = 0; i < 4; i++) {
 		CGPartyObj* party = Game.m_partyObjArr[i];
@@ -4687,7 +4691,7 @@ void decMagic(int amount)
  * JP Address: TODO
  * JP Size: TODO
  */
-void calcWeightMax()
+inline void calcWeightMax()
 {
 	for (int i = 0; i < 4; i++) {
 		CGPartyObj* party = Game.m_partyObjArr[i];
@@ -4990,13 +4994,16 @@ void CGPartyObj::ghostPartyMog()
 					break;
 				}
 				float innerScale;
-				if (innerMode == 2) {
-					innerScale = FLOAT_80331A58 * ramp + FLOAT_80331A58;
-				} else {
+				switch (innerMode) {
+				default:
 					innerScale = kMonObjOne;
-					if (innerMode < 2 && innerMode != 0) {
-						innerScale = FLOAT_80331A58 * (kMonObjOne - ramp) + FLOAT_80331A58;
-					}
+					break;
+				case 1:
+					innerScale = FLOAT_80331A58 * (kMonObjOne - ramp) + FLOAT_80331A58;
+					break;
+				case 2:
+					innerScale = FLOAT_80331A58 * ramp + FLOAT_80331A58;
+					break;
 				}
 				if (static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x38)) >= static_cast<int>(FLOAT_80331A5C * innerScale)) {
 					bossState = 3;
@@ -5142,7 +5149,7 @@ void CGPartyObj::gpmMove()
 	}
 
 	Vec pathVec;
-	float pathDist = 0.0f;
+	float pathDist;
 	gpmCalcDist(&pathVec, pathDist);
 
 	Vec toLeader;
@@ -5415,14 +5422,16 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 
 		float rate = static_cast<float>(CharaGhostValue(0x2054)) / kMonObjPercentMax;
 		double angleScale;
-		if (bossKind == 2) {
-			angleScale = FLOAT_80331A58 * rate + FLOAT_80331A58;
-		} else if (bossKind > 2) {
+		switch (bossKind) {
+		default:
 			angleScale = kMonObjOne;
-		} else if (bossKind == 1) {
+			break;
+		case 1:
 			angleScale = FLOAT_80331A58 * (kMonObjOne - rate) + FLOAT_80331A58;
-		} else {
-			angleScale = kMonObjOne;
+			break;
+		case 2:
+			angleScale = FLOAT_80331A58 * rate + FLOAT_80331A58;
+			break;
 		}
 
 		sprintf(text, s_partyObjGhostFmt, sGhostPartyWork.thresholdA, CharaGhostValue(0x2048),

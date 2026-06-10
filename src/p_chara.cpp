@@ -1,4 +1,5 @@
-static const char s_p_chara_ptrarray_grow_error[] = "CPtrArray grow error";
+static const char s_p_chara_ptrarray_grow_error[] =
+    "\x83\x6f\x83\x62\x83\x74\x83\x40\x90\xac\x92\xb7\x82\xaa\x95\x73\x8b\x96\x89\xc2\x82\xc5\x82\xb7\x81\x42\x0a";
 static const char s_p_chara_collection_ptrarray_h[] = "collection_ptrarray.h";
 
 #define FFCC_PTRARRAY_GROW_ERROR s_p_chara_ptrarray_grow_error
@@ -66,9 +67,9 @@ extern "C" void destroyViewer__9CCharaPcsFv(CCharaPcs*);
 extern "C" void calcViewer__9CCharaPcsFv(CCharaPcs*);
 extern "C" void drawViewer__9CCharaPcsFv(CCharaPcs*);
 
-static const char s_CCharaPcs_GAME[] = "CCharaPcs GAME";
-static const char s_CCharaPcs_VIEWER[] = "CCharaPcs VIEWER";
-static const char s_CCharaPcs_PART[] = "CCharaPcs PART";
+static const char s_CCharaPcs_GAME_801D9128[] = "CCharaPcs(GAME)";
+static const char s_CCharaPcs_VIEWER_801D9138[] = "CCharaPcs(VIEWER)";
+static const char s_CCharaPcs_PART_801D914C[] = "CCharaPcs(PART)";
 
 static CProcessTableCallback s_charaTableDescCreate = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__9CCharaPcsFv)};
 static CProcessTableCallback s_charaTableDescDestroy = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__9CCharaPcsFv)};
@@ -91,7 +92,7 @@ static CProcessTableCallback s_charaTableDescPartCalcAfter = {0, 0xFFFFFFFF, rei
 
 CProcessTable PTR_s_CCharaPcs_GAME_[3] = {
     {
-        const_cast<char*>(s_CCharaPcs_GAME),
+        const_cast<char*>(s_CCharaPcs_GAME_801D9128),
         {
             s_charaTableDescCreate.m_thisOffset, s_charaTableDescCreate.m_virtualOffset, s_charaTableDescCreate.m_function,
             s_charaTableDescDestroy.m_thisOffset, s_charaTableDescDestroy.m_virtualOffset, s_charaTableDescDestroy.m_function,
@@ -110,7 +111,7 @@ CProcessTable PTR_s_CCharaPcs_GAME_[3] = {
         },
     },
     {
-        const_cast<char*>(s_CCharaPcs_VIEWER),
+        const_cast<char*>(s_CCharaPcs_VIEWER_801D9138),
         {
             s_charaTableDescCreateViewer.m_thisOffset, s_charaTableDescCreateViewer.m_virtualOffset, s_charaTableDescCreateViewer.m_function,
             s_charaTableDescDestroyViewer.m_thisOffset, s_charaTableDescDestroyViewer.m_virtualOffset, s_charaTableDescDestroyViewer.m_function,
@@ -124,7 +125,7 @@ CProcessTable PTR_s_CCharaPcs_GAME_[3] = {
         },
     },
     {
-        const_cast<char*>(s_CCharaPcs_PART),
+        const_cast<char*>(s_CCharaPcs_PART_801D914C),
         {
             s_charaTableDescPartCreate.m_thisOffset, s_charaTableDescPartCreate.m_virtualOffset, s_charaTableDescPartCreate.m_function,
             s_charaTableDescPartDestroy.m_thisOffset, s_charaTableDescPartDestroy.m_virtualOffset, s_charaTableDescPartDestroy.m_function,
@@ -145,8 +146,8 @@ inline void* operator new(unsigned long, void* ptr)
 
 static const char s_p_chara_cpp[] = "p_chara.cpp";
 static const char s_CCharaPcs_stage[] = "CCharaPcs";
-static const char s_CCharaPcs_amem[] = "CCharaPcs amem";
-static const char s_CCharaPcs_amemw[] = "CCharaPcs amemw";
+static const char s_CCharaPcs_amem[] = "CCharaPcs.amem";
+static const char s_CCharaPcs_amemw[] = "CCharaPcs.amemw";
 static const char s_CCharaPcs_loadModel[] = "CCharaPcs LoadModel";
 static const char s_CCharaPcs_loadTex[] = "CCharaPcs LoadTex";
 static const char s_CCharaPcs_loadWepTex[] = "CCharaPcs LoadWepTex";
@@ -202,9 +203,9 @@ static const char s_charaAmemAnimCompactAllocFailed[] =
 static const char s_charaAmemAnimCompactCountFmt[] =
     "\x61\x6d\x65\x6d\x20\x61\x6e\x69\x6d\x20\x83\x4b\x83\x78\x81\x5b\x83\x57"
     "\x83\x52\x83\x8c\x83\x4e\x83\x56\x83\x87\x83\x93\x82\xb5\x82\xe6\x82\xa4"
-    "\x82\xc6\x82\xb5\x82\xc4\x82\xa2\x82\xe9\x83\x41\x83\x6a\x83\x81\x5b\x83"
-    "\x56\x83\x87\x83\x93\x82\xcc\x91\x8d\x90\x94\x82\xcd\x25\x64\x82\xc5\x82"
-    "\xb7\x81\x42\x0a";
+    "\x82\xc6\x82\xb5\x82\xc4\x82\xa2\x82\xe9\x83\x41\x83\x6a\x83\x81\x81\x5b"
+    "\x83\x56\x83\x87\x83\x93\x82\xcc\x91\x8d\x90\x94\x82\xcd\x25\x64\x82\xc5"
+    "\x82\xb7\x81\x42\x0a";
 static const char s_charaAmemAnimCompactWritebackFmt[] =
     "\x8f\x91\x82\xab\x96\xdf\x82\xb5\x20\x25\x64\x8c\xc2\x20\x25\x78\x20\x2d"
     "\x20\x25\x78\x0a";
@@ -218,16 +219,24 @@ static const char s_charaAmemCompactFailed[] =
     "\x91\x53\x82\xc4\x8f\xc1\x8b\x8e\x82\xb5\x82\xdc\x82\xb7\x81\x42\n";
 static const char s_charaBasePathFmt[] = "dvd/char/%s/%s%03d/%s%03d%s";
 static const char s_charaAnimPathFmt[] = "dvd/char/%s/%s%03d/%s.cha";
-static const char s_charaModelSuffix[] = ".mdl";
-static const char s_charaDynamicsSuffix[] = ".dyn";
+static const char s_charaModelSuffix[] = ".chm";
+static const char s_charaDynamicsSuffix[] = ".chd";
 static const char s_charaTextureSuffix[] = ".tex";
 static const char s_charaTextureVariantFmt[] = "%s_%c";
-static const char s_mogFurTextureName[] = "mog_hair";
-static const char s_charaSetAnimMissingFmt[] = "CCharaPcs missing anim %d %d %d\n";
-static const char s_charaLoadAnimLogFmt[] = "CCharaPcs LoadAnim %s %d %d\n";
+static const char s_mogFurTextureName[] = "n915m_2";
+static const char s_charaSetAnimMissingFmt[] =
+    "\x83\x41\x83\x6a\x83\x81\x81\x5b\x83\x56\x83\x87\x83\x93\x82\xaa\x82\xa0\x82\xe8\x82\xdc\x82\xb9\x82\xf1\x81\x42"
+    "\x74\x79\x70\x65\x3d\x25\x64\x20\x6e\x75\x6d\x62\x65\x72\x3d\x25\x64\x20\x61\x6e\x69\x6d\x6e\x6f\x3d\x25\x64\x0a";
+static const char s_charaLoadAnimLogFmt[] =
+    "\x1b\x5b\x33\x31\x6d\x4d\x65\x72\x67\x65\x3a\x20\x83\x41\x83\x6a\x83\x81\x81\x5b\x83\x56\x83\x87\x83\x93\x82\xf0"
+    "\x44\x56\x44\x82\xa9\x82\xe7\x93\xc7\x82\xdd\x8d\x9e\x82\xdd\x82\xdc\x82\xb5\x82\xbd\x81\x42\x6e\x61\x6d\x65\x20"
+    "\x3d\x20\x25\x73\x20\x74\x79\x70\x65\x20\x3d\x20\x25\x64\x20\x6e\x75\x6d\x62\x65\x72\x20\x3d\x20\x25\x64\x0a\x1b"
+    "\x5b\x30\x6d";
 static const char s_charaLoadPdtLogFmt[] =
     "\x1b[31mMerge: \x83\x82\x83\x93\x83X\x83^\x81[PDT\x82\xf0" "DVD\x82\xa9\x82\xe7\x93\xc7\x82\xdd\x8d\x9e\x82\xdd\x82\xdc\x82\xb5\x82\xbd\x81" "Btype = %d number = %d idxTexture = %d\n\x1b[0m";
-static const char s_charaReleaseAnimBankFmt[] = "bank release %d %s\n";
+static const char s_charaReleaseAnimBankFmt[] =
+    "\x83\x71\x83\x58\x83\x67\x83\x8a\x81\x5b\x25\x64\x82\xcc\x83\x41\x83\x6a\x83\x81\x81\x5b\x83\x56\x83\x87\x83\x93"
+    "\x25\x73\x82\xf0\x8a\x4a\x95\xfa\x82\xb5\x82\xdc\x82\xb5\x82\xbd\x81\x42\x0a";
 static const char s_charaAsyncCancelFmt[] =
     "\x83\x82\x83\x66\x83\x8b\x94\xf1\x93\xaf\x8a\xfa\x93\xc7\x82\xdd"
     "\x8d\x9e\x82\xdd\x92\x86\x82\xc9\x83\x4c\x83\x83\x83\x93\x83\x5a"
@@ -238,34 +247,42 @@ static const char s_charaAsyncCompleteFmt[] =
 static const char s_charaAsyncEntryFmt[] =
     "\x94\xf1\x93\xaf\x8a\xfa\x93\xc7\x82\xdd\x8d\x9e\x82\xdd\x83\x47"
     "\x83\x93\x83\x67\x83\x8a\x81\x5b\n";
-static const char s_charaDumpModelHdr1[] = "MODEL\n";
-static const char s_charaDumpModelHdr2[] = " no t num lv mask addr a? a_addr a_size\n";
-static const char s_charaDumpLineSep[] = "----------------------------------------\n";
-static const char s_charaDumpModelFmt[] = "%3d %1d %3d %3d %08x %08x %d %08x %08x\n";
-static const char s_charaDumpTextureHdr1[] = "TEXTURE\n";
-static const char s_charaDumpTextureHdr2[] = " no t num t lv mask addr a? a_addr a_size\n";
-static const char s_charaDumpTextureFmt[] = "%3d %1d %3d %1d %3d %08x %08x %d %08x %08x\n";
-static const char s_charaDumpPdtHdr1[] = "PDT\n";
-static const char s_charaDumpPdtHdr2[] = " no t num t pdt hdl lv mask\n";
+static const char s_charaDumpModelHdr1[] = "model\n";
+static const char s_charaDumpModelHdr2[] = "no  t num lv  mask     addr     a a-addr   a-size\n";
+static const char s_charaDumpModelSep[] = "--- - --- --- -------- -------- - -------- --------\n";
+static const char s_charaDumpModelFmt[] = "%3d %1d %3d %3d %08x %08x %d %08x %8d\n";
+static const char s_charaDumpTextureHdr1[] = "texture\n";
+static const char s_charaDumpTextureHdr2[] = "no  t num t lv  mask     addr     a a-addr   a-size\n";
+static const char s_charaDumpTextureSep[] = "--- - --- - --- -------- -------- - -------- --------\n";
+static const char s_charaDumpTextureFmt[] = "%3d %1d %3d %1d %3d %08x %08x %d %08x %8d\n";
+static const char s_charaDumpPdtHdr1[] = "pdt\n";
+static const char s_charaDumpPdtHdr2[] = "no  t num t pdt hdl  lv  mask    \n";
+static const char s_charaDumpPdtSep[] = "--- - --- - -------- --- --------\n";
 static const char s_charaDumpPdtFmt[] = "%3d %1d %3d %1d %8d %3d %08x\n";
-static const char s_charaDumpAnimHdr1[] = "ANIM\n";
-static const char s_charaDumpAnimHdr2[] = " no t num name lv mask addr banksz sum bankaddr\n";
-static const char s_charaDumpAnimFmt[] = "%3d %1d %3d %-14s %3d %08x %08x %d %08x\n";
-static const char s_charaKindPath0[] = "k00";
-static const char s_charaKindPath1[] = "k01";
-static const char s_charaKindPath2[] = "k02";
-static const char s_charaKindPath3[] = "k03";
-static const char s_charaKindPath4[] = "k04";
-static const char s_charaKindPath5[] = "k05";
-static const char s_charaKindFile[] = "chara";
-static const char s_charaKindSuffix[] = "";
+static const char s_charaDumpAnimHdr1[] = "anim\n";
+static const char s_charaDumpAnimHdr2[] = "no  t num name           lv  mask     addr     banksize banksum  histroy\n";
+static const char s_charaDumpAnimSep[] = "--- - --- -------------- --- -------- -------- -------- -------- --------\n";
+static const char s_charaDumpAnimFmt[] = "%3d %1d %3d %14s %3d %08x %08x %8d %8d %8d\n";
+static const char lbl_80330228[] = "pc";
+static const char lbl_8033022C[] = "c";
+static const char lbl_80330230[] = "_root";
+static const char lbl_80330238[] = "mon";
+static const char lbl_8033023C[] = "m";
+static const char lbl_80330240[] = "npc";
+static const char lbl_80330244[] = "n";
+static const char lbl_80330248[] = "fa";
+static const char lbl_8033024C[] = "f";
+static const char lbl_80330250[] = "wep";
+static const char lbl_80330254[] = "w";
+static const char lbl_80330258[] = "loc";
+static const char lbl_8033025C[] = "l";
 static const char* s_charaKindPathParts[][3] = {
-    {s_charaKindPath0, s_charaKindFile, s_charaKindSuffix},
-    {s_charaKindPath1, s_charaKindFile, s_charaKindSuffix},
-    {s_charaKindPath2, s_charaKindFile, s_charaKindSuffix},
-    {s_charaKindPath3, s_charaKindFile, s_charaKindSuffix},
-    {s_charaKindPath4, s_charaKindFile, s_charaKindSuffix},
-    {s_charaKindPath5, s_charaKindFile, s_charaKindSuffix},
+    {lbl_80330228, lbl_8033022C, lbl_80330230},
+    {lbl_80330238, lbl_8033023C, lbl_80330230},
+    {lbl_80330240, lbl_80330244, lbl_80330230},
+    {lbl_80330248, lbl_8033024C, lbl_80330230},
+    {lbl_80330250, lbl_80330254, lbl_80330230},
+    {lbl_80330258, lbl_8033025C, lbl_80330230},
 };
 
 #pragma dont_inline on
@@ -624,7 +641,7 @@ void CCharaPcs::Init()
             if (i == 0) {
                 m_viewerDiffusePos[lightIndex].x = 0.0f;
                 m_viewerDiffusePos[lightIndex].y = 0.0f;
-                m_viewerDiffusePos[lightIndex].z = 1.0f;
+                m_viewerDiffusePos[lightIndex].z = -1.0f;
             }
         }
     }
@@ -651,12 +668,12 @@ void CCharaPcs::Init()
     CColor baseColor(0x00, 0x00, 0x40, 0x40);
     m_texShadowColor = baseColor.color;
 
-    CVector baseVec(0.0f, 10.0f, 0.0f);
+    CVector baseVec(0.0f, 100.0f, 0.0f);
     Vec* constructedVec = reinterpret_cast<Vec*>(&baseVec);
     m_texShadowPos.x = constructedVec->x;
     m_texShadowPos.y = constructedVec->y;
     m_texShadowPos.z = constructedVec->z;
-    m_texShadowRadius = 120.0f;
+    m_texShadowRadius = 500.0f;
     m_texShadowSize = 0x80;
     m_texShadowDistance = 100;
 }
@@ -1479,7 +1496,7 @@ void CCharaPcs::DumpLoad()
         System.Printf(const_cast<char*>(s_charaDumpModelHdr2));
     }
     if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-        System.Printf(const_cast<char*>(s_charaDumpLineSep));
+        System.Printf(const_cast<char*>(s_charaDumpModelSep));
     }
     int modelCount = LoadModelArray(this)->GetSize();
     for (int i = 0; i < modelCount; i++) {
@@ -1503,7 +1520,7 @@ void CCharaPcs::DumpLoad()
         System.Printf(const_cast<char*>(s_charaDumpTextureHdr2));
     }
     if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-        System.Printf(const_cast<char*>(s_charaDumpLineSep));
+        System.Printf(const_cast<char*>(s_charaDumpTextureSep));
     }
     int textureCount = LoadTextureArray(this)->GetSize();
     for (int i = 0; i < textureCount; i++) {
@@ -1527,7 +1544,7 @@ void CCharaPcs::DumpLoad()
         System.Printf(const_cast<char*>(s_charaDumpPdtHdr2));
     }
     if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-        System.Printf(const_cast<char*>(s_charaDumpLineSep));
+        System.Printf(const_cast<char*>(s_charaDumpPdtSep));
     }
     int pdtCount = LoadPdtArray(this)->GetSize();
     for (int i = 0; i < pdtCount; i++) {
@@ -1547,7 +1564,7 @@ void CCharaPcs::DumpLoad()
         System.Printf(const_cast<char*>(s_charaDumpAnimHdr2));
     }
     if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-        System.Printf(const_cast<char*>(s_charaDumpLineSep));
+        System.Printf(const_cast<char*>(s_charaDumpAnimSep));
     }
     int animCount = LoadAnimArray(this)->GetSize();
     int totalBankSize = 0;
@@ -2847,13 +2864,13 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
 
     if (drawPass == 3) {
         if ((m_flags & 4) != 0) {
-            const float offsetY = 0.25f * (m_worldPosY - m_bgCharmPlaneY);
+            const float offsetY = 2.0f * (m_worldPosY - m_bgCharmPlaneY);
             viewMtx[0][3] += viewMtx[0][1] * offsetY;
             viewMtx[1][3] += viewMtx[1][1] * offsetY;
             viewMtx[2][3] += viewMtx[2][1] * offsetY;
-            viewMtx[1][1] *= 0.5f;
-            viewMtx[0][1] *= 0.5f;
-            viewMtx[2][1] *= 0.5f;
+            viewMtx[1][1] *= -1.0f;
+            viewMtx[0][1] *= -1.0f;
+            viewMtx[2][1] *= -1.0f;
         } else if ((m_flags & 8) != 0) {
             PSMTXConcat(viewMtx, CFlatCenterMatrix(), viewMtx);
         }

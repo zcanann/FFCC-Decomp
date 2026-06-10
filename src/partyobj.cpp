@@ -28,7 +28,11 @@
 class CAStar {
 public:
 	void addRealTime(CGPartyObj*);
+
+	unsigned char m_data[0x24A8];
 };
+
+extern CAStar AStar;
 
 extern const char lbl_801DCA48[];
 extern const char lbl_801DCCB0[];
@@ -948,11 +952,11 @@ void CGPartyObj::onFrameAlways()
 	}
 #undef traceSlot
 
-	if (reinterpret_cast<int>(m_scriptHandle[0xED]) == 0 && (MiniGamePcs.m_flags & 0x400) != 0) {
-		reinterpret_cast<CAStar*>(reinterpret_cast<unsigned char*>(&DbgMenuPcs) + 0x2A5C)->addRealTime(this);
+	if (reinterpret_cast<int>(m_scriptHandle[0xED]) == 0 && (*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&DbgMenuPcs) + 4) & 0x400) != 0) {
+		AStar.addRealTime(this);
 	}
 
-	if ((MiniGamePcs.m_flags & 0x2000) != 0) {
+	if ((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&DbgMenuPcs) + 4) & 0x2000) != 0) {
 		int itemId;
 		do {
 			itemId = Math.Rand(0x155) + 0x9F;

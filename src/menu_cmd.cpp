@@ -2311,7 +2311,8 @@ void CMenuPcs::DrawUniteList()
 			}
 			const s32 skillId = caravan->m_inventoryItems[itemIdx];
 			char** flatText = Game.m_cFlatDataArr[1].TableStrings(0);
-			text = flatText[skillId * 5 + 4];
+			int __p9 = skillId;
+			text = flatText[__p9 * 5 + 4];
 		}
 
 		const float width = static_cast<float>(font->GetWidth(text));
@@ -2371,7 +2372,7 @@ void CMenuPcs::DrawUniteList()
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x38));
 
 		const s32 labelAnchor =
-		    (groupStart == GetCmdStateView(this)->selected) ? groupStart + 1 : groupStart;
+		    (!(groupStart == GetCmdStateView(this)->selected)) ? groupStart : groupStart + 1;
 		const float panelX =
 		    static_cast<float>(topX - (GetCmdListStorage(this)->entries[labelAnchor].x - topX));
 		drawW = kCmdMenuUnitePanelWidth;
@@ -2445,7 +2446,7 @@ void CMenuPcs::DrawUniteList()
 	if (GetCmdStateView(this)->mode == 0) {
 		const s16 helpSlot = caravan->m_commandListExtra[GetCmdStateView(this)->selected];
 		if (helpSlot != 0) {
-			int helpId = helpSlot;
+			int helpId =  (helpSlot + 0);
 			const u8 helpAlpha =
 			    static_cast<u8>(kCmdMenuAlphaMax * GetCmdListStorage(this)->entries[0].alpha);
 			if (helpSlot == 0x207 || helpSlot == 0x20B || helpSlot == 0x20F) {

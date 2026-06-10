@@ -936,7 +936,8 @@ void CMenuPcs::CalcSelectCloseAnim()
 			int t0 = off;
 			int t1 = off;
 			int i = 0;
-			for (; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++, off += 0x40) {
+			int __p3 = i;
+			for (; __p3 < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++, off += 0x40) {
 				int sprOff = off + 8;
 				BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + sprOff);
 				spr->alpha = FLOAT_80331EB0;
@@ -993,7 +994,8 @@ void CMenuPcs::CalcSelectCloseAnim()
 			spr->targetY = (float)spr->y + spr->motionY;
 		}
 
-		int base = activePartyCount + 4;
+		int base;
+		base = activePartyCount + 4;
 		s_PlayerTop = (unsigned char)base;
 		for (int i = 0; i < activePartyCount; i++) {
 			int off = ((base + i) << 6) + 8;
@@ -2442,7 +2444,7 @@ void CMenuPcs::CalcResultCloseAnim()
 		// extraBase + pc block: flags = 0
 		base += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
-			int sprite = this->m_bonusAnimPtr + (base + i) * 0x40 + 8;
+			int sprite =  (s32)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
 			*(int*)(sprite + 0x24) = 0;
 		}
 
@@ -2487,7 +2489,8 @@ void CMenuPcs::CalcResultCloseAnim()
 	int off = 0;
 	for (int i = 0; i < *(short*)this->m_bonusAnimPtr; i++) {
 		int sprOff = off + 8;
-		BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + sprOff);
+		int __p4 = sprOff;
+		BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + __p4);
 
 		if ((BonusSpriteFlags(sprite) & 1) != 0) {
 			sprite->alpha = FLOAT_80331EB0;
@@ -2495,10 +2498,10 @@ void CMenuPcs::CalcResultCloseAnim()
 			if (sprite->startFrame > frame) {
 				sprite->alpha = FLOAT_80331EB0;
 			}
-			if (sprite->startFrame + sprite->duration <= frame) {
-				sprite->alpha = kBonusZClearOrigin;
-			} else {
+			if (!(sprite->startFrame + sprite->duration <= frame)) {
 				sprite->alpha = (float)(1.0 - (1.0 / (double)sprite->duration) * (double)sprite->timer);
+			} else {
+				sprite->alpha = kBonusZClearOrigin;
 			}
 		}
 
@@ -2514,7 +2517,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			sprite->motionY = (ty - fy) * progress;
 		}
 
-		if (sprite->startFrame < frame && frame <= sprite->startFrame + sprite->duration) {
+		if (frame > sprite->startFrame && frame <= sprite->startFrame + sprite->duration) {
 			sprite->timer++;
 		}
 
@@ -2570,12 +2573,12 @@ void CMenuPcs::CalcResultCloseAnim()
 		int alphaOff = (total2 + 1) * 0x40;
 		int partyOff = i;
 		for (; i < total2; i++) {
-			int __p2 =  (alphaOff - 0);
+			int __p2 =   (int)(unsigned int)((alphaOff - 0));
 			int aOff = __p2 + 0x8;
 			BonusAnimSprite* alphaSprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + aOff);
 			CCharaPcs::CHandle* handle;
 			int tribeId;
-			if (i < activePartyCount) {
+			if (!(!(i < activePartyCount))) {
 				int p = (int)s_Rinfo + partyOff;
 				handle = *(CCharaPcs::CHandle**)(p + 0x20);
 				tribeId = *(int*)(p + 0x44);

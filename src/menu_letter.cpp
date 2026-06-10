@@ -2341,18 +2341,18 @@ int CMenuPcs::LetterCtrlCur()
 			char* line = workText;
 			int i = 0;
 			do {
-				char* newline = strchr(line, '\n');
-				if (newline != 0) {
-					*newline = '\0';
-				}
-				if (i == s_ReplyPos) {
-					strcpy(s_ReplyStr, line);
-				}
-				if (newline == 0) {
-					break;
-				}
-				++i;
-				line = newline + 1;
+					char* newline = strchr(line, '\n');
+					if (newline != 0) {
+						*newline = '\0';
+					}
+					if (i == s_ReplyPos) {
+						strcpy(s_ReplyStr, line);
+					}
+					if (newline == 0) {
+						break;
+					}
+					++i;
+					line = newline + 1;
 			} while (i < 7);
 
 			delete[] srcText;

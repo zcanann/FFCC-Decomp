@@ -689,10 +689,10 @@ void CalcReflectionVector2(
     Vec objSpacePos;
     Vec objSpaceNormal;
     Vec2d uv;
-    Mtx nodeMtx;
-    Mtx nodeRotMtx;
-    Mtx cameraMtx;
     Mtx cameraModelMtx;
+    Mtx cameraMtx;
+    Mtx nodeRotMtx;
+    Mtx nodeMtx;
     float (*nodeMatrix)[4];
     u16* dl = (u16*)displayList;
     u16* dlEnd;
@@ -763,17 +763,19 @@ void CalcReflectionVector2(
             outVec = &reflectionVec[posIndex];
             C_VECReflect(&cameraVector, &objSpaceNormal, outVec);
 
-            float absY = fabsf(outVec->y);
-            float absX = fabsf(outVec->x);
-            float absZ = fabsf(outVec->z);
+            float absVals[3];
+            float* absPtr = absVals;
+            absPtr[1] = fabsf(outVec->y);
+            absPtr[0] = fabsf(outVec->x);
+            absPtr[2] = fabsf(outVec->z);
 
             axis = 0;
-            maxAxis = absX;
-            if (absY > absX) {
+            maxAxis = absPtr[0];
+            if (absPtr[1] > absPtr[0]) {
                 axis = 1;
-                maxAxis = absY;
+                maxAxis = absPtr[1];
             }
-            if (absZ > maxAxis) {
+            if (absPtr[2] > maxAxis) {
                 axis = 2;
             }
             CVector reflected(outVec->x, outVec->y, outVec->z);

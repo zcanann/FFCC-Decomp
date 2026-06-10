@@ -3173,23 +3173,25 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
     if (m_weaponNodeFlagBits.m_unk10 && (Game.m_currentMapId != 0x21)) {
         {
             Vec bottom = m_worldPosition;
-            bottom.y += useCapsuleOffset != 0 ? m_capsuleHalfHeight : sPushDistance;
+            const float bottomY = (useCapsuleOffset != 0 ? m_capsuleHalfHeight : sPushDistance) + bottom.y;
+            bottom.y = bottomY;
             Vec direction = bottom;
             direction.x = sZeroFloat;
             direction.y = sDownUnitY;
             direction.z = sZeroFloat;
+            const u32 hitMask = m_bgHitMask;
             CMapCylinder bodyCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
             bodyCylinder.m_bottom.x = bottom.x;
-            bodyCylinder.m_bottom.y = bottom.y;
+            bodyCylinder.m_bottom.y = bottomY;
             bodyCylinder.m_bottom.z = bottom.z;
-            bodyCylinder.m_axis.x = direction.x;
-            bodyCylinder.m_axis.y = direction.y;
-            bodyCylinder.m_axis.z = direction.z;
+            bodyCylinder.m_axis.x = sZeroFloat;
+            bodyCylinder.m_axis.y = sDownUnitY;
+            bodyCylinder.m_axis.z = sZeroFloat;
             bodyCylinder.m_radius = sZeroFloat;
 
             if (MapMng.CheckHitCylinderNear(
                     &bodyCylinder, &direction,
-                    m_bgHitMask) != 0) {
+                    hitMask) != 0) {
                 MapMng.m_hitMapObj->CalcHitPosition(&m_worldPosition);
             }
         }

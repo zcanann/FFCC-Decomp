@@ -611,11 +611,10 @@ void CCameraPcs::CalcQuake()
     if (System.m_scenegraphStepMode == 2) {
         return;
     }
-    unsigned char mode = m_quake.m_mode;
-    if (mode == 2 && m_quake.m_state == 0) {
+    if (m_quake.m_mode == 2 && m_quake.m_state == 0) {
         return;
     }
-    if (mode == 1 && m_quake.m_state == 0 && m_quake.m_endTimer <= 0) {
+    if (m_quake.m_mode == 1 && m_quake.m_state == 0 && m_quake.m_endTimer <= 0) {
         return;
     }
 
@@ -629,9 +628,9 @@ void CCameraPcs::CalcQuake()
     randomSign = randomValue >> 0x1F;
     m_quake.m_signZ = ((randomValue & 1) ^ randomSign) - randomSign;
 
-    jitter.x = kCameraZeroF;
-    jitter.y = kCameraZeroF;
-    jitter.z = kCameraZeroF;
+    offset.z = kCameraZeroF;
+    offset.y = kCameraZeroF;
+    offset.x = kCameraZeroF;
 
     if (m_quake.m_signX == 0) {
         offset.x = -m_quake.m_positionAmplitude.x;
@@ -650,6 +649,10 @@ void CCameraPcs::CalcQuake()
     } else {
         offset.z = m_quake.m_positionAmplitude.z;
     }
+
+    jitter.z = kCameraZeroF;
+    jitter.y = kCameraZeroF;
+    jitter.x = kCameraZeroF;
 
     u32 randX = static_cast<u32>(rand());
     u16 signX = static_cast<u16>(randX >> 0x1F);

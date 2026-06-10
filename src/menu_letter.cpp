@@ -62,7 +62,7 @@ extern "C" const float FLOAT_80333158 = 640.0f;
 extern "C" const float FLOAT_8033315c = 40.0f;
 extern "C" const float FLOAT_80333160 = 64.0f;
 extern "C" const float FLOAT_80333164 = 352.0f;
-extern "C" const float FLOAT_80333168 = 536.0f;
+extern "C" const float FLOAT_80333168;
 
 static const char s_fmt_pcts_pcts[] = "%s%s";
 static const char s_fmt_pcts_pcts_pcts[] = "%s%s%s";
@@ -2643,3 +2643,5 @@ void CMenuPcs::LetterSetAttachItem(unsigned int itemIndex, int flag)
 	}
 	s_AttachMode = flag;
 }
+
+extern "C" const float FLOAT_80333168 = 536.0f;

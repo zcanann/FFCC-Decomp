@@ -728,38 +728,37 @@ loop_body:
         {
             int s = (unsigned int)threadParam->m_state;
 
-            if (s >= 0x17)
+            if (s < 0x17)
             {
-                if (s >= 0x384)
-                {
-                    if (s >= 0x387)
-                        goto do_recvsend;
+                if (s == 6)
                     goto timeout_expiry;
+
+                if (s < 7)
+                {
+                    if (s >= 5)
+                        goto do_recvsend;
+                    if (s >= 0)
+                        goto timeout_expiry;
+                    goto do_recvsend;
                 }
+
+                if (s >= 0x14)
+                    goto timeout_expiry;
+                goto do_recvsend;
+            }
+
+            if (s < 0x384)
+            {
                 if (s >= 0x21)
                     goto do_recvsend;
                 if (s >= 0x1D)
                     goto do_cancel;
                 goto do_recvsend;
             }
-            else if (s == 6)
-            {
-                goto timeout_expiry;
-            }
-            else if (s >= 7)
-            {
-                if (s >= 0x14)
-                    goto timeout_expiry;
+
+            if (s >= 0x387)
                 goto do_recvsend;
-            }
-            else if (s >= 5)
-            {
-                goto do_recvsend;
-            }
-            else
-            {
-                goto timeout_expiry;
-            }
+            goto timeout_expiry;
 
         do_cancel:
             if (SendCancel(threadParam) < 0)

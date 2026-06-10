@@ -1173,15 +1173,7 @@ void CMenuPcs::CmakeResultDraw1()
 
     DrawWMFrame0(1, 1.0f);
 
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-    GXColor backdropColor;
-    backdropColor.r = 0xFF;
-    backdropColor.g = 0xFF;
-    backdropColor.b = 0xFF;
-    backdropColor.a = 0xFF;
-    GXSetChanMatColor(GX_COLOR0A0, backdropColor);
+    SetCmakeBlendMatColor(1.0f);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3F));
     MenuPcs.DrawRect(
@@ -1207,37 +1199,22 @@ void CMenuPcs::CmakeResultDraw1()
         tileX += tileW;
     }
 
-    DrawCmakePreviewChara(this);
+    DrawCmakePreviewCharaAlpha(this, 1.0f);
 
     if (CmakeState(this)->m_mode == 0) {
-        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-        GXColor panelCol;
-        panelCol.r = 0xFF;
-        panelCol.g = 0xFF;
-        panelCol.b = 0xFF;
-        panelCol.a = 0xFF;
-        GXSetChanMatColor(GX_COLOR0A0, panelCol);
+        SetCmakeBlendMatColor(1.0f);
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
         MenuPcs.DrawRect(
             0, 192.0f, 56.0f, 416.0f, 264.0f,
             0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     } else {
-        int panelA = static_cast<int>(255.0f * alpha);
-        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-        GXColor panelCol;
-        panelCol.r = 0xFF;
-        panelCol.g = 0xFF;
-        panelCol.b = 0xFF;
-        panelCol.a = static_cast<unsigned char>(panelA);
-        GXSetChanMatColor(GX_COLOR0A0, panelCol);
+        SetCmakeBlendMatColor(alpha);
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
         MenuPcs.DrawRect(
             0, 192.0f, 56.0f, 416.0f, 264.0f,
             0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     }
-    DrawCmakeTitle(7, 1.0f, alpha);
+    DrawCmakeTitle(7, alpha, 1.0f);
 
     float textAlpha = alpha;
     if (CmakeState(this)->m_mode == 0) {
@@ -1245,16 +1222,7 @@ void CMenuPcs::CmakeResultDraw1()
     }
     {
         int tribe = static_cast<int>(s_CmakeInfo.m_tribe);
-        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-        int crestA = static_cast<int>(255.0f * textAlpha);
-        GXColor crestCol;
-        crestCol.r = 0xFF;
-        crestCol.g = 0xFF;
-        crestCol.b = 0xFF;
-        crestCol.a = static_cast<unsigned char>(crestA);
-        GXSetChanMatColor(GX_COLOR0A0, crestCol);
+        SetCmakeBlendMatColor(textAlpha);
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x31));
         MenuPcs.DrawRect(
             0,
@@ -1422,15 +1390,7 @@ void CMenuPcs::CmakeResultDraw()
 
     DrawWMFrame0(1, 1.0f);
 
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-    GXColor backdropColor;
-    backdropColor.r = 0xFF;
-    backdropColor.g = 0xFF;
-    backdropColor.b = 0xFF;
-    backdropColor.a = 0xFF;
-    GXSetChanMatColor(GX_COLOR0A0, backdropColor);
+    SetCmakeBlendMatColor(1.0f);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3F));
     MenuPcs.DrawRect(
@@ -1740,15 +1700,7 @@ void CMenuPcs::CmakeJobDraw()
 
     DrawWMFrame0(1, 1.0f);
 
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-    GXColor backdropColor;
-    backdropColor.r = 0xFF;
-    backdropColor.g = 0xFF;
-    backdropColor.b = 0xFF;
-    backdropColor.a = 0xFF;
-    GXSetChanMatColor(GX_COLOR0A0, backdropColor);
+    SetCmakeBlendMatColor(1.0f);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3F));
     MenuPcs.DrawRect(
@@ -2007,15 +1959,7 @@ void CMenuPcs::CmakeTribeDraw()
 
     DrawWMFrame0(1, 1.0f);
 
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-    GXColor backdropColor;
-    backdropColor.r = 0xFF;
-    backdropColor.g = 0xFF;
-    backdropColor.b = 0xFF;
-    backdropColor.a = 0xFF;
-    GXSetChanMatColor(GX_COLOR0A0, backdropColor);
+    SetCmakeBlendMatColor(1.0f);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3F));
     MenuPcs.DrawRect(

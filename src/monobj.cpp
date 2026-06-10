@@ -2906,9 +2906,9 @@ void CGMonObj::setRepop(int mode)
 
 		if (mode == 0) {
 			prgObj->playSe3D(0x18, 0x32, 0x96, 0, (Vec*)0);
-			prgObj->putParticle(300, 0, &object->m_worldPosition, 0.0f, 0);
+			prgObj->putParticle(300, 0, &object->m_worldPosition, 1.0f, 0);
 			object->m_bgColMask |= 0x90002;
-			*reinterpret_cast<float*>(mon + 0x694) = 0.0f;
+			*reinterpret_cast<float*>(mon + 0x694) = 1.0f;
 		}
 	}
 
@@ -2932,7 +2932,7 @@ void CGMonObj::setRepop(int mode)
 		}
 
 		int dataNo = object->m_charaModelHandle->GetPdtSlot();
-		prgObj->putParticleBindTrace((i + particleBase + 0x50) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x5A4), object, 0.0f, 0);
+		prgObj->putParticleBindTrace((i + particleBase + 0x50) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x5A4), object, 1.0f, 0);
 	}
 
 	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x20000);
@@ -2940,14 +2940,14 @@ void CGMonObj::setRepop(int mode)
 	unsigned short countB = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AA);
 	for (int i = 0; i < static_cast<int>(countB); i++) {
 		int dataNo = object->m_charaModelHandle->GetPdtSlot();
-		prgObj->putParticleBindTrace((i + 0x5A) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x5A8), object, 0.0f, 0);
+		prgObj->putParticleBindTrace((i + 0x5A) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x5A8), object, 1.0f, 0);
 	}
 
 	if ((*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFE) & 1) == 0) {
 		return;
 	}
 
-	*reinterpret_cast<float*>(mon + 0x694) = 1.0f;
+	*reinterpret_cast<float*>(mon + 0x694) = kMonObjTwoFifths;
 	scriptHandle = object->m_scriptHandle;
 	classId = reinterpret_cast<int>(scriptHandle[4]);
 	int weaponMode = object->m_weaponNodeFlagBits.m_prg;
@@ -2964,7 +2964,7 @@ void CGMonObj::setRepop(int mode)
 
 	for (int i = 0; i < static_cast<int>(countC); i++) {
 		int dataNo = object->m_charaModelHandle->GetPdtSlot();
-		prgObj->putParticleBindTrace((particleBase + i) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x594), object, 0.0f, 0);
+		prgObj->putParticleBindTrace((particleBase + i) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x594), object, 1.0f, 0);
 	}
 
 	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC) == 0xB) {

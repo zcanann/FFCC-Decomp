@@ -3603,8 +3603,8 @@ void CGCharaObj::combi2()
 	}
 
 #define comboCmd (comboData[0xC])
-	const int isSharedResult = (0x1F8 - comboData[participantCount * 3 - 3]) != 0;
-	if (isSharedResult) {
+	const int isShared1F8 = (static_cast<unsigned int>(__cntlzw(0x1F8 - comboData[participantCount * 3 - 3])) >> 5) & 0xFF;
+	if (isShared1F8 == 0) {
 		comboCenter.Identity();
 		for (int i = 0; i < participantCount; i++) {
 			CVector candidateCenter(CharaObjComboCenter(candidates[i]));
@@ -3616,12 +3616,12 @@ void CGCharaObj::combi2()
 	System.Printf(const_cast<char*>(sCharaObjComboDecisionFmt), System.m_frameCounter, comboCmd);
 
 	CGPartyObj* leadParty = candidates[participantCount - 1];
-	bool playedComboSe = false;
+	int playedComboSe = 0;
 	for (int i = 0; i < participantCount; i++) {
 		CGPartyObj* party = candidates[i];
 		unsigned int comboMode = 0xFFFFFFFF;
 
-		if (!isSharedResult) {
+		if (isShared1F8 != 0) {
 			switch (comboCmd) {
 			case 0x207:
 				comboMode = 0;
@@ -3643,13 +3643,13 @@ void CGCharaObj::combi2()
 			}
 		} else {
 			CharaObjComboCenter(party) = comboCenter;
-			if (!playedComboSe && party != 0 &&
+			if (playedComboSe == 0 &&
 			    (Game.m_gameWork.m_menuStageMode == 0 || Game.m_gameWork.m_bossArtifactStageIndex >= 0xF ||
 			     (static_cast<unsigned short>(party->GetCID()) & 0x6D) != 0x6D ||
 			     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party->m_scriptHandle) + 0x3B4) == 0)) {
 				CharaObjComboItemId(party) = comboCmd;
 				party->playSe3D(0x3F, 0x32, 0x96, 0, 0);
-				playedComboSe = true;
+				playedComboSe = 1;
 			} else {
 				CharaObjComboItemId(party) = 0;
 			}

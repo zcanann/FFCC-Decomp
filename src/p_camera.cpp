@@ -1400,38 +1400,46 @@ void CCameraPcs::createRampTex8()
  */
 void CCameraPcs::createFullShadow()
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
     unsigned int rampTexSize;
     unsigned int i;
     unsigned char* rampTex;
-    char* fileName = const_cast<char*>(s_p_camera_cpp);
 
+    CMapMng& map = MapMng;
+    char* fileName = const_cast<char*>(s_p_camera_cpp);
     m_fullScreenShadow.m_shadowTexture = 0;
-    rampTexSize = GXGetTexBufferSize(0x1E0, 0x1E0, GX_TF_I8, GX_FALSE, 0);
-    m_fullScreenShadow.m_shadowTexture = new (MapMng.m_stage, fileName, 0x3A5) u8[rampTexSize];
+    m_fullScreenShadow.m_shadowTexture =
+        new (map.m_stage, fileName, 0x3A5)
+            u8[GXGetTexBufferSize(0x1E0, 0x1E0, GX_TF_I8, GX_FALSE, 0)];
 
     m_fullScreenShadow.m_rampTexture = 0;
-    rampTexSize = GXGetTexBufferSize(0x10, 0x10, GX_TF_I8, GX_FALSE, 0);
-    rampTex = new (MapMng.m_stage, fileName, 0x361) u8[rampTexSize];
+    rampTex = new (map.m_stage, fileName, 0x361)
+        u8[rampTexSize = GXGetTexBufferSize(0x10, 0x10, GX_TF_I8, GX_FALSE, 0)];
     m_fullScreenShadow.m_rampTexture = rampTex;
 
     for (i = 0; i < 0x100; i += 8) {
-        rampTex[((i & 3) << 3) + ((i << 4) & 0xC0) + ((i >> 2) & 0x20) + ((i >> 4) & 7)] =
+        u32 v1 = i + 1;
+        u32 v2 = i + 2;
+        rampTex[((i & 0x80) >> 2) + ((i >> 4) & 7) + ((i & 0xC) << 4) + ((i & 3) << 3)] =
             static_cast<unsigned char>(i);
-        rampTex[(((i + 1) * 8) & 0x18) + (((i + 1) * 0x10) & 0xC0) + (((i + 1) >> 2) & 0x20) + (((i + 1) >> 4) & 7)] =
-            static_cast<unsigned char>(i + 1);
-        rampTex[(((i + 2) * 8) & 0x18) + (((i + 2) * 0x10) & 0xC0) + (((i + 2) >> 2) & 0x20) + (((i + 2) >> 4) & 7)] =
-            static_cast<unsigned char>(i + 2);
-        rampTex[(((i + 3) * 8) & 0x18) + (((i + 3) * 0x10) & 0xC0) + (((i + 3) >> 2) & 0x20) + (((i + 3) >> 4) & 7)] =
-            static_cast<unsigned char>(i + 3);
-        rampTex[(((i + 4) * 0x10) & 0xC0) + (((i + 4) >> 2) & 0x20) + (((i + 4) >> 4) & 7)] =
-            static_cast<unsigned char>(i + 4);
-        rampTex[(((i + 5) * 8) & 0x18) + (((i + 5) * 0x10) & 0xC0) + (((i + 5) >> 2) & 0x20) + (((i + 5) >> 4) & 7)] =
-            static_cast<unsigned char>(i + 5);
-        rampTex[(((i + 6) * 8) & 0x18) + (((i + 6) * 0x10) & 0xC0) + (((i + 6) >> 2) & 0x20) + (((i + 6) >> 4) & 7)] =
-            static_cast<unsigned char>(i + 6);
-        rampTex[(((i + 7) * 8) & 0x18) + (((i + 7) * 0x10) & 0xC0) + (((i + 7) >> 2) & 0x20) + (((i + 7) >> 4) & 7)] =
-            static_cast<unsigned char>(i + 7);
+        u32 v3 = i + 3;
+        rampTex[((v1 & 0x80) >> 2) + ((v1 >> 4) & 7) + ((v1 & 0xC) << 4) + ((v1 & 3) << 3)] =
+            static_cast<unsigned char>(v1);
+        u32 v4 = i + 4;
+        rampTex[((v2 & 0x80) >> 2) + ((v2 >> 4) & 7) + ((v2 & 0xC) << 4) + ((v2 & 3) << 3)] =
+            static_cast<unsigned char>(v2);
+        u32 v5 = i + 5;
+        rampTex[((v3 & 0x80) >> 2) + ((v3 >> 4) & 7) + ((v3 & 0xC) << 4) + ((v3 & 3) << 3)] =
+            static_cast<unsigned char>(v3);
+        rampTex[((v4 & 0x80) >> 2) + ((v4 >> 4) & 7) + ((v4 & 0xC) << 4) + ((v4 & 3) << 3)] =
+            static_cast<unsigned char>(v4);
+        u32 v6 = i + 6;
+        rampTex[((v5 & 0x80) >> 2) + ((v5 >> 4) & 7) + ((v5 & 0xC) << 4) + ((v5 & 3) << 3)] =
+            static_cast<unsigned char>(v5);
+        u32 v7 = i + 7;
+        rampTex[((v6 & 0x80) >> 2) + ((v6 >> 4) & 7) + ((v6 & 0xC) << 4) + ((v6 & 3) << 3)] =
+            static_cast<unsigned char>(v6);
+        rampTex[((v7 & 0x80) >> 2) + ((v7 >> 4) & 7) + ((v7 & 0xC) << 4) + ((v7 & 3) << 3)] =
+            static_cast<unsigned char>(v7);
     }
 
     GXInitTexObj(&m_fullScreenShadow.m_texObjs[1], rampTex, 0x10, 0x10, GX_TF_I8,

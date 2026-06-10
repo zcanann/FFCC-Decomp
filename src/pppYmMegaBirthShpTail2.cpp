@@ -110,6 +110,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
         u8* particle = (u8*)particles + i * 0x1B8;
         if (*(u16*)(particle + 0x22) != 0) {
             const s32 frameCountRaw = *(u16*)(step + 0x84);
+            s32 frameCount = frameCountRaw;
             pppFMATRIX drawMtx;
             Vec zeroVec;
             Vec segVec;
@@ -161,7 +162,6 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
             float drawX, drawY, drawZ;
             float camX, camY, camZ;
             float segX, segY, segZ;
-            s32 frameCount = frameCountRaw;
 
             pppUnitMatrix(drawMtx);
             history = (Vec*)(particle + 0x40);

@@ -2222,7 +2222,7 @@ void CMenuPcs::DrawResultCloseAnim()
 #pragma opt_dead_assignments off
 void CMenuPcs::CalcResultCloseAnim()
 {
-	const unsigned int activePartyCount = s_Rinfo->m_partyCount;
+	const int activePartyCount = s_Rinfo->m_partyCount;
 
 	if (*(signed char*)(this->m_bonusStatePtr + 0xb) == 0) {
 		int off = 0;
@@ -2241,21 +2241,24 @@ void CMenuPcs::CalcResultCloseAnim()
 		}
 
 		for (int i = 0; i < activePartyCount; i++) {
-			int sprite =  (s32)(this->m_bonusAnimPtr + (i + 1) * 0x40 + 8);
+			int idx = i + 1;
+			int off2 = idx * 0x40 + 8;
+			int sprite = this->m_bonusAnimPtr + off2;
 			*(int*)(sprite + 0x24) = 0x10;
 		}
 
 		// iconBase block: src = frameBase (back = activePartyCount sprites); dance
 		int base = activePartyCount + 1;
 		int __p13 = activePartyCount;
+		int delta = (base - 1) * 0x40;
 		for (int i = 0; i < __p13; i++) {
-			short* sprite = (short*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
-			*(int*)(sprite + 0x12) = *(int*)(sprite - activePartyCount * 0x20 + 0x12) +
-			    *(int*)(sprite - activePartyCount * 0x20 + 0x14);
-			*(int*)((int)sprite + 0x2c) = 1;
-			*(float*)(sprite + 0x1c) = (float)(int)*sprite;
-			*(float*)(sprite + 0x18) = FLOAT_80331ED0;
-			*sprite = (short)(int)((float)(int)*sprite - *(float*)(sprite + 0x18));
+			int spr = this->m_bonusAnimPtr + (base + i) * 0x40 + 8;
+			int src = spr - delta;
+			*(int*)(spr + 0x24) = *(int*)(src + 0x24) + *(int*)(src + 0x28);
+			*(int*)(spr + 0x2c) = 1;
+			*(float*)(spr + 0x38) = (float)*(short*)spr;
+			*(float*)(spr + 0x30) = FLOAT_80331ED0;
+			*(short*)spr = (short)(int)((float)*(short*)spr - *(float*)(spr + 0x30));
 		}
 
 		// digitBase block: src = iconBase (back = activePartyCount sprites); no dance
@@ -2284,14 +2287,17 @@ void CMenuPcs::CalcResultCloseAnim()
 
 		// digitEchoBase block: src = iconBase (back = base - iconBase = base - (pc+1)); dance
 		base += activePartyCount;
-		for (int i = 0; i < activePartyCount; i++) {
-			short* sprite = (short*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
-			int __p16 =  (activePartyCount | 0);
-			*(int*)(sprite + 0x12) = *(int*)(sprite - (base - __p16 - 1) * 0x20 + 0x12);
-			*(int*)((int)sprite + 0x2c) = 1;
-			*(float*)(sprite + 0x1c) = (float)(int)*sprite;
-			*(float*)(sprite + 0x18) = FLOAT_80331ED0;
-			*sprite = (unsigned short)(int)((float)(int)*sprite - *(float*)(sprite + 0x18));
+		{
+			int delta = (base - activePartyCount - 1) * 0x40;
+			for (int i = 0; i < activePartyCount; i++) {
+				int spr = this->m_bonusAnimPtr + (base + i) * 0x40 + 8;
+				int src = spr - delta;
+				*(int*)(spr + 0x24) = *(int*)(src + 0x24);
+				*(int*)(spr + 0x2c) = 1;
+				*(float*)(spr + 0x38) = (float)*(short*)spr;
+				*(float*)(spr + 0x30) = FLOAT_80331ED0;
+				*(short*)spr = (unsigned short)(int)((float)*(short*)spr - *(float*)(spr + 0x30));
+			}
 		}
 
 		// sprites[digitEchoBase + pc].startFrame = sprites[1].startFrame
@@ -2309,13 +2315,17 @@ void CMenuPcs::CalcResultCloseAnim()
 
 		// extraBase block: src = iconBase (back = base - (pc+1)); dance
 		base = countTop + activePartyCount;
-		for (int i = 0; i < activePartyCount; i++) {
-			short* sprite = (short*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
-			*(int*)(sprite + 0x12) = *(int*)(sprite - (base - activePartyCount - 1) * 0x20 + 0x12);
-			*(int*)((int)sprite + 0x2c) = 1;
-			*(float*)(sprite + 0x1c) = (float)(int)*sprite;
-			*(float*)(sprite + 0x18) = FLOAT_80331ED0;
-			*sprite = (unsigned short)(int)((float)(int)*sprite - *(float*)(sprite + 0x18));
+		{
+			int delta = (base - activePartyCount - 1) * 0x40;
+			for (int i = 0; i < activePartyCount; i++) {
+				int spr = this->m_bonusAnimPtr + (base + i) * 0x40 + 8;
+				int src = spr - delta;
+				*(int*)(spr + 0x24) = *(int*)(src + 0x24);
+				*(int*)(spr + 0x2c) = 1;
+				*(float*)(spr + 0x38) = (float)*(short*)spr;
+				*(float*)(spr + 0x30) = FLOAT_80331ED0;
+				*(short*)spr = (unsigned short)(int)((float)*(short*)spr - *(float*)(spr + 0x30));
+			}
 		}
 
 		// extraBase + pc block: flags = 0
@@ -2327,31 +2337,17 @@ void CMenuPcs::CalcResultCloseAnim()
 
 		// extraBase + 2*pc block: src = extraBase + pc (back = activePartyCount sprites); dance
 		base += activePartyCount;
-		for (int i = 0; i < activePartyCount; i++) {
-			short* sprite = (short*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
-			*(int*)(sprite + 0x12) = *(int*)(sprite - activePartyCount * 0x20 + 0x12);
-			*(int*)((int)sprite + 0x2c) = 1;
-			*(float*)(sprite + 0x1c) = (float)(int)*sprite;
-			*(float*)(sprite + 0x18) = FLOAT_80331ED0;
-			*sprite = (short)(int)((float)(int)*sprite - *(float*)(sprite + 0x18));
-		}
-
-		// extraBase + 3*pc block: flags = 0
-		base += activePartyCount;
-		for (int i = 0; i < activePartyCount; i++) {
-			int sprite =  (int)(unsigned int)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
-			*(int*)(sprite + 0x24) = 0;
-		}
-
-		// extraBase + 4*pc block: src = iconBase (back = base - (pc+1)); dance
-		base += activePartyCount;
-		for (int i = 0; i < activePartyCount; i++) {
-			short* sprite = (short*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
-			*(int*)(sprite + 0x12) = *(int*)(sprite - (base - activePartyCount - 1) * 0x20 + 0x12);
-			*(int*)((int)sprite + 0x2c) = 1;
-			*(float*)(sprite + 0x1c) = (float)(int)*sprite;
-			*(float*)(sprite + 0x18) = FLOAT_80331ED0;
-			*sprite = (short)(int)((float)(int)*sprite - *(float*)(sprite + 0x18));
+		{
+			int delta = activePartyCount * 0x40;
+			for (int i = 0; i < activePartyCount; i++) {
+				int spr = this->m_bonusAnimPtr + (base + i) * 0x40 + 8;
+				int src = spr - delta;
+				*(int*)(spr + 0x24) = *(int*)(src + 0x24);
+				*(int*)(spr + 0x2c) = 1;
+				*(float*)(spr + 0x38) = (float)*(short*)spr;
+				*(float*)(spr + 0x30) = FLOAT_80331ED0;
+				*(short*)spr = (short)(int)((float)*(short*)spr - *(float*)(spr + 0x30));
+			}
 		}
 
 		off = 0;
@@ -2417,83 +2413,98 @@ void CMenuPcs::CalcResultCloseAnim()
 		off += 0x40;
 	}
 
-	int boardOff = 0;
-	off = 0;
-	if (0 < activePartyCount) {
-		int base = activePartyCount + 1;
-		for (int i = 0; i < activePartyCount; i++) {
-			short* sprite = (short*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
-			int boardPtr = this->m_bonus.m_bonusBoardPtr;
-			float x = (float)(int)*sprite + *(float*)(sprite + 0x18);
-			float y = (float)(int)sprite[1] + *(float*)(sprite + 0x1a);
-			*(short*)(boardPtr + boardOff + 8) =
-			    (short)(int)((double)(float)(24.0f + (float)(int)sprite[2] * 0.5f + x) - 320.0);
-			*(short*)(boardPtr + boardOff + 10) =
-			    (short)(int)((double)(float)((float)(int)sprite[3] * 0.5f + y) - 224.0);
-			*(int*)(boardPtr + boardOff + 0x40) = (int)(x + 12.0f);
-			*(int*)(boardPtr + boardOff + 0x44) = (int)(y - 8.0f);
-			if ((double)*(int*)(boardPtr + boardOff + 0x40) < 0.0) {
-				*(int*)(boardPtr + boardOff + 0x40) = 0;
+	{
+		int i = 0;
+		int boardOff = i;
+		int base2 = activePartyCount + 1;
+		for (; i < activePartyCount; i++) {
+			int sprOff2 = ((base2 + i) << 6) + 8;
+			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + sprOff2);
+			int o08 = boardOff + 0x8;
+			int o0a = boardOff + 0xa;
+			int o40 = boardOff + 0x40;
+			int o44 = boardOff + 0x44;
+			int centerX = (int)(float)((double)(float)(4.0 + ((double)sprite->w * DOUBLE_80331E78 + (double)((float)sprite->x + sprite->motionX))) - DOUBLE_80331EE8);
+			int centerY = (int)(float)((double)(float)((double)sprite->h * DOUBLE_80331E78 + (double)((float)sprite->y + sprite->motionY)) - DOUBLE_80331EF0);
+			*(short*)(this->m_bonus.m_bonusBoardPtr + o08) = (short)centerX;
+			*(short*)(this->m_bonus.m_bonusBoardPtr + o0a) = (short)centerY;
+			*(int*)(this->m_bonus.m_bonusBoardPtr + o40) = (int)(FLOAT_80331EF8 + ((float)sprite->x + sprite->motionX));
+			*(int*)(this->m_bonus.m_bonusBoardPtr + o44) = (int)(((float)sprite->y + sprite->motionY) - FLOAT_80331EFC);
+			if ((double)*(int*)(this->m_bonus.m_bonusBoardPtr + o40) < 0.0) {
+				*(int*)(this->m_bonus.m_bonusBoardPtr + o40) = 0;
 			}
-			if ((double)*(int*)(boardPtr + boardOff + 0x44) < 0.0) {
-				*(int*)(boardPtr + boardOff + 0x44) = 0;
+			{
+				int o44b = boardOff + 0x44;
+				if ((double)*(int*)(this->m_bonus.m_bonusBoardPtr + o44b) < 0.0) {
+					*(int*)(this->m_bonus.m_bonusBoardPtr + o44b) = 0;
+				}
 			}
-			*(int*)(boardPtr + boardOff + 0x48) = 0x48;
-			*(int*)(boardPtr + boardOff + 0x4c) = 0x58;
+			{
+				int o48 = boardOff + 0x48;
+				int o4c = boardOff + 0x4c;
+				*(int*)(this->m_bonus.m_bonusBoardPtr + o48) = 0x48;
+				*(int*)(this->m_bonus.m_bonusBoardPtr + o4c) = 0x58;
+			}
 			boardOff += 0x50;
 		}
 	}
 	Mtx scaleMtx;
 	Mtx rotXMtx;
 	Mtx rotYMtx;
-	int partyByteOff = 0;
-	int alphaOff = (activePartyCount * 2 + 1) * 0x40;
-	int __p10 = activePartyCount;
-	for (int i = 0; i < __p10 * 2; i++) {
-		int animPtr = this->m_bonusAnimPtr;
-		CCharaPcs::CHandle* handle;
-		unsigned int tribeId = 0;
-		if (i < activePartyCount) {
-			int __p8 = partyByteOff;
-			handle = *(CCharaPcs::CHandle**)((int)s_Rinfo + __p8 + 0x20);
-			tribeId = *(unsigned int*)((int)s_Rinfo + partyByteOff + 0x44);
-			float modelScale = s_BonusModelScale[tribeId];
-			PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
-		} else {
-			handle = GetBonusDisplayHandleSlots(this)[i - activePartyCount];
-			PSMTXScale(scaleMtx, 1.0f, 1.0f, 1.0f);
-		}
+	{
+		int i = 0;
+		int total2 = activePartyCount * 2;
+		int alphaOff = (total2 + 1) * 0x40;
+		int partyOff = i;
+		for (; i < total2; i++) {
+			int aOff = alphaOff + 0x8;
+			BonusAnimSprite* alphaSprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + aOff);
+			CCharaPcs::CHandle* handle;
+			int tribeId;
+			if (i < activePartyCount) {
+				int p = (int)s_Rinfo + partyOff;
+				handle = *(CCharaPcs::CHandle**)(p + 0x20);
+				tribeId = *(int*)(p + 0x44);
+			} else {
+				int slotOff = (i - activePartyCount) * 4 + 0x774;
+				handle = *(CCharaPcs::CHandle**)((int)this + slotOff);
+			}
+			if (i < activePartyCount) {
+				float modelScale = s_BonusModelScale[tribeId];
+				PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
+			} else {
+				PSMTXScale(scaleMtx, 1.0f, 1.0f, 1.0f);
+			}
 
-		if (i / activePartyCount == 1) {
-			PSMTXRotRad(rotXMtx, 'x', 0.2617993950843811f);
-			PSMTXConcat(scaleMtx, rotXMtx, scaleMtx);
-			PSMTXRotRad(rotYMtx, 'y', 0.01745329238474369f * *reinterpret_cast<float*>(this->m_bonusStatePtr));
-			PSMTXConcat(scaleMtx, rotYMtx, scaleMtx);
-		}
+			if (i / activePartyCount == 1) {
+				PSMTXRotRad(rotXMtx, 'x', 0.2617993950843811f);
+				PSMTXConcat(scaleMtx, rotXMtx, scaleMtx);
+				PSMTXRotRad(rotYMtx, 'y', 0.01745329238474369f * *reinterpret_cast<float*>(this->m_bonusStatePtr));
+				PSMTXConcat(scaleMtx, rotYMtx, scaleMtx);
+			}
 
-		if (i < activePartyCount) {
-			scaleMtx[0][3] = 0.0f;
-			scaleMtx[1][3] = s_BonusModelYPos[tribeId];
-			scaleMtx[2][3] = 0.0f;
-		} else {
-			scaleMtx[0][3] = 0.0f;
-			scaleMtx[1][3] = 0.0f;
-			scaleMtx[2][3] = 0.0f;
-		}
+			if (i < activePartyCount) {
+				scaleMtx[0][3] = kBonusZClearOrigin;
+				scaleMtx[2][3] = kBonusZClearOrigin;
+				scaleMtx[1][3] = s_BonusModelYPos[tribeId];
+			} else {
+				scaleMtx[0][3] = kBonusZClearOrigin;
+				scaleMtx[1][3] = kBonusZClearOrigin;
+				scaleMtx[2][3] = kBonusZClearOrigin;
+			}
 
-		handle->m_model->m_flags10CBits.m_flag10C_80 = 1;
-		handle->m_model->SetMatrix(scaleMtx);
-		handle->m_model->CalcMatrix();
-		handle->m_model->CalcSkin();
-		int __p6 = activePartyCount;
-		if (i < __p6) {
-			handle->m_model->m_lightAlpha = 1.0f;
-		} else {
-			int __p9 = alphaOff;
-			handle->m_model->m_lightAlpha = *(float*)(animPtr + __p9 + 0x18);
+			handle->m_model->m_flags10CBits.m_flag10C_80 = 1;
+			handle->m_model->SetMatrix(scaleMtx);
+			handle->m_model->CalcMatrix();
+			handle->m_model->CalcSkin();
+			if (i < activePartyCount) {
+				handle->m_model->m_lightAlpha = FLOAT_80331EB0;
+			} else {
+				handle->m_model->m_lightAlpha = alphaSprite->alpha;
+			}
+			alphaOff += 0x40;
+			partyOff += 0x2c;
 		}
-		alphaOff += 0x40;
-		partyByteOff += 0x2c;
 	}
 
 	if (*(short*)this->m_bonusAnimPtr == doneCount) {

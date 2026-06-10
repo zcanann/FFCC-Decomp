@@ -428,15 +428,15 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 			s32 deniedIdx = selectedMngSt - PartMng.m_pppMng;
 			denied[deniedIdx] = 1;
 			_pppPObjLink* prev = &selectedMngSt->m_pppPObjLinkHead;
-			_pppPObjLink* obj = prev->m_next;
+			_pppPObjLink* obj = selectedMngSt->m_pppPObjLinkHead.m_next;
 			while (obj != 0)
 			{
 				_pppPObjLink* next = obj->m_next;
-				_pppPDataVal* owner = obj->m_owner;
-				if ((s8)((s32)((u32)owner->m_programSetDef->m_drawFlags << 30) >> 31) == 0)
+				if ((s8)((s32)((u32)obj->m_owner->m_programSetDef->m_drawFlags << 30) >> 31) == 0)
 				{
 					prev->m_next = next;
 
+					_pppPDataVal* owner = obj->m_owner;
 					_pppProgSetDef* ownerSet = owner->m_programSetDef;
 					_pppProgSetDef* stageSet = ownerSet;
 					for (s32 stageIndex = 0; stageIndex < ownerSet->m_numStages; stageIndex++)
@@ -561,15 +561,15 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 			denied[deniedIdx] = 1;
 
 			_pppPObjLink* prev = &selectedMngSt->m_pppPObjLinkHead;
-			_pppPObjLink* obj = prev->m_next;
+			_pppPObjLink* obj = selectedMngSt->m_pppPObjLinkHead.m_next;
 			while (obj != 0)
 			{
 				_pppPObjLink* next = obj->m_next;
-				_pppPDataVal* owner = obj->m_owner;
-				if ((s8)((s32)((u32)owner->m_programSetDef->m_drawFlags << 30) >> 31) == 0)
+				if ((s8)((s32)((u32)obj->m_owner->m_programSetDef->m_drawFlags << 30) >> 31) == 0)
 				{
 					prev->m_next = next;
 
+					_pppPDataVal* owner = obj->m_owner;
 					_pppProgSetDef* ownerSet = owner->m_programSetDef;
 					_pppProgSetDef* stageSet = ownerSet;
 					for (s32 stageIndex = 0; stageIndex < ownerSet->m_numStages; stageIndex++)
@@ -820,15 +820,15 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 			s32 deniedIdx = selectedMngSt - PartMng.m_pppMng;
 			denied[deniedIdx] = 1;
 			_pppPObjLink* prev = &selectedMngSt->m_pppPObjLinkHead;
-			_pppPObjLink* obj = prev->m_next;
+			_pppPObjLink* obj = selectedMngSt->m_pppPObjLinkHead.m_next;
 			while (obj != 0)
 			{
 				_pppPObjLink* next = obj->m_next;
-				_pppPDataVal* owner = obj->m_owner;
-				if ((s8)((s32)((u32)owner->m_programSetDef->m_drawFlags << 30) >> 31) == 0)
+				if ((s8)((s32)((u32)obj->m_owner->m_programSetDef->m_drawFlags << 30) >> 31) == 0)
 				{
 					prev->m_next = next;
 
+					_pppPDataVal* owner = obj->m_owner;
 					_pppProgSetDef* ownerSet = owner->m_programSetDef;
 					_pppProgSetDef* stageSet = ownerSet;
 					for (s32 stageIndex = 0; stageIndex < ownerSet->m_numStages; stageIndex++)
@@ -1658,15 +1658,15 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 				denied[deniedIdx] = 1;
 
 				_pppPObjLink* prev = &selectedMngSt->m_pppPObjLinkHead;
-				_pppPObjLink* obj = prev->m_next;
+				_pppPObjLink* obj = selectedMngSt->m_pppPObjLinkHead.m_next;
 				while (obj != 0)
 				{
 					_pppPObjLink* next = obj->m_next;
-					_pppPDataVal* owner = obj->m_owner;
-					if ((s8)((s32)((u32)owner->m_programSetDef->m_drawFlags << 30) >> 31) == 0)
+					if ((s8)((s32)((u32)obj->m_owner->m_programSetDef->m_drawFlags << 30) >> 31) == 0)
 					{
 						prev->m_next = next;
 
+						_pppPDataVal* owner = obj->m_owner;
 						_pppProgSetDef* ownerSet = owner->m_programSetDef;
 						_pppProgSetDef* stageSet = ownerSet;
 						for (int stageIndex = 0; stageIndex < ownerSet->m_numStages; stageIndex++)

@@ -2282,9 +2282,9 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			if ((static_cast<unsigned short>(GetCID()) & 0xAD) != 0xAD ||
 				(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 8) == 0) {
 				CVector sourcePos(sourceObj->m_worldPosition);
-				CVector selfPos(m_worldPosition);
+				const CVector& selfPos = CVector(m_worldPosition);
 				CVector deltaVec;
-				PSVECSubtract(reinterpret_cast<Vec*>(&selfPos), reinterpret_cast<Vec*>(&sourcePos), reinterpret_cast<Vec*>(&deltaVec));
+				PSVECSubtract((Vec*)&selfPos, reinterpret_cast<Vec*>(&sourcePos), reinterpret_cast<Vec*>(&deltaVec));
 				Vec delta;
 				delta.x = deltaVec.x;
 				delta.y = deltaVec.y;

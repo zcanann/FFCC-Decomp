@@ -665,34 +665,32 @@ void CFont::Create(void* filePtr, CMemory::CStage* stage)
                         chunkFile.Get(m_glyphData, chunk.m_size);
                     }
 
-                    unsigned short** glyphBucket = m_glyphBuckets;
                     unsigned short* bucket = static_cast<unsigned short*>(m_glyphData);
-                    for (int i = 0; i < 32; i++) {
-                        glyphBucket[0] = bucket;
+                    for (int i = 0; i < 256; i += 8) {
+                        m_glyphBuckets[i + 0] = bucket;
                         bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
                         bucket++;
-                        glyphBucket[1] = bucket;
+                        m_glyphBuckets[i + 1] = bucket;
                         bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
                         bucket++;
-                        glyphBucket[2] = bucket;
+                        m_glyphBuckets[i + 2] = bucket;
                         bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
                         bucket++;
-                        glyphBucket[3] = bucket;
+                        m_glyphBuckets[i + 3] = bucket;
                         bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
                         bucket++;
-                        glyphBucket[4] = bucket;
+                        m_glyphBuckets[i + 4] = bucket;
                         bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
                         bucket++;
-                        glyphBucket[5] = bucket;
+                        m_glyphBuckets[i + 5] = bucket;
                         bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
                         bucket++;
-                        glyphBucket[6] = bucket;
+                        m_glyphBuckets[i + 6] = bucket;
                         bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
                         bucket++;
-                        glyphBucket[7] = bucket;
+                        m_glyphBuckets[i + 7] = bucket;
                         bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
                         bucket++;
-                        glyphBucket += 8;
                     }
                     break;
                 case 'TXTR':

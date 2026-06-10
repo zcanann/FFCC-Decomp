@@ -2207,7 +2207,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 				 (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) &&
 				 ((static_cast<unsigned short>(partyObj->GetCID()) & 0x6D) == 0x6D) &&
 				 (reinterpret_cast<int>(partyObj->m_scriptHandle[0xED]) != 0)) ||
-				(*reinterpret_cast<float*>(mon + partyIndex * 4 + 0x5D0) >=
+				!(*reinterpret_cast<float*>(mon + partyIndex * 4 + 0x5D0) <
 				 (coneLength - sideDist))) {
 				continue;
 			}
@@ -2237,15 +2237,15 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 			CVector targetDir;
 			PSVECNormalize(&targetDelta, reinterpret_cast<Vec*>(&targetDir));
 			float dot = PSVECDotProduct(reinterpret_cast<Vec*>(&forward), reinterpret_cast<Vec*>(&targetDir));
-			if (((sideDist - object->m_bodyEllipsoidRadius) > targetDist) ||
+			if (!((sideDist - object->m_bodyEllipsoidRadius) <= targetDist) ||
 				((halfAngle != kMonObjZero) &&
-				 (kMonObjZero >= dot))) {
+				 !(kMonObjZero < dot))) {
 				continue;
 			}
 
 			float angle = static_cast<float>(acos(static_cast<double>(dot)));
 			if ((halfAngle != kMonObjZero) &&
-				(angle >= halfAngle)) {
+				!(angle < halfAngle)) {
 				continue;
 			}
 

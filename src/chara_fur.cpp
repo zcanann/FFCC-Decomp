@@ -1014,11 +1014,11 @@ void CChara::CModel::InitMogFurTex()
 #pragma opt_dead_assignments off
 void CChara::CModel::MogFurFrame(CGObject* gObject)
 {
+	int messageId = -1;
 	const int debugPadLock = Pad.m_debugPadLock;
 	const short heldButtons = MogHeldButtons(debugPadLock);
 	const short triggerButtons = MogTriggerButtons(debugPadLock);
 	const unsigned short rotateButtons = (MogPadInt(debugPadLock, 64) == 0) ? MogHeldButtons(debugPadLock) : 0;
-	int messageId = -1;
 
 	if (MogWork().m_started == 0) {
 		if ((heldButtons & 0x100) != 0) {

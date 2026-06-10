@@ -1616,18 +1616,20 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 
 				unsigned int sourcePower = *reinterpret_cast<unsigned short*>(
 					reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0x1E);
+				int clampedDamage = 1;
 				float multiplier = CharaObjGetStatusMultiplier(0x2C);
 				unsigned int defense = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x22);
 				int rawDamage = static_cast<int>(multiplier * static_cast<float>(basePower + sourcePower)) - defense;
-				if (rawDamage < 1) {
-					rawDamage = 1;
+				if (rawDamage >= 1) {
+					clampedDamage = rawDamage;
 				}
-				int bonus = 0;
+				unsigned char hasBonus = 0;
 				if ((((static_cast<unsigned int>(__cntlzw(0x6D - (static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D))) >> 5) & 0xFFU) != 0) && itemEffect == 0x1F8) {
-					bonus = static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(
-						reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0xBDD));
+					hasBonus = 1;
 				}
-				damageAmount = rawDamage + bonus;
+				int bonus = hasBonus ? static_cast<int>(*reinterpret_cast<unsigned char*>(
+					reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0xBDD)) : 0;
+				damageAmount = clampedDamage + bonus;
 				if (scriptDefense != 0) {
 					damageAmount = static_cast<int>(static_cast<float>(damageAmount) * CharaObjGetStatusMultiplier(0x42));
 				}
@@ -1678,18 +1680,17 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 
 				unsigned int sourcePower = *reinterpret_cast<unsigned short*>(
 					reinterpret_cast<unsigned char*>(powerSource->m_scriptHandle) + 0x20);
+				int clampedDamage = 1;
 				float multiplier = CharaObjGetStatusMultiplier(0x2E);
 				unsigned int defense = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x22);
 				int rawDamage = static_cast<int>(multiplier * static_cast<float>(basePower + sourcePower)) - defense;
-				if (rawDamage < 1) {
-					rawDamage = 1;
+				if (rawDamage >= 1) {
+					clampedDamage = rawDamage;
 				}
-				unsigned int bonus = 0;
-				if ((((static_cast<unsigned int>(__cntlzw(0x6D - (static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D))) >> 5) & 0xFFU) != 0)) {
-					bonus = static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(
-						reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0xBDE));
-				}
-				damageAmount = rawDamage + bonus;
+				unsigned int bonus = ((((static_cast<unsigned int>(__cntlzw(0x6D - (static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D))) >> 5) & 0xFFU) != 0)) ?
+					static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(
+						reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0xBDE)) : 0;
+				damageAmount = clampedDamage + bonus;
 				System.Printf(dbg + 0x1DC, basePower, sourcePower, multiplier, defense, bonus, damageAmount);
 				break;
 			}

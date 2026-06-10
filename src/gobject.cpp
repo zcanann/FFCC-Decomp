@@ -1717,17 +1717,18 @@ void CGObject::update()
             }
         }
 
-        const float twistRate = sBgAttrFast;
         const unsigned char lookBlendByte = *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x56);
         CChara::CModel* chestModel = m_charaModelHandle->m_model;
         float lookBlend = sLookBlendScale * static_cast<float>(lookBlendByte);
-        const float chestAmp = ModelChestAmp(chestModel);
-        const float chestTilt = ModelChestTilt(chestModel);
-        ModelChestAmp(chestModel) = lookBlend * (lookYaw - chestAmp) + chestAmp;
-        ModelChestTilt(chestModel) = lookBlend * (lookPitch - chestTilt) + chestTilt;
+        float chestAmp = ModelChestAmp(chestModel);
+        float chestTilt = ModelChestTilt(chestModel);
+        chestAmp = lookBlend * (lookYaw - chestAmp) + chestAmp;
+        chestTilt = lookBlend * (lookPitch - chestTilt) + chestTilt;
+        ModelChestAmp(chestModel) = chestAmp;
+        ModelChestTilt(chestModel) = chestTilt;
         CChara::CModel* twistModel = m_charaModelHandle->m_model;
         const float twistAngle = ModelTwistAngle(twistModel);
-        ModelTwistAngle(twistModel) = twistRate * (*reinterpret_cast<float*>(m_worldMode) - twistAngle) + twistAngle;
+        ModelTwistAngle(twistModel) = sBgAttrFast * (*reinterpret_cast<float*>(m_worldMode) - twistAngle) + twistAngle;
 
         m_charaModelHandle->m_model->SetMatrix(modelMtx);
 

@@ -3491,4 +3491,3 @@ void CChara::CModel::CalcNodeWorldMatrix(float (*outMtx)[4], CChara::CNode* node
 }
 
 CChara Chara;
-CChara& gChara = Chara;

@@ -3215,9 +3215,6 @@ void CGObject::DrawDebug(CFont* font)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma optimization_level 1
-#pragma opt_common_subs on
 void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
 {
     m_worldPosition = *position;
@@ -3292,7 +3289,6 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
         m_animBlend = m_bgAttrValue;
     }
 }
-#pragma pop
 
 /*
  * --INFO--

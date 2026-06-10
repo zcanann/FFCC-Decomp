@@ -3800,30 +3800,30 @@ void CGMonObj::statWatch()
 			}
 		}
 
-		actionState = monObj->mlAttackCheck(selectedTarget);
-		if (actionState == -1) {
-			actionState = 0;
-			memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
-			chaseState = 2;
-			chaseTimer = 0;
-			monObj->m_chaseDirty = 1;
-		} else if (actionState == -2) {
+		int attackResult = monObj->mlAttackCheck(selectedTarget);
+		if (attackResult == -2) {
 			actionState = 0;
 			memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
 			chaseState = 0;
 			chaseTimer = 0;
 			monObj->m_chaseDirty = 1;
+		} else if (attackResult == -1) {
+			actionState = 0;
+			memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
+			chaseState = 2;
+			chaseTimer = 0;
+			monObj->m_chaseDirty = 1;
 		} else {
 			unsigned char* scriptBase = script;
 			if (*reinterpret_cast<unsigned short*>(scriptBase + 0x10C) == 1) {
-				if (actionState < 100) {
+				if (attackResult < 100) {
 					short aiState = monObj->m_aiState;
 					unsigned char* aiData = scriptBase;
 					if (aiState != 0) {
 						aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
 							(aiState + *reinterpret_cast<unsigned short*>(scriptBase + 0x100)) * 0x1D0 + 0x10;
 					}
-					int actionOff = actionState * 0x10;
+					int actionOff = attackResult * 0x10;
 					if ((*reinterpret_cast<unsigned short*>(aiData + actionOff + 0x110) & 0x20) != 0) {
 						actionState = 0x21;
 						CGPartyObj* party = Game.m_partyObjArr[selectedTarget];
@@ -3895,8 +3895,11 @@ void CGMonObj::statWatch()
 					monObj->m_moveWork.m_range = range;
 					monObj->m_moveWork.m_changeStat = static_cast<int>(changeStat);
 				}
+				else {
+					actionState = attackResult;
+				}
 			} else {
-				actionState = actionState - 0xE;
+				actionState = attackResult - 0xE;
 			}
 			chaseState = 1;
 			chaseTimer = 0;

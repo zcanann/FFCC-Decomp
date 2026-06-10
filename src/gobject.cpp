@@ -2262,7 +2262,7 @@ CGObject* CGObject::CCClass(int useBodyRadius, int classMask, float yOffset, Vec
         PSVECSubtract(&other->m_worldPosition, &origin, &toOther);
         const float dist = PSVECMag(&toOther);
         float extraAngle = sZeroFloat;
-        if ((sZeroFloat < dist) && (dist < maxDist)) {
+        if ((extraAngle < dist) && (dist < maxDist)) {
             if (useBodyRadius != 0) {
                 extraAngle = static_cast<float>(atan(static_cast<double>((other->m_bodyEllipsoidRadius * dist / maxDist) / dist)));
             }

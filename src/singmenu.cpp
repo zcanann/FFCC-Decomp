@@ -50,6 +50,29 @@ static inline CCaravanWork* SingleCaravanWork()
     return reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 }
 
+extern const double kSingHalf;
+extern const float kSingStatBaseX;
+extern const float kSingStatPanelPad;
+extern const float kSingStatPanelW;
+extern const float kSingStatPanelH;
+extern const float kSingStatScreenPadX;
+extern const float kSingStatScreenY;
+
+struct CFontRenderFlagBits
+{
+    signed char shadow : 1;
+    signed char zCompare : 1;
+    signed char zUpdate : 1;
+    signed char fixedWidth : 1;
+    signed char snapPosition : 1;
+    signed char pad : 3;
+};
+
+static inline CFontRenderFlagBits& GetRenderFlagBits(unsigned char& flags)
+{
+    return reinterpret_cast<CFontRenderFlagBits&>(flags);
+}
+
 struct SingMenuStaticMessageInfo
 {
     int lineCount;
@@ -68,7 +91,7 @@ struct SingMenuSoloNameTable
 };
 
 extern char s_singmenu_cpp[];
-extern "C" char* s_singMenuTexturePathFmt;
+extern "C" char s_singMenuTexturePathFmt[];
 extern "C" char s_singMenuSubfontPathFmt[];
 extern "C" char* PTR_s_Tutti_802143ec;
 extern "C" char* PTR_s_Alle_Rassen_8021430c;
@@ -1145,6 +1168,7 @@ void CMenuPcs::SingMenuInit()
     m_bonus.m_bonusBoardPtr = reinterpret_cast<int>(new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x5DD) u8[sizeof(MenuBoardEntry)]);
 
     MenuBoardEntry* boardEntry = reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr);
+    int screenY = static_cast<int>(kSingStatScreenY);
     boardEntry->m_rotZ = 0.0f;
     boardEntry->m_rotY = 0.0f;
     boardEntry->m_rotX = 0.0f;
@@ -1155,6 +1179,8 @@ void CMenuPcs::SingMenuInit()
     boardEntry->m_unk38 = 1.0f;
     boardEntry->m_unk34 = 1.0f;
     reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_modelHandle = 0;
+    float centerY = static_cast<float>(static_cast<double>(static_cast<float>(kSingStatPanelH * 0.5
+                + kSingStatPanelH)) - 224.0);
     reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_effectHandle = 0;
     reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_centerX = 0;
     reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_centerY = 0;
@@ -1168,14 +1194,12 @@ void CMenuPcs::SingMenuInit()
     reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_screenWidth = 0x280;
     reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_screenHeight = 0x1C0;
     reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_centerX = static_cast<s16>(static_cast<int>(
-        static_cast<double>(static_cast<float>(static_cast<double>(static_cast<float>(4.0 + static_cast<double>(96.0f) * 0.5
-                + static_cast<double>(440.0f + 28.0f))) - 320.0)) - 4.0));
-    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_centerY = static_cast<s16>(static_cast<int>(
-        static_cast<double>(static_cast<float>(static_cast<double>(88.0f) * 0.5
-                + static_cast<double>(88.0f))) - 224.0));
-    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_screenX = static_cast<int>(static_cast<double>(12.0f)
-                                             + static_cast<double>(440.0f + 28.0f));
-    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_screenY = static_cast<int>(80.0f);
+        static_cast<double>(static_cast<float>(static_cast<double>(static_cast<float>(4.0 + (kSingStatPanelW * 0.5
+                + (kSingStatBaseX + kSingStatPanelPad)))) - 320.0)) - 4.0));
+    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_centerY = static_cast<s16>(static_cast<int>(centerY));
+    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_screenX = static_cast<int>(kSingStatScreenPadX
+                                             + (kSingStatBaseX + kSingStatPanelPad));
+    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_screenY = screenY;
     reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_screenWidth = 0x48;
     reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_screenHeight = 0x58;
 
@@ -1524,27 +1548,26 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
     }
 
     if (SingleCaravanWork()->m_shopRequestState == 0) {
+        int loadCompleted;
         int loadIndex = m_singleMenuTextureLoadIndex;
         if (loadIndex >= 2) {
-            gSingMenuAsyncLoadCompleted = 1;
+            loadCompleted = 1;
         } else {
             if (m_singleMenuTextureLoadState == 0) {
                 char path[260];
-                const char* language = Game.GetLangString();
-                sprintf(path, s_singMenuTexturePathFmt, language, PTR_s_solo1.entries[loadIndex]);
+                sprintf(path, s_singMenuTexturePathFmt, Game.GetLangString(), PTR_s_solo1.entries[loadIndex]);
                 gSingMenuAsyncFileHandle = File.Open(path, 0, CFile::PRI_LOW);
                 File.ReadASync(gSingMenuAsyncFileHandle);
                 m_singleMenuTextureLoadState = m_singleMenuTextureLoadState + 1;
             } else if (m_singleMenuTextureLoadState == 1) {
                 if (!File.IsCompleted(gSingMenuAsyncFileHandle)) {
-                    gSingMenuAsyncLoadCompleted = 0;
-                    goto post_texture_load;
+                    loadCompleted = 0;
+                    goto store_load_completed;
                 }
 
-                CTextureSet* textureSet = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x748) CTextureSet;
-                m_textureSets[loadIndex + 5] = textureSet;
+                m_textureSets[loadIndex + 5] = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x748) CTextureSet;
 
-                textureSet->Create(File.m_readBuffer, Game.m_gameWork.m_menuStageMode != 0 ? m_stageF4 : m_menuStage, 0, 0, 0, 0);
+                m_textureSets[loadIndex + 5]->Create(File.m_readBuffer, Game.m_gameWork.m_menuStageMode != 0 ? m_stageF4 : m_menuStage, 0, 0, 0, 0);
                 File.Close(gSingMenuAsyncFileHandle);
                 gSingMenuAsyncFileHandle = 0;
                 m_singleMenuTextureLoadState = 0;
@@ -1552,20 +1575,25 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
             }
 
             if (m_singleMenuTextureLoadIndex < 2) {
-                gSingMenuAsyncLoadCompleted = 0;
+                loadCompleted = 0;
             } else {
                 SingMenuTextureRef* mapping = s_singleMenuModelTextureTable;
-                for (int i = 0; i < 0x33; i++) {
-                    CTextureSet* set = m_textureSets[mapping->textureSetIndex];
-                    int texIdx = set->Find(mapping->textureName);
-                    CTexture* tex = set->GetTexture(static_cast<unsigned long>(texIdx));
-                    m_textures[i + 45] = tex;
+                int i = 0;
+                u8* texSlot = reinterpret_cast<u8*>(this);
+                do {
+                    int texIdx = m_textureSets[mapping->textureSetIndex]->Find(mapping->textureName);
+                    CTexture* tex = m_textureSets[mapping->textureSetIndex]->GetTexture(static_cast<unsigned long>(texIdx));
+                    i++;
+                    mapping++;
                     tex->AddRef();
-                    ++mapping;
-                }
-                gSingMenuAsyncLoadCompleted = 1;
+                    *reinterpret_cast<CTexture**>(texSlot + offsetof(CMenuPcs, m_textures[45])) = tex;
+                    texSlot += sizeof(CTexture*);
+                } while (i < 0x33);
+                loadCompleted = 1;
             }
         }
+store_load_completed:
+        gSingMenuAsyncLoadCompleted = loadCompleted;
     }
 
 post_texture_load:
@@ -1595,15 +1623,16 @@ post_texture_load:
     }
 
     if (gSingMenuHasScriptFoodBase == 0) {
-        s16 state = m_singleMenuPhase;
-        if (state == 1) {
-            SingleCalcCtrl();
-        } else if (state < 1) {
-            if (state >= 0) {
+        switch (m_singleMenuPhase) {
+            case 0:
                 SingleCalcFadeIn();
-            }
-        } else if (state < 3) {
-            SingleCalcFadeOut();
+                break;
+            case 1:
+                SingleCalcCtrl();
+                break;
+            case 2:
+                SingleCalcFadeOut();
+                break;
         }
     }
 }
@@ -1617,7 +1646,7 @@ inline void CMenuPcs::SingCalcChara(float frameStep)
 {
     CChara::CModel* model = m_wm.m_handles[0]->m_model;
 
-    if (model->m_animEnd < model->m_curFrame) {
+    if (model->m_time < model->m_animEnd) {
         model->AddFrame(frameStep);
     } else {
         model->SetFrame(0.0f);
@@ -1690,59 +1719,58 @@ void CMenuPcs::DrawSingleBase(float alpha)
  */
 void CMenuPcs::DrawSingleStat(float alpha)
 {
-    u8* self = reinterpret_cast<u8*>(this);
-    unsigned int languageId = Game.m_gameWork.m_languageId;
+    int languageId = Game.m_gameWork.m_languageId;
 
     DrawInit();
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
+    float a255 = 255.0f * alpha;
     _GXColor color;
     color.r = 0xFF;
     color.g = 0xFF;
     color.b = 0xFF;
-    color.a = static_cast<u8>(255.0f * alpha);
+    color.a = static_cast<u8>(a255);
     GXSetChanMatColor(GX_COLOR0A0, color);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x26));
-    MenuPcs.DrawRect(0, 440.0f, 0.0f, 152.0f, 40.0f,
+    float x = 440.0f;
+    MenuPcs.DrawRect(0, x, 0.0f, 152.0f, 40.0f,
                                      0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     MenuPcs.DrawRect(4, 440.0f, 408.0f, 152.0f, 40.0f,
                                      0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x29));
-    for (float y = 40.0f; y < 408.0f; ) {
-        float sliceHeight = 8.0f;
+    float sliceHeight = 8.0f;
+    for (float y = 40.0f; y < 408.0f; y += sliceHeight) {
         if ((408.0f - y) < sliceHeight) {
             sliceHeight = 408.0f - y;
         }
         MenuPcs.DrawRect(0, 440.0f, y, 640.0f, sliceHeight,
                                          0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-        y += sliceHeight;
     }
 
-    _GXColor color2;
-    color2.r = 0xFF;
-    color2.g = 0xFF;
-    color2.b = 0xFF;
-    color2.a = static_cast<u8>(255.0 * (0.5 * alpha));
-    GXSetChanMatColor(GX_COLOR0A0, color2);
+    color.r = 0xFF;
+    color.g = 0xFF;
+    color.b = 0xFF;
+    color.a = static_cast<u8>(255.0 * (0.5 * alpha));
+    GXSetChanMatColor(GX_COLOR0A0, color);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x22));
 
-    unsigned short charaNo = SingleCaravanWork()->m_tribeId;
+    int charaNo = SingleCaravanWork()->m_tribeId;
     float iconStep = 216.0f;
-    float texU = static_cast<float>(charaNo & 1) * iconStep;
-    float texV = static_cast<float>(static_cast<int>(charaNo) / 2) * iconStep;
-    MenuPcs.DrawRect(0, 440.0f - 32.0f, 176.0f, iconStep, iconStep,
-                                     texU, texV, 1.0f, 1.0f, 0.0f);
+    int texU = static_cast<int>(static_cast<float>(charaNo & 1) * iconStep);
+    int texV = static_cast<int>(static_cast<float>(charaNo / 2) * iconStep);
+    x -= 32.0f;
+    MenuPcs.DrawRect(0, x, 176.0f, iconStep, iconStep,
+                                     static_cast<float>(texU), static_cast<float>(texV), 1.0f, 1.0f, 0.0f);
 
-    _GXColor color3;
-    color3.r = 0xFF;
-    color3.g = 0xFF;
-    color3.b = 0xFF;
-    color3.a = static_cast<u8>(255.0f * alpha);
-    GXSetChanMatColor(GX_COLOR0A0, color3);
+    color.r = 0xFF;
+    color.g = 0xFF;
+    color.b = 0xFF;
+    color.a = static_cast<u8>(a255);
+    GXSetChanMatColor(GX_COLOR0A0, color);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2A));
-    MenuPcs.DrawRect(0, 440.0f + 28.0f, 88.0f, 96.0f, 88.0f,
+    MenuPcs.DrawRect(0, kSingStatBaseX + kSingStatPanelPad, 88.0f, 96.0f, 88.0f,
                                      0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     DrawInit();
@@ -1755,32 +1783,29 @@ void CMenuPcs::DrawSingleStat(float alpha)
     DrawInit();
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-    _GXColor color4;
-    color4.r = 0xFF;
-    color4.g = 0xFF;
-    color4.b = 0xFF;
-    color4.a = static_cast<u8>(255.0f * alpha);
-    GXSetChanMatColor(GX_COLOR0A0, color4);
+    color.r = 0xFF;
+    color.g = 0xFF;
+    color.b = 0xFF;
+    color.a = static_cast<u8>(a255);
+    GXSetChanMatColor(GX_COLOR0A0, color);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2A));
-    MenuPcs.DrawRect(0, 440.0f + 28.0f, 128.0f, 96.0f, 48.0f,
+    MenuPcs.DrawRect(0, kSingStatBaseX + kSingStatPanelPad, 128.0f, 96.0f, 48.0f,
                                      0.0f, 88.0f, 1.0f, 1.0f, 0.0f);
 
     DrawInit();
     CFont* font = m_fonts[0];
-    font->SetMargin(0.0f);
+    font->SetMargin(1.0f);
     font->SetShadow(1);
     font->SetScale(0.8999999761581421f);
 
-    CColor fontColor(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * alpha));
-    font->SetColor(fontColor.color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(a255)).color);
     font->DrawInit();
 
-    CCaravanWork* caravanWork = SingleCaravanWork();
-    char* charaName = reinterpret_cast<char*>(caravanWork->m_name);
+    char* charaName = reinterpret_cast<char*>(SingleCaravanWork()->m_name);
     float titleWidth = static_cast<float>(font->GetWidth(charaName));
-    float titleX = 440.0f + (152.0f - titleWidth) * static_cast<float>(0.5);
     font->SetTlut(0x12);
-    font->SetPosX(titleX);
+    float titleX = 440.0f + static_cast<float>((152.0f - titleWidth) * 0.5);
+    font->SetPosX(1.0f + titleX);
     font->SetPosY(53.0f);
     font->Draw(charaName);
 
@@ -1790,6 +1815,11 @@ void CMenuPcs::DrawSingleStat(float alpha)
     font->Draw(charaName);
 
     font->SetTlut(0x15);
+    const char** labelsDe = gSingMenuTextTableDe;
+    const char** labelsIt = gSingMenuTextTableIt;
+    const char** labelsFr = gSingMenuTextTableFr;
+    const char** labelsEs = gSingMenuTextTableEs;
+    const char** labelsEn = gSingMenuTextTableEn;
     float y = 184.0f;
     for (int i = 0; i < 4; i++) {
         font->SetPosX(440.0f);
@@ -1798,19 +1828,20 @@ void CMenuPcs::DrawSingleStat(float alpha)
         char* label;
         switch (Game.m_gameWork.m_languageId) {
             case 2:
-                label = (char*)gSingMenuTextTableDe[i + 5];
+                label = (char*)labelsDe[5];
                 break;
             case 3:
-                label = (char*)gSingMenuTextTableIt[i + 5];
+                label = (char*)labelsIt[5];
                 break;
             case 4:
-                label = (char*)gSingMenuTextTableFr[i + 5];
+                label = (char*)labelsFr[5];
                 break;
             case 5:
-                label = (char*)gSingMenuTextTableEs[i + 5];
+                label = (char*)labelsEs[5];
                 break;
+            case 1:
             default:
-                label = (char*)gSingMenuTextTableEn[i + 5];
+                label = (char*)labelsEn[5];
                 break;
         }
 
@@ -1822,7 +1853,7 @@ void CMenuPcs::DrawSingleStat(float alpha)
         }
         font->Draw(label);
 
-        font->renderFlags = (font->renderFlags & 0xEF) | 0x10;
+        GetRenderFlagBits(font->renderFlags).fixedWidth = 1;
         if (languageId == 2) {
             font->SetMargin(-5.0f);
             font->SetScaleX(0.7199999690055847f);
@@ -1832,15 +1863,15 @@ void CMenuPcs::DrawSingleStat(float alpha)
             font->SetScale(0.8999999761581421f);
         }
 
-        unsigned short stat;
+        int stat;
         if (i == 0) {
-            stat = caravanWork->m_strength;
+            stat = SingleCaravanWork()->m_strength;
         } else if (i == 1) {
-            stat = caravanWork->m_defense;
+            stat = SingleCaravanWork()->m_defense;
         } else if (i == 2) {
-            stat = caravanWork->m_magic;
+            stat = SingleCaravanWork()->m_magic;
         } else {
-            stat = caravanWork->m_progressValue;
+            stat = SingleCaravanWork()->m_progressValue;
         }
 
         char valueText[36];
@@ -1849,12 +1880,17 @@ void CMenuPcs::DrawSingleStat(float alpha)
         font->SetPosX(592.0f - valueW);
         font->Draw(valueText);
 
-        font->renderFlags &= 0xEF;
+        GetRenderFlagBits(font->renderFlags).fixedWidth = 0;
         font->SetMargin(1.0f);
         y += 36.0f;
+        labelsDe++;
+        labelsIt++;
+        labelsFr++;
+        labelsEs++;
+        labelsEn++;
     }
 
-    font->renderFlags &= 0xEF;
+    GetRenderFlagBits(font->renderFlags).fixedWidth = 0;
     font->SetMargin(1.0f);
     DrawInit();
 }
@@ -1905,16 +1941,25 @@ void CMenuPcs::SingleCalcFadeIn()
         Sound.PlaySe(0xE, 0x40, 0x7F, 0);
         memset(m_singleFadeState, 0, sizeof(SingleFadeState));
 
-        m_singleFadeState->entries[0].startFrame = 0;
-        m_singleFadeState->entries[0].duration = 10;
-        m_singleFadeState->entries[1].startFrame = (m_singleMenuMode == 8) ? 0 : 10;
-        m_singleFadeState->entries[1].duration = 10;
-        m_singleFadeState->entries[2].startFrame = (m_singleMenuMode == 8) ? 0 : 10;
-        m_singleFadeState->entries[2].duration = 10;
-        m_singleFadeState->entries[3].startFrame = (m_singleMenuMode == 8) ? 0 : 10;
-        m_singleFadeState->entries[3].duration = 10;
+        int idx = 0;
+        SingleFadeEntry* e = &m_singleFadeState->entries[idx];
+        e->startFrame = 0;
+        e->duration = 10;
+        idx++;
+        e = &m_singleFadeState->entries[idx];
+        e->startFrame = (m_singleMenuMode == 8) ? 0 : 10;
+        e->duration = 10;
+        idx++;
+        e = &m_singleFadeState->entries[idx];
+        e->startFrame = (m_singleMenuMode == 8) ? 0 : 10;
+        e->duration = 10;
+        idx++;
+        e = &m_singleFadeState->entries[idx];
+        e->startFrame = (m_singleMenuMode == 8) ? 0 : 10;
+        e->duration = 10;
+        idx++;
 
-        m_singleFadeState->count = 4;
+        m_singleFadeState->count = static_cast<s16>(idx);
         m_singleFadeState->done = 0;
         m_singleFadeState->active = 1;
     }
@@ -1939,7 +1984,7 @@ void CMenuPcs::SingleCalcFadeIn()
         entry = entry + 1;
     }
 
-    if (m_wm.m_handles[0]->m_model->m_animEnd < m_wm.m_handles[0]->m_model->m_time) {
+    if (m_wm.m_handles[0]->m_model->m_time < m_wm.m_handles[0]->m_model->m_animEnd) {
         m_wm.m_handles[0]->m_model->AddFrame(1.0f);
     } else {
         m_wm.m_handles[0]->m_model->SetFrame(0.0f);
@@ -2000,16 +2045,25 @@ void CMenuPcs::SingleCalcFadeOut()
         Sound.PlaySe(0xF, 0x40, 0x7F, 0);
         memset(m_singleFadeState, 0, sizeof(SingleFadeState));
 
-        m_singleFadeState->entries[0].startFrame = (m_singleMenuMode == 8) ? 0 : 10;
-        m_singleFadeState->entries[0].duration = 10;
-        m_singleFadeState->entries[1].startFrame = 0;
-        m_singleFadeState->entries[1].duration = 10;
-        m_singleFadeState->entries[2].startFrame = 0;
-        m_singleFadeState->entries[2].duration = 10;
-        m_singleFadeState->entries[3].startFrame = 0;
-        m_singleFadeState->entries[3].duration = 10;
+        int idx = 0;
+        SingleFadeEntry* e = &m_singleFadeState->entries[idx];
+        e->startFrame = (m_singleMenuMode == 8) ? 0 : 10;
+        e->duration = 10;
+        idx++;
+        e = &m_singleFadeState->entries[idx];
+        e->startFrame = 0;
+        e->duration = 10;
+        idx++;
+        e = &m_singleFadeState->entries[idx];
+        e->startFrame = 0;
+        e->duration = 10;
+        idx++;
+        e = &m_singleFadeState->entries[idx];
+        e->startFrame = 0;
+        e->duration = 10;
+        idx++;
 
-        m_singleFadeState->count = 4;
+        m_singleFadeState->count = static_cast<s16>(idx);
         m_singleFadeState->done = 0;
         m_singleFadeState->active = 1;
     }
@@ -2035,7 +2089,7 @@ void CMenuPcs::SingleCalcFadeOut()
         entry = entry + 1;
     }
 
-    if (m_wm.m_handles[0]->m_model->m_animEnd < m_wm.m_handles[0]->m_model->m_time) {
+    if (m_wm.m_handles[0]->m_model->m_time < m_wm.m_handles[0]->m_model->m_animEnd) {
         m_wm.m_handles[0]->m_model->AddFrame(1.0f);
     } else {
         m_wm.m_handles[0]->m_model->SetFrame(0.0f);
@@ -2104,10 +2158,10 @@ void CMenuPcs::SingleCalcCtrl()
     }
 
     int result = 0;
-    if (m_wm.m_handles[0]->m_model->m_animEnd < m_wm.m_handles[0]->m_model->m_time) {
-        m_wm.m_handles[0]->m_model->SetFrame(0.0f);
-    } else {
+    if (m_wm.m_handles[0]->m_model->m_time < m_wm.m_handles[0]->m_model->m_animEnd) {
         m_wm.m_handles[0]->m_model->AddFrame(1.0f);
+    } else {
+        m_wm.m_handles[0]->m_model->SetFrame(0.0f);
     }
 
     unsigned short modelScaleIndex = SingleCaravanWork()->m_tribeId;
@@ -2579,37 +2633,42 @@ void CMenuPcs::DrawListPosMark(float x, float y, float z)
  */
 int CMenuPcs::EquipChk(int itemNo)
 {
-    CCaravanWork* caravanWork = SingleCaravanWork();
-    int commandItem;
-
-    if (2 < caravanWork->m_numCmdListSlots) {
-        commandItem = caravanWork->m_commandListInventorySlotRef[2];
-        if ((commandItem >= 0) && (commandItem == itemNo)) {
+    CCaravanWork* w = SingleCaravanWork();
+    int item;
+    int slot = 2;
+        if (slot < w->m_numCmdListSlots) {
+        item = w->m_commandListInventorySlotRef[2];
+        if ((item >= 0) && (item == itemNo)) {
             return 1;
         }
-        if (3 < caravanWork->m_numCmdListSlots) {
-            commandItem = caravanWork->m_commandListInventorySlotRef[3];
-            if ((commandItem >= 0) && (commandItem == itemNo)) {
+        slot++;
+        if (slot < w->m_numCmdListSlots) {
+            item = w->m_commandListInventorySlotRef[3];
+            if ((item >= 0) && (item == itemNo)) {
                 return 1;
             }
-            if (4 < caravanWork->m_numCmdListSlots) {
-                commandItem = caravanWork->m_commandListInventorySlotRef[4];
-                if ((commandItem >= 0) && (commandItem == itemNo)) {
+            slot++;
+            if (slot < w->m_numCmdListSlots) {
+                item = w->m_commandListInventorySlotRef[4];
+                if ((item >= 0) && (item == itemNo)) {
                     return 1;
                 }
-                if (5 < caravanWork->m_numCmdListSlots) {
-                    commandItem = caravanWork->m_commandListInventorySlotRef[5];
-                    if ((commandItem >= 0) && (commandItem == itemNo)) {
+                slot++;
+                if (slot < w->m_numCmdListSlots) {
+                    item = w->m_commandListInventorySlotRef[5];
+                    if ((item >= 0) && (item == itemNo)) {
                         return 1;
                     }
-                    if (6 < caravanWork->m_numCmdListSlots) {
-                        commandItem = caravanWork->m_commandListInventorySlotRef[6];
-                        if ((commandItem >= 0) && (commandItem == itemNo)) {
+                    slot++;
+                    if (slot < w->m_numCmdListSlots) {
+                        item = w->m_commandListInventorySlotRef[6];
+                        if ((item >= 0) && (item == itemNo)) {
                             return 1;
                         }
-                        if (7 < caravanWork->m_numCmdListSlots) {
-                            commandItem = caravanWork->m_commandListInventorySlotRef[7];
-                            if ((commandItem >= 0) && (commandItem == itemNo)) {
+                        slot++;
+                        if (slot < w->m_numCmdListSlots) {
+                            item = w->m_commandListInventorySlotRef[7];
+                            if ((item >= 0) && (item == itemNo)) {
                                 return 1;
                             }
                         }
@@ -2619,20 +2678,20 @@ int CMenuPcs::EquipChk(int itemNo)
         }
     }
 
-    int equipment = caravanWork->m_equipment[0];
-    if ((equipment >= 0) && (equipment == itemNo)) {
+    item = w->m_equipment[0];
+    if ((item >= 0) && (item == itemNo)) {
         return 1;
     }
-    equipment = caravanWork->m_equipment[1];
-    if ((equipment >= 0) && (equipment == itemNo)) {
+    item = w->m_equipment[1];
+    if ((item >= 0) && (item == itemNo)) {
         return 1;
     }
-    equipment = caravanWork->m_equipment[2];
-    if ((equipment >= 0) && (equipment == itemNo)) {
+    item = w->m_equipment[2];
+    if ((item >= 0) && (item == itemNo)) {
         return 1;
     }
-    equipment = caravanWork->m_equipment[3];
-    if ((equipment >= 0) && (equipment == itemNo)) {
+    item = w->m_equipment[3];
+    if ((item >= 0) && (item == itemNo)) {
         return 1;
     }
 
@@ -2685,8 +2744,8 @@ void CMenuPcs::DrawSingWin(short mode)
         return;
     }
 
-    float left = static_cast<float>(m_menuWindowInfo->x) + static_cast<float>(static_cast<double>(m_menuWindowInfo->width) * 0.5);
-    float top = static_cast<float>(m_menuWindowInfo->y) + static_cast<float>(static_cast<double>(m_menuWindowInfo->height) * 0.5);
+    float left = static_cast<float>(m_menuWindowInfo->x) + static_cast<float>(static_cast<double>(m_menuWindowInfo->width) * kSingHalf);
+    float top = static_cast<float>(m_menuWindowInfo->y) + static_cast<float>(static_cast<double>(m_menuWindowInfo->height) * kSingHalf);
     float width;
     float height;
 
@@ -2713,8 +2772,6 @@ void CMenuPcs::DrawSingWin(short mode)
     float y0 = static_cast<float>(topPx);
     float w = static_cast<float>(widthPx);
     float h = static_cast<float>(heightPx);
-    float x1 = x0 + w - 32.0f;
-    float y1 = y0 + h - 32.0f;
 
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
     _GXColor white;
@@ -2724,57 +2781,66 @@ void CMenuPcs::DrawSingWin(short mode)
     white.a = 0xFF;
     GXSetChanMatColor(GX_COLOR0A0, white);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3F));
-    for (unsigned long i = 0; i < 4; i++) {
-        unsigned long uvFlag = 0;
-        float x = x0;
-        float y = y0;
+    float x1 = x0 + w - 32.0f;
+    float y1 = y0 + h - 32.0f;
+    unsigned long uvFlag;
+    for (int i = 0; i < 4; i++) {
+        uvFlag = 0;
+        float x;
         if ((i & 1) != 0) {
-            uvFlag = 8;
+            uvFlag |= 8;
             x = x1;
+        } else {
+            x = x0;
         }
+        float y;
         if ((i & 2) != 0) {
             uvFlag |= 4;
             y = y1;
+        } else {
+            y = y0;
         }
         MenuPcs.DrawRect(uvFlag, x, y, 32.0f, 32.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     }
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x41));
-    float innerW = w - static_cast<float>(64.0);
+    double innerW = static_cast<double>(w) - 64.0;
     float innerX = 32.0f + x0;
+    float yy = y0;
+    float innerWf = static_cast<float>(innerW);
     for (int i = 0; i < 2; i++) {
-        unsigned long uvFlag = 0;
-        float y = y0;
+        uvFlag = 0;
         if (i != 0) {
-            uvFlag = 4;
-            y = y1;
+            uvFlag |= 4;
+            yy = y1;
         }
-        MenuPcs.DrawRect(uvFlag, innerX, y, innerW, 32.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+        MenuPcs.DrawRect(uvFlag, innerX, yy, innerWf, 32.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     }
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x40));
-    float innerH = h - static_cast<float>(64.0);
+    double innerH = static_cast<double>(h) - 64.0;
     float innerY = 32.0f + y0;
+    float xx = x0;
+    float innerHf = static_cast<float>(innerH);
     for (int i = 0; i < 2; i++) {
-        unsigned long uvFlag = 0;
-        float x = x0;
+        uvFlag = 0;
         if (i != 0) {
-            uvFlag = 8;
-            x = x1;
+            uvFlag |= 8;
+            xx = x1;
         }
-        MenuPcs.DrawRect(uvFlag, x, innerY, 32.0f, innerH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+        MenuPcs.DrawRect(uvFlag, xx, innerY, 32.0f, innerHf, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     }
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x42));
-    MenuPcs.DrawRect(0, innerX, innerY, innerW, innerH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+    MenuPcs.DrawRect(uvFlag, innerX, innerY, static_cast<float>(innerW), static_cast<float>(innerH), 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     MenuWindowInfo* win = m_menuWindowInfo;
     s16 state = win->state;
     if (state == 0) {
         win->frame = win->frame + 1;
-        if (win->frame > 5) {
-            win->frame = 6;
-            win->state = 1;
+        if (m_menuWindowInfo->frame > 5) {
+            m_menuWindowInfo->frame = 6;
+            m_menuWindowInfo->state = 1;
         }
     } else if (state == 1) {
         if (win->frame != 6) {
@@ -2782,9 +2848,9 @@ void CMenuPcs::DrawSingWin(short mode)
         }
     } else if (state == 2) {
         win->frame = win->frame - 1;
-        if (win->frame < 1) {
-            win->frame = 0;
-            win->state = 3;
+        if (m_menuWindowInfo->frame < 1) {
+            m_menuWindowInfo->frame = 0;
+            m_menuWindowInfo->state = 3;
         }
     }
 }
@@ -2806,9 +2872,9 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     font->SetScale(FLOAT_8032ea78);
     font->DrawInit();
 
-    CColor color(0xFF, 0xFF, 0xFF, 0xFF);
-    font->SetColor(color.color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 
+    int maxWidth = 0;
     int lineCount;
     if (useDynamic != 0) {
         lineCount = s_DynamicMess[0];
@@ -2818,11 +2884,12 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     char* dynamicText = s_DynamicMessStr;
     const SingMenuStaticMessageInfo& staticMessage = s_singleMenuStaticMessages[messageNo];
 
-    int maxWidth = 0;
     for (int i = 0; i < lineCount; i++) {
-        const char* text = dynamicText;
+        const char* text;
         if (useDynamic == 0) {
             text = GetSingWinMessage(staticMessage.textIds[i], dynamicText, 0);
+        } else {
+            text = dynamicText;
         }
         int textWidth = font->GetWidth(text);
         if (textWidth > maxWidth) {
@@ -2832,22 +2899,24 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     }
 
     MenuWindowInfo* win = m_menuWindowInfo;
-    unsigned int lineHeight = static_cast<int>(22.0f * FLOAT_8032ea78);
-    if (0.0f < 22.0f * FLOAT_8032ea78 - static_cast<float>(lineHeight)) {
+    int lineHeight = static_cast<int>(22.0f * FLOAT_8032ea78);
+    float x = static_cast<float>(static_cast<double>(win->width - maxWidth) * 0.5
+            + static_cast<double>(win->x));
+    float y = static_cast<float>(win->y + 0x20);
+    if (22.0f * FLOAT_8032ea78 - static_cast<float>(lineHeight) > 0.0f) {
         lineHeight++;
     }
-
-    float x = static_cast<float>(win->x) + static_cast<float>(win->width - maxWidth) * static_cast<float>(0.5);
-    float y = static_cast<float>(win->y + 0x20);
-    unsigned int lineStep = lineHeight + 3;
+    int lineStep = lineHeight + 3;
 
     dynamicText = s_DynamicMessStr;
     for (int i = 0; i < lineCount; i++) {
-        font->SetTlut(((activeMask & (1 << i)) != 0) + 8);
+        font->SetTlut(8 - ((activeMask & (1 << i)) != 0));
 
-        const char* text = dynamicText;
+        const char* text;
         if (useDynamic == 0) {
             text = GetSingWinMessage(staticMessage.textIds[i], dynamicText, 0);
+        } else {
+            text = dynamicText;
         }
         if (static_cast<int>(strlen(text)) != 0) {
             char lineBuffer[128];
@@ -2880,20 +2949,22 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
     font->SetShadow(1);
     font->SetScale(FLOAT_8032ea78);
 
+    int maxWidth = 0;
     int lineCount;
     if (useDynamic != 0) {
         lineCount = s_DynamicMess[0];
     } else {
         lineCount = s_singleMenuStaticMessages[messageNo].lineCount;
     }
+    char* dynamicText = s_DynamicMessStr;
     const SingMenuStaticMessageInfo& staticMessage = s_singleMenuStaticMessages[messageNo];
 
-    int maxWidth = 0;
-    char* dynamicText = s_DynamicMessStr;
     for (int i = 0; i < lineCount; i++) {
-        const char* text = dynamicText;
+        const char* text;
         if (useDynamic == 0) {
             text = GetSingWinMessage(staticMessage.textIds[i], dynamicText, 0);
+        } else {
+            text = dynamicText;
         }
         int textWidth = font->GetWidth(text);
         if (textWidth > maxWidth) {
@@ -2909,12 +2980,12 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
     }
 
     int lineHeight = static_cast<int>(22.0f * FLOAT_8032ea78);
-    if (0.0f < 22.0f * FLOAT_8032ea78 - static_cast<float>(lineHeight)) {
+    if (22.0f * FLOAT_8032ea78 - static_cast<float>(lineHeight) > 0.0f) {
         lineHeight++;
     }
 
     int widthLines = maxWidth / lineHeight;
-    if (maxWidth != widthLines * lineHeight) {
+    if (maxWidth - widthLines * lineHeight != 0) {
         widthLines++;
     }
 
@@ -3541,3 +3612,11 @@ int CMenuPcs::GetItemType(int itemId, int useRawItemId)
     }
     return 9;
 }
+
+const double kSingHalf = 0.5;
+const float kSingStatBaseX = 440.0f;
+const float kSingStatPanelPad = 28.0f;
+const float kSingStatPanelW = 96.0f;
+const float kSingStatPanelH = 88.0f;
+const float kSingStatScreenPadX = 12.0f;
+const float kSingStatScreenY = 80.0f;

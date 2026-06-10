@@ -152,18 +152,34 @@ static inline float calc_spawn_speed(PRyjMegaBirthModel* params, u8 speedMode)
 
 static inline float calc_mesh_sample_t(u8 mode)
 {
+    float r1;
+    float r2;
+    float r3;
+    float r4;
+
     switch (mode) {
     case 1:
         (void)Math.RandF();
         return Math.RandF();
     case 2:
-        return Math.RandF() * Math.RandF() * Math.RandF();
+        r2 = Math.RandF();
+        r3 = Math.RandF();
+        return Math.RandF() * (r3 * r2);
     case 3:
-        return (float)(kPppRyjMegaBirthModelOneF64 - (double)(Math.RandF() * Math.RandF() * Math.RandF()));
+        r2 = Math.RandF();
+        r3 = Math.RandF();
+        return (float)(kPppRyjMegaBirthModelOneF64 - (double)(Math.RandF() * (r3 * r2)));
     case 4:
-        return Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF();
+        r1 = Math.RandF();
+        r2 = Math.RandF();
+        r3 = Math.RandF();
+        return Math.RandF() * (r3 * (r2 * r1));
     case 5:
-        return (float)(kPppRyjMegaBirthModelOneF64 - (double)(Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF()));
+        r1 = Math.RandF();
+        r2 = Math.RandF();
+        r3 = Math.RandF();
+        r4 = Math.RandF();
+        return (float)(kPppRyjMegaBirthModelOneF64 - (double)(Math.RandF() * (r4 * (r3 * (r2 * r1)))));
     default:
         return Math.RandF();
     }

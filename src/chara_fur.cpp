@@ -2069,10 +2069,10 @@ void CChara::makeFurTex()
 #define furTipColor (furColors[1])
 	static CColor furNoiseBase(0, 0, 0, 0);
 	static CColor furNoiseRange(8, 8, 8, 0);
-	static Vec velBase = CVector(kCharaFurDepthZero, FLOAT_80331160, kCharaFurDepthZero);
-	static Vec velRand = CVector(kCharaFurDepthZero, kYmEnvQuarter, kCharaFurDepthZero);
-	static Vec accelBase = CVector(kCharaFurDepthZero, kCharaFurDepthZero, kCharaFurDepthZero);
-	static Vec accelRand = CVector(kCharaFurDepthZero, kCharaFurDepthZero, kCharaFurDepthZero);
+	static CVector velBase = CVector(kCharaFurDepthZero, FLOAT_80331160, kCharaFurDepthZero);
+	static CVector velRand = CVector(kCharaFurDepthZero, kYmEnvQuarter, kCharaFurDepthZero);
+	static CVector accelBase = CVector(kCharaFurDepthZero, kCharaFurDepthZero, kCharaFurDepthZero);
+	static CVector accelRand = CVector(kCharaFurDepthZero, kCharaFurDepthZero, kCharaFurDepthZero);
 
 	s_mogFurRand = 0;
 	s_mogFurMaxY = 0.0f;
@@ -2085,26 +2085,26 @@ void CChara::makeFurTex()
 	for (int i = 0; i < 0x20; i++) {
 		float velRandScale = FurRandScaleL(scaleBase, randScale, depthThreshold);
 		CVector velScaleOut;
-		PSVECScale(&velRand, velScaleOut, velRandScale);
+		PSVECScale(velRand, velScaleOut, velRandScale);
 		Vec velScaled;
 		velScaled.x = velScaleOut.x;
 		velScaled.y = velScaleOut.y;
 		velScaled.z = velScaleOut.z;
 		CVector velAddOut;
-		PSVECAdd(&velBase, &velScaled, velAddOut);
+		PSVECAdd(velBase, &velScaled, velAddOut);
 		hairSet[i].m_vec0.x = velAddOut.x;
 		hairSet[i].m_vec0.y = velAddOut.y;
 		hairSet[i].m_vec0.z = velAddOut.z;
 
 		float accelRandScale = FurRandScaleL(scaleBase, randScale, depthThreshold);
 		CVector accelScaleOut;
-		PSVECScale(&accelRand, accelScaleOut, accelRandScale);
+		PSVECScale(accelRand, accelScaleOut, accelRandScale);
 		Vec accelScaled;
 		accelScaled.x = accelScaleOut.x;
 		accelScaled.y = accelScaleOut.y;
 		accelScaled.z = accelScaleOut.z;
 		CVector accelAddOut;
-		PSVECAdd(&accelBase, &accelScaled, accelAddOut);
+		PSVECAdd(accelBase, &accelScaled, accelAddOut);
 		hairSet[i].m_vec1.x = accelAddOut.x;
 		hairSet[i].m_vec1.y = accelAddOut.y;
 		hairSet[i].m_vec1.z = accelAddOut.z;

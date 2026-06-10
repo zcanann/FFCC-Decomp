@@ -1626,16 +1626,16 @@ void CMapMng::SetLightSource()
                 light.m_direction.x = kMapZero;
                 light.m_direction.y = kMapZero;
                 light.m_direction.z = kMapViewScaleZ;
-                light.m_partMask = 1 << mapLightIndex;
                 light.m_attenRadius = pointAttr->m_radius;
-                light.m_range = pointAttr->m_intensity;
-                light.m_attenFalloff = kMapViewScaleZ;
+                light.m_spotScale = 0.78539816339744828f;
+                light.m_radius = pointAttr->m_intensity;
                 light.m_targetColor[0] = pointAttr->m_altColor;
                 light.m_targetColor[1] = pointAttr->m_color;
-                *(u32*)light.m_targetEnable = 0;
+                *(u32*)light.m_bumpShade = 0;
                 light.m_spotFn = pointAttr->m_colorMode;
                 light.m_unk4D = 4;
                 light.m_directionMode = pointAttr->m_unknown20;
+                light.m_partMask = 1 << mapLightIndex;
                 LightPcs.Add(&light);
                 mapLightIndex += 1;
                 break;
@@ -1683,17 +1683,17 @@ void CMapMng::SetLightSource()
                     PSVECNormalize(reinterpret_cast<Vec*>(&light.m_direction), reinterpret_cast<Vec*>(&light.m_direction));
 
                     light.m_attenRadius = spotAttr->m_radius;
-                    light.m_range = spotAttr->m_nearRange;
-                    light.m_attenFalloff = spotAttr->m_farRange;
+                    light.m_spotScale = 0.017453292519943295f * spotAttr->m_nearRange;
+                    light.m_radius = spotAttr->m_farRange;
 
                     light.m_targetColor[0] = spotAttr->m_altColor;
                     light.m_targetColor[1] = spotAttr->m_color;
+                    *(u32*)light.m_bumpShade = 0;
 
                     light.m_spotFn = spotAttr->m_colorMode;
                     light.m_unk4D = (spotAttr->m_useAltColor == 0) ? 4 : 2;
                     light.m_directionMode = spotAttr->m_keyFrameCount;
                     light.m_partMask = 1 << mapLightIndex;
-                    *(u32*)light.m_targetEnable = 0;
                     LightPcs.Add(&light);
                 }
                 mapLightIndex += 1;

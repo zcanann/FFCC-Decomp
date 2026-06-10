@@ -2828,8 +2828,8 @@ void CGPartyObj::checkTargetParticle()
 		float dist = PSVECDistance(&m_worldPosition, targetPos);
 
 		float zero = LoadFloat(FLOAT_80331a78);
-		int scriptPtr = *reinterpret_cast<int*>(self + 0x58);
 		if (*reinterpret_cast<int*>(self + 0x520) == 2) {
+			int scriptPtr = *reinterpret_cast<int*>(self + 0x58);
 			unsigned int vNode = *reinterpret_cast<unsigned short*>(*reinterpret_cast<int*>(scriptPtr + 0x24) + 0x19A);
 			unsigned int vItem = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<int*>(self + 0x560) * 0x48 + 0x30);
 			float base = static_cast<float>(vItem) + static_cast<float>(vNode);
@@ -2841,6 +2841,7 @@ void CGPartyObj::checkTargetParticle()
 			}
 			maxRange = zero + (base + static_cast<float>(vFlag));
 		} else {
+			int scriptPtr = *reinterpret_cast<int*>(self + 0x58);
 			unsigned int vNode = *reinterpret_cast<unsigned short*>(*reinterpret_cast<int*>(scriptPtr + 0x24) + 0x19C);
 			unsigned int vItem = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<int*>(self + 0x560) * 0x48 + 0x30);
 			float base = static_cast<float>(vItem) + static_cast<float>(vNode);

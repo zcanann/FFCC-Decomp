@@ -1163,25 +1163,31 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		if (pickResult >= 0) {
 			MogWork().m_pickTicks++;
 
-			if (MogWork().m_prevScoreA + 5 <= Chara.MogFur().m_score[0]) {
-				MogWork().m_prevScoreA = Chara.MogFur().m_score[0];
+			int* prevScoreP = &MogWork().m_prevScoreA;
+			int* scoreP = &Chara.MogFur().m_score[0];
+			if (prevScoreP[0] + 5 <= scoreP[0]) {
+				prevScoreP[0] = scoreP[0];
 				messageId = 1;
-			} else if (MogWork().m_prevScoreA - 5 > Chara.MogFur().m_score[0]) {
-				MogWork().m_prevScoreA = Chara.MogFur().m_score[0];
+			} else if (prevScoreP[0] - 5 > scoreP[0]) {
+				prevScoreP[0] = scoreP[0];
 				messageId = 6;
 			}
-			if (MogWork().m_prevScoreB + 5 <= Chara.MogFur().m_score[1]) {
-				MogWork().m_prevScoreB = Chara.MogFur().m_score[1];
+			prevScoreP++;
+			scoreP++;
+			if (prevScoreP[0] + 5 <= scoreP[0]) {
+				prevScoreP[0] = scoreP[0];
 				messageId = 1;
-			} else if (MogWork().m_prevScoreB - 5 > Chara.MogFur().m_score[1]) {
-				MogWork().m_prevScoreB = Chara.MogFur().m_score[1];
+			} else if (prevScoreP[0] - 5 > scoreP[0]) {
+				prevScoreP[0] = scoreP[0];
 				messageId = 6;
 			}
-			if (MogWork().m_prevScoreC + 5 <= Chara.MogFur().m_score[2]) {
-				MogWork().m_prevScoreC = Chara.MogFur().m_score[2];
+			prevScoreP++;
+			scoreP++;
+			if (prevScoreP[0] + 5 <= scoreP[0]) {
+				prevScoreP[0] = scoreP[0];
 				messageId = 1;
-			} else if (MogWork().m_prevScoreC - 5 > Chara.MogFur().m_score[2]) {
-				MogWork().m_prevScoreC = Chara.MogFur().m_score[2];
+			} else if (prevScoreP[0] - 5 > scoreP[0]) {
+				prevScoreP[0] = scoreP[0];
 				messageId = 6;
 			}
 

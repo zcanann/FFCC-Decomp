@@ -284,22 +284,7 @@ void CMenuPcs::LetterInit1()
 	int iVar5;
 	float fVar1;
 
-	memset(GetLetterAnimStorage(this), 0, sizeof(*GetLetterAnimStorage(this)));
-	fVar1 = FLOAT_803330f8;
-	iVar4 = GetLetterAnimBase(this) + 8;
-	iVar5 = 8;
-	do {
-		*reinterpret_cast<float*>(iVar4 + 0x14) = fVar1;
-		*reinterpret_cast<float*>(iVar4 + 0x54) = fVar1;
-		*reinterpret_cast<float*>(iVar4 + 0x94) = fVar1;
-		*reinterpret_cast<float*>(iVar4 + 0xD4) = fVar1;
-		*reinterpret_cast<float*>(iVar4 + 0x114) = fVar1;
-		*reinterpret_cast<float*>(iVar4 + 0x154) = fVar1;
-		*reinterpret_cast<float*>(iVar4 + 0x194) = fVar1;
-		*reinterpret_cast<float*>(iVar4 + 0x1D4) = fVar1;
-		iVar4 += 0x200;
-		--iVar5;
-	} while (iVar5 != 0);
+	ClearLetterAnimStorage(this);
 
 	int n = 0;
 	s16* p = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n++]);
@@ -310,8 +295,8 @@ void CMenuPcs::LetterInit1()
 	p[0] = static_cast<s16>((0x280 - p[2]) * scale);
 	p[1] = static_cast<s16>((0x1C0 - p[3]) * scale);
 	fVar1 = FLOAT_803330bc;
-	*reinterpret_cast<float*>(p + 8) = fVar1;
-	*reinterpret_cast<float*>(p + 0xA) = fVar1;
+	*reinterpret_cast<float*>(p + 4) = fVar1;
+	*reinterpret_cast<float*>(p + 6) = fVar1;
 	*reinterpret_cast<int*>(p + 0x12) = 0;
 	*reinterpret_cast<int*>(p + 0x14) = 10;
 
@@ -321,8 +306,8 @@ void CMenuPcs::LetterInit1()
 	p[3] = 0x60;
 	p[0] = 0x20;
 	p[1] = static_cast<s16>(0x1A0 - p[3]);
-	*reinterpret_cast<float*>(p + 8) = fVar1;
-	*reinterpret_cast<float*>(p + 0xA) = fVar1;
+	*reinterpret_cast<float*>(p + 4) = fVar1;
+	*reinterpret_cast<float*>(p + 6) = fVar1;
 	*reinterpret_cast<int*>(p + 0x12) = 0;
 	*reinterpret_cast<int*>(p + 0x14) = 10;
 

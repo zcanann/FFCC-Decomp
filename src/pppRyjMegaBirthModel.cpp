@@ -524,24 +524,31 @@ void birth(
 
     s32 mode = params->m_spawnMode;
     if (mode < 6) {
-        if (mode < 4) {
-            if (kPppRyjMegaBirthSharedZero != params->m_speed) {
-                float speedScalar = calc_direction_speed(params, params->m_speedMode);
-
-                rowY.x = particleData->m_matrix[0][1];
-                rowY.y = particleData->m_matrix[1][1];
-                rowY.z = particleData->m_matrix[2][1];
-                rowPos.x = particleData->m_matrix[0][3];
-                rowPos.y = particleData->m_matrix[1][3];
-                rowPos.z = particleData->m_matrix[2][3];
-                pppScaleVectorXYZ(rowPos, rowY, speedScalar);
-                particleData->m_matrix[0][3] = rowPos.x;
-                particleData->m_matrix[1][3] = rowPos.y;
-                particleData->m_matrix[2][3] = rowPos.z;
-            }
-            goto join_position;
+        if (mode >= 4) {
+            goto spawn_speed_block;
         }
+    } else if (mode < 10) {
+        goto mesh_block;
+    }
+
         if (kPppRyjMegaBirthSharedZero != params->m_speed) {
+            float speedScalar = calc_direction_speed(params, params->m_speedMode);
+
+            rowY.x = particleData->m_matrix[0][1];
+            rowY.y = particleData->m_matrix[1][1];
+            rowY.z = particleData->m_matrix[2][1];
+            rowPos.x = particleData->m_matrix[0][3];
+            rowPos.y = particleData->m_matrix[1][3];
+            rowPos.z = particleData->m_matrix[2][3];
+            pppScaleVectorXYZ(rowPos, rowY, speedScalar);
+            particleData->m_matrix[0][3] = rowPos.x;
+            particleData->m_matrix[1][3] = rowPos.y;
+            particleData->m_matrix[2][3] = rowPos.z;
+        }
+    goto join_position;
+
+spawn_speed_block:
+    if (kPppRyjMegaBirthSharedZero != params->m_speed) {
             float halfSpeed = MegaBirthHalf() * params->m_speed;
             u8 speedMode = params->m_speedMode;
             float t;
@@ -702,8 +709,11 @@ void birth(
             particleData->m_matrix[1][3] = speedY * scaleY;
             particleData->m_matrix[2][3] = speedZ * scaleZ;
         }
-        goto join_position;
-    } else if (mode < 10) {
+    goto join_position;
+
+mesh_block:
+    {
+
         s16 pathIndex = *(s16*)(payload + 0x138);
         Vec* pathBase = pObject->m_drawMatrixPtr;
 

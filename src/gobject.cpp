@@ -252,7 +252,7 @@ extern "C" const float sBgAttrFast;               // FLOAT_8033036c
 static const float sDebugScreenY = 320.0f;            // FLOAT_80330370
 static const float sDebugScreenX = 224.0f;            // FLOAT_80330374
 extern "C" const float sNegativeOne;              // FLOAT_80330390
-static const float sLargeDistance = 10000000.0f;      // FLOAT_80330394
+extern "C" const float sLargeDistance;      // FLOAT_80330394
 extern "C" const float sDefaultMoveBaseSpeed;      // FLOAT_803303d4
 extern "C" const float sHitProbeHeight;          // FLOAT_80330410
 extern "C" const float sHitMoveScale;       // FLOAT_80330414
@@ -2261,10 +2261,10 @@ CGObject* CGObject::CCClass(int useBodyRadius, int classMask, float yOffset, Vec
 
         PSVECSubtract(&other->m_worldPosition, &origin, &toOther);
         const float dist = PSVECMag(&toOther);
+        float extraAngle = sZeroFloat;
         if ((sZeroFloat < dist) && (dist < maxDist)) {
-            float extraAngle = sZeroFloat;
             if (useBodyRadius != 0) {
-                extraAngle = static_cast<float>(atan(static_cast<double>(other->m_bodyEllipsoidRadius / maxDist)));
+                extraAngle = static_cast<float>(atan(static_cast<double>((other->m_bodyEllipsoidRadius * dist / maxDist) / dist)));
             }
             PSVECScale(&toOther, &toOther, sAnimFrameOffset / dist);
             const float angle = static_cast<float>(acos(static_cast<double>(PSVECDotProduct(&toOther, &targetDir))));

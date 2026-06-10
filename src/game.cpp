@@ -782,6 +782,8 @@ void CGame::ChangeMap(int mapId, int mapVariant, int param4, int param5)
             param4 != 0 ? 0x580000 : 0,
             loadStep);
 
+        loadStep = param4;
+
         PartPcs.LoadFieldPdt(
             mapId,
             mapVariant,

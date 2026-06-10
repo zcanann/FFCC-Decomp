@@ -2264,7 +2264,7 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 			if (ModelAfterMeshDrawCallback(this) != 0) {
 				ModelAfterMeshDrawCallback(this)(this, ModelCbUser0(this), ModelCbUser1(this), meshIndex, static_cast<unsigned int>(displayListIndex), meshMtx);
 			} else {
-				MaterialMan.SetMaterial(ModelMaterialSet(this), displayList->m_material, (flags >> 2) & 1, (_GXTevScale)0);
+				MaterialMan.SetMaterial(ModelMaterialSet(this), displayList->m_material, materialAlpha, (_GXTevScale)0);
 				GXCallDisplayList(displayList->m_data, displayList->m_size);
 			}
 		}

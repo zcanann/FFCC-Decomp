@@ -1,12 +1,6 @@
 #include "ffcc/mapobj.h"
 
-extern const char s_CPtrArrayGrowError[];
-extern const char s_CPtrArrayFile[];
-#define FFCC_PTRARRAY_GROW_ERROR s_CPtrArrayGrowError
-#define FFCC_PTRARRAY_FILE s_CPtrArrayFile
 #include "ffcc/ptrarray.h"
-#undef FFCC_PTRARRAY_GROW_ERROR
-#undef FFCC_PTRARRAY_FILE
 
 #include "ffcc/map.h"
 #include "ffcc/mapanim.h"
@@ -27,15 +21,6 @@ extern const char s_CPtrArrayFile[];
 #include <string.h>
 #include <PowerPC_EABI_Support/Runtime/New.h>
 
-static const float kMapObjBoundMinInit = 10000000000.0f;
-static const float kMapObjBoundMaxInit = -10000000000.0f;
-static const float kMapObjZero = 1.0f;
-static const float kMapObjOne = 0.0f;
-static const float kMapObjInitNegOne = 1000000000000000.0f;
-static const float kMapObjColorBlendScale = 255.0f;
-static const float kMapObjDegToRad = 0.017453292f;
-static const float kMapObjInitValue50 = -1.0f;
-static const float kMapObjDefaultAngle = 48.0f;
 extern const char s_mapobj_cpp[] = "mapobj.cpp";
 extern const char sMapObjScaleWithoutNameWarn[0x78] = {
     (char)0x83, (char)0x47, (char)0x83, (char)0x89, (char)0x81, (char)0x5b, (char)0x81, (char)0x49,
@@ -144,6 +129,8 @@ int CPtrArray<CMapAnimRun*>::Add(CMapAnimRun* item)
 template <>
 int CPtrArray<CMapAnimRun*>::setSize(unsigned long newSize)
 {
+    extern const char s_CPtrArrayGrowError[];
+    extern const char s_CPtrArrayFile[];
     CMapAnimRun** newItems;
 
     if (m_size < newSize) {
@@ -212,6 +199,8 @@ int CPtrArray<CMapShadow*>::Add(CMapShadow* item)
 template <>
 int CPtrArray<CMapShadow*>::setSize(unsigned long newSize)
 {
+    extern const char s_CPtrArrayGrowError[];
+    extern const char s_CPtrArrayFile[];
     CMapShadow** newItems;
 
     if (m_size < newSize) {
@@ -256,6 +245,8 @@ int CPtrArray<CMapShadow*>::setSize(unsigned long newSize)
  */
 CBound::CBound()
 {
+    extern const float kMapObjBoundMinInit;
+    extern const float kMapObjBoundMaxInit;
     float max = kMapObjBoundMaxInit;
     float min = kMapObjBoundMinInit;
 
@@ -311,6 +302,9 @@ CMapObj::~CMapObj()
  */
 void CMapObj::Init()
 {
+    extern const float kMapObjOne;
+    extern const float kMapObjInitNegOne;
+    extern const float kMapObjInitValue50;
     m_calcMtxPending = 1;
     m_localMtxDirty = 1;
     m_parent = 0;
@@ -407,6 +401,9 @@ inline CMapObjAtrMeshName::CMapObjAtrMeshName()
  */
 int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
 {
+    extern const float kMapObjZero;
+    extern const float kMapObjOne;
+    extern const float kMapObjDefaultAngle;
     enum {
         CHUNK_AMBI = 0x414D4249,
         CHUNK_ANIM = 0x414E494D,
@@ -443,6 +440,8 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         CHUNK_VTXL = 0x5654584C,
     };
 
+    CMapMng& mng = MapMng;
+
     Init();
 
     chunkFile.PushChunk();
@@ -460,18 +459,18 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             if (parentIdx == -1) {
                 m_parent = 0;
             } else {
-                m_parent = MapMng.GetMapObjArray() + parentIdx;
+                m_parent = &mng.m_mapObjArray[parentIdx];
             }
 
             if (meshOrHitIdx == -1) {
                 m_mapData = 0;
             } else if (m_mapDataType == 1) {
-                m_mapData = MapMng.GetMapMeshArray() + meshOrHitIdx;
+                m_mapData = &mng.m_mapMeshArray[meshOrHitIdx];
                 m_baseDrawPriority = 0;
                 m_drawPriority = 0;
             } else if ((m_mapDataType == 2) || (m_mapDataType == 3)) {
                 if (meshOrHitIdx != -2) {
-                    m_mapData = &MapMng.m_mapHitArray[meshOrHitIdx];
+                    m_mapData = &mng.m_mapHitArray[meshOrHitIdx];
                 } else {
                     CMapObjAtrMeshName* meshName =
                         new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x84) CMapObjAtrMeshName();
@@ -486,10 +485,13 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             }
             goto checkScaleScene7;
         checkScaleMeshType:
-            if ((m_meshType < 10) && (m_meshType >= 8)) {
+            switch (m_meshType) {
+            case 8:
+            case 9:
                 m_transRateX = kMapObjZero;
                 m_transRateY = kMapObjOne;
                 m_transRateZ = kMapObjZero;
+                break;
             }
             break;
         checkScaleScene7:
@@ -534,9 +536,8 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             if (m_attribute != 0) {
                 System.Printf(const_cast<char*>(sMapObjTooManyAttributesWarn), objIndex);
             }
-            CMapObjAtrPointLight* pointLightAttr =
+            CMapObjAtrPointLight* pointLight =
                 new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0xD4) CMapObjAtrPointLight();
-            CMapObjAtrPointLight* pointLight = pointLightAttr;
 
             if (chunk.m_version == 2) {
                 chunkFile.PushChunk();
@@ -604,16 +605,15 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 pointLight->m_intensity = chunkFile.GetF4();
                 pointLight->m_colorMode = chunkFile.Get1();
             }
-            m_attribute = pointLightAttr;
+            m_attribute = pointLight;
             break;
         }
         case CHUNK_SLIT: {
             if (m_attribute != 0) {
                 System.Printf(const_cast<char*>(sMapObjTooManyAttributesWarn), objIndex);
             }
-            CMapObjAtrSpotLight* spotLightAttr =
+            CMapObjAtrSpotLight* spotLight =
                 new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x139) CMapObjAtrSpotLight();
-            CMapObjAtrSpotLight* spotLight = spotLightAttr;
 
             if (chunk.m_version == 6) {
                 chunkFile.PushChunk();
@@ -631,7 +631,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                         chunkFile.GetF4();
                         spotLight->m_falloff = chunkFile.GetF4();
                         unsigned short targetIndex = chunkFile.Get2();
-                        spotLight->m_target = MapMng.m_mapObjArray + targetIndex;
+                        spotLight->m_target = &MapMng.m_mapObjArray[targetIndex];
                         spotLight->m_colorMode = chunkFile.Get1();
                         spotLight->m_useAltColor = chunkFile.Get1();
                         spotLight->m_angle = chunkFile.GetF4();
@@ -705,7 +705,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 chunkFile.GetF4();
                 spotLight->m_falloff = chunkFile.GetF4();
                 unsigned short targetIndex = chunkFile.Get2();
-                spotLight->m_target = MapMng.m_mapObjArray + targetIndex;
+                spotLight->m_target = &MapMng.m_mapObjArray[targetIndex];
                 spotLight->m_colorMode = chunkFile.Get1();
                 spotLight->m_useAltColor = chunkFile.Get1();
                 spotLight->m_angle = chunkFile.GetF4();
@@ -730,13 +730,13 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 chunkFile.GetF4();
                 spotLight->m_falloff = chunkFile.GetF4();
                 unsigned short targetIndex = chunkFile.Get2();
-                spotLight->m_target = MapMng.m_mapObjArray + targetIndex;
+                spotLight->m_target = &MapMng.m_mapObjArray[targetIndex];
                 spotLight->m_colorMode = chunkFile.Get1();
                 spotLight->m_useAltColor = chunkFile.Get1();
                 spotLight->m_angle = kMapObjDefaultAngle;
                 spotLight->m_unknown2E = 0;
             }
-            m_attribute = spotLightAttr;
+            m_attribute = spotLight;
             break;
         }
         case CHUNK_ANIM: {
@@ -773,9 +773,9 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
 
             if (chunk.m_version == 4) {
                 shadow->m_materialIndex = static_cast<unsigned short>(chunkFile.Get4());
-                shadow->m_modelA = MapMng.m_mapObjArray + chunkFile.Get2();
-                shadow->m_modelB = MapMng.m_mapObjArray + chunkFile.Get2();
-                shadow->m_modelC = MapMng.m_mapObjArray + chunkFile.Get2();
+                shadow->m_modelA = &MapMng.m_mapObjArray[chunkFile.Get2()];
+                shadow->m_modelB = &MapMng.m_mapObjArray[chunkFile.Get2()];
+                shadow->m_modelC = &MapMng.m_mapObjArray[chunkFile.Get2()];
                 shadow->m_useFrustum = chunkFile.Get1();
                 shadow->m_shadowMaterialType = chunkFile.Get1();
                 shadow->m_targetEnabled[1] = (chunkFile.Get1() == 0);
@@ -796,9 +796,9 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 shadow->m_targetBounds[0].m_max.z = chunkFile.GetF4();
             } else if (chunk.m_version == 3) {
                 shadow->m_materialIndex = static_cast<unsigned short>(chunkFile.Get4());
-                shadow->m_modelA = MapMng.m_mapObjArray + chunkFile.Get2();
-                shadow->m_modelB = MapMng.m_mapObjArray + chunkFile.Get2();
-                shadow->m_modelC = MapMng.m_mapObjArray + chunkFile.Get2();
+                shadow->m_modelA = &MapMng.m_mapObjArray[chunkFile.Get2()];
+                shadow->m_modelB = &MapMng.m_mapObjArray[chunkFile.Get2()];
+                shadow->m_modelC = &MapMng.m_mapObjArray[chunkFile.Get2()];
                 shadow->m_useFrustum = chunkFile.Get1();
                 shadow->m_shadowMaterialType = chunkFile.Get1();
                 chunkFile.Get1();
@@ -1003,6 +1003,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
  */
 void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
 {
+    extern const float kMapObjDegToRad;
     Mtx mtx2;
     Mtx mtx1;
     Mtx mtx0;
@@ -1373,6 +1374,7 @@ void CMapObj::SetLink()
 
 static inline void calcRunningColorKeyFrame(CMapKeyFrame* keyFrame, _GXColor& out, _GXColor* colors)
 {
+    extern const float kMapObjColorBlendScale;
     float blend;
     int key0;
     int key1;
@@ -1399,6 +1401,7 @@ static inline void calcRunningColorKeyFrame(CMapKeyFrame* keyFrame, _GXColor& ou
 
 static inline void calcColorKeyFrame(CMapKeyFrame* keyFrame, _GXColor& out, _GXColor* colors)
 {
+    extern const float kMapObjColorBlendScale;
     if (keyFrame->IsRun() == 0) {
         return;
     }
@@ -1438,6 +1441,8 @@ static inline void calcColorKeyFrame(CMapKeyFrame* keyFrame, _GXColor& out, _GXC
  */
 void CMapObj::Calc()
 {
+    extern const float kMapObjOne;
+    extern const float kMapObjInitNegOne;
     Vec delta;
     Vec posCam;
     Vec pos;
@@ -1608,6 +1613,7 @@ void CMapObj::SetDrawEnv()
  */
 void CMapObj::Draw(unsigned char priority)
 {
+    extern const float kMapObjOne;
     if (m_drawPriority != priority) {
         return;
     }
@@ -1770,6 +1776,9 @@ void CMapObj::DrawHitNormal()
  */
 int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long mask)
 {
+    extern const float kMapObjBoundMinInit;
+    extern const float kMapObjBoundMaxInit;
+    extern const float kMapObjZero;
     if ((m_mapDataType == 2) && (m_mapData != 0) && (m_octTreeIndex == -1)) {
         Mtx inverseMtx;
 
@@ -1779,7 +1788,7 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
         PSMTXMultVec(inverseMtx, &cylinder->m_top, &localCylinder.m_top);
 
         localCylinder.m_radius = cylinder->m_radius;
-        float marginX = LoadFloat(kMapObjZero) + localCylinder.m_radius;
+        float marginX = kMapObjZero + localCylinder.m_radius;
 
         if (localCylinder.m_bottom.x < localCylinder.m_top.x) {
             localCylinder.m_bound.m_min.x = localCylinder.m_bottom.x - marginX;
@@ -1814,6 +1823,7 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
         unsigned char xyOverlap = 0;
         {
             int xOverlap = 0;
+            int yOverlap = 0;
             float positionMinX = mapHit->m_positionMin.x;
             if (positionMinX < localCylinder.m_bound.m_min.x) {
                 xOverlap = localCylinder.m_bound.m_min.x <= mapHit->m_positionMax.x;
@@ -1824,7 +1834,6 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
             }
 
             if (xOverlap) {
-                int yOverlap = 0;
                 float positionMinY = mapHit->m_positionMin.y;
                 if (positionMinY < localCylinder.m_bound.m_min.y) {
                     yOverlap = localCylinder.m_bound.m_min.y <= mapHit->m_positionMax.y;
@@ -1878,6 +1887,9 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
  */
 void CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned long mask)
 {
+    extern const float kMapObjBoundMinInit;
+    extern const float kMapObjBoundMaxInit;
+    extern const float kMapObjZero;
     if ((m_mapDataType == 2) && (m_mapData != 0) && (m_octTreeIndex == -1)) {
         Mtx inverseMtx;
         Vec localMove;
@@ -1888,7 +1900,7 @@ void CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned l
         PSMTXMultVec(inverseMtx, &cylinder->m_top, &localCylinder.m_top);
 
         localCylinder.m_radius = cylinder->m_radius;
-        float marginX = LoadFloat(kMapObjZero) + localCylinder.m_radius;
+        float marginX = kMapObjZero + localCylinder.m_radius;
 
         if (localCylinder.m_bottom.x < localCylinder.m_top.x) {
             localCylinder.m_bound.m_min.x = localCylinder.m_bottom.x - marginX;
@@ -1923,6 +1935,7 @@ void CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned l
         unsigned char xyOverlap = 0;
         {
             int xOverlap = 0;
+            int yOverlap = 0;
             float positionMinX = mapHit->m_positionMin.x;
             if (positionMinX < localCylinder.m_bound.m_min.x) {
                 xOverlap = localCylinder.m_bound.m_min.x <= mapHit->m_positionMax.x;
@@ -1933,7 +1946,6 @@ void CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned l
             }
 
             if (xOverlap) {
-                int yOverlap = 0;
                 float positionMinY = mapHit->m_positionMin.y;
                 if (positionMinY < localCylinder.m_bound.m_min.y) {
                     yOverlap = localCylinder.m_bound.m_min.y <= mapHit->m_positionMax.y;
@@ -2138,3 +2150,21 @@ CMapObjAtrPointLight::~CMapObjAtrPointLight()
 CMapObjAtrMeshName::~CMapObjAtrMeshName()
 {
 }
+
+extern const float kMapObjBoundMinInit = 10000000000.0f;
+extern const float kMapObjBoundMaxInit = -10000000000.0f;
+extern const float kMapObjZero = 1.0f;
+extern const float kMapObjOne = 0.0f;
+extern const float kMapObjInitNegOne = 1000000000000000.0f;
+extern const float kMapObjColorBlendScale = 255.0f;
+extern const float kMapObjDegToRad = 0.017453292f;
+extern const float kMapObjDefaultAngle = 48.0f;
+extern const float kMapObjInitValue50 = -1.0f;
+
+extern const char s_CPtrArrayGrowError[0x1C] = {
+    (char)0x83, (char)0x6F, (char)0x83, (char)0x62, (char)0x83, (char)0x74, (char)0x83, (char)0x40,
+    (char)0x90, (char)0xAC, (char)0x92, (char)0xB7, (char)0x82, (char)0xAA, (char)0x95, (char)0x73,
+    (char)0x8B, (char)0x96, (char)0x89, (char)0xC2, (char)0x82, (char)0xC5, (char)0x82, (char)0xB7,
+    (char)0x81, (char)0x42, (char)0x0A, (char)0x00,
+};
+extern const char s_CPtrArrayFile[] = "collection_ptrarray.h";

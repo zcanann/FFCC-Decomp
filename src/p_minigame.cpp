@@ -1580,15 +1580,13 @@ void CMiniGamePcs::calc(void)
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
 
     switch (m_managerState) {
-    case 0:
-        return;
     case 1:
         Joybus.ExitThread();
         m_managerState = 2;
     case 2:
         if (!Joybus.IsThreadRunning())
         {
-            char managerFile[260];
+            char managerFile[256];
             char managerSpFile[256];
 
             sprintf(managerFile, s_miniGameManagerFileFmt, s_miniGameManagerDir, m_managerIndex);
@@ -1606,6 +1604,7 @@ void CMiniGamePcs::calc(void)
         return;
     case 3:
         break;
+    case 0:
     default:
         return;
     }

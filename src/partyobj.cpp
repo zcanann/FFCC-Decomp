@@ -2832,23 +2832,25 @@ void CGPartyObj::checkTargetParticle()
 		if (*reinterpret_cast<int*>(self + 0x520) == 2) {
 			unsigned int vNode = *reinterpret_cast<unsigned short*>(*reinterpret_cast<int*>(scriptPtr + 0x24) + 0x19A);
 			unsigned int vItem = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<int*>(self + 0x560) * 0x48 + 0x30);
+			float base = static_cast<float>(vItem) + static_cast<float>(vNode);
 			int vFlag;
-			if ((*reinterpret_cast<unsigned int*>(scriptPtr + 0x3B0) & 0x4000) == 0) {
-				vFlag = 0;
-			} else {
+			if ((*reinterpret_cast<unsigned int*>(scriptPtr + 0x3B0) & 0x4000) != 0) {
 				vFlag = *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x0A);
+			} else {
+				vFlag = 0;
 			}
-			maxRange = zero + (static_cast<float>(vItem) + static_cast<float>(vNode) + static_cast<float>(vFlag));
+			maxRange = zero + (base + static_cast<float>(vFlag));
 		} else {
 			unsigned int vNode = *reinterpret_cast<unsigned short*>(*reinterpret_cast<int*>(scriptPtr + 0x24) + 0x19C);
 			unsigned int vItem = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<int*>(self + 0x560) * 0x48 + 0x30);
+			float base = static_cast<float>(vItem) + static_cast<float>(vNode);
 			int vFlag;
-			if ((*reinterpret_cast<unsigned int*>(scriptPtr + 0x3B0) & 0x8000) == 0) {
-				vFlag = 0;
-			} else {
+			if ((*reinterpret_cast<unsigned int*>(scriptPtr + 0x3B0) & 0x8000) != 0) {
 				vFlag = *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x0C);
+			} else {
+				vFlag = 0;
 			}
-			maxRange = zero + (static_cast<float>(vItem) + static_cast<float>(vNode) + static_cast<float>(vFlag));
+			maxRange = zero + (base + static_cast<float>(vFlag));
 		}
 
 		CVector worldPosV(m_worldPosition);

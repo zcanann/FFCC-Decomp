@@ -2771,6 +2771,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     case -0x41: {
         const unsigned int* localBase = object->m_localBase;
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
+        int mode = *localBase & 3;
         float alpha = static_cast<float>(static_cast<int>(localBase[1])) /
                       static_cast<float>(static_cast<int>(localBase[2]));
         Quaternion start;
@@ -2785,7 +2786,6 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         end.z = localFloats[9];
         end.w = localFloats[10];
 
-        int mode = *localBase & 3;
         if (mode == 3) {
             alpha = -((kCFlatHalfF * (kCFlatOneF + std::sinf(kCFlatPi * alpha + kCFlatHalfPi))) -
                       kCFlatOneF);
@@ -2796,10 +2796,10 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         }
 
         C_QUATSlerp(&start, &end, &rotation, alpha);
-        *reinterpret_cast<float*>(localBase[11]) = rotation.x;
-        *reinterpret_cast<float*>(localBase[12]) = rotation.y;
-        *reinterpret_cast<float*>(localBase[13]) = rotation.z;
-        *reinterpret_cast<float*>(localBase[14]) = rotation.w;
+        *reinterpret_cast<float*>(object->m_localBase[11]) = rotation.x;
+        *reinterpret_cast<float*>(object->m_localBase[12]) = rotation.y;
+        *reinterpret_cast<float*>(object->m_localBase[13]) = rotation.z;
+        *reinterpret_cast<float*>(object->m_localBase[14]) = rotation.w;
         this->push(object, 0);
         outResult = 0;
         break;

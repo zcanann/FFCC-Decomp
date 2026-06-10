@@ -3356,13 +3356,11 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		{
-			int y = 0x38;
-			for (int i = 0; i < activePartyCount; i++, y += 0x60) {
-				int off = ((i + 1) << 6) + 8;
-				BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + off);
+			for (int i = 0; i < activePartyCount; i++) {
+				BonusAnimSprite* spr = &((BonusAnimList*)this->m_bonusAnimPtr)->sprites[i + 1];
 				spr->kind = 0x17;
 				spr->x = 0x80;
-				spr->y = (short)y;
+				spr->y = (short)(i * 0x60 + 0x38);
 				spr->w = 0x1a0;
 				spr->h = 0x40;
 				spr->mulX = kBonusZClearOrigin;
@@ -3637,17 +3635,13 @@ void CMenuPcs::CalcResultOpenAnim()
 
 		{
 			int i = 0;
-			int boardOff = activePartyCount * 2;
-			boardOff = boardOff * 0x50;
+			int total2 = activePartyCount * 2;
 			for (; i < activePartyCount; i++) {
-				int sprOff = ((i + 1) << 6) + 8;
-				BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + sprOff);
-				int o08 = boardOff + 0x8;
-				int o0a = boardOff + 0xa;
-				*(short*)(this->m_bonus.m_bonusBoardPtr + o08) = (short)(int)kBonusZClearOrigin;
+				BonusAnimSprite* sprite = &((BonusAnimList*)this->m_bonusAnimPtr)->sprites[i + 1];
+				int boardOff = (total2 + i) * 0x50;
+				*(short*)(this->m_bonus.m_bonusBoardPtr + boardOff + 0x8) = (short)(int)kBonusZClearOrigin;
 				int centerY = (int)(float)((double)(float)((double)sprite->h * DOUBLE_80331E78 + (double)sprite->y) - DOUBLE_80331EF0);
-				*(short*)(this->m_bonus.m_bonusBoardPtr + o0a) = (short)centerY;
-				boardOff += 0x50;
+				*(short*)(this->m_bonus.m_bonusBoardPtr + boardOff + 0xa) = (short)centerY;
 			}
 		}
 

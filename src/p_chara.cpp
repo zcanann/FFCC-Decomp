@@ -67,9 +67,9 @@ extern "C" void destroyViewer__9CCharaPcsFv(CCharaPcs*);
 extern "C" void calcViewer__9CCharaPcsFv(CCharaPcs*);
 extern "C" void drawViewer__9CCharaPcsFv(CCharaPcs*);
 
-static const char s_CCharaPcs_GAME[] = "CCharaPcs(GAME)";
-static const char s_CCharaPcs_VIEWER[] = "CCharaPcs(VIEWER)";
-static const char s_CCharaPcs_PART[] = "CCharaPcs(PART)";
+static const char s_CCharaPcs_GAME_801D9128[] = "CCharaPcs(GAME)";
+static const char s_CCharaPcs_VIEWER_801D9138[] = "CCharaPcs(VIEWER)";
+static const char s_CCharaPcs_PART_801D914C[] = "CCharaPcs(PART)";
 
 static CProcessTableCallback s_charaTableDescCreate = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__9CCharaPcsFv)};
 static CProcessTableCallback s_charaTableDescDestroy = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__9CCharaPcsFv)};
@@ -92,7 +92,7 @@ static CProcessTableCallback s_charaTableDescPartCalcAfter = {0, 0xFFFFFFFF, rei
 
 CProcessTable PTR_s_CCharaPcs_GAME_[3] = {
     {
-        const_cast<char*>(s_CCharaPcs_GAME),
+        const_cast<char*>(s_CCharaPcs_GAME_801D9128),
         {
             s_charaTableDescCreate.m_thisOffset, s_charaTableDescCreate.m_virtualOffset, s_charaTableDescCreate.m_function,
             s_charaTableDescDestroy.m_thisOffset, s_charaTableDescDestroy.m_virtualOffset, s_charaTableDescDestroy.m_function,
@@ -111,7 +111,7 @@ CProcessTable PTR_s_CCharaPcs_GAME_[3] = {
         },
     },
     {
-        const_cast<char*>(s_CCharaPcs_VIEWER),
+        const_cast<char*>(s_CCharaPcs_VIEWER_801D9138),
         {
             s_charaTableDescCreateViewer.m_thisOffset, s_charaTableDescCreateViewer.m_virtualOffset, s_charaTableDescCreateViewer.m_function,
             s_charaTableDescDestroyViewer.m_thisOffset, s_charaTableDescDestroyViewer.m_virtualOffset, s_charaTableDescDestroyViewer.m_function,
@@ -125,7 +125,7 @@ CProcessTable PTR_s_CCharaPcs_GAME_[3] = {
         },
     },
     {
-        const_cast<char*>(s_CCharaPcs_PART),
+        const_cast<char*>(s_CCharaPcs_PART_801D914C),
         {
             s_charaTableDescPartCreate.m_thisOffset, s_charaTableDescPartCreate.m_virtualOffset, s_charaTableDescPartCreate.m_function,
             s_charaTableDescPartDestroy.m_thisOffset, s_charaTableDescPartDestroy.m_virtualOffset, s_charaTableDescPartDestroy.m_function,
@@ -263,26 +263,26 @@ static const char s_charaDumpAnimHdr1[] = "anim\n";
 static const char s_charaDumpAnimHdr2[] = "no  t num name           lv  mask     addr     banksize banksum  histroy\n";
 static const char s_charaDumpAnimSep[] = "--- - --- -------------- --- -------- -------- -------- -------- --------\n";
 static const char s_charaDumpAnimFmt[] = "%3d %1d %3d %14s %3d %08x %08x %8d %8d %8d\n";
-static const char s_charaKindPath0[] = "pc";
-static const char s_charaKindFile0[] = "c";
-static const char s_charaKindSuffix[] = "_root";
-static const char s_charaKindPath1[] = "mon";
-static const char s_charaKindFile1[] = "m";
-static const char s_charaKindPath2[] = "npc";
-static const char s_charaKindFile2[] = "n";
-static const char s_charaKindPath3[] = "fa";
-static const char s_charaKindFile3[] = "f";
-static const char s_charaKindPath4[] = "wep";
-static const char s_charaKindFile4[] = "w";
-static const char s_charaKindPath5[] = "loc";
-static const char s_charaKindFile5[] = "l";
+static const char lbl_80330228[] = "pc";
+static const char lbl_8033022C[] = "c";
+static const char lbl_80330230[] = "_root";
+static const char lbl_80330238[] = "mon";
+static const char lbl_8033023C[] = "m";
+static const char lbl_80330240[] = "npc";
+static const char lbl_80330244[] = "n";
+static const char lbl_80330248[] = "fa";
+static const char lbl_8033024C[] = "f";
+static const char lbl_80330250[] = "wep";
+static const char lbl_80330254[] = "w";
+static const char lbl_80330258[] = "loc";
+static const char lbl_8033025C[] = "l";
 static const char* s_charaKindPathParts[][3] = {
-    {s_charaKindPath0, s_charaKindFile0, s_charaKindSuffix},
-    {s_charaKindPath1, s_charaKindFile1, s_charaKindSuffix},
-    {s_charaKindPath2, s_charaKindFile2, s_charaKindSuffix},
-    {s_charaKindPath3, s_charaKindFile3, s_charaKindSuffix},
-    {s_charaKindPath4, s_charaKindFile4, s_charaKindSuffix},
-    {s_charaKindPath5, s_charaKindFile5, s_charaKindSuffix},
+    {lbl_80330228, lbl_8033022C, lbl_80330230},
+    {lbl_80330238, lbl_8033023C, lbl_80330230},
+    {lbl_80330240, lbl_80330244, lbl_80330230},
+    {lbl_80330248, lbl_8033024C, lbl_80330230},
+    {lbl_80330250, lbl_80330254, lbl_80330230},
+    {lbl_80330258, lbl_8033025C, lbl_80330230},
 };
 
 #pragma dont_inline on

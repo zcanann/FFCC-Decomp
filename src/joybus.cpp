@@ -4259,7 +4259,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
         m_pposWordIndex[threadParam->m_portIndex] = 0;
         m_cmdBuffer[4 + threadParam->m_portIndex] = 0;
 
-        int enemyCount = 0;
+        int enemyCount;
 
         GbaQue.GetEnemyPos(threadParam->m_portIndex, posWords, &enemyCount);
 
@@ -4301,9 +4301,9 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 
         if (m_pposWordIndex[threadParam->m_portIndex] >= (int)(signed char)m_cmdBuffer[4 + threadParam->m_portIndex])
         {
+            state += 1;
             m_cmdBuffer[4 + threadParam->m_portIndex] = 0;
             m_pposWordIndex[threadParam->m_portIndex] = 0;
-            state += 1;
         }
 
         break;
@@ -4315,7 +4315,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
         m_pposWordIndex[threadParam->m_portIndex] = 0;
         m_cmdBuffer[4 + threadParam->m_portIndex] = 0;
 
-        int treasureCount = 0;
+        int treasureCount;
 
         GbaQue.GetTreasurePos(threadParam->m_portIndex, posWords, &treasureCount);
 

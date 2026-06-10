@@ -241,6 +241,11 @@ static bool isBossArtifactStage()
 	return Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0x0F;
 }
 
+static inline float LoadFloat(const float& value)
+{
+	return value;
+}
+
 static bool isFrameInterval(int frame, int interval)
 {
 	return frame % interval == 0;
@@ -2797,7 +2802,7 @@ void CGPartyObj::checkTargetParticle()
 
 		float dist = PSVECDistance(&m_worldPosition, targetPos);
 
-		float maxRangeRaw;
+		float zero = LoadFloat(FLOAT_80331a78);
 		int scriptPtr = *reinterpret_cast<int*>(self + 0x58);
 		if (*reinterpret_cast<int*>(self + 0x520) == 2) {
 			unsigned int vNode = *reinterpret_cast<unsigned short*>(*reinterpret_cast<int*>(scriptPtr + 0x24) + 0x19A);
@@ -2808,7 +2813,7 @@ void CGPartyObj::checkTargetParticle()
 			} else {
 				vFlag = *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x0A);
 			}
-			maxRangeRaw = static_cast<float>(vItem) + static_cast<float>(vNode) + static_cast<float>(vFlag);
+			maxRange = zero + (static_cast<float>(vItem) + static_cast<float>(vNode) + static_cast<float>(vFlag));
 		} else {
 			unsigned int vNode = *reinterpret_cast<unsigned short*>(*reinterpret_cast<int*>(scriptPtr + 0x24) + 0x19C);
 			unsigned int vItem = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<int*>(self + 0x560) * 0x48 + 0x30);
@@ -2818,9 +2823,8 @@ void CGPartyObj::checkTargetParticle()
 			} else {
 				vFlag = *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x0C);
 			}
-			maxRangeRaw = static_cast<float>(vItem) + static_cast<float>(vNode) + static_cast<float>(vFlag);
+			maxRange = zero + (static_cast<float>(vItem) + static_cast<float>(vNode) + static_cast<float>(vFlag));
 		}
-		maxRange = FLOAT_80331a78 + maxRangeRaw;
 
 		CVector worldPosV(m_worldPosition);
 		CVector targetCenterV(*targetPos);

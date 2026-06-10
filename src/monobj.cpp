@@ -23,6 +23,8 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
+extern "C" int Rand__5CMathFUl(CMath* math);
+
 u8 CGMonObj::m_aiWork[0xC];
 u8 CGMonObj::m_boss[0x8C];
 
@@ -3402,23 +3404,23 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 				groupIndex = *reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x11A);
 			}
 
-			if (groupIndex < 8) {
-				groupTable[actionIndex] = groupIndex;
-				groupCount[groupIndex] += 1;
-			}
+			groupTable[actionIndex] = groupIndex;
+			groupCount[groupIndex] += 1;
 		}
 	}
 
 	if (selectorType == 1) {
 		int& groupCursor = monObj->m_unk6CC;
-		while (groupCount[groupCursor] == 0) {
+	wloop:
+		if (groupCount[groupCursor] == 0) {
 			groupCursor += 1;
 			if (groupCursor >= 8) {
 				groupCursor = 0;
 			}
+			goto wloop;
 		}
 
-		int pick = Math.Rand(8);
+		int pick = Rand__5CMathFUl(&Math);
 		int seen = 0;
 		int i = 0;
 		int* groupPtr = reinterpret_cast<int*>(groupTable);

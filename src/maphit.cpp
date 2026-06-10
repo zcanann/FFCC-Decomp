@@ -650,13 +650,14 @@ edge_loop:
                 Vec edge;
                 PSVECSubtract(&current, &previous, &edge);
 
+                Vec rayDirection;
+                Vec rayStart = g_hit_cyl.m_bottom;
+                rayDirection = *hitDirection;
+
                 CMapCylinder edgeCylinder;
                 edgeCylinder.m_bottom = previous;
                 edgeCylinder.m_axis = edge;
                 edgeCylinder.m_radius = g_hit_cyl.m_radius;
-
-                Vec rayStart = g_hit_cyl.m_bottom;
-                Vec rayDirection = *hitDirection;
 
                 float edgeT;
                 if (FindIntersection(rayStart, rayDirection, edgeCylinder, edgeT) != 0 &&

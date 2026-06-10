@@ -832,7 +832,11 @@ timeout_expiry:
         case 0x00:
         {
             threadParam->m_state = 1;
+        }
+        // fall through
 
+        case 0x01:
+        {
             GbaQue.SetChgUseItemFlg(threadParam->m_portIndex);
             GbaQue.SetResetFlg(threadParam->m_portIndex);
 
@@ -901,12 +905,6 @@ timeout_expiry:
                 }
             }
 
-            break;
-        }
-
-        case 0x01:
-        {
-            // TODO: optionally split logic from case 0 if needed
             break;
         }
 

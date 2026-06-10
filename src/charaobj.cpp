@@ -1652,10 +1652,27 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			case 4:
 			case 0x1C: {
 				unsigned int basePower = *reinterpret_cast<unsigned short*>(itemData + 6);
-				CGPrgObj* powerSource = sourceObj;
-				if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
-				    (static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D && sourceObj->m_scriptHandle[0xED] != 0) {
+				unsigned char condC = 0;
+				unsigned char condB = 0;
+				unsigned char condA = 0;
+				if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+					condA = 1;
+				}
+				if (condA != 0) {
+					if ((((static_cast<unsigned int>(__cntlzw(0x6D - (static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D))) >> 5) & 0xFFU) != 0)) {
+						condB = 1;
+					}
+				}
+				if (condB != 0) {
+					if (sourceObj->m_scriptHandle[0xED] != 0) {
+						condC = 1;
+					}
+				}
+				CGPrgObj* powerSource;
+				if (condC != 0) {
 					powerSource = Game.m_partyObjArr[0];
+				} else {
+					powerSource = sourceObj;
 				}
 
 				unsigned int sourcePower = *reinterpret_cast<unsigned short*>(

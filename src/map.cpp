@@ -1988,14 +1988,12 @@ int CMapMng::ReadMpl(char* mapName)
                             if (meshCount >= 0xA0) {
                                 return 0;
                             }
-                            CMapMesh* mesh = GetMapMeshArray() + meshCount;
-                            mesh->ReadOtmMesh(chunkFile, m_stage, 1, 1);
+                            m_mapMeshArray[meshCount].ReadOtmMesh(chunkFile, MapMng.m_stage, 1, 1);
                             break;
                         }
                         case 0x44534554: {
                             short& meshCount = m_mapMeshCount;
-                            CMapMesh* mesh = GetMapMeshArray() + meshCount;
-                            mesh->ReadOtmMesh(chunkFile, m_stage, 1, 1);
+                            m_mapMeshArray[meshCount].ReadOtmMesh(chunkFile, MapMng.m_stage, 1, 1);
                             meshCount += 1;
                             break;
                         }

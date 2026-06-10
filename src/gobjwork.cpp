@@ -1469,94 +1469,116 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 		}
 
 		{
-			int bit0 = 0;
-			int bit1 = 0;
-			int bit2 = 0;
-			unsigned char* evtWorkBytes = reinterpret_cast<unsigned char*>(m_evtWorkArr);
+			int bit0;
+			int bit1;
+			int bit2;
 
 			for (int i = 0; i < 8; i++) {
 				const unsigned short evtRule = curLetter->m_eventRules[i];
 				const int sourceType = (evtRule >> 11) & 3;
 				const int sourceIdx = evtRule & 0x7FF;
-				int checkValue = bit0;
 
 				if (sourceType == 3) {
 					continue;
 				}
 
 				switch (sourceType) {
-				case 2:
-					bit0 = ((evtWorkBytes[sourceIdx / 8] & (1 << (sourceIdx % 8))) != 0);
-					bit1 = ((evtWorkBytes[(sourceIdx + 1) / 8] & (1 << ((sourceIdx + 1) % 8))) != 0);
-					bit2 = ((evtWorkBytes[(sourceIdx + 2) / 8] & (1 << ((sourceIdx + 2) % 8))) != 0);
-					break;
 				case 1:
-					bit0 = ((static_cast<signed char>(Game.m_gameWork.m_eventFlags[sourceIdx / 8]) &
+					bit0 = ((static_cast<unsigned char>(Game.m_gameWork.m_eventFlags[sourceIdx / 8]) &
 							 (1 << (sourceIdx % 8))) != 0);
 					bit1 = ((static_cast<unsigned char>(Game.m_gameWork.m_eventFlags[(sourceIdx + 1) / 8]) &
 							 (1 << ((sourceIdx + 1) % 8))) != 0);
 					bit2 = ((static_cast<unsigned char>(Game.m_gameWork.m_eventFlags[(sourceIdx + 2) / 8]) &
 							 (1 << ((sourceIdx + 2) % 8))) != 0);
 					break;
+				case 2:
+					bit0 = ((reinterpret_cast<unsigned char*>(this)[sourceIdx / 8 + 0x8A4] & (1 << (sourceIdx % 8))) != 0);
+					bit1 = ((reinterpret_cast<unsigned char*>(this)[(sourceIdx + 1) / 8 + 0x8A4] & (1 << ((sourceIdx + 1) % 8))) != 0);
+					bit2 = ((reinterpret_cast<unsigned char*>(this)[(sourceIdx + 2) / 8 + 0x8A4] & (1 << ((sourceIdx + 2) % 8))) != 0);
+					break;
 				}
-
-				checkValue = bit0;
 
 				switch ((evtRule >> 13) & 7) {
 				case 0:
+					if (bit0 != 0) {
+						goto NextLetter;
+					}
+					break;
 				case 1:
+					if (bit0 == 0) {
+						goto NextLetter;
+					}
 					break;
 				case 2:
 					if (bit0 != 0) {
 						goto NextLetter;
 					}
-					checkValue = bit2;
 					if (bit1 != 0) {
 						goto NextLetter;
 					}
-					break;
-				case 3:
-					if ((bit0 != 0) || (bit1 != 0)) {
-						continue;
+					if (bit2 == 0) {
+						break;
 					}
-					checkValue = bit2;
+					goto NextLetter;
+				case 3:
+					if (bit0 != 0) {
+						break;
+					}
+					if (bit1 != 0) {
+						break;
+					}
+					if (bit2 == 0) {
+						goto NextLetter;
+					}
 					break;
 				case 4:
-				case 5:
-					checkValue = bit2;
 					if (bit1 != 0) {
 						goto NextLetter;
 					}
-					break;
+					if (bit2 == 0) {
+						break;
+					}
+					goto NextLetter;
+				case 5:
+					if (bit1 != 0) {
+						goto NextLetter;
+					}
+					if (bit2 != 0) {
+						break;
+					}
+					goto NextLetter;
 				case 6:
-				case 7:
-					checkValue = bit2;
 					if (bit1 == 0) {
 						goto NextLetter;
 					}
-					break;
-				default:
-					continue;
-				}
-
-				if (checkValue == 0) {
+					if (bit2 == 0) {
+						break;
+					}
 					goto NextLetter;
+				case 7:
+					if (bit1 == 0) {
+						goto NextLetter;
+					}
+					if (bit2 == 0) {
+						goto NextLetter;
+					}
+					break;
 				}
 			}
 		}
 
 		if (foundCount == maxResults) {
-			unsigned short minPriority = 0xFFFF;
+			int minPriority = 0xFFFF;
 			int replaceIndex = 0;
 			for (int i = 0; i < maxResults; i++) {
-				short priority = romLetterWork[i]->m_priorityFlags & 0xF00;
+				const int priority = romLetterWork[i]->m_priorityFlags & 0xF00;
 				if (priority < minPriority) {
 					minPriority = priority;
 					replaceIndex = i;
 				}
 			}
 
-			const short curPriority = curLetter->m_priorityFlags & 0xF00;
+			const int curPriority = curLetter->m_priorityFlags & 0xF00;
 			if (minPriority < curPriority) {
 				romLetterWork[replaceIndex] = curLetter;
 			}

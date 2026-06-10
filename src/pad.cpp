@@ -398,8 +398,6 @@ static inline void MergePadInputs(CPad* pad, u16* puVar13, u16* puVar18, u16* pu
  */
 void CPad::Frame()
 {
-	float fVar2;
-	float fVar3;
 	int iVar6;
 	u16 uVar1;
 	u16 uVar8;
@@ -414,7 +412,6 @@ void CPad::Frame()
 	u32 uVar15;
 	u32 gbaIdx;
 	u32 uVar16;
-	u32 uVar17;
 	u16* puVar18;
 	int iVar19;
 	CPad::Gba local_98[4];
@@ -527,11 +524,11 @@ void CPad::Frame()
 		}
 	}
 
-	puVar13 = reinterpret_cast<u16*>(local_88);
+	puVar7 = reinterpret_cast<u16*>(local_88);
 	puVar10 = reinterpret_cast<u16*>(self + 0x154);
 	uVar16 = 0;
 	gbaIdx = 0;
-	puVar7 = puVar13;
+	puVar13 = puVar7;
 	do
 	{
 		cVar9 = *reinterpret_cast<s8*>(puVar7 + 5);

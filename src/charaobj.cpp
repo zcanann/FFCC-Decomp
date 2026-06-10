@@ -1630,7 +1630,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				if (scriptDefense != 0) {
 					damageAmount = static_cast<int>(static_cast<float>(damageAmount) * CharaObjGetStatusMultiplier(0x42));
 				}
-				System.Printf(dbg + 0x1A0, basePower, sourcePower, defense, bonus, damageAmount);
+				System.Printf(dbg + 0x1A0, basePower, sourcePower, multiplier, defense, bonus, damageAmount);
 
 				if (staType != 0x6A && (static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D && (static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD &&
 				    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 0x100) != 0 &&
@@ -1670,7 +1670,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 						reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0xBDE)) :
 					0;
 				damageAmount = rawDamage + bonus;
-				System.Printf(dbg + 0x1DC, basePower, sourcePower, defense, bonus, damageAmount);
+				System.Printf(dbg + 0x1DC, basePower, sourcePower, multiplier, defense, bonus, damageAmount);
 				break;
 			}
 			case 10: {
@@ -1706,7 +1706,8 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				unsigned int basePower = *reinterpret_cast<unsigned short*>(itemData + 6);
 				unsigned int sourcePower = *reinterpret_cast<unsigned short*>(
 					reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0x1E);
-				int guardValue = static_cast<int>(defense * CharaObjGetStatusMultiplier(0x30));
+				float multiplier = CharaObjGetStatusMultiplier(0x30);
+				int guardValue = static_cast<int>(defense * multiplier);
 				int computed30 = static_cast<int>(basePower + sourcePower) - guardValue;
 				damageAmount = 1;
 				if (computed30 >= 1) {
@@ -1715,7 +1716,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				if (scriptDefense != 0) {
 					damageAmount = static_cast<int>(damageAmount * CharaObjGetStatusMultiplier(0x42));
 				}
-				System.Printf(dbg + 0x240);
+				System.Printf(dbg + 0x240, basePower, sourcePower, defense, multiplier, damageAmount);
 				break;
 			}
 			case 0:
@@ -1727,13 +1728,14 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				unsigned int basePower = *reinterpret_cast<unsigned short*>(itemData + 6);
 				unsigned int sourcePower = *reinterpret_cast<unsigned short*>(
 					reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0x20);
-				int guardValue = static_cast<int>(defense * CharaObjGetStatusMultiplier(0x32));
+				float multiplier = CharaObjGetStatusMultiplier(0x32);
+				int guardValue = static_cast<int>(defense * multiplier);
 				int computed32 = static_cast<int>(basePower + sourcePower) - guardValue;
 				damageAmount = 1;
 				if (computed32 >= 1) {
 					damageAmount = computed32;
 				}
-				System.Printf(dbg + 0x274);
+				System.Printf(dbg + 0x274, basePower, sourcePower, defense, multiplier, damageAmount);
 				break;
 			}
 			case 10: {
@@ -1768,7 +1770,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				if (computedGuard >= 1) {
 					damageAmount = computedGuard;
 				}
-				System.Printf(dbg + 0x2BC, basePower, sourcePower, defense, damageAmount);
+				System.Printf(dbg + 0x2BC, basePower, sourcePower, defense, defenseRate, damageAmount);
 				break;
 			}
 			case 0x25:

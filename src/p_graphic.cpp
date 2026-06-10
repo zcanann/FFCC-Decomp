@@ -710,12 +710,14 @@ void CGraphicPcs::drawBar()
     GXColor barColor = {0x80, 0x80, 0x80, 0xFF};
     drawSFRect(kDebugBarLeft, kDebugBarTop, kDebugBarRight, kDebugBarBottom, barColor, barColor);
 
+    int hue;
+    u32 y;
     CSystem::COrder* order = System.GetFirstOrder();
     const int orderCount = System.m_orderCount;
-    const int lastOrder = orderCount - 1;
-    int hue = 0;
-    u32 y = 0x10;
-    for (int i = 0; i < orderCount; i++) {
+    int i = 0;
+    hue = 0;
+    y = 0x10;
+    for (; i < orderCount; i++) {
         const int priority = order->m_priority;
         const float lastTime = order->m_lastTime;
         GXColor colorTmp;
@@ -736,7 +738,7 @@ void CGraphicPcs::drawBar()
             x += width;
         }
 
-        if (i == lastOrder) {
+        if (i == orderCount - 1) {
             GXColor soundGX;
             *reinterpret_cast<u32*>(&soundGX) = Math.Hsb2Rgb(0, 100, 100);
             barColor.r = soundGX.r;

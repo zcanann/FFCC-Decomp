@@ -126,7 +126,7 @@ int CMenuPcs::ChkEquipActive(int index)
 	int item = caravanWork->m_inventoryItems[itemEntries[index - 1]];
 	unsigned int active = ChkEquipPossible(item);
 
-	if (((active & 0xff) != 0) && (GetEquipType(item) != equipIndex)) {
+	if (((active & 0xff) != 0) && (equipIndex != GetEquipType(item))) {
 		active = 0;
 	}
 
@@ -270,33 +270,37 @@ int CMenuPcs::EquipOpen0()
 int CMenuPcs::EquipCtrlCur()
 {
 	bool blocked = false;
-	s16 press;
-	s16 hold;
+	int press;
+	int hold;
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 
 	int padLock = Pad.m_debugPadLock;
 	if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
 		blocked = true;
 	}
+	u16 rawPress;
 	if (blocked) {
-		press = 0;
+		rawPress = 0;
 	} else {
 		int padIndex = 0;
 		padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
-		press = Pad.GetPadInputs()[padIndex].buttonDown[0];
+		rawPress = Pad.GetPadInputs()[padIndex].buttonDown[0];
 	}
+	press = (s16)rawPress;
 
 	blocked = false;
 	if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
 		blocked = true;
 	}
+	u16 rawHold;
 	if (blocked) {
-		hold = 0;
+		rawHold = 0;
 	} else {
 		int padIndex = 0;
 		padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
-		hold = Pad.GetPadInputs()[padIndex].repeatButton;
+		rawHold = Pad.GetPadInputs()[padIndex].repeatButton;
 	}
+	hold = (s16)rawHold;
 
 	if (hold == 0) {
 		return 0;
@@ -778,50 +782,11 @@ int CMenuPcs::EquipClose()
 	int result = 0;
 	if (**(short**)&this->m_equipList == doneCount) {
 		item = GetEquipListStorage(this)->entries;
-		unsigned int n = (unsigned int)itemCount;
-		if (0 < (int)n) {
-			unsigned int blocks = n >> 3;
-			if (blocks != 0) {
-				unsigned int b;
-				for (b = 0; b < blocks; b++) {
-					item[0].startFrame = 0;
-					item[0].duration = 1;
-					item[0].alpha = fVar1;
-					item[1].startFrame = 0;
-					item[1].duration = 1;
-					item[1].alpha = fVar1;
-					item[2].startFrame = 0;
-					item[2].duration = 1;
-					item[2].alpha = fVar1;
-					item[3].startFrame = 0;
-					item[3].duration = 1;
-					item[3].alpha = fVar1;
-					item[4].startFrame = 0;
-					item[4].duration = 1;
-					item[4].alpha = fVar1;
-					item[5].startFrame = 0;
-					item[5].duration = 1;
-					item[5].alpha = fVar1;
-					item[6].startFrame = 0;
-					item[6].duration = 1;
-					item[6].alpha = fVar1;
-					item[7].startFrame = 0;
-					item[7].duration = 1;
-					item[7].alpha = fVar1;
-					item += 8;
-				}
-				n = n & 7;
-				if (n == 0) {
-					return 1;
-				}
-			}
-			do {
-				item->startFrame = 0;
-				item->duration = 1;
-				item->alpha = fVar1;
-				item++;
-				n = n - 1;
-			} while (n != 0);
+		for (int k = itemCount; k > 0; k--) {
+			item->startFrame = 0;
+			item->duration = 1;
+			item->alpha = fVar1;
+			item++;
 		}
 		result = 1;
 	}
@@ -837,7 +802,7 @@ int CMenuPcs::EquipClose()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::EquipCtrl()
+int CMenuPcs::EquipCtrl()
 {
 	GetEquipMenuState(this)->prevMode = GetEquipMenuState(this)->mode;
 	int mode = GetEquipMenuState(this)->mode;
@@ -877,6 +842,7 @@ void CMenuPcs::EquipCtrl()
 			e->duration = 3;
 		}
 	}
+	return state;
 }
 
 
@@ -902,69 +868,53 @@ int CMenuPcs::EquipOpen()
 	s16* puVar9;
 	s16 sVar10;
 	int iVar11;
-	u32 uVar12;
+	int iCount;
+	EquipOpenAnim* entry;
 	double dVar20;
 
 	if ((signed char)GetEquipMenuState(this)->initialized == 0) {
 		memset(GetEquipListStorage(this), 0, sizeof(EquipOpenAnimList));
 		fVar5 = kEquipOne;
-		EquipOpenAnim* entry = GetEquipListStorage(this)->entries;
-		iVar11 = 8;
-		do {
-			entry[0].scale = fVar5;
-			entry[1].scale = fVar5;
-			entry[2].scale = fVar5;
-			entry[3].scale = fVar5;
-			entry[4].scale = fVar5;
-			entry[5].scale = fVar5;
-			entry[6].scale = fVar5;
-			entry[7].scale = fVar5;
-			dVar4 = kEquipIntToDoubleBias;
-			dVar3 = kEquipHalfDouble;
-			dVar2 = kEquipWindowCenterX;
-			fVar1 = kEquipZero;
-			entry += 8;
-			iVar11--;
-		} while (iVar11 != 0);
+		entry = GetEquipListStorage(this)->entries;
+		for (iVar11 = 64; iVar11 != 0; iVar11--) {
+			entry->scale = fVar5;
+			entry++;
+		}
 
+		dVar4 = kEquipIntToDoubleBias;
+		dVar3 = kEquipHalfDouble;
+		dVar2 = kEquipWindowCenterX;
+		fVar1 = kEquipZero;
 		iVar6 = 0;
 		entry = GetEquipListStorage(this)->entries;
-		for (iVar11 = 0; iVar11 < 2; iVar11++) {
-			entry[0].tex = 0x34;
-			entry[0].w = 200;
-			entry[0].h = 0x28;
-			entry[0].x = (s16)(int)-((double)entry[0].w * dVar3 - dVar2);
-			entry[0].y = iVar6 * (entry[0].h - 8) + 0x60;
-			entry[0].u = fVar1;
-			entry[0].v = fVar1;
-			entry[0].startFrame = iVar6;
+		for (iVar11 = 4; iVar11 != 0; iVar11--) {
+			entry->tex = 0x34;
+			entry->w = 200;
+			entry->h = 0x28;
+			entry->x = (s16)(int)-((double)entry->w * dVar3 - dVar2);
+			entry->y = iVar6 * (entry->h - 8) + 0x60;
+			entry->u = fVar1;
+			entry->v = fVar1;
+			entry->startFrame = iVar6;
 			iVar6++;
-			entry[0].duration = 3;
-
-			entry[1].tex = 0x34;
-			entry[1].w = 200;
-			entry[1].h = 0x28;
-			entry[1].x = (s16)(int)-((double)entry[1].w * dVar3 - dVar2);
-			entry[1].y = iVar6 * (entry[1].h - 8) + 0x60;
-			entry[1].u = fVar1;
-			entry[1].v = fVar1;
-			entry[1].startFrame = iVar6;
-			iVar6++;
-			entry[1].duration = 3;
-			entry += 2;
+			entry->duration = 3;
+			entry++;
 		}
 
 		GetEquipListStorage(this)->count = 4;
 		EquipInit1();
 		puVar9 = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 		sVar10 = 0;
-		for (iVar6 = 0; iVar6 < 0x40; iVar6++) {
+		iVar6 = 0;
+		int letterMax = 0x40;
+		while (iVar6 < letterMax) {
 			iVar11 = GetItemType(iVar6, 0);
 			if (iVar11 == 1) {
 				puVar9++;
 				*puVar9 = (s16)iVar6;
 				sVar10++;
 			}
+			iVar6++;
 		}
 
 		psVar7 = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
@@ -975,12 +925,12 @@ int CMenuPcs::EquipOpen()
 
 	iVar6 = 0;
 	GetEquipMenuState(this)->frame = GetEquipMenuState(this)->frame + 1;
-	uVar8 = (u32)GetEquipListStorage(this)->count;
-	EquipOpenAnim* entry = GetEquipListStorage(this)->entries;
-	iVar11 = static_cast<int>(GetEquipMenuState(this)->frame);
-	for (int i = 0; i < (int)uVar8; i++) {
-		if (entry->startFrame <= iVar11) {
-			if (entry->startFrame + entry->duration <= iVar11) {
+	iCount = GetEquipListStorage(this)->count;
+	entry = GetEquipListStorage(this)->entries;
+	int frameNow = static_cast<int>(GetEquipMenuState(this)->frame);
+	for (int i = 0; i < iCount; i++) {
+		if (entry->startFrame <= frameNow) {
+			if (entry->startFrame + entry->duration <= frameNow) {
 				iVar6++;
 				entry->alpha = kEquipOne;
 			} else {
@@ -996,50 +946,11 @@ int CMenuPcs::EquipOpen()
 	int result = 0;
 	if (GetEquipListStorage(this)->count == iVar6) {
 		entry = GetEquipListStorage(this)->entries;
-		if (0 < (int)uVar8) {
-			uVar12 = uVar8 >> 3;
-			if (uVar12 != 0) {
-				do {
-					entry[0].startFrame = 0;
-					entry[0].duration = 1;
-					entry[0].alpha = fVar5;
-					entry[1].startFrame = 0;
-					entry[1].duration = 1;
-					entry[1].alpha = fVar5;
-					entry[2].startFrame = 0;
-					entry[2].duration = 1;
-					entry[2].alpha = fVar5;
-					entry[3].startFrame = 0;
-					entry[3].duration = 1;
-					entry[3].alpha = fVar5;
-					entry[4].startFrame = 0;
-					entry[4].duration = 1;
-					entry[4].alpha = fVar5;
-					entry[5].startFrame = 0;
-					entry[5].duration = 1;
-					entry[5].alpha = fVar5;
-					entry[6].startFrame = 0;
-					entry[6].duration = 1;
-					entry[6].alpha = fVar5;
-					entry[7].startFrame = 0;
-					entry[7].duration = 1;
-					entry[7].alpha = fVar5;
-					entry += 8;
-					uVar12--;
-				} while (uVar12 != 0);
-				uVar8 &= 7;
-				if (uVar8 == 0) {
-					return 1;
-				}
-			}
-
-			do {
-				entry->startFrame = 0;
-				entry->duration = 1;
-				entry->alpha = fVar5;
-				entry++;
-				uVar8--;
-			} while (uVar8 != 0);
+		for (iVar11 = iCount; iVar11 > 0; iVar11--) {
+			entry->startFrame = 0;
+			entry->duration = 1;
+			entry->alpha = fVar5;
+			entry++;
 		}
 		result = 1;
 	}
@@ -1057,7 +968,6 @@ int CMenuPcs::EquipOpen()
  */
 void CMenuPcs::EquipInit1()
 {
-	int yOff = 0;
 	int i = (int)GetEquipListStorage(this)->count;
 
 	EquipOpenAnim* e = &GetEquipListStorage(this)->entries[i++];
@@ -1108,6 +1018,7 @@ void CMenuPcs::EquipInit1()
 	e->startFrame = 0;
 	e->duration = 5;
 
+	int yOff = 0;
 	EquipOpenAnim* anchor = &GetEquipListStorage(this)->entries[GetEquipListStorage(this)->count];
 	for (int n = 0; n < 8; n++) {
 		e = &GetEquipListStorage(this)->entries[i];
@@ -1129,7 +1040,7 @@ void CMenuPcs::EquipInit1()
 	float fVar2 = kEquipZero;
 	int n = (int)GetEquipListStorage(this)->listEnd - (int)GetEquipListStorage(this)->count;
 	EquipOpenAnim* psVar10 = &GetEquipListStorage(this)->entries[GetEquipListStorage(this)->count];
-	for (int k = 0; k < n; k++) {
+	for (int k = n; k > 0; k--) {
 		psVar10->step = 0;
 		psVar10->alpha = fVar2;
 		psVar10++;

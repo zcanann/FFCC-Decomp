@@ -201,27 +201,12 @@ void CFlatRuntime::clear()
 	m_objectPoolBase = self + 0x1288;
 
 	u8* node = self;
-	int idx = 0;
-	for (int block = 0; block < 0x30; block++) {
+	for (int idx = 0; idx < 0x90; idx++) {
 		*reinterpret_cast<void**>(node + 0x998) =
 		    (idx == 0) ? (self + 0x988) : (self + ((idx - 1) * 0x10) + 0x998);
 		*reinterpret_cast<void**>(node + 0x99C) =
 		    (idx == 0x8F) ? (self + 0x988) : (self + ((idx + 1) * 0x10) + 0x998);
-		idx++;
-
-		*reinterpret_cast<void**>(node + 0x9A8) =
-		    (idx == 0) ? (self + 0x988) : (self + ((idx - 1) * 0x10) + 0x998);
-		*reinterpret_cast<void**>(node + 0x9AC) =
-		    (idx == 0x8F) ? (self + 0x988) : (self + ((idx + 1) * 0x10) + 0x998);
-		idx++;
-
-		*reinterpret_cast<void**>(node + 0x9B8) =
-		    (idx == 0) ? (self + 0x988) : (self + ((idx - 1) * 0x10) + 0x998);
-		*reinterpret_cast<void**>(node + 0x9BC) =
-		    (idx == 0x8F) ? (self + 0x988) : (self + ((idx + 1) * 0x10) + 0x998);
-		idx++;
-
-		node += 0x30;
+		node += 0x10;
 	}
 
 	memset(&m_performanceTotalTime, 0, sizeof(m_performanceTotalTime) + sizeof(m_performanceBlock));

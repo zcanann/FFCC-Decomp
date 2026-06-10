@@ -2277,7 +2277,7 @@ void CGPartyObj::statCharge()
 		if (m_subFrame == 5 && m_comboItemState >= 0) {
 			endPSlotBit(0x20);
 			CFlat.ResetParticleWork(
-			    (m_comboItemState + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 5 + 0x1C) | 0x400,
+			    ((m_comboItemState + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 5) + 0x1C) | 0x400,
 			    m_particleSlots[5]);
 			CFlat.SetParticleWorkBind(reinterpret_cast<CFlatRuntime::CObject*>(this));
 			CFlat.PutParticleWork();
@@ -2290,8 +2290,8 @@ void CGPartyObj::statCharge()
 		} else {
 			phase = m_subFrame;
 		}
-		int itemType =
-		    *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 10) & 0xFF;
+		SCfdItemRow* cfdRows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
+		int itemType = cfdRows[m_itemId].m_fieldA & 0xFF;
 
 		if (phase == 0) {
 			if (m_comboLinkCount != 0) {
@@ -2322,14 +2322,15 @@ void CGPartyObj::statCharge()
 			}
 		}
 
-		if (phase == *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 0x20)) {
+		SCfdItemRow* phaseRows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
+		if (phase == phaseRows[m_itemId].m_field20) {
 			putParticleFromItem(m_itemId, 3, m_particleSlots[0], static_cast<Vec*>(0));
 		}
 
 		int entry = (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
 		             *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2) * 0x1CA;
-		int row = (static_cast<int>(*reinterpret_cast<unsigned short*>(
-		               Game.unkCFlatData0[2] + m_itemId * 0x48 + 10)) >> 8) * 0x42;
+		SCfdItemRow* rowRows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
+		int row = (static_cast<int>(rowRows[m_itemId].m_fieldA) >> 8) * 0x42;
 		unsigned short* table =
 		    reinterpret_cast<unsigned short*>(Game.unk_flat3_field_30_0xc7e0 + entry + row + 0x36);
 
@@ -2342,7 +2343,8 @@ void CGPartyObj::statCharge()
 					PSVECSubtract(&m_comboCenter, &m_worldPosition, &delta);
 					float mag = PSVECMag(&delta);
 					CVector dest(m_comboCenter);
-					if ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 0x32) & 0x10) != 0) {
+					SCfdItemRow* flagRows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
+					if ((flagRows[m_itemId].m_field32 & 0x10) != 0) {
 						unsigned int maxReach = *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x70);
 						if (static_cast<float>(maxReach) < mag) {
 							const CVector& dir = CVector(delta);

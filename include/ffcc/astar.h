@@ -29,10 +29,7 @@ public:
 	class CATemp
 	{
 	public:
-		CATemp()
-		{
-			memset(this, 0, sizeof(*this));
-		}
+		CATemp() {}
 		CATemp(const CATemp&);
 
 		void operator=(const CATemp& other);
@@ -45,6 +42,7 @@ public:
 	
 	CAStar()
 	{
+		memset(&m_bestPath, 0, sizeof(m_bestPath));
 		reset();
 	}
 	~CAStar();

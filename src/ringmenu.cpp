@@ -340,6 +340,16 @@ void CRingMenu::onScriptChanging(char*)
  */
 void CRingMenu::drawGBA()
 {
+	float sinA;
+	float sinB;
+	float angle;
+	float gbaAnim;
+	float showScale;
+	float posX;
+	float posY;
+	float sizePulse;
+	float cycle;
+
 	if (!((Game.m_gameWork.m_menuStageMode == 0) || (m_menuIndex < 1))) {
 		return;
 	}
@@ -349,7 +359,7 @@ void CRingMenu::drawGBA()
 		return;
 	}
 
-	float showScale = static_cast<float>(m_displayCounter) * kRingMenuAnimStep;
+	showScale = static_cast<float>(m_displayCounter) * kRingMenuAnimStep;
 	if (m_displayDirection != 0) {
 		showScale = kRingMenuOne - showScale;
 	}
@@ -359,39 +369,39 @@ void CRingMenu::drawGBA()
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x16));
 
-	float gbaAnim = static_cast<float>(
+	float gbaAnimRaw = static_cast<float>(
 	    sin(static_cast<double>((kRingMenuHalfPi * static_cast<float>(m_gbaAnimCounter)) / kRingMenuWobbleDivisor)));
+	gbaAnim = gbaAnimRaw;
 	if (m_gbaConnectedFlag == 1) {
-		gbaAnim = kRingMenuOne - gbaAnim;
+		gbaAnim = kRingMenuOne - gbaAnimRaw;
 	}
 
 	int posXInt = 0x30;
 	if ((m_menuIndex & 1) != 0) {
 		posXInt = 0x250;
 	}
-	float posX = static_cast<float>(posXInt);
+	posX = static_cast<float>(posXInt);
 
 	int posYInt = 0x30;
 	if ((m_menuIndex & 2) != 0) {
 		posYInt = 400;
 	}
-	float posY = static_cast<float>(posYInt);
+	posY = static_cast<float>(posYInt);
 
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	const float sizePulse = kRingMenuPulseScale * (kRingMenuOne - gbaAnim) + kRingMenuOne;
+	sizePulse = kRingMenuPulseScale * (kRingMenuOne - gbaAnim) + kRingMenuOne;
 	float cycleRaw = static_cast<float>(fmod(static_cast<double>(kRingMenuCycleStep * static_cast<float>(m_commonFrameCounter)),
 	                                         kRingMenuCycleWrapD));
-	float cycle;
 	if (cycleRaw > kRingMenuOne) {
 		cycle = kRingMenuTwo - cycleRaw;
 	} else {
 		cycle = cycleRaw;
 	}
 
-	const float angle = kRingMenuPi * cycle;
-	const float sinA = static_cast<float>(sin(static_cast<double>(angle)));
-	const float sinB = static_cast<float>(sin(static_cast<double>(kRingMenuNegHalfPi + angle)));
+	angle = kRingMenuPi * cycle;
+	sinA = static_cast<float>(sin(static_cast<double>(angle)));
+	sinB = static_cast<float>(sin(static_cast<double>(kRingMenuNegHalfPi + angle)));
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 

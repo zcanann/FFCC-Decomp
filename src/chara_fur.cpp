@@ -1306,7 +1306,6 @@ int CChara::CModel::PickFur(
 
 	CMaterialSet* materialSet = ModelMaterialSet(this);
 	FurMeshRaw* mesh = ModelMeshes(this);
-	CChara::CNode* nodes = ModelNodes(this);
 	const unsigned short meshCount = ModelMeshCount(this);
 
 	FurProjectedVertex verts[3];
@@ -1325,7 +1324,7 @@ int CChara::CModel::PickFur(
 		if (mesh->m_data->m_skinCount != 0) {
 			PSMTXCopy(ModelWorldDrawMtx(this), meshMtx);
 		} else {
-			PSMTXConcat(ModelWorldDrawMtx(this), nodes[mesh->m_data->m_nodeIndex].m_mtx, meshMtx);
+			PSMTXConcat(ModelWorldDrawMtx(this), ModelNodes(this)[mesh->m_data->m_nodeIndex].m_mtx, meshMtx);
 		}
 
 		Mtx modelViewMtx;
@@ -1720,7 +1719,6 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	int prevExtraTexture = -1;
 	int prevExtraTextureFormat = -1;
 
-	CChara::CNode* nodes = ModelNodes(this);
 	FurMeshRaw* mesh = ModelMeshes(this);
 
 	for (unsigned int meshIndex = 0; meshIndex < ModelMeshCount(this); meshIndex++, mesh++) {
@@ -1735,7 +1733,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 		if (mesh->m_data->m_skinCount != 0) {
 			PSMTXCopy(ModelWorldDrawMtx(this), meshMtx);
 		} else {
-			PSMTXConcat(ModelWorldDrawMtx(this), nodes[mesh->m_data->m_nodeIndex].m_mtx, meshMtx);
+			PSMTXConcat(ModelWorldDrawMtx(this), ModelNodes(this)[mesh->m_data->m_nodeIndex].m_mtx, meshMtx);
 		}
 
 		int shadowCount = 0;

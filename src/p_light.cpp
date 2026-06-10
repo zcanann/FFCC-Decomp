@@ -226,33 +226,8 @@ void CLightPcs::create()
  */
 void CLightPcs::destroy()
 {
-    u32 i = 0;
-    do {
-        if (m_bumpLights[i + 8].m_textureData != 0) {
-            bool hasTexture = m_bumpLights[i + 8].m_textureData != 0;
-            if (hasTexture) {
-                Memory.Free(m_bumpLights[i + 8].m_textureData);
-                m_bumpLights[i + 8].m_textureData = 0;
-            }
-            m_bumpLights[i + 8].m_hasTexture = 0;
-            m_bumpLights[i + 8].m_useViewSpace = 0;
-        }
-        i++;
-    } while (i < 8);
-
-    i = 0;
-    do {
-        if (m_bumpLights[i].m_textureData != 0) {
-            bool hasTexture = m_bumpLights[i].m_textureData != 0;
-            if (hasTexture) {
-                Memory.Free(m_bumpLights[i].m_textureData);
-                m_bumpLights[i].m_textureData = 0;
-            }
-            m_bumpLights[i].m_hasTexture = 0;
-            m_bumpLights[i].m_useViewSpace = 0;
-        }
-        i++;
-    } while (i < 8);
+    DestroyBumpLightAll(static_cast<TARGET>(1));
+    DestroyBumpLightAll(static_cast<TARGET>(0));
 }
 
 /*

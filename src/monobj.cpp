@@ -267,7 +267,7 @@ void CGMonObj::undeadOff()
 
 	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x1000);
 
-	short count = (weaponMode != 0) ?
+	int count = (weaponMode != 0) ?
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AC) :
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AE);
 	int particleBase = (weaponMode != 0) ? 0x46 : 0x3C;
@@ -306,12 +306,12 @@ void CGMonObj::undeadOn()
 
 	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x1000);
 
-	short count = (weaponMode != 0) ?
+	int count = (weaponMode != 0) ?
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AC) :
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AE);
 	int particleBase = (weaponMode != 0) ? 0x46 : 0x3C;
 
-	for (int i = 0; i < static_cast<int>(count); i++) {
+	for (int i = 0; i < static_cast<int>(static_cast<unsigned short>(count)); i++) {
 		int dataNo = object->m_charaModelHandle->GetPdtSlot();
 		reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace((particleBase + i) | (dataNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x594), object, kMonObjDefaultScale, 0);
 	}
@@ -2765,7 +2765,7 @@ void CGMonObj::setIceJEffect(int enabled)
 
 	if (enabled != 0) {
 		unsigned short count = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AA);
-		for (int i = 0; i < static_cast<int>(count); i++) {
+		for (int i = 0; i < static_cast<int>(static_cast<unsigned short>(count)); i++) {
 			int dataNo = object->m_charaModelHandle->GetPdtSlot();
 			reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace((i + 0x5A) | (dataNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x5A8), object, kMonObjDefaultScale, 0);
 		}
@@ -4362,7 +4362,7 @@ void CGMonObj::onChangePrg(int value)
 		}
 
 		if (isNormal != 0) {
-			for (int i = 0; i < static_cast<int>(count); i++) {
+			for (int i = 0; i < static_cast<int>(static_cast<unsigned short>(count)); i++) {
 				int dataNo = object->m_charaModelHandle->GetPdtSlot();
 				reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace(
 					(particleBase + i) | (dataNo << 8),

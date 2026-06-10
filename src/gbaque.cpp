@@ -945,13 +945,13 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(*scriptFoodBase);
 	unsigned char* valueBytes = reinterpret_cast<unsigned char*>(&value);
 	const unsigned int itemSlot = valueBytes[2];
-	const unsigned char recipeIndex = valueBytes[3];
-	const short baseItem = caravanWork->m_inventoryItems[itemSlot];
+	const int recipeIndex = valueBytes[3];
+	const int baseItem = caravanWork->m_inventoryItems[itemSlot];
 
 	caravanWork->DeleteItemIdx(itemSlot, 1);
 
-	const unsigned int itemTableBase = Game.unkCFlatData0[2] + static_cast<int>(baseItem) * 0x48;
-	const short smithItem = *reinterpret_cast<unsigned short*>(itemTableBase + recipeIndex * 2 + 0x38);
+	const unsigned int itemTableBase = Game.unkCFlatData0[2] + baseItem * 0x48;
+	const int smithItem = *reinterpret_cast<unsigned short*>(itemTableBase + recipeIndex * 2 + 0x38);
 
 	unsigned int materialTable = itemTableBase;
 	for (int i = 0; i < 3; i++, materialTable += 2) {
@@ -966,45 +966,43 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
 		}
 
 		for (int materialIdx = 0; materialIdx < static_cast<int>(materialCount); materialIdx++) {
-			int byteOffset = 0;
 			int foundSlot = 0;
 			int groups;
 
 			for (groups = 0; groups < 8; groups++) {
 				char* invBase = static_cast<char*>(reinterpret_cast<void*>(*scriptFoodBase));
-				if (static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xB6)) == materialId) {
+				if (static_cast<int>(*reinterpret_cast<short*>(invBase + foundSlot * 2 + 0xB6)) == materialId) {
 					break;
 				}
 				foundSlot++;
-				if (static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xB8)) == materialId) {
+				if (static_cast<int>(*reinterpret_cast<short*>(invBase + foundSlot * 2 + 0xB6)) == materialId) {
 					break;
 				}
 				foundSlot++;
-				if (static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xBA)) == materialId) {
+				if (static_cast<int>(*reinterpret_cast<short*>(invBase + foundSlot * 2 + 0xB6)) == materialId) {
 					break;
 				}
 				foundSlot++;
-				if (static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xBC)) == materialId) {
+				if (static_cast<int>(*reinterpret_cast<short*>(invBase + foundSlot * 2 + 0xB6)) == materialId) {
 					break;
 				}
 				foundSlot++;
-				if (static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xBE)) == materialId) {
+				if (static_cast<int>(*reinterpret_cast<short*>(invBase + foundSlot * 2 + 0xB6)) == materialId) {
 					break;
 				}
 				foundSlot++;
-				if (static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xC0)) == materialId) {
+				if (static_cast<int>(*reinterpret_cast<short*>(invBase + foundSlot * 2 + 0xB6)) == materialId) {
 					break;
 				}
 				foundSlot++;
-				if (static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xC2)) == materialId) {
+				if (static_cast<int>(*reinterpret_cast<short*>(invBase + foundSlot * 2 + 0xB6)) == materialId) {
 					break;
 				}
 				foundSlot++;
-				if (static_cast<int>(*reinterpret_cast<short*>(invBase + byteOffset + 0xC4)) == materialId) {
+				if (static_cast<int>(*reinterpret_cast<short*>(invBase + foundSlot * 2 + 0xB6)) == materialId) {
 					break;
 				}
 				foundSlot++;
-				byteOffset += 0x10;
 			}
 
 			reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->DeleteItemIdx(foundSlot, 1);

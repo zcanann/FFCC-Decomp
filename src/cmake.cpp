@@ -2172,32 +2172,40 @@ void CMenuPcs::CmakeTribeClose()
  */
 int CMenuPcs::CmakeTribeCtrl()
 {
-    unsigned short down;
-    unsigned short repeat;
+    short repeat;
+    short down;
 
     bool padBusy = false;
     int padLock = Pad.m_debugPadLock;
     if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
         padBusy = true;
     }
-    if (padBusy) {
-        down = 0;
-    } else {
-        int padIndex = 0;
-        padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-        down = static_cast<short>(Pad.GetPadInputs()[padIndex].buttonDown[0]);
+    {
+        unsigned short held;
+        if (padBusy) {
+            held = 0;
+        } else {
+            int padIndex = 0;
+            padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+            held = Pad.GetPadInputs()[padIndex].buttonDown[0];
+        }
+        down = static_cast<short>(held);
     }
 
     padBusy = false;
     if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
         padBusy = true;
     }
-    if (padBusy) {
-        repeat = 0;
-    } else {
-        int padIndex = 0;
-        padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-        repeat = Pad.GetPadInputs()[padIndex].repeatButton;
+    {
+        unsigned short held;
+        if (padBusy) {
+            held = 0;
+        } else {
+            int padIndex = 0;
+            padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+            held = Pad.GetPadInputs()[padIndex].repeatButton;
+        }
+        repeat = static_cast<short>(held);
     }
 
     if (repeat == 0) {
@@ -2211,21 +2219,22 @@ int CMenuPcs::CmakeTribeCtrl()
         }
         return 0;
     } else {
+        int tribeCount = 4;
         int fieldSelect = CmakeState(this)->m_fieldSelect;
 
         if ((repeat & 0x8) != 0) {
             short* values = &CmakeState(this)->m_select;
             int idx = fieldSelect;
-            if (values[idx] != 0) {
+            if (static_cast<int>(values[idx]) != 0) {
                 values[idx] = static_cast<short>(values[idx] - 1);
             } else {
-                values[idx] = 3;
+                values[idx] = static_cast<short>(tribeCount - 1);
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else if ((repeat & 0x4) != 0) {
             short* values = &CmakeState(this)->m_select;
             int idx = fieldSelect;
-            if (values[idx] < 3) {
+            if (values[idx] < tribeCount - 1) {
                 values[idx] = static_cast<short>(values[idx] + 1);
             } else {
                 values[idx] = 0;

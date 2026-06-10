@@ -3630,7 +3630,7 @@ void CMenuPcs::DrawCmakeTitle(int page, float x, float alpha)
     float offs = static_cast<float>(offsU);
     MenuPcs.DrawRect(
         0, 278.0f, offs, 248.0f, 40.0f,
-        0.0f, 264.0f, 1.0f, alpha, 0.0f);
+        0.0f, 264.0f, 1.0f, x, 0.0f);
 
     if (x < 1.0) {
         return;

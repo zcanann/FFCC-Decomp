@@ -44,6 +44,26 @@ static inline float LoadFloat(const float& value) {
     return value;
 }
 
+
+extern const float kGraphicZeroF = 0.0f;
+extern const float kGraphicOneF = 1.0f;
+extern const float FLOAT_8032F6C8 = 640.0f;
+extern const float FLOAT_8032F6CC = 448.0f;
+extern const float kGraphicSphereNegativeX = -1.0f;
+extern const double kGraphicHalfF64 = 4503599627370496.0;
+extern const float kGraphicSpherePi = 3.1415927410125732f;
+extern const double DOUBLE_8032F6E8 = 4503601774854144.0;
+extern const float kGraphicSmallBackTextureWidth = 320.0f;
+extern const float kGraphicSmallBackTextureHeight = 224.0f;
+extern const float FLOAT_8032F6F8 = 16777215.0f;
+extern const float FLOAT_8032F6FC = 0.7f;
+extern const float kGraphicSphereRingDivisor = 6.0f;
+extern const float kGraphicSphereSegmentAngle = 0.7853981852531433f;
+extern const float kGraphicBlurAlphaScale = -100.0f;
+extern const float kGraphicNoiseTexScaleU = 0.015625f;
+extern const float kGraphicNoiseTexScaleV = 0.010416667163372f;
+extern const char sGraphicUnknownOrderName[4] = "---";
+
 static inline float CameraNearZ()
 {
     return CameraPcs.m_nearZ;
@@ -366,8 +386,8 @@ void CGraphic::SetStdPixelFmt()
  */
 void CGraphic::SetViewport()
 {
-    GXSetViewport(0.0f, 0.0f, static_cast<f32>(m_renderMode->fbWidth), static_cast<f32>(m_renderMode->efbHeight),
-                  0.0f, 1.0f);
+    GXSetViewport(kGraphicZeroF, kGraphicZeroF, static_cast<f32>(m_renderMode->fbWidth), static_cast<f32>(m_renderMode->efbHeight),
+                  kGraphicZeroF, kGraphicOneF);
     GXSetScissor(0, 0, m_renderMode->fbWidth, m_renderMode->efbHeight);
 }
 
@@ -1633,7 +1653,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		GXProject(cameraPos.x + scaledDir.x, targetPos.y, cameraPos.z + scaledDir.z, cameraMtx, gxProjection,
 		          gxViewport, &projX, &projY, &projZ);
 
-		depthAlphaNear = static_cast<unsigned int>(projZ * 16777215.0f) >> 16;
+		depthAlphaNear = static_cast<unsigned int>(projZ * FLOAT_8032F6F8) >> 16;
 		if (depthAlphaNear >= 0xFF) {
 			depthAlphaNear = 0xFF;
 		}
@@ -1648,7 +1668,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		GXProject(targetPos.x + scaledDir.x, targetPos.y, targetPos.z + scaledDir.z, cameraMtx, gxProjection,
 		          gxViewport, &projX, &projY, &projZ);
 
-		depthAlphaFar = static_cast<unsigned int>(projZ * 16777215.0f) >> 16;
+		depthAlphaFar = static_cast<unsigned int>(projZ * FLOAT_8032F6F8) >> 16;
 		if (depthAlphaFar == 0) {
 			depthAlphaFar = 0xFF;
 		}
@@ -1674,7 +1694,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 	gUtil.SetOrthoEnv();
 
 	xOffset = (float)blurWidth;
-	yOffset = xOffset * 0.35f;
+	yOffset = xOffset * FLOAT_8032F6FC;
 
 	for (int pass = 0; pass < 2; pass++) {
 		int kColorSel = 0x0C;
@@ -1733,44 +1753,44 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		GXSetNumTevStages(2);
 		GXSetNumTexGens(2);
 
-		quadMin.x = 0.0f;
-		quadMin.y = 0.0f;
-		quadMin.z = 0.0f;
-		quadMax.x = 640.0f;
-		quadMax.y = 224.0f;
-		quadMax.z = 0.0f;
+		quadMin.x = kGraphicZeroF;
+		quadMin.y = kGraphicZeroF;
+		quadMin.z = kGraphicZeroF;
+		quadMax.x = FLOAT_8032F6C8;
+		quadMax.y = FLOAT_8032F6CC;
+		quadMax.z = kGraphicZeroF;
 		gUtil.RenderQuadTex2(quadMin, quadMax, dofColor, 0, 0);
 
 		quadMin.x = -xOffset;
-		quadMin.y = 0.0f;
-		quadMin.z = 0.0f;
-		quadMax.x = 640.0f - xOffset;
-		quadMax.y = 224.0f;
-		quadMax.z = 0.0f;
+		quadMin.y = kGraphicZeroF;
+		quadMin.z = kGraphicZeroF;
+		quadMax.x = FLOAT_8032F6C8 - xOffset;
+		quadMax.y = FLOAT_8032F6CC;
+		quadMax.z = kGraphicZeroF;
 		gUtil.RenderQuadTex2(quadMin, quadMax, dofColor, 0, 0);
 
 		quadMin.x = xOffset;
-		quadMin.y = 0.0f;
-		quadMin.z = 0.0f;
-		quadMax.x = 640.0f + xOffset;
-		quadMax.y = 224.0f;
-		quadMax.z = 0.0f;
+		quadMin.y = kGraphicZeroF;
+		quadMin.z = kGraphicZeroF;
+		quadMax.x = FLOAT_8032F6C8 + xOffset;
+		quadMax.y = FLOAT_8032F6CC;
+		quadMax.z = kGraphicZeroF;
 		gUtil.RenderQuadTex2(quadMin, quadMax, dofColor, 0, 0);
 
-		quadMin.x = 0.0f;
+		quadMin.x = kGraphicZeroF;
 		quadMin.y = -yOffset;
-		quadMin.z = 0.0f;
-		quadMax.x = 640.0f;
-		quadMax.y = 224.0f - yOffset;
-		quadMax.z = 0.0f;
+		quadMin.z = kGraphicZeroF;
+		quadMax.x = FLOAT_8032F6C8;
+		quadMax.y = FLOAT_8032F6CC - yOffset;
+		quadMax.z = kGraphicZeroF;
 		gUtil.RenderQuadTex2(quadMin, quadMax, dofColor, 0, 0);
 
-		quadMin.x = 0.0f;
+		quadMin.x = kGraphicZeroF;
 		quadMin.y = yOffset;
-		quadMin.z = 0.0f;
-		quadMax.x = 640.0f;
-		quadMax.y = 224.0f + yOffset;
-		quadMax.z = 0.0f;
+		quadMin.z = kGraphicZeroF;
+		quadMax.x = FLOAT_8032F6C8;
+		quadMax.y = FLOAT_8032F6CC + yOffset;
+		quadMax.z = kGraphicZeroF;
 		gUtil.RenderQuadTex2(quadMin, quadMax, dofColor, 0, 0);
 	}
 }
@@ -1825,53 +1845,53 @@ void CGraphic::CreateSmallBackTexture(void* src, _GXTexObj* texObj, long width, 
     white.a = 0xFF;
 
     GetBackBufferRect2(m_scratchTextureBuffer, &tempTex, 0, 0, 0x140, 0xE0, 0x46000, filter, GX_TF_RGBA8, 0);
-    quadMin.x = 0.0f;
-    quadMin.y = 0.0f;
-    quadMin.z = 0.0f;
+    quadMin.x = kGraphicZeroF;
+    quadMin.y = kGraphicZeroF;
+    quadMin.z = kGraphicZeroF;
     quadMax.x = static_cast<float>(halfWidth);
     quadMax.y = static_cast<float>(halfHeight);
-    quadMax.z = 0.0f;
+    quadMax.z = kGraphicZeroF;
     GXLoadTexObj(&tempTex, GX_TEXMAP0);
     gUtil.RenderQuad(quadMin, quadMax, white, 0, 0);
 
     GetBackBufferRect2(m_scratchTextureBuffer, texObj, 0x140, 0, 0x140, 0xE0, 0, filter, format, 0);
     quadMin.x = static_cast<float>(halfWidth);
-    quadMin.y = 0.0f;
-    quadMin.z = 0.0f;
+    quadMin.y = kGraphicZeroF;
+    quadMin.z = kGraphicZeroF;
     quadMax.x = static_cast<float>(width);
     quadMax.y = static_cast<float>(halfHeight);
-    quadMax.z = 0.0f;
+    quadMax.z = kGraphicZeroF;
     GXLoadTexObj(texObj, GX_TEXMAP0);
     gUtil.RenderQuad(quadMin, quadMax, white, 0, 0);
 
     GetBackBufferRect2(m_scratchTextureBuffer, texObj, 0, 0xE0, 0x140, 0xE0, 0, filter, format, 0);
-    quadMin.x = 0.0f;
+    quadMin.x = kGraphicZeroF;
     quadMin.y = static_cast<float>(halfHeight);
-    quadMin.z = 0.0f;
+    quadMin.z = kGraphicZeroF;
     quadMax.x = static_cast<float>(halfWidth);
     quadMax.y = static_cast<float>(height);
-    quadMax.z = 0.0f;
+    quadMax.z = kGraphicZeroF;
     GXLoadTexObj(texObj, GX_TEXMAP0);
     gUtil.RenderQuad(quadMin, quadMax, white, 0, 0);
 
     GetBackBufferRect2(m_scratchTextureBuffer, texObj, 0x140, 0xE0, 0x140, 0xE0, 0, filter, format, 0);
     quadMin.x = static_cast<float>(halfWidth);
     quadMin.y = static_cast<float>(halfHeight);
-    quadMin.z = 0.0f;
+    quadMin.z = kGraphicZeroF;
     quadMax.x = static_cast<float>(width);
     quadMax.y = static_cast<float>(height);
-    quadMax.z = 0.0f;
+    quadMax.z = kGraphicZeroF;
     GXLoadTexObj(texObj, GX_TEXMAP0);
     gUtil.RenderQuad(quadMin, quadMax, white, 0, 0);
 
     GetBackBufferRect2(src, texObj, 0, 0, static_cast<int>(width), static_cast<int>(height), textureSize, filter, format, 0);
     GXLoadTexObj(&tempTex, GX_TEXMAP0);
-    quadMin.x = 0.0f;
-    quadMin.y = 0.0f;
-    quadMin.z = 0.0f;
+    quadMin.x = kGraphicZeroF;
+    quadMin.y = kGraphicZeroF;
+    quadMin.z = kGraphicZeroF;
     quadMax.x = kGraphicSmallBackTextureWidth;
     quadMax.y = kGraphicSmallBackTextureHeight;
-    quadMax.z = 0.0f;
+    quadMax.z = kGraphicZeroF;
     gUtil.RenderQuad(quadMin, quadMax, white, 0, 0);
 
     PSMTXCopy(CameraMatrix(), cameraMtx);
@@ -1953,24 +1973,24 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
         int negativeBlurOffset = -blurOffsetInt;
         u8* textureBase = reinterpret_cast<u8*>(m_savedFrameBuffer) + textureOffset;
         GXInitTexObj(&texObj, textureBase, 0x140, 0xE0, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
-        GXInitTexObjLOD(&texObj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+        GXInitTexObjLOD(&texObj, GX_LINEAR, GX_LINEAR, kGraphicZeroF, kGraphicZeroF, kGraphicZeroF, GX_FALSE, GX_FALSE, GX_ANISO_1);
         GXLoadTexObj(&texObj, GX_TEXMAP0);
 
         if (mode == 1) {
-            quadMin.x = 0.0f;
-            quadMin.y = 0.0f;
-            quadMin.z = 0.0f;
-            quadMax.x = 640.0f;
-            quadMax.y = 448.0f;
-            quadMax.z = 0.0f;
+            quadMin.x = kGraphicZeroF;
+            quadMin.y = kGraphicZeroF;
+            quadMin.z = kGraphicZeroF;
+            quadMax.x = FLOAT_8032F6C8;
+            quadMax.y = FLOAT_8032F6CC;
+            quadMax.z = kGraphicZeroF;
             gUtil.RenderQuad(quadMin, quadMax, blurColor, 0, 0);
         } else if (mode == 0) {
             quadMin.x = static_cast<float>(negativeBlurOffset);
             quadMin.y = static_cast<float>(negativeBlurOffset);
-            quadMin.z = 0.0f;
+            quadMin.z = kGraphicZeroF;
             quadMax.x = static_cast<float>(640 - negativeBlurOffset);
             quadMax.y = static_cast<float>(448 - negativeBlurOffset);
-            quadMax.z = 0.0f;
+            quadMax.z = kGraphicZeroF;
             gUtil.RenderQuad(quadMin, quadMax, blurColor, 0, 0);
         }
         textureOffset += 0x46000;

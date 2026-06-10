@@ -231,6 +231,17 @@ static inline float ClampFloat(float value, float minValue, float maxValue)
     return value;
 }
 
+static inline double ClampDouble(double value, double minValue, double maxValue)
+{
+    if (value < minValue) {
+        return minValue;
+    }
+    if (maxValue < value) {
+        return maxValue;
+    }
+    return value;
+}
+
 extern "C" const float sAnimFrameOffset;
 extern "C" const float sZeroFloat;
 
@@ -1477,12 +1488,7 @@ void CGObject::update()
     float turnFactor;
     if (m_animSlotSel != -1 && m_shieldNodeFlagBits.m_bit40) {
         const double turnLimit = fabs(m_turnBaseSpeed);
-        double clampedTurn = -turnLimit;
-        if (turnDelta < clampedTurn) {
-        } else {
-            clampedTurn = turnLimit < turnDelta ? turnLimit : turnDelta;
-        }
-        turnDelta = clampedTurn;
+        turnDelta = ClampDouble(turnDelta, -turnLimit, turnLimit);
         turnFactor = sAnimFrameOffset;
     } else {
         turnFactor = m_hitNormal.x;

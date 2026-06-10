@@ -1593,6 +1593,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 	_GXTexObj smallBackTex;
 	_GXTexObj backBufferTex;
 	_GXColor dofColor;
+	_GXColor chanColor;
 	Vec cameraPos;
 	Vec cameraToTarget;
 	Vec scaledDir;
@@ -1607,8 +1608,8 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 	unsigned int texBufferSize;
 	unsigned int depthAlphaNear;
 	unsigned int depthAlphaFar;
-	signed char nearAlpha;
-	unsigned char farAlpha;
+	int nearAlpha;
+	int farAlpha;
 	float xOffset;
 	float yOffset;
 	int hasNearAlpha;
@@ -1657,7 +1658,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		if (depthAlphaNear >= 0xFF) {
 			depthAlphaNear = 0xFF;
 		}
-		nearAlpha = (signed char)depthAlphaNear;
+		nearAlpha = depthAlphaNear;
 		hasNearAlpha = 1;
 	}
 
@@ -1675,7 +1676,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		if (depthAlphaFar >= 0xFF) {
 			depthAlphaFar = 0xFF;
 		}
-		farAlpha = (signed char)depthAlphaFar;
+		farAlpha = depthAlphaFar;
 		hasFarAlpha = 1;
 	}
 
@@ -1699,7 +1700,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 	for (int pass = 0; pass < 2; pass++) {
 		int kColorSel = 0x0C;
 		int kAlphaSel = 0x1C;
-		signed char passAlpha = nearAlpha;
+		int passAlpha = nearAlpha;
 
 		if ((pass == 0) && !((mode != 2) && hasNearAlpha && (mode != 1) && hasFarAlpha)) {
 			continue;
@@ -1717,9 +1718,12 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		dofColor.a = passAlpha;
 		GXSetTevKColor((GXTevKColorID)pass, dofColor);
 
-		dofColor.a = 0x80;
-		GXSetChanAmbColor(GX_COLOR0A0, dofColor);
-		GXSetChanMatColor(GX_COLOR0A0, dofColor);
+		chanColor.r = passAlpha;
+		chanColor.g = passAlpha;
+		chanColor.b = passAlpha;
+		chanColor.a = 0x80;
+		GXSetChanAmbColor(GX_COLOR0A0, chanColor);
+		GXSetChanMatColor(GX_COLOR0A0, chanColor);
 
 		_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
 

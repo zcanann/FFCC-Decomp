@@ -1438,19 +1438,17 @@ targetJoin: ;
 		if (cmdIdx == 1) {
 			const int element =
 			    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0);
-			if (element == 2) {
-				changeStat(0x14, 0, 0);
-				return;
-			}
-			if (element > 2) {
-				if (element >= 4) {
-					return;
-				}
-				changeStat(0x15, 0, 0);
-				return;
-			}
-			if (element >= 0) {
+			switch (element) {
+			case 0:
+			case 1:
 				changeStat(8, 0, 0);
+				break;
+			case 2:
+				changeStat(0x14, 0, 0);
+				break;
+			case 3:
+				changeStat(0x15, 0, 0);
+				break;
 			}
 			return;
 		}

@@ -505,7 +505,6 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         PSVECScale(hitDirection, &g_hit_hpv, hitT);
         PSVECAdd(&g_hit_cyl.m_bottom, &g_hit_hpv, &g_hit_hpv);
 
-        Vec point;
         Vec edgeStart;
         Vec edgeEnd;
         Vec edge;
@@ -521,9 +520,9 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         Vec current;
         switch (g_hit_lpface->m_projectionAxis) {
         case 0:
-            point.x = pushedHit.y;
-            point.y = pushedHit.z;
-            point.z = kMapHitZero;
+            pushedHit.x = pushedHit.y;
+            pushedHit.y = pushedHit.z;
+            pushedHit.z = kMapHitZero;
 
             for (int i = 0; i < static_cast<int>(g_hit_lpface->m_vertexCount); i++) {
                 current = m_vertices[g_hit_lpface->m_vertexIndices[i]];
@@ -535,7 +534,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
                 edgeEnd.z = kMapHitZero;
 
                 PSVECSubtract(&edgeEnd, &edgeStart, &edge);
-                PSVECSubtract(&point, &edgeEnd, &toPoint);
+                PSVECSubtract(&pushedHit, &edgeEnd, &toPoint);
                 PSVECCrossProduct(&edge, &toPoint, &cross);
                 if (cross.z >= kMapHitZero) {
                     sideMask &= 1;
@@ -553,9 +552,8 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
             }
             break;
         case 1:
-            point.x = pushedHit.x;
-            point.y = pushedHit.z;
-            point.z = kMapHitZero;
+            pushedHit.y = pushedHit.z;
+            pushedHit.z = kMapHitZero;
 
             for (int i = 0; i < static_cast<int>(g_hit_lpface->m_vertexCount); i++) {
                 current = m_vertices[g_hit_lpface->m_vertexIndices[i]];
@@ -567,7 +565,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
                 edgeEnd.z = kMapHitZero;
 
                 PSVECSubtract(&edgeEnd, &edgeStart, &edge);
-                PSVECSubtract(&point, &edgeEnd, &toPoint);
+                PSVECSubtract(&pushedHit, &edgeEnd, &toPoint);
                 PSVECCrossProduct(&edge, &toPoint, &cross);
                 if (cross.z >= kMapHitZero) {
                     sideMask &= 1;
@@ -585,9 +583,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
             }
             break;
         case 2:
-            point.x = pushedHit.x;
-            point.y = pushedHit.y;
-            point.z = kMapHitZero;
+            pushedHit.z = kMapHitZero;
 
             for (int i = 0; i < static_cast<int>(g_hit_lpface->m_vertexCount); i++) {
                 current = m_vertices[g_hit_lpface->m_vertexIndices[i]];
@@ -599,7 +595,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
                 edgeEnd.z = kMapHitZero;
 
                 PSVECSubtract(&edgeEnd, &edgeStart, &edge);
-                PSVECSubtract(&point, &edgeEnd, &toPoint);
+                PSVECSubtract(&pushedHit, &edgeEnd, &toPoint);
                 PSVECCrossProduct(&edge, &toPoint, &cross);
                 if (cross.z >= kMapHitZero) {
                     sideMask &= 1;
@@ -660,8 +656,6 @@ edge_loop:
                     edgeT < g_hit_t_min) {
                     g_hit_t = edgeT;
                     edgeIndex = i;
-                    PSVECScale(hitDirection, &g_hit_hpv, g_hit_t);
-                    PSVECAdd(&g_hit_cyl.m_bottom, &g_hit_hpv, &g_hit_hpv);
                     goto commit;
                 }
             }

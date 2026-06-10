@@ -3741,11 +3741,9 @@ int CPartMng::pppLoadPmd(const char* baseName)
         struct PartMngModelStBlock {
             pppModelSt m_entries[0x100];
         };
-        pppModelSt* modelArray = (new (stageLoad, const_cast<char*>(s_partMng_cpp), 0xca9) PartMngModelStBlock)->m_entries;
-        if (modelArray != 0) {
-            for (int i = 0; i < 0x100; i++) {
-                modelArray[i].m_isUsed = 0;
-            }
+        pppModelSt* modelArray = reinterpret_cast<pppModelSt*>(new (stageLoad, const_cast<char*>(s_partMng_cpp), 0xca9) PartMngModelStBlock);
+        for (int i = 0; i < 0x100; i++) {
+            modelArray[i].m_isUsed = 0;
         }
         m_pppModelStArr = modelArray;
     }
@@ -3876,11 +3874,9 @@ int CPartMng::pppLoadPan(const char* baseName)
         struct PartMngShapeStBlock {
             pppShapeSt m_entries[0x100];
         };
-        pppShapeSt* shapeArray = (new (stageLoad, const_cast<char*>(s_partMng_cpp), 0xd0b) PartMngShapeStBlock)->m_entries;
-        if (shapeArray != 0) {
-            for (int i = 0; i < 0x100; i++) {
-                shapeArray[i].m_inUse = 0;
-            }
+        pppShapeSt* shapeArray = reinterpret_cast<pppShapeSt*>(new (stageLoad, const_cast<char*>(s_partMng_cpp), 0xd0b) PartMngShapeStBlock);
+        for (int i = 0; i < 0x100; i++) {
+            shapeArray[i].m_inUse = 0;
         }
         m_pppShapeStArr = shapeArray;
     }

@@ -463,7 +463,6 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, CText
 
     if (color != 0) {
         GXColor quadColor = *color;
-        u32 colorValue = *reinterpret_cast<u32*>(&quadColor);
         Vec v0 = pos1;
         Vec v1 = pos0;
         float u1;
@@ -487,33 +486,32 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, CText
         GXWGFifo.f32 = v1.x;
         GXWGFifo.f32 = v1.y;
         GXWGFifo.f32 = v1.z;
-        GXWGFifo.u32 = colorValue;
+        GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
         GXWGFifo.f32 = u1;
         GXWGFifo.f32 = v;
 
         GXWGFifo.f32 = v0.x;
         GXWGFifo.f32 = v1.y;
         GXWGFifo.f32 = v1.z;
-        GXWGFifo.u32 = colorValue;
+        GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
         GXWGFifo.f32 = u2;
         GXWGFifo.f32 = v;
 
         GXWGFifo.f32 = v0.x;
         GXWGFifo.f32 = v0.y;
         GXWGFifo.f32 = v1.z;
-        GXWGFifo.u32 = colorValue;
+        GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
         GXWGFifo.f32 = u2;
         GXWGFifo.f32 = v2;
 
         GXWGFifo.f32 = v1.x;
         GXWGFifo.f32 = v0.y;
         GXWGFifo.f32 = v1.z;
-        GXWGFifo.u32 = colorValue;
+        GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
         GXWGFifo.f32 = u1;
         GXWGFifo.f32 = v2;
     } else {
         GXColor quadColor = white;
-        u32 colorValue = *reinterpret_cast<u32*>(&quadColor);
         Vec v0 = pos1;
         Vec v1 = pos0;
         float u1;
@@ -537,28 +535,28 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, CText
         GXWGFifo.f32 = v1.x;
         GXWGFifo.f32 = v1.y;
         GXWGFifo.f32 = v1.z;
-        GXWGFifo.u32 = colorValue;
+        GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
         GXWGFifo.f32 = u1;
         GXWGFifo.f32 = v;
 
         GXWGFifo.f32 = v0.x;
         GXWGFifo.f32 = v1.y;
         GXWGFifo.f32 = v1.z;
-        GXWGFifo.u32 = colorValue;
+        GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
         GXWGFifo.f32 = u2;
         GXWGFifo.f32 = v;
 
         GXWGFifo.f32 = v0.x;
         GXWGFifo.f32 = v0.y;
         GXWGFifo.f32 = v1.z;
-        GXWGFifo.u32 = colorValue;
+        GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
         GXWGFifo.f32 = u2;
         GXWGFifo.f32 = v2;
 
         GXWGFifo.f32 = v1.x;
         GXWGFifo.f32 = v0.y;
         GXWGFifo.f32 = v1.z;
-        GXWGFifo.u32 = colorValue;
+        GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
         GXWGFifo.f32 = u1;
         GXWGFifo.f32 = v2;
     }
@@ -657,7 +655,6 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTe
 
     if (color != 0) {
         GXColor quadColor = *color;
-        u32 colorValue = *reinterpret_cast<u32*>(&quadColor);
         Vec v0 = pos1;
         Vec v1 = pos0;
         float u1;
@@ -681,33 +678,32 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTe
         GXWGFifo.f32 = v1.x;
         GXWGFifo.f32 = v1.y;
         GXWGFifo.f32 = v1.z;
-        GXWGFifo.u32 = colorValue;
+        GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
         GXWGFifo.f32 = u1;
         GXWGFifo.f32 = v;
 
         GXWGFifo.f32 = v0.x;
         GXWGFifo.f32 = v1.y;
         GXWGFifo.f32 = v1.z;
-        GXWGFifo.u32 = colorValue;
+        GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
         GXWGFifo.f32 = u2;
         GXWGFifo.f32 = v;
 
         GXWGFifo.f32 = v0.x;
         GXWGFifo.f32 = v0.y;
         GXWGFifo.f32 = v1.z;
-        GXWGFifo.u32 = colorValue;
+        GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
         GXWGFifo.f32 = u2;
         GXWGFifo.f32 = v2;
 
         GXWGFifo.f32 = v1.x;
         GXWGFifo.f32 = v0.y;
         GXWGFifo.f32 = v1.z;
-        GXWGFifo.u32 = colorValue;
+        GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
         GXWGFifo.f32 = u1;
         GXWGFifo.f32 = v2;
     } else {
         GXColor quadColor = white;
-        u32 colorValue = *reinterpret_cast<u32*>(&quadColor);
         Vec v0 = pos1;
         Vec v1 = pos0;
         float u1;
@@ -731,28 +727,28 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTe
         GXWGFifo.f32 = v1.x;
         GXWGFifo.f32 = v1.y;
         GXWGFifo.f32 = v1.z;
-        GXWGFifo.u32 = colorValue;
+        GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
         GXWGFifo.f32 = u1;
         GXWGFifo.f32 = v;
 
         GXWGFifo.f32 = v0.x;
         GXWGFifo.f32 = v1.y;
         GXWGFifo.f32 = v1.z;
-        GXWGFifo.u32 = colorValue;
+        GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
         GXWGFifo.f32 = u2;
         GXWGFifo.f32 = v;
 
         GXWGFifo.f32 = v0.x;
         GXWGFifo.f32 = v0.y;
         GXWGFifo.f32 = v1.z;
-        GXWGFifo.u32 = colorValue;
+        GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
         GXWGFifo.f32 = u2;
         GXWGFifo.f32 = v2;
 
         GXWGFifo.f32 = v1.x;
         GXWGFifo.f32 = v0.y;
         GXWGFifo.f32 = v1.z;
-        GXWGFifo.u32 = colorValue;
+        GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
         GXWGFifo.f32 = u1;
         GXWGFifo.f32 = v2;
     }

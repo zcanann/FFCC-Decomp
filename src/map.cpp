@@ -2228,28 +2228,26 @@ int CMapMng::ReadOtm(char* mapName)
 
     CMapObj* mapObj = GetMapObjArray();
     CMapObj* mapObjEnd = m_mapObjArray + m_mapObjCount;
-    CMapObj* root = 0;
-    while (mapObj < mapObjEnd) {
+    for (; mapObj < mapObjEnd; mapObj++) {
         if (mapObj->m_parent == 0) {
-            root = mapObj;
-            break;
+            goto rootFound;
         }
-        mapObj++;
     }
-
-    m_rootMapObj = root;
-    if (root == 0) {
+    mapObj = 0;
+rootFound:
+    m_rootMapObj = mapObj;
+    if (m_rootMapObj == 0) {
         if (System.m_execParam != 0) {
             System.Printf(const_cast<char*>(s_error_root_mapobj_not_found));
         }
         return 0;
     }
 
-    root->SetLink();
+    m_rootMapObj->SetLink();
 
     Mtx identity;
     PSMTXIdentity(identity);
-    root->CalcMtx(identity, 1);
+    m_rootMapObj->CalcMtx(identity, 1);
 
     for (int i = 0; i < m_mapObjCount; i++) {
         CMapObjAtr* attr = m_mapObjArray[i].m_attribute;

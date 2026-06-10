@@ -2892,9 +2892,9 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         modelPos.y = modelMtx[1][3];
         modelPos.z = modelMtx[2][3];
 
-        CVector focusPos(CharaPcs.m_texShadowPos);
+        const CVector& focusPos = CVector(CharaPcs.m_texShadowPos);
         CVector deltaTmp;
-        PSVECSubtract(focusPos, modelPos, deltaTmp);
+        PSVECSubtract((Vec*)&focusPos, modelPos, deltaTmp);
         Vec delta;
         delta.x = deltaTmp.x;
         delta.y = deltaTmp.y;

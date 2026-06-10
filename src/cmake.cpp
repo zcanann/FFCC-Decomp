@@ -2287,14 +2287,7 @@ void CMenuPcs::CmakeSexDraw()
     float alpha = CalcCmakeFadeAlpha(this);
     DrawWMFrame0(1, 1.0f);
 
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-    GXColor backdropColor;
-    backdropColor.r = 0xFF;
-    backdropColor.g = 0xFF;
-    backdropColor.b = 0xFF;
-    backdropColor.a = 0xFF;
-    GXSetChanMatColor(GX_COLOR0A0, backdropColor);
+    SetCmakeBlendMatColor(1.0f);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3F));
     MenuPcs.DrawRect(
         0, 0.0f, 24.0f, 32.0f, 336.0f,
@@ -2303,8 +2296,9 @@ void CMenuPcs::CmakeSexDraw()
         8, 608.0f, 24.0f, 32.0f, 336.0f,
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x40));
+    int span;
     for (int x = 0x20; x < 0x260;) {
-        int span = 0x20;
+        span = 0x20;
         if ((0x260 - x) < span) {
             span = 0x260 - x;
         }
@@ -2316,16 +2310,8 @@ void CMenuPcs::CmakeSexDraw()
 
     DrawCmakePreviewChara(this);
 
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-    GXColor panelColor;
-    panelColor.r = 0xFF;
-    panelColor.g = 0xFF;
-    panelColor.b = 0xFF;
+    SetCmakeBlendMatColor(alpha);
     a255 = 255.0f * alpha;
-    panelColor.a = static_cast<unsigned char>(a255);
-    GXSetChanMatColor(GX_COLOR0A0, panelColor);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
     float sexW = 256.0f;
     float sexH = 162.4615478515625f;

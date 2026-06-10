@@ -940,7 +940,8 @@ int CMenuPcs::EquipOpen()
 		puVar9 = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 		sVar10 = 0;
 		iVar6 = 0;
-		while (iVar6 < 0x40) {
+		int letterMax = 0x40;
+		while (iVar6 < letterMax) {
 			iVar11 = GetItemType(iVar6, 0);
 			if (iVar11 == 1) {
 				puVar9++;

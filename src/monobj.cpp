@@ -3581,24 +3581,34 @@ body:
 				return;
 			}
 
-			if (*reinterpret_cast<unsigned short*>(script + 0x10C) == 1) {
-				actionState = nextAction;
-				if (nextAction < 100) {
+			void** handleB = object->m_scriptHandle;
+			unsigned char* scriptC = reinterpret_cast<unsigned char*>(handleB[9]);
+			if (*reinterpret_cast<unsigned short*>(scriptC + 0x10C) == 1) {
+				if (nextAction >= 100) {
+					actionState = nextAction;
+				} else {
 #define AISCRIPT ((monObj->m_aiState == 0) \
 	? script \
 	: (reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) + \
 		(static_cast<int>(monObj->m_aiState) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10))
+					short aiState = monObj->m_aiState;
+					int aiStateI = aiState;
+					unsigned char* aiScript = scriptC;
+					if (aiState != 0) {
+						aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+							(aiStateI + *reinterpret_cast<unsigned short*>(scriptC + 0x100)) * 0x1D0 + 0x10;
+					}
 					int actionOffset = nextAction * 0x10;
-					if ((*reinterpret_cast<unsigned short*>(AISCRIPT + (actionOffset + 0x110)) & 0x20) != 0) {
-						actionState = 0x21;
+					if ((*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x110) & 0x20) != 0) {
 						CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
+						actionState = 0x21;
 						if (monObj->m_moveWork.m_mode != 4) {
 							memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
 							monObj->m_moveWork.m_flags = 0x855;
 							if ((*reinterpret_cast<unsigned short*>(script + 0xFE) & 4) != 0) {
 								monObj->m_moveWork.m_flags |= 0x400;
 							}
-							if ((*reinterpret_cast<short*>(AISCRIPT + 0x102) & 0x80) != 0) {
+							if ((*reinterpret_cast<unsigned short*>(AISCRIPT + 0x102) & 0x80) != 0) {
 								monObj->m_moveWork.m_flags |= 0x20000;
 							}
 							monObj->m_moveWork.m_mode = 4;
@@ -3612,10 +3622,24 @@ body:
 						return;
 					}
 
-					float actionRange = static_cast<float>(*reinterpret_cast<unsigned short*>(AISCRIPT + (actionOffset + 0x11C)));
-					short actionParam = *reinterpret_cast<short*>(AISCRIPT + actionOffset + 0x11E);
-					actionState = 0x21;
+					unsigned char* aiScript3;
+					if (aiState == 0) {
+						aiScript3 = reinterpret_cast<unsigned char*>(handleB[9]);
+					} else {
+						aiScript3 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+							(aiStateI + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(handleB[9]) + 0x100)) * 0x1D0 + 0x10;
+					}
+					float actionRange = static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript3 + actionOffset + 0x11C));
+					unsigned char* aiScript4;
+					if (aiState == 0) {
+						aiScript4 = reinterpret_cast<unsigned char*>(handleB[9]);
+					} else {
+						aiScript4 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+							(aiStateI + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(handleB[9]) + 0x100)) * 0x1D0 + 0x10;
+					}
 					CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
+					short actionParam = *reinterpret_cast<short*>(aiScript4 + actionOffset + 0x11E);
+					actionState = 0x21;
 					if (monObj->m_moveWork.m_mode != 2) {
 						memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
 						monObj->m_moveWork.m_flags = 0x325;

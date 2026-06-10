@@ -327,20 +327,30 @@ void CGraphicPcs::drawScreenFade()
                 const float sy = kGraphicScreenCenterY - kGraphicScreenCenterY * pos.y;
                 pos.x = sx;
                 pos.y = sy;
-                float clamped = kGraphicZero;
-                if (sx < kGraphicZero) goto storeX;
-                clamped = kGraphicScreenWidth;
-                if (kGraphicScreenWidth < sx) goto storeX;
-                clamped = sx;
+                float clampedX = kGraphicZero;
+                if (!(sx < clampedX)) goto checkMaxX;
+                goto storeX;
+            checkMaxX:
+                clampedX = kGraphicScreenWidth;
+                if (!(clampedX < sx)) goto useX;
+                goto storeX;
+            useX:
+                clampedX = sx;
             storeX:
-                pos.x = clamped;
-                clamped = kGraphicZero;
-                if (pos.y < kGraphicZero) goto storeY;
-                clamped = kGraphicScreenHeight;
-                if (kGraphicScreenHeight < pos.y) goto storeY;
-                clamped = pos.y;
-            storeY:
-                pos.y = clamped;
+                pos.x = clampedX;
+                {
+                    float clampedY = kGraphicZero;
+                    if (!(pos.y < clampedY)) goto checkMaxY;
+                    goto storeY;
+                checkMaxY:
+                    clampedY = kGraphicScreenHeight;
+                    if (!(clampedY < pos.y)) goto useY;
+                    goto storeY;
+                useY:
+                    clampedY = pos.y;
+                storeY:
+                    pos.y = clampedY;
+                }
 
                 const int radius = (int)(kScreenFadeCircleRadius * (kGraphicOne - fadeWave));
                 drawSFCircle(0x500, radius, (int)pos.x, (int)pos.y, baseColor, baseColor);

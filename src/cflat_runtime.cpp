@@ -1677,16 +1677,18 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 		}
 		case 2: {
 			const u32 arg = *reinterpret_cast<u32*>(code + 1);
+			const int index = static_cast<int>(arg) >> 8;
 			const u32 classId = object->m_engineObject != 0 ? static_cast<u32>(*reinterpret_cast<s16*>(reinterpret_cast<u8*>(object->m_engineObject) + 0x30)) : 1U;
 			if ((arg & 1) != 0) {
-				*object->m_sp = ((classId & 0xFFF) | (static_cast<u32>(static_cast<int>(arg) >> 8) << 13)) | (0x1000 & -(arg >> 4 & 1));
+				const u32 sign = (arg >> 4 & 1) != 0 ? 0x1000 : 0;
+				*object->m_sp = ((static_cast<u32>(index) << 13) | (classId & 0xFFF)) | sign;
 				object->m_sp++;
 			} else if ((arg & 2) != 0) {
 				CodeWord offset;
+				const u32 sign = (arg >> 4 & 1) != 0 ? 0x1000 : 0;
 				object->m_sp--;
 				offset.u = *object->m_sp;
-				*object->m_sp = (0x1000 & -(arg >> 4 & 1)) |
-				                (((static_cast<int>(arg) >> 8) + offset.s) * 0x2000 | (classId & 0xFFF));
+				*object->m_sp = sign | ((classId & 0xFFF) | (index + offset.s) * 0x2000);
 				object->m_sp++;
 			}
 			break;
@@ -1887,7 +1889,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			    static_cast<s16>((*reinterpret_cast<s16*>(&newObject->m_codePos) & 0xF)
 			                     | (static_cast<s16>(func->m_index) << 4));
 			newObject->m_codeIndex.m_codeOffset = 0;
-			newObject->m_flags = static_cast<u8>((newObject->m_flags & 0xDF) | 0x20);
+			newObject->m_flagBits.m_callFlag = 1;
 			newObject->m_waitCounter = 0;
 			*reinterpret_cast<int*>(&newObject->m_reqFlag0) = 0;
 

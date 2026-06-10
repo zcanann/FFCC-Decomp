@@ -3386,6 +3386,7 @@ void drawShapeSeqGrouad(int shapeNo, int groupNo, int x, int y, float scaleX, fl
     _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0xFF);
     GXSetZCompLoc(GX_TRUE);
 
+    MaterialMan.LockEnvInline();
     MaterialMan.SetMaterialMenu(
         ppvEnv->m_materialSetPtr,
         static_cast<int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(shape) + 10)), 0);
@@ -3455,6 +3456,7 @@ void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, flo
     GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
     GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
 
+    MaterialMan.LockEnvInline();
     MaterialMan.SetMaterialMenu(
         ppvEnv->m_materialSetPtr,
         static_cast<int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(shape) + 10)), 0);
@@ -3463,9 +3465,9 @@ void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, flo
     GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
 
-    unsigned char* displayList = reinterpret_cast<unsigned char*>(shape);
-    int shapeCount = *reinterpret_cast<unsigned short*>(displayList + 2);
-    for (int i = 0; i < shapeCount; i++) {
+    unsigned char* shapeBytes = reinterpret_cast<unsigned char*>(shape);
+    unsigned char* displayList = shapeBytes;
+    for (int i = 0; i < *reinterpret_cast<short*>(shapeBytes + 2); i++) {
         GXCallDisplayList(*reinterpret_cast<void**>(displayList + 0xC), 0x60);
         displayList += 8;
     }
@@ -3500,9 +3502,9 @@ void drawShapeSeq(int shapeNo, int groupNo, int x, int y, unsigned char alpha, u
         scaleY = FLOAT_80332DD0;
     }
     screenMtx[1][1] = scaleY;
+    screenMtx[2][2] = FLOAT_80332d78;
     screenMtx[0][3] = static_cast<float>(x);
     screenMtx[1][3] = static_cast<float>(y);
-    screenMtx[2][2] = FLOAT_80332d78;
     GXLoadPosMtxImm(screenMtx, 0);
     GXSetCurrentMtx(0);
 
@@ -3531,6 +3533,7 @@ void drawShapeSeq(int shapeNo, int groupNo, int x, int y, unsigned char alpha, u
     GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
     GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
 
+    MaterialMan.LockEnvInline();
     MaterialMan.SetMaterialMenu(
         ppvEnv->m_materialSetPtr,
         static_cast<int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(shape) + 10)), 0);
@@ -3541,8 +3544,7 @@ void drawShapeSeq(int shapeNo, int groupNo, int x, int y, unsigned char alpha, u
 
     unsigned char* shapeBytes = reinterpret_cast<unsigned char*>(shape);
     unsigned char* displayList = shapeBytes;
-    int shapeCount = *reinterpret_cast<unsigned short*>(shapeBytes + 2);
-    for (int i = 0; i < shapeCount; i++) {
+    for (int i = 0; i < *reinterpret_cast<short*>(shapeBytes + 2); i++) {
         GXCallDisplayList(*reinterpret_cast<void**>(displayList + 0xC), 0x60);
         displayList += 8;
     }

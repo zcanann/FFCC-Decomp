@@ -1318,7 +1318,7 @@ int CChara::CModel::PickFur(
 	const double cursorYd = static_cast<float>(Chara.MogFur().m_cursorY);
 	float hitU = kCharaFurDepthZero;
 	float hitV = kCharaFurDepthZero;
-	double nearestDepth = static_cast<double>(kCharaFurNoHitDepth);
+	float nearestDepth = kCharaFurNoHitDepth;
 	int hitAny = 0;
 	unsigned int hitPaintable = 0;
 	CVector hitViewPos;
@@ -1478,9 +1478,8 @@ int CChara::CModel::PickFur(
 							remainEdges--;
 						} while (remainEdges != 0);
 
-						double depth;
-						if (passed != 3 ||
-						    nearestDepth <= (depth = static_cast<double>(depthAccum / kCharaFurTriangleVertexCount))) {
+						float depth;
+						if (passed != 3 || nearestDepth <= (depth = depthAccum / kCharaFurTriangleVertexCount)) {
 							goto nextVertex;
 						}
 
@@ -1525,9 +1524,9 @@ int CChara::CModel::PickFur(
 						normal.Normalize();
 
 						Vec planeDelta;
-						CVector vertA0(verts[0].m_viewPos);
+						const CVector& vertA0 = CVector(verts[0].m_viewPos);
 						CVector planeSub;
-						PSVECSubtract(vertA0, rayStart, planeSub);
+						PSVECSubtract(const_cast<CVector&>(vertA0), rayStart, planeSub);
 						planeDelta.x = planeSub.x;
 						planeDelta.y = planeSub.y;
 						planeDelta.z = planeSub.z;
@@ -1543,21 +1542,21 @@ int CChara::CModel::PickFur(
 						CVector areaAB;
 						CVector areaBC;
 						CVector areaCA;
-						CVector vertA1(verts[0].m_viewPos);
+						const CVector& vertA1 = CVector(verts[0].m_viewPos);
 						CVector hitToASub;
-						PSVECSubtract(vertA1, hitViewPos, hitToASub);
+						PSVECSubtract(const_cast<CVector&>(vertA1), hitViewPos, hitToASub);
 						hitToA.x = hitToASub.x;
 						hitToA.y = hitToASub.y;
 						hitToA.z = hitToASub.z;
-						CVector vertB(verts[1].m_viewPos);
+						const CVector& vertB = CVector(verts[1].m_viewPos);
 						CVector hitToBSub;
-						PSVECSubtract(vertB, hitViewPos, hitToBSub);
+						PSVECSubtract(const_cast<CVector&>(vertB), hitViewPos, hitToBSub);
 						hitToB.y = hitToBSub.y;
 						hitToB.x = hitToBSub.x;
 						hitToB.z = hitToBSub.z;
-						CVector vertC(verts[2].m_viewPos);
+						const CVector& vertC = CVector(verts[2].m_viewPos);
 						CVector hitToCSub;
-						PSVECSubtract(vertC, hitViewPos, hitToCSub);
+						PSVECSubtract(const_cast<CVector&>(vertC), hitViewPos, hitToCSub);
 						hitToC.x = hitToCSub.x;
 						hitToC.y = hitToCSub.y;
 						hitToC.z = hitToCSub.z;

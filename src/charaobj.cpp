@@ -2472,11 +2472,9 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 {
 	if (staIndex == 0 || staIndex == 4) {
-		unsigned short* staField =
-			reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + (staIndex * 2));
-		if (staField[0x1F] != 0) {
+		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + staIndex * 2 + 0x3E) != 0) {
 			System.Printf(const_cast<char*>(sCharaObjEffectTimeNoOverwriteMsg));
-			return static_cast<int>(staField[0x1F]);
+			return static_cast<int>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + staIndex * 2 + 0x3E));
 		}
 	}
 
@@ -2522,10 +2520,9 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 			break;
 	}
 
-	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + (amount * 0x48);
 	int itemType;
 	if (amount >= 0x1F5) {
-		itemType = *reinterpret_cast<unsigned short*>(itemData + 2);
+		itemType = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + amount * 0x48 + 2);
 	} else {
 		itemType = 1;
 	}
@@ -2555,7 +2552,7 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 		}
 		powerValue = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(powerSource->m_scriptHandle[9]) + 0x198);
 	} else {
-		powerValue = *reinterpret_cast<unsigned short*>(itemData + 0x2E);
+		powerValue = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + amount * 0x48 + 0x2E);
 	}
 
 	unsigned int power = powerValue;

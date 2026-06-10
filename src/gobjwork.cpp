@@ -2337,7 +2337,8 @@ int CCaravanWork::DelCmdListAndItem(int cmdListIdx)
 
 			numGrouped = 1;
 			int nextIdx = topIdx + 1;
-			for (int n = topIdx + 1; n < (short)m_numCmdListSlots; n++) {
+			short numSlots = m_numCmdListSlots;
+			for (int n = topIdx + 1; n < numSlots; n++) {
 				if (m_commandListExtra[nextIdx] != -1) {
 					break;
 				}

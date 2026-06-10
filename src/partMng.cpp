@@ -3137,61 +3137,62 @@ void CPartMng::pppDrawPrioPdtFpno(unsigned char drawMode, short kind, short node
     cameraPos.y = invCamera[1][3];
     cameraPos.z = invCamera[2][3];
 
-    mng = reinterpret_cast<PppMngStDrawPdtRaw*>(m_pppMng);
-    remaining = 0x180;
-    while ((mng->m_nodeIndex != nodeIndex || mng->m_kind != kind || mng->m_endRequested != 0
-            || mng->m_baseTime == -0x1000 || mng->m_drawMode != drawMode || mng->m_baseTime >= 0)) {
-        mng++;
-        remaining--;
-        if (remaining == 0) {
-            return;
+    unsigned char* base = reinterpret_cast<unsigned char*>(this);
+    for (remaining = 0x180; remaining != 0; remaining--) {
+        mng = reinterpret_cast<PppMngStDrawPdtRaw*>(base + 0x2A18);
+        if (mng->m_nodeIndex == nodeIndex && mng->m_kind == kind && mng->m_endRequested == 0
+            && mng->m_baseTime != -0x1000 && mng->m_drawMode == drawMode && mng->m_baseTime < 0) {
+            if (mng->m_slotVisible == 0) {
+                break;
+            }
+
+            ppvMng = reinterpret_cast<_pppMngSt*>(mng);
+            partPos.x = mng->m_matrix.value[0][3];
+            partPos.y = mng->m_matrix.value[1][3];
+            partPos.z = mng->m_matrix.value[2][3];
+
+            {
+                struct PppCullBound { Vec m_min; Vec m_max; };
+
+                if ((double)mng->m_cullRadiusSq != -1.0) {
+                    goto checkCull;
+                }
+
+            drawPart:
+                PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
+                mng->m_sortDepth = viewPos.z;
+                ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4);
+                ppvMng = reinterpret_cast<_pppMngSt*>(mng);
+                pppSetFpMatrix(reinterpret_cast<_pppMngSt*>(mng));
+                _pppDrawPart(reinterpret_cast<_pppMngSt*>(mng));
+                break;
+
+            checkCull:
+                PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
+                if (!(PSVECSquareMag(&cameraDelta) < mng->m_cullRadiusSq)) {
+                    break;
+                }
+
+                PppCullBound bound;
+                float yOffset = mng->m_cullYOffset;
+                float radius = mng->m_cullRadius;
+                bound.m_min.y = partPos.y;
+                bound.m_max.y = partPos.y + yOffset;
+                bound.m_min.x = partPos.x - radius;
+                bound.m_max.x = partPos.x + radius;
+                bound.m_min.z = partPos.z - radius;
+                bound.m_max.z = partPos.z + radius;
+                if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(
+                        cameraPos, ppvCameraMatrix, kPartMngFrustumCullLimit) != 0) {
+                    goto drawPart;
+                }
+                break;
+            }
         }
+        base += 0x158;
     }
-
-    if (mng->m_slotVisible == 0) {
+    if (drawMode < 8) {
         return;
-    }
-
-    ppvMng = reinterpret_cast<_pppMngSt*>(mng);
-    partPos.x = mng->m_matrix.value[0][3];
-    partPos.y = mng->m_matrix.value[1][3];
-    partPos.z = mng->m_matrix.value[2][3];
-
-    {
-        struct PppCullBound { Vec m_min; Vec m_max; };
-
-        if ((double)mng->m_cullRadiusSq != -1.0) {
-            goto checkCull;
-        }
-
-    drawPart:
-        PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
-        mng->m_sortDepth = viewPos.z;
-        ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4);
-        ppvMng = reinterpret_cast<_pppMngSt*>(mng);
-        pppSetFpMatrix(reinterpret_cast<_pppMngSt*>(mng));
-        _pppDrawPart(reinterpret_cast<_pppMngSt*>(mng));
-        return;
-
-    checkCull:
-        PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
-        if (!(PSVECSquareMag(&cameraDelta) < mng->m_cullRadiusSq)) {
-            return;
-        }
-
-        PppCullBound bound;
-        float yOffset = mng->m_cullYOffset;
-        float radius = mng->m_cullRadius;
-        bound.m_min.y = partPos.y;
-        bound.m_max.y = partPos.y + yOffset;
-        bound.m_min.x = partPos.x - radius;
-        bound.m_max.x = partPos.x + radius;
-        bound.m_min.z = partPos.z - radius;
-        bound.m_max.z = partPos.z + radius;
-        if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(
-                cameraPos, ppvCameraMatrix, kPartMngFrustumCullLimit) != 0) {
-            goto drawPart;
-        }
     }
 }
 

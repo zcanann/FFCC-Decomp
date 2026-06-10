@@ -4922,7 +4922,6 @@ void CGPartyObj::gpmCol()
 	CGPartyObj* leader = Game.m_partyObjArr[0];
 
 	unsigned char* trailBase = ghostWork + 0x50;
-	int newIndex = 0;
 	int i = 0;
 	do {
 		Vec* pos = (i == 0) ? &m_worldPosition
@@ -4951,29 +4950,26 @@ void CGPartyObj::gpmCol()
 		cylinder.m_axis.x = halfHeight;
 
 		if (MapMng.CheckHitCylinderNear(&cylinder, &diffVec, flags) != 0) {
-			int capped = activeTrailCount;
-			if (capped >= i + 1) {
-				capped = i + 1;
+			int capped = i + 1;
+			if (activeTrailCount < capped) {
+				capped = activeTrailCount;
 			}
-			i++;
 			activeTrailCount = capped;
-			newIndex = trailIndex;
 		} else {
 			*reinterpret_cast<float*>(trailBase + i * 0xC) = leader->m_worldPosition.x;
 			Vec* slot = reinterpret_cast<Vec*>(trailBase + i * 0xC);
 			slot->y = leader->m_worldPosition.y;
 			slot->z = leader->m_worldPosition.z;
+			int idx = i;
 			activeTrailCount = i + 1;
-			if (trailIndex < i) {
-				newIndex = trailIndex;
-			} else {
-				newIndex = i;
+			if (trailIndex < idx) {
+				idx = trailIndex;
 			}
+			trailIndex = idx;
 			break;
 		}
+		i++;
 	} while (static_cast<unsigned int>(i) < 5);
-
-	trailIndex = newIndex;
 #define gpmColClamp ((activeTrailCount - 1) & ~((activeTrailCount - 1) >> 31))
 	if (trailIndex >= gpmColClamp) {
 		trailIndex = gpmColClamp;

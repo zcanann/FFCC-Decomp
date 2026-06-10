@@ -2472,19 +2472,20 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 		}
 		m_blendMax = m_blendCur;
 
-		if (startFrame < 0) {
-			startFrame = 0;
-		}
+		int frameStart = (startFrame == -1) ? 0 : startFrame;
 
-		m_animStart = static_cast<float>(startFrame);
+		m_animStart = static_cast<float>(frameStart);
 		m_curFrame = m_animStart;
 		m_time = m_curFrame;
 
+		int frameEnd;
 		if (endFrame == -1) {
-			endFrame = static_cast<int>(AnimFrameCount(m_anim)) - 1;
+			frameEnd = static_cast<int>(AnimFrameCount(m_anim)) - 1;
+		} else {
+			frameEnd = endFrame;
 		}
 
-		m_animEnd = static_cast<float>(endFrame);
+		m_animEnd = static_cast<float>(frameEnd);
 	} else {
 		m_curFrame = 0.0f;
 		m_time = 0.0f;

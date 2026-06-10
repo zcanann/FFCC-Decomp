@@ -1584,8 +1584,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 				romLetterWork[replaceIndex] = curLetter;
 			}
 		} else {
-			romLetterWork[foundCount] = curLetter;
-			foundCount++;
+			romLetterWork[foundCount++] = curLetter;
 		}
 
 	NextLetter:;

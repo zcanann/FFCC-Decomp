@@ -12752,56 +12752,25 @@ void McCtrl::SetListDat(int slot, int clearPlayTime)
 			*reinterpret_cast<unsigned int*>(entry + 0x10) = *reinterpret_cast<unsigned int*>(save + 0x28);
 			*reinterpret_cast<unsigned int*>(entry + 0x14) = *reinterpret_cast<unsigned int*>(save + 0x2C);
 
-			unsigned char* party = save + *reinterpret_cast<int*>(save + 0x30) * 0x9C0;
-			if (*reinterpret_cast<int*>(party + 0x1A84) == 0) {
-				*reinterpret_cast<int*>(save + 0x30) = -1;
-			}
-			if (party[0x1D90] != 0) {
-				*reinterpret_cast<int*>(save + 0x30) = -1;
-			}
-			party = save + *reinterpret_cast<int*>(save + 0x34) * 0x9C0;
-			if (*reinterpret_cast<int*>(party + 0x1A84) == 0) {
-				*reinterpret_cast<int*>(save + 0x34) = -1;
-			}
-			if (party[0x1D90] != 0) {
-				*reinterpret_cast<int*>(save + 0x34) = -1;
-			}
-			party = save + *reinterpret_cast<int*>(save + 0x38) * 0x9C0;
-			if (*reinterpret_cast<int*>(party + 0x1A84) == 0) {
-				*reinterpret_cast<int*>(save + 0x38) = -1;
-			}
-			if (party[0x1D90] != 0) {
-				*reinterpret_cast<int*>(save + 0x38) = -1;
-			}
-			party = save + *reinterpret_cast<int*>(save + 0x3C) * 0x9C0;
-			if (*reinterpret_cast<int*>(party + 0x1A84) == 0) {
-				*reinterpret_cast<int*>(save + 0x3C) = -1;
-			}
-			if (party[0x1D90] != 0) {
-				*reinterpret_cast<int*>(save + 0x3C) = -1;
+			unsigned char* base = save;
+			for (int i = 0; i < 4; i++) {
+				unsigned char* party = base + reinterpret_cast<int*>(save + 0x30)[i] * 0x9C0;
+				if (*reinterpret_cast<int*>(party + 0x1A84) == 0) {
+					reinterpret_cast<int*>(save + 0x30)[i] = -1;
+				}
+				if (party[0x1D90] != 0) {
+					reinterpret_cast<int*>(save + 0x30)[i] = -1;
+				}
 			}
 
-			*reinterpret_cast<unsigned int*>(save + 0x1C) = MemoryCardMan.CalcCrc(reinterpret_cast<Mc::SaveDat*>(save));
+			*reinterpret_cast<unsigned int*>(base + 0x1C) = MemoryCardMan.CalcCrc(reinterpret_cast<Mc::SaveDat*>(base));
 
-			if (*reinterpret_cast<int*>(save + 0x30) >= 0) {
-				*reinterpret_cast<unsigned int*>(entry + 0x18) = *reinterpret_cast<short*>(save + *reinterpret_cast<int*>(save + 0x30) * 0x9C0 + 0x14D0);
-			} else {
-				*reinterpret_cast<unsigned int*>(entry + 0x18) = 0xFFFFFFFFu;
-			}
-			if (*reinterpret_cast<int*>(save + 0x34) >= 0) {
-				*reinterpret_cast<unsigned int*>(entry + 0x1C) = *reinterpret_cast<unsigned short*>(save + *reinterpret_cast<int*>(save + 0x34) * 0x9C0 + 0x14D0);
-			} else {
-				*reinterpret_cast<unsigned int*>(entry + 0x1C) = 0xFFFFFFFFu;
-			}
-			if (*reinterpret_cast<int*>(save + 0x38) >= 0) {
-				*reinterpret_cast<unsigned int*>(entry + 0x20) = *reinterpret_cast<unsigned short*>(save + *reinterpret_cast<int*>(save + 0x38) * 0x9C0 + 0x14D0);
-			} else {
-				*reinterpret_cast<unsigned int*>(entry + 0x20) = 0xFFFFFFFFu;
-			}
-			if (*reinterpret_cast<int*>(save + 0x3C) >= 0) {
-				*reinterpret_cast<unsigned int*>(entry + 0x24) = *reinterpret_cast<unsigned short*>(save + *reinterpret_cast<int*>(save + 0x3C) * 0x9C0 + 0x14D0);
-			} else {
-				*reinterpret_cast<unsigned int*>(entry + 0x24) = 0xFFFFFFFFu;
+			for (int i = 0; i < 4; i++) {
+				if (reinterpret_cast<int*>(save + 0x30)[i] >= 0) {
+					reinterpret_cast<unsigned int*>(entry + 0x18)[i] = *reinterpret_cast<unsigned short*>(save + reinterpret_cast<int*>(save + 0x30)[i] * 0x9C0 + 0x14D0);
+				} else {
+					reinterpret_cast<unsigned int*>(entry + 0x18)[i] = -1;
+				}
 			}
 			*reinterpret_cast<unsigned int*>(entry + 0x28) = *reinterpret_cast<unsigned int*>(save + 0xB8);
 			memcpy(entry + 0x2C, save + 0x10C0, 0x10);
@@ -12809,24 +12778,24 @@ void McCtrl::SetListDat(int slot, int clearPlayTime)
 		} else {
 			entry[0x42] = 1;
 		}
+	} else {
+		entry[0x42] = 0;
+		entry[0x41] = 0;
 	}
 
-	entry[0x43] = 0;
 	unsigned char* const dst = MenuPcs.m_wmCharaState + slot * kMcListEntrySize;
 	unsigned int* const dstWords = reinterpret_cast<unsigned int*>(dst);
 	unsigned int* const entryWords = reinterpret_cast<unsigned int*>(entry);
-	dstWords[0] = entryWords[0];
-	dstWords[1] = entryWords[1];
+	struct Quad16 { unsigned int w[4]; };
+	*reinterpret_cast<unsigned long long*>(dst) = *reinterpret_cast<unsigned long long*>(entry);
 	dstWords[2] = entryWords[2];
 	dstWords[3] = entryWords[3];
 	dstWords[4] = entryWords[4];
 	dstWords[5] = entryWords[5];
-	dstWords[6] = entryWords[6];
-	dstWords[7] = entryWords[7];
-	dstWords[8] = entryWords[8];
-	dstWords[9] = entryWords[9];
+	*reinterpret_cast<Quad16*>(dst + 0x18) = *reinterpret_cast<Quad16*>(entry + 0x18);
 	dstWords[10] = entryWords[10];
-	memcpy(dst + 0x2C, entry + 0x2C, 0x15);
+	struct Tail15 { unsigned char b[0x15]; };
+	*reinterpret_cast<Tail15*>(dst + 0x2C) = *reinterpret_cast<Tail15*>(entry + 0x2C);
 	dst[0x41] = entry[0x41];
 	dst[0x42] = entry[0x42];
 	dst[0x43] = entry[0x43];

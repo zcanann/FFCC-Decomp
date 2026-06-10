@@ -56,21 +56,22 @@ static inline CUSBStreamDataState* UsbStream(CPartPcs* self)
     return &self->m_usbStreamState;
 }
 
-extern float kCFlatPadStickZero;
-extern float kCFlatAlphaMax;
-extern float kCFlatPi;
-extern float kCFlatDegrees180;
+extern const float kCFlatPadStickZero;
+extern const float kCFlatAlphaMax;
+extern const float kCFlatPi;
+extern const float kCFlatDegrees180;
 extern const float kCFlatOneF;
 extern const float FLOAT_80330B38;
-extern float kCFlatHalfF;
+extern const float kCFlatHalfF;
 extern const float FLOAT_80330B40;
 extern const float FLOAT_80330B44;
 extern const float FLOAT_80330B48;
 extern const float FLOAT_80330B4C;
 extern const float FLOAT_80330B5C;
-extern float kCFlatHalfPi;
-extern float kCFlatPi;
-extern float kCFlatThreeHalfPi;
+extern const float FLOAT_80330BC0;
+extern const float kCFlatHalfPi;
+extern const float kCFlatPi;
+extern const float kCFlatThreeHalfPi;
 
 
 static inline int RemapPadSlot(CPad* pad, int padIndex)
@@ -1677,13 +1678,13 @@ int CLine<64>::IsInner(Vec* position, float margin)
 
 void CLine<64>::CalcBound()
 {
-    min.x = kLineBoundsInitMin;
-    min.y = kLineBoundsInitMin;
-    min.z = kLineBoundsInitMin;
-    max.x = kLineBoundsInitMax;
-    max.y = kLineBoundsInitMax;
-    max.z = kLineBoundsInitMax;
-    totalLength = kLineSegmentMinT;
+    min.x = FLOAT_80330B5C;
+    min.y = FLOAT_80330B5C;
+    min.z = FLOAT_80330B5C;
+    max.x = FLOAT_80330BC0;
+    max.y = FLOAT_80330BC0;
+    max.z = FLOAT_80330BC0;
+    totalLength = kCFlatPadStickZero;
 
     for (u32 i = 0; i < pointCount; i++) {
         if (points[i].x < min.x) {
@@ -4230,7 +4231,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
         unsigned int flag = static_cast<unsigned int>(static_cast<unsigned char>(gameWork.m_eventFlags[byteIndex])) & mask;
         FlatLastResult(this) = (-flag | flag) >> 31;
     } else if (systemValue <= -200) {
-        short* artifact = &gameWork.m_eventWork[systemValue + 0x1C7];
+        short* artifact = &Game.m_gameWork.m_eventWork[systemValue + 0x1C7];
         FlatLastResult(this) = static_cast<unsigned int>(static_cast<int>(*artifact));
     } else {
         switch (systemValue) {
@@ -4406,7 +4407,7 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
                 *flagByte &= ~mask;
             }
         } else if (systemValue <= -200) {
-            short* artifact = &gameWork.m_eventWork[systemValue + 0x1C7];
+            short* artifact = &Game.m_gameWork.m_eventWork[systemValue + 0x1C7];
             stack[-1].m_word = *artifact;
             switch (setMode) {
             case -1:
@@ -4494,7 +4495,7 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
             case -0x4A:
             case -0x49:
             case -0x48: {
-                int* value = &gameWork.m_bossArtifactStageTable[systemValue + 0x56];
+                int* value = &Game.m_gameWork.m_bossArtifactStageTable[systemValue + 0x56];
                 stack[-1].m_word = *value;
                 switch (setMode) {
                 case -1:
@@ -4524,7 +4525,7 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
             case -0x59:
             case -0x58:
             case -0x57: {
-                int* value = &gameWork.m_unkStageTable[systemValue + 0x65];
+                int* value = &Game.m_gameWork.m_unkStageTable[systemValue + 0x65];
                 stack[-1].m_word = *value;
                 switch (setMode) {
                 case -1:
@@ -4558,7 +4559,7 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
             case -0x69:
             case -0x68:
             case -0x67: {
-                int* value = &gameWork.m_eventHeader[systemValue + 0x6B];
+                int* value = &Game.m_gameWork.m_eventHeader[systemValue + 0x6B];
                 stack[-1].m_word = *value;
                 switch (setMode) {
                 case -1:

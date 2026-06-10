@@ -1003,6 +1003,8 @@ void CChara::CModel::InitMogFurTex()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_dead_assignments off
 void CChara::CModel::MogFurFrame(CGObject* gObject)
 {
 	const short heldButtons = MogHeldButtons();
@@ -1285,6 +1287,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 	OpenMogHintMessage(messageId);
 	MogWork().m_frameCount++;
 }
+#pragma pop
 
 /*
  * --INFO--

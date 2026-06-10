@@ -1747,10 +1747,10 @@ void CCameraPcs::drawShadowEnd()
     Mtx44 proj;
     Mtx ident;
     float z;
-    int x0;
     int y0;
-    int x1;
     int y1;
+    int x0;
+    int x1;
     int x2;
 
     if (m_fullScreenShadowEnabled == 0) {

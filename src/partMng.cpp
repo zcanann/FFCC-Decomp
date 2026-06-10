@@ -913,12 +913,12 @@ void CPartMng::render3Dcursor()
     GXSetChanCtrl((GXChannelID)0, 0, (GXColorSrc)0, (GXColorSrc)0, 0, (GXDiffuseFn)2, (GXAttnFn)2);
     GXSetChanCtrl((GXChannelID)2, 0, (GXColorSrc)0, (GXColorSrc)0, 0, (GXDiffuseFn)2, (GXAttnFn)2);
 
+    Mtx identity;
     Mtx44 orthoProjection;
     C_MTXOrtho(orthoProjection, kPartMngZero, kPartMngOrthoHeight, kPartMngZero, kPartMngOrthoWidth, kPartMngZero,
                kPartMngOrthoFar);
     GXSetProjection(orthoProjection, GX_ORTHOGRAPHIC);
 
-    Mtx identity;
     PSMTXIdentity(identity);
     GXLoadPosMtxImm(identity, 0);
     GXSetZCompLoc(0);
@@ -942,35 +942,33 @@ void CPartMng::render3Dcursor()
     float y = cursorPos[1];
     float z = cursorPos[2];
 
-    _GXColor colorX;
-    colorX.r = 0xff;
-    colorX.g = 0x80;
-    colorX.b = 0x80;
-    colorX.a = 0xff;
-    GXSetChanAmbColor((GXChannelID)4, colorX);
-    GXSetChanMatColor((GXChannelID)4, colorX);
+    _GXColor color;
+    color.r = 0xff;
+    color.g = 0x80;
+    color.b = 0x80;
+    color.a = 0xff;
+    GXSetChanAmbColor((GXChannelID)4, color);
+    GXSetChanMatColor((GXChannelID)4, color);
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
     GXPosition3f32(x - kPartMngCullRadius, y, z);
     GXPosition3f32(x + kPartMngCullRadius, y, z);
 
-    _GXColor colorY;
-    colorY.r = 0x80;
-    colorY.g = 0xff;
-    colorY.b = 0x80;
-    colorY.a = 0xff;
-    GXSetChanAmbColor((GXChannelID)4, colorY);
-    GXSetChanMatColor((GXChannelID)4, colorY);
+    color.r = 0x80;
+    color.g = 0xff;
+    color.b = 0x80;
+    color.a = 0xff;
+    GXSetChanAmbColor((GXChannelID)4, color);
+    GXSetChanMatColor((GXChannelID)4, color);
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
     GXPosition3f32(x, y - kPartMngCullRadius, z);
     GXPosition3f32(x, y + kPartMngCullRadius, z);
 
-    _GXColor colorZ;
-    colorZ.r = 0xff;
-    colorZ.g = 0xff;
-    colorZ.b = 0x80;
-    colorZ.a = 0xff;
-    GXSetChanAmbColor((GXChannelID)4, colorZ);
-    GXSetChanMatColor((GXChannelID)4, colorZ);
+    color.r = 0xff;
+    color.g = 0xff;
+    color.b = 0x80;
+    color.a = 0xff;
+    GXSetChanAmbColor((GXChannelID)4, color);
+    GXSetChanMatColor((GXChannelID)4, color);
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
     GXPosition3f32(x, y, z - kPartMngCullRadius);
     GXPosition3f32(x, y, z + kPartMngCullRadius);

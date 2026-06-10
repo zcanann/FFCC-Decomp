@@ -688,9 +688,8 @@ CGPrgObj* CGItemObj::CreateFromScript(
 	gItemObjCreateFlags = createFlags;
 	gCFlatRuntime().SystemCall(0, 1, 7, 5, inStack, &outStack);
 
-	CGPrgObj* newItem = 0;
 	if (createMode != 1) {
-		newItem = (CGPrgObj*)CFlat.intToClass((int)outStack.m_word);
+		CGPrgObj* newItem = (CGPrgObj*)CFlat.intToClass((int)outStack.m_word);
 		unsigned char* itemSelf = (unsigned char*)newItem;
 
 		if (createMode == 2) {
@@ -755,9 +754,11 @@ CGPrgObj* CGItemObj::CreateFromScript(
 			reinterpret_cast<CGItemObj*>(newItem)->m_pendingAnimName = ccfs->m_pendingAnimName;
 			reinterpret_cast<CGItemObj*>(newItem)->m_memoryCapsuleNameIndex = ccfs->m_memoryCapsuleNameIndex;
 		}
+
+		return newItem;
 	}
 
-	return newItem;
+	return 0;
 }
 
 /*

@@ -924,7 +924,7 @@ void CMes::addString(char** text, int branchMode)
 	setupFont->SetScaleY(setupScaleY);
 	CFont* font = setupFont;
 
-	bool running = true;
+	int running = 1;
 	unsigned char caseMode = 0;
 	unsigned char flowMode = 0;
 	char nameItem[32];
@@ -942,7 +942,7 @@ void CMes::addString(char** text, int branchMode)
 
 		if (uch == 0)
 		{
-			running = false;
+			running = 0;
 			goto updateBounds;
 		}
 
@@ -980,18 +980,18 @@ void CMes::addString(char** text, int branchMode)
 				wait = 3;
 			}
 			mWaitFrames = wait;
-			running = false;
+			running = 0;
 			mWaitActive = 1;
 			goto advanceLine;
 		}
 		case 0x29:
 			mWaitFrames = 5;
-			running = false;
+			running = 0;
 			mWaitActive = 1;
 			goto advanceLine;
 		case 2:
 			mWaitFrames = 4;
-			running = false;
+			running = 0;
 			mWaitActive = 1;
 			goto advanceLine;
 		case 3:
@@ -1020,8 +1020,9 @@ void CMes::addString(char** text, int branchMode)
 			break;
 		case 8:
 		{
+			char colorTag = ReadTagByte(text);
 			int oldColor = mColor;
-			if (ReadTagByte(text) != 0)
+			if (colorTag != 0)
 			{
 				mColor = 6;
 			}
@@ -1039,8 +1040,9 @@ void CMes::addString(char** text, int branchMode)
 		case 0x3D:
 		case 0x3F:
 		{
+			char colorTag = ReadTagByte(text);
 			int oldColor = mColor;
-			if (ReadTagByte(text) != 0)
+			if (colorTag != 0)
 			{
 				mColor = 5;
 			}
@@ -1085,8 +1087,9 @@ void CMes::addString(char** text, int branchMode)
 		case 0x3E:
 		case 0x40:
 		{
+			char colorTag = ReadTagByte(text);
 			int oldColor = mColor;
-			if (ReadTagByte(text) != 0)
+			if (colorTag != 0)
 			{
 				mColor = 0;
 			}
@@ -1126,8 +1129,9 @@ void CMes::addString(char** text, int branchMode)
 		}
 		case 0x2B:
 		{
+			char colorTag = ReadTagByte(text);
 			int oldColor = mColor;
-			if (ReadTagByte(text) != 0)
+			if (colorTag != 0)
 			{
 				mColor = 6;
 			}
@@ -1140,8 +1144,9 @@ void CMes::addString(char** text, int branchMode)
 		}
 		case 0x2C:
 		{
+			char colorTag = ReadTagByte(text);
 			int oldColor = mColor;
-			if (ReadTagByte(text) != 0)
+			if (colorTag != 0)
 			{
 				mColor = 4;
 			}
@@ -1154,8 +1159,9 @@ void CMes::addString(char** text, int branchMode)
 		}
 		case 0x2D:
 		{
+			char colorTag = ReadTagByte(text);
 			int oldColor = mColor;
-			if (ReadTagByte(text) != 0)
+			if (colorTag != 0)
 			{
 				mColor = 3;
 			}
@@ -1230,11 +1236,11 @@ void CMes::addString(char** text, int branchMode)
 			mColor = (int)uch - 0x0C;
 			break;
 		case 0x24:
-			running = false;
+			running = 0;
 			mWaitFrames = 2;
 			goto advanceLine;
 		case 0x28:
-			running = false;
+			running = 0;
 			mWaitFrames = 1;
 			goto advanceLine;
 		case 0x26:
@@ -1248,7 +1254,7 @@ void CMes::addString(char** text, int branchMode)
 			int value = ReadTagS8(text);
 			if (mFontCount != 0)
 			{
-				if (System.m_execParam != 0)
+				if ((unsigned int)System.m_execParam >= 1U)
 				{
 					System.Printf(lbl_801D9E58);
 				}
@@ -1533,20 +1539,8 @@ void CMes::addString(char** text, int branchMode)
 		}
 
 	updateBounds:
-		{
-			float w = mCurrentX;
-			if (w < mLineWidth)
-			{
-				w = mLineWidth;
-			}
-			mLineWidth = w;
-			float h = mCurrentY;
-			if (h < mLineHeight)
-			{
-				h = mLineHeight;
-			}
-			mLineHeight = h;
-		}
+		mLineWidth = (mCurrentX < mLineWidth) ? mLineWidth : mCurrentX;
+		mLineHeight = (mCurrentY < mLineHeight) ? mLineHeight : mCurrentY;
 	}
 }
 

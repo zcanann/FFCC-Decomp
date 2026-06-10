@@ -2828,7 +2828,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
             shade.color.a = blendedCopy.color.a;
         }
 
-        CColor3 ambientBase(CharaPcs.m_viewerAmbientColor[lightBank]);
+        const CColor3& ambientBase = CColor3(CharaPcs.m_viewerAmbientColor[lightBank]);
         CColor3 ambientShade;
         ambientShade.color.r = static_cast<signed char>((static_cast<unsigned int>(ambientBase.color.r) * shade.color.r) / 255);
         ambientShade.color.g = static_cast<signed char>((static_cast<unsigned int>(ambientBase.color.g) * shade.color.g) / 255);
@@ -2839,7 +2839,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         LightPcs.SetAmbient(ambientGX);
 
         for (unsigned long i = 0; i < 3; i++) {
-            CColor3 diffuseBase(CharaPcs.m_viewerDiffuseColor[lightBank][i]);
+            const CColor3& diffuseBase = CColor3(CharaPcs.m_viewerDiffuseColor[lightBank][i]);
             CColor3 diffuseShade;
             diffuseShade.color.r = static_cast<signed char>((static_cast<unsigned int>(diffuseBase.color.r) * shade.color.r) / 255);
             diffuseShade.color.g = static_cast<unsigned char>((static_cast<int>(diffuseBase.color.g) * shade.color.g) / 255);

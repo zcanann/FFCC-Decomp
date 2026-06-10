@@ -903,139 +903,134 @@ int CFlatRuntime::SystemCall(CFlatRuntime::CObject* objectParam, int systemKind,
 	}
 
 	CObject* const object = reinterpret_cast<CObject*>(objectParam->m_engineObject);
+	CFunc* func;
+
 	if (object->m_flagBits.m_deleteFlag != 0) {
 		return 1;
 	}
 
-	u8* func = 0;
 	const int classIndex = object->m_activeClassIndex;
 	if ((classIndex >= 0)
 	    && (((systemKind == 2) || (systemKind == 3)) && (systemIndex >= 0))) {
 		u8* const classes = reinterpret_cast<u8*>(m_classes) + (classIndex * 0x22C) + 0x24;
-		const int funcPos = *reinterpret_cast<int*>(classes + (systemIndex * 4));
-		if (funcPos >= 0) {
-			func = m_funcs + (funcPos * 0x50);
+		const int funcIndex = *reinterpret_cast<int*>(classes + (systemIndex * 4));
+		if (funcIndex >= 0) {
+			func = reinterpret_cast<CFunc*>(m_funcs) + funcIndex;
+			goto haveFunc;
 		}
 	} else {
-		u8* searchFunc = m_funcs;
-		unsigned int funcCount = m_funcCount;
+		const int funcCount = m_funcCount;
+		func = reinterpret_cast<CFunc*>(m_funcs);
 
-		for (; funcCount > 0; funcCount--, searchFunc += 0x50) {
-			if ((*reinterpret_cast<int*>(searchFunc + 0x40) == systemKind)
-			    && (*reinterpret_cast<int*>(searchFunc + 0x44) == systemIndex)) {
-				func = searchFunc;
-				break;
+		for (int i = 0; i < funcCount; i++, func++) {
+			if (func->m_systemKind != systemKind) {
+				continue;
 			}
+			if (func->m_systemIndex != systemIndex) {
+				continue;
+			}
+			goto haveFunc;
 		}
 	}
+	func = 0;
+haveFunc:
 
-	if ((func == 0) || (*reinterpret_cast<int*>(func + 0x30) == 0)) {
+	if ((func == 0) || (func->m_codeSize == 0)) {
 		return 0;
 	}
 
 	int copiedArgs = 0;
 	if (argCount > 0) {
-		u8* const objectBytes = reinterpret_cast<u8*>(object);
 		if (argCount > 8) {
-			unsigned int batchCount = (static_cast<int>(argCount) - 1) >> 3;
-			int byteOffset = 0;
 			CStack* batchArgs = args;
+			int byteOffset = 0;
 
-			if (argCount - 8 > 0) {
-				do {
-					const int offset1 = byteOffset + 4;
-					const int offset2 = byteOffset + 8;
-					const int offset3 = byteOffset + 0xC;
-					const int offset4 = byteOffset + 0x10;
-					*reinterpret_cast<u32*>(*reinterpret_cast<u32*>(objectBytes + 0x08) + byteOffset) =
-					    batchArgs[0].m_word;
-					const int offset5 = byteOffset + 0x14;
-					const int offset6 = byteOffset + 0x18;
-					const int offset7 = byteOffset + 0x1C;
-					byteOffset += 0x20;
-					copiedArgs += 8;
-					*reinterpret_cast<u32*>(*reinterpret_cast<u32*>(objectBytes + 0x08) + offset1) =
-					    batchArgs[1].m_word;
-					*reinterpret_cast<u32*>(*reinterpret_cast<u32*>(objectBytes + 0x08) + offset2) =
-					    batchArgs[2].m_word;
-					*reinterpret_cast<u32*>(*reinterpret_cast<u32*>(objectBytes + 0x08) + offset3) =
-					    batchArgs[3].m_word;
-					*reinterpret_cast<u32*>(*reinterpret_cast<u32*>(objectBytes + 0x08) + offset4) =
-					    batchArgs[4].m_word;
-					*reinterpret_cast<u32*>(*reinterpret_cast<u32*>(objectBytes + 0x08) + offset5) =
-					    batchArgs[5].m_word;
-					*reinterpret_cast<u32*>(*reinterpret_cast<u32*>(objectBytes + 0x08) + offset6) =
-					    batchArgs[6].m_word;
-					CStack* finalArg = batchArgs + 7;
-					batchArgs += 8;
-					*reinterpret_cast<u32*>(*reinterpret_cast<u32*>(objectBytes + 0x08) + offset7) =
-					    finalArg->m_word;
-					batchCount--;
-				} while (batchCount != 0);
+			for (; argCount - copiedArgs > 8; copiedArgs += 8) {
+				const int offset1 = byteOffset + 4;
+				const int offset2 = byteOffset + 8;
+				const int offset3 = byteOffset + 0xC;
+				const int offset4 = byteOffset + 0x10;
+				*reinterpret_cast<u32*>(reinterpret_cast<u32>(object->m_sp) + byteOffset) =
+				    batchArgs[0].m_word;
+				const int offset5 = byteOffset + 0x14;
+				const int offset6 = byteOffset + 0x18;
+				const int offset7 = byteOffset + 0x1C;
+				byteOffset += 0x20;
+				*reinterpret_cast<u32*>(reinterpret_cast<u32>(object->m_sp) + offset1) =
+				    batchArgs[1].m_word;
+				*reinterpret_cast<u32*>(reinterpret_cast<u32>(object->m_sp) + offset2) =
+				    batchArgs[2].m_word;
+				*reinterpret_cast<u32*>(reinterpret_cast<u32>(object->m_sp) + offset3) =
+				    batchArgs[3].m_word;
+				*reinterpret_cast<u32*>(reinterpret_cast<u32>(object->m_sp) + offset4) =
+				    batchArgs[4].m_word;
+				*reinterpret_cast<u32*>(reinterpret_cast<u32>(object->m_sp) + offset5) =
+				    batchArgs[5].m_word;
+				*reinterpret_cast<u32*>(reinterpret_cast<u32>(object->m_sp) + offset6) =
+				    batchArgs[6].m_word;
+				CStack* finalArg = batchArgs + 7;
+				batchArgs += 8;
+				*reinterpret_cast<u32*>(reinterpret_cast<u32>(object->m_sp) + offset7) =
+				    finalArg->m_word;
 			}
 		}
 
 		int byteOffset = copiedArgs * 4;
-		int remainingArgs = argCount - copiedArgs;
 		CStack* tailArgs = args + copiedArgs;
-		if (copiedArgs < argCount) {
-			do {
-				CStack* const arg = tailArgs;
-				tailArgs++;
-				copiedArgs++;
-				*reinterpret_cast<u32*>(*reinterpret_cast<u32*>(objectBytes + 0x08) + byteOffset) = arg->m_word;
-				byteOffset += 4;
-				remainingArgs--;
-			} while (remainingArgs != 0);
+		for (; argCount - copiedArgs > 0; copiedArgs++) {
+			*reinterpret_cast<u32*>(reinterpret_cast<u32>(object->m_sp) + byteOffset) =
+			    tailArgs->m_word;
+			tailArgs++;
+			byteOffset += 4;
 		}
 	}
 	object->m_sp += copiedArgs;
 
-	const unsigned int prevCodePos = object->m_codePos;
-	const u8 prevFlags = object->m_flags;
+	const u32 prevCodePos = object->m_codePos;
+	const int prevCallFlag = object->m_flagBits.m_callFlag;
 	unsigned int* const prevLocalBase = object->m_localBase;
 	const int prevWaitCounter = object->m_waitCounter;
-	const int prevReqFlags = *reinterpret_cast<int*>(&object->m_reqFlag0);
+	const int prevReqFlag0 = *reinterpret_cast<int*>(&object->m_reqFlag0);
 	const s16 prevArgCount = object->m_argCount;
 
-	if (*reinterpret_cast<int*>(func + 0x4C) != 0) {
-		object->m_sp--;
-		object->m_argCount = static_cast<s16>(*object->m_sp);
+	if (func->m_useCallerArgs != 0) {
+		object->m_argCount = static_cast<s16>(pop(object));
 		object->m_localBase = object->m_sp - object->m_argCount;
 		object->m_sp = object->m_localBase + object->m_argCount;
 	} else {
-		object->m_localBase = object->m_sp - *reinterpret_cast<int*>(func + 0x24);
-		object->m_sp = object->m_localBase + *reinterpret_cast<int*>(func + 0x28);
+		object->m_localBase = object->m_sp - func->m_argCount;
+		object->m_sp = object->m_localBase + func->m_localCount;
 	}
 
-	*reinterpret_cast<u16*>(&object->m_codePos) =
-	    static_cast<u16>((static_cast<s16>(*reinterpret_cast<int*>(func + 0x00)) << 4)
-	                     | (*reinterpret_cast<u16*>(&object->m_codePos) & 0x000F));
-	object->m_codePos &= 0xFFF00000;
-	object->m_flags = static_cast<u8>((object->m_flags & 0xDF) | 0x20);
+	object->m_codeIndex.m_codeFunc = static_cast<s16>(func->m_index);
+	object->m_codeIndex.m_codeOffset = 0;
+
+	object->m_flagBits.m_callFlag = 1;
 	object->m_waitCounter = 0;
 	*reinterpret_cast<int*>(&object->m_reqFlag0) = 0;
 
-	*object->m_sp++ = reinterpret_cast<unsigned int>(prevLocalBase);
-	*object->m_sp++ = prevCodePos;
-	*object->m_sp++ =
-	    static_cast<int>((static_cast<unsigned int>(prevFlags) << 26) | (static_cast<unsigned int>(prevFlags) >> 6)) >> 31;
-	*object->m_sp++ = static_cast<unsigned int>(prevArgCount) | (static_cast<unsigned int>(prevWaitCounter) << 16)
-	                | (static_cast<unsigned int>(prevReqFlags) << 15);
+	*object->m_sp = reinterpret_cast<u32>(prevLocalBase);
+	object->m_sp++;
+	*object->m_sp = prevCodePos;
+	object->m_sp++;
+	*object->m_sp = static_cast<u32>(prevCallFlag);
+	object->m_sp++;
+	*object->m_sp =
+	    static_cast<u32>(prevArgCount | ((prevWaitCounter << 16) | (prevReqFlag0 << 15)));
+	object->m_sp++;
 
-	int clearCount = *reinterpret_cast<int*>(func + 0x28) - *reinterpret_cast<int*>(func + 0x24);
+	int clearCount = func->m_localCount - func->m_argCount;
 	if (clearCount != 0) {
-		unsigned int* clear = object->m_localBase + *reinterpret_cast<int*>(func + 0x24);
+		unsigned int* clearPtr = object->m_localBase + func->m_argCount;
 		while (clearCount > 0) {
-			*clear++ = 0;
+			*clearPtr++ = 0;
 			clearCount--;
 		}
 	}
 
 	objectFrame(object);
-	object->m_sp--;
 
-	const unsigned int result = *object->m_sp;
+	const int result = pop(object);
 	if (outArg != 0) {
 		outArg->m_word = result;
 	}

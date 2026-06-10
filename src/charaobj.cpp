@@ -70,7 +70,8 @@ struct SCharaItemRow {
 	unsigned short m_particleBank;  // 0x12
 	unsigned short m_particleEntries[4]; // 0x14
 	unsigned short m_particleSpec;  // 0x1C
-	unsigned char m_pad1E[0x8];     // 0x1E
+	unsigned char m_pad1E[0x6];     // 0x1E
+	unsigned short m_fanCount;      // 0x24
 	unsigned short m_speed;         // 0x26
 	unsigned char m_pad28[0x2];     // 0x28
 	unsigned short m_distance;      // 0x2A
@@ -3008,13 +3009,15 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 			offsetPos.z = m_worldPosition.z + cosf(m_rotTargetY) * distance;
 			CFlatRuntime2Storage().SetParticleWorkPos(offsetPos, m_rotTargetY);
 			CFlatRuntime2Storage().SetParticleWorkVector(m_rotTargetY, kCharaObjZero);
-			if ((*reinterpret_cast<unsigned short*>(itemData + 0x0C) & 0x2000) != 0) {
+			SCharaItemRow* traceRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
+			if ((traceRows[effectId].m_particleFlags & 0x2000) != 0) {
 				int partyIndex = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6C4);
 				if (partyIndex >= 0 && partyIndex < 4) {
 					CFlatRuntime2Storage().SetParticleWorkTrace(Game.m_partyObjArr[partyIndex]);
 				}
 			}
-			if ((*reinterpret_cast<unsigned short*>(itemData + 0x0C) & 0x4000) != 0) {
+			SCharaItemRow* targetRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
+			if ((targetRows[effectId].m_particleFlags & 0x4000) != 0) {
 				CFlatRuntime2Storage().SetParticleWorkPos(m_worldPosition, m_rotTargetY);
 				CFlatRuntime2Storage().SetParticleWorkTarget(m_jumpOffset);
 				CFlatRuntime2Storage().SetParticleWorkTrace(this);
@@ -3161,7 +3164,8 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 		}
 
 		if (!emittedCustom) {
-			int fanCount = *reinterpret_cast<unsigned short*>(itemData + 0x24);
+			SCharaItemRow* fanRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
+			int fanCount = fanRows[effectId].m_fanCount;
 			if (effectArg0 == 3 && fanCount > 1) {
 				for (int i = 0; i < fanCount; i++) {
 					CFlatRuntime2Storage().SetParticleWorkVector(FLOAT_803319A4 * static_cast<float>(i) / static_cast<float>(fanCount), kCharaObjZero);

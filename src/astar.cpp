@@ -41,6 +41,20 @@ struct CMapCylinderRaw
 	Vec m_boundsMin;
 };
 
+struct CABlock
+{
+	unsigned int m_words[16];
+};
+
+static inline CVector& SubVector(Vec* a, Vec* b)
+{
+	CVector result;
+
+	PSVECSubtract(a, b, reinterpret_cast<Vec*>(&result));
+
+	return result;
+}
+
 static inline float LoadFloat(const float& value)
 {
 	return value;
@@ -167,11 +181,9 @@ unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
 CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int forbiddenGroup)
 {
 	Vec escapeDir;
+	Vec portalVec;
 	CVector baseVec(base);
-	Vec* fromVec = reinterpret_cast<Vec*>(&CVector(from));
-	CVector escapeDirSource;
-
-	PSVECSubtract(fromVec, reinterpret_cast<Vec*>(&baseVec), reinterpret_cast<Vec*>(&escapeDirSource));
+	const CVector& escapeDirSource = SubVector(CVector(from), baseVec);
 
 	escapeDir.x = escapeDirSource.x;
 	escapeDir.y = escapeDirSource.y;
@@ -213,12 +225,7 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 				if (forbiddenGroup != otherGroup)
 				{
 					CVector portalDirBase(base);
-					Vec* portalDirPos = reinterpret_cast<Vec*>(&CVector(m_portals[i].m_position));
-					CVector dirToPortalSource;
-					Vec portalVec;
-
-					PSVECSubtract(portalDirPos, reinterpret_cast<Vec*>(&portalDirBase),
-					              reinterpret_cast<Vec*>(&dirToPortalSource));
+					const CVector& dirToPortalSource = SubVector(CVector(m_portals[i].m_position), portalDirBase);
 
 					portalVec.x = dirToPortalSource.x;
 					portalVec.y = dirToPortalSource.y;
@@ -229,11 +236,7 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 					                            reinterpret_cast<Vec*>(&portalVec));
 
 					CVector distBase(base);
-					Vec* distPortal = reinterpret_cast<Vec*>(&CVector(m_portals[i].m_position));
-					CVector distVecSource;
-
-					PSVECSubtract(distPortal, reinterpret_cast<Vec*>(&distBase),
-					              reinterpret_cast<Vec*>(&distVecSource));
+					const CVector& distVecSource = SubVector(CVector(m_portals[i].m_position), distBase);
 
 					portalVec.x = distVecSource.x;
 					portalVec.y = distVecSource.y;
@@ -288,8 +291,8 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 
 	Graphic.Printf(10, 10, const_cast<char*>(kAStarGroupDebugFormat), static_cast<int>(gPartyObj->m_aStarGroupId));
 
-	int padLock = Pad.m_debugPadLock;
 	bool padBusy = false;
+	int padLock = Pad.m_debugPadLock;
 
 	if (padLock != 0 || Pad.m_debugPadPort != -1)
 	{
@@ -336,8 +339,11 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 		return;
 	}
 
-	int groupLow = m_currentGroup;
-	int groupHigh = m_previousGroup;
+	int groupLow;
+	int groupHigh;
+
+	groupHigh = m_previousGroup;
+	groupLow = m_currentGroup;
 
 	if (groupHigh < groupLow)
 	{
@@ -437,16 +443,16 @@ void CAStar::drawAStar()
 
 			do
 			{
-				unsigned char b = static_cast<unsigned char>(Math.Rand(0xff));
-				unsigned char g = static_cast<unsigned char>(Math.Rand(0xff));
-				unsigned char r = static_cast<unsigned char>(Math.Rand(0xff));
+				int b = static_cast<unsigned char>(Math.Rand(0xff));
+				int g = static_cast<unsigned char>(Math.Rand(0xff));
+				int r = static_cast<unsigned char>(Math.Rand(0xff));
 				MapMng.SetIdGrpColor(group, 0, CColor(r, g, b, 0xFF).color);
 				++group;
 			} while (group < 64);
 		}
 
-		bool hasGroups = false;
 		float (*drawMtx)[4] = CameraPcs.m_cameraMatrix;
+		bool hasGroups = false;
 
 		if (m_currentGroup != 0 && m_previousGroup != 0)
 		{
@@ -455,8 +461,8 @@ void CAStar::drawAStar()
 
 		if (hasGroups)
 		{
-			CColor white(0xFF, 0xFF, 0xFF, 0xFF);
-			Graphic.DrawSphere(drawMtx, &m_lastGroupPos, LoadFloat(kDrawAStarSphereRadius), &white.color);
+			_GXColor* whiteColor = &CColor(0xFF, 0xFF, 0xFF, 0xFF).color;
+			Graphic.DrawSphere(drawMtx, &m_lastGroupPos, LoadFloat(kDrawAStarSphereRadius), whiteColor);
 		}
 
 		int i = 0;
@@ -472,8 +478,8 @@ void CAStar::drawAStar()
 
 			if (exists)
 			{
-				CColor yellow(0xFF, 0xFF, 0x00, 0xFF);
-				Graphic.DrawSphere(drawMtx, &m_portals[i].m_position, LoadFloat(kDrawAStarSphereRadius), &yellow.color);
+				_GXColor* yellowColor = &CColor(0xFF, 0xFF, 0x00, 0xFF).color;
+				Graphic.DrawSphere(drawMtx, &m_portals[i].m_position, LoadFloat(kDrawAStarSphereRadius), yellowColor);
 
 				int side = 0;
 				unsigned char* group = &m_portals[i].m_groupA;
@@ -557,6 +563,8 @@ void CAStar::calcAStar()
 
 			CATemp temp;
 
+			memset(&temp, 0, sizeof(temp));
+
 			check(from, to, temp);
 
 			if (m_bestPath.m_cost < LoadFloat(kInfiniteCost))
@@ -603,61 +611,8 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 	{
 		if (temp.m_cost < m_bestPath.m_cost)
 		{
-			u32 word;
-			unsigned int* dstVisited = reinterpret_cast<unsigned int*>(m_bestPath.m_visited);
-			unsigned int* srcVisited = reinterpret_cast<unsigned int*>(temp.m_visited);
-			unsigned int* dstPath = reinterpret_cast<unsigned int*>(m_bestPath.m_path);
-			unsigned int* srcPath = reinterpret_cast<unsigned int*>(temp.m_path);
-
-			word = srcVisited[1];
-			dstVisited[0] = srcVisited[0];
-			dstVisited[1] = word;
-			word = srcVisited[3];
-			dstVisited[2] = srcVisited[2];
-			dstVisited[3] = word;
-			word = srcVisited[5];
-			dstVisited[4] = srcVisited[4];
-			dstVisited[5] = word;
-			word = srcVisited[7];
-			dstVisited[6] = srcVisited[6];
-			dstVisited[7] = word;
-			word = srcVisited[9];
-			dstVisited[8] = srcVisited[8];
-			dstVisited[9] = word;
-			word = srcVisited[11];
-			dstVisited[10] = srcVisited[10];
-			dstVisited[11] = word;
-			word = srcVisited[13];
-			dstVisited[12] = srcVisited[12];
-			dstVisited[13] = word;
-			word = srcVisited[15];
-			dstVisited[14] = srcVisited[14];
-			dstVisited[15] = word;
-
-			word = srcPath[1];
-			dstPath[0] = srcPath[0];
-			dstPath[1] = word;
-			word = srcPath[3];
-			dstPath[2] = srcPath[2];
-			dstPath[3] = word;
-			word = srcPath[5];
-			dstPath[4] = srcPath[4];
-			dstPath[5] = word;
-			word = srcPath[7];
-			dstPath[6] = srcPath[6];
-			dstPath[7] = word;
-			word = srcPath[9];
-			dstPath[8] = srcPath[8];
-			dstPath[9] = word;
-			word = srcPath[11];
-			dstPath[10] = srcPath[10];
-			dstPath[11] = word;
-			word = srcPath[13];
-			dstPath[12] = srcPath[12];
-			dstPath[13] = word;
-			word = srcPath[15];
-			dstPath[14] = srcPath[14];
-			dstPath[15] = word;
+			*reinterpret_cast<CABlock*>(m_bestPath.m_visited) = *reinterpret_cast<CABlock*>(temp.m_visited);
+			*reinterpret_cast<CABlock*>(m_bestPath.m_path) = *reinterpret_cast<CABlock*>(temp.m_path);
 			m_bestPath.m_pathLength = temp.m_pathLength;
 			m_bestPath.m_cost = temp.m_cost;
 		}
@@ -684,43 +639,8 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 			if (temp.m_visited[other0Index] == 0)
 			{
 				CATemp level1;
-				unsigned int* visited1 = reinterpret_cast<unsigned int*>(level1.m_visited);
-				unsigned int* path1 = reinterpret_cast<unsigned int*>(level1.m_path);
-
-				visited1[0] = reinterpret_cast<unsigned int*>(temp.m_visited)[0];
-				visited1[1] = reinterpret_cast<unsigned int*>(temp.m_visited)[1];
-				visited1[2] = reinterpret_cast<unsigned int*>(temp.m_visited)[2];
-				visited1[3] = reinterpret_cast<unsigned int*>(temp.m_visited)[3];
-				visited1[4] = reinterpret_cast<unsigned int*>(temp.m_visited)[4];
-				visited1[5] = reinterpret_cast<unsigned int*>(temp.m_visited)[5];
-				visited1[6] = reinterpret_cast<unsigned int*>(temp.m_visited)[6];
-				visited1[7] = reinterpret_cast<unsigned int*>(temp.m_visited)[7];
-				visited1[8] = reinterpret_cast<unsigned int*>(temp.m_visited)[8];
-				visited1[9] = reinterpret_cast<unsigned int*>(temp.m_visited)[9];
-				visited1[10] = reinterpret_cast<unsigned int*>(temp.m_visited)[10];
-				visited1[11] = reinterpret_cast<unsigned int*>(temp.m_visited)[11];
-				visited1[12] = reinterpret_cast<unsigned int*>(temp.m_visited)[12];
-				visited1[13] = reinterpret_cast<unsigned int*>(temp.m_visited)[13];
-				visited1[14] = reinterpret_cast<unsigned int*>(temp.m_visited)[14];
-				visited1[15] = reinterpret_cast<unsigned int*>(temp.m_visited)[15];
-
-				path1[0] = reinterpret_cast<unsigned int*>(temp.m_path)[0];
-				path1[1] = reinterpret_cast<unsigned int*>(temp.m_path)[1];
-				path1[2] = reinterpret_cast<unsigned int*>(temp.m_path)[2];
-				path1[3] = reinterpret_cast<unsigned int*>(temp.m_path)[3];
-				path1[4] = reinterpret_cast<unsigned int*>(temp.m_path)[4];
-				path1[5] = reinterpret_cast<unsigned int*>(temp.m_path)[5];
-				path1[6] = reinterpret_cast<unsigned int*>(temp.m_path)[6];
-				path1[7] = reinterpret_cast<unsigned int*>(temp.m_path)[7];
-				path1[8] = reinterpret_cast<unsigned int*>(temp.m_path)[8];
-				path1[9] = reinterpret_cast<unsigned int*>(temp.m_path)[9];
-				path1[10] = reinterpret_cast<unsigned int*>(temp.m_path)[10];
-				path1[11] = reinterpret_cast<unsigned int*>(temp.m_path)[11];
-				path1[12] = reinterpret_cast<unsigned int*>(temp.m_path)[12];
-				path1[13] = reinterpret_cast<unsigned int*>(temp.m_path)[13];
-				path1[14] = reinterpret_cast<unsigned int*>(temp.m_path)[14];
-				path1[15] = reinterpret_cast<unsigned int*>(temp.m_path)[15];
-
+				*reinterpret_cast<CABlock*>(level1.m_visited) = *reinterpret_cast<CABlock*>(temp.m_visited);
+				*reinterpret_cast<CABlock*>(level1.m_path) = *reinterpret_cast<CABlock*>(temp.m_path);
 				level1.m_pathLength = temp.m_pathLength;
 				level1.m_cost = temp.m_cost;
 				float distance1 = PSVECDistance(&pos0->m_position, &m_portals[other0Index].m_position);
@@ -734,42 +654,8 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 				{
 					if (level1.m_cost < m_bestPath.m_cost)
 					{
-						unsigned int* dstVisited = reinterpret_cast<unsigned int*>(m_bestPath.m_visited);
-						unsigned int* dstPath = reinterpret_cast<unsigned int*>(m_bestPath.m_path);
-
-						dstVisited[0] = visited1[0];
-						dstVisited[1] = visited1[1];
-						dstVisited[2] = visited1[2];
-						dstVisited[3] = visited1[3];
-						dstVisited[4] = visited1[4];
-						dstVisited[5] = visited1[5];
-						dstVisited[6] = visited1[6];
-						dstVisited[7] = visited1[7];
-						dstVisited[8] = visited1[8];
-						dstVisited[9] = visited1[9];
-						dstVisited[10] = visited1[10];
-						dstVisited[11] = visited1[11];
-						dstVisited[12] = visited1[12];
-						dstVisited[13] = visited1[13];
-						dstVisited[14] = visited1[14];
-						dstVisited[15] = visited1[15];
-
-						dstPath[0] = path1[0];
-						dstPath[1] = path1[1];
-						dstPath[2] = path1[2];
-						dstPath[3] = path1[3];
-						dstPath[4] = path1[4];
-						dstPath[5] = path1[5];
-						dstPath[6] = path1[6];
-						dstPath[7] = path1[7];
-						dstPath[8] = path1[8];
-						dstPath[9] = path1[9];
-						dstPath[10] = path1[10];
-						dstPath[11] = path1[11];
-						dstPath[12] = path1[12];
-						dstPath[13] = path1[13];
-						dstPath[14] = path1[14];
-						dstPath[15] = path1[15];
+						*reinterpret_cast<CABlock*>(m_bestPath.m_visited) = *reinterpret_cast<CABlock*>(level1.m_visited);
+						*reinterpret_cast<CABlock*>(m_bestPath.m_path) = *reinterpret_cast<CABlock*>(level1.m_path);
 						m_bestPath.m_pathLength = level1.m_pathLength;
 						m_bestPath.m_cost = level1.m_cost;
 					}
@@ -796,42 +682,8 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 							if (level1.m_visited[other1Index] == 0)
 							{
 								CATemp level2;
-								unsigned int* level2Visited = reinterpret_cast<unsigned int*>(level2.m_visited);
-								unsigned int* level2Path = reinterpret_cast<unsigned int*>(level2.m_path);
-
-								level2Visited[0] = visited1[0];
-								level2Visited[1] = visited1[1];
-								level2Visited[2] = visited1[2];
-								level2Visited[3] = visited1[3];
-								level2Visited[4] = visited1[4];
-								level2Visited[5] = visited1[5];
-								level2Visited[6] = visited1[6];
-								level2Visited[7] = visited1[7];
-								level2Visited[8] = visited1[8];
-								level2Visited[9] = visited1[9];
-								level2Visited[10] = visited1[10];
-								level2Visited[11] = visited1[11];
-								level2Visited[12] = visited1[12];
-								level2Visited[13] = visited1[13];
-								level2Visited[14] = visited1[14];
-								level2Visited[15] = visited1[15];
-
-								level2Path[0] = path1[0];
-								level2Path[1] = path1[1];
-								level2Path[2] = path1[2];
-								level2Path[3] = path1[3];
-								level2Path[4] = path1[4];
-								level2Path[5] = path1[5];
-								level2Path[6] = path1[6];
-								level2Path[7] = path1[7];
-								level2Path[8] = path1[8];
-								level2Path[9] = path1[9];
-								level2Path[10] = path1[10];
-								level2Path[11] = path1[11];
-								level2Path[12] = path1[12];
-								level2Path[13] = path1[13];
-								level2Path[14] = path1[14];
-								level2Path[15] = path1[15];
+								*reinterpret_cast<CABlock*>(level2.m_visited) = *reinterpret_cast<CABlock*>(level1.m_visited);
+								*reinterpret_cast<CABlock*>(level2.m_path) = *reinterpret_cast<CABlock*>(level1.m_path);
 								level2.m_pathLength = level1.m_pathLength;
 								level2.m_cost = level1.m_cost;
 								float distance2 = PSVECDistance(&pos1->m_position, &m_portals[other1Index].m_position);

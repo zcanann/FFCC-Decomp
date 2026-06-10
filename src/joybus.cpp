@@ -3314,36 +3314,34 @@ int JoyBus::SetSendQueue(ThreadParam* threadParam, unsigned int command)
 
 /*
  * --INFO--
- * Address:	........
- * Size:	........
+ * Address:	TODO
+ * Size:	TODO
  */
-inline void JoyBus::ReadInitialCode(ThreadParam* threadParam)
+int JoyBus::SendMapNo(ThreadParam* threadParam)
 {
-    unsigned int readBuf[4];
+    unsigned int cmd;
+    int stageNo;
+    int stageNoSub;
 
-    bool singleMode = GbaQue.IsSingleMode(threadParam->m_portIndex);
+    int port = threadParam->m_portIndex;
 
-    if (singleMode && (int)threadParam->m_portIndex != 1)
-    {
-        threadParam->m_gbaStatus = 0;
-    }
-    else
-    {
-        threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
-    }
+    GbaQue.GetStageNo(port, &stageNo, &stageNoSub);
 
-    if ((int)threadParam->m_gbaStatus == 0 && threadParam->m_unk3 == 0x28)
-    {
-        threadParam->m_gbaStatus = GBARead(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(readBuf), &threadParam->m_unk3);
+    cmd = 0;
+    ((unsigned char*)&cmd)[0] = 0x0E;
+    ((unsigned char*)&cmd)[1] = 1;
+    ((unsigned char*)&cmd)[2] = (unsigned char)stageNo;
+    ((unsigned char*)&cmd)[3] = (unsigned char)stageNoSub;
 
-        if ((int)threadParam->m_gbaStatus == 0)
-        {
-            threadParam->m_recvReadIdx = readBuf[0];
+    unsigned int queueCmd = cmd;
 
-            *reinterpret_cast<unsigned int*>(&threadParam->m_deviceType) = 1;
-        }
-    }
+    unsigned int result;
+
+    result = SetSendQueue(threadParam, queueCmd);
+
+    return result != 0 ? -1 : 0;
 }
+
 
 /*
  * --INFO--
@@ -3363,13 +3361,9 @@ inline int JoyBus::WriteInitialCode(ThreadParam* threadParam)
         threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
     }
 
+    if ((int)threadParam->m_gbaStatus != 0)
     {
-        int chk = threadParam->m_gbaStatus;
-
-        if (chk != 0)
-        {
-            return chk;
-        }
+        return (int)threadParam->m_gbaStatus;
     }
 
     if (threadParam->m_unk3 != 0x20)
@@ -3379,13 +3373,9 @@ inline int JoyBus::WriteInitialCode(ThreadParam* threadParam)
 
     threadParam->m_gbaStatus = GBAWrite(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(m_diskId), &threadParam->m_unk3);
 
+    if ((int)threadParam->m_gbaStatus != 0)
     {
-        int chk = threadParam->m_gbaStatus;
-
-        if (chk != 0)
-        {
-            return chk;
-        }
+        return (int)threadParam->m_gbaStatus;
     }
 
     singleMode = GbaQue.IsSingleMode(threadParam->m_portIndex);
@@ -3399,13 +3389,9 @@ inline int JoyBus::WriteInitialCode(ThreadParam* threadParam)
         threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
     }
 
+    if ((int)threadParam->m_gbaStatus != 0)
     {
-        int chk = threadParam->m_gbaStatus;
-
-        if (chk != 0)
-        {
-            return chk;
-        }
+        return (int)threadParam->m_gbaStatus;
     }
 
     if ((threadParam->m_unk3 & 0x30) != 0x20)
@@ -3423,11 +3409,7 @@ inline int JoyBus::WriteInitialCode(ThreadParam* threadParam)
  */
 inline int JoyBus::ReadContext(ThreadParam* threadParam)
 {
-    struct
-    {
-        unsigned char h;
-        unsigned char f;
-    } tmpBuf;
+    unsigned int ctxData;
 
     bool singleMode = GbaQue.IsSingleMode(threadParam->m_portIndex);
 
@@ -3440,13 +3422,9 @@ inline int JoyBus::ReadContext(ThreadParam* threadParam)
         threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
     }
 
+    if ((int)threadParam->m_gbaStatus != 0)
     {
-        int chk = threadParam->m_gbaStatus;
-
-        if (chk != 0)
-        {
-            return chk;
-        }
+        return (int)threadParam->m_gbaStatus;
     }
 
     if (threadParam->m_unk3 != 0x28)
@@ -3454,25 +3432,21 @@ inline int JoyBus::ReadContext(ThreadParam* threadParam)
         return 1;
     }
 
-    threadParam->m_gbaStatus = GBARead(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(&tmpBuf), &threadParam->m_unk3);
+    threadParam->m_gbaStatus = GBARead(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(&ctxData), &threadParam->m_unk3);
 
+    if ((int)threadParam->m_gbaStatus != 0)
     {
-        int chk = threadParam->m_gbaStatus;
-
-        if (chk != 0)
-        {
-            return chk;
-        }
+        return (int)threadParam->m_gbaStatus;
     }
 
-    if (tmpBuf.h != 1)
+    if (((unsigned char*)&ctxData)[0] != 1)
     {
         return 1;
     }
 
-    threadParam->m_gbaBootFlag    = (unsigned char)((int)tmpBuf.f >> 6);
-    threadParam->m_unk2           = (unsigned char)((tmpBuf.f >> 4) & 0x03);
-    threadParam->m_bootRetryCount = (unsigned char)(tmpBuf.f & 0x0F);
+    threadParam->m_gbaBootFlag    = (unsigned char)((int)((unsigned char*)&ctxData)[1] >> 6);
+    threadParam->m_unk2           = (unsigned char)((((unsigned char*)&ctxData)[1] >> 4) & 0x03);
+    threadParam->m_bootRetryCount = (unsigned char)(((unsigned char*)&ctxData)[1] & 0x0F);
 
     return 0;
 }
@@ -3497,13 +3471,9 @@ inline int JoyBus::ReadHostId(ThreadParam* threadParam)
         threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
     }
 
+    if ((int)threadParam->m_gbaStatus != 0)
     {
-        int chk = threadParam->m_gbaStatus;
-
-        if (chk != 0)
-        {
-            return chk;
-        }
+        return (int)threadParam->m_gbaStatus;
     }
 
     if (threadParam->m_unk3 != 0x28)
@@ -3513,13 +3483,9 @@ inline int JoyBus::ReadHostId(ThreadParam* threadParam)
 
     threadParam->m_gbaStatus = GBARead(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(&timeValue), &threadParam->m_unk3);
 
+    if ((int)threadParam->m_gbaStatus != 0)
     {
-        int chk = threadParam->m_gbaStatus;
-
-        if (chk != 0)
-        {
-            return chk;
-        }
+        return (int)threadParam->m_gbaStatus;
     }
 
     threadParam->m_timeChangedFlag = (unsigned char)(((timeValue - threadParam->m_timestamp) | (threadParam->m_timestamp - timeValue)) >> 31);
@@ -3546,13 +3512,9 @@ inline int JoyBus::WriteHostId(ThreadParam* threadParam)
         threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
     }
 
+    if ((int)threadParam->m_gbaStatus != 0)
     {
-        int chk = threadParam->m_gbaStatus;
-
-        if (chk != 0)
-        {
-            return chk;
-        }
+        return (int)threadParam->m_gbaStatus;
     }
 
     if (threadParam->m_unk3 != 0x20)
@@ -3568,16 +3530,29 @@ inline int JoyBus::WriteHostId(ThreadParam* threadParam)
 
     threadParam->m_gbaStatus = GBAWrite(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(&threadParam->m_timestamp), &threadParam->m_unk3);
 
+    if ((int)threadParam->m_gbaStatus != 0)
     {
-        int chk = threadParam->m_gbaStatus;
-
-        if (chk != 0)
-        {
-            return chk;
-        }
+        return (int)threadParam->m_gbaStatus;
     }
 
     return 0;
+}
+
+/*
+ * --INFO--
+ * Address:	........
+ * Size:	........
+ */
+inline int JoyBus::SendLanguage(ThreadParam* threadParam)
+{
+    unsigned int cmd;
+
+    cmd = 0;
+    ((unsigned char*)&cmd)[0] = 0x14;
+    ((unsigned char*)&cmd)[1] = 0x16;
+    ((unsigned char*)&cmd)[2] = (unsigned char)(Game.m_gameWork.m_languageId - 1) | kPppYmMeltMaskBit4;
+
+    return SetSendQueue(threadParam, cmd);
 }
 
 /*
@@ -3600,13 +3575,9 @@ inline int JoyBus::WriteContext(ThreadParam* threadParam)
         threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
     }
 
+    if ((int)threadParam->m_gbaStatus != 0)
     {
-        int chk = threadParam->m_gbaStatus;
-
-        if (chk != 0)
-        {
-            return chk;
-        }
+        return (int)threadParam->m_gbaStatus;
     }
 
     if (threadParam->m_unk3 != 0x20)
@@ -3631,13 +3602,9 @@ inline int JoyBus::WriteContext(ThreadParam* threadParam)
 
     threadParam->m_gbaStatus = GBAWrite(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(&word), &threadParam->m_unk3);
 
+    if ((int)threadParam->m_gbaStatus != 0)
     {
-        int chk = threadParam->m_gbaStatus;
-
-        if (chk != 0)
-        {
-            return chk;
-        }
+        return (int)threadParam->m_gbaStatus;
     }
 
     return 0;
@@ -3652,19 +3619,43 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
 {
     int result;
     int status;
+    unsigned int readBuf[4];
 
     switch ((unsigned char)threadParam->m_subState)
     {
     case 0:
+    {
         m_stateFlagArr[threadParam->m_portIndex] = 0;
 
         ResetQueue(threadParam);
 
-        ReadInitialCode(threadParam);
+        bool singleMode = GbaQue.IsSingleMode(threadParam->m_portIndex);
+
+        if (singleMode && (int)threadParam->m_portIndex != 1)
+        {
+            threadParam->m_gbaStatus = 0;
+        }
+        else
+        {
+            threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
+        }
+
+        if ((int)threadParam->m_gbaStatus == 0 && threadParam->m_unk3 == 0x28)
+        {
+            threadParam->m_gbaStatus = GBARead(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(readBuf), &threadParam->m_unk3);
+
+            if ((int)threadParam->m_gbaStatus == 0)
+            {
+                threadParam->m_recvReadIdx = readBuf[0];
+
+                *reinterpret_cast<unsigned int*>(&threadParam->m_deviceType) = 1;
+            }
+        }
 
         threadParam->m_subState = 1;
         result = 0;
         break;
+    }
 
     case 1:
         status = WriteInitialCode(threadParam);
@@ -3741,33 +3732,13 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
         }
         else
         {
-            int stageNoSub;
-            int stageNo;
-            unsigned int cmdStage;
-            unsigned int cmdGame;
-
-            GbaQue.GetStageNo(threadParam->m_portIndex, &stageNo, &stageNoSub);
-
-            cmdStage = 0;
-            ((unsigned char*)&cmdStage)[0] = 0x0E;
-            ((unsigned char*)&cmdStage)[1] = 1;
-            ((unsigned char*)&cmdStage)[2] = (unsigned char)stageNo;
-            ((unsigned char*)&cmdStage)[3] = (unsigned char)stageNoSub;
-
-            unsigned int stageResult = SetSendQueue(threadParam, cmdStage);
-
-            if ((int)(-stageResult | stageResult) >> 31 < 0)
+            if (SendMapNo(threadParam) < 0)
             {
                 result = 1;
             }
             else
             {
-                cmdGame = 0;
-                ((unsigned char*)&cmdGame)[0] = 0x14;
-                ((unsigned char*)&cmdGame)[1] = 0x16;
-                ((unsigned char*)&cmdGame)[2] = (unsigned char)(Game.m_gameWork.m_languageId - 1) | kPppYmMeltMaskBit4;
-
-                err = SetSendQueue(threadParam, cmdGame);
+                err = SendLanguage(threadParam);
 
                 if (err < 0)
                 {
@@ -4219,34 +4190,7 @@ int JoyBus::SendMBase(ThreadParam* threadParam)
     return result != 0 ? -1 : 0;
 }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-int JoyBus::SendMapNo(ThreadParam* threadParam)
-{
-    int port = threadParam->m_portIndex;
 
-    char stageMajor[4];
-    char stageMinor[4];
-
-    GbaQue.GetStageNo(port, (int*)&stageMajor, (int*)&stageMinor);
-
-    unsigned int cmd = 0;
-    unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
-    cmdBytes[0] = 0x0E;
-    cmdBytes[1] = 1;
-    cmdBytes[2] = stageMajor[3];
-    cmdBytes[3] = stageMinor[3];
-    unsigned int queueCmd = cmd;
-
-    unsigned int result;
-
-    result = SetSendQueue(threadParam, queueCmd);
-
-    return result != 0 ? -1 : 0;
-}
 
 
 

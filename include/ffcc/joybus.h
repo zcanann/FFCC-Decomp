@@ -77,12 +77,12 @@ public:
     void ThreadInit();
     void ThreadSleep(long long);
 
-    void ReadInitialCode(ThreadParam* threadParam);
     int WriteInitialCode(ThreadParam* threadParam);
     int ReadContext(ThreadParam* threadParam);
     int ReadHostId(ThreadParam* threadParam);
     int WriteHostId(ThreadParam* threadParam);
     int WriteContext(ThreadParam* threadParam);
+    int SendLanguage(ThreadParam* threadParam);
 
     void SetPadData(ThreadParam* threadParam, unsigned char* data);
     unsigned short GetPadData(int portIndex);

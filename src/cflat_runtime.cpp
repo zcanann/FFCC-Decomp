@@ -85,7 +85,6 @@ void CFlatRuntime::Quit()
 void CFlatRuntime::Destroy()
 {
 	u8* const self = reinterpret_cast<u8*>(this);
-	const u32 clearBit = 0;
 	CObject* object = m_objectSentinel.m_next;
 
 	while (object != &m_objectSentinel) {
@@ -100,7 +99,7 @@ void CFlatRuntime::Destroy()
 		object->m_freeListNode[1] = m_objectFreeListHead;
 		m_objectFreeListHead = object->m_freeListNode;
 
-		object->m_flags = static_cast<u8>(__rlwimi(object->m_flags, clearBit, 4, 27, 27));
+		object->m_flagBits.m_constructFlag = 0;
 
 		onDeleteObject(object);
 
@@ -645,7 +644,6 @@ int CFlatRuntime::Frame(int mode, int unused)
  */
 void CFlatRuntime::AfterFrame(int mode)
 {
-	const u32 clearBit = 0;
 	CObject* object = m_objectSentinel.m_next;
 
 	while (object != &m_objectSentinel) {
@@ -661,7 +659,7 @@ void CFlatRuntime::AfterFrame(int mode)
 			object->m_freeListNode[1] = m_objectFreeListHead;
 			m_objectFreeListHead = object->m_freeListNode;
 
-			object->m_flags = static_cast<u8>(__rlwimi(object->m_flags, clearBit, 4, 27, 27));
+			object->m_flagBits.m_constructFlag = 0;
 
 			onDeleteObject(object);
 		}
@@ -681,8 +679,6 @@ void CFlatRuntime::AfterFrame(int mode)
  */
 void CFlatRuntime::deleteObject(CFlatRuntime::CObject* object)
 {
-	const u32 clearBit = 0;
-
 	object->m_previous->m_next = object->m_next;
 	object->m_next->m_previous = object->m_previous;
 
@@ -692,7 +688,7 @@ void CFlatRuntime::deleteObject(CFlatRuntime::CObject* object)
 	object->m_freeListNode[1] = m_objectFreeListHead;
 	m_objectFreeListHead = object->m_freeListNode;
 
-	object->m_flags = static_cast<u8>(__rlwimi(object->m_flags, clearBit, 4, 27, 27));
+	object->m_flagBits.m_constructFlag = 0;
 
 	onDeleteObject(object);
 }
@@ -2327,7 +2323,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 
 				engineObject->m_freeListNode[1] = m_objectFreeListHead;
 				m_objectFreeListHead = engineObject->m_freeListNode;
-				engineObject->m_flags = static_cast<u8>(__rlwimi(engineObject->m_flags, 0, 4, 27, 27));
+				engineObject->m_flagBits.m_constructFlag = 0;
 
 				onDeleteObject(engineObject);
 			} else {

@@ -2172,9 +2172,9 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 
 	const int cullFlag = flags & 1;
 	const int shadowDisabled = ((flags >> 1) & 1) ^ 1;
+	const int materialAlpha = (flags >> 2) & 1;
 	const int shadowCullEnabled = (flags >> 3) & 1;
 	const int skipShadowPosition = ((flags >> 4) & 1) ^ 1;
-	const int materialAlpha = (flags >> 2) & 1;
 	BeforeDrawModelCallback beforeDrawModel = ModelBeforeDrawCallback(this);
 	if (beforeDrawModel != 0 && pass == 0) {
 		beforeDrawModel(this, ModelCbUser0(this), ModelCbUser1(this), view, cullFlag);

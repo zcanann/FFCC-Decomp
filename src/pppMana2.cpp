@@ -937,39 +937,41 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
         C_MTXPerspective(projectionMtx, LoadFloat(kMana2ParaboloidFov), LoadFloat(kMana2One),
                          LoadFloat(kMana2One), LoadFloat(kMana2ParaboloidFar));
         GXSetProjection(projectionMtx, (_GXProjectionType)0);
+        float one = LoadFloat(kMana2One);
+        float zero = LoadFloat(kMana2Zero);
 
         for (i = 0; i < 6; i++) {
             cameraPos.x = centerPos.x;
             cameraPos.y = centerPos.y;
             cameraPos.z = centerPos.z;
-            cameraUp.x = LoadFloat(kMana2Zero);
-            cameraUp.y = LoadFloat(kMana2One);
-            cameraUp.z = LoadFloat(kMana2Zero);
+            cameraUp.x = zero;
+            cameraUp.y = one;
+            cameraUp.z = zero;
 
             switch (i) {
             case 0:
-                cameraPos.x = centerPos.x + LoadFloat(kMana2One);
+                cameraPos.x = centerPos.x + one;
                 break;
             case 4:
-                cameraPos.z = centerPos.z + LoadFloat(kMana2One);
+                cameraPos.z = centerPos.z + one;
                 break;
             case 1:
-                cameraPos.x = centerPos.x - LoadFloat(kMana2One);
+                cameraPos.x = centerPos.x - one;
                 break;
             case 5:
-                cameraPos.z = centerPos.z - LoadFloat(kMana2One);
+                cameraPos.z = centerPos.z - one;
                 break;
             case 2:
-                cameraPos.y = centerPos.y + LoadFloat(kMana2One);
-                cameraUp.x = LoadFloat(kMana2Zero);
-                cameraUp.y = LoadFloat(kMana2Zero);
+                cameraPos.y = centerPos.y + one;
+                cameraUp.x = zero;
+                cameraUp.y = zero;
                 cameraUp.z = LoadFloat(kMana2NegativeOne);
                 break;
             case 3:
-                cameraPos.y = centerPos.y - LoadFloat(kMana2One);
-                cameraUp.x = LoadFloat(kMana2Zero);
-                cameraUp.y = LoadFloat(kMana2Zero);
-                cameraUp.z = LoadFloat(kMana2One);
+                cameraPos.y = centerPos.y - one;
+                cameraUp.x = zero;
+                cameraUp.y = zero;
+                cameraUp.z = one;
                 break;
             }
 

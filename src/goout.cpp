@@ -665,8 +665,12 @@ void DrawGoOutMenu()
             MenuPcs.DrawInit();
             MenuPcs.DrawCMakeMenu();
         }
-        if (goOutMenu.m_goOutMode != 0xF && goOutMenu.m_goOutMode < 0xF && goOutMenu.m_goOutMode >= 0xE) {
+        switch (goOutMenu.m_goOutMode) {
+        case 0xE:
             MenuPcs.DrawLoadMenu();
+            break;
+        case 0xF:
+            break;
         }
         if (goOutMenu.m_goOutMode == 1 &&
             MenuGoOutState().m_resultSelect != 0) {

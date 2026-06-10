@@ -2506,7 +2506,7 @@ timeout_expiry:
             break;
         }
 
-        default:
+        case 901:
         {
             threadParam->m_flags[4] = 0;
             GbaQue.SetChgUseItemFlg(threadParam->m_portIndex);
@@ -2549,6 +2549,33 @@ timeout_expiry:
                 threadParam->m_prevState = 0;
             }
 
+            break;
+        }
+
+        default:
+        {
+            threadParam->m_flags[4] = 0;
+            GbaQue.SetChgUseItemFlg(threadParam->m_portIndex);
+            threadParam->m_sentStartFlag = 0;
+            threadParam->m_flags[1] = 0;
+            threadParam->m_flags[5] = 0;
+
+            if (threadParam->m_counter0x2B == 0)
+            {
+                GbaQue.SetResetFlg(threadParam->m_portIndex);
+                threadParam->m_counter0x2B = 1;
+            }
+
+            if (GetGBAStat(threadParam) == 0)
+            {
+                threadParam->m_state = 0;
+                break;
+            }
+
+            ResetQueue(threadParam);
+            m_stateFlagArr[threadParam->m_portIndex] = 1;
+            m_stateCodeArr[threadParam->m_portIndex] = 0xFF;
+            ThreadSleep(OSMillisecondsToTicks(15));
             break;
         }
         }

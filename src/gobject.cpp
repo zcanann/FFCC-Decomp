@@ -2008,15 +2008,18 @@ void CGObject::onDraw()
         Graphic.DrawSphere(posMtx, &m_worldPosition, m_nearColRadius, &CColor(0x40, 0xFF, 0x40, 0xFF).color);
     }
 
+    _GXColor* loopColorPtr;
     if (((CFlat.m_debugFlags & 0x40000) != 0) && ((m_bgColMask & 0x40000) != 0)) {
-        for (unsigned int i = 0; i < 8; i++) {
+        for (int i = 0; i < 8; i++) {
             AttackCol* collider = &m_attackColliders[i];
-            if (*reinterpret_cast<int*>(&collider->m_localStart.x) == 0) {
+            if (*reinterpret_cast<int*>(&collider[1].m_localStart.x) == 0) {
                 continue;
             }
 
-            Graphic.DrawSphere(posMtx, &collider->m_worldPosition, collider->m_radius,
-                               &CColor(0xFF, 0x80, 0x80, 0xFF).color);
+            loopColorPtr = &CColor(0xFF, 0x80, 0x80, 0xFF).color;
+            Graphic.DrawSphere(posMtx, reinterpret_cast<Vec*>(&collider->m_worldPosition.y),
+                               collider->m_hitRadius,
+                               loopColorPtr);
 
             GXLoadPosMtxImm(posMtx, GX_PNMTX0);
             GXBegin(GX_LINES, GX_VTXFMT0, 2);
@@ -2028,14 +2031,15 @@ void CGObject::onDraw()
     if (((CFlat.m_debugFlags & 0x80000) != 0) && ((m_bgColMask & 0x80000) != 0)) {
         for (int i = 0; i < 8; i++) {
             DamageCol* collider = &m_damageColliders[i];
-            if (*reinterpret_cast<int*>(&collider->m_localPosition.x) == 0) {
+            if (*reinterpret_cast<int*>(&collider[1].m_localPosition.x) == 0) {
                 continue;
             }
 
-            _GXColor* colorPtr = &CColor(0x80, 0x80, 0xFF, 0xFF).color;
-            Graphic.DrawSphere(posMtx, &collider->m_worldPosition,
-                               CVector(collider->m_innerRadius, collider->m_outerRadius, collider->m_innerRadius),
-                               colorPtr);
+            loopColorPtr = &CColor(0x80, 0x80, 0xFF, 0xFF).color;
+            const float hitInner = collider->m_hitInnerRadius;
+            Graphic.DrawSphere(posMtx, reinterpret_cast<Vec*>(&collider->m_worldPosition.y),
+                               CVector(hitInner, collider->m_hitOuterRadius, hitInner),
+                               loopColorPtr);
         }
     }
 }

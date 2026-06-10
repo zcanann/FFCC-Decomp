@@ -976,7 +976,7 @@ int CCharaPcs::correctLoadAnimAmem()
 
             Memory.CopyFromAMemorySync(
                 tempBuffer + chunkSize,
-                reinterpret_cast<void*>(m_amemStage->m_heapTop + static_cast<int>(animOffset)),
+                reinterpret_cast<void*>(static_cast<int>(animOffset) + m_amemStage->m_heapTop),
                 static_cast<unsigned long>(animSize));
 
             loadAnim->m_anim->m_bankAddress = compactedSize + chunkSize;
@@ -984,7 +984,7 @@ int CCharaPcs::correctLoadAnimAmem()
         }
 
         if (chunkLoadCount != 0) {
-            const int writeBase = m_amemStage->m_heapTop + compactedSize;
+            const int writeBase = compactedSize + m_amemStage->m_heapTop;
             Memory.CopyToAMemorySync(
                 tempBuffer, reinterpret_cast<void*>(writeBase),
                 static_cast<unsigned long>(chunkSize));

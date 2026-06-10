@@ -1775,12 +1775,16 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			case 1:
 			case 4: {
 				unsigned int basePower = *reinterpret_cast<unsigned short*>(itemData + 6);
-				unsigned int sourcePower = (static_cast<unsigned short>(sourceObj->GetCID()) & 0xAD) == 0xAD ?
-					*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0x20) :
-					*reinterpret_cast<unsigned short*>(itemData + 0x30);
+				unsigned short rawSourcePower;
+				if ((((static_cast<unsigned int>(__cntlzw(0xAD - (static_cast<unsigned short>(sourceObj->GetCID()) & 0xAD))) >> 5) & 0xFFU) != 0)) {
+					rawSourcePower = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0x20);
+				} else {
+					rawSourcePower = *reinterpret_cast<unsigned short*>(itemData + 0x30);
+				}
+				unsigned int sourcePower = rawSourcePower;
 				unsigned int defense = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x22);
 				float defenseRate = kOneF32;
-				if ((static_cast<unsigned short>(sourceObj->GetCID()) & 0xAD) == 0xAD) {
+				if ((((static_cast<unsigned int>(__cntlzw(0xAD - (static_cast<unsigned short>(sourceObj->GetCID()) & 0xAD))) >> 5) & 0xFFU) != 0)) {
 					defenseRate = CharaObjGetStatusMultiplier(0x32);
 				}
 				int guardValue = static_cast<int>(static_cast<float>(static_cast<int>(defense)) * defenseRate);

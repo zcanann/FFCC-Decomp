@@ -1826,12 +1826,10 @@ void pppInitPdt(long* progOffsetReconstructionTable, pppProg* pppProg)
 		return;
 	}
 
-	int* entry = table;
-	int* head = 0;
-	do {
-		head = entry;
+	int* head = table;
+	for (;;) {
 		*head = (int)progOffsetReconstructionTable + *head;
-		entry = head;
+		int* entry = head;
 
 		for (int i = 0; i < *(short*)((int)head + 0x26); i++) {
 			entry[10] = (int)(pppProg + entry[10]);
@@ -1840,10 +1838,14 @@ void pppInitPdt(long* progOffsetReconstructionTable, pppProg* pppProg)
 			entry += 4;
 		}
 
-		entry = (int*)*head;
-	} while (*(unsigned int*)*head != 0);
+		int* next = (int*)*head;
+		if (*(unsigned int*)next == 0) {
+			*head = 0;
+			break;
+		}
+		head = next;
+	}
 
-	*head = 0;
 	for (int i = 0; i < pppProgRelocCount; i++) {
 		pppProgRelocs[i] = (int)(pppProg + pppProgRelocs[i]);
 	}

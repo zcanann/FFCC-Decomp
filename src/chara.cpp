@@ -988,6 +988,7 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 
 	CChunkFile chunkFile(fileData);
 	CChunkFile::CChunk chunk;
+	CChara* charaPtr = &Chara;
 
 	while (chunkFile.GetNextChunk(chunk)) {
 		if (chunk.m_id != CharaFourCC('C', 'H', 'M', ' ')) {
@@ -1011,7 +1012,7 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 				m_data->m_normQuant = chunkFile.Get4();
 			} else if (chunk.m_id == 0x4D534554) {
 				CMaterialSet* materialSet =
-				    new(Chara.GetMemoryStage(), const_cast<char*>(s_chara_cpp), 0x132) CMaterialSet();
+				    new(charaPtr->GetMemoryStage(), const_cast<char*>(s_chara_cpp), 0x132) CMaterialSet();
 				m_data->m_materialSet = materialSet;
 				CMaterialSet* createdSet = m_data->m_materialSet;
 				createdSet->m_materials.SetDefaultSize(0x20);
@@ -1020,7 +1021,7 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 			} else if (chunk.m_id == 0x54415354) {
 				if (chunk.m_arg0 != 0) {
 					CTexAnimSet* texAnimSet =
-					    new(Chara.GetMemoryStage(), const_cast<char*>(s_chara_cpp), 0x13A) CTexAnimSet();
+					    new(charaPtr->GetMemoryStage(), const_cast<char*>(s_chara_cpp), 0x13A) CTexAnimSet();
 					m_texAnimSet = texAnimSet;
 					m_texAnimSet->Create(chunkFile, stage);
 				}
@@ -1117,12 +1118,12 @@ void CChara::CModel::CreateDynamics(void* dynData, CMemory::CStage* stage)
 		chunkFile.PushChunk();
 		while (chunkFile.GetNextChunk(chunk)) {
 			if (chunk.m_id == CharaFourCC('D', 'G', 'R', 'P')) {
-				if (chunk.m_size == 0) {
+				if (chunk.m_arg0 == 0) {
 					continue;
 				}
 
 				ModelDynCount(this) = 0;
-				void* dynParams = static_cast<void*>(new (stage, const_cast<char*>(s_chara_cpp), 0x1E7) u8[chunk.m_size * 0x24]);
+				void* dynParams = static_cast<void*>(new (stage, const_cast<char*>(s_chara_cpp), 0x1E7) u8[chunk.m_arg0 * 0x24]);
 				ModelDynParams(this) = dynParams;
 
 				chunkFile.PushChunk();
@@ -1859,20 +1860,25 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 	float* dynParam = reinterpret_cast<float*>(reinterpret_cast<u8*>(ModelDynParams(this)) + NodeDynParamIndex(node) * 0x24);
 
 	Vec forward;
+	Vec right;
+	Vec up;
+	Vec origin;
+	Vec target;
+	Vec accel;
+	Vec predicted;
+	Vec direction;
 	{
 		CVector tmp(NodeWorldMtx(node)[0][0], NodeWorldMtx(node)[1][0], NodeWorldMtx(node)[2][0]);
 		forward.x = tmp.x;
 		forward.y = tmp.y;
 		forward.z = tmp.z;
 	}
-	Vec right;
 	{
 		CVector tmp(NodeWorldMtx(node)[0][1], NodeWorldMtx(node)[1][1], NodeWorldMtx(node)[2][1]);
 		right.x = tmp.x;
 		right.y = tmp.y;
 		right.z = tmp.z;
 	}
-	Vec up;
 	{
 		CVector tmp(NodeWorldMtx(node)[0][2], NodeWorldMtx(node)[1][2], NodeWorldMtx(node)[2][2]);
 		up.x = tmp.x;
@@ -1880,7 +1886,6 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 		up.z = tmp.z;
 	}
 	reinterpret_cast<CVector&>(forward).Normalize();
-	Vec origin;
 	{
 		CVector tmp(NodeWorldMtx(node)[0][3], NodeWorldMtx(node)[1][3], NodeWorldMtx(node)[2][3]);
 		origin.x = tmp.x;
@@ -1889,20 +1894,18 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 	}
 	float boneLen = NodeBoneLen(node);
 
-	Vec target;
 	{
 		CVector tmp;
 		PSVECScale(&forward, reinterpret_cast<Vec*>(&tmp), boneLen);
-		target.x = tmp.x;
-		target.y = tmp.y;
-		target.z = tmp.z;
-	}
-	{
-		CVector tmp;
-		PSVECAdd(&origin, &target, reinterpret_cast<Vec*>(&tmp));
-		target.x = tmp.x;
-		target.y = tmp.y;
-		target.z = tmp.z;
+		Vec scaled;
+		scaled.x = tmp.x;
+		scaled.y = tmp.y;
+		scaled.z = tmp.z;
+		CVector tmp2;
+		PSVECAdd(&origin, &scaled, reinterpret_cast<Vec*>(&tmp2));
+		target.x = tmp2.x;
+		target.y = tmp2.y;
+		target.z = tmp2.z;
 	}
 
 	if (ModelFlag10C_80(this)) {
@@ -1930,7 +1933,6 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 		windImpulse.z = tmp2.z;
 	}
 
-	Vec accel;
 	{
 		CVector tmp;
 		PSVECSubtract(&target, &NodeDynPosition(node), reinterpret_cast<Vec*>(&tmp));
@@ -1946,7 +1948,6 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 	}
 	PSVECAdd(&NodeDynVelocity(node), &accel, &NodeDynVelocity(node));
 
-	Vec predicted;
 	{
 		float velScale = dynParam[0];
 		CVector tmp;
@@ -1963,7 +1964,6 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 	}
 	PSVECScale(&NodeDynVelocity(node), &NodeDynVelocity(node), dynParam[1]);
 
-	Vec direction;
 	{
 		CVector tmp;
 		PSVECSubtract(&predicted, &origin, reinterpret_cast<Vec*>(&tmp));
@@ -2164,6 +2164,8 @@ int CChara::CModel::SearchNodeSk(char* name)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_propagation off
 void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 {
 	if (ModelLightAlpha(this) == FLOAT_803301b0) {
@@ -2172,12 +2174,12 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 
 	const int cullFlag = flags & 1;
 	const int shadowDisabled = ((flags >> 1) & 1) ^ 1;
+	const int materialAlpha = (flags >> 2) & 1;
 	const int shadowCullEnabled = (flags >> 3) & 1;
 	const int skipShadowPosition = ((flags >> 4) & 1) ^ 1;
-	const int materialAlpha = (flags >> 2) & 1;
 	BeforeDrawModelCallback beforeDrawModel = ModelBeforeDrawCallback(this);
 	if (beforeDrawModel != 0 && pass == 0) {
-		beforeDrawModel(this, ModelCbUser0(this), ModelCbUser1(this), view, cullFlag);
+		beforeDrawModel(this, m_callbackContext, m_callbackParam, view, cullFlag);
 	}
 
 	ModelMaterialSet(this)->SetTextureSet(m_texSet);
@@ -2229,23 +2231,23 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 			position.y = ModelDrawMtx(this)[1][3];
 			position.z = ModelDrawMtx(this)[2][3];
 			MaterialMan.SetPosition(static_cast<CMapShadow::TARGET>(0), &position, FLOAT_803301C8, FLOAT_803301CC, meshMtx,
-			                        static_cast<int>(static_cast<u32>(ModelFlagsA0(this)) << 24) >> 31);
+			                        static_cast<int>(static_cast<u32>(ModelFlagsA0(this) & 0xC0) << 24) >> 31);
 		}
 
-		const int lightEnable = (mesh->m_data->m_flags & 0x80) == 0;
+		const int lightEnable = static_cast<int>(static_cast<u32>(mesh->m_data->m_flags & 0xC0) << 24) >> 31;
 		if (lastLightEnable != lightEnable) {
-			LightPcs.EnableLight(lightEnable, 0);
 			lastLightEnable = lightEnable;
+			LightPcs.EnableLight(lightEnable == 0, 0);
 		}
 
-		const int zWriteEnable = (mesh->m_data->m_flags & 0x40) == 0;
+		const int zWriteEnable = static_cast<int>(static_cast<u32>(mesh->m_data->m_flags & 0x60) << 25) >> 31;
 		if (lastZWrite != zWriteEnable) {
-			GXSetZMode((u8)1, (GXCompare)3, (u8)zWriteEnable);
 			lastZWrite = zWriteEnable;
+			GXSetZMode((u8)1, (GXCompare)3, zWriteEnable == 0);
 		}
 
 		if (ModelBeforeMeshCallback(this) != 0) {
-			ModelBeforeMeshCallback(this)(this, ModelCbUser0(this), ModelCbUser1(this), meshIndex);
+			ModelBeforeMeshCallback(this)(this, m_callbackContext, m_callbackParam, meshIndex);
 		}
 
 		CopyCharaMaterialEnv();
@@ -2262,23 +2264,24 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 		CCharaDisplayListRaw* displayList = mesh->m_data->m_displayLists;
 		for (int displayListIndex = static_cast<int>(mesh->m_data->m_displayListCount) - 1; displayListIndex >= 0; displayListIndex--, displayList++) {
 			if (ModelAfterMeshDrawCallback(this) != 0) {
-				ModelAfterMeshDrawCallback(this)(this, ModelCbUser0(this), ModelCbUser1(this), meshIndex, static_cast<unsigned int>(displayListIndex), meshMtx);
+				ModelAfterMeshDrawCallback(this)(this, m_callbackContext, m_callbackParam, meshIndex, static_cast<unsigned int>(displayListIndex), meshMtx);
 			} else {
-				MaterialMan.SetMaterial(ModelMaterialSet(this), displayList->m_material, (flags >> 2) & 1, (_GXTevScale)0);
+				MaterialMan.SetMaterial(ModelMaterialSet(this), displayList->m_material, materialAlpha, (_GXTevScale)0);
 				GXCallDisplayList(displayList->m_data, displayList->m_size);
 			}
 		}
 
 		if (ModelAfterMeshEnvCallback(this) != 0) {
-			ModelAfterMeshEnvCallback(this)(this, ModelCbUser0(this), ModelCbUser1(this), meshIndex, meshMtx);
+			ModelAfterMeshEnvCallback(this)(this, m_callbackContext, m_callbackParam, meshIndex, meshMtx);
 		}
 	}
 
 	AfterDrawModelCallback afterDrawModel = ModelAfterDrawCallback(this);
 	if (afterDrawModel != 0) {
-		afterDrawModel(this, ModelCbUser0(this), ModelCbUser1(this));
+		afterDrawModel(this, m_callbackContext, m_callbackParam);
 	}
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -2399,8 +2402,9 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 	if (blendMode == -1) {
 		CAnim* currentAnim = m_anim;
 		u8 interpCount;
+		int resolvedBlend;
 		if (currentAnim != 0 && (interpCount = AnimInterpCount(currentAnim)) != 0 && AnimBank(currentAnim) != 0) {
-			blendMode = 4;
+			resolvedBlend = 4;
 
 			u16* interpTable = reinterpret_cast<u16*>(reinterpret_cast<u8*>(AnimBank(currentAnim)) + AnimInterpOffset(currentAnim));
 			int frame = static_cast<int>(m_curFrame);
@@ -2409,15 +2413,16 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 				int start = (i == 0) ? 0 : interpTable[i * 2];
 				int end = (i + 1 < static_cast<int>(interpCount)) ? interpTable[i * 2 + 2] : 10000000;
 				if (start <= frame && frame < end) {
-					blendMode = interpTable[i * 2 + 1];
+					resolvedBlend = interpTable[i * 2 + 1];
 					break;
 				}
 			}
 		} else if (currentAnim != 0) {
-			blendMode = 4;
+			resolvedBlend = 4;
 		} else {
-			blendMode = 0;
+			resolvedBlend = 0;
 		}
+		blendMode = resolvedBlend;
 	}
 
 	if (anim != m_anim) {
@@ -2459,31 +2464,31 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 	}
 
 	if (m_anim != 0) {
-		int blendFrames = 0;
 		if (ModelAttachMode(this) == 0) {
 			int flagBit = (AnimFlags(m_anim) >> 7) & 1;
 			int flagMask = ((-flagBit) | flagBit) >> 31;
-			blendFrames = blendMode & flagMask;
+			m_blendCur = static_cast<u16>(blendMode & flagMask);
 		} else if (ModelAttachMode(this) == 1) {
-			blendFrames = blendMode;
+			m_blendCur = static_cast<u16>(blendMode);
+		} else {
+			m_blendCur = 0;
 		}
-
-		m_blendCur = static_cast<u16>(blendFrames);
 		m_blendMax = m_blendCur;
 
-		if (startFrame < 0) {
-			startFrame = 0;
-		}
+		int frameStart = (startFrame == -1) ? 0 : startFrame;
 
-		m_animStart = static_cast<float>(startFrame);
+		m_animStart = static_cast<float>(frameStart);
 		m_curFrame = m_animStart;
 		m_time = m_curFrame;
 
+		int frameEnd;
 		if (endFrame == -1) {
-			endFrame = static_cast<int>(AnimFrameCount(m_anim)) - 1;
+			frameEnd = static_cast<int>(AnimFrameCount(m_anim)) - 1;
+		} else {
+			frameEnd = endFrame;
 		}
 
-		m_animEnd = static_cast<float>(endFrame);
+		m_animEnd = static_cast<float>(frameEnd);
 	} else {
 		m_curFrame = 0.0f;
 		m_time = 0.0f;

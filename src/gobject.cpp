@@ -1488,7 +1488,8 @@ void CGObject::update()
     float turnFactor;
     if (m_animSlotSel != -1 && m_shieldNodeFlagBits.m_bit40) {
         const double turnLimit = fabs(m_turnBaseSpeed);
-        turnDelta = ClampDouble(turnDelta, -turnLimit, turnLimit);
+        const double negLimit = -turnLimit;
+        turnDelta = ClampDouble(turnDelta, negLimit, turnLimit);
         turnFactor = sAnimFrameOffset;
     } else {
         turnFactor = m_hitNormal.x;
@@ -1731,7 +1732,7 @@ void CGObject::update()
         if (sZeroFloat == m_lookAtTimer) {
             m_weaponNodeFlagBits.m_unk20 = 0;
         }
-        m_weaponNodeFlagBits.m_unk40 = m_weaponNodeFlagBits.m_unk40 | m_weaponNodeFlagBits.m_unk20;
+        m_weaponNodeFlagBits.m_unk40 |= m_weaponNodeFlagBits.m_unk20;
 
         if ((m_displayFlags & 1) != 0) {
             if ((m_weaponNodeFlagBits.m_unk20 &&

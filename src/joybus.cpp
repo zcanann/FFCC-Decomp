@@ -4969,10 +4969,11 @@ int JoyBus::SendMapObjDrawFlg(ThreadParam* threadParam)
 
         volatile unsigned char* data = (volatile unsigned char*)&flgWord;
         unsigned char crcBytes[4];
-        crcBytes[3] = data[0];
-        crcBytes[2] = data[1];
-        crcBytes[1] = data[2];
-        crcBytes[0] = data[3];
+        volatile unsigned char* q = crcBytes;
+        q[3] = data[0];
+        q[2] = data[1];
+        q[1] = data[2];
+        q[0] = data[3];
         unsigned int crc = 0xFFFF;
         int crcCount = 4;
         unsigned char* crcData = crcBytes;

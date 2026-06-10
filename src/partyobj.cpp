@@ -167,6 +167,12 @@ struct SFoodTblRow { // stride 0x1CA flat3 row, viewed as SFoodRec records
 	unsigned char tail[62];
 };
 
+static inline int getEquipWeaponInventoryItem(CCaravanWork* work)
+{
+	int equip0 = work->m_equipment[0];
+	return equip0 >= 0 ? work->m_inventoryItems[equip0] : 0;
+}
+
 static inline PartyObjOverlay& PartyData(CGPartyObj* self)
 {
 	return self->m_partyData;
@@ -1488,8 +1494,8 @@ targetJoin: ;
 			int weaponRef;
 			caravan->GetCurrentWeaponItem(weaponItem, weaponRef);
 			if (weaponItem != party.unk6BC ||
-			    weaponRef != (caravan->m_equipment[0] >= 0 ? caravan->m_inventoryItems[caravan->m_equipment[0]] : 0)) {
-				int newWeaponRef = caravan->m_equipment[0] >= 0 ? caravan->m_inventoryItems[caravan->m_equipment[0]] : 0;
+			    weaponRef != getEquipWeaponInventoryItem(caravan)) {
+				int newWeaponRef = getEquipWeaponInventoryItem(caravan);
 				*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D4) = party.unk6BC;
 				party.weaponRef = newWeaponRef;
 				party.commandFlagBits.flag20 = 1;
@@ -1497,7 +1503,7 @@ targetJoin: ;
 				return;
 			}
 
-			m_itemId = weaponRef;
+			m_itemId = caravan->m_equipment[0] >= 0 ? caravan->m_inventoryItems[caravan->m_equipment[0]] : 0;
 			changeStat(7, 0, 0);
 			return;
 		}

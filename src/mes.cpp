@@ -47,6 +47,25 @@ static inline CFontRenderFlagBits& GetRenderFlagBits(unsigned char& flags)
 	return reinterpret_cast<CFontRenderFlagBits&>(flags);
 }
 
+// One drawn character record inside CMes (this+0xC, stride 0x14).
+struct CMesCharCell
+{
+	float m_x;                     // 0x00
+	float m_width;                 // 0x04
+	short m_y;                     // 0x08
+	unsigned char m_scaleX;        // 0x0A
+	char m_pad0B;                  // 0x0B
+	short m_reveal;                // 0x0C
+	unsigned char m_fontAlign : 4; // 0x0E hi
+	unsigned char m_fontIndex : 4; // 0x0E lo
+	unsigned char m_textAlign : 4; // 0x0F hi
+	unsigned char m_pad0F : 4;     // 0x0F lo
+	char m_char;                   // 0x10
+	unsigned char m_scaleY;        // 0x11
+	char m_color;                  // 0x12
+	char m_flagCount;              // 0x13
+};
+
 static inline int GetMesNibbleValue(const char* data)
 {
 	signed char high = (signed char)(((unsigned char)data[0] & 0x0F) << 4);
@@ -1456,11 +1475,11 @@ void CMes::addString(char** text, int branchMode)
 	renderTag:
 		if (flowMode != 2)
 		{
-			int* glyph = (int*)this + mCounter * 5 + 3;
-			*(char*)((int)glyph + 0x12) = (char)mColor;
-			*(char*)(glyph + 4) = (char)uch;
-			*(float*)glyph = mCurrentX;
-			*(short*)(glyph + 2) = (short)(int)mCurrentY;
+			CMesCharCell* glyph = (CMesCharCell*)((int*)this + mCounter * 5 + 3);
+			glyph->m_color = (char)mColor;
+			glyph->m_char = (char)uch;
+			glyph->m_x = mCurrentX;
+			glyph->m_y = (short)(int)mCurrentY;
 
 			GetRenderFlagBits(font->renderFlags).snapPosition = 1;
 			float width;
@@ -1472,19 +1491,20 @@ void CMes::addString(char** text, int branchMode)
 			{
 				width = font->GetWidth(uch);
 			}
-			*(float*)(glyph + 1) = width;
+			glyph->m_width = width;
+			float packedScale = kMesPackedScaleFactor;
 			GetRenderFlagBits(font->renderFlags).snapPosition = 0;
 
-			*(short*)(glyph + 3) = (short)mRevealCursor;
-			*(char*)((int)glyph + 0xF) = (mTextAlign << 4) | *(char*)((int)glyph + 0xF) & 0xF;
-			*(char*)((int)glyph + 0xF) = *(char*)((int)glyph + 0xF) & 0xF0;
-			*(char*)((int)glyph + 0x13) = (char)mFlagCount;
-			*(char*)((int)glyph + 0xE) = (mFontAlign << 4) | *(char*)((int)glyph + 0xE) & 0xF;
-			*(char*)((int)glyph + 0xE) = mFontIndex & 0xF | *(char*)((int)glyph + 0xE) & 0xF0;
-			*(char*)((int)glyph + 0xA) = (char)(int)(kMesPackedScaleFactor * mScaleX);
-			*(char*)((int)glyph + 0x11) = (char)(int)(kMesPackedScaleFactor * mScaleY);
+			glyph->m_reveal = (short)mRevealCursor;
+			glyph->m_textAlign = mTextAlign;
+			glyph->m_pad0F = 0;
+			glyph->m_flagCount = (char)mFlagCount;
+			glyph->m_fontAlign = mFontAlign;
+			glyph->m_fontIndex = mFontIndex;
+			glyph->m_scaleX = (char)(int)(packedScale * mScaleX);
+			glyph->m_scaleY = (char)(int)(packedScale * mScaleY);
 
-			mCurrentX = mCurrentX + *(float*)(glyph + 1) + mLineSpacing;
+			mCurrentX = mCurrentX + (glyph->m_width + mLineSpacing);
 			if (mAdvanceEnabled != 0)
 			{
 				int step = mAdvanceStep;

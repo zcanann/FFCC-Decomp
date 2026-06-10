@@ -11,9 +11,6 @@
 
 static const char s_ME_USB_process_cpp[] = "ME_USB_process.cpp";
 extern "C" const char sMemAllocErrorSizeFmt[] = "MemAlloc Error!!! size=%d\n";
-extern "C" const float kMapEditorZero;
-extern "C" const float kMapEditorOne;
-extern "C" const double kMapEditorS32ToDoubleBias;
 
 namespace {
 struct ViewerSRT {
@@ -80,21 +77,6 @@ static inline void StoreSwapS16(s16* value)
     *value = __lhbrx(&raw, 0);
 }
 
-static inline f32 S32ToFloat(s32 value)
-{
-    union {
-        struct {
-            u32 hi;
-            u32 lo;
-        } words;
-        f64 value;
-    } cvt;
-
-    cvt.words.hi = 0x43300000;
-    cvt.words.lo = value ^ 0x80000000;
-    return static_cast<f32>(cvt.value - kMapEditorS32ToDoubleBias);
-}
-
 }
 
 /*
@@ -132,6 +114,8 @@ void CMaterialEditorPcs::SetUSBData()
         AddRsdList(&m_zlist1);
         break;
     case 0x10: {
+        extern const float kMapEditorZero;
+        extern const float kMapEditorOne;
         ViewerSRT srt;
         Vec minPos;
         Vec maxPos;
@@ -165,15 +149,18 @@ void CMaterialEditorPcs::SetUSBData()
         s32 xDiff = static_cast<s32>(maxPos.y - minPos.y);
         s32 yDiff = static_cast<s32>(maxPos.z - minPos.z);
 
+        srt.transX = kMapEditorZero;
+        srt.transZ = kMapEditorZero;
+        srt.transY = kMapEditorZero;
         srt.rotZ = kMapEditorZero;
-        srt.transY = S32ToFloat(-xDiff / 2);
         srt.rotY = kMapEditorZero;
         srt.rotX = kMapEditorZero;
         srt.scaleZ = kMapEditorOne;
         srt.scaleY = kMapEditorOne;
         srt.scaleX = kMapEditorOne;
-        srt.transZ = S32ToFloat(-yDiff * (xDiff / 0x14) - 10);
         srt.transX = kMapEditorZero;
+        srt.transY = static_cast<f32>(-xDiff / 2);
+        srt.transZ = static_cast<f32>(-yDiff * (xDiff / 0x14) - 10);
         CameraPcs.SetViewerSRT(reinterpret_cast<const SRT*>(&srt));
         break;
     }
@@ -356,10 +343,11 @@ void CMaterialEditorPcs::SetUSBData()
         memcpy(this->m_textureHeader[this->m_loadedTextureCount], headerBuffer, 0x10);
 
         if (headerBuffer[1] == 0x20) {
+            u32 dataBytes = usb.m_sizeBytes;
             void* texData = Memory._Alloc(
-                usb.m_sizeBytes - 0x10, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0);
+                dataBytes - 0x10, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0);
             if (texData == 0) {
-                System.Printf(const_cast<char*>(sMemAllocErrorSizeFmt), usb.m_sizeBytes - 0x10);
+                System.Printf(const_cast<char*>(sMemAllocErrorSizeFmt), dataBytes - 0x10);
             }
             this->m_textureData[this->m_loadedTextureCount] = texData;
             memcpy(this->m_textureData[this->m_loadedTextureCount], headerBuffer + 8, usb.m_sizeBytes - 0x10);
@@ -375,8 +363,10 @@ void CMaterialEditorPcs::SetUSBData()
                 System.Printf(const_cast<char*>(sMemAllocErrorSizeFmt), imageDataSize);
             }
             this->m_textureData[this->m_loadedTextureCount] = texData;
-            memcpy(this->m_textureData[this->m_loadedTextureCount], headerBuffer + 8, imageDataSize);
-            DCFlushRange(this->m_textureData[this->m_loadedTextureCount], imageDataSize);
+            memcpy(this->m_textureData[this->m_loadedTextureCount], headerBuffer + 8,
+                static_cast<int>(usb.m_sizeBytes) - 0x10 - tlutDataSize);
+            DCFlushRange(this->m_textureData[this->m_loadedTextureCount],
+                static_cast<int>(usb.m_sizeBytes) - 0x10 - tlutDataSize);
 
             void* tlutData = Memory._Alloc(
                 tlutDataSize, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0);
@@ -480,3 +470,6 @@ void CMaterialEditorPcs::MemFree(void* ptr)
         Memory.Free(ptr);
     }
 }
+
+extern const float kMapEditorZero = 0.0f;
+extern const float kMapEditorOne = 1.0f;

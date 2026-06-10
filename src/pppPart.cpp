@@ -2288,7 +2288,7 @@ void _pppCalcPart(_pppMngSt* pppMngSt)
 	ppvMng = pppMngSt;
 	if (se->m_soundEffectSlot >= 0 &&
 		pppMngSt->m_currentFrame >= se->m_soundEffectStartFrame &&
-		se->m_soundEffectStopFlag == 0)
+		(s32)se->m_soundEffectStopFlag == 0)
 	{
 		Vec soundPos;
 		soundPos.x = mtx->value[0][3];

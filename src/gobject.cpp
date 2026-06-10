@@ -181,24 +181,24 @@ static const char s_noTurnMotion[36] =
     "\203\136\201\133\203\223\203\202\201\133\203\126\203\207\203\223"
     "\202\315\202\240\202\350\202\334\202\271\202\361\201\102\012";
 extern "C" float sAnimFrameOffset;                    // FLOAT_80330338
-static const float sHugeCylinderExtent = 10000000000.0f; // FLOAT_8033033c
-static const float sNegHugeCylinderExtent = -10000000000.0f; // FLOAT_80330340
+extern "C" const float sHugeCylinderExtent; // FLOAT_8033033c
+extern "C" const float sNegHugeCylinderExtent; // FLOAT_80330340
 static const float sQuarterTurn = 1.5707964f;         // FLOAT_80330344
 extern "C" const double sLoopBias;                    // DOUBLE_80330378
 extern "C" const float sZeroFloat;                    // FLOAT_80330350
-static const float sPushDistance = 1000.0f;           // FLOAT_80330354
-extern const float sDownUnitY = -1.0f;                // FLOAT_80330358
-static const float sDownProbeDistance = -10000.0f;    // FLOAT_8033035c
-static const float sStepProbeHeight = 5.0f;           // FLOAT_80330360
-static const float sBgAttrSlow = 0.75f;               // FLOAT_80330364
-static const float sBgAttrNormal = 0.5f;              // FLOAT_80330368
-static const float sBgAttrFast = 0.25f;               // FLOAT_8033036c
+extern "C" const float sPushDistance;           // FLOAT_80330354
+extern "C" const float sDownUnitY;                // FLOAT_80330358
+extern "C" const float sDownProbeDistance;    // FLOAT_8033035c
+extern "C" const float sStepProbeHeight;           // FLOAT_80330360
+extern "C" const float sBgAttrSlow;               // FLOAT_80330364
+extern "C" const float sBgAttrNormal;              // FLOAT_80330368
+extern "C" const float sBgAttrFast;               // FLOAT_8033036c
 static const float sDebugScreenY = 320.0f;            // FLOAT_80330370
 static const float sDebugScreenX = 224.0f;            // FLOAT_80330374
 static const float sNegativeOne = -1.0f;              // FLOAT_80330390
 static const float sLargeDistance = 10000000.0f;      // FLOAT_80330394
 static const float sDefaultMoveBaseSpeed = 2.0f;      // FLOAT_803303d4
-static const float sHitProbeHeight = 100.0f;          // FLOAT_80330410
+extern "C" const float sHitProbeHeight;          // FLOAT_80330410
 static const float sHitMoveScale = 0.16000001f;       // FLOAT_80330414
 static const float sJumpLift = 10.0f;                 // FLOAT_80330418
 static const float sLandingDampenCutoff = -1.5f;      // FLOAT_8033041c
@@ -1140,16 +1140,20 @@ void CGObject::bgAttribCollision()
     m_shieldNodeFlagBits.m_bit20 = 0;
 
     if ((m_displayFlags & 4) != 0) {
-        CVector probeMove(sZeroFloat, sDownProbeDistance, sZeroFloat);
-        CVector probeBase(m_worldPosition.x, m_worldPosition.y + sHitProbeHeight, m_worldPosition.z);
+        CVector* probeMove = &CVector(sZeroFloat, sDownProbeDistance, sZeroFloat);
+        CVector* probeBase = &CVector(m_worldPosition.x, m_worldPosition.y + sHitProbeHeight, m_worldPosition.z);
 
         CMapCylinder charmCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
-        charmCylinder.m_bottom = probeBase;
-        charmCylinder.m_axis = probeMove;
+        charmCylinder.m_bottom.x = probeBase->x;
+        charmCylinder.m_bottom.y = probeBase->y;
+        charmCylinder.m_bottom.z = probeBase->z;
+        charmCylinder.m_axis.x = probeMove->x;
+        charmCylinder.m_axis.y = probeMove->y;
+        charmCylinder.m_axis.z = probeMove->z;
         charmCylinder.m_radius = sZeroFloat;
 
         if (MapMng.CheckHitCylinderNear(
-                &charmCylinder, reinterpret_cast<Vec*>(&probeMove),
+                &charmCylinder, reinterpret_cast<Vec*>(probeMove),
                 0x80000000) != 0) {
             Vec hitPos;
             MapMng.m_hitMapObj->CalcHitPosition(&hitPos);
@@ -1169,20 +1173,20 @@ void CGObject::bgAttribCollision()
                 (m_charaModelHandle != (CCharaPcs::CHandle*)0) &&
                 (m_charaModelHandle->m_model != (CChara::CModel*)0);
             if (hasModel) {
-                CVector probeMove(sZeroFloat, sDownProbeDistance, sZeroFloat);
-                CVector probeBase(m_worldPosition.x, m_worldPosition.y + sStepProbeHeight, m_worldPosition.z);
+                CVector* probeMove = &CVector(sZeroFloat, sDownProbeDistance, sZeroFloat);
+                CVector* probeBase = &CVector(m_worldPosition.x, m_worldPosition.y + sStepProbeHeight, m_worldPosition.z);
 
                 CMapCylinder attrCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
-                attrCylinder.m_bottom.x = probeBase.x;
-                attrCylinder.m_bottom.y = probeBase.y;
-                attrCylinder.m_bottom.z = probeBase.z;
-                attrCylinder.m_axis.x = probeMove.x;
-                attrCylinder.m_axis.y = probeMove.y;
-                attrCylinder.m_axis.z = probeMove.z;
+                attrCylinder.m_bottom.x = probeBase->x;
+                attrCylinder.m_bottom.y = probeBase->y;
+                attrCylinder.m_bottom.z = probeBase->z;
+                attrCylinder.m_axis.x = probeMove->x;
+                attrCylinder.m_axis.y = probeMove->y;
+                attrCylinder.m_axis.z = probeMove->z;
                 attrCylinder.m_radius = sZeroFloat;
 
                 if (MapMng.CheckHitCylinderNear(
-                        &attrCylinder, reinterpret_cast<Vec*>(&probeMove),
+                        &attrCylinder, reinterpret_cast<Vec*>(probeMove),
                         0x78000000) != 0) {
                     switch (gMapHitFace->m_groupIndex - 0x28) {
                     case 0:

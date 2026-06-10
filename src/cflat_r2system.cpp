@@ -56,21 +56,23 @@ static inline CUSBStreamDataState* UsbStream(CPartPcs* self)
     return &self->m_usbStreamState;
 }
 
-extern float kCFlatPadStickZero;
-extern float kCFlatAlphaMax;
-extern float kCFlatPi;
-extern float kCFlatDegrees180;
+extern const float kCFlatPadStickZero;
+extern const float kCFlatAlphaMax;
+extern const float kCFlatPi;
+extern const float kCFlatDegrees180;
 extern const float kCFlatOneF;
 extern const float FLOAT_80330B38;
-extern float kCFlatHalfF;
+extern const float kCFlatHalfF;
 extern const float FLOAT_80330B40;
 extern const float FLOAT_80330B44;
 extern const float FLOAT_80330B48;
 extern const float FLOAT_80330B4C;
 extern const float FLOAT_80330B5C;
-extern float kCFlatHalfPi;
-extern float kCFlatPi;
-extern float kCFlatThreeHalfPi;
+extern const float FLOAT_80330B90;
+extern const float FLOAT_80330BC0;
+extern const float kCFlatHalfPi;
+extern const float kCFlatPi;
+extern const float kCFlatThreeHalfPi;
 
 
 static inline int RemapPadSlot(CPad* pad, int padIndex)
@@ -268,7 +270,7 @@ static inline void WriteGameWorkEventFlag(CGame::CGameWork& gameWork, int system
  */
 void CGame::SetNextScriptNewGame()
 {
-    m_nextScript.m_flags = 1;
+    m_nextScriptFlags = 1;
 }
 
 /*
@@ -875,10 +877,14 @@ done_check:
  */
 void CCharaPcs::SetMapShadeColor(int shadeIndex, CColor color)
 {
-    m_viewerChoiceColor[shadeIndex].color.r = color.color.r;
-    m_viewerChoiceColor[shadeIndex].color.g = color.color.g;
-    m_viewerChoiceColor[shadeIndex].color.b = color.color.b;
-    m_viewerChoiceColor[shadeIndex].color.a = color.color.a;
+    char r = color.color.r;
+    char g = color.color.g;
+    m_viewerChoiceColor[shadeIndex].color.r = r;
+    char b = color.color.b;
+    m_viewerChoiceColor[shadeIndex].color.g = g;
+    char a = color.color.a;
+    m_viewerChoiceColor[shadeIndex].color.b = b;
+    m_viewerChoiceColor[shadeIndex].color.a = a;
 }
 
 /*
@@ -1256,23 +1262,20 @@ void VECLerp(Vec* a, Vec* b, Vec* out, float t)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void SetDiffuse__9CCharaPcsFiUlP8_GXColorP3Vec(
-    CCharaPcs* chara, int lightIndex, unsigned long lightSet, _GXColor* color, Vec* direction)
+void CCharaPcs::SetDiffuse(int lightIndex, unsigned long lightSet, _GXColor* color, Vec* direction)
 {
-    char* colorBase = (char*)chara + lightSet * 4 + lightIndex * 0xC;
-    colorBase[0xF0] = color->r;
-    colorBase[0xF1] = color->g;
-    colorBase[0xF2] = color->b;
-    colorBase[0xF3] = color->a;
+    m_viewerDiffuseColor[lightIndex][lightSet].r = color->r;
+    m_viewerDiffuseColor[lightIndex][lightSet].g = color->g;
+    m_viewerDiffuseColor[lightIndex][lightSet].b = color->b;
+    m_viewerDiffuseColor[lightIndex][lightSet].a = color->a;
 
     if (lightIndex != 0) {
         return;
     }
 
-    char* dirBase = (char*)chara + lightSet * 0xC;
-    *(float*)(dirBase + 0x108) = direction->x;
-    *(float*)(dirBase + 0x10C) = direction->y;
-    *(float*)(dirBase + 0x110) = direction->z;
+    m_viewerDiffusePos[lightSet].x = direction->x;
+    m_viewerDiffusePos[lightSet].y = direction->y;
+    m_viewerDiffusePos[lightSet].z = direction->z;
 }
 
 /*
@@ -1284,13 +1287,12 @@ extern "C" void SetDiffuse__9CCharaPcsFiUlP8_GXColorP3Vec(
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void SetAmbient__9CCharaPcsFiP8_GXColor(CCharaPcs* chara, int index, _GXColor* color)
+void CCharaPcs::SetAmbient(int index, _GXColor* color)
 {
-    char* base = (char*)chara + index * 4;
-    base[0xE8] = color->r;
-    base[0xE9] = color->g;
-    base[0xEA] = color->b;
-    base[0xEB] = color->a;
+    m_viewerAmbientColor[index].r = color->r;
+    m_viewerAmbientColor[index].g = color->g;
+    m_viewerAmbientColor[index].b = color->b;
+    m_viewerAmbientColor[index].a = color->a;
 }
 
 /*
@@ -1356,13 +1358,6 @@ void CVector::operator=(const CVector& other)
  * JP Address: TODO
  * JP Size: TODO
  */
-CVector::CVector(const CVector& other)
-{
-    this->x = other.x;
-    this->y = other.y;
-    this->z = other.z;
-}
-
 /*
  * --INFO--
  * PAL Address: 0x800B9884
@@ -1433,20 +1428,7 @@ void CCameraPcs::SetZRotate(float zRotate)
  */
 void CGame::SetNextScript(CGame::CNextScript* nextScript)
 {
-    int count = 0x20;
-    unsigned int* src = (unsigned int*)((char*)nextScript - 4);
-    unsigned int* dst = (unsigned int*)&m_nextScript;
-
-    do {
-        unsigned int a = src[1];
-        src += 2;
-        unsigned int b = src[0];
-        dst[1] = a;
-        dst += 2;
-        dst[0] = b;
-        count--;
-    } while (count != 0);
-
+    m_nextScript = *nextScript;
     m_newGameFlag = 1;
 }
 
@@ -1697,13 +1679,13 @@ int CLine<64>::IsInner(Vec* position, float margin)
 
 void CLine<64>::CalcBound()
 {
-    min.x = kLineBoundsInitMin;
-    min.y = kLineBoundsInitMin;
-    min.z = kLineBoundsInitMin;
-    max.x = kLineBoundsInitMax;
-    max.y = kLineBoundsInitMax;
-    max.z = kLineBoundsInitMax;
-    totalLength = kLineSegmentMinT;
+    min.x = FLOAT_80330B5C;
+    min.y = FLOAT_80330B5C;
+    min.z = FLOAT_80330B5C;
+    max.x = FLOAT_80330BC0;
+    max.y = FLOAT_80330BC0;
+    max.z = FLOAT_80330BC0;
+    totalLength = kCFlatPadStickZero;
 
     for (u32 i = 0; i < pointCount; i++) {
         if (points[i].x < min.x) {
@@ -1947,27 +1929,37 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     }
     case -0x0D: {
         float* values = reinterpret_cast<float*>(object->m_localBase);
-        Vec a = {values[0], values[1], values[2]};
-        Vec b = {values[3], values[4], values[5]};
+        Vec a;
+        Vec b;
+        a.x = values[0];
+        a.y = values[1];
+        a.z = values[2];
+        b.x = values[3];
+        b.y = values[4];
+        b.z = values[5];
         float value = PSVECDistance(&a, &b);
         this->push(object, *reinterpret_cast<int*>(&value));
         outResult = 0;
         break;
     }
-    case -0x0E:
-        this->push(object, Math.Rand(*object->m_localBase));
+    case -0x0E: {
+        int result = Math.Rand(*object->m_localBase);
+        this->push(object, result);
         outResult = 0;
         break;
+    }
     case -0x0F: {
         float value = Math.RandF(*reinterpret_cast<float*>(object->m_localBase));
         this->push(object, *reinterpret_cast<int*>(&value));
         outResult = 0;
         break;
     }
-    case -0x10:
-        this->push(object, Math.RandPM(*object->m_localBase));
+    case -0x10: {
+        int result = Math.RandPM(*object->m_localBase);
+        this->push(object, result);
         outResult = 0;
         break;
+    }
     case -0x11: {
         float value = Math.RandFPM(*reinterpret_cast<float*>(object->m_localBase));
         this->push(object, *reinterpret_cast<int*>(&value));
@@ -2023,7 +2015,6 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     }
     case -0x16: {
         CGame::CNextScript nextScript;
-        nextScript.m_flags = 0;
         strcpy(nextScript.m_name, this->m_strBlob + this->m_strOffsets[*object->m_localBase]);
         Game.SetNextScript(&nextScript);
         this->push(object, 0);
@@ -2041,20 +2032,20 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     case -0x19: {
-        if (m_pathPointCount < 0x40) {
-            if (*object->m_localBase != 0) {
+        if (m_pathPointCount < 0x40U) {
+            if (*reinterpret_cast<int*>(object->m_localBase) != 0) {
                 m_pathPointCount = 0;
                 m_pathTotalDistance = kCFlatPadStickZero;
             }
 
-            Vec* point = &m_pathPoints[m_pathPointCount].m_position;
-            point->x = reinterpret_cast<float*>(object->m_localBase)[1];
-            point->y = reinterpret_cast<float*>(object->m_localBase)[2];
-            point->z = reinterpret_cast<float*>(object->m_localBase)[3];
+            m_pathPoints[m_pathPointCount].m_position.x = reinterpret_cast<float*>(object->m_localBase)[1];
+            m_pathPoints[m_pathPointCount].m_position.y = reinterpret_cast<float*>(object->m_localBase)[2];
+            m_pathPoints[m_pathPointCount].m_position.z = reinterpret_cast<float*>(object->m_localBase)[3];
 
             if (m_pathPointCount != 0) {
-                m_pathTotalDistance +=
-                    PSVECDistance(point, &m_pathPoints[m_pathPointCount - 1].m_position);
+                m_pathTotalDistance += PSVECDistance(
+                    &m_pathPoints[m_pathPointCount].m_position,
+                    &m_pathPoints[m_pathPointCount - 1].m_position);
             }
 
             m_pathPoints[m_pathPointCount].m_distance = m_pathTotalDistance;
@@ -2178,21 +2169,23 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             for (int i = 0; i < maxIndex; i++, point++) {
                 if (point->m_distance <= pathDistance && pathDistance <= point[1].m_distance) {
                     const int i0 = (i - 1) < 0 ? 0 : (i - 1);
-                    const int i2 = (i + 1) > maxIndex ? maxIndex : (i + 1);
-                    const int i3 = (i + 2) > maxIndex ? maxIndex : (i + 2);
-                    const float scaleA = m_pathPoints[i].m_distance - m_pathPoints[i0].m_distance;
-                    const float scaleB = m_pathPoints[i2].m_distance - m_pathPoints[i].m_distance;
-                    const float scaleC = m_pathPoints[i3].m_distance - m_pathPoints[i2].m_distance;
-                    float segmentT = kCFlatPadStickZero;
-                    if (scaleB != kCFlatPadStickZero) {
-                        segmentT = (pathDistance - point->m_distance) / scaleB;
-                    }
+                    CFlatPathPoint* p0 = &m_pathPoints[i0];
+                    CFlatPathPoint* p1 = &m_pathPoints[i];
+                    const int i2 = (i + 1) < maxIndex ? (i + 1) : maxIndex;
+                    CFlatPathPoint* p2 = &m_pathPoints[i2];
+                    const int i3 = (i + 2) < maxIndex ? (i + 2) : maxIndex;
+                    CFlatPathPoint* p3 = &m_pathPoints[i3];
+                    const float scaleA = p1->m_distance - p0->m_distance;
+                    const float scaleB = p2->m_distance - p1->m_distance;
+                    const float scaleC = p3->m_distance - p2->m_distance;
+                    float segmentT = (kCFlatPadStickZero != scaleB)
+                                         ? (pathDistance - p1->m_distance) / scaleB
+                                         : kCFlatPadStickZero;
 
                     Vec result;
                     CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
                         scaleA, scaleB, scaleC, segmentT, kCFlatOneF, &Math, reinterpret_cast<float*>(&result),
-                        &m_pathPoints[i0].m_position, &m_pathPoints[i].m_position,
-                        &m_pathPoints[i2].m_position, &m_pathPoints[i3].m_position);
+                        &p0->m_position, &p1->m_position, &p2->m_position, &p3->m_position);
                     *reinterpret_cast<float*>(object->m_localBase[3]) = result.x;
                     *reinterpret_cast<float*>(object->m_localBase[4]) = result.y;
                     *reinterpret_cast<float*>(object->m_localBase[5]) = result.z;
@@ -2223,29 +2216,29 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         this->push(object, 0);
         outResult = 0;
         break;
-    case -0x1F:
-        if (*object->m_localBase < 0x10) {
-            CLine<64>& line = m_debugLines[*object->m_localBase];
-            if (line.pointCount < 0x40) {
-                const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-                Vec& point = line.points[line.pointCount];
-                point.x = localFloats[1];
-                point.y = localFloats[2];
-                point.z = localFloats[3];
-                line.pointCount++;
-                line.CalcBound();
+    case -0x1F: {
+        unsigned int slot = *object->m_localBase;
+        if (slot < 0x10) {
+            if (m_debugLines[slot].pointCount < 0x40) {
+                unsigned long index = m_debugLines[slot].pointCount;
+                m_debugLines[slot].pointCount = index + 1;
+                m_debugLines[slot].points[index].x = reinterpret_cast<float*>(object->m_localBase)[1];
+                m_debugLines[slot].points[index].y = reinterpret_cast<float*>(object->m_localBase)[2];
+                m_debugLines[slot].points[index].z = reinterpret_cast<float*>(object->m_localBase)[3];
+                m_debugLines[slot].CalcBound();
             }
         }
         this->push(object, 0);
         outResult = 0;
         break;
+    }
     case -0x20: {
         CColor color(
             static_cast<u8>(object->m_localBase[1]),
             static_cast<u8>(object->m_localBase[2]),
             static_cast<u8>(object->m_localBase[3]),
             0xFF);
-        SetAmbient__9CCharaPcsFiP8_GXColor(&CharaPcs, *object->m_localBase, color);
+        CharaPcs.SetAmbient(*object->m_localBase, color);
         this->push(object, 0);
         outResult = 0;
         break;
@@ -2256,17 +2249,15 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         const float pitch = localFloats[6];
         const float sinYaw = std::sinf(yaw);
         const float cosYaw = std::cosf(yaw);
-        const float sinPitch = std::sinf(pitch);
-        const float cosPitch = std::cosf(pitch);
-        CVector direction(-sinYaw * cosPitch, -sinPitch, -cosYaw * cosPitch);
+        CVector direction(
+            -(sinYaw * std::cosf(pitch)), -std::sinf(pitch), -(cosYaw * std::cosf(pitch)));
         CColor color(
             static_cast<u8>(object->m_localBase[2]),
             static_cast<u8>(object->m_localBase[3]),
             static_cast<u8>(object->m_localBase[4]),
             0xFF);
 
-        SetDiffuse__9CCharaPcsFiUlP8_GXColorP3Vec(
-            &CharaPcs, *object->m_localBase, object->m_localBase[1], color, direction);
+        CharaPcs.SetDiffuse(*object->m_localBase, object->m_localBase[1], color, direction);
         this->push(object, 0);
         outResult = 0;
         break;
@@ -2274,11 +2265,10 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     case -0x22: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         const unsigned int mask = *object->m_localBase;
-        Vec target = {
-            localFloats[1],
-            localFloats[2],
-            localFloats[3],
-        };
+        Vec target;
+        target.x = localFloats[1];
+        target.y = localFloats[2];
+        target.z = localFloats[3];
         const float margin = localFloats[4];
         int found = 0;
         unsigned int bestLine = 0;
@@ -2291,9 +2281,9 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
                 continue;
             }
 
-            unsigned long segment = 0;
-            float segmentRatio = 0.0f;
-            float nearestDistance = 0.0f;
+            unsigned long segment;
+            float segmentRatio;
+            float nearestDistance;
             if (line.Calc((Vec*)0, &nearestDistance, &segment, &segmentRatio, &target, margin) != 0 &&
                 nearestDistance < bestDistance) {
                 found = 1;
@@ -2317,7 +2307,10 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         const float distance = localFloats[1];
         CLine<64>* line = &m_debugLines[*object->m_localBase];
-        Vec position = {0.0f, 0.0f, 0.0f};
+        Vec position;
+        position.x = 0.0f;
+        position.y = 0.0f;
+        position.z = 0.0f;
 
         if (line->pointCount > 0) {
             if (distance < 0.0f || line->pointCount == 1) {
@@ -2347,7 +2340,10 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         const float distance = localFloats[1];
         CLine<64>* line = &m_debugLines[*object->m_localBase];
-        Vec direction = {0.0f, 0.0f, 0.0f};
+        Vec direction;
+        direction.x = 0.0f;
+        direction.y = 0.0f;
+        direction.z = 0.0f;
 
         if (line->pointCount > 1) {
             if (distance < 0.0f) {
@@ -2380,17 +2376,16 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     }
     case -0x25: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        Vec target = {
-            localFloats[1],
-            localFloats[2],
-            localFloats[3],
-        };
+        Vec target;
+        target.x = localFloats[1];
+        target.y = localFloats[2];
+        target.z = localFloats[3];
         CLine<64>* line = &m_debugLines[*object->m_localBase];
-        unsigned long segment = 0;
-        float segmentRatio = 0.0f;
-        float distance = 0.0f;
+        unsigned long segment;
+        float segmentRatio;
+        float distance = kCFlatPadStickZero;
 
-        if (line->Calc((Vec*)0, (float*)0, &segment, &segmentRatio, &target, 0.0f) != 0) {
+        if (line->Calc((Vec*)0, (float*)0, &segment, &segmentRatio, &target, kCFlatPadStickZero) != 0) {
             distance = line->segments[segment].length * segmentRatio + line->segments[segment].startLength;
         }
 
@@ -2452,27 +2447,25 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     case -0x29: {
-        _GXColor color = {
-            static_cast<u8>(object->m_localBase[0]),
-            static_cast<u8>(object->m_localBase[1]),
-            static_cast<u8>(object->m_localBase[2]),
-            0xFF,
-        };
-        Graphic.SetCopyClear(color, 0);
+        _GXColor color;
+        color.r = static_cast<u8>(object->m_localBase[0]);
+        color.g = static_cast<u8>(object->m_localBase[1]);
+        color.b = static_cast<u8>(object->m_localBase[2]);
+        color.a = 0xFF;
+        Graphic.SetCopyClear(color, 0xFFFFFF);
         this->push(object, 0);
         outResult = 0;
         break;
     }
     case -0x2A: {
-        const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        _GXColor color = {
-            static_cast<u8>(object->m_localBase[0]),
-            static_cast<u8>(object->m_localBase[1]),
-            static_cast<u8>(object->m_localBase[2]),
-            0xFF,
-        };
+        _GXColor color;
+        color.a = 0xFF;
+        color.r = static_cast<u8>(object->m_localBase[0]);
+        color.g = static_cast<u8>(object->m_localBase[1]);
+        color.b = static_cast<u8>(object->m_localBase[2]);
         Graphic.SetFogColor(color);
-        Graphic.SetFogParam(localFloats[3], localFloats[4]);
+        Graphic.SetFogParam(reinterpret_cast<float*>(object->m_localBase)[3],
+                            reinterpret_cast<float*>(object->m_localBase)[4]);
         this->push(object, 0);
         outResult = 0;
         break;
@@ -2484,11 +2477,10 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     case -0x2C: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        Vec position = {
-            localFloats[0],
-            localFloats[1],
-            localFloats[2],
-        };
+        Vec position;
+        position.x = localFloats[0];
+        position.y = localFloats[1];
+        position.z = localFloats[2];
         CameraPcs.SetFullScreenShadowPos(&position, localFloats[3]);
         this->push(object, 0);
         outResult = 0;
@@ -2536,7 +2528,10 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     }
     case -0x34: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        Vec axis = {std::cosf(localFloats[1]), 0.0f, std::sinf(localFloats[1])};
+        Vec axis;
+        axis.x = std::cosf(localFloats[1]);
+        axis.y = 0.0f;
+        axis.z = std::sinf(localFloats[1]);
         Mtx matrix;
         Mtx rotation;
 
@@ -2759,8 +2754,12 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     }
     case -0x40: {
         float* values = reinterpret_cast<float*>(object->m_localBase);
-        Quaternion rotation = {values[0], values[1], values[2], values[3]};
+        Quaternion rotation;
         Mtx matrix;
+        rotation.x = values[0];
+        rotation.y = values[1];
+        rotation.z = values[2];
+        rotation.w = values[3];
         PSMTXQuat(matrix, &rotation);
         CameraPcs.SetWorldMapMatrix(matrix);
         this->push(object, 0);
@@ -2770,32 +2769,35 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     case -0x41: {
         const unsigned int* localBase = object->m_localBase;
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
+        int mode = *localBase & 3;
         float alpha = static_cast<float>(static_cast<int>(localBase[1])) /
                       static_cast<float>(static_cast<int>(localBase[2]));
-        Quaternion start = {localFloats[3], localFloats[4], localFloats[5], localFloats[6]};
-        Quaternion end = {localFloats[7], localFloats[8], localFloats[9], localFloats[10]};
+        Quaternion start;
+        Quaternion end;
         Quaternion rotation;
+        start.x = localFloats[3];
+        start.y = localFloats[4];
+        start.z = localFloats[5];
+        start.w = localFloats[6];
+        end.x = localFloats[7];
+        end.y = localFloats[8];
+        end.z = localFloats[9];
+        end.w = localFloats[10];
 
-        switch (*localBase & 3) {
-        case 3:
+        if (mode == 3) {
             alpha = -((kCFlatHalfF * (kCFlatOneF + std::sinf(kCFlatPi * alpha + kCFlatHalfPi))) -
                       kCFlatOneF);
-            break;
-        case 1:
+        } else if (mode == 1) {
             alpha = kCFlatOneF + std::sinf(kCFlatHalfPi * alpha + kCFlatThreeHalfPi);
-            break;
-        case 2:
+        } else if (mode == 2) {
             alpha = std::sinf(kCFlatHalfPi * alpha);
-            break;
-        default:
-            break;
         }
 
         C_QUATSlerp(&start, &end, &rotation, alpha);
-        *reinterpret_cast<float*>(localBase[11]) = rotation.x;
-        *reinterpret_cast<float*>(localBase[12]) = rotation.y;
-        *reinterpret_cast<float*>(localBase[13]) = rotation.z;
-        *reinterpret_cast<float*>(localBase[14]) = rotation.w;
+        *reinterpret_cast<float*>(object->m_localBase[11]) = rotation.x;
+        *reinterpret_cast<float*>(object->m_localBase[12]) = rotation.y;
+        *reinterpret_cast<float*>(object->m_localBase[13]) = rotation.z;
+        *reinterpret_cast<float*>(object->m_localBase[14]) = rotation.w;
         this->push(object, 0);
         outResult = 0;
         break;
@@ -2830,7 +2832,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             }
             MenuPcs.GetMesMenu(a0)->Open(message, a1, a2, a3, a4, a5, a6);
         } else {
-            if (GetNumMes__9CFlatDataFv(&System) != 0) {
+            if (GetNumMes__9CFlatDataFv(&System) >= 1U) {
                 System.Printf(const_cast<char*>("MesMenu no %d is null\n"), a0);
             }
         }
@@ -2842,7 +2844,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         if (MenuPcs.GetMesMenu(*object->m_localBase) != 0) {
             MenuPcs.GetMesMenu(*object->m_localBase)->CloseRequest(1);
         } else {
-            if (GetNumMes__9CFlatDataFv(&System) != 0) {
+            if (GetNumMes__9CFlatDataFv(&System) >= 1U) {
                 System.Printf(const_cast<char*>("MesMenu no %d is null\n"), *object->m_localBase);
             }
         }
@@ -2854,7 +2856,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         if (MenuPcs.GetMesMenu(*object->m_localBase) != 0) {
             GetMes__9CFlatDataFi(MenuPcs.GetMesMenu(*object->m_localBase), object->m_localBase[1], object->m_localBase[2]);
         } else {
-            if (GetNumMes__9CFlatDataFv(&System) != 0) {
+            if (GetNumMes__9CFlatDataFv(&System) >= 1U) {
                 System.Printf(const_cast<char*>("MesMenu no %d is null\n"), *object->m_localBase);
             }
         }
@@ -2868,7 +2870,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         if (MenuPcs.GetMesMenu(a0) != 0) {
             this->push(object, GetErrorLevel__7CSystemFv(MenuPcs.GetMesMenu(a0), a1));
         } else {
-            if (GetNumMes__9CFlatDataFv(&System) != 0) {
+            if (GetNumMes__9CFlatDataFv(&System) >= 1U) {
                 System.Printf(const_cast<char*>("MesMenu no %d is null\n"), a0);
             }
             this->push(object, 0);
@@ -2877,12 +2879,11 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     }
     case -0x4C: {
-        _GXColor color = {
-            static_cast<u8>(object->m_localBase[2]),
-            static_cast<u8>(object->m_localBase[3]),
-            static_cast<u8>(object->m_localBase[4]),
-            0x80,
-        };
+        _GXColor color;
+        color.a = 0x80;
+        color.r = static_cast<u8>(object->m_localBase[2]);
+        color.g = static_cast<u8>(object->m_localBase[3]);
+        color.b = static_cast<u8>(object->m_localBase[4]);
         MapMng.SetIdGrpColor(*object->m_localBase, object->m_localBase[1], color);
         this->push(object, 0);
         outResult = 0;
@@ -2890,7 +2891,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     }
     case -0x4D: {
         if (MenuPcs.GetMesMenu(*object->m_localBase) == 0) {
-            if (GetNumMes__9CFlatDataFv(&System) != 0) {
+            if (GetNumMes__9CFlatDataFv(&System) >= 1U) {
                 System.Printf(const_cast<char*>("MesMenu no %d is null\n"), *object->m_localBase);
             }
             this->push(object, 0);
@@ -2911,24 +2912,24 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             *reinterpret_cast<float*>(object->m_localBase + 2),
             *reinterpret_cast<float*>(object->m_localBase + 3),
             *reinterpret_cast<float*>(object->m_localBase + 4),
-            (60.0f * 1000.0f * *reinterpret_cast<float*>(object->m_localBase + 5)) / 180.0f);
+            (kCFlatDegrees180 * (2.0f * *reinterpret_cast<float*>(object->m_localBase + 5))) /
+                kCFlatPi);
         this->push(object, 0);
         outResult = 0;
         break;
     case -0x50: {
         CGraphicPcs::ScreenFadeSlot* screenFade = &GraphicPcs.m_screenFade[0];
-        unsigned int phase = 2;
-        screenFade->m_phase = *reinterpret_cast<float*>(&phase);
+        screenFade->m_mode = 2;
         screenFade->m_colorA.r = 0xFF;
         screenFade->m_colorA.g = 0xFF;
-        screenFade->m_colorB.r = 0xFF;
-        screenFade->m_colorB.g = 0xFF;
-        screenFade->m_targetYOffs = 0.0f;
+        screenFade->m_colorA.b = 0xFF;
+        screenFade->m_colorA.a = 0xFF;
+        screenFade->m_invert = 0;
         screenFade->m_timer = object->m_localBase[0];
-        GraphicPcs.m_screenFade[1].m_mode = object->m_localBase[1];
-        screenFade->m_stretch = *reinterpret_cast<float*>(&object->m_localBase[2]);
-        GraphicPcs.m_screenFade[1].m_timer = object->m_localBase[3];
         screenFade->m_duration = screenFade->m_timer;
+        screenFade->m_amplitude = reinterpret_cast<float*>(object->m_localBase)[1];
+        screenFade->m_phase = reinterpret_cast<float*>(object->m_localBase)[2];
+        screenFade->m_stretch = reinterpret_cast<float*>(object->m_localBase)[3];
         GraphicPcs.ReqScreenCapture();
         this->push(object, 0);
         outResult = 0;
@@ -3025,7 +3026,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     case -0x5E:
-        if (GetNumMes__9CFlatDataFv(&System) != 0) {
+        if (GetNumMes__9CFlatDataFv(&System) >= 1U) {
             System.Printf(const_cast<char*>("\203f\203o\203b\203O\227p\212\326\220\224setForceAnimInterp\202\315\224p\216~\202\263\202\352\202\334\202\265\202\275\201B\n"));
         }
         this->push(object, 0);
@@ -3129,18 +3130,24 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         this->push(object, 0);
         outResult = 0;
         break;
-    case -0x6C:
-        this->push(object, Sound.PlaySe(*object->m_localBase, 0x40, 0x7F, 0));
+    case -0x6C: {
+        int result = Sound.PlaySe(*object->m_localBase, 0x40, 0x7F, 0);
+        this->push(object, result);
         outResult = 0;
         break;
-    case -0x6D:
-        Game.m_gameWork.m_linkTable[object->m_localBase[2]][object->m_localBase[3]][object->m_localBase[0]]
-                                   [object->m_localBase[1]] = static_cast<unsigned char>(object->m_localBase[4]);
-        Game.m_gameWork.m_linkTable[object->m_localBase[0]][object->m_localBase[1]][object->m_localBase[2]]
-                                   [object->m_localBase[3]] = static_cast<unsigned char>(object->m_localBase[4]);
+    }
+    case -0x6D: {
+        unsigned int c = object->m_localBase[2];
+        unsigned int d = object->m_localBase[3];
+        unsigned int a = object->m_localBase[0];
+        unsigned int b = object->m_localBase[1];
+        unsigned char value = static_cast<unsigned char>(object->m_localBase[4]);
+        Game.m_gameWork.m_linkTable[c][d][a][b] = value;
+        Game.m_gameWork.m_linkTable[a][b][c][d] = value;
         this->push(object, 0);
         outResult = 0;
         break;
+    }
     case -0x6E:
         this->push(
             object, Game.m_gameWork.m_linkTable[object->m_localBase[0]][object->m_localBase[1]][object->m_localBase[2]]
@@ -3212,20 +3219,20 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     }
-    case -0x7B:
-        this->push(
-            object, Sound.PlaySe3DLine(*object->m_localBase, static_cast<char>(object->m_localBase[1]),
-                        *reinterpret_cast<float*>(object->m_localBase + 2),
-                        *reinterpret_cast<float*>(object->m_localBase + 3), 0));
+    case -0x7B: {
+        int result = Sound.PlaySe3DLine(*object->m_localBase, static_cast<char>(object->m_localBase[1]),
+                         *reinterpret_cast<float*>(object->m_localBase + 2),
+                         *reinterpret_cast<float*>(object->m_localBase + 3), 0);
+        this->push(object, result);
         outResult = 0;
         break;
+    }
     case -0x7A: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        this->push(
-            object,
-            Sound.PlaySe3D(
-                *object->m_localBase, CVector(localFloats[1], localFloats[2], localFloats[3]),
-                localFloats[4], localFloats[5], 0));
+        int result = Sound.PlaySe3D(
+            *object->m_localBase, CVector(localFloats[1], localFloats[2], localFloats[3]),
+            localFloats[4], localFloats[5], 0);
+        this->push(object, result);
         outResult = 0;
         break;
     }
@@ -3265,25 +3272,24 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         this->push(object, 0);
         outResult = 0;
         break;
-    case -0x85:
-        this->push(
-            object, Wind.AddAmbient(reinterpret_cast<float*>(object->m_localBase)[0],
-                                    reinterpret_cast<float*>(object->m_localBase)[1]));
+    case -0x85: {
+        int result = Wind.AddAmbient(reinterpret_cast<float*>(object->m_localBase)[0],
+                                     reinterpret_cast<float*>(object->m_localBase)[1]);
+        this->push(object, result);
         outResult = 0;
         break;
+    }
     case -0x86: {
         const float* f = reinterpret_cast<float*>(object->m_localBase);
-        this->push(
-            object,
-            Wind.AddDiffuse(CVector(f[0], f[1], f[2]), f[3], f[4], f[5]));
+        int result = Wind.AddDiffuse(CVector(f[0], f[1], f[2]), f[3], f[4], f[5]);
+        this->push(object, result);
         outResult = 0;
         break;
     }
     case -0x87: {
         const float* f = reinterpret_cast<float*>(object->m_localBase);
-        this->push(
-            object,
-            Wind.AddSphere(CVector(f[0], f[1], f[2]), f[3], f[4], object->m_localBase[5]));
+        int result = Wind.AddSphere(CVector(f[0], f[1], f[2]), f[3], f[4], object->m_localBase[5]);
+        this->push(object, result);
         outResult = 0;
         break;
     }
@@ -3455,27 +3461,31 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         }
 
         CCharaPcs::CCameraFrame*& cameraSlotRef = CharaPcs.m_cameraData[cameraSlot];
-        *reinterpret_cast<int*>(object->m_localBase[2]) = cameraSlotRef[cameraFrame].m_values[0].m_int;
+        *reinterpret_cast<float*>(object->m_localBase[2]) = cameraSlotRef[cameraFrame].m_values[0].m_float;
         *reinterpret_cast<float*>(object->m_localBase[3]) = -cameraSlotRef[cameraFrame].m_values[1].m_float;
         *reinterpret_cast<float*>(object->m_localBase[4]) = -cameraSlotRef[cameraFrame].m_values[2].m_float;
-        *reinterpret_cast<int*>(object->m_localBase[5]) = cameraSlotRef[cameraFrame].m_values[3].m_int;
+        *reinterpret_cast<float*>(object->m_localBase[5]) = cameraSlotRef[cameraFrame].m_values[3].m_float;
         *reinterpret_cast<float*>(object->m_localBase[6]) = -cameraSlotRef[cameraFrame].m_values[4].m_float;
         *reinterpret_cast<float*>(object->m_localBase[7]) = -cameraSlotRef[cameraFrame].m_values[5].m_float;
-        *reinterpret_cast<int*>(object->m_localBase[8]) = cameraSlotRef[cameraFrame].m_values[6].m_int;
+        *reinterpret_cast<float*>(object->m_localBase[8]) = cameraSlotRef[cameraFrame].m_values[6].m_float;
         *reinterpret_cast<float*>(object->m_localBase[9]) =
             -((kCFlatPi * cameraSlotRef[cameraFrame].m_values[7].m_float) / kCFlatDegrees180);
         this->push(object, 1);
         outResult = 0;
         break;
     }
-    case -0x9D:
-        this->push(object, (static_cast<unsigned int>(__cntlzw(MemoryCardMan.DummyLoad())) >> 5) & 0xFF);
+    case -0x9D: {
+        int result = MemoryCardMan.DummyLoad();
+        this->push(object, (static_cast<unsigned int>(__cntlzw(result)) >> 5) & 0xFF);
         outResult = 0;
         break;
-    case -0x9E:
-        this->push(object, (static_cast<unsigned int>(__cntlzw(MemoryCardMan.DummySave())) >> 5) & 0xFF);
+    }
+    case -0x9E: {
+        int result = MemoryCardMan.DummySave();
+        this->push(object, (static_cast<unsigned int>(__cntlzw(result)) >> 5) & 0xFF);
         outResult = 0;
         break;
+    }
     case -0x9F:
         if (object->m_localBase[1] < 0) {
             Game.m_caravanWorkArr[*object->m_localBase].m_shopState = 0;
@@ -3576,13 +3586,13 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     }
-    case -0xB3:
-        this->push(
-            object,
-            CGItemObj::DeleteOld(*object->m_localBase, object->m_localBase[1], object,
-                                 reinterpret_cast<CFlatRuntime::CObject*>(object->m_engineObject)));
+    case -0xB3: {
+        int result = CGItemObj::DeleteOld(*object->m_localBase, object->m_localBase[1], object,
+                                          reinterpret_cast<CFlatRuntime::CObject*>(object->m_engineObject));
+        this->push(object, result);
         outResult = 0;
         break;
+    }
     case -0xB7:
         this->push(object, Game.m_caravanWorkArr[*object->m_localBase].unk_0x3ac);
         outResult = 0;
@@ -3616,18 +3626,21 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         Game.m_caravanWorkArr[*object->m_localBase].SearchRomLetterWork(romLetterWork, 8);
 
         for (int i = 0; i < 8; i++) {
-            CRomLetterWork* letter = romLetterWork[i];
             int dstOffs = i * 4;
-            *reinterpret_cast<int*>(object->m_localBase[1] + dstOffs) = letter != 0 ? letter->m_from : -1;
-            *reinterpret_cast<int*>(object->m_localBase[2] + dstOffs) = letter != 0 ? letter->m_subject : -1;
-            *reinterpret_cast<int*>(object->m_localBase[3] + dstOffs) = letter != 0 ? letter->m_message : -1;
-            *reinterpret_cast<int*>(object->m_localBase[4] + dstOffs) = letter != 0 ? letter->m_priorityFlags : -1;
-            if (letter == 0) {
-                *reinterpret_cast<int*>(object->m_localBase[13] + dstOffs) = -1;
-            } else {
-                int letterIndex =
-                    (reinterpret_cast<int>(letter) - static_cast<int>(Game.m_romLetterWorkBase)) / sizeof(CRomLetterWork);
+            for (int j = 0; j < 12; j++) {
+                if (romLetterWork[i] != 0) {
+                    *reinterpret_cast<int*>(object->m_localBase[1 + j] + dstOffs) =
+                        reinterpret_cast<const unsigned short*>(romLetterWork[i])[j];
+                } else {
+                    *reinterpret_cast<int*>(object->m_localBase[1 + j] + dstOffs) = -1;
+                }
+            }
+            if (romLetterWork[i] != 0) {
+                int letterIndex = (reinterpret_cast<int>(romLetterWork[i]) - static_cast<int>(Game.m_romLetterWorkBase)) /
+                                  static_cast<int>(sizeof(CRomLetterWork));
                 *reinterpret_cast<int*>(object->m_localBase[13] + dstOffs) = letterIndex;
+            } else {
+                *reinterpret_cast<int*>(object->m_localBase[13] + dstOffs) = -1;
             }
         }
 
@@ -3636,7 +3649,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     }
     case -0xBF:
-        if (object->m_localBase[2] != 0) {
+        if (*reinterpret_cast<int*>(object->m_localBase + 2) != 0) {
             MapMng.ShowMapObjChildID(*object->m_localBase, object->m_localBase[1]);
         } else {
             MapMng.ShowMapObjID(*object->m_localBase, object->m_localBase[1]);
@@ -3646,14 +3659,13 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     case -0xC0: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        CColor color(
+        CharaPcs.SetTexShadowPos(CVector(localFloats[0], localFloats[1], localFloats[2]));
+        CharaPcs.SetTexShadowColor(CColor(
             static_cast<u8>(object->m_localBase[3]),
             static_cast<u8>(object->m_localBase[4]),
             static_cast<u8>(object->m_localBase[5]),
-            static_cast<u8>(object->m_localBase[6]));
-        CharaPcs.SetTexShadowPos(CVector(localFloats[0], localFloats[1], localFloats[2]));
-        CharaPcs.SetTexShadowColor(color);
-        CharaPcs.SetTexShadowRadius(localFloats[7]);
+            static_cast<u8>(object->m_localBase[6])));
+        CharaPcs.SetTexShadowRadius(reinterpret_cast<float*>(object->m_localBase)[7]);
         this->push(object, 0);
         outResult = 0;
         break;
@@ -3734,15 +3746,10 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     }
     case -0xCA: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        Vec position = {
-            localFloats[1],
-            localFloats[2],
-            localFloats[3],
-        };
-        this->push(
-            object,
-            Sound.PlaySe3D(
-                *object->m_localBase, &position, localFloats[4], localFloats[5], object->m_localBase[6]));
+        int result = Sound.PlaySe3D(
+            *object->m_localBase, CVector(localFloats[1], localFloats[2], localFloats[3]),
+            localFloats[4], localFloats[5], object->m_localBase[6]);
+        this->push(object, result);
         outResult = 0;
         break;
     }
@@ -3806,32 +3813,31 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     case -0xD2: {
-        if (*object->m_localBase == 0) {
+        if (*reinterpret_cast<int*>(object->m_localBase) != 0) {
+            memcpy(m_savedNextScript, Game.m_currentScriptName, sizeof(m_savedNextScript));
+        } else {
             CGame::CNextScript nextScript;
-            nextScript.m_flags = 0;
             strcpy(nextScript.m_name, m_savedNextScript);
             Game.SetNextScript(&nextScript);
-        } else {
-            memcpy(m_savedNextScript, Game.m_currentScriptName, sizeof(m_savedNextScript));
         }
         this->push(object, 0);
         outResult = 0;
         break;
     }
     case -0xD3:
-        if (object->m_localBase[1] == 0) {
-            MapMng.SetMeshCameraSemiTransAlpha(static_cast<unsigned short>(*object->m_localBase), 0, 0x3C);
-        } else {
+        if (*reinterpret_cast<int*>(object->m_localBase + 1) != 0) {
             MapMng.SetMeshCameraSemiTransAlpha(static_cast<unsigned short>(*object->m_localBase), 0x80, 0x3C);
+        } else {
+            MapMng.SetMeshCameraSemiTransAlpha(static_cast<unsigned short>(*object->m_localBase), 0, 0x3C);
         }
         this->push(object, 0);
         outResult = 0;
         break;
     case -0xD4:
-        if (*object->m_localBase == 0) {
-            MapMng.SetDrawRangeMapObj(*reinterpret_cast<float*>(object->m_localBase + 1));
-        } else {
+        if (*reinterpret_cast<int*>(object->m_localBase) != 0) {
             MapMng.SetDrawRangeOctTree(*reinterpret_cast<float*>(object->m_localBase + 1));
+        } else {
+            MapMng.SetDrawRangeMapObj(*reinterpret_cast<float*>(object->m_localBase + 1));
         }
         this->push(object, 0);
         outResult = 0;
@@ -3842,19 +3848,17 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     case -0xD6: {
-        const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        _GXColor color = {
-            static_cast<u8>(255.0f * localFloats[10]),
-            static_cast<u8>(255.0f * localFloats[10]),
-            static_cast<u8>(255.0f * localFloats[10]),
-            static_cast<u8>(255.0f * localFloats[11]),
-        };
+        const unsigned int* localBase = object->m_localBase;
+        const float* localFloats = reinterpret_cast<const float*>(localBase);
+        unsigned char value = static_cast<u8>(kCFlatAlphaMax * localFloats[10]);
+        unsigned char alpha = static_cast<u8>(kCFlatAlphaMax * localFloats[11]);
+        char* layerName = this->m_strBlob + this->m_strOffsets[localBase[1]];
+        _GXColor color = {value, value, value, alpha};
         this->drawLayer(
-            *object->m_localBase, this->m_strBlob + this->m_strOffsets[object->m_localBase[1]], object->m_localBase[2],
-            object->m_localBase[3], object->m_localBase[4], object->m_localBase[5],
-            static_cast<short>(object->m_localBase[6]), static_cast<short>(object->m_localBase[7]),
+            *object->m_localBase, layerName, localBase[2],
+            localBase[3], localBase[4], localBase[5], localBase[6], localBase[7],
             localFloats[8], localFloats[9], &color,
-            object->m_localBase[12]);
+            localBase[12]);
         this->push(object, 0);
         outResult = 0;
         break;
@@ -3897,18 +3901,21 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     case -0xDF:
-        if (*object->m_localBase == 1) {
-            if (object->m_localBase[1] == 0) {
-                PartPcs.EndMiruraEvent();
-            } else {
-                PartPcs.StartMiruraEvent();
-            }
-        } else if (*object->m_localBase == 0) {
-            if (object->m_localBase[1] == 0) {
-                PartPcs.EndLocationTitle();
-            } else {
+        switch (*reinterpret_cast<int*>(object->m_localBase)) {
+        case 0:
+            if (*reinterpret_cast<int*>(object->m_localBase + 1) != 0) {
                 PartPcs.StartLocationTitle();
+            } else {
+                PartPcs.EndLocationTitle();
             }
+            break;
+        case 1:
+            if (*reinterpret_cast<int*>(object->m_localBase + 1) != 0) {
+                PartPcs.StartMiruraEvent();
+            } else {
+                PartPcs.EndMiruraEvent();
+            }
+            break;
         }
         this->push(object, 0);
         outResult = 0;
@@ -3972,7 +3979,10 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     }
     case -0xE9: {
         _GXTexObj backTexObj;
-        if (*object->m_localBase != 0) {
+        if (*reinterpret_cast<int*>(object->m_localBase) != 0) {
+            Graphic.GetBackBufferRect2(
+                Graphic.GetTmpFrameBuffer(), 0, 0, 0, 0x280, 0x1C0, 0, GX_NEAR, GX_TF_RGB565, 0);
+        } else {
             CColor color(0xFF, 0xFF, 0xFF, static_cast<u8>(object->m_localBase[1]));
 
             GXInitTexObj(
@@ -3981,9 +3991,6 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             GXInitTexObjLOD(&backTexObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
             gUtil.RenderTextureQuad(
                 0.0f, 0.0f, 640.0f, 448.0f, &backTexObj, 0, 0, color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
-        } else {
-            Graphic.GetBackBufferRect2(
-                Graphic.GetTmpFrameBuffer(), &backTexObj, 0, 0, 0x280, 0x1C0, 0, GX_NEAR, GX_TF_RGBA8, 0);
         }
         this->push(object, 0);
         outResult = 0;
@@ -4013,12 +4020,11 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     }
     case -0xED: {
-        const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         CVector hitPosition;
-        hitPosition.x = localFloats[0];
-        hitPosition.y = localFloats[1];
-        hitPosition.z = localFloats[2];
-        if (MapPcs.CheckHitCylinderNear(hitPosition, CVector(kCFlatPadStickZero, 1.0f, kCFlatPadStickZero), kCFlatPadStickZero, object->m_localBase[3]) == 0) {
+        hitPosition.x = reinterpret_cast<float*>(object->m_localBase)[0];
+        hitPosition.y = reinterpret_cast<float*>(object->m_localBase)[1];
+        hitPosition.z = reinterpret_cast<float*>(object->m_localBase)[2];
+        if (MapPcs.CheckHitCylinderNear(hitPosition, CVector(kCFlatPadStickZero, FLOAT_80330B90, kCFlatPadStickZero), kCFlatPadStickZero, object->m_localBase[3]) == 0) {
             this->push(object, 0);
         } else {
             MapPcs.CalcHitPosition(hitPosition);
@@ -4057,10 +4063,12 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         this->push(object, 0);
         outResult = 0;
         break;
-    case -0xF3:
-        this->push(object, this->GetSysControl(*object->m_localBase));
+    case -0xF3: {
+        int result = this->GetSysControl(*object->m_localBase);
+        this->push(object, result);
         outResult = 0;
         break;
+    }
     case -0xF4:
         PartPcs.pppSetDebugHide(static_cast<unsigned char>(*object->m_localBase));
         this->push(object, 0);
@@ -4220,7 +4228,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
         unsigned int flag = static_cast<unsigned int>(static_cast<unsigned char>(gameWork.m_eventFlags[byteIndex])) & mask;
         FlatLastResult(this) = (-flag | flag) >> 31;
     } else if (systemValue <= -200) {
-        short* artifact = &gameWork.m_eventWork[systemValue + 0x1C7];
+        short* artifact = &Game.m_gameWork.m_eventWork[systemValue + 0x1C7];
         FlatLastResult(this) = static_cast<unsigned int>(static_cast<int>(*artifact));
     } else {
         switch (systemValue) {

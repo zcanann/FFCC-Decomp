@@ -26,10 +26,7 @@ public:
     class CNextScript
     {
     public:
-        unsigned int m_flags;
         char m_name[256];
-
-        CNextScript& operator=(const CNextScript&);
     };
 
     class CGameWork
@@ -198,7 +195,8 @@ public:
     int m_mapId;                            // 0xCB20
     int m_mapVariant;                       // 0xCB24
     int m_newGameFlag;                      // 0xCB28
-    CNextScript m_nextScript;               // 0xCB2C
+    unsigned int m_nextScriptFlags;         // 0xCB2C
+    CNextScript m_nextScript;               // 0xCB30
     CMemory::CStage* m_mainStage;           // 0xCC30
     CMemory::CStage* m_debugStage;          // 0xCC34
     CFlatData m_cFlatDataArr[4];            // 0xCC38 stride 0x14D4, total 0x5350

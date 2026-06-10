@@ -474,7 +474,7 @@ void CGame::Create()
     int mapVariant;
     char scriptName[256];
 
-    m_nextScript.m_flags = 1;
+    m_nextScriptFlags = 1;
     clearWork();
 
     memset(&m_gameWork.m_gameDataStartMarker, 0, kGameWorkDataClearSize);
@@ -488,17 +488,7 @@ void CGame::Create()
 
     if (strlen(m_startScriptName) != 0) {
         strcpy(scriptName, m_startScriptName);
-        u32* dst = reinterpret_cast<u32*>(&m_nextScript);
-        u32* src = reinterpret_cast<u32*>(scriptName) - 1;
-        int count = sizeof(scriptName) / (sizeof(u32) * 2);
-        do {
-            u32 a = src[1];
-            u32 b = src[2];
-            src += 2;
-            dst[1] = a;
-            dst[2] = b;
-            dst += 2;
-        } while (--count != 0);
+        m_nextScript = *reinterpret_cast<CNextScript*>(scriptName);
         m_newGameFlag = 1;
     }
 
@@ -732,7 +722,7 @@ void CGame::CheckScriptChange()
     int scriptResult = CFlatRuntime2Storage().Load(m_nextScript.m_name);
     strcpy(m_currentScriptName, m_nextScript.m_name);
 
-    if ((int)m_nextScript.m_flags != 0) {
+    if ((int)m_nextScriptFlags != 0) {
         System.Printf(const_cast<char*>(s_gameDebugMarker));
         System.Printf(const_cast<char*>(assetNameBlock + kNewGameInitMsg));
         System.Printf(const_cast<char*>(s_gameDebugMarker));
@@ -748,7 +738,7 @@ void CGame::CheckScriptChange()
         strcpy(game->m_gameWork.m_townName, game->m_gameWork.m_languageId == 3 ? s_townNameTepa : s_townNameTipa);
         CFlatRuntime2Storage().ResetNewGame();
         Chara.InitFurTexBuffer();
-        m_nextScript.m_flags = 0;
+        m_nextScriptFlags = 0;
     }
 
     System.ScriptChanged(m_nextScript.m_name, scriptResult);

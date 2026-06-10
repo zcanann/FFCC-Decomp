@@ -3914,7 +3914,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 		const int itemId = reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_inventoryItems[i];
 		if (itemId >= 401) {
 			unsigned int itemBuf[0xE];
-			const int itemOffset = itemId * 0x48;
+			const unsigned int itemOffset = itemId * 0x48;
 			unsigned short* itemBase = reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemOffset);
 
 			memset(itemBuf, 0, sizeof(itemBuf));

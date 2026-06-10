@@ -2516,7 +2516,7 @@ void CGObject::boundCheck()
     if ((m_charaModelHandle != 0) && (m_charaModelHandle->m_model != 0)) {
         const float zero = sZeroFloat;
         const float oneF = sAnimFrameOffset;
-        const float clipLimit = 2.0f;
+        const float clipLimit = sNegativeOne;
 
         clipMask = 0x1F;
         s32 i = 0;

@@ -3077,12 +3077,11 @@ void GbaQueue::ChkCMakeCharaType(int channel, unsigned int value)
 	unsigned int stackValue = value;
 	unsigned char* valueBytes = reinterpret_cast<unsigned char*>(&stackValue);
 	char* obj = reinterpret_cast<char*>(this);
-	unsigned char charaType = valueBytes[2];
 
-	if (charaType == 0xFF) {
+	if (valueBytes[2] == 0xFF) {
 		OSWaitSemaphore(accessSemaphores + channel);
-		reinterpret_cast<unsigned char*>(obj)[0x2CCA + channel * 0x20] = 0xFF;
-		reinterpret_cast<unsigned char*>(obj)[0x2CD1 + channel * 0x20] = 0xFF;
+		cmakeInfo[channel].m_charaType = valueBytes[2];
+		cmakeInfo[channel].m_jobType = 0xFF;
 		OSSignalSemaphore(accessSemaphores + channel);
 		return;
 	}
@@ -3092,11 +3091,10 @@ void GbaQueue::ChkCMakeCharaType(int channel, unsigned int value)
 		OSWaitSemaphore(accessSemaphores + i);
 	}
 
-	signed char playerSlot = static_cast<unsigned char>(obj[0x2CB8 + channel * 0x20]);
+	signed char playerSlot = cmakeInfo[channel].m_playerSlot;
 	for (int i = 0; i < 4; i++) {
-		int otherOffset = i * 0x20;
 		if ((channel != i) && (cmakeInfo[i].m_active != 0) &&
-		    (static_cast<unsigned char>(obj[0x2CCA + otherOffset]) == charaType)) {
+		    (cmakeInfo[i].m_charaType == valueBytes[2])) {
 			Joybus.SendResult(channel, 1, valueBytes[1], 0);
 			foundDuplicate = true;
 			break;
@@ -3112,18 +3110,16 @@ void GbaQueue::ChkCMakeCharaType(int channel, unsigned int value)
 	}
 
 	for (int i = 0; i < 8; i++) {
-		CCaravanWork* caravanWork = &Game.m_caravanWorkArr[i];
-		char* caravanObj = reinterpret_cast<char*>(caravanWork);
-		if ((i != playerSlot) && (*reinterpret_cast<int*>(caravanObj + 0x3A4) != 0) &&
-		    (static_cast<unsigned char>(caravanObj[0xBA6]) == 0)) {
-			short existingCharaType = *reinterpret_cast<unsigned short*>(caravanObj + 0x3E0) & 0xFF;
-			existingCharaType |= static_cast<unsigned short>(
-			    static_cast<unsigned char>(static_cast<char>(*reinterpret_cast<unsigned short*>(caravanObj + 0x3E4)) << 2));
-			if (*reinterpret_cast<short*>(caravanObj + 0x3E2) != 0) {
-				existingCharaType = static_cast<unsigned short>(existingCharaType | 0x80);
+		if ((i != playerSlot) && (Game.m_caravanWorkArr[i].m_shopState != 0) &&
+		    (Game.m_caravanWorkArr[i].m_caravanLocalFlags == 0)) {
+			unsigned char existingCharaType =
+			    (Game.m_caravanWorkArr[i].m_tribeId & 0xFF) |
+			    static_cast<signed char>(Game.m_caravanWorkArr[i].m_appearanceVariant << 2);
+			if (Game.m_caravanWorkArr[i].m_genderFlag != 0) {
+				existingCharaType |= 0x80;
 			}
 
-			if (existingCharaType == charaType) {
+			if (existingCharaType == valueBytes[2]) {
 				Joybus.SendResult(channel, 1, valueBytes[1], 0);
 				return;
 			}
@@ -3132,9 +3128,10 @@ void GbaQueue::ChkCMakeCharaType(int channel, unsigned int value)
 
 	Joybus.SendResult(channel, 0, valueBytes[1], 0);
 	OSWaitSemaphore(accessSemaphores + channel);
-	obj[0x2CCA + channel * 0x20] = static_cast<char>(charaType);
+	cmakeInfo[channel].m_charaType = valueBytes[2];
 	OSSignalSemaphore(accessSemaphores + channel);
-	MenuPcs.ChgModel(static_cast<int>(playerSlot), charaType & 3, (charaType >> 2) & 3, static_cast<int>(charaType >> 7));
+	MenuPcs.ChgModel(static_cast<int>(playerSlot), valueBytes[2] & 3, (valueBytes[2] >> 2) & 3,
+	                 static_cast<int>(valueBytes[2] >> 7));
 }
 
 /*
@@ -3154,7 +3151,7 @@ void GbaQueue::ChkCMakeJob(int channel, unsigned int value)
 
 	if (valueBytes[2] == 0xFF) {
 		OSWaitSemaphore(accessSemaphores + channel);
-		obj[0x2CD1 + channel * 0x20] = static_cast<char>(valueBytes[2]);
+		cmakeInfo[channel].m_jobType = valueBytes[2];
 		OSSignalSemaphore(accessSemaphores + channel);
 		return;
 	}
@@ -3164,11 +3161,10 @@ void GbaQueue::ChkCMakeJob(int channel, unsigned int value)
 		OSWaitSemaphore(accessSemaphores + i);
 	}
 
-	unsigned char playerSlot = static_cast<unsigned char>(obj[0x2CB8 + channel * 0x20]);
+	unsigned char playerSlot = cmakeInfo[channel].m_playerSlot;
 	for (int i = 0; i < 4; i++) {
-		int otherOffset = i * 0x20;
 		if ((channel != i) && (cmakeInfo[i].m_active != 0) &&
-		    (static_cast<unsigned char>(obj[0x2CD1 + otherOffset]) == valueBytes[2])) {
+		    (cmakeInfo[i].m_jobType == valueBytes[2])) {
 			Joybus.SendResult(channel, 1, valueBytes[1], 0);
 			foundDuplicate = true;
 			break;
@@ -3194,7 +3190,7 @@ void GbaQueue::ChkCMakeJob(int channel, unsigned int value)
 
 	Joybus.SendResult(channel, 0, valueBytes[1], 0);
 	OSWaitSemaphore(accessSemaphores + channel);
-	obj[0x2CD1 + channel * 0x20] = static_cast<char>(valueBytes[2]);
+	cmakeInfo[channel].m_jobType = valueBytes[2];
 	OSSignalSemaphore(accessSemaphores + channel);
 }
 

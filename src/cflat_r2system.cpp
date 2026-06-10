@@ -3851,9 +3851,10 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         const float* localFloats = reinterpret_cast<const float*>(localBase);
         unsigned char value = static_cast<u8>(kCFlatAlphaMax * localFloats[10]);
         unsigned char alpha = static_cast<u8>(kCFlatAlphaMax * localFloats[11]);
+        char* layerName = this->m_strBlob + this->m_strOffsets[localBase[1]];
         _GXColor color = {value, value, value, alpha};
         this->drawLayer(
-            *object->m_localBase, this->m_strBlob + this->m_strOffsets[localBase[1]], localBase[2],
+            *object->m_localBase, layerName, localBase[2],
             localBase[3], localBase[4], localBase[5], localBase[6], localBase[7],
             localFloats[8], localFloats[9], &color,
             localBase[12]);

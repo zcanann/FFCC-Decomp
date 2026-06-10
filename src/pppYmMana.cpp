@@ -321,8 +321,8 @@ void Chara_DrawShadowMeshDLCallback(CChara::CModel* model, void* work, void* vYm
 void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int partIndex, int dlIndex, float (*mtx)[4])
 {
     CChara::CMesh::CRefData* mesh = model->m_meshes[partIndex].m_data;
-    CChara::CMesh::CDisplayList* displayList = &mesh->m_displayLists[dlIndex];
     VYmMana* mana = static_cast<VYmMana*>(work);
+    CChara::CMesh::CDisplayList* displayList = &mesh->m_displayLists[dlIndex];
     pppYmManaStep* stepData = static_cast<pppYmManaStep*>(step);
     int type = stepData->m_type;
     CGObject* object = mana->m_object;

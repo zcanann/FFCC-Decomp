@@ -3651,7 +3651,7 @@ void CGCharaObj::combi2()
 		return;
 	}
 
-	int fallback = 0;
+	int fallback;
 	unsigned int comboIndex = searchCombi(candidateCount, candidates, fallback);
 	if (comboIndex < 0) {
 		if (fallback == 0 || candidates[0]->m_comboFrame >= 0x42) {

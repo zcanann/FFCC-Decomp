@@ -1991,10 +1991,7 @@ void CGObject::onDraw()
 
     if (((CFlat.m_debugFlags & 0x2) != 0) && ((m_bgColMask & 0x2) != 0)) {
         CVector capsuleOffset;
-        capsuleOffset.x = sZeroFloat;
-        capsuleOffset.y = sZeroFloat;
-        capsuleOffset.z = sZeroFloat;
-        if (*reinterpret_cast<int*>(&m_bodyEllipsoidOffset) == 0) {
+        if (sZeroFloat == m_bodyEllipsoidOffset) {
         } else {
             capsuleOffset.y = sZeroFloat;
             capsuleOffset.x = m_bodyEllipsoidOffset * -sinf(m_rotBaseY);

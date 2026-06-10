@@ -3124,7 +3124,7 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
     col.r = 0xFF;
     col.g = 0xFF;
     col.b = 0xFF;
-    col.a = static_cast<unsigned char>(static_cast<int>(alpha255));
+    col.a = static_cast<unsigned char>(alpha255);
     GXSetChanMatColor(GX_COLOR0A0, col);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3A));
@@ -3149,13 +3149,12 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
     font->DrawInit();
     font->SetTlut(7);
 
-    CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha));
-    font->SetColor(rgba.color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha255)).color);
 
     const char* yesStr = GetMenuStr(1);
     float yesW = static_cast<float>(font->GetWidth(yesStr));
     int yesX = static_cast<int>(
-        (48.0f - yesW) * 0.5f + static_cast<float>(0x1D0));
+        (48.0f - yesW) / 2.0f + static_cast<float>(0x1D0));
     font->SetPosX(static_cast<float>(yesX));
     font->SetPosY(369.0f);
     font->Draw(yesStr);
@@ -3163,7 +3162,7 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
     const char* noStr = GetMenuStr(2);
     float noW = static_cast<float>(font->GetWidth(noStr));
     int noX = static_cast<int>(
-        (48.0f - noW) * 0.5f + static_cast<float>(0x218));
+        (48.0f - noW) / 2.0f + static_cast<float>(0x218));
     font->SetPosX(static_cast<float>(noX));
     font->SetPosY(369.0f);
     font->Draw(noStr);

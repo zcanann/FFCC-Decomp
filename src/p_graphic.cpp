@@ -163,6 +163,60 @@ STATIC_ASSERT(offsetof(CGraphicPcs::ScreenFadeSlot, m_stretch) == 0x24);
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 268b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CGraphicPcs::drawSFRect(float x0, float y0, float x1, float y1, _GXColor topColor, _GXColor bottomColor)
+{
+    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+    GXPosition3f32(x0, y0, kGraphicZero);
+    GXColor1u32(*(u32*)&topColor);
+    GXTexCoord2u16(0, 0);
+    GXPosition3f32(x1, y0, kGraphicZero);
+    GXColor1u32(*(u32*)&topColor);
+    GXTexCoord2u16(2, 0);
+    GXPosition3f32(x1, y1, kGraphicZero);
+    GXColor1u32(*(u32*)&bottomColor);
+    GXTexCoord2u16(2, 2);
+    GXPosition3f32(x0, y1, kGraphicZero);
+    GXColor1u32(*(u32*)&bottomColor);
+    GXTexCoord2u16(0, 2);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 268b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CGraphicPcs::drawSFRect(float x0, float y0, float x1, float y1, _GXColor color)
+{
+    drawSFRect(x0, y0, x1, y1, color, color);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 268b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CGraphicPcs::drawSFCircle(int innerRadius, int outerRadius, int centerX, int centerY, _GXColor color)
+{
+    drawSFCircle(innerRadius, outerRadius, centerX, centerY, color, color);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80045178
  * PAL Size: 4256b
  * EN Address: TODO
@@ -246,64 +300,14 @@ void CGraphicPcs::drawScreenFade()
         baseColor2.a = 0;
 
         if (slot == 3) {
-            const int barHeight = (int)(kScreenFadeBarEdge * fadeWave);
-            const unsigned int barEdge = (int)(kScreenFadeRingWidth * fadeWave);
+            int barHeight = (int)(kScreenFadeBarEdge * fadeWave);
+            const int barEdge = (int)(kScreenFadeRingWidth * fadeWave);
 
-            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-            GXPosition3f32(kGraphicZero, kGraphicZero, kGraphicZero);
-            GXColor1u32(*(u32*)&baseColor);
-            GXTexCoord2u16(0, 0);
-            GXPosition3f32(kGraphicScreenWidth, kGraphicZero, kGraphicZero);
-            GXColor1u32(*(u32*)&baseColor);
-            GXTexCoord2u16(2, 0);
-            GXPosition3f32(kGraphicScreenWidth, (float)barHeight, kGraphicZero);
-            GXColor1u32(*(u32*)&baseColor);
-            GXTexCoord2u16(2, 2);
-            GXPosition3f32(kGraphicZero, (float)barHeight, kGraphicZero);
-            GXColor1u32(*(u32*)&baseColor);
-            GXTexCoord2u16(0, 2);
-
-            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-            GXPosition3f32(kGraphicZero, (float)barHeight, kGraphicZero);
-            GXColor1u32(*(u32*)&baseColor);
-            GXTexCoord2u16(0, 0);
-            GXPosition3f32(kGraphicScreenWidth, (float)barHeight, kGraphicZero);
-            GXColor1u32(*(u32*)&baseColor);
-            GXTexCoord2u16(2, 0);
-            GXPosition3f32(kGraphicScreenWidth, (float)(barHeight + barEdge), kGraphicZero);
-            GXColor1u32(*(u32*)&baseColor2);
-            GXTexCoord2u16(2, 2);
-            GXPosition3f32(kGraphicZero, (float)(barHeight + barEdge), kGraphicZero);
-            GXColor1u32(*(u32*)&baseColor2);
-            GXTexCoord2u16(0, 2);
-
-            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-            GXPosition3f32(kGraphicZero, kGraphicScreenHeight, kGraphicZero);
-            GXColor1u32(*(u32*)&baseColor);
-            GXTexCoord2u16(0, 0);
-            GXPosition3f32(kGraphicScreenWidth, kGraphicScreenHeight, kGraphicZero);
-            GXColor1u32(*(u32*)&baseColor);
-            GXTexCoord2u16(2, 0);
-            GXPosition3f32(kGraphicScreenWidth, kGraphicScreenHeight - (float)barHeight, kGraphicZero);
-            GXColor1u32(*(u32*)&baseColor);
-            GXTexCoord2u16(2, 2);
-            GXPosition3f32(kGraphicZero, kGraphicScreenHeight - (float)barHeight, kGraphicZero);
-            GXColor1u32(*(u32*)&baseColor);
-            GXTexCoord2u16(0, 2);
-
-            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-            GXPosition3f32(kGraphicZero, kGraphicScreenHeight - (float)barHeight, kGraphicZero);
-            GXColor1u32(*(u32*)&baseColor);
-            GXTexCoord2u16(0, 0);
-            GXPosition3f32(kGraphicScreenWidth, kGraphicScreenHeight - (float)barHeight, kGraphicZero);
-            GXColor1u32(*(u32*)&baseColor);
-            GXTexCoord2u16(2, 0);
-            GXPosition3f32(kGraphicScreenWidth, kGraphicScreenHeight - (float)(barHeight + barEdge), kGraphicZero);
-            GXColor1u32(*(u32*)&baseColor2);
-            GXTexCoord2u16(2, 2);
-            GXPosition3f32(kGraphicZero, kGraphicScreenHeight - (float)(barHeight + barEdge), kGraphicZero);
-            GXColor1u32(*(u32*)&baseColor2);
-            GXTexCoord2u16(0, 2);
+            drawSFRect(kGraphicZero, kGraphicZero, kGraphicScreenWidth, (float)barHeight, baseColor);
+            drawSFRect(kGraphicZero, (float)barHeight, kGraphicScreenWidth, (float)(barHeight + barEdge), baseColor, baseColor2);
+            barHeight = 448 - barHeight;
+            drawSFRect(kGraphicZero, kGraphicScreenHeight, kGraphicScreenWidth, (float)barHeight, baseColor);
+            drawSFRect(kGraphicZero, (float)barHeight, kGraphicScreenWidth, (float)(barHeight - barEdge), baseColor, baseColor2);
             continue;
         }
 
@@ -311,19 +315,7 @@ void CGraphicPcs::drawScreenFade()
             const int mode = slotData->m_mode;
             if (mode == 0) {
             drawSlot2Fullscreen:
-                GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-                GXPosition3f32(kGraphicZero, kGraphicZero, kGraphicZero);
-                GXColor1u32(*(u32*)&baseColor);
-                GXTexCoord2u16(0, 0);
-                GXPosition3f32(kGraphicScreenWidth, kGraphicZero, kGraphicZero);
-                GXColor1u32(*(u32*)&baseColor);
-                GXTexCoord2u16(2, 0);
-                GXPosition3f32(kGraphicScreenWidth, kGraphicScreenHeight, kGraphicZero);
-                GXColor1u32(*(u32*)&baseColor);
-                GXTexCoord2u16(2, 2);
-                GXPosition3f32(kGraphicZero, kGraphicScreenHeight, kGraphicZero);
-                GXColor1u32(*(u32*)&baseColor);
-                GXTexCoord2u16(0, 2);
+                drawSFRect(kGraphicZero, kGraphicZero, kGraphicScreenWidth, kGraphicScreenHeight, baseColor);
             } else if (mode == 1) {
                 CGObject* obj = static_cast<CGObject*>(slotData->m_targetObj);
                 if (obj == NULL) {
@@ -333,24 +325,24 @@ void CGraphicPcs::drawScreenFade()
                 pos.y += slotData->m_targetYOffs;
                 PSMTX44MultVec(worldScreenMtx, &pos, &pos);
 
-                float sx = pos.x * kGraphicScreenCenterX + kGraphicScreenCenterX;
-                float sy = -(pos.y * kGraphicScreenCenterY - kGraphicScreenCenterY);
-                if (sx < kGraphicZero) {
-                    sx = kGraphicZero;
-                } else if (sx > kGraphicScreenWidth) {
-                    sx = kGraphicScreenWidth;
+                const float sx = kGraphicScreenCenterX * pos.x + kGraphicScreenCenterX;
+                const float sy = -(kGraphicScreenCenterY * pos.y - kGraphicScreenCenterY);
+                pos.x = sx;
+                pos.y = sy;
+                float clamped = kGraphicZero;
+                if (sx >= kGraphicZero) {
+                    clamped = (kGraphicScreenWidth >= sx) ? sx : kGraphicScreenWidth;
                 }
-                if (sy < kGraphicZero) {
-                    sy = kGraphicZero;
-                } else if (sy > kGraphicScreenHeight) {
-                    sy = kGraphicScreenHeight;
+                pos.x = clamped;
+                clamped = kGraphicZero;
+                if (pos.y >= kGraphicZero) {
+                    clamped = (kGraphicScreenHeight >= pos.y) ? pos.y : kGraphicScreenHeight;
                 }
+                pos.y = clamped;
 
                 const int radius = (int)(kScreenFadeCircleRadius * (kGraphicOne - fadeWave));
-                const int ix = (int)sx;
-                const int iy = (int)sy;
-                drawSFCircle(0x500, radius, ix, iy, baseColor, baseColor);
-                drawSFCircle(radius, radius - 8, ix, iy, baseColor, baseColor2);
+                drawSFCircle(0x500, radius, (int)pos.x, (int)pos.y, baseColor);
+                drawSFCircle(radius, radius - 8, (int)pos.x, (int)pos.y, baseColor, baseColor2);
             }
             continue;
         }
@@ -363,32 +355,16 @@ void CGraphicPcs::drawScreenFade()
                 _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
                 GXLoadTexObj(&Graphic.m_smallBackTexObj, GX_TEXMAP0);
 
-                const float amp = slotData->m_amplitude * (kGraphicOne - t);
-                const float offX = slotData->m_stretch * (kGraphicScreenCenterX * amp) * (float)sin((double)slotData->m_phase);
-                const float size = amp + kGraphicOne;
-                const float offY = slotData->m_stretch * (kGraphicScreenCenterY * amp) * (float)cos((double)slotData->m_phase);
+                t = slotData->m_amplitude * (kGraphicOne - t);
+                const float offX = slotData->m_stretch * ((kGraphicScreenCenterX * t) * (float)sin((double)slotData->m_phase));
+                const float offY = slotData->m_stretch * ((kGraphicScreenCenterY * t) * (float)cos((double)slotData->m_phase));
+                t += kGraphicOne;
 
-                GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-                const float centerX = kGraphicScreenCenterX + offX;
-                const float halfWidth = kGraphicScreenCenterX * size;
-                const float centerY = kGraphicScreenCenterY + offY;
-                const float halfHeight = kGraphicScreenCenterY * size;
-                const float left = centerX - halfWidth;
-                const float right = centerX + halfWidth;
-                const float top = centerY - halfHeight;
-                const float bottom = centerY + halfHeight;
-                GXPosition3f32(left, top, kGraphicZero);
-                GXColor1u32(*(u32*)&baseColor);
-                GXTexCoord2u16(0, 0);
-                GXPosition3f32(right, top, kGraphicZero);
-                GXColor1u32(*(u32*)&baseColor);
-                GXTexCoord2u16(2, 0);
-                GXPosition3f32(right, bottom, kGraphicZero);
-                GXColor1u32(*(u32*)&baseColor);
-                GXTexCoord2u16(2, 2);
-                GXPosition3f32(left, bottom, kGraphicZero);
-                GXColor1u32(*(u32*)&baseColor);
-                GXTexCoord2u16(0, 2);
+                drawSFRect((kGraphicScreenCenterX + offX) - kGraphicScreenCenterX * t,
+                           (kGraphicScreenCenterY + offY) - kGraphicScreenCenterY * t,
+                           (kGraphicScreenCenterX + offX) + kGraphicScreenCenterX * t,
+                           (kGraphicScreenCenterY + offY) + kGraphicScreenCenterY * t,
+                           baseColor);
             }
             continue;
         }
@@ -407,28 +383,37 @@ void CGraphicPcs::drawScreenFade()
                 _GXSetTevAlphaIn(GX_TEVSTAGE0, (_GXTevAlphaArg)7, (_GXTevAlphaArg)4, (_GXTevAlphaArg)5, (_GXTevAlphaArg)7);
                 _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
 
-                for (u32 tile = 0; tile < 4; tile++) {
+                for (int tile = 0; tile < 4; tile++) {
+                    CColor topColor;
+                    CColor bottomColor;
                     _GXTexObj backTexObj;
                     const int x = (tile & 1) ? 0x140 : 0;
                     const int y = (tile & 2) ? 0xE0 : 0;
                     const int row = (tile & 2) ? 1 : 0;
 
                     Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backTexObj, x, y, 0x140, 0xE0, 0,
-                                               GX_LINEAR, GX_TF_RGBA8, 0);
+                                               GX_NEAR, GX_TF_RGBA8, 0);
                     GXLoadTexObj(&backTexObj, GX_TEXMAP0);
 
+                    baseColor.r = slotData->m_colorA.r;
+                    baseColor.g = slotData->m_colorA.g;
+                    baseColor.b = slotData->m_colorA.b;
+                    baseColor.a = slotData->m_colorA.a;
+                    baseColor2.r = slotData->m_colorB.r;
+                    baseColor2.g = slotData->m_colorB.g;
+                    baseColor2.b = slotData->m_colorB.b;
+                    baseColor2.a = slotData->m_colorB.a;
+
                     const float t0 = (float)row * kGraphicHalf;
-                    CColor topColor;
-                    topColor.color.r = (u8)(t0 * ((float)baseColor2.r - (float)baseColor.r) + (float)baseColor.r);
-                    topColor.color.g = (u8)(t0 * ((float)baseColor2.g - (float)baseColor.g) + (float)baseColor.g);
-                    topColor.color.b = (u8)(t0 * ((float)baseColor2.b - (float)baseColor.b) + (float)baseColor.b);
+                    topColor.color.r = (u8)(t0 * ((float)slotData->m_colorB.r - (float)slotData->m_colorA.r) + (float)slotData->m_colorA.r);
+                    topColor.color.g = (u8)(t0 * ((float)slotData->m_colorB.g - (float)slotData->m_colorA.g) + (float)slotData->m_colorA.g);
+                    topColor.color.b = (u8)(t0 * ((float)slotData->m_colorB.b - (float)slotData->m_colorA.b) + (float)slotData->m_colorA.b);
                     topColor.color.a = 0xFF;
 
                     const float t1 = (float)(row + 1) * kGraphicHalf;
-                    CColor bottomColor;
-                    bottomColor.color.r = (u8)(t1 * ((float)baseColor2.r - (float)baseColor.r) + (float)baseColor.r);
-                    bottomColor.color.g = (u8)(t1 * ((float)baseColor2.g - (float)baseColor.g) + (float)baseColor.g);
-                    bottomColor.color.b = (u8)(t1 * ((float)baseColor2.b - (float)baseColor.b) + (float)baseColor.b);
+                    bottomColor.color.r = (u8)(t1 * ((float)slotData->m_colorB.r - (float)slotData->m_colorA.r) + (float)slotData->m_colorA.r);
+                    bottomColor.color.g = (u8)(t1 * ((float)slotData->m_colorB.g - (float)slotData->m_colorA.g) + (float)slotData->m_colorA.g);
+                    bottomColor.color.b = (u8)(t1 * ((float)slotData->m_colorB.b - (float)slotData->m_colorA.b) + (float)slotData->m_colorA.b);
                     bottomColor.color.a = 0xFF;
 
                     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
@@ -453,19 +438,8 @@ void CGraphicPcs::drawScreenFade()
                     _GXSetBlendMode((GXBlendMode)3, (GXBlendFactor)4, (GXBlendFactor)1, (GXLogicOp)5);
                 }
 
-                GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-                GXPosition3f32(kGraphicZero, kGraphicZero, kGraphicZero);
-                GXColor1u32(*(u32*)&baseColor);
-                GXTexCoord2u16(0, 0);
-                GXPosition3f32(kGraphicScreenWidth, kGraphicZero, kGraphicZero);
-                GXColor1u32(*(u32*)&baseColor);
-                GXTexCoord2u16(2, 0);
-                GXPosition3f32(kGraphicScreenWidth, kGraphicScreenHeight, kGraphicZero);
-                GXColor1u32(*(u32*)&baseColor2);
-                GXTexCoord2u16(2, 2);
-                GXPosition3f32(kGraphicZero, kGraphicScreenHeight, kGraphicZero);
-                GXColor1u32(*(u32*)&baseColor2);
-                GXTexCoord2u16(0, 2);
+                drawSFRect(kGraphicZero, kGraphicZero, kGraphicScreenWidth, kGraphicScreenHeight,
+                           slotData->m_colorA, slotData->m_colorB);
             }
         }
     }
@@ -544,35 +518,6 @@ void CGraphicPcs::drawSFCircle(int innerRadius, int outerRadius, int centerX, in
         GXColor1u32(outerColorWord);
         GXTexCoord2u16(0, 0);
     }
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 268b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CGraphicPcs::drawSFRect(float x0, float y0, float x1, float y1, _GXColor topColor, _GXColor bottomColor)
-{
-    const u32 topColorWord = *(u32*)&topColor;
-    const u32 bottomColorWord = *(u32*)&bottomColor;
-
-    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-    GXPosition3f32(x0, y0, 0.0f);
-    GXColor1u32(topColorWord);
-    GXTexCoord2u16(0, 0);
-    GXPosition3f32(x1, y0, 0.0f);
-    GXColor1u32(topColorWord);
-    GXTexCoord2u16(2, 0);
-    GXPosition3f32(x1, y1, 0.0f);
-    GXColor1u32(bottomColorWord);
-    GXTexCoord2u16(2, 2);
-    GXPosition3f32(x0, y1, 0.0f);
-    GXColor1u32(bottomColorWord);
-    GXTexCoord2u16(0, 2);
 }
 
 /*

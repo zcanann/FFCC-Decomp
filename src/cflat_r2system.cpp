@@ -1936,8 +1936,14 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     }
     case -0x0D: {
         float* values = reinterpret_cast<float*>(object->m_localBase);
-        Vec a = {values[0], values[1], values[2]};
-        Vec b = {values[3], values[4], values[5]};
+        Vec a;
+        Vec b;
+        a.x = values[0];
+        a.y = values[1];
+        a.z = values[2];
+        b.x = values[3];
+        b.y = values[4];
+        b.z = values[5];
         float value = PSVECDistance(&a, &b);
         this->push(object, *reinterpret_cast<int*>(&value));
         outResult = 0;
@@ -2262,11 +2268,10 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     case -0x22: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         const unsigned int mask = *object->m_localBase;
-        Vec target = {
-            localFloats[1],
-            localFloats[2],
-            localFloats[3],
-        };
+        Vec target;
+        target.x = localFloats[1];
+        target.y = localFloats[2];
+        target.z = localFloats[3];
         const float margin = localFloats[4];
         int found = 0;
         unsigned int bestLine = 0;
@@ -2305,7 +2310,10 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         const float distance = localFloats[1];
         CLine<64>* line = &m_debugLines[*object->m_localBase];
-        Vec position = {0.0f, 0.0f, 0.0f};
+        Vec position;
+        position.x = 0.0f;
+        position.y = 0.0f;
+        position.z = 0.0f;
 
         if (line->pointCount > 0) {
             if (distance < 0.0f || line->pointCount == 1) {
@@ -2335,7 +2343,10 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         const float distance = localFloats[1];
         CLine<64>* line = &m_debugLines[*object->m_localBase];
-        Vec direction = {0.0f, 0.0f, 0.0f};
+        Vec direction;
+        direction.x = 0.0f;
+        direction.y = 0.0f;
+        direction.z = 0.0f;
 
         if (line->pointCount > 1) {
             if (distance < 0.0f) {
@@ -2368,11 +2379,10 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     }
     case -0x25: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        Vec target = {
-            localFloats[1],
-            localFloats[2],
-            localFloats[3],
-        };
+        Vec target;
+        target.x = localFloats[1];
+        target.y = localFloats[2];
+        target.z = localFloats[3];
         CLine<64>* line = &m_debugLines[*object->m_localBase];
         unsigned long segment = 0;
         float segmentRatio = 0.0f;
@@ -2472,11 +2482,10 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     case -0x2C: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        Vec position = {
-            localFloats[0],
-            localFloats[1],
-            localFloats[2],
-        };
+        Vec position;
+        position.x = localFloats[0];
+        position.y = localFloats[1];
+        position.z = localFloats[2];
         CameraPcs.SetFullScreenShadowPos(&position, localFloats[3]);
         this->push(object, 0);
         outResult = 0;
@@ -2524,7 +2533,10 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     }
     case -0x34: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        Vec axis = {std::cosf(localFloats[1]), 0.0f, std::sinf(localFloats[1])};
+        Vec axis;
+        axis.x = std::cosf(localFloats[1]);
+        axis.y = 0.0f;
+        axis.z = std::sinf(localFloats[1]);
         Mtx matrix;
         Mtx rotation;
 
@@ -2747,8 +2759,12 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     }
     case -0x40: {
         float* values = reinterpret_cast<float*>(object->m_localBase);
-        Quaternion rotation = {values[0], values[1], values[2], values[3]};
+        Quaternion rotation;
         Mtx matrix;
+        rotation.x = values[0];
+        rotation.y = values[1];
+        rotation.z = values[2];
+        rotation.w = values[3];
         PSMTXQuat(matrix, &rotation);
         CameraPcs.SetWorldMapMatrix(matrix);
         this->push(object, 0);
@@ -3728,11 +3744,10 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     }
     case -0xCA: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        Vec position = {
-            localFloats[1],
-            localFloats[2],
-            localFloats[3],
-        };
+        Vec position;
+        position.x = localFloats[1];
+        position.y = localFloats[2];
+        position.z = localFloats[3];
         this->push(
             object,
             Sound.PlaySe3D(

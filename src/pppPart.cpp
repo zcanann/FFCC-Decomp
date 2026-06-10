@@ -754,8 +754,8 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 #define programSet loc.m_programSet
 	_pppPObjLink* newObj = 0;
 	int firstFailure = 1;
-	u32 totalSize;
 	CMemory::CStage* stage;
+	u32 totalSize;
 	int canRetry;
 	_pppPDataVal* dataVal = pppPDataVal;
 

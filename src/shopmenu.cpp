@@ -896,7 +896,9 @@ char* CShopMenu::GetItemName(int itemNo)
         return 0;
     }
 
-    return reinterpret_cast<char*>(reinterpret_cast<int*>(Game.m_cFlatDataArr[1].TableStrings(0))[itemNo * 5 + 4]);
+    char** entry = reinterpret_cast<char**>(
+        reinterpret_cast<char*>(Game.m_cFlatDataArr[1].TableStrings(0)) + itemNo * 0x14);
+    return entry[4];
 }
 
 /*

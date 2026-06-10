@@ -1317,11 +1317,13 @@ tmpArtifactBlock:
 				Sound.PlaySe(0x0C, 0x40, 0x7F, 0);
 				int& charaCommand = Chara.MogFur().m_commandIndex;
 				charaCommand += cmdDir;
-				if (charaCommand < 0) {
-					charaCommand += 5;
-				} else if (charaCommand > 4) {
-					charaCommand -= 5;
+				int adjusted = charaCommand;
+				if (adjusted < 0) {
+					adjusted += 5;
+				} else if (adjusted > 4) {
+					adjusted -= 5;
 				}
+				charaCommand = adjusted;
 			}
 			const int charaCommand = Chara.MogFur().m_commandIndex;
 			ringCommand = charaCommand + 0x1E;

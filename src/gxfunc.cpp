@@ -186,6 +186,7 @@ void _InitGxFunc()
 	s_GXSetNumTevStages_nStages = 0xFFFF;
 	s_GXSetBlendMode_Reg.mode = static_cast<_GXBlendMode>(-1);
 }
+#pragma always_inline off
 
 /*
  * --INFO--

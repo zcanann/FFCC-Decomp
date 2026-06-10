@@ -1056,29 +1056,27 @@ context_proc:
             else
             {
                 int status;
-                bool failed;
+                int failed;
 
-                do
+                status = GBAGetStatus(channel, param + 0xC0);
+                if (status != 0)
                 {
-                    status = GBAGetStatus(channel, param + 0xC0);
-                    if (status != 0)
-                    {
-                        break;
-                    }
-                    if (param[0xC0] != 0x28)
-                    {
-                        status = 1;
-                        break;
-                    }
-                    status = GBARead(channel, reinterpret_cast<u8*>(&identity7), param + 0xC0);
-                    if (status != 0)
-                    {
-                        break;
-                    }
-                    status = 0;
-                    *reinterpret_cast<unsigned int*>(param + 0xA4) = identity7;
-                    param[0xC3] = 1;
-                } while (0);
+                    goto identity_done7;
+                }
+                if (param[0xC0] != 0x28)
+                {
+                    status = 1;
+                    goto identity_done7;
+                }
+                status = GBARead(channel, reinterpret_cast<u8*>(&identity7), param + 0xC0);
+                if (status != 0)
+                {
+                    goto identity_done7;
+                }
+                status = 0;
+                *reinterpret_cast<unsigned int*>(param + 0xA4) = identity7;
+                param[0xC3] = 1;
+identity_done7:;
                 if (status == 0 &&
                     (memcmp(param + 0xA4, self + 0x1344, 4) == 0 || *reinterpret_cast<unsigned int*>(param + 0xA4) == 0x414D4752))
                 {
@@ -1087,42 +1085,44 @@ context_proc:
                         *reinterpret_cast<int*>(param + 0x9C) = 0;
                     }
 
-                    do
+                    status = GBAGetStatus(channel, param + 0xC0);
+                    if (status != 0)
                     {
-                        status = GBAGetStatus(channel, param + 0xC0);
-                        if (status != 0)
-                        {
-                            break;
-                        }
-                        if (param[0xC0] != 0x20)
-                        {
-                            status = 1;
-                            break;
-                        }
-                        status = GBAWrite(channel, self + 0x1344, param + 0xC0);
-                        if (status != 0)
-                        {
-                            break;
-                        }
-                        status = GBAGetStatus(channel, param + 0xC0);
-                        if (status != 0)
-                        {
-                            break;
-                        }
-                        if (param[0xC0] != 0x30)
-                        {
-                            status = 1;
-                            break;
-                        }
-                        status = 0;
-                    } while (0);
+                        goto write_done7;
+                    }
+                    if (param[0xC0] != 0x20)
+                    {
+                        status = 1;
+                        goto write_done7;
+                    }
+                    status = GBAWrite(channel, self + 0x1344, param + 0xC0);
+                    if (status != 0)
+                    {
+                        goto write_done7;
+                    }
+                    status = GBAGetStatus(channel, param + 0xC0);
+                    if (status != 0)
+                    {
+                        goto write_done7;
+                    }
+                    if (param[0xC0] != 0x30)
+                    {
+                        status = 1;
+                        goto write_done7;
+                    }
+                    status = 0;
+write_done7:;
                     if (status != 0)
                     {
                         goto ctx_fail7;
                     }
                     command7 = 0x60000000;
                     status = GBAWrite(channel, reinterpret_cast<u8*>(&command7), param + 0xC0);
-                    if (status == 0 && (param[0xC0] & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_FLAGS_MASK)
+                    if (!(status == 0 && (param[0xC0] & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_FLAGS_MASK))
+                    {
+                        failed = 1;
+                    }
+                    else
                     {
                         int i = 0;
                         do
@@ -1130,31 +1130,27 @@ context_proc:
                             int st = GBAGetStatus(channel, param + 0xC0);
                             if (st != 0 || param[0xC0] != 0x38)
                             {
-                                failed = true;
+                                failed = 1;
                                 goto ctx_done7;
                             }
                             st = GBARead(channel, param + i + 0x28, param + 0xC0);
                             if (st != 0 || (param[0xC0] & GBA_JSTAT_FLAGS_MASK) != GBA_JSTAT_FLAGS_MASK)
                             {
-                                failed = true;
+                                failed = 1;
                                 goto ctx_done7;
                             }
                             i += 4;
                         } while (i < 0x60);
-                        failed = false;
-                    }
-                    else
-                    {
-                        failed = true;
+                        failed = 0;
                     }
                 }
                 else
                 {
 ctx_fail7:
-                    failed = true;
+                    failed = 1;
                 }
 ctx_done7:
-                if (!failed)
+                if (failed == 0)
                 {
                     reinterpret_cast<void (*)(MgGbaThreadParam*, void*)>(*reinterpret_cast<void**>(param + 0x24))(
                         reinterpret_cast<MgGbaThreadParam*>(param), reinterpret_cast<void*>(message));
@@ -1173,32 +1169,34 @@ ctx_done7:
         *reinterpret_cast<int*>(param + 0x9C) = 1;
         param[0xC3] = 0;
         ret = GBAReset(channel, param + 0xC0);
-        if (ret == 0)
+        if (ret != 0)
+        {
+            retryLine = 0x31A;
+            goto retry_sleep;
+        }
         {
             int status;
-            bool failed;
+            int failed;
 
-            do
+            status = GBAGetStatus(channel, param + 0xC0);
+            if (status != 0)
             {
-                status = GBAGetStatus(channel, param + 0xC0);
-                if (status != 0)
-                {
-                    break;
-                }
-                if (param[0xC0] != 0x28)
-                {
-                    status = 1;
-                    break;
-                }
-                status = GBARead(channel, reinterpret_cast<u8*>(&identity8), param + 0xC0);
-                if (status != 0)
-                {
-                    break;
-                }
-                status = 0;
-                *reinterpret_cast<unsigned int*>(param + 0xA4) = identity8;
-                param[0xC3] = 1;
-            } while (0);
+                goto identity_done8;
+            }
+            if (param[0xC0] != 0x28)
+            {
+                status = 1;
+                goto identity_done8;
+            }
+            status = GBARead(channel, reinterpret_cast<u8*>(&identity8), param + 0xC0);
+            if (status != 0)
+            {
+                goto identity_done8;
+            }
+            status = 0;
+            *reinterpret_cast<unsigned int*>(param + 0xA4) = identity8;
+            param[0xC3] = 1;
+identity_done8:;
             if (status == 0 &&
                 (memcmp(param + 0xA4, self + 0x1344, 4) == 0 || *reinterpret_cast<unsigned int*>(param + 0xA4) == 0x414D4752))
             {
@@ -1206,42 +1204,44 @@ ctx_done7:
                 {
                     *reinterpret_cast<int*>(param + 0x9C) = 0;
                 }
-                do
+                status = GBAGetStatus(channel, param + 0xC0);
+                if (status != 0)
                 {
-                    status = GBAGetStatus(channel, param + 0xC0);
-                    if (status != 0)
-                    {
-                        break;
-                    }
-                    if (param[0xC0] != 0x20)
-                    {
-                        status = 1;
-                        break;
-                    }
-                    status = GBAWrite(channel, self + 0x1344, param + 0xC0);
-                    if (status != 0)
-                    {
-                        break;
-                    }
-                    status = GBAGetStatus(channel, param + 0xC0);
-                    if (status != 0)
-                    {
-                        break;
-                    }
-                    if (param[0xC0] != 0x30)
-                    {
-                        status = 1;
-                        break;
-                    }
-                    status = 0;
-                } while (0);
+                    goto write_done8;
+                }
+                if (param[0xC0] != 0x20)
+                {
+                    status = 1;
+                    goto write_done8;
+                }
+                status = GBAWrite(channel, self + 0x1344, param + 0xC0);
+                if (status != 0)
+                {
+                    goto write_done8;
+                }
+                status = GBAGetStatus(channel, param + 0xC0);
+                if (status != 0)
+                {
+                    goto write_done8;
+                }
+                if (param[0xC0] != 0x30)
+                {
+                    status = 1;
+                    goto write_done8;
+                }
+                status = 0;
+write_done8:;
                 if (status != 0)
                 {
                     goto ctx_fail8;
                 }
                 command8 = 0x60000000;
                 status = GBAWrite(channel, reinterpret_cast<u8*>(&command8), param + 0xC0);
-                if (status == 0 && (param[0xC0] & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_FLAGS_MASK)
+                if (!(status == 0 && (param[0xC0] & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_FLAGS_MASK))
+                {
+                    failed = 1;
+                }
+                else
                 {
                     int i = 0;
                     do
@@ -1249,41 +1249,33 @@ ctx_done7:
                         int st = GBAGetStatus(channel, param + 0xC0);
                         if (st != 0 || param[0xC0] != 0x38)
                         {
-                            failed = true;
+                            failed = 1;
                             goto ctx_done8;
                         }
                         st = GBARead(channel, param + i + 0x28, param + 0xC0);
                         if (st != 0 || (param[0xC0] & GBA_JSTAT_FLAGS_MASK) != GBA_JSTAT_FLAGS_MASK)
                         {
-                            failed = true;
+                            failed = 1;
                             goto ctx_done8;
                         }
                         i += 4;
                     } while (i < 0x60);
-                    failed = false;
-                }
-                else
-                {
-                    failed = true;
+                    failed = 0;
                 }
             }
             else
             {
 ctx_fail8:
-                failed = true;
+                failed = 1;
             }
 ctx_done8:
-            if (!failed)
+            if (failed == 0)
             {
                 reinterpret_cast<void (*)(MgGbaThreadParam*, void*)>(*reinterpret_cast<void**>(param + 0x24))(
                     reinterpret_cast<MgGbaThreadParam*>(param), reinterpret_cast<void*>(message));
                 goto receive_message;
             }
             retryLine = 0x322;
-        }
-        else
-        {
-            retryLine = 0x31A;
         }
         goto retry_sleep;
     case 10:
@@ -1312,7 +1304,7 @@ ctx_done8:
             }
             startTime = OSGetTime();
             retryLine = 0x341;
-            step = 1;
+            step++;
             goto retry_loop;
         }
 
@@ -1326,7 +1318,7 @@ ctx_done8:
                 {
                     System.Printf(const_cast<char*>(s_miniGameFlagsRetryFmt), channel);
                     command = 0x10000000;
-                    GBAWrite(channel, reinterpret_cast<u8*>(&command), param + 0xC0);
+                    ret = GBAWrite(channel, reinterpret_cast<u8*>(&command), param + 0xC0);
                     startTime = OSGetTime();
                     MiniGameThreadSleepTicks(OSMicrosecondsToTicks(100));
                 }
@@ -1397,12 +1389,14 @@ transfer_done:
         MiniGameThreadSleepTicks(OSMicrosecondsToTicks(100));
         if (ret == 0)
         {
-            retryLine = 0x3B0;
-            step++;
-            goto retry_loop;
+            goto write_next;
         }
         System.Printf(const_cast<char*>(s_miniGameSourceLineFmt), s_miniGameSourceName, 0x3AC);
         goto comm_fail;
+write_next:
+        retryLine = 0x3B0;
+        step++;
+        goto retry_loop;
     }
 }
 #undef channel

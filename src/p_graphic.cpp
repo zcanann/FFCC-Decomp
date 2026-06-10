@@ -221,8 +221,7 @@ void CGraphicPcs::drawScreenFade()
         GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
         _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
-        CColor whiteColor(0xFF, 0xFF, 0xFF, 0xFF);
-        GXSetChanAmbColor(GX_COLOR0A0, whiteColor.color);
+        GXSetChanAmbColor(GX_COLOR0A0, CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
         _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
         _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 
@@ -234,17 +233,17 @@ void CGraphicPcs::drawScreenFade()
         const u8 fadeAlpha = (u8)(kGraphicColorMax * fadeWave);
 
         _GXColor baseColor;
-        baseColor.r = slotData->m_colorA.r;
-        baseColor.g = slotData->m_colorA.g;
-        baseColor.b = slotData->m_colorA.b;
-        baseColor.a = slotData->m_colorA.a;
         _GXColor baseColor2;
         baseColor2.r = slotData->m_colorA.r;
         baseColor2.g = slotData->m_colorA.g;
         baseColor2.b = slotData->m_colorA.b;
         baseColor2.a = slotData->m_colorA.a;
+        baseColor.r = slotData->m_colorA.r;
+        baseColor.g = slotData->m_colorA.g;
+        baseColor.b = slotData->m_colorA.b;
+        baseColor.a = slotData->m_colorA.a;
         baseColor.a = fadeAlpha;
-        baseColor2.a = fadeAlpha;
+        baseColor2.a = 0;
 
         if (slot == 3) {
             const int barHeight = (int)(kScreenFadeBarEdge * fadeWave);

@@ -961,7 +961,6 @@ void* CMemory::CStage::alloc(unsigned long size, char* source, unsigned long lin
     }
 
     size = (size + 0x3F) & ~0x3F;
-    unsigned int allocSize = static_cast<unsigned int>(size);
     unsigned int allocated = 0;
 
     for (int pass = 0; pass < 2; pass++) {
@@ -970,12 +969,12 @@ void* CMemory::CStage::alloc(unsigned long size, char* source, unsigned long lin
                  (node->m_flags & 3) == 0;
                  node = node->m_next) {
                 if (((node->m_flags & kMemoryBlockUsedFlag) == 0) &&
-                    (allocSize <= static_cast<unsigned int>(node->m_size))) {
-                    if (allocSize < static_cast<unsigned int>(node->m_size - 0x40)) {
-                        CBlock* split = stageBlockAt(reinterpret_cast<unsigned long>(node) + allocSize);
+                    (size <= static_cast<unsigned int>(node->m_size))) {
+                    if (size < static_cast<unsigned int>(node->m_size - 0x40)) {
+                        CBlock* split = stageBlockAt(reinterpret_cast<unsigned long>(node) + size);
                         split[1].m_flags = 0;
-                        split[1].m_size = (node->m_size - static_cast<int>(allocSize)) - 0x40;
-                        node->m_size = allocSize;
+                        split[1].m_size = (node->m_size - static_cast<int>(size)) - 0x40;
+                        node->m_size = size;
                         split[1].m_magicStart = kMemoryBlockStartMagic;
                         split[1].m_magicEnd = kMemoryBlockEndMagic;
                         split[1].m_prev = node;
@@ -1017,7 +1016,7 @@ void* CMemory::CStage::alloc(unsigned long size, char* source, unsigned long lin
 
     if ((noError == 0) && (allocated == 0)) {
         System.Printf(
-            const_cast<char*>(sStageAllocNoMemoryFmt), stageGetSourceName(this), allocSize,
+            const_cast<char*>(sStageAllocNoMemoryFmt), stageGetSourceName(this), size,
             source != (char*)nullptr ? source : const_cast<char*>(sEmptyAllocSourceName), line);
         heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
     }

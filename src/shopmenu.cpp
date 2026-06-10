@@ -2562,77 +2562,78 @@ void CShopMenu::SelectYesNo()
         return;
     }
 
-    int yesNo = m_yesNo;
-    if (yesNo == 1) {
+    switch (m_yesNo) {
+    case 0:
+        m_subMode = 0;
+        if (m_listType == 0) {
+            Sound.PlaySe(0x50, 0x40, 0x7F, 0);
+            int itemId = getItemNo(m_selectedIndex);
+            int costBase = itemId * 0x48;
+            int quantity = 0;
+            while (quantity < m_quantity) {
+                CCaravanWork* caravanWork = m_caravanWork;
+                bool hasSpace = caravanWork->m_inventoryItemCount + 1 <= 0x40;
+                if (!hasSpace) {
+                    break;
+                }
+                int gilValue;
+                if (m_listType == 0) {
+                    if (itemId <= 0) {
+                        gilValue = 0;
+                    } else {
+                        int gil = caravanWork->m_shopParam *
+                                  *reinterpret_cast<unsigned short*>(costBase + Game.unkCFlatData0[2] + 0x20);
+                        gilValue = gil / 100;
+                    }
+                } else if (m_listType == 1) {
+                    if (itemId <= 0) {
+                        gilValue = 0;
+                    } else {
+                        int gil = caravanWork->m_shopParam *
+                                  *reinterpret_cast<unsigned short*>(costBase + Game.unkCFlatData0[2] + 0x20);
+                        gilValue = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil / 100));
+                    }
+                } else {
+                    gilValue = -1;
+                }
+
+                if (caravanWork->CanAddGil(-gilValue) == 0) {
+                    return;
+                }
+
+                m_caravanWork->AddItem(itemId, 0);
+                int gilValue2;
+                if (m_listType == 0) {
+                    if (itemId <= 0) {
+                        gilValue2 = 0;
+                    } else {
+                        int gil = m_caravanWork->m_shopParam *
+                                  *reinterpret_cast<unsigned short*>(costBase + Game.unkCFlatData0[2] + 0x20);
+                        gilValue2 = gil / 100;
+                    }
+                } else if (m_listType == 1) {
+                    if (itemId <= 0) {
+                        gilValue2 = 0;
+                    } else {
+                        int gil = m_caravanWork->m_shopParam *
+                                  *reinterpret_cast<unsigned short*>(costBase + Game.unkCFlatData0[2] + 0x20);
+                        gilValue2 = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil / 100));
+                    }
+                } else {
+                    gilValue2 = -1;
+                }
+                m_caravanWork->AddGil(-gilValue2);
+                ++quantity;
+            }
+            return;
+        }
+        goto sellBlock;
+    case 1:
         goto yesBlock;
     }
+    return;
 
-    if ((yesNo >= 1) || (yesNo < 0)) {
-        return;
-    }
-
-    m_subMode = 0;
-    int itemId = getItemNo(m_selectedIndex);
-    if (m_listType == 0) {
-        Sound.PlaySe(0x50, 0x40, 0x7F, 0);
-        int costBase = itemId * 0x48;
-        int quantity = 0;
-        CCaravanWork* caravanWork;
-        while ((quantity < m_quantity) &&
-               (caravanWork = m_caravanWork,
-                static_cast<short>(caravanWork->m_inventoryItemCount + 1) < 0x41)) {
-            int gilValue;
-            if (m_listType == 0) {
-                if (itemId <= 0) {
-                    gilValue = 0;
-                } else {
-                    int gil = caravanWork->m_shopParam *
-                              *reinterpret_cast<unsigned short*>(costBase + Game.unkCFlatData0[2] + 0x20);
-                    gilValue = gil / 100;
-                }
-            } else if (m_listType == 1) {
-                if (itemId <= 0) {
-                    gilValue = 0;
-                } else {
-                    int gil = caravanWork->m_shopParam *
-                              *reinterpret_cast<unsigned short*>(costBase + Game.unkCFlatData0[2] + 0x20);
-                    gilValue = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil / 100));
-                }
-            } else {
-                gilValue = -1;
-            }
-
-            if (caravanWork->CanAddGil(-gilValue) == 0) {
-                return;
-            }
-
-            m_caravanWork->AddItem(static_cast<short>(itemId), 0);
-            int gilValue2;
-            if (m_listType == 0) {
-                if (itemId <= 0) {
-                    gilValue2 = 0;
-                } else {
-                    int gil = m_caravanWork->m_shopParam *
-                              *reinterpret_cast<unsigned short*>(costBase + Game.unkCFlatData0[2] + 0x20);
-                    gilValue2 = gil / 100;
-                }
-            } else if (m_listType == 1) {
-                if (itemId <= 0) {
-                    gilValue2 = 0;
-                } else {
-                    int gil = m_caravanWork->m_shopParam *
-                              *reinterpret_cast<unsigned short*>(costBase + Game.unkCFlatData0[2] + 0x20);
-                    gilValue2 = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil / 100));
-                }
-            } else {
-                gilValue2 = -1;
-            }
-            m_caravanWork->AddGil(-gilValue2);
-            ++quantity;
-        }
-        return;
-    }
-
+sellBlock:
     int itemIndex = m_selectedIndex;
     bool canTrade = false;
     if (itemIndex != -1) {

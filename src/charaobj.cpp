@@ -2895,6 +2895,9 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 	int hasParticle;
 
 	switch (particleClass) {
+	default:
+		particleBank = particleClass;
+		break;
 	case 0xFE:
 		particleBank = CharaObjGetModelPdtNo(this);
 		break;
@@ -2902,9 +2905,6 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 	case 0xFF:
 		hasParticle = 0;
 		goto checkParticle;
-	default:
-		particleBank = particleClass;
-		break;
 	}
 
 	if (particleBank == -1) {

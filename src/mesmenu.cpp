@@ -1024,10 +1024,9 @@ void CMesMenu::onCalc()
 
             unsigned int downMask = 0;
             unsigned int repeatMask = 0;
-            int maxButtons = m_stateTimer;
-            if (maxButtons > 0) {
+            if (m_stateTimer > 0) {
                 for (int button = 0; button < 4; button++) {
-                    if ((m_buttonMask & (1U << button)) != 0) {
+                    if ((m_buttonMask & (1 << button)) != 0) {
                         downMask |= MenuPcs.GetButtonDown(button) & 0xFFFF;
                         repeatMask |= MenuPcs.GetButtonRepeat(button) & 0xFFFF;
                     }

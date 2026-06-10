@@ -263,6 +263,32 @@ static inline void EncodeSaveData(char* saveBuffer)
     }
 }
 
+static inline void DecodeSaveData(char* saveBuffer)
+{
+    Mc::SaveDat* const save = GetSaveDat(saveBuffer);
+    u32* ptr = GetSaveEncodedWords(save);
+    const int rotAmount = 0x20 - (save->m_rotateKey % 0x20);
+
+    for (int count = 0; count < 0x5B6; count++)
+    {
+        u32 word = ptr[0];
+        ptr[0] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
+        word = ptr[1];
+        ptr[1] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
+        word = ptr[2];
+        ptr[2] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
+        word = ptr[3];
+        ptr[3] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
+        word = ptr[4];
+        ptr[4] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
+        word = ptr[5];
+        ptr[5] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
+        word = ptr[6];
+        ptr[6] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
+        ptr += 7;
+    }
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800c17b8
@@ -453,10 +479,8 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
         System.Printf(const_cast<char*>(sMcOdekakeFmt), srcChar, dstChar, mode != 0 ? sMcOdekakeOut : sMcOdekakeReturn);
     }
 
-    u8* srcSaveData = reinterpret_cast<u8*>(&srcSave);
-    u8* dstSaveData = reinterpret_cast<u8*>(&dstSave);
-    u8* srcCharData = srcSaveData + srcChar * 0x9C0 + 0x14D0;
-    u8* dstCharData = dstSaveData + dstChar * 0x9C0 + 0x14D0;
+    u8* srcCharData = reinterpret_cast<u8*>(&srcSave) + srcChar * 0x9C0 + 0x14D0;
+    u8* dstCharData = reinterpret_cast<u8*>(&dstSave) + dstChar * 0x9C0 + 0x14D0;
 
     if (mode != 0)
     {
@@ -490,12 +514,12 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
         *reinterpret_cast<u32*>(dstCharData + 0x8BC) = *reinterpret_cast<u32*>(srcCharData + 0x8BC);
         dstCharData[0x8C2] = srcCharData[0x8C2];
         *reinterpret_cast<u32*>(dstCharData + 0x8C4) = *reinterpret_cast<u32*>(srcCharData + 0x8C4);
-        u32 serial0 = *reinterpret_cast<u32*>(srcSaveData + 0x13D0);
-        *reinterpret_cast<u32*>(dstCharData + 0x8CC) = *reinterpret_cast<u32*>(srcSaveData + 0x13D4);
+        u32 serial0 = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(&srcSave) + 0x13D0);
+        *reinterpret_cast<u32*>(dstCharData + 0x8CC) = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(&srcSave) + 0x13D4);
         *reinterpret_cast<u32*>(dstCharData + 0x8C8) = serial0;
-        *reinterpret_cast<u32*>(dstCharData + 0x8D0) = *reinterpret_cast<u32*>(srcSaveData + 0x13D8);
+        *reinterpret_cast<u32*>(dstCharData + 0x8D0) = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(&srcSave) + 0x13D8);
 
-        u8* dstWork = dstSaveData + dstChar * 0x200;
+        u8* dstWork = reinterpret_cast<u8*>(&dstSave) + dstChar * 0x200;
         int i = 0;
         do
         {
@@ -558,7 +582,7 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
     {
         memcpy(dstCharData + 0xBC, srcCharData + 0xBC, 0x0C);
 
-        u8* srcWork = srcSaveData + (srcChar << 9) + (srcChar << 3);
+        u8* srcWork = reinterpret_cast<u8*>(&srcSave) + (srcChar << 9) + (srcChar << 3);
         for (int i = 0; i < 2; i++)
         {
             srcWork[0xC0] = 0;
@@ -602,11 +626,11 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
         *reinterpret_cast<u16*>(dstCharData + 0x6C2) = 0x0C;
     }
 
-    GetSaveDat(srcSaveData)->m_random = Math.Rand(0x7FFFFFFF);
-    GetSaveDat(srcSaveData)->m_crc = CalcCrc(GetSaveDat(srcSaveData));
+    srcSave.m_random = Math.Rand(0x7FFFFFFF);
+    srcSave.m_crc = CalcCrc(&srcSave);
 
-    GetSaveDat(dstSaveData)->m_random = Math.Rand(0x7FFFFFFF);
-    GetSaveDat(dstSaveData)->m_crc = CalcCrc(GetSaveDat(dstSaveData));
+    dstSave.m_random = Math.Rand(0x7FFFFFFF);
+    dstSave.m_crc = CalcCrc(&dstSave);
 }
 
 /*
@@ -620,28 +644,7 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
  */
 void CMemoryCardMan::DecodeData()
 {
-    Mc::SaveDat* const save = GetSaveDat(m_saveBuffer);
-    u32* ptr = GetSaveEncodedWords(save);
-    const int rotAmount = 0x20 - (save->m_rotateKey % 0x20);
-
-    for (int count = 0; count < 0x5B6; count++)
-    {
-        u32 word = ptr[0];
-        ptr[0] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
-        word = ptr[1];
-        ptr[1] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
-        word = ptr[2];
-        ptr[2] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
-        word = ptr[3];
-        ptr[3] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
-        word = ptr[4];
-        ptr[4] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
-        word = ptr[5];
-        ptr[5] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
-        word = ptr[6];
-        ptr[6] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
-        ptr += 7;
-    }
+    DecodeSaveData(m_saveBuffer);
 }
 
 /*
@@ -655,28 +658,7 @@ void CMemoryCardMan::DecodeData()
  */
 void CMemoryCardMan::EncodeData()
 {
-    Mc::SaveDat* const save = GetSaveDat(m_saveBuffer);
-    const int rotAmount = save->m_rotateKey % 0x20;
-    u32* ptr = GetSaveEncodedWords(save);
-
-    for (int count = 0; count < 0x5B6; count++)
-    {
-        u32 rotated = __rlwnm(ptr[0], rotAmount, 0, 31);
-        ptr[0] = __lwbrx(&rotated, 0);
-        rotated = __rlwnm(ptr[1], rotAmount, 0, 31);
-        ptr[1] = __lwbrx(&rotated, 0);
-        rotated = __rlwnm(ptr[2], rotAmount, 0, 31);
-        ptr[2] = __lwbrx(&rotated, 0);
-        rotated = __rlwnm(ptr[3], rotAmount, 0, 31);
-        ptr[3] = __lwbrx(&rotated, 0);
-        rotated = __rlwnm(ptr[4], rotAmount, 0, 31);
-        ptr[4] = __lwbrx(&rotated, 0);
-        rotated = __rlwnm(ptr[5], rotAmount, 0, 31);
-        ptr[5] = __lwbrx(&rotated, 0);
-        rotated = __rlwnm(ptr[6], rotAmount, 0, 31);
-        ptr[6] = __lwbrx(&rotated, 0);
-        ptr += 7;
-    }
+    EncodeSaveData(m_saveBuffer);
 }
 
 /*
@@ -1328,7 +1310,8 @@ void CMemoryCardMan::SetLoadData()
     Game.m_gameWork.m_mcHasSerial = save[0x13DC];
     Sound.SetBgmMasterVolume(static_cast<s8>(save[0x13DD]));
     Sound.SetSeMasterVolume(static_cast<s8>(save[0x13DE]));
-    Sound.SetStereo(static_cast<u32>(__cntlzw(Sound.GetSoundMode())) >> 5);
+    u32 soundMode = static_cast<u32>(__cntlzw(Sound.GetSoundMode()));
+    Sound.SetStereo(soundMode >> 5);
 
     CGame::CGameWork* gameWork = &Game.m_gameWork;
     gameWork->m_gameInitFlag = MakeLoadBool(static_cast<s8>(save[0x13E0]));

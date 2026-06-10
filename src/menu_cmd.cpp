@@ -2642,7 +2642,7 @@ unsigned int CMenuPcs::CmdOpen1()
 
 	GetCmdStateView(this)->transitionTimer = static_cast<s16>(GetCmdStateView(this)->transitionTimer + 1);
 
-	const s32 selected = static_cast<s32>(GetCmdStateView(this)->selected);
+	const s32 selected =  (int)(long)(static_cast<s32>(GetCmdStateView(this)->selected));
 
 	*reinterpret_cast<f32*>(reinterpret_cast<u8*>(GetCmdList(this)) + selected * 0x40 + 0x18) = static_cast<f32>(
 		-((kCmdMenuTransitionStepD * static_cast<f64>(GetCmdStateView(this)->transitionTimer)) - kCmdMenuOneD)
@@ -2699,7 +2699,8 @@ unsigned int CMenuPcs::CmdOpen1()
 
 	animEntry->alpha = static_cast<f32>(kCmdMenuTransitionStepD * static_cast<f64>(GetCmdStateView(this)->transitionTimer));
 	u32 done = (static_cast<f64>(GetCmdStateView(this)->transitionTimer) >= kCmdMenuTransitionFramesD) ? 1 : 0;
-	if (done != 0) {
+	int __p5 =   (int)(unsigned int)((done + 0));
+	if (__p5 != 0) {
 		GetCmdStateView(this)->choice = 0;
 	}
 

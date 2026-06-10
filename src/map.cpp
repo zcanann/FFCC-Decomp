@@ -1883,13 +1883,13 @@ int CMapMng::ReadMtx(char* mapName)
  */
 int CMapMng::ReadMpl(char* mapName)
 {
+    char* strTmp = g_StrTmp;
     int loadIndex = 0;
 
     MapMng.m_mapReadReady = 1;
 
-    char* strTmp = g_StrTmp;
     while (true) {
-        sprintf(strTmp, const_cast<char*>(s_mapMplPathFmt), mapName, loadIndex);
+        sprintf(g_StrTmp, const_cast<char*>(s_mapMplPathFmt), mapName, loadIndex);
 
         int canRead;
         if (m_asyncLoadState.m_mapReadMode == 1) {

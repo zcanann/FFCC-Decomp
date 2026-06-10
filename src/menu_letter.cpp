@@ -1880,23 +1880,26 @@ void CMenuPcs::LetterListDraw()
 		GXSetChanMatColor(GX_COLOR0A0, markColor);
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x43));
 
+		float markY = FLOAT_8033308c;
+		float markX = FLOAT_80333088;
 		const float iconSize = FLOAT_803330b8;
 		const double iconOffset = (iconSize - iconSize * markScale) * DOUBLE_803330a8;
-		const double markX = static_cast<double>(static_cast<float>(static_cast<double>(FLOAT_80333088) + iconOffset));
-		const double markY = static_cast<double>(static_cast<float>(static_cast<double>(FLOAT_8033308c) + iconOffset));
+		markX += iconOffset;
+		markY += iconOffset;
 
 		if ((pageMark & 1) != 0) {
 			MenuPcs.DrawRect(
-			    4, static_cast<float>(markX), static_cast<float>(markY), FLOAT_803330b8,
-			    FLOAT_803330b8, FLOAT_803330bc, FLOAT_803330bc, static_cast<float>(markScale),
-			    static_cast<float>(markScale), 0.0f);
+			    4, markX, markY, FLOAT_803330b8,
+			    FLOAT_803330b8, FLOAT_803330bc, FLOAT_803330bc, markScale,
+			    markScale, 0.0f);
 		}
 
+		markY += FLOAT_803330c0;
 		if ((pageMark & 2) != 0) {
 			MenuPcs.DrawRect(
-			    0, static_cast<float>(markX), static_cast<float>(static_cast<float>(markY + static_cast<double>(FLOAT_803330c0))),
+			    0, markX, markY,
 			    FLOAT_803330b8, FLOAT_803330b8, FLOAT_803330bc, FLOAT_803330bc,
-			    static_cast<float>(markScale), static_cast<float>(markScale), 0.0f);
+			    markScale, markScale, 0.0f);
 		}
 	}
 

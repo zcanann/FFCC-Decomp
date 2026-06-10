@@ -291,13 +291,18 @@ void pppRyjDrawMegaBirth(_pppPObject* obj, PRyjMegaBirth* stepData, _pppCtrlTabl
 
 	for (int i = 0; i < numParticles; i++) {
 		if (*u16_at(particle, 0x22) != 0) {
+			Mtx rotMatrix;
+			pppFMATRIX viewMatrix;
 			Mtx drawMatrix;
+			Vec viewPos2;
+			Vec viewPos1;
+			Vec viewPos0;
+			Vec drawPos;
 			pppCVECTOR drawColor;
 			int red;
 			int green;
 			int blue;
 			int alpha;
-			pppFMATRIX viewMatrix;
 
 			PSMTXIdentity(drawMatrix);
 			drawMatrix[0][0] = *f32_at(particle, 0x34) * ppvMng->m_scale.x;
@@ -305,14 +310,11 @@ void pppRyjDrawMegaBirth(_pppPObject* obj, PRyjMegaBirth* stepData, _pppCtrlTabl
 			drawMatrix[2][2] = drawMatrix[0][0];
 
 			if (*f32_at(particle, 0x28) != kPppRyjMegaBirthZero) {
-				Mtx rotMatrix;
-
 				PSMTXRotRad(rotMatrix, 'Z', kPppRyjMegaBirthDegToRad * *f32_at(particle, 0x28));
 				PSMTXConcat(drawMatrix, rotMatrix, drawMatrix);
 			}
 
 			{
-				Vec drawPos;
 				drawPos.x = drawMatrix[0][3];
 				drawPos.y = drawMatrix[1][3];
 				drawPos.z = drawMatrix[2][3];
@@ -324,43 +326,40 @@ void pppRyjDrawMegaBirth(_pppPObject* obj, PRyjMegaBirth* stepData, _pppCtrlTabl
 
 			switch (params->m_matrixMode) {
 			case 0: {
-				Vec viewPos;
 
-				viewPos.x = drawMatrix[0][3];
-				viewPos.y = drawMatrix[1][3];
-				viewPos.z = drawMatrix[2][3];
-				PSMTXMultVec(baseViewMatrix.value, &viewPos, &viewPos);
-				drawMatrix[0][3] = viewPos.x;
-				drawMatrix[1][3] = viewPos.y;
-				drawMatrix[2][3] = viewPos.z;
+				viewPos0.x = drawMatrix[0][3];
+				viewPos0.y = drawMatrix[1][3];
+				viewPos0.z = drawMatrix[2][3];
+				PSMTXMultVec(baseViewMatrix.value, &viewPos0, &viewPos0);
+				drawMatrix[0][3] = viewPos0.x;
+				drawMatrix[1][3] = viewPos0.y;
+				drawMatrix[2][3] = viewPos0.z;
 				break;
 			}
 			case 1: {
-				Vec viewPos;
 
 				PSMTXConcat(*(Mtx*)particleWorldMat, obj->m_localMatrix.value, viewMatrix.value);
 				PSMTXConcat(ppvCameraMatrix, viewMatrix.value, viewMatrix.value);
-				viewPos.x = drawMatrix[0][3];
-				viewPos.y = drawMatrix[1][3];
-				viewPos.z = drawMatrix[2][3];
-				PSMTXMultVec(viewMatrix.value, &viewPos, &viewPos);
-				drawMatrix[0][3] = viewPos.x;
-				drawMatrix[1][3] = viewPos.y;
-				drawMatrix[2][3] = viewPos.z;
+				viewPos1.x = drawMatrix[0][3];
+				viewPos1.y = drawMatrix[1][3];
+				viewPos1.z = drawMatrix[2][3];
+				PSMTXMultVec(viewMatrix.value, &viewPos1, &viewPos1);
+				drawMatrix[0][3] = viewPos1.x;
+				drawMatrix[1][3] = viewPos1.y;
+				drawMatrix[2][3] = viewPos1.z;
 				break;
 			}
 			case 2: {
-				Vec viewPos;
 
 				PSMTXConcat(work->m_worldMatrix, *(Mtx*)particleWorldMat, viewMatrix.value);
 				PSMTXConcat(ppvCameraMatrix, viewMatrix.value, viewMatrix.value);
-				viewPos.x = drawMatrix[0][3];
-				viewPos.y = drawMatrix[1][3];
-				viewPos.z = drawMatrix[2][3];
-				PSMTXMultVec(viewMatrix.value, &viewPos, &viewPos);
-				drawMatrix[0][3] = viewPos.x;
-				drawMatrix[1][3] = viewPos.y;
-				drawMatrix[2][3] = viewPos.z;
+				viewPos2.x = drawMatrix[0][3];
+				viewPos2.y = drawMatrix[1][3];
+				viewPos2.z = drawMatrix[2][3];
+				PSMTXMultVec(viewMatrix.value, &viewPos2, &viewPos2);
+				drawMatrix[0][3] = viewPos2.x;
+				drawMatrix[1][3] = viewPos2.y;
+				drawMatrix[2][3] = viewPos2.z;
 				break;
 			}
 			default:

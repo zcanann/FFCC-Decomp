@@ -1801,6 +1801,13 @@ void CGPartyObj::onFrameStat()
 			}
 		}
 		break;
+	case 0x20:
+		if (m_stateFrame == 0) {
+			reqAnim(0x31, 0, 0);
+		} else if (isLoopAnim() != 0) {
+			changeStat(0, 0, 0);
+		}
+		break;
 	case 6:
 		statCharge();
 		break;
@@ -1974,13 +1981,6 @@ void CGPartyObj::onFrameStat()
 		break;
 	case 0x1A:
 		statKorobi();
-		break;
-	case 0x20:
-		if (m_stateFrame == 0) {
-			reqAnim(0x31, 0, 0);
-		} else if (isLoopAnim() != 0) {
-			changeStat(0, 0, 0);
-		}
 		break;
 	case 0x22: {
 		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);

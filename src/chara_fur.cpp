@@ -1016,7 +1016,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 {
 	const int debugPadLock = Pad.m_debugPadLock;
 	const short heldButtons = MogHeldButtons(debugPadLock);
-	const unsigned short triggerButtons = MogTriggerButtons(debugPadLock);
+	const short triggerButtons = MogTriggerButtons(debugPadLock);
 	const unsigned short rotateButtons = (MogPadInt(debugPadLock, 64) == 0) ? MogHeldButtons(debugPadLock) : 0;
 	int messageId = -1;
 

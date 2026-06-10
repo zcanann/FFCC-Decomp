@@ -3502,9 +3502,10 @@ void CMenuPcs::DrawCmakeTitle(int page, float x, float alpha)
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
-    int offsU = static_cast<int>(
-        -(static_cast<double>(40.0f * x - 40.0f) * 0.5) + 32.0);
-    float offs = static_cast<float>(offsU);
+    int baseX = ((page == 0) ? 0x116 : 0x116);
+    double offsCalc = -(static_cast<double>(40.0f * x - 40.0f) / 2.0) + 32.0;
+    float offs = static_cast<float>(static_cast<int>(offsCalc));
+    int offsU = static_cast<int>(offsCalc);
     MenuPcs.DrawRect(
         0, 278.0f, offs, 248.0f, 40.0f,
         0.0f, 264.0f, 1.0f, x, 0.0f);
@@ -3515,7 +3516,7 @@ void CMenuPcs::DrawCmakeTitle(int page, float x, float alpha)
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x65 : 0x3E));
 
-    float titleX = static_cast<float>(static_cast<int>(static_cast<double>(offsU) + 20.0));
+    float titleX = static_cast<float>(static_cast<int>(baseX + 20.0));
     float titleY = static_cast<float>(static_cast<int>(static_cast<double>(offsU) + 8.0));
     MenuPcs.DrawRect(
         0, titleX, titleY, 208.0f, 24.0f,

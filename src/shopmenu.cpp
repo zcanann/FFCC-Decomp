@@ -541,33 +541,29 @@ static int CountShopMenuOwnedItems(CCaravanWork* caravanWork, int itemNo)
     return count;
 }
 
-static bool CanTradeShopMenuItem(CShopMenu* shopMenu, int index, int itemNo)
+static int CanTradeShopMenuItem(CShopMenu* shopMenu, int index, int itemNo)
 {
-    if (itemNo <= 0) {
-        return false;
-    }
-
     int listType = shopMenu->m_listType;
-    if (listType == 0) {
-        return true;
-    }
-
-    if (listType == 2) {
-        unsigned int bit = static_cast<unsigned int>(itemNo - 0x191);
-        if ((ShopMenuCaravanWork(shopMenu)->m_shopArgs[(itemNo - 0x191) >> 5] & (1U << (bit & 0x1F))) != 0) {
-            return true;
+    int canTrade;
+    if (itemNo <= 0) {
+        canTrade = 0;
+    } else if (listType == 0) {
+        canTrade = 1;
+    } else if (listType == 2) {
+        canTrade = 1;
+        if ((shopMenu->m_caravanWork->m_shopArgs[((int)(itemNo - 0x191U) >> 5)] &
+             (1 << ((itemNo - 0x191U) & 0x1F))) != 0) {
+        } else {
+            canTrade = 0;
         }
-        return false;
+    } else if (static_cast<unsigned char>(MenuPcs.EquipChk(index)) != 0) {
+        canTrade = 0;
+    } else if (itemNo > 0x9E) {
+        canTrade = 1;
+    } else {
+        canTrade = 0;
     }
-
-    if (MenuPcs.EquipChk(index) != 0) {
-        return false;
-    }
-
-    if (itemNo > 0x9E) {
-        return true;
-    }
-    return false;
+    return canTrade;
 }
 
 struct ShopMenuFontRenderFlags {
@@ -2917,27 +2913,29 @@ void CShopMenu::SelectItemIdx()
         }
     } else if ((GetShopMenuListButtons() & 4) != 0) {
         ++m_selectedIndex;
-        if (m_selectedIndex < getItemCnt()) {
-            Sound.PlaySe(1, 0x40, 0x7F, 0);
-        } else {
+        if (m_selectedIndex >= getItemCnt()) {
             gShopMenuInputLatch = 4;
             m_selectedIndex = getItemCnt() - 1;
             Sound.PlaySe(4, 0x40, 0x7F, 0);
+        } else {
+            Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
     } else if ((GetPadButtons() & 0x100) != 0) {
-        bool canSelect = false;
+        int canSelect;
         m_figureMode = 0;
         m_yesNo = 0;
 
         int listType = m_listType;
         if (listType == 0) {
-            if (m_selectedIndex != -1) {
+            if (m_selectedIndex == -1) {
+                canSelect = 0;
+            } else {
                 canSelect = CanTradeShopMenuItem(this, m_selectedIndex, getItemNo(m_selectedIndex));
             }
-            if (canSelect) {
+            if (canSelect != 0) {
                 CCaravanWork* caravanWork = m_caravanWork;
-                if (m_quantity <= (0x40 - static_cast<unsigned short>(caravanWork->m_inventoryItemCount))) {
-                    unsigned int itemId = getItemNo(m_selectedIndex);
+                if (m_quantity <= (0x40 - caravanWork->m_inventoryItemCount)) {
+                    int itemId = getItemNo(m_selectedIndex);
                     int unitGil;
                     if (m_listType == 0) {
                         if (itemId <= 0) {
@@ -2968,20 +2966,24 @@ void CShopMenu::SelectItemIdx()
             }
             Sound.PlaySe(4, 0x40, 0x7F, 0);
         } else if (listType == 1) {
-            if (m_selectedIndex != -1) {
+            if (m_selectedIndex == -1) {
+                canSelect = 0;
+            } else {
                 canSelect = CanTradeShopMenuItem(this, m_selectedIndex, getItemNo(m_selectedIndex));
             }
-            if (canSelect) {
+            if (canSelect != 0) {
                 m_subMode = 2;
                 Sound.PlaySe(2, 0x40, 0x7F, 0);
             } else {
                 Sound.PlaySe(4, 0x40, 0x7F, 0);
             }
         } else if (listType == 2) {
-            if (m_selectedIndex != -1) {
+            if (m_selectedIndex == -1) {
+                canSelect = 0;
+            } else {
                 canSelect = CanTradeShopMenuItem(this, m_selectedIndex, getItemNo(m_selectedIndex));
             }
-            if (canSelect) {
+            if (canSelect != 0) {
                 m_nextMode = 0xC;
                 m_resultItem = MenuPcs.GetSmithItem(getItemNo(m_selectedIndex));
                 SetMode(0xB);

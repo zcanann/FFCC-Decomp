@@ -83,13 +83,14 @@ unsigned short s_GXSetNumTevStages_nStages;
  * JP Address: TODO
  * JP Size: TODO
  */
-void _InitGxFunc()
+#pragma always_inline on
+static inline void initTevRegs()
 {
+	int* puVar2 = (int*)s_GXSetTevOrder_Reg;
 	int iVar1 = 0;
 	int iVar8 = 0;
 	int iVar10 = 0;
 	int iVar9 = 0;
-	int* puVar2 = (int*)s_GXSetTevOrder_Reg;
 	int* colorIn = (int*)s_GXSetTevColorIn_Reg;
 	int* alphaIn = (int*)s_GXSetTevAlphaIn_Reg;
 	int* colorOp = (int*)s_GXSetTevColorOp_Reg;
@@ -171,6 +172,11 @@ void _InitGxFunc()
 		alphaOp[iVar11 * 5] = -1;
 		swapMode[iVar11 * 2] = -1;
 	}
+}
+
+void _InitGxFunc()
+{
+	initTevRegs();
 
 	s_GXSetTevSwapModeTable_Reg[0].red = static_cast<_GXTevColorChan>(-1);
 	s_GXSetTevSwapModeTable_Reg[1].red = static_cast<_GXTevColorChan>(-1);

@@ -597,7 +597,8 @@ void CGPartyObj::onCancelStat(int state)
 			if (weaponA <= 0) {
 				LoadWeapon(-1, 0);
 			} else {
-				unsigned short packedItem = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + weaponA * 0x48 + 2);
+				SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
+				unsigned short packedItem = rows[weaponA].m_model;
 				LoadWeapon(packedItem & 0xFFF, packedItem >> 12);
 			}
 			*reinterpret_cast<int*>(self + 0x6DC) = weaponB;
@@ -1988,7 +1989,8 @@ void CGPartyObj::onFrameStat()
 			if (weaponItem <= 0) {
 				LoadWeapon(-1, 0);
 			} else {
-				unsigned short itemKind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + weaponItem * 0x48 + 2);
+				SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
+				unsigned short itemKind = rows[weaponItem].m_model;
 				LoadWeapon(itemKind & 0xFFF, itemKind >> 12);
 			}
 			party.weaponItem = weaponRef;
@@ -3736,7 +3738,8 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 		break;
 	case 0x0D:
 		if (kind == 0x12) {
-			int item = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + value * 0x48 + 8);
+			SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
+			int item = rows[value].m_field8;
 			if (item < 0x69) {
 				if (item >= 0x26 || item < 0x24) {
 					break;

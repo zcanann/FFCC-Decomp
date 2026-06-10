@@ -2745,6 +2745,16 @@ void CCharaPcs::CHandle::Draw(int drawPass)
  * Address:	TODO
  * Size:	TODO
  */
+static inline void GetCameraClipPlanes(float* nearOut, float* farOut)
+{
+    if (nearOut) {
+        *nearOut = CameraPcs.m_nearZ;
+    }
+    if (farOut) {
+        *farOut = CameraPcs.m_farZ;
+    }
+}
+
 void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
 {
     if (m_model == 0) {
@@ -2944,8 +2954,9 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
                     static_cast<Vec*>(lookAtUp), reinterpret_cast<Point3d*>(&eye));
         PSMTXCopy(m_shadowViewMtx, viewMtx);
 
-        const float nearZ = CameraPcs.m_nearZ;
-        const float farZ = CameraPcs.m_farZ;
+        float nearZ;
+        float farZ;
+        GetCameraClipPlanes(&nearZ, &farZ);
         CColor shadowFog;
         shadowFog.color.a = 0xFF;
         shadowFog.color.b = static_cast<unsigned char>(static_cast<int>(255.0f * shadowFade));
@@ -2960,8 +2971,9 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         float invBlend = kCharaOne - m_fogBlend;
         float fogBlend = kCharaOne - invBlend * invBlend;
 
-        float nearZ = CameraPcs.m_nearZ;
-        float farZ = CameraPcs.m_farZ;
+        float nearZ;
+        float farZ;
+        GetCameraClipPlanes(&nearZ, &farZ);
         const float fogStart = Graphic.m_fogStart;
         const unsigned int fogColorWord = *reinterpret_cast<unsigned int*>(&Graphic.m_fogColor);
         const float fogEnd = Graphic.m_fogEnd;

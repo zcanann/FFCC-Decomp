@@ -1800,6 +1800,8 @@ void CShopMenu::DrawMakeBase()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_propagation off
 void CShopMenu::DrawShopBase()
 {
     Graphic.SetDrawDoneDebugData(1);
@@ -1902,13 +1904,17 @@ void CShopMenu::DrawShopBase()
         Graphic.SetDrawDoneDebugData(0x10);
         char* confirmText = (m_listType == 0) ? ShopMenuMes(languageId, SHOP_MENU_TEXT_BUY) :
                                                 ShopMenuMes(languageId, SHOP_MENU_TEXT_SELL);
-        font->SetPosX(CalcCenteredShopMenuX(font, confirmText, 0x50));
+        int confirmCenterX = 0x50;
+        float confirmTextX = CalcCenteredShopMenuX(font, confirmText, confirmCenterX);
+        font->SetPosX(confirmTextX);
         font->SetPosY(FLOAT_80332DD8);
         font->Draw(confirmText);
         Graphic.SetDrawDoneDebugData(0x11);
 
         char* cancelText = ShopMenuMes(languageId, SHOP_MENU_TEXT_CANCEL);
-        font->SetPosX(CalcCenteredShopMenuX(font, cancelText, 0x50));
+        int cancelCenterX = 0x50;
+        float cancelTextX = CalcCenteredShopMenuX(font, cancelText, cancelCenterX);
+        font->SetPosX(cancelTextX);
         font->SetPosY(FLOAT_80332DDC);
         font->Draw(cancelText);
         Graphic.SetDrawDoneDebugData(0x12);
@@ -1922,6 +1928,7 @@ void CShopMenu::DrawShopBase()
         }
     }
 }
+#pragma pop
 /*
  * --INFO--
  * Address:	TODO

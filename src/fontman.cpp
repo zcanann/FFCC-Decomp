@@ -74,15 +74,16 @@ static inline float LoadFloat(const float& value)
 float CFont::GetWidth(unsigned short ch)
 {
 	unsigned short* glyphBucket = m_glyphBuckets[ch & 0xFF];
-	CFontGlyphEntry* glyph = FirstGlyph(glyphBucket);
+	CFontGlyphEntry* entry = FirstGlyph(glyphBucket);
 	int count = static_cast<int>(*glyphBucket);
+	CFontGlyphEntry* glyph;
 
 	for (; count > 0; count--) {
-		if (static_cast<unsigned int>(glyph->m_codeHigh) != ((ch >> 8) & 0xFF)) {
-			glyph++;
-		} else {
+		if (static_cast<unsigned int>(entry->m_codeHigh) == ((ch >> 8) & 0xFF)) {
+			glyph = entry;
 			goto found_glyph;
 		}
+		entry++;
 	}
 	glyph = 0;
 
@@ -120,15 +121,14 @@ find_fallback:
 	glyphBucket = m_glyphBuckets[63];
 	CFontGlyphEntry* fallbackGlyph = FirstGlyph(glyphBucket);
 	for (count = static_cast<int>(*glyphBucket); count > 0; count--) {
-		if (static_cast<unsigned int>(fallbackGlyph->m_codeHigh) != 0) {
-			fallbackGlyph++;
-		} else {
+		if (static_cast<unsigned int>(fallbackGlyph->m_codeHigh) == 0) {
+			glyph = fallbackGlyph;
 			goto found_fallback_glyph;
 		}
+		fallbackGlyph++;
 	}
-	fallbackGlyph = 0;
+	glyph = 0;
 found_fallback_glyph:
-	glyph = fallbackGlyph;
 	if (glyph != 0) {
 		goto found_fallback;
 	}
@@ -160,11 +160,10 @@ float CFont::GetWidth(char* text)
 		float charWidth;
 
 		for (; count > 0; count--) {
-			if (static_cast<unsigned int>(glyph->m_codeHigh) != ((ch >> 8) & 0xFF)) {
-				glyph++;
-			} else {
+			if (static_cast<unsigned int>(glyph->m_codeHigh) == ((ch >> 8) & 0xFF)) {
 				goto found_glyph;
 			}
+			glyph++;
 		}
 		glyph = 0;
 
@@ -201,11 +200,10 @@ find_fallback:
 		CFontGlyphEntry* fallbackGlyph = FirstGlyph(glyphBucket);
 		count = static_cast<int>(*glyphBucket);
 		for (; count > 0; count--) {
-			if (fallbackGlyph->m_codeHigh != 0) {
-				fallbackGlyph++;
-			} else {
+			if (fallbackGlyph->m_codeHigh == 0) {
 				goto use_fallback_glyph;
 			}
+			fallbackGlyph++;
 		}
 		fallbackGlyph = 0;
 use_fallback_glyph:
@@ -248,11 +246,10 @@ void CFont::Draw(unsigned short ch)
 	int count = static_cast<int>(*glyphBucket);
 
 	for (; count > 0; count--) {
-		if (static_cast<unsigned int>(glyph->m_codeHigh) != ((ch >> 8) & 0xFF)) {
-			glyph++;
-		} else {
+		if (static_cast<unsigned int>(glyph->m_codeHigh) == ((ch >> 8) & 0xFF)) {
 			goto found_glyph;
 		}
+		glyph++;
 	}
 	glyph = 0;
 
@@ -262,11 +259,10 @@ found_glyph:
 		unsigned short* glyphBucket = m_glyphBuckets[63];
 		glyph = FirstGlyph(glyphBucket);
 		for (count = static_cast<int>(*glyphBucket); count > 0; count--) {
-			if (static_cast<unsigned int>(glyph->m_codeHigh) != 0) {
-				glyph++;
-			} else {
+			if (static_cast<unsigned int>(glyph->m_codeHigh) == 0) {
 				goto found_fallback;
 			}
+			glyph++;
 		}
 		glyph = 0;
 

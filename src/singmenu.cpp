@@ -50,6 +50,9 @@ static inline CCaravanWork* SingleCaravanWork()
     return reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 }
 
+extern const float kSingStatBaseX;
+extern const float kSingStatPanelPad;
+
 struct CFontRenderFlagBits
 {
     signed char shadow : 1;
@@ -1746,7 +1749,8 @@ void CMenuPcs::DrawSingleStat(float alpha)
     float iconStep = 216.0f;
     int texU = static_cast<int>(static_cast<float>(charaNo & 1) * iconStep);
     int texV = static_cast<int>(static_cast<float>(charaNo / 2) * iconStep);
-    MenuPcs.DrawRect(0, x - 32.0f, 176.0f, iconStep, iconStep,
+    x -= 32.0f;
+    MenuPcs.DrawRect(0, x, 176.0f, iconStep, iconStep,
                                      static_cast<float>(texU), static_cast<float>(texV), 1.0f, 1.0f, 0.0f);
 
     color.r = 0xFF;
@@ -1755,8 +1759,7 @@ void CMenuPcs::DrawSingleStat(float alpha)
     color.a = static_cast<u8>(a255);
     GXSetChanMatColor(GX_COLOR0A0, color);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2A));
-    float panelX = 440.0f;
-    MenuPcs.DrawRect(0, panelX + 28.0f, 88.0f, 96.0f, 88.0f,
+    MenuPcs.DrawRect(0, kSingStatBaseX + kSingStatPanelPad, 88.0f, 96.0f, 88.0f,
                                      0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     DrawInit();
@@ -1775,7 +1778,7 @@ void CMenuPcs::DrawSingleStat(float alpha)
     color.a = static_cast<u8>(a255);
     GXSetChanMatColor(GX_COLOR0A0, color);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2A));
-    MenuPcs.DrawRect(0, panelX + 28.0f, 128.0f, 96.0f, 48.0f,
+    MenuPcs.DrawRect(0, kSingStatBaseX + kSingStatPanelPad, 128.0f, 96.0f, 48.0f,
                                      0.0f, 88.0f, 1.0f, 1.0f, 0.0f);
 
     DrawInit();
@@ -3564,3 +3567,6 @@ int CMenuPcs::GetItemType(int itemId, int useRawItemId)
     }
     return 9;
 }
+
+const float kSingStatBaseX = 440.0f;
+const float kSingStatPanelPad = 28.0f;

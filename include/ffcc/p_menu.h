@@ -440,7 +440,7 @@ public:
     char* GetJobStr(int);
     char* GetHairStr(int);
     int GetItemType(int, int);
-    unsigned char GetItemIcon(int);
+    int GetItemIcon(int);
     void ArtiInit();
     void ArtiInit1();
     int ArtiOpen();

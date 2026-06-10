@@ -68,6 +68,7 @@ extern const float FLOAT_80330B44;
 extern const float FLOAT_80330B48;
 extern const float FLOAT_80330B4C;
 extern const float FLOAT_80330B5C;
+extern const float FLOAT_80330B90;
 extern const float FLOAT_80330BC0;
 extern const float kCFlatHalfPi;
 extern const float kCFlatPi;
@@ -4019,12 +4020,11 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     }
     case -0xED: {
-        const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         CVector hitPosition;
-        hitPosition.x = localFloats[0];
-        hitPosition.y = localFloats[1];
-        hitPosition.z = localFloats[2];
-        if (MapPcs.CheckHitCylinderNear(hitPosition, CVector(kCFlatPadStickZero, 1.0f, kCFlatPadStickZero), kCFlatPadStickZero, object->m_localBase[3]) == 0) {
+        hitPosition.x = reinterpret_cast<float*>(object->m_localBase)[0];
+        hitPosition.y = reinterpret_cast<float*>(object->m_localBase)[1];
+        hitPosition.z = reinterpret_cast<float*>(object->m_localBase)[2];
+        if (MapPcs.CheckHitCylinderNear(hitPosition, CVector(kCFlatPadStickZero, FLOAT_80330B90, kCFlatPadStickZero), kCFlatPadStickZero, object->m_localBase[3]) == 0) {
             this->push(object, 0);
         } else {
             MapPcs.CalcHitPosition(hitPosition);

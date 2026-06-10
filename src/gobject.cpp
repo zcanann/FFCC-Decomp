@@ -1637,7 +1637,11 @@ void CGObject::update()
         const float alphaBase = m_stepSlopeLimit * onAlphaUpdate();
         const float alphaStep = ClampFloat(alphaBase * visibleScale - m_lookAtTimer, -m_bgDownDist, m_bgDownDist);
         m_lookAtTimer = ClampFloat(m_lookAtTimer + alphaStep, sZeroFloat, sAnimFrameOffset);
-        m_worldParam = m_worldParam > 0.05f ? m_worldParam - 0.05f : sZeroFloat;
+        float worldParamNext = m_worldParam - 0.05f;
+        if (worldParamNext < sZeroFloat) {
+            worldParamNext = sZeroFloat;
+        }
+        m_worldParam = worldParamNext;
         if ((m_displayFlags & 0x1000) != 0) {
             m_lookAtTimer = alphaBase;
         }

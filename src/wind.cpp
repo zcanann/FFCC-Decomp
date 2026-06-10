@@ -635,15 +635,7 @@ void CWind::Frame()
                 obj->targetPower = f2 * obj->basePower + obj->targetPower;
                 f0 = obj->targetPower;
                 f1 = kWindZero;
-                if (f0 < f1) {
-                    goto storePower;
-                }
-                f1 = obj->basePower;
-                if (f1 < f0) {
-                    goto storePower;
-                }
-                f1 = f0;
-            storePower:
+                f1 = (f0 < f1) ? f1 : ((obj->basePower < f0) ? obj->basePower : f0);
                 obj->targetPower = f1;
             }
 
@@ -659,16 +651,8 @@ void CWind::Frame()
                 obj->targetDir = f2 * obj->baseDir + obj->targetDir;
                 f0 = obj->targetDir;
                 f1 = obj->baseDir;
-                if (f0 < f1) {
-                    goto storeDir;
-                }
-                f2 = kWindDirMaxOffset + f1;
-                if (f2 < f0) {
-                    goto storeDir;
-                }
-                f2 = f0;
-                obj->targetDir = f2;
-            storeDir:;
+                f1 = (f0 < f1) ? f1 : ((kWindDirMaxOffset + f1 < f0) ? kWindDirMaxOffset + f1 : f0);
+                obj->targetDir = f1;
             }
 
             if (obj->type == 2) {

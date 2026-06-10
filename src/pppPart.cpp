@@ -773,7 +773,7 @@ void callCon2Prog(_pppPObject* pObject)
 _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 {
 	_pppPDataVal* dataVal = pppPDataVal;
-	_pppProgSetDef* programSet = dataVal->m_programSetDef;
+	_pppProgSetDef* volatile programSet = dataVal->m_programSetDef;
 	s16 numStages = programSet->m_numStages;
 	u32 allocSize = programSet->m_workBaseOffset;
 	CMemory::CStage* stage = ppvEnv->m_stagePtr;

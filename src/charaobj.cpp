@@ -2244,6 +2244,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 				putParticleBindTrace(0x107, m_particleSlots[20], this, FLOAT_803319AC * m_attackColRadius, 0);
 				break;
 			case 0x67:
+			case 0x68:
 			default:
 				break;
 		}

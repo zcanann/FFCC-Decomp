@@ -1364,7 +1364,6 @@ int CChara::CModel::PickFur(
 			if (pickTexture != 0 && pickTexture->m_format == 5) {
 				paintableMaterial = 1;
 			}
-			const unsigned int furMaterial = material->IsFurEnabled();
 
 			const unsigned char* cursor = reinterpret_cast<const unsigned char*>(displayList->m_data);
 			if ((cursor[0] & 7) == 0) {
@@ -1587,11 +1586,11 @@ int CChara::CModel::PickFur(
 							outWorldPos->y = hitViewPos.y;
 							outWorldPos->z = hitViewPos.z;
 						}
-						if (furMaterial) {
+						hitU = outU;
+						hitV = outV;
+						if (material->IsFurEnabled()) {
 							hitPaintable = paintableMaterial;
 							nearestDepth = depth;
-							hitU = outU;
-							hitV = outV;
 						}
 					}
 nextVertex:

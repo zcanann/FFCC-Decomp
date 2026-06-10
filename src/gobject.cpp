@@ -1476,6 +1476,7 @@ void CGObject::update()
 
     Mtx modelMtx;
     Mtx ecScratch;
+    Mtx attachApplyMtx;
     if (Game.m_currentMapId == 0x21) {
         Mtx tempMtx;
 
@@ -1855,8 +1856,8 @@ void CGObject::update()
 
         if (HasLoadedModel(m_weaponModelHandle) && (m_displayFlags & 1) != 0 && m_weaponAttachNode >= 0) {
             PSMTXCopy(ModelNodeMtx(m_charaModelHandle->m_model, m_weaponAttachNode), ecScratch);
-            PSMTXTransApply(ecScratch, ecScratch, m_worldPosition.x, m_worldPosition.y, m_worldPosition.z);
-            m_weaponModelHandle->m_model->SetMatrix(ecScratch);
+            PSMTXTransApply(ecScratch, attachApplyMtx, m_worldPosition.x, m_worldPosition.y, m_worldPosition.z);
+            m_weaponModelHandle->m_model->SetMatrix(attachApplyMtx);
             m_weaponModelHandle->m_model->CalcMatrix();
             if (static_cast<s32>(static_cast<u32>(weaponFlagsLo) << 26 | static_cast<u32>(weaponFlagsLo) >> 6) < 0) {
                 m_weaponModelHandle->m_model->CalcSkin();
@@ -1870,8 +1871,8 @@ void CGObject::update()
 
         if (HasLoadedModel(m_shieldModelHandle) && (m_displayFlags & 1) != 0 && m_shieldAttachNodeIndex >= 0) {
             PSMTXCopy(ModelNodeMtx(m_charaModelHandle->m_model, m_shieldAttachNodeIndex), ecScratch);
-            PSMTXTransApply(ecScratch, ecScratch, m_worldPosition.x, m_worldPosition.y, m_worldPosition.z);
-            m_shieldModelHandle->m_model->SetMatrix(ecScratch);
+            PSMTXTransApply(ecScratch, attachApplyMtx, m_worldPosition.x, m_worldPosition.y, m_worldPosition.z);
+            m_shieldModelHandle->m_model->SetMatrix(attachApplyMtx);
             m_shieldModelHandle->m_model->CalcMatrix();
 
             ModelLightAlpha(m_shieldModelHandle->m_model) = m_lookAtTimer;

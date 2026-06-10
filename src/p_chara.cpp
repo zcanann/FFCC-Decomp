@@ -1020,7 +1020,8 @@ void CCharaPcs::onScriptChanging(char*)
         const CColor& white = CColor(0xFF, 0xFF, 0xFF, 0xFF);
         CColor shade;
 
-        float scale = static_cast<float>(i) * 0.25f;
+        float scale = static_cast<float>(i);
+        scale *= 0.25f;
         shade.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.r) * scale));
         shade.color.g = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.g) * scale));
         shade.color.b = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.b) * scale));

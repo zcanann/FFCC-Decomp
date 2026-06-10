@@ -1826,8 +1826,8 @@ void CGMonObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 	charaObj->CGCharaObj::onDrawDebug(font, posX, posY, posZ);
 
 	if ((static_cast<signed char>((static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags)) << 24) & 0xC0000000) >> 31)) != 0) &&
-			(CFlatCenterState() == 0) &&
-		((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&DbgMenuPcs) + 0x6484) & 0x80) != 0)) {
+			(static_cast<int>(CFlatCenterState()) == 0) &&
+		((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&DbgMenuPcs) + 0x4) & 0x80) != 0)) {
 		char text[0x100];
 		unsigned short aiState = m_groupTag;
 		int targetIndex = m_targetPartyIndex;
@@ -1851,12 +1851,14 @@ void CGMonObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 		float lineH = static_cast<float>(font->m_glyphHeight) * font->scaleY;
 		posY = posY - lineH;
 
-		int targetDist = 0;
+		int targetDist;
 		if (m_targetPartyIndex >= 0) {
 			targetDist = static_cast<int>(*reinterpret_cast<float*>(mon + m_targetPartyIndex * 4 + 0x5D0));
+		} else {
+			targetDist = 0;
 		}
 
-		int chaseRange = static_cast<int>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xCC));
+		int chaseRange = static_cast<int>(static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xCC)));
 		int spawnDist = static_cast<int>(PSVECDistance(&m_homePosition, &object->m_worldPosition));
 		sprintf(text, s_monObjDistanceFmt, targetDist, spawnDist, chaseRange);
 		float curPosY2 = posY;

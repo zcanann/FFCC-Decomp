@@ -923,11 +923,9 @@ void CLightPcs::CBumpLight::MakeLightMap()
     float dScale = kBumpLightMapGridStep;
     float dHalf = kLightOne;
     static float tParam[4] = {48.0f, 128.0f, 256.0f, 512.0f};
+    int offset = 0;
     float* lightScale = tParam;
     float dFactor = kBumpLightMapCoordScale;
-    float dInv = kBumpLightNormalDivisor;
-    int offset = 0;
-    float dW = kBumpLightMapVertexZ;
 
     for (int i = 0; i < (int)(unsigned int)m_textureCount; i++) {
         u8* texDst = m_textureData + offset;
@@ -948,6 +946,8 @@ void CLightPcs::CBumpLight::MakeLightMap()
 
         GXLoadLightObjImm(&lightObj, (GXLightID)1);
 
+        float dInv = kBumpLightNormalDivisor;
+        float dW = kBumpLightMapVertexZ;
         u32 y = 0;
         do {
             GXBegin((GXPrimitive)0x98, (GXVtxFmt)0, 0x42);

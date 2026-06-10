@@ -80,6 +80,12 @@ static inline CFlatRuntime2* ItemCFlatRuntime()
 	return &CFlat;
 }
 
+struct SItemFlatRow {
+	unsigned char m_pad[0x10];
+	unsigned short m_fineValue;
+	unsigned char m_pad2[0x36];
+};
+
 /*
  * --INFO--
  * PAL Address: 0x80124b78
@@ -508,9 +514,11 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 {
 	unsigned char* self = (unsigned char*)this;
 	CFlatRuntime::CStack stack[3];
-	int canSystemCall = 0;
+	int canSystemCall;
+	unsigned char canSystemCall8;
 
 	if (carryState == 0) {
+		canSystemCall = 0;
 		bool isStageCarry = false;
 		bool isMenuBossStage = false;
 
@@ -531,6 +539,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 
 		*(CGPartyObj**)(self + 0x550) = partyObj;
 		*(int*)(self + 0x554) = carryMode;
+		canSystemCall8 = (unsigned char)canSystemCall;
 
 		if (carryMode == 0) {
 			const CVector& attachOffset = CVector(kItemObjZero, kItemObjZero, kItemObjZero);
@@ -561,17 +570,19 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 				}
 			}
 
+			CGObject* attachSelf = this;
 			const char* attachName = s_itemAttachLeftItem;
 			if (useBossAttachName) {
 				attachName = s_itemAttachCenterItem3;
 			}
-			Attach(partyObj, const_cast<char*>(attachName), attachOffsetPtr);
+			attachSelf->Attach(partyObj, const_cast<char*>(attachName), attachOffsetPtr);
 			changeStat(0, 0, 0);
 			*(float*)(self + 0x144) = kItemObjZero;
 		} else {
 			changeStat(0xB, 0, 0);
 		}
 	} else if (carryState == 1 || carryState == 2) {
+		canSystemCall = 0;
 		bool isStageCarry = false;
 		bool isMenuBossStage = false;
 
@@ -592,6 +603,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 		}
 
 		*(int*)(self + 0x554) = carryMode;
+		canSystemCall8 = (unsigned char)canSystemCall;
 
 		if (carryMode == 0) {
 			Vec safePos;
@@ -617,7 +629,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 		*reinterpret_cast<u32*>(self + 0x94) = 0x1194;
 	}
 
-	if ((*(unsigned int*)(self + 0x5C) & 0x10) != 0 && canSystemCall != 0) {
+	if ((*(unsigned int*)(self + 0x5C) & 0x10) != 0 && canSystemCall8 != 0) {
 		stack[0].m_word = 3;
 		stack[1].m_word = static_cast<unsigned int>(-carryState | carryState) >> 0x1F;
 		stack[2].m_word = 0;
@@ -919,11 +931,12 @@ void CGItemObj::onFrameStat()
 			}
 
 			CGObject* attachOwner = m_owner;
+			CGObject* attachSelf = this;
 			const char* attachName = s_itemAttachLeftItem;
 			if (useBossAttachName) {
 				attachName = s_itemAttachCenterItem3;
 			}
-			Attach(attachOwner, const_cast<char*>(attachName), attachOffsetPtr);
+			attachSelf->Attach(attachOwner, const_cast<char*>(attachName), attachOffsetPtr);
 			changeStat(0, 0, 0);
 			m_bodyEllipsoidRadius = kItemObjZero;
 		}
@@ -1161,9 +1174,9 @@ void CGItemObj::onFrameStat()
 				pdtNo = -1;
 			}
 
+			SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
 			float particleScale =
-			    kItemObjFineStep * (float)*(unsigned short*)(Game.unkCFlatData0[2] + prgObj->m_worldParamB * 0x48 + 0x10) +
-			    kItemObjParticleScaleBase;
+			    kItemObjFineStep * (float)itemRows[prgObj->m_worldParamB].m_fineValue + kItemObjParticleScaleBase;
 			putParticle((pdtNo << 8) | 0x13, m_particleSlot, this, particleScale, 0x12903);
 		} else if (m_stateFrame == 0xD) {
 			int ownerSlot = *(int*)(*(unsigned char**)(*(unsigned char**)(self + 0x550) + 0x58) + 0x3B4);
@@ -1200,9 +1213,9 @@ void CGItemObj::onFrameStat()
 				pdtNo = -1;
 			}
 
+			SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
 			float particleScale =
-			    kItemObjFineStep * (float)*(unsigned short*)(Game.unkCFlatData0[2] + prgObj->m_worldParamB * 0x48 + 0x10) +
-			    kItemObjParticleScaleBase;
+			    kItemObjFineStep * (float)itemRows[prgObj->m_worldParamB].m_fineValue + kItemObjParticleScaleBase;
 			putParticle((pdtNo << 8) | 4, m_particleSlot, this, particleScale, 0x12908);
 		} else if (m_stateFrame == 0xD) {
 			int ownerSlot = *(int*)(*(unsigned char**)(*(unsigned char**)(self + 0x550) + 0x58) + 0x3B4);
@@ -1269,9 +1282,8 @@ void CGItemObj::onFrame()
 			SetAnimSlot(0, 0);
 			PlayAnim(0, 1, 0, -1, -1, 0);
 
-			CGObject* owner = m_owner;
-			int ownerScriptSlot = *(int*)(*(int*)((unsigned char*)owner + 0x58) + 0x3B4);
 			int* soundData = *(int**)(*(int*)(*reinterpret_cast<int*>(CGMonObj::m_boss) + 0xF8) + 0x178);
+			int ownerData = *(int*)((unsigned char*)m_owner + 0x58);
 			int soundEntry;
 			if (soundData != 0) {
 				soundEntry = soundData[5];
@@ -1279,10 +1291,10 @@ void CGItemObj::onFrame()
 				soundEntry = -1;
 			}
 
-			unsigned char* itemTable = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]);
-			float particleValue = static_cast<float>(*reinterpret_cast<unsigned short*>(itemTable + m_worldParamB * 0x48 + 0x10));
+			SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
+			float particleValue = static_cast<float>(itemRows[m_worldParamB].m_fineValue);
 			float particleScale = kItemObjFineStep * (float)particleValue + kItemObjParticleScaleBase;
-			putParticle(ownerScriptSlot | (soundEntry << 8), m_particleSlot, this, particleScale, 0x12909);
+			putParticle((soundEntry << 8) | *(int*)(ownerData + 0x3B4), m_particleSlot, this, particleScale, 0x12909);
 
 			SetDamageCol(0, const_cast<char*>(s_itemDamageBoneHip), kItemObjMemoryRadius, kItemObjMemoryRadius,
 			             CVector(kItemObjZero, kItemObjZero, kItemObjZero));

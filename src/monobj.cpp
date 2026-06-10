@@ -3760,11 +3760,12 @@ void CGMonObj::statWatch()
 		}
 
 		unsigned char* aiScript;
-		if (monObj->m_aiState == 0) {
+		short aiState0 = monObj->m_aiState;
+		if (aiState0 == 0) {
 			aiScript = script;
 		} else {
 			aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-				(static_cast<int>(monObj->m_aiState) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
+				(aiState0 + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
 		}
 
 		int targetMode = *reinterpret_cast<unsigned short*>(aiScript + 0x106);

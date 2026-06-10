@@ -3424,7 +3424,6 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 		int seen = 0;
 		int i = 0;
 		int* groupPtr = reinterpret_cast<int*>(groupTable);
-		int iter = 2;
 		do {
 			if (groupCursor == groupPtr[0]) {
 				if (seen == pick) {
@@ -3456,8 +3455,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 			}
 			groupPtr += 4;
 			i += 4;
-			iter -= 1;
-		} while (iter != 0);
+		} while (i < 8);
 	}
 
 	return selectedAction;

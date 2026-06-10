@@ -1002,7 +1002,6 @@ int CMenuPcs::EquipOpen()
  */
 void CMenuPcs::EquipInit1()
 {
-	int yOff = 0;
 	int i = (int)GetEquipListStorage(this)->count;
 
 	EquipOpenAnim* e = &GetEquipListStorage(this)->entries[i++];
@@ -1053,6 +1052,7 @@ void CMenuPcs::EquipInit1()
 	e->startFrame = 0;
 	e->duration = 5;
 
+	int yOff = 0;
 	EquipOpenAnim* anchor = &GetEquipListStorage(this)->entries[GetEquipListStorage(this)->count];
 	for (int n = 0; n < 8; n++) {
 		e = &GetEquipListStorage(this)->entries[i];
@@ -1074,7 +1074,7 @@ void CMenuPcs::EquipInit1()
 	float fVar2 = kEquipZero;
 	int n = (int)GetEquipListStorage(this)->listEnd - (int)GetEquipListStorage(this)->count;
 	EquipOpenAnim* psVar10 = &GetEquipListStorage(this)->entries[GetEquipListStorage(this)->count];
-	for (int k = 0; k < n; k++) {
+	for (int k = n; k > 0; k--) {
 		psVar10->step = 0;
 		psVar10->alpha = fVar2;
 		psVar10++;

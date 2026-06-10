@@ -1607,8 +1607,8 @@ void CCameraPcs::drawShadowBegin()
     Mtx rotX;
     Mtx rotXY;
     Mtx tempMtx;
-    Vec up;
     Vec delta;
+    Vec up;
     float depth;
 
     if (m_fullScreenShadowEnabled == 0) {
@@ -1653,8 +1653,8 @@ void CCameraPcs::drawShadowBegin()
             if (w < h) {
                 w = h;
             }
-            m_fullScreenShadow.m_span = kCameraHalfF * w;
             depth = w;
+            m_fullScreenShadow.m_span = kCameraHalfF * depth;
         } else if (m_shadowAuto == 2) {
             m_targetX = m_fullScreenShadowPosition.x;
             m_targetY = m_fullScreenShadowPosition.y;
@@ -1698,10 +1698,10 @@ void CCameraPcs::drawShadowBegin()
         PSMTXMultVecSR(tempMtx, reinterpret_cast<Vec*>(&m_shadowCamera.m_position.x), reinterpret_cast<Vec*>(&m_shadowCamera.m_position.x));
     }
 
-    PSVECAdd(reinterpret_cast<Vec*>(&m_shadowCamera.m_position.x), reinterpret_cast<Vec*>(&m_positionX), reinterpret_cast<Vec*>(&m_shadowCamera.m_position.x));
-    m_shadowCamera.m_target.x = m_positionX;
-    m_shadowCamera.m_target.y = m_positionY;
-    m_shadowCamera.m_target.z = m_positionZ;
+    PSVECAdd(reinterpret_cast<Vec*>(&m_shadowCamera.m_position.x), reinterpret_cast<Vec*>(&m_targetX), reinterpret_cast<Vec*>(&m_shadowCamera.m_position.x));
+    m_shadowCamera.m_target.x = m_targetX;
+    m_shadowCamera.m_target.y = m_targetY;
+    m_shadowCamera.m_target.z = m_targetZ;
     m_shadowCamera.m_nearZ = kCameraDefaultNearZ;
     m_shadowCamera.m_farZ = kCameraTwoF * m_fullScreenShadowDepth;
 

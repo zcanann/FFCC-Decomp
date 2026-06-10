@@ -1851,7 +1851,7 @@ void CMenuPcs::CmakeJobClose()
  * JP Address: TODO
  * JP Size: TODO
  */
-unsigned short CMenuPcs::CmakeJobCtrl()
+int CMenuPcs::CmakeJobCtrl()
 {
     unsigned short down;
     unsigned short repeat;
@@ -2158,7 +2158,7 @@ void CMenuPcs::CmakeTribeClose()
  * JP Address: TODO
  * JP Size: TODO
  */
-unsigned short CMenuPcs::CmakeTribeCtrl()
+int CMenuPcs::CmakeTribeCtrl()
 {
     unsigned short down;
     unsigned short repeat;

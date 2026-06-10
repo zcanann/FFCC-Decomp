@@ -953,11 +953,14 @@ void CLightPcs::CBumpLight::MakeLightMap()
             GXBegin((GXPrimitive)0x98, (GXVtxFmt)0, 0x42);
 
             for (u32 x = 0; x < 0x21; x++) {
-                float x0 = dFactor * (float)y * dScale - dHalf;
+                float t0 = dFactor * (float)y;
+                float x0 = t0 * dScale - dHalf;
                 float xd0 = x0 / dInv;
-                float x1 = dFactor * (float)(y + 1) * dScale - dHalf;
+                float t1 = dFactor * (float)(y + 1);
+                float x1 = t1 * dScale - dHalf;
                 float xd1 = x1 / dInv;
-                float z0 = dFactor * (float)x * dScale - dHalf;
+                float tz = dFactor * (float)x;
+                float z0 = tz * dScale - dHalf;
                 float zd = z0 / dInv;
                 float dist0 = z0 * z0 + x0 * x0;
                 if (dist0 < dHalf) {

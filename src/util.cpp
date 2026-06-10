@@ -8,14 +8,6 @@ struct UtilHermiteBasis {
 	float m_value[4];
 };
 
-static const float kUtilZero = 0.0f;
-static const float kUtilOne = 1.0f;
-static const float kUtilOrthoBottom = 448.0f;
-static const float kUtilOrthoRight = 640.0f;
-static const float kUtilQuadDepth = -0.9999999f;
-static const float kUtilHermiteCoeff2 = 2.0f;
-static const float kUtilHermiteCoeff3 = 3.0f;
-static const float kUtilHermiteCoeffNeg2 = -2.0f;
 extern const UtilHermiteBasis kUtilHermiteBasis;
 extern Vec gUtilUpVector;
 
@@ -388,6 +380,11 @@ void CUtil::SetPaletteEnv(CTexture* texture)
 void CUtil::RenderTextureQuad(float x, float y, float width, float height, CTexture* texture, Vec2d* uv1, Vec2d* uv2,
                               _GXColor* color, _GXBlendFactor srcBlend, _GXBlendFactor dstBlend)
 {
+    extern const float kUtilZero;
+    extern const float kUtilOne;
+    extern const float kUtilOrthoBottom;
+    extern const float kUtilOrthoRight;
+
     Mtx44 screenMtx;
     Mtx cameraMtx;
     Mtx44 orthoMtx;
@@ -471,10 +468,10 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, CText
         float v2;
 
         if (uv1 == 0 || uv2 == 0) {
-            u1 = kUtilZero;
-            v = kUtilZero;
-            u2 = kUtilOne;
-            v2 = kUtilOne;
+            u1 = 0.0f;
+            v = 0.0f;
+            u2 = 1.0f;
+            v2 = 1.0f;
         } else {
             u1 = uv1->x;
             v = uv1->y;
@@ -520,10 +517,10 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, CText
         float v2;
 
         if (uv1 == 0 || uv2 == 0) {
-            u1 = kUtilZero;
-            v = kUtilZero;
-            u2 = kUtilOne;
-            v2 = kUtilOne;
+            u1 = 0.0f;
+            v = 0.0f;
+            u2 = 1.0f;
+            v2 = 1.0f;
         } else {
             u1 = uv1->x;
             v = uv1->y;
@@ -583,6 +580,11 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, CText
 void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTexObj* texObj, Vec2d* uv1, Vec2d* uv2,
                               _GXColor* color, _GXBlendFactor srcBlend, _GXBlendFactor dstBlend)
 {
+    extern const float kUtilZero;
+    extern const float kUtilOne;
+    extern const float kUtilOrthoBottom;
+    extern const float kUtilOrthoRight;
+
     Mtx44 screenMtx;
     Mtx cameraMtx;
     Mtx44 orthoMtx;
@@ -663,10 +665,10 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTe
         float v2;
 
         if (uv1 == 0 || uv2 == 0) {
-            u1 = kUtilZero;
-            v = kUtilZero;
-            u2 = kUtilOne;
-            v2 = kUtilOne;
+            u1 = 0.0f;
+            v = 0.0f;
+            u2 = 1.0f;
+            v2 = 1.0f;
         } else {
             u1 = uv1->x;
             v = uv1->y;
@@ -712,10 +714,10 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTe
         float v2;
 
         if (uv1 == 0 || uv2 == 0) {
-            u1 = kUtilZero;
-            v = kUtilZero;
-            u2 = kUtilOne;
-            v2 = kUtilOne;
+            u1 = 0.0f;
+            v = 0.0f;
+            u2 = 1.0f;
+            v2 = 1.0f;
         } else {
             u1 = uv1->x;
             v = uv1->y;
@@ -774,6 +776,11 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTe
  */
 void CUtil::RenderColorQuad(float x, float y, float width, float height, _GXColor color)
 {
+    extern const float kUtilZero;
+    extern const float kUtilOne;
+    extern const float kUtilOrthoBottom;
+    extern const float kUtilOrthoRight;
+
     Mtx44 screenMtx;
     Mtx cameraMtx;
     Mtx44 orthoMtx;
@@ -871,6 +878,12 @@ void CUtil::RenderColorQuad(float x, float y, float width, float height, _GXColo
  */
 void CUtil::ClearZBufferRect(float x, float y, float width, float height)
 {
+    extern const float kUtilZero;
+    extern const float kUtilOne;
+    extern const float kUtilOrthoBottom;
+    extern const float kUtilOrthoRight;
+    extern const float kUtilQuadDepth;
+
     Mtx44 screenMtx;
     Mtx cameraMtx;
     Mtx44 orthoMtx;
@@ -994,6 +1007,11 @@ void CUtil::EndQuadEnv()
  */
 void CUtil::BeginQuadEnv()
 {
+    extern const float kUtilZero;
+    extern const float kUtilOne;
+    extern const float kUtilOrthoBottom;
+    extern const float kUtilOrthoRight;
+
     Mtx44 orthoMtx;
     Mtx modelMtx;
     float indMtx[2][3];
@@ -1056,6 +1074,9 @@ void CUtil::DisableIndMtx()
  */
 void CUtil::RenderQuadTex2(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d* uv2)
 {
+    extern const float kUtilZero;
+    extern const float kUtilOne;
+
     u32* colorPtr = reinterpret_cast<u32*>(&color);
     float u1;
     float v1;
@@ -1130,6 +1151,9 @@ void CUtil::RenderQuadTex2(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d
  */
 void CUtil::RenderQuad(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d* uv2)
 {
+    extern const float kUtilZero;
+    extern const float kUtilOne;
+
     u32* colorPtr = reinterpret_cast<u32*>(&color);
     float u0;
     float v0;
@@ -1295,6 +1319,11 @@ void CUtil::ConvI2FVector(Vec& out, S16Vec in, long shift)
  */
 void CUtil::GetSplinePos(Vec& out, Vec p0, Vec p1, Vec p2, Vec p3, float t, float scale)
 {
+    extern const float kUtilOne;
+    extern const float kUtilHermiteCoeff2;
+    extern const float kUtilHermiteCoeff3;
+    extern const float kUtilHermiteCoeffNeg2;
+
 	Vec tan0;
 	Vec tan1;
 
@@ -1365,6 +1394,11 @@ int CUtil::GetNoise(unsigned char noise)
  */
 void CUtil::SetOrthoEnv()
 {
+    extern const float kUtilZero;
+    extern const float kUtilOne;
+    extern const float kUtilOrthoBottom;
+    extern const float kUtilOrthoRight;
+
     Mtx modelMtx;
     Mtx44 orthoMtx;
 
@@ -1475,3 +1509,12 @@ void CUtil::Quit()
 {
 	// TODO
 }
+
+extern const float kUtilZero = 0.0f;
+extern const float kUtilOne = 1.0f;
+extern const float kUtilOrthoBottom = 448.0f;
+extern const float kUtilOrthoRight = 640.0f;
+extern const float kUtilQuadDepth = -0.9999999f;
+extern const float kUtilHermiteCoeff2 = 2.0f;
+extern const float kUtilHermiteCoeff3 = 3.0f;
+extern const float kUtilHermiteCoeffNeg2 = -2.0f;

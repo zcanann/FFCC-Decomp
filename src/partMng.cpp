@@ -4171,7 +4171,7 @@ found:
         if ((unsigned int)System.m_execParam >= 1) {
             System.Printf(const_cast<char*>(sPppFreeDataMngAllocError));
         }
-        OSPanic(const_cast<char*>(s_partMng_cpp), 0xD74, "");
+        OSPanic(const_cast<char*>(s_partMng_cpp), 0xD74, const_cast<char*>(sPartMngEmptyString));
         return -1;
     }
 

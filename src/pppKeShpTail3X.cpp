@@ -186,20 +186,20 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     Vec seg;
     float nextBaseX;
     float segDx;
-    float segDz;
     float segDy;
+    float segDz;
     float invCountMinusOne;
     float drawScale;
     float posZ;
     int life;
     s32 shapeFrameDuration;
-    float nextBaseZ;
     float nextBaseY;
+    float nextBaseZ;
     float segLen;
     float trailStep;
     float startX;
-    float startZ;
     float startY;
+    float startZ;
     u8 zEnable;
     s32 dataValIndex;
 

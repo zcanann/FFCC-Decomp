@@ -2147,25 +2147,21 @@ int CMenuPcs::LetterCtrlCur()
 			}
 		}
 
-		if ((hold & 0xC) != 0) {
-			return 0;
-		}
-		if ((press & 0x20) != 0) {
-			*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x1E) = 1;
-			Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
-			return 1;
-		}
-		if ((press & 0x40) != 0) {
-			*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x1E) = -1;
-			Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
-			return 1;
-		}
-		if ((press & 0x100) != 0) {
-			if (letterCount == 0) {
-				Sound.PlaySe(4, 0x40, 0x7F, 0);
-				return 0;
+		if ((hold & 0xC) == 0) {
+			if ((press & 0x20) != 0) {
+				*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x1E) = 1;
+				Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
+				return 1;
 			}
-
+			if ((press & 0x40) != 0) {
+				*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x1E) = -1;
+				Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
+				return 1;
+			}
+			if ((press & 0x100) != 0) {
+				if (letterCount == 0) {
+					Sound.PlaySe(4, 0x40, 0x7F, 0);
+				} else {
 			*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) + 1;
 			s_SelLetter = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x34) + *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x26);
 			char* letterBytes = reinterpret_cast<char*>(caravanWork) + s_SelLetter * 0xC;
@@ -2194,18 +2190,14 @@ int CMenuPcs::LetterCtrlCur()
 
 			*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x22) = 0;
 			Sound.PlaySe(2, 0x40, 0x7F, 0);
-			return 0;
+				}
+			} else if ((press & 0x200) != 0) {
+				*reinterpret_cast<u8*>(GetLetterStateBase(this) + 0xD) = 1;
+				Sound.PlaySe(3, 0x40, 0x7F, 0);
+				return 1;
+			}
 		}
-
-		if ((press & 0x200) == 0) {
-			return 0;
-		}
-		*reinterpret_cast<u8*>(GetLetterStateBase(this) + 0xD) = 1;
-		Sound.PlaySe(3, 0x40, 0x7F, 0);
-		return 1;
-	}
-
-	if (menuMode == 1) {
+	} else if (menuMode == 1) {
 		if ((press & 0x100) != 0) {
 			char* letterBytes = reinterpret_cast<char*>(caravanWork) + s_SelLetter * 0xC;
 			if ((reinterpret_cast<CCaravanWork::CLetterWork*>(letterBytes + 0x3EC)->AttachmentValue() != 0) &&
@@ -2225,22 +2217,16 @@ int CMenuPcs::LetterCtrlCur()
 				}
 				*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) + 1;
 				Sound.PlaySe(2, 0x40, 0x7F, 0);
-				return 0;
-			}
-
-			if ((CFlatLetterEventEnabled() != 0) &&
+			} else if ((CFlatLetterEventEnabled() != 0) &&
 			    caravanWork->m_letters[s_SelLetter].HasReply() &&
 			    !caravanWork->m_letters[s_SelLetter].IsReplySent()) {
 				*reinterpret_cast<u8*>(GetLetterStateBase(this) + 8) = 2;
 				*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) + 1;
 				Sound.PlaySe(2, 0x40, 0x7F, 0);
-				return 0;
+			} else {
+				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			}
-			Sound.PlaySe(4, 0x40, 0x7F, 0);
-			return 0;
-		}
-
-		if ((press & 0x200) != 0) {
+		} else if ((press & 0x200) != 0) {
 			*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 8) = -1;
 			*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) + 1;
 			int n = 0;
@@ -2262,18 +2248,11 @@ int CMenuPcs::LetterCtrlCur()
 			*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x22) = 0;
 			Sound.PlaySe(3, 0x40, 0x7F, 0);
 		}
-		return 0;
-	}
-
-	if (menuMode == 2) {
+	} else if (menuMode == 2) {
 		if ((hold & 0xC) != 0) {
 			*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28) ^= 1;
 			Sound.PlaySe(1, 0x40, 0x7F, 0);
-		}
-		if ((hold & 0xC) != 0) {
-			return 0;
-		}
-		if ((press & 0x100) != 0) {
+		} else if ((press & 0x100) != 0) {
 			s16 sel = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28);
 			if ((static_cast<int>(*reinterpret_cast<unsigned char*>(GetLetterStateBase(this) + 9)) & (1 << (sel + 1))) != 0) {
 				if (sel == 0) {
@@ -2297,30 +2276,22 @@ int CMenuPcs::LetterCtrlCur()
 				*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) + 1;
 				m_menuWindowInfo->state = 2;
 				Sound.PlaySe(2, 0x40, 0x7F, 0);
-				return 0;
+			} else {
+				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			}
-
-			Sound.PlaySe(4, 0x40, 0x7F, 0);
-			return 0;
+		} else if ((press & 0x200) != 0) {
+			if ((CFlatLetterEventEnabled() != 0) &&
+			    caravanWork->m_letters[s_SelLetter].HasReply() &&
+			    !caravanWork->m_letters[s_SelLetter].IsReplySent()) {
+				*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 8) = 1;
+			} else {
+				*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 8) = -1;
+			}
+			*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) + 1;
+			m_menuWindowInfo->state = 2;
+			Sound.PlaySe(3, 0x40, 0x7F, 0);
 		}
-
-		if ((press & 0x200) == 0) {
-			return 0;
-		}
-		if ((CFlatLetterEventEnabled() != 0) &&
-		    caravanWork->m_letters[s_SelLetter].HasReply() &&
-		    !caravanWork->m_letters[s_SelLetter].IsReplySent()) {
-			*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 8) = 1;
-		} else {
-			*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 8) = -1;
-		}
-		*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) + 1;
-		m_menuWindowInfo->state = 2;
-		Sound.PlaySe(3, 0x40, 0x7F, 0);
-		return 0;
-	}
-
-	if (menuMode == 3) {
+	} else if (menuMode == 3) {
 		int maxReply = static_cast<int>(s_ReplyMax);
 		if ((hold & 8) != 0) {
 			int cur = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28);
@@ -2340,11 +2311,9 @@ int CMenuPcs::LetterCtrlCur()
 			Sound.PlaySe(1, 0x40, 0x7F, 0);
 		}
 
-		if ((hold & 0xC) != 0) {
-			return 0;
-		}
-		if ((press & 0x100) != 0) {
-			int curReply = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28);
+		if ((hold & 0xC) == 0) {
+			if ((press & 0x100) != 0) {
+				int curReply = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28);
 			if (curReply >= maxReply - 1) {
 				*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 8) = -1;
 			} else {
@@ -2386,20 +2355,14 @@ int CMenuPcs::LetterCtrlCur()
 			*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) + 1;
 			m_menuWindowInfo->state = 2;
 			Sound.PlaySe(2, 0x40, 0x7F, 0);
-			return 0;
+			} else if ((press & 0x200) != 0) {
+				*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 8) = -1;
+				*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) + 1;
+				m_menuWindowInfo->state = 2;
+				Sound.PlaySe(3, 0x40, 0x7F, 0);
+			}
 		}
-
-		if ((press & 0x200) == 0) {
-			return 0;
-		}
-		*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 8) = -1;
-		*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) + 1;
-		m_menuWindowInfo->state = 2;
-		Sound.PlaySe(3, 0x40, 0x7F, 0);
-		return 0;
-	}
-
-	if (menuMode == 4) {
+	} else if (menuMode == 4) {
 		if ((hold & 8) != 0) {
 			int cur = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28);
 			if (cur != 0) {
@@ -2418,45 +2381,33 @@ int CMenuPcs::LetterCtrlCur()
 			Sound.PlaySe(1, 0x40, 0x7F, 0);
 		}
 
-		if ((hold & 0xC) != 0) {
-			return 0;
-		}
-		if ((press & 0x100) != 0) {
-			int choice = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28);
-			if (choice >= 3) {
-				s_Attach = 2;
+		if ((hold & 0xC) == 0) {
+			if ((press & 0x100) != 0) {
+				int choice = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28);
+				if (choice >= 3) {
+					s_Attach = 2;
+					*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 8) = -1;
+				} else {
+					s_Attach = static_cast<signed char>(choice);
+					*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 8) = 1;
+				}
+				*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) + 1;
+				s_AttachMode = 0;
+				s_AttachItem = 0;
+				m_menuWindowInfo->state = 2;
+				Sound.PlaySe(2, 0x40, 0x7F, 0);
+			} else if ((press & 0x200) != 0) {
 				*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 8) = -1;
-			} else {
-				s_Attach = static_cast<signed char>(choice);
-				*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 8) = 1;
+				*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) + 1;
+				m_menuWindowInfo->state = 2;
+				Sound.PlaySe(3, 0x40, 0x7F, 0);
 			}
-			*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) + 1;
-			s_AttachMode = 0;
-			s_AttachItem = 0;
-			m_menuWindowInfo->state = 2;
-			Sound.PlaySe(2, 0x40, 0x7F, 0);
-			return 0;
 		}
-		if ((press & 0x200) == 0) {
-			return 0;
-		}
-		*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 8) = -1;
-		*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) + 1;
-		m_menuWindowInfo->state = 2;
-		Sound.PlaySe(3, 0x40, 0x7F, 0);
-		return 0;
-	}
-
-	if (menuMode != 5) {
-		return 0;
-	}
-
-	if ((hold & 0xC) != 0) {
-		*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28) ^= 1;
-		Sound.PlaySe(1, 0x40, 0x7F, 0);
-		return 0;
-	}
-	if ((press & 0x100) != 0) {
+	} else if (menuMode == 5) {
+		if ((hold & 0xC) != 0) {
+			*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28) ^= 1;
+			Sound.PlaySe(1, 0x40, 0x7F, 0);
+		} else if ((press & 0x100) != 0) {
 		if (*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28) == 0) {
 			int itemValue = s_AttachItem;
 			int gilValue = 0;
@@ -2482,17 +2433,16 @@ int CMenuPcs::LetterCtrlCur()
 		}
 
 		*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) + 1;
-		m_menuWindowInfo->state = 2;
-		Sound.PlaySe(2, 0x40, 0x7F, 0);
-		return 0;
+			m_menuWindowInfo->state = 2;
+			Sound.PlaySe(2, 0x40, 0x7F, 0);
+		} else if ((press & 0x200) != 0) {
+			*reinterpret_cast<u8*>(GetLetterStateBase(this) + 8) = 0xFF;
+			*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) + 1;
+			m_menuWindowInfo->state = 2;
+			Sound.PlaySe(3, 0x40, 0x7F, 0);
+		}
 	}
-	if ((press & 0x200) == 0) {
-		return 0;
-	}
-	*reinterpret_cast<u8*>(GetLetterStateBase(this) + 8) = 0xFF;
-	*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) + 1;
-	m_menuWindowInfo->state = 2;
-	Sound.PlaySe(3, 0x40, 0x7F, 0);
+
 	return 0;
 }
 

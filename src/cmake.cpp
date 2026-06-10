@@ -3812,53 +3812,62 @@ void CMenuPcs::CalcSingCMake()
         CmakeMcState(this) = 3;
     }
 
-    unsigned short result;
+    int result;
 
     switch (CmakeState(this)->m_step) {
     case 0:
         if (CmakeState(this)->m_mode == 0) {
             CalcWMFrame0(CmakeState(this)->m_frame - 10);
+            int done;
             if (CmakeState(this)->m_frame >= 10) {
                 CmakeState(this)->m_select = 0;
                 CmakeState(this)->m_row = 0;
                 CmakeState(this)->m_table = 0;
                 CmakeState(this)->m_subSelect = 0;
-                result = 1;
+                done = 1;
             } else {
                 CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
-                result = 0;
+                done = 0;
             }
+            result = done;
         } else if (CmakeState(this)->m_mode == 1) {
             result = 0;
         } else {
             CalcWMFrame0(-CmakeState(this)->m_frame);
+            int done;
             if (CmakeState(this)->m_frame >= 10) {
-                result = 1;
+                done = 1;
             } else {
                 CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
-                result = 0;
+                done = 0;
             }
+            result = done;
         }
         break;
     case 1:
         if (CmakeState(this)->m_mode == 0) {
+            int done;
             if (CmakeState(this)->m_frame >= 10) {
-                result = 1;
+                done = 1;
             } else {
                 CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
-                result = 0;
+                done = 0;
             }
+            result = done;
         } else if (CmakeState(this)->m_mode == 1) {
-            result = static_cast<unsigned short>(CmakeNameCtrl());
+            result = CmakeNameCtrl();
         } else {
+            int done;
             if (CmakeState(this)->m_frame >= 10) {
                 if (CmakeState(this)->m_resultDir < 0) {
                     ChgModel(static_cast<int>(CmakeSlot(this)), -1, -1, -1);
                 }
-                result = 1;
+                done = 1;
             } else {
                 CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+                done = 0;
             }
+            result = done;
         }
         break;
     case 2: {
@@ -3867,18 +3876,21 @@ void CMenuPcs::CalcSingCMake()
                 CmakeState(this)->m_select = 0;
                 CmakeState(this)->m_selectionInitialized = 1;
             }
+            int done;
             if (CmakeState(this)->m_frame >= 10) {
-                result = 1;
+                done = 1;
             } else {
                 CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
-                result = 0;
+                done = 0;
             }
+            result = done;
         } else if (CmakeState(this)->m_mode == 1) {
             short down;
             unsigned short repeat;
 
             int padLock = Pad.m_debugPadLock;
-            if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
+            unsigned char noPad = (padLock != 0) || (Pad.m_debugPadPort != -1);
+            if (noPad) {
                 down = 0;
             } else {
                 int padIndex = 0;
@@ -3886,7 +3898,8 @@ void CMenuPcs::CalcSingCMake()
                 down = Pad.GetPadInputs()[padIndex].buttonDown[0];
             }
 
-            if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
+            noPad = (padLock != 0) || (Pad.m_debugPadPort != -1);
+            if (noPad) {
                 repeat = 0;
             } else {
                 int padIndex = 0;
@@ -3919,11 +3932,14 @@ void CMenuPcs::CalcSingCMake()
                 result = 0;
             }
         } else {
+            int done;
             if (CmakeState(this)->m_frame >= 10) {
-                result = 1;
+                done = 1;
             } else {
                 CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+                done = 0;
             }
+            result = done;
         }
         break;
     }
@@ -3935,20 +3951,25 @@ void CMenuPcs::CalcSingCMake()
                 CmakeState(this)->m_fieldSelect = 0;
                 CmakeState(this)->m_selectionInitialized = 1;
             }
+            int done;
             if (CmakeState(this)->m_frame >= 10) {
-                result = 1;
+                done = 1;
             } else {
                 CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
-                result = 0;
+                done = 0;
             }
+            result = done;
         } else if (CmakeState(this)->m_mode == 1) {
             result = CmakeTribeCtrl();
         } else {
+            int done;
             if (CmakeState(this)->m_frame >= 10) {
-                result = 1;
+                done = 1;
             } else {
                 CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+                done = 0;
             }
+            result = done;
         }
         break;
     case 4:
@@ -3957,20 +3978,25 @@ void CMenuPcs::CalcSingCMake()
                 CmakeState(this)->m_select = 0;
                 CmakeState(this)->m_selectionInitialized = 1;
             }
+            int done;
             if (CmakeState(this)->m_frame >= 10) {
-                result = 1;
+                done = 1;
             } else {
                 CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
-                result = 0;
+                done = 0;
             }
+            result = done;
         } else if (CmakeState(this)->m_mode == 1) {
             result = CmakeJobCtrl();
         } else {
+            int done;
             if (CmakeState(this)->m_frame >= 10) {
-                result = 1;
+                done = 1;
             } else {
                 CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+                done = 0;
             }
+            result = done;
         }
         break;
     case 5: {
@@ -3979,18 +4005,21 @@ void CMenuPcs::CalcSingCMake()
                 CmakeState(this)->m_select = 0;
                 CmakeState(this)->m_selectionInitialized = 1;
             }
+            int done;
             if (CmakeState(this)->m_frame >= 10) {
-                result = 1;
+                done = 1;
             } else {
                 CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
-                result = 0;
+                done = 0;
             }
+            result = done;
         } else if (CmakeState(this)->m_mode == 1) {
             unsigned short down;
             unsigned short repeat;
 
             int padLock = Pad.m_debugPadLock;
-            if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
+            unsigned char noPad = (padLock != 0) || (Pad.m_debugPadPort != -1);
+            if (noPad) {
                 down = 0;
             } else {
                 int padIndex = 0;
@@ -3998,7 +4027,8 @@ void CMenuPcs::CalcSingCMake()
                 down = Pad.GetPadInputs()[padIndex].buttonDown[0];
             }
 
-            if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
+            noPad = (padLock != 0) || (Pad.m_debugPadPort != -1);
+            if (noPad) {
                 repeat = 0;
             } else {
                 int padIndex = 0;
@@ -4065,11 +4095,14 @@ void CMenuPcs::CalcSingCMake()
             }
         } else {
             if (CmakeState(this)->m_stepTimer == 0) {
+                int done;
                 if (CmakeState(this)->m_frame >= 10) {
-                    result = 1;
+                    done = 1;
                 } else {
                     CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+                    done = 0;
                 }
+                result = done;
             } else {
                 CmakeState(this)->m_stepTimer =
                     static_cast<short>(CmakeState(this)->m_stepTimer - 1);
@@ -4083,18 +4116,21 @@ void CMenuPcs::CalcSingCMake()
                 CmakeState(this)->m_select = 0;
                 CmakeState(this)->m_selectionInitialized = 1;
             }
+            int done;
             if (CmakeState(this)->m_frame >= 10) {
-                result = 1;
+                done = 1;
             } else {
                 CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
-                result = 0;
+                done = 0;
             }
+            result = done;
         } else if (CmakeState(this)->m_mode == 1) {
             short down;
             unsigned short repeat;
 
             int padLock = Pad.m_debugPadLock;
-            if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
+            unsigned char noPad = (padLock != 0) || (Pad.m_debugPadPort != -1);
+            if (noPad) {
                 down = 0;
             } else {
                 int padIndex = 0;
@@ -4102,7 +4138,8 @@ void CMenuPcs::CalcSingCMake()
                 down = Pad.GetPadInputs()[padIndex].buttonDown[0];
             }
 
-            if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
+            noPad = (padLock != 0) || (Pad.m_debugPadPort != -1);
+            if (noPad) {
                 repeat = 0;
             } else {
                 int padIndex = 0;
@@ -4148,11 +4185,14 @@ void CMenuPcs::CalcSingCMake()
                 result = 0;
             }
         } else {
+            int done;
             if (CmakeState(this)->m_frame >= 10) {
-                result = 1;
+                done = 1;
             } else {
                 CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+                done = 0;
             }
+            result = done;
         }
         break;
     }

@@ -1928,7 +1928,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 	    staType != 0x66 && staType != 0x67 && staType != 0x65) {
 		bonus(0x14, resolvedItemId, sourceObj);
 		sourceObj->bonus(0x10, resolvedItemId, this);
-		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
+		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
 			sourceObj->bonus(0x0B, resolvedItemId, this);
 		}
 	}
@@ -1946,7 +1946,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
  */
 void CGCharaObj::setSta(int staIndex, int value)
 {
-	unsigned int isIceJ = 0;
+	int isIceJ = 0;
 	int isMon = 0;
 	if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
 		isMon = 1;
@@ -1988,7 +1988,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 					putParticle(0x10B, 0, this, FLOAT_803319AC * m_attackColRadius, 0);
 				}
 				playSe3D(0x16, 0x32, 0x96, 0, 0);
-				if (isMon) {
+				if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
 					reinterpret_cast<CGMonObj*>(this)->setIceJEffect(1);
 				}
 				break;
@@ -2000,13 +2000,13 @@ void CGCharaObj::setSta(int staIndex, int value)
 				}
 				break;
 			case 10:
-				if (isMon && (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 4) != 0 &&
-					*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
+				if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 4) != 0 &&
+					*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
 					reinterpret_cast<CGMonObj*>(this)->flyUp();
 				}
 				break;
 			case 0x1C:
-				if (isMon && (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 1) != 0) {
+				if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 1) != 0) {
 					reinterpret_cast<CGMonObj*>(this)->undeadOn();
 				}
 				break;
@@ -2017,7 +2017,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 					}
 				}
 				float monsterScale;
-				if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
+				if ((((static_cast<unsigned int>(__cntlzw(0xAD - (static_cast<unsigned short>(GetCID()) & 0xAD))) >> 5) & 0xFFU) != 0)) {
 					monsterScale = static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0x1B4)) * 0.01f;
 				} else {
 					monsterScale = kOneF32;
@@ -2034,7 +2034,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 					}
 				}
 				float monsterScale;
-				if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
+				if ((((static_cast<unsigned int>(__cntlzw(0xAD - (static_cast<unsigned short>(GetCID()) & 0xAD))) >> 5) & 0xFFU) != 0)) {
 					monsterScale = static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0x1B4)) * 0.01f;
 				} else {
 					monsterScale = kOneF32;
@@ -2116,7 +2116,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 				} else {
 					putParticle(0x10A, m_particleSlots[2], this, FLOAT_803319AC * m_attackColRadius, 0);
 				}
-				if (isMon) {
+				if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
 					reinterpret_cast<CGMonObj*>(this)->setIceJEffect(0);
 				}
 				break;
@@ -2134,7 +2134,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 				}
 				break;
 			case 10:
-				if (isMon && (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 4) != 0) {
+				if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 4) != 0) {
 					reinterpret_cast<CGMonObj*>(this)->flyDown();
 				}
 				break;
@@ -2145,7 +2145,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 					}
 				}
 				float monsterScale;
-				if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
+				if ((((static_cast<unsigned int>(__cntlzw(0xAD - (static_cast<unsigned short>(GetCID()) & 0xAD))) >> 5) & 0xFFU) != 0)) {
 					monsterScale = static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0x1B4)) * 0.01f;
 				} else {
 					monsterScale = kOneF32;
@@ -2162,7 +2162,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 					}
 				}
 				float monsterScale;
-				if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
+				if ((((static_cast<unsigned int>(__cntlzw(0xAD - (static_cast<unsigned short>(GetCID()) & 0xAD))) >> 5) & 0xFFU) != 0)) {
 					monsterScale = static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0x1B4)) * 0.01f;
 				} else {
 					monsterScale = kOneF32;
@@ -2208,7 +2208,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 				putParticleBindTrace(0x107, m_particleSlots[20], this, FLOAT_803319AC * m_attackColRadius, 0);
 				break;
 			case 0x1C:
-				if (isMon && (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 1) != 0) {
+				if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 1) != 0) {
 					reinterpret_cast<CGMonObj*>(this)->undeadOff();
 				}
 				break;

@@ -1629,9 +1629,9 @@ void CGObject::update()
 
         float visibleScale = sAnimFrameOffset;
         if (Game.m_currentMapId == 0x21) {
-            visibleScale = m_screenDepth <= 60.0f ? sAnimFrameOffset : sZeroFloat;
+            visibleScale = m_screenDepth > 60.0f ? sZeroFloat : sAnimFrameOffset;
         } else {
-            visibleScale = m_screenDepth <= 30.0f ? sAnimFrameOffset : sZeroFloat;
+            visibleScale = m_screenDepth > 30.0f ? sZeroFloat : sAnimFrameOffset;
         }
 
         const float alphaTarget = m_stepSlopeLimit * onAlphaUpdate() * visibleScale;

@@ -1559,7 +1559,6 @@ void CGObject::update()
             m_worldPosition = attachPos;
         } else {
             float interp = static_cast<float>(m_moveMode) / static_cast<float>(m_moveModePrevious);
-            interp = ClampFloat(interp, sZeroFloat, sAnimFrameOffset);
             Vec fromOwner;
             Vec fromSelf;
             PSVECScale(&attachPos, &fromOwner, sAnimFrameOffset - interp);

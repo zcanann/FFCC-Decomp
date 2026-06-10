@@ -827,7 +827,11 @@ int CMenuPcs::LetterCtrl()
 				*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28) = 0;
 				*reinterpret_cast<char*>(GetLetterStateBase(this) + 0xC) = 1;
 			}
+			done = 0;
 			if (m_menuWindowInfo->state == 1) {
+				done = 1;
+			}
+			if (done != 0) {
 				*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = 1;
 			}
 		} else if (mode == 3) {
@@ -836,8 +840,8 @@ int CMenuPcs::LetterCtrl()
 			}
 		} else if (mode == 4) {
 			if (*reinterpret_cast<char*>(GetLetterStateBase(this) + 0xC) == '\0') {
-				s16 winW;
 				s16 winH;
+				s16 winW;
 				GetSingWinSize(2, &winW, &winH, 0);
 				SetMcWinInfo(static_cast<int>(winW), static_cast<int>(winH));
 				m_menuWindowInfo->state = 0;
@@ -845,7 +849,11 @@ int CMenuPcs::LetterCtrl()
 				*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 9) = 0xFF;
 				*reinterpret_cast<char*>(GetLetterStateBase(this) + 0xC) = 1;
 			}
+			done = 0;
 			if (m_menuWindowInfo->state == 1) {
+				done = 1;
+			}
+			if (done != 0) {
 				*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = 1;
 			}
 		} else if (mode == 5) {
@@ -1438,7 +1446,7 @@ inline void CMenuPcs::LetterItemWinClose()
  * JP Address: TODO
  * JP Size: TODO
  */
-bool CMenuPcs::LetterReplyWinOpen()
+int CMenuPcs::LetterReplyWinOpen()
 {
 	CCaravanWork* caravanWork = GetLetterCaravanWork();
 	int languageId = Game.m_gameWork.m_languageId;
@@ -1506,9 +1514,9 @@ bool CMenuPcs::LetterReplyWinOpen()
 		*reinterpret_cast<char*>(GetLetterStateBase(this) + 0x9) = -1;
 		*reinterpret_cast<char*>(GetLetterStateBase(this) + 0xC) = 1;
 	}
-	bool opened = false;
+	int opened = 0;
 	if (m_menuWindowInfo->state == 1) {
-		opened = true;
+		opened = 1;
 	}
 	return opened;
 }
@@ -1604,7 +1612,7 @@ inline void CMenuPcs::LetterAttachWinClose()
  * Address:	TODO
  * Size:	TODO
  */
-bool CMenuPcs::LetterConfirmOpen()
+int CMenuPcs::LetterConfirmOpen()
 {
 	CCaravanWork* caravanWork = GetLetterCaravanWork();
 	int languageId = Game.m_gameWork.m_languageId;
@@ -1704,9 +1712,9 @@ bool CMenuPcs::LetterConfirmOpen()
 		*reinterpret_cast<char*>(GetLetterStateBase(this) + 0xC) = 1;
 	}
 
-	bool opened = false;
+	int opened = 0;
 	if (m_menuWindowInfo->state == 1) {
-		opened = true;
+		opened = 1;
 	}
 	return opened;
 }

@@ -456,6 +456,8 @@ static int RenderWaterMesh(VMana2* mana2)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_dead_assignments off
 static int UpdateWaterMesh(VMana2* mana2)
 {
     float* waterHeightA;
@@ -477,8 +479,9 @@ static int UpdateWaterMesh(VMana2* mana2)
     do {
         currentScale = kMana2Zero;
         neighborScale = kMana2Half;
+        int col = 1;
         int index = rowBase + 1;
-        for (int col = 1; col < 0x10; col += 5, index += 5) {
+        while (col < 0x10) {
             int above0 = index - 0x11;
             int below0 = index + 0x11;
             float* center0 = &waterHeightA[index];
@@ -488,34 +491,34 @@ static int UpdateWaterMesh(VMana2* mana2)
                                                    center0[-1] + center0[1]) -
                                   waterHeightB[index];
 
-            int index1 = index + 1;
-            int above1 = index1 - 0x11;
-            int below1 = index1 + 0x11;
+            int index1 = col + rowBase + 1;
+            int above1 = col + rowBase + 1 - 0x11;
+            int below1 = col + rowBase + 1 + 0x11;
             float* center1 = &waterHeightA[index1];
             waterHeightB[index1] = currentScale * center1[0] +
                                    neighborScale * (waterHeightA[above1] + waterHeightA[below1] +
                                                     center1[-1] + center1[1]) -
                                    waterHeightB[index1];
 
-            int index2 = index + 2;
-            int above2 = index2 - 0x11;
-            int below2 = index2 + 0x11;
+            int index2 = col + rowBase + 2;
+            int above2 = col + rowBase + 2 - 0x11;
+            int below2 = col + rowBase + 2 + 0x11;
             float* center2 = &waterHeightA[index2];
             waterHeightB[index2] = currentScale * center2[0] +
                                    neighborScale * (waterHeightA[above2] + waterHeightA[below2] +
                                                     center2[-1] + center2[1]) -
                                    waterHeightB[index2];
 
-            int index3 = index + 3;
-            int above3 = index3 - 0x11;
-            int below3 = index3 + 0x11;
+            int index3 = col + rowBase + 3;
+            int above3 = col + rowBase + 3 - 0x11;
+            int below3 = col + rowBase + 3 + 0x11;
             float* center3 = &waterHeightA[index3];
             waterHeightB[index3] = currentScale * center3[0] +
                                    neighborScale * (waterHeightA[above3] + waterHeightA[below3] +
                                                     center3[-1] + center3[1]) -
                                    waterHeightB[index3];
 
-            int index4 = index + 4;
+            int index4 = col + rowBase + 4;
             int above4 = index4 - 0x11;
             int below4 = index4 + 0x11;
             float* center4 = &waterHeightA[index4];
@@ -523,6 +526,8 @@ static int UpdateWaterMesh(VMana2* mana2)
                                    neighborScale * (waterHeightA[above4] + waterHeightA[below4] +
                                                     center4[-1] + center4[1]) -
                                    waterHeightB[index4];
+            col += 5;
+            index += 5;
         }
         row++;
         rowBase += 0x11;
@@ -545,6 +550,7 @@ static int UpdateWaterMesh(VMana2* mana2)
                               mana2->m_waterMtx, mana2->m_colors, mana2->m_texCoord1);
     return 1;
 }
+#pragma pop
 
 /*
  * --INFO--

@@ -828,7 +828,7 @@ void CGObject::objectCollision()
                     if (!usePushTimers || (m_collisionPushTimerMax != 0) || (other->m_collisionPushTimerMax == 0)) {
                         const float thisPush = static_cast<float>(m_pushParamA + m_pushParamB);
                         const float otherPush = static_cast<float>(other->m_pushParamA + other->m_pushParamB);
-                        const float rawSplit = 0.5f + (thisPush - otherPush) / 510.0f;
+                        const float rawSplit = sBgAttrNormal + (thisPush - otherPush) / sCrossCheckOuterRadius;
                         float split;
                         if (rawSplit < sZeroFloat) {
                             split = sZeroFloat;

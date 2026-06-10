@@ -2364,6 +2364,7 @@ void CGoOutMenu::CalcDel()
     const unsigned char selInit = static_cast<unsigned char>(__cntlzw(2 - static_cast<int>(m_deleteMode)) >> 5 & 0xFF);
     const int selResult = MenuPcs.CalcGoOutSelChar(selInit, 0);
     unsigned short input;
+    unsigned char next;
 
     switch (m_deleteMode) {
     case 0:
@@ -2421,8 +2422,6 @@ void CGoOutMenu::CalcDel()
         m_cursorListY1 = 0xbc;
         m_cursorMode = 0;
         {
-            unsigned char next;
-
             if (MenuPcs.m_menuWindowInfo->state != 1) {
                 next = 0;
                 goto do_switch_del3;
@@ -2481,8 +2480,6 @@ void CGoOutMenu::CalcDel()
         m_cursorListY1 = 0xd1;
         m_cursorMode = 0;
         {
-            unsigned char next;
-
             if (MenuPcs.m_menuWindowInfo->state != 1) {
                 next = 0;
                 goto do_switch_del4;
@@ -2560,8 +2557,6 @@ void CGoOutMenu::CalcDel()
         m_cursorListY1 = 0xe9;
         m_cursorMode = 0;
         {
-            unsigned char next;
-
             if (MenuPcs.m_menuWindowInfo->state != 1) {
                 next = 0;
                 goto do_switch_del6;

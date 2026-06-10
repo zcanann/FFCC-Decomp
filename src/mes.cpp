@@ -1257,15 +1257,11 @@ void CMes::addString(char** text, int branchMode)
 		case 0x34:
 		{
 			mFontIndex = ReadTagS8(text);
-			int sel = mFontIndex;
 			CFont* newFont;
-			switch (sel)
+			switch (mFontIndex)
 			{
 			case 0:
 				newFont = MenuPcs.m_fonts[0];
-				break;
-			case 1:
-				newFont = MenuPcs.m_fonts[2];
 				break;
 			case 2:
 				newFont = MenuPcs.m_fonts[2];
@@ -1273,14 +1269,12 @@ void CMes::addString(char** text, int branchMode)
 			case 3:
 				newFont = MenuPcs.m_fonts[2];
 				break;
-			default:
-				newFont = MenuPcs.m_fonts[2];
-				break;
 			}
 			newFont->SetShadow(mShadow);
 			newFont->SetMargin(kMesZero);
+			float newScaleY = mScaleY;
 			newFont->SetScaleX(mScaleX);
-			newFont->SetScaleY(mScaleY);
+			newFont->SetScaleY(newScaleY);
 			font = newFont;
 			break;
 		}

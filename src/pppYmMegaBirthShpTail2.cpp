@@ -125,7 +125,8 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
             const float alphaScale = (float)*(s16*)((u8*)colorWork + 6) / kPppYmMegaBirthShpTail2AlphaDivisor;
             const float stepDivisor = (float)((s32)frameCountRaw - 1);
             float fadeA = (float)step[0x7B] * alphaScale;
-            const float fadeANum = fadeA - (float)step[0x7F] * alphaScale;
+            const float fadeAEnd = (float)step[0x7F] * alphaScale;
+            const float fadeANum = fadeA - fadeAEnd;
             float fadeR = (float)step[0x78];
             float fadeG = (float)step[0x79];
             float fadeB = (float)step[0x7A];

@@ -269,7 +269,7 @@ draw_loop:
     drawMtx.value[1][3] = pos.y;
     drawMtx.value[2][3] = pos.z;
 
-    zEnable = (u8)((u32)__cntlzw((u32)step->m_zDisable) >> 5);
+    zEnable = (step->m_zDisable == 0);
     pppSetDrawEnv(0, &drawMtx, (step->m_useEnvDepth != 0) ? step->m_envDepth : kPppKeShpTail2XZero, 0,
                   step->m_drawA, step->m_blendMode, 0, zEnable, 1, 0);
 

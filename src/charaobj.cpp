@@ -2138,6 +2138,11 @@ void CGCharaObj::setSta(int staIndex, int value)
 					reinterpret_cast<CGMonObj*>(this)->flyDown();
 				}
 				break;
+			case 0x1C:
+				if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 1) != 0) {
+					reinterpret_cast<CGMonObj*>(this)->undeadOff();
+				}
+				break;
 			case 9: {
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x4000U) != 0) {
@@ -2206,11 +2211,6 @@ void CGCharaObj::setSta(int staIndex, int value)
 					}
 				}
 				putParticleBindTrace(0x107, m_particleSlots[20], this, FLOAT_803319AC * m_attackColRadius, 0);
-				break;
-			case 0x1C:
-				if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 1) != 0) {
-					reinterpret_cast<CGMonObj*>(this)->undeadOff();
-				}
 				break;
 			case 0x67:
 			default:

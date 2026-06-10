@@ -450,8 +450,8 @@ void CAStar::drawAStar()
 			} while (group < 64);
 		}
 
-		bool hasGroups = false;
 		float (*drawMtx)[4] = CameraPcs.m_cameraMatrix;
+		bool hasGroups = false;
 
 		if (m_currentGroup != 0 && m_previousGroup != 0)
 		{
@@ -460,8 +460,8 @@ void CAStar::drawAStar()
 
 		if (hasGroups)
 		{
-			CColor white(0xFF, 0xFF, 0xFF, 0xFF);
-			Graphic.DrawSphere(drawMtx, &m_lastGroupPos, LoadFloat(kDrawAStarSphereRadius), &white.color);
+			_GXColor* whiteColor = &CColor(0xFF, 0xFF, 0xFF, 0xFF).color;
+			Graphic.DrawSphere(drawMtx, &m_lastGroupPos, LoadFloat(kDrawAStarSphereRadius), whiteColor);
 		}
 
 		int i = 0;
@@ -477,8 +477,8 @@ void CAStar::drawAStar()
 
 			if (exists)
 			{
-				CColor yellow(0xFF, 0xFF, 0x00, 0xFF);
-				Graphic.DrawSphere(drawMtx, &m_portals[i].m_position, LoadFloat(kDrawAStarSphereRadius), &yellow.color);
+				_GXColor* yellowColor = &CColor(0xFF, 0xFF, 0x00, 0xFF).color;
+				Graphic.DrawSphere(drawMtx, &m_portals[i].m_position, LoadFloat(kDrawAStarSphereRadius), yellowColor);
 
 				int side = 0;
 				unsigned char* group = &m_portals[i].m_groupA;

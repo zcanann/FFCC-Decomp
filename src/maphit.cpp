@@ -505,18 +505,18 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         PSVECScale(hitDirection, &g_hit_hpv, hitT);
         PSVECAdd(&g_hit_cyl.m_bottom, &g_hit_hpv, &g_hit_hpv);
 
+        Vec pushedHit;
+        Vec scaledNormal;
         Vec edgeStart;
         Vec edgeEnd;
-        Vec edge;
-        Vec toPoint;
-        Vec cross;
-        Vec scaledNormal;
         PSVECScale(&g_hit_lpface->m_normal, &scaledNormal, g_hit_cyl.m_radius);
-        Vec pushedHit;
         PSVECSubtract(&g_hit_hpv, &scaledNormal, &pushedHit);
 
         unsigned int sideMask = 3;
         Vec previous = m_vertices[g_hit_lpface->m_vertexIndices[g_hit_lpface->m_vertexCount - 1]];
+        Vec edge;
+        Vec toPoint;
+        Vec cross;
         Vec current;
         switch (g_hit_lpface->m_projectionAxis) {
         case 0:
@@ -616,7 +616,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
     }
 
 commit:
-    if (s_bitMask.m_fields.m_mode != 0) {
+    if (static_cast<signed char>(s_bitMask.m_fields.m_mode) != 0) {
         g_hit_lpface->m_drawFlags = s_bitMask.m_fields.m_drawFlags;
     }
     g_hit_t_slide_min = g_hit_t;
@@ -630,7 +630,7 @@ commit:
     return 1;
 
 edge_loop:
-    if (s_bitMask.m_fields.m_mode != 0) {
+    if (static_cast<signed char>(s_bitMask.m_fields.m_mode) != 0) {
         g_hit_lpface->m_drawFlags = s_bitMask.m_fields.m_drawFlags;
     }
 

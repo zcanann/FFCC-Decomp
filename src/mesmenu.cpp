@@ -910,6 +910,7 @@ void CMesMenu::onDraw()
  */
 void CMesMenu::onCalc()
 {
+    CFlatRuntime::CStack stack2[2];
     if (Game.m_gameWork.m_menuStageMode != 0) {
         if ((m_menuIndex >= 1) && (m_menuIndex < 4)) {
             return;
@@ -1104,9 +1105,13 @@ void CMesMenu::onCalc()
                 }
             }
 
-            int closeReady = (*(int*)((char*)this + 0x3CC8) != 0) &&
-                (*(int*)((char*)this + 0x3CD8) == *(int*)((char*)this + 0x3CD4));
-            if (closeReady) {
+            int msgState = *(int*)((char*)this + 0x3CC8);
+            if (msgState != 0) {
+                bool closeReady = false;
+                if ((msgState != 0) && (*(int*)((char*)this + 0x3CD8) == *(int*)((char*)this + 0x3CD4))) {
+                    closeReady = true;
+                }
+                if (closeReady) {
                 if (*(int*)((char*)this + 0x3C90) != 0) {
                     int wait5 = m_mes.GetWait();
                     if (wait5 != 4) {
@@ -1137,6 +1142,7 @@ void CMesMenu::onCalc()
                 } else {
                     m_mes.Next();
                 }
+                }
             }
         }
         break;
@@ -1162,14 +1168,13 @@ void CMesMenu::onCalc()
             m_stateTimerMax = 8;
             break;
         case 3: {
-            CFlatRuntime::CStack stack[2];
             m_state = 4;
             m_stateTimer = 0;
             m_stateTimerMax = 0;
             m_mes.Set(0, 0);
-            stack[0].m_word = m_menuIndex;
-            stack[1].m_word = m_closeReason;
-            gCFlatRuntime().SystemCall(0, 1, 3, 2, stack, 0);
+            stack2[0].m_word = m_menuIndex;
+            stack2[1].m_word = m_closeReason;
+            gCFlatRuntime().SystemCall(0, 1, 3, 2, stack2, 0);
             m_state = 4;
             m_active = 0;
             if (m_menuIndex < 4) {

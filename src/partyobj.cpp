@@ -1787,7 +1787,7 @@ void CGPartyObj::onFrameStat()
 			CGObject* chaliceObj = reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0);
 			unsigned short held = getPadHeldForSlot(static_cast<signed char>(m_animStateMisc));
 			int heldMask = held & 0x400;
-			unsigned short up = getPadButtonUpForSlot(static_cast<char>(m_animStateMisc));
+			unsigned short up = getPadButtonUpForSlot(static_cast<signed char>(m_animStateMisc));
 			if ((up & 0x400) != 0) {
 				if (sGhostMogMenuWork.holdTimer < 10 &&
 				    party.carryObject != chaliceObj) {

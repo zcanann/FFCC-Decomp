@@ -122,21 +122,12 @@ static const char sMcOdekakeOut[] = {
 static const char sMcMountErrorFmt[] = "McMount(%d) error(%d)\n";
 static const char sMcOpenErrorFmt[] = "McOpen(%d) error(%d)\n";
 static const char sMemoryCardSourceFile[] = "memorycard.cpp";
-static const char sMemoryAllocationError[0x88] = {
-    0x25, 0x73, 0x28, 0x25, 0x64, 0x29, 0x3A, 0x20, 0x45, 0x72, 0x72, 0x6F,
-    0x72, 0x3A, 0x20, 0x6D, 0x65, 0x6D, 0x6F, 0x72, 0x79, 0x20, 0x61, 0x6C,
-    0x6C, 0x6F, 0x63, 0x61, 0x74, 0x69, 0x6F, 0x6E, 0x20, 0x65, 0x72, 0x72,
-    0x6F, 0x72, 0x0A, 0x00, 0x4D, 0x63, 0x52, 0x65, 0x61, 0x64, 0x28, 0x25,
-    0x64, 0x29, 0x20, 0x65, 0x72, 0x72, 0x6F, 0x72, 0x28, 0x25, 0x64, 0x29,
-    0x0A, 0x00, 0x00, 0x00, 0x4D, 0x63, 0x46, 0x6F, 0x72, 0x6D, 0x61, 0x74,
-    0x28, 0x25, 0x64, 0x29, 0x20, 0x65, 0x72, 0x72, 0x6F, 0x72, 0x28, 0x25,
-    0x64, 0x29, 0x0A, 0x00, 0x4D, 0x63, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65,
-    0x28, 0x25, 0x64, 0x29, 0x20, 0x65, 0x72, 0x72, 0x6F, 0x72, 0x28, 0x25,
-    0x64, 0x29, 0x0A, 0x00, 0x4D, 0x63, 0x47, 0x65, 0x74, 0x53, 0x74, 0x61,
-    0x74, 0x28, 0x25, 0x64, 0x29, 0x20, 0x65, 0x72, 0x72, 0x6F, 0x72, 0x28,
-    0x25, 0x64, 0x29, 0x0A,
-};
-static const char sMcWriteErrorFmtData[] = "\0\0\0\0McWrite(%d) error(%d)\n";
+static const char sMemoryAllocationError[] = "%s(%d): Error: memory allocation error\n";
+static const char sMcReadErrorFmt[] = "McRead(%d) error(%d)\n";
+static const char sMcFormatErrorFmt[] = "McFormat(%d) error(%d)\n";
+static const char sMcCreateErrorFmt[] = "McCreate(%d) error(%d)\n";
+static const char sMcGetStatErrorFmt[] = "McGetStat(%d) error(%d)\n";
+static const char sMcWriteErrorFmt[] = "McWrite(%d) error(%d)\n";
 static const char sMcSetStatErrorFmt[] = "McSetStat(%d) error(%d)\n";
 static const char sBrokenLoadData[] = "Bloken load data!!\n";
 static const char sLoadDataVersionDifferent[] = "The version of load data is different\n";
@@ -169,12 +160,6 @@ static const char sDebugReadWriteFailedMsg[] = {
     (char)0x82, (char)0xB5, (char)0x82, (char)0xBD, (char)0x81, 0x42, 0x0A,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 };
-
-#define sMcWriteErrorFmt (sMcWriteErrorFmtData + 4)
-#define sMcReadErrorFmt (sMemoryAllocationError + 0x28)
-#define sMcFormatErrorFmt (sMemoryAllocationError + 0x40)
-#define sMcCreateErrorFmt (sMemoryAllocationError + 0x58)
-#define sMcGetStatErrorFmt (sMemoryAllocationError + 0x70)
 
 enum {
     kMemoryCardStageSize = 0x16000,
@@ -367,29 +352,34 @@ unsigned int CMemoryCardMan::CalcCrc(Mc::SaveDat* saveData)
 {
     int count;
     unsigned char* ptr;
+    unsigned char* ptr2;
     unsigned int crc;
-    Mc::SaveDat* save = saveData;
+    unsigned char* crcData;
 
-    if (save == nullptr)
+    if (saveData == nullptr)
     {
-        save = GetSaveDat(m_saveBuffer);
+        crcData = (unsigned char*)m_saveBuffer;
+    }
+    else
+    {
+        crcData = reinterpret_cast<unsigned char*>(saveData);
     }
 
     crc = 0xFFFFFFFF;
+    ptr = crcData;
     count = 0x1C;
-    ptr = reinterpret_cast<unsigned char*>(save);
     while (--count >= 0)
     {
         crc = (crc << 8) ^ s_CrcTable[(crc >> 24) ^ *ptr];
         ptr += 1;
     }
 
-    ptr = reinterpret_cast<unsigned char*>(save->m_body);
+    ptr2 = crcData + 0x20;
     count = 0x8BB0;
     while (--count >= 0)
     {
-        crc = (crc << 8) ^ s_CrcTable[(crc >> 24) ^ *ptr];
-        ptr += 1;
+        crc = (crc << 8) ^ s_CrcTable[(crc >> 24) ^ *ptr2];
+        ptr2 += 1;
     }
 
     return ~crc;
@@ -510,35 +500,14 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
         do
         {
             u8* item = dstWork + dstChar * 8;
-            int row = 0;
-            for (int j = 0; j < 2; j++)
+            for (int j = 0; j < 8; j++)
             {
-                u8 a = 0;
-                if ((i == 0) && (row == 0))
+                u8 flag = 0;
+                if ((i == 0) && (j == 0))
                 {
-                    a = 1;
+                    flag = 1;
                 }
-                u8 b = 0;
-                item[0xC0] = (-a | a) >> 0x1F & 0x32;
-                if ((i == 0) && (row == -1))
-                {
-                    b = 1;
-                }
-                a = 0;
-                item[0xC1] = (-b | b) >> 0x1F & 0x32;
-                if ((i == 0) && (row == -2))
-                {
-                    a = 1;
-                }
-                b = 0;
-                item[0xC2] = (-a | a) >> 0x1F & 0x32;
-                if ((i == 0) && (row == -3))
-                {
-                    b = 1;
-                }
-                row += 4;
-                item[0xC3] = (-b | b) >> 0x1F & 0x32;
-                item += 4;
+                item[0xC0 + j] = (-flag | flag) >> 0x1F & 0x32;
             }
             i++;
             dstWork += 0x40;
@@ -808,7 +777,7 @@ int CMemoryCardMan::DummyLoad()
         if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
             // "McMount(%d) error(%d)"
-            System.Printf(const_cast<char*>(sMcMountErrorFmt), 0);
+            System.Printf(const_cast<char*>(sMcMountErrorFmt), 0, m_result);
         }
 
         result = CARDUnmount(0);
@@ -831,7 +800,7 @@ int CMemoryCardMan::DummyLoad()
         if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
             // "McOpen(%d) error(%d)"
-            System.Printf(const_cast<char*>(sMcOpenErrorFmt), 0);
+            System.Printf(const_cast<char*>(sMcOpenErrorFmt), 0, m_result);
         }
 
         result = CARDUnmount(0);
@@ -883,7 +852,7 @@ int CMemoryCardMan::DummyLoad()
         if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
             // "McRead(%d) error(%d)"
-            System.Printf(const_cast<char*>(sMcReadErrorFmt), 0);
+            System.Printf(const_cast<char*>(sMcReadErrorFmt), 0, m_result);
         }
 
         int chan = m_fileInfo.chan;
@@ -997,7 +966,7 @@ int CMemoryCardMan::DummySave()
             if (static_cast<unsigned int>(System.m_execParam) >= 1)
             {
                 // "%s(%d) McFormat(%d) error(%d)"
-                System.Printf(const_cast<char*>(sMcFormatErrorFmt), 0);
+                System.Printf(const_cast<char*>(sMcFormatErrorFmt), 0, m_result);
             }
 
             result = CARDUnmount(0);
@@ -1016,7 +985,7 @@ int CMemoryCardMan::DummySave()
         if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
             // "%s(%d) McMount(%d) error(%d)"
-            System.Printf(const_cast<char*>(sMcMountErrorFmt), 0);
+            System.Printf(const_cast<char*>(sMcMountErrorFmt), 0, m_result);
         }
 
         result = CARDUnmount(0);
@@ -1061,7 +1030,7 @@ int CMemoryCardMan::DummySave()
             if (static_cast<unsigned int>(System.m_execParam) >= 1)
             {
                 // "McCreate(%d) error(%d)"
-                System.Printf(const_cast<char*>(sMcCreateErrorFmt), 0);
+                System.Printf(const_cast<char*>(sMcCreateErrorFmt), 0, m_result);
             }
 
             result = CARDUnmount(0);
@@ -1083,7 +1052,7 @@ int CMemoryCardMan::DummySave()
             if (static_cast<unsigned int>(System.m_execParam) >= 1)
             {
                 // "McGetStat(%d) error(%d)"
-                System.Printf(const_cast<char*>(sMcGetStatErrorFmt), 0);
+                System.Printf(const_cast<char*>(sMcGetStatErrorFmt), 0, m_result);
             }
 
             result = CARDUnmount(0);
@@ -1135,7 +1104,7 @@ int CMemoryCardMan::DummySave()
         {
             if (static_cast<unsigned int>(System.m_execParam) >= 1)
             {
-                System.Printf(const_cast<char*>(sMcWriteErrorFmt), 0);
+                System.Printf(const_cast<char*>(sMcWriteErrorFmt), 0, m_result);
             }
 
             result = CARDUnmount(0);
@@ -1162,7 +1131,7 @@ int CMemoryCardMan::DummySave()
         {
             if (static_cast<unsigned int>(System.m_execParam) >= 1)
             {
-                System.Printf(const_cast<char*>(sMcSetStatErrorFmt), 0);
+                System.Printf(const_cast<char*>(sMcSetStatErrorFmt), 0, m_result);
             }
 
             result = CARDUnmount(0);
@@ -1223,7 +1192,7 @@ int CMemoryCardMan::DummySave()
     {
         if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
-            System.Printf(const_cast<char*>(sMcWriteErrorFmt), 0);
+            System.Printf(const_cast<char*>(sMcWriteErrorFmt), 0, m_result);
         }
 
         if (m_fileInfo.chan < 0 || m_fileInfo.chan > 1)
@@ -1528,11 +1497,14 @@ void CMemoryCardMan::MakeSaveData()
 {
     if (m_saveBuffer == (char*)nullptr)
     {
-        m_saveBuffer = new (reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB)
-            char[kMemoryCardSaveBufferSize];
-        if (m_saveBuffer == (char*)nullptr && static_cast<unsigned int>(System.m_execParam) >= 1)
+        if (m_saveBuffer == (char*)nullptr)
         {
-            System.Printf(const_cast<char*>(sMemoryAllocationError), const_cast<char*>(sMemoryCardSourceFile), 0x2AD);
+            m_saveBuffer = new (reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB)
+                char[kMemoryCardSaveBufferSize];
+            if (m_saveBuffer == (char*)nullptr && static_cast<unsigned int>(System.m_execParam) >= 1)
+            {
+                System.Printf(const_cast<char*>(sMemoryAllocationError), const_cast<char*>(sMemoryCardSourceFile), 0x2AD);
+            }
         }
         memset(m_saveBuffer, 0, kMemoryCardSaveBufferSize);
     }
@@ -1613,7 +1585,7 @@ void CMemoryCardMan::MakeSaveData()
                 caravanWork->unk_0xc1e = 1;
             }
         }
-        else
+        if (caravanWork->m_shopState == 0)
         {
             caravanWork->m_shopRandSeed = 0;
             caravanWork->unk_0xc1e = 0;

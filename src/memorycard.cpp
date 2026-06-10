@@ -1533,11 +1533,14 @@ void CMemoryCardMan::MakeSaveData()
 {
     if (m_saveBuffer == (char*)nullptr)
     {
-        m_saveBuffer = new (reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB)
-            char[kMemoryCardSaveBufferSize];
-        if (m_saveBuffer == (char*)nullptr && static_cast<unsigned int>(System.m_execParam) >= 1)
+        if (m_saveBuffer == (char*)nullptr)
         {
-            System.Printf(const_cast<char*>(sMemoryAllocationError), const_cast<char*>(sMemoryCardSourceFile), 0x2AD);
+            m_saveBuffer = new (reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB)
+                char[kMemoryCardSaveBufferSize];
+            if (m_saveBuffer == (char*)nullptr && static_cast<unsigned int>(System.m_execParam) >= 1)
+            {
+                System.Printf(const_cast<char*>(sMemoryAllocationError), const_cast<char*>(sMemoryCardSourceFile), 0x2AD);
+            }
         }
         memset(m_saveBuffer, 0, kMemoryCardSaveBufferSize);
     }

@@ -1771,7 +1771,7 @@ void CGObject::update()
             if (activeAnimIndex >= 0 && m_charaModelHandle->m_animSlot[activeAnimIndex] != 0) {
                 unsigned char* animRefBytes =
                     reinterpret_cast<unsigned char*>(m_charaModelHandle->m_animSlot[activeAnimIndex]);
-                const unsigned short pointCount = *reinterpret_cast<short*>(animRefBytes + 0x2C);
+                const unsigned short pointCount = *reinterpret_cast<unsigned short*>(animRefBytes + 0x2C);
                 if (pointCount > 0) {
                     const float animSpan =
                         sAnimFrameOffset + (ModelAnimEnd(m_charaModelHandle->m_model) - ModelAnimStart(m_charaModelHandle->m_model));
@@ -1782,7 +1782,7 @@ void CGObject::update()
                         nextWrapped = (animSpan - sAnimFrameOffset) - nextWrapped;
                     }
 
-                    for (int i = 0; i < pointCount; i++) {
+                    for (int i = 0; i < *reinterpret_cast<unsigned short*>(animRefBytes + 0x2C); i++) {
                         const unsigned short pointFrame = *reinterpret_cast<unsigned short*>(animRefBytes + 0x30 + i * 4);
                         const float eventFrame = static_cast<float>(pointFrame) + ModelAnimStart(m_charaModelHandle->m_model);
                         if (prevWrapped < eventFrame && (eventFrame <= nextWrapped || nextWrapped < prevWrapped)) {

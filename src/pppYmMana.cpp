@@ -1054,12 +1054,13 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
         C_MTXPerspective(projectionMtx, LoadFloat(kYmManaCaptureFovY), LoadFloat(kYmManaOne), LoadFloat(kYmManaOne),
                          LoadFloat(kYmManaCaptureFarClip));
         GXSetProjection(projectionMtx, (_GXProjectionType)0);
-        char* compareName = Game.m_currentScriptName;
         GXTexObj* sourceIter = sourceTexObjs;
+        char* compareName = Game.m_currentScriptName;
         GXTexObj* captureIter = captureTexObjs;
+        i = 0;
         u32 scissorZero = (u32)LoadFloat(kPppYmMoveParabolaZero);
 
-        for (i = 0; i < 6; i++) {
+        for (; i < 6; i++) {
             cameraPos = centerPos;
             cameraUp.x = LoadFloat(kPppYmMoveParabolaZero);
             cameraUp.y = LoadFloat(kYmManaOne);

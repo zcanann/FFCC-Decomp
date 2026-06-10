@@ -62,7 +62,7 @@ static inline float LoadFloat(const float& value)
  * JP Size: TODO
  */
 #pragma push
-#pragma opt_dead_assignments off
+#pragma global_optimizer off
 void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirthShpTail3RenderStep* stepData, pppYmMegaBirthShpTail3Offsets* offsets)
 {
     u8* step = (u8*)stepData;

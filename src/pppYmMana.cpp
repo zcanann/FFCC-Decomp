@@ -1240,10 +1240,10 @@ static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, u
     int quadIndex;
     int rowBase;
     float* positions;
-    int rowCount;
     float* normals;
     float* uvs;
     int colCount;
+    int rowCount;
     int pairCount;
 
     normalY = LoadFloat(kYmManaOne);

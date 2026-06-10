@@ -342,8 +342,8 @@ void operator delete[](void* ptr)
  */
 unsigned int CheckSum(void* data, int size)
 {
-    unsigned int checksum = 0x12345678;
     unsigned char* bytes = reinterpret_cast<unsigned char*>(data);
+    unsigned int checksum = 0x12345678;
     int i;
 
     for (i = size; i != 0; i--) {

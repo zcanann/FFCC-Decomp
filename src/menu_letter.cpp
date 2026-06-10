@@ -1057,7 +1057,7 @@ int CMenuPcs::LetterCtrl()
 					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x30) = 1;
 					float resetAlpha = FLOAT_803330f8;
 					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = 2;
-					*reinterpret_cast<unsigned char*>(GetLetterStateBase(this) + 8) = 0xFF;
+					*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 8) = -1;
 					int n = 0;
 					s16* p = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n++]);
 					*reinterpret_cast<int*>(p + 0x12) = 0;
@@ -2052,7 +2052,7 @@ int CMenuPcs::LetterCtrlCur()
 {
 	bool blocked = false;
 	int press;
-	int hold;
+	unsigned int hold;
 	int pressRaw;
 	int holdRaw;
 	int padState = Pad.m_debugPadLock;

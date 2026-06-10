@@ -211,6 +211,22 @@ static const float sDefaultAttackColRadius = 7.0f;    // FLOAT_80330434
 static const float sDefaultBodyColRadius = 6.0f;      // FLOAT_80330438
 static const float sDefaultFrontHitAngle = 0.78539819f; // FLOAT_8033043c
 static const float sDefaultBgDownDist = 0.033333335f; // FLOAT_80330440
+extern "C" const float sRadiusWobbleScale;         // FLOAT_80330398 (0.8)
+extern "C" const float sWobbleBiasLarge;           // FLOAT_8033039c (0.3)
+extern "C" const float sWobbleBiasSmall;           // FLOAT_803303a0 (0.05)
+extern "C" const float sRadiusWobbleDecay;         // FLOAT_803303a4 (0.95)
+extern "C" const float sPiFloat;                   // FLOAT_803303a8
+extern "C" const float sRadiusCtrlStep;            // FLOAT_803303ac (0.1)
+extern "C" const float sTiltDivisor;               // FLOAT_803303c8 (3.0)
+extern "C" const float sSwayImpulse;               // FLOAT_803303cc (0.2)
+extern "C" const float sSwayDotLimit;              // FLOAT_803303d0 (0.9999)
+extern "C" const float sSwayDamping;               // FLOAT_803303d8 (0.9)
+extern "C" const float sNegWobbleBiasSmall;        // FLOAT_803303dc (-0.05)
+extern "C" const double sYawLookCutoff;            // DOUBLE_803303e0 (pi/2)
+extern "C" const double sPitchLookCutoff;          // DOUBLE_803303e8 (pi/4)
+extern "C" const float sLookBlendScale;            // FLOAT_803303f0 (0.001)
+extern "C" const float sFarVisibleDepth;           // FLOAT_803303f4 (10000)
+extern "C" const float sNearVisibleDepth;          // FLOAT_803303f8 (750)
 
 /*
  * --INFO--
@@ -345,20 +361,18 @@ void CGObject::onCreate()
     m_radiusCtrlVel.y = m_radiusCtrl.y;
     m_radiusCtrlVel.z = m_radiusCtrl.z;
     m_groundFriction = m_radiusCtrlVel.x;
-    m_moveMode = 0;
-    m_moveModePrevious = 4;
 
     m_hitNormal.x = sBgAttrFast;
-    m_hitNormal.y = 0.0f;
-    m_hitNormal.z = 0.0f;
     m_bgDownDist = sDefaultBgDownDist;
+    m_moveMode = 0;
+    m_moveModePrevious = 4;
     m_groundSlide = 0.0f;
+    m_hitNormal.z = 0.0f;
+    m_hitNormal.y = 0.0f;
     m_worldParam = 0.0f;
-    m_worldParamA = 0;
-    m_field_0x56 = 0x7D;
-    *reinterpret_cast<float*>(m_worldMode) = 0.0f;
 
     m_lookAtTargetNodeIndex = -1;
+    m_worldParamA = 0;
     m_lookAtAccumYaw = 0.0f;
     m_lookAtAccumPitch = 0.0f;
     m_weaponAttachNode = -1;
@@ -369,46 +383,24 @@ void CGObject::onCreate()
     m_extraMoveVec.y = 0.0f;
     m_extraMoveVec.x = 0.0f;
     m_shieldNodeFlagBits.m_bit01 = 0;
+    m_field_0x56 = 0x7D;
+    *reinterpret_cast<float*>(m_worldMode) = 0.0f;
 
     int animStateOffset = 0;
+    s8* animState;
     for (int i = 0; i < 2; i++) {
-        s8* animState = reinterpret_cast<s8*>(m_animQueue) + animStateOffset - 0x41;
-        animState[0] = -1;
-        animState[1] = -1;
-        animState[2] = -1;
-        animState[3] = -1;
-        animState[4] = 0xFF;
-        animState[5] = -1;
-        animState[6] = -1;
-        animState[7] = 0xFF;
-        animState = reinterpret_cast<s8*>(m_animQueue) + animStateOffset - 0x39;
-        animState[0] = -1;
-        animState[1] = -1;
-        animState[2] = -1;
-        animState[3] = -1;
-        animState[4] = 0xFF;
-        animState[5] = -1;
-        animState[6] = -1;
-        animState[7] = 0xFF;
-        animState = reinterpret_cast<s8*>(m_animQueue) + animStateOffset - 0x31;
-        animState[0] = -1;
-        animState[1] = -1;
-        animState[2] = -1;
-        animState[3] = -1;
-        animState[4] = 0xFF;
-        animState[5] = -1;
-        animState[6] = -1;
-        animState[7] = 0xFF;
-        animState = reinterpret_cast<s8*>(m_animQueue) + animStateOffset - 0x29;
-        animStateOffset += 0x20;
-        animState[0] = -1;
-        animState[1] = -1;
-        animState[2] = -1;
-        animState[3] = -1;
-        animState[4] = 0xFF;
-        animState[5] = -1;
-        animState[6] = -1;
-        animState[7] = 0xFF;
+        for (int j = 0; j < 4; j++) {
+            animState = reinterpret_cast<s8*>(m_animQueue) + animStateOffset - 0x41;
+            animStateOffset += 8;
+            animState[0] = -1;
+            animState[1] = -1;
+            animState[2] = -1;
+            animState[3] = -1;
+            animState[4] = 0xFF;
+            animState[5] = -1;
+            animState[6] = -1;
+            animState[7] = 0xFF;
+        }
     }
 
     memset(&m_attackColliders[0].m_localStart.y, 0, 0x180);
@@ -941,13 +933,15 @@ void CGObject::bgNormalCollision()
 
     unsigned int retry = 4;
     const double epsilon = DOUBLE_80330400;
-    while (retry != 0) {
+    do {
+        const unsigned long hitMask = m_bgHitMask;
+        const float radius = m_capsuleHalfHeight;
         CMapCylinder bodyCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
         bodyCylinder.m_bottom = pos;
         bodyCylinder.m_axis = move;
-        bodyCylinder.m_radius = m_capsuleHalfHeight;
+        bodyCylinder.m_radius = radius;
 
-        if (MapMng.CheckHitCylinderNear(&bodyCylinder, &move, m_bgHitMask) == 0) {
+        if (MapMng.CheckHitCylinderNear(&bodyCylinder, &move, hitMask) == 0) {
             break;
         }
 
@@ -965,7 +959,7 @@ void CGObject::bgNormalCollision()
         }
 
         --retry;
-    }
+    } while (retry != 0);
 
     if (retry == 0) {
         m_groundHitOffset.z = sZeroFloat;
@@ -975,19 +969,23 @@ void CGObject::bgNormalCollision()
     }
 
     PSVECAdd(&pos, &move, &pos);
-    move.x = sZeroFloat;
     move.y = m_groundHitOffset.y - sStepProbeHeight;
+    move.x = sZeroFloat;
     move.z = sZeroFloat;
 
-    CMapCylinder stepCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
-    stepCylinder.m_bottom = pos;
-    stepCylinder.m_axis.x = sZeroFloat;
-    stepCylinder.m_axis.z = sZeroFloat;
-    stepCylinder.m_axis.y = move.y;
-    stepCylinder.m_radius = m_capsuleHalfHeight;
+    {
+        const unsigned long stepHitMask = m_bgHitMask;
+        const float stepRadius = m_capsuleHalfHeight;
+        CMapCylinder stepCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
+        stepCylinder.m_bottom = pos;
+        stepCylinder.m_axis.x = sZeroFloat;
+        stepCylinder.m_axis.y = move.y;
+        stepCylinder.m_axis.z = sZeroFloat;
+        stepCylinder.m_radius = stepRadius;
 
-    if (MapMng.CheckHitCylinderNear(&stepCylinder, &move, m_bgHitMask) == 0) {
-        goto stepMiss;
+        if (MapMng.CheckHitCylinderNear(&stepCylinder, &move, stepHitMask) == 0) {
+            goto stepMiss;
+        }
     }
 
     if ((MapMng.GetMapIdGrpArray()[gMapHitFace->m_groupIndex].m_mask & 0x20) == 0) {
@@ -1002,12 +1000,14 @@ void CGObject::bgNormalCollision()
     }
 
     if (MapMng.m_hitMapObj->CalcHitSlide(&move, sBgAttrNormal) != 0) {
+        const unsigned long slideHitMask = m_bgHitMask;
+        const float slideRadius = m_capsuleHalfHeight;
         CMapCylinder hitCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
         hitCylinder.m_bottom = pos;
         hitCylinder.m_axis = move;
-        hitCylinder.m_radius = m_capsuleHalfHeight;
+        hitCylinder.m_radius = slideRadius;
 
-        if (MapMng.CheckHitCylinderNear(&hitCylinder, &move, m_bgHitMask) != 0) {
+        if (MapMng.CheckHitCylinderNear(&hitCylinder, &move, slideHitMask) != 0) {
             Vec hitPos;
             MapMng.m_hitMapObj->CalcHitPosition(&hitPos);
             PSVECSubtract(&hitPos, &pos, &move);
@@ -1022,14 +1022,14 @@ void CGObject::bgNormalCollision()
     }
 
     float oldY = (m_groundHitOffset.y < sMinGroundClamp) ? sMinGroundClamp : m_groundHitOffset.y;
+    float delta = oldY - move.y;
     float clampedY = (m_groundHitOffset.y < sMinGroundClamp) ? sMinGroundClamp : m_groundHitOffset.y;
 
-    float delta = oldY - move.y;
     m_worldPosition.y = pos.y;
-    m_gravityY = m_jumpLandingDampening * -((clampedY - delta) + delta);
     m_groundHitOffset.y = sZeroFloat;
     m_groundHitOffset.x = pos.x - m_worldPosition.x;
     m_groundHitOffset.z = pos.z - m_worldPosition.z;
+    m_gravityY = m_jumpLandingDampening * -((clampedY - delta) + delta);
 
     if (((m_displayFlags & 1) != 0) && (m_weaponNodeFlagBits.m_attached == 0)) {
         Sound.PlaySe3D(
@@ -1369,8 +1369,8 @@ void CGObject::update()
             m_currentAnimSlot != -1) {
             float frame = sZeroFloat;
             if (m_lastBgAttr < sZeroFloat) {
-                const float animStart = ModelAnimStart(m_charaModelHandle->m_model);
-                frame = ModelAnimEnd(m_charaModelHandle->m_model) - animStart;
+                frame = ModelAnimStart(m_charaModelHandle->m_model);
+                frame = ModelAnimEnd(m_charaModelHandle->m_model) - frame;
             }
             m_turnSpeed = frame;
             m_charaModelHandle->m_model->SetFrame(m_turnSpeed);
@@ -1385,9 +1385,11 @@ void CGObject::update()
     float turnFactor;
     if (m_animSlotSel != -1 && m_shieldNodeFlagBits.m_bit40) {
         const double turnLimit = fabs(m_turnBaseSpeed);
-        double clampedTurn = (turnDelta < -turnLimit)
-                                 ? -turnLimit
-                                 : (turnLimit < turnDelta ? turnLimit : turnDelta);
+        double clampedTurn = -turnLimit;
+        if (turnDelta < clampedTurn) {
+        } else {
+            clampedTurn = turnLimit < turnDelta ? turnLimit : turnDelta;
+        }
         turnDelta = clampedTurn;
         turnFactor = sAnimFrameOffset;
     } else {
@@ -1399,12 +1401,12 @@ void CGObject::update()
     Mtx ecScratch;
     if (Game.m_currentMapId == 0x21) {
         Mtx tempMtx;
-        Vec worldNorm;
 
         PSMTXRotRad(modelMtx, 'y', atan2f(m_worldPosition.x, m_worldPosition.z));
         Vec mapUp = DAT_801D9B88;
+        Vec worldNorm;
         PSVECNormalize(&m_worldPosition, &worldNorm);
-        PSMTXRotRad(tempMtx, 'x', acosf(PSVECDotProduct(&worldNorm, &mapUp)));
+        PSMTXRotRad(tempMtx, 'x', acosf(PSVECDotProduct(&mapUp, &worldNorm)));
         PSMTXConcat(modelMtx, tempMtx, modelMtx);
 
         PSMTXRotRad(tempMtx, 'y', m_rotBaseY);
@@ -1415,15 +1417,10 @@ void CGObject::update()
         modelMtx[2][3] = m_worldPosition.z;
     } else {
         GObjectSRT srt;
-        srt.m_scale.x = sAnimFrameOffset;
-        srt.m_scale.y = sAnimFrameOffset;
-        srt.m_scale.z = sAnimFrameOffset;
-        srt.m_trans.x = sZeroFloat;
-        srt.m_trans.y = sZeroFloat;
-        srt.m_trans.z = sZeroFloat;
-        srt.m_rot.x = sZeroFloat;
-        srt.m_rot.y = sZeroFloat;
-        srt.m_rot.z = sZeroFloat;
+        const float scaleInit = sAnimFrameOffset;
+        srt.m_trans.x = srt.m_trans.y = srt.m_trans.z = sZeroFloat;
+        srt.m_rot.x = srt.m_rot.y = srt.m_rot.z = sZeroFloat;
+        srt.m_scale.x = srt.m_scale.y = srt.m_scale.z = scaleInit;
         srt.m_trans = m_worldPosition;
         PSVECAdd(&srt.m_trans, &m_extraMoveVec, &srt.m_trans);
 
@@ -1436,16 +1433,16 @@ void CGObject::update()
 
         if (m_worldParamA == 0x20 || m_worldParamA == 0x13 || m_worldParamA == 0x15 ||
             m_worldParamA == 0x16 || m_worldParamA == 0x17 || m_worldParamA == 0x14) {
-            const float wobbleBias = m_worldParamA == 0x20 ? 0.3f : 0.05f;
-            m_radiusCtrl.z += 0.8f * m_radiusCtrl.y + wobbleBias;
-            m_radiusCtrl.y *= 0.95f;
+            const float wobbleBias = m_worldParamA == 0x20 ? sWobbleBiasLarge : sWobbleBiasSmall;
+            m_radiusCtrl.z += sRadiusWobbleScale * m_radiusCtrl.y + wobbleBias;
+            m_radiusCtrl.y *= sRadiusWobbleDecay;
             srt.m_rot.y += m_radiusCtrl.z;
         } else if (m_worldParamA == 0x24 || m_worldParamB == 0x125) {
             const float cameraYaw = CameraPcs.m_yaw;
-            srt.m_rot.y = 3.1415927f - cameraYaw;
+            srt.m_rot.y = sPiFloat - cameraYaw;
             srt.m_rot.y += sBgAttrNormal * cosf(sBgAttrNormal * m_radiusCtrl.y);
             srt.m_trans.y += sAnimFrameOffset + sinf(m_radiusCtrl.y);
-            m_radiusCtrl.y += 0.1f;
+            m_radiusCtrl.y += sRadiusCtrlStep;
         }
 
         Math.SRTToMatrix(modelMtx, reinterpret_cast<SRT*>(&srt));
@@ -1458,9 +1455,8 @@ void CGObject::update()
                 const float slideMagSq =
                     m_groundHitOffset.x * m_groundHitOffset.x + m_groundHitOffset.z * m_groundHitOffset.z;
                 const float slideMag = sqrtf(slideMagSq);
-                CVector worldUp(sZeroFloat, sAnimFrameOffset, sZeroFloat);
-                PSVECCrossProduct(&m_groundHitOffset, worldUp, &axis);
-                PSMTXRotAxisRad(rotScratch, &axis, -slideMag / 3.0f);
+                PSVECCrossProduct(&m_groundHitOffset, CVector(sZeroFloat, sAnimFrameOffset, sZeroFloat), &axis);
+                PSMTXRotAxisRad(rotScratch, &axis, -slideMag / sTiltDivisor);
                 PSMTXQuat(tiltMtx, &m_bgCollisionQtrn);
                 PSMTXConcat(rotScratch, tiltMtx, tiltMtx);
                 C_QUATMtx(&m_bgCollisionQtrn, tiltMtx);
@@ -1471,65 +1467,58 @@ void CGObject::update()
             const float tx = modelMtx[0][3];
             const float ty = modelMtx[1][3];
             const float tz = modelMtx[2][3];
-            CVector tiltZero0(sZeroFloat, sZeroFloat, sZeroFloat);
-            modelMtx[0][3] = tiltZero0.x;
-            CVector tiltZero1(sZeroFloat, sZeroFloat, sZeroFloat);
-            modelMtx[1][3] = tiltZero1.y;
-            CVector tiltZero2(sZeroFloat, sZeroFloat, sZeroFloat);
-            modelMtx[2][3] = tiltZero2.z;
+            modelMtx[0][3] = CVector(sZeroFloat, sZeroFloat, sZeroFloat).x;
+            modelMtx[1][3] = CVector(sZeroFloat, sZeroFloat, sZeroFloat).y;
+            modelMtx[2][3] = CVector(sZeroFloat, sZeroFloat, sZeroFloat).z;
             PSMTXConcat(tiltMtx, modelMtx, modelMtx);
             modelMtx[0][3] = tx;
             modelMtx[1][3] = ty;
             modelMtx[2][3] = tz;
         } else if ((m_objectFlags & 0x90) != 0 && m_stateFlags0Bits.unk0) {
             if (m_groundHitOffset.x != sZeroFloat || m_groundHitOffset.z != sZeroFloat) {
-                m_radiusCtrl.y += 0.2f * m_groundHitOffset.x;
-                m_radiusCtrlVel.x += 0.2f * m_groundHitOffset.z;
+                m_radiusCtrl.y += sSwayImpulse * m_groundHitOffset.x;
+                m_radiusCtrlVel.x += sSwayImpulse * m_groundHitOffset.z;
             }
 
             const float swayDx = m_radiusCtrlVel.x - m_groundFriction;
             const float swayDz = m_radiusCtrl.y - m_radiusCtrlVel.y;
+            const float swayMag = sqrtf(swayDx * swayDx + swayDz * swayDz);
             m_radiusCtrlVel.y += sBgAttrNormal * swayDz;
             m_groundFriction += sBgAttrNormal * swayDx;
 
             Vec swayDir;
             PSVECNormalize(reinterpret_cast<Vec*>(&m_radiusCtrlVel.y), &swayDir);
-            CVector swayUp(sZeroFloat, sAnimFrameOffset, sZeroFloat);
-            const float swayDot = PSVECDotProduct(&swayDir, swayUp);
-            if (swayDot < 0.9999f) {
-                const float swayAngle = acosf(swayDot);
-                CVector swayAxisUp(sZeroFloat, sAnimFrameOffset, sZeroFloat);
+            const float swayDot = PSVECDotProduct(&swayDir, CVector(sZeroFloat, sAnimFrameOffset, sZeroFloat));
+            if (swayDot < sSwayDotLimit) {
+                const float negSwayAngle = -acosf(swayDot);
                 Vec swayAxis;
-                PSVECCrossProduct(&swayDir, swayAxisUp, &swayAxis);
-                PSMTXRotAxisRad(rotScratch, &swayAxis, -swayAngle);
+                PSVECCrossProduct(&swayDir, CVector(sZeroFloat, sAnimFrameOffset, sZeroFloat), &swayAxis);
+                PSMTXRotAxisRad(rotScratch, &swayAxis, negSwayAngle);
 
                 const float mtx0 = modelMtx[0][3];
                 const float mtx1 = modelMtx[1][3];
                 const float mtx2 = modelMtx[2][3];
-                CVector swayZero0(sZeroFloat, sZeroFloat, sZeroFloat);
-                modelMtx[0][3] = swayZero0.x;
-                CVector swayZero1(sZeroFloat, sZeroFloat, sZeroFloat);
-                modelMtx[1][3] = swayZero1.y;
-                CVector swayZero2(sZeroFloat, sZeroFloat, sZeroFloat);
-                modelMtx[2][3] = swayZero2.z;
+                modelMtx[0][3] = CVector(sZeroFloat, sZeroFloat, sZeroFloat).x;
+                modelMtx[1][3] = CVector(sZeroFloat, sZeroFloat, sZeroFloat).y;
+                modelMtx[2][3] = CVector(sZeroFloat, sZeroFloat, sZeroFloat).z;
                 PSMTXConcat(rotScratch, modelMtx, modelMtx);
-                const float swayTan = tan(-swayAngle);
-                const float swayTanScaled = 2.0f * swayTan;
+                const float swayTan = tan(negSwayAngle);
+                const float swayTanScaled = sDefaultMoveBaseSpeed * swayTan;
                 modelMtx[0][3] = mtx0;
                 modelMtx[2][3] = mtx2;
                 modelMtx[1][3] = mtx1 - swayTanScaled;
             }
 
+            const float swayRy = m_radiusCtrl.y;
+            const float swayRx = m_radiusCtrlVel.x;
             float swayClamp = swayDot < sAnimFrameOffset ? swayDot : sAnimFrameOffset;
             swayClamp = swayClamp < sZeroFloat ? sZeroFloat : swayClamp;
             const float swaySin = sinf(swayClamp);
             const float swayCos = cosf(swayClamp);
-            const float swayRy = m_radiusCtrl.y;
-            const float swayRx = m_radiusCtrlVel.x;
             m_radiusCtrl.y = swayCos * swayRy - swaySin * swayRx;
             m_radiusCtrlVel.x = swaySin * swayRy + swayCos * swayRx;
-            m_radiusCtrl.y *= 0.9f;
-            m_radiusCtrlVel.x *= 0.9f;
+            m_radiusCtrl.y *= sSwayDamping;
+            m_radiusCtrlVel.x *= sSwayDamping;
         }
     }
 
@@ -1559,8 +1548,8 @@ void CGObject::update()
             m_worldPosition = attachPos;
         } else {
             float interp = static_cast<float>(m_moveMode) / static_cast<float>(m_moveModePrevious);
-            Vec fromOwner;
             Vec fromSelf;
+            Vec fromOwner;
             PSVECScale(&attachPos, &fromOwner, sAnimFrameOffset - interp);
             PSVECScale(&m_worldPosition, &fromSelf, interp);
             PSVECAdd(&fromOwner, &fromSelf, &m_worldPosition);
@@ -1573,7 +1562,7 @@ void CGObject::update()
     }
 
     if (HasLoadedModel(m_charaModelHandle)) {
-        m_animBlend += ClampFloat(m_bgAttrValue - m_animBlend, -0.25f, 0.25f);
+        m_animBlend += ClampFloat(m_bgAttrValue - m_animBlend, sNegWobbleBiasSmall, sWobbleBiasSmall);
 
         float lookYaw = m_lookAtAccumYaw;
         float lookPitch = m_lookAtAccumPitch;
@@ -1590,28 +1579,30 @@ void CGObject::update()
             lookDelta.y += unk_0x184 - targetNodeY;
 
             const float lookDistance = PSVECMag(&lookDelta);
-            if (lookDistance > sZeroFloat) {
+            if (sZeroFloat != lookDistance) {
                 const float targetYaw = atan2f(-lookDelta.x, -lookDelta.z);
                 const float yawDelta = Math.DstRot(targetYaw, m_rotBaseY);
-                if (fabs(yawDelta) < 0.75f) {
-                    const float pitchDelta = atan2f(lookDelta.y, lookDistance);
-                    if (fabs(pitchDelta) < 0.5f) {
+                if (fabs(yawDelta) < sYawLookCutoff) {
+                    const double pitchDelta = atan2(lookDelta.y, lookDistance);
+                    if (fabs((float)pitchDelta) < sPitchLookCutoff) {
                         lookYaw += yawDelta;
-                        lookPitch += pitchDelta;
+                        lookPitch += (float)pitchDelta;
                     }
                 }
             }
         }
 
+        const float twistRate = sBgAttrFast;
         const unsigned char lookBlendByte = *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x56);
-        float lookBlend = 0.015625f * static_cast<float>(lookBlendByte);
         CChara::CModel* chestModel = m_charaModelHandle->m_model;
+        float lookBlend = sLookBlendScale * static_cast<float>(lookBlendByte);
         const float chestAmp = ModelChestAmp(chestModel);
         const float chestTilt = ModelChestTilt(chestModel);
         ModelChestAmp(chestModel) = lookBlend * (lookYaw - chestAmp) + chestAmp;
         ModelChestTilt(chestModel) = lookBlend * (lookPitch - chestTilt) + chestTilt;
-        ModelTwistAngle(m_charaModelHandle->m_model) +=
-            sBgAttrFast * (*reinterpret_cast<float*>(m_worldMode) - ModelTwistAngle(m_charaModelHandle->m_model));
+        CChara::CModel* twistModel = m_charaModelHandle->m_model;
+        const float twistAngle = ModelTwistAngle(twistModel);
+        ModelTwistAngle(twistModel) = twistRate * (*reinterpret_cast<float*>(m_worldMode) - twistAngle) + twistAngle;
 
         m_charaModelHandle->m_model->SetMatrix(modelMtx);
 
@@ -1629,33 +1620,36 @@ void CGObject::update()
 
         float visibleScale = sAnimFrameOffset;
         if (Game.m_currentMapId == 0x21) {
-            visibleScale = m_screenDepth > 60.0f ? sZeroFloat : sAnimFrameOffset;
+            visibleScale = m_screenDepth > sFarVisibleDepth ? sZeroFloat : sAnimFrameOffset;
         } else {
-            visibleScale = m_screenDepth > 30.0f ? sZeroFloat : sAnimFrameOffset;
+            visibleScale = m_screenDepth > sNearVisibleDepth ? sZeroFloat : sAnimFrameOffset;
         }
 
-        const float alphaTarget = m_stepSlopeLimit * onAlphaUpdate() * visibleScale;
-        const float alphaStep = ClampFloat(alphaTarget - m_lookAtTimer, -m_bgDownDist, m_bgDownDist);
-        m_lookAtTimer = ClampFloat(m_lookAtTimer + alphaStep, sZeroFloat, sAnimFrameOffset);
-        m_worldParam = m_worldParam > 0.25f ? m_worldParam - 0.25f : sZeroFloat;
+        const float alphaTarget = m_stepSlopeLimit * onAlphaUpdate();
+        const float alphaStep = ClampFloat(alphaTarget * visibleScale - m_lookAtTimer, -m_bgDownDist, m_bgDownDist);
+        m_lookAtTimer = m_lookAtTimer + alphaStep;
+        m_lookAtTimer = ClampFloat(m_lookAtTimer, sZeroFloat, sAnimFrameOffset);
+        const float worldParamStep = m_worldParam - sWobbleBiasSmall;
+        m_worldParam = worldParamStep < sZeroFloat ? sZeroFloat : worldParamStep;
         if ((m_displayFlags & 0x1000) != 0) {
             m_lookAtTimer = alphaTarget;
         }
 
-        if (m_lookAtTimer == sZeroFloat) {
+        if (sZeroFloat == m_lookAtTimer) {
             m_weaponNodeFlagBits.m_unk20 = 0;
         }
         m_weaponNodeFlagBits.m_unk40 =
-            (static_cast<s32>(static_cast<s32>(weaponFlagsLo) << 25 | static_cast<u32>(weaponFlagsLo) >> 7) |
-             static_cast<s32>(static_cast<u32>(weaponFlagsLo) << 26 | static_cast<u32>(weaponFlagsLo) >> 6)) < 0;
+            (static_cast<s32>(static_cast<u32>(weaponFlagsLo) << 25 | static_cast<u32>(weaponFlagsLo) >> 7) >> 31 |
+             static_cast<s32>(static_cast<u32>(weaponFlagsLo) << 26 | static_cast<u32>(weaponFlagsLo) >> 6) >> 31);
 
         if ((m_displayFlags & 1) != 0) {
-            if ((static_cast<s32>(static_cast<u32>(weaponFlagsLo) << 26 | static_cast<u32>(weaponFlagsLo) >> 6) < 0 &&
+            if ((static_cast<signed char>(
+                     static_cast<s32>(static_cast<u32>(weaponFlagsLo) << 26 | static_cast<u32>(weaponFlagsLo) >> 6) >> 31) &&
                  miniGameModelPass == 0) ||
                 m_currentAnimSlot != -1 || m_animSlotSel != static_cast<signed char>(shieldFlagsHi)) {
                 m_charaModelHandle->m_model->CalcMatrix();
             }
-            if (m_weaponNodeFlagBits.m_unk04 &&
+            if (static_cast<s32>(static_cast<u32>(weaponFlagsLo) << 26 | static_cast<u32>(weaponFlagsLo) >> 6) < 0 &&
                 miniGameModelPass == 0) {
                 m_charaModelHandle->m_model->CalcSkin();
             }
@@ -1982,16 +1976,17 @@ void CGObject::onDraw()
     Mtx& posMtx = CameraPcs.CurrentCameraState().m_cameraMatrix;
 
     if (((CFlat.m_debugFlags & 0x1) != 0) && ((m_bgColMask & 0x1) != 0)) {
-        CColor color(0xFF, 0x00, 0x00, 0xFF);
-        CVector pos(m_worldPosition.x, m_worldPosition.y + m_capsuleHalfHeight, m_worldPosition.z);
-        Graphic.DrawSphere(posMtx, pos, m_capsuleHalfHeight, &color.color);
+        _GXColor* colorPtr = &CColor(0xFF, 0x00, 0x00, 0xFF).color;
+        Graphic.DrawSphere(posMtx,
+                           CVector(m_worldPosition.x, m_worldPosition.y + m_capsuleHalfHeight, m_worldPosition.z),
+                           m_capsuleHalfHeight, colorPtr);
     }
 
     if (((CFlat.m_debugFlags & 0x2) != 0) && ((m_bgColMask & 0x2) != 0)) {
         CVector capsuleOffset;
         if (sZeroFloat != m_bodyEllipsoidOffset) {
-            capsuleOffset.y = sZeroFloat;
             capsuleOffset.x = m_bodyEllipsoidOffset * -sinf(m_rotBaseY);
+            capsuleOffset.y = sZeroFloat;
             capsuleOffset.z = m_bodyEllipsoidOffset * -cosf(m_rotBaseY);
         } else {
             capsuleOffset.z = sZeroFloat;
@@ -2006,46 +2001,49 @@ void CGObject::onDraw()
         PSMTXRotRad(rotMtx, 'y', m_rotBaseY);
         PSMTXConcat(rotMtx, scaleMtx, scaleMtx);
 
-        CVector spherePos(m_worldPosition.x, m_worldPosition.y + m_bodyEllipsoidRadius, m_worldPosition.z);
-        PSVECAdd(spherePos, capsuleOffset, spherePos);
+        PSVECAdd(CVector(m_worldPosition.x, m_worldPosition.y + m_bodyEllipsoidRadius, m_worldPosition.z),
+                 capsuleOffset, capsuleOffset);
 
-        scaleMtx[0][3] = spherePos.x;
-        scaleMtx[1][3] = spherePos.y;
-        scaleMtx[2][3] = spherePos.z;
+        scaleMtx[0][3] = capsuleOffset.x;
+        scaleMtx[1][3] = capsuleOffset.y;
+        scaleMtx[2][3] = capsuleOffset.z;
         PSMTXConcat(posMtx, scaleMtx, scaleMtx);
         GXLoadPosMtxImm(scaleMtx, GX_PNMTX0);
 
-        CColor color(0x00, 0xFF, 0x00, 0xFF);
-        GXSetChanMatColor(GX_COLOR0A0, color.color);
+        GXSetChanMatColor(GX_COLOR0A0, CColor(0x00, 0xFF, 0x00, 0xFF).color);
         Graphic.DrawSphere();
     }
 
     if (((CFlat.m_debugFlags & 0x4) != 0) && ((m_bgColMask & 0x4) != 0)) {
-        CColor color(0x00, 0x00, 0xFF, 0xFF);
-        CVector pos(m_worldPosition.x, m_worldPosition.y + m_bodyColRadius, m_worldPosition.z);
-        Graphic.DrawSphere(posMtx, pos, m_bodyColRadius, &color.color);
+        _GXColor* colorPtr = &CColor(0x00, 0x00, 0xFF, 0xFF).color;
+        Graphic.DrawSphere(posMtx,
+                           CVector(m_worldPosition.x, m_worldPosition.y + m_bodyColRadius, m_worldPosition.z),
+                           m_bodyColRadius, colorPtr);
     }
 
     if (((CFlat.m_debugFlags & 0x8) != 0) && ((m_bgColMask & 0x8) != 0)) {
-        CColor color(0xFF, 0xFF, 0x00, 0xFF);
-        CVector pos(m_worldPosition.x, m_worldPosition.y + m_attackColRadius, m_worldPosition.z);
-        Graphic.DrawSphere(posMtx, pos, m_attackColRadius, &color.color);
+        _GXColor* colorPtr = &CColor(0xFF, 0xFF, 0x00, 0xFF).color;
+        Graphic.DrawSphere(posMtx,
+                           CVector(m_worldPosition.x, m_worldPosition.y + m_attackColRadius, m_worldPosition.z),
+                           m_attackColRadius, colorPtr);
     }
 
     if (((CFlat.m_debugFlags & 0x10) != 0) && ((m_bgColMask & 0x10) != 0)) {
-        CColor color(0x40, 0xFF, 0x40, 0xFF);
-        Graphic.DrawSphere(posMtx, &m_worldPosition, m_nearColRadius, &color.color);
+        Graphic.DrawSphere(posMtx, &m_worldPosition, m_nearColRadius, &CColor(0x40, 0xFF, 0x40, 0xFF).color);
     }
 
+    _GXColor* loopColorPtr;
     if (((CFlat.m_debugFlags & 0x40000) != 0) && ((m_bgColMask & 0x40000) != 0)) {
-        for (unsigned int i = 0; i < 8; i++) {
+        for (int i = 0; i < 8; i++) {
             AttackCol* collider = &m_attackColliders[i];
-            if (*reinterpret_cast<int*>(&collider->m_localStart.x) == 0) {
+            if (*reinterpret_cast<int*>(&collider[1].m_localStart.x) == 0) {
                 continue;
             }
 
-            CColor color(0xFF, 0x80, 0x80, 0xFF);
-            Graphic.DrawSphere(posMtx, &collider->m_worldPosition, collider->m_radius, &color.color);
+            loopColorPtr = &CColor(0xFF, 0x80, 0x80, 0xFF).color;
+            Graphic.DrawSphere(posMtx, reinterpret_cast<Vec*>(&collider->m_worldPosition.y),
+                               collider->m_hitRadius,
+                               loopColorPtr);
 
             GXLoadPosMtxImm(posMtx, GX_PNMTX0);
             GXBegin(GX_LINES, GX_VTXFMT0, 2);
@@ -2057,13 +2055,15 @@ void CGObject::onDraw()
     if (((CFlat.m_debugFlags & 0x80000) != 0) && ((m_bgColMask & 0x80000) != 0)) {
         for (int i = 0; i < 8; i++) {
             DamageCol* collider = &m_damageColliders[i];
-            if (*reinterpret_cast<int*>(&collider->m_localPosition.x) == 0) {
+            if (*reinterpret_cast<int*>(&collider[1].m_localPosition.x) == 0) {
                 continue;
             }
 
-            CColor color(0x80, 0x80, 0xFF, 0xFF);
-            CVector scale(collider->m_innerRadius, collider->m_outerRadius, collider->m_innerRadius);
-            Graphic.DrawSphere(posMtx, &collider->m_worldPosition, scale, &color.color);
+            loopColorPtr = &CColor(0x80, 0x80, 0xFF, 0xFF).color;
+            const float hitInner = collider->m_hitInnerRadius;
+            Graphic.DrawSphere(posMtx, reinterpret_cast<Vec*>(&collider->m_worldPosition.y),
+                               CVector(hitInner, collider->m_hitOuterRadius, hitInner),
+                               loopColorPtr);
         }
     }
 }
@@ -3347,10 +3347,13 @@ float CGObject::CalcSafePos(int hitMask, CGObject* other, Vec* outSafePos)
     PSVECSubtract(&m_worldPosition, &centerPos, &hitMove);
     hitMove.y = sZeroFloat;
 
+    const float hitRadius = m_capsuleHalfHeight;
     CMapCylinder hitCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
     hitCylinder.m_bottom = centerPos;
-    hitCylinder.m_axis = hitMove;
-    hitCylinder.m_radius = m_capsuleHalfHeight;
+    hitCylinder.m_axis.x = hitMove.x;
+    hitCylinder.m_axis.y = sZeroFloat;
+    hitCylinder.m_axis.z = hitMove.z;
+    hitCylinder.m_radius = hitRadius;
 
     if (MapMng.CheckHitCylinderNear(&hitCylinder, &hitMove, hitMask) != 0) {
         MapMng.m_hitMapObj->CalcHitPosition(&centerPos);
@@ -3359,14 +3362,16 @@ float CGObject::CalcSafePos(int hitMask, CGObject* other, Vec* outSafePos)
         safeDistance = PSVECDistance(&m_worldPosition, &centerPos);
     } else {
         *outSafePos = m_worldPosition;
-        hitMove.y = sZeroFloat;
         hitMove.x = (m_capsuleHalfHeight + other->m_capsuleHalfHeight) * (float)sin((double)other->m_rotBaseY);
-        hitMove.z = (m_capsuleHalfHeight + other->m_capsuleHalfHeight) * (float)cos((double)other->m_rotBaseY);
+        hitMove.y = sZeroFloat;
+        const float cosRot = (float)cos((double)other->m_rotBaseY);
+        const float safeRadius = m_capsuleHalfHeight;
+        hitMove.z = (safeRadius + other->m_capsuleHalfHeight) * cosRot;
 
         CMapCylinder safeCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
         safeCylinder.m_bottom = centerPos;
         safeCylinder.m_axis = hitMove;
-        safeCylinder.m_radius = m_capsuleHalfHeight;
+        safeCylinder.m_radius = safeRadius;
 
         if (MapMng.CheckHitCylinderNear(&safeCylinder, &hitMove, hitMask) != 0) {
             MapMng.m_hitMapObj->CalcHitPosition(&centerPos);

@@ -2709,32 +2709,40 @@ void CMenuPcs::CmakeNameClose()
  */
 int CMenuPcs::CmakeNameCtrl()
 {
-    unsigned short down;
-    unsigned short repeat;
+    short down;
+    short repeat;
 
     bool padBusy = false;
     int padLock = Pad.m_debugPadLock;
     if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
         padBusy = true;
     }
-    if (padBusy) {
-        down = 0;
-    } else {
-        int padIndex = 0;
-        padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-        down = static_cast<unsigned short>(Pad.GetPadInputs()[padIndex].buttonDown[0]);
+    {
+        unsigned short held;
+        if (padBusy) {
+            held = 0;
+        } else {
+            int padIndex = 0;
+            padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+            held = Pad.GetPadInputs()[padIndex].buttonDown[0];
+        }
+        down = static_cast<short>(held);
     }
 
     padBusy = false;
     if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
         padBusy = true;
     }
-    if (padBusy) {
-        repeat = 0;
-    } else {
-        int padIndex = 0;
-        padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-        repeat = Pad.GetPadInputs()[padIndex].repeatButton;
+    {
+        unsigned short held;
+        if (padBusy) {
+            held = 0;
+        } else {
+            int padIndex = 0;
+            padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+            held = Pad.GetPadInputs()[padIndex].repeatButton;
+        }
+        repeat = static_cast<short>(held);
     }
 
     if (repeat == 0) {
@@ -2746,9 +2754,11 @@ int CMenuPcs::CmakeNameCtrl()
             Sound.PlaySe(2, 0x40, 0x7F, 0);
             CmakeMcState(this) = 2;
         }
-    } else {
+        return 0;
+    }
+    {
         if ((repeat & 0x8) != 0) {
-            if (CmakeState(this)->m_row != 0) {
+            if (static_cast<int>(CmakeState(this)->m_row) != 0) {
                 CmakeState(this)->m_row = static_cast<short>(CmakeState(this)->m_row - 1);
             } else if (CmakeState(this)->m_select >= 10) {
                 CmakeState(this)->m_row = 5;
@@ -2757,7 +2767,7 @@ int CMenuPcs::CmakeNameCtrl()
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else if ((repeat & 0x4) != 0) {
-            if (CmakeState(this)->m_row < (CmakeState(this)->m_select >= 10 ? 4 : 3)) {
+            if (CmakeState(this)->m_row < (CmakeState(this)->m_select >= 10 ? 5 : 4)) {
                 CmakeState(this)->m_row = static_cast<short>(CmakeState(this)->m_row + 1);
             } else {
                 CmakeState(this)->m_row = 0;
@@ -2770,7 +2780,7 @@ int CMenuPcs::CmakeNameCtrl()
                 Sound.PlaySe(4, 0x40, 0x7F, 0);
             } else {
                 CmakeMenuState* state = CmakeState(this);
-                if (state->m_select != 0) {
+                if (static_cast<int>(state->m_select) != 0) {
                     state->m_select = static_cast<short>(state->m_select - 1);
                 } else {
                     state->m_select = 0xB;

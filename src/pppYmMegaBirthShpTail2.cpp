@@ -158,6 +158,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
             float trailX, trailY, trailZ;
             float drawX, drawY, drawZ;
             float camX, camY, camZ;
+            float segX, segY, segZ;
             s32 frameCount = frameCountRaw;
 
             pppUnitMatrix(drawMtx);
@@ -182,9 +183,12 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
                 camY = p->y;
                 camZ = p->z;
             }
-            segVec.x = camX - trailX;
-            segVec.y = camY - trailY;
-            segVec.z = camZ - trailZ;
+            segX = camX - trailX;
+            segY = camY - trailY;
+            segZ = camZ - trailZ;
+            segVec.x = segX;
+            segVec.y = segY;
+            segVec.z = segZ;
             zeroVec.x = 0.0f;
             zeroVec.y = 0.0f;
             zeroVec.z = 0.0f;
@@ -243,9 +247,9 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
                     s32 prevNext;
 
                     if (segRemaining >= *(float*)(step + 0x80)) {
-                        trailX = segVec.x * segProgress / segLen + drawX;
-                        trailY = segVec.y * segProgress / segLen + drawY;
-                        trailZ = segVec.z * segProgress / segLen + drawZ;
+                        trailX = segX * segProgress / segLen + drawX;
+                        trailY = segY * segProgress / segLen + drawY;
+                        trailZ = segZ * segProgress / segLen + drawZ;
                         segProgress += *(float*)(step + 0x80);
                         segRemaining -= *(float*)(step + 0x80);
                         break;
@@ -270,9 +274,12 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
                         camY = p->y;
                         camZ = p->z;
                     }
-                    segVec.x = camX - drawX;
-                    segVec.y = camY - drawY;
-                    segVec.z = camZ - drawZ;
+                    segX = camX - drawX;
+                    segY = camY - drawY;
+                    segZ = camZ - drawZ;
+                    segVec.x = segX;
+                    segVec.y = segY;
+                    segVec.z = segZ;
                     innerZero.x = 0.0f;
                     innerZero.y = 0.0f;
                     innerZero.z = 0.0f;

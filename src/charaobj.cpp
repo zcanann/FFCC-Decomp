@@ -2947,14 +2947,13 @@ checkParticle:
 			}
 	}
 	} else {
-		seNo = 0;
-		emittedCustom = 0;
 		CFlatRuntime2Storage().ResetParticleWork((particleBank << 8) | particleNo, effectArg1);
 		SCharaItemRow* scaleRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
 		CFlatRuntime2Storage().SetParticleWorkScale((static_cast<float>(scaleRows[effectId].m_scale) * 0.01f) + 1.0e-07f);
 		CFlatRuntime2Storage().SetParticleWorkParam(effectId, this);
 		SCharaItemRow* speedRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
 		CFlatRuntime2Storage().SetParticleWorkSpeed((static_cast<float>(speedRows[effectId].m_speed) * 0.01f) + 1.0e-07f);
+		seNo = 0;
 
 		switch (effectArg0) {
 		case 0: {
@@ -3052,6 +3051,7 @@ checkParticle:
 			CFlatRuntime2Storage().SetParticleWorkPos(m_worldPosition, m_rotTargetY);
 		}
 
+		emittedCustom = 0;
 		switch (effectId) {
 		case 0x410:
 			if (effectArg0 == 2 || effectArg0 == 3) {

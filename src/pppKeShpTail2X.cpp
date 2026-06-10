@@ -117,31 +117,34 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     tagOAN3_SHAPE* shapeEntry;
     s32 count;
     float alphaMul;
-    float colorR;
-    float colorG;
-    float colorB;
-    float colorA;
-    float colorStepR;
-    float colorStepG;
-    float colorStepB;
-    float colorStepA;
+    float colorStartR;
+    float colorStartG;
+    float colorStartB;
+    float colorStartA;
+    float colorEndR;
+    float colorEndG;
+    float colorEndB;
+    float colorEndA;
+    float colorStep[4];
+    float* stepPtr;
     float invCountMinusOne;
-    pppFVECTOR4 colorStart;
-    pppFVECTOR4 colorEnd;
-    pppFVECTOR4 colorStep;
     pppFMATRIX localBase;
+    pppFMATRIX initMtx;
     pppFMATRIX drawMtx;
-    Vec zeroVec ATTRIBUTE_ALIGN(8);
-    Vec pos ATTRIBUTE_ALIGN(8);
-    Vec seg ATTRIBUTE_ALIGN(8);
-    Vec initialSeg ATTRIBUTE_ALIGN(8);
-    float trailLen;
+    Vec zeroVec;
+    Vec initialSeg;
+    Vec pos;
+    Vec zeroVecB;
+    Vec seg;
     float segLen;
     float segCursor;
     float segRemain;
     float segDx;
     float segDy;
     float segDz;
+    float curX;
+    float curY;
+    float curZ;
     float segBaseX;
     float segBaseY;
     float segBaseZ;
@@ -154,9 +157,10 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     s32 curIndex;
     s32 nextIndex;
     s32 lastIndex;
-    u8 zEnable;
+    Vec* history;
+    u32 zEnable;
     const float zero = LoadFloat(kPppKeShpTail2XZero);
-    u32 dataValIndex;
+    s32 dataValIndex;
 
     dataValIndex = step->m_dataValIndex;
     if (dataValIndex == 0xffff) {
@@ -166,32 +170,28 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     count = step->m_drawCount;
     invCountMinusOne = (float)(count - 1);
     alphaMul = (float)GetKeShpTail2XAlphaWork(&obj->m_object, param_3)->m_alpha / kPppKeShpTail2XAlphaScale;
-    colorStart.w = step->m_colorStartA;
-    colorEnd.w = step->m_colorEndA;
-    colorStart.x = step->m_colorStartR;
-    colorStart.y = step->m_colorStartG;
-    colorStart.z = step->m_colorStartB;
-    colorEnd.x = step->m_colorEndR;
-    colorEnd.y = step->m_colorEndG;
-    colorEnd.z = step->m_colorEndB;
-    colorStart.w *= alphaMul;
-    colorEnd.w *= alphaMul;
-    colorA = colorStart.w;
-    colorR = colorStart.x;
-    colorG = colorStart.y;
-    colorB = colorStart.z;
+    colorStartR = step->m_colorStartR;
+    colorStartG = step->m_colorStartG;
+    colorStartB = step->m_colorStartB;
+    colorStartA = step->m_colorStartA;
+    colorEndA = step->m_colorEndA;
+    colorStartA *= alphaMul;
+    colorEndA *= alphaMul;
+    colorEndR = step->m_colorEndR;
+    colorEndG = step->m_colorEndG;
+    colorEndB = step->m_colorEndB;
+    stepPtr = colorStep;
     if (invCountMinusOne != zero) {
-        colorStep.x = (colorStart.x - colorEnd.x) / invCountMinusOne;
-        colorStep.y = (colorStart.y - colorEnd.y) / invCountMinusOne;
-        colorStep.z = (colorStart.z - colorEnd.z) / invCountMinusOne;
-        colorStep.w = (colorStart.w - colorEnd.w) / invCountMinusOne;
+        stepPtr[3] = (colorStartR - colorEndR) / invCountMinusOne;
+        stepPtr[2] = (colorStartG - colorEndG) / invCountMinusOne;
+        stepPtr[1] = (colorStartB - colorEndB) / invCountMinusOne;
+        stepPtr[0] = (colorStartA - colorEndA) / invCountMinusOne;
     } else {
-        colorStep.x = colorStep.y = colorStep.z = colorStep.w = kPppKeShpTail2XHalf;
+        stepPtr[3] = kPppKeShpTail2XHalf;
+        stepPtr[2] = stepPtr[3];
+        stepPtr[1] = stepPtr[3];
+        stepPtr[0] = stepPtr[3];
     }
-    colorStepR = colorStep.x;
-    colorStepG = colorStep.y;
-    colorStepB = colorStep.z;
-    colorStepA = colorStep.w;
 
     work = GetKeShpTail2XWork(&obj->m_object, param_3);
     shape = ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex];
@@ -206,33 +206,37 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     }
 
     pppCopyMatrix(localBase, obj->m_object.m_localMatrix);
-    pppUnitMatrix(drawMtx);
+    pppUnitMatrix(initMtx);
 
     drawScale = step->m_scaleStart;
     scaleStepDelta = (step->m_scaleStart - step->m_scaleEnd) / invCountMinusOne;
     trailStep = step->m_stepDistance * ppvMng->m_scale.x;
 
+    history = work->m_posHistory;
     curIndex = work->m_head;
     nextIndex = curIndex + 1;
     lastIndex = work->m_count - 1;
-    segBaseX = work->m_posHistory[curIndex].x;
-    segBaseY = work->m_posHistory[curIndex].y;
-    segBaseZ = work->m_posHistory[curIndex].z;
-    if (nextIndex == work->m_count) {
+    curX = history[curIndex].x;
+    curY = history[curIndex].y;
+    curZ = history[curIndex].z;
+    segBaseX = curX;
+    segBaseY = curY;
+    segBaseZ = curZ;
+    if (curIndex == lastIndex) {
         nextIndex = 0;
     }
-    nextBaseX = work->m_posHistory[nextIndex].x;
-    nextBaseY = work->m_posHistory[nextIndex].y;
-    nextBaseZ = work->m_posHistory[nextIndex].z;
-    segDx = nextBaseX - segBaseX;
-    segDy = nextBaseY - segBaseY;
-    segDz = nextBaseZ - segBaseZ;
+    nextBaseX = history[nextIndex].x;
+    nextBaseY = history[nextIndex].y;
+    nextBaseZ = history[nextIndex].z;
+    segDx = nextBaseX - curX;
+    segDy = nextBaseY - curY;
+    segDz = nextBaseZ - curZ;
     initialSeg.x = segDx;
     initialSeg.y = segDy;
     initialSeg.z = segDz;
-    zeroVec.x = zero;
-    zeroVec.y = zero;
-    zeroVec.z = zero;
+    zeroVec.x = kPppKeShpTail2XZero;
+    zeroVec.y = kPppKeShpTail2XZero;
+    zeroVec.z = kPppKeShpTail2XZero;
     segLen = PSVECDistance(&zeroVec, &initialSeg);
     segRemain = segLen;
     segCursor = zero;
@@ -242,9 +246,9 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     }
 
 draw_loop:
-    pos.x = segBaseX;
-    pos.y = segBaseY;
-    pos.z = segBaseZ;
+    pos.x = curX;
+    pos.y = curY;
+    pos.z = curZ;
 
     if (step->m_worldSpaceMode == 0) {
         PSMTXScaleApply(obj->m_object.m_localMatrix.value, obj->m_object.m_drawMatrix.value,
@@ -271,10 +275,10 @@ draw_loop:
 
     {
         GXColor amb;
-        amb.r = (u8)colorR;
-        amb.g = (u8)colorG;
-        amb.b = (u8)colorB;
-        amb.a = (u8)colorA;
+        amb.r = (u8)colorStartR;
+        amb.g = (u8)colorStartG;
+        amb.b = (u8)colorStartB;
+        amb.a = (u8)colorStartA;
         GXSetChanAmbColor(GX_COLOR0A0, amb);
     }
 
@@ -287,30 +291,26 @@ update_step:
         return;
     }
 
-    colorR -= colorStepR;
-    colorG -= colorStepG;
-    colorB -= colorStepB;
-    colorA -= colorStepA;
+    colorStartR -= stepPtr[3];
+    colorStartG -= stepPtr[2];
+    colorStartB -= stepPtr[1];
+    colorStartA -= stepPtr[0];
     drawScale -= scaleStepDelta;
-    if (trailStep <= zero) {
+    if (trailStep <= kPppKeShpTail2XZero) {
         return;
     }
 
 advance_segment:
     if (segRemain >= trailStep) {
-        pos.x = (segDx * segCursor) / segLen + segBaseX;
-        pos.y = (segDy * segCursor) / segLen + segBaseY;
-        pos.z = (segDz * segCursor) / segLen + segBaseZ;
+        curX = (segDx * segCursor) / segLen + segBaseX;
+        curY = (segDy * segCursor) / segLen + segBaseY;
+        curZ = (segDz * segCursor) / segLen + segBaseZ;
         segCursor += trailStep;
         segRemain -= trailStep;
-        segBaseX = pos.x;
-        segBaseY = pos.y;
-        segBaseZ = pos.z;
         goto draw_loop;
     }
 
-    nextIndex++;
-    if (nextIndex > lastIndex) {
+    if (nextIndex++ == lastIndex) {
         nextIndex = 0;
     }
     if (nextIndex == curIndex) {
@@ -318,24 +318,23 @@ advance_segment:
     }
 
 move_next_segment:
-    trailLen = segCursor - segLen;
+    segCursor -= segLen;
     segBaseX = nextBaseX;
     segBaseY = nextBaseY;
     segBaseZ = nextBaseZ;
-    nextBaseX = work->m_posHistory[nextIndex].x;
-    nextBaseY = work->m_posHistory[nextIndex].y;
-    nextBaseZ = work->m_posHistory[nextIndex].z;
+    nextBaseX = history[nextIndex].x;
+    nextBaseY = history[nextIndex].y;
+    nextBaseZ = history[nextIndex].z;
     segDx = nextBaseX - segBaseX;
     segDy = nextBaseY - segBaseY;
     segDz = nextBaseZ - segBaseZ;
     seg.x = segDx;
     seg.y = segDy;
     seg.z = segDz;
-    zeroVec.x = zero;
-    zeroVec.y = zero;
-    zeroVec.z = zero;
-    segLen = PSVECDistance(&zeroVec, &seg);
-    segCursor = trailLen;
+    zeroVecB.x = kPppKeShpTail2XZero;
+    zeroVecB.y = kPppKeShpTail2XZero;
+    zeroVecB.z = kPppKeShpTail2XZero;
+    segLen = PSVECDistance(&zeroVecB, &seg);
     segRemain += segLen;
     goto advance_segment;
 }

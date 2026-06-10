@@ -1389,7 +1389,7 @@ void CMemoryCardMan::SetLoadData()
         for (count = 0; count < 100; count++)
         {
             reinterpret_cast<CCaravanWork::CLetterWork*>(letterDst + 0x3EC)->FlagsBits().m_attachmentIsGil =
-                reinterpret_cast<CCaravanWork::CLetterWork*>(letterSrc + 0x104)->AttachmentIsGil();
+                reinterpret_cast<CCaravanWork::CLetterWork*>(letterSrc + 0x104)->FlagsBits().m_attachmentIsGil;
             reinterpret_cast<CCaravanWork::CLetterWork*>(letterDst + 0x3EC)->HeaderBitsRef().m_messageType =
                 reinterpret_cast<CCaravanWork::CLetterWork*>(letterSrc + 0x104)->HeaderBitsRef().m_messageType;
             reinterpret_cast<CCaravanWork::CLetterWork*>(letterDst + 0x3EC)->WordBitsRef().m_senderId =
@@ -1607,7 +1607,7 @@ void CMemoryCardMan::MakeSaveData()
         for (int letter = 0; letter < 100; letter++)
         {
             reinterpret_cast<CCaravanWork::CLetterWork*>(letterDst + 0x104)->FlagsBits().m_attachmentIsGil =
-                reinterpret_cast<CCaravanWork::CLetterWork*>(letterSrc + 0x3EC)->AttachmentIsGil();
+                reinterpret_cast<CCaravanWork::CLetterWork*>(letterSrc + 0x3EC)->FlagsBits().m_attachmentIsGil;
             reinterpret_cast<CCaravanWork::CLetterWork*>(letterDst + 0x104)->HeaderBitsRef().m_messageType =
                 reinterpret_cast<CCaravanWork::CLetterWork*>(letterSrc + 0x3EC)->HeaderBitsRef().m_messageType;
             reinterpret_cast<CCaravanWork::CLetterWork*>(letterDst + 0x104)->WordBitsRef().m_senderId =

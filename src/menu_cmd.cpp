@@ -989,7 +989,8 @@ void CMenuPcs::CmdDraw()
 				} else {
 					t = kCmdMenuSmallOffset;
 				}
-				if ((animState == 1) && (i < caravan->m_numCmdListSlots) &&
+				int __p17 = animState;
+				if ((__p17 == 1) && (i < caravan->m_numCmdListSlots) &&
 				    (i == GetCmdStateView(this)->selected)) {
 					t = kCmdMenuSelectedUvY;
 					y -= kCmdMenuSmallOffset;
@@ -1165,7 +1166,8 @@ void CMenuPcs::CmdDraw()
 							}
 
 							int equippable = 1;
-							if (itemIdx + 2 < itemCount) {
+							int __p18 = itemIdx;
+							if (__p18 + 2 < itemCount) {
 								equippable = EquipChk(static_cast<int>(letterBuf[itemIdx + 1]));
 							}
 
@@ -1268,7 +1270,7 @@ void CMenuPcs::CmdDraw()
 		DrawInit();
 
 		CmdListEntry* iconRow = scan;
-		for (s32 row = 0; row < 8; row++, iconRow++) {
+		for (s32 row =  (int)(unsigned int)(0); row < 8; row++, iconRow++) {
 			if ((itemCount <= 8) && (row + GetCmdStateView(this)->scrollTop >= itemCount)) {
 				break;
 			}

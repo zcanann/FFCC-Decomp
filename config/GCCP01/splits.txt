@@ -332,7 +332,7 @@ mapshadow.cpp:
 	extab       start:0x80006AAC end:0x80006AC4
 	extabindex  start:0x8000C70C end:0x8000C730
 	.text       start:0x8004C71C end:0x8004CA08
-	.sdata2     start:0x8032FCF0 end:0x8032FD10
+	.sdata2     start:0x8032FCF0 end:0x8032FD00
 
 ME_USB_process.cpp:
 	extab       start:0x80006AC4 end:0x80006AD4
@@ -340,6 +340,7 @@ ME_USB_process.cpp:
 	.text       start:0x8004CA08 end:0x8004DCE8
 	.rodata     start:0x801D7D78 end:0x801D7DA8
 	.data       start:0x801EA668 end:0x801EA778
+	.sdata2     start:0x8032FD00 end:0x8032FD10
 
 ME_AppRequest.cpp:
 	extab       start:0x80006AD4 end:0x80006AFC

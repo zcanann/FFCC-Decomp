@@ -851,13 +851,16 @@ void CMenuPcs::CmakeVillageDraw()
 
     DrawInit();
     if (villageWork->m_mode == 1 && villageWork->m_row < 5) {
-        int wobble = System.m_frameCounter & 7;
+        int cursorLeft = 0xC8;
+        int wobble = static_cast<int>(System.m_frameCounter) % 8;
         DrawCursor(
-            static_cast<int>(240.0f + villageWork->m_select * 26.9f) + wobble,
+            static_cast<int>(26.9f * static_cast<float>(villageWork->m_select) +
+                static_cast<float>(cursorLeft)) + wobble,
             villageWork->m_row * 0x20 + 0x70, 1.0f);
     }
 
-    int showNameCursor = __cntlzw(static_cast<unsigned int>(1 - villageWork->m_mode)) >> 5;
+    int showNameCursor = static_cast<int>(
+        static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(1 - villageWork->m_mode))) >> 5);
     if (villageWork->m_row >= 5) {
         showNameCursor = 0;
     }
@@ -866,8 +869,7 @@ void CMenuPcs::CmakeVillageDraw()
         showNameCursor = 0;
     }
     DrawCmakeName(1, showNameCursor, s_CmakeInfo.m_name, alpha);
-    DrawCmakeDecision((static_cast<unsigned int>(villageWork->m_row) >> 31) +
-        (static_cast<int>(villageWork->m_row) >= 5), alpha);
+    DrawCmakeDecision(villageWork->m_row >= 5, alpha);
 }
 
 /*

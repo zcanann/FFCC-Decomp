@@ -3197,10 +3197,10 @@ void CGMonObj::moveFrame()
 	float stepDist;
 	if ((moveFlags & 0x200) != 0) {
 		unsigned short speedScale = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4);
-		stepDist = moveSpeedRate * (0.001f * speedScale + 1.0f);
+		stepDist = moveSpeedRate * (0.01f * speedScale + kMonObjEpsilon);
 	} else if ((moveFlags & 0x800) != 0) {
 		unsigned short speedScale = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4);
-		stepDist = moveSpeedRate * (0.001f * speedScale + 1.0f);
+		stepDist = moveSpeedRate * (0.01f * speedScale + kMonObjEpsilon);
 	} else {
 		stepDist = moveSpeed;
 	}

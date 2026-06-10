@@ -3607,8 +3607,9 @@ void CMenuPcs::DrawDiaryBase(int page, float alpha)
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(widePage ? 0x36 : 0x40));
+    int span;
     for (int x = 0x20; x < 0x260;) {
-        int span = 0x20;
+        span = 0x20;
         if ((0x260 - x) < span) {
             span = 0x260 - x;
         }

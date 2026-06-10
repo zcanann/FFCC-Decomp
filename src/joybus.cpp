@@ -428,6 +428,8 @@ void JoyBus::Destroy()
  * Address:	TODO
  * Size:	TODO
  */
+#pragma push
+#pragma opt_common_subs off
 int JoyBus::LoadBin()
 {
     if (static_cast<signed char>(m_binLoaded) != 0)
@@ -466,34 +468,8 @@ int JoyBus::LoadBin()
 
             int idx = 0xBC;
 
-            int sum = 0xE7 - (unsigned char)m_gbaBootImage[0xA0];
-            sum -= (unsigned char)m_gbaBootImage[0xA1];
-            sum -= (unsigned char)m_gbaBootImage[0xA2];
-            sum -= (unsigned char)m_gbaBootImage[0xA3];
-            sum -= (unsigned char)m_gbaBootImage[0xA4];
-            sum -= (unsigned char)m_gbaBootImage[0xA5];
-            sum -= (unsigned char)m_gbaBootImage[0xA6];
-            sum -= (unsigned char)m_gbaBootImage[0xA7];
-            sum -= (unsigned char)m_gbaBootImage[0xA8];
-            sum -= (unsigned char)m_gbaBootImage[0xA9];
-            sum -= (unsigned char)m_gbaBootImage[0xAA];
-            sum -= (unsigned char)m_gbaBootImage[0xAB];
-            sum -= (unsigned char)m_gbaBootImage[0xAC];
-            sum -= (unsigned char)m_gbaBootImage[0xAD];
-            sum -= (unsigned char)m_gbaBootImage[0xAE];
-            sum -= (unsigned char)m_gbaBootImage[0xAF];
-            sum -= (unsigned char)m_gbaBootImage[0xB0];
-            sum -= (unsigned char)m_gbaBootImage[0xB1];
-            sum -= (unsigned char)m_gbaBootImage[0xB2];
-            sum -= (unsigned char)m_gbaBootImage[0xB3];
-            sum -= (unsigned char)m_gbaBootImage[0xB4];
-            sum -= (unsigned char)m_gbaBootImage[0xB5];
-            sum -= (unsigned char)m_gbaBootImage[0xB6];
-            sum -= (unsigned char)m_gbaBootImage[0xB7];
-            sum -= (unsigned char)m_gbaBootImage[0xB8];
-            sum -= (unsigned char)m_gbaBootImage[0xB9];
-            sum -= (unsigned char)m_gbaBootImage[0xBA];
-            sum -= (unsigned char)m_gbaBootImage[0xBB];
+            unsigned char* buf = (unsigned char*)m_gbaBootImage;
+            int sum = 0xE7 - buf[0xA0] - buf[0xA1] - buf[0xA2] - buf[0xA3] - buf[0xA4] - buf[0xA5] - buf[0xA6] - buf[0xA7] - buf[0xA8] - buf[0xA9] - buf[0xAA] - buf[0xAB] - buf[0xAC] - buf[0xAD] - buf[0xAE] - buf[0xAF] - buf[0xB0] - buf[0xB1] - buf[0xB2] - buf[0xB3] - buf[0xB4] - buf[0xB5] - buf[0xB6] - buf[0xB7] - buf[0xB8] - buf[0xB9] - buf[0xBA] - buf[0xBB];
 
             if (idx < 0xBD)
             {
@@ -514,6 +490,7 @@ int JoyBus::LoadBin()
 
     return 0;
 }
+#pragma pop
 
 
 /*

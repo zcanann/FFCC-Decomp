@@ -116,6 +116,11 @@ struct GhostMogMenuWork {
 
 #define sGhostMogMenuWork (*reinterpret_cast<GhostMogMenuWork*>(CGPartyObj::m_ghostWork))
 
+struct SScriptShieldView { // script overlay: shield item table at +0xB6
+	unsigned char pad[0xB6];
+	short m_shields[8];
+};
+
 struct SScriptFoodView { // script overlay: food table at +0x3B8
 	unsigned char pad[0x3B8];
 	unsigned short m_foods[8];
@@ -949,7 +954,8 @@ void CGPartyObj::onFrameAlways()
 			if (weaponItem <= 0) {
 				LoadWeapon(-1, 0);
 			} else {
-				unsigned short packedItem = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + weaponItem * 0x48 + 2);
+				SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
+				unsigned short packedItem = rows[weaponItem].m_model;
 				LoadWeapon(packedItem & 0xFFF, packedItem >> 12);
 			}
 			party.weaponItem = weaponRef;
@@ -962,12 +968,14 @@ void CGPartyObj::onFrameAlways()
 		int shieldIndex = *reinterpret_cast<short*>(script + 0xB0);
 		int shieldItem;
 		if (shieldIndex >= 0) {
-			shieldItem = *reinterpret_cast<short*>(script + shieldIndex * 2 + 0xB6);
+			SScriptShieldView* shields = reinterpret_cast<SScriptShieldView*>(script);
+			shieldItem = shields->m_shields[shieldIndex];
 		} else {
 			shieldItem = 0;
 		}
 		if (shieldItem > 0) {
-			int shieldModel = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + shieldItem * 0x48 + 2) & 0xFFF;
+			SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
+			int shieldModel = rows[shieldItem].m_model & 0xFFF;
 			if (m_shieldModelHandle == nullptr || static_cast<unsigned int>(m_shieldModelHandle->m_charaNo) != static_cast<unsigned int>(shieldModel)) {
 				LoadShield(shieldModel);
 			}

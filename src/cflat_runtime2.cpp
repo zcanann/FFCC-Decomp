@@ -960,38 +960,36 @@ int CFlatRuntime2::Load(char* fileName)
 	sprintf(path, sCFlatRuntime2FileNameFmt, fileName);
 
 	CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
-	if (fileHandle == 0) {
+	if (fileHandle != 0) {
+		File.Read(fileHandle);
+		File.SyncCompleted(fileHandle);
+		reinterpret_cast<CFlatRuntime*>(this)->Create(File.m_readBuffer);
+		File.Close(fileHandle);
+	} else {
 		return 0;
 	}
-
-	File.Read(fileHandle);
-	File.SyncCompleted(fileHandle);
-	reinterpret_cast<CFlatRuntime*>(this)->Create(File.m_readBuffer);
-	File.Close(fileHandle);
 
 	if (getDebugStage() != 0) {
 		int debugIndex = 0;
 		int debugChunk = 0;
-		for (;; debugIndex++) {
+		do {
 			sprintf(path, sCFlatRuntime2DebugFileNameFmt, fileName);
 			if (debugIndex != 0) {
 				sprintf(path, "%s%d", path, debugIndex);
 			}
 
 			fileHandle = File.Open(path, 0, CFile::PRI_LOW);
-			if (fileHandle == 0) {
+			if (fileHandle != 0) {
+				File.Read(fileHandle);
+				File.SyncCompleted(fileHandle);
+				debugChunk = reinterpret_cast<CFlatRuntime*>(this)->CreateDebug(File.m_readBuffer, debugChunk);
+				File.Close(fileHandle);
+			} else {
 				return 0;
 			}
 
-			File.Read(fileHandle);
-			File.SyncCompleted(fileHandle);
-			debugChunk = reinterpret_cast<CFlatRuntime*>(this)->CreateDebug(File.m_readBuffer, debugChunk);
-			File.Close(fileHandle);
-
-			if (debugChunk == -1) {
-				break;
-			}
-		}
+			debugIndex++;
+		} while (debugChunk != -1);
 	}
 
 	resetChangeScript();

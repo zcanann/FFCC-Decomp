@@ -917,9 +917,12 @@ void birth(
 		baseDirection.y = *f32_at(payload, 0xA4);
 		baseDirection.z = *f32_at(payload, 0xA8);
 
-		angle[0] = (s32)((float)((s32)(range * Math.RandF() - spread) << 15) / kPppRyjMegaBirthHalfTurnDegrees);
-		angle[1] = (s32)((float)((s32)(range * Math.RandF() - spread) << 15) / kPppRyjMegaBirthHalfTurnDegrees);
-		angle[2] = (s32)((float)((s32)(range * Math.RandF() - spread) << 15) / kPppRyjMegaBirthHalfTurnDegrees);
+		angle[0] = (s32)(range * Math.RandF() - spread);
+		angle[0] = (s32)((float)(angle[0] << 15) / kPppRyjMegaBirthHalfTurnDegrees);
+		angle[1] = (s32)(range * Math.RandF() - spread);
+		angle[1] = (s32)((float)(angle[1] << 15) / kPppRyjMegaBirthHalfTurnDegrees);
+		angle[2] = (s32)(range * Math.RandF() - spread);
+		angle[2] = (s32)((float)(angle[2] << 15) / kPppRyjMegaBirthHalfTurnDegrees);
 
 		if ((payload[0x2A] == 2) || (payload[0x2A] == 3)) {
 			angle[0] = 0;

@@ -533,8 +533,8 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 		*(int*)(self + 0x554) = carryMode;
 
 		if (carryMode == 0) {
-			CVector attachOffset(kItemObjZero, kItemObjZero, kItemObjZero);
-			Vec* attachOffsetPtr = reinterpret_cast<Vec*>(&attachOffset);
+			const CVector& attachOffset = CVector(kItemObjZero, kItemObjZero, kItemObjZero);
+			Vec* attachOffsetPtr = reinterpret_cast<Vec*>(const_cast<CVector*>(&attachOffset));
 			bool useBossAttachName = false;
 
 			if (Game.m_gameWork.m_menuStageMode != 0) {
@@ -642,10 +642,10 @@ CGPrgObj* CGItemObj::CreateFromScript(
 	System.Printf(itemObjStrings + kItemObjStrNumFreeItemFmt, freeItemCount);
 
 	if (freeItemCount == 0) {
-		CFlatRuntime2* runtime = ItemCFlatRuntime();
-		int deletedCount = 0;
-		unsigned char* bestItemObj = 0;
 		int bestScriptObjectPos = 0x00989680;
+		unsigned char* bestItemObj = 0;
+		int deletedCount = 0;
+		CFlatRuntime2* runtime = ItemCFlatRuntime();
 
 		for (unsigned char* itemObj = reinterpret_cast<unsigned char*>(runtime->FindGItemObjFirst());
 			 itemObj != 0;
@@ -662,12 +662,16 @@ CGPrgObj* CGItemObj::CreateFromScript(
 
 		if (bestItemObj != 0) {
 			runtime->deleteObject(reinterpret_cast<CFlatRuntime::CObject*>(bestItemObj));
-			deletedCount = 1;
+			goto markDeleted;
 		} else {
 			if ((unsigned int)System.m_execParam >= 3U) {
 				System.Printf(itemObjStrings + kItemObjStrNoDeletableObjectMsg);
 			}
+			goto skipMark;
 		}
+	markDeleted:
+		deletedCount = 1;
+	skipMark:
 
 		System.Printf(itemObjStrings + kItemObjStrNumDeleteItemFmt, deletedCount);
 		if (deletedCount == 0) {
@@ -688,9 +692,8 @@ CGPrgObj* CGItemObj::CreateFromScript(
 	gItemObjCreateFlags = createFlags;
 	gCFlatRuntime().SystemCall(0, 1, 7, 5, inStack, &outStack);
 
-	CGPrgObj* newItem = 0;
 	if (createMode != 1) {
-		newItem = (CGPrgObj*)CFlat.intToClass((int)outStack.m_word);
+		CGPrgObj* newItem = (CGPrgObj*)CFlat.intToClass((int)outStack.m_word);
 		unsigned char* itemSelf = (unsigned char*)newItem;
 
 		if (createMode == 2) {
@@ -755,9 +758,11 @@ CGPrgObj* CGItemObj::CreateFromScript(
 			reinterpret_cast<CGItemObj*>(newItem)->m_pendingAnimName = ccfs->m_pendingAnimName;
 			reinterpret_cast<CGItemObj*>(newItem)->m_memoryCapsuleNameIndex = ccfs->m_memoryCapsuleNameIndex;
 		}
+
+		return newItem;
 	}
 
-	return newItem;
+	return 0;
 }
 
 /*
@@ -884,8 +889,8 @@ void CGItemObj::onFrameStat()
 	}
 	case 0xB:
 		if (m_stateFrame == m_carryFrame) {
-			CVector attachOffset(kItemObjZero, kItemObjZero, kItemObjZero);
-			Vec* attachOffsetPtr = reinterpret_cast<Vec*>(&attachOffset);
+			const CVector& attachOffset = CVector(kItemObjZero, kItemObjZero, kItemObjZero);
+			Vec* attachOffsetPtr = reinterpret_cast<Vec*>(const_cast<CVector*>(&attachOffset));
 			bool useBossAttachName = false;
 
 			if (Game.m_gameWork.m_menuStageMode != 0) {
@@ -1003,7 +1008,7 @@ void CGItemObj::onFrameStat()
 		}
 
 		if (7 < m_stateFrame) {
-			prgObj->m_rotTargetY = prgObj->m_rotTargetY + kItemObjMotionStep;
+			prgObj->m_rotTargetY += kItemObjMotionStep;
 			prgObj->m_worldPosition.x =
 			    kItemObjMotionStep * (m_owner->m_worldPosition.x - prgObj->m_worldPosition.x) + prgObj->m_worldPosition.x;
 			prgObj->m_worldPosition.y =
@@ -1103,7 +1108,7 @@ void CGItemObj::onFrameStat()
 			prgObj->m_groundHitOffset.y = clamped;
 		}
 
-		prgObj->m_rotTargetY = prgObj->m_rotTargetY + kItemObjFineStep;
+		prgObj->m_rotTargetY += kItemObjFineStep;
 		prgObj->m_groundHitOffset.x =
 		    kItemObjFineStep * -(prgObj->m_worldPosition.x - *(float*)(*(unsigned char**)(self + 0x550) + 0x15C));
 		prgObj->m_groundHitOffset.z =
@@ -1111,7 +1116,7 @@ void CGItemObj::onFrameStat()
 		break;
 	case 0x25: {
 		prgObj->m_moveOffset.y = kItemObjMoveOffsetXZ;
-		prgObj->m_rotTargetY = prgObj->m_rotTargetY + kItemObjMemoryTurnStep;
+		prgObj->m_rotTargetY += kItemObjMemoryTurnStep;
 
 		CVector monTarget(*reinterpret_cast<Vec*>(CGMonObj::m_aiWork + 4));
 		CVector worldPos(prgObj->m_worldPosition);
@@ -1223,7 +1228,7 @@ void CGItemObj::onFrameStat()
 				gCFlatRuntime().SystemCall(
 				    *reinterpret_cast<CFlatRuntime::CObject**>(self + 0x550), 2, 0x16, 1, &stack, 0);
 			} else {
-				if ((unsigned int)System.m_execParam > 1U) {
+				if ((unsigned int)System.m_execParam >= 2U) {
 					System.Printf(itemObjStrings + kItemObjStrMemoryMagiciteCreateFailedMsg);
 				}
 			}

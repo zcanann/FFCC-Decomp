@@ -2584,16 +2584,29 @@ int CCharaPcs::CHandle::LoadAnim(
         }
     }
 
-    const int resolvedKind = charaKind == -1 ? m_charaKind : charaKind;
-    const int resolvedNo = charaNo == -1 ? m_charaNo : charaNo;
+    int resolvedKind = charaKind;
+    if (resolvedKind == -1) {
+        resolvedKind = m_charaKind;
+    }
+    int resolvedNo = charaNo;
+    if (resolvedNo == -1) {
+        resolvedNo = m_charaNo;
+    }
 
     CLoadAnim* loadAnim = FindLoadedAnim(&CharaPcs, resolvedKind, resolvedNo, animName);
     if (loadAnim == 0) {
-        loadAnim = LoadAnimFromDisk(&CharaPcs, resolvedKind, resolvedNo, animName, mergeFileId, mergeFlags);
+        if (LoadAnimFromDisk(&CharaPcs, resolvedKind, resolvedNo, animName, mergeFileId, mergeFlags) == 0) {
+            return 0;
+        }
     }
-    if (loadAnim == 0) {
-        return 0;
+
+    if (charaKind == -1) {
+        charaKind = m_charaKind;
     }
+    if (charaNo == -1) {
+        charaNo = m_charaNo;
+    }
+    loadAnim = FindLoadedAnim(&CharaPcs, charaKind, charaNo, animName);
 
     m_animSlot[animIndex] = loadAnim;
     reinterpret_cast<CRef*>(loadAnim)->AddRef();

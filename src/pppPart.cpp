@@ -907,7 +907,7 @@ allocated:
 			_pppPObjLink* prev = &pppMngSt->m_pppPObjLinkHead;
 			s16 sortKey = programSet->m_sortKey;
 			_pppPObjLink* iter = firstObj;
-			while (iter != 0)
+			do
 			{
 				_pppProgSetDef* iterSet = iter->m_owner->m_programSetDef;
 				if (iterSet->m_sortKey >= sortKey)
@@ -919,7 +919,7 @@ allocated:
 				}
 				prev = iter;
 				iter = iter->m_next;
-			}
+			} while (iter != 0);
 			dataVal->m_pppPObjLink = &newObject->m_link;
 			prev->m_next = &newObject->m_link;
 			newObject->m_link.m_next = 0;

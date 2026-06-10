@@ -793,10 +793,11 @@ void CCameraPcs::calc()
                               : CameraRawPadInput().stickXF;
         lateral -= kCameraDebugZoomStep * moveInOut;
 
-        float pitch = m_pitch;
+        float sinY;
         float yaw = m_yaw;
-        float sinY = static_cast<float>(cos(pitch));
-        const float sinXCosY = static_cast<float>(sin(yaw)) * sinY;
+        float pitch = m_pitch;
+        sinY = static_cast<float>(cos(pitch));
+        const float sinXCosY = sinY * static_cast<float>(sin(yaw));
         sinY = static_cast<float>(sin(pitch));
         const float cosXCosY = static_cast<float>(cos(yaw)) * static_cast<float>(cos(pitch));
 

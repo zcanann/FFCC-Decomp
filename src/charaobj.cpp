@@ -1454,9 +1454,9 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		return;
 	}
 
-	int particleLife = particleLife;
-	short itemEffect = *reinterpret_cast<unsigned short*>(itemData);
-	short scriptDefense = scriptDefense;
+	int particleLife = *reinterpret_cast<unsigned short*>(itemData + 0xE);
+	int itemEffect = *reinterpret_cast<unsigned short*>(itemData);
+	int scriptDefense = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E);
 	calcRegist(static_cast<int>(staType), resolvedItemId, resistType, allowEffect, effectResult, 0);
 
 	if (resistType == 3) {

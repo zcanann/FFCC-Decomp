@@ -2276,7 +2276,7 @@ void CGPartyObj::statCharge()
 						}
 					}
 					if (FLOAT_80331a78 != mag) {
-						Move(reinterpret_cast<Vec*>(&dest), mag / static_cast<float>(-dist), dist, 1, 1, 0, 1);
+						Move(reinterpret_cast<Vec*>(&dest), mag / static_cast<float>(static_cast<int>(dist)), dist, 1, 1, 0, 1);
 					}
 				} else {
 					moveVectorRot(m_rotTargetY, FLOAT_80331a78, FLOAT_80331ADC * static_cast<float>(p[5]),

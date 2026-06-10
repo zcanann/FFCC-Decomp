@@ -5149,7 +5149,7 @@ void CGPartyObj::gpmMove()
 	}
 
 	Vec pathVec;
-	float pathDist = 0.0f;
+	float pathDist;
 	gpmCalcDist(&pathVec, pathDist);
 
 	Vec toLeader;

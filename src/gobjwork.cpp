@@ -444,7 +444,8 @@ void CCaravanWork::AddLetter(int letterType, int senderId, int moneyValue, int h
  */
 void CCaravanWork::FGLetterOpen(int letterIdx)
 {
-	CLetterWork* letter = &m_letters[letterIdx];
+	CCaravanWork* shifted = reinterpret_cast<CCaravanWork*>(reinterpret_cast<char*>(this) + letterIdx * sizeof(CLetterWork));
+#define letter (&shifted->m_letters[0])
 	CFlatRuntime::CStack stack[2];
 
 	stack[0].m_word = letter->MessageType();
@@ -478,6 +479,7 @@ void CCaravanWork::FGLetterOpen(int letterIdx)
 	CMes::m_tempVar[8] = m_saveSlot;
 
 	letter->SetOpened();
+#undef letter
 }
 
 /*

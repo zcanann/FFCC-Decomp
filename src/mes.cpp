@@ -1283,15 +1283,19 @@ void CMes::addString(char** text, int branchMode)
 			float scale = kMesTagScaleStep * (float)ReadTagS16(text);
 			mScaleY = scale;
 			mScaleX = scale;
+			float tagScaleY = mScaleY;
 			font->SetScaleX(mScaleX);
-			font->SetScaleY(mScaleY);
+			font->SetScaleY(tagScaleY);
 			break;
 		}
 		case 0x1A:
+		{
 			mScaleX = kMesTagScaleStep * (float)ReadTagS16(text);
+			float tagScaleY = mScaleY;
 			font->SetScaleX(mScaleX);
-			font->SetScaleY(mScaleY);
+			font->SetScaleY(tagScaleY);
 			break;
+		}
 		case 0x36:
 		{
 			unsigned char idx = (unsigned char)ReadTagU8(text);

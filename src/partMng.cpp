@@ -2635,9 +2635,6 @@ void CPartMng::pppEditDraw()
 
     m_pppEnvSt.m_debugCounter = 0;
 
-    Vec partPos;
-    Vec viewPos;
-
     if (*reinterpret_cast<long**>(reinterpret_cast<unsigned char*>(this) + 0x5dc) != 0) {
         if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x174) <= 3) {
 #define PPP_EDIT_DRAW_PASS(drawPass)                                                                       \
@@ -2646,6 +2643,8 @@ void CPartMng::pppEditDraw()
                 Mtx invCamera;                                                                             \
                 Vec cameraPos;                                                                             \
                 Vec cameraDelta;                                                                           \
+                Vec partPos;                                                                               \
+                Vec viewPos;                                                                               \
                 PSMTXInverse(ppvCameraMatrix, invCamera);                                                  \
                 cameraPos.x = invCamera[0][3];                                                             \
                 cameraPos.y = invCamera[1][3];                                                             \
@@ -2701,6 +2700,8 @@ void CPartMng::pppEditDraw()
             PPP_EDIT_DRAW_PASS(7)
 #undef PPP_EDIT_DRAW_PASS
         } else {
+            Vec partPos;
+            Vec viewPos;
             char* mng = reinterpret_cast<char*>(m_pppMng);
             int editCount = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + kEditCountOffset);
             for (int i = 0; i < editCount; i++) {

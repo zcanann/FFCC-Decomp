@@ -1259,10 +1259,10 @@ void CCameraPcs::calcMap()
     buttons = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? 0 : CameraRawPadInput().buttonDown[0];
 
     stickH = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? kCameraZeroF : CameraRawPadInput().substickYF;
-    stickH = kCameraDegToRad * (stickH / kCameraOneEighthF);
+    stickH = 0.017453292519943295f * (stickH / 0.125f);
 
     stickV = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? kCameraZeroF : *reinterpret_cast<float*>(&CameraRawPadInput().lockedButton[0]);
-    stickV = -(kCameraDegToRad * (stickV / kCameraOneEighthF));
+    stickV = -(0.017453292519943295f * (stickV / 0.125f));
 
     triggerL = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? kCameraZeroF : CameraRawPadInput().stickYF;
 

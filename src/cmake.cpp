@@ -817,7 +817,7 @@ void CMenuPcs::CmakeVillageDraw()
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
     float panelW = 328.0f;
     MenuPcs.DrawRect(
-        0, static_cast<float>(static_cast<int>(400.0 - panelW * 0.5)), 288.0f, panelW, 56.0f,
+        0, static_cast<float>(static_cast<int>(-(panelW / 2.0 - 400.0))), 288.0f, panelW, 56.0f,
         0.0f, 368.0f, 1.0f, 1.0f, 0.0f);
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -2047,8 +2047,8 @@ void CMenuPcs::CmakeTribeDraw()
     float boxH = 240.0f;
     MenuPcs.DrawRect(
         0,
-        static_cast<float>(static_cast<int>(-(boxW * 0.5 - 400.0))),
-        static_cast<float>(static_cast<int>(-(boxH * 0.5 - 188.0))),
+        static_cast<float>(static_cast<int>(-(boxW / 2.0 - 400.0))),
+        static_cast<float>(static_cast<int>(-(boxH / 2.0 - 188.0))),
         boxW, 264.0f,
         0.0f, 0.0f, 1.0f, 0.90909094f, 0.0f);
 
@@ -2590,7 +2590,7 @@ void CMenuPcs::CmakeNameDraw()
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
     float titleW = 280.0f;
     MenuPcs.DrawRect(
-        0, static_cast<float>(static_cast<int>(-(titleW * 0.5 - 400.0))), 268.0f, titleW, 64.0f,
+        0, static_cast<float>(static_cast<int>(-(titleW / 2.0 - 400.0))), 268.0f, titleW, 64.0f,
         0.0f, 304.0f, 1.0f, 1.0f, 0.0f);
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -3212,7 +3212,7 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 
     float nameW = 161.0f;
-    int nameX = static_cast<int>(-((nameW * 0.5) - 400.0));
+    int nameX = static_cast<int>(-(nameW / 2.0 - 400.0));
 
     int baseY = 300;
     if (x != 0) {

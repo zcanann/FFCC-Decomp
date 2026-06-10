@@ -1944,8 +1944,6 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma switch_tables off
 void CGCharaObj::setSta(int staIndex, int value)
 {
 	unsigned int isIceJ = 0;
@@ -2079,7 +2077,6 @@ void CGCharaObj::setSta(int staIndex, int value)
 					}
 				}
 				break;
-			case 0x67:
 				break;
 			default:
 				break;
@@ -2215,6 +2212,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 					reinterpret_cast<CGMonObj*>(this)->undeadOff();
 				}
 				break;
+			case 0x67:
 			default:
 				break;
 		}
@@ -2222,7 +2220,6 @@ void CGCharaObj::setSta(int staIndex, int value)
 
 	*reinterpret_cast<short*>(staSlot + 0x3E) = static_cast<short>(value);
 }
-#pragma pop
 
 /*
  * --INFO--

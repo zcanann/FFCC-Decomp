@@ -465,9 +465,9 @@ static bool IsCmakeNameBlank(const char* name)
     return true;
 }
 
-static bool IsDuplicateCmakeName(CMenuPcs* menu, const char* name)
+static int IsDuplicateCmakeName(CMenuPcs* menu, const char* name)
 {
-    bool found = false;
+    int found = false;
     unsigned char* entry = reinterpret_cast<unsigned char*>(&Game);
     for (int slot = 0; slot < 8; ++slot, entry += 0xC30) {
         if (slot == CmakeSlot(menu)) {
@@ -2937,31 +2937,32 @@ int CMenuPcs::CmakeNameCtrl()
                 }
             } else if ((down & 0x200) != 0) {
                 unsigned int bsLen0 = strlen(s_CmakeInfo.m_name);
-                if ((bsLen0 & (static_cast<int>(-bsLen0 | bsLen0) >> 31)) == 0) {
+                if ((bsLen0 & (static_cast<int>(-bsLen0 | bsLen0) >> 31)) != 0) {
+                    int bsRet;
+                    unsigned int bsLen1 = strlen(s_CmakeInfo.m_name);
+                    if ((bsLen1 & (static_cast<int>(-bsLen1 | bsLen1) >> 31)) == 0) {
+                        bsRet = -1;
+                    } else {
+                        int bsPos = strlen(s_CmakeInfo.m_name);
+                        if ((__cntlzw(static_cast<unsigned int>(strlen(s_CmakeInfo.m_name))) >> 5 & 1) == 0) {
+                            s_CmakeInfo.m_name[bsPos - 1] = '\0';
+                        } else {
+                            s_CmakeInfo.m_name[bsPos - 2] = '\0';
+                        }
+                        bsRet = 0;
+                    }
+                    if (bsRet != 0) {
+                        Sound.PlaySe(4, 0x40, 0x7F, 0);
+                    } else {
+                        Sound.PlaySe(3, 0x40, 0x7F, 0);
+                    }
+                    return 0;
+                } else {
                     Sound.PlaySe(0x34, 0x40, 0x7F, 0);
                     ChgModel(static_cast<int>(CmakeSlot(this)), -1, -1, -1);
                     CmakeState(this)->m_resultDir = -1;
                     return -1;
                 }
-                int bsRet;
-                unsigned int bsLen1 = strlen(s_CmakeInfo.m_name);
-                if ((bsLen1 & (static_cast<int>(-bsLen1 | bsLen1) >> 31)) == 0) {
-                    bsRet = -1;
-                } else {
-                    int bsPos = strlen(s_CmakeInfo.m_name);
-                    if ((__cntlzw(static_cast<unsigned int>(strlen(s_CmakeInfo.m_name))) >> 5 & 1) == 0) {
-                        s_CmakeInfo.m_name[bsPos - 1] = '\0';
-                    } else {
-                        s_CmakeInfo.m_name[bsPos - 2] = '\0';
-                    }
-                    bsRet = 0;
-                }
-                if (bsRet != 0) {
-                    Sound.PlaySe(4, 0x40, 0x7F, 0);
-                } else {
-                    Sound.PlaySe(3, 0x40, 0x7F, 0);
-                }
-                return 0;
             }
         }
     }

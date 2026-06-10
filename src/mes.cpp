@@ -403,37 +403,55 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		}
 		case 0x41:
 		{
-			signed char mode = (signed char)GetMesNibbleValue((const char*)op);
+			int mode = (signed char)GetMesNibbleValue((const char*)op);
+			int newCaseMode;
 			if (mode == 1)
 			{
-				caseMode = 1;
-			}
-			else if (mode == 0)
-			{
-				caseMode = 3;
+				newCaseMode = 1;
 			}
 			else
 			{
-				caseMode = 2;
+				newCaseMode = 2;
+				if (mode == 0)
+				{
+					newCaseMode = 3;
+				}
 			}
+			caseMode = newCaseMode;
 			in += 2;
 			break;
 		}
 		case 0x44:
-			branchMode = (playerIndex == 0) ? 1 : 2;
+		{
+			int newBranchMode = 2;
+			if (playerIndex == 0)
+			{
+				newBranchMode = 1;
+			}
+			branchMode = newBranchMode;
 			break;
+		}
 		case 0x42:
 		{
 			signed char varIndex = (signed char)GetMesNibbleValue((const char*)op);
-			branchMode = (CMes::m_tempVar[varIndex] == 1) ? 1 : 2;
+			int newBranchMode = 2;
+			if (CMes::m_tempVar[varIndex] == 1)
+			{
+				newBranchMode = 1;
+			}
+			branchMode = newBranchMode;
 			in += 2;
 			break;
 		}
 		case 0x45:
 		{
 			signed char varIndex = (signed char)GetMesNibbleValue((const char*)op);
-			int caravanIdx = CMes::m_tempVar[varIndex];
-			branchMode = (Game.m_caravanWorkArr[caravanIdx].m_genderFlag == 0) ? 1 : 2;
+			int newBranchMode = 2;
+			if (Game.m_caravanWorkArr[CMes::m_tempVar[varIndex]].m_genderFlag == 0)
+			{
+				newBranchMode = 1;
+			}
+			branchMode = newBranchMode;
 			in += 2;
 			break;
 		}

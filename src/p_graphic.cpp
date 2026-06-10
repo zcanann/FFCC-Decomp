@@ -310,48 +310,49 @@ void CGraphicPcs::drawScreenFade()
 
         if (slot == 2) {
             const int mode = slotData->m_mode;
-            if (mode == 1) {
+            if (mode == 0) {
+            drawSlot2Fullscreen:
+                GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+                GXPosition3f32(kGraphicZero, kGraphicZero, kGraphicZero);
+                GXColor1u32(*(u32*)&baseColor);
+                GXTexCoord2u16(0, 0);
+                GXPosition3f32(kGraphicScreenWidth, kGraphicZero, kGraphicZero);
+                GXColor1u32(*(u32*)&baseColor);
+                GXTexCoord2u16(2, 0);
+                GXPosition3f32(kGraphicScreenWidth, kGraphicScreenHeight, kGraphicZero);
+                GXColor1u32(*(u32*)&baseColor);
+                GXTexCoord2u16(2, 2);
+                GXPosition3f32(kGraphicZero, kGraphicScreenHeight, kGraphicZero);
+                GXColor1u32(*(u32*)&baseColor);
+                GXTexCoord2u16(0, 2);
+            } else if (mode == 1) {
                 CGObject* obj = static_cast<CGObject*>(slotData->m_targetObj);
-                if (obj != NULL) {
-                    Vec pos = obj->m_worldPosition;
-                    pos.y += slotData->m_targetYOffs;
-                    PSMTX44MultVec(worldScreenMtx, &pos, &pos);
-
-                    const int radius = (unsigned int)(kGraphicScreenWidth * (kGraphicOne - fadeWave));
-                    float sx = pos.x * kGraphicScreenCenterX + kGraphicScreenCenterX;
-                    float sy = -(pos.y * kGraphicScreenCenterY - kGraphicScreenCenterY);
-                    if (sx < kGraphicZero) {
-                        sx = kGraphicZero;
-                    } else if (sx > kGraphicScreenWidth) {
-                        sx = kGraphicScreenWidth;
-                    }
-                    if (sy < kGraphicZero) {
-                        sy = kGraphicZero;
-                    } else if (sy > kGraphicScreenHeight) {
-                        sy = kGraphicScreenHeight;
-                    }
-
-                    const unsigned int ix = (unsigned int)sx;
-                    const unsigned int iy = (unsigned int)sy;
-                    drawSFCircle(0x500, radius, ix, iy, baseColor, baseColor);
-                    drawSFCircle(radius, radius - static_cast<unsigned int>(kScreenFadeRingWidth), ix, iy, baseColor, baseColor2);
-                    continue;
+                if (obj == NULL) {
+                    goto drawSlot2Fullscreen;
                 }
-            }
+                Vec pos = obj->m_worldPosition;
+                pos.y += slotData->m_targetYOffs;
+                PSMTX44MultVec(worldScreenMtx, &pos, &pos);
 
-            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-            GXPosition3f32(kGraphicZero, kGraphicZero, kGraphicZero);
-            GXColor1u32(*(u32*)&baseColor);
-            GXTexCoord2u16(0, 0);
-            GXPosition3f32(kGraphicScreenWidth, kGraphicZero, kGraphicZero);
-            GXColor1u32(*(u32*)&baseColor);
-            GXTexCoord2u16(2, 0);
-            GXPosition3f32(kGraphicScreenWidth, kGraphicScreenHeight, kGraphicZero);
-            GXColor1u32(*(u32*)&baseColor);
-            GXTexCoord2u16(2, 2);
-            GXPosition3f32(kGraphicZero, kGraphicScreenHeight, kGraphicZero);
-            GXColor1u32(*(u32*)&baseColor);
-            GXTexCoord2u16(0, 2);
+                float sx = pos.x * kGraphicScreenCenterX + kGraphicScreenCenterX;
+                float sy = -(pos.y * kGraphicScreenCenterY - kGraphicScreenCenterY);
+                if (sx < kGraphicZero) {
+                    sx = kGraphicZero;
+                } else if (sx > kGraphicScreenWidth) {
+                    sx = kGraphicScreenWidth;
+                }
+                if (sy < kGraphicZero) {
+                    sy = kGraphicZero;
+                } else if (sy > kGraphicScreenHeight) {
+                    sy = kGraphicScreenHeight;
+                }
+
+                const int radius = (int)(kScreenFadeCircleRadius * (kGraphicOne - fadeWave));
+                const int ix = (int)sx;
+                const int iy = (int)sy;
+                drawSFCircle(0x500, radius, ix, iy, baseColor, baseColor);
+                drawSFCircle(radius, radius - 8, ix, iy, baseColor, baseColor2);
+            }
             continue;
         }
 

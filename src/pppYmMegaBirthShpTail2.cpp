@@ -104,7 +104,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
         step[0x6E], 0, (u8)(((u32)__cntlzw((u32)step[0x6B])) >> 5), 1, 0);
     pppSetBlendMode(step[0x6E]);
 
-    for (u32 i = 0; i < maxParticles; i++) {
+    for (u32 i = 0; i < work->m_maxParticles; i++) {
         u8* particle = (u8*)particles + i * 0x1B8;
         if (*(u16*)(particle + 0x22) != 0) {
             const u16 frameCountRaw = *(u16*)(step + 0x84);

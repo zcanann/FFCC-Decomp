@@ -699,7 +699,7 @@ int CMenuPcs::LetterCtrl()
 		s16 mode = *reinterpret_cast<s16*>(state + 0x30);
 		if (mode == 0) {
 			*reinterpret_cast<s16*>(state + 0x22) = *reinterpret_cast<s16*>(state + 0x22) + 1;
-			unsigned int panelCount = GetLetterAnimStorage(this)->count;
+			int panelCount = GetLetterAnimStorage(this)->count;
 			s16* panel = GetLetterPanelBase(this);
 			int frame = static_cast<int>(*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x22));
 			done = 0;
@@ -791,16 +791,18 @@ int CMenuPcs::LetterCtrl()
 				}
 			}
 		} else if (mode == 2) {
+			int lang = Game.m_gameWork.m_languageId;
+			CCaravanWork* caravanWork = GetLetterCaravanWork();
 			if (*reinterpret_cast<char*>(GetLetterStateBase(this) + 0xC) == '\0') {
 				char info[0x80];
-				char left[0x10];
 				char right[0x10];
-				s16 winW;
+				char left[0x10];
 				s16 winH;
-				CCaravanWork::CLetterWork* letter = &GetLetterCaravanWork()->m_letters[s_SelLetter];
-				if (letter->AttachmentIsGil()) {
-					s16 gil = static_cast<int>(letter->AttachmentValue()) * 100;
-					if (Game.m_gameWork.m_languageId == 2) {
+				s16 winW;
+				char* letterBytes = reinterpret_cast<char*>(caravanWork) + s_SelLetter * 0xC;
+				if (reinterpret_cast<CCaravanWork::CLetterWork*>(letterBytes + 0x3EC)->AttachmentIsGil()) {
+					int gil = static_cast<int>(reinterpret_cast<CCaravanWork::CLetterWork*>(letterBytes + 0x3EC)->AttachmentValue()) * 100;
+					if (lang == 2) {
 						sprintf(info, s_fmt_pctd_sp_pcts_pcts,
 						        gil,
 						        GetMenuStr(4),
@@ -812,16 +814,15 @@ int CMenuPcs::LetterCtrl()
 						        GetMenuStr(4));
 					}
 				} else {
-					int itemId = letter->AttachmentValue() * 5 + 4;
-					char* value = GetLetterItemName(itemId);
-					if (Game.m_gameWork.m_languageId == 2) {
+					int value = reinterpret_cast<CCaravanWork::CLetterWork*>(letterBytes + 0x3EC)->AttachmentValue();
+					if (lang == 2) {
 						sprintf(info, s_letterItemInfoFmt,
 						        GetMenuStr(0x23),
-						        value,
+						        GetLetterItemName(value * 5 + 4),
 						        GetMenuStr(0x24),
 						        GetMenuStr(0x22));
 					} else {
-						sprintf(info, s_fmt_pcts_pcts_q, GetMenuStr(0x22), value);
+						sprintf(info, s_fmt_pcts_pcts_q, GetMenuStr(0x22), GetLetterItemName(value * 5 + 4));
 					}
 				}
 				strcpy(left, "  ");
@@ -888,7 +889,7 @@ int CMenuPcs::LetterCtrl()
 						if ((*reinterpret_cast<unsigned int*>(panel + 0x16) & 2) == 0) {
 							f = static_cast<float>(DOUBLE_803330e8 -
 							                       (DOUBLE_803330e8 / static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(panel + 0x14)))) *
-							                           static_cast<double>(static_cast<float>(*reinterpret_cast<unsigned int*>(panel + 0x10))));
+							                           static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(panel + 0x10))));
 							float dx = (*reinterpret_cast<float*>(panel + 0x1C) - static_cast<float>(panel[0])) * f;
 							float dy = (*reinterpret_cast<float*>(panel + 0x1E) - static_cast<float>(panel[1])) * f;
 							*reinterpret_cast<float*>(panel + 0x18) = dx;

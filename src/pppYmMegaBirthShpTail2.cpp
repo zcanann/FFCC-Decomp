@@ -125,11 +125,10 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
             const s32 trailReadIndex = *(u8*)(particle + 0x38);
             const s32 trailMaxIndex = *(u8*)(particle + 0x37) - 1;
             s32 trailNextIndex = trailReadIndex + 1;
-            const float alphaScale = (float)*(s16*)((u8*)colorWork + 6) / kPppYmMegaBirthShpTail2AlphaDivisor;
             const float stepDivisor = (float)((s32)frameCountRaw - 1);
+            const float alphaScale = (float)*(s16*)((u8*)colorWork + 6) / kPppYmMegaBirthShpTail2AlphaDivisor;
             float fadeA = (float)step[0x7B] * alphaScale;
-            const float fadeAEnd = (float)step[0x7F] * alphaScale;
-            const float fadeANum = fadeA - fadeAEnd;
+            const float fadeANum = fadeA - (float)step[0x7F] * alphaScale;
             float fadeRGB[3];
             fadeRGB[2] = (float)step[0x78];
             fadeRGB[1] = (float)step[0x79];

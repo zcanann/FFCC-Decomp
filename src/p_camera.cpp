@@ -934,9 +934,10 @@ void CCameraPcs::draw()
         Mtx cameraMtx;
         Mtx shadowMtx;
         Vec* shadowPos = &g_shadow_pos;
-        float posX = shadowPos->x;
-        float posY = shadowPos->y;
-        float posZ = shadowPos->z;
+        float posX, posY, posZ;
+        posZ = shadowPos->z;
+        posY = shadowPos->y;
+        posX = shadowPos->x;
         PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         GXSetZCompLoc(0);
@@ -966,9 +967,10 @@ void CCameraPcs::draw()
         Mtx cameraMtx;
         Mtx shadowMtx;
         Vec* shadowRefPos = &g_shadow_refpos;
-        float refPosX = shadowRefPos->x;
-        float refPosY = shadowRefPos->y;
-        float refPosZ = shadowRefPos->z;
+        float refPosX, refPosY, refPosZ;
+        refPosX = shadowRefPos->x;
+        refPosZ = shadowRefPos->z;
+        refPosY = shadowRefPos->y;
         PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         GXSetZCompLoc(0);

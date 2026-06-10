@@ -291,19 +291,19 @@ void CMaterialEditorPcs::drawViewer()
                     int v;
                     v = polygon->v0;
                     if (v < 0) {
-                        polygon->v0 = v * -1;
+                        polygon->v0 = v * -1U;
                     }
                     v = polygon->v1;
                     if (v < 0) {
-                        polygon->v1 = v * -1;
+                        polygon->v1 = v * -1U;
                     }
                     v = polygon->v2;
                     if (v < 0) {
-                        polygon->v2 = v * -1;
+                        polygon->v2 = v * -1U;
                     }
                     v = polygon->v3;
                     if (v < 0) {
-                        polygon->v3 = v * -1;
+                        polygon->v3 = v * -1U;
                     }
 
                     pp = polygon;
@@ -399,10 +399,12 @@ void CMaterialEditorPcs::drawViewer()
                     clrIndex[3] = 2;
                 }
 
+                u32 pos;
+                u32 clr;
                 u8 i = 0;
                 while (i < vertexCount) {
-                    u32 pos = posIndex[i];
-                    u32 clr = clrIndex[i];
+                    pos = posIndex[i];
+                    clr = clrIndex[i];
                     i++;
                     GXWGFifo.u16 = static_cast<u16>(pos);
                     GXWGFifo.u16 = static_cast<u16>(pos);

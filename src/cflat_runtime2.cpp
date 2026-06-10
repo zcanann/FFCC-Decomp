@@ -1615,9 +1615,9 @@ void CFlatRuntime2::Draw()
 				GXWGFifo.f32 = vtx[1];
 				GXWGFifo.f32 = vtx[2];
 				const int next = (j + 1) & 7;
-				GXWGFifo.f32 = verts[next * 3];
-				GXWGFifo.f32 = verts[next * 3 + 1];
-				GXWGFifo.f32 = verts[next * 3 + 2];
+				GXWGFifo.f32 = ringVerts[next * 3];
+				GXWGFifo.f32 = ringVerts[next * 3 + 1];
+				GXWGFifo.f32 = ringVerts[next * 3 + 2];
 				vtx += 3;
 			}
 		}

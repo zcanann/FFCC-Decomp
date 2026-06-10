@@ -183,10 +183,10 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                 }
 
                 while ((s32)frameCount > 0) {
-                    Vec* curHist = &history[trailNextIndex];
-                    bool canDraw = (kPppYmMegaBirthShpTail3Zero != curHist->x) ||
-                                   (kPppYmMegaBirthShpTail3Zero != curHist->y) ||
-                                   (kPppYmMegaBirthShpTail3Zero != curHist->z);
+                    u8* curHist = particle + trailNextIndex * 0xc;
+                    bool canDraw = (kPppYmMegaBirthShpTail3Zero != *(float*)(curHist + 0x80)) ||
+                                   (kPppYmMegaBirthShpTail3Zero != *(float*)(curHist + 0x84)) ||
+                                   (kPppYmMegaBirthShpTail3Zero != *(float*)(curHist + 0x88));
                     if (canDraw) {
                         workRand = (s16)((u32)workRand * 0x80d + 7);
                         const u32 shapeFrame = (u32)(particleShapeFrame + workRand) / shapeFrameStep;

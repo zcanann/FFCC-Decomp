@@ -4387,6 +4387,8 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 }
 
 
+#pragma push
+#pragma opt_unroll_loops off
 /*
  * --INFO--
  * PAL Address: 0x800AB24C
@@ -4444,61 +4446,19 @@ int JoyBus::MakeJoyData(char* src, int length, unsigned int* outBuffer)
         param_4[7] = *param_2;
 
         if (1 < iVar3) {
-            uVar5 = static_cast<unsigned int>(iVar3 - 1);
-            uVar8 = uVar5 >> 2;
-            unsigned char marker = 0x85;
-
-            if (uVar8 != 0) {
-                do {
-                    puVar6[0] = marker;
-                    puVar6[1] = pbVar4[0];
-                    puVar6[2] = pbVar4[1];
-                    puVar6[3] = pbVar4[2];
-
-                    puVar6[4] = marker;
-                    puVar6[5] = pbVar4[3];
-                    puVar6[6] = pbVar4[4];
-                    puVar6[7] = pbVar4[5];
-
-                    puVar6[8] = marker;
-                    puVar6[9] = pbVar4[6];
-                    puVar6[10] = pbVar4[7];
-                    puVar6[11] = pbVar4[8];
-
-                    puVar6[12] = marker;
-                    puVar6[13] = pbVar4[9];
-                    puVar6[14] = pbVar4[10];
-
-                    pbVar1 = pbVar4 + 0x0B;
-                    pbVar4 = pbVar4 + 0x0C;
-
-                    puVar6[15] = *pbVar1;
-                    puVar6 = puVar6 + 0x10;
-
-                    uVar8 = uVar8 - 1;
-                } while (uVar8 != 0);
-
-                uVar5 = uVar5 & 3;
-                if (uVar5 == 0) {
-                    return iVar3;
-                }
+            int i;
+            for (i = 0; i < iVar3 - 1; i++) {
+                *puVar6++ = 0x85;
+                *puVar6++ = *pbVar4++;
+                *puVar6++ = *pbVar4++;
+                *puVar6++ = *pbVar4++;
             }
-
-            do {
-                puVar6[0] = marker;
-                puVar6[1] = pbVar4[0];
-                puVar6[2] = pbVar4[1];
-                pbVar1 = pbVar4 + 2;
-                pbVar4 = pbVar4 + 3;
-                puVar6[3] = *pbVar1;
-                puVar6 = puVar6 + 4;
-                uVar5 = uVar5 - 1;
-            } while (uVar5 != 0);
         }
     }
 
     return iVar3;
 }
+#pragma pop
 
 
 /*

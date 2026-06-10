@@ -836,7 +836,8 @@ void GbaQueue::ExecutQueue()
 							const int quantity = bytes[3];
 							int shopItem = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_shopList[bytes[2]];
 							for (n = 0; n < quantity; n++) {
-								if (reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->AddItem(shopItem, 0) == false) {
+								bool added = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->AddItem(shopItem, 0);
+								if (added == false) {
 									Joybus.SendResult(channel, 1, bytes[0], bytes[1]);
 								}
 							}

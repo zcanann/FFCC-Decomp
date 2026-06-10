@@ -2565,8 +2565,8 @@ void CShopMenu::SelectYesNo()
             int quantity = 0;
             while (quantity < m_quantity) {
                 CCaravanWork* caravanWork = m_caravanWork;
-                bool hasSpace = caravanWork->m_inventoryItemCount + 1 <= 0x40;
-                if (!hasSpace) {
+                unsigned char hasSpace = caravanWork->m_inventoryItemCount + 1 <= 0x40;
+                if (hasSpace == 0) {
                     break;
                 }
                 int gilValue;
@@ -2628,34 +2628,32 @@ void CShopMenu::SelectYesNo()
 
 sellBlock:
     int itemIndex = m_selectedIndex;
-    bool canTrade = false;
+    int canTrade;
     if (itemIndex == -1) {
-        goto tradeResolved;
-    }
-    {
+        canTrade = 0;
+    } else {
         int tradeItem = getItemNo(itemIndex);
         if (tradeItem <= 0) {
-            canTrade = false;
+            canTrade = 0;
         } else if (m_listType == 0) {
-            canTrade = true;
+            canTrade = 1;
         } else if (m_listType == 2) {
-            canTrade = true;
+            canTrade = 1;
             if ((m_caravanWork->m_shopArgs[((int)(tradeItem - 0x191U) >> 5)] &
                  (1 << ((tradeItem - 0x191U) & 0x1F))) != 0) {
             } else {
-                canTrade = false;
+                canTrade = 0;
             }
         } else if (static_cast<unsigned char>(MenuPcs.EquipChk(itemIndex)) != 0) {
-            canTrade = false;
+            canTrade = 0;
         } else if (tradeItem > 0x9E) {
-            canTrade = true;
+            canTrade = 1;
         } else {
-            canTrade = false;
+            canTrade = 0;
         }
     }
 
-tradeResolved:
-    if (canTrade) {
+    if (canTrade != 0) {
         Sound.PlaySe(0x50, 0x40, 0x7F, 0);
         int sellId = getItemNo(m_selectedIndex);
         int gilValue;

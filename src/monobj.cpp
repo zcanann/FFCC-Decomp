@@ -250,7 +250,7 @@ void CGMonObj::undeadOff()
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 
-	*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x694) = 0.0f;
+	*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x694) = 1.0f;
 
 	unsigned char weaponFlags = *reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags);
 	int weaponMode = static_cast<int>((static_cast<unsigned int>(weaponFlags) << 24) & 0xC0000000) >> 31;
@@ -272,7 +272,7 @@ void CGMonObj::undeadOff()
 
 	if ((isUndead != 0) && (count != 0)) {
 		int dataNo = object->m_charaModelHandle->GetPdtSlot();
-		reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace((particleBase + 9) | (dataNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x594), object, 0.0f, 0);
+		reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace((particleBase + 9) | (dataNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x594), object, 1.0f, 0);
 	}
 
 	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC) == 0xB) {
@@ -999,7 +999,7 @@ void CGMonObj::onFrameStat()
 			Vec delta;
 			PSVECSubtract(&src, &object->m_worldPosition, &delta);
 			float speedScale = *reinterpret_cast<float*>(mon + 0x690) *
-				(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4)) + 0.8f);
+				(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4)) + kMonObjEpsilon);
 			object->MoveVector(&delta, speedScale, 1, 1, 0, 1);
 		} else {
 			prgObj->changeStat(0, 0, 0);
@@ -1016,7 +1016,7 @@ void CGMonObj::onFrameStat()
 		Vec delta;
 		PSVECSubtract(&m_homePosition, &object->m_worldPosition, &delta);
 		float speedScale = *reinterpret_cast<float*>(mon + 0x690) *
-			(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4)) + 0.8f);
+			(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4)) + kMonObjEpsilon);
 		object->MoveVector(&delta, speedScale, 1, 1, 0, 1);
 		break;
 	}
@@ -1105,7 +1105,7 @@ void CGMonObj::onFrameStat()
 							object->m_rotTargetY = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]));
 						} else {
 							float speedScale = *reinterpret_cast<float*>(mon + 0x690) *
-								(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(script9b + 0xD4)) + 0.8f);
+								(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(script9b + 0xD4)) + kMonObjEpsilon);
 							CVector targetVec(reinterpret_cast<CGObject*>(Game.m_partyObjArr[m_targetPartyIndex])->m_worldPosition);
 							CVector myVec(object->m_worldPosition);
 							CVector diff;
@@ -1151,7 +1151,7 @@ void CGMonObj::onFrameStat()
 					int rand = Math.Rand(0x50);
 					float randF = Math.RandF();
 					float speedScale = *reinterpret_cast<float*>(mon + 0x690) *
-						(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle[9]) + 0xD4)) + 0.8f);
+						(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle[9]) + 0xD4)) + kMonObjEpsilon);
 					object->moveVectorRot(kMonObjTwo * (FLOAT_803319C4 * randF), 0.0f, kMonObjQuarter * speedScale, rand + 10);
 				} else {
 					unsigned char weaponFlags1 = object->m_weaponNodeFlagBytes.m_flags1;
@@ -1172,7 +1172,7 @@ void CGMonObj::onFrameStat()
 
 	case 0x1E: {
 		float speedScale = *reinterpret_cast<float*>(mon + 0x690) *
-			(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4)) + 0.8f);
+			(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4)) + kMonObjEpsilon);
 		CVector targetVec(reinterpret_cast<CGObject*>(Game.m_partyObjArr[m_targetPartyIndex])->m_worldPosition);
 		CVector myVec(object->m_worldPosition);
 		CVector diff;
@@ -1337,7 +1337,7 @@ void CGMonObj::onFrameStat()
 			*reinterpret_cast<float*>(mon + 0x694) = kMonObjDefaultScale;
 			object->m_displayFlags |= 1;
 			float speedScale = *reinterpret_cast<float*>(mon + 0x690) *
-				(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4)) + 0.8f);
+				(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4)) + kMonObjEpsilon);
 			object->moveVectorRot(object->m_rotBaseY, 0.0f, speedScale, 0x14);
 		}
 		if (prgObj->m_stateFrame == 0x10) {
@@ -1826,8 +1826,8 @@ void CGMonObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 	charaObj->CGCharaObj::onDrawDebug(font, posX, posY, posZ);
 
 	if ((static_cast<signed char>((static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags)) << 24) & 0xC0000000) >> 31)) != 0) &&
-			(CFlatCenterState() == 0) &&
-		((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&DbgMenuPcs) + 0x6484) & 0x80) != 0)) {
+			(static_cast<int>(CFlatCenterState()) == 0) &&
+		((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&DbgMenuPcs) + 0x4) & 0x80) != 0)) {
 		char text[0x100];
 		unsigned short aiState = m_groupTag;
 		int targetIndex = m_targetPartyIndex;
@@ -1851,12 +1851,14 @@ void CGMonObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 		float lineH = static_cast<float>(font->m_glyphHeight) * font->scaleY;
 		posY = posY - lineH;
 
-		int targetDist = 0;
+		int targetDist;
 		if (m_targetPartyIndex >= 0) {
 			targetDist = static_cast<int>(*reinterpret_cast<float*>(mon + m_targetPartyIndex * 4 + 0x5D0));
+		} else {
+			targetDist = 0;
 		}
 
-		int chaseRange = static_cast<int>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xCC));
+		int chaseRange = static_cast<int>(static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xCC)));
 		int spawnDist = static_cast<int>(PSVECDistance(&m_homePosition, &object->m_worldPosition));
 		sprintf(text, s_monObjDistanceFmt, targetDist, spawnDist, chaseRange);
 		float curPosY2 = posY;
@@ -2198,12 +2200,16 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 
 			if (((Game.m_gameWork.m_menuStageMode != 0) &&
 				 (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) &&
-				 ((partyObj->GetCID() & 0x6D) == 0x6D) &&
-				 (partyObj->m_scriptHandle[0xED] != NULL)) ||
-				(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(partyObj->m_scriptHandle) + 7) == 0) ||
+				 ((static_cast<unsigned short>(partyObj->GetCID()) & 0x6D) == 0x6D) &&
+				 (reinterpret_cast<int>(partyObj->m_scriptHandle[0xED]) != 0)) ||
+				(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(partyObj->m_scriptHandle) + 0x1C) == 0) ||
 				(partyObj->m_lastStateId == 9) ||
 				(partyObj->m_lastStateId == 0x22) ||
-				(*reinterpret_cast<float*>(mon + partyIndex * 4 + 0x5D0) >=
+				((Game.m_gameWork.m_menuStageMode != 0) &&
+				 (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) &&
+				 ((static_cast<unsigned short>(partyObj->GetCID()) & 0x6D) == 0x6D) &&
+				 (reinterpret_cast<int>(partyObj->m_scriptHandle[0xED]) != 0)) ||
+				!(*reinterpret_cast<float*>(mon + partyIndex * 4 + 0x5D0) <
 				 (coneLength - sideDist))) {
 				continue;
 			}
@@ -2226,22 +2232,22 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 				targetDelta.z = delta.z;
 			}
 			float targetDist = PSVECMag(&targetDelta);
-			if (kMonObjZero >= targetDist) {
+			if (!(kMonObjZero < targetDist)) {
 				continue;
 			}
 
 			CVector targetDir;
 			PSVECNormalize(&targetDelta, reinterpret_cast<Vec*>(&targetDir));
 			float dot = PSVECDotProduct(reinterpret_cast<Vec*>(&forward), reinterpret_cast<Vec*>(&targetDir));
-			if (((sideDist - object->m_bodyEllipsoidRadius) > targetDist) ||
-				((static_cast<double>(kMonObjZero) != static_cast<double>(halfAngle)) &&
-				 (kMonObjZero >= dot))) {
+			if (!((sideDist - object->m_bodyEllipsoidRadius) <= targetDist) ||
+				((halfAngle != kMonObjZero) &&
+				 !(kMonObjZero < dot))) {
 				continue;
 			}
 
 			float angle = static_cast<float>(acos(static_cast<double>(dot)));
-			if ((static_cast<double>(kMonObjZero) != static_cast<double>(halfAngle)) &&
-				(angle >= halfAngle)) {
+			if ((halfAngle != kMonObjZero) &&
+				!(angle < halfAngle)) {
 				continue;
 			}
 
@@ -2271,7 +2277,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 			debugDelta.y = targetDelta.y;
 			debugDelta.z = targetDelta.z;
 			if (mapHit != 0) {
-				PSVECScale(&debugDelta, &debugDelta, g_hit_t);
+				PSVECScale(&debugDelta, &debugDelta, g_hit_t_slide_min);
 			}
 			CFlat.AddDebugDrawCC(reinterpret_cast<Vec*>(&startPos), &debugDelta, cylRadius, 1, mapHit == 0);
 
@@ -2283,7 +2289,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 			}
 		}
 
-		if (static_cast<double>(kMonObjZero) != static_cast<double>(halfAngle)) {
+		if (halfAngle != kMonObjZero) {
 			float debugRadius = coneLength * static_cast<float>(tan(static_cast<double>(halfAngle)));
 			CFlat.AddDebugDrawCC(&coneStart, reinterpret_cast<Vec*>(&move), debugRadius, 0, didHit);
 		}
@@ -2521,7 +2527,7 @@ void CGMonObj::onFrameAlways()
 					CGPartyObj* party = Game.m_partyObjArr[i];
 					if (party != nullptr && party->m_comboState != 0) {
 						float dist = PSVECDistance(&party->m_comboCenter, &object->m_worldPosition);
-						if (dist < 60.0f + object->m_bodyEllipsoidRadius) {
+						if (dist < kMonObjHomeSnapDistance + object->m_bodyEllipsoidRadius) {
 							hasNearParty = 1;
 							break;
 						}
@@ -2906,9 +2912,9 @@ void CGMonObj::setRepop(int mode)
 
 		if (mode == 0) {
 			prgObj->playSe3D(0x18, 0x32, 0x96, 0, (Vec*)0);
-			prgObj->putParticle(300, 0, &object->m_worldPosition, 0.0f, 0);
+			prgObj->putParticle(300, 0, &object->m_worldPosition, 1.0f, 0);
 			object->m_bgColMask |= 0x90002;
-			*reinterpret_cast<float*>(mon + 0x694) = 0.0f;
+			*reinterpret_cast<float*>(mon + 0x694) = 1.0f;
 		}
 	}
 
@@ -2932,7 +2938,7 @@ void CGMonObj::setRepop(int mode)
 		}
 
 		int dataNo = object->m_charaModelHandle->GetPdtSlot();
-		prgObj->putParticleBindTrace((i + particleBase + 0x50) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x5A4), object, 0.0f, 0);
+		prgObj->putParticleBindTrace((i + particleBase + 0x50) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x5A4), object, 1.0f, 0);
 	}
 
 	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x20000);
@@ -2940,14 +2946,14 @@ void CGMonObj::setRepop(int mode)
 	unsigned short countB = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AA);
 	for (int i = 0; i < static_cast<int>(countB); i++) {
 		int dataNo = object->m_charaModelHandle->GetPdtSlot();
-		prgObj->putParticleBindTrace((i + 0x5A) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x5A8), object, 0.0f, 0);
+		prgObj->putParticleBindTrace((i + 0x5A) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x5A8), object, 1.0f, 0);
 	}
 
 	if ((*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFE) & 1) == 0) {
 		return;
 	}
 
-	*reinterpret_cast<float*>(mon + 0x694) = 1.0f;
+	*reinterpret_cast<float*>(mon + 0x694) = kMonObjTwoFifths;
 	scriptHandle = object->m_scriptHandle;
 	classId = reinterpret_cast<int>(scriptHandle[4]);
 	int weaponMode = object->m_weaponNodeFlagBits.m_prg;
@@ -2964,7 +2970,7 @@ void CGMonObj::setRepop(int mode)
 
 	for (int i = 0; i < static_cast<int>(countC); i++) {
 		int dataNo = object->m_charaModelHandle->GetPdtSlot();
-		prgObj->putParticleBindTrace((particleBase + i) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x594), object, 0.0f, 0);
+		prgObj->putParticleBindTrace((particleBase + i) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x594), object, 1.0f, 0);
 	}
 
 	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC) == 0xB) {
@@ -3197,10 +3203,10 @@ void CGMonObj::moveFrame()
 	float stepDist;
 	if ((moveFlags & 0x200) != 0) {
 		unsigned short speedScale = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4);
-		stepDist = moveSpeedRate * (0.001f * speedScale + 1.0f);
+		stepDist = moveSpeedRate * (0.01f * speedScale + kMonObjEpsilon);
 	} else if ((moveFlags & 0x800) != 0) {
 		unsigned short speedScale = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4);
-		stepDist = moveSpeedRate * (0.001f * speedScale + 1.0f);
+		stepDist = moveSpeedRate * (0.01f * speedScale + kMonObjEpsilon);
 	} else {
 		stepDist = moveSpeed;
 	}

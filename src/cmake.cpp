@@ -2162,8 +2162,8 @@ int CMenuPcs::CmakeTribeCtrl()
         }
         return 0;
     } else {
-        int tribeCount = 4;
         int fieldSelect = CmakeState(this)->m_fieldSelect;
+        int tribeCount = (fieldSelect != 0) ? 4 : 4;
 
         if ((repeat & 0x8) != 0) {
             short* values = &CmakeState(this)->m_select;

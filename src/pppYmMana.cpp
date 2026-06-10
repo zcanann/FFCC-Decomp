@@ -728,11 +728,11 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
     CChara::CMesh* mesh;
     CCharaPcs::CHandle* handle;
     CChara::CModel* model;
+    u8* setupArea;
     CGObject* gObject;
     s32 i;
     u32 meshIndex;
     u32 vertexIndex;
-    u8* setupArea;
 
     if (ppvUserStopPartF != 0) {
         return;

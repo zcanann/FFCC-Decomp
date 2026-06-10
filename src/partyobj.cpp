@@ -1503,7 +1503,10 @@ targetJoin: ;
 				return;
 			}
 
-			m_itemId = caravan->m_equipment[0] >= 0 ? caravan->m_inventoryItems[caravan->m_equipment[0]] : 0;
+			{
+				int equip0 = caravan->m_equipment[0];
+				m_itemId = static_cast<short>(equip0) >= 0 ? caravan->m_inventoryItems[equip0] : 0;
+			}
 			changeStat(7, 0, 0);
 			return;
 		}
@@ -1527,12 +1530,11 @@ targetJoin: ;
 		}
 
 		const int itemId = caravan->DelCmdListAndItem(cmdIdx);
-		const int kindOffset = itemId * 0x48;
-		const unsigned short itemKind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + kindOffset);
+		const unsigned short itemKind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48);
 		switch (itemKind) {
 		case 0x100:
 			if (itemId == 0x103) {
-				if (Math.Rand(3) == 0) {
+				if (static_cast<unsigned int>(Math.Rand(3)) == 0) {
 					ClearAllSta();
 					setSta(0x1B, 900);
 					caravan->GetNumCombi(party.unk6BC, 1);
@@ -1542,7 +1544,10 @@ targetJoin: ;
 				changeStat(2, 0, 2);
 				return;
 			}
-			m_itemId = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + kindOffset + 10);
+			{
+				SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
+				m_itemId = rows[itemId].m_fieldA;
+			}
 			changeStat(2, 0, 0);
 			return;
 		case 0x1F5:
@@ -1574,10 +1579,12 @@ targetJoin: ;
 				caravan->GetNumCombi(party.unk6BC, 1);
 			}
 			return;
-		case 0xDF:
-			m_itemId = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + kindOffset + 10);
+		case 0xDF: {
+			SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
+			m_itemId = rows[itemId].m_fieldA;
 			changeStat(2, 0, 0);
 			return;
+		}
 		default:
 			return;
 		}

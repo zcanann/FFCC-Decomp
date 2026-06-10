@@ -1008,7 +1008,7 @@ void CGItemObj::onFrameStat()
 		}
 
 		if (7 < m_stateFrame) {
-			prgObj->m_rotTargetY = prgObj->m_rotTargetY + kItemObjMotionStep;
+			prgObj->m_rotTargetY += kItemObjMotionStep;
 			prgObj->m_worldPosition.x =
 			    kItemObjMotionStep * (m_owner->m_worldPosition.x - prgObj->m_worldPosition.x) + prgObj->m_worldPosition.x;
 			prgObj->m_worldPosition.y =
@@ -1108,7 +1108,7 @@ void CGItemObj::onFrameStat()
 			prgObj->m_groundHitOffset.y = clamped;
 		}
 
-		prgObj->m_rotTargetY = prgObj->m_rotTargetY + kItemObjFineStep;
+		prgObj->m_rotTargetY += kItemObjFineStep;
 		prgObj->m_groundHitOffset.x =
 		    kItemObjFineStep * -(prgObj->m_worldPosition.x - *(float*)(*(unsigned char**)(self + 0x550) + 0x15C));
 		prgObj->m_groundHitOffset.z =
@@ -1116,7 +1116,7 @@ void CGItemObj::onFrameStat()
 		break;
 	case 0x25: {
 		prgObj->m_moveOffset.y = kItemObjMoveOffsetXZ;
-		prgObj->m_rotTargetY = prgObj->m_rotTargetY + kItemObjMemoryTurnStep;
+		prgObj->m_rotTargetY += kItemObjMemoryTurnStep;
 
 		CVector monTarget(*reinterpret_cast<Vec*>(CGMonObj::m_aiWork + 4));
 		CVector worldPos(prgObj->m_worldPosition);

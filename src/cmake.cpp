@@ -2543,12 +2543,12 @@ void CMenuPcs::CmakeNameDraw()
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-    int a = static_cast<int>(255.0f * alpha);
+    float a255 = 255.0f * alpha;
     GXColor col;
     col.r = 0xFF;
     col.g = 0xFF;
     col.b = 0xFF;
-    col.a = static_cast<unsigned char>(a);
+    col.a = static_cast<unsigned char>(a255);
     GXSetChanMatColor(GX_COLOR0A0, col);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
     MenuPcs.DrawRect(
@@ -2559,7 +2559,7 @@ void CMenuPcs::CmakeNameDraw()
         DrawNamePreviewChara(this, 1.0f, 0xFF);
         DrawCmakeTitle(1, alpha, 1.0f);
     } else if ((CmakeState(this)->m_mode != 2) || (CmakeState(this)->m_resultDir == -1)) {
-        DrawNamePreviewChara(this, alpha, a);
+        DrawNamePreviewChara(this, alpha, static_cast<int>(a255));
         DrawCmakeTitle(1, 1.0f, alpha);
     } else {
         DrawNamePreviewChara(this, 1.0f, 0xFF);
@@ -2572,13 +2572,12 @@ void CMenuPcs::CmakeNameDraw()
     col2.r = 0xFF;
     col2.g = 0xFF;
     col2.b = 0xFF;
-    col2.a = static_cast<unsigned char>(a);
+    col2.a = static_cast<unsigned char>(a255);
     GXSetChanMatColor(GX_COLOR0A0, col2);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
-    unsigned int titleU = static_cast<unsigned int>(
-        -(static_cast<double>(280.0f) * 0.5 - 400.0));
+    float titleW = 280.0f;
     MenuPcs.DrawRect(
-        0, static_cast<float>(titleU), 268.0f, 280.0f, 64.0f,
+        0, static_cast<float>(static_cast<int>(-(titleW * 0.5 - 400.0))), 268.0f, titleW, 64.0f,
         0.0f, 304.0f, 1.0f, 1.0f, 0.0f);
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -2587,14 +2586,15 @@ void CMenuPcs::CmakeNameDraw()
     col3.r = 0xFF;
     col3.g = 0xFF;
     col3.b = 0xFF;
-    col3.a = static_cast<unsigned char>(a);
+    col3.a = static_cast<unsigned char>(a255);
     GXSetChanMatColor(GX_COLOR0A0, col3);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x68 : 0x41));
     MenuPcs.DrawRect(
         0, 184.0f, 216.0f, 48.0f, 48.0f,
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+    double crestRightX = 568.0;
     MenuPcs.DrawRect(
-        0, static_cast<float>(static_cast<int>(568.0)), 216.0f, 48.0f, 48.0f,
+        0, static_cast<float>(static_cast<int>(crestRightX)), 216.0f, 48.0f, 48.0f,
         48.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     if ((CmakeState(this)->m_mode == 1) && (CmakeState(this)->m_row < 5)) {
@@ -2623,8 +2623,7 @@ void CMenuPcs::CmakeNameDraw()
     font->DrawInit();
     GetRenderFlagBits(font->renderFlags).fixedWidth = 1;
     font->SetMargin(4.9f);
-    CColor textCol(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha));
-    font->SetColor(textCol.color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)).color);
 
     int y = 0x6C;
     for (unsigned int i = 0; i < 5; i++) {
@@ -2647,7 +2646,8 @@ void CMenuPcs::CmakeNameDraw()
     }
 
     char* name = GetCmakeNameBuffer();
-    int nameCursor = __cntlzw(static_cast<unsigned int>(1 - CmakeState(this)->m_mode)) >> 5;
+    int nameCursor = static_cast<int>(
+        static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(1 - CmakeState(this)->m_mode))) >> 5);
     if (CmakeState(this)->m_row >= 5) {
         nameCursor = 0;
     }
@@ -2656,10 +2656,7 @@ void CMenuPcs::CmakeNameDraw()
         nameCursor = 0;
     }
     DrawCmakeName(0, nameCursor, name, alpha);
-    DrawCmakeDecision(
-        (static_cast<unsigned int>(CmakeState(this)->m_row) >> 31) +
-            (static_cast<int>(static_cast<int>(CmakeState(this)->m_row)) >= 5),
-        alpha);
+    DrawCmakeDecision(CmakeState(this)->m_row >= 5, alpha);
 
     if (CmakeMcState(this) != 3) {
         DrawMcWin(-1, 0);

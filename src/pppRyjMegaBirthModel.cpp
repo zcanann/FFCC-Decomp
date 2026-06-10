@@ -507,14 +507,79 @@ void birth(
             goto join_position;
         }
         if (kPppRyjMegaBirthSharedZero != params->m_speed) {
+            float halfSpeed = MegaBirthHalf() * params->m_speed;
             u8 speedMode = params->m_speedMode;
             Vec speed;
-            speed.x = particleData->m_matrix[0][3];
-            speed.y = particleData->m_matrix[1][3];
-            speed.z = particleData->m_matrix[2][3];
-            speed.x = calc_spawn_speed(params, speedMode);
-            speed.y = calc_spawn_speed(params, speedMode);
-            speed.z = calc_spawn_speed(params, speedMode);
+
+            switch (speedMode) {
+            case 1:
+                (void)Math.RandF();
+                speed.x = particleData->m_matrix[0][3];
+                speed.y = particleData->m_matrix[1][3];
+                speed.z = particleData->m_matrix[2][3];
+                speed.x = params->m_speed * Math.RandF();
+                speed.x -= halfSpeed;
+                speed.y = params->m_speed * Math.RandF();
+                speed.y -= halfSpeed;
+                speed.z = params->m_speed * Math.RandF();
+                speed.z -= halfSpeed;
+                break;
+            case 2:
+                speed.x = particleData->m_matrix[0][3];
+                speed.y = particleData->m_matrix[1][3];
+                speed.z = particleData->m_matrix[2][3];
+                speed.x = Math.RandF() * (params->m_speed * Math.RandF());
+                speed.x -= halfSpeed;
+                speed.y = Math.RandF() * (params->m_speed * Math.RandF());
+                speed.y -= halfSpeed;
+                speed.z = Math.RandF() * (params->m_speed * Math.RandF());
+                speed.z -= halfSpeed;
+                break;
+            case 3:
+                speed.x = particleData->m_matrix[0][3];
+                speed.y = particleData->m_matrix[1][3];
+                speed.z = particleData->m_matrix[2][3];
+                speed.x = -(MegaBirthSpeedFalloff() * (Math.RandF() * (params->m_speed * Math.RandF())) - params->m_speed);
+                speed.x -= halfSpeed;
+                speed.y = -(MegaBirthSpeedFalloff() * (Math.RandF() * (params->m_speed * Math.RandF())) - params->m_speed);
+                speed.y -= halfSpeed;
+                speed.z = -(MegaBirthSpeedFalloff() * (Math.RandF() * (params->m_speed * Math.RandF())) - params->m_speed);
+                speed.z -= halfSpeed;
+                break;
+            case 4:
+                speed.x = particleData->m_matrix[0][3];
+                speed.y = particleData->m_matrix[1][3];
+                speed.z = particleData->m_matrix[2][3];
+                speed.x = Math.RandF() * (Math.RandF() * (Math.RandF() * (params->m_speed * Math.RandF())));
+                speed.x -= halfSpeed;
+                speed.y = Math.RandF() * (Math.RandF() * (Math.RandF() * (params->m_speed * Math.RandF())));
+                speed.y -= halfSpeed;
+                speed.z = Math.RandF() * (Math.RandF() * (Math.RandF() * (params->m_speed * Math.RandF())));
+                speed.z -= halfSpeed;
+                break;
+            case 5:
+                speed.x = particleData->m_matrix[0][3];
+                speed.y = particleData->m_matrix[1][3];
+                speed.z = particleData->m_matrix[2][3];
+                speed.x = -(MegaBirthHalf() * (Math.RandF() * (Math.RandF() * (params->m_speed * Math.RandF()))) - params->m_speed);
+                speed.x -= halfSpeed;
+                speed.y = -(MegaBirthHalf() * (Math.RandF() * (Math.RandF() * (params->m_speed * Math.RandF()))) - params->m_speed);
+                speed.y -= halfSpeed;
+                speed.z = -(MegaBirthHalf() * (Math.RandF() * (Math.RandF() * (params->m_speed * Math.RandF()))) - params->m_speed);
+                speed.z -= halfSpeed;
+                break;
+            default:
+                speed.x = particleData->m_matrix[0][3];
+                speed.y = particleData->m_matrix[1][3];
+                speed.z = particleData->m_matrix[2][3];
+                speed.x = params->m_speed * Math.RandF();
+                speed.x -= halfSpeed;
+                speed.y = params->m_speed * Math.RandF();
+                speed.y -= halfSpeed;
+                speed.z = params->m_speed * Math.RandF();
+                speed.z -= halfSpeed;
+                break;
+            }
             particleData->m_matrix[0][3] = speed.x;
             particleData->m_matrix[1][3] = speed.y;
             particleData->m_matrix[2][3] = speed.z;

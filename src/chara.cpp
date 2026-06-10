@@ -2128,28 +2128,31 @@ int CChara::CModel::SearchNodeSk(char* name)
 			CNode* node = ModelNodes(this);
 			for (; i < ModelNodeCount(this); i++, node++) {
 				int tail = strlen(NodeRefName(node)) - 3;
-				if (tail > 0 && strcmp(NodeRefName(node) + tail, name) == 0) {
+				if (tail > 0 && strcmp(&node->m_refData->m_name[tail], name) == 0) {
 					return (int)i;
 				}
 			}
 		} else if (name[1] == 'r' && name[2] == 'o' && name[3] == 'o' && name[4] == 't') {
-			u32 i = 0;
 			CNode* node = ModelNodes(this);
+			u32 i = 0;
 			for (; i < ModelNodeCount(this); i++, node++) {
 				int tail = strlen(NodeRefName(node)) - 5;
-				if (tail > 0 && strcmp(NodeRefName(node) + tail, name) == 0) {
+				if (tail > 0 && strcmp(&node->m_refData->m_name[tail], name) == 0) {
 					return (int)i;
 				}
 			}
 		}
 	} else {
 		CNode* node = ModelNodes(this);
-		for (u32 i = 0; i < ModelNodeCount(this); i++, node++) {
+		u32 i = 0;
+		for (; i < ModelNodeCount(this); i++, node++) {
 			if (strcmp(NodeRefName(node), name) == 0) {
-				return (int)i;
+				goto foundPlain;
 			}
 		}
-		return -1;
+		i = (u32)-1;
+foundPlain:
+		return (int)i;
 	}
 
 	return -1;

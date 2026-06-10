@@ -2474,19 +2474,16 @@ int CMapMng::ReadMid(char* mapName)
         chunkFile.PopChunk();
     }
 
-    CMapObj* obj = MapMng.m_mapObjArray;
-    for (int i = 0; i < m_mapObjCount; i++, obj++) {
-        unsigned char type = obj->m_mapDataType;
+    for (int i = 0; i < m_mapObjCount; i++) {
+        unsigned char type = MapMng.m_mapObjArray[i].m_mapDataType;
         if (type == 2 || type == 3) {
-            CMapHit* hit = static_cast<CMapHit*>(obj->m_mapData);
-            if (hit != 0) {
-                int hitIndex = hit - GetMapHitArray();
-                if (hitIndex >= m_mapHitCount) {
-                    if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-                        System.Printf(const_cast<char*>(s_read_mid_mesh_count_error));
-                    }
-                    obj->m_mapData = 0;
+            CMapHit* hit = static_cast<CMapHit*>(MapMng.m_mapObjArray[i].m_mapData);
+            int hitIndex = hit - MapMng.m_mapHitArray;
+            if (hitIndex >= m_mapHitCount) {
+                if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+                    System.Printf(const_cast<char*>(s_read_mid_mesh_count_error));
                 }
+                MapMng.m_mapObjArray[i].m_mapData = 0;
             }
         }
     }

@@ -203,7 +203,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
                 goto step_advance;
             }
             for (frameCount = *(u16*)(step + 0x84); frameCount > 0; frameCount--) {
-                Vec* testPos = &history[trailNextIndex];
+                Vec* testPos = &((Vec*)(particle + 0x40))[trailNextIndex];
                 if ((testPos->x != 0.0f) || (testPos->y != 0.0f) || (testPos->z != 0.0f)) {
                     pppUnitMatrix(drawMtx);
                     drawMtx.value[0][0] = drawScale * ppvMng->m_scale.x;

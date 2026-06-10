@@ -1709,13 +1709,12 @@ void CLine<64>::CalcBound()
         }
 
         if (i != 0) {
-            u32 prevIndex = i - 1;
-            PSVECSubtract(&points[i], &points[prevIndex], &segments[prevIndex].delta);
-            segments[prevIndex].length = PSVECMag(&segments[prevIndex].delta);
-            segments[prevIndex].startLength = totalLength;
-            totalLength += segments[prevIndex].length;
-            if (segments[prevIndex].length != kLineSegmentMinT) {
-                PSVECNormalize(&segments[prevIndex].delta, &segments[prevIndex].normal);
+            PSVECSubtract(&points[i], &points[i - 1], &segments[i - 1].delta);
+            segments[i - 1].length = PSVECMag(&segments[i - 1].delta);
+            segments[i - 1].startLength = totalLength;
+            totalLength += segments[i - 1].length;
+            if (kCFlatPadStickZero != segments[i - 1].length) {
+                PSVECNormalize(&segments[i - 1].delta, &segments[i - 1].normal);
             }
         }
     }

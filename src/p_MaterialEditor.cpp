@@ -165,6 +165,8 @@ void CMaterialEditorPcs::drawViewer()
         return;
     }
 
+    GXColor blue;
+    GXColor red;
     ZLIST* zlist = &m_zlist1;
     _ZLISTITEM* it = zlist->m_root.m_previous;
     while (it != 0) {
@@ -328,8 +330,6 @@ void CMaterialEditorPcs::drawViewer()
                         GXSetNumTevStages(3);
                         GXSetNumTexGens(1);
 
-                        GXColor red;
-                        GXColor blue;
                         red.r = 0xff;
                         red.g = 0xff;
                         red.b = 0;

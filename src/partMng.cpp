@@ -2799,58 +2799,13 @@ void CPartMng::pppEditPartDrawAfter()
             && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x174) <= 3) {
 #define PPP_DRAW_AFTER_PASS(drawPass)                                                              \
             {                                                                                              \
-                struct PppCullBound { Vec m_min; Vec m_max; };                                             \
                 Mtx invCamera;                                                                             \
                 Vec cameraPos;                                                                             \
-                Vec cameraDelta;                                                                           \
-                Vec partPos;                                                                               \
-                Vec viewPos;                                                                               \
                 PSMTXInverse(ppvCameraMatrix, invCamera);                                                  \
                 cameraPos.x = invCamera[0][3];                                                             \
                 cameraPos.y = invCamera[1][3];                                                             \
                 cameraPos.z = invCamera[2][3];                                                             \
-                                                                                                           \
-                for (int i = 0; i < kPppMngCount; i++) {                                                   \
-                    _pppMngSt* mng = &m_pppMng[i];                                                         \
-                    if (mng->m_hitBgFlag == 0 && mng->m_baseTime != -0x1000                                \
-                        && (signed char)mng->m_drawPass == (drawPass) && mng->m_baseTime < 0               \
-                        && mng->m_slotVisible != 0 && mng->m_ownerFacing != 0) {                           \
-                        ppvMng = mng;                                                                      \
-                        partPos.x = mng->m_matrix.value[0][3];                                             \
-                        partPos.y = mng->m_matrix.value[1][3];                                             \
-                        partPos.z = mng->m_matrix.value[2][3];                                             \
-                                                                                                           \
-                        if ((double)mng->m_cullRadiusSq != -1.0) {                                          \
-                            goto checkCull##drawPass;                                                      \
-                        }                                                                                  \
-                                                                                                           \
-                    drawPart##drawPass:                                                                    \
-                        PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);                                 \
-                        mng->m_sortDepth = viewPos.z;                                                      \
-                        ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4); \
-                        ppvMng = mng;                                                                      \
-                        pppSetFpMatrix(reinterpret_cast<_pppMngSt*>(mng));                                  \
-                        _pppDrawPart(reinterpret_cast<_pppMngSt*>(mng));                                    \
-                        continue;                                                                          \
-                                                                                                           \
-                    checkCull##drawPass:                                                                   \
-                        PSVECSubtract(&cameraPos, &partPos, &cameraDelta);                                 \
-                        if (PSVECSquareMag(&cameraDelta) < mng->m_cullRadiusSq) {                          \
-                            PppCullBound bound;                                                            \
-                            float radius = mng->m_cullRadius;                                              \
-                            bound.m_min.x = partPos.x - radius;                                               \
-                            bound.m_max.x = partPos.x + radius;                                               \
-                            bound.m_min.z = partPos.z - radius;                                               \
-                            bound.m_min.y = partPos.y;                                                        \
-                            bound.m_max.z = partPos.z + radius;                                               \
-                            bound.m_max.y = partPos.y + mng->m_cullYOffset;                                   \
-                            if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(                           \
-                                    cameraPos, ppvCameraMatrix, kPartMngFrustumCullLimit) != 0) {                    \
-                                goto drawPart##drawPass;                                                   \
-                            }                                                                              \
-                        }                                                                                  \
-                    }                                                                                      \
-                }                                                                                          \
+                pppEditDrawPass(reinterpret_cast<unsigned char*>(this), drawPass, cameraPos);              \
             }
 
             PPP_DRAW_AFTER_PASS(5)

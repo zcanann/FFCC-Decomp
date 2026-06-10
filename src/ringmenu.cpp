@@ -191,8 +191,8 @@ void CRingMenu::DrawIcon()
 
 	float angle = static_cast<float>(atan2(static_cast<double>(clipPos.x), static_cast<double>(clipPos.y)));
 
-	float posX = kRingMenuScreenHalfWidth * clampedX + kRingMenuScreenHalfWidth;
-	float posY = -(kRingMenuScreenHalfHeight * clampedY - kRingMenuScreenHalfHeight);
+	float posX = kRingMenuScreenHalfWidth * clipPos.x + kRingMenuScreenHalfWidth;
+	float posY = kRingMenuScreenHalfHeight - kRingMenuScreenHalfHeight * clipPos.y;
 	unsigned char blinkAlpha = sRingMenuBlinkAlphaTable[static_cast<int>(System.m_frameCounter) % 16];
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x19));

@@ -393,11 +393,12 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
                 GXSetArray((GXAttr)0xE, mana->m_meshTexCoords1, 4);
                 u8* materialMan = reinterpret_cast<u8*>(&MaterialMan);
                 u32 tevBit = 0xACE0F;
+                Vec* reflVec = mana->m_meshReflectionVec;
                 *reinterpret_cast<u32*>(materialMan + 0x48) = tevBit;
                 *reinterpret_cast<u32*>(materialMan + 0x128) = 0;
                 *reinterpret_cast<u32*>(materialMan + 0x12C) = 0x1E;
                 *reinterpret_cast<u32*>(materialMan + 0x130) = 0;
-                *reinterpret_cast<Vec**>(materialMan + 0x8) = mana->m_meshReflectionVec;
+                *reinterpret_cast<Vec**>(materialMan + 0x8) = reflVec;
                 *reinterpret_cast<u32*>(materialMan + 0x44) = 0xFFFFFFFF;
                 *reinterpret_cast<u8*>(materialMan + 0x4C) = 0xFF;
                 *reinterpret_cast<u32*>(materialMan + 0x11C) = 0;

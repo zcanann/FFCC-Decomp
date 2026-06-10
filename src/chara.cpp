@@ -2164,6 +2164,8 @@ int CChara::CModel::SearchNodeSk(char* name)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_propagation off
 void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 {
 	if (ModelLightAlpha(this) == FLOAT_803301b0) {
@@ -2279,6 +2281,7 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 		afterDrawModel(this, m_callbackContext, m_callbackParam);
 	}
 }
+#pragma pop
 
 /*
  * --INFO--

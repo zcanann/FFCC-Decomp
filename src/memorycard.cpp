@@ -1525,11 +1525,11 @@ void CMemoryCardMan::MakeSaveData()
         }
     }
 
-    *reinterpret_cast<u32*>(save + 0x20) = *reinterpret_cast<u32*>(&gameWork->m_scriptSysVal0);
-    *reinterpret_cast<int*>(save + 0x24) = gameWork->m_timerA;
-    *reinterpret_cast<int*>(save + 0x28) = gameWork->m_scriptGlobalTime;
-    *reinterpret_cast<int*>(save + 0x2C) = gameWork->m_frameCounter;
-    memcpy(save + 0x30, gameWork->m_wmBackupParams, 0x10);
+    *reinterpret_cast<u32*>(save + 0x20) = *reinterpret_cast<u32*>(&Game.m_gameWork.m_scriptSysVal0);
+    *reinterpret_cast<int*>(save + 0x24) = Game.m_gameWork.m_timerA;
+    *reinterpret_cast<int*>(save + 0x28) = Game.m_gameWork.m_scriptGlobalTime;
+    *reinterpret_cast<int*>(save + 0x2C) = Game.m_gameWork.m_frameCounter;
+    memcpy(save + 0x30, Game.m_gameWork.m_wmBackupParams, 0x10);
     memcpy(save + 0x40, Game.m_gameWork.m_bossArtifactStageTable, 0x3C);
     memcpy(save + 0x7C, Game.m_gameWork.m_unkStageTable, 0x3C);
     *reinterpret_cast<int*>(save + 0xB8) = Game.m_gameWork.m_chaliceElement;
@@ -1559,15 +1559,13 @@ void CMemoryCardMan::MakeSaveData()
         u8* dst = save + 0x14D0 + c * 0x9C0;
         CCaravanWork* caravanWork = &Game.m_caravanWorkArr[c];
 
-        if (caravanWork->m_shopState != 0)
+        int shopState = caravanWork->m_shopState;
+        if (shopState != 0 && static_cast<s8>(caravanWork->unk_0xc1e) == 0)
         {
-            if (static_cast<s8>(caravanWork->unk_0xc1e) == 0)
-            {
-                caravanWork->m_shopRandSeed = Math.Rand(0x7FFFFFFF);
-                caravanWork->unk_0xc1e = 1;
-            }
+            caravanWork->m_shopRandSeed = Math.Rand(0x7FFFFFFF);
+            caravanWork->unk_0xc1e = 1;
         }
-        if (caravanWork->m_shopState == 0)
+        else if (shopState == 0)
         {
             caravanWork->m_shopRandSeed = 0;
             caravanWork->unk_0xc1e = 0;

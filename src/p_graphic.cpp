@@ -387,8 +387,7 @@ void CGraphicPcs::drawScreenFade()
 
                 int tile = 0;
                 do {
-                    CColor topColor;
-                    CColor bottomColor;
+                    CColor gradColor[2];
                     _GXTexObj backTexObj;
                     const int x = (tile & 1) ? 0x140 : 0;
                     const int y = (tile & 2) ? 0xE0 : 0;
@@ -409,28 +408,28 @@ void CGraphicPcs::drawScreenFade()
 
                     const float t0 = (float)row * kGraphicHalf;
                     const float t1 = (float)(row + 1) * kGraphicHalf;
-                    topColor.color.r = (u8)(t0 * ((float)slotData->m_colorB.r - (float)baseColor.r) + (float)baseColor.r);
-                    topColor.color.g = (u8)(t0 * ((float)slotData->m_colorB.g - (float)baseColor.g) + (float)baseColor.g);
-                    topColor.color.b = (u8)(t0 * ((float)slotData->m_colorB.b - (float)baseColor.b) + (float)baseColor.b);
-                    topColor.color.a = 0xFF;
+                    gradColor[0].color.r = (u8)(t0 * ((float)slotData->m_colorB.r - (float)baseColor.r) + (float)baseColor.r);
+                    gradColor[0].color.g = (u8)(t0 * ((float)slotData->m_colorB.g - (float)baseColor.g) + (float)baseColor.g);
+                    gradColor[0].color.b = (u8)(t0 * ((float)slotData->m_colorB.b - (float)baseColor.b) + (float)baseColor.b);
+                    gradColor[0].color.a = 0xFF;
 
-                    bottomColor.color.r = (u8)(t1 * ((float)slotData->m_colorB.r - (float)baseColor.r) + (float)baseColor.r);
-                    bottomColor.color.g = (u8)(t1 * ((float)slotData->m_colorB.g - (float)baseColor.g) + (float)baseColor.g);
-                    bottomColor.color.b = (u8)(t1 * ((float)slotData->m_colorB.b - (float)baseColor.b) + (float)baseColor.b);
-                    bottomColor.color.a = 0xFF;
+                    gradColor[1].color.r = (u8)(t1 * ((float)slotData->m_colorB.r - (float)baseColor.r) + (float)baseColor.r);
+                    gradColor[1].color.g = (u8)(t1 * ((float)slotData->m_colorB.g - (float)baseColor.g) + (float)baseColor.g);
+                    gradColor[1].color.b = (u8)(t1 * ((float)slotData->m_colorB.b - (float)baseColor.b) + (float)baseColor.b);
+                    gradColor[1].color.a = 0xFF;
 
                     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
                     GXPosition3f32((float)x, (float)y, kGraphicZero);
-                    GXColor1u32(*(u32*)&topColor.color);
+                    GXColor1u32(*(u32*)&gradColor[0].color);
                     GXTexCoord2u16(0, 0);
                     GXPosition3f32((float)(x + 0x140), (float)y, kGraphicZero);
-                    GXColor1u32(*(u32*)&topColor.color);
+                    GXColor1u32(*(u32*)&gradColor[0].color);
                     GXTexCoord2u16(2, 0);
                     GXPosition3f32((float)(x + 0x140), (float)(y + 0xE0), kGraphicZero);
-                    GXColor1u32(*(u32*)&bottomColor.color);
+                    GXColor1u32(*(u32*)&gradColor[1].color);
                     GXTexCoord2u16(2, 2);
                     GXPosition3f32((float)x, (float)(y + 0xE0), kGraphicZero);
-                    GXColor1u32(*(u32*)&bottomColor.color);
+                    GXColor1u32(*(u32*)&gradColor[1].color);
                     GXTexCoord2u16(0, 2);
                     tile++;
                 } while (tile < 4);

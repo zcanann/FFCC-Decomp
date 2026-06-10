@@ -160,10 +160,11 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     pppFMATRIX localBase;
     pppFMATRIX drawMtx;
     pppFMATRIX rotMtx;
-    Vec zeroVec ATTRIBUTE_ALIGN(8);
-    Vec pos ATTRIBUTE_ALIGN(8);
-    Vec seg ATTRIBUTE_ALIGN(8);
-    Vec initialSeg ATTRIBUTE_ALIGN(8);
+    Vec zeroVecA;
+    Vec zeroVecB;
+    Vec pos;
+    Vec seg;
+    Vec initialSeg;
     float drawScale;
     float segDx;
     float segDy;
@@ -177,19 +178,20 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     float trailStep;
     float trailStepDelta;
     float segLen;
-    float trailLen;
-    float segCursor;
     float segRemain;
-    float segBaseX;
-    float segBaseY;
-    float segBaseZ;
+    float posX;
+    float posY;
+    float posZ;
+    float startX;
+    float startY;
+    float startZ;
     float nextBaseX;
     float nextBaseY;
     float nextBaseZ;
     s32 currentIndex;
     s32 nextIndex;
     u8 zEnable;
-    const float zero = LoadFloat(kPppKeShpTail3XZero);
+    float segCursor = kPppKeShpTail3XZero;
     s32 dataValIndex;
 
     work = GetKeShpTail3XWork(obj, param_3);
@@ -207,7 +209,7 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     S4ToF32(&colorEnd, &work->m_values[4]);
     colorStart.w *= alphaMul;
     colorEnd.w *= alphaMul;
-    if (invCountMinusOne != zero) {
+    if (invCountMinusOne != kPppKeShpTail3XZero) {
         colorStep.x = (colorStart.x - colorEnd.x) / invCountMinusOne;
         colorStep.y = (colorStart.y - colorEnd.y) / invCountMinusOne;
         colorStep.z = (colorStart.z - colorEnd.z) / invCountMinusOne;
@@ -228,34 +230,36 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     shapeScaleStep = (shapeScale - (float)step->m_arg3) / invCountMinusOne;
     trailStep = step->m_stepDistance * ppvMng->m_scale.x;
     trailStepDelta = trailStep * (shapeScaleStep / shapeScale);
-    if (trailStep == zero) {
+    if (trailStep == kPppKeShpTail3XZero) {
         count = 0;
     }
 
     history = work->m_posHistory;
     currentIndex = work->m_head;
-    segBaseX = history[currentIndex].x;
-    segBaseY = history[currentIndex].y;
-    segBaseZ = history[currentIndex].z;
+    posX = history[currentIndex].x;
+    posZ = history[currentIndex].z;
+    posY = history[currentIndex].y;
+    startZ = posZ;
+    startX = posX;
+    startY = posY;
     nextIndex = currentIndex + 1;
     if (currentIndex == 0x1b) {
         nextIndex = 0;
     }
     nextBaseX = history[nextIndex].x;
-    nextBaseY = history[nextIndex].y;
     nextBaseZ = history[nextIndex].z;
-    segDx = nextBaseX - segBaseX;
-    segDy = nextBaseY - segBaseY;
-    segDz = nextBaseZ - segBaseZ;
+    segDx = nextBaseX - posX;
+    nextBaseY = history[nextIndex].y;
+    segDz = nextBaseZ - posZ;
+    segDy = nextBaseY - posY;
     initialSeg.x = segDx;
     initialSeg.y = segDy;
     initialSeg.z = segDz;
-    zeroVec.x = zero;
-    zeroVec.y = zero;
-    zeroVec.z = zero;
-    segLen = PSVECDistance(&zeroVec, &initialSeg);
+    zeroVecA.z = kPppKeShpTail3XZero;
+    zeroVecA.y = kPppKeShpTail3XZero;
+    zeroVecA.x = kPppKeShpTail3XZero;
+    segLen = PSVECDistance(&zeroVecA, &initialSeg);
     segRemain = segLen;
-    segCursor = kPppKeShpTail3XZero;
     life = work->m_shapeData;
     shapeFrameDuration = shapeAnim->m_frames[0].m_duration;
     rng = work->m_rand;
@@ -279,9 +283,9 @@ draw_loop:
         }
     }
 
-    pos.x = segBaseX;
-    pos.y = segBaseY;
-    pos.z = segBaseZ;
+    pos.x = posX;
+    pos.z = posZ;
+    pos.y = posY;
 
     if (step->m_worldSpaceMode == 0) {
         PSMTXScaleApply(obj->m_object.m_localMatrix.value, obj->m_object.m_drawMatrix.value,
@@ -312,7 +316,7 @@ draw_loop:
 
     zEnable = (u8)((u32)__cntlzw((u32)step->m_zDisable) >> 5);
     pppSetDrawEnv(
-        0, &drawMtx, (step->m_useEnvDepth != 0) ? step->m_envDepth : zero, 0, step->m_drawA,
+        0, &drawMtx, (step->m_useEnvDepth != 0) ? step->m_envDepth : kPppKeShpTail3XZero, 0, step->m_drawA,
         step->m_blendMode, 0, zEnable, 1, 0);
     GXLoadPosMtxImm(drawMtx.value, 0);
 
@@ -341,49 +345,45 @@ update_step:
     colorStart.w -= colorStep.w;
     shapeScale -= shapeScaleStep;
     trailStep -= trailStepDelta;
-    if (trailStep <= zero) {
+    if (trailStep <= kPppKeShpTail3XZero) {
         return;
     }
 
 advance_segment:
     if (segRemain >= trailStep) {
-        pos.x = segDx * (segCursor / segLen) + segBaseX;
-        pos.y = segDy * (segCursor / segLen) + segBaseY;
-        pos.z = segDz * (segCursor / segLen) + segBaseZ;
+        float ratio = segCursor / segLen;
+        posX = segDx * ratio + startX;
+        posZ = segDz * ratio + startZ;
         segCursor += trailStep;
+        posY = segDy * ratio + startY;
         segRemain -= trailStep;
-        segBaseX = pos.x;
-        segBaseY = pos.y;
-        segBaseZ = pos.z;
         goto draw_loop;
     }
 
-    nextIndex++;
-    if (nextIndex > 0x1b) {
+    if (nextIndex++ == 0x1b) {
         nextIndex = 0;
     }
     if (nextIndex == currentIndex) {
         return;
     }
 
-    trailLen = segCursor - segLen;
-    segBaseX = nextBaseX;
-    segBaseY = nextBaseY;
-    segBaseZ = nextBaseZ;
-    nextBaseX = history[nextIndex].x;
+    startX = nextBaseX;
+    startY = nextBaseY;
+    startZ = nextBaseZ;
+    segCursor -= segLen;
     nextBaseY = history[nextIndex].y;
     nextBaseZ = history[nextIndex].z;
-    segDx = nextBaseX - segBaseX;
-    segDy = nextBaseY - segBaseY;
-    segDz = nextBaseZ - segBaseZ;
-    seg.x = segDx;
+    nextBaseX = history[nextIndex].x;
+    segDy = nextBaseY - startY;
+    segDz = nextBaseZ - startZ;
+    segDx = nextBaseX - startX;
     seg.y = segDy;
     seg.z = segDz;
-    zeroVec.x = zero;
-    zeroVec.y = zero;
-    zeroVec.z = zero;
-    segLen = PSVECDistance(&zeroVec, &seg);
-    segCursor = trailLen;
+    seg.x = segDx;
+    zeroVecB.z = kPppKeShpTail3XZero;
+    zeroVecB.y = kPppKeShpTail3XZero;
+    zeroVecB.x = kPppKeShpTail3XZero;
+    segLen = PSVECDistance(&zeroVecB, &seg);
     segRemain += segLen;
     goto advance_segment;
 }

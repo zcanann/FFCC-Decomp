@@ -844,25 +844,17 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
  */
 inline int CFlatRuntime::getTopBit(unsigned int value)
 {
-	int bitBase = 0x1F;
-	int scanCount = 4;
+	int bit = 0x1F;
 
-	do {
-		int bit = bitBase;
-		if ((((((value & 0x80000000) != 0) || ((bit = bitBase - 1), (value & 0x40000000) != 0))
-		      || ((bit = bitBase - 2), (value & 0x20000000) != 0))
-		     || (((bit = bitBase - 3), (value & 0x10000000) != 0)
-		         || ((bit = bitBase - 4), (value & 0x08000000) != 0)))
-		    || (((bit = bitBase - 5), (value & 0x04000000) != 0)
-		        || (((bit = bitBase - 6), (value & 0x02000000) != 0)
-		            || ((bit = bitBase - 7), (value & 0x01000000) != 0)))) {
-			return bit;
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 8; j++) {
+			if ((value & 0x80000000) != 0) {
+				return bit;
+			}
+			value <<= 1;
+			bit--;
 		}
-
-		value <<= 8;
-		bitBase -= 8;
-		scanCount--;
-	} while (scanCount != 0);
+	}
 
 	return -1;
 }
@@ -875,6 +867,23 @@ inline int CFlatRuntime::getTopBit(unsigned int value)
 void CFlatRuntime::searchFunc(int, int, int)
 {
 	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+inline int CFlatRuntime::pop(CFlatRuntime::CObject* object)
+{
+	union {
+		u32 u;
+		s32 s;
+	} value;
+
+	object->m_sp--;
+	value.u = *object->m_sp;
+	return value.s;
 }
 
 /*
@@ -1055,168 +1064,134 @@ void CFlatRuntime::CStack::operator= (const CFlatRuntime::CStack&)
 int CFlatRuntime::request(CFlatRuntime::CObject* object, int systemKind, int systemIndex, int argCount,
                           CFlatRuntime::CStack* args)
 {
-	u8* const self = reinterpret_cast<u8*>(this);
-	u8* const targetObject = *reinterpret_cast<u8**>(reinterpret_cast<u8*>(object) + 0x18);
-	u8* func = 0;
+	CObject* const engineObject = reinterpret_cast<CObject*>(object->m_engineObject);
+	CFunc* func;
 
-	if (reinterpret_cast<CObject*>(targetObject)->m_flagBits.m_deleteFlag != 0) {
+	if (engineObject->m_flagBits.m_deleteFlag != 0) {
 		return 1;
 	}
 
-	const s16 classIndex = reinterpret_cast<CObject*>(targetObject)->m_activeClassIndex;
+	const int classIndex = engineObject->m_activeClassIndex;
 	if ((classIndex >= 0)
 	    && (((systemKind == 2) || (systemKind == 3)) && (systemIndex >= 0))) {
-		u8* const classes = *reinterpret_cast<u8**>(self + 0x18) + (classIndex * 0x22C) + 0x24;
+		u8* const classes = reinterpret_cast<u8*>(m_classes) + (classIndex * 0x22C) + 0x24;
 		const int funcIndex = *reinterpret_cast<int*>(classes + (systemIndex * 4));
 		if (funcIndex >= 0) {
-			func = *reinterpret_cast<u8**>(self + 0x20) + (funcIndex * 0x50);
+			func = reinterpret_cast<CFunc*>(m_funcs) + funcIndex;
+			goto haveFunc;
 		}
 	} else {
-		u8* searchFunc = *reinterpret_cast<u8**>(self + 0x20);
-		int funcCount = *reinterpret_cast<int*>(self + 0x1C);
+		const int funcCount = m_funcCount;
+		func = reinterpret_cast<CFunc*>(m_funcs);
 
-		for (int i = 0; i < funcCount; i++, searchFunc += 0x50) {
-			if ((*reinterpret_cast<int*>(searchFunc + 0x40) == systemKind)
-			    && (*reinterpret_cast<int*>(searchFunc + 0x44) == systemIndex)) {
-				func = searchFunc;
-				break;
+		for (int i = 0; i < funcCount; i++, func++) {
+			if (func->m_systemKind != systemKind) {
+				continue;
 			}
+			if (func->m_systemIndex != systemIndex) {
+				continue;
+			}
+			goto haveFunc;
 		}
 	}
+	func = 0;
+haveFunc:
 
 	if (func == 0) {
 		return 0;
 	}
 
-	const int reqFlagIndex = *reinterpret_cast<int*>(func + 0x48);
+	const int reqFlagIndex = func->m_reqFlagIndex;
 	if (reqFlagIndex >= 0) {
-		unsigned int reqFlags = static_cast<unsigned int>(*reinterpret_cast<u16*>(targetObject + 0x34));
-		int highestBit = 0x1F;
-
-		for (int scanCount = 0; scanCount < 4; scanCount++) {
-			for (int bit = 0; bit < 8; bit++) {
-				if ((reqFlags & 0x80000000) != 0) {
-					goto foundBit;
-				}
-				reqFlags <<= 1;
-				highestBit--;
-			}
-		}
-
-		highestBit = -1;
-	foundBit:
-
-		if (reqFlagIndex <= highestBit) {
+		if (reqFlagIndex <= getTopBit(engineObject->m_0x34)) {
 			return 0;
 		}
-		*reinterpret_cast<u16*>(targetObject + 0x34) =
-		    static_cast<u16>(*reinterpret_cast<u16*>(targetObject + 0x34) | (1 << reqFlagIndex));
+		engineObject->m_0x34 |= 1 << reqFlagIndex;
 	}
 
 	int copiedArgs = 0;
 	if (argCount > 0) {
 		if (argCount > 8) {
-			const int batchRemaining = argCount - 8;
-			unsigned int batchCount = (static_cast<unsigned int>(batchRemaining) + 7) >> 3;
-			int byteOffset = 0;
 			CStack* batchArgs = args;
+			int byteOffset = 0;
 
-			if (batchRemaining > 0) {
-				do {
-					const int offset1 = byteOffset + 4;
-					const int offset2 = byteOffset + 8;
-					const int offset3 = byteOffset + 0xC;
-					const int offset4 = byteOffset + 0x10;
-					*reinterpret_cast<u32*>(*reinterpret_cast<u32*>(targetObject + 0x08) + byteOffset) =
-					    batchArgs[0].m_word;
-					const int offset5 = byteOffset + 0x14;
-					const int offset6 = byteOffset + 0x18;
-					const int offset7 = byteOffset + 0x1C;
-					byteOffset += 0x20;
-					*reinterpret_cast<u32*>(*reinterpret_cast<u32*>(targetObject + 0x08) + offset1) =
-					    batchArgs[1].m_word;
-					*reinterpret_cast<u32*>(*reinterpret_cast<u32*>(targetObject + 0x08) + offset2) =
-					    batchArgs[2].m_word;
-					*reinterpret_cast<u32*>(*reinterpret_cast<u32*>(targetObject + 0x08) + offset3) =
-					    batchArgs[3].m_word;
-					*reinterpret_cast<u32*>(*reinterpret_cast<u32*>(targetObject + 0x08) + offset4) =
-					    batchArgs[4].m_word;
-					*reinterpret_cast<u32*>(*reinterpret_cast<u32*>(targetObject + 0x08) + offset5) =
-					    batchArgs[5].m_word;
-					*reinterpret_cast<u32*>(*reinterpret_cast<u32*>(targetObject + 0x08) + offset6) =
-					    batchArgs[6].m_word;
-					CStack* finalArg = batchArgs + 7;
-					batchArgs += 8;
-					*reinterpret_cast<u32*>(*reinterpret_cast<u32*>(targetObject + 0x08) + offset7) =
-					    finalArg->m_word;
-					copiedArgs += 8;
-					batchCount--;
-				} while (batchCount != 0);
+			for (; argCount - copiedArgs > 8; copiedArgs += 8) {
+				const int offset1 = byteOffset + 4;
+				const int offset2 = byteOffset + 8;
+				const int offset3 = byteOffset + 0xC;
+				const int offset4 = byteOffset + 0x10;
+				*reinterpret_cast<u32*>(reinterpret_cast<u32>(engineObject->m_sp) + byteOffset) =
+				    batchArgs[0].m_word;
+				const int offset5 = byteOffset + 0x14;
+				const int offset6 = byteOffset + 0x18;
+				const int offset7 = byteOffset + 0x1C;
+				byteOffset += 0x20;
+				*reinterpret_cast<u32*>(reinterpret_cast<u32>(engineObject->m_sp) + offset1) =
+				    batchArgs[1].m_word;
+				*reinterpret_cast<u32*>(reinterpret_cast<u32>(engineObject->m_sp) + offset2) =
+				    batchArgs[2].m_word;
+				*reinterpret_cast<u32*>(reinterpret_cast<u32>(engineObject->m_sp) + offset3) =
+				    batchArgs[3].m_word;
+				*reinterpret_cast<u32*>(reinterpret_cast<u32>(engineObject->m_sp) + offset4) =
+				    batchArgs[4].m_word;
+				*reinterpret_cast<u32*>(reinterpret_cast<u32>(engineObject->m_sp) + offset5) =
+				    batchArgs[5].m_word;
+				*reinterpret_cast<u32*>(reinterpret_cast<u32>(engineObject->m_sp) + offset6) =
+				    batchArgs[6].m_word;
+				CStack* finalArg = batchArgs + 7;
+				batchArgs += 8;
+				*reinterpret_cast<u32*>(reinterpret_cast<u32>(engineObject->m_sp) + offset7) =
+				    finalArg->m_word;
 			}
 		}
 
 		int byteOffset = copiedArgs * 4;
-		int remainingArgs = argCount - copiedArgs;
 		CStack* tailArgs = args + copiedArgs;
-		if (copiedArgs < argCount) {
-			do {
-				CStack* const arg = tailArgs;
-				tailArgs++;
-				copiedArgs++;
-				*reinterpret_cast<u32*>(*reinterpret_cast<u32*>(targetObject + 0x08) + byteOffset) =
-				    arg->m_word;
-				byteOffset += 4;
-				remainingArgs--;
-			} while (remainingArgs != 0);
+		for (; argCount - copiedArgs > 0; copiedArgs++) {
+			*reinterpret_cast<u32*>(reinterpret_cast<u32>(engineObject->m_sp) + byteOffset) =
+			    tailArgs->m_word;
+			tailArgs++;
+			byteOffset += 4;
 		}
 	}
-	*reinterpret_cast<u32*>(targetObject + 0x08) += copiedArgs * 4;
+	engineObject->m_sp += copiedArgs;
 
-	const u32 prevCodePos = *reinterpret_cast<u32*>(targetObject + 0x1C);
-	const u8 prevFlags = targetObject[0x38];
-	const u32 prevLocalBase = *reinterpret_cast<u32*>(targetObject + 0x0C);
-	const int prevWaitCounter = *reinterpret_cast<int*>(targetObject + 0x28);
-	const int prevReqFlag0 = *reinterpret_cast<int*>(targetObject + 0x2C);
-	const s16 prevArgCount = *reinterpret_cast<s16*>(targetObject + 0x36);
+	const u32 prevCodePos = engineObject->m_codePos;
+	const int prevCallFlag = engineObject->m_flagBits.m_callFlag;
+	unsigned int* const prevLocalBase = engineObject->m_localBase;
+	const int prevWaitCounter = engineObject->m_waitCounter;
+	const int prevReqFlag0 = *reinterpret_cast<int*>(&engineObject->m_reqFlag0);
+	const s16 prevArgCount = engineObject->m_argCount;
 
-	if (*reinterpret_cast<int*>(func + 0x4C) != 0) {
-		*reinterpret_cast<u32*>(targetObject + 0x08) -= 4;
-		*reinterpret_cast<s16*>(targetObject + 0x36) = static_cast<s16>(**reinterpret_cast<u32**>(targetObject + 0x08));
-		*reinterpret_cast<u32*>(targetObject + 0x0C) =
-		    *reinterpret_cast<u32*>(targetObject + 0x08) - (static_cast<u32>(*reinterpret_cast<s16*>(targetObject + 0x36)) * 4);
-		*reinterpret_cast<u32*>(targetObject + 0x08) =
-		    *reinterpret_cast<u32*>(targetObject + 0x0C) + (static_cast<u32>(*reinterpret_cast<s16*>(targetObject + 0x36)) * 4);
+	if (func->m_useCallerArgs != 0) {
+		engineObject->m_argCount = static_cast<s16>(pop(engineObject));
+		engineObject->m_localBase = engineObject->m_sp - engineObject->m_argCount;
+		engineObject->m_sp = engineObject->m_localBase + engineObject->m_argCount;
 	} else {
-		*reinterpret_cast<u32*>(targetObject + 0x0C) =
-		    *reinterpret_cast<u32*>(targetObject + 0x08) - (static_cast<u32>(*reinterpret_cast<int*>(func + 0x24)) * 4);
-		*reinterpret_cast<u32*>(targetObject + 0x08) =
-		    *reinterpret_cast<u32*>(targetObject + 0x0C) + (static_cast<u32>(*reinterpret_cast<int*>(func + 0x28)) * 4);
+		engineObject->m_localBase = engineObject->m_sp - func->m_argCount;
+		engineObject->m_sp = engineObject->m_localBase + func->m_localCount;
 	}
 
-	*reinterpret_cast<u16*>(targetObject + 0x1C) =
-	    static_cast<u16>((*reinterpret_cast<u16*>(targetObject + 0x1C) & 0x000F)
-	                     | (static_cast<u16>(*reinterpret_cast<s16*>(func + 0x00)) << 4));
-	*reinterpret_cast<u32*>(targetObject + 0x1C) &= 0xFFF00000;
+	engineObject->m_codeIndex.m_codeFunc = static_cast<s16>(func->m_index);
+	engineObject->m_codeIndex.m_codeOffset = 0;
 
-	targetObject[0x38] = static_cast<u8>((targetObject[0x38] & 0xDF) | 0x20);
-	*reinterpret_cast<int*>(targetObject + 0x28) = 0;
-	*reinterpret_cast<int*>(targetObject + 0x2C) = 0;
+	engineObject->m_flagBits.m_callFlag = 1;
+	engineObject->m_waitCounter = 0;
+	*reinterpret_cast<int*>(&engineObject->m_reqFlag0) = 0;
 
-	**reinterpret_cast<u32**>(targetObject + 0x08) = prevLocalBase;
-	*reinterpret_cast<u32*>(targetObject + 0x08) += 4;
-	**reinterpret_cast<u32**>(targetObject + 0x08) = prevCodePos;
-	*reinterpret_cast<u32*>(targetObject + 0x08) += 4;
-	**reinterpret_cast<int**>(targetObject + 0x08) =
-	    static_cast<int>((static_cast<u32>(prevFlags) << 26) | (static_cast<u32>(prevFlags) >> 6)) >> 31;
-	*reinterpret_cast<u32*>(targetObject + 0x08) += 4;
-	**reinterpret_cast<u32**>(targetObject + 0x08) =
-	    static_cast<u32>(prevArgCount) | (static_cast<u32>(prevWaitCounter) << 16) | (static_cast<u32>(prevReqFlag0) << 15);
-	*reinterpret_cast<u32*>(targetObject + 0x08) += 4;
+	*engineObject->m_sp = reinterpret_cast<u32>(prevLocalBase);
+	engineObject->m_sp++;
+	*engineObject->m_sp = prevCodePos;
+	engineObject->m_sp++;
+	*engineObject->m_sp = static_cast<u32>(prevCallFlag);
+	engineObject->m_sp++;
+	*engineObject->m_sp =
+	    static_cast<u32>(prevArgCount | ((prevWaitCounter << 16) | (prevReqFlag0 << 15)));
+	engineObject->m_sp++;
 
-	int clearCount = *reinterpret_cast<int*>(func + 0x28) - *reinterpret_cast<int*>(func + 0x24);
+	int clearCount = func->m_localCount - func->m_argCount;
 	if (clearCount != 0) {
-		u32* clearPtr =
-		    reinterpret_cast<u32*>(*reinterpret_cast<u32*>(targetObject + 0x0C) + (*reinterpret_cast<int*>(func + 0x24) * 4));
+		unsigned int* clearPtr = engineObject->m_localBase + func->m_argCount;
 		while (clearCount > 0) {
 			*clearPtr++ = 0;
 			clearCount--;
@@ -1321,23 +1296,6 @@ void CFlatRuntime::push(CFlatRuntime::CObject*, CFlatRuntime::CStack*, int)
 void CFlatRuntime::pushAddress(CFlatRuntime::CObject*, CFlatRuntime::CStack*)
 {
 	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-inline int CFlatRuntime::pop(CFlatRuntime::CObject* object)
-{
-	union {
-		u32 u;
-		s32 s;
-	} value;
-
-	object->m_sp--;
-	value.u = *object->m_sp;
-	return value.s;
 }
 
 /*

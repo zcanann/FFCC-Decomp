@@ -51,7 +51,7 @@ public:
 		union {
 			unsigned int m_codePos; // 0x1C
 			struct {
-				int m_codeFunc : 12;
+				short m_codeFunc : 12;
 				int m_codeOffset : 20;
 			} m_codeIndex;
 		};

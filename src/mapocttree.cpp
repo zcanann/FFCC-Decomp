@@ -18,6 +18,7 @@ static const float kMapOctTreeDefaultOffsetZ = 0.0f;
 static CBound s_bound(kMapOctTreeBoundMinInit, kMapOctTreeBoundMaxInit);
 static CMapCylinder s_cyl(kMapOctTreeBoundMinInit, kMapOctTreeBoundMaxInit);
 static Vec s_mvec;
+static unsigned long s_insertLightBitIndex = 0;
 static unsigned long s_insertShadowBitIndex = 0;
 static int s_light_no = 0;
 static unsigned long s_shadow_no = 0;
@@ -974,9 +975,9 @@ void InsertLight_r(COctNode* node)
 	}
 
 	if (node->m_meshCount != 0) {
-		unsigned long byteOffset = (s_light_no >> 3) & 0x1ffffffc;
+		unsigned long byteOffset = (s_insertLightBitIndex >> 3) & 0x1ffffffc;
 		unsigned long* bits = reinterpret_cast<unsigned long*>(Ptr(&node->m_lightFlags, byteOffset));
-		*bits |= 1UL << (s_light_no & 0x1f);
+		*bits |= 1UL << (s_insertLightBitIndex & 0x1f);
 	}
 
 	COctNode* nodeIter = node;
@@ -1034,21 +1035,20 @@ void InsertLight_r(COctNode* node)
 
 		if (childOverlap) {
 			if (child->m_meshCount != 0) {
-				unsigned long byteOffset = (s_light_no >> 3) & 0x1ffffffc;
+				unsigned long byteOffset = (s_insertLightBitIndex >> 3) & 0x1ffffffc;
 				unsigned long* bits = reinterpret_cast<unsigned long*>(Ptr(child, byteOffset));
-				bits[0x44 / sizeof(unsigned long)] |= 1UL << (s_light_no & 0x1f);
+				bits[0x44 / sizeof(unsigned long)] |= 1UL << (s_insertLightBitIndex & 0x1f);
 			}
 
-			COctNode* childIter = child;
 			for (int j = 0; j < 8; j++) {
-				COctNode* grandChild = childIter->m_children[0];
+				COctNode* grandChild = child->m_children[0];
 				if (grandChild == 0) {
 					break;
 				}
 
 				if (grandChild->GetBound()->CheckCross(s_bound) != 0) {
 					if (grandChild->m_meshCount != 0) {
-						setbit32(&grandChild->m_lightFlags, s_light_no);
+						setbit32(&grandChild->m_lightFlags, s_insertLightBitIndex);
 					}
 
 					COctNode* grandChildIter = grandChild;
@@ -1061,7 +1061,7 @@ void InsertLight_r(COctNode* node)
 						grandChildIter = reinterpret_cast<COctNode*>(Ptr(grandChildIter, 4));
 					}
 				}
-				childIter = reinterpret_cast<COctNode*>(Ptr(childIter, 4));
+				child = reinterpret_cast<COctNode*>(Ptr(child, 4));
 			}
 		}
 		nodeIter = reinterpret_cast<COctNode*>(Ptr(nodeIter, 4));
@@ -1089,7 +1089,7 @@ void COctTree::InsertLight(long bitIndex, Vec& position, float radius, unsigned 
 		return;
 	}
 
-	s_light_no = bitIndex;
+	s_insertLightBitIndex = bitIndex;
 	PSMTXInverse(m_mapObject->m_worldMtx, inverseMtx);
 	PSMTXMultVec(inverseMtx, &position, &localPosition);
 

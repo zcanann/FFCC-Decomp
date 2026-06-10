@@ -883,8 +883,8 @@ void CChara::InitFurTexBuffer()
 	do {
 		unsigned int inner = 0;
 		int byteOffset = row << 1;
-		int count = 8;
-		do {
+		int count;
+		for (count = 0; count < 8; count++) {
 			int idxBase = inner + row;
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Chara.MogFur().m_texels) + byteOffset) = 0x7FFF;
 			byteOffset += 0x10;
@@ -896,8 +896,7 @@ void CChara::InitFurTexBuffer()
 			Chara.MogFur().m_texels[idxBase + 6] = 0x7FFF;
 			Chara.MogFur().m_texels[idxBase + 7] = 0x7FFF;
 			inner += 8;
-			count--;
-		} while (count != 0);
+		}
 		rowCount++;
 		row += 0x40;
 	} while (rowCount < 0x40);

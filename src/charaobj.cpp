@@ -3159,11 +3159,12 @@ void CGCharaObj::statAttack()
 	if ((cid & 0xAD) == 0xAD && m_subState == 0) {
 		int animPoint = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x10);
 		if (animPoint == 0x88 || animPoint == 0x87) {
-			if (!CharaObjIsAttackAnimBoundary(this)) {
+			if (CharaObjIsAttackAnimBoundary(this)) {
+				m_subState = 1;
+				m_stateFrame = 0;
+			} else {
 				return;
 			}
-			m_subState = 1;
-			m_stateFrame = 0;
 		}
 	}
 

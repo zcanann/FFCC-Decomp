@@ -1223,7 +1223,7 @@ void CGItemObj::onFrameStat()
 				gCFlatRuntime().SystemCall(
 				    *reinterpret_cast<CFlatRuntime::CObject**>(self + 0x550), 2, 0x16, 1, &stack, 0);
 			} else {
-				if ((unsigned int)System.m_execParam > 1U) {
+				if ((unsigned int)System.m_execParam >= 2U) {
 					System.Printf(itemObjStrings + kItemObjStrMemoryMagiciteCreateFailedMsg);
 				}
 			}

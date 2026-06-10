@@ -1862,6 +1862,7 @@ card_connected:;
         }
 
         {
+            unsigned char sel;
             if (m_returnTransfer == 0) {
                 m_drawCursor = 1;
                 m_cursorListY0 = 0xb1;
@@ -1870,7 +1871,7 @@ card_connected:;
 
                 if (MenuPcs.m_menuWindowInfo->state != 1) {
                     next = 0;
-                    goto do_switch_go10;
+                    goto go10_done1;
                 }
 
                 input = GetGoOutInputMask();
@@ -1886,11 +1887,13 @@ card_connected:;
                             Sound.PlaySe(3, 0x40, 0x7f, 0);
                         }
                         next = static_cast<unsigned char>(m_cursorChoice + 1);
-                        goto do_switch_go10;
+                        goto go10_done1;
                     }
                 }
 
                 next = 0;
+            go10_done1:
+                sel = next;
             } else {
                 m_drawCursor = 1;
                 m_cursorListY0 = 0x8b;
@@ -1899,7 +1902,7 @@ card_connected:;
 
                 if (MenuPcs.m_menuWindowInfo->state != 1) {
                     next = 0;
-                    goto do_switch_go10;
+                    goto go10_done2;
                 }
 
                 input = GetGoOutInputMask();
@@ -1915,14 +1918,15 @@ card_connected:;
                             Sound.PlaySe(3, 0x40, 0x7f, 0);
                         }
                         next = static_cast<unsigned char>(m_cursorChoice + 1);
-                        goto do_switch_go10;
+                        goto go10_done2;
                     }
                 }
 
                 next = 0;
+            go10_done2:
+                sel = next;
             }
-        do_switch_go10:
-            switch (next) {
+            switch (sel) {
             case 1:
                 SetGoOutMode(0x11);
                 break;

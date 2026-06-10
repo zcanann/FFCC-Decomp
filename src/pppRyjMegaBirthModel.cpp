@@ -534,7 +534,36 @@ void birth(
     }
 
         if (kPppRyjMegaBirthSharedZero != params->m_speed) {
-            float speedScalar = calc_direction_speed(params, params->m_speedMode);
+            float speedScalar = params->m_speed;
+            float dr1;
+            float dr2;
+            float dr3;
+
+            switch (params->m_speedMode) {
+            case 1:
+                (void)Math.RandF();
+                speedScalar = params->m_speed * Math.RandF();
+                break;
+            case 2:
+                dr3 = Math.RandF();
+                speedScalar = (params->m_speed * Math.RandF()) * dr3;
+                break;
+            case 3:
+                dr3 = Math.RandF();
+                speedScalar = -(MegaBirthSpeedFalloff() * ((params->m_speed * Math.RandF()) * dr3) - params->m_speed);
+                break;
+            case 4:
+                dr1 = Math.RandF();
+                dr2 = Math.RandF();
+                dr3 = Math.RandF();
+                speedScalar = Math.RandF() * (dr3 * ((params->m_speed * dr2) * dr1));
+                break;
+            case 5:
+                dr2 = Math.RandF();
+                dr3 = Math.RandF();
+                speedScalar = -(MegaBirthHalf() * (Math.RandF() * ((params->m_speed * dr3) * dr2)) - params->m_speed);
+                break;
+            }
 
             rowY.x = particleData->m_matrix[0][1];
             rowY.y = particleData->m_matrix[1][1];

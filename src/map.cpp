@@ -2422,18 +2422,15 @@ int CMapMng::ReadMid(char* mapName)
                 goto midChunkDone;
             }
 
-            CMapObj* mapObj = nextMapObj;
-            while (true) {
-                signed char meshType = mapObj->m_meshType;
-                if (meshType == 1 || meshType == 2) {
+            do {
+                if (nextMapObj->m_meshType == 1) {
                     goto octtreeFound;
                 }
-                nextMapObj = mapObj + 1;
-                if (nextMapObj - MapMng.m_mapObjArray >= m_mapObjCount) {
-                    break;
+                if (nextMapObj->m_meshType == 2) {
+                    goto octtreeFound;
                 }
-                mapObj = nextMapObj;
-            }
+                nextMapObj++;
+            } while (nextMapObj - MapMng.m_mapObjArray < m_mapObjCount);
             if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                 System.Printf(const_cast<char*>(s_read_mid_ground_error));
             }
@@ -2444,27 +2441,33 @@ int CMapMng::ReadMid(char* mapName)
                 return 0;
             }
             m_octTreeArray[m_octTreeCount].ReadOtmOctTree(chunkFile);
-            m_octTreeArray[m_octTreeCount].SetMapObject(mapObj);
+            m_octTreeArray[m_octTreeCount].SetMapObject(nextMapObj);
+            nextMapObj++;
             {
                 CMapObj* check = m_octTreeArray[m_octTreeCount].GetMapObject();
-                if (check->m_mapData == 0) {
-                    if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-                        System.Printf(const_cast<char*>(s_read_mid_hit_null_error));
-                    }
-                } else {
-                    signed char checkType = check->m_meshType;
-                    if (checkType == 1 || checkType == 2) {
-                        goto octtreeDone;
-                    }
+                if (check->m_mapData != 0) {
+                    goto octtreeMeshCheck;
                 }
-            }
+                if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+                    System.Printf(const_cast<char*>(s_read_mid_hit_null_error));
+                }
         octtreeError:
-            if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-                System.Printf(const_cast<char*>(s_read_mid_node_order_warning));
+                if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+                    System.Printf(const_cast<char*>(s_read_mid_node_order_warning));
+                }
+                ok = 0;
+                goto octtreeDone;
+
+        octtreeMeshCheck:
+                if (check->m_meshType == 1) {
+                    goto octtreeDone;
+                }
+                if (check->m_meshType == 2) {
+                    goto octtreeDone;
+                }
+                goto octtreeError;
             }
-            ok = 0;
         octtreeDone:
-            nextMapObj = mapObj + 1;
             m_octTreeCount += 1;
         }
     midChunkDone:

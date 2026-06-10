@@ -38,7 +38,7 @@ static const char sCameraPcsPartTableName[] = "CCameraPcs(PART)";
 static const char sCameraPcsShadowTableName[] = "CCameraPcs(SHADOW)";
 
 extern float kCameraPi;
-extern float kCameraOneF;
+extern const float kCameraOneF;
 extern float kCameraHalfF;
 extern const double kCameraS16ToDoubleBias;
 extern const float kCameraDebugFov;
@@ -1057,36 +1057,28 @@ void CCameraPcs::SetViewerSRT(const SRT* srt)
  */
 void CCameraPcs::createChara()
 {
-    float fVar6;
-    float fVar5;
-    float fVar4;
-    float fVar3;
-    float fVar2;
-    float fVar1;
-    float fVar7;
-
-    fVar2 = 0.0f;
+    float farZ = kCameraDefaultFarZ;
+    float nearZ = kCameraDefaultNearZ;
+    float fov = kCameraDefaultFov;
+    float fifty = kCameraFiftyF;
+    float negTen = kCameraNegativeTenF;
+    float one = kCameraOneF;
+    float zero = kCameraZeroF;
     m_viewerOverride = 0;
-    fVar1 = 1.0f;
-    m_viewer.m_position.z = fVar2;
-    fVar6 = -10.0f;
-    m_viewer.m_position.y = fVar2;
-    fVar7 = 50.0f;
-    m_viewer.m_position.x = fVar2;
-    fVar4 = 25.0f;
-    m_viewer.m_distance = fVar2;
-    fVar3 = 10.0f;
-    m_viewer.m_rotY = fVar2;
-    fVar5 = 10000.0f;
-    m_viewer.m_rotX = fVar2;
-    m_viewer.m_scale.z = fVar1;
-    m_viewer.m_scale.y = fVar1;
-    m_viewer.m_scale.x = fVar1;
-    m_viewer.m_position.y = fVar6;
-    m_viewer.m_distance = fVar7;
-    m_fov = fVar4;
-    m_nearZ = fVar3;
-    m_farZ = fVar5;
+    m_viewer.m_position.z = zero;
+    m_viewer.m_position.y = zero;
+    m_viewer.m_position.x = zero;
+    m_viewer.m_distance = zero;
+    m_viewer.m_rotY = zero;
+    m_viewer.m_rotX = zero;
+    m_viewer.m_scale.z = one;
+    m_viewer.m_scale.y = one;
+    m_viewer.m_scale.x = one;
+    m_viewer.m_position.y = negTen;
+    m_viewer.m_distance = fifty;
+    m_fov = fov;
+    m_nearZ = nearZ;
+    m_farZ = farZ;
 }
 
 /*

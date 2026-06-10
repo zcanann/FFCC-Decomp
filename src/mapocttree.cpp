@@ -1418,14 +1418,13 @@ void InsertShadow_r(COctNode* node)
 				bits[0x48 / sizeof(unsigned long)] |= 1UL << (s_insertShadowBitIndex & 0x1f);
 			}
 
-			COctNode* childIter = child;
 			for (int j = 0; j < 8; j++) {
-				if (childIter->m_children[0] == 0) {
+				if (child->m_children[0] == 0) {
 					break;
 				}
 
 				s_light_no++;
-				COctNode* grandChild = childIter->m_children[0];
+				COctNode* grandChild = child->m_children[0];
 
 				if (grandChild->GetBound()->CheckCross(s_bound) != 0) {
 					if ((s_light_no >= 3) && (grandChild->m_meshCount != 0)) {
@@ -1444,7 +1443,7 @@ void InsertShadow_r(COctNode* node)
 						s_light_no--;
 					}
 				}
-				childIter = reinterpret_cast<COctNode*>(Ptr(childIter, 4));
+				child = reinterpret_cast<COctNode*>(Ptr(child, 4));
 				s_light_no--;
 			}
 		}

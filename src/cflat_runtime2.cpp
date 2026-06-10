@@ -482,7 +482,7 @@ CFlatRuntime2::CFlatRuntime2()
 	resetChangeScript();
 	memset(m_spawnBits, 0, sizeof(m_spawnBits));
 
-	CGBaseObj* baseObj = reinterpret_cast<CGBaseObj*>(m_objBase);
+	CGBaseObj* baseObj = m_objBase;
 	for (int i = 0; i < 0x28; i++) {
 		InitFlatObjectSlot(baseObj, static_cast<u16>(i + 1));
 		baseObj++;
@@ -506,8 +506,9 @@ CFlatRuntime2::CFlatRuntime2()
 	InitFlatObjectSlot(&m_objParty[3], 0x304);
 
 	CGMonObj* monObj = reinterpret_cast<CGMonObj*>(m_objMon);
-	for (int i = 0; i < kFlatMonObjCount; i++, monObj++) {
+	for (int i = 0; i < kFlatMonObjCount; i++) {
 		InitFlatObjectSlot(monObj, static_cast<u16>((i + 1) | 0x400));
+		monObj++;
 	}
 
 	u8* itemObjBytes = reinterpret_cast<u8*>(m_objItem);

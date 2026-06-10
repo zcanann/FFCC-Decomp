@@ -309,31 +309,32 @@ void CMenuPcs::LetterInit1()
 		--iVar5;
 	} while (iVar5 != 0);
 
-	iVar4 = GetLetterAnimBase(this);
-	*reinterpret_cast<int*>(iVar4 + 0x24) = 0x5F;
-	*reinterpret_cast<s16*>(iVar4 + 0xC) = 0x238;
-	*reinterpret_cast<s16*>(iVar4 + 0xE) = 0x178;
+	int n = 0;
+	s16* p = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n++]);
+	*reinterpret_cast<int*>(p + 0xE) = 0x5F;
+	p[2] = 0x238;
+	p[3] = 0x178;
 	double scale = DOUBLE_803330a8;
-	*reinterpret_cast<s16*>(iVar4 + 8) = static_cast<s16>((0x280 - *reinterpret_cast<s16*>(iVar4 + 0xC)) * scale);
-	*reinterpret_cast<s16*>(iVar4 + 0xA) = static_cast<s16>((0x1C0 - *reinterpret_cast<s16*>(iVar4 + 0xE)) * scale);
+	p[0] = static_cast<s16>((0x280 - p[2]) * scale);
+	p[1] = static_cast<s16>((0x1C0 - p[3]) * scale);
 	fVar1 = FLOAT_803330bc;
-	*reinterpret_cast<float*>(iVar4 + 0x10) = fVar1;
-	*reinterpret_cast<float*>(iVar4 + 0x14) = fVar1;
-	*reinterpret_cast<int*>(iVar4 + 0x2C) = 0;
-	*reinterpret_cast<int*>(iVar4 + 0x30) = 10;
+	*reinterpret_cast<float*>(p + 8) = fVar1;
+	*reinterpret_cast<float*>(p + 0xA) = fVar1;
+	*reinterpret_cast<int*>(p + 0x12) = 0;
+	*reinterpret_cast<int*>(p + 0x14) = 10;
 
-	iVar4 = GetLetterAnimBase(this);
-	*reinterpret_cast<int*>(iVar4 + 0x64) = 0x3E;
-	*reinterpret_cast<s16*>(iVar4 + 0x4C) = 0xA8;
-	*reinterpret_cast<s16*>(iVar4 + 0x4E) = 0x60;
-	*reinterpret_cast<s16*>(iVar4 + 0x48) = 0x20;
-	*reinterpret_cast<s16*>(iVar4 + 0x4A) = static_cast<s16>(0x1A0 - *reinterpret_cast<s16*>(iVar4 + 0x4E));
-	*reinterpret_cast<float*>(iVar4 + 0x50) = fVar1;
-	*reinterpret_cast<float*>(iVar4 + 0x54) = fVar1;
-	*reinterpret_cast<int*>(iVar4 + 0x6C) = 0;
-	*reinterpret_cast<int*>(iVar4 + 0x70) = 10;
+	p = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n++]);
+	*reinterpret_cast<int*>(p + 0xE) = 0x3E;
+	p[2] = 0xA8;
+	p[3] = 0x60;
+	p[0] = 0x20;
+	p[1] = static_cast<s16>(0x1A0 - p[3]);
+	*reinterpret_cast<float*>(p + 8) = fVar1;
+	*reinterpret_cast<float*>(p + 0xA) = fVar1;
+	*reinterpret_cast<int*>(p + 0x12) = 0;
+	*reinterpret_cast<int*>(p + 0x14) = 10;
 
-	GetLetterAnimStorage(this)->count = 2;
+	GetLetterAnimStorage(this)->count = static_cast<s16>(n);
 	m_singMenuState->frame = 0;
 	m_singMenuState->initialized = 1;
 }

@@ -1201,6 +1201,8 @@ void CShopMenu::DrawItemHelp(int index, int centerX, int y)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_propagation off
 void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, int unused1, int unused2, int unused3)
 {
     (void)unused0;
@@ -1221,10 +1223,10 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
     font->DrawInit();
 
     int languageId = static_cast<unsigned int>(Game.m_gameWork.m_languageId);
+    char* label = 0;
     int langIndex = languageId - 1;
     int equipType = MenuPcs.GetEquipType(itemNo);
     int statType;
-    char* label = 0;
     if (equipType == 0) {
         statType = 0;
         label = ShopMenuMes(langIndex, SHOP_MENU_TEXT_STRENGTH);
@@ -1252,7 +1254,7 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
     MenuPcs.DrawNoShadowFont(font, textBuffer, labelX, static_cast<float>(y), 0x18, 0x12);
     MenuPcs.DrawInit();
 
-    unsigned int valueRightX = x + 0x108;
+    int valueRightX = static_cast<int>(static_cast<float>(x + 0x108));
     CFont* font2 = GetShopMenuInfoPanelFont();
     font2->SetShadow(1);
     font2->SetScale(FLOAT_80332d28);
@@ -1323,6 +1325,7 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
         MenuPcs.DrawInit();
     }
 }
+#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x80150e50

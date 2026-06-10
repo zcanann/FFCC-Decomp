@@ -902,69 +902,51 @@ int CMenuPcs::EquipOpen()
 	s16* puVar9;
 	s16 sVar10;
 	int iVar11;
-	u32 uVar12;
+	int iCount;
 	double dVar20;
 
 	if ((signed char)GetEquipMenuState(this)->initialized == 0) {
 		memset(GetEquipListStorage(this), 0, sizeof(EquipOpenAnimList));
 		fVar5 = kEquipOne;
 		EquipOpenAnim* entry = GetEquipListStorage(this)->entries;
-		iVar11 = 8;
-		do {
-			entry[0].scale = fVar5;
-			entry[1].scale = fVar5;
-			entry[2].scale = fVar5;
-			entry[3].scale = fVar5;
-			entry[4].scale = fVar5;
-			entry[5].scale = fVar5;
-			entry[6].scale = fVar5;
-			entry[7].scale = fVar5;
-			dVar4 = kEquipIntToDoubleBias;
-			dVar3 = kEquipHalfDouble;
-			dVar2 = kEquipWindowCenterX;
-			fVar1 = kEquipZero;
-			entry += 8;
-			iVar11--;
-		} while (iVar11 != 0);
+		for (iVar11 = 64; iVar11 != 0; iVar11--) {
+			entry->scale = fVar5;
+			entry++;
+		}
 
+		dVar4 = kEquipIntToDoubleBias;
+		dVar3 = kEquipHalfDouble;
+		dVar2 = kEquipWindowCenterX;
+		fVar1 = kEquipZero;
 		iVar6 = 0;
 		entry = GetEquipListStorage(this)->entries;
-		for (iVar11 = 0; iVar11 < 2; iVar11++) {
-			entry[0].tex = 0x34;
-			entry[0].w = 200;
-			entry[0].h = 0x28;
-			entry[0].x = (s16)(int)-((double)entry[0].w * dVar3 - dVar2);
-			entry[0].y = iVar6 * (entry[0].h - 8) + 0x60;
-			entry[0].u = fVar1;
-			entry[0].v = fVar1;
-			entry[0].startFrame = iVar6;
+		for (iVar11 = 4; iVar11 != 0; iVar11--) {
+			entry->tex = 0x34;
+			entry->w = 200;
+			entry->h = 0x28;
+			entry->x = (s16)(int)-((double)entry->w * dVar3 - dVar2);
+			entry->y = iVar6 * (entry->h - 8) + 0x60;
+			entry->u = fVar1;
+			entry->v = fVar1;
+			entry->startFrame = iVar6;
 			iVar6++;
-			entry[0].duration = 3;
-
-			entry[1].tex = 0x34;
-			entry[1].w = 200;
-			entry[1].h = 0x28;
-			entry[1].x = (s16)(int)-((double)entry[1].w * dVar3 - dVar2);
-			entry[1].y = iVar6 * (entry[1].h - 8) + 0x60;
-			entry[1].u = fVar1;
-			entry[1].v = fVar1;
-			entry[1].startFrame = iVar6;
-			iVar6++;
-			entry[1].duration = 3;
-			entry += 2;
+			entry->duration = 3;
+			entry++;
 		}
 
 		GetEquipListStorage(this)->count = 4;
 		EquipInit1();
 		puVar9 = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 		sVar10 = 0;
-		for (iVar6 = 0; iVar6 < 0x40; iVar6++) {
+		iVar6 = 0;
+		while (iVar6 < 0x40) {
 			iVar11 = GetItemType(iVar6, 0);
 			if (iVar11 == 1) {
 				puVar9++;
 				*puVar9 = (s16)iVar6;
 				sVar10++;
 			}
+			iVar6++;
 		}
 
 		psVar7 = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
@@ -975,10 +957,10 @@ int CMenuPcs::EquipOpen()
 
 	iVar6 = 0;
 	GetEquipMenuState(this)->frame = GetEquipMenuState(this)->frame + 1;
-	uVar8 = (u32)GetEquipListStorage(this)->count;
+	iCount = GetEquipListStorage(this)->count;
 	EquipOpenAnim* entry = GetEquipListStorage(this)->entries;
 	iVar11 = static_cast<int>(GetEquipMenuState(this)->frame);
-	for (int i = 0; i < (int)uVar8; i++) {
+	for (int i = 0; i < iCount; i++) {
 		if (entry->startFrame <= iVar11) {
 			if (entry->startFrame + entry->duration <= iVar11) {
 				iVar6++;
@@ -996,50 +978,11 @@ int CMenuPcs::EquipOpen()
 	int result = 0;
 	if (GetEquipListStorage(this)->count == iVar6) {
 		entry = GetEquipListStorage(this)->entries;
-		if (0 < (int)uVar8) {
-			uVar12 = uVar8 >> 3;
-			if (uVar12 != 0) {
-				do {
-					entry[0].startFrame = 0;
-					entry[0].duration = 1;
-					entry[0].alpha = fVar5;
-					entry[1].startFrame = 0;
-					entry[1].duration = 1;
-					entry[1].alpha = fVar5;
-					entry[2].startFrame = 0;
-					entry[2].duration = 1;
-					entry[2].alpha = fVar5;
-					entry[3].startFrame = 0;
-					entry[3].duration = 1;
-					entry[3].alpha = fVar5;
-					entry[4].startFrame = 0;
-					entry[4].duration = 1;
-					entry[4].alpha = fVar5;
-					entry[5].startFrame = 0;
-					entry[5].duration = 1;
-					entry[5].alpha = fVar5;
-					entry[6].startFrame = 0;
-					entry[6].duration = 1;
-					entry[6].alpha = fVar5;
-					entry[7].startFrame = 0;
-					entry[7].duration = 1;
-					entry[7].alpha = fVar5;
-					entry += 8;
-					uVar12--;
-				} while (uVar12 != 0);
-				uVar8 &= 7;
-				if (uVar8 == 0) {
-					return 1;
-				}
-			}
-
-			do {
-				entry->startFrame = 0;
-				entry->duration = 1;
-				entry->alpha = fVar5;
-				entry++;
-				uVar8--;
-			} while (uVar8 != 0);
+		for (iVar11 = iCount; iVar11 > 0; iVar11--) {
+			entry->startFrame = 0;
+			entry->duration = 1;
+			entry->alpha = fVar5;
+			entry++;
 		}
 		result = 1;
 	}

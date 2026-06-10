@@ -3331,10 +3331,13 @@ float CGObject::CalcSafePos(int hitMask, CGObject* other, Vec* outSafePos)
     PSVECSubtract(&m_worldPosition, &centerPos, &hitMove);
     hitMove.y = sZeroFloat;
 
+    const float hitRadius = m_capsuleHalfHeight;
     CMapCylinder hitCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
     hitCylinder.m_bottom = centerPos;
-    hitCylinder.m_axis = hitMove;
-    hitCylinder.m_radius = m_capsuleHalfHeight;
+    hitCylinder.m_axis.x = hitMove.x;
+    hitCylinder.m_axis.y = sZeroFloat;
+    hitCylinder.m_axis.z = hitMove.z;
+    hitCylinder.m_radius = hitRadius;
 
     if (MapMng.CheckHitCylinderNear(&hitCylinder, &hitMove, hitMask) != 0) {
         MapMng.m_hitMapObj->CalcHitPosition(&centerPos);
@@ -3343,14 +3346,16 @@ float CGObject::CalcSafePos(int hitMask, CGObject* other, Vec* outSafePos)
         safeDistance = PSVECDistance(&m_worldPosition, &centerPos);
     } else {
         *outSafePos = m_worldPosition;
-        hitMove.y = sZeroFloat;
         hitMove.x = (m_capsuleHalfHeight + other->m_capsuleHalfHeight) * (float)sin((double)other->m_rotBaseY);
-        hitMove.z = (m_capsuleHalfHeight + other->m_capsuleHalfHeight) * (float)cos((double)other->m_rotBaseY);
+        hitMove.y = sZeroFloat;
+        const float cosRot = (float)cos((double)other->m_rotBaseY);
+        const float safeRadius = m_capsuleHalfHeight;
+        hitMove.z = (safeRadius + other->m_capsuleHalfHeight) * cosRot;
 
         CMapCylinder safeCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
         safeCylinder.m_bottom = centerPos;
         safeCylinder.m_axis = hitMove;
-        safeCylinder.m_radius = m_capsuleHalfHeight;
+        safeCylinder.m_radius = safeRadius;
 
         if (MapMng.CheckHitCylinderNear(&safeCylinder, &hitMove, hitMask) != 0) {
             MapMng.m_hitMapObj->CalcHitPosition(&centerPos);

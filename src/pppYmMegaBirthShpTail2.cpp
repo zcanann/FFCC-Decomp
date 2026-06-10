@@ -158,10 +158,6 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
             float camX, camY, camZ;
             u16 frameCount = frameCountRaw;
 
-            if (trailReadIndex == trailMaxIndex) {
-                trailNextIndex = 0;
-            }
-
             pppUnitMatrix(drawMtx);
             drawScale = *(float*)(step + 0x70);
             drawScaleStep = (drawScale - *(float*)(step + 0x74)) / stepDivisor;
@@ -170,6 +166,9 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
                 drawX = p->x;
                 drawY = p->y;
                 drawZ = p->z;
+            }
+            if (trailReadIndex == trailMaxIndex) {
+                trailNextIndex = 0;
             }
             {
                 Vec* p = &history[trailNextIndex];

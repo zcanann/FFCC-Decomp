@@ -1353,21 +1353,21 @@ void GbaQueue::LoadPlayerStat()
 				entry[0x1E] = static_cast<unsigned char>(caravanWork->m_letterMeta[6]);
 				entry[0x1F] = static_cast<unsigned char>(caravanWork->m_letterMeta[7]);
 
-				entry[0] = static_cast<unsigned char>(caravanWork->m_saveSlot);
 				{
-					unsigned char* link = &Game.m_gameWork.m_linkTable[caravanWork->m_saveSlot][0][caravanWork->m_saveSlot][0];
-					unsigned char l0 = link[0];
+					const int saveSlot = caravanWork->m_saveSlot;
+					entry[0] = static_cast<unsigned char>(saveSlot);
 					entry[4] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x12]);
-					unsigned char l1 = link[1];
-					unsigned char l2 = link[2];
+					unsigned char l0 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][0];
+					unsigned char l1 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][1];
 					entry[5] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x13]);
-					unsigned char l3 = link[3];
-					unsigned char l4 = link[4];
+					unsigned char l2 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][2];
+					unsigned char l3 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][3];
 					entry[6] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x14]);
-					unsigned char l5 = link[5];
-					unsigned char l6 = link[6];
+					unsigned char l4 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][4];
+					unsigned char l5 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][5];
 					entry[7] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x15]);
-					unsigned char l7 = link[7];
+					unsigned char l6 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][6];
+					unsigned char l7 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][7];
 					entry[8] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x16]);
 					entry[9] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x17]);
 					entry[0xA] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x18]);
@@ -1391,21 +1391,30 @@ void GbaQueue::LoadPlayerStat()
 				memcpy(entry + 0x3A, caravanWork->m_inventoryItems, 0x80);
 				{
 					int artifactIndex = 0;
+					unsigned int artifactBit = 1;
+					int artifactSlot;
+					int artifactWordOff;
 					int artifactGroup;
 					for (artifactGroup = 0; artifactGroup < 0x20; artifactGroup++) {
-						if (static_cast<short>(caravanWork->m_artifacts[artifactIndex]) > 0) {
-							reinterpret_cast<unsigned int*>(entry + 0x28)[artifactIndex / 32] |=
-							    static_cast<unsigned int>(1U << (artifactIndex % 32));
+						artifactSlot = 0x40 + artifactIndex;
+						if (caravanWork->m_inventoryItems[artifactSlot] > 0) {
+							artifactWordOff = (artifactIndex >> 5) * 4 + 0x28;
+							*reinterpret_cast<unsigned int*>(entry + artifactWordOff) |=
+							    static_cast<unsigned int>(artifactBit << (artifactIndex % 32));
 						}
 						artifactIndex++;
-						if (static_cast<short>(caravanWork->m_artifacts[artifactIndex]) > 0) {
-							reinterpret_cast<unsigned int*>(entry + 0x28)[artifactIndex / 32] |=
-							    static_cast<unsigned int>(1U << (artifactIndex % 32));
+						artifactSlot = 0x40 + artifactIndex;
+						if (caravanWork->m_inventoryItems[artifactSlot] > 0) {
+							artifactWordOff = (artifactIndex >> 5) * 4 + 0x28;
+							*reinterpret_cast<unsigned int*>(entry + artifactWordOff) |=
+							    static_cast<unsigned int>(artifactBit << (artifactIndex % 32));
 						}
 						artifactIndex++;
-						if (static_cast<short>(caravanWork->m_artifacts[artifactIndex]) > 0) {
-							reinterpret_cast<unsigned int*>(entry + 0x28)[artifactIndex / 32] |=
-							    static_cast<unsigned int>(1U << (artifactIndex % 32));
+						artifactSlot = 0x40 + artifactIndex;
+						if (caravanWork->m_inventoryItems[artifactSlot] > 0) {
+							artifactWordOff = (artifactIndex >> 5) * 4 + 0x28;
+							*reinterpret_cast<unsigned int*>(entry + artifactWordOff) |=
+							    static_cast<unsigned int>(artifactBit << (artifactIndex % 32));
 						}
 						artifactIndex++;
 					}
@@ -1432,12 +1441,9 @@ void GbaQueue::LoadPlayerStat()
 				entry[0xDA] = static_cast<unsigned char>(caravanWork->m_equipment[3]);
 
 				entry[0x23] = 1;
-				entry[0xD4] = 0;
-				if (partyObj != 0) {
-					entry[0xD4] = static_cast<unsigned char>(partyObj->IsDispRader() != 0);
-				}
+				entry[0xD4] = static_cast<unsigned char>(partyObj->IsDispRader() != 0);
 
-				if ((caravanWork->IsOutOfShouki() != 0) && (entry[0x17] != 0)) {
+				if ((caravanWork->IsOutOfShouki() != 0) && (static_cast<signed char>(entry[0x17]) != 0)) {
 					outOfShoukiMask |= (1U << i);
 				}
 
@@ -1449,10 +1455,10 @@ void GbaQueue::LoadPlayerStat()
 				}
 			}
 
-			if (partyObj != 0) {
-				short posX = static_cast<short>(partyObj->m_worldPosition.x / kGbaQueueMapCoordScale);
-				short posZ = static_cast<short>(partyObj->m_worldPosition.z / kGbaQueueMapCoordScale);
+			if (Game.m_partyObjArr[i] != 0) {
 				entry[1] = 1;
+				short posX = static_cast<short>(Game.m_partyObjArr[i]->m_worldPosition.x / kGbaQueueMapCoordScale);
+				short posZ = static_cast<short>(Game.m_partyObjArr[i]->m_worldPosition.z / kGbaQueueMapCoordScale);
 				*reinterpret_cast<short*>(entry + 0x36) = posX;
 				*reinterpret_cast<short*>(entry + 0x38) = posZ;
 			}

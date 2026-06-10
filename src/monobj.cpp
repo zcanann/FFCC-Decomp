@@ -3425,39 +3425,51 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 		int i = 0;
 		int* groupPtr = reinterpret_cast<int*>(groupTable);
 		do {
-			if (groupCursor == groupPtr[0]) {
+			int cursor0 = groupCursor;
+			if (cursor0 == groupPtr[0]) {
 				if (seen == pick) {
-					groupCursor += 1;
-					return i;
+					selectedAction = i;
+					groupCursor = cursor0 + 1;
+					goto mlDone;
 				}
 				seen += 1;
 			}
-			if (groupCursor == groupPtr[1]) {
+			i += 1;
+			int cursor1 = groupCursor;
+			if (cursor1 == groupPtr[1]) {
 				if (seen == pick) {
-					groupCursor += 1;
-					return i + 1;
+					selectedAction = i;
+					groupCursor = cursor1 + 1;
+					goto mlDone;
 				}
 				seen += 1;
 			}
-			if (groupCursor == groupPtr[2]) {
+			i += 1;
+			int cursor2 = groupCursor;
+			if (cursor2 == groupPtr[2]) {
 				if (seen == pick) {
-					groupCursor += 1;
-					return i + 2;
+					selectedAction = i;
+					groupCursor = cursor2 + 1;
+					goto mlDone;
 				}
 				seen += 1;
 			}
-			if (groupCursor == groupPtr[3]) {
+			i += 1;
+			int cursor3 = groupCursor;
+			if (cursor3 == groupPtr[3]) {
 				if (seen == pick) {
-					groupCursor += 1;
-					return i + 3;
+					selectedAction = i;
+					groupCursor = cursor3 + 1;
+					goto mlDone;
 				}
 				seen += 1;
 			}
+			i += 1;
 			groupPtr += 4;
-			i += 4;
 		} while (i < 8);
 	}
 
+mlDone:
 	return selectedAction;
 #undef aiScript
 #undef baseScript

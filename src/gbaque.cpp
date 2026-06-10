@@ -1567,7 +1567,7 @@ void GbaQueue::LoadEnemyStat()
 				enemyEntry[3] = 0;
 			} else {
 				const int enemyDataBase = Game.unkCFlatData0[1] +
-				    reinterpret_cast<CMonWork*>(Game.m_scriptWork[4][0][i])->m_baseDataIndex * 0x1D0;
+				    reinterpret_cast<CMonWork*>(Game.m_scriptWork[8][0][i])->m_baseDataIndex * 0x1D0;
 				const unsigned int enemyKind = *reinterpret_cast<unsigned short*>(enemyDataBase + 0x10C);
 
 				if (enemyKind == 10) {
@@ -1578,7 +1578,7 @@ void GbaQueue::LoadEnemyStat()
 					enemyEntry[1] = 2;
 				}
 
-				CMonWork* enemyWork = reinterpret_cast<CMonWork*>(Game.m_scriptWork[4][0][i]);
+				CMonWork* enemyWork = reinterpret_cast<CMonWork*>(Game.m_scriptWork[8][0][i]);
 				CGObject* enemyObj = reinterpret_cast<CGObject*>(Game.m_scriptWork[0][0][i]);
 				enemyEntry[3] = static_cast<unsigned char>(enemyWork->m_baseDataIndex);
 				*reinterpret_cast<unsigned short*>(enemyEntry + 4) = enemyWork->m_hp;
@@ -4558,7 +4558,7 @@ int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
 		for (int i = 0; i < 0x40; i++) {
 			scouterEntry[0] = enemyEntry[0xB37];
 			if (scouterEntry[0] != 0) {
-				CMonWork* enemyWork = reinterpret_cast<CMonWork*>(Game.m_scriptWork[4][0][i]);
+				CMonWork* enemyWork = reinterpret_cast<CMonWork*>(Game.m_scriptWork[8][0][i]);
 				const int enemyDataBase = Game.unkCFlatData0[1] + enemyEntry[0xB37] * 0x1D0;
 
 				work = enemyWork->m_maxHp;
@@ -4743,7 +4743,7 @@ void GbaQueue::SetHitEnemy(int channel, int enemyIdx)
 
 	if (enemyIdx >= 0) {
 		enemyId = static_cast<short>(enemyIdx);
-		enemyType = static_cast<short>(*reinterpret_cast<unsigned short*>(Game.m_scriptWork[4][0][enemyIdx] + 0x1C));
+		enemyType = static_cast<short>(*reinterpret_cast<unsigned short*>(Game.m_scriptWork[8][0][enemyIdx] + 0x1C));
 	} else {
 		enemyType = enemyId = -1;
 	}

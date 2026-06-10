@@ -200,15 +200,6 @@ inline CGame::CGame()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CGame::~CGame()
-{
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8001600c
  * PAL Size: 476b
  * EN Address: TODO
@@ -581,12 +572,12 @@ void CGame::clearWork()
 
     unk_flat3_0xc7d0 = 0;
 
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < 8; i++) {
         for (j = 0; j < 4; j++) {
             m_scriptWork[i][j][0] = 0;
-            m_scriptWork[i + 4][j][0] = 0;
+            m_scriptWork[i + 8][j][0] = 0;
             m_scriptWork[i][j][1] = 0;
-            m_scriptWork[i + 4][j][1] = 0;
+            m_scriptWork[i + 8][j][1] = 0;
         }
     }
 
@@ -657,12 +648,12 @@ inline void CGame::clearWorkScript()
 
     unk_flat3_0xc7d0 = 0;
 
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 8; j++) {
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 4; j++) {
             m_scriptWork[i][j][0] = 0;
-            m_scriptWork[i + 4][j][0] = 0;
+            m_scriptWork[i + 8][j][0] = 0;
             m_scriptWork[i][j][1] = 0;
-            m_scriptWork[i + 4][j][1] = 0;
+            m_scriptWork[i + 8][j][1] = 0;
         }
     }
 
@@ -782,6 +773,8 @@ void CGame::ChangeMap(int mapId, int mapVariant, int param4, int param5)
             param4 != 0 ? 0x580000 : 0,
             loadStep);
 
+        loadStep = param4;
+
         PartPcs.LoadFieldPdt(
             mapId,
             mapVariant,
@@ -827,12 +820,12 @@ void CGame::ScriptChanged(char*, int)
 
     unk_flat3_0xc7d0 = 0;
 
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < 8; i++) {
         for (j = 0; j < 4; j++) {
             m_scriptWork[i][j][0] = 0;
-            m_scriptWork[i + 4][j][0] = 0;
+            m_scriptWork[i + 8][j][0] = 0;
             m_scriptWork[i][j][1] = 0;
-            m_scriptWork[i + 4][j][1] = 0;
+            m_scriptWork[i + 8][j][1] = 0;
         }
     }
 
@@ -1034,14 +1027,15 @@ void CGame::LoadInit()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGame::LoadScript(char* scriptData)
+static inline void loadPermanentScriptVars(char* scriptData)
 {
     int scriptOffset = 0;
-    int i = 0;
     int entryOffset = 0;
+    int i = 0;
 
     while (i < CFlatPermanentVarCount()) {
-        if ((CFlatPermanentVarFlagByte(entryOffset) & 0x20) != 0) {
+        int flagIndex = entryOffset + 1;
+        if ((CFlatPermanentVarDefs()[flagIndex] & 0x20) != 0) {
             CFlatPermanentVarWord(entryOffset) = *reinterpret_cast<u32*>(scriptData + scriptOffset);
             scriptOffset += 4;
         }
@@ -1049,6 +1043,11 @@ void CGame::LoadScript(char* scriptData)
         entryOffset += 4;
         i++;
     }
+}
+
+void CGame::LoadScript(char* scriptData)
+{
+    loadPermanentScriptVars(scriptData);
 }
 
 /*
@@ -1060,16 +1059,15 @@ void CGame::LoadScript(char* scriptData)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGame::SaveScript(char* scriptData)
+static inline void savePermanentScriptVars(char* scriptData)
 {
-    memset(scriptData, 0, kGameScriptSaveDataSize);
-
     int scriptOffset = 0;
-    int entryOffset = 0;
     int i = 0;
+    int entryOffset = 0;
 
     while (i < CFlatPermanentVarCount()) {
-        if ((CFlatPermanentVarFlagByte(entryOffset) & 0x20) != 0) {
+        int flagIndex = entryOffset + 1;
+        if ((CFlatPermanentVarDefs()[flagIndex] & 0x20) != 0) {
             *reinterpret_cast<u32*>(scriptData + scriptOffset) = CFlatPermanentVarWord(entryOffset);
             scriptOffset += 4;
         }
@@ -1077,6 +1075,12 @@ void CGame::SaveScript(char* scriptData)
         entryOffset += 4;
         i++;
     }
+}
+
+void CGame::SaveScript(char* scriptData)
+{
+    memset(scriptData, 0, kGameScriptSaveDataSize);
+    savePermanentScriptVars(scriptData);
 }
 
 /*

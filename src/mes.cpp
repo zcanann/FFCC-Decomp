@@ -102,9 +102,10 @@ static inline int ReadTagS16(char** text)
 		}                                                                 \
 		else if (caseMode == 2)                                           \
 		{                                                                 \
-			if ((text)[0] != '\0')                                        \
+			char* caseModePtr = (text);                                   \
+			if (caseModePtr[0] != '\0')                                   \
 			{                                                             \
-				(text)[0] = (char)toupperLatin1((unsigned char)(text)[0]); \
+				caseModePtr[0] = (char)toupperLatin1((unsigned char)caseModePtr[0]); \
 			}                                                             \
 		}                                                                 \
 		else                                                              \
@@ -1104,8 +1105,8 @@ void CMes::addString(char** text, int branchMode)
 			{
 				mColor = 6;
 			}
+			strcpy(nameTag2B, FlatNameDirect(2, mFlagVars[ReadTagS8(text)] & 0xFFFF));
 			char* namePtr = nameTag2B;
-			strcpy(namePtr, FlatNameDirect(2, mFlagVars[ReadTagS8(text)] & 0xFFFF));
 			ApplyCaseMode(namePtr, caseMode);
 			addString(&namePtr, branchMode);
 			mColor = oldColor;
@@ -1118,8 +1119,8 @@ void CMes::addString(char** text, int branchMode)
 			{
 				mColor = 4;
 			}
+			strcpy(nameTag2C, FlatNameDirect(3, mFlagVars[ReadTagS8(text)] & 0xFFFF));
 			char* namePtr = nameTag2C;
-			strcpy(namePtr, FlatNameDirect(3, mFlagVars[ReadTagS8(text)] & 0xFFFF));
 			ApplyCaseMode(namePtr, caseMode);
 			addString(&namePtr, branchMode);
 			mColor = oldColor;
@@ -1132,8 +1133,8 @@ void CMes::addString(char** text, int branchMode)
 			{
 				mColor = 3;
 			}
+			strcpy(nameTag2D, FlatNameDirect(3, (mFlagVars[ReadTagS8(text)] & 0xFFFF) + 0x3C));
 			char* namePtr = nameTag2D;
-			strcpy(namePtr, FlatNameDirect(3, (mFlagVars[ReadTagS8(text)] & 0xFFFF) + 0x3C));
 			ApplyCaseMode(namePtr, caseMode);
 			addString(&namePtr, branchMode);
 			mColor = oldColor;

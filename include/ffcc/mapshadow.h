@@ -26,7 +26,6 @@ public:
         m_modelA = 0;
         m_modelB = 0;
         m_modelC = 0;
-        m_yFilterMode = 0;
     }
     void Init();
     void Calc();

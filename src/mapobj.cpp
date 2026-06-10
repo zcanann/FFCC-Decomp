@@ -538,9 +538,8 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             if (m_attribute != 0) {
                 System.Printf(const_cast<char*>(sMapObjTooManyAttributesWarn), objIndex);
             }
-            CMapObjAtrPointLight* pointLightAttr =
+            CMapObjAtrPointLight* pointLight =
                 new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0xD4) CMapObjAtrPointLight();
-            CMapObjAtrPointLight* pointLight = pointLightAttr;
 
             if (chunk.m_version == 2) {
                 chunkFile.PushChunk();
@@ -608,16 +607,15 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 pointLight->m_intensity = chunkFile.GetF4();
                 pointLight->m_colorMode = chunkFile.Get1();
             }
-            m_attribute = pointLightAttr;
+            m_attribute = pointLight;
             break;
         }
         case CHUNK_SLIT: {
             if (m_attribute != 0) {
                 System.Printf(const_cast<char*>(sMapObjTooManyAttributesWarn), objIndex);
             }
-            CMapObjAtrSpotLight* spotLightAttr =
+            CMapObjAtrSpotLight* spotLight =
                 new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x139) CMapObjAtrSpotLight();
-            CMapObjAtrSpotLight* spotLight = spotLightAttr;
 
             if (chunk.m_version == 6) {
                 chunkFile.PushChunk();
@@ -740,7 +738,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 spotLight->m_angle = kMapObjDefaultAngle;
                 spotLight->m_unknown2E = 0;
             }
-            m_attribute = spotLightAttr;
+            m_attribute = spotLight;
             break;
         }
         case CHUNK_ANIM: {

@@ -2983,10 +2983,11 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         GXSetFog(GX_FOG_PERSP_LIN, nearZ, nearZ + kCharaOne, nearZ, farZ, shadowFogGX);
     }
 
-    bool restoreFog = false;
+    int restoreFog = 0;
     if (kCharaZero < m_fogBlend && (drawPass == 0 || drawPass == 4)) {
         float invBlend = kCharaOne - m_fogBlend;
-        float fogBlend = kCharaOne - invBlend * invBlend;
+        invBlend *= invBlend;
+        float fogBlend = kCharaOne - invBlend;
 
         float nearZ;
         float farZ;
@@ -3032,7 +3033,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
                  nearZ,
                  farZ,
                  fogColor);
-        restoreFog = true;
+        restoreFog = 1;
     }
 
     if (drawPass == 1 || drawPass == 2) {
@@ -3056,17 +3057,22 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
             GXPixModeSync();
         }
     } else {
-        int modelDrawFlags = 0;
+        unsigned char charmFlag = 0;
         if (drawPass == 3 && (m_flags & 0x0C) != 0) {
-            modelDrawFlags |= 1;
+            charmFlag = 1;
         }
         const unsigned int drawFlags = m_flags;
-        modelDrawFlags |= ((drawFlags & 0x400) != 0) ? 2 : 0;
-        modelDrawFlags |= ((drawFlags & 0x2000) != 0) ? 4 : 0;
+        const int blendBit = ((drawFlags & 0x400) != 0) ? 2 : 0;
+        const int specBit = ((drawFlags & 0x2000) != 0) ? 4 : 0;
+        int modelDrawFlags = static_cast<int>(charmFlag != 0) | blendBit | specBit;
+        unsigned char effectFlag = 0;
         if (drawPass == 3 && (drawFlags & 0x8000) != 0) {
-            modelDrawFlags |= 8;
+            effectFlag = 1;
         }
-        modelDrawFlags |= ((drawFlags & 0x100000) != 0) ? 0x10 : 0;
+        const int effectBit = (effectFlag != 0) ? 8 : 0;
+        const int furBit = ((drawFlags & 0x100000) != 0) ? 0x10 : 0;
+        modelDrawFlags |= effectBit;
+        modelDrawFlags |= furBit;
         m_model->Draw(viewMtx, modelDrawFlags, 0);
     }
 

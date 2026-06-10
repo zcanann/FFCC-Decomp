@@ -4809,7 +4809,7 @@ void CGPartyObj::gpmCol()
 
 		unsigned int flags = leader->m_bgHitMask & ~0x10U;
 		float halfHeight = m_capsuleHalfHeight;
-		CVector bottom(pos->x, FLOAT_80331A98 + pos->y, pos->z);
+		const CVector& bottom = CVector(pos->x, FLOAT_80331A98 + pos->y, pos->z);
 
 		CMapCylinder cylinder(FLOAT_80331a9c, FLOAT_80331aa0);
 		cylinder.m_bottom.x = bottom.x;

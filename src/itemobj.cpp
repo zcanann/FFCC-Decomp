@@ -642,10 +642,10 @@ CGPrgObj* CGItemObj::CreateFromScript(
 	System.Printf(itemObjStrings + kItemObjStrNumFreeItemFmt, freeItemCount);
 
 	if (freeItemCount == 0) {
-		CFlatRuntime2* runtime = ItemCFlatRuntime();
-		int deletedCount = 0;
-		unsigned char* bestItemObj = 0;
 		int bestScriptObjectPos = 0x00989680;
+		unsigned char* bestItemObj = 0;
+		int deletedCount = 0;
+		CFlatRuntime2* runtime = ItemCFlatRuntime();
 
 		for (unsigned char* itemObj = reinterpret_cast<unsigned char*>(runtime->FindGItemObjFirst());
 			 itemObj != 0;

@@ -1105,8 +1105,8 @@ void CMes::addString(char** text, int branchMode)
 			{
 				mColor = 6;
 			}
-			strcpy(nameTag2B, FlatNameDirect(2, mFlagVars[ReadTagS8(text)] & 0xFFFF));
-			char* namePtr = nameTag2B;
+			char* namePtr;
+			strcpy(namePtr = nameTag2B, FlatNameDirect(2, mFlagVars[ReadTagS8(text)] & 0xFFFF));
 			ApplyCaseMode(namePtr, caseMode);
 			addString(&namePtr, branchMode);
 			mColor = oldColor;
@@ -1119,8 +1119,8 @@ void CMes::addString(char** text, int branchMode)
 			{
 				mColor = 4;
 			}
-			strcpy(nameTag2C, FlatNameDirect(3, mFlagVars[ReadTagS8(text)] & 0xFFFF));
-			char* namePtr = nameTag2C;
+			char* namePtr;
+			strcpy(namePtr = nameTag2C, FlatNameDirect(3, mFlagVars[ReadTagS8(text)] & 0xFFFF));
 			ApplyCaseMode(namePtr, caseMode);
 			addString(&namePtr, branchMode);
 			mColor = oldColor;
@@ -1133,8 +1133,8 @@ void CMes::addString(char** text, int branchMode)
 			{
 				mColor = 3;
 			}
-			strcpy(nameTag2D, FlatNameDirect(3, (mFlagVars[ReadTagS8(text)] & 0xFFFF) + 0x3C));
-			char* namePtr = nameTag2D;
+			char* namePtr;
+			strcpy(namePtr = nameTag2D, FlatNameDirect(3, (mFlagVars[ReadTagS8(text)] & 0xFFFF) + 0x3C));
 			ApplyCaseMode(namePtr, caseMode);
 			addString(&namePtr, branchMode);
 			mColor = oldColor;

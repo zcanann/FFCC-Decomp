@@ -2828,7 +2828,6 @@ int JoyBus::RecvGBA(ThreadParam* threadParam, unsigned int* recvBuffer)
     return 2;
 }
 
-extern const unsigned int kJoyBusCmdOpMask = 0x0000003F;
 
 /*
  * --INFO--
@@ -7078,3 +7077,5 @@ int CFile::IsDiskError()
 {
 	return m_isDiskError;
 }
+
+extern const unsigned int kJoyBusCmdOpMask = 0x0000003F;

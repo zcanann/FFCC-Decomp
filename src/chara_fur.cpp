@@ -612,17 +612,20 @@ void CChara::CalcMogScore()
 		int level;
 
 		*scorePtr = (line + circle * 2 - bit * 2) / 3;
+		int sc;
 		if (*scorePtr < 0) {
-			*scorePtr = 0;
+			sc = 0;
 		} else {
-			*scorePtr = (*scorePtr > 100) ? 100 : *scorePtr;
+			sc = (*scorePtr > 100) ? 100 : *scorePtr;
 		}
+		*scorePtr = sc;
 
-		level = (100 - *scorePtr) / 5;
-		if (level < 5) {
+		fur.m_radarLevel[i] = (100 - *scorePtr) / 5;
+		const int lv = fur.m_radarLevel[i];
+		if (lv < 5) {
 			level = 5;
 		} else {
-			level = (level > 0xF) ? 0xF : level;
+			level = (lv > 0xF) ? 0xF : lv;
 		}
 		fur.m_radarLevel[i] = level;
 	}

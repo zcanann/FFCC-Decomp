@@ -165,6 +165,8 @@ void CMaterialEditorPcs::drawViewer()
         return;
     }
 
+    GXColor blue;
+    GXColor red;
     ZLIST* zlist = &m_zlist1;
     _ZLISTITEM* it = zlist->m_root.m_previous;
     while (it != 0) {
@@ -254,70 +256,70 @@ void CMaterialEditorPcs::drawViewer()
                 case 'H':
                 if (static_cast<s16>(m_loadedTextureCount) > polygon->textureIndex) {
                     s16* textureHeader = m_textureHeader[polygon->textureIndex];
-                    float scaleU = static_cast<float>(LoadDouble(kMaterialEditorOneF64) / S16ToDouble(textureHeader[2]));
-                    float scaleV = static_cast<float>(LoadDouble(kMaterialEditorOneF64) / S16ToDouble(textureHeader[3]));
+                    float scaleU = static_cast<float>(LoadDouble(kMaterialEditorOneF64) / static_cast<double>(textureHeader[2]));
+                    float scaleV = static_cast<float>(LoadDouble(kMaterialEditorOneF64) / static_cast<double>(textureHeader[3]));
                     MaterialEditorPolygon* pp = polygon;
                     s16 u = pp->u0;
 
                     if (u < 0) {
-                        pp->texCoord[0][0] = (scaleU * S16ToFloat(u)) + LoadFloat(kMaterialEditorOneF);
+                        pp->texCoord[0][0] = (scaleU * static_cast<float>(u)) + LoadFloat(kMaterialEditorOneF);
                     } else {
-                        pp->texCoord[0][0] = scaleU * S16ToFloat(u);
+                        pp->texCoord[0][0] = scaleU * static_cast<float>(u);
                     }
                     pp = polygon;
                     u = pp->u1;
                     if (u < 0) {
-                        pp->texCoord[1][0] = (scaleU * S16ToFloat(u)) + LoadFloat(kMaterialEditorOneF);
+                        pp->texCoord[1][0] = (scaleU * static_cast<float>(u)) + LoadFloat(kMaterialEditorOneF);
                     } else {
-                        pp->texCoord[1][0] = scaleU * S16ToFloat(u);
+                        pp->texCoord[1][0] = scaleU * static_cast<float>(u);
                     }
                     pp = polygon;
                     u = pp->u2;
                     if (u < 0) {
-                        pp->texCoord[2][0] = (scaleU * S16ToFloat(u)) + LoadFloat(kMaterialEditorOneF);
+                        pp->texCoord[2][0] = (scaleU * static_cast<float>(u)) + LoadFloat(kMaterialEditorOneF);
                     } else {
-                        pp->texCoord[2][0] = scaleU * S16ToFloat(u);
+                        pp->texCoord[2][0] = scaleU * static_cast<float>(u);
                     }
                     pp = polygon;
                     u = pp->u3;
                     if (u < 0) {
-                        pp->texCoord[3][0] = (scaleU * S16ToFloat(u)) + LoadFloat(kMaterialEditorOneF);
+                        pp->texCoord[3][0] = (scaleU * static_cast<float>(u)) + LoadFloat(kMaterialEditorOneF);
                     } else {
-                        pp->texCoord[3][0] = scaleU * S16ToFloat(u);
+                        pp->texCoord[3][0] = scaleU * static_cast<float>(u);
                     }
 
                     int v;
                     v = polygon->v0;
                     if (v < 0) {
-                        polygon->v0 = v * -1;
+                        polygon->v0 = v * -1U;
                     }
                     v = polygon->v1;
                     if (v < 0) {
-                        polygon->v1 = v * -1;
+                        polygon->v1 = v * -1U;
                     }
                     v = polygon->v2;
                     if (v < 0) {
-                        polygon->v2 = v * -1;
+                        polygon->v2 = v * -1U;
                     }
                     v = polygon->v3;
                     if (v < 0) {
-                        polygon->v3 = v * -1;
+                        polygon->v3 = v * -1U;
                     }
 
                     pp = polygon;
-                    pp->texCoord[0][1] = -(scaleV * S16ToFloat(pp->v0) - LoadFloat(kMaterialEditorOneF));
+                    pp->texCoord[0][1] = -(scaleV * static_cast<float>(pp->v0) - LoadFloat(kMaterialEditorOneF));
                     pp = polygon;
-                    pp->texCoord[1][1] = -(scaleV * S16ToFloat(pp->v1) - LoadFloat(kMaterialEditorOneF));
+                    pp->texCoord[1][1] = -(scaleV * static_cast<float>(pp->v1) - LoadFloat(kMaterialEditorOneF));
                     pp = polygon;
-                    pp->texCoord[2][1] = -(scaleV * S16ToFloat(pp->v2) - LoadFloat(kMaterialEditorOneF));
+                    pp->texCoord[2][1] = -(scaleV * static_cast<float>(pp->v2) - LoadFloat(kMaterialEditorOneF));
                     pp = polygon;
-                    pp->texCoord[3][1] = -(scaleV * S16ToFloat(pp->v3) - LoadFloat(kMaterialEditorOneF));
+                    pp->texCoord[3][1] = -(scaleV * static_cast<float>(pp->v3) - LoadFloat(kMaterialEditorOneF));
                     DCStoreRange(polygon, sizeof(MaterialEditorPolygon));
 
                     if (textureHeader[1] == 0x20) {
                         GXSetNumTevStages(1);
                         GXSetNumTexGens(1);
-                        GXLoadTexObj(m_texObj[polygon->textureIndex], GX_TEXMAP0);
+                        GXLoadTexObj(m_texObj[polygon->textureIndex], static_cast<_GXTexMapID>(polygon->textureIndex));
                         _GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASC, GX_CC_ZERO);
                         _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
                         _GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_TEXA, GX_CA_RASA, GX_CA_ZERO);
@@ -328,8 +330,6 @@ void CMaterialEditorPcs::drawViewer()
                         GXSetNumTevStages(3);
                         GXSetNumTexGens(1);
 
-                        GXColor red;
-                        GXColor blue;
                         red.r = 0xff;
                         red.g = 0xff;
                         red.b = 0;
@@ -378,13 +378,14 @@ void CMaterialEditorPcs::drawViewer()
                 GXSetArray(GX_VA_CLR0, polygon->_30, 4);
                 GXSetArray(GX_VA_TEX0, polygon->texCoord, 8);
 
-                u32 vertexIndex[8];
-                vertexIndex[4] = polygon->index0;
-                vertexIndex[5] = polygon->index1;
-                vertexIndex[6] = polygon->index2;
-                vertexIndex[0] = 0;
-                vertexIndex[1] = 1;
-                vertexIndex[2] = 2;
+                u32 posIndex[4];
+                u32 clrIndex[4];
+                posIndex[0] = polygon->index0;
+                posIndex[1] = polygon->index1;
+                posIndex[2] = polygon->index2;
+                clrIndex[0] = 0;
+                clrIndex[1] = 1;
+                clrIndex[2] = 2;
 
                 if (flags == 0) {
                     GXBegin(GX_TRIANGLES, GX_VTXFMT0, 3);
@@ -392,21 +393,19 @@ void CMaterialEditorPcs::drawViewer()
                 if (flags == 1) {
                     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
                     vertexCount = 4;
-                    vertexIndex[6] = polygon->index3;
-                    vertexIndex[7] = polygon->index2;
-                    vertexIndex[2] = 3;
-                    vertexIndex[3] = 2;
+                    posIndex[2] = polygon->index3;
+                    posIndex[3] = polygon->index2;
+                    clrIndex[2] = 3;
+                    clrIndex[3] = 2;
                 }
 
-                s8 i = 0;
+                u32 clr;
+                u8 i = 0;
                 while (i < vertexCount) {
-                    u32* posIndex = &vertexIndex[4];
-                    u32* clrIndex = &vertexIndex[0];
-                    u32 pos = posIndex[i];
-                    u32 clr = clrIndex[i];
+                    GXWGFifo.u16 = static_cast<u16>(posIndex[i]);
+                    GXWGFifo.u16 = static_cast<u16>(posIndex[i]);
+                    clr = clrIndex[i];
                     i++;
-                    GXWGFifo.u16 = static_cast<u16>(pos);
-                    GXWGFifo.u16 = static_cast<u16>(pos);
                     GXWGFifo.u8 = static_cast<u8>(clr);
                     GXWGFifo.u16 = static_cast<u16>(clr);
                 }

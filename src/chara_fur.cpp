@@ -1286,15 +1286,15 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 int CChara::CModel::PickFur(
     Mtx param_2, _GXColor brushColor, int doPaint, int mode, _GXColor* centerBefore, _GXColor* centerAfter, Vec* worldPos)
 {
-	if ((m_flags10C & 0x40) == 0) {
+	if (m_flags10CBits.m_flag10C_40 == 0) {
 		return -1;
 	}
 	register Vec* outWorldPos = worldPos;
 
 	const double cursorXd = static_cast<float>(Chara.MogFur().m_cursorX);
 	const double cursorYd = static_cast<float>(Chara.MogFur().m_cursorY);
-	float hitU = 0.0f;
-	float hitV = 0.0f;
+	float hitU = kCharaFurDepthZero;
+	float hitV = kCharaFurDepthZero;
 	double nearestDepth = static_cast<double>(kCharaFurNoHitDepth);
 	int hitAny = 0;
 	unsigned int hitPaintable = 0;

@@ -27,6 +27,8 @@
 #include <dolphin/mtx.h>
 #include <dolphin/os/OSCache.h>
 
+Vec g_shadow_pos;
+Vec g_shadow_refpos;
 CCameraPcs CameraPcs;
 
 static const char sCameraPcsGameTableName[] = "CCameraPcs(GAME)";
@@ -305,9 +307,6 @@ CProcessTable CCameraPcs::m_table[7] = {
         0x1,
     }
 };
-Vec g_shadow_pos;
-Vec g_shadow_refpos;
-
 extern "C" {
 void pppEditGetViewPos__FP3Vec(Vec*);
 void pppEditGetViewMatrix__FPA4_f(float (*)[4]);
@@ -896,10 +895,19 @@ void CCameraPcs::SetStdProjectionMatrix()
  * JP Address: TODO
  * JP Size: TODO
  */
+static inline _GXColor sCameraMakeColor(u8 r, u8 g, u8 b, u8 a)
+{
+    _GXColor c;
+    c.r = r;
+    c.g = g;
+    c.b = b;
+    c.a = a;
+    return c;
+}
+
 void CCameraPcs::draw()
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    Vec* shadowPos = &g_shadow_pos;
 
     if ((m_isAbsolute == 0) ||
         ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_Camera) != 0)) {
@@ -925,6 +933,7 @@ void CCameraPcs::draw()
         {
         Mtx cameraMtx;
         Mtx shadowMtx;
+        Vec* shadowPos = &g_shadow_pos;
         float posX = shadowPos->x;
         float posY = shadowPos->y;
         float posZ = shadowPos->z;
@@ -949,12 +958,7 @@ void CCameraPcs::draw()
         shadowMtx[2][3] = posZ;
         PSMTXConcat(cameraMtx, shadowMtx, shadowMtx);
         GXLoadPosMtxImm(shadowMtx, 0);
-        _GXColor redColor;
-        redColor.r = 0xFF;
-        redColor.g = 0;
-        redColor.b = 0;
-        redColor.a = 0xFF;
-        GXSetChanMatColor(GX_COLOR0A0, redColor);
+        GXSetChanMatColor(GX_COLOR0A0, sCameraMakeColor(0xFF, 0, 0, 0xFF));
         Graphic.DrawSphere();
         }
 
@@ -986,12 +990,7 @@ void CCameraPcs::draw()
         shadowMtx[2][3] = refPosZ;
         PSMTXConcat(cameraMtx, shadowMtx, shadowMtx);
         GXLoadPosMtxImm(shadowMtx, 0);
-        _GXColor magentaColor;
-        magentaColor.r = 0;
-        magentaColor.g = 0xFF;
-        magentaColor.b = 0;
-        magentaColor.a = 0xFF;
-        GXSetChanMatColor(GX_COLOR0A0, magentaColor);
+        GXSetChanMatColor(GX_COLOR0A0, sCameraMakeColor(0, 0xFF, 0, 0xFF));
         Graphic.DrawSphere();
         }
     }

@@ -60,8 +60,8 @@ extern "C" const float kMonObjTwoThirdsPi = 2.0943952f;
 static const char s_monObjTexAnimU0[3] = "u0";
 extern "C" const float kMonObjPercentMax = 100.0f;
 extern "C" const float kMonObjOne = 1.0f;
-static const char s_monObjAiStateFmt[] = "%d:%c %d:%c";
-static const char s_monObjDistanceFmt[] = "%d %d %d";
+static const char s_monObjAiStateFmt[] = "%d %c %d %c";
+static const char s_monObjDistanceFmt[] = "%d %d/%d";
 
 /*
  * --INFO--
@@ -3291,7 +3291,7 @@ typedef struct MonObjMlAttackPool {
 	char classNames[0x54];
 	char actFlagFmt[0x20];
 } MonObjMlAttackPool;
-static const MonObjMlAttackPool sMonObjMlAttackPool = {
+static const MonObjMlAttackPool lbl_801DC950 = {
 	"dvd/gba/", "ffcc_cli.bin", "objdat.spt",
 	{ { 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
 		0xFFFFFFFF } },
@@ -3310,7 +3310,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 		? baseScript \
 		: reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) + \
 			(monObj->m_aiState + *reinterpret_cast<unsigned short*>(baseScript + 0x100)) * 0x1D0 + 0x10)
-	const MonObjMlAttackPool* mlPool = &sMonObjMlAttackPool;
+	const MonObjMlAttackPool* mlPool = &lbl_801DC950;
 	int selectedAction = -1;
 	if (monObj->m_funcs->attackCheck != 0) {
 		int result = (monObj->*monObj->m_funcs->attackCheck)(partyIndex);
@@ -3412,21 +3412,23 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 			int partyState = reinterpret_cast<CGPrgObj*>(party)->m_lastStateId;
 			if (((partyState == 1) || (partyState == 7)) &&
 				((float)__fabs(Math.DstRot(object->m_rotBaseY, reinterpret_cast<CGObject*>(party)->m_rotBaseY)) > kMonObjHalfPi)) {
-				if (*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) {
-					if (monObj->m_forcedAction != static_cast<short>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x11E))) {
-						goto skipForce;
-					}
-				} else if ((*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) ||
-					(monObj->m_forcedAction != actionIndex)) {
-					goto skipForce;
+				if (((*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) &&
+						(monObj->m_forcedAction ==
+							static_cast<short>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x11E)))) ||
+					((*reinterpret_cast<unsigned short*>(
+							reinterpret_cast<unsigned char*>(*reinterpret_cast<void* volatile*>(&object->m_scriptHandle[9])) +
+							0x10C) != 1) &&
+						(monObj->m_forcedAction == actionIndex))) {
+					forceAction = 1;
 				}
-				forceAction = 1;
 			}
-		skipForce:
 
 			if (forceAction || (Math.Rand(100) <= chance)) {
 				selectedAction = actionIndex;
-				if ((*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) || forceAction) {
+				if (*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) {
+					break;
+				}
+				if (forceAction) {
 					break;
 				}
 			}

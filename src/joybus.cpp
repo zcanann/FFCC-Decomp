@@ -716,7 +716,7 @@ loop_body:
 
         unsigned int gamePadState = (int)Game.m_scriptFoodBase[statusIndex];
 
-        if (gamePadState == 0 && padType != 0x00040000)
+        if (gamePadState == 0 && padType == 0x00040000)
         {
             int s = (unsigned int)threadParam->m_state;
 
@@ -725,7 +725,7 @@ loop_body:
                 if (s == 6)
                     goto timeout_expiry;
 
-                if (s < 7)
+                if (s < 6)
                 {
                     if (s >= 5)
                         goto do_recvsend;

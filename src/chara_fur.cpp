@@ -1257,7 +1257,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 					CFlatRuntime2Storage().ResetParticleWork(particleNo | 0x100, 0);
 					CFlatRuntime2Storage().SetParticleWorkPos(worldPos, kCharaFurDepthZero);
 					const int particleIndex = CFlatRuntime2Storage().PutParticleWork();
-					pppFVECTOR4 color;
+					pppFVECTOR4 color = *reinterpret_cast<const pppFVECTOR4*>(sMogRadarTypeLabels);
 					color.x = static_cast<float>(particleColor.r) / kCharaFurColorComponentScale;
 					color.y = static_cast<float>(particleColor.g) / kCharaFurColorComponentScale;
 					color.z = static_cast<float>(particleColor.b) / kCharaFurColorComponentScale;
@@ -1272,19 +1272,19 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 					if (messageId == -1) {
 						messageId = 2;
 					}
-					MogWork().m_offColorTicks = 0x0B;
+					MogWork().m_offColorTicks++;
 				}
 				if (MogWork().m_eraseTicks == 10) {
 					if (messageId == -1) {
 						messageId = 5;
 					}
-					MogWork().m_eraseTicks = 0x0B;
+					MogWork().m_eraseTicks++;
 				}
 				if (MogWork().m_eraseTicks == 0x32) {
 					if (messageId == -1) {
 						messageId = 6;
 					}
-					MogWork().m_eraseTicks = 0x33;
+					MogWork().m_eraseTicks++;
 				}
 
 				if (Chara.MogFur().m_commandIndex < 3 && Chara.MogFur().m_commandIndex >= 0 && doPaint != 0

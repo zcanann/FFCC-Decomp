@@ -3619,7 +3619,6 @@ body:
 						if ((*reinterpret_cast<unsigned short*>(aiScript + 0x102) & 0x40) != 0) {
 							monObj->m_moveWork.m_flags |= 0x10000;
 						}
-						monObj->m_moveWork.m_flags = *reinterpret_cast<volatile int*>(&monObj->m_moveWork.m_flags);
 						monObj->m_moveWork.m_mode = 1;
 					}
 					monObj->m_moveWork.m_target = target;

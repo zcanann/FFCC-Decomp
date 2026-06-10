@@ -838,6 +838,7 @@ static inline CTexture* FindMogFurTexture(CChara::CModel* model)
 
 static inline void CopyMogTextureFromChara(CChara::CModel* model)
 {
+	Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp), 0x506);
 	CTexture* texture = FindMogFurTexture(model);
 	if (texture == 0) {
 		return;
@@ -846,7 +847,6 @@ static inline void CopyMogTextureFromChara(CChara::CModel* model)
 	void* dstBuffer = texture->m_imageData;
 	const int texelCountBytes = texture->m_width * texture->m_height * 2;
 
-	Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp), 0x506);
 	DCInvalidateRange(dstBuffer, texelCountBytes);
 	memcpy(dstBuffer, Chara.MogFur().m_texels, 0x2000);
 	DCFlushRange(dstBuffer, texelCountBytes);
@@ -855,6 +855,7 @@ static inline void CopyMogTextureFromChara(CChara::CModel* model)
 
 static void CopyMogTextureToChara(CChara::CModel* model)
 {
+	Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp), 0x506);
 	CTexture* texture = FindMogFurTexture(model);
 	if (texture == 0) {
 		return;
@@ -863,7 +864,6 @@ static void CopyMogTextureToChara(CChara::CModel* model)
 	void* srcBuffer = texture->m_imageData;
 	const int texelCountBytes = texture->m_width * texture->m_height * 2;
 
-	Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp), 0x506);
 	memcpy(Chara.MogFur().m_texels, srcBuffer, 0x2000);
 	DCFlushRange(srcBuffer, texelCountBytes);
 	GXInvalidateTexAll();
@@ -1142,11 +1142,20 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 			doPaint = ((static_cast<int>(System.m_frameCounter) % 4) == 0) ? 1 : 0;
 			break;
 		}
-		_GXColor centerBefore = CColor(0xF, 0xF, 0xF, 0).color;
-		_GXColor centerAfter = centerBefore;
+		_GXColor centerBefore;
+		_GXColor centerAfter;
 		Vec worldPos;
 
 		CopyMogTextureFromChara(this);
+		const _GXColor initColor = CColor(0xF, 0xF, 0xF, 0).color;
+		centerAfter.r = initColor.r;
+		centerAfter.g = initColor.g;
+		centerAfter.b = initColor.b;
+		centerAfter.a = initColor.a;
+		centerBefore.r = initColor.r;
+		centerBefore.g = initColor.g;
+		centerBefore.b = initColor.b;
+		centerBefore.a = initColor.a;
 		int pickResult = PickFur(cameraMtx, brushColor, doPaint, eraseMode, &centerBefore, &centerAfter, &worldPos);
 		CopyMogTextureToChara(this);
 		Chara.CalcMogScore();

@@ -2171,21 +2171,23 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             for (int i = 0; i < maxIndex; i++, point++) {
                 if (point->m_distance <= pathDistance && pathDistance <= point[1].m_distance) {
                     const int i0 = (i - 1) < 0 ? 0 : (i - 1);
-                    const int i2 = (i + 1) > maxIndex ? maxIndex : (i + 1);
-                    const int i3 = (i + 2) > maxIndex ? maxIndex : (i + 2);
-                    const float scaleA = m_pathPoints[i].m_distance - m_pathPoints[i0].m_distance;
-                    const float scaleB = m_pathPoints[i2].m_distance - m_pathPoints[i].m_distance;
-                    const float scaleC = m_pathPoints[i3].m_distance - m_pathPoints[i2].m_distance;
-                    float segmentT = kCFlatPadStickZero;
-                    if (scaleB != kCFlatPadStickZero) {
-                        segmentT = (pathDistance - point->m_distance) / scaleB;
-                    }
+                    CFlatPathPoint* p0 = &m_pathPoints[i0];
+                    CFlatPathPoint* p1 = &m_pathPoints[i];
+                    const int i2 = (i + 1) < maxIndex ? (i + 1) : maxIndex;
+                    CFlatPathPoint* p2 = &m_pathPoints[i2];
+                    const int i3 = (i + 2) < maxIndex ? (i + 2) : maxIndex;
+                    CFlatPathPoint* p3 = &m_pathPoints[i3];
+                    const float scaleA = p1->m_distance - p0->m_distance;
+                    const float scaleB = p2->m_distance - p1->m_distance;
+                    const float scaleC = p3->m_distance - p2->m_distance;
+                    float segmentT = (kCFlatPadStickZero != scaleB)
+                                         ? (pathDistance - p1->m_distance) / scaleB
+                                         : kCFlatPadStickZero;
 
                     Vec result;
                     CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
                         scaleA, scaleB, scaleC, segmentT, kCFlatOneF, &Math, reinterpret_cast<float*>(&result),
-                        &m_pathPoints[i0].m_position, &m_pathPoints[i].m_position,
-                        &m_pathPoints[i2].m_position, &m_pathPoints[i3].m_position);
+                        &p0->m_position, &p1->m_position, &p2->m_position, &p3->m_position);
                     *reinterpret_cast<float*>(object->m_localBase[3]) = result.x;
                     *reinterpret_cast<float*>(object->m_localBase[4]) = result.y;
                     *reinterpret_cast<float*>(object->m_localBase[5]) = result.z;

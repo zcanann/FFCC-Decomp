@@ -3650,7 +3650,7 @@ body:
 							(aiStateI + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(handleB[9]) + 0x100)) * 0x1D0 + 0x10;
 					}
 					CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
-					short actionParam = *reinterpret_cast<short*>(aiScript4 + actionOffset + 0x11E);
+					int actionParam = static_cast<short>(*reinterpret_cast<unsigned short*>(aiScript4 + actionOffset + 0x11E));
 					actionState = 0x21;
 					if (monObj->m_moveWork.m_mode != 2) {
 						memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
@@ -3662,7 +3662,7 @@ body:
 					}
 					monObj->m_moveWork.m_target = target;
 					monObj->m_moveWork.m_range = actionRange;
-					monObj->m_moveWork.m_changeStat = static_cast<int>(actionParam);
+					monObj->m_moveWork.m_changeStat = actionParam;
 #undef AISCRIPT
 				}
 			} else {

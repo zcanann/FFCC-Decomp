@@ -2252,7 +2252,9 @@ int CMenuPcs::LetterCtrlCur()
 		if ((hold & 0xC) != 0) {
 			*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28) ^= 1;
 			Sound.PlaySe(1, 0x40, 0x7F, 0);
-		} else if ((press & 0x100) != 0) {
+		}
+		if ((hold & 0xC) == 0) {
+			if ((press & 0x100) != 0) {
 			s16 sel = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28);
 			if ((static_cast<int>(*reinterpret_cast<unsigned char*>(GetLetterStateBase(this) + 9)) & (1 << (sel + 1))) != 0) {
 				if (sel == 0) {
@@ -2290,6 +2292,7 @@ int CMenuPcs::LetterCtrlCur()
 			*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) + 1;
 			m_menuWindowInfo->state = 2;
 			Sound.PlaySe(3, 0x40, 0x7F, 0);
+			}
 		}
 	} else if (menuMode == 3) {
 		int maxReply = static_cast<int>(s_ReplyMax);
@@ -2407,39 +2410,41 @@ int CMenuPcs::LetterCtrlCur()
 		if ((hold & 0xC) != 0) {
 			*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28) ^= 1;
 			Sound.PlaySe(1, 0x40, 0x7F, 0);
-		} else if ((press & 0x100) != 0) {
-		if (*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28) == 0) {
-			int itemValue = s_AttachItem;
-			int gilValue = 0;
-			if (s_Attach != 0) {
-				itemValue = 0;
-				if (s_Attach == 1) {
-					gilValue = s_AttachItem;
-				}
-			}
-			caravanWork->FGLetterReply(
-			    static_cast<int>(s_SelLetter),
-			    static_cast<int>(s_ReplyPos),
-			    itemValue,
-			    gilValue);
-			if (s_Attach == 0) {
-				caravanWork->DeleteItemIdx(static_cast<int>(s_AttachItemIdx), 0);
-			} else {
-				caravanWork->AddGil(-gilValue);
-			}
-			*reinterpret_cast<u8*>(GetLetterStateBase(this) + 8) = 1;
-		} else {
-			*reinterpret_cast<s8*>(GetLetterStateBase(this) + 8) = 0xFF;
 		}
+		if ((hold & 0xC) == 0) {
+			if ((press & 0x100) != 0) {
+				if (*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28) == 0) {
+					int itemValue = 0;
+					int gilValue = 0;
+					if (s_Attach == 0) {
+						itemValue = s_AttachItem;
+					} else if (s_Attach == 1) {
+						gilValue = s_AttachItem;
+					}
+					caravanWork->FGLetterReply(
+					    static_cast<int>(s_SelLetter),
+					    static_cast<int>(s_ReplyPos),
+					    itemValue,
+					    gilValue);
+					if (s_Attach == 0) {
+						caravanWork->DeleteItemIdx(static_cast<int>(s_AttachItemIdx), 0);
+					} else {
+						caravanWork->AddGil(-gilValue);
+					}
+					*reinterpret_cast<u8*>(GetLetterStateBase(this) + 8) = 1;
+				} else {
+					*reinterpret_cast<s8*>(GetLetterStateBase(this) + 8) = 0xFF;
+				}
 
-		*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) + 1;
-			m_menuWindowInfo->state = 2;
-			Sound.PlaySe(2, 0x40, 0x7F, 0);
-		} else if ((press & 0x200) != 0) {
-			*reinterpret_cast<u8*>(GetLetterStateBase(this) + 8) = 0xFF;
-			*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) + 1;
-			m_menuWindowInfo->state = 2;
-			Sound.PlaySe(3, 0x40, 0x7F, 0);
+				*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) + 1;
+				m_menuWindowInfo->state = 2;
+				Sound.PlaySe(2, 0x40, 0x7F, 0);
+			} else if ((press & 0x200) != 0) {
+				*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 8) = -1;
+				*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) + 1;
+				m_menuWindowInfo->state = 2;
+				Sound.PlaySe(3, 0x40, 0x7F, 0);
+			}
 		}
 	}
 

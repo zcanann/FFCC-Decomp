@@ -52,6 +52,10 @@ static inline CCaravanWork* SingleCaravanWork()
 
 extern const float kSingStatBaseX;
 extern const float kSingStatPanelPad;
+extern const float kSingStatPanelW;
+extern const float kSingStatPanelH;
+extern const float kSingStatScreenPadX;
+extern const float kSingStatScreenY;
 
 struct CFontRenderFlagBits
 {
@@ -1163,6 +1167,7 @@ void CMenuPcs::SingMenuInit()
     m_bonus.m_bonusBoardPtr = reinterpret_cast<int>(new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x5DD) u8[sizeof(MenuBoardEntry)]);
 
     MenuBoardEntry* boardEntry = reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr);
+    int screenY = static_cast<int>(kSingStatScreenY);
     boardEntry->m_rotZ = 0.0f;
     boardEntry->m_rotY = 0.0f;
     boardEntry->m_rotX = 0.0f;
@@ -1173,6 +1178,8 @@ void CMenuPcs::SingMenuInit()
     boardEntry->m_unk38 = 1.0f;
     boardEntry->m_unk34 = 1.0f;
     reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_modelHandle = 0;
+    float centerY = static_cast<float>(static_cast<double>(static_cast<float>(kSingStatPanelH * 0.5
+                + kSingStatPanelH)) - 224.0);
     reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_effectHandle = 0;
     reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_centerX = 0;
     reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_centerY = 0;
@@ -1186,14 +1193,12 @@ void CMenuPcs::SingMenuInit()
     reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_screenWidth = 0x280;
     reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_screenHeight = 0x1C0;
     reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_centerX = static_cast<s16>(static_cast<int>(
-        static_cast<double>(static_cast<float>(static_cast<double>(static_cast<float>(4.0 + static_cast<double>(96.0f) * 0.5
-                + static_cast<double>(440.0f + 28.0f))) - 320.0)) - 4.0));
-    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_centerY = static_cast<s16>(static_cast<int>(
-        static_cast<double>(static_cast<float>(static_cast<double>(88.0f) * 0.5
-                + static_cast<double>(88.0f))) - 224.0));
-    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_screenX = static_cast<int>(static_cast<double>(12.0f)
-                                             + static_cast<double>(440.0f + 28.0f));
-    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_screenY = static_cast<int>(80.0f);
+        static_cast<double>(static_cast<float>(static_cast<double>(static_cast<float>(4.0 + (kSingStatPanelW * 0.5
+                + (kSingStatBaseX + kSingStatPanelPad)))) - 320.0)) - 4.0));
+    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_centerY = static_cast<s16>(static_cast<int>(centerY));
+    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_screenX = static_cast<int>(kSingStatScreenPadX
+                                             + (kSingStatBaseX + kSingStatPanelPad));
+    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_screenY = screenY;
     reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_screenWidth = 0x48;
     reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_screenHeight = 0x58;
 
@@ -3570,3 +3575,7 @@ int CMenuPcs::GetItemType(int itemId, int useRawItemId)
 
 const float kSingStatBaseX = 440.0f;
 const float kSingStatPanelPad = 28.0f;
+const float kSingStatPanelW = 96.0f;
+const float kSingStatPanelH = 88.0f;
+const float kSingStatScreenPadX = 12.0f;
+const float kSingStatScreenY = 80.0f;

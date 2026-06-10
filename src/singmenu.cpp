@@ -50,6 +50,21 @@ static inline CCaravanWork* SingleCaravanWork()
     return reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 }
 
+struct CFontRenderFlagBits
+{
+    signed char shadow : 1;
+    signed char zCompare : 1;
+    signed char zUpdate : 1;
+    signed char fixedWidth : 1;
+    signed char snapPosition : 1;
+    signed char pad : 3;
+};
+
+static inline CFontRenderFlagBits& GetRenderFlagBits(unsigned char& flags)
+{
+    return reinterpret_cast<CFontRenderFlagBits&>(flags);
+}
+
 struct SingMenuStaticMessageInfo
 {
     int lineCount;
@@ -1690,59 +1705,58 @@ void CMenuPcs::DrawSingleBase(float alpha)
  */
 void CMenuPcs::DrawSingleStat(float alpha)
 {
-    u8* self = reinterpret_cast<u8*>(this);
-    unsigned int languageId = Game.m_gameWork.m_languageId;
+    int languageId = Game.m_gameWork.m_languageId;
 
     DrawInit();
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
+    float a255 = 255.0f * alpha;
     _GXColor color;
     color.r = 0xFF;
     color.g = 0xFF;
     color.b = 0xFF;
-    color.a = static_cast<u8>(255.0f * alpha);
+    color.a = static_cast<u8>(a255);
     GXSetChanMatColor(GX_COLOR0A0, color);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x26));
-    MenuPcs.DrawRect(0, 440.0f, 0.0f, 152.0f, 40.0f,
+    float x = 440.0f;
+    MenuPcs.DrawRect(0, x, 0.0f, 152.0f, 40.0f,
                                      0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     MenuPcs.DrawRect(4, 440.0f, 408.0f, 152.0f, 40.0f,
                                      0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x29));
-    for (float y = 40.0f; y < 408.0f; ) {
-        float sliceHeight = 8.0f;
+    float sliceHeight = 8.0f;
+    for (float y = 40.0f; y < 408.0f; y += sliceHeight) {
         if ((408.0f - y) < sliceHeight) {
             sliceHeight = 408.0f - y;
         }
         MenuPcs.DrawRect(0, 440.0f, y, 640.0f, sliceHeight,
                                          0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-        y += sliceHeight;
     }
 
-    _GXColor color2;
-    color2.r = 0xFF;
-    color2.g = 0xFF;
-    color2.b = 0xFF;
-    color2.a = static_cast<u8>(255.0 * (0.5 * alpha));
-    GXSetChanMatColor(GX_COLOR0A0, color2);
+    color.r = 0xFF;
+    color.g = 0xFF;
+    color.b = 0xFF;
+    color.a = static_cast<u8>(255.0 * (0.5 * alpha));
+    GXSetChanMatColor(GX_COLOR0A0, color);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x22));
 
-    unsigned short charaNo = SingleCaravanWork()->m_tribeId;
+    int charaNo = SingleCaravanWork()->m_tribeId;
     float iconStep = 216.0f;
-    float texU = static_cast<float>(charaNo & 1) * iconStep;
-    float texV = static_cast<float>(static_cast<int>(charaNo) / 2) * iconStep;
-    MenuPcs.DrawRect(0, 440.0f - 32.0f, 176.0f, iconStep, iconStep,
-                                     texU, texV, 1.0f, 1.0f, 0.0f);
+    int texU = static_cast<int>(static_cast<float>(charaNo & 1) * iconStep);
+    int texV = static_cast<int>(static_cast<float>(charaNo / 2) * iconStep);
+    MenuPcs.DrawRect(0, x - 32.0f, 176.0f, iconStep, iconStep,
+                                     static_cast<float>(texU), static_cast<float>(texV), 1.0f, 1.0f, 0.0f);
 
-    _GXColor color3;
-    color3.r = 0xFF;
-    color3.g = 0xFF;
-    color3.b = 0xFF;
-    color3.a = static_cast<u8>(255.0f * alpha);
-    GXSetChanMatColor(GX_COLOR0A0, color3);
+    color.r = 0xFF;
+    color.g = 0xFF;
+    color.b = 0xFF;
+    color.a = static_cast<u8>(a255);
+    GXSetChanMatColor(GX_COLOR0A0, color);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2A));
-    MenuPcs.DrawRect(0, 440.0f + 28.0f, 88.0f, 96.0f, 88.0f,
+    float panelX = 440.0f;
+    MenuPcs.DrawRect(0, panelX + 28.0f, 88.0f, 96.0f, 88.0f,
                                      0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     DrawInit();
@@ -1755,32 +1769,30 @@ void CMenuPcs::DrawSingleStat(float alpha)
     DrawInit();
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-    _GXColor color4;
-    color4.r = 0xFF;
-    color4.g = 0xFF;
-    color4.b = 0xFF;
-    color4.a = static_cast<u8>(255.0f * alpha);
-    GXSetChanMatColor(GX_COLOR0A0, color4);
+    color.r = 0xFF;
+    color.g = 0xFF;
+    color.b = 0xFF;
+    color.a = static_cast<u8>(a255);
+    GXSetChanMatColor(GX_COLOR0A0, color);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2A));
-    MenuPcs.DrawRect(0, 440.0f + 28.0f, 128.0f, 96.0f, 48.0f,
+    MenuPcs.DrawRect(0, panelX + 28.0f, 128.0f, 96.0f, 48.0f,
                                      0.0f, 88.0f, 1.0f, 1.0f, 0.0f);
 
     DrawInit();
     CFont* font = m_fonts[0];
-    font->SetMargin(0.0f);
+    font->SetMargin(1.0f);
     font->SetShadow(1);
     font->SetScale(0.8999999761581421f);
 
-    CColor fontColor(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * alpha));
+    CColor fontColor(0xFF, 0xFF, 0xFF, static_cast<u8>(a255));
     font->SetColor(fontColor.color);
     font->DrawInit();
 
-    CCaravanWork* caravanWork = SingleCaravanWork();
-    char* charaName = reinterpret_cast<char*>(caravanWork->m_name);
+    char* charaName = reinterpret_cast<char*>(SingleCaravanWork()->m_name);
     float titleWidth = static_cast<float>(font->GetWidth(charaName));
-    float titleX = 440.0f + (152.0f - titleWidth) * static_cast<float>(0.5);
     font->SetTlut(0x12);
-    font->SetPosX(titleX);
+    float titleX = 440.0f + static_cast<float>((152.0f - titleWidth) * 0.5);
+    font->SetPosX(1.0f + titleX);
     font->SetPosY(53.0f);
     font->Draw(charaName);
 
@@ -1790,6 +1802,11 @@ void CMenuPcs::DrawSingleStat(float alpha)
     font->Draw(charaName);
 
     font->SetTlut(0x15);
+    const char** labelsDe = gSingMenuTextTableDe;
+    const char** labelsIt = gSingMenuTextTableIt;
+    const char** labelsFr = gSingMenuTextTableFr;
+    const char** labelsEs = gSingMenuTextTableEs;
+    const char** labelsEn = gSingMenuTextTableEn;
     float y = 184.0f;
     for (int i = 0; i < 4; i++) {
         font->SetPosX(440.0f);
@@ -1798,19 +1815,20 @@ void CMenuPcs::DrawSingleStat(float alpha)
         char* label;
         switch (Game.m_gameWork.m_languageId) {
             case 2:
-                label = (char*)gSingMenuTextTableDe[i + 5];
+                label = (char*)labelsDe[5];
                 break;
             case 3:
-                label = (char*)gSingMenuTextTableIt[i + 5];
+                label = (char*)labelsIt[5];
                 break;
             case 4:
-                label = (char*)gSingMenuTextTableFr[i + 5];
+                label = (char*)labelsFr[5];
                 break;
             case 5:
-                label = (char*)gSingMenuTextTableEs[i + 5];
+                label = (char*)labelsEs[5];
                 break;
+            case 1:
             default:
-                label = (char*)gSingMenuTextTableEn[i + 5];
+                label = (char*)labelsEn[5];
                 break;
         }
 
@@ -1822,7 +1840,7 @@ void CMenuPcs::DrawSingleStat(float alpha)
         }
         font->Draw(label);
 
-        font->renderFlags = (font->renderFlags & 0xEF) | 0x10;
+        GetRenderFlagBits(font->renderFlags).fixedWidth = 1;
         if (languageId == 2) {
             font->SetMargin(-5.0f);
             font->SetScaleX(0.7199999690055847f);
@@ -1832,15 +1850,15 @@ void CMenuPcs::DrawSingleStat(float alpha)
             font->SetScale(0.8999999761581421f);
         }
 
-        unsigned short stat;
+        int stat;
         if (i == 0) {
-            stat = caravanWork->m_strength;
+            stat = SingleCaravanWork()->m_strength;
         } else if (i == 1) {
-            stat = caravanWork->m_defense;
+            stat = SingleCaravanWork()->m_defense;
         } else if (i == 2) {
-            stat = caravanWork->m_magic;
+            stat = SingleCaravanWork()->m_magic;
         } else {
-            stat = caravanWork->m_progressValue;
+            stat = SingleCaravanWork()->m_progressValue;
         }
 
         char valueText[36];
@@ -1849,12 +1867,17 @@ void CMenuPcs::DrawSingleStat(float alpha)
         font->SetPosX(592.0f - valueW);
         font->Draw(valueText);
 
-        font->renderFlags &= 0xEF;
+        GetRenderFlagBits(font->renderFlags).fixedWidth = 0;
         font->SetMargin(1.0f);
         y += 36.0f;
+        labelsDe++;
+        labelsIt++;
+        labelsFr++;
+        labelsEs++;
+        labelsEn++;
     }
 
-    font->renderFlags &= 0xEF;
+    GetRenderFlagBits(font->renderFlags).fixedWidth = 0;
     font->SetMargin(1.0f);
     DrawInit();
 }

@@ -3281,6 +3281,25 @@ void CGMonObj::moveFrame()
  * JP Address: TODO
  * JP Size: TODO
  */
+typedef struct MonObjWords8 { unsigned int w[8]; } MonObjWords8;
+typedef struct MonObjMlAttackPool {
+	char gbaDir[12];
+	char gbaClient[16];
+	char gbaObjdat[12];
+	MonObjWords8 groupTableInit;
+	MonObjWords8 groupCountInit;
+	char classNames[0x54];
+	char actFlagFmt[0x20];
+} MonObjMlAttackPool;
+static const MonObjMlAttackPool sMonObjMlAttackPool = {
+	"dvd/gba/", "ffcc_cli.bin", "objdat.spt",
+	{ { 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+		0xFFFFFFFF } },
+	{ { 0, 0, 0, 0, 0, 0, 0, 0 } },
+	"CGMonObj\0\0\0\0CFlatRuntime::CObject\0\0\0CGBaseObj\0\0\0CGObject\0\0\0\0CGPrgObj\0\0\0\0CGCharaObj\0",
+	"ACT_FLAG_ROT_CHECK \x8d\xb7\x95\xaa=%f\x93x\x81\x42\n"
+};
+
 int CGMonObj::mlAttackCheck(int partyIndex)
 {
 	CGMonObj* monObj = this;
@@ -3291,6 +3310,8 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 		? baseScript \
 		: reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) + \
 			(monObj->m_aiState + *reinterpret_cast<unsigned short*>(baseScript + 0x100)) * 0x1D0 + 0x10)
+	const MonObjMlAttackPool* mlPool = &sMonObjMlAttackPool;
+	int selectedAction = -1;
 	if (monObj->m_funcs->attackCheck != 0) {
 		int result = (monObj->*monObj->m_funcs->attackCheck)(partyIndex);
 		if (result == -2) {
@@ -3308,14 +3329,30 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 		return -1;
 	}
 
-	unsigned int groupTable[8] = { 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-		0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF };
-	int groupCount[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-	int selectedAction = -1;
+	unsigned int groupTable[8];
+	int groupCount[8];
+	groupTable[0] = mlPool->groupTableInit.w[0];
+	groupTable[1] = mlPool->groupTableInit.w[1];
+	groupTable[2] = mlPool->groupTableInit.w[2];
+	groupTable[3] = mlPool->groupTableInit.w[3];
+	groupTable[4] = mlPool->groupTableInit.w[4];
+	groupTable[5] = mlPool->groupTableInit.w[5];
+	groupTable[6] = mlPool->groupTableInit.w[6];
+	groupTable[7] = mlPool->groupTableInit.w[7];
+	groupCount[0] = static_cast<int>(mlPool->groupCountInit.w[0]);
+	groupCount[1] = static_cast<int>(mlPool->groupCountInit.w[1]);
+	groupCount[2] = static_cast<int>(mlPool->groupCountInit.w[2]);
+	groupCount[3] = static_cast<int>(mlPool->groupCountInit.w[3]);
+	groupCount[4] = static_cast<int>(mlPool->groupCountInit.w[4]);
+	groupCount[5] = static_cast<int>(mlPool->groupCountInit.w[5]);
+	groupCount[6] = static_cast<int>(mlPool->groupCountInit.w[6]);
+	groupCount[7] = static_cast<int>(mlPool->groupCountInit.w[7]);
+	int rotOffset = partyIndex * 4 + 0x610;
+	int* groupPtr = reinterpret_cast<int*>(groupTable);
 
 	for (int actionIndex = 0; actionIndex < 8; actionIndex++) {
 		int actionOffset = actionIndex * 0x10;
-		unsigned short actionFlags = *reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x110);
+		int actionFlags = *reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x110);
 		if (actionFlags == 0xFFFF) {
 			if (actionIndex == 0) {
 				return -2;
@@ -3334,7 +3371,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 			continue;
 		}
 
-		unsigned int artifactLevel;
+		int artifactLevel;
 		if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
 			int idx = Game.m_gameWork.m_bossArtifactStageIndex;
 			int stage = Game.m_gameWork.m_bossArtifactStageTable[idx];
@@ -3349,14 +3386,12 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 		}
 
 		if ((actionFlags & 0x40) != 0) {
-			float targetRot = *reinterpret_cast<float*>(mon + partyIndex * 4 + 0x610);
+			float targetRot = *reinterpret_cast<float*>(mon + rotOffset);
 			float baseRot =
 				kMonObjDegToRad * static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x118)) +
 				object->m_rotBaseY;
 			float angleDelta = (float)__fabs(Math.DstRot(targetRot, baseRot));
-			System.Printf(
-				const_cast<char*>("ACT_FLAG_ROT_CHECK \x8d\xb7\x95\xaa=%f\x93x\x81\x42\n"),
-				kMonObjRadToDeg * angleDelta);
+			System.Printf(const_cast<char*>(mlPool->actFlagFmt), kMonObjRadToDeg * angleDelta);
 			float angleLimit =
 				kMonObjDegToRad * static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x11A));
 			if (!(angleDelta < angleLimit)) {
@@ -3410,10 +3445,10 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 	}
 
 	if (selectorType == 1) {
-		int& groupCursor = monObj->m_unk6CC;
+#define groupCursor (*reinterpret_cast<volatile int*>(&monObj->m_unk6CC))
 	wloop:
 		if (groupCount[groupCursor] == 0) {
-			groupCursor += 1;
+			groupCursor = groupCursor + 1;
 			if (groupCursor >= 8) {
 				groupCursor = 0;
 			}
@@ -3423,50 +3458,58 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 		int pick = Rand__5CMathFUl(&Math);
 		int seen = 0;
 		int i = 0;
-		int* groupPtr = reinterpret_cast<int*>(groupTable);
-		do {
-			int cursor0 = groupCursor;
-			if (cursor0 == groupPtr[0]) {
-				if (seen == pick) {
-					selectedAction = i;
-					groupCursor = cursor0 + 1;
-					goto mlDone;
+		for (int pass = 0; pass < 2; pass++) {
+			{
+				int cursor0 = groupCursor;
+				if (cursor0 == groupPtr[0]) {
+					if (seen == pick) {
+						selectedAction = i;
+						groupCursor = cursor0 + 1;
+						goto mlDone;
+					}
+					seen += 1;
 				}
-				seen += 1;
 			}
 			i += 1;
-			int cursor1 = groupCursor;
-			if (cursor1 == groupPtr[1]) {
-				if (seen == pick) {
-					selectedAction = i;
-					groupCursor = cursor1 + 1;
-					goto mlDone;
+			{
+				int cursor1 = groupCursor;
+				if (cursor1 == groupPtr[1]) {
+					if (seen == pick) {
+						selectedAction = i;
+						groupCursor = cursor1 + 1;
+						goto mlDone;
+					}
+					seen += 1;
 				}
-				seen += 1;
 			}
 			i += 1;
-			int cursor2 = groupCursor;
-			if (cursor2 == groupPtr[2]) {
-				if (seen == pick) {
-					selectedAction = i;
-					groupCursor = cursor2 + 1;
-					goto mlDone;
+			{
+				int cursor2 = groupCursor;
+				if (cursor2 == groupPtr[2]) {
+					if (seen == pick) {
+						selectedAction = i;
+						groupCursor = cursor2 + 1;
+						goto mlDone;
+					}
+					seen += 1;
 				}
-				seen += 1;
 			}
 			i += 1;
-			int cursor3 = groupCursor;
-			if (cursor3 == groupPtr[3]) {
-				if (seen == pick) {
-					selectedAction = i;
-					groupCursor = cursor3 + 1;
-					goto mlDone;
+			{
+				int cursor3 = groupCursor;
+				if (cursor3 == groupPtr[3]) {
+					if (seen == pick) {
+						selectedAction = i;
+						groupCursor = cursor3 + 1;
+						goto mlDone;
+					}
+					seen += 1;
 				}
-				seen += 1;
 			}
 			i += 1;
 			groupPtr += 4;
-		} while (i < 8);
+		}
+#undef groupCursor
 	}
 
 mlDone:

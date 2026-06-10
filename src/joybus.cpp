@@ -5412,12 +5412,11 @@ int JoyBus::SendBonusStr(ThreadParam* threadParam)
                 }
 
                 int bonusIndex = GbaQue.GetBonus(bonusPort);
-                char** bonusTable = Game.m_cFlatDataArr[1].TableStrings(7);
-                strcpy((char*)bonusStr, bonusTable[bonusIndex * 2]);
+                strcpy((char*)bonusStr, Game.m_cFlatDataArr[1].TableStrings(7)[bonusIndex * 2]);
 
                 int firstLen = strlen((char*)bonusStr);
                 byteLen = firstLen + 1;
-                strcpy((char*)(bonusStr + firstLen + 1), bonusTable[bonusIndex * 2 + 1]);
+                strcpy((char*)(bonusStr + firstLen + 1), Game.m_cFlatDataArr[1].TableStrings(7)[bonusIndex * 2 + 1]);
 
                 byteLen = byteLen + 1;
                 byteLen = byteLen + strlen((char*)(bonusStr + firstLen + 1));

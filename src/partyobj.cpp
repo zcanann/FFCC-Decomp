@@ -1540,14 +1540,18 @@ targetJoin: ;
 		int itemIdx = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504);
 		int kind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemIdx * 0x48);
 		int kindClass;
-		if (kind == 0x125) {
+		switch (kind) {
+		case 1:
+		case 0x100:
+		case 0x125:
 			kindClass = 0;
-		} else if (kind > 0x125) {
-			kindClass = (kind == 0x190) ? 1 : 2;
-		} else if (kind == 0x100 || kind == 1) {
-			kindClass = 0;
-		} else {
+			break;
+		case 0x190:
+			kindClass = 1;
+			break;
+		default:
 			kindClass = 2;
+			break;
 		}
 
 		if (kindClass == 0 || kindClass == 2) {

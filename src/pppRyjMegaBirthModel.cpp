@@ -362,10 +362,10 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirthModel* work, PRyjMegaBirth
                 }
             }
 
-            if (particleWMat != NULL) {
+            if (particleWMat) {
                 particleWMat++;
             }
-            if (particleColor != NULL) {
+            if (particleColor) {
                 particleColor = particleColor + 1;
             }
             particleData = (_PARTICLE_DATA*)((u8*)particleData + 0xA0);
@@ -400,16 +400,16 @@ void birth(
     float randomRange = kPppRyjMegaBirthModelTwoF * spread;
 
     memset(particleData, 0, 0xA0);
-    if (particleWMat != NULL) {
+    if (particleWMat) {
         memset(particleWMat, 0, sizeof(_PARTICLE_WMAT));
     }
-    if (particleColor != NULL) {
+    if (particleColor) {
         memset(particleColor, 0, sizeof(_PARTICLE_COLOR));
     }
 
     pppUnitMatrix(*(pppFMATRIX*)&particleData->m_matrix);
 
-    if (params->m_spawnMode < 8) {
+    if ((s32)params->m_spawnMode < 8 && (s32)params->m_spawnMode >= 0) {
         Vec baseDirection;
         Vec angles;
         Vec forward;
@@ -513,6 +513,17 @@ void birth(
             Vec speed;
 
             switch (speedMode) {
+            default:
+                speed.x = particleData->m_matrix[0][3];
+                speed.y = particleData->m_matrix[1][3];
+                speed.z = particleData->m_matrix[2][3];
+                speed.x = params->m_speed * Math.RandF();
+                speed.x -= halfSpeed;
+                speed.y = params->m_speed * Math.RandF();
+                speed.y -= halfSpeed;
+                speed.z = params->m_speed * Math.RandF();
+                speed.z -= halfSpeed;
+                break;
             case 1:
                 (void)Math.RandF();
                 speed.x = particleData->m_matrix[0][3];
@@ -567,17 +578,6 @@ void birth(
                 speed.y = -(MegaBirthHalf() * (Math.RandF() * ((params->m_speed * Math.RandF()) * Math.RandF())) - params->m_speed);
                 speed.y -= halfSpeed;
                 speed.z = -(MegaBirthHalf() * (Math.RandF() * ((params->m_speed * Math.RandF()) * Math.RandF())) - params->m_speed);
-                speed.z -= halfSpeed;
-                break;
-            default:
-                speed.x = particleData->m_matrix[0][3];
-                speed.y = particleData->m_matrix[1][3];
-                speed.z = particleData->m_matrix[2][3];
-                speed.x = params->m_speed * Math.RandF();
-                speed.x -= halfSpeed;
-                speed.y = params->m_speed * Math.RandF();
-                speed.y -= halfSpeed;
-                speed.z = params->m_speed * Math.RandF();
                 speed.z -= halfSpeed;
                 break;
             }
@@ -849,11 +849,11 @@ join_position:
     }
     *u8_at(particleData, 0x9c) = 0;
 
-    if (particleWMat != NULL) {
+    if (particleWMat) {
         pppCopyMatrix(*(pppFMATRIX*)particleWMat, ppvMng->m_matrix);
     }
 
-    if (particleColor != NULL) {
+    if (particleColor) {
         particleColor->m_colorFrameDeltas[0] = *(float*)(payload + 0x2C);
         particleColor->m_colorFrameDeltas[1] = *(float*)(payload + 0x30);
         particleColor->m_colorFrameDeltas[2] = *(float*)(payload + 0x34);
@@ -884,7 +884,7 @@ void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
     Vec position;
     Vec step;
 
-    if (particleColor != NULL) {
+    if (particleColor) {
         particleColor->m_color[0] = particleColor->m_color[0] + particleColor->m_colorFrameDeltas[0];
         particleColor->m_color[1] = particleColor->m_color[1] + particleColor->m_colorFrameDeltas[1];
         particleColor->m_color[2] = particleColor->m_color[2] + particleColor->m_colorFrameDeltas[2];
@@ -1076,7 +1076,7 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* stepData, _p
         int blue = baseBlue + (int)*(s8*)((u8*)particle + 0x34);
         int alpha = (int)((float)baseAlpha + (float)(int)*(s8*)((u8*)particle + 0x35) - *f32_at(particle, 0x98));
 
-        if (particleColor != NULL) {
+        if (particleColor) {
             red += (int)particleColor->m_color[0];
             green += (int)particleColor->m_color[1];
             blue += (int)particleColor->m_color[2];
@@ -1130,7 +1130,7 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* stepData, _p
         if (particleWorldMatrix != NULL) {
             particleWorldMatrix++;
         }
-        if (particleColor != NULL) {
+        if (particleColor) {
             particleColor++;
         }
         particle = (_PARTICLE_DATA*)((u8*)particle + 0xA0);

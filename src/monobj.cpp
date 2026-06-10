@@ -3816,7 +3816,9 @@ void CGMonObj::statWatch()
 		} else {
 			unsigned char* scriptBase = script;
 			if (*reinterpret_cast<unsigned short*>(scriptBase + 0x10C) == 1) {
-				if (attackResult < 100) {
+				if (attackResult >= 100) {
+					actionState = attackResult;
+				} else {
 					short aiState = monObj->m_aiState;
 					unsigned char* aiData = scriptBase;
 					if (aiState != 0) {
@@ -3894,9 +3896,6 @@ void CGMonObj::statWatch()
 					monObj->m_moveWork.m_target = reinterpret_cast<CGCharaObj*>(party);
 					monObj->m_moveWork.m_range = range;
 					monObj->m_moveWork.m_changeStat = static_cast<int>(changeStat);
-				}
-				else {
-					actionState = attackResult;
 				}
 			} else {
 				actionState = attackResult - 0xE;

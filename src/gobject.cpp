@@ -3184,8 +3184,8 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
             bodyCylinder.m_bottom.x = bottom.x;
             bodyCylinder.m_bottom.y = bottomY;
             bodyCylinder.m_bottom.z = bottom.z;
-            bodyCylinder.m_axis.x = sZeroFloat;
             bodyCylinder.m_axis.y = sDownUnitY;
+            bodyCylinder.m_axis.x = sZeroFloat;
             bodyCylinder.m_axis.z = sZeroFloat;
             bodyCylinder.m_radius = sZeroFloat;
 
@@ -3201,8 +3201,9 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
             hasModel = true;
         }
         if (hasModel) {
+            CVector* attrBottom;
             CVector* attrDirection = &CVector(sZeroFloat, sDownProbeDistance, sZeroFloat);
-            CVector* attrBottom = &CVector(m_worldPosition.x, sStepProbeHeight + m_worldPosition.y, m_worldPosition.z);
+            attrBottom = &CVector(m_worldPosition.x, sStepProbeHeight + m_worldPosition.y, m_worldPosition.z);
             CMapCylinder attrCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
 
             attrCylinder.m_bottom.x = attrBottom->x;

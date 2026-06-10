@@ -674,11 +674,11 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
             pppShapeSt* shape = reinterpret_cast<pppShapeSt**>(pdt->m_shapeNames)[i];
             if (--shape->m_refCount <= 0) {
                 if (shape->m_animData != 0) {
-                    delete[] reinterpret_cast<u8*>(shape->m_animData);
+                    delete reinterpret_cast<u8*>(shape->m_animData);
                     shape->m_animData = 0;
                 }
                 if (shape->m_displayListData != 0) {
-                    delete[] reinterpret_cast<u8*>(shape->m_displayListData);
+                    delete reinterpret_cast<u8*>(shape->m_displayListData);
                     shape->m_displayListData = 0;
                 }
                 shape->m_refCount = 0;
@@ -1881,11 +1881,11 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             if (shapeSlot != 0) {
                 if (--shapeSlot->m_refCount <= 0) {
                     if (shapeSlot->m_animData != 0) {
-                        delete[] reinterpret_cast<u8*>(shapeSlot->m_animData);
+                        delete reinterpret_cast<u8*>(shapeSlot->m_animData);
                         shapeSlot->m_animData = 0;
                     }
                     if (shapeSlot->m_displayListData != 0) {
-                        delete[] reinterpret_cast<u8*>(shapeSlot->m_displayListData);
+                        delete reinterpret_cast<u8*>(shapeSlot->m_displayListData);
                         shapeSlot->m_displayListData = 0;
                     }
                     shapeSlot->m_refCount = 0;
@@ -1992,11 +1992,11 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         {
             void*& pppDataHead0 = *reinterpret_cast<void**>(self + kPppDataHeadTableOffset);
             if (pppDataHead0 != 0) {
-                delete[] reinterpret_cast<u8*>(pppDataHead0);
+                delete reinterpret_cast<u8*>(pppDataHead0);
                 pppDataHead0 = 0;
             }
             if (*reinterpret_cast<void**>(self + kRecvBuffOffset) != 0) {
-                delete[] *reinterpret_cast<u8**>(self + kRecvBuffOffset);
+                delete *reinterpret_cast<u8**>(self + kRecvBuffOffset);
                 *reinterpret_cast<void**>(self + kRecvBuffOffset) = 0;
             }
             pppDataHead0 = operator new[](
@@ -2039,11 +2039,11 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x673);
 #define pppDataHead (*reinterpret_cast<void**>(self + kPppDataHeadTableOffset + (*reinterpret_cast<int*>(self + kPdtCountOffset)) * 4))
         if (pppDataHead != 0) {
-            delete[] reinterpret_cast<u8*>(pppDataHead);
+            delete reinterpret_cast<u8*>(pppDataHead);
             pppDataHead = 0;
         }
         if (*reinterpret_cast<void**>(self + kRecvBuffOffset) != 0) {
-            delete[] *reinterpret_cast<u8**>(self + kRecvBuffOffset);
+            delete *reinterpret_cast<u8**>(self + kRecvBuffOffset);
             *reinterpret_cast<void**>(self + kRecvBuffOffset) = 0;
         }
 
@@ -3738,7 +3738,10 @@ int CPartMng::pppLoadPmd(const char* baseName)
 
     if (m_pppModelStArr == 0) {
         CMemory::CStage* stageLoad = PartPcs.m_usbStreamState.m_stageLoad;
-        pppModelSt* modelArray = new(stageLoad, const_cast<char*>(s_partMng_cpp), 0xca9) pppModelSt[0x100];
+        struct PartMngModelStBlock {
+            pppModelSt m_entries[0x100];
+        };
+        pppModelSt* modelArray = (new (stageLoad, const_cast<char*>(s_partMng_cpp), 0xca9) PartMngModelStBlock)->m_entries;
         if (modelArray != 0) {
             for (int i = 0; i < 0x100; i++) {
                 modelArray[i].m_isUsed = 0;
@@ -3870,7 +3873,10 @@ int CPartMng::pppLoadPan(const char* baseName)
 
     if (m_pppShapeStArr == 0) {
         CMemory::CStage* stageLoad = PartPcs.m_usbStreamState.m_stageLoad;
-        pppShapeSt* shapeArray = new(stageLoad, const_cast<char*>(s_partMng_cpp), 0xd0b) pppShapeSt[0x100];
+        struct PartMngShapeStBlock {
+            pppShapeSt m_entries[0x100];
+        };
+        pppShapeSt* shapeArray = (new (stageLoad, const_cast<char*>(s_partMng_cpp), 0xd0b) PartMngShapeStBlock)->m_entries;
         if (shapeArray != 0) {
             for (int i = 0; i < 0x100; i++) {
                 shapeArray[i].m_inUse = 0;

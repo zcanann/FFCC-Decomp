@@ -72,6 +72,7 @@ extern const float FLOAT_80331F50;
 extern const float FLOAT_80331F58;
 extern const char lbl_80331F54[2];
 extern "C" const char s_pcts_pctd_Error_memory_allocation_error_801DD598[];
+extern const double DOUBLE_80331F30;
 
 static float s_BallTrnsXspl[] = {
     0.03333299979567528f, 27.700000762939453f, 0.0f, 0.0f,
@@ -1212,8 +1213,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 #pragma pop
 
 #pragma push
-#pragma opt_strength_reduction off
-#pragma opt_dead_assignments off
+#pragma optimization_level 3
 /*
  * --INFO--
  * PAL Address: 0x8013473c
@@ -1223,6 +1223,13 @@ void CMenuPcs::CalcSelectCloseAnim()
  * JP Address: TODO
  * JP Size: TODO
  */
+namespace {
+struct BonusModelFlags {
+	unsigned char m_visible : 1;
+	unsigned char m_rest : 7;
+};
+} // namespace
+
 // CalcSelectWait / CalcSelectOpenAnim anchor on &lbl_801DD510 and reach the
 // bonus model arrays via fixed offsets (matching the target's pooled-base
 // addressing).
@@ -1230,44 +1237,48 @@ void CMenuPcs::CalcSelectCloseAnim()
 #define s_BonusModelScale ((const float*)(lbl_801DD510 + 0x5C))
 void CMenuPcs::CalcSelectWait()
 {
+	char* anchor = lbl_801DD510;
 	int activePartyCount = s_Rinfo->m_partyCount;
 
 	if (*(signed char*)(this->m_bonusStatePtr + 0xb) == 0) {
 		this->m_menuWindowInfo->state = 3;
-		int animBase;
-		short count;
-		int walkOff = 0;
-		int i = 0;
-		while (i < (int)*(short*)this->m_bonusAnimPtr) {
-			animBase = this->m_bonusAnimPtr + walkOff + 8;
-			*(float*)(animBase + 0x10) = 1.0f;
-			*(int*)(animBase + 0x2c) = 3;
-			walkOff += 0x40;
-			i++;
+		{
+			int walkOff = 0;
+			int i = 0;
+			while (i < (int)*(short*)this->m_bonusAnimPtr) {
+				int animBase = this->m_bonusAnimPtr + walkOff + 8;
+				*(float*)(animBase + 0x10) = FLOAT_80331EB0;
+				*(int*)(animBase + 0x2c) = 3;
+				walkOff += 0x40;
+				i++;
+			}
 		}
-		animBase = this->m_bonusAnimPtr;
-		count = *(short*)animBase;
-		BonusAnimSprite* cursor = (BonusAnimSprite*)(animBase + count * 0x40 + 8);
-		BonusAnimSprite* partySprite = cursor - activePartyCount * 2;
-		cursor->kind = 0x20;
-		cursor->x = (short)(partySprite->x - 3);
-		cursor->y = (short)(partySprite->y - 8);
-		cursor->w = 0x40;
-		cursor->h = 0x30;
-		cursor->mulX = 0.0f;
-		cursor->mulY = 0.0f;
-		cursor->startFrame = 0;
-		cursor->duration = 8;
-		cursor->depth = 1.0f;
-		((BonusAnimHeader*)this->m_bonusAnimPtr)->count = (short)(count + 1);
-		BonusSpriteFlags(&((BonusAnimSprite*)(this->m_bonusAnimPtr + 8))[2]) = 0;
-		*(short*)(this->m_bonusStatePtr + 0xe) = 0;
-		*(short*)(this->m_bonusStatePtr + 0x26) = 4;
-		*(short*)(this->m_bonusStatePtr + 0x18) = 0;
-		((BonusAnimHeader*)this->m_bonusAnimPtr)->finished = 0;
-		*(unsigned char*)(this->m_bonusStatePtr + 0xb) = 1;
-		*(short*)(this->m_bonusStatePtr + 0x1a) = 0;
-		*(unsigned char*)(this->m_bonusStatePtr + 8) = 0;
+		{
+			int animBase = this->m_bonusAnimPtr;
+			short count = *(short*)animBase;
+			BonusAnimSprite* cursor = (BonusAnimSprite*)(animBase + count * 0x40 + 8);
+			BonusAnimSprite* partySprite = cursor - activePartyCount * 2;
+			cursor->kind = 0x20;
+			cursor->x = (short)(partySprite->x - 3);
+			cursor->y = (short)(partySprite->y - 8);
+			cursor->w = 0x40;
+			cursor->h = 0x30;
+			cursor->mulX = kBonusZClearOrigin;
+			cursor->mulY = kBonusZClearOrigin;
+			cursor->startFrame = 0;
+			cursor->duration = 8;
+			cursor->depth = FLOAT_80331EB0;
+			cursor->flags = 0;
+			((BonusAnimHeader*)this->m_bonusAnimPtr)->count = (short)(count + 1);
+			BonusSpriteFlags(&((BonusAnimSprite*)(this->m_bonusAnimPtr + 8))[2]) = 0;
+			*(short*)(this->m_bonusStatePtr + 0xe) = 0;
+			*(short*)(this->m_bonusStatePtr + 0x26) = 4;
+			*(short*)(this->m_bonusStatePtr + 0x18) = 0;
+			((BonusAnimHeader*)this->m_bonusAnimPtr)->finished = 0;
+			*(unsigned char*)(this->m_bonusStatePtr + 0xb) = 1;
+			*(short*)(this->m_bonusStatePtr + 0x1a) = 0;
+			*(unsigned char*)(this->m_bonusStatePtr + 8) = 0;
+		}
 	}
 
 #define statePtr (this->m_bonusStatePtr)
@@ -1275,81 +1286,71 @@ void CMenuPcs::CalcSelectWait()
 #define selection (*(short*)(this->m_bonusStatePtr + 0x26))
 #define confirmSel (*(short*)(this->m_bonusStatePtr + 0x28))
 #define delay (*(short*)(this->m_bonusStatePtr + 0x1a))
-	int animPtr = this->m_bonusAnimPtr;
-	MenuWindowInfo* window = this->m_menuWindowInfo;
-	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
-	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
-
 	*(short*)(statePtr + 0x22) = *(short*)(statePtr + 0x22) + 1;
 	int frame = (int)*(short*)(statePtr + 0x22);
-	short& promptMode = window->state;
-	int currentPartySlot = 0;
-	for (; currentPartySlot < activePartyCount; currentPartySlot++) {
-		if (currentPartyIndex == s_Rinfo->m_party[currentPartySlot].m_rank) {
+
+	int idx;
+	for (idx = 0; idx < activePartyCount; idx++) {
+		if (currentPartyIndex == s_Rinfo->m_party[idx].m_rank) {
 			break;
 		}
 	}
-	BonusPartySummary* currentParty = &s_Rinfo->m_party[currentPartySlot];
-	int padSlot = currentParty->m_partySlot;
-	unsigned short repeat;
-	unsigned short down;
-	unsigned char padLocked = (Pad.m_debugPadLock != 0 || (padSlot == 0 && Pad.m_debugPadPort != -1));
-	if (padLocked) {
-		repeat = 0;
-	} else {
-		int resolvedPadSlot = (Pad.m_debugPadPort == padSlot) ? 0 : padSlot;
-		repeat = Pad.m_padInputs[resolvedPadSlot].repeatButton;
-	}
-	padLocked = (Pad.m_debugPadLock != 0 || (padSlot == 0 && Pad.m_debugPadPort != -1));
-	if (padLocked) {
-		down = 0;
-	} else {
-		int resolvedPadSlot = (Pad.m_debugPadPort == padSlot) ? 0 : padSlot;
-		down = Pad.m_padInputs[resolvedPadSlot].buttonDown[0];
-	}
-	if (promptMode != 3) {
-		if (promptMode == 1) {
+
+	if (this->m_menuWindowInfo->state != 3) {
+		if (this->m_menuWindowInfo->state == 1) {
+			int padSlot = s_Rinfo->m_party[idx].m_partySlot;
+			unsigned short repeat;
+			unsigned short down;
+			unsigned char padLocked = (Pad.m_debugPadLock != 0 || (padSlot == 0 && Pad.m_debugPadPort != -1));
+			if (padLocked) {
+				repeat = 0;
+			} else {
+				int resolvedPadSlot = (Pad.m_debugPadPort == padSlot) ? 0 : padSlot;
+				repeat = Pad.m_padInputs[resolvedPadSlot].repeatButton;
+			}
+			padLocked = (Pad.m_debugPadLock != 0 || (padSlot == 0 && Pad.m_debugPadPort != -1));
+			if (padLocked) {
+				down = 0;
+			} else {
+				int resolvedPadSlot = (Pad.m_debugPadPort == padSlot) ? 0 : padSlot;
+				down = Pad.m_padInputs[resolvedPadSlot].buttonDown[0];
+			}
 			if ((repeat & 3) != 0) {
 				confirmSel = (short)(confirmSel ^ 1);
 				Sound.PlaySe(1, 0x40, 0x7f, 0);
-			} else {
-				if (!((down & 0x100) == 0)) {
-					promptMode = 2;
-					Sound.PlaySe(2, 0x40, 0x7f, 0);
-				} else {
-					if ((down & 0x200) != 0) {
-						promptMode = 2;
-						confirmSel = 1;
-						Sound.PlaySe(3, 0x40, 0x7f, 0);
-					}
-				}
+			} else if ((down & 0x100) != 0) {
+				this->m_menuWindowInfo->state = 2;
+				Sound.PlaySe(2, 0x40, 0x7f, 0);
+			} else if ((down & 0x200) != 0) {
+				this->m_menuWindowInfo->state = 2;
+				confirmSel = 1;
+				Sound.PlaySe(3, 0x40, 0x7f, 0);
 			}
-		} else if (promptMode == 2) {
-			if (window->frame == 1 && confirmSel == 0) {
+		} else if (this->m_menuWindowInfo->state == 2) {
+			if (this->m_menuWindowInfo->frame <= 1 && confirmSel == 0) {
 				delay = 10;
 				*(unsigned char*)(statePtr + 8) = 0xff;
 			}
-		} else {
-			promptMode = 3;
 		}
 	} else {
-		unsigned short repeat;
-		unsigned short down;
-		unsigned char padLocked = (Pad.m_debugPadLock != 0 || (padSlot == 0 && Pad.m_debugPadPort != -1));
-		if (padLocked) {
-			repeat = 0;
-		} else {
-			int resolvedPadSlot = (Pad.m_debugPadPort == padSlot) ? 0 : padSlot;
-			repeat = Pad.m_padInputs[resolvedPadSlot].repeatButton;
-		}
-		padLocked = (Pad.m_debugPadLock != 0 || (padSlot == 0 && Pad.m_debugPadPort != -1));
-		if (padLocked) {
-			down = 0;
-		} else {
-			int resolvedPadSlot = (padSlot == Pad.m_debugPadPort) ? 0 : padSlot;
-			down = Pad.m_padInputs[resolvedPadSlot].buttonDown[0];
-		}
 		if (delay == 0 && currentPartyIndex < activePartyCount) {
+			int padSlot = s_Rinfo->m_party[idx].m_partySlot;
+			unsigned short repeat;
+			unsigned short down;
+			unsigned char padLocked = (Pad.m_debugPadLock != 0 || (padSlot == 0 && Pad.m_debugPadPort != -1));
+			if (padLocked) {
+				repeat = 0;
+			} else {
+				int resolvedPadSlot = (Pad.m_debugPadPort == padSlot) ? 0 : padSlot;
+				repeat = Pad.m_padInputs[resolvedPadSlot].repeatButton;
+			}
+			padLocked = (Pad.m_debugPadLock != 0 || (padSlot == 0 && Pad.m_debugPadPort != -1));
+			if (padLocked) {
+				down = 0;
+			} else {
+				int resolvedPadSlot = (Pad.m_debugPadPort == padSlot) ? 0 : padSlot;
+				down = Pad.m_padInputs[resolvedPadSlot].buttonDown[0];
+			}
 			if ((repeat & 9) != 0) {
 				selection = (short)(selection + 1);
 				if (*(short*)(this->m_bonusStatePtr + 0x26) > 7) {
@@ -1365,53 +1366,61 @@ void CMenuPcs::CalcSelectWait()
 			}
 
 			if ((repeat & 0xf) == 0) {
+				int unavailableMask = ((int)(signed char)s_Rinfo->pad_0008 | (int)(signed char)s_Rinfo->m_missingArtifactMask)
+				    | s_Rinfo->m_party[idx].m_ownedArtifactMask;
 				if ((down & 0x100) != 0) {
-					int bit = 1 << selection;
-					int unavailableMask = GetBonusUnavailableMask(statePtr, currentParty);
-					if (!((unavailableMask & bit) == 0)) {
+					if (!((unavailableMask & (1 << selection)) == 0)) {
 						Sound.PlaySe(4, 0x40, 0x7f, 0);
 					} else {
-						*(unsigned char*)(statePtr + 8) = 1;
 						delay = 10;
+						*(unsigned char*)(statePtr + 8) = 1;
 						Sound.PlaySe(0x4f, 0x40, 0x7f, 0);
 					}
 				} else if ((down & 0x200) != 0) {
-					short winW = 0;
-					short winH = 0;
+					short winW;
+					short winH;
 					GetWinSize(0x18, &winW, &winH, 1);
 					SetMcWinInfo((int)winW, (int)winH);
+					this->m_menuWindowInfo->state = 0;
 					confirmSel = 1;
-					promptMode = 0;
 					Sound.PlaySe(3, 0x40, 0x7f, 0);
 				}
 			}
 		} else if (currentPartyIndex < activePartyCount) {
 			delay = (short)(delay - 1);
-			if (delay == 0 && *(unsigned char*)(statePtr + 8) > 0) {
-				int bit = 1 << selection;
-				int itemId = (&s_Rinfo->m_tempArtifacts[0])[selection];
-				s_Rinfo->pad_0008 = (unsigned char)(s_Rinfo->pad_0008 | bit);
+			if (delay == 0) {
+				if (*(signed char*)(statePtr + 8) > 0) {
+					int bit = 1 << selection;
+					s_Rinfo->pad_0008 = (unsigned char)(s_Rinfo->pad_0008 | bit);
+					s_Rinfo->m_party[idx].m_selectedSlot = selection;
+					s_Rinfo->m_party[idx].m_selectedItemId = s_Rinfo->m_tempArtifacts[selection];
+				}
+				if (currentPartyIndex < activePartyCount) {
+					currentPartyIndex = (short)(currentPartyIndex + 1);
+				}
 				*(unsigned char*)(statePtr + 8) = 0;
-				s_Rinfo->m_party[currentPartySlot].m_selectedItemId = itemId;
-				s_Rinfo->m_party[currentPartySlot].m_selectedSlot = selection;
-				currentPartyIndex = (short)(currentPartyIndex + 1);
 			}
 		} else {
 			delay = 0;
 		}
 	}
 
-	float* base = s_Base[0];
-	sprites[2].x = (short)(int)base[selection * 2 + 2];
-	sprites[2].y = (short)(int)base[selection * 2 + 3];
-	if (sprites[2].timer < sprites[2].duration) {
-		sprites[2].alpha = (float)sprites[2].timer / (float)sprites[2].duration;
-		sprites[2].timer++;
-	} else {
-		sprites[2].alpha = 1.0f;
+	short count2;
+	{
+		BonusAnimSprite* spr2 = (BonusAnimSprite*)(this->m_bonusAnimPtr + 0x88);
+		spr2->x = (short)(int)s_Base[0][selection * 2 + 2];
+		count2 = *(short*)this->m_bonusAnimPtr;
+		spr2 = (BonusAnimSprite*)(this->m_bonusAnimPtr + 0x88);
+		spr2->y = (short)(int)s_Base[0][selection * 2 + 3];
+		if (spr2->timer < spr2->duration) {
+			spr2->alpha = (float)spr2->timer / (float)spr2->duration;
+			spr2->timer++;
+		} else {
+			spr2->alpha = FLOAT_80331EB0;
+		}
 	}
 	{
-		BonusAnimSprite* cursor = &sprites[header->count - 1];
+		BonusAnimSprite* cursor = (BonusAnimSprite*)(this->m_bonusAnimPtr + (count2 - 1) * 0x40 + 8);
 		if (currentPartyIndex < activePartyCount) {
 			BonusAnimSprite* partySprite = cursor - (activePartyCount * 2 - currentPartyIndex);
 			int pulseFrame = frame % 20 - 10;
@@ -1420,84 +1429,98 @@ void CMenuPcs::CalcSelectWait()
 			}
 			cursor->x = (short)(partySprite->x - 3);
 			cursor->y = (short)(partySprite->y - 8);
-			cursor->alpha = (float)((double)pulseFrame / 10.0);
+			cursor->alpha = (float)((double)pulseFrame / DOUBLE_80331F30);
 		} else {
-			cursor->alpha = 0.0f;
+			cursor->alpha = kBonusZClearOrigin;
 		}
 	}
 
 	Mtx scaleMtx;
 	Mtx rotMtx;
 	Mtx tempMtx;
+	Mtx tempMtx2;
 	Vec srcVec;
 	Vec dstVec;
-	for (int i = 0; i < activePartyCount + 8; i++) {
-		CCharaPcs::CHandle* handle;
-		int tribeId;
-		if (i < activePartyCount) {
-			handle = s_Rinfo->m_party[i].m_partyHandle;
-			tribeId = s_Rinfo->m_party[i].m_tribeId;
-			float modelScale = s_BonusModelScale[tribeId];
-			PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
-
-			scaleMtx[1][3] = s_BonusModelYPos[tribeId];
-			scaleMtx[0][3] = 0.0f;
-		} else {
-			unsigned int artifactIndex = i - activePartyCount;
-			handle = GetBonusDisplayHandleSlots(this)[activePartyCount * 2 + artifactIndex];
-			if (handle == 0) {
-				continue;
+	{
+		int i = 0;
+		int doubleCount = activePartyCount * 2;
+		for (; i < activePartyCount + 8; i++) {
+			BonusAnimSprite* alphaSprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + (((int)(signed char)s_PlayerTop + i) << 6) + 8);
+			CCharaPcs::CHandle* handle;
+			int tribeOrSlot;
+			if (i < activePartyCount) {
+				tribeOrSlot = s_Rinfo->m_party[i].m_tribeId;
+				handle = s_Rinfo->m_party[i].m_partyHandle;
+				const float* scaleArr = (const float*)(anchor + 0x5C);
+				float modelScale = scaleArr[tribeOrSlot];
+				PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
+			} else {
+				tribeOrSlot = doubleCount + (i - activePartyCount);
+				handle = GetBonusDisplayHandleSlots(this)[tribeOrSlot];
+				if (handle == 0) {
+					continue;
+				}
+				PSMTXScale(scaleMtx, FLOAT_80331F00, FLOAT_80331F00, FLOAT_80331F00);
 			}
 
-			PSMTXScale(scaleMtx, 0.5799999833106995f, 0.5799999833106995f, 0.5799999833106995f);
-			srcVec.x = s_BonusModelScale[4];
-			srcVec.y = 0.0f;
-			srcVec.z = 0.0f;
-			PSMTXRotRad(rotMtx, 'z', 0.01745329238474369f * (float)(-45.0 * (double)artifactIndex));
-			PSMTXMultVecSR(rotMtx, &srcVec, &dstVec);
+			if (i < activePartyCount) {
+				const float* yPosArr = (const float*)(anchor + 0x4C);
+				scaleMtx[0][3] = kBonusZClearOrigin;
+				scaleMtx[1][3] = yPosArr[tribeOrSlot];
+				scaleMtx[2][3] = kBonusZClearOrigin;
+			} else {
+				int artifactIndex = i - activePartyCount;
+				srcVec.x = *(const float*)(anchor + 0x6C);
+				srcVec.y = kBonusZClearOrigin;
+				srcVec.z = kBonusZClearOrigin;
+				PSMTXRotRad(rotMtx, 'z', FLOAT_80331F04 * (float)(DOUBLE_80331F08 * (double)artifactIndex));
+				PSMTXMultVecSR(rotMtx, &srcVec, &dstVec);
 
-			int charaNo = handle->m_charaNo;
-			if (charaNo == 0x44) {
-				PSMTXRotRad(tempMtx, 'y', 3.1415927410125732f);
-				PSMTXConcat(scaleMtx, tempMtx, scaleMtx);
-				PSMTXRotRad(tempMtx, 'x', -1.1693705320358276f);
-				PSMTXConcat(scaleMtx, tempMtx, scaleMtx);
+				if (handle->m_charaNo == 0x44u) {
+					PSMTXRotRad(tempMtx, 'y', FLOAT_80331F10);
+					PSMTXConcat(scaleMtx, tempMtx, scaleMtx);
+					PSMTXRotRad(tempMtx2, 'x', FLOAT_80331F14);
+					PSMTXConcat(scaleMtx, tempMtx2, scaleMtx);
+				}
+
+				scaleMtx[0][3] = dstVec.x;
+				float modelY = (float)((double)(FLOAT_80331F18 * dstVec.y) - DOUBLE_80331F20);
+				if (handle->m_charaNo == 0x41u || handle->m_charaNo == 0x37u) {
+					modelY += FLOAT_80331F28;
+				} else if (handle->m_charaNo == 0x44u) {
+					modelY += FLOAT_80331F2C;
+				}
+				scaleMtx[1][3] = modelY;
+				scaleMtx[2][3] = kBonusZClearOrigin;
 			}
 
-			scaleMtx[0][3] = dstVec.x;
-			float modelY = (float)((double)(0.9670329689979553f * dstVec.y) - 5.0);
-			if (charaNo == 0x41 || charaNo == 0x37) {
-				modelY += 3.4000000953674316f;
-			} else if (charaNo == 0x44) {
-				modelY += 5.0f;
-			}
-			scaleMtx[1][3] = modelY;
+			((BonusModelFlags*)&handle->m_model->m_flags10C)->m_visible = 1;
+			handle->m_model->SetMatrix(scaleMtx);
+			handle->m_model->CalcMatrix();
+			handle->m_model->CalcSkin();
+			handle->m_model->m_lightAlpha = alphaSprite->alpha;
 		}
-		scaleMtx[2][3] = 0.0f;
-
-		handle->m_model->m_flags10C = (handle->m_model->m_flags10C & 0x7F) | 0x80;
-		handle->m_model->SetMatrix(scaleMtx);
-		handle->m_model->CalcMatrix();
-		handle->m_model->CalcSkin();
-		handle->m_model->m_lightAlpha = sprites[(int)(unsigned char)s_PlayerTop + i].alpha;
 	}
 
 	if (currentPartyIndex >= activePartyCount && delay == 0) {
 		if (*(short*)(statePtr + 0x18) >= 10) {
 			*(short*)(statePtr + 0x18) = 0;
-			for (int i = 0; i < activePartyCount; i++) {
-				BonusPartySummary& summary = s_Rinfo->m_party[i];
-				int itemId = summary.m_selectedItemId;
+			int i = 0;
+			((BonusAnimHeader*)this->m_bonusAnimPtr)->finished = 1;
+			for (; i < activePartyCount; i++) {
+				int itemId = s_Rinfo->m_party[i].m_selectedItemId;
+				int partySlot = s_Rinfo->m_party[i].m_partySlot;
 				if (itemId > 0) {
-					CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[summary.m_partySlot]);
 					if (itemId < 0xff) {
-						caravanWork->m_artifacts[itemId - 0x9f] = static_cast<unsigned short>(itemId);
+						int artIdx = itemId - 0x9f;
+						CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[partySlot]);
+						caravanWork->m_artifacts[artIdx] = static_cast<unsigned short>(itemId);
 					} else {
+						CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[partySlot]);
 						caravanWork->AddItem(itemId, 0);
 					}
 				}
 			}
-			header->finished = 1;
 		} else {
 			*(short*)(statePtr + 0x18) = (short)(*(short*)(statePtr + 0x18) + 1);
 		}

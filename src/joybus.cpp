@@ -105,27 +105,30 @@ extern const unsigned short JoyBusCrcTable[256] =
     0x2E93, 0x3EB2, 0x0ED1, 0x1EF0
 };
 
+static const char s_not_found_error_fmt[] = "Error: %s not found\n";
+static const char s_load_bin_error[] = "JoyBus::LoadBin() error\n";
+static const char s_thread_init_end[] = "JoyBus::ThreadInit end\n";
+static const char s_recv_type_differ_warn_fmt[] = "(%d):%s(%d): Warning: Recv data type differ!!\n";
+static const char s_joybus_cpp[] = "joybus.cpp";
+static const char s_ppos_cnt_error_fmt[] = "(%d) Error: m_PposCnt error(%d)\n";
+static const char s_send_type_error_fmt[] = "(%d): Error: send type error(%02x)\n";
+static const char s_map_filename_fmt[] = "m%02d_%d.mcd";
+static const char s_mem_alloc_error_fmt[] = "%s(%d): Error: memory allocation error\n";
+
 static const char s_dvd_gba_dir[] = "dvd/gba/";
 static const char s_ffcc_cli_bin[] = "ffcc_cli.bin";
 static const char s_objdat_spt[] = "objdat.spt";
-static const char s_joybus_cpp[] = "joybus.cpp";
-static const char s_mem_alloc_error_fmt[] = "%s(%d): Error: memory allocation";
-static const char s_not_found_error_fmt[] = "Error: %s not found";
-static const char s_map_filename_fmt[] = "m%02d_%d.mcd";
-static const char s_thread_init_end_nl[] = "JoyBus::ThreadInit end\n";
-static const char s_recv_type_mismatch_warn_fmt[] = "(%d):%s(%d): Warning: Recv data type mismatch";
-static const char s_load_bin_error[] = "JoyBus::LoadBin() error";
-static const char s_thread_init_end[] = "JoyBus::ThreadInit end";
-extern char s_pctd_Error_m_PposCnt_error_pctd_801DA32C[];
-extern char s_pctd_Error_send_type_error_pct02x_801DA350[];
+static const char s_icon_dat[] = "icon.dat";
+static const char s_game_name[] = "FF Crystal Chronicles";
 
 extern const u32 kPppYmMeltMaskBit0;
 extern const u32 kPppYmMeltMaskBit4;
 
 namespace JoyBusConst {
-static char* DVD_DIR = const_cast<char*>(s_dvd_gba_dir);
-static char* CLIENT_FILE = const_cast<char*>(s_ffcc_cli_bin);
-static char* OBJ_FILE = const_cast<char*>(s_objdat_spt);
+static char* DVD_DIR = const_cast<char*>("dvd/gba/");
+static char* CLIENT_FILE = const_cast<char*>("ffcc_cli.bin");
+static char* OBJ_FILE = const_cast<char*>("objdat.spt");
+static char* ICON_FILE = const_cast<char*>("icon.dat");
 const unsigned int CTRL_GBA = 0x10;
 const unsigned int JOY_CODE_MASK = 0x1;
 }
@@ -2623,7 +2626,7 @@ void JoyBus::ThreadInit()
 
     if ((unsigned int)System.m_execParam >= 2u)
     {
-        System.Printf(const_cast<char*>(s_thread_init_end_nl));
+        System.Printf(const_cast<char*>(s_thread_init_end));
     }
 }
 
@@ -3107,7 +3110,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
                 {
                     if (static_cast<unsigned int>(System.m_execParam) >= 2u)
                     {
-                        System.Printf(const_cast<char*>(s_recv_type_mismatch_warn_fmt), threadParam->m_portIndex, const_cast<char*>(s_joybus_cpp), 0x1079);
+                        System.Printf(const_cast<char*>(s_recv_type_differ_warn_fmt), threadParam->m_portIndex, const_cast<char*>(s_joybus_cpp), 0x1079);
                     }
 
                     OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
@@ -4066,7 +4069,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
             {
                 if ((unsigned int)System.m_execParam >= 1)
                 {
-                    System.Printf(s_pctd_Error_send_type_error_pct02x_801DA350, threadParam->m_portIndex);
+                    System.Printf(const_cast<char*>(s_send_type_error_fmt), threadParam->m_portIndex);
                 }
                 return -1;
             }
@@ -4467,7 +4470,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
         {
             signed char cnt = (signed char)m_cmdBuffer[threadParam->m_portIndex];
 
-            System.Printf(s_pctd_Error_m_PposCnt_error_pctd_801DA32C, threadParam->m_portIndex, (int)cnt);
+            System.Printf(const_cast<char*>(s_ppos_cnt_error_fmt), threadParam->m_portIndex, (int)cnt);
         }
 
         m_cmdBuffer[threadParam->m_portIndex] = 0;

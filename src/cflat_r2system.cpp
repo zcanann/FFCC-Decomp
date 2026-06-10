@@ -1360,11 +1360,6 @@ void CVector::operator=(const CVector& other)
  * JP Address: TODO
  * JP Size: TODO
  */
-CVector::CVector(const CVector& other)
-{
-    *this = other;
-}
-
 /*
  * --INFO--
  * PAL Address: 0x800B9884

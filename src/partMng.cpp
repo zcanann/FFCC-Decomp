@@ -2680,7 +2680,7 @@ static inline void pppEditDrawPass(unsigned char* base, int drawPass, Vec& camer
             PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
             if (PSVECSquareMag(&cameraDelta) < mng->m_cullRadiusSq) {
                 PppCullBound bound;
-                float maxY = partPos.y + mng->m_cullYOffset;
+                float maxY = mng->m_cullYOffset + partPos.y;
                 float radius = mng->m_cullRadius;
                 bound.m_min.y = partPos.y;
                 bound.m_max.y = maxY;

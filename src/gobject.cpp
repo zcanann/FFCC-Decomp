@@ -80,6 +80,61 @@ static inline bool HasLoadedModel(CCharaPcs::CHandle* handle)
     return handle != 0 && handle->m_model != 0;
 }
 
+extern "C" const float sZeroFloat;
+extern "C" const double DOUBLE_803303B0; // 0.5
+extern "C" const double DOUBLE_803303B8; // 3.0
+extern "C" const double DOUBLE_803303C0; // 0.0
+
+static inline float GObjSqrtf(float x)
+{
+    union {
+        float f;
+        unsigned long bits;
+    } bits;
+    int fpclass;
+
+    if (x > 0.0f) {
+        double guess = __frsqrte((double)x);
+        guess = DOUBLE_803303B0 * guess * (DOUBLE_803303B8 - guess * guess * x);
+        guess = DOUBLE_803303B0 * guess * (DOUBLE_803303B8 - guess * guess * x);
+        guess = DOUBLE_803303B0 * guess * (DOUBLE_803303B8 - guess * guess * x);
+        x = (float)(x * guess);
+        return x;
+    }
+
+    if ((double)x < DOUBLE_803303C0) {
+        x = NAN;
+        return x;
+    }
+
+    bits.f = x;
+    switch (bits.bits & 0x7f800000) {
+    case 0x7f800000:
+        if ((bits.bits & 0x7fffff) != 0) {
+            fpclass = 1;
+        } else {
+            fpclass = 2;
+        }
+        break;
+    case 0:
+        if ((bits.bits & 0x7fffff) != 0) {
+            fpclass = 5;
+        } else {
+            fpclass = 3;
+        }
+        break;
+    default:
+        fpclass = 4;
+        break;
+    }
+
+    if (fpclass == 1) {
+        x = NAN;
+    }
+
+    return x;
+}
+
 
 static inline unsigned char* ModelBytes(CChara::CModel* model)
 {
@@ -1457,7 +1512,7 @@ void CGObject::update()
                 Vec axis;
                 const float slideMagSq =
                     m_groundHitOffset.x * m_groundHitOffset.x + m_groundHitOffset.z * m_groundHitOffset.z;
-                const float slideMag = sqrtf(slideMagSq);
+                const float slideMag = GObjSqrtf(slideMagSq);
                 PSVECCrossProduct(&m_groundHitOffset, CVector(sZeroFloat, sAnimFrameOffset, sZeroFloat), &axis);
                 PSMTXRotAxisRad(rotScratch, &axis, -slideMag / sTiltDivisor);
                 PSMTXQuat(tiltMtx, &m_bgCollisionQtrn);
@@ -1485,7 +1540,7 @@ void CGObject::update()
 
             const float swayDx = m_radiusCtrlVel.x - m_groundFriction;
             const float swayDz = m_radiusCtrl.y - m_radiusCtrlVel.y;
-            const float swayMag = sqrtf(swayDx * swayDx + swayDz * swayDz);
+            const float swayMag = GObjSqrtf(swayDx * swayDx + swayDz * swayDz);
             m_radiusCtrlVel.y += sBgAttrNormal * swayDz;
             m_groundFriction += sBgAttrNormal * swayDx;
 

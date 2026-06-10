@@ -917,10 +917,6 @@ void CRingMenu::onCalc()
 			m_displayCounter = 0x10 - m_displayCounter;
 		}
 
-		int animCount = 9;
-		float* animFloat = &m_animFloat[0][0];
-		const float animMin = kRingMenuZero;
-
 		m_displayCounter = clampDecToZero(m_displayCounter);
 		m_transitionCounter = clampDecToZero(m_transitionCounter);
 		m_commonFrameCounter = m_commonFrameCounter + 1;
@@ -934,25 +930,26 @@ void CRingMenu::onCalc()
 		m_buttonTimers[5] = clampDecToZero(m_buttonTimers[5]);
 
 		const float animStep = kRingMenuBlinkPhaseStep;
+		const float animMin = kRingMenuZero;
 		m_buttonTimers[6] = clampDecToZero(m_buttonTimers[6]);
 		m_buttonTimers[7] = clampDecToZero(m_buttonTimers[7]);
 		m_buttonTimers[8] = clampDecToZero(m_buttonTimers[8]);
+		int row = 0;
 		do {
-			animFloat[0] = animFloat[0] - animStep;
-			if (animFloat[0] < animMin) {
-				animFloat[0] = animMin;
+			m_animFloat[row][0] = m_animFloat[row][0] - animStep;
+			if (m_animFloat[row][0] < animMin) {
+				m_animFloat[row][0] = animMin;
 			}
-			animFloat[1] = animFloat[1] - animStep;
-			if (animFloat[1] < animMin) {
-				animFloat[1] = animMin;
+			m_animFloat[row][1] = m_animFloat[row][1] - animStep;
+			if (m_animFloat[row][1] < animMin) {
+				m_animFloat[row][1] = animMin;
 			}
-			animFloat[2] = animFloat[2] - animStep;
-			if (animFloat[2] < animMin) {
-				animFloat[2] = animMin;
+			m_animFloat[row][2] = m_animFloat[row][2] - animStep;
+			if (m_animFloat[row][2] < animMin) {
+				m_animFloat[row][2] = animMin;
 			}
-			animFloat += 3;
-			animCount--;
-		} while (animCount != 0);
+			row++;
+		} while (row != 9);
 
 		fmod(static_cast<double>(m_spinPhase), kRingMenuOneD);
 		int i = 0x1B;
@@ -977,35 +974,28 @@ void CRingMenu::onCalc()
 		}
 		m_gbaAnimCounter = clampDecToZero(m_gbaAnimCounter);
 
+		double scrollDelta = static_cast<double>(kRingMenuZero);
 		CGPartyObj* partyObj = Game.m_partyObjArr[m_menuIndex];
 		if (partyObj != 0) {
 			CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle);
-			int currentCmd;
-			if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
-				currentCmd = Chara.MogFur().m_commandIndex;
-			} else {
-				currentCmd = caravanWork->GetIdxCmdList();
-			}
+			int currentCmd = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
+			                     ? Chara.MogFur().m_commandIndex
+			                     : caravanWork->GetIdxCmdList();
 
-			int* trackedCmd = &m_currentCommandIndex;
-			if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
-				trackedCmd = &Chara.MogFur().m_trackedCommandIndex;
-			}
+			int* trackedCmd = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
+			                      ? &Chara.MogFur().m_trackedCommandIndex
+			                      : &m_currentCommandIndex;
 
-			float scrollDelta = kRingMenuZero;
+			int prev = currentCmd;
+			int next = currentCmd;
 			if (*trackedCmd != currentCmd) {
-				int prev = currentCmd;
-				int next = currentCmd;
-				int nextCandidate = (currentCmd + 1) % 5;
-				int prevCandidate = (currentCmd + 4) % 5;
 				for (int step = 1; step < 4; step++) {
-					if (Game.m_gameWork.m_bossArtifactStageIndex != 0x19) {
-						nextCandidate = caravanWork->GetNextCmdListIdx(next, 1);
-						prevCandidate = caravanWork->GetNextCmdListIdx(prev, -1);
-					}
-
-					prev = prevCandidate;
-					next = nextCandidate;
+					int nextCandidate = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
+					                        ? (currentCmd + 1) % 5
+					                        : caravanWork->GetNextCmdListIdx(next, 1);
+					int prevCandidate = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
+					                        ? (currentCmd + 4) % 5
+					                        : caravanWork->GetNextCmdListIdx(prev, -1);
 
 					int trackedValue = *trackedCmd;
 					if (trackedValue != currentCmd) {
@@ -1019,27 +1009,40 @@ void CRingMenu::onCalc()
 						}
 						if ((prevDir != 0) || (nextDir != 0)) {
 							if ((prevDir != 0) && (nextDir != 0)) {
-								unsigned short trigger = 0;
-								if ((Pad.m_debugPadLock == 0) && !((m_menuIndex == 0) && (Pad.m_debugPadPort != -1))) {
+								unsigned char lockOut = 0;
+								if ((Pad.m_debugPadLock != 0) || ((m_menuIndex == 0) && (Pad.m_debugPadPort != -1))) {
+									lockOut = 1;
+								}
+								unsigned short trigger;
+								if (lockOut != 0) {
+									trigger = 0;
+								} else {
 									const int idx =
 										m_menuIndex &
 										~(static_cast<int>(~(Pad.m_debugPadPort - m_menuIndex | m_menuIndex - Pad.m_debugPadPort)) >> 31);
 									trigger = Pad.GetPadInputs()[idx].button[0];
 								}
-								scrollDelta = ((trigger & 0x40) != 0) ? static_cast<float>(prevDir) : static_cast<float>(nextDir);
+								if ((trigger & 0x40) != 0) {
+									nextDir = prevDir;
+								}
+								scrollDelta = static_cast<double>(static_cast<float>(nextDir));
 							} else if (prevDir != 0) {
-								scrollDelta = static_cast<float>(prevDir);
+								scrollDelta = static_cast<double>(static_cast<float>(prevDir));
 							} else if (nextDir != 0) {
-								scrollDelta = static_cast<float>(nextDir);
+								scrollDelta = static_cast<double>(static_cast<float>(nextDir));
 							}
 							break;
 						}
+						scrollDelta = static_cast<double>(kRingMenuZero);
 					}
+
+					prev = prevCandidate;
+					next = nextCandidate;
 				}
 			}
 
 			*trackedCmd = currentCmd;
-			m_spinAccumulator += scrollDelta;
+			m_spinAccumulator = static_cast<float>(static_cast<double>(m_spinAccumulator) + scrollDelta);
 			m_spinAccumulator *= kRingMenuSpinDamping;
 		}
 	}

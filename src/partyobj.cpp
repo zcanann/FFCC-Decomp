@@ -5235,11 +5235,11 @@ void CGPartyObj::gpmMove()
 				sGhostPartyWork.slotSel = newSlotSel;
 
 				switch (sGhostPartyWork.slotSel) {
-				case 1:
-					*reinterpret_cast<int*>(self + 0x560) = 0x20F;
-					break;
 				case 0:
 					*reinterpret_cast<int*>(self + 0x560) = 0x207;
+					break;
+				case 1:
+					*reinterpret_cast<int*>(self + 0x560) = 0x20F;
 					break;
 				case 2:
 					*reinterpret_cast<int*>(self + 0x560) = 0x20B;
@@ -5247,8 +5247,8 @@ void CGPartyObj::gpmMove()
 				}
 				changeStat(2, 0, 0);
 				sGhostPartyWork.gauge = 0;
-				PartyData(this).flags.flag40 = 0;
-				PartyData(this).flags.flag20 = 0;
+				sGhostPartyWork.flagBits.flag40 = 0;
+				sGhostPartyWork.flagBits.flag20 = 0;
 				return;
 			}
 		} else {

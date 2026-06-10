@@ -239,7 +239,7 @@ static const char s_noTurnMotion[36] =
 extern "C" const float sAnimFrameOffset;                    // FLOAT_80330338
 extern "C" const float sHugeCylinderExtent; // FLOAT_8033033c
 extern "C" const float sNegHugeCylinderExtent; // FLOAT_80330340
-static const float sQuarterTurn = 1.5707964f;         // FLOAT_80330344
+extern "C" const float sQuarterTurn;         // FLOAT_80330344
 extern "C" const double sLoopBias;                    // DOUBLE_80330378
 extern "C" const float sZeroFloat;                    // FLOAT_80330350
 extern "C" const float sPushDistance;           // FLOAT_80330354
@@ -2572,7 +2572,7 @@ void CGObject::boundCheck()
     if ((m_charaModelHandle != 0) && (m_charaModelHandle->m_model != 0)) {
         const float zero = sZeroFloat;
         const float oneF = sAnimFrameOffset;
-        const float clipLimit = 2.0f;
+        const float clipLimit = sNegativeOne;
 
         clipMask = 0x1F;
         s32 i = 0;

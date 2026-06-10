@@ -2697,9 +2697,9 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
 {
 	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + (itemId * 0x48);
 
-	bool isNormal = false;
+	int isNormal = 0;
 	if ((*reinterpret_cast<unsigned short*>(itemData + 0x32) & 1) != 0 || forceNormal != 0) {
-		isNormal = true;
+		isNormal = 1;
 	}
 
 	outA = 3;
@@ -2757,17 +2757,18 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
 	System.Printf(const_cast<char*>(sCharaObjResistanceFmt), outA);
 
 	switch (outA) {
-	case 1:
-		outB = (isNormal != 0) ? 1 : 0;
-		break;
 	case 0:
 		outB = 1;
+		break;
+	case 1:
+		outB = (isNormal != 0) ? 1 : 0;
 		break;
 	default:
 		outB = 0;
 		break;
 	}
-	outC = static_cast<int>(static_cast<unsigned int>(outA ^ 3) >> 1);
+	int xorA = outA ^ 3;
+	outC = static_cast<unsigned int>((xorA >> 1) - (xorA & 3)) >> 31;
 }
 #pragma pop
 

@@ -5345,16 +5345,17 @@ void CGPartyObj::gpmMove()
 			return;
 		}
 
-		PartyData(this).partyFlags |= 0x20;
+		sGhostPartyWork.flagBits.flag20 = 1;
 		sGhostPartyWork.gauge++;
 		if (sGhostPartyWork.gauge <= 0xF) {
 			return;
 		}
-		if (static_cast<unsigned char>(static_cast<unsigned int>((static_cast<unsigned int>(PartyData(this).partyFlags) << 25) & 0xC0000000) >> 31) != 0) {
+		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(sGhostPartyWork.flags) << 25) & 0xC0000000) >> 31) != 0) {
 			return;
 		}
 	}
 
+	sGhostPartyWork.flagBits.flag40 = 1;
 	{
 		unsigned char* base = CGPartyObj::m_ghostWork;
 		const int slotSel = sGhostPartyWork.slotSel;
@@ -5367,7 +5368,7 @@ void CGPartyObj::gpmMove()
 			base += 4;
 		}
 	}
-	PartyData(this).partyFlags = (PartyData(this).partyFlags & 0xAF) | 0x40;
+	sGhostPartyWork.flagBits.flag10 = 0;
 }
 
 /*

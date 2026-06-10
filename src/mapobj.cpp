@@ -442,6 +442,8 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         CHUNK_VTXL = 0x5654584C,
     };
 
+    CMapMng& mng = MapMng;
+
     Init();
 
     chunkFile.PushChunk();
@@ -459,18 +461,18 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             if (parentIdx == -1) {
                 m_parent = 0;
             } else {
-                m_parent = &MapMng.m_mapObjArray[parentIdx];
+                m_parent = &mng.m_mapObjArray[parentIdx];
             }
 
             if (meshOrHitIdx == -1) {
                 m_mapData = 0;
             } else if (m_mapDataType == 1) {
-                m_mapData = &MapMng.m_mapMeshArray[meshOrHitIdx];
+                m_mapData = &mng.m_mapMeshArray[meshOrHitIdx];
                 m_baseDrawPriority = 0;
                 m_drawPriority = 0;
             } else if ((m_mapDataType == 2) || (m_mapDataType == 3)) {
                 if (meshOrHitIdx != -2) {
-                    m_mapData = &MapMng.m_mapHitArray[meshOrHitIdx];
+                    m_mapData = &mng.m_mapHitArray[meshOrHitIdx];
                 } else {
                     CMapObjAtrMeshName* meshName =
                         new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x84) CMapObjAtrMeshName();

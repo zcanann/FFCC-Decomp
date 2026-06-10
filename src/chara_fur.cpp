@@ -2075,7 +2075,6 @@ void CChara::makeFurTex()
 	static CVector accelRand = CVector(kCharaFurDepthZero, kCharaFurDepthZero, kCharaFurDepthZero);
 
 	s_mogFurRand = 0;
-	s_mogFurMaxY = 0.0f;
 
 	float scaleBase = kCharaFurDepthScaleBase;
 	float randScale = FLOAT_80331164;

@@ -32,28 +32,14 @@ inline void* operator new(unsigned long, void* ptr)
 CMapMng MapMng;
 char g_StrTmp[0x400];
 
-extern const float kMapViewScaleXPrimary = 0.73898232f;
-extern const float kMapViewScaleY = 0.88677877f;
-extern const float kMapViewScaleZ = 1.0f;
-extern const float kMapViewScaleXSecondary = 0.84455127f;
 CMapHitDrawMode g_MapHitDrawMode;
 unsigned char g_MapHitFaceFlag;
 unsigned int s_loadedMapNo__7CMapPcs;
-extern const float kMapCameraSemiTransMinSentinel = 1.0e15f;
-extern const float kMapCameraSemiTransMaxSentinel = -1.0f;
-extern const float kMapZero = 0.0f;
 
 static inline CMapMngAsyncLoadState& GetMapMngAsyncLoadState(CMapMng* mapMng)
 {
     return mapMng->m_asyncLoadState;
 }
-extern const float kMapHitMoveEpsilon = 0.0001f;
-extern const float kMapHitMoveNegEpsilon = -0.0001f;
-extern const float kMapHitTInitial = 10.0f;
-extern const float kMapLargeDistance = 100000.0f;
-extern const float kMapFullTurnDegrees = 360.0f;
-extern const float kMapTinyEpsilon = 5.0e-6f;
-extern const float kMapHitWireZOffset = -0.1f;
 static const char s_mapNewLine[] = "\n";
 extern "C" unsigned char Vec_80245758[];
 
@@ -200,6 +186,7 @@ CMapIdGrp::CMapIdGrp()
  */
 float CMapKeyFrame::Get()
 {
+    extern const float kMapZero;
     switch (m_mode) {
     case 0:
         return Math.Line1D(static_cast<int>(m_keyCount) - 1, static_cast<float>(m_currentFrame), m_keyValue, m_keyFrame);
@@ -1051,6 +1038,8 @@ CMapShadow* CPtrArray<CMapShadow*>::GetAt(unsigned long index)
  */
 int CMapKeyFrame::Get(int& key0, int& key1, float& blend)
 {
+    extern const float kMapZero;
+    extern const float kMapViewScaleZ;
     switch (m_mode) {
     case 0:
         blend = Math.Line1D(
@@ -1091,7 +1080,7 @@ int CMapKeyFrame::Get(int& key0, int& key1, float& blend)
     key1 = static_cast<int>(1.0f + blend);
     blend = blend - static_cast<float>(key0);
     key0 = m_junTable[key0];
-    if (blend == kMapZero) {
+    if (kMapZero == blend) {
         key1 = key0;
         return 0;
     }
@@ -1578,6 +1567,7 @@ search:
  */
 int CMapMng::GetDebugPlaySta(int playStaNo, Vec* vec)
 {
+    extern const float kMapZero;
     CMapObj* mapObj = GetMapObjArray();
 
     goto search;
@@ -1613,6 +1603,8 @@ search:
  */
 void CMapMng::SetLightSource()
 {
+    extern const float kMapZero;
+    extern const float kMapViewScaleZ;
     int mapLightIndex = 0;
     const short mapObjCount = m_mapObjCount;
     CMapObj* mapObj = GetMapObjArray();
@@ -2661,6 +2653,11 @@ void CMapMng::DrawBefore()
  */
 void CMapMng::Draw()
 {
+    extern const float kMapLargeDistance;
+    extern const float kMapFullTurnDegrees;
+    extern const float kMapZero;
+    extern const float kMapTinyEpsilon;
+    extern const float kMapHitWireZOffset;
     if (m_mapReadReady == 0) {
         return;
     }
@@ -3035,13 +3032,14 @@ void CMapMng::DrawAfter()
  */
 int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long mask)
 {
+    extern const float kMapZero;
     if ((kMapZero == move->x) && (kMapZero == move->z) && (kMapZero == move->y)) {
         return 0;
     }
 
-    if ((move->x <= kMapHitMoveEpsilon) && (move->x >= kMapHitMoveNegEpsilon) &&
-        (move->y <= kMapHitMoveEpsilon) && (move->y >= kMapHitMoveNegEpsilon) &&
-        (move->z <= kMapHitMoveEpsilon) && (move->z >= kMapHitMoveNegEpsilon)) {
+    if ((move->x <= 0.0001f) && (move->x >= -0.0001f) &&
+        (move->y <= 0.0001f) && (move->y >= -0.0001f) &&
+        (move->z <= 0.0001f) && (move->z >= -0.0001f)) {
         if (static_cast<unsigned int>(System.m_execParam) >= 2) {
             System.Printf(g_MsgFlashy);
         }
@@ -3055,7 +3053,7 @@ int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
     }
 
     g_hit_edge_idx_min = -2;
-    g_hit_t_min = kMapHitTInitial;
+    g_hit_t_min = 10.0f;
     PSVECAdd(&cylinder->m_bottom, move, &cylinder->m_top);
 
     for (int i = 0; i < m_octTreeCount; i++) {
@@ -3086,13 +3084,14 @@ int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
  */
 int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned long mask)
 {
+    extern const float kMapZero;
     if ((kMapZero == move->x) && (kMapZero == move->z) && (kMapZero == move->y)) {
         return 0;
     }
 
-    if ((move->x <= kMapHitMoveEpsilon) && (move->x >= kMapHitMoveNegEpsilon) &&
-        (move->y <= kMapHitMoveEpsilon) && (move->y >= kMapHitMoveNegEpsilon) &&
-        (move->z <= kMapHitMoveEpsilon) && (move->z >= kMapHitMoveNegEpsilon)) {
+    if ((move->x <= 0.0001f) && (move->x >= -0.0001f) &&
+        (move->y <= 0.0001f) && (move->y >= -0.0001f) &&
+        (move->z <= 0.0001f) && (move->z >= -0.0001f)) {
         if (static_cast<unsigned int>(System.m_execParam) >= 2) {
             System.Printf(g_MsgFlashy);
         }
@@ -3106,7 +3105,7 @@ int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
     }
 
     g_hit_edge_idx_min = -2;
-    g_hit_t_min = kMapHitTInitial;
+    g_hit_t_min = 10.0f;
     int hit = 0;
     PSVECAdd(&cylinder->m_bottom, move, &cylinder->m_top);
 
@@ -3162,6 +3161,10 @@ void CMapMng::GetAnimRunID(int)
  */
 void CMapMng::SetViewMtx(float (*viewMtx)[4], float (*projMtx)[4])
 {
+    extern const float kMapViewScaleY;
+    extern const float kMapViewScaleXPrimary;
+    extern const float kMapViewScaleZ;
+    extern const float kMapViewScaleXSecondary;
     float* proj = reinterpret_cast<float*>(projMtx);
 
     PSMTXCopy(viewMtx, m_viewMtx);
@@ -3258,6 +3261,8 @@ void CMapMng::SetIdGrpColor(int mapIdGrpIndex, int channelIndex, _GXColor color)
 void CMapMng::SetMeshCameraSemiTransRange(unsigned short id, float nearRange, float farRange, float minAlpha,
                                           float maxAlpha, float fadeRange)
 {
+    extern const float kMapCameraSemiTransMinSentinel;
+    extern const float kMapCameraSemiTransMaxSentinel;
     int found = 0;
 
     for (int i = 0; i < m_mapObjCount; i++) {
@@ -3743,3 +3748,18 @@ void CMapMng::GetFogEnable()
 CMapMng::~CMapMng()
 {
 }
+
+extern const float kMapCameraSemiTransMinSentinel = 1.0e15f;
+extern const float kMapCameraSemiTransMaxSentinel = -1.0f;
+extern const float kMapViewScaleXPrimary = 0.73898232f;
+extern const float kMapViewScaleY = 0.88677877f;
+extern const float kMapViewScaleZ = 1.0f;
+extern const float kMapViewScaleXSecondary = 0.84455127f;
+extern const float kMapZero = 0.0f;
+extern const float kMapHitMoveEpsilon = 0.0001f;
+extern const float kMapHitMoveNegEpsilon = -0.0001f;
+extern const float kMapHitTInitial = 10.0f;
+extern const float kMapLargeDistance = 100000.0f;
+extern const float kMapFullTurnDegrees = 360.0f;
+extern const float kMapTinyEpsilon = 5.0e-6f;
+extern const float kMapHitWireZOffset = -0.1f;

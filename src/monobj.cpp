@@ -999,7 +999,7 @@ void CGMonObj::onFrameStat()
 			Vec delta;
 			PSVECSubtract(&src, &object->m_worldPosition, &delta);
 			float speedScale = *reinterpret_cast<float*>(mon + 0x690) *
-				(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4)) + 0.8f);
+				(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4)) + kMonObjEpsilon);
 			object->MoveVector(&delta, speedScale, 1, 1, 0, 1);
 		} else {
 			prgObj->changeStat(0, 0, 0);
@@ -1016,7 +1016,7 @@ void CGMonObj::onFrameStat()
 		Vec delta;
 		PSVECSubtract(&m_homePosition, &object->m_worldPosition, &delta);
 		float speedScale = *reinterpret_cast<float*>(mon + 0x690) *
-			(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4)) + 0.8f);
+			(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4)) + kMonObjEpsilon);
 		object->MoveVector(&delta, speedScale, 1, 1, 0, 1);
 		break;
 	}
@@ -1105,7 +1105,7 @@ void CGMonObj::onFrameStat()
 							object->m_rotTargetY = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]));
 						} else {
 							float speedScale = *reinterpret_cast<float*>(mon + 0x690) *
-								(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(script9b + 0xD4)) + 0.8f);
+								(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(script9b + 0xD4)) + kMonObjEpsilon);
 							CVector targetVec(reinterpret_cast<CGObject*>(Game.m_partyObjArr[m_targetPartyIndex])->m_worldPosition);
 							CVector myVec(object->m_worldPosition);
 							CVector diff;
@@ -1151,7 +1151,7 @@ void CGMonObj::onFrameStat()
 					int rand = Math.Rand(0x50);
 					float randF = Math.RandF();
 					float speedScale = *reinterpret_cast<float*>(mon + 0x690) *
-						(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle[9]) + 0xD4)) + 0.8f);
+						(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle[9]) + 0xD4)) + kMonObjEpsilon);
 					object->moveVectorRot(kMonObjTwo * (FLOAT_803319C4 * randF), 0.0f, kMonObjQuarter * speedScale, rand + 10);
 				} else {
 					unsigned char weaponFlags1 = object->m_weaponNodeFlagBytes.m_flags1;
@@ -1172,7 +1172,7 @@ void CGMonObj::onFrameStat()
 
 	case 0x1E: {
 		float speedScale = *reinterpret_cast<float*>(mon + 0x690) *
-			(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4)) + 0.8f);
+			(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4)) + kMonObjEpsilon);
 		CVector targetVec(reinterpret_cast<CGObject*>(Game.m_partyObjArr[m_targetPartyIndex])->m_worldPosition);
 		CVector myVec(object->m_worldPosition);
 		CVector diff;
@@ -1337,7 +1337,7 @@ void CGMonObj::onFrameStat()
 			*reinterpret_cast<float*>(mon + 0x694) = kMonObjDefaultScale;
 			object->m_displayFlags |= 1;
 			float speedScale = *reinterpret_cast<float*>(mon + 0x690) *
-				(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4)) + 0.8f);
+				(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4)) + kMonObjEpsilon);
 			object->moveVectorRot(object->m_rotBaseY, 0.0f, speedScale, 0x14);
 		}
 		if (prgObj->m_stateFrame == 0x10) {

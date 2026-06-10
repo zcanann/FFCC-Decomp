@@ -2239,7 +2239,8 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 		const int zWriteEnable = static_cast<int>(static_cast<u32>(mesh->m_data->m_flags & 0x60) << 25) >> 31;
 		if (lastZWrite != zWriteEnable) {
 			lastZWrite = zWriteEnable;
-			GXSetZMode((u8)1, (GXCompare)3, zWriteEnable == 0);
+			int zOff = zWriteEnable == 0;
+			GXSetZMode((u8)1, (GXCompare)3, (GXBool)zOff);
 		}
 
 		if (ModelBeforeMeshCallback(this) != 0) {

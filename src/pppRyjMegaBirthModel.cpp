@@ -971,8 +971,7 @@ join_position:
     if (params->m_directionVelocityRandom != kPppRyjMegaBirthSharedZero) {
         *f32_at(particleData, 0x80) =
             *f32_at(particleData, 0x80) +
-            (float)((double)(float)((double)kPppRyjMegaBirthModelTwoF * (double)params->m_directionVelocityRandom) * (double)Math.RandF() -
-                    (double)params->m_directionVelocityRandom);
+            (kPppRyjMegaBirthModelTwoF * params->m_directionVelocityRandom * Math.RandF() - params->m_directionVelocityRandom);
     }
 
     *f32_at(particleData, 0x88) = *(float*)(payload + 0xD0);
@@ -1002,7 +1001,7 @@ join_position:
     }
 
     if (*u16_at(params, 0x26) == 0) {
-        *s16_at(particleData, 0x30) = -1;
+        *s16_at(particleData, 0x30) = 0xFFFF;
     } else {
         *s16_at(particleData, 0x30) = *u16_at(params, 0x26);
     }

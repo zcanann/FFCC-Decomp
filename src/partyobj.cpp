@@ -5300,19 +5300,16 @@ void CGPartyObj::gpmMove()
 			moveDir.z = toLeaderV.z;
 		}
 
-		float nextSpeed = sGhostPartyWork.carrySpeed + FLOAT_80331A70;
-		float speedScale = (pressureLimit <= sGhostPartyWork.pressure) ? kMonObjOne : FLOAT_80331A88;
-		if (nextSpeed < 0.0f) {
-			sGhostPartyWork.carrySpeed = nextSpeed;
-		} else {
-			float speedLimit = speedScale * m_moveBaseSpeed * *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(Game.m_partyObjArr[0]) + 0x690);
-			sGhostPartyWork.carrySpeed = (speedLimit < nextSpeed) ? speedLimit : nextSpeed;
+		sGhostPartyWork.carryDir = *reinterpret_cast<Vec*>(&moveDir);
+		sGhostPartyWork.carrySpeed += FLOAT_80331A70;
+		float speedScale = (sGhostPartyWork.pressure >= pressureLimit) ? kMonObjOne : FLOAT_80331A88;
+		if (sGhostPartyWork.carrySpeed >= 0.0f) {
+			float speedLimit = speedScale * (m_moveBaseSpeed * *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(Game.m_partyObjArr[0]) + 0x690));
+			sGhostPartyWork.carrySpeed = (speedLimit < sGhostPartyWork.carrySpeed) ? speedLimit : sGhostPartyWork.carrySpeed;
 		}
 
-		sGhostPartyWork.carryDir = *reinterpret_cast<Vec*>(&moveDir);
-		if (sGhostPartyWork.field08 + 1 != 4) {
-			sGhostPartyWork.field08++;
-		} else {
+		sGhostPartyWork.field08++;
+		if (sGhostPartyWork.field08 == 4) {
 			sGhostPartyWork.field08 = 0;
 		}
 		return;

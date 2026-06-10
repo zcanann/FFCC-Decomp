@@ -504,15 +504,18 @@ allocDone:
 extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage, char* file, int line)
 {
 	int firstAllocFailure = 1;
-	int canRetry = 1;
+	int canRetry;
+	_pppPObjLink* allocation;
 	char denied[0x180];
 
 	ppvMemAllocErrorF = 0;
 	do
 	{
-		_pppPObjLink* allocation = (_pppPObjLink*)Memory._Alloc(allocSize, stage, file, line, 1);
-		if (allocation == 0)
+		allocation = (_pppPObjLink*)Memory._Alloc(allocSize, stage, file, line, 1);
+		if (allocation != 0)
 		{
+			goto freeDone;
+		}
 
 		if (firstAllocFailure)
 		{
@@ -620,18 +623,15 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 				}
 				obj = next;
 			}
-		}
-
-		}
-		else
-		{
-			return allocation;
+			canRetry = 1;
 		}
 	}
 	while (canRetry);
 
 	ppvMemAllocErrorF = 1;
 	return 0;
+freeDone:
+	return allocation;
 }
 #pragma pop
 

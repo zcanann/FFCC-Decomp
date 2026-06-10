@@ -2778,17 +2778,22 @@ void CMenuPcs::DrawSingWin(short mode)
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3F));
     float x1 = x0 + w - 32.0f;
     float y1 = y0 + h - 32.0f;
+    unsigned long uvFlag;
     for (int i = 0; i < 4; i++) {
-        unsigned long uvFlag = 0;
-        float x = x0;
+        uvFlag = 0;
+        float x;
         if ((i & 1) != 0) {
-            uvFlag = 8;
+            uvFlag |= 8;
             x = x1;
+        } else {
+            x = x0;
         }
-        float y = y0;
+        float y;
         if ((i & 2) != 0) {
             uvFlag |= 4;
             y = y1;
+        } else {
+            y = y0;
         }
         MenuPcs.DrawRect(uvFlag, x, y, 32.0f, 32.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     }
@@ -2796,28 +2801,29 @@ void CMenuPcs::DrawSingWin(short mode)
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x41));
     double innerW = static_cast<double>(w) - 64.0;
     float innerX = 32.0f + x0;
-    unsigned long uvFlag;
     float yy = y0;
+    float innerWf = static_cast<float>(innerW);
     for (int i = 0; i < 2; i++) {
         uvFlag = 0;
         if (i != 0) {
-            uvFlag = 4;
+            uvFlag |= 4;
             yy = y1;
         }
-        MenuPcs.DrawRect(uvFlag, innerX, yy, static_cast<float>(innerW), 32.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+        MenuPcs.DrawRect(uvFlag, innerX, yy, innerWf, 32.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     }
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x40));
     double innerH = static_cast<double>(h) - 64.0;
     float innerY = 32.0f + y0;
     float xx = x0;
+    float innerHf = static_cast<float>(innerH);
     for (int i = 0; i < 2; i++) {
         uvFlag = 0;
         if (i != 0) {
-            uvFlag = 8;
+            uvFlag |= 8;
             xx = x1;
         }
-        MenuPcs.DrawRect(uvFlag, xx, innerY, 32.0f, static_cast<float>(innerH), 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+        MenuPcs.DrawRect(uvFlag, xx, innerY, 32.0f, innerHf, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     }
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x42));

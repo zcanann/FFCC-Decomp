@@ -680,10 +680,10 @@ bool CMenuPcs::LetterOpen()
  */
 int CMenuPcs::LetterCtrl()
 {
-	int done = 0;
-	*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x32) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x30);
-	s_OpenClose = 0;
+	int done;
 	int ret = 0;
+	*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x32) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x30);
+	done = s_OpenClose = 0;
 
 	int state = GetLetterStateBase(this);
 	s16 phase = *reinterpret_cast<s16*>(state + 0x12);

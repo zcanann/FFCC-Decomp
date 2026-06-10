@@ -2066,8 +2066,9 @@ void CChara::makeFurTex()
 		                           FurColorLval(CColor(0xF0, 0xF0, 0xF0, 0)) };
 #define furBaseColor (furColors[0])
 #define furTipColor (furColors[1])
-	static CColor furNoiseBase(0, 0, 0, 0);
-	static CColor furNoiseRange(8, 8, 8, 0);
+	static CColor furNoise[2] = { FurColorLval(CColor(0, 0, 0, 0)), FurColorLval(CColor(8, 8, 8, 0)) };
+#define furNoiseBase (furNoise[0])
+#define furNoiseRange (furNoise[1])
 	static CVector velBase = CVector(kCharaFurDepthZero, FLOAT_80331160, kCharaFurDepthZero);
 	static CVector velRand = CVector(kCharaFurDepthZero, kYmEnvQuarter, kCharaFurDepthZero);
 	static CVector accelBase = CVector(kCharaFurDepthZero, kCharaFurDepthZero, kCharaFurDepthZero);
@@ -2366,6 +2367,8 @@ void CChara::makeFurTex()
 }
 #undef furBaseColor
 #undef furTipColor
+#undef furNoiseBase
+#undef furNoiseRange
 #pragma pop
 
 /*

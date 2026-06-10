@@ -90,7 +90,7 @@ void CFlatRuntime::Destroy()
 	while (object != &m_objectSentinel) {
 		CObject* const next = object->m_next;
 
-		object->m_previous->m_next = object->m_next;
+		object->m_previous->m_next = next;
 		object->m_next->m_previous = object->m_previous;
 
 		*reinterpret_cast<void**>(reinterpret_cast<u8*>(*object->m_freeListNode) + 4) = object->m_freeListNode[1];
@@ -111,7 +111,7 @@ void CFlatRuntime::Destroy()
 		delete[] reinterpret_cast<u8*>(ptr);
 	}
 
-	for (int i = 0, off = 0; i < m_funcCount; i++, off += 0x50) {
+	for (int i = 0, off = 0; i < m_funcCount; off += 0x50, i++) {
 		delete[] *reinterpret_cast<u8**>(m_funcs + off + 0x34);
 		delete[] *reinterpret_cast<u8**>(m_funcs + off + 0x3C);
 	}
@@ -121,9 +121,8 @@ void CFlatRuntime::Destroy()
 		delete[] reinterpret_cast<u8*>(ptr);
 	}
 
-	ptr = m_classes;
-	if (ptr != 0) {
-		delete[] (reinterpret_cast<u8*>(ptr) - 0x10);
+	if (m_classes != 0) {
+		delete[] m_classes;
 	}
 
 	ptr = m_strBlob;

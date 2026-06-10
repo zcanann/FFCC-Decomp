@@ -2245,51 +2245,53 @@ int CMenuPcs::LetterCtrlCur()
 		if ((hold & 0xC) != 0) {
 			*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28) ^= 1;
 			Sound.PlaySe(1, 0x40, 0x7F, 0);
+		}
+		if ((hold & 0xC) != 0) {
 			return 0;
 		}
-		if ((press & 0x100) == 0) {
-			if ((press & 0x200) == 0) {
+		if ((press & 0x100) != 0) {
+			s16 sel = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28);
+			if ((static_cast<int>(*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 9)) & (1 << (sel + 1))) != 0) {
+				if (sel == 0) {
+					int value = caravanWork->m_letters[s_SelLetter].AttachmentValue();
+					if (caravanWork->m_letters[s_SelLetter].AttachmentIsGil()) {
+						caravanWork->AddGil(value * 100);
+					} else {
+						caravanWork->AddItem(value, 0);
+					}
+					caravanWork->m_letters[s_SelLetter].SetAttachmentClaimed();
+				}
+
+				if ((CFlatLetterEventEnabled() != 0) &&
+				    caravanWork->m_letters[s_SelLetter].HasReply() &&
+				    !caravanWork->m_letters[s_SelLetter].IsReplySent()) {
+					*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 8) = 1;
+				} else {
+					*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 8) = -1;
+				}
+				*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) + 1;
+				m_menuWindowInfo->state = 2;
+				Sound.PlaySe(2, 0x40, 0x7F, 0);
 				return 0;
 			}
-			CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[s_SelLetter];
-			if ((CFlatLetterEventEnabled() == 0) || !letter->HasReply() ||
-			    letter->IsReplySent()) {
-				*reinterpret_cast<u8*>(GetLetterStateBase(this) + 8) = 0xFF;
-			} else {
-				*reinterpret_cast<u8*>(GetLetterStateBase(this) + 8) = 1;
-			}
-			*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) + 1;
-			m_menuWindowInfo->state = 2;
-			Sound.PlaySe(3, 0x40, 0x7F, 0);
+
+			Sound.PlaySe(4, 0x40, 0x7F, 0);
 			return 0;
 		}
 
-		s16 sel = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28);
-		if ((static_cast<int>(static_cast<unsigned char>(*reinterpret_cast<char*>(GetLetterStateBase(this) + 9))) & (1 << (sel + 1))) != 0) {
-			CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[s_SelLetter];
-			if (sel == 0) {
-				unsigned int value = letter->AttachmentValue();
-				if (!letter->AttachmentIsGil()) {
-					caravanWork->AddItem(static_cast<short>(value), 0);
-				} else {
-					caravanWork->AddGil(static_cast<int>(value * 100));
-				}
-				letter->SetAttachmentClaimed();
-			}
-
-			if ((CFlatLetterEventEnabled() == 0) || !letter->HasReply() ||
-			    letter->IsReplySent()) {
-				*reinterpret_cast<u8*>(GetLetterStateBase(this) + 8) = 0xFF;
-			} else {
-				*reinterpret_cast<u8*>(GetLetterStateBase(this) + 8) = 1;
-			}
-			*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<u16*>(GetLetterStateBase(this) + 0x12) + 1;
-			m_menuWindowInfo->state = 2;
-			Sound.PlaySe(2, 0x40, 0x7F, 0);
+		if ((press & 0x200) == 0) {
 			return 0;
 		}
-
-		Sound.PlaySe(4, 0x40, 0x7F, 0);
+		if ((CFlatLetterEventEnabled() != 0) &&
+		    caravanWork->m_letters[s_SelLetter].HasReply() &&
+		    !caravanWork->m_letters[s_SelLetter].IsReplySent()) {
+			*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 8) = 1;
+		} else {
+			*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 8) = -1;
+		}
+		*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) + 1;
+		m_menuWindowInfo->state = 2;
+		Sound.PlaySe(3, 0x40, 0x7F, 0);
 		return 0;
 	}
 

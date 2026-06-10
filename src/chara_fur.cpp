@@ -1829,6 +1829,8 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 			}
 
 			if (prevExtraTexture != hasExtraTexture || prevExtraTextureFormat != extraTextureFormat) {
+				prevExtraTexture = hasExtraTexture;
+				prevExtraTextureFormat = extraTextureFormat;
 				GXSetTevDirect(GX_TEVSTAGE0);
 				_GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 				_GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASC, GX_CC_ZERO);
@@ -1896,8 +1898,10 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 					GXSetTexCoordGen2(GX_TEXCOORD2, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, GX_PTIDENTITY);
 				}
 				GXSetNumTevStages(static_cast<u8>(tevStageCount));
-				prevExtraTexture = hasExtraTexture;
-				prevExtraTextureFormat = extraTextureFormat;
+			}
+
+			if ((reinterpret_cast<const unsigned char*>(displayList->m_data)[0] & 7) != 0) {
+				continue;
 			}
 
 			for (unsigned int layer = 0; layer < 8; layer++) {

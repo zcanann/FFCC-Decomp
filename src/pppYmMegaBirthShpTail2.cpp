@@ -762,9 +762,10 @@ path:
 
                     if (pathBase != 0) {
                         u16 sampleIndex = (u16)work->m_pathIndex;
+                        u16* indices = (u16*)*(int*)(pathInfo + 2);
                         work->m_pathIndex = sampleIndex + 1;
 
-                        float* pathVec = (float*)((u8*)pathBase + *(u16*)(*(int*)(pathInfo + 2) + sampleIndex * 2) * sizeof(Vec));
+                        float* pathVec = (float*)((u8*)pathBase + indices[sampleIndex] * sizeof(Vec));
                         vx = pathVec[0];
                         vy = pathVec[1];
                         vz = pathVec[2];

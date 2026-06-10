@@ -4717,6 +4717,7 @@ void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 	int& activeTrailCount = *reinterpret_cast<int*>(countBase + 0x48);
 
 	if (activeTrailCount == 0) {
+	reset:
 		activeTrailCount = 0;
 		outVec->x = m_partyDelta[0].x;
 		outVec->y = m_partyDelta[0].y;
@@ -4767,18 +4768,7 @@ void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 
 	outDist = (outDist < flatLen) ? outDist : flatLen;
 	if (outDist > DOUBLE_80331AA8) {
-		activeTrailCount = 0;
-		outVec->x = m_partyDelta[0].x;
-		outVec->y = m_partyDelta[0].y;
-		outVec->z = m_partyDelta[0].z;
-		outVec->y = FLOAT_80331a78;
-
-		outDist = PSVECMag(outVec);
-		float maxDist = m_partyDistance[0];
-		if (outDist < maxDist) {
-			maxDist = outDist;
-		}
-		outDist = maxDist;
+		goto reset;
 	}
 }
 

@@ -1332,6 +1332,7 @@ void CMemoryCardMan::SetLoadData()
         i = count;
         if (i < 64)
         {
+            int trip = 64 - i;
             do
             {
                 if (*reinterpret_cast<s16*>(src + 0x3C + i * 2) != -1)
@@ -1339,7 +1340,7 @@ void CMemoryCardMan::SetLoadData()
                     count++;
                 }
                 i++;
-            } while (i < 64);
+            } while (--trip != 0);
         }
         if (count != *reinterpret_cast<u16*>(src + 0x28))
         {

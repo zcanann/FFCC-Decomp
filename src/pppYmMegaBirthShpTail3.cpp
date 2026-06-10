@@ -116,7 +116,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                 const float alphaScale = (float)*(u16*)((u8*)colorWork + 6) / LoadFloat(kPppYmMegaBirthShpTail3AlphaDivisor);
                 const float stepDivisor = (float)((u32)frameCountRaw - 1);
                 float fadeA = (float)(*(s16*)(workBytes + 0x56) >> 7) * alphaScale;
-                float fadeR = (float)(*(u16*)(workBytes + 0x50) >> 7);
+                float fadeR = (float)(*(s16*)(workBytes + 0x50) >> 7);
                 float fadeG = (float)(*(s16*)(workBytes + 0x52) >> 7);
                 float fadeB = (float)(*(s16*)(workBytes + 0x54) >> 7);
                 float fadeRStep = kPppYmMegaBirthShpTail3Zero;
@@ -302,7 +302,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
         if (colors != 0) {
             colors = colors + 1;
         }
-        *(u16*)(particle + 0x1C) += *(s16*)(step + 0xA);
+        *(u16*)(particle + 0x1C) += *(s32*)(step + 0x8);
     }
 }
 #pragma pop

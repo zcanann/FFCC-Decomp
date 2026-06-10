@@ -3635,17 +3635,16 @@ void CGCharaObj::combi2()
 		}
 	}
 
-	for (int i = 1; i < candidateCount; ) {
-		if (kQuadObjDebugHeight < PSVECDistance(&CharaObjComboCenter(candidates[0]), &CharaObjComboCenter(candidates[i]))) {
-			CGPartyObj** shiftCursor = &candidates[i];
+	for (int i = 1; i < candidateCount; i++) {
+		CGPartyObj** slot = &candidates[i];
+		if (kQuadObjDebugHeight < PSVECDistance(&CharaObjComboCenter(candidates[0]), &CharaObjComboCenter(*slot))) {
 			for (int remaining = (candidateCount - 1) - i; remaining != 0; remaining--) {
-				shiftCursor[0] = shiftCursor[1];
-				shiftCursor++;
+				slot[0] = slot[1];
+				slot++;
 			}
 			candidateCount--;
-			continue;
+			i--;
 		}
-		i++;
 	}
 
 	if (candidates[0]->m_comboFrame == 0) {

@@ -1311,8 +1311,8 @@ void CMemoryCardMan::SetLoadData()
     Game.m_gameWork.m_mcHasSerial = save[0x13DC];
     Sound.SetBgmMasterVolume(static_cast<s8>(save[0x13DD]));
     Sound.SetSeMasterVolume(static_cast<s8>(save[0x13DE]));
-    u32 soundMode = static_cast<u32>(__cntlzw(Sound.GetSoundMode()));
-    Sound.SetStereo(soundMode >> 5);
+    u32 soundMode = static_cast<u32>(__cntlzw(Sound.GetSoundMode())) >> 5;
+    Sound.SetStereo(soundMode);
 
     CGame::CGameWork* gameWork = &Game.m_gameWork;
     gameWork->m_gameInitFlag = MakeLoadBool(static_cast<s8>(save[0x13E0]));

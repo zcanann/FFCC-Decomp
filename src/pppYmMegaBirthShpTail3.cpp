@@ -682,7 +682,7 @@ scalar:
             }
 
             Vec velocity = *reinterpret_cast<Vec*>(particleData->m_matrix[1]);
-            pppScaleVectorXYZ(*reinterpret_cast<Vec*>(particleData->m_matrix[1]), velocity, scale);
+            pppScaleVectorXYZ(*reinterpret_cast<Vec*>(particleData->m_matrix[0]), velocity, scale);
         }
         goto done;
     }

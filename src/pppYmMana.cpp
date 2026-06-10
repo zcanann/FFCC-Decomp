@@ -318,12 +318,14 @@ void Chara_DrawShadowMeshDLCallback(CChara::CModel* model, void* work, void* vYm
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_propagation off
 void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int partIndex, int dlIndex, float (*mtx)[4])
 {
     CChara::CMesh::CRefData* mesh = model->m_meshes[partIndex].m_data;
-    CChara::CMesh::CDisplayList* displayList = &mesh->m_displayLists[dlIndex];
     VYmMana* mana = static_cast<VYmMana*>(work);
     pppYmManaStep* stepData = static_cast<pppYmManaStep*>(step);
+    CChara::CMesh::CDisplayList* displayList = &mesh->m_displayLists[dlIndex];
     int type = stepData->m_type;
     CGObject* object = mana->m_object;
     int draw = 0;
@@ -391,7 +393,31 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
                 GXSetArray((GXAttr)0xB, mana->m_meshColors, 4);
                 GXSetArray((GXAttr)0xD, mana->m_meshTexCoords0, 4);
                 GXSetArray((GXAttr)0xE, mana->m_meshTexCoords1, 4);
-                MaterialMan.SetManaReflectionEnv(mana->m_meshReflectionVec, mana->m_generatedTexObj0, mana->m_generatedTexObj1, 0xAEE0F);
+                u8* materialMan = reinterpret_cast<u8*>(&MaterialMan);
+                u32 tevBit = 0xACE0F;
+                Vec* reflVec = mana->m_meshReflectionVec;
+                *reinterpret_cast<u32*>(materialMan + 0x48) = tevBit;
+                *reinterpret_cast<u32*>(materialMan + 0x128) = 0;
+                *reinterpret_cast<u32*>(materialMan + 0x12C) = 0x1E;
+                *reinterpret_cast<u32*>(materialMan + 0x130) = 0;
+                *reinterpret_cast<Vec**>(materialMan + 0x8) = reflVec;
+                *reinterpret_cast<u32*>(materialMan + 0x44) = 0xFFFFFFFF;
+                *reinterpret_cast<u8*>(materialMan + 0x4C) = 0xFF;
+                *reinterpret_cast<u32*>(materialMan + 0x11C) = 0;
+                *reinterpret_cast<u32*>(materialMan + 0x120) = 0x1E;
+                *reinterpret_cast<u32*>(materialMan + 0x124) = 0;
+                *reinterpret_cast<u8*>(materialMan + 0x205) = 0xFF;
+                *reinterpret_cast<u8*>(materialMan + 0x206) = 0xFF;
+                *reinterpret_cast<u32*>(materialMan + 0x58) = 0;
+                *reinterpret_cast<u32*>(materialMan + 0x5C) = 0;
+                *reinterpret_cast<u8*>(materialMan + 0x208) = 0;
+                *reinterpret_cast<u32*>(materialMan + 0x48) = tevBit | 0x2000;
+                *reinterpret_cast<u32*>(materialMan + 0x128) = 0;
+                *reinterpret_cast<u32*>(materialMan + 0x12C) = 0x1E;
+                *reinterpret_cast<u32*>(materialMan + 0x130) = 0;
+                *reinterpret_cast<u32*>(materialMan + 0x40) = tevBit | 0x2000;
+                *reinterpret_cast<_GXTexObj**>(materialMan + 0xD0) = mana->m_generatedTexObj0;
+                *reinterpret_cast<_GXTexObj**>(materialMan + 0xDC) = mana->m_generatedTexObj1;
                 GXSetCullMode((GXCullMode)1);
                 GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
                 MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
@@ -440,6 +466,7 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
     _GXSetBlendMode(GX_BM_NONE, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_SET);
     GXCallDisplayList(displayList->m_data, displayList->m_size);
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -701,11 +728,11 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
     CChara::CMesh* mesh;
     CCharaPcs::CHandle* handle;
     CChara::CModel* model;
+    u8* setupArea;
     CGObject* gObject;
     s32 i;
     u32 meshIndex;
     u32 vertexIndex;
-    u8* setupArea;
 
     if (ppvUserStopPartF != 0) {
         return;
@@ -732,11 +759,12 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
 
     SetManaModelCallbacks(model, mana, param_2);
 
-    MaterialMan.SetManaAlpha((u8)((float)*(setupArea + 0xB) * gObject->m_lookAtTimer));
+    u8 manaAlpha = (u8)((float)*(setupArea + 0xB) * gObject->m_lookAtTimer);
     if (Game.m_currentMapId == 0x21) {
-        MaterialMan.SetManaAlpha((u8)(gObject->m_lookAtTimer * (float)*(setupArea + 0xB)));
+        manaAlpha = (u8)(gObject->m_lookAtTimer * (float)*(setupArea + 0xB));
     }
-    mana->m_manaAlpha = MaterialMan.GetManaAlpha();
+    MaterialMan.SetManaAlpha(manaAlpha);
+    mana->m_manaAlpha = manaAlpha;
 
     if (reinterpret_cast<_pppPObject*>(pppYmMana)->m_graphId != 0) {
         return;
@@ -873,15 +901,14 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
                                 const_cast<char*>(s_pppYmMana_cpp), 0x407));
                 CChara::CMesh::CDisplayList* displayList = meshShape->m_displayLists;
                 for (s32 dlIndex = meshShape->m_displayListCount - 1; dlIndex >= 0; dlIndex--) {
-                    void* copiedDisplayList =
+                    mana->m_displayListCopies[dlIndex] =
                         pppMemAlloc(displayList->m_size, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x411);
-                    copiedDisplayList =
-                        reinterpret_cast<void*>((reinterpret_cast<u32>(copiedDisplayList) + 0x1F) & 0xFFFFFFE0);
-                    mana->m_displayListCopies[dlIndex] = copiedDisplayList;
+                    mana->m_displayListCopies[dlIndex] = reinterpret_cast<void*>(
+                        (reinterpret_cast<u32>(mana->m_displayListCopies[dlIndex]) + 0x1F) & 0xFFFFFFE0);
                     mana->m_displayListSize = displayList->m_size;
-                    memcpy(copiedDisplayList, displayList->m_data, displayList->m_size);
-                    DCFlushRange(copiedDisplayList, displayList->m_size);
-                    gUtil.ReWriteDisplayList(copiedDisplayList, displayList->m_size, 3);
+                    memcpy(mana->m_displayListCopies[dlIndex], displayList->m_data, displayList->m_size);
+                    DCFlushRange(mana->m_displayListCopies[dlIndex], displayList->m_size);
+                    gUtil.ReWriteDisplayList(mana->m_displayListCopies[dlIndex], displayList->m_size, 3);
                     displayList++;
                 }
             }
@@ -976,16 +1003,24 @@ void pppRenderYmMana(PYmMana*, pppYmManaStep*, _pppCtrlTable*)
  * JP Address: TODO
  * JP Size: TODO
  */
+struct YmManaWeaponFlagByte {
+    s8 m_pad : 7;
+    s8 m_lockFlag : 1;
+};
+
 void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (*)[4], int pass)
 {
     VYmMana* mana = static_cast<VYmMana*>(workPtr);
     pppYmManaStep* stepData = static_cast<pppYmManaStep*>(step);
-    Mtx identityMtx;
-    Mtx savedCameraMtx;
-    Mtx lookAtMtx;
     Mtx44 savedScreenMtx;
+    Mtx savedCameraMtx;
+    Mtx identityMtx;
+    Mtx lookAtMtx;
     Mtx44 projectionMtx;
-    _GXTexObj sceneTexObj;
+    union {
+        _GXTexObj sceneTexObj;
+        double sceneTexObjAlign;
+    };
     Vec centerPos;
     Vec cameraPos;
     Vec cameraUp;
@@ -996,7 +1031,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     u32 texBufferStride;
     GXTexObj* sourceTexObjs;
     GXTexObj* captureTexObjs;
-    GXTexObj* targetTexObj;
+    CTexture* targetTexObj;
     s32 i;
     f32 savedViewport[6];
 
@@ -1017,8 +1052,9 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     PSMTXIdentity(identityMtx);
     PSMTXCopy(CameraMatrix(), savedCameraMtx);
     PSMTX44Copy(CameraScreenMatrix(), savedScreenMtx);
-    Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &sceneTexObj, (int)LoadFloat(kPppYmMoveParabolaZero),
-                               (int)LoadFloat(kPppYmMoveParabolaZero), 0x80, 0x80, 0, GX_NEAR, GX_TF_RGBA8, 0);
+    int zeroInt = (int)LoadFloat(kPppYmMoveParabolaZero);
+    Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &sceneTexObj, zeroInt,
+                               zeroInt, 0x80, 0x80, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
     gObject = mana->m_object;
     if (gObject == NULL) {
@@ -1042,12 +1078,16 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     captureTexObjs = mana->m_captureTexObjs;
 
     if (stepData->m_map21Flag != 0) {
-        char* compareName = Game.m_currentScriptName;
         C_MTXPerspective(projectionMtx, LoadFloat(kYmManaCaptureFovY), LoadFloat(kYmManaOne), LoadFloat(kYmManaOne),
                          LoadFloat(kYmManaCaptureFarClip));
         GXSetProjection(projectionMtx, (_GXProjectionType)0);
+        GXTexObj* sourceIter = sourceTexObjs;
+        char* compareName = Game.m_currentScriptName;
+        GXTexObj* captureIter = captureTexObjs;
+        i = 0;
+        u32 scissorZero = (u32)LoadFloat(kPppYmMoveParabolaZero);
 
-        for (i = 0; i < 6; i++) {
+        for (; i < 6; i++) {
             cameraPos = centerPos;
             cameraUp.x = LoadFloat(kPppYmMoveParabolaZero);
             cameraUp.y = LoadFloat(kYmManaOne);
@@ -1064,9 +1104,11 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
                 } else if (i == 3) {
                     cameraPos.x -= LoadFloat(kYmManaOne);
                 }
-            }
-
-            if (nameCompare != 0 || i == 4 || i == 5) {
+                if (i == 4 || i == 5) {
+                    goto runCaptureSwitch;
+                }
+            } else {
+            runCaptureSwitch:
                 switch (i) {
                 case 0:
                     cameraPos.x += LoadFloat(kYmManaOne);
@@ -1080,31 +1122,33 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
                 case 3:
                     cameraPos.z -= LoadFloat(kYmManaOne);
                     break;
-                case 5:
-                    cameraPos.y -= LoadFloat(kYmManaOne);
-                    cameraUp.y = LoadFloat(kPppYmMoveParabolaZero);
-                    cameraUp.z = LoadFloat(kPppYmMoveParabolaZero);
-                    break;
                 case 4:
                     cameraPos.y += LoadFloat(kYmManaOne);
+                    cameraUp.x = LoadFloat(kPppYmMoveParabolaZero);
                     cameraUp.y = LoadFloat(kPppYmMoveParabolaZero);
                     cameraUp.z = LoadFloat(kYmManaNegOne);
+                    break;
+                case 5:
+                    cameraPos.y -= LoadFloat(kYmManaOne);
+                    cameraUp.z = LoadFloat(kYmManaOne);
+                    cameraUp.x = LoadFloat(kPppYmMoveParabolaZero);
+                    cameraUp.y = LoadFloat(kPppYmMoveParabolaZero);
                     break;
                 }
             }
 
             C_MTXLookAt(lookAtMtx, (Point3d*)&centerPos, &cameraUp, (Point3d*)&cameraPos);
             Graphic.SetViewport();
-            GXSetScissor((u32)LoadFloat(kPppYmMoveParabolaZero), (u32)LoadFloat(kPppYmMoveParabolaZero), 0x80, 0x80);
+            GXSetScissor(scissorZero, scissorZero, 0x80, 0x80);
             gUtil.RenderTextureQuad(kPppYmMoveParabolaZero, kPppYmMoveParabolaZero, kYmManaCaptureTextureSize, kYmManaCaptureTextureSize,
-                                    sourceTexObjs, 0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
+                                    sourceIter, 0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
 
             GXSetViewport(kPppYmMoveParabolaZero, kPppYmMoveParabolaZero, kYmManaCaptureTextureSize, kYmManaCaptureTextureSize, kPppYmMoveParabolaZero, kYmManaOne);
-            GXSetScissor((u32)LoadFloat(kPppYmMoveParabolaZero), (u32)LoadFloat(kPppYmMoveParabolaZero), 0x80, 0x80);
+            GXSetScissor(scissorZero, scissorZero, 0x80, 0x80);
             PSMTXCopy(lookAtMtx, CameraMatrix());
             GXSetProjection(projectionMtx, (_GXProjectionType)0);
 
-            if (((gObject->m_weaponNodeFlags & 1) != 0 || gObject->m_attachOwner != NULL) &&
+            if ((reinterpret_cast<YmManaWeaponFlagByte*>(&gObject->m_weaponNodeFlags)->m_lockFlag != 0 || gObject->m_attachOwner != NULL) &&
                 gObject->m_attachOwner->m_charaModelHandle != NULL) {
                 CCharaPcs::CHandle* owner = gObject->m_attachOwner->m_charaModelHandle;
                 CChara::CModel* ownerModel = owner->m_model;
@@ -1119,11 +1163,11 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
                 owner->m_model->m_drawShadowMeshDLCallback = 0;
             }
 
-            Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, captureTexObjs, 0, 0, 0x80, 0x80,
+            Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, captureIter, zeroInt, zeroInt, 0x80, 0x80,
                                        depthTexSize, GX_LINEAR, GX_TF_RGB565, 0);
             depthTexSize += texBufferStride;
-            sourceTexObjs++;
-            captureTexObjs++;
+            sourceIter++;
+            captureIter++;
         }
 
         PSMTXCopy(savedCameraMtx, CameraMatrix());
@@ -1137,16 +1181,16 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
         mana->m_paraboloidReady = 1;
     }
 
-    targetTexObj = &mana->m_envTexture0->m_texObj;
+    targetTexObj = mana->m_envTexture0;
     if (stepData->m_map21Flag != 0) {
         GXInitTexObj(mana->m_generatedTexObj0, mana->m_generatedTexture0, 0x80, 0x80, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
         GXInitTexObjLOD(mana->m_generatedTexObj0, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
         GXInitTexObj(mana->m_generatedTexObj1, mana->m_generatedTexture1, 0x80, 0x80, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
         GXInitTexObjLOD(mana->m_generatedTexObj1, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
-        drawParaboloidMap(mana->m_captureTexObjs, mana->m_generatedTexObj1, mana->m_paraboloidMap, mana->m_paraboloidMapSize,
-                          targetTexObj, 1);
-        drawParaboloidMap(mana->m_captureTexObjs, mana->m_generatedTexObj0, mana->m_paraboloidMap, mana->m_paraboloidMapSize,
-                          targetTexObj, 0);
+        drawParaboloidMap(captureTexObjs, mana->m_generatedTexObj1, mana->m_paraboloidMap, mana->m_paraboloidMapSize,
+                          &targetTexObj->m_texObj, 1);
+        drawParaboloidMap(captureTexObjs, mana->m_generatedTexObj0, mana->m_paraboloidMap, mana->m_paraboloidMapSize,
+                          &targetTexObj->m_texObj, 0);
         Graphic.SetViewport();
         GXSetProjection(savedScreenMtx, (_GXProjectionType)0);
         PSMTXCopy(savedCameraMtx, CameraMatrix());
@@ -1156,10 +1200,10 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
         if (mana->m_paraboloidReady == 0) {
             GXInitTexObj(mana->m_generatedTexObj0, mana->m_generatedTexture0, 0x80, 0x80, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
             GXInitTexObj(mana->m_generatedTexObj1, mana->m_generatedTexture1, 0x80, 0x80, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
-            drawParaboloidMap(mana->m_baseParaboloidTexObjs, mana->m_generatedTexObj1, mana->m_paraboloidMap,
-                              mana->m_paraboloidMapSize, targetTexObj, 1);
-            drawParaboloidMap(mana->m_baseParaboloidTexObjs, mana->m_generatedTexObj0, mana->m_paraboloidMap,
-                              mana->m_paraboloidMapSize, targetTexObj, 0);
+            drawParaboloidMap(sourceTexObjs, mana->m_generatedTexObj1, mana->m_paraboloidMap,
+                              mana->m_paraboloidMapSize, &targetTexObj->m_texObj, 1);
+            drawParaboloidMap(sourceTexObjs, mana->m_generatedTexObj0, mana->m_paraboloidMap,
+                              mana->m_paraboloidMapSize, &targetTexObj->m_texObj, 0);
             gUtil.RenderTextureQuad(kPppYmMoveParabolaZero, kPppYmMoveParabolaZero, kYmManaCaptureTextureSize, kYmManaCaptureTextureSize, &sceneTexObj,
                                     0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
             mana->m_paraboloidReady = 1;
@@ -1191,18 +1235,19 @@ static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, u
 {
     float zero;
     float normalY;
-    float radius;
-    float uvStep;
     float x;
     float z;
+    float step;
+    float radius;
+    float uvStep;
     int indexOffset;
     int quadIndex;
     int rowBase;
     float* positions;
-    int rowCount;
     float* normals;
     float* uvs;
     int colCount;
+    int rowCount;
     int pairCount;
 
     normalY = LoadFloat(kYmManaOne);
@@ -1210,12 +1255,13 @@ static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, u
     rowCount = 0;
     uvStep = LoadFloat(kYmManaWaterUvStep);
     radius = size * LoadFloat(kYmManaHalf);
-    for (z = radius; z >= -radius; z -= size * uvStep) {
+    step = size * uvStep;
+    for (z = radius; z >= -radius; z -= step) {
         colCount = 0;
         positions = reinterpret_cast<float*>(positionsInOut);
         normals = reinterpret_cast<float*>(normalsOut);
         uvs = reinterpret_cast<float*>(uvOut);
-        for (x = -radius; x <= radius; x += size * uvStep) {
+        for (x = -radius; x <= radius; x += step) {
             *positions = x;
             positionsInOut = reinterpret_cast<Vec*>(positions + 3);
             positions[1] = zero;
@@ -1735,11 +1781,11 @@ void CalcReflectionVector2(
         int i;
         u32 fmt = drawFmt & 7;
 
+        dl = (u16*)((u8*)dl + 3);
         if (gUtil.IsHasDrawFmtDL(drawFmt) == 0) {
             break;
         }
 
-        dl = (u16*)((u8*)dl + 3);
         for (i = 0; i < itemCount; i++) {
             u16 posIndex = dl[0];
             u16 normalIndex = dl[1];

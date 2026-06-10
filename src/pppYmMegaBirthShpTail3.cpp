@@ -68,6 +68,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
     YmMegaBirthShpTail3DataOffsets* serializedOffsets = offsets->m_serializedDataOffsets;
     const s32 colorOffset = serializedOffsets->m_colorOffset;
     const s32 particleDataOffset = serializedOffsets->m_workOffset;
+    s32 trailReadIndex;
     u8* workBytes = object->m_workArea + particleDataOffset;
     VColor* colorWork = (VColor*)(object->m_workArea + colorOffset);
     u8* particle = *(u8**)(workBytes + 0x3c);
@@ -112,10 +113,9 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                 tagOAN3_SHAPE* shape;
                 u32 particleShapeFrame;
                 u32 shapeFrameStep;
-                u32 workRand;
-                u32 shapeFrameCount;
                 const float alphaScale = (float)*(s16*)((u8*)colorWork + 6) / LoadFloat(kPppYmMegaBirthShpTail3AlphaDivisor);
                 const float stepDivisor = (float)(s32)(frameCountRaw - 1);
+                s32 trailNextIndex;
                 const s32 trailMaxIndex = *(u8*)(particle + 0x37) - 1;
                 float fadeR = (float)(*(s16*)(workBytes + 0x50) >> 7);
                 float fadeG = (float)(*(s16*)(workBytes + 0x52) >> 7);
@@ -123,7 +123,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                 float fadeA = (float)(*(s16*)(workBytes + 0x56) >> 7) * alphaScale;
                 const float fadeAEnd = (float)(*(s16*)(workBytes + 0x5e) >> 7) * alphaScale;
                 const float fadeANum = fadeA - fadeAEnd;
-                const s32 trailReadIndex = *(u8*)(particle + 0x38);
+                trailReadIndex = *(u8*)(particle + 0x38);
                 const float fadeRNum = fadeR - (float)(*(s16*)(workBytes + 0x58) >> 7);
                 const float fadeGNum = fadeG - (float)(*(s16*)(workBytes + 0x5a) >> 7);
                 const float fadeBNum = fadeB - (float)(*(s16*)(workBytes + 0x5c) >> 7);
@@ -139,10 +139,12 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                     fadeAStep = fadeANum / stepDivisor;
                 }
                 float drawScale = *(float*)(payload + 0x5C);
-                s32 trailNextIndex = trailReadIndex + 1;
+                trailNextIndex = trailReadIndex + 1;
                 const float drawScaleStep =
                     (drawScale - *(float*)(payload + 0x60)) / stepDivisor;
                 Vec* history = (Vec*)(particle + 0x80);
+                u32 workRand;
+                u32 shapeFrameCount;
                 float trailX, trailY, trailZ;
                 float startX, startY, startZ;
                 float camX, camY, camZ;

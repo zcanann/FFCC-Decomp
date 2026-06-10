@@ -309,31 +309,32 @@ void CMenuPcs::LetterInit1()
 		--iVar5;
 	} while (iVar5 != 0);
 
-	iVar4 = GetLetterAnimBase(this);
-	*reinterpret_cast<int*>(iVar4 + 0x24) = 0x5F;
-	*reinterpret_cast<s16*>(iVar4 + 0xC) = 0x238;
-	*reinterpret_cast<s16*>(iVar4 + 0xE) = 0x178;
+	int n = 0;
+	s16* p = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n++]);
+	*reinterpret_cast<int*>(p + 0xE) = 0x5F;
+	p[2] = 0x238;
+	p[3] = 0x178;
 	double scale = DOUBLE_803330a8;
-	*reinterpret_cast<s16*>(iVar4 + 8) = static_cast<s16>((0x280 - *reinterpret_cast<s16*>(iVar4 + 0xC)) * scale);
-	*reinterpret_cast<s16*>(iVar4 + 0xA) = static_cast<s16>((0x1C0 - *reinterpret_cast<s16*>(iVar4 + 0xE)) * scale);
+	p[0] = static_cast<s16>((0x280 - p[2]) * scale);
+	p[1] = static_cast<s16>((0x1C0 - p[3]) * scale);
 	fVar1 = FLOAT_803330bc;
-	*reinterpret_cast<float*>(iVar4 + 0x10) = fVar1;
-	*reinterpret_cast<float*>(iVar4 + 0x14) = fVar1;
-	*reinterpret_cast<int*>(iVar4 + 0x2C) = 0;
-	*reinterpret_cast<int*>(iVar4 + 0x30) = 10;
+	*reinterpret_cast<float*>(p + 8) = fVar1;
+	*reinterpret_cast<float*>(p + 0xA) = fVar1;
+	*reinterpret_cast<int*>(p + 0x12) = 0;
+	*reinterpret_cast<int*>(p + 0x14) = 10;
 
-	iVar4 = GetLetterAnimBase(this);
-	*reinterpret_cast<int*>(iVar4 + 0x64) = 0x3E;
-	*reinterpret_cast<s16*>(iVar4 + 0x4C) = 0xA8;
-	*reinterpret_cast<s16*>(iVar4 + 0x4E) = 0x60;
-	*reinterpret_cast<s16*>(iVar4 + 0x48) = 0x20;
-	*reinterpret_cast<s16*>(iVar4 + 0x4A) = static_cast<s16>(0x1A0 - *reinterpret_cast<s16*>(iVar4 + 0x4E));
-	*reinterpret_cast<float*>(iVar4 + 0x50) = fVar1;
-	*reinterpret_cast<float*>(iVar4 + 0x54) = fVar1;
-	*reinterpret_cast<int*>(iVar4 + 0x6C) = 0;
-	*reinterpret_cast<int*>(iVar4 + 0x70) = 10;
+	p = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n++]);
+	*reinterpret_cast<int*>(p + 0xE) = 0x3E;
+	p[2] = 0xA8;
+	p[3] = 0x60;
+	p[0] = 0x20;
+	p[1] = static_cast<s16>(0x1A0 - p[3]);
+	*reinterpret_cast<float*>(p + 8) = fVar1;
+	*reinterpret_cast<float*>(p + 0xA) = fVar1;
+	*reinterpret_cast<int*>(p + 0x12) = 0;
+	*reinterpret_cast<int*>(p + 0x14) = 10;
 
-	GetLetterAnimStorage(this)->count = 2;
+	GetLetterAnimStorage(this)->count = static_cast<s16>(n);
 	m_singMenuState->frame = 0;
 	m_singMenuState->initialized = 1;
 }
@@ -545,7 +546,7 @@ inline void CMenuPcs::LetterInit4()
 bool CMenuPcs::LetterOpen()
 {
 	int iVar4;
-	unsigned int iVar5;
+	int iVar5;
 	int iVar6;
 	int iVar8;
 	float fVar1;
@@ -556,6 +557,7 @@ bool CMenuPcs::LetterOpen()
 		memset(GetLetterAnimStorage(this), 0, sizeof(*GetLetterAnimStorage(this)));
 		fVar1 = FLOAT_803330f8;
 		iVar4 = GetLetterAnimBase(this) + 8;
+		int dur = 10;
 		iVar8 = 8;
 		do {
 			*reinterpret_cast<float*>(iVar4 + 0x14) = fVar1;
@@ -569,19 +571,20 @@ bool CMenuPcs::LetterOpen()
 			iVar4 += 0x200;
 			--iVar8;
 		} while (iVar8 != 0);
-		iVar4 = GetLetterAnimBase(this);
-		*reinterpret_cast<int*>(iVar4 + 0x24) = 0;
-		*reinterpret_cast<int*>(iVar4 + 0x2C) = 0;
-		*reinterpret_cast<int*>(iVar4 + 0x30) = 10;
-		iVar4 = GetLetterAnimBase(this);
-		*reinterpret_cast<int*>(iVar4 + 0x64) = 0;
-		*reinterpret_cast<unsigned int*>(iVar4 + 0x6C) =
-			~(((-static_cast<int>(static_cast<char>(m_singleMenuCtrlResetFlag)) |
-				static_cast<int>(static_cast<char>(m_singleMenuCtrlResetFlag))) >>
-			   31)) &
-			10;
-		*reinterpret_cast<int*>(iVar4 + 0x70) = 10;
-		GetLetterAnimStorage(this)->count = 2;
+		int n = 0;
+		s16* p = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n++]);
+		*reinterpret_cast<int*>(p + 0xE) = 0;
+		*reinterpret_cast<int*>(p + 0x12) = 0;
+		*reinterpret_cast<int*>(p + 0x14) = dur;
+		p = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n++]);
+		*reinterpret_cast<int*>(p + 0xE) = 0;
+		*reinterpret_cast<unsigned int*>(p + 0x12) =
+			dur &
+			~((-static_cast<int>(static_cast<char>(m_singleMenuCtrlResetFlag)) |
+			   static_cast<int>(static_cast<char>(m_singleMenuCtrlResetFlag))) >>
+			  31);
+		*reinterpret_cast<int*>(p + 0x14) = dur;
+		GetLetterAnimStorage(this)->count = static_cast<s16>(n);
 		m_singMenuState->frame = 0;
 		m_singMenuState->initialized = 1;
 		iVar4 = SingGetLetterAttachflg();
@@ -602,11 +605,12 @@ bool CMenuPcs::LetterOpen()
 				iVar4 += 0x200;
 				--iVar8;
 			} while (iVar8 != 0);
-			iVar4 = GetLetterAnimBase(this);
-			*reinterpret_cast<int*>(iVar4 + 0x24) = 0;
-			*reinterpret_cast<int*>(iVar4 + 0x2C) = 0;
-			*reinterpret_cast<int*>(iVar4 + 0x30) = 10;
-			GetLetterAnimStorage(this)->count = 1;
+			int n2 = 0;
+			s16* p2 = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n2++]);
+			*reinterpret_cast<int*>(p2 + 0xE) = 0;
+			*reinterpret_cast<int*>(p2 + 0x12) = 0;
+			*reinterpret_cast<int*>(p2 + 0x14) = 10;
+			GetLetterAnimStorage(this)->count = static_cast<s16>(n2);
 			m_singMenuState->frame = 0;
 			m_singMenuState->selectedIndex = static_cast<s16>(s_BackUpCur[0]);
 			m_singMenuState->scrollIndex = static_cast<s16>(s_BackUpCur[1]);
@@ -632,9 +636,8 @@ bool CMenuPcs::LetterOpen()
 	iVar5 = static_cast<int>(GetLetterAnimStorage(this)->count);
 	psVar7 = GetLetterPanelBase(this);
 	iVar8 = static_cast<int>(m_singMenuState->frame);
-	iVar4 = iVar5;
-	if (0 < iVar5) {
-		do {
+	for (iVar4 = 0; iVar4 < iVar5; ++iVar4) {
+		{
 			fVar1 = FLOAT_803330bc;
 			if (iVar8 >= *reinterpret_cast<int*>(psVar7 + 0x12)) {
 				if (*reinterpret_cast<int*>(psVar7 + 0x12) + *reinterpret_cast<int*>(psVar7 + 0x14) <= iVar8) {
@@ -650,16 +653,15 @@ bool CMenuPcs::LetterOpen()
 					if ((*reinterpret_cast<unsigned int*>(psVar7 + 0x16) & 2) == 0) {
 						fVar1 = static_cast<float>((DOUBLE_803330e8 / static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(psVar7 + 0x14)))) *
 						                           static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(psVar7 + 0x10))));
-						*reinterpret_cast<float*>(psVar7 + 0x18) =
-							(*reinterpret_cast<float*>(psVar7 + 0x1C) - static_cast<float>(psVar7[0])) * fVar1;
-						*reinterpret_cast<float*>(psVar7 + 0x1A) =
-							(*reinterpret_cast<float*>(psVar7 + 0x1E) - static_cast<float>(psVar7[1])) * fVar1;
+						float dx = (*reinterpret_cast<float*>(psVar7 + 0x1C) - static_cast<float>(psVar7[0])) * fVar1;
+						float dy = (*reinterpret_cast<float*>(psVar7 + 0x1E) - static_cast<float>(psVar7[1])) * fVar1;
+						*reinterpret_cast<float*>(psVar7 + 0x18) = dx;
+						*reinterpret_cast<float*>(psVar7 + 0x1A) = dy;
 					}
 				}
 			}
-			psVar7 += 0x20;
-			iVar4 = iVar4 + -1;
-		} while (iVar4 != 0);
+		}
+		psVar7 += 0x20;
 	}
 	bool allFinished = iVar5 == iVar6;
 	if (allFinished) {
@@ -717,10 +719,10 @@ int CMenuPcs::LetterCtrl()
 						if ((*reinterpret_cast<unsigned int*>(panel + 0x16) & 2) == 0) {
 							f = static_cast<float>((DOUBLE_803330e8 / static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(panel + 0x14)))) *
 							                       static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(panel + 0x10))));
-							*reinterpret_cast<float*>(panel + 0x18) =
-							    (*reinterpret_cast<float*>(panel + 0x1C) - static_cast<float>(panel[0])) * f;
-							*reinterpret_cast<float*>(panel + 0x1A) =
-							    (*reinterpret_cast<float*>(panel + 0x1E) - static_cast<float>(panel[1])) * f;
+							float dx = (*reinterpret_cast<float*>(panel + 0x1C) - static_cast<float>(panel[0])) * f;
+							float dy = (*reinterpret_cast<float*>(panel + 0x1E) - static_cast<float>(panel[1])) * f;
+							*reinterpret_cast<float*>(panel + 0x18) = dx;
+							*reinterpret_cast<float*>(panel + 0x1A) = dy;
 						}
 					}
 				}
@@ -760,10 +762,10 @@ int CMenuPcs::LetterCtrl()
 						if ((*reinterpret_cast<unsigned int*>(panel + 0x16) & 2) == 0) {
 							f = static_cast<float>((DOUBLE_803330e8 / static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(panel + 0x14)))) *
 							                       static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(panel + 0x10))));
-							*reinterpret_cast<float*>(panel + 0x18) =
-							    (*reinterpret_cast<float*>(panel + 0x1C) - static_cast<float>(panel[0])) * f;
-							*reinterpret_cast<float*>(panel + 0x1A) =
-							    (*reinterpret_cast<float*>(panel + 0x1E) - static_cast<float>(panel[1])) * f;
+							float dx = (*reinterpret_cast<float*>(panel + 0x1C) - static_cast<float>(panel[0])) * f;
+							float dy = (*reinterpret_cast<float*>(panel + 0x1E) - static_cast<float>(panel[1])) * f;
+							*reinterpret_cast<float*>(panel + 0x18) = dx;
+							*reinterpret_cast<float*>(panel + 0x1A) = dy;
 						}
 					}
 				}
@@ -887,10 +889,10 @@ int CMenuPcs::LetterCtrl()
 							f = static_cast<float>(DOUBLE_803330e8 -
 							                       (DOUBLE_803330e8 / static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(panel + 0x14)))) *
 							                           static_cast<double>(static_cast<float>(*reinterpret_cast<unsigned int*>(panel + 0x10))));
-							*reinterpret_cast<float*>(panel + 0x18) =
-							    (*reinterpret_cast<float*>(panel + 0x1C) - static_cast<float>(panel[0])) * f;
-							*reinterpret_cast<float*>(panel + 0x1A) =
-							    (*reinterpret_cast<float*>(panel + 0x1E) - static_cast<float>(panel[1])) * f;
+							float dx = (*reinterpret_cast<float*>(panel + 0x1C) - static_cast<float>(panel[0])) * f;
+							float dy = (*reinterpret_cast<float*>(panel + 0x1E) - static_cast<float>(panel[1])) * f;
+							*reinterpret_cast<float*>(panel + 0x18) = dx;
+							*reinterpret_cast<float*>(panel + 0x1A) = dy;
 						}
 					}
 				}
@@ -929,10 +931,10 @@ int CMenuPcs::LetterCtrl()
 								f = static_cast<float>(DOUBLE_803330e8 -
 								                       (DOUBLE_803330e8 / static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(panel + 0x14)))) *
 								                           static_cast<double>(static_cast<float>(*reinterpret_cast<unsigned int*>(panel + 0x10))));
-								*reinterpret_cast<float*>(panel + 0x18) =
-								    (*reinterpret_cast<float*>(panel + 0x1C) - static_cast<float>(panel[0])) * f;
-								*reinterpret_cast<float*>(panel + 0x1A) =
-								    (*reinterpret_cast<float*>(panel + 0x1E) - static_cast<float>(panel[1])) * f;
+								float dx = (*reinterpret_cast<float*>(panel + 0x1C) - static_cast<float>(panel[0])) * f;
+								float dy = (*reinterpret_cast<float*>(panel + 0x1E) - static_cast<float>(panel[1])) * f;
+								*reinterpret_cast<float*>(panel + 0x18) = dx;
+								*reinterpret_cast<float*>(panel + 0x1A) = dy;
 							}
 						}
 					}
@@ -1153,10 +1155,10 @@ int CMenuPcs::LetterClose()
 					f = static_cast<float>(DOUBLE_803330e8 -
 					                       (DOUBLE_803330e8 / static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(entry + 0x14)))) *
 					                           static_cast<double>(static_cast<float>(*reinterpret_cast<unsigned int*>(entry + 0x10))));
-					*reinterpret_cast<float*>(entry + 0x18) =
-					    (*reinterpret_cast<float*>(entry + 0x1C) - static_cast<float>(entry[0])) * f;
-					*reinterpret_cast<float*>(entry + 0x1A) =
-					    (*reinterpret_cast<float*>(entry + 0x1E) - static_cast<float>(entry[1])) * f;
+					float dx = (*reinterpret_cast<float*>(entry + 0x1C) - static_cast<float>(entry[0])) * f;
+					float dy = (*reinterpret_cast<float*>(entry + 0x1E) - static_cast<float>(entry[1])) * f;
+					*reinterpret_cast<float*>(entry + 0x18) = dx;
+					*reinterpret_cast<float*>(entry + 0x1A) = dy;
 				}
 			}
 		}
@@ -1200,10 +1202,10 @@ inline void CMenuPcs::LetterLstOpen()
 				    static_cast<float>(*reinterpret_cast<int*>(panel + 0x10)) / static_cast<float>(*reinterpret_cast<int*>(panel + 0x14));
 				if ((*reinterpret_cast<unsigned int*>(panel + 0x16) & 2) == 0) {
 					f = static_cast<float>(*reinterpret_cast<int*>(panel + 0x10)) / static_cast<float>(*reinterpret_cast<int*>(panel + 0x14));
-					*reinterpret_cast<float*>(panel + 0x18) =
-					    (*reinterpret_cast<float*>(panel + 0x1C) - static_cast<float>(panel[0])) * f;
-					*reinterpret_cast<float*>(panel + 0x1A) =
-					    (*reinterpret_cast<float*>(panel + 0x1E) - static_cast<float>(panel[1])) * f;
+					float dx = (*reinterpret_cast<float*>(panel + 0x1C) - static_cast<float>(panel[0])) * f;
+					float dy = (*reinterpret_cast<float*>(panel + 0x1E) - static_cast<float>(panel[1])) * f;
+					*reinterpret_cast<float*>(panel + 0x18) = dx;
+					*reinterpret_cast<float*>(panel + 0x1A) = dy;
 				}
 			} else {
 				++done;
@@ -1248,10 +1250,10 @@ inline void CMenuPcs::LetterLstClose()
 					f = static_cast<float>(DOUBLE_803330e8 -
 					                       (DOUBLE_803330e8 / static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(panel + 0x14)))) *
 					                           static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(panel + 0x10))));
-					*reinterpret_cast<float*>(panel + 0x18) =
-					    (*reinterpret_cast<float*>(panel + 0x1C) - static_cast<float>(panel[0])) * f;
-					*reinterpret_cast<float*>(panel + 0x1A) =
-					    (*reinterpret_cast<float*>(panel + 0x1E) - static_cast<float>(panel[1])) * f;
+					float dx = (*reinterpret_cast<float*>(panel + 0x1C) - static_cast<float>(panel[0])) * f;
+					float dy = (*reinterpret_cast<float*>(panel + 0x1E) - static_cast<float>(panel[1])) * f;
+					*reinterpret_cast<float*>(panel + 0x18) = dx;
+					*reinterpret_cast<float*>(panel + 0x1A) = dy;
 				}
 			} else {
 				++done;
@@ -1297,10 +1299,10 @@ inline void CMenuPcs::LetterMessOpen()
 				    static_cast<float>(*reinterpret_cast<int*>(panel + 0x10)) / static_cast<float>(*reinterpret_cast<int*>(panel + 0x14));
 				if ((*reinterpret_cast<unsigned int*>(panel + 0x16) & 2) == 0) {
 					f = static_cast<float>(*reinterpret_cast<int*>(panel + 0x10)) / static_cast<float>(*reinterpret_cast<int*>(panel + 0x14));
-					*reinterpret_cast<float*>(panel + 0x18) =
-					    (*reinterpret_cast<float*>(panel + 0x1C) - static_cast<float>(panel[0])) * f;
-					*reinterpret_cast<float*>(panel + 0x1A) =
-					    (*reinterpret_cast<float*>(panel + 0x1E) - static_cast<float>(panel[1])) * f;
+					float dx = (*reinterpret_cast<float*>(panel + 0x1C) - static_cast<float>(panel[0])) * f;
+					float dy = (*reinterpret_cast<float*>(panel + 0x1E) - static_cast<float>(panel[1])) * f;
+					*reinterpret_cast<float*>(panel + 0x18) = dx;
+					*reinterpret_cast<float*>(panel + 0x1A) = dy;
 				}
 			} else {
 				++done;
@@ -1778,8 +1780,7 @@ void CMenuPcs::LetterListDraw()
 	font->SetScale(FLOAT_803330f8);
 	font->DrawInit();
 
-	CColor titleColor(0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_803330a0 * *reinterpret_cast<float*>(menuDataBase + 0x58)));
-	font->SetColor(titleColor.color);
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_803330a0 * *reinterpret_cast<float*>(menuDataBase + 0x58))).color);
 
 	char* menuTitle = GetMenuStr(0x1D);
 	float titleX = static_cast<float>((FLOAT_80333158 - font->GetWidth(menuTitle)) *
@@ -1790,8 +1791,7 @@ void CMenuPcs::LetterListDraw()
 		return;
 	}
 
-	CColor textColor(0xFF, 0xFF, 0xFF, 0xFF);
-	font->SetColor(textColor.color);
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 
 	CCaravanWork* caravanWork = GetLetterCaravanWork();
 	const int topRow = static_cast<int>(m_singMenuState->topIndex);
@@ -1812,15 +1812,15 @@ void CMenuPcs::LetterListDraw()
 
 		font->SetTlut(tlut);
 
-		float rowY = static_cast<float>(y) - FLOAT_80333148;
-		const char* from = Game.m_cFlatDataArr[1].TableStrings(5)[(letter->Word0() & 0x7FC) >> 2];
+		float yf = static_cast<float>(y);
+		const char* from = Game.m_cFlatDataArr[1].TableStrings(5)[(letter->HeaderWord() & 0x7FC) >> 2];
 		font->SetPosX(FLOAT_80333160);
-		font->SetPosY(rowY);
+		font->SetPosY(yf - FLOAT_80333148);
 		font->Draw(from);
 
 		const char* subject = Game.m_cFlatDataArr[1].TableStrings(2)[(letter->Word0() >> 9) & 0x1FF];
 		font->SetPosX(FLOAT_80333164);
-		font->SetPosY(rowY);
+		font->SetPosY(yf - FLOAT_80333148);
 		font->Draw(subject);
 
 		y += 0x20;
@@ -1921,6 +1921,8 @@ void CMenuPcs::LetterMessDraw()
 		float y0 = static_cast<float>(panel[1]);
 		float x1 = static_cast<float>(panel[2]);
 		float y1 = static_cast<float>(panel[3]);
+		float u = *reinterpret_cast<float*>(panel + 4);
+		float v = *reinterpret_cast<float*>(panel + 6);
 		u8 alpha = static_cast<u8>(FLOAT_803330a0 * *reinterpret_cast<float*>(panel + 8));
 		GXColor color;
 		color.r = 0xFF;
@@ -1931,7 +1933,7 @@ void CMenuPcs::LetterMessDraw()
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(*reinterpret_cast<int*>(panel + 0xE)));
 		MenuPcs.DrawRect(
 		    0, x0, y0, x1,
-		    y1, *reinterpret_cast<float*>(panel + 4), *reinterpret_cast<float*>(panel + 6),
+		    y1, u, v,
 		    *reinterpret_cast<float*>(panel + 10), *reinterpret_cast<float*>(panel + 10), 0.0f);
 	}
 
@@ -1943,16 +1945,11 @@ void CMenuPcs::LetterMessDraw()
 	font->DrawInit();
 	font->SetTlut(0x1C);
 
-	{
-		u8 alpha = static_cast<u8>(FLOAT_803330a0 * *reinterpret_cast<float*>(animBase + 0xC));
-		CColor color(0xFF, 0xFF, 0xFF, alpha);
-		font->SetColor(color.color);
-	}
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_803330a0 * *reinterpret_cast<float*>(animBase + 0xC))).color);
 
 	CMemory::CStage* stage = GetLetterMenuStage(this);
 	char* srcText = new (stage, const_cast<char*>(s_menu_letter_cpp), 0x535) char[kLetterTextScratchSize];
-	stage = GetLetterMenuStage(this);
-	char* workText = new (stage, const_cast<char*>(s_menu_letter_cpp), 0x537) char[kLetterTextScratchSize];
+	char* workText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x537) char[kLetterTextScratchSize];
 
 	memset(srcText, 0, kLetterTextScratchSize);
 	memset(workText, 0, kLetterTextScratchSize);
@@ -1962,9 +1959,10 @@ void CMenuPcs::LetterMessDraw()
 	strcpy(srcText, Game.m_cFlatDataArr[1].Message(((msgIndex & 0x7FC) >> 1) + 0x10));
 	CMes::MakeAgbString(workText, srcText, caravanWork->m_genderFlag, 0);
 
-	char* curLine = workText;
 	int y = 0x58;
-	for (int i = 0; i < 7; ++i) {
+	int i = 0;
+	char* curLine = workText;
+	for (; i < 7; ++i) {
 		char* newline = strchr(curLine, '\n');
 		const float yf = static_cast<float>(y);
 		if (newline != 0) {
@@ -1990,10 +1988,14 @@ void CMenuPcs::LetterMessDraw()
 
 	DrawInit();
 
-	if (caravanWork->m_letters[s_SelLetter].AttachmentValue() != 0) {
-		int icon = 0x26 + (caravanWork->m_letters[s_SelLetter].IsAttachmentClaimed() ? 1 : 0);
+	char* letterBytes = reinterpret_cast<char*>(caravanWork) + s_SelLetter * 0xC;
+	if ((*reinterpret_cast<u16*>(letterBytes + 0x3EE) & 0x1FF) != 0) {
+		float iconX = FLOAT_8033314c;
+		float iconY = FLOAT_80333150;
+		int icon = 0x26 +
+		           (reinterpret_cast<CCaravanWork::CLetterWork*>(letterBytes + 0x3EC)->IsAttachmentClaimed() ? 1 : 0);
 		DrawSingleIcon(
-		    icon, static_cast<int>(FLOAT_8033314c), static_cast<int>(FLOAT_80333150),
+		    icon, static_cast<int>(iconX), static_cast<int>(iconY),
 		    *reinterpret_cast<float*>(animBase + 0xC), 1, FLOAT_80333154);
 	}
 
@@ -2002,10 +2004,9 @@ void CMenuPcs::LetterMessDraw()
 	}
 
 	DrawSingWin(-1);
-	unsigned int state = GetLetterStateBase(this);
-	if ((*reinterpret_cast<s16*>(state + 0x12) == 1) &&
+	if ((*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) == 1) &&
 	    (m_menuWindowInfo->state == 1)) {
-		int msgType = static_cast<int>(*reinterpret_cast<signed char*>(state + 9));
+		int msgType = static_cast<int>(*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 9));
 		if (mode == 4) {
 			DrawSingWinMess(2, msgType, 0);
 		} else {
@@ -2014,23 +2015,22 @@ void CMenuPcs::LetterMessDraw()
 
 		float cursorX;
 		float cursorY;
-		MenuWindowInfo* window = m_menuWindowInfo;
-		int itemSel = *reinterpret_cast<s16*>(state + 0x28);
 		if ((mode == 2) || (mode == 5)) {
+			cursorX = static_cast<float>(m_menuWindowInfo->x + 0x14);
+			int itemSel = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28);
 			if (mode == 2) {
 				itemSel += 1;
 			} else {
 				int attach = static_cast<int>(s_Attach);
 				itemSel += (~((attach - 2) | (2 - attach)) >> 31) + 4;
 			}
-			cursorX = static_cast<float>(window->x + 0x14);
-			cursorY = static_cast<float>(window->y + itemSel * SingWinMessHeight() + 0x20);
+			cursorY = static_cast<float>(m_menuWindowInfo->y + itemSel * SingWinMessHeight() + 0x20);
 		} else if ((mode == 3) || (mode == 4)) {
-			cursorX = static_cast<float>(window->x - 8);
+			cursorX = static_cast<float>(m_menuWindowInfo->x - 8);
 			if (mode == 4) {
 				cursorX += FLOAT_80333110;
 			}
-			cursorY = static_cast<float>(window->y + *reinterpret_cast<s16*>(state + 0x28) * SingWinMessHeight() + 0x20);
+			cursorY = static_cast<float>(m_menuWindowInfo->y + *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28) * SingWinMessHeight() + 0x20);
 		}
 
 		int frameAnim = static_cast<int>(System.m_frameCounter) % 8;
@@ -2469,14 +2469,19 @@ int CMenuPcs::LetterCtrlCur()
  */
 void CMenuPcs::LetterLstBaseDraw(float param_1)
 {
+	unsigned long flip;
+	int i;
+
 	if (param_1 <= FLOAT_803330bc) {
 		return;
 	}
 
-	float h = static_cast<float>(static_cast<int>(FLOAT_803330f0 - DOUBLE_803330e8));
-	float w = static_cast<float>(static_cast<int>(FLOAT_803330e0 - DOUBLE_803330a8));
-	float y0 = static_cast<float>(static_cast<int>(static_cast<double>(static_cast<float>(DOUBLE_803330d8 + FLOAT_803330d0 * param_1)) - DOUBLE_803330e8));
-	float x0 = static_cast<float>(static_cast<int>(static_cast<double>(FLOAT_803330d4 - static_cast<float>(static_cast<float>(FLOAT_803330d0 * param_1) * DOUBLE_803330a8)) - DOUBLE_803330a8));
+	float x0 = static_cast<float>(static_cast<int>(static_cast<double>(FLOAT_803330d4 - static_cast<float>((FLOAT_803330d0 * param_1) * DOUBLE_803330a8)) - DOUBLE_803330a8));
+	float fy = FLOAT_803330e0;
+	float y0 = static_cast<float>(static_cast<int>(fy - DOUBLE_803330a8));
+	float w = static_cast<float>(static_cast<int>(static_cast<double>(static_cast<float>(DOUBLE_803330d8 + FLOAT_803330d0 * param_1)) - DOUBLE_803330e8));
+	float fh = FLOAT_803330f0;
+	float h = static_cast<float>(static_cast<int>(fh - DOUBLE_803330e8));
 
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	GXColor white;
@@ -2486,14 +2491,14 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 	white.a = 0xFF;
 	GXSetChanMatColor(GX_COLOR0A0, white);
 
-	float xw = static_cast<float>(x0 + w);
-	float yh = static_cast<float>(y0 + h);
-	float x1 = static_cast<float>(xw - FLOAT_803330f4);
-	float y1 = static_cast<float>(yh - FLOAT_803330f4);
+	float xw = x0 + w;
+	float yh = y0 + h;
+	float x1 = xw - FLOAT_803330f4;
+	float y1 = yh - FLOAT_803330f4;
 
-	for (unsigned int i = 0; i < 4; ++i) {
+	for (i = 0; i < 4; ++i) {
 		int tex;
-		int flip = 0;
+		flip = 0;
 		if (i == 0) {
 			tex = 0x3C;
 		} else if (i == 1) {
@@ -2504,111 +2509,122 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 			tex = 0x4D;
 		}
 
-		double x = x0;
-		double y = y0;
+		float x;
+		float y;
 		if ((i & 1) != 0) {
 			x = x1;
 			if (i == 1) {
 				flip |= 8;
 			}
+		} else {
+			x = x0;
 		}
 		if ((i & 2) != 0) {
 			y = y1;
+		} else {
+			y = y0;
 		}
 
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
 		MenuPcs.DrawRect(
-		    flip, static_cast<float>(x), static_cast<float>(y), FLOAT_803330f4, FLOAT_803330f4,
-		    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
+		    flip, x, y, FLOAT_803330f4, FLOAT_803330f4,
+		    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, FLOAT_803330bc);
 	}
 
-	float innerW = static_cast<float>(w - DOUBLE_803330d8);
-	float innerH = static_cast<float>(h - DOUBLE_803330d8);
-	float innerX = static_cast<float>(x0 + FLOAT_803330f4);
-	float innerY = static_cast<float>(y0 + FLOAT_803330f4);
-
-	for (int i = 0; i < 2; ++i) {
-		unsigned int tex = (i == 0) ? 0x49 : 0x4C;
-		float y = (i == 0) ? y0 : y1;
+	double innerW = w - DOUBLE_803330d8;
+	float innerX = FLOAT_803330f4 + x0;
+	float y = y0;
+	float innerWf = static_cast<float>(innerW);
+	for (i = 0; i < 2; ++i) {
+		int tex = 0x49;
+		if (i != 0) {
+			tex = 0x4C;
+		}
+		if (i != 0) {
+			y = y1;
+		}
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
 		MenuPcs.DrawRect(
-		    0, static_cast<float>(innerX), static_cast<float>(y), static_cast<float>(innerW), FLOAT_803330f4,
-		    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
+		    0, innerX, y, innerWf, FLOAT_803330f4,
+		    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, FLOAT_803330bc);
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x4A));
-	for (int i = 0; i < 2; ++i) {
-		int flip = 0;
-		double x = x0;
+	double innerH = h - DOUBLE_803330d8;
+	float innerY = FLOAT_803330f4 + y0;
+	float x = x0;
+	float innerHf = static_cast<float>(innerH);
+	for (i = 0; i < 2; ++i) {
+		flip = 0;
 		if (i != 0) {
 			x = x1;
 			flip |= 8;
 		}
 		MenuPcs.DrawRect(
-		    flip, static_cast<float>(x), static_cast<float>(innerY), FLOAT_803330f4, static_cast<float>(innerH),
-		    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
+		    flip, x, innerY, FLOAT_803330f4, innerHf,
+		    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, FLOAT_803330bc);
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x4E));
 	MenuPcs.DrawRect(
-	    0, static_cast<float>(innerX), static_cast<float>(innerY), static_cast<float>(innerW), static_cast<float>(innerH),
-	    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
+	    flip, innerX, innerY, static_cast<float>(innerW), static_cast<float>(innerH),
+	    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, FLOAT_803330bc);
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x4F));
-	double decoX0 = static_cast<double>(static_cast<float>(xw - static_cast<double>(FLOAT_80333108)));
+	float decoX = xw - FLOAT_80333108;
 	double decoY0 = y0 - DOUBLE_80333100;
-	double decoX1 = DOUBLE_80333100 + decoX0;
-	double decoY1 = DOUBLE_80333100 + static_cast<double>(static_cast<float>(yh - static_cast<double>(FLOAT_8033310c)));
-	for (unsigned int i = 0; i < 4; ++i) {
-		double x;
-		if ((i & 1) == 0) {
-			x = x0 - static_cast<double>(FLOAT_80333110);
+	double decoX1 = DOUBLE_80333100 + decoX;
+	double decoY1 = DOUBLE_80333100 + (yh - FLOAT_8033310c);
+	for (i = 0; i < 4; ++i) {
+		flip = 0;
+		float dx;
+		float dy;
+		if ((i & 1) != 0) {
+			dx = static_cast<float>(decoX1);
 		} else {
-			x = decoX1;
+			dx = x0 - FLOAT_80333110;
 		}
-		double y;
-		int flip = 0;
-		if ((i & 2) == 0) {
-			y = decoY0;
-		} else {
-			y = decoY1;
+		if ((i & 2) != 0) {
+			dy = static_cast<float>(decoY1);
 			flip |= 4;
+		} else {
+			dy = static_cast<float>(decoY0);
 		}
 		MenuPcs.DrawRect(
-		    flip, static_cast<float>(x), static_cast<float>(y), FLOAT_80333108, FLOAT_8033310c,
-		    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
+		    flip, dx, dy, FLOAT_80333108, FLOAT_8033310c,
+		    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, FLOAT_803330bc);
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x50));
-	double barX0 = static_cast<double>(static_cast<float>(x0 - static_cast<double>(FLOAT_80333110)));
-	double barX1 = static_cast<double>(static_cast<float>(static_cast<double>(FLOAT_80333110) + decoX0));
-	double barY0 = static_cast<double>(static_cast<float>((DOUBLE_80333118 + y0) - DOUBLE_80333100));
-	double barY1 = static_cast<double>(static_cast<float>(barY0 + static_cast<double>(static_cast<float>(h - DOUBLE_80333120))));
-	for (int side = 0; side < 2; ++side) {
-		double x = (side == 0) ? barX0 : barX1;
-		float y = static_cast<float>(barY0);
-		while (y < barY1) {
-			float seg = static_cast<float>(barY1 - y);
+	float barX = x0 - FLOAT_80333110;
+	float barX1 = FLOAT_80333110 + decoX;
+	float barY0 = static_cast<float>((DOUBLE_80333118 + y0) - DOUBLE_80333100);
+	float barY1 = barY0 + static_cast<float>(h - DOUBLE_80333120);
+	for (i = 0; i < 2; ++i) {
+		if (i != 0) {
+			barX = barX1;
+		}
+		float by = barY0;
+		while (by < barY1) {
+			float seg = barY1 - by;
 			if (seg >= DOUBLE_80333118) {
 				seg = FLOAT_8033310c;
 			}
 			MenuPcs.DrawRect(
-			    0, static_cast<float>(x), y, FLOAT_80333108, seg,
-			    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
-			y = y + seg;
+			    0, barX, by, FLOAT_80333108, seg,
+			    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, FLOAT_803330bc);
+			by = by + seg;
 		}
 	}
 
 	if (param_1 >= DOUBLE_803330e8) {
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3D));
 		MenuPcs.DrawRect(
-		    0, static_cast<float>(x0 - static_cast<double>(FLOAT_803330f4)),
-		    static_cast<float>(y0 - static_cast<double>(FLOAT_80333108)),
-		    FLOAT_80333128, FLOAT_8033312c, FLOAT_80333130, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
+		    0, x0 - FLOAT_803330f4, y0 - FLOAT_80333108,
+		    FLOAT_80333128, FLOAT_8033312c, FLOAT_80333130, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, FLOAT_803330bc);
 		MenuPcs.DrawRect(
-		    0, static_cast<float>(xw - static_cast<double>(FLOAT_80333134)),
-		    static_cast<float>(yh - static_cast<double>(FLOAT_803330c0)),
-		    FLOAT_80333130, FLOAT_80333138, FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
+		    0, xw - FLOAT_80333134, yh - FLOAT_803330c0,
+		    FLOAT_80333130, FLOAT_80333138, FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, FLOAT_803330bc);
 	}
 }
 

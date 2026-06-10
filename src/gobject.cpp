@@ -209,7 +209,8 @@ static const float sAnalogSpeedScale = 4.0f;          // FLOAT_8033042c
 static const float sSlideThreshold = 0.01f;           // FLOAT_80330430
 extern "C" const float sDefaultAttackColRadius;    // FLOAT_80330434
 extern "C" const float sDefaultBodyColRadius;      // FLOAT_80330438
-extern "C" const float FLOAT_8033043C; // FLOAT_8033043c
+extern "C" const float FLOAT_8033043C;
+extern "C" const float FLOAT_803303FC;            // 1.2f // FLOAT_8033043c
 extern "C" const float sDefaultBgDownDist; // FLOAT_80330440
 extern "C" const float sRadiusWobbleScale;         // FLOAT_80330398 (0.8)
 extern "C" const float sWobbleBiasLarge;           // FLOAT_8033039c (0.3)
@@ -1684,9 +1685,10 @@ void CGObject::update()
                     (*reinterpret_cast<unsigned int*>(
                          reinterpret_cast<unsigned char*>(m_charaModelHandle->m_animSlot[activeAnimIndex]) + 0x70) &
                      0x4) != 0) {
-                    frameDelta = m_lastBgAttr < sZeroFloat ? sNegativeOne : sAnimFrameOffset;
+                    frameDelta = frameDelta < sZeroFloat ? sNegativeOne : sAnimFrameOffset;
                 }
-                frameStep = m_turnSpeed + frameDelta * 1.2f;
+                frameDelta = frameDelta * FLOAT_803303FC;
+                frameStep = m_turnSpeed + frameDelta;
             }
 
             const float prevTime = m_charaModelHandle->m_model->m_time;

@@ -1866,11 +1866,12 @@ void CFlatRuntime2::drawLayer(
 	GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
 	GXSetChanMatColor(GX_COLOR0A0, *color);
 
+	Mtx texMtx;
 	Mtx44 ortho;
+	Mtx identity;
 	C_MTXOrtho(ortho, FLOAT_80330144, FLOAT_80330148, FLOAT_80330144, FLOAT_8033014C, FLOAT_80330144, FLOAT_80330150);
 	GXSetProjection(ortho, GX_ORTHOGRAPHIC);
 
-	Mtx identity;
 	PSMTXIdentity(identity);
 	GXLoadPosMtxImm(identity, GX_PNMTX0);
 	GXSetCurrentMtx(GX_PNMTX0);
@@ -1891,7 +1892,6 @@ void CFlatRuntime2::drawLayer(
 
 	TextureMan.SetTexture(GX_TEXMAP0, texture);
 
-	Mtx texMtx;
 	const float texW = static_cast<float>(static_cast<unsigned int>(texture->m_width));
 	const float texH = static_cast<float>(static_cast<unsigned int>(texture->m_height));
 	PSMTXScale(texMtx, FLOAT_80330140 / texW, FLOAT_80330140 / texH, FLOAT_80330140);
@@ -1960,25 +1960,23 @@ void CFlatRuntime2::drawLayer(
 		_GXSetTevAlphaIn((_GXTevStageID)tevStage, (_GXTevAlphaArg)7, (_GXTevAlphaArg)4, (_GXTevAlphaArg)0, (_GXTevAlphaArg)7);
 		_GXSetTevAlphaOp((_GXTevStageID)tevStage, (_GXTevOp)0, (_GXTevBias)0, (_GXTevScale)0, 1, (_GXTevRegID)0);
 
-		const int pixelWidth = static_cast<int>(scaledWidth * FLOAT_80330154);
-		const int pixelHeight = static_cast<int>(scaledHeight * FLOAT_80330154);
 		CColor texCol0;
 		CColor texCol1;
 
 		for (int quad = 0; quad < 4; quad++) {
-			int rectW = pixelWidth;
-			int rectH = pixelHeight;
+			int rectW = static_cast<int>(scaledWidth * FLOAT_80330154);
+			int rectH = static_cast<int>(scaledHeight * FLOAT_80330154);
 
 			float bx;
 			if ((quad & 1) != 0) {
-				bx = x0 + static_cast<float>(pixelWidth);
+				bx = x0 + static_cast<float>(rectW);
 			} else {
 				bx = x0;
 			}
 			int rectX = static_cast<int>(bx);
 			float by;
 			if ((quad & 2) != 0) {
-				by = y0 + static_cast<float>(pixelHeight);
+				by = y0 + static_cast<float>(rectH);
 			} else {
 				by = y0;
 			}

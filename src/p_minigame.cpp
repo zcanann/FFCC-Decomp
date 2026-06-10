@@ -1881,10 +1881,10 @@ static inline unsigned int MiniGameCrc8(unsigned int value)
 void CMiniGamePcs::MngThreadMain(void*)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    int managerStackOffset = 0x1000;
+    unsigned char* spMode = reinterpret_cast<unsigned char*>(&Game);
     unsigned char* threadParam = self;
     unsigned char* threadState = self;
-    unsigned char* spMode = reinterpret_cast<unsigned char*>(&Game);
+    int managerStackOffset = 0x1000;
 
     int i = 0;
     do

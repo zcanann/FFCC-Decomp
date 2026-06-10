@@ -863,7 +863,7 @@ void CMenuPcs::CmakeVillageDraw()
 
     DrawInit();
     if (villageWork->m_mode == 1 && villageWork->m_row < 5) {
-        int cursorLeft = 0xC8;
+        int cursorLeft = (villageWork->m_select == 0) ? 0xC8 : 0xC8;
         int wobble = static_cast<int>(System.m_frameCounter) % 8;
         DrawCursor(
             static_cast<int>(26.9f * static_cast<float>(villageWork->m_select) +
@@ -2287,14 +2287,7 @@ void CMenuPcs::CmakeSexDraw()
     float alpha = CalcCmakeFadeAlpha(this);
     DrawWMFrame0(1, 1.0f);
 
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-    GXColor backdropColor;
-    backdropColor.r = 0xFF;
-    backdropColor.g = 0xFF;
-    backdropColor.b = 0xFF;
-    backdropColor.a = 0xFF;
-    GXSetChanMatColor(GX_COLOR0A0, backdropColor);
+    SetCmakeBlendMatColor(1.0f);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3F));
     MenuPcs.DrawRect(
         0, 0.0f, 24.0f, 32.0f, 336.0f,
@@ -2303,8 +2296,9 @@ void CMenuPcs::CmakeSexDraw()
         8, 608.0f, 24.0f, 32.0f, 336.0f,
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x40));
+    int span;
     for (int x = 0x20; x < 0x260;) {
-        int span = 0x20;
+        span = 0x20;
         if ((0x260 - x) < span) {
             span = 0x260 - x;
         }
@@ -2316,16 +2310,8 @@ void CMenuPcs::CmakeSexDraw()
 
     DrawCmakePreviewChara(this);
 
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-    GXColor panelColor;
-    panelColor.r = 0xFF;
-    panelColor.g = 0xFF;
-    panelColor.b = 0xFF;
+    SetCmakeBlendMatColor(alpha);
     a255 = 255.0f * alpha;
-    panelColor.a = static_cast<unsigned char>(a255);
-    GXSetChanMatColor(GX_COLOR0A0, panelColor);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
     float sexW = 256.0f;
     float sexH = 162.4615478515625f;
@@ -2369,7 +2355,7 @@ void CMenuPcs::CmakeSexDraw()
                                 static_cast<float>(wobble)) -
             maxWidth / 2.0);
         int cursorY = static_cast<int>(156.0f + static_cast<float>(sel * 0x28));
-        DrawCursor(cursorX, cursorY, alpha);
+        DrawCursor(cursorX, cursorY, 1.0f);
     }
 
 }
@@ -2572,7 +2558,7 @@ void CMenuPcs::CmakeNameDraw()
     DrawInit();
 
     if ((CmakeState(this)->m_mode == 1) && (CmakeState(this)->m_row < 5)) {
-        int cursorLeft = 0xC8;
+        int cursorLeft = (CmakeState(this)->m_select == 0) ? 0xC8 : 0xC8;
         int wobble = static_cast<int>(System.m_frameCounter) % 8;
         DrawCursor(
             static_cast<int>(26.9f * static_cast<float>(CmakeState(this)->m_select) +
@@ -3078,16 +3064,19 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
 
     const char* yesStr = GetMenuStr(1);
     float yesW = static_cast<float>(font->GetWidth(yesStr));
-    int yesX = static_cast<int>(
-        (48.0f - yesW) / 2.0f + static_cast<float>(0x1D0));
+    int packed = (yesNoSel == 0) ? 0x01D00218 : 0x01D00218;
+    int yesX = packed >> 16;
+    yesX = static_cast<int>(
+        (48.0f - yesW) / 2.0f + static_cast<float>(yesX));
     font->SetPosX(static_cast<float>(yesX));
     font->SetPosY(369.0f);
     font->Draw(yesStr);
 
     const char* noStr = GetMenuStr(2);
     float noW = static_cast<float>(font->GetWidth(noStr));
-    int noX = static_cast<int>(
-        (48.0f - noW) / 2.0f + static_cast<float>(0x218));
+    int noX = packed & 0xFFFF;
+    noX = static_cast<int>(
+        (48.0f - noW) / 2.0f + static_cast<float>(noX));
     font->SetPosX(static_cast<float>(noX));
     font->SetPosY(369.0f);
     font->Draw(noStr);
@@ -3499,9 +3488,10 @@ void CMenuPcs::DrawCmakeTitle(int page, float x, float alpha)
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
-    int offsU = static_cast<int>(
-        -(static_cast<double>(40.0f * x - 40.0f) * 0.5) + 32.0);
-    float offs = static_cast<float>(offsU);
+    int baseX = ((page == 0) ? 0x116 : 0x116);
+    double offsCalc = -(static_cast<double>(40.0f * x - 40.0f) / 2.0) + 32.0;
+    float offs = static_cast<float>(static_cast<int>(offsCalc));
+    int offsU = static_cast<int>(offsCalc);
     MenuPcs.DrawRect(
         0, 278.0f, offs, 248.0f, 40.0f,
         0.0f, 264.0f, 1.0f, x, 0.0f);
@@ -3512,8 +3502,10 @@ void CMenuPcs::DrawCmakeTitle(int page, float x, float alpha)
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x65 : 0x3E));
 
-    float titleX = static_cast<float>(static_cast<int>(static_cast<double>(offsU) + 20.0));
-    float titleY = static_cast<float>(static_cast<int>(static_cast<double>(offsU) + 8.0));
+    baseX = static_cast<int>(baseX + 20.0);
+    offsU = static_cast<int>(static_cast<double>(offsU) + 8.0);
+    float titleX = static_cast<float>(baseX);
+    float titleY = static_cast<float>(offsU);
     MenuPcs.DrawRect(
         0, titleX, titleY, 208.0f, 24.0f,
         0.0f, static_cast<float>(page * 0x18), 1.0f, 1.0f, 0.0f);
@@ -3601,8 +3593,9 @@ void CMenuPcs::DrawDiaryBase(int page, float alpha)
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(widePage ? 0x36 : 0x40));
+    int span;
     for (int x = 0x20; x < 0x260;) {
-        int span = 0x20;
+        span = 0x20;
         if ((0x260 - x) < span) {
             span = 0x260 - x;
         }

@@ -1034,14 +1034,15 @@ void CGame::LoadInit()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGame::LoadScript(char* scriptData)
+static inline void loadPermanentScriptVars(char* scriptData)
 {
     int scriptOffset = 0;
-    int i = 0;
     int entryOffset = 0;
+    int i = 0;
 
     while (i < CFlatPermanentVarCount()) {
-        if ((CFlatPermanentVarFlagByte(entryOffset) & 0x20) != 0) {
+        int flagIndex = entryOffset + 1;
+        if ((CFlatPermanentVarDefs()[flagIndex] & 0x20) != 0) {
             CFlatPermanentVarWord(entryOffset) = *reinterpret_cast<u32*>(scriptData + scriptOffset);
             scriptOffset += 4;
         }
@@ -1049,6 +1050,11 @@ void CGame::LoadScript(char* scriptData)
         entryOffset += 4;
         i++;
     }
+}
+
+void CGame::LoadScript(char* scriptData)
+{
+    loadPermanentScriptVars(scriptData);
 }
 
 /*
@@ -1060,10 +1066,8 @@ void CGame::LoadScript(char* scriptData)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGame::SaveScript(char* scriptData)
+static inline void savePermanentScriptVars(char* scriptData)
 {
-    memset(scriptData, 0, kGameScriptSaveDataSize);
-
     int scriptOffset = 0;
     int entryOffset = 0;
     int i = 0;
@@ -1077,6 +1081,12 @@ void CGame::SaveScript(char* scriptData)
         entryOffset += 4;
         i++;
     }
+}
+
+void CGame::SaveScript(char* scriptData)
+{
+    memset(scriptData, 0, kGameScriptSaveDataSize);
+    savePermanentScriptVars(scriptData);
 }
 
 /*

@@ -3428,9 +3428,8 @@ int CGCharaObj::calcCastTime(int itemId)
 		return 0;
 	}
 
-	int itemOffset = itemId * 0x48;
-	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + itemOffset;
-	unsigned int baseCast = *reinterpret_cast<unsigned short*>(itemData + 0x2E);
+	SCharaItemRow* castRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
+	unsigned int baseCast = castRows[itemId].m_power;
 	float castScale;
 
 	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x4E) != 0) {
@@ -3441,8 +3440,9 @@ int CGCharaObj::calcCastTime(int itemId)
 		castScale = kOneF32;
 	}
 
-	int itemNo = *reinterpret_cast<short*>(itemData + 0x0);
-	int itemType = *reinterpret_cast<unsigned short*>(itemData + 0xE);
+	SCharaItemRow* typeRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
+	int itemNo = typeRows[itemId].m_effect;
+	int itemType = typeRows[itemId].m_particleLife;
 	int result;
 
 	if (itemNo != 0x1F8 && itemType == 2) {

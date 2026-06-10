@@ -1808,10 +1808,13 @@ void CGObject::update()
                     const float animSpan = sAnimFrameOffset + (ModelAnimEnd(m_charaModelHandle->m_model) - ModelAnimStart(m_charaModelHandle->m_model));
                     if (animSpan == sAnimFrameOffset) {
                         animFinished = true;
-                    } else if (m_lastBgAttr < sZeroFloat) {
-                        animFinished = ModelTime(m_charaModelHandle->m_model) <= sZeroFloat;
                     } else {
-                        animFinished = animSpan - sAnimFrameOffset < ModelTime(m_charaModelHandle->m_model);
+                        const float modelTime = m_charaModelHandle->m_model->m_time;
+                        if (m_lastBgAttr < sZeroFloat) {
+                            animFinished = sZeroFloat >= modelTime;
+                        } else {
+                            animFinished = animSpan - sAnimFrameOffset < modelTime;
+                        }
                     }
                 }
             } else {

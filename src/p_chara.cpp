@@ -937,6 +937,7 @@ int CCharaPcs::correctLoadAnimAmem()
     int maxEnd = 0;
     int compactedSize = 0;
     int scanOffset = 0;
+    int chunkSize = 0;
     for (int i = 0; i < loadAnimCount; i++) {
         CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
         CChara::CAnim* anim = loadAnim->m_anim;
@@ -953,7 +954,6 @@ int CCharaPcs::correctLoadAnimAmem()
 
     do {
         int chunkLoadCount = 0;
-        int chunkSize = 0;
         unsigned int nextOffset = 0;
         const unsigned int scanEnd = static_cast<unsigned int>(scanOffset + 0x80000);
 
@@ -976,7 +976,7 @@ int CCharaPcs::correctLoadAnimAmem()
 
             Memory.CopyFromAMemorySync(
                 tempBuffer + chunkSize,
-                reinterpret_cast<void*>(m_amemStage->m_heapTop + static_cast<int>(animOffset)),
+                reinterpret_cast<void*>(static_cast<int>(animOffset) + m_amemStage->m_heapTop),
                 static_cast<unsigned long>(animSize));
 
             loadAnim->m_anim->m_bankAddress = compactedSize + chunkSize;
@@ -984,7 +984,7 @@ int CCharaPcs::correctLoadAnimAmem()
         }
 
         if (chunkLoadCount != 0) {
-            const int writeBase = m_amemStage->m_heapTop + compactedSize;
+            const int writeBase = compactedSize + m_amemStage->m_heapTop;
             Memory.CopyToAMemorySync(
                 tempBuffer, reinterpret_cast<void*>(writeBase),
                 static_cast<unsigned long>(chunkSize));
@@ -996,6 +996,7 @@ int CCharaPcs::correctLoadAnimAmem()
 
         compactedSize += chunkSize;
         scanOffset = nextOffset;
+        chunkSize = 0;
     } while (scanOffset < maxEnd);
 
     delete tempBuffer;
@@ -2437,10 +2438,11 @@ foundModel:
 
         int modelStageIndex;
         if (specialModelStage != 0) {
-            modelStageIndex = 4;
+            int specialIndex = 4;
             if (m_charaKind == 3) {
-                modelStageIndex = 5;
+                specialIndex = 5;
             }
+            modelStageIndex = specialIndex;
         } else {
             modelStageIndex = 0;
         }
@@ -2591,13 +2593,17 @@ int CCharaPcs::CHandle::LoadAnim(
         }
     }
 
-    int resolvedKind = charaKind;
-    if (resolvedKind == -1) {
+    int resolvedKind;
+    if (charaKind == -1) {
         resolvedKind = m_charaKind;
+    } else {
+        resolvedKind = charaKind;
     }
-    int resolvedNo = charaNo;
-    if (resolvedNo == -1) {
+    int resolvedNo;
+    if (charaNo == -1) {
         resolvedNo = m_charaNo;
+    } else {
+        resolvedNo = charaNo;
     }
 
     CLoadAnim* loadAnim = FindLoadedAnim(&CharaPcs, resolvedKind, resolvedNo, animName);
@@ -2904,15 +2910,19 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
     } else if (drawPass == 2) {
         CVector modelPos;
         Mtx modelMtx;
+        Vec delta;
         PSMTXCopy(*ModelLocalMtx(m_model), modelMtx);
         modelPos.x = modelMtx[0][3];
         modelPos.y = modelMtx[1][3];
         modelPos.z = modelMtx[2][3];
 
         const CVector& focusPos = CVector(CharaPcs.m_texShadowPos);
+        Vec shadowPos;
+        Vec shadowBase;
+        Vec scaledDeltaCopy;
+        Vec eye;
         CVector deltaTmp;
         PSVECSubtract((Vec*)&focusPos, modelPos, deltaTmp);
-        Vec delta;
         delta.x = deltaTmp.x;
         delta.y = deltaTmp.y;
         delta.z = deltaTmp.z;
@@ -2928,7 +2938,6 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
 
         reinterpret_cast<CVector*>(&delta)->Normalize();
 
-        Vec eye;
         {
             CVector up(kCharaZero, 10.0f, kCharaZero);
             CVector eyeTmp;
@@ -2945,9 +2954,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         CVector scaledDelta;
         PSVECScale(&delta, scaledDelta, shadowDistance);
 
-        Vec shadowBase;
         {
-            Vec scaledDeltaCopy;
             scaledDeltaCopy.x = scaledDelta.x;
             scaledDeltaCopy.y = scaledDelta.y;
             scaledDeltaCopy.z = scaledDelta.z;
@@ -2958,7 +2965,6 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
             shadowBase.z = baseTmp.z;
         }
 
-        Vec shadowPos;
         {
             CVector posTmp;
             PSVECAdd(&shadowBase, shadowUp, posTmp);
@@ -2983,10 +2989,11 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         GXSetFog(GX_FOG_PERSP_LIN, nearZ, nearZ + kCharaOne, nearZ, farZ, shadowFogGX);
     }
 
-    bool restoreFog = false;
+    int restoreFog = 0;
     if (kCharaZero < m_fogBlend && (drawPass == 0 || drawPass == 4)) {
         float invBlend = kCharaOne - m_fogBlend;
-        float fogBlend = kCharaOne - invBlend * invBlend;
+        invBlend *= invBlend;
+        float fogBlend = kCharaOne - invBlend;
 
         float nearZ;
         float farZ;
@@ -3032,7 +3039,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
                  nearZ,
                  farZ,
                  fogColor);
-        restoreFog = true;
+        restoreFog = 1;
     }
 
     if (drawPass == 1 || drawPass == 2) {
@@ -3056,17 +3063,22 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
             GXPixModeSync();
         }
     } else {
-        int modelDrawFlags = 0;
+        unsigned char charmFlag = 0;
         if (drawPass == 3 && (m_flags & 0x0C) != 0) {
-            modelDrawFlags |= 1;
+            charmFlag = 1;
         }
         const unsigned int drawFlags = m_flags;
-        modelDrawFlags |= ((drawFlags & 0x400) != 0) ? 2 : 0;
-        modelDrawFlags |= ((drawFlags & 0x2000) != 0) ? 4 : 0;
+        const int blendBit = ((drawFlags & 0x400) != 0) ? 2 : 0;
+        const int specBit = ((drawFlags & 0x2000) != 0) ? 4 : 0;
+        int modelDrawFlags = static_cast<int>(charmFlag != 0) | blendBit | specBit;
+        unsigned char effectFlag = 0;
         if (drawPass == 3 && (drawFlags & 0x8000) != 0) {
-            modelDrawFlags |= 8;
+            effectFlag = 1;
         }
-        modelDrawFlags |= ((drawFlags & 0x100000) != 0) ? 0x10 : 0;
+        const int effectBit = (effectFlag != 0) ? 8 : 0;
+        const int furBit = ((drawFlags & 0x100000) != 0) ? 0x10 : 0;
+        modelDrawFlags |= effectBit;
+        modelDrawFlags |= furBit;
         m_model->Draw(viewMtx, modelDrawFlags, 0);
     }
 

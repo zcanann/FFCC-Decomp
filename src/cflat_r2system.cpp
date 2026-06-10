@@ -1944,20 +1944,24 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     }
-    case -0x0E:
-        this->push(object, Math.Rand(*object->m_localBase));
+    case -0x0E: {
+        int result = Math.Rand(*object->m_localBase);
+        this->push(object, result);
         outResult = 0;
         break;
+    }
     case -0x0F: {
         float value = Math.RandF(*reinterpret_cast<float*>(object->m_localBase));
         this->push(object, *reinterpret_cast<int*>(&value));
         outResult = 0;
         break;
     }
-    case -0x10:
-        this->push(object, Math.RandPM(*object->m_localBase));
+    case -0x10: {
+        int result = Math.RandPM(*object->m_localBase);
+        this->push(object, result);
         outResult = 0;
         break;
+    }
     case -0x11: {
         float value = Math.RandFPM(*reinterpret_cast<float*>(object->m_localBase));
         this->push(object, *reinterpret_cast<int*>(&value));

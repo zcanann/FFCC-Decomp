@@ -793,7 +793,7 @@ void CMenuPcs::CmakeVillageDraw()
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
     float panelW = 328.0f;
     MenuPcs.DrawRect(
-        0, static_cast<float>(static_cast<int>(-(0.5 * panelW - 400.0))), 288.0f, panelW, 56.0f,
+        0, static_cast<float>(static_cast<int>(400.0 - panelW * 0.5)), 288.0f, panelW, 56.0f,
         0.0f, 368.0f, 1.0f, 1.0f, 0.0f);
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -813,8 +813,8 @@ void CMenuPcs::CmakeVillageDraw()
         0, static_cast<float>(static_cast<int>(crestRightX)), 216.0f, 48.0f, 48.0f,
         48.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
-    int cursorBase = 0xE5;
     if (villageWork->m_mode == 1 && villageWork->m_row < 5) {
+        int cursorBase = (villageWork->m_row < 5) ? 0xE5 : 0xE5;
         int cursorY = villageWork->m_row * 0x20 + 0x63;
         int cursorX = static_cast<int>(
             26.9f * static_cast<float>(villageWork->m_select) + static_cast<float>(cursorBase));

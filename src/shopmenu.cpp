@@ -2636,7 +2636,10 @@ void CShopMenu::SelectYesNo()
 sellBlock:
     int itemIndex = m_selectedIndex;
     bool canTrade = false;
-    if (itemIndex != -1) {
+    if (itemIndex == -1) {
+        goto tradeResolved;
+    }
+    {
         int tradeItem = getItemNo(itemIndex);
         if (tradeItem <= 0) {
             canTrade = false;
@@ -2645,22 +2648,20 @@ sellBlock:
         } else if (m_listType == 2) {
             canTrade = true;
             if ((m_caravanWork->m_shopArgs[((int)(tradeItem - 0x191U) >> 5)] &
-                 (1 << ((tradeItem - 0x191U) & 0x1F))) == 0) {
-                canTrade = false;
-            }
-        } else {
-            if (MenuPcs.EquipChk(itemIndex) == 0) {
-                if (tradeItem > 0x9E) {
-                    canTrade = true;
-                } else {
-                    canTrade = false;
-                }
+                 (1 << ((tradeItem - 0x191U) & 0x1F))) != 0) {
             } else {
                 canTrade = false;
             }
+        } else if (static_cast<unsigned char>(MenuPcs.EquipChk(itemIndex)) != 0) {
+            canTrade = false;
+        } else if (tradeItem > 0x9E) {
+            canTrade = true;
+        } else {
+            canTrade = false;
         }
     }
 
+tradeResolved:
     if (canTrade) {
         Sound.PlaySe(0x50, 0x40, 0x7F, 0);
         int sellId = getItemNo(m_selectedIndex);
@@ -2670,18 +2671,16 @@ sellBlock:
                 gilValue = 0;
             } else {
                 int gil = m_caravanWork->m_shopParam *
-                          *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + sellId * 0x48 + 0x20);
-                gil = gil / 100 + (gil >> 0x1F);
-                gilValue = gil - (gil >> 0x1F);
+                          reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + sellId * 0x48)[0x10];
+                gilValue = gil / 100;
             }
         } else if (m_listType == 1) {
             if (sellId <= 0) {
                 gilValue = 0;
             } else {
                 int gil = m_caravanWork->m_shopParam *
-                          *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + sellId * 0x48 + 0x20);
-                gil = gil / 100 + (gil >> 0x1F);
-                gilValue = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil - (gil >> 0x1F)));
+                          reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + sellId * 0x48)[0x10];
+                gilValue = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil / 100));
             }
         } else {
             gilValue = -1;
@@ -2695,18 +2694,16 @@ sellBlock:
                     gilValue2 = 0;
                 } else {
                     int gil = m_caravanWork->m_shopParam *
-                              *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + sellId * 0x48 + 0x20);
-                    gil = gil / 100 + (gil >> 0x1F);
-                    gilValue2 = gil - (gil >> 0x1F);
+                              reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + sellId * 0x48)[0x10];
+                    gilValue2 = gil / 100;
                 }
             } else if (m_listType == 1) {
                 if (sellId <= 0) {
                     gilValue2 = 0;
                 } else {
                     int gil = m_caravanWork->m_shopParam *
-                              *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + sellId * 0x48 + 0x20);
-                    gil = gil / 100 + (gil >> 0x1F);
-                    gilValue2 = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil - (gil >> 0x1F)));
+                              reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + sellId * 0x48)[0x10];
+                    gilValue2 = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil / 100));
                 }
             } else {
                 gilValue2 = -1;

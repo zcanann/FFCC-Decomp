@@ -118,7 +118,7 @@ public:
     int SendMapObjDrawFlg(ThreadParam* threadParam);
     int SendFavorite(ThreadParam* threadParam);
 
-    unsigned int RequestData(ThreadParam*, int a, int b);
+    int RequestData(ThreadParam*, int a, int b);
     void SetRecvBuffer(ThreadParam*, unsigned int);
     void ClrRecvBuffer(int portIndex);
 	void GetRecvBuffer(int playerIndex, unsigned char* outBuffer);

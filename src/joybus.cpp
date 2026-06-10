@@ -855,10 +855,10 @@ timeout_expiry:
 
             unsigned char controllerMode = GbaQue.GetControllerMode();
 
-            if (controllerMode == 0)
-                m_nextModeTypeArr[threadParam->m_portIndex] = 0;
-            else
+            if (controllerMode != 0)
                 m_nextModeTypeArr[threadParam->m_portIndex] = 4;
+            else
+                m_nextModeTypeArr[threadParam->m_portIndex] = 0;
 
             ResetQueue(threadParam);
 
@@ -886,7 +886,6 @@ timeout_expiry:
                 threadParam->m_timestamp = OSGetTick();
 
                 ThreadSleep(OSMillisecondsToTicks(15));
-                stateStartTime = OSGetTime();
             }
             else if ((int)threadParam->m_gbaStatus == 3)
             {
@@ -1031,12 +1030,12 @@ timeout_expiry:
 
             if ((GbaQue.GetControllerMode() & 0xFF) != 0)
             {
-                m_ctrlModeArr[threadParam->m_portIndex] = 4;
+                m_nextModeTypeArr[threadParam->m_portIndex] = 4;
             }
 
-            if (m_ctrlModeArr[threadParam->m_portIndex] == 4)
+            if (m_nextModeTypeArr[threadParam->m_portIndex] == 4)
             {
-                if (SendMType(threadParam, m_ctrlModeArr[threadParam->m_portIndex]) < 0)
+                if (SendMType(threadParam, m_nextModeTypeArr[threadParam->m_portIndex]) < 0)
                 {
                     goto sleep_retry;
                 }
@@ -1085,7 +1084,7 @@ timeout_expiry:
                 }
             }
 
-            char radarType = GbaQue.GetRadarType(threadParam->m_portIndex);
+            int radarType = GbaQue.GetRadarType(threadParam->m_portIndex);
             if ((int)GbaQue.GetStageFlg(threadParam->m_portIndex) == 0 && radarType == 2)
             {
                 if ((char)GbaQue.GetChgScouFlg(threadParam->m_portIndex) != 0 ||
@@ -2550,6 +2549,7 @@ timeout_expiry:
             break;
         }
 
+        case 902:
         default:
         {
             threadParam->m_flags[4] = 0;
@@ -5164,7 +5164,7 @@ int JoyBus::SendFavorite(ThreadParam* threadParam)
  * Address:	TODO
  * Size:	TODO
  */
-unsigned int JoyBus::RequestData(ThreadParam* threadParam, int a, int b)
+int JoyBus::RequestData(ThreadParam* threadParam, int a, int b)
 {
     unsigned int cmd = 0;
     unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);

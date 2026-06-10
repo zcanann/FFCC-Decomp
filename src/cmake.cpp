@@ -467,15 +467,10 @@ static bool IsCmakeNameBlank(const char* name)
 
 static bool IsDuplicateCmakeName(CMenuPcs* menu, const char* name)
 {
-    if (name[0] == '\0') {
-        return false;
-    }
-
     bool found = false;
-    int activeSlot = static_cast<int>(CmakeSlot(menu));
     unsigned char* entry = reinterpret_cast<unsigned char*>(&Game);
     for (int slot = 0; slot < 8; ++slot, entry += 0xC30) {
-        if (slot == activeSlot) {
+        if (slot == CmakeSlot(menu)) {
             continue;
         }
         if (*reinterpret_cast<int*>(entry + 0x1794) == 0) {

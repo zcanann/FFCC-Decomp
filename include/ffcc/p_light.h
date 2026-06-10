@@ -101,7 +101,7 @@ public:
     void MakeLightMap();
     void SetBumpTexMatirx(float (*)[4], CLightPcs::CBumpLight*, Vec*, unsigned char);
     float (*GetBumpIndTexMtx())[3] { return reinterpret_cast<float (*)[3]>(&m_bumpTexScratch[12]); }
-    CBumpLight* GetBumpLight(CLightPcs::TARGET target, int index) { return &m_bumpLights[static_cast<int>(target) * 8 + index]; }
+    CBumpLight* GetBumpLight(CLightPcs::TARGET target, int index) { return &m_bumpLights[target][index]; }
 
     Mtx m_bumpTexMtx0;               // 0x04
     Mtx m_bumpTexMtx1;               // 0x34
@@ -112,7 +112,7 @@ public:
     u32 m_sceneLightCount;           // 0xB8
     CLight m_diffuseLights[8];       // 0xBC
     CLight m_sceneLights[0x20];      // 0x63C
-    CBumpLight m_bumpLights[0x20];   // 0x1C3C
+    CBumpLight m_bumpLights[4][8];   // 0x1C3C
     _GXColor m_mapLightColor[4];     // 0x433C
     float m_mapLightParams[9];       // 0x434C
     GXLightObj m_mapLightObj;        // 0x4370

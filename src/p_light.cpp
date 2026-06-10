@@ -126,7 +126,8 @@ inline void CLightPcs::CLight::Set(CLightPcs::CLight* light)
     if (m_range < kLightZero) {
         m_range = -m_range;
     }
-    m_range = m_range * kLightHalf * m_radius;
+    float range = m_range * kLightHalf;
+    m_range = range * m_radius;
 
     m_targetEnable[3] = 1;
     m_targetEnable[2] = 1;
@@ -210,8 +211,8 @@ int CLightPcs::GetTable(unsigned long index)
 void CLightPcs::create()
 {
     for (int i = 0; i < 0x20; i++) {
-        m_bumpLights[i].m_hasTexture = 0;
-        m_bumpLights[i].m_textureData = 0;
+        m_bumpLights[0][i].m_hasTexture = 0;
+        m_bumpLights[0][i].m_textureData = 0;
     }
 }
 
@@ -226,33 +227,8 @@ void CLightPcs::create()
  */
 void CLightPcs::destroy()
 {
-    u32 i = 0;
-    do {
-        if (m_bumpLights[i + 8].m_textureData != 0) {
-            bool hasTexture = m_bumpLights[i + 8].m_textureData != 0;
-            if (hasTexture) {
-                Memory.Free(m_bumpLights[i + 8].m_textureData);
-                m_bumpLights[i + 8].m_textureData = 0;
-            }
-            m_bumpLights[i + 8].m_hasTexture = 0;
-            m_bumpLights[i + 8].m_useViewSpace = 0;
-        }
-        i++;
-    } while (i < 8);
-
-    i = 0;
-    do {
-        if (m_bumpLights[i].m_textureData != 0) {
-            bool hasTexture = m_bumpLights[i].m_textureData != 0;
-            if (hasTexture) {
-                Memory.Free(m_bumpLights[i].m_textureData);
-                m_bumpLights[i].m_textureData = 0;
-            }
-            m_bumpLights[i].m_hasTexture = 0;
-            m_bumpLights[i].m_useViewSpace = 0;
-        }
-        i++;
-    } while (i < 8);
+    DestroyBumpLightAll(static_cast<TARGET>(1));
+    DestroyBumpLightAll(static_cast<TARGET>(0));
 }
 
 /*
@@ -266,19 +242,16 @@ void CLightPcs::destroy()
  */
 void CLightPcs::DestroyBumpLightAll(CLightPcs::TARGET target)
 {
-    CBumpLight* bumpLights = m_bumpLights;
-    CBumpLight* light = &bumpLights[static_cast<int>(target) * 8];
-
     for (u32 i = 0; i < 8; i++) {
-        if (light[i].m_textureData != 0) {
-            bool hasTexture = light[i].m_textureData != 0;
+        if (m_bumpLights[target][i].m_textureData != 0) {
+            bool hasTexture = m_bumpLights[target][i].m_textureData != 0;
             if (hasTexture) {
-                Memory.Free(light[i].m_textureData);
-                light[i].m_textureData = 0;
+                Memory.Free(m_bumpLights[target][i].m_textureData);
+                m_bumpLights[target][i].m_textureData = 0;
             }
 
-            light[i].m_hasTexture = 0;
-            light[i].m_useViewSpace = 0;
+            m_bumpLights[target][i].m_hasTexture = 0;
+            m_bumpLights[target][i].m_useViewSpace = 0;
         }
     }
 }
@@ -355,7 +328,8 @@ void CLightPcs::draw()
 void CLightPcs::Add(CLightPcs::CLight* light)
 {
     CLight sceneLight;
-    sceneLight.Set(light);
+    CLight* sp = &sceneLight;
+    sp->Set(light);
 
     u32 idx = m_sceneLightCount;
     m_sceneLightCount = idx + 1;
@@ -378,7 +352,7 @@ CLightPcs::CBumpLight* CLightPcs::AddBump(CLightPcs::CLight* srcLight, CLightPcs
     CBumpLight* bumpLight = GetFreeBumpLight(target);
 
     if (bumpLight == 0) {
-        if (static_cast<int>(System.m_execParam) >= 1) {
+        if (static_cast<u32>(System.m_execParam) >= 1) {
             System.Printf(const_cast<char*>(sLightTextureFullMsg));
         }
         return 0;
@@ -415,11 +389,9 @@ CLightPcs::CBumpLight* CLightPcs::AddBump(CLightPcs::CLight* srcLight, CLightPcs
  */
 inline CLightPcs::CBumpLight* CLightPcs::GetFreeBumpLight(CLightPcs::TARGET target)
 {
-    CBumpLight* bumpLights = &m_bumpLights[target * 8];
-
     for (int i = 0; i < 8; i++) {
-        if (bumpLights[i].m_hasTexture == 0) {
-            return &bumpLights[i];
+        if (m_bumpLights[target][i].m_hasTexture == 0) {
+            return &m_bumpLights[target][i];
         }
     }
 
@@ -949,17 +921,12 @@ void CLightPcs::CBumpLight::MakeLightMap()
     }
 
     int copySize = GXGetTexBufferSize(0x40, 0x40, 3, 0, 0);
-    float dScale = kBumpLightMapGridStep;
-    float dHalf = kLightOne;
     static float tParam[4] = {48.0f, 128.0f, 256.0f, 512.0f};
-    float* lightScale = tParam;
-    float dFactor = kBumpLightMapCoordScale;
-    float dInv = kBumpLightNormalDivisor;
     int offset = 0;
-    float dW = kBumpLightMapVertexZ;
+    float* lightScale = tParam;
 
     for (int i = 0; i < (int)(unsigned int)m_textureCount; i++) {
-        int texBase = (int)m_textureData;
+        u8* texDst = m_textureData + offset;
         GXLightObj lightObj;
         GXInitSpecularDir(&lightObj, eyeDir.x, eyeDir.y, eyeDir.z);
 
@@ -977,22 +944,27 @@ void CLightPcs::CBumpLight::MakeLightMap()
 
         GXLoadLightObjImm(&lightObj, (GXLightID)1);
 
-        int y = 0;
+        float dW = kBumpLightMapVertexZ;
+        float dInv = kBumpLightNormalDivisor;
+        u32 y = 0;
         do {
-            unsigned int yBase = y;
             GXBegin((GXPrimitive)0x98, (GXVtxFmt)0, 0x42);
 
-            float x0 = dFactor * (float)yBase * dScale - dHalf;
-            float dx0 = x0;
-            float x1 = dFactor * (float)(yBase + 1) * dScale - dHalf;
-            float dx1 = x1;
-
-            int inner = 0x21;
-            unsigned int x = 0;
-            do {
-                float z0 = dFactor * (float)x * dScale - dHalf;
-                float dz0 = z0;
-                float dist0 = dx0 * dx0 + dz0 * dz0;
+            float fy = (float)y;
+            float dFactor = kBumpLightMapCoordScale;
+            float dHalf = kLightOne;
+            float dScale = kBumpLightMapGridStep;
+            for (u32 x = 0; x < 0x21; x++) {
+                float t0 = dFactor * fy;
+                float x0 = t0 * dScale - dHalf;
+                float xd0 = x0 / dInv;
+                float t1 = dFactor * (float)(y + 1);
+                float x1 = t1 * dScale - dHalf;
+                float xd1 = x1 / dInv;
+                float tz = dFactor * (float)x;
+                float z0 = tz * dScale - dHalf;
+                float zd = z0 / dInv;
+                float dist0 = z0 * z0 + x0 * x0;
                 if (dist0 < dHalf) {
                     dist0 = sqrtf(dHalf - dist0);
                 } else {
@@ -1000,11 +972,11 @@ void CLightPcs::CBumpLight::MakeLightMap()
                 }
 
                 GXWGFifo.f32 = x0;
-                float dist1 = dx1 * dx1 + dz0 * dz0;
+                float dist1 = z0 * z0 + x1 * x1;
                 GXWGFifo.f32 = z0;
                 GXWGFifo.f32 = dW;
-                GXWGFifo.f32 = dx0 / dInv;
-                GXWGFifo.f32 = dz0 / dInv;
+                GXWGFifo.f32 = xd0;
+                GXWGFifo.f32 = zd;
                 GXWGFifo.f32 = dist0;
 
                 if (dist1 < dHalf) {
@@ -1016,20 +988,17 @@ void CLightPcs::CBumpLight::MakeLightMap()
                 GXWGFifo.f32 = x1;
                 GXWGFifo.f32 = z0;
                 GXWGFifo.f32 = dW;
-                GXWGFifo.f32 = dx1 / dInv;
-                GXWGFifo.f32 = dz0 / dInv;
+                GXWGFifo.f32 = xd1;
+                GXWGFifo.f32 = zd;
                 GXWGFifo.f32 = dist1;
+            }
 
-                inner--;
-                x++;
-            } while (inner != 0);
-
-            y = yBase + 1;
+            y++;
         } while (y < 0x20);
 
         GXSetTexCopySrc(0, 0, 0x40, 0x40);
         GXSetTexCopyDst((unsigned short)0x40, (unsigned short)0x40, (GXTexFmt)3, (unsigned char)0);
-        GXCopyTex(reinterpret_cast<void*>(texBase + offset), 1);
+        GXCopyTex(texDst, 1);
         GXPixModeSync();
 
         offset += copySize;
@@ -1078,13 +1047,11 @@ void CLightPcs::MakeLightMap()
 
     for (u32 target = 0; target < 4; target++) {
         u32 i = 0;
-        CBumpLight* bumpLight = &m_bumpLights[target * 8];
         do {
-            if (bumpLight->m_hasTexture != 0) {
-                bumpLight->MakeLightMap();
+            if (m_bumpLights[target][i].m_hasTexture != 0) {
+                m_bumpLights[target][i].MakeLightMap();
             }
             i++;
-            bumpLight++;
         } while (i < 8);
     }
 
@@ -1201,9 +1168,9 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
     nrm[0][2] = out[0][2];
     nrm[1][2] = out[1][2];
     nrm[2][2] = out[2][2];
-    nrm[0][3] = kLightZero;
-    nrm[1][3] = kLightZero;
-    nrm[2][3] = kLightZero;
+    nrm[0][3] = 0.0f;
+    nrm[1][3] = 0.0f;
+    nrm[2][3] = 0.0f;
     GXLoadNrmMtxImm(nrm, 0);
 
     if ((bump != nullptr) && (bump->m_hasTexture != 0)) {
@@ -1230,10 +1197,10 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
             float* scratch = m_bumpTexScratch;
 
             float mtxScale = kBumpTexMtxScale;
-            float scrollScale = kBumpTexScrollScale;
-            float zero = kLightZero;
-            scratch[0] = kBumpTexScrollScale;
             float half = kLightHalf;
+            float zero = kLightZero;
+            float scrollScale = kBumpTexScrollScale;
+            scratch[0] = scrollScale;
             scratch[6] = scrollScale;
             scratch[10] = zero;
             scratch[5] = zero;

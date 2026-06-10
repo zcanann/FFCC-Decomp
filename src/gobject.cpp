@@ -1720,18 +1720,15 @@ void CGObject::update()
         if (sZeroFloat == m_lookAtTimer) {
             m_weaponNodeFlagBits.m_unk20 = 0;
         }
-        m_weaponNodeFlagBits.m_unk40 =
-            (static_cast<s32>(static_cast<u32>(weaponFlagsLo) << 25 | static_cast<u32>(weaponFlagsLo) >> 7) >> 31 |
-             static_cast<s32>(static_cast<u32>(weaponFlagsLo) << 26 | static_cast<u32>(weaponFlagsLo) >> 6) >> 31);
+        m_weaponNodeFlagBits.m_unk40 = m_weaponNodeFlagBits.m_unk40 | m_weaponNodeFlagBits.m_unk20;
 
         if ((m_displayFlags & 1) != 0) {
-            if ((static_cast<signed char>(
-                     static_cast<s32>(static_cast<u32>(weaponFlagsLo) << 26 | static_cast<u32>(weaponFlagsLo) >> 6) >> 31) &&
+            if ((m_weaponNodeFlagBits.m_unk20 &&
                  miniGameModelPass == 0) ||
                 m_currentAnimSlot != -1 || m_animSlotSel != static_cast<signed char>(shieldFlagsHi)) {
                 m_charaModelHandle->m_model->CalcMatrix();
             }
-            if (static_cast<s32>(static_cast<u32>(weaponFlagsLo) << 26 | static_cast<u32>(weaponFlagsLo) >> 6) < 0 &&
+            if (m_weaponNodeFlagBits.m_unk20 &&
                 miniGameModelPass == 0) {
                 m_charaModelHandle->m_model->CalcSkin();
             }
@@ -1750,13 +1747,13 @@ void CGObject::update()
                 if (ModelAnim(m_charaModelHandle->m_model) != 0) {
                     const unsigned short frameCount = *reinterpret_cast<unsigned short*>(
                         reinterpret_cast<unsigned char*>(ModelAnim(m_charaModelHandle->m_model)) + 0x10);
-                    frameStep = m_turnSpeed + static_cast<float>(frameCount) /
-                                 static_cast<float>(*reinterpret_cast<unsigned int*>(&m_attackColliders[0].m_localStart.x));
+                    frameStep = static_cast<float>(frameCount) /
+                                 static_cast<float>(*reinterpret_cast<unsigned int*>(&m_attackColliders[0].m_localStart.x)) + m_turnSpeed;
                 } else {
                     if (static_cast<unsigned int>(System.m_execParam) >= 2) {
                         System.Printf(const_cast<char*>(s_noTurnMotion));
                     }
-                    frameStep = m_turnSpeed + sAnimFrameOffset;
+                    frameStep = sAnimFrameOffset + m_turnSpeed;
                 }
             } else {
                 float frameDelta = m_lastBgAttr;
@@ -1768,7 +1765,7 @@ void CGObject::update()
                     frameDelta = frameDelta < sZeroFloat ? sNegativeOne : sAnimFrameOffset;
                 }
                 frameDelta = frameDelta * FLOAT_803303FC;
-                frameStep = m_turnSpeed + frameDelta;
+                frameStep = frameDelta + m_turnSpeed;
             }
 
             const float prevTime = m_charaModelHandle->m_model->m_time;

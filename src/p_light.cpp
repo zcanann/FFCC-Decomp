@@ -952,16 +952,14 @@ void CLightPcs::CBumpLight::MakeLightMap()
         do {
             GXBegin((GXPrimitive)0x98, (GXVtxFmt)0, 0x42);
 
-            float x0 = dFactor * (float)y * dScale - dHalf;
-            float xd0 = x0 / dInv;
-            float x1 = dFactor * (float)(y + 1) * dScale - dHalf;
-            float xd1 = x1 / dInv;
-
             for (u32 x = 0; x < 0x21; x++) {
+                float x0 = dFactor * (float)y * dScale - dHalf;
+                float xd0 = x0 / dInv;
+                float x1 = dFactor * (float)(y + 1) * dScale - dHalf;
+                float xd1 = x1 / dInv;
                 float z0 = dFactor * (float)x * dScale - dHalf;
                 float zd = z0 / dInv;
-                float zSq = z0 * z0;
-                float dist0 = x0 * x0 + zSq;
+                float dist0 = z0 * z0 + x0 * x0;
                 if (dist0 < dHalf) {
                     dist0 = sqrtf(dHalf - dist0);
                 } else {
@@ -969,7 +967,7 @@ void CLightPcs::CBumpLight::MakeLightMap()
                 }
 
                 GXWGFifo.f32 = x0;
-                float dist1 = x1 * x1 + zSq;
+                float dist1 = z0 * z0 + x1 * x1;
                 GXWGFifo.f32 = z0;
                 GXWGFifo.f32 = dW;
                 GXWGFifo.f32 = xd0;

@@ -10858,106 +10858,105 @@ void CMenuPcs::ChkMcDataCnt()
  */
 void CMenuPcs::DrawMCList()
 {
-	const int* const DAT_801dc118 = reinterpret_cast<int*>(lbl_801DB7F8 + 0x920);
-	const int DAT_801dc140 = *reinterpret_cast<int*>(lbl_801DB7F8 + 0x948);
-	unsigned char* const lbl_801DC294 = reinterpret_cast<unsigned char*>(lbl_801DB7F8 + 0xA9C);
+	extern float FLOAT_803314D8;
+	extern float FLOAT_803314DC;
+	extern float FLOAT_803314E0;
+	extern float FLOAT_803314F8;
+	extern float FLOAT_803314FC;
+	extern double DOUBLE_803314F0;
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	CFont* fontF8 = m_fonts[0];
 #define worldState GetWmWorldState(this)
-	const double kSlope = DOUBLE_80331498;
-	const double kBase = DOUBLE_80331490;
 	short state = worldState->m_mainState;
 
 	if ((state == 2 || state == 3) && worldState->m_subState != 0) {
-		unsigned int slotIdx = 0;
+		int slotIdx = 0;
 		int iVar16 = 0;
 		do {
-			float yPos = FLOAT_803314d8;
-			float alpha = FLOAT_803313e8;
+			float yPos;
+			float alpha;
 			short sub = worldState->m_subState;
 			if (sub == 1 || worldState->m_mainState == 3) {
 				int animFrames;
 				if (worldState->m_mainState == 2) {
 					animFrames = (int)worldState->m_frameCounter - iVar16;
 				} else {
-					animFrames = 10 - ((int)worldState->m_frameCounter - (3 - (int)slotIdx) * 3);
-					}
-					if (animFrames >= 0) {
-						if (animFrames <= 10) {
-							alpha = static_cast<float>(DOUBLE_803314e8 *
-							                           (static_cast<double>(animFrames) - DOUBLE_80331408));
-							yPos = static_cast<float>(static_cast<float>(static_cast<double>(animFrames) -
-							                                             DOUBLE_80331408) *
-							                          FLOAT_803314e0 +
-							                          FLOAT_803314dc);
-						}
-						goto LAB_draw;
-					}
-			} else {
-LAB_draw:
-				if (alpha > FLOAT_803314f0) {
-					float slotY = (float)(kSlope * (double)(int)slotIdx + kBase);
-					MenuPcs.SetAttrFmt((FMT)0);
-					GXColor slotColor;
-					slotColor.r = 0xFF;
-					slotColor.g = 0xFF;
-					slotColor.b = 0xFF;
-					slotColor.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * alpha));
-					GXSetChanMatColor(GX_COLOR0A0, slotColor);
-
-					// Draw slot background
-					MenuPcs.SetTexture((TEX)0x24);
-					MenuPcs.DrawRect(0xFFFFFFFF, yPos, slotY, FLOAT_80331468, FLOAT_803314f8,
-					         FLOAT_803313dc, FLOAT_803313dc,
-					         FLOAT_803313e8, FLOAT_803313e8, 0);
-					MenuPcs.SetTexture((TEX)0x25);
-					MenuPcs.DrawRect(0xFFFFFFFF, yPos + FLOAT_80331468, slotY, FLOAT_803314fc, FLOAT_803314f8,
-					         FLOAT_803313dc, FLOAT_803313dc,
-					         FLOAT_803313e8, FLOAT_803313e8, 0);
-
-					// Draw slot content area
-					MenuPcs.SetAttrFmt((FMT)1);
-					float contentX = yPos + FLOAT_80331468 + FLOAT_803314fc;
-					GXColor contentColors[4];
-					contentColors[0].r = 0xFF;
-					contentColors[0].g = 0xFF;
-					contentColors[0].b = 0xFF;
-					contentColors[0].a = slotColor.a;
-					contentColors[1].r = 0xFF;
-					contentColors[1].g = 0xFF;
-					contentColors[1].b = 0xFF;
-					contentColors[1].a = 0;
-					contentColors[2].r = 0xFF;
-					contentColors[2].g = 0xFF;
-					contentColors[2].b = 0xFF;
-					contentColors[2].a = slotColor.a;
-					contentColors[3].r = 0xFF;
-					contentColors[3].g = 0xFF;
-					contentColors[3].b = 0xFF;
-					contentColors[3].a = 0;
-					MenuPcs.DrawRect(0xFFFFFFFF, contentX, slotY, FLOAT_80331500, FLOAT_803314f8,
-					         FLOAT_803313dc, FLOAT_803313dc, contentColors,
-					         FLOAT_803313e8, FLOAT_803313e8, 0);
+					animFrames = 10 - ((int)worldState->m_frameCounter - (3 - slotIdx) * 3);
 				}
+				if (animFrames < 0) {
+					goto LAB_next;
+				}
+				if (animFrames > 10) {
+					yPos = FLOAT_803314D8;
+					alpha = FLOAT_803313e8;
+				} else {
+					alpha = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(animFrames));
+					yPos = static_cast<float>(animFrames) * FLOAT_803314E0 + FLOAT_803314DC;
+				}
+			} else {
+				yPos = FLOAT_803314D8;
+				alpha = FLOAT_803313e8;
 			}
+			if (!(alpha <= DOUBLE_803314F0)) {
+				float slotY = (float)(DOUBLE_80331498 * static_cast<double>(slotIdx) + DOUBLE_80331490);
+				MenuPcs.SetAttrFmt((FMT)0);
+				alpha = FLOAT_80331458 * alpha;
+				GXColor slotColor;
+				slotColor.r = 0xFF;
+				slotColor.g = 0xFF;
+				slotColor.b = 0xFF;
+				slotColor.a = static_cast<unsigned char>(static_cast<int>(alpha));
+				GXSetChanMatColor(GX_COLOR0A0, slotColor);
+
+				// Draw slot background
+				MenuPcs.SetTexture((TEX)0x24);
+				MenuPcs.DrawRect(0, yPos, slotY, FLOAT_80331468, FLOAT_803314F8,
+				         FLOAT_803313dc, FLOAT_803313dc,
+				         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+				yPos += FLOAT_80331468;
+				MenuPcs.SetTexture((TEX)0x25);
+				MenuPcs.DrawRect(0, yPos, slotY, FLOAT_803314FC, FLOAT_803314F8,
+				         FLOAT_803313dc, FLOAT_803313dc,
+				         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+				yPos += FLOAT_803314FC;
+
+				// Draw slot content area
+				MenuPcs.SetAttrFmt((FMT)1);
+				GXColor contentColors[4];
+				contentColors[0].r = 0xFF;
+				contentColors[0].g = 0xFF;
+				contentColors[0].b = 0xFF;
+				contentColors[0].a = static_cast<unsigned char>(static_cast<int>(static_cast<float>(alpha)));
+				contentColors[1].r = 0xFF;
+				contentColors[1].g = 0xFF;
+				contentColors[1].b = 0xFF;
+				contentColors[1].a = 0;
+				contentColors[2].r = 0xFF;
+				contentColors[2].g = 0xFF;
+				contentColors[2].b = 0xFF;
+				contentColors[2].a = static_cast<unsigned char>(static_cast<int>(static_cast<float>(alpha)));
+				contentColors[3].r = 0xFF;
+				contentColors[3].g = 0xFF;
+				contentColors[3].b = 0xFF;
+				contentColors[3].a = 0;
+				MenuPcs.DrawRect(0, yPos, slotY, FLOAT_80331500, FLOAT_803314F8,
+				         FLOAT_803313dc, FLOAT_803313dc, contentColors,
+				         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+			}
+LAB_next:
 			slotIdx++;
 			iVar16 += 3;
-		} while ((unsigned int)slotIdx < 4);
+		} while (slotIdx < 4);
 	}
 
 	float frameAlpha;
 	state = worldState->m_mainState;
 	if (state == 0) {
-		frameAlpha = static_cast<float>(DOUBLE_803314e8 *
-		                                (static_cast<double>(worldState->m_frameCounter) -
-		                                 DOUBLE_80331408));
+		frameAlpha = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(worldState->m_frameCounter));
 	} else if (state > 0 && state < 4) {
 		frameAlpha = FLOAT_803313e8;
 	} else {
-		frameAlpha = static_cast<float>(-(DOUBLE_803314e8 *
-		                                  (static_cast<double>(worldState->m_frameCounter) -
-		                                   DOUBLE_80331408) -
-		                                  DOUBLE_80331420));
+		frameAlpha = static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331420));
 	}
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	GXColor frameColor;
@@ -10967,17 +10966,16 @@ LAB_draw:
 	frameColor.a = static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(frameAlpha)));
 	GXSetChanMatColor(static_cast<GXChannelID>(4), frameColor);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
-	unsigned char* const frame = m_wm.m_frameInfo;
-	for (unsigned int i = 0, offset = 0; i < 2; i++, offset += 0x1C) {
+	for (int i = 0, offset = i; i < 2; i++, offset += 0x1C) {
 		if (((1 << i) & 2) != 0) {
-			unsigned char* const frameEntry = frame + offset + 4;
-			MenuPcs.DrawRect(0xFFFFFFFF, static_cast<float>(*reinterpret_cast<short*>(frameEntry)),
+			unsigned char* const frameEntry = m_wm.m_frameInfo + offset + 4;
+			MenuPcs.DrawRect(*reinterpret_cast<unsigned int*>(frameEntry + 0x18),
+			         static_cast<float>(*reinterpret_cast<short*>(frameEntry)),
 			         static_cast<float>(*reinterpret_cast<short*>(frameEntry + 2)),
 			         static_cast<float>(*reinterpret_cast<short*>(frameEntry + 4)),
 			         static_cast<float>(*reinterpret_cast<short*>(frameEntry + 6)),
 			         *reinterpret_cast<float*>(frameEntry + 8), *reinterpret_cast<float*>(frameEntry + 0x0C),
-			         FLOAT_803313e8, FLOAT_803313e8,
-			         static_cast<float>(*reinterpret_cast<int*>(frameEntry + 0x18)));
+			         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 		}
 	}
 
@@ -10991,31 +10989,43 @@ LAB_draw:
 	short separatorSub = worldState->m_subState;
 	if (separatorSub != 0 && separatorSub > 1 &&
 	    worldState->m_mainState == 2) {
+		const float sepZero = FLOAT_803313dc;
+		const double sepSlope = DOUBLE_80331498;
+		const double sepBase = DOUBLE_80331490;
 		const double sepOff = DOUBLE_80331510;
 		for (int slot = 0; slot < kMcListCount; slot++) {
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
-			MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_803314d8,
-			         static_cast<float>((kSlope * static_cast<double>(slot) + kBase) -
+			MenuPcs.DrawRect(0, FLOAT_803314D8,
+			         static_cast<float>(static_cast<float>(sepSlope * static_cast<double>(slot) + sepBase) -
 			                            sepOff),
-			         FLOAT_803314d8, FLOAT_803314d8,
-			         static_cast<float>(kBase * static_cast<double>(slot)), FLOAT_803313e0,
-			         FLOAT_803313e8, FLOAT_803313e8, 0.0f);
+			         FLOAT_803314D8, FLOAT_803314D8,
+			         static_cast<float>(sepBase * static_cast<double>(slot)), FLOAT_803313e0,
+			         FLOAT_803313e8, FLOAT_803313e8, sepZero);
 		}
 	}
 
 	if (worldState->m_subState >= 0x11 &&
 	    worldState->m_mainState < 3) {
-		unsigned char* const mcData = m_wmCharaState;
-		for (int slot = 0; slot < kMcListCount; slot++) {
-			unsigned char* const slotData = mcData + slot * kMcListEntrySize;
-			const float slotY = static_cast<float>(kSlope * static_cast<double>(slot) + kBase);
+		const double mapX = DOUBLE_80331510 + static_cast<double>(FLOAT_80331518);
+		const int language = Game.m_gameWork.m_languageId;
+		int* const digitWidths = reinterpret_cast<int*>(lbl_801DB7F8 + 0x920);
+		int* const playWidths = reinterpret_cast<int*>(lbl_801DB7F8 + 0xab0);
+		const double rowSlopeD = DOUBLE_80331498;
+		const double rowBaseD = DOUBLE_80331490;
+		for (int slot = 0, slotOff = slot; slot < kMcListCount; slot++, slotOff += kMcListEntrySize) {
+			unsigned char* const slotData = m_wmCharaState + slotOff;
+			const float slotY = (float)(rowSlopeD * static_cast<double>(slot) + rowBaseD);
 			if (*reinterpret_cast<char*>(slotData + 0x42) == 0 && *reinterpret_cast<char*>(slotData + 0x41) != 0) {
-				const float rowY = slotY + FLOAT_80331440;
+				float rowY = FLOAT_80331440 + slotY;
+				float capX = FLOAT_80331468;
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x26));
-				MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_80331468, rowY, FLOAT_803314d8, FLOAT_80331440,
-				         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
+				MenuPcs.DrawRect(0, FLOAT_80331468, rowY, FLOAT_803314D8, FLOAT_80331440,
+				         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 
-				unsigned int memberCount = static_cast<unsigned int>(*reinterpret_cast<int*>(slotData + 0x18) >= 0);
+				int memberCount = 0;
+				if (*reinterpret_cast<int*>(slotData + 0x18) >= 0) {
+					memberCount = 1;
+				}
 				if (*reinterpret_cast<int*>(slotData + 0x1C) >= 0) {
 					memberCount++;
 				}
@@ -11026,255 +11036,217 @@ LAB_draw:
 					memberCount++;
 				}
 				const int panelWidth = memberCount * 0x30 + 0x40;
-				MenuPcs.DrawRect(0xFFFFFFFF,
-				         FLOAT_80331468 + FLOAT_803314d8 + static_cast<float>(static_cast<int>(panelWidth)),
-				         rowY, FLOAT_803314d8, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc,
-				         FLOAT_803313e8, FLOAT_803313e8, 8.0f);
-					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2A));
-					MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_8033151c, rowY, static_cast<float>(panelWidth), FLOAT_80331440,
-					         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
+				capX += FLOAT_803314D8 + static_cast<float>(panelWidth);
+				MenuPcs.DrawRect(8, capX, rowY, FLOAT_803314D8, FLOAT_80331440,
+				         FLOAT_803313dc, FLOAT_803313dc,
+				         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2A));
+				MenuPcs.DrawRect(0, FLOAT_8033151c, rowY, static_cast<float>(panelWidth), FLOAT_80331440,
+				         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 
-					const int language = Game.m_gameWork.m_languageId;
-					float dateY = rowY;
+				float digitX = FLOAT_80331520;
+				if (language != 5) {
+					rowY = FLOAT_803314D8 + slotY;
+				}
+				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x17));
+				int digitCount = (*reinterpret_cast<int*>(slotData + 8) > 9) + 1;
+				if (*reinterpret_cast<int*>(slotData + 8) > 99) {
+					digitCount = 3;
+				}
+				if (digitCount == 3) {
+					MenuPcs.DrawRect(0, FLOAT_80331520, rowY, static_cast<float>(digitWidths[10]), FLOAT_80331410,
+					         FLOAT_80331524, FLOAT_80331528, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+				} else {
+					int totalWidth;
+					for (int di = 0; di < digitCount; di++) {
+						if (digitCount == 1) {
+							totalWidth = reinterpret_cast<int*>(lbl_801DB7F8 + 0x920)[*reinterpret_cast<int*>(slotData + 8) % 10];
+						} else if (di == 0) {
+							totalWidth = reinterpret_cast<int*>(lbl_801DB7F8 + 0x920)[*reinterpret_cast<int*>(slotData + 8) / 10];
+						} else {
+							totalWidth += reinterpret_cast<int*>(lbl_801DB7F8 + 0x920)[*reinterpret_cast<int*>(slotData + 8) % 10];
+						}
+					}
+					float digitScale = static_cast<float>((language != 5) ? DOUBLE_80331530 : DOUBLE_80331420);
+					if (language == 2) {
+						totalWidth += 8;
+					} else if (language == 3) {
+						totalWidth += 0xB;
+					} else if (language != 5) {
+						totalWidth += 0x20;
+					}
+					digitX += static_cast<float>((0x20 - static_cast<int>(static_cast<float>(totalWidth) * digitScale)) / 2);
+					const float zeroF = FLOAT_803313dc;
+					const double colSlope = DOUBLE_80331490;
+					const double rowSlope = DOUBLE_80331540;
+					const double rowBase = DOUBLE_80331538;
+					for (int digitIdx = 0; digitIdx < digitCount; digitIdx++) {
+						int digit;
+						if (digitCount == 1) {
+							digit = *reinterpret_cast<int*>(slotData + 8) % 10;
+						} else if (digitIdx == 0) {
+							digit = *reinterpret_cast<int*>(slotData + 8) / 10;
+						} else {
+							digit = *reinterpret_cast<int*>(slotData + 8) % 10;
+						}
+						const int digitWidth = reinterpret_cast<int*>(lbl_801DB7F8 + 0x920)[digit];
+						const float digitWidthF = static_cast<float>(digitWidth);
+						MenuPcs.DrawRect(0, digitX, rowY, digitWidthF, FLOAT_80331410,
+						         static_cast<float>(colSlope * static_cast<float>(digit % 5)),
+						         static_cast<float>(rowSlope * static_cast<float>(digit / 5) + rowBase),
+						         digitScale, FLOAT_803313e8, zeroF);
+						digitX += digitWidthF * digitScale;
+					}
+					float suffixWidth;
+					if (language == 2) {
+						suffixWidth = FLOAT_80331548;
+					} else if (language == 3) {
+						suffixWidth = FLOAT_8033154C;
+					} else {
+						suffixWidth = FLOAT_80331410;
+					}
+					float suffixU = FLOAT_803313dc;
+					unsigned char wideLang = (language == 1 || language == 4);
+					float suffixScale = static_cast<float>(wideLang ? DOUBLE_80331530 : DOUBLE_80331420);
+					if (language == 1) {
+						if (*reinterpret_cast<int*>(slotData + 8) / 10 == 1) {
+							suffixU = FLOAT_8033151c;
+						} else {
+							const int ones = *reinterpret_cast<int*>(slotData + 8) % 10;
+							if (ones >= 1 && ones <= 3) {
+								suffixU = FLOAT_803314D8 * static_cast<float>(ones - 1);
+							} else {
+								suffixU = FLOAT_8033151c;
+							}
+						}
+					} else if (language == 4) {
+						if (*reinterpret_cast<int*>(slotData + 8) != 1) {
+							suffixU = FLOAT_803314D8;
+						}
+					} else if (language == 2) {
+						rowY += FLOAT_80331550;
+					}
 					if (language != 5) {
-						dateY = slotY + FLOAT_803314d8;
+						MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x34));
+						MenuPcs.DrawRect(0, digitX, rowY, suffixWidth, FLOAT_803314D8,
+						         suffixU, FLOAT_803313dc, suffixScale, FLOAT_803313e8, FLOAT_803313dc);
 					}
-					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x17));
-					const int saveYear = *reinterpret_cast<int*>(slotData + 8);
-					int digitCount = 1;
-					if (saveYear > 99) {
-						digitCount = 3;
-					} else if (saveYear > 9) {
-						digitCount = 2;
-					}
-					if (digitCount == 3) {
-						MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_80331520, dateY, static_cast<float>(DAT_801dc140), FLOAT_80331410,
-						         FLOAT_80331524, FLOAT_80331528, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
-					} else {
-						int totalWidth = 0;
-						for (int di = 0; di < digitCount; di++) {
-							int digit;
-							if (digitCount == 1) {
-								const unsigned int t = saveYear / 10 + (saveYear >> 0x1F);
-								digit = saveYear + (t - (t >> 0x1F)) * -10;
-							} else if (di == 0) {
-								const int t = saveYear / 10 + (saveYear >> 0x1F);
-								digit = t - (t >> 0x1F);
-							} else {
-								const int t = saveYear / 10 + (saveYear >> 0x1F);
-								digit = saveYear + (t - (t >> 0x1F)) * -10;
-							}
-							totalWidth += DAT_801dc118[digit];
-						}
-						float digitScale = static_cast<float>(DOUBLE_80331420);
-						if (language != 5) {
-							digitScale = static_cast<float>(DOUBLE_80331530);
-						}
-						int adjustedWidth = totalWidth;
-						if (language == 2) {
-							adjustedWidth += 8;
-						} else if (language == 3) {
-							adjustedWidth += 0xB;
-						} else if (language != 5) {
-							adjustedWidth += 0x20;
-						}
-						float digitX = FLOAT_80331520 +
-						               static_cast<float>((0x20 - static_cast<int>(static_cast<float>(adjustedWidth) * digitScale)) / 2);
-						const double rowBase = DOUBLE_80331538;
-						const double rowSlope = DOUBLE_80331540;
-						const double colSlope = DOUBLE_80331490;
-						for (int digitIdx = 0; digitIdx < digitCount; digitIdx++) {
-							int digit;
-							if (digitCount == 1) {
-								const int t = saveYear / 10 + (saveYear >> 0x1F);
-								digit = saveYear + (t - (t >> 0x1F)) * -10;
-							} else if (digitIdx == 0) {
-								const int t = saveYear / 10 + (saveYear >> 0x1F);
-								digit = t - (t >> 0x1F);
-							} else {
-								const int t = saveYear / 10 + (saveYear >> 0x1F);
-								digit = saveYear + (t - (t >> 0x1F)) * -10;
-							}
-							const int digitWidth = DAT_801dc118[digit];
-							const int row = digit / 5 + (digit >> 0x1F);
-							const unsigned int rowIndex = row - (row >> 0x1F);
-							const int col = digit + rowIndex * -5;
-							const float digitWidthF = static_cast<float>(digitWidth);
-							MenuPcs.DrawRect(0xFFFFFFFF, digitX, dateY, digitWidthF, FLOAT_80331410,
-							         static_cast<float>(colSlope * static_cast<double>(col)),
-							         static_cast<float>(rowSlope * static_cast<double>(rowIndex) + rowBase),
-							         digitScale, FLOAT_803313e8, 0.0f);
-							digitX += digitWidthF * digitScale;
-						}
-						if (language != 5) {
-							float suffixWidth = FLOAT_80331410;
-							if (language == 2) {
-								suffixWidth = FLOAT_80331548;
-							} else if (language == 3) {
-								suffixWidth = FLOAT_8033154C;
-							}
-							float suffixU = FLOAT_803313dc;
-							float suffixScale = static_cast<float>(DOUBLE_80331420);
-							if (language == 1 || language == 4) {
-								suffixScale = static_cast<float>(DOUBLE_80331530);
-							}
-							if (language == 1) {
-								const int tens = static_cast<int>(saveYear) / 10 + (static_cast<unsigned int>(saveYear) >> 0x1F);
-								if (tens - (tens >> 0x1F) == 1) {
-									suffixU = FLOAT_8033151c;
-								} else {
-									const int ones = static_cast<int>(saveYear) + (tens - (tens >> 0x1F)) * -10;
-									if (ones < 1 || ones > 3) {
-										suffixU = FLOAT_8033151c;
-									} else {
-										suffixU = FLOAT_803314d8 * static_cast<float>(ones - 1);
-									}
-								}
-							} else if (language == 4) {
-								if (saveYear != 1) {
-									suffixU = FLOAT_803314d8;
-								}
-							} else if (language == 2) {
-								dateY += FLOAT_80331550;
-							}
-							MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x34));
-							MenuPcs.DrawRect(0xFFFFFFFF, digitX, dateY, suffixWidth, FLOAT_803314d8,
-							         suffixU, FLOAT_803313dc, suffixScale, FLOAT_803313e8, 0.0f);
-						}
-					}
+				}
 
-					float dateLabelY;
-					if (language == 5) {
-						dateLabelY = FLOAT_803314c8 + (slotY + FLOAT_803314d8);
-					} else {
-						dateLabelY = slotY + FLOAT_80331554;
-					}
-					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x21));
-					MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_80331520 - FLOAT_80331550, dateLabelY,
-					         FLOAT_80331440, FLOAT_80331558, FLOAT_803313dc, FLOAT_803313dc,
-					         FLOAT_803313e8, FLOAT_803313e8, 0.0f);
+				float labelX = FLOAT_80331520;
+				float dateLabelY;
+				if (language != 5) {
+					dateLabelY = FLOAT_80331554 + slotY;
+				} else {
+					dateLabelY = FLOAT_803314c8 + (FLOAT_803314D8 + slotY);
+				}
+				labelX -= FLOAT_80331550;
+				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x21));
+				MenuPcs.DrawRect(0, labelX, dateLabelY,
+				         FLOAT_80331440, FLOAT_80331558, FLOAT_803313dc, FLOAT_803313dc,
+				         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 
-					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x37));
-					float iconX = FLOAT_8033155C;
-				for (int member = 0; member < 4; member++) {
-					const int modelNo = *reinterpret_cast<int*>(slotData + 0x18 + member * 4);
+				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x37));
+				float iconX = FLOAT_8033155C;
+				const float iconY = FLOAT_803314D8 + slotY;
+				unsigned char* memberPtr = slotData;
+				for (int member = 0; member < 4; member++, memberPtr += 4) {
+					const int modelNo = *reinterpret_cast<int*>(memberPtr + 0x18);
 					if (modelNo >= 0) {
 						const int faceNo = modelNo - 100;
-						const int tribe = faceNo / 100 + (faceNo >> 31);
-						const int tribeIndex = static_cast<unsigned int>(tribe - (tribe >> 31));
-						float texU = FLOAT_803314f0;
-						if ((tribeIndex & 1) != 0) {
-							texU = FLOAT_80331560;
-						}
-						const unsigned int variant = faceNo + (tribe - (tribe >> 31)) * -100;
-						MenuPcs.DrawRect(0xFFFFFFFF, iconX, slotY + FLOAT_803314d8, FLOAT_80331468, FLOAT_80331468,
-						         texU + FLOAT_80331468 * static_cast<float>(variant),
-						         FLOAT_80331468 * static_cast<float>(static_cast<int>(tribeIndex / 2)),
-						         FLOAT_803313e8, FLOAT_803313e8, 0.0f);
+						float texU = ((faceNo / 100 & 1) != 0) ? FLOAT_80331560 : DOUBLE_803314F0;
+						const float du = static_cast<float>(faceNo % 100) * FLOAT_80331468;
+						texU += du;
+						MenuPcs.DrawRect(0, iconX, iconY, FLOAT_80331468, FLOAT_80331468,
+						         texU,
+						         static_cast<float>(faceNo / 100 / 2) * FLOAT_80331468,
+						         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 						iconX += FLOAT_80331468;
 					}
 				}
-					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x20));
-					MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_80331564, slotY + FLOAT_80331468,
-					         FLOAT_80331554, FLOAT_803314d8, FLOAT_803313dc, FLOAT_803313dc,
-					         FLOAT_803313e8, FLOAT_803313e8, 0.0f);
+				rowY = FLOAT_80331468 + slotY;
+				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x20));
+				MenuPcs.DrawRect(0, FLOAT_80331564, rowY,
+				         FLOAT_80331554, FLOAT_803314D8, FLOAT_803313dc, FLOAT_803313dc,
+				         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 
-					int playHours;
-					int playMinutes;
-					MemoryCardMan.CnvPlayTime(*reinterpret_cast<unsigned int*>(slotData + 0x14), &playHours, &playMinutes);
-					const int* const playDigitWidths = reinterpret_cast<int*>(lbl_801DC294 + 0x14);
-					const int playColonWidth = *reinterpret_cast<int*>(lbl_801DC294 + 0x3C);
-					int playDigits[5];
-					float playWidth = FLOAT_803313dc;
-					int hundreds = playHours / 100 + (playHours >> 0x1F);
-					playDigits[0] = hundreds - (hundreds >> 0x1F);
-					if (playDigits[0] == 0) {
-						playDigits[0] = -1;
-					} else {
-						playWidth += static_cast<float>(playDigitWidths[playDigits[0]]);
-					}
-					int hourRemainder = playHours + (hundreds - (hundreds >> 0x1F)) * -100;
-					int tens = hourRemainder / 10 + (hourRemainder >> 0x1F);
-					playDigits[1] = tens - (tens >> 0x1F);
-					if (playDigits[1] == 0 && playDigits[0] < 1) {
-						playDigits[1] = -1;
-					} else {
-						playWidth += static_cast<float>(playDigitWidths[playDigits[1]]);
-					}
-					int ones = hourRemainder / 10 + (hourRemainder >> 0x1F);
-					playDigits[2] = hourRemainder + (ones - (ones >> 0x1F)) * -10;
-					int minuteTens = playMinutes / 10 + (playMinutes >> 0x1F);
-					playDigits[3] = minuteTens - (minuteTens >> 0x1F);
-					playDigits[4] = playMinutes + (minuteTens - (minuteTens >> 0x1F)) * -10;
-					playWidth += static_cast<float>(playDigitWidths[playDigits[2]] + playColonWidth +
-					                                playDigitWidths[playDigits[3]] + playDigitWidths[playDigits[4]]);
-					float playX = FLOAT_80331518 - playWidth;
-					const float playY = slotY + FLOAT_80331468;
-					for (int digitIdx = 0; digitIdx < 5; digitIdx++) {
-						if (playDigits[digitIdx] >= 0) {
-							if (digitIdx == 3) {
-								MenuPcs.DrawRect(0xFFFFFFFF, playX, playY, static_cast<float>(playColonWidth), FLOAT_803314d8,
-								         FLOAT_80331568, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
-								playX += static_cast<float>(playColonWidth);
-							}
-							const int digit = playDigits[digitIdx];
-							const int digitWidth = playDigitWidths[digit];
-							MenuPcs.DrawRect(0xFFFFFFFF, playX, playY, static_cast<float>(digitWidth), FLOAT_803314d8,
-							         static_cast<float>(DOUBLE_80331490 * static_cast<double>(digit) + DOUBLE_80331570),
-							         FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
-							playX += static_cast<float>(digitWidth);
-						}
-					}
-
-					const int mapInfoIndex = *reinterpret_cast<int*>(slotData + 0x10) * 4;
-					unsigned char* const mapInfo = lbl_801DC294 + 0x40 + mapInfoIndex;
-					CMaterial* material = MapMng.GetMaterialID(mapInfo[0]);
-					CTexture* texture = *reinterpret_cast<CTexture**>(reinterpret_cast<unsigned char*>(material) + 0x3C);
-					TextureMan.SetTexture(static_cast<_GXTexMapID>(0), texture);
-					Mtx texMtx;
-					PSMTXScale(texMtx, FLOAT_803313e8 / static_cast<float>(texture->m_width),
-					           FLOAT_803313e8 / static_cast<float>(texture->m_height), FLOAT_803313e8);
-					GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX2x4);
-					GXSetNumTexGens(1);
-					GXSetTexCoordGen2(static_cast<GXTexCoordID>(0), static_cast<GXTexGenType>(1),
-					                  static_cast<GXTexGenSrc>(4), 0x1E, GX_FALSE, 0x7D);
-					TextureMan.SetTextureTev(texture);
-					MenuPcs.DrawRect(0xFFFFFFFF,
-					         static_cast<float>(static_cast<double>(FLOAT_80331518) + DOUBLE_80331510),
-					         static_cast<float>(static_cast<double>(slotY) + DOUBLE_80331510),
-					         FLOAT_80331578, FLOAT_80331578,
-					         static_cast<float>(static_cast<int>(static_cast<char>(mapInfo[1])) << 7),
-					         static_cast<float>(static_cast<unsigned int>(static_cast<char>(mapInfo[2])) << 7),
-					         FLOAT_80331434, FLOAT_80331434, 0.0f);
-				}
-			}
-	}
-
-	// Draw text info for each save slot
-	if (worldState->m_subState >= 0x11 &&
-	    worldState->m_mainState < 3) {
-		unsigned int* mcData = reinterpret_cast<unsigned int*>(m_wmCharaState);
-		for (int slot = 0; slot < 4; slot++) {
-			float alpha2 = FLOAT_803313e8;
-			float yPos2 = FLOAT_803314d8;
-			short sub2 = worldState->m_subState;
-			if (sub2 == 1 || worldState->m_mainState == 3) {
-				int af2;
-				if (worldState->m_mainState == 2) {
-					af2 = (int)worldState->m_frameCounter - slot * 3;
+				int playHours;
+				int playMinutes;
+				MemoryCardMan.CnvPlayTime(*reinterpret_cast<unsigned int*>(slotData + 0x14), &playHours, &playMinutes);
+				int playDigits[5];
+				float playWidth = FLOAT_803313dc;
+				const int hundreds = playHours / 100;
+				if (hundreds != 0) {
+					playDigits[0] = hundreds;
+					playWidth += static_cast<float>(reinterpret_cast<int*>(lbl_801DB7F8 + 0xab0)[hundreds]);
 				} else {
-					af2 = 10 - ((int)worldState->m_frameCounter - (3 - slot) * 3);
+					playDigits[0] = -1;
 				}
-				if (af2 < 0) continue;
-				if (af2 <= 10) {
-					alpha2 = (float)af2;
+				const int hourRemainder = playHours % 100;
+				const int tens = hourRemainder / 10;
+				if (tens != 0 || playDigits[0] > 0) {
+					playDigits[1] = tens;
+					playWidth += static_cast<float>(reinterpret_cast<int*>(lbl_801DB7F8 + 0xab0)[tens]);
+				} else {
+					playDigits[1] = -1;
 				}
+				playDigits[2] = hourRemainder % 10;
+				playDigits[3] = playMinutes / 10;
+				playDigits[4] = playMinutes % 10;
+				playWidth += static_cast<float>(reinterpret_cast<int*>(lbl_801DB7F8 + 0xab0)[playDigits[2]]);
+				playWidth += static_cast<float>(playWidths[10]);
+				playWidth += static_cast<float>(reinterpret_cast<int*>(lbl_801DB7F8 + 0xab0)[playDigits[3]]);
+				playWidth += static_cast<float>(reinterpret_cast<int*>(lbl_801DB7F8 + 0xab0)[playDigits[4]]);
+				float playX = FLOAT_80331518 - playWidth;
+				for (int digitIdx = 0; digitIdx < 5; digitIdx++) {
+					if (playDigits[digitIdx] >= 0) {
+						if (digitIdx == 3) {
+							const float colonW = static_cast<float>(playWidths[10]);
+							MenuPcs.DrawRect(0, playX, rowY, colonW, FLOAT_803314D8,
+							         FLOAT_80331568, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+							playX += colonW;
+						}
+						const float digitW = static_cast<float>(reinterpret_cast<int*>(lbl_801DB7F8 + 0xab0)[playDigits[digitIdx]]);
+						MenuPcs.DrawRect(0, playX, rowY, digitW, FLOAT_803314D8,
+						         static_cast<float>(DOUBLE_80331490 * static_cast<double>(playDigits[digitIdx]) + DOUBLE_80331570),
+						         FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+						playX += digitW;
+					}
+				}
+
+				unsigned char* const mapInfo = reinterpret_cast<unsigned char*>(lbl_801DB7F8 + 0xadc) +
+				                               *reinterpret_cast<int*>(slotData + 0x10) * 4;
+				CMaterial* material = MapMng.GetMaterialID(mapInfo[0]);
+				CTexture* texture = *reinterpret_cast<CTexture**>(reinterpret_cast<unsigned char*>(material) + 0x3C);
+				TextureMan.SetTexture(static_cast<_GXTexMapID>(0), texture);
+				Mtx texMtx;
+				PSMTXScale(texMtx, FLOAT_803313e8 / static_cast<float>(texture->m_width),
+				           FLOAT_803313e8 / static_cast<float>(texture->m_height), FLOAT_803313e8);
+				GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX2x4);
+				GXSetNumTexGens(1);
+				GXSetTexCoordGen2(static_cast<GXTexCoordID>(0), static_cast<GXTexGenType>(1),
+				                  static_cast<GXTexGenSrc>(4), 0x1E, GX_FALSE, 0x7D);
+				TextureMan.SetTextureTev(texture);
+				MenuPcs.DrawRect(0,
+				         static_cast<float>(mapX),
+				         static_cast<float>(DOUBLE_80331510 + static_cast<double>(slotY)),
+				         FLOAT_80331578, FLOAT_80331578,
+				         static_cast<float>(static_cast<int>(static_cast<char>(mapInfo[1])) << 7),
+				         static_cast<float>(static_cast<int>(static_cast<char>(mapInfo[2])) << 7),
+				         FLOAT_80331434, FLOAT_80331434, FLOAT_803313dc);
 			}
+		}
 
-			if (alpha2 <= FLOAT_803314f0) continue;
-
-			unsigned char* slotData = reinterpret_cast<unsigned char*>(mcData) + slot * 0x48;
-			const float slotY = static_cast<float>(kSlope * static_cast<double>(slot) + kBase);
+		// Draw text info for each save slot
+		const double tSlope = DOUBLE_80331498;
+		const double tBase = DOUBLE_80331490;
+		for (int slot = 0, slotOff = slot; slot < 4; slot++, slotOff += 0x48) {
+			char part[64];
+			char locationStr[64];
+			char line1[64];
+			char line2[64];
+			unsigned char* const slotData = m_wmCharaState + slotOff;
+			const float slotY = (float)(tSlope * static_cast<double>(slot) + tBase);
 			if (*reinterpret_cast<char*>(slotData + 0x42) != 0 || *reinterpret_cast<int*>(slotData + 8) <= 0) {
 				fontF8->SetMargin(FLOAT_803313e8);
 				fontF8->SetShadow(1);
@@ -11282,13 +11254,12 @@ LAB_draw:
 				fontF8->DrawInit();
 				fontF8->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 				fontF8->SetTlut(0x19);
-				const unsigned int msgId = static_cast<int>(
-					__cntlzw(static_cast<unsigned int>(static_cast<int>(*reinterpret_cast<char*>(slotData + 0x42))))) >> 5;
-				char* text = const_cast<char*>(GetMcStr(msgId));
-				const int width = static_cast<int>(fontF8->GetWidth(text));
-				fontF8->SetPosX(static_cast<float>((0x238 - width) * DOUBLE_803313f8 + static_cast<double>(FLOAT_803314d8)));
-				fontF8->SetPosY(static_cast<float>(static_cast<double>(slotY) + DOUBLE_80331580));
-				fontF8->Draw(text);
+				const unsigned int msgId =
+					__cntlzw(static_cast<unsigned int>(static_cast<int>(*reinterpret_cast<char*>(slotData + 0x42)))) >> 5;
+				const int width = static_cast<int>(fontF8->GetWidth(const_cast<char*>(GetMcStr(msgId))));
+				fontF8->SetPosX(static_cast<float>(static_cast<float>(0x238 - width) * DOUBLE_803313F8 + FLOAT_803314D8));
+				fontF8->SetPosY(static_cast<float>(DOUBLE_80331580 + static_cast<double>(slotY)));
+				fontF8->Draw(const_cast<char*>(GetMcStr(msgId)));
 			} else {
 				fontF8->SetMargin(FLOAT_803313e8);
 				fontF8->SetShadow(0);
@@ -11298,12 +11269,11 @@ LAB_draw:
 				fontF8->SetTlut(0x2C);
 				fontF8->SetPosX(FLOAT_80331520);
 				fontF8->SetPosY(static_cast<float>(static_cast<double>(slotY) - DOUBLE_80331510));
-				char nameStr[64];
-				strcpy(nameStr, reinterpret_cast<char*>(slotData + 0x2C));
-				if (nameStr[0] != 0) {
-					nameStr[0] = static_cast<char>(toupperLatin1(static_cast<unsigned char>(nameStr[0])));
+				strcpy(locationStr, reinterpret_cast<char*>(slotData + 0x2C));
+				if (locationStr[0] != 0) {
+					locationStr[0] = static_cast<char>(toupperLatin1(static_cast<unsigned char>(locationStr[0])));
 				}
-				fontF8->Draw(nameStr);
+				fontF8->Draw(locationStr);
 
 				fontF8->SetMargin(FLOAT_803313e8);
 				fontF8->SetShadow(1);
@@ -11311,16 +11281,16 @@ LAB_draw:
 				fontF8->DrawInit();
 				fontF8->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 				fontF8->SetTlut(7);
-				char locationStr[64];
 				const int locationIndex = *reinterpret_cast<int*>(slotData + 0x10);
 				if (locationIndex == 0x0F) {
 					strcpy(locationStr, reinterpret_cast<char*>(slotData + 0x2C));
 				} else if (locationIndex == 0x16) {
-					if (Game.m_gameWork.m_languageId == 2) {
+					const int lang2 = Game.m_gameWork.m_languageId;
+					if (lang2 == 2) {
 						strcpy(locationStr, reinterpret_cast<char*>(slotData + 0x2C));
-						strcat(locationStr, lbl_80210D10[1]);
+						strcat(locationStr, lbl_80210D10[lang2 - 1]);
 					} else {
-						strcpy(locationStr, lbl_80210D10[Game.m_gameWork.m_languageId - 1]);
+						strcpy(locationStr, lbl_80210D10[lang2 - 1]);
 						strcat(locationStr, reinterpret_cast<char*>(slotData + 0x2C));
 					}
 				} else {
@@ -11329,33 +11299,36 @@ LAB_draw:
 				if (locationStr[0] != 0) {
 					locationStr[0] = static_cast<char>(toupperLatin1(static_cast<unsigned char>(locationStr[0])));
 				}
-				float locationY = static_cast<float>(static_cast<double>(slotY) + static_cast<double>(FLOAT_80331558));
-				if (fontF8->GetWidth(locationStr) <= FLOAT_8033155C) {
-					const int locationWidth = static_cast<int>(fontF8->GetWidth(locationStr));
-					fontF8->SetPosX(static_cast<float>(static_cast<double>(FLOAT_80331518) - static_cast<double>(locationWidth)));
+				const float locationWidth = fontF8->GetWidth(locationStr);
+				float locationY = FLOAT_80331558 + slotY;
+				if (locationWidth <= FLOAT_8033155C) {
+					fontF8->SetPosX(FLOAT_80331518 - locationWidth);
 					fontF8->SetPosY(locationY);
 					fontF8->Draw(locationStr);
 				} else {
-					char line1[64];
-					char line2[64];
-					char part[64];
 					locationY = locationY + FLOAT_80331550;
 					strcpy(line1, locationStr);
 					line2[0] = 0;
-					char* space = strchr(locationStr, ' ');
-					if (space != 0) {
+					char* searchPos = locationStr;
+					for (;;) {
+						char* space = strchr(searchPos, ' ');
+						if (space == 0) {
+							break;
+						}
 						const int firstLen = space - locationStr;
 						memcpy(part, locationStr, firstLen);
 						part[firstLen] = 0;
-						if (static_cast<int>(fontF8->GetWidth(part)) <= 0x90) {
-							strcpy(line1, part);
-							strcpy(line2, space + 1);
+						if (static_cast<int>(fontF8->GetWidth(part)) > 0x90) {
+							break;
 						}
+						strcpy(line1, part);
+						strcpy(line2, space + 1);
+						searchPos = space + 1;
 					}
-					fontF8->SetPosX(static_cast<float>(static_cast<double>(FLOAT_80331518) - static_cast<double>(static_cast<unsigned int>(fontF8->GetWidth(line1)))));
-					fontF8->SetPosY(static_cast<float>(static_cast<double>(locationY) - static_cast<double>(FLOAT_80331590)));
+					fontF8->SetPosX(FLOAT_80331518 - fontF8->GetWidth(line1));
+					fontF8->SetPosY(locationY - FLOAT_80331590);
 					fontF8->Draw(line1);
-					fontF8->SetPosX(static_cast<float>(static_cast<double>(FLOAT_80331518) - static_cast<double>(static_cast<unsigned int>(fontF8->GetWidth(line2)))));
+					fontF8->SetPosX(FLOAT_80331518 - fontF8->GetWidth(line2));
 					fontF8->SetPosY(locationY);
 					fontF8->Draw(line2);
 				}
@@ -11363,18 +11336,17 @@ LAB_draw:
 		}
 	}
 	if (worldState->m_subState == 0x11) {
-		unsigned short mode = worldState->m_menuMode;
-		int __p1 = mode;
-		if (__p1 == 5) {
-			CColor color(0xFF, 0xFF, 0xFF, 0xFF);
+		short mode = worldState->m_menuMode;
+		if (mode == 5) {
+			GXColor color = CColor(0xFF, 0xFF, 0xFF, 0xFF).color;
 			char* text = const_cast<char*>(GetMcStr(2));
 			const int x = static_cast<int>(CalcCenteringPos2(const_cast<char*>(GetMcStr(2)), FLOAT_80331594, FLOAT_803313e8));
-			DrawFont2(x, 0x187, color.color, 7, text, FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
+			DrawFont2(x, 0x187, color, 7, text, FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
 		} else if (mode == 2) {
-			CColor color(0xFF, 0xFF, 0xFF, 0xFF);
+			GXColor color = CColor(0xFF, 0xFF, 0xFF, 0xFF).color;
 			char* text = const_cast<char*>(GetMcStr(3));
 			const int x = static_cast<int>(CalcCenteringPos2(const_cast<char*>(GetMcStr(3)), FLOAT_80331594, FLOAT_803313e8));
-			DrawFont2(x, 0x187, color.color, 7, text, FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
+			DrawFont2(x, 0x187, color, 7, text, FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
 		}
 	}
 	DrawInit();

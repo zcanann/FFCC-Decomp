@@ -500,35 +500,14 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
         do
         {
             u8* item = dstWork + dstChar * 8;
-            int row = 0;
-            for (int j = 0; j < 2; j++)
+            for (int j = 0; j < 8; j++)
             {
-                u8 a = 0;
-                if ((i == 0) && (row == 0))
+                u8 flag = 0;
+                if ((i == 0) && (j == 0))
                 {
-                    a = 1;
+                    flag = 1;
                 }
-                u8 b = 0;
-                item[0xC0] = (-a | a) >> 0x1F & 0x32;
-                if ((i == 0) && (row == -1))
-                {
-                    b = 1;
-                }
-                a = 0;
-                item[0xC1] = (-b | b) >> 0x1F & 0x32;
-                if ((i == 0) && (row == -2))
-                {
-                    a = 1;
-                }
-                b = 0;
-                item[0xC2] = (-a | a) >> 0x1F & 0x32;
-                if ((i == 0) && (row == -3))
-                {
-                    b = 1;
-                }
-                row += 4;
-                item[0xC3] = (-b | b) >> 0x1F & 0x32;
-                item += 4;
+                item[0xC0 + j] = (-flag | flag) >> 0x1F & 0x32;
             }
             i++;
             dstWork += 0x40;

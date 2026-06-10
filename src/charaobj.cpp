@@ -2530,25 +2530,27 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 	CGPrgObj* sourceObj = reinterpret_cast<CGPrgObj*>(source);
 	unsigned short powerValue;
 	if ((((static_cast<unsigned int>(__cntlzw(0x2D - (static_cast<unsigned short>(source->GetCID()) & 0x2D)))) >> 5) & 0xFFU) != 0) {
-		bool stageModeActive = false;
-		bool usePartySource = false;
-		bool usePartyLeader = false;
+		unsigned char usePartyLeader = 0;
+		unsigned char usePartySource = 0;
+		unsigned char stageModeActive = 0;
 
-		if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-			stageModeActive = true;
+		if (static_cast<int>(Game.m_gameWork.m_menuStageMode) != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+			stageModeActive = 1;
 		}
-		if (stageModeActive) {
+		if (stageModeActive != 0) {
 			if ((((static_cast<unsigned int>(__cntlzw(0x6D - (static_cast<unsigned short>(source->GetCID()) & 0x6D)))) >> 5) & 0xFFU) != 0) {
-				usePartySource = true;
+				usePartySource = 1;
 			}
 		}
-		if (usePartySource && sourceObj->m_scriptHandle[0xED] != 0) {
-			usePartyLeader = true;
+		if (usePartySource != 0 && sourceObj->m_scriptHandle[0xED] != 0) {
+			usePartyLeader = 1;
 		}
 
-		CGPrgObj* powerSource = sourceObj;
-		if (usePartyLeader) {
+		CGPrgObj* powerSource;
+		if (usePartyLeader != 0) {
 			powerSource = Game.m_partyObjArr[0];
+		} else {
+			powerSource = sourceObj;
 		}
 		powerValue = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(powerSource->m_scriptHandle[9]) + 0x198);
 	} else {

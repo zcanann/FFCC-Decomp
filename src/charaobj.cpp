@@ -2509,9 +2509,10 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 {
 	if (staIndex == 0 || staIndex == 4) {
-		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + staIndex * 2 + 0x3E) != 0) {
+		SCharaStaBlock* staBlock = reinterpret_cast<SCharaStaBlock*>(m_scriptHandle);
+		if (staBlock->m_sta[staIndex] != 0) {
 			System.Printf(const_cast<char*>(sCharaObjEffectTimeNoOverwriteMsg));
-			return static_cast<int>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + staIndex * 2 + 0x3E));
+			return static_cast<int>(staBlock->m_sta[staIndex]);
 		}
 	}
 
@@ -2559,7 +2560,8 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 
 	int itemType;
 	if (amount >= 0x1F5) {
-		itemType = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + amount * 0x48 + 2);
+		SCharaItemRow* kindRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
+		itemType = kindRows[amount].m_kind;
 	} else {
 		itemType = 1;
 	}
@@ -2591,7 +2593,8 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 		}
 		powerValue = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(powerSource->m_scriptHandle[9]) + 0x198);
 	} else {
-		powerValue = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + amount * 0x48 + 0x2E);
+		SCharaItemRow* powerRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
+		powerValue = powerRows[amount].m_power;
 	}
 
 	unsigned int power = powerValue;

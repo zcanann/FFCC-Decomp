@@ -1517,9 +1517,18 @@ CMapObj* CMapMng::SearchChildMapObj(CMapObj* searchStart, CMapObj* parentObj)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMng::SearchAtribMapObj(CMapObj*, CMapObjAtr::TYPE)
+inline CMapObj* CMapMng::SearchAtribMapObj(CMapObj* mapObj, CMapObjAtr::TYPE type)
 {
-	// TODO
+    CMapObj* mapObjEnd = m_mapObjArray + m_mapObjCount;
+
+    for (; mapObj < mapObjEnd; mapObj++) {
+        CMapObjAtr* mapObjAtr = mapObj->m_attribute;
+        if (mapObjAtr != 0 && mapObjAtr->m_type == type) {
+            return mapObj;
+        }
+    }
+
+    return 0;
 }
 
 /*
@@ -1551,26 +1560,7 @@ void CMapMng::AttachMapHit(CMapHit* mapHit, char* mapHitName)
         mapObj++;
 
 search:
-        unsigned int stride =
-            reinterpret_cast<unsigned int>(mapObj + 1) - reinterpret_cast<unsigned int>(mapObj);
-        CMapObj* mapObjEnd = m_mapObjArray + m_mapObjCount;
-        unsigned int remaining =
-            (reinterpret_cast<unsigned int>(mapObjEnd) + (stride - 1) - reinterpret_cast<unsigned int>(mapObj)) /
-            stride;
-
-        for (unsigned int i = 0; i < remaining; i++) {
-            if (mapObj >= mapObjEnd) {
-                break;
-            }
-            CMapObjAtr* mapObjAtr = mapObj->m_attribute;
-            if (mapObjAtr != 0 && mapObjAtr->m_type == CMapObjAtr::MESH_NAME) {
-                goto found;
-            }
-            mapObj++;
-        }
-
-        mapObj = 0;
-found:
+        mapObj = SearchAtribMapObj(mapObj, CMapObjAtr::MESH_NAME);
         if (mapObj == 0) {
             return;
         }
@@ -1602,26 +1592,7 @@ int CMapMng::GetDebugPlaySta(int playStaNo, Vec* vec)
         mapObj++;
 
 search:
-        unsigned int stride =
-            reinterpret_cast<unsigned int>(mapObj + 1) - reinterpret_cast<unsigned int>(mapObj);
-        CMapObj* mapObjEnd = m_mapObjArray + m_mapObjCount;
-        unsigned int remaining =
-            (reinterpret_cast<unsigned int>(mapObjEnd) + (stride - 1) - reinterpret_cast<unsigned int>(mapObj)) /
-            stride;
-
-        for (unsigned int i = 0; i < remaining; i++) {
-            if (mapObj >= mapObjEnd) {
-                break;
-            }
-            CMapObjAtr* mapObjAtr = mapObj->m_attribute;
-            if (mapObjAtr != 0 && mapObjAtr->m_type == CMapObjAtr::PLAY_STA) {
-                goto found;
-            }
-            mapObj++;
-        }
-
-        mapObj = 0;
-found:
+        mapObj = SearchAtribMapObj(mapObj, CMapObjAtr::PLAY_STA);
         if (mapObj == 0) {
             vec->z = kMapZero;
             vec->y = kMapZero;

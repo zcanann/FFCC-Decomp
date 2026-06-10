@@ -175,7 +175,7 @@ public:
     void MapCheckFileRead(char*);
     void LoadMapNoSyncCalc();
     CMapObj* SearchChildMapObj(CMapObj*, CMapObj*);
-    void SearchAtribMapObj(CMapObj*, CMapObjAtr::TYPE);
+    CMapObj* SearchAtribMapObj(CMapObj*, CMapObjAtr::TYPE);
     void AttachMapHit(CMapHit*, char*);
     int GetDebugPlaySta(int, Vec*);
     void SetLightSource();

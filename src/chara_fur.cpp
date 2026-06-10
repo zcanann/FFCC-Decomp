@@ -2415,6 +2415,8 @@ void CChara::makeFurTex()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_loop_invariants off
 void brush(unsigned short* pixels, int width, int height, float fx, float fy, int mode, _GXColor targetColor, _GXColor* centerBefore, _GXColor* centerAfter)
 {
 	int dy;
@@ -2429,6 +2431,7 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 
 	DCInvalidateRange(pixels, texelCountBytes);
 
+	const int rowStride = width * 4;
 	for (dy = -2; dy <= 2; dy++) {
 		int dx;
 		int py = centerY + dy;
@@ -2446,18 +2449,12 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 				continue;
 			}
 
-			int adx = dx;
-			if (adx < 0) {
-				adx = -adx;
-			}
-			int ady = dy;
-			if (ady < 0) {
-				ady = -ady;
-			}
+			const int sdx = dx >> 31;
+			const int adx = (dx ^ sdx) - sdx;
+			const int sdy = dy >> 31;
+			const int ady = (dy ^ sdy) - sdy;
 			distance = adx + ady;
-			unsigned int ux = px;
-			unsigned int uy = py;
-			tileIndex = ((ux & 3) + ((uy & 3) * 4) + (ux >> 2) * 0x10 + (uy >> 2) * width * 4) * 2;
+			tileIndex = (px % 4 + ((py % 4) * 4 + ((px / 4) * 0x10 + (py / 4) * rowStride))) * 2;
 			packed = *(unsigned short*)(((char*)pixels) + tileIndex);
 
 			b = packed & 0x0f;
@@ -2500,6 +2497,7 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 	DCFlushRange(pixels, texelCountBytes);
 	GXInvalidateTexAll();
 }
+#pragma pop
 
 /*
  * --INFO--

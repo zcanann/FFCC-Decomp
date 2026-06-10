@@ -40,6 +40,8 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
+extern "C" char* strcat(char*, const char*);
+
 extern "C" void CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
     float scaleA, float scaleB, float scaleC, float radius, float scale, CMath* math, float* outResult,
     Vec* p0, Vec* p1, Vec* p2, Vec* p3);
@@ -1709,13 +1711,12 @@ void CLine<64>::CalcBound()
         }
 
         if (i != 0) {
-            u32 prevIndex = i - 1;
-            PSVECSubtract(&points[i], &points[prevIndex], &segments[prevIndex].delta);
-            segments[prevIndex].length = PSVECMag(&segments[prevIndex].delta);
-            segments[prevIndex].startLength = totalLength;
-            totalLength += segments[prevIndex].length;
-            if (segments[prevIndex].length != kLineSegmentMinT) {
-                PSVECNormalize(&segments[prevIndex].delta, &segments[prevIndex].normal);
+            PSVECSubtract(&points[i], &points[i - 1], &segments[i - 1].delta);
+            segments[i - 1].length = PSVECMag(&segments[i - 1].delta);
+            segments[i - 1].startLength = totalLength;
+            totalLength += segments[i - 1].length;
+            if (kCFlatPadStickZero != segments[i - 1].length) {
+                PSVECNormalize(&segments[i - 1].delta, &segments[i - 1].normal);
             }
         }
     }
@@ -1732,6 +1733,7 @@ void CLine<64>::CalcBound()
  */
 int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFunc, int& outResult)
 {
+    char* gbaPath = const_cast<char*>("dvd/gba/");
 
     switch (systemFunc) {
     case -3:
@@ -1805,35 +1807,42 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
 
             for (int i = 0; i < object->m_argCount - 3; i++) {
                 while (true) {
+                    char* dst = spec;
+                    char c;
                     int specLen = 0;
-                    while ((format[specLen] != '\0') && ((specLen == 0) || (format[specLen] != '%'))) {
-                        spec[specLen] = format[specLen];
+                    while (((c = *format) != '\0') && ((specLen == 0) || ((specLen != 0) && (c != '%')))) {
+                        *dst = c;
+                        format++;
                         specLen++;
+                        dst++;
                     }
                     spec[specLen] = '\0';
-                    format += specLen;
 
                     if (spec[0] == '%') {
                         break;
                     }
-                    strcat(line, spec, sizeof(line));
+                    strcat(line, spec);
                 }
 
-                rendered[0] = '\0';
                 const int argIndex = i + 3;
-                char* scan = spec + 1;
+                unsigned int* localArgs = object->m_localBase;
+                char* scan;
                 if (spec[0] == '%') {
                     int fmtIndex = 1;
                     int width = 0;
                     int started = spec[1] == '0';
-                    for (; (*scan >= '0') && (*scan <= '9'); scan++) {
+                    for (char* digits = spec + 1; (*digits >= '0') && (*digits <= '9'); digits++) {
                         fmtIndex++;
-                        width = width * 10 + (*scan - '0');
+                        width = (*digits - '0') + width * 10;
                     }
 
-                    if (spec[fmtIndex] == 'b') {
+                    if (spec[fmtIndex] != 'b') {
+                        goto formatScan;
+                    }
+
+                    {
                         char* out = rendered;
-                        int value = object->m_localBase[argIndex];
+                        int value = static_cast<int>(localArgs[argIndex]);
                         int outLen = 0;
                         for (int bit = 0; bit < width; bit++) {
                             const int cur = (value >> ((width - bit) - 1)) & 1;
@@ -1846,38 +1855,33 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
                             }
                         }
                         rendered[outLen] = '\0';
-                        strcat(rendered, spec + fmtIndex + 1, sizeof(rendered));
-                    } else {
-                        while (*scan != '\0') {
-                            switch (*scan) {
-                            case 'd':
-                            case 'x':
-                                sprintf(rendered, spec, object->m_localBase[argIndex]);
-                                scan = const_cast<char*>("");
-                                break;
-                            case 'f': {
-                                union {
-                                    unsigned int word;
-                                    float value;
-                                } arg;
-                                arg.word = object->m_localBase[argIndex];
-                                sprintf(rendered, spec, static_cast<double>(arg.value));
-                                scan = const_cast<char*>("");
-                                break;
-                            }
-                            case 's':
-                                sprintf(rendered, spec, this->m_strBlob + this->m_strOffsets[object->m_localBase[argIndex]]);
-                                scan = const_cast<char*>("");
-                                break;
-                            default:
-                                scan++;
-                                break;
-                            }
+                        strcat(rendered, spec + fmtIndex + 1);
+                    }
+                } else {
+formatScan:
+                    scan = spec + 1;
+                    while (*scan != '\0') {
+                        switch (*scan) {
+                        case 'd':
+                        case 'x':
+                            sprintf(rendered, spec, localArgs[argIndex]);
+                            goto renderedDone;
+                        case 'f':
+                            sprintf(rendered, spec,
+                                    static_cast<double>(reinterpret_cast<float*>(localArgs)[argIndex]));
+                            goto renderedDone;
+                        case 's':
+                            sprintf(rendered, spec, this->m_strBlob + this->m_strOffsets[localArgs[argIndex]]);
+                            goto renderedDone;
+                        default:
+                            scan++;
+                            break;
                         }
                     }
                 }
 
-                strcat(line, rendered, sizeof(line));
+renderedDone:
+                strcat(line, rendered);
             }
 
             Graphic.Printf(x, y, line);
@@ -1901,10 +1905,10 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     }
     case -0x0B: {
         short buttons;
-        if (((1 << *object->m_localBase) & m_padInputDisableMask) == 0) {
-            buttons = Pad.GetButtonDown(*object->m_localBase);
-        } else {
+        if (((1 << *object->m_localBase) & m_padInputDisableMask) != 0) {
             buttons = 0;
+        } else {
+            buttons = Pad.GetButtonDown(*object->m_localBase);
         }
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
             buttons &= ~0xC00;
@@ -1915,10 +1919,10 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     }
     case -0x0C: {
         short buttons;
-        if (((1 << *object->m_localBase) & m_padInputDisableMask) == 0) {
-            buttons = Pad.GetButtonRepeat(*object->m_localBase);
-        } else {
+        if (((1 << *object->m_localBase) & m_padInputDisableMask) != 0) {
             buttons = 0;
+        } else {
+            buttons = Pad.GetButtonRepeat(*object->m_localBase);
         }
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
             buttons &= ~0xC00;
@@ -1967,14 +1971,14 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     }
     case -0x12:
-        if ((DbgMenuPcs.GetDbgFlag() & 0x100) == 0) {
-            *reinterpret_cast<float*>(object->m_localBase[1]) =
-                static_cast<float>(Pad.GetLeftStickX(*object->m_localBase));
-            *reinterpret_cast<float*>(object->m_localBase[2]) =
-                static_cast<float>(Pad.GetLeftStickY(*object->m_localBase));
-        } else {
+        if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
             *reinterpret_cast<float*>(object->m_localBase[1]) = kCFlatPadStickZero;
             *reinterpret_cast<float*>(object->m_localBase[2]) = kCFlatPadStickZero;
+        } else {
+            const float stickX = Pad.GetLeftStickX(*object->m_localBase);
+            const float stickY = Pad.GetLeftStickY(*object->m_localBase);
+            *reinterpret_cast<float*>(object->m_localBase[1]) = stickX;
+            *reinterpret_cast<float*>(object->m_localBase[2]) = stickY;
         }
         this->push(object, 0);
         outResult = 0;
@@ -1989,14 +1993,14 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     }
     case -0x13:
-        if ((DbgMenuPcs.GetDbgFlag() & 0x100) == 0) {
-            *reinterpret_cast<float*>(object->m_localBase[1]) =
-                static_cast<float>(Pad.GetRightStickX(*object->m_localBase));
-            *reinterpret_cast<float*>(object->m_localBase[2]) =
-                static_cast<float>(Pad.GetRightStickY(*object->m_localBase));
-        } else {
+        if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
             *reinterpret_cast<float*>(object->m_localBase[1]) = kCFlatPadStickZero;
             *reinterpret_cast<float*>(object->m_localBase[2]) = kCFlatPadStickZero;
+        } else {
+            const float stickX = Pad.GetRightStickX(*object->m_localBase);
+            const float stickY = Pad.GetRightStickY(*object->m_localBase);
+            *reinterpret_cast<float*>(object->m_localBase[1]) = stickX;
+            *reinterpret_cast<float*>(object->m_localBase[2]) = stickY;
         }
         this->push(object, 0);
         outResult = 0;
@@ -2308,23 +2312,18 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         const float distance = localFloats[1];
         CLine<64>* line = &m_debugLines[*object->m_localBase];
         Vec position;
-        position.x = 0.0f;
-        position.y = 0.0f;
-        position.z = 0.0f;
 
-        if (line->pointCount > 0) {
-            if (distance < 0.0f || line->pointCount == 1) {
-                position = line->points[0];
-            } else if (distance >= line->totalLength) {
-                position = line->points[line->pointCount - 1];
-            } else {
-                for (unsigned int i = 0; i + 1 < line->pointCount; i++) {
-                    CLineSegment& segment = line->segments[i];
-                    if (segment.startLength <= distance && distance < segment.startLength + segment.length) {
-                        const float t = (distance - segment.startLength) / segment.length;
-                        VECLerp(&line->points[i], &line->points[i + 1], &position, t);
-                        break;
-                    }
+        if (distance < kCFlatPadStickZero) {
+            position = line->points[0];
+        } else if (line->totalLength <= distance) {
+            position = line->points[line->pointCount - 1];
+        } else {
+            for (unsigned int i = 0; i < line->pointCount - 1; i++) {
+                if (line->segments[i].startLength <= distance &&
+                    distance < line->segments[i].startLength + line->segments[i].length) {
+                    const float t = (distance - line->segments[i].startLength) / line->segments[i].length;
+                    VECLerp(&line->points[i], &line->points[i + 1], &position, t);
+                    break;
                 }
             }
         }
@@ -2341,27 +2340,22 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         const float distance = localFloats[1];
         CLine<64>* line = &m_debugLines[*object->m_localBase];
         Vec direction;
-        direction.x = 0.0f;
-        direction.y = 0.0f;
-        direction.z = 0.0f;
 
-        if (line->pointCount > 1) {
-            if (distance < 0.0f) {
-                direction = line->segments[0].normal;
-            } else if (distance >= line->totalLength) {
-                direction = line->segments[line->pointCount - 2].normal;
-            } else {
-                for (unsigned int i = 0; i + 1 < line->pointCount; i++) {
-                    CLineSegment& segment = line->segments[i];
-                    if (segment.startLength <= distance && distance < segment.startLength + segment.length) {
-                        direction = segment.normal;
-                        break;
-                    }
+        if (distance < kCFlatPadStickZero) {
+            direction = line->segments[0].normal;
+        } else if (line->totalLength <= distance) {
+            direction = line->segments[line->pointCount - 1].normal;
+        } else {
+            for (unsigned int i = 0; i < line->pointCount - 1; i++) {
+                if (line->segments[i].startLength <= distance &&
+                    distance < line->segments[i].startLength + line->segments[i].length) {
+                    direction = line->segments[i].normal;
+                    break;
                 }
             }
         }
 
-        if (object->m_localBase[2] == 0) {
+        if (static_cast<int>(object->m_localBase[2]) == 0) {
             direction.x = -direction.x;
             direction.y = -direction.y;
             direction.z = -direction.z;
@@ -4170,8 +4164,8 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
  */
 CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int systemValue)
 {
-    u8* game = reinterpret_cast<u8*>(&Game);
     CGame::CGameWork& gameWork = Game.m_gameWork;
+    u8* game = reinterpret_cast<u8*>(&Game);
 
     if (systemValue <= -0x1000) {
         int valueIndex = -0x1000 - systemValue;
@@ -4223,13 +4217,13 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
         FlatLastResult(this) = result;
     } else if (systemValue <= -500) {
         int bitIndex = systemValue + 0x9F3;
-        int byteIndex = bitIndex / 8 + 8;
+        int byteIndex = bitIndex / 8;
         unsigned int mask = 1U << (bitIndex % 8);
-        unsigned int flag = static_cast<unsigned int>(static_cast<unsigned char>(gameWork.m_eventFlags[byteIndex])) & mask;
+        unsigned int flag = static_cast<unsigned int>(static_cast<unsigned char>(Game.m_gameWork.m_eventFlags[byteIndex])) & mask;
         FlatLastResult(this) = (-flag | flag) >> 31;
     } else if (systemValue <= -200) {
-        short* artifact = &Game.m_gameWork.m_eventWork[systemValue + 0x1C7];
-        FlatLastResult(this) = static_cast<unsigned int>(static_cast<int>(*artifact));
+        int workIndex = systemValue + 0x1C7;
+        FlatLastResult(this) = static_cast<unsigned int>(static_cast<int>(gameWork.m_eventWork[workIndex]));
     } else {
         switch (systemValue) {
         case -0x40:
@@ -4314,12 +4308,14 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
         case -0x6E:
         case -0x6D:
         case -0x6C: {
-            u8* usbEdit = game + (systemValue + 0x73) * 0xC30;
+            u8* usbEdit = reinterpret_cast<u8*>(&Game) + (systemValue + 0x73) * 0xC30;
+            unsigned int charaValue;
             if (*(int*)(usbEdit + 0x1794) != 0) {
-                FlatLastResult(this) = *(unsigned short*)(usbEdit + 0x1404);
+                charaValue = *(unsigned short*)(usbEdit + 0x1404);
             } else {
-                FlatLastResult(this) = 0;
+                charaValue = 0;
             }
+            FlatLastResult(this) = charaValue;
             break;
         }
         case -0x76:
@@ -4330,7 +4326,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
             break;
         case -0x7A: {
             unsigned int languageValue = 1;
-            switch (gameWork.m_languageId) {
+            switch (Game.m_gameWork.m_languageId) {
             case 0:
                 languageValue = 1;
                 break;
@@ -4374,14 +4370,15 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
  */
 void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack, int setMode)
 {
-    CGame::CGameWork& gameWork = Game.m_gameWork;
+    CGame::CGameWork* gameWork = &Game.m_gameWork;
     if (systemValue > -0x1000) {
         if (systemValue <= -500) {
             int bitIndex = systemValue + 0x9F3;
-            int byteIndex = bitIndex / 8 + 8;
-            unsigned char* flagByte = reinterpret_cast<unsigned char*>(gameWork.m_eventFlags) + byteIndex;
+            int byteIndex = bitIndex / 8;
+            unsigned char* flagByte = reinterpret_cast<unsigned char*>(Game.m_gameWork.m_eventFlags) + byteIndex;
+            unsigned char flagBits = *flagByte;
             unsigned int mask = 1U << (bitIndex % 8);
-            unsigned int flag = *flagByte & mask;
+            unsigned int flag = mask & flagBits;
             int value = (-flag | flag) >> 31;
             stack[-1].m_word = value;
 
@@ -4404,76 +4401,78 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
                 *flagByte &= ~mask;
             }
         } else if (systemValue <= -200) {
-            short* artifact = &Game.m_gameWork.m_eventWork[systemValue + 0x1C7];
-            stack[-1].m_word = *artifact;
+            int workIndex = systemValue + 0x1C7;
+            stack[-1].m_word = gameWork->m_eventWork[workIndex];
             switch (setMode) {
             case -1:
-                *artifact = static_cast<short>(*artifact - stack->m_word);
+                gameWork->m_eventWork[workIndex] =
+                    static_cast<short>(gameWork->m_eventWork[workIndex] - stack->m_word);
                 break;
             case 0:
-                *artifact = static_cast<short>(stack->m_word);
+                gameWork->m_eventWork[workIndex] = static_cast<short>(stack->m_word);
                 break;
             case 1:
-                *artifact = static_cast<short>(*artifact + stack->m_word);
+                gameWork->m_eventWork[workIndex] =
+                    static_cast<short>(gameWork->m_eventWork[workIndex] + stack->m_word);
                 break;
             }
         } else {
             switch (systemValue) {
             case -0x40:
-                stack[-1].m_word = *reinterpret_cast<unsigned int*>(&gameWork.m_scriptSysVal0);
+                stack[-1].m_word = *reinterpret_cast<unsigned int*>(&gameWork->m_scriptSysVal0);
                 switch (setMode) {
                 case -1:
-                    *reinterpret_cast<unsigned int*>(&gameWork.m_scriptSysVal0) =
-                        *reinterpret_cast<unsigned int*>(&gameWork.m_scriptSysVal0) - stack->m_word;
+                    *reinterpret_cast<unsigned int*>(&gameWork->m_scriptSysVal0) =
+                        *reinterpret_cast<unsigned int*>(&gameWork->m_scriptSysVal0) - stack->m_word;
                     break;
                 case 0:
-                    *reinterpret_cast<unsigned int*>(&gameWork.m_scriptSysVal0) = stack->m_word;
+                    *reinterpret_cast<unsigned int*>(&gameWork->m_scriptSysVal0) = stack->m_word;
                     break;
                 case 1:
-                    *reinterpret_cast<unsigned int*>(&gameWork.m_scriptSysVal0) =
-                        *reinterpret_cast<unsigned int*>(&gameWork.m_scriptSysVal0) + stack->m_word;
+                    *reinterpret_cast<unsigned int*>(&gameWork->m_scriptSysVal0) =
+                        *reinterpret_cast<unsigned int*>(&gameWork->m_scriptSysVal0) + stack->m_word;
                     break;
                 }
                 break;
             case -0x41:
-                stack[-1].m_word = gameWork.m_timerA;
+                stack[-1].m_word = gameWork->m_timerA;
                 switch (setMode) {
                 case -1:
-                    gameWork.m_timerA = gameWork.m_timerA - stack->m_word;
+                    gameWork->m_timerA = gameWork->m_timerA - stack->m_word;
                     break;
                 case 0:
-                    gameWork.m_timerA = stack->m_word;
+                    gameWork->m_timerA = stack->m_word;
                     break;
                 case 1:
-                    gameWork.m_timerA = gameWork.m_timerA + stack->m_word;
+                    gameWork->m_timerA = gameWork->m_timerA + stack->m_word;
                     break;
                 }
                 break;
             case -0x42:
-                stack[-1].m_word = gameWork.m_scriptGlobalTime;
+                stack[-1].m_word = gameWork->m_scriptGlobalTime;
                 switch (setMode) {
                 case -1:
-                    gameWork.m_scriptGlobalTime = gameWork.m_scriptGlobalTime - stack->m_word;
+                    gameWork->m_scriptGlobalTime = gameWork->m_scriptGlobalTime - stack->m_word;
                     break;
                 case 0:
-                    gameWork.m_scriptGlobalTime = stack->m_word;
+                    gameWork->m_scriptGlobalTime = stack->m_word;
                     break;
                 case 1:
-                    gameWork.m_scriptGlobalTime = gameWork.m_scriptGlobalTime + stack->m_word;
+                    gameWork->m_scriptGlobalTime = gameWork->m_scriptGlobalTime + stack->m_word;
                     break;
                 }
                 break;
             case -0x43:
-                stack[-1].m_word = gameWork.m_frameCounter;
+                stack[-1].m_word = gameWork->m_frameCounter;
                 switch (setMode) {
                 case -1:
-                    gameWork.m_frameCounter = gameWork.m_frameCounter - stack->m_word;
+                    gameWork->m_frameCounter = gameWork->m_frameCounter - stack->m_word;
                     break;
                 case 0:
-                    gameWork.m_frameCounter = stack->m_word;
+                    gameWork->m_frameCounter = stack->m_word;
                     break;
                 case 1:
-                    gameWork.m_frameCounter = gameWork.m_frameCounter + stack->m_word;
+                    gameWork->m_frameCounter = gameWork->m_frameCounter + stack->m_word;
                     break;
                 }
                 break;
@@ -4492,17 +4491,17 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
             case -0x4A:
             case -0x49:
             case -0x48: {
-                int* value = &Game.m_gameWork.m_bossArtifactStageTable[systemValue + 0x56];
-                stack[-1].m_word = *value;
+                int workIndex = systemValue + 0x56;
+                stack[-1].m_word = gameWork->m_bossArtifactStageTable[workIndex];
                 switch (setMode) {
                 case -1:
-                    *value = *value - stack->m_word;
+                    gameWork->m_bossArtifactStageTable[workIndex] = gameWork->m_bossArtifactStageTable[workIndex] - stack->m_word;
                     break;
                 case 0:
-                    *value = stack->m_word;
+                    gameWork->m_bossArtifactStageTable[workIndex] = stack->m_word;
                     break;
                 case 1:
-                    *value = *value + stack->m_word;
+                    gameWork->m_bossArtifactStageTable[workIndex] = gameWork->m_bossArtifactStageTable[workIndex] + stack->m_word;
                     break;
                 }
                 break;
@@ -4522,32 +4521,32 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
             case -0x59:
             case -0x58:
             case -0x57: {
-                int* value = &Game.m_gameWork.m_unkStageTable[systemValue + 0x65];
-                stack[-1].m_word = *value;
+                int workIndex = systemValue + 0x65;
+                stack[-1].m_word = gameWork->m_unkStageTable[workIndex];
                 switch (setMode) {
                 case -1:
-                    *value = *value - stack->m_word;
+                    gameWork->m_unkStageTable[workIndex] = gameWork->m_unkStageTable[workIndex] - stack->m_word;
                     break;
                 case 0:
-                    *value = stack->m_word;
+                    gameWork->m_unkStageTable[workIndex] = stack->m_word;
                     break;
                 case 1:
-                    *value = *value + stack->m_word;
+                    gameWork->m_unkStageTable[workIndex] = gameWork->m_unkStageTable[workIndex] + stack->m_word;
                     break;
                 }
                 break;
             }
             case -0x66:
-                stack[-1].m_word = gameWork.m_chaliceElement;
+                stack[-1].m_word = gameWork->m_chaliceElement;
                 switch (setMode) {
                 case -1:
-                    gameWork.m_chaliceElement = gameWork.m_chaliceElement - stack->m_word;
+                    gameWork->m_chaliceElement = gameWork->m_chaliceElement - stack->m_word;
                     break;
                 case 0:
-                    gameWork.m_chaliceElement = stack->m_word;
+                    gameWork->m_chaliceElement = stack->m_word;
                     break;
                 case 1:
-                    gameWork.m_chaliceElement = gameWork.m_chaliceElement + stack->m_word;
+                    gameWork->m_chaliceElement = gameWork->m_chaliceElement + stack->m_word;
                     break;
                 }
                 break;
@@ -4556,17 +4555,17 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
             case -0x69:
             case -0x68:
             case -0x67: {
-                int* value = &Game.m_gameWork.m_eventHeader[systemValue + 0x6B];
-                stack[-1].m_word = *value;
+                int workIndex = systemValue + 0x6B;
+                stack[-1].m_word = gameWork->m_eventHeader[workIndex];
                 switch (setMode) {
                 case -1:
-                    *value = *value - stack->m_word;
+                    gameWork->m_eventHeader[workIndex] = gameWork->m_eventHeader[workIndex] - stack->m_word;
                     break;
                 case 0:
-                    *value = stack->m_word;
+                    gameWork->m_eventHeader[workIndex] = stack->m_word;
                     break;
                 case 1:
-                    *value = *value + stack->m_word;
+                    gameWork->m_eventHeader[workIndex] = gameWork->m_eventHeader[workIndex] + stack->m_word;
                     break;
                 }
                 break;
@@ -4575,17 +4574,17 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
             case -0x46:
             case -0x45:
             case -0x44: {
-                int* value = &Game.m_gameWork.m_wmBackupParams[systemValue + 0x47];
-                stack[-1].m_word = *value;
+                int workIndex = systemValue + 0x47;
+                stack[-1].m_word = gameWork->m_wmBackupParams[workIndex];
                 switch (setMode) {
                 case -1:
-                    *value = *value - stack->m_word;
+                    gameWork->m_wmBackupParams[workIndex] = gameWork->m_wmBackupParams[workIndex] - stack->m_word;
                     break;
                 case 0:
-                    *value = stack->m_word;
+                    gameWork->m_wmBackupParams[workIndex] = stack->m_word;
                     break;
                 case 1:
-                    *value = *value + stack->m_word;
+                    gameWork->m_wmBackupParams[workIndex] = gameWork->m_wmBackupParams[workIndex] + stack->m_word;
                     break;
                 }
                 break;
@@ -4607,7 +4606,7 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
                 }
                 break;
             case -0x76: {
-                unsigned int value = static_cast<unsigned int>(gameWork.m_menuStageMode);
+                unsigned int value = static_cast<unsigned int>(gameWork->m_menuStageMode);
                 stack[-1].m_word = value;
                 switch (setMode) {
                 case -1:
@@ -4639,22 +4638,22 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
                     break;
                 }
                 break;
-            case -0x79:
-                stack[-1].m_word = static_cast<int>(static_cast<unsigned short>(Game.m_gameWork.m_optionValue));
+            case -0x79: {
+                short* optionValue = reinterpret_cast<short*>(&Game.m_gameWork.m_optionValue);
+                stack[-1].m_word = *optionValue;
                 switch (setMode) {
                 case -1:
-                    Game.m_gameWork.m_optionValue =
-                        static_cast<unsigned short>(Game.m_gameWork.m_optionValue - stack->m_word);
+                    *optionValue = static_cast<short>(*optionValue - stack->m_word);
                     break;
                 case 0:
-                    Game.m_gameWork.m_optionValue = static_cast<unsigned short>(stack->m_word);
+                    *optionValue = static_cast<short>(stack->m_word);
                     break;
                 case 1:
-                    Game.m_gameWork.m_optionValue =
-                        static_cast<unsigned short>(Game.m_gameWork.m_optionValue + stack->m_word);
+                    *optionValue = static_cast<short>(*optionValue + stack->m_word);
                     break;
                 }
                 break;
+            }
             default:
                 break;
             }

@@ -159,7 +159,9 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     pppFVECTOR4 colorStep;
     pppFMATRIX localBase;
     pppFMATRIX drawMtx;
-    pppFMATRIX rotMtx;
+    pppFMATRIX unitScratch;
+    pppFMATRIX rotMtxA;
+    pppFMATRIX rotMtxB;
     Vec zeroVecA;
     Vec zeroVecB;
     Vec pos;
@@ -224,7 +226,7 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     shapeAnim = static_cast<pppShapeAnimData*>(ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex]->m_animData);
 
     pppCopyMatrix(localBase, obj->m_object.m_localMatrix);
-    pppUnitMatrix(drawMtx);
+    pppUnitMatrix(unitScratch);
 
     shapeScale = (float)step->m_stepValue;
     shapeScaleStep = (shapeScale - (float)step->m_arg3) / invCountMinusOne;
@@ -293,8 +295,8 @@ draw_loop:
                         localBase.value[1][1] * (drawScale * ppvMng->m_scale.y),
                         localBase.value[2][2] * (drawScale * ppvMng->m_scale.z));
         if ((step->m_rotateEnabled != 0) && (count != 0)) {
-            PSMTXRotRad(rotMtx.value, 'z', kPppKeShpTail3XDegToRad * (float)work->m_angles[count]);
-            pppMulMatrix(obj->m_object.m_drawMatrix, rotMtx, obj->m_object.m_drawMatrix);
+            PSMTXRotRad(rotMtxA.value, 'z', kPppKeShpTail3XDegToRad * (float)work->m_angles[count]);
+            pppMulMatrix(obj->m_object.m_drawMatrix, rotMtxA, obj->m_object.m_drawMatrix);
         }
         PSMTXMultVec(ppvWorldMatrix, &pos, &pos);
         PSMTXCopy(obj->m_object.m_drawMatrix.value, drawMtx.value);
@@ -304,8 +306,8 @@ draw_loop:
         drawMtx.value[1][1] = drawScale * (localBase.value[1][1] * ppvMng->m_scale.y);
         drawMtx.value[2][2] = drawScale * (localBase.value[2][2] * ppvMng->m_scale.z);
         if ((step->m_rotateEnabled != 0) && (count != 0)) {
-            PSMTXRotRad(rotMtx.value, 'z', kPppKeShpTail3XDegToRad * (float)work->m_angles[count]);
-            pppMulMatrix(drawMtx, rotMtx, drawMtx);
+            PSMTXRotRad(rotMtxB.value, 'z', kPppKeShpTail3XDegToRad * (float)work->m_angles[count]);
+            pppMulMatrix(drawMtx, rotMtxB, drawMtx);
         }
         PSMTXMultVec(ppvCameraMatrix, &pos, &pos);
     }

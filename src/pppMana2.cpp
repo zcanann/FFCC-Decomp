@@ -116,6 +116,11 @@ static inline float LoadFloat(const float& value)
     return value;
 }
 
+static inline float LoadFloatFresh(const volatile float& value)
+{
+    return value;
+}
+
 static inline void ClearMana2ModelCallbacks(CChara::CModel* model)
 {
     model->SetCallbackContext(0, 0);
@@ -971,8 +976,10 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
             C_MTXLookAt(lookAtMtx, (Point3d*)&centerPos, &cameraUp, (Point3d*)&cameraPos);
             Graphic.SetViewport();
             GXSetScissor(0, 0, 0x280, 0x1C0);
-            gUtil.RenderTextureQuad(LoadFloat(kMana2Zero), LoadFloat(kMana2Zero), LoadFloat(kMana2ParaboloidTexSize),
-                                    LoadFloat(kMana2ParaboloidTexSize), baseParaboloidTexObjs, 0, 0, 0,
+            float texQuadZero = LoadFloatFresh(kMana2Zero);
+            float texQuadSize = LoadFloatFresh(kMana2ParaboloidTexSize);
+            gUtil.RenderTextureQuad(texQuadZero, texQuadZero, texQuadSize,
+                                    texQuadSize, baseParaboloidTexObjs, 0, 0, 0,
                                     (_GXBlendFactor)4, (_GXBlendFactor)5);
             baseParaboloidTexObjs++;
         }

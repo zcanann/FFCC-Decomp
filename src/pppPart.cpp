@@ -1602,11 +1602,11 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 
 	if (pppMngSt->m_numPrograms != 0)
 	{
+		u32 allocSize = (u32)pppMngSt->m_numPrograms << 4;
 		CMemory::CStage* stage = ppvEnv->m_stagePtr;
 		int firstAllocFailure = 1;
 		int canRetry;
 		_pppPDataVal* pDataVals = 0;
-		u32 allocSize = (u32)pppMngSt->m_numPrograms << 4;
 		s8 denied[0x180];
 
 		ppvMemAllocErrorF = 0;

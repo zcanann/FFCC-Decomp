@@ -2311,23 +2311,18 @@ renderedDone:
         const float distance = localFloats[1];
         CLine<64>* line = &m_debugLines[*object->m_localBase];
         Vec position;
-        position.x = 0.0f;
-        position.y = 0.0f;
-        position.z = 0.0f;
 
-        if (line->pointCount > 0) {
-            if (distance < 0.0f || line->pointCount == 1) {
-                position = line->points[0];
-            } else if (distance >= line->totalLength) {
-                position = line->points[line->pointCount - 1];
-            } else {
-                for (unsigned int i = 0; i + 1 < line->pointCount; i++) {
-                    CLineSegment& segment = line->segments[i];
-                    if (segment.startLength <= distance && distance < segment.startLength + segment.length) {
-                        const float t = (distance - segment.startLength) / segment.length;
-                        VECLerp(&line->points[i], &line->points[i + 1], &position, t);
-                        break;
-                    }
+        if (distance < kCFlatPadStickZero) {
+            position = line->points[0];
+        } else if (line->totalLength <= distance) {
+            position = line->points[line->pointCount - 1];
+        } else {
+            for (unsigned int i = 0; i < line->pointCount - 1; i++) {
+                if (line->segments[i].startLength <= distance &&
+                    distance < line->segments[i].startLength + line->segments[i].length) {
+                    const float t = (distance - line->segments[i].startLength) / line->segments[i].length;
+                    VECLerp(&line->points[i], &line->points[i + 1], &position, t);
+                    break;
                 }
             }
         }
@@ -2344,27 +2339,22 @@ renderedDone:
         const float distance = localFloats[1];
         CLine<64>* line = &m_debugLines[*object->m_localBase];
         Vec direction;
-        direction.x = 0.0f;
-        direction.y = 0.0f;
-        direction.z = 0.0f;
 
-        if (line->pointCount > 1) {
-            if (distance < 0.0f) {
-                direction = line->segments[0].normal;
-            } else if (distance >= line->totalLength) {
-                direction = line->segments[line->pointCount - 2].normal;
-            } else {
-                for (unsigned int i = 0; i + 1 < line->pointCount; i++) {
-                    CLineSegment& segment = line->segments[i];
-                    if (segment.startLength <= distance && distance < segment.startLength + segment.length) {
-                        direction = segment.normal;
-                        break;
-                    }
+        if (distance < kCFlatPadStickZero) {
+            direction = line->segments[0].normal;
+        } else if (line->totalLength <= distance) {
+            direction = line->segments[line->pointCount - 1].normal;
+        } else {
+            for (unsigned int i = 0; i < line->pointCount - 1; i++) {
+                if (line->segments[i].startLength <= distance &&
+                    distance < line->segments[i].startLength + line->segments[i].length) {
+                    direction = line->segments[i].normal;
+                    break;
                 }
             }
         }
 
-        if (object->m_localBase[2] == 0) {
+        if (static_cast<int>(object->m_localBase[2]) == 0) {
             direction.x = -direction.x;
             direction.y = -direction.y;
             direction.z = -direction.z;

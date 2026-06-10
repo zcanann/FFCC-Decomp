@@ -1864,7 +1864,6 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 	Vec up;
 	Vec origin;
 	Vec target;
-	Vec windImpulse;
 	Vec accel;
 	Vec predicted;
 	Vec direction;
@@ -1918,6 +1917,7 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 	}
 
 	float randomScale = FLOAT_803301D0 * Math.RandF() + FLOAT_803301D0;
+	Vec windImpulse;
 	{
 		float windScale = dynParam[2];
 		CVector tmp;

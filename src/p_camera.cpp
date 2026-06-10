@@ -1562,9 +1562,9 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
         float negMinZ = -clipBoundData[2];
         float ratioX = (clipBoundData[3] - clipBoundData[0]) / negMinZ;
         float ratioY = (clipBoundData[4] - clipBoundData[1]) / negMinZ;
-        if (ratioX > kCameraDebugRotateStep) {
+        if (ratioX > 0.2f) {
             // proceed
-        } else if (!(ratioY > kCameraDebugRotateStep)) {
+        } else if (!(ratioY > 0.2f)) {
             continue;
         }
 

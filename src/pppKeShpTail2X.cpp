@@ -130,6 +130,7 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     float colorStepB;
     float colorStepA;
     float invCountMinusOne;
+    float diffA;
     pppFMATRIX localBase;
     pppFMATRIX initMtx;
     pppFMATRIX drawMtx ATTRIBUTE_ALIGN(8);
@@ -177,6 +178,7 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     colorEndA = step->m_colorEndA;
     colorStartA *= alphaMul;
     colorEndA *= alphaMul;
+    diffA = colorStartA - colorEndA;
     colorEndR = step->m_colorEndR;
     colorEndG = step->m_colorEndG;
     colorEndB = step->m_colorEndB;
@@ -185,13 +187,12 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
         colorStepR = (colorStartR - colorEndR) / invCountMinusOne;
         colorStepG = (colorStartG - colorEndG) / invCountMinusOne;
         colorStepB = (colorStartB - colorEndB) / invCountMinusOne;
-        colorStepA = (colorStartA - colorEndA) / invCountMinusOne;
+        colorStepA = diffA / invCountMinusOne;
     } else {
-        float halfStep = LoadFloat(kPppKeShpTail2XHalf);
-        colorStepR = halfStep;
-        colorStepG = halfStep;
-        colorStepB = halfStep;
-        colorStepA = halfStep;
+        colorStepR = *(const volatile float*)&kPppKeShpTail2XHalf;
+        colorStepG = LoadFloat(kPppKeShpTail2XHalf);
+        colorStepB = colorStepR;
+        colorStepA = colorStepR;
     }
 
     work = GetKeShpTail2XWork(&obj->m_object, param_3);

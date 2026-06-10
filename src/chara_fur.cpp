@@ -1616,7 +1616,12 @@ displayDone:;
 		PSMTXMultVec(invViewMtx, outWorldPos, outWorldPos);
 	}
 
-	return nearestDepth == kCharaFurNoHitDepth ? -(hitAny == 0) : 1;
+	if (kCharaFurNoHitDepth == nearestDepth) {
+		goto noHitReturn;
+	}
+	return 1;
+noHitReturn:
+	return -(hitAny == 0);
 }
 
 /*

@@ -767,12 +767,11 @@ void CMenuPcs::CmakeVillageDraw()
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-    float a255 = 255.0f * alpha;
     GXColor col0;
     col0.r = 0xFF;
     col0.g = 0xFF;
     col0.b = 0xFF;
-    col0.a = static_cast<unsigned char>(static_cast<int>(a255));
+    col0.a = static_cast<unsigned char>(static_cast<int>(255.0f * alpha));
     GXSetChanMatColor(GX_COLOR0A0, col0);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
     MenuPcs.DrawRect(
@@ -787,13 +786,12 @@ void CMenuPcs::CmakeVillageDraw()
     col1.r = 0xFF;
     col1.g = 0xFF;
     col1.b = 0xFF;
-    col1.a = static_cast<unsigned char>(static_cast<int>(a255));
+    col1.a = static_cast<unsigned char>(static_cast<int>(255.0f * alpha));
     GXSetChanMatColor(GX_COLOR0A0, col1);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
-    float panelX = static_cast<float>(static_cast<int>(
-        -(static_cast<double>(328.0f) * 0.5 - 400.0)));
+    float panelW = 328.0f;
     MenuPcs.DrawRect(
-        0, panelX, 288.0f, 328.0f, 56.0f,
+        0, static_cast<float>(static_cast<int>(-(panelW * 0.5 - 400.0))), 288.0f, panelW, 56.0f,
         0.0f, 368.0f, 1.0f, 1.0f, 0.0f);
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -802,19 +800,21 @@ void CMenuPcs::CmakeVillageDraw()
     col2.r = 0xFF;
     col2.g = 0xFF;
     col2.b = 0xFF;
-    col2.a = static_cast<unsigned char>(static_cast<int>(a255));
+    col2.a = static_cast<unsigned char>(static_cast<int>(255.0f * alpha));
     GXSetChanMatColor(GX_COLOR0A0, col2);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x68 : 0x41));
     MenuPcs.DrawRect(
         0, 184.0f, 216.0f, 48.0f, 48.0f,
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     MenuPcs.DrawRect(
-        0, static_cast<float>(20.0), 216.0f, 48.0f, 48.0f,
+        0, static_cast<float>(static_cast<int>(568.0)), 216.0f, 48.0f, 48.0f,
         48.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     if (villageWork->m_mode == 1 && villageWork->m_row < 5) {
-        short row = villageWork->m_row;
-        int cursorX = static_cast<int>(26.9f * static_cast<float>(villageWork->m_select)) + 0xE5;
+        int cursorBase = 0xE5;
+        int cursorY = villageWork->m_row * 0x20 + 0x63;
+        int cursorX = static_cast<int>(
+            26.9f * static_cast<float>(villageWork->m_select) + static_cast<float>(cursorBase));
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
         GXColor cursorColor;
@@ -826,7 +826,7 @@ void CMenuPcs::CmakeVillageDraw()
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 100 : 0x3D));
         MenuPcs.DrawRect(
             0,
-            static_cast<float>(cursorX), static_cast<float>(row * 0x20 + 0x63), 48.0f, 48.0f,
+            static_cast<float>(cursorX), static_cast<float>(cursorY), 48.0f, 48.0f,
             128.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     }
 

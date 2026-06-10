@@ -1659,7 +1659,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		          gxViewport, &projX, &projY, &projZ);
 
 		nearAlpha = static_cast<unsigned int>(projZ * FLOAT_8032F6F8) >> 16;
-		if (nearAlpha >= 0xFF) {
+		if ((unsigned int)nearAlpha >= 0xFF) {
 			nearAlpha = 0xFF;
 		}
 		hasNearAlpha = 1;
@@ -1676,7 +1676,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		if (farAlpha == 0) {
 			farAlpha = 0xFF;
 		}
-		if (farAlpha >= 0xFF) {
+		if ((unsigned int)farAlpha >= 0xFF) {
 			farAlpha = 0xFF;
 		}
 		hasFarAlpha = 1;
@@ -1700,15 +1700,17 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 	yOffset = xOffset * FLOAT_8032F6FC;
 
 	for (int pass = 0; pass < 2; pass++) {
-		int kColorSel = 0x0C;
-		int kAlphaSel = 0x1C;
-		int passAlpha = nearAlpha;
-
 		if ((pass == 0) && !((mode != 2) && hasNearAlpha && (mode != 1) && hasFarAlpha)) {
 			continue;
 		}
 
+		GXTevKColorID kColorId = (GXTevKColorID)0;
+		int kColorSel = 0x0C;
+		int kAlphaSel = 0x1C;
+		int passAlpha = nearAlpha;
+
 		if (pass != 0) {
+			kColorId = (GXTevKColorID)1;
 			kColorSel = 0x0D;
 			kAlphaSel = 0x1D;
 			passAlpha = farAlpha;
@@ -1722,7 +1724,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		chanColor.g = passAlpha;
 		chanColor.b = passAlpha;
 		chanColor.a = 0x80;
-		GXSetTevKColor((GXTevKColorID)pass, dofColor);
+		GXSetTevKColor(kColorId, dofColor);
 		GXSetChanAmbColor(GX_COLOR0A0, chanColor);
 		GXSetChanMatColor(GX_COLOR0A0, chanColor);
 

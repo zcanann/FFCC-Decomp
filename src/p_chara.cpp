@@ -2591,13 +2591,17 @@ int CCharaPcs::CHandle::LoadAnim(
         }
     }
 
-    int resolvedKind = charaKind;
-    if (resolvedKind == -1) {
+    int resolvedKind;
+    if (charaKind == -1) {
         resolvedKind = m_charaKind;
+    } else {
+        resolvedKind = charaKind;
     }
-    int resolvedNo = charaNo;
-    if (resolvedNo == -1) {
+    int resolvedNo;
+    if (charaNo == -1) {
         resolvedNo = m_charaNo;
+    } else {
+        resolvedNo = charaNo;
     }
 
     CLoadAnim* loadAnim = FindLoadedAnim(&CharaPcs, resolvedKind, resolvedNo, animName);

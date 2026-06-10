@@ -1452,10 +1452,13 @@ void CMiniGamePcs::GbaThreadInit(long, MgGbaThreadParam*, OSThread*, unsigned ch
  */
 void CMiniGamePcs::OpenCallback(MgGbaThreadParam* param, void* context)
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    unsigned char* paramBytes = reinterpret_cast<unsigned char*>(param);
     int doWrite = 1;
+    unsigned char swapByte;
+    int swapWord;
+    unsigned int baseTick;
     int wasResync = 0;
+    unsigned char* paramBytes = reinterpret_cast<unsigned char*>(param);
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
 
     if (paramBytes[0xC4] != 0)
     {
@@ -1464,7 +1467,7 @@ void CMiniGamePcs::OpenCallback(MgGbaThreadParam* param, void* context)
     paramBytes[0xC4] = 0;
     paramBytes[0xC6] = 0;
     paramBytes[0xBF] = 3;
-    unsigned int baseTick = *reinterpret_cast<unsigned int*>(paramBytes + 0x30);
+    baseTick = *reinterpret_cast<unsigned int*>(paramBytes + 0x30);
     *reinterpret_cast<int*>(paramBytes + 0x30) = *reinterpret_cast<int*>(self + (static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16B4));
 
     if (paramBytes[0x28] == 0)
@@ -1506,10 +1509,10 @@ void CMiniGamePcs::OpenCallback(MgGbaThreadParam* param, void* context)
     }
     else
     {
-        unsigned char swapByte = paramBytes[0x2A];
+        swapByte = paramBytes[0x2A];
 
         paramBytes[0x2A] = self[static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16AE];
-        int swapWord = *reinterpret_cast<int*>(paramBytes + 0x34);
+        swapWord = *reinterpret_cast<int*>(paramBytes + 0x34);
         *reinterpret_cast<int*>(paramBytes + 0x34) = *reinterpret_cast<int*>(self + (static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16B8));
 
         int compareResult = memcmp(paramBytes + 0x28, self + (static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16AC), 0x60);

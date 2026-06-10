@@ -1620,23 +1620,20 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 	pppMngSt->m_numPrograms = *programs++;
 	pppMngSt->m_programTable = programs;
 
-	if (pppMngSt->m_numPrograms == 0)
-	{
-		pppMngSt->m_pppPDataVals = 0;
-	}
-	else
+	if (pppMngSt->m_numPrograms != 0)
 	{
 		CMemory::CStage* stage = ppvEnv->m_stagePtr;
 		int firstAllocFailure = 1;
 		int canRetry = 1;
 		_pppPDataVal* pDataVals = 0;
+		u32 allocSize = (u32)pppMngSt->m_numPrograms << 4;
 		s8 denied[0x180];
 
 		ppvMemAllocErrorF = 0;
 		do
 		{
 			pDataVals = (_pppPDataVal*)Memory._Alloc(
-			    pppMngSt->m_numPrograms << 4, stage, (char*)s_pppPart_cpp, 0x585, 1);
+			    allocSize, stage, (char*)s_pppPart_cpp, 0x585, 1);
 			if (pDataVals != 0)
 			{
 				goto DataValsAllocated;
@@ -1754,6 +1751,10 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 		ppvMemAllocErrorF = 1;
 DataValsAllocated:
 		pppMngSt->m_pppPDataVals = pDataVals;
+	}
+	else
+	{
+		pppMngSt->m_pppPDataVals = 0;
 	}
 
 	if (programSet->m_next != 0)

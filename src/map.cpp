@@ -2034,10 +2034,11 @@ int CMapMng::ReadMpl(char* mapName)
  */
 int CMapMng::ReadOtm(char* mapName)
 {
-    void* filePtr;
+    CFile::CHandle* fileHandle;
 
     MapMng.m_mapReadReady = 1;
     char* strTmp = g_StrTmp;
+    void* filePtr;
     sprintf(strTmp, const_cast<char*>(s_mapOtmPathFmt), mapName);
     if (static_cast<unsigned int>(System.m_execParam) >= 3) {
         System.Printf(const_cast<char*>(s_read_otm_fmt), strTmp);
@@ -2053,7 +2054,7 @@ int CMapMng::ReadOtm(char* mapName)
         CheckSum(filePtr, size);
         m_asyncLoadState.m_asyncReadIndex += 1;
     } else {
-        CFile::CHandle* fileHandle = File.Open(strTmp, 0, CFile::PRI_LOW);
+        fileHandle = File.Open(strTmp, 0, CFile::PRI_LOW);
         if (fileHandle != 0) {
             const int size = File.GetLength(fileHandle);
             if (m_asyncLoadState.m_mapReadMode == 3) {

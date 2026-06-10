@@ -840,51 +840,50 @@ void CPartMng::drawCursor()
     GXSetNumTevStages(1);
     pppSetBlendMode(3);
 
-    _GXColor white;
-    white.r = 0xff;
-    white.g = 0xff;
-    white.b = 0xff;
-    white.a = 0xff;
+    _GXColor color;
+    color.r = 0xff;
+    color.g = 0xff;
+    color.b = 0xff;
+    color.a = 0xff;
     int cursorX = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x28);
     int cursorY = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x2c);
 
-    GXSetChanAmbColor((GXChannelID)4, white);
-    GXSetChanMatColor((GXChannelID)4, white);
+    GXSetChanAmbColor((GXChannelID)4, color);
+    GXSetChanMatColor((GXChannelID)4, color);
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
     GXPosition3f32((float)(cursorX + 0x140), (float)(cursorY + 0xd6), kPartMngZero);
     GXPosition3f32((float)(cursorX + 0x140), (float)(cursorY + 0xea), kPartMngZero);
 
-    GXSetChanAmbColor((GXChannelID)4, white);
-    GXSetChanMatColor((GXChannelID)4, white);
+    GXSetChanAmbColor((GXChannelID)4, color);
+    GXSetChanMatColor((GXChannelID)4, color);
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
     GXPosition3f32((float)(cursorX + 0x13f), (float)(cursorY + 0xd6), kPartMngZero);
     GXPosition3f32((float)(cursorX + 0x13f), (float)(cursorY + 0xea), kPartMngZero);
 
-    _GXColor yellow;
-    yellow.r = 0x00;
-    yellow.g = 0x00;
-    yellow.b = 0x00;
-    yellow.a = 0xff;
-    GXSetChanAmbColor((GXChannelID)4, yellow);
-    GXSetChanMatColor((GXChannelID)4, yellow);
+    GXSetChanAmbColor((GXChannelID)4, color);
+    GXSetChanMatColor((GXChannelID)4, color);
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
     GXPosition3f32((float)(cursorX + 0x12c), (float)(cursorY + 0xe0), kPartMngZero);
     GXPosition3f32((float)(cursorX + 0x154), (float)(cursorY + 0xe0), kPartMngZero);
 
-    GXSetChanAmbColor((GXChannelID)4, white);
-    GXSetChanMatColor((GXChannelID)4, white);
+    color.r = 0x00;
+    color.g = 0x00;
+    color.b = 0x00;
+    color.a = 0xff;
+    GXSetChanAmbColor((GXChannelID)4, color);
+    GXSetChanMatColor((GXChannelID)4, color);
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
     GXPosition3f32((float)(cursorX + 0x141), (float)(cursorY + 0xd7), kPartMngZero);
     GXPosition3f32((float)(cursorX + 0x141), (float)(cursorY + 0xeb), kPartMngZero);
 
-    GXSetChanAmbColor((GXChannelID)4, white);
-    GXSetChanMatColor((GXChannelID)4, white);
+    GXSetChanAmbColor((GXChannelID)4, color);
+    GXSetChanMatColor((GXChannelID)4, color);
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
     GXPosition3f32((float)(cursorX + 0x142), (float)(cursorY + 0xd7), kPartMngZero);
     GXPosition3f32((float)(cursorX + 0x142), (float)(cursorY + 0xeb), kPartMngZero);
 
-    GXSetChanAmbColor((GXChannelID)4, white);
-    GXSetChanMatColor((GXChannelID)4, white);
+    GXSetChanAmbColor((GXChannelID)4, color);
+    GXSetChanMatColor((GXChannelID)4, color);
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
     GXPosition3f32((float)(cursorX + 0x12d), (float)(cursorY + 0xe1), kPartMngZero);
     GXPosition3f32((float)(cursorX + 0x155), (float)(cursorY + 0xe1), kPartMngZero);

@@ -3407,7 +3407,8 @@ void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, flo
     GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
 
     _GXColor mat;
-    *reinterpret_cast<unsigned int*>(&mat) = (gShopMenuMaterialWhiteBase & 0xFFFFFF00) | alpha;
+    *reinterpret_cast<unsigned int*>(&mat) = gShopMenuMaterialWhiteBase;
+    mat.a = alpha;
 
     int shapeData = reinterpret_cast<int>(ppvEnv->m_resourceTables.m_shapeTablePtr[shapeNo]->m_animData);
     tagOAN3_SHAPE* shape =
@@ -3415,9 +3416,7 @@ void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, flo
 
     MaterialMan.SetDefaultStdDrawEnv(0xACE0F);
 
-    _GXColor amb;
-    *reinterpret_cast<unsigned int*>(&amb) = gShopMenuAmbientWhite;
-    GXSetChanAmbColor(GX_COLOR0A0, amb);
+    GXSetChanAmbColor(GX_COLOR0A0, *reinterpret_cast<_GXColor*>(&gShopMenuAmbientWhite));
     GXSetChanMatColor(GX_COLOR0A0, mat);
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);

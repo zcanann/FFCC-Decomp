@@ -75,8 +75,8 @@ static const char s_fmt_pcts_pcts_q[] = "%s%s?";
 
 static short s_SelLetter = 0;
 static unsigned char s_OpenClose = 0;
-static unsigned char s_ReplyMax = 0;
-static unsigned char s_ReplyPos = 0;
+static signed char s_ReplyMax = 0;
+static signed char s_ReplyPos = 0;
 static signed char s_Attach = 0;
 static signed char s_AttachItemIdx = 0;
 static int s_AttachItem = 0;

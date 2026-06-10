@@ -371,45 +371,20 @@ void CGObject::onCreate()
     *reinterpret_cast<float*>(m_worldMode) = 0.0f;
 
     int animStateOffset = 0;
+    s8* animState;
     for (int i = 0; i < 2; i++) {
-        s8* animState;
-        animState = reinterpret_cast<s8*>(this) + (animStateOffset + 0x9D);
-        animState[0] = -1;
-        animState[1] = -1;
-        animState[2] = -1;
-        animState[3] = -1;
-        animState[4] = -1;
-        animState[5] = -1;
-        animState[6] = -1;
-        animState[7] = -1;
-        animState = reinterpret_cast<s8*>(this) + (animStateOffset + 0xA5);
-        animState[0] = -1;
-        animState[1] = -1;
-        animState[2] = -1;
-        animState[3] = -1;
-        animState[4] = -1;
-        animState[5] = -1;
-        animState[6] = -1;
-        animState[7] = -1;
-        animState = reinterpret_cast<s8*>(this) + (animStateOffset + 0xAD);
-        animState[0] = -1;
-        animState[1] = -1;
-        animState[2] = -1;
-        animState[3] = -1;
-        animState[4] = -1;
-        animState[5] = -1;
-        animState[6] = -1;
-        animState[7] = -1;
-        animState = reinterpret_cast<s8*>(this) + (animStateOffset + 0xB5);
-        animStateOffset += 0x20;
-        animState[0] = -1;
-        animState[1] = -1;
-        animState[2] = -1;
-        animState[3] = -1;
-        animState[4] = -1;
-        animState[5] = -1;
-        animState[6] = -1;
-        animState[7] = -1;
+        for (int j = 0; j < 4; j++) {
+            animState = reinterpret_cast<s8*>(m_animQueue) + animStateOffset - 0x41;
+            animStateOffset += 8;
+            animState[0] = -1;
+            animState[1] = -1;
+            animState[2] = -1;
+            animState[3] = -1;
+            animState[4] = 0xFF;
+            animState[5] = -1;
+            animState[6] = -1;
+            animState[7] = 0xFF;
+        }
     }
 
     memset(&m_attackColliders[0].m_localStart.y, 0, 0x180);

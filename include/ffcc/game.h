@@ -99,7 +99,6 @@ public:
 
 public:
     CGame();
-    ~CGame();
 
     void Init();
     void Quit();

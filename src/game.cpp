@@ -200,15 +200,6 @@ inline CGame::CGame()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CGame::~CGame()
-{
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8001600c
  * PAL Size: 476b
  * EN Address: TODO

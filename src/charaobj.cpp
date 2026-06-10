@@ -1476,9 +1476,9 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 	if (m_lastStateId == 8 && m_subState == 1 &&
 	    ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + resolvedItemId * 0x48 + 0x2C) & 8) == 0)) {
 		CVector selfPos(m_worldPosition);
-		CVector sourcePos(sourceObj->m_worldPosition);
+		const CVector& sourcePos = CVector(sourceObj->m_worldPosition);
 		CVector deltaVec;
-		PSVECSubtract(reinterpret_cast<Vec*>(&sourcePos), reinterpret_cast<Vec*>(&selfPos), reinterpret_cast<Vec*>(&deltaVec));
+		PSVECSubtract((Vec*)&sourcePos, reinterpret_cast<Vec*>(&selfPos), reinterpret_cast<Vec*>(&deltaVec));
 		Vec frontDelta;
 		frontDelta.x = deltaVec.x;
 		frontDelta.y = deltaVec.y;
@@ -1522,9 +1522,9 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		if (currentKind == 2) {
 			if (staType != 0x66 && staType != 0x67 && staType != 7) {
 				CVector sourcePos(sourceObj->m_worldPosition);
-				CVector selfPos(m_worldPosition);
+				const CVector& selfPos = CVector(m_worldPosition);
 				CVector deltaVec;
-				PSVECSubtract(reinterpret_cast<Vec*>(&selfPos), reinterpret_cast<Vec*>(&sourcePos), reinterpret_cast<Vec*>(&deltaVec));
+				PSVECSubtract((Vec*)&selfPos, reinterpret_cast<Vec*>(&sourcePos), reinterpret_cast<Vec*>(&deltaVec));
 				Vec delta;
 				delta.x = deltaVec.x;
 				delta.y = deltaVec.y;
@@ -1542,9 +1542,9 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 	if (itemEffect == 0x1F8 && (sourceObj->m_weaponNodeFlags & 0x20) != 0 &&
 	    ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 0x0A) & 0xFF) == 3)) {
 		CVector sourcePos(sourceObj->m_worldPosition);
-		CVector selfPos(m_worldPosition);
+		const CVector& selfPos = CVector(m_worldPosition);
 		CVector deltaVec;
-		PSVECSubtract(reinterpret_cast<Vec*>(&selfPos), reinterpret_cast<Vec*>(&sourcePos), reinterpret_cast<Vec*>(&deltaVec));
+		PSVECSubtract((Vec*)&selfPos, reinterpret_cast<Vec*>(&sourcePos), reinterpret_cast<Vec*>(&deltaVec));
 		Vec delta;
 		delta.x = deltaVec.x;
 		delta.y = deltaVec.y;

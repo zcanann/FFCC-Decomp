@@ -471,7 +471,7 @@ void CPad::Frame()
 					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar12) + 9) =
 						*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 9);
 					puVar10 = puVar7 + 5;
-					puVar7 = puVar7 + 6;
+					puVar13 = puVar13 + 6;
 					*reinterpret_cast<u8*>(puVar12 + 5) = *reinterpret_cast<u8*>(puVar10);
 					iVar11 = *reinterpret_cast<int*>(reinterpret_cast<int>(_1b0_4_) + 8) * 0x40 + iVar14;
 					iVar14 = iVar14 + 4;
@@ -516,7 +516,7 @@ void CPad::Frame()
 				{
 					*puVar7 = static_cast<u16>(*puVar7 | uVar8);
 				}
-				puVar7 = puVar7 + 6;
+				puVar13 = puVar13 + 6;
 				iVar6 = iVar6 + 0x0C;
 				iVar19 = iVar19 + 4;
 				puVar13 = puVar13 + 2;
@@ -531,7 +531,7 @@ void CPad::Frame()
 	puVar13 = puVar7;
 	do
 	{
-		cVar9 = *reinterpret_cast<s8*>(puVar7 + 5);
+		cVar9 = *reinterpret_cast<s8*>(puVar13 + 5);
 		uVar15 = 0x80000000 >> gbaIdx;
 		if (cVar9 == -1)
 		{
@@ -570,7 +570,7 @@ void CPad::Frame()
 		_1a8_4_ = _1a8_4_ & ~uVar15;
 	flag_done:
 		gbaIdx = gbaIdx + 1;
-		puVar7 = puVar7 + 6;
+		puVar13 = puVar13 + 6;
 	} while (gbaIdx < 4);
 
 	if ((uVar16 & 0xF0000000) != 0)
@@ -578,7 +578,7 @@ void CPad::Frame()
 		PADReset(uVar16 & 0xF0000000);
 	}
 
-	MergePadInputs(this, puVar13, puVar18, puVar10);
+	MergePadInputs(this, puVar7, puVar18, puVar10);
 
 	if (_1bc_4_ >= 0)
 	{

@@ -2325,6 +2325,8 @@ void CShopMenu::DrawMake()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_propagation off
 void CShopMenu::DrawSmith0()
 {
     DrawShopBase();
@@ -2348,11 +2350,14 @@ void CShopMenu::DrawSmith0()
         title = ShopMenuMes(languageId, SHOP_MENU_TEXT_BLACKSMITH);
     }
 
+    int rightEdge = 0x108;
+    int titleX = static_cast<int>(static_cast<float>(rightEdge) - font->GetWidth(title));
     font->DrawInit();
-    MenuPcs.DrawNoShadowFont(font, const_cast<char*>(title), 264 - font->GetWidth(title), FLOAT_80332e4c, 9, 0x12);
+    MenuPcs.DrawNoShadowFont(font, const_cast<char*>(title), static_cast<float>(titleX), FLOAT_80332e4c, 9, 0x12);
     MenuPcs.DrawInit();
     MenuPcs.DrawInit();
 }
+#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x80155058

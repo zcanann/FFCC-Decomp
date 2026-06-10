@@ -791,13 +791,13 @@ void CCameraPcs::calc()
 
         float lateral = kCameraDebugZoomStep * triggerR - kCameraDebugZoomStep * moveInOut;
 
-        float panStick = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1))
-                             ? kCameraZeroF
-                             : CameraRawPadInput().substickXF;
-
         const float sinXCosY = static_cast<float>(sin(m_yaw)) * static_cast<float>(cos(m_pitch));
         const float sinY = static_cast<float>(sin(m_pitch));
         const float cosXCosY = static_cast<float>(cos(m_yaw)) * static_cast<float>(cos(m_pitch));
+
+        float panStick = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1))
+                             ? kCameraZeroF
+                             : CameraRawPadInput().substickXF;
         const float camMove = kCameraDefaultNearZ * panStick;
 
         m_targetX = sinXCosY * camMove + m_targetX;

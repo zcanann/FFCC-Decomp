@@ -884,8 +884,8 @@ void CGItemObj::onFrameStat()
 	}
 	case 0xB:
 		if (m_stateFrame == m_carryFrame) {
-			CVector attachOffset(kItemObjZero, kItemObjZero, kItemObjZero);
-			Vec* attachOffsetPtr = reinterpret_cast<Vec*>(&attachOffset);
+			const CVector& attachOffset = CVector(kItemObjZero, kItemObjZero, kItemObjZero);
+			Vec* attachOffsetPtr = reinterpret_cast<Vec*>(const_cast<CVector*>(&attachOffset));
 			bool useBossAttachName = false;
 
 			if (Game.m_gameWork.m_menuStageMode != 0) {

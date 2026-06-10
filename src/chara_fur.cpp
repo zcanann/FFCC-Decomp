@@ -65,6 +65,7 @@ class CMaterial;
 extern char sYmEnvSeparator[4];
 extern "C" char* sMogRadarTypeLabels[];
 extern "C" char sMogRadarDebugFormatBlock[];
+extern "C" char lbl_801DB648[];
 extern "C" char sMogFurTextureName[8];
 extern "C" {
 extern unsigned char m_mogWork[0x2C];
@@ -525,7 +526,8 @@ static int FurColorMatch(CColor src, CColor ref)
  */
 void CChara::CalcMogScore()
 {
-	MogFurState& fur = MogFur();
+	char* fmtBase = lbl_801DB648;
+	#define fur m_sharedState.m_mogFur
 	unsigned short* texels = fur.m_texels;
 	int bitCount = 0;
 	int lineCount = 0;
@@ -617,15 +619,16 @@ void CChara::CalcMogScore()
 	}
 
 	{
-		const int b0 = fur.m_score[0];
-		const int b1 = fur.m_score[1];
-		const int b2 = fur.m_score[2];
-
-		if (b0 >= 3 && kYmEnvDefaultScale * static_cast<float>(b1 + b2) < static_cast<float>(b0)) {
+		if (fur.m_score[0] >= 3
+		    && kYmEnvDefaultScale * static_cast<float>(fur.m_score[1] + fur.m_score[2]) < static_cast<float>(fur.m_score[0])) {
 			Game.m_gameWork.m_mogScoreRadarType = 1;
-		} else if (b1 >= 3 && kYmEnvDefaultScale * static_cast<float>(b0 + b2) < static_cast<float>(b1)) {
+		} else if (fur.m_score[1] >= 3
+		           && kYmEnvDefaultScale * static_cast<float>(fur.m_score[0] + fur.m_score[2])
+		                  < static_cast<float>(fur.m_score[1])) {
 			Game.m_gameWork.m_mogScoreRadarType = 2;
-		} else if (b2 >= 3 && kYmEnvDefaultScale * static_cast<float>(b0 + b1) < static_cast<float>(b2)) {
+		} else if (fur.m_score[2] >= 3
+		           && kYmEnvDefaultScale * static_cast<float>(fur.m_score[0] + fur.m_score[1])
+		                  < static_cast<float>(fur.m_score[2])) {
 			Game.m_gameWork.m_mogScoreRadarType = 3;
 		} else {
 			Game.m_gameWork.m_mogScoreRadarType = 0;
@@ -634,14 +637,15 @@ void CChara::CalcMogScore()
 
 	{
 		char* radarLabel[4];
-		radarLabel[0] = sMogRadarTypeLabels[4];
-		radarLabel[1] = sMogRadarTypeLabels[5];
-		radarLabel[2] = sMogRadarTypeLabels[6];
-		radarLabel[3] = sMogRadarTypeLabels[7];
+		char** typeLabels = reinterpret_cast<char**>(fmtBase + 0x4C);
+		radarLabel[0] = typeLabels[4];
+		radarLabel[1] = typeLabels[5];
+		radarLabel[2] = typeLabels[6];
+		radarLabel[3] = typeLabels[7];
 		Graphic.Printf(
 		    5,
 		    0xB,
-		    sMogRadarDebugFormatBlock + 0x18,
+		    fmtBase + 0x84,
 		    fur.m_radarLevel[0],
 		    fur.m_radarLevel[1],
 		    fur.m_radarLevel[2],
@@ -656,7 +660,7 @@ void CChara::CalcMogScore()
 		Graphic.Printf(
 		    5,
 		    0xC,
-		    sMogRadarDebugFormatBlock + 0x4C,
+		    fmtBase + 0xB8,
 		    fur.m_lineScore[0],
 		    fur.m_lineScore[1],
 		    fur.m_lineScore[2],
@@ -676,6 +680,8 @@ void CChara::CalcMogScore()
  * JP Address: TODO
  * JP Size: TODO
  */
+#undef fur
+
 void CChara::ChangeMogMode(int mogMode)
 {
 	if (mogMode != 0) {

@@ -224,8 +224,8 @@ void CFont::Draw(unsigned short ch)
 	CFontRenderFlagBits& renderFlagBits = GetRenderFlagBits(renderFlags);
 	signed char sign = static_cast<signed char>(renderFlagBits.shadow);
 	int drawWidth;
-	int glyphOffset = (static_cast<unsigned int>(-static_cast<int>(sign) | static_cast<int>(sign)) >> 30 & 2) + 3;
-	unsigned char* glyphInfo = reinterpret_cast<unsigned char*>(drawGlyph) + glyphOffset;
+	unsigned int glyphOffset = static_cast<unsigned int>(-static_cast<int>(sign) | static_cast<int>(sign)) >> 30 & 2;
+	unsigned char* glyphInfo = reinterpret_cast<unsigned char*>(drawGlyph) + glyphOffset + 3;
 	int glyphIndex;
 	int row;
 	float u0;
@@ -241,7 +241,7 @@ void CFont::Draw(unsigned short ch)
 		drawWidth = static_cast<int>(m_glyphWidth);
 		glyphIndex = static_cast<int>(drawGlyph->m_textureIndex);
 		row = glyphIndex / m_glyphColumns;
-		u0 = static_cast<float>(drawWidth * (glyphIndex - row * m_glyphColumns) * 2);
+		u0 = static_cast<float>(m_glyphWidth * (glyphIndex - row * m_glyphColumns) * 2);
 		v0 = static_cast<float>(m_glyphHeight * row * 2);
 	}
 

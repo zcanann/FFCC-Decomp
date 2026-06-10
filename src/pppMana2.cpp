@@ -1021,6 +1021,9 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
         GXSetColorUpdate(GX_TRUE);
         GXSetAlphaUpdate(GX_TRUE);
         GXSetZCompLoc(GX_TRUE);
+        quadMin.x = LoadFloat(kMana2Zero);
+        quadMin.y = LoadFloat(kMana2Zero);
+        quadMin.z = LoadFloat(kMana2Zero);
         gUtil.RenderTextureQuad(LoadFloat(kMana2Zero), LoadFloat(kMana2Zero), LoadFloat(kMana2ParaboloidTexSize),
                                 LoadFloat(kMana2ParaboloidTexSize), &sceneTexObj, 0, 0, 0, (_GXBlendFactor)4,
                                 (_GXBlendFactor)5);

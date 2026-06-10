@@ -1321,7 +1321,8 @@ targetJoin: ;
 			}
 			primaryAvailable = true;
 			primaryCommand = -1;
-		} else if (caravan->m_hp == 0) {
+		}
+		} else {
 			primaryAvailable = true;
 			primaryCommand = 0x1B;
 		}
@@ -1362,7 +1363,6 @@ targetJoin: ;
 			const int charaCommand = Chara.MogFur().m_commandIndex;
 			ringCommand = charaCommand + 0x1E;
 			ringCommandArg = charaCommand;
-		}
 		}
 		}
 	}

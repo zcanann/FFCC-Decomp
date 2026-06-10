@@ -237,9 +237,9 @@ void CGraphicPcs::drawScreenFade()
 
     PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
     PSMTXCopy(cameraMtx, screenMtx);
-    screenMtx[3][0] = kGraphicZero;
-    screenMtx[3][1] = kGraphicZero;
     screenMtx[3][2] = kGraphicZero;
+    screenMtx[3][1] = kGraphicZero;
+    screenMtx[3][0] = kGraphicZero;
     screenMtx[3][3] = kGraphicOne;
     PSMTX44Copy(CameraPcs.m_screenMatrix, worldScreenMtx);
     PSMTX44Concat(worldScreenMtx, screenMtx, worldScreenMtx);
@@ -300,14 +300,13 @@ void CGraphicPcs::drawScreenFade()
         baseColor2.a = 0;
 
         if (slot == 3) {
-            int barHeight = (int)(kScreenFadeBarEdge * fadeWave);
+            const int barHeight = (int)(kScreenFadeBarEdge * fadeWave);
             const int barEdge = (int)(kScreenFadeRingWidth * fadeWave);
 
             drawSFRect(kGraphicZero, kGraphicZero, kGraphicScreenWidth, (float)barHeight, baseColor);
             drawSFRect(kGraphicZero, (float)barHeight, kGraphicScreenWidth, (float)(barHeight + barEdge), baseColor, baseColor2);
-            barHeight = 448 - barHeight;
-            drawSFRect(kGraphicZero, kGraphicScreenHeight, kGraphicScreenWidth, (float)barHeight, baseColor);
-            drawSFRect(kGraphicZero, (float)barHeight, kGraphicScreenWidth, (float)(barHeight - barEdge), baseColor, baseColor2);
+            drawSFRect(kGraphicZero, kGraphicScreenHeight, kGraphicScreenWidth, (float)(448 - barHeight), baseColor);
+            drawSFRect(kGraphicZero, (float)(448 - barHeight), kGraphicScreenWidth, (float)((448 - barHeight) - barEdge), baseColor, baseColor2);
             continue;
         }
 

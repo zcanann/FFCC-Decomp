@@ -211,6 +211,22 @@ static const float sDefaultAttackColRadius = 7.0f;    // FLOAT_80330434
 static const float sDefaultBodyColRadius = 6.0f;      // FLOAT_80330438
 static const float sDefaultFrontHitAngle = 0.78539819f; // FLOAT_8033043c
 static const float sDefaultBgDownDist = 0.033333335f; // FLOAT_80330440
+extern "C" const float sRadiusWobbleScale;         // FLOAT_80330398 (0.8)
+extern "C" const float sWobbleBiasLarge;           // FLOAT_8033039c (0.3)
+extern "C" const float sWobbleBiasSmall;           // FLOAT_803303a0 (0.05)
+extern "C" const float sRadiusWobbleDecay;         // FLOAT_803303a4 (0.95)
+extern "C" const float sPiFloat;                   // FLOAT_803303a8
+extern "C" const float sRadiusCtrlStep;            // FLOAT_803303ac (0.1)
+extern "C" const float sTiltDivisor;               // FLOAT_803303c8 (3.0)
+extern "C" const float sSwayImpulse;               // FLOAT_803303cc (0.2)
+extern "C" const float sSwayDotLimit;              // FLOAT_803303d0 (0.9999)
+extern "C" const float sSwayDamping;               // FLOAT_803303d8 (0.9)
+extern "C" const float sNegWobbleBiasSmall;        // FLOAT_803303dc (-0.05)
+extern "C" const double sYawLookCutoff;            // DOUBLE_803303e0 (pi/2)
+extern "C" const double sPitchLookCutoff;          // DOUBLE_803303e8 (pi/4)
+extern "C" const float sLookBlendScale;            // FLOAT_803303f0 (0.001)
+extern "C" const float sFarVisibleDepth;           // FLOAT_803303f4 (10000)
+extern "C" const float sNearVisibleDepth;          // FLOAT_803303f8 (750)
 
 /*
  * --INFO--
@@ -1417,16 +1433,16 @@ void CGObject::update()
 
         if (m_worldParamA == 0x20 || m_worldParamA == 0x13 || m_worldParamA == 0x15 ||
             m_worldParamA == 0x16 || m_worldParamA == 0x17 || m_worldParamA == 0x14) {
-            const float wobbleBias = m_worldParamA == 0x20 ? 0.3f : 0.05f;
-            m_radiusCtrl.z += 0.8f * m_radiusCtrl.y + wobbleBias;
-            m_radiusCtrl.y *= 0.95f;
+            const float wobbleBias = m_worldParamA == 0x20 ? sWobbleBiasLarge : sWobbleBiasSmall;
+            m_radiusCtrl.z += sRadiusWobbleScale * m_radiusCtrl.y + wobbleBias;
+            m_radiusCtrl.y *= sRadiusWobbleDecay;
             srt.m_rot.y += m_radiusCtrl.z;
         } else if (m_worldParamA == 0x24 || m_worldParamB == 0x125) {
             const float cameraYaw = CameraPcs.m_yaw;
-            srt.m_rot.y = 3.1415927f - cameraYaw;
+            srt.m_rot.y = sPiFloat - cameraYaw;
             srt.m_rot.y += sBgAttrNormal * cosf(sBgAttrNormal * m_radiusCtrl.y);
             srt.m_trans.y += sAnimFrameOffset + sinf(m_radiusCtrl.y);
-            m_radiusCtrl.y += 0.1f;
+            m_radiusCtrl.y += sRadiusCtrlStep;
         }
 
         Math.SRTToMatrix(modelMtx, reinterpret_cast<SRT*>(&srt));
@@ -1440,7 +1456,7 @@ void CGObject::update()
                     m_groundHitOffset.x * m_groundHitOffset.x + m_groundHitOffset.z * m_groundHitOffset.z;
                 const float slideMag = sqrtf(slideMagSq);
                 PSVECCrossProduct(&m_groundHitOffset, CVector(sZeroFloat, sAnimFrameOffset, sZeroFloat), &axis);
-                PSMTXRotAxisRad(rotScratch, &axis, -slideMag / 3.0f);
+                PSMTXRotAxisRad(rotScratch, &axis, -slideMag / sTiltDivisor);
                 PSMTXQuat(tiltMtx, &m_bgCollisionQtrn);
                 PSMTXConcat(rotScratch, tiltMtx, tiltMtx);
                 C_QUATMtx(&m_bgCollisionQtrn, tiltMtx);
@@ -1460,8 +1476,8 @@ void CGObject::update()
             modelMtx[2][3] = tz;
         } else if ((m_objectFlags & 0x90) != 0 && m_stateFlags0Bits.unk0) {
             if (m_groundHitOffset.x != sZeroFloat || m_groundHitOffset.z != sZeroFloat) {
-                m_radiusCtrl.y += 0.2f * m_groundHitOffset.x;
-                m_radiusCtrlVel.x += 0.2f * m_groundHitOffset.z;
+                m_radiusCtrl.y += sSwayImpulse * m_groundHitOffset.x;
+                m_radiusCtrlVel.x += sSwayImpulse * m_groundHitOffset.z;
             }
 
             const float swayDx = m_radiusCtrlVel.x - m_groundFriction;
@@ -1473,7 +1489,7 @@ void CGObject::update()
             Vec swayDir;
             PSVECNormalize(reinterpret_cast<Vec*>(&m_radiusCtrlVel.y), &swayDir);
             const float swayDot = PSVECDotProduct(&swayDir, CVector(sZeroFloat, sAnimFrameOffset, sZeroFloat));
-            if (swayDot < 0.9999f) {
+            if (swayDot < sSwayDotLimit) {
                 const float negSwayAngle = -acosf(swayDot);
                 Vec swayAxis;
                 PSVECCrossProduct(&swayDir, CVector(sZeroFloat, sAnimFrameOffset, sZeroFloat), &swayAxis);
@@ -1487,7 +1503,7 @@ void CGObject::update()
                 modelMtx[2][3] = CVector(sZeroFloat, sZeroFloat, sZeroFloat).z;
                 PSMTXConcat(rotScratch, modelMtx, modelMtx);
                 const float swayTan = tan(negSwayAngle);
-                const float swayTanScaled = 2.0f * swayTan;
+                const float swayTanScaled = sDefaultMoveBaseSpeed * swayTan;
                 modelMtx[0][3] = mtx0;
                 modelMtx[2][3] = mtx2;
                 modelMtx[1][3] = mtx1 - swayTanScaled;
@@ -1501,8 +1517,8 @@ void CGObject::update()
             const float swayCos = cosf(swayClamp);
             m_radiusCtrl.y = swayCos * swayRy - swaySin * swayRx;
             m_radiusCtrlVel.x = swaySin * swayRy + swayCos * swayRx;
-            m_radiusCtrl.y *= 0.9f;
-            m_radiusCtrlVel.x *= 0.9f;
+            m_radiusCtrl.y *= sSwayDamping;
+            m_radiusCtrlVel.x *= sSwayDamping;
         }
     }
 
@@ -1546,7 +1562,7 @@ void CGObject::update()
     }
 
     if (HasLoadedModel(m_charaModelHandle)) {
-        m_animBlend += ClampFloat(m_bgAttrValue - m_animBlend, -0.25f, 0.25f);
+        m_animBlend += ClampFloat(m_bgAttrValue - m_animBlend, sNegWobbleBiasSmall, sWobbleBiasSmall);
 
         float lookYaw = m_lookAtAccumYaw;
         float lookPitch = m_lookAtAccumPitch;
@@ -1566,9 +1582,9 @@ void CGObject::update()
             if (sZeroFloat != lookDistance) {
                 const float targetYaw = atan2f(-lookDelta.x, -lookDelta.z);
                 const float yawDelta = Math.DstRot(targetYaw, m_rotBaseY);
-                if (fabs(yawDelta) < 0.75f) {
+                if (fabs(yawDelta) < sYawLookCutoff) {
                     const double pitchDelta = atan2(lookDelta.y, lookDistance);
-                    if (fabs((float)pitchDelta) < 0.5) {
+                    if (fabs((float)pitchDelta) < sPitchLookCutoff) {
                         lookYaw += yawDelta;
                         lookPitch += (float)pitchDelta;
                     }
@@ -1579,7 +1595,7 @@ void CGObject::update()
         const float twistRate = sBgAttrFast;
         const unsigned char lookBlendByte = *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x56);
         CChara::CModel* chestModel = m_charaModelHandle->m_model;
-        float lookBlend = 0.015625f * static_cast<float>(lookBlendByte);
+        float lookBlend = sLookBlendScale * static_cast<float>(lookBlendByte);
         const float chestAmp = ModelChestAmp(chestModel);
         const float chestTilt = ModelChestTilt(chestModel);
         ModelChestAmp(chestModel) = lookBlend * (lookYaw - chestAmp) + chestAmp;
@@ -1604,16 +1620,16 @@ void CGObject::update()
 
         float visibleScale = sAnimFrameOffset;
         if (Game.m_currentMapId == 0x21) {
-            visibleScale = m_screenDepth > 60.0f ? sZeroFloat : sAnimFrameOffset;
+            visibleScale = m_screenDepth > sFarVisibleDepth ? sZeroFloat : sAnimFrameOffset;
         } else {
-            visibleScale = m_screenDepth > 30.0f ? sZeroFloat : sAnimFrameOffset;
+            visibleScale = m_screenDepth > sNearVisibleDepth ? sZeroFloat : sAnimFrameOffset;
         }
 
         const float alphaTarget = m_stepSlopeLimit * onAlphaUpdate();
         const float alphaStep = ClampFloat(alphaTarget * visibleScale - m_lookAtTimer, -m_bgDownDist, m_bgDownDist);
         m_lookAtTimer = m_lookAtTimer + alphaStep;
         m_lookAtTimer = ClampFloat(m_lookAtTimer, sZeroFloat, sAnimFrameOffset);
-        const float worldParamStep = m_worldParam - 0.25f;
+        const float worldParamStep = m_worldParam - sWobbleBiasSmall;
         m_worldParam = worldParamStep < sZeroFloat ? sZeroFloat : worldParamStep;
         if ((m_displayFlags & 0x1000) != 0) {
             m_lookAtTimer = alphaTarget;

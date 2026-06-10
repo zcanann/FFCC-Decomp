@@ -2129,7 +2129,7 @@ next_player:
                     unsigned int masked = word & 0xFFFF00;
                     if ((word & 0x8000) != 0)
                     {
-                        PadCodeProc(j, static_cast<unsigned short>((word & 0xFF00) | ((int)(masked >> 8) >> 8)));
+                        PadCodeProc(j, static_cast<unsigned short>(masked | ((int)(unsigned short)(masked >> 8) >> 8)));
                     }
                     unsigned int crc = 0;
                     *reinterpret_cast<unsigned int*>(txBase + 0x1378) = (j + 0x40) * 0x1000000;
@@ -2146,8 +2146,9 @@ next_player:
                 *reinterpret_cast<unsigned int*>(self + 5000) = 0x44000000;
                 *reinterpret_cast<unsigned int*>(self + 5000) =
                     *reinterpret_cast<unsigned int*>(self + 5000) |
-                    (((*reinterpret_cast<unsigned short*>(self + 0x134E) & 0xFF) << 8 |
-                      (int)(unsigned int)*reinterpret_cast<unsigned short*>(self + 0x134E) >> 8) << 8);
+                    (static_cast<unsigned int>(static_cast<unsigned short>(
+                         *reinterpret_cast<unsigned short*>(self + 0x134E) >> 8 |
+                         *reinterpret_cast<unsigned short*>(self + 0x134E) << 8)) << 8);
                 seqCrc = MiniGameCrc8(*reinterpret_cast<int*>(self + 5000));
                 unsigned int k = 0;
                 *reinterpret_cast<unsigned int*>(self + 5000) =

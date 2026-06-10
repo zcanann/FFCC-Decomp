@@ -28,8 +28,9 @@
 
 extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
     CMath*, Vec*, float*, Vec*, Vec*, Vec*, float, float, float);
-extern double DOUBLE_803303e8;
-extern double DOUBLE_80330400;
+// Defined in this unit's .sdata2 (the target object owns these named doubles)
+extern const double DOUBLE_803303e8 = 0.7853981852531433;    // (double)(pi/4 f)
+extern const double DOUBLE_80330400 = 0.0010000000474974513; // (double)0.001f
 extern const Vec DAT_801D9B88;
 extern const Vec DAT_801D9B94;
 
@@ -663,7 +664,7 @@ void CGObject::move()
             }
 
             if ((*reinterpret_cast<u32*>(&m_radiusCtrl.x) & 0x400000) != 0) {
-                speed *= sQuarterTurn;
+                speed *= 0.75f; // FLOAT_80330364
             }
 
             PSVECScale(&moveVec, &moveVec, speed);
@@ -836,7 +837,7 @@ void CGObject::objectCollision()
                     if (!usePushTimers || (m_collisionPushTimerMax != 0) || (other->m_collisionPushTimerMax == 0)) {
                         const float thisPush = static_cast<float>(m_pushParamA + m_pushParamB);
                         const float otherPush = static_cast<float>(other->m_pushParamA + other->m_pushParamB);
-                        const float rawSplit = 0.5f + (thisPush - otherPush) / 510.0f;
+                        const float rawSplit = 0.5f + (thisPush - otherPush) / 50.0f;
                         float split;
                         if (rawSplit < sZeroFloat) {
                             split = sZeroFloat;
@@ -1574,7 +1575,7 @@ void CGObject::update()
     }
 
     if (HasLoadedModel(m_charaModelHandle)) {
-        m_animBlend += ClampFloat(m_bgAttrValue - m_animBlend, -0.25f, 0.25f);
+        m_animBlend += ClampFloat(m_bgAttrValue - m_animBlend, -0.05f, 0.05f);
 
         float lookYaw = m_lookAtAccumYaw;
         float lookPitch = m_lookAtAccumPitch;
@@ -1594,9 +1595,9 @@ void CGObject::update()
             if (lookDistance > sZeroFloat) {
                 const float targetYaw = atan2f(-lookDelta.x, -lookDelta.z);
                 const float yawDelta = Math.DstRot(targetYaw, m_rotBaseY);
-                if (fabs(yawDelta) < 0.75f) {
+                if (fabs(yawDelta) < 1.5707963705062866) {
                     const float pitchDelta = atan2f(lookDelta.y, lookDistance);
-                    if (fabs(pitchDelta) < 0.5f) {
+                    if (fabs(pitchDelta) < DOUBLE_803303e8) {
                         lookYaw += yawDelta;
                         lookPitch += pitchDelta;
                     }
@@ -1605,13 +1606,12 @@ void CGObject::update()
         }
 
         const unsigned char lookBlendByte = *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x56);
-        float lookBlend = 0.015625f * static_cast<float>(lookBlendByte);
-        if (lookBlend == sZeroFloat) {
-            lookBlend = sBgAttrFast;
-        }
+        const float lookBlend = 0.001f * static_cast<float>(lookBlendByte);
         CChara::CModel* chestModel = m_charaModelHandle->m_model;
-        ModelChestAmp(chestModel) += lookBlend * (lookYaw - ModelChestAmp(chestModel));
-        ModelChestTilt(chestModel) += lookBlend * (lookPitch - ModelChestTilt(chestModel));
+        ModelChestAmp(chestModel) = static_cast<float>(
+            static_cast<double>(lookBlend) * (lookYaw - ModelChestAmp(chestModel)) + ModelChestAmp(chestModel));
+        ModelChestTilt(chestModel) = static_cast<float>(
+            static_cast<double>(lookBlend) * (lookPitch - ModelChestTilt(chestModel)) + ModelChestTilt(chestModel));
         ModelTwistAngle(m_charaModelHandle->m_model) +=
             sBgAttrFast * (*reinterpret_cast<float*>(m_worldMode) - ModelTwistAngle(m_charaModelHandle->m_model));
 
@@ -1631,17 +1631,22 @@ void CGObject::update()
 
         float visibleScale = sAnimFrameOffset;
         if (Game.m_currentMapId == 0x21) {
-            visibleScale = m_screenDepth <= 60.0f ? sAnimFrameOffset : sZeroFloat;
+            visibleScale = m_screenDepth <= 10000.0f ? sAnimFrameOffset : sZeroFloat;
         } else {
-            visibleScale = m_screenDepth <= 30.0f ? sAnimFrameOffset : sZeroFloat;
+            visibleScale = m_screenDepth <= 750.0f ? sAnimFrameOffset : sZeroFloat;
         }
 
-        const float alphaTarget = m_stepSlopeLimit * onAlphaUpdate() * visibleScale;
+        const float alphaBase = m_stepSlopeLimit * onAlphaUpdate();
+        const float alphaTarget = alphaBase * visibleScale;
         const float alphaStep = ClampFloat(alphaTarget - m_lookAtTimer, -m_bgDownDist, m_bgDownDist);
         m_lookAtTimer = ClampFloat(m_lookAtTimer + alphaStep, sZeroFloat, sAnimFrameOffset);
-        m_worldParam = m_worldParam > 0.25f ? m_worldParam - 0.25f : sZeroFloat;
+        float worldParamNext = m_worldParam - 0.05f;
+        if (worldParamNext < sZeroFloat) {
+            worldParamNext = sZeroFloat;
+        }
+        m_worldParam = worldParamNext;
         if ((m_displayFlags & 0x1000) != 0) {
-            m_lookAtTimer = alphaTarget;
+            m_lookAtTimer = alphaBase;
         }
 
         if (m_lookAtTimer == sZeroFloat) {
@@ -2518,7 +2523,7 @@ void CGObject::boundCheck()
     if ((m_charaModelHandle != 0) && (m_charaModelHandle->m_model != 0)) {
         const float zero = sZeroFloat;
         const float oneF = sAnimFrameOffset;
-        const float clipLimit = 2.0f;
+        const float clipLimit = -1.0f;
 
         clipMask = 0x1F;
         s32 i = 0;

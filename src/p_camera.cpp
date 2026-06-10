@@ -1717,7 +1717,11 @@ void CCameraPcs::drawShadowBegin()
     GXSetProjection(m_screenMatrix, GX_ORTHOGRAPHIC);
     GXSetColorUpdate(GX_FALSE);
     GXSetCullMode(GX_CULL_BACK);
-    GXSetViewport(kCameraTwoF, kCameraTwoF, kCameraShadowViewportSize, kCameraShadowViewportSize, kCameraZeroF, kCameraOneF);
+    {
+        float vpXY = kCameraTwoF;
+        float vpWH = kCameraShadowViewportSize;
+        GXSetViewport(vpXY, vpXY, vpWH, vpWH, kCameraZeroF, kCameraOneF);
+    }
     GXSetScissor(2, 2, 0x1DC, 0x1DC);
     _GXSetBlendMode(GX_BM_NONE, GX_BL_ZERO, GX_BL_ZERO, GX_LO_NOOP);
     _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0xFF);

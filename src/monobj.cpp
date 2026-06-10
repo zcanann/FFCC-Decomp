@@ -2271,7 +2271,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 			debugDelta.y = targetDelta.y;
 			debugDelta.z = targetDelta.z;
 			if (mapHit != 0) {
-				PSVECScale(&debugDelta, &debugDelta, g_hit_t);
+				PSVECScale(&debugDelta, &debugDelta, g_hit_t_slide_min);
 			}
 			CFlat.AddDebugDrawCC(reinterpret_cast<Vec*>(&startPos), &debugDelta, cylRadius, 1, mapHit == 0);
 

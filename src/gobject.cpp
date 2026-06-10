@@ -1174,8 +1174,8 @@ void CGObject::bgWorldCollision()
         Vec delta;
 
         MapMng.m_hitMapObj->CalcHitPosition(&radial);
-        delta = vecSub(reinterpret_cast<CVector&>(radial), CVector(m_worldPosition));
-        m_groundHitOffset = delta;
+        const Vec& newOffset = vecSub(reinterpret_cast<CVector&>(radial), CVector(m_worldPosition));
+        m_groundHitOffset = delta = newOffset;
 
         if ((MapMng.GetMapIdGrpArray()[gMapHitFace->m_groupIndex].m_mask & 0x20) == 0) {
             m_stateFlags0Bits.unk0 = 1;

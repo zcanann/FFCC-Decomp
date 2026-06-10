@@ -898,8 +898,9 @@ done:
     particleData->m_matrix[2][2] = pYmMegaBirthShpTail3->m_colorDeltaAdd[1];
     particleData->m_matrix[2][3] = pYmMegaBirthShpTail3->m_sizeStart;
     if (pYmMegaBirthShpTail3->m_colorDeltaAdd[3] != 0.0f) {
+        float rand1 = Math.RandF();
         particleData->m_matrix[2][2] +=
-            (kPppYmMegaBirthShpTail3Double * pYmMegaBirthShpTail3->m_colorDeltaAdd[3]) * Math.RandF() -
+            (kPppYmMegaBirthShpTail3Double * pYmMegaBirthShpTail3->m_colorDeltaAdd[3]) * rand1 -
             pYmMegaBirthShpTail3->m_colorDeltaAdd[3];
     }
 

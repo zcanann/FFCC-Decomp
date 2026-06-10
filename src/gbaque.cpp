@@ -2401,24 +2401,26 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
     }
     memset(workText, 0, kGbaQueueScratchTextSize);
 
-    CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
+    unsigned int* foodBasePtr = &Game.m_scriptFoodBase[channel];
+    CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(*foodBasePtr);
     CMes::m_tempVar[0] = caravanWork->m_letters[letterIndex].TempVar(0);
     CMes::m_tempVar[1] = caravanWork->m_letters[letterIndex].TempVar(1);
     CMes::m_tempVar[2] = caravanWork->m_letters[letterIndex].TempVar(2);
     CMes::m_tempVar[3] = caravanWork->m_letters[letterIndex].TempVar(3);
 
-    unsigned short msgIndex = caravanWork->m_letters[letterIndex].HeaderWord();
+    unsigned short msgIndex = *reinterpret_cast<unsigned short*>(
+        reinterpret_cast<char*>(caravanWork) + letterIndex * 0xC + 0x3EC);
     int mesIndex = (msgIndex & 0x7FC) >> 1;
 
-    strcpy(srcText, reinterpret_cast<char**>(Game.m_cFlatDataArr[1].Data(3).m_data)[mesIndex]);
-    CMes::MakeAgbString(workText, srcText, caravanWork->m_genderFlag, 0);
+    strcpy(srcText, Game.m_cFlatDataArr[1].Message(mesIndex + 0x10));
+    CMes::MakeAgbString(workText, srcText, reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_genderFlag, 0);
     int totalSize = static_cast<int>(strlen(workText) + 1);
     memcpy(outData, workText, totalSize);
 
     memset(srcText, 0, kGbaQueueScratchTextSize);
     memset(workText, 0, kGbaQueueScratchTextSize);
-    strcpy(srcText, reinterpret_cast<char**>(Game.m_cFlatDataArr[1].Data(3).m_data)[mesIndex + 1]);
-    CMes::MakeAgbString(workText, srcText, caravanWork->m_genderFlag, 0);
+    strcpy(srcText, Game.m_cFlatDataArr[1].Message(mesIndex + 0x11));
+    CMes::MakeAgbString(workText, srcText, reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_genderFlag, 0);
     int line2Size = static_cast<int>(strlen(workText));
     memcpy(outData + totalSize, workText, line2Size + 1);
     totalSize += line2Size + 1;

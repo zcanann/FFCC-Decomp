@@ -3105,37 +3105,23 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
 
             if ((cmdBytes[0] >> 6) == 2)
             {
-                unsigned short crc = 0xFFFF;
-                int len = buf.m_length;
-                unsigned char* data = buf.m_payload;
-                unsigned int idx;
-                unsigned int hi;
+                unsigned short crcAcc = 0xFFFF;
 
-                goto crc_check_len;
-
-            crc_loop:
-                idx = crc;
-                hi = idx << 8;
-                idx = (unsigned int)((int)(short)idx >> 8);
-                idx = (unsigned char)idx;
-                idx = idx ^ (unsigned int)*data;
-                data = data + 1;
-                crc = (unsigned short)(hi ^ JoyBusCrcTable[idx]);
-
-            crc_check_len:
-                len = len - 1;
-                if (len >= 0)
-                {
-                    goto crc_loop;
-                }
-
-                if (static_cast<short>(~crc) == buf.m_crc)
+                if (Crc16(m_recvBuffer[threadParam->m_portIndex].m_length,
+                          m_recvBuffer[threadParam->m_portIndex].m_payload, &crcAcc)
+                    == m_recvBuffer[threadParam->m_portIndex].m_crc)
                 {
                     GbaQue.SetQueue(threadParam->m_portIndex, prevCmd);
                 }
                 else
                 {
-                    SetSendQueue(&m_threadParams[threadParam->m_portIndex], 0x07150000);
+                    unsigned int resendCmd = 0;
+                    unsigned char* resendBytes = reinterpret_cast<unsigned char*>(&resendCmd);
+                    resendBytes[0] = 0x07;
+                    resendBytes[1] = 0x15;
+                    resendBytes[2] = 0;
+
+                    SetSendQueue(&m_threadParams[threadParam->m_portIndex], resendCmd);
 
                     OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
                     memset(&m_recvBuffer[threadParam->m_portIndex], 0, sizeof(m_recvBuffer[threadParam->m_portIndex]));

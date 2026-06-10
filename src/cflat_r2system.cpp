@@ -2029,20 +2029,20 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     case -0x19: {
-        if (m_pathPointCount < 0x40) {
-            if (*object->m_localBase != 0) {
+        if (m_pathPointCount < 0x40U) {
+            if (*reinterpret_cast<int*>(object->m_localBase) != 0) {
                 m_pathPointCount = 0;
                 m_pathTotalDistance = kCFlatPadStickZero;
             }
 
-            Vec* point = &m_pathPoints[m_pathPointCount].m_position;
-            point->x = reinterpret_cast<float*>(object->m_localBase)[1];
-            point->y = reinterpret_cast<float*>(object->m_localBase)[2];
-            point->z = reinterpret_cast<float*>(object->m_localBase)[3];
+            m_pathPoints[m_pathPointCount].m_position.x = reinterpret_cast<float*>(object->m_localBase)[1];
+            m_pathPoints[m_pathPointCount].m_position.y = reinterpret_cast<float*>(object->m_localBase)[2];
+            m_pathPoints[m_pathPointCount].m_position.z = reinterpret_cast<float*>(object->m_localBase)[3];
 
             if (m_pathPointCount != 0) {
-                m_pathTotalDistance +=
-                    PSVECDistance(point, &m_pathPoints[m_pathPointCount - 1].m_position);
+                m_pathTotalDistance += PSVECDistance(
+                    &m_pathPoints[m_pathPointCount].m_position,
+                    &m_pathPoints[m_pathPointCount - 1].m_position);
             }
 
             m_pathPoints[m_pathPointCount].m_distance = m_pathTotalDistance;
@@ -2760,23 +2760,26 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         float alpha = static_cast<float>(static_cast<int>(localBase[1])) /
                       static_cast<float>(static_cast<int>(localBase[2]));
-        Quaternion start = {localFloats[3], localFloats[4], localFloats[5], localFloats[6]};
-        Quaternion end = {localFloats[7], localFloats[8], localFloats[9], localFloats[10]};
+        Quaternion start;
+        Quaternion end;
         Quaternion rotation;
+        start.x = localFloats[3];
+        start.y = localFloats[4];
+        start.z = localFloats[5];
+        start.w = localFloats[6];
+        end.x = localFloats[7];
+        end.y = localFloats[8];
+        end.z = localFloats[9];
+        end.w = localFloats[10];
 
-        switch (*localBase & 3) {
-        case 3:
+        int mode = *localBase & 3;
+        if (mode == 3) {
             alpha = -((kCFlatHalfF * (kCFlatOneF + std::sinf(kCFlatPi * alpha + kCFlatHalfPi))) -
                       kCFlatOneF);
-            break;
-        case 1:
+        } else if (mode == 1) {
             alpha = kCFlatOneF + std::sinf(kCFlatHalfPi * alpha + kCFlatThreeHalfPi);
-            break;
-        case 2:
+        } else if (mode == 2) {
             alpha = std::sinf(kCFlatHalfPi * alpha);
-            break;
-        default:
-            break;
         }
 
         C_QUATSlerp(&start, &end, &rotation, alpha);
@@ -2818,7 +2821,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             }
             MenuPcs.GetMesMenu(a0)->Open(message, a1, a2, a3, a4, a5, a6);
         } else {
-            if (GetNumMes__9CFlatDataFv(&System) != 0) {
+            if (GetNumMes__9CFlatDataFv(&System) >= 1U) {
                 System.Printf(const_cast<char*>("MesMenu no %d is null\n"), a0);
             }
         }
@@ -2830,7 +2833,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         if (MenuPcs.GetMesMenu(*object->m_localBase) != 0) {
             MenuPcs.GetMesMenu(*object->m_localBase)->CloseRequest(1);
         } else {
-            if (GetNumMes__9CFlatDataFv(&System) != 0) {
+            if (GetNumMes__9CFlatDataFv(&System) >= 1U) {
                 System.Printf(const_cast<char*>("MesMenu no %d is null\n"), *object->m_localBase);
             }
         }
@@ -2842,7 +2845,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         if (MenuPcs.GetMesMenu(*object->m_localBase) != 0) {
             GetMes__9CFlatDataFi(MenuPcs.GetMesMenu(*object->m_localBase), object->m_localBase[1], object->m_localBase[2]);
         } else {
-            if (GetNumMes__9CFlatDataFv(&System) != 0) {
+            if (GetNumMes__9CFlatDataFv(&System) >= 1U) {
                 System.Printf(const_cast<char*>("MesMenu no %d is null\n"), *object->m_localBase);
             }
         }
@@ -2856,7 +2859,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         if (MenuPcs.GetMesMenu(a0) != 0) {
             this->push(object, GetErrorLevel__7CSystemFv(MenuPcs.GetMesMenu(a0), a1));
         } else {
-            if (GetNumMes__9CFlatDataFv(&System) != 0) {
+            if (GetNumMes__9CFlatDataFv(&System) >= 1U) {
                 System.Printf(const_cast<char*>("MesMenu no %d is null\n"), a0);
             }
             this->push(object, 0);
@@ -2878,7 +2881,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     }
     case -0x4D: {
         if (MenuPcs.GetMesMenu(*object->m_localBase) == 0) {
-            if (GetNumMes__9CFlatDataFv(&System) != 0) {
+            if (GetNumMes__9CFlatDataFv(&System) >= 1U) {
                 System.Printf(const_cast<char*>("MesMenu no %d is null\n"), *object->m_localBase);
             }
             this->push(object, 0);
@@ -2899,7 +2902,8 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             *reinterpret_cast<float*>(object->m_localBase + 2),
             *reinterpret_cast<float*>(object->m_localBase + 3),
             *reinterpret_cast<float*>(object->m_localBase + 4),
-            (60.0f * 1000.0f * *reinterpret_cast<float*>(object->m_localBase + 5)) / 180.0f);
+            (kCFlatDegrees180 * (2.0f * *reinterpret_cast<float*>(object->m_localBase + 5))) /
+                kCFlatPi);
         this->push(object, 0);
         outResult = 0;
         break;
@@ -3013,7 +3017,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     case -0x5E:
-        if (GetNumMes__9CFlatDataFv(&System) != 0) {
+        if (GetNumMes__9CFlatDataFv(&System) >= 1U) {
             System.Printf(const_cast<char*>("\203f\203o\203b\203O\227p\212\326\220\224setForceAnimInterp\202\315\224p\216~\202\263\202\352\202\334\202\265\202\275\201B\n"));
         }
         this->push(object, 0);
@@ -3604,18 +3608,21 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         Game.m_caravanWorkArr[*object->m_localBase].SearchRomLetterWork(romLetterWork, 8);
 
         for (int i = 0; i < 8; i++) {
-            CRomLetterWork* letter = romLetterWork[i];
             int dstOffs = i * 4;
-            *reinterpret_cast<int*>(object->m_localBase[1] + dstOffs) = letter != 0 ? letter->m_from : -1;
-            *reinterpret_cast<int*>(object->m_localBase[2] + dstOffs) = letter != 0 ? letter->m_subject : -1;
-            *reinterpret_cast<int*>(object->m_localBase[3] + dstOffs) = letter != 0 ? letter->m_message : -1;
-            *reinterpret_cast<int*>(object->m_localBase[4] + dstOffs) = letter != 0 ? letter->m_priorityFlags : -1;
-            if (letter == 0) {
-                *reinterpret_cast<int*>(object->m_localBase[13] + dstOffs) = -1;
-            } else {
-                int letterIndex =
-                    (reinterpret_cast<int>(letter) - static_cast<int>(Game.m_romLetterWorkBase)) / sizeof(CRomLetterWork);
+            for (int j = 0; j < 12; j++) {
+                if (romLetterWork[i] != 0) {
+                    *reinterpret_cast<int*>(object->m_localBase[1 + j] + dstOffs) =
+                        reinterpret_cast<const unsigned short*>(romLetterWork[i])[j];
+                } else {
+                    *reinterpret_cast<int*>(object->m_localBase[1 + j] + dstOffs) = -1;
+                }
+            }
+            if (romLetterWork[i] != 0) {
+                int letterIndex = (reinterpret_cast<int>(romLetterWork[i]) - static_cast<int>(Game.m_romLetterWorkBase)) /
+                                  static_cast<int>(sizeof(CRomLetterWork));
                 *reinterpret_cast<int*>(object->m_localBase[13] + dstOffs) = letterIndex;
+            } else {
+                *reinterpret_cast<int*>(object->m_localBase[13] + dstOffs) = -1;
             }
         }
 
@@ -3624,7 +3631,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     }
     case -0xBF:
-        if (object->m_localBase[2] != 0) {
+        if (*reinterpret_cast<int*>(object->m_localBase + 2) != 0) {
             MapMng.ShowMapObjChildID(*object->m_localBase, object->m_localBase[1]);
         } else {
             MapMng.ShowMapObjID(*object->m_localBase, object->m_localBase[1]);
@@ -3634,14 +3641,13 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     case -0xC0: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        CColor color(
+        CharaPcs.SetTexShadowPos(CVector(localFloats[0], localFloats[1], localFloats[2]));
+        CharaPcs.SetTexShadowColor(CColor(
             static_cast<u8>(object->m_localBase[3]),
             static_cast<u8>(object->m_localBase[4]),
             static_cast<u8>(object->m_localBase[5]),
-            static_cast<u8>(object->m_localBase[6]));
-        CharaPcs.SetTexShadowPos(CVector(localFloats[0], localFloats[1], localFloats[2]));
-        CharaPcs.SetTexShadowColor(color);
-        CharaPcs.SetTexShadowRadius(localFloats[7]);
+            static_cast<u8>(object->m_localBase[6])));
+        CharaPcs.SetTexShadowRadius(reinterpret_cast<float*>(object->m_localBase)[7]);
         this->push(object, 0);
         outResult = 0;
         break;
@@ -3794,31 +3800,31 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     case -0xD2: {
-        if (*object->m_localBase == 0) {
+        if (*reinterpret_cast<int*>(object->m_localBase) != 0) {
+            memcpy(m_savedNextScript, Game.m_currentScriptName, sizeof(m_savedNextScript));
+        } else {
             CGame::CNextScript nextScript;
             strcpy(nextScript.m_name, m_savedNextScript);
             Game.SetNextScript(&nextScript);
-        } else {
-            memcpy(m_savedNextScript, Game.m_currentScriptName, sizeof(m_savedNextScript));
         }
         this->push(object, 0);
         outResult = 0;
         break;
     }
     case -0xD3:
-        if (object->m_localBase[1] == 0) {
-            MapMng.SetMeshCameraSemiTransAlpha(static_cast<unsigned short>(*object->m_localBase), 0, 0x3C);
-        } else {
+        if (*reinterpret_cast<int*>(object->m_localBase + 1) != 0) {
             MapMng.SetMeshCameraSemiTransAlpha(static_cast<unsigned short>(*object->m_localBase), 0x80, 0x3C);
+        } else {
+            MapMng.SetMeshCameraSemiTransAlpha(static_cast<unsigned short>(*object->m_localBase), 0, 0x3C);
         }
         this->push(object, 0);
         outResult = 0;
         break;
     case -0xD4:
-        if (*object->m_localBase == 0) {
-            MapMng.SetDrawRangeMapObj(*reinterpret_cast<float*>(object->m_localBase + 1));
-        } else {
+        if (*reinterpret_cast<int*>(object->m_localBase) != 0) {
             MapMng.SetDrawRangeOctTree(*reinterpret_cast<float*>(object->m_localBase + 1));
+        } else {
+            MapMng.SetDrawRangeMapObj(*reinterpret_cast<float*>(object->m_localBase + 1));
         }
         this->push(object, 0);
         outResult = 0;
@@ -3884,18 +3890,21 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     case -0xDF:
-        if (*object->m_localBase == 1) {
-            if (object->m_localBase[1] == 0) {
-                PartPcs.EndMiruraEvent();
-            } else {
-                PartPcs.StartMiruraEvent();
-            }
-        } else if (*object->m_localBase == 0) {
-            if (object->m_localBase[1] == 0) {
-                PartPcs.EndLocationTitle();
-            } else {
+        switch (*reinterpret_cast<int*>(object->m_localBase)) {
+        case 0:
+            if (*reinterpret_cast<int*>(object->m_localBase + 1) != 0) {
                 PartPcs.StartLocationTitle();
+            } else {
+                PartPcs.EndLocationTitle();
             }
+            break;
+        case 1:
+            if (*reinterpret_cast<int*>(object->m_localBase + 1) != 0) {
+                PartPcs.StartMiruraEvent();
+            } else {
+                PartPcs.EndMiruraEvent();
+            }
+            break;
         }
         this->push(object, 0);
         outResult = 0;

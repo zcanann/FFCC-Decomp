@@ -2350,20 +2350,22 @@ void CMenuPcs::CalcResultCloseAnim()
 			}
 		}
 
-		off = 0;
-		short* sp = (short*)this->m_bonusAnimPtr;
-		for (int i = 0; i < *sp; i++, sp = (short*)this->m_bonusAnimPtr) {
-			if (0.0f == *(float*)((int)sp + off + 0x38)) {
-				*(float*)((int)sp + off + 0x40) = (float)(int)*(short*)((int)sp + off + 8);
+		{
+			int i = 0;
+			off = i;
+			for (; i < *(short*)this->m_bonusAnimPtr; i++) {
+				if (0.0f == *(float*)(this->m_bonusAnimPtr + off + 0x38)) {
+					*(float*)(this->m_bonusAnimPtr + off + 0x40) = (float)(int)*(short*)(this->m_bonusAnimPtr + off + 8);
+				}
+				int s = this->m_bonusAnimPtr + off;
+				if (0.0f == *(float*)(s + 0x3c)) {
+					*(float*)(s + 0x44) = (float)(int)*(short*)(s + 10);
+				}
+				off += 0x40;
 			}
-			int s = this->m_bonusAnimPtr + off;
-			if (0.0f == *(float*)(s + 0x3c)) {
-				*(float*)(s + 0x44) = (float)(int)*(short*)(s + 10);
-			}
-			off += 0x40;
 		}
 
-		sp[3] = 0;
+		((short*)this->m_bonusAnimPtr)[3] = 0;
 		*(unsigned char*)(this->m_bonusStatePtr + 0xb) = 1;
 	}
 

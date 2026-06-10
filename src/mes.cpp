@@ -1616,12 +1616,11 @@ void CMes::Next()
 					break;
 				}
 			}
-			runLength = (unsigned int)(j - i);
 			groupWidth = (curr[-5] - *start) + (start[1] + *(float*)((char*)this + 0x3d3c));
-			for (; runLength != 0; runLength = runLength - 1)
+			for (; start <= curr - 5; start = start + 5)
 			{
-				type = (int)(((unsigned int)*(unsigned char*)((char*)start + 0xe) >> 4) & 0xF);
-				if ((int)type == 1)
+				type = (*(unsigned char*)((char*)start + 0xe) >> 4) & 0xF;
+				if (type == 1)
 				{
 					*start = halfVal * (*(float*)((char*)this + 0x3ca4) - groupWidth) + *start;
 				}
@@ -1629,7 +1628,6 @@ void CMes::Next()
 				{
 					*start = *start + (*(float*)((char*)this + 0x3ca4) - groupWidth);
 				}
-				start = start + 5;
 			}
 			i = j;
 			start = curr;

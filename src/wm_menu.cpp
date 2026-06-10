@@ -14132,12 +14132,12 @@ int McCtrl::SaveDataBuffer(char* buffer)
 			}
 
 			const int closeResult = MemoryCardMan.McClose();
-			if (closeResult == 0) {
-				MemoryCardMan.McUnmount(m_cardChannel);
-				MemoryCardMan.DestroyMcBuff();
-			} else {
+			if (!(closeResult == 0)) {
 				m_lastResult = closeResult;
 				m_state = -1;
+			} else {
+				MemoryCardMan.McUnmount(m_cardChannel);
+				MemoryCardMan.DestroyMcBuff();
 			}
 		}
 		break;
@@ -14149,7 +14149,8 @@ int McCtrl::SaveDataBuffer(char* buffer)
 	if (m_state == -1) {
 		return -999;
 	}
-	int result = 0;
+	int result;
+	result = 0;
 	if (m_state == 0x12) {
 		result = 1;
 	}

@@ -846,14 +846,15 @@ void CGraphicPcs::drawEnd()
 		for (; port < 4; port++) {
 			bool suppress = (Pad.m_debugPadLock != 0) || ((port == 0) && (Pad.m_debugPadPort != -1));
 
-			u16 buttons;
+			u16 held;
 			if (suppress) {
-				buttons = 0;
+				held = 0;
 			} else {
 				int selectedPort = Pad.m_debugPadPort;
 				u32 portIndex = port & ~((int)~((selectedPort - port) | (port - selectedPort)) >> 31);
-				buttons = Pad.GetPadInputs()[portIndex].button[0];
+				held = Pad.GetPadInputs()[portIndex].button[0];
 			}
+			const u16 buttons = held;
 
 			const char c = ((buttons & 0x20) != 0) ? 'r' : ' ';
 			const char z = ((buttons & 0x40) != 0) ? 'l' : ' ';

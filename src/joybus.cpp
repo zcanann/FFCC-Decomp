@@ -22,6 +22,12 @@ JoyBus Joybus;
 
 int gJoyBusThreadExitValue = 0;
 
+static const char s_dvd_gba_dir[] = "dvd/gba/";
+static const char s_ffcc_cli_bin[] = "ffcc_cli.bin";
+static const char s_objdat_spt[] = "objdat.spt";
+static const char s_icon_dat[] = "icon.dat";
+static const char s_game_name[] = "FF Crystal Chronicles";
+
 extern const unsigned short JoyBusCrcTable[256] =
 {
     0x0000, 0x1021, 0x2042, 0x3063,
@@ -114,12 +120,6 @@ static const char s_ppos_cnt_error_fmt[] = "(%d) Error: m_PposCnt error(%d)\n";
 static const char s_send_type_error_fmt[] = "(%d): Error: send type error(%02x)\n";
 static const char s_map_filename_fmt[] = "m%02d_%d.mcd";
 static const char s_mem_alloc_error_fmt[] = "%s(%d): Error: memory allocation error\n";
-
-static const char s_dvd_gba_dir[] = "dvd/gba/";
-static const char s_ffcc_cli_bin[] = "ffcc_cli.bin";
-static const char s_objdat_spt[] = "objdat.spt";
-static const char s_icon_dat[] = "icon.dat";
-static const char s_game_name[] = "FF Crystal Chronicles";
 
 extern const u32 kPppYmMeltMaskBit0;
 extern const u32 kPppYmMeltMaskBit4;

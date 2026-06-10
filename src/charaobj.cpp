@@ -1857,7 +1857,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x46) != 0) {
 			setSta(4, 0);
 		}
-		if (scriptDefense != 0 && staType != 2 && staType != 0) {
+		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E) != 0 && staType != 2 && staType != 0) {
 			setSta(0, 0);
 		}
 

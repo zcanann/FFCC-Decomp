@@ -1607,11 +1607,13 @@ displayDone:;
 	if (doPaint != 0 && hitPaintable != 0) {
 		CTexture* texture = FindMogFurTexture(this);
 		if (texture != 0 && texture->m_format == 5 && nearestDepth != kCharaFurDepthZero) {
+			unsigned short* furTexels = reinterpret_cast<unsigned short*>(texture->m_imageData);
+			int furTexWidth = texture->m_width;
+			int furTexHeight = texture->m_height;
 			_GXColor paintColor = brushColor;
 			_GXColor before;
 			_GXColor after;
-			brush(reinterpret_cast<unsigned short*>(texture->m_imageData), texture->m_width, texture->m_height, hitU, hitV, mode,
-			      paintColor, &before, &after);
+			brush(furTexels, furTexWidth, furTexHeight, hitU, hitV, mode, paintColor, &before, &after);
 			if (centerBefore != 0) {
 				*centerBefore = before;
 			}

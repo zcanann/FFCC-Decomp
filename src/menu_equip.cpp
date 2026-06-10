@@ -903,12 +903,13 @@ int CMenuPcs::EquipOpen()
 	s16 sVar10;
 	int iVar11;
 	int iCount;
+	EquipOpenAnim* entry;
 	double dVar20;
 
 	if ((signed char)GetEquipMenuState(this)->initialized == 0) {
 		memset(GetEquipListStorage(this), 0, sizeof(EquipOpenAnimList));
 		fVar5 = kEquipOne;
-		EquipOpenAnim* entry = GetEquipListStorage(this)->entries;
+		entry = GetEquipListStorage(this)->entries;
 		for (iVar11 = 64; iVar11 != 0; iVar11--) {
 			entry->scale = fVar5;
 			entry++;
@@ -958,11 +959,11 @@ int CMenuPcs::EquipOpen()
 	iVar6 = 0;
 	GetEquipMenuState(this)->frame = GetEquipMenuState(this)->frame + 1;
 	iCount = GetEquipListStorage(this)->count;
-	EquipOpenAnim* entry = GetEquipListStorage(this)->entries;
-	iVar11 = static_cast<int>(GetEquipMenuState(this)->frame);
+	entry = GetEquipListStorage(this)->entries;
+	int frameNow = static_cast<int>(GetEquipMenuState(this)->frame);
 	for (int i = 0; i < iCount; i++) {
-		if (entry->startFrame <= iVar11) {
-			if (entry->startFrame + entry->duration <= iVar11) {
+		if (entry->startFrame <= frameNow) {
+			if (entry->startFrame + entry->duration <= frameNow) {
 				iVar6++;
 				entry->alpha = kEquipOne;
 			} else {

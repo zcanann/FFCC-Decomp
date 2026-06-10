@@ -895,14 +895,14 @@ void CCameraPcs::SetStdProjectionMatrix()
  * JP Address: TODO
  * JP Size: TODO
  */
-static inline _GXColor sCameraMakeColor(u8 r, u8 g, u8 b, u8 a)
+static inline void sCameraSetMatColor(u8 r, u8 g, u8 b, u8 a)
 {
     _GXColor c;
     c.r = r;
     c.g = g;
     c.b = b;
     c.a = a;
-    return c;
+    GXSetChanMatColor(GX_COLOR0A0, c);
 }
 
 void CCameraPcs::draw()
@@ -959,7 +959,7 @@ void CCameraPcs::draw()
         shadowMtx[2][3] = posZ;
         PSMTXConcat(cameraMtx, shadowMtx, shadowMtx);
         GXLoadPosMtxImm(shadowMtx, 0);
-        GXSetChanMatColor(GX_COLOR0A0, sCameraMakeColor(0xFF, 0, 0, 0xFF));
+        sCameraSetMatColor(0xFF, 0, 0, 0xFF);
         Graphic.DrawSphere();
         }
 
@@ -992,7 +992,7 @@ void CCameraPcs::draw()
         shadowMtx[2][3] = refPosZ;
         PSMTXConcat(cameraMtx, shadowMtx, shadowMtx);
         GXLoadPosMtxImm(shadowMtx, 0);
-        GXSetChanMatColor(GX_COLOR0A0, sCameraMakeColor(0, 0xFF, 0, 0xFF));
+        sCameraSetMatColor(0, 0xFF, 0, 0xFF);
         Graphic.DrawSphere();
         }
     }

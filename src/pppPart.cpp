@@ -741,9 +741,10 @@ void callCon2Prog(_pppPObject* pObject)
 		u32 stageSlotOffset = 0;
 		for (; stageCount < progSet->m_numStages; stageCount++)
 		{
+			_pppCtrlTable* stage = stageSet->m_stages;
 			s32** slotPtr = (s32**)(((u8*)pObject) + progSet->m_workBaseOffset + stageSlotOffset);
-			s32* nextSlot = (s32*)(((u8*)*slotPtr) + stageSet->m_stages[0].m_workOffset);
-			pppProg* prog = stageSet->m_stages[0].m_prog;
+			s32* nextSlot = (s32*)(((u8*)*slotPtr) + stage->m_workOffset);
+			pppProg* prog = stage->m_prog;
 
 			if (*nextSlot == pObject->m_graphId)
 			{
@@ -751,7 +752,7 @@ void callCon2Prog(_pppPObject* pObject)
 			}
 			if (prog != 0 && prog->m_pppFunctionOperation != 0 && prog->m_pppFunctionConstructor2 != 0)
 			{
-				((pppProgOperation2Callback)prog->m_pppFunctionOperation)(pObject, *slotPtr);
+				((pppProgOperationCallback)prog->m_pppFunctionOperation)(pObject, *slotPtr, stage);
 			}
 
 			stageSet = (_pppProgSetDef*)(((u8*)stageSet) + sizeof(_pppCtrlTable));

@@ -519,7 +519,7 @@ static int FurColorMatch(CColor src, CColor ref)
 	}
 	db += 7 - static_cast<int>(src.color.a);
 
-	int hits = (dr < 5) + (dg < 5) + (db < 5);
+	int hits = (dr < 6) + (dg < 6) + (db < 6);
 	return static_cast<unsigned int>(__cntlzw(3 - hits)) >> 5;
 }
 
@@ -1769,15 +1769,24 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 		CMaterial* shadowMaterials[2];
 		MtxPtr shadowMatrices[2];
 		if (shadowPass != 0) {
+			*reinterpret_cast<unsigned long long*>(shadowMaterials) = g_chara_fur_1;
+			*reinterpret_cast<unsigned long long*>(shadowMatrices) = g_chara_fur_2;
 			shadowCount = MaterialMan.GetCharaShadow(2, shadowMaterials, shadowMatrices, reinterpret_cast<Vec*>(&modelPos), kCharaFurShadowRange, kCharaFurShadowFade, 0);
+			CMaterial** shadowMatP = shadowMaterials;
+			MtxPtr* shadowMtxP = shadowMatrices;
+			int shadowTexMtxId = 0x21;
 			for (int shadowIndex = 0; shadowIndex < shadowCount; shadowIndex++) {
-				TextureMan.SetTexture(static_cast<GXTexMapID>(shadowIndex + 3), shadowMaterials[shadowIndex]->GetFurTexture(0));
+				const int shadowTexMap = shadowIndex + 3;
+				TextureMan.SetTexture(static_cast<GXTexMapID>(shadowTexMap), (*shadowMatP)->GetTexture(0));
 
 				Mtx shadowTexMtx;
-				PSMTXConcat(shadowMatrices[shadowIndex], meshMtx, shadowTexMtx);
-				GXLoadTexMtxImm(shadowTexMtx, 0x21 + shadowIndex * 3, GX_MTX3x4);
-				GXSetTexCoordGen2(static_cast<GXTexCoordID>(shadowIndex + 3), GX_TG_MTX3x4, GX_TG_POS,
-				                  0x21 + shadowIndex * 3, GX_FALSE, GX_PTIDENTITY);
+				PSMTXConcat(*shadowMtxP, meshMtx, shadowTexMtx);
+				GXLoadTexMtxImm(shadowTexMtx, shadowTexMtxId, GX_MTX3x4);
+				GXSetTexCoordGen2(static_cast<GXTexCoordID>(shadowTexMap), GX_TG_MTX3x4, GX_TG_POS,
+				                  shadowTexMtxId, GX_FALSE, GX_PTIDENTITY);
+				shadowTexMtxId += 3;
+				shadowMatP++;
+				shadowMtxP++;
 			}
 		}
 

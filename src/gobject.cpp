@@ -3123,13 +3123,17 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
         {
             Vec bottom = m_worldPosition;
             bottom.y += useCapsuleOffset != 0 ? m_capsuleHalfHeight : sPushDistance;
-            Vec direction;
+            Vec direction = bottom;
             direction.x = sZeroFloat;
             direction.y = sDownUnitY;
             direction.z = sZeroFloat;
             CMapCylinder bodyCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
-            bodyCylinder.m_bottom = bottom;
-            bodyCylinder.m_axis = direction;
+            bodyCylinder.m_bottom.x = bottom.x;
+            bodyCylinder.m_bottom.y = bottom.y;
+            bodyCylinder.m_bottom.z = bottom.z;
+            bodyCylinder.m_axis.x = direction.x;
+            bodyCylinder.m_axis.y = direction.y;
+            bodyCylinder.m_axis.z = direction.z;
             bodyCylinder.m_radius = sZeroFloat;
 
             if (MapMng.CheckHitCylinderNear(
@@ -3144,19 +3148,21 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
             hasModel = true;
         }
         if (hasModel) {
-            CVector attrDirection(sZeroFloat, sDownProbeDistance, sZeroFloat);
-            CVector attrBottom(m_worldPosition.x, m_worldPosition.y + sStepProbeHeight, m_worldPosition.z);
+            CVector* attrDirection = &CVector(sZeroFloat, sDownProbeDistance, sZeroFloat);
+            CVector* attrBottom = &CVector(m_worldPosition.x, sStepProbeHeight + m_worldPosition.y, m_worldPosition.z);
             CMapCylinder attrCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
 
-            attrCylinder.m_bottom = attrBottom;
-            attrCylinder.m_axis.x = attrDirection.x;
-            attrCylinder.m_axis.y = attrDirection.y;
-            attrCylinder.m_axis.z = attrDirection.z;
+            attrCylinder.m_bottom.x = attrBottom->x;
+            attrCylinder.m_bottom.y = attrBottom->y;
+            attrCylinder.m_bottom.z = attrBottom->z;
+            attrCylinder.m_axis.x = attrDirection->x;
+            attrCylinder.m_axis.y = attrDirection->y;
+            attrCylinder.m_axis.z = attrDirection->z;
             attrCylinder.m_radius = sZeroFloat;
 
             if (MapMng.CheckHitCylinderNear(
                     &attrCylinder,
-                    reinterpret_cast<Vec*>(&attrDirection), 0x78000000) != 0) {
+                    reinterpret_cast<Vec*>(attrDirection), 0x78000000) != 0) {
                 switch (gMapHitFace->m_groupIndex - 0x28) {
                 case 0:
                     m_bgAttrValue = sBgAttrSlow;

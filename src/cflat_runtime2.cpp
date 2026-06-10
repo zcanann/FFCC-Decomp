@@ -1981,7 +1981,7 @@ void CFlatRuntime2::drawLayer(
 			}
 			int rectY = static_cast<int>(by);
 
-			int quadU0;
+			unsigned int quadU0;
 			if ((quad & 1) != 0) {
 				quadU0 = texU + rectW;
 			} else {

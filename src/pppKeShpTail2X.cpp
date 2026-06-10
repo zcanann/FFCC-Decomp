@@ -159,7 +159,7 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     s32 nextIndex;
     s32 lastIndex;
     Vec* history;
-    u32 zEnable;
+    int zEnable;
     float segCursor = LoadFloat(kPppKeShpTail2XZero);
     s32 dataValIndex;
 
@@ -209,7 +209,7 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     pppUnitMatrix(initMtx);
 
     drawScale = step->m_scaleStart;
-    scaleStepDelta = (step->m_scaleStart - step->m_scaleEnd) / invCountMinusOne;
+    scaleStepDelta = (drawScale - step->m_scaleEnd) / invCountMinusOne;
     trailStep = step->m_stepDistance * ppvMng->m_scale.x;
 
     history = work->m_posHistory;
@@ -268,7 +268,7 @@ draw_loop:
     drawMtx.value[1][3] = pos.y;
     drawMtx.value[2][3] = pos.z;
 
-    zEnable = (u32)__cntlzw((u32)step->m_zDisable) >> 5;
+    zEnable = (u8)((u32)__cntlzw((u32)step->m_zDisable) >> 5);
     pppSetDrawEnv(0, &drawMtx, (step->m_useEnvDepth != 0) ? step->m_envDepth : kPppKeShpTail2XZero, 0,
                   step->m_drawA, step->m_blendMode, 0, zEnable, 1, 0);
 

@@ -1420,10 +1420,11 @@ void CMenuPcs::InitCharaInfo()
 	baseSlot = 0x20;
 	baseY = 0x66;
 	while (row < 2) {
-		int slot = baseSlot;
+		int slot =  (baseSlot + 0);
 		baseX = 0x68;
 		for (int col = 0; col < 2; col++) {
-			int slotOffset = slot * 0x50;
+			int __p15 = slot;
+			int slotOffset = __p15 * 0x50;
 			int y = (s32)(baseY);
 			if (row != 0) {
 				y = baseY + 8;

@@ -484,27 +484,29 @@ void birth(
         pppFMATRIX basis;
         Vec direction;
         Vec right;
+        Vec directionCopy;
         Vec worldUp;
-        Vec up;
-        Vec translation;
+        float translationX;
+        float translationY;
+        float translationZ;
 
         pppUnitMatrix(basis);
         direction.x = particleData->m_matrix[0][1];
         direction.y = particleData->m_matrix[1][1];
         direction.z = particleData->m_matrix[2][1];
-        translation.x = particleData->m_matrix[0][3];
-        translation.y = particleData->m_matrix[1][3];
-        translation.z = particleData->m_matrix[2][3];
+        translationX = particleData->m_matrix[0][3];
+        translationY = particleData->m_matrix[1][3];
+        translationZ = particleData->m_matrix[2][3];
         pppNormalize(direction, direction);
-        pppCopyVector(direction, direction);
+        pppCopyVector(directionCopy, direction);
 
         worldUp.x = kPppRyjMegaBirthSharedZero;
         worldUp.y = kPppRyjMegaBirthSharedZero;
         worldUp.z = kPppRyjMegaBirthModelOneF;
-        pppOuterProduct(right, direction, worldUp);
+        pppOuterProduct(right, directionCopy, worldUp);
         pppNormalize(right, right);
-        pppOuterProduct(up, right, direction);
-        pppNormalize(up, up);
+        pppOuterProduct(worldUp, right, direction);
+        pppNormalize(worldUp, worldUp);
 
         pppUnitMatrix(basis);
         basis.value[0][0] = right.x;
@@ -513,12 +515,12 @@ void birth(
         basis.value[0][1] = direction.x;
         basis.value[1][1] = direction.y;
         basis.value[2][1] = direction.z;
-        basis.value[0][2] = up.x;
-        basis.value[1][2] = up.y;
-        basis.value[2][2] = up.z;
-        basis.value[0][3] = translation.x;
-        basis.value[1][3] = translation.y;
-        basis.value[2][3] = translation.z;
+        basis.value[0][2] = worldUp.x;
+        basis.value[1][2] = worldUp.y;
+        basis.value[2][2] = worldUp.z;
+        basis.value[0][3] = translationX;
+        basis.value[1][3] = translationY;
+        basis.value[2][3] = translationZ;
         pppCopyMatrix(*(pppFMATRIX*)&particleData->m_matrix, basis);
     }
 

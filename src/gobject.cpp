@@ -1416,9 +1416,10 @@ void CGObject::update()
         modelMtx[2][3] = m_worldPosition.z;
     } else {
         GObjectSRT srt;
-        srt.m_scale.x = srt.m_scale.y = srt.m_scale.z = sAnimFrameOffset;
+        const float scaleInit = sAnimFrameOffset;
         srt.m_trans.x = srt.m_trans.y = srt.m_trans.z = sZeroFloat;
         srt.m_rot.x = srt.m_rot.y = srt.m_rot.z = sZeroFloat;
+        srt.m_scale.x = srt.m_scale.y = srt.m_scale.z = scaleInit;
         srt.m_trans = m_worldPosition;
         PSVECAdd(&srt.m_trans, &m_extraMoveVec, &srt.m_trans);
 

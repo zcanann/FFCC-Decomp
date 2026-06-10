@@ -752,14 +752,14 @@ void brush(unsigned short*, int, int, float, float, int, _GXColor, _GXColor*, _G
 
 namespace {
 
-static inline bool HasDebugPadOverride()
+static inline bool HasDebugPadOverride(int debugPadLock)
 {
-	return (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
+	return (debugPadLock != 0) || (Pad.m_debugPadPort != -1);
 }
 
-static inline unsigned short MogHeldButtons()
+static inline unsigned short MogHeldButtons(int debugPadLock)
 {
-	if (HasDebugPadOverride()) {
+	if (HasDebugPadOverride(debugPadLock)) {
 		return 0;
 	}
 	int padIndex = 0;
@@ -767,9 +767,9 @@ static inline unsigned short MogHeldButtons()
 	return static_cast<unsigned short>(Pad.GetPadInputs()[padIndex].button[0]);
 }
 
-static inline unsigned short MogTriggerButtons()
+static inline unsigned short MogTriggerButtons(int debugPadLock)
 {
-	if (HasDebugPadOverride()) {
+	if (HasDebugPadOverride(debugPadLock)) {
 		return 0;
 	}
 	int padIndex = 0;
@@ -777,9 +777,9 @@ static inline unsigned short MogTriggerButtons()
 	return static_cast<unsigned short>(Pad.GetPadInputs()[padIndex].buttonDown[0]);
 }
 
-static inline int MogPadInt(int offset)
+static inline int MogPadInt(int debugPadLock, int offset)
 {
-	if (HasDebugPadOverride()) {
+	if (HasDebugPadOverride(debugPadLock)) {
 		return 0;
 	}
 	int padIndex = 0;
@@ -787,10 +787,10 @@ static inline int MogPadInt(int offset)
 	return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Pad) + padIndex * sizeof(CPad::PadInput) + offset);
 }
 
-static inline float MogPadFloat(int offset)
+static inline float MogPadFloat(int debugPadLock, int offset)
 {
-	if (HasDebugPadOverride()) {
-		return 0.0f;
+	if (HasDebugPadOverride(debugPadLock)) {
+		return kCharaFurDepthZero;
 	}
 	int padIndex = 0;
 	padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
@@ -1014,9 +1014,10 @@ void CChara::CModel::InitMogFurTex()
 #pragma opt_dead_assignments off
 void CChara::CModel::MogFurFrame(CGObject* gObject)
 {
-	const short heldButtons = MogHeldButtons();
-	const unsigned short triggerButtons = MogTriggerButtons();
-	const unsigned short rotateButtons = (MogPadInt(64) == 0) ? MogHeldButtons() : 0;
+	const int debugPadLock = Pad.m_debugPadLock;
+	const short heldButtons = MogHeldButtons(debugPadLock);
+	const unsigned short triggerButtons = MogTriggerButtons(debugPadLock);
+	const unsigned short rotateButtons = (MogPadInt(debugPadLock, 64) == 0) ? MogHeldButtons(debugPadLock) : 0;
 	int messageId = -1;
 
 	if (MogWork().m_started == 0) {
@@ -1069,9 +1070,9 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		}
 	}
 
-	Chara.MogFur().m_cursorX = static_cast<int>(kYmEnvTen * MogPadFloat(36) +
+	Chara.MogFur().m_cursorX = static_cast<int>(kYmEnvTen * MogPadFloat(debugPadLock, 36) +
 	                                     static_cast<float>(static_cast<unsigned int>(Chara.MogFur().m_cursorX)));
-	Chara.MogFur().m_cursorY = static_cast<int>(-(kYmEnvTen * MogPadFloat(40) -
+	Chara.MogFur().m_cursorY = static_cast<int>(-(kYmEnvTen * MogPadFloat(debugPadLock, 40) -
 	                                     static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorY))));
 
 	const int cursorXv = static_cast<int>(Chara.MogFur().m_cursorX);

@@ -961,7 +961,7 @@ void CCameraPcs::draw()
         {
         Mtx cameraMtx;
         Mtx shadowMtx;
-        Vec* shadowRefPos = shadowPos + 1;
+        Vec* shadowRefPos = &g_shadow_refpos;
         float refPosX = shadowRefPos->x;
         float refPosY = shadowRefPos->y;
         float refPosZ = shadowRefPos->z;

@@ -1424,25 +1424,25 @@ void CCameraPcs::createFullShadow()
     m_fullScreenShadow.m_rampTexture = rampTex;
 
     for (i = 0; i < 0x100; i += 8) {
-        u32 v1 = i + 1;
+        u32 v7 = i + 7;
+        u32 v6 = i + 6;
+        u32 v5 = i + 5;
+        u32 v4 = i + 4;
+        u32 v3 = i + 3;
         u32 v2 = i + 2;
+        u32 v1 = i + 1;
         rampTex[((i & 0x80) >> 2) + ((i >> 4) & 7) + ((i & 0xC) << 4) + ((i & 3) << 3)] =
             static_cast<unsigned char>(i);
-        u32 v3 = i + 3;
         rampTex[((v1 & 0x80) >> 2) + ((v1 >> 4) & 7) + ((v1 & 0xC) << 4) + ((v1 & 3) << 3)] =
             static_cast<unsigned char>(v1);
-        u32 v4 = i + 4;
         rampTex[((v2 & 0x80) >> 2) + ((v2 >> 4) & 7) + ((v2 & 0xC) << 4) + ((v2 & 3) << 3)] =
             static_cast<unsigned char>(v2);
-        u32 v5 = i + 5;
         rampTex[((v3 & 0x80) >> 2) + ((v3 >> 4) & 7) + ((v3 & 0xC) << 4) + ((v3 & 3) << 3)] =
             static_cast<unsigned char>(v3);
         rampTex[((v4 & 0x80) >> 2) + ((v4 >> 4) & 7) + ((v4 & 0xC) << 4) + ((v4 & 3) << 3)] =
             static_cast<unsigned char>(v4);
-        u32 v6 = i + 6;
         rampTex[((v5 & 0x80) >> 2) + ((v5 >> 4) & 7) + ((v5 & 0xC) << 4) + ((v5 & 3) << 3)] =
             static_cast<unsigned char>(v5);
-        u32 v7 = i + 7;
         rampTex[((v6 & 0x80) >> 2) + ((v6 >> 4) & 7) + ((v6 & 0xC) << 4) + ((v6 & 3) << 3)] =
             static_cast<unsigned char>(v6);
         rampTex[((v7 & 0x80) >> 2) + ((v7 >> 4) & 7) + ((v7 & 0xC) << 4) + ((v7 & 3) << 3)] =

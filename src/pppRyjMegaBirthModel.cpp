@@ -251,8 +251,9 @@ static inline void wrap_birth_angle(s32* value, s32 limit)
 {
     s32 v = *value;
     if ((v >= limit) || (v < -0x8000)) {
-        u32 sign = (u32)v >> 0x1F;
-        u32 y = (u32)(v << 0x11) - sign;
+        s32 w = *value;
+        u32 sign = (u32)w >> 0x1F;
+        u32 y = (u32)(w << 0x11) - sign;
         *value = (s32)(__rlwinm(y, 0xF, 0, 0x1F) + sign);
     }
 }
@@ -533,8 +534,8 @@ void birth(
         goto mesh_block;
     }
 
-        if (kPppRyjMegaBirthSharedZero != params->m_speed) {
-            float speedScalar = params->m_speed;
+        float speedScalar = params->m_speed;
+        if (kPppRyjMegaBirthSharedZero != speedScalar) {
             float dr1;
             float dr2;
             float dr3;
@@ -562,6 +563,8 @@ void birth(
                 dr2 = Math.RandF();
                 dr3 = Math.RandF();
                 speedScalar = -(MegaBirthHalf() * (Math.RandF() * ((params->m_speed * dr3) * dr2)) - params->m_speed);
+                break;
+            default:
                 break;
             }
 
@@ -1043,7 +1046,8 @@ join_position:
     }
 
     if (*u16_at(params, 0x26) == 0) {
-        *s16_at(particleData, 0x30) = 0xFFFF;
+        s32 noSpriteId = 0xFFFF;
+        *s16_at(particleData, 0x30) = noSpriteId;
     } else {
         *s16_at(particleData, 0x30) = *u16_at(params, 0x26);
     }

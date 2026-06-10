@@ -2926,18 +2926,17 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     case -0x50: {
         CGraphicPcs::ScreenFadeSlot* screenFade = &GraphicPcs.m_screenFade[0];
-        unsigned int phase = 2;
-        screenFade->m_phase = *reinterpret_cast<float*>(&phase);
+        screenFade->m_mode = 2;
         screenFade->m_colorA.r = 0xFF;
         screenFade->m_colorA.g = 0xFF;
-        screenFade->m_colorB.r = 0xFF;
-        screenFade->m_colorB.g = 0xFF;
-        screenFade->m_targetYOffs = 0.0f;
+        screenFade->m_colorA.b = 0xFF;
+        screenFade->m_colorA.a = 0xFF;
+        screenFade->m_invert = 0;
         screenFade->m_timer = object->m_localBase[0];
-        GraphicPcs.m_screenFade[1].m_mode = object->m_localBase[1];
-        screenFade->m_stretch = *reinterpret_cast<float*>(&object->m_localBase[2]);
-        GraphicPcs.m_screenFade[1].m_timer = object->m_localBase[3];
         screenFade->m_duration = screenFade->m_timer;
+        screenFade->m_amplitude = reinterpret_cast<float*>(object->m_localBase)[1];
+        screenFade->m_phase = reinterpret_cast<float*>(object->m_localBase)[2];
+        screenFade->m_stretch = reinterpret_cast<float*>(object->m_localBase)[3];
         GraphicPcs.ReqScreenCapture();
         this->push(object, 0);
         outResult = 0;

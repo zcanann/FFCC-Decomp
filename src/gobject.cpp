@@ -1027,6 +1027,9 @@ void CGObject::bgNormalCollision()
     }
 
     PSVECAdd(&pos, &move, &pos);
+    move.x = m_groundHitOffset.x;
+    move.y = m_groundHitOffset.y;
+    move.z = m_groundHitOffset.z;
     move.y = m_groundHitOffset.y - sStepProbeHeight;
     move.x = sZeroFloat;
     move.z = sZeroFloat;

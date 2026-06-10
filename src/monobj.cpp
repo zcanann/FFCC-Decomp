@@ -2937,14 +2937,23 @@ void CGMonObj::setRepop(int mode)
 	for (int i = 0; i < static_cast<int>(countA); i++) {
 		int particleBase = 0;
 		if (classId < 0xA7) {
-			if (classId == 0x9C) {
-				particleBase = 1;
-			}
+			if (classId == 0x9C) goto pbSet1;
+			goto pbDone;
 		} else if (classId == 0xA9) {
-			particleBase = 0;
+			goto pbSetA9;
 		} else if (classId < 0xA9) {
-			particleBase = 2;
+			goto pbSet2;
 		}
+		goto pbDone;
+	pbSetA9:
+		particleBase = 0;
+		goto pbDone;
+	pbSet1:
+		particleBase = 1;
+		goto pbDone;
+	pbSet2:
+		particleBase = 2;
+	pbDone:
 
 		int dataNo = object->m_charaModelHandle->GetPdtSlot();
 		prgObj->putParticleBindTrace((i + particleBase + 0x50) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x5A4), object, 1.0f, 0);

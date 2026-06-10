@@ -1327,6 +1327,7 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
  */
 #pragma push
 #pragma peephole on
+#pragma opt_propagation off
 void CShopMenu::DrawItemInfo0()
 {
     if (m_selectedIndex == -1) {
@@ -1418,17 +1419,19 @@ void CShopMenu::DrawItemInfo0()
     }
 
     if ((m_subMode == 1) && (m_listType == 0)) {
+        CFont* countFont = MenuPcs.m_fonts[0];
+        int countEdge = 0x108;
         int amount = m_quantity;
-        font->SetShadow(1);
-        font->SetScale(FLOAT_80332d28);
-        font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
-        font->DrawInit();
-        SetShopMenuFontRenderBit(font);
-        font->SetMargin(FLOAT_80332d34);
+        countFont->SetShadow(1);
+        countFont->SetScale(FLOAT_80332d28);
+        countFont->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
+        countFont->DrawInit();
+        SetShopMenuFontRenderBit(countFont);
+        countFont->SetMargin(FLOAT_80332d34);
         char countBuffer[64];
         sprintf(countBuffer, s_TwoDigitFormat_80332d18, amount);
-        int countRightX = static_cast<int>(FLOAT_80332d70 - font->GetWidth(countBuffer));
-        MenuPcs.DrawNoShadowFont(font, countBuffer, static_cast<float>(countRightX), FLOAT_80332d6c, 4, 0x12);
+        int countRightX = static_cast<int>(countEdge - countFont->GetWidth(countBuffer));
+        MenuPcs.DrawNoShadowFont(countFont, countBuffer, static_cast<float>(countRightX), FLOAT_80332d6c, 4, 0x12);
         MenuPcs.DrawInit();
 
         font->DrawInit();
@@ -1437,7 +1440,7 @@ void CShopMenu::DrawItemInfo0()
         const char* quantityText = ShopMenuMes(languageId, SHOP_MENU_TEXT_QUANTITY);
         float quantityWidth = font->GetWidth(quantityText);
         font->DrawInit();
-        int quantityX = static_cast<int>(static_cast<float>(countRightX) - FLOAT_80332d5c - quantityWidth);
+        int quantityX = static_cast<int>(static_cast<float>(countRightX) - quantityWidth - FLOAT_80332d5c);
         MenuPcs.DrawNoShadowFont(font, const_cast<char*>(quantityText), static_cast<float>(quantityX), FLOAT_80332d6c, 0x18, 0x12);
         MenuPcs.DrawInit();
 

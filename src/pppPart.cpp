@@ -362,15 +362,18 @@ void pppDestroyHeap(_pppEnvSt* pppEnvSt)
 void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, int line)
 {
 	int firstAllocFailure = 1;
-	int canRetry = 1;
+	int canRetry;
+	_pppPObjLink* allocation;
 	s8 denied[0x180];
 
 	ppvMemAllocErrorF = 0;
 	do
 	{
-		_pppPObjLink* allocation = (_pppPObjLink*)Memory._Alloc(allocSize, stage, file, line, 1);
-		if (allocation == 0)
+		allocation = (_pppPObjLink*)Memory._Alloc(allocSize, stage, file, line, 1);
+		if (allocation != 0)
 		{
+			goto allocDone;
+		}
 
 		if (firstAllocFailure)
 		{
@@ -477,12 +480,7 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 				}
 				obj = next;
 			}
-		}
-
-		}
-		else
-		{
-			return allocation;
+			canRetry = 1;
 		}
 	}
 	while (canRetry);
@@ -490,7 +488,8 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 	ppvEnv->m_stagePtr->heapWalker(2, 0, 0xFFFFFFFF);
 	PartMng.pppDumpMngSt();
 	ppvMemAllocErrorF = 1;
-	return 0;
+allocDone:
+	return allocation;
 }
 #pragma pop
 

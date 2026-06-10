@@ -132,7 +132,7 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     float invCountMinusOne;
     pppFMATRIX localBase;
     pppFMATRIX initMtx;
-    pppFMATRIX drawMtx;
+    pppFMATRIX drawMtx ATTRIBUTE_ALIGN(8);
     Vec zeroVec;
     Vec initialSeg;
     Vec pos;
@@ -232,12 +232,12 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     segDx = nextBaseX - curX;
     segDy = nextBaseY - curY;
     segDz = nextBaseZ - curZ;
-    initialSeg.x = segDx;
-    initialSeg.y = segDy;
-    initialSeg.z = segDz;
     zeroVec.x = kPppKeShpTail2XZero;
     zeroVec.y = kPppKeShpTail2XZero;
     zeroVec.z = kPppKeShpTail2XZero;
+    initialSeg.x = segDx;
+    initialSeg.y = segDy;
+    initialSeg.z = segDz;
     segLen = PSVECDistance(&zeroVec, &initialSeg);
     segRemain = segLen;
 
@@ -328,12 +328,12 @@ move_next_segment:
     segDx = nextBaseX - segBaseX;
     segDy = nextBaseY - segBaseY;
     segDz = nextBaseZ - segBaseZ;
-    seg.x = segDx;
-    seg.y = segDy;
-    seg.z = segDz;
     zeroVecB.x = kPppKeShpTail2XZero;
     zeroVecB.y = kPppKeShpTail2XZero;
     zeroVecB.z = kPppKeShpTail2XZero;
+    seg.x = segDx;
+    seg.y = segDy;
+    seg.z = segDz;
     segLen = PSVECDistance(&zeroVecB, &seg);
     segRemain += segLen;
     goto advance_segment;

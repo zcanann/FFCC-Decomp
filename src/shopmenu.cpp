@@ -894,9 +894,8 @@ char* CShopMenu::GetItemName(int itemNo)
         return 0;
     }
 
-    char** entry = reinterpret_cast<char**>(
-        reinterpret_cast<char*>(Game.m_cFlatDataArr[1].TableStrings(0)) + itemNo * 0x14);
-    return entry[4];
+    return *reinterpret_cast<char**>(
+        reinterpret_cast<int>(Game.m_cFlatDataArr[1].TableStrings(0)) + 0x10 + itemNo * 0x14);
 }
 
 /*
@@ -1366,7 +1365,12 @@ void CShopMenu::DrawItemInfo0()
         font->SetMargin(FLOAT_80332d28);
     }
 
-    bool canTrade = CanTradeShopMenuItem(this, m_selectedIndex, getItemNo(m_selectedIndex));
+    int canTrade;
+    if (m_selectedIndex == -1) {
+        canTrade = 0;
+    } else {
+        canTrade = CanTradeShopMenuItem(this, m_selectedIndex, getItemNo(m_selectedIndex));
+    }
 
     if (canTrade) {
         font->SetMargin(FLOAT_80332d28);
@@ -1486,7 +1490,12 @@ void CShopMenu::DrawBuySellInfo()
     char* unitText = ShopMenuMes(languageId, SHOP_MENU_TEXT_GIL);
     float unitWidth = font->GetWidth(unitText);
 
-    bool canTrade = CanTradeShopMenuItem(this, m_selectedIndex, getItemNo(m_selectedIndex));
+    int canTrade;
+    if (m_selectedIndex == -1) {
+        canTrade = 0;
+    } else {
+        canTrade = CanTradeShopMenuItem(this, m_selectedIndex, getItemNo(m_selectedIndex));
+    }
 
     int totalGil;
     if (canTrade) {

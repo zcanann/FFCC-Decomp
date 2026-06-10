@@ -185,16 +185,8 @@ static inline void ClearLetterAnimStorage(CMenuPcs* menu)
 {
 	memset(GetLetterAnimStorage(menu), 0, sizeof(*GetLetterAnimStorage(menu)));
 	int anim = GetLetterAnimBase(menu) + 8;
-	for (int i = 0; i < 8; ++i) {
+	for (int i = 0; i < 64; ++i, anim += 0x40) {
 		*reinterpret_cast<float*>(anim + 0x14) = FLOAT_803330f8;
-		*reinterpret_cast<float*>(anim + 0x54) = FLOAT_803330f8;
-		*reinterpret_cast<float*>(anim + 0x94) = FLOAT_803330f8;
-		*reinterpret_cast<float*>(anim + 0xD4) = FLOAT_803330f8;
-		*reinterpret_cast<float*>(anim + 0x114) = FLOAT_803330f8;
-		*reinterpret_cast<float*>(anim + 0x154) = FLOAT_803330f8;
-		*reinterpret_cast<float*>(anim + 0x194) = FLOAT_803330f8;
-		*reinterpret_cast<float*>(anim + 0x1D4) = FLOAT_803330f8;
-		anim += 0x200;
 	}
 }
 
@@ -689,9 +681,9 @@ bool CMenuPcs::LetterOpen()
 int CMenuPcs::LetterCtrl()
 {
 	int done = 0;
-	int ret = 0;
 	*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x32) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x30);
 	s_OpenClose = 0;
+	int ret = 0;
 
 	int state = GetLetterStateBase(this);
 	s16 phase = *reinterpret_cast<s16*>(state + 0x12);
@@ -945,20 +937,14 @@ int CMenuPcs::LetterCtrl()
 					replyFinished = 1;
 				}
 				if (replyFinished) {
-					if (s_Attach == 2) {
+					if (s_Attach != 2) {
+						ret = 1;
+					} else {
 						memset(GetLetterAnimStorage(this), 0, 0x1008);
 						float resetAlpha = FLOAT_803330f8;
 						int anim = GetLetterAnimBase(this) + 8;
-						for (int i = 0; i < 8; ++i) {
+						for (int i = 0; i < 64; ++i, anim += 0x40) {
 							*reinterpret_cast<float*>(anim + 0x14) = resetAlpha;
-							*reinterpret_cast<float*>(anim + 0x54) = resetAlpha;
-							*reinterpret_cast<float*>(anim + 0x94) = resetAlpha;
-							*reinterpret_cast<float*>(anim + 0xD4) = resetAlpha;
-							*reinterpret_cast<float*>(anim + 0x114) = resetAlpha;
-							*reinterpret_cast<float*>(anim + 0x154) = resetAlpha;
-							*reinterpret_cast<float*>(anim + 0x194) = resetAlpha;
-							*reinterpret_cast<float*>(anim + 0x1D4) = resetAlpha;
-							anim += 0x200;
 						}
 						anim = GetLetterAnimBase(this);
 						*reinterpret_cast<int*>(anim + 0x24) = 0;
@@ -975,8 +961,6 @@ int CMenuPcs::LetterCtrl()
 						GetLetterAnimStorage(this)->count = 2;
 						*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x22) = 0;
 						*reinterpret_cast<char*>(GetLetterStateBase(this) + 0xB) = 1;
-					} else {
-						ret = 1;
 					}
 					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = 0;
 					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x30) = 0;

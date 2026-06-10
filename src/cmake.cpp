@@ -3440,7 +3440,7 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
     col.r = 0xFF;
     col.g = 0xFF;
     col.b = 0xFF;
-    col.a = static_cast<unsigned char>(static_cast<int>(alpha255));
+    col.a = static_cast<unsigned char>(alpha255);
     GXSetChanMatColor(GX_COLOR0A0, col);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
@@ -3458,7 +3458,7 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
         col2.r = 0xFF;
         col2.g = 0xFF;
         col2.b = 0xFF;
-        col2.a = static_cast<unsigned char>(static_cast<int>(alpha255));
+        col2.a = static_cast<unsigned char>(alpha255);
         GXSetChanMatColor(GX_COLOR0A0, col2);
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x64 : 0x3D));
         MenuPcs.DrawRect(
@@ -3473,8 +3473,7 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
     font->DrawInit();
     font->SetTlut(7);
 
-    CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha));
-    font->SetColor(rgba.color);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha255)).color);
 
     const char* txt = GetMenuStr(0x29);
     float w = static_cast<float>(font->GetWidth(txt));

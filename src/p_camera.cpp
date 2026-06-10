@@ -1473,18 +1473,24 @@ void CCameraPcs::createFullShadow()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_propagation off
 void CCameraPcs::destroyFullShadow()
 {
+    u8* zero;
+
+    zero = 0;
     if (m_fullScreenShadow.m_shadowTexture != 0) {
         delete static_cast<u8*>(m_fullScreenShadow.m_shadowTexture);
-        m_fullScreenShadow.m_shadowTexture = 0;
+        m_fullScreenShadow.m_shadowTexture = zero;
     }
 
+    zero = 0;
     if (m_fullScreenShadow.m_rampTexture != 0) {
         delete m_fullScreenShadow.m_rampTexture;
-        m_fullScreenShadow.m_rampTexture = 0;
+        m_fullScreenShadow.m_rampTexture = zero;
     }
 }
+#pragma opt_propagation on
 
 /*
  * --INFO--

@@ -1745,9 +1745,9 @@ void CGPartyObj::onFrameStat()
 			    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x44) == 0) &&
 			    (Game.m_gameWork.m_bossArtifactStageIndex != 0x17)) {
 				CVector worldPos(m_worldPosition);
-				CVector chalicePos(*reinterpret_cast<Vec*>(Game.unk_flat3_0xc7d0 + 0x15C));
+				const CVector& chalicePos = CVector(*reinterpret_cast<Vec*>(Game.unk_flat3_0xc7d0 + 0x15C));
 				CVector diff;
-				PSVECSubtract(reinterpret_cast<Vec*>(&chalicePos), reinterpret_cast<Vec*>(&worldPos), reinterpret_cast<Vec*>(&diff));
+				PSVECSubtract((Vec*)&chalicePos, reinterpret_cast<Vec*>(&worldPos), reinterpret_cast<Vec*>(&diff));
 				Vec moveVec;
 				moveVec.x = diff.x;
 				moveVec.y = diff.y;
@@ -2256,9 +2256,9 @@ void CGPartyObj::statCharge()
 					if ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 0x32) & 0x10) != 0) {
 						unsigned int maxReach = *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x70);
 						if (static_cast<float>(maxReach) < mag) {
-							CVector dir(delta);
+							const CVector& dir = CVector(delta);
 							CVector scaled;
-							PSVECScale(reinterpret_cast<Vec*>(&dir), reinterpret_cast<Vec*>(&scaled), mag - static_cast<float>(maxReach));
+							PSVECScale((Vec*)&dir, reinterpret_cast<Vec*>(&scaled), mag - static_cast<float>(maxReach));
 							Vec scaledCopy;
 							scaledCopy.x = scaled.x;
 							scaledCopy.y = scaled.y;
@@ -2269,9 +2269,9 @@ void CGPartyObj::statCharge()
 							unitCopy.x = unit.x;
 							unitCopy.y = unit.y;
 							unitCopy.z = unit.z;
-							CVector origin(m_worldPosition);
+							const CVector& origin = CVector(m_worldPosition);
 							CVector sum;
-							PSVECAdd(reinterpret_cast<Vec*>(&origin), reinterpret_cast<Vec*>(&unitCopy), reinterpret_cast<Vec*>(&sum));
+							PSVECAdd((Vec*)&origin, reinterpret_cast<Vec*>(&unitCopy), reinterpret_cast<Vec*>(&sum));
 							dest.x = sum.x;
 							dest.y = sum.y;
 							dest.z = sum.z;
@@ -2306,9 +2306,9 @@ void CGPartyObj::statCharge()
 			float angLimit = FLOAT_80331AE0 * static_cast<float>(limitFrames);
 			if (phase == table[0x1F]) {
 				CVector worldPos(m_worldPosition);
-				CVector center(m_comboCenter);
+				const CVector& center = CVector(m_comboCenter);
 				CVector diff;
-				PSVECSubtract(reinterpret_cast<Vec*>(&center), reinterpret_cast<Vec*>(&worldPos), reinterpret_cast<Vec*>(&diff));
+				PSVECSubtract((Vec*)&center, reinterpret_cast<Vec*>(&worldPos), reinterpret_cast<Vec*>(&diff));
 				float horizSq = diff.z * diff.z + diff.x * diff.x;
 				float horiz = (horizSq > FLOAT_80331a78) ? sqrtf(horizSq) : horizSq;
 				if (FLOAT_80331a78 != diff.y && FLOAT_80331a78 != horiz) {

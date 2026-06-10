@@ -1619,7 +1619,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				int clampedDamage = 1;
 				float multiplier = CharaObjGetStatusMultiplier(0x2C);
 				unsigned int defense = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x22);
-				int rawDamage = static_cast<int>(multiplier * static_cast<float>(basePower + sourcePower)) - defense;
+				int rawDamage = static_cast<int>(multiplier * static_cast<float>(static_cast<int>(basePower + sourcePower))) - defense;
 				if (rawDamage >= 1) {
 					clampedDamage = rawDamage;
 				}
@@ -1683,7 +1683,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				int clampedDamage = 1;
 				float multiplier = CharaObjGetStatusMultiplier(0x2E);
 				unsigned int defense = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x22);
-				int rawDamage = static_cast<int>(multiplier * static_cast<float>(basePower + sourcePower)) - defense;
+				int rawDamage = static_cast<int>(multiplier * static_cast<float>(static_cast<int>(basePower + sourcePower))) - defense;
 				if (rawDamage >= 1) {
 					clampedDamage = rawDamage;
 				}
@@ -1745,7 +1745,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			case 2:
 			case 4:
 			case 0x1C: {
-				unsigned int defense = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x22);
+				int defense = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x22);
 				unsigned int basePower = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + resolvedItemId * 0x48 + 6);
 				unsigned int sourcePower = *reinterpret_cast<unsigned short*>(
 					reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0x20);

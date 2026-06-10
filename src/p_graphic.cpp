@@ -704,6 +704,7 @@ void CGraphicPcs::drawBar()
     if ((padState != 0) && (Joybus.GetPadType(0) != 0x40000)) {
         drawText = 1;
     }
+    const int textFlag = (u8)drawText;
 
     float x = kDebugBarLeft;
     GXColor barColor = {0x80, 0x80, 0x80, 0xFF};
@@ -726,11 +727,11 @@ void CGraphicPcs::drawBar()
         barColor.a = colorTmp.a;
 
         if (priority == 0x26) {
-            drawSFRect(x, drawText ? static_cast<float>(static_cast<int>(y)) : kDebugBarMoveBottom,
+            drawSFRect(x, textFlag ? static_cast<float>(static_cast<int>(y)) : kDebugBarMoveBottom,
                        kGraphicOne + (x + width), kDebugBarTop, barColor);
             x += width;
         } else if (priority != 0x27) {
-            drawSFRect(x, drawText ? static_cast<float>(static_cast<int>(y)) : kDebugBarObjectTop,
+            drawSFRect(x, textFlag ? static_cast<float>(static_cast<int>(y)) : kDebugBarObjectTop,
                        kGraphicOne + (x + width), kDebugBarMoveBottom, barColor);
             x += width;
         }
@@ -744,7 +745,7 @@ void CGraphicPcs::drawBar()
             barColor.a = soundGX.a;
             const float soundWidth = (kGraphicScreenCenterX * Sound.GetPerformance()) / kDebugBarFrameBudget;
 
-            drawSFRect(x, drawText ? static_cast<float>(static_cast<int>(y)) : kDebugBarMoveBottom,
+            drawSFRect(x, textFlag ? static_cast<float>(static_cast<int>(y)) : kDebugBarMoveBottom,
                        kGraphicOne + (x + soundWidth), kDebugBarTop, barColor);
         }
 
@@ -769,7 +770,7 @@ void CGraphicPcs::drawBar()
     barColor.a = fifoTmp.a;
     drawSFRect(kDebugIndicatorFifoLeft, kDebugIndicatorTop, kDebugIndicatorFifoRight, kDebugIndicatorBottom, barColor);
 
-    if (drawText) {
+    if (textFlag) {
         Graphic.InitDebugString();
 
         order = System.GetFirstOrder();

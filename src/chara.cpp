@@ -1619,6 +1619,7 @@ void CChara::CModel::calcMatrix()
 		if (blendCur != 0) {
 			u16 blendMax = ModelBlendMax(this);
 			float alpha = FLOAT_803301BC - (static_cast<float>(blendCur) * (FLOAT_803301BC / static_cast<float>(blendMax)));
+			Vec targetPos;
 			Vec targetScale;
 			Quaternion targetQuat;
 			Vec positionScaleA;
@@ -1626,12 +1627,9 @@ void CChara::CModel::calcMatrix()
 			Vec blendedPos;
 			Mtx quatMtx;
 			Mtx scaleMtx;
-			float tpY = NodeLocalRuntimeMtx(node)[1][3];
-			float tpZ = NodeLocalRuntimeMtx(node)[2][3];
-			Vec targetPos;
 			targetPos.x = NodeLocalRuntimeMtx(node)[0][3];
-			targetPos.y = tpY;
-			targetPos.z = tpZ;
+			targetPos.y = NodeLocalRuntimeMtx(node)[1][3];
+			targetPos.z = NodeLocalRuntimeMtx(node)[2][3];
 
 			Math.MTXGetScale(NodeLocalRuntimeMtx(node), &targetScale);
 			if (targetScale.x < FLOAT_803301E4) {
@@ -1728,7 +1726,8 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 			parentNode = reinterpret_cast<CNode*>(reinterpret_cast<u8*>(ModelNodes(this)) + parent * 0xC0);
 		}
 
-		int nextReuseAnimNode0Srt = 0;
+		int curReuseAnimNode0Srt = reuseAnimNode0Srt;
+		reuseAnimNode0Srt = 0;
 		SRTView cachedParentScaleSrt = parentScaleSrt;
 		SRTView srt;
 		Mtx animMtx;
@@ -1738,7 +1737,7 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 			if (parentNode != 0 && NodeAnimNode0(parentNode) != 0 &&
 			    AnimNodeUsesScale(NodeAnimNode0(parentNode))) {
 				NodeAnimNode0(parentNode)->Interp(m_anim, reinterpret_cast<SRT*>(&parentScaleSrt), frame);
-				nextReuseAnimNode0Srt = 1;
+				reuseAnimNode0Srt = 1;
 				PSMTXScale(localMtx,
 				           FLOAT_803301BC / parentScaleSrt.m_scale.x,
 				           FLOAT_803301BC / parentScaleSrt.m_scale.y,
@@ -1773,7 +1772,7 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 			}
 
 			if (NodeAnimNode0(node) != 0) {
-				if (reuseAnimNode0Srt) {
+				if (curReuseAnimNode0Srt) {
 					srt = cachedParentScaleSrt;
 				} else {
 					NodeAnimNode0(node)->Interp(m_anim, reinterpret_cast<SRT*>(&srt), frame);
@@ -1788,7 +1787,6 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 		} else {
 			PSMTXCopy(ref->m_localMtx, localMtx);
 		}
-		reuseAnimNode0Srt = nextReuseAnimNode0Srt;
 
 		u16 blendCur = ModelBlendCur(this);
 		if (blendCur != 0) {
@@ -1800,12 +1798,10 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 			Vec positionScaleB;
 			Vec blendedPos;
 			Mtx scaleMtx;
-			float tpY = localMtx[1][3];
-			float tpZ = localMtx[2][3];
 			Vec targetPos;
 			targetPos.x = localMtx[0][3];
-			targetPos.y = tpY;
-			targetPos.z = tpZ;
+			targetPos.y = localMtx[1][3];
+			targetPos.z = localMtx[2][3];
 
 			Math.MTXGetScale(localMtx, &targetScale);
 			if (targetScale.x < FLOAT_803301E4) {
@@ -1832,9 +1828,6 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 
 		PSMTXConcat(localMtx, out, out);
 
-		if (parentNode == 0) {
-			break;
-		}
 		node = parentNode;
 	}
 

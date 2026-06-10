@@ -606,24 +606,14 @@ static void SetupShopMenuAmountFont(CFont* font)
     font->SetMargin(FLOAT_80332d64);
 }
 
-static void SetupShopMenuMakeAmountFont(CFont* font)
+static void SetupShopMenuMakeFont(CFont* font, float margin)
 {
     font->SetShadow(1);
     font->SetScale(FLOAT_80332d28);
     font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
     font->DrawInit();
     SetShopMenuFontRenderBit(font);
-    font->SetMargin(FLOAT_80332E10 * FLOAT_80332d28 + FLOAT_80332D10);
-}
-
-static void SetupShopMenuMakeOwnedFont(CFont* font)
-{
-    font->SetShadow(1);
-    font->SetScale(FLOAT_80332d28);
-    font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
-    font->DrawInit();
-    SetShopMenuFontRenderBit(font);
-    font->SetMargin(FLOAT_80332d64);
+    font->SetMargin(margin);
 }
 
 static void DrawShopMenuAmount(CFont* font, int value, float rightEdge, float y, int tlut)
@@ -2160,6 +2150,7 @@ void CShopMenu::DrawMake()
     SetupShopMenuUnitFont(font);
     float gilUnitWidth = font->GetWidth(ShopMenuMes(languageId, SHOP_MENU_TEXT_GIL));
 
+    float makeMarginW = FLOAT_80332E10;
     int makeAmountX = static_cast<int>(FLOAT_80332E14 - gilUnitWidth - FLOAT_80332d5c - FLOAT_80332d5c);
     CFont* amountFont = MenuPcs.m_fonts[0];
     SetupShopMenuAmountFont(amountFont);
@@ -2236,9 +2227,10 @@ void CShopMenu::DrawMake()
     MenuPcs.DrawInit();
 
     int rowY = 300;
-    float scaleOne = FLOAT_80332d28;
     short recipeMaterial[6];
     MenuPcs.GetRecipeMaterial(getItemNo(m_selectedIndex), reinterpret_cast<CMenuPcs::MaterialInfo*>(recipeMaterial));
+    float makeMarginScale = FLOAT_80332d28;
+    float makeMarginBase = FLOAT_80332D10;
     short* material = recipeMaterial;
     for (int i = 0; i < 3; i++, material++, rowY += 0x1E) {
         if (*material <= 0) {
@@ -2246,9 +2238,9 @@ void CShopMenu::DrawMake()
         }
 
         headerFont->DrawInit();
-        headerFont->SetMargin(scaleOne);
+        headerFont->SetMargin(FLOAT_80332d28);
         headerFont->SetShadow(1);
-        headerFont->SetScale(scaleOne);
+        headerFont->SetScale(FLOAT_80332d28);
         headerFont->DrawInit();
         MenuPcs.DrawNoShadowFont(headerFont, s_Slash_80332d84, FLOAT_80332E3C, rowY, 0x1B, 0x12);
         MenuPcs.DrawInit();
@@ -2256,7 +2248,7 @@ void CShopMenu::DrawMake()
         CFont* makeAmountFont = MenuPcs.m_fonts[0];
         x = 372;
         int neededCount = material[3];
-        SetupShopMenuMakeAmountFont(makeAmountFont);
+        SetupShopMenuMakeFont(makeAmountFont, makeMarginW * makeMarginScale + makeMarginBase);
         char neededBuffer[64];
         sprintf(neededBuffer, s_DecimalFormat_80332d14, neededCount);
         x = static_cast<int>(x - makeAmountFont->GetWidth(neededBuffer));
@@ -2264,9 +2256,9 @@ void CShopMenu::DrawMake()
         MenuPcs.DrawInit();
 
         headerFont->DrawInit();
-        headerFont->SetMargin(scaleOne);
+        headerFont->SetMargin(FLOAT_80332d28);
         headerFont->SetShadow(1);
-        headerFont->SetScale(scaleOne);
+        headerFont->SetScale(FLOAT_80332d28);
         x -= 8;
         x = static_cast<int>(x - headerFont->GetWidth("/"));
         headerFont->DrawInit();
@@ -2289,12 +2281,13 @@ void CShopMenu::DrawMake()
         }
 
         int ownedTlut = 2;
+        makeMarginW = FLOAT_80332E10;
         if (ownedCount >= material[3]) {
             ownedTlut = 0x1B;
         }
         CFont* ownedFont = MenuPcs.m_fonts[0];
         x = 452;
-        SetupShopMenuMakeOwnedFont(ownedFont);
+        SetupShopMenuMakeFont(ownedFont, FLOAT_80332d64);
         char ownedBuffer[64];
         sprintf(ownedBuffer, s_TwoDigitFormat_80332d18, ownedCount);
         x = static_cast<int>(x - ownedFont->GetWidth(ownedBuffer));

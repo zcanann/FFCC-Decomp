@@ -1531,14 +1531,16 @@ void CShopMenu::DrawBuySellInfo()
 
     float rightPrice = FLOAT_80332d88 - unitWidth;
     int amountRightPrice = static_cast<int>(rightPrice - FLOAT_80332d5c);
-    SetupShopMenuAmountFont(font);
-    DrawShopMenuAmountTrunc(font, totalGil, amountRightPrice, FLOAT_80332d90, 0x13);
+    CFont* amountFont = MenuPcs.m_fonts[0];
+    SetupShopMenuAmountFont(amountFont);
+    DrawShopMenuAmountTrunc(amountFont, totalGil, amountRightPrice, FLOAT_80332d90, 0x13);
 
     float rightMoney = FLOAT_80332d94 - unitWidth;
     int amountRightMoney = static_cast<int>(rightMoney - FLOAT_80332d5c);
     int currentMoney = ShopMenuCaravanWork(this)->m_gil;
-    SetupShopMenuAmountFont(font);
-    DrawShopMenuAmountTrunc(font, currentMoney, amountRightMoney, FLOAT_80332d90, 0x14);
+    CFont* amountFont2 = MenuPcs.m_fonts[0];
+    SetupShopMenuAmountFont(amountFont2);
+    DrawShopMenuAmountTrunc(amountFont2, currentMoney, amountRightMoney, FLOAT_80332d90, 0x14);
 
     SetupShopMenuUnitFont(font);
     font->DrawInit();

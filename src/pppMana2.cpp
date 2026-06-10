@@ -1613,9 +1613,9 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
         offset.y = stepData->m_waterScale;
         PSMTXMultVec(mtx, &offset, &offset);
 
-        float newY = y - offset.y;
+        y = y - offset.y;
         mtx[0][3] = x;
-        mtx[1][3] = newY;
+        mtx[1][3] = y;
         mtx[2][3] = z;
 
         PSMTXConcat(cameraMtx, mtx, posMtx);

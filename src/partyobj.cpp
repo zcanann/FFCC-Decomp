@@ -1746,11 +1746,11 @@ void CGPartyObj::onFrameStat()
 			    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x50) == 0) &&
 			    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x44) == 0) &&
 			    (Game.m_gameWork.m_bossArtifactStageIndex != 0x17)) {
+				Vec moveVec;
 				CVector worldPos(m_worldPosition);
 				const CVector& chalicePos = CVector(*reinterpret_cast<Vec*>(Game.unk_flat3_0xc7d0 + 0x15C));
 				CVector diff;
 				PSVECSubtract((Vec*)&chalicePos, reinterpret_cast<Vec*>(&worldPos), reinterpret_cast<Vec*>(&diff));
-				Vec moveVec;
 				moveVec.x = diff.x;
 				moveVec.y = diff.y;
 				moveVec.z = diff.z;

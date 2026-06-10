@@ -2650,7 +2650,7 @@ static inline void pppEditDrawPass(unsigned char* base, int drawPass, Vec& camer
     Vec cameraDelta;
     struct PppCullBound { Vec m_min; Vec m_max; };
 
-    for (int i = 0; i < kPppMngCount; i++) {
+    for (int i = 0; i < kPppMngCount; i++, base += kPppMngStride) {
         _pppMngSt* mng = reinterpret_cast<_pppMngSt*>(base + kPppMngOffset);
         if (base[kPppMngOffset + 0xE8] == 0 && mng->m_baseTime != -0x1000
             && (signed char)mng->m_drawPass == drawPass && mng->m_baseTime < 0
@@ -2694,7 +2694,6 @@ static inline void pppEditDrawPass(unsigned char* base, int drawPass, Vec& camer
                 }
             }
         }
-        base += kPppMngStride;
     }
 }
 

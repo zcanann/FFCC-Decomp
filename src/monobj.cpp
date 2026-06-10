@@ -2521,7 +2521,7 @@ void CGMonObj::onFrameAlways()
 					CGPartyObj* party = Game.m_partyObjArr[i];
 					if (party != nullptr && party->m_comboState != 0) {
 						float dist = PSVECDistance(&party->m_comboCenter, &object->m_worldPosition);
-						if (dist < 60.0f + object->m_bodyEllipsoidRadius) {
+						if (dist < kMonObjHomeSnapDistance + object->m_bodyEllipsoidRadius) {
 							hasNearParty = 1;
 							break;
 						}

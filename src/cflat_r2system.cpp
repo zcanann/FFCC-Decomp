@@ -4375,14 +4375,15 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
  */
 void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack, int setMode)
 {
-    CGame::CGameWork& gameWork = Game.m_gameWork;
+    CGame::CGameWork* gameWork = &Game.m_gameWork;
     if (systemValue > -0x1000) {
         if (systemValue <= -500) {
             int bitIndex = systemValue + 0x9F3;
-            int byteIndex = bitIndex / 8 + 8;
-            unsigned char* flagByte = reinterpret_cast<unsigned char*>(gameWork.m_eventFlags) + byteIndex;
+            int byteIndex = bitIndex / 8;
+            unsigned char* flagByte = reinterpret_cast<unsigned char*>(Game.m_gameWork.m_eventFlags) + byteIndex;
+            unsigned char flagBits = *flagByte;
             unsigned int mask = 1U << (bitIndex % 8);
-            unsigned int flag = *flagByte & mask;
+            unsigned int flag = flagBits & mask;
             int value = (-flag | flag) >> 31;
             stack[-1].m_word = value;
 
@@ -4405,76 +4406,78 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
                 *flagByte &= ~mask;
             }
         } else if (systemValue <= -200) {
-            short* artifact = &Game.m_gameWork.m_eventWork[systemValue + 0x1C7];
-            stack[-1].m_word = *artifact;
+            int workIndex = systemValue + 0x1C7;
+            stack[-1].m_word = gameWork->m_eventWork[workIndex];
             switch (setMode) {
             case -1:
-                *artifact = static_cast<short>(*artifact - stack->m_word);
+                gameWork->m_eventWork[workIndex] =
+                    static_cast<short>(gameWork->m_eventWork[workIndex] - stack->m_word);
                 break;
             case 0:
-                *artifact = static_cast<short>(stack->m_word);
+                gameWork->m_eventWork[workIndex] = static_cast<short>(stack->m_word);
                 break;
             case 1:
-                *artifact = static_cast<short>(*artifact + stack->m_word);
+                gameWork->m_eventWork[workIndex] =
+                    static_cast<short>(gameWork->m_eventWork[workIndex] + stack->m_word);
                 break;
             }
         } else {
             switch (systemValue) {
             case -0x40:
-                stack[-1].m_word = *reinterpret_cast<unsigned int*>(&gameWork.m_scriptSysVal0);
+                stack[-1].m_word = *reinterpret_cast<unsigned int*>(&gameWork->m_scriptSysVal0);
                 switch (setMode) {
                 case -1:
-                    *reinterpret_cast<unsigned int*>(&gameWork.m_scriptSysVal0) =
-                        *reinterpret_cast<unsigned int*>(&gameWork.m_scriptSysVal0) - stack->m_word;
+                    *reinterpret_cast<unsigned int*>(&gameWork->m_scriptSysVal0) =
+                        *reinterpret_cast<unsigned int*>(&gameWork->m_scriptSysVal0) - stack->m_word;
                     break;
                 case 0:
-                    *reinterpret_cast<unsigned int*>(&gameWork.m_scriptSysVal0) = stack->m_word;
+                    *reinterpret_cast<unsigned int*>(&gameWork->m_scriptSysVal0) = stack->m_word;
                     break;
                 case 1:
-                    *reinterpret_cast<unsigned int*>(&gameWork.m_scriptSysVal0) =
-                        *reinterpret_cast<unsigned int*>(&gameWork.m_scriptSysVal0) + stack->m_word;
+                    *reinterpret_cast<unsigned int*>(&gameWork->m_scriptSysVal0) =
+                        *reinterpret_cast<unsigned int*>(&gameWork->m_scriptSysVal0) + stack->m_word;
                     break;
                 }
                 break;
             case -0x41:
-                stack[-1].m_word = gameWork.m_timerA;
+                stack[-1].m_word = gameWork->m_timerA;
                 switch (setMode) {
                 case -1:
-                    gameWork.m_timerA = gameWork.m_timerA - stack->m_word;
+                    gameWork->m_timerA = gameWork->m_timerA - stack->m_word;
                     break;
                 case 0:
-                    gameWork.m_timerA = stack->m_word;
+                    gameWork->m_timerA = stack->m_word;
                     break;
                 case 1:
-                    gameWork.m_timerA = gameWork.m_timerA + stack->m_word;
+                    gameWork->m_timerA = gameWork->m_timerA + stack->m_word;
                     break;
                 }
                 break;
             case -0x42:
-                stack[-1].m_word = gameWork.m_scriptGlobalTime;
+                stack[-1].m_word = gameWork->m_scriptGlobalTime;
                 switch (setMode) {
                 case -1:
-                    gameWork.m_scriptGlobalTime = gameWork.m_scriptGlobalTime - stack->m_word;
+                    gameWork->m_scriptGlobalTime = gameWork->m_scriptGlobalTime - stack->m_word;
                     break;
                 case 0:
-                    gameWork.m_scriptGlobalTime = stack->m_word;
+                    gameWork->m_scriptGlobalTime = stack->m_word;
                     break;
                 case 1:
-                    gameWork.m_scriptGlobalTime = gameWork.m_scriptGlobalTime + stack->m_word;
+                    gameWork->m_scriptGlobalTime = gameWork->m_scriptGlobalTime + stack->m_word;
                     break;
                 }
                 break;
             case -0x43:
-                stack[-1].m_word = gameWork.m_frameCounter;
+                stack[-1].m_word = gameWork->m_frameCounter;
                 switch (setMode) {
                 case -1:
-                    gameWork.m_frameCounter = gameWork.m_frameCounter - stack->m_word;
+                    gameWork->m_frameCounter = gameWork->m_frameCounter - stack->m_word;
                     break;
                 case 0:
-                    gameWork.m_frameCounter = stack->m_word;
+                    gameWork->m_frameCounter = stack->m_word;
                     break;
                 case 1:
-                    gameWork.m_frameCounter = gameWork.m_frameCounter + stack->m_word;
+                    gameWork->m_frameCounter = gameWork->m_frameCounter + stack->m_word;
                     break;
                 }
                 break;
@@ -4493,17 +4496,17 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
             case -0x4A:
             case -0x49:
             case -0x48: {
-                int* value = &Game.m_gameWork.m_bossArtifactStageTable[systemValue + 0x56];
-                stack[-1].m_word = *value;
+                int workIndex = systemValue + 0x56;
+                stack[-1].m_word = gameWork->m_bossArtifactStageTable[workIndex];
                 switch (setMode) {
                 case -1:
-                    *value = *value - stack->m_word;
+                    gameWork->m_bossArtifactStageTable[workIndex] = gameWork->m_bossArtifactStageTable[workIndex] - stack->m_word;
                     break;
                 case 0:
-                    *value = stack->m_word;
+                    gameWork->m_bossArtifactStageTable[workIndex] = stack->m_word;
                     break;
                 case 1:
-                    *value = *value + stack->m_word;
+                    gameWork->m_bossArtifactStageTable[workIndex] = gameWork->m_bossArtifactStageTable[workIndex] + stack->m_word;
                     break;
                 }
                 break;
@@ -4523,32 +4526,32 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
             case -0x59:
             case -0x58:
             case -0x57: {
-                int* value = &Game.m_gameWork.m_unkStageTable[systemValue + 0x65];
-                stack[-1].m_word = *value;
+                int workIndex = systemValue + 0x65;
+                stack[-1].m_word = gameWork->m_unkStageTable[workIndex];
                 switch (setMode) {
                 case -1:
-                    *value = *value - stack->m_word;
+                    gameWork->m_unkStageTable[workIndex] = gameWork->m_unkStageTable[workIndex] - stack->m_word;
                     break;
                 case 0:
-                    *value = stack->m_word;
+                    gameWork->m_unkStageTable[workIndex] = stack->m_word;
                     break;
                 case 1:
-                    *value = *value + stack->m_word;
+                    gameWork->m_unkStageTable[workIndex] = gameWork->m_unkStageTable[workIndex] + stack->m_word;
                     break;
                 }
                 break;
             }
             case -0x66:
-                stack[-1].m_word = gameWork.m_chaliceElement;
+                stack[-1].m_word = gameWork->m_chaliceElement;
                 switch (setMode) {
                 case -1:
-                    gameWork.m_chaliceElement = gameWork.m_chaliceElement - stack->m_word;
+                    gameWork->m_chaliceElement = gameWork->m_chaliceElement - stack->m_word;
                     break;
                 case 0:
-                    gameWork.m_chaliceElement = stack->m_word;
+                    gameWork->m_chaliceElement = stack->m_word;
                     break;
                 case 1:
-                    gameWork.m_chaliceElement = gameWork.m_chaliceElement + stack->m_word;
+                    gameWork->m_chaliceElement = gameWork->m_chaliceElement + stack->m_word;
                     break;
                 }
                 break;
@@ -4557,17 +4560,17 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
             case -0x69:
             case -0x68:
             case -0x67: {
-                int* value = &Game.m_gameWork.m_eventHeader[systemValue + 0x6B];
-                stack[-1].m_word = *value;
+                int workIndex = systemValue + 0x6B;
+                stack[-1].m_word = gameWork->m_eventHeader[workIndex];
                 switch (setMode) {
                 case -1:
-                    *value = *value - stack->m_word;
+                    gameWork->m_eventHeader[workIndex] = gameWork->m_eventHeader[workIndex] - stack->m_word;
                     break;
                 case 0:
-                    *value = stack->m_word;
+                    gameWork->m_eventHeader[workIndex] = stack->m_word;
                     break;
                 case 1:
-                    *value = *value + stack->m_word;
+                    gameWork->m_eventHeader[workIndex] = gameWork->m_eventHeader[workIndex] + stack->m_word;
                     break;
                 }
                 break;
@@ -4576,17 +4579,17 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
             case -0x46:
             case -0x45:
             case -0x44: {
-                int* value = &Game.m_gameWork.m_wmBackupParams[systemValue + 0x47];
-                stack[-1].m_word = *value;
+                int workIndex = systemValue + 0x47;
+                stack[-1].m_word = gameWork->m_wmBackupParams[workIndex];
                 switch (setMode) {
                 case -1:
-                    *value = *value - stack->m_word;
+                    gameWork->m_wmBackupParams[workIndex] = gameWork->m_wmBackupParams[workIndex] - stack->m_word;
                     break;
                 case 0:
-                    *value = stack->m_word;
+                    gameWork->m_wmBackupParams[workIndex] = stack->m_word;
                     break;
                 case 1:
-                    *value = *value + stack->m_word;
+                    gameWork->m_wmBackupParams[workIndex] = gameWork->m_wmBackupParams[workIndex] + stack->m_word;
                     break;
                 }
                 break;
@@ -4608,7 +4611,7 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
                 }
                 break;
             case -0x76: {
-                unsigned int value = static_cast<unsigned int>(gameWork.m_menuStageMode);
+                unsigned int value = static_cast<unsigned int>(gameWork->m_menuStageMode);
                 stack[-1].m_word = value;
                 switch (setMode) {
                 case -1:
@@ -4640,22 +4643,22 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
                     break;
                 }
                 break;
-            case -0x79:
-                stack[-1].m_word = static_cast<int>(static_cast<unsigned short>(Game.m_gameWork.m_optionValue));
+            case -0x79: {
+                short* optionValue = reinterpret_cast<short*>(&Game.m_gameWork.m_optionValue);
+                stack[-1].m_word = *optionValue;
                 switch (setMode) {
                 case -1:
-                    Game.m_gameWork.m_optionValue =
-                        static_cast<unsigned short>(Game.m_gameWork.m_optionValue - stack->m_word);
+                    *optionValue = static_cast<short>(*optionValue - stack->m_word);
                     break;
                 case 0:
-                    Game.m_gameWork.m_optionValue = static_cast<unsigned short>(stack->m_word);
+                    *optionValue = static_cast<short>(stack->m_word);
                     break;
                 case 1:
-                    Game.m_gameWork.m_optionValue =
-                        static_cast<unsigned short>(Game.m_gameWork.m_optionValue + stack->m_word);
+                    *optionValue = static_cast<short>(*optionValue + stack->m_word);
                     break;
                 }
                 break;
+            }
             default:
                 break;
             }

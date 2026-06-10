@@ -3172,10 +3172,14 @@ void CMenuPcs::AddNameChara(int c, int slot, int, int)
  */
 void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
 {
+    float textW;
+
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 
-    int baseY = 300;
+    float nameW = 161.0f;
+    int nameX = static_cast<int>(-((nameW * 0.5) - 400.0));
 
+    int baseY = 300;
     if (x != 0) {
         baseY = 0x130;
     }
@@ -3187,14 +3191,11 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
     GetRenderFlagBits(font->renderFlags).fixedWidth = 1;
     font->SetMargin(1.0f);
 
-    int a = static_cast<int>(255.0f * alpha);
-    CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a));
-    font->SetColor(rgba.color);
+    alpha = 255.0f * alpha;
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha)).color);
     font->SetTlut(6);
 
-    float textW = static_cast<float>(font->GetWidth(text));
-    int nameX = static_cast<int>(
-        -((static_cast<double>(textW) * 0.5) - 400.0));
+    textW = font->GetWidth(text);
     font->SetPosX(static_cast<float>(nameX));
     font->SetPosY(static_cast<float>(baseY - 4));
     font->Draw(text);
@@ -3209,7 +3210,7 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
         drawColor.r = 0xFF;
         drawColor.g = 0xFF;
         drawColor.b = 0xFF;
-        drawColor.a = static_cast<unsigned char>(a);
+        drawColor.a = static_cast<unsigned char>(alpha);
         GXSetChanMatColor(GX_COLOR0A0, drawColor);
 
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x60 : 0x39));
@@ -3220,7 +3221,7 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
             static_cast<float>(cursorX),
             static_cast<float>(baseY - 0x10),
             32.0f, 48.0f,
-            static_cast<float>((static_cast<int>(System.m_frameCounter) % 8) << 5), 0.0f,
+            static_cast<float>(((static_cast<int>(System.m_frameCounter) >> 1) % 8) << 5), 0.0f,
             1.0f, 1.0f, 0.0f);
     }
 }

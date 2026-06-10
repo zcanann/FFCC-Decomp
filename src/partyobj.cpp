@@ -1413,8 +1413,9 @@ targetJoin: ;
 			caravan->GetCurrentWeaponItem(weaponItem, weaponRef);
 			if (weaponItem != party.unk6BC ||
 			    weaponRef != (caravan->m_equipment[0] >= 0 ? caravan->m_inventoryItems[caravan->m_equipment[0]] : 0)) {
+				int newWeaponRef = caravan->m_equipment[0] >= 0 ? caravan->m_inventoryItems[caravan->m_equipment[0]] : 0;
 				*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D4) = party.unk6BC;
-				party.weaponRef = caravan->m_equipment[0] >= 0 ? caravan->m_inventoryItems[caravan->m_equipment[0]] : 0;
+				party.weaponRef = newWeaponRef;
 				party.commandFlagBits.flag20 = 1;
 				changeStat(0x0F, 0, 0);
 				return;

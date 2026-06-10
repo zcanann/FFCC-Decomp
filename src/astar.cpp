@@ -172,6 +172,7 @@ unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
 CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int forbiddenGroup)
 {
 	Vec escapeDir;
+	Vec portalVec;
 	CVector baseVec(base);
 	Vec* fromVec = reinterpret_cast<Vec*>(&CVector(from));
 	CVector escapeDirSource;
@@ -220,7 +221,6 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 					CVector portalDirBase(base);
 					Vec* portalDirPos = reinterpret_cast<Vec*>(&CVector(m_portals[i].m_position));
 					CVector dirToPortalSource;
-					Vec portalVec;
 
 					PSVECSubtract(portalDirPos, reinterpret_cast<Vec*>(&portalDirBase),
 					              reinterpret_cast<Vec*>(&dirToPortalSource));
@@ -293,8 +293,8 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 
 	Graphic.Printf(10, 10, const_cast<char*>(kAStarGroupDebugFormat), static_cast<int>(gPartyObj->m_aStarGroupId));
 
-	int padLock = Pad.m_debugPadLock;
 	bool padBusy = false;
+	int padLock = Pad.m_debugPadLock;
 
 	if (padLock != 0 || Pad.m_debugPadPort != -1)
 	{

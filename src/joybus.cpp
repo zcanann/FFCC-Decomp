@@ -4967,21 +4967,20 @@ int JoyBus::SendMapObjDrawFlg(ThreadParam* threadParam)
     {
         GbaQue.GetMapObjDrawFlg(&flgWord);
 
-        unsigned char* data = (unsigned char*)&flgWord;
+        volatile unsigned char* data = (volatile unsigned char*)&flgWord;
         unsigned char crcBytes[4];
         crcBytes[3] = data[0];
         crcBytes[2] = data[1];
         crcBytes[1] = data[2];
         crcBytes[0] = data[3];
-        unsigned char* crcData = crcBytes;
         unsigned int crc = 0xFFFF;
         int crcCount = 4;
+        unsigned char* crcData = crcBytes;
 
         while (--crcCount >= 0)
         {
-            unsigned char byte = *crcData++;
-            unsigned int index = (crc >> 8) ^ byte;
-            crc = (unsigned short)((crc << 8) ^ JoyBusCrcTable[index]);
+            crc = (((crc & 0xFFFF) << 8) ^ static_cast<unsigned int>(JoyBusCrcTable[((crc >> 8) & 0xFF) ^ static_cast<unsigned int>(*crcData)])) & 0xFFFF;
+            crcData = crcData + 1;
         }
 
         crc = ~(unsigned short)crc;

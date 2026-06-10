@@ -144,9 +144,8 @@ static inline void MergePadInputs(CPad* pad, u16* puVar13, u16* puVar18, u16* pu
 				puVar12[0x26] = static_cast<u16>(*reinterpret_cast<u16*>(p12 + 0x30) | *puVar12);
 				if (iVar14 == 0)
 				{
-					uVar8 = *puVar18;
 					*reinterpret_cast<u16*>(p12 + 0x08) = *reinterpret_cast<u16*>(p12 + 0x0A);
-					uVar16 = (__cntlzw(1 - (uVar8 & 0x3FFF)) >> 5) & 0xFF;
+					uVar16 = (__cntlzw(1 - (*puVar18 & 0x3FFF)) >> 5) & 0xFF;
 					*reinterpret_cast<s8*>(p12 + 0x40) = *reinterpret_cast<s8*>(puVar13 + 5);
 					*reinterpret_cast<u32*>(p12 + 0x50) = uVar16;
 					*reinterpret_cast<u32*>(p12 + 0x44) = 0;
@@ -256,9 +255,8 @@ static inline void MergePadInputs(CPad* pad, u16* puVar13, u16* puVar18, u16* pu
 				}
 				else if (reinterpret_cast<CPad::Gba*>(puVar18)->connected)
 				{
-					uVar8 = puVar18[1];
 					*reinterpret_cast<u32*>(p12 + 0x44) = *reinterpret_cast<u32*>(p12 + 0x44) | 1;
-					*puVar12 = uVar8;
+					*puVar12 = puVar18[1];
 				}
 				puVar12[2] = static_cast<u16>(*puVar12 & (puVar12[0x26] ^ *puVar12));
 				if (iVar14 == 0)

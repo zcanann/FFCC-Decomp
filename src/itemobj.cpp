@@ -515,6 +515,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 	unsigned char* self = (unsigned char*)this;
 	CFlatRuntime::CStack stack[3];
 	int canSystemCall;
+	unsigned char canSystemCall8;
 
 	if (carryState == 0) {
 		canSystemCall = 0;
@@ -538,6 +539,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 
 		*(CGPartyObj**)(self + 0x550) = partyObj;
 		*(int*)(self + 0x554) = carryMode;
+		canSystemCall8 = (unsigned char)canSystemCall;
 
 		if (carryMode == 0) {
 			const CVector& attachOffset = CVector(kItemObjZero, kItemObjZero, kItemObjZero);
@@ -600,6 +602,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 		}
 
 		*(int*)(self + 0x554) = carryMode;
+		canSystemCall8 = (unsigned char)canSystemCall;
 
 		if (carryMode == 0) {
 			Vec safePos;
@@ -625,7 +628,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 		*reinterpret_cast<u32*>(self + 0x94) = 0x1194;
 	}
 
-	if ((*(unsigned int*)(self + 0x5C) & 0x10) != 0 && canSystemCall != 0) {
+	if ((*(unsigned int*)(self + 0x5C) & 0x10) != 0 && canSystemCall8 != 0) {
 		stack[0].m_word = 3;
 		stack[1].m_word = static_cast<unsigned int>(-carryState | carryState) >> 0x1F;
 		stack[2].m_word = 0;

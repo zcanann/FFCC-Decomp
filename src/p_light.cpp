@@ -352,7 +352,7 @@ CLightPcs::CBumpLight* CLightPcs::AddBump(CLightPcs::CLight* srcLight, CLightPcs
     CBumpLight* bumpLight = GetFreeBumpLight(target);
 
     if (bumpLight == 0) {
-        if (static_cast<int>(System.m_execParam) >= 1) {
+        if (static_cast<u32>(System.m_execParam) >= 1) {
             System.Printf(const_cast<char*>(sLightTextureFullMsg));
         }
         return 0;
@@ -1167,9 +1167,9 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
     nrm[0][2] = out[0][2];
     nrm[1][2] = out[1][2];
     nrm[2][2] = out[2][2];
-    nrm[0][3] = kLightZero;
-    nrm[1][3] = kLightZero;
-    nrm[2][3] = kLightZero;
+    nrm[0][3] = 0.0f;
+    nrm[1][3] = 0.0f;
+    nrm[2][3] = 0.0f;
     GXLoadNrmMtxImm(nrm, 0);
 
     if ((bump != nullptr) && (bump->m_hasTexture != 0)) {

@@ -19,6 +19,7 @@ public:
 		color.b = 0xFF;
 		color.a = 0xFF;
 	}
+	CColor& Ref() { return *this; }
 
 	GXColor color;
 };

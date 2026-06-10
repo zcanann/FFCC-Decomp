@@ -2035,34 +2035,38 @@ void CMenuPcs::LetterMessDraw()
 int CMenuPcs::LetterCtrlCur()
 {
 	bool blocked = false;
-	unsigned int press;
-	s16 hold;
+	int press;
+	int hold;
+	int pressRaw;
+	int holdRaw;
 	int padState = Pad.m_debugPadLock;
 
 	if ((padState != 0) || (Pad.m_debugPadPort != -1)) {
 		blocked = true;
 	}
 	if (blocked) {
-		press = 0;
+		pressRaw = 0;
 	} else {
 		int padIndex = 0;
 		int mask = -((__cntlzw((unsigned int)Pad.m_debugPadPort) >> 5) & 1);
 		padIndex &= ~mask;
-		press = Pad.GetPadInputs()[padIndex].buttonDown[0];
+		pressRaw = Pad.GetPadInputs()[padIndex].buttonDown[0];
 	}
+	press = static_cast<s16>(static_cast<u16>(pressRaw));
 
 	blocked = false;
 	if ((padState != 0) || (Pad.m_debugPadPort != -1)) {
 		blocked = true;
 	}
 	if (blocked) {
-		hold = 0;
+		holdRaw = 0;
 	} else {
 		int padIndex = 0;
 		int mask = -((__cntlzw((unsigned int)Pad.m_debugPadPort) >> 5) & 1);
 		padIndex &= ~mask;
-		hold = Pad.GetPadInputs()[padIndex].repeatButton;
+		holdRaw = Pad.GetPadInputs()[padIndex].repeatButton;
 	}
+	hold = static_cast<s16>(static_cast<u16>(holdRaw));
 
 	if (hold == 0) {
 		return 0;
@@ -2078,15 +2082,17 @@ int CMenuPcs::LetterCtrlCur()
 		}
 
 		if ((hold & 8) != 0) {
-			if (*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x26) != 0) {
-				*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x26) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x26) - 1;
+			int cur = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x26);
+			if (cur != 0) {
+				*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x26) = cur - 1;
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			} else {
-				if (*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x34) == 0) {
-					Sound.PlaySe(4, 0x40, 0x7F, 0);
-				} else {
-					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x34) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x34) - 1;
+				int top = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x34);
+				if (top != 0) {
+					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x34) = top - 1;
 					Sound.PlaySe(1, 0x40, 0x7F, 0);
+				} else {
+					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				}
 			}
 		} else if ((hold & 4) != 0) {

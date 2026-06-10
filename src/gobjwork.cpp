@@ -406,7 +406,7 @@ void CCaravanWork::AddLetter(int letterType, int senderId, int moneyValue, int h
 	memset(&m_letters[0], 0, sizeof(m_letters[0]));
 	m_letters[0].SetMessageType(letterType);
 	m_letters[0].m_words.m_word0 = (m_letters[0].m_words.m_word0 & 0xFFFC01FF) | ((senderId & 0x1FF) << 9);
-	m_letters[0].SetFlags((m_letters[0].Flags() & ~8) | ((hasMoneyFlag << 3) & 8));
+	m_letters[0].FlagsBits().m_attachmentIsGil = hasMoneyFlag;
 	int attachmentValue;
 	if (m_letters[0].AttachmentIsGil()) {
 		attachmentValue = moneyValue / 100;
@@ -424,11 +424,7 @@ void CCaravanWork::AddLetter(int letterType, int senderId, int moneyValue, int h
 	m_letters[0].m_half.m_tempVars[3] = static_cast<unsigned short>(itemD);
 
 	int nextCount = m_letterCount + 1;
-	int letterCount = 100;
-	if (nextCount < 100) {
-		letterCount = nextCount;
-	}
-	m_letterCount = letterCount;
+	m_letterCount = (nextCount < 100) ? nextCount : 100;
 
 	GbaQue.SetAddLetter(m_joybusCaravanId);
 }
@@ -971,10 +967,10 @@ int CCaravanWork::GetFoodRank(int playerIdx)
  */
 void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxResults)
 {
-	int foundCount = 0;
 	int bit0;
 	int bit1;
 	int bit2;
+	int foundCount = 0;
 
 	for (int i = 0; i < maxResults; i++) {
 		romLetterWork[i] = 0;
@@ -1698,9 +1694,9 @@ void CCaravanWork::SafeDeleteTempItem()
 		System.Printf(const_cast<char*>(sNoWorldReturnItemWarning));
 	}
 
-	int totalSlots = 0;
 	int artifactIndex = 0;
 	CCaravanWork* artifactCur = this;
+	int totalSlots = 0;
 	for (int i = 50; i != 0; i--) {
 		if (artifactIndex < 96) {
 			int artifactId = artifactCur->m_artifacts[0];
@@ -1884,11 +1880,11 @@ void CCaravanWork::CalcStatus()
 			case 0xDB:
 				cmdBonus += value;
 				break;
-			case 0xE4:
-				hpBonus += value;
-				break;
 			case 0xDF:
 				magBonus += value;
+				break;
+			case 0xE4:
+				hpBonus += value;
 				break;
 			}
 		}
@@ -1909,11 +1905,7 @@ void CCaravanWork::CalcStatus()
 	}
 	m_numCmdListSlots = cmdSlotCap;
 
-	unsigned short cappedValue = 0x10;
-	if (m_maxHp < 0x10) {
-		cappedValue = m_maxHp;
-	}
-	m_maxHp = cappedValue;
+	m_maxHp = (m_maxHp < 0x10) ? m_maxHp : 0x10;
 
 	for (int equipIdx = 0; equipIdx < 4; equipIdx++) {
 		int equipSlot = m_equipment[equipIdx];
@@ -2182,18 +2174,21 @@ int CCaravanWork::GetCmdListItemName(int cmdListIdx, int* firstCmdIdx, int* item
 {
 	short numSlots;
 	int groupedCount;
+	int topIdx;
+	int extraOff = cmdListIdx * 2;
 
 	if (Game.m_gameWork.m_menuStageMode == 0) {
 		groupedCount = 1;
 	} else {
-		if (m_commandListExtra[cmdListIdx] == 0) {
+		short* cur = (short*)((char*)this + extraOff);
+		if (*(short*)((char*)cur + 0x214) == 0) {
 			groupedCount = 1;
 		} else {
-			int topIdx;
 			for (topIdx = cmdListIdx; topIdx >= 0; topIdx--) {
-				if (m_commandListExtra[topIdx] != -1) {
+				if (*(short*)((char*)cur + 0x214) != -1) {
 					break;
 				}
+				cur--;
 			}
 
 			groupedCount = 1;
@@ -2210,10 +2205,12 @@ int CCaravanWork::GetCmdListItemName(int cmdListIdx, int* firstCmdIdx, int* item
 	}
 
 	if (groupedCount > 1) {
+		short* cur2 = (short*)((char*)this + extraOff);
 		for (int n = cmdListIdx; n >= 0; n--) {
-			if (m_commandListExtra[cmdListIdx] != -1) {
+			if (*(short*)((char*)cur2 + 0x214) != -1) {
 				break;
 			}
+			cur2--;
 			cmdListIdx--;
 		}
 
@@ -2889,11 +2886,8 @@ void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
 
 	if ((*reinterpret_cast<int*>(&Game.m_gameWork.m_scriptSysVal0) == 1) &&
 		(Game.m_gameWork.m_bossArtifactStageIndex < 0xF)) {
-		CGame::CBossArtifactStage* bossArtifacts =
-			&Game.m_bossArtifactBase[Game.m_gameWork.m_bossArtifactStageIndex];
-		short artifactScale = bossArtifacts->m_entries[8].m_values[0];
 		m_maxHp = (unsigned short)((float)m_maxHp *
-								   ((((float)artifactScale) * kGObjWorkStatusScaleStep) + kGObjWorkStatusScaleBase));
+								   ((((float)Game.m_bossArtifactBase[Game.m_gameWork.m_bossArtifactStageIndex].m_entries[8].m_values[0]) * kGObjWorkStatusScaleStep) + kGObjWorkStatusScaleBase));
 	}
 
 	m_hp = m_maxHp;

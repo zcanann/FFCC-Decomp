@@ -1102,21 +1102,32 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		int doPaint = 1;
 		_GXColor brushColor;
 		switch (Chara.MogFur().m_commandIndex) {
-		case 0:
-			brushColor = CColor(0xF, 4, 4, 2).color;
+		case 0: {
+			const _GXColor c = CColor(0xF, 4, 4, 2).color;
+			brushColor = c;
 			break;
-		case 1:
-			brushColor = CColor(4, 8, 0xF, 2).color;
+		}
+		case 1: {
+			const _GXColor c = CColor(4, 8, 0xF, 2).color;
+			brushColor = c;
 			break;
-		case 2:
-			brushColor = CColor(4, 0xF, 4, 2).color;
+		}
+		case 2: {
+			const _GXColor c = CColor(4, 0xF, 4, 2).color;
+			brushColor = c;
 			break;
-		case 3:
-			brushColor = CColor(0xF, 0xF, 0xF, 4).color;
+		}
+		case 3: {
+			const _GXColor c = CColor(0xF, 0xF, 0xF, 4).color;
+			brushColor = c;
 			doPaint = ((static_cast<int>(System.m_frameCounter) % 4) == 0) ? 1 : 0;
 			break;
+		}
 		case 4:
-			brushColor = CColor(0, 0, 0, 2).color;
+			{
+				const _GXColor c = CColor(0, 0, 0, 2).color;
+				brushColor = c;
+			}
 			eraseMode = 1;
 			doPaint = ((static_cast<int>(System.m_frameCounter) % 4) == 0) ? 1 : 0;
 			break;

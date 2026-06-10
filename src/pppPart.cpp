@@ -383,50 +383,41 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 		}
 
 		_pppMngSt* selectedMngSt = 0;
+		_pppMngSt* candidate;
 		int selectedPrio = 1;
-		int selectedPrioTime = 0;
+		s32 i;
+		s8* deniedPtr = (s8*)denied;
+		u8* mngBase = (u8*)&PartMng;
+		int selectedPrioTime;
 
-		for (s32 i = 0; i < 0x180; i += 2)
+		for (i = 0; i < 0x180; i++)
 		{
-			_pppMngSt* candidateA = &PartMng.m_pppMng[i];
-			if (denied[i] == 0 && candidateA->m_baseTime != -0x1000 && candidateA->m_kind != 0)
+			if (deniedPtr[0] == 0)
 			{
-				u8 prioA = candidateA->m_prio;
-				if (prioA > 1)
+				candidate = (_pppMngSt*)(mngBase + 0x2a18);
+				if (*(s32*)(mngBase + 0x2a2c) != -0x1000 && candidate->m_kind != 0)
 				{
-					if (selectedPrio < prioA)
+					u8 prio = candidate->m_prio;
+					if (prio > 1)
 					{
-						selectedPrioTime = candidateA->m_prioTime;
-						selectedPrio = prioA;
-						selectedMngSt = candidateA;
-					}
-					else if (selectedPrio == prioA && selectedPrioTime < candidateA->m_prioTime)
-					{
-						selectedPrioTime = candidateA->m_prioTime;
-						selectedMngSt = candidateA;
+						if (selectedPrio < prio)
+						{
+							selectedPrioTime = candidate->m_prioTime;
+							selectedPrio = prio;
+							selectedMngSt = candidate;
+						}
+						else if (selectedPrio == prio && selectedPrioTime < candidate->m_prioTime)
+						{
+							selectedPrioTime = candidate->m_prioTime;
+							selectedMngSt = candidate;
+						}
 					}
 				}
 			}
-			_pppMngSt* candidateB = candidateA + 1;
-			if (denied[i + 1] == 0 && candidateB->m_baseTime != -0x1000 && candidateB->m_kind != 0)
-			{
-				u8 prioB = candidateB->m_prio;
-				if (prioB > 1)
-				{
-					if (selectedPrio < prioB)
-					{
-						selectedPrioTime = candidateB->m_prioTime;
-						selectedPrio = prioB;
-						selectedMngSt = candidateB;
-					}
-					else if (selectedPrio == prioB && selectedPrioTime < candidateB->m_prioTime)
-					{
-						selectedPrioTime = candidateB->m_prioTime;
-						selectedMngSt = candidateB;
-					}
-				}
-			}
+			deniedPtr++;
+			mngBase += sizeof(_pppMngSt);
 		}
+
 
 		if (selectedMngSt == 0)
 		{
@@ -1634,51 +1625,41 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 			}
 
 			_pppMngSt* selectedMngSt = 0;
+			_pppMngSt* candidate;
 			int selectedPrio = 1;
-			int selectedPrioTime = 0;
+			s32 i;
+			s8* deniedPtr = (s8*)denied;
+			u8* mngBase = (u8*)&PartMng;
+			int selectedPrioTime;
 
-			for (int i = 0; i < 0x180; i += 2)
+			for (i = 0; i < 0x180; i++)
 			{
-				_pppMngSt* candidateA = &PartMng.m_pppMng[i];
-				if (denied[i] == 0 && candidateA->m_baseTime != -0x1000 && candidateA->m_kind != 0)
+				if (deniedPtr[0] == 0)
 				{
-					u8 prioA = candidateA->m_prio;
-					if (prioA > 1)
+					candidate = (_pppMngSt*)(mngBase + 0x2a18);
+					if (*(s32*)(mngBase + 0x2a2c) != -0x1000 && candidate->m_kind != 0)
 					{
-						if (selectedPrio < prioA)
+						u8 prio = candidate->m_prio;
+						if (prio > 1)
 						{
-							selectedPrioTime = candidateA->m_prioTime;
-							selectedPrio = prioA;
-							selectedMngSt = candidateA;
-						}
-						else if (selectedPrio == prioA && selectedPrioTime < candidateA->m_prioTime)
-						{
-							selectedPrioTime = candidateA->m_prioTime;
-							selectedMngSt = candidateA;
+							if (selectedPrio < prio)
+							{
+								selectedPrioTime = candidate->m_prioTime;
+								selectedPrio = prio;
+								selectedMngSt = candidate;
+							}
+							else if (selectedPrio == prio && selectedPrioTime < candidate->m_prioTime)
+							{
+								selectedPrioTime = candidate->m_prioTime;
+								selectedMngSt = candidate;
+							}
 						}
 					}
 				}
-
-				_pppMngSt* candidateB = candidateA + 1;
-				if (denied[i + 1] == 0 && candidateB->m_baseTime != -0x1000 && candidateB->m_kind != 0)
-				{
-					u8 prioB = candidateB->m_prio;
-					if (prioB > 1)
-					{
-						if (selectedPrio < prioB)
-						{
-							selectedPrioTime = candidateB->m_prioTime;
-							selectedPrio = prioB;
-							selectedMngSt = candidateB;
-						}
-						else if (selectedPrio == prioB && selectedPrioTime < candidateB->m_prioTime)
-						{
-							selectedPrioTime = candidateB->m_prioTime;
-							selectedMngSt = candidateB;
-						}
-					}
-				}
+				deniedPtr++;
+				mngBase += sizeof(_pppMngSt);
 			}
+
 
 			if (selectedMngSt == 0)
 			{

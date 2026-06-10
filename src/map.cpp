@@ -2226,20 +2226,9 @@ int CMapMng::ReadOtm(char* mapName)
         GetMapShadowArray()[i]->Init();
     }
 
-    CMapObj* mapObj = GetMapObjArray();
-    CMapObj* mapObjEnd = m_mapObjArray + m_mapObjCount;
-    for (; mapObj < mapObjEnd; mapObj++) {
-        if (mapObj->m_parent == 0) {
-            goto rootFound;
-        }
-    }
-    mapObj = 0;
-rootFound:
-    m_rootMapObj = mapObj;
+    m_rootMapObj = SearchChildMapObj(GetMapObjArray(), 0);
     if (m_rootMapObj == 0) {
-        if (System.m_execParam != 0) {
-            System.Printf(const_cast<char*>(s_error_root_mapobj_not_found));
-        }
+        System.Printf(const_cast<char*>(s_error_root_mapobj_not_found));
         return 0;
     }
 

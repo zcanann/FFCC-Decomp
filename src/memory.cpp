@@ -629,6 +629,7 @@ CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int mode
 
         if (stage == &modeData.m_freeList) {
             System.Printf(const_cast<char*>(strBase + 0x6d4));
+            return (CMemory::CStage*)nullptr;
         } else {
             CStage* list = &modeData.m_activeList;
             do {

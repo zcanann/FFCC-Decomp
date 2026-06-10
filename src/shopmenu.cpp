@@ -1828,58 +1828,60 @@ void CShopMenu::DrawShopBase()
     }
 
     Graphic.SetDrawDoneDebugData(3);
-    _GXColor fadeA;
-    fadeA.r = 0xFF; fadeA.g = 0xFF; fadeA.b = 0xFF; fadeA.a = 0x00;
-    _GXColor fadeB;
-    fadeB.r = 0xFF; fadeB.g = 0xFF; fadeB.b = 0xFF; fadeB.a = 0xFF;
-    _GXColor fadeC;
-    fadeC.r = 0xFF; fadeC.g = 0xFF; fadeC.b = 0xFF; fadeC.a = 0x00;
-    _GXColor fadeD;
-    fadeD.r = 0xFF; fadeD.g = 0xFF; fadeD.b = 0xFF; fadeD.a = 0xFF;
-    drawShapeSeqGrouad(9, 0, 0x1C, panelY + 0x22, FLOAT_80332d78, FLOAT_80332DC8, fadeA, fadeB, fadeC, fadeD);
+    _GXColor colorA;
+    _GXColor colorB;
+    _GXColor colorC;
+    _GXColor colorD;
+    colorA.r = 0xFF; colorA.g = 0xFF; colorA.b = 0xFF; colorA.a = 0x00;
+    colorC.r = 0xFF; colorC.g = 0xFF; colorC.b = 0xFF; colorC.a = 0x00;
+    colorB.r = 0xFF; colorB.g = 0xFF; colorB.b = 0xFF; colorB.a = 0xFF;
+    colorD.r = 0xFF; colorD.g = 0xFF; colorD.b = 0xFF; colorD.a = 0xFF;
+    drawShapeSeqGrouad(9, 0, 0x1C, panelY + 0x22, FLOAT_80332d78, FLOAT_80332DC8, colorA, colorB, colorC, colorD);
 
-    _GXColor whiteA;
-    whiteA.r = 0xFF; whiteA.g = 0xFF; whiteA.b = 0xFF; whiteA.a = 0xFF;
-    _GXColor whiteB;
-    whiteB.r = 0xFF; whiteB.g = 0xFF; whiteB.b = 0xFF; whiteB.a = 0xFF;
-    _GXColor whiteC;
-    whiteC.r = 0xFF; whiteC.g = 0xFF; whiteC.b = 0xFF; whiteC.a = 0xFF;
-    _GXColor whiteD;
-    whiteD.r = 0xFF; whiteD.g = 0xFF; whiteD.b = 0xFF; whiteD.a = 0xFF;
-    unsigned int x = 0x3C;
+    colorA.r = 0xFF; colorA.g = 0xFF; colorA.b = 0xFF; colorA.a = 0xFF;
+    colorC.r = 0xFF; colorC.g = 0xFF; colorC.b = 0xFF; colorC.a = 0xFF;
+    colorB.r = 0xFF; colorB.g = 0xFF; colorB.b = 0xFF; colorB.a = 0xFF;
+    colorD.r = 0xFF; colorD.g = 0xFF; colorD.b = 0xFF; colorD.a = 0xFF;
+    int x = 0x3C;
     while (x < 0x25C) {
-        drawShapeSeqGrouad(9, 0, x, panelY + 0x22, FLOAT_80332d78, FLOAT_80332DC8, whiteA, whiteB, whiteC, whiteD);
+        drawShapeSeqGrouad(9, 0, x, panelY + 0x22, FLOAT_80332d78, FLOAT_80332DC8, colorA, colorB, colorC, colorD);
         x += 0x20;
     }
 
-    _GXColor endA;
-    endA.r = 0xFF; endA.g = 0xFF; endA.b = 0xFF; endA.a = 0xFF;
-    _GXColor endB;
-    endB.r = 0xFF; endB.g = 0xFF; endB.b = 0xFF; endB.a = 0x00;
-    _GXColor endC;
-    endC.r = 0xFF; endC.g = 0xFF; endC.b = 0xFF; endC.a = 0xFF;
-    _GXColor endD;
-    endD.r = 0xFF; endD.g = 0xFF; endD.b = 0xFF; endD.a = 0x00;
-    drawShapeSeqGrouad(9, 0, x, panelY + 0x22, FLOAT_80332d78, FLOAT_80332DC8, endA, endB, endC, endD);
+    colorA.r = 0xFF; colorA.g = 0xFF; colorA.b = 0xFF; colorA.a = 0xFF;
+    colorC.r = 0xFF; colorC.g = 0xFF; colorC.b = 0xFF; colorC.a = 0xFF;
+    colorB.r = 0xFF; colorB.g = 0xFF; colorB.b = 0xFF; colorB.a = 0x00;
+    colorD.r = 0xFF; colorD.g = 0xFF; colorD.b = 0xFF; colorD.a = 0x00;
+    drawShapeSeqGrouad(9, 0, x, panelY + 0x22, FLOAT_80332d78, FLOAT_80332DC8, colorA, colorB, colorC, colorD);
     Graphic.SetDrawDoneDebugData(4);
 
     if (m_mode >= 3) {
-        int listX = (m_mode <= 8) ? 0x64 : 0x118;
-        for (int barX = listX + 0x48; barX < 0x244; barX += 8) {
+        int listX;
+        int listY;
+        if (m_mode >= 9) {
+            listX = 0x118;
+            listY = 0xAA;
+        } else {
+            listX = 0x64;
+            listY = 0xAA;
+        }
+        int barX;
+        for (barX = listX + 0x48; barX < 0x244; barX += 8) {
             Graphic.SetDrawDoneDebugData(5);
-            drawShapeSeq(0x10, 0, barX, 0x11E, 0xFF, 0, 0, FLOAT_80332D9C, 0);
+            drawShapeSeq(0x10, 0, barX, listY + 0x74, 0xFF, 0, 0, FLOAT_80332D9C, 0);
             Graphic.SetDrawDoneDebugData(6);
         }
         Graphic.SetDrawDoneDebugData(7);
-        drawShapeSeq(0xD, 0, listX + 0x46, 0xA7, 0xFF, 0, 0, FLOAT_80332D9C, 0);
+        drawShapeSeq(0xD, 0, listX + 0x46, listY - 3, 0xFF, 0, 0, FLOAT_80332D9C, 0);
         Graphic.SetDrawDoneDebugData(8);
         Graphic.SetDrawDoneDebugData(9);
-        drawShapeSeq(8, 0, 0x244, 0x11E, 0xFF, 0, 0, FLOAT_80332D9C, 0);
+        drawShapeSeq(8, 0, barX, listY + 0x74, 0xFF, 0, 0, FLOAT_80332D9C, 0);
         Graphic.SetDrawDoneDebugData(10);
     }
 
     if (m_mode <= 8) {
-        for (int sideX = 0x4E; sideX > 0x32; sideX -= 0x10) {
+        int sideX;
+        for (sideX = 0x4E; sideX > 0x32; sideX -= 0x10) {
             Graphic.SetDrawDoneDebugData(0xB);
             drawShapeSeq(0xC, 0, sideX, 0x174, 0xFF, 0, 0, FLOAT_80332D9C, 0);
             Graphic.SetDrawDoneDebugData(0xC);
@@ -1887,7 +1889,7 @@ void CShopMenu::DrawShopBase()
         Graphic.SetDrawDoneDebugData(0xD);
         drawShapeSeq(0xB, 0, 0x7E, 0x150, 0xFF, 0, 0, FLOAT_80332D9C, 0);
         Graphic.SetDrawDoneDebugData(0xE);
-        drawShapeSeq(8, 0, 0x2E, 0x170, 0xFF, 0, 0, FLOAT_80332D9C, 0);
+        drawShapeSeq(8, 0, sideX, 0x170, 0xFF, 0, 0, FLOAT_80332D9C, 0);
         Graphic.SetDrawDoneDebugData(0xF);
         CFont* font = MenuPcs.m_fonts[4];
         font->SetMargin(FLOAT_80332d28);

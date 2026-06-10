@@ -1784,14 +1784,16 @@ void CGPartyObj::onFrameStat()
 		    reinterpret_cast<int*>(m_scriptHandle)[0xED] == 0 &&
 		    Game.m_partyObjArr[1] != nullptr &&
 		    Game.m_partyObjArr[1]->m_lastStateId == 0) {
+			CGObject* chaliceObj = reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0);
 			unsigned short held = getPadHeldForSlot(static_cast<signed char>(m_animStateMisc));
+			int heldMask = held & 0x400;
 			unsigned short up = getPadButtonUpForSlot(static_cast<char>(m_animStateMisc));
 			if ((up & 0x400) != 0) {
 				if (sGhostMogMenuWork.holdTimer < 10 &&
-				    party.carryObject != reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)) {
+				    party.carryObject != chaliceObj) {
 					sGhostMogMenuWork.flags.carryActive = (party.carryObject != nullptr);
 				}
-			} else if ((held & 0x400) != 0) {
+			} else if (heldMask != 0) {
 				sGhostMogMenuWork.holdTimer++;
 				if (sGhostMogMenuWork.holdTimer >= 10 && sGhostMogMenuWork.mood == 0) {
 					sGhostMogMenuWork.mood = 2;

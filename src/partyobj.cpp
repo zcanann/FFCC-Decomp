@@ -4990,13 +4990,16 @@ void CGPartyObj::ghostPartyMog()
 					break;
 				}
 				float innerScale;
-				if (innerMode == 2) {
-					innerScale = FLOAT_80331A58 * ramp + FLOAT_80331A58;
-				} else {
+				switch (innerMode) {
+				default:
 					innerScale = kMonObjOne;
-					if (innerMode < 2 && innerMode != 0) {
-						innerScale = FLOAT_80331A58 * (kMonObjOne - ramp) + FLOAT_80331A58;
-					}
+					break;
+				case 1:
+					innerScale = FLOAT_80331A58 * (kMonObjOne - ramp) + FLOAT_80331A58;
+					break;
+				case 2:
+					innerScale = FLOAT_80331A58 * ramp + FLOAT_80331A58;
+					break;
 				}
 				if (static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x38)) >= static_cast<int>(FLOAT_80331A5C * innerScale)) {
 					bossState = 3;

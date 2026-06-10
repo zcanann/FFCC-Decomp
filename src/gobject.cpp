@@ -3006,17 +3006,9 @@ int CGObject::IsAnimFinished(int mode)
                             const float lastAttr = m_lastBgAttr;
                             if (static_cast<double>(lastAttr)
                                 < static_cast<double>(sZeroFloat)) {
-                                result =
-                                    (static_cast<u32>(static_cast<u8>(
-                                         (static_cast<double>(sZeroFloat) >= threshold) << 1))
-                                     << 0x1C)
-                                    >> 0x1D;
+                                result = static_cast<double>(sZeroFloat) >= threshold;
                             } else {
-                                result =
-                                    (static_cast<u32>(static_cast<u8>(
-                                         (static_cast<double>(animSpan - sAnimFrameOffset) < threshold) << 3))
-                                     << 0x1C)
-                                    >> 0x1F;
+                                result = static_cast<double>(animSpan - sAnimFrameOffset) < threshold;
                             }
                         }
                     } else {
@@ -3024,7 +3016,7 @@ int CGObject::IsAnimFinished(int mode)
                     }
                 }
 
-                result = static_cast<u32>(-static_cast<int>(result)) >> 0x1F;
+                return static_cast<unsigned char>(result != 0);
             }
 
             return result & 0xFF;

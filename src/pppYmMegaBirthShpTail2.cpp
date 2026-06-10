@@ -151,6 +151,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
             Vec* history = (Vec*)(particle + 0x40);
             float drawScale;
             float drawScaleStep;
+            s32 trailStartIndex;
             float segLen;
             float segProgress = 0.0f;
             float segRemaining;
@@ -159,6 +160,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
             u16 frameCount = frameCountRaw;
 
             pppUnitMatrix(drawMtx);
+            trailStartIndex = *(u8*)(particle + 0x38);
             drawScale = *(float*)(step + 0x70);
             drawScaleStep = (drawScale - *(float*)(step + 0x74)) / stepDivisor;
             {
@@ -240,7 +242,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
                     if (wrap) {
                         trailNextIndex = 0;
                     }
-                    if (trailNextIndex == *(u8*)(particle + 0x38)) {
+                    if (trailNextIndex == trailStartIndex) {
                         goto next_particle;
                     }
 

@@ -612,10 +612,10 @@ void CGObject::move()
                 const float stickX = (Pad.m_debugPadLock != 0 || (player == 0 && Pad.m_debugPadPort != -1))
                     ? sZeroFloat
                     : Pad.GetPadInputs()[RemapPadSlot(&Pad, player)].stickXF;
+                moveVec.x = moveVec.x - stickX;
                 const float stickY = (Pad.m_debugPadLock != 0 || (player == 0 && Pad.m_debugPadPort != -1))
                     ? sZeroFloat
                     : Pad.GetPadInputs()[RemapPadSlot(&Pad, player)].stickYF;
-                moveVec.x = moveVec.x - stickX;
                 moveVec.z = moveVec.z + stickY;
                 if ((moveVec.x != sZeroFloat) || (moveVec.z != sZeroFloat)) {
                     hasStickInput = 1;

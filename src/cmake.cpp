@@ -1487,24 +1487,35 @@ void CMenuPcs::CmakeResultDraw()
         DrawInit();
     }
 
-    float panelAlphaValue = alpha;
     if ((CmakeState(this)->m_mode == 2) && (CmakeState(this)->m_resultDir < 0)) {
-        panelAlphaValue = 1.0f;
-    }
-    int panelAlpha = static_cast<int>(255.0f * panelAlphaValue);
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
+        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-    GXColor panelColor;
-    panelColor.r = 0xFF;
-    panelColor.g = 0xFF;
-    panelColor.b = 0xFF;
-    panelColor.a = static_cast<unsigned char>(panelAlpha);
-    GXSetChanMatColor(GX_COLOR0A0, panelColor);
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
-    MenuPcs.DrawRect(
-        0, 192.0f, 56.0f, 416.0f, 264.0f,
-        0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+        GXColor panelColor;
+        panelColor.r = 0xFF;
+        panelColor.g = 0xFF;
+        panelColor.b = 0xFF;
+        panelColor.a = 0xFF;
+        GXSetChanMatColor(GX_COLOR0A0, panelColor);
+        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
+        MenuPcs.DrawRect(
+            0, 192.0f, 56.0f, 416.0f, 264.0f,
+            0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+    } else {
+        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
+        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+
+        GXColor panelColor;
+        panelColor.r = 0xFF;
+        panelColor.g = 0xFF;
+        panelColor.b = 0xFF;
+        panelColor.a = static_cast<unsigned char>(255.0f * alpha);
+        GXSetChanMatColor(GX_COLOR0A0, panelColor);
+        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
+        MenuPcs.DrawRect(
+            0, 192.0f, 56.0f, 416.0f, 264.0f,
+            0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+    }
 
     if ((CmakeState(this)->m_mode == 2) && (CmakeState(this)->m_resultDir > 0)) {
         DrawCmakeTitle(6, 1.0f, alpha);

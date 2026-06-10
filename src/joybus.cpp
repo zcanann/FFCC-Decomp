@@ -241,6 +241,8 @@ JoyBus::~JoyBus()
  * Address:	TODO
  * Size:	TODO
  */
+#pragma push
+#pragma opt_propagation off
 void JoyBus::CreateInit()
 {
     memset(m_sendBuffer, 0, sizeof(m_sendBuffer));
@@ -254,21 +256,27 @@ void JoyBus::CreateInit()
     m_mapId = 0xFF;
     m_stageId = 0xFF;
 
-    for (int i = 0; i < 4; i++)
     {
-        m_threadParams[i].m_gbaStatus = 1;
-        m_threadParams[i].m_padType = 0x40;
+        int i = 0;
+        unsigned char zeroB = (unsigned char)i;
+        unsigned int zeroW = (unsigned int)i;
 
-        m_cmdCount[i] = 0;
-        m_secCmdCount[i] = 0;
+        for (; i < 4; i++)
+        {
+            m_threadParams[i].m_gbaStatus = 1;
+            m_threadParams[i].m_padType = 0x40;
 
-        OSInitSemaphore(&m_accessSemaphores[i], 1);
+            m_cmdCount[i] = zeroW;
+            m_secCmdCount[i] = zeroW;
 
-        m_ctrlModeArr[i] = 0;
-        m_nextModeTypeArr[i] = 0;
-        m_modeXArr[i] = 0;
-        m_stateCodeArr[i] = 0xFF;
-        m_stateFlagArr[i] = 0;
+            OSInitSemaphore(&m_accessSemaphores[i], 1);
+
+            m_ctrlModeArr[i] = zeroB;
+            m_nextModeTypeArr[i] = zeroB;
+            m_modeXArr[i] = zeroB;
+            m_stateCodeArr[i] = 0xFF;
+            m_stateFlagArr[i] = zeroB;
+        }
     }
 
     if (m_gbaBootImage == 0)
@@ -344,6 +352,7 @@ void JoyBus::CreateInit()
         }
     }
 }
+#pragma pop
 
 
 /*
@@ -402,21 +411,27 @@ void JoyBus::Destroy()
     m_mapId = 0xFF;
     m_stageId = 0xFF;
 
-    for (int i = 0; i < 4; i++)
     {
-        m_threadParams[i].m_gbaStatus = 1;
-        m_threadParams[i].m_padType = 0x40;
+        int i = 0;
+        unsigned char zeroB = (unsigned char)i;
+        unsigned int zeroW = (unsigned int)i;
 
-        m_cmdCount[i] = 0;
-        m_secCmdCount[i] = 0;
+        for (; i < 4; i++)
+        {
+            m_threadParams[i].m_gbaStatus = 1;
+            m_threadParams[i].m_padType = 0x40;
 
-        OSInitSemaphore(&m_accessSemaphores[i], 1);
+            m_cmdCount[i] = zeroW;
+            m_secCmdCount[i] = zeroW;
 
-        m_ctrlModeArr[i] = 0;
-        m_nextModeTypeArr[i] = 0;
-        m_modeXArr[i] = 0;
-        m_stateCodeArr[i] = 0xFF;
-        m_stateFlagArr[i] = 0;
+            OSInitSemaphore(&m_accessSemaphores[i], 1);
+
+            m_ctrlModeArr[i] = zeroB;
+            m_nextModeTypeArr[i] = zeroB;
+            m_modeXArr[i] = zeroB;
+            m_stateCodeArr[i] = 0xFF;
+            m_stateFlagArr[i] = zeroB;
+        }
     }
 
     m_fileBaseA_dup = 0;
@@ -428,6 +443,8 @@ void JoyBus::Destroy()
  * Address:	TODO
  * Size:	TODO
  */
+#pragma push
+#pragma opt_common_subs off
 int JoyBus::LoadBin()
 {
     if (static_cast<signed char>(m_binLoaded) != 0)
@@ -466,34 +483,8 @@ int JoyBus::LoadBin()
 
             int idx = 0xBC;
 
-            int sum = 0xE7 - (unsigned char)m_gbaBootImage[0xA0];
-            sum -= (unsigned char)m_gbaBootImage[0xA1];
-            sum -= (unsigned char)m_gbaBootImage[0xA2];
-            sum -= (unsigned char)m_gbaBootImage[0xA3];
-            sum -= (unsigned char)m_gbaBootImage[0xA4];
-            sum -= (unsigned char)m_gbaBootImage[0xA5];
-            sum -= (unsigned char)m_gbaBootImage[0xA6];
-            sum -= (unsigned char)m_gbaBootImage[0xA7];
-            sum -= (unsigned char)m_gbaBootImage[0xA8];
-            sum -= (unsigned char)m_gbaBootImage[0xA9];
-            sum -= (unsigned char)m_gbaBootImage[0xAA];
-            sum -= (unsigned char)m_gbaBootImage[0xAB];
-            sum -= (unsigned char)m_gbaBootImage[0xAC];
-            sum -= (unsigned char)m_gbaBootImage[0xAD];
-            sum -= (unsigned char)m_gbaBootImage[0xAE];
-            sum -= (unsigned char)m_gbaBootImage[0xAF];
-            sum -= (unsigned char)m_gbaBootImage[0xB0];
-            sum -= (unsigned char)m_gbaBootImage[0xB1];
-            sum -= (unsigned char)m_gbaBootImage[0xB2];
-            sum -= (unsigned char)m_gbaBootImage[0xB3];
-            sum -= (unsigned char)m_gbaBootImage[0xB4];
-            sum -= (unsigned char)m_gbaBootImage[0xB5];
-            sum -= (unsigned char)m_gbaBootImage[0xB6];
-            sum -= (unsigned char)m_gbaBootImage[0xB7];
-            sum -= (unsigned char)m_gbaBootImage[0xB8];
-            sum -= (unsigned char)m_gbaBootImage[0xB9];
-            sum -= (unsigned char)m_gbaBootImage[0xBA];
-            sum -= (unsigned char)m_gbaBootImage[0xBB];
+            unsigned char* buf = (unsigned char*)m_gbaBootImage;
+            int sum = 0xE7 - buf[0xA0] - buf[0xA1] - buf[0xA2] - buf[0xA3] - buf[0xA4] - buf[0xA5] - buf[0xA6] - buf[0xA7] - buf[0xA8] - buf[0xA9] - buf[0xAA] - buf[0xAB] - buf[0xAC] - buf[0xAD] - buf[0xAE] - buf[0xAF] - buf[0xB0] - buf[0xB1] - buf[0xB2] - buf[0xB3] - buf[0xB4] - buf[0xB5] - buf[0xB6] - buf[0xB7] - buf[0xB8] - buf[0xB9] - buf[0xBA] - buf[0xBB];
 
             if (idx < 0xBD)
             {
@@ -514,6 +505,7 @@ int JoyBus::LoadBin()
 
     return 0;
 }
+#pragma pop
 
 
 /*
@@ -2836,6 +2828,8 @@ int JoyBus::RecvGBA(ThreadParam* threadParam, unsigned int* recvBuffer)
     return 2;
 }
 
+extern const unsigned int kJoyBusCmdOpMask = 0x0000003F;
+
 /*
  * --INFO--
  * Address:	TODO
@@ -3042,9 +3036,10 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
 
             if ((cmdBytes[0] >> 6) == 0)
             {
-                OSSemaphore* sem = &m_accessSemaphores[threadParam->m_portIndex];
+                const int port = threadParam->m_portIndex;
+                OSSemaphore* sem = &m_accessSemaphores[port];
                 OSWaitSemaphore(sem);
-                memset(&m_recvBuffer[threadParam->m_portIndex], 0, sizeof(m_recvBuffer[threadParam->m_portIndex]));
+                memset(&m_recvBuffer[port], 0, sizeof(m_recvBuffer[port]));
                 OSSignalSemaphore(sem);
             }
 
@@ -3117,9 +3112,14 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
 
                     SetSendQueue(&m_threadParams[threadParam->m_portIndex], resendCmd);
 
-                    OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-                    memset(&m_recvBuffer[threadParam->m_portIndex], 0, sizeof(m_recvBuffer[threadParam->m_portIndex]));
-                    OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+                    {
+                        OSSemaphore* sem;
+                        const int port = threadParam->m_portIndex;
+                        sem = &m_accessSemaphores[port];
+                        OSWaitSemaphore(sem);
+                        memset(&m_recvBuffer[port], 0, sizeof(m_recvBuffer[port]));
+                        OSSignalSemaphore(sem);
+                    }
                 }
             }
         }
@@ -3139,17 +3139,17 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
         {
             OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
-            unsigned int newCount = 0;
+            extern const unsigned int kJoyBusCmdOpMask;
+            int newCount = 0;
 
             for (int i = 0; i < (int)m_cmdCount[threadParam->m_portIndex]; ++i)
             {
-                unsigned int cmd = m_cmdQueueData[threadParam->m_portIndex][i];
-                unsigned char op = static_cast<unsigned char>(cmd >> 24) & 0x3F;
+                unsigned char op = (unsigned char)(*(unsigned char*)&m_cmdQueueData[threadParam->m_portIndex][i] & kJoyBusCmdOpMask);
 
                 if (op == 0x0A || op == 0x10 || op == 0x14 ||
                     op == 0x1B || op == 0x13 || op == 0x09)
                 {
-                    m_recvQueueEntriesArr[threadParam->m_portIndex][newCount++] = cmd;
+                    m_recvQueueEntriesArr[threadParam->m_portIndex][newCount++] = m_cmdQueueData[threadParam->m_portIndex][i];
                 }
             }
 
@@ -3178,21 +3178,21 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
         if (m_stateFlagArr[threadParam->m_portIndex] != 0 &&
             m_stateCodeArr[threadParam->m_portIndex] != 0x09 &&
             state != 0x05 &&
-            state > 0x20 && state < 0x29)
+            state >= 0x21 && state <= 0x28)
         {
             OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
-            unsigned int newCount = 0;
+            extern const unsigned int kJoyBusCmdOpMask;
+            int newCount = 0;
 
-            for (unsigned int i = 0; i < m_cmdCount[threadParam->m_portIndex]; ++i)
+            for (int i = 0; i < (int)m_cmdCount[threadParam->m_portIndex]; ++i)
             {
-                int cmd = m_cmdQueueData[threadParam->m_portIndex][i];
-                unsigned char op = static_cast<signed char>(cmd >> 24) & 0x3F;
+                unsigned char op = (unsigned char)(*(unsigned char*)&m_cmdQueueData[threadParam->m_portIndex][i] & kJoyBusCmdOpMask);
 
                 if (op == 0x0A || op == 0x10 || op == 0x14 ||
                     op == 0x1B || op == 0x13 || op == 0x09)
                 {
-                    m_recvQueueEntriesArr[threadParam->m_portIndex][newCount++] = cmd;
+                    m_recvQueueEntriesArr[threadParam->m_portIndex][newCount++] = m_cmdQueueData[threadParam->m_portIndex][i];
                 }
             }
 
@@ -4196,6 +4196,7 @@ int JoyBus::SendMBase(ThreadParam* threadParam)
 int JoyBus::SendPpos(ThreadParam* threadParam)
 {
     int result = 0;
+    int cnt;
 
     unsigned char& state = threadParam->m_pposCounter;
     unsigned char* posBytes = m_playerPosPacketBuffer[threadParam->m_portIndex] + 2;
@@ -4223,7 +4224,8 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 
     case 1:
     {
-        int sent = m_pposWordIndex[threadParam->m_portIndex];
+        cnt = m_pposWordIndex[threadParam->m_portIndex];
+        int sent = cnt;
         unsigned int* wordPtr = &posWords[sent];
 
         while (sent < (int)(signed char)m_cmdBuffer[threadParam->m_portIndex])
@@ -4259,11 +4261,9 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
         m_pposWordIndex[threadParam->m_portIndex] = 0;
         m_cmdBuffer[4 + threadParam->m_portIndex] = 0;
 
-        int enemyCount = 0;
+        GbaQue.GetEnemyPos(threadParam->m_portIndex, posWords, &cnt);
 
-        GbaQue.GetEnemyPos(threadParam->m_portIndex, posWords, &enemyCount);
-
-        m_cmdBuffer[4 + threadParam->m_portIndex] = (unsigned char)enemyCount;
+        m_cmdBuffer[4 + threadParam->m_portIndex] = (unsigned char)cnt;
 
         // If there are no enemies, skip straight to treasure (state 4)
         if (static_cast<signed char>(m_cmdBuffer[4 + threadParam->m_portIndex]) == 0)
@@ -4301,9 +4301,9 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 
         if (m_pposWordIndex[threadParam->m_portIndex] >= (int)(signed char)m_cmdBuffer[4 + threadParam->m_portIndex])
         {
+            state += 1;
             m_cmdBuffer[4 + threadParam->m_portIndex] = 0;
             m_pposWordIndex[threadParam->m_portIndex] = 0;
-            state += 1;
         }
 
         break;
@@ -4315,7 +4315,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
         m_pposWordIndex[threadParam->m_portIndex] = 0;
         m_cmdBuffer[4 + threadParam->m_portIndex] = 0;
 
-        int treasureCount = 0;
+        int treasureCount;
 
         GbaQue.GetTreasurePos(threadParam->m_portIndex, posWords, &treasureCount);
 
@@ -4387,6 +4387,8 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 }
 
 
+#pragma push
+#pragma opt_unroll_loops off
 /*
  * --INFO--
  * PAL Address: 0x800AB24C
@@ -4400,13 +4402,12 @@ int JoyBus::MakeJoyData(char* src, int length, unsigned int* outBuffer)
 {
     unsigned char* param_2 = reinterpret_cast<unsigned char*>(src);
     unsigned char* param_4 = reinterpret_cast<unsigned char*>(outBuffer);
-    unsigned char* pbVar1;
-    unsigned bVar2;
-    int iVar3;
-    unsigned char* pbVar4;
     unsigned int uVar5;
-    unsigned char* puVar6;
     int chunkCount;
+    unsigned char* pbVar4;
+    unsigned char* pbVar1;
+    int iVar3;
+    unsigned char* puVar6;
     unsigned int uVar8;
 
     uVar5 = 0xFFFF;
@@ -4414,14 +4415,13 @@ int JoyBus::MakeJoyData(char* src, int length, unsigned int* outBuffer)
     pbVar4 = param_2;
 
     while (--chunkCount >= 0) {
-        bVar2 = *pbVar4;
+        uVar5 = (((uVar5 & 0xFFFF) << 8) ^ static_cast<unsigned int>(JoyBusCrcTable[((uVar5 >> 8) & 0xFF) ^ static_cast<unsigned int>(*pbVar4)])) & 0xFFFF;
         pbVar4 = pbVar4 + 1;
-        uVar5 = (((uVar5 & 0xFFFF) << 8) ^ static_cast<unsigned int>(JoyBusCrcTable[((uVar5 >> 8) & 0xFF) ^ static_cast<unsigned int>(bVar2)])) & 0xFFFF;
     }
 
     unsigned short inv = static_cast<unsigned short>(~static_cast<unsigned short>(uVar5));
-    chunkCount = (length - 1) / 3;
     param_4[0] = 5;
+    chunkCount = (length - 1) / 3;
 
     if ((length - 1) - (chunkCount * 3) != 0) {
         chunkCount = chunkCount + 1;
@@ -4444,61 +4444,19 @@ int JoyBus::MakeJoyData(char* src, int length, unsigned int* outBuffer)
         param_4[7] = *param_2;
 
         if (1 < iVar3) {
-            uVar5 = static_cast<unsigned int>(iVar3 - 1);
-            uVar8 = uVar5 >> 2;
-            unsigned char marker = 0x85;
-
-            if (uVar8 != 0) {
-                do {
-                    puVar6[0] = marker;
-                    puVar6[1] = pbVar4[0];
-                    puVar6[2] = pbVar4[1];
-                    puVar6[3] = pbVar4[2];
-
-                    puVar6[4] = marker;
-                    puVar6[5] = pbVar4[3];
-                    puVar6[6] = pbVar4[4];
-                    puVar6[7] = pbVar4[5];
-
-                    puVar6[8] = marker;
-                    puVar6[9] = pbVar4[6];
-                    puVar6[10] = pbVar4[7];
-                    puVar6[11] = pbVar4[8];
-
-                    puVar6[12] = marker;
-                    puVar6[13] = pbVar4[9];
-                    puVar6[14] = pbVar4[10];
-
-                    pbVar1 = pbVar4 + 0x0B;
-                    pbVar4 = pbVar4 + 0x0C;
-
-                    puVar6[15] = *pbVar1;
-                    puVar6 = puVar6 + 0x10;
-
-                    uVar8 = uVar8 - 1;
-                } while (uVar8 != 0);
-
-                uVar5 = uVar5 & 3;
-                if (uVar5 == 0) {
-                    return iVar3;
-                }
+            int i;
+            for (i = 1; i < iVar3; i++) {
+                *puVar6++ = 0x85;
+                *puVar6++ = *pbVar4++;
+                *puVar6++ = *pbVar4++;
+                *puVar6++ = *pbVar4++;
             }
-
-            do {
-                puVar6[0] = marker;
-                puVar6[1] = pbVar4[0];
-                puVar6[2] = pbVar4[1];
-                pbVar1 = pbVar4 + 2;
-                pbVar4 = pbVar4 + 3;
-                puVar6[3] = *pbVar1;
-                puVar6 = puVar6 + 4;
-                uVar5 = uVar5 - 1;
-            } while (uVar5 != 0);
         }
     }
 
     return iVar3;
 }
+#pragma pop
 
 
 /*
@@ -5009,21 +4967,21 @@ int JoyBus::SendMapObjDrawFlg(ThreadParam* threadParam)
     {
         GbaQue.GetMapObjDrawFlg(&flgWord);
 
-        unsigned char* data = (unsigned char*)&flgWord;
+        volatile unsigned char* data = (volatile unsigned char*)&flgWord;
         unsigned char crcBytes[4];
-        crcBytes[3] = data[0];
-        crcBytes[2] = data[1];
-        crcBytes[1] = data[2];
-        crcBytes[0] = data[3];
-        unsigned char* crcData = crcBytes;
+        volatile unsigned char* q = crcBytes;
+        q[3] = data[0];
+        q[2] = data[1];
+        q[1] = data[2];
+        q[0] = data[3];
         unsigned int crc = 0xFFFF;
         int crcCount = 4;
+        unsigned char* crcData = crcBytes;
 
         while (--crcCount >= 0)
         {
-            unsigned char byte = *crcData++;
-            unsigned int index = (crc >> 8) ^ byte;
-            crc = (unsigned short)((crc << 8) ^ JoyBusCrcTable[index]);
+            crc = (((crc & 0xFFFF) << 8) ^ static_cast<unsigned int>(JoyBusCrcTable[((crc >> 8) & 0xFF) ^ static_cast<unsigned int>(*crcData)])) & 0xFFFF;
+            crcData = crcData + 1;
         }
 
         crc = ~(unsigned short)crc;
@@ -5032,8 +4990,8 @@ int JoyBus::SendMapObjDrawFlg(ThreadParam* threadParam)
         cmds[0] = 0;
         cmds[1] = 0;
         unsigned char* cmdBytes = (unsigned char*)cmds;
-        cmdBytes[0] = 0x16;
         cmdBytes[1] = (unsigned char)(crc & 0xFF);
+        cmdBytes[0] = 0x16;
         cmdBytes[2] = (unsigned char)((crc >> 8) & 0xFF);
         cmdBytes[3] = crcBytes[0];
         cmdBytes[4] = 0x56;
@@ -6800,17 +6758,20 @@ void JoyBus::RestartThread()
 
             Joybus.m_diskId = (char*)File.GetCurrentDiskID();
 
+            unsigned char* img;
+            unsigned char* p;
             int idx = 0xBC;
+            int sum;
 
             Joybus.m_gbaBootImage[0xAC] = Joybus.m_diskId[0];
             Joybus.m_gbaBootImage[0xAD] = Joybus.m_diskId[1];
             Joybus.m_gbaBootImage[0xAE] = Joybus.m_diskId[2];
             Joybus.m_gbaBootImage[0xAF] = Joybus.m_diskId[3];
 
-            unsigned char* img = (unsigned char*)Joybus.m_gbaBootImage;
-            unsigned char* p = img + 0xBC;
+            img = (unsigned char*)Joybus.m_gbaBootImage;
+            p = img + 0xBC;
 
-            int sum =
+            sum =
                 (
                     ((((((((((((((((((((((((((((0xE7
                     - img[0xA0])

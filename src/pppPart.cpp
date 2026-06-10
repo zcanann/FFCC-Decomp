@@ -1569,6 +1569,7 @@ void pppCacheLoadShape(short* shapeList, _pppDataHead* pppDataHead)
  */
 void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 {
+	int volatile runControl = runControlPrograms;
 	_pppProgSetDef* programSet = (_pppProgSetDef*)(pdt + 6);
 	ppvMng = pppMngSt;
 	pppMngSt->m_lifeEnd = (int)pdt[0];
@@ -1786,7 +1787,7 @@ DataValsAllocated:
 		pDataVals++;
 	}
 
-	if (runControlPrograms != 0)
+	if (runControl != 0)
 	{
 		int entryOffset = 0;
 		for (int i = 0; i < pppMngSt->m_numControlPrograms; i++)

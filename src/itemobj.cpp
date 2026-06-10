@@ -533,8 +533,8 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 		*(int*)(self + 0x554) = carryMode;
 
 		if (carryMode == 0) {
-			CVector attachOffset(kItemObjZero, kItemObjZero, kItemObjZero);
-			Vec* attachOffsetPtr = reinterpret_cast<Vec*>(&attachOffset);
+			const CVector& attachOffset = CVector(kItemObjZero, kItemObjZero, kItemObjZero);
+			Vec* attachOffsetPtr = reinterpret_cast<Vec*>(const_cast<CVector*>(&attachOffset));
 			bool useBossAttachName = false;
 
 			if (Game.m_gameWork.m_menuStageMode != 0) {

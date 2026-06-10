@@ -149,8 +149,8 @@ void CMapHit::Draw()
             }
         }
 
-        face++;
         faceIndex++;
+        face++;
     }
 
     GXClearVtxDesc();
@@ -160,35 +160,33 @@ void CMapHit::Draw()
     GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
 
     face = m_faces;
-    faceIndex = 0;
-    while (faceIndex < static_cast<int>(m_faceCount)) {
-        if ((face->m_drawFlags & 1) == 0) {
+    for (faceIndex = 0; faceIndex < static_cast<int>(m_faceCount); faceIndex++, face++) {
+        if ((face->m_drawFlags & 1) != 0) {
             face->m_drawFlags = 0;
         } else {
             face->m_drawFlags = 0;
-            face->m_drawFlags = 0;
-
-            GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
-            int i = 0;
-            while (i < static_cast<int>(face->m_vertexCount)) {
-                Vec* vertex = m_vertices + face->m_vertexIndices[i];
-                GXPosition3f32(vertex->x, vertex->y, vertex->z);
-                GXColor4u8(0x40, 0xFF, 0x40, 0xFF);
-                i++;
-            }
-
-            GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
-            i = static_cast<int>(face->m_vertexCount) - 1;
-            while (i >= 0) {
-                Vec* vertex = m_vertices + face->m_vertexIndices[i];
-                GXPosition3f32(vertex->x, vertex->y, vertex->z);
-                GXColor4u8(0x40, 0xFF, 0x40, 0xFF);
-                i--;
-            }
+            continue;
         }
 
-        face++;
-        faceIndex++;
+        face->m_drawFlags = 0;
+
+        GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
+        int i = 0;
+        while (i < static_cast<int>(face->m_vertexCount)) {
+            Vec* vertex = m_vertices + face->m_vertexIndices[i];
+            GXPosition3f32(vertex->x, vertex->y, vertex->z);
+            GXColor4u8(0x40, 0xFF, 0x40, 0xFF);
+            i++;
+        }
+
+        GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
+        i = static_cast<int>(face->m_vertexCount) - 1;
+        while (i >= 0) {
+            Vec* vertex = m_vertices + face->m_vertexIndices[i];
+            GXPosition3f32(vertex->x, vertex->y, vertex->z);
+            GXColor4u8(0x40, 0xFF, 0x40, 0xFF);
+            i--;
+        }
     }
 }
 

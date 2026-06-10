@@ -1677,17 +1677,8 @@ void CMes::Set(char* text, int param)
 
 			addString(&mText, 1);
 
-			float width = mLineWidth;
-			if (width < mMaxWidth) {
-				width = mMaxWidth;
-			}
-			mMaxWidth = width;
-
-			float height = mLineHeight;
-			if (height < mMaxHeight) {
-				height = mMaxHeight;
-			}
-			mMaxHeight = height;
+			mMaxWidth = (mLineWidth < mMaxWidth) ? mMaxWidth : mLineWidth;
+			mMaxHeight = (mLineHeight < mMaxHeight) ? mMaxHeight : mLineHeight;
 		}
 
 		memcpy(mFlagVars, flagBackup, sizeof(flagBackup));

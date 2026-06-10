@@ -1303,7 +1303,8 @@ void CGObject::bgAttribCollision()
     }
 
     {
-        if ((sZeroFloat != m_groundHitOffset.x) || (sZeroFloat != m_groundHitOffset.z)) {
+        const float cmpZero = sZeroFloat;
+        if ((cmpZero != m_groundHitOffset.x) || (cmpZero != m_groundHitOffset.z)) {
             if (HasLoadedModel(m_charaModelHandle)) {
                 CVector* probeMove = &CVector(sZeroFloat, sDownProbeDistance, sZeroFloat);
 

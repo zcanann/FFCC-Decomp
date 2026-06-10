@@ -1280,8 +1280,8 @@ void CGItemObj::onFrame()
 			SetAnimSlot(0, 0);
 			PlayAnim(0, 1, 0, -1, -1, 0);
 
-			int ownerData = *(int*)((unsigned char*)m_owner + 0x58);
 			int* soundData = *(int**)(*(int*)(*reinterpret_cast<int*>(CGMonObj::m_boss) + 0xF8) + 0x178);
+			int ownerData = *(int*)((unsigned char*)m_owner + 0x58);
 			int soundEntry;
 			if (soundData != 0) {
 				soundEntry = soundData[5];

@@ -443,7 +443,6 @@ void birth(
     if ((s32)params->m_spawnMode < 8 && (s32)params->m_spawnMode >= 0) {
         Vec baseDirection;
         Vec angles;
-        Vec forward;
         pppFMATRIX rotMatrix;
 
         baseDirection.x = params->m_baseDirection.x;
@@ -464,16 +463,16 @@ void birth(
         pppUnitMatrix(rotMatrix);
         pppRotMatrix(rotMatrix, rotMatrix, angles);
 
-        forward.x = particleData->m_matrix[0][1];
-        forward.y = particleData->m_matrix[1][1];
-        forward.z = particleData->m_matrix[2][1];
-        pppApplyMatrix(forward, rotMatrix, baseDirection);
-        forward.x *= params->m_directionScale.x;
-        forward.y *= params->m_directionScale.y;
-        forward.z *= params->m_directionScale.z;
-        particleData->m_matrix[0][1] = forward.x;
-        particleData->m_matrix[1][1] = forward.y;
-        particleData->m_matrix[2][1] = forward.z;
+        rowY.x = particleData->m_matrix[0][1];
+        rowY.y = particleData->m_matrix[1][1];
+        rowY.z = particleData->m_matrix[2][1];
+        pppApplyMatrix(rowY, rotMatrix, baseDirection);
+        rowY.x *= params->m_directionScale.x;
+        rowY.y *= params->m_directionScale.y;
+        rowY.z *= params->m_directionScale.z;
+        particleData->m_matrix[0][1] = rowY.x;
+        particleData->m_matrix[1][1] = rowY.y;
+        particleData->m_matrix[2][1] = rowY.z;
         pppGetRowVector(*(pppFMATRIX*)&particleData->m_matrix, rowX, rowY, rowZ, rowPos);
         pppNormalize(rowY, rowY);
         pppOuterProduct(rowZ, rowY, rowX);
@@ -483,39 +482,43 @@ void birth(
         pppSetRowVector(*(pppFMATRIX*)&particleData->m_matrix, rowX, rowY, rowZ, rowPos);
 
         pppFMATRIX basis;
+        Vec direction;
+        Vec right;
         Vec worldUp;
+        Vec up;
+        Vec translation;
 
         pppUnitMatrix(basis);
-        rowY.x = particleData->m_matrix[0][1];
-        rowY.y = particleData->m_matrix[1][1];
-        rowY.z = particleData->m_matrix[2][1];
-        rowPos.x = particleData->m_matrix[0][3];
-        rowPos.y = particleData->m_matrix[1][3];
-        rowPos.z = particleData->m_matrix[2][3];
-        pppNormalize(rowY, rowY);
-        pppCopyVector(rowY, rowY);
+        direction.x = particleData->m_matrix[0][1];
+        direction.y = particleData->m_matrix[1][1];
+        direction.z = particleData->m_matrix[2][1];
+        translation.x = particleData->m_matrix[0][3];
+        translation.y = particleData->m_matrix[1][3];
+        translation.z = particleData->m_matrix[2][3];
+        pppNormalize(direction, direction);
+        pppCopyVector(direction, direction);
 
         worldUp.x = kPppRyjMegaBirthSharedZero;
         worldUp.y = kPppRyjMegaBirthSharedZero;
         worldUp.z = kPppRyjMegaBirthModelOneF;
-        pppOuterProduct(rowZ, rowY, worldUp);
-        pppNormalize(rowZ, rowZ);
-        pppOuterProduct(rowX, rowZ, rowY);
-        pppNormalize(rowX, rowX);
+        pppOuterProduct(right, direction, worldUp);
+        pppNormalize(right, right);
+        pppOuterProduct(up, right, direction);
+        pppNormalize(up, up);
 
         pppUnitMatrix(basis);
-        basis.value[0][0] = rowZ.x;
-        basis.value[1][0] = rowZ.y;
-        basis.value[2][0] = rowZ.z;
-        basis.value[0][1] = rowY.x;
-        basis.value[1][1] = rowY.y;
-        basis.value[2][1] = rowY.z;
-        basis.value[0][2] = rowX.x;
-        basis.value[1][2] = rowX.y;
-        basis.value[2][2] = rowX.z;
-        basis.value[0][3] = rowPos.x;
-        basis.value[1][3] = rowPos.y;
-        basis.value[2][3] = rowPos.z;
+        basis.value[0][0] = right.x;
+        basis.value[1][0] = right.y;
+        basis.value[2][0] = right.z;
+        basis.value[0][1] = direction.x;
+        basis.value[1][1] = direction.y;
+        basis.value[2][1] = direction.z;
+        basis.value[0][2] = up.x;
+        basis.value[1][2] = up.y;
+        basis.value[2][2] = up.z;
+        basis.value[0][3] = translation.x;
+        basis.value[1][3] = translation.y;
+        basis.value[2][3] = translation.z;
         pppCopyMatrix(*(pppFMATRIX*)&particleData->m_matrix, basis);
     }
 
@@ -524,19 +527,17 @@ void birth(
         if (mode < 4) {
             if (kPppRyjMegaBirthSharedZero != params->m_speed) {
                 float speedScalar = calc_direction_speed(params, params->m_speedMode);
-                Vec direction;
-                Vec position;
 
-                direction.x = particleData->m_matrix[0][1];
-                direction.y = particleData->m_matrix[1][1];
-                direction.z = particleData->m_matrix[2][1];
-                position.x = particleData->m_matrix[0][3];
-                position.y = particleData->m_matrix[1][3];
-                position.z = particleData->m_matrix[2][3];
-                pppScaleVectorXYZ(position, direction, speedScalar);
-                particleData->m_matrix[0][3] = position.x;
-                particleData->m_matrix[1][3] = position.y;
-                particleData->m_matrix[2][3] = position.z;
+                rowY.x = particleData->m_matrix[0][1];
+                rowY.y = particleData->m_matrix[1][1];
+                rowY.z = particleData->m_matrix[2][1];
+                rowPos.x = particleData->m_matrix[0][3];
+                rowPos.y = particleData->m_matrix[1][3];
+                rowPos.z = particleData->m_matrix[2][3];
+                pppScaleVectorXYZ(rowPos, rowY, speedScalar);
+                particleData->m_matrix[0][3] = rowPos.x;
+                particleData->m_matrix[1][3] = rowPos.y;
+                particleData->m_matrix[2][3] = rowPos.z;
             }
             goto join_position;
         }

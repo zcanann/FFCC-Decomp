@@ -2215,22 +2215,22 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         this->push(object, 0);
         outResult = 0;
         break;
-    case -0x1F:
-        if (*object->m_localBase < 0x10) {
-            CLine<64>& line = m_debugLines[*object->m_localBase];
-            if (line.pointCount < 0x40) {
-                const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-                Vec& point = line.points[line.pointCount];
-                point.x = localFloats[1];
-                point.y = localFloats[2];
-                point.z = localFloats[3];
-                line.pointCount++;
-                line.CalcBound();
+    case -0x1F: {
+        unsigned int slot = *object->m_localBase;
+        if (slot < 0x10) {
+            if (m_debugLines[slot].pointCount < 0x40) {
+                unsigned long index = m_debugLines[slot].pointCount;
+                m_debugLines[slot].pointCount = index + 1;
+                m_debugLines[slot].points[index].x = reinterpret_cast<float*>(object->m_localBase)[1];
+                m_debugLines[slot].points[index].y = reinterpret_cast<float*>(object->m_localBase)[2];
+                m_debugLines[slot].points[index].z = reinterpret_cast<float*>(object->m_localBase)[3];
+                m_debugLines[slot].CalcBound();
             }
         }
         this->push(object, 0);
         outResult = 0;
         break;
+    }
     case -0x20: {
         CColor color(
             static_cast<u8>(object->m_localBase[1]),
@@ -3981,7 +3981,10 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     }
     case -0xE9: {
         _GXTexObj backTexObj;
-        if (*object->m_localBase != 0) {
+        if (*reinterpret_cast<int*>(object->m_localBase) != 0) {
+            Graphic.GetBackBufferRect2(
+                Graphic.GetTmpFrameBuffer(), 0, 0, 0, 0x280, 0x1C0, 0, GX_NEAR, GX_TF_RGB565, 0);
+        } else {
             CColor color(0xFF, 0xFF, 0xFF, static_cast<u8>(object->m_localBase[1]));
 
             GXInitTexObj(
@@ -3990,9 +3993,6 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             GXInitTexObjLOD(&backTexObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
             gUtil.RenderTextureQuad(
                 0.0f, 0.0f, 640.0f, 448.0f, &backTexObj, 0, 0, color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
-        } else {
-            Graphic.GetBackBufferRect2(
-                Graphic.GetTmpFrameBuffer(), &backTexObj, 0, 0, 0x280, 0x1C0, 0, GX_NEAR, GX_TF_RGBA8, 0);
         }
         this->push(object, 0);
         outResult = 0;

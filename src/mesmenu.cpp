@@ -186,10 +186,7 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int unk1, int unk2, i
         }
     } else if ((flags & 0x100) == 0) {
         fVar1 = m_windowWidth;
-        if (fVar1 < FLOAT_803308f0) {
-            fVar1 = FLOAT_803308f0;
-        }
-        m_windowWidth = fVar1;
+        m_windowWidth = (fVar1 < FLOAT_803308f0) ? FLOAT_803308f0 : fVar1;
     }
 
     uVar2 = (unsigned int)m_menuIndex;

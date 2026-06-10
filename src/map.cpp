@@ -1691,9 +1691,10 @@ void CMapMng::SetLightSource()
                     *(u32*)light.m_bumpShade = 0;
 
                     light.m_spotFn = spotAttr->m_colorMode;
-                    light.m_unk4D = 2;
                     if (spotAttr->m_useAltColor == 0) {
                         light.m_unk4D = 4;
+                    } else {
+                        light.m_unk4D = 2;
                     }
                     light.m_directionMode = spotAttr->m_keyFrameCount;
                     light.m_partMask = 1 << mapLightIndex;

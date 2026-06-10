@@ -328,16 +328,22 @@ void CPartMng::Create()
         }
     }
 
-    for (int i = 0; i < kPppMngCount; i++) {
-        unsigned char* mng = self + 0x2A18 + (i * kPppMngStride);
-        *reinterpret_cast<int*>(mng + 0x14) = -0x1000;
-        *reinterpret_cast<int*>(mng + 0x12c) = -1;
-        *reinterpret_cast<int*>(mng + 0x11c) = -1;
-        *reinterpret_cast<unsigned char*>(mng + 0x120) = 0;
-        *reinterpret_cast<unsigned char*>(mng + 0x121) = 1;
-        *reinterpret_cast<int*>(mng + 0x124) = 0;
-        *reinterpret_cast<unsigned char*>(mng + 0x122) = 0;
-        *reinterpret_cast<int*>(mng + 0x128) = 0x1e;
+    {
+        unsigned char* mng = self + 0x2A18;
+        for (int i = 0; i < kPppMngCount / 6; i++) {
+            for (int k = 0; k < 6; k++) {
+                unsigned char* e = mng + (k * kPppMngStride);
+                *reinterpret_cast<int*>(e + 0x14) = -0x1000;
+                *reinterpret_cast<int*>(e + 0x12c) = -1;
+                *reinterpret_cast<int*>(e + 0x11c) = -1;
+                *reinterpret_cast<unsigned char*>(e + 0x120) = 0;
+                *reinterpret_cast<unsigned char*>(e + 0x121) = 1;
+                *reinterpret_cast<int*>(e + 0x124) = 0;
+                *reinterpret_cast<unsigned char*>(e + 0x122) = 0;
+                *reinterpret_cast<int*>(e + 0x128) = 0x1e;
+            }
+            mng += 6 * kPppMngStride;
+        }
     }
 
     {

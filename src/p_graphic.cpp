@@ -328,14 +328,18 @@ void CGraphicPcs::drawScreenFade()
                 pos.x = sx;
                 pos.y = sy;
                 float clamped = kGraphicZero;
-                if (sx >= kGraphicZero) {
-                    clamped = (kGraphicScreenWidth >= sx) ? sx : kGraphicScreenWidth;
-                }
+                if (sx < kGraphicZero) goto storeX;
+                clamped = kGraphicScreenWidth;
+                if (kGraphicScreenWidth < sx) goto storeX;
+                clamped = sx;
+            storeX:
                 pos.x = clamped;
                 clamped = kGraphicZero;
-                if (pos.y >= kGraphicZero) {
-                    clamped = (kGraphicScreenHeight >= pos.y) ? pos.y : kGraphicScreenHeight;
-                }
+                if (pos.y < kGraphicZero) goto storeY;
+                clamped = kGraphicScreenHeight;
+                if (kGraphicScreenHeight < pos.y) goto storeY;
+                clamped = pos.y;
+            storeY:
                 pos.y = clamped;
 
                 const int radius = (int)(kScreenFadeCircleRadius * (kGraphicOne - fadeWave));

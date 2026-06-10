@@ -1822,7 +1822,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			addHp(-damageAmount, sourceObj);
 			int selfNoGuard = (static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(
 				*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C)))) >> 5) & 0xFF;
-			if (selfNoGuard == 0) {
+			if (selfNoGuard != 0) {
 				bonus(0, resolvedItemId, sourceObj);
 				sourceObj->bonus(1, resolvedItemId, this);
 			}
@@ -1830,12 +1830,12 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			    ((static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D && sourceChara->m_comboItemState >= 0)) {
 				bonus(0x15, resolvedItemId, sourceObj);
 				sourceObj->bonus(0x11, resolvedItemId, this);
-				if (selfNoGuard == 0) {
+				if (selfNoGuard != 0) {
 					sourceObj->bonus(0xC, resolvedItemId, this);
 				}
 				for (int i = 0; i < sourceChara->m_comboLinkCount; i++) {
 					sourceChara->m_comboLinks[i]->bonus(0x11, resolvedItemId, this);
-					if (selfNoGuard == 0) {
+					if (selfNoGuard != 0) {
 						sourceChara->m_comboLinks[i]->bonus(0xC, resolvedItemId, this);
 					}
 				}
@@ -1844,13 +1844,13 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					if (itemEffect == 0x1F8) {
 						bonus(0x13, resolvedItemId, sourceObj);
 						sourceObj->bonus(0xF, resolvedItemId, this);
-						if (selfNoGuard == 0) {
+						if (selfNoGuard != 0) {
 							sourceObj->bonus(10, resolvedItemId, this);
 						}
 					} else {
 						bonus(0x12, resolvedItemId, sourceObj);
 						sourceObj->bonus(0xE, resolvedItemId, this);
-						if (selfNoGuard == 0) {
+						if (selfNoGuard != 0) {
 							sourceObj->bonus(9, resolvedItemId, this);
 						}
 					}
@@ -1939,7 +1939,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C)))) >> 5) & 0xFF;
 		bonus(0x14, resolvedItemId, sourceObj);
 		sourceObj->bonus(0x10, resolvedItemId, this);
-		if (tailNoGuard == 0) {
+		if (tailNoGuard != 0) {
 			sourceObj->bonus(0x0B, resolvedItemId, this);
 		}
 	}

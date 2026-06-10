@@ -162,7 +162,7 @@ static inline float ClampFloat(float value, float minValue, float maxValue)
     return value;
 }
 
-extern "C" float sAnimFrameOffset;
+extern "C" const float sAnimFrameOffset;
 extern "C" const float sZeroFloat;
 
 static inline float WrapAnimFrame(float value, float span)
@@ -180,7 +180,7 @@ static const char s_r_item[] = "r_item";
 static const char s_noTurnMotion[36] =
     "\203\136\201\133\203\223\203\202\201\133\203\126\203\207\203\223"
     "\202\315\202\240\202\350\202\334\202\271\202\361\201\102\012";
-extern "C" float sAnimFrameOffset;                    // FLOAT_80330338
+extern "C" const float sAnimFrameOffset;                    // FLOAT_80330338
 extern "C" const float sHugeCylinderExtent; // FLOAT_8033033c
 extern "C" const float sNegHugeCylinderExtent; // FLOAT_80330340
 static const float sQuarterTurn = 1.5707964f;         // FLOAT_80330344
@@ -195,22 +195,22 @@ extern "C" const float sBgAttrNormal;              // FLOAT_80330368
 extern "C" const float sBgAttrFast;               // FLOAT_8033036c
 static const float sDebugScreenY = 320.0f;            // FLOAT_80330370
 static const float sDebugScreenX = 224.0f;            // FLOAT_80330374
-static const float sNegativeOne = -1.0f;              // FLOAT_80330390
+extern "C" const float sNegativeOne;              // FLOAT_80330390
 static const float sLargeDistance = 10000000.0f;      // FLOAT_80330394
-static const float sDefaultMoveBaseSpeed = 2.0f;      // FLOAT_803303d4
+extern "C" const float sDefaultMoveBaseSpeed;      // FLOAT_803303d4
 extern "C" const float sHitProbeHeight;          // FLOAT_80330410
 extern "C" const float sHitMoveScale;       // FLOAT_80330414
-static const float sJumpLift = 10.0f;                 // FLOAT_80330418
+extern "C" const float sJumpLift;                 // FLOAT_80330418
 static const float sLandingDampenCutoff = -1.5f;      // FLOAT_8033041c
 static const float sMinGroundClamp = -4.0f;           // FLOAT_80330420
 static const float sCrossCheckOuterRadius = 50.0f;    // FLOAT_80330424
 static const float sGroundOffsetFloor = -5.0f;        // FLOAT_80330428
 static const float sAnalogSpeedScale = 4.0f;          // FLOAT_8033042c
 static const float sSlideThreshold = 0.01f;           // FLOAT_80330430
-static const float sDefaultAttackColRadius = 7.0f;    // FLOAT_80330434
-static const float sDefaultBodyColRadius = 6.0f;      // FLOAT_80330438
-static const float sDefaultFrontHitAngle = 0.78539819f; // FLOAT_8033043c
-static const float sDefaultBgDownDist = 0.033333335f; // FLOAT_80330440
+extern "C" const float sDefaultAttackColRadius;    // FLOAT_80330434
+extern "C" const float sDefaultBodyColRadius;      // FLOAT_80330438
+extern "C" const float FLOAT_8033043C; // FLOAT_8033043c
+extern "C" const float sDefaultBgDownDist; // FLOAT_80330440
 extern "C" const float sRadiusWobbleScale;         // FLOAT_80330398 (0.8)
 extern "C" const float sWobbleBiasLarge;           // FLOAT_8033039c (0.3)
 extern "C" const float sWobbleBiasSmall;           // FLOAT_803303a0 (0.05)
@@ -251,29 +251,29 @@ void CGBaseObj::onFrame()
 #pragma optimization_level 3
 void CGObject::onCreate()
 {
-    m_worldPosition.z = 0.0f;
-    m_worldPosition.y = 0.0f;
-    m_worldPosition.x = 0.0f;
-    m_groundHitOffset.z = 0.0f;
-    m_groundHitOffset.y = 0.0f;
-    m_groundHitOffset.x = 0.0f;
+    m_worldPosition.z = sZeroFloat;
+    m_worldPosition.y = sZeroFloat;
+    m_worldPosition.x = sZeroFloat;
+    m_groundHitOffset.z = sZeroFloat;
+    m_groundHitOffset.y = sZeroFloat;
+    m_groundHitOffset.x = sZeroFloat;
 
-    m_rotBaseZ = 0.0f;
-    m_rotBaseY = 0.0f;
-    m_rotBaseX = 0.0f;
-    m_rotTargetZ = 0.0f;
-    m_rotTargetY = 0.0f;
-    m_rotTargetX = 0.0f;
+    m_rotBaseZ = sZeroFloat;
+    m_rotBaseY = sZeroFloat;
+    m_rotBaseX = sZeroFloat;
+    m_rotTargetZ = sZeroFloat;
+    m_rotTargetY = sZeroFloat;
+    m_rotTargetX = sZeroFloat;
 
-    m_bodyOffset.x = 0.0f;
+    m_bodyOffset.x = sZeroFloat;
     m_bodyOffset.y = sNegativeOne;
-    m_bodyOffset.z = 0.0f;
-    m_jumpOffset.x = 0.0f;
+    m_bodyOffset.z = sZeroFloat;
+    m_jumpOffset.x = sZeroFloat;
     m_jumpOffset.y = sJumpLift;
-    m_jumpOffset.z = 0.0f;
-    m_moveOffset.x = 0.0f;
-    m_moveOffset.y = 1.0f;
-    m_moveOffset.z = 0.0f;
+    m_jumpOffset.z = sZeroFloat;
+    m_moveOffset.x = sZeroFloat;
+    m_moveOffset.y = sAnimFrameOffset;
+    m_moveOffset.z = sZeroFloat;
 
     m_charaModelHandle = 0;
     m_weaponModelHandle = 0;
@@ -287,8 +287,8 @@ void CGObject::onCreate()
     m_currentAnimSlot = -1;
 
     m_bodyEllipsoidRadius = sStepProbeHeight;
-    m_bodyEllipsoidOffset = 0.0f;
-    m_bodyEllipsoidAspect = 1.0f;
+    m_bodyEllipsoidOffset = sZeroFloat;
+    m_bodyEllipsoidAspect = sAnimFrameOffset;
     m_capsuleHalfHeight = sStepProbeHeight;
 
     m_attackColRadius = sDefaultAttackColRadius;
@@ -303,48 +303,48 @@ void CGObject::onCreate()
 
     m_objectFlags = 1;
     m_displayFlags = 3;
-    m_rotationX = 1.0f;
-    m_rotationY = 1.0f;
-    m_rotationZ = 1.0f;
+    m_rotationX = sAnimFrameOffset;
+    m_rotationY = sAnimFrameOffset;
+    m_rotationZ = sAnimFrameOffset;
     m_attrFlags = 0;
     m_ownerType = -1;
     m_classWorkIndex = 0;
     m_scriptHandle = 0;
 
-    unk_0x184 = 0.0f;
-    unk_0x188 = 0.0f;
+    unk_0x184 = sZeroFloat;
+    unk_0x188 = sZeroFloat;
     m_weaponNodeFlagBits.m_attached = 0;
     m_weaponNodeFlagBits.m_unk20 = 1;
     m_weaponNodeFlagBits.m_unk40 = 0;
     m_bgHitMask = -1;
     m_animSlotSel = -1;
-    m_turnSpeed = 0.0f;
+    m_turnSpeed = sZeroFloat;
     m_pushParamB = 0;
     m_pushParamA = 0;
 
     m_shieldNodeFlagBits.m_bit40 = 0;
-    m_frontHitAngle = sDefaultFrontHitAngle;
+    m_frontHitAngle = FLOAT_8033043C;
     m_lookAtTarget = 0;
-    m_stepSlopeLimit = 1.0f;
-    m_lookAtTimer = 1.0f;
+    m_stepSlopeLimit = sAnimFrameOffset;
+    m_lookAtTimer = sAnimFrameOffset;
     m_shieldNodeFlagBits.m_bit20 = 0;
-    m_animBlend = 1.0f;
-    m_bgAttrValue = 1.0f;
-    m_bounceFactor = 1.0f;
-    m_gravityY = 0.0f;
-    m_jumpLandingDampening = 0.0f;
+    m_animBlend = sAnimFrameOffset;
+    m_bgAttrValue = sAnimFrameOffset;
+    m_bounceFactor = sAnimFrameOffset;
+    m_gravityY = sZeroFloat;
+    m_jumpLandingDampening = sZeroFloat;
 
     m_stateFlags0Bits.unk3 = 0;
 
-    m_bgCollisionQtrn.z = 0.0f;
-    m_bgCollisionQtrn.y = 0.0f;
-    m_bgCollisionQtrn.x = 0.0f;
-    m_bgCollisionQtrn.w = 1.0f;
+    m_bgCollisionQtrn.z = sZeroFloat;
+    m_bgCollisionQtrn.y = sZeroFloat;
+    m_bgCollisionQtrn.x = sZeroFloat;
+    m_bgCollisionQtrn.w = sAnimFrameOffset;
 
     m_shieldNodeFlagBits.m_bit10 = 0;
     m_dispItemTimer = 0;
     m_shieldNodeFlagBits.m_bit80 = 0;
-    m_lastBgAttr = 1.0f;
+    m_lastBgAttr = sAnimFrameOffset;
     m_shieldNodeFlagBits.m_bit08 = 0;
     m_shieldNodeFlagBits.m_bit04 = 0;
     m_collisionPushTimerMax = 0x32;
@@ -355,9 +355,9 @@ void CGObject::onCreate()
     m_stateFlags0Bits.unk4 = 0;
     m_ownerSlot = 0;
     m_stateFlags0Bits.unk0 = 0;
-    m_radiusCtrlVel.x = 0.0f;
-    m_radiusCtrl.y = 0.0f;
-    m_radiusCtrl.z = 1.0f;
+    m_radiusCtrlVel.x = sZeroFloat;
+    m_radiusCtrl.y = sZeroFloat;
+    m_radiusCtrl.z = sAnimFrameOffset;
     m_radiusCtrlVel.y = m_radiusCtrl.y;
     m_radiusCtrlVel.z = m_radiusCtrl.z;
     m_groundFriction = m_radiusCtrlVel.x;
@@ -366,25 +366,25 @@ void CGObject::onCreate()
     m_bgDownDist = sDefaultBgDownDist;
     m_moveMode = 0;
     m_moveModePrevious = 4;
-    m_groundSlide = 0.0f;
-    m_hitNormal.z = 0.0f;
-    m_hitNormal.y = 0.0f;
-    m_worldParam = 0.0f;
+    m_groundSlide = sZeroFloat;
+    m_hitNormal.z = sZeroFloat;
+    m_hitNormal.y = sZeroFloat;
+    m_worldParam = sZeroFloat;
 
     m_lookAtTargetNodeIndex = -1;
     m_worldParamA = 0;
-    m_lookAtAccumYaw = 0.0f;
-    m_lookAtAccumPitch = 0.0f;
+    m_lookAtAccumYaw = sZeroFloat;
+    m_lookAtAccumPitch = sZeroFloat;
     m_weaponAttachNode = -1;
     m_shieldAttachNodeIndex = -1;
     *reinterpret_cast<u16*>(&m_lastMapIdHit) = 0;
     m_weaponNodeFlagBits.m_prg = 0;
-    m_extraMoveVec.z = 0.0f;
-    m_extraMoveVec.y = 0.0f;
-    m_extraMoveVec.x = 0.0f;
+    m_extraMoveVec.z = sZeroFloat;
+    m_extraMoveVec.y = sZeroFloat;
+    m_extraMoveVec.x = sZeroFloat;
     m_shieldNodeFlagBits.m_bit01 = 0;
     m_field_0x56 = 0x7D;
-    *reinterpret_cast<float*>(m_worldMode) = 0.0f;
+    *reinterpret_cast<float*>(m_worldMode) = sZeroFloat;
 
     int animStateOffset = 0;
     s8* animState;

@@ -1155,8 +1155,8 @@ void CMes::addString(char** text, int branchMode)
 		case 0x30:
 		{
 			char number[256];
-			char* numberPtr = number;
-			sprintf(numberPtr, s_mesNumFmt, mFlagVars[ReadTagS8(text)]);
+			char* numberPtr;
+			sprintf(numberPtr = number, s_mesNumFmt, mFlagVars[ReadTagS8(text)]);
 			addString(&numberPtr, branchMode);
 			break;
 		}

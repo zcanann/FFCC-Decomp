@@ -169,7 +169,6 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     }
 
     count = step->m_drawCount;
-    invCountMinusOne = (float)(step->m_drawCount - 1);
     alphaMul = (float)GetKeShpTail2XAlphaWork(&obj->m_object, param_3)->m_alpha / kPppKeShpTail2XAlphaScale;
     colorStartR = step->m_colorStartR;
     colorStartG = step->m_colorStartG;
@@ -181,6 +180,7 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     colorEndR = step->m_colorEndR;
     colorEndG = step->m_colorEndG;
     colorEndB = step->m_colorEndB;
+    invCountMinusOne = (float)(step->m_drawCount - 1);
     if (invCountMinusOne != segCursor) {
         colorStepR = (colorStartR - colorEndR) / invCountMinusOne;
         colorStepG = (colorStartG - colorEndG) / invCountMinusOne;

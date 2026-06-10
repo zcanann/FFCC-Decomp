@@ -2977,8 +2977,8 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 		}
 
 		if (effectId >= 501) {
-			unsigned char* colData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + effectId * 0x48;
-			int itemType = *reinterpret_cast<unsigned short*>(colData + 2);
+			SCharaItemRow* colRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
+			int itemType = colRows[effectId].m_kind;
 			int colType;
 			switch (itemType) {
 			case 1:
@@ -2994,7 +2994,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 				colType = 9;
 				break;
 			}
-			CFlatRuntime2Storage().SetParticleWorkCol(colType, -1, *reinterpret_cast<unsigned short*>(colData + 4) * 0.01f);
+			CFlatRuntime2Storage().SetParticleWorkCol(colType, -1, (static_cast<float>(colRows[effectId].m_field04) * 0.01f) + 1.0e-07f);
 		}
 
 		if ((particleEntry & 0x100) != 0) {

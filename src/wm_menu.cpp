@@ -8009,15 +8009,17 @@ void CMenuPcs::DrawWMFrame0(int mask, float alpha)
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 
-	int offset = 0;
-	int i = 0;
+	int offset;
+	int i;
+	i = 0;
+	offset = 0;
 	do {
 		if ((static_cast<unsigned int>(mask) & (1 << i)) != 0) {
 			short* psVar1 = reinterpret_cast<short*>(m_wm.m_frameInfo + offset + 4);
-			MenuPcs.DrawRect(0xFFFFFFFF, static_cast<float>(static_cast<int>(psVar1[0])), static_cast<float>(static_cast<int>(psVar1[1])),
+			MenuPcs.DrawRect(*reinterpret_cast<unsigned int*>(psVar1 + 0xC), static_cast<float>(static_cast<int>(psVar1[0])), static_cast<float>(static_cast<int>(psVar1[1])),
 			         static_cast<float>(static_cast<int>(psVar1[2])), static_cast<float>(static_cast<int>(psVar1[3])),
 			         *reinterpret_cast<float*>(psVar1 + 4), *reinterpret_cast<float*>(psVar1 + 6),
-			         FLOAT_803313e8, FLOAT_803313e8, *reinterpret_cast<float*>(psVar1 + 0xC));
+			         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 		}
 		i = i + 1;
 		offset = offset + 0x1C;
@@ -9371,11 +9373,11 @@ void CMenuPcs::DrawCMLife()
 
 	float fade;
 	if (worldState->m_mainState == 1) {
-		fade = static_cast<float>(DOUBLE_803314e8 * static_cast<double>(worldState->m_frameCounter));
+		fade = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(worldState->m_frameCounter));
 	} else if (worldState->m_mainState == 2) {
 		fade = FLOAT_803313e8;
 	} else {
-		fade = static_cast<float>(-(DOUBLE_803314e8 * static_cast<double>(worldState->m_frameCounter) -
+		fade = static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(worldState->m_frameCounter) -
 		                            DOUBLE_80331420));
 	}
 	unsigned int readyMask = 0;
@@ -9385,7 +9387,7 @@ void CMenuPcs::DrawCMLife()
 			readyMask |= 1u << entry.m_currentSlot;
 		}
 	}
-	const float alphaF = FLOAT_80331458 * fade;
+	const double alphaF = FLOAT_80331458 * fade;
 
 	for (int slot = 0; slot < 8; slot++) {
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x27));
@@ -9404,12 +9406,12 @@ void CMenuPcs::DrawCMLife()
 		float blue;
 		if ((readyMask & (1u << slot)) != 0) {
 			red = FLOAT_803313e8;
-			green = FLOAT_803313e8;
-			blue = FLOAT_803313e8;
+			green = red;
+			blue = red;
 		} else {
 			red = FLOAT_80331434;
 			green = FLOAT_80331668;
-			blue = FLOAT_80331668;
+			blue = green;
 		}
 
 		GXColor color;
@@ -9420,15 +9422,16 @@ void CMenuPcs::DrawCMLife()
 		GXSetChanMatColor(GX_COLOR0A0, color);
 
 		const int row = slot / 4;
-		const int col = slot - row * 4;
+		const int col = slot % 4;
 		float y = FLOAT_80331478 + static_cast<float>(row * 0xB8);
-		if (row != 0) {
-			y += FLOAT_80331548;
-		}
 		const float xBase = FLOAT_80331410 + static_cast<float>(col * 0x90);
-		const float yBase = y + FLOAT_8033166C;
-		float x = static_cast<float>(xBase + static_cast<double>(0x90 - count * 0x10) * DOUBLE_803313f8);
-		float step = static_cast<float>(static_cast<double>(8 - count) * DOUBLE_803313f8);
+		float yTmp = y;
+		if (row != 0) {
+			yTmp = y + FLOAT_80331548;
+		}
+		const float yBase = yTmp + FLOAT_8033166C;
+		float x = static_cast<float>(static_cast<double>(0x90 - count * 0x10) * DOUBLE_803313F8 + static_cast<double>(xBase));
+		float step = static_cast<float>(static_cast<double>(8 - count) * DOUBLE_803313F8);
 
 		const float kSplineDiv = FLOAT_803314c0;
 		const float kZero = FLOAT_803313dc;
@@ -9436,7 +9439,7 @@ void CMenuPcs::DrawCMLife()
 		const double kStepDelta = DOUBLE_80331420;
 
 		for (int i = 0; i < count; i++) {
-			float yAdd = kZero;
+			float yAdd = FLOAT_803313dc;
 			const float t = step / kSplineDiv;
 			if (t >= gWmLifeYOffsetSpline[gWmLifeYOffsetSplineCount * 4 - 4]) {
 				yAdd = gWmLifeYOffsetSpline[gWmLifeYOffsetSplineCount * 4 - 3];
@@ -9463,9 +9466,9 @@ void CMenuPcs::DrawCMLife()
 			}
 
 			MenuPcs.DrawRect(
-			    0, x, yBase + yAdd, kRectSize, kRectSize,
-			                                kZero, kZero, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
-			step += static_cast<float>(kStepDelta);
+			    0, x, yBase + yAdd, FLOAT_80331558, FLOAT_80331558,
+			                                kZero, kZero, FLOAT_803313e8, FLOAT_803313e8, kZero);
+			step = static_cast<float>(step + kStepDelta);
 			x += kRectSize;
 		}
 
@@ -9473,21 +9476,21 @@ void CMenuPcs::DrawCMLife()
 		unsigned char flagB;
 		if (m_cmakeWorkActive == 1 && m_cmakeWork != 0) {
 			const unsigned char* const work = m_cmakeWork + slot * 0x9C0;
-			flagA = work[0x1D90];
 			flagB = work[0x1D91];
+			flagA = work[0x1D90];
 		} else {
 			const CCaravanWork& caravanWork = Game.m_caravanWorkArr[slot];
-			flagA = caravanWork.m_shopBusyFlag;
 			flagB = caravanWork.m_caravanLocalFlags;
+			flagA = caravanWork.m_shopBusyFlag;
 		}
 		if (flagA != 0 || flagB != 0) {
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x38));
 			MenuPcs.DrawRect(
 			    0, static_cast<float>(xBase + DOUBLE_80331670),
-			                                y + static_cast<float>(DOUBLE_803315C0), FLOAT_80331524,
+			                                static_cast<float>((row != 0 ? y + FLOAT_80331548 : y) + DOUBLE_803315C0), FLOAT_80331524,
 			                                FLOAT_80331440, FLOAT_803313dc,
 			                                flagA != 0 ? FLOAT_803313dc : FLOAT_80331440,
-			                                FLOAT_803313e8, FLOAT_803313e8, 0.0f);
+			                                FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 		}
 	}
 #undef worldState

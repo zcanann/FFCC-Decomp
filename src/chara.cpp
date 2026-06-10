@@ -2879,8 +2879,8 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 			m_data->m_skins =
 			    new (stage, const_cast<char*>(s_chara_cpp), 0x7F8) CChara::CSkin[m_data->m_skinCount];
 
-			unsigned int skinOffset = 0;
 			chunk.PushChunk();
+			unsigned int skinOffset = 0;
 			while (chunk.GetNextChunk(chunkInfo)) {
 				if (chunkInfo.m_id == 0x4E4F4445) {
 					u8* skinEntry = reinterpret_cast<u8*>(m_data->m_skins) + skinOffset;

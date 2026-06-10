@@ -2326,8 +2326,11 @@ void CPartMng::pppEditBeforeCalc()
                 delete (*editorObj)->m_charaModelHandle;
                 (*editorObj)->m_charaModelHandle = 0;
             }
-            delete *editorObj;
-            *editorObj = 0;
+            CGObject* dyingObj = *reinterpret_cast<CGObject* volatile*>(editorObj);
+            if (dyingObj != 0) {
+                operator delete(dyingObj);
+                *editorObj = 0;
+            }
         }
 
         *editorObj =

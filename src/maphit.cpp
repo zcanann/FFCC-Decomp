@@ -45,7 +45,7 @@ int g_hit_edge_idx_min;
 float g_hit_t;
 float g_hit_t_min;
 float g_hit_t_slide_min;
-float g_hit_edge_t;
+unsigned char g_MapHitFaceFlag;
 CMapHitFace* g_hit_lpface;
 CMapHitFace* g_hit_f;
 CMapHitFace* g_hit_lpface_min;
@@ -641,7 +641,11 @@ edge_loop:
     {
         Vec previous = m_vertices[g_hit_lpface->m_vertexIndices[g_hit_lpface->m_vertexCount - 1]];
         for (int i = 0; i < static_cast<int>(g_hit_lpface->m_vertexCount); i++) {
-            Vec current = m_vertices[g_hit_lpface->m_vertexIndices[i]];
+            Vec current;
+            Vec* vertex = &m_vertices[g_hit_lpface->m_vertexIndices[i]];
+            current.x = vertex->x;
+            current.y = vertex->y;
+            current.z = vertex->z;
             if ((g_hit_lpface->m_edgeFlags & (1 << i)) != 0) {
                 Vec edge;
                 PSVECSubtract(&current, &previous, &edge);
@@ -651,8 +655,11 @@ edge_loop:
                 edgeCylinder.m_axis = edge;
                 edgeCylinder.m_radius = g_hit_cyl.m_radius;
 
+                Vec rayStart = g_hit_cyl.m_bottom;
+                Vec rayDirection = *hitDirection;
+
                 float edgeT;
-                if (FindIntersection(g_hit_cyl.m_bottom, *hitDirection, edgeCylinder, edgeT) != 0 &&
+                if (FindIntersection(rayStart, rayDirection, edgeCylinder, edgeT) != 0 &&
                     edgeT < g_hit_t_min) {
                     g_hit_t = edgeT;
                     edgeIndex = i;

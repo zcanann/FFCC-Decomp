@@ -33,7 +33,6 @@ CMapMng MapMng;
 char g_StrTmp[0x400];
 
 CMapHitDrawMode g_MapHitDrawMode;
-unsigned char g_MapHitFaceFlag;
 unsigned int s_loadedMapNo__7CMapPcs;
 
 static inline CMapMngAsyncLoadState& GetMapMngAsyncLoadState(CMapMng* mapMng)

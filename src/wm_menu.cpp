@@ -5047,7 +5047,8 @@ void CMenuPcs::DrawMoveMenu()
 	int __p16 = state;
 	if (__p16 == 1) {
 		moveAlpha = static_cast<float>((static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408) / DOUBLE_803316e8);
-	} else if (state == 2 && bytes[0x13] != 0) {
+	int __p16 = state;
+	} else if (__p16 == 2 && bytes[0x13] != 0) {
 		moveAlpha = static_cast<float>(DOUBLE_80331420 - (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408) / DOUBLE_803316e8);
 	} else {
 		moveAlpha = FLOAT_803313e8;
@@ -5118,7 +5119,7 @@ void CMenuPcs::DrawMoveMenu()
 			PartPcs.GetParColIdx(partColorIndex, color);
 			color.w = handle->m_model->m_lightAlpha;
 			PartPcs.SetParColIdx(partColorIndex, color);
-			if (m_effectTimer == 0) {
+			if (!(!(m_effectTimer == 0))) {
 				m_effectTimer = 1;
 			} else {
 				PartPcs.DrawMenu(m_crystalAttr);

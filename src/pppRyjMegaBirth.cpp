@@ -889,7 +889,7 @@ void birth(
 {
 	u8* payload;
 	u8* particlePayload;
-	s16 life;
+	u16 life;
 
 	payload = (u8*)param;
 	particlePayload = (u8*)particle;
@@ -925,11 +925,11 @@ void birth(
 		}
 
 		pppGetRotMatrixXYZ(rot, (pppIVECTOR4*)angle);
+		PSMTXMultVecSR(rot.value, &baseDirection, (Vec*)(particlePayload + 0x10));
+		*f32_at(particlePayload, 0x10) = *f32_at(particlePayload, 0x10) * *f32_at(payload, 0xD8);
+		*f32_at(particlePayload, 0x14) = *f32_at(particlePayload, 0x14) * *f32_at(payload, 0xDC);
+		*f32_at(particlePayload, 0x18) = *f32_at(particlePayload, 0x18) * *f32_at(payload, 0xE0);
 		direction = (Vec*)(particlePayload + 0x10);
-		PSMTXMultVecSR(rot.value, &baseDirection, direction);
-		direction->x = direction->x * *f32_at(payload, 0xD8);
-		direction->y = direction->y * *f32_at(payload, 0xDC);
-		direction->z = direction->z * *f32_at(payload, 0xE0);
 		PSVECNormalize(direction, direction);
 	}
 
@@ -1189,12 +1189,13 @@ join_position:
 
 	if (payload[0xEB] != 0) {
 		*f32_at(particlePayload, 0x30) = *f32_at(payload, 0x9C) * Math.RandF();
-		if (((payload[0xEB] & 1) != 0) && ((payload[0xEB] & 2) != 0)) {
+		u8 tailFlags = payload[0xEB];
+		if (((tailFlags & 1) != 0) && ((tailFlags & 2) != 0)) {
 			if (kPppRyjMegaBirthHalfDouble < (double)Math.RandF()) {
 				float v30 = *f32_at(particlePayload, 0x30);
 				*f32_at(particlePayload, 0x30) = v30 * kPppRyjMegaBirthSignFlipTable[0];
 			}
-		} else if ((payload[0xEB] & 2) != 0) {
+		} else if ((tailFlags & 2) != 0) {
 			float v30 = *f32_at(particlePayload, 0x30);
 			*f32_at(particlePayload, 0x30) = v30 * kPppRyjMegaBirthSignFlipTable[0];
 		}
@@ -1230,14 +1231,19 @@ join_position:
 			float randomRotation = *f32_at(payload, 0x80) * Math.RandF();
 			*f32_at(particlePayload, 0x48) = randomRotation;
 			*f32_at(particlePayload, 0x44) = randomRotation;
-			if (((payload[0xEA] & 1) != 0) && ((payload[0xEA] & 2) != 0)) {
+			u8 rotFlags = payload[0xEA];
+			if (((rotFlags & 1) != 0) && ((rotFlags & 2) != 0)) {
 				if (kPppRyjMegaBirthHalfDouble < (double)Math.RandF()) {
-					*f32_at(particlePayload, 0x44) = *f32_at(particlePayload, 0x44) * kPppRyjMegaBirthSignFlipTable[0];
-					*f32_at(particlePayload, 0x48) = *f32_at(particlePayload, 0x48) * kPppRyjMegaBirthSignFlipTable[0];
+					float v44 = *f32_at(particlePayload, 0x44);
+					*f32_at(particlePayload, 0x44) = v44 * kPppRyjMegaBirthSignFlipTable[0];
+					float v48 = *f32_at(particlePayload, 0x48);
+					*f32_at(particlePayload, 0x48) = v48 * kPppRyjMegaBirthSignFlipTable[0];
 				}
-			} else if ((payload[0xEA] & 2) != 0) {
-				*f32_at(particlePayload, 0x44) = *f32_at(particlePayload, 0x44) * kPppRyjMegaBirthSignFlipTable[0];
-				*f32_at(particlePayload, 0x48) = *f32_at(particlePayload, 0x48) * kPppRyjMegaBirthSignFlipTable[0];
+			} else if ((rotFlags & 2) != 0) {
+				float v44 = *f32_at(particlePayload, 0x44);
+				*f32_at(particlePayload, 0x44) = v44 * kPppRyjMegaBirthSignFlipTable[0];
+				float v48 = *f32_at(particlePayload, 0x48);
+				*f32_at(particlePayload, 0x48) = v48 * kPppRyjMegaBirthSignFlipTable[0];
 			}
 		} else {
 			*f32_at(particlePayload, 0x44) = *f32_at(payload, 0x80) * Math.RandF();
@@ -1254,13 +1260,14 @@ join_position:
 		*f32_at(particlePayload, 0x40) = *f32_at(particlePayload, 0x40) + *f32_at(particlePayload, 0x48);
 	}
 
-	*f32_at(particlePayload, 0x4C) = *f32_at(payload, 0xC0);
-	*f32_at(particlePayload, 0x50) = *f32_at(payload, 0xCC);
 	{
-		float velocityRandom = *f32_at(payload, 0xC8);
-		if (velocityRandom != kPppRyjMegaBirthZero) {
+		float zero = kPppRyjMegaBirthZero;
+		*f32_at(particlePayload, 0x4C) = *f32_at(payload, 0xC0);
+		*f32_at(particlePayload, 0x50) = *f32_at(payload, 0xCC);
+		if (zero != *f32_at(payload, 0xC8)) {
 			*f32_at(particlePayload, 0x4C) =
-				*f32_at(particlePayload, 0x4C) + (kPppRyjMegaBirthDouble * velocityRandom * Math.RandF() - velocityRandom);
+				*f32_at(particlePayload, 0x4C) +
+				(kPppRyjMegaBirthDouble * *f32_at(payload, 0xC8) * Math.RandF() - *f32_at(payload, 0xC8));
 		}
 	}
 

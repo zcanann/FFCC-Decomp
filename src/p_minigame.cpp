@@ -393,21 +393,21 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
         memcpy(managerImage, readBuffer, *reinterpret_cast<unsigned int*>(self + 0x1358));
     }
 
-    unsigned int offset = 0xA0;
-    int managerBase = *reinterpret_cast<int*>(self + 0x1354);
+    int offset = 0xA0;
+    signed char* managerBase = *reinterpret_cast<signed char**>(self + 0x1354);
     int checksum = 0xE7;
 
-    *reinterpret_cast<unsigned char*>(managerBase + 0xAC) = self[0x1344];
-    *reinterpret_cast<unsigned char*>(managerBase + 0xAD) = self[0x1345];
-    *reinterpret_cast<unsigned char*>(managerBase + 0xAE) = self[0x1346];
-    *reinterpret_cast<unsigned char*>(managerBase + 0xAF) = self[0x1347];
+    managerBase[0xAC] = self[0x1344];
+    managerBase[0xAD] = self[0x1345];
+    managerBase[0xAE] = self[0x1346];
+    managerBase[0xAF] = self[0x1347];
 
     while (offset < 0xBD)
     {
-        checksum -= *reinterpret_cast<signed char*>(managerBase + offset);
+        checksum -= managerBase[offset];
         offset++;
     }
-    *reinterpret_cast<char*>(managerBase + offset) = checksum;
+    managerBase[offset] = checksum;
 
     void* managerSpImage = *reinterpret_cast<void**>(self + 0x135C);
     fileHandle = File.Open(managerSpFilePath, 0, CFile::PRI_LOW);
@@ -422,20 +422,20 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
     }
 
     offset = 0xA0;
-    managerBase = *reinterpret_cast<int*>(self + 0x135C);
+    managerBase = *reinterpret_cast<signed char**>(self + 0x135C);
     checksum = 0xE7;
 
-    *reinterpret_cast<unsigned char*>(managerBase + 0xAC) = self[0x1344];
-    *reinterpret_cast<unsigned char*>(managerBase + 0xAD) = self[0x1345];
-    *reinterpret_cast<unsigned char*>(managerBase + 0xAE) = self[0x1346];
-    *reinterpret_cast<unsigned char*>(managerBase + 0xAF) = self[0x1347];
+    managerBase[0xAC] = self[0x1344];
+    managerBase[0xAD] = self[0x1345];
+    managerBase[0xAE] = self[0x1346];
+    managerBase[0xAF] = self[0x1347];
 
     while (offset < 0xBD)
     {
-        checksum -= *reinterpret_cast<signed char*>(managerBase + offset);
+        checksum -= managerBase[offset];
         offset++;
     }
-    *reinterpret_cast<char*>(managerBase + offset) = checksum;
+    managerBase[offset] = checksum;
 
     u8 gbaStatus[8];
     GBAReset(0, gbaStatus);

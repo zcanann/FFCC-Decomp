@@ -24,6 +24,15 @@ extern const float kBonusZClearOrigin;
 extern const float FLOAT_80331EB0;
 extern const float FLOAT_80331ED0;
 extern const float FLOAT_80331F6C;
+extern const float FLOAT_80331F5C;
+extern const float FLOAT_80331F60;
+extern const float FLOAT_80331F64;
+extern const float FLOAT_80331F68;
+extern const double DOUBLE_80331E78;
+extern const double DOUBLE_80331EE8;
+extern const double DOUBLE_80331EF0;
+extern const float FLOAT_80331EF8;
+extern const float FLOAT_80331EFC;
 extern const float kBonusZClearWidth;
 extern const float kBonusZClearHeight;
 extern char lbl_801DD510[];
@@ -165,7 +174,7 @@ struct BonusAnimSprite {
 	int timer;
 	int startFrame;
 	int duration;
-	float scale;
+	int flags;
 	float motionX;
 	float motionY;
 	float targetX;
@@ -322,7 +331,7 @@ static inline void InitAnimSprite(BonusAnimSprite* sprite, int kind, short x, sh
 	sprite->timer = 0;
 	sprite->startFrame = startFrame;
 	sprite->duration = duration;
-	sprite->scale = 1.0f;
+	*reinterpret_cast<float*>(&sprite->flags) = 1.0f;
 }
 
 static inline void ResetAnimSpriteMotion(BonusAnimSprite* sprite)
@@ -331,12 +340,12 @@ static inline void ResetAnimSpriteMotion(BonusAnimSprite* sprite)
 	sprite->mulY = 0.0f;
 	sprite->alpha = 0.0f;
 	sprite->depth = 0.0f;
-	sprite->scale = 1.0f;
+	*reinterpret_cast<float*>(&sprite->flags) = 1.0f;
 }
 
 static inline int& BonusSpriteFlags(BonusAnimSprite* sprite)
 {
-	return *reinterpret_cast<int*>(&sprite->scale);
+	return sprite->flags;
 }
 
 static inline void InitSelectOpenPartyIcon(BonusAnimSprite* sprite, int slotIndex, short y)
@@ -1530,195 +1539,302 @@ void CMenuPcs::DrawSelectOpenAnim()
  */
 #pragma push
 #pragma opt_strength_reduction off
+#pragma opt_propagation off
 void CMenuPcs::CalcSelectOpenAnim()
 {
 	int activePartyCount = s_Rinfo->m_partyCount;
+	char* anchor = lbl_801DD510;
 
 	if (*(signed char*)(this->m_bonusStatePtr + 0xb) == 0) {
-		int animPtr = this->m_bonusAnimPtr;
-		BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
-		BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 		int idx;
-		int iconBase;
-		int detailBase;
 
 		this->m_bonusCursorFlag = 0;
 		Sound.PlaySe(0x4c, 0x40, 0x7f, 0);
-		memset((void*)animPtr, 0, sizeof(BonusAnimList));
-		*(short*)(this->m_bonusStatePtr + 0x22) = 0;
+		memset((void*)this->m_bonusAnimPtr, 0, sizeof(BonusAnimList));
 
 		idx = 0;
-		sprites[idx].kind = 0x16;
-		sprites[idx].y = 0;
-		sprites[idx].x = 0;
-		sprites[idx].w = 0x280;
-		sprites[idx].h = 0x1c0;
-		sprites[idx].mulY = 0.0f;
-		sprites[idx].mulX = 0.0f;
-		sprites[idx].startFrame = 0;
-		sprites[idx].duration = 0;
-		sprites[idx].depth = 1.0f;
-		BonusSpriteFlags(&sprites[idx]) = 3;
-		idx++;
+		{
+			int off = (idx << 6) + 8;
+			BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + off);
+			spr->kind = 0x16;
+			spr->y = 0;
+			spr->x = 0;
+			spr->w = 0x280;
+			spr->h = 0x1c0;
+			spr->mulY = kBonusZClearOrigin;
+			spr->mulX = kBonusZClearOrigin;
+			spr->startFrame = 0;
+			spr->duration = 0;
+			spr->depth = FLOAT_80331EB0;
+			BonusSpriteFlags(spr) = 3;
+			idx = 1;
+		}
+		{
+			int off = (idx << 6) + 8;
+			BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + off);
+			spr->kind = -3;
+			spr->x = 0xf0;
+			spr->y = 0x38;
+			spr->w = 0x168;
+			spr->h = 0x148;
+			spr->mulY = kBonusZClearOrigin;
+			spr->mulX = kBonusZClearOrigin;
+			spr->startFrame = 0;
+			spr->duration = 8;
+			spr->depth = FLOAT_80331EB0;
+			idx = 2;
+		}
+		{
+			int off = (idx << 6) + 8;
+			BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + off);
+			spr->kind = 0x1f;
+			spr->x = 0;
+			spr->y = 0;
+			spr->w = 0x80;
+			spr->h = 0x78;
+			spr->mulY = kBonusZClearOrigin;
+			spr->mulX = kBonusZClearOrigin;
+			spr->startFrame = 9999;
+			spr->duration = 8;
+			spr->depth = FLOAT_80331EB0;
+			spr->motionX = FLOAT_80331F5C;
+			spr->motionY = FLOAT_80331F5C;
+			BonusSpriteFlags(spr) = 2;
+			idx = 3;
+		}
+		{
+			int off = (idx << 6) + 8;
+			BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + off);
+			spr->kind = -4;
+			spr->x = 0;
+			spr->y = 0;
+			spr->w = 0x70;
+			spr->h = 0x68;
+			spr->mulY = kBonusZClearOrigin;
+			spr->mulX = kBonusZClearOrigin;
+			spr->startFrame = 0;
+			spr->duration = 8;
+			spr->depth = FLOAT_80331EB0;
+			idx = 4;
+		}
 
-		sprites[idx].kind = -3;
-		sprites[idx].x = 0xf0;
-		sprites[idx].y = 0x38;
-		sprites[idx].w = 0x168;
-		sprites[idx].h = 0x148;
-		sprites[idx].mulX = 0.0f;
-		sprites[idx].mulY = 0.0f;
-		sprites[idx].startFrame = 0;
-		sprites[idx].duration = 8;
-		sprites[idx].depth = 1.0f;
-		idx++;
-		sprites[idx].kind = 0x1f;
-		sprites[idx].x = 0;
-		sprites[idx].y = 0;
-		sprites[idx].w = 0x80;
-		sprites[idx].h = 0x78;
-		sprites[idx].mulX = 0.0f;
-		sprites[idx].mulY = 0.0f;
-		sprites[idx].startFrame = 9999;
-		sprites[idx].duration = 8;
-		sprites[idx].depth = 1.0f;
-		idx++;
-		BonusSpriteFlags(&sprites[2]) = 2;
-		sprites[2].motionX = -150.0f;
-		sprites[2].motionY = -150.0f;
-		InitAnimSprite(&sprites[idx++], -4, 0, 0, 0x70, 0x68, 0, 8);
-		ResetAnimSpriteMotion(&sprites[3]);
-		sprites[3].depth = 1.0f;
-
-		iconBase = idx;
-		short y = 0x28;
-		for (unsigned int i = 0; i < activePartyCount; i++) {
-			InitSelectOpenPartyIcon(&sprites[idx], i, y);
-			idx++;
+		int top;
+		int y = 0x28;
+		for (int i = 0; i < activePartyCount; i++) {
+			int partySlot;
+			BonusSummaryData* p = s_Rinfo;
+			for (int j = 0; j < activePartyCount; j++) {
+				if (i == p->m_party[0].m_rank) {
+					partySlot = s_Rinfo->m_party[j].m_partySlot;
+					break;
+				}
+				p = (BonusSummaryData*)((int)p + 0x2c);
+			}
+			int off = ((4 + i) << 6) + 8;
+			BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + off);
+			spr->kind = 0x18;
+			spr->x = ((1 <= i) && (i <= 2)) ? 0x30 : 0x48;
+			spr->y = y;
+			spr->w = 0x60;
+			spr->h = 0x58;
+			spr->mulX = (float)((partySlot & 1) ? spr->w : 0);
+			spr->mulY = (float)((partySlot >> 1) ? spr->h : 0);
+			spr->startFrame = 0;
+			spr->duration = 8;
+			spr->depth = FLOAT_80331EB0;
+			spr->motionX = FLOAT_80331F60;
+			spr->motionY = kBonusZClearOrigin;
+			spr->targetX = (float)spr->x + spr->motionX;
+			spr->targetY = (float)spr->y + spr->motionY;
+			BonusSpriteFlags(spr) = 1;
 			y += 0x60;
 		}
 
-		s_PlayerTop = (unsigned char)idx;
+		top = activePartyCount + 4;
+		s_PlayerTop = (unsigned char)top;
 		for (int i = 0; i < activePartyCount; i++) {
-			InitAnimSprite(&sprites[idx], -2, 0, 0, 0, 0, sprites[iconBase + i].startFrame, 8);
-			sprites[idx].tex = 0;
-			sprites[idx].motionX = 100.0f;
-			sprites[idx].motionY = 0.0f;
-			sprites[idx].targetX = (float)sprites[idx].x + sprites[idx].motionX;
-			sprites[idx].targetY = (float)sprites[idx].y + sprites[idx].motionY;
-			idx++;
+			int off = ((top + i) << 6) + 8;
+			BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + off);
+			spr->kind = -2;
+			spr->x = 0;
+			spr->y = 0;
+			spr->w = 0;
+			spr->h = 0;
+			spr->mulX = kBonusZClearOrigin;
+			spr->mulY = kBonusZClearOrigin;
+			spr->startFrame = (spr - activePartyCount)->startFrame;
+			spr->duration = 8;
+			spr->depth = FLOAT_80331EB0;
+			spr->motionX = FLOAT_80331F60;
+			spr->motionY = kBonusZClearOrigin;
+			spr->targetX = (float)spr->x + spr->motionX;
+			spr->targetY = (float)spr->y + spr->motionY;
+			BonusSpriteFlags(spr) = 1;
 		}
 
-		s_ArtiTop = (unsigned char)idx;
-		for (int i = 0; i < 8; i++) {
-			int start = 10 + i * 5;
-			start = (int)(0.6f * (float)start);
-			InitAnimSprite(&sprites[idx], -2, 0, 0, 0, 0, start, 0x21);
-			sprites[idx].tex = 0;
-			BonusSpriteFlags(&sprites[idx]) = 1;
-			idx++;
+		top += activePartyCount;
+		s_ArtiTop = (unsigned char)top;
+		{
+			int start = 10;
+			for (int i = 0; i < 8; i++) {
+				int off = ((top + i) << 6) + 8;
+				BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + off);
+				spr->kind = -2;
+				spr->x = 0;
+				spr->y = 0;
+				spr->w = 0;
+				spr->h = 0;
+				spr->mulX = kBonusZClearOrigin;
+				spr->mulY = kBonusZClearOrigin;
+				spr->startFrame = start;
+				spr->startFrame = (int)(FLOAT_80331F64 * (float)spr->startFrame);
+				spr->duration = 0x21;
+				spr->depth = FLOAT_80331EB0;
+				BonusSpriteFlags(spr) = 1;
+				start += 5;
+			}
 		}
 
-		detailBase = idx;
+		int copyDelta = top + 4;
+		top += 8;
 		for (int i = 0; i < activePartyCount; i++) {
-			sprites[idx] = sprites[iconBase + i];
-			sprites[idx].y = (short)(sprites[idx].y + 0x20);
-			sprites[idx].w = 0xA8;
-			sprites[idx].h = 0x38;
-			sprites[idx].alpha = 0.0f;
-			sprites[idx].mulX = 0.0f;
-			sprites[idx].mulY = 56.0f;
-			BonusSpriteFlags(&sprites[idx]) = 1;
-			sprites[idx].depth = 1.0f;
-			sprites[idx].motionX = 100.0f;
-			sprites[idx].motionY = 0.0f;
-			sprites[idx].targetX = (float)sprites[idx].x + sprites[idx].motionX;
-			sprites[idx].targetY = (float)sprites[idx].y + sprites[idx].motionY;
-			idx++;
+			int off = ((top + i) << 6) + 8;
+			BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + off);
+			*spr = *(spr - copyDelta);
+			spr->y = (short)(spr->y + 0x20);
+			spr->w = 0xA8;
+			spr->h = 0x38;
+			spr->mulX = kBonusZClearOrigin;
+			spr->mulY = FLOAT_80331F68;
+			spr->motionX = FLOAT_80331F60;
+			spr->motionY = kBonusZClearOrigin;
+			spr->targetX = (float)spr->x + spr->motionX;
+			spr->targetY = (float)spr->y + spr->motionY;
+			BonusSpriteFlags(spr) = 1;
 		}
 
+		top += activePartyCount;
 		y = 0x28;
 		for (int i = 0; i < activePartyCount; i++) {
-			short x = ((1 <= i) && (i <= 2)) ? 8 : 0x20;
-			InitAnimSprite(&sprites[idx], 0x19, x, y, 0x38, 0x28, i * 2, 8);
-			ResetAnimSpriteMotion(&sprites[idx]);
-			sprites[idx].mulX = (float)(i * sprites[idx].w);
-			sprites[idx].depth = 1.0f;
-			sprites[idx].motionX = 100.0f;
-			sprites[idx].motionY = 0.0f;
-			sprites[idx].targetX = (float)sprites[idx].x + sprites[idx].motionX;
-			sprites[idx].targetY = (float)sprites[idx].y + sprites[idx].motionY;
-			BonusSpriteFlags(&sprites[idx]) = 1;
-			idx++;
+			int off = ((top + i) << 6) + 8;
+			BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + off);
+			spr->kind = 0x19;
+			spr->x = ((1 <= i) && (i <= 2)) ? 8 : 0x20;
+			spr->y = y;
+			spr->w = 0x38;
+			spr->h = 0x28;
+			spr->mulX = (float)(i * spr->w);
+			spr->mulY = kBonusZClearOrigin;
+			spr->startFrame = 0;
+			spr->duration = 8;
+			spr->depth = FLOAT_80331EB0;
+			spr->motionX = FLOAT_80331F60;
+			spr->motionY = kBonusZClearOrigin;
+			spr->targetX = (float)spr->x + spr->motionX;
+			spr->targetY = (float)spr->y + spr->motionY;
+			BonusSpriteFlags(spr) = 1;
 			y += 0x60;
 		}
 
+		top += activePartyCount;
+		int nameDelta = top - 4;
 		for (int i = 0; i < activePartyCount; i++) {
-			InitSelectOpenPartyName(&sprites[idx], &sprites[iconBase + i], 0x50, 0x48, sprites[detailBase + i].startFrame + 2);
-			idx++;
+			int off = ((top + i) << 6) + 8;
+			BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + off);
+			BonusAnimSprite* prev = spr - nameDelta;
+			spr->kind = -1;
+			spr->x = (short)(prev->x + 0x50);
+			spr->y = (short)(prev->y + 0x48);
+			spr->w = 0;
+			spr->h = 0;
+			spr->mulX = kBonusZClearOrigin;
+			spr->mulY = kBonusZClearOrigin;
+			spr->startFrame = prev->startFrame;
+			spr->duration = 8;
+			spr->depth = FLOAT_80331EB0;
+			spr->motionX = FLOAT_80331F60;
+			spr->motionY = kBonusZClearOrigin;
+			spr->targetX = (float)spr->x + spr->motionX;
+			spr->targetY = (float)spr->y + spr->motionY;
+			BonusSpriteFlags(spr) = 1;
 		}
 
-		ArtiBaseInfoInit(reinterpret_cast<CMenuPcs::Sprt2*>(&sprites[1]), reinterpret_cast<CMenuPcs::Sprt2*>(&sprites[3]));
-		MenuBoardEntry* boardEntries = GetBonusBoardEntries(this);
-		BonusAnimSprite* boardSprite = &sprites[1];
-		for (int i = 0; i < 8; i++) {
-			int __p3 = activePartyCount;
-			MenuBoardEntry& entry = boardEntries[__p3 * 2 + i];
-			entry.m_rotZ = 0.0f;
-			entry.m_rotY = 0.0f;
-			entry.m_rotX = 0.0f;
-			entry.m_scaleZ = 0.0f;
-			entry.m_scaleY = 0.0f;
-			entry.m_scaleX = 0.0f;
-			entry.m_unk3c = 1.0f;
-			entry.m_unk38 = 1.0f;
-			entry.m_unk34 = 1.0f;
-			entry.m_modelHandle = 0;
-			entry.m_effectHandle = 0;
-			int centerX = (int)((double)(float)((double)boardSprite->w * 0.5 + (double)boardSprite->x) - 320.0);
-			int centerY = (int)((double)(float)((double)boardSprite->h * 0.5 + (double)boardSprite->y) - 240.0);
-			entry.m_centerX = (short)centerX;
-			entry.m_centerY = (short)centerY;
-			entry.m_width = 0x280;
-			entry.m_height = 0x1C0;
-			entry.m_posX = 0.0f;
-			entry.m_posY = 0.0f;
-			entry.m_depth = 1000.0f;
-			entry.m_screenX = 0;
-			entry.m_screenY = 0;
-			entry.m_screenWidth = 0x280;
-			entry.m_screenHeight = 0x1C0;
+		top += activePartyCount;
+		{
+			CMenuPcs::Sprt2* p3 = reinterpret_cast<CMenuPcs::Sprt2*>(this->m_bonusAnimPtr + 0xc8);
+			ArtiBaseInfoInit(reinterpret_cast<CMenuPcs::Sprt2*>((int)p3 - 0x80), p3);
+		}
+		{
+			int anim = this->m_bonusAnimPtr;
+			int boardOff = activePartyCount * 2;
+			boardOff = boardOff * 0x50;
+			for (int i = 0; i < 8; i++) {
+				int o04 = boardOff + 0x4;
+				int o08 = boardOff + 0x8;
+				int o0a = boardOff + 0xa;
+				int o0c = boardOff + 0xc;
+				int o0e = boardOff + 0xe;
+				int o10 = boardOff + 0x10;
+				int o14 = boardOff + 0x14;
+				int o18 = boardOff + 0x18;
+				int o40 = boardOff + 0x40;
+				int o44 = boardOff + 0x44;
+				int o48 = boardOff + 0x48;
+				int o4c = boardOff + 0x4c;
+				int b = this->m_bonus.m_bonusBoardPtr;
+				*(float*)(b + (boardOff + 0x24)) = kBonusZClearOrigin;
+				*(float*)(b + (boardOff + 0x20)) = kBonusZClearOrigin;
+				*(float*)(b + (boardOff + 0x1c)) = kBonusZClearOrigin;
+				*(float*)(b + (boardOff + 0x30)) = kBonusZClearOrigin;
+				*(float*)(b + (boardOff + 0x2c)) = kBonusZClearOrigin;
+				*(float*)(b + (boardOff + 0x28)) = kBonusZClearOrigin;
+				*(float*)(b + (boardOff + 0x3c)) = FLOAT_80331EB0;
+				*(float*)(b + (boardOff + 0x38)) = FLOAT_80331EB0;
+				*(float*)(b + (boardOff + 0x34)) = FLOAT_80331EB0;
+				*(int*)(this->m_bonus.m_bonusBoardPtr + boardOff) = 0;
+				*(int*)(this->m_bonus.m_bonusBoardPtr + o04) = 0;
+				int centerX = (int)((double)(float)((double)*(short*)(anim + 0x4c) * DOUBLE_80331E78 + (double)*(short*)(anim + 0x48)) - DOUBLE_80331EE8);
+				*(short*)(this->m_bonus.m_bonusBoardPtr + o08) = (short)centerX;
+				int centerY = (int)((double)(float)((double)*(short*)(anim + 0x4e) * DOUBLE_80331E78 + (double)*(short*)(anim + 0x4a)) - DOUBLE_80331EF0);
+				*(short*)(this->m_bonus.m_bonusBoardPtr + o0a) = (short)centerY;
+				*(short*)(this->m_bonus.m_bonusBoardPtr + o0c) = 0x280;
+				*(short*)(this->m_bonus.m_bonusBoardPtr + o0e) = 0x1C0;
+				*(float*)(this->m_bonus.m_bonusBoardPtr + o10) = kBonusZClearOrigin;
+				*(float*)(this->m_bonus.m_bonusBoardPtr + o14) = kBonusZClearOrigin;
+				*(float*)(this->m_bonus.m_bonusBoardPtr + o18) = FLOAT_80331F6C;
+				*(int*)(this->m_bonus.m_bonusBoardPtr + o40) = 0;
+				*(int*)(this->m_bonus.m_bonusBoardPtr + o44) = 0;
+				*(int*)(this->m_bonus.m_bonusBoardPtr + o48) = 0x280;
+				*(int*)(this->m_bonus.m_bonusBoardPtr + o4c) = 0x1C0;
+				boardOff += 0x50;
+			}
 		}
 
-		header->count = (short)idx;
-		header->finished = 0;
+		((BonusAnimHeader*)this->m_bonusAnimPtr)->count = (short)top;
+		((BonusAnimHeader*)this->m_bonusAnimPtr)->finished = 0;
 		*(unsigned char*)(this->m_bonusStatePtr + 0xb) = 1;
 	}
 
-	int statePtr = this->m_bonusStatePtr;
-	int animPtr = this->m_bonusAnimPtr;
-	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
-	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
-
-	*(short*)(statePtr + 0x22) = *(unsigned short*)(statePtr + 0x22) + 1;
-	int frame = (int)*(short*)(statePtr + 0x22);
+	*(short*)(this->m_bonusStatePtr + 0x22) = *(short*)(this->m_bonusStatePtr + 0x22) + 1;
+	int frame = (int)*(short*)(this->m_bonusStatePtr + 0x22);
+	int i0 = 0;
+	int off = i0;
 	int doneCount = 0;
 
-	int off = 0;
-	for (int i = 0; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++, off += 0x40) {
-		BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + off + 8);
-		int flags = BonusSpriteFlags(sprite);
+	for (; i0 < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i0++, off += 0x40) {
+		int sprOff = off + 8;
+		BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + sprOff);
 
-		if ((flags & 1) != 0) {
-			sprite->alpha = 1.0f;
+		if ((BonusSpriteFlags(sprite) & 1) != 0) {
+			sprite->alpha = FLOAT_80331EB0;
 		} else {
 			if (frame < sprite->startFrame) {
-				sprite->alpha = 0.0f;
+				sprite->alpha = kBonusZClearOrigin;
 			}
 			if (sprite->startFrame + sprite->duration <= frame) {
-				sprite->alpha = 1.0f;
+				sprite->alpha = FLOAT_80331EB0;
 			} else {
-				sprite->alpha = (1.0f / (float)sprite->duration) * (float)sprite->timer;
+				sprite->alpha = (float)((1.0 / (double)sprite->duration) * (double)sprite->timer);
 			}
 		}
 
@@ -1726,10 +1842,10 @@ void CMenuPcs::CalcSelectOpenAnim()
 			doneCount++;
 		}
 
-		if ((flags & 2) == 0 && (sprite->motionX != 0.0f || sprite->motionY != 0.0f)) {
+		if ((BonusSpriteFlags(sprite) & 2) == 0 && (sprite->motionX != kBonusZClearOrigin || sprite->motionY != kBonusZClearOrigin)) {
 			float fy = (float)sprite->y;
 			float ty = sprite->targetY;
-			float progress = 1.0f - ((1.0f / (float)sprite->duration) * (float)sprite->timer);
+			float progress = (float)(1.0 - (1.0 / (double)sprite->duration) * (double)sprite->timer);
 			sprite->motionX = (sprite->targetX - (float)sprite->x) * progress;
 			sprite->motionY = (ty - fy) * progress;
 		}
@@ -1739,27 +1855,39 @@ void CMenuPcs::CalcSelectOpenAnim()
 		}
 	}
 
-	MenuBoardEntry* boardEntries = GetBonusBoardEntries(this);
-	for (int i = 0; i < activePartyCount; i++) {
-		MenuBoardEntry& entry = boardEntries[i];
-		BonusAnimSprite* sprite = &sprites[4 + i];
-		int centerX = (int)((double)(float)((double)sprite->w * 0.5 + (double)((float)sprite->x + sprite->motionX)) - 320.0);
-		int centerY = (int)((double)(float)((double)sprite->h * 0.5 + (double)((float)sprite->y + sprite->motionY)) - 240.0);
-		entry.m_centerX = (short)centerX;
-		entry.m_centerY = (short)centerY;
-
-		int screenX = (int)(24.0f + (float)sprite->x + sprite->motionX);
-		int screenY = (int)(((float)sprite->y + sprite->motionY) - 28.0f);
-		if ((double)screenX < 0.0) {
-			screenX = 0;
+	{
+		int i = 0;
+		int boardOff = i;
+		for (; i < activePartyCount; i++) {
+			int sprOff = ((4 + i) << 6) + 8;
+			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + sprOff);
+			int o08 = boardOff + 0x8;
+			int o0a = boardOff + 0xa;
+			int o40 = boardOff + 0x40;
+			int o44 = boardOff + 0x44;
+			int centerX = (int)(float)((double)(float)(4.0 + ((double)sprite->w * DOUBLE_80331E78 + (double)((float)sprite->x + sprite->motionX))) - DOUBLE_80331EE8);
+			int centerY = (int)(float)((double)(float)((double)sprite->h * DOUBLE_80331E78 + (double)((float)sprite->y + sprite->motionY)) - DOUBLE_80331EF0);
+			*(short*)(this->m_bonus.m_bonusBoardPtr + o08) = (short)centerX;
+			*(short*)(this->m_bonus.m_bonusBoardPtr + o0a) = (short)centerY;
+			*(int*)(this->m_bonus.m_bonusBoardPtr + o40) = (int)(FLOAT_80331EF8 + ((float)sprite->x + sprite->motionX));
+			*(int*)(this->m_bonus.m_bonusBoardPtr + o44) = (int)(((float)sprite->y + sprite->motionY) - FLOAT_80331EFC);
+			if ((double)*(int*)(this->m_bonus.m_bonusBoardPtr + o40) < 0.0) {
+				*(int*)(this->m_bonus.m_bonusBoardPtr + o40) = 0;
+			}
+			{
+				int o44b = boardOff + 0x44;
+				if ((double)*(int*)(this->m_bonus.m_bonusBoardPtr + o44b) < 0.0) {
+					*(int*)(this->m_bonus.m_bonusBoardPtr + o44b) = 0;
+				}
+			}
+			{
+				int o48 = boardOff + 0x48;
+				int o4c = boardOff + 0x4c;
+				*(int*)(this->m_bonus.m_bonusBoardPtr + o48) = 0x48;
+				*(int*)(this->m_bonus.m_bonusBoardPtr + o4c) = 0x58;
+			}
+			boardOff += 0x50;
 		}
-		if ((double)screenY < 0.0) {
-			screenY = 0;
-		}
-		entry.m_screenX = screenX;
-		entry.m_screenY = screenY;
-		entry.m_screenWidth = 0x48;
-		entry.m_screenHeight = 0x58;
 	}
 
 	Mtx scaleMtx;
@@ -1768,93 +1896,103 @@ void CMenuPcs::CalcSelectOpenAnim()
 	Mtx rotXMtx;
 	Vec srcVec;
 	Vec dstVec;
-	CCharaPcs::CHandle** displaySlots = GetBonusDisplayHandleSlots(this);
-	int partyByteOff = 0;
-	for (int i = 0; i < activePartyCount + 8; i++, partyByteOff += sizeof(BonusPartySummary)) {
-		BonusAnimSprite* iconSprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + ((int)(unsigned char)s_PlayerTop + i) * 0x40 + 8);
-		CCharaPcs::CHandle* handle;
-		int tribeId;
-		if (i < activePartyCount) {
-			tribeId = *(int*)((int)s_Rinfo + partyByteOff + 0x44);
-			handle = *(CCharaPcs::CHandle**)((int)s_Rinfo + partyByteOff + 0x20);
-			float modelScale = s_BonusModelScale[tribeId];
-			PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
-
-			scaleMtx[1][3] = s_BonusModelYPos[tribeId];
-			scaleMtx[0][3] = 0.0f;
-		} else {
-			handle = displaySlots[i + activePartyCount];
-			if (handle == 0) {
-				continue;
-			}
-			PSMTXScale(scaleMtx, 0.5799999833106995f, 0.5799999833106995f, 0.5799999833106995f);
-
-			int duration = iconSprite->duration;
-			unsigned int artifactIndex = i - activePartyCount;
-			unsigned int fcvIndex = duration / 5;
-			float rate = (float)(450.0 / (double)(float)duration);
-			int __p2 = artifactIndex;
-			int phase = (int)(((double)duration / 10.0) * (double)(10 - __p2));
-
-			if (frame == iconSprite->startFrame && this->m_bonusCursorFlag == 0) {
-				this->m_bonusCursorFlag = 1;
-				Sound.PlaySe(0x4d, 0x40, 0x7f, 0);
-			}
-
-			float angle;
-			if (frame < iconSprite->startFrame) {
-				srcVec.x = s_BonusModelScale[6];
-				angle = -90.0f;
-			} else if (iconSprite->timer >= phase) {
-				srcVec.x = s_BonusModelScale[4];
-				angle = (float)(45.0 * (double)(8 - artifactIndex));
+	{
+		int i = 0;
+		int partyByteOff = i;
+		const float* scale4 = (const float*)(anchor + 0x6c);
+		int total = activePartyCount + 8;
+		for (; i < total; i++, partyByteOff += sizeof(BonusPartySummary)) {
+			int sprOff2 = (((int)(signed char)s_PlayerTop + i) << 6) + 8;
+			BonusAnimSprite* iconSprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + sprOff2);
+			CCharaPcs::CHandle* handle;
+			int tribeId;
+			if (i < activePartyCount) {
+				int p = (int)s_Rinfo + partyByteOff;
+				tribeId = *(int*)(p + 0x44);
+				handle = *(CCharaPcs::CHandle**)(p + 0x20);
+				const float* scaleTbl = (const float*)(anchor + 0x5c);
+				float modelScale = scaleTbl[tribeId];
+				PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
 			} else {
-				int last = iconSprite->timer - 1;
-				int __p4 = fcvIndex;
-				if (last > __p4) {
-					srcVec.x = ((s_BonusModelScale[5] - s_BonusModelScale[4]) /
-					    ((float)phase - (float)fcvIndex)) *
-					    (float)(last - fcvIndex) - s_BonusModelScale[5];
-				} else {
-					srcVec.x = (float)last *
-					    ((s_BonusModelScale[6] - s_BonusModelScale[5]) / (float)fcvIndex) -
-					    s_BonusModelScale[6];
+				int artifactIndex = i - activePartyCount;
+				int slotOff = (activePartyCount * 2 + artifactIndex) * 4 + 0x774;
+				handle = *(CCharaPcs::CHandle**)((int)this + slotOff);
+				if (handle == 0) {
+					continue;
 				}
-				srcVec.x = -srcVec.x;
-				angle = (float)(-90.0 + (double)(float)(rate * (double)(float)last));
+				PSMTXScale(scaleMtx, 0.5799999833106995f, 0.5799999833106995f, 0.5799999833106995f);
 			}
-			srcVec.y = 0.0f;
-			srcVec.z = 0.0f;
-			PSMTXRotRad(rotZMtx, 'z', 0.01745329238474369f * angle);
-			PSMTXMultVecSR(rotZMtx, &srcVec, &dstVec);
+			if (i < activePartyCount) {
+				scaleMtx[0][3] = kBonusZClearOrigin;
+				const float* yposTbl = (const float*)(anchor + 0x4c);
+				scaleMtx[1][3] = yposTbl[tribeId];
+				scaleMtx[2][3] = kBonusZClearOrigin;
+			} else {
+				int duration = iconSprite->duration;
+				int artifactIndex = i - activePartyCount;
+				int fcvIndex = duration / 5;
+				int rem = 8 - artifactIndex;
+				int phase = (int)(((double)duration / 10.0) * (double)(rem + 2));
+				float rate = (float)(450.0 / (double)(float)duration);
 
-			unsigned int charaNo = handle->m_charaNo;
-			if (charaNo == 0x44) {
-				PSMTXRotRad(rotYMtx, 'y', 3.1415927410125732f);
-				PSMTXConcat(scaleMtx, rotYMtx, scaleMtx);
-				PSMTXRotRad(rotXMtx, 'x', -1.1693705320358276f);
-				PSMTXConcat(scaleMtx, rotXMtx, scaleMtx);
+				if (frame == iconSprite->startFrame && *(signed char*)&this->m_bonusCursorFlag == 0) {
+					this->m_bonusCursorFlag = 1;
+					Sound.PlaySe(0x4d, 0x40, 0x7f, 0);
+				}
+
+				float angle;
+				if (frame < iconSprite->startFrame) {
+					srcVec.x = scale4[2];
+					angle = -90.0f;
+				} else if (iconSprite->timer >= phase) {
+					srcVec.x = ((const float*)(anchor + 0x5c))[4];
+					angle = (float)(45.0 * (double)rem);
+				} else {
+					int last = iconSprite->timer - 1;
+					if (last <= fcvIndex) {
+						srcVec.x = scale4[2] -
+						    (float)last * ((scale4[2] - scale4[1]) / (float)fcvIndex);
+					} else {
+						srcVec.x = scale4[1] -
+						    ((scale4[1] - ((const float*)(anchor + 0x5c))[4]) /
+						    ((float)phase - (float)fcvIndex)) *
+						    (float)(last - fcvIndex);
+					}
+					angle = (float)(-90.0 + (double)(rate * (float)last));
+				}
+				srcVec.y = kBonusZClearOrigin;
+				srcVec.z = kBonusZClearOrigin;
+				PSMTXRotRad(rotZMtx, 'z', 0.01745329238474369f * angle);
+				PSMTXMultVecSR(rotZMtx, &srcVec, &dstVec);
+
+				if ((unsigned int)handle->m_charaNo == 0x44) {
+					PSMTXRotRad(rotYMtx, 'y', 3.1415927410125732f);
+					PSMTXConcat(scaleMtx, rotYMtx, scaleMtx);
+					PSMTXRotRad(rotXMtx, 'x', -1.1693705320358276f);
+					PSMTXConcat(scaleMtx, rotXMtx, scaleMtx);
+				}
+
+				scaleMtx[0][3] = dstVec.x;
+				float modelY = (float)((double)(0.9670329689979553f * dstVec.y) - 5.0);
+				if ((unsigned int)handle->m_charaNo == 0x41 || (unsigned int)handle->m_charaNo == 0x37) {
+					modelY += 3.4000000953674316f;
+				} else if ((unsigned int)handle->m_charaNo == 0x44) {
+					modelY += 5.0f;
+				}
+				scaleMtx[1][3] = modelY;
+				scaleMtx[2][3] = kBonusZClearOrigin;
 			}
 
-			scaleMtx[0][3] = dstVec.x;
-			scaleMtx[1][3] = (float)((double)(0.9670329689979553f * dstVec.y) - 5.0);
-			if (charaNo == 0x41 || charaNo == 0x37) {
-				scaleMtx[1][3] = scaleMtx[1][3] + 3.4000000953674316f;
-			} else if (charaNo == 0x44) {
-				scaleMtx[1][3] = scaleMtx[1][3] + 5.0f;
-			}
+			handle->m_model->m_flags10C = (handle->m_model->m_flags10C & 0x7F) | 0x80;
+			handle->m_model->SetMatrix(scaleMtx);
+			handle->m_model->CalcMatrix();
+			handle->m_model->CalcSkin();
+			handle->m_model->m_lightAlpha = iconSprite->alpha;
 		}
-		scaleMtx[2][3] = 0.0f;
-
-		handle->m_model->m_flags10C = (handle->m_model->m_flags10C & 0x7F) | 0x80;
-		handle->m_model->SetMatrix(scaleMtx);
-		handle->m_model->CalcMatrix();
-		handle->m_model->CalcSkin();
-		handle->m_model->m_lightAlpha = iconSprite->alpha;
 	}
 
-	if (doneCount == (int)header->count) {
-		header->finished = 1;
+	if ((int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count == doneCount) {
+		((BonusAnimHeader*)this->m_bonusAnimPtr)->finished = 1;
 	}
 }
 

@@ -169,7 +169,7 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     }
 
     count = step->m_drawCount;
-    invCountMinusOne = (float)(count - 1);
+    invCountMinusOne = (float)(step->m_drawCount - 1);
     alphaMul = (float)GetKeShpTail2XAlphaWork(&obj->m_object, param_3)->m_alpha / kPppKeShpTail2XAlphaScale;
     colorStartR = step->m_colorStartR;
     colorStartG = step->m_colorStartG;

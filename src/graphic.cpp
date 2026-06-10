@@ -1407,8 +1407,9 @@ void CGraphic::GetBackBufferRect2(void* dstBuffer, _GXTexObj* texObj, int x, int
     if ((xEnd >= 0) && (yEnd >= 0) && (copyX <= m_renderMode->fbWidth) &&
         ((yEnd >= 0) && (copyY <= m_renderMode->efbHeight)) &&
         ((copyWidth > 0) && ((copyHeight > 0) && (xEnd != copyX))) && (yEnd != copyY)) {
+        void* textureBase;
         int textureSize = GXGetTexBufferSize((u16)copyWidth, (u16)copyHeight, copyFormat, GX_FALSE, GX_FALSE);
-        void* textureBase =
+        textureBase =
             reinterpret_cast<void*>((reinterpret_cast<u32>(dstBuffer) + ((dstOffset + 0x1F) & 0xFFFFFFE0) + 0x1F) &
                                     0xFFFFFFE0);
 

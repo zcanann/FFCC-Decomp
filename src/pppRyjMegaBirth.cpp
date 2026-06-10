@@ -948,8 +948,8 @@ void birth(
 	}
 
 	{
-		float speedScalar = *f32_at(payload, 0xD4);
-		if (kPppRyjMegaBirthZero != speedScalar) {
+		float speedScalar;
+		if (kPppRyjMegaBirthZero != (speedScalar = *f32_at(payload, 0xD4))) {
 			float r1;
 			float r2;
 			float r3;

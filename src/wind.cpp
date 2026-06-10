@@ -648,7 +648,8 @@ void CWind::Frame()
                     f2 = kWindDirNegativeJitter;
                 }
 
-                obj->targetDir = f2 * obj->baseDir + obj->targetDir;
+                f1 = obj->baseDir;
+                obj->targetDir = f1 * f2 + obj->targetDir;
                 f0 = obj->targetDir;
                 f1 = obj->baseDir;
                 f1 = (f0 < f1) ? f1 : ((kWindDirMaxOffset + f1 < f0) ? kWindDirMaxOffset + f1 : f0);

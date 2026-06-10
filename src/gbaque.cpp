@@ -1157,22 +1157,20 @@ void GbaQueue::SetRadarType()
 {
 	char* obj = reinterpret_cast<char*>(this);
 	unsigned int validMemberCount;
+	int assignedCount;
 	unsigned int activeMask;
-	unsigned int assignedCount;
-	int prevAssignedType;
 	int i;
 
-	if (static_cast<unsigned char>(m_radarTypeFlags) != 0) {
+	if (static_cast<signed char>(m_radarTypeFlags) != 0) {
 		return;
 	}
 	if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
 		return;
 	}
 
-	const int* wmParams = Game.m_gameWork.m_wmBackupParams;
 	validMemberCount = 0;
 	for (i = 0; i < 4; i++) {
-		if (wmParams[i] >= 0) {
+		if (Game.m_gameWork.m_wmBackupParams[i] >= 0) {
 			validMemberCount++;
 		}
 	}
@@ -1186,18 +1184,17 @@ void GbaQueue::SetRadarType()
 		}
 	}
 
+	int assignedType;
 	assignedCount = 0;
-	prevAssignedType = 0;
 	while (assignedCount < static_cast<int>(validMemberCount)) {
-		const int slot = rand() & 3;
+		const int slot = rand() % 4;
 		if ((activeMask & (1 << slot)) != 0) {
-			int assignedType = assignedCount;
-			if (assignedCount >= 2) {
-				if (assignedCount == 2) {
-					assignedType = assignedCount + (rand() & 1);
-				} else {
-					assignedType = (prevAssignedType == 2) ? 3 : 2;
-				}
+			if (assignedCount < 2) {
+				assignedType = assignedCount;
+			} else if (assignedCount == 2) {
+				assignedType = assignedCount + (rand() & 1);
+			} else {
+				assignedType = (assignedType == 2) ? 3 : 2;
 			}
 
 			OSWaitSemaphore(accessSemaphores + slot);
@@ -1206,7 +1203,6 @@ void GbaQueue::SetRadarType()
 
 			activeMask &= static_cast<unsigned int>(~(1 << slot));
 			assignedCount++;
-			prevAssignedType = assignedType;
 		}
 	}
 
@@ -1226,13 +1222,12 @@ void GbaQueue::SetRadarType()
 	}
 
 	for (i = 0; i < 4; i++) {
-		const unsigned char mask = static_cast<unsigned char>(1 << i);
-		const unsigned char oldMode = m_radarMode;
-
 		OSWaitSemaphore(accessSemaphores + i);
-		m_radarMode = static_cast<unsigned char>((oldMode & ~mask) | mask);
+		const int oldMode = m_radarMode;
+		const int mask = 1 << i;
+		m_radarMode = static_cast<char>((oldMode & ~mask) | mask);
 		if (oldMode != m_radarMode) {
-			m_chgRadarMode = static_cast<unsigned char>(m_chgRadarMode | mask);
+			m_chgRadarMode = static_cast<char>(m_chgRadarMode | mask);
 		}
 		OSSignalSemaphore(accessSemaphores + i);
 	}

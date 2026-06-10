@@ -1587,24 +1587,26 @@ void CGObject::update()
                 const float targetYaw = atan2f(-lookDelta.x, -lookDelta.z);
                 const float yawDelta = Math.DstRot(targetYaw, m_rotBaseY);
                 if (fabs(yawDelta) < 0.75f) {
-                    const float pitchDelta = atan2f(lookDelta.y, lookDistance);
-                    if (fabs(pitchDelta) < 0.5f) {
+                    const double pitchDelta = atan2(lookDelta.y, lookDistance);
+                    if (fabs((float)pitchDelta) < 0.5) {
                         lookYaw += yawDelta;
-                        lookPitch += pitchDelta;
+                        lookPitch += (float)pitchDelta;
                     }
                 }
             }
         }
 
+        const float twistRate = sBgAttrFast;
         const unsigned char lookBlendByte = *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x56);
-        float lookBlend = 0.015625f * static_cast<float>(lookBlendByte);
         CChara::CModel* chestModel = m_charaModelHandle->m_model;
+        float lookBlend = 0.015625f * static_cast<float>(lookBlendByte);
         const float chestAmp = ModelChestAmp(chestModel);
         const float chestTilt = ModelChestTilt(chestModel);
         ModelChestAmp(chestModel) = lookBlend * (lookYaw - chestAmp) + chestAmp;
         ModelChestTilt(chestModel) = lookBlend * (lookPitch - chestTilt) + chestTilt;
-        ModelTwistAngle(m_charaModelHandle->m_model) +=
-            sBgAttrFast * (*reinterpret_cast<float*>(m_worldMode) - ModelTwistAngle(m_charaModelHandle->m_model));
+        CChara::CModel* twistModel = m_charaModelHandle->m_model;
+        const float twistAngle = ModelTwistAngle(twistModel);
+        ModelTwistAngle(twistModel) = twistRate * (*reinterpret_cast<float*>(m_worldMode) - twistAngle) + twistAngle;
 
         m_charaModelHandle->m_model->SetMatrix(modelMtx);
 
@@ -1627,28 +1629,31 @@ void CGObject::update()
             visibleScale = m_screenDepth > 30.0f ? sZeroFloat : sAnimFrameOffset;
         }
 
-        const float alphaTarget = m_stepSlopeLimit * onAlphaUpdate() * visibleScale;
-        const float alphaStep = ClampFloat(alphaTarget - m_lookAtTimer, -m_bgDownDist, m_bgDownDist);
-        m_lookAtTimer = ClampFloat(m_lookAtTimer + alphaStep, sZeroFloat, sAnimFrameOffset);
-        m_worldParam = m_worldParam > 0.25f ? m_worldParam - 0.25f : sZeroFloat;
+        const float alphaTarget = m_stepSlopeLimit * onAlphaUpdate();
+        const float alphaStep = ClampFloat(alphaTarget * visibleScale - m_lookAtTimer, -m_bgDownDist, m_bgDownDist);
+        m_lookAtTimer = m_lookAtTimer + alphaStep;
+        m_lookAtTimer = ClampFloat(m_lookAtTimer, sZeroFloat, sAnimFrameOffset);
+        const float worldParamStep = m_worldParam - 0.25f;
+        m_worldParam = worldParamStep < sZeroFloat ? sZeroFloat : worldParamStep;
         if ((m_displayFlags & 0x1000) != 0) {
             m_lookAtTimer = alphaTarget;
         }
 
-        if (m_lookAtTimer == sZeroFloat) {
+        if (sZeroFloat == m_lookAtTimer) {
             m_weaponNodeFlagBits.m_unk20 = 0;
         }
         m_weaponNodeFlagBits.m_unk40 =
-            (static_cast<s32>(static_cast<s32>(weaponFlagsLo) << 25 | static_cast<u32>(weaponFlagsLo) >> 7) |
-             static_cast<s32>(static_cast<u32>(weaponFlagsLo) << 26 | static_cast<u32>(weaponFlagsLo) >> 6)) < 0;
+            (static_cast<s32>(static_cast<u32>(weaponFlagsLo) << 25 | static_cast<u32>(weaponFlagsLo) >> 7) >> 31 |
+             static_cast<s32>(static_cast<u32>(weaponFlagsLo) << 26 | static_cast<u32>(weaponFlagsLo) >> 6) >> 31);
 
         if ((m_displayFlags & 1) != 0) {
-            if ((static_cast<s32>(static_cast<u32>(weaponFlagsLo) << 26 | static_cast<u32>(weaponFlagsLo) >> 6) < 0 &&
+            if ((static_cast<signed char>(
+                     static_cast<s32>(static_cast<u32>(weaponFlagsLo) << 26 | static_cast<u32>(weaponFlagsLo) >> 6) >> 31) &&
                  miniGameModelPass == 0) ||
                 m_currentAnimSlot != -1 || m_animSlotSel != static_cast<signed char>(shieldFlagsHi)) {
                 m_charaModelHandle->m_model->CalcMatrix();
             }
-            if (m_weaponNodeFlagBits.m_unk04 &&
+            if (static_cast<s32>(static_cast<u32>(weaponFlagsLo) << 26 | static_cast<u32>(weaponFlagsLo) >> 6) < 0 &&
                 miniGameModelPass == 0) {
                 m_charaModelHandle->m_model->CalcSkin();
             }

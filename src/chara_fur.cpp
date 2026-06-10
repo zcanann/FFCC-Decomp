@@ -1022,7 +1022,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 	const int debugPadLock = Pad.m_debugPadLock;
 	const short heldButtons = MogHeldButtons(debugPadLock);
 	const short triggerButtons = MogTriggerButtons(debugPadLock);
-	const unsigned short rotateButtons = (MogPadInt(debugPadLock, 64) == 0) ? MogHeldButtons(debugPadLock) : 0;
+	const unsigned short rotateButtons = static_cast<unsigned short>((MogPadInt(debugPadLock, 64) == 0) ? MogHeldButtons(debugPadLock) : static_cast<unsigned short>(0));
 
 	if (MogWork().m_started == 0) {
 		if ((heldButtons & 0x100) != 0) {

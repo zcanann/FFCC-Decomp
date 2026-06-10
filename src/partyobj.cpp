@@ -1387,7 +1387,7 @@ targetJoin: ;
 
 			CGObject* scriptTarget = party.secondaryTarget != nullptr ?
 				reinterpret_cast<CGObject*>(party.secondaryTarget) : party.target;
-			party.partyFlags |= 0x80;
+			party.flags.commandActive = 1;
 
 			CFlatRuntime::CStack stack[2];
 			stack[0].m_word = primaryCommand;

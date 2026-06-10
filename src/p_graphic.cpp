@@ -327,28 +327,12 @@ void CGraphicPcs::drawScreenFade()
                 const float sy = kGraphicScreenCenterY - kGraphicScreenCenterY * pos.y;
                 pos.x = sx;
                 pos.y = sy;
-                float clampedX = kGraphicZero;
-                if (!(sx < clampedX)) goto checkMaxX;
-                goto storeX;
-            checkMaxX:
-                clampedX = kGraphicScreenWidth;
-                if (!(clampedX < sx)) goto useX;
-                goto storeX;
-            useX:
-                clampedX = sx;
-            storeX:
+                float clampedX = 0.0f;
+                clampedX = (sx < clampedX) ? clampedX : ((kGraphicScreenWidth < sx) ? kGraphicScreenWidth : sx);
                 pos.x = clampedX;
                 {
-                    float clampedY = kGraphicZero;
-                    if (!(pos.y < clampedY)) goto checkMaxY;
-                    goto storeY;
-                checkMaxY:
-                    clampedY = kGraphicScreenHeight;
-                    if (!(clampedY < pos.y)) goto useY;
-                    goto storeY;
-                useY:
-                    clampedY = pos.y;
-                storeY:
+                    float clampedY = 0.0f;
+                    clampedY = (pos.y < clampedY) ? clampedY : ((kGraphicScreenHeight < pos.y) ? kGraphicScreenHeight : pos.y);
                     pos.y = clampedY;
                 }
 

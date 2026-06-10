@@ -2162,6 +2162,8 @@ int CMenuPcs::LetterCtrlCur()
 				if (letterCount == 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else {
+			int n = 0;
+			float f = FLOAT_803330f8;
 			*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) + 1;
 			s_SelLetter = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x34) + *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x26);
 			char* letterBytes = reinterpret_cast<char*>(caravanWork) + s_SelLetter * 0xC;
@@ -2170,7 +2172,6 @@ int CMenuPcs::LetterCtrlCur()
 			CMes::m_tempVar[2] = reinterpret_cast<CCaravanWork::CLetterWork*>(letterBytes + 0x3EC)->TempVar(2);
 			CMes::m_tempVar[3] = reinterpret_cast<CCaravanWork::CLetterWork*>(letterBytes + 0x3EC)->TempVar(3);
 
-			int n = 0;
 			s16* p = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n++]);
 			*reinterpret_cast<int*>(p + 0xE) = 0;
 			*reinterpret_cast<int*>(p + 0x12) = 10;
@@ -2180,7 +2181,6 @@ int CMenuPcs::LetterCtrlCur()
 			*reinterpret_cast<int*>(p + 0x12) = 0;
 			*reinterpret_cast<int*>(p + 0x14) = 10;
 
-			float f = FLOAT_803330f8;
 			int panelCount = GetLetterAnimStorage(this)->count;
 			s16* panel = GetLetterPanelBase(this);
 			for (int i = 0; i < panelCount; ++i, panel += 0x20) {
@@ -2218,8 +2218,8 @@ int CMenuPcs::LetterCtrlCur()
 				*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) + 1;
 				Sound.PlaySe(2, 0x40, 0x7F, 0);
 			} else if ((CFlatLetterEventEnabled() != 0) &&
-			    caravanWork->m_letters[s_SelLetter].HasReply() &&
-			    !caravanWork->m_letters[s_SelLetter].IsReplySent()) {
+			    reinterpret_cast<CCaravanWork::CLetterWork*>(letterBytes + 0x3EC)->HasReply() &&
+			    !reinterpret_cast<CCaravanWork::CLetterWork*>(letterBytes + 0x3EC)->IsReplySent()) {
 				*reinterpret_cast<u8*>(GetLetterStateBase(this) + 8) = 2;
 				*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) + 1;
 				Sound.PlaySe(2, 0x40, 0x7F, 0);
@@ -2256,7 +2256,7 @@ int CMenuPcs::LetterCtrlCur()
 		if ((hold & 0xC) == 0) {
 			if ((press & 0x100) != 0) {
 			s16 sel = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28);
-			if ((static_cast<int>(*reinterpret_cast<unsigned char*>(GetLetterStateBase(this) + 9)) & (1 << (sel + 1))) != 0) {
+			if ((static_cast<int>(*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 9)) & (1 << (sel + 1))) != 0) {
 				if (sel == 0) {
 					char* letterBytes = reinterpret_cast<char*>(caravanWork) + s_SelLetter * 0xC;
 					int value = reinterpret_cast<CCaravanWork::CLetterWork*>(letterBytes + 0x3EC)->AttachmentValue();
@@ -2321,10 +2321,8 @@ int CMenuPcs::LetterCtrlCur()
 				*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 8) = -1;
 			} else {
 				s_ReplyPos = static_cast<u8>(curReply);
-			CMemory::CStage* stage = GetLetterMenuStage(this);
-			char* srcText = new (stage, const_cast<char*>(s_menu_letter_cpp), 0x65E) char[kLetterTextScratchSize];
-			stage = GetLetterMenuStage(this);
-			char* workText = new (stage, const_cast<char*>(s_menu_letter_cpp), 0x660) char[kLetterTextScratchSize];
+			char* srcText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x65E) char[kLetterTextScratchSize];
+			char* workText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x660) char[kLetterTextScratchSize];
 			memset(srcText, 0, kLetterTextScratchSize);
 			memset(workText, 0, kLetterTextScratchSize);
 

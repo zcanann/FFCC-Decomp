@@ -1542,15 +1542,19 @@ void CFlatRuntime2::Draw()
 		redColor.b = 0x00;
 		redColor.a = 0xFF;
 		static Vec worldUp = {0.0f, 1.0f, 0.0f};
-		float ringVerts[8][3];
+		float ringVerts[24];
+		float* verts = ringVerts;
 
 		CFlatRuntime2::CDebugDrawCC* entry = DebugDrawCCEntries(runtime);
-		for (int i = 0; i < DebugDrawCCCount(runtime); i++) {
-			GXColor* drawColor = &greenColor;
+		for (int i = 0; i < DebugDrawCCCount(runtime); i++, entry++) {
+			GXColor* drawColor;
 			if (entry->m_flagBits.m_bit6 != 0) {
 				drawColor = &redColor;
-			} else if (entry->m_flagBits.m_bit7 != 0) {
-				drawColor = &blueColor;
+			} else {
+				drawColor = &greenColor;
+				if (entry->m_flagBits.m_bit7 != 0) {
+					drawColor = &blueColor;
+				}
 			}
 			GXSetChanMatColor(GX_COLOR0A0, *drawColor);
 
@@ -1580,13 +1584,13 @@ void CFlatRuntime2::Draw()
 			GXLoadPosMtxImm(orientMtx, GX_PNMTX0);
 
 			GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, 0x20);
-			float* vtx = ringVerts[0];
+			float* vtx = verts;
 			for (int j = 0; j < 8; j++) {
-				const float angle = static_cast<float>(j) * FLOAT_80330190;
+				const float angle = FLOAT_80330190 * static_cast<float>(j);
 				vtx[0] = entry->m_radius * sinf(angle);
 				vtx[1] = entry->m_radius * cosf(angle);
 				vtx[2] = length;
-				if ((entry->m_flags & 0x40) != 0) {
+				if (entry->m_flagBits.m_bit7 != 0) {
 					GXWGFifo.f32 = vtx[0];
 					GXWGFifo.f32 = vtx[1];
 					GXWGFifo.f32 = FLOAT_80330144;
@@ -1601,9 +1605,9 @@ void CFlatRuntime2::Draw()
 				vtx += 3;
 			}
 
-			vtx = ringVerts[0];
+			vtx = verts;
 			for (int j = 0; j < 8; j++) {
-				const float angle = static_cast<float>(j) * FLOAT_80330190;
+				const float angle = FLOAT_80330190 * static_cast<float>(j);
 				vtx[0] = entry->m_radius * sinf(angle);
 				vtx[1] = entry->m_radius * cosf(angle);
 				vtx[2] = length;
@@ -1611,13 +1615,11 @@ void CFlatRuntime2::Draw()
 				GXWGFifo.f32 = vtx[1];
 				GXWGFifo.f32 = vtx[2];
 				const int next = (j + 1) & 7;
-				GXWGFifo.f32 = ringVerts[next][0];
-				GXWGFifo.f32 = ringVerts[next][1];
-				GXWGFifo.f32 = ringVerts[next][2];
+				GXWGFifo.f32 = verts[next * 3];
+				GXWGFifo.f32 = verts[next * 3 + 1];
+				GXWGFifo.f32 = verts[next * 3 + 2];
 				vtx += 3;
 			}
-
-			entry++;
 		}
 	}
 }

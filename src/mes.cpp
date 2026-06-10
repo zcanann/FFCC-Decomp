@@ -137,6 +137,11 @@ static inline int ReadTagS16(char** text)
 		caseMode = 0;                                                     \
 	}
 
+static inline CColor& MesColorRef(const CColor& color)
+{
+	return (CColor&)color;
+}
+
 static inline char* FlatNameDirect(int tableIndex, int entryIndex)
 {
 	return Game.m_cFlatDataArr[1].TableStrings(tableIndex)[entryIndex];
@@ -600,9 +605,8 @@ void CMes::Draw()
 					}
 					MenuPcs.DrawInit();
 
-					unsigned int ch = (unsigned int)*(unsigned char*)(glyph + 4);
-					int iconId = ch;
-					switch (ch + 0x48)
+					int iconId = *(unsigned char*)(glyph + 4);
+					switch (iconId + 0x48)
 					{
 					case 0x4F:
 					{
@@ -615,7 +619,7 @@ void CMes::Draw()
 						if (specialPad)
 						{
 							int padType = Joybus.GetPadType(0);
-							mode = ((unsigned int)((padType - 0x40000) | (0x40000 - padType))) >> 31;
+							mode = ((unsigned int)((0x40000 - padType) | (padType - 0x40000))) >> 31;
 						}
 						else
 						{
@@ -635,7 +639,7 @@ void CMes::Draw()
 						if (specialPad)
 						{
 							int padType = Joybus.GetPadType(0);
-							mode = ((unsigned int)((padType - 0x40000) | (0x40000 - padType))) >> 31;
+							mode = ((unsigned int)((0x40000 - padType) | (padType - 0x40000))) >> 31;
 						}
 						else
 						{
@@ -655,7 +659,7 @@ void CMes::Draw()
 						if (specialPad)
 						{
 							int padType = Joybus.GetPadType(0);
-							mode = ((unsigned int)((padType - 0x40000) | (0x40000 - padType))) >> 31;
+							mode = ((unsigned int)((0x40000 - padType) | (padType - 0x40000))) >> 31;
 						}
 						else
 						{
@@ -675,7 +679,7 @@ void CMes::Draw()
 						if (specialPad)
 						{
 							int padType = Joybus.GetPadType(0);
-							mode = ((unsigned int)((padType - 0x40000) | (0x40000 - padType))) >> 31;
+							mode = ((unsigned int)((0x40000 - padType) | (padType - 0x40000))) >> 31;
 						}
 						else
 						{
@@ -686,15 +690,14 @@ void CMes::Draw()
 					}
 					}
 
-					CColor color(0xFF, 0xFF, 0xFF, 0xFF);
-					MenuPcs.SetColor(color);
+					MenuPcs.SetColor(MesColorRef(CColor(0xFF, 0xFF, 0xFF, 0xFF)));
 					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x15));
 
 					MenuPcs.DrawRect(
 					    0, *(float*)((char*)this + 0x3C9C) + *glyph,
-					    kMesIconDrawYOffset + *(float*)((char*)this + 0x3CA0) + (float)*(unsigned short*)(glyph + 2),
+					    kMesIconDrawYOffset + (*(float*)((char*)this + 0x3CA0) + (float)*(short*)(glyph + 2)),
 					    kMesIconDefaultWidth, kMesIconDefaultWidth, (float)((iconId % 5) * 0x16),
-					    (float)((iconId / 5) * 0x16), kMesOne, kMesOne, 0.0f);
+					    (float)((iconId / 5) * 0x16), kMesOne, kMesOne, kMesZero);
 
 					if (font != 0)
 					{
@@ -706,22 +709,17 @@ void CMes::Draw()
 					int fontId = (int)((unsigned int)*(unsigned char*)((char*)glyph + 0x0E) & 0x0F);
 					if (activeFontId != fontId)
 					{
+						activeFontId = fontId;
 						switch (fontId)
 						{
 						case 0:
 							nextFont = MenuPcs.m_fonts[0];
-							break;
-						case 1:
-							nextFont = font;
 							break;
 						case 2:
 							nextFont = MenuPcs.m_fonts[2];
 							break;
 						case 3:
 							nextFont = MenuPcs.m_fonts[2];
-							break;
-						default:
-							nextFont = font;
 							break;
 						}
 
@@ -731,31 +729,33 @@ void CMes::Draw()
 						nextFont->SetScaleX(*(float*)((char*)this + 0x3D44));
 						nextFont->SetScaleY(fontScaleY);
 						nextFont->DrawInit();
-						activeFontId = fontId;
 						font = nextFont;
 					}
 
 					unsigned int fadeCur = (unsigned int)*(unsigned char*)((char*)glyph + 0x0F) & 0x0F;
-					unsigned int fadeMax = (unsigned int)*(signed char*)((char*)glyph + 0x0F) >> 4 & 0xF;
+					unsigned int fadeMax = (*(unsigned char*)((char*)glyph + 0x0F) >> 4) & 0xF;
 					float ratio = (float)fadeCur / (float)fadeMax;
-					unsigned char alpha;
-					if (ratio >= kMesOne)
+					_GXColor color;
+					color.r = 0xFF;
+					color.g = 0xFF;
+					color.b = 0xFF;
+					int alpha;
+					if (ratio < kMesOne)
 					{
-						alpha = (unsigned char)globalAlpha;
+						alpha = (unsigned char)(ratio * (float)globalAlpha);
 					}
 					else
 					{
-						alpha = (signed char)((float)globalAlpha * ratio);
+						alpha = globalAlpha;
 					}
-
-					_GXColor color = {0xFF, 0xFF, 0xFF, alpha};
+					color.a = alpha;
 					font->SetColor(color);
 
 					int tlut = (int)*(unsigned char*)((char*)glyph + 0x12);
 					if ((activeTlut != tlut) && (((unsigned int)*(unsigned char*)((char*)glyph + 0x0E) & 0x0F) < 2))
 					{
-						font->SetTlut(tlut + *(int*)((char*)this + 0x3D34));
 						activeTlut = tlut;
+						font->SetTlut(tlut + *(int*)((char*)this + 0x3D34));
 					}
 
 					font->SetPosX(*(float*)((char*)this + 0x3C9C) + *glyph);

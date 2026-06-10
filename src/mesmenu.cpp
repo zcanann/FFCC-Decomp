@@ -70,6 +70,11 @@ extern float FLOAT_80330980;
 extern float FLOAT_80330994;
 }
 
+static inline CColor& MesMenuColorRef(const CColor& color)
+{
+    return (CColor&)color;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8009b4e4
@@ -288,8 +293,7 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
     }
 
     if (FLOAT_803308d8 < alpha) {
-        CColor heartColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(FLOAT_80330908 * alpha));
-        MenuPcs.SetColor(heartColor);
+        MenuPcs.SetColor(MesMenuColorRef(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(FLOAT_80330908 * alpha))));
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x17));
 
         int heartOffset = 0x4C;
@@ -484,8 +488,7 @@ void CMesMenu::onDraw()
         }
         }
 
-        CColor cursorColor(0xFF, 0xFF, 0xFF, 0xFF);
-        MenuPcs.SetColor(cursorColor);
+        MenuPcs.SetColor(MesMenuColorRef(CColor(0xFF, 0xFF, 0xFF, 0xFF)));
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0));
         MenuPcs.DrawRect(
             0, (float)(int)(Chara.MogFur().m_cursorX - 0x20), (float)(int)Chara.MogFur().m_cursorY,
@@ -543,17 +546,15 @@ void CMesMenu::onDraw()
         } else {
             pulseX = -pulse;
         }
-        float baseX = m_baseX + m_offsetX;
         int maskY = m_menuIndex & 2;
-        baseX += pulseX;
+        float baseX = (m_baseX + m_offsetX) + pulseX;
         float pulseY;
         if (maskY != 0) {
             pulseY = pulse;
         } else {
             pulseY = -pulse;
         }
-        float baseY = m_baseY + m_offsetY;
-        baseY += pulseY;
+        float baseY = (m_baseY + m_offsetY) + pulseY;
 
         if (FLOAT_803308d8 < stateBlend) {
             float width = m_windowWidth * stateBlend;
@@ -576,8 +577,7 @@ void CMesMenu::onDraw()
 
             float stateAlpha = FLOAT_80330908 * stateBlend;
             float alphaF = stateAlpha * stageBlend;
-            CColor windowColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF));
-            MenuPcs.SetColor(windowColor);
+            MenuPcs.SetColor(MesMenuColorRef(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF))));
             MenuPcs.DrawWindow(drawX, drawY, width, height, static_cast<CMenuPcs::TEX>(2), FLOAT_8033092c);
 
             if ((m_state == 1) && (FLOAT_80330914 == stageBlend)) {
@@ -587,8 +587,7 @@ void CMesMenu::onDraw()
 
             if ((m_itemIndex >= 0) || (m_nameIndex >= 0)) {
                 MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x14));
-                CColor iconColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF));
-                MenuPcs.SetColor(iconColor);
+                MenuPcs.SetColor(MesMenuColorRef(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF))));
 
                 float cursorWave = sinf(FLOAT_80330930 * (FLOAT_80330914 - stateBlend) + FLOAT_80330930);
                 int iconMenuIndex = m_menuIndex;
@@ -623,8 +622,7 @@ void CMesMenu::onDraw()
                     int itemIndex = m_itemIndex;
                     int itemU = (itemIndex % 8) * 0x30;
                     int itemV = (itemIndex / 8) * 0x30;
-                    CColor itemColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF));
-                    MenuPcs.SetColor(itemColor);
+                    MenuPcs.SetColor(MesMenuColorRef(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF))));
                     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x18));
                     MenuPcs.m_textures[0x18]->SetExternalTlut(0, 1);
                     int itemMaskX = m_menuIndex & 1;
@@ -646,8 +644,7 @@ void CMesMenu::onDraw()
 
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x16));
         float titleAlpha = FLOAT_80330908 * stageBlend;
-        CColor frameColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(titleAlpha));
-        MenuPcs.SetColor(frameColor);
+        MenuPcs.SetColor(MesMenuColorRef(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(titleAlpha))));
         unsigned int frameMask = m_menuIndex;
         int frameNegX = -(int)(frameMask & 1);
         float frameX = baseX - (float)(frameNegX & 0x80);
@@ -672,8 +669,7 @@ void CMesMenu::onDraw()
             CCaravanWork* heartFood =
                 reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[m_menuIndex]);
             if ((heartFood != 0) && (FLOAT_803308d8 < stageBlend)) {
-                CColor heartColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(titleAlpha));
-                MenuPcs.SetColor(heartColor);
+                MenuPcs.SetColor(MesMenuColorRef(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(titleAlpha))));
                 MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x17));
 
                 int heartOffset = 0x4C;
@@ -759,8 +755,7 @@ void CMesMenu::onDraw()
             foodShakeY = (foodTimer >> 2) * s_mesMenuShakePattern[3 - (foodTimer & 3)];
         }
         float shakeY = (float)foodShakeY;
-        CColor foodColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(titleAlpha));
-        MenuPcs.SetColor(foodColor);
+        MenuPcs.SetColor(MesMenuColorRef(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(titleAlpha))));
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x18));
         MenuPcs.m_textures[0x18]->SetExternalTlut(
             (scriptFood->m_hp != 0) ? 0 : (void*)MenuPcs.m_externalFontTlut, 1);
@@ -783,8 +778,7 @@ void CMesMenu::onDraw()
         if ((m_flags & 1) == 0) {
             float stateAlpha = FLOAT_80330908 * stateBlend;
             float alphaF = stateAlpha * stageBlend;
-            CColor windowColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF));
-            MenuPcs.SetColor(windowColor);
+            MenuPcs.SetColor(MesMenuColorRef(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF))));
 
             int tex = 0xB;
             if ((m_flags & 0x200) != 0) {
@@ -796,8 +790,7 @@ void CMesMenu::onDraw()
                 unsigned int iconAnchor = (m_flags >> 10) & 7;
                 if (iconAnchor != 0) {
                     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x14));
-                    CColor iconColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF));
-                    MenuPcs.SetColor(iconColor);
+                    MenuPcs.SetColor(MesMenuColorRef(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF))));
                     unsigned int anchorX = (iconAnchor - 1) & 1;
                     float iconEdgeX;
                     if (anchorX != 0) {
@@ -837,8 +830,7 @@ void CMesMenu::onDraw()
                         int itemIndex = m_itemIndex;
                         int itemU = (itemIndex % 8) * 0x30;
                         int itemV = (itemIndex / 8) * 0x30;
-                        CColor itemColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF));
-                        MenuPcs.SetColor(itemColor);
+                        MenuPcs.SetColor(MesMenuColorRef(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF))));
                         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x18));
                         MenuPcs.m_textures[0x18]->SetExternalTlut(0, 1);
                         int itemOffsetX = 83;
@@ -872,8 +864,7 @@ void CMesMenu::onDraw()
             float sinX = sinf(FLOAT_80330980 + angle);
             MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
             float alpha255 = FLOAT_80330908 * windowScale;
-            CColor shadowColor(0, 0, 0, static_cast<unsigned char>((FLOAT_803308ec * alpha255) * stageBlend));
-            MenuPcs.SetColor(shadowColor);
+            MenuPcs.SetColor(MesMenuColorRef(CColor(0, 0, 0, static_cast<unsigned char>((FLOAT_803308ec * alpha255) * stageBlend))));
             float promptX = (float)(int)(FLOAT_803308f8 + drawX);
             float promptY = (float)(int)(FLOAT_8033092c + drawY);
             float waveX = promptX + FLOAT_80330984 * (pulseScale * sinX);
@@ -884,8 +875,7 @@ void CMesMenu::onDraw()
                 3, FLOAT_803308e4 + waveX, FLOAT_803308e4 + waveY, FLOAT_8033098C, FLOAT_8033095C, FLOAT_803308d8,
                 FLOAT_803308d8, FLOAT_80330990 * (FLOAT_80330914 + fadeScale), FLOAT_80330990 * (pulseScale + fadeScale),
                 rotation);
-            CColor promptColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha255 * stageBlend));
-            MenuPcs.SetColor(promptColor);
+            MenuPcs.SetColor(MesMenuColorRef(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha255 * stageBlend))));
             MenuPcs.DrawRect(
                 3, waveX, waveY, FLOAT_8033098C, FLOAT_8033095C, FLOAT_803308d8, FLOAT_803308d8,
                 FLOAT_80330990 * pulseScale, FLOAT_80330990 * pulseScale, rotation);
@@ -899,8 +889,7 @@ void CMesMenu::onDraw()
 
     if ((m_state == 1) && (m_mes.GetWait() == 3)) {
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0));
-        CColor waitColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(FLOAT_80330908 * stageBlend));
-        MenuPcs.SetColor(waitColor);
+        MenuPcs.SetColor(MesMenuColorRef(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(FLOAT_80330908 * stageBlend))));
 
         MenuPcs.DrawRect(
             0, FLOAT_80330994 + *(float*)((char*)this + 0x3CB8),

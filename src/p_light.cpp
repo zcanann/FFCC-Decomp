@@ -930,7 +930,7 @@ void CLightPcs::CBumpLight::MakeLightMap()
     float dW = kBumpLightMapVertexZ;
 
     for (int i = 0; i < (int)(unsigned int)m_textureCount; i++) {
-        int texBase = (int)m_textureData;
+        u8* texDst = m_textureData + offset;
         GXLightObj lightObj;
         GXInitSpecularDir(&lightObj, eyeDir.x, eyeDir.y, eyeDir.z);
 
@@ -948,22 +948,20 @@ void CLightPcs::CBumpLight::MakeLightMap()
 
         GXLoadLightObjImm(&lightObj, (GXLightID)1);
 
-        int y = 0;
+        u32 y = 0;
         do {
-            unsigned int yBase = y;
             GXBegin((GXPrimitive)0x98, (GXVtxFmt)0, 0x42);
 
-            float x0 = dFactor * (float)yBase * dScale - dHalf;
-            float dx0 = x0;
-            float x1 = dFactor * (float)(yBase + 1) * dScale - dHalf;
-            float dx1 = x1;
+            float x0 = dFactor * (float)y * dScale - dHalf;
+            float xd0 = x0 / dInv;
+            float x1 = dFactor * (float)(y + 1) * dScale - dHalf;
+            float xd1 = x1 / dInv;
 
-            int inner = 0x21;
-            unsigned int x = 0;
-            do {
+            for (u32 x = 0; x < 0x21; x++) {
                 float z0 = dFactor * (float)x * dScale - dHalf;
-                float dz0 = z0;
-                float dist0 = dx0 * dx0 + dz0 * dz0;
+                float zd = z0 / dInv;
+                float zSq = z0 * z0;
+                float dist0 = x0 * x0 + zSq;
                 if (dist0 < dHalf) {
                     dist0 = sqrtf(dHalf - dist0);
                 } else {
@@ -971,11 +969,11 @@ void CLightPcs::CBumpLight::MakeLightMap()
                 }
 
                 GXWGFifo.f32 = x0;
-                float dist1 = dx1 * dx1 + dz0 * dz0;
+                float dist1 = x1 * x1 + zSq;
                 GXWGFifo.f32 = z0;
                 GXWGFifo.f32 = dW;
-                GXWGFifo.f32 = dx0 / dInv;
-                GXWGFifo.f32 = dz0 / dInv;
+                GXWGFifo.f32 = xd0;
+                GXWGFifo.f32 = zd;
                 GXWGFifo.f32 = dist0;
 
                 if (dist1 < dHalf) {
@@ -987,20 +985,17 @@ void CLightPcs::CBumpLight::MakeLightMap()
                 GXWGFifo.f32 = x1;
                 GXWGFifo.f32 = z0;
                 GXWGFifo.f32 = dW;
-                GXWGFifo.f32 = dx1 / dInv;
-                GXWGFifo.f32 = dz0 / dInv;
+                GXWGFifo.f32 = xd1;
+                GXWGFifo.f32 = zd;
                 GXWGFifo.f32 = dist1;
+            }
 
-                inner--;
-                x++;
-            } while (inner != 0);
-
-            y = yBase + 1;
+            y++;
         } while (y < 0x20);
 
         GXSetTexCopySrc(0, 0, 0x40, 0x40);
         GXSetTexCopyDst((unsigned short)0x40, (unsigned short)0x40, (GXTexFmt)3, (unsigned char)0);
-        GXCopyTex(reinterpret_cast<void*>(texBase + offset), 1);
+        GXCopyTex(texDst, 1);
         GXPixModeSync();
 
         offset += copySize;

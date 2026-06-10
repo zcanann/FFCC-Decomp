@@ -938,7 +938,7 @@ void CGPartyObj::onFrameAlways()
 		showTraceParticle = 1;
 	}
 
-	int& traceSlot = PartyTraceParticleSlot(port);
+#define traceSlot PartyTraceParticleSlot(port)
 	if (showTraceParticle && traceSlot == 0) {
 		traceSlot = CFlat.GetFreeParticleSlot();
 		putParticleTrace((port + 0x42U) | 0x100, traceSlot, this, kMonObjOne, 0);
@@ -946,6 +946,7 @@ void CGPartyObj::onFrameAlways()
 		CFlat.EndParticleSlot(traceSlot, 1);
 		traceSlot = 0;
 	}
+#undef traceSlot
 
 	if (reinterpret_cast<int>(m_scriptHandle[0xED]) == 0 && (MiniGamePcs.m_flags & 0x400) != 0) {
 		reinterpret_cast<CAStar*>(reinterpret_cast<unsigned char*>(&DbgMenuPcs) + 0x2A5C)->addRealTime(this);
@@ -1139,9 +1140,9 @@ void CGPartyObj::command()
 	PartyObjOverlay& party = PartyData(this);
 #define caravan reinterpret_cast<CCaravanWork*>(m_scriptHandle)
 #define padSlot static_cast<char>(m_animStateMisc)
-	bool primaryAvailable = false;
+	int primaryAvailable = false;
 	int primaryCommand = -1;
-	bool secondaryAvailable = false;
+	int secondaryAvailable = false;
 	int secondaryCommand = -1;
 	int ringCommand = -1;
 	int ringCommandArg = -1;
@@ -1212,81 +1213,114 @@ void CGPartyObj::command()
 			}
 			if (targetState < 0x24) {
 				if (targetState < 0x12) {
-					if (targetState != 0x0B && (targetState > 0x0A || targetState > 0x09) &&
-					    *reinterpret_cast<int*>(targetBytes + 0x550) == 0) {
-						secondaryAvailable = true;
-						secondaryCommand = 4;
+					if (targetState == 0x0B) {
+						goto targetJoin;
 					}
-				} else if (targetState < 0x1C) {
-					if (targetState < 0x19) {
-tmpArtifactBlock:
-#define freshTargetBytes (reinterpret_cast<unsigned char*>(party.target))
-						if (*reinterpret_cast<int*>(targetBytes + 0x550) == 0) {
-							secondaryAvailable = true;
-							if ((targetState == 0x24 && caravan->CanAddTmpArtifact(1) != 0) ||
-							    (*reinterpret_cast<int*>(freshTargetBytes + 0x500) == 0x20 &&
-							     caravan->CanAddGil(*reinterpret_cast<int*>(freshTargetBytes + 0x558)) != 0) ||
-							    ((*reinterpret_cast<int*>(freshTargetBytes + 0x500) != 0x24 &&
-							      *reinterpret_cast<int*>(freshTargetBytes + 0x500) != 0x20) &&
-							     *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xB4) + 1 <= 0x40)) {
-								secondaryCommand = 0x17;
-							} else {
-								secondaryCommand = 4;
-							}
-						}
-#undef freshTargetBytes
+					if (targetState >= 0x0B) {
+						goto cmdFourBlock;
 					}
-				} else if (targetState < 0x22) {
+					if (targetState >= 0x0A) {
+						goto cmdFourBlock;
+					}
+					goto targetJoin;
+				}
+				if (targetState < 0x1C) {
+					if (targetState >= 0x19) {
+						goto targetJoin;
+					}
 					goto tmpArtifactBlock;
 				}
-			} else if (targetState < 0xCA) {
+				if (targetState >= 0x22) {
+					goto targetJoin;
+				}
+				goto tmpArtifactBlock;
+			}
+			if (targetState == 0xCA) {
+				goto stateCABlock;
+			}
+			if (targetState < 0xCA) {
 				if (targetState == 0xC8) {
-					if (static_cast<int>(CFlatCenterState()) == 0) {
-						secondaryAvailable = true;
-						secondaryCommand = 0x0B;
-					} else {
-						primaryAvailable = true;
-						primaryCommand = 0x0B;
-					}
-				} else if (targetState > 0xC7) {
-					if (static_cast<int>(CFlatCenterState()) == 0) {
-						secondaryAvailable = true;
-						secondaryCommand = 0x0A;
-					} else {
-						primaryAvailable = true;
-						primaryCommand = 0x0A;
-					}
+					goto stateC8Block;
 				}
-			} else if (targetState == 0xCA) {
-				if (static_cast<int>(CFlatCenterState()) == 0) {
-					secondaryAvailable = true;
-					secondaryCommand = 0x1C;
-				} else {
-					primaryAvailable = true;
-					primaryCommand = 0x1C;
+				if (targetState >= 0xC8) {
+					goto stateC9Block;
 				}
-			} else if (targetState == 0xCC) {
+				goto targetJoin;
+			}
+			if (targetState == 0xCC) {
 				secondaryAvailable = true;
 				secondaryCommand = 6;
 			}
+			goto targetJoin;
+
+cmdFourBlock:
+			if (*reinterpret_cast<unsigned int*>(targetBytes + 0x550) == 0) {
+				secondaryAvailable = true;
+				secondaryCommand = 4;
+			}
+			goto targetJoin;
+
+tmpArtifactBlock:
+#define freshTargetBytes (reinterpret_cast<unsigned char*>(party.target))
+			if (*reinterpret_cast<unsigned int*>(targetBytes + 0x550) == 0) {
+				secondaryAvailable = true;
+				if ((targetState == 0x24 && caravan->CanAddTmpArtifact(1) != 0) ||
+				    (*reinterpret_cast<int*>(freshTargetBytes + 0x500) == 0x20 &&
+				     caravan->CanAddGil(*reinterpret_cast<int*>(freshTargetBytes + 0x558)) != 0) ||
+				    ((*reinterpret_cast<int*>(freshTargetBytes + 0x500) != 0x24 &&
+				      *reinterpret_cast<int*>(freshTargetBytes + 0x500) != 0x20) &&
+				     *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xB4) + 1 <= 0x40)) {
+					secondaryCommand = 0x17;
+				} else {
+					secondaryCommand = 4;
+				}
+			}
+#undef freshTargetBytes
+			goto targetJoin;
+
+stateC8Block:
+			if (static_cast<int>(CFlatCenterState()) == 0) {
+				secondaryAvailable = true;
+				secondaryCommand = 0x0B;
+			} else {
+				primaryAvailable = true;
+				primaryCommand = 0x0B;
+			}
+			goto targetJoin;
+
+stateC9Block:
+			if (static_cast<int>(CFlatCenterState()) == 0) {
+				secondaryAvailable = true;
+				secondaryCommand = 0x0A;
+			} else {
+				primaryAvailable = true;
+				primaryCommand = 0x0A;
+			}
+			goto targetJoin;
+
+stateCABlock:
+			if (static_cast<int>(CFlatCenterState()) == 0) {
+				secondaryAvailable = true;
+				secondaryCommand = 0x1C;
+			} else {
+				primaryAvailable = true;
+				primaryCommand = 0x1C;
+			}
+targetJoin: ;
 		}
 
 		if (party.carryObject != nullptr) {
 			const int carryState = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.carryObject) + 0x500);
 			secondaryAvailable = true;
+			if (carryState == 0x0D) {
+				secondaryCommand = 7;
+			} else if (carryState == 0x0E) {
+				secondaryCommand = 8;
+			} else {
+				secondaryCommand = 5;
+			}
 			primaryAvailable = true;
 			primaryCommand = -1;
-			switch (carryState) {
-			case 0x0D:
-				secondaryCommand = 7;
-				break;
-			case 0x0E:
-				secondaryCommand = 8;
-				break;
-			default:
-				secondaryCommand = 5;
-				break;
-			}
 		} else if (caravan->m_hp == 0) {
 			primaryAvailable = true;
 			primaryCommand = 0x1B;
@@ -1317,11 +1351,13 @@ tmpArtifactBlock:
 				Sound.PlaySe(0x0C, 0x40, 0x7F, 0);
 				int& charaCommand = Chara.MogFur().m_commandIndex;
 				charaCommand += cmdDir;
-				if (charaCommand < 0) {
-					charaCommand += 5;
-				} else if (charaCommand > 4) {
-					charaCommand -= 5;
+				int adjusted = charaCommand;
+				if (adjusted < 0) {
+					adjusted += 5;
+				} else if (adjusted > 4) {
+					adjusted -= 5;
 				}
+				charaCommand = adjusted;
 			}
 			const int charaCommand = Chara.MogFur().m_commandIndex;
 			ringCommand = charaCommand + 0x1E;
@@ -1331,10 +1367,9 @@ tmpArtifactBlock:
 		}
 	}
 
-	CRingMenu* ring = getBattleRingMenuForPort(getPartyJoybusPort(this));
-	ring->SetBattleCommand(0, primaryCommand, -1);
-	ring->SetBattleCommand(1, secondaryCommand, -1);
-	ring->SetBattleCommand(2, ringCommand, ringCommandArg);
+	getBattleRingMenuForPort(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4))->SetBattleCommand(0, primaryCommand, -1);
+	getBattleRingMenuForPort(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4))->SetBattleCommand(1, secondaryCommand, -1);
+	getBattleRingMenuForPort(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4))->SetBattleCommand(2, ringCommand, ringCommandArg);
 
 	}
 
@@ -1352,7 +1387,7 @@ tmpArtifactBlock:
 
 			CGObject* scriptTarget = party.secondaryTarget != nullptr ?
 				reinterpret_cast<CGObject*>(party.secondaryTarget) : party.target;
-			party.partyFlags |= 0x80;
+			party.flags.commandActive = 1;
 
 			CFlatRuntime::CStack stack[2];
 			stack[0].m_word = primaryCommand;
@@ -1372,14 +1407,15 @@ tmpArtifactBlock:
 
 		const int cmdIdx = caravan->GetIdxCmdList();
 		party.unk6BC = cmdIdx;
-		if (cmdIdx == 0) {
+		if (party.unk6BC == 0) {
 			int weaponItem;
 			int weaponRef;
 			caravan->GetCurrentWeaponItem(weaponItem, weaponRef);
 			if (weaponItem != party.unk6BC ||
 			    weaponRef != (caravan->m_equipment[0] >= 0 ? caravan->m_inventoryItems[caravan->m_equipment[0]] : 0)) {
-				*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D4) = cmdIdx;
-				party.weaponRef = caravan->m_equipment[0] >= 0 ? caravan->m_inventoryItems[caravan->m_equipment[0]] : 0;
+				int newWeaponRef = caravan->m_equipment[0] >= 0 ? caravan->m_inventoryItems[caravan->m_equipment[0]] : 0;
+				*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D4) = party.unk6BC;
+				party.weaponRef = newWeaponRef;
 				party.commandFlagBits.flag20 = 1;
 				changeStat(0x0F, 0, 0);
 				return;
@@ -1413,39 +1449,27 @@ tmpArtifactBlock:
 		const int itemId = caravan->DelCmdListAndItem(cmdIdx);
 		const int kindOffset = itemId * 0x48;
 		const unsigned short itemKind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + kindOffset);
-		if (itemKind == 0x125) {
-			m_itemId = 0x220;
-			changeStat(2, 0, 2);
-			return;
-		}
-		if (itemKind > 0x124) {
-			if (itemKind != 0x186) {
-				if (itemKind > 0x185) {
-					if (itemKind != 0x1F5) {
-						return;
-					}
-					m_itemId = itemId;
-					changeStat(2, 0, 0);
+		switch (itemKind) {
+		case 0x100:
+			if (itemId == 0x103) {
+				if (Math.Rand(3) == 0) {
+					ClearAllSta();
+					setSta(0x1B, 900);
+					caravan->GetNumCombi(party.unk6BC, 1);
 					return;
 				}
-				if (itemKind != 0x17D) {
-					return;
-				}
+				m_itemId = 0x103;
+				changeStat(2, 0, 2);
+				return;
 			}
-			if (useItem(itemId) != 0) {
-				caravan->GetNumCombi(party.unk6BC, 1);
-			}
-			return;
-		}
-		if (itemKind == 0xDF) {
 			m_itemId = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + kindOffset + 10);
 			changeStat(2, 0, 0);
 			return;
-		}
-		if (itemKind < 0xDF) {
-			if (itemKind != 1) {
-				return;
-			}
+		case 0x1F5:
+			m_itemId = itemId;
+			changeStat(2, 0, 0);
+			return;
+		case 1: {
 			int weaponItem;
 			int weaponRef;
 			caravan->GetCurrentWeaponItem(weaponItem, weaponRef);
@@ -1460,23 +1484,23 @@ tmpArtifactBlock:
 			changeStat(7, 0, 0);
 			return;
 		}
-		if (itemKind != 0x100) {
-			return;
-		}
-		if (itemId == 0x103) {
-			if (Math.Rand(3) == 0) {
-				ClearAllSta();
-				setSta(0x1B, 900);
-				caravan->GetNumCombi(party.unk6BC, 1);
-				return;
-			}
-			m_itemId = 0x103;
+		case 0x125:
+			m_itemId = 0x220;
 			changeStat(2, 0, 2);
 			return;
+		case 0x186:
+		case 0x17D:
+			if (useItem(itemId) != 0) {
+				caravan->GetNumCombi(party.unk6BC, 1);
+			}
+			return;
+		case 0xDF:
+			m_itemId = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + kindOffset + 10);
+			changeStat(2, 0, 0);
+			return;
+		default:
+			return;
 		}
-		m_itemId = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + kindOffset + 10);
-		changeStat(2, 0, 0);
-		return;
 	}
 
 	if ((getPadTrigForSlot(padSlot) & 0x200) == 0) {
@@ -1744,11 +1768,11 @@ void CGPartyObj::onFrameStat()
 			    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x50) == 0) &&
 			    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x44) == 0) &&
 			    (Game.m_gameWork.m_bossArtifactStageIndex != 0x17)) {
-				CVector worldPos(m_worldPosition);
-				CVector chalicePos(*reinterpret_cast<Vec*>(Game.unk_flat3_0xc7d0 + 0x15C));
-				CVector diff;
-				PSVECSubtract(reinterpret_cast<Vec*>(&chalicePos), reinterpret_cast<Vec*>(&worldPos), reinterpret_cast<Vec*>(&diff));
 				Vec moveVec;
+				CVector worldPos(m_worldPosition);
+				const CVector& chalicePos = CVector(*reinterpret_cast<Vec*>(Game.unk_flat3_0xc7d0 + 0x15C));
+				CVector diff;
+				PSVECSubtract((Vec*)&chalicePos, reinterpret_cast<Vec*>(&worldPos), reinterpret_cast<Vec*>(&diff));
 				moveVec.x = diff.x;
 				moveVec.y = diff.y;
 				moveVec.z = diff.z;
@@ -2256,9 +2280,9 @@ void CGPartyObj::statCharge()
 					if ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 0x32) & 0x10) != 0) {
 						unsigned int maxReach = *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x70);
 						if (static_cast<float>(maxReach) < mag) {
-							CVector dir(delta);
+							const CVector& dir = CVector(delta);
 							CVector scaled;
-							PSVECScale(reinterpret_cast<Vec*>(&dir), reinterpret_cast<Vec*>(&scaled), mag - static_cast<float>(maxReach));
+							PSVECScale((Vec*)&dir, reinterpret_cast<Vec*>(&scaled), mag - static_cast<float>(maxReach));
 							Vec scaledCopy;
 							scaledCopy.x = scaled.x;
 							scaledCopy.y = scaled.y;
@@ -2269,9 +2293,9 @@ void CGPartyObj::statCharge()
 							unitCopy.x = unit.x;
 							unitCopy.y = unit.y;
 							unitCopy.z = unit.z;
-							CVector origin(m_worldPosition);
+							const CVector& origin = CVector(m_worldPosition);
 							CVector sum;
-							PSVECAdd(reinterpret_cast<Vec*>(&origin), reinterpret_cast<Vec*>(&unitCopy), reinterpret_cast<Vec*>(&sum));
+							PSVECAdd((Vec*)&origin, reinterpret_cast<Vec*>(&unitCopy), reinterpret_cast<Vec*>(&sum));
 							dest.x = sum.x;
 							dest.y = sum.y;
 							dest.z = sum.z;
@@ -2306,9 +2330,9 @@ void CGPartyObj::statCharge()
 			float angLimit = FLOAT_80331AE0 * static_cast<float>(limitFrames);
 			if (phase == table[0x1F]) {
 				CVector worldPos(m_worldPosition);
-				CVector center(m_comboCenter);
+				const CVector& center = CVector(m_comboCenter);
 				CVector diff;
-				PSVECSubtract(reinterpret_cast<Vec*>(&center), reinterpret_cast<Vec*>(&worldPos), reinterpret_cast<Vec*>(&diff));
+				PSVECSubtract((Vec*)&center, reinterpret_cast<Vec*>(&worldPos), reinterpret_cast<Vec*>(&diff));
 				float horizSq = diff.z * diff.z + diff.x * diff.x;
 				float horiz = (horizSq > FLOAT_80331a78) ? sqrtf(horizSq) : horizSq;
 				if (FLOAT_80331a78 != diff.y && FLOAT_80331a78 != horiz) {
@@ -2591,9 +2615,9 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 		}
 
 		CVector startOffset(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
-		CVector worldPos(m_worldPosition);
+		const CVector& worldPos = CVector(m_worldPosition);
 		CVector startPos;
-		PSVECAdd(reinterpret_cast<Vec*>(&worldPos), reinterpret_cast<Vec*>(&startOffset), reinterpret_cast<Vec*>(&startPos));
+		PSVECAdd((Vec*)&worldPos, reinterpret_cast<Vec*>(&startOffset), reinterpret_cast<Vec*>(&startPos));
 
 		CMapCylinder hitCylinder(FLOAT_80331a9c, FLOAT_80331aa0);
 		hitCylinder.m_bottom.x = startPos.x;
@@ -2607,21 +2631,21 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 			hitObj->CalcHitPosition(&m_comboCenter);
 		} else {
 			CVector startOffset2(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
-			CVector worldPos2(m_worldPosition);
+			const CVector& worldPos2 = CVector(m_worldPosition);
 			CVector startPos2;
-			PSVECAdd(reinterpret_cast<Vec*>(&worldPos2), reinterpret_cast<Vec*>(&startOffset2), reinterpret_cast<Vec*>(&startPos2));
+			PSVECAdd((Vec*)&worldPos2, reinterpret_cast<Vec*>(&startOffset2), reinterpret_cast<Vec*>(&startPos2));
 			Vec startPosVec;
 			startPosVec.x = startPos2.x;
 			startPosVec.y = startPos2.y;
 			startPosVec.z = startPos2.z;
 			PSVECAdd(&startPosVec, &rayDir, &m_comboCenter);
 		}
-		CVector down(FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78);
+		const CVector& down = CVector(FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78);
 		CMapCylinder floorCylinder(FLOAT_80331a9c, FLOAT_80331aa0);
 		floorCylinder.m_bottom = m_comboCenter;
-		floorCylinder.m_axis = *reinterpret_cast<Vec*>(&down);
+		floorCylinder.m_axis = *(Vec*)&down;
 		floorCylinder.m_radius = FLOAT_80331a78;
-		if (MapMng.CheckHitCylinderNear(&floorCylinder, reinterpret_cast<Vec*>(&down), 0x30) != 0) {
+		if (MapMng.CheckHitCylinderNear(&floorCylinder, (Vec*)&down, 0x30) != 0) {
 			CMapObj* hitObj = getMapHitObject();
 			hitObj->CalcHitPosition(&m_comboCenter);
 			CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
@@ -2763,9 +2787,9 @@ void CGPartyObj::checkTargetParticle()
 		if ((leader->m_lastStateId == 2 || leader->m_lastStateId == 6) &&
 		    leader->m_comboState != 0) {
 			CVector leaderCenter(leader->m_comboCenter);
-			CVector selfCenter(m_comboCenter);
+			const CVector& selfCenter = CVector(m_comboCenter);
 			CVector subResult;
-			PSVECSubtract(reinterpret_cast<Vec*>(&selfCenter), reinterpret_cast<Vec*>(&leaderCenter), reinterpret_cast<Vec*>(&subResult));
+			PSVECSubtract((Vec*)&selfCenter, reinterpret_cast<Vec*>(&leaderCenter), reinterpret_cast<Vec*>(&subResult));
 			Vec toLeaderTarget;
 			toLeaderTarget.x = subResult.x;
 			toLeaderTarget.y = subResult.y;
@@ -2827,9 +2851,9 @@ void CGPartyObj::checkTargetParticle()
 		}
 
 		CVector worldPosV(m_worldPosition);
-		CVector targetCenterV(*targetPos);
+		const CVector& targetCenterV = CVector(*targetPos);
 		CVector fromCenterResult;
-		PSVECSubtract(reinterpret_cast<Vec*>(&targetCenterV), reinterpret_cast<Vec*>(&worldPosV), reinterpret_cast<Vec*>(&fromCenterResult));
+		PSVECSubtract((Vec*)&targetCenterV, reinterpret_cast<Vec*>(&worldPosV), reinterpret_cast<Vec*>(&fromCenterResult));
 		Vec fromCenter;
 		fromCenter.x = fromCenterResult.x;
 		fromCenter.y = fromCenterResult.y;
@@ -2841,9 +2865,9 @@ void CGPartyObj::checkTargetParticle()
 		}
 
 		CVector targetCenterV2(*targetPos);
-		CVector centerTargetV(*centerPos);
+		const CVector& centerTargetV = CVector(*centerPos);
 		CVector moveResult;
-		PSVECSubtract(reinterpret_cast<Vec*>(&targetCenterV2), reinterpret_cast<Vec*>(&centerTargetV), reinterpret_cast<Vec*>(&moveResult));
+		PSVECSubtract(reinterpret_cast<Vec*>(&targetCenterV2), (Vec*)&centerTargetV, reinterpret_cast<Vec*>(&moveResult));
 		Vec move;
 		move.x = moveResult.x;
 		move.y = moveResult.y;
@@ -2871,9 +2895,9 @@ void CGPartyObj::checkTargetParticle()
 			}
 
 			CVector up(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
-			CVector centerForBottom(*centerPos);
+			const CVector& centerForBottom = CVector(*centerPos);
 			CVector bottomResult;
-			PSVECAdd(reinterpret_cast<Vec*>(&centerForBottom), reinterpret_cast<Vec*>(&up), reinterpret_cast<Vec*>(&bottomResult));
+			PSVECAdd((Vec*)&centerForBottom, reinterpret_cast<Vec*>(&up), reinterpret_cast<Vec*>(&bottomResult));
 			Vec bottom;
 			bottom.x = bottomResult.x;
 			bottom.y = bottomResult.y;
@@ -2898,24 +2922,24 @@ void CGPartyObj::checkTargetParticle()
 		} while (iter > 0);
 
 		CVector upFinal(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
-		CVector centerFinal(*centerPos);
+		const CVector& centerFinal = CVector(*centerPos);
 		CVector addUpResult;
-		PSVECAdd(reinterpret_cast<Vec*>(&centerFinal), reinterpret_cast<Vec*>(&upFinal), reinterpret_cast<Vec*>(&addUpResult));
+		PSVECAdd((Vec*)&centerFinal, reinterpret_cast<Vec*>(&upFinal), reinterpret_cast<Vec*>(&addUpResult));
 		Vec centerPlusUp;
 		centerPlusUp.x = addUpResult.x;
 		centerPlusUp.y = addUpResult.y;
 		centerPlusUp.z = addUpResult.z;
 		PSVECAdd(&centerPlusUp, &move, targetPos);
 
-		CVector down(FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78);
+		const CVector& down = CVector(FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78);
 		CMapCylinder floorCylinder(FLOAT_80331a9c, FLOAT_80331aa0);
 		floorCylinder.m_bottom.x = targetPos->x;
 		floorCylinder.m_bottom.y = targetPos->y;
 		floorCylinder.m_bottom.z = targetPos->z;
-		floorCylinder.m_top = *reinterpret_cast<Vec*>(&down);
+		floorCylinder.m_top = *(Vec*)&down;
 		floorCylinder.m_radius = FLOAT_80331a78;
 
-		if (MapMng.CheckHitCylinderNear(&floorCylinder, reinterpret_cast<Vec*>(&down), 0x30) != 0) {
+		if (MapMng.CheckHitCylinderNear(&floorCylinder, (Vec*)&down, 0x30) != 0) {
 			getMapHitObject()->CalcHitPosition(targetPos);
 			if (m_scriptHandle != nullptr) {
 				CCaravanWork* work = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
@@ -2934,9 +2958,9 @@ void CGPartyObj::checkTargetParticle()
 	}
 
 	CVector worldPosFinal(m_worldPosition);
-	CVector comboCenterFinal(m_comboCenter);
+	const CVector& comboCenterFinal = CVector(m_comboCenter);
 	CVector deltaResult;
-	PSVECSubtract(reinterpret_cast<Vec*>(&comboCenterFinal), reinterpret_cast<Vec*>(&worldPosFinal), reinterpret_cast<Vec*>(&deltaResult));
+	PSVECSubtract((Vec*)&comboCenterFinal, reinterpret_cast<Vec*>(&worldPosFinal), reinterpret_cast<Vec*>(&deltaResult));
 	Vec delta;
 	delta.x = deltaResult.x;
 	delta.y = deltaResult.y;
@@ -2967,9 +2991,9 @@ void CGPartyObj::moveCenterTargetParticle()
 	float wave = static_cast<float>(sin(FLOAT_80331ac8 * ((float)(step + 1) / FLOAT_80331ac4)));
 
 	CVector centerPos(m_comboTarget);
-	CVector targetPos(m_comboCenter);
+	const CVector& targetPos = CVector(m_comboCenter);
 	CVector subResult;
-	PSVECSubtract(reinterpret_cast<Vec*>(&targetPos), reinterpret_cast<Vec*>(&centerPos), reinterpret_cast<Vec*>(&subResult));
+	PSVECSubtract((Vec*)&targetPos, reinterpret_cast<Vec*>(&centerPos), reinterpret_cast<Vec*>(&subResult));
 	Vec toTarget;
 	toTarget.x = subResult.x;
 	toTarget.y = subResult.y;
@@ -2982,15 +3006,15 @@ void CGPartyObj::moveCenterTargetParticle()
 	movement.y = scaleResult.y;
 	movement.z = scaleResult.z;
 
-	CVector centerPos2(m_comboTarget);
+	const CVector& centerPos2 = CVector(m_comboTarget);
 	CVector addResult;
-	PSVECAdd(reinterpret_cast<Vec*>(&centerPos2), &movement, reinterpret_cast<Vec*>(&addResult));
+	PSVECAdd((Vec*)&centerPos2, &movement, reinterpret_cast<Vec*>(&addResult));
 	Vec hitPos;
 	hitPos.x = addResult.x;
 	hitPos.y = addResult.y;
 	hitPos.z = addResult.z;
 
-	CVector moveVec(FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78);
+	const CVector& moveVec = CVector(FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78);
 	CVector yOffset(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
 	Vec hitNormal;
 
@@ -3001,10 +3025,10 @@ void CGPartyObj::moveCenterTargetParticle()
 	hitCylinder.m_bottom.x = bottomResult.x;
 	hitCylinder.m_bottom.y = bottomResult.y;
 	hitCylinder.m_bottom.z = bottomResult.z;
-	hitCylinder.m_top = *reinterpret_cast<Vec*>(&moveVec);
+	hitCylinder.m_top = *(Vec*)&moveVec;
 	hitCylinder.m_radius = FLOAT_80331a78;
 
-	if (MapMng.CheckHitCylinderNear(&hitCylinder, reinterpret_cast<Vec*>(&moveVec), 0x30) != 0) {
+	if (MapMng.CheckHitCylinderNear(&hitCylinder, (Vec*)&moveVec, 0x30) != 0) {
 		CMapObj* hitObj = getMapHitObject();
 		hitObj->CalcHitPosition(&hitPos);
 		hitObj->GetHitFaceNormal(&hitNormal);
@@ -3358,7 +3382,7 @@ void CGPartyObj::carry(int carryType, CGObject* object, int forceMode)
 				}
 		} else {
 			changeStat((carryType == 1) ? 0x0C : 0x0D, 0, 0);
-			reinterpret_cast<CGItemObj*>(PartyData(this).carryObject)->carry(this, carryType, getCarryAnimNo(this, carryType));
+			reinterpret_cast<CGItemObj*>(PartyData(this).carryObject)->carry(this, carryType, getCarryAnimNo(this, 1));
 			PartyData(this).carryObject = (CGObject*)0;
 		}
 	}
@@ -4717,6 +4741,7 @@ void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 	int& activeTrailCount = *reinterpret_cast<int*>(countBase + 0x48);
 
 	if (activeTrailCount == 0) {
+	reset:
 		activeTrailCount = 0;
 		outVec->x = m_partyDelta[0].x;
 		outVec->y = m_partyDelta[0].y;
@@ -4729,13 +4754,13 @@ void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 	}
 
 	CVector unused;
-	float flatLen = 0.0f;
 	int capturedCurrent = 0;
 	unsigned char* loopBase = CGPartyObj::m_ghostWork;
 	int& loopTrailIndex = *reinterpret_cast<int*>(loopBase + 0x4C);
 	unsigned char* leaderPtr = loopBase;
 
 	outDist = 0.0f;
+	float flatLen = 0.0f;
 	for (int i = 0; i < activeTrailCount; i++) {
 		if (loopTrailIndex <= i) {
 			Vec* nextPos;
@@ -4767,18 +4792,7 @@ void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 
 	outDist = (outDist < flatLen) ? outDist : flatLen;
 	if (outDist > DOUBLE_80331AA8) {
-		activeTrailCount = 0;
-		outVec->x = m_partyDelta[0].x;
-		outVec->y = m_partyDelta[0].y;
-		outVec->z = m_partyDelta[0].z;
-		outVec->y = FLOAT_80331a78;
-
-		outDist = PSVECMag(outVec);
-		float maxDist = m_partyDistance[0];
-		if (outDist < maxDist) {
-			maxDist = outDist;
-		}
-		outDist = maxDist;
+		goto reset;
 	}
 }
 
@@ -4807,18 +4821,18 @@ void CGPartyObj::gpmCol()
 		Vec* pos = (i == 0) ? &m_worldPosition
 		                    : reinterpret_cast<Vec*>(trailBase + (i - 1) * 0xC);
 
-		CVector posV(*pos);
-		CVector leaderV(leader->m_worldPosition);
-		CVector diff;
-		PSVECSubtract(reinterpret_cast<Vec*>(&leaderV), reinterpret_cast<Vec*>(&posV), reinterpret_cast<Vec*>(&diff));
 		Vec diffVec;
+		CVector posV(*pos);
+		const CVector& leaderV = CVector(leader->m_worldPosition);
+		CVector diff;
+		PSVECSubtract((Vec*)&leaderV, reinterpret_cast<Vec*>(&posV), reinterpret_cast<Vec*>(&diff));
 		diffVec.x = diff.x;
 		diffVec.y = diff.y;
 		diffVec.z = diff.z;
 
 		unsigned int flags = leader->m_bgHitMask & ~0x10U;
 		float halfHeight = m_capsuleHalfHeight;
-		CVector bottom(pos->x, FLOAT_80331A98 + pos->y, pos->z);
+		const CVector& bottom = CVector(pos->x, FLOAT_80331A98 + pos->y, pos->z);
 
 		CMapCylinder cylinder(FLOAT_80331a9c, FLOAT_80331aa0);
 		cylinder.m_bottom.x = bottom.x;
@@ -5221,11 +5235,11 @@ void CGPartyObj::gpmMove()
 				sGhostPartyWork.slotSel = newSlotSel;
 
 				switch (sGhostPartyWork.slotSel) {
-				case 1:
-					*reinterpret_cast<int*>(self + 0x560) = 0x20F;
-					break;
 				case 0:
 					*reinterpret_cast<int*>(self + 0x560) = 0x207;
+					break;
+				case 1:
+					*reinterpret_cast<int*>(self + 0x560) = 0x20F;
 					break;
 				case 2:
 					*reinterpret_cast<int*>(self + 0x560) = 0x20B;
@@ -5233,8 +5247,8 @@ void CGPartyObj::gpmMove()
 				}
 				changeStat(2, 0, 0);
 				sGhostPartyWork.gauge = 0;
-				PartyData(this).flags.flag40 = 0;
-				PartyData(this).flags.flag20 = 0;
+				sGhostPartyWork.flagBits.flag40 = 0;
+				sGhostPartyWork.flagBits.flag20 = 0;
 				return;
 			}
 		} else {

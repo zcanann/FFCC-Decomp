@@ -1275,8 +1275,7 @@ void CGItemObj::onFrame()
 			SetAnimSlot(0, 0);
 			PlayAnim(0, 1, 0, -1, -1, 0);
 
-			CGObject* owner = m_owner;
-			int ownerScriptSlot = *(int*)(*(int*)((unsigned char*)owner + 0x58) + 0x3B4);
+			int ownerData = *(int*)((unsigned char*)m_owner + 0x58);
 			int* soundData = *(int**)(*(int*)(*reinterpret_cast<int*>(CGMonObj::m_boss) + 0xF8) + 0x178);
 			int soundEntry;
 			if (soundData != 0) {
@@ -1288,7 +1287,7 @@ void CGItemObj::onFrame()
 			SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
 			float particleValue = static_cast<float>(itemRows[m_worldParamB].m_fineValue);
 			float particleScale = kItemObjFineStep * (float)particleValue + kItemObjParticleScaleBase;
-			putParticle(ownerScriptSlot | (soundEntry << 8), m_particleSlot, this, particleScale, 0x12909);
+			putParticle((soundEntry << 8) | *(int*)(ownerData + 0x3B4), m_particleSlot, this, particleScale, 0x12909);
 
 			SetDamageCol(0, const_cast<char*>(s_itemDamageBoneHip), kItemObjMemoryRadius, kItemObjMemoryRadius,
 			             CVector(kItemObjZero, kItemObjZero, kItemObjZero));

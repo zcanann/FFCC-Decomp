@@ -147,7 +147,7 @@ void CRingMenu::DrawIcon()
 	CVector offset(kRingMenuZero, kRingMenuHalf * partyObj->unk_0x188, kRingMenuZero);
 	CVector baseWorldPos(partyObj->m_worldPosition);
 	CVector worldPos;
-	PSVECAdd(reinterpret_cast<Vec*>(&baseWorldPos), reinterpret_cast<Vec*>(&offset), reinterpret_cast<Vec*>(&worldPos));
+	PSVECAdd(baseWorldPos, offset, worldPos);
 
 	viewInput.x = worldPos.x;
 	viewInput.y = worldPos.y;
@@ -353,7 +353,7 @@ void CRingMenu::drawGBA()
 	if (m_displayDirection != 0) {
 		showScale = kRingMenuOne - showScale;
 	}
-	if (showScale == kRingMenuZero) {
+	if (kRingMenuZero == showScale) {
 		return;
 	}
 

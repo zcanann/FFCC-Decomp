@@ -99,10 +99,9 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
 
     pppShapeAnimData* shapeAnim =
         static_cast<pppShapeAnimData*>(ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex]->m_animData);
-    const u8 zEnable = (u8)(((u32)__cntlzw((u32)step[0x6B])) >> 5);
     pppSetDrawEnv(
         0, &object->m_drawMatrix, *(float*)(step + 0x88), step[0x8C], step[0x0C],
-        step[0x6E], 0, zEnable, 1, 0);
+        step[0x6E], 0, (u8)(((u32)__cntlzw((u32)step[0x6B])) >> 5), 1, 0);
     pppSetBlendMode(step[0x6E]);
 
     for (u32 i = 0; i < maxParticles; i++) {

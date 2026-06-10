@@ -157,6 +157,14 @@ struct SFoodRec { // stride 0x42, indexed by item low byte
 	unsigned char pad3C[6];   // 0x3C
 };
 
+struct SCarryAnimRow { // stride 0x1CA flat3 row; carry anim ids at +0x1C2..0x1C8
+	unsigned char pad[0x1C2];
+	unsigned short m_anim0; // 0x1C2
+	unsigned short m_anim1; // 0x1C4
+	unsigned short m_anim2; // 0x1C6
+	unsigned short m_anim3; // 0x1C8
+};
+
 struct SAtkTblRow { // stride 0x1CA flat3 row, viewed as SAtkRec records
 	SAtkRec recs[25];
 	unsigned char tail[8];
@@ -345,29 +353,25 @@ static inline int getCarryAnimNo(CGPartyObj* self, int carryType)
 	if (carryType == 0) {
 		if (CFlatItemCarryMode() == 1) {
 			unsigned char* script = reinterpret_cast<unsigned char*>(self->m_scriptHandle);
-			unsigned int table = Game.unk_flat3_field_30_0xc7e0 +
-			    (*reinterpret_cast<unsigned short*>(script + 0x3E2) +
-			     *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2) * 0x1CA;
-			return *reinterpret_cast<unsigned short*>(table + 0x1C6);
+			SCarryAnimRow* rows = reinterpret_cast<SCarryAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+			return rows[*reinterpret_cast<unsigned short*>(script + 0x3E2) +
+			            *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2].m_anim2;
 		}
 		unsigned char* script = reinterpret_cast<unsigned char*>(self->m_scriptHandle);
-		unsigned int table = Game.unk_flat3_field_30_0xc7e0 +
-		    (*reinterpret_cast<unsigned short*>(script + 0x3E2) +
-		     *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2) * 0x1CA;
-		return *reinterpret_cast<unsigned short*>(table + 0x1C2);
+		SCarryAnimRow* rows = reinterpret_cast<SCarryAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+		return rows[*reinterpret_cast<unsigned short*>(script + 0x3E2) +
+		            *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2].m_anim0;
 	} else {
 		if (CFlatItemCarryMode() == 1) {
 			unsigned char* script = reinterpret_cast<unsigned char*>(self->m_scriptHandle);
-			unsigned int table = Game.unk_flat3_field_30_0xc7e0 +
-			    (*reinterpret_cast<unsigned short*>(script + 0x3E2) +
-			     *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2) * 0x1CA;
-			return *reinterpret_cast<unsigned short*>(table + 0x1C8);
+			SCarryAnimRow* rows = reinterpret_cast<SCarryAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+			return rows[*reinterpret_cast<unsigned short*>(script + 0x3E2) +
+			            *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2].m_anim3;
 		}
 		unsigned char* script = reinterpret_cast<unsigned char*>(self->m_scriptHandle);
-		unsigned int table = Game.unk_flat3_field_30_0xc7e0 +
-		    (*reinterpret_cast<unsigned short*>(script + 0x3E2) +
-		     *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2) * 0x1CA;
-		return *reinterpret_cast<unsigned short*>(table + 0x1C4);
+		SCarryAnimRow* rows = reinterpret_cast<SCarryAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+		return rows[*reinterpret_cast<unsigned short*>(script + 0x3E2) +
+		            *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2].m_anim1;
 	}
 }
 

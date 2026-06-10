@@ -1291,16 +1291,17 @@ void CFlatRuntime2::Destroy()
 
 	int zero = 0;
 	for (int i = 0; i < 8; i++) {
-		CFile::CHandle* fileHandle = LayerResources(this)[i].m_fileHandle;
+		CFlatLayerResource* layer = &LayerResources(this)[i];
+		CFile::CHandle* fileHandle = layer->m_fileHandle;
 		if (fileHandle != 0) {
 			File.Close(fileHandle);
-			LayerResources(this)[i].m_fileHandle = reinterpret_cast<CFile::CHandle*>(zero);
+			layer->m_fileHandle = reinterpret_cast<CFile::CHandle*>(zero);
 		}
 
-		CTextureSet* textureSet = LayerResources(this)[i].m_textureSet;
+		CTextureSet* textureSet = layer->m_textureSet;
 		if (textureSet != 0) {
 			delete textureSet;
-			LayerResources(this)[i].m_textureSet = reinterpret_cast<CTextureSet*>(zero);
+			layer->m_textureSet = reinterpret_cast<CTextureSet*>(zero);
 		}
 	}
 }

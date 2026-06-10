@@ -41,6 +41,13 @@ struct CModelAnimState {
     CChara::CAnim* m_anim;
 };
 
+struct ModelFlagsA0Signed {
+    s8 m_bit80 : 1;
+    s8 m_bit40 : 1;
+    s8 m_bit20 : 1;
+    s8 m_lo : 5;
+};
+
 struct GObjectSRT {
     Vec m_trans;
     Vec m_rot;
@@ -1905,7 +1912,8 @@ void CGObject::update()
         m_groundHitOffset.z *= m_bounceFactor;
     }
 
-    if (HasLoadedModel(m_charaModelHandle) && (ModelFlagsA0(m_charaModelHandle->m_model) & 0x40) != 0) {
+    if (HasLoadedModel(m_charaModelHandle) && CFlat.m_gameFlagBits.m_flagBit1
+        && reinterpret_cast<ModelFlagsA0Signed*>(&ModelFlagsA0(m_charaModelHandle->m_model))->m_bit40) {
         m_charaModelHandle->m_model->MogFurFrame(this);
     }
 }

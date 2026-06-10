@@ -93,6 +93,13 @@ static inline int ReadTagS8(char** text)
 	return (int)ReadTagByte(text);
 }
 
+static inline int ReadMesChar(char** text)
+{
+	unsigned char* p = (unsigned char*)*text;
+	*text = (char*)(p + 1);
+	return *p;
+}
+
 static inline int ReadTagNibble(char** text)
 {
 	char* p = *text;
@@ -936,11 +943,7 @@ void CMes::addString(char** text, int branchMode)
 	unsigned short uch;
 	while (running)
 	{
-		unsigned char* p = (unsigned char*)*text;
-		*text = (char*)(p + 1);
-		uch = *p;
-
-		if (uch == 0)
+		if ((uch = ReadMesChar(text)) == 0)
 		{
 			running = 0;
 			goto updateBounds;
@@ -1233,7 +1236,7 @@ void CMes::addString(char** text, int branchMode)
 		case 0x16:
 		case 0x17:
 		case 0x18:
-			mColor = (int)uch - 0x0C;
+			mColor = (unsigned int)uch - 0x0C;
 			break;
 		case 0x24:
 			running = 0;
@@ -1330,7 +1333,7 @@ void CMes::addString(char** text, int branchMode)
 		}
 		case 0x36:
 		{
-			unsigned char idx = (unsigned char)ReadTagU8(text);
+			signed char idx = (unsigned char)ReadTagU8(text);
 			if (branchMode == 0)
 			{
 				CFlag flag;

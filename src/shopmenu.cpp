@@ -2273,6 +2273,7 @@ void CShopMenu::DrawMake()
     MenuPcs.DrawInit();
 
     int rowY = 300;
+    int ownedRightX = 452;
     short recipeMaterial[6];
     MenuPcs.GetRecipeMaterial(getItemNo(m_selectedIndex), reinterpret_cast<CMenuPcs::MaterialInfo*>(recipeMaterial));
     float makeMarginScale = FLOAT_80332d28;
@@ -2332,13 +2333,8 @@ void CShopMenu::DrawMake()
             ownedTlut = 0x1B;
         }
         CFont* ownedFont = MenuPcs.m_fonts[0];
-        x = 452;
-        ownedFont->SetShadow(1);
-        ownedFont->SetScale(FLOAT_80332d28);
-        ownedFont->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
-        ownedFont->DrawInit();
-        SetShopMenuFontRenderBit(ownedFont);
-        ownedFont->SetMargin(FLOAT_80332d64);
+        x = ownedRightX;
+        SetupShopMenuGilFont(ownedFont);
         char ownedBuffer[64];
         sprintf(ownedBuffer, s_TwoDigitFormat_80332d18, ownedCount);
         x = static_cast<int>(x - ownedFont->GetWidth(ownedBuffer));

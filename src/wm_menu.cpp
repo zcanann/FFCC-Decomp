@@ -4111,7 +4111,7 @@ void CMenuPcs::DrawMainMenu()
 	extern float FLOAT_803316D0;
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
-	const short state = m_wmWorldState->m_mainState;
+	short state = m_wmWorldState->m_mainState;
 	float frameAlpha;
 	if (state == 0) {
 		frameAlpha = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter));
@@ -4839,9 +4839,10 @@ void CMenuPcs::DrawCMakeMenu()
 	extern double DOUBLE_803314E8;
 	extern double DOUBLE_803313F8;
 	extern double DOUBLE_803314D0;
+	unsigned int ti;
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
-	const short state = m_wmWorldState->m_mainState;
+	short state = m_wmWorldState->m_mainState;
 	float frameAlpha;
 	if (state == 0) {
 		frameAlpha = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter));
@@ -4877,7 +4878,7 @@ void CMenuPcs::DrawCMakeMenu()
 		byteOffset += 0x1C;
 	} while (bit < 2);
 
-	const short contentState = m_wmWorldState->m_mainState;
+	short contentState = m_wmWorldState->m_mainState;
 	if (contentState > 0 && contentState < 4) {
 		float contentAlpha;
 		if (contentState == 1) {
@@ -4935,7 +4936,6 @@ void CMenuPcs::DrawCMakeMenu()
 			const int textIndex = static_cast<int>(*reinterpret_cast<short*>(bytes + 0x74) / 0x4B);
 			char* textList[3] = { 0, 0, 0 };
 			char** const langText = &lbl_80210750[(Game.m_gameWork.m_languageId - 1) * 0x0B];
-			unsigned int ti;
 			ti = 5;
 			textList[0] = langText[ti];
 			ti = 6;

@@ -3440,10 +3440,10 @@ inline void CMenuPcs::CalcSingLife()
  */
 void CMenuPcs::DrawSingLife()
 {
-    const CCaravanWork* const caravanWork = SingleCaravanWork();
     int lifeTimer = m_singleLifeTimer;
     float xBase = 366.0f;
     float y = -32.0f;
+    const CCaravanWork* const caravanWork = SingleCaravanWork();
     if (lifeTimer < 0) {
         return;
     }
@@ -3462,8 +3462,8 @@ void CMenuPcs::DrawSingLife()
     } else if (lifeTimer < 0x28) {
         y = 32.0f;
     } else {
-        int t = 10 - (lifeTimer - 0x28);
         int phase;
+        int t = 10 - (lifeTimer - 0x28);
         if (t < 0) {
             phase = 0;
         } else {

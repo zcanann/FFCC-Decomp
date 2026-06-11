@@ -6793,11 +6793,11 @@ void CMenuPcs::CalcFukidashi()
 			}
 		} else {
 			bitIdx = 0;
-			if ((sFlags & (0x10 << bitIdx)) == 0) { bitIdx = 1;
-			if ((sFlags & (0x10 << bitIdx)) == 0) { bitIdx = 2;
-			if ((sFlags & (0x10 << bitIdx)) == 0) { bitIdx = 3;
-			if ((sFlags & (0x10 << bitIdx)) == 0) { bitIdx = 4;
-			if ((sFlags & (0x10 << bitIdx)) == 0) { bitIdx = 5; }}}}}
+			if ((sFlags & (0x10 << bitIdx)) == 0) { bitIdx++;
+			if ((sFlags & (0x10 << bitIdx)) == 0) { bitIdx++;
+			if ((sFlags & (0x10 << bitIdx)) == 0) { bitIdx++;
+			if ((sFlags & (0x10 << bitIdx)) == 0) { bitIdx++;
+			if ((sFlags & (0x10 << bitIdx)) == 0) { bitIdx++; }}}}}
 			modelIdx = bitIdx + 0x0C;
 		}
 

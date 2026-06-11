@@ -62,6 +62,32 @@ STATIC_ASSERT(offsetof(CChara::MogFurState, m_alphaScore) == 0x2050);
 
 class CMaterial;
 
+extern "C" void __ct__7CVectorFv(CVector*);
+
+struct FurPickPointerTable {
+	CVector* volatile m_areaCA2;
+	CVector* volatile m_areaBC2;
+	CVector* volatile m_hitToC2;
+	CVector* volatile m_hitToB2;
+	CVector* volatile m_areaCA1;
+	CVector* volatile m_areaBC1;
+	CVector* volatile m_hitToC1;
+	CVector* volatile m_hitToB1;
+	CVector* volatile m_rayEndB;
+	CVector* volatile m_rayEndA;
+};
+
+struct FurPickWorkPointers {
+	CVector* volatile m_areaCAw;
+	CVector* volatile m_areaBCw;
+	CVector* volatile m_hitToBw;
+	CVector* volatile m_areaCAc;
+	CVector* volatile m_areaBCc;
+	CVector* volatile m_hitToCc;
+	CVector* volatile m_hitToBc;
+	CVector* volatile m_rayEndc;
+};
+
 extern char sYmEnvSeparator[4];
 extern "C" char* sMogRadarTypeLabels[];
 extern "C" char sMogRadarDebugFormatBlock[];
@@ -499,7 +525,9 @@ void CChara::TimeMogFur()
 }
 #pragma pop
 
-static int FurColorMatch(CColor src, CColor ref)
+#pragma push
+#pragma bool off
+static int FurColorMatch(CColor src, CColor ref, int limit)
 {
 	int dr = static_cast<int>(src.color.r) - static_cast<int>(ref.color.r);
 	if (dr < 0) {
@@ -519,9 +547,10 @@ static int FurColorMatch(CColor src, CColor ref)
 	}
 	db += 7 - static_cast<int>(src.color.a);
 
-	int hits = (dr < 6) + (dg < 6) + (db < 6);
+	int hits = (dr <= limit) + (dg <= limit) + (db <= limit);
 	return static_cast<unsigned int>(__cntlzw(3 - hits)) >> 5;
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -537,11 +566,12 @@ void CChara::CalcMogScore()
 	char* fmtBase = lbl_801DB648;
 	#define fur m_sharedState.m_mogFur
 	unsigned short* texels = fur.m_texels;
-	int bitCount = 0;
-	int lineCount = 0;
-	int circleCount = 0;
 
 	memset(fur.m_score, 0, 0x40);
+
+	int bitCount = 0;
+	int circleCount = 0;
+	int lineCount = 0;
 
 	for (int y = 0; y < 0x40; y++) {
 		for (int x = 0; x < 0x40; x++) {
@@ -564,9 +594,9 @@ void CChara::CalcMogScore()
 			                static_cast<unsigned char>(a));
 
 			int colorHit[3];
-			colorHit[0] = FurColorMatch(srcColor, CColor(0xF, 4, 4, 2));
-			colorHit[1] = FurColorMatch(srcColor, CColor(4, 0xF, 4, 2));
-			colorHit[2] = FurColorMatch(srcColor, CColor(4, 8, 0xF, 2));
+			colorHit[0] = FurColorMatch(srcColor, CColor(0xF, 4, 4, 2), 5);
+			colorHit[1] = FurColorMatch(srcColor, CColor(4, 0xF, 4, 2), 5);
+			colorHit[2] = FurColorMatch(srcColor, CColor(4, 8, 0xF, 2), 5);
 			fur.m_alphaScore += a;
 
 			const int ring = dist % 12;
@@ -611,17 +641,20 @@ void CChara::CalcMogScore()
 		int level;
 
 		*scorePtr = (line + circle * 2 - bit * 2) / 3;
+		int sc;
 		if (*scorePtr < 0) {
-			*scorePtr = 0;
+			sc = 0;
 		} else {
-			*scorePtr = (*scorePtr > 100) ? 100 : *scorePtr;
+			sc = (*scorePtr > 100) ? 100 : *scorePtr;
 		}
+		*scorePtr = sc;
 
-		level = (100 - *scorePtr) / 5;
-		if (level < 5) {
+		fur.m_radarLevel[i] = (100 - *scorePtr) / 5;
+		const int lv = fur.m_radarLevel[i];
+		if (lv < 5) {
 			level = 5;
 		} else {
-			level = (level > 0xF) ? 0xF : level;
+			level = (lv > 0xF) ? 0xF : lv;
 		}
 		fur.m_radarLevel[i] = level;
 	}
@@ -862,10 +895,11 @@ static void CopyMogTextureToChara(CChara::CModel* model)
 	}
 
 	void* srcBuffer = texture->m_imageData;
-	const int texelCountBytes = texture->m_width * texture->m_height * 2;
+	const int texWidth = texture->m_width;
+	const int texHeight = texture->m_height;
 
 	memcpy(Chara.MogFur().m_texels, srcBuffer, 0x2000);
-	DCFlushRange(srcBuffer, texelCountBytes);
+	DCFlushRange(srcBuffer, texWidth * texHeight * 2);
 	GXInvalidateTexAll();
 }
 
@@ -1018,7 +1052,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 	const int debugPadLock = Pad.m_debugPadLock;
 	const short heldButtons = MogHeldButtons(debugPadLock);
 	const short triggerButtons = MogTriggerButtons(debugPadLock);
-	const unsigned short rotateButtons = (MogPadInt(debugPadLock, 64) == 0) ? MogHeldButtons(debugPadLock) : 0;
+	const unsigned short rotateButtons = static_cast<unsigned short>((MogPadInt(debugPadLock, 64) == 0) ? MogHeldButtons(debugPadLock) : static_cast<unsigned short>(0));
 
 	if (MogWork().m_started == 0) {
 		if ((heldButtons & 0x100) != 0) {
@@ -1130,7 +1164,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		case 3: {
 			const _GXColor c = CColor(0xF, 0xF, 0xF, 4).color;
 			brushColor = c;
-			doPaint = ((static_cast<int>(System.m_frameCounter) % 4) == 0) ? 1 : 0;
+			doPaint = (static_cast<int>(System.m_frameCounter) % 4) == 0;
 			break;
 		}
 		case 4:
@@ -1139,7 +1173,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 				brushColor = c;
 			}
 			eraseMode = 1;
-			doPaint = ((static_cast<int>(System.m_frameCounter) % 4) == 0) ? 1 : 0;
+			doPaint = (static_cast<int>(System.m_frameCounter) % 4) == 0;
 			break;
 		}
 		_GXColor centerBefore;
@@ -1204,7 +1238,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 
 			if (doPaint != 0) {
 				int particleNo = 0;
-				unsigned int seId = 0;
+				int seId = 0;
 				int emitParticle = ((static_cast<int>(System.m_frameCounter) % 2) == 0);
 				int playGate = ((static_cast<int>(System.m_frameCounter) % 4) == 0);
 				CColor particleColorObj(centerBefore);
@@ -1321,6 +1355,8 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma optimization_level 3
 int CChara::CModel::PickFur(
     Mtx param_2, _GXColor brushColor, int doPaint, int mode, _GXColor* centerBefore, _GXColor* centerAfter, Vec* worldPos)
 {
@@ -1347,6 +1383,13 @@ int CChara::CModel::PickFur(
 	FurProjectedVertex verts[3];
 	FurProjectedVertex incoming;
 	Mtx44 invScreenMtx;
+	Vec rayEndMem;
+	Vec hitToBMem;
+	Vec hitToCMem;
+	Vec areaBCMem;
+	Vec areaCAMem;
+	FurPickPointerTable ptrTable;
+	FurPickWorkPointers workPtrs;
 
 	for (unsigned int meshIndex = 0; meshIndex < ModelMeshCount(this); meshIndex++, mesh++) {
 		if (mesh->m_workPositions == 0) {
@@ -1370,6 +1413,17 @@ int CChara::CModel::PickFur(
 		Chara.gqrInit(posGqr << 0x18 | 0x70000 | posGqr << 8 | 7,
 		              normGqr << 0x18 | 0x70000 | normGqr << 8 | 7, 0xc070c07);
 
+		ptrTable.m_rayEndA = reinterpret_cast<CVector*>(&rayEndMem);
+		ptrTable.m_rayEndB = reinterpret_cast<CVector*>(&rayEndMem);
+		ptrTable.m_hitToB1 = reinterpret_cast<CVector*>(&hitToBMem);
+		ptrTable.m_hitToC1 = reinterpret_cast<CVector*>(&hitToCMem);
+		ptrTable.m_areaBC1 = reinterpret_cast<CVector*>(&areaBCMem);
+		ptrTable.m_areaCA1 = reinterpret_cast<CVector*>(&areaCAMem);
+		ptrTable.m_hitToB2 = reinterpret_cast<CVector*>(&hitToBMem);
+		ptrTable.m_hitToC2 = reinterpret_cast<CVector*>(&hitToCMem);
+		ptrTable.m_areaBC2 = reinterpret_cast<CVector*>(&areaBCMem);
+		ptrTable.m_areaCA2 = reinterpret_cast<CVector*>(&areaCAMem);
+
 		FurDisplayListRaw* displayList = mesh->m_data->m_displayLists;
 		int displayCount = mesh->m_data->m_displayListCount;
 		while (--displayCount >= 0) {
@@ -1392,14 +1446,22 @@ int CChara::CModel::PickFur(
 				command = cursor[0];
 				const short count = *reinterpret_cast<const unsigned short*>(cursor + 1);
 				cursor += 3;
-				const unsigned char primitive = command & 0xF8;
-				remaining -= static_cast<int>(count) * 8 + 3;
+				const int primitive = command & 0xF8;
+				remaining -= static_cast<int>(static_cast<unsigned short>(count)) * 8 + 3;
 				if (primitive != 0x90 && primitive != 0x98) {
 					break;
 				}
 
-				verts[0].m_valid = 0;
-				verts[1].m_valid = 0;
+				workPtrs.m_rayEndc = ptrTable.m_rayEndA;
+				CVector* rayEndP = ptrTable.m_rayEndB;
+				workPtrs.m_hitToBc = ptrTable.m_hitToB1;
+				workPtrs.m_hitToCc = ptrTable.m_hitToC1;
+				workPtrs.m_areaBCc = ptrTable.m_areaBC1;
+				workPtrs.m_areaCAc = ptrTable.m_areaCA1;
+				workPtrs.m_hitToBw = ptrTable.m_hitToB2;
+				CVector* hitToCP = ptrTable.m_hitToC2;
+				workPtrs.m_areaBCw = ptrTable.m_areaBC2;
+				workPtrs.m_areaCAw = ptrTable.m_areaCA2;
 
 				for (unsigned int vertexIndex = 0; vertexIndex < count; vertexIndex++) {
 					const unsigned short* indices = reinterpret_cast<const unsigned short*>(cursor);
@@ -1428,7 +1490,9 @@ int CChara::CModel::PickFur(
 					Vec curViewPos;
 					PSMTXMultVec(modelViewMtx, &localPos, &curViewPos);
 
-					if (static_cast<double>(curViewPos.z) < static_cast<double>(kCharaFurDepthZero)) {
+					if (static_cast<double>(curViewPos.z) >= static_cast<double>(kCharaFurDepthZero)) {
+						incoming.m_flagBits.m_projValid = 0;
+					} else {
 						Vec4d curClip;
 						incoming.m_flagBits.m_projValid = 1;
 						Math.MTX44MultVec4(screenMtx, &curViewPos, &curClip);
@@ -1439,8 +1503,6 @@ int CChara::CModel::PickFur(
 						incoming.m_clipW = curClip.w;
 						incoming.m_screenX = kCharaFurScreenCenterX * curClip.x * invW + kCharaFurScreenCenterX;
 						incoming.m_screenY = kCharaFurScreenCenterY - kCharaFurScreenCenterY * curClip.y * invW;
-					} else {
-						incoming.m_flagBits.m_projValid = 0;
 					}
 					incoming.m_viewPos = curViewPos;
 					incoming.m_u = curU;
@@ -1465,9 +1527,8 @@ int CChara::CModel::PickFur(
 					    (primitive == 0x98 && static_cast<int>(vertexIndex) >= 2)) {
 						FurProjectedVertex* vp = &verts[0];
 						int passed = 0;
-						int remainEdges = 3;
 						float depthAccum = kCharaFurDepthZero;
-						do {
+						for (int remainEdges = 3; remainEdges != 0; remainEdges--) {
 							if (vp->m_flagBits.m_projValid == 0) {
 								break;
 							}
@@ -1489,8 +1550,7 @@ int CChara::CModel::PickFur(
 							depthAccum = depthAccum + vp->m_clipW;
 							vp++;
 							passed++;
-							remainEdges--;
-						} while (remainEdges != 0);
+						}
 
 						float depth;
 						if (passed != 3 || nearestDepth <= (depth = depthAccum / kCharaFurTriangleVertexCount)) {
@@ -1502,7 +1562,7 @@ int CChara::CModel::PickFur(
 						C_MTX44Inverse(invScreenMtx, invScreenMtx);
 
 						CVector rayStart;
-						CVector rayEnd;
+						__ct__7CVectorFv(workPtrs.m_rayEndc);
 						CVector rayStartInit(
 						    (static_cast<float>(cursorXd) - kCharaFurScreenCenterX) / kCharaFurScreenCenterX,
 						    static_cast<float>(negCursorY) / kCharaFurScreenCenterY, kCharaFurDepthZero);
@@ -1510,15 +1570,15 @@ int CChara::CModel::PickFur(
 						rayStart.y = rayStartInit.y;
 						rayStart.z = rayStartInit.z;
 						CVector rayEndInit(rayStartInit.x, rayStartInit.y, kCharaFurPickRayFarZ);
-						rayEnd.x = rayEndInit.x;
-						rayEnd.y = rayEndInit.y;
-						rayEnd.z = rayEndInit.z;
+						rayEndP->x = rayEndInit.x;
+						rayEndMem.y = rayEndInit.y;
+						rayEndMem.z = rayEndInit.z;
 						PSMTX44MultVec(invScreenMtx, rayStart, rayStart);
-						PSMTX44MultVec(invScreenMtx, rayEnd, rayEnd);
+						PSMTX44MultVec(invScreenMtx, *rayEndP, *rayEndP);
 
 						Vec ray;
 						CVector raySub;
-						PSVECSubtract(rayEnd, rayStart, raySub);
+						PSVECSubtract(*rayEndP, rayStart, raySub);
 						ray.x = raySub.x;
 						ray.y = raySub.y;
 						ray.z = raySub.z;
@@ -1551,11 +1611,11 @@ int CChara::CModel::PickFur(
 						PSVECAdd(rayStart, &scaledRay, hitViewPos);
 
 						CVector hitToA;
-						CVector hitToC;
-						CVector hitToB;
+						__ct__7CVectorFv(workPtrs.m_hitToBc);
+						__ct__7CVectorFv(workPtrs.m_hitToCc);
 						CVector areaAB;
-						CVector areaBC;
-						CVector areaCA;
+						__ct__7CVectorFv(workPtrs.m_areaBCc);
+						__ct__7CVectorFv(workPtrs.m_areaCAc);
 						const CVector& vertA1 = CVector(verts[0].m_viewPos);
 						CVector hitToASub;
 						PSVECSubtract(const_cast<CVector&>(vertA1), hitViewPos, hitToASub);
@@ -1565,26 +1625,26 @@ int CChara::CModel::PickFur(
 						const CVector& vertB = CVector(verts[1].m_viewPos);
 						CVector hitToBSub;
 						PSVECSubtract(const_cast<CVector&>(vertB), hitViewPos, hitToBSub);
-						hitToB.y = hitToBSub.y;
-						hitToB.x = hitToBSub.x;
-						hitToB.z = hitToBSub.z;
+						hitToBMem.y = hitToBSub.y;
+						workPtrs.m_hitToBw->x = hitToBSub.x;
+						hitToBMem.z = hitToBSub.z;
 						const CVector& vertC = CVector(verts[2].m_viewPos);
 						CVector hitToCSub;
 						PSVECSubtract(const_cast<CVector&>(vertC), hitViewPos, hitToCSub);
-						hitToC.x = hitToCSub.x;
-						hitToC.y = hitToCSub.y;
-						hitToC.z = hitToCSub.z;
+						hitToCP->x = hitToCSub.x;
+						hitToCMem.y = hitToCSub.y;
+						hitToCMem.z = hitToCSub.z;
 
-						PSVECCrossProduct(hitToA, hitToB, areaAB);
-						PSVECCrossProduct(hitToB, hitToC, areaBC);
-						PSVECCrossProduct(hitToC, hitToA, areaCA);
+						PSVECCrossProduct(hitToA, *workPtrs.m_hitToBw, areaAB);
+						PSVECCrossProduct(*workPtrs.m_hitToBw, *hitToCP, *workPtrs.m_areaBCw);
+						PSVECCrossProduct(*hitToCP, hitToA, *workPtrs.m_areaCAw);
 						const float magAB = PSVECMag(areaAB);
-						const float magCA = PSVECMag(areaCA);
-						const float magBC = PSVECMag(areaBC);
+						const float magCA = PSVECMag(*workPtrs.m_areaCAw);
+						const float magBC = PSVECMag(*workPtrs.m_areaBCw);
 						const CVector& weightsInit = CVector(magBC, magCA, magAB);
-						CVector weightsScale;
+						Vec weightsScale;
 						CVector weights;
-						PSVECScale(const_cast<CVector&>(weightsInit), weightsScale, kCharaFurWeightScale);
+						PSVECScale(const_cast<CVector&>(weightsInit), &weightsScale, kCharaFurWeightScale);
 						weights.x = weightsScale.x;
 						weights.y = weightsScale.y;
 						weights.z = weightsScale.z;
@@ -1652,6 +1712,7 @@ noHitReturn:
 	return -(hitAny == 0);
 }
 
+#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x800e25e8
@@ -1774,9 +1835,10 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 			shadowCount = MaterialMan.GetCharaShadow(2, shadowMaterials, shadowMatrices, reinterpret_cast<Vec*>(&modelPos), kCharaFurShadowRange, kCharaFurShadowFade, 0);
 			CMaterial** shadowMatP = shadowMaterials;
 			MtxPtr* shadowMtxP = shadowMatrices;
-			int shadowTexMtxId = 0x21;
+			int shadowTexMtxBase = 0;
 			for (int shadowIndex = 0; shadowIndex < shadowCount; shadowIndex++) {
 				const int shadowTexMap = shadowIndex + 3;
+				const int shadowTexMtxId = shadowTexMtxBase + 0x21;
 				TextureMan.SetTexture(static_cast<GXTexMapID>(shadowTexMap), (*shadowMatP)->GetTexture(0));
 
 				Mtx shadowTexMtx;
@@ -1784,7 +1846,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 				GXLoadTexMtxImm(shadowTexMtx, shadowTexMtxId, GX_MTX3x4);
 				GXSetTexCoordGen2(static_cast<GXTexCoordID>(shadowTexMap), GX_TG_MTX3x4, GX_TG_POS,
 				                  shadowTexMtxId, GX_FALSE, GX_PTIDENTITY);
-				shadowTexMtxId += 3;
+				shadowTexMtxBase += 3;
 				shadowMatP++;
 				shadowMtxP++;
 			}
@@ -2411,6 +2473,8 @@ void CChara::makeFurTex()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_loop_invariants off
 void brush(unsigned short* pixels, int width, int height, float fx, float fy, int mode, _GXColor targetColor, _GXColor* centerBefore, _GXColor* centerAfter)
 {
 	int dy;
@@ -2425,6 +2489,7 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 
 	DCInvalidateRange(pixels, texelCountBytes);
 
+	const int rowStride = width * 4;
 	for (dy = -2; dy <= 2; dy++) {
 		int dx;
 		int py = centerY + dy;
@@ -2442,18 +2507,12 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 				continue;
 			}
 
-			int adx = dx;
-			if (adx < 0) {
-				adx = -adx;
-			}
-			int ady = dy;
-			if (ady < 0) {
-				ady = -ady;
-			}
+			const int sdx = dx >> 31;
+			const int adx = (dx ^ sdx) - sdx;
+			const int sdy = dy >> 31;
+			const int ady = (dy ^ sdy) - sdy;
 			distance = adx + ady;
-			unsigned int ux = px;
-			unsigned int uy = py;
-			tileIndex = ((ux & 3) + ((uy & 3) * 4) + (ux >> 2) * 0x10 + (uy >> 2) * width * 4) * 2;
+			tileIndex = (px % 4 + ((py % 4) * 4 + ((px / 4) * 0x10 + (py / 4) * rowStride))) * 2;
 			packed = *(unsigned short*)(((char*)pixels) + tileIndex);
 
 			b = packed & 0x0f;
@@ -2472,7 +2531,7 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 				a = a < 0 ? 0 : a;
 			} else {
 				float k = (float)(7 - targetColor.a) / kCharaFurAlphaComponentScale + (float)(distance / 4);
-				k = (k > 1.0f) ? 1.0f : k;
+				k = (1.0f < k) ? 1.0f : k;
 				{
 					float inv = 1.0f - k;
 					r = (int)((float)r * k + (float)targetColor.r * inv);
@@ -2496,6 +2555,7 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 	DCFlushRange(pixels, texelCountBytes);
 	GXInvalidateTexAll();
 }
+#pragma pop
 
 /*
  * --INFO--

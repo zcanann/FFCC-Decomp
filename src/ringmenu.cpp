@@ -145,7 +145,7 @@ void CRingMenu::DrawIcon()
 	Vec4d clipPos;
 	Vec viewInput;
 	CVector offset(kRingMenuZero, kRingMenuHalf * partyObj->unk_0x188, kRingMenuZero);
-	CVector baseWorldPos(partyObj->m_worldPosition);
+	Vec* baseWorldPos = CVector(partyObj->m_worldPosition);
 	CVector worldPos;
 	PSVECAdd(baseWorldPos, offset, worldPos);
 
@@ -195,14 +195,12 @@ void CRingMenu::DrawIcon()
 		iconCol = foodProgress % 100 + (foodProgress - 100) / 100 * 4;
 	}
 
-	CColor bgColor(0, 0, 0, 0x80);
-	MenuPcs.SetColor(bgColor);
+	MenuPcs.SetColor(CColor(0, 0, 0, 0x80));
 	MenuPcs.DrawRect(3, kRingMenuShadowOffset + posX,
 	                                 kRingMenuShadowOffset + posY, kRingMenuCommandCellSize, kRingMenuCommandCellSize,
 	                                 kRingMenuZero, kRingMenuZero, kRingMenuOne, kRingMenuOne, angle);
 
-	CColor fgColor(0xFF, 0xFF, 0xFF, 0xFF);
-	MenuPcs.SetColor(fgColor);
+	MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF));
 	MenuPcs.DrawRect(3, posX, posY, kRingMenuCommandCellSize, kRingMenuCommandCellSize, kRingMenuZero,
 	    static_cast<float>(iconRow * 0x38), kRingMenuOne, kRingMenuOne,
 	    angle);
@@ -223,8 +221,7 @@ void CRingMenu::DrawIcon()
 	_GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
 	_GXSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
 
-	CColor iconColor(0xFF, 0xFF, 0xFF, blinkAlpha);
-	MenuPcs.SetColor(iconColor);
+	MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, blinkAlpha));
 
 	float u = static_cast<float>(uInt);
 	float v = static_cast<float>(vInt);
@@ -562,8 +559,7 @@ void CRingMenu::onDraw()
 		}
 
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1F));
-		CColor buttonColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(buttonAlpha * alphaScaleBase));
-		MenuPcs.SetColor(buttonColor);
+		MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(buttonAlpha * alphaScaleBase)));
 
 		float drawX;
 		float drawY;
@@ -765,16 +761,13 @@ void CRingMenu::onDraw()
 
 							float blink;
 							if (charge != 0) {
-								CColor color(0x00, 0xFF, 0x00, static_cast<unsigned char>(fullAlpha));
-								MenuPcs.SetColor(color);
+								MenuPcs.SetColor(CColor(0x00, 0xFF, 0x00, static_cast<unsigned char>(fullAlpha)));
 								blink = static_cast<float>(static_cast<int>((System.m_frameCounter >> 2) & 1));
 							} else if (caravanWork->IsSelectedCmdList(i)) {
-								CColor color(0x20, 0xFF, 0x20, static_cast<unsigned char>(fullAlpha));
-								MenuPcs.SetColor(color);
+								MenuPcs.SetColor(CColor(0x20, 0xFF, 0x20, static_cast<unsigned char>(fullAlpha)));
 								blink = kRingMenuZero;
 							} else {
-								CColor color(0x80, 0x80, 0x80, static_cast<unsigned char>(dimAlpha));
-								MenuPcs.SetColor(color);
+								MenuPcs.SetColor(CColor(0x80, 0x80, 0x80, static_cast<unsigned char>(dimAlpha)));
 								blink = kRingMenuZero;
 							}
 
@@ -929,6 +922,7 @@ void CRingMenu::onCalc()
 		m_buttonTimers[7] = clampDecToZero(m_buttonTimers[7]);
 		m_buttonTimers[8] = clampDecToZero(m_buttonTimers[8]);
 		int row = 0;
+		int count = 9;
 		do {
 			m_animFloat[row][0] = m_animFloat[row][0] - animStep;
 			if (m_animFloat[row][0] < animMin) {
@@ -943,7 +937,7 @@ void CRingMenu::onCalc()
 				m_animFloat[row][2] = animMin;
 			}
 			row++;
-		} while (row != 9);
+		} while (--count != 0);
 
 		fmod(static_cast<double>(m_spinPhase), kRingMenuOneD);
 		int i = 0x1B;
@@ -968,7 +962,7 @@ void CRingMenu::onCalc()
 		}
 		m_gbaAnimCounter = clampDecToZero(m_gbaAnimCounter);
 
-		double scrollDelta = static_cast<double>(kRingMenuZero);
+		float scrollDelta = kRingMenuZero;
 		CGPartyObj* partyObj = Game.m_partyObjArr[m_menuIndex];
 		if (partyObj != 0) {
 			CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle);
@@ -980,25 +974,25 @@ void CRingMenu::onCalc()
 			                      ? &Chara.MogFur().m_trackedCommandIndex
 			                      : &m_currentCommandIndex;
 
-			int prev = currentCmd;
 			int next = currentCmd;
+			int prev = currentCmd;
 			if (*trackedCmd != currentCmd) {
 				for (int step = 1; step < 4; step++) {
-					int nextCandidate = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
-					                        ? (currentCmd + 1) % 5
-					                        : caravanWork->GetNextCmdListIdx(next, 1);
-					int prevCandidate = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
-					                        ? (currentCmd + 4) % 5
-					                        : caravanWork->GetNextCmdListIdx(prev, -1);
+					next = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
+					           ? (currentCmd + 1) % 5
+					           : caravanWork->GetNextCmdListIdx(next, 1);
+					prev = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
+					           ? (currentCmd + 4) % 5
+					           : caravanWork->GetNextCmdListIdx(prev, -1);
 
 					int trackedValue = *trackedCmd;
 					if (trackedValue != currentCmd) {
 						int prevDir = 0;
 						int nextDir = 0;
-						if (trackedValue == prevCandidate) {
+						if (trackedValue == prev) {
 							prevDir = step;
 						}
-						if (trackedValue == nextCandidate) {
+						if (trackedValue == next) {
 							nextDir = -step;
 						}
 						if ((prevDir != 0) || (nextDir != 0)) {
@@ -1019,24 +1013,22 @@ void CRingMenu::onCalc()
 								if ((trigger & 0x40) != 0) {
 									nextDir = prevDir;
 								}
-								scrollDelta = static_cast<double>(static_cast<float>(nextDir));
+								scrollDelta = static_cast<float>(nextDir);
 							} else if (prevDir != 0) {
-								scrollDelta = static_cast<double>(static_cast<float>(prevDir));
+								scrollDelta = static_cast<float>(prevDir);
 							} else if (nextDir != 0) {
-								scrollDelta = static_cast<double>(static_cast<float>(nextDir));
+								scrollDelta = static_cast<float>(nextDir);
 							}
 							break;
 						}
-						scrollDelta = static_cast<double>(kRingMenuZero);
+						scrollDelta = kRingMenuZero;
 					}
 
-					prev = prevCandidate;
-					next = nextCandidate;
 				}
 			}
 
 			*trackedCmd = currentCmd;
-			m_spinAccumulator = static_cast<float>(static_cast<double>(m_spinAccumulator) + scrollDelta);
+			m_spinAccumulator = m_spinAccumulator + scrollDelta;
 			m_spinAccumulator *= kRingMenuSpinDamping;
 		}
 	}

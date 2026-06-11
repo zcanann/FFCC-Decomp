@@ -1792,38 +1792,32 @@ DataValsAllocated:
 void pppInitPdt(long* progOffsetReconstructionTable, pppProg* pppProg)
 {
 	int* table = (int*)(progOffsetReconstructionTable + 6);
-	int pppProgRelocOffset = progOffsetReconstructionTable[2];
-	int pdtRelocOffset = progOffsetReconstructionTable[3];
-	int tableHead = table[0];
-	int* pppProgRelocHead = (int*)((int)progOffsetReconstructionTable + pppProgRelocOffset);
-	int* pdtRelocHead = (int*)((int)progOffsetReconstructionTable + pdtRelocOffset);
-	int pppProgRelocCount = pppProgRelocHead[0];
-	int pdtRelocCount = pdtRelocHead[0];
-	int* pppProgRelocs = pppProgRelocHead + 1;
-	int* pdtRelocs = pdtRelocHead + 1;
+	int* pppProgRelocs = (int*)((int)progOffsetReconstructionTable + progOffsetReconstructionTable[2]);
+	int* pdtRelocs = (int*)((int)progOffsetReconstructionTable + progOffsetReconstructionTable[3]);
+	int pppProgRelocCount = *pppProgRelocs++;
+	int pdtRelocCount = *pdtRelocs++;
 
-	if ((u32)tableHead == 0) {
+	if ((u32)table[0] == 0) {
 		return;
 	}
 
-	int* head = table;
 	for (;;) {
-		*head = (int)progOffsetReconstructionTable + *head;
-		int* entry = head;
+		*table = (int)progOffsetReconstructionTable + *table;
+		int* entry = table;
 
-		for (int i = 0; i < *(short*)((int)head + 0x26); i++) {
+		for (int i = 0; i < *(short*)((int)table + 0x26); i++) {
 			entry[10] = (int)(pppProg + entry[10]);
 			entry[12] = (int)progOffsetReconstructionTable + entry[12];
 			entry[13] = (int)progOffsetReconstructionTable + entry[13];
 			entry += 4;
 		}
 
-		int* next = (int*)*head;
+		int* next = (int*)*table;
 		if (*(unsigned int*)next == 0) {
-			*head = 0;
+			*table = 0;
 			break;
 		}
-		head = next;
+		table = next;
 	}
 
 	for (int i = 0; i < pppProgRelocCount; i++) {

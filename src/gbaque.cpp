@@ -3348,12 +3348,16 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 	unsigned char* writePtr;
 	int outSize;
 	int selectedCount;
+	int playerOffset;
+	OSSemaphore* semaphore;
 
-	OSWaitSemaphore(accessSemaphores + channel);
-	memcpy(compatibilityData, reinterpret_cast<unsigned char*>(this) + channel * 0xDC + 0x458, sizeof(compatibilityData));
-	OSSignalSemaphore(accessSemaphores + channel);
+	semaphore = accessSemaphores + channel;
+	OSWaitSemaphore(semaphore);
+	playerOffset = channel * 0xDC;
+	memcpy(compatibilityData, reinterpret_cast<unsigned char*>(this) + playerOffset + 0x458, sizeof(compatibilityData));
+	OSSignalSemaphore(semaphore);
 
-	outCompatibility[0] = reinterpret_cast<unsigned char*>(this)[channel * 0xDC + 0x529];
+	outCompatibility[0] = reinterpret_cast<unsigned char*>(this)[playerOffset + 0x529];
 	count = 2;
 	if (compatibilityData[3] != 0) {
 		count++;
@@ -3380,8 +3384,7 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 	selectedCount = 0;
 	outSize = 2;
 	for (int slot = 1; (selectedCount < count) && (slot < 8); slot++) {
-		unsigned char slotValue = compatibilityData[slot];
-		if ((selectedCount < 2) || ((selectedCount >= 2) && (slotValue != 0))) {
+		if ((selectedCount < 2) || ((selectedCount >= 2) && (compatibilityData[slot] != 0))) {
 			writePtr[0] = static_cast<unsigned char>(slot);
 			writePtr[1] = compatibilityData[slot + 8];
 			writePtr += 2;

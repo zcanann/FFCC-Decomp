@@ -11262,84 +11262,77 @@ void CMenuPcs::CalcMcObj()
 	unsigned char* const worldObj = m_wm.m_worldObjData;
 
 	const float panelStateFloat = FLOAT_80331480;
-	const double yBase = DOUBLE_80331488;
-	const double ySlope = DOUBLE_80331498;
-	const double bias = DOUBLE_80331408;
-	const double yOffset = DOUBLE_80331490;
-	const float yScale = FLOAT_803314A0;
-	const float zero = FLOAT_803313dc;
-	const float six = FLOAT_803314a4;
-	const double doubleD = DOUBLE_803314a8;
 
 	SplineTable* const yTbl = reinterpret_cast<SplineTable*>(&gWmModelYOffsetSplineCount);
 
-	union I2D {
-		double d;
-		struct {
-			unsigned int hi;
-			unsigned int lo;
-		} u;
-	};
-
+	int i;
 	unsigned int* panelState = reinterpret_cast<unsigned int*>(worldObj + 0x550);
-	for (int i = 0; i < 4; i++, panelState = reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(panelState) + 0x50)) {
+	for (i = 0; i < 4; i++, panelState = reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(panelState) + 0x50)) {
 		*reinterpret_cast<short*>(panelState + 2) = static_cast<short>(panelStateFloat);
 
-		I2D iConv;
-		iConv.u.hi = 0x43300000;
-		iConv.u.lo = static_cast<unsigned int>(i) ^ 0x80000000;
 		const int y = static_cast<int>(
-		    static_cast<float>(yBase + ySlope * (iConv.d - bias) + yOffset) -
-		    yScale);
+		    static_cast<float>(48.0 + (88.0 * static_cast<double>(i) + 24.0)) -
+		    112.0f);
 		*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(panelState) + 0xA) = static_cast<short>(y);
 		*reinterpret_cast<unsigned short*>(panelState + 3) = 0x140;
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(panelState) + 0xE) = 0xE0;
-		reinterpret_cast<float*>(panelState)[4] = zero;
-		reinterpret_cast<float*>(panelState)[5] = zero;
-		reinterpret_cast<float*>(panelState)[6] = six;
+		reinterpret_cast<float*>(panelState)[4] = 0.0f;
+		reinterpret_cast<float*>(panelState)[5] = 0.0f;
+		reinterpret_cast<float*>(panelState)[6] = 50.0f;
 
 		panelState[1]++;
+		unsigned char* const charaState = m_wmCharaState + i * 0x48;
 		if (static_cast<float>(static_cast<int>(panelState[1])) >=
-		    doubleD * static_cast<double>(yTbl->data[gWmModelYOffsetSplineCount * 4 - 4])) {
+		    25.0 * static_cast<double>(yTbl->data[gWmModelYOffsetSplineCount * 4 - 4])) {
 			panelState[1] = 0;
 		}
 
-		unsigned char* const charaState = m_wmCharaState + i * 0x48;
 		if (*reinterpret_cast<int*>(charaState + 8) <= 0) {
 			panelState[0] = 0;
 		} else {
-			panelState[0] = 1;
-			reinterpret_cast<float*>(panelState)[7] = FLOAT_803314B0;
-			reinterpret_cast<float*>(panelState)[8] = FLOAT_803314B4;
-			reinterpret_cast<float*>(panelState)[9] = FLOAT_803313dc;
-			reinterpret_cast<float*>(panelState)[0xD] = FLOAT_80331434;
-			reinterpret_cast<float*>(panelState)[0xE] = FLOAT_80331434;
-			reinterpret_cast<float*>(panelState)[0xF] = FLOAT_80331434;
-			reinterpret_cast<float*>(panelState)[10] = FLOAT_803314B8;
-			reinterpret_cast<float*>(panelState)[0xB] = reinterpret_cast<float*>(panelState)[0xB] + FLOAT_803314bc;
+			Mtx scaleMtx;
+			Mtx rotXMtx;
+			Mtx rotYMtx;
+			float* spl;
+			int cnt;
+			float* splR;
+			int cntR;
 
-			float t = static_cast<float>(static_cast<int>(panelState[1])) / FLOAT_803314c0;
-			float yResult = FLOAT_803313dc;
-			if (t >= gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4]) {
-				yResult = gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 3];
+			panelState[0] = 1;
+			reinterpret_cast<float*>(panelState)[7] = 0.6f;
+			reinterpret_cast<float*>(panelState)[8] = -1.4f;
+			float yResult = 0.0f;
+			reinterpret_cast<float*>(panelState)[9] = yResult;
+			reinterpret_cast<float*>(panelState)[0xD] = 0.5f;
+			reinterpret_cast<float*>(panelState)[0xE] = 0.5f;
+			reinterpret_cast<float*>(panelState)[0xF] = 0.5f;
+			reinterpret_cast<float*>(panelState)[10] = 0.17453292f;
+			reinterpret_cast<float*>(panelState)[0xB] = reinterpret_cast<float*>(panelState)[0xB] + 0.017453292f;
+
+			float t = static_cast<float>(static_cast<int>(panelState[1])) / 25.0f;
+			cnt = gWmModelYOffsetSplineCount;
+			spl = gWmModelYOffsetSpline;
+			float* end = spl + cnt * 4;
+			if (t >= end[-4]) {
+				yResult = end[-3];
 			} else {
 				int idx = 0;
-				float* spline = gWmModelYOffsetSpline;
-				for (int n =  (gWmModelYOffsetSplineCount - 0); n > 0; n--) {
+				float* spline = spl;
+				for (int n = cnt; n != 0; n--) {
 					if (t <= *spline) {
 						if (idx == 0) {
-							yResult = gWmModelYOffsetSpline[idx * 4 + 1];
+							yResult = spl[idx * 4 + 1];
 						} else {
-							float* cur = gWmModelYOffsetSpline + idx * 4;
-							float* prev = gWmModelYOffsetSpline + (idx - 1) * 4;
+							float* cur = spl + idx * 4;
+							float* prev = spl + (idx - 1) * 4;
 							float width = *cur - *prev;
 							float u = (t - *prev) / width;
 							float u2 = u * u;
 							float u3 = u2 * u;
 							yResult =
-							    width * (prev[3] * (u + (u3 - FLOAT_803314c8 * u2)) + cur[2] * (u3 - u2)) +
-							    (prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2)) +
-							    cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2));
+							    width * (prev[3] * (u + (u3 - 2.0f * u2)) + cur[2] * (u3 - u2)) +
+							    (prev[1] * (1.0f + (2.0f * u3 - 3.0f * u2)) +
+							    cur[1] * (-2.0f * u3 + 3.0f * u2));
 						}
 						break;
 					}
@@ -11349,26 +11342,29 @@ void CMenuPcs::CalcMcObj()
 			}
 			reinterpret_cast<float*>(panelState)[8] = reinterpret_cast<float*>(panelState)[8] + yResult;
 
-			float rotResult = FLOAT_803313dc;
-			t = static_cast<float>(static_cast<int>(panelState[1])) / FLOAT_803314c0;
-			if (!(t >= gWmModelRotationSpline[gWmModelRotationSplineCount * 4 - 4])) {
+			float rotResult = 0.0f;
+			t = static_cast<float>(static_cast<int>(panelState[1])) / 25.0f;
+			cntR = gWmModelRotationSplineCount;
+			splR = gWmModelRotationSpline;
+			float* endR = splR + cntR * 4;
+			if (!(t >= endR[-4])) {
 				int idx = 0;
-				float* spline = gWmModelRotationSpline;
-				for (int n = gWmModelRotationSplineCount; n > 0; n--) {
+				float* spline = splR;
+				for (int n = cntR; n != 0; n--) {
 					if (t <= *spline) {
 						if (idx == 0) {
-							rotResult = gWmModelRotationSpline[idx * 4 + 1];
+							rotResult = splR[idx * 4 + 1];
 						} else {
-							float* cur = gWmModelRotationSpline + idx * 4;
-							float* prev = gWmModelRotationSpline + (idx - 1) * 4;
+							float* cur = splR + idx * 4;
+							float* prev = splR + (idx - 1) * 4;
 							float width = *cur - *prev;
 							float u = (t - *prev) / width;
 							float u2 = u * u;
 							float u3 = u2 * u;
 							rotResult =
-							    width * (prev[3] * (u + (u3 - FLOAT_803314c8 * u2)) + cur[2] * (u3 - u2)) +
-							    (prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2)) +
-							    cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2));
+							    width * (prev[3] * (u + (u3 - 2.0f * u2)) + cur[2] * (u3 - u2)) +
+							    (prev[1] * (1.0f + (2.0f * u3 - 3.0f * u2)) +
+							    cur[1] * (-2.0f * u3 + 3.0f * u2));
 						}
 						break;
 					}
@@ -11376,13 +11372,9 @@ void CMenuPcs::CalcMcObj()
 					idx++;
 				}
 			} else {
-				rotResult = gWmModelRotationSpline[gWmModelRotationSplineCount * 4 - 3];
+				rotResult = endR[-3];
 			}
-			reinterpret_cast<float*>(panelState)[0xB] = FLOAT_803314bc * rotResult;
-
-			Mtx scaleMtx;
-			Mtx rotXMtx;
-			Mtx rotYMtx;
+			reinterpret_cast<float*>(panelState)[0xB] = 0.017453292f * rotResult;
 			PSMTXScale(scaleMtx, reinterpret_cast<float*>(panelState)[0xD], reinterpret_cast<float*>(panelState)[0xE],
 			           reinterpret_cast<float*>(panelState)[0xF]);
 			PSMTXRotRad(rotXMtx, 'x', reinterpret_cast<float*>(panelState)[10]);

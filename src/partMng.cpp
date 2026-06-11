@@ -115,7 +115,15 @@ static const char s_ReadPanLogFormat[] = "ReadPan fn=%s\n";
 static const char s_ReadPmdLogFormat[] = "ReadPmd fn=%s\n";
 static const char s_ReadPtxLogFormat[] = "ReadPtx fn=%s\n";
 static const char sPartMngChecksumErrorFmt[] = "CheckSum ERROR code=0x%x!!!\n";
-static const char sPartMngDumpSeparator[] = "----------------------------------\n";
+static const char sPartMngDumpVectorFmt[] = "%s=(%f %f %f)\n";
+static const char sPartMngDumpMatrixFmt[] =
+    "%s=\n{ %f %f %f %f }\n{ %f %f %f %f }\n{ %f %f %f %f }\n\n";
+static const char sPartMngDumpSeparator[] =
+    "=====================================================\n"
+    "=====================================================\n"
+    "                      pppDumpMngSt\n"
+    "=====================================================\n"
+    "=====================================================\n";
 static const char sPartMngDumpEntryFmt[] =
     "  prioTime=%d  prio=%d  heapSize=%d  pdtID=%2d  fpno=%3d   mngNo=%d  %s\n";
 static const char sPartMngHeapSummaryFmt[] =

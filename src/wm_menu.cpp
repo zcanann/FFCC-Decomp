@@ -10390,8 +10390,8 @@ void CMenuPcs::DrawMainMenuSub()
 	float depthValues[5];
 	unsigned int drawOrder[5];
 
-	Mtx44 projectionMtx;
 	Mtx lookAtMtx;
+	Mtx44 projectionMtx;
 	C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 	GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 	PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
@@ -10414,21 +10414,22 @@ void CMenuPcs::DrawMainMenuSub()
 	             *reinterpret_cast<unsigned int*>(worldObj + 0x778), *reinterpret_cast<unsigned int*>(worldObj + 0x77C));
 	PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
 
-	const double one = DOUBLE_80331420;
-	const double scaleX = DOUBLE_803315A0;
 	const float zSub = FLOAT_80331598;
-	const float zero = FLOAT_803313dc;
-	const float subY = FLOAT_803315b4;
-	const float subX = FLOAT_803315b0;
-	const double scaleY = DOUBLE_803315A8;
 	const Vec* posPtr = s_MMenuPos;
+	const double scaleX = DOUBLE_803315A0;
+	const double one = DOUBLE_80331420;
+	const double scaleY = DOUBLE_803315A8;
+	const float subX = FLOAT_803315b0;
+	const float subY = FLOAT_803315b4;
+	const float zero = FLOAT_803313dc;
 	int viewOff = 0;
 	for (int i = 0; i < 5; i++) {
 		Vec viewPos;
 		Vec4d clipPos;
 		viewPos.x = posPtr->x;
-		viewPos.z = posPtr->z - zSub;
+		viewPos.z = posPtr->z;
 		viewPos.y = posPtr->y;
+		viewPos.z = viewPos.z - zSub;
 		Math.MTX44MultVec4(screenMtx, &viewPos, &clipPos);
 		posPtr++;
 

@@ -52,6 +52,7 @@ extern const float FLOAT_80331FA0;
 extern const float FLOAT_80331FA4;
 extern const float FLOAT_80331FA8;
 extern const double DOUBLE_80331E90;
+extern const double DOUBLE_80331F98;
 extern const double DOUBLE_80331ED8;
 extern const double DOUBLE_80331EE0;
 extern const double DOUBLE_80331FB0;
@@ -2858,14 +2859,19 @@ void CMenuPcs::DrawResultCountAnim()
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(sprite->kind));
 
 				if ((signed char)s_CntTop <= i && i < (signed char)s_CntTop + activePartyCount) {
-					int value = s_Rinfo->m_party[i - (signed char)s_CntTop].m_totalValue;
+					int total = s_Rinfo->m_party[i - (signed char)s_CntTop].m_totalValue;
+					int value;
 					if (*(short*)(this->m_bonusStatePtr + 0x10) == 0) {
-						double frame = (double)*(short*)(this->m_bonusStatePtr + 0x22) - 8.0;
-						if (frame <= 0.0) {
+						double frame = (double)*(short*)(this->m_bonusStatePtr + 0x22) - DOUBLE_80331F98;
+						if (frame <= DOUBLE_80331E90) {
 							value = 0;
-						} else if (frame < (double)value) {
+						} else if (frame < (double)total) {
 							value = (int)frame;
+						} else {
+							value = total;
 						}
+					} else {
+						value = total;
 					}
 					unsigned int digits[3];
 					int digitCount;
@@ -2873,20 +2879,20 @@ void CMenuPcs::DrawResultCountAnim()
 					if (value >= 100) {
 						digitCount = 3;
 						digits[0] = value / 100;
-						value -= digits[0] * 100;
+						value -= (value / 100) * 100;
 						digits[1] = value / 10;
-						digits[2] = value - digits[1] * 10;
+						digits[2] = value - (value / 10) * 10;
 					} else if (value >= 10) {
 						digitCount = 2;
 						digits[0] = value / 10;
-						digits[1] = value - digits[0] * 10;
+						digits[1] = value - (value / 10) * 10;
 					} else {
 						digitCount = 1;
 						digits[0] = value;
 					}
 
 					float digitW = (float)sprite->w;
-					float digitX = (float)((3.0 * (double)sprite->w - (double)(digitCount * sprite->w)) * 0.5 + (double)sprite->x);
+					float digitX = (float)((DOUBLE_80331EC8 * (double)sprite->w - (float)(digitCount * sprite->w)) * DOUBLE_80331E78 + (double)sprite->x);
 					for (int digitIndex = 0; digitIndex < digitCount; digitIndex++) {
 						MenuPcs.DrawRect(0, digitX, (float)sprite->y, digitW, (float)sprite->h,
 						    digitW * (float)digits[digitIndex], sprite->mulY,

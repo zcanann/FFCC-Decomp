@@ -3624,8 +3624,8 @@ void CMenuPcs::CalcResultOpenAnim()
 				int w3 = sprite->w * 3;
 				int extent = w3 + 0x20;
 				int centerX = (int)(float)((double)(float)((double)w3 * DOUBLE_80331E78 + (double)sprite->x) - DOUBLE_80331EE8);
-				*(short*)(this->m_bonus.m_bonusBoardPtr + boardOff + 0x8 + half) = (short)centerX;
 				int centerY = (int)(float)((double)(float)((double)sprite->h * DOUBLE_80331E78 + (double)sprite->y) - DOUBLE_80331EF0);
+				*(short*)(this->m_bonus.m_bonusBoardPtr + boardOff + 0x8 + half) = (short)centerX;
 				*(short*)(this->m_bonus.m_bonusBoardPtr + boardOff + 0xa + half) = (short)centerY;
 				*(int*)(this->m_bonus.m_bonusBoardPtr + boardOff + 0x40 + half) = sprite->x - 0x10;
 				*(int*)(this->m_bonus.m_bonusBoardPtr + boardOff + 0x44 + half) = sprite->y - 0x10;

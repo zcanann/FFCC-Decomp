@@ -643,13 +643,13 @@ void CWind::Frame()
                 (obj->curPower < kWindPowerLowThreshold * obj->basePower)) {
                 rnd = Math.Rand(3);
                 if (rnd == 0) {
-                    f2 = kWindDirPositiveJitter;
+                    f1 = kWindDirPositiveJitter;
                 } else {
-                    f2 = kWindDirNegativeJitter;
+                    f1 = kWindDirNegativeJitter;
                 }
 
-                f1 = obj->baseDir;
-                obj->targetDir = f2 * f1 + obj->targetDir;
+                f2 = obj->baseDir;
+                obj->targetDir = f1 * f2 + obj->targetDir;
                 f0 = obj->targetDir;
                 f1 = obj->baseDir;
                 f1 = (f0 < f1) ? f1 : ((kWindDirMaxOffset + f1 < f0) ? kWindDirMaxOffset + f1 : f0);

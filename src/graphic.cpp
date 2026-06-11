@@ -1068,6 +1068,8 @@ void CGraphic::DrawSphere(float (*mtx)[4], _GXColor color)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_propagation off
 void CGraphic::makeSphere()
 {
     float vertices[126];
@@ -1075,7 +1077,7 @@ void CGraphic::makeSphere()
     int vertexCount = 0;
     vertices[0] = kGraphicSphereNegativeX;
     vertices[1] = kGraphicZeroF;
-    vertices[2] = kGraphicZeroF;
+    vertices[vertexCount * 3 + 2] = kGraphicZeroF;
 
     vertexCount++;
     float* vertex = &vertices[vertexCount * 3];
@@ -1174,6 +1176,7 @@ void CGraphic::makeSphere()
     m_sphereDisplayListSize = GXEndDisplayList();
     DCFlushRange(m_sphereDisplayList, m_sphereDisplayListSize);
 }
+#pragma pop
 
 /*
  * --INFO--

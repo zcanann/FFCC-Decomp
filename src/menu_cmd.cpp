@@ -2894,12 +2894,13 @@ unsigned int CMenuPcs::CmdClose2()
 
 		if (UniteCloseAnim(uniteIdx) != 0) {
 			ChkUnite(selected, combo);
+			int* comboSel = &combo[0][1];
 
 			s32 comboIdx = 0;
-			if (combo[0][1] < combo[1][1]) {
-				comboIdx = (modeSel == static_cast<u32>(combo[0][1])) ? 0 : 1;
+			if (comboSel[0] < comboSel[2]) {
+				comboIdx = (modeSel == static_cast<u32>(comboSel[0])) ? 0 : 1;
 			} else {
-				comboIdx = (modeSel == static_cast<u32>(combo[1][1])) ? 1 : 0;
+				comboIdx = (modeSel == static_cast<u32>(comboSel[2])) ? 1 : 0;
 			}
 
 			const s32 closeSel = GetCmdStateView(this)->selected;
@@ -2917,8 +2918,8 @@ unsigned int CMenuPcs::CmdClose2()
 			const s16 uniteCount = GetUniteRecipeCount(combo[comboIdx][0]);
 			const s16 uniteCmd = GetUniteRecipeCmd(combo[comboIdx][0]);
 			reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0])->UniteComList(
-			    combo[comboIdx][1], uniteCount, uniteCmd);
-			GetCmdStateView(this)->selected = static_cast<s16>(combo[comboIdx][1]);
+			    comboSel[comboIdx * 2], uniteCount, uniteCmd);
+			GetCmdStateView(this)->selected = static_cast<s16>(comboSel[comboIdx * 2]);
 			GetCmdStateView(this)->uniteState = 2;
 		}
 		return 0;

@@ -4007,20 +4007,20 @@ void CMenuPcs::CalcSingCMake()
         case5_out:
             result = done;
         } else {
+            int done;
             if (static_cast<int>(CmakeState(this)->m_stepTimer) != 0) {
                 CmakeState(this)->m_stepTimer =
                     static_cast<short>(CmakeState(this)->m_stepTimer - 1);
-                result = 0;
+                done = 0;
             } else {
-                int done;
                 if (CmakeState(this)->m_frame >= 10) {
                     done = 1;
                 } else {
                     CmakeState(this)->m_frame++;
                     done = 0;
                 }
-                result = done;
             }
+            result = done;
         }
         break;
     }

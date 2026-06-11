@@ -1019,7 +1019,7 @@ cylinder_body:
             }
         }
 
-        capB = -((localDirection.z * axisLen) - capB);
+        capB = capB - (localDirection.z * axisLen);
         disc = capB * capB - (f32)(axisLen * -((2.0 * pz) - axisLen) + capC);
         if (disc > 0.0) {
             disc = sqrtf(disc);

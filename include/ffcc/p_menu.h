@@ -621,7 +621,7 @@ public:
     void CompaInit();
     void CompaInit0();
     bool CompaOpen();
-    void CompaCtrl();
+    unsigned int CompaCtrl();
     bool CompaClose();
     void CompaDraw();
     void CalcMainMenuSub();

@@ -317,6 +317,7 @@ extern double DOUBLE_80331678;
 extern double DOUBLE_80331420;
 extern double DOUBLE_80331428;
 extern double DOUBLE_803314a8;
+extern double DOUBLE_803314A8;
 extern double DOUBLE_803314d0;
 extern double DOUBLE_803314f0;
 extern double DOUBLE_80331490;
@@ -6669,7 +6670,7 @@ void CMenuPcs::CalcFukidashi()
 	float nameWidthF = fontFC->GetWidth(nameBuffer);
 
 	int sVar15 = 0x4C;
-	*reinterpret_cast<short*>(BUB() + 0x38) =
+	*reinterpret_cast<short*>(BUB() + 0x70) =
 	    static_cast<short>(static_cast<int>(
 	        (FLOAT_80331704 - nameWidthF) * FLOAT_80331434 +
 	        static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(BUB())))));
@@ -6711,42 +6712,42 @@ void CMenuPcs::CalcFukidashi()
 		*reinterpret_cast<float*>(puVar20 + 4) = fVar1;
 		*reinterpret_cast<float*>(puVar20 + 5) = fVar1;
 		*reinterpret_cast<float*>(puVar20 + 6) = fVar2;
-		puVar20 = reinterpret_cast<int*>(WOBJ() + iVar19);
-		puVar20[0] = 0;
-		*reinterpret_cast<short*>(puVar20 + 2) = sVar15b;
-		*reinterpret_cast<short*>((int)(puVar20 + 2) + 2) = sVar22;
-		*reinterpret_cast<short*>(puVar20 + 3) = 0x140;
-		*reinterpret_cast<short*>((int)(puVar20 + 3) + 2) = 0xE0;
-		*reinterpret_cast<float*>(puVar20 + 4) = fVar1;
-		*reinterpret_cast<float*>(puVar20 + 5) = fVar1;
-		*reinterpret_cast<float*>(puVar20 + 6) = fVar2;
-		puVar20 = reinterpret_cast<int*>(WOBJ() + iVar18);
-		puVar20[0] = 0;
-		*reinterpret_cast<short*>(puVar20 + 2) = sVar15b;
-		*reinterpret_cast<short*>((int)(puVar20 + 2) + 2) = sVar22;
-		*reinterpret_cast<short*>(puVar20 + 3) = 0x140;
-		*reinterpret_cast<short*>((int)(puVar20 + 3) + 2) = 0xE0;
-		*reinterpret_cast<float*>(puVar20 + 4) = fVar1;
-		*reinterpret_cast<float*>(puVar20 + 5) = fVar1;
-		*reinterpret_cast<float*>(puVar20 + 6) = fVar2;
-		puVar20 = reinterpret_cast<int*>(WOBJ() + iVar17);
-		puVar20[0] = 0;
-		*reinterpret_cast<short*>(puVar20 + 2) = sVar15b;
-		*reinterpret_cast<short*>((int)(puVar20 + 2) + 2) = sVar22;
-		*reinterpret_cast<short*>(puVar20 + 3) = 0x140;
-		*reinterpret_cast<short*>((int)(puVar20 + 3) + 2) = 0xE0;
-		*reinterpret_cast<float*>(puVar20 + 4) = fVar1;
-		*reinterpret_cast<float*>(puVar20 + 5) = fVar1;
-		*reinterpret_cast<float*>(puVar20 + 6) = fVar2;
-		puVar20 = reinterpret_cast<int*>(WOBJ() + iVar16);
-		puVar20[0] = 0;
-		*reinterpret_cast<short*>(puVar20 + 2) = sVar15b;
-		*reinterpret_cast<short*>((int)(puVar20 + 2) + 2) = sVar22;
-		*reinterpret_cast<short*>(puVar20 + 3) = 0x140;
-		*reinterpret_cast<short*>((int)(puVar20 + 3) + 2) = 0xE0;
-		*reinterpret_cast<float*>(puVar20 + 4) = fVar1;
-		*reinterpret_cast<float*>(puVar20 + 5) = fVar1;
-		*reinterpret_cast<float*>(puVar20 + 6) = fVar2;
+		iVar19 = WOBJ() + iVar19;
+		*reinterpret_cast<int*>(iVar19) = 0;
+		*reinterpret_cast<short*>(iVar19 + 8) = sVar15b;
+		*reinterpret_cast<short*>(iVar19 + 0xA) = sVar22;
+		*reinterpret_cast<short*>(iVar19 + 0xC) = 0x140;
+		*reinterpret_cast<short*>(iVar19 + 0xE) = 0xE0;
+		*reinterpret_cast<float*>(iVar19 + 0x10) = fVar1;
+		*reinterpret_cast<float*>(iVar19 + 0x14) = fVar1;
+		*reinterpret_cast<float*>(iVar19 + 0x18) = fVar2;
+		iVar18 = WOBJ() + iVar18;
+		*reinterpret_cast<int*>(iVar18) = 0;
+		*reinterpret_cast<short*>(iVar18 + 8) = sVar15b;
+		*reinterpret_cast<short*>(iVar18 + 0xA) = sVar22;
+		*reinterpret_cast<short*>(iVar18 + 0xC) = 0x140;
+		*reinterpret_cast<short*>(iVar18 + 0xE) = 0xE0;
+		*reinterpret_cast<float*>(iVar18 + 0x10) = fVar1;
+		*reinterpret_cast<float*>(iVar18 + 0x14) = fVar1;
+		*reinterpret_cast<float*>(iVar18 + 0x18) = fVar2;
+		iVar17 = WOBJ() + iVar17;
+		*reinterpret_cast<int*>(iVar17) = 0;
+		*reinterpret_cast<short*>(iVar17 + 8) = sVar15b;
+		*reinterpret_cast<short*>(iVar17 + 0xA) = sVar22;
+		*reinterpret_cast<short*>(iVar17 + 0xC) = 0x140;
+		*reinterpret_cast<short*>(iVar17 + 0xE) = 0xE0;
+		*reinterpret_cast<float*>(iVar17 + 0x10) = fVar1;
+		*reinterpret_cast<float*>(iVar17 + 0x14) = fVar1;
+		*reinterpret_cast<float*>(iVar17 + 0x18) = fVar2;
+		iVar16 = WOBJ() + iVar16;
+		*reinterpret_cast<int*>(iVar16) = 0;
+		*reinterpret_cast<short*>(iVar16 + 8) = sVar15b;
+		*reinterpret_cast<short*>(iVar16 + 0xA) = sVar22;
+		*reinterpret_cast<short*>(iVar16 + 0xC) = 0x140;
+		*reinterpret_cast<short*>(iVar16 + 0xE) = 0xE0;
+		*reinterpret_cast<float*>(iVar16 + 0x10) = fVar1;
+		*reinterpret_cast<float*>(iVar16 + 0x14) = fVar1;
+		*reinterpret_cast<float*>(iVar16 + 0x18) = fVar2;
 		fVar2 = FLOAT_803314a4;
 		fVar1 = FLOAT_803313dc;
 	}
@@ -6843,7 +6844,7 @@ void CMenuPcs::CalcFukidashi()
 
 		puVar20[1] = puVar20[1] + 1;
 		if (static_cast<double>(static_cast<float>(static_cast<double>(puVar20[1]))) >=
-		    DOUBLE_803314a8 * static_cast<double>(gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4])) {
+		    DOUBLE_803314A8 * static_cast<double>(gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4])) {
 			puVar20[1] = 0;
 		}
 	}
@@ -6925,7 +6926,7 @@ void CMenuPcs::CalcFukidashi()
 
 				puVar20[1] = puVar20[1] + 1;
 				if (static_cast<double>(static_cast<float>(static_cast<double>(puVar20[1]))) >=
-				    DOUBLE_803314a8 * static_cast<double>(gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4])) {
+				    DOUBLE_803314A8 * static_cast<double>(gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4])) {
 					puVar20[1] = 0;
 				}
 				slotIdx++;

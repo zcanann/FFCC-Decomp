@@ -29,39 +29,38 @@ static signed char s_place[16];
 inline void CMenuPcs::MoneySetPlace(int row)
 {
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+	int digitPlace = 1;
+	int digitIndex;
+	int started = 0;
 	int gil;
+
 	if (row != 0) {
 		gil = s_Money;
+		digitIndex = 0;
 	} else {
 		gil = caravanWork->m_gil;
+		digitIndex = 0;
 	}
 
-	signed char* place = s_place + row * 8;
-	int digitPlace = 10000000;
-	int digitIndex = 0;
-	int digitCount = 8;
-	int started = 0;
+	digitPlace *= 10000000;
 
 	do {
 		if ((!started) && (gil >= digitPlace)) {
 			started = 1;
 		}
 		if (((!started) && (gil < digitPlace)) && (digitIndex < 7)) {
-			*place = -1;
+			s_place[row * 8 + digitIndex] = -1;
 		} else {
-			int quotient = gil / digitPlace;
-			int digit = quotient;
+			int digit = gil / digitPlace;
 			if (9 < digit) {
 				digit = 9;
 			}
-			*place = static_cast<signed char>(digit);
-			gil = gil - quotient * digitPlace;
+			s_place[row * 8 + digitIndex] = static_cast<signed char>(digit);
+			gil = gil % digitPlace;
 		}
-		place++;
 		digitIndex++;
 		digitPlace /= 10;
-		digitCount--;
-	} while (digitCount != 0);
+	} while (digitIndex < 8);
 }
 
 STATIC_ASSERT(offsetof(CMenuPcs, m_fonts) == 0xF8);
@@ -107,8 +106,10 @@ STATIC_ASSERT(sizeof(MoneyMenuAnimList) == 0x1008);
 int CMenuPcs::MoneyCtrlCur()
 {
 	bool blocked;
-	unsigned int press;
-	unsigned int hold;
+	u16 pressRaw;
+	u16 holdRaw;
+	s16 hold;
+	s16 press;
 
 	int padLock = Pad.m_debugPadLock;
 	blocked = false;
@@ -116,32 +117,34 @@ int CMenuPcs::MoneyCtrlCur()
 		blocked = true;
 	}
 	if (blocked) {
-		press = 0;
+		pressRaw = 0;
 	} else {
 		int padIndex = 0;
 		padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
-		press = Pad.GetPadInputs()[padIndex].buttonDown[0];
+		pressRaw = Pad.GetPadInputs()[padIndex].buttonDown[0];
 	}
+	press = (s16)(u16)pressRaw;
 
 	blocked = false;
 	if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
 		blocked = true;
 	}
 	if (blocked) {
-		hold = 0;
+		holdRaw = 0;
 	} else {
 		int padIndex = 0;
 		padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
-		hold = Pad.GetPadInputs()[padIndex].repeatButton;
+		holdRaw = Pad.GetPadInputs()[padIndex].repeatButton;
 	}
+	hold = (s16)(u16)holdRaw;
 
 	if (hold == 0) {
 		return 0;
 	}
 
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
-	int mode = this->m_moneyState->mode;
 	int maxDigits = 1;
+	int mode = this->m_moneyState->mode;
 	int maxGil = caravanWork->m_gil;
 	int digitPlace = 10;
 
@@ -156,7 +159,8 @@ int CMenuPcs::MoneyCtrlCur()
 	int attachFlag = SingGetLetterAttachflg();
 
 	if (mode == 0) {
-		int cursor = this->m_moneyState->selections[mode];
+		s16* sel = &this->m_moneyState->selections[mode];
+		int cursor = *sel;
 		unsigned int placeValue = 1;
 		while (0 < cursor) {
 			placeValue *= 10;
@@ -167,11 +171,10 @@ int CMenuPcs::MoneyCtrlCur()
 			if (caravanWork->m_gil == 0) {
 				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			} else {
-				unsigned int gil = s_Money + placeValue;
-				gil = (gil <= (unsigned int)caravanWork->m_gil) ? gil : 0u;
+				int gil = s_Money + placeValue;
+				gil = (gil <= caravanWork->m_gil) ? gil : 0;
 				s_Money = gil;
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
-				gil = s_Money;
 
 				MoneySetPlace(1);
 			}
@@ -181,8 +184,8 @@ int CMenuPcs::MoneyCtrlCur()
 				if (gil == 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else {
-					if (-1 < (int)(s_Money - placeValue)) {
-						gil = s_Money - placeValue;
+					if (0 <= (int)(s_Money - placeValue)) {
+						gil = (int)(s_Money - placeValue);
 					}
 					s_Money = gil;
 					MoneySetPlace(1);
@@ -225,7 +228,7 @@ int CMenuPcs::MoneyCtrlCur()
 				}
 				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			} else if ((press & 0x100) != 0) {
-				if (s_Money < 1) {
+				if ((int)s_Money <= 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else {
 					if (attachFlag >= 0) {
@@ -278,10 +281,11 @@ int CMenuPcs::MoneyCtrlCur()
 
 		if ((hold & 0xC) == 0) {
 			if ((press & 0x100) != 0) {
-				if (((int)this->m_moneyState->messageMask & (1 << this->m_moneyState->selections[mode])) == 0) {
+				int sel = this->m_moneyState->selections[mode];
+				if (((int)this->m_moneyState->messageMask & (1 << sel)) == 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else {
-					if (this->m_moneyState->selections[mode] == 0) {
+					if (sel == 0) {
 						caravanWork->FGPutGil(static_cast<int>(s_Money));
 						s_Money = 0;
 						MoneySetPlace(0);
@@ -316,23 +320,26 @@ void CMenuPcs::MoneyDraw()
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	int selectionState = this->m_moneyState->listState;
-	int mode = this->m_moneyState->mode;
 	MoneyMenuAnim* entry = this->m_moneyPanel->anims;
+	int i;
+	GXColor color;
+	float x;
+	float y;
+	int mode = this->m_moneyState->mode;
 
-	for (int i = 0; i < this->m_moneyPanel->count; i++, entry++) {
+	for (i = 0; i < this->m_moneyPanel->count; i++, entry++) {
 		int tex = entry->tex;
 		if (tex < 0) {
 			continue;
 		}
 
-		float x = (float)entry->x;
-		float y = (float)entry->y;
+		x = (float)entry->x;
+		y = (float)entry->y;
 		float w = (float)entry->w;
 		float h = (float)entry->h;
 		float u = entry->u;
 		float v = entry->v;
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
-		GXColor color;
 		color.r = 0xFF;
 		color.g = 0xFF;
 		color.b = 0xFF;
@@ -345,7 +352,6 @@ void CMenuPcs::MoneyDraw()
 	MoneyMenuAnim* drawBase = this->m_moneyPanel->anims;
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x5D));
 	{
-		GXColor color;
 		color.r = 0xFF;
 		color.g = 0xFF;
 		color.b = 0xFF;
@@ -353,9 +359,9 @@ void CMenuPcs::MoneyDraw()
 		GXSetChanMatColor(GX_COLOR0A0, color);
 	}
 
-	for (int i = 0; i < 2; i++) {
-		float y = (float)(drawBase->y + 0x18) + 32.0f * (float)i;
-		float x = (float)(drawBase->x + 0x20);
+	for (i = 0; i < 2; i++) {
+		y = (float)(drawBase->y + 0x18) + 32.0f * (float)i;
+		x = (float)(drawBase->x + 0x20);
 		for (int j = 0; j < 8; j++) {
 			signed char digit = s_place[i * 8 + j];
 			if (digit >= 0) {
@@ -370,7 +376,6 @@ void CMenuPcs::MoneyDraw()
 	if ((mode == 0) && (selectionState == 1)) {
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x48));
 		{
-			GXColor color;
 			color.r = 0xFF;
 			color.g = 0xFF;
 			color.b = 0xFF;
@@ -396,7 +401,7 @@ void CMenuPcs::MoneyDraw()
 	}
 
 	const char* label = GetMenuStr(0x15);
-	for (int i = 0; i < 2; i++) {
+	for (i = 0; i < 2; i++) {
 		font->SetPosX((float)(drawBase->x + 0xB6));
 		font->SetPosY((32.0f + ((float)(drawBase->y + 0x18) + 32.0f * (float)i)) -
 		              19.8f - 4.0f);
@@ -413,11 +418,13 @@ void CMenuPcs::MoneyDraw()
 
 	if ((mode != 0) && (this->m_moneyState->optionState == 1)) {
 		MenuWindowInfo* window = this->m_menuWindowInfo;
-		float cursorY = (float)(window->y + 0x20);
-		cursorY += (float)(this->m_moneyState->selections[1] * SingWinMessHeight());
+		y = (float)(window->y + 0x20);
+		y += (float)(this->m_moneyState->selections[1] * SingWinMessHeight());
 
 		int anim = (int)System.m_frameCounter % 8;
-		DrawCursor((unsigned int)((float)window->x + (float)anim), (int)cursorY, 1.0f);
+		x = (float)window->x;
+		x += (float)anim;
+		DrawCursor((int)x, (int)y, 1.0f);
 	}
 }
 
@@ -564,7 +571,7 @@ bool CMenuPcs::MoneyOpen()
 		firstAnim->uvScale = 1.0f;
 		firstAnim->startFrame = 0;
 		firstAnim->duration = 10;
-		this->m_moneyPanel->count = 1;
+		this->m_moneyPanel->count = entryIndex;
 
 		s_Money = 0;
 		int row = 0;

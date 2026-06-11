@@ -1945,9 +1945,10 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
                 System.Printf(const_cast<char*>(strBase + 0x4c));
             }
 
-            int offset2;
             int i;
-            offset2 = i = 0;
+            int offset2;
+            i = 0;
+            offset2 = i;
             for (; i < m_cacheCount; i++) {
                 CAmemCache& entry = *reinterpret_cast<CAmemCache*>(reinterpret_cast<char*>(m_cacheTable) + offset2);
                 if (((entry.m_inUse != 0) || (entry.m_cacheData != 0)) && (static_cast<unsigned int>(System.m_execParam) >= 3)) {

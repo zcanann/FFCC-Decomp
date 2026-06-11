@@ -2741,8 +2741,8 @@ void CMenuPcs::CalcResultCloseAnim()
 	Mtx rotXMtx;
 	Mtx rotYMtx;
 	{
-		int i = 0;
 		int total2 = activePartyCount * 2;
+		int i = 0;
 		int alphaOff = (total2 + 1) * 0x40;
 		int partyOff = i;
 		for (; i < total2; i++) {

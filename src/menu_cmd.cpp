@@ -2491,6 +2491,9 @@ void CMenuPcs::DrawUniteList()
  */
 int CMenuPcs::UniteOpenAnim(int topIdx)
 {
+	int finished;
+	float targetX;
+
 	if (s_unitePanelCount == 0) {
 		return 1;
 	}
@@ -2514,8 +2517,8 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 			}
 		}
 	} else {
-		int finished = 0;
-		float targetX = kCmdMenuPanelSize64 + baseX;
+		finished = 0;
+		targetX = kCmdMenuPanelSize64 + baseX;
 		s32* top = &s_UniteTop[finished];
 		for (int i = 0; i < s_unitePanelCount; i++) {
 			for (int j = 0; j < 3; j++) {

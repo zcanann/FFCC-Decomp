@@ -418,6 +418,13 @@ struct MenuOptLayout14 {
 struct MenuOptPair {
 	f32 x, y;
 };
+struct MenuOptText5 {
+	char* p0;
+	char* p1;
+	char* p2;
+	char* p3;
+	char* p4;
+};
 struct MenuOptLayoutPairs {
 	MenuOptPair p[5];
 };
@@ -426,7 +433,7 @@ struct MenuOptLayoutPairs {
 
 void CMenuPcs::DrawOptionMenu()
 {
-	const f32* layoutBase = s_MenuOptionEstandarEs.m_layout;
+	const f32* layoutBase = reinterpret_cast<const f32*>(lbl_801E3058 + 0x694);
 	CFont* font = m_fonts[0];
 	int langRow = Game.m_gameWork.m_languageId - 1;
 	f32 rowWidth;
@@ -442,13 +449,15 @@ void CMenuPcs::DrawOptionMenu()
 	color.b = 0xFF;
 	color.a = static_cast<unsigned char>(static_cast<int>(kOptionMenuAlphaMax * m_optionOpenAnim));
 
-	char* optionText[5] = {};
-	char* helpText[5] = {};
+	char* optionText[5];
+	char* helpText[5];
 	char** mes = &g_strMenuUtilMes[langRow * 20];
 	int idx = 2;
+	*reinterpret_cast<MenuOptText5*>(optionText) = *reinterpret_cast<const MenuOptText5*>(&layoutBase[0]);
 	for (int n = 0; n < 5; n++) {
 		optionText[n] = mes[idx++];
 	}
+	*reinterpret_cast<MenuOptText5*>(helpText) = *reinterpret_cast<const MenuOptText5*>(&layoutBase[5]);
 	for (int n = 0; n < 5; n++) {
 		helpText[n] = mes[idx++];
 	}
@@ -909,9 +918,8 @@ void CMenuPcs::DrawOptionMenu()
 		int y = k;
 		int uvY =  (k | 0);
 		int uvY2 = 0x18;
-		unsigned int modeU = 0x280;
-		int __p1 = i;
-		for (int i = 0; __p1 < 4; i++, y += 0x28, uvY += 0x20, uvY2 += 0x20, modeU += 0x40, k = 0) {
+		int modeU = 0x280;
+		for (int i = 0; i < 4; i++, y += 0x28, uvY += 0x20, uvY2 += 0x20, modeU += 0x40, k = 0) {
 			CTexture* cursorPanel = GetTextureSetTexture(GetMenuTextureSet(this, 0xBC), 4);
 			float cursorWidth = static_cast<float>(cursorPanel->m_width);
 			float cursorHeight = static_cast<float>(cursorPanel->m_height);
@@ -920,7 +928,8 @@ void CMenuPcs::DrawOptionMenu()
 				             static_cast<unsigned int>(cursorWidth), static_cast<unsigned int>(cursorHeight));
 				gUtil.CalcUV(uv1.x, uv1.y, static_cast<unsigned int>(cursorWidth), 0x28,
 				             static_cast<unsigned int>(cursorWidth), static_cast<unsigned int>(cursorHeight));
-				gUtil.RenderTextureQuad(pts.p[k].x, pts.p[k].y + static_cast<float>(y), kOptionSelectorHeight,
+				const MenuOptPair* pp = &pts.p[k];
+				gUtil.RenderTextureQuad(pp->x, pp->y + static_cast<float>(y), kOptionSelectorHeight,
 				                        kOptionLargeIconSize, cursorPanel, &uv0, &uv1, &color, GX_BL_SRCALPHA,
 				                        GX_BL_INVSRCALPHA);
 			}
@@ -930,7 +939,8 @@ void CMenuPcs::DrawOptionMenu()
 				             static_cast<unsigned int>(cursorHeight));
 				gUtil.CalcUV(uv1.x, uv1.y, static_cast<unsigned int>(cursorWidth), static_cast<unsigned int>(cursorHeight),
 				             static_cast<unsigned int>(cursorWidth), static_cast<unsigned int>(cursorHeight));
-				gUtil.RenderTextureQuad(pts.p[k + 1].x, pts.p[k + 1].y + static_cast<float>(y),
+				const MenuOptPair* pp1 = &pts.p[k + 1];
+				gUtil.RenderTextureQuad(pp1->x, pp1->y + static_cast<float>(y),
 				                        cursorWidth, kOptionMeterSegmentSize, cursorPanel,
 				                        &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
@@ -938,7 +948,7 @@ void CMenuPcs::DrawOptionMenu()
 				             static_cast<unsigned int>(cursorWidth), static_cast<unsigned int>(cursorHeight));
 				gUtil.CalcUV(uv1.x, uv1.y, 0, static_cast<unsigned int>(cursorHeight),
 				             static_cast<unsigned int>(cursorWidth), static_cast<unsigned int>(cursorHeight));
-				gUtil.RenderTextureQuad(cursorWidth + pts.p[k + 1].x, pts.p[k + 1].y + static_cast<float>(y),
+				gUtil.RenderTextureQuad(cursorWidth + pp1->x, pp1->y + static_cast<float>(y),
 				                        cursorWidth, kOptionMeterSegmentSize, cursorPanel,
 				                        &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 			}
@@ -951,30 +961,33 @@ void CMenuPcs::DrawOptionMenu()
 			gUtil.CalcUV(uv0.x, uv0.y, static_cast<unsigned int>(modeW - kOptionSelectorHeight),
 			             uvY, modeWidth, modeHeight);
 			gUtil.CalcUV(uv1.x, uv1.y, modeWidth, uvY2, modeWidth, modeHeight);
-			int modeXi = static_cast<int>(static_cast<float>(modeU) - pts.p[k + 2].x);
+			const MenuOptPair* pp2 = &pts.p[k + 2];
+			int modeXi = static_cast<int>(static_cast<float>(modeU) - pp2->x);
 			gUtil.RenderTextureQuad(static_cast<float>(static_cast<int>(static_cast<float>(modeXi) *
-			                                           specialRowCos + pts.p[k + 2].x)),
-			                        pts.p[k + 2].y + static_cast<float>(y), kOptionLargeIconSize, kOptionSmallIconSize,
+			                                           specialRowCos + pp2->x)),
+			                        pp2->y + static_cast<float>(y), kOptionLargeIconSize, kOptionSmallIconSize,
 			                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
-			int step1 = static_cast<int>(kOptionSmallIconSize + (static_cast<float>(modeU) - pts.p[k + 3].x));
-			int textXi = static_cast<int>(pts.p[k + 3].x + static_cast<float>(step1) * specialRowCos);
+			const MenuOptPair* pp3 = &pts.p[k + 3];
+			int step1 = static_cast<int>(kOptionSmallIconSize + (static_cast<float>(modeU) - pp3->x));
+			int textXi = static_cast<int>(pp3->x + static_cast<float>(step1) * specialRowCos);
 			if (m_specialModeFlags[i] == 0) {
 				gUtil.CalcUV(uv0.x, uv0.y, 0, uvY, modeWidth, modeHeight);
 				gUtil.CalcUV(uv1.x, uv1.y, 0x78, (i + 1) * 0x20, modeWidth, modeHeight);
-				gUtil.RenderTextureQuad(static_cast<float>(textXi), pts.p[k + 3].y + static_cast<float>(y),
+				gUtil.RenderTextureQuad(static_cast<float>(textXi), pp3->y + static_cast<float>(y),
 				                        kOptionSelectorWidth, kOptionCursorSize,
 				                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 				CFont* fnt = m_fonts[0];
 				char* txt = OPT_MES(18);
-				int textXi2 = static_cast<int>(pts.p[k + 4].x + static_cast<float>(step1) * specialRowCos);
+				const MenuOptPair* pp4 = &pts.p[k + 4];
+				int textXi2 = static_cast<int>(pp4->x + static_cast<float>(step1) * specialRowCos);
 				fnt->SetMargin(kOptionAnimMax);
 				fnt->SetShadow(1);
 				fnt->SetScale(kOptionAnimMax);
 				DrawFont(static_cast<int>(static_cast<float>((kOptionSelectorWidth - fnt->GetWidth(txt)) *
 				                          kOptionHalf64 + textXi2)),
 				         static_cast<int>(kOptionTextYOffset + (kOptionModeTextYOffset +
-				                          (pts.p[k + 4].y + static_cast<float>(y)))), color, 7,
+				                          (pp4->y + static_cast<float>(y)))), color, 7,
 				         txt, kOptionAnimMax, kOptionAnimMax);
 			} else {
 				CFont* fnt = m_fonts[0];
@@ -985,13 +998,14 @@ void CMenuPcs::DrawOptionMenu()
 				DrawFont(static_cast<int>(static_cast<float>((kOptionSelectorWidth - fnt->GetWidth(txt)) *
 				                          kOptionHalf64 + textXi)),
 				         static_cast<int>(kOptionTextYOffset + (kOptionModeTextYOffset +
-				                          (pts.p[k + 3].y + static_cast<float>(y)))), color, 7,
+				                          (pp3->y + static_cast<float>(y)))), color, 7,
 				         txt, kOptionAnimMax, kOptionAnimMax);
-				int panelXi = static_cast<int>(pts.p[k + 4].x + static_cast<float>(step1) * specialRowCos);
+				const MenuOptPair* pp4e = &pts.p[k + 4];
+				int panelXi = static_cast<int>(pp4e->x + static_cast<float>(step1) * specialRowCos);
 				gUtil.CalcUV(uv0.x, uv0.y, 0x78, uvY, modeWidth, modeHeight);
 				gUtil.CalcUV(uv1.x, uv1.y, 0xE0, (i + 1) * 0x20, modeWidth, modeHeight);
 				gUtil.RenderTextureQuad(static_cast<float>(panelXi),
-				                        pts.p[k + 4].y + static_cast<float>(y), kOptionStereoTextOffset, kOptionCursorSize,
+				                        pp4e->y + static_cast<float>(y), kOptionStereoTextOffset, kOptionCursorSize,
 				                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 			}
 		}

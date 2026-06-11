@@ -3175,33 +3175,27 @@ int CMenuPcs::SingWinMessHeight()
 int CMenuPcs::ChkEquipPossible(int itemNo)
 {
     unsigned int genderMask = 0x10;
-    s16 flags = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 4);
+    int flags = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 4);
+    int raceBits = flags & 0xF;
+    int genderBits = flags & 0x30;
     unsigned int raceMask = 1 << (SingleCaravanWork()->m_tribeId & 3);
 
     if (SingleCaravanWork()->m_genderFlag != 0) {
         genderMask = 0x20;
     }
 
-    int raceBits = flags & 0xF;
-    int genderBits = flags & 0x30;
-
     unsigned int result;
-    if (raceBits != 0) {
-        if (genderBits != 0) {
-            if (((raceBits & raceMask) == 0) || ((genderBits & genderMask) == 0)) {
-                result = 0;
-            } else {
-                result = 1;
-            }
-            goto done;
+    if ((raceBits != 0) && (genderBits != 0)) {
+        if (((raceBits & raceMask) != 0) && ((genderBits & genderMask) != 0)) {
+            result = 1;
+        } else {
+            result = 0;
         }
-    }
-    if (raceBits == 0) {
-        result = (genderBits & genderMask) != 0;
-    } else {
+    } else if (raceBits != 0) {
         result = (raceBits & raceMask) != 0;
+    } else {
+        result = (genderBits & genderMask) != 0;
     }
-done:
     return result != 0;
 }
 

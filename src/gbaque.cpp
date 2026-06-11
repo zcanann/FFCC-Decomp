@@ -959,7 +959,8 @@ inline void GbaQueue::SetBuyData(int, unsigned int)
  */
 void GbaQueue::SetSmithData(int channel, unsigned int value)
 {
-	unsigned int* scriptFoodBase = Game.m_scriptFoodBase + channel;
+	unsigned int* foodBaseArr = Game.m_scriptFoodBase;
+	unsigned int* scriptFoodBase = foodBaseArr + channel;
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(*scriptFoodBase);
 	unsigned char* valueBytes = reinterpret_cast<unsigned char*>(&value);
 	const unsigned int itemSlot = valueBytes[2];
@@ -969,7 +970,8 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
 	caravanWork->DeleteItemIdx(itemSlot, 1);
 
 	const unsigned int itemTableBase = Game.unkCFlatData0[2] + baseItem * 0x48;
-	const int smithItem = *reinterpret_cast<unsigned short*>(itemTableBase + recipeIndex * 2 + 0x38);
+	unsigned short* recipeBase = reinterpret_cast<unsigned short*>(itemTableBase) + recipeIndex;
+	const int smithItem = recipeBase[0x1C];
 
 	unsigned int materialTable = itemTableBase;
 	for (int i = 0; i < 3; i++, materialTable += 2) {
@@ -2609,7 +2611,8 @@ void GbaQueue::ReplyLetter(int channel)
 		itemId = value & 0xffff;
 	}
 
-	unsigned int* scriptFoodBase = Game.m_scriptFoodBase + channel;
+	unsigned int* foodBaseArr = Game.m_scriptFoodBase;
+	unsigned int* scriptFoodBase = foodBaseArr + channel;
 	reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->FGLetterReply(arg0, arg1, itemId, gil);
 	Joybus.ClrRecvBuffer(channel);
 	Joybus.SendResult(channel, 0, 0x15, 0);

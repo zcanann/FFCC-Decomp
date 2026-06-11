@@ -2407,9 +2407,9 @@ foundTexture:
             textureSet->Create(readBuffer, HandleTextureStage(charaKind), 0, 0, 0, 0);
             loadTexture->m_textureSet = textureSet;
 
+            m_texLoadRef = loadTexture;
             File.Close(fileHandle);
 
-            m_texLoadRef = loadTexture;
             m_texLoadRef->AddRef();
             m_textureSet = reinterpret_cast<CLoadTexture*>(m_texLoadRef)->m_textureSet;
             m_textureSet->AddRef();

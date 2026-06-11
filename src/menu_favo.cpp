@@ -495,42 +495,12 @@ void CMenuPcs::FavoInit0()
 	entry->startFrame = 0;
 	entry->duration = 5;
 
-	count = (unsigned int)this->m_favoList->count;
-	entry = this->m_favoList->entries;
-	if (0 < (int)count) {
-		blockCount = count >> 3;
-		if (blockCount != 0) {
-			do {
-				entry[0].step = 0;
-				entry[0].alpha = alpha;
-				entry[1].step = 0;
-				entry[1].alpha = alpha;
-				entry[2].step = 0;
-				entry[2].alpha = alpha;
-				entry[3].step = 0;
-				entry[3].alpha = alpha;
-				entry[4].step = 0;
-				entry[4].alpha = alpha;
-				entry[5].step = 0;
-				entry[5].alpha = alpha;
-				entry[6].step = 0;
-				entry[6].alpha = alpha;
-				entry[7].step = 0;
-				entry[7].alpha = alpha;
-				entry += 8;
-				blockCount = blockCount - 1;
-			} while (blockCount != 0);
-			count = count & 7;
-			if (count == 0) {
-				return;
-			}
-		}
-		do {
-			entry->step = 0;
-			entry->alpha = alpha;
-			entry++;
-			count = count - 1;
-		} while (count != 0);
+	list = this->m_favoList;
+	entry = list->entries;
+	for (int n = list->count; n > 0; n--) {
+		entry->step = 0;
+		entry->alpha = alpha;
+		entry++;
 	}
 }
 

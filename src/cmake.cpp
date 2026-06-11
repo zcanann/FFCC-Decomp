@@ -1533,9 +1533,7 @@ void CMenuPcs::CmakeResultDraw()
         } else if (i == 1) {
             value = GetMenuStr(static_cast<int>(s_CmakeInfo.m_gender) + 0x11);
         } else if (i == 2) {
-            value = GetTribeStr(static_cast<int>(s_CmakeInfo.m_tribe));
-
-            strcpy(tribeWithSlash, value);
+            strcpy(tribeWithSlash, GetTribeStr(static_cast<int>(s_CmakeInfo.m_tribe)));
             strcat(tribeWithSlash, "/", sizeof(tribeWithSlash));
             value = tribeWithSlash;
         } else {

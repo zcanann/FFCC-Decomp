@@ -106,8 +106,8 @@ STATIC_ASSERT(sizeof(MoneyMenuAnimList) == 0x1008);
 int CMenuPcs::MoneyCtrlCur()
 {
 	bool blocked;
-	unsigned int press;
-	unsigned int hold;
+	u16 pressRaw;
+	u16 holdRaw;
 
 	int padLock = Pad.m_debugPadLock;
 	blocked = false;
@@ -115,24 +115,26 @@ int CMenuPcs::MoneyCtrlCur()
 		blocked = true;
 	}
 	if (blocked) {
-		press = 0;
+		pressRaw = 0;
 	} else {
 		int padIndex = 0;
 		padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
-		press = Pad.GetPadInputs()[padIndex].buttonDown[0];
+		pressRaw = Pad.GetPadInputs()[padIndex].buttonDown[0];
 	}
+	s16 press = pressRaw;
 
 	blocked = false;
 	if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
 		blocked = true;
 	}
 	if (blocked) {
-		hold = 0;
+		holdRaw = 0;
 	} else {
 		int padIndex = 0;
 		padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
-		hold = Pad.GetPadInputs()[padIndex].repeatButton;
+		holdRaw = Pad.GetPadInputs()[padIndex].repeatButton;
 	}
+	s16 hold = holdRaw;
 
 	if (hold == 0) {
 		return 0;
@@ -155,7 +157,8 @@ int CMenuPcs::MoneyCtrlCur()
 	int attachFlag = SingGetLetterAttachflg();
 
 	if (mode == 0) {
-		int cursor = this->m_moneyState->selections[mode];
+		s16* sel = &this->m_moneyState->selections[mode];
+		int cursor = *sel;
 		unsigned int placeValue = 1;
 		while (0 < cursor) {
 			placeValue *= 10;
@@ -166,11 +169,10 @@ int CMenuPcs::MoneyCtrlCur()
 			if (caravanWork->m_gil == 0) {
 				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			} else {
-				unsigned int gil = s_Money + placeValue;
-				gil = (gil <= (unsigned int)caravanWork->m_gil) ? gil : 0u;
+				int gil = s_Money + placeValue;
+				gil = (gil <= caravanWork->m_gil) ? gil : 0;
 				s_Money = gil;
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
-				gil = s_Money;
 
 				MoneySetPlace(1);
 			}
@@ -180,8 +182,8 @@ int CMenuPcs::MoneyCtrlCur()
 				if (gil == 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else {
-					if (-1 < (int)(s_Money - placeValue)) {
-						gil = s_Money - placeValue;
+					if (0 <= (int)(s_Money - placeValue)) {
+						gil = (int)(s_Money - placeValue);
 					}
 					s_Money = gil;
 					MoneySetPlace(1);
@@ -277,10 +279,11 @@ int CMenuPcs::MoneyCtrlCur()
 
 		if ((hold & 0xC) == 0) {
 			if ((press & 0x100) != 0) {
-				if (((int)this->m_moneyState->messageMask & (1 << this->m_moneyState->selections[mode])) == 0) {
+				int sel = this->m_moneyState->selections[mode];
+				if (((int)this->m_moneyState->messageMask & (1 << sel)) == 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else {
-					if (this->m_moneyState->selections[mode] == 0) {
+					if (sel == 0) {
 						caravanWork->FGPutGil(static_cast<int>(s_Money));
 						s_Money = 0;
 						MoneySetPlace(0);
